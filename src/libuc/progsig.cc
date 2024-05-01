@@ -49,8 +49,8 @@
 
 /* local defines */
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000		/* poll-time multiplier */
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000		/* poll-time multiplier */
 #endif
 
 #ifndef	MSGHDR
@@ -933,7 +933,7 @@ static int progsig_reqrecv(PROGSIG *uip,MSGDATA *mip)
 {
 	struct pollfd	fds[1] ;
 	cint	fd = uip->sfd ;
-	cint	mto = (5*POLLINTMULT) ;
+	cint	mto = (5*POLL_INTMULT) ;
 	cint	nfds = 1 ;
 	int		size ;
 	int		rs ;

@@ -56,17 +56,17 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_MAILALIAS= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_MAILALIAS= mailaliaschr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_MAILALIAS= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_MAILALIAS= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_MAILALIAS= sifext.o
+OBJ0_MAILALIAS= mailalias_obj.o
+OBJ1_MAILALIAS= 
+OBJ2_MAILALIAS= 
+OBJ3_MAILALIAS= 
+OBJ4_MAILALIAS= 
 
 
-OBJA_MAILALIAS= obj0_mailalias.o obj1_mailalias.o
+OBJA_MAILALIAS= obj0_mailalias.o
 OBJB_MAILALIAS= obj2_mailalias.o obj3_mailalias.o obj4_mailalias.o
 
-OBJ_MAILALIAS= $(OBJA_MAILALIAS) $(OBJB_MAILALIAS)
+OBJ_MAILALIAS= $(OBJA_MAILALIAS)
 
 
 default:		$(T).o

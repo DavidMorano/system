@@ -138,8 +138,8 @@
 
 /* local defines */
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000		/* poll-time multiplier */
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000		/* poll-time multiplier */
 #endif
 
 #ifndef	POLLTIMEINT
@@ -481,7 +481,7 @@ static int subinfo_readslow(SUBINFO *sip)
 	while ((rs >= 0) && ((sip->ulen - sip->tlen) > 0)) {
 	    int	f_break = FALSE ;
 
-	    if ((rs = u_poll(fds,1,POLLINTMULT)) > 0) {
+	    if ((rs = u_poll(fds,1,POLL_INTMULT)) > 0) {
 	        const int	re = fds[0].revents ;
 
 #if	CF_DEBUGS

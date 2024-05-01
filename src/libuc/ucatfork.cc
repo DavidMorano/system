@@ -100,8 +100,8 @@ namespace {
 	ucatfork_ent	*tail ;
     } ;
     struct ucatfork {
-	ptm		m ;		/* data mutex */
-	ucatfork_list	list ;		/* memory allocations */
+	ptm		mx ;		/* data mutex */
+	ucatfork_list	hlist ;		/* memory allocations */
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
@@ -182,21 +182,21 @@ int ucatfork::init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (!fvoid) {
-	    cint		to = utimeout[uto_busy] ;
+	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = m.create) >= 0) {
+	        if ((rs = mx.create) >= 0) {
 	            void_f	sb = ucatfork_atforkbefore ;
 	            void_f	sp = ucatfork_atforkparent ;
 	            void_f	sc = ucatfork_atforkchild ;
-	            if ((rs = pt_atfork(sb,sp,sc)) >= 0) {
+	            if ((rs = u_atfork(sb,sp,sc)) >= 0) {
 	                if ((rs = uc_atexit(ucatfork_exit)) >= 0) {
 	        	    finitdone = true ;
 	        	    f = true ;
 	                } /* end if (uc_atexit) */
-	            } /* end if (pt_atfork) */
+	            } /* end if (u_atfork) */
 		    if (rs < 0) {
-		        m.destroy() ;
+		        mx.destroy() ;
 		    }
 	        } /* end if (ptm-create) */
 	        if (rs < 0) {
@@ -230,7 +230,7 @@ int ucatfork::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = m.destroy() ;
+	        rs1 = mx.destroy() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    finit = false ;
@@ -252,7 +252,7 @@ int ucatfork::record(void_f sb,void_f sp,void_f sc) noex {
 	                if ((rs = ucatfork_trackbegin()) >= 0) {
 	                    cint	esize = sizeof(UCATFORK_ENT) ;
 	                    if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
-				ucatfork_list	*lp = &list ;
+				ucatfork_list	*lp = &hlist ;
 				entry_load(ep,sb,sp,sc) ;
 				list_add(lp,ep) ;
 	                    } /* end if (memory-allocation) */
@@ -280,7 +280,7 @@ int ucatfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	    if ((rs = init()) >= 0) {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	            if ((rs = m.lockbegin) >= 0) { /* single */
-			ucatfork_list	*lp = &list ;
+			ucatfork_list	*lp = &hlist ;
 	                if ((rs = ucatfork_trackbegin()) >= 0) {    
 	                    UCATFORK_ENT	*ep = lp->head ;
 	                    UCATFORK_ENT	*nep ;
@@ -318,7 +318,7 @@ int ucatfork::trackend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ftrack) {
-	    ucatfork_ent	*ep = list.head ;
+	    ucatfork_ent	*ep = hlist.head ;
 	    ucatfork_ent	*nep ;
 	    ftrack = false ;
 	    while (ep) {
@@ -327,8 +327,8 @@ int ucatfork::trackend() noex {
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
 	    } /* end while */
-	    list.head = nullptr ;
-	    list.tail = nullptr ;
+	    hlist.head = nullptr ;
+	    hlist.tail = nullptr ;
 	} /* end if (tracking was started) */
 	return rs ;
 }
@@ -339,7 +339,7 @@ void ucatfork::atforkbefore() noex {
 	int		rs = SR_OK ;
 	if (finitdone) {
 	    if ((rs = m.lockbegin) >= 0) {
-	        ucatfork_ent	*ep = list.tail ;
+	        ucatfork_ent	*ep = hlist.tail ;
 	        ucatfork_ent	*pep ;
 	        while (ep) {
 	            pep = ep->prev ;
@@ -357,7 +357,7 @@ void ucatfork::atforkparent() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
-	    ucatfork_ent	*ep = list.head ;
+	    ucatfork_ent	*ep = hlist.head ;
 	    ucatfork_ent	*nep ;
 	    while (ep) {
 	        nep = ep->next ;
@@ -378,7 +378,7 @@ void ucatfork::atforkchild() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
-	    ucatfork_ent	*ep = list.head ;
+	    ucatfork_ent	*ep = hlist.head ;
 	    ucatfork_ent	*nep ;
 	    while (ep) {
 	        nep = ep->next ;

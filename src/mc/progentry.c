@@ -29,12 +29,7 @@
 
 ******************************************************************************/
 
-
-#define	PROGENTRY_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -43,11 +38,12 @@
 #include	<string.h>
 
 #include	<usystem.h>
+#include	<mallocstuff.h>
 #include	<vecstr.h>
 #include	<varsub.h>
-#include	<field.h>
 #include	<sbuf.h>
-#include	<mallocstuff.h>
+#include	<field.h>
+#include	<fieldterms.h>
 #include	<localmisc.h>
 
 #include	"srvtab.h"
@@ -958,8 +954,7 @@ static int processargs(alp,args)
 vecstr		*alp ;
 char		args[] ;
 {
-	FIELD	fsb ;
-
+	field		fsb ;
 	int	rs = SR_OK ;
 	int	i = 0 ;
 
@@ -975,7 +970,7 @@ char		args[] ;
 	fieldterms(terms,0," \t") ;
 
 	if ((rs = field_start(&fsb,args,-1)) >= 0) {
-	    const int	flen = BUFLEN ;
+	    cint	flen = BUFLEN ;
 	    int		fl ;
 	    char	fbuf[BUFLEN + 1] ;
 

@@ -420,13 +420,13 @@ static int thread_start(THREAD *tip,pcspolls *op)
 	if ((rs = thrcomm_start(&tip->tc,0)) >= 0) {
 	    sigset_t	osm, nsm ;
 	    if ((rs = uc_sigsetfill(&nsm)) >= 0) {
-		if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
+		if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	    	    pthread_t	tid ;
 	    	    uptsub_t	fn = (uptsub_t) thread_worker ;
 	    	    if ((rs = uptcreate(&tid,NULL,fn,tip)) >= 0) {
 	    	        tip->tid = tid ;
 		    }
-		    pt_sigmask(SIG_SETMASK,&osm,NULL) ;
+		    u_sigmask(SIG_SETMASK,&osm,NULL) ;
 		} /* end if (sigmask) */
 	    } /* end if (signal handling) */
 	} /* end if (thrcomm-start) */

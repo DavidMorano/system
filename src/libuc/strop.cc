@@ -24,14 +24,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<six.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 #include	<baops.h>
+#include	<localmisc.h>
 
-#include	"six.h"			/* <- the money shot */
 #include	"strop.h"
 
 
@@ -49,12 +52,26 @@
 
 /* forward references */
 
-
-/* local subroutines */
-
-static inline bool iswhiteor(int ch,int tch) noex {
-	return CHAR_ISWHITE(ch) || (ch == tch) ;
+static bool iswhiteand(strop *sop,int tch) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return CHAR_ISWHITE(ch) && (ch != tch) ;
 }
+
+static bool isnotchr(strop *sop,int tch) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return (ch != tch) ;
+}
+
+static bool isnotterm(strop *sop,cchar *terms) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return (! batst(terms,ch)) ;
+}
+
+static bool isterm(strop *sop,cchar *terms) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return  batst(terms,ch) ;
+}
+
 
 /* local variables */
 
@@ -122,7 +139,7 @@ int strop_white(strop *sop) noex {
 }
 
 int strop_whitechr(strop *sop,int tch) noex {
-	while ((sop->sl > 0) && iswhiteor(sop->sp[0],tch)) {
+	while ((sop->sl > 0) && iswhiteand(sop,tch)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	}
@@ -131,7 +148,7 @@ int strop_whitechr(strop *sop,int tch) noex {
 /* end subroutine (strop_whitechr) */
 
 int strop_findchr(strop *sop,int tch) noex {
-	while ((sop->sl > 0) && (mkchar(sop->sp[0]) != tch)) {
+	while ((sop->sl > 0) && isnotchr(sop,tch)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	}
@@ -140,7 +157,7 @@ int strop_findchr(strop *sop,int tch) noex {
 /* end subroutine (strop_findchr) */
 
 int strop_findterm(strop *sop,cchar *terms) noex {
-	while ((sop->sl > 0) && (! batst(terms,sop->sp[0]))) {
+	while ((sop->sl > 0) && isnotterm(sop,terms)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	}
@@ -149,7 +166,7 @@ int strop_findterm(strop *sop,cchar *terms) noex {
 /* end subroutine (strop_findterm) */
 
 int strop_spanterm(strop *sop,cchar *terms) noex {
-	while ((sop->sl > 0) && batst(terms,sop->sp[0])) {
+	while ((sop->sl > 0) && isterm(sop,terms)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	}

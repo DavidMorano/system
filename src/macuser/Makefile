@@ -38,7 +38,7 @@ LINT= lint
 DEFS +=
 
 
-INCS += usystem.h localmisc.h
+INCS +=
 
 
 LIBS += -lmacuser
@@ -95,6 +95,8 @@ control:
 	(uname -n ; date) > Control
 
 
-main.o:			main.cc
+main.o:			main.cc			$(INCS)
+
+ccfile.o:		ccfile.cc ccfile.hh
 
 

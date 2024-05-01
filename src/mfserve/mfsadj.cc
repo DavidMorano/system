@@ -66,8 +66,8 @@
 #define	MFSADJ		struct mfsadj
 #define	MFSADJ_FL	struct mfsadj_fl
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	PBUFLEN
@@ -107,7 +107,7 @@ extern int	cfdecmfi(const char *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	listenusd(const char *,mode_t,int) ;
 extern int	msghdr_size(MSGHDR *) ;
-extern int	cmsghdr_passed(CMSGHDR *) ;
+extern int	cmsghdr_passed(CONMSGHDR *) ;
 extern int	isBadSend(int) ;
 extern int	isBadMsg(int) ;
 extern int	isNotPresent(int) ;

@@ -356,8 +356,8 @@ typedef const char	cc ;
 #define	NULLFNAME	"/dev/null"
 #endif
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000		/* poll-time multiplier */
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000		/* poll-interval-multiplier (to secs) */
 #endif
 
 #ifndef	NYEARS_CENTURY

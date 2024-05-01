@@ -68,6 +68,7 @@
 #include	<hasx.h>
 #include	<six.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<localmisc.h>
 
 #include	"mkquoted.h"

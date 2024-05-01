@@ -73,8 +73,8 @@
 #define	SHUT_RDWR	2
 #endif
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 
@@ -117,7 +117,7 @@ int		mxu ;
 	int		fdi = 0 ;
 	int		loopcount = 0 ;
 	int		stype, optlen ;
-	int		pollint = (10 * POLLINTMULT) ;
+	int		pollint = (10 * POLL_INTMULT) ;
 	int		pollinput = (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI) ;
 	int		polloutput = (POLLWRNORM | POLLWRBAND) ;
 	int		c_already = 0 ;
@@ -772,7 +772,7 @@ int		mxu ;
 #endif
 
 	    if (f && (c_already == 0)) {
-	        pollint = POLLINTMULT / 4 ;
+	        pollint = POLL_INTMULT / 4 ;
 	        c_already = 1 ;
 	    }
 

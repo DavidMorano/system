@@ -2,16 +2,12 @@
 
 /* subroutines to maintain status on machines */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -19,15 +15,13 @@
 
 /******************************************************************************
 
-	This subroutine will allocate structures for maintaining 	
+	This subroutine will allocate structures for maintaining
 	information on a remote machine.
-
 
 ******************************************************************************/
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
@@ -49,6 +43,7 @@
 #include	<vecitem.h>
 #include	<varsub.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<logfile.h>
 #include	<paramopt.h>
 #include	<localmisc.h>

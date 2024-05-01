@@ -51,8 +51,8 @@
 
 #define	O_SRVFLAGS	(O_RDWR | O_CREAT)
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	TIMEBUFLEN

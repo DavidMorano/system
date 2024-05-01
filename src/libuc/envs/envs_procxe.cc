@@ -64,15 +64,16 @@
 #include	<nulstr.h>
 #include	<bfile.h>
 #include	<field.h>
-#include	<char.h>
-#include	<mkchar.h>
+#include	<fieldterms.h>
 #include	<ascii.h>
 #include	<buffer.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
-#include	<ischarx.h>
 #include	<strn.h>
 #include	<vstrkeycmpx.h>
+#include	<char.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"envs.h"

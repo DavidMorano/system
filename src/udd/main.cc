@@ -10,13 +10,10 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #define	CF_DEBUGS	0
 #define	CF_DEBUG	0	
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -31,6 +28,7 @@
 #include	<userinfo.h>
 #include	<baops.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<logfile.h>
 #include	<getax.h>
 #include	<ugetpw.h>
@@ -100,7 +98,7 @@ const char	*envv[] ;
 	struct tm	ts, *timep ;
 	struct utimbuf	ft ;
 	struct passwd	ps, *pp ;
-	struct field	fsb, *fbp = &fsb ;
+	field		fsb, *fbp = &fsb ;
 	SERINFO		u ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;

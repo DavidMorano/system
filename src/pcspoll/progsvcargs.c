@@ -3,9 +3,7 @@
 /* process server file program arguments */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -18,18 +16,15 @@
 
 /*****************************************************************************
 
-        This subroutine is used to parse the SERVER program arguments from an
-        expanded (substituted) server file entry. Basically, we just
-        "field-SHELL" out arguments and put them into the supplied vector string
-        object.
+	This subroutine is used to parse the SERVER program arguments
+	from an expanded (substituted) server file entry.  Basically,
+	we just "field-SHELL" out arguments and put them into the
+	supplied vector string object.
 
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<netdb.h>
@@ -43,6 +38,7 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecstr.h>
 #include	<baops.h>
 #include	<localmisc.h>

@@ -3,18 +3,14 @@
 /* perform various functions on a job */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_PCSPROG	1		/* assume a PCS program first */
 #define	CF_UGETPW	1		/* use 'ugetpw(3uc)' */
 
-
 /* revision history:
 
 	= 1991-09-10, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -25,12 +21,9 @@
 	This subroutine is responsible for processing a job that
 	we have received in full.
 
-
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -40,13 +33,13 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 #include	<time.h>
 
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<logfile.h>
 #include	<vecitem.h>
 #include	<vecstr.h>
@@ -921,8 +914,8 @@ struct argparams	*sp ;
 	fieldterms(terms,0," \t") ;
 
 	if ((rs = field_start(&fsb,command,-1)) >= 0) {
-	    const int	flen = BUFLEN ;
-	    const int	elen = BUFLEN ;
+	    cint	flen = BUFLEN ;
+	    cint	elen = BUFLEN ;
 	    int		fl ;
 	    int		el ;
 	    char	fbuf[BUFLEN+1] ;

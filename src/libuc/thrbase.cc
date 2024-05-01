@@ -129,7 +129,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 	        sigset_t	osm{} ;
 	        sigset_t	nsm{} ;
 	        if ((rs = uc_sigsetfill(&nsm)) >= 0) {
-		    if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
+		    if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	                THRBASE_SI	*sip ;
 			cnullptr	np{} ;
 	                cint		sz = sizeof(THRBASE_SI) ;
@@ -148,7 +148,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 		                uc_free(sip) ;
 			    }
 	                } /* end if (memory-allocation) */
-		        rs1 = pt_sigmask(SIG_SETMASK,&osm,np) ;
+		        rs1 = u_sigmask(SIG_SETMASK,&osm,np) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (sigmask) */
 	        } /* end if (signal handling) */

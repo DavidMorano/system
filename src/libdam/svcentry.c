@@ -16,17 +16,13 @@
 
 /*******************************************************************************
 
-        This little object is used to create a program entry and to populate
-        aspects of it with different operations on the object. This object is
-        used in "server" types of programs. This object is usually created from
-        elements taken from the parsing of a server file.
-
+	This little object is used to create a program entry and
+	to populate aspects of it with different operations on the
+	object.  This object is used in "server" types of programs.
+	This object is usually created from elements taken from the
+	parsing of a server file.
 
 *******************************************************************************/
-
-
-#define	SVCENTRY_MASTER	0
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -40,6 +36,7 @@
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<sbuf.h>
 #include	<svcfile.h>
 #include	<mkchar.h>
@@ -900,15 +897,15 @@ char		abuf[] ;
 #endif
 
 	if ((abuf != NULL) && (abuf[0] != '\0')) {
-	    FIELD	fsb ;
-	    const int	alen = strlen(abuf) ;
+	    field	fsb ;
+	    cint	alen = strlen(abuf) ;
 	    uchar	terms[32] ;
 
 	    fieldterms(terms,FALSE," \t") ;
 
 	    if ((rs = field_start(&fsb,abuf,alen)) >= 0) {
-	        const int	flen = alen ;
-	        char		*fbuf ;
+	        cint	flen = alen ;
+	        char	*fbuf ;
 		if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	            int		fl ;
 	            while ((fl = field_sharg(&fsb,terms,fbuf,flen)) > 0) {

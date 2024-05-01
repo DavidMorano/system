@@ -110,8 +110,8 @@
 #define	NIOVECS		1
 #define	O_SRVFLAGS	(O_RDWR | O_CREAT)
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	TIMEBUFLEN
@@ -497,10 +497,10 @@ top:
 /* do the poll */
 
 	if (njobs <= 0)
-		to_poll = to_pollidle * POLLINTMULT ;
+		to_poll = to_pollidle * POLL_INTMULT ;
 
 	else
-		to_poll = to_pollidle * POLLINTMULT / 2 ;
+		to_poll = to_pollidle * POLL_INTMULT / 2 ;
 
 	if (f_child)
 	    to_poll = 100 ;

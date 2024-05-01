@@ -78,7 +78,7 @@ int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    if ((rs = strmgr_start(&d,dbuf,dlen)) >= 0) {
 		while ((rs >= 0) && cl--) {
 		    if (*cp == CH_NL) break ;
-		    rs = strmgr_char(&d,*cp) ;
+		    rs = strmgr_chr(&d,*cp) ;
 		    cp += 1 ;
 		} /* end while */
 		rs1 = strmgr_finish(&d) ;

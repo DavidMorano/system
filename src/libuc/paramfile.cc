@@ -43,6 +43,7 @@
 #include	<ascii.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<char.h>

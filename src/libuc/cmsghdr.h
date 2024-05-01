@@ -14,8 +14,8 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CMSGHDR_INCLUDE
-#define	CMSGHDR_INCLUDE
+#ifndef	CONMSGHDR_INCLUDE
+#define	CONMSGHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,11 +26,11 @@
 
 EXTERNC_begin
 
-extern int	cmsghdr_passed(CMSGHDR *) noex ;
+extern int	cmsghdr_passed(CONMSGHDR *) noex ;
 
 EXTERNC_end
 
 
-#endif /* CMSGHDR_INCLUDE */
+#endif /* CONMSGHDR_INCLUDE */
 
 

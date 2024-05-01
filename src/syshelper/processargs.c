@@ -3,9 +3,7 @@
 /* process server file program arguments */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -25,13 +23,9 @@
 	we just "field-SHELL" out arguments and put them into the
 	supplied vector string object.
 
-
 *****************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -39,15 +33,11 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<netdb.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 

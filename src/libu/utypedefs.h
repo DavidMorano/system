@@ -26,14 +26,13 @@
 #include	<sys/types.h>
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
-#include	<sys/time.h>		/* for 'u_adjtime(3u)' */
-#include	<sys/timeb.h>		/* for 'uc_ftime(3uc)' */
+#include	<sys/time.h>		/* for |u_adjtime(3u)| */
+#include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
 #include	<sys/resource.h>
 #include	<sys/resource.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
-#include	<sys/poll.h>
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
 #include	<sys/acl.h>
@@ -43,16 +42,15 @@
 
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>		/* for 'u_utime(2)' */
-#include	<utime.h>		/* for 'u_utime(2)' */
+#include	<poll.h>
+#include	<time.h>		/* for |u_utime(2)| */
+#include	<utime.h>		/* for |u_utime(2)| */
 #include	<pthread.h>
 #include	<termios.h>
 #include	<errno.h>
 #include	<dirent.h>
 #include	<ucontext.h>
 #include	<netdb.h>
-#include	<pwd.h>
-#include	<grp.h>
 #include	<limits.h>
 #include	<signal.h>
 #include	<stddef.h>		/* |wchar_t| */
@@ -62,15 +60,10 @@
 #include	<xti.h>
 #endif
 
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#include	<project.h>
-#include	<user_attr.h>
-#endif
-
 #include	<usys.h>	/* <- auxilllary OS support */
 
 
-/* for 'stat(2)' and its many friends */
+/* for |stat(2)| and its many friends */
 
 #ifndef	STRUCT_USTAT
 #define	STRUCT_USTAT
@@ -85,7 +78,7 @@
 #endif
 #endif
 
-/* for 'statvfs(2)' and its many friends */
+/* for |statvfs(2)| and its many friends */
 
 #ifndef	STRUCT_USTATVFS
 #define	STRUCT_USTATVFS
@@ -99,20 +92,6 @@
 #endif
 #endif
 #endif
-
-/* off_t */
-#ifndef	TYPEDEF_OFFSET
-#define	TYPEDEF_OFFSET
-#if	defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64)
-#if	defined(__LP64__) || defined(__LP64__)
-typedef off_t		off_t ;
-#else
-typedef long long	off_t ;
-#endif /* defined(__LP64__) || defined(__LP64__) */
-#else
-typedef off_t		off_t ;
-#endif /* defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64) */
-#endif /* TYPEDEF_OFFSET */
 
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
@@ -196,6 +175,16 @@ typedef const void		cvoid ;
 #define	TYPEDEF_CSIZE
 typedef const size_t		csize ;
 #endif /* TYPEDEF_CSIZE */
+
+#ifndef	TYPEDEF_CNFDS
+#define	TYPEDEF_CBFDS
+typedef const nfds_t		cnfds ;
+#endif
+
+#ifndef	TYPEDEF_CSOCKLEN
+#define	TYPEDEF_CSOCKLEN
+typedef const socklen_t		csocklen ;
+#endif /* TYPEDEF_CSOCKLEN */
 
 #ifndef	TYPEDEF_CMODE
 #define	TYPEDEF_CMODE

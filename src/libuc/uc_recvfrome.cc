@@ -65,7 +65,7 @@
 
 /* local defines */
 
-#define	POLLMULT	1000		/* poll() takes milliseconds ! */
+#define	POLL_INTMULT	1000		/* poll() takes milliseconds ! */
 #define	TI_POLL		10
 #define	EBUFLEN		100
 
@@ -144,7 +144,7 @@ int		opts ;
 	while (f_first || (timeout > 0)) {
 
 	    f_first = FALSE ;
-	    rs = u_poll(fds,1,(pollint * POLLMULT)) ;
+	    rs = u_poll(fds,1,(pollint * POLL_INTMULT)) ;
 	    if (rs < 0) break ;
 
 #if	CF_DEBUGS

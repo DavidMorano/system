@@ -113,7 +113,7 @@ char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	        cchar	*cp{} ;
 	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
 		    if (dl > 0) {
-	                if ((rs = strmgr_char(&m,CH_SP)) >= 0) {
+	                if ((rs = strmgr_chr(&m,CH_SP)) >= 0) {
 		            dl += 1 ;
 		        }
 		    }

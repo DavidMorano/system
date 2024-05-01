@@ -43,6 +43,7 @@
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<strn.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>

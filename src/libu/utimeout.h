@@ -28,6 +28,8 @@ enum utos {
 	uto_again,
 	uto_intr,
 	uto_nomem,
+	uto_nosr,
+	uto_nobufs,
 	uto_busy,
 	uto_get,
 	uto_deadlock,
@@ -39,11 +41,11 @@ enum utos {
 	uto_read,
 	uto_mfile,
 	uto_nfile,
-	uto_nosr,
 	uto_poll,
 	uto_nolck,
 	uto_capture,
 	uto_txtbusy,
+	uto_closewait,
 	uto_overlast
 } ; /* end enum (utos) */
 

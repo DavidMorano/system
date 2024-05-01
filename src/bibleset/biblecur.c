@@ -20,21 +20,18 @@
 
 	This subroutine does something! :-)
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
 #include	<stdarg.h>
-
+#include	<string.h>
 #include	<usystem.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<char.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"biblecur.h"
@@ -45,12 +42,9 @@
 
 /* external subroutines */
 
-extern int	field_word(FIELD *,const uchar *,cchar **) ;
-
 extern int	siskipwhite(cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;

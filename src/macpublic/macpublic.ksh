@@ -2,7 +2,7 @@
 # MACPUBLIC
 
 
-# this little program (must be run as root) checks to make sure that
+# Rhis little program (must be run as root) checks to make sure that
 # all users -- located in the '/Users' directory -- have:
 #	"Public"
 #	"Public/Drop Box"

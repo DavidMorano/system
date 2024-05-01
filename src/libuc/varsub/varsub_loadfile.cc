@@ -46,6 +46,7 @@
 #include	<stdfnames.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<char.h>
 #include	<rmx.h>
 #include	<localmisc.h>

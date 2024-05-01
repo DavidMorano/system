@@ -30,9 +30,7 @@
 
 /* exported subroutines */
 
-
-int u_times(struct tms *rp)
-{
+int u_times(TMS *rp) noex {
 	clock_t		tics ;
 	int		rs ;
 

@@ -110,7 +110,7 @@ int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 	    if ((rs = uc_libmalloc(osize,&oap)) >= 0) {
 	        sigset_t	nsm, osm ;
 	        uc_sigsetfill(&nsm) ;
-	        if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
+	        if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 		    {
 	                oap->start = start ;
 	                oap->op = op ;
@@ -120,7 +120,7 @@ int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 		            rv = (v & INT_MAX) ;
 		        }
 		    }
-		    rs1 = pt_sigmask(SIG_SETMASK,&osm,NULL) ;
+		    rs1 = u_sigmask(SIG_SETMASK,&osm,NULL) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	    } /* end if (memory-allocation) */

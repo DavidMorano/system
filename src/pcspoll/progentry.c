@@ -18,21 +18,15 @@
 
 /******************************************************************************
 
-        This little object is used to create a program entry and to populate
-        aspects of it with different operations on the object. This object is
-        used in "server" types of programs. This object is usually created from
-        elements taken from the parsing of a server file.
-
+	This little object is used to create a program entry and
+	to populate aspects of it with different operations on the
+	object.  This object is used in "server" types of programs.
+	This object is usually created from elements taken from the
+	parsing of a server file.
 
 ******************************************************************************/
 
-
-#define	PROGENTRY_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
@@ -43,6 +37,7 @@
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<sbuf.h>
 #include	<svcfile.h>
 #include	<mallocstuff.h>
@@ -830,7 +825,7 @@ char		args[] ;
 	fieldterms(terms,FALSE," \t") ;
 
 	if ((rs = field_init(&fsb,args,-1)) >= 0) {
-	    const int	flen = FBUFLEN ;
+	    cint	flen = FBUFLEN ;
 	    int		fl ;
 	    char	fbuf[FBUFLEN + 1] ;
 

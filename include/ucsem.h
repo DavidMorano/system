@@ -13,7 +13,6 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<semaphore.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -42,8 +41,8 @@ extern int	ucsem_trywait(ucsem *) noex ;
 extern int	ucsem_post(ucsem *) noex ;
 extern int	ucsem_unlink(ucsem *) noex ;
 
-extern int	ucsemunlink(const char *) noex ;
-extern int	unlinkucsem(const char *) noex ;
+extern int	ucsemunlink(cchar *) noex ;
+extern int	unlinkucsem(cchar *) noex ;
 
 EXTERNC_end
 

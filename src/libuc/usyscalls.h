@@ -42,7 +42,7 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utime.h>		/* for 'u_utime(2)' */
+#include	<utime.h>		/* for old UNIX® |u_utime(2)| */
 #include	<pthread.h>
 #include	<termios.h>
 #include	<time.h>
@@ -57,13 +57,6 @@
 #include	<xti.h>
 #endif
 
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#include	<thread.h>
-#include	<shadow.h>
-#include	<project.h>
-#include	<user_attr.h>
-#endif
-
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -72,6 +65,7 @@
 
 #include	<um.h>		/* UNIX® memory-management */
 #include	<ustr.h>	/* UNIX® STREAMS */
+#include	<ufiledesc.h>	/* file-descriptor users */
 #include	<udup.h>
 
 
@@ -101,6 +95,7 @@ extern int	u_setsid() noex ;
 
 extern int	u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
 extern int	u_sigprocmask(int,sigset_t *,sigset_t *) noex ;
+extern int	u_sigmask(int,sigset_t *,sigset_t *) noex ;
 extern int	u_sigsuspend(const sigset_t *) noex ;
 extern int	u_sigwait(const sigset_t *,int *) noex ;
 extern int	u_sigpending(sigset_t *) noex ;
@@ -114,6 +109,7 @@ extern int	u_setcontext(const ucontext_t *) noex ;
 
 extern int	u_fork() noex ;
 extern int	u_vfork() noex ;
+extern int	u_atfork(void_f,void_f,void_f) noex ;
 extern int	u_execve(cchar *,mainv,mainv) noex ;
 extern int	u_execv(cchar *,mainv) noex ;
 extern int	u_execvp(cchar *,mainv) noex ;
@@ -129,24 +125,23 @@ extern int	u_mkdir(cchar *,mode_t) noex ;
 extern int	u_chdir(cchar *) noex ;
 extern int	u_readlink(cchar *,char *,int) noex ;
 extern int	u_pathconf(cchar *,int,long *) noex ;
-extern int	u_statvfs(cchar *,USTATVFS *) noex ;
 extern int	u_stat(cchar *,USTAT *) noex ;
 extern int	u_lstat(cchar *,USTAT *) noex ;
+
 extern int	u_creat(cchar *,mode_t) noex ;
 extern int	u_open(cchar *,int,mode_t) noex ;
+extern int	u_socket(int,int,int) noex ;
+extern int	u_acceptpass(int) noex ;
+extern int	u_accept(int,SOCKADDR *,int *) noex ;
+extern int	u_pipe(int *) noex ;
+extern int	u_socketpair(int,int,int,int *) noex ;
+extern int	u_pipe(int *) noex ;
 
 extern int	u_getdents(int,dirent_t *,int) noex ;
 extern int	u_fchdir(int) noex ;
 extern int	u_fsync(int) noex ;
-extern int	u_pipe(int *) noex ;
-extern int	u_socket(int,int,int) noex ;
-extern int	u_getsockopt(int,int,int,void *,int *) noex ;
-extern int	u_setsockopt(int,int,int,cvoid *,int) noex ;
-extern int	u_socketpair(int,int,int,int *) noex ;
-extern int	u_connect(int,cvoid *,int) noex ;
-extern int	u_accept(int,cvoid *,int *) noex ;
 
-extern int	u_closeonexec(int,bool) noex ;
+extern int	u_closeonexec(int,int) noex ;
 extern int	u_poll(POLLFD *,int,int) noex ;
 extern int	u_read(int,void *,int) noex ;
 extern int	u_readv(int,IOVEC *,int) noex ;
@@ -157,8 +152,6 @@ extern int	u_pwrite(int,cvoid *,int,off_t) noex ;
 
 extern int	u_fpathconf(int,int,long *) noex ;
 extern int	u_fstat(int,USTAT *) noex ;
-extern int	u_fstatvfs(int,USTATVFS *) noex ;
-
 extern int	u_fchown(int,uid_t,gid_t) noex ;
 extern int	u_fcntl(int,int,...) noex ;
 extern int	u_ioctl(int,int,...) noex ;
@@ -167,18 +160,6 @@ extern int	u_rewind(int) noex ;
 extern int	u_seek(int,off_t,int) noex ;
 extern int	u_tell(int,off_t *) noex ;
 extern int	u_seeko(int,off_t,int,off_t *) noex ;
-
-extern int	u_bind(int,void *,int) noex ;
-extern int	u_getsockname(int,void *,int *) noex ;
-extern int	u_getpeername(int,void *,int *) noex ;
-extern int	u_listen(int,int) noex ;
-extern int	u_send(int,cvoid *,int,int) noex ;
-extern int	u_sendto(int,cvoid *,int,int,void *,int) noex ;
-extern int	u_sendmsg(int,MSGHDR *,int) noex ;
-extern int	u_recv(int,void *,int,int) noex ;
-extern int	u_recvfrom(int,void *,int,int,void *,int *) noex ;
-extern int	u_recvmsg(int,MSGHDR *,int) noex ;
-extern int	u_shutdown(int,int) noex ;
 extern int	u_close(int) noex ;
 
 extern int	u_resolvepath(cchar *,char *,int) noex ;
@@ -193,6 +174,7 @@ extern int	u_lchown(cchar *,uid_t,gid_t) noex ;
 extern int	u_chmod(cchar *,mode_t) noex ;
 extern int	u_utime(cchar *,const UTIMBUF *) noex ;
 extern int	u_utimes(cchar *,const TIMEVAL *) noex ;
+extern int	u_nanosleep(CTIMESPEC *,TIMESPEC *) noex ;
 extern int	u_sync() noex ;
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)

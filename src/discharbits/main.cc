@@ -3,36 +3,27 @@
 /* program to display characters */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0
-
 
 /* revision history:
 
 	= 1988-01-10, David A­D­ Morano
 
-
 */
-
 
 /************************************************************************
 
-	This program displays the characters typed on the
-	terminal in HEX output in a form suitable for inclusion
-	into a C language program.
-
+	This program displays the characters typed on the terminal
+	in HEX output in a form suitable for inclusion into a C
+	language program.
 
 ***************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
-#include	<field.h>
+#include	<fieldterms.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -101,16 +92,7 @@ char	*envv[] ;
 
 /* initialize the bit array */
 
-#if	CF_DEBUG
-	debugprintf("main: about to call 'fieldterms'\n") ;
-#endif
-
 	fieldterms(bits,0,"") ;
-
-#if	CF_DEBUG
-	debugprintf("main: called 'fieldterms'\n") ;
-#endif
-
 
 	f_exit = FALSE ;
 	while (! f_exit) {
@@ -122,12 +104,6 @@ char	*envv[] ;
 
 	        len = uterm_reade(tfd,fm_rawin | fm_noecho,
 	            buf,1, 2,0,0,0) ;
-
-#if	CF_DEBUG
-	        bprintf(efp,"len read (%d)\n",len) ; 
-	        ; 
-	        bflush(efp) ;
-#endif
 
 	        if (len < 0) {
 
@@ -156,15 +132,7 @@ char	*envv[] ;
 
 	        else {
 
-#if	CF_DEBUG
-	            debugprintf("main: about to call 'fieldterms' for a character\n") ;
-#endif
-
 	            fieldterms(bits,1,buf2) ;
-
-#if	CF_DEBUG
-	            debugprintf("main: called 'fieldterms' for a character\n") ;
-#endif
 
 	        }
 

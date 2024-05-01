@@ -5465,7 +5465,7 @@ static int inter_suspend(INTER *iap)
 
 	uc_sigsetempty(&nsm) ;
 	if ((rs = uc_sigsetadd(&nsm,sig)) >= 0) {
-	    if ((rs = pt_sigmask(SIG_UNBLOCK,&nsm,&osm)) >= 0) {
+	    if ((rs = u_sigmask(SIG_UNBLOCK,&nsm,&osm)) >= 0) {
 	        struct sigaction	sao, san ;
 
 	        uc_sigsetfill(&nsm) ;
@@ -5490,7 +5490,7 @@ static int inter_suspend(INTER *iap)
 	            u_sigaction(sig,&sao,NULL) ;
 	        } /* end if (sigaction) */
 
-	        pt_sigmask(SIG_SETMASK,&osm,NULL) ;
+	        u_sigmask(SIG_SETMASK,&osm,NULL) ;
 	    } /* end if (sigmask) */
 	} /* end if */
 

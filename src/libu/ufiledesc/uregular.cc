@@ -1,0 +1,628 @@
+/* uregular SUPPORT */
+/* lang=C++20 */
+
+/* interface component for UNIX® library-2 */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Names:
+	u_closeonexec
+	u_readn
+	u_writen
+	u_fchdir
+	u_fchmod
+	u_fchown
+	u_close
+	u_poll
+	u_fstatfs
+	u_fstatvfs
+	u_fpathconf
+	u_fsync
+	u_ioctl
+	u_lockf
+	u_pread
+	u_pwrite
+	u_read
+	u_readv
+	u_seeko
+	u_tell
+	u_write
+	u_writev
+	u_seek
+	u_seekoff
+	u_rewind
+	u_seekable
+
+	Description:
+	This module contains the UNIX® file-system system calls.
+
+	Name:
+	u_lockf
+
+	Description:
+	This subroutine is the friendly version of the library
+	subroutine (system call in some older OSes) that handles
+	UNIX® System V style locking (not the stupid |flock()|
+	stuff).
+
+	Synopsis:
+	int u_lockf(int fd,int cmd,off_t sz) noex
+
+	Arguments:
+	fd		file-descriptor
+	cmd		command:
+				F_LOCK
+				F_UNLOCK
+				F_TLOCK
+				F_TEST
+	sz		the size of the area to lock (can be zero)
+
+	Returns:
+	>=0		OK
+	<0		error code (system-return)
+
+	Notes:
+	1. Note that the stupid developers of the File Locking
+	mechanism un UNIX® System V did not distinguish a real
+	deadlock from a temporary lack of system resources.  We
+	attempt to make up for this screw ball bug in UNIX® with
+	our retries on DEADLOCK.
+	2. I can hardly believe how flipped up the Apple Darwin
+	operating system is (or was).  In the old days of Darwin,
+	I actually had to write my own version of |poll(2)| (in
+	terms of |select(2)|) because Darwin did not (yet) have any
+	|poll(2)|.  That is how flipped up Apple Darwin was!  My and
+	one million other people on this planet all (independently)
+	had to write out own versions of |poll(2)|.  Flip if that
+	that ever happens again (if we can help it)!
+	3.  Added code to wait (sleep) if we receive a return from
+	|close(2)| with a resturn-status of SR_INPROGRESS.  In such
+	a case, we wait for TO_CLOSEWAIT seconds and then we ourself
+	return w/ SR_OK.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>		/* required for |fstatfs(2)| */
+#include	<sys/mount.h>		/* required for |fstatfs(2)| */
+#include	<unistd.h>
+#include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<usystem.h>
+#include	<usysflag.h>
+#include	<intsat.h>
+#include	<localmisc.h>
+
+#include	"ufiledesc.h"
+
+
+/* local defines */
+
+#if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
+#define	F_ACL		1
+#else
+#define	F_ACL		0
+#endif
+
+#ifndef	UPOLL_RESOLUTION
+#define	UPOLL_RESOLUTION	1000
+#endif
+
+#ifndef	INFTIM
+#define	INFTIM		(-1)
+#endif
+
+#ifndef	POLLRDNORM
+#define	POLLRDNORM	POLLIN
+#endif
+
+#ifndef	POLLRDBAND
+#define	POLLRDBAND	0
+#endif
+
+#ifndef	POLLWRNORM
+#define	POLLWRNORM	POLLOUT
+#endif
+
+#ifndef	POLLWRBAND
+#define	POLLWRBAND	0
+#endif
+
+
+/* imported namespaces */
+
+using namespace	ufiledesc ;		/* namespace */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+constexpr nullptr_t		np{} ;
+
+namespace {
+    struct uregular ;
+    typedef int (uregular::*uregular_m)(int) noex ;
+    struct uregular : ufiledescbase {
+	uregular_m	m = nullptr ;
+	POLLFD		*fds ;
+	CIOVEC		*iop ;
+	cvoid		*valp ;
+	int		*lenp ;
+	off_t		sz ;
+	int		n ;
+	int		to ;
+	int		cmd ;
+	int		len ;
+	int		name ;
+	int		flags ;
+	uregular() noex { } ;
+	uregular(void *rb,int rl,off_t o = 0z) noex {
+	    rbuf = rb ;
+	    rlen = rl ;
+	    sz = o ;
+	} ;
+	uregular(cvoid *wb,int wl,off_t o = 0z) noex {
+	    wbuf = wb ;
+	    wlen = wl ;
+	    sz = o ;
+	} 
+	uregular(POLLFD *s,int an,int t) noex : fds(s), n(an), to(t) { } ;
+	uregular(int c,int s) noex : cmd(c), sz(s) { } ;
+	uregular(IOVEC *p,int an) noex : iop(p), n(an) { } ;
+	int callstd(int fd) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fd) ;
+	    }
+	    return rs ;
+	} ;
+	void submem(uregular_m mem) noex {
+	    m = mem ;
+	} ;
+	int iclose(int) noex ;
+	int ipoll(int) noex ;
+	int ifsync(int) noex ;
+	int ilockf(int) noex ;
+	int ipread(int) noex ;
+	int ipwrite(int) noex ;
+	int iread(int) noex ;
+	int ireadv(int) noex ;
+	int iwrite(int) noex ;
+	int iwritev(int) noex ;
+    } ; /* end struct (uregular) */
+}
+
+
+/* forward references */
+
+
+/* local variables */
+
+constexpr bool		f_acl = F_ACL ; /* future use */
+constexpr bool		f_sunos = F_SUNOS ; /* this is really Solaris® */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int u_closeonexec(int fd,int f) noex {
+	int		rs ;
+	int		f_previous = false ;
+	if ((rs = u_fcntl(fd,F_GETFD,0)) >= 0) {
+	    int		fdflags = rs ;
+	    f_previous = (fdflags & FD_CLOEXEC) ? 1 : 0 ;
+	    if (! LEQUIV(f_previous,f)) {
+	        if (f) {
+	            fdflags |= FD_CLOEXEC ;
+	        } else {
+	            fdflags &= (~ FD_CLOEXEC) ;
+		}
+	        rs = u_fcntl(fd,F_SETFD,fdflags) ;
+	    } /* end if (needed a change) */
+	} /* end if */
+	return (rs >= 0) ? f_previous : rs ;
+}
+/* end subroutine (u_closeonexec) */
+
+int u_readn(int fd,void *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	if (rbuf) {
+	    caddr_t		cbuf = caddr_t(rbuf) ;
+	    rs = SR_INVALID ;
+	    if (rlen >= 0) {
+		auto rd = [&] () -> int {
+		    cint	remlen = (rlen - rl) ;
+		    char	*rb = (cbuf + rl) ;
+		    return u_read(fd,rb,remlen) ;
+		} ;
+		rs = SR_OK ;
+		while ((rl < rlen) && ((rs = rd()) > 0)) {
+		    rl += rs ;
+		} /* end while */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end subroutine (u_readn) */
+
+int u_writen(int fd,cvoid *wbuf,int wlen) noex {
+	int		rs = SR_FAULT ;
+	int		wl = 0 ;
+	if (wbuf) {
+	    const caddr_t	cbuf = caddr_t(wbuf) ;
+	    rs = SR_INVALID ;
+	    if (wlen >= 0) {
+		auto wr = [&] () -> int {
+		    cint	remlen = (wlen - wl) ;
+		    cchar	*wb = (cbuf + wl) ;
+		    return u_write(fd,wb,remlen) ;
+		} ;
+		rs = SR_OK ;
+	        while ((wl < wlen) && ((rs = wr()) > 0)) {
+		    wl += rs ;
+		} /* end while */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wl : rs ;
+}
+/* end subroutine (u_writen) */
+
+int u_fchdir(int fd) noex {
+	int		rs ;
+	repeat {
+	    if ((rs = fchdir(fd)) < 0) {
+		rs = (- errno) ;
+	    }
+	} until (rs != SR_INTR) ;
+	return rs ;
+}
+/* end subroutine (u_fchdir) */
+
+int u_fchmod(int fd,mode_t m) noex {
+	int		rs ;
+	m &= (~ S_IFMT) ;
+	repeat {
+	    if ((rs = fchmod(fd,m)) < 0) {
+		rs = (- errno) ;
+	    }
+	} until (rs != SR_INTR) ;
+	return rs ;
+}
+/* end subroutine (u_fchmod) */
+
+int u_fchown(int fd,uid_t uid,gid_t gid) noex {
+	int		rs ;
+	repeat {
+	    if ((rs = fchown(fd,uid,gid)) < 0) {
+		rs = (- errno) ;
+	    }
+	} until (rs != SR_INTR) ;
+	return rs ;
+}
+/* end subroutine (u_fchown) */
+
+int u_close(int fd) noex {
+	uregular	ro ;
+	ro.m = &uregular::iclose ;
+	ro.f.fclose = true ;		/* special treatment */
+	return ro(fd) ;
+}
+/* end subroutine (u_close) */
+
+/* this is (sort of) a spæcial case */
+int u_poll(POLLFD *fds,int n,int to) noex {
+	int		rs = SR_FAULT ;
+	if (fds) {
+	    uregular	ro(fds,n,to) ;
+	    ro.m = &uregular::ipoll ;
+	    ro.f.fintr = true ;
+	    rs = ro(0) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_poll) */
+
+int u_fstatfs(int fd,STATFS *ssp) noex {
+	int		rs = SR_FAULT ;
+	if (ssp) {
+	    repeat {
+	        if ((rs = fstatfs(fd,ssp)) >= 0) {
+	            rs = (- errno) ;
+	        }
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_fstatfs) */
+
+int u_fstatvfs(int fd,STATVFS *sbp) noex {
+	int		rs = SR_FAULT ;
+	if (sbp) {
+	    repeat {
+	        if ((rs = fstatvfs(fd,sbp)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_fstatvfs) */
+
+int u_fpathconf(int fd,int name,long *rp) noex {
+	int		rs = SR_INVALID ;
+	long		lw = 0 ;
+	if ((fd >= 0) && (name >= 0)) {
+	    rs = SR_OK ;
+	    errno = 0 ;
+	    if ((lw = fpathconf(fd,name)) < 0) {
+		if_constexpr (f_sunos) {
+	            if ((name == _PC_CHOWN_RESTRICTED) && (lw == -1)) {
+		        lw = 0 ;
+	            }
+		} /* end if_constexpr (f_sunos) */
+	        if (errno != 0) rs = (- errno) ;
+	    } /* end if (fpathconf) */
+	    if ((rs >= 0) && (lw >= 0)) {
+	        rs = intsat(lw) ;
+	    } /* end if (ok) */
+	} /* end if (valid) */
+	if (rp) {
+	    *rp = (rs >= 0) ? lw : 0l ;
+	}
+	return rs ;
+}
+/* end subroutine (u_fpathconf) */
+
+int u_fsync(int fd) noex {
+	uregular	ro ;
+	ro.m = &uregular::ifsync ;
+	return ro(fd) ;
+}
+/* end subroutine (u_fsync) */
+
+
+
+#ifdef	COMMENT
+
+int u_ioctl(int fd,int cmd,...) noex {
+	caddr_t		any ;
+	int		rs ;
+	int		to_nomem = TO_NOMEM ;
+	int		to_nosr = TO_NOSR ;
+	int		f_exit = false ;
+
+	{
+	va_list	ap ;
+	va_begin(ap,cmd) ;
+	any = va_arg(ap,caddr_t) ;
+	va_end(ap) ;
+	}
+
+	repeat {
+	    if ((rs = ioctl(fd,cmd,any)) < 0) rs = (- errno) ;
+	    if (rs < 0) {
+	        switch (rs) {
+	        case SR_NOMEM:
+	            if (to_nomem-- > 0) {
+			msleep(1000) ;
+		    } else {
+			f_exit = true ;
+		    }
+	            break ;
+#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
+	        case SR_NOSR:
+	            if (to_nosr-- > 0) {
+			msleep(1000) ;
+		    } else {
+			f_exit = true ;
+		    }
+	            break ;
+#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
+	        case SR_INTR:
+	            break ;
+		default:
+		    f_exit = true ;
+		    break ;
+		} /* end switch */
+	    } /* end if (error) */
+	} until ((rs >= 0) || f_exit) ;
+
+	return rs ;
+}
+/* end subroutine (u_ioctl) */
+
+#endif /* COMMENT */
+
+
+int u_lockf(int fd,int cmd,off_t sz) noex {
+	uregular	ro(cmd,sz) ;
+	ro.m = &uregular::ilockf ;
+	return ro(fd) ;
+}
+/* end subroutine (u_lockf) */
+
+int u_pread(int fd,void *rbuf,int rlen,off_t off) noex {
+	uregular	ro(rbuf,rlen,off) ;
+	ro.m = &uregular::ipread ;
+	return ro(fd) ;
+}
+/* end subroutine (u_pread) */
+
+int u_pwrite(int fd,cvoid *wbuf,int wlen,off_t off) noex {
+	uregular	ro(wbuf,wlen,off) ;
+	ro.m = &uregular::ipwrite ;
+	ro.f.fwrite = true ;
+	return ro(fd) ;
+}
+/* end subroutine (u_pwrite) */
+
+int u_read(int fd,void *rbuf,int rlen) noex {
+	uregular	ro(rbuf,rlen) ;
+	ro.m = &uregular::iread ;
+	return ro(fd) ;
+}
+/* end subroutine (u_read) */
+
+int u_readv(int fd,IOVEC *iop,int n) noex {
+	uregular	ro(iop,n) ;
+	ro.m = &uregular::ireadv ;
+	return ro(fd) ;
+}
+/* end subroutine (u_readv) */
+
+int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
+	off_t		ro ;
+	int		rs ;
+	repeat {
+	    rs = SR_OK ;
+	    if ((ro = lseek(fd,wo,w)) < 0) {
+	        rs = (- errno) ;
+	    }
+	} until (rs != SR_INTR) ;
+	if (offp) {
+	    *offp = (rs >= 0) ? ro : 0z ;
+	}
+	if (rs >= 0) {
+	    rs = intsat(ro) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_seeko) */
+
+int u_write(int fd,cvoid *wbuf,int wlen) noex {
+	uregular	ro(wbuf,wlen) ;
+	ro.m = &uregular::iwrite ;
+	ro.f.fwrite = true ;
+	return ro(fd) ;
+}
+/* end subroutine (u_write) */
+
+int u_writev(int fd,CIOVEC *iop,int n) noex {
+	uregular	ro(iop,n) ;
+	ro.m = &uregular::iwritev ;
+	ro.f.fwrite = true ;
+	return ro(fd) ;
+}
+/* end subroutine (u_writev) */
+
+
+/* local subroutines */
+
+int uregular::iclose(int fd) noex {
+	int		rs ;
+	if ((rs = close(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::iclose) */
+
+/* this is a special case (could be moved in the future) */
+int uregular::ipoll(int) noex {
+	cnfds		nfd = nfds_t(n) ;
+	cint		mto = (to * POLL_INTMULT) ;
+	int		rs ;
+	if ((rs = poll(fds,nfd,mto)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::ipoll) */
+
+int uregular::ifsync(int fd) noex {
+	int		rs ;
+	if ((rs = fsync(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiledesc::ifsync) */
+
+int uregular::ilockf(int fd) noex {
+	int		rs ;
+	if ((rs = lockf(fd,cmd,sz)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::ilockf) */
+
+int uregular::ipread(int fd) noex {
+	csize		rsz = size_t(rlen) ;
+	int		rs ;
+	if ((rs = pread(fd,rbuf,rsz,sz)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::ipread) */
+
+int uregular::ipwrite(int fd) noex {
+	csize		wsz = size_t(wlen) ;
+	int		rs ;
+	if ((rs = pwrite(fd,wbuf,wsz,sz)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::ipwrite) */
+
+int uregular::iread(int fd) noex {
+	csize		rsz = size_t(rlen) ;
+	int		rs ;
+	if ((rs = read(fd,rbuf,rsz)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::iread) */
+
+int uregular::ireadv(int fd) noex {
+	IOVEC		*riop = const_cast<IOVEC *>(iop) ;
+	int		rs ;
+	if ((rs = readv(fd,riop,n)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (uregular::ireadv) */
+
+int uregular::iwrite(int fd) noex {
+	csize		wsz = size_t(wlen) ;
+	int		rs ;
+	if ((rs = write(fd,wbuf,wsz)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::iwrite) */
+
+int uregular::iwritev(int fd) noex {
+	int		rs ;
+	if ((rs = writev(fd,iop,n)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::iwritev) */
+
+

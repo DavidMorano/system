@@ -39,6 +39,9 @@
 
 EXTERNC_begin
 
+extern int uc_open(cchar *,int,mode_t) noex ;
+extern int uc_opene(cchar *,int,mode_t,int) noex ;
+extern int uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
 extern int uc_socket(int,int,int) noex ;
 extern int uc_dupmin(int,int) noex ;
 extern int uc_dupmince(int,int) noex ;

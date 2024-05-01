@@ -1,4 +1,4 @@
-/* u_sysinfo SUPPORT */
+/* usysinfo SUPPORT */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -28,7 +28,16 @@
 /* local defines */
 
 
+/* external subroutines */
+
+
 /* external variables */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

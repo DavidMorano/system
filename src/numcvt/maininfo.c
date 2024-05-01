@@ -111,7 +111,7 @@ int maininfo_start(MAININFO *mip,int argc,cchar **argv)
 
 	uc_sigsetempty(&ss) ;
 	uc_sigsetadd(&ss,sig) ;
-	if ((rs = pt_sigmask(SIG_BLOCK,&ss,&mip->savemask)) >= 0) {
+	if ((rs = u_sigmask(SIG_BLOCK,&ss,&mip->savemask)) >= 0) {
 	    if ((rs = vecstr_start(&mip->stores,2,0)) >= 0) {
 	        int	cl ;
 	        cchar	*cp ;
@@ -141,7 +141,7 @@ int maininfo_start(MAININFO *mip,int argc,cchar **argv)
 	        if (rs < 0)
 	            vecstr_finish(&mip->stores) ;
 	    } /* end if (vecstr_start) */
-	} /* end if (pt_sigmask) */
+	} /* end if (u_sigmask) */
 
 	return rs ;
 }
@@ -158,7 +158,7 @@ int maininfo_finish(MAININFO *mip)
 	rs1 = vecstr_finish(&mip->stores) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = pt_sigmask(SIG_SETMASK,&mip->savemask,NULL) ;
+	rs1 = u_sigmask(SIG_SETMASK,&mip->savemask,NULL) ;
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;

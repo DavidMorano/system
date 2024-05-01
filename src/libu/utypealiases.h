@@ -33,7 +33,9 @@
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 #include	<sys/poll.h>
-#include	<sys/msg.h>
+#include	<sys/shm.h>		/* UNIX® Sys-V IPC - Shared-Memory */
+#include	<sys/msg.h>		/* UNIX® Sys-V IPC - Message-Queues */
+#include	<sys/sem.h>		/* UNIX® Sys-V IPC - Semaphores */
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
 #include	<sys/acl.h>
@@ -104,8 +106,12 @@
 #define	USTAT		struct ustat
 #endif
 
-#ifndef	USTATVFS
-#define	USTATVFS	struct ustatvfs
+#ifndef	STATFS
+#define	STATFS		struct statfs
+#endif
+
+#ifndef	STATVFS
+#define	STATVFS		struct statvfs
 #endif
 
 #ifndef	DIRENT
@@ -145,8 +151,8 @@
 #endif
 
 /* not constant - "Control-Message-Header" */
-#ifndef	CMSGHDR
-#define	CMSGHDR		struct cmsghdr
+#ifndef	CONMSGHDR
+#define	CONMSGHDR	const cmsghdr
 #endif
 
 #ifndef	TIMEVAL
@@ -185,6 +191,8 @@
 #define	WINSIZE		struct winsize
 #endif
 
+/* UNIX® System V STREAMS® */
+
 #ifndef	POLLFD
 #define	POLLFD		struct pollfd		/* UNIX® Sys-V (STREAMS) */
 #endif
@@ -205,13 +213,40 @@
 #define	STRIOCTL	struct strioctl		/* UNIX® Sys-V STREAMS */
 #endif
 
-#ifndef	MQATTR
-#define	MQATTR		struct mq_attr		/* for SysV-IPC */
+/* UNIX® System V Inter-Process-Communication (IPC) */
+
+#ifndef	SHMIDDS
+#define	SHMIDDS		struct shmid_ds		/* for UNIX® SysV-IPC SHM */
 #endif
 
 #ifndef	MSQIDDS
-#define	MSQIDDS		struct msqid_ds		/* for SysV-IPC */
+#define	MSQIDDS		struct msqid_ds		/* for UNIX® SysV-IPC MQ */
 #endif
+
+#ifndef	MQATTR
+#define	MQATTR		struct mq_attr		/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	MSQPERM		/* this is an ALIAS of |MSGPERM| */
+#define	MSQPERM		struct msg_perm		/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	MSGPERM
+#define	MSGPERM		struct msg_perm		/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	SEMIDDS
+#define	SEMIDDS		struct semid_ds		/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	SEMBUF
+#define	SEMBUF		struct sembuf		/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	SEMUN
+#define	SEMUN		union semun		/* for UNIX® SysV-IPC SEM */
+#endif
+
 
 /* UTMPX */
 
@@ -271,8 +306,8 @@
 #define	CSOCKADDR	const SOCKADDR
 #endif
 
-#ifndef	CUTMPX
-#define	CUTMPX		const UTMPX
+#ifndef	CMSGHDR
+#define	CMSGHDR		const MSGHDR
 #endif
 
 #ifndef	CRLIMIT
@@ -281,6 +316,14 @@
 
 #ifndef	CIOVEC
 #define	CIOVEC		const IOVEC
+#endif
+
+#ifndef	CUTMPX
+#define	CUTMPX		const UTMPX
+#endif
+
+#ifndef	CSCHEDPARAM
+#define	CSCHEDPARAM	const SCHEDPARAM
 #endif
 
 
@@ -368,6 +411,40 @@
 
 #ifndef	CADDRINFO
 #define	CADDRINFO	const struct addrinfo
+#endif
+
+/* UNIX® System V Inter-Process-Communication (IPC) */
+
+#ifndef	CSHMIDDS
+#define	CSHMIDDS	const struct shmid_ds	/* for UNIX® SysV-IPC SHM */
+#endif
+
+#ifndef	CMSQIDDS
+#define	CMSQIDDS	const struct msqid_ds	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CMQATTR
+#define	CMQATTR		const struct mq_attr	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CMSQPERM		/* this is an ALIAS of |MSGPERM| */
+#define	CMSQPERM	const struct msg_perm	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CMSGPERM
+#define	CMSGPERM	const struct msg_perm	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CSEMIDDS
+#define	CSEMIDDS	const struct semid_ds	/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	CSEMBUF
+#define	CSEMBUF		const struct sembuf	/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	CSEMUN
+#define	CSEMUN		const union semun	/* for UNIX® SysV-IPC SEM */
 #endif
 
 

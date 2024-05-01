@@ -4,7 +4,6 @@
 /* manage a MAILALIAS object */
 /* lang=C20 */
 
-#define	CF_SAFE		1		/* safe mode */
 #define	CF_FASTKEYMATCH	1		/* faster key matching */
 #define	CF_DEFPROFILE	0		/* always use default MA-profile */
 
@@ -68,6 +67,7 @@
 #include	<bfile.h>
 #include	<opentmp.h>
 #include	<field.h>
+#include	<terminit.hh>
 #include	<kvsfile.h>
 #include	<strtab.h>
 #include	<intceil.h>
@@ -182,15 +182,17 @@ namespace {
 	vecobj		*rlp ;
 	strtab		*klp ;
 	strtab		*vlp ;
+	int		(*rectab)[2] ;
 	uint		nrecs ;
 	uint		nkeys ;
 	int		fd ;
 	int		ikey{} ;
-	int		c{} ;
+	int		count{} ;
 	int		ktlen ;
 	int		ktsize ;
 	int		reclen ;
 	int		recsize ;
+	int		ropts ;
 	int		rilen ;
 	int		risize ;
 	int		sksize ;
@@ -204,6 +206,11 @@ namespace {
 	    f_havekey = false ;
 	} ;
 	int procline(cchar *,int) noex ;
+	int wrfilekeytab() noex ;
+	int wrfilerec() noex ;
+	int wrfilekeys() noex ;
+	int wrfilevals() noex ;
+	int mkind(vecobj *,cc *,rt_t,int) noex ;
     } ; /* end class (dbmake) */
     class record {
     public:
@@ -275,11 +282,6 @@ static int	mailalias_dbmaking(MA *,int,time_t,int) noex ;
 static int	mailalias_procfile(MA *,DBMAKE *,cchar *) noex ;
 static int	mailalias_wrfile(MA *,DBMAKE *, time_t) noex ;
 static int	mailalias_wrfiler(MA *,DBMAKE *, time_t) noex ;
-static int	mailalias_wrfilekeytab(MA *,DBMAKE *) noex ;
-static int	mailalias_wrfilerec(MA *,DBMAKE *) noex ;
-static int	mailalias_wrfilekeys(MA *,DBMAKE *) noex ;
-static int	mailalias_wrfilevals(MA *,DBMAKE *) noex ;
-static int	mailalias_mkind(MA *,vecobj *,cchar *,rt_t,int) noex ;
 static int	mailalias_fileold(MA *,time_t) noex ;
 static int	mailalias_aprofile(MA *,time_t) noex ;
 
@@ -325,28 +327,10 @@ constexpr cpcchar	aptabsched[] = {
 } ;
 
 /* all white space plus colon (':') */
-constexpr cchar		kterms[] = {
-	0x00, 0x1F, 0x00, 0x00,
-	0x01, 0x00, 0x00, 0x04,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+constexpr terminit	keys("\b\t\n\f\v :") ;
 
 /* all white space plus comma (',') */
-constexpr cchar		vterms[] = {
-	0x00, 0x1F, 0x00, 0x00,
-	0x01, 0x10, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+constexpr terminit	vals("\b\t\n\f\v ,") ;
 
 
 /* exported variables */
@@ -464,27 +448,29 @@ int mailalias_close(MA *op) noex {
 /* end subroutine (mailalias_close) */
 
 int mailalias_audit(MA *op) noex {
-	int		rs = SR_OK ;
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailalias_audit) */
 
 int mailalias_count(MA *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	return (op->rtlen - 1) ;
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    rs = (op->rtlen - 1) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (mailalias_count) */
 
 int mailalias_indcount(MA *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	return op->rilen ;
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    rs = op->rilen ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (mailalias_indcount) */
 
@@ -534,11 +520,8 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	int		ri = 0 ;
 	int		vl = 0 ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-#endif
 
 	if (curp == nullptr) return SR_FAULT ;
 
@@ -564,8 +547,9 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	            if (kbuf != nullptr) {
 
 	                cl = ALIASNAMELEN ;
-	                if (klen >= 0)
+	                if (klen >= 0) {
 	                    cl = min(klen,ALIASNAMELEN) ;
+			}
 
 	                bp = strwcpy(kbuf,(op->skey + ai),cl) ;
 	                vl = (bp - kbuf) ;
@@ -611,13 +595,10 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	int		vl = 0 ;
 	int		rs1 ;
 	int		f_cur = false ;
-	(void) opts ;;
+	(void) opts ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-#endif
 
 	if (aname == nullptr) return SR_INVALID ;
 
@@ -702,9 +683,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	            } /* end if (secondary hasing) */
 
 	        } else {
-
 /* get the next record index (if there is one) */
-
 	            hi = curp->i ;
 	            if (hi != 0) {
 	                ri = (op->indtab)[hi][0] ;
@@ -751,7 +730,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	        } /* end if (following the existing chain) */
 /* if successful, retrieve value */
 	        if (rs >= 0) {
-
 	            vi = op->rectab[ri][1] ;
 	            if (vbuf != nullptr) {
 	                cl = min(vlen,ALIASNAMELEN) ;
@@ -760,15 +738,11 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	            } else {
 	                vl = strlen(op->sval + vi) ;
 	            }
-
 /* update cursor */
-
 	            if (f_cur) {
 	                curp->i = hi ;
 	            }
-
 	        } /* end if (got one) */
-
 	        rs1 = mailalias_enterend(op,dt) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mailalias-enter) */
@@ -860,7 +834,7 @@ static int mailalias_checkold(MA *op,time_t dt) noex {
 
 /* read the file header and check it out */
 static int mailalias_hdrload(MA *op) noex {
-	cint	msize = MAILALIAS_FILEMAGICSIZE ;
+	cint		msize = MAILALIAS_FILEMAGICSIZE ;
 	int		rs = SR_OK ;
 	cchar		*cp = (cchar *) op->mapdata ;
 	if (hasValidMagic(cp,msize,MAILALIAS_FILEMAGIC)) {
@@ -894,8 +868,8 @@ static int mailalias_hdrloader(MA *op) noex {
 	op->keytab = (int *) (op->mapdata + table[header_key]) ;
 	op->rectab = (int (*)[2]) (op->mapdata + table[header_rec]) ;
 	op->indtab = (int (*)[2]) (op->mapdata + table[header_ind]) ;
-	op->skey = (cchar *) (op->mapdata + table[header_skey]) ;
-	op->sval = (cchar *) (op->mapdata + table[header_sval]) ;
+	op->skey = charp(op->mapdata + table[header_skey]) ;
+	op->sval = charp(op->mapdata + table[header_sval]) ;
 
 	op->ktlen = table[header_keylen] ;
 	op->rtlen = table[header_reclen] ;
@@ -909,9 +883,8 @@ static int mailalias_hdrloader(MA *op) noex {
 
 static int mailalias_fileopen(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd < 0) {
-	    int	oflags = op->oflags ;
+	    int		oflags = op->oflags ;
 	    oflags &= (~ O_CREAT) ;
 	    oflags &= (~ O_RDWR) ;
 	    oflags &= (~ O_WRONLY) ;
@@ -926,7 +899,6 @@ static int mailalias_fileopen(MA *op,time_t dt) noex {
 		}
 	    } /* end if */
 	} /* end if (needed open) */
-
 	return (rs >= 0) ? op->fd : rs ;
 }
 /* end subroutine (mailalias_fileopen) */
@@ -993,7 +965,6 @@ static int mailalias_keymatch(MA *op,int opts,int ri,cchar *aname) noex {
 static int mailalias_dbopen(MA *op,time_t dt) noex {
 	int		rs ;
 	int		f_create = false ;
-
 	if ((rs = mailalias_dbopenfile(op,dt)) >= 0) {
 	    f_create = rs ;
 	    if ((rs = mailalias_dbopenmake(op,dt)) >= 0) {
@@ -1003,8 +974,9 @@ static int mailalias_dbopen(MA *op,time_t dt) noex {
 	                    if ((rs = mailalias_hdrload(op)) >= 0) {
 	                        op->ti_access = dt ;
 	                    }
-	                    if (rs < 0)
+	                    if (rs < 0) {
 	                        mailalias_mapend(op) ;
+			    }
 	                } /* end if (mailalias_mapbegin) */
 	            } /* end if (mailalias_dbopenwait) */
 	        } /* end if (mailalias_isremote) */
@@ -1013,7 +985,6 @@ static int mailalias_dbopen(MA *op,time_t dt) noex {
 	        mailalias_fileclose(op) ;
 	    }
 	} /* end if (mailalias_dbopenfile) */
-
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_dbopen) */
@@ -1029,16 +1000,12 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	if ((rs = u_open(op->dbfname,of,op->operm)) >= 0) {
 	    USTAT	sb ;
 	    op->fd = rs ;
-
 	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-
 	        op->fi.mtime = sb.st_mtime ;
 	        op->fi.fsize = sb.st_size ;
 	        op->fi.ino = sb.st_ino ;
 	        op->fi.dev = sb.st_dev ;
-
 	        op->ti_open = dt ;
-
 	        if (op->f.ocreate && op->f.owrite) {
 	            f_create = (sb.st_size == 0) ;
 	            if (! f_create) {
@@ -1050,9 +1017,7 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	                mailalias_fileclose(op) ;
 	            }
 	        } /* end if (we can possibly create the DB) */
-
 	    } /* end if (stat) */
-
 	    if (rs < 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
@@ -1062,11 +1027,9 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	    f_create = true ;
 	    op->f.needcreate = true ;
 	} /* end if (successful file open) */
-
 	if ((rs >= 0) && f_create) {
 	    op->f.needcreate = true ;
 	}
-
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_dbopenfile) */
@@ -1099,7 +1062,7 @@ static int mailalias_dbopenmake(MA *op,time_t dt) noex {
 
 static int mailalias_dbopenwait(MA *op) noex {
 	USTAT		sb ;
-	cint	to = TO_FILECOME ;
+	cint		to = TO_FILECOME ;
 	int		rs = SR_OK ;
 	int		msize ; /* minimum size */
 	int		i ;
@@ -1137,15 +1100,19 @@ static int mailalias_isremote(MA *op) noex {
 /* end subroutine (mailalias_isremote) */
 
 static int mailalias_dbclose(MA *op) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	rs1 = mailalias_mapend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = mailalias_fileclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = mailalias_mapend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = mailalias_fileclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailalias_dbclose) */
@@ -1154,12 +1121,9 @@ static int mailalias_dbclose(MA *op) noex {
 static int mailalias_dbmake(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar	*cp ;
-
+	cchar		*cp ;
 	if (dt == 0) dt = time(nullptr) ;
-
 /* get the directory of the DB file and see if it is writable to us */
-
 	if ((cl = sfdirname(op->dbfname,-1,&cp)) > 0) {
 	    char	dbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath1w(dbuf,cp,cl)) >= 0) {
@@ -1185,8 +1149,8 @@ static int mailalias_dbmake(MA *op,time_t dt) noex {
 /* end subroutine (mailalias_dbmake) */
 
 static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
-	cint	sz = MAILALIAS_TOPLEN ;
-	cint	clen = MAXNAMELEN ;
+	cint		sz = MAILALIAS_TOPLEN ;
+	cint		clen = MAXNAMELEN ;
 	int		n = NREC_GUESS ;
 	int		rs ;
 	int		rs1 ;
@@ -1203,9 +1167,9 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 	            fd = rs ;
 	        } else if (rs == SR_EXIST) {
 	            USTAT	sb ;
-	            int		i ;
+	            int		i ; /* used-afterwards */
 	            for (i = 0 ; i < TO_FILECOME ; i += 1) {
-	                sleep(1) ;
+	                msleep(1) ;
 	                rs1 = u_stat(op->dbfname,&sb) ;
 	                if ((rs1 >= 0) && (sb.st_size >= sz)) break ;
 	            } /* end for */
@@ -1248,7 +1212,7 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 /* end subroutine (mailalias_dbmaker) */
 
 static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
-	cint	sz = sizeof(record) ;
+	cint		sz = sizeof(record) ;
 	int		rs ;
 	int		rs1 ;
 	vecobj		recs ;
@@ -1258,11 +1222,12 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	        strtab	svals ;
 	        if ((rs = strtab_start(&svals,(n * 2))) >= 0) {
 	            if ((rs = mailalias_aprofile(op,dt)) >= 0) {
-	                DBMAKE	data(&recs,&skeys,&svals,fd) ;
-	                int	i ;
+	                dbmake	data(&recs,&skeys,&svals,fd) ;
 	                cchar	*cp ;
 	                char	tmpfname[MAXPATHLEN+1] ;
-	                for (i = 0 ; op->aprofile[i] != nullptr ; i += 1) {
+			data.rectab = op->rectab ;
+			data.ropts = op->ropts ;
+	                for (int i = 0 ; op->aprofile[i] != nullptr ; i += 1) {
 	                    cp = (cchar *) op->aprofile[i] ;
 	                    if (*cp != '/') {
 	                        cchar	*ap = op->aprofile[i] ;
@@ -1314,24 +1279,19 @@ static int mailalias_procfile(MA *op,DBMAKE *dp,cchar *fname) noex {
 
 	    dp->f_havekey = false ;
 	    c_rec = 0 ;
-	    dp->c = 0 ;
 	    while ((rs = breadln(&afile,lbuf,llen)) > 0) {
 	        int	len = rs ;
-
 	        f_eol = (lbuf[len - 1] == '\n') ;
 	        if (f_eol) len -= 1 ;
-
 	        if ((len > 0) && f_bol && f_eol) {
 	            if (lbuf[0] != '#') {
 	                if (! CHAR_ISWHITE(lbuf[0])) {
-	                    dp->c = 0 ;
 	                    dp->f_havekey = false ;
 	                }
 	                rs = dp->procline(lbuf,len) ;
 	                c_rec += rs ;
 	            }
 	        } /* end if (BOL and EOL) */
-
 	        f_bol = f_eol ;
 	        if (rs < 0) break ;
 	    } /* end while (reading extended lines) */
@@ -1340,7 +1300,6 @@ static int mailalias_procfile(MA *op,DBMAKE *dp,cchar *fname) noex {
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	} /* end if (afile) */
-
 	return (rs >= 0) ? c_rec : rs ;
 }
 /* end subroutine (mailalias_procfile) */
@@ -1389,7 +1348,7 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 
 	fidbuf[16] = MAILALIAS_FILEVERSION ;
 	fidbuf[17] = ENDIAN ;
-	fidbuf[18] = op->ropts ;
+	fidbuf[18] = dp->ropts ;
 	fidbuf[19] = 0 ;
 
 /* write magic along with version encoding */
@@ -1430,10 +1389,10 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 /* write out the header */
 
 	    if ((rs = u_write(dp->fd,header,hsize)) >= 0) {
-		if ((rs = mailalias_wrfilekeytab(op,dp)) >= 0) {
-	            if ((rs = mailalias_wrfilerec(op,dp)) >= 0) {
-	        	if ((rs = mailalias_wrfilekeys(op,dp)) >= 0) {
-	        	    rs = mailalias_wrfilevals(op,dp) ;
+		if ((rs = dp->wrfilekeytab()) >= 0) {
+	            if ((rs = dp->wrfilerec()) >= 0) {
+	        	if ((rs = dp->wrfilekeys()) >= 0) {
+	        	    rs = dp->wrfilevals() ;
 			}
 		    }
 		}
@@ -1444,194 +1403,6 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 	return rs ;
 }
 /* end subroutine (mailalias_wrfiler) */
-
-/* write the key-table */
-static int mailalias_wrfilekeytab(MA *op,DBMAKE *dp) noex {
-	cint	ktsize = dp->ktsize ;
-	int		rs ;
-	int		*keytab ;
-	if ((rs = uc_malloc(ktsize,&keytab)) >= 0) {
-	    if ((rs = strtab_recmk(dp->klp,keytab,ktsize)) >= 0) {
-		rs = u_write(dp->fd,keytab,ktsize) ;
-	    }
-	    uc_free(keytab) ;
-	} /* end if */
-	return rs ;
-}
-/* end subroutine (mailalias_wrfilekeytab) */
-
-/* write the record table */
-static int mailalias_wrfilerec(MA *op,DBMAKE *dp) noex {
-	cint		recsize = dp->recsize ;
-	int		rs ;
-	int		rs1 ;
-	int		wlen = 0 ;
-	int		(*rectab)[2] ;
-	if ((rs = uc_malloc(recsize,&rectab)) >= 0) {
-	    vecobj	*rlp = dp->rlp ;
-	    void	*vp{} ;
-	    int		ri = 0 ;
-	    rectab[ri][0] = 0 ;
-	    rectab[ri][1] = 0 ;
-	    ri += 1 ;
-	    for (int i = 0 ; vecobj_get(rlp,i,&vp) >= 0 ; i += 1) {
-	    	record	*rep = (record *) vp ;
-	        rectab[ri][0] = rep->key ;
-	        rectab[ri][1] = rep->val ;
-	        ri += 1 ;
-	    } /* end for */
-	    rectab[ri][0] = -1 ;
-	    rectab[ri][1] = 0 ;
-	    rs = u_write(dp->fd,rectab,recsize) ;
-	    wlen = rs ;
-	    rs1 = uc_free(rectab) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (record table) */
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailalias_wrfilerec) */
-
-/* make the index table and the key-string table */
-static int mailalias_wrfilekeys(MA *op,DBMAKE *dp) noex {
-	cint		risize = dp->risize ;
-	int		rs ;
-	int		rs1 ;
-	int		(*indtab)[2] ;
-	if ((rs = uc_malloc(risize,&indtab)) >= 0) {
-	    cint	sksize = dp->sksize ;
-	    char	*kstab ;
-	    if ((rs = uc_malloc(sksize,&kstab)) >= 0) {
-	        if ((rs = strtab_strmk(dp->klp,kstab,sksize)) >= 0) {
-	            vecobj	*rlp = dp->rlp ;
-	            int		(*it)[2] = indtab ;
-	            cint	ris = risize ;
-	            if ((rs = mailalias_mkind(op,rlp,kstab,it,ris)) >= 0) {
-	                if ((rs = u_write(dp->fd,indtab,risize)) >= 0) {
-	                    rs = u_write(dp->fd,kstab,sksize) ;
-	                }
-	            }
-	        }
-	        rs1 = uc_free(kstab) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory allocation) */
-	    rs1 = uc_free(indtab) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory allocation) */
-	return rs ;
-}
-/* end subroutine (mailalias_wrfilekeys) */
-
-/* make the value-string table */
-static int mailalias_wrfilevals(MA *op,DBMAKE *dp) noex {
-	cint		svsize = dp->svsize ;
-	int		rs ;
-	int		rs1 ;
-	char		*vstab ;
-	if ((rs = uc_malloc(svsize,&vstab)) >= 0) {
-	    if ((rs = strtab_strmk(dp->vlp,vstab,svsize)) >= 0) {
-	        rs = u_write(dp->fd,vstab,svsize) ;
-	    }
-	    rs1 = uc_free(vstab) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (value string-table) */
-	return rs ;
-}
-/* end subroutine (mailalias_wrfilevals) */
-
-/* make the (only) index for this file */
-static int mailalias_mkind(MA *op,vecobj *rp,cc *skey,rt_t it,int itsz) noex {
-	cint		ns = NSHIFT ;
-	int		rs ;
-	int		sz ;
-	int		n = 0 ; /* ¥ GCC false complaint */
-
-	if (it == nullptr) return SR_FAULT ;
-
-	if ((rs = vecobj_count(rp)) >= 0) {
-	    n = nextpowtwo(rs) ;
-	    if (n < 4) n = 4 ;
-
-	    sz = (n * 2 * sizeof(uint)) ;
-
-	    if (sz <= itsz) {
-		void		*vp{} ;
-	        uint		khash ;
-	        int		ri, hi, ki ;
-	        int		v, c ;
-	        int		kl ;
-	        int		f ;
-	        cchar	*kp ;
-
-	        memset(it,0,sz) ;
-	        ri = 1 ;
-	        for (int i = 0 ; vecobj_get(rp,i,&vp) >= 0 ; i += 1) {
-	            record	*rep = recordp(vp) ;
-	            kp = charp(skey + rep->key) ;
-	            kl = strlen(kp) ;
-
-	            khash = hash_elf(kp,kl) ;
-
-	            hi = hashindex(khash,n) ;
-
-	            c = 0 ;
-	            if ((op->ropts & MAILALIAS_OSEC) && (it[hi][0] != 0)) {
-
-	                while ((v = it[hi][0]) != 0) {
-
-	                    ki = op->rectab[v][0] ;
-	                    f = (strcmp(kp,(op->skey + ki)) == 0) ;
-
-	                    if (! f) break ;
-
-	                    if (op->ropts & MAILALIAS_ORANDLC) {
-	                        khash = randlc(khash + c) ;
-	                    } else {
-	                        khash = ((khash<<(32-ns))|(khash>>ns))+c ;
-	                    }
-
-	                    hi = hashindex(khash,n) ;
-	                    c += 1 ;
-
-	                } /* end while */
-
-	            } /* end if (secondary hash on collision) */
-
-	            if (it[hi][0] != 0) {
-	                int	lhi ;
-	                c += 1 ;
-	                while (it[hi][1] != 0) {
-	                    c += 1 ;
-	                    hi = it[hi][1] ;
-	                }
-
-	                lhi = hi ;		/* save last hash-index value */
-	                hi = hashindex((hi + 1),n) ;
-
-	                while (it[hi][0] != 0) {
-	                    c += 1 ;
-	                    hi = hashindex((hi + 1),n) ;
-	                } /* end while */
-
-	                it[lhi][1] = hi ;	/* update the previous slot */
-
-	            } /* end if (got a hash collision) */
-
-	            it[hi][0] = ri ;
-	            it[hi][1] = 0 ;
-
-#ifdef	COMMENT
-	            op->s.c_l1 += c ;
-	            recorder_cden(asp,wi,c) ;
-#endif
-	            ri += 1 ;
-	        } /* end for (looping through records) */
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} /* end if (vecobj_count) */
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailalias_mkind) */
 
 static int mailalias_filechanged(MA *op,USTAT *sbp) noex {
 	csize		fsz = size_t(sbp->st_size) ;
@@ -1800,29 +1571,30 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	int		c_rec = 0 ;
 	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
 	    cint	rsn = SR_NOTFOUND ;
+	    cint	klen = ALIASNAMELEN ;
 	    char	kbuf[ALIASNAMELEN+1] = { 0 } ;
-	    c = 0 ;
 	    if (! f_havekey) {
+		cchar	*kt = keys.terms ;
+	        cchar	*pm = "Postmaster" ;
 	        cchar	*kp ;
-	        if (int kl ; (kl = field_get(&fsb,kterms,&kp)) >= 0) {
+	        if (int kl ; (kl = field_get(&fsb,kt,&kp)) >= 0) {
 	            if (kl > 0) {
-	                bool	f ;
-	                cchar	*pm = "Postmaster" ;
+	                cbool	f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
 	                f_havekey = true ;
-	                c = 0 ;
-	                f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
 	                if (f) {
-	                    strwcpylc(kbuf,kp,min(kl,ALIASNAMELEN)) ;
+	                    strwcpylc(kbuf,kp,min(kl,klen)) ;
 	                } else {
-	                    strwcpy(kbuf,kp,min(kl,ALIASNAMELEN)) ;
+	                    strwcpy(kbuf,kp,min(kl,klen)) ;
 	                }
 	            } /* end if (positive) */
 	        } /* end if (field_get) */
 	    } /* end if (didn't have a key already) */
 	    if (f_havekey && (fsb.term != '#')) {
+		int	c = 0 ;
 	        int	vl ;
+		cchar	*vt = vals.terms ;
 	        cchar	*vp ;
-	        while ((vl = field_get(&fsb,vterms,&vp)) >= 0) {
+	        while ((vl = field_get(&fsb,vt,&vp)) >= 0) {
 	            if (vl > 0) {
 	                int	ival = 0 ;
 	                if (c == 0) { /* enter into key-string table */
@@ -1848,9 +1620,9 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	                            rs = vecobj_add(rlp,&re) ;
 	                        }
 	                        if (rs >= 0) {
-	                            c += 1 ;
 	                            nrecs += 1 ;
 	                            c_rec += 1 ;
+				    c += 1 ;
 	                        }
 	                    } /* end if (new entry) */
 	                } /* end if (ok) */
@@ -1862,9 +1634,177 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	    rs1 = field_finish(&fsb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
+	count = c_rec ;
 	return (rs >= 0) ? c_rec : rs ;
 }
 /* end method (dbmake::procline) */
+
+/* write the key-table */
+int dbmake::wrfilekeytab() noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	int		*keytab ;
+	if ((rs = uc_malloc(ktsize,&keytab)) >= 0) {
+	    if ((rs = strtab_recmk(klp,keytab,ktsize)) >= 0) {
+		rs = u_write(fd,keytab,ktsize) ;
+		wlen += rs ;
+	    }
+	    rs1 = uc_free(keytab) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (dbmake::wrfilekeytab) */
+
+/* write the record table */
+int dbmake::wrfilerec() noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	int		(*rectab)[2] ;
+	if ((rs = uc_malloc(recsize,&rectab)) >= 0) {
+	    {
+	        void	*vp{} ;
+	        int	ri = 0 ;
+	        rectab[ri][0] = 0 ;
+	        rectab[ri][1] = 0 ;
+	        ri += 1 ;
+	        for (int i = 0 ; vecobj_get(rlp,i,&vp) >= 0 ; i += 1) {
+	    	    record	*rep = recordp(vp) ;
+	            rectab[ri][0] = rep->key ;
+	            rectab[ri][1] = rep->val ;
+	            ri += 1 ;
+	        } /* end for */
+	        rectab[ri][0] = -1 ;
+	        rectab[ri][1] = 0 ;
+	        rs = u_write(fd,rectab,recsize) ;
+	        wlen = rs ;
+	    } /* end block */
+	    rs1 = uc_free(rectab) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (record table) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (dbmake::wrfilerec) */
+
+/* make the index table and the key-string table */
+int dbmake::wrfilekeys() noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	int		(*indtab)[2] ;
+	if ((rs = uc_malloc(risize,&indtab)) >= 0) {
+	    char	*kstab ;
+	    if ((rs = uc_malloc(sksize,&kstab)) >= 0) {
+	        if ((rs = strtab_strmk(klp,kstab,sksize)) >= 0) {
+	            int		(*it)[2] = indtab ;
+	            cint	ris = risize ;
+	            if ((rs = mkind(rlp,kstab,it,ris)) >= 0) {
+	                if ((rs = u_write(fd,indtab,risize)) >= 0) {
+			    wlen += rs ;
+	                    rs = u_write(fd,kstab,sksize) ;
+			    wlen += rs ;
+	                }
+	            }
+	        }
+	        rs1 = uc_free(kstab) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (memory allocation) */
+	    rs1 = uc_free(indtab) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (memory allocation) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (dbmake::wrfilekeys) */
+
+/* make the value-string table */
+int dbmake::wrfilevals() noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	char		*vstab ;
+	if ((rs = uc_malloc(svsize,&vstab)) >= 0) {
+	    if ((rs = strtab_strmk(vlp,vstab,svsize)) >= 0) {
+	        rs = u_write(fd,vstab,svsize) ;
+		wlen += rs ;
+	    }
+	    rs1 = uc_free(vstab) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (value string-table) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (dbmake::wrfilevals) */
+
+/* make the (only) index for this file */
+int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
+	cint		ns = NSHIFT ;
+	int		rs = SR_FAULT ;
+	int		n = 0 ; /* ¥ GCC false complaint */
+	if (it) {
+	    int		sz ;
+	    if ((rs = vecobj_count(rp)) >= 0) {
+	        n = nextpowtwo(rs) ;
+	        if (n < 4) n = 4 ;
+	        sz = (n * 2 * sizeof(uint)) ;
+	        if (sz <= itsz) {
+		    void	*vp{} ;
+	            uint	khash ;
+	            int		ri, hi, ki ;
+	            int		v ;
+	            int		kl ;
+	            int		f ;
+	            cchar	*kp ;
+	            memset(it,0,sz) ;
+	            ri = 1 ;
+	            for (int i = 0 ; vecobj_get(rp,i,&vp) >= 0 ; i += 1) {
+	                record	*rep = recordp(vp) ;
+	                int	c = 0 ;
+	                kp = charp(skey + rep->key) ;
+	                kl = strlen(kp) ;
+	                khash = hash_elf(kp,kl) ;
+	                hi = hashindex(khash,n) ;
+	                if ((ropts & MAILALIAS_OSEC) && (it[hi][0] != 0)) {
+	                    while ((v = it[hi][0]) != 0) {
+	                        ki = rectab[v][0] ;
+	                        f = (strcmp(kp,(skey + ki)) == 0) ;
+	                        if (! f) break ;
+	                        if (ropts & MAILALIAS_ORANDLC) {
+	                            khash = randlc(khash + c) ;
+	                        } else {
+	                            khash = ((khash<<(32-ns))|(khash>>ns))+c ;
+	                        }
+	                        hi = hashindex(khash,n) ;
+	                        c += 1 ;
+	                    } /* end while */
+	                } /* end if (secondary hash on collision) */
+	                if (it[hi][0] != 0) {
+	                    int	lhi ;
+	                    c += 1 ;
+	                    while (it[hi][1] != 0) {
+	                        c += 1 ;
+	                        hi = it[hi][1] ;
+	                    }
+	                    lhi = hi ;	/* save last hash-index value */
+	                    hi = hashindex((hi + 1),n) ;
+	                    while (it[hi][0] != 0) {
+	                        c += 1 ;
+	                        hi = hashindex((hi + 1),n) ;
+	                    } /* end while */
+	                    it[lhi][1] = hi ; /* update the previous slot */
+	                } /* end if (got a hash collision) */
+	                it[hi][0] = ri ;
+	                it[hi][1] = 0 ;
+	                ri += 1 ;
+	            } /* end for (looping through records) */
+	        } else {
+	            rs = SR_OVERFLOW ;
+	        }
+	    } /* end if (vecobj_count) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end method (dbmake::mkind) */
 
 /* calculate the next hash table index from a given one */
 static int hashindex(uint i,int n) noex {

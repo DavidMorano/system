@@ -3,67 +3,58 @@
 /* process server file program arguments */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUG	0		/* run-time debugging */
-
+#define	CF_DEBUG	1		/* compile-time debugging */
 
 /* revision history:
 
-	= 1998-09-01, David A­D­ Morano
+	= 1991-09-01, David A­D­ Morano
 
 	This program was originally written.
 
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1991 David A­D­ Morano.  All rights reserved. */
 
 /*****************************************************************************
 
-	This subroutine is used to parse the SERVER program arguments
+	These subroutines are used to parse the SERVER program arguments
 	from an expanded (substituted) server file entry.  Basically,
 	we just "field-SHELL" out arguments and put them into the
 	supplied vector string object.
 
-
 *****************************************************************************/
 
-
-#include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
+#include	<baops.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecstr.h>
-#include	<baops.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
 
 #ifndef	BUFLEN
-#define	BUFLEN		(4 * MAXPATHLEN)
+#define	BUFLEN	(4 * MAXPATHLEN)
 #endif
 
 
-
 /* external subroutines */
+
+extern char	*strbasename() ;
 
 
 /* externals variables */
@@ -72,11 +63,13 @@
 /* forward references */
 
 
+/* local global variables */
+
+
 /* local structures */
 
 
-
-
+/* exported subroutines */
 
 
 int processargs(pip,args,alp)
@@ -106,18 +99,22 @@ vecstr		*alp ;
 
 	if ((rs = field_start(&fsb,args,-1)) >= 0) {
 
-	while ((fl = field_sharg(&fsb,terms,fbuf,BUFLEN)) >= 0) {
+	while ((fl = field_sharg(&fsb,terms,fbuf,BUFLEN)) > 0) {
 
-	    rs = vecstr_add(alp,fbuf,fl) ;
 	    i += 1 ;
+	    rs = vecstr_add(alp,fbuf,fl) ;
 
 	    if (rs < 0) break ;
 	} /* end while */
 
-	field_finish(&fsb) ;
+	    field_finish(&fsb) ;
 	} /* end if (field) */
 
-ret0:
+#if	CF_DEBUG
+	if (pip->debuglevel > 1)
+	    debugprintf("processargs: exiting, %d args\n",i) ;
+#endif
+
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (processargs) */

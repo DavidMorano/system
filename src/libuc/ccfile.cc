@@ -24,14 +24,14 @@
 
 	Description:
 	This subroutine tries to mimic the old normal 'read' function
-	from the old days.  The "modern" |istread::getline(3c++)|
+	from the old days.  The "modern" |istream::getline(3c++)|
 	and |std::getline(3c++)| want to be in the middle of a
 	sequence of input operations (like reading various typed
 	fields from the input file).  So they return something like
 	the type |istream &| so that they can be chained together.
 	But I want to have the older style semantic where either
-	the number of characters read is returned or an |errno(3)|
-	error code is returned.
+	the number of characters read is returned or an |errno(2)|
+	error code is returned
 
 	Synopsis:
 	int readln(istream &cin,char *ibuf,int ilen,int chdelim = eol) noex
@@ -44,7 +44,7 @@
 
 	Returns:
 	>=0		number characters read, including terminating char
-	<0		error (system-return)
+	<0		error code (system-return)
 
 	Implementation-node:
 	:-)
@@ -240,7 +240,8 @@ int ccfile::seek(off_t o,int w) noex {
 
 int ccfile::iclose() noex {
 	int		rs = SR_OK ;
-	fstream::close() ;
+	clear() ;
+	fstream::close() ; /* superclass */
 	if (fail()) {
 	    rs = SR_IO ;
 	}

@@ -57,8 +57,8 @@
 
 /* local defines */
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	I_SENDFD
@@ -156,7 +156,7 @@ static int waitready(int fd,int timeout) noex {
 	    polls[1].events = 0 ;
 	    ti_timeout = daytime + timeout ;
 	    while (rs >= 0) {
-	        cint	pollto = MIN(timeout,5) * POLLMULT ;
+	        cint	pollto = MIN(timeout,5) * POLL_INTMULT ;
 	        if ((rs = u_poll(polls,1,pollto)) > 0) {
 		    cint	re = polls[0].revents ;
 	            if (re & POLLHUP) {

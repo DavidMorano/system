@@ -52,7 +52,7 @@
 
 /* exported subroutines */
 
-int sigblocker_start(sigblocker *op,const int *sigs) noex {
+int sigblocker_start(sigblocker *op,cint *sigs) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    sigset_t	nsm ;
@@ -67,7 +67,7 @@ int sigblocker_start(sigblocker *op,const int *sigs) noex {
 	    }
     
 	    if (rs >= 0) {
-	        rs = pt_sigmask(SIG_BLOCK,&nsm,&op->osm) ;
+	        rs = u_sigmask(SIG_BLOCK,&nsm,&op->osm) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
@@ -77,7 +77,7 @@ int sigblocker_start(sigblocker *op,const int *sigs) noex {
 int sigblocker_finish(sigblocker *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pt_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
+	    rs = u_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
 	}
 	return rs ;
 }

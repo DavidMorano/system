@@ -27,7 +27,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* need types */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>

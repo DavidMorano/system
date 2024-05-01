@@ -59,6 +59,8 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<format.h>
+#include	<ctbin.h>
+#include	<ctoct.h>
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<mkchar.h>
@@ -129,6 +131,18 @@ int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine-template (sbuf_xxxx) */
+
+template<typename T>
+int sbuf_binx(sbuf *sbp,T v) noex {
+	return sbuf_xxxx(sbp,ctbin,v) ;
+}
+/* end subroutine-template (sbuf_binx) */
+
+template<typename T>
+int sbuf_octx(sbuf *sbp,T v) noex {
+	return sbuf_xxxx(sbp,ctoct,v) ;
+}
+/* end subroutine-template (sbuf_octx) */
 
 template<typename T>
 int sbuf_decx(sbuf *sbp,T v) noex {
@@ -255,6 +269,66 @@ int sbuf_strs(sbuf *bp,int sch,cchar **sv) noex {
 	return rs ;
 }
 /* end subroutine (sbuf_strs) */
+
+int sbuf_bini(sbuf *sbp,int v) noex {
+	return sbuf_binx(sbp,v) ;
+}
+/* end subroutine (sbuf_bini) */
+
+int sbuf_binl(sbuf *sbp,long v) noex {
+	return sbuf_binx(sbp,v) ;
+}
+/* end subroutine (sbuf_binl) */
+
+int sbuf_binll(sbuf *sbp,longlong v) noex {
+	return sbuf_binx(sbp,v) ;
+}
+/* end subroutine (sbuf_binll) */
+
+int sbuf_binui(sbuf *sbp,uint v) noex {
+	return sbuf_binx(sbp,v) ;
+}
+/* end subroutine (sbuf_binui) */
+
+int sbuf_binul(sbuf *sbp,ulong v) noex {
+	return sbuf_binx(sbp,v) ;
+}
+/* end subroutine (sbuf_binul) */
+
+int sbuf_binull(sbuf *sbp,ulonglong v) noex {
+	return sbuf_binx(sbp,v) ;
+}
+/* end subroutine (sbuf_binull) */
+
+int sbuf_octi(sbuf *sbp,int v) noex {
+	return sbuf_octx(sbp,v) ;
+}
+/* end subroutine (sbuf_octi) */
+
+int sbuf_octl(sbuf *sbp,long v) noex {
+	return sbuf_octx(sbp,v) ;
+}
+/* end subroutine (sbuf_octl) */
+
+int sbuf_octll(sbuf *sbp,longlong v) noex {
+	return sbuf_octx(sbp,v) ;
+}
+/* end subroutine (sbuf_octll) */
+
+int sbuf_octui(sbuf *sbp,uint v) noex {
+	return sbuf_octx(sbp,v) ;
+}
+/* end subroutine (sbuf_octui) */
+
+int sbuf_octul(sbuf *sbp,ulong v) noex {
+	return sbuf_octx(sbp,v) ;
+}
+/* end subroutine (sbuf_octul) */
+
+int sbuf_octull(sbuf *sbp,ulonglong v) noex {
+	return sbuf_octx(sbp,v) ;
+}
+/* end subroutine (sbuf_octull) */
 
 int sbuf_deci(sbuf *sbp,int v) noex {
 	return sbuf_decx(sbp,v) ;
@@ -618,4 +692,5 @@ int sbuf_co::operator () (int a) noex {
 	return rs ;
 }
 /* end method (sbuf_co::operator) */
+
 

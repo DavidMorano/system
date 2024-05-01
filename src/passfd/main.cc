@@ -51,8 +51,8 @@
 
 /* local defines */
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #define	DEBUGFILE	"/tmp/passfd.deb"
@@ -765,7 +765,7 @@ static int procserve(PROGINFO *pip,cchar *pfname,cchar *sfname,mode_t om)
 	fds[i].fd = -1 ;
 	fds[i].events = 0 ;
 
-	pto = (to * POLLMULT) ;
+	pto = (to * POLL_INTMULT) ;
 	while (rs >= 0) {
 
 	    if ((rs = u_poll(fds,1,pto)) > 0) {
