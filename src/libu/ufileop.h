@@ -8,7 +8,8 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -29,14 +30,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>		/* |SOCKADDR| */
+#include	<sys/types.h>		/* system types */
+#include	<sys/stat.h>
+#include	<sys/mount.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |intptr_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
@@ -49,16 +47,14 @@
 
 namespace ufileop {
     struct ufileopflags {
-	uint		fclose:1 ;
-	uint		fwrite:1 ;
 	uint		fintr:1 ;	/* request interrupts to return */
     } ; /* end struct (ufileopflags) */
     struct ufileopbase {
 	cchar		*fn ;
 	ufileopflags	f{} ;
 	ufileopbase() noex { } ;
-	int operator () (int) noex ;
-	virtual int callstd(int) noex = 0 ;
+	int operator () (cchar *) noex ;
+	virtual int callstd(cchar *) noex = 0 ;
     } ; /* end struct (ufileopbase) */
 }
 
@@ -66,6 +62,24 @@ namespace ufileop {
 
 EXTERNC_begin
 
+extern int u_access(cchar *,int) noex ;
+extern int u_chdir(cchar *) noex ;
+extern int u_chmod(cchar *,mode_t) noex ;
+extern int u_chown(cchar *,uid_t,gid_t) noex ;
+extern int u_lchown(cchar *,uid_t,gid_t) noex ;
+extern int u_link(cchar *,cchar *) noex ;
+extern int u_lstat(cchar *,USTAT *) noex ;
+extern int u_mknod(cchar *,mode_t,dev_t) noex ;
+extern int u_pathconf(cchar *,int,long *) noex ;
+extern int u_readlink(cchar *,char *,int) noex ;
+extern int u_rename(cchar *,cchar *) noex ;
+extern int u_resolvepath(cchar *,char *,int) noex ;
+extern int u_rmdir(cchar *) noex ;
+extern int u_statfs(cchar *,STATFS *) noex ;
+extern int u_statvfs(cchar *,STATVFS *) noex ;
+extern int u_symlink(cchar *,cchar *) noex ;
+extern int u_truncate(cchar *,off_t) noex ;
+extern int u_unlink(cchar *) noex ;
 
 EXTERNC_end
 

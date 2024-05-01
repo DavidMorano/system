@@ -29,14 +29,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>		/* |SOCKADDR| */
+#include	<sys/types.h>		/* system types */
+#include	<sys/stat.h>
+#include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |intptr_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>

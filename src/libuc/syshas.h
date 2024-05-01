@@ -154,22 +154,22 @@
 /* Solaris®: ptmx(9) */
 #define	SYSHAS_PTMX		1
 
-/* Solaris®: POSIX shared memory ('shm(3rt)') */
+/* Solaris®: POSIX shared memory (|shm(3rt)|) */
 #define	SYSHAS_PSHM		1
 
-/* Solaris®: POSIX regular semaphores ('sem(3rt)') */
+/* Solaris®: POSIX regular semaphores (|sem(3rt)| */
 #define	SYSHAS_PSEM		1
 
-/* Solaris: POSIX named semaphores ('sem(3rt)') */
+/* Solaris: POSIX named semaphores (|sem(3rt)|) */
 #define	SYSHAS_NSEM		1
 
-/* Solaris®: POSIX message queues ('mq(3rt)') */
+/* Solaris®: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		1
 
 /* Solaris®: AUDIT - part of Solaris® Basic-Security-Module (BSM) */
 #define	SYSHAS_AUDIT		1
 
-/* Solaris®: get-directory-entries ('getdents(2)') */
+/* Solaris®: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		1
 
 /* Solaris®: XTI */
@@ -220,6 +220,9 @@
 /* Solaris®: |stime(2)| */
 #define	SYSHAS_STIME		1
 
+/* Solaris®: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	1
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -262,10 +265,10 @@
 #define	SYSHAS_SETENV		0
 #define	SYSHAS_UNSETENV		0
 
-/* Darwin: system information header for 'sysinfo(2)' */
+/* Darwin: system information header for |sysinfo(2)| */
 #define	SYSHAS_SYSINFO		0
 
-/* Darwin: system has a 'off_t' data type (assumed to be 64 bits) */
+/* Darwin: system has a |offset_t| data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		0
 
 /* Darwin: getcwd(3c) */
@@ -368,22 +371,22 @@
 /* Darwin: ptmx(9) */
 #define	SYSHAS_PTMX		1
 
-/* Darwin: POSIX shared memory ('shm(3rt)') */
+/* Darwin: POSIX shared memory (|shm(3rt)|) */
 #define	SYSHAS_PSHM		1
 
-/* Darwin: POSIX unnamed semaphores ('sem(3rt)') */
+/* Darwin: POSIX unnamed semaphores (|sem(3rt)|) */
 #define	SYSHAS_PSEM		0
 
-/* Darwin: POSIX named semaphores ('sem(3rt)') */
+/* Darwin: POSIX named semaphores (|sem(3rt)|) */
 #define	SYSHAS_NSEM		1
 
-/* Darwin: POSIX message queues ('mq(3rt)') */
+/* Darwin: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		0
 
 /* Darwin: AUDIT - part of Solaris® Basic-Security-Module (BSM) */
 #define	SYSHAS_AUDIT		0
 
-/* Darwin: get-directory-entries ('getdents(2)') */
+/* Darwin: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		0
 
 /* Darwin: XTI */
@@ -434,6 +437,10 @@
 /* Darwin: |stime(2)| */
 #define	SYSHAS_STIME		0
 
+/* Darwin: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	0
+
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -468,10 +475,10 @@
 #define	SYSHAS_SETENV		0
 #define	SYSHAS_UNSETENV		0
 
-/* Linux: system information header for 'sysinfo(2)' */
+/* Linux: system information header for |sysinfo(2)| */
 #define	SYSHAS_SYSINFO		1
 
-/* Linux: system has a 'off_t' data type (assumed to be 64 bits) */
+/* Linux: system has a |offset_t| data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
 /* Linux: getcwd(3c) */
@@ -627,6 +634,10 @@
 
 /* Linux: |stime(2)| */
 #define	SYSHAS_STIME		0
+
+/* Linux: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	0
+
 
 /******************************************************************************/
 #endif /* OSNAME */

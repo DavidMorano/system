@@ -241,6 +241,11 @@ ufiledesc.o:		ufiledesc.dir
 ufiledesc.dir:
 	makesubdir $@
 
+# UFILEOP
+ufileop.o:		ufileop.dir
+ufileop.dir:
+	makesubdir $@
+
 # UIPC
 uipc.o:			uipc.dir
 uipc.dir:

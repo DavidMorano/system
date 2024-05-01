@@ -84,6 +84,7 @@ int ufiledescbase::operator () (int fd) noex {
 	if (fd >= 0) {
 	    int		to_closewait	= utimeout[uto_closewait] ;
 	    errtimer	to_again	= utimeout[uto_again] ;
+	    errtimer	to_busy		= utimeout[uto_busy] ;
 	    errtimer	to_nomem	= utimeout[uto_nomem] ;
 	    errtimer	to_nosr		= utimeout[uto_nosr] ;
 	    errtimer	to_nobufs	= utimeout[uto_nobufs] ;
@@ -100,6 +101,9 @@ int ufiledescbase::operator () (int fd) noex {
                     switch (rs) {
                     case SR_AGAIN:
                         r = to_again(rs) ;
+                        break ;
+                    case SR_BUSY:
+                        r = to_busy(rs) ;
                         break ;
                     case SR_NOMEM:
                         r = to_nomem(rs) ;

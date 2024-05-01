@@ -56,6 +56,12 @@ EXTERNC_end
 #include	<semaphore.h>
 
 
+#ifndef	TYPEDEF_CCHAR
+#define	TYPEDEF_CCHAR
+typedef const char	cchar ;
+#endif
+
+
 #ifndef	SIGEVENT
 #define	SIGEVENT	struct sigevent
 #endif
@@ -285,6 +291,22 @@ EXTERNC_end
 
 #endif /* defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0) */
 /* UTMPENT_FIELDS end */
+/*----------------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------------*/
+#ifndef	SUBROUTINE_RENAME
+#define	SUBROUTINE_RENAME
+extern int	rename(cchar *,cchar *) noex ;
+#endif
+/*----------------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------------*/
+#ifndef	SUBROUTINE_RESOLVEPATH
+#define	SUBROUTINE_RESOLVEPATH
+extern int	resolvepath(cchar *,char *,int) noex ;
+#endif
 /*----------------------------------------------------------------------------*/
 
 
