@@ -44,6 +44,7 @@
 #include	<usys_ttynamerp.h>
 #include	<usys_ugetnisdom.h>
 #include	<usys_stime.h>
+#include	<usys_resolvepath.h>
 
 
 #endif /* USYS_INCLUDE */

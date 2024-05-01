@@ -58,7 +58,7 @@ OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ3_USYS= usys_ttynamerp.o usys_ugetnisdom.o
-OBJ4_USYS= usys_stime.o
+OBJ4_USYS= usys_stime.o usys_resolvepath.o
 
 OBJ_USYS= obj0_usys.o obj1_usys.o obj2_usys.o obj3_usys.o obj4_usys.o
 
@@ -133,5 +133,6 @@ usys_getrandom.o:	usys_getrandom.cc usys_getrandom.h	$(INCS)
 usys_ttynamerp.o:	usys_ttynamerp.cc usys_ttynamerp.h	$(INCS)
 usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
 usys_stime.o:		usys_stime.cc usys_stime.h		$(INCS)
+usys_resolvepath.o:	usys_resolvepath.cc usys_resolvepath.h	$(INCS)
 
 

@@ -1,4 +1,4 @@
-/* usys_gethrtime HEADER */
+/* usys_resolvepath HEADER */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -23,43 +23,34 @@
 
 *******************************************************************************/
 
-#ifndef	USYSGETHRTIME_INCLUDE
-#define	USYSGETHRTIME_INCLUDE
+#ifndef	USYSRESOLVEPATH_INCLUDE
+#define	USYSRESOLVEPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* <- |gethrtime(3c)| */
-#include	<time.h>
+
+/* RESOLVEPATH begin */
+#if	(!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0)
+
+
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 
-/* GETHRTIME begin */
-#if	defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0)
-
-/* » nothing needed « */
-
-#else /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
-
-#ifndef	TYPEDEF_HRTIME
-#define	TYPEDEF_HRTIME
-
-typedef unsigned long		hrtime_t ;
-
-#endif /* TYPEDEF_HRTIME */
-
-#ifndef	SUBROUTINE_GETHRTIME
-#define	SUBROUTINE_GETHRTIME
+#ifndef	SUBROUTINE_RESOLVEPATH
+#define	SUBROUTINE_RESOLVEPATH
 EXTERNC_begin
 
-extern hrtime_t gethrtime() noex ;
+extern int	resolvepath(cchar *,char *,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_GETHRTIME */
-
-#endif /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
-/* GETHRTIME end */
+#endif /* SUBROUTINE_RESOLVEPATH */
 
 
-#endif /* USYSGETHRTIME_INCLUDE */
+#endif /* (!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0) */
+/* RESOLVEPATH end */
+
+
+#endif /* USYSRESOLVEPATH_INCLUDE */
 
 

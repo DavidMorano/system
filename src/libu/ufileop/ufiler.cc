@@ -295,10 +295,11 @@ int u_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (fn && rbuf) {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0] && (rlen >= 0)) {
+		csize	rsz = size_t(rlen) ;
 	        repeat {
 	            errno = 0 ;
-	            if ((rs = resolvepath(fn,rbuf,rlen)) < 0) {
+	            if ((rs = resolvepath(fn,rbuf,rsz)) < 0) {
 		        rs = (- errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;

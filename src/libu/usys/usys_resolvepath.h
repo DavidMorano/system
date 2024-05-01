@@ -1,4 +1,4 @@
-/* usys_getrandom HEADER */
+/* usys_resolvepath HEADER */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -21,43 +21,36 @@
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
 
-
 *******************************************************************************/
 
-#ifndef	USYSGETRANDOM_INCLUDE
-#define	USYSGETRANDOM_INCLUDE
+#ifndef	USYSRESOLVEPATH_INCLUDE
+#define	USYSRESOLVEPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* GETRANDOM begin */
-#if	(!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0)
+/* RESOLVEPATH begin */
+#if	(!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0)
 
 
-#include	<sys/random.h>		/* |getentropy(2)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
 
-#define GRND_NONBLOCK		0x01	/* do not block open */
-#define GRND_RANDOM		0x02	/* use '/dev/random' */
-#define GRND_INSECURE		0x04	/* quality can be compromised */
-
-
-#ifndef	SUBROUTINE_GETRANDOM
-#define	SUBROUTINE_GETRANDOM
+#ifndef	SUBROUTINE_RESOLVEPATH
+#define	SUBROUTINE_RESOLVEPATH
 EXTERNC_begin
 
-extern int	getrandom(void *,size_t,uint) noex ;
+extern int	resolvepath(cchar *,char *,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_GETRANDOM */
+#endif /* SUBROUTINE_RESOLVEPATH */
 
 
-#endif /* (!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0) */
-/* GETRANDOM end */
+#endif /* (!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0) */
+/* RESOLVEPATH end */
 
 
-#endif /* USYSGETRANDOM_INCLUDE */
+#endif /* USYSRESOLVEPATH_INCLUDE */
 
 
