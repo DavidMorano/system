@@ -62,11 +62,14 @@
 #include	<clanguage.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
+#include	<ustat.h>	/* missing STAT stuff */
 
 #include	<um.h>		/* UNIX® memory-management */
-#include	<ustr.h>	/* UNIX® STREAMS */
+#include	<uipc.h>	/* UNIX® System V IPC */
+#include	<ustr.h>	/* UNIX® STREAMS® */
 #include	<ufiledesc.h>	/* file-descriptor users */
-#include	<udup.h>
+#include	<uopen.h>
+#include	<usig.h>
 
 
 EXTERNC_begin
@@ -92,18 +95,6 @@ extern int	u_setegid(gid_t) noex ;
 extern int	u_setregid(gid_t,gid_t) noex ;
 extern int	u_setpgid(pid_t,pid_t) noex ;
 extern int	u_setsid() noex ;
-
-extern int	u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
-extern int	u_sigprocmask(int,sigset_t *,sigset_t *) noex ;
-extern int	u_sigmask(int,sigset_t *,sigset_t *) noex ;
-extern int	u_sigsuspend(const sigset_t *) noex ;
-extern int	u_sigwait(const sigset_t *,int *) noex ;
-extern int	u_sigpending(sigset_t *) noex ;
-extern int	u_pause() noex ;
-extern int	u_sigaltstack(const stack_t *,stack_t *) noex ;
-
-extern int	u_sigsend(idtype_t,id_t,int) noex ;
-extern int	u_sigsendset(procset_t *,int) noex ;
 
 extern int	u_setcontext(const ucontext_t *) noex ;
 

@@ -261,5 +261,7 @@ unanosleep.o:		unanosleep.cc	$(INCS)
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
 intsat.o:		intsat.cc intsat.h
+ulogerror.o:		ulogerror.cc ulogerror.h
+usig.o:			usig.cc usig.h
 
 

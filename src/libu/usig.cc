@@ -38,6 +38,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"usig.h"
+
 
 /* local defines */
 
