@@ -109,13 +109,13 @@ static inline int u_seekoff(int fd,off_t wo,int w,off_t *offp) noex {
 	return u_seeko(fd,wo,w,offp) ;
 }
 static inline int u_tell(int fd,off_t *rp) noex {
-	return u_seeko(fd,0z,SEEK_CUR,rp) ;
+	return u_seeko(fd,0L,SEEK_CUR,rp) ;
 }
 static inline int u_seekable(int fd) noex {
-	return u_seek(fd,0z,SEEK_CUR) ;
+	return u_seek(fd,0L,SEEK_CUR) ;
 }
 static inline int u_rewind(int fd) noex {
-	return u_seek(fd,0z,SEEK_SET) ;
+	return u_seek(fd,0L,SEEK_SET) ;
 }
 
 extern int u_poll(POLLFD *,int,int) noex ;	/* <- special case */

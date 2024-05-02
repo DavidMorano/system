@@ -8,13 +8,26 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+	Names:
+	u_open
+	u_openat
+	u_socket
+	u_accept
+	u_acceptpass
+	u_dup
+	u_dup2
+	u_socketpair
+	u_pipe
+
 
 	Name:
 	u_open

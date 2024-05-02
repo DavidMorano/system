@@ -17,7 +17,22 @@
 /*******************************************************************************
 
 	Names:
+	u_sigaction
+	u_sigaltstack
+	u_sigpending
 	u_sigprocmask
+	u_sigsuspend
+	u_sigsend
+	u_sigsendset
+	u_sigwait
+	u_sigmask
+
+
+	Name:
+	u_sigprocmask
+
+	Descrption:
+	This module provides UNIX® process signal mangement.
 
 	Notes:
 	|u_sigprocmask(3u)|

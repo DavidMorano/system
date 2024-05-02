@@ -1,7 +1,7 @@
 /* usig HEADER */
 /* lang=C20 */
 
-/* additional UNIX® limits support */
+/* UNIX® process signal mangement */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-	Additional (or supplemental) support for UNIX® limits.
+	This module provides UNIX® process signal mangement.
 
 *******************************************************************************/
 
@@ -34,15 +34,15 @@
 
 EXTERNC_begin
 
-extern int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp) noex ;
-extern int u_sigaltstack(const stack_t *ssp,stack_t *ossp) noex ;
-extern int u_sigpending(sigset_t *ssp) noex ;
-extern int u_sigprocmask(int how,sigset_t *setp,sigset_t *osetp) noex ;
-extern int u_sigsuspend(const sigset_t *ssp) noex ;
-extern int u_sigsend(idtype_t idtype,id_t id,int sig) noex ;
-extern int u_sigsendset(procset_t *psp,int sig) noex ;
-extern int u_sigwait(const sigset_t *ssp,int *rp) noex ;
-extern int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex ;
+extern int u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
+extern int u_sigaltstack(const stack_t *,stack_t *) noex ;
+extern int u_sigpending(sigset_t *) noex ;
+extern int u_sigprocmask(int,sigset_t *,sigset_t *) noex ;
+extern int u_sigsuspend(const sigset_t *) noex ;
+extern int u_sigsend(idtype_t,id_t,int) noex ;
+extern int u_sigsendset(procset_t *,int) noex ;
+extern int u_sigwait(const sigset_t *,int *) noex ;
+extern int u_sigmask(int,sigset_t *,sigset_t *) noex ;
 
 EXTERNC_end
 

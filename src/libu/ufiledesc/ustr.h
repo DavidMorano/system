@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	This file contains the subroutine declarations for the
-	UNIX® system STREAMS message interface.
+	UNIX® system STREAMS® message interface.
 
 *******************************************************************************/
 
