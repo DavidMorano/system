@@ -109,7 +109,7 @@ extern int	u_kill(pid_t,int) noex ;
 extern int	u_waitpid(pid_t,int *,int) noex ;
 extern int	u_getrlimit(int,RLIMIT *) noex ;
 extern int	u_setrlimit(int,CRLIMIT *) noex ;
-extern int	u_nice(int) noex ;
+extern int	u_nice(int,int *) noex ;
 
 extern int	u_mknod(cchar *,mode_t,dev_t) noex ;
 extern int	u_mkdir(cchar *,mode_t) noex ;

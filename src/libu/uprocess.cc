@@ -30,7 +30,15 @@
 	u_nice
 	u_pause
 	u_sbrk
-	u_setid
+	u_setuid
+	u_setreuid
+	u_seteuid
+	u_setgid
+	u_setregid
+	u_setegid
+	u_setpgid
+	u_setsid
+	u_setgroups
 	u_setrlimit
 	u_times
 	u_ulimit
@@ -130,7 +138,7 @@
 #include	<sys/resource.h>
 #include	<sys/wait.h>
 #include	<ulimit.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -150,6 +158,8 @@
 
 /* imported namespaces */
 
+using namespace	uprocess ;		/* namespace */
+
 
 /* local typedefs */
 
@@ -162,11 +172,51 @@
 
 /* local structues */
 
+namespace {
+    struct uprocess ;
+    typedef int (uprocess::*uprocess_m)(cchar *) noex ;
+    struct uprocess : uprocessbase {
+	uprocess_m	m = nullptr ;
+	cvoid		*cvp ;
+	void		**rpp ;
+	int		*rip ;
+	int		incr ;
+	id_t		id1, id2 ;
+	uprocess() noex { } ;
+	uprocess(cvoid *c) noex : cvp(c) { } ;
+	uprocess(int i,void **pp) noes : incr(i), rpp(pp) { } ;
+	uprocess(int i,int *p) noex : incr(i), rip(p) { } ;
+	uprocess(id_t i1,id_t i2 = 0) noex : id1(i1), id2(i2) { } ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+	int callstd(cchar *fn) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fn) ;
+	    }
+	    return rs ;
+	} ;
+	void submem(uprocess_m mem) noex {
+	    m = mem ;
+	} ;
+	int ibrk() noex ;
+	int ifork() noex ;
+	int ivfork() noex ;
+	int isbrk() noex ;
+	int isetuid() noex ;
+	int isetreuid() noex ;
+	int iseteuid() noex ;
+    } ; /* end struct (uprocess) */
+}
+
 
 /* forward references */
 
 
 /* local variables */
+
+constexpr void *	erraddr = voidp(-1L) ;
 
 
 /* exported variables */
@@ -176,49 +226,21 @@
 
 int u_alarm(cuint secs) noex {
 	uint		rem = 0 ;
-	int		rs ;
+	int		rs  = SR_OK ;
 	if ((rem = alarm(secs)) < 0) {
 	    rs = (- errno) ;
 	}
-	if (rs >= 0) rs = intsat(rem) ;
+	if (rs >= 0) {
+	    rs = intsat(rem) ;
+	}
 	return rs ;
 }
 /* end subroutine (u_alarm) */
 
 int u_brk(cvoid *endp) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_again = TO_AGAIN ;
-	int		f_exit = FALSE ;
-	void		*e = (void *) endp ;
-
-	repeat {
-	    if ((rs = brk(e)) == -1) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+	uprocess	po(endp) ;
+	po.m = &uprocess:ibrk ;
+	return po() ;
 }
 /* end subroutine (u_brk) */
 
@@ -229,39 +251,9 @@ int u_exit(int ex) noex {
 /* end subroutine (u_exit) */
 
 int u_fork() noex {
-	int		rs ;
-	int		to_again = TO_AGAIN ;
-	int		to_nomem = TO_NOMEM ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = (int) fork1()) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_AGAIN:
-	            if (to_again -- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-		    break ;
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-		    break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+	uprocess	po ;
+	po.m = &uprocess:ifork ;
+	return po() ;
 }
 /* end subroutine (u_fork) */
 
@@ -286,11 +278,12 @@ int u_getpgid(pid_t pid) noex {
 /* end subroutine (u_getpgid) */
 
 int u_getrlimit(int rn,RLIMIT *rp) noex {
-	int		rs ;
-
-	if ((rs = getrlimit(rn,rp)) < 0) 
-	    rs = (- errno) ;
-
+	int		rs = SR_FAULT ;
+	if (rp) {
+	    if ((rs = getrlimit(rn,rp)) < 0)  {
+	        rs = (- errno) ;
+	    }
+	}
 	return rs ;
 }
 /* end subroutine (u_getrlimit) */
@@ -313,15 +306,18 @@ int u_kill(pid_t pid,int sig) noex {
 }
 /* end subroutine (u_kill) */
 
-int u_nice(int value) noex {
+int u_nice(int value,int *rip) noex {
 	int		rs = SR_OK ;
 	int		v ;
-
 	errno = 0 ;
-	v = nice(value) ;
-	if ((v == -1) && (errno != 0)) rs = (- errno) ;
-
-	if ((rs >= 0) && (v >= 0)) rs = v ;
+	if ((v = nice(value)) == -1) {
+	    if (errno != 0) {
+		rs = (- errno) ;
+	    }
+	}
+	if (rip) {
+	    *rip = (rs >= 0) ? v : 0 ;
+	}
 	return rs ;
 }
 /* end subroutine (u_nice) */
@@ -336,117 +332,23 @@ int u_pause() noex {
 /* end subroutine (u_pause) */
 
 int u_sbrk(int incr,void **rpp) noex {
-	void		*rp ;
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_again = TO_AGAIN ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    rs = SR_OK ;
-	    if ((rp = (void *) sbrk(incr)) == ((void *) -1)) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-		    break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? rp : NULL ;
-	}
-
-	return rs ;
+	uprocess	po(incr,rpp) ;
+	po.m = &uprocess:isbrk ;
+	return po ;
 }
 /* end subroutine (u_sbrk) */
 
 int u_setuid(uid_t uid) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_again = TO_AGAIN ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = setuid(uid)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+	uprocess	po(uid) ;
+	po.m = &uprocess:isetuid ;
+	return po ;
 }
 /* end subroutine (u_setuid) */
 
 int u_setreuid(uid_t ruid,uid_t euid) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_again = TO_AGAIN ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = setreuid(ruid,euid)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+	uprocess	po(ruid,euid) ;
+	po.m = &uprocess:isetreuid ;
+	return po ;
 }
 /* end subroutine (u_setreuid) */
 
@@ -727,44 +629,25 @@ int u_times(TMS *rp) noex {
 
 int u_ulimit(int cmd,int nval) noex {
 	int		rs = SR_OK ;
-	int		rval ;
-
+	long		rval = 0 ;
 	errno = 0 ;
-	rval = ulimit(cmd,nval) ;
-	if ((rval == -1) && (errno != 0)) rs = (- errno) ;
-
-	if (rs >= 0) rs = (rval & INT_MAX) ;
+	if ((rval = ulimit(cmd,nval)) == -1L) {
+	    if (errno != 0) {
+		rs = (- errno) ;
+	    } else {
+		rs = INT_MAX ;
+	    }
+	} else {
+	    rs = intsat(rval) ;
+	}
 	return rs ;
 }
 /* end subroutine (u_ulimit) */
 
 int u_vfork() noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = (int) vfork()) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-		    break ;
-	        case SR_AGAIN:
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+	uprocess	po ;
+	po.m = &uprocess::ivfork ;
+	return po ;
 }
 /* end subroutine (u_vfork) */
 
@@ -810,5 +693,73 @@ int u_waitpid(pid_t pid,int *sp,int flags) noex {
 	return rs ;
 }
 /* end subroutine (u_waitpid) */
+
+
+/* local subroutines */
+
+int uprocess::ibrk() noex {
+	int		rs = SR_FAULT ;
+	if (cvp) {
+	    rs = SR_OK ;
+	    if (void *rvp ; (rvp = brk(cvp)) == erraddr) {
+	        rs = (- errno) ;
+	    }
+	}
+	return rs ;
+}
+/* end method (uprocess::ibrk) */
+
+int uprocess::ifork() noex {
+	int		rs = SR_OK ;
+	if (pid_t pid ; (pid = fork()) >= 0) {
+	    rs = int(pid) ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uprocess::ifork) */
+
+int uprocess::ivfork() noex {
+	int		rs = SR_OK ;
+	if (pid_t pid ; (pid = vfork()) >= 0) {
+	    rs = int(pid) ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uprocess::ivfork) */
+
+int uprocess::isbrk() noex {
+	int		rs = SR_OK ;
+	void		*rp ;
+	if ((rp = sbrk(incr)) == erraddr) {
+	    rs = (- errno) ;
+	}
+	if (rpp) {
+	    *rpp = (rs >= 0) ? rp : nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (uprocess::isbrk) */
+
+int uprocess:isetuid() noex {
+	int		rs ;
+	if ((rs = setuid(id1)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uprocess::isetuid) */
+
+int uprocess:isetreuid() noex {
+	int		rs ;
+	if ((rs = setreuid(id1,id2)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (uprocess::isetreuid) */
 
 

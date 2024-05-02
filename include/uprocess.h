@@ -30,7 +30,15 @@
 	u_nice
 	u_pause
 	u_sbrk
-	u_setid
+	u_setuid
+	u_setreuid
+	u_seteuid
+	u_setgid
+	u_setregid
+	u_setegid
+	u_setpgid
+	u_setsid
+	u_setgroups
 	u_setrlimit
 	u_times
 	u_ulimit
@@ -89,7 +97,7 @@ extern int u_getpgid(pid_t pid) noex ;
 extern int u_getrlimit(int rn,RLIMIT *rp) noex ;
 extern int u_getsid(pid_t pid) noex ;
 extern int u_kill(pid_t pid,int sig) noex ;
-extern int u_nice(int value) noex ;
+extern int u_nice(int,int *) noex ;
 extern int u_pause() noex ;
 extern int u_sbrk(int incr,void **rpp) noex ;
 extern int u_setuid(uid_t uid) noex ;
