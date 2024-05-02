@@ -58,9 +58,13 @@ OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ3_USYS= usys_ttynamerp.o usys_ugetnisdom.o
-OBJ4_USYS= usys_stime.o usys_resolvepath.o
+OBJ4_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
+OBJ5_USYS= 
 
-OBJ_USYS= obj0_usys.o obj1_usys.o obj2_usys.o obj3_usys.o obj4_usys.o
+OBJA= obj0_usys.o obj1_usys.o obj2_usys.o 
+OBJB= obj3_usys.o obj4_usys.o
+
+OBJ_USYS= obja.o objb.o
 
 
 default:		$(T).o
@@ -106,6 +110,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_usys.o:	$(OBJ0_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_USYS)
 
@@ -122,6 +127,13 @@ obj4_usys.o:	$(OBJ4_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_USYS)
 
 
+obja.o:		$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:		$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+
 usys_xxx.o:		usys_xxx.cc usys_xxx.h			$(INCS)
 usys_sunos.o:		usys_sunos.cc usys_sunos.h		$(INCS)
 usys_darwin.o:		usys_darwin.cc usys_darwin.h		$(INCS)
@@ -134,5 +146,6 @@ usys_ttynamerp.o:	usys_ttynamerp.cc usys_ttynamerp.h	$(INCS)
 usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
 usys_stime.o:		usys_stime.cc usys_stime.h		$(INCS)
 usys_resolvepath.o:	usys_resolvepath.cc usys_resolvepath.h	$(INCS)
+usys_waitid.o:		usys_waitid.cc usys_waitid.h		$(INCS)
 
 

@@ -26,6 +26,7 @@ BUILDTYPE=develope
 : ${CGS_RANLIB:=ranlib}
 : ${CGS_AR:=ar}
 : ${CGS_NM:=nm}
+: ${CGS_SZ:=sz}
 
 : ${CGS_GCPP:=gcpp13}
 : ${CGS_GCC:=gcc13}
@@ -35,11 +36,14 @@ BUILDTYPE=develope
 : ${CGS_GAR:=gar13}
 : ${CGS_GNM:=gnm13}
 : ${CGS_GCOV:=gcov13}
+: ${CGS_GSZ:=gsz}
 
+export CGS_BINDIR
 export CGS_INCDIR
 export CGS_CRTDIR
 export CGS_VALDIR
 export CGS_LIBDIR
+export CGS_MANDIR
 
 export CGS_INFODIR
 export CGS_HELPDIR
@@ -49,9 +53,10 @@ export CGS_CPP
 export CGS_CC
 export CGS_CXX
 export CGS_LD
+export CGS_RANLIB
 export CGS_AR
 export CGS_NM
-export CGS_RANLIB
+export CGS_SZ
 
 export CGS_GCPP
 export CGS_GCC
@@ -61,6 +66,7 @@ export CGS_GAR
 export CGS_GNM
 export CGS_GRANLIB
 export CGS_GCOV
+export CGS_GSZ
 
 
 function getflags {

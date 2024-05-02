@@ -77,12 +77,11 @@ int uc_realpath(cchar *fname,char *rbuf) noex {
 		    if ((rs = maxpathlen) >= 0) {
 		        cint	rlen = rs ;
 	                if (char *rp ; (rp = realpath(fname,np)) != np) {
-		            rl = strlen(rp) ;
-		            if (rl <= rlen) {
+		            if ((rl = strlen(rp)) <= rlen) {
 		                strcpy(rbuf,rp) ;
 			        rs = SR_OK ;
 		            } else {
-			        rs = SR_TOOBIG ;
+			        rs = SR_OVERFLOW ;
 		            }
 		        } else {
 		            rs = (- errno) ;

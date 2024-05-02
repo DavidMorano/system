@@ -66,7 +66,7 @@ static inline int intsat(uint v) noex {
 static inline int intsat(ulong v) noex {
 	return intsatul(v) ;
 }
-#ifdef	COMMENT
+#ifdef	COMMENT /* GCC says that this is an alias of |ulong| */
 static inline int intsat(size_t v) noex {
 	return intsats(v) ;
 }

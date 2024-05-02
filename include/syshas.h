@@ -223,6 +223,9 @@
 /* Solaris®: |resolvepath(2)| */
 #define	SYSHAS_RESOLVEPATH	1
 
+/* Solaris®: |waitid(2)| */
+#define	SYSHAS_WAITID		1
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -440,6 +443,8 @@
 /* Darwin: |resolvepath(2)| */
 #define	SYSHAS_RESOLVEPATH	0
 
+/* Darwin: |waitid(2)| */
+#define	SYSHAS_WAITID		1	/* <- welcome to club! (confirmed) */
 
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
@@ -638,6 +643,8 @@
 /* Linux: |resolvepath(2)| */
 #define	SYSHAS_RESOLVEPATH	0
 
+/* Linux: |waitid(2)| */
+#define	SYSHAS_WAITID		1
 
 /******************************************************************************/
 #endif /* OSNAME */
