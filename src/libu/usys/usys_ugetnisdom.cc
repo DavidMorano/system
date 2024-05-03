@@ -23,10 +23,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
 #include	<usysrets.h>
 #include	<usysflag.h>
 #include	<utypedefs.h>
-#include	<clanguage.h>
 
 #include	"usys_ugetnisdom.h"
 

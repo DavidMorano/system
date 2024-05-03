@@ -19,7 +19,6 @@
 
 	Names:
 	u_alarm
-	u_brk
 	u_exit
 	u_fork
 	u_getgroups
@@ -29,7 +28,6 @@
 	u_kill
 	u_nice
 	u_pause
-	u_sbrk
 	u_setuid
 	u_setreuid
 	u_seteuid
@@ -76,11 +74,10 @@ namespace uprocess {
 	uint		fintr:1 ;	/* request interrupts to return */
     } ; /* end struct (uprocessflags) */
     struct uprocessbase {
-	cchar		*fn ;
 	uprocessflags	f{} ;
 	uprocessbase() noex { } ;
-	int operator () (cchar *) noex ;
-	virtual int callstd(cchar *) noex = 0 ;
+	int operator () () noex ;
+	virtual int callstd() noex = 0 ;
     } ; /* end struct (uprocessbase) */
 }
 
@@ -89,7 +86,6 @@ namespace uprocess {
 EXTERNC_begin
 
 extern int u_alarm(cuint secs) noex ;
-extern int u_brk(cvoid *endp) noex ;
 extern int u_exit(int ex) noex ;
 extern int u_fork() noex ;
 extern int u_getgroups(int n,gid_t *a) noex ;
@@ -99,7 +95,6 @@ extern int u_getsid(pid_t pid) noex ;
 extern int u_kill(pid_t pid,int sig) noex ;
 extern int u_nice(int,int *) noex ;
 extern int u_pause() noex ;
-extern int u_sbrk(int incr,void **rpp) noex ;
 extern int u_setuid(uid_t uid) noex ;
 extern int u_setreuid(uid_t ruid,uid_t euid) noex ;
 extern int u_seteuid(uid_t euid) noex ;
@@ -118,6 +113,14 @@ extern int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex ;
 extern int u_waitpid(pid_t pid,int *sp,int flags) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int u_nice(int incr) noex {
+	return u_nice(incr,nullptr) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* UPROCESS_INCLUDE */

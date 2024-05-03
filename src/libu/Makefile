@@ -128,10 +128,10 @@ OBJ55=
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
 OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
-OBJB= ufiledesc.o uipc.o unanosleep.o usig.o
+OBJB= usys.o uipc.o unanosleep.o usig.o
 OBJC= uopen.o ustr.o usysdata.o uatfork.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
-OBJE= usys.o
+OBJE= usys.o ufiledesc.o ufileop.o uprocess.o
 
 #OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 OBJ= obja.o objb.o objc.o objd.o obje.o
@@ -227,6 +227,9 @@ utimeout.o:		utimeout.c utimeout.h
 utimeouts.o:		utimeouts.cc utimeouts.h
 usupport.o:		usupport.cc usupport.h
 timewatch.o:		timewatch.cc timewatch.hh
+aflag.o:		aflag.cc aflag.hh
+errtimer.o:		errtimer.cc errtimer.hh
+intsat.o:		intsat.cc intsat.h
 
 # ADAPTATION
 usysauxinfo.o:		usysauxinfo.cc
@@ -255,13 +258,9 @@ uipc.dir:
 	makesubdir $@
 
 # OTHER
-unanosleep.o:		unanosleep.cc	$(INCS)
-
-# UTILITY
-aflag.o:		aflag.cc aflag.hh
-errtimer.o:		errtimer.cc errtimer.hh
-intsat.o:		intsat.cc intsat.h
-ulogerror.o:		ulogerror.cc ulogerror.h
-usig.o:			usig.cc usig.h
+unanosleep.o:		unanosleep.cc			$(INCS)
+ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
+usig.o:			usig.cc usig.h			$(INCS)
+uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 
 

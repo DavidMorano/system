@@ -32,10 +32,10 @@
 #include	<sys/time.h>		/* <- the money shot */
 #include	<cerrno>
 #include	<ctime>			/* Darwin |clock_xx(3)| */
-#include	<usysflag.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysflag.h>
 
 #include	"usys_gethrtime.h"
 

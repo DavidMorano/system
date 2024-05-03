@@ -80,12 +80,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usysflag.h>
-#include	<clanguage.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 

@@ -26,8 +26,8 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
-#include	<usysrets.h>
 #include	<clanguage.h>
+#include	<usysrets.h>
 
 #include	"usys_mqueue.h"
 

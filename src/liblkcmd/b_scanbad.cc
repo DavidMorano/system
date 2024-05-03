@@ -1,8 +1,8 @@
-/* b_scanbad */
+/* b_scanbad SUPPOTRT */
+/* lang=C++20 */
 
-/* program to return a user's home login directory */
+/* program to find bad files */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,12 +10,12 @@
 #define	CF_BADBLOCK	0		/* try some bad-block handling */
 #define	CF_LOCSETENT	0		/* "locinfo_setentry()| */
 
-
 /* revision history:
 
 	= 2004-07-14, David A­D­ Morano
-	This was written inspired by a previous program that did about the same
-	function as this.  But this was written a fresh as a KSH builtin.
+	This was written inspired by a previous program that did
+	about the same function as this.  But this was written a
+	fresh as a KSH builtin.
 
 */
 
@@ -24,12 +24,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ scanbad [file(s) ...]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -47,12 +44,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>

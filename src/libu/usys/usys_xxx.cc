@@ -29,10 +29,10 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
+#include	<clanguage.h>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"usys_xxx.h"
 

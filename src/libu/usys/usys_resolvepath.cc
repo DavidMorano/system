@@ -32,9 +32,9 @@
 #include	<cstdlib>		/* |realpath(3c)| */
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
 #include	<usysflag.h>
 #include	<utypedefs.h>
-#include	<clanguage.h>
 
 #include	"usys_resolvepath.h"
 

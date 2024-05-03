@@ -29,6 +29,10 @@
 
 EXTERNC_begin
 
+static inline int intsati(int v) noex {
+	return v ;
+}
+
 extern int intsatl(long) noex ;
 extern int intsato(off_t) noex ;
 extern int intsatll(longlong) noex ;
@@ -50,6 +54,9 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
+static inline int intsat(int v) noex {
+	return intsati(v) ;
+}
 static inline int intsat(long v) noex {
 	return intsatl(v) ;
 }

@@ -233,6 +233,11 @@ typedef void **			voidpp ;
 typedef const void *		cvoidp ;
 #endif
 
+#ifndef	TYPEDEF_CPCVOID
+#define	TYPEDEF_CPCVOID
+typedef const void *const	cpcvoid ;
+#endif
+
 #ifndef	TYPEDEF_CVOIDPP
 #define	TYPEDEF_CVOIDPP
 typedef const void **		cvoidpp ;

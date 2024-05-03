@@ -32,12 +32,12 @@
 #include	<cstdlib>
 #include	<cstdint>		/* |intptr_t| */
 #include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 

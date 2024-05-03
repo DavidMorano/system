@@ -32,12 +32,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
@@ -93,7 +93,7 @@ int ufileopbase::operator () (cchar *fn) noex {
 	        errtimer	to_nospc	= utimeout[uto_nospc] ;
 	        errtimer	to_dquot	= utimeout[uto_dquot] ;
 	        errtimer	to_io		= utimeout[uto_io] ;
-	        reterr	r ;
+	        reterr		r ;
 	        repeat {
 	            if ((rs = callstd(fn)) < 0) {
 		        r(rs) ;			/* <- default causes exit */

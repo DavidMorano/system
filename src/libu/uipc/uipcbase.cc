@@ -34,12 +34,12 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>		/* |intptr_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"uipc.h"

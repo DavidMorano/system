@@ -24,10 +24,10 @@
 #include	<cerrno>
 #include	<cstring>		/* |strncpy(3c)| + |strlcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
 #include	<usysflag.h>
 #include	<utypedefs.h>
 #include	<usysrets.h>
-#include	<clanguage.h>
 #include	<aflag.hh>		/* mutex-flag */
 
 #include	"usys_ttynamerp.h"

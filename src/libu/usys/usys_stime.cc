@@ -36,10 +36,10 @@
 #include	<sys/time.h>		/* type |timeval| */
 #include	<cerrno>
 #include	<ctime>
-#include	<usysflag.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysflag.h>
 
 #include	"usys_stime.h"
 

@@ -23,10 +23,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
+#include	<clanguage.h>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"usys_sunos.h"
 
