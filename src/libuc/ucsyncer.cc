@@ -221,9 +221,10 @@ int uc_syncer(int w) noex {
 	UCSYNCER	*uip = &ucsyncer_data ;
 	int		rs = SR_INVALID ;
 	if (w >= 0) {
+	    rs = SR_OK ;
 	    switch (w) {
 	    case 0:
-	        rs = u_sync() ;
+	        sync() ;
 	        break ;
 	    case 1:
 	        rs = ucsyncer_sendsync(uip) ;
@@ -350,11 +351,10 @@ static int ucsyncer_worker(UCSYNCER *uip) noex {
 /* end subroutine (ucsyncer_worker) */
 
 static int ucsyncer_worksync(UCSYNCER *uip) noex {
-	int		rs ;
+	int		rs = SR_OK ;
 	uip->f_syncing = true ;
-	if ((rs = u_sync()) >= 0) {
-	    uip->count += 1 ;
-	}
+	sync()
+	uip->count += 1 ;
 	uip->f_syncing = false ;
 	return rs ;
 }

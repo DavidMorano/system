@@ -302,14 +302,6 @@ extern int	rename(cchar *,cchar *) noex ;
 /*----------------------------------------------------------------------------*/
 
 
-/*----------------------------------------------------------------------------*/
-#ifndef	SUBROUTINE_RESOLVEPATH
-#define	SUBROUTINE_RESOLVEPATH
-extern int	resolvepath(cchar *,char *,int) noex ;
-#endif
-/*----------------------------------------------------------------------------*/
-
-
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYSDARWIN finish */
 

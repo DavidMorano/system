@@ -50,7 +50,12 @@
 #include	<csignal>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usupport.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"usig.h"
@@ -159,13 +164,6 @@ int u_pause() noex {
 }
 /* end subroutine (u_pause) */
 
-int u_alarm(const uint usec) noex {
-	uint		rem = alarm(usec) ;
-	int		rs ;
-	rs = int(rem & INT_MAX) ;
-	return rs ;
-}
-/* end subroutine (u_alarm) */
 
 /* these below are NOT on all systems (like MacOS Darwin!) */
 

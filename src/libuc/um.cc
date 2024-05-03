@@ -63,7 +63,11 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"um.h"

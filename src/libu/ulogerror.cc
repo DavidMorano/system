@@ -44,7 +44,11 @@
 #include	<cstdlib>
 #include	<cstdio>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<getfdfile.h>		/* <- for |FD_STDxxx| */
 #include	<strdcpy.h>
 #include	<localmisc.h>

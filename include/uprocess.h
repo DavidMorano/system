@@ -1,4 +1,4 @@
-/* uprocess SUPPORT (UNIX® file operations) */
+/* uprocess HEADER (UNIX® file operations) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -25,9 +25,7 @@
 	u_getpgid
 	u_getrlimit
 	u_getsid
-	u_kill
 	u_nice
-	u_pause
 	u_setuid
 	u_setreuid
 	u_seteuid

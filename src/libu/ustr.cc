@@ -32,7 +32,11 @@
 #include	<unistd.h>
 #include	<poll.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<ustropts.h>
 #include	<localmisc.h>
 

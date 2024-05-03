@@ -33,6 +33,7 @@
 #if	(!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0)
 
 
+#include	<stddef.h>		/* |size_t| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
@@ -41,7 +42,7 @@
 #define	SUBROUTINE_RESOLVEPATH
 EXTERNC_begin
 
-extern int	resolvepath(cchar *,char *,int) noex ;
+extern int	resolvepath(cchar *,char *,size_t) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_RESOLVEPATH */

@@ -31,7 +31,11 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 

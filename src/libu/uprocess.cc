@@ -25,9 +25,7 @@
 	u_getpgid
 	u_getrlimit
 	u_getsid
-	u_kill
 	u_nice
-	u_pause
 	u_setuid
 	u_setreuid
 	u_seteuid
@@ -303,15 +301,6 @@ int u_getsid(pid_t pid) noex {
 }
 /* end subroutine (u_getsid) */
 
-int u_kill(pid_t pid,int sig) noex {
-	int		rs ;
-	if ((rs = kill(pid,sig)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end subroutine (u_kill) */
-
 int u_nice(int value,int *rip) noex {
 	int		rs = SR_OK ;
 	int		v ;
@@ -327,15 +316,6 @@ int u_nice(int value,int *rip) noex {
 	return rs ;
 }
 /* end subroutine (u_nice) */
-
-int u_pause() noex {
-	int		rs = SR_OK ;
-	if (pause() == -1) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end subroutine (u_pause) */
 
 int u_setuid(uid_t uid) noex {
 	uprocer		po(uid) ;

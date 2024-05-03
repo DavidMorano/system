@@ -26,17 +26,12 @@
 #include	<sys/types.h>
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
-#include	<sys/time.h>		/* for 'u_adjtime(3u)' */
-#include	<sys/timeb.h>		/* for 'uc_ftime(3uc)' */
+#include	<sys/time.h>		/* |u_adjtime(2u)| */
 #include	<sys/resource.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 #include	<sys/poll.h>
-
-#if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
-#include	<sys/acl.h>
-#endif
 
 #include	<signal.h>
 #include	<limits.h>
@@ -64,23 +59,22 @@
 #include	<usys.h>	/* <- auxilllary OS support */
 #include	<ustat.h>	/* missing STAT stuff */
 
+#include	<usysop.h>	/* UNIX® system-operations */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */
-#include	<ufiledesc.h>	/* file-descriptor users */
 #include	<uopen.h>
+#include	<ufiledesc.h>	/* file-descriptor */
+#include	<ufileop.h>	/* file-operations */
 #include	<usig.h>
+#include	<uprocess.h>
 
 
 EXTERNC_begin
 
-extern int	u_brk(cvoid *) noex ;
-extern int	u_sbrk(int,void **) noex ;
-
 extern int	u_uname(UTSNAME *) noex ;
 extern int	u_getloadavg(uint *,int) noex ;
 extern int	u_sysauxinfo(char *,int,int) noex ;
-extern int	u_adjtime(TIMEVAL *,TIMEVAL *) noex ;
 extern int	u_ulimit(int,int) noex ;
 
 extern int	u_getpgid(pid_t) noex ;

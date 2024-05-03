@@ -42,7 +42,11 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<cstring>		/* <- for |strcmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
