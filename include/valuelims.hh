@@ -1,4 +1,4 @@
-/* valuelimits HEADER */
+/* valuelims HEADER */
 /* lang=C++20 */
 
 /* provide value limits on the various integer types */
@@ -20,20 +20,20 @@
 
 *******************************************************************************/
 
-#ifndef	VALUELIMITS_INCLUDE
-#define	VALUELIMITS_INCLUDE
+#ifndef	VALUELIMS_INCLUDE
+#define	VALUELIMS_INCLUDE
 #ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
 
-struct valuelimits {
+struct valuelims {
 	short		smin = short(0x8000) ;
 	short		smax = short(0x7FFF) ;
 	int		imin = INT_MIN ;
@@ -53,13 +53,13 @@ struct valuelimits {
 	    llmin = (one << (n-1)) ;
 	    llmax = longlong(ullmax >> 1) ;
 	} ;
-	constexpr valuelimits() noex {
+	constexpr valuelims() noex {
 	    mklonglong() ;
 	} ;
-} ; /* end subroutine (valuelimits) */
+} ; /* end subroutine (valuelims) */
 
 
 #endif /* __cplusplus */
-#endif /* VALUELIMITS_INCLUDE */
+#endif /* VALUELIMS_INCLUDE */
 
 

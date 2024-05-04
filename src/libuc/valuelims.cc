@@ -1,4 +1,4 @@
-/* valuelimits SUPPORT */
+/* valuelims SUPPORT */
 /* lang=C++20 */
 
 /* provide value limits on the various integer types */
@@ -21,8 +21,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
 
 #include	"valuelims.hh"
 

@@ -24,6 +24,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
@@ -37,7 +38,6 @@
 /* USYS_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<sys/types.h>
 #include	<sys/mman.h>
 #include	<unistd.h>		/* |getdomainname(3darwin)| */
 
@@ -117,8 +117,9 @@ int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 
 
 int darwin_ugetnisdom(char *rbuf,int rlen) noex {
+	csize		rsz = size_t(rlen+1) ;
 	int		rs ;
-	if ((rs = getdomainname(rbuf,(rlen+1))) < 0) {
+	if ((rs = getdomainname(rbuf,rsz)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;

@@ -45,17 +45,16 @@ int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	    if (req >= 0) {
 	        rs = SR_OVERFLOW ;
 	        if (ulen >= 1) {
-		    clong	llen = (ulen+1) ;
-		    long	result ;
-		    rs = SR_OK ;
-	            if ((result = sysinfo(req,ubuf,llen)) < 0) {
+		    csize	usz = (ulen+1) ;
+	            if (long res ; (res = sysinfo(req,ubuf,usz)) >= 0) {
+			if (res > usz) {
+			    rs = SR_OVERFLOW ;
+			} else {
+			    rs = int(res & INT_MAX) ;
+			    len = rs ;
+			}
+		    } else {
 		        rs = (- errno) ;
-	            }
-	            if (result > 0) {
-		        len = (int) ((result-1) & INT_MAX) ;
-	            }
-	            if ((rs >= 0) && (result > llen)) {
-		        rs = SR_OVERFLOW ;
 	            }
 	        } /* end if (not-overflow) */
 	    } /* end if (valid) */
@@ -71,7 +70,7 @@ int sunos_ugetnisdom(char *rbuf,int rlen) noex {
 /* end subroutine (sunos_ugetnisdom) */
 
 
-#else
+#else /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
 int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
@@ -99,7 +98,5 @@ int sunos_ugetnisdom(char *rbuf,int rlen) noex {
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYS_SUNOS finish */
-
-
 
 

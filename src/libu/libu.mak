@@ -58,6 +58,10 @@ CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
+#SOFL= -shared -Xlinker -flat_namespace -Xlinker -undefined -Xlinker suppress
+#SOFL= -shared -Xlinker -undefined -Xlinker dynamic_lookup
+SOFL= -shared
+
 
 OBJ00= 
 OBJ01= 
@@ -189,7 +193,7 @@ $(T).o:			$(OBJ) Makefile localmisc.h
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).so:		$(OBJ) Makefile localmisc.h
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO) > $(T).lm
+	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO) > $(T).lm
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -202,9 +206,9 @@ $(T).order order:	$(OBJ) $(T).a
 install-pre:
 	filefind . -s h | makenewer -af - -d $(INCDIR)
 
-install:		$(ALL) Makefile install-incs
+install:		$(ALL) Makefile
 	ranlib $(T).a
-	makenewer -r $(ALL) $(LIBDIR)
+	install -S -p -m 0775 $(T).so $(LIBDIR)
 
 install-incs:		$(INSTALLINCS)
 	makenewer $(INSTALLINCS) $(INCDIR)

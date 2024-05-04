@@ -64,7 +64,7 @@
 
 constinit const varnames	varname ;
 constinit const syswords	sysword ;
-constinit const valuelimits	valuelimit ;
+constinit const valuelims	valuelimit ;
 constinit const digbufsizes	digbufsize ;
 
 

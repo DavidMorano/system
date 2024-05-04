@@ -107,6 +107,10 @@ using std::nullptr_t ;			/* type */
 
 /* external subroutines */
 
+extern "C" {
+    extern int	rename(cchar *,cchar *) noex ;
+}
+
 
 /* external variables */
 

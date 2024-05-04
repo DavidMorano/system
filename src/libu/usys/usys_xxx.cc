@@ -41,9 +41,7 @@
 /* USERATTR begin */
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 void setuserattr() noex { 
 	errno = ENOSYS ;
@@ -76,9 +74,7 @@ userattr *getuseruid(uid_t) noex {
 	return nullptr ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
@@ -89,18 +85,14 @@ userattr *getuseruid(uid_t) noex {
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 int plock(int) noex {
 	errno = ENOSYS ;
 	return -1 ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */

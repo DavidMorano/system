@@ -1,7 +1,7 @@
 /* intsat HEADER */
 /* lang=C20 */
 
-/* Integer Saturation Addition */
+/* Integer Saturation (clamping) */
 /* version %I% last-modified %G% */
 
 
@@ -21,6 +21,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
+#include	<stddef.h>
 #include	<stdint.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -41,14 +42,6 @@ extern int intsatui(uint) noex ;
 extern int intsatul(ulong) noex ;
 extern int intsats(size_t) noex ;
 extern int intsatull(ulonglong) noex ;
-
-extern int iaddsat(int,int) noex ;
-extern long laddsat(long,long) noex ;
-extern longlong lladdsat(longlong,longlong) noex ;
-
-extern uint uaddsat(uint,uint) noex ;
-extern ulong uladdsat(ulong,ulong) noex ;
-extern ulonglong ulladdsat(ulonglong,ulonglong) noex ;
 
 EXTERNC_end
 

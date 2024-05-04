@@ -297,7 +297,9 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 #ifndef	SUBROUTINE_RENAME
 #define	SUBROUTINE_RENAME
+EXTERNC_begin
 extern int	rename(cchar *,cchar *) noex ;
+EXTERNC_end
 #endif
 /*----------------------------------------------------------------------------*/
 

@@ -28,6 +28,10 @@
 #include	<usysflag.h>
 #include	<utypedefs.h>
 
+#include	"usys_sunos.h"
+#include	"usys_darwin.h"
+#include	"usys_linux.h"
+
 #include	"usys_ugetnisdom.h"
 
 
@@ -56,6 +60,7 @@
 
 constexpr bool		f_sunos = F_SUNOS ;
 constexpr bool		f_darwin = F_DARWIN ;
+constexpr bool		f_linux = F_LINUX ;
 
 
 /* exported variables */
@@ -74,6 +79,9 @@ int ugetnisdom(char *rbuf,int rlen) noex {
 		    len = rs ;
 		} else if (f_darwin) {
 		    rs = darwin_ugetnisdom(rbuf,rlen) ;
+		    len = rs ;
+		} else if (f_linux) {
+		    rs = linux_ugetnisdom(rbuf,rlen) ;
 		    len = rs ;
 		} else {
 		    rs = xxx_ugetnisdom(rbuf,rlen) ;
