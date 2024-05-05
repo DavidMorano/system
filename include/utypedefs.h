@@ -346,6 +346,11 @@ typedef const mode_t	cfsperm ;
 typedef const off_t	coff ;
 #endif /* TYPEDEF_COFF */
 
+#ifndef	TYPEDEF_ERRNO
+#define	TYPEDEF_ERRNO
+typedef int		errno_t ;
+#endif /* TYPEDEF_ERRNO */
+
 
 #endif /* UTYPEDEFS_INCLUDE */
 

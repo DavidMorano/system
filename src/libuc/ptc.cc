@@ -44,12 +44,18 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forward references */
 
 
 /* local variables */
 
 constexpr bool		f_reltimedwait = F_RELTIMEDWAIT ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -61,7 +67,9 @@ int ptc_create(ptc *op,ptca *ap) noex {
 	int		rs ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = pthread_cond_init(pop,ap)) > 0) rs = (- rs) ;
+	    if ((rs = pthread_cond_init(pop,ap)) > 0) {
+		rs = (- rs) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_NOMEM:

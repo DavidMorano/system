@@ -102,7 +102,9 @@ int ptrwlock_create(ptrwlock *psp,ptrwa *atp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_init(psp,atp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_init(psp,atp)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -113,7 +115,9 @@ int ptrwlock_destroy(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_destroy(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_destroy(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -124,7 +128,9 @@ int ptrwlock_rdlock(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_rdlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_rdlock(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -135,7 +141,9 @@ int ptrwlock_tryrdlock(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -152,7 +160,9 @@ int ptrwlock_rdlockto(ptrwlock *psp,int to) noex {
 	    if (to < 0) to = (INT_MAX/(2*NLPS)) ;
 	    cto = (to*NLPS) ;
 	    repeat {
-	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	        if (rs < 0) {
 		    switch (rs) {
 		    case SR_BUSY:
@@ -179,7 +189,9 @@ int ptrwlock_wrlock(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_wrlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_wrlock(psp)) > 0) {
+		   rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -190,7 +202,9 @@ int ptrwlock_trywrlock(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -207,7 +221,9 @@ int ptrwlock_wrlockto(ptrwlock *psp,int to) noex {
 	    if (to < 0) to = (INT_MAX/(2*NLPS)) ;
 	    cto = (to*NLPS) ;
 	    repeat {
-	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	        if (rs < 0) {
 		    switch (rs) {
 		    case SR_BUSY:
@@ -232,7 +248,9 @@ int ptrwlock_unlock(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
-	        if ((rs = pthread_rwlock_unlock(psp)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlock_unlock(psp)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;

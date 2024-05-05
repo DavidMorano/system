@@ -33,9 +33,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-/* SIGX begin */
+/* SIGQUEUE begin */
 #if	(!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0)
-
 
 #ifndef	SUBROUTINE_SIGQUEUE
 #define	SUBROUTINE_SIGQUEUE
@@ -46,6 +45,11 @@ extern int sigqueue(pid_t,int,const SIGVAL) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_SIGUEUE */
 
+#endif /* (!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0) */
+/* SIGQUEUE end */
+
+/* SIGSEND begin */
+#if	(!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0)
 
 #ifndef	SUBROUTINE_SIGSEND
 #define	SUBROUTINE_SIGSEND
@@ -56,6 +60,12 @@ extern int sigsend(idtype_t,id_t,int) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_SIGSEND */
 
+#endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
+/* SIGSEND end */
+
+/* SIGSENDSET begin */
+#if	(!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0)
+
 #ifndef	SUBROUTINE_SIGSENDSET
 #define	SUBROUTINE_SIGSENDSET
 EXTERNC_begin
@@ -65,9 +75,23 @@ extern int sigsendset(procset_t *,int) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_SIGSENDSET */
 
+#endif /* (!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0) */
+/* SIGSENDSET end */
 
-#endif /* (!defined(SYSHAS_SIGX)) || (SYSHAS_SIGX == 0) */
-/* SIGX end */
+/* PTHREADSIGQUEUE begin */
+#if	(!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0)
+
+#ifndef	SUBROUTINE_PTHREADSIGQUEUE
+#define	SUBROUTINE_PTHREADSIGQUEUE
+EXTERNC_begin
+
+extern int pthread_sigqueue(pthread_t,int,const SIGVAL) noex ;
+
+EXTERNC_end
+#endif /* SUBROUTINE_PTHREADSIGQUEUE */
+
+#endif /* (!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0) */
+/* PTHREADSIGQUEUE end */
 
 
 #endif /* USYSSIGX_INCLUDE */

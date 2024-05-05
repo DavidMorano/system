@@ -42,7 +42,7 @@
 
 int sigqueue(pid_t pid,int sn,const SIGVAL) noex {
 	int		rc = 0 ;
-	if (pid > 0) {
+	if ((pid > 0) && (sn >= 0)) {
 	    rc = kill(pid,sn) ;
 	} else {
 	    errno = EINVAL ;
@@ -57,7 +57,10 @@ int sigqueue(pid_t pid,int sn,const SIGVAL) noex {
 /* SIGSEND start */
 #if	(!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0)
 
+#ifndef	ID_CONSTEXPR
+#define	ID_CONSTEXPR
 constexpr id_t		idend = id_t(-1) ;
+#endif
 
 int sigsend(idtype_t type,id_t id,int sn) noex {
 	int		rc = 0 ;
@@ -120,5 +123,25 @@ int sigsendset(procset_t *sp,int sn) noex {
 
 #endif /* (!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0) */
 /* SIGSENDSET end */
+
+/* PTHREADSIGQUEUE begin */
+#if	(!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0)
+
+extern int pthread_sigqueue(pthread_t tid,int sn,const SIGVAL) noex {
+	int		rc = 0 ;
+	if (sn >= 0) {
+	    if (errno_t ec ; (ec = pthread_kill(tid,sn)) > 0) {
+		errno = ec ;
+		rc = -1 ;
+	    }
+	} else {
+	    errno = EINVAL ;
+	    rc = -1 ;
+	}
+	return rc ;
+}
+
+#endif /* (!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0) */
+/* PTHREADSIGQUEUE end */
 
 

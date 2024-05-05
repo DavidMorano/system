@@ -51,7 +51,9 @@ int ptca_create(ptca *op) noex {
 	    int		to_nomem = utimeout[uto_nomem] ;
 	    bool	f_exit = false ;
 	    repeat {
-	        if ((rs = pthread_condattr_init(op)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_condattr_init(op)) > 0) {
+		    rs = (- rs) ;
+		}
 	        if (rs < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -76,24 +78,27 @@ int ptca_create(ptca *op) noex {
 
 int ptca_destroy(ptca *op) noex {
 	int		rs ;
-	rs = pthread_condattr_destroy(op) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_condattr_destroy(op)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptca_destroy) */
 
 int ptca_getpshared(ptca *op,int *oldp) noex {
 	int		rs ;
-	rs = pthread_condattr_getpshared(op,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_condattr_getpshared(op,oldp)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptca_getpshared) */
 
 int ptca_setpshared(ptca *op,int fl) noex {
 	int		rs ;
-	rs = pthread_condattr_setpshared(op,fl) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_condattr_setpshared(op,fl)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptca_setpshared) */

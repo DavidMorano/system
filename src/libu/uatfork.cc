@@ -39,10 +39,13 @@
 /* exported subroutines */
 
 int u_atfork(void_f b,void_f ap,void_f ac) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	repeat {
-	    if (pthread_atfork(b,ap,ac) != 0) rs = (- errno) ;
-	} until (rs != SR_INTR) ;
+	    rs = SR_OK ;
+	    if (errno_t ec ; (ec = pthread_atfork(b,ap,ac)) > 0) {
+		 rs = (- ec) ;
+	    }
+	} until ((rs != SR_INTR) && (rs != SR_AGAIN)) ;
 	return rs ;
 }
 /* end subroutine (u_atfork) */

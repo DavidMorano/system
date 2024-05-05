@@ -209,12 +209,9 @@ int u_sigwait(const sigset_t *ssp,int *rp) noex {
 /* end subroutine (u_sigwait) */
 
 int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
-	int		rs ;
-	errno = 0 ;
-	if ((rs = pthread_sigmask(how,setp,osetp)) > 0) {
-	    rs = (- rs) ;
-	} else if (rs < 0) {
-	    rs = (- errno) ;
+	int		rs = SR_OK ;
+	if (errno_t ec ; (ec = pthread_sigmask(how,setp,osetp)) > 0) {
+	    rs = (- ec) ;
 	}
 	return rs ;
 }

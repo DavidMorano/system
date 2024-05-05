@@ -60,7 +60,9 @@ int ptma_create(PTMA *op) noex {
 	    int		to_nomem = utimeout[uto_nomem] ;
 	    bool	f_exit = false ;
 	    repeat {
-	        if ((rs = pthread_mutexattr_init(op)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_mutexattr_init(op)) > 0) {
+		    rs = (- rs) ;
+		}
 	        if (rs < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -85,32 +87,36 @@ int ptma_create(PTMA *op) noex {
 
 int ptma_destroy(PTMA *op) noex {
 	int		rs ;
-	rs = pthread_mutexattr_destroy(op) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_destroy(op)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_destroy) */
 
 int ptma_getprioceiling(PTMA *op,int *oldp) noex {
 	int		rs ;
-	rs = pthread_mutexattr_getprioceiling(op,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_getprioceiling(op,oldp)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_getprioceiling) */
 
 int ptma_setprioceiling(PTMA *op,int fn) noex {
 	int		rs ;
-	rs = pthread_mutexattr_setprioceiling(op,fn) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_setprioceiling(op,fn)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_setprioceiling) */
 
 int ptma_getprotocol(PTMA *op,int *oldp) noex {
 	int		rs ;
-	rs = pthread_mutexattr_getprotocol(op,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_getprotocol(op,oldp)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_getprotocol) */
@@ -133,8 +139,9 @@ int ptma_getpshared(PTMA *op,int *oldp) noex {
 
 int ptma_setpshared(PTMA *op,int fn) noex {
 	int		rs ;
-	rs = pthread_mutexattr_setpshared(op,fn) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_setpshared(op,fn)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_setpshared) */
@@ -143,8 +150,9 @@ int ptma_getrobustnp(PTMA *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if constexpr (f_mutexrobust) {
-	        rs = pthread_mutexattr_getrobust_np(op,oldp) ;
-	        if (rs > 1) rs = (- rs) ;
+	        if ((rs = pthread_mutexattr_getrobust_np(op,oldp)) > 0) {
+	            rs = (- rs) ;
+		}
 	    } else {
 	        (void) oldp ;
 	        rs = SR_OK ;
@@ -158,8 +166,9 @@ int ptma_setrobustnp(PTMA *op,int fn) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if constexpr (f_mutexrobust) {
-		rs = pthread_mutexattr_setrobust_np(op,fn) ;
-		if (rs > 0) rs = (- rs) ;
+		if ((rs = pthread_mutexattr_setrobust_np(op,fn)) > 0) {
+		    rs = (- rs) ;
+		}
 	    } else {
 	        (void) fn ;
 	        rs = SR_OK ;
@@ -171,16 +180,18 @@ int ptma_setrobustnp(PTMA *op,int fn) noex {
 
 int ptma_gettype(PTMA *op,int *oldp) noex {
 	int		rs ;
-	rs = pthread_mutexattr_gettype(op,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_gettype(op,oldp)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_gettype) */
 
 int ptma_settype(PTMA *op,int nf) noex {
 	int		rs ;
-	rs = pthread_mutexattr_settype(op,nf) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutexattr_settype(op,nf)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptma_settype) */

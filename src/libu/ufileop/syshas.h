@@ -196,6 +196,9 @@
 /* Solaris®: sigwait(2) */
 #define	SYSHAS_SIGWAIT		1
 
+/* Solaris®: pthread_sigsend(2) */
+#define	SYSHAS_PTHREADSIGSEND	1
+
 /* Solaris®: ucontext */
 #define	SYSHAS_UCONTEXT		1
 
@@ -422,6 +425,9 @@
 /* Darwin: sigwait(2) */
 #define	SYSHAS_SIGWAIT		0
 
+/* Darwin: pthread_sigsend(2) */
+#define	SYSHAS_PTHREADSIGSEND	0
+
 /* Darwin: ucontext */
 #define	SYSHAS_UCONTEXT		1
 
@@ -627,6 +633,9 @@
 
 /* Linux: sigwait(2) */
 #define	SYSHAS_SIGWAIT		1
+
+/* Linux: pthread_sigsend(2) */
+#define	SYSHAS_PTHREADSIGSEND	0
 
 /* Linux: ucontext */
 #define	SYSHAS_UCONTEXT		1

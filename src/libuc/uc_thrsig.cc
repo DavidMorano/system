@@ -1,4 +1,4 @@
-/* ucthesig SUPPORT */
+/* ucthrsig SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -37,8 +37,9 @@ int uc_thrkill(pthread_t tid,int sn) noex {
 	int		to_again = utimeout[uto_again] ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = pthread_kill(tid,sn)) < 0) {
-		rs = (- errno) ;
+	    rs = SR_OK ;
+	    if (errno_t ec ; (ec = pthread_kill(tid,sn)) > 0) {
+		rs = (- ec) ;
 	    }
 	    if (rs < 0) {
 	        switch (rs) {
@@ -65,8 +66,9 @@ int uc_thrsigqueue(pthread_t tid,int sn,const SIGVAL val) noex {
 	int		to_again = utimeout[uto_again] ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = pthread_sigqueue(tid,sn,val)) < 0) {
-		rs = (- errno) ;
+	    rs = SR_OK ;
+	    if (errno_t ec ; (ec = pthread_sigqueue(tid,sn,val)) > 0) {
+		rs = (- ec) ;
 	    }
 	    if (rs < 0) {
 	        switch (rs) {
