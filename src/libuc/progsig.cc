@@ -86,31 +86,6 @@
 
 /* local typedefs */
 
-
-/* external subroutines */
-
-extern "C" {
-    int		progsig_init(void) noex ;
-    int		progsig_fini(void) noex ;
-    int		progsig_initenviron(void *) noex ;
-    int		progsig_callcmd(cchar *,int,cchar **,cchar **,void *) noex ;
-    int 	progsig_callfunc(subcmd_t,int,cchar **,cchar **,void *) noex ;
-}
-extern "C" {
-    int		progsig_initmemalloc(int) noex ;
-}
-
-/* external variables */
-
-extern char	**environ ;
-
-
-/* local structures */
-
-extern "C" {
-    typedef int (*subcmd_t)(int,cchar **,cchar **,void *) noex ;
-}
-
 #ifndef	TYPEDEF_TWORKER
 #define	TYPEDEF_TWORKER
 extern "C" {
@@ -122,6 +97,31 @@ extern "C" {
     typedef	int (*cmdsub_t)(int,cchar **,cchar **,void *) noex ;
     typedef	int (*func_caller)(int,cchar **,void *) noex ;
 }
+
+
+/* external subroutines */
+
+extern "C" {
+    typedef int (*subcmd_f)(int,cchar **,cchar **,void *) noex ;
+}
+
+extern "C" {
+    int		progsig_init(void) noex ;
+    int		progsig_fini(void) noex ;
+    int		progsig_initenviron(void *) noex ;
+    int		progsig_callcmd(cchar *,int,cchar **,cchar **,void *) noex ;
+    int 	progsig_callfunc(subcmd_f,int,cchar **,cchar **,void *) noex ;
+}
+extern "C" {
+    int		progsig_initmemalloc(int) noex ;
+}
+
+/* external variables */
+
+extern char	**environ ;
+
+
+/* local structures */
 
 struct progsig_flags {
 	uint		dummy:1 ;
@@ -179,6 +179,7 @@ enum cmds {
 extern "C" {
     static void	progsig_atforkbefore() noex ;
     static void	progsig_atforkafter() noex ;
+    static void	progsig_exit() noex ;
     static void	progsig_sighand(int,siginfo_t *,void *) noex ;
 }
 
@@ -264,10 +265,10 @@ int progsig_init(void) noex {
 	    uip->f_init = true ;
 	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
 	        if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
-	            void	(*b)() = progsig_atforkbefore ;
-	            void	(*a)() = progsig_atforkafter ;
+	            void_f	b = progsig_atforkbefore ;
+	            void_f	a = progsig_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(progsig_fini)) >= 0) {
+	                if ((rs = uc_atexit(progsig_exit)) >= 0) {
 			    uip->pid = getpid() ;
 			    uip->sfd = -1 ;
 		            rs = 1 ;
@@ -292,8 +293,8 @@ int progsig_init(void) noex {
 }
 /* end subroutine (progsig_init) */
 
-void progsig_fini(void) noex {
-	struct progsig	*uip = &progsig_data ;
+int progsig_fini(void) noex {
+	PROGSIG		*uip = &progsig_data ;
 	int		rs = SR_NXIO ;
 	int		rs1 ;
 	if (uip->f_initdone) {
@@ -324,6 +325,7 @@ void progsig_fini(void) noex {
 	    uip->f_init = false ;
 	    uip->f_initdone = false ;
 	} /* end if (atexit registered) */
+	return rs ;
 }
 /* end subroutine (progsig_fini) */
 
@@ -388,9 +390,7 @@ int progsig_serial() noex {
 }
 /* end subroutine (progsig_serial) */
 
-
-int progsig_sigquit(void)
-{
+int progsig_sigquit(void) noex {
 	PROGSIG		*kip = &progsig_data ;
 	int		rs = SR_OK ;
 	if (kip->f_sigquit) {
@@ -943,6 +943,11 @@ static void progsig_atforkafter() noex {
 }
 /* end subroutine (progsig_atforkafter) */
 
+static void progsig_exit() noex {
+	(void) progsig_fini() ;
+}
+/* end subroutine (progsig_atforkafter) */
+
 /* ARGSUSED */
 static void kshlib_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	PROGSIG		*kip = &progsig_data ;
@@ -1046,7 +1051,7 @@ static int progsig_sigend(PROGSIG *kip) noex {
 }
 /* end subroutine (progsig_sigend) */
 
-static int snote_start(SN *ep,int mt,tine_t st,cc *un,char *mdp,int mdl) noex {
+static int snote_start(SN *ep,int mt,time_t st,cc *un,char *mdp,int mdl) noex {
 	int		rs = SR_FAULT ;
 	if (un && mdp) {
 	    int		sz = 0 ;

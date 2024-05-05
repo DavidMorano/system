@@ -34,8 +34,9 @@
 
 
 #include	<sys/random.h>		/* |getentropy(2)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #define GRND_NONBLOCK		0x01	/* do not block open */
@@ -47,7 +48,7 @@
 #define	SUBROUTINE_GETRANDOM
 EXTERNC_begin
 
-extern int	getrandom(void *,size_t,uint) noex ;
+extern unixret_t	getrandom(void *,size_t,uint) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_GETRANDOM */

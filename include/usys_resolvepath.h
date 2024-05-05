@@ -34,15 +34,16 @@
 
 
 #include	<stddef.h>		/* |size_t| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #ifndef	SUBROUTINE_RESOLVEPATH
 #define	SUBROUTINE_RESOLVEPATH
 EXTERNC_begin
 
-extern int	resolvepath(cchar *,char *,size_t) noex ;
+extern unixret_t resolvepath(cchar *,char *,size_t) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_RESOLVEPATH */

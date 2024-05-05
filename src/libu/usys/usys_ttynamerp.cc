@@ -37,9 +37,9 @@
 
 #if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
-int ttyname_rp(int fd,char *rbuf,int rlen) noex {
+errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		sz = size_t(rlen) ;
-	int		ec = 0 ;
+	errno_t		ec = 0 ;
 	if (char *p ; (p = ttyname_r(fd,rbuf,sz)) == nullptr) {
 	    ec = errno ;
 	}
@@ -48,7 +48,7 @@ int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 
 #else /* all other operatring systems at this time */
 
-int ttyname_rp(int fd,char *rbuf,int rlen) noex {
+errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		sz = size_t(rlen) ;
 	return ttyname_r(fd,rbuf,sz) ;
 }
@@ -59,8 +59,8 @@ int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 
 static constinit aflag	mx ;
 
-int ttyname_rp(int fd,char *rbuf,int rlen) noex {
-	int		ec = 0 ;
+errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
+	errno_t		ec = 0 ;
 	if (fd >= 0) {
 	    if (rbuf) {
 		if (rlen >= 0) {

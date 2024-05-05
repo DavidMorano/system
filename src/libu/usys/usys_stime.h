@@ -32,6 +32,8 @@
 #include	<sys/time.h>		/* for all others |gettimeofday(3c)| */
 #include	<unistd.h>		/* for Solaris® */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 /* GETRANDOM begin */
 #if	defined(SYSHAS_GETRANDOM) && (SYSHAS_GETRANDOM > 0)
@@ -44,7 +46,7 @@
 #define	SUBROUTINE_STIME
 EXTERNC_begin
 
-extern int	stime(const time_t *) noex ;
+extern unixret_t stime(const time_t *) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_STIME */

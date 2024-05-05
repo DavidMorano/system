@@ -38,11 +38,13 @@
 #include	<pthread.h>
 #include	<time.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
 
-extern int xxx_ugetnisdom(char *,int) noex ;
+extern sysret_t xxx_ugetnisdom(char *,int) noex ;
 
 EXTERNC_end
 
@@ -143,7 +145,7 @@ typedef long		sysvmsgtype ;
 #define	SUBROUTINE_MEMCNTL
 EXTERNC_begin
 
-extern int memcntl(void *,size_t,int,void *,int,int) noex ;
+extern unixret_t memcntl(void *,size_t,int,void *,int,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_MEMCNTL */
@@ -185,7 +187,7 @@ enum syshasmemplock {
 #define	SUBROUTINE_MEMPLOCK
 EXTERNC_begin
 
-extern int plock(int) noex ;
+extern unixret_t plock(int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_MEMPLOCK */

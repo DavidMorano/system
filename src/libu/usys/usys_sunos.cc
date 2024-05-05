@@ -37,7 +37,7 @@
 #include	<sys/systeminfo.h>
 
 
-int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
+sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (ubuf) {
@@ -63,7 +63,7 @@ int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 }
 /* end subroutine (sunos_sysinfo) */
 
-int sunos_ugetnisdom(char *rbuf,int rlen) noex {
+sysret_t sunos_ugetnisdom(char *rbuf,int rlen) noex {
 	cint	req = SI_SRPC_DOMAIN ;	/* <- whew! nothing is easy */
 	return sunos_sysinfo(rbuf,rlen,req) ;
 }
@@ -73,7 +73,7 @@ int sunos_ugetnisdom(char *rbuf,int rlen) noex {
 #else /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
-int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
+sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (ubuf) {
@@ -89,8 +89,8 @@ int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 }
 /* end subroutine (sunos_sysinfo) */
 
-int sunos_ugetnisdom(char *rbuf,int rlen) noex {
-	cint	req = 0 ;
+unixret_t sunos_ugetnisdom(char *rbuf,int rlen) noex {
+	cint		req = 0 ;
 	return sunos_sysinfo(rbuf,rlen,req) ;
 }
 /* end subroutine (sunos_ugetnisdom) */

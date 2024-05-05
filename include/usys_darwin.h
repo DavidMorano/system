@@ -32,14 +32,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 EXTERNC_begin
 
-extern int	darwin_ugetnisdom(char *,int) noex ;
+extern sysret_t darwin_ugetnisdom(char *,int) noex ;
 
 EXTERNC_end
 
@@ -103,9 +103,9 @@ typedef struct procset		procset_t ;
 
 EXTERNC_begin
 
-extern int sigsend(idtype_t,id_t,int) noex ;
-extern int sigsendset(procset_t *,int) noex ;
-extern int sigqueue(pid_t,int,const union sigval) noex ;
+extern unixret_t sigsend(idtype_t,id_t,int) noex ;
+extern unixret_t sigsendset(procset_t *,int) noex ;
+extern unixret_t sigqueue(pid_t,int,const union sigval) noex ;
 
 EXTERNC_end
 
@@ -120,10 +120,10 @@ EXTERNC_end
 
 EXTERNC_begin
 
-extern int sigwait(const sigset_t *,int *) noex ;
-extern int sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
-extern int sigtimedwait(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
-extern int sigwaitinfoto(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
+extern unixret_t sigwait(const sigset_t *,int *) noex ;
+extern unixret_t sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
+extern unixret_t sigtimedwait(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
+extern unixret_t sigwaitinfoto(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 
 EXTERNC_end
 
@@ -160,11 +160,11 @@ typedef int	timer_t ;
 
 EXTERNC_begin
 
-extern int timer_create(clockid_t,SIGEVENT *,timer_t *) noex ;
-extern int timer_delete(timer_t) noex ;
-extern int timer_settime(timer_t,int,ITIMERSPEC *,ITIMERSPEC *) noex ;
-extern int timer_gettime(timer_t,ITIMERSPEC *) noex ;
-extern int timer_getoverrun(timer_t) noex ;
+extern errno_t timer_create(clockid_t,SIGEVENT *,timer_t *) noex ;
+extern errno_t timer_delete(timer_t) noex ;
+extern errno_t timer_settime(timer_t,int,ITIMERSPEC *,ITIMERSPEC *) noex ;
+extern errno_t timer_gettime(timer_t,ITIMERSPEC *) noex ;
+extern errno_t timer_getoverrun(timer_t) noex ;
 
 EXTERNC_end
 
@@ -189,7 +189,7 @@ EXTERNC_end
 
 EXTERNC_begin
 
-extern int pthread_cond_reltimedwait_np(PTC *,PTM *,CTIMESPEC *) noex ;
+extern errno_t pthread_cond_reltimedwait_np(PTC *,PTM *,CTIMESPEC *) noex ;
 
 EXTERNC_end
 
@@ -212,8 +212,8 @@ EXTERNC_end
 #define	SUBROUTINE_PTHREADMUTEXATTR
 EXTERNC_begin
 
-extern int pthread_mutexattr_setrobust_np(PTMA *,int) noex ;
-extern int pthread_mutexattr_getrobust_np(PTMA *,int *) noex ;
+extern errno_t pthread_mutexattr_setrobust_np(PTMA *,int) noex ;
+extern errno_t pthread_mutexattr_getrobust_np(PTMA *,int *) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_PTHREADMUTEXATTR */
@@ -242,7 +242,7 @@ EXTERNC_end
 #define	SUBROUTINE_MEMCNTL
 EXTERNC_begin
 
-extern int memcntl(void *,size_t,int,void *,int,int) noex ;
+extern unixret_t memcntl(void *,size_t,int,void *,int,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_MEMCNTL */
@@ -261,8 +261,8 @@ EXTERNC_end
 #define	SUBROUTINE_SEMINIT
 EXTERNC_begin
 
-extern int darwinsem_init(sem_t *,int,unsigned int) noex ;
-extern int darwinsem_destroy(sem_t *) noex ;
+extern unixret_t darwinsem_init(sem_t *,int,unsigned int) noex ;
+extern unixret_t darwinsem_destroy(sem_t *) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_SEMINIT */
@@ -297,12 +297,14 @@ EXTERNC_end
 
 
 /*----------------------------------------------------------------------------*/
+#ifdef	COMMENT /* should not be necessary on Darwin */
 #ifndef	SUBROUTINE_RENAME
 #define	SUBROUTINE_RENAME
 EXTERNC_begin
-extern int	rename(cchar *,cchar *) noex ;
+extern unixret_t rename(cchar *,cchar *) noex ;
 EXTERNC_end
 #endif
+#endif /* COMMENT */
 /*----------------------------------------------------------------------------*/
 
 

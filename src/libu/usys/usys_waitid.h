@@ -35,8 +35,9 @@
 #if	(!defined(SYSHAS_WAITID)) || (SYSHAS_WAITID == 0)
 
 
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #ifndef	TYPEDEF_WAITID
@@ -68,7 +69,7 @@ typedef enum idtype {          /* pollutes XPG4.2 namespace */
 #define	SUBROUTINE_WAITID
 EXTERNC_begin
 
-extern int	waitid(idtype_t,id_t,siginfo_t *,int) noex ;
+extern unixret_t waitid(idtype_t,id_t,siginfo_t *,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_WAITID */

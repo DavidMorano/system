@@ -39,13 +39,12 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysflag.h>
 
 #include	"usys_stime.h"
 
 
-int stime(const time_t *tp) noex {
-	int		rc = -1 ;
+unixret_t stime(const time_t *tp) noex {
+	unixret_t	rc = -1 ;
 	if (tp) {
 	    TIMEVAL	tv{} ;
 	    tv.tv_sec = *tp ;

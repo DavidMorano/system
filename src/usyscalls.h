@@ -52,9 +52,9 @@
 #include	<xti.h>
 #endif
 
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
 #include	<ustat.h>	/* missing STAT stuff */

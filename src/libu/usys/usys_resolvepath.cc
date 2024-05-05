@@ -33,8 +33,8 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<usysflag.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"usys_resolvepath.h"
 
@@ -68,9 +68,9 @@
 
 /* exported subroutines */
 
-int resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
+unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	cint		rlen = int(rsz & INT_MAX) ;
-	int		rc = 0 ;
+	unixret_t	rc = 0 ;
 	int		rl = 0 ;
 	if (rbuf) {
 	    cnullptr	np{} ;

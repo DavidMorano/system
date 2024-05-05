@@ -70,7 +70,7 @@
 
 /* exported subroutines */
 
-int waitid(idtype_t,id_t,siginfo_t *,int) noex {
+unixret_t waitid(idtype_t,id_t,siginfo_t *,int) noex {
 	errno = ENOSYS ;
 	return -1 ;
 }

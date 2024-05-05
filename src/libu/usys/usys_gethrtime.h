@@ -31,6 +31,8 @@
 #include	<sys/time.h>		/* <- |gethrtime(3c)| */
 #include	<time.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 /* GETHRTIME begin */

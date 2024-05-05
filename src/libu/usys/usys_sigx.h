@@ -40,7 +40,7 @@
 #define	SUBROUTINE_SIGQUEUE
 EXTERNC_begin
 
-extern int sigqueue(pid_t,int,const SIGVAL) noex ;
+extern unixret_t sigqueue(pid_t,int,const SIGVAL) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_SIGUEUE */
@@ -55,7 +55,7 @@ EXTERNC_end
 #define	SUBROUTINE_SIGSEND
 EXTERNC_begin
 
-extern int sigsend(idtype_t,id_t,int) noex ;
+extern unixret_t sigsend(idtype_t,id_t,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_SIGSEND */
@@ -70,7 +70,7 @@ EXTERNC_end
 #define	SUBROUTINE_SIGSENDSET
 EXTERNC_begin
 
-extern int sigsendset(procset_t *,int) noex ;
+extern unixret_t sigsendset(procset_t *,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_SIGSENDSET */
@@ -85,7 +85,7 @@ EXTERNC_end
 #define	SUBROUTINE_PTHREADSIGQUEUE
 EXTERNC_begin
 
-extern int pthread_sigqueue(pthread_t,int,const SIGVAL) noex ;
+extern errno_t pthread_sigqueue(pthread_t,int,const SIGVAL) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_PTHREADSIGQUEUE */

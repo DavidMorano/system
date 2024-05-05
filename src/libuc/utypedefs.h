@@ -34,10 +34,6 @@
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 
-#if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
-#include	<sys/acl.h>
-#endif
-
 #include	<arpa/inet.h>		/* <- |in_addr_t| */
 
 #include	<unistd.h>
@@ -55,12 +51,6 @@
 #include	<signal.h>
 #include	<stddef.h>		/* |wchar_t| */
 #include	<stdlib.h>
-
-#if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
-#include	<xti.h>
-#endif
-
-#include	<usys.h>	/* <- auxilllary OS support */
 
 
 /* for |stat(2)| and its many friends */
@@ -326,8 +316,8 @@ EXTERNC_end
 #ifndef	TYPEDEF_SORTVCMP
 #define	TYPEDEF_SORTVCMP
 EXTERNC_begin
-typedef int (*sort_vcmp)(cvoid *,cvoid *) noex ;
-typedef int (*sortvcmp_f)(cvoid *,cvoid *) noex ;
+typedef int (*sort_vcmp)(const void *,const void *) noex ;
+typedef int (*sortvcmp_f)(const void *,const void *) noex ;
 EXTERNC_end
 #endif /* TYPEDEF_SORTVCMP */
 
@@ -350,6 +340,16 @@ typedef const off_t	coff ;
 #define	TYPEDEF_ERRNO
 typedef int		errno_t ;
 #endif /* TYPEDEF_ERRNO */
+
+#ifndef	TYPEDEF_UNIXRET
+#define	TYPEDEF_UNIXRET
+typedef int		unixret_t ;
+#endif /* TYPEDEF_UNIXRET */
+
+#ifndef	TYPEDEF_SYSRET
+#define	TYPEDEF_SYSRET
+typedef int		sysret_t ;
+#endif /* TYPEDEF_SYSRET */
 
 
 #endif /* UTYPEDEFS_INCLUDE */

@@ -99,8 +99,8 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 
-int xxx_ugetnisdom(char *rbuf,int rlen) noex {
-	int		ec = EFAULT ;
+sysret_t xxx_ugetnisdom(char *rbuf,int rlen) noex {
+	errno_t		ec = EFAULT ;
 	if (rbuf) {
 	    ec = EINVAL ;
 	    if (rlen >= 0) {

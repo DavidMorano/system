@@ -38,7 +38,7 @@
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 
-int linux_ugetnisdom(char *rbuf,int rlen) noex {
+sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
 	csize		rsz = size_t(rlen+1) ;
 	int		rs ;
 	if ((rs = getdomainname(rbuf,rsz)) < 0) {
@@ -52,8 +52,8 @@ int linux_ugetnisdom(char *rbuf,int rlen) noex {
 #else /* other operating systems */
 
 
-int linux_ugetnisdom(char *rbuf,int rlen) noex {
-	int		ec = EFAULT ;
+sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
+	errno_t		ec = EFAULT ;
 	if (rbuf) {
 	    ec = EINVAL ;
 	    if (rlen >= 0) {
