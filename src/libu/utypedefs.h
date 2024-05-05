@@ -52,6 +52,8 @@
 #include	<stddef.h>		/* |wchar_t| */
 #include	<stdlib.h>
 
+#include	<clanguage.h>		/* relatively necessary inclusion */
+
 
 /* for |stat(2)| and its many friends */
 
