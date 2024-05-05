@@ -90,10 +90,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>		/* required for |fstatfs(2)| */
 #include	<sys/mount.h>		/* required for |fstatfs(2)| */
+#include	<sys/ioctl.h>		/* for |ioctl(2)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<intsat.h>
@@ -164,6 +167,7 @@ namespace {
 	CIOVEC		*iop ;
 	cvoid		*valp ;
 	int		*lenp ;
+	caddr_t		anyarg ;
 	off_t		sz ;
 	int		n ;
 	int		to ;
@@ -183,8 +187,9 @@ namespace {
 	    sz = o ;
 	} 
 	uregular(POLLFD *s,int an,int t) noex : fds(s), n(an), to(t) { } ;
-	uregular(int c,int s) noex : cmd(c), sz(s) { } ;
 	uregular(IOVEC *p,int an) noex : iop(p), n(an) { } ;
+	uregular(int c,caddr_t aa) noex : cmd(c), anyarg(aa) { } ;
+	uregular(int c,int s) noex : cmd(c), sz(s) { } ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -205,6 +210,7 @@ namespace {
 	int ireadv(int) noex ;
 	int iwrite(int) noex ;
 	int iwritev(int) noex ;
+	int iioctl(int) noex ;
     } ; /* end struct (uregular) */
 }
 
@@ -399,59 +405,21 @@ int u_fsync(int fd) noex {
 }
 /* end subroutine (u_fsync) */
 
-
-
-#ifdef	COMMENT
-
 int u_ioctl(int fd,int cmd,...) noex {
-	caddr_t		any ;
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = false ;
-
-	{
-	va_list	ap ;
+	va_list		ap ;
+	int		rs = SR_INVALID ;
+	caddr_t		anyarg ;
 	va_begin(ap,cmd) ;
-	any = va_arg(ap,caddr_t) ;
-	va_end(ap) ;
+	anyarg = va_arg(ap,caddr_t) ;
+	if (cmd >= 0) {
+	    uregular	ro(cmd,anyarg) ;
+	    ro.m = &uregular::iioctl ;
+	    rs = ro(fd) ;
 	}
-
-	repeat {
-	    if ((rs = ioctl(fd,cmd,any)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = true ;
-		    break ;
-		} /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
+	va_end(ap) ;
 	return rs ;
 }
 /* end subroutine (u_ioctl) */
-
-#endif /* COMMENT */
-
 
 int u_lockf(int fd,int cmd,off_t sz) noex {
 	uregular	ro(cmd,sz) ;
@@ -624,5 +592,15 @@ int uregular::iwritev(int fd) noex {
 	return rs ;
 }
 /* end method (uregular::iwritev) */
+
+int uregular::iioctl(int fd) noex {
+	ulong		icmd = ulong(cmd) ;
+	int		rs ;
+	if ((rs = ioctl(fd,icmd,anyarg)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::iioctl) */
 
 

@@ -16,6 +16,13 @@
 
 /*******************************************************************************
 
+	Name:
+	u_strmsgget
+	u_strmsggetp
+	u_strmsgput
+	u_strmsgputp
+
+	Description:
 	This module manages UNIX® STREAMS®.  These are the STREAMS®
 	invented by Dennis Ritchie (of AT&T Bell Laboratories fame).
 	The STREAMS® framework first appeared in UNIX® System V
@@ -25,6 +32,24 @@
 	completeness, the people who ported STREAMS® to UNIX® System
 	V Release 4 were: Robert Israel, Gil McGrath, Dave Olander,
 	Her-Daw Che, and Maury Bach.
+
+	Synopsis:
+	int u_strmsgget(int fd,STRBUF *cmp,STRBUF *dmp,int *fp) noex
+	int u_strmsggetp(int fd,STRBUF *cmp,STRBUF *dmp,int *bp,int *fp) noex
+	int u_strmsgput(int fd,STRBUF *cmp,STRBUF *dmp,int flags) noex
+	int u_strmsgputp(int fd,STRBUF *cmp,STRBUF *dmp,int flags) noex
+
+	Arguments:
+	fd		file-descriptor
+	cmp		control-message-pointer
+	dmp		data-message-pointer
+	fp		pointer to flags (an integer)
+	bp		pointer to priority-band (an integer)
+	flag		flags
+
+	Returns:
+	>=0		OK
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -56,17 +81,18 @@
 
 namespace {
     struct ustr ;
-    typedef int (ustr::*mem_f)(int,STRBUF *,STRBUF *) noex ;
+    typedef int (ustr::*ustr_m)(int,STRBUF *,STRBUF *) noex ;
     struct ustr {
-	mem_f		m ;
+	ustr_m		m = nullptr ;
 	int		*fp ;
 	int		*bp ;
 	int		flags ;
+	int		band ;
 	ustr(int *ufp,int *ubp = nullptr) noex {
 	    fp = ufp ;
 	    bp = ubp ;
 	} ; /* end dtor */
-	ustr(int fl) noex : flags(fl) { } ;
+	ustr(int fl,int bd = 0) noex : flags(fl), band(bd) { } ;
 	int msgget(int,STRBUF *,STRBUF *) noex ;
 	int msggetp(int,STRBUF *,STRBUF *) noex ;
 	int msgput(int,STRBUF *,STRBUF *) noex ;
@@ -108,8 +134,8 @@ int u_strmsgput(int fd,STRBUF *cmp,STRBUF *dmp,int flags) noex {
 }
 /* end subroutine (u_strmsgput) */
 
-int u_strmsgputp(int fd,STRBUF *cmp,STRBUF *dmp,int flags) noex {
-	ustr		uso(flags) ;
+int u_strmsgputp(int fd,STRBUF *cmp,STRBUF *dmp,int band,int flags) noex {
+	ustr		uso(flags,band) ;
 	uso.m = &ustr::msgputp ;
 	return uso(fd,cmp,dmp) ;
 }
@@ -215,7 +241,7 @@ int ustr::msggetp(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 
 int ustr::msgput(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
-	if ((rs = putmsg(fd,cmp,dmp,fp)) < 0) {
+	if ((rs = putmsg(fd,cmp,dmp,flags)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -224,7 +250,7 @@ int ustr::msgput(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 
 int ustr::msgputp(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
-	if ((rs = putpmsg(fd,cmp,dmp,bp,fp)) < 0) {
+	if ((rs = putpmsg(fd,cmp,dmp,band,flags)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;

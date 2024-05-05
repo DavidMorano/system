@@ -53,12 +53,11 @@
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<clanguage.h>
-#include	<usupport.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
+#include	<usupport.h>
 #include	<usyscalls.h>
-#include	<localmisc.h>
 
 #include	"usig.h"
 
@@ -146,7 +145,9 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 	int		f_exit = false ;
 	repeat {
 	    rs = SR_OK ;
-	    if (sigsuspend(ssp) == -1) rs = (- errno) ;
+	    if (sigsuspend(ssp) < 0) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 		switch (rs) {
 	        case SR_INTR:
@@ -168,7 +169,7 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 
 int u_pause() noex {
 	int		rs = SR_OK ;
-	if (pause() == -1) {
+	if (pause() < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;

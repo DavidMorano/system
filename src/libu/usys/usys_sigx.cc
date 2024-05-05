@@ -31,8 +31,9 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<usysflag.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"usys_sigx.h"
 
@@ -57,8 +58,8 @@ unixret_t sigqueue(pid_t pid,int sn,const SIGVAL) noex {
 /* SIGSEND start */
 #if	(!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0)
 
-#ifndef	ID_CONSTEXPR
-#define	ID_CONSTEXPR
+#ifndef	CONSTEXPR_ID
+#define	CONSTEXPR_ID
 constexpr id_t		idend = id_t(-1) ;
 #endif
 

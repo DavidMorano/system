@@ -24,7 +24,7 @@
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
 
-	Below are some STREAMS structures. They were defined with 
+	Below are some STREAMS® structures.  They were defined with 
 	UNIX® System V Release 3.
 
 *******************************************************************************/
@@ -34,9 +34,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 #ifndef	STRBUF
@@ -110,10 +110,10 @@ struct strioctl {
 
 EXTERNC_begin
 
-extern int getmsg(int,STRBUF *,STRBUF *,int *) noex ;
-extern int getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
-extern int putmsg(int,STRBUF *,STRBUF *,int *) noex ;
-extern int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern unixret_t getmsg(int,STRBUF *,STRBUF *,int *) noex ;
+extern unixret_t getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern unixret_t putmsg(int,STRBUF *,STRBUF *,int) noex ;
+extern unixret_t putpmsg(int,STRBUF *,STRBUF *,int,int) noex ;
 
 EXTERNC_end
 

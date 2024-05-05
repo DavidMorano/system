@@ -36,6 +36,7 @@
 /* SIGQUEUE begin */
 #if	(!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0)
 
+
 #ifndef	SUBROUTINE_SIGQUEUE
 #define	SUBROUTINE_SIGQUEUE
 EXTERNC_begin
