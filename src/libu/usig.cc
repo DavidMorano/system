@@ -17,6 +17,8 @@
 /*******************************************************************************
 
 	Names:
+	u_kill
+	u_killpg
 	u_sigaction
 	u_sigaltstack
 	u_sigpending
@@ -92,6 +94,15 @@ int u_kill(pid_t pid,int sig) noex {
 	return rs ;
 }
 /* end subroutine (u_kill) */
+
+int u_killpg(pid_t pid,int sig) noex {
+	int		rs ;
+	if ((rs = killpg(pid,sig)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_killpg) */
 
 int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp) noex {
 	int		rs ;

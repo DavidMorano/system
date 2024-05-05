@@ -148,6 +148,9 @@ default:		all
 
 all:			$(ALL)
 
+so:			$(T).so
+
+
 .cc.o:
 	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $(CPPFLAGS) $<
 

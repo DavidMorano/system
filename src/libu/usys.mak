@@ -59,10 +59,10 @@ OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o
 OBJ2_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ3_USYS= usys_ttynamerp.o usys_ugetnisdom.o
 OBJ4_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
-OBJ5_USYS= 
+OBJ5_USYS= usys_sigx.o
 
 OBJA= obj0_usys.o obj1_usys.o obj2_usys.o 
-OBJB= obj3_usys.o obj4_usys.o
+OBJB= obj3_usys.o obj4_usys.o obj5_usys.o
 
 OBJ_USYS= obja.o objb.o
 
@@ -126,6 +126,9 @@ obj3_usys.o:	$(OBJ3_USYS)
 obj4_usys.o:	$(OBJ4_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_USYS)
 
+obj5_usys.o:	$(OBJ5_USYS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_USYS)
+
 
 obja.o:		$(OBJA)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
@@ -147,5 +150,6 @@ usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
 usys_stime.o:		usys_stime.cc usys_stime.h		$(INCS)
 usys_resolvepath.o:	usys_resolvepath.cc usys_resolvepath.h	$(INCS)
 usys_waitid.o:		usys_waitid.cc usys_waitid.h		$(INCS)
+usys_sigx.o:		usys_sigx.cc usys_sigx.h		$(INCS)
 
 

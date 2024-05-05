@@ -177,6 +177,8 @@ EXTERNC_end
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
 
+#include	<pthread.h>
+
 #ifndef	PTM
 #define	PTM		pthread_mutex_t
 #endif

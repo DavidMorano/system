@@ -34,6 +34,8 @@
 
 EXTERNC_begin
 
+extern int u_kill(pid_t,int) noex ;
+extern int u_killpg(pid_t,int) noex ;
 extern int u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
 extern int u_sigaltstack(const stack_t *,stack_t *) noex ;
 extern int u_sigpending(sigset_t *) noex ;

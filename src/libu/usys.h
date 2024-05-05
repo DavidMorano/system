@@ -46,6 +46,7 @@
 #include	<usys_stime.h>
 #include	<usys_resolvepath.h>
 #include	<usys_waitid.h>
+#include	<usys_sigx.h>
 
 
 #endif /* USYS_INCLUDE */

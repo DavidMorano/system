@@ -184,8 +184,14 @@
 /* Solaris®: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
+/* Solaris®: sigqueue(3c) */
+#define	SYSHAS_SIGQUEUE		1
+
 /* Solaris®: sigsend(2) */
 #define	SYSHAS_SIGSEND		1
+
+/* Solaris®: sigsendset(2) */
+#define	SYSHAS_SIGSENDSET	1
 
 /* Solaris®: sigwait(2) */
 #define	SYSHAS_SIGWAIT		1
@@ -404,8 +410,14 @@
 /* Darwin: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
+/* Darwin: sigqueue(3c) */
+#define	SYSHAS_SIGQUEUE		0
+
 /* Darwin: sigsend(2) */
 #define	SYSHAS_SIGSEND		0
+
+/* Darwin: sigsendset(2) */
+#define	SYSHAS_SIGSENDSET	0
 
 /* Darwin: sigwait(2) */
 #define	SYSHAS_SIGWAIT		0
@@ -604,8 +616,14 @@
 /* Linux: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		0
 
+/* Linux: sigqueue(3c) */
+#define	SYSHAS_SIGQUEUE		1
+
 /* Linux: sigsend(2) */
 #define	SYSHAS_SIGSEND		1
+
+/* Linux: sigsendset(2) */
+#define	SYSHAS_SIGSENDSET	0
 
 /* Linux: sigwait(2) */
 #define	SYSHAS_SIGWAIT		1
