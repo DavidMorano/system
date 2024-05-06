@@ -25,8 +25,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #ifndef	ENDIAN
@@ -41,6 +42,20 @@
 extern int	endianval ;
 
 extern cchar	*endianstr ;
+
+
+#ifdef	__cplusplus
+
+#include	<bit>
+
+struct machendianinfo {
+	cbool islittle	= (std::endian::native == std::endian::little) ;
+	cbool isbig	= (std::endian::native == std::endian::big) ;
+} ;
+
+constexpr machendianinfo	machendian ;
+
+#endif /* __cplusplus */
 
 
 #endif /* ENDIAN_INCLUDE */

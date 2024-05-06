@@ -37,8 +37,9 @@
 	u_rewind
 	u_seekable
 
-	Description:
+	General-Description:
 	This module contains the UNIX® file-system system calls.
+
 
 	Name:
 	u_lockf
@@ -65,6 +66,23 @@
 	>=0		OK
 	<0		error code (system-return)
 
+
+	Name:
+	u_ioctl
+
+	Description:
+	This subroutine provides special control over I-O devices.
+	See note-4 below for more information on the implementation.
+
+	Synopsis:
+	int u_ioctl(int fd,int cmd,...) noex
+
+	Arguments:
+	fd		file-descriptor
+	cmd		request (command)
+	...		**any-arg**
+
+
 	Notes:
 	1. Note that the stupid developers of the File Locking
 	mechanism un UNIX® System V did not distinguish a real
@@ -83,6 +101,18 @@
 	|close(2)| with a resturn-status of SR_INPROGRESS.  In such
 	a case, we wait for TO_CLOSEWAIT seconds and then we ourself
 	return w/ SR_OK.
+	4. Because of the subroutine signature of |u_ioctl(3u)|
+	allowing for a variable number of arguments and also
+	importantly allowing for arguments with any types, passing
+	those arguments down to another subroutine is potentially
+	problematic.  For little-ending machines, this is not a
+	problem as it is such a superior machine byte ordering
+	convention over the stupid and idiotic big-endian (idiotic)
+	convention.  Happily, for all machines supported by this
+	present code none are big-endian, and further, for all of
+	the command-requests take a |uintptr_t| (or similar) type
+	of argument.  So there is no problem with just passing a
+	promoted argument of |uintptr_t| or similar.
 
 *******************************************************************************/
 
