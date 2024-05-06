@@ -76,7 +76,7 @@ constexpr int	nb = CHAR_BIT ;
 /* subroutine templates */
 
 template<typename T>
-int stdorder_rxx(cchar *buf,T *wp) noex {
+static int stdorder_rxx(cchar *buf,T *wp) noex {
 	cint		n = sizeof(T) ;
 	T		stage = 0 ;
 	const uchar	*ubuf = (uchar *) buf ;
@@ -90,7 +90,7 @@ int stdorder_rxx(cchar *buf,T *wp) noex {
 /* end subroutine-template (stdorder_rxx) */
 
 template<typename T>
-int stdorder_wxx(char *buf,T w) noex {
+static int stdorder_wxx(char *buf,T w) noex {
 	cint		n = sizeof(T) ;
 	uchar		*ubuf = (uchar *) buf ;
 	for (int i = 0 ; i < n ; i += 1) {
