@@ -42,6 +42,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
+#include	<strn.h>
+#include	<mkmagic.h>
 #include	<localmisc.h>
 
 #include	"strlisthdr.h"
@@ -54,16 +56,13 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -91,6 +90,9 @@ enum his {
 
 /* local variables */
 
+constexpr cint		magicsize = STRLISTHDR_MAGICSIZE ;
+constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
+
 
 /* exported variables */
 
@@ -99,16 +101,14 @@ enum his {
 
 int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	cint	magicsize = STRLISTHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		headsize ;
 	int		bl, cl ;
-	cchar	*magicstr = STRLISTHDR_MAGICSTR ;
 	cchar	*tp, *cp ;
 	char		*bp ;
 
-	if (ep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if (hbuf == nullptr) return SR_FAULT ;
 
 	bp = hbuf ;
 	bl = hlen ;
@@ -122,7 +122,7 @@ int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
 
 	            cp = bp ;
 	            cl = magicsize ;
-	            if ((tp = strnchr(cp,cl,'\n')) != NULL)
+	            if ((tp = strnchr(cp,cl,'\n')) != nullptr)
 	                cl = (tp - cp) ;
 
 	            bp += magicsize ;
@@ -130,11 +130,12 @@ int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
 
 /* verify the magic string */
 
-	            if (strncmp(magicstr,cp,cl) != 0)
+	            if (strncmp(magicstr,cp,cl) != 0) {
 	                rs = SR_NXIO ;
-
-	        } else
+		    }
+	        } else {
 	            rs = SR_ILSEQ ;
+		}
 
 	    } /* end if (item) */
 
@@ -145,17 +146,20 @@ int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
 
 	            memcpy(ep->vetu,bp,4) ;
 
-	            if (ep->vetu[0] != STRLISTHDR_VERSION)
+	            if (ep->vetu[0] != STRLISTHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
+		    }
 
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN))
+	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
+		    }
 
 	            bp += 4 ;
 	            bl -= 4 ;
 
-	        } else
+	        } else {
 	            rs = SR_ILSEQ ;
+		}
 	    } /* end if (item) */
 
 	    if ((rs >= 0) && (bl > 0)) {
@@ -177,8 +181,9 @@ int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
 	            bp += headsize ;
 	            bl -= headsize ;
 
-	        } else
+	        } else {
 	            rs = SR_ILSEQ ;
+		}
 	    } /* end if (item) */
 
 	} else { /* write */

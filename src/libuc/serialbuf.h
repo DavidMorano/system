@@ -27,9 +27,9 @@
 
 
 struct serialbuf_head {
-	char		*bp ;	/* current buffer pointer (changes) */
-	int		len ;	/* supplied buffer length (does not change) */
-	int		i ;	/* current buffer index (changes) */
+	char		*sbuf ;	/* buffer pointer (does not change) */
+	int		slen ;	/* buffer length  (does not change) */
+	int		i ;	/* buffer index   (changes) */
 } ;
 
 typedef	SERIALBUF	serialbuf ;
@@ -42,10 +42,11 @@ extern int serialbuf_robj(serialbuf *,void *,int) noex ;
 extern int serialbuf_rc(serialbuf *,char *) noex ;
 extern int serialbuf_rs(serialbuf *,short *) noex ;
 extern int serialbuf_ri(serialbuf *,int *) noex ;
-extern int serialbuf_ria(serialbuf *,int *,int) noex ;
 extern int serialbuf_rl(serialbuf *,long *) noex ;
-extern int serialbuf_rla(serialbuf *,long *,int) noex ;
 extern int serialbuf_rll(serialbuf *,longlong *) noex ;
+extern int serialbuf_ria(serialbuf *,int *,int) noex ;
+extern int serialbuf_rla(serialbuf *,long *,int) noex ;
+extern int serialbuf_rlla(serialbuf *,longlong *,int) noex ;
 extern int serialbuf_rstrw(serialbuf *,char *,int) noex ;
 extern int serialbuf_rstrn(serialbuf *,char *,int) noex ;
 extern int serialbuf_rbuf(serialbuf *,char *,int) noex ;
@@ -53,33 +54,37 @@ extern int serialbuf_rbuf(serialbuf *,char *,int) noex ;
 extern int serialbuf_ruc(serialbuf *,uchar *) noex ;
 extern int serialbuf_rus(serialbuf *,ushort *) noex ;
 extern int serialbuf_rui(serialbuf *,uint *) noex ;
-extern int serialbuf_ruia(serialbuf *,uint *,int) noex ;
 extern int serialbuf_rul(serialbuf *,ulong *) noex ;
-extern int serialbuf_rula(serialbuf *,ulong *,int) noex ;
 extern int serialbuf_rull(serialbuf *,ulonglong *) noex ;
+extern int serialbuf_ruia(serialbuf *,uint *,int) noex ;
+extern int serialbuf_rula(serialbuf *,ulong *,int) noex ;
+extern int serialbuf_rulla(serialbuf *,ulonglong *,int) noex ;
 extern int serialbuf_rustrw(serialbuf *,uchar *,int) noex ;
 extern int serialbuf_rustrn(serialbuf *,uchar *,int) noex ;
 extern int serialbuf_rubuf(serialbuf *,uchar *,int) noex ;
 
 extern int serialbuf_wobj(serialbuf *,cvoid *,int) noex ;
-extern int serialbuf_wc(serialbuf *,int) noex ;
-extern int serialbuf_ws(serialbuf *,int) noex ;
+extern int serialbuf_wc(serialbuf *,char) noex ;
+extern int serialbuf_ws(serialbuf *,short) noex ;
 extern int serialbuf_wi(serialbuf *,int) noex ;
-extern int serialbuf_wia(serialbuf *,int *,int) noex ;
 extern int serialbuf_wl(serialbuf *,long) noex ;
-extern int serialbuf_wla(serialbuf *,long *,int) noex ;
 extern int serialbuf_wll(serialbuf *,longlong) noex ;
+extern int serialbuf_wia(serialbuf *,int *,int) noex ;
+extern int serialbuf_wla(serialbuf *,long *,int) noex ;
+extern int serialbuf_wlla(serialbuf *,longlong *,int) noex ;
 extern int serialbuf_wstrw(serialbuf *,cchar *,int) noex ;
 extern int serialbuf_wstrn(serialbuf *,cchar *,int) noex ;
 extern int serialbuf_wbuf(serialbuf *,cchar *,int) noex ;
 
-extern int serialbuf_wuc(serialbuf *,uint) noex ;
-extern int serialbuf_wus(serialbuf *,uint) noex ;
+extern int serialbuf_wuc(serialbuf *,uchar) noex ;
+extern int serialbuf_wus(serialbuf *,ushort) noex ;
 extern int serialbuf_wui(serialbuf *,uint) noex ;
-extern int serialbuf_wuia(serialbuf *,uint *,int) noex ;
 extern int serialbuf_wul(serialbuf *,ulong) noex ;
-extern int serialbuf_wula(serialbuf *,ulong *,int) noex ;
 extern int serialbuf_wull(serialbuf *,ulonglong) noex ;
+extern int serialbuf_wuia(serialbuf *,uint *,int) noex ;
+extern int serialbuf_wuia(serialbuf *,uint *,int) noex ;
+extern int serialbuf_wula(serialbuf *,ulong *,int) noex ;
+extern int serialbuf_wulla(serialbuf *,ulonglong *,int) noex ;
 extern int serialbuf_wustrw(serialbuf *,const uchar *,int) noex ;
 extern int serialbuf_wustrn(serialbuf *,const uchar *,int) noex ;
 extern int serialbuf_wubuf(serialbuf *,const uchar *,int) noex ;
@@ -87,6 +92,7 @@ extern int serialbuf_wubuf(serialbuf *,const uchar *,int) noex ;
 extern int serialbuf_adv(serialbuf *,int) noex ;
 
 extern int serialbuf_getlen(serialbuf *) noex ;
+extern int serialbuf_reset(serialbuf *) noex ;
 extern int serialbuf_finish(serialbuf *) noex ;
 
 EXTERNC_end

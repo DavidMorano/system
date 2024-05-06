@@ -1,4 +1,4 @@
-/* uc_pipe2 */
+/* uc_pipe2 SUPPORT */
 /* lang=C20 */
 
 /* check file access for the current process by its effective UID */
@@ -64,12 +64,15 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_pipe2(int *pipes,int of) noex {
 	int		rs ;
 	if ((rs = u_pipe(pipes)) >= 0) {
-	    cint	f = TRUE ;
+	    cint	f = true ;
 	    if ((rs >= 0) && (of & O_NONBLOCK)) {
 	        if ((rs = uc_nonblock(pipes[0],f)) >= 0) {
 	            rs = uc_nonblock(pipes[1],f) ;

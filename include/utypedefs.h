@@ -250,6 +250,26 @@ typedef const char *		ccp ;
 typedef char *			charp ;
 #endif
 
+#ifndef	TYPEDEF_WCHARP
+#define	TYPEDEF_WCHARP
+typedef wchar_t *		wcharp ;
+#endif
+
+#ifndef	TYPEDEF_SHORTP
+#define	TYPEDEF_SHORTP
+typedef short *			shortp ;
+#endif
+
+#ifndef	TYPEDEF_INTP
+#define	TYPEDEF_INTP
+typedef int *			intp ;
+#endif
+
+#ifndef	TYPEDEF_LONGP
+#define	TYPEDEF_LONGP
+typedef long *			longp ;
+#endif
+
 #ifndef	TYPEDEF_CHARPP
 #define	TYPEDEF_CHARPP
 typedef char **			charpp ;
