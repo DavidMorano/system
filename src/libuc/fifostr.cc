@@ -80,7 +80,7 @@ int fifostr_start(fifostr *op) noex {
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
 	    op->ic = 0 ;
-	    op->cc = 0 ;
+	    op->cnt = 0 ;
 	    op->magic = FIFOSTR_MAGIC ;
 	}
 	return rs ;
@@ -124,7 +124,7 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	                op->tail = ep ;
 	            } /* end if */
 	            c = ++op->ic ;
-	            op->cc += sl ;
+	            op->cnt += sl ;
 	        } /* end if (memory-allocation) */
 	    } /* end block */
 	} /* end if (magic) */
@@ -237,7 +237,7 @@ int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
                     }
                     rs = uc_libfree(ep) ;
                     op->ic -= 1 ;
-                    op->cc -= sl ;
+                    op->cnt -= sl ;
                 } /* end if (successful removal) */
             } else {
 	        rs = SR_NOTFOUND ;
@@ -334,7 +334,7 @@ int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
                 rs1 = uc_libfree(ep) ;
                 if (rs >= 0) rs = rs1 ;
                 c = --op->ic ;
-                op->cc -= sl ;
+                op->cnt -= sl ;
             } else {
                 rs = SR_NOTFOUND ;
             }

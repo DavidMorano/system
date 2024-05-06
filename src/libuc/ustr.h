@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	This file contains the subroutine declarations for the
-	UNIX® system STREAMS message interface.
+	UNIX® system STREAMS® message interface.
 
 *******************************************************************************/
 
@@ -42,7 +42,7 @@ EXTERNC_begin
 extern int u_strmsgget(int,STRBUF *,STRBUF *,int *) noex ;
 extern int u_strmsggetp(int,STRBUF *,STRBUF *,int *,int *) noex ;
 extern int u_strmsgput(int,STRBUF *,STRBUF *,int) noex ;
-extern int u_strmsgputp(int,STRBUF *,STRBUF *,int) noex ;
+extern int u_strmsgputp(int,STRBUF *,STRBUF *,int,int) noex ;
 
 EXTERNC_end
 

@@ -29,10 +29,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* USYSLINUX start */
-#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
-
 #include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
@@ -40,6 +36,20 @@
 #include	<pthread.h>
 #include	<time.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+
+
+EXTERNC_begin
+
+extern int linux_ugetnisdom(char *,int) noex ;
+
+EXTERNC_end
+
+
+/* USYSLINUX start */
+#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 
 /*----------------------------------------------------------------------------*/

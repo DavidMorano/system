@@ -1,7 +1,7 @@
 /* uopen HEADER */
 /* lang=C20 */
 
-/* additional UNIX® limits support */
+/* UNIX® support for opening files or devices */
 /* version %I% last-modified %G% */
 
 
@@ -10,16 +10,25 @@
 	= 1998-03-21, David A­D­ Morano
 	This module was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
-
 */
 
 /* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Additional (or supplemental) support for UNIX® limits.
+	Names:
+	u_open
+	u_openat
+	u_socket
+	u_accept
+	u_acceptpass
+	u_dup
+	u_dup2
+	u_socketpair
+	u_pipe
+
+	Description:
+	This module provides support for opening files or devices.
 
 *******************************************************************************/
 

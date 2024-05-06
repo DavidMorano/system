@@ -51,8 +51,9 @@ int pta_create(pta *op) noex {
 	    int		to_again = utimeout[uto_again] ;
 	    bool	f_exit = false ;
 	    repeat {
-	        rs = pthread_attr_init(op) ;
-	        if (rs > 0) rs = (- rs) ;
+	        if ((rs = pthread_attr_init(op)) > 0) {
+	            rs = (- rs) ;
+		}
 	        if (rs < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -94,8 +95,9 @@ int pta_destroy(pta *op) noex {
 int pta_setstacksize(pta *op,size_t v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_setstacksize(op,v) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setstacksize(op,v)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -104,8 +106,9 @@ int pta_setstacksize(pta *op,size_t v) noex {
 int pta_getstacksize(pta *op,size_t *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_getstacksize(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getstacksize(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -114,8 +117,9 @@ int pta_getstacksize(pta *op,size_t *vp) noex {
 int pta_setguardsize(pta *op,size_t v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_setguardsize(op,v) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setguardsize(op,v)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -124,8 +128,9 @@ int pta_setguardsize(pta *op,size_t v) noex {
 int pta_getguardsize(pta *op,size_t *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_getguardsize(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getguardsize(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -134,8 +139,9 @@ int pta_getguardsize(pta *op,size_t *vp) noex {
 int pta_setstackaddr(pta *op,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_setstackaddr(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setstackaddr(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -144,8 +150,9 @@ int pta_setstackaddr(pta *op,void *vp) noex {
 int pta_getstackaddr(pta *op,void **vpp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vpp) {
-	    rs = pthread_attr_getstackaddr(op,vpp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getstackaddr(op,vpp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -154,8 +161,9 @@ int pta_getstackaddr(pta *op,void **vpp) noex {
 int pta_setdetachstate(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_setdetachstate(op,v) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setdetachstate(op,v)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -164,8 +172,9 @@ int pta_setdetachstate(pta *op,int v) noex {
 int pta_getdetachstate(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_getdetachstate(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getdetachstate(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -174,8 +183,9 @@ int pta_getdetachstate(pta *op,int *vp) noex {
 int pta_setscope(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_setscope(op,v) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setscope(op,v)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -184,8 +194,9 @@ int pta_setscope(pta *op,int v) noex {
 int pta_getscope(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	     rs = pthread_attr_getscope(op,vp) ;
-	     if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getscope(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -194,8 +205,9 @@ int pta_getscope(pta *op,int *vp) noex {
 int pta_setinheritsched(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_setinheritsched(op,v) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setinheritsched(op,v)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -204,8 +216,9 @@ int pta_setinheritsched(pta *op,int v) noex {
 int pta_getinheritsched(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_getinheritsched(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getinheritsched(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -214,8 +227,9 @@ int pta_getinheritsched(pta *op,int *vp) noex {
 int pta_setschedpolicy(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_setschedpolicy(op,v) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setschedpolicy(op,v)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -224,8 +238,9 @@ int pta_setschedpolicy(pta *op,int v) noex {
 int pta_getschedpolicy(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_attr_getschedpolicy(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getschedpolicy(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -234,8 +249,9 @@ int pta_getschedpolicy(pta *op,int *vp) noex {
 int pta_setschedparam(pta *op,const SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_setschedparam(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_setschedparam(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -244,8 +260,9 @@ int pta_setschedparam(pta *op,const SCHEDPARAM *vp) noex {
 int pta_getschedparam(pta *op,SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    rs = pthread_attr_getschedparam(op,vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_attr_getschedparam(op,vp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }

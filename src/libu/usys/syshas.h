@@ -154,22 +154,22 @@
 /* Solaris®: ptmx(9) */
 #define	SYSHAS_PTMX		1
 
-/* Solaris®: POSIX shared memory ('shm(3rt)') */
+/* Solaris®: POSIX shared memory (|shm(3rt)|) */
 #define	SYSHAS_PSHM		1
 
-/* Solaris®: POSIX regular semaphores ('sem(3rt)') */
+/* Solaris®: POSIX regular semaphores (|sem(3rt)| */
 #define	SYSHAS_PSEM		1
 
-/* Solaris: POSIX named semaphores ('sem(3rt)') */
+/* Solaris: POSIX named semaphores (|sem(3rt)|) */
 #define	SYSHAS_NSEM		1
 
-/* Solaris®: POSIX message queues ('mq(3rt)') */
+/* Solaris®: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		1
 
 /* Solaris®: AUDIT - part of Solaris® Basic-Security-Module (BSM) */
 #define	SYSHAS_AUDIT		1
 
-/* Solaris®: get-directory-entries ('getdents(2)') */
+/* Solaris®: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		1
 
 /* Solaris®: XTI */
@@ -184,11 +184,20 @@
 /* Solaris®: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
+/* Solaris®: sigqueue(3c) */
+#define	SYSHAS_SIGQUEUE		1
+
 /* Solaris®: sigsend(2) */
 #define	SYSHAS_SIGSEND		1
 
+/* Solaris®: sigsendset(2) */
+#define	SYSHAS_SIGSENDSET	1
+
 /* Solaris®: sigwait(2) */
 #define	SYSHAS_SIGWAIT		1
+
+/* Solaris®: pthread_sigsend(2) */
+#define	SYSHAS_PTHREADSIGSEND	1
 
 /* Solaris®: ucontext */
 #define	SYSHAS_UCONTEXT		1
@@ -219,6 +228,12 @@
 
 /* Solaris®: |stime(2)| */
 #define	SYSHAS_STIME		1
+
+/* Solaris®: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	1
+
+/* Solaris®: |waitid(2)| */
+#define	SYSHAS_WAITID		1
 
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -262,10 +277,10 @@
 #define	SYSHAS_SETENV		0
 #define	SYSHAS_UNSETENV		0
 
-/* Darwin: system information header for 'sysinfo(2)' */
+/* Darwin: system information header for |sysinfo(2)| */
 #define	SYSHAS_SYSINFO		0
 
-/* Darwin: system has a 'off_t' data type (assumed to be 64 bits) */
+/* Darwin: system has a |offset_t| data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		0
 
 /* Darwin: getcwd(3c) */
@@ -368,22 +383,22 @@
 /* Darwin: ptmx(9) */
 #define	SYSHAS_PTMX		1
 
-/* Darwin: POSIX shared memory ('shm(3rt)') */
+/* Darwin: POSIX shared memory (|shm(3rt)|) */
 #define	SYSHAS_PSHM		1
 
-/* Darwin: POSIX unnamed semaphores ('sem(3rt)') */
+/* Darwin: POSIX unnamed semaphores (|sem(3rt)|) */
 #define	SYSHAS_PSEM		0
 
-/* Darwin: POSIX named semaphores ('sem(3rt)') */
+/* Darwin: POSIX named semaphores (|sem(3rt)|) */
 #define	SYSHAS_NSEM		1
 
-/* Darwin: POSIX message queues ('mq(3rt)') */
+/* Darwin: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		0
 
 /* Darwin: AUDIT - part of Solaris® Basic-Security-Module (BSM) */
 #define	SYSHAS_AUDIT		0
 
-/* Darwin: get-directory-entries ('getdents(2)') */
+/* Darwin: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		0
 
 /* Darwin: XTI */
@@ -398,11 +413,20 @@
 /* Darwin: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
+/* Darwin: sigqueue(3c) */
+#define	SYSHAS_SIGQUEUE		0
+
 /* Darwin: sigsend(2) */
 #define	SYSHAS_SIGSEND		0
 
+/* Darwin: sigsendset(2) */
+#define	SYSHAS_SIGSENDSET	0
+
 /* Darwin: sigwait(2) */
 #define	SYSHAS_SIGWAIT		0
+
+/* Darwin: pthread_sigsend(2) */
+#define	SYSHAS_PTHREADSIGSEND	0
 
 /* Darwin: ucontext */
 #define	SYSHAS_UCONTEXT		1
@@ -433,6 +457,12 @@
 
 /* Darwin: |stime(2)| */
 #define	SYSHAS_STIME		0
+
+/* Darwin: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	0
+
+/* Darwin: |waitid(2)| */
+#define	SYSHAS_WAITID		1	/* <- welcome to club! (confirmed) */
 
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
@@ -468,10 +498,10 @@
 #define	SYSHAS_SETENV		0
 #define	SYSHAS_UNSETENV		0
 
-/* Linux: system information header for 'sysinfo(2)' */
+/* Linux: system information header for |sysinfo(2)| */
 #define	SYSHAS_SYSINFO		1
 
-/* Linux: system has a 'off_t' data type (assumed to be 64 bits) */
+/* Linux: system has a |offset_t| data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
 /* Linux: getcwd(3c) */
@@ -592,11 +622,20 @@
 /* Linux: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		0
 
+/* Linux: sigqueue(3c) */
+#define	SYSHAS_SIGQUEUE		1
+
 /* Linux: sigsend(2) */
 #define	SYSHAS_SIGSEND		1
 
+/* Linux: sigsendset(2) */
+#define	SYSHAS_SIGSENDSET	0
+
 /* Linux: sigwait(2) */
 #define	SYSHAS_SIGWAIT		1
+
+/* Linux: pthread_sigsend(2) */
+#define	SYSHAS_PTHREADSIGSEND	0
 
 /* Linux: ucontext */
 #define	SYSHAS_UCONTEXT		1
@@ -627,6 +666,12 @@
 
 /* Linux: |stime(2)| */
 #define	SYSHAS_STIME		0
+
+/* Linux: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	0
+
+/* Linux: |waitid(2)| */
+#define	SYSHAS_WAITID		1
 
 /******************************************************************************/
 #endif /* OSNAME */

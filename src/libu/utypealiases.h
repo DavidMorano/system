@@ -183,6 +183,10 @@
 #define	TM		struct tm
 #endif
 
+#ifndef	TMS
+#define	TMS		struct tms
+#endif
+
 #ifndef	TERMIOS
 #define	TERMIOS		struct termios
 #endif
@@ -296,6 +300,10 @@
 
 #ifndef	CTM
 #define	CTM		const TM
+#endif
+
+#ifndef	CTMS
+#define	CTMS		const TMS
 #endif
 
 #ifndef	CTERMIOS

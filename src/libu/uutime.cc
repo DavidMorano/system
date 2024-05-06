@@ -36,7 +36,11 @@
 #include	<sys/types.h>
 #include	<utime.h>		/* <- the money shot */
 #include	<cerrno>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 

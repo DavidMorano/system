@@ -40,10 +40,6 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<limits.h>
-#include	<pwd.h>
-#if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
-#include	<shadow.h>
-#endif
 
 
 /* extra "open" flags */

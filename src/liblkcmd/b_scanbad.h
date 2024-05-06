@@ -1,4 +1,8 @@
-/* config */
+/* b_scanbad HEADER */
+/* lang=C++20 */
+
+/* program to find bad files */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

@@ -16,8 +16,6 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
-
 	Important note:
 
 	On Darwin (MacOS) the header 'sys/random.h' -- which is
@@ -36,47 +34,20 @@
 
 #include	<cerrno>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usysflag.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysflag.h>
 
 #include	"usys_getrandom.h"
 
-
-/* local defines */
-
-
-/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
 
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
-int getrandom(void *rbuf,size_t rlen,uint) noex {
-	int		rc = 0 ;
+unixret_t getrandom(void *rbuf,size_t rlen,uint) noex {
+	unixret_t	rc = 0 ;
 	int		rl = 0 ;
 	if (rbuf) {
 	    if (rlen > 0) {

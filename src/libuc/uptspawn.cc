@@ -137,8 +137,9 @@ static int uptcreator(pthread_t *rp,pthread_attr_t *ptap,void *arg) noex {
 	int		rs ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = pthread_create(rp,ptap,uptruner,arg)) > 0) {
-		rs = (- rs) ;
+	    rc = SR_OK ;
+	    if (errno_t ec ; (ec = pthread_create(rp,ptap,uptruner,arg)) > 0) {
+		rs = (- ec) ;
 	    }
 	    if (rs < 0) {
 	        switch (rs) {

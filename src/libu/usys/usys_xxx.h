@@ -26,8 +26,8 @@
 
 *******************************************************************************/
 
-#ifndef	USYS_XXX_INCLUDE
-#define	USYS_XXX_INCLUDE
+#ifndef	USYSXXX_INCLUDE
+#define	USYSXXX_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -38,11 +38,13 @@
 #include	<pthread.h>
 #include	<time.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
 
-extern int xxx_ugetnisdom(char *,int) noex ;
+extern sysret_t xxx_ugetnisdom(char *,int) noex ;
 
 EXTERNC_end
 
@@ -63,7 +65,7 @@ EXTERNC_end
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
 #ifndef	STRUCT_USERATTR
-#define	STRUCT_USERATTR		1
+#define	STRUCT_USERATTR	
 #define	TYPEDEF_USERATTR
 	typedef struct userattr_s {
 		char   *name;
@@ -75,7 +77,7 @@ EXTERNC_end
 #endif /* STRUCT_USERATTR */
 
 #ifndef	SUBROUTINE_USERATTR
-#define	SUBROUTINE_USERATTR	1
+#define	SUBROUTINE_USERATTR
 EXTERNC_begin
 
 extern void setuserattr() noex ;
@@ -99,18 +101,18 @@ EXTERNC_end
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
 #ifndef	TYPEDEF_PROJID
-#define	TYPEDEF_PROJID		1
+#define	TYPEDEF_PROJID
 typedef int	projid_t ;
 #endif
 
 #ifndef	SUBROUTINE_GETPROJID
-#define	SUBROUTINE_GETPROJID	1
+#define	SUBROUTINE_GETPROJID
 #ifdef	__cplusplus
 extern "C" {
     extern projid_t getprojid() noex ;
 }
 #else
-     extern projid_t getprojid() noex ;
+    extern projid_t getprojid() noex ;
 #endif /* __cplusplus */
 #endif /* SUBROUTINE_GETPROJID */
 
@@ -123,7 +125,7 @@ extern "C" {
 /* SYSV-MSG begin */
 
 #ifndef	TYPEDEF_SYSVMSGTYPE
-#define	TYPEDEF_SYSVMSGTYPE	1
+#define	TYPEDEF_SYSVMSGTYPE
 typedef long		sysvmsgtype ;
 #endif
 
@@ -140,10 +142,10 @@ typedef long		sysvmsgtype ;
 #if	(!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 
 #ifndef	SUBROUTINE_MEMCNTL
-#define	SUBROUTINE_MEMCNTL	1
+#define	SUBROUTINE_MEMCNTL
 EXTERNC_begin
 
-extern int memcntl(void *,size_t,int,void *,int,int) noex ;
+extern unixret_t memcntl(void *,size_t,int,void *,int,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_MEMCNTL */
@@ -182,10 +184,10 @@ enum syshasmemplock {
 #endif
 
 #ifndef	SUBROUTINE_MEMPLOCK
-#define	SUBROUTINE_MEMPLOCK	1
+#define	SUBROUTINE_MEMPLOCK
 EXTERNC_begin
 
-extern int plock(int) noex ;
+extern unixret_t plock(int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_MEMPLOCK */
@@ -195,6 +197,6 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 
-#endif /* USYS_XXX_INCLUDE */
+#endif /* USYSXXX_INCLUDE */
 
 

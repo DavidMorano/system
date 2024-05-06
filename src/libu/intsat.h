@@ -1,7 +1,7 @@
 /* intsat HEADER */
 /* lang=C20 */
 
-/* Integer Saturation Addition */
+/* Integer Saturation (clamping) */
 /* version %I% last-modified %G% */
 
 
@@ -21,6 +21,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
+#include	<stddef.h>
 #include	<stdint.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -28,6 +29,10 @@
 
 
 EXTERNC_begin
+
+static inline int intsati(int v) noex {
+	return v ;
+}
 
 extern int intsatl(long) noex ;
 extern int intsato(off_t) noex ;
@@ -38,18 +43,13 @@ extern int intsatul(ulong) noex ;
 extern int intsats(size_t) noex ;
 extern int intsatull(ulonglong) noex ;
 
-extern int iaddsat(int,int) noex ;
-extern long laddsat(long,long) noex ;
-extern longlong lladdsat(longlong,longlong) noex ;
-
-extern uint uaddsat(uint,uint) noex ;
-extern ulong uladdsat(ulong,ulong) noex ;
-extern ulonglong ulladdsat(ulonglong,ulonglong) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
 
+static inline int intsat(int v) noex {
+	return intsati(v) ;
+}
 static inline int intsat(long v) noex {
 	return intsatl(v) ;
 }
@@ -66,7 +66,7 @@ static inline int intsat(uint v) noex {
 static inline int intsat(ulong v) noex {
 	return intsatul(v) ;
 }
-#ifdef	COMMENT
+#ifdef	COMMENT /* GCC says that this is an alias of |ulong| */
 static inline int intsat(size_t v) noex {
 	return intsats(v) ;
 }

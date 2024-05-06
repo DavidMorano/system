@@ -24,12 +24,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"usys_darwin.h"
 
@@ -37,7 +38,6 @@
 /* USYS_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<sys/types.h>
 #include	<sys/mman.h>
 #include	<unistd.h>		/* |getdomainname(3darwin)| */
 
@@ -48,31 +48,31 @@
 
 EXTERNC_begin
 
-int timer_create(clockid_t,SIGEVENT *,timer_t *tmp) noex {
-	int	ec = EFAULT ;
+errno_t timer_create(clockid_t,SIGEVENT *,timer_t *tmp) noex {
+	errno_t		ec = EFAULT ;
 	if (tmp) {
 	    ec = ENOSYS ;
 	}
 	return ec ;
 }
-int timer_delete(timer_t) noex {
+errno_t timer_delete(timer_t) noex {
     return ENOSYS ;
 }
-int timer_settime(timer_t,int,ITIMERSPEC *ntvp,ITIMERSPEC *) noex {
-	int	ec = EFAULT ;
+errno_t timer_settime(timer_t,int,ITIMERSPEC *ntvp,ITIMERSPEC *) noex {
+	errno_t		ec = EFAULT ;
 	if (ntvp) {
 	    ec = ENOSYS ;
 	}
 	return ec ;
 }
-int timer_gettime(timer_t,ITIMERSPEC *otvp) noex {
-	int	ec = EFAULT ;
+errno_t timer_gettime(timer_t,ITIMERSPEC *otvp) noex {
+	errno_t		ec = EFAULT ;
 	if (otvp) {
 	    ec = ENOSYS ;
 	}
 	return ec ;
 }
-int timer_getoverrun(timer_t) noex {
+errno_t timer_getoverrun(timer_t) noex {
     return ENOSYS ;
 }
 
@@ -88,7 +88,7 @@ EXTERNC_end
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
 
 int pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
-	int	ec = EFAULT ;
+	errno_t		ec = EFAULT ;
 	if (op && mp) {
 	     ec = ENOSYS ;
 	}
@@ -103,7 +103,7 @@ int pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 /*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
 int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
-	int	ec = EFAULT ;
+	errno_t		ec = EFAULT ;
 	if (ma) {
 	    ec = EINVAL ;
 	    if (ms > 0) {
@@ -116,9 +116,10 @@ int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 /*----------------------------------------------------------------------------*/
 
 
-int darwin_ugetnisdom(char *rbuf,int rlen) noex {
+sysret_t darwin_ugetnisdom(char *rbuf,int rlen) noex {
+	csize		rsz = size_t(rlen+1) ;
 	int		rs ;
-	if ((rs = getdomainname(rbuf,(rlen+1))) < 0) {
+	if ((rs = getdomainname(rbuf,rsz)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -129,7 +130,7 @@ int darwin_ugetnisdom(char *rbuf,int rlen) noex {
 #else /* other operating systems */
 
 
-int darwin_ugetnisdom(char *rbuf,int rlen) noex {
+sysret_t darwin_ugetnisdom(char *rbuf,int rlen) noex {
 	int		ec = EFAULT ;
 	if (rbuf) {
 	    ec = EINVAL ;

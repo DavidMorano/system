@@ -1,4 +1,4 @@
 UFILEOP
 
-This directoryu holds subroutines that operate on files.
+This directory holds subroutines that operate on files.
 

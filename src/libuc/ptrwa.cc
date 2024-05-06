@@ -57,7 +57,9 @@ int ptrwa_create(ptrwa *op) noex {
 	    int		to_nomem = utimeout[uto_nomem] ;
 	    bool	f_exit = FALSE ;
 	    repeat {
-	        if ((rs = pthread_rwlockattr_init(op)) > 0) rs = (- rs) ;
+	        if ((rs = pthread_rwlockattr_init(op)) > 0) {
+		    rs = (- rs) ;
+		}
 	        if (rs < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -83,8 +85,9 @@ int ptrwa_create(ptrwa *op) noex {
 int ptrwa_destroy(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_rwlockattr_destroy(op) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_rwlockattr_destroy(op)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -93,8 +96,9 @@ int ptrwa_destroy(ptrwa *op) noex {
 int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_rwlockattr_getpshared(op,oldp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_rwlockattr_getpshared(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -103,8 +107,9 @@ int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 int ptrwa_setpshared(ptrwa *op,int fl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_rwlockattr_setpshared(op,fl) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if ((rs = pthread_rwlockattr_setpshared(op,fl)) > 0) {
+	        rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }

@@ -1,7 +1,7 @@
 SCANBAD
 
-This program reads the specified files and reports on any errors that are
-encountered.
+This program reads the specified files and reports on any errors
+that are encountered.
 
 Synopsis:
 $ scannad <file(s)> [-m <maxbad>] [-s <start>[:<len>]] [-nice <nice>] 

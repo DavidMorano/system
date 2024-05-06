@@ -35,6 +35,8 @@
 #include	<pthread.h>
 #include	<time.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #ifndef	MQATTR
@@ -65,14 +67,14 @@ typedef uintptr_t	mqd_t ;
 #define	SUBROUTINE_PMQ
 EXTERNC_begin
 
-extern mqd_t mq_open(const char *,int,mode_t,const MQATTR *) noex ;
-extern int mq_close(mqd_t) noex ;
-extern int mq_send(mqd_t,const char *,int,int) noex ;
-extern int mq_receive(mqd_t,char *,int,uint *) noex ;
-extern int mq_setattr(mqd_t,const MQATTR *,MQATTR *) noex ;
-extern int mq_getattr(mqd_t,MQATTR *) noex ;
-extern int mq_notify(mqd_t,struct sigevent *) noex ;
-extern int mq_unlink(const char *) noex ;
+extern mqd_t mq_open(cchar *,int,mode_t,const MQATTR *) noex ;
+extern unixret_t mq_close(mqd_t) noex ;
+extern unixret_t mq_send(mqd_t,cchar *,int,int) noex ;
+extern unixret_t mq_receive(mqd_t,char *,int,uint *) noex ;
+extern unixret_t mq_setattr(mqd_t,const MQATTR *,MQATTR *) noex ;
+extern unixret_t mq_getattr(mqd_t,MQATTR *) noex ;
+extern unixret_t mq_notify(mqd_t,struct sigevent *) noex ;
+extern unixret_t mq_unlink(cchar *) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_PMQ */

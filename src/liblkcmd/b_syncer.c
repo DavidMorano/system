@@ -1,13 +1,12 @@
-/* b_syncer */
+/* b_syncer SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in version of 'sync(1)' */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -21,12 +20,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ syncer [-b]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -651,17 +647,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        if ((rs = uc_fork()) == 0) {
 		    for (i = 0 ; i < NOFILE ; i += 1) u_close(i) ;
 		    setsid() ;
-		    u_sync() ;
+		    sync() ;
 		    uc_exit(EX_OK) ;
 	        } /* end if (child) */
 	    } else if (lip->f.parallel) {
 	        rs = uc_syncer(1) ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	debugprintf("b_syncer: uc_syncer() rs=%d\n",rs) ;
-#endif
 	    } else {
-	        rs = u_sync() ;
+	        sync() ;
 	    }
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;

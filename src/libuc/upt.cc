@@ -131,8 +131,9 @@ int uptjoin(pthread_t tid,int *rsp) noex {
 	void		*vp{} ;
 	int		rs ;
 	repeat {
-	    rs = pthread_join(tid,&vp) ;
-	    if (rs > 0) rs = (- rs) ;
+	    if (errno_t ec ; (ec = pthread_join(tid,&vp)) > 0) {
+	        rs = (- ec) ;
+	    }
 	} until (rs != SR_INTR) ;
 	if (rsp) {
 	    uintptr_t	up = uintptr_t(vp) ;

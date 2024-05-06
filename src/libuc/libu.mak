@@ -58,6 +58,10 @@ CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
+#SOFL= -shared -Xlinker -flat_namespace -Xlinker -undefined -Xlinker suppress
+#SOFL= -shared -Xlinker -undefined -Xlinker dynamic_lookup
+SOFL= -shared
+
 
 OBJ00= 
 OBJ01= 
@@ -128,10 +132,10 @@ OBJ55=
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
 OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
-OBJB= ufiledesc.o uipc.o unanosleep.o usig.o
+OBJB= usys.o usysop.o uipc.o usig.o unanosleep.o
 OBJC= uopen.o ustr.o usysdata.o uatfork.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
-OBJE= usys.o
+OBJE= ufiledesc.o ufileop.o uprocess.o
 
 #OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 OBJ= obja.o objb.o objc.o objd.o obje.o
@@ -143,6 +147,9 @@ OBJ= obja.o objb.o objc.o objd.o obje.o
 default:		all
 
 all:			$(ALL)
+
+so:			$(T).so
+
 
 .cc.o:
 	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $(CPPFLAGS) $<
@@ -185,8 +192,11 @@ objg.o:			$(OBJG)
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
+$(T).o:			$(OBJ) Makefile localmisc.h
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+
 $(T).so:		$(OBJ) Makefile localmisc.h
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO) > $(T).lm
+	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO) > $(T).lm
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -199,9 +209,9 @@ $(T).order order:	$(OBJ) $(T).a
 install-pre:
 	filefind . -s h | makenewer -af - -d $(INCDIR)
 
-install:		$(ALL) Makefile install-incs
+install:		$(ALL) Makefile
 	ranlib $(T).a
-	makenewer -r $(ALL) $(LIBDIR)
+	install -S -p -m 0775 $(T).so $(LIBDIR)
 
 install-incs:		$(INSTALLINCS)
 	makenewer $(INSTALLINCS) $(INCDIR)
@@ -224,6 +234,9 @@ utimeout.o:		utimeout.c utimeout.h
 utimeouts.o:		utimeouts.cc utimeouts.h
 usupport.o:		usupport.cc usupport.h
 timewatch.o:		timewatch.cc timewatch.hh
+aflag.o:		aflag.cc aflag.hh
+errtimer.o:		errtimer.cc errtimer.hh
+intsat.o:		intsat.cc intsat.h
 
 # ADAPTATION
 usysauxinfo.o:		usysauxinfo.cc
@@ -241,17 +254,21 @@ ufiledesc.o:		ufiledesc.dir
 ufiledesc.dir:
 	makesubdir $@
 
+# UFILEOP
+ufileop.o:		ufileop.dir
+ufileop.dir:
+	makesubdir $@
+
 # UIPC
 uipc.o:			uipc.dir
 uipc.dir:
 	makesubdir $@
 
 # OTHER
-unanosleep.o:		unanosleep.cc	$(INCS)
-
-# UTILITY
-aflag.o:		aflag.cc aflag.hh
-errtimer.o:		errtimer.cc errtimer.hh
-intsat.o:		intsat.cc intsat.h
+unanosleep.o:		unanosleep.cc			$(INCS)
+ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
+usig.o:			usig.cc usig.h			$(INCS)
+uprocess.o:		uprocess.cc uprocess.h		$(INCS)
+usysop.o:		usysop.cc usysop.h		$(INCS)
 
 

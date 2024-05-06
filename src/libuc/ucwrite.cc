@@ -73,11 +73,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	iaddsat(int,int) noex ;
-    extern long	laddsat(long,long) noex ;
-}
-
 
 /* external variables */
 

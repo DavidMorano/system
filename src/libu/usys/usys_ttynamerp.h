@@ -29,14 +29,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #ifndef	SUBROUTINE_TTYNAMERP
 #define	SUBROUTINE_TTYNAMERP
 EXTERNC_begin
 
-extern int	ttyname_rp(int,char *,int) noex ;
+extern errno_t ttyname_rp(int,char *,int) noex ;
 
 EXTERNC_end
 #endif /* SUBROUTINE_TTYNAMERP */

@@ -40,11 +40,16 @@
 #include	<sys/utsname.h>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* <- for |strcmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
-#include	<sncpyx.h>
 #include	<localmisc.h>
 
 
@@ -65,6 +70,17 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 /* forward references */
 
 static int uuname_machine(UTSNAME *) noex ;
+
+static int sncpy(char *dbuf,int dlen,cchar *sp) noex {
+	csize		dsz = (dlen + 1) ;
+	int		rs ;
+	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
+	    rs = SR_OVERFLOW ;
+	} else {
+	    rs = int(rsz & INT_MAX) ;
+	}
+	return rs ;
+}
 
 
 /* local variables */
@@ -114,7 +130,7 @@ static int uuname_machine(UTSNAME *up) noex {
 	    if constexpr (f_darwin) {
 	        sp = "Apple-Macintosh-Intel" ;
 	    }
-	    rs = sncpy1(mbuf,mlen,sp) ;
+	    rs = sncpy(mbuf,mlen,sp) ;
 	}
 	return rs ;
 }
@@ -128,7 +144,7 @@ static int uuname_architecture(UTSNAME *up) noex {
 	if constexpr (f_darwin) {
 	    if (strcmp(abuf,"i386") == 0) {
 		cchar	*sp = "x86_64" ;
-	        rs = sncpy1(abuf,alen,sp) ;
+	        rs = sncpy(abuf,alen,sp) ;
 	    }
 	} /* end if-constexpr (f_darwin) */
 	return rs ;

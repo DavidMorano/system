@@ -23,10 +23,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
+#include	<clanguage.h>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"usys_sunos.h"
 
@@ -37,7 +37,7 @@
 #include	<sys/systeminfo.h>
 
 
-int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
+sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (ubuf) {
@@ -45,17 +45,16 @@ int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	    if (req >= 0) {
 	        rs = SR_OVERFLOW ;
 	        if (ulen >= 1) {
-		    clong	llen = (ulen+1) ;
-		    long	result ;
-		    rs = SR_OK ;
-	            if ((result = sysinfo(req,ubuf,llen)) < 0) {
+		    csize	usz = (ulen+1) ;
+	            if (long res ; (res = sysinfo(req,ubuf,usz)) >= 0) {
+			if (res > usz) {
+			    rs = SR_OVERFLOW ;
+			} else {
+			    rs = int(res & INT_MAX) ;
+			    len = rs ;
+			}
+		    } else {
 		        rs = (- errno) ;
-	            }
-	            if (result > 0) {
-		        len = (int) ((result-1) & INT_MAX) ;
-	            }
-	            if ((rs >= 0) && (result > llen)) {
-		        rs = SR_OVERFLOW ;
 	            }
 	        } /* end if (not-overflow) */
 	    } /* end if (valid) */
@@ -64,17 +63,17 @@ int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 }
 /* end subroutine (sunos_sysinfo) */
 
-int sunos_ugetnisdom(char *rbuf,int rlen) noex {
+sysret_t sunos_ugetnisdom(char *rbuf,int rlen) noex {
 	cint	req = SI_SRPC_DOMAIN ;	/* <- whew! nothing is easy */
 	return sunos_sysinfo(rbuf,rlen,req) ;
 }
 /* end subroutine (sunos_ugetnisdom) */
 
 
-#else
+#else /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
-int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
+sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (ubuf) {
@@ -90,8 +89,8 @@ int sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 }
 /* end subroutine (sunos_sysinfo) */
 
-int sunos_ugetnisdom(char *rbuf,int rlen) noex {
-	cint	req = 0 ;
+unixret_t sunos_ugetnisdom(char *rbuf,int rlen) noex {
+	cint		req = 0 ;
 	return sunos_sysinfo(rbuf,rlen,req) ;
 }
 /* end subroutine (sunos_ugetnisdom) */
@@ -99,7 +98,5 @@ int sunos_ugetnisdom(char *rbuf,int rlen) noex {
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYS_SUNOS finish */
-
-
 
 

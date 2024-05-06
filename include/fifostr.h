@@ -44,7 +44,7 @@ struct fifostr_head {
 	FIFOSTR_ENT	*tail ;
 	uint		magic ;
 	int		ic ;		/* item count */
-	int		cc ;		/* character count */
+	int		cnt ;		/* character count */
 } ;
 
 struct fifostr_cursor {

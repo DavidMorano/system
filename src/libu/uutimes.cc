@@ -22,7 +22,11 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<ctime>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 

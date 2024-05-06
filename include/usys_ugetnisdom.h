@@ -40,14 +40,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 EXTERNC_begin
 
-extern int	ugetnisdom(char *,int) noex ;
+extern sysret_t ugetnisdom(char *,int) noex ;
 
 EXTERNC_end
 

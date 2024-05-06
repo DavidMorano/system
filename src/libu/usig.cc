@@ -17,7 +17,24 @@
 /*******************************************************************************
 
 	Names:
+	u_kill
+	u_killpg
+	u_sigaction
+	u_sigaltstack
+	u_sigpending
 	u_sigprocmask
+	u_sigsuspend
+	u_sigsend
+	u_sigsendset
+	u_sigwait
+	u_sigmask
+
+
+	Name:
+	u_sigprocmask
+
+	Descrption:
+	This module provides UNIX® process signal mangement.
 
 	Notes:
 	|u_sigprocmask(3u)|
@@ -35,8 +52,14 @@
 #include	<csignal>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usupport.h>
+#include	<usyscalls.h>
+
+#include	"usig.h"
 
 
 /* local defines */
@@ -70,6 +93,15 @@ int u_kill(pid_t pid,int sig) noex {
 	return rs ;
 }
 /* end subroutine (u_kill) */
+
+int u_killpg(pid_t pid,int sig) noex {
+	int		rs ;
+	if ((rs = killpg(pid,sig)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_killpg) */
 
 int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp) noex {
 	int		rs ;
@@ -113,7 +145,9 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 	int		f_exit = false ;
 	repeat {
 	    rs = SR_OK ;
-	    if (sigsuspend(ssp) == -1) rs = (- errno) ;
+	    if (sigsuspend(ssp) < 0) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 		switch (rs) {
 	        case SR_INTR:
@@ -135,20 +169,13 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 
 int u_pause() noex {
 	int		rs = SR_OK ;
-	if (pause() == -1) {
+	if (pause() < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
 /* end subroutine (u_pause) */
 
-int u_alarm(const uint usec) noex {
-	uint		rem = alarm(usec) ;
-	int		rs ;
-	rs = int(rem & INT_MAX) ;
-	return rs ;
-}
-/* end subroutine (u_alarm) */
 
 /* these below are NOT on all systems (like MacOS Darwin!) */
 
@@ -183,12 +210,9 @@ int u_sigwait(const sigset_t *ssp,int *rp) noex {
 /* end subroutine (u_sigwait) */
 
 int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
-	int		rs ;
-	errno = 0 ;
-	if ((rs = pthread_sigmask(how,setp,osetp)) > 0) {
-	    rs = (- rs) ;
-	} else if (rs < 0) {
-	    rs = (- errno) ;
+	int		rs = SR_OK ;
+	if (errno_t ec ; (ec = pthread_sigmask(how,setp,osetp)) > 0) {
+	    rs = (- ec) ;
 	}
 	return rs ;
 }

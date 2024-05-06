@@ -40,8 +40,6 @@
 
 /* forward references */
 
-int		ptm_lockto(ptm *,int) noex ;
-
 
 /* local structures */
 
@@ -76,24 +74,27 @@ int ptm_create(ptm *op,ptma *ap) noex {
 
 int ptm_destroy(ptm *op) noex {
 	int		rs ;
-	rs = pthread_mutex_destroy(op) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutex_destroy(op)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptm_destroy) */
 
 int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
 	int		rs ;
-	rs = pthread_mutex_setprioceiling(op,npri,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutex_setprioceiling(op,npri,oldp)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptm_setprioceiling) */
 
 int ptm_getprioceiling(ptm *op,int *oldp) noex {
 	int		rs ;
-	rs = pthread_mutex_getprioceiling(op,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutex_getprioceiling(op,oldp)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptm_getprioceiling) */
@@ -126,8 +127,9 @@ int ptm_locktry(ptm *op) noex {
 
 int ptm_unlock(ptm *op) noex {
 	int		rs ;
-	rs = pthread_mutex_unlock(op) ;
-	if (rs > 0) rs = (- rs) ;
+	if ((rs = pthread_mutex_unlock(op)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ptm_unlock) */
@@ -181,7 +183,9 @@ int ucptm::operator () (ptm *op) noex {
 int ucptm::create(ptm *op) noex {
 	int		rs = SR_FAULT ;
 	if (ap) {
-	    if ((rs = pthread_mutex_init(op,ap)) > 0) rs = (- rs) ;
+	    if ((rs = pthread_mutex_init(op,ap)) > 0) {
+		rs = (- rs) ;
+	    }
 	}
 	return rs ;
 }
@@ -189,14 +193,18 @@ int ucptm::create(ptm *op) noex {
 
 int ucptm::lock(ptm *op) noex {
 	int		rs ;
-	if ((rs = pthread_mutex_lock(op)) > 0) rs = (- rs) ;
+	if ((rs = pthread_mutex_lock(op)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end subroutine (ucptm::lock) */
 
 int ucptm::locktry(ptm *op) noex {
 	int		rs ;
-	if ((rs = pthread_mutex_trylock(op)) > 0) rs = (- rs) ;
+	if ((rs = pthread_mutex_trylock(op)) > 0) {
+	    rs = (- rs) ;
+	}
 	return rs ;
 }
 /* end method (ucptm::locktry) */

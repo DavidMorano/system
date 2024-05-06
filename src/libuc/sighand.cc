@@ -77,7 +77,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
             int             nhandles = 0 ;
             int             sz ;
             void            *p ;
-            rs = memclear(iap) ;                    /* dangerous */
+            rs = memclear(iap) ; /* dangerous */
             if (hf == nullptr) {
                 hf = reinterpret_cast<SH_H>(voidp(SIG_IGN)) ;
             }

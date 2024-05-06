@@ -26,17 +26,12 @@
 #include	<sys/types.h>
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
-#include	<sys/time.h>		/* for 'u_adjtime(3u)' */
-#include	<sys/timeb.h>		/* for 'uc_ftime(3uc)' */
+#include	<sys/time.h>		/* |u_adjtime(2u)| */
 #include	<sys/resource.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 #include	<sys/poll.h>
-
-#if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
-#include	<sys/acl.h>
-#endif
 
 #include	<signal.h>
 #include	<limits.h>
@@ -57,27 +52,29 @@
 #include	<xti.h>
 #endif
 
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
+#include	<ustat.h>	/* missing STAT stuff */
 
+#include	<usysop.h>	/* UNIX® system-operations */
 #include	<um.h>		/* UNIX® memory-management */
-#include	<ustr.h>	/* UNIX® STREAMS */
-#include	<ufiledesc.h>	/* file-descriptor users */
-#include	<udup.h>
+#include	<uipc.h>	/* UNIX® System V IPC */
+#include	<ustr.h>	/* UNIX® STREAMS® */
+#include	<uopen.h>
+#include	<ufiledesc.h>	/* file-descriptor */
+#include	<ufileop.h>	/* file-operations */
+#include	<usig.h>
+#include	<uprocess.h>
 
 
 EXTERNC_begin
 
-extern int	u_brk(cvoid *) noex ;
-extern int	u_sbrk(int,void **) noex ;
-
 extern int	u_uname(UTSNAME *) noex ;
 extern int	u_getloadavg(uint *,int) noex ;
 extern int	u_sysauxinfo(char *,int,int) noex ;
-extern int	u_adjtime(TIMEVAL *,TIMEVAL *) noex ;
 extern int	u_ulimit(int,int) noex ;
 
 extern int	u_getpgid(pid_t) noex ;
@@ -93,18 +90,6 @@ extern int	u_setregid(gid_t,gid_t) noex ;
 extern int	u_setpgid(pid_t,pid_t) noex ;
 extern int	u_setsid() noex ;
 
-extern int	u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
-extern int	u_sigprocmask(int,sigset_t *,sigset_t *) noex ;
-extern int	u_sigmask(int,sigset_t *,sigset_t *) noex ;
-extern int	u_sigsuspend(const sigset_t *) noex ;
-extern int	u_sigwait(const sigset_t *,int *) noex ;
-extern int	u_sigpending(sigset_t *) noex ;
-extern int	u_pause() noex ;
-extern int	u_sigaltstack(const stack_t *,stack_t *) noex ;
-
-extern int	u_sigsend(idtype_t,id_t,int) noex ;
-extern int	u_sigsendset(procset_t *,int) noex ;
-
 extern int	u_setcontext(const ucontext_t *) noex ;
 
 extern int	u_fork() noex ;
@@ -118,7 +103,7 @@ extern int	u_kill(pid_t,int) noex ;
 extern int	u_waitpid(pid_t,int *,int) noex ;
 extern int	u_getrlimit(int,RLIMIT *) noex ;
 extern int	u_setrlimit(int,CRLIMIT *) noex ;
-extern int	u_nice(int) noex ;
+extern int	u_nice(int,int *) noex ;
 
 extern int	u_mknod(cchar *,mode_t,dev_t) noex ;
 extern int	u_mkdir(cchar *,mode_t) noex ;

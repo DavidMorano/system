@@ -1,4 +1,4 @@
-/* uipc SUPPORT (UNIX® System V System C Inter-Process-Communication) */
+/* uipc SUPPORT (UNIX® System V Inter-Process-Communication) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -8,7 +8,8 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 

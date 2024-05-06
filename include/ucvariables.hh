@@ -39,7 +39,7 @@
 
 extern const syswords		sysword ;
 extern const varnames		varname ;
-extern const valuelimits	valuelimit ;
+extern const valuelims		valuelimit ;
 extern const digbufsizes	digbufsize ;
 
 

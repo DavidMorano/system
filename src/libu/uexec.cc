@@ -31,7 +31,11 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -84,7 +88,6 @@ int u_execve(cchar *p,mainv argv,mainv envv) noex {
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	return rs ;
 }
 /* end subroutine (u_execve) */

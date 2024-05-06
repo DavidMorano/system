@@ -24,46 +24,46 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"usys_linux.h"
 
-
-/* local defines */
-
-
-/* local typedefs */
+#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 
-/* external variables */
+sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
+	csize		rsz = size_t(rlen+1) ;
+	int		rs ;
+	if ((rs = getdomainname(rbuf,rsz)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (linux_ugetnisdom) */
 
 
-/* external subroutines */
+#else /* other operating systems */
 
 
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported subroutines */
-
-
-/* *NOTHING for now* */
+sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
+	errno_t		ec = EFAULT ;
+	if (rbuf) {
+	    ec = EINVAL ;
+	    if (rlen >= 0) {
+		ec = ENOSYS ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+	return (- ec) ;
+}
+/* end subroutine (linux_ugetnisdom) */
 
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */

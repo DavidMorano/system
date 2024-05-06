@@ -70,7 +70,6 @@
 #include	<usysrets.h>
 #include	<usupport.h>
 
-#include	<ustat.h>
 #include	<uinet.h>
 #include	<ulimits.h>
 #include	<uopen.h>

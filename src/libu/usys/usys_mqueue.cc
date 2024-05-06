@@ -26,8 +26,9 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
-#include	<usysrets.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"usys_mqueue.h"
 
@@ -70,92 +71,92 @@ static constexpr mqd_t	mqdbad = mkmqdbad() ;
 #endif
 
 mqd_t mq_open(const char *n,int,mode_t,const MQATTR *) noex {
-	int	ec = EFAULT ;
+	errno_t		ec = EFAULT ;
 	if (n) {
 	    ec = EINVAL ;
 	    if (n[0]) {
 		ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return mqdbad ;
 }
-int mq_close(mqd_t qd) noex {
-	int	ec = EBADFD ;
+unixret_t mq_close(mqd_t qd) noex {
+	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = ENOSYS ;
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
-int mq_send(mqd_t qd,const char *sp,int,int) noex {
-	int	ec = EBADFD ;
+unixret_t mq_send(mqd_t qd,const char *sp,int,int) noex {
+	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
 	    if (sp) {
 	        ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
-int mq_receive(mqd_t qd,char *rp,int,uint *) noex {
-	int	ec = EBADFD ;
+unixret_t mq_receive(mqd_t qd,char *rp,int,uint *) noex {
+	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
 	    if (rp) {
 	        ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
-int mq_setattr(mqd_t qd,const MQATTR *ap,MQATTR *) noex {
-	int	ec = EBADFD ;
+unixret_t mq_setattr(mqd_t qd,const MQATTR *ap,MQATTR *) noex {
+	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
 	    if (ap) {
 	        ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
-int mq_getattr(mqd_t qd,MQATTR *ap) noex {
-	int	ec = EBADFD ;
+unixret_t mq_getattr(mqd_t qd,MQATTR *ap) noex {
+	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
 	    if (ap) {
 	        ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
-int mq_notify(mqd_t qd,struct sigevent *sep) noex {
-	int	ec = EBADFD ;
+unixret_t mq_notify(mqd_t qd,struct sigevent *sep) noex {
+	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
 	    if (sep) {
 	        ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
-int mq_unlink(const char *n) noex {
-	int	ec = EFAULT ;
+unixret_t mq_unlink(const char *n) noex {
+	errno_t		ec = EFAULT ;
 	if (n) {
 	    ec = EINVAL ;
 	    if (n[0]) {
 	        ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
+	if (ec) errno = ec ;
 	return -1 ;
 }
 
 #endif /* (!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0) */
-/* PMQ end */
+/* SYSHAS_PMQ end */
 
 

@@ -1,7 +1,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
-#include	<clanguage.h>
 #include	<localmisc.h>
