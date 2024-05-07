@@ -245,7 +245,7 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
                 mainv       sv ;
                 if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-                    cchar   *modbn = STRLISTMK_MODBNAME ;
+                    cchar	*modbn = STRLISTMK_MODBNAME ;
                     int		mo = 0 ;
                     mo |= MODLOAD_OLIBVAR ;
                     mo |= MODLOAD_OPRS ;
@@ -294,6 +294,8 @@ static int strlistmk_objloadend(SLM *op) noex {
 /* end subroutine (strlistmk_objloadend) */
 
 static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
+	modload		*lp = op->mlp ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	for (int i = 0 ; (rs >= SR_OK) && subs[i] ; i += 1) {
@@ -301,8 +303,8 @@ static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 	    char	sbuf[SYMNAMELEN + 1] ;
 	    cchar	*sn = subs[i] ;
 	    if ((rs = sncpy(sbuf,slen,soname,"_",sn)) >= 0) {
-		cnullptr	np{} ;
-	        if (void *snp ; (snp = dlsym(op->sop,sbuf)) != np) {
+		cvoid	*snp ;
+	        if ((rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:
@@ -321,8 +323,8 @@ static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 		        op->call.close = close_f(snp) ;
 		        break ;
 		    } /* end switch */
-	        } else if (isrequired(i)) {
-	            rs = SR_NOTFOUND ;
+	        } else if ((rs == rsn) && (! isrequired(i))) {
+	            rs = SR_OK ;
 	        }
 	    } /* end if (sncpy) */
 	} /* end for (subs) */
@@ -337,13 +339,11 @@ static int vecstr_loadsubs(vecstr *vlp,cc *objn) noex {
 	int		c = 0 ;
 	char		sbuf[SYMNAMELEN + 1] ;
 	for (int i = 0 ; (rs >= 0) && (i < ne) && subs[i] ; i += 1) {
-            if (isrequired(i)) {
-		cchar	*sn = subs[i] ;
-                if ((rs = sncpy3(sbuf,slen,objn,"_",sn)) >= 0) {
-		    c += 1 ;
-                    rs = vecstr_add(vlp,sbuf,rs) ;
-                }
-	    } /* end if (required) */
+	    cchar	*sn = subs[i] ;
+            if ((rs = sncpy3(sbuf,slen,objn,"_",sn)) >= 0) {
+		c += 1 ;
+                rs = vecstr_add(vlp,sbuf,rs) ;
+            }
             if (rs < 0) break ;
         } /* end for */
 	return rs ;

@@ -40,7 +40,6 @@ EXTERNC_end
 
 struct strlistmk_head {
 	modload		*mlp ;		/* module-load-pointer */
-	void		*sop ;		/* shared-object (SO) pointer */
 	void		*obj ;		/* object pointer */
 	STRLISTMK_CA	call ;
 	uint		magic ;

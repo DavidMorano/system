@@ -226,7 +226,7 @@ int modload_close(ML *op) noex {
 
 int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 	int		rs = SR_OK ;
-	cvoid		*rp ;
+	cvoid		*rp = nullptr ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (symname == nullptr) return SR_FAULT ;
@@ -235,16 +235,15 @@ int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 
 	if (symname[0] == '\0') return SR_INVALID ;
 
-	if (op->sop != nullptr) {
-	    rp = dlsym(op->sop,symname) ;
-	    if (rp == nullptr) {
+	if (op->sop) {
+	    if ((rp = dlsym(op->sop,symname)) == nullptr) {
 	        rs = SR_NOTFOUND ;
 	    }
 	} else {
 	    rs = SR_NOTFOUND ;
 	}
 
-	if (vpp != nullptr) {
+	if (vpp) {
 	    *vpp = (rs >= 0) ? rp : nullptr ;
 	}
 

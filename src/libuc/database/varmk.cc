@@ -4,7 +4,6 @@
 /* VARMK management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
 /* revision history:
@@ -57,25 +56,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,
-			cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	pathclean(char *,cchar *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -83,11 +65,11 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* forward references */
 
-static int	varmk_objloadbegin(VARMK *,cchar *,cchar *) ;
-static int	varmk_objloadend(VARMK *) ;
-static int	varmk_loadcalls(VARMK *,cchar *) ;
+static int	varmk_objloadbegin(VARMK *,cchar *,cchar *) noex ;
+static int	varmk_objloadend(VARMK *) noex ;
+static int	varmk_loadcalls(VARMK *,cchar *) noex ;
 
-static int	isrequired(int) ;
+static bool	isrequired(int) noex ;
 
 
 /* global variables */
@@ -101,7 +83,7 @@ static cchar	*subs[] = {
 	"abort",
 	"chgrp",
 	"close",
-	NULL
+	nullptr
 } ;
 
 enum subs {
@@ -124,18 +106,14 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	cchar	*objname = VARMK_OBJNAME ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("varmk_open: ent dbname=%s\n",dbname) ;
-#endif
+	memclear(op) ;
 
-	memset(op,0,sizeof(VARMK)) ;
-
-	if ((rs = getnodedomain(NULL,dn)) >= 0) {
+	if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	    cint	prlen = MAXPATHLEN ;
 	    cchar	*pn = VARPRLOCAL ;
 	    char	prbuf[MAXPATHLEN+1] ;
@@ -150,10 +128,6 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	    } /* end if (mkpr) */
 	} /* end if (getnodedomain) */
 
-#if	CF_DEBUGS
-	debugprintf("varmk_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (varmk_open) */
@@ -165,23 +139,15 @@ int varmk_close(VARMK *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("varmk_close: varmks_close() rs=%d\n",rs) ;
-#endif
-
 	rs1 = varmk_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("varmk_close: varmk_objloadend() rs=%d\n",rs) ;
-#endif
 
 	op->magic = 0 ;
 	return rs ;
@@ -193,7 +159,7 @@ int varmk_addvar(VARMK *op,cchar k[],cchar vp[],int vl)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
 
@@ -208,11 +174,11 @@ int varmk_abort(VARMK *op)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.abort != NULL) {
+	if (op->call.abort != nullptr) {
 	    rs = (*op->call.abort)(op->obj) ;
 	}
 
@@ -225,11 +191,11 @@ int varmk_chgrp(VARMK *op,gid_t gid)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.chgrp != NULL) {
+	if (op->call.chgrp != nullptr) {
 	    rs = (*op->call.chgrp)(op->obj,gid) ;
 	}
 
@@ -240,35 +206,26 @@ int varmk_chgrp(VARMK *op,gid_t gid)
 
 /* private subroutines */
 
-
-/* find and load the DB-access object */
-static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	VECSTR		syms ;
-	cint	n = nelem(subs) ;
-	cint	vo = VECSTR_OCOMPACT ;
+static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
+	modload		*lp = &op->loader ;
+	vecstr		syms ;
+	cint		ne = sub_overlast ;
+	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("varmk_objloadbegin: ent pr=%s on=%s\n",pr,objname) ;
-#endif
-
-	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
+	if ((rs = vecstr_start(&syms,ne,vo)) >= 0) {
 	    cint	snl = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    cchar	**sv ;
 	    cchar	*on = objname ;
 	    char	snb[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
-	        if (isrequired(i)) {
+	    for (i = 0 ; (i < ne) && subs[i] ; i += 1) {
 	            if ((rs = sncpy3(snb,snl,on,"_",subs[i])) >= 0) {
 	                rs = vecstr_add(&syms,snb,rs) ;
 		    }
-	        }
 	        if (rs < 0) break ;
 	    } /* end for */
 
@@ -288,8 +245,9 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname)
 
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_modload)
+	    if ((rs < 0) && f_modload) {
 		modload_close(lp) ;
+	    }
 	} /* end if (vecstr_start) */
 
 	if (rs >= 0) {
@@ -300,37 +258,29 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname)
 	        if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
 	            op->obj = p ;
 	            rs = varmk_loadcalls(op,objname) ;
-#if	CF_DEBUGS
-	            debugprintf("varmk_objloadbegin: _loadcalls() rs=%d\n",rs) ;
-#endif
 	            if (rs < 0) {
 	                uc_free(op->obj) ;
-	                op->obj = NULL ;
+	                op->obj = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
 	    } /* end if (modload_getmva) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        modload_close(lp) ;
+	    }
 	} /* end if (modload_open) */
-
-#if	CF_DEBUGS
-	debugprintf("varmk_objloadbegin: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (varmk_objloadbegin) */
 
-
-static int varmk_objloadend(VARMK *op)
-{
+static int varmk_objloadend(VARMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -347,24 +297,18 @@ static int varmk_loadcalls(VARMK *op,cchar *soname) noex {
 	char		symname[SYMNAMELEN + 1] ;
 	cvoid	*snp ;
 
-	for (int i = 0 ; subs[i] != NULL ; i += 1) {
+	for (int i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(symname,SYMNAMELEN,soname,"_",subs[i])) >= 0) {
 	        if ((rs = modload_getsym(lp,symname,&snp)) == SR_NOTFOUND) {
-	            snp = NULL ;
+	            snp = nullptr ;
 	            if (! isrequired(i)) rs = SR_OK ;
 	        }
 	    }
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
-	    debugprintf("varmk_loadcalls: call=%s %c\n",
-	        subs[i],
-	        ((snp != NULL) ? 'Y' : 'N')) ;
-#endif
-
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 	        switch (i) {
@@ -397,23 +341,17 @@ static int varmk_loadcalls(VARMK *op,cchar *soname) noex {
 
 	} /* end for (subs) */
 
-#if	CF_DEBUGS
-	debugprintf("varmk_loadcalls: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (varmk_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+static bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_addvar:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
