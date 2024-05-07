@@ -625,13 +625,13 @@ static int strlistmks_mkvarfile(SLM *op) noex {
 /* end subroutine (strlistmks_mkvarfile) */
 
 static int strlistmks_wrvarfile(SLM *op) noex {
-	strlisthdr	hf ;
-	FILER		varfile ;
-	STRTAB		*ksp = &op->strs ;
+	strlisthdr	hf{} ;
+	filer		varfile ;
+	strtab		*ksp = &op->strs ;
 	const time_t	daytime = time(nullptr) ;
 	uint		fileoff = 0 ;
 	uint		(*rt)[1] ;
-	cint	pagesize = getpagesize() ;
+	cint		pagesize = getpagesize() ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rtl ;
@@ -656,7 +656,6 @@ static int strlistmks_wrvarfile(SLM *op) noex {
 
 /* prepare the file-header */
 
-	memset(&hf,0,sizeof(strlisthdr)) ;
 	hf.vetu[0] = STRLISTMKS_VERSION ;
 	hf.vetu[1] = ENDIAN ;
 	hf.vetu[2] = 0 ;
@@ -667,7 +666,7 @@ static int strlistmks_wrvarfile(SLM *op) noex {
 
 /* create the file-header */
 
-	rs = strlisthdr_msg(&hf,0,buf,BUFLEN) ;
+	rs = strlisthdr_rd(&hf,buf,BUFLEN) ;
 	bl = rs ;
 	if (rs < 0)
 	    goto ret2 ;
@@ -750,9 +749,8 @@ ret2:
 
 	    hf.fsize = fileoff ;
 
-	    rs = strlisthdr_msg(&hf,0,buf,BUFLEN) ;
-	    bl = rs ;
-	    if (rs >= 0) {
+	    if ((rs = strlisthdr_rd(&hf,buf,BUFLEN)) >= 0) {
+	        bl = rs ;
 	        rs = u_pwrite(op->nfd,buf,bl,0L) ;
 	    }
 
