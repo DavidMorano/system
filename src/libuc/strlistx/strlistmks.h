@@ -46,15 +46,15 @@ struct strlistmks_flags {
 
 struct strlistmks_rectab {
 	uint		(*rectab)[1] ;
-	int		i ;			/* highest index */
-	int		n ;			/* extent */
+	int		i ;		/* highest index */
+	int		n ;		/* extent */
 } ;
 
 struct strlistmks_head {
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nfname ;
-	strtab		strs ;
+	strtab		*stp ;		/* string-tab-pointer */
 	STRLISTMKS_REC	rectab ;
 	STRLISTMKS_FL	f ;
 	gid_t		gid ;
@@ -65,9 +65,9 @@ struct strlistmks_head {
 } ;
 
 typedef	STRLISTMKS	strlistmks ;
+typedef	STRLISTMKS_FL	strlistmks_fl ;
 typedef	STRLISTMKS_OBJ	strlistmks_obj ;
 typedef	STRLISTMKS_REC	strlistmks_rec ;
-typedef	STRLISTMKS_FL	strlistmks_fl ;
 
 EXTERNC_begin
 
