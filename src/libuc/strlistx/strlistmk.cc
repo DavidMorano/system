@@ -62,6 +62,14 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+extern "C" {
+    typedef int (*open_f)(void *,cchar *,cchar *,int,mode_t,int) noex ;
+    typedef int (*add_f)(void *,cchar *,int) noex ;
+    typedef int (*abort_f)(void *) noex ;
+    typedef int (*chgrp_f)(void *,gid_t) noex ;
+    typedef int (*close_f)(void *) noex ;
+}
+
 
 /* external subroutines */
 
@@ -145,48 +153,46 @@ static constexpr cpcchar	subs[] = {
 
 /* exported subroutines */
 
-int strlistmk_open(SLM *op,cc *pr,cc *dbname,cc *lfname,
+int strlistmk_open(SLM *op,cc *pr,cc *dbn,cc *lfn,
 		int of,mode_t om,int n) noex {
 	int		rs ;
 	cchar		*objname = STRLISTMK_OBJNAME ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-	if (lfname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-	if (lfname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = strlistmk_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,dbname,lfname,of,om,n)) >= 0) {
-		op->magic = STRLISTMK_MAGIC ;
-	    }
-	    if (rs < 0)
-		strlistmk_objloadend(op) ;
-	} /* end if (objloadbegin) */
-
+	if ((rs = strlistmk_ctor(op,pr,dbn,lfn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbn[0] && lfn[0]) {
+	        if ((rs = strlistmk_objloadbegin(op,pr,objname)) >= 0) {
+		    auto ofun = op->call.open ;
+	            if ((rs = ofun(op->obj,dbn,lfn,of,om,n)) >= 0) {
+		        op->magic = STRLISTMK_MAGIC ;
+	            }
+	            if (rs < 0) {
+			strlistmk_objloadend(op) ;
+		    }
+	        } /* end if (objloadbegin) */
+	    } /* end if (valid) */
+	} /* end if (strlistmk_ctor) */
 	return rs ;
 }
 /* end subroutine (strlistmk_open) */
 
 int strlistmk_close(SLM *op) noex {
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLISTMK_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = strlistmk_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = strlistmk_magic(op)) >= 0) {
+	    {
+	        rs1 = (*op->call.close)(op->obj) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = strlistmk_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = strlistmk_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlistmk_close) */
@@ -221,8 +227,9 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != STRLISTMK_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.chgrp != nullptr)
+	if (op->call.chgrp != nullptr) {
 	    rs = (*op->call.chgrp)(op->obj,gid) ;
+	}
 
 	return rs ;
 }
@@ -232,12 +239,13 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 /* private subroutines */
 
 static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objname) noex {
-	MODLOAD	*lp = &op->loader ;
-	int	rs ;
+	modload		*lp = op->mlp ;
+	int		rs ;
+	int		rs1 ;
 	{
-		vecstr		syms ;
+		vecstr	syms ;
 	        cint	n = nelem(subs) ;
-		int		opts = VECSTR_OCOMPACT ;
+		int	opts = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 		    cint	symlen = SYMNAMELEN ;
 		    int		snl ;
@@ -259,15 +267,16 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objname) noex {
 		    }
         
 	            if (rs >= 0) {
-	                cchar	*modbname = STRLISTMK_MODBNAME ;
+	                cchar	*modbn = STRLISTMK_MODBNAME ;
 			opts = 0 ;
 	                opts |= MODLOAD_OLIBVAR ;
 			opts |= MODLOAD_OPRS ;
 			opts |= MODLOAD_OSDIRS ;
-	                rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
+	                rs = modload_open(lp,pr,modbn,objname,opts,sv) ;
 	            }
 
-	            vecstr_finish(&syms) ;
+	            rs1 = vecstr_finish(&syms) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (allocation) */
 		if (rs >= 0) {
 		    int		mv[2] ;
@@ -302,7 +311,7 @@ static int strlistmk_objloadend(SLM *op) noex {
 	    op->obj = nullptr ;
 	}
 	{
-	    rs1 = modload_close(&op->loader) ;
+	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -329,33 +338,24 @@ static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 	    }
 
 	    if (snp != nullptr) {
-
 	        c += 1 ;
 		switch (i) {
-
 		case sub_open:
-		    op->call.open = (int (*)(void *,
-			cchar *,cchar *,int,mode_t,int)) snp ;
+		    op->call.open = open_f(snp) ;
 		    break ;
-
 		case sub_add:
-		    op->call.add = (int (*)(void *,cchar *,int)) snp ;
+		    op->call.add = add_f(snp) ;
 		    break ;
-
 		case sub_abort:
-		    op->call.abort = (int (*)(void *)) snp ;
+		    op->call.abort = abort_f(snp) ;
 		    break ;
-
 		case sub_chgrp:
-		    op->call.chgrp = (int (*)(void *,gid_t)) snp ;
+		    op->call.chgrp = chgrp_f(snp) ;
 		    break ;
-
 		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
+		    op->call.close = close_f(snp) ;
 		    break ;
-
 		} /* end switch */
-
 	    } /* end if (it had the call) */
 
 	} /* end for (subs) */
@@ -365,12 +365,12 @@ static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 /* end subroutine (strlistmk_loadcalls) */
 
 static bool isrequired(int i) noex {
-	bool		f = FALSE ;
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_add:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
