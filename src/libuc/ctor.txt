@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int strlist_ctor(strlist *op,Args ... args) noex {
+static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int strlist_ctor(strlist *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (strlist_ctor) */
+/* end subroutine (strlistmk_ctor) */
 
-static int strlist_dtor(strlist *op) noex {
+static int strlistmk_dtor(strlistmk *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (strlist_dtor) */
+/* end subroutine (strlistmk_dtor) */
 
 template<typename ... Args>
-static inline int strlist_magic(strlist *op,Args ... args) noex {
+static inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == STRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == STRLISTMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (strlist_magic) */
+/* end subroutine (strlistmk_magic) */

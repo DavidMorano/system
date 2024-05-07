@@ -180,41 +180,33 @@ SL_OBJ	strlist_mod = {
 int strlist_open(SL *op,cchar *dbname) noex {
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
+	int		rs1 ;
 	if ((rs = strlist_ctor(op,dbname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) {
-		rs = SR_OK ;
-	{
-	    int		pl = -1 ;
-	    char	adb[MAXPATHLEN+1] ;
-	    if (dbname[0] != '/') {
-	        char	pwd[MAXPATHLEN+1] ;
-	        if ((rs = getpwd(pwd,MAXPATHLEN)) >= 0) {
-	            rs = mkpath2(adb,pwd,dbname) ;
-	            pl = rs ;
-	            dbname = adb ;
-	        }
-	    }
-	    if (rs >= 0) {
-	    	cchar	*cp ;
-	        if ((rs = uc_mallocstrw(dbname,pl,&cp)) >= 0) {
-	            op->dbname = cp ;
-		    if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
-			op->ti_lastcheck = dt ;
-			op->magic = STRLIST_MAGIC ;
-		    }
-		    if (rs < 0) {
-	    		uc_free(op->dbname) ;
-	    		op->dbname = nullptr ;
-		    }
-		} /* end if (memory-allocation) */
-	    } /* end if */
-	} /* end block */
-
-		if (rs < 0) {
-		    strlist_dtor(op) ;
-		}
+		absfn	db ;
+		cchar	*fnp{} ;
+		if ((rs = db.start(dbname,-1,&fnp)) >= 0) {
+		    cint	fnl = rs ;
+	    	    cchar	*cp ;
+	            if ((rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
+	                op->dbname = cp ;
+		        if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
+			    op->ti_lastcheck = dt ;
+			    op->magic = STRLIST_MAGIC ;
+		        }
+		        if (rs < 0) {
+	    		    uc_free(op->dbname) ;
+	    		    op->dbname = nullptr ;
+		        }
+		    } /* end if (memory-allocation) */
+		    rs1 = db.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (absfn) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		strlist_dtor(op) ;
+	    }
 	} /* end if (strlist_ctor) */
 	return rs ;
 }
@@ -364,7 +356,10 @@ int strlist_look(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
                         hi = it[hi][itentry_nhi] ;
                         if (hi != 0) {
                             ri = it[hi][itentry_ri] ;
-                            f_mat = ((it[hi][itentry_info] & INT_MAX) == chash) ;
+			    {
+				cuint thash = (it[hi][itentry_info] & INT_MAX) ;
+                                f_mat = (thash == chash) ;
+			    }
                             if ((ri > 0) && f_mat) {
                                 ki = rt[ri][0] ;
                                 f_mat = ismatkey((kst + ki),kp,kl) ;
@@ -382,7 +377,7 @@ int strlist_look(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
                     rs = SR_NOTFOUND ;
                 }
             } /* end if (preparation) */
-    /* if successful, retrieve value */
+    	    /* if successful, retrieve value */
             if (rs >= 0) {
                 curp->i = hi ;
             } /* end if (got one) */

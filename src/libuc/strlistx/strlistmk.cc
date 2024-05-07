@@ -56,6 +56,9 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
@@ -70,6 +73,44 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->mlp = new(nothrow) modload) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-modload) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strlistmk_ctor) */
+
+static int strlistmk_dtor(strlistmk *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strlistmk_dtor) */
+
+template<typename ... Args>
+static inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == STRLISTMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (strlistmk_magic) */
 
 static int	strlistmk_objloadbegin(SLM *,cchar *,cchar *) noex ;
 static int	strlistmk_objloadend(SLM *) noex ;

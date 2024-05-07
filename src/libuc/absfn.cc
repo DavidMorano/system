@@ -136,6 +136,7 @@ static int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	if (sl > ABSFN_SHORTLEN) {
 	    cchar	*cp ;
 	    if ((rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+		sl = rs ;
 		*rpp = cp ;
 		op->as = cp ;
 	    } /* end if (memory-allocation) */
