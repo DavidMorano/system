@@ -38,6 +38,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -57,6 +58,8 @@
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -90,6 +93,8 @@ enum his {
 
 /* local variables */
 
+constexpr nullptr_t	np{} ;
+constexpr cint		hdrsz = hi_overlast * sizeof(uint) ;
 constexpr cint		magicsize = STRLISTHDR_MAGICSIZE ;
 constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
 
@@ -99,128 +104,114 @@ constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
 
 /* exported subroutines */
 
-int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
-	uint		*header ;
-	int		rs = SR_OK ;
-	int		headsize ;
-	int		bl, cl ;
-	cchar	*tp, *cp ;
-	char		*bp ;
+int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (ep && hbuf) {
+	    rs = SR_INVALID ;
+	    if (hlen > 0) {
+	        int	bl = hlen ;
+	        cchar	*bp = hbuf ;
+	        rs = SR_OK ;
+	        if ((rs >= 0) && (bl > 0)) {
+	            if (bl >= magicsize) {
+	                cchar	*cp = bp ;
+	                int	cl = magicsize ;
+	                if (cchar *tp ; (tp = strnchr(cp,cl,'\n')) != np) {
+	                    cl = (tp - cp) ;
+		        }
+	                bp += magicsize ;
+	                bl -= magicsize ;
+    			/* verify the magic string */
+	                if (strncmp(magicstr,cp,cl) != 0) {
+	                    rs = SR_NXIO ;
+		        }
+	            } else {
+	                rs = SR_ILSEQ ;
+		    }
+	        } /* end if (ok) */
+		/* read out the VETU information */
+	        if ((rs >= 0) && (bl > 0)) {
+	            if (bl >= 4) {
+	                memcpy(ep->vetu,bp,4) ;
+	                if (ep->vetu[0] != STRLISTHDR_VERSION) {
+	                    rs = SR_PROTONOSUPPORT ;
+		        }
+	                if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
+	                    rs = SR_PROTOTYPE ;
+		        }
+	                bp += 4 ;
+	                bl -= 4 ;
+	            } else {
+	                rs = SR_ILSEQ ;
+		    }
+	        } /* end if (item) */
+	        if ((rs >= 0) && (bl > 0)) {
+	            if (bl >= hdrsz) {
+	                uint	*header = (uint *) bp ;
+	                ep->fsize = header[hi_fsize] ;
+	                ep->wtime = header[hi_wtime] ;
+	                ep->stoff = header[hi_stoff] ;
+	                ep->stlen = header[hi_stlen] ;
+	                ep->rtoff = header[hi_rtoff] ;
+	                ep->rtlen = header[hi_rtlen] ;
+	                ep->itoff = header[hi_itoff] ;
+	                ep->itlen = header[hi_itlen] ;
+	                ep->nstrs = header[hi_nstrs] ;
+	                ep->nskip = header[hi_nskip] ;
+	                bp += hdrsz ;
+	                bl -= hdrsz ;
+	            } else {
+	                rs = SR_ILSEQ ;
+		    }
+	        } /* end if (item) */
+		if (rs >= 0) {
+		    len = (bp - hbuf) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (strlisthdr_wr) */
 
-	if (ep == nullptr) return SR_FAULT ;
-	if (hbuf == nullptr) return SR_FAULT ;
-
-	bp = hbuf ;
-	bl = hlen ;
-	headsize = hi_overlast * sizeof(uint) ;
-	if (f) { /* read */
-
-/* the magic string is with the first 16 bytes */
-
-	    if ((rs >= 0) && (bl > 0)) {
-	        if (bl >= magicsize) {
-
-	            cp = bp ;
-	            cl = magicsize ;
-	            if ((tp = strnchr(cp,cl,'\n')) != nullptr)
-	                cl = (tp - cp) ;
-
+int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (ep && hbuf) {
+	    rs = SR_INVALID ;
+	    if (hlen > 0) {
+		char	*bp = hbuf ;
+		int	bl = hlen ;
+	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-
-/* verify the magic string */
-
-	            if (strncmp(magicstr,cp,cl) != 0) {
-	                rs = SR_NXIO ;
-		    }
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-
-	    } /* end if (item) */
-
-/* read out the VETU information */
-
-	    if ((rs >= 0) && (bl > 0)) {
-	        if (bl >= 4) {
-
-	            memcpy(ep->vetu,bp,4) ;
-
-	            if (ep->vetu[0] != STRLISTHDR_VERSION) {
-	                rs = SR_PROTONOSUPPORT ;
-		    }
-
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
-	                rs = SR_PROTOTYPE ;
-		    }
-
+	            memcpy(bp,ep->vetu,4) ;
+	            *bp = STRLISTHDR_VERSION ;
 	            bp += 4 ;
 	            bl -= 4 ;
-
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-	    } /* end if (item) */
-
-	    if ((rs >= 0) && (bl > 0)) {
-	        if (bl >= headsize) {
-
-	            header = (uint *) bp ;
-
-	            ep->fsize = header[hi_fsize] ;
-	            ep->wtime = header[hi_wtime] ;
-	            ep->stoff = header[hi_stoff] ;
-	            ep->stlen = header[hi_stlen] ;
-	            ep->rtoff = header[hi_rtoff] ;
-	            ep->rtlen = header[hi_rtlen] ;
-	            ep->itoff = header[hi_itoff] ;
-	            ep->itlen = header[hi_itlen] ;
-	            ep->nstrs = header[hi_nstrs] ;
-	            ep->nskip = header[hi_nskip] ;
-
-	            bp += headsize ;
-	            bl -= headsize ;
-
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-	    } /* end if (item) */
-
-	} else { /* write */
-
-	    mkmagic(bp, magicsize, magicstr) ;
-	    bp += magicsize ;
-	    bl -= magicsize ;
-
-	    memcpy(bp,ep->vetu,4) ;
-	    *bp = STRLISTHDR_VERSION ;
-	    bp += 4 ;
-	    bl -= 4 ;
-
-	    if ((rs >= 0) && (bl >= headsize)) {
-
-	        header = (uint *) bp ;
-
-	        header[hi_fsize] = ep->fsize ;
-	        header[hi_wtime] = ep->wtime ;
-	        header[hi_stoff] = ep->stoff ;
-	        header[hi_stlen] = ep->stlen ;
-	        header[hi_rtoff] = ep->rtoff ;
-	        header[hi_rtlen] = ep->rtlen ;
-	        header[hi_itoff] = ep->itoff ;
-	        header[hi_itlen] = ep->itlen ;
-	        header[hi_nstrs] = ep->nstrs ;
-	        header[hi_nskip] = ep->nskip ;
-
-	        bp += headsize ;
-	        bl -= headsize ;
-
-	    } /* end if */
-
-	} /* end if */
-
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	            if ((rs >= 0) && (bl >= hdrsz)) {
+	                uint	*header = (uint *) bp ;
+	                header[hi_fsize] = ep->fsize ;
+	                header[hi_wtime] = ep->wtime ;
+	                header[hi_stoff] = ep->stoff ;
+	                header[hi_stlen] = ep->stlen ;
+	                header[hi_rtoff] = ep->rtoff ;
+	                header[hi_rtlen] = ep->rtlen ;
+	                header[hi_itoff] = ep->itoff ;
+	                header[hi_itlen] = ep->itlen ;
+	                header[hi_nstrs] = ep->nstrs ;
+	                header[hi_nskip] = ep->nskip ;
+	                bp += hdrsz ;
+	                bl -= hdrsz ;
+	            } /* end if */
+		    if (rs >= 0) {
+		        len = (bp - hbuf) ;
+		    }
+		} /* end if (mkmagic) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (strlisthdr) */
+/* end subroutine (strlisthdr_rd) */
 
 

@@ -220,6 +220,11 @@ typedef void *			voidp ;
 typedef void **			voidpp ;
 #endif
 
+#ifndef	TYPEDEF_CCP
+#define	TYPEDEF_CCP
+typedef const char *		ccp ;
+#endif
+
 #ifndef	TYPEDEF_CVOIDP
 #define	TYPEDEF_CVOIDP
 typedef const void *		cvoidp ;
@@ -240,19 +245,14 @@ typedef const void **		cvoidpp ;
 typedef const nullptr_t		cnullptr ;
 #endif
 
-#ifndef	TYPEDEF_CCP
-#define	TYPEDEF_CCP
-typedef const char *		ccp ;
+#ifndef	TYPEDEF_WCHARP
+#define	TYPEDEF_WCHARP
+typedef wchar_t *		wcharp ;
 #endif
 
 #ifndef	TYPEDEF_CHARP
 #define	TYPEDEF_CHARP
 typedef char *			charp ;
-#endif
-
-#ifndef	TYPEDEF_WCHARP
-#define	TYPEDEF_WCHARP
-typedef wchar_t *		wcharp ;
 #endif
 
 #ifndef	TYPEDEF_SHORTP
@@ -270,14 +270,69 @@ typedef int *			intp ;
 typedef long *			longp ;
 #endif
 
-#ifndef	TYPEDEF_CHARPP
-#define	TYPEDEF_CHARPP
-typedef char **			charpp ;
+#ifndef	TYPEDEF_UCHARP
+#define	TYPEDEF_UCHARP
+typedef unsigned char *		ucharp ;
+#endif
+
+#ifndef	TYPEDEF_USHORTP
+#define	TYPEDEF_USHORTP
+typedef unsigned short *	ushortp ;
+#endif
+
+#ifndef	TYPEDEF_UINTP
+#define	TYPEDEF_UINTP
+typedef unsigned int *		uintp ;
+#endif
+
+#ifndef	TYPEDEF_ULONGP
+#define	TYPEDEF_ULONGP
+typedef unsigned long *		ulongp ;
 #endif
 
 #ifndef	TYPEDEF_CCHARP
 #define	TYPEDEF_CCHARP
 typedef const char *		ccharp ;
+#endif
+
+#ifndef	TYPEDEF_CSHORTP
+#define	TYPEDEF_CSHORTP
+typedef const short *		cshortp ;
+#endif
+
+#ifndef	TYPEDEF_CINTP
+#define	TYPEDEF_CINTP
+typedef const int *		cintp ;
+#endif
+
+#ifndef	TYPEDEF_CLONGP
+#define	TYPEDEF_CLONGP
+typedef const long *		clongp ;
+#endif
+
+#ifndef	TYPEDEF_CUCHARP
+#define	TYPEDEF_CUCHARP
+typedef const unsigned char *	cucharp ;
+#endif
+
+#ifndef	TYPEDEF_CUSHORTP
+#define	TYPEDEF_CUSHORTP
+typedef const unsigned short *	cushortp ;
+#endif
+
+#ifndef	TYPEDEF_CUINTP
+#define	TYPEDEF_CUINTP
+typedef const unsigned int *	cuintp ;
+#endif
+
+#ifndef	TYPEDEF_CULONGP
+#define	TYPEDEF_CULONGP
+typedef const unsigned long *	culongp ;
+#endif
+
+#ifndef	TYPEDEF_CHARPP
+#define	TYPEDEF_CHARPP
+typedef char **			charpp ;
 #endif
 
 #ifndef	TYPEDEF_CCHARPP

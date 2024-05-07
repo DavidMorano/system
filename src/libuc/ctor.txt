@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mailalias_ctor(mailalias *op,Args ... args) noex {
+static int strlist_ctor(strlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int mailalias_ctor(mailalias *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailalias_ctor) */
+/* end subroutine (strlist_ctor) */
 
-static int mailalias_dtor(mailalias *op) noex {
+static int strlist_dtor(strlist *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailalias_dtor) */
+/* end subroutine (strlist_dtor) */
 
 template<typename ... Args>
-static inline int mailalias_magic(mailalias *op,Args ... args) noex {
+static inline int strlist_magic(strlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == STRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailalias_magic) */
+/* end subroutine (strlist_magic) */

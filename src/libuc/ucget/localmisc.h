@@ -105,6 +105,9 @@
 #define	UC(ch)		((unsigned char) (ch))
 #endif
 
+#ifndef	MODP2
+#define	MODP2(v,n)	((v) & ((n) - 1))
+#endif
 
 /* basic scalar types */
 
