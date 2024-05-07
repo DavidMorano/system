@@ -46,7 +46,7 @@
 
 	= open-flags
 
-	open-flags	if DB exits	if NDB exists	returns
+			if DB exits	if NDB exists	returns
 	___________________________________________________________________
 
 	-		no		no		SR_OK (created)
@@ -89,7 +89,6 @@
 #include	<mkx.h>
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
-#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"strlistmks.h"
@@ -137,8 +136,6 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
-typedef mode_t		om_t ;
 
 
 /* external subroutines */
@@ -271,9 +268,9 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	        op->om = om ;
 	        op->nfd = -1 ;
 	        op->gid = -1 ;
-	        op->f.ofcreat = (of & O_CREAT) ;
-	        op->f.ofexcl = (of & O_EXCL) ;
-	        op->f.none = (! op->f.ofcreat) && (! op->f.ofexcl) ;
+	        op->f.creat = (of & O_CREAT) ;
+	        op->f.excl = (of & O_EXCL) ;
+	        op->f.none = (! op->f.creat) && (! op->f.excl) ;
 	        if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 		    op->dbname = cp ;
 		    if ((rs = strlistmks_filesbegin(op)) >= 0) {
@@ -403,7 +400,7 @@ static int strlistmks_filesbegin(SLM *op) noex {
 	            }
 	            if (rs >= 0) {
 	                if ((rs = strlistmks_nfcreate(op,FSUF_IND)) >= 0) {
-	                    if (op->f.ofcreat && op->f.ofexcl) {
+	                    if (op->f.creat && op->f.excl) {
 	                        rs = strlistmks_fexists(op) ;
 	                    }
 	                    if (rs < 0) {
@@ -450,7 +447,6 @@ static int strlistmks_filesend(SLM *op,int f) noex {
 /* end subroutine (strlistmks_filesend) */
 
 static int strlistmks_nfcreate(SLM *op,cchar *fsuf) noex {
-	cint		rse = SR_EXIST ;
 	int		rs ;
 	int		rs1 ;
 	char		*tbuf{} ;
@@ -464,34 +460,42 @@ static int strlistmks_nfcreate(SLM *op,cchar *fsuf) noex {
 	            USTAT	sb ;
 	            cint	to_old = TO_OLDFILE ;
 		    cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
-		    cmode	om = op->om ;
 	            op->nfname = charp(cp) ;
-		    op->f.fcreated = false ;
-		    while ((rs >= 0) && (! op->f.fcreated)) {
-		        if ((rs = u_open(op->nfname,of,om)) >= 0) {
-			    op->nfd = rs ;
-			    op->f.ofcreated = true ;
-			} else if (rs == rse) {
-	    		    custime	dt = time(nullptr) ;
-	    		    if ((rs = u_stat(op->nfname,&sb)) >= 0) {
-	    	                bool	f = false ;
-	    			if ((dt - sb.st_mtime) > to_old) {
-				    u_unlink(op->nfname) ;
-				} else {
-	    			    op->f.inprogress = true ;
-	    			    f = op->f.none ;
-	    			    f = f || (op->f.ofcreat && op->f.ofexcl) ;
-	    			    rs = (f) ? SR_INPROGRESS : SR_OK ;
-				} /* end if */
-			    } else if (isNotPresent(rs)) {
-				rs = SR_OK ;
-			    } /* end if (u_stat) */
-			} /* end if (u_open) */
-		    } /* end while */
-	    	    if ((rs < 0) && op->nfname) {
-	        	uc_free(op->nfname) ;
-	        	op->nfname = nullptr ;
-	    	    }
+
+again:
+	rs = u_open(op->nfname,of,op->om) ;
+	op->nfd = rs ;
+
+#if	CF_LATE
+	if (rs >= 0) {
+	    u_close(op->nfd) ;
+	    op->nfd = -1 ;
+	}
+#endif /* CF_LATE */
+
+	if (rs == SR_EXIST) {
+	    time_t	daytime = time(nullptr) ;
+	    int		f_inprogress ;
+	    rs1 = u_stat(op->nfname,&sb) ;
+	    if ((rs1 >= 0) && ((daytime - sb.st_mtime) > to_old)) {
+		u_unlink(op->nfname) ;
+		goto again ;
+	    }
+	    op->f.inprogress = true ;
+	    f_inprogress = op->f.none ;
+	    f_inprogress = f_inprogress || (op->f.creat && op->f.excl) ;
+	    rs = (f_inprogress) ? SR_INPROGRESS : SR_OK ;
+	} /* end if */
+
+	if (rs >= 0) {
+	    op->f.created = true ;
+	} else {
+	    if (op->nfname != nullptr) {
+	        uc_free(op->nfname) ;
+	        op->nfname = nullptr ;
+	    }
+	}
+
 		} /* end if (memory-allocation of 'nfname') */
 	    } /* end if (mkfname) */
 	    rs1 = uc_free(tbuf) ;
@@ -528,7 +532,7 @@ static int strlistmks_nfcreatecheck(SLM *op,cchar *fpre,cchar *fsuf) noex {
 		if (rs >= 0) {
 		    rs = opentmpfile(infname,of,op->om,outfname) ;
 	            op->nfd = rs ;
-		    op->f.fcreated = (rs >= 0) ;
+		    op->f.created = (rs >= 0) ;
 		}
 		if (rs >= 0) {
 		    rs = strlistmks_nfstore(op,outfname) ;
@@ -541,7 +545,7 @@ static int strlistmks_nfcreatecheck(SLM *op,cchar *fpre,cchar *fsuf) noex {
 	    } else {
 	        rs = u_open(op->nfname,of,op->om) ;
 	        op->nfd = rs ;
-		op->f.fcreated = (rs >= 0) ;
+		op->f.created = (rs >= 0) ;
 	    }
 	    if (rs < 0) {
 		if (op->nfd >= 0) {
@@ -608,15 +612,14 @@ static int strlistmks_nfstore(SLM *op,char *outfname) noex {
 static int strlistmks_fexists(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->f.ofcreat && op->f.ofexcl && op->f.inprogress) {
+	if (op->f.creat && op->f.excl && op->f.inprogress) {
 	    cchar	*suf = FSUF_IND ;
 	    cchar	*end = ENDIANSTR ;
 	    char	*tbuf{} ;
 	    if ((rs = malloc_mp(&tbuf)) >= 0) {
-		cchar	*dbn = op->dbname ;
-	        if ((rs = mkfnamesuf2(tbuf,dbn,suf,end)) >= 0) {
+	        if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
 		    USTAT	sb ;
-	            cint	rs1 = u_stat(tbuf,&sb) ;
+	            int	rs1 = u_stat(tbuf,&sb) ;
 	            if (rs1 >= 0) rs = SR_EXIST ;
 	        }
 		rs1 = uc_free(tbuf) ;
@@ -672,7 +675,7 @@ static int strlistmks_wrvarfile(SLM *op) noex {
 	strlisthdr	hf{} ;
 	filer		varfile ;
 	strtab		*ksp = op->stp ;
-	const time_t	dt = time(nullptr) ;
+	const time_t	daytime = time(nullptr) ;
 	uint		fileoff = 0 ;
 	uint		(*rt)[1] ;
 	cint		pagesize = getpagesize() ;
@@ -704,7 +707,7 @@ static int strlistmks_wrvarfile(SLM *op) noex {
 	hf.vetu[1] = ENDIAN ;
 	hf.vetu[2] = 0 ;
 	hf.vetu[3] = 0 ;
-	hf.wtime = uint(dt) ;
+	hf.wtime = (uint) daytime ;
 	hf.nstrs = op->nstrs ;
 	hf.nskip = STRLISTMKS_NSKIP ;
 

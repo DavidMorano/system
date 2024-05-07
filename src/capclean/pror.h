@@ -2,23 +2,15 @@
 
 
 #ifndef	PROR_INCLUDE
-#define	PROR_INCLUDE	1
+#define	PROR_INCLUDE
 
-
-#ifndef	TYPEDEF_UTIMET
-#define	TYPEDEF_UTIMET
-typedef unsigned long	utime_t	;
-#endif
 
 /* NULL linked structure list end */
-
 #ifndef	NULLLINK
 #define	NULLLINK		((void *) 0xFFFFFFFF)
 #endif
 
-
 /* return values */
-
 #define	PROR_OK			0
 #define	PROR_BADTMP		-1
 #define	PROR_NAMEOPEN		-2
@@ -28,8 +20,6 @@ typedef unsigned long	utime_t	;
 #define	PROR_BADSTAT		-6
 
 
-
 #endif /* PROR_INCLUDE */
-
 
 

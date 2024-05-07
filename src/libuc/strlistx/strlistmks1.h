@@ -37,11 +37,11 @@ struct strlistmks_object {
 struct strlistmks_flags {
 	uint		viopen:1 ;
 	uint		abort:1 ;
-	uint		ofcreat:1 ;
-	uint		ofexcl:1 ;
+	uint		creat:1 ;
+	uint		excl:1 ;
 	uint		none:1 ;
 	uint		inprogress:1 ;
-	uint		fcreated:1 ;
+	uint		created:1 ;
 } ;
 
 struct strlistmks_rectab {

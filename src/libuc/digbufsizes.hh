@@ -27,8 +27,7 @@
 #include	<valuelims.hh>
 
 
-extern const valuelimits	valuelimit ;
-
+extern const valuelims	valuelimit ;
 
 constexpr int	digbufsizes_maxbase = 64 ;	/* current max-base */
 

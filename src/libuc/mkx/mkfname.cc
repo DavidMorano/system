@@ -21,10 +21,11 @@
 
 	Description:
 	This subroutine constructs a filename (a single filename
-	component) out the given source strings.  This subroutine
+	component) with the given source strings.  This subroutine
 	it totally just a big concatenation of c-strings but with the
 	restriction that the destination buffer is only MAXPATHLEN
-	long.
+	long.  So this is very similar to |sncpyx(3uc)| with the
+	length of the destination string given as MAXPATHLEN.
 
 	Synopsis:
 	int mkfname(char *ofname,cchar *p1,cchar *p2,cchar *p3) noex
@@ -115,8 +116,8 @@ int mkfnamex(char *rbuf,int na,...) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    cint	rlen = rs ;
 	    va_list	ap ;
+	    cint	rlen = rs ;
 	    va_begin(ap,na) ;
 	    for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
 	        cc	*sp = (cc *) va_arg(ap,cc *) ;

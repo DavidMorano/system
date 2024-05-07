@@ -65,8 +65,6 @@
 
 #define	NENTS		1000
 
-#define	NOISEDATA	struct noisedata
-
 
 /* imported namespaces */
 
@@ -93,11 +91,11 @@ struct noisedata {
 
 /* forward references */
 
-static int	noisedata_start(NOISEDATA *) noex ;
-static int	noisedata_add(NOISEDATA *,uint) noex ;
-static int	noisedata_finish(NOISEDATA *) noex ;
+static int	noisedata_start(noisedata *) noex ;
+static int	noisedata_add(noisedata *,uint) noex ;
+static int	noisedata_finish(noisedata *) noex ;
  
-static int	noisedata_addtime(NOISEDATA *) noex ;
+static int	noisedata_addtime(noisedata *) noex ;
 
 
 /* local variables */
@@ -114,22 +112,22 @@ int mknoise(uint *a,int n) noex {
 	if (a) {
 	    rs = SR_INVALID ;
 	    if (n > 0) {
-	        NOISEDATA	nd ;
+	        noisedata	nd ;
 	        if ((rs = noisedata_start(&nd)) >= 0) {
 	            if ((rs = noisedata_addtime(&nd)) >= 0) {
 	                if (nd.c > 0) {
 	                    SHA1	d ;
 	                    if ((rs = sha1_start(&d)) >= 0) {
-	                        int	size = nd.maxi * int(sizeof(ushort)) ;
-	                        sha1_update(&d,(char *) nd.buf,size) ;
+	                        int	sz = nd.maxi * int(sizeof(ushort)) ;
+	                        sha1_update(&d,(char *) nd.buf,sz) ;
 	                        if (n >= 5) {
 	                            sha1_digest(&d,(uchar *) a) ;
 	                            n = 5 ;
 	                        } else {
 	                            uint	aa[5] ;
 	                            sha1_digest(&d,(uchar *) aa) ;
-	                            size = n * int(sizeof(uint)) ;
-	                            memcpy(a,aa,size) ;
+	                            sz = n * int(sizeof(uint)) ;
+	                            memcpy(a,aa,sz) ;
 	                        }
 	                        rs1 = sha1_finish(&d) ;
 				if (rs >= 0) rs = rs1 ;
@@ -148,10 +146,10 @@ int mknoise(uint *a,int n) noex {
 
 /* local subroutines */
 
-static int noisedata_addtime(NOISEDATA *ndp) noex {
+static int noisedata_addtime(noisedata *ndp) noex {
 	TIMEVAL		tv ;
 	int		rs ;
-	if ((rs = uc_gettimeofday(&tv,NULL)) >= 0) {
+	if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
 	    noisedata_add(ndp,(uint) (tv.tv_sec >> 16)) ;
 	    noisedata_add(ndp,(uint) (tv.tv_sec >> 0)) ;
 	    noisedata_add(ndp,(uint) (tv.tv_usec >> 16)) ;
@@ -161,7 +159,7 @@ static int noisedata_addtime(NOISEDATA *ndp) noex {
 }
 /* end subroutine (noisedata_addtime) */
 
-static int noisedata_start(NOISEDATA *ndp) noex {
+static int noisedata_start(noisedata *ndp) noex {
 	int		rs = SR_FAULT ;
 	if (ndp) {
 	    rs = SR_OK ;
@@ -174,7 +172,7 @@ static int noisedata_start(NOISEDATA *ndp) noex {
 }
 /* end subroutine (noisedata_start) */
 
-static int noisedata_finish(NOISEDATA *ndp) noex {
+static int noisedata_finish(noisedata *ndp) noex {
 	int		rs = SR_FAULT ;
 	if (ndp) {
 	    rs = SR_OK ;
@@ -186,7 +184,7 @@ static int noisedata_finish(NOISEDATA *ndp) noex {
 }
 /* end subroutine (noisedata_finish) */
 
-static int noisedata_add(NOISEDATA *ndp,uint v) noex {
+static int noisedata_add(noisedata *ndp,uint v) noex {
 	ndp->buf[ndp->i] ^= v ;
 	ndp->i = (ndp->i + 1) % NENTS ;
 	if (ndp->i > ndp->maxi) {
