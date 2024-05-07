@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
+static int modload_ctor(modload *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (strlistmk_ctor) */
+/* end subroutine (modload_ctor) */
 
-static int strlistmk_dtor(strlistmk *op) noex {
+static int modload_dtor(modload *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (strlistmk_dtor) */
+/* end subroutine (modload_dtor) */
 
 template<typename ... Args>
-static inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
+static inline int modload_magic(modload *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == STRLISTMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MODLOAD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (strlistmk_magic) */
+/* end subroutine (modload_magic) */

@@ -23,8 +23,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -160,7 +158,7 @@ int strlistmk_open(SLM *op,cc *pr,cc *dbn,cc *lfn,int of,om_t om,int n) noex {
 	    rs = SR_INVALID ;
 	    if (dbn[0] && lfn[0]) {
 	        if ((rs = strlistmk_objloadbegin(op,pr,objn)) >= 0) {
-		    auto ofun = op->call.open ;
+		    auto	ofun = op->call.open ;
 	            if ((rs = ofun(op->obj,dbn,lfn,of,om,n)) >= 0) {
 		        op->magic = STRLISTMK_MAGIC ;
 	            }
@@ -169,6 +167,9 @@ int strlistmk_open(SLM *op,cc *pr,cc *dbn,cc *lfn,int of,om_t om,int n) noex {
 		    }
 	        } /* end if (objloadbegin) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		strlistmk_dtor(op) ;
+	    }
 	} /* end if (strlistmk_ctor) */
 	return rs ;
 }
