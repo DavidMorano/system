@@ -21,9 +21,11 @@
 #include	"strlistmks.h"
 
 
-#define	STRLISTMK	struct strlistmk_head
-#define	STRLISTMK_CA	struct strlistmk_calls
-#define	STRLISTMK_MAGIC	0x99447256
+#define	STRLISTMK		struct strlistmk_head
+#define	STRLISTMK_CA		struct strlistmk_calls
+#define	STRLISTMK_MAGIC		0x99447256
+#define	STRLISTMK_MODBNAME	"strlistmks"
+#define	STRLISTMK_OBJNAME	"strlistmks"
 
 
 EXTERNC_begin
