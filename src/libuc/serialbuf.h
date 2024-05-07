@@ -111,11 +111,91 @@ struct serialbuf : serialbuf_head {
 	int wustrw(cuchar *,int) noex ;
 	int wustrn(cuchar *,int) noex ;
 	int wubuf(cuchar *,int) noex ;
+	serialbuf &operator += (int incr) noex {
+	    adv(incr) ;
+	    return *this ;
+	} ;
+	template<typename T> int r(T *) noex {
+	    i = SR_NOTSUP ;
+	    return i ;
+	} ;
+	serialbuf &operator >> (auto *p) noex {
+	    r(p) ;
+	    return *this ;
+	} ;
+	template<typename T> int w(T) noex {
+	    i = SR_NOTSUP ;
+	    return i ;
+	} ;
+	serialbuf &operator << (auto v) noex {
+	    w(v) ;
+	    return *this ;
+	} ;
 	void dtor() noex ;
 	~serialbuf() noex {
 	    dtor() ;
 	} ;
 } ; /* end struct (serialbuf) */
+	template<> int serialbuf::r(char *p) noex {
+	    return rc(p) ;
+	}
+	template<> int serialbuf::r(short *p) noex {
+	    return rs(p) ;
+	}
+	template<> int serialbuf::r(int *p) noex {
+	    return ri(p) ;
+	}
+	template<> int serialbuf::r(long *p) noex {
+	    return rl(p) ;
+	}
+	template<> int serialbuf::r(longlong *p) noex {
+	    return rll(p) ;
+	}
+	template<> int serialbuf::r(uchar *p) noex {
+	    return ruc(p) ;
+	}
+	template<> int serialbuf::r(ushort *p) noex {
+	    return rus(p) ;
+	}
+	template<> int serialbuf::r(uint *p) noex {
+	    return rui(p) ;
+	}
+	template<> int serialbuf::r(ulong *p) noex {
+	    return rul(p) ;
+	}
+	template<> int serialbuf::r(ulonglong *p) noex {
+	    return rull(p) ;
+	}
+	template<> int serialbuf::w(char v) noex {
+	    return wc(v) ;
+	}
+	template<> int serialbuf::w(short v) noex {
+	    return ws(v) ;
+	}
+	template<> int serialbuf::w(int v) noex {
+	    return wi(v) ;
+	}
+	template<> int serialbuf::w(long v) noex {
+	    return wl(v) ;
+	}
+	template<> int serialbuf::w(longlong v) noex {
+	    return wll(v) ;
+	}
+	template<> int serialbuf::w(uchar v) noex {
+	    return wuc(v) ;
+	}
+	template<> int serialbuf::w(ushort v) noex {
+	    return wus(v) ;
+	}
+	template<> int serialbuf::w(uint v) noex {
+	    return wui(v) ;
+	}
+	template<> int serialbuf::w(ulong v) noex {
+	    return wul(v) ;
+	}
+	template<> int serialbuf::w(ulonglong v) noex {
+	    return wull(v) ;
+	}
 #else	/* __cplusplus */
 typedef SERIALBUF	serialbuf ;
 #endif /* __cplusplus */
