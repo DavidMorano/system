@@ -334,42 +334,33 @@ int strlistmks_close(SLM *op) noex {
 
 int strlistmks_addvar(SLM *op,cchar *sp,int sl) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLISTMKS_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = strtab_add(op->stp,sp,sl)) >= 0) {
-	    uint	ki = rs ;
-	    if ((rs = rectab_add(&op->rectab,ki)) >= 0) {
-	        op->nstrs += 1 ;
+	if ((rs = strlistmks_magic(op,sp)) >= 0) {
+	    if ((rs = strtab_add(op->stp,sp,sl)) >= 0) {
+	        uint	ki = rs ;
+	        if ((rs = rectab_add(&op->rectab,ki)) >= 0) {
+	            op->nstrs += 1 ;
+	        }
 	    }
-	}
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlistmks_addvar) */
 
 int strlistmks_abort(SLM *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == STRLISTMKS_MAGIC) {
-		rs = SR_OK ;
-	        op->f.abort = true ;
-	    }
-	} /* end if (non-null) */
+	int		rs ;
+	if ((rs = strlistmks_magic(op)) >= 0) {
+	    op->f.abort = true ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlistmks_abort) */
 
 int strlistmks_chgrp(SLM *op,gid_t gid) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != STRLISTMKS_MAGIC) return SR_NOTOPEN ;
-
-	op->gid = gid ;
-	return SR_OK ;
+	int		rs ;
+	if ((rs = strlistmks_magic(op)) >= 0) {
+	    op->gid = gid ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (strlistmks_chgrp) */
 
@@ -391,8 +382,9 @@ static int strlistmks_filesbegin(SLM *op) noex {
 	        if (dnl == 0) {
 	            rs = getpwd(tmpdname,MAXPATHLEN) ;
 	            dnl = rs ;
-	        } else
+	        } else {
 	            rs = mkpath1w(tmpdname,dnp,dnl) ;
+		}
 	        if (rs >= 0) {
 	            int	operm = (X_OK | W_OK) ;
 	            rs = perm(tmpdname,-1,-1,nullptr,operm) ;
