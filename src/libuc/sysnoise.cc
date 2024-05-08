@@ -17,8 +17,8 @@
 	This was originally written before random bits were readily
 	available.  The world has changed since 2002 (if this was
 	even originally written as late as that).  I am wiping this
-	old crap totallt clean, and writing this to use |getrandom(3c)|
-	esclusively.  For those messed-up operating systems that
+	old crap totally clean, and writing this to use |uc_rand(3uc)|
+	exclusively.  For those messed-up operating systems that
 	do not natively provide |getrandom(3c)| -- like messed-up
 	Darwin (MacOS) -- then we use the hacked version of
 	|getrandom(3c)| that was written for it as a stop-gap
@@ -103,11 +103,7 @@
 /* exported subroutines */
 
 int sysnoise(uchar *a,int alen) noex {
-	int		rs = SR_FAULT ;
-	if (a) {
-	    rs = uc_getrandom(a,alen,0) ;
-	} /* end if (non-null) */
-	return rs ;
+	return uc_rand(a,alen) ;
 }
 /* end subroutine (sysnoise) */
 
