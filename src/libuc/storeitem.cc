@@ -14,7 +14,7 @@
 
 	= 2023-11-04, David A­D­ Morano
 	I updated this a little bit to take advantage of the built-in
-	"bit" features of C++23, like |has_isingle_bit()|. Otherwise,
+	"bit" features of C++23, like |has_isingle_bit()|.  Otherwise,
 	this code could have stayed in C89! :-)  Am I just looking
 	for an excuse to try out some C++23 feature?
 
@@ -39,17 +39,18 @@
 
 	Returns:
 	>=0		length of the newly stored item
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>
 #include	<cstring>
 #include	<bit>
 #include	<usystem.h>
 #include	<intceil.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"storeitem.h"
 
@@ -83,6 +84,9 @@ extern "C" {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -230,7 +234,7 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 }
 /* end subroutine (storeitem_dec) */
 
-int storeitem_char(storeitem *op,int ch,cchar **rpp) noex {
+int storeitem_chr(storeitem *op,int ch,cchar **rpp) noex {
 	cint		wlen = 1 ;
 	int		rs = SR_FAULT ;
 	if (rpp) *rpp = nullptr ;
@@ -257,7 +261,7 @@ int storeitem_char(storeitem *op,int ch,cchar **rpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (storeitem_char) */
+/* end subroutine (storeitem_chr) */
 
 int storeitem_nul(storeitem *op,cchar **rpp) noex {
 	return storeitem_strw(op,op->dbuf,0,rpp) ;
@@ -304,7 +308,7 @@ int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 /* end subroutine (storeitem_block) */
 
 int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
-	constexpr int	align = sizeof(void *) ;
+	cint		align = sizeof(void *) ;
 	void		**vpp = (void **) vppp ;
 	int		rs = SR_FAULT ;
 	if (op && vpp) {

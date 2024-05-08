@@ -31,8 +31,9 @@
 #include	<sys/types.h>
 #include	<sys/random.h>		/* |getentropy(2)| */
 #include	<unistd.h>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cerrno>
-#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -311,7 +312,7 @@ int rander::geter(char *rbuf,int rlen) noex {
 		if (ulong uv ; (rs = randomvar_getulong(rvp,&uv)) >= 0) {
 		    for (int i = 0 ; (rlen > 0) && (i < usize) ; i += 1) {
 			rbuf[rl++] = char(uv) ;
-			uv >>= 8 ;
+			uv >>= CHAR_BIT ;
 			rlen -= 1 ;
 		    } /* end for */
 		} /* end if (randomvar_getulong) */

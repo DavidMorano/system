@@ -37,20 +37,17 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += usyscalls.h localmisc.h
-
 
 LIBS += -lmacuser -lu
 
 
 INCDIRS=
 
-
 LIBDIRS= -L$(LIBDIR)
 
 
-LDRPATH= $(USRLOCAL)
+LDRPATH= $(USRLOCAL)/lib
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -59,10 +56,7 @@ CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= usystem.h localmisc.h
+LDFLAGS= $(MAKELDFLAGS) -rpath $(LDRPATH)
 
 
 OBJ_MACHAVE= main.o
@@ -95,7 +89,7 @@ $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
 again:
-	rm -f $(TALL)
+	rm -f $(T).x
 
 clean:
 	makeclean $(ALL)

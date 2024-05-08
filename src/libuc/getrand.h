@@ -41,11 +41,11 @@ static inline int getrand(uint *p, int n = 1) noex {
 	return getrand(p,(sz * n)) ;
 }
 static inline int getrand(ulong *p,int n = 1) noex {
-	cint	sz = sizeof(uint) ;
+	cint	sz = sizeof(ulong) ;
 	return getrand(p,(sz * n)) ;
 }
 static inline int getrand(longlong *p,int n = 1) noex {
-	cint	sz = sizeof(uint) ;
+	cint	sz = sizeof(ulonglong) ;
 	return getrand(p,(sz * n)) ;
 }
 

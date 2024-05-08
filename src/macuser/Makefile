@@ -37,9 +37,7 @@ LINT= lint
 
 DEFS +=
 
-
 INCS +=
-
 
 LIBS += -lmacuser -lu
 
@@ -48,7 +46,10 @@ INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
-LDRPATH= $(USRLOCAL)
+
+LDRPATH= $(USRLOCAL)/lib
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -58,7 +59,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS) -rpath $(LDRPATH)
 
 
-OBJ_USERHOME= main.o
+OBJ_MACUSER= main.o
 
 
 default:		$(T).x
@@ -81,14 +82,14 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).x:			$(OBJ_USERHOME)
-	$(CXX) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
+$(T).x:			$(OBJ_MACUSER)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJ_MACUSER) $(LIBINFO)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
 again:
-	rm -f $(TALL)
+	rm -f $(T).x
 
 clean:
 	makeclean $(ALL)

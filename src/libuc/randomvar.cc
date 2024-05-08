@@ -69,7 +69,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* UNIX® system subroutines */
@@ -395,7 +395,7 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 		        cint	ml = min(rlen,wl) ;
 		        for (int i = 0 ; i < ml ; i += 1) {
 			    *rp++ = char(rv) ;
-			    rv >>= 8 ;
+			    rv >>= CHAR_BIT ;
 			    rlen -= 1 ;
 		        } /* end for */
 		    } /* end if (randomvar_getulong) */

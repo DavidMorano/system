@@ -43,12 +43,16 @@ extern int storeitem_start(storeitem *,char *,int) noex ;
 extern int storeitem_strw(storeitem *,cchar *,int,cchar **) noex ;
 extern int storeitem_buf(storeitem *,cvoid *,int,cchar **) noex ;
 extern int storeitem_dec(storeitem *,int,cchar **) noex ;
-extern int storeitem_char(storeitem *,int,cchar **) noex ;
+extern int storeitem_chr(storeitem *,int,cchar **) noex ;
 extern int storeitem_nul(storeitem *,cchar **) noex ;
 extern int storeitem_ptab(storeitem *,int,void ***) noex ;
 extern int storeitem_block(storeitem *,int,int,void **) noex ;
 extern int storeitem_getlen(storeitem *) noex ;
 extern int storeitem_finish(storeitem *) noex ;
+
+static inline int storeitem_char(storeitem *op,int ch,cchar **rpp) noex {
+	return storeitem_chr(op,ch,rpp) ;
+}
 
 EXTERNC_end
 

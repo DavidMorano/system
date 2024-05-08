@@ -57,7 +57,7 @@
 /* exported subroutines */
 
 int getrand(void *rbuf,int rlen) noex {
-	return uc_getrandom(rbuf,rlen,0) ;
+	return uc_rand(rbuf,rlen) ;
 }
 /* end subroutine (getrand) */
 
