@@ -1,7 +1,7 @@
-/* ucgetpid HEADER */
+/* ucrand HEADER */
 /* lang=C20 */
 
-/* slightly tuned UNIX® look-alike for |getpid(2)| */
+/* get random data from the system */
 /* version %I% last-modified %G% */
 
 
@@ -14,12 +14,11 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	UCGETPID_INCLUDE
-#define	UCGETPID_INCLUDE
+#ifndef	UCRAND_INCLUDE
+#define	UCRAND_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -28,12 +27,11 @@
 
 EXTERNC_begin
 
-extern int	uc_getpid() noex ;
-extern int	uc_setpid(pid_t) noex ;
+extern int	uc_rand(void *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* UCGETPID_INCLUDE */
+#endif /* UCRAND_INCLUDE */
 
 

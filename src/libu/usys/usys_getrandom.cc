@@ -42,6 +42,8 @@
 #include	"usys_getrandom.h"
 
 
+#define	MAXRANDSIZE	256		/* limit imposed (else EIO) */
+
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -51,7 +53,7 @@ unixret_t getrandom(void *rbuf,size_t rlen,uint) noex {
 	int		rl = 0 ;
 	if (rbuf) {
 	    if (rlen > 0) {
-		csize		inc = 256 ;
+		csize		inc = MAXRANDSIZE ;
 		const caddr_t	ca = caddr_t(rbuf) ;
 		while ((rc >= 0) && (rlen > 0)) {
 		    csize	ml = min(rlen,inc) ;

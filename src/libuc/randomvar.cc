@@ -145,7 +145,6 @@ static int mkprocrand() noex ;
 /* local variables */
 
 constexpr int	digsize = sizeof(RANDOMVAR_DIGIT) ;
-constexpr int	ndeg = sizeof(RANDOMVAR_DEGREE) ;
 constexpr int	slen = RANDOMVAR_STATELEN ;
 
 static constexpr ulong	randtbl[] = {
@@ -294,8 +293,8 @@ int randomvar_setpoly(randomvar *op,int a,int b) noex {
 	int		rs ;
 	if ((rs = randomvar_magic(op)) >= 0) {
 	    rs = SR_INVALID ;
-	    if ((a > 0) && (a < ndeg)) {
-	        if ((b > 0) && (b < ndeg)) {
+	    if ((a > 0) && (a < slen)) {
+	        if ((b > 0) && (b < slen)) {
 		    op->a = COF(a) ;
 		    op->b = COF(b) ;
 		}

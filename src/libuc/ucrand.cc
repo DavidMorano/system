@@ -1,7 +1,7 @@
-/* getrandom SUPPORT */
+/* ucrand SUPPORT */
 /* lang=C++20 */
 
-/* Get-Random-data UNIX® System interposer */
+/* get random data from the system */
 /* version %I% last-modified %G% */
 
 #define	CF_GETENTROPY	0		/* compile-define |getentropy(2)| */
@@ -57,11 +57,6 @@
 
 #define	RBUFLEN		64
 
-#ifndef	GRAND_RANDOM
-#define	GRAND_RANDOM	(1<<1)
-#define	GRAND_NONBLOCK	(1<<2)
-#endif /* GRAND_RANDOM */
-
 #define	GETRANDOM_MAXENT	256	/* maximum bytes per call */
 
 
@@ -83,7 +78,7 @@ namespace {
     struct rander {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
-	void		*rv ;
+	void		*rvarp ;
 	time_t		ti_noise ;	/* last addition of noise */
 	int		waiters ;
 	aflag		fvoid ;
@@ -97,9 +92,9 @@ namespace {
 	int randend() noex ;
 	int capbegin(int = -1) noex ;
 	int capend() noex ;
-	int get(char *,int,uint) noex ;
-	int geter(char *,int,uint) noex ;
-	int addnoise(uint) noex ;
+	int get(char *,int) noex ;
+	int geter(char *,int) noex ;
+	int addnoise() noex ;
 	void atbefore() noex {
 	    mx.lockbegin() ;
 	}
@@ -123,45 +118,23 @@ extern "C" {
 
 static rander		rander_data ;
 
-static constexpr cpcchar	devs[] = {
-	"/dev/urandom",
-	"/dev/random",
-	nullptr
-} ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int getrandom(void *arbuf,size_t arlen,uint fl) noex {
+sysret_t uc_rand(void *arbuf,size_t arlen) noex {
 	cint		rlen = (int) arlen ;
 	int		rs ;
 	char		*rbuf = charp(arbuf) ;
-	if ((rs = rander_data.get(rbuf,rlen,fl)) < 0) {
-	    errno = (-rs) ;
+	if ((rs = rander_data.get(rbuf,rlen)) < 0) {
+	    errno = (- rs) ;
 	    rs = -1 ;
 	}
 	return rs ;
 }
-/* end subroutine (getrandom) */
-
-#if	 CF_GETENTROPY
-int getentropy(void *rbuf,size_t rlen) noex {
-	int		rc = 0 ;
-	if (rlen < GETRANDOM_MAXENT) {
-	    if ((rc = getrandom(rbuf,rlen,0)) >= 0) {
-	        rc = 0 ;
-	    }
-	} else {
-	    errno = EIO ;
-	    rc = -1 ;
-	}
-	return rc ;
-}
-/* end subroutine (getentropy) */
-#endif /* CF_GETENTROPY */
+/* end subroutine (uc_rand) */
 
 
 /* local subroutines */
@@ -244,7 +217,7 @@ int rander::fini() noex {
 }
 /* end method (rander::fini) */
 
-int rander::get(char *rbuf,int rlen,uint fl) noex {
+int rander::get(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -256,7 +229,7 @@ int rander::get(char *rbuf,int rlen,uint fl) noex {
 	            cint	to = utimeout[uto_capture] ;
 	            if ((rs = capbegin(to)) >= 0) {
 		        if ((rs = randcheck()) >= 0) {
-	                    rs = geter(rbuf,rlen,fl) ;
+	                    rs = geter(rbuf,rlen) ;
 			    len = rs ;
 		        } /* end if (rander::randcheck) */
 	                rs1 = capend() ;
@@ -273,30 +246,30 @@ int rander::get(char *rbuf,int rlen,uint fl) noex {
 
 int rander::randcheck() noex {
 	int		rs = SR_OK ;
-	if (rv == nullptr) {
+	if (rvarp == nullptr) {
 	    rs = randbegin() ;
 	}
 	return rs ;
 }
 /* end method (rander::randcheck) */
 
-int rander::geter(char *rbuf,int rlen,uint fl) noex {
-	const time_t	dt = time(nullptr) ;
+int rander::geter(char *rbuf,int rlen) noex {
+	custime		dt = time(nullptr) ;
 	cint		to_noise = utimeout[uto_busy] ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	if ((dt - ti_noise) >= to_noise) {
 	    ti_noise = dt ;
-	    rs = addnoise(fl) ;
+	    rs = addnoise() ;
 	} /* end if */
 	if (rs >= 0) {
-	    randomvar	*rvp = static_cast<randomvar *>(rv) ;
+	    randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
 	    ulong	uv{} ;
 	    cint	usize = sizeof(ulong) ;
 	    while ((rs >= 0) && (rlen > 0)) {
 		if ((rs = randomvar_getulong(rvp,&uv)) >= 0) {
 		    for (int i = 0 ; (rlen > 0) && (i < usize) ; i += 1) {
-			rbuf[rl++] = (char) uv ;
+			rbuf[rl++] = char(uv) ;
 			uv >>= 8 ;
 			rlen -= 1 ;
 		    } /* end for */
@@ -307,38 +280,38 @@ int rander::geter(char *rbuf,int rlen,uint fl) noex {
 }
 /* end method (randero::geter) */
 
-int rander::addnoise(uint fl) noex {
-	cint		ri = bool(fl & GRAND_RANDOM) ;
+int rander::addnoise() noex {
 	cint		of = O_RDONLY ;
-	cchar		*dev ;
+	cchar		*dev = RANDOMDEV ;
 	int		rs ;
 	int		rs1 ;
-	dev = devs[ri] ;
+	int		rl = 0 ;
 	if ((rs = u_open(dev,of,0666)) >= 0) {
 	    cint	rlen = RBUFLEN ;
 	    cint	fd = rs ;
 	    char	rbuf[RBUFLEN+1] ;
 	    if ((rs = u_read(fd,rbuf,rlen)) >= 0) {
-		randomvar	*rvp = static_cast<randomvar *>(rv) ;
+		randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
 		cint		len = rs ;
 		rs = randomvar_addnoise(rvp,rbuf,len) ;
+		rl = rs ;
 	    } /* end if (read) */
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file-random) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end method (rander::addnoise) */
 
 int rander::randbegin() noex {
 	int		rs = SR_OK ;
-	if (rv == nullptr) {
+	if (rvarp == nullptr) {
 	    cint	osize = sizeof(randomvar) ;
 	    void	*vp{} ;
 	    if ((rs = uc_libmalloc(osize,&vp)) >= 0) {
 	        randomvar	*rvp = static_cast<randomvar *>(vp) ;
 	        if ((rs = randomvar_start(rvp,0,0)) >= 0) {
-	            rv = vp ;
+	            rvarp = vp ;	/* <- store object pointer */
 		}
 	        if (rs < 0) {
 	            uc_libfree(vp) ;
@@ -352,16 +325,16 @@ int rander::randbegin() noex {
 int rander::randend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (rv) {
+	if (rvarp) {
 	    {
-	        randomvar	*rvp = static_cast<randomvar *>(rv) ;
+	        randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
 	        rs1 = randomvar_finish(rvp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_libfree(rv) ;
+	        rs1 = uc_libfree(rvarp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        rv = nullptr ;
+	        rvarp = nullptr ;
 	    }
 	}
 	return rs ;
@@ -415,7 +388,7 @@ static void rander_atforkafter() noex {
 static void rander_exit() noex {
 	int		rs ;
 	if ((rs = rander_data.fini()) < 0) {
-	    ulogerror("getrandom",rs,"exit-fini") ;
+	    ulogerror("ucrand",rs,"exit-fini") ;
 	}
 }
 /* end subroutine (rander_exit) */
