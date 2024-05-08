@@ -22,13 +22,16 @@
 
 	This object provides a random number generator.  This is
 	similar to the UNIX® System |random(3)| subroutine except
-	that no global variables are used.  This version also
-	provides a means to get truly random numbers by periodically
-	mixing in garbage collected from the machine environment.
+	that no global variables are used.  Rather this is an onject
+	and can be instantiated wherever one wants.  This version
+	also provides a means to get truly random numbers (besides
+	pseudo-random numbers) by periodically mixing in garbage
+	supplied by the caller.  Of couse, like all normal objects,
+	it is thread-safe.
 
 	We implement a standard cyclical shift register with feedback
 	taps to create our random numbers (like |random(3)| does)
-	but we do it with a 128 degree polynomial.  Our polynomial
+	but we do it with a 127 degree polynomial.  Our polynomial
 	is currently:
 
 		x**127 + x**67 + x**23 + 1
@@ -41,6 +44,25 @@
 		x**15 + x**1 + 1
 		x**31 + x**3 + 1
 		x**63 + x**1 + 1
+
+	Implementation-notes:
+	This is an object.  It is -- of course -- thread-safe, as
+	all of my code is and always has been these last decades.
+	This object supports two kinds of uses.  It can be used to
+	provide pseudo-random numbers, or it can be used to provide
+	real random numbers (a little bit harder, but not by too
+	much). Both used (just mentioned) require some initialization
+	of the object state.  In the case of pseudo-random numbers,
+	the state is just some static data stored below that is
+	loaded into the object state variable.  In the case of real
+	random numbers, the initialization has two phases. One:
+	some initial random data is extracted that is constant over
+	the lifetime of the process.  This data is collected once
+	and is then available for further object initializations
+	after the first (see the |mkprocrand()| subroutine below).
+	And two: the second phase of real random number initialization
+	comes from dynamic system resources, and has to occur every
+	time a new object is instantiated.
 
 *******************************************************************************/
 
@@ -69,8 +91,8 @@
 #define	STIRINTERVAL	(5 * 60)
 #define	MAINTCOUNT	1000
 
-#define	NINITS		6		/* number initiailization vars */
-#define	NLS		4		/* number of longs in array(of) */
+#define	NINITS		8		/* number initiailization vars */
+#define	NLS		8		/* number of longs in array(of) */
 
 
 /* imported namespaces */
@@ -98,7 +120,7 @@ namespace {
 	uint		v[N] ;
     } ;
     template<int N> struct arrlongs {
-	ulong		v[N] = {} ;
+	ulong		v[N] ;
 	cint		n = N ;
 	int		c = 0 ;
 	bool		flipped = false ;
@@ -173,7 +195,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	    void	*vp{} ;
 	    csize	sz = (slen * sizeof(ulong)) ;
 	    memclear(op) ;
-	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 		op->state = ulongp(vp) ;
 	        op->f.flipper = false ;
 	        op->f.pseudo = f_pseudo ;
@@ -197,7 +219,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 		    }
 		} /* end if (ok) */
 		if (rs < 0) {
-		    uc_free(op->state) ;
+		    uc_libfree(op->state) ;
 		    op->state = nullptr ;
 		    op->magic = 0 ;
 		}
@@ -212,7 +234,7 @@ int randomvar_finish(randomvar *op) noex {
 	int		rs1 ;
 	if ((rs = randomvar_magic(op)) >= 0) {
 	    if (op->state) {
-		rs1 = uc_free(op->state) ;
+		rs1 = uc_libfree(op->state) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -221,12 +243,12 @@ int randomvar_finish(randomvar *op) noex {
 }
 /* end subroutine (randomvar_finish) */
 
-int randomvar_stateload(randomvar *op,cchar *state,int sl) noex {
+int randomvar_stateload(randomvar *op,cchar *nstate,int sl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(op,state)) >= 0) {
+	if ((rs = randomvar_magic(op,nstate)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sl >= slen) {
-	        cchar	*sp = charp(state) ;
+	        cchar	*sp = charp(nstate) ;
 		rs = SR_OK ;
 	        for (int i = 0 ; i < slen ; i += 1) {
 	            ulong	ulw{} ;
@@ -253,8 +275,7 @@ int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 		rs = SR_OK ;
 	        for (int i = 0 ; i < slen ; i += 1) {
 	            ulong	ulw = op->state[i]  ;
-	            int		r ;
-	            if ((r = wrulong(bp,bl,ulw)) > 0) {
+	            if (int r ; (r = wrulong(bp,bl,ulw)) > 0) {
 		        bp += r ;
 		        bl -= r ;
 	            } else {
@@ -486,22 +507,23 @@ static int wrulong(char *bp,int bl,ulong ulw) noex {
 }
 /* end subroutine (wrulong) */
 
-/* this creates the process-constant randoness */
+/* this extracts process-constant randoness (done only once) */
 static int mkprocrand() noex {
 	uint		v ;
 	int		rs = SR_OK ;
-	int		i = 0 ;
+	int		c = 0 ;
 	cchar		*var = getenv(varname.random) ;
-	initrv.v[i++] = (v = getpid(),randlc(v)) ;
-	initrv.v[i++] = (v = getuid(),randlc(v)) ;
-	initrv.v[i++] = (v = getppid(),randlc(v)) ;
-	initrv.v[i++] = (v = getpgrp(),randlc(v)) ;
+	initrv.v[c++] = (v = getpid(),randlc(v)) ;
+	initrv.v[c++] = (v = getuid(),randlc(v)) ;
+	initrv.v[c++] = (v = getppid(),randlc(v)) ;
+	initrv.v[c++] = (v = getpgrp(),randlc(v)) ;
+	initrv.v[c++] = (v = getsid(0),randlc(v)) ;
 	if (var) {
-	    if (uint v{} ; cfdecui(var,-1,&v) >= 0) {
-		initrv.v[i++] = v ;
+	    if (cfdecui(var,-1,&v) >= 0) {
+		initrv.v[c++] = v ;
 	    }
 	}
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mkprocrand) */
 
