@@ -1,22 +1,14 @@
 /* wdt */
 
 
-#ifndef	INC_PROCESS
-#define	INC_PROCESS	1
+#ifndef	PROCESS_INCLUDE
+#define	PROCESS_INCLUDE
 
-
-#ifndef	TYPEDEF_UTIMET
-#define	TYPEDEF_UTIMET
-typedef unsigned long	utime_t	;
-#endif
 
 /* NULL linked structure list end */
-
 #define	NULLLINK		((void *) 0xFFFFFFFF)
 
-
 /* return values */
-
 #define	PROR_OK			0
 #define	PROR_BADTMP		-1
 #define	PROR_BADTMPOPEN		-2
@@ -26,8 +18,6 @@ typedef unsigned long	utime_t	;
 #define	PROR_BADSTAT		-6
 
 
-
-#endif /* INC_PROCESS */
-
+#endif /* PROCESS_INCLUDE */
 
 

@@ -60,8 +60,8 @@ OBJ2_STRLIST= strlistmk.o
 OBJ3_STRLIST= strlistmks.o
 
 
-OBJA_STRLIST= obj0_strlist.o obj1_strlist.o
-OBJB_STRLIST= obj2_strlist.o obj3_strlist.o obj4_strlist.o
+OBJA_STRLIST= obj0.o obj1.o
+OBJB_STRLIST= obj2.o obj3.o
 
 OBJ_STRLIST= $(OBJA_STRLIST) $(OBJB_STRLIST)
 
@@ -109,20 +109,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_strlist.o:	$(OBJ0_STRLIST)
+obj0.o:			$(OBJ0_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRLIST)
 
-obj1_strlist.o:	$(OBJ1_STRLIST)
+obj1.o:			$(OBJ1_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRLIST)
 
-obj2_strlist.o:	$(OBJ2_STRLIST)
+obj2.o:			$(OBJ2_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRLIST)
 
-obj3_strlist.o:	$(OBJ3_STRLIST)
+obj3.o:			$(OBJ3_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRLIST)
-
-obj4_strlist.o:	$(OBJ4_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_STRLIST)
 
 
 strlist.o:		strlist.cc			$(INCS)

@@ -105,6 +105,9 @@
 #define	UC(ch)		((unsigned char) (ch))
 #endif
 
+#ifndef	MODP2
+#define	MODP2(v,n)	((v) & ((n) - 1))
+#endif
 
 /* basic scalar types */
 
@@ -137,20 +140,35 @@
 typedef signed char		schar ;
 #endif /* TYPEDEF_SCHAR */
 
+#ifndef	TYPEDEF_UCHAR
+#define	TYPEDEF_UCHAR
+typedef unsigned char		uchar ;
+#endif
+
+#ifndef	TYPEDEF_USHORT
+#define	TYPEDEF_USHORT
+typedef unsigned short		ushort ;
+#endif
+
+#ifndef	TYPEDEF_UINT
+#define	TYPEDEF_UINT
+typedef unsigned int		uint ;
+#endif
+
+#ifndef	TYPEDEF_ULONG
+#define	TYPEDEF_ULONG
+typedef unsigned long		ulong ;
+#endif
+
 #ifndef	TYPEDEF_CSCHAR
 #define	TYPEDEF_CSCHAR
 typedef const signed char	cschar ;
 #endif /* TYPEDEF_SCHAR */
 
-#ifndef	TYPEDEF_UCHAR
-#define	TYPEDEF_UCHAR
-typedef unsigned char		uchar ;
-#endif /* TYPEDEF_UCHAR */
-
-#ifndef	TYPEDEF_CUCHAR
-#define	TYPEDEF_CUCHAR
-typedef const unsigned char	cuchar ;
-#endif /* TYPEDEF_UCHAR */
+#ifndef	TYPEDEF_CCHAR
+#define	TYPEDEF_CCHAR
+typedef const char		cchar ;
+#endif /* TYPEDEF_SCHAR */
 
 #ifndef	TYPEDEF_CSHORT
 #define	TYPEDEF_CSHORT
@@ -167,38 +185,49 @@ typedef const int		cint ;
 typedef const long		clong ;
 #endif /* TYPEDEF_CLONG */
 
+#ifndef	TYPEDEF_CUCHAR
+#define	TYPEDEF_CUCHAR
+typedef const unsigned char	cuchar ;
+#endif /* TYPEDEF_UCHAR */
+
+#ifndef	TYPEDEF_CUSHORT
+#define	TYPEDEF_CUSHORT
+typedef const unsigned short	cushort ;
+#endif
+
 #ifndef	TYPEDEF_CUINT
 #define	TYPEDEF_CUINT
 typedef const unsigned int	cuint ;
-#endif /* TYPEDEF_CUINT */
+#endif
 
+#ifndef	TYPEDEF_CULONG
+#define	TYPEDEF_CULONG
+typedef const unsigned long	culong ;
+#endif
 
 #ifndef	TYPEDEF_USTIME
 #define	TYPEDEF_USTIME
-typedef unsigned int		ustime_t ;
+typedef time_t			ustime ;
 #endif
-
-#ifndef	TYPEDEF_UTIME
-#define	TYPEDEF_UTIME
-#if	defined(_LP64)
-typedef unsigned long		utime_t ;
-#else
-typedef unsigned long long	utime_t ;
-#endif
-#endif /* TYPEDEF_UTIME */
 
 #ifndef	TYPEDEF_UNIXTIME
 #define	TYPEDEF_UNIXTIME
-#if	defined(_LP64)
-typedef long			unixtime_t ;
-#else
-typedef long long		unixtime_t ;
+typedef time_t			unixtime ;
 #endif
-#endif /* TYPEDEF_UNIXTIME */
+
+#ifndef	TYPEDEF_CUSTIME
+#define	TYPEDEF_USTIME
+typedef const time_t		custime ;
+#endif
+
+#ifndef	TYPEDEF_CUNIXTIME
+#define	TYPEDEF_CUNIXTIME
+typedef const time_t		cunixtime ;
+#endif
 
 #ifndef	TYPEDEF_CC
 #define	TYPEDEF_CC
-typedef const char	cc ;
+typedef const char		cc ;
 #endif
 
 /* C-language limits */

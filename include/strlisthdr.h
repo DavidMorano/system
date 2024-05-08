@@ -12,9 +12,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -37,7 +37,7 @@ struct strlisthdr_head {
 	uint		itoff ;		/* index-table offset */
 	uint		itlen ;		/* index-table length (n-entries) */
 	uint		nstrs ;		/* total number of strings */
-	uint		nskip ;		/* a hash-loookup parameter */
+	uint		nskip ;		/* a hash-lookup parameter */
 	char		vetu[4] ;
 } ;
 
@@ -45,11 +45,10 @@ typedef STRLISTHDR	strlisthdr ;
 
 EXTERNC_begin
 
-extern int strlisthdr_msg(strlisthdr *,int,char *,int) noex ;
-/* read from file-buffer to object */
-extern int strlisthdr_rd(strlisthdr *,cchar *,int) noex ;
-/* write to file-buffer from object */
-extern int strlisthdr_wr(strlisthdr *,char *,int) noex ;
+/* read from object; into the supplied buffer (like |read(2)|) */
+extern int strlisthdr_rd(strlisthdr *,char *,int) noex ;
+/* write to  object; from file-buffer to the object (like |write(2)|) */
+extern int strlisthdr_wr(strlisthdr *,cchar *,int) noex ;
 
 EXTERNC_end
 

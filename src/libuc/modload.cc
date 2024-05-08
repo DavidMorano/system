@@ -4,7 +4,6 @@
 /* module-load management */
 /* version %I% last-modified %G% */
 
-#define	CF_FORCEPR	0		/* force having a PR */
 
 /* revision history:
 
@@ -30,7 +29,7 @@
 	Arguments:
 	op		object pointer
 	pr		program-root
-	modfname	module file-name
+	modfn	module file-name
 	modname		module name (the name inside the so-file itself)
 	opts		options
 	syms		array of symbols
@@ -83,6 +82,9 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
@@ -102,7 +104,7 @@ struct subinfo_flags {
 struct subinfo {
 	void		*op ;
 	cchar		*pr ;
-	cchar		*modfname ;
+	cchar		*modfn ;
 	cchar		**syms ;
 	SUBINFO_FL	f ;
 	ids		id ;
@@ -112,10 +114,38 @@ struct subinfo {
 
 /* forward references */
 
+template<typename ... Args>
+static int modload_ctor(modload *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(op) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (modload_ctor) */
+
+static int modload_dtor(modload *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (modload_dtor) */
+
+template<typename ... Args>
+static inline int modload_magic(modload *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MODLOAD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (modload_magic) */
+
 static int	modload_objloadclose(ML *) noex ;
 
-static int	subinfo_start(SI *,ML *,cchar *,
-			cchar *,int,cchar **) noex ;
+static int	subinfo_start(SI *,ML *,cc *,cc *,int,cc **) noex ;
 static int	subinfo_modload(SI *) noex ;
 static int	subinfo_finish(SI *,int) noex ;
 
@@ -172,61 +202,51 @@ static constexpr cpcchar	extdirs[] = {
 
 /* exported subroutines */
 
-int modload_open(ML *op,cc *pr,cc *modfname,cc *modname,int opts,
-		cc **syms) noex {
-	SUBINFO		si ;
+int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,cc **syms) noex {
 	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (modfname == nullptr) return SR_FAULT ;
-	if (modfname == nullptr) return SR_FAULT ;
-
-#if	CF_FORCEPR
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_NOTFOUND ;
-#endif /* CF_FORCEPR */
-
-	if (modfname[0] == '\0') return SR_INVALID ;
-	if (modfname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	op->modname = modname ;
-
-	if ((rs = subinfo_start(&si,op,pr,modfname,opts,syms)) >= 0) {
-	    if ((rs = subinfo_modload(&si)) >= 0) {
-	        op->magic = MODLOAD_MAGIC ;
+	if ((rs = modload_ctor(op,modfn,modname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (modfn[0] && modname[0]) {
+	        SUBINFO		si ;
+	        op->modname = modname ;
+	        if ((rs = subinfo_start(&si,op,pr,modfn,opts,syms)) >= 0) {
+	            if ((rs = subinfo_modload(&si)) >= 0) {
+	                op->magic = MODLOAD_MAGIC ;
+	            }
+	            rs1 = subinfo_finish(&si,(rs<0)) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		modload_dtor(op) ;
 	    }
-	    rs1 = subinfo_finish(&si,(rs<0)) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if */
-
+	} /* end if (modload_ctor) */
 	return rs ;
 }
 /* end subroutine (modload_open) */
 
 int modload_close(ML *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == MODLOAD_MAGIC) {
-	        rs = SR_OK ;
-		{
-		    rs1 = modload_objloadclose(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		op->magic = 0 ;
-	    } /* end if (magic) */
-	} /* end if (non-null) */
+	if ((rs = modload_magic(op)) >= 0) {
+	    {
+		rs1 = modload_objloadclose(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = modload_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (modload_close) */
 
 int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 	int		rs = SR_OK ;
-	cvoid		*rp ;
+	cvoid		*rp = nullptr ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (symname == nullptr) return SR_FAULT ;
@@ -235,16 +255,15 @@ int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 
 	if (symname[0] == '\0') return SR_INVALID ;
 
-	if (op->sop != nullptr) {
-	    rp = dlsym(op->sop,symname) ;
-	    if (rp == nullptr) {
+	if (op->sop) {
+	    if ((rp = dlsym(op->sop,symname)) == nullptr) {
 	        rs = SR_NOTFOUND ;
 	    }
 	} else {
 	    rs = SR_NOTFOUND ;
 	}
 
-	if (vpp != nullptr) {
+	if (vpp) {
 	    *vpp = (rs >= 0) ? rp : nullptr ;
 	}
 
@@ -310,13 +329,13 @@ static int modload_objloadclose(ML *op) noex {
 }
 /* end subroutine (modload_objloadclose) */
 
-static int subinfo_start(SI *sip,ML *op,cc *pr,cc *modfname,
+static int subinfo_start(SI *sip,ML *op,cc *pr,cc *modfn,
 		int opts,cc **syms) noex {
 	int		rs ;
 	memclear(sip) ;
 	sip->op = op ;
 	sip->pr = pr ;
-	sip->modfname = modfname ;
+	sip->modfn = modfn ;
 	sip->opts = opts ;
 	sip->syms = syms ;
 	rs = ids_load(&sip->id) ;
@@ -579,7 +598,7 @@ static int subinfo_socheckliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 	ids		*idp = &sip->id ;
 	cint		am = (X_OK|R_OK) ;
 	int		rs = SR_OK ;
-	cchar		*mfn = sip->modfname ;
+	cchar		*mfn = sip->modfn ;
 	char		sfn[MAXPATHLEN + 1] ;
 	(void) dsp ;
 	for (int j = 0 ; exts[j] != nullptr ; j += 1) {

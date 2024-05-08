@@ -21,22 +21,22 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>		/* for |gettimeofday(3c)| */
 #include	<sys/timeb.h>		/* for |ftime(3c)| */
 #include	<dlfcn.h>
+#include	<cerrno>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-#include	<cerrno>
-
 #include	<usystem.h>
 #include	<tmz.h>
 #include	<localmisc.h>
+
+#include	"pretime.h"
 
 
 /* local defines */
@@ -58,7 +58,7 @@
 /* local typedefs */
 
 extern "C" {
-typedef int	(*gettimeofday_t)(TIMEVAL *,void *) noex ;
+    typedef int	(*gettimeofday_t)(TIMEVAL *,void *) noex ;
 }
 
 
@@ -82,7 +82,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* local structures */
 
-struct pretime_head {
+extern "C" {
+    struct pretime_head {
 	long		off ;
 	time_t		(*func_time)(time_t *) ;
 	int		(*func_gettimeofday)(TIMEVAL *,void *) ;
@@ -90,7 +91,8 @@ struct pretime_head {
 	volatile int	f_init ;
 	volatile int	f_initdone ;
 	int		serial ;
-} ;
+    } ; /* end struct (pretime_head) */
+}
 
 
 /* forward references */

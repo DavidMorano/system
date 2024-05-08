@@ -21,9 +21,10 @@
 
 	Description:
 	This subroutine constructs a filename (a single filename
-	component) out of several possible strings.  The first
-	string is a base name, the other possible strings are suffix
-	components.
+	component) given the supplied c-strings.  The first string
+	is a base name, the other possible strings are suffix
+	components.  The destination (result) buffer is assumed to
+	be MAXPATHLEN in length (+1 for the terminating NUL character).
 
 	Synopsis:
 	int mkfnamesuf(char *ofname,int n,cc *p1,...) noex

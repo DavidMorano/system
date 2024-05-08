@@ -78,6 +78,7 @@
 #include	<ucfdmanip.h>
 #include	<uctimer.h>
 #include	<ucgetpid.h>
+#include	<ucrand.h>
 #include	<ucgetrandom.h>
 
 

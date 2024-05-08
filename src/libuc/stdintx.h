@@ -58,6 +58,30 @@ typedef const longlong		clonglong ;
 typedef const ulonglong		culonglong ;
 #endif
 
+/* pointers */
+
+#ifndef	TYPEDEF_LONGLONGP
+#define	TYPEDEF_LONGLONGP
+typedef __int128 *		longlongp ;
+#endif /* TYPEDEF_LONGLONGP */
+
+#ifndef	TYPEDEF_ULONGLONGP
+#define	TYPEDEF_ULONGLONGP
+typedef unsigned __int128	ulonglongp ;
+#endif /* TYPEDEF_ULONGLONGP */
+
+/* pointers-to-constant */
+
+#ifndef	TYPEDEF_CLONGLONGP
+#define	TYPEDEF_CLONGLONGP
+typedef const longlong *	clonglongp ;
+#endif
+
+#ifndef	TYPEDEF_CULONGLONGP
+#define	TYPEDEF_CULONGLONGP
+typedef const ulonglong *	culonglongp ;
+#endif
+
 #ifdef	__cplusplus
 
 #include	<type_traits>

@@ -51,10 +51,6 @@
 
 /* local defines */
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	16
-#endif
-
 
 /* imported namespaces */
 

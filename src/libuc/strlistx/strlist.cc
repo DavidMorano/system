@@ -75,26 +75,28 @@
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
 
+#ifndef	MODP2
 #define	MODP2(v,n)	((v) & ((n) - 1))
+#endif
 
 #ifndef	MAXMAPSIZE
 #define	MAXMAPSIZE	(512*1024*1024)
 #endif
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
-
-
-/* exported variables */
-
-SL_OBJ	strlist_mod = {
-	"strlist",
-	sizeof(strlist),
-	sizeof(strlist_cur)
-} ;
 
 
 /* local structures */
@@ -108,6 +110,44 @@ enum itentries {
 
 
 /* forward references */
+
+template<typename ... Args>
+static int strlist_ctor(strlist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->fhp = new(nothrow) strlisthdr) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-strlisthdr) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strlist_ctor) */
+
+static int strlist_dtor(strlist *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->fhp) {
+		delete op->fhp ;
+		op->fhp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strlist_dtor) */
+
+template<typename ... Args>
+static inline int strlist_magic(strlist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == STRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (strlist_magic) */
 
 static int strlist_dbloadbegin(SL *,time_t) noex ;
 static int strlist_dbloadend(SL *) noex ;
@@ -128,318 +168,252 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 /* exported variables */
 
+SL_OBJ	strlist_mod = {
+	"strlist",
+	sizeof(strlist),
+	sizeof(strlist_cur)
+} ;
+
 
 /* exported subroutines */
 
 int strlist_open(SL *op,cchar *dbname) noex {
 	const time_t	dt = time(nullptr) ;
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	{
-	    int		pl = -1 ;
-	    char	adb[MAXPATHLEN+1] ;
-	    if (dbname[0] != '/') {
-	        char	pwd[MAXPATHLEN+1] ;
-	        if ((rs = getpwd(pwd,MAXPATHLEN)) >= 0) {
-	            rs = mkpath2(adb,pwd,dbname) ;
-	            pl = rs ;
-	            dbname = adb ;
-	        }
+	int		rs ;
+	int		rs1 ;
+	if ((rs = strlist_ctor(op,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbname[0]) {
+		absfn	db ;
+		cchar	*fnp{} ;
+		if ((rs = db.start(dbname,-1,&fnp)) >= 0) {
+		    cint	fnl = rs ;
+	    	    cchar	*cp ;
+	            if ((rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
+	                op->dbname = cp ;
+		        if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
+			    op->ti_lastcheck = dt ;
+			    op->magic = STRLIST_MAGIC ;
+		        }
+		        if (rs < 0) {
+	    		    uc_free(op->dbname) ;
+	    		    op->dbname = nullptr ;
+		        }
+		    } /* end if (memory-allocation) */
+		    rs1 = db.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (absfn) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		strlist_dtor(op) ;
 	    }
-	    if (rs >= 0) {
-	    	cchar	*cp ;
-	        if ((rs = uc_mallocstrw(dbname,pl,&cp)) >= 0) {
-	            op->dbname = cp ;
-		    if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
-			op->ti_lastcheck = dt ;
-			op->magic = STRLIST_MAGIC ;
-		    }
-		    if (rs < 0) {
-	    		uc_free(op->dbname) ;
-	    		op->dbname = nullptr ;
-		    }
-		} /* end if (memory-allocation) */
-	    } /* end if */
-	} /* end block */
-
+	} /* end if (strlist_ctor) */
 	return rs ;
 }
 /* end subroutine (strlist_open) */
 
 int strlist_close(SL *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = strlist_dbloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->dbname != nullptr) {
-	    rs1 = uc_free(op->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = strlist_magic(op)) >= 0) {
+	    {
+	        rs1 = strlist_dbloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->dbname) {
+	        rs1 = uc_free(op->dbname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbname = nullptr ;
+	    }
+	    {
+		rs1 = strlist_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlist_close) */
 
 int strlist_getinfo(SL *op,SL_INFO *vip) noex {
-	SL_FM	*fip ;
-	strlisthdr	*hip ;
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (vip == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	memclear(vip) ;
-
-	fip = &op->vf ;
-	hip = op->fhp ;
-
-	vip->mtime = fip->ti_mod ;
-	vip->wtime = (time_t) hip->wtime ;
-
-	vip->nstrlist = hip->nstrs ;
-	vip->nskip = hip->nskip ;
-
+	int		rs ;
+	if ((rs = strlist_magic(op,vip)) >= 0) {
+	    SL_FM	*fip = &op->vf ;
+	    strlisthdr	*hip = op->fhp ;
+	    memclear(vip) ;
+	    {
+	        vip->mtime = fip->ti_mod ;
+	        vip->wtime = (time_t) hip->wtime ;
+	    }
+	    {
+	        vip->nstrlist = hip->nstrs ;
+	        vip->nskip = hip->nskip ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlist_info) */
 
 int strlist_audit(SL *op) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-/* verify that all list pointers and list entries are valid */
-
-	rs = strlist_ouraudit(op) ;
-
+	if ((rs = strlist_magic(op)) >= 0) {
+	    rs = strlist_ouraudit(op) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlist_audit) */
 
 int strlist_count(SL *op) noex {
-	strlisthdr	*hip ;
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	hip = op->fhp ;
-	return (rs >= 0) ? hip->nstrs : rs ;
+	int		rs ;
+	int		nstrs = 0 ;
+	if ((rs = strlist_magic(op)) >= 0) {
+	    strlisthdr	*hip = op->fhp ;
+	    nstrs = hip->nstrs ;
+	} /* end if (magic) */
+	return (rs >= 0) ? nstrs : rs ;
 }
 /* end subroutine (strlist_count) */
 
 int strlist_curbegin(SL *op,SL_CUR *curp) noex {
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = 0 ;
-	curp->chash = 0 ;
-	op->ncursors += 1 ;
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = strlist_magic(op,curp)) >= 0) {
+	    curp->i = 0 ;
+	    curp->chash = 0 ;
+	    op->ncursors += 1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (strlist_curbegin) */
 
 int strlist_curend(SL *op,SL_CUR *curp) noex {
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = 0 ;
-	if (op->ncursors > 0) {
-	    op->ncursors -= 1 ;
-	}
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = strlist_magic(op,curp)) >= 0) {
+	    curp->i = 0 ;
+	    if (op->ncursors > 0) {
+	        op->ncursors -= 1 ;
+	    }
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (strlist_curend) */
 
 int strlist_look(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
-	SL_CUR	dcur ;
-	SL_MI	*mip ;
-	strlisthdr	*hip ;
-	uint		khash, nhash, chash ;
-	uint		hi ;
-	uint		ki ;
-	int		rs = SR_OK ;
-	int		ri, c ;
-	int		(*rt)[1] ;
-	int		(*it)[3] ;
+	int		rs ;
 	int		vl = 0 ;
-	int		f_mat = FALSE ;
-	cchar	*kst ;
-	cchar	*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	if (curp == nullptr) {
-	    curp = &dcur ;
-	    curp->i = 0 ;
-	}
-
-	if (kl < 0)
-	    kl = strlen(kp) ;
-
-	mip = &op->mi ;
-	hip = op->fhp ;
-
-	kst = mip->kst ;
-	rt = mip->rt ;
-	it = mip->it ;
-
-	if (curp->i <= 0) {
-
-/* unhappy or not, the index-table uses same-hash-linking! */
-
-	    khash = hash_elf(kp,kl) ;
-
-	    nhash = khash ;
-	    chash = (khash & INT_MAX) ;
-	    curp->chash = chash ;	/* store "check" hash */
-
-	    hi = hashindex(khash,hip->itlen) ;
-
-	    c = 0 ;
-	    while ((ri = it[hi][itentry_ri]) > 0) {
-
-	        f_mat = ((it[hi][itentry_info] & INT_MAX) == chash) ;
-	        if (f_mat) {
-	            ki = rt[ri][0] ;
-	            cp = (kst + ki) ;
-	            f_mat = (cp[0] == kp[0]) && ismatkey(cp,kp,kl) ;
-	        }
-
-	        if (f_mat)
-	            break ;
-
-	        if ((it[hi][itentry_info] & (~ INT_MAX)) == 0)
-	            break ;
-
-	        if (c >= int(hip->itlen + hip->nskip))
-	            break ;
-
-	        nhash = hash_again(nhash,c++,hip->nskip) ;
-
-	        hi = hashindex(nhash,hip->itlen) ;
-
-	    } /* end while */
-
-	    if ((rs >= 0) && (! f_mat)) {
-	        rs = SR_NOTFOUND ;
-	    }
-
-	} else {
-
-	    chash = curp->chash ;
-	    hi = curp->i ;
-
-	    if (hi < hip->itlen) {
-
-	        ri = it[hi][itentry_ri] ;
-
-	        if (ri > 0) {
-
-	            hi = it[hi][itentry_nhi] ;
-
-	            if (hi != 0) {
-
-	                ri = it[hi][itentry_ri] ;
-	                f_mat = ((it[hi][itentry_info] & INT_MAX) == chash) ;
-	                if ((ri > 0) && f_mat) {
-	                    ki = rt[ri][0] ;
-	                    f_mat = ismatkey((kst + ki),kp,kl) ;
-	                }
-
-	                if (! f_mat) {
-	                    rs = SR_NOTFOUND ;
-			}
-	            } else {
-	                rs = SR_NOTFOUND ;
-		    }
-	        } else {
-	            rs = SR_NOTFOUND ;
-		}
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    }
-	} /* end if (preparation) */
-
-/* if successful, retrieve value */
-
-	if (rs >= 0) {
-	    curp->i = hi ;
-	} /* end if (got one) */
-
+	if ((rs = strlist_magic(op,curp,kp)) >= 0) {
+            SL_CUR          dcur ;
+            SL_MI           *mip ;
+            strlisthdr      *hip ;
+            uint            khash, nhash, chash ;
+            uint            hi ;
+            uint            ki ;
+            int             ri, c ;
+            int             (*rt)[1] ;
+            int             (*it)[3] ;
+            bool            f_mat = false ;
+            cchar   *kst ;
+            cchar   *cp ;
+            if (curp == nullptr) {
+                curp = &dcur ;
+                curp->i = 0 ;
+            }
+            if (kl < 0) kl = strlen(kp) ;
+            mip = &op->mi ;
+            hip = op->fhp ;
+            kst = mip->kst ;
+            rt = mip->rt ;
+            it = mip->it ;
+            if (curp->i <= 0) {
+    /* unhappy or not, the index-table uses same-hash-linking! */
+                khash = hash_elf(kp,kl) ;
+                nhash = khash ;
+                chash = (khash & INT_MAX) ;
+                curp->chash = chash ;       /* store "check" hash */
+                hi = hashindex(khash,hip->itlen) ;
+                c = 0 ;
+                while ((ri = it[hi][itentry_ri]) > 0) {
+                    f_mat = ((it[hi][itentry_info] & INT_MAX) == chash) ;
+                    if (f_mat) {
+                        ki = rt[ri][0] ;
+                        cp = (kst + ki) ;
+                        f_mat = (cp[0] == kp[0]) && ismatkey(cp,kp,kl) ;
+                    }
+                    if (f_mat) break ;
+                    if ((it[hi][itentry_info] & (~ INT_MAX)) == 0) break ;
+                    if (c >= int(hip->itlen + hip->nskip)) break ;
+                    nhash = hash_again(nhash,c++,hip->nskip) ;
+                    hi = hashindex(nhash,hip->itlen) ;
+                } /* end while */
+                if ((rs >= 0) && (! f_mat)) {
+                    rs = SR_NOTFOUND ;
+                }
+            } else {
+                chash = curp->chash ;
+                hi = curp->i ;
+                if (hi < hip->itlen) {
+                    ri = it[hi][itentry_ri] ;
+                    if (ri > 0) {
+                        hi = it[hi][itentry_nhi] ;
+                        if (hi != 0) {
+                            ri = it[hi][itentry_ri] ;
+			    {
+				cuint thash = (it[hi][itentry_info] & INT_MAX) ;
+                                f_mat = (thash == chash) ;
+			    }
+                            if ((ri > 0) && f_mat) {
+                                ki = rt[ri][0] ;
+                                f_mat = ismatkey((kst + ki),kp,kl) ;
+                            }
+                            if (! f_mat) {
+                                rs = SR_NOTFOUND ;
+                            }
+                        } else {
+                            rs = SR_NOTFOUND ;
+                        }
+                    } else {
+                        rs = SR_NOTFOUND ;
+                    }
+                } else {
+                    rs = SR_NOTFOUND ;
+                }
+            } /* end if (preparation) */
+    	    /* if successful, retrieve value */
+            if (rs >= 0) {
+                curp->i = hi ;
+            } /* end if (got one) */
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (strlist_look) */
 
 int strlist_enum(SL *op,SL_CUR *curp,char *kbuf,int klen) noex {
-	SL_MI	*mip ;
-	strlisthdr	*hip ;
-	uint		ri, ki ;
-	int		rs = SR_OK ;
-	cchar	*kp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRLIST_MAGIC) return SR_NOTOPEN ;
-
-	if (op->ncursors == 0) return SR_INVALID ;
-
-	kbuf[0] = '\0' ;
-
-	mip = &op->mi ;
-	hip = op->fhp ;
-
-	ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
-
-/* ok, we're good to go */
-
-	if (ri < hip->rtlen) {
-	    ki = mip->rt[ri][0] ;
-	    if (ki < hip->stlen) {
-	        kp = mip->kst + ki ;
-	        if ((rs = sncpy1(kbuf,klen,kp)) >= 0) {
-	            curp->i = ri ;
-		}
-	    } else {
-	        rs = SR_BADFMT ;
-	    }
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
-
+	int		rs ;
+	if ((rs = strlist_magic(op,curp,kbuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (op->ncursors > 0) {
+	        SL_MI		*mip = &op->mi ;
+	        strlisthdr	*hip = op->fhp ;
+	        uint		ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
+	        uint		ki ;
+	        cchar		*kp ;
+		rs = SR_OK ;
+	        kbuf[0] = '\0' ;
+                /* ok, we are good to go */
+	        if (ri < hip->rtlen) {
+	            ki = mip->rt[ri][0] ;
+	            if (ki < hip->stlen) {
+	                kp = mip->kst + ki ;
+	                if ((rs = sncpy1(kbuf,klen,kp)) >= 0) {
+	                    curp->i = ri ;
+		        }
+	            } else {
+	                rs = SR_BADFMT ;
+	            }
+	        } else {
+	            rs = SR_NOTFOUND ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (strlist_enum) */
@@ -496,107 +470,112 @@ static int strlist_dbmapdestroy(SL *op) noex {
 /* end subroutine (strlist_dbmapdestroy) */
 
 static int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
-	cint		of = O_RDONLY ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	cmode		om = 0666 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if ((rs = u_open(fn,of,om)) >= 0) {
-	    USTAT	sb ;
-	    cint	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
-	  	if (sb.st_size <= MAXMAPSIZE) {
+	if (op && fip) {
+	    cint	of = O_RDONLY ;
+	    cmode	om = 0666 ;
+	    if ((rs = u_open(fn,of,om)) >= 0) {
+	        USTAT	sb ;
+	        cint	fd = rs ;
+	        if ((rs = u_fstat(fd,&sb)) >= 0) {
 		    cnullptr	np{} ;
-	            size_t	ms = size_t(sb.st_size) ;
-	            int		mp = PROT_READ ;
-	            int		mf = MAP_SHARED ;
-	            void	*md{} ;
-	            if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
-	                fip->mdata = charp(md) ;
-	                fip->msize = ms ;
-	                fip->ti_mod = sb.st_mtime ;
-	                fip->ti_map = dt ;
-	            }
-		} else {
-		    rs = SR_TOOBIG ;
-		}
-	    } /* end if (stat) */
-	    rs1 = u_close(fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (mapped file) */
-
+	  	    if (sb.st_size <= MAXMAPSIZE) {
+	                csize	ms = size_t(sb.st_size) ;
+	                int	mp = PROT_READ ;
+	                int	mf = MAP_SHARED ;
+	                void	*md{} ;
+	                if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	                    fip->mdata = charp(md) ;
+	                    fip->msize = ms ;
+	                    fip->ti_mod = sb.st_mtime ;
+	                    fip->ti_map = dt ;
+	                }
+		    } else {
+		        rs = SR_TOOBIG ;
+		    }
+	        } /* end if (stat) */
+	        rs1 = u_close(fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (mapped file) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (strlist_filemapcreate) */
 
 static int strlist_filemapdestroy(SL *op,SL_FM *fip) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (fip->mdata) {
-	    rs = u_mmapend(fip->mdata,fip->msize) ;
-	    fip->mdata = nullptr ;
-	    fip->msize = 0 ;
-	    fip->ti_map = 0 ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (op && fip) {
+	    rs = R_OK ;
+	    if (fip->mdata) {
+		void	*md = fip->mdata ;
+		csize	ms = fip->msize ;
+	        rs = u_mmapend(md,ms) ;
+	        fip->mdata = nullptr ;
+	        fip->msize = 0 ;
+	        fip->ti_map = 0 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (strlist_filemapdestroy) */
 
 static int strlist_dbproc(SL *op,time_t dt) noex {
-	SL_FM	*fip = &op->vf ;
-	SL_MI	*mip = &op->mi ;
+	SL_FM		*fip = &op->vf ;
+	SL_MI		*mip = &op->mi ;
 	strlisthdr	*hip = op->fhp ;
-	int		rs ;
-	if ((rs = strlisthdr_msg(hip,1,fip->mdata,fip->msize)) >= 0) {
-	    if ((rs = strlist_viverify(op,dt)) >= 0) {
-	        mip->rt = (int (*)[1]) (fip->mdata + hip->rtoff) ;
-	        mip->it = (int (*)[3]) (fip->mdata + hip->itoff) ;
-	        mip->kst = (char *) (fip->mdata + hip->stoff) ;
-	    }
-	}
+	int		rs = SR_FAULT ;
+	if (hip) {
+	    cint	hl = int(fip->msize) ;
+	    cchar	*hp = charp(fip->mdata) ;
+	    if ((rs = strlisthdr_wr(hip,hp,hl)) >= 0) { /* write-object */
+	        if ((rs = strlist_viverify(op,dt)) >= 0) {
+	            mip->rt = (int (*)[1]) (fip->mdata + hip->rtoff) ;
+	            mip->it = (int (*)[3]) (fip->mdata + hip->itoff) ;
+	            mip->kst = (char *) (fip->mdata + hip->stoff) ;
+	        }
+	    } /* end if (strlsthdr_wr) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (strlist_dbproc) */
 
 static int strlist_viverify(SL *op,time_t dt) noex {
-	SL_FM	*fip = &op->vf ;
+	SL_FM		*fip = &op->vf ;
 	strlisthdr	*hip = op->fhp ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
 	int		sz ;
-	int		f = TRUE ;
-
-	f = f && (hip->fsize == fip->msize) ;
-	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-	f = f && (hip->stoff <= fip->msize) ;
-	f = f && ((hip->stoff + hip->stlen) <= fip->msize) ;
-
-	f = f && (hip->rtoff <= fip->msize) ;
-	sz = (hip->rtlen + 1) * 2 * sizeof(int) ;
-	f = f && ((hip->rtoff + sz) <= fip->msize) ;
-
-	f = f && (hip->itoff <= fip->msize) ;
-	sz = (hip->itlen + 1) * 3 * sizeof(int) ;
-	f = f && ((hip->itoff + sz) <= fip->msize) ;
-
+	bool		f = true ;
+	{
+	    f = f && (hip->fsize == fip->msize) ;
+	    f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
+	    f = f && (hip->stoff <= fip->msize) ;
+	    f = f && ((hip->stoff + hip->stlen) <= fip->msize) ;
+	}
+	{
+	    f = f && (hip->rtoff <= fip->msize) ;
+	    sz = (hip->rtlen + 1) * 2 * sizeof(int) ;
+	    f = f && ((hip->rtoff + sz) <= fip->msize) ;
+	}
+	{
+	    f = f && (hip->itoff <= fip->msize) ;
+	    sz = (hip->itlen + 1) * 3 * sizeof(int) ;
+	    f = f && ((hip->itoff + sz) <= fip->msize) ;
+	}
 /* an extra (redundant) value */
-
-	f = f && (hip->nstrs == (hip->rtlen - 1)) ;
-
-	if (! f)
+	{
+	    f = f && (hip->nstrs == (hip->rtlen - 1)) ;
+	}
+	if (! f) {
 	    rs = SR_BADFMT ;
-
+	}
 	return rs ;
 }
 /* end subroutine (strlist_viverify) */
 
 static int strlist_ouraudit(SL *op) noex {
-	SL_MI	*mip = &op->mi ;
+	SL_MI		*mip = &op->mi ;
 	strlisthdr	*hip = op->fhp ;
 	uint		khash, chash ;
 	int		rs = SR_OK ;
@@ -605,13 +584,10 @@ static int strlist_ouraudit(SL *op) noex {
 	int		(*it)[3] ;
 	cchar	*kst ;
 	cchar	*cp ;
-
 	rt = mip->rt ;
 	it = mip->it ;
 	kst = mip->kst ;
-
 /* record table */
-
 	if ((rt[0][0] != 0) || (rt[0][1] != 0)) {
 	    rs = SR_BADFMT ;
 	}
@@ -632,15 +608,12 @@ static int strlist_ouraudit(SL *op) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for (record table entries) */
-
 /* index table */
-
 	if (rs >= 0) {
 	    if ((it[0][0] != 0) || (it[0][1] != 0) || (it[0][2] != 0)) {
 	        rs = SR_BADFMT ;
 	    }
 	}
-
 	for (uint i = 1 ; (rs >= 0) && (i < hip->itlen) ; i += 1) {
 	    if (it[i][0] != 0) {
 	        uint	ri = it[i][0] ;
@@ -665,7 +638,6 @@ static int strlist_ouraudit(SL *op) noex {
 		}
 	    } /* end if */
 	} /* end for (index table entries) */
-
 	return rs ;
 }
 /* end subroutine (strlist_ouraudit) */

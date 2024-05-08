@@ -1,4 +1,4 @@
-# MAKEFILE (machav)
+# MAKEFILE (machave)
 
 T= machave
 
@@ -8,6 +8,7 @@ ALL= $(T).x
 BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
+RUNDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
@@ -21,10 +22,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -34,27 +35,31 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
 
-LDRPATH= $(EXTRA)/lib
+INCS += usyscalls.h localmisc.h
+
+LIBS += -lmacuser -lu
+
+
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS= -luserhome
 
+LDRPATH= $(USRLOCAL)/lib
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+LDFLAGS= $(MAKELDFLAGS) -rpath $(LDRPATH)
 
 
-INCS= usystem.h localmisc.h
-
-
-OBJ_USERHOME= main.o
+OBJ_MACHAVE= main.o
 
 
 default:		$(T).x
@@ -77,14 +82,14 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).x:			$(OBJ_USERHOME)
-	$(LD) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
+$(T).x:			$(OBJ_MACHAVE)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJ_MACHAVE) $(LIBINFO)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
 again:
-	rm -f $(TALL)
+	rm -f $(T).x
 
 clean:
 	makeclean $(ALL)

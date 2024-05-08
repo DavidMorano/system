@@ -1,7 +1,7 @@
-/* random SUPPORT */
+/* librandom SUPPORT */
 /* lang=C++20 */
 
-/* random object */
+/* librandom object */
 /* version %I% last-modified %G% */
 
 
@@ -10,8 +10,8 @@
 	= 1998-04-23, David A­D­ Morano
 	I made this object to mimic the behavior of the UNIX® System
 	RNG |random()| but to make it thread safe (and object
-	oriented)! So many stupid subroutines in UNIX® are not
-	thread safe and there is no need for it all! But those
+	oriented)!  So many stupid subroutines in UNIX® are not
+	thread safe and there is no need for it all!  But those
 	Computer Science types who were so instrumental in developing
 	UNIX® and its libraries in the first place were not the
 	smartest when it came to production-grade computer software!
@@ -23,10 +23,10 @@
 
 /*******************************************************************************
 
-	This is a knock-off of the UNIX® System |random(3)| library
-	RNG.  I support the same "types" as it did ; namely five
-	in all with type zero being the old stupid LC RNG that
-	produces crap!  If you want it, it is there.
+	This is a knock-off of the UNIX® System |librandom(3)|
+	library RNG.  I support the same "types" as it did ; namely
+	five in all with type zero being the old Linear-Congruent
+	(LC) RNG.
 
 *******************************************************************************/
 
@@ -38,7 +38,7 @@
 #include	<randlc.h>
 #include	<localmisc.h>
 
-#include	"random.h"
+#include	"librandom.h"
 
 
 /* local defines */
@@ -62,8 +62,6 @@
 #define	TYPE_4		4		/* x**63 + x**1 + 1 */
 #define	DEG_4		63
 #define	SEP_4		1
-
-#define	MAX_TYPES	5		/* max number of types above */
 
 
 /* imported namespaces */
@@ -91,11 +89,11 @@ static constexpr uint randtbl[] = {
 	0x4382aee7, 0x535b6b41, 0xf3bec5da, 0
 } ;
 
-static constexpr int degrees[MAX_TYPES] = {
+static constexpr int degrees[LIBRANDOM_NTYPES] = {
 	DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 
 } ;
 
-static constexpr int seps[MAX_TYPES] =	{
+static constexpr int seps[LIBRANDOM_NTYPES] = {
 	SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 
 } ;
 
@@ -105,11 +103,11 @@ static constexpr int seps[MAX_TYPES] =	{
 
 /* exported subroutines */
 
-int random_start(random *rp,int type,uint seed) noex {
+int librandom_start(librandom *rp,int type,uint seed) noex {
 	int		rs = SR_FAULT ;
 	if (rp) {
 	    rs = SR_NOTSUP ;
-	    if (type < MAX_TYPES) {
+	    if (type < LIBRANDOM_NTYPES) {
 	        ulong	hi, lo ;
 	        uint	ihi, ilo, uiw ;
 	        rs = memclear(rp) ;
@@ -122,23 +120,21 @@ int random_start(random *rp,int type,uint seed) noex {
 	        rp->fptr = rp->state + rp->rand_sep ;
 	        rp->rptr = rp->state ;
 	        rp->end_ptr = rp->state + rp->rand_deg ;
-	        if (seed == 0) {
+		{
 	            for (int i = 0 ; randtbl[i] != 0 ; i += 1) {
-	                uiw = (uint) randlc(randtbl[i]) ;
-	                hi = uiw ;
+	                hi = uint(randlc(randtbl[i])) ;
 	                lo = randtbl[i] ;
 	                rp->state[i] = (hi << 32) | lo ;
 	                if (type == TYPE_0) break ;
 	            } /* end for */
-	        } else {
+		} /* end block */
+		if (seed != 0) {
 	            for (int i = 0 ; i < 64 ; i += 1) {
-	                ihi = seed ;
-	                seed = (uint) randlc(seed) ;
-	                ilo = seed ;
-	                seed = (uint) randlc(seed) ;
+	                ihi = seed = uint(randlc(seed)) ;
+	                ilo = seed = uint(randlc(seed)) ;
 	                hi = ihi ;
 	                lo = ilo ;
-	                rp->state[i] = (hi << 32) | lo ;
+	                rp->state[i] += ((hi << 32) | lo) ;
 	                if (type == TYPE_0) break ;
 	            } /* end for */
 	        } /* end if (seeding) */
@@ -146,29 +142,29 @@ int random_start(random *rp,int type,uint seed) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (random_start) */
+/* end subroutine (librandom_start) */
 
-int random_finish(random *rp) noex {
+int librandom_finish(librandom *rp) noex {
 	int		rs = SR_FAULT ;
 	if (rp) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (random_finish) */
+/* end subroutine (librandom_finish) */
 
-int random_getuint(random *rp,uint *uip) noex {
+int librandom_getuint(librandom *rp,uint *uip) noex {
 	int		rs = SR_FAULT ;
 	if (rp && uip) {
 	    uint	rv ;
 	    rs = SR_OK ;
 	    if (rp->rand_type == TYPE_0) {
 	        rv = rp->state[0] ;
-	        rv = (uint) randlc(rv) ;
+	        rv = uint(randlc(rv)) ;
 	        rp->state[0] = rv ;
 	    } else {
 	        *rp->fptr += *rp->rptr ;
-	        rv = (uint) *rp->fptr ;
+	        rv = uint(*rp->fptr) ;
 	        if (++rp->fptr >= rp->end_ptr) {
 	            rp->fptr = rp->state ;
 	            rp->rptr += 1 ;
@@ -180,16 +176,16 @@ int random_getuint(random *rp,uint *uip) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (random_getuint) */
+/* end subroutine (librandom_getuint) */
 
-int random_getint(random *rp,int *ip) noex {
+int librandom_getint(librandom *rp,int *ip) noex {
 	int		rs = SR_FAULT ;
 	if (rp && ip) {
 	    int		rv ;
 	    rs = SR_OK ;
 	    if (rp->rand_type == TYPE_0) {
-	        rv = (int) rp->state[0] ;
-	        rv = (int) randlc(rv) ;
+	        rv = int(rp->state[0]) ;
+	        rv = int(randlc(rv)) ;
 	        rp->state[0] = ulong(rv) ;
 	    } else {
 	        *rp->fptr += *rp->rptr ;
@@ -201,23 +197,23 @@ int random_getint(random *rp,int *ip) noex {
 	            rp->rptr = rp->state ;
 	        }
 	    } /* end if */
-	    *ip = (int) rv ;
+	    *ip = int(rv) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (random_getint) */
+/* end subroutine (librandom_getint) */
 
-int random_getulong(random *rp,ulong *ulp) noex {
+int librandom_getulong(librandom *rp,ulong *ulp) noex {
 	int		rs = SR_FAULT ;
 	if (rp && ulp) {
 	    ulong	rv, hi, lo ;
 	    uint	ihi, ilo ;
 	    rs = SR_OK ;
 	    if (rp->rand_type == TYPE_0) {
-	        ihi = (uint) (rp->state[0]) ;
-	        ilo = (uint) (rp->state[0] >> 32) ;
-	        ihi = (uint) randlc(ihi) ;
-	        ilo = (uint) randlc(ilo) ;
+	        ihi = uint(rp->state[0]) ;
+	        ilo = uint(rp->state[0] >> 32) ;
+	        ihi = uint(randlc(ihi)) ;
+	        ilo = uint(randlc(ilo)) ;
 	        hi = ihi ;
 	        lo = ilo ;
 	        rv = (hi << 32) | lo ;
@@ -236,6 +232,6 @@ int random_getulong(random *rp,ulong *ulp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (random_getulong) */
+/* end subroutine (librandom_getulong) */
 
 

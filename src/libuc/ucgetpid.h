@@ -19,14 +19,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
 extern int	uc_getpid() noex ;
-extern void	uc_setpid(pid_t) noex ;
+extern int	uc_setpid(pid_t) noex ;
 
 EXTERNC_end
 

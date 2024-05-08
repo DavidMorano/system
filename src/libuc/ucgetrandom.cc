@@ -18,6 +18,7 @@
 #include	<sys/types.h>
 #include	<sys/random.h>		/* |getentropy(2)| */
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usysflag.h>

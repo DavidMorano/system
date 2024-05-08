@@ -1,10 +1,8 @@
-/* testgetrandom */
+/* testgetrandom SUPPORT */
 /* lang=C89 */
-
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debugging memory-allocations */
-
 
 /* revision history:
 
@@ -15,14 +13,14 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/random.h>
 #include	<stdarg.h>
 #include	<stdio.h>
 #include	<usystem.h>
 #include	<localmisc.h>
+
 
 /* local defines */
 
@@ -40,29 +38,30 @@
 #define	VARCOLUMNS	"COLUMNS"
 
 extern int	cfdeci(cchar *,int,int *) ;
-extern int	fbwrite(FILE *,const void *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	fbwrite(FILE *,cvoid *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar 	*getourenv(const char **,const char *) ;
+extern cchar 	*getourenv(cchar **,cchar *) ;
 
 extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint		mo_start = 0 ;

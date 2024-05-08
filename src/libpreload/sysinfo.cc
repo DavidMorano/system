@@ -1,9 +1,8 @@
-/* sysinfo */
+/* sysinfo SUPPORT */
+/* lang=C++20 */
 
 /* System-Information UNIX® System interposer */
-
-
-#define	CF_DEBUGN	0		/* special debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -38,28 +37,28 @@
 	Q. Why are you so smart?
 	A. I do not know.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<errno.h>
+#include	<cerrno>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<preload.h>
 #include	<buffer.h>
 #include	<vecstr.h>
 #include	<filer.h>
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<localmisc.h>
+
+#include	"preload.h"
 
 
 /* local defines */
@@ -95,29 +94,20 @@
 #define	NDF		"sysinfo.deb"
 
 
-/* typedefs */
+/* imported subroutines */
 
-typedef	int (*sysinfo_func)(int,char *,long) ;
+
+/* local typedefs */
+
+extern "C" {
+    typedef	int (*sysinfo_func)(int,char *,long) noex ;
+}
 
 
 /* external subroutines */
 
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfnumui(const char *,int,uint *) ;
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexul(const char *,int,ulong *) ;
-extern int	vecstr_envfile(VECSTR *,const char *) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	isNotPresent(int) ;
 
-#if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -129,22 +119,23 @@ struct sysinfo_head {
 
 /* forward references */
 
-static int	sysinfo_hwserial(char *,long) ;
-static int	sysinfo_setdomain(int,char *,long) ;
-static int	sysinfo_setdomainlog(int,char *,long,long) ;
-static int	sysinfo_next(int,char *,long) ;
+static unixret_t	sysinfo_hwserial(char *,long) noex ;
+static unixret_t	sysinfo_setdomain(int,char *,long) noex ;
+static unixret_t	sysinfo_next(int,char *,long) noex ;
 
-static int	sysinfo_varhwserial(BUFFER *) ;
-static int	sysinfo_varhostid(BUFFER *) ;
-static int	sysinfo_var(BUFFER *,const char *) ;
-static int	sysinfo_file(BUFFER *) ;
-static int	sysinfo_def(BUFFER *) ;
+static int	sysinfo_setdomainlog(int,char *,long,long) noex ;
+
+static int	sysinfo_varhwserial(BUFFER *) noex ;
+static int	sysinfo_varhostid(BUFFER *) noex ;
+static int	sysinfo_var(BUFFER *,cchar *) noex ;
+static int	sysinfo_file(BUFFER *) noex ;
+static int	sysinfo_def(BUFFER *) noex ;
 
 #ifdef	COMMENT
-static int	sysinfo_defer(BUFFER *,int,const char *) ;
+static int	sysinfo_defer(BUFFER *,int,cchar *) noex ;
 #endif /* COMMENT */
 
-static int	uload_hwserial(char *,const char *,long) ;
+static int	uload_hwserial(char *,cchar *,long) noex ;
 
 
 /* local variables */
@@ -156,19 +147,14 @@ static int	(*sysinfos[])(BUFFER *) = {
 	sysinfo_varhostid,
 	sysinfo_file,
 	sysinfo_def,
-	NULL
+	nullptr
 } ;
 
 
 /* exported subroutines */
 
-
-int sysinfo(int name,char *ubuf,long len)
-{
+unixret_t sysinfo(int name,char *ubuf,long len) noex {
 	int		rc = 0 ;
-#if	CF_DEBUGN
-	nprintf(NDF,"sysinfo: ent n=%u\n",name) ;
-#endif
 	ubuf[0] = '\0' ;
 	if (name == SYSINFO_HWSERIAL) {
 	    rc = sysinfo_hwserial(ubuf,len) ;
@@ -177,10 +163,6 @@ int sysinfo(int name,char *ubuf,long len)
 	} else {
 	    rc = sysinfo_next(name,ubuf,len) ;
 	} /* end if */
-#if	CF_DEBUGN
-	nprintf(NDF,"sysinfo: ret rc=%d\n",rc) ;
-	nprintf(NDF,"sysinfo: ret ubuf=>%s<\n",ubuf) ;
-#endif
 	return rc ;
 }
 /* end subroutine (sysinfo) */
@@ -188,29 +170,22 @@ int sysinfo(int name,char *ubuf,long len)
 
 /* local subroutines */
 
-
-static int sysinfo_next(int name,char *rbuf,long len)
-{
+static unixret_t sysinfo_next(int name,char *rbuf,long len) noex {
 	SYSINFO		*sip = &sysinfo_data ;
 	int		rc = 0 ;
-
-	if (sip->func == NULL) {
+	if (sip->func == nullptr) {
 	    void		*sp = dlsym(RTLD_NEXT,"sysinfo") ;
 	    sip->func = (sysinfo_func) sp ;
 	}
-
-	if (sip->func != NULL) {
+	if (sip->func != nullptr) {
 	    sysinfo_func	func = (sysinfo_func) sip->func ;
 	    rc = (*func)(name,rbuf,len) ;
 	}
-
 	return rc ;
 }
 /* end subroutine (sysinfo_next) */
 
-
-static int sysinfo_setdomain(int name,char *rbuf,long len)
-{
+static int sysinfo_setdomain(int name,char *rbuf,long len) noex {
 	long		rc ;
 	rc = sysinfo_next(name,rbuf,len) ;
 	sysinfo_setdomainlog(name,rbuf,len,rc) ;
@@ -218,56 +193,27 @@ static int sysinfo_setdomain(int name,char *rbuf,long len)
 }
 /* end subroutine (sysinfo_setdomain) */
 
-
-static int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc)
-{
-	const mode_t	om = 0666 ;
-	const int	of = (O_WRONLY|O_APPEND) ;
-	int		rs ;
-	int		rs1 ;
-	cchar		*fn = SYSINFO_LOGDOMAIN ;
-	if ((rs = u_open(fn,of,om)) >= 0) {
-	    FILER	b ;
-	    const int	fd = rs ;
-	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
-		const int	rl = (int) (len & INT_MAX) ;
-		cchar		*fmt = "setoncdomain dn=%t (%ld)\n" ;
-		filer_printf(&b,fmt,rbuf,rl,rc) ;
-		rs1 = filer_finish(&b) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (filer) */
-	    u_close(fd) ;
-	} /* end if (file) */
-	return rs ;
-}
-/* end subroutine (sysinfo_setdomainlog) */
-
-
-static int sysinfo_hwserial(char *ubuf,long len)
-{
-	const int	rlen = SYSINFO_BUFLEN ;
+static unixret_t sysinfo_hwserial(char *ubuf,long len) noex {
+	cint		rlen = SYSINFO_BUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
 	char		*rbuf ;
-#if	CF_DEBUGN
-	nprintf(NDF,"sysinfo_hwserial: ent\n") ;
-#endif
 	if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
-	    const int	di = PRELOAD_DHWSERIAL ;
+	    cint	di = PRELOAD_DHWSERIAL ;
 	    if ((rs = preload_get(di,rbuf,rlen)) == 0) {
-		BUFFER		b ;
-		const int	blen = MAXNAMELEN ;
+		buffer	b ;
+		cint	blen = MAXNAMELEN ;
 		if ((rs = buffer_start(&b,blen)) >= 0) {
 		    int		i ;
-		    for (i = 0 ; sysinfos[i] != NULL ; i += 1) {
+		    for (i = 0 ; sysinfos[i] != nullptr ; i += 1) {
 			rs = (*sysinfos[i])(&b) ;
 			if (rs != 0) break ;
 		    } /* end for */
 		    if (rs > 0) {
 	    		cchar	*bp ;
 	   		if ((rs = buffer_get(&b,&bp)) >= 0) {
-			    const int	ttl = SYSINFO_TTL ;
+			    cint	ttl = SYSINFO_TTL ;
 			    if ((rs = preload_set(di,bp,rs,ttl)) >= 0) {
 	    		        rc = uload_hwserial(ubuf,bp,len) ;
 			    } /* end if (preload_set) */
@@ -281,37 +227,27 @@ static int sysinfo_hwserial(char *ubuf,long len)
 	    } /* end if (cache) */
 	    uc_free(rbuf) ;
 	} /* end if (m-a) */
-
-	if (rs < 0) errno = ENOMEM ; /* only real run-time error */
-#if	CF_DEBUGN
-	nprintf(NDF,"sysinfo_hwserial: ret rs=%d rc=%d\n",rs,rc) ;
-#endif
+	if (rs < 0) errno = (- rs) ;
 	return (rs >= 0) ? rc : 0 ;
 }
 /* end subroutine (sysinfo_hwserial) */
 
-
-static int sysinfo_varhwserial(BUFFER *bdp)
-{
+static int sysinfo_varhwserial(BUFFER *bdp) noex {
 	cchar		*var = VARHWSERIAL ;
 	return sysinfo_var(bdp,var) ;
 }
 /* end subroutine (sysinfo_varhwserial) */
 
-
-static int sysinfo_varhostid(BUFFER *bdp)
-{
+static int sysinfo_varhostid(BUFFER *bdp) noex {
 	cchar		*var = VARHOSTID ;
 	return sysinfo_var(bdp,var) ;
 }
 /* end subroutine (sysinfo_varhostid) */
 
-
-static int sysinfo_var(BUFFER *bdp,cchar *var)
-{
+static int sysinfo_var(BUFFER *bdp,cchar *var) noex {
 	int		rs = SR_OK ;
 	cchar		*vp ;
-	if ((vp = getenv(var)) != NULL) {
+	if ((vp = getenv(var)) != nullptr) {
 	    if (vp[0] != '\0') {
 	        rs = buffer_strw(bdp,vp,-1) ;
 	    }
@@ -320,10 +256,8 @@ static int sysinfo_var(BUFFER *bdp,cchar *var)
 }
 /* end subroutine (sysinfo_var) */
 
-
-static int sysinfo_file(BUFFER *bdp)
-{
-	VECSTR		env ;
+static int sysinfo_file(BUFFER *bdp) noex {
+	vecstr		env ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
@@ -333,9 +267,9 @@ static int sysinfo_file(BUFFER *bdp)
 		cchar	*var = VARHOSTID ;
 		cchar	*ep ;
 		if ((rs = vecstr_finder(&env,var,vstrkeycmp,&ep)) >= 0) {
-		    if (ep != NULL) {
+		    if (ep != nullptr) {
 		        cchar	*tp = strchr(ep,'=') ;
-			if ((tp != NULL) && (tp[1] != '\0')) {
+			if (tp && (tp[1] != '\0')) {
 			    rs = buffer_strw(bdp,(tp+1),-1) ;
 			    rl = rs ;
 			} /* end if (have proper ENV variable) */
@@ -350,19 +284,17 @@ static int sysinfo_file(BUFFER *bdp)
 }
 /* end subroutine (sysinfo_file) */
 
-
-static int sysinfo_def(BUFFER *bdp)
-{
-	const int	name = SI_HW_SERIAL ;
-	const int	dlen = DIGBUFLEN ;
+static int sysinfo_def(BUFFER *bdp) noex {
+	cint		name = SI_HW_SERIAL ;
+	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
 	int		rc ;
 	char		dbuf[DIGBUFLEN+1] ;
 	if ((rc = sysinfo_next(name,dbuf,(dlen+1))) > 1) {
 	    uint	uv ;
 	    if ((rs = cfdecui(dbuf,(rc-1),&uv)) >= 0) {
-		const int	hlen = HEXBUFLEN ;
-		char		hbuf[HEXBUFLEN+1] ;
+		cint	hlen = HEXBUFLEN ;
+		char	hbuf[HEXBUFLEN+1] ;
 		if ((rs = cthexui(hbuf,hlen,uv)) >= 0) {
 		    int	hl = rs ;
 		    if ((rs = buffer_strw(bdp,"0x",2)) >= 0) {
@@ -375,14 +307,35 @@ static int sysinfo_def(BUFFER *bdp)
 }
 /* end subroutine (sysinfo_def) */
 
+static int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc) noex {
+	cint		of = (O_WRONLY|O_APPEND) ;
+	int		rs ;
+	int		rs1 ;
+	cmode		om = 0666 ;
+	cchar		*fn = SYSINFO_LOGDOMAIN ;
+	if ((rs = u_open(fn,of,om)) >= 0) {
+	    filer	b ;
+	    cint	fd = rs ;
+	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
+		cint	rl = int(len & INT_MAX) ;
+		cchar	*fmt = "setoncdomain dn=%t (%ld)\n" ;
+		filer_printf(&b,fmt,rbuf,rl,rc) ;
+		rs1 = filer_finish(&b) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (filer) */
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (file) */
+	return rs ;
+}
+/* end subroutine (sysinfo_setdomainlog) */
 
-static int uload_hwserial(char *ubuf,cchar *rbuf,long len)
-{
+static int uload_hwserial(char *ubuf,cchar *rbuf,long len) noex {
 	uint	uv ;
 	int	rs ;
 	int	rl = 0 ;
 	if ((rs = cfnumui(rbuf,-1,&uv)) >= 0) {
-	    const int	dlen = DIGBUFLEN ;
+	    cint	dlen = DIGBUFLEN ;
 	    char	dbuf[DIGBUFLEN+1] ;
 	    if ((rs = ctdecui(dbuf,dlen,uv)) >= 0) {
 		rl = (strlcpy(ubuf,dbuf,len)+1) ;

@@ -403,17 +403,13 @@ objl.o:			$(OBJL)
 
 # library private subroutine modules
 
-preload.o:		preload.c preload.h
-
-confstr.o:		confstr.c preload.h
-
-sysinfo.o:		sysinfo.c preload.h
-
-gethostid.o:		gethostid.c preload.h
+preload.o:		preload.cc preload.h
+confstr.o:		confstr.cc preload.h
+sysinfo.o:		sysinfo.cc preload.h
+gethostid.o:		gethostid.cc preload.h
 
 
 # general subroutine modules
-
 fsdir.o:		fsdir.c fsdir.h
 
 # POSIX Thread Attribute

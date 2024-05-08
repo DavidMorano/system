@@ -131,9 +131,10 @@ int uc_getpid(void) noex {
 	return rs ;
 }
 
-void uc_setpid(pid_t pid) noex {
+int uc_setpid(pid_t pid) noex {
 	if (pid < 0) pid = getpid() ;
 	ucgetpid_data.pid = pid ;
+	return SR_OK ;
 }
 /* end subroutine (uc_setpid) */
 

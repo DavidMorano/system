@@ -48,6 +48,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"preload.h"
+
 
 /* local defines */
 
@@ -56,6 +58,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -83,7 +88,7 @@ int getpagesize(void) noex {
 	int		rs = SR_OK ;
 	if (psp->ps == 0) {
 	    cint	cmd = _SC_PAGESIZE ;
-	    if ((rs = uc_sysconf(cmd,NULL)) >= 0) {
+	    if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
 	        psp->ps = rs ;
 	    } else {
 	        psp->ps = DEFPAGESIZE ;

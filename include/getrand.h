@@ -19,15 +19,37 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<stdintx.h>
 
 
 EXTERNC_begin
 
 extern int	getrand(void *,int) noex ;
+extern int	getrandi(int *) noex ;
+extern int	getrandl(long *) noex ;
+extern int	getrandll(longlong *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+static inline int getrand(uint *p, int n = 1) noex {
+	cint	sz = sizeof(uint) ;
+	return getrand(p,(sz * n)) ;
+}
+static inline int getrand(ulong *p,int n = 1) noex {
+	cint	sz = sizeof(ulong) ;
+	return getrand(p,(sz * n)) ;
+}
+static inline int getrand(longlong *p,int n = 1) noex {
+	cint	sz = sizeof(ulonglong) ;
+	return getrand(p,(sz * n)) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* GETRAND_INCLUDE */

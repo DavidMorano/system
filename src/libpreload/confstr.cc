@@ -1,9 +1,8 @@
-/* confstr */
+/* confstr SUPPORT */
+/* lang=C++20 */
 
 /* Configuration-String UNIX® System interposer */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -41,20 +40,24 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<errno.h>
+#include	<cerrno>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<buffer.h>
-#include	<preload.h>
 #include	<vecstr.h>
+#include	<sfx.h>
+#include	<vstrkeycmpx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"preload.h"
 
 
 /* local defines */
@@ -76,15 +79,6 @@
 
 /* external subroutines */
 
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	vecstr_envfile(VECSTR *,const char *) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-
 
 /* local structures */
 
@@ -94,39 +88,40 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 static size_t	confstr_cspath(char *,size_t) ;
 static size_t	confstr_next(int,char *,size_t) ;
 
-static int	confstr_var(BUFFER *) ;
-static int	confstr_file(BUFFER *) ;
-static int	confstr_def(BUFFER *) ;
-static int	confstr_defsbin(BUFFER *) ;
-static int	confstr_defer(BUFFER *,int,const char *) ;
+static int	confstr_var(buffer *) ;
+static int	confstr_file(buffer *) ;
+static int	confstr_def(buffer *) ;
+static int	confstr_defsbin(buffer *) ;
+static int	confstr_defer(buffer *,int,cchar *) ;
 
 
 /* local variables */
 
-static int	(*confstrs[])(BUFFER *) = {
+static int	(*confstrs[])(buffer *) = {
 	confstr_var,
 	confstr_file,
 	confstr_def,
-	NULL
+	nullptr
 } ;
 
-static const char	*comps[] = {
+static cchar	*comps[] = {
 	"/usr/preroot/bin",
 	"/usr/xpg4/bin",
 	"/usr/ccs/bin",
 	"/usr/bin",
 	"/usr/SUNWspro/bin",
 	"/usr/extra/bin",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-size_t confstr(int name,char *rbuf,size_t len)
-{
-	size_t	rc = 0 ;
+size_t confstr(int name,char *rbuf,size_t len) noex {
+	size_t		rc = 0 ;
 	if (name == CONFSTR_CSPATH) {
 	    rc = confstr_cspath(rbuf,len) ;
 	} else {
@@ -139,14 +134,14 @@ size_t confstr(int name,char *rbuf,size_t len)
 
 /* local subroutines */
 
+extern "C" {
+    typedef	size_t (*func_confstr)(int,char *,size_t) noex ;
+}
 
-typedef	size_t (*func_confstr)(int,char *,size_t) ;
-
-static size_t confstr_next(int name,char *rbuf,size_t len)
-{
-	size_t	rc = 0 ;
-	void	*sp = dlsym(RTLD_NEXT,"confstr") ;
-	if (sp != NULL) {
+static size_t confstr_next(int name,char *rbuf,size_t len) noex {
+	size_t		rc = 0 ;
+	void		*sp = dlsym(RTLD_NEXT,"confstr") ;
+	if (sp) {
 	    func_confstr	func = (func_confstr) sp ;
 	    rc = (*func)(name,rbuf,len) ;
 	}
@@ -154,22 +149,19 @@ static size_t confstr_next(int name,char *rbuf,size_t len)
 }
 /* end subroutine (confstr_next) */
 
-
-static size_t confstr_cspath(char *ubuf,size_t len)
-{
-	const int	rlen = CONFSTR_BUFLEN ;
+static size_t confstr_cspath(char *ubuf,size_t len) noex {
+	cint		rlen = CONFSTR_BUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	size_t		rc = 0 ;
 	char		*rbuf ;
 	if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
-	    const int	di = PRELOAD_DCSPATH ;
+	    cint	di = PRELOAD_DCSPATH ;
 	    if ((rs = preload_get(di,rbuf,rlen)) == 0) {
-		BUFFER		b ;
-		const int	blen = MAXNAMELEN ;
+		buffer	b ;
+		cint		blen = MAXNAMELEN ;
 		if ((rs = buffer_start(&b,blen)) >= 0) {
-		    int	i ;
-		    for (i = 0 ; confstrs[i] != NULL ; i += 1) {
+		    for (int i = 0 ; confstrs[i] != nullptr ; i += 1) {
 			rs = (*confstrs[i])(&b) ;
 			if (rs != 0) break ;
 		    } /* end for */
@@ -179,7 +171,7 @@ static size_t confstr_cspath(char *ubuf,size_t len)
 		    if (rs >= 0) {
 	    		cchar	*bp ;
 	   		if ((rs = buffer_get(&b,&bp)) >= 0) {
-			    const int	ttl = CONFSTR_TTL ;
+			    cint	ttl = CONFSTR_TTL ;
 			    if ((rs = preload_set(di,bp,rs,ttl)) >= 0) {
 	    		        rc = (strlcpy(ubuf,bp,len)+1) ;
 			    } /* end if (preload_set) */
@@ -191,19 +183,18 @@ static size_t confstr_cspath(char *ubuf,size_t len)
 	    } else {
 		rc = (strlcpy(ubuf,rbuf,len)+1) ;
 	    } /* end if (cache) */
-	    uc_free(rbuf) ;
+	    rs1 = uc_free(rbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
-	if (rs < 0) errno = ENOMEM ; /* only real run-time error */
+	if (rs < 0) errno = (- rs) ;
 	return (rs >= 0) ? rc : 0 ;
 }
 /* end subroutine (confstr_cspath) */
 
-
-static int confstr_var(BUFFER *bdp)
-{
+static int confstr_var(buffer *bdp) noex {
 	int		rs = SR_OK ;
 	cchar		*vp ;
-	if ((vp = getenv(VARCSPATH)) != NULL) {
+	if ((vp = getenv(VARCSPATH)) != nullptr) {
 	    if (vp[0] != '\0') {
 	        rs = buffer_strw(bdp,vp,-1) ;
 	    }
@@ -212,10 +203,8 @@ static int confstr_var(BUFFER *bdp)
 }
 /* end subroutine (confstr_var) */
 
-
-static int confstr_file(BUFFER *bdp)
-{
-	VECSTR		env ;
+static int confstr_file(buffer *bdp) noex {
+	vecstr		env ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
@@ -225,9 +214,9 @@ static int confstr_file(BUFFER *bdp)
 		cchar	*var = VARCSPATH ;
 		cchar	*ep ;
 		if ((rs = vecstr_finder(&env,var,vstrkeycmp,&ep)) >= 0) {
-		    if (ep != NULL) {
+		    if (ep != nullptr) {
 		        cchar	*tp = strchr(ep,'=') ;
-			if ((tp != NULL) && (tp[1] != '\0')) {
+			if ((tp != nullptr) && (tp[1] != '\0')) {
 			    rs = buffer_strw(bdp,(tp+1),-1) ;
 			    rl = rs ;
 			} /* end if (have proper ENV variable) */
@@ -242,15 +231,12 @@ static int confstr_file(BUFFER *bdp)
 }
 /* end subroutine (confstr_file) */
 
-
-static int confstr_def(BUFFER *bdp)
-{
-	int	rs = SR_OK ;
-	int	i ;
-	int	rl = 0 ;
-	for (i = 0 ; (rs >= 0) && (comps[i] != NULL) ; i += 1) {
-	    struct ustat	sb ;
-	    cchar		*dname = comps[i] ;
+static int confstr_def(buffer *bdp) noex {
+	int		rs = SR_OK ;
+	int		rl = 0 ;
+	for (int i = 0 ; (rs >= 0) && comps[i] ; i += 1) {
+	    USTAT	sb ;
+	    cchar	*dname = comps[i] ;
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 		    rs = confstr_defer(bdp,i,dname) ;
@@ -263,10 +249,8 @@ static int confstr_def(BUFFER *bdp)
 }
 /* end subroutine (confstr_def) */
 
-
 /* super El-Cheapo (but correct) way to append a path-component to the end! */
-static int confstr_defsbin(BUFFER *bdp)
-{
+static int confstr_defsbin(buffer *bdp) noex {
 	const uid_t	uid = getuid() ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -276,7 +260,7 @@ static int confstr_defsbin(BUFFER *bdp)
 		int	bl = rs ;
 	        cchar	*dname = CONFSTR_SBIN ;
 	        cchar	*tp ;
-	        if (sfsub(bp,bl,dname,NULL) < 0) {
+	        if (sfsub(bp,bl,dname,nullptr) < 0) {
 		    int	f = ((bl > 0) && (bp[bl-1] != ':')) ;
 		    rs = confstr_defer(bdp,f,dname) ;
 		    rl += rs ;
@@ -296,11 +280,9 @@ static int confstr_defsbin(BUFFER *bdp)
 }
 /* end subroutine (confstr_defsbin) */
 
-
-static int confstr_defer(BUFFER *bdp,int i,const char *dname)
-{
-	int	rs = SR_OK ;
-	int	rl = 0 ;
+static int confstr_defer(buffer *bdp,int i,cchar *dname) noex {
+	int		rs = SR_OK ;
+	int		rl = 0 ;
 	if (i > 0) {
 	    rs = buffer_char(bdp,':') ;
 	    rl += rs ;
