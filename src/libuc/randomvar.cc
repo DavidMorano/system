@@ -156,7 +156,7 @@ static constexpr ulong	randtbl[] = {
 	0x09378c8352c7a471UL, 0x8d293ea91f4fc301UL, 
 	0xc3db71be39b44e1cUL, 0xf8a44ef94c8b80b1UL,
 	0x19edc32887bf4bddUL, 0xc9b240e5e9ee4b1bUL, 
-	0x4382aee7535b6b41UL, 0xf3bec5da00000000UL
+	0x4382aee7535b6b41UL, 0xf3bec5da31415926UL
 } ;
 
 static procrand<NINITS>	initrv ;
@@ -231,8 +231,7 @@ int randomvar_stateload(randomvar *op,cchar *state,int sl) noex {
 		rs = SR_OK ;
 	        for (int i = 0 ; i < slen ; i += 1) {
 	            ulong	ulw{} ;
-		    int		r ;
-	            if ((r = rdulong(sp,sl,&ulw)) > 0) {
+	            if (int r ; (r = rdulong(sp,sl,&ulw)) > 0) {
 	                op->state[i] = ulw ;
 		        sp += r ;
 		        sl -= r ;
@@ -276,8 +275,7 @@ int randomvar_addnoise(randomvar *op,cvoid *noise,int sl) noex {
 	    cchar	*sp = charp(noise) ;
 	    for (int i = 0 ; i < nmax ; i += 1) {
 	        ulong	ulw{} ;
-	        int	r ;
-	        if ((r = rdulong(sp,sl,&ulw)) > 0) {
+	        if (int r ; (r = rdulong(sp,sl,&ulw)) > 0) {
 	            int		ii = MOD(i) ;
 	            op->state[ii] ^= ulw ;
 		    sp += r ;
