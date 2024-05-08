@@ -54,9 +54,27 @@ extern int randomvar_getlong(randomvar *,long *) noex ;
 extern int randomvar_getulong(randomvar *,ulong *) noex ;
 extern int randomvar_getint(randomvar *,int *) noex ;
 extern int randomvar_getuint(randomvar *,uint *) noex ;
+extern int randomvar_get(randomvar *,void *,int) noex ;
 extern int randomvar_finish(randomvar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int randomvar_get(randomvar *op,int *p) noex {
+	return randomvar_getint(op,p) ;
+}
+inline int randomvar_get(randomvar *op,long *p) noex {
+	return randomvar_getlong(op,p) ;
+}
+inline int randomvar_get(randomvar *op,uint *p) noex {
+	return randomvar_getuint(op,p) ;
+}
+inline int randomvar_get(randomvar *op,ulong *p) noex {
+	return randomvar_getulong(op,p) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* RANDOMVAR_INCLUDE */

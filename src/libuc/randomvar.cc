@@ -381,6 +381,31 @@ int randomvar_getuint(randomvar *op,uint *rp) noex {
 }
 /* end subroutine (randomvar_getuint) */
 
+int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    rs = SR_INVALID ;
+	    if (rlen >= 0) {
+	        cint	wl = sizeof(ulong) ;
+	        ulong	rv ;
+	        char	*rp = charp(rbuf) ;
+		rs = SR_OK ;
+	        while ((rs >= 0) && (rlen > 0)) {
+		    if ((rs = randomvar_getulong(op,&rv)) >= 0) {
+		        cint	ml = min(rlen,wl) ;
+		        for (int i = 0 ; i < ml ; i += 1) {
+			    *rp++ = char(rv) ;
+			    rv >>= 8 ;
+			    rlen -= 1 ;
+		        } /* end for */
+		    } /* end if (randomvar_getulong) */
+	        } /* end while */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (randomvar_getuint) */
+
 
 /* private subroutines */
 
