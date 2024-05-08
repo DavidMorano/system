@@ -1,9 +1,8 @@
-/* time */
+/* time SUPPORT */
+/* lang=C++20 */
 
 /* this is the intercept for the UNIX® System |time(2)| call */
-
-
-#define	CF_DEBUGN	0		/* special debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -41,37 +40,19 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<errno.h>
 #include	<usystem.h>
 #include	<localmisc.h>
-#include	"pretime.h"
+
+#include	"preload.h"
 
 
 /* local defines */
 
-#define	NDF	"libpretime.nd"
-
 
 /* external subroutines */
-
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfnumui(const char *,int,uint *) ;
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexul(const char *,int,ulong *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* local structures */
@@ -83,22 +64,20 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-time_t time(time_t *tp)
-{
+time_t time(time_t *tp) noex {
 	time_t		t = 0 ;
 	int		rs ;
-	if ((rs = pretime_modtime(&t)) >= 0) {
-#if	CF_DEBUGN
-	    {
-	        int	sn = pretime_serial() ;
-	        nprintf(NDF,"libpretime_time: ent sn=%u\n",sn) ;
-	    }
-#endif
+	if ((rs = pretime_modtime(&t)) < 0) {
+	    ulogerror("time",rs,"pretime_modtime") ;
 	}
-	if (tp != NULL) *tp = (rs>=0) ? t : 0 ;
+	if (tp) {
+	    *tp = (rs >= 0) ? t : 0 ;
+	}
 	return t ;
 }
 /* end subroutine (time) */

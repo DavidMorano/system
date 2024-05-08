@@ -4,7 +4,6 @@
 /* retrieve process ID related noise from the system */
 /* version %I% last-modified %G% */
 
-#define	CF_STAT		1		/* |stat(2)| the file also */
 
 /* revision history:
 
@@ -150,10 +149,10 @@ static int noisedata_addtime(noisedata *ndp) noex {
 	TIMEVAL		tv ;
 	int		rs ;
 	if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
-	    noisedata_add(ndp,(uint) (tv.tv_sec >> 16)) ;
-	    noisedata_add(ndp,(uint) (tv.tv_sec >> 0)) ;
-	    noisedata_add(ndp,(uint) (tv.tv_usec >> 16)) ;
-	    noisedata_add(ndp,(uint) (tv.tv_usec >> 0)) ;
+	    noisedata_add(ndp,uint(tv.tv_sec >> 16)) ;
+	    noisedata_add(ndp,uint(tv.tv_sec >> 0)) ;
+	    noisedata_add(ndp,uint(tv.tv_usec >> 16)) ;
+	    noisedata_add(ndp,uint(tv.tv_usec >> 0)) ;
 	}
 	return rs ;
 }

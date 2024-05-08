@@ -41,19 +41,21 @@ DEFS +=
 INCS +=
 
 
-LIBS += -lmacuser
+LIBS += -lmacuser -lu
 
 
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
+LDRPATH= $(USRLOCAL)
+
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+LDFLAGS= $(MAKELDFLAGS) -rpath $(LDRPATH)
 
 
 OBJ_USERHOME= main.o
@@ -80,7 +82,7 @@ all:			$(ALL)
 
 
 $(T).x:			$(OBJ_USERHOME)
-	$(LD) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

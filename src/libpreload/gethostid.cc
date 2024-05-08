@@ -1,9 +1,8 @@
-/* gethostid */
+/* gethostid SUPPORT */
+/* lang=C++20 */
 
 /* Get-Host-ID UNIX® System interposer */
-
-
-#define	CF_DEBUGN	0		/* special debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -38,19 +37,20 @@
 	Q. Why are you so smart?
 	A. I do not know.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/systeminfo.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<errno.h>
+#include	<cerrno>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
+
+#include	"preload.h"
 
 
 /* local defines */
@@ -59,33 +59,10 @@
 #define	VARHOSTID	"HOSTID"
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int64_t in decimal */
-#endif
-
 #define	GETHOSTID	struct gethostid_head
-
-#define	NDF		"gethostid.deb"
 
 
 /* external subroutines */
-
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfnumui(const char *,int,uint *) ;
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexul(const char *,int,ulong *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* local structures */
@@ -103,19 +80,20 @@ struct gethostid_head {
 static GETHOSTID	gethostid_data ; /* zero-initialized */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-long gethostid(void)
-{
+long gethostid(void) noex {
 	GETHOSTID	*gip = &gethostid_data ;
 	long		rc = 0 ;
 	int		rs = SR_OK ;
 	if (gip->hostid == 0) {
-	    const int	dlen = DIGBUFLEN ;
+	    cint	dlen = DIGBUFLEN ;
 	    int		vl = -1 ;
-	    const char	*var = VARHOSTID ;
-	    const char	*vp ;
+	    cchar	*var = VARHOSTID ;
+	    cchar	*vp ;
 	    char	dbuf[DIGBUFLEN+1] ;
 	    if (((vp = getenv(var)) == NULL) || (vp[0] == '\0')) {
 	        if ((rs = u_sysinfo(SI_HW_SERIAL,dbuf,dlen)) >= 0) {

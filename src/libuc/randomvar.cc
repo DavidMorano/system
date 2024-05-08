@@ -21,17 +21,17 @@
 /*******************************************************************************
 
 	This object provides a random number generator.  This is
-	similar to the UNIX® System 'random(3)' subroutine except
+	similar to the UNIX® System |random(3)| subroutine except
 	that no global variables are used.  This version also
 	provides a means to get truly random numbers by periodically
 	mixing in garbage collected from the machine environment.
 
 	We implement a standard cyclical shift register with feedback
-	taps to create our random numbers (like 'random(3)' does)
+	taps to create our random numbers (like |random(3)| does)
 	but we do it with a 128 degree polynomial.  Our polynomial
 	is currently:
 
-		x**128 + x**67 + x**23 + 1
+		x**127 + x**67 + x**23 + 1
 
 	If you have a better one (which is likely) or even a good
 	one, let me know!  Some known good polynomials for lower
@@ -48,9 +48,12 @@
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>
 #include	<climits>
-#include	<cstdlib>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* UNIX® system subroutines */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<ucvariables.hh>
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>
@@ -60,22 +63,62 @@
 
 /* local defines */
 
-#define	MOD(n)		((n) % ndeg)
+#define	MOD(n)		((n) % slen)
 #define	COF(n)		MOD(n)
 
 #define	STIRINTERVAL	(5 * 60)
 #define	MAINTCOUNT	1000
 
-#ifndef	VARRANDOM
-#define	VARRANDOM	"RANDOM"
-#endif
+#define	NINITS		6		/* number initiailization vars */
+#define	NLS		4		/* number of longs in array(of) */
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
 
-/* forward references */
+/* external variables */
 
-int		randomvar_getulong(randomvar *,ulong *) noex ;
+
+/* local structures */
+
+namespace {
+    template<int N> struct procrand {
+	cint		n = N ;
+	uint		v[N] ;
+    } ;
+    template<int N> struct arrlongs {
+	ulong		v[N] = {} ;
+	cint		n = N ;
+	int		c = 0 ;
+	bool		flipped = false ;
+	void add(uint iv) noex {
+	    if (c < n) {
+	        if (flipped) {
+		    ulong	tv = (ulong(iv) << 32) ;
+		    v[c++] |= tv ;
+		    flipped = false ;
+	        } else {
+		    v[c] = ulong(iv) ;
+		    flipped = true ;
+	        }
+	    } /* end if */
+	} ;
+    } ; /* end struct (arrlongs) */
+}
+
+
+/* forward references */
 
 template<typename ... Args>
 static inline int randomvar_magic(randomvar *op,Args ... args) noex {
@@ -86,13 +129,17 @@ static inline int randomvar_magic(randomvar *op,Args ... args) noex {
 	return rs ;
 }
 
-static int	randomvar_startreal(randomvar *,uint) noex ;
+static int	randomvar_initpseudo(randomvar *,uint) noex ;
+static int	randomvar_initreal(randomvar *,uint) noex ;
 static int	randomvar_maint(randomvar *) noex ;
+static int	randomvar_swapone(randomvar *) noex ;
 
-static void	addnoise(randomvar_st *,TIMEVAL *tvp) noex ;
+static void	addtime(ulong *,TIMEVAL *tvp) noex ;
 
 static int	rdulong(cchar *,int,ulong *) noex ;
 static int	wrulong(char *,int,ulong) noex ;
+
+static int mkprocrand() noex ;
 
 
 /* local variables */
@@ -101,65 +148,92 @@ constexpr int	digsize = sizeof(RANDOMVAR_DIGIT) ;
 constexpr int	ndeg = sizeof(RANDOMVAR_DEGREE) ;
 constexpr int	slen = RANDOMVAR_STATELEN ;
 
+static constexpr ulong	randtbl[] = {
+	0x991539b116a5bce3UL, 0x6774a4cd3e01511eUL, 
+	0x4e508aaa61048c05UL, 0xf5500617846b7115UL, 
+	0x6a19892c896a97afUL, 0xdb48f93614898454UL,
+	0x37ffd106b58bff9cUL, 0x59e17104cf918a49UL, 
+	0x09378c8352c7a471UL, 0x8d293ea91f4fc301UL, 
+	0xc3db71be39b44e1cUL, 0xf8a44ef94c8b80b1UL,
+	0x19edc32887bf4bddUL, 0xc9b240e5e9ee4b1bUL, 
+	0x4382aee7535b6b41UL, 0xf3bec5da00000000UL
+} ;
+
+static procrand<NINITS>	initrv ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int randomvar_start(randomvar *rdp,int f_pseudo,uint seed) noex {
+int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	int		rs = SR_FAULT ;
-	if (rdp) {
-	    ulong	dummy{} ;
-	    rs = SR_OK ;
-	    if (seed == 0) seed = 31415926 ;
-	    rdp->f.flipper = false ;
-	    rdp->f.pseudo = f_pseudo ;
-	    rdp->laststir = 0 ;
-	    rdp->maintcount = 0 ;
-	    if (rdp->f.pseudo) {
-	        rdp->state.is[0] = randlc(seed) ;
-	        for (int i = 1 ; i < (ndeg * 2) ; i += 1) {
-	            rdp->state.is[i] = randlc(rdp->state.is[i - 1]) ;
-	        }
-	    } else {
-		rs = randomvar_startreal(rdp,seed) ;
-	    } /* end if (initializing state) */
-/* our polynomial --  x**128 + x**67 + x**23 + 1  */
-	    rdp->a = COF(67) ;
-	    rdp->b = COF(23) ;
-	    rdp->c = COF(0) ;
-	    rdp->magic = RANDOMVAR_MAGIC ;
-/* stir the pot at least one cycle */
-	    for (int i = 0 ; i < (ndeg * 20) ; i += 1) {
-	        randomvar_getulong(rdp,&dummy) ;
-	    }
+	if (seed == 0) seed = 31415926 ;
+	if (op) {
+	    void	*vp{} ;
+	    csize	sz = (slen * sizeof(ulong)) ;
+	    memclear(op) ;
+	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+		op->state = ulongp(vp) ;
+	        op->f.flipper = false ;
+	        op->f.pseudo = f_pseudo ;
+	        op->laststir = 0 ;
+	        op->maintcount = 0 ;
+	        if (op->f.pseudo) {
+		    rs = randomvar_initpseudo(op,seed) ;
+	        } else {
+		    rs = randomvar_initreal(op,seed) ;
+	        } /* end if (initializing state) */
+    /* our polynomial --  x**128 + x**67 + x**23 + 1  */
+		if (rs >= 0) {
+		    cint	n = (slen * 10) ;
+	            op->a = COF(67) ;
+	            op->b = COF(23) ;
+	            op->c = COF(0) ;
+	            op->magic = RANDOMVAR_MAGIC ;
+		    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+			ulong	dummy ;
+			rs = randomvar_getulong(op,&dummy) ;
+		    }
+		} /* end if (ok) */
+		if (rs < 0) {
+		    uc_free(op->state) ;
+		    op->state = nullptr ;
+		    op->magic = 0 ;
+		}
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (randomvar_start) */
 
-int randomvar_finish(randomvar *rdp) noex {
+int randomvar_finish(randomvar *op) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp)) >= 0) {
-	    rdp->magic = 0 ;
+	int		rs1 ;
+	if ((rs = randomvar_magic(op)) >= 0) {
+	    if (op->state) {
+		rs1 = uc_free(op->state) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (randomvar_finish) */
 
-int randomvar_stateload(randomvar *rdp,cchar *state,int sl) noex {
+int randomvar_stateload(randomvar *op,cchar *state,int sl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,state)) >= 0) {
+	if ((rs = randomvar_magic(op,state)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sl >= slen) {
-	        cchar	*sp = (cchar *) state ;
+	        cchar	*sp = charp(state) ;
 		rs = SR_OK ;
-	        for (int i = 0 ; i < ndeg ; i += 1) {
+	        for (int i = 0 ; i < slen ; i += 1) {
 	            ulong	ulw{} ;
 		    int		r ;
 	            if ((r = rdulong(sp,sl,&ulw)) > 0) {
-	                rdp->state.ls[i] = ulw ;
+	                op->state[i] = ulw ;
 		        sp += r ;
 		        sl -= r ;
 	            } else {
@@ -172,15 +246,15 @@ int randomvar_stateload(randomvar *rdp,cchar *state,int sl) noex {
 }
 /* end subroutine (randomvar_stateload) */
 
-int randomvar_statesave(randomvar *rdp,char *state,int bl) noex {
+int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,state)) >= 0) {
-	    char	*bp = (char *) state ;
+	if ((rs = randomvar_magic(op,state)) >= 0) {
+	    char	*bp = charp(state) ;
 	    rs = SR_INVALID ;
 	    if (bl >= slen) {
 		rs = SR_OK ;
-	        for (int i = 0 ; i < ndeg ; i += 1) {
-	            ulong	ulw = rdp->state.ls[i]  ;
+	        for (int i = 0 ; i < slen ; i += 1) {
+	            ulong	ulw = op->state[i]  ;
 	            int		r ;
 	            if ((r = wrulong(bp,bl,ulw)) > 0) {
 		        bp += r ;
@@ -195,17 +269,17 @@ int randomvar_statesave(randomvar *rdp,char *state,int bl) noex {
 }
 /* end subroutine (randomvar_statesave) */
 
-int randomvar_addnoise(randomvar *rdp,cvoid *noise,int sl) noex {
+int randomvar_addnoise(randomvar *op,cvoid *noise,int sl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,noise)) >= 0) {
+	if ((rs = randomvar_magic(op,noise)) >= 0) {
 	    cint	nmax = (sl / digsize) ;
-	    cchar	*sp = (cchar *) noise ;
+	    cchar	*sp = charp(noise) ;
 	    for (int i = 0 ; i < nmax ; i += 1) {
 	        ulong	ulw{} ;
 	        int	r ;
 	        if ((r = rdulong(sp,sl,&ulw)) > 0) {
 	            int		ii = MOD(i) ;
-	            rdp->state.ls[ii] ^= ulw ;
+	            op->state[ii] ^= ulw ;
 		    sp += r ;
 		    sl -= r ;
 	        } else {
@@ -218,14 +292,14 @@ int randomvar_addnoise(randomvar *rdp,cvoid *noise,int sl) noex {
 /* end subroutine (randomvar_addnoise) */
 
 /* set the polynomial to use (second highest degree to next lowest) */
-int randomvar_setpoly(randomvar *rdp,int a,int b) noex {
+int randomvar_setpoly(randomvar *op,int a,int b) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp)) >= 0) {
+	if ((rs = randomvar_magic(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if ((a > 0) && (a < ndeg)) {
 	        if ((b > 0) && (b < ndeg)) {
-		    rdp->a = COF(a) ;
-		    rdp->b = COF(b) ;
+		    op->a = COF(a) ;
+		    op->b = COF(b) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -233,90 +307,56 @@ int randomvar_setpoly(randomvar *rdp,int a,int b) noex {
 }
 /* end subroutine (randomvar_setpoly) */
 
-int randomvar_getlong(randomvar *rdp,long *rp) noex {
+int randomvar_getlong(randomvar *op,long *rp) noex {
+	ulong		res ;
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,rp)) >= 0) {
-	    rdp->a = MOD(rdp->a) ;
-	    rdp->b = MOD(rdp->b) ;
-	    rdp->c = MOD(rdp->c) ;
-	    rdp->state.ls[rdp->a] += rdp->state.ls[rdp->b] ;
-	    rdp->state.ls[rdp->a] += rdp->state.ls[rdp->c] ;
-	    *rp = (rdp->state.ls[rdp->a] >> 1) & LONG_MAX ;
-	    rdp->a = MOD(rdp->a + 1) ;
-	    rdp->b = MOD(rdp->b + 1) ;
-	    rdp->c = MOD(rdp->c + 1) ;
-	    if (++rdp->maintcount >= MAINTCOUNT) {
-	        randomvar_maint(rdp) ;
-	    }
-	} /* end if (magic) */
+	if ((rs = randomvar_getulong(op,&res)) >= 0) {
+	    if (rp) *rp = long(res >> 1) ;
+	} /* end if (randomvar_getulong) */
 	return rs ;
 }
 /* end subroutine (randomvar_getlong) */
 
-int randomvar_getulong(randomvar *rdp,ulong *rp) noex {
+int randomvar_getulong(randomvar *op,ulong *rp) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,rp)) >= 0) {
-	    rdp->a = MOD(rdp->a) ;
-	    rdp->b = MOD(rdp->b) ;
-	    rdp->c = MOD(rdp->c) ;
-	    rdp->state.ls[rdp->a] += rdp->state.ls[rdp->b] ;
-	    rdp->state.ls[rdp->a] += rdp->state.ls[rdp->c] ;
-	    *rp = rdp->state.ls[rdp->a] ;
-	    rdp->a = MOD(rdp->a + 1) ;
-	    rdp->b = MOD(rdp->b + 1) ;
-	    rdp->c = MOD(rdp->c + 1) ;
-	    if (++rdp->maintcount >= MAINTCOUNT) {
-	        randomvar_maint(rdp) ;
+	if ((rs = randomvar_magic(op,rp)) >= 0) {
+	    op->state[op->a] += op->state[op->b] ;
+	    op->state[op->a] += op->state[op->c] ;
+	    *rp = op->state[op->a] ;
+	    op->a = MOD(op->a + 1) ;
+	    op->b = MOD(op->b + 1) ;
+	    op->c = MOD(op->c + 1) ;
+	    if (op->maintcount++ >= MAINTCOUNT) {
+	        randomvar_maint(op) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (randomvar_getulong) */
 
-int randomvar_getint(randomvar *rdp,int *rp) noex {
+int randomvar_getint(randomvar *op,int *rp) noex {
+	uint		res ;
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,rp)) >= 0) {
-	    rdp->a = MOD(rdp->a) ;
-	    rdp->b = MOD(rdp->b) ;
-	    rdp->c = MOD(rdp->c) ;
-	    rdp->f.flipper = (! rdp->f.flipper) ;
-	    if (rdp->f.flipper) {
-	        rdp->state.ls[rdp->a] += rdp->state.ls[rdp->b] ;
-	        rdp->state.ls[rdp->a] += rdp->state.ls[rdp->c] ;
-	        *rp = (rdp->state.is[(rdp->a << 1) + 1] >> 1) & INT_MAX ;
-	        rdp->a = MOD(rdp->a + 1) ;
-	        rdp->b = MOD(rdp->b + 1) ;
-	        rdp->c = MOD(rdp->c + 1) ;
-	    } else {
-	        *rp = (rdp->state.is[rdp->a << 1] >> 1) & INT_MAX ;
-	    }
-	    if (++rdp->maintcount >= MAINTCOUNT) {
-	        randomvar_maint(rdp) ;
-	    }
-	} /* end if (magic) */
+	if ((rs = randomvar_getuint(op,&res)) >= 0) {
+	    if (rp) *rp = (res >> 1) ;
+	} /* end if (randomvar_getuint) */
 	return rs ;
 }
 /* end subroutine (randomvar_getint) */
 
-int randomvar_getuint(randomvar *rdp,uint *rp) noex {
+int randomvar_getuint(randomvar *op,uint *rp) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(rdp,rp)) >= 0) {
-	    rdp->a = MOD(rdp->a) ;
-	    rdp->b = MOD(rdp->b) ;
-	    rdp->c = MOD(rdp->c) ;
-	    rdp->f.flipper = (! rdp->f.flipper) ;
-	    if (rdp->f.flipper) {
-	        rdp->state.ls[rdp->a] += rdp->state.ls[rdp->b] ;
-	        rdp->state.ls[rdp->a] += rdp->state.ls[rdp->c] ;
-	        *rp = rdp->state.is[(rdp->a << 1) + 1] ;
-	        rdp->a = MOD(rdp->a + 1) ;
-	        rdp->b = MOD(rdp->b + 1) ;
-	        rdp->c = MOD(rdp->c + 1) ;
+	if ((rs = randomvar_magic(op,rp)) >= 0) {
+	    ulong	rv ;
+	    if (op->f.flipper) {
+		rv = op->state[op->a] ;
+		*rp = uint(rv >> 32) ;
+		op->f.flipper = false ;
 	    } else {
-	        *rp = rdp->state.is[rdp->a << 1] ;
-	    }
-	    if (++rdp->maintcount >= MAINTCOUNT) {
-	        randomvar_maint(rdp) ;
+		if ((rs = randomvar_getulong(op,&rv)) >= 0) {
+		    *rp = uint(rv) ;
+		    op->f.flipper = true ;
+		}
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -326,74 +366,111 @@ int randomvar_getuint(randomvar *rdp,uint *rp) noex {
 
 /* private subroutines */
 
-static int randomvar_startreal(randomvar *rdp,uint seed) noex {
-	        TIMEVAL		tv ;
-	        cint		pid = getpid() ;
-	        cint		uid = getuid() ;
-	        uint		v1 = getppid() ;
-	        uint		v2 = getpgrp() ;
-	        uint		v3 = 0 ;
-	        int		i = 0 ;
-  	        cchar		*cp ;
-	        gettimeofday(&tv,nullptr) ;
-	        if ((cp = getenv(VARRANDOM)) != nullptr) {
-		    cfdecui(cp,-1,&v3) ;
-	        }
-	        rdp->state.is[i++] += randlc(tv.tv_usec) ;
-	        rdp->state.is[i++] += randlc(pid) ;
-	        rdp->state.is[i++] += randlc(v1) ;
-	        rdp->state.is[i++] += randlc(v2) ;
-	        rdp->state.is[i++] += randlc(v3) ;
-	        rdp->state.is[i++] += randlc(tv.tv_sec) ;
-	        rdp->state.is[i++] += randlc(uid) ;
-	        for (int j = 0 ; j < 6 ; j += 1) {
-	            seed ^= rdp->state.is[j] ;
-	        }
-	        rdp->state.is[i++] += randlc(seed) ;
-	        for (int j = i ; j < (ndeg * 2) ; j += 1) {
-	            rdp->state.is[j] += randlc(rdp->state.is[j - 1]) ;
-	        }
+static int randomvar_initpseudo(randomvar *op,uint seed) noex {
+	ulong		lseed = ulong(seed) ;
+	ulong		tv = ulong(randlc(seed)) ;
+	cint		tl = nelem(randtbl) ;
+	lseed |= (tv << 32) ;
+	for (int i = 0 ; i < min(tl,slen) ; i += 1) {
+	    op->state[i] = randtbl[i] ;
+	}
+	for (int i = 0 ; i < slen ; i += 1) {
+	    op->state[i] |= lseed ;
+	}
 	return SR_OK ;
 }
-/* end subroutine (randomvar_startreal) */
+/* end subroutine (randomvar_initpseudo) */
 
-static int randomvar_maint(randomvar *rdp) noex {
-	rdp->maintcount = 0 ;
-	for (int i = 0 ; i < (ndeg * 2) ; i += 2) {
-	    uint	v0 = randlc(rdp->state.is[i + 0]) ;
-	    uint	v1 = randlc(rdp->state.is[i + 1]) ;
-	    rdp->state.is[i + 0] += v1 ;
-	    rdp->state.is[i + 1] += v0 ;
-	} /* end for */
-	if (! rdp->f.pseudo) {
-	    TIMEVAL	tv ;
-	    gettimeofday(&tv,nullptr) ;
-	    if ((tv.tv_sec - rdp->laststir) >= RANDOMVAR_STIRTIME) {
-	        rdp->laststir = tv.tv_sec ;
-	        addnoise(&rdp->state,&tv) ;
+static int randomvar_initreal(randomvar *op,uint seed) noex {
+	static int	rsr = mkprocrand() ;
+	arrlongs<NLS>	al ;
+	int		rs ;
+	if ((rs = rsr) >= 0) {
+	    uint	v ;
+	    cint	ninit = rs ;
+	    {
+	        TIMEVAL	tv ;
+	        gettimeofday(&tv,nullptr) ;
+	        v = randlc(tv.tv_usec) ; al.add(v) ;
+	        v = randlc(tv.tv_sec) ; al.add(v) ;
 	    }
-	} /* end if (not-pseudo) */
-	return SR_OK ;
+	    for (int i = 0 ; i < ninit ; i += 1) {
+	        v = initrv.v[i] ;
+		al.add(v) ;
+	    }
+	    v = randlc(seed) ;
+	    al.add(v) ;
+	    for (int i = 0 ; i < min(al.c,slen) ; i += 1) {
+	        op->state[i] += al.v[i] ;
+	    }
+	} /* end if (mkprocrand) */
+	return rs ;
+}
+/* end subroutine (randomvar_initreal) */
+
+static int randomvar_maint(randomvar *op) noex {
+	int		rs ;
+	if ((rs = randomvar_swapone(op)) >= 0) {
+	    op->maintcount = 0 ;
+	    if (! op->f.pseudo) {
+	        TIMEVAL	tv ;
+	        gettimeofday(&tv,nullptr) ;
+	        if ((tv.tv_sec - op->laststir) >= RANDOMVAR_STIRINT) {
+	            op->laststir = tv.tv_sec ;
+	            addtime((op->state+0),&tv) ;
+	        }
+	    } /* end if (not-pseudo) */
+	} /* end if (swapone) */
+	return rs ;
 }
 /* end subroutine (randomvar_maint) */
 
-static void addnoise(randomvar_st *sp,TIMEVAL *tvp) noex {
-	sp->is[0] ^= randlc(tvp->tv_sec ^ sp->is[0]) ;
-	sp->is[1] ^= randlc(tvp->tv_usec ^ sp->is[1]) ;
+static int randomvar_swapone(randomvar *op) noex {
+	ulong		one = op->state[0] ;
+	ulong		one0, one1 ;
+	uint		s0, s1, t0, t1 ;
+	int		rs = SR_OK ;
+	s0 = uint(one >> 00) ;
+	s1 = uint(one >> 32) ;
+	t0 = randlc(s0) ;
+	t1 = randlc(s1) ;
+	one0 = ulong(t1) ;	/* swapped */
+	one1 = ulong(t0) ;	/* swapped */
+	one = ((one1 << 32) | (one0 << 00)) ;
+	op->state[0] = one ;
+	return rs ;
 }
-/* end subroutine (addnoise) */
+/* end subroutine (randomvar_swapone) */
+
+static void addtime(ulong *lp,TIMEVAL *tvp) noex {
+	ulong		cur = *lp ;
+	uint		t0 = uint(tvp->tv_sec) ;
+	uint		t1 = uint(tvp->tv_usec) ;
+	uint		c0, c1, n0, n1 ;
+	c0 = (cur >> 0) ;
+	c1 = (cur >> 32) ;
+	n0 = c0 ^ randlc(c0 ^ t0) ;
+	n1 = c1 ^ randlc(c1 ^ t1) ;
+	{
+	    ulong	ln0 = ulong(n0) ;
+	    ulong	ln1 = ulong(n1) ;
+	    ulong	stage ;
+	    stage = ((ln1 << 32) | ln0) ;
+	    *lp = stage ;
+	}
+}
+/* end subroutine (addtime) */
 
 static int rdulong(cchar *sp,int sl,ulong *lp) noex {
 	int		r = 0 ;
 	if (sl > 0) {
 	    ulong	ulw = 0 ;
-	    int		mlen = MIN(sl,digsize) ;
-	    int		i ;
-	    for (i = 0 ; i < mlen ; i += 1) {
+	    int		mlen = min(sl,digsize) ;
+	    for (int i = 0 ; i < mlen ; i += 1) {
 		ulw <<= 8 ;
-		ulw |= ((uchar) *sp++) ;
+		ulw |= uchar(*sp++) ;
 		r += 1 ;
-	    }
+	    } /* end for */
 	    *lp = ulw ;
 	} else {
 	    *lp = 0 ;
@@ -404,12 +481,31 @@ static int rdulong(cchar *sp,int sl,ulong *lp) noex {
 
 static int wrulong(char *bp,int bl,ulong ulw) noex {
 	cint		n = digsize ;
-	int		i = 0 ;
+	int		i = 0 ; /* used afterwards */
 	for (i = 0 ; (i < n) && (i < bl) ; i += 1) {
-	    *bp = (char) ulw ; ulw >>= 8 ;
+	    *bp = char(ulw) ; ulw >>= 8 ;
 	} /* end for */
 	return i ;
 }
 /* end subroutine (wrulong) */
+
+/* this creates the process-constant randoness */
+static int mkprocrand() noex {
+	uint		v ;
+	int		rs = SR_OK ;
+	int		i = 0 ;
+	cchar		*var = getenv(varname.random) ;
+	initrv.v[i++] = (v = getpid(),randlc(v)) ;
+	initrv.v[i++] = (v = getuid(),randlc(v)) ;
+	initrv.v[i++] = (v = getppid(),randlc(v)) ;
+	initrv.v[i++] = (v = getpgrp(),randlc(v)) ;
+	if (var) {
+	    if (uint v{} ; cfdecui(var,-1,&v) >= 0) {
+		initrv.v[i++] = v ;
+	    }
+	}
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (mkprocrand) */
 
 

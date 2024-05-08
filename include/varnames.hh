@@ -91,6 +91,7 @@ struct varnames {
 	static const char tmout[] ;
 	static const char editor[] ;
 	static const char visual[] ;
+	static const char random[] ;
 } ; /* end struct (varnames) */
 
 

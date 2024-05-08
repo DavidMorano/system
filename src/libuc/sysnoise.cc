@@ -17,13 +17,14 @@
 	This was originally written before random bits were readily
 	available.  The world has changed since 2002 (if this was
 	even originally written as late as that).  I am wiping this
-	old crap totall clean, and writing this to use |getrandom(3c)|
-	esclusively.  For those messed-up operating systems that do
-	not natively provide |getrandom(3c)| -- like messed-up Darwin
-	(MacOS) -- then we use the hacked version of |getrandom(3c)|
-	that was written for it as a stop-gap measure.  Oh, before I
-	leave here, I just want to say "F*ck You MacOS" for not 
-	natively supplying |getrandom(3c)|.
+	old crap totallt clean, and writing this to use |getrandom(3c)|
+	esclusively.  For those messed-up operating systems that
+	do not natively provide |getrandom(3c)| -- like messed-up
+	Darwin (MacOS) -- then we use the hacked version of
+	|getrandom(3c)| that was written for it as a stop-gap
+	measure.  Oh, before I leave here, I just want to say that
+	it would ave been nice if Apple Darwin had support for
+	|getrandom(3c)| natively.
 
 */
 

@@ -24,14 +24,18 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<atomic>
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<varray.h>
 #include	<localmisc.h>
+
+#include	"preload.h"
 
 
 /* local defines */
@@ -93,23 +97,23 @@ extern "C" {
     static void	preload_atforkafter() noex ;
 }
 
-static int	preload_struct(PRELOAD *) noex ;
-static int	preload_begin(PRELOAD *) noex ;
-static int	preload_end(PRELOAD *) noex ;
-static int	preload_entryntfins(PRELOAD *) noex ;
-static int	preload_capbegin(PRELOAD *,int) noex ;
-static int	preload_capend(PRELOAD *) noex ;
-static int	preload_seter(PRELOAD *,int,cchar *,int,int) noex ;
-static int	preload_geter(PRELOAD *,int,char *,int) noex ;
+static int	preload_struct(preload *) noex ;
+static int	preload_begin(preload *) noex ;
+static int	preload_end(preload *) noex ;
+static int	preload_entryntfins(preload *) noex ;
+static int	preload_capbegin(preload *,int) noex ;
+static int	preload_capend(preload *) noex ;
+static int	preload_seter(preload *,int,cchar *,int,int) noex ;
+static int	preload_geter(preload *,int,char *,int) noex ;
 
-static int	entry_start(PRELOAD_ENT *,cchar *,int,int) noex ;
-static int	entry_reload(PRELOAD_ENT *,cchar *,int,int) noex ;
-static int	entry_finish(PRELOAD_ENT *) noex ;
+static int	entry_start(preload_ent *,cchar *,int,int) noex ;
+static int	entry_reload(preload_ent *,cchar *,int,int) noex ;
+static int	entry_finish(preload_ent *) noex ;
 
 
 /* local variables */
 
-static PRELOAD	preload_data ;
+static preload	preload_data ;
 
 
 /* exported variables */
@@ -192,62 +196,59 @@ int preload_fini() noex {
 /* end subroutine (preload_fini) */
 
 int preload_set(int di,cchar *cbuf,int clen,int ttl) noex {
-	sigblocker	b ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (cbuf == nullptr) return SR_FAULT ;
-
-	if (di < 0) return SR_INVALID ;
-	if (cbuf[0] == '\0') return SR_INVALID ;
-
-	if ((rs = sigblock_start(&b,nullptr)) >= 0) {
-	    if ((rs = preload_init()) >= 0) {
-		PRELOAD		*uip = &preload_data ;
-		cint	to = TO_CAP ;
-		if ((rs = preload_capbegin(uip,to)) >= 0) {
-		    if ((rs = preload_struct(uip)) >= 0) {
-			rs = preload_seter(uip,di,cbuf,clen,ttl) ;
-		    } /* end if (preload_struct) */
-		    rs1 = preload_capend(uip) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (preload_cap) */
-	    } /* end if (preload_init) */
-	    rs1 = sigblock_finish(&b) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (sigblock) */
-
+	if (cbuf) {
+	    rs = SR_INVALID ;
+	    if ((di >= 0) && cbuf[0]) {
+	        sigblocker	b ;
+	        if ((rs = b.start) >= 0) {
+	            if ((rs = preload_init()) >= 0) {
+		        preload		*uip = &preload_data ;
+		        cint		to = TO_CAP ;
+		        if ((rs = preload_capbegin(uip,to)) >= 0) {
+		            if ((rs = preload_struct(uip)) >= 0) {
+			        rs = preload_seter(uip,di,cbuf,clen,ttl) ;
+		            } /* end if (preload_struct) */
+		            rs1 = preload_capend(uip) ;
+		            if (rs >= 0) rs = rs1 ;
+		        } /* end if (preload_cap) */
+	            } /* end if (preload_init) */
+	            rs1 = b.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (sigblocker) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (preload_set) */
 
 int preload_get(int di,char *rbuf,int rlen) noex {
-	sigblocker	b ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (di < 0) return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = sigblock_start(&b,nullptr)) >= 0) {
-	    if ((rs = preload_init()) >= 0) {
-	        PRELOAD		*uip = &preload_data ;
-	        cint	to = TO_CAP ;
-	        if ((rs = preload_capbegin(uip,to)) >= 0) {
-		    if (uip->ents != nullptr) {
-	                rs = preload_geter(uip,di,rbuf,rlen) ;
-			len = rs ;
-		    } /* end if (entries-present) */
-	            rs1 = preload_capend(uip) ;
-	            if (rs >= 0) rs = rs1 ;
-		} /* end if (preload_cap) */
-	    } /* end if (preload_init) */
-	    sigblock_finish(&b) ;
-	} /* end if (sigblock) */
-
+	if (rbuf) {
+	    rs = SR_INVALID ;
+	    if (di >= 0) {
+	        sigblocker	b ;
+	        rbuf[0] = '\0' ;
+	        if ((rs = b.start) >= 0) {
+	            if ((rs = preload_init()) >= 0) {
+	                preload		*uip = &preload_data ;
+	                cint		to = TO_CAP ;
+	                if ((rs = preload_capbegin(uip,to)) >= 0) {
+		            if (uip->ents != nullptr) {
+	                        rs = preload_geter(uip,di,rbuf,rlen) ;
+			        len = rs ;
+		            } /* end if (entries-present) */
+	                    rs1 = preload_capend(uip) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        } /* end if (preload_cap) */
+	            } /* end if (preload_init) */
+	            rs1 = b.finish ;
+	        } /* end if (sigblock) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (preload_get) */
@@ -255,7 +256,7 @@ int preload_get(int di,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int preload_struct(PRELOAD *uip) noex {
+static int preload_struct(preload *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    rs = preload_begin(uip) ;
@@ -264,14 +265,14 @@ static int preload_struct(PRELOAD *uip) noex {
 }
 /* end subroutine (preload_struct) */
 
-static int preload_begin(PRELOAD *uip) noex {
+static int preload_begin(preload *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    cint	osize = sizeof(varray) ;
 	    void	*p{} ;
 	    if ((rs = uc_libmalloc(osize,&p)) >= 0) {
 	        varray		*ents = (varray *) p ;
-	        cint		esize = sizeof(PRELOAD_ENT) ;
+	        cint		esize = sizeof(preload_ent) ;
 	        cint		n = 4 ;
 	        if ((rs = varray_start(ents,esize,n)) >= 0) {
 	            uip->ents = ents ;
@@ -285,7 +286,7 @@ static int preload_begin(PRELOAD *uip) noex {
 }
 /* end subroutine (preload_begin) */
 
-static int preload_end(PRELOAD *uip) noex {
+static int preload_end(preload *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->ents != nullptr) {
@@ -308,9 +309,9 @@ static int preload_end(PRELOAD *uip) noex {
 }
 /* end subroutine (preload_end) */
 
-static int preload_entryntfins(PRELOAD *uip) noex {
+static int preload_entryntfins(preload *uip) noex {
 	varray		*vap = (varray *) uip->ents ;
-	PRELOAD_ENT	*ep ;
+	preload_ent	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; varray_enum(vap,i,&ep) >= 0 ; i += 1) { 
@@ -323,7 +324,7 @@ static int preload_entryntfins(PRELOAD *uip) noex {
 }
 /* end subroutine (preload_entryntfins) */
 
-static int preload_capbegin(PRELOAD *uip,int to) noex {
+static int preload_capbegin(preload *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
@@ -342,7 +343,7 @@ static int preload_capbegin(PRELOAD *uip,int to) noex {
 }
 /* end subroutine (preload_capbegin) */
 
-static int preload_capend(PRELOAD *uip) noex {
+static int preload_capend(preload *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lock(&uip->m)) >= 0) {
@@ -357,10 +358,9 @@ static int preload_capend(PRELOAD *uip) noex {
 }
 /* end subroutine (preload_capend) */
 
-static int preload_seter(PRELOAD *uip,int di,cchar *cbuf,int clen,
-		int ttl) noex {
+static int preload_seter(preload *uip,int di,cc *cbuf,int clen,int ttl) noex {
 	varray		*vap = (varray *) uip->ents ;
-	PRELOAD_ENT	*ep ;
+	preload_ent	*ep ;
 	int		rs ;
 	if ((rs = varray_acc(vap,di,&ep)) > 0) {
 	    rs = entry_reload(ep,cbuf,clen,ttl) ;
@@ -373,13 +373,13 @@ static int preload_seter(PRELOAD *uip,int di,cchar *cbuf,int clen,
 }
 /* end subroutine (preload_seter) */
 
-static int preload_geter(PRELOAD *uip,int di,char *rbuf,int rlen) noex {
+static int preload_geter(preload *uip,int di,char *rbuf,int rlen) noex {
 	varray		*vap = (varray *) uip->ents ;
-	PRELOAD_ENT	*ep ;
+	preload_ent	*ep ;
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = varray_acc(vap,di,&ep)) > 0) {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = time(nullptr) ;
 	    if ((ep->et > 0) && ((dt-ep->et) < ep->ttl)) {
 		rs = sncpy1w(rbuf,rlen,ep->vp,ep->vl) ;
 		len = rs ;
@@ -390,19 +390,19 @@ static int preload_geter(PRELOAD *uip,int di,char *rbuf,int rlen) noex {
 /* end subroutine (preload_geter) */
 
 static void preload_atforkbefore() noex {
-	PRELOAD		*uip = &preload_data ;
+	preload		*uip = &preload_data ;
 	preload_capbegin(uip,-1) ;
 }
 /* end subroutine (preload_atforkbefore) */
 
 static void preload_atforkafter() noex {
-	PRELOAD		*uip = &preload_data ;
+	preload		*uip = &preload_data ;
 	preload_capend(uip) ;
 }
 /* end subroutine (preload_atforkafter) */
 
-static int entry_start(PRELOAD_ENT *ep,cchar *vp,int vl,int ttl) noex {
-	const time_t	dt = time(nullptr) ;
+static int entry_start(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
+	custime		dt = time(nullptr) ;
 	int		rs ;
 	char		*bp{} ;
 	if (vl < 0) vl = strlen(vp) ;
@@ -417,7 +417,7 @@ static int entry_start(PRELOAD_ENT *ep,cchar *vp,int vl,int ttl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(PRELOAD_ENT *ep) noex {
+static int entry_finish(preload_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp != nullptr) {
@@ -429,7 +429,7 @@ static int entry_finish(PRELOAD_ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_reload(PRELOAD_ENT *ep,cchar *vp,int vl,int ttl) noex {
+static int entry_reload(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
 	if (ep->vp != nullptr) {
 	    rs = uc_libfree(ep->vp) ;
