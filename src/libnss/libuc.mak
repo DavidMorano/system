@@ -1139,6 +1139,7 @@ getaddr.o:		getaddr.cc getaddr.h
 getmjd.o:		getmjd.cc getmjd.h
 gethz.o:		gethz.cc gethz.h
 getpassword.o:		getpassword.cc getpassword.h
+getrand.o:		getrand.cc getrand.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh

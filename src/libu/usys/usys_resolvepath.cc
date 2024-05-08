@@ -39,35 +39,6 @@
 #include	"usys_resolvepath.h"
 
 
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
 unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	cint		rlen = int(rsz & INT_MAX) ;
 	unixret_t	rc = 0 ;

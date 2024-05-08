@@ -16,7 +16,23 @@
 
 /*******************************************************************************
 
-	We define some missing operating system utily functions.
+	Name:
+	ucloseonexec
+
+	Description:
+	This provides a means to get the NIS domain-name from the
+	operating system in an OS-independent way by regualr callers.
+
+	Synosis:
+	int ugetnisdom(char *rbuf,int rlen) noex
+
+	Arguments:
+	rbuf		result buffer pointer
+	rlen		result buffer length
+
+	Returns:
+	>=0		length of result
+	<0		error code (- errno)
 
 *******************************************************************************/
 

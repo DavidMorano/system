@@ -1,4 +1,4 @@
-/* usys_ugetnisdom HEADER */
+/* usys_ucloseonexec HEADER */
 /* lang=C20 */
 
 /* operating support for retrieving the NIS domain-name */
@@ -16,28 +16,12 @@
 
 /*******************************************************************************
 
-	Name:
-	ucloseonexec
-
-	Description:
-	This provides a means to get the NIS domain-name from the
-	operating system in an OS-independent way by regualr callers.
-
-	Synosis:
-	int ugetnisdom(char *rbuf,int rlen) noex
-
-	Arguments:
-	rbuf		result buffer pointer
-	rlen		result buffer length
-
-	Returns:
-	>=0		length of result
-	<0		error code (- errno)
+	This is an utility function for use by other emulators.
 
 *******************************************************************************/
 
-#ifndef	USYSUGETNISDOM_INCLUDE
-#define	USYSUGETNISDOM_INCLUDE
+#ifndef	USYSUCLOSEONEXEC_INCLUDE
+#define	USYSUCLOSEONEXEC_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -48,11 +32,11 @@
 
 EXTERNC_begin
 
-extern sysret_t ugetnisdom(char *,int) noex ;
+extern sysret_t ucloseonexec(int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* USYSUGETNISDOM_INCLUDE */
+#endif /* USYSUCLOSEONEXEC_INCLUDE */
 
 

@@ -27,6 +27,7 @@
 	u_dup2
 	u_socketpair
 	u_pipe
+	u_piper
 
 
 	Name:
@@ -135,6 +136,7 @@ namespace {
 	int idup2(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
+	int ipiper(cchar *,int,mode_t) noex ;
 	int icloseonexec(int) noex ;
 	void fderror(int) noex ;
     } ; /* end struct (opener) */
@@ -225,6 +227,14 @@ int u_pipe(int *pipes) noex {
 	oo.m = &opener::ipipe ;
 	oo.flavor = flavor_pipes ;
 	return oo ;
+}
+
+int u_piper(int *pipes,int of) noex {
+	cnullptr	np{} ;
+	opener		oo(pipes) ;
+	oo.m = &opener::ipiper ;
+	oo.flavor = flavor_pipes ;
+	return oo(np,of,0) ;
 }
 
 
@@ -417,6 +427,17 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 	return rs ;
 }
 /* end method (opener::ipipe) */
+
+int opener::ipiper(cchar *,int of,mode_t) noex {
+	int		rs = SR_FAULT ;
+	if (pipes) {
+	    if ((rs = pipe2(pipes,of)) < 0) {
+		rs = (- errno) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+}
+/* end method (opener::ipiper) */
 
 int opener::icloseonexec(int fd) noex {
 	int		rs = SR_OK ;

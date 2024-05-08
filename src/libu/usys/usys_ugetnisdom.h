@@ -16,11 +16,12 @@
 
 /*******************************************************************************
 
+	Name:
+	ucloseonexec
+
+	Description:
 	This provides a means to get the NIS domain-name from the
 	operating system in an OS-independent way by regualr callers.
-
-	Name:
-	ugetnisdom
 
 	Synosis:
 	int ugetnisdom(char *rbuf,int rlen) noex

@@ -235,6 +235,13 @@
 /* Solaris®: |waitid(2)| */
 #define	SYSHAS_WAITID		1
 
+/* Solaris®: |pipe2(2)| */
+#if	defined(OSNUM) && (OSNUM >= 9)
+#define	SYSHAS_PIPES		1
+#else
+#define	SYSHAS_PIPES		0
+#endif
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -464,6 +471,9 @@
 /* Darwin: |waitid(2)| */
 #define	SYSHAS_WAITID		1	/* <- welcome to club! (confirmed) */
 
+/* Darwin: |pipe2(2)| */
+#define	SYSHAS_PIPES		0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -672,6 +682,9 @@
 
 /* Linux: |waitid(2)| */
 #define	SYSHAS_WAITID		1
+
+/* Linux: |pipe2(2)| */
+#define	SYSHAS_PIPES		1
 
 /******************************************************************************/
 #endif /* OSNAME */
