@@ -40,7 +40,7 @@
 
 /* utilities */
 #include	<usys_ugetnisdom.h>
-#include	<usys_ucloseonexec.h>
+#include	<usys_ufcntl.h>
 
 /* missing operating system calls */
 #include	<usys_mqueue.h>

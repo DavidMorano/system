@@ -276,5 +276,6 @@ uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
 endian.o:		endian.cc endian.h		$(INCS)
 mtime.o:		mtime.cc mtime.h		$(INCS)
+timespec.o:		timespec.cc timespec.h		$(INCS)
 
 

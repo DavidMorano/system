@@ -56,7 +56,7 @@ LDFLAGS= $(MAKELDFLAGS)
 
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
-OBJ2_USYS= usys_ugetnisdom.o usys_ucloseonexec.o
+OBJ2_USYS= usys_ugetnisdom.o usys_ufcntl.o
 OBJ3_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ4_USYS= usys_ttynamerp.o 
 OBJ5_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
@@ -159,7 +159,7 @@ usys_linux.o:		usys_linux.cc usys_linux.h		$(INCS)
 
 # utilities
 usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
-usys_ucloseonexec.o:	usys_ucloseonexec.cc usys_ucloseonexec.h $(INCS)
+usys_ufcntl.o:		usys_ufcntl.cc usys_ufcntl.h 		$(INCS)
 
 # missing operating system calls
 usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h		$(INCS)

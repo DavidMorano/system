@@ -87,7 +87,7 @@ namespace {
     typedef int (ufuncter::*ufuncter_m)(int) noex ;
     struct ufuncter : ufiledescbase {
 	ufuncter_m	m = nullptr ;
-	uintptr_t		anyarg ;
+	uintptr_t	anyarg ;
 	int		cmd ;
 	ufuncter() noex { } ;
 	ufuncter(int c,uintptr_t aa) noex : cmd(c), anyarg(aa) { } ;

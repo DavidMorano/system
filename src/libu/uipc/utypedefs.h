@@ -424,6 +424,16 @@ typedef mode_t		fsperm ;
 typedef const mode_t	cfsperm ;
 #endif /* TYPEDEF_CFPERM */
 
+#ifndef	TYPEDEF_USTIME
+#define	TYPEDEF_USTIME
+typedef time_t			ustime ;
+#endif
+
+#ifndef	TYPEDEF_CUSTIME
+#define	TYPEDEF_USTIME
+typedef const time_t		custime ;
+#endif
+
 #ifndef	TYPEDEF_ERRNO
 #define	TYPEDEF_ERRNO
 typedef int		errno_t ;

@@ -1,4 +1,4 @@
-/* usys_ucloseonexec SUPPORT */
+/* usys_ufcntl SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® system emulated support */
@@ -22,27 +22,59 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
+#include	<ctime>			/* |nanosleep(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>		/* |uintptr_t| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<usysrets.h>
 #include	<usysflag.h>
-#include	<utypedefs.h>
+#include	<utypedefs.h>		/* |ustime| */
+#include	<utypealiases.h>	/* |TIMESPEC| */
+#include	<timespec.h>		/* |timespec_load(3u)| */
 #include	<localmisc.h>		/* |LEQUIV| */
 
 #include	"usys_ucloseonexec.h"
 
 
-static sysret_t ufcntl(int fd,int cmd,uintptr_t anyarg) noex {
-	int		rs ;
-	if ((rs = fcntl(fd,cmd,anyarg)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
+#define	FCNTL_TO	30		/* general timeout */
+
+
+constexpr ustime	onethousand = 1000 ;
 
 namespace usys {
+    sysret_t ufcntl(int fd,int cmd,uintptr_t anyarg) noex {
+	TIMESPEC	ts{} ;
+	int		to = FCNTL_TO ;
+	int		rs ;
+	if ((rs = timespec_load(&ts,onethousand,0)) >= 0) {
+	    bool	fexit = false ;
+	    repeat {
+	        if ((rs = fcntl(fd,cmd,anyarg)) < 0) {
+		    const errno_t	ec = errno ;
+		    switch (ec) {
+		    case EMFILE:
+		    case ENFILE:
+		    case ENOSPC:
+		    case ENOBUFS:
+		        if (to-- > 0) {
+		            nanosleep(&ts,nullptr) ;
+			} else {
+			    fexit = true ;
+			}
+			break ;
+		    case EAGAIN:
+		    case EINTR:
+		        break ;
+		    default:
+			fexit = true ;
+			break ;
+		    } /* end switch */
+	            rs = (- ec) ;
+	        } /* end if (error) */
+	    } until ((rs >= 0) || fexit) ;
+	} /* end if (timespec_load) */
+	return rs ;
+    } /* end if (ufcntl) */
     sysret_t ucloseonexec(int fd,int f) noex {
 	int		rs ;
 	int		f_previous = false ;

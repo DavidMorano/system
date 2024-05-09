@@ -1,4 +1,4 @@
-/* usys_ucloseonexec HEADER */
+/* usys_ufcntl HEADER */
 /* lang=C20 */
 
 /* operating support for retrieving the NIS domain-name */
@@ -20,8 +20,8 @@
 
 *******************************************************************************/
 
-#ifndef	USYSUCLOSEONEXEC_INCLUDE
-#define	USYSUCLOSEONEXEC_INCLUDE
+#ifndef	USYSUFCNTL_INCLUDE
+#define	USYSUFCNTL_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -32,12 +32,13 @@
 
 
 namespace usys {
+    extern sysret_t ufcntl(int,int,...) noex ;
     extern sysret_t ucloseonexec(int,int) noex ;
     extern sysret_t unonblock(int,int) noex ;
 }
 
 
 #endif /* __cplusplus */
-#endif /* USYSUCLOSEONEXEC_INCLUDE */
+#endif /* USYSUFCNTL_INCLUDE */
 
 

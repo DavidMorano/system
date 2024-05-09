@@ -2,6 +2,7 @@
 /* lang=C99 */
 
 /* time-spec object methods */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
