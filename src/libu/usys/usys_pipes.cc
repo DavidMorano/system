@@ -50,7 +50,7 @@ unixret_t pipes(int *pipes,int of) noex {
 	int		rl = 0 ;
 	if (pipes) {
 	    if ((rc = pipe(pipes)) >= 0) {
-		int		rs = SR_OK ;
+		sysret_t	rs = SR_OK ;
                 if ((rs >= 0) && (of & O_CLOEXEC)) {
                    if ((rs = ucloseonexec(pipes[0],true)) >= 0) {
                        rs = ucloseonexec(pipes[1],true) ;

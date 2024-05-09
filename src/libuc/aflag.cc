@@ -125,18 +125,18 @@ bool aflag_co::operator () (bool a) noex {
 int aflag_gu::operator () (int to) noex {
 	int		rs = SR_BUGCHECK ;
 	switch (w) {
-	case aflagmx_guardbegin:
-	    rs = op->iguardbegin(to) ;
+	case aflagmx_lockbegin:
+	    rs = op->ilockbegin(to) ;
 	    break ;
-	case aflagmx_guardend:
-	    rs = op->iguardbegin() ;
+	case aflagmx_lockend:
+	    rs = op->ilockend() ;
 	    break ;
 	} /* end switch */
 	return rs ;
 }
 /* end method (aflag_gu::operator) */
 
-int aflag::iguardbegin(int to) noex {
+int aflag::ilockbegin(int to) noex {
 	int		rs = SR_OK ;
 	if (to >= 0) {
 	    timewatch	tw(to) ;
@@ -151,13 +151,13 @@ int aflag::iguardbegin(int to) noex {
 	}
 	return rs ;
 }
-/* end method (aflag::iguardbegin) */
+/* end method (aflag::ilockbegin) */
 
-int aflag::iguardend() noex {
+int aflag::ilockend() noex {
 	af.clear(memord_release) ;
 	af.notify_one() ;
 	return SR_OK ;
 }
-/* end method (aflag::iguardend) */
+/* end method (aflag::ilockend) */
 
 

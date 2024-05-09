@@ -157,7 +157,7 @@ namespace {
 
 /* local variables */
 
-static aflag		oguard ;
+static aflag		uopenmx ;
 
 constexpr bool		f_sunos = F_SUNOS ;
 
@@ -166,6 +166,15 @@ constexpr bool		f_sunos = F_SUNOS ;
 
 
 /* exported subroutines */
+
+namespace uopen {
+    sysret_t uopen_lockbegin() noex {
+	return uopenmx.lockbegin ;
+    }
+    sysret_t uopen_lockend () noex {
+	return uopenmx.lockend ;
+    }
+}
 
 int u_open(cchar *fname,int of,mode_t om) noex {
 	opener		oo ;
@@ -224,22 +233,9 @@ int u_dupmin(int sfd,int mfd) noex {
 int u_dupminer(int sfd,int mfd,int of) noex {
 	opener		oo(sfd,mfd) ;
 	cnullptr	np{} ;
-	int		rs ;
-	int		fd = -1 ;
 	oo.m = &opener::idupminer ;
-	if (of & O_CLOEXEC) {
-	    oo.fcloseonexec = true ;
-	}
-	if ((rs = oo(np,of,0)) >= 0) {
-	    fd = rs ;
-	    if (of & O_NONBLOCK) {
-		rs = unonblock(fd,true) ;
-	    }
-	    if (rs < 0) {
-		close(fd) ;
-	    }
-	} /* end if (ok) */
-	return (rs >= 0) ? fd : rs ;
+	if (of & O_CLOEXEC) oo.fcloseonexec = true ;
+	return oo(np,of,0) ;
 }
 /* end subroutine (u_dupminer) */
 
@@ -279,14 +275,14 @@ int opener::openreg(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = oguard.guardbegin) >= 0) {
+	if ((rs = uopenmx.lockbegin) >= 0) {
 	    {
 		rs = openjack(fname,of,om) ;
 		fd = rs ;
 	    }
-	    rs1 = oguard.guardend ;
+	    rs1 = uopenmx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (oguard) */
+	} /* end if (uopenmx) */
 	if (rs < 0) fderror(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
