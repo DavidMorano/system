@@ -448,14 +448,22 @@ int opener::idupmin(cchar *,int,mode_t) noex {
 
 int opener::idupminer(cchar *,int of,mode_t) noex {
 	int		rs = SR_BADF ;
-	(void) of ;
+	int		fd = -1 ;
 	if ((dfd >= 0) && (tfd >= 0)) {
 	    cint	cmd = (fcloseonexec) ? F_DUPFD_CLOEXEC : F_DUPFD ;
-	    if ((rs = fcntl(dfd,cmd,tfd)) < 0) {
+	    if ((rs = fcntl(dfd,cmd,tfd)) >= 0) {
+		fd = rs ;
+	        if (of & O_NONBLOCK) {
+		    rs = unonblock(fd,true) ;
+		    if (rs < 0) {
+			close(fd) ;
+		    }
+	        } /* end if (O_NONBLOCK was specified) */
+	    } else {
 	        rs = (- errno) ;
 	    }
 	}
-	return rs ;
+	return (rs >= 0) ? fd : rs ;
 }
 /* end method (opener::idupminer) */
 
