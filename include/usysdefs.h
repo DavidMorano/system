@@ -39,7 +39,7 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
+#include	<limits.h>		/* |{xxx}_MAX| */
 
 
 /* extra "open" flags */

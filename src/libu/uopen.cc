@@ -24,9 +24,12 @@
 	u_accept
 	u_acceptpass
 	u_dup
+	u_dupmin
+	u_dupminer
 	u_dup2
 	u_socketpair
 	u_pipe
+	u_piper
 
 
 	Name:
@@ -69,6 +72,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using usys::unonblock ;			/* subroutine */
 
 
 /* local typedefs */
@@ -96,7 +100,8 @@ namespace {
 	int		pf ;
 	int		st ;
 	int		pr ;
-	int		flavor{} ;
+	flavors		flavor{} ;
+	bool		fcloseonexec = false ;
 	opener() noex { } ;
 	opener(int adfd,int atfd = -1) noex : dfd(adfd), tfd(atfd) { } ;
 	opener(int apf,int ast,int apr,int *ap = nullptr) noex : pf(apf) {
@@ -133,8 +138,11 @@ namespace {
 	int iacceptpass(cchar *,int,mode_t) noex ;
 	int idup1(cchar *,int,mode_t) noex ;
 	int idup2(cchar *,int,mode_t) noex ;
+	int idupmin(cchar *,int,mode_t) noex ;
+	int idupminer(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
+	int ipiper(cchar *,int,mode_t) noex ;
 	int icloseonexec(int) noex ;
 	void fderror(int) noex ;
     } ; /* end struct (opener) */
@@ -149,7 +157,7 @@ namespace {
 
 /* local variables */
 
-static aflag		oguard ;
+static aflag		uopenmx ;
 
 constexpr bool		f_sunos = F_SUNOS ;
 
@@ -158,6 +166,15 @@ constexpr bool		f_sunos = F_SUNOS ;
 
 
 /* exported subroutines */
+
+namespace uopen {
+    sysret_t uopen_lockbegin() noex {
+	return uopenmx.lockbegin ;
+    }
+    sysret_t uopen_lockend () noex {
+	return uopenmx.lockend ;
+    }
+}
 
 int u_open(cchar *fname,int of,mode_t om) noex {
 	opener		oo ;
@@ -206,6 +223,22 @@ int u_dup(int sfd) noex {
 }
 /* end subroutine (u_dup) */
 
+int u_dupmin(int sfd,int mfd) noex {
+	opener		oo(sfd,mfd) ;
+	oo.m = &opener::idupmin ;
+	return oo ;
+}
+/* end subroutine (u_dupmin) */
+
+int u_dupminer(int sfd,int mfd,int of) noex {
+	opener		oo(sfd,mfd) ;
+	cnullptr	np{} ;
+	oo.m = &opener::idupminer ;
+	if (of & O_CLOEXEC) oo.fcloseonexec = true ;
+	return oo(np,of,0) ;
+}
+/* end subroutine (u_dupminer) */
+
 int u_dup2(int sfd,int tfd) noex {
 	opener		oo(sfd,tfd) ;
 	oo.m = &opener::idup2 ;
@@ -227,6 +260,14 @@ int u_pipe(int *pipes) noex {
 	return oo ;
 }
 
+int u_piper(int *pipes,int of) noex {
+	cnullptr	np{} ;
+	opener		oo(pipes) ;
+	oo.m = &opener::ipiper ;
+	oo.flavor = flavor_pipes ;
+	return oo(np,of,0) ;
+}
+
 
 /* local subroutines */
 
@@ -234,14 +275,14 @@ int opener::openreg(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = oguard.guardbegin) >= 0) {
+	if ((rs = uopenmx.lockbegin) >= 0) {
 	    {
 		rs = openjack(fname,of,om) ;
 		fd = rs ;
 	    }
-	    rs1 = oguard.guardend ;
+	    rs1 = uopenmx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (oguard) */
+	} /* end if (uopenmx) */
 	if (rs < 0) fderror(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
@@ -383,7 +424,7 @@ int opener::idup1(cchar *,int,mode_t) noex {
 /* end method (opener::idup1) */
 
 int opener::idup2(cchar *,int,mode_t) noex {
-	int		rs = SR_INVALID ;
+	int		rs = SR_BADF ;
 	if ((dfd >= 0) && (tfd >= 0)) {
 	    if ((rs = dup2(dfd,tfd)) < 0) {
 	        rs = (- errno) ;
@@ -392,6 +433,39 @@ int opener::idup2(cchar *,int,mode_t) noex {
 	return rs ;
 }
 /* end method (opener::idup2) */
+
+int opener::idupmin(cchar *,int,mode_t) noex {
+	int		rs = SR_BADF ;
+	if ((dfd >= 0) && (tfd >= 0)) {
+	    cint	cmd = F_DUPFD ;
+	    if ((rs = fcntl(dfd,cmd,tfd)) < 0) {
+	        rs = (- errno) ;
+	    }
+	}
+	return rs ;
+}
+/* end method (opener::idupmin) */
+
+int opener::idupminer(cchar *,int of,mode_t) noex {
+	int		rs = SR_BADF ;
+	int		fd = -1 ;
+	if ((dfd >= 0) && (tfd >= 0)) {
+	    cint	cmd = (fcloseonexec) ? F_DUPFD_CLOEXEC : F_DUPFD ;
+	    if ((rs = fcntl(dfd,cmd,tfd)) >= 0) {
+		fd = rs ;
+	        if (of & O_NONBLOCK) {
+		    rs = unonblock(fd,true) ;
+		    if (rs < 0) {
+			close(fd) ;
+		    }
+	        } /* end if (O_NONBLOCK was specified) */
+	    } else {
+	        rs = (- errno) ;
+	    }
+	}
+	return (rs >= 0) ? fd : rs ;
+}
+/* end method (opener::idupminer) */
 
 int opener::isocketpair(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
@@ -418,6 +492,17 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 }
 /* end method (opener::ipipe) */
 
+int opener::ipiper(cchar *,int of,mode_t) noex {
+	int		rs = SR_FAULT ;
+	if (pipes) {
+	    if ((rs = pipe2(pipes,of)) < 0) {
+		rs = (- errno) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+}
+/* end method (opener::ipiper) */
+
 int opener::icloseonexec(int fd) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -430,13 +515,16 @@ int opener::icloseonexec(int fd) noex {
 	    break ;
 	case flavor_pipes:
 	    if (pipes) {
-		for (int i = 0 ; i < flavor_overlast ; i += 1) {
+		for (int i = 0 ; i < 2 ; i += 1) {
 		    if (pipes[i] >= 0) {
 			rs1 = u_closeonexec(pipes[i],true) ;
 			if (rs >= 0) rs = rs1 ;
 		    }
 	        } /* end for */
 	    }
+	    break ;
+	default:
+	    rs = SR_BUGCHECK ;
 	    break ;
 	} /* end switch */
 	return rs ;
@@ -450,13 +538,15 @@ void opener::fderror(int fd) noex {
 	    break ;
 	case flavor_pipes:
 	    if (pipes) {
-		for (int i = 0 ; i < flavor_overlast ; i += 1) {
+		for (int i = 0 ; i < 2 ; i += 1) {
 		    if (pipes[i] >= 0) {
 			close(pipes[i]) ;
 			pipes[i] = -1 ;
 		    }
 	        } /* end for */
 	    }
+	    break ;
+	default:
 	    break ;
 	} /* end switch */
 }

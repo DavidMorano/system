@@ -20,7 +20,7 @@ EXTERNC_begin
 extern int getho_begin(int) noex ;
 extern int getho_ent(ucentho *,char *,int) noex ;
 extern int getho_name(ucentho *,char *,int,cchar *) noex ;
-extern int getho_addr(ucentho *,char *,int,cvoid *,int) noex ;
+extern int getho_addr(ucentho *,char *,int,int,cvoid *,int) noex ;
 extern int getho_end() noex ;
 
 EXTERNC_end

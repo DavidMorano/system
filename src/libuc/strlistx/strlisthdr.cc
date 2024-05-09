@@ -104,6 +104,7 @@ constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
 
 /* exported subroutines */
 
+/* write to the object from the supplied buffer */
 int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -174,6 +175,7 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 }
 /* end subroutine (strlisthdr_wr) */
 
+/* read from object into supplied buffer */
 int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;

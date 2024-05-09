@@ -67,14 +67,14 @@ errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 		    csize	sz = size_t(rlen) ;
 		    int		rs ;
 		    int		rs1 ;
-		    if ((rs = mx.guardbegin) >= 0) {
+		    if ((rs = mx.lockbegin) >= 0) {
 		        if (char *p ; (p = ttyname(fd)) != nullptr) {
 			    char	*dp = stpncpy(rbuf,p,sz) ;
 			    *dp = '\0' ;
 		        } else {
 			    ec = errno ;
 		        } /* end if (ttyname) */
-			rs1 = mx.guardend ;
+			rs1 = mx.lockend ;
 			if (rs >= 0) rs = rs1 ;
 			if (rs < 0) {
 			    ec = (- rs) ;

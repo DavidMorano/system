@@ -23,9 +23,12 @@
 	u_accept
 	u_acceptpass
 	u_dup
+	u_dupmin
+	u_dupminee
 	u_dup2
 	u_socketpair
 	u_pipe
+	u_piper
 
 	Description:
 	This module provides support for opening files or devices.
@@ -97,11 +100,23 @@ extern int u_accept(int,SOCKADDR *,int *) noex ;
 extern int u_acceptpass(int) noex ;
 extern int u_dup(int) noex ;
 extern int u_dup2(int,int) noex ;
+extern int u_dupmin(int,int) noex ;
+extern int u_dupminer(int,int,int) noex ;
 /* special */
 extern int u_socketpair(int,int,int,int *) noex ;
 extern int u_pipe(int *) noex ;
+extern int u_piper(int *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+namespace uopen {
+   extern sysret_t uopen_lockbegin() noex ;
+   extern sysret_t uopen_lockend() noex ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* UOPEN_INCLUDE */

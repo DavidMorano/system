@@ -108,7 +108,7 @@ namespace {
 
 /* forward refeferences */
 
-static int	ufcntl(int,int,uintptr_t) noex ;
+static sysret_t	ufcntl(int,int,uintptr_t) noex ;
 
 
 /* local variables */
@@ -127,7 +127,7 @@ int u_fcntl(int fd,int cmd,...) noex {
 	        va_list		ap ;
 	        va_begin(ap,cmd) ;
 		if_constexpr (machendian.islittle) {
-	            const uintptr_t anyarg = va_arg(ap,uintptr_t) ;
+	            const uintptr_t	anyarg = va_arg(ap,uintptr_t) ;
 		    rs = ufcntl(fd,cmd,anyarg) ;
 		} else if_constexpr (machendian.isbig) {
 		    rs = SR_NOTSUP ;
@@ -144,7 +144,7 @@ int u_fcntl(int fd,int cmd,...) noex {
 
 /* local subroutines */
 
-static int ufcntl(int fd,int cmd,uintptr_t anyarg) noex {
+static sysret_t ufcntl(int fd,int cmd,uintptr_t anyarg) noex {
 	ufuncter	fo(cmd,anyarg) ;
 	fo.m = &ufuncter::ifcntl ;
 	return fo(fd) ;

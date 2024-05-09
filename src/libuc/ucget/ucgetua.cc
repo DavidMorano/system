@@ -52,7 +52,6 @@
 
 #include	"userattr.h"
 #include	"ucgetua.h"
-#include	"ucgetuserattr.h"
 
 
 /* local defines */

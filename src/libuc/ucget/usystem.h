@@ -54,24 +54,17 @@
 #include	<grp.h>
 #include	<dirent.h>
 
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#include	<shadow.h>
-#include	<project.h>
-#include	<user_attr.h>
-#endif
-
 #include	<usys.h>	/* <- auxilllary OS support */
 
-#include	<stdintx.h>
 #include	<clanguage.h>
 #include	<usysdefs.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usupport.h>
+#include	<stdintx.h>
 
 #include	<uinet.h>
-#include	<ulimits.h>
 #include	<uopen.h>
 #include	<usyscalls.h>
 #include	<uxti.h>

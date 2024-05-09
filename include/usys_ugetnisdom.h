@@ -16,11 +16,12 @@
 
 /*******************************************************************************
 
+	Name:
+	ucloseonexec
+
+	Description:
 	This provides a means to get the NIS domain-name from the
 	operating system in an OS-independent way by regualr callers.
-
-	Name:
-	ugetnisdom
 
 	Synosis:
 	int ugetnisdom(char *rbuf,int rlen) noex
@@ -37,6 +38,7 @@
 
 #ifndef	USYSUGETNISDOM_INCLUDE
 #define	USYSUGETNISDOM_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -45,13 +47,12 @@
 #include	<utypealiases.h>
 
 
-EXTERNC_begin
-
-extern sysret_t ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
+namespace usys {
+    extern sysret_t ugetnisdom(char *,int) noex ;
+}
 
 
+#endif /* __cplusplus */
 #endif /* USYSUGETNISDOM_INCLUDE */
 
 

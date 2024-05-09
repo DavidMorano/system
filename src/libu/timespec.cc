@@ -52,6 +52,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -59,6 +62,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -69,7 +75,7 @@ int timespec_load(TIMESPEC *tsp,time_t sec,long nsec) noex {
 	    while (nsec >= INTBILLION) {
 	        sec += 1 ;
 	        nsec -= INTBILLION ;
-	    }
+	    } /* end while */
 	    tsp->tv_sec = sec ;
 	    tsp->tv_nsec = nsec ;
 	} /* end if (non-null) */

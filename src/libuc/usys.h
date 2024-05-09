@@ -38,15 +38,21 @@
 #include	<usys_darwin.h>
 #include	<usys_linux.h>
 
+/* utilities */
+#include	<usys_ugetnisdom.h>
+#include	<usys_ufcntl.h>
+
+/* missing operating system calls */
 #include	<usys_mqueue.h>
 #include	<usys_gethrtime.h>
 #include	<usys_getrandom.h>
 #include	<usys_ttynamerp.h>
-#include	<usys_ugetnisdom.h>
 #include	<usys_stime.h>
 #include	<usys_resolvepath.h>
 #include	<usys_waitid.h>
 #include	<usys_sigx.h>
+#include	<usys_streams.h>
+#include	<usys_pipes.h>
 
 
 #endif /* USYS_INCLUDE */

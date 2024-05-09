@@ -41,35 +41,6 @@
 #include	"usys_waitid.h"
 
 
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
 unixret_t waitid(idtype_t,id_t,siginfo_t *,int) noex {
 	errno = ENOSYS ;
 	return -1 ;
