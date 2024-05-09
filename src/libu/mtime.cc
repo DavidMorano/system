@@ -30,21 +30,27 @@
 #include	"mtime.h"
 
 
+/* local defines */
+
+
+/* local variables */
+
+
 /* exported varaibles */
 
 
 /* exported subroutines */
 
-mtime_t mtime(void) {
+mtime_t mtime(void) noex {
 	TIMEVAL		tv ;
 	mtime_t		t ;
 	mtime_t		m = 0 ;
-	if (gettimeofday(&tv,NULL) >= 0) {
+	if (gettimeofday(&tv,nullptr) >= 0) {
 	    t = tv.tv_sec ;
 	    m += (t*1000) ;
 	    m += (tv.tv_usec / 1000) ;
 	} else {
-	    t = time(NULL) ; /* good until year 2038! */
+	    t = time(nullptr) ; /* good until year 2038! */
 	    m += (t*1000) ;
 	}
 	return m ;
