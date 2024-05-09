@@ -24,7 +24,22 @@
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

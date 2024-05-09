@@ -11,6 +11,7 @@
 
 	Names:
 	u_closeonexec
+	u_nonblock
 	u_readn
 	u_writen
 	u_fchdir
@@ -171,6 +172,7 @@
 /* imported namespaces */
 
 using namespace	ufiledesc ;		/* namespace */
+using namespace usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
 
@@ -277,6 +279,25 @@ int u_closeonexec(int fd,int f) noex {
 	return (rs >= 0) ? f_previous : rs ;
 }
 /* end subroutine (u_closeonexec) */
+
+int u_nonblock(int fd,int f) noex {
+	int		rs ;
+	int		f_previous = false ;
+	if ((rs = u_fcntl(fd,F_GETFL,0)) >= 0) {
+	    int		flflags = rs ;
+	    f_previous = (flflags & O_NONBLOCK) ? 1 : 0 ;
+	    if (! LEQUIV(f_previous,f)) {
+	        if (f) {
+	            flflags |= O_NONBLOCK ;
+	        } else {
+	            flflags &= (~ O_NONBLOCK) ;
+		}
+	        rs = u_fcntl(fd,F_SETFL,flflags) ;
+	    } /* end if (needed a change) */
+	} /* end if (u_fcntl) */
+	return (rs >= 0) ? f_previous : rs ;
+}
+/* end subroutine (u_nonblock) */
 
 int u_readn(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;

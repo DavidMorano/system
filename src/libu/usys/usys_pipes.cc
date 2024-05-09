@@ -42,15 +42,23 @@
 #include	"usys_pipes.h"
 
 
+using usys::ucloseonexec ;		/* subroutine */
+using usys::unonblock ;			/* subroutine */
+
 unixret_t pipes(int *pipes,int of) noex {
 	unixret_t	rc = 0 ;
 	int		rl = 0 ;
 	if (pipes) {
 	    if ((rc = pipe(pipes)) >= 0) {
 		int		rs = SR_OK ;
-                if (of & O_CLOEXEC) {
+                if ((rs >= 0) && (of & O_CLOEXEC)) {
                    if ((rs = ucloseonexec(pipes[0],true)) >= 0) {
                        rs = ucloseonexec(pipes[1],true) ;
+                   }
+                }
+                if ((rs >= 0) && (of & O_NONBLOCK)) {
+                   if ((rs = unonblock(pipes[0],true)) >= 0) {
+                       rs = unonblock(pipes[1],true) ;
                    }
                 }
                 if (rs < 0) {

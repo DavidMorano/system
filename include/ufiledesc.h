@@ -82,6 +82,7 @@ extern int u_recvfrom(int,void *,int,int,void *,int *) noex ;
 extern int u_shutdown(int,int) noex ;
 
 extern int u_closeonexec(int,int) noex ;
+extern int u_nonblock(int,int) noex ;
 extern int u_readn(int,void *,int) noex ;
 extern int u_writen(int,cvoid *,int) noex ;
 extern int u_fchdir(int) noex ;

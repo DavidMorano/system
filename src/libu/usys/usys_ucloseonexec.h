@@ -22,6 +22,7 @@
 
 #ifndef	USYSUCLOSEONEXEC_INCLUDE
 #define	USYSUCLOSEONEXEC_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -30,13 +31,13 @@
 #include	<utypealiases.h>
 
 
-EXTERNC_begin
+namespace usys {
+    extern sysret_t ucloseonexec(int,int) noex ;
+    extern sysret_t unonblock(int,int) noex ;
+}
 
-extern sysret_t ucloseonexec(int,int) noex ;
 
-EXTERNC_end
-
-
+#endif /* __cplusplus */
 #endif /* USYSUCLOSEONEXEC_INCLUDE */
 
 

@@ -84,7 +84,8 @@ constexpr bool		f_linux = F_LINUX ;
 
 /* exported subroutines */
 
-sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+namespace usys {
+    sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) {
@@ -106,7 +107,7 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (ugetnisdom) */
 }
-/* end subroutine (ugetnisdom) */
 
 

@@ -38,6 +38,7 @@
 
 #ifndef	USYSUGETNISDOM_INCLUDE
 #define	USYSUGETNISDOM_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -46,13 +47,12 @@
 #include	<utypealiases.h>
 
 
-EXTERNC_begin
-
-extern sysret_t ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
+namespace usys {
+    extern sysret_t ugetnisdom(char *,int) noex ;
+}
 
 
+#endif /* __cplusplus */
 #endif /* USYSUGETNISDOM_INCLUDE */
 
 

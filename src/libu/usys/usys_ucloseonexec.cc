@@ -42,7 +42,8 @@ static sysret_t ufcntl(int fd,int cmd,uintptr_t anyarg) noex {
 	return rs ;
 }
 
-sysret_t ucloseonexec(int fd,int f) noex {
+namespace usys {
+    sysret_t ucloseonexec(int fd,int f) noex {
 	int		rs ;
 	int		f_previous = false ;
 	if ((rs = ufcntl(fd,F_GETFD,0)) >= 0) {
@@ -58,7 +59,24 @@ sysret_t ucloseonexec(int fd,int f) noex {
 	    } /* end if (needed a change) */
 	} /* end if */
 	return (rs >= 0) ? f_previous : rs ;
+    } /* end subroutine (ucloseonexec) */
+    sysret_t unonblock(int fd,int f) noex {
+	int		rs ;
+	int		f_previous = FALSE ;
+	if ((rs = ufcntl(fd,F_GETFL,0)) >= 0) {
+	    int		flflags = rs ;
+	    f_previous = (flflags & O_NONBLOCK) ? 1 : 0 ;
+	    if (! LEQUIV(f_previous,f)) {
+	        if (f) {
+	            flflags |= O_NONBLOCK ;
+	        } else {
+	            flflags &= (~ O_NONBLOCK) ;
+		}
+	        rs = ufcntl(fd,F_SETFL,flflags) ;
+	    } /* end if (needed a change) */
+	} /* end if (u_fcntl) */
+	return (rs >= 0) ? f_previous : rs ;
+    } /* end subroutine (unonblock) */
 }
-/* end subroutine (ucloseonexec) */
 
 

@@ -360,7 +360,7 @@ int sbuf_decull(sbuf *sbp,ulonglong v) noex {
 }
 /* end subroutine (sbuf_decull) */
 
-int sbuf_hexc(sbuf *sbp,int v) noex {
+int sbuf_hexc(sbuf *sbp,char v) noex {
 	uint		uv = uint(v) ;
 	return sbuf_hexuc(sbp,uv) ;
 }
@@ -384,7 +384,7 @@ int sbuf_hexll(sbuf *sbp,longlong v) noex {
 }
 /* end subroutine (sbuf_hexll) */
 
-int sbuf_hexuc(sbuf *sbp,uint v) noex {
+int sbuf_hexuc(sbuf *sbp,uchar v) noex {
 	cint		hlen = (2*sizeof(uchar)) ; /* unsigned character */
 	int		rs = SR_FAULT ;
 	int		len = 0 ;

@@ -123,8 +123,6 @@
 #define	MODP2(v,n)	((v) & ((n) - 1))
 #endif
 
-#define	DEBFNAME	"strlistmks.deb"
-
 #ifndef	CF_MINMOD
 #define	CF_MINMOD	1		/* ensure minimum file mode */
 #endif
@@ -470,7 +468,7 @@ static int strlistmks_nfcreate(SLM *op,cchar *fsuf) noex {
 		    while ((rs >= 0) && (! op->f.fcreated)) {
 		        if ((rs = u_open(op->nfname,of,om)) >= 0) {
 			    op->nfd = rs ;
-			    op->f.ofcreated = true ;
+			    op->f.ofcreat = true ;
 			} else if (rs == rse) {
 	    		    custime	dt = time(nullptr) ;
 	    		    if ((rs = u_stat(op->nfname,&sb)) >= 0) {

@@ -29,7 +29,6 @@
 #include	<sys/time.h>		/* for |u_adjtime(3u)| */
 #include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
 #include	<sys/resource.h>
-#include	<sys/resource.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
@@ -51,6 +50,7 @@
 #include	<signal.h>
 #include	<stddef.h>		/* |wchar_t| */
 #include	<stdlib.h>
+#include	<stdint.h>		/* |intptr_t| + |uintptr_t| */
 
 #include	<clanguage.h>		/* relatively necessary inclusion */
 
@@ -167,6 +167,21 @@ typedef const void		cvoid ;
 #define	TYPEDEF_CSIZE
 typedef const size_t		csize ;
 #endif /* TYPEDEF_CSIZE */
+
+#ifndef	TYPEDEF_COFF
+#define	TYPEDEF_COFF
+typedef const off_t		coff ;
+#endif /* TYPEDEF_COFF */
+
+#ifndef	TYPEDEF_CINTPTR
+#define	TYPEDEF_CINTPTR
+typedef const intptr_t		cintptr ;
+#endif /* TYPEDEF_CINTPTR */
+
+#ifndef	TYPEDEF_CUINTPTR
+#define	TYPEDEF_CUINTPTR
+typedef const uintptr_t		cuintptr ;
+#endif /* TYPEDEF_CUINTPTR */
 
 #ifndef	TYPEDEF_CNFDS
 #define	TYPEDEF_CBFDS
@@ -330,6 +345,7 @@ typedef const unsigned int *	cuintp ;
 typedef const unsigned long *	culongp ;
 #endif
 
+/* special types for characters */
 #ifndef	TYPEDEF_CHARPP
 #define	TYPEDEF_CHARPP
 typedef char **			charpp ;
@@ -407,11 +423,6 @@ typedef mode_t		fsperm ;
 #define	TYPEDEF_CFPERM
 typedef const mode_t	cfsperm ;
 #endif /* TYPEDEF_CFPERM */
-
-#ifndef	TYPEDEF_COFF
-#define	TYPEDEF_COFF
-typedef const off_t	coff ;
-#endif /* TYPEDEF_COFF */
 
 #ifndef	TYPEDEF_ERRNO
 #define	TYPEDEF_ERRNO
