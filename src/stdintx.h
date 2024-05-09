@@ -67,7 +67,7 @@ typedef __int128 *		longlongp ;
 
 #ifndef	TYPEDEF_ULONGLONGP
 #define	TYPEDEF_ULONGLONGP
-typedef unsigned __int128	ulonglongp ;
+typedef unsigned __int128 *	ulonglongp ;
 #endif /* TYPEDEF_ULONGLONGP */
 
 /* pointers-to-constant */
@@ -82,7 +82,7 @@ typedef const longlong *	clonglongp ;
 typedef const ulonglong *	culonglongp ;
 #endif
 
-#ifdef	__cplusplus
+#ifdef	__cplusplus /* C++ only */
 
 #include	<type_traits>
 #include	<concepts>

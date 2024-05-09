@@ -17,15 +17,19 @@
 /*******************************************************************************
 
 	Name:
+	uc_gethobegin
+	uc_gethoend
 	uc_gethoent
 	uc_gethonam
 	uc_gethoadd
 
 	Description:
-	This subroutine is a platform independent subroutine to get an
-	INET host (retrieved into an |ucentho| object).
+	These subroutines are a platform independent subroutine to
+	get an INET host (retrieved into an |ucentho| object).
 
 	Synopsis:
+	int uc_gethobegin(int stayopen) noex
+	int uc_gethoend() noex
 	int uc_gethoent(ucentho *pep,char *hobuf,int pelen) noex
 	int uc_gethonam(ucentho *pep,char *hobuf,int pelen,cchar *name) noex
 	int uc_gethoadd(ucentho *pep,char *hobuf,int pelen,

@@ -19,9 +19,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<ucentgr.h>
 
 
@@ -30,7 +30,7 @@ EXTERNC_begin
 extern int	uc_getgrbegin() noex ;
 extern int	uc_getgrent(ucentgr *,char *,int) noex ;
 extern int	uc_getgrnam(ucentgr *,char *,int,cchar *) noex ;
-extern int	uc_getgruid(ucentgr *,char *,int,uid_t) noex ;
+extern int	uc_getgrgid(ucentgr *,char *,int,gid_t) noex ;
 extern int	uc_getgrend() noex ;
 
 EXTERNC_end
