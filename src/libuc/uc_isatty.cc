@@ -24,6 +24,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
+#include	<cerrno>
 #include	<usystem.h>
 
 
@@ -40,8 +41,9 @@
 
 int uc_isatty(int fd) noex {
 	int		rs ;
-	if ((rs = isatty(fd)) != 0) {
-	    rs = (- rs) ;
+	errno = 0 ;
+	if ((rs = isatty(fd)) == 0) {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
@@ -49,8 +51,9 @@ int uc_isatty(int fd) noex {
 
 int uc_isastream(int fd) noex {
 	int		rs ;
-	if ((rs = isastream(fd)) != 0) {
-	    rs = (- rs) ;
+	errno = 0 ;
+	if ((rs = isastream(fd)) == 0) {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
