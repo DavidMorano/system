@@ -57,7 +57,6 @@
 #include	<utypealiases.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
-#include	<ustat.h>	/* missing STAT stuff */
 
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<um.h>		/* UNIX® memory-management */

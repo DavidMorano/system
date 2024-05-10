@@ -17,6 +17,8 @@
 /*******************************************************************************
 
 	Name:
+	u_fattach
+	u_fdetach
 	u_strmsgget
 	u_strmsggetp
 	u_strmsgput
@@ -34,6 +36,8 @@
 	Her-Daw Che, and Maury Bach.
 
 	Synopsis:
+	int u_fattach(int fd,cchar *fname) noex
+	int u_fdetach(cchar *fname) noex
 	int u_strmsgget(int fd,STRBUF *cmp,STRBUF *dmp,int *fp) noex
 	int u_strmsggetp(int fd,STRBUF *cmp,STRBUF *dmp,int *bp,int *fp) noex
 	int u_strmsgput(int fd,STRBUF *cmp,STRBUF *dmp,int flags) noex
@@ -46,6 +50,7 @@
 	fp		pointer to flags (an integer)
 	bp		pointer to priority-band (an integer)
 	flag		flags
+	fname		file-name to attach to or detach from
 
 	Returns:
 	>=0		OK

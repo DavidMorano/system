@@ -172,5 +172,6 @@ usys_waitid.o:		usys_waitid.cc usys_waitid.h		$(INCS)
 usys_sigx.o:		usys_sigx.cc usys_sigx.h		$(INCS)
 usys_streams.o:		usys_streams.cc usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc usys_pipes.h		$(INCS)
+usys_stat.o:		usys_stat.cc usys_stat.h		$(INCS)
 
 

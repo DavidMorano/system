@@ -1,7 +1,7 @@
-/* ustat HEADER */
+/* usys_stat HEADER */
 /* lang=C20 */
 
-/* UNIX® USTAT support */
+/* UNIX® USYSSTAT support */
 /* version %I% last-modified %G% */
 
 
@@ -19,13 +19,13 @@
 
 /*******************************************************************************
 
-	This file contains some support for the UNIX® USTAT related
+	This file contains some support for the UNIX® USYSSTAT related
 	operations.
 
 *******************************************************************************/
 
-#ifndef	USTAT_INCLUDE
-#define	USTAT_INCLUDE
+#ifndef	USYSSTAT_INCLUDE
+#define	USYSSTAT_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -40,9 +40,6 @@
 #define	S_IFNAM		0x5000		/* taken from Solaris® */
 #endif
 
-
-/* possible missing S_ISNAM */
-
 #ifndef	S_ISNAM
 #ifdef	S_IFNAM
 #define	S_ISNAM(mode)	(((mode) & S_IFMT) == S_IFNAM)
@@ -52,6 +49,6 @@
 #endif /* S_ISNAM */
 
 
-#endif /* USTAT_INCLUDE */
+#endif /* USYSSTAT_INCLUDE */
 
 
