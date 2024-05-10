@@ -37,7 +37,7 @@
 
 
 #ifndef	S_IFNAM
-#define	S_IFNAME	0x5000		/* taken from Solaris® */
+#define	S_IFNAM		0x5000		/* taken from Solaris® */
 #endif
 
 
@@ -45,7 +45,7 @@
 
 #ifndef	S_ISNAM
 #ifdef	S_IFNAM
-#define	S_ISNAM(mode)	(((mode)&S_IFMT) == S_IFNAM)
+#define	S_ISNAM(mode)	(((mode) & S_IFMT) == S_IFNAM)
 #else
 #define	S_ISNAM(mode)	0
 #endif

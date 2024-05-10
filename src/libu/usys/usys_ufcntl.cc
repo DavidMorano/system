@@ -80,7 +80,7 @@ namespace usys {
 	int		f_previous = false ;
 	if ((rs = ufcntl(fd,F_GETFD,0)) >= 0) {
 	    int		fdflags = rs ;
-	    f_previous = (fdflags & FD_CLOEXEC) ? 1 : 0 ;
+	    f_previous = !!(fdflags & FD_CLOEXEC) ;
 	    if (! LEQUIV(f_previous,f)) {
 	        if (f) {
 	            fdflags |= FD_CLOEXEC ;
@@ -94,10 +94,10 @@ namespace usys {
     } /* end subroutine (ucloseonexec) */
     sysret_t unonblock(int fd,int f) noex {
 	int		rs ;
-	int		f_previous = FALSE ;
+	int		f_previous = false ;
 	if ((rs = ufcntl(fd,F_GETFL,0)) >= 0) {
 	    int		flflags = rs ;
-	    f_previous = (flflags & O_NONBLOCK) ? 1 : 0 ;
+	    f_previous = !!(flflags & O_NONBLOCK) ;
 	    if (! LEQUIV(f_previous,f)) {
 	        if (f) {
 	            flflags |= O_NONBLOCK ;

@@ -41,7 +41,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<ustropts.h>
 #include	<localmisc.h>
 
 

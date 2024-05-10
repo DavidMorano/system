@@ -62,7 +62,6 @@
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
-#include	<ustropts.h>
 #include	<localmisc.h>
 
 #include	"ustr.h"
@@ -112,6 +111,34 @@ namespace {
 
 
 /* exported subroutines */
+
+int u_fattach(int fd,cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	if (fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        if ((rs = fattach(fd,fname)) < 0) {
+		    rs = (- errno) ;
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (u_fattach) */
+
+int u_fdetach(cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	if (fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        if ((rs = fdetach(fname)) < 0) {
+		    rs = (- errno) ;
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (u_fdetach) */
 
 int u_strmsgget(int fd,STRBUF *cmp,STRBUF *dmp,int *fp) noex {
 	ustr		uso(fp) ;

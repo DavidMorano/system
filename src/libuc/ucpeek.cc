@@ -44,7 +44,6 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<libmallocxx.h>
-#include	<ustropts.h>		/* <- important money shot */
 #include	<localmisc.h>
 
 #include	"ucpeek.h"

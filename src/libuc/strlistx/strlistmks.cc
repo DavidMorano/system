@@ -6,7 +6,6 @@
 
 #define	CF_FIRSTHASH	0		/* arrange for first-attempt hashing */
 #define	CF_MINMOD	1		/* ensure minimum file mode */
-#define	CF_LATE		0		/* late open */
 
 /* revision history:
 
@@ -408,7 +407,7 @@ static int strlistmks_filesbegin(SLM *op) noex {
 		                strlistmks_nfdestroy(op) ;
 		 	    }
 	                } /* end if (nfcreate) */
-	            }
+	            } /* end if (ok) */
 	            if (rs < 0) {
 		        if (op->idname != nullptr) {
 	    	            uc_free(op->idname) ;
@@ -645,7 +644,7 @@ static int strlistmks_listend(SLM *op) noex {
 	    rs1 = rectab_finish(&op->rectab) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	{
+	if (op->stp) {
 	    rs1 = strtab_finish(op->stp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}

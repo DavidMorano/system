@@ -16,6 +16,26 @@
 
 /*******************************************************************************
 
+	Names:
+	ttyname_rp
+
+	Description:
+	These subroutines support the tread-safe version of
+	|ttyname(3c)| for those operating systems that do not have
+	that.  Yes, those operating systems are brain-damaged in
+	this day-and-age of ubiquous multi-threading.
+
+	Synopsis:
+	errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
+
+	Arguments:
+	fd		file-desciptor
+	rbuf		result buffer pointer
+	rlen		result buffer length
+
+	Returns:
+	==0		OK
+	*errno*		UNIX® ERRNO code
 
 *******************************************************************************/
 

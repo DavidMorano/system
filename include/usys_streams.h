@@ -70,14 +70,93 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<ustropts.h>
+
+
+#ifndef	STRBUF
+#define	STRBUF		struct strbuf
+#endif
+
+#ifndef	STRPEEK
+#define	STRPEEK		struct strpeek
+#endif
+
+#ifndef	STRRECVFD
+#define	STRRECVFD	struct strrecvfd
+#endif
+
+#ifndef	STRIOCTL	
+#define	STRIOCTL	struct strioctl
+#endif
+
 
 /* STREAMS begin */
-#if	(!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0)
+#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
 
+/* system has STREAMS® */
+#include	<stropts.h>
 
+#else /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 
-#endif /* (!defined(SYSHAS_PTHREADSTREAMS)) || (SYSHAS_PTHREADSTREAMS == 0) */
+#ifndef	I_PEEK
+#define	I_PEEK		0
+#endif
+
+#ifndef	I_STR
+#define	I_STR		1
+#endif
+
+#ifndef	I_SENDFD
+#define	I_SENDFD	2
+#endif
+
+#ifndef	I_RECVFD
+#define	I_RECVFD	3
+#endif
+
+#ifndef	ISPTM
+#define	ISPTM		0		/* ask if FD is a pseudo-terminal */
+#endif
+
+struct strbuf {
+	char		*buf ;
+	int		len ;
+	int		maxlen ;
+} ;
+
+struct strpeek {
+	STRBUF		ctlbuf ;
+	STRBUF		databuf ;
+	uint		flags ;
+} ;
+
+struct strrecvfd {      
+        int		fd ;
+        uid_t		uid ;
+        gid_t		gid ;
+        char		fill[8] ;
+} ;
+
+struct strioctl {
+	char		*ic_dp ;	/* data pointer */
+	int		ic_len ;	/* data length */
+	int		ic_cmd ;	/* command */
+	int		ic_timout ;	/* timeout */
+} ;
+
+EXTERNC_begin
+
+extern unixret_t isastream(int) noex ;
+extern unixret_t fattach(int,cchar *) noex ;
+extern unixret_t fdetach(cchar *) noex ;
+
+extern unixret_t getmsg(int,STRBUF *,STRBUF *,int *) noex ;
+extern unixret_t getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern unixret_t putmsg(int,STRBUF *,STRBUF *,int) noex ;
+extern unixret_t putpmsg(int,STRBUF *,STRBUF *,int,int) noex ;
+
+EXTERNC_end
+
+#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 /* STREAMS end */
 
 
