@@ -59,6 +59,7 @@
 #include	<usys.h>	/* <- auxilllary OS support */
 
 #include	<usysop.h>	/* UNIX® system-operations */
+#include	<usysdata.h>	/* UNIX® system-data */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */
@@ -67,15 +68,12 @@
 #include	<ufileop.h>	/* file-operations */
 #include	<usig.h>
 #include	<uprocess.h>
+#include	<ugetloadavg.h>
 
 
 EXTERNC_begin
 
-extern int	u_uname(UTSNAME *) noex ;
-extern int	u_getloadavg(uint *,int) noex ;
-extern int	u_sysauxinfo(char *,int,int) noex ;
 extern int	u_ulimit(int,int) noex ;
-
 extern int	u_getpgid(pid_t) noex ;
 extern int	u_getsid(pid_t) noex ;
 extern int	u_getgroups(int,gid_t *) noex ;

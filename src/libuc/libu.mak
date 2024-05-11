@@ -241,6 +241,9 @@ timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
 intsat.o:		intsat.cc intsat.h
+endian.o:		endian.cc endian.h		$(INCS)
+mtime.o:		mtime.cc mtime.h		$(INCS)
+timespec.o:		timespec.cc timespec.h		$(INCS)
 
 # ADAPTATION
 usysauxinfo.o:		usysauxinfo.cc
@@ -269,13 +272,11 @@ uipc.dir:
 	makesubdir $@
 
 # OTHER
-unanosleep.o:		unanosleep.cc			$(INCS)
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
-endian.o:		endian.cc endian.h		$(INCS)
-mtime.o:		mtime.cc mtime.h		$(INCS)
-timespec.o:		timespec.cc timespec.h		$(INCS)
+unanosleep.o:		unanosleep.cc			$(INCS)
+ugetloadavh.o:		ugetloadacg.cc ugetloadavg.h	$(INCS)
 
 

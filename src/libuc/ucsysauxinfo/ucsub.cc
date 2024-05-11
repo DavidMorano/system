@@ -47,7 +47,7 @@
 #include	<ptm.h>
 #include	<localmisc.h>
 
-#include	"sysauxinfo.h"
+#include	"usysauxinfo.h"
 
 
 /* local defines */
@@ -142,7 +142,7 @@ int ucsysauxinfo::get(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
 	if constexpr (f_sysauxinfo) {
-	    if ((rs = sysauxinfo(rbuf,rlen,req)) < 0) {
+	    if ((rs = usysauxinfo(rbuf,rlen,req)) < 0) {
 	        rs = (-rs) ;
 	    } else if (rs == 0) {
 		if (errno) {

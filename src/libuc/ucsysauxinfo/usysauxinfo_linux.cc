@@ -1,4 +1,4 @@
-/* usysauxinfo_linux */
+/* usysauxinfo_linux SUPPORT */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */
@@ -28,54 +28,26 @@
 /* USYSAUXINFO_LINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
-
 #include	<sys/types.h>
+#include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
-#include	<unistd.h>
-#include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<xlanguage.h>
 
 #include	"usysauxinfo_linux.h"
 
 
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported subroutines */
-
 /* SYSAUXINFO begin */
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int snwcpy(char *,const char *,int) noex ;
 
-int sysauxinfo(char *rbuf,int rlen,int req) noex {
+int usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    const char	*vp = nullptr ;
@@ -97,11 +69,9 @@ int sysauxinfo(char *rbuf,int rlen,int req) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sysauxinfo) */
+/* end subroutine (usysauxinfo) */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
 /* SYSAUXINFO end */

@@ -37,10 +37,8 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
-
 
 LIBS=
 
@@ -49,6 +47,7 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
