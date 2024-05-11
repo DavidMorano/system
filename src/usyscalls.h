@@ -43,13 +43,6 @@
 #include	<time.h>
 #include	<errno.h>
 #include	<dirent.h>
-#include	<netdb.h>
-#include	<pwd.h>
-#include	<grp.h>
-
-#if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
-#include	<xti.h>
-#endif
 
 #include	<clanguage.h>
 #include	<utypedefs.h>
