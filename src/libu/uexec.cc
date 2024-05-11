@@ -38,6 +38,8 @@
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
+#include	"uexec.h"
+
 
 /* local defines */
 

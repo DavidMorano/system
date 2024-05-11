@@ -59,6 +59,7 @@
 
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<usysdata.h>	/* UNIX® system-data */
+#include	<ugetloadavg.h>
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
 #include	<ustr.h>	/* UNIX® STREAMS® */
@@ -67,31 +68,7 @@
 #include	<ufileop.h>	/* file-operations */
 #include	<usig.h>
 #include	<uprocess.h>
-#include	<ugetloadavg.h>
-
-
-EXTERNC_begin
-
-extern int	u_resolvepath(cchar *,char *,int) noex ;
-extern int	u_access(cchar *,int) noex ;
-extern int	u_link(cchar *,cchar *) noex ;
-extern int	u_unlink(cchar *) noex ;
-extern int	u_rmdir(cchar *) noex ;
-extern int	u_rename(cchar *,cchar *) noex ;
-extern int	u_symlink(cchar *,cchar *) noex ;
-extern int	u_chown(cchar *,uid_t,gid_t) noex ;
-extern int	u_lchown(cchar *,uid_t,gid_t) noex ;
-extern int	u_chmod(cchar *,mode_t) noex ;
-extern int	u_utime(cchar *,const UTIMBUF *) noex ;
-extern int	u_utimes(cchar *,const TIMEVAL *) noex ;
-extern int	u_sync() noex ;
-
-#if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
-extern int	u_acl(cchar *,int,int,aclent_t *) noex ;
-extern int	u_facl(int,int,int,aclent_t *) noex ;
-#endif /* SYSHAS_ACL */
-
-EXTERNC_end
+#include	<uexec.h>
 
 
 #endif /* USYSCALLS_INCLUDE */
