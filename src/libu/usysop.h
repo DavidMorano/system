@@ -33,12 +33,10 @@
 #include	<sys/time.h>		/* |adjtime(2)| */
 #include	<unistd.h>
 #include	<time.h>		/* |time(2)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 
 
 EXTERNC_begin

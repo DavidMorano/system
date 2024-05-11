@@ -44,9 +44,9 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 /* extra system flags for 'openXXX(2)' and friends */

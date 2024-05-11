@@ -36,8 +36,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<usupport.h>
 
 

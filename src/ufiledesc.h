@@ -31,15 +31,12 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
-#include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 
 
 #ifdef	__cplusplus

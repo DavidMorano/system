@@ -42,6 +42,7 @@
 	u_wait
 	u_waitid
 	u_waitpid
+	u_nanosleep
 
 
 	Name:
@@ -117,11 +118,11 @@
 	This subroutine gets some process limits.
 
 	Synopsis:
-	int u_ulimit(int cmd,uint nval) noex
+	int u_ulimit(int cmd,...) noex
 
 	Arguments:
 	cmd		particular limit specifier 
-	nval		possible new value for specific limit
+	...		possible new value for specific limit
 
 	Returns:
 	>=0	OK
@@ -134,12 +135,13 @@
 #include	<sys/resource.h>
 #include	<sys/wait.h>
 #include	<sys/times.h>		/* |times(2)| */
-#include	<ulimit.h>
-#include	<climits>		/* |INT_MAX| */
+#include	<ulimit.h>		/* commands for |ulimit(2)| */
+#include	<climits>		/* |INT_MAX| + |LONG_MAX| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>		/* |uintptr_t| */
+#include	<cstdarg>		/* |uintptr_t| */
 #include	<utility>		/* |unreachable(3c++)| */
 #include	<bit>			/* |bit_cast(3c++)| */
 #include	<clanguage.h>
@@ -401,11 +403,27 @@ int u_times(TMS *rp) noex {
 }
 /* end subroutine (u_times) */
 
-int u_ulimit(int cmd,int nval) noex {
+int u_ulimit(int cmd,...) noex {
+	va_list		ap ;
 	int		rs = SR_OK ;
 	long		rval = 0 ;
-	errno = 0 ;
-	if ((rval = ulimit(cmd,nval)) == -1L) {
+	switch (cmd) {
+	case UL_GETFSIZE:
+	    rval = ulimit(cmd,rval) ;
+	    break ;
+	case UL_SETFSIZE:
+	    va_begin(ap,cmd) ;
+	    {
+		csize	sz = size_t(va_arg(ap,long)) ;
+		{
+		   long	nval = long(sz & LONG_MAX) ;
+	           rval = ulimit(cmd,nval) ;
+		}
+	    }
+	    va_end(ap) ;
+	    break ;
+	} /* end switch */
+	if (rval == -1L) {
 	    if (errno != 0) {
 		rs = (- errno) ;
 	    } else {
@@ -467,6 +485,17 @@ int u_waitpid(pid_t pid,int *sp,int flags) noex {
 	return rs ;
 }
 /* end subroutine (u_waitpid) */
+
+int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
+	int		rs = SR_FAULT ;
+	if (tsp) {
+	    if ((rs = nanosleep(tsp,rtsp)) < 0) {
+	        rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_nanosleep) */
 
 
 /* local subroutines */

@@ -1,4 +1,4 @@
-/* usysop HEADER (UNIX® system operations) */
+/* uexec HEADER (UNIX® file operations) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -18,21 +18,21 @@
 /*******************************************************************************
 
 	Names:
+	u_execve
 
 	Description:
-	These subroutines mange the operating system itself.
+	All of the UNIX® system calls that use (operate on) a
+	UNIX® process.
 
 *******************************************************************************/
 
-#ifndef	USYSOP_INCLUDE
-#define	USYSOP_INCLUDE
+#ifndef	UEXEC_INCLUDE
+#define	UEXEC_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* |adjtime(2)| */
 #include	<unistd.h>
-#include	<time.h>		/* |time(2)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -41,13 +41,21 @@
 
 EXTERNC_begin
 
-extern int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
-extern int u_stime(time_t *tp) noex ;
-extern int u_time(time_t *rp) noex ;
+extern int	u_execve(cchar *,mainv,mainv) noex ;
+extern int	u_execv(cchar *,mainv) noex ;
+extern int	u_execvp(cchar *,mainv) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
 
-#endif /* USYSOP_INCLUDE */
+inline int u_nice(int incr) noex {
+	return u_nice(incr,nullptr) ;
+}
+
+#endif /* __cplusplus */
+
+
+#endif /* UEXEC_INCLUDE */
 
 

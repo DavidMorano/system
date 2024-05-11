@@ -136,7 +136,7 @@ OBJ55=
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
 OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
-OBJB= usys.o usysop.o uipc.o usig.o unanosleep.o
+OBJB= usys.o usysop.o uipc.o usig.o
 OBJC= uopen.o ustr.o usysdata.o uatfork.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
 OBJE= ufiledesc.o ufileop.o uprocess.o endian.o
@@ -276,7 +276,6 @@ ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
-unanosleep.o:		unanosleep.cc			$(INCS)
-ugetloadavh.o:		ugetloadacg.cc ugetloadavg.h	$(INCS)
+ugetloadavg.o:		ugetloadacg.cc ugetloadavg.h	$(INCS)
 
 
