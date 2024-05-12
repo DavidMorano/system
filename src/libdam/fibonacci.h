@@ -19,14 +19,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<char.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
 
-extern long fibonacci(int) noex ;
+extern long	fibonacci(int) noex ;
 
 EXTERNC_end
 

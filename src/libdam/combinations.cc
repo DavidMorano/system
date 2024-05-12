@@ -64,25 +64,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<limits.h>
-#include	<utypedef.h>
+#include	<climits>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
-/* external subroutines */
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern long	factorial(int) noex ;
-extern long	permutations(int,int) noex ;
+extern "C" {
+    extern long		factorial(int) noex ;
+    extern long		permutations(int,int) noex ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -111,9 +126,11 @@ long combinations(int n,int k) noex {
 }
 /* end subroutine (combinations) */
 
+#ifdef	COMMENT
 long multicombinations(int n,int k) noex {
-	return combinations(n+k-1,k) ;
+	return combinations((n + k - 1),k) ;
 }
 /* end subroutine (multicombinations) */
+#endif /* COMMENT */
 
 

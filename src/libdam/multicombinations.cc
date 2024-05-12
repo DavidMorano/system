@@ -20,14 +20,15 @@
 	multicombinations
 
 	Description:
-	We calculate the multicombinations of the given number.
+	We calculate the multicombinations of the given number
+	(n-choose-k function WITH repitition).
 
 	Synopsis:
 	long multicombinations(int n,int k) noex
 
 	Arguments:
 	n	number of items to choose from
-	k	nuber of item to choose without repitition
+	k	nuber of item to choose WITH repitition
 
 	Returns:
 	-	the Fibonacci number of the input

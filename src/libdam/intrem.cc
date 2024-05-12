@@ -1,6 +1,8 @@
-/* intrem */
+/* intrem SUPPORT */
+/* lang=C++20 */
 
 /* integer remainder */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,84 +12,86 @@
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	These subroutine calculates the unsigned remainder of a division of the
-	two given numbers.
+	Names:
+	{x}irem
+
+	Description:
+	These subroutine calculates the unsigned remainder of a
+	division of the two given numbers.
 
 	Synopsis:
-
-	int irem(v,m)
-	int	v ;
-	int	m ;
+	int {x}rem(int v,int m) noex
 
 	Arguments:
-
 	v	number to find the remainder for
 	m	the modulus to use in the calculation
 
 	Returns:
-
 	-	the remainder value
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<localmisc.h>
 
-#include	<sys/types.h>
+#include	"intrem.h"
 
-#include	<localmisc.h>		/* for shortened unsigned types */
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int irem(int v,int m)
-{
+int irem(int v,int m) noex {
 	const int	q = (v/m) ;
 	return (v-(q*m)) ;
 }
 /* end subroutine (irem) */
 
-
-long lrem(long v,long m)
-{
+long lrem(long v,long m) noex {
 	const long	q = (v/m) ;
 	return (v-(q*m)) ;
 }
 /* end subroutine (lrem) */
 
-
-longlong llrem(longlong v,int m)
-{
+longlong llrem(longlong v,int m) noex {
 	const longlong	q = (v/m) ;
 	return (v-(q*m)) ;
 }
 /* end subroutine (llrem) */
 
-
-uint uirem(uint v,int m)
-{
+uint uirem(uint v,int m) noex {
 	const uint	q = (v/m) ;
 	return (v-(q*m)) ;
 }
 /* end subroutine (uirem) */
 
-
-ulong ulrem(ulong v,int m)
-{
+ulong ulrem(ulong v,int m) noex {
 	const ulong	q = (v/m) ;
 	return (v-(q*m)) ;
 }
 /* end subroutine (ulrem) */
 
-
-ulonglong ullrem(ulonglong v,int m)
-{
+ulonglong ullrem(ulonglong v,int m) noex {
 	const ulonglong	q = (v/m) ;
 	return (v-(q*m)) ;
 }

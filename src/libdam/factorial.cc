@@ -53,14 +53,27 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 #include	"factorial.h"
 
 
+/* local defines */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -78,6 +91,9 @@ static constexpr long	facttab[] = {
 	0x0016beecca730000, 0x01b02b9306890000,
 	0x21c3677c82b40000
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

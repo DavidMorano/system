@@ -1,5 +1,8 @@
-/* intrem */
+/* intrem SUPPORT */
+/* lang=C++20 */
+
 /* Integer Ceiling */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,26 +15,26 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	INTREM_INCLUDE
-#define	INTREM_INCLUDE	 1
+#define	INTREM_INCLUDE
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
-extern int irem(int,int) ;
-extern long lrem(long,long) ;
-extern LONG llrem(LONG,LONG) ;
-extern uint urem(uint,uint) ;
-extern ulong ulrem(ulong,ulong) ;
-extern ULONG ullrem(ULONG,ULONG) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int		irem(int,int) noex ;
+extern long		lrem(long,long) noex ;
+extern longlong		llrem(longlong,longlong) noex ;
+extern uint		urem(uint,uint) noex ;
+extern ulong		ulrem(ulong,ulong) noex ;
+extern ulonglong	ullrem(ulonglong,ulonglong) noex ;
+
+EXTERNC_end
+
 
 #endif /* INTREM_INCLUDE */
 

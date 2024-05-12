@@ -55,7 +55,7 @@
 #include	<localmisc.h>
 
 
-/* external subroutines */
+/* local defines */
 
 
 /* external subroutines */
@@ -63,10 +63,19 @@
 extern long	factorial(int) noex ;
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

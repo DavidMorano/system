@@ -1,10 +1,10 @@
-/* bufstr */
+/* bufstr SUPPORT */
+/* lang=C++20 */
 
 /* string buffer object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_FASTGROW	1		/* grow faster */
-
 
 /* revision history:
 
@@ -17,30 +17,23 @@
 
 /*******************************************************************************
 
-	This module can be used to construct strings or messages in buffers
-	WITHOUT using the 'sprint' subroutine.
-
-	This module is useful when the user does NOT supply a buffer to be used
-	as the working store.  Rather, an internally, dynamically grown and
-	managed buffer is maintained.
-
-	This module uses an object, that must be initialized and eventually
-	freed, to track the state of the dynamically used internal buffer.
-
+	This module can be used to construct strings or messages
+	in buffers WITHOUT using the 'sprint' subroutine.  This
+	module is useful when the user does NOT supply a buffer to
+	be used as the working store.  Rather, an internally,
+	dynamically grown and managed buffer is maintained.  This
+	module uses an object, that must be initialized and eventually
+	freed, to track the state of the dynamically used internal
+	buffer.
 
 *******************************************************************************/
 
-
-#define	BUFSTR_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"bufstr.h"
@@ -51,21 +44,24 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-int		bufstr_strw(BUFSTR *,const char *,int) ;
+static int	bufstr_extend(bufstr *,int,char **) noex ;
 
-static int	bufstr_extend(BUFSTR *,int,char **) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bufstr_start(BUFSTR	 *op)
-{
+int bufstr_start(BUFSTR	 *op) noex {
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -77,9 +73,7 @@ int bufstr_start(BUFSTR	 *op)
 }
 /* end subroutine (bufstr_start) */
 
-
-int bufstr_finish(BUFSTR *op)
-{
+int bufstr_finish(bufstr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -98,9 +92,7 @@ int bufstr_finish(BUFSTR *op)
 }
 /* end subroutine (bufstr_finish) */
 
-
-int bufstr_char(BUFSTR *op,int ch)
-{
+int bufstr_char(bufstr *op,int ch) noex {
 	int		rs ;
 	char		buf[2] ;
 
@@ -111,9 +103,7 @@ int bufstr_char(BUFSTR *op,int ch)
 }
 /* end subroutine (bufstr_char) */
 
-
-int bufstr_strw(BUFSTR *op,cchar *sp,int sl)
-{
+int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	char		*bp ;
 
@@ -131,9 +121,7 @@ int bufstr_strw(BUFSTR *op,cchar *sp,int sl)
 }
 /* end subroutine (bufstr_strw) */
 
-
-int bufstr_buf(BUFSTR *op,cchar sp[],int sl)
-{
+int bufstr_buf(bufstr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	char		*bp ;
 
@@ -151,15 +139,12 @@ int bufstr_buf(BUFSTR *op,cchar sp[],int sl)
 }
 /* end subroutine (bufstr_buf) */
 
-
-/* get the pointer the object string */
-int bufstr_get(BUFSTR *op,cchar **spp)
-{
-
+int bufstr_get(bufstr *op,cchar **spp) noex {
 	if (op == NULL) return SR_FAULT ;
 
-	if (spp != NULL)
+	if (spp) {
 	    *spp = (op->dbuf != NULL) ? op->dbuf : op->sbuf ;
+	}
 
 	return op->len ;
 }
@@ -168,19 +153,12 @@ int bufstr_get(BUFSTR *op,cchar **spp)
 
 /* private subroutines */
 
-
-static int bufstr_extend(BUFSTR *op,int nlen,char **rpp)
-{
-	const int	slen = BUFSTR_LEN ;
+static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
+	cint		slen = BUFSTR_LEN ;
 	int		rs = SR_OK ;
 	int		dlen ;
 	int		rlen ;
 	char		*dp ;
-
-#if	CF_DEBUGS
-	debugprintf("buffer_extend: nlen=%d\n",nlen) ;
-	debugprintf("buffer_extend: e=%u l=%d\n",op->dlen,op->len) ;
-#endif
 
 	if (op->dbuf == NULL) {
 	    rlen = (slen-op->len) ;
@@ -207,12 +185,9 @@ static int bufstr_extend(BUFSTR *op,int nlen,char **rpp)
 	    }
 	} /* end if (extension needed) */
 
-	if (rpp != NULL)
+	if (rpp) {
 	    *rpp = (rs >= 0) ? dp : NULL ;
-
-#if	CF_DEBUGS
-	debugprintf("buffer_extend: ret rs=%d e=%u\n",rs,op->dlen) ;
-#endif
+	}
 
 	return rs ;
 }

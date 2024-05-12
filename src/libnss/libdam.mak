@@ -743,40 +743,25 @@ outbuf.o:		outbuf.c outbuf.h
 matenv.o:		matenv.c matenv.h
 
 mailmsgmatenv.o:	mailmsgmatenv.c mailmsgmatenv.h
-
 mailmsgmathdr.o:	mailmsgmathdr.c mailmsgmathdr.h
-
 mailmsgfrom.o:		mailmsgfrom.c mailmsgfrom.h
-
 mailbox.o:		mailbox.c mailbox.h
-
 mailbox_getfrom.o:	mailbox_getfrom.c mailbox.h
-
 mailmsg.o:		mailmsg.c mailmsg.h mailmsgmatenv.h
-
 mailmsg_loadfile.o:	mailmsg_loadfile.c mailmsg.h
-
 mailmsg_loadfd.o:	mailmsg_loadfile.c mailmsg.h
-
 mailmsg_loadmb.o:	mailmsg_loadmb.c mailmsg.h mailmsgmatenv.h
-
 mailmsg_enver.o:	mailmsg_enver.c mailmsg.h mailmsgmatenv.h
-
 mailmsg_envtimes.o:	mailmsg_envtimes.c mailmsg.h
-
 mailmsg_envdates.o:	mailmsg_envdates.c mailmsg.h
-
 mailmsghdrs.o:		mailmsghdrs.c mailmsghdrs.h mailmsg.h
-
 mailmsgstage.o:		mailmsgstage.c mailmsgstage.h 
-
 mailmsghdrval.o:	mailmsghdrval.c mailmsghdrval.h
-
 mailmsghdrfold.o:	mailmsghdrfold.c mailmsghdrfold.h
+mailaddrquote.o:	mailaddrquote.cc mailaddrquote.h
 
 staackaddr.o:		stackaddr.c stsackaddr.h
 
-mailaddrquote.o:	mailaddrquote.c mailaddrquote.h
 
 char.o:			char.c char.h
 mkchar.o:		mkchar.c mkchar.h
