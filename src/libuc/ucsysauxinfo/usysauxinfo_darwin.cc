@@ -45,13 +45,14 @@
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
 EXTERNC_begin
+extern int sncpy1(char *,int,cchar *) noex ;
+EXTERNC_end
 
-extern int sncpy1(char *,int,const char *) noex ;
-
-int usysauxinfo(char *rbuf,int rlen,int req) noex {
+namespace usys {
+    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    const char	*vp = nullptr ;
+	    cchar	*vp = nullptr ;
 	    rs = SR_NOENT ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
@@ -69,10 +70,8 @@ int usysauxinfo(char *rbuf,int rlen,int req) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
+    } /* end subroutine (usysauxinfo) */
 }
-/* end subroutine (usysauxinfo) */
-
-EXTERNC_end
 
 #endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
 /* SYSAUXINFO end */

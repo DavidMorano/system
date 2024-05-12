@@ -46,10 +46,11 @@
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
 EXTERNC_begin
-
 extern int snwcpy(char *,const char *,int) noex ;
+EXTERNC_end
 
-sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
+namespace usys {
+    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    int		r = -1 ;
@@ -76,10 +77,8 @@ sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
+    } /* end subroutine (usysauxinfo) */
 }
-/* end subroutine (usysauxinfo) */
-
-EXTERNC_end
 
 #endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
 /* SYSAUXINFO end */

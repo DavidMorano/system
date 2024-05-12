@@ -50,15 +50,15 @@
 
 	Returns:
 	>=0	bytes of noise returned
-	<0	error (system-return)
+	<0	error code (system-return)
 
 	Important Note:
-	There is great danger in this subroutine! What if the
+	There is great danger in this subroutine!  What if the
 	sub-process starts up OK but then never writes anything
 	into the pipe AND it also just hangs there indefinitely?
 	Well, you might say "how can that happen?"  "Even if it
 	does not write anything, will not the sub-process eventually
-	exit and thereby close its end of the pipe?" Well, my
+	exit and thereby close its end of the pipe?"  Well, my
 	response, is, it has happened!  Remember that we are trying
 	to run 'vmstat -s'!  Who knows what weirdo locks it has to
 	acquire that might hang rather indefinitely?  That is exactly

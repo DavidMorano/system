@@ -59,6 +59,14 @@
 #endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
 
 
+/* imported namespaces */
+
+using usys::usysauxinfo ;		/* subroutines */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -66,7 +74,7 @@
 
 namespace {
     struct ucsysauxinfo ;
-    typedef int (ucsysauxinfo::*mem_f)(char *,int,int) ;
+    typedef int (ucsysauxinfo::*mem_f)(char *,int,int) noex ;
     struct ucsysauxinfo {
 	mem_f		m ;
 	ucsysauxinfo() noex { } ;
@@ -86,6 +94,9 @@ extern "C" {
 /* local variables */
 
 constexpr bool		f_sysauxinfo = F_SYSAUXINFO ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

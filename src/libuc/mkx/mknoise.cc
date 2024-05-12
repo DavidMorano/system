@@ -9,7 +9,7 @@
 
 	= 2002-07-13, David A­D­ Morano
 	This is just a quick hack to get some additional noise from
-	a UNIX® system that is fairly portable (a big problem). I
+	a UNIX® system that is fairly portable (a big problem).  I
 	really failed here because the most noise we get is from
 	the presence of the current processes on the machine and
 	this is very non-portable on systems not running System V.
@@ -30,21 +30,21 @@
 	mknoise
 
 	Description:
-	This subroutine acquires some of the process noise in the
-	system.  It basically just looks at the process IDs that
-	exist at the moment of the call and returns a random sequence
-	of data based on that.
+	This subroutine acquires some of the noise from the system.
+	It basically just looks at the process IDs that exist at
+	the moment of the call and returns a random sequence of
+	data based on that.
 
 	Synopsis:
 	int mknoise(uint *a,int n) noex
 
 	Arguments:
-	a	array of integers to receive the noise
+	a	array of (unsigned) integers to receive the noise
 	n	number of integers supplied by caller
 
 	Returns:
-	>=0	number of intergers containing random data being returned
-	<0	error (system-return)
+	>=0	number of integers containing random data being returned
+	<0	error code (system-return)
 
 *******************************************************************************/
 
@@ -90,7 +90,16 @@
 
 int mknoise(uint *a,int n) noex {
 	uint		sz = sizeof(uint) ;
-	return uc_rand(a,(n * sz)) ;
+	int		rs = SR_FAULT ;
+	if (a) {
+	    rs = SR_INVALID ;
+	    if (n) {
+	        if ((rs = uc_rand(a,(n * sz))) >= 0) {
+		    n = int(rs / sz) ;
+		}
+	    }
+	}
+	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mknoise) */
 

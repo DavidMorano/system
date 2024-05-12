@@ -16,6 +16,7 @@
 
 #ifndef	USYSAUXINFO_INCLUDE
 #define	USYSAUXINFO_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -33,13 +34,12 @@
 #define SAI_SRPCDOMAIN		usysauxinforeq_srpcdomain
 
 
-EXTERNC_begin
-
-extern int usysauxinfo(char *,int,int) noex ;
-
-EXTERNC_end
+namespace usys {
+    extern int usysauxinfo(char *,int,int) noex ;
+}
 
 
+#endif /* __cplusplus */
 #endif /* SYSUAUXINFO_INCLUDE */
 
 

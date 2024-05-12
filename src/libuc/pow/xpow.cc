@@ -46,7 +46,7 @@
 #include	<stdintx.h>
 #include	<localmisc.h>
 
-#include	"ipow.h"
+#include	"pow.h"
 
 
 /* local defines */
@@ -80,7 +80,7 @@ static int	ipow10(int) noex ;
 
 constexpr bool	f_dynamic = CF_DYNAMIC ;
 
-constexpr int	b20tab[] = {
+constexpr int	b10tab[] = {
 	1, 10, 100, 1000, 10000, 100000, 1000000,
 	10000000, 100000000, 1000000000
 } ;
@@ -149,7 +149,7 @@ longlong llpow(longlong b,int n) noex {
 static int ipow10(int n) noex {
 	int		r = 0 ;
 	if (n < 9) {
-	    r = b20tab[n] ;
+	    r = b10tab[n] ;
 	} /* end if */
 	return r ;
 }
