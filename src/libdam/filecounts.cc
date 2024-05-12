@@ -1,9 +1,8 @@
-/* filecounts */
+/* filecounts SUPPORT */
+/* lang=C++20 */
 
 /* manage a file-based counter database */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,52 +16,41 @@
 
 /*******************************************************************************
 
-	This module is a manager for a counter data-base maintained in a file.
+	Name:
+	filecounts
+
+	Description:
+	This module is a manager for a counter data-base maintained
+	in a file.
 
 	Synopsis:
-
-	int filecounts_open(op,fname)
-	FILECOUNTS	*op ;
-	const char	fname[] ;
-
-	int filecounts_close(op)
-	FILECOUNTS	*op ;
-
-	int filecounts_process(op,list)
-	FILECOUNTS	*op ;
-	FILECOUNTS_N	*list ;
+	int filecounts_open(FILECOUNTS *op,cchar *fname) noex
+	int filecounts_close(FILECOUNT *op) noex
+	int filecounts_process(FILECOUNTS *op,FILECOUNTS_N *list) noex
 
 	= Notes
-
 	Different processing occurs for each variable depending on how
 	the variable 'value' in a list-item is set:
-
 	value		action
 	-1		retrieve value only (do not add if not present)
 	0		create as necessary and retrieve value only
 	1		create as necessary, retreive value, and increment
 	<v>		create as necessary, and set to value <v>
 
-
 	Format of file records:
-
 	<count> <date> <name> 
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
-
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<filer.h>
 #include	<vecobj.h>
@@ -110,26 +98,26 @@
 
 extern uint	uaddsat(uint,uint) ;
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	iaddsat(int,int) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
+extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -146,7 +134,7 @@ struct worker {
 } ;
 
 struct worker_ent {
-	const char	*name ;		/* name of DB entry */
+	cchar	*name ;		/* name of DB entry */
 	uint		ovalue ;	/* old-value */
 	uint		avalue ;	/* action-value */
 	int		eoff ;		/* offset in file */
@@ -171,7 +159,7 @@ static int	filecounts_lockbegin(FILECOUNTS *) ;
 static int	filecounts_lockend(FILECOUNTS *) ;
 
 static int	worker_start(WORKER *,FILECOUNTS_N *) ;
-static int	worker_match(WORKER *,const char *,int) ;
+static int	worker_match(WORKER *,cchar *,int) ;
 static int	worker_record(WORKER *,int,int,uint) ;
 static int	worker_remaining(WORKER *) ;
 static int	worker_sort(WORKER *) ;
@@ -181,13 +169,13 @@ static int	worker_finish(WORKER *) ;
 static int	mkentry(char *,int,uint,int,cchar *,int,cchar *) ;
 static int	actioncmd(int) ;
 
-static int	vcmpoff(const void *,const void *) ;
+static int	vcmpoff(vcoid *,vcoid *) ;
 
 
 /* local variables */
 
-static const char	*total = "TOTAL" ;
-static const char	blanks[] = "                    " ;
+static cchar	*total = "TOTAL" ;
+static cchar	blanks[] = "                    " ;
 
 
 /* exported subroutines */
@@ -337,8 +325,8 @@ int filecounts_curend(FILECOUNTS *op,FILECOUNTS_CUR *curp)
 int filecounts_snap(FILECOUNTS *op,FILECOUNTS_CUR *curp)
 {
 	VECOBJ		tlist ;
-	const int	iisize = sizeof(FILECOUNTS_II) ;
-	const int	to = TO_LOCK ;
+	cint	iisize = sizeof(FILECOUNTS_II) ;
+	cint	to = TO_LOCK ;
 	int		rs ;
 	int		n = DEFNENTRIES ;
 	int		opts = 0 ;
@@ -419,7 +407,7 @@ int filecounts_read(FILECOUNTS *op,FILECOUNTS_CUR *curp,FILECOUNTS_INFO *fcip,
 	int		rs = SR_OK ;
 	int		ei ;
 	int		nl = 0 ;
-	const char	*np ;
+	cchar	*np ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -501,8 +489,8 @@ static int filecounts_proclist(FILECOUNTS *op,FILECOUNTS_N *nlp)
 static int filecounts_scan(FILECOUNTS *op,WORKER *wp,FILER *fbp)
 {
 	uint		foff = 0 ;
-	const int	llen = LINEBUFLEN ;
-	const int	to = TO_LOCK ;
+	cint	llen = LINEBUFLEN ;
+	cint	to = TO_LOCK ;
 	int		rs ;
 	int		len ;
 	int		rn = 1 ;
@@ -538,16 +526,16 @@ static int filecounts_procline(op,wp,eoff,lbuf,len)
 FILECOUNTS	*op ;
 WORKER		*wp ;
 int		eoff ;
-const char	*lbuf ;
+cchar	*lbuf ;
 int		len ;
 {
 	uint		v ;
-	const int	llen = FILECOUNTS_NUMDIGITS ;
+	cint	llen = FILECOUNTS_NUMDIGITS ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		si ;
 	int		nl ;
-	const char	*np ;
+	cchar	*np ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -610,7 +598,7 @@ static int filecounts_update(FILECOUNTS *op,WORKER *wp)
 	                } else {
 	                    c += 1 ;
 	                    if (strcmp(wep->name,"TOTAL") == 0) {
-	                        const int	ni = wep->ni ;
+	                        cint	ni = wep->ni ;
 	                        wep->action = WORKER_CMDSET ;
 	                        nlp[ni].value += wp->vall ;
 	                    }
@@ -630,8 +618,8 @@ static int filecounts_update(FILECOUNTS *op,WORKER *wp)
 static int filecounts_updateone(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 {
 	uint		nv ;
-	const int	ulen = UPDATEBUFLEN ;
-	const int	na = wep->action ;
+	cint	ulen = UPDATEBUFLEN ;
+	cint	na = wep->action ;
 	int		rs = SR_OK ;
 	int		ni = wep->ni ;
 	int		wlen = 0 ;
@@ -684,10 +672,10 @@ static int filecounts_append(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 {
 	off_t	eoff ;
 	uint		nv ;
-	const int	nvsize = FILECOUNTS_NUMDIGITS ;
-	const int	tsize = FILECOUNTS_LOGZLEN ;
-	const int	ulen = UPDATEBUFLEN ;
-	const int	na = wep->action ;
+	cint	nvsize = FILECOUNTS_NUMDIGITS ;
+	cint	tsize = FILECOUNTS_LOGZLEN ;
+	cint	ulen = UPDATEBUFLEN ;
+	cint	na = wep->action ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		ubuf[UPDATEBUFLEN + 1] ;
@@ -765,10 +753,10 @@ static int filecounts_snaper(FILECOUNTS *op,VECOBJ *ilp)
 
 	if ((rs = dater_start(&dm,NULL,NULL,0)) >= 0) {
 	    FILER	fb ;
-	    const int	opts = 0 ;
+	    cint	opts = 0 ;
 	    if ((rs = filer_start(&fb,op->fd,0L,0,opts)) >= 0) {
-	        const int	to = -1 ;
-	        const int	llen = LINEBUFLEN ;
+	        cint	to = -1 ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
 	            rs = filecounts_snaperline(op,&dm,ilp,lbuf,rs) ;
@@ -801,9 +789,9 @@ int		llen ;
 	    uint	v ;
 	    int		sl = llen ;
 	    int		cl ;
-	    const char	*cp ;
-	    const char	*np ;
-	    const char	*sp = lbuf ;
+	    cchar	*cp ;
+	    cchar	*np ;
+	    cchar	*sp = lbuf ;
 
 	if (sl && (sp[sl-1] == '\n')) sl -= 1 ;
 
@@ -817,7 +805,7 @@ int		llen ;
 	sl -= ((cp + cl + 1) - sp) ;
 	sp = (cp + cl + 1) ;
 
-	cp = (const char *) sp ;
+	cp = (cchar *) sp ;
 	cl = FILECOUNTS_LOGZLEN ;
 	if ((rs = dater_setlogz(dmp,cp,cl)) >= 0) {
 	    time_t	utime ;
@@ -859,8 +847,8 @@ int		llen ;
 
 static int filecounts_lockbegin(FILECOUNTS *op)
 {
-	const int	to = TO_LOCK ;
-	const int	cmd = (op->f.rdonly) ? F_RLOCK : F_WLOCK ;
+	cint	to = TO_LOCK ;
+	cint	cmd = (op->f.rdonly) ? F_RLOCK : F_WLOCK ;
 	int		rs ;
 	rs = lockfile(op->fd,cmd,0L,0L,to) ;
 	return rs ;
@@ -870,7 +858,7 @@ static int filecounts_lockbegin(FILECOUNTS *op)
 
 static int filecounts_lockend(FILECOUNTS *op)
 {
-	const int	cmd = F_ULOCK ;
+	cint	cmd = F_ULOCK ;
 	int		rs ;
 	rs = lockfile(op->fd,cmd,0L,0L,0) ;
 	return rs ;
@@ -880,8 +868,8 @@ static int filecounts_lockend(FILECOUNTS *op)
 
 static int worker_start(WORKER *wp,FILECOUNTS_N *nlp)
 {
-	const int	wesize = sizeof(WORKER_ENT) ;
-	const int	n = DEFNENTRIES ;
+	cint	wesize = sizeof(WORKER_ENT) ;
+	cint	n = DEFNENTRIES ;
 	int		rs ;
 	int		opts ;
 
@@ -895,12 +883,12 @@ static int worker_start(WORKER *wp,FILECOUNTS_N *nlp)
 	    int		na ;
 	    int		vadding = 0 ;
 	    int		ti = -1 ;
-	    const char	*tnp = total ;
-	    const char	*np ;
+	    cchar	*tnp = total ;
+	    cchar	*np ;
 	    for (i = 0 ; nlp[i].name != NULL ; i += 1) {
 	        np = nlp[i].name ;
 	        if ((np[0] != 'T') || (strcmp(np,tnp) != 0)) {
-	            const int	nv = nlp[i].value ;
+	            cint	nv = nlp[i].value ;
 	            na = actioncmd(nv) ;
 	            if (na == WORKER_CMDINC) vadding += nv ;
 	            memset(&we,0,wesize) ;
@@ -1002,7 +990,7 @@ static int worker_record(WORKER *wp,int ei,int eoff,uint v)
 	int		rs ;
 
 	if ((rs = vecobj_get(&wp->list,ei,&wep)) >= 0) {
-	    const int	ni = wep->ni ;
+	    cint	ni = wep->ni ;
 	    if (wp->nremain > 0) wp->nremain -= 1 ;
 	    wep->eoff = eoff ;
 	    wep->ovalue = v ;
@@ -1042,9 +1030,9 @@ char		rbuf[] ;
 int		rlen ;
 uint		nv ;
 int		nvsize ;
-const char	tbuf[] ;
+cchar	tbuf[] ;
 int		timesize ;
-const char	name[] ;
+cchar	name[] ;
 {
 	int		rs ;
 	int		n ;
@@ -1118,9 +1106,7 @@ static int actioncmd(int nv)
 }
 /* end subroutine (actioncmd) */
 
-
-static int vcmpoff(const void *v1p,const void *v2p)
-{
+static int vcmpoff(vcoid *v1p,vcoid *v2p) noex {
 	WORKER_ENT	**e1pp = (WORKER_ENT **) v1p ;
 	WORKER_ENT	**e2pp = (WORKER_ENT **) v2p ;
 	WORKER_ENT	*e1p ;

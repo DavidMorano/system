@@ -1,16 +1,21 @@
-/* filecounts */
+/* filecounts HEADERS */
+/* lang=C20 */
+
+/* manage a file-based counter database */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	FILECOUNTS_INCLUDE
-#define	FILECOUNTS_INCLUDE	1
+#define	FILECOUNTS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -20,32 +25,32 @@
 
 #define	FILECOUNTS		struct filecounts_head
 #define	FILECOUNTS_N		struct filecounts_name
-#define	FILECOUNTS_INFO		struct filecounts_info
-#define	FILECOUNTS_CUR		struct filecounts_cur
-#define	FILECOUNTS_II		struct filecounts_ii
+#define	FILECOUNTS_INFO		struct filecounts_infomation
+#define	FILECOUNTS_CUR		struct filecounts_cursor
+#define	FILECOUNTS_II		struct filecounts_iil
 #define	FILECOUNTS_FL		struct filecounts_flags
 
 
-struct filecounts_ii {
-	const char	*name ;
+struct filecounts_iil {
+	cchar		*name ;
 	time_t		utime ;
 	int		value ;
 } ;
 
-struct filecounts_cur {
+struct filecounts_cursor {
 	uint		magic ;
 	FILECOUNTS_II	*list ;
 	int		nlist ;
 	int		i ;
 } ;
 
-struct filecounts_info {
+struct filecounts_infomation {
 	time_t		utime ;		/* last update time */
 	int		value ;		/* counter previous value */
 } ;
 
 struct filecounts_name {
-	const char	*name ;		/* counter name */
+	cchar		*name ;		/* counter name */
 	int		value ;		/* counter previous value */
 } ;
 
@@ -54,34 +59,33 @@ struct filecounts_flags {
 } ;
 
 struct filecounts_head {
-	uint		magic ;
-	const char	*fname ;	/* file-name */
+	cchar		*fname ;	/* file-name */
 	FILECOUNTS_FL	f ;
+	uint		magic ;
 	int		fd ;
 	int		ncursors ;
 } ;
 
+extern	FILECOUNTS		filecounts ;
+extern	FILECOUNTS_N		filecounts_n ;
+extern	FILECOUNTS_INFO		filecounts_info ;
+extern	FILECOUNTS_CUR		filecounts_cur ;
+extern	FILECOUNTS_II		filecounts_ii ;
+extern	FILECOUNTS_FL		filecounts_fl ;
 
-#if	(! defined(FILECOUNTS_MASTER)) || (FILECOUNTS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int filecounts_open(FILECOUNTS *,const char *,int,mode_t) ;
-extern int filecounts_process(FILECOUNTS *,FILECOUNTS_N *) ;
-extern int filecounts_curbegin(FILECOUNTS *,FILECOUNTS_CUR *) ;
-extern int filecounts_snap(FILECOUNTS *,FILECOUNTS_CUR *) ;
+extern int filecounts_open(FILECOUNTS *,cchar *,int,mode_t) noex ;
+extern int filecounts_process(FILECOUNTS *,FILECOUNTS_N *) noex ;
+extern int filecounts_curbegin(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
+extern int filecounts_snap(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
 extern int filecounts_read(FILECOUNTS *,FILECOUNTS_CUR *,
-		FILECOUNTS_INFO *,char *,int) ;
-extern int filecounts_curend(FILECOUNTS *,FILECOUNTS_CUR *) ;
-extern int filecounts_close(FILECOUNTS *) ;
+		FILECOUNTS_INFO *,char *,int) noex ;
+extern int filecounts_curend(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
+extern int filecounts_close(FILECOUNTS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* FILECOUNTS_MASTER */
 
 #endif /* FILECOUNTS_INCLUDE */
 

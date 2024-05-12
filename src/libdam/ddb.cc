@@ -1,11 +1,9 @@
-/* ddb (unneeded, unfinished) */
+/* ddb SUPPORT (unneeded, unfinished) */
 /* lang=C++20 */
 
 /* domain data-base */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_SAFE		1
 
 /* revision history:
 
@@ -33,15 +31,16 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<netdb.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<hdb.h>
 #include	<sfx.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
 
 
@@ -50,67 +49,40 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
+/* external variables [subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-static int ddb_open(op,pr,fname)
-DDB		*op ;
-cchar	pr[] ;
-cchar	fname[] ;
-{
-	int	rs ;
-
-
-#if	CF_SAFE
-	if (op == NULL)
-		return SR_FAULT ;
-#endif
-
-
-
+int ddb_open(DDB *op,cc *pr,cc *fname) noex {
+	int		rs = SR_FAULT ;
+	if (op && pr && fname) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ddb_open) */
 
-
-static int ddb_search(op,key,value)
+int ddb_search(op,key,value)
 DDB		*op ;
 cchar	key[] ;
 char		value[] ;
 {
-	int	rs ;
-
-
-#if	CF_SAFE
-	if (op == NULL)
-		return SR_FAULT ;
-#endif
+	int	rs = SR_OK ;
 
 
 	return rs ;
 }
 /* end subroutine (ddb_search) */
 
-
-static int ddb_close(op)
-DDB		*op ;
-{
-	HDB_CUR	cur ;
-
+int ddb_close(DDB *op) noex {
+	HDB_CUR		cur ;
 	HDB_DATUM	key, value ;
-
-	int	rs = SR_OK ;
-
-
-#if	CF_SAFE
-	if (op == NULL)
-		return SR_FAULT ;
-#endif
+	int		rs = SR_OK ;
 
 	hdb_curbegin(&op->db,&cur) ;
 
@@ -139,8 +111,7 @@ DDB		*op ;
 
 /* private subroutines */
 
-
-int ddb_parse(op,fname)
+static int ddb_parse(op,fname)
 DDB		*op ;
 cchar	fname[] ;
 {
@@ -157,10 +128,6 @@ cchar	fname[] ;
 	char	udfname[MAXPATHLEN + 1] ;
 	char	linebuf[LINEBUFLEN + 1] ;
 
-
-#if	CF_DEBUGS
-	debugprintf("ddb_parse: username=%s\n",username) ;
-#endif
 
 	if ((pr != NULL) && (pr[0] != '\0')) {
 
@@ -197,17 +164,9 @@ cchar	fname[] ;
 	        sl -= ((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 
-#if	CF_DEBUGS
-	        debugprintf("ddb_prase: remaining sl=%d sp=%s\n",sl,sp) ;
-#endif
-
 	        cl = nextfield(sp,sl,&cp) ;
 
 	        if (cl > 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("udomain: d=%s\n",cp) ;
-#endif
 
 	            ml = MIN(cl,MAXHOSTNAMELEN) ;
 	            strwcpy(domainname,cp,ml) ;
@@ -225,6 +184,5 @@ cchar	fname[] ;
 	return (rs >= 0) ? ml : rs ;
 }
 /* end subroutine (ddb_parse) */
-
 
 

@@ -1,17 +1,19 @@
-/* issue */
+/* issue HEADER */
+/* lang=C++20 */
+
+/* object to help and manage "issue" messages */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ISSUE_INCLUDE
-#define	ISSUE_INCLUDE	1
+#define	ISSUE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
@@ -53,24 +55,16 @@ struct issue_head {
 	int		nenv ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(ISSUE_MASTER)) || (ISSUE_MASTER == 0)
+extern int	issue_open(ISSUE *,cchar *) noex ;
+extern int	issue_check(ISSUE *,time_t) noex ;
+extern int	issue_process(ISSUE *,cchar *,cchar **,int) noex ;
+extern int	issue_audit(ISSUE *) noex ;
+extern int	issue_close(ISSUE *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	issue_open(ISSUE *,cchar *) ;
-extern int	issue_check(ISSUE *,time_t) ;
-extern int	issue_process(ISSUE *,cchar *,cchar **,int) ;
-extern int	issue_audit(ISSUE *) ;
-extern int	issue_close(ISSUE *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* ISSUE_MASTER */
 
 #endif /* ISSUE_INCLUDE */
 
