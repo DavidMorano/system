@@ -1,10 +1,8 @@
-/* dfibonacci */
+/* dfibonacci SUPPORT */
 /* lang=C++98 */
 
 /* floating-point Fibonacci function */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,10 +16,13 @@
 
 /*******************************************************************************
 
+	Name:
+	dfifonacci
+
+	Description:
 	We calculate the (floating) Fibonacci of the given number.
 
 	Synopsis:
-
 	double dfibonacci(int n)
 
 	Arguments:
@@ -45,13 +46,14 @@
 
 	Note that the variable 'phi' above is the Golden-Number.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
 #include	<cmath>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -60,27 +62,32 @@
 
 /* external subroutines */
 
-extern "C" double	binexp(double,int) ;
+extern "C" double	dfibonacci(int) noex ;
 
-#if	CF_DEBUGS
-extern "C" int	debugprintf(const char *,...) ;
-extern "C" int	strlinelen(const char *,int,int) ;
-#endif
+extern "C" double	binexp(double,int) noex ;
 
 
-/* local variables */
+/* external variables */
+
+
+/* local structures */
 
 
 /* foward references */
 
-extern "C" double	dfibonacci(int) ;
+
+/* local variables */
+
+constexpr double	phi = ((1.0 + sqrt(5.0)) / 2.0) ;
+constexpr double	den = sqrt(5.0) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-double dfibonacci(int n)
-{	
+double dfibonacci(int n) noex {
 	double		v = -1.0 ;
 	if (n >= 0) {
 	    v = 0.0 ;
@@ -89,13 +96,12 @@ double dfibonacci(int n)
 	    } else if (n == 3) {
 	        v = 2.0 ;
 	    } else if (n > 3) {
-	        constexpr double	phi = ((1.0 + sqrt(5.0)) / 2.0) ;
-	        constexpr double	den = sqrt(5.0) ;
-	        double			num = binexp(phi,n) - binexp((1.0 - phi),n) ;
-	        v = floor(num/den) ;
+	        double	num = binexp(phi,n) - binexp((1.0 - phi),n) ;
+	        v = floor(num / den) ;
 	    }
 	}
 	return v ;
 }
 /* end subroutine (dfibonacci) */
+
 

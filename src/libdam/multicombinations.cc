@@ -1,9 +1,8 @@
-/* multicombinations */
+/* multicombinations SUPPORT */
+/* lang=C++20 */
 
 /* n-choose-k function WITH repitition */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,53 +16,61 @@
 
 /*******************************************************************************
 
+	Name:
+	multicombinations
+
+	Description:
 	We calculate the multicombinations of the given number.
 
 	Synopsis:
-
-	int multicombinations(int n,int k)
+	long multicombinations(int n,int k) noex
 
 	Arguments:
-
 	n	number of items to choose from
 	k	nuber of item to choose without repitition
 
 	Returns:
-
 	-	the Fibonacci number of the input
 
 	Notes:
-
 	Two immediate answers:
-
 	a) combinations(n+k-1,k)
 	b) combinations(n+k-1,n-1)
-
 	also:
-
 	c) factorial(n+l-1) / ( factorial(k) * factorial(n-1) )
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<limits.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<climits>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern "C" {
+    extern long		factorial(int) noex ;
+    extern long		combinations(int,int) noex ;
+    extern long		permutations(int,int) noex ;
+}
 
 
-/* external subroutines */
+/* external variables */
 
-extern int	factorial(int) ;
-extern int	permutations(int,int) ;
+
+/* local structures */
 
 
 /* forward references */
@@ -72,12 +79,13 @@ extern int	permutations(int,int) ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
 
-int multicombinations(int n,int k)
-{
-	return combinations(n+k-1,k) ;
+/* external subroutines */
+
+long multicombinations(int n,int k) noex {
+	return combinations((n + k - 1),k) ;
 }
 /* end subroutine (multicombinations) */
 

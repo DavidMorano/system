@@ -68,6 +68,21 @@
 
 /* local variables */
 
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
 static constexpr long	fibotab[] = {
 	0x00000000, 0x00000001, 0x00000001, 0x00000002,
 	0x00000003, 0x00000005, 0x00000008, 0x0000000d,
@@ -82,6 +97,9 @@ static constexpr long	fibotab[] = {
 	0x06197ecb, 0x09de8d6d, 0x0ff80c38, 0x19d699a5,
 	0x29cea5dd, 0x43a53f82, 0x6d73e55f, 0xb11924e1
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

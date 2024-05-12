@@ -2,23 +2,22 @@
 /* lang=C++11 */
 
 /* convert numbers from one base to another */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_CFDECMFUI	1		/* use 'cfdecmfui(3dam)' */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 	= 2017-09-19, David A­D­ Morano
-	Converted this to C++ so that we can use the |ctwords(3dam)| C++
-	subroutine.
+	Converted this to C++ so that we can use the |ctwords(3dam)|
+	C++ subroutine.
 
 */
 
@@ -26,15 +25,12 @@
 
 /*******************************************************************************
 
-	We converts numbers (given as arguments or on STDIN) from one numberic
-	base to another.
-
-	This subroutine is fairly standard as front-ends go.  It calls
-	|procspec()| to do the real work.
-
+	We converts numbers (given as arguments or on STDIN) from
+	one numberic base to another.  This subroutine is fairly
+	standard as front-ends go.  It calls |procspec()| to do the
+	real work.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -198,7 +194,7 @@ static const char	*argopts[] = {
 	"ef",
 	"of",
 	"if",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -259,20 +255,21 @@ static const BASERECORD	bases[] = {
 	{ "binary", 2 },
 	{ "roman", 1 },
 	{ "words", 3 },
-	{ NULL, 0 }
+	{ nullptr, 0 }
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_numcvt(int argc,cchar *argv[],void *contextp)
-{
+int b_numcvt(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    const char	**envv = (const char **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
@@ -320,20 +317,20 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 
 	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
+	const char	*argval = nullptr ;
+	const char	*pr = nullptr ;
+	const char	*sn = nullptr ;
+	const char	*afname = nullptr ;
 	const char	*ifname = STDFNIN ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*basei = NULL ;
-	const char	*baseo = NULL ;
+	const char	*ofname = nullptr ;
+	const char	*efname = nullptr ;
+	const char	*basei = nullptr ;
+	const char	*baseo = nullptr ;
 	const char	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_numcvt: starting DFD=%d\n",rs) ;
 	}
@@ -350,7 +347,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* early things to initialize */
@@ -375,7 +372,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -403,14 +400,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -734,8 +731,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -790,7 +787,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -802,17 +799,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* check a few more things */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
-	if (ofname == NULL) ofname = getourenv(envv,VAROFNAME) ;
+	if (ofname == nullptr) ofname = getourenv(envv,VAROFNAME) ;
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 /* check arguments */
 
@@ -822,7 +819,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        basei,baseo) ;
 #endif
 
-	if ((rs >= 0) && (basei != NULL) && (basei[0] != '\0')) {
+	if ((rs >= 0) && (basei != nullptr) && (basei[0] != '\0')) {
 	    rs = findbase(pip,bases,basei,-1) ;
 	    lip->basei = rs ;
 	    if ((rs >= 0) && isNotValidBase(rs)) {
@@ -830,7 +827,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    }
 	} /* end if */
 
-	if ((rs >= 0) && (baseo != NULL) && (baseo[0] != '\0')) {
+	if ((rs >= 0) && (baseo != nullptr) && (baseo[0] != '\0')) {
 	    rs = findbase(pip,bases,baseo,-1) ;
 	    lip->baseo = rs ;
 	    if ((rs >= 0) && isNotValidBase(rs)) {
@@ -897,11 +894,11 @@ retearly:
 	    debugprintf("b_numcvt: exiting rs=%d ex=%u\n",rs,ex) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    SHIO	*efp = (SHIO *) pip->efp ;
 	    pip->open.errfile = FALSE ;
 	    shio_close(efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -1027,7 +1024,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
@@ -1045,7 +1042,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
 	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	            f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	            if (f) {
 	                cp = aip->argv[ai] ;
 	                if (cp[0] != '\0') {
@@ -1060,7 +1057,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
 	        } /* end for */
 	    } /* end if (ok) */
 
-	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	        SHIO	afile, *afp = &afile ;
 
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
@@ -1192,7 +1189,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 	int		cl ;
 	const char	*cp ;
 
-	if (name == NULL) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 
 	if (namelen == 0)
 	    return SR_OK ;
@@ -1332,7 +1329,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 	if (rs >= 0) {
 	    const int	olen = OUTBUFLEN ;
 	    int		ol = -1 ;
-	    cchar	*obufp = NULL ;
+	    cchar	*obufp = nullptr ;
 	    char	obuf[OUTBUFLEN + 1] ;
 	    obufp = obuf ;
 	    switch (lip->baseo) {
@@ -1400,7 +1397,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
-	if (lip == NULL)
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -1418,7 +1415,7 @@ static int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
-	if (lip == NULL)
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
 	return rs ;
@@ -1437,7 +1434,7 @@ static int locinfo_base(LOCINFO *lip,cchar *sp,int sl)
 	debugprintf("b_numcvt/locinfo_base: b=>%t<\n",sp,sl) ;
 #endif
 
-	if ((tp = strnchr(sp,sl,':')) != NULL) {
+	if ((tp = strnchr(sp,sl,':')) != nullptr) {
 	    cchar	*cp = sp ;
 	    int		cl = (tp-sp) ;
 	    if (cl > 0) {
