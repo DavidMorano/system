@@ -19,6 +19,7 @@
 #define	MAILADDRQUOTE		struct mailaddrquote_head
 #define	MAILADDRQUOTE_FL	struct mailaddrquote_flags
 #define	MAILADDRQUOTE_LEN	100		/* default value */
+#define	MAILADDRQUOTE_MAGIC	0x08938725	/* magic */
 
 
 struct mailaddrquote_flags {
@@ -26,8 +27,9 @@ struct mailaddrquote_flags {
 } ;
 
 struct mailaddrquote_head {
-	bufstr			qaddr ;
+	bufstr			*bsp ;	/* buffer-string-pointer */
 	MAILADDRQUOTE_FL	f ;
+	uint			magic ;
 } ;
 
 typedef	MAILADDRQUOTE		mailaddrquote ;
@@ -35,8 +37,8 @@ typedef	MAILADDRQUOTE_FL	mailaddrquote_fl ;
 
 EXTERNC_begin
 
-extern int mailaddrquote_start(MAILADDRQUOTE *,cchar *,int,cchar **) noex ;
-extern int mailaddrquote_finish(MAILADDRQUOTE *) noex ;
+extern int mailaddrquote_start(mailaddrquote *,cchar *,int,cchar **) noex ;
+extern int mailaddrquote_finish(mailaddrquote *) noex ;
 
 EXTERNC_end
 
