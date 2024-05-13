@@ -517,7 +517,7 @@ ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc
 ucatexit.o:		ucatexit.cc
 ucfork.o:		ucfork.cc
-ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h ugetloadavg.h
+ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
 ucgetpid.o:		ucgetpid.cc ucgetpid.h
 ucproguser.o:		ucproguser.cc ucproguser.h

@@ -276,7 +276,7 @@ ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
-ugetloadavg.o:		ugetloadacg.cc ugetloadavg.h	$(INCS)
+ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 
 

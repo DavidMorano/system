@@ -137,8 +137,8 @@ int u_getloadavg(uint *la,int n) noex {
 }
 /* end subroutine (u_getloadavg) */
 
-namespace libuc {
-    int ucgetloadavg(double *dla,int n) noex {
+namespace libu {
+    int dloadavg(double *dla,int n) noex {
 	int		to_again = utimeout[uto_again] ;
 	int		rs ;
 	bool		f_exit = false ;
@@ -164,7 +164,7 @@ namespace libuc {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-    } /* end subroutine (ucgetloadavg) */
+    } /* end subroutine (dloadavg) */
 }
 
 
@@ -179,7 +179,7 @@ static int ugetloadavg(uint *la,int n) noex {
 	    if (n > 0) {
 	        double	d[nmax] ;
 	        if (n > nmax) n = nmax ;
-	        if ((rs = libuc::ucgetloadavg(d,n)) >= 0) {
+	        if ((rs = libu::dloadavg(d,n)) >= 0) {
 		    rn = rs ;
 	            for (int i = 0 ; i < n ; i += 1) {
 	                la[i] = uint(d[i] * FSCALE) ;

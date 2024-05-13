@@ -49,8 +49,8 @@ EXTERNC_end
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
 #ifdef	__cplusplus
-namespace libuc {
-    extern int	ucgetloadavg(double *,int) noex ;
+namespace libu {
+    extern int	dloadavg(double *,int) noex ;
 }
 #endif /* __cplusplus */
 

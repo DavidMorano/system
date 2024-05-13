@@ -1,4 +1,4 @@
-/* uc_nonblock */
+/* uc_nonblock SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX®Â® library-3c */
@@ -46,7 +46,7 @@
 
 int uc_nonblock(int fd,int f) noex {
 	int		rs ;
-	int		f_previous = FALSE ;
+	int		f_previous = false ;
 	if ((rs = u_fcntl(fd,F_GETFL,0)) >= 0) {
 	    int		flflags = rs ;
 	    f_previous = (flflags & O_NONBLOCK) ? 1 : 0 ;

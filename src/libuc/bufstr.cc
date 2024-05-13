@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	This module can be used to construct strings or messages
-	in buffers WITHOUT using the 'sprint' subroutine.  This
+	in buffers WITHOUT using the |snsprint(3c)| subroutine.  This
 	module is useful when the user does NOT supply a buffer to
 	be used as the working store.  Rather, an internally,
 	dynamically grown and managed buffer is maintained.  This
@@ -31,7 +31,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
@@ -71,7 +71,7 @@ static int	bufstr_extend(bufstr *,int,char **) noex ;
 
 /* exported subroutines */
 
-int bufstr_start(BUFSTR	 *op) noex {
+int bufstr_start(bufstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -170,7 +170,7 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	if (op->dbuf) {
 	    rlen = (slen-op->len) ;
 	    if (nlen > rlen) {
-	    	dlen = MAX((slen + nlen),(slen * 2)) ;
+	    	dlen = max((slen + nlen),(slen * 2)) ;
 		if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
 		    op->dlen = dlen ;
 		    op->dbuf = dp ;

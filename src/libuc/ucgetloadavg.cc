@@ -30,7 +30,6 @@
 #include	<usystem.h>
 
 #include	"ucgetloadavg.h"
-#include	"ugetloadavg.h"
 
 
 /* local defines */
@@ -38,7 +37,7 @@
 
 /* imported namespaces */
 
-using libuc::ucgetloadavg ;		/* internal library subroutine */
+using libu::dloadavg ;			/* internal library subroutine */
 
 
 /* local typedefs */
@@ -65,7 +64,7 @@ using libuc::ucgetloadavg ;		/* internal library subroutine */
 /* exported subroutines */
 
 int uc_getloadavg(double *dla,int n) noex {
-	return ucgetloadavg(dla,n) ;
+	return dloadavg(dla,n) ;
 }
 /* end subroutine (uc_getloadavg) */
 
