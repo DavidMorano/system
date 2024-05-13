@@ -32,6 +32,7 @@
 #include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -40,6 +41,15 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -62,91 +72,89 @@ static int	bufstr_extend(bufstr *,int,char **) noex ;
 /* exported subroutines */
 
 int bufstr_start(BUFSTR	 *op) noex {
-
-	if (op == NULL) return SR_FAULT ;
-
-	op->len = 0 ;
-	op->dlen = 0 ;
-	op->dbuf = NULL ;
-	op->sbuf[0] = '\0' ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    op->len = 0 ;
+	    op->dlen = 0 ;
+	    op->dbuf = nullptr ;
+	    op->sbuf[0] = '\0' ;
+	}
+	return rs ;
 }
 /* end subroutine (bufstr_start) */
 
 int bufstr_finish(bufstr *op) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->dbuf != NULL) {
-	    rs1 = uc_free(op->dbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbuf = NULL ;
-	}
-
-	if (rs >= 0) rs = op->len ;
-	op->len = 0 ;
-	op->dlen = 0 ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->dbuf) {
+	        rs1 = uc_free(op->dbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbuf = nullptr ;
+	    }
+	    if (rs >= 0) rs = op->len ;
+	    op->len = 0 ;
+	    op->dlen = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bufstr_finish) */
 
 int bufstr_char(bufstr *op,int ch) noex {
-	int		rs ;
-	char		buf[2] ;
-
-	buf[0] = (char) ch ;
-	rs = bufstr_strw(op,buf,1) ;
-
+	int		rs = SR_FAULT ;
+	if (op) {
+	    char	buf[2] = { char(ch) } ;
+	    rs = bufstr_strw(op,buf,1) ;
+	}
 	return rs ;
 }
 /* end subroutine (bufstr_char) */
 
 int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
-	int		rs ;
-	char		*bp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (sl < 0)
-	    sl = strlen(sp) ;
-
-	if ((rs = bufstr_extend(op,sl,&bp)) >= 0) {
-	    strwcpy(bp,sp,sl) ;
-	    op->len += sl ;
-	}
-
-	return (rs >= 0) ? op->len : rs ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op) {
+	    char	*bp ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = bufstr_extend(op,sl,&bp)) >= 0) {
+	        strwcpy(bp,sp,sl) ;
+	        op->len += sl ;
+	        len = op->len ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bufstr_strw) */
 
 int bufstr_buf(bufstr *op,cchar *sp,int sl) noex {
-	int		rs ;
-	char		*bp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (sl < 0)
-	    sl = strlen(sp) ;
-
-	if ((rs = bufstr_extend(op,sl,&bp)) >= 0) {
-	    memcpy(bp,sp,sl) ;
-	    op->len += sl ;
-	}
-
-	return (rs >= 0) ? op->len : rs ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op) {
+	    char	*bp ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = bufstr_extend(op,sl,&bp)) >= 0) {
+	        memcpy(bp,sp,sl) ;
+	        op->len += sl ;
+	        len = op->len ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bufstr_buf) */
 
 int bufstr_get(bufstr *op,cchar **spp) noex {
-	if (op == NULL) return SR_FAULT ;
-
-	if (spp) {
-	    *spp = (op->dbuf != NULL) ? op->dbuf : op->sbuf ;
-	}
-
-	return op->len ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (spp) {
+	        *spp = (op->dbuf) ? op->dbuf : op->sbuf ;
+	    }
+	    len = op->len ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bufstr_get) */
 
@@ -159,8 +167,7 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	int		dlen ;
 	int		rlen ;
 	char		*dp ;
-
-	if (op->dbuf == NULL) {
+	if (op->dbuf) {
 	    rlen = (slen-op->len) ;
 	    if (nlen > rlen) {
 	    	dlen = MAX((slen + nlen),(slen * 2)) ;
@@ -184,11 +191,9 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 		dp = (op->dbuf+op->len) ;
 	    }
 	} /* end if (extension needed) */
-
 	if (rpp) {
-	    *rpp = (rs >= 0) ? dp : NULL ;
+	    *rpp = (rs >= 0) ? dp : nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (bufstr_extend) */
