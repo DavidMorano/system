@@ -1,4 +1,4 @@
-/* fbinexp SUPPORT */
+/* dbinexp SUPPORT */
 /* lang=C99 */
 
 /* (floating) binary-exponential function */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	fbinexp
+	dbinexp
 
 	Description:
 	We calculate the binary exponential of a given base (double
@@ -76,7 +76,7 @@
 
 /* exported subroutines */
 
-double fbinexp(double x,int n) noex {
+double dbinexp(double x,int n) noex {
 	double		v = -1 ;
 	if (n >= 0) {
 	    v = 1.0 ;
@@ -85,12 +85,12 @@ double fbinexp(double x,int n) noex {
 	    } else if (n == 2) {
 		v = x*x ;
 	    } else if (n > 2) {
-		double	t = fbinexp(x,(n/2)) ;
+		double	t = dbinexp(x,(n/2)) ;
 		v = (n&1) ? x*t*t : t*t ;
 	    }
 	}
 	return v ;
 }
-/* end subroutine (fbinexp) */
+/* end subroutine (dbinexp) */
 
 

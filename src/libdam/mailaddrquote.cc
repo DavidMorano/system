@@ -40,9 +40,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<baops.h>
 #include	<ascii.h>
@@ -126,9 +127,11 @@ static int	mailaddrquote_quote(MAQ *,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr cchar		qchars[] = "\"\\<>()" ;
+constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
-static char		qterms[32] ;
+constexpr cchar		qchars[] = R"xx("\<>())xx" ;
+
+static char		qterms[termsize] ;
 
 
 /* exported variables */
@@ -173,7 +176,7 @@ int mailaddrquote_finish(MAQ *op) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = mailaddrquote_magic(op)) >= 0) {
-	    if (op->f.qaddr) {
+	    if (op->bsp && op->f.qaddr) {
 	        op->f.qaddr = false ;
 	        len = bufstr_finish(op->bsp) ;
 	        if (rs >= 0) rs = len ;

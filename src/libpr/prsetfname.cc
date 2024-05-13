@@ -16,20 +16,17 @@
 
 /*******************************************************************************
 
+	Name:
+	prsetfname
+
+	Description:
 	We create a file name according to some rules.
 
 	Synopsis:
-
-	int prsetfname(pr,fname,sp,sl,f_def,dname,name,suf)
-	cchar	*pr ;
-	char		fname[] ;
-	cchar	sp[] ;
-	cchar	dname[], name[], suf[] ;
-	int		sl ;
-	int		f_def ;
+	int prsetfname(cc *pr,cc *fn,cc *sp,int sl,int f_def,
+		cc *dname,cc *name,cc *suf) noex
 
 	Arguments:
-
 	pr		program-root
 	fname		result buffer
 	sp		source pointer
@@ -61,14 +58,6 @@
 
 
 /* local defines */
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
 
 #ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
