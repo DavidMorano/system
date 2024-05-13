@@ -86,7 +86,7 @@
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<logfile.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

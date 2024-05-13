@@ -46,7 +46,7 @@
 #include	<localmisc.h>
 
 #include	"listenspec.h"
-#include	"prsetfname.h"
+#include	"prmkfname.h"
 #include	"defs.h"
 #include	"mfsmain.h"
 #include	"mfslocinfo.h"

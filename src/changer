@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} CMSGHDR"
+NAMES="${NAMES} prsetfname.h"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/CMSGHDR/s//CONMSGHDR/g
+g/prsetfname.h/s//prmkfname.h/g
 	w
 	q
 EOF

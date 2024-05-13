@@ -1,4 +1,4 @@
-/* prsetfname HEADER */
+/* prmkfname HEADER */
 /* lang=C20 */
 
 /* set program-root (oriented) file-name */
@@ -14,8 +14,8 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PRSETFNAME_INCLUDE
-#define	PRSETFNAME_INCLUDE
+#ifndef	PRMKFNAME_INCLUDE
+#define	PRMKFNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -26,11 +26,16 @@
 
 EXTERNC_begin
 
-extern int prsetfname(cc *,char *,cc *,int,int,cc *,cc *,cc *) noex ;
+extern int prmkfname(cc *,char *,cc *,int,int,cc *,cc *,cc *) noex ;
+
+static inline int prsetfname(cc *pr,char *fn,cc *ep,int el,int f,cc *dn,
+		cc *n,cc *s) noex {
+	return prmkfname(pr,fn,ep,el,f,dn,n,s) ;
+}
 
 EXTERNC_end
 
 
-#endif /* PRSETFNAME_INCLUDE	*/
+#endif /* PRMKFNAME_INCLUDE	*/
 
 

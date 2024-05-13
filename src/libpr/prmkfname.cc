@@ -1,4 +1,4 @@
-/* prsetfname SUPPORT */
+/* prmkfname SUPPORT */
 /* lang=C++20 */
 
 /* set program-root (oriented) file-name */
@@ -17,13 +17,13 @@
 /*******************************************************************************
 
 	Name:
-	prsetfname
+	prmkfname
 
 	Description:
 	We create a file name according to some rules.
 
 	Synopsis:
-	int prsetfname(cc *pr,cc *fn,cc *sp,int sl,int f_def,
+	int prmkfname(cc *pr,cc *fn,cc *sp,int sl,int f_def,
 		cc *dname,cc *name,cc *suf) noex
 
 	Arguments:
@@ -54,7 +54,7 @@
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"prsetfname.h"
+#include	"prmkfname.h"
 
 
 /* local defines */
@@ -96,7 +96,7 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int prsetfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
+int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 		cc *name,cc *suf) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -157,6 +157,6 @@ int prsetfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (prsetfname) */
+/* end subroutine (prmkfname) */
 
 

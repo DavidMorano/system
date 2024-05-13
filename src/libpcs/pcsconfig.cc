@@ -1,11 +1,8 @@
-/* pcs-config */
+/* pcs-config SUPPORT */
+/* lang=C++20 */
 
 /* handle PCS configuration functions */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
 
 
 /* revision history:
@@ -19,29 +16,26 @@
 
 /*******************************************************************************
 
-        These subroutines form part of the PCS program (yes, getting a little
-        bit more complicated every day now).
-
+	These subroutines form part of the PCS program (yes, getting
+	a little bit more complicated every day now).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<logfile.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"pcsmain.h"
@@ -51,11 +45,6 @@
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
 
 
 /* local defines */
@@ -76,49 +65,10 @@ typedef const char	cchar ;
 #define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
-#define	DEBUGFNAME	"/tmp/pcs.deb"
-
 #define	PCS_REQCNAME	"req"
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -129,29 +79,11 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 /* forward references */
 
-static int	config_addcooks(CONFIG *) ;
-static int	config_reader(CONFIG *,char *,char *,char *) ;
+static int	config_addcooks(CONFIG *) noex ;
+static int	config_reader(CONFIG *,char *,char *,char *) noex ;
 
 
 /* local variables */
-
-static const char	*params[] = {
-	"cmd",
-	"logsize",
-	"msfile",
-	"pidfile",
-	"runtime",
-	"runint",
-	"mspoll",
-	"pollint",
-	"markint",
-	"lockint",
-	"speedint",
-	"logfile",
-	"reqfile",
-	"speedname",
-	NULL
-} ;
 
 enum params {
 	param_cmd,
@@ -171,18 +103,37 @@ enum params {
 	param_overlast
 } ;
 
+static constexpr cpcchar	params[] = {
+	"cmd",
+	"logsize",
+	"msfile",
+	"pidfile",
+	"runtime",
+	"runint",
+	"mspoll",
+	"pollint",
+	"markint",
+	"lockint",
+	"speedint",
+	"logfile",
+	"reqfile",
+	"speedname",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
-{
-	EXPCOOK		*ckp ;
+int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck) noex {
+	expcook		*ckp ;
 	int		rs = SR_OK ;
 
-	if (cfp == NULL) return SR_FAULT ;
-	if (pip == NULL) return SR_FAULT ;
-	if (cfname == NULL) return SR_FAULT ;
+	if (cfp == nullptr) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (cfname == nullptr) return SR_FAULT ;
 
 	if (cfname[0] == '\0') return SR_INVALID ;
 
@@ -192,37 +143,12 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
 	cfp->pip = pip ;
 	cfp->intcheck = intcheck ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("config_start: cfname=%s\n",cfname) ;
-	    debugprintf("config_start: nodename=%s\n",pip->nodename) ;
-	    debugprintf("config_start: domainname=%s\n",pip->domainname) ;
-	}
-#endif
-
 	ckp = &cfp->cooks ;
 	if ((rs = paramfile_open(&cfp->p,pip->envv,cfname)) >= 0) {
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("config_start: paramfile_open rs=%d\n",rs) ;
-#endif
 	    if ((rs = expcook_start(ckp)) >= 0) {
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("config_start: expcook_start rs=%d\n",rs) ;
-#endif
 	        if ((rs = config_addcooks(cfp)) >= 0) {
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("config_start: config_addcooks rs=%d\n",
-				rs) ;
-#endif
-	            cfp->f.p = TRUE ;
+	            cfp->f.p = true ;
 	            rs = config_read(cfp) ;
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("config_start: config_read rs=%d\n",rs) ;
-#endif
 	        }
 	    }
 	    if (rs < 0)
@@ -230,11 +156,6 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
 	}
 	if (rs < 0)
 	    expcook_finish(ckp) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("config_start: ret rs=%d \n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -247,27 +168,12 @@ int config_finish(CONFIG *cfp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("config_finish: ent\n") ;
-#endif
-
-	if (cfp == NULL) return SR_FAULT ;
+	if (cfp == nullptr) return SR_FAULT ;
 
 	pip = cfp->pip ;
-	if (pip == NULL) return SR_FAULT ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("config_finish: ent %c\n",
-		((cfp->f.p) ? '¥' : '_')) ;
-#endif
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (cfp->f.p) {
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("config_finish: fins\n") ;
-#endif
 
 	    rs1 = expcook_finish(&cfp->cooks) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -278,11 +184,6 @@ int config_finish(CONFIG *cfp)
 	} else
 	    rs = SR_NOTOPEN ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("config_finish: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (config_finish) */
@@ -292,37 +193,25 @@ int config_check(CONFIG *cfp)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
-	int		f_changed = FALSE ;
+	int		f_changed = false ;
 
-	if (cfp == NULL)
+	if (cfp == nullptr)
 	    return SR_FAULT ;
 
 	pip = cfp->pip ;
 	if (cfp->f.p) {
 	    const time_t	dt = pip->daytime ;
-	    const int		intcheck = cfp->intcheck ;
-	    int			f_check = FALSE ;
+	    cint		intcheck = cfp->intcheck ;
+	    int			f_check = false ;
 
 	    f_check = f_check && (intcheck > 0) ;
 	    f_check = f_check && ((dt - cfp->ti_lastcheck) >= intcheck) ;
 	    if (f_check) {
 	        cfp->ti_lastcheck = dt ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("pcsmain/config_check: paramfile_check()\n") ;
-#endif
-
 	        if ((rs = paramfile_check(&cfp->p,dt)) > 0) {
-	            f_changed = TRUE ;
+	            f_changed = true ;
 	            rs = config_read(cfp) ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("pcsmain/config_check: "
-	                    "config_read() rs=%d\n",rs) ;
-#endif
-
 	        } /* end if (parameter file changed) */
 	    } /* end if (needed a check) */
 
@@ -376,18 +265,13 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	int		kl ;
 	int		ml, vl, el ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("config_read: f_p=%u\n",cfp->f.p) ;
-#endif
-
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
-	    const int	elen = EBUFLEN ;
+	    cint	elen = EBUFLEN ;
 	    int		v ;
 	    cchar	*pr = pip->pr ;
-	    const char	*ccp ;
-	    const char	*kp, *vp ;
+	    cchar	*ccp ;
+	    cchar	*kp, *vp ;
 
 	    while (rs >= 0) {
 	        kl = paramfile_enum(pfp,&cur,&pe,pbuf,PBUFLEN) ;
@@ -410,16 +294,7 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	                ebuf[el] = '\0' ;
 	        } /* end if */
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4)) {
-	            debugprintf("config_read: ebuf=>%t<\n",ebuf,el) ;
-	            debugprintf("config_read: param=%s(%u)\n",
-	                params[pi],pi) ;
-	        }
-#endif
-
-	        if (el < 0)
-	            continue ;
+	        if (el < 0) continue ;
 
 	        switch (pi) {
 	        case param_logsize:
@@ -462,60 +337,60 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            break ;
 	        case param_pidfile:
 	            if (! pip->final.pidfname) {
-	                pip->have.pidfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                pip->have.pidfname = true ;
+	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
 	                ccp = pip->pidfname ;
-	                if ((ccp == NULL) ||
+	                if ((ccp == nullptr) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &pip->pidfname ;
-	                    pip->changed.pidfname = TRUE ;
+			    cchar	**vpp = &pip->pidfname ;
+	                    pip->changed.pidfname = true ;
 	                    rs = proginfo_setentry(pip,vpp,tbuf,rs1) ;
 	                }
 	            }
 	            break ;
 	        case param_msfile:
 	            if (! lip->final.msfname) {
-	                lip->have.msfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                lip->have.msfname = true ;
+	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
 	                    MSDNAME,MSFNAME,"") ;
 	                ccp = lip->msfname ;
-	                if ((ccp == NULL) ||
+	                if ((ccp == nullptr) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &lip->msfname ;
-	                    lip->changed.msfname = TRUE ;
+			    cchar	**vpp = &lip->msfname ;
+	                    lip->changed.msfname = true ;
 	                    rs = locinfo_setentry(lip,vpp,tbuf,rs1) ;
 	                }
 	            }
 	            break ;
 	        case param_logfile:
 	            if (! pip->final.logprog) {
-	                pip->have.logprog = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                pip->have.logprog = true ;
+	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
 	                    LOGDNAME,pip->searchname,"") ;
 	                ccp = pip->lfname ;
-	                if ((ccp == NULL) ||
+	                if ((ccp == nullptr) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &pip->lfname ;
-	                    pip->changed.logprog = TRUE ;
+			    cchar	**vpp = &pip->lfname ;
+	                    pip->changed.logprog = true ;
 	                    rs = proginfo_setentry(pip,vpp,tbuf,rs1) ;
 	                }
 	            } /* end if */
 	            break ;
 	        case param_reqfile:
 	            if (! lip->final.reqfname) {
-	                lip->have.reqfname = TRUE ;
+	                lip->have.reqfname = true ;
 #ifdef	COMMENT
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
 	                    LOGDNAME,pip->searchname,"") ;
 #else			    
 	                rs1 = mkpath1w(tbuf,ebuf,el) ;
 #endif /* COMMENT */
 	                ccp = lip->reqfname ;
-	                if ((ccp == NULL) ||
+	                if ((ccp == nullptr) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &lip->reqfname ;
-	                    lip->changed.reqfname = TRUE ;
+			    cchar	**vpp = &lip->reqfname ;
+	                    lip->changed.reqfname = true ;
 	                    rs = locinfo_setentry(lip,vpp,tbuf,rs1) ;
 	                }
 	            } /* end if */
@@ -527,12 +402,12 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            break ;
 	        case param_speedname:
 	            if (! lip->final.speedname) {
-	                lip->have.speedname = TRUE ;
+	                lip->have.speedname = true ;
 	                ccp = lip->speedname ;
-	                if ((ccp == NULL) ||
+	                if ((ccp == nullptr) ||
 	                    (strwcmp(ccp,ebuf,el) != 0)) {
-			    const char	**vpp = &lip->speedname ;
-	                    lip->changed.speedname = TRUE ;
+			    cchar	**vpp = &lip->speedname ;
+	                    lip->changed.speedname = true ;
 	                    rs = locinfo_setentry(lip,vpp,ebuf,el) ;
 	                }
 
@@ -549,20 +424,18 @@ int config_reader(CONFIG *cfp,char *pbuf,char *ebuf,char *tbuf)
 }
 /* end subroutine (config_readrer) */
 
-
-static int config_addcooks(CONFIG *cfp)
-{
+static int config_addcooks(CONFIG *cfp) noex {
 	PROGINFO	*pip = cfp->pip ;
-	EXPCOOK		*ckp = &cfp->cooks ;
+	expcook		*ckp = &cfp->cooks ;
 	int		rs = SR_OK ;
 	int		i ;
 	cchar		*keys = "PSNDHRU" ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	for (i = 0 ; keys[i] ; i += 1) {
-	    const int	kch = MKCHAR(keys[i]) ;
+	    cint	kch = mkchar(keys[i]) ;
 	    int		vl = -1 ;
-  	    cchar	*vp = NULL ;
+  	    cchar	*vp = nullptr ;
 	    switch (kch) {
 	    case 'P':
 		vp = pip->progname ;
@@ -578,7 +451,7 @@ static int config_addcooks(CONFIG *cfp)
 		break ;
 	    case 'H':
 		{
-		    const int	hlen = MAXHOSTNAMELEN ;
+		    cint	hlen = MAXHOSTNAMELEN ;
 		    cchar	*nn = pip->domainname ;
 		    cchar	*dn = pip->nodename ;
 		    char	hbuf[MAXHOSTNAMELEN+1] ;
@@ -595,7 +468,7 @@ static int config_addcooks(CONFIG *cfp)
 		vp = pip->username ;
 		break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 		char	kbuf[2] = { 0, 0 } ;
 		kbuf[0] = kch ;
 		rs = expcook_add(ckp,kbuf,vp,vl) ;

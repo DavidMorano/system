@@ -45,7 +45,7 @@
 #include	<listenspec.h>
 #include	<localmisc.h>
 
-#include	"prsetfname.h"
+#include	"prmkfname.h"
 #include	"config.h"
 #include	"defs.h"
 

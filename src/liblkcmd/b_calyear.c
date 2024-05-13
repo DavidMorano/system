@@ -75,7 +75,7 @@
 #include	<expcook.h>
 #include	<paramfile.h>
 #include	<dayspec.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
 #include	<ucmallreg.h>
 #include	<strn.h>
 #include	<exitcodes.h>
