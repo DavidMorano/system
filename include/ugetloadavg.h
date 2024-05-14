@@ -42,7 +42,7 @@
 
 #else /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
-EXTERNC_begin
+EXTERNC_begin /* Solaris® placeholder */
 extern int __getloadavg(int *,int) noex ;
 EXTERNC_end
 

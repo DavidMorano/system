@@ -177,18 +177,18 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 		    dp = strwcpy(dp,op->sbuf,op->len) ;
 		}
 	    } else {
-		dp = (op->sbuf+op->len) ;
+		dp = (op->sbuf + op->len) ;
 	    }
 	} else {
-	    rlen = (op->dlen-op->len) ;
+	    rlen = (op->dlen - op->len) ;
 	    if (nlen > rlen) {
-		dlen = (op->dlen+nlen+slen) ;
+		dlen = (op->dlen + nlen+slen) ;
 		if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
 		    op->dbuf = dp ;
 		    op->dlen = dlen ;
 		}
 	    } else {
-		dp = (op->dbuf+op->len) ;
+		dp = (op->dbuf + op->len) ;
 	    }
 	} /* end if (extension needed) */
 	if (rpp) {

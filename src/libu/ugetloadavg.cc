@@ -138,7 +138,7 @@ int u_getloadavg(uint *la,int n) noex {
 /* end subroutine (u_getloadavg) */
 
 namespace libu {
-    int dloadavg(double *dla,int n) noex {
+    sysret_t dloadavg(double *dla,int n) noex {
 	int		to_again = utimeout[uto_again] ;
 	int		rs ;
 	bool		f_exit = false ;
@@ -170,7 +170,7 @@ namespace libu {
 
 /* local subroutines */
 
-static int ugetloadavg(uint *la,int n) noex {
+static sysret_t ugetloadavg(uint *la,int n) noex {
 	cint		nmax = maxloadavgs ;
 	int		rs = SR_FAULT ;
 	int		rn = 0 ;

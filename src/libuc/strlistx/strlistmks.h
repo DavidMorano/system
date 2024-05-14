@@ -22,7 +22,7 @@
 
 #define	STRLISTMKS		struct strlistmks_head
 #define	STRLISTMKS_OBJ		struct strlistmks_object
-#define	STRLISTMKS_REC		struct strlistmks_rectab
+#define	STRLISTMKS_RT		struct strlistmks_rectab
 #define	STRLISTMKS_FL		struct strlistmks_flags
 #define	STRLISTMKS_MAGIC	0x88773423
 #define	STRLISTMKS_NENTRIES	(2 * 1024)
@@ -55,7 +55,7 @@ struct strlistmks_head {
 	cchar		*idname ;
 	char		*nfname ;
 	strtab		*stp ;		/* string-tab-pointer */
-	STRLISTMKS_REC	rectab ;
+	STRLISTMKS_RT	rectab ;
 	STRLISTMKS_FL	f ;
 	gid_t		gid ;
 	uint		magic ;
@@ -67,7 +67,7 @@ struct strlistmks_head {
 typedef	STRLISTMKS	strlistmks ;
 typedef	STRLISTMKS_FL	strlistmks_fl ;
 typedef	STRLISTMKS_OBJ	strlistmks_obj ;
-typedef	STRLISTMKS_REC	strlistmks_rec ;
+typedef	STRLISTMKS_RT	strlistmks_rt ;
 
 EXTERNC_begin
 
@@ -78,6 +78,20 @@ extern int	strlistmks_chgrp(strlistmks *,gid_t) noex ;
 extern int	strlistmks_close(strlistmks *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (strlistmks_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* STRLISTMKS_INCLUDE */

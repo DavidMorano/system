@@ -137,7 +137,7 @@ OBJ55=
 
 OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
 OBJB= usys.o usysop.o uipc.o usig.o uexec.o
-OBJC= uopen.o ustr.o usysdata.o uatfork.o
+OBJC= uopen.o ustr.o usysdata.o uatfork.o ugetloadavg.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
 OBJE= ufiledesc.o ufileop.o uprocess.o endian.o
 

@@ -1,6 +1,9 @@
 /* bufstr SUPPORT */
 /* lang=C++20 */
 
+/* string buffer object */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

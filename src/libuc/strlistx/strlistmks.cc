@@ -74,6 +74,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<sysval.hh>
+#include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<endian.h>
 #include	<vecobj.h>
@@ -103,7 +105,7 @@
 
 #define	SLM		strlistmks
 #define	SLM_OBJ		strlistmks_obj
-#define	SLM_REC		strlistmks_rec
+#define	SLM_RT		strlistmks_rt
 #define	SLM_FL		strlistmks_fl
 #define	RECTAB		struct strlistmks_rectab
 #define	VE		struct varentry
@@ -112,7 +114,7 @@
 #define	KEYBUFLEN	120
 #endif
 
-#define	BUFLEN		(sizeof(strlisthdr) + 128)
+#define	HDRBUFLEN	(sizeof(strlisthdr) + 128)
 
 #define	FSUF_IND	"si"
 
@@ -136,6 +138,8 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 typedef mode_t		om_t ;
+
+typedef uint		(*rectab_t)[1] ;
 
 
 /* external subroutines */
@@ -196,16 +200,6 @@ static int strlistmks_dtor(strlistmks *op) noex {
 }
 /* end subroutine (strlistmks_dtor) */
 
-template<typename ... Args>
-static inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (strlistmks_magic) */
-
 static int	strlistmks_filesbegin(SLM *) noex ;
 static int	strlistmks_filesend(SLM *,int) noex ;
 
@@ -245,6 +239,8 @@ static int	hashindex(uint,int) noex ;
 static cchar	zerobuf[4] = {
 	0, 0, 0, 0 
 } ;
+
+static sysval		pagesize(sysval_ps) ;
 
 constexpr gid_t		gidend = -1 ;
 
@@ -665,164 +661,134 @@ static int strlistmks_mkvarfile(SLM *op) noex {
 }
 /* end subroutine (strlistmks_mkvarfile) */
 
-static int strlistmks_wrvarfile(SLM *op) noex {
+namespace {
+    struct sub_wrvarfile {
+	strlistmks	*op ;
 	strlisthdr	hf{} ;
-	filer		varfile ;
-	strtab		*ksp = op->stp ;
-	const time_t	dt = time(nullptr) ;
-	uint		fileoff = 0 ;
-	uint		(*rt)[1] ;
-	cint		pagesize = getpagesize() ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		rtl ;
-	int		itl ;
-	int		sz ;
-	int		bl ;
-	char		buf[BUFLEN + 1] ;
+	custime		dt = time(nullptr) ;
+	cint		hlen = HDRBUFLEN ;
+	char		hbuf[HDRBUFLEN+1] ;
+	uint		foff = 0 ;
+	int		ps ;
+	sub_wrvarfile(strlistmks *p) noex : op(p) { } ;
+	operator int () noex ;
+	int mkfile(rectab_t,int) noex ;
+	int mkkstab(filer *,int,int) noex ;
+    } ;
+}
 
-	rtl = rectab_getvec(&op->rectab,&rt) ;
-
-/* open (create) the STRLIST file */
-
-	rs = strlistmks_nfcreatecheck(op,"nv",FSUF_IND) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	op->f.viopen = true ;
-	sz = (pagesize * 4) ;
-	rs = filer_start(&varfile,op->nfd,0,sz,0) ;
-	if (rs < 0)
-	    goto ret1 ;
-
-/* prepare the file-header */
-
-	hf.vetu[0] = STRLISTMKS_VERSION ;
-	hf.vetu[1] = ENDIAN ;
-	hf.vetu[2] = 0 ;
-	hf.vetu[3] = 0 ;
-	hf.wtime = uint(dt) ;
-	hf.nstrs = op->nstrs ;
-	hf.nskip = STRLISTMKS_NSKIP ;
-
-/* create the file-header */
-
-	rs = strlisthdr_rd(&hf,buf,BUFLEN) ;
-	bl = rs ;
-	if (rs < 0)
-	    goto ret2 ;
-
-/* write header */
-
-	if (rs >= 0) {
-	    rs = filer_writefill(&varfile,buf,bl) ;
-	    fileoff += rs ;
-	}
-
-	if (rs < 0)
-	    goto ret2 ;
-
-/* write the record table */
-
-	hf.rtoff = fileoff ;
-	hf.rtlen = rtl ;
-
-	sz = (rtl + 1) * 2 * sizeof(uint) ;
-	rs = filer_write(&varfile,rt,sz) ;
-	fileoff += rs ;
-
-/* make and write out key-string table */
-
-	if (rs >= 0) {
-	    char	*kstab = nullptr ;
-
-	    sz = strtab_strsize(ksp) ;
-
-	    hf.stoff = fileoff ;
-	    hf.stlen = sz ;
-
-	    if ((rs = uc_malloc(sz,&kstab)) >= 0) {
-
-	        rs = strtab_strmk(ksp,kstab,sz) ;
-
-/* write out the key-string table */
-
-	        if (rs >= 0) {
-	            rs = filer_write(&varfile,kstab,sz) ;
-	            fileoff += rs ;
-	        }
-
-/* make and write out the record-index table */
-
-	        if (rs >= 0) {
-		    uint	(*indtab)[3] = nullptr ;
-
-	            itl = nextpowtwo(rtl) ;
-
-	            hf.itoff = fileoff ;
-	            hf.itlen = itl ;
-
-	            sz = (itl + 1) * 3 * sizeof(int) ;
-
-	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
-			memset(indtab,0,sz) ;
-	                rs = strlistmks_mkind(op,kstab,indtab,itl) ;
-	                if (rs >= 0) {
-	                    rs = filer_write(&varfile,indtab,sz) ;
-	                    fileoff += rs ;
-	                }
-
-	                uc_free(indtab) ;
-	            } /* end if (memory allocation) */
-
-	        } /* end if (record-index table) */
-
-	        uc_free(kstab) ;
-	    } /* end if (memory allocation) */
-
-	} /* end if (key-string table) */
-
-/* write out the header -- again! */
-ret2:
-	filer_finish(&varfile) ;
-
-	if (rs >= 0) {
-
-	    hf.fsize = fileoff ;
-
-	    if ((rs = strlisthdr_rd(&hf,buf,BUFLEN)) >= 0) {
-	        bl = rs ;
-	        rs = u_pwrite(op->nfd,buf,bl,0L) ;
-	    }
-
-#if	CF_MINMOD
-	if (rs >= 0) {
-	    rs = uc_fminmod(op->nfd,op->om) ;
-	}
-#endif /* CF_MINMOD */
-
-	    if ((rs >= 0) && (op->gid != gidend)) {
-		rs = u_fchown(op->nfd,-1,op->gid) ;
-	    }
-
-	} /* end if (succeeded?) */
-
-/* we're out of here */
-ret1:
-	op->f.viopen = false ;
-	rs1 = u_close(op->nfd) ;
-	if (rs >= 0) rs = rs1 ;
-	op->nfd = -1 ;
-
-	if ((rs < 0) && (op->nfname[0] != '\0')) {
-	    u_unlink(op->nfname) ;
-	    op->nfname[0] = '\0' ;
-	}
-
-ret0:
-	return rs ;
+static int strlistmks_wrvarfile(SLM *op) noex {
+	sub_wrvarfile	wrf(op) ;
+	return wrf ;
 }
 /* end subroutine (strlistmks_wrvarfile) */
+
+sub_wrvarfile::operator int () noex {
+	int		rs ;
+	if ((rs = pagesize) >= 0) {
+	    rectab_t	rt ;
+	    ps = rs ;
+	    if ((rs = rectab_getvec(&op->rectab,&rt)) >= 0) {
+	        cint	rtl = rs ;
+	        cchar	*suf = FSUF_IND ;
+	        if ((rs = strlistmks_nfcreatecheck(op,"nv",suf)) >= 0) {
+		    if ((rs = mkfile(rt,rtl)) >= 0) {
+	    	        hf.fsize = foff ;
+	    		if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
+	        	    cint	hl = rs ;
+	        	    if ((rs = u_pwrite(op->nfd,hbuf,hl,0z)) >= 0) {
+				if_constexpr (f_minmod) {
+	    			    rs = uc_fminmod(op->nfd,op->om) ;
+				} /* end if_constexpr (f_minmod) */
+	    			if ((rs >= 0) && (op->gid != gidend)) {
+				    rs = u_fchown(op->nfd,-1,op->gid) ;
+	    			}
+	    		    }
+			}
+		    }
+		}
+	    } /* end if (rectab_getvec) */
+	} /* end if (pagesize) */
+	return rs ;
+}
+/* end method (sub_wrvarfile::operator) */ 
+
+int sub_wrvarfile::mkfile(rectab_t rt,int rtl) noex {
+	filer		varfile ;
+	int		rs ;
+	int		rs1 ;
+	int		sz = (ps * 4) ;
+	op->f.viopen = true ;
+	if ((rs = filer_start(&varfile,op->nfd,0,sz,0)) >= 0) {
+	    /* prepare the file-header */
+	    hf.vetu[0] = STRLISTMKS_VERSION ;
+	    hf.vetu[1] = ENDIAN ;
+	    hf.vetu[2] = 0 ;
+	    hf.vetu[3] = 0 ;
+	    hf.wtime = uint(dt) ;
+	    hf.nstrs = op->nstrs ;
+	    hf.nskip = STRLISTMKS_NSKIP ;
+	    if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
+		int	hl = rs ;
+	        if ((rs = filer_writefill(&varfile,hbuf,hl)) >= 0) {
+	    	    foff += rs ;
+	            /* write the record table */
+	            hf.rtoff = foff ;
+	            hf.rtlen = rtl ;
+	            sz = (rtl + 1) * 2 * sizeof(uint) ;
+	            if ((rs = filer_write(&varfile,rt,sz)) >= 0) {
+			strtab	*ksp = op->stp ;
+	                foff += rs ;
+		        /* make and write out key-string table */
+			if ((rs = strtab_strsize(ksp)) >= 0) {
+			    cint	sz = rs ;
+			    hf.stoff = foff ;
+			    hf.stlen = sz ;
+			    rs = mkkstab(&varfile,rtl,sz) ;
+			}
+		    }
+		}
+	    }
+	    rs1 = filer_finish(&varfile) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (filer) */
+	return rs ;
+}
+/* end subroutine (sub_wrvarfile::mkfile) */
+
+int sub_wrvarfile::mkkstab(filer *vfp,int rtl,int sz) noex {
+	int		rs ;
+	int		rs1 ;
+	char		*kstab = nullptr ;
+	if ((rs = uc_malloc(sz,&kstab)) >= 0) {
+	    strtab	*ksp = op->stp ;
+	    if ((rs = strtab_strmk(ksp,kstab,sz)) >= 0) {
+		/* write out the key-string table */
+		if ((rs = filer_write(vfp,kstab,sz)) >= 0) {
+		    uint	(*indtab)[3] = nullptr ;
+	            cint	itl = nextpowtwo(rtl) ;
+	            foff += rs ;
+		    /* make and write out the record-index table */
+	            hf.itoff = foff ;
+	            hf.itlen = itl ;
+	            sz = (itl + 1) * 3 * sizeof(int) ;
+	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
+			memset(indtab,0,sz) ;
+	                if ((rs = strlistmks_mkind(op,kstab,indtab,itl)) >= 0) {
+	                    rs = filer_write(vfp,indtab,sz) ;
+	                    foff += rs ;
+	                }
+	                rs1 = uc_free(indtab) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (m-a-f) */
+	        } /* end if (record-index table) */
+	        rs1 = uc_free(kstab) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (key-string table) */
+	return rs ;
+}
+/* end subroutine (sub_wrvarfile::mkkstab) */
 
 int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 	VE		ve ;
