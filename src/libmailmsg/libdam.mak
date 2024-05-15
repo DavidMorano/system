@@ -1128,16 +1128,22 @@ ctwords.o:		ctwords.cc ctwords.hh
 
 
 unlinkd.o:		$(*)/$(@)
-	cd $(*) ; make up
+	make -C $(*) up
 
 nifinfo.o:		$(*)/$(@)
-	cd $(*) ; make up
+	make -C $(*) up
 
 belowincs:
 	makebelow upincs
 
 below:
 	makebelow
+
+# STRLISTX
+strlistx.o:		strlistx.dir
+strlistx.dir:
+	makesubdir $@
+
 
 
 # other targets

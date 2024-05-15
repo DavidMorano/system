@@ -19,10 +19,11 @@
 #include	<strtab.h>
 #include	<localmisc.h>
 
+#include	"rectab.h"
+
 
 #define	STRLISTMKS		struct strlistmks_head
 #define	STRLISTMKS_OBJ		struct strlistmks_object
-#define	STRLISTMKS_RT		struct strlistmks_rectab
 #define	STRLISTMKS_FL		struct strlistmks_flags
 #define	STRLISTMKS_MAGIC	0x88773423
 #define	STRLISTMKS_NENTRIES	(2 * 1024)
@@ -44,18 +45,12 @@ struct strlistmks_flags {
 	uint		fcreated:1 ;
 } ;
 
-struct strlistmks_rectab {
-	uint		(*rectab)[1] ;
-	int		i ;		/* highest index */
-	int		n ;		/* extent */
-} ;
-
 struct strlistmks_head {
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nfname ;
 	strtab		*stp ;		/* string-tab-pointer */
-	STRLISTMKS_RT	rectab ;
+	rectab		*rtp ;		/* record-table-pointer */
 	STRLISTMKS_FL	f ;
 	gid_t		gid ;
 	uint		magic ;
@@ -67,7 +62,6 @@ struct strlistmks_head {
 typedef	STRLISTMKS	strlistmks ;
 typedef	STRLISTMKS_FL	strlistmks_fl ;
 typedef	STRLISTMKS_OBJ	strlistmks_obj ;
-typedef	STRLISTMKS_RT	strlistmks_rt ;
 
 EXTERNC_begin
 

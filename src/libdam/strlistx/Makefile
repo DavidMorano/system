@@ -60,13 +60,13 @@ LDFLAGS= $(MAKELDFLAGS)
 OBJ0_STRLIST= strlist.o
 OBJ1_STRLIST= strlisthdr.o
 OBJ2_STRLIST= strlistmk.o
-OBJ3_STRLIST= strlistmks.o
+OBJ3_STRLIST= strlistmks.o rectab.o
 
 
 OBJA_STRLIST= obj0.o obj1.o
 OBJB_STRLIST= obj2.o obj3.o
 
-OBJ_STRLIST= $(OBJA_STRLIST) $(OBJB_STRLIST)
+OBJ_STRLIST= obja.o objb.o
 
 
 default:		$(T).o
@@ -125,9 +125,18 @@ obj3.o:			$(OBJ3_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRLIST)
 
 
+obja.o:			$(OBJA_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_STRLIST)
+
+objb.o:			$(OBJB_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_STRLIST)
+
+
 strlist.o:		strlist.cc			$(INCS)
 strlisthdr.o:		strlisthdr.cc			$(INCS)
 strlistmk.o:		strlistmk.cc strlistmk.h 	$(INCS)
-strlistmks.o:		strlistmks.cc strlistmks.h	$(INCS)
+strlistmks.o:		strlistmks.cc strlistmks.h	$(INCS) rectab.h
+
+rectab.o:		rectab.cc rectab.h		$(INCS)
 
 

@@ -1024,11 +1024,6 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
-# STRLIST
-strlistx.o:		strlistx.dir
-strlistx.dir:
-	makesubdir $@
-
 # MAILALIS
 mailalias.o:		mailalias.dir
 mailalias.dir:

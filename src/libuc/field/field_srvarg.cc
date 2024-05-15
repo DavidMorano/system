@@ -308,7 +308,7 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 /* local subroutines */
 
 static void fieldinit_terms() noex {
-	constexpr bool	f_retain = true ;
+	cbool	f_retain = true ;
 	fieldterms(dterms,f_retain,",") ;
 	fieldterms(doubles,f_retain,"\"$\\`") ;
 }

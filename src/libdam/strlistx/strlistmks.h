@@ -19,10 +19,11 @@
 #include	<strtab.h>
 #include	<localmisc.h>
 
+#include	"rectab.h"
+
 
 #define	STRLISTMKS		struct strlistmks_head
 #define	STRLISTMKS_OBJ		struct strlistmks_object
-#define	STRLISTMKS_REC		struct strlistmks_rectab
 #define	STRLISTMKS_FL		struct strlistmks_flags
 #define	STRLISTMKS_MAGIC	0x88773423
 #define	STRLISTMKS_NENTRIES	(2 * 1024)
@@ -37,17 +38,11 @@ struct strlistmks_object {
 struct strlistmks_flags {
 	uint		viopen:1 ;
 	uint		abort:1 ;
-	uint		creat:1 ;
-	uint		excl:1 ;
+	uint		ofcreat:1 ;
+	uint		ofexcl:1 ;
 	uint		none:1 ;
 	uint		inprogress:1 ;
-	uint		created:1 ;
-} ;
-
-struct strlistmks_rectab {
-	uint		(*rectab)[1] ;
-	int		i ;		/* highest index */
-	int		n ;		/* extent */
+	uint		fcreated:1 ;
 } ;
 
 struct strlistmks_head {
@@ -55,7 +50,7 @@ struct strlistmks_head {
 	cchar		*idname ;
 	char		*nfname ;
 	strtab		*stp ;		/* string-tab-pointer */
-	STRLISTMKS_REC	rectab ;
+	rectab		*rtp ;		/* record-table-pointer */
 	STRLISTMKS_FL	f ;
 	gid_t		gid ;
 	uint		magic ;
@@ -67,7 +62,6 @@ struct strlistmks_head {
 typedef	STRLISTMKS	strlistmks ;
 typedef	STRLISTMKS_FL	strlistmks_fl ;
 typedef	STRLISTMKS_OBJ	strlistmks_obj ;
-typedef	STRLISTMKS_REC	strlistmks_rec ;
 
 EXTERNC_begin
 
@@ -78,6 +72,20 @@ extern int	strlistmks_chgrp(strlistmks *,gid_t) noex ;
 extern int	strlistmks_close(strlistmks *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (strlistmks_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* STRLISTMKS_INCLUDE */
