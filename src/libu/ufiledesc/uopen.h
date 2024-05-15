@@ -94,6 +94,7 @@
 EXTERNC_begin
 
 extern int u_open(cchar *,int,mode_t) noex ;
+extern int u_creat(cchar *,mode_t) noex ;
 extern int u_openat(int,cchar *,int,mode_t) noex ;
 extern int u_socket(int,int,int) noex ;
 extern int u_accept(int,SOCKADDR *,int *) noex ;

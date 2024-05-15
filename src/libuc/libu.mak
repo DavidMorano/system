@@ -38,15 +38,12 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += usyscalls.h localmisc.h
-
 
 LIBS +=
 
 
 INCDIRS=
-
 
 LIBDIRS= -L$(LIBDIR)
 
@@ -135,9 +132,9 @@ OBJ55=
 
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
-OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
+OBJA= usupport.o utimeout.o utimeouts.o timewatch.o timespec.o
 OBJB= usys.o usysop.o uipc.o usig.o uexec.o
-OBJC= uopen.o ustr.o usysdata.o uatfork.o ugetloadavg.o
+OBJC= uopen.o ustr.o usysdata.o ugetloadavg.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
 OBJE= ufiledesc.o ufileop.o uprocess.o endian.o
 

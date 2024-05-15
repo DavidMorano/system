@@ -25,9 +25,9 @@
 #include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<char.h>
 #include	<mailmsghdrfold.h>
 #include	<strn.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"filer.h"

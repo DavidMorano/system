@@ -37,14 +37,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= strlist.h strlisthdr.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)

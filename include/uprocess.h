@@ -21,6 +21,7 @@
 	u_alarm
 	u_exit
 	u_fork
+	u_atfork
 	u_getgroups
 	u_getpgid
 	u_getrlimit
@@ -83,6 +84,7 @@ namespace uprocess {
 EXTERNC_begin
 
 extern int u_alarm(cuint secs) noex ;
+extern int u_atfork(void_f,void_f,void_f) noex ;
 extern int u_exit(int ex) noex ;
 extern int u_fork() noex ;
 extern int u_getgroups(int n,gid_t *a) noex ;

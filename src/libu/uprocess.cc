@@ -19,6 +19,7 @@
 
 	Names:
 	u_alarm
+	u_atfork
 	u_exit
 	u_fork
 	u_getgroups
@@ -184,6 +185,7 @@ namespace {
     typedef int (uprocer::*uprocer_m)() noex ;
     struct uprocer : uprocessbase {
 	uprocer_m	m = nullptr ;
+	void_f		bf, apf, acf ;
 	const gid_t	*glist ;
 	void		**rpp ;
 	int		*rip ;
@@ -195,6 +197,10 @@ namespace {
 	uprocer(int i,int *p) noex : incr(i), rip(p) { } ;
 	uprocer(id_t i1,id_t i2 = 0) noex : id1(i1), id2(i2) { } ;
 	uprocer(int an,const gid_t *gp) noex : n(an), glist(gp) { } ;
+	uprocer(void_f b,void_f ap,void_f ac) noex : bf(b) {
+	    apf = ap ;
+	    acf = ac ;
+	} ;
 	operator int () noex {
 	    return operator () () ;
 	} ;
@@ -208,6 +214,7 @@ namespace {
 	void submem(uprocer_m mem) noex {
 	    m = mem ;
 	} ;
+	int iatfork() noex ;
 	int ifork() noex ;
 	int ivfork() noex ;
 	int isetuid() noex ;
@@ -248,6 +255,13 @@ int u_alarm(cuint secs) noex {
 	return rs ;
 }
 /* end subroutine (u_alarm) */
+
+int u_atfork(void_f b,void_f ap,void_f ac) noex {
+	uprocer		po(b,ap,ac) ;
+	po.m = &uprocer::iatfork ;
+	return po() ;
+}
+/* end subroutine (u_atfork) */
 
 int u_exit(int ex) noex {
 	_exit(ex) ;
@@ -499,6 +513,15 @@ int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
 
 
 /* local subroutines */
+
+int uprocer::iatfork() noex {
+	int		rs ;
+	if ((rs = pthread_atfork(bf,apf,acf)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uprocer::iatfork) */
 
 int uprocer::ifork() noex {
 	int		rs = SR_OK ;

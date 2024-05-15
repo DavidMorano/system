@@ -31,7 +31,7 @@
 
 	Returns:
 	>=0		number of bytes written
-	<0		error (system-return)
+	<0		error code (system-return)
 
 
 	Name:
@@ -50,7 +50,7 @@
 
 	Returns:
 	>=0		number of bytes written
-	<0		error (system-return)
+	<0		error code (system-return)
 
 
 	Name:
@@ -69,7 +69,7 @@
 
 	Returns:
 	>=0		number of bytes written
-	<0		error (system-return)
+	<0		error code (system-return)
 
 
 	Name:
@@ -87,7 +87,7 @@
 
 	Returns:
 	>=0		number of bytes written
-	<0		error (system-return)
+	<0		error code (system-return)
 
 
 	Name:
@@ -109,7 +109,7 @@
 
 	Returns:
 	>=0		number of bytes written
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -146,6 +146,19 @@ using std::max ;			/* subroutine-template */
 
 /* local structures */
 
+namespace {
+    template<int N> struct blanks {
+	cint		l = N ;
+	char		p[N+1] ;
+	constexpr blanks() noex {
+	    for (int i = 0 ; i < N ; i += 1) {
+		p[i] = ' ' ;
+	    }
+	    p[N] = '\0' ;
+	} ;
+    } ;
+}
+
 
 /* forward references */
 
@@ -157,12 +170,11 @@ extern "C" {
 
 /* local variables */
 
-constexpr int	zsize = sizeof(int) ;
-constexpr int	nblanks = NBLANKS ;
+constexpr int			zsize = sizeof(int) ;
 
-static cchar	blanks[] = "        " ;
+constexpr blanks<NBLANKS>	bo ;
 
-static cchar	zerobuf[zsize] = { } ;
+constexpr cchar			zerobuf[zsize] = { } ;
 
 
 /* exported variables */
@@ -174,22 +186,22 @@ int filer_writeblanks(filer *fbp,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	while ((rs >= 0) && (wlen < n)) {
-	    cint	ml = min((n-wlen),nblanks) ;
-	    rs = filer_write(fbp,blanks,ml) ;
+	    cint	ml = min((n-wlen),bo.l) ;
+	    rs = filer_write(fbp,bo.p,ml) ;
 	    wlen += rs ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_writeblanks) */
 
-int filer_writefill(filer *bp,cchar *sp,int sl) noex {
+int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (sl < 0) sl = (strlen(sp) + 1) ;
-	if ((rs = filer_write(bp,sp,sl)) >= 0) {
+	if ((rs = filer_write(op,sp,sl)) >= 0) {
 	    cint	asize = sizeof(int) ;
 	    wlen = rs ;
-	    rs = filer_writealign(bp,asize) ;
+	    rs = filer_writealign(op,asize) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -214,14 +226,13 @@ int filer_writealign(filer *bp,int asize) noex {
 }
 /* end subroutine (filer_writeallign) */
 
-int filer_writezero(filer *fp,int size) noex {
+int filer_writezero(filer *fp,int zlen) noex {
 	int		rs = SR_OK ;
-	int		rlen = size ;
 	int		wlen = 0 ;
-	while ((rs >= 0) && (rlen > 0)) {
-	    cint	ml = min(rlen,zsize) ;
+	while ((rs >= 0) && (zlen > 0)) {
+	    cint	ml = min(zlen,zsize) ;
 	    rs = filer_write(fp,zerobuf,ml) ;
-	    rlen -= rs ;
+	    zlen -= rs ;
 	    wlen += rs ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;

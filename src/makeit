@@ -94,14 +94,14 @@ export OSNAME OSNUM
 
 case ${OSNAME}:${OSNUM} in
 Darwin:*)
-  : ${CO_GCCALL:=""}
+  : ${CO_GCCALL:="-pthread"}
   : ${CO_GCCDEB:="-Wall -Wextra"}
   : ${CO_GCCOPT:=""}
-  : ${CO_GCCLIB:=""}
-  : ${CO_GPPALL:=""}
+  : ${CO_GCCLIB:="-fpic"}
+  : ${CO_GPPALL:="-pthread"}
   : ${CO_GPPDEB:="-Wall -Wextra"}
   : ${CO_GPPOPT:=""}
-  : ${CO_GPPLIB:=""}
+  : ${CO_GPPLIB:="-fpic"}
   case ${BUILDTYPE} in
   debug)
     CO_GCCOPT="-g"
@@ -114,7 +114,7 @@ Darwin:*)
   esac
   ;;
 SunOS:*)
-  : ${CO_GCCALL:="-pthreads"}
+  : ${CO_GCCALL:="-pthread"}
   case "${ARCHITECTURE}" in
   sparc)
     CO_GCOPARC="-mcpu=v9"
@@ -124,6 +124,7 @@ SunOS:*)
     ;;
   *)
     : ${CO_GCCOPT:="-O3"}
+    : ${CO_GCCLIB:="-fpic"}
     ;;
   esac
   : ${CO_GCCOPT:="-O3"}
@@ -163,7 +164,7 @@ develope|debug)
   MAKECPPFLAGS=
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCDEB} ${CO_GCCOPT} ${CO_GCCLIB}"
   MAKECCFLAGS="${CO_GPPALL} ${CO_GPPDEB} ${CO_GPPOPT} ${CO_GPPLIB}"
-  MAKELDFLAGS=
+  MAKELDFLAGS="-pthread"
   ;;
 test)
   ;;
@@ -176,6 +177,7 @@ deliver)
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCOPT} ${CO_GCCLIB}"
   MAKECCFLAGS="${CO_GPPALL} ${CO_GPPOPT} ${CO_GPPLIB}"
   MAKELDFLAGS=
+  MAKELDFLAGS="-pthread"
   ;;
 esac
 

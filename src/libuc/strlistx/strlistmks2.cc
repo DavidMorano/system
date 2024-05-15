@@ -4,6 +4,7 @@
 /* make a STRLIST database */
 /* version %I% last-modified %G% */
 
+#define	CF_FIRSTHASH	0		/* arrange for first-attempt hashing */
 #define	CF_MINMOD	1		/* ensure minimum file mode */
 
 /* revision history:
@@ -16,9 +17,6 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
-
-	Name:
-	strlistmks
 
 	Description:
 	This subroutine creates a STRLIST database file.
@@ -230,11 +228,17 @@ static int	rectab_finish(RECTAB *) noex ;
 static int	rectab_count(RECTAB *) noex ;
 #endif
 
+static int	filer_writefill(FILER *,char *,int) noex ;
+
 static int	indinsert(uint (*rt)[1],uint (*it)[3],int,VE *) noex ;
 static int	hashindex(uint,int) noex ;
 
 
 /* local variables */
+
+static cchar	zerobuf[4] = {
+	0, 0, 0, 0 
+} ;
 
 static sysval		pagesize(sysval_ps) ;
 
@@ -742,9 +746,9 @@ int sub_wrvarfile::mkfile(rectab_t rt,int rtl) noex {
 			    hf.stlen = sz ;
 			    rs = mkkstab(&varfile,rtl,sz) ;
 			}
-		    } /* end if (filer_write) */
-		} /* end if (filer_writefill) */
-	    } /* end if (strlisthdr_rd) */
+		    }
+		}
+	    }
 	    rs1 = filer_finish(&varfile) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
@@ -787,34 +791,88 @@ int sub_wrvarfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 /* end subroutine (sub_wrvarfile::mkkstab) */
 
 int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
+	VE		ve ;
+	uint		ki, hi ;
+	uint		khash ;
 	uint		(*rt)[1] ;
-	int		rs ;
+	int		rs = SR_OK ;
+	int		rtl ;
 	int		sc = 0 ;
-	if ((rs = rectab_getvec(&op->rectab,&rt)) >= 0) {
-	    VE		ve ;
-	    cint	rtl = rs ;
-	    uint	hi ;
-	    uint	ki ;
-	    uint	khash ;
-	    char	*kp ;
-	        for (int ri = 1 ; ri < rtl ; ri += 1) {
-	            ki = rt[ri][0] ;
-	            kp = kst + ki ;
-	            khash = hash_elf(kp,-1) ;
-	            hi = hashindex(khash,il) ;
-	            ve.ri = ri ;
-	            ve.ki = ki ;
-	            ve.khash = khash ;
+	char	*kp ;
+
+	rtl = rectab_getvec(&op->rectab,&rt) ;
+
+#if	CF_FIRSTHASH
+	{
+	    VE		*vep ;
+	    vecobj	ves ;
+	    cint	sz = sizeof(VE) ;
+	    cint	vo = VECOBJ_OCOMPACT ;
+	    int		i ;
+	    if ((rs = vecobj_start(&ves,sz,rtl,vo)) >= 0) {
+
+	    for (int ri = 1 ; ri < rtl ; ri += 1) {
+
+	        ki = rt[ri][0] ;
+	        kp = kst + ki ;
+	        khash = hash_elf(kp,-1) ;
+
+	        hi = hashindex(khash,il) ;
+
+	        if (it[hi][0] == 0) {
+	            it[hi][0] = ri ;
+	            it[hi][1] = (khash & INT_MAX) ;
+	            it[hi][2] = 0 ;
+	            sc += 1 ;
+	        } else {
+		    ve.ri = ri ;
+		    ve.ki = ki ;
+	            ve.khash = chash ;
 	            ve.hi = hi ;
-	            sc += indinsert(rt,it,il,&ve) ;
-	        } /* end for */
-	    it[il][0] = UINT_MAX ;
-	    it[il][1] = 0 ;
-	    it[il][2] = 0 ;
-	    if (sc < 0) {
-	        sc = 0 ;
+	            rs = vecobj_add(&ves,&ve) ;
+	        }
+
+	        if (rs < 0) break ;
+	    } /* end for */
+
+	    if (rs >= 0) {
+	    for (i = 0 ; vecobj_get(&ves,i,&vep) >= 0 ; i += 1) {
+	        sc += indinsert(rt,it,il,vep) ;
+	    } /* end for */
 	    }
-	} /* end if (rectab_getvec) */
+
+	    vecobj_finish(&ves) ;
+	    } /* end if (ves) */
+
+	}
+#else /* CF_FIRSTHASH */
+	{
+	for (int ri = 1 ; ri < rtl ; ri += 1) {
+
+	    ki = rt[ri][0] ;
+	    kp = kst + ki ;
+
+	    khash = hash_elf(kp,-1) ;
+
+	    hi = hashindex(khash,il) ;
+
+	    ve.ri = ri ;
+	    ve.ki = ki ;
+	    ve.khash = khash ;
+	    ve.hi = hi ;
+	    sc += indinsert(rt,it,il,&ve) ;
+
+	} /* end for */
+	}
+#endif /* CF_FIRSTHASH */
+
+	it[il][0] = UINT_MAX ;
+	it[il][1] = 0 ;
+	it[il][2] = 0 ;
+	if (sc < 0) {
+	    sc = 0 ;
+	}
+
 	return (rs >= 0) ? sc : rs ;
 }
 /* end subroutine (strlistmks_mkind) */
@@ -850,6 +908,7 @@ static int rectab_start(RECTAB *rtp,int n) noex {
 	rtp->n = n ;
 	sz = (n + 1) * 1 * sizeof(int) ;
 	if ((rs = uc_malloc(sz,&p)) >= 0) {
+	    typedef uint (*rectab_t)[1] ;
 	    rtp->rectab = rectab_t(p) ;
 	    rtp->rectab[0][0] = 0 ;
 	    rtp->i = 1 ;
@@ -890,7 +949,7 @@ static int rectab_extend(RECTAB *rtp) noex {
 	    uint	(*va)[1] ;
 	    int		nn = (rtp->n + 1) * 1 ;
 	    int		sz ;
-	    sz = (nn + 1) * sizeof(int) ;
+	    sz = (nn + 1)  * sizeof(int) ;
 	    if ((rs = uc_realloc(rtp->rectab,sz,&va)) >= 0) {
 	        rtp->rectab = va ;
 	        rtp->n = nn ;
@@ -920,34 +979,67 @@ static int rectab_getvec(RECTAB *rtp,uint (**rpp)[1]) noex {
 }
 /* end subroutine (rectab_getvec) */
 
+static int filer_writefill(filer *bp,char *wbuf,int wlen) noex {
+	int		rs ;
+	int		len = 0 ;
+	if (wlen < 0) {
+	    wlen = (strlen(wbuf) + 1) ;
+	}
+	if ((rs = filer_write(bp,wbuf,wlen)) >= 0) {
+	    cint	r = (wlen & 3) ;
+	    len += rs ;
+	    if (r > 0) {
+	    	cint	nzero = (4 - r) ;
+	        if (nzero > 0) {
+	            rs = filer_write(bp,zerobuf,nzero) ;
+	            len += rs ;
+	        }
+	    }
+	} /* end if (filer_writer) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (filer_writefill) */
+
 static int indinsert(uint (*rt)[1], uint (*it)[3],int il,VE *vep) noex {
-	uint		nhash = vep->khash ;
-	uint		chash = (vep->khash & INT_MAX) ;
-	uint		hi = vep->hi ;
+	uint		nhash, chash ;
+	uint		ri, ki ;
+	uint		lhi, nhi, hi ;
 	int		c = 0 ;
-	while (it[hi][0] != 0) {
-	    uint	ri = it[hi][0] ;
-	    uint	ki = rt[ri][0] ;
+
+	hi = vep->hi ;
+	nhash = vep->khash ;
+	chash = (nhash & INT_MAX) ;
+
+/* CONSTCOND */
+	forever {
+	    if (it[hi][0] == 0) break ;
+	    ri = it[hi][0] ;
+	    ki = rt[ri][0] ;
 	    if (ki == vep->ki) break ;
 	    it[hi][1] |= (~ INT_MAX) ;
 	    nhash = hash_again(nhash,c++,STRLISTMKS_NSKIP) ;
 	    hi = hashindex(nhash,il) ;
 	} /* end while */
+
 	if (it[hi][0] > 0) {
-	    uint	lhi = hi ;
-	    uint	nhi ;
+
+	    lhi = hi ;
 	    while ((nhi = it[lhi][2]) > 0) {
 	        lhi = nhi ;
 	    }
+
 	    hi = hashindex((lhi + 1),il) ;
+
 	    while (it[hi][0] > 0) {
 	        hi = hashindex((hi + 1),il) ;
 	    }
 	    it[lhi][2] = hi ;
 	} /* end if (same-key continuation) */
+
 	it[hi][0] = vep->ri ;
 	it[hi][1] = chash ;
 	it[hi][2] = 0 ;
+
 	return c ;
 }
 /* end subroutine (indinsert) */
