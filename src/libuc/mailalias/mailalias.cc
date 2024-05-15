@@ -60,9 +60,13 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
+#include	<sysval.hh>
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<endian.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
+#include	<linebuffer.h>
 #include	<bfile.h>
 #include	<opentmp.h>
 #include	<field.h>
@@ -332,7 +336,7 @@ constexpr bool		f_defprofile = CF_DEFPROFILE ;
 /* exported subroutines */
 
 int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = time(nullptr) ;
 	int		rs ;
 	int		f_create = false ;
 	if ((rs = mailalias_ctor(op,pr,pname)) >= 0) {
@@ -1194,29 +1198,28 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	        if ((rs = strtab_start(&svals,(n * 2))) >= 0) {
 	            if ((rs = mailalias_aprofile(op,dt)) >= 0) {
 	                dbmake	data(&recs,&skeys,&svals,fd) ;
-	                cchar	*cp ;
-	                char	tmpfname[MAXPATHLEN+1] ;
 			data.rectab = op->rectab ;
 			data.ropts = op->ropts ;
-	                for (int i = 0 ; op->aprofile[i] != nullptr ; i += 1) {
-	                    cp = (cchar *) op->aprofile[i] ;
-	                    if (*cp != '/') {
-	                        cchar	*ap = op->aprofile[i] ;
-	                        cp = tmpfname ;
-	                        rs = mkpath2(tmpfname,op->pr,ap) ;
-	                    }
-	                    if (rs >= 0) {
-	                        rs = mailalias_procfile(op,&data,cp) ;
-	                    }
-	                    if (rs < 0) break ;
-	                } /* end for */
-/* where are we? */
-/* OK, write out the file */
+	                char	*tbuf{} ;
+			if ((rs = malloc_mp(&tbuf)) >= 0) {
+	                    for (int i = 0 ; op->aprofile[i] ; i += 1) {
+	                        cchar	*cp = charp(op->aprofile[i]) ;
+	                        if (*cp != '/') {
+	                            cchar	*ap = op->aprofile[i] ;
+	                            cp = tbuf ;
+	                            rs = mkpath2(tbuf,op->pr,ap) ;
+	                        }
+	                        if (rs >= 0) {
+	                            rs = mailalias_procfile(op,&data,cp) ;
+	                        }
+	                        if (rs < 0) break ;
+	                    } /* end for */
+			    rs1 = uc_free(tbuf) ;
+			    if (rs >= 0) rs = rs1 ;
+			} /* end if (m-a-f) */
+			/* OK, write out the file */
 	                if (rs >= 0) {
-	                    if ((rs = mailalias_wrfile(op,&data,dt)) >= 0) {
-	                        u_close(fd) ;
-	                        fd = -1 ;
-	                    } /* end if */
+	                    rs = mailalias_wrfile(op,&data,dt) ;
 	                } /* end if (ok) */
 	            } /* end if (mailalias_aprofile) */
 	            rs1 = strtab_finish(&svals) ;
@@ -1233,44 +1236,47 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 /* end subroutine (mailalias_dbmaking) */
 
 static int mailalias_procfile(MA *op,DBMAKE *dp,cchar *fname) noex {
-	bfile		afile ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c_rec = 0 ; /* ¥ GCC false complaint */
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	if ((rs = bopen(&afile,fname,"r",0666)) >= 0) {
-	    cint	llen = LINEBUFLEN ;
-	    int		f_bol = true ;
-	    int		f_eol ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-	    dp->f_havekey = false ;
-	    c_rec = 0 ;
-	    while ((rs = breadln(&afile,lbuf,llen)) > 0) {
-	        int	len = rs ;
-	        f_eol = (lbuf[len - 1] == '\n') ;
-	        if (f_eol) len -= 1 ;
-	        if ((len > 0) && f_bol && f_eol) {
-	            if (lbuf[0] != '#') {
-	                if (! CHAR_ISWHITE(lbuf[0])) {
-	                    dp->f_havekey = false ;
-	                }
-	                rs = dp->procline(lbuf,len) ;
-	                c_rec += rs ;
-	            }
-	        } /* end if (BOL and EOL) */
-	        f_bol = f_eol ;
-	        if (rs < 0) break ;
-	    } /* end while (reading extended lines) */
-	    rs1 = bclose(&afile) ;
-	    if (rs >= 0) rs = rs1 ;
-	} else if (isNotPresent(rs)) {
-	    rs = SR_OK ;
-	} /* end if (afile) */
+	if (op) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		linebuffer	lb ;
+		if ((rs = lb.start) >= 0) {
+	            bfile	afile ;
+		    cint	llen = lb.llen ;
+		    char	*lbuf = lb.lbuf ;
+	            if ((rs = bopen(&afile,fname,"r",0666)) >= 0) {
+	                bool	f_bol = true ;
+	                bool	f_eol ;
+	                dp->f_havekey = false ;
+	                while ((rs = breadln(&afile,lbuf,llen)) > 0) {
+	                    int		len = rs ;
+	                    f_eol = (lbuf[len - 1] == '\n') ;
+	                    if (f_eol) len -= 1 ;
+	                    if ((len > 0) && f_bol && f_eol) {
+	                        if (lbuf[0] != '#') {
+	                            if (! CHAR_ISWHITE(lbuf[0])) {
+	                                dp->f_havekey = false ;
+	                            }
+	                            rs = dp->procline(lbuf,len) ;
+	                            c_rec += rs ;
+	                        }
+	                    } /* end if (BOL and EOL) */
+	                    f_bol = f_eol ;
+	                    if (rs < 0) break ;
+	                } /* end while (reading extended lines) */
+	                rs1 = bclose(&afile) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } else if (isNotPresent(rs)) {
+	                rs = SR_OK ;
+	            } /* end if (afile) */
+		    rs1 = lb.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (linebuffer) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c_rec : rs ;
 }
 /* end subroutine (mailalias_procfile) */
@@ -1300,7 +1306,7 @@ static int mailalias_wrfile(MA *op,DBMAKE *dp,time_t dt) noex {
 }
 /* end subroutine (mailalias_wrfile) */
 
-/* OK, we're ready to start writing stuff out! */
+/* OK, we are ready to start writing stuff out! */
 static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 	int		rs ;
 	int		header[header_overlast] ;
@@ -1418,7 +1424,7 @@ static int mailalias_fileold(MA *op,time_t dt) noex {
 static int mailalias_aprofile(MA *op,time_t dt) noex {
 	USTAT		sb ;
 	kvsfile		aptab ;
-	cint	tlen = MAXPATHLEN ;
+	cint		tlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*profp = nullptr ;
@@ -1438,18 +1444,14 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 	        rs = mkpath2(tbuf,op->pr,profp) ;
 	        profp = tbuf ;
 	    }
-
 	    rs1 = u_stat(profp,&sb) ;
-
-	    if ((rs1 >= 0) && S_ISDIR(sb.st_mode))
+	    if ((rs1 >= 0) && S_ISDIR(sb.st_mode)) {
 	        rs1 = SR_ISDIR ;
-
-	    if (rs1 >= 0)
+	    }
+	    if (rs1 >= 0) {
 	        rs1 = sperm(&op->id,&sb,R_OK) ;
-
-	    if (rs1 >= 0)
-	        break ;
-
+	    }
+	    if (rs1 >= 0) break ;
 	} /* end for */
 
 	if (profp) {
@@ -1468,12 +1470,14 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 	                if (rs1 < 0) break ;
 	                rs = vecstr_add(&op->apfiles,tbuf,rs1) ;
 	            } /* end while */
-	            kvsfile_curend(&aptab,&cur) ;
+	            rs1 = kvsfile_curend(&aptab,&cur) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (kvsfile-cur) */
 	        if (rs >= 0) {
 	            rs = vecstr_getvec(&op->apfiles,&op->aprofile) ;
 	        }
-	        kvsfile_close(&aptab) ;
+	        rs1 = kvsfile_close(&aptab) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (opened key-values table) */
 	    if_constexpr (f_defprofile) {
 	        if (op->aprofile[0] == nullptr) {
@@ -1547,7 +1551,9 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	        cchar	*kp ;
 	        if (int kl ; (kl = field_get(&fsb,kt,&kp)) >= 0) {
 	            if (kl > 0) {
-	                cbool	f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
+			bool	f = true ;
+	                f = f && (kl == 10) ;
+			f = f && (strncasecmp(pm,kp,kl) == 0) ;
 	                f_havekey = true ;
 	                if (f) {
 	                    strwcpylc(kbuf,kp,min(kl,klen)) ;
