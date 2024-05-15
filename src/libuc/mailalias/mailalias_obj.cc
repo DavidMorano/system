@@ -321,6 +321,9 @@ constexpr cpcchar	aptabsched[] = {
 	nullptr
 } ;
 
+static bufsizevar	maxnamelen(getbufsize_mn) ;
+static bufsizevar	maxpathlen(getbufsize_mp) ;
+
 /* all white space plus colon (':') */
 constexpr terminit	keys("\b\t\n\f\v :") ;
 
@@ -1129,10 +1132,11 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 	int		n = NREC_GUESS ;
 	int		rs ;
 	int		rs1 ;
+	cchar		*pat = "dbmkXXXXXX" ;
 	cchar		*suf = MAILALIAS_FE ;
 	cchar		*end = ENDIANSTR ;
 	char		cbuf[MAXNAMELEN+1] ;
-	if ((rs = sncpy5(cbuf,clen,"dbmkXXXXXX",".",suf,end,"n")) >= 0) {
+	if ((rs = sncpy(cbuf,clen,pat,".",suf,end,"n")) >= 0) {
 	    char	tbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpath2(tbuf,dname,cbuf)) >= 0) {
 	        int	of = (O_WRONLY | O_CREAT | O_EXCL) ;
