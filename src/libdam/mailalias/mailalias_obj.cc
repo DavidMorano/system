@@ -266,7 +266,6 @@ constexpr cpcchar	aptabsched[] = {
 
 static sysval		pagesize(sysval_ps) ;
 
-static bufsizevar	maxnamelen(getbufsize_mn) ;
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 constexpr int		mailaddrlen = MAILADDRLEN ;
@@ -286,39 +285,39 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	int		rs ;
 	int		f_create = false ;
 	if ((rs = mailalias_ctor(op,pr,pname)) >= 0) {
-	op->fd = -1 ;
-	op->oflags = of ;
-	op->operm = om ;
-	op->otype = ot ;
-	op->f.ocreate = ((of & O_CREAT) == O_CREAT) ;
-	op->f.owrite |= ((of & O_WRONLY) == O_WRONLY) ;
-	op->f.owrite |= ((of & O_RDWR) == O_RDWR) ;
-	op->aprofile = defprofile ;
-	op->pagesize = getpagesize() ;
-	if ((rs = ids_load(op->idp)) >= 0) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	        op->pr = cp ;
-	        if ((rs = uc_mallocstrw(pname,-1,&cp)) >= 0) {
-	            op->apname = cp ;
-		    if ((rs = pagesize) >= 0) {
-			op->pagesize = rs ;
-			rs = mailalias_opener(op) ;
-		    } /* end if (pagesize) */
+	    op->fd = -1 ;
+	    op->oflags = of ;
+	    op->operm = om ;
+	    op->otype = ot ;
+	    op->f.ocreate = ((of & O_CREAT) == O_CREAT) ;
+	    op->f.owrite |= ((of & O_WRONLY) == O_WRONLY) ;
+	    op->f.owrite |= ((of & O_RDWR) == O_RDWR) ;
+	    op->aprofile = defprofile ;
+	    op->pagesize = getpagesize() ;
+	    if ((rs = ids_load(op->idp)) >= 0) {
+	        cchar	*cp ;
+	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	            op->pr = cp ;
+	            if ((rs = uc_mallocstrw(pname,-1,&cp)) >= 0) {
+	                op->apname = cp ;
+		        if ((rs = pagesize) >= 0) {
+			    op->pagesize = rs ;
+			    rs = mailalias_opener(op) ;
+		        } /* end if (pagesize) */
+	                if (rs < 0) {
+	                    uc_free(op->apname) ;
+	                    op->apname = nullptr ;
+	                }
+	            } /* end if (ma-a) */
 	            if (rs < 0) {
-	                uc_free(op->apname) ;
-	                op->apname = nullptr ;
+	                uc_free(op->pr) ;
+	                op->pr = nullptr ;
 	            }
-	        } /* end if (ma-a) */
+	        } /* end if (m-a) */
 	        if (rs < 0) {
-	            uc_free(op->pr) ;
-	            op->pr = nullptr ;
+	            ids_release(op->idp) ;
 	        }
-	    } /* end if (m-a) */
-	    if (rs < 0) {
-	        ids_release(op->idp) ;
-	    }
-	} /* end if (ids_load) */
+	    } /* end if (ids_load) */
 	    if (rs < 0) {
 		mailalias_dtor(op) ;
 	    }
@@ -636,7 +635,7 @@ static int mailalias_opener(MA *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_create = false ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = maxpathlen) >= 0) {
 	    cint	maxpath = rs ;
 	    cint	sz = ((rs + 1) * 2) ;
 	    char	*a{} ;
@@ -1036,67 +1035,77 @@ static int mailalias_dbmake(MA *op,time_t dt) noex {
 /* end subroutine (mailalias_dbmake) */
 
 static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
-	cint		sz = MAILALIAS_TOPLEN ;
-	cint		clen = MAXNAMELEN ;
-	int		n = NREC_GUESS ;
 	int		rs ;
 	int		rs1 ;
-	cchar		*pat = "dbmkXXXXXX" ;
-	cchar		*suf = MAILALIAS_FE ;
-	cchar		*end = ENDIANSTR ;
-	char		cbuf[MAXNAMELEN+1] ;
-	if ((rs = sncpy(cbuf,clen,pat,".",suf,end,"n")) >= 0) {
-	    char	tbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpath2(tbuf,dname,cbuf)) >= 0) {
-	        int	of = (O_WRONLY | O_CREAT | O_EXCL) ;
-	        int	fd = -1 ;
-		cmode	om = 0664 ;
-	        char	nfname[MAXPATHLEN+1] ;
-	        if ((rs = opentmpfile(tbuf,of,om,nfname)) >= 0) {
-	            fd = rs ;
-	        } else if (rs == SR_EXIST) {
-	            USTAT	sb ;
-	            int		i ; /* used-afterwards */
-	            for (i = 0 ; i < TO_FILECOME ; i += 1) {
-	                msleep(1) ;
-	                rs1 = u_stat(op->dbfname,&sb) ;
-	                if ((rs1 >= 0) && (sb.st_size >= sz)) break ;
-	            } /* end for */
-	            rs = (i < TO_FILECOME) ? SR_OK : SR_TIMEDOUT ;
-	            if (rs == SR_TIMEDOUT) {
-	                of = (O_WRONLY | O_CREAT) ;
-	                rs = u_open(nfname,of,om) ;
-	                fd = rs ;
-	                if (rs == SR_ACCESS) {
-	                    u_unlink(nfname) ;
-	                    rs = u_open(nfname,of,om) ;
+	if ((rs = maxpathlen) >= 0) {
+	    cint	maxpath = rs ;
+	    cint	sz = ((rs + 1) * 3) ;
+	    char	*a{} ;
+	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+		int	ai = 0 ;
+	        cint	clen = rs ;
+	        cchar	*pat = "dbmkXXXXXX" ;
+	        cchar	*suf = MAILALIAS_FE ;
+	        cchar	*end = ENDIANSTR ;
+	        char	*cbuf = (a + (ai++ * (maxpath + 1))) ;
+	        if ((rs = sncpy(cbuf,clen,pat,".",suf,end,"n")) >= 0) {
+	            char	*tbuf = (a + (ai++ * (maxpath + 1))) ;
+	            if ((rs = mkpath2(tbuf,dname,cbuf)) >= 0) {
+	                int	of = (O_WRONLY | O_CREAT | O_EXCL) ;
+	                int	fd = -1 ;
+		        cmode	om = 0664 ;
+	                char	*nfname = (a + (ai++ * (maxpath + 1))) ;
+	                if ((rs = opentmpfile(tbuf,of,om,nfname)) >= 0) {
 	                    fd = rs ;
-	                }
-	            } /* end if (attempt to break the lock) */
-	        } /* end if (waiting for file to come in) */
-	        if ((rs >= 0) && (fd >= 0)) {
-	            if ((rs = mailalias_dbmaking(op,fd,dt,n)) >= 0) {
-	                u_close(fd) ;
-	                fd = -1 ;
-	                if ((rs = u_rename(nfname,op->dbfname)) >= 0) {
+	                } else if (rs == SR_EXIST) {
+	                    USTAT	sb ;
+		            coff	fsz = MAILALIAS_TOPLEN ;
+	                    int		i ; /* used-afterwards */
+	                    for (i = 0 ; i < TO_FILECOME ; i += 1) {
+	                        msleep(1) ;
+	                        rs1 = u_stat(op->dbfname,&sb) ;
+	                        if ((rs1 >= 0) && (sb.st_size >= fsz)) break ;
+	                    } /* end for */
+	                    rs = (i < TO_FILECOME) ? SR_OK : SR_TIMEDOUT ;
+	                    if (rs == SR_TIMEDOUT) {
+	                        of = (O_WRONLY | O_CREAT) ;
+	                        rs = u_open(nfname,of,om) ;
+	                        fd = rs ;
+	                        if (rs == SR_ACCESS) {
+	                            u_unlink(nfname) ;
+	                            rs = u_open(nfname,of,om) ;
+	                            fd = rs ;
+	                        }
+	                    } /* end if (attempt to break the lock) */
+	                } /* end if (waiting for file to come in) */
+	                if ((rs >= 0) && (fd >= 0)) {
+		            cint	n = NREC_GUESS ;
+	                    if ((rs = mailalias_dbmaking(op,fd,dt,n)) >= 0) {
+	                        u_close(fd) ;
+	                        fd = -1 ;
+	                        if ((rs = u_rename(nfname,op->dbfname)) >= 0) {
+	                            nfname[0] = '\0' ;
+	                        }
+	                    }
+	                    if (rs < 0) {
+	                        if (fd >= 0) {
+	                            u_close(fd) ;
+	                            fd = -1 ;
+	                        }
+	                        nfname[0] = '\0' ;
+	                    }
+	                } else {
 	                    nfname[0] = '\0' ;
 	                }
-	            }
-	            if (rs < 0) {
-	                if (fd >= 0) {
-	                    u_close(fd) ;
-	                    fd = -1 ;
+	                if (nfname[0] != '\0') {
+	                    u_unlink(nfname) ;
 	                }
-	                nfname[0] = '\0' ;
-	            }
-	        } else {
-	            nfname[0] = '\0' ;
-	        }
-	        if (nfname[0] != '\0') {
-	            u_unlink(nfname) ;
-	        }
-	    } /* end if (mkpath2) */
-	} /* end if (sncpy5) */
+	            } /* end if (mkpath2) */
+	        } /* end if (sncpy5) */
+		rs1 = uc_free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (maxpathlen) */
 	return rs ;
 }
 /* end subroutine (mailalias_dbmaker) */
