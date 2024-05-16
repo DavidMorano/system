@@ -44,7 +44,7 @@
 #define	MAILALIAS_DEFAPTAB	"default"
 
 #define	MAILALIAS_OSEC		(1<<0)		/* use secondard hash */
-#define	MAILALIAS_ORANDLC	(1<<1)		/* use 'randlc()' */
+#define	MAILALIAS_ORANDLC	(1<<1)		/* use |randlc()| */
 
 
 struct mailalias_cursor {

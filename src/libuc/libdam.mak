@@ -1139,6 +1139,11 @@ belowincs:
 below:
 	makebelow
 
+# MAILALIS
+mailalias.o:		mailalias.dir
+mailalias.dir:
+	makesubdir $@
+
 # STRLISTX
 strlistx.o:		strlistx.dir
 strlistx.dir:

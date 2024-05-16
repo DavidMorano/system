@@ -341,6 +341,11 @@ typedef const char		cc ;
 #define	MAILADDRLEN	(3 * HOSTNAMELEN)
 #endif
 
+/* mail alias-length */
+#ifndef	MAILALIASLEN
+#define	MAILALIASLEN	64
+#endif
+
 #ifndef	ARGBUFLEN
 #define	ARGBUFLEN	MAXARGLEN
 #endif

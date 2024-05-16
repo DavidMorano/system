@@ -38,7 +38,7 @@ LINT=	lint
 DEFS +=
 
 
-INCS += mailalias.h
+INCS += mailalias.h mailaliashdr.h
 
 
 LIBS +=
@@ -57,16 +57,16 @@ LDFLAGS= $(MAKELDFLAGS)
 
 
 OBJ0_MAILALIAS= mailalias_obj.o
-OBJ1_MAILALIAS= 
+OBJ1_MAILALIAS= dbmake.o
 OBJ2_MAILALIAS= 
 OBJ3_MAILALIAS= 
 OBJ4_MAILALIAS= 
 
 
-OBJA_MAILALIAS= obj0_mailalias.o
-OBJB_MAILALIAS= obj2_mailalias.o obj3_mailalias.o obj4_mailalias.o
+OBJA_MAILALIAS= obj0.o obj1.o
+OBJB_MAILALIAS= obj2.o obj3.o obj4.o
 
-OBJ_MAILALIAS= $(OBJA_MAILALIAS)
+OBJ_MAILALIAS= obja.o
 
 
 default:		$(T).o
@@ -112,22 +112,31 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_mailalias.o:	$(OBJ0_MAILALIAS)
+obj0.o:			$(OBJ0_MAILALIAS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILALIAS)
 
-obj1_mailalias.o:	$(OBJ1_MAILALIAS)
+obj1.o:			$(OBJ1_MAILALIAS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILALIAS)
 
-obj2_mailalias.o:	$(OBJ2_MAILALIAS)
+obj2.o:			$(OBJ2_MAILALIAS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILALIAS)
 
-obj3_mailalias.o:	$(OBJ3_MAILALIAS)
+obj3.o:			$(OBJ3_MAILALIAS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILALIAS)
 
-obj4_mailalias.o:	$(OBJ4_MAILALIAS)
+obj4.o:			$(OBJ4_MAILALIAS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILALIAS)
 
 
-mailalias_obj.o:	mailalias_obj.cc	$(INCS)
+obja.o:			$(OBJA_MAILALIAS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILALIAS)
+
+objb.o:			$(OBJB_MAILALIAS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MAILALIAS)
+
+
+mailalias_obj.o:	mailalias_obj.cc	$(INCS) dbmake.hh
+
+dbmake.o:		dbmake.cc dbmake.hh	$(INCS)
 
 
