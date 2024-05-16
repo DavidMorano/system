@@ -1,7 +1,8 @@
-/* uc_isatty */
+/* uc_isatty SUPPORT */
+/* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
-/* get the filename (path) of a terminal device */
+/* determine is the given file-descriptor references a terminal device */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,16 +16,15 @@
 
 /*******************************************************************************
 
-        This subroutine determines if a supplied file-descriptor is associated
-        with a terminal or not.
-
+	This subroutine determines if a supplied file-descriptor
+	is associated with a terminal or not.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
+#include	<cerrno>
 #include	<usystem.h>
 
 
@@ -34,19 +34,29 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_isatty(int fd)
-{
-	int	rs ;
-
-	if ((rs = isatty(fd)) != 0) {
-	    rs = (- rs) ;
+int uc_isatty(int fd) noex {
+	int		rs ;
+	errno = 0 ;
+	if ((rs = isatty(fd)) == 0) {
+	    rs = (- errno) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (uc_isatty) */
+
+int uc_isastream(int fd) noex {
+	int		rs ;
+	errno = 0 ;
+	if ((rs = isastream(fd)) == 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (uc_isastream) */
 
 

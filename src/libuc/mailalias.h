@@ -32,19 +32,17 @@
 #define	MAILALIAS_CUR		struct mailalias_cursor
 #define	MAILALIAS_FI		struct mailalias_finfo
 #define	MAILALIAS_FL		struct mailalias_flags
-
 #define	MAILALIAS_MAGIC		0x23456187
 #define	MAILALIAS_FILEMAGIC	"MAILALIAS"
 #define	MAILALIAS_FILEMAGICSIZE	16
 #define	MAILALIAS_FILEMAGICLEN	sizeof(MAILALIAS_FILEMAGIC)
-
+#define	MAILALIAS_NSHIFT	8
 #define	MAILALIAS_FILEVERSION	0
 #define	MAILALIAS_FILETYPE	0
-
 #define	MAILALIAS_DEFAPTAB	"default"
 
 #define	MAILALIAS_OSEC		(1<<0)		/* use secondard hash */
-#define	MAILALIAS_ORANDLC	(1<<1)		/* use 'randlc()' */
+#define	MAILALIAS_ORANDLC	(1<<1)		/* use |randlc()| */
 
 
 struct mailalias_cursor {
@@ -93,8 +91,8 @@ struct mailalias_head {
 	int		(*rectab)[2] ;
 	int		(*indtab)[2] ;
 	char		*mapdata ;
-	vecstr		apfiles ;
-	ids		id ;
+	vecstr		*afp ;
+	ids		*idp ;
 	time_t		ti_aprofile ;
 	time_t		ti_open ;
 	time_t		ti_access ;

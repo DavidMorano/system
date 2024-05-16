@@ -1,0 +1,35 @@
+	    if_constexpr (f_firsthash) {
+	        VE	*vep ;
+	        vecobj	ves ;
+	        cint	sz = sizeof(VE) ;
+	        cint	vo = VECOBJ_OCOMPACT ;
+	        if ((rs = vecobj_start(&ves,sz,rtl,vo)) >= 0) {
+	            for (int ri = 1 ; ri < rtl ; ri += 1) {
+	                ki = rt[ri][0] ;
+	                kp = kst + ki ;
+	                khash = hash_elf(kp,-1) ;
+	                hi = hashindex(khash,il) ;
+	                if (it[hi][0] == 0) {
+	                    it[hi][0] = ri ;
+	                    it[hi][1] = (khash & INT_MAX) ;
+	                    it[hi][2] = 0 ;
+	                    sc += 1 ;
+	                } else {
+		            ve.ri = ri ;
+		            ve.ki = ki ;
+	                    ve.khash = chash ;
+	                    ve.hi = hi ;
+	                    rs = vecobj_add(&ves,&ve) ;
+	                }
+	                if (rs < 0) break ;
+	            } /* end for */
+	            if (rs >= 0) {
+			auto	vg = vecobj_get ;
+			for (int i = 0 ; vg(&ves,i,&vep) >= 0 ; i += 1) {
+	                    sc += indinsert(rt,it,il,vep) ;
+	                } /* end for */
+	            }
+	            rs1 = vecobj_finish(&ves) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (ves) */
+	    } else {

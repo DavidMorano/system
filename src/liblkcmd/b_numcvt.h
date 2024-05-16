@@ -1,4 +1,8 @@
-/* config */
+/* config HEADER */
+/* lang=C++20 */
+
+/* convert numbers from one base to another */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

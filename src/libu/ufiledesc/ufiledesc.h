@@ -31,15 +31,12 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
-#include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 
 
 #ifdef	__cplusplus
@@ -89,6 +86,7 @@ extern int u_fchdir(int) noex ;
 extern int u_fchmod(int,mode_t) noex ;
 extern int u_fchown(int,uid_t,gid_t) noex ;
 extern int u_close(int) noex ;
+extern int u_fstat(int,USTAT *) noex ;
 extern int u_fstatfs(int,STATFS *) noex ;
 extern int u_fstatvfs(int,STATVFS *) noex ;
 extern int u_fpathconf(int,int,long *) noex ;

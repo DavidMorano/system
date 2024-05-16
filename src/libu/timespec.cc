@@ -41,6 +41,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"timespec.h"
+
 
 /* local defines */
 

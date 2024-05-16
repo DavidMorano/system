@@ -36,6 +36,20 @@ static inline int ipowell(int b,int e) noex {
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+static inline int	pow(int b,int e) noex {
+	return ipow(b,e) ;
+}
+static inline long	pow(long b,int e) noex {
+	return lpow(b,e) ;
+}
+static inline longlong	pow(longlong b,int e) noex {
+	return llpow(b,e) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* POW_INCLUDE */
 

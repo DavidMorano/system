@@ -19,6 +19,7 @@
 	u_fchown
 	u_close
 	u_poll
+	u_fstat
 	u_fstatfs
 	u_fstatvfs
 	u_fpathconf
@@ -385,18 +386,18 @@ int u_close(int fd) noex {
 }
 /* end subroutine (u_close) */
 
-/* this is (sort of) a spæcial case */
-int u_poll(POLLFD *fds,int n,int to) noex {
+int u_fstat(int fd,USTAT *ssp) noex {
 	int		rs = SR_FAULT ;
-	if (fds) {
-	    uregular	ro(fds,n,to) ;
-	    ro.m = &uregular::ipoll ;
-	    ro.f.fintr = true ;
-	    rs = ro(0) ;
+	if (ssp) {
+	    repeat {
+	        if ((rs = fstat(fd,ssp)) >= 0) {
+	            rs = (- errno) ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (u_poll) */
+/* end subroutine (u_fstat) */
 
 int u_fstatfs(int fd,STATFS *ssp) noex {
 	int		rs = SR_FAULT ;
@@ -542,6 +543,19 @@ int u_writev(int fd,CIOVEC *iop,int n) noex {
 	return ro(fd) ;
 }
 /* end subroutine (u_writev) */
+
+/* this is (sort of) a spæcial case */
+int u_poll(POLLFD *fds,int n,int to) noex {
+	int		rs = SR_FAULT ;
+	if (fds) {
+	    uregular	ro(fds,n,to) ;
+	    ro.m = &uregular::ipoll ;
+	    ro.f.fintr = true ;
+	    rs = ro(0) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_poll) */
 
 
 /* local subroutines */

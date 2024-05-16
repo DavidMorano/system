@@ -1,4 +1,4 @@
-/* usysauxinfo_darwin */
+/* usysauxinfo_darwin SUPPORT */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */
@@ -29,57 +29,30 @@
 /* USYSAUXINFO_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-
 #include	<sys/types.h>
-#include	<cerrno>
 #include	<climits>
 #include	<unistd.h>
-#include	<cstring>
-#include	<usysrets.h>
+#include	<cerrno>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	"usysauxinfo_darwin.h"
 
 
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported subroutines */
-
 /* SYSAUXINFO begin */
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
+extern int sncpy1(char *,int,cchar *) noex ;
+EXTERNC_end
 
-extern int sncpy1(char *,int,const char *) noex ;
-
-int sysauxinfo(char *rbuf,int rlen,int req) noex {
+namespace usys {
+    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    const char	*vp = nullptr ;
+	    cchar	*vp = nullptr ;
 	    rs = SR_NOENT ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
@@ -97,12 +70,8 @@ int sysauxinfo(char *rbuf,int rlen,int req) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
+    } /* end subroutine (usysauxinfo) */
 }
-/* end subroutine (sysauxinfo) */
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
 /* SYSAUXINFO end */

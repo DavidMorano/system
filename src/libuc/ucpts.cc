@@ -91,7 +91,6 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<ustropts.h>
 #include	<snx.h>
 
 #include	"ucpts.h"

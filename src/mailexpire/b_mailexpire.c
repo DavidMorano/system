@@ -66,7 +66,7 @@
 #include	<sysusernames.h>
 #include	<mailbox.h>
 #include	<toxc.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

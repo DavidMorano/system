@@ -1,8 +1,8 @@
-/* main */
+/* main SUPPORT (tps) */
+/* lang=C++20 */
 
 /* program to return process status */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,23 +10,23 @@
 #define	CF_PRINTHELP	0
 #define	CF_GETEXECNAME	1		/* use 'getexecname(3c)' */
 
-
 /* revision history:
 
 	= 1989-03-01, David A­D­ Morano
-	This subroutine was originally written.  This whole program, LOGDIR, is
-	needed for use on the Sun CAD machines because Sun doesn't support
-	LOGDIR or LOGNAME at this time.  There was a previous program but it is
-	lost and not as good as this one anyway.  This one handles NIS+ also.
-	(The previous one didn't.)
+	This subroutine was originally written.  This whole program,
+	LOGDIR, is needed for use on the Sun CAD machines because
+	Sun doesn't support LOGDIR or LOGNAME at this time.  There
+	was a previous program but it is lost and not as good as
+	this one anyway.  This one handles NIS+ also.  (The previous
+	one didn't.)
 
 	= 1998-06-01, David A­D­ Morano
 	I enhanced the program a little to print out some other user
 	information besides the user's name and login home directory.
 
 	= 1999-03-01, David A­D­ Morano
-	I enhanced the program to also print out effective UID and effective
-	GID.
+	I enhanced the program to also print out effective UID and
+	effective GID.
 
 */
 
@@ -35,29 +35,26 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ tps 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/sysctl.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
 #include	<kvm.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdio>
-#include	<time.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -94,23 +91,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-#if	CF_PRINTHELP
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
 
 /* external variables */
 
@@ -123,16 +103,6 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
-	    "VERSION",
-	    "VERBOSE",
-	    "HELP",
-	    "ROOT",
-	    "of",
-	    "pg",
-	    NULL
-} ;
-
 enum argopts {
 	argopt_version,
 	argopt_verbose,
@@ -141,17 +111,15 @@ enum argopts {
 	argopt_of,
 	argopt_pg,
 	argopt_overlast
-
 } ;
 
-/* define the configuration keywords */
-static const char *qopts[] = {
-	    "sysname",
-	    "release",
-	    "version",
-	    "machine",
-	    "logname",
-	    "username",
+constexpr cpcch		argopts[] = {
+	    "VERSION",
+	    "VERBOSE",
+	    "HELP",
+	    "ROOT",
+	    "of",
+	    "pg",
 	    NULL
 } ;
 
@@ -163,22 +131,26 @@ enum qopts {
 	qopt_logname,
 	qopt_username,
 	qopt_overlast
+} ;
 
+constexpr cpcchar	qopts[] = {
+	"sysname",
+	"release",
+	"version",
+	"machine",
+	"logname",
+	"username",
+	nullptr
 } ;
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) noex {
 	PROGINFO	pi, *pip = &pi ;
-
 	int	argr, argl, aol, akl, avl ;
 	int	argvalue = -1 ;
 	int	maxai, pan, npa, kwi, ai, i, j, k ;

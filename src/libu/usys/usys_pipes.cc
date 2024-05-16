@@ -45,7 +45,7 @@
 using usys::ucloseonexec ;		/* subroutine */
 using usys::unonblock ;			/* subroutine */
 
-unixret_t pipes(int *pipes,int of) noex {
+unixret_t pipe2(int *pipes,int of) noex {
 	unixret_t	rc = 0 ;
 	int		rl = 0 ;
 	if (pipes) {

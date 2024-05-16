@@ -19,7 +19,7 @@
 
 	Coding note:
 	The Solaris® (from Sun Microsystems) OS is messed up if
-	|execvp(2)| is called with a rooted program file. Why is
+	|execvp(2)| is called with a rooted program file.  Why is
 	it hosed? Who can fathom the screw-up known as Solaris?  So
 	we check if the program file is rooted ourselves and if it
 	is, we change and call |execv(2)| instead.  Did I mention
@@ -37,6 +37,8 @@
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<localmisc.h>
+
+#include	"uexec.h"
 
 
 /* local defines */
@@ -93,7 +95,7 @@ int u_execve(cchar *p,mainv argv,mainv envv) noex {
 /* end subroutine (u_execve) */
 
 int u_execv(cchar *p,mainv argv) noex {
-	char *const	*eav = (char *const *) argv ;
+	char		*const	*eav = (char *const *) argv ;
 	int		rs ;
 	int		to_again = utimeout[uto_again] ;
 	int		to_nomem = utimeout[uto_nomem] ;

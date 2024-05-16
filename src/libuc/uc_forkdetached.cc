@@ -1,9 +1,8 @@
-/* uc_forkdetached */
+/* uc_forkdetached SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,28 +16,25 @@
 
 /*******************************************************************************
 
-        This subroutine forks the current process but it does so with the CHILD
-        signal ignored first.
+	Description:
+	This subroutine forks the current process but it does so
+	with the CHILD signal ignored first.
 
-        Note: This really accomplishes pretty much nothing, and therefore is not
-        even compiled into anything (libraries included).
 
 	Synopsis:
-
 	int uc_forkdetached()
 
 	Arguments:
 
-	pid		PID of process to retrieve UID for
-
 	Returns:
-
 	>=0		UID of process (as an integer)
-	<0		error
+	<0		error code (system-return)
 
+        Note: 
+	This really accomplishes pretty much nothing, and therefore
+	is not even compiled into anything (libraries included).
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -63,36 +59,31 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_forkdetached()
-{
-	struct sigaction	osh, nsh ;
-
+int uc_forkdetached() noex {
+	SIGACTION	osh ;
+	SIGACTION	nsh{} ;
 	sigset_t	sm ;
-
-	pid_t		pid ;
-
-	int	rs ;
-
-
+	int		rs ;
+	int		rs1 ;
+	int		pid = 0 ;
 	uc_sigemptyset(&sm) ;
-
-	memset(&nsh,0,sizeof(struct sigaction)) ;
 	nsh.sa_handler = SIG_IGN ;
 	nsh.sa_mask = sm ;
 	nsh.sa_flags = (SA_NOCLDWAIT | SA_NOCLDSTOP) ;
-
 	if ((rs = u_sigaction(SIGCLD,&nsh,&osh)) >= 0) {
-
-	    rs = uc_fork() ;
-	    pid = rs ;
-
-	    u_sigaction(SIGCLD,&osh,NULL) ;
+	    {
+	        rs = uc_fork() ;
+	        pid = rs ;
+	    }
+	    rs1 = u_sigaction(SIGCLD,&osh,nullptr) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigaction) */
-
-	return (rs >= 0) ? ((int) pid) : rs ;
+	return (rs >= 0) ? pid : rs ;
 }
 /* end subroutine (uc_forkdetached) */
 

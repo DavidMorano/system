@@ -42,6 +42,9 @@
 	Her-Daw Che, and Maury Bach.
 
 	Synopsis:
+	unixret_t isasteam(int fd) noex
+	unixret_t fattch(int fd,cchar *fname) noex
+	unixret_t fdetch(cchar *fname) noex
 	unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex
 	unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex
 	unixret_t putmsg(int fd,SB *cmp,SB *dmp,int flags) noex
@@ -54,6 +57,7 @@
 	fp		pointer to flags (an integer)
 	bp		pointer to priority-band (an integer)
 	flag		flags
+	fname		file-name of file to attach to or detach from
 
 	Returns:
 	>=0		OK
@@ -73,6 +77,7 @@
 #include	<clanguage.h>
 #include	<usysflag.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"usys_streams.h"
 
@@ -84,61 +89,138 @@
 #if	(!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0)
 
 
-extern unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
+extern unixret_t isastream(int fd) noex {
 	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
 	if (fd >= 0) {
-	    if (cmp && dmp && fp) {
-		errno = ENOSYS ;
+	    ec = ENOSYS ;
+	} else {
+	    ec = EBADF ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
+	}
+	return rc ;
+}
+
+extern unixret_t fattach(int fd,cchar *fname) noex {
+	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
+	if (fd >= 0) {
+	    if (fname) {
+		if (fname[0]) {
+		    ec = ENOSYS ;
+		} else {
+		    ec = EINVAL ;
+		}
 	    } else {
-		errno = EFAULT ;
+		ec = EFAULT ;
 	    }
 	} else {
-	    errno = EBADF ;
+	    ec = EBADF ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
+	}
+	return rc ;
+}
+
+extern unixret_t fdetach(cchar *fname) noex {
+	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
+	if (fname) {
+	    if (fname[0]) {
+		ec = ENOSYS ;
+	    } else {
+		ec = EINVAL ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
+	}
+	return rc ;
+}
+
+extern unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
+	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
+	if (fd >= 0) {
+	    if (cmp && dmp && fp) {
+		ec = ENOSYS ;
+	    } else {
+		ec = EFAULT ;
+	    }
+	} else {
+	    ec = EBADF ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
 	}
 	return rc ;
 }
 
 extern unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
 	if (fd >= 0) {
 	    if (cmp && dmp && bp && fp) {
-		errno = ENOSYS ;
+		ec = ENOSYS ;
 	    } else {
-		errno = EFAULT ;
+		ec = EFAULT ;
 	    }
 	} else {
-	    errno = EBADF ;
+	    ec = EBADF ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
 	}
 	return rc ;
 }
 
 extern unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
 	(void) fl ;
 	if (fd >= 0) {
 	    if (cmp && dmp) {
-		errno = ENOSYS ;
+		ec = ENOSYS ;
 	    } else {
-		errno = EFAULT ;
+		ec = EFAULT ;
 	    }
 	} else {
-	    errno = EBADF ;
+	    ec = EBADF ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
 	}
 	return rc ;
 }
 
 extern unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	unixret_t	rc = -1 ;
+	errno_t		ec = 0 ;
 	(void) fl ;
 	(void) bd ;
 	if (fd >= 0) {
 	    if (cmp && dmp) {
-		errno = ENOSYS ;
+		ec = ENOSYS ;
 	    } else {
-		errno = EFAULT ;
+		ec = EFAULT ;
 	    }
 	} else {
-	    errno = EBADF ;
+	    ec = EBADF ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    rc = -1 ;
 	}
 	return rc ;
 }

@@ -37,37 +37,17 @@
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
-#include	<sys/wait.h>		/* <- type |idtype_t| is there */
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<signal.h>
-#include	<pthread.h>
-#include	<time.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
-#include	<sysauxinfonames.h>
+#include	<usysauxinfo.h>
 
 
 /* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
-
-/* only define what this system has */
-#define	SAI_ARCHITECTURE	sysauxinfo_architecture
-#define	SAI_PLATFORM		sysauxinfo_platform
-#define	SAI_HWPROVIDER		sysauxinfo_hwprovider
-
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
+#if	(!defined(SYSHAS_SYSAUXINFO)) || (SYSHAS_SYSAUXINFO == 0)
 
 
-/* always define the following -- even if you do not have it */
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int sysauxinfo(char *,int,int) noex ;
-
-#ifdef	__cplusplus
-}
 #endif
 
 

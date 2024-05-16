@@ -44,7 +44,7 @@
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<logfile.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
 #include	<localmisc.h>
 
 #include	"mfsmain.h"

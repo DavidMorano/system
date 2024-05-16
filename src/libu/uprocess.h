@@ -21,6 +21,7 @@
 	u_alarm
 	u_exit
 	u_fork
+	u_atfork
 	u_getgroups
 	u_getpgid
 	u_getrlimit
@@ -42,6 +43,7 @@
 	u_wait
 	u_waitid
 	u_waitpid
+	u_nanosleep
 
 	Description:
 	All of the UNIX® system calls that use (operate on) a
@@ -57,12 +59,10 @@
 #include	<sys/types.h>		/* system types */
 #include	<sys/resource.h>	/* |getrlimit(2)| */
 #include	<unistd.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>
 
 
 #ifdef	__cplusplus
@@ -84,6 +84,7 @@ namespace uprocess {
 EXTERNC_begin
 
 extern int u_alarm(cuint secs) noex ;
+extern int u_atfork(void_f,void_f,void_f) noex ;
 extern int u_exit(int ex) noex ;
 extern int u_fork() noex ;
 extern int u_getgroups(int n,gid_t *a) noex ;
@@ -104,11 +105,12 @@ extern int u_setsid() noex ;
 extern int u_setgroups(int n,const gid_t *list) noex ;
 extern int u_setrlimit(int rn,CRLIMIT *rp) noex ;
 extern int u_times(TMS *rp) noex ;
-extern int u_ulimit(int cmd,int nval) noex ;
+extern int u_ulimit(int,...) noex ;
 extern int u_vfork() noex ;
 extern int u_wait(int *sp) noex ;
 extern int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex ;
 extern int u_waitpid(pid_t pid,int *sp,int flags) noex ;
+extern int u_nanosleep(CTIMESPEC *,TIMESPEC *) noex ;
 
 EXTERNC_end
 

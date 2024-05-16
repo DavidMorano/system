@@ -53,6 +53,7 @@
 #include	<usys_sigx.h>
 #include	<usys_streams.h>
 #include	<usys_pipes.h>
+#include	<usys_stat.h>
 
 
 #endif /* USYS_INCLUDE */

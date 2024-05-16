@@ -21,7 +21,7 @@
 
 	Description:
 	This subroutine calculates the next higher power of two for
-	the value given as the argument. This is very useful in
+	the value given as the argument.  This is very useful in
 	many memory mappings and other storage allocation schemes
 	where a power of two is preferred for management simplicity.
 

@@ -96,13 +96,6 @@ using std::max ;			/* subroutine-template */
 static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 
-/* local variables */
-
-constexpr cchar		blanks[] = "        " ;
-
-constexpr int		nblanks = strlen(blanks) ;
-
-
 /* local subroutine-templates */
 
 template<typename T>
@@ -155,6 +148,13 @@ int sbuf_hexx(sbuf *sbp,T v) noex {
 	return sbuf_xxxx(sbp,cthex,v) ;
 }
 /* end subroutine-template (sbuf_hexx) */
+
+
+/* local variables */
+
+constexpr cchar		blanks[] = "        " ;
+
+constexpr int		nblanks = strlen(blanks) ;
 
 
 /* exported variables */

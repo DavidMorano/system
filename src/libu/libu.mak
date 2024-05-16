@@ -3,7 +3,7 @@
 T= libu
 
 #ALL= $(T).so $(T).a
-ALL= $(T).a
+ALL= $(T).a $(T).o
 
 
 BINDIR= $(REPOROOT)/bin
@@ -38,15 +38,12 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += usyscalls.h localmisc.h
-
 
 LIBS +=
 
 
 INCDIRS=
-
 
 LIBDIRS= -L$(LIBDIR)
 
@@ -135,9 +132,9 @@ OBJ55=
 
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
-OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
-OBJB= usys.o usysop.o uipc.o usig.o unanosleep.o
-OBJC= uopen.o ustr.o usysdata.o uatfork.o
+OBJA= usupport.o utimeout.o utimeouts.o timewatch.o timespec.o
+OBJB= usys.o usysop.o uipc.o usig.o uexec.o
+OBJC= uopen.o ustr.o usysdata.o ugetloadavg.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
 OBJE= ufiledesc.o ufileop.o uprocess.o endian.o
 
@@ -241,6 +238,9 @@ timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
 intsat.o:		intsat.cc intsat.h
+endian.o:		endian.cc endian.h		$(INCS)
+mtime.o:		mtime.cc mtime.h		$(INCS)
+timespec.o:		timespec.cc timespec.h		$(INCS)
 
 # ADAPTATION
 usysauxinfo.o:		usysauxinfo.cc
@@ -269,13 +269,11 @@ uipc.dir:
 	makesubdir $@
 
 # OTHER
-unanosleep.o:		unanosleep.cc			$(INCS)
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
-endian.o:		endian.cc endian.h		$(INCS)
-mtime.o:		mtime.cc mtime.h		$(INCS)
-timespec.o:		timespec.cc timespec.h		$(INCS)
+ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
+uexec.o:		uexec.cc uexec.h		$(INCS)
 
 

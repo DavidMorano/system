@@ -4,7 +4,7 @@
 /* get random data from the system */
 /* version %I% last-modified %G% */
 
-#define	CF_GETENTROPY	0		/* compile-define |getentropy(2)| */
+#define	CF_GETRANDOM	1		/* compile-define |getrandom(2)| */
 
 /* revision history:
 
@@ -17,19 +17,28 @@
 
 /*******************************************************************************
 
-	This is a version of |getrandom(2)| that is preloaded to
-	over-ride the standard UNIX® system version.
+	Name:
+	ucrand
 
-	Q. Is this multi-thread safe?
-	A. Since it is a knock-off of an existing UNIX® system LIBC (3c)
-	   subroutine that is already multi-thread safe -- then of course
-	   it is!
+	Description:
+	This is an emulated operating system kernel call that retrieves
+	random data from a pool of random data (in user space).
+
+	Synopsis:
+	int ucrand(void *mrbuf,int rlen) noex
+
+	Arguments:
+	rbuf		result buffer pointer
+	rlen		result buffer length
+
+	Returns:
+	>=0		number of bytes returns
+	<0		error code (system return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/random.h>		/* |getentropy(2)| */
 #include	<unistd.h>
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cerrno>
@@ -59,6 +68,10 @@
 #define	RBUFLEN		64
 
 #define	GETRANDOM_MAXENT	256	/* maximum bytes per call */
+
+#ifndef	CF_GETRANDOM
+#define	CF_GETRANDOM	1		/* compile-define |getrandom(2)| */
+#endif
 
 
 /* imported namespaces */
@@ -161,14 +174,16 @@ extern "C" {
 
 static rander		rander_data ;
 
+constexpr bool		f_getrandom = CF_GETRANDOM ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-sysret_t uc_rand(void *arbuf,size_t arlen) noex {
-	cint		rlen = (int) arlen ;
+sysret_t uc_rand(void *arbuf,int arlen) noex {
+	cint		rlen = arlen ;
 	int		rs ;
 	char		*rbuf = charp(arbuf) ;
 	if ((rs = rander_data.get(rbuf,rlen)) < 0) {
@@ -323,24 +338,35 @@ int rander::geter(char *rbuf,int rlen) noex {
 /* end method (randero::geter) */
 
 int rander::iaddnoise() noex {
-	cint		of = O_RDONLY ;
-	cchar		*dev = RANDOMDEV ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = u_open(dev,of,0666)) >= 0) {
+	if_constexpr (f_getrandom) {
 	    cint	rlen = RBUFLEN ;
-	    cint	fd = rs ;
 	    char	rbuf[RBUFLEN+1] ;
-	    if ((rs = u_read(fd,rbuf,rlen)) >= 0) {
+	    if ((rs = uc_getrandom(rbuf,rlen,0)) >= 0) {
 		randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
-		cint		len = rs ;
+		cint	len = rs ;
 		rs = randomvar_addnoise(rvp,rbuf,len) ;
 		rl = rs ;
-	    } /* end if (read) */
-	    rs1 = u_close(fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (file-random) */
+	    } /* end if (uc_getrandom) */
+	} else {
+	    cint	of = O_RDONLY ;
+	    cchar	*dev = RANDOMDEV ;
+	    if ((rs = u_open(dev,of,0666)) >= 0) {
+	        cint	rlen = RBUFLEN ;
+	        cint	fd = rs ;
+	        char	rbuf[RBUFLEN+1] ;
+	        if ((rs = u_read(fd,rbuf,rlen)) >= 0) {
+		    randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
+		    cint	len = rs ;
+		    rs = randomvar_addnoise(rvp,rbuf,len) ;
+		    rl = rs ;
+	        } /* end if (read) */
+	        rs1 = u_close(fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (file-random) */
+	} /* end if_constexpr (f_getrandom) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (rander::iaddnoise) */

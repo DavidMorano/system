@@ -47,7 +47,7 @@
 #include	<ptm.h>
 #include	<localmisc.h>
 
-#include	"sysauxinfo.h"
+#include	"usysauxinfo.h"
 
 
 /* local defines */
@@ -59,6 +59,14 @@
 #endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
 
 
+/* imported namespaces */
+
+using usys::usysauxinfo ;		/* subroutines */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -66,7 +74,7 @@
 
 namespace {
     struct ucsysauxinfo ;
-    typedef int (ucsysauxinfo::*mem_f)(char *,int,int) ;
+    typedef int (ucsysauxinfo::*mem_f)(char *,int,int) noex ;
     struct ucsysauxinfo {
 	mem_f		m ;
 	ucsysauxinfo() noex { } ;
@@ -86,6 +94,9 @@ extern "C" {
 /* local variables */
 
 constexpr bool		f_sysauxinfo = F_SYSAUXINFO ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -142,7 +153,7 @@ int ucsysauxinfo::get(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
 	if constexpr (f_sysauxinfo) {
-	    if ((rs = sysauxinfo(rbuf,rlen,req)) < 0) {
+	    if ((rs = usysauxinfo(rbuf,rlen,req)) < 0) {
 	        rs = (-rs) ;
 	    } else if (rs == 0) {
 		if (errno) {

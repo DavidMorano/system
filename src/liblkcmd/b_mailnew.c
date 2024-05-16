@@ -93,7 +93,7 @@
 #include	<mailbox.h>
 #include	<mbcache.h>
 #include	<hdrdecode.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

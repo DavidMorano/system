@@ -29,20 +29,22 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<ustropts.h>		/* <- the money shot */
 
 #include	<usys.h>
 
 
 EXTERNC_begin
 
+extern int u_fattach(int,cchar *) noex ;
 extern int u_strmsgget(int,STRBUF *,STRBUF *,int *) noex ;
 extern int u_strmsggetp(int,STRBUF *,STRBUF *,int *,int *) noex ;
 extern int u_strmsgput(int,STRBUF *,STRBUF *,int) noex ;
 extern int u_strmsgputp(int,STRBUF *,STRBUF *,int,int) noex ;
+
+extern int u_fdetach(cchar *) noex ;
 
 EXTERNC_end
 

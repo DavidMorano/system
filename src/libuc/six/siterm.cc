@@ -57,6 +57,18 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int siterm(cchar *sp,int sl,cchar *terms) noex {

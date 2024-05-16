@@ -1,7 +1,7 @@
 /* usys_ufcntl HEADER */
 /* lang=C20 */
 
-/* operating support for retrieving the NIS domain-name */
+/* UNIX® system emulated support */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-	This is an utility function for use by other emulators.
+	This is a utility function for use by other emulators.
 
 *******************************************************************************/
 

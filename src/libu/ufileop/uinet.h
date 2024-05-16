@@ -33,9 +33,9 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
+#include	<clanguage.h>		/* |MAX| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>		/* |MAX| */
 
 
 #ifndef	PF_INET4

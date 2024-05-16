@@ -52,6 +52,8 @@
 #include	<usysflag.h>
 #include	<localmisc.h>
 
+#include	"usysdata.h"
+
 
 /* local defines */
 

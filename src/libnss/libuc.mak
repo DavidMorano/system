@@ -37,10 +37,8 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
-
 
 LIBS=
 
@@ -49,6 +47,10 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
+
+LDRPATH=
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -515,7 +517,7 @@ ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc
 ucatexit.o:		ucatexit.cc
 ucfork.o:		ucfork.cc
-ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h ugetloadavg.h
+ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
 ucgetpid.o:		ucgetpid.cc ucgetpid.h
 ucproguser.o:		ucproguser.cc ucproguser.h
@@ -1022,16 +1024,6 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
-# STRLIST
-strlistx.o:		strlistx.dir
-strlistx.dir:
-	makesubdir $@
-
-# MAILALIS
-mailalias.o:		mailalias.dir
-mailalias.dir:
-	makesubdir $@
-
 # POW
 pow.o:			pow.dir
 pow.dir:
@@ -1098,6 +1090,7 @@ thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
 pwentry.o:		pwentry.cc	pwentry.h
 pwfile.o:		pwfile.cc	pwfile.h
 sif.o:			sif.cc		sif.hh
+bufstr.o:		bufstr.cc bufstr.h
 
 
 # sring-comparisons

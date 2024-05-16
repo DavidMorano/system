@@ -25,6 +25,7 @@
 	u_lchown
 	u_link
 	u_lstat
+	u_mkdir
 	u_mknod
 	u_pathconf
 	u_readlink
@@ -126,7 +127,7 @@ namespace {
 	dev_t		dev ;
 	mode_t		fm ;
 	ufiler() noex { } ;
-	ufiler(mode_t m,dev_t d) noex : fm(m), dev(d) { } ;
+	ufiler(mode_t m,dev_t d = 0) noex : fm(m), dev(d) { } ;
 	ufiler(cchar *d) noex : dfn(d) { } ;
 	int callstd(cchar *fn) noex override {
 	    int		rs = SR_BUGCHECK ;
@@ -138,6 +139,7 @@ namespace {
 	void submem(ufiler_m mem) noex {
 	    m = mem ;
 	} ;
+	int imkdir(cchar *) noex ;
 	int imknod(cchar *) noex ;
 	int irename(cchar *) noex ;
 	int irmdir(cchar *) noex ;
@@ -236,6 +238,13 @@ int u_lstat(cchar *fname,USTAT *sbp) noex {
 	return rs ;
 }
 /* end subroutine (u_lstat) */
+
+int u_mkdir(cchar *fn,mode_t fm) noex {
+	ufiler		fo(fm) ;
+	fo.m = &ufiler::imkdir ;
+	return fo(fn) ;
+}
+/* end subroutine (u_mkdir) */
 
 int u_mknod(cchar *fn,mode_t fm,dev_t dev) noex {
 	ufiler		fo(fm,dev) ;
@@ -387,6 +396,15 @@ int u_unlink(cchar *fname) noex {
 
 
 /* local subroutines */
+
+int ufiler::imkdir(cchar *fn) noex {
+	int		rs = SR_FAULT ;
+	if ((rs = mkdir(fn,fm)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiler::imkdir) */
 
 int ufiler::imknod(cchar *fn) noex {
 	int		rs = SR_FAULT ;

@@ -1,4 +1,5 @@
-/* MAILADDRQUOTE */
+/* mailaddrquote SUPPORT */
+/* lang=C++20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -7,14 +8,18 @@
 #define	MAILADDRQUOTE_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<bufstr.h>
+#include	<localmisc.h>
 
 
 #define	MAILADDRQUOTE		struct mailaddrquote_head
-
+#define	MAILADDRQUOTE_FL	struct mailaddrquote_flags
 #define	MAILADDRQUOTE_LEN	100		/* default value */
+#define	MAILADDRQUOTE_MAGIC	0x08938725	/* magic */
 
 
 struct mailaddrquote_flags {
@@ -22,25 +27,21 @@ struct mailaddrquote_flags {
 } ;
 
 struct mailaddrquote_head {
-	BUFSTR		qaddr ;
-	struct mailaddrquote_flags	f ;
+	bufstr			*bsp ;	/* buffer-string-pointer */
+	MAILADDRQUOTE_FL	f ;
+	uint			magic ;
 } ;
 
+typedef	MAILADDRQUOTE		mailaddrquote ;
+typedef	MAILADDRQUOTE_FL	mailaddrquote_fl ;
 
-#if	(! defined(MAILADDRQUOTE_MASTER)) || (MAILADDRQUOTE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int mailaddrquote_start(mailaddrquote *,cchar *,int,cchar **) noex ;
+extern int mailaddrquote_finish(mailaddrquote *) noex ;
 
-extern int mailaddrquote_start(MAILADDRQUOTE *,const char *,int,const char **) ;
-extern int mailaddrquote_finish(MAILADDRQUOTE *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MAILADDRQUOTE_MASTER */
 
 #endif /* MAILADDRQUOTE_INCLUDE */
 

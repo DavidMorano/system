@@ -39,7 +39,7 @@
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
-#include	<prsetfname.h>
+#include	<prmkfname.h>
 #include	<localmisc.h>
 
 #include	"msumain.h"
