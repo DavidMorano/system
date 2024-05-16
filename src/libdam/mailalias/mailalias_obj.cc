@@ -58,6 +58,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<sysval.hh>
@@ -132,7 +133,6 @@
 #define	TO_FILEOLD	10		/* backing-store check */
 
 #define	NREC_GUESS	100		/* guess of number of records */
-#define	NSHIFT		6
 
 #ifndef	CF_DEFPROFILE
 #define	CF_DEFPROFILE	0		/* always use default MA-profile */
@@ -145,6 +145,8 @@ using namespace	mailutils ;		/* namespace */
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::rotl ;			/* subroutine-template */
+using std::rotr ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -268,6 +270,8 @@ constexpr int		mailaddrlen = MAILADDRLEN ;
 constexpr int		mailaliaslen = MAILALIASLEN ;
 
 constexpr bool		f_defprofile = CF_DEFPROFILE ;
+
+constexpr cchar		pm[] = "Postmaster" ;
 
 
 /* exported variables */
@@ -464,8 +468,8 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	                if (ri < op->rtlen) {
 	                    int		ai = op->rectab[ri][0] ;
 	                    int		vi = op->rectab[ri][1] ;
-	                    int		cl ;
 	                    if ((ai < op->sklen) && (vi < op->svlen)) {
+	                        int	cl ;
 	                        char	*bp ;
 	                        if (kbuf != nullptr) {
 	                            cl = mailaliaslen ;
@@ -502,148 +506,112 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 }
 /* end subroutine (mailalias_enum) */
 
-/* ARGSUSED */
 int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 		char *vbuf,int vlen) noex {
-	MA_CUR		cur ;
-	time_t		dt = 0 ;
-	uint		khash ;
-	int		rs = SR_OK ;
-	int		vl = 0 ;
+	int		rs ;
 	int		rs1 ;
-	int		f_cur = false ;
+	int		vl = 0 ;
 	(void) opts ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	if (aname == nullptr) return SR_INVALID ;
-
-	if (curp == nullptr) {
-	    curp = &cur ;
-	    curp->i = -1 ;
-	} else {
-	    f_cur = true ;
-	    if (op->cursors == 0) {
-	        rs = SR_INVALID ;
-	    }
-	} /* end if */
-
-	if (rs >= 0) {
-	    if ((rs = mailalias_enterbegin(op,dt)) >= 0) {
-	        cint	ns = NSHIFT ;
-	        int		vi, hi, ri ;
-	        int		cl, hl, n ;
-	        int		f ;
-	        cchar	*hp ;
-	        cchar	*cp ;
-
-/* continue with regular fetch activities */
-
-	        op->f.cursoracc = true ;	/* doesn't hurt if no cursor! */
-	        n = op->rilen ;
-
-/* OK, we go from here */
-
-	        if (curp->i < 0) {
-	            char	keybuf[mailaliaslen + 1] ;
-
-	            f = (strcasecmp(aname,"Postmaster") == 0) ;
-
-	            if (f) {
-	                hp = keybuf ;
-	                cp = strwcpylc(keybuf,aname,mailaliaslen) ;
-	                hl = cp - keybuf ;
-	            } else {
-	                hp = aname ;
-	                hl = strlen(aname) ;
-	            } /* end if */
-
-	            khash = hash_elf(hp,hl) ;
-
-	            hi = hashindex(khash,op->rilen) ;
-
-/* start searching! */
-
-	            if (op->ropts & MAILALIAS_OSEC) {
-			int	c = 0 ;
-	                bool	f{} ;
-	                while ((ri = (op->indtab)[hi][0]) != 0) {
-
-	                    f = mailalias_keymatch(op,ri,aname) ;
-	                    if (f)
-	                        break ;
-
-	                    op->collisions += 1 ;
-	                    if (op->ropts & MAILALIAS_ORANDLC) {
-	                        khash = randlc(khash + c) ;
-	                    } else {
-	                        khash = 
-	                            ((khash << (32 - ns)) | (khash >> ns)) + c ;
-	                    }
-
-	                    hi = hashindex(khash,n) ;
-	                    c += 1 ;
-
-	                } /* end while */
-
-	                if (ri == 0) {
-	                    rs = SR_NOTFOUND ;
-	                }
-
-	            } /* end if (secondary hasing) */
-
-	        } else {
-/* get the next record index (if there is one) */
-	            hi = curp->i ;
-	            if (hi != 0) {
-	                ri = (op->indtab)[hi][0] ;
-	                if (ri != 0) {
-	                    hi = (op->indtab)[hi][1] ;
-	                    if (hi != 0) {
-	                        ri = (op->indtab)[hi][0] ;
-	                    } else {
-	                        rs = SR_NOTFOUND ;
-	                    }
-	                } else {
-	                    rs = SR_NOTFOUND ;
-	                }
-	            } else {
-	                rs = SR_NOTFOUND ;
-	            }
-	        } /* end if (preparation) */
-	        if (rs >= 0) {
-	            while ((ri = (op->indtab)[hi][0]) != 0) {
-	                f = mailalias_keymatch(op,ri,aname) ;
-	                if (f) break ;
-	                hi = (op->indtab)[hi][1] ;
-	                if (hi == 0) break ;
-	                op->collisions += 1 ;
-	            } /* end while */
-	            if ((ri == 0) || (hi == 0)) {
-	                rs = SR_NOTFOUND ;
-	            }
-	        } /* end if (following the existing chain) */
-/* if successful, retrieve value */
-	        if (rs >= 0) {
-	            vi = op->rectab[ri][1] ;
-	            if (vbuf != nullptr) {
-	                cl = min(vlen,mailaliaslen) ;
-	                cp = strwcpy(vbuf,(op->sval + vi),cl) ;
-	                vl = (cp - vbuf) ;
-	            } else {
-	                vl = strlen(op->sval + vi) ;
-	            }
-/* update cursor */
-	            if (f_cur) {
-	                curp->i = hi ;
-	            }
-	        } /* end if (got one) */
-	        rs1 = mailalias_enterend(op,dt) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (mailalias-enter) */
-	} /* end if (ok) */
-
+	if ((rs = mailalias_magic(op,aname,curp,vbuf)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == MAILALIAS_MAGIC) {
+		rs = SR_INVALID ;
+	        if (op->cursors) {
+	            time_t		dt = 0 ;
+                    if ((rs = mailalias_enterbegin(op,dt)) >= 0) {
+                        cint        ns = MAILALIAS_NSHIFT ;
+	                uint	khash ;
+                        int         vi, hi, ri ;
+                        int         cl, hl, n ;
+                        cchar       *hp ;
+                        cchar       *cp ;
+                        /* continue with regular fetch activities */
+                        op->f.cursoracc = true ; /* no hurt if no cursor */
+                        n = op->rilen ;
+                        /* OK, we go from here */
+                        if (curp->i < 0) {
+                            char    keybuf[mailaliaslen + 1] ;
+			    if (strcasecmp(aname,pm) == 0) {
+                                hp = keybuf ;
+                                cp = strwcpylc(keybuf,aname,mailaliaslen) ;
+                                hl = cp - keybuf ;
+                            } else {
+                                hp = aname ;
+                                hl = strlen(aname) ;
+                            } /* end if */
+                            khash = hash_elf(hp,hl) ;
+                            hi = hashindex(khash,op->rilen) ;
+                            /* start searching! */
+                            if (op->ropts & MAILALIAS_OSEC) {
+                                int         c = 0 ;
+                                bool        f{} ;
+                                while ((ri = (op->indtab)[hi][0]) != 0) {
+                                    f = mailalias_keymatch(op,ri,aname) ;
+                                    if (f) break ;
+                                    op->collisions += 1 ;
+                                    if (op->ropts & MAILALIAS_ORANDLC) {
+                                        khash = randlc(khash + c) ;
+                                    } else {
+                                        khash = rotr(khash,ns) ;
+                                    }
+                                    hi = hashindex(khash,n) ;
+                                    c += 1 ;
+                                } /* end while */
+                                if (ri == 0) {
+                                    rs = SR_NOTFOUND ;
+                                }
+                            } /* end if (secondary hasing) */
+                        } else {
+                            /* get the next record index (if there is one) */
+                            hi = curp->i ;
+                            if (hi != 0) {
+                                ri = (op->indtab)[hi][0] ;
+                                if (ri != 0) {
+                                    hi = (op->indtab)[hi][1] ;
+                                    if (hi != 0) {
+                                        ri = (op->indtab)[hi][0] ;
+                                    } else {
+                                        rs = SR_NOTFOUND ;
+                                    }
+                                } else {
+                                    rs = SR_NOTFOUND ;
+                                }
+                            } else {
+                                rs = SR_NOTFOUND ;
+                            }
+                        } /* end if (preparation) */
+                        if (rs >= 0) {
+			    bool	f ;
+                            while ((ri = (op->indtab)[hi][0]) != 0) {
+                                f = mailalias_keymatch(op,ri,aname) ;
+                                if (f) break ;
+                                hi = (op->indtab)[hi][1] ;
+                                if (hi == 0) break ;
+                                op->collisions += 1 ;
+                            } /* end while */
+                            if ((ri == 0) || (hi == 0)) {
+                                rs = SR_NOTFOUND ;
+                            }
+                        } /* end if (following the existing chain) */
+                        /* if successful, retrieve value */
+                        if (rs >= 0) {
+                            vi = op->rectab[ri][1] ;
+                            if (vbuf != nullptr) {
+                                cl = min(vlen,mailaliaslen) ;
+                                cp = strwcpy(vbuf,(op->sval + vi),cl) ;
+                                vl = (cp - vbuf) ;
+                            } else {
+                                vl = strlen(op->sval + vi) ;
+                            }
+                            /* update cursor */
+                            curp->i = hi ;
+                        } /* end if (got one) */
+                        rs1 = mailalias_enterend(op,dt) ;
+                        if (rs >= 0) rs = rs1 ;
+                    } /* end if (mailalias-enter) */
+		} /* end if (valid) */
+	    } /* end if (cursor-magic) */
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (mailalias_fetch) */

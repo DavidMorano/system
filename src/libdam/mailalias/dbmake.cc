@@ -56,6 +56,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<sysval.hh>
@@ -99,6 +100,8 @@ using namespace	mailutils ;		/* namespace */
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::rotl ;			/* subroutine-template */
+using std::rotr ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -487,7 +490,8 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	                        if (ropts & DBMAKE_ORANDLC) {
 	                            khash = randlc(khash + c) ;
 	                        } else {
-	                            khash = ((khash<<(32-ns))|(khash>>ns))+c ;
+	                            khash = rotr(khash,ns) ;
+				    khash += c ;
 	                        }
 	                        hi = hashindex(khash,n) ;
 	                        c += 1 ;
