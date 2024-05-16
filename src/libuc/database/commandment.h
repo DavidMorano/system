@@ -1,4 +1,4 @@
-/* commandment SUPPORT */
+/* commandment HEADER */
 /* lang=C++20 */
 
 /* COMMANDMENT object-load management */
@@ -24,7 +24,6 @@
 #include	<clanguage.h>
 #include	<modload.h>
 #include	<localmisc.h>
-
 #include	<commandments.h>
 
 

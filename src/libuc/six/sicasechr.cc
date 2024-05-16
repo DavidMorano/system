@@ -1,4 +1,4 @@
-/* sicasechr SUPPOERT */
+/* sicasechr SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to find the index of a character in a given string */

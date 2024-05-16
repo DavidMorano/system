@@ -1,5 +1,5 @@
-/* bufstr SUPPORT */
-/* lang=C++20 */
+/* bufstr HEADER */
+/* lang=C20 */
 
 /* string buffer object */
 /* version %I% last-modified %G% */

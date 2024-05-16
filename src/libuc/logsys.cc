@@ -1,4 +1,4 @@
-/* logsys SUPPRT */
+/* logsys SUPPORT */
 /* lang=C++20 */
 
 /* send log messages to the system logger device */

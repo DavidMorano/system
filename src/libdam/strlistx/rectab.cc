@@ -1,4 +1,4 @@
-/* rectab SUPPOrectab */
+/* rectab SUPPORT */
 /* lang=C++20 */
 
 /* record-table */

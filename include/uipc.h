@@ -1,4 +1,4 @@
-/* uipc SUPPORT (UNIX® System V Inter-Process-Communication) */
+/* uipc HEADER (UNIX® System V Inter-Process-Communication) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */

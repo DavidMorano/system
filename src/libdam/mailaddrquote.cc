@@ -1,7 +1,7 @@
 /* mailaddrquote SUPPORT */
 /* lang=C++20 */
 
-/* subroutine to quote mail-addresses */
+/* quote mail-addresses */
 /* version %I% last-modified %G% */
 
 

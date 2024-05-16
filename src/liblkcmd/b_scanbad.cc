@@ -1,4 +1,4 @@
-/* b_scanbad SUPPOTRT */
+/* b_scanbad SUPPORT */
 /* lang=C++20 */
 
 /* program to find bad files */
@@ -28,7 +28,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1

@@ -1,4 +1,4 @@
-/* mainchoose SUPPOER */
+/* mainchoose SUPPORT */
 /* lang=C++11 */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -17,11 +17,9 @@
 
 	We experiement with permutations and combinations.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<cstdlib>
 #include	<cinttypes>

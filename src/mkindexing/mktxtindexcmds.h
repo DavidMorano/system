@@ -1,4 +1,4 @@
-/* mkcmds SUPPORT */
+/* mktxtindexcmds HEADER */
 /* lang=C20 */
 
 /* names string storiage: purpose? */

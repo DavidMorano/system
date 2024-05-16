@@ -1,4 +1,5 @@
-/* config - header defaults */
+/* bbnews HEADER */
+/* lang=C20 */
 
 
 /* revision history:

@@ -1,4 +1,4 @@
-/* recsvc SUPPORR */
+/* recsvc SUPPORT */
 /* lang=C++20 */
 
 /* SMS service entry table object */
@@ -41,12 +41,11 @@
 
 #define	RECSVC_MAGIC	0x12356734
 
-#define	MODP2(v,n)	((v) & ((n) - 1))
-
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
+
+/* external variables */
 
 
 /* forward references */

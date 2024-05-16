@@ -40,7 +40,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- |CHAR_BIT| */
-#include	<bit>
+#include	<bit>			/* |countl_zero(3c++)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -94,9 +94,8 @@ static inline int flbsi(int v) noex {
 /* exported subroutines */
 
 int nextpowtwo(int v) noex {
-	int		lb ;
 	int		nn = 0 ;
-	if ((lb = flbsi(v)) >= 0) {
+	if (int lb ; (lb = flbsi(v)) >= 0) {
 	    uint	mask = ((1 << lb) - 1) ;
 	    if ((v & mask) && (lb < 31)) lb += 1 ;
 	    nn = (1 << lb) ;

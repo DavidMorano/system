@@ -1,4 +1,4 @@
-/* nodesfile SUPPORT */
+/* nodesfile HEADER */
 /* lang=C20 */
 
 /* UNIX "nodes" file support */

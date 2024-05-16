@@ -1,4 +1,4 @@
-/* mkdirlist SUPPORT */
+/* mkdirlist HEADER */
 /* lang=C20 */
 
 /* create a list of the newsgroup directories */
