@@ -51,53 +51,11 @@
 #define	DBMAKE_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
-#include	<sysval.hh>
-#include	<bufsizevar.hh>
-#include	<mallocxx.h>
-#include	<endian.h>
 #include	<vecobj.h>
-#include	<vecstr.h>
-#include	<linebuffer.h>
-#include	<bfile.h>
-#include	<opentmp.h>
-#include	<field.h>
-#include	<terminit.hh>
-#include	<kvsfile.h>
 #include	<strtab.h>
-#include	<intceil.h>
-#include	<hash.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<mkx.h>
-#include	<mkpathx.h>
-#include	<mkpathxw.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<mkdirs.h>
-#include	<ids.h>
-#include	<xperm.h>
-#include	<nextpowtwo.h>
-#include	<randlc.h>
-#include	<matxstr.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<isfiledesc.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<ischarx.h>
 #include	<localmisc.h>		/* |MAILADDRLEN| */
 
 
