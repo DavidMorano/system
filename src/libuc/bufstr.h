@@ -7,8 +7,28 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	This module can be used to construct strings or messages
+	in buffers WITHOUT using the |snsprint(3c)| subroutine.  This
+	module is useful when the user does NOT supply a buffer to
+	be used as the working store.  Rather, an internally,
+	dynamically grown and managed buffer is maintained.  This
+	module uses an object, that must be initialized and eventually
+	freed, to track the state of the dynamically used internal
+	buffer.
+
+*******************************************************************************/
+
 #ifndef	BUFSTR_INCLUDE
 #define	BUFSTR_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	BUFSTR		struct bufstr_head

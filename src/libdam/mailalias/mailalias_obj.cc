@@ -28,12 +28,12 @@
 	of "prefix" match fetching!
 
 	We use TWO string tables in this DB (unlike some other
-	similar DBs). We use one string table for keys and another
-	for values. I sort of did this for fun (so far). This is
+	similar DBs).  We use one string table for keys and another
+	for values.  I sort of did this for fun (so far).  This is
 	actually potentially less space-efficient than using just
 	one string table since strings that are both a key and a
 	value are not combined in one table but rather appear
-	separately in each of the two tables. However, the up side
+	separately in each of the two tables.  However, the up side
 	is that:
 
 	a. making a record table of only keys is done by just taking
@@ -119,9 +119,9 @@
 #define	MAILALIAS_HEADOFF	MAILALIAS_IDLEN
 #define	MAILALIAS_BUFOFF	(MAILALIAS_HEADOFF + MAILALIAS_HEADLEN)
 
-#define	MA			MAILALIAS
-#define	MA_CUR			MAILALIAS_CUR
-#define	MA_INFO			MAILALIAS_INFO
+#define	MA			mailalias
+#define	MA_CUR			mailalias_cur
+#define	MA_INFO			mailalias_info
 
 #define	TO_APROFILE	(1 * 60)
 #define	TO_FILECOME	15		/* timeout for file to "come in" */
@@ -216,6 +216,7 @@ static inline int mailalias_magic(mailalias *op,Args ... args) noex {
 }
 /* end subroutine (mailalias_magic) */
 
+static int	mailalias_opener(MA *op) noex ;
 static int	mailalias_hdrload(MA *) noex ;
 static int	mailalias_hdrloader(MA *) noex ;
 static int	mailalias_enterbegin(MA *,time_t) noex ;
@@ -263,6 +264,8 @@ constexpr cpcchar	aptabsched[] = {
 	nullptr
 } ;
 
+static sysval		pagesize(sysval_ps) ;
+
 static bufsizevar	maxnamelen(getbufsize_mn) ;
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
@@ -280,7 +283,6 @@ constexpr cchar		pm[] = "Postmaster" ;
 /* exported subroutines */
 
 int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
-	custime		dt = time(nullptr) ;
 	int		rs ;
 	int		f_create = false ;
 	if ((rs = mailalias_ctor(op,pr,pname)) >= 0) {
@@ -298,36 +300,11 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	    if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	        op->pr = cp ;
 	        if ((rs = uc_mallocstrw(pname,-1,&cp)) >= 0) {
-	            cchar	*fe = MAILALIAS_FE ;
-	            char	endian[2] ;
-	            char	fname[MAXPATHLEN + 1] ;
 	            op->apname = cp ;
-	            endian[0] = (ENDIAN) ? '1' : '0' ;
-	            endian[1] = '\0' ;
-	            if ((rs = mkfnamesuf2(fname,pname,fe,endian)) >= 0) {
-	                cchar	*db = MAILALIAS_DNAME ;
-	                char		dbfname[MAXPATHLEN + 1] ;
-	                if ((rs = mkpath3(dbfname,pr,db,fname)) >= 0) {
-	                    if ((rs = uc_mallocstrw(dbfname,-1,&cp)) >= 0) {
-	                        vecstr	*alp = op->afp ;
-	                        cint	vo = VECSTR_OCOMPACT ;
-	                        op->dbfname = cp ;
-	                        if ((rs = vecstr_start(alp,5,vo)) >= 0) {
-	                            if ((rs = mailalias_dbopen(op,dt)) >= 0) {
-	                                f_create = (rs > 0) ;
-	                                op->magic = MAILALIAS_MAGIC ;
-	                            }
-	                            if (rs < 0) {
-	                                vecstr_finish(op->afp) ;
-				    }
-	                        } /* end if (vecstr_start) */
-	                        if (rs < 0) {
-	                            uc_free(op->dbfname) ;
-	                            op->dbfname = nullptr ;
-	                        }
-	                    } /* end if (m-a) */
-	                } /* end if (mkpath) */
-	            } /* end if (mkfnamesuf) */
+		    if ((rs = pagesize) >= 0) {
+			op->pagesize = rs ;
+			rs = mailalias_opener(op) ;
+		    } /* end if (pagesize) */
 	            if (rs < 0) {
 	                uc_free(op->apname) ;
 	                op->apname = nullptr ;
@@ -616,54 +593,93 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 }
 /* end subroutine (mailalias_fetch) */
 
-#ifdef	COMMENT
-int mailalias_getinfo(MA *op,MAILALIAS_INFO *rp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (rp == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	if (rp != nullptr) {
-	    rp->collisions = op->collisions ;
-	}
-
+int mailalias_getinfo(MA *op,MA_INFO *rp) noex {
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    if (rp) {
+	        rp->collisions = op->collisions ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailalias_getinfo) */
-#endif /* COMMENT */
 
 int mailalias_check(MA *op,time_t dt) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	if ((! op->f.held) && (op->mapdata != nullptr)) {
-	    if (dt == 0) dt = time(nullptr) ;
-	    if ((dt - op->ti_check) >= TO_CHECK) {
-	        op->ti_check = dt ;
-	        if ((rs = mailalias_checkchanged(op,dt)) > 0) {
-	            f = true ;
-	            rs = mailalias_fileclose(op) ;
-	        } else if (rs == 0) {
-	            if ((rs = mailalias_checkold(op,dt)) > 0) {
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    if ((! op->f.held) && op->mapdata) {
+	        if (dt == 0) dt = time(nullptr) ;
+	        if ((dt - op->ti_check) >= TO_CHECK) {
+	            op->ti_check = dt ;
+	            if ((rs = mailalias_checkchanged(op,dt)) > 0) {
 	                f = true ;
 	                rs = mailalias_fileclose(op) ;
+	            } else if (rs == 0) {
+	                if ((rs = mailalias_checkold(op,dt)) > 0) {
+	                    f = true ;
+	                    rs = mailalias_fileclose(op) ;
+	                }
 	            }
 	        }
 	    }
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (mailalias_check) */
 
 
 /* private subroutines */
+
+static int mailalias_opener(MA *op) noex {
+	custime		dt = time(nullptr) ;
+	int		rs ;
+	int		rs1 ;
+	int		f_create = false ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    cint	maxpath = rs ;
+	    cint	sz = ((rs + 1) * 2) ;
+	    char	*a{} ;
+	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+		cchar	*pname = op->apname ;
+	        cchar	*fe = MAILALIAS_FE ;
+	        char	endstr[2] ;
+		char	*fname = a ;
+	        endstr[0] = (ENDIAN) ? '1' : '0' ;
+	        endstr[1] = '\0' ;
+	        if ((rs = mkfnamesuf2(fname,pname,fe,endstr)) >= 0) {
+		    cchar	*pr = op->pr ;
+	            cchar	*db = MAILALIAS_DNAME ;
+	            char	*dbfname = (a + (maxpath+1)) ;
+	            if ((rs = mkpath3(dbfname,pr,db,fname)) >= 0) {
+			cchar	*cp ;
+	                if ((rs = uc_mallocstrw(dbfname,-1,&cp)) >= 0) {
+	                    vecstr	*alp = op->afp ;
+	                    cint	vo = VECSTR_OCOMPACT ;
+	                    op->dbfname = cp ;
+	                    if ((rs = vecstr_start(alp,5,vo)) >= 0) {
+	                        if ((rs = mailalias_dbopen(op,dt)) >= 0) {
+	                            f_create = (rs > 0) ;
+	                            op->magic = MAILALIAS_MAGIC ;
+	                        }
+	                        if (rs < 0) {
+	                            vecstr_finish(op->afp) ;
+				}
+	                    } /* end if (vecstr_start) */
+	                    if (rs < 0) {
+	                        uc_free(op->dbfname) ;
+	                        op->dbfname = nullptr ;
+	                    }
+	                } /* end if (m-a) */
+	            } /* end if (mkpath) */
+	        } /* end if (mkfnamesuf) */
+		rs1 = uc_free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (getbufsize) */
+	return (rs >= 0) ? f_create : rs ;
+}
+/* end subroutine (mailalias_opener) */
 
 static int mailalias_checkchanged(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -700,7 +716,7 @@ static int mailalias_checkold(MA *op,time_t dt) noex {
 static int mailalias_hdrload(MA *op) noex {
 	cint		msize = MAILALIAS_FILEMAGICSIZE ;
 	int		rs = SR_OK ;
-	cchar		*cp = (cchar *) op->mapdata ;
+	cchar		*cp = charp(op->mapdata) ;
 	if (hasValidMagic(cp,msize,MAILALIAS_FILEMAGIC)) {
 	    cp += msize ;
 	    if (cp[0] == MAILALIAS_FILEVERSION) {
@@ -798,8 +814,8 @@ static int mailalias_mapbegin(MA *op,time_t dt) noex {
 	        op->mapsize = ms ;
 	        op->ti_map = dt ;
 	        f = true ;
-	    }
-	}
+	    } /* end if (u_mmapbegin) */
+	} /* end if (map needed) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (mailalias_mapbegin) */
@@ -808,7 +824,9 @@ static int mailalias_mapend(MA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata != nullptr) {
-	    rs1 = u_mmapend(op->mapdata,op->mapsize) ;
+	    csize	ms = op->mapsize ;
+	    void	*md = op->mapdata ;
+	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
@@ -929,8 +947,8 @@ static int mailalias_dbopenmake(MA *op,time_t dt) noex {
 static int mailalias_dbopenwait(MA *op) noex {
 	USTAT		sb ;
 	cint		to = TO_FILECOME ;
-	int		rs = SR_OK ;
-	int		msize = (MAILALIAS_TOPLEN) ;
+	int		rs ;
+	int		msize = MAILALIAS_TOPLEN ;
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 	    int		i ; /* used afterwards */
 	    op->fi.fsize = sb.st_size ;

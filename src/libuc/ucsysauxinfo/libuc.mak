@@ -392,7 +392,7 @@ $(TT).a:		$(TOBJ)
 	$(AR) -rc $@ $?
 
 $(T).so:		$(SOBJ) Makefile $(T).a
-	$(LD) -G -o $@ $(SLDFLAGS) $(SOBJ) $(SLIBINFO) > $(T).lm
+	$(LD) -G -o $@ $(SLDFLAGS) $(SOBJ) $(SLIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

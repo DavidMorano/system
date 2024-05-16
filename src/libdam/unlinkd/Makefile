@@ -154,7 +154,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ) Makefile $(T).map
-	$(LD) -r -o $@ $(LDFLAGS) -M $(T).map -B reduce $(OBJ) > $(T).lm
+	$(LD) -r -o $@ $(LDFLAGS) -M $(T).map -B reduce $(OBJ)
 
 $(T).nm nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
