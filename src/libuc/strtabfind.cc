@@ -53,6 +53,7 @@
 #include	<usystem.h>
 #include	<nleadstr.h>
 #include	<hash.h>
+#include	<hashindex.h>
 #include	<localmisc.h>
 
 #include	"strtabfind.h"
@@ -85,7 +86,6 @@ typedef int (*it_t)[3] ;
 
 /* forward references */
 
-static int	hashindex(uint,int) noex ;
 static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
@@ -144,13 +144,6 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 
 
 /* local subroutines */
-
-static int hashindex(uint i,int n) noex {
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	bool		f = (key[0] == kp[0]) ;

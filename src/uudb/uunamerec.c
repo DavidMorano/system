@@ -33,8 +33,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<nextpowtwo.h>
 #include	<hash.h>
+#include	<hashindex.h>
+#include	<nextpowtwo.h>
 #include	<localmisc.h>
 
 #include	"uunamerec.h"
@@ -53,8 +54,6 @@
 /* forward references */
 
 static int	uunamerec_extend(UUNAMEREC *) ;
-
-static int	hashindex(uint,uint) ;
 
 
 /* exported subroutines */
@@ -345,16 +344,5 @@ UUNAMEREC	*asp ;
 	return (asp->e) ;
 }
 /* end subroutine (uunamerec_extend) */
-
-
-/* calculate the next hash from a given one */
-static int hashindex(i,n)
-uint	i, n ;
-{
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end if (hashindex) */
 
 

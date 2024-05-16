@@ -47,8 +47,9 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
-#include	<localmisc.h>
 #include	<hash.h>
+#include	<hashindex.h>
+#include	<localmisc.h>
 
 #include	"vars.h"
 #include	"varhdr.h"
@@ -108,8 +109,7 @@ static int	vars_dbproc(VARS *,time_t) ;
 static int	vars_viverify(VARS *,time_t) ;
 static int	vars_ouraudit(VARS *) ;
 
-static int	hashindex(uint,int) ;
-static int	ismatkey(cchar *,cchar *,int) ;
+static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -129,7 +129,7 @@ int vars_open(VARS *op,cchar *dbname) noex {
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(VARS)) ;
+	memclear(op) ;
 
 	{
 	    int		pl = -1 ;
@@ -738,20 +738,8 @@ static int vars_ouraudit(VARS *op)
 }
 /* end subroutine (vars_ouraudit) */
 
-
-/* calculate the next hash from a given one */
-static int hashindex(uint i,int n)
-{
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
-
-
-static int ismatkey(cchar key[],cchar kp[],int kl)
-{
-	int	f = (key[0] == kp[0]) ;
+static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
+	bool		f = (key[0] == kp[0]) ;
 	if (f) {
 	    int	m = nleadstr(key,kp,kl) ;
 	    f = (m == kl) && (key[m] == '\0') ;

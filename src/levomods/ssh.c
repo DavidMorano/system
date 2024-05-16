@@ -39,6 +39,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
+#include	<hash.h>
+#include	<hashindex.h>
 #include	<localmisc.h>
 
 #include	"ssh.h"
@@ -53,18 +55,14 @@
 
 /* external subroutines */
 
-extern uint	hash_elf(const void *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* forward references */
 
-static int	hashindex(uint,uint) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int ssh_init(op,fname)
 SSH		*op ;
@@ -374,28 +372,5 @@ SSH		*op ;
 	return rs ;
 }
 /* end subroutine (ssh_free) */
-
-
-
-/* INTERNAL SUBROUTINES */
-
-
-
-/* calculate the next hash from a given one */
-static int hashindex(i,n)
-uint	i, n ;
-{
-	int	hi ;
-
-
-	hi = MODP2(i,n) ;
-
-	if (hi == 0)
-	    hi = 1 ;
-
-	return hi ;
-}
-/* end if (hashindex) */
-
 
 

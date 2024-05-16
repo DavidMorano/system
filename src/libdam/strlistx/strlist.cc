@@ -49,6 +49,7 @@
 #include	<absfn.h>
 #include	<endian.h>
 #include	<hash.h>
+#include	<hashindex.h>
 #include	<sncpyx.h>
 #include	<mkx.h>
 #include	<mkpathx.h>
@@ -159,7 +160,6 @@ static int strlist_dbproc(SL *,time_t) noex ;
 static int strlist_viverify(SL *,time_t) noex ;
 static int strlist_ouraudit(SL *) noex ;
 
-static int	hashindex(uint,int) noex ;
 static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
@@ -641,13 +641,6 @@ static int strlist_ouraudit(SL *op) noex {
 	return rs ;
 }
 /* end subroutine (strlist_ouraudit) */
-
-static int hashindex(uint i,int n) noex {
-	int		hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	int		m ;

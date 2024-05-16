@@ -50,6 +50,7 @@
 #include	<vecobj.h>
 #include	<intceil.h>
 #include	<hash.h>
+#include	<hashindex.h>
 #include	<nextpowtwo.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -193,13 +194,6 @@ static inline int indexsize(int il) noex {
 	return ((il + 1) * 3 * sizeof(int)) ;
 }
 /* end subroutine (indexsize) */
-
-static inline int hashindex(uint hv,int n) noex {
-	int		hi = MODP2(hv,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 
 /* exported subroutines */

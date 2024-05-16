@@ -38,6 +38,7 @@
 #include	<tmtime.h>
 #include	<sfx.h>
 #include	<hash.h>
+#include	<hashindex.h>
 #include	<nextpowtwo.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -163,7 +164,6 @@ static int	getcite(uint *,const char *,int) ;
 static int	mkcite(uint *,int,int) ;
 
 static int	indinsert(uint (*rt)[3],int (*it)[3],int,struct varentry *) ;
-static int	hashindex(uint,int) ;
 static int	ismatkey(const char *,const char *,int) ;
 
 static int	vcmprec(const void *,const void *) ;
@@ -1240,14 +1240,6 @@ static int indinsert(uint (*rt)[3],int (*it)[3],int il,struct varentry *vep)
 }
 /* end subroutine (indinsert) */
 
-
-static int hashindex(uint i,int n) noex {
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
-
 static int ismatkey(cchar key[],cchar kp[],int kl) noex {
 	int	f = (key[0] == kp[0]) ;
 	if (f) {
@@ -1257,7 +1249,6 @@ static int ismatkey(cchar key[],cchar kp[],int kl) noex {
 	return f ;
 }
 /* end subroutine (ismatkey) */
-
 
 static int vcmprec(const void *v1p,const void *v2p) noex {
 	uint		**i1pp = (uint **) v1p ;

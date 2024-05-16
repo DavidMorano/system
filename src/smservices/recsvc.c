@@ -29,6 +29,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<hash.h>
+#include	<hashindex.h>
 #include	<nextpowtwo.h>
 #include	<localmisc.h>
 
@@ -44,8 +46,6 @@
 
 /* external subroutines */
 
-extern uint	hash_elf(const void *,int) ;
-
 extern char	*strwcpy(char *,const char *,int) ;
 
 
@@ -54,12 +54,14 @@ extern char	*strwcpy(char *,const char *,int) ;
 static int	recsvc_extend(RECSVC *) ;
 static int	recsvc_already(RECSVC *,uint,int,int) ;
 
-static int	hashindex(uint,uint) ;
+
+/* local variables */
 
 
+/* exported variables */
 
 
-
+/* exported subroutines */
 
 int recsvc_init(asp,n)
 RECSVC	*asp ;
@@ -467,31 +469,8 @@ RECSVC	*asp ;
 #endif /* CF_UCMALLOC */
 
 	asp->rectab = (struct recsvc_ent *) nrt ;
-
-#if	CF_DEBUGS
-	debugprintf("recsvc_extend: returning e=%d\n",asp->e) ;
-#endif
-
 	return (asp->e) ;
 }
 /* end subroutine (recsvc_extend) */
-
-
-/* calculate the next hash from a given one */
-static int hashindex(i,n)
-uint	i, n ;
-{
-	int	hi ;
-
-
-	hi = MODP2(i,n) ;
-
-	if (hi == 0)
-		hi = 1 ;
-
-	return hi ;
-}
-/* end if (hashindex) */
-
 
 

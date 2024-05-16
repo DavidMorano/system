@@ -84,6 +84,7 @@
 #include	<filer.h>
 #include	<opentmp.h>
 #include	<hash.h>
+#include	<hashindex.h>
 #include	<nextpowtwo.h>
 #include	<localmisc.h>
 
@@ -202,7 +203,6 @@ static int	mknewfname(char *,int,cchar *,cchar *) ;
 static int	unlinkstale(cchar *,int) ;
 
 static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct varentry *) ;
-static int	hashindex(uint,int) ;
 
 
 /* local variables */
@@ -1172,14 +1172,5 @@ static int indinsert(uint (*rt)[2],uint (*it)[3],int il,struct varentry *vep)
 	return c ;
 }
 /* end subroutine (indinsert) */
-
-
-static int hashindex(uint i,int n)
-{
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 

@@ -93,6 +93,7 @@
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
 #include	<nextpowtwo.h>
+#include	<hashindex.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -227,7 +228,6 @@ static int	strlistmks_mkind(SLM *,char *,uint (*)[3],int) noex ;
 static int	strlistmks_renamefiles(SLM *) noex ;
 
 static int	indinsert(rectab_t,uint (*it)[3],int,VE *) noex ;
-static int	hashindex(uint,int) noex ;
 
 
 /* local variables */
@@ -868,12 +868,5 @@ static int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
 	return c ;
 }
 /* end subroutine (indinsert) */
-
-static int hashindex(uint i,int n) noex {
-	int		hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 

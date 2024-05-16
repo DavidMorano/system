@@ -64,6 +64,8 @@
 #include	<dstr.h>
 #include	<realname.h>
 #include	<endian.h>
+#include	<hash.h>
+#include	<hashindex.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"postfile.h"
@@ -86,8 +88,6 @@
 
 
 /* external subroutines */
-
-extern uint	hash_elf(const void *,int) ;
 
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	randlc(int) ;
@@ -114,8 +114,6 @@ static int	postfile_fileopen(POSTFILE *,time_t) ;
 static int	postfile_fileclose(POSTFILE *) ;
 static int	postfile_keymatchlast(POSTFILE *,int,int,char *,int) ;
 static int	postfile_keymatchall(POSTFILE *,int,int,REALNAME *) ;
-
-static int	hashindex(uint,uint) ;
 
 
 /* local variables */
@@ -1539,41 +1537,13 @@ REALNAME	*np ;
 	        return FALSE ;
 
 	}
-
-#if	CF_DEBUGS
-	debugprintf("keymatchall: got one\n") ;
-#endif
-
 	return TRUE ;
 }
 /* end subroutine (postfile_keymatchall) */
 
-
-/* calculate the next hash table index from a given one */
-static int hashindex(i,n)
-uint	i, n ;
-{
-	int	hi ;
-
-
-	hi = MODP2(i,n) ;
-
-	if (hi == 0)
-	    hi = 1 ;
-
-	return hi ;
-}
-/* end if (hashindex) */
-
-
-static uint ceiling(v,a)
-uint	v, a ;
-{
-
-
+static uint ceiling(uint v,uint a) noex {
 	return (v + (a - 1)) & (~ (a - 1)) ;
 }
 /* end subroutine (ceiling) */
-
 
 
