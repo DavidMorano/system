@@ -1,20 +1,20 @@
-/* tourna */
+/* tourna SUPPORT */
+/* lang=C++20 */
 
 /* this is a TOURNA branch predictor */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0
 #define	CF_SAFE		1
 #define	CF_VOTEREPLACE	0		/* replace by voting among counters */
 #define	CF_COUNTREPLACE	1		/* replace by counting all counters */
 
-
 /* revision history:
 
 	= 2002-05-01, David A­D­ Morano
-        This object module was created for Levo research. It is a value
-        predictor. This is not coded as hardware. It is like Atom analysis
-        subroutines!
+	This object module was created for Levo research.  It is a
+	value predictor.  This is not coded as hardware.  It is
+	like Atom analysis subroutines!
 
 */
 
@@ -22,28 +22,24 @@
 
 /*******************************************************************************
 
-        This object module implements a branch predictor. This BP is a
-        Tournament type branch predictor (see McFarling and then Alpha 21264).
-
+	This object module implements a branch predictor.  This BP
+	is a Tournament type branch predictor (see McFarling and
+	then Alpha 21264).
 
 *******************************************************************************/
 
-
-#define	TOURNA_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<nextpowtwo.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -67,8 +63,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
 
 extern int	flbsi(uint) ;
 

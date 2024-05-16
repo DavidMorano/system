@@ -68,9 +68,6 @@
 
 /* external subroutines */
 
-extern uint	hashagain(uint,int,int) ;
-extern uint	nextpowtwo(uint) ;
-
 extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,

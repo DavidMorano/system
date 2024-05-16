@@ -92,6 +92,7 @@
 #include	<mkx.h>
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
+#include	<nextpowtwo.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -145,10 +146,6 @@ typedef uint		*rectab_t ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern uint	nextpowtwo(uint) noex ;
-}
 
 
 /* external variables */

@@ -45,7 +45,7 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
-#include	"powtwo.h"
+#include	"nextpowtwo.h"
 
 
 /* local defines */
@@ -62,23 +62,23 @@ using std::countl_one ;
 
 /* external subroutines */
 
+extern "C" {
+   extern int nextpowtwo(int) noex ;
+}
+
 
 /* local subroutines */
 
 
 /* forward references */
 
-extern "C" {
-   extern int nextpowtwo(int) noex ;
-}
-
 
 /* local subroutine-template */
 
 static inline int flbsi(int v) noex {
-	static constexpr int	nbit = (sizeof(int) * CHAR_BIT) ;
-	uint			uv = uint(v) ;
-	int			bn = -1 ;
+	cint		nbit = (sizeof(int) * CHAR_BIT) ;
+	uint		uv = uint(v) ;
+	int		bn = -1 ;
 	if (v) {
 	    cint	nc = countl_zero(uv) ;
 	    bn = (nbit - nc - 1) ;

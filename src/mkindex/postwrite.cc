@@ -69,10 +69,6 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-extern uint	hash_elf(void *,int) ;
-extern uint	uceil(uint,int) ;
-
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	sfshrink(cchar *,int,cchar **) ;

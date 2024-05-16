@@ -78,6 +78,7 @@
 #include	<nleadstr.h>
 #include	<strwcpy.h>
 #include	<intceil.h>
+#include	<nextpowtwo.h>
 #include	<localmisc.h>
 
 #include	"vecpstr.h"
@@ -109,10 +110,6 @@ extern "C" {
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	nextpowtwo(int) noex ;
-}
 
 
 /* local structures */

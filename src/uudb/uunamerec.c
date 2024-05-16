@@ -1,4 +1,4 @@
-/* uunamerec */
+/* uunamerec SUPPORT */
 /* lang=C20 */
 
 /* string uunamerec object */
@@ -29,11 +29,13 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<nextpowtwo.h>
 #include	<hash.h>
+#include	<localmisc.h>
 
 #include	"uunamerec.h"
 
@@ -46,8 +48,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
 
 
 /* forward references */

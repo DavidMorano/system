@@ -1,7 +1,8 @@
-/* postfile */
+/* postfile SUPPORT */
+/* lang=C++20 */
 
 /* indexed POST file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1		/* safe mode */
@@ -9,21 +10,16 @@
 #define	CF_HOLDING	1		/* use file-map holding */
 #define	CF_MEMSYNC	1		/* use memory synchronization ? */
 
-
 /* revision history:
 
 	= 2002-05-01, David A­D­ Morano
-
 	This object module was created for Levo research, to determine
 	if a conditional branch at a given instruction address is
 	a SS-Hamock or not.
 
-
 	= 2003-06-11, David A­D­ Morano
-
 	I snarfed this file from the SS-Hammock crap since I thought
-	it might be a bit similar.  We'll see how it works out ! :-)
-
+	it might be a bit similar.  We will see how it works out!  :-)
 
 */
 
@@ -32,46 +28,41 @@
 /******************************************************************************
 
 	This object module provides an interface to a data base of
-	information about the GECOS name in the system PASSWD database.
+	information about the GECOS name in the system PASSWD
+	database.
 
 	The system PASSWD database (whether a file or whatever) was
-	enumerated (separately) and an index file was made with several
-	indices to lookup usernames based on a real name.  For starters
-	only indices consisting of using the first character of the
-	last name, the first 3 characters of the last name, and the
-	first character of the first name have been used.  But future
-	index files might provide more combinations, like using the
-	first 3 characters of the last name combined with the first
-	character of the first name !
+	enumerated (separately) and an index file was made with
+	several indices to lookup usernames based on a real name.
+	For starters only indices consisting of using the first
+	character of the last name, the first 3 characters of the
+	last name, and the first character of the first name have
+	been used.  But future index files might provide more
+	combinations, like using the first 3 characters of the last
+	name combined with the first character of the first name !
 
 	The various data and indices were written into a file.
 	We are accessing that file within this object.
 
-
 *****************************************************************************/
 
-
-#define	POSTFILE_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocstuff.h>
 #include	<storeitem.h>
 #include	<dstr.h>
 #include	<realname.h>
-#include	<mallocstuff.h>
 #include	<endian.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
@@ -96,7 +87,6 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
 extern uint	hash_elf(const void *,int) ;
 
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;

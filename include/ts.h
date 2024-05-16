@@ -22,17 +22,17 @@
 
 #define	TS_MAGIC		918245636
 #define	TS			struct ts_head
+#define	TS_FL			struct ts_flags
 #define	TS_CUR			struct ts_cursor
 #define	TS_H			struct ts_h
 #define	TS_ENT			TSE_ALL
 
-#define	TS_FILEMAGIC		"MS"
+#define	TS_FILEMAGIC		"TIMESTAMP"
 #define	TS_FILEMAGICSIZE	16
-#define	TS_FILEMAGICLEN		sizeof(TS_FILEMAGIC)
 #define	TS_FILEVERSION		0
 #define	TS_ENDIAN		0
 #define	TS_KEYNAMELEN		TSE_LKEYNAME
-#define	TS_IDLEN		(16 + sizeof(uint))
+#define	TS_IDLEN		(TS_FILEMAGICSIZE + sizeof(uint))
 #define	TS_HEADTABLEN		(3 * sizeof(uint))
 #define	TS_TOPLEN		(TS_IDLEN + TS_HEADTABLEN)
 
@@ -62,13 +62,13 @@ struct ts_flags {
 
 struct ts_head {
 	cchar		*fname ;
-	TS_FL		f ;
-	TS_H		h ;
-	EBUF		ebm ;			/* entry-buffer-manager */
-	MAPSTRINT	ni ;			/* nodename index */
+	ebuf		ebm ;			/* entry-buffer-manager */
+	mapstrint	ni ;			/* nodename index */
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
+	TS_H		h ;
+	TS_FL		f ;
 	uint		magic ;
 	int		oflags ;
 	int		pagesize ;
@@ -86,9 +86,10 @@ struct ts_c {
 } ;
 
 typedef	TS		ts ;
-typedef	TS_CUR		ts_cur ;
+typedef	TS_FL		ts_fl ;
 typedef	TS_H		ts_h ;
-typedef	TS_ENT		ts_ednt ;
+typedef	TS_CUR		ts_cur ;
+typedef	TS_ENT		ts_ent ;
 
 EXTERNC_begin
 

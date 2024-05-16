@@ -45,8 +45,9 @@
 #include	<varsub.h>
 #include	<hdb.h>
 #include	<ascii.h>
-#include	<localmisc.h>
+#include	<nextpowtwo.h>
 #include	<exitcodes.h>
+#include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -67,8 +68,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
 
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkfnamesuf1(char *,cchar *,cchar *) ;

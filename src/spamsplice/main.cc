@@ -96,8 +96,6 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;

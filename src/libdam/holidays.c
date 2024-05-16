@@ -31,13 +31,14 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<ids.h>
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<tmtime.h>
 #include	<sfx.h>
-#include	<ids.h>
 #include	<hash.h>
+#include	<nextpowtwo.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -74,8 +75,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
 
 extern int	snsds(char *,int,const char *,const char *) ;
 extern int	sncpy1(char *,int,const char *) ;

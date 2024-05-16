@@ -31,10 +31,12 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<hash.h>
+#include	<nextpowtwo.h>
 #include	<randlc.h>
 #include	<localmisc.h>
 
@@ -55,10 +57,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern uint	nextpowtwo(uint) noex ;
-}
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;

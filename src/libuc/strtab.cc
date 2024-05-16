@@ -111,10 +111,11 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<sysval.hh>
-#include	<localmisc.h>
 #include	<intceil.h>
 #include	<hash.h>
+#include	<nextpowtwo.h>
 #include	<strwcpy.h>
+#include	<localmisc.h>
 
 #include	"strtab.h"
 
@@ -151,10 +152,6 @@ typedef strtab_ch *	chunkp ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	nextpowtwo(int) noex ;
-}
 
 
 /* local structures */

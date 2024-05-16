@@ -1,7 +1,8 @@
-/* gskew */
+/* gskew SUPPORT */
+/* lang=C++20 */
 
 /* this is a GSKEW branch predictor */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0
 #define	CF_DEBUGS2	0
@@ -10,13 +11,12 @@
 #define	CF_ALLMIDDLE	1
 #define	CF_MUSTAGREE	0		/* predictor must agree w/ outcome */
 
-
 /* revision history:
 
 	= 2002-05-01, David A­D­ Morano
-        This object module was created for Levo research. It is a value
-        predictor. This is not coded as hardware. It is like Atom analysis
-        subroutines!
+	This object module was created for Levo research.  It is a
+	value predictor.  This is not coded as hardware.  It is
+	like Atom analysis subroutines!
 
 */
 
@@ -24,41 +24,39 @@
 
 /*******************************************************************************
 
-	This object module implements the GSKEW (2Bc-gskew) branch predictor.
+	Name:
 
+	Description:
+	This object module implements the GSKEW (2Bc-gskew) branch
+	predictor.
 
 	Synopsis:
-
 	int gskew_init(op,p1,p2,p3,p4)
 	GSKEW	*op ;
 	int	p1, p2, p3, p4 ;
 
 	Arguments:
-
 	p1	table length
 	p2	number of history bits
 
 	Returns:
-
+	>=0	OK
+	<0	error-code (system-return)
 
 *******************************************************************************/
 
-
-#define	GSKEW_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<nextpowtwo.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -87,8 +85,6 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-
 extern int	flbsi(uint) ;
 
 
@@ -104,7 +100,7 @@ static uint	fi_meta(int,uint,uint) ;
 
 /* global variables */
 
-struct bpload	gskew = {
+struct bpload	gskew_mod = {
 	"gskew",
 	sizeof(GSKEW),
 } ;
@@ -113,8 +109,10 @@ struct bpload	gskew = {
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int gskew_init(op,p1,p2,p3,p4)
 GSKEW	*op ;
