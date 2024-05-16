@@ -38,7 +38,6 @@
 #define	MAILALIAS_FILEMAGICLEN	sizeof(MAILALIAS_FILEMAGIC)
 #define	MAILALIAS_NSHIFT	8
 #define	MAILALIAS_FILEVERSION	0
-#define	MAILALIAS_FILETYPE	0
 #define	MAILALIAS_DEFAPTAB	"default"
 
 #define	MAILALIAS_OSEC		(1<<0)		/* use secondard hash */

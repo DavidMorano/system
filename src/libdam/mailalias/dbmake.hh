@@ -61,7 +61,6 @@
 
 #define	DBMAKE_IDLEN		64
 #define	DBMAKE_ALIASNAMELEN	MAILALIASLEN
-#define	DBMAKE_FILEVERSION	0
 #define	DBMAKE_OSEC		(1<<0)
 #define	DBMAKE_ORANDLC		(1<<1)
 
@@ -91,6 +90,7 @@ namespace mailutils {
 	int		svsize ;
 	int		nshift ;
 	int		mags ;
+	int		fver ;
 	int		f_havekey ;
 	dbmake(vecobj *arlp,strtab *aklp,strtab *avlp,int afd) noex {
 	    rlp = arlp ;
@@ -105,6 +105,9 @@ namespace mailutils {
 	} ;
 	void setnshift(int n) noex {
 	    nshift = n ;
+	} ;
+	void setversion(int v) noex {
+	    fver = v ;
 	} ;
 	int wrfileproc(cchar *) noex ;
 	int wrfileline(cchar *,int) noex ;

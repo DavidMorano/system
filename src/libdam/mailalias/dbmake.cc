@@ -222,7 +222,7 @@ int dbmake::wrfiler(time_t dt) noex {
 	}
 /* prepare the version and encoding (VETU) */
 	{
-	fidbuf[16] = DBMAKE_FILEVERSION ;
+	fidbuf[16] = uchar(fver) ;	/* file-version */
 	fidbuf[17] = ENDIAN ;
 	fidbuf[18] = ropts ;
 	fidbuf[19] = 0 ;

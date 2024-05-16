@@ -1130,6 +1130,7 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 			data.ropts = op->ropts ;
 			data.setmagic(magp,mags) ;
 			data.setnshift(nshift) ;
+			data.setversion(MAILALIAS_FILEVERSION) ;
 			if ((rs = malloc_mp(&tbuf)) >= 0) {
 	                    for (int i = 0 ; op->aprofile[i] ; i += 1) {
 	                        cchar	*cp = charp(op->aprofile[i]) ;
