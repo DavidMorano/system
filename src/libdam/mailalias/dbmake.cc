@@ -216,9 +216,9 @@ int dbmake::wrfiler(time_t dt) noex {
 	char		*bp ;
 /* prepare the file magic */
 	{
-	bp = fidbuf ;
-	ml = mkmagic(bp,DBMAKE_FILEMAGICSIZE,DBMAKE_FILEMAGIC) ;
-	bp += ml ;
+	    bp = fidbuf ;
+	    ml = mkmagic(bp,mags,magp) ;
+	    bp += ml ;
 	}
 /* prepare the version and encoding (VETU) */
 	{
@@ -456,7 +456,7 @@ int dbmake::wrfilevals() noex {
 
 /* make the (only) index for this file */
 int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
-	cint		ns = DBMAKE_NSHIFT ;
+	cint		ns = nshift ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ; /* ¥ GCC false complaint */
 	if (it) {

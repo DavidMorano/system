@@ -1120,11 +1120,16 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	    if ((rs = strtab_start(&skeys,n)) >= 0) {
 	        strtab	svals ;
 	        if ((rs = strtab_start(&svals,(n * 2))) >= 0) {
+		    cint	nshift = MAILALIAS_NSHIFT ;
+		    cint	mags = MAILALIAS_FILEMAGICSIZE ;
+		    cchar	*magp = MAILALIAS_FILEMAGIC ;
 	            if ((rs = mailalias_aprofile(op,dt)) >= 0) {
 	                dbmake	data(&recs,&skeys,&svals,fd) ;
+	                char	*tbuf{} ;
 			data.rectab = op->rectab ;
 			data.ropts = op->ropts ;
-	                char	*tbuf{} ;
+			data.setmagic(magp,mags) ;
+			data.setnshift(nshift) ;
 			if ((rs = malloc_mp(&tbuf)) >= 0) {
 	                    for (int i = 0 ; op->aprofile[i] ; i += 1) {
 	                        cchar	*cp = charp(op->aprofile[i]) ;
