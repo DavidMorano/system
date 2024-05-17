@@ -1,9 +1,8 @@
-/* logbase */
+/* logbase SUPPORT */
+/* lang=C20 */
 
 /* calculate the log of a number given the base also */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,42 +16,38 @@
 
 /*******************************************************************************
 
+	Name:
+	logbase
+
+	Description:
 	Find the log-base-(b) of a number (v).
 
 	Synopsis:
-
-	double logbase(double b,double v)
+	double logbase(double b,double v) noex
 
 	Arguments:
-
 	b		base
 	v		number to take the log-base-(b) of
 
 	Returns:
-
 	-		result
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cmath>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
-#include	<sys/types.h>
-#include	<math.h>
-
-#include	<localmisc.h>
+#include	"logbase.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -69,13 +64,25 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* exported subroutines */
 
+float		logbasef(float b,float v) noex {
+	const float	n = log(v) ;
+	const float	d = log(b) ;
+	return (n / d) ;
+}
+/* end subroutine (logbasef) */
 
-double logbase(double b,double v)
-{
+double logbase(double b,double v) noex {
 	const double	n = log(v) ;
 	const double	d = log(b) ;
-	return (n/d) ;
+	return (n / d) ;
 }
 /* end subroutine (logbase) */
+
+long double logbasel(long double b,long double v) noex {
+	const long double	n = log(v) ;
+	const long double	d = log(b) ;
+	return (n / d) ;
+}
+/* end subroutine (logbasel) */
 
 

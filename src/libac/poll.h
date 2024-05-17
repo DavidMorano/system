@@ -1,6 +1,8 @@
-/* poll */
+/* poll HEADER */
+/* lang=C++20 */
 
 /* poll header stuff */
+/* version %I% last-modified %G% */
 
 
 /* revistion history:
@@ -25,17 +27,18 @@
 
 ******************************************************************************/
 
-
 #ifndef POLL_INCLUDE
-#define	POLL_INCLUDE	1
+#define	POLL_INCLUDE
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #if	(! defined(SYSHAS_POLL)) || (SYSHAS_POLL == 0)
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef struct pollfd {
 	int		fd;		/* file desc to poll */
@@ -46,7 +49,6 @@ typedef struct pollfd {
 typedef unsigned long	nfds_t;
 
 /* * Testable select events */
-
 #define	POLLIN		0x0001		/* fd is readable */
 #define	POLLPRI		0x0002		/* high priority info at fd */
 #define	POLLOUT		0x0004		/* fd is writeable (won't block) */
@@ -67,13 +69,9 @@ typedef unsigned long	nfds_t;
 
 #define	POLLREMOVE	0x0800	/* remove a cached poll fd from /dev/poll */
 
-
-
-#ifdef	__cplusplus
-}
-#endif
-
 extern int	poll(pollfd_t *,nfds_t,int) ;
+
+EXTERNC_end
 
 #endif /* (! defined(SYSHAS_POLL)) || (SYSHAS_POLL == 0) */
 
