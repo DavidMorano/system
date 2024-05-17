@@ -145,7 +145,7 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	        } /* end if (item) */
 	        if ((rs >= 0) && (bl > 0)) {
 	            if (bl >= hdrsz) {
-	                uint	*header = (uint *) bp ;
+	                uint	*header = uintp(bp) ;
 	                ep->fsize = header[hi_fsize] ;
 	                ep->wtime = header[hi_wtime] ;
 	                ep->stoff = header[hi_stoff] ;
@@ -188,7 +188,7 @@ int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	            bp += 4 ;
 	            bl -= 4 ;
 	            if ((rs >= 0) && (bl >= hdrsz)) {
-	                uint	*header = (uint *) bp ;
+	                uint	*header = uintp(bp) ;
 	                header[hi_fsize] = ep->fsize ;
 	                header[hi_wtime] = ep->wtime ;
 	                header[hi_stoff] = ep->stoff ;

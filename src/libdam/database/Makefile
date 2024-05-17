@@ -37,9 +37,7 @@ LINT=	lint
 
 DEFS +=
 
-
 INCS += database.h
-
 
 LIBS +=
 
@@ -47,6 +45,9 @@ LIBS +=
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -112,6 +113,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_database.o:	$(OBJ0_DATABASE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DATABASE)
 
@@ -127,5 +129,11 @@ obj3_database.o:	$(OBJ3_DATABASE)
 obj4_database.o:	$(OBJ4_DATABASE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_DATABASE)
 
+
+obja.o:		$(OBJA_DATABASE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_DATABASE)
+
+objb.o:		$(OBJB_DATABASE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_DATABASE)
 
 

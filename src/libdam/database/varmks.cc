@@ -18,13 +18,16 @@
 
 /*******************************************************************************
 
+	Name:
+	varmks
+
 	Description:
 	This subroutine creates a VAR database file.
 
 	Synopsis:
 	int varmks_open(op,dbname,of,om,n)
 	VARMKS		*op ;
-	const char	dbname[] ;
+	cchar	dbname[] ;
 	int		of ;
 	mode_t		om ;
 	int		n ;
@@ -119,25 +122,25 @@
 
 /* external subroutines */
 
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	strnnlen(cchar *,int,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfhexi(cchar *,int,uint *) ;
 extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	vstrkeycmp(const char *,const char *) ;
+extern int	vstrkeycmp(cchar *,cchar *) ;
 extern int	filer_writefill(FILER *,cchar *,int) ;
-extern int	hasuc(const char *,int) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -146,14 +149,6 @@ extern int	strlinelen(cchar *,int,int) ;
 
 
 /* external variables */
-
-
-/* exported variables */
-
-VARMKS_OBJ	varmks_mod = {
-	"varmks",
-	sizeof(VARMKS)
-} ;
 
 
 /* local structures */
@@ -182,7 +177,7 @@ static int	varmks_mkvarfiler(VARMKS *) ;
 static int	varmks_mkidxwrmain(VARMKS *,VARHDR *) ;
 static int	varmks_mkidxwrhdr(VARMKS *,VARHDR *,FILER *) ;
 static int	varmks_mkrectab(VARMKS *,VARHDR *,FILER *,int) ;
-static int	varmks_mkind(VARMKS *,const char *,uint (*)[3],int) ;
+static int	varmks_mkind(VARMKS *,cchar *,uint (*)[3],int) ;
 static int	varmks_mkstrtab(VARMKS *,VARHDR *,FILER *,int) ;
 static int	varmks_nidxopen(VARMKS *) ;
 static int	varmks_nidxclose(VARMKS *) ;
@@ -210,13 +205,18 @@ static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct varentry *) ;
 
 /* exported variables */
 
+VARMKS_OBJ	varmks_mod = {
+	"varmks",
+	sizeof(VARMKS)
+} ;
+
 
 /* exported subroutines */
 
-int varmks_open(VARMKS *op,cchar dbname[],int of,mode_t om,int n) noex {
+int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 	int		rs ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (dbname == NULL) return SR_FAULT ;
@@ -411,7 +411,7 @@ static int varmks_filesbegin(VARMKS *op)
 
 static int varmks_filesbeginc(VARMKS *op)
 {
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
@@ -450,9 +450,9 @@ static int varmks_filesbeginwait(VARMKS *op)
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
 	    const mode_t	om = op->om ;
-	    const int		to_stale = VARMKS_INTSTALE ;
-	    const int		nrs = SR_EXISTS ;
-	    const int		of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	    cint		to_stale = VARMKS_INTSTALE ;
+	    cint		nrs = SR_EXISTS ;
+	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
 	    int			to = VARMKS_INTOPEN ;
 	    while ((rs = varmks_filesbegincreate(op,tbuf,of,om)) == nrs) {
 #if	CF_DEBUGS
@@ -489,7 +489,7 @@ static int varmks_filesbegincreate(VARMKS *op,cchar *tfn,int of,mode_t om)
 	}
 #endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    cchar	*cp ;
 	    op->f.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
@@ -538,7 +538,7 @@ static int varmks_filesend(VARMKS *op)
 
 static int varmks_listbegin(VARMKS *op,int n)
 {
-	const int	size = (n * VARMKS_SIZEMULT) ;
+	cint	size = (n * VARMKS_SIZEMULT) ;
 	int		rs ;
 
 	if ((rs = strtab_start(&op->keys,size)) >= 0) {
@@ -615,13 +615,13 @@ static int varmks_mkvarfiler(VARMKS *op)
 	    hdr.nskip = VARMKS_NSKIP ;
 
 	    if ((rs = varmks_mkidxwrmain(op,&hdr)) >= 0) {
-	        const int	hlen = HDRBUFLEN ;
+	        cint	hlen = HDRBUFLEN ;
 	        char		hbuf[HDRBUFLEN+1] ;
 	        hdr.fsize = rs ;
 	        wlen = rs ;
 
 	        if ((rs = varhdr(&hdr,0,hbuf,hlen)) >= 0) {
-	            const int	bl = rs ;
+	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
 	                const mode_t	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
@@ -646,8 +646,8 @@ static int varmks_mkvarfiler(VARMKS *op)
 static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 {
 	FILER		hf, *hfp = &hf ;
-	const int	nfd = op->nfd ;
-	const int	ps = getpagesize() ;
+	cint	nfd = op->nfd ;
+	cint	ps = getpagesize() ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
@@ -676,7 +676,7 @@ static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 /* ARGSUSED */
 static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILER *hfp)
 {
-	const int	hlen = HDRBUFLEN ;
+	cint	hlen = HDRBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HDRBUFLEN+1] ;
@@ -742,7 +742,7 @@ static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 /* make an index table of the record table */
 int varmks_mkind(op,kst,it,il)
 VARMKS		*op ;
-const char	kst[] ;
+cchar	kst[] ;
 uint		(*it)[3] ;
 int		il ;
 {
@@ -753,7 +753,7 @@ int		il ;
 	int		rs = SR_OK ;
 	int		rtl ;
 	int		sc = 0 ;
-	const char	*kp ;
+	cchar	*kp ;
 
 	rtl = rectab_getvec(&op->rectab,&rt) ;
 
@@ -885,7 +885,7 @@ static int varmks_nidxopen(VARMKS *op)
 	debugprintf("varmks_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
 #endif
 	if (op->nidxfname == NULL) {
-	    const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -941,8 +941,8 @@ static int varmks_nidxclose(VARMKS *op)
 static int varmks_renamefiles(VARMKS *op)
 {
 	int		rs ;
-	const char	*suf = FSUF_IDX ;
-	const char	*end = ENDIANSTR ;
+	cchar	*suf = FSUF_IDX ;
+	cchar	*end = ENDIANSTR ;
 	char		idxfname[MAXPATHLEN + 1] ;
 
 	if ((rs = mkfnamesuf2(idxfname,op->dbname,suf,end)) >= 0) {

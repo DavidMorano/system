@@ -78,15 +78,6 @@
 /* external variables */
 
 
-/* exported variables */
-
-VARS_OBJ	vars_mod = {
-	"vars",
-	sizeof(VARS),
-	sizeof(VARS_CUR)
-} ;
-
-
 /* local structures */
 
 enum itentries {
@@ -116,6 +107,12 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
 /* exported variables */
+
+VARS_OBJ	vars_mod = {
+	"vars",
+	sizeof(VARS),
+	sizeof(VARS_CUR)
+} ;
 
 
 /* exported subroutines */
