@@ -1,17 +1,18 @@
-/* ssh */
+/* ssh SUPPORT */
+/* lang=C++20 */
 
 /* SS-hammock detection object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0
 #define	CF_SAFE		0
 
-
 /* revision history:
 
 	= 2002-05-01, David A­D­ Morano
-        This object module was created for Levo research, to determine if a
-        conditional branch at a given instruction address is a SS-Hamock or not.
+	This object module was created for Levo research, to determine
+	if a conditional branch at a given instruction address is
+	a SS-Hamock or not.
 
 */
 
@@ -19,30 +20,27 @@
 
 /******************************************************************************
 
-        This object module provides an interface to a data base of information
-        about SS-Hammock branchs. A query can be made to retrieve information
-        about a conditional branch as specified by its instruction address.
-
+	This object module provides an interface to a data base of
+	information about SS-Hammock branchs.  A query can be made
+	to retrieve information about a conditional branch as
+	specified by its instruction address.
 
 *****************************************************************************/
 
-
-#define	SSH_MASTER	1
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/mman.h>		/* Memory Management */
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
+#include	<hash.h>
+#include	<hashindex.h>
 #include	<localmisc.h>
 
 #include	"ssh.h"
@@ -57,19 +55,14 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-extern uint	hash_elf(const void *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* forward references */
 
-static int	hashindex(uint,uint) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int ssh_init(op,fname)
 SSH		*op ;
@@ -379,28 +372,5 @@ SSH		*op ;
 	return rs ;
 }
 /* end subroutine (ssh_free) */
-
-
-
-/* INTERNAL SUBROUTINES */
-
-
-
-/* calculate the next hash from a given one */
-static int hashindex(i,n)
-uint	i, n ;
-{
-	int	hi ;
-
-
-	hi = MODP2(i,n) ;
-
-	if (hi == 0)
-	    hi = 1 ;
-
-	return hi ;
-}
-/* end if (hashindex) */
-
 
 

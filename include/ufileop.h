@@ -1,4 +1,4 @@
-/* ufileop SUPPORT (UNIX® file operations) */
+/* ufileop HEADER (UNIX® file operations) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */

@@ -1,4 +1,4 @@
-/* broadcast SUPPOET */
+/* broadcast SUPPORT */
 /* lang=C++20 */
 
 /* some kind of broadcast thing */

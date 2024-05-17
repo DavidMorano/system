@@ -111,10 +111,12 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<sysval.hh>
-#include	<localmisc.h>
 #include	<intceil.h>
 #include	<hash.h>
+#include	<hashindex.h>
+#include	<nextpowtwo.h>
 #include	<strwcpy.h>
+#include	<localmisc.h>
 
 #include	"strtab.h"
 
@@ -151,10 +153,6 @@ typedef strtab_ch *	chunkp ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	nextpowtwo(int) noex ;
-}
 
 
 /* local structures */
@@ -254,13 +252,6 @@ static inline int indexsize(int il) noex {
 	return ((il + 1) * 3 * sizeof(int)) ;
 }
 /* end subroutine (indexsize) */
-
-static inline int hashindex(uint hv,int n) noex {
-	int		hi = MODP2(hv,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 
 /* exported variables */

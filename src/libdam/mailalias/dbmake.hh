@@ -56,17 +56,13 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<strtab.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| */
+#include	<localmisc.h>		/* |MAILADDRLEN| + |MAILALIASLEN| */
 
 
 #define	DBMAKE_IDLEN		64
-#define	DBMAKE_ALIASNAMELEN	64
-#define	DBMAKE_FILEMAGIC	"mailalias"
-#define	DBMAKE_FILEMAGICSIZE	strlen(DBMAKE_FILEMAGIC)
-#define	DBMAKE_FILEVERSION	0
+#define	DBMAKE_ALIASNAMELEN	MAILALIASLEN
 #define	DBMAKE_OSEC		(1<<0)
 #define	DBMAKE_ORANDLC		(1<<1)
-#define	DBMAKE_NSHIFT		8
 
 
 namespace mailutils {
@@ -76,6 +72,7 @@ namespace mailutils {
 	vecobj		*rlp ;
 	strtab		*klp ;
 	strtab		*vlp ;
+	cchar		*magp ;
 	int		(*rectab)[2] ;
 	uint		nrecs ;
 	uint		nkeys ;
@@ -91,6 +88,9 @@ namespace mailutils {
 	int		risize ;
 	int		sksize ;
 	int		svsize ;
+	int		nshift ;
+	int		mags ;
+	int		fver ;
 	int		f_havekey ;
 	dbmake(vecobj *arlp,strtab *aklp,strtab *avlp,int afd) noex {
 	    rlp = arlp ;
@@ -98,6 +98,16 @@ namespace mailutils {
 	    vlp = avlp ;
 	    fd = afd ;
 	    f_havekey = false ;
+	} ;
+	void setmagic(cchar *m,int s) noex {
+	    magp = m ;
+	    mags = s ;
+	} ;
+	void setnshift(int n) noex {
+	    nshift = n ;
+	} ;
+	void setversion(int v) noex {
+	    fver = v ;
 	} ;
 	int wrfileproc(cchar *) noex ;
 	int wrfileline(cchar *,int) noex ;

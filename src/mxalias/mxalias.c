@@ -107,8 +107,6 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;

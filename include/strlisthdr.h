@@ -20,9 +20,8 @@
 
 #define	STRLISTHDR		struct strlisthdr_head
 
-#define	STRLISTHDR_MAGICSTR	"STRLISTHDR"
-#define	STRLISTHDR_FSUF		"si"
-#define	STRLISTHDR_MAGICLEN	sizeof(STRLISTHDR_MAGICSTR)
+#define	STRLISTHDR_FSUF		"si"	/* String-Index */
+#define	STRLISTHDR_MAGICSTR	"STRLIST"
 #define	STRLISTHDR_MAGICSIZE	16
 #define	STRLISTHDR_VERSION	0
 

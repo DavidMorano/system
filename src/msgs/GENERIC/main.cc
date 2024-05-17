@@ -1,3 +1,6 @@
+/* main SUPPORT */
+/* lang=C20 */
+
 
 #ifndef lint
 static char *rcsid = "$Header:msgs.c 12.0$";

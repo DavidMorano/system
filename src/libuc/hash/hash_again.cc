@@ -42,6 +42,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<randlc.h>
+#include	<urotate.h>
 #include	<localmisc.h>
 
 #include	"hash.h"
@@ -64,9 +65,11 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern uint	urotate(uint,int) noex ;
-}
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

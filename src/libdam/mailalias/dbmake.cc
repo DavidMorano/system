@@ -216,24 +216,24 @@ int dbmake::wrfiler(time_t dt) noex {
 	char		*bp ;
 /* prepare the file magic */
 	{
-	bp = fidbuf ;
-	ml = mkmagic(bp,DBMAKE_FILEMAGICSIZE,DBMAKE_FILEMAGIC) ;
-	bp += ml ;
+	    bp = fidbuf ;
+	    ml = mkmagic(bp,mags,magp) ;
+	    bp += ml ;
 	}
 /* prepare the version and encoding (VETU) */
 	{
-	fidbuf[16] = DBMAKE_FILEVERSION ;
+	fidbuf[16] = uchar(fver) ;	/* file-version */
 	fidbuf[17] = ENDIAN ;
 	fidbuf[18] = ropts ;
 	fidbuf[19] = 0 ;
 	}
 /* write magic along with version encoding */
-	if ((rs = u_write(fd,fidbuf,DBMAKE_IDLEN)) >= 0) {
+	if ((rs = u_write(fd,fidbuf,(bp - fidbuf))) >= 0) {
 	    cint	hsize = (mailaliashdr_overlast * sizeof(int)) ;
-	    fto += DBMAKE_IDLEN ;
+	    fto += (bp - fidbuf) ;
 /* make the header itself (skip over it for FTO) */
 	    {
-	    fto += (mailaliashdr_overlast * sizeof(int)) ;
+	    fto += hsize ;
 	    }
 /* everything else */
 	    {
@@ -456,7 +456,7 @@ int dbmake::wrfilevals() noex {
 
 /* make the (only) index for this file */
 int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
-	cint		ns = DBMAKE_NSHIFT ;
+	cint		ns = nshift ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ; /* ¥ GCC false complaint */
 	if (it) {

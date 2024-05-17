@@ -1,8 +1,9 @@
-/* rectab SUPPOrectab */
+/* rectab SUPPORT */
 /* lang=C++20 */
 
 /* record-table */
 /* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -70,10 +71,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern uint	nextpowtwo(uint) noex ;
-}
 
 
 /* external variables */

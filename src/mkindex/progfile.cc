@@ -50,15 +50,16 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<hash.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -71,9 +72,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
-extern uint	hash_elf(const void *,int) ;
 
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;

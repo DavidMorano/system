@@ -1,5 +1,8 @@
-/* mailaddrquote SUPPORT */
-/* lang=C++20 */
+/* mailaddrquote HEADER */
+/* lang=C20 */
+
+/* quote mail-addresses */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */

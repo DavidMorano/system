@@ -33,12 +33,11 @@
 #define	MAILALIAS_FI		struct mailalias_finfo
 #define	MAILALIAS_FL		struct mailalias_flags
 #define	MAILALIAS_MAGIC		0x23456187
-#define	MAILALIAS_FILEMAGIC	"MAILALIAS"
-#define	MAILALIAS_FILEMAGICSIZE	16
-#define	MAILALIAS_FILEMAGICLEN	sizeof(MAILALIAS_FILEMAGIC)
+#define	MAILALIAS_FSUF		"mac"		/* Mail Alias Cache */
+#define	MAILALIAS_MAGICSTR	"MAILALIAS"
+#define	MAILALIAS_MAGICSIZE	16
 #define	MAILALIAS_NSHIFT	8
 #define	MAILALIAS_FILEVERSION	0
-#define	MAILALIAS_FILETYPE	0
 #define	MAILALIAS_DEFAPTAB	"default"
 
 #define	MAILALIAS_OSEC		(1<<0)		/* use secondard hash */

@@ -1108,14 +1108,12 @@ TS		*op ;
 }
 /* end subroutine (ts_filetopread) */
 
-
-/* verify the file */
-static int ts_fileverify(op)
-TS		*op ;
-{
-	int	rs = SR_OK ;
-	int	f ;
-	const char	*cp ;
+static int ts_fileverify(TS *op) noex {
+	static cint	magl = strlen(TS_FILEMAGIC) ;
+	int		rs = SR_OK ;
+	int		f ;
+	cchar		*magp = TS_FILEMAGIC ;
+	cchar		*cp ;
 
 	if (op->topsize < TS_TOPLEN) {
 	    rs = SR_INVALID ;
@@ -1123,8 +1121,8 @@ TS		*op ;
 	}
 
 	cp = op->topbuf ;
-	f = (strncmp(cp,TS_FILEMAGIC,TS_FILEMAGICLEN) == 0) ;
-	f = f && (*(cp + TS_FILEMAGICLEN) == '\n') ;
+	f = (strncmp(cp,magp,magl) == 0) ;
+	f = f && (*(cp + magl) == '\n') ;
 
 	if (! f) {
 

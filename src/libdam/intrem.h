@@ -1,7 +1,7 @@
-/* intrem SUPPORT */
-/* lang=C++20 */
+/* intrem HEADER */
+/* lang=C20 */
 
-/* Integer Ceiling */
+/* Integer-Remaider */
 /* version %I% last-modified %G% */
 
 
@@ -16,6 +16,7 @@
 
 #ifndef	INTREM_INCLUDE
 #define	INTREM_INCLUDE
+
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>

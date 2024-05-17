@@ -31,10 +31,12 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<hash.h>
+#include	<nextpowtwo.h>
 #include	<randlc.h>
 #include	<localmisc.h>
 
@@ -55,10 +57,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern uint	nextpowtwo(uint) noex ;
-}
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
@@ -84,8 +82,6 @@ static int	recorder_matfl3(RECORDER *,cchar *,uint [][2],int,cchar *) ;
 static int	recorder_matun(RECORDER *,cchar *,uint [][2],int,cchar *) ;
 static int	recorder_cden(RECORDER *,int,int) ;
 
-static int	hashindex(uint,int) ;
-
 #if	CF_DEBUGS && CF_DEBUGBOUNDS
 static int inbounds(const char *,int,const char *) ;
 #endif
@@ -101,6 +97,9 @@ enum indices {
 	index_un,
 	index_overlast
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -1040,14 +1039,6 @@ static int recorder_cden(RECORDER *asp,int wi,int c) noex {
 	return 0 ;
 }
 /* end subroutine (recorder_cden) */
-
-/* calculate the next hash from a given one */
-static int hashindex(uint i,int n) noex {
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end if (hashindex) */
 
 #if	CF_DEBUGS && CF_DEBUGBOUNDS
 static int inbounds(cchar *buf,int buflen,cchar *tp) noex {

@@ -76,6 +76,7 @@
 #include	<realname.h>
 #include	<pwihdr.h>
 #include	<hash.h>
+#include	<hashindex.h>
 #include	<strn.h>
 #include	<mkpath.h>
 #include	<mkfnamesuf.h>
@@ -148,8 +149,6 @@ static int	ipasswd_keymatchlast(IPASSWD *,int,int,char *,int) noex ;
 #endif
 
 static int	mkourfname(char *,cchar *) noex ;
-
-static int	hashindex(uint,int) noex ;
 
 static int	detOurSuf(cchar *,cchar *,int) noex ;
 
@@ -1394,13 +1393,6 @@ static int mkourfname(char *dbfname,cchar *dbname) noex {
 	return rs ;
 }
 /* end subroutine (mkourfname) */
-
-static int hashindex(uint i,int n) noex {
-	uint		hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 static int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	int		len = 0 ;

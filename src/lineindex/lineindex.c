@@ -36,19 +36,20 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
 #include	<netinet/in.h>
-#include	<inttypes.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cinttypes>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<bfile.h>
 #include	<mallocstuff.h>
+#include	<bfile.h>
 #include	<filemap.h>
-#include	<localmisc.h>
 #include	<intceil.h>
+#include	<localmisc.h>
 
 #include	"lineindex.h"
 
@@ -67,17 +68,11 @@
 #define	LINEBUFLEN	2048
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	FILEMAPSIZE	(500 * 1024 * 1024)
 #define	NRECS		(2 * 1024)
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
 
 extern int	mkpath1w(char *,const char *,int) ;
 extern int	mkpath1(char *,const char *) ;

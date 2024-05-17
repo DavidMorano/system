@@ -1,4 +1,4 @@
-/* errtimer SUPPORT (UNIX® System V System C Inter-Process-Communication) */
+/* errtimer HEADER (UNIX® System V System C Inter-Process-Communication) */
 /* lang=C20 */
 
 /* error-timer */

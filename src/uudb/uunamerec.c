@@ -1,4 +1,4 @@
-/* uunamerec */
+/* uunamerec SUPPORT */
 /* lang=C20 */
 
 /* string uunamerec object */
@@ -29,11 +29,14 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<hash.h>
+#include	<hashindex.h>
+#include	<nextpowtwo.h>
+#include	<localmisc.h>
 
 #include	"uunamerec.h"
 
@@ -47,14 +50,10 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-
 
 /* forward references */
 
 static int	uunamerec_extend(UUNAMEREC *) ;
-
-static int	hashindex(uint,uint) ;
 
 
 /* exported subroutines */
@@ -345,16 +344,5 @@ UUNAMEREC	*asp ;
 	return (asp->e) ;
 }
 /* end subroutine (uunamerec_extend) */
-
-
-/* calculate the next hash from a given one */
-static int hashindex(i,n)
-uint	i, n ;
-{
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end if (hashindex) */
 
 

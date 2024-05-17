@@ -1,5 +1,5 @@
-/* strlist SUPPORT */
-/* lang=C++20 */
+/* strlist HEADER */
+/* lang=C20 */
 
 /* read or audit a STRLIST database */
 /* version %I% last-modified %G% */
@@ -23,8 +23,7 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
-
-#include	"strlisthdr.h"		/* this is the hash-file-header */
+#include	<strlisthdr.h>
 
 
 #define	STRLIST_MAGIC	0x88773421

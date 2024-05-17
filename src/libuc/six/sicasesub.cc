@@ -1,4 +1,4 @@
-/* sicasesub SUPPPORT */
+/* sicasesub SUPPORT */
 /* lang=C++20 */
 
 /* find the string-index of a sin-string within the given c-string */

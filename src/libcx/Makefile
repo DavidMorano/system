@@ -242,7 +242,7 @@ $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
 $(T).so:		$(OBJS) Makefile localmisc.h
-	$(LD) -G -m -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO) > $(T).lm
+	$(LD) -G -m -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

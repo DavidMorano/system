@@ -177,7 +177,7 @@ $(T).a:			$(LOBJ)
 	$(AR) -rc $(T).a $?
 
 $(T).so:		$(LOBJS) Makefile localmisc.h $(T).a
-	$(LD) -o $@ -G $(LDFLAGS) $(LOBJS) > $(T).lm
+	$(LD) -o $@ -G $(LDFLAGS) $(LOBJS)
 
 safe:
 	makesafe -v=3 -I $(INCDIR) $(LOBJ) $(TOBJ)
@@ -197,7 +197,7 @@ install-incs:		$(INCS)
 testuterm.x:	$(TOBJ) Makefile
 	makedate -m $(T) > makedate.c
 	$(CC) -c $(CFLAGS) makedate.c
-	$(LD) -o $@ $(LDFLAGS) $(TOBJS) $(LIBDIRS) $(LIBS) > tesuterm.lm
+	$(LD) -o $@ $(LDFLAGS) $(TOBJS) $(LIBDIRS) $(LIBS)
 
 
 testuterm.o:		testuterm.c config.h defs.h uterm.h

@@ -40,12 +40,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- |CHAR_BIT| */
-#include	<bit>
+#include	<bit>			/* |countl_zero(3c++)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
 
-#include	"powtwo.h"
+#include	"nextpowtwo.h"
 
 
 /* local defines */
@@ -62,23 +62,23 @@ using std::countl_one ;
 
 /* external subroutines */
 
+extern "C" {
+   extern int nextpowtwo(int) noex ;
+}
+
 
 /* local subroutines */
 
 
 /* forward references */
 
-extern "C" {
-   extern int nextpowtwo(int) noex ;
-}
-
 
 /* local subroutine-template */
 
 static inline int flbsi(int v) noex {
-	static constexpr int	nbit = (sizeof(int) * CHAR_BIT) ;
-	uint			uv = uint(v) ;
-	int			bn = -1 ;
+	cint		nbit = (sizeof(int) * CHAR_BIT) ;
+	uint		uv = uint(v) ;
+	int		bn = -1 ;
 	if (v) {
 	    cint	nc = countl_zero(uv) ;
 	    bn = (nbit - nc - 1) ;
@@ -94,9 +94,8 @@ static inline int flbsi(int v) noex {
 /* exported subroutines */
 
 int nextpowtwo(int v) noex {
-	int		lb ;
 	int		nn = 0 ;
-	if ((lb = flbsi(v)) >= 0) {
+	if (int lb ; (lb = flbsi(v)) >= 0) {
 	    uint	mask = ((1 << lb) - 1) ;
 	    if ((v & mask) && (lb < 31)) lb += 1 ;
 	    nn = (1 << lb) ;

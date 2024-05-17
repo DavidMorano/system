@@ -70,12 +70,12 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<estrings.h>
@@ -84,6 +84,8 @@
 #include	<filer.h>
 #include	<opentmp.h>
 #include	<hash.h>
+#include	<hashindex.h>
+#include	<nextpowtwo.h>
 #include	<localmisc.h>
 
 #include	"varmks.h"
@@ -116,8 +118,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
 
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
@@ -203,7 +203,6 @@ static int	mknewfname(char *,int,cchar *,cchar *) ;
 static int	unlinkstale(cchar *,int) ;
 
 static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct varentry *) ;
-static int	hashindex(uint,int) ;
 
 
 /* local variables */
@@ -1173,14 +1172,5 @@ static int indinsert(uint (*rt)[2],uint (*it)[3],int il,struct varentry *vep)
 	return c ;
 }
 /* end subroutine (indinsert) */
-
-
-static int hashindex(uint i,int n)
-{
-	int	hi = MODP2(i,n) ;
-	if (hi == 0) hi = 1 ;
-	return hi ;
-}
-/* end subroutine (hashindex) */
 
 
