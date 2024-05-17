@@ -4,7 +4,6 @@
 /* string buffer object */
 /* version %I% last-modified %G% */
 
-#define	CF_FASTGROW	1		/* grow faster */
 
 /* revision history:
 

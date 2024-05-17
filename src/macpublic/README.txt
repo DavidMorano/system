@@ -1,4 +1,10 @@
-SYSDB
+MACPUBLIC
 
-This program lists all of the services in the system 'services' database.
+This little program (must be run as root) checks to make sure that
+all users -- located in the '/Users' directory -- have:
+	"Public"
+	"Public/Drop Box"
+	"rje"
+
+all both existing and with the proper permissions.
 
