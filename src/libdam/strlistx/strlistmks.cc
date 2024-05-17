@@ -149,14 +149,6 @@ typedef uint		*rectab_t ;
 /* external variables */
 
 
-/* exported variables */
-
-STRLISTMKS_OBJ	strlistmks_mod = {
-	"strlistmks",
-	sizeof(STRLISTMKS)
-} ;
-
-
 /* local structures */
 
 struct varentry {
@@ -246,6 +238,11 @@ constexpr bool		f_minmod = CF_MINMOD ;
 
 
 /* exported variables */
+
+STRLISTMKS_OBJ	strlistmks_mod = {
+	"strlistmks",
+	sizeof(STRLISTMKS)
+} ;
 
 
 /* exported subroutines */
@@ -839,9 +836,9 @@ int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 static int strlistmks_renamefiles(SLM *op) noex {
 	int		rs ;
 	int		rs1 ;
-	cchar		*end = ENDIANSTR ;
 	char		*tbuf{} ;
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    cchar	*end = ENDIANSTR ;
 	    if ((rs = mkfnamesuf2(tbuf,op->dbname,STRLISTMKS_FSUF,end)) >= 0) {
 	        if ((rs = u_rename(op->nfname,tbuf)) >= 0) {
 	            op->nfname[0] = '\0' ;
