@@ -52,10 +52,6 @@
 
 /* local defines */
 
-#ifndef	ITEMLEN
-#define	ITEMLEN		100
-#endif
-
 
 /* imported namespaces */
 

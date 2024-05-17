@@ -108,15 +108,15 @@
 /* local defines */
 
 #define	MAILALIAS_DNAME		"var/mailalias"
-#define	MAILALIAS_FE		"mac"		/* Mail Alias Cache */
 #define	MAILALIAS_DIRMODE	0775
 
-#define	MAILALIAS_IDLEN		(MAILALIAS_FILEMAGICSIZE + 4)
-#define	MAILALIAS_HEADLEN	(mailaliashdr_overlast * sizeof(int))
-#define	MAILALIAS_TOPLEN	(MAILALIAS_IDLEN + MAILALIAS_HEADLEN)
-
 #define	MAILALIAS_IDOFF		0
+#define	MAILALIAS_IDLEN		(MAILALIAS_MAGICSIZE + sizeof(uint))
+
 #define	MAILALIAS_HEADOFF	MAILALIAS_IDLEN
+#define	MAILALIAS_HEADLEN	(mailaliashdr_overlast * sizeof(uint))
+
+#define	MAILALIAS_TOPLEN	(MAILALIAS_IDLEN + MAILALIAS_HEADLEN)
 #define	MAILALIAS_BUFOFF	(MAILALIAS_HEADOFF + MAILALIAS_HEADLEN)
 
 #define	MA			mailalias
@@ -641,7 +641,7 @@ static int mailalias_opener(MA *op) noex {
 	    char	*a{} ;
 	    if ((rs = uc_malloc(sz,&a)) >= 0) {
 		cchar	*pname = op->apname ;
-	        cchar	*fe = MAILALIAS_FE ;
+	        cchar	*fe = MAILALIAS_FSUF ;
 	        char	endstr[2] ;
 		char	*fname = a ;
 	        endstr[0] = (ENDIAN) ? '1' : '0' ;
@@ -713,10 +713,10 @@ static int mailalias_checkold(MA *op,time_t dt) noex {
 
 /* read the file header and check it out */
 static int mailalias_hdrload(MA *op) noex {
-	cint		msize = MAILALIAS_FILEMAGICSIZE ;
+	cint		msize = MAILALIAS_MAGICSIZE ;
 	int		rs = SR_OK ;
 	cchar		*cp = charp(op->mapdata) ;
-	if (hasValidMagic(cp,msize,MAILALIAS_FILEMAGIC)) {
+	if (hasValidMagic(cp,msize,MAILALIAS_MAGICSTR)) {
 	    cp += msize ;
 	    if (cp[0] == MAILALIAS_FILEVERSION) {
 	        if (cp[1] == ENDIAN) {
@@ -1045,7 +1045,7 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 		int	ai = 0 ;
 	        cint	clen = rs ;
 	        cchar	*pat = "dbmkXXXXXX" ;
-	        cchar	*suf = MAILALIAS_FE ;
+	        cchar	*suf = MAILALIAS_FSUF ;
 	        cchar	*end = ENDIANSTR ;
 	        char	*cbuf = (a + (ai++ * (maxpath + 1))) ;
 	        if ((rs = sncpy(cbuf,clen,pat,".",suf,end,"n")) >= 0) {
@@ -1121,8 +1121,8 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	        strtab	svals ;
 	        if ((rs = strtab_start(&svals,(n * 2))) >= 0) {
 		    cint	nshift = MAILALIAS_NSHIFT ;
-		    cint	mags = MAILALIAS_FILEMAGICSIZE ;
-		    cchar	*magp = MAILALIAS_FILEMAGIC ;
+		    cint	mags = MAILALIAS_MAGICSIZE ;
+		    cchar	*magp = MAILALIAS_MAGICSTR ;
 	            if ((rs = mailalias_aprofile(op,dt)) >= 0) {
 	                dbmake	data(&recs,&skeys,&svals,fd) ;
 	                char	*tbuf{} ;

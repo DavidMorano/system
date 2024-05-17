@@ -228,12 +228,12 @@ int dbmake::wrfiler(time_t dt) noex {
 	fidbuf[19] = 0 ;
 	}
 /* write magic along with version encoding */
-	if ((rs = u_write(fd,fidbuf,DBMAKE_IDLEN)) >= 0) {
+	if ((rs = u_write(fd,fidbuf,(bp - fidbuf))) >= 0) {
 	    cint	hsize = (mailaliashdr_overlast * sizeof(int)) ;
-	    fto += DBMAKE_IDLEN ;
+	    fto += (bp - fidbuf) ;
 /* make the header itself (skip over it for FTO) */
 	    {
-	    fto += (mailaliashdr_overlast * sizeof(int)) ;
+	    fto += hsize ;
 	    }
 /* everything else */
 	    {
