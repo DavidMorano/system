@@ -39,6 +39,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<nextpowtwo.h>
+#include	<findbits.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -57,9 +58,6 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-extern int	uc_malloc() ;
-
 
 /* forward references */
 
@@ -69,19 +67,18 @@ static int	calu(struct yags_cache *,uint,uint,uint *) ;
 static int	caup(struct yags_cache *,uint,uint,int,int) ;
 
 
-/* global variables */
+/* local variables */
 
-struct bpload	yags = {
+
+/* exported variables */
+
+struct bpload	yags_mod = {
 	"yags",
 	sizeof(YAGS),
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
-
 
 int yags_init(op,chlen,calen)
 YAGS		*op ;
@@ -93,7 +90,7 @@ int		calen ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(YAGS)) ;
+	memclear(op) ;
 
 /* the choice PHT */
 
@@ -112,7 +109,7 @@ int		calen ;
 	malloclog_alloc(op->choice,rs,"yags_init:choice") ;
 #endif
 
-	(void) memset(op->choice,0,size) ;
+	memset(op->choice,0,size) ;
 
 /* the caches */
 
@@ -136,7 +133,7 @@ int		calen ;
 	malloclog_alloc(op->taken,rs,"yags_init:taken") ;
 #endif
 
-	(void) memset(op->taken,0,size) ;
+	memset(op->taken,0,size) ;
 
 	rs = uc_malloc(size,&op->nottaken) ;
 

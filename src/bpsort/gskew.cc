@@ -57,6 +57,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<nextpowtwo.h>
+#include	<findbits.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -85,8 +86,6 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-
 
 /* forward references */
 
@@ -98,18 +97,15 @@ static uint	fi_g1(int,uint,uint) ;
 static uint	fi_meta(int,uint,uint) ;
 
 
-/* global variables */
+/* local variables */
+
+
+/* exported variables */
 
 struct bpload	gskew_mod = {
 	"gskew",
 	sizeof(GSKEW),
 } ;
-
-
-/* local variables */
-
-
-/* exported variables */
 
 
 /* exported subroutines */
@@ -125,7 +121,7 @@ int	p1, p2, p3, p4 ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(GSKEW)) ;
+	memclear(op) ;
 
 	max = p1 ;
 	if (max < 0)
@@ -155,7 +151,7 @@ int	p1, p2, p3, p4 ;
 	if (rs < 0)
 	    goto bad0 ;
 
-	(void) memset(op->table,0,size) ;
+	memset(op->table,0,size) ;
 
 #if	CF_ALLMIDDLE
 

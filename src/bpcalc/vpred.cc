@@ -58,8 +58,6 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-
 extern char	*strwcpy(char *,const char *,int) ;
 
 
@@ -68,8 +66,10 @@ extern char	*strwcpy(char *,const char *,int) ;
 static uint	satcount(uint,uint,int) ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int vpred_init(op,nentry,nops,sbits)
 VPRED		*op ;
@@ -85,7 +85,7 @@ int		sbits ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(VPRED)) ;
+	memclear(op) ;
 
 	if (nentry <= 0)
 	    nentry = VPRED_DEFN ;
@@ -102,7 +102,7 @@ int		sbits ;
 	malloclog_alloc(op->table,rs,"vpred_init:table") ;
 #endif
 
-	(void) memset(op->table,0,sizeof(VPRED)) ;
+	memset(op->table,0,sizeof(VPRED)) ;
 
 /* calculate how much to shift the IA (right) */
 
@@ -225,7 +225,7 @@ int		n ;
 /* we missed (no allocation is done) */
 miss:
 	size = n * sizeof(uint) ;
-	(void) memset(values,0,size) ;
+	memset(values,0,size) ;
 	return SR_NOENT ;
 }
 /* end subroutine (vpred_lookup) */
@@ -321,7 +321,7 @@ uint		values[] ;
 		op->table[ti].replaces += 1 ;
 
 	    size = op->nops * sizeof(struct vpred_operand) ;
-	    (void) memset(ops,0,size) ;
+	    memset(ops,0,size) ;
 
 /* load our tag into the entry */
 

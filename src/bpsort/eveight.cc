@@ -40,6 +40,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<nextpowtwo.h>
+#include	<findbits.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -68,8 +69,6 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-
 
 /* forward references */
 
@@ -80,19 +79,18 @@ static uint	fi_g1(uint,uint) ;
 static uint	fi_meta(uint,uint) ;
 
 
-/* global variables */
+/* local variables */
 
-struct bpload	eveight = {
+
+/* exported variables */
+
+struct bpload	eveight_mod = {
 	"eveight",
 	sizeof(EVEIGHT),
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
-
 
 int eveight_init(op,p1,p2,p3,p4)
 EVEIGHT	*op ;
@@ -104,7 +102,7 @@ int	p1, p2, p3, p4 ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(EVEIGHT)) ;
+	memclear(op) ;
 
 	max = -1 ;
 	max = MAX(p1,p2) ;

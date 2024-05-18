@@ -37,7 +37,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-
+#include	<findbits.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -62,27 +62,24 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-
 
 /* forward references */
 
 static uint	satcount(uint,uint,int) ;
 
 
-/* global variables */
+/* local variables */
 
-struct bpload	bpalpha = {
+
+/* exported variables */
+
+struct bpload	bpalpha_mod = {
 	"bpalpha",
 	sizeof(BPALPHA),
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
-
 
 int bpalpha_init(op,lhlen,lplen,glen)
 BPALPHA	*op ;
@@ -95,7 +92,7 @@ int	glen ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(BPALPHA)) ;
+	memclear(op) ;
 
 /* the choice PHT */
 

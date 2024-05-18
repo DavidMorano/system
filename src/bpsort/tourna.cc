@@ -40,6 +40,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<nextpowtwo.h>
+#include	<findbits.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -64,27 +65,24 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-
 
 /* forward references */
 
 static uint	satcount(uint,uint,int) ;
 
 
-/* global variables */
+/* local variables */
 
-struct bpload	tourna = {
+
+/* exported variables */
+
+struct bpload	tourna_mod = {
 	"tourna",
 	sizeof(TOURNA),
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
-
 
 int tourna_init(op,lhlen,lplen,glen)
 TOURNA	*op ;
@@ -97,7 +95,7 @@ int	glen ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(TOURNA)) ;
+	memclear(op) ;
 
 /* the choice PHT */
 
@@ -119,7 +117,7 @@ int	glen ;
 	malloclog_alloc(op->cpht,rs,"tourna_init:cpht") ;
 #endif
 
-	(void) memset(op->cpht,0,size) ;
+	memset(op->cpht,0,size) ;
 
 /* global PHT */
 
@@ -132,7 +130,7 @@ int	glen ;
 	malloclog_alloc(op->gpht,rs,"tourna_init:gpht") ;
 #endif
 
-	(void) memset(op->gpht,0,size) ;
+	memset(op->gpht,0,size) ;
 
 /* local BHT */
 
@@ -156,7 +154,7 @@ int	glen ;
 	malloclog_alloc(op->lbht,rs,"tourna_init:lbht") ;
 #endif
 
-	(void) memset(op->lbht,0,size) ;
+	memset(op->lbht,0,size) ;
 
 /* local PHT */
 
@@ -180,7 +178,7 @@ int	glen ;
 	malloclog_alloc(op->lpht,rs,"tourna_init:lpht") ;
 #endif
 
-	(void) memset(op->lpht,0,size) ;
+	memset(op->lpht,0,size) ;
 
 /* global branch history register */
 

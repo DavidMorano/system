@@ -85,7 +85,7 @@ char		fname[] ;
 	if (fname == NULL)
 	    return SR_FAULT ;
 
-	(void) memset(op,0,sizeof(SSH)) ;
+	memclear(op) ;
 
 	rs = u_open(fname,O_RDONLY,0666) ;
 

@@ -38,6 +38,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<nextpowtwo.h>
+#include	<findbits.h>
 #include	<localmisc.h>
 
 #include	"bpload.h"
@@ -59,15 +60,16 @@
 
 /* external subroutines */
 
-extern int	flbsi(uint) ;
-
 
 /* forward references */
 
 static uint	satcount(uint,uint,int) ;
 
 
-/* global variables */
+/* local variables */
+
+
+/* exported variables */
 
 struct bpload	gspag_mod = {
 	"gspag",
@@ -75,11 +77,7 @@ struct bpload	gspag_mod = {
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
-
 
 int gspag_init(op,bhlen,phlen)
 GSPAG	*op ;
@@ -91,7 +89,7 @@ int	phlen ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(GSPAG)) ;
+	memclear(op) ;
 
 /* BHT */
 
@@ -110,7 +108,7 @@ int	phlen ;
 	malloclog_alloc(op->lbht,rs,"gspag_init:lbht") ;
 #endif
 
-	(void) memset(op->lbht,0,size) ;
+	memset(op->lbht,0,size) ;
 
 /* global PHT */
 
@@ -129,7 +127,7 @@ int	phlen ;
 	malloclog_alloc(op->gpht,rs,"gspag_init:gpht") ;
 #endif
 
-	(void) memset(op->gpht,0,size) ;
+	memset(op->gpht,0,size) ;
 
 
 /* we're out of here */
