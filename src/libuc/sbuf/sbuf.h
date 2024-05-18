@@ -129,6 +129,14 @@ struct sbuf : sbuf_head {
 	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
+	sbuf &operator << (cchar *cp) noex {
+	    strw(cp) ;
+	    return *this ;
+	} ;
+	sbuf &operator << (char ch) noex {
+	    chr(ch) ;
+	    return *this ;
+	} ;
 	sbuf_iter begin() noex {
 	    sbuf_iter		it(rbuf) ;
 	    return it ;

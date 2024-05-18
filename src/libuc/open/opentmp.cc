@@ -1,4 +1,4 @@
-/* opentmpfile SUPPORT */
+/* opentmp SUPPORT */
 /* lang=C++20 */
 
 /* make and open a temporary file */
@@ -51,7 +51,6 @@
 #include	<sys/time.h>		/* for |TIMEVAL| */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<netdb.h>
 #include	<cstdlib>
 #include	<ctime>
 #include	<usystem.h>
@@ -77,7 +76,7 @@
 
 #define	MAXLOOP		1000
 
-#define	RANDBUFLEN	int(sizeof(ulong)*2)
+#define	RANDBUFLEN	int(sizeof(ulong) * 2)
 
 #ifndef	CF_SPLITFNAME
 #define	CF_SPLITFNAME	0		/* used |splitfname(3uc)| */

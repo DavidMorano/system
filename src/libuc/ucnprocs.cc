@@ -26,8 +26,8 @@
 
 	Description:
 	We basically cheat and count the number of "files" in '/proc'
-	that start with a leading digit character. The filename may
-	have to return a good |stat(2)| also. Of course, the whole
+	that start with a leading digit character.  The filename has
+	to return a good |stat(2)| also.  Of course, the whole
 	file-system might be unmounted also, in which case we return
 	with failure.
 
@@ -42,20 +42,21 @@
 				3=current-session
 
 	Returns:
-	<0		error
 	>=0		number of processes on the machine
+	<0		error (system-return)
 
 	Notes:
 	Amazingly, the '/proc' file-system with file entries in it
 	that look like process IDs is probably the most portable
 	way invented so far to enumerate process IDs on the system.
 	I think we can all thank AT&T for this, for inventing the
-	PROC FS back in the mid-1980s or so. It is amazing how much
+	PROC FS back in the mid-1980s or so.  It is amazing how much
 	stuff that AT&T invented in the 1980s for UNIX® that has
-	passed the test of time. The only real problem with the
-	PROC FS is that it is possible that orifinally it could be
+	passed the test of time.  The only real problem with the
+	PROCFS is that it is possible that it actually could be
 	unmounted (not mounted), in which case everyone is left
-	with nothing. But some news OSes do not allow
+	with nothing.  Also some newer OSes do not even have
+	a PROCFS.
 
 *******************************************************************************/
 
@@ -123,6 +124,9 @@ namespace {
 constexpr cchar		dn[] = PROCDNAME ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_nprocs(int w) noex {
@@ -154,9 +158,6 @@ procer::operator int () noex {
 }
 /* end method (procer::operator) */
 
-
-/* local subroutines */
-
 int procer::setid() noex {
 	int		rs = SR_INVALID ;
 	if ((w >= 0) && (w < ucproctype_overlast)) {
@@ -183,7 +184,7 @@ int procer::fsdent() noex {
 	int		n = 0 ;
         if ((rs = fsdir_open(&d,dn)) >= 0) {
                 switch (w) {
-                case ucproctype_all: /* all processes */
+                case ucproctype_all:		/* all processes */
                     {
                         while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
                             cint    ch = mkchar(de.name[0]) ;
@@ -193,10 +194,10 @@ int procer::fsdent() noex {
                         } /* end while */
                     } /* end block */
                     break ;
-                case ucproctype_sys: /* system processes */
-                case ucproctype_user: /* all-user processes */
-                case ucproctype_session: /* session processes */
-                case ucproctype_group: /* group processes */
+                case ucproctype_sys:		/* system processes */
+                case ucproctype_user:		/* all-user processes */
+                case ucproctype_session:	/* session processes */
+                case ucproctype_group:		/* group processes */
 		    rs = selection() ;
 		    n = rs ;
 		    break ;

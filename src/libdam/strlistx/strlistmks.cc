@@ -5,6 +5,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_MINMOD	1		/* ensure minimum file mode */
+#define	CF_USESBUF	1		/* use |sbuf(3uc)| */
 
 /* revision history:
 
@@ -37,31 +38,6 @@
 	>=0		OK
 	<0		error code (system-return)
 
-	Notes:
-
-	= possible returns to an open attempt
-	- OK (creating)
-	- already exists
-	- doesn't exist but is in progress
-	- exists and is in progress
-
-	= open-flags
-
-	open-flags	if DB exits	if NDB exists	returns
-	___________________________________________________________________
-
-	-		no		no		SR_OK (created)
-	-		no		yes		SR_INPROGRESS
-	-		yes		no		SR_OK
-	-		yes		yes		SR_INPROGRESS
-
-	O_CREAT|O_EXCL	no		no		SR_OK (created)
-	O_CREAT|O_EXCL	no		yes		SR_INPROGRESS
-	O_CREAT|O_EXCL	yes		no		SR_EXIST
-	O_CREAT|O_EXCL	yes		yes		SR_INPROGRESS
-
-	O_CREAT		x		x		SR_OK (created)
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -86,13 +62,16 @@
 #include	<getpwd.h>
 #include	<xperm.h>
 #include	<opentmp.h>
-#include	<hash.h>
+#include	<sbuf.h>
 #include	<sfx.h>
+#include	<snx.h>
 #include	<sncpyx.h>
 #include	<mkx.h>
 #include	<mkpathx.h>
+#include	<mknpathx.h>
 #include	<mkfnamesuf.h>
 #include	<nextpowtwo.h>
+#include	<hash.h>
 #include	<hashindex.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |MODP2| */
@@ -127,6 +106,9 @@
 
 #ifndef	CF_MINMOD
 #define	CF_MINMOD	1		/* ensure minimum file mode */
+#endif
+#ifndef	CF_USESBUF
+#define	CF_USESBUF	1		/* use |sbuf(3uc)| */
 #endif
 
 
@@ -205,16 +187,20 @@ static int strlistmks_dtor(strlistmks *op) noex {
 /* end subroutine (strlistmks_dtor) */
 
 static int	strlistmks_filesbegin(SLM *) noex ;
-static int	strlistmks_filesend(SLM *,int) noex ;
+static int	strlistmks_filesend(SLM *) noex ;
+static int	strlistmks_fexists(SLM *,char *) noex ;
+static int	strlistmks_dirok(SLM *,char *) noex ;
 
 static int	strlistmks_listbegin(SLM *,int) noex ;
 static int	strlistmks_listend(SLM *) noex ;
 
-static int	strlistmks_nfcreate(SLM *,cchar *) noex ;
-static int	strlistmks_nfcreatecheck(SLM *,cchar *,cchar *) noex ;
+static int	strlistmks_nfcreate(SLM *,char *,int) noex ;
 static int	strlistmks_nfdestroy(SLM *) noex ;
+static int	strlistmks_mknfn(SLM *,char *,int) noex ;
+
+#ifdef	COMMENT
 static int	strlistmks_nfstore(SLM *,char *) noex ;
-static int	strlistmks_fexists(SLM *) noex ;
+#endif /* COMMENT */
 
 static int	strlistmks_mkvarfile(SLM *) noex ;
 static int	strlistmks_wrvarfile(SLM *) noex ;
@@ -232,9 +218,16 @@ static sysval		pagesize(sysval_ps) ;
 
 static vars		var ;
 
+static cchar		*end = ENDIANSTR ;
+
 constexpr gid_t		gidend = -1 ;
 
+constexpr cchar		pre[] = STRLISTMKS_FSUF ;
+constexpr cchar		pat[] = "XXXXXXXX" ;
+constexpr cchar		suf[] = STRLISTMKS_FSUF ;
+
 constexpr bool		f_minmod = CF_MINMOD ;
+constexpr bool		f_usesbuf = CF_USESBUF ;
 
 
 /* exported variables */
@@ -271,7 +264,7 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 			        op->magic = STRLISTMKS_MAGIC ;
 		            }
 		            if (rs < 0) {
-			        strlistmks_filesend(op,false) ;
+			        strlistmks_filesend(op) ;
 		            }
 		        } /* end if */
 		        if (rs < 0) {
@@ -294,11 +287,9 @@ int strlistmks_close(SLM *op) noex {
 	int		rs1 ;
 	int		nvars = 0 ;
 	if ((rs = strlistmks_magic(op)) >= 0) {
-	    bool	f_remove = true ;
 	    nvars = op->nstrs ;
 	    if (! op->f.abort) {
 	        rs1 = strlistmks_mkvarfile(op) ;
-	        f_remove = (rs1 < 0) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->nfd >= 0) {
@@ -308,7 +299,6 @@ int strlistmks_close(SLM *op) noex {
 	    }
 	    {
 	        rs1 = strlistmks_listend(op) ;
-	        if (! f_remove) f_remove = (rs1 < 0) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if ((rs >= 0) && (! op->f.abort)) {
@@ -316,7 +306,7 @@ int strlistmks_close(SLM *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = strlistmks_filesend(op,f_remove) ;
+	        rs1 = strlistmks_filesend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->dbname) {
@@ -375,42 +365,17 @@ static int strlistmks_filesbegin(SLM *op) noex {
 	char		*tbuf{} ;
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
 	    cint	tlen = rs ;
-	    cchar	*dnp ;
-	    rs = SR_INVALID ;
-	    /* check that the parent directory is writable to us */
-	    if (int dnl ; (dnl = sfdirname(op->dbname,-1,&dnp)) > 0) {
-	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(dnp,dnl,&cp)) >= 0) {
-	            op->idname = cp ;
-	            if (dnl == 0) {
-	                rs = getpwd(tbuf,tlen) ;
-	                dnl = rs ;
-	            } else {
-	                rs = mkpath1w(tbuf,dnp,dnl) ;
-		    }
-	            if (rs >= 0) {
-	                cint	am = (X_OK | W_OK) ;
-	                rs = perm(tbuf,-1,-1,nullptr,am) ;
-	            }
-	            if (rs >= 0) {
-			cchar	*suf = STRLISTMKS_FSUF ;
-	                if ((rs = strlistmks_nfcreate(op,suf)) >= 0) {
-	                    if (op->f.ofcreat && op->f.ofexcl) {
-	                        rs = strlistmks_fexists(op) ;
-	                    }
-	                    if (rs < 0) {
-		                strlistmks_nfdestroy(op) ;
-		 	    }
-	                } /* end if (nfcreate) */
-	            } /* end if (ok) */
+	    if ((rs = strlistmks_fexists(op,tbuf)) >= 0) {
+	        if ((rs = strlistmks_dirok(op,tbuf)) >= 0) {
+		    rs = strlistmks_nfcreate(op,tbuf,tlen) ;
 	            if (rs < 0) {
-		        if (op->idname != nullptr) {
+		        if (op->idname) { /* from |_dirok()| */
 	    	            uc_free(op->idname) ;
 	    	            op->idname = nullptr ;
 		        }
-	            }
-	        } /* end if (memory-allocation) */
-	    } /* end if (sfdirname) */
+	            } /* end if (error) */
+	        } /* end if (strlistmks_dirok) */
+	    } /* end if (strlistmks_fexists) */
 	    rs1 = uc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -418,19 +383,12 @@ static int strlistmks_filesbegin(SLM *op) noex {
 }
 /* end subroutine (strlistmks_filesbegin) */
 
-static int strlistmks_filesend(SLM *op,int f) noex {
+static int strlistmks_filesend(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->nfname) {
-	    if (f && (op->nfname[0] != '\0')) {
-	        u_unlink(op->nfname) ;
-		op->nfname[0] = '\0' ;
-	    }
-	    {
-	        rs1 = uc_free(op->nfname) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->nfname = nullptr ;
-	    }
+	{
+	    rs1 = strlistmks_nfdestroy(op) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->idname) {
 	    rs1 = uc_free(op->idname) ;
@@ -441,133 +399,48 @@ static int strlistmks_filesend(SLM *op,int f) noex {
 }
 /* end subroutine (strlistmks_filesend) */
 
-static int strlistmks_nfcreate(SLM *op,cchar *fsuf) noex {
-	cint		rse = SR_EXIST ;
+/* check that the index-directory is writable to us */
+static int strlistmks_dirok(SLM *op,char *tbuf) noex {
+	int		rs = SR_NOTDIR ;
+	cchar		*dnp ;
+	if (int dnl ; (dnl = sfdirname(op->dbname,-1,&dnp)) > 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(dnp,dnl,&cp)) >= 0) {
+	        op->idname = cp ;
+		if ((rs = mkpath1w(tbuf,dnp,dnl)) >= 0) {
+		    cint	am = (X_OK | W_OK) ;
+		    rs = perm(tbuf,-1,-1,nullptr,am) ;
+		} /* end if (mkpath) */
+	        if (rs < 0) {
+	    	    uc_free(op->idname) ;
+	    	    op->idname = nullptr ;
+	        } /* end if (error) */
+	    } /* end if (memory-allocation) */
+	} /* end if (extracting directory) */
+	return rs ;
+}
+/* end if (strlistmks_dirok) */
+
+static int strlistmks_nfcreate(SLM *op,char *tbuf,int tlen) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
-	    cchar	*dbn = op->dbname ;
-	    cchar	*end = ENDIANSTR ;
-	    if ((rs = mkfnamesuf3(tbuf,dbn,fsuf,end,"n")) >= 0) {
-	        cint	nfl = rs ;
-	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(tbuf,nfl,&cp)) >= 0) {
-	            USTAT	sb ;
-	            cint	to_old = TO_OLDFILE ;
-		    cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
-		    cmode	om = op->om ;
-	            op->nfname = charp(cp) ;
-		    op->f.fcreated = false ;
-		    while ((rs >= 0) && (! op->f.fcreated)) {
-		        if ((rs = u_open(op->nfname,of,om)) >= 0) {
-			    op->nfd = rs ;
-			    op->f.ofcreat = true ;
-			} else if (rs == rse) {
-	    		    custime	dt = time(nullptr) ;
-	    		    if ((rs = u_stat(op->nfname,&sb)) >= 0) {
-	    	                bool	f = false ;
-	    			if ((dt - sb.st_mtime) > to_old) {
-				    u_unlink(op->nfname) ;
-				} else {
-	    			    op->f.inprogress = true ;
-	    			    f = op->f.none ;
-	    			    f = f || (op->f.ofcreat && op->f.ofexcl) ;
-	    			    rs = (f) ? SR_INPROGRESS : SR_OK ;
-				} /* end if */
-			    } else if (isNotPresent(rs)) {
-				rs = SR_OK ;
-			    } /* end if (u_stat) */
-			} /* end if (u_open) */
-		    } /* end while */
-	    	    if ((rs < 0) && op->nfname) {
-	        	uc_free(op->nfname) ;
-	        	op->nfname = nullptr ;
-	    	    }
-		} /* end if (memory-allocation of 'nfname') */
-	    } /* end if (mkfname) */
-	    rs1 = uc_free(tbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
+	if ((rs = strlistmks_mknfn(op,tbuf,tlen)) >= 0) {
+	    cint	nfl = rs ;
+	    char	*rbuf{} ;
+	    if ((rs = malloc_mp(&rbuf)) >= 0) {
+		cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
+		cmode	om = op->om ;
+	        if ((rs = opentmpfile(tbuf,of,om,rbuf)) >= 0) {
+	            if (cchar *cp ; (rs = uc_mallocstrw(tbuf,nfl,&cp)) >= 0) {
+	                op->nfname = charp(cp) ;
+		    } /* end if (memory-allocation of 'nfname') */
+	        } /* end if (opentmpfile) */
+		rs1 = uc_free(rbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (strlistmks_mknfn) */
 	return rs ;
 }
 /* end subroutine (txindexmks_nfcreate) */
-
-static int strlistmks_nfcreatecheck(SLM *op,cchar *fpre,cchar *fsuf) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	if ((op->nfd < 0) || op->f.inprogress) {
-	    cint	of = O_WRONLY | O_CREAT ;
-	    if (op->nfd >= 0) {
-		u_close(op->nfd) ;
-		op->nfd = -1 ;
-	    }
-	    if (op->f.inprogress) {
-		cint	maxname = var.maxnamelen ;
-		cint	maxpath = var.maxpathlen ;
-		int	sz = 0 ;
-		int	ai = 0 ;
-		char	*a{} ;
-		sz += (maxname + 1) ;
-		sz += ((maxpath + 1) * 2) ;
-		if ((rs = uc_malloc(sz,&a)) >= 0) {
-		    cint	clen = maxname ;
-		    cchar	pat[] = "XXXXXXXX" ;
-		    cchar	*end = ENDIANSTR ;
-		    char	*infname = (a + ((maxpath + 1) * ai++)) ;
-		    char	*outfname = (a + ((maxpath + 1) * ai++)) ;
-		    char	*cname = (a + ((maxpath + 1) * ai++)) ;
-		    outfname[0] = '\0' ;
-		    rs = sncpy(cname,clen,fpre,pat,".",fsuf,end,"n") ;
-		    if (rs >= 0) {
-		        if (op->idname && op->idname[0]) {
-		            rs = mkpath2(infname,op->idname,cname) ;
-		        } else {
-		            rs = mkpath1(infname,cname) ;
-		        }
-		    }
-		    if (rs >= 0) {
-		        rs = opentmpfile(infname,of,op->om,outfname) ;
-	                op->nfd = rs ;
-		        op->f.fcreated = (rs >= 0) ;
-		    }
-		    if (rs >= 0) {
-		        rs = strlistmks_nfstore(op,outfname) ;
-		    }
-		    if (rs < 0) {
-		        if (outfname[0] != '\0') {
-			    u_unlink(outfname) ;
-		        }
-		    }
-		    rs1 = uc_free(a) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
-	    } else {
-	        rs = u_open(op->nfname,of,op->om) ;
-	        op->nfd = rs ;
-		op->f.fcreated = (rs >= 0) ;
-	    } /* end if */
-	    if (rs < 0) {
-		if (op->nfd >= 0) {
-		    u_close(op->nfd) ;
-		    op->nfd = -1 ;
-		}
-	        if (op->nfname != nullptr) {
-		    if (op->nfname[0] != '\0') {
-			u_unlink(op->nfname) ;
-			op->nfname[0] = '\0' ;
-		    }
-		    {
-	                uc_free(op->nfname) ;
-	                op->nfname = nullptr ;
-		    }
-		}
-	    } /* end if (error-cleanup) */
-	} /* end if */
-
-	return rs ;
-}
-/* end subroutine (strlistmks_nfcreatecheck) */
 
 static int strlistmks_nfdestroy(SLM *op) noex {
 	int		rs = SR_OK ;
@@ -593,39 +466,97 @@ static int strlistmks_nfdestroy(SLM *op) noex {
 }
 /* end subroutine (strlistmks_nfdestroy) */
 
+static int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
+	int		rs ;
+	int		rs1 ;
+	int		i = 0 ;
+	if_constexpr (f_usesbuf) {
+	    sbuf	b ;
+	    if ((rs = b.start(tbuf,tlen)) >= 0) {
+		{
+		    b << op->idname ;
+		    b << '/' ;
+		    b << pre ;
+		    b << pat ;
+		    b << '.' ;
+		    b << suf ;
+		    b << end ;
+		    b << 'n' ;
+		} /* end block */
+		rs1 = b.finish ;
+		if (rs >= 0) rs = rs1 ;
+		i = rs1 ;
+	    } /* end if (sbuf) */
+	} else {
+	    rs = SR_OK ;
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,op->idname) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,"/") ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,pre) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,pat) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,".") ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,suf) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,end) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = snadd(tbuf,tlen,i,"n") ;
+	        i += rs ;
+	    }
+	} /* end if_constexpr (f_usesbuf) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (strlistmks_nfdestroy) */
+
+#ifdef	COMMENT
 static int strlistmks_nfstore(SLM *op,char *outfname) noex {
 	int		rs = SR_OK ;
-	cchar		*cp ;
+	int		rs1 ;
 	if (op->nfname) {
-	    uc_free(op->nfname) ;
+	    rs1 = uc_free(op->nfname) ;
+	    if (rs >= 0) rs = rs1 ;
 	    op->nfname = nullptr ;
 	}
-	{
-	    if ((rs = uc_mallocstrw(outfname,-1,&cp)) >= 0) {
+	if (rs >= 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(outfname,-1,&cp)) >= 0) {
 		op->nfname = charp(cp) ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (strlistmks_nfstore) */
+#endif /* COMMENT */
 
-static int strlistmks_fexists(SLM *op) noex {
+static int strlistmks_fexists(SLM *op,char *tbuf) noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
-	if (op->f.ofcreat && op->f.ofexcl && op->f.inprogress) {
-	    cchar	*suf = STRLISTMKS_FSUF ;
-	    cchar	*end = ENDIANSTR ;
-	    char	*tbuf{} ;
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
-		cchar	*dbn = op->dbname ;
-	        if ((rs = mkfnamesuf2(tbuf,dbn,suf,end)) >= 0) {
-		    USTAT	sb ;
-	            cint	rs1 = u_stat(tbuf,&sb) ;
-	            if (rs1 >= 0) rs = SR_EXIST ;
+	if (op->f.ofcreat && op->f.ofexcl) {
+	    cchar	*dbn = op->dbname ;
+	    if ((rs = mkfnamesuf2(tbuf,dbn,suf,end)) >= 0) {
+		USTAT	sb ;
+		if ((rs = u_stat(tbuf,&sb)) >= 0) {
+	            rs = SR_EXIST ;
+		} else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
 	        }
-		rs1 = uc_free(tbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	    } /* end if (mkfnamesuf) */
 	} /* end if */
 	return rs ;
 }
@@ -680,7 +611,7 @@ namespace {
 	cint		hlen = HDRBUFLEN ;
 	char		hbuf[HDRBUFLEN+1] ;
 	uint		foff = 0 ;
-	int		ps ;
+	int		ps ;		/* pagesize */
 	sub_wrvarfile(strlistmks *p) noex : op(p) { } ;
 	operator int () noex ;
 	int mkfile(rectab_t,int) noex ;
@@ -701,23 +632,20 @@ sub_wrvarfile::operator int () noex {
 	    ps = rs ;
 	    if ((rs = rectab_getvec(op->rtp,&rt)) >= 0) {
 	        cint	rtl = rs ;
-	        cchar	*suf = STRLISTMKS_FSUF ;
-	        if ((rs = strlistmks_nfcreatecheck(op,"nv",suf)) >= 0) {
-		    if ((rs = mkfile(rt,rtl)) >= 0) {
-	    	        hf.fsize = foff ;
-	    		if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
-	        	    cint	hl = rs ;
-	        	    if ((rs = u_pwrite(op->nfd,hbuf,hl,0z)) >= 0) {
-				if_constexpr (f_minmod) {
-	    			    rs = uc_fminmod(op->nfd,op->om) ;
-				} /* end if_constexpr (f_minmod) */
-	    			if ((rs >= 0) && (op->gid != gidend)) {
-				    rs = u_fchown(op->nfd,-1,op->gid) ;
-	    			}
+		if ((rs = mkfile(rt,rtl)) >= 0) {
+	    	    hf.fsize = foff ;
+	  	    if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
+	        	cint	hl = rs ;
+	        	if ((rs = u_pwrite(op->nfd,hbuf,hl,0z)) >= 0) {
+			    if_constexpr (f_minmod) {
+	    			rs = uc_fminmod(op->nfd,op->om) ;
+			    } /* end if_constexpr (f_minmod) */
+	    		    if ((rs >= 0) && (op->gid != gidend)) {
+				rs = u_fchown(op->nfd,-1,op->gid) ;
 	    		    }
-			}
-		    }
-		}
+	    		}
+		    } /* end if (strlisthdr_rd) */
+		} /* end if (mkfile) */
 	    } /* end if (rectab_getvec) */
 	} /* end if (pagesize) */
 	return rs ;
@@ -782,7 +710,7 @@ int sub_wrvarfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 		    /* make and write out the record-index table */
 	            hf.itoff = foff ;
 	            hf.itlen = itl ;
-	            sz = (itl + 1) * 3 * sizeof(int) ;
+	            sz = (itl + 1) * 3 * sizeof(uint) ;
 	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
 			memset(indtab,0,sz) ;
 	                if ((rs = strlistmks_mkind(op,kstab,indtab,itl)) >= 0) {
@@ -839,8 +767,6 @@ static int strlistmks_renamefiles(SLM *op) noex {
 	int		rs1 ;
 	char		*tbuf{} ;
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
-	    cchar	*suf = STRLISTMKS_FSUF ;
-	    cchar	*end = ENDIANSTR ;
 	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
 	        if ((rs = u_rename(op->nfname,tbuf)) >= 0) {
 	            op->nfname[0] = '\0' ;

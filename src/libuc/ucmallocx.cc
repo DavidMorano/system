@@ -76,7 +76,7 @@
 
 	Returns:
 	>=0		nominally -> strnlen(sp,sl)
-	<0		error
+	<0		error code (system-return)
 
 *******************************************************************************/
 

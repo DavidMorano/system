@@ -55,7 +55,7 @@
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
 #include	<nleadstr.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NATURAULWORDLEN| */
 
 #include	"strlist.h"
 #include	"strlisthdr.h"

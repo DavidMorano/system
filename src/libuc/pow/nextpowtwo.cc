@@ -37,13 +37,19 @@
 			value; it will be the same if the given
 			value is already at a power of two
 
+	Notes:
+	Yes, yes.  The subroutine |bit_ceil(3c++)| does not exactly
+	give the "next power of two" like the present subroutine
+	claims, but it is close enough (for government work).
+
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- |CHAR_BIT| */
 #include	<bit>			/* |countl_zero(3c++)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 #include	"nextpowtwo.h"

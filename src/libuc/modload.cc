@@ -24,15 +24,15 @@
 	attempts to load another named module.
 
 	Synopsis:
-	int modload_open(ML *op,cc *pr,cc *fn,cc *mn,int opts,cc **syms) noex
+	int modload_open(ML *op,cc *pr,cc *fn,cc *mn,int opts,mv syms) noex
 
 	Arguments:
 	op		object pointer
 	pr		program-root
-	modfn	module file-name
+	modfn		module file-name
 	modname		module name (the name inside the so-file itself)
 	opts		options
-	syms		array of symbols
+	syms		array of symbols to check for existence
 
 	Returns:
 	>=0		OK
@@ -88,6 +88,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef mainv		mv ;
+
 
 /* external subroutines */
 
@@ -105,9 +107,9 @@ struct subinfo {
 	void		*op ;
 	cchar		*pr ;
 	cchar		*modfn ;
-	cchar		**syms ;
-	SUBINFO_FL	f ;
+	mainv		syms ;
 	ids		id ;
+	SUBINFO_FL	f ;
 	int		opts ;
 } ;
 
@@ -145,7 +147,7 @@ static inline int modload_magic(modload *op,Args ... args) noex {
 
 static int	modload_objloadclose(ML *) noex ;
 
-static int	subinfo_start(SI *,ML *,cc *,cc *,int,cc **) noex ;
+static int	subinfo_start(SI *,ML *,cc *,cc *,int,mainv) noex ;
 static int	subinfo_modload(SI *) noex ;
 static int	subinfo_finish(SI *,int) noex ;
 
@@ -202,7 +204,7 @@ static constexpr cpcchar	extdirs[] = {
 
 /* exported subroutines */
 
-int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,cc **syms) noex {
+int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,mv syms) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = modload_ctor(op,modfn,modname)) >= 0) {
@@ -330,7 +332,7 @@ static int modload_objloadclose(ML *op) noex {
 /* end subroutine (modload_objloadclose) */
 
 static int subinfo_start(SI *sip,ML *op,cc *pr,cc *modfn,
-		int opts,cc **syms) noex {
+		int opts,mv syms) noex {
 	int		rs ;
 	memclear(sip) ;
 	sip->op = op ;
@@ -479,13 +481,11 @@ static int subinfo_sofindpr(SI *sip,dirseen *dsp,int dlm,cchar *pr) noex {
 static int subinfo_sofindsdirs(SI *sip,dirseen *dsp,int dlm) noex {
 	int		rs = SR_NOENT ;
 	cchar		*dirname ;
-
 	for (int i = 0 ; sysprs[i] != nullptr ; i += 1) {
 	    dirname = sysprs[i] ;
 	    rs = subinfo_sofindpr(sip,dsp,dlm,dirname) ;
 	    if ((rs >= 0) || (! isNotPresent(rs))) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (subinfo_sofindsdirs) */
@@ -552,43 +552,43 @@ static int subinfo_socheckvarc(SI *sip,dirseen *dsp,
 /* end subroutine (subinfo_sofindvarc) */
 
 static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
-	USTAT		sb ;
-	modload		*op = (ML *) sip->op ;
-	cint		am = (R_OK | X_OK) ;
-	int		rs = SR_OK ;
-	int		i ;
-	cchar		*ldnp ;
-	char		subdname[MAXPATHLEN + 1] ;
-
-	if (dsp == nullptr) return SR_FAULT ;
-
-	op->sop = nullptr ;
-	for (i = 0 ; extdirs[i] != nullptr ; i += 1) {
-	    ldnp = ldname ;
-	    if (extdirs[i][0] != '\0') {
-	        ldnp = subdname ;
-	        rs = mkpath2(subdname,ldname,extdirs[i]) ;
-	    }
-	    if (rs >= 0) {
-	        if ((rs = u_stat(ldnp,&sb)) >= 0) {
-	            if (S_ISDIR(sb.st_mode)) {
-			ids	*idp = &sip->id ;
-			if ((rs = sperm(idp,&sb,am)) >= 0) {
-		   	    rs = subinfo_socheckliber(sip,dsp,ldnp,dlm) ;
-			} else if (isNotPresent(rs)) {
-	    		    dirseen_add(dsp,ldnp,-1,&sb) ;
-			    rs = SR_OK ;
+	int		rs = SR_FAULT ;
+	if (dsp) {
+	    USTAT		sb ;
+	    modload		*op = (ML *) sip->op ;
+	    cint		am = (R_OK | X_OK) ;
+	    cchar		*ldnp ;
+	    char		subdname[MAXPATHLEN + 1] ;
+	    rs = SR_OK ;
+	    op->sop = nullptr ;
+	    for (int i = 0 ; extdirs[i] != nullptr ; i += 1) {
+	        ldnp = ldname ;
+	        if (extdirs[i][0] != '\0') {
+	            ldnp = subdname ;
+	            rs = mkpath2(subdname,ldname,extdirs[i]) ;
+	        }
+	        if (rs >= 0) {
+	            if ((rs = u_stat(ldnp,&sb)) >= 0) {
+	                if (S_ISDIR(sb.st_mode)) {
+			    ids		*idp = &sip->id ;
+			    if ((rs = sperm(idp,&sb,am)) >= 0) {
+		   	        rs = subinfo_socheckliber(sip,dsp,ldnp,dlm) ;
+			    } else if (isNotPresent(rs)) {
+	    		        dirseen_add(dsp,ldnp,-1,&sb) ;
+			        rs = SR_OK ;
+			    }
+		        } else {
+			    rs = SR_NOTDIR ;
 			}
-		    } else
-			rs = SR_NOTDIR ;
-		} else if (isNotPresent(rs)) {
-		    rs = SR_OK ;
-		}
-	    } /* end if (ok) */
-	    if (op->sop != nullptr) break ;
-	    if (rs < 0) break ;
-	} /* end for (extdirs) */
-	if ((rs >= 0) && (op->sop == nullptr)) rs = SR_LIBACC ;
+		    } else if (isNotPresent(rs)) {
+		        rs = SR_OK ;
+		    }
+	        } /* end if (ok) */
+	        if (op->sop != nullptr) break ;
+	        if (rs < 0) break ;
+	    } /* end for (extdirs) */
+	    if ((rs >= 0) && (op->sop == nullptr)) rs = SR_LIBACC ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_sochecklib) */
@@ -638,19 +638,17 @@ static int subinfo_socheckliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 
 static int subinfo_sotest(SI *sip) noex {
 	modload		*op = (ML *) sip->op ;
-	int		rs = SR_NOTFOUND ;
-	void		*vp ;
-
-	if (op->sop == nullptr) return SR_FAULT ;
-
-	if ((vp = dlsym(op->sop,op->modname)) != nullptr) {
-	    MODLOAD_MI	*mip = (MODLOAD_MI *) vp ;
-	    op->midp = mip ;
-	    if (strcmp(mip->name,op->modname) == 0) {
-		rs = SR_OK ;
-	    }
-	} /* end if */
-
+	int		rs = SR_FAULT ;
+	if (op->sop) {
+	    rs = SR_NOTFOUND ;
+	    if (void *vp ; (vp = dlsym(op->sop,op->modname)) != nullptr) {
+	        MODLOAD_MI	*mip = (MODLOAD_MI *) vp ;
+	        op->midp = mip ;
+	        if (strcmp(mip->name,op->modname) == 0) {
+		    rs = SR_OK ;
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_sotest) */
