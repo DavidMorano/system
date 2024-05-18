@@ -7,12 +7,36 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
-	Originally written for Rightcore Network Services.
+	= 2003-03-04, David A.D. Morano
+	This was written from scratch.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Names:
+	logbasef
+	logbase
+	logbasel
+
+	Description:
+	Find the log-base-(b) of a number (v).
+
+	Synopsis:
+	float		logbase(float b,float v) noex
+	double		logbase(double b,double v) noex
+	long double	logbase(long double b,long double v) noex
+
+	Arguments:
+	b		base
+	v		number to take the log-base-(b) of
+
+	Returns:
+	-		result
+
+*******************************************************************************/
 
 #ifndef	LOGBASE_INCLUDE
 #define	LOGBASE_INCLUDE

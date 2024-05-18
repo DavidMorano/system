@@ -69,7 +69,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| + |UINT_MAX| */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -241,7 +241,7 @@ constexpr bool		f_minmod = CF_MINMOD ;
 
 STRLISTMKS_OBJ	strlistmks_mod = {
 	"strlistmks",
-	sizeof(STRLISTMKS)
+	sizeof(strlistmks)
 } ;
 
 
@@ -294,7 +294,7 @@ int strlistmks_close(SLM *op) noex {
 	int		rs1 ;
 	int		nvars = 0 ;
 	if ((rs = strlistmks_magic(op)) >= 0) {
-	    int		f_remove = true ;
+	    bool	f_remove = true ;
 	    nvars = op->nstrs ;
 	    if (! op->f.abort) {
 	        rs1 = strlistmks_mkvarfile(op) ;
@@ -393,7 +393,8 @@ static int strlistmks_filesbegin(SLM *op) noex {
 	                rs = perm(tbuf,-1,-1,nullptr,am) ;
 	            }
 	            if (rs >= 0) {
-	                if ((rs = strlistmks_nfcreate(op,STRLISTMKS_FSUF)) >= 0) {
+			cchar	*suf = STRLISTMKS_FSUF ;
+	                if ((rs = strlistmks_nfcreate(op,suf)) >= 0) {
 	                    if (op->f.ofcreat && op->f.ofexcl) {
 	                        rs = strlistmks_fexists(op) ;
 	                    }
@@ -838,8 +839,9 @@ static int strlistmks_renamefiles(SLM *op) noex {
 	int		rs1 ;
 	char		*tbuf{} ;
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    cchar	*suf = STRLISTMKS_FSUF ;
 	    cchar	*end = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(tbuf,op->dbname,STRLISTMKS_FSUF,end)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
 	        if ((rs = u_rename(op->nfname,tbuf)) >= 0) {
 	            op->nfname[0] = '\0' ;
 		}

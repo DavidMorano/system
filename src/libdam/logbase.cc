@@ -16,14 +16,18 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
+	logbasef
 	logbase
+	logbasel
 
 	Description:
 	Find the log-base-(b) of a number (v).
 
 	Synopsis:
-	double logbase(double b,double v) noex
+	float		logbase(float b,float v) noex
+	double		logbase(double b,double v) noex
+	long double	logbase(long double b,long double v) noex
 
 	Arguments:
 	b		base
@@ -58,30 +62,35 @@
 
 /* forward references */
 
+template<typename T>
+T logbasex(T b,T v) noex {
+	const T		n = log(v) ;
+	const T		d = log(b) ;
+	return (n / d) ;
+}
+/* end subroutine-template (logbasef) */
+
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-float		logbasef(float b,float v) noex {
-	const float	n = log(v) ;
-	const float	d = log(b) ;
-	return (n / d) ;
+float logbasef(float b,float v) noex {
+	return logbasex(b,v) ;
 }
 /* end subroutine (logbasef) */
 
 double logbase(double b,double v) noex {
-	const double	n = log(v) ;
-	const double	d = log(b) ;
-	return (n / d) ;
+	return logbasex(b,v) ;
 }
 /* end subroutine (logbase) */
 
 long double logbasel(long double b,long double v) noex {
-	const long double	n = log(v) ;
-	const long double	d = log(b) ;
-	return (n / d) ;
+	return logbasex(b,v) ;
 }
 /* end subroutine (logbasel) */
 
