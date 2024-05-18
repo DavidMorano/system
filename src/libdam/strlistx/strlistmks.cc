@@ -202,8 +202,8 @@ static int	strlistmks_mknfn(SLM *,char *,int) noex ;
 static int	strlistmks_nfstore(SLM *,char *) noex ;
 #endif /* COMMENT */
 
-static int	strlistmks_mkvarfile(SLM *) noex ;
-static int	strlistmks_wrvarfile(SLM *) noex ;
+static int	strlistmks_mksfile(SLM *) noex ;
+static int	strlistmks_wrsfile(SLM *) noex ;
 static int	strlistmks_mkind(SLM *,char *,uint (*)[3],int) noex ;
 static int	strlistmks_renamefiles(SLM *) noex ;
 
@@ -222,9 +222,12 @@ static cchar		*end = ENDIANSTR ;
 
 constexpr gid_t		gidend = -1 ;
 
+constexpr int		maglen = STRLISTMKS_MAGICSIZE ;
+
 constexpr cchar		pre[] = STRLISTMKS_FSUF ;
 constexpr cchar		pat[] = "XXXXXXXX" ;
 constexpr cchar		suf[] = STRLISTMKS_FSUF ;
+constexpr cchar		magstr[] = STRLISTMKS_MAGICSTR ;
 
 constexpr bool		f_minmod = CF_MINMOD ;
 constexpr bool		f_usesbuf = CF_USESBUF ;
@@ -289,7 +292,7 @@ int strlistmks_close(SLM *op) noex {
 	if ((rs = strlistmks_magic(op)) >= 0) {
 	    nvars = op->nstrs ;
 	    if (! op->f.abort) {
-	        rs1 = strlistmks_mkvarfile(op) ;
+	        rs1 = strlistmks_mksfile(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->nfd >= 0) {
@@ -430,7 +433,7 @@ static int strlistmks_nfcreate(SLM *op,char *tbuf,int tlen) noex {
 		cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
 		cmode	om = op->om ;
 	        if ((rs = opentmpfile(tbuf,of,om,rbuf)) >= 0) {
-	            if (cchar *cp ; (rs = uc_mallocstrw(tbuf,nfl,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = uc_mallocstrw(rbuf,nfl,&cp)) >= 0) {
 	                op->nfname = charp(cp) ;
 		    } /* end if (memory-allocation of 'nfname') */
 	        } /* end if (opentmpfile) */
@@ -590,21 +593,21 @@ static int strlistmks_listend(SLM *op) noex {
 }
 /* end subroutine (strlistmks_listend) */
 
-static int strlistmks_mkvarfile(SLM *op) noex {
+static int strlistmks_mksfile(SLM *op) noex {
 	cint		rtl = rectab_done(op->rtp) ;
 	int		rs = SR_BUGCHECK ;
 	int		nstrs = 0 ;
 	if (rtl == (op->nstrs + 1)) {
-	    if ((rs = strlistmks_wrvarfile(op)) >= 0) {
+	    if ((rs = strlistmks_wrsfile(op)) >= 0) {
 		nstrs = op->nstrs ;
 	    }
 	}
 	return (rs >= 0) ? nstrs : rs ;
 }
-/* end subroutine (strlistmks_mkvarfile) */
+/* end subroutine (strlistmks_mksfile) */
 
 namespace {
-    struct sub_wrvarfile {
+    struct sub_wrsfile {
 	strlistmks	*op ;
 	strlisthdr	hf{} ;
 	custime		dt = time(nullptr) ;
@@ -612,20 +615,20 @@ namespace {
 	char		hbuf[HDRBUFLEN+1] ;
 	uint		foff = 0 ;
 	int		ps ;		/* pagesize */
-	sub_wrvarfile(strlistmks *p) noex : op(p) { } ;
+	sub_wrsfile(strlistmks *p) noex : op(p) { } ;
 	operator int () noex ;
 	int mkfile(rectab_t,int) noex ;
 	int mkkstab(filer *,int,int) noex ;
     } ;
 }
 
-static int strlistmks_wrvarfile(SLM *op) noex {
-	sub_wrvarfile	wrf(op) ;
+static int strlistmks_wrsfile(SLM *op) noex {
+	sub_wrsfile	wrf(op) ;
 	return wrf ;
 }
-/* end subroutine (strlistmks_wrvarfile) */
+/* end subroutine (strlistmks_wrsfile) */
 
-sub_wrvarfile::operator int () noex {
+sub_wrsfile::operator int () noex {
 	int		rs ;
 	if ((rs = pagesize) >= 0) {
 	    rectab_t	rt ;
@@ -635,8 +638,9 @@ sub_wrvarfile::operator int () noex {
 		if ((rs = mkfile(rt,rtl)) >= 0) {
 	    	    hf.fsize = foff ;
 	  	    if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
+			coff	moff = STRLISTHDR_MAGICSIZE ;
 	        	cint	hl = rs ;
-	        	if ((rs = u_pwrite(op->nfd,hbuf,hl,0z)) >= 0) {
+	        	if ((rs = u_pwrite(op->nfd,hbuf,hl,moff)) >= 0) {
 			    if_constexpr (f_minmod) {
 	    			rs = uc_fminmod(op->nfd,op->om) ;
 			    } /* end if_constexpr (f_minmod) */
@@ -650,52 +654,58 @@ sub_wrvarfile::operator int () noex {
 	} /* end if (pagesize) */
 	return rs ;
 }
-/* end method (sub_wrvarfile::operator) */ 
+/* end method (sub_wrsfile::operator) */ 
 
-int sub_wrvarfile::mkfile(rectab_t rt,int rtl) noex {
-	filer		varfile ;
+int sub_wrsfile::mkfile(rectab_t rt,int rtl) noex {
+	filer		sfile, *sfp = &sfile ;
 	int		rs ;
 	int		rs1 ;
 	int		sz = (ps * 4) ;
-	op->f.viopen = true ;
-	if ((rs = filer_start(&varfile,op->nfd,0,sz,0)) >= 0) {
-	    /* prepare the file-header */
-	    hf.vetu[0] = STRLISTMKS_VERSION ;
-	    hf.vetu[1] = ENDIAN ;
-	    hf.vetu[2] = 0 ;
-	    hf.vetu[3] = 0 ;
-	    hf.wtime = uint(dt) ;
-	    hf.nstrs = op->nstrs ;
-	    hf.nskip = STRLISTMKS_NSKIP ;
-	    if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
-		int	hl = rs ;
-	        if ((rs = filer_writefill(&varfile,hbuf,hl)) >= 0) {
-	    	    foff += rs ;
-	            /* write the record table */
-	            hf.rtoff = foff ;
-	            hf.rtlen = rtl ;
-	            sz = (rtl + 1) * sizeof(uint) ;
-	            if ((rs = filer_write(&varfile,rt,sz)) >= 0) {
-			strtab	*ksp = op->stp ;
-	                foff += rs ;
-		        /* make and write out key-string table */
-			if ((rs = strtab_strsize(ksp)) >= 0) {
-			    cint	sz = rs ;
-			    hf.stoff = foff ;
-			    hf.stlen = sz ;
-			    rs = mkkstab(&varfile,rtl,sz) ;
-			}
-		    } /* end if (filer_write) */
-		} /* end if (filer_writefill) */
-	    } /* end if (strlisthdr_rd) */
-	    rs1 = filer_finish(&varfile) ;
+	if ((rs = filer_start(sfp,op->nfd,0,sz,0)) >= 0) {
+	    cint	mlen = maglen ;
+	    char	mbuf[maglen + 1] ;
+	    if ((rs = mkmagic(mbuf,mlen,magstr)) >= 0) {
+		foff += rs ;
+		if ((rs = filer_write(sfp,mbuf,rs)) >= 0) {
+	            /* prepare the file-header */
+	            hf.vetu[0] = STRLISTMKS_VERSION ;
+	            hf.vetu[1] = ENDIAN ;
+	            hf.vetu[2] = 0 ;
+	            hf.vetu[3] = 0 ;
+	            hf.wtime = uint(dt) ;
+	            hf.nstrs = op->nstrs ;
+	            hf.nskip = STRLISTMKS_NSKIP ;
+	            if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
+		        cint	hl = rs ;
+	                if ((rs = filer_writefill(sfp,hbuf,hl)) >= 0) {
+	    	            foff += rs ;
+	                    /* write the record table */
+	                    hf.rtoff = foff ;
+	                    hf.rtlen = rtl ;
+	                    sz = (rtl + 1) * sizeof(uint) ;
+	                    if ((rs = filer_write(sfp,rt,sz)) >= 0) {
+			        strtab	*ksp = op->stp ;
+	                        foff += rs ;
+		                /* make and write out key-string table */
+			        if ((rs = strtab_strsize(ksp)) >= 0) {
+			            cint	sz = rs ;
+			            hf.stoff = foff ;
+			            hf.stlen = sz ;
+			            rs = mkkstab(sfp,rtl,sz) ;
+			        }
+		            } /* end if (filer_write) */
+		        } /* end if (filer_writefill) */
+	            } /* end if (strlisthdr_rd) */
+		} /* end if */
+	    } /* end if (mkmagic) */
+	    rs1 = filer_finish(sfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return rs ;
 }
-/* end subroutine (sub_wrvarfile::mkfile) */
+/* end subroutine (sub_wrsfile::mkfile) */
 
-int sub_wrvarfile::mkkstab(filer *vfp,int rtl,int sz) noex {
+int sub_wrsfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 	int		rs ;
 	int		rs1 ;
 	char		*kstab{} ;
@@ -727,7 +737,7 @@ int sub_wrvarfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 	} /* end if (key-string table) */
 	return rs ;
 }
-/* end subroutine (sub_wrvarfile::mkkstab) */
+/* end subroutine (sub_wrsfile::mkkstab) */
 
 int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 	rectab_t	rt ;
