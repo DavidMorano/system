@@ -1,35 +1,34 @@
-/* vpred */
+/* vpred HEADER */
+/* lang=C20 */
 
 
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
 
 #ifndef	VPRED_INCLUDE
-#define	VPRED_INCLUDE	1
+#define	VPRED_INCLUDE
 
 
-#include	<sys/types.h>
-#include	<time.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
-
-
-
-/* object defines */
 
 #define	VPRED			struct vpred_head
 #define	VPRED_ENT		struct vpred_ent
 #define	VPRED_STATS		struct vpred_stats
 
-
 /* more important defines */
-
 #define	VPRED_NOPS		5	/* number of operands */
 #define	VPRED_COUNTBITS		2	/* counter bits */
 
 
-
-
-
-/* statistics */
 struct vpred_stats {
 	ULONG	in_lu, in_hit ;
 	ULONG	in_up, in_update, in_replace ;
@@ -52,9 +51,9 @@ struct vpred_ent {
 } ;
 
 struct vpred_head {
-	unsigned long		magic ;
 	struct vpred_ent	*table ;
 	struct vpred_stats	s ;		/* statistics */
+	uint			magic ;
 	uint			tablen ;
 	uint			tagshift ;
 	uint			ncount ;	/* number of states */
@@ -62,9 +61,7 @@ struct vpred_head {
 	int			nops ;
 } ;
 
-
-
-#if	(! defined(VPRED_MASTER)) || (VPRED_MASTER == 0)
+EXTERNC_begin
 
 extern int	vpred_init(VPRED *,int,int,int) ;
 extern int	vpred_lookup(VPRED *,uint,uint *,int) ;
@@ -73,10 +70,9 @@ extern int	vpred_zerostats(VPRED *) ;
 extern int	vpred_stats(VPRED *,VPRED_STATS *) ;
 extern int	vpred_free(VPRED *) ;
 
-#endif /* VPRED_MASTER */
+EXTERNC_end
 
 
 #endif /* VPRED_INCLUDE */
-
 
 

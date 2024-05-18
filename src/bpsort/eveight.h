@@ -1,4 +1,5 @@
-/* eveight */
+/* eveight HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,14 +11,14 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	EVEIGHT_INCLUDE
-#define	EVEIGHT_INCLUDE	1
+#define	EVEIGHT_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<time.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -29,7 +30,6 @@
 #define	EVEIGHT_COUNTBITS	2	/* counter bits */
 
 
-/* statistics */
 struct eveight_stats {
 	uint		tlen ;
 	uint		bits ;
@@ -43,16 +43,15 @@ struct eveight_banks {
 } ;
 
 struct eveight_head {
-	unsigned long		magic ;
 	struct eveight_stats	s ;
 	struct eveight_banks	*table ;
+	uint			magic ;
 	uint			bhistory ;	/* global branch history */
 	uint			tlen ;
 	uint			tmask ;
 } ;
 
-
-#if	(! defined(EVEIGHT_MASTER)) || (EVEIGHT_MASTER == 0)
+EXTERNC_begin
 
 extern int	eveight_init(EVEIGHT *,int,int,int,int) ;
 extern int	eveight_lookup(EVEIGHT *,uint) ;
@@ -62,7 +61,8 @@ extern int	eveight_zerostats(EVEIGHT *) ;
 extern int	eveight_stats(EVEIGHT *,EVEIGHT_STATS *) ;
 extern int	eveight_free(EVEIGHT *) ;
 
-#endif /* EVEIGHT_MASTER */
+EXTERNC_end
+
 
 #endif /* EVEIGHT_INCLUDE */
 

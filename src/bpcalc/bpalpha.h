@@ -1,4 +1,5 @@
-/* bpalpha */
+/* bpalpha HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,13 +11,14 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	BPALPHA_INCLUDE
-#define	BPALPHA_INCLUDE	1
+#define	BPALPHA_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -25,7 +27,6 @@
 #define	BPALPHA_STATS		struct bpalpha_stats
 
 
-/* statistics */
 struct bpalpha_stats {
 	uint			gpht ;		/* global length */
 	uint			lbht ;		/* local history length */
@@ -34,12 +35,12 @@ struct bpalpha_stats {
 } ;
 
 struct bpalpha_head {
-	unsigned long		magic ;
 	struct bpalpha_stats	s ;
 	uint			*lbht ;		/* local BHT */
 	uchar			*lpht ;		/* local PHT */
 	uchar			*cpht ;		/* choice PHT */
 	uchar			*gpht ;		/* global PHT */
+	uint			magic ;
 	uint			bhistory ;	/* global branch history */
 	uint			lhlen ;		/* local history length */
 	uint			lplen ;		/* local pattern length */
@@ -47,8 +48,7 @@ struct bpalpha_head {
 	uint			historymask ;
 } ;
 
-
-#if	(! defined(BPALPHA_MASTER)) || (BPALPHA_MASTER == 0)
+EXTERNC_begin
 
 extern int	bpalpha_init(BPALPHA *,int,int,int) ;
 extern int	bpalpha_lookup(BPALPHA *,uint) ;
@@ -58,7 +58,8 @@ extern int	bpalpha_zerostats(BPALPHA *) ;
 extern int	bpalpha_stats(BPALPHA *,BPALPHA_STATS *) ;
 extern int	bpalpha_free(BPALPHA *) ;
 
-#endif /* BPALPHA_MASTER */
+EXTERNC_end
+
 
 #endif /* BPALPHA_INCLUDE */
 
