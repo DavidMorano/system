@@ -41,6 +41,7 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<ucvariables.hh>
+#include	<getsysname.h>
 #include	<sfx.h>
 #include	<matxstr.h>
 #include	<strwcmp.h>

@@ -1123,6 +1123,7 @@ digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
 getxid.o:		getxid.cc getxid.h
 getngroups.o:		getngroups.cc getngroups.h
+getsysname.o:		getsysname.cc getsysname.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h
 getuserorg.o:		getuserorg.cc getuserorg.h
