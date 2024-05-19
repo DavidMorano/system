@@ -40,9 +40,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<toxc.h>
 #include	<mkchar.h>
 #include	<nleadstr.h>
 
@@ -56,6 +57,9 @@
 
 
 /* local typedefs */
+
+
+/* local variables */
 
 
 /* external subroutines */
@@ -85,5 +89,28 @@ int strwcmpx(cchar *s1,cchar *s2,int s2len) noex {
 	return rc ;
 }
 /* end subroutine (strwcmpx) */
+
+int strwcasecmpx(cchar *s1,cchar *s2,int s2len) noex {
+	int		rc = tolc(s1[0]) ;
+	if (s2len < 0) s2len = strlen(s2) ;
+	if (s2len > 0) {
+	    cint	ch1 = tolc(*s1) ;
+	    cint	ch2 = tolc(*s2) ;
+	    if ((rc = (ch1 - ch2)) == 0) {
+	        if ((rc = strncasecmp(s1,s2,s2len)) == 0) {
+	            cint	m = nleadcasestr(s1,s2,s2len) ;
+	            if (m < s2len) {
+	    	        cint	m1 = tolc(s1[m]) ;
+	    	        cint	m2 = tolc(s2[m]) ;
+		        rc = (m1 - m2) ;
+		    } else {
+		        rc = tolc(s1[m]) ;
+		    }
+		}
+	    }
+	}
+	return rc ;
+}
+/* end subroutine (strwcasecmpx) */
 
 

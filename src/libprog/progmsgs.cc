@@ -328,7 +328,7 @@ static cchar	*hdrspecials[] = {
 int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 	PROCDATA	pd, *pdp = &pd ;
 	BFLINER		*blp ;
-	off_t	boff ;
+	off_t		boff ;
 	cint		llen = MSGLINELEN ;
 	int		rs ;
 	int		vi ;

@@ -76,6 +76,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<nleadstr.h>
 #include	<toxc.h>
 #include	<localmisc.h>

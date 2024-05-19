@@ -332,7 +332,7 @@ UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
-UOBJ08= strkeycmp.o strwcmp.o
+UOBJ08= strkeycmp.o
 UOBJ09= readln.o ccfile.o
 UOBJ10= cfx.o sncpyx.o sncpyxc.o sncpyxw.o
 UOBJ11= strmgr.o strop.o field.o
@@ -1137,7 +1137,7 @@ inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
 strenv.o:		strenv.cc strenv.hh
-strwcpy.o:		strwcmp.cc strwcmp.h
+strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h

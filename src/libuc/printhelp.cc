@@ -202,7 +202,7 @@ int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
 	if (osp && pr && sn) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && sn[0]) {
-		static int	rsv = mkvars() ;
+		static cint	rsv = mkvars() ;
 		if ((rs = rsv) >= 0) {
 	            if (fn[0] != '/') {
 		        rs = printhelper(osp,pr,sn,fn) ;

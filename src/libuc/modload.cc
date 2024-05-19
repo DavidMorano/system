@@ -230,7 +230,7 @@ int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,mv syms) noex {
 	if ((rs = modload_ctor(op,modfn,modname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (modfn[0] && modname[0]) {
-		static int	rsv = mkvars() ;
+		static cint	rsv = mkvars() ;
 		if ((rs = rsv) >= 0) {
 	            SUBINFO	si ;
 	            op->modname = modname ;

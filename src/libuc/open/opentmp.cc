@@ -546,7 +546,7 @@ static int substr(char *dp,int dl,ulong rv) noex {
 /* end subroutine (substr) */
 
 static int mkvarsx() noex {
-	static int	rsv = mkvars() ;
+	static cint	rsv = mkvars() ;
 	return rsv ;
 }
 /* end subroutine (mkvarsx) */

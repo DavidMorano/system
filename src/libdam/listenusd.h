@@ -31,8 +31,8 @@
 
 *******************************************************************************/
 
-#ifndef	LISTEMUSD_INCLUDE
-#define	LISTEMUSD_INCLUDE
+#ifndef	LISTENUSD_INCLUDE
+#define	LISTENUSD_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -49,6 +49,6 @@ extern int	listenusd(cchar *,mode_t,int) noex ;
 EXTERNC_end
 
 
-#endif /* LISTEMUSD_INCLUDE */
+#endif /* LISTENUSD_INCLUDE */
 
 

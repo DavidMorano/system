@@ -19,16 +19,38 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
 
 extern int strwcmpx(cchar *,cchar *,int) noex ;
+extern int strwcasecmpx(cchar *,cchar *,int) noex ;
 
 static inline int strwcmp(cchar *bs,cchar *sp,int sl) noex {
 	return strwcmpx(bs,sp,sl) ;
+}
+static inline int strwbasecmp(cchar *bs,cchar *sp,int sl) noex {
+	return strwcmpx(bs,sp,sl) ;
+}
+static inline int strwcasecmp(cchar *bs,cchar *sp,int sl) noex {
+	return strwcasecmpx(bs,sp,sl) ;
+}
+
+static inline int strwbasecmpo(cchar *s1,cchar *s2,int len) noex {
+	return strwcmpx(s1,s2,len) ;
+}
+static inline int strwbasecmpr(cchar *s1,cchar *s2,int len) noex {
+	return strwcmpx(s2,s1,len) ;
+}
+
+static inline int strwcasecmpo(cchar *s1,cchar *s2,int len) noex {
+	return strwcasecmpx(s1,s2,len) ;
+}
+static inline int strwcasecmpr(cchar *s1,cchar *s2,int len) noex {
+	return strwcasecmpx(s2,s1,len) ;
 }
 
 EXTERNC_end

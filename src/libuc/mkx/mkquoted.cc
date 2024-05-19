@@ -126,7 +126,7 @@ static char		qterms[termsize] ;
 int mkquoted(char *qbuf,int qlen,cchar *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	if (qbuf && abuf) {
-	    static int	srs = fieldterms(qterms,false,qchars) ;
+	    static cint		srs = fieldterms(qterms,false,qchars) ;
 	    if ((rs = srs) >= 0) {
 	        quoter	q(qbuf,qlen,abuf,alen) ;
 	        rs = q ;

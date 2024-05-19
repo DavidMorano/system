@@ -226,7 +226,7 @@ static vars		var ;
 /* exported subroutines */
 
 int grmems_start(grmems *op,int nmax,int ttl) noex {
-	static int	rsv = mkvars() ;
+	static cint	rsv = mkvars() ;
 	int		rs ;
 	if (nmax < GRMEMS_DEFMAX) nmax = GRMEMS_DEFMAX ;
 	if (ttl < GRMEMS_DEFTTL) ttl = GRMEMS_DEFTTL ;

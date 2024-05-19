@@ -78,6 +78,7 @@
 #include	<getnodename.h>
 #include	<getusername.h>
 #include	<getprojname.h>		/* |getprojname(3uc)| */
+#include	<getostype.h>
 #include	<userattrdb.h>
 #include	<getax.h>
 #include	<gecos.h>
@@ -99,14 +100,6 @@
 
 
 /* local defines */
-
-#undef	USERINFO_SYSV
-#if	defined(SYSV)||(defined(OSTYPE_SYSV)&&(OSTYPE_SYSV>0))\
-	    ||defined(OSNAME_SunOS)&&(OSNAME_SunOS==1)
-#define	USERINFO_SYSV 	1
-#else
-#define	USERINFO_SYSV 	0
-#endif
 
 #if	CF_UCPWCACHE
 #define	GETPW_NAME	ucpwcache_name
@@ -404,11 +397,6 @@ static int	checknul(cchar *,cchar **) noex ;
 static int	empty(cchar *) noex ;
 #endif
 
-#if	USERINFO_SYSV
-#else
-static int	getostype() noex ;
-#endif
-
 static int	mkvars() noex ;
 
 
@@ -444,9 +432,9 @@ static constexpr int	(*components[])(PROCINFO *) = {
 	nullptr
 } ;
 
-constexpr bool		f_sysv = USERINFO_SYSV ;
-
 static vars		var ;
+
+constexpr bool		f_sysv = USERINFO_SYSV ;
 
 
 /* exported variables */
@@ -1686,35 +1674,6 @@ static int empty(cchar *cp) noex {
 }
 /* end subroutine (empty) */
 #endif /* COMMENT */
-
-#if	USERINFO_SYSV
-#else /* USERINFO_SYSV */
-static int getostype() noex {
-	int		rc = -1 ;
-	cchar		*cp ;
-/* first try straight-out (fastest) */
-	if ((cp = getenv(VAROSTYPE)) != nullptr) {
-	    rc = (strcasecmp(cp,"SYSV") == 0) ;
-	}
-/* next try checking if the OS name and number mean something (pretty fast) */
-	if ((rc < 0) && ((cp = getenv(VAROSNAME)) != nullptr)) {
-	    int		v ;
-	    if ((strcmp(cp,"SunOS") == 0) &&
-	        ((cp = getenv(VAROSNUM)) != nullptr)) {
-
-	        if (cfdeci(cp,-1,&v) >= 0) {
-	            rc = (v >= 5) ;
-		}
-	    } /* end if */
-	} /* end if (check for "SunOS") */
-/* finally (if necessary) |stat(2)| the i-node (slow disk access) */
-	if (rc < 0) {
-	    rc = (u_access(SBINDNAME,X_OK) >= 0) ;
-	}
-	return (rc >= 0) ? rc : false ;
-}
-/* end subroutine (getostype) */
-#endif /* USERINFO_SYSV */
 
 #if	CF_OLDUSERINFO
 int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {

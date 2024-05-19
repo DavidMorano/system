@@ -41,8 +41,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<nleadkeystr.h>
 #include	<strkeycmp.h>
 #include	<localmisc.h>

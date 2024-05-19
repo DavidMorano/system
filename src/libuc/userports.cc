@@ -225,7 +225,7 @@ int userports_open(UP *op,cchar *fname) noex {
 	    fname = USERPORTS_FNAME ;
 	}
 	if ((rs = userports_ctor(op)) >= 0) {
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 		rs = userports_opener(op,fname) ;
 	    }

@@ -1,7 +1,7 @@
-/* listenusd HEADER */
+/* getostype HEADER */
 /* lang=C20 */
 
-/* Listen-on-UNIX-Socket-Datagram */
+/* get the type of operating system we are on */
 /* version %I% last-modified %G% */
 
 
@@ -16,39 +16,35 @@
 
 /*******************************************************************************
 
-	Names:
-	listenusd
-
-	Description:
-	Listen on a UNIX® datagram socket.
-
-	Synopsis:
-
-	Arguments:
-
-	Returns:
-	-		result
+	Retrieve the type of operating system.
 
 *******************************************************************************/
 
-#ifndef	LISTENUSD_INCLUDE
-#define	LISTENUSD_INCLUDE
+#ifndef	GETOSTYPE_INCLUDE
+#define	GETOSTYPE_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
 
+enum ostypes {
+	ostype_bsd,
+	ostype_sysv,
+	ostype_linux,
+	ostype_overlast
+} ;
+
+
 EXTERNC_begin
 
-extern int	listenusd(cchar *,mode_t,int) noex ;
+extern int	getostype() noex ;
 
 EXTERNC_end
 
 
-#endif /* LISTENUSD_INCLUDE */
+#endif /* GETOSTYPE_INCLUDE */
 
 

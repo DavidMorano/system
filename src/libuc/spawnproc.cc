@@ -216,7 +216,7 @@ static constexpr cchar	nullfname[] = NULLFNAME ;
 /* exported subroutines */
 
 int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
-	static int	rsv = mkvars() ;
+	static cint	rsv = mkvars() ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pid = 0 ;
