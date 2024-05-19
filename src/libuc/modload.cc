@@ -55,6 +55,7 @@
 #include	<getnodename.h>		/* |getnodedomain(3uc)| */
 #include	<ids.h>
 #include	<dirseen.h>
+#include	<snx.h>
 #include	<pathclean.h>
 #include	<mkpathx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
@@ -170,8 +171,8 @@ static int	subinfo_sofindpr(SI *,dirseen *,int,cchar *) noex ;
 static int	subinfo_sofindvar(SI *,dirseen *,int) noex ;
 static int	subinfo_socheckvarc(SI *,dirseen *,cchar *,int,int) noex ;
 static int	subinfo_sochecklib(SI *,dirseen *,cchar *,int) noex ;
-static int	subinfo_sochliber(SI *,dirseen *,cchar *,int) noex ;
-static int	subinfo_sotest(SI *) noex ;
+static int	subinfo_sockliber(SI *,dirseen *,cchar *,int) noex ;
+static int	subinfo_sotest(SI *,char *,int) noex ;
 static int	subinfo_checksyms(SI *) noex ;
 
 static int	mkvars() noex ;
@@ -212,6 +213,8 @@ constexpr cpcchar	extdirs[] = {
 } ;
 
 static vars		var ;
+
+constexpr cchar		symsuf[] = "_mod" ;
 
 constexpr bool		f_darwin = F_DARWIN ;
 
@@ -597,9 +600,9 @@ static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
 	            if (rs >= 0) {
 	                if ((rs = u_stat(ldnp,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
-			        ids		*idp = &sip->id ;
+			        ids	*idp = &sip->id ;
 			        if ((rs = sperm(idp,&sb,am)) >= 0) {
-		   	            rs = subinfo_sochliber(sip,dsp,ldnp,dlm) ;
+		   	            rs = subinfo_sockliber(sip,dsp,ldnp,dlm) ;
 			        } else if (isNotPresent(rs)) {
 	    		            dirseen_add(dsp,ldnp,-1,&sb) ;
 			            rs = SR_OK ;
@@ -625,13 +628,14 @@ static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
 }
 /* end subroutine (subinfo_sochecklib) */
 
-static int subinfo_sochliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
+static int subinfo_sockliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
 	char		*tbuf{} ;
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
 	    modload	*op = (ML *) sip->op ;
 	    ids		*idp = &sip->id ;
+	    cint	tlen = rs ;
 	    cint	am = (X_OK|R_OK) ;
 	    cchar	*mfn = sip->modfn ;
 	    (void) dsp ;
@@ -645,7 +649,7 @@ static int subinfo_sochliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 				void		*sop ;
 			        if ((sop = dlopen(tbuf,dlm)) != np) {
 				    op->sop = sop ;
-				    rs = subinfo_sotest(sip) ;
+				    rs = subinfo_sotest(sip,tbuf,tlen) ;
 				    if (rs < 0) {
 				        dlclose(sop) ;
 				        op->sop = nullptr ;
@@ -672,20 +676,23 @@ static int subinfo_sochliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 	} /* end if (m-a-f) */
 	return rs ;
 }
-/* end subroutine (subinfo_sochliber) */
+/* end subroutine (subinfo_sockliber) */
 
-static int subinfo_sotest(SI *sip) noex {
+static int subinfo_sotest(SI *sip,char *tbuf,int tlen) noex {
 	modload		*op = (ML *) sip->op ;
 	int		rs = SR_FAULT ;
 	if (op->sop) {
-	    rs = SR_NOTFOUND ;
-	    if (void *vp ; (vp = dlsym(op->sop,op->modname)) != nullptr) {
-	        MODLOAD_MI	*mip = (MODLOAD_MI *) vp ;
-	        op->midp = mip ;
-	        if (strcmp(mip->name,op->modname) == 0) {
-		    rs = SR_OK ;
-	        }
-	    } /* end if */
+	    if ((rs = sncpy(tbuf,tlen,op->modname,symsuf)) >= 0) {
+		cnullptr	np{} ;
+	        rs = SR_NOTFOUND ;
+	        if (void *vp ; (vp = dlsym(op->sop,tbuf)) != np) {
+	            MODLOAD_MI	*mip = (MODLOAD_MI *) vp ;
+	            op->midp = mip ;
+	            if (strcmp(mip->name,op->modname) == 0) {
+		        rs = SR_OK ;
+	            }
+	        } /* end if (dlsym) */
+	    } /* end if (sncpy) */
 	} /* end if (non-null) */
 	return rs ;
 }
