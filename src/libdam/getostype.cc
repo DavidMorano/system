@@ -41,6 +41,7 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<ucvariables.hh>
+#include	<mallocxx.h>
 #include	<getsysname.h>
 #include	<sfx.h>
 #include	<matxstr.h>
@@ -77,6 +78,7 @@ namespace {
 	int envosname() noex ;
 	int envsysname() noex ;
 	int env(cchar *) noex ;
+	int trysysname() noex ;
 	int other() noex ;
 	int matguess(cchar *,int) noex ;
     } ; /* end struct (typer) */
@@ -118,6 +120,7 @@ constexpr typer_m	mems[] = {
 	&typer::envostype,
 	&typer::envosname,
 	&typer::envsysname,
+	&typer::trysysname,
 	&typer::other
 } ;
 
@@ -204,6 +207,24 @@ int typer::env(cchar *vn) noex {
 	return rs ;
 }
 /* end method (typer::env) */
+
+int typer::trysysname() noex {
+	int		rs ;
+	int		rs1 ;
+	int		rtype = 0 ;
+	char		*sbuf{} ;
+	if ((rs = malloc_mn(&sbuf)) >= 0) {
+	    cint	slen = rs ;
+	    if ((rs = getsysname(sbuf,slen)) >= 0) {
+		rs = matguess(sbuf,rs) ;
+		rtype = rs ;
+	    } /* end if (getsysname) */
+	    rs1 = uc_free(sbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? rtype : rs ;
+}
+/* end method (typer::trysysname) */
 
 int typer::matguess(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
