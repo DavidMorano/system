@@ -1,7 +1,8 @@
-/* main (DMAIL) */
+/* main SUPPORT (DMAIL) */
+/* lang=C++20 */
 
 /* fairly generic (PCS) front-end */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable print-outs */
@@ -12,24 +13,25 @@
 #define	CF_DEFLOGSIZE	0		/* use a default log length */
 #define	CF_PROGMSGS	1		/* call 'progmsgs()' */
 #define	CF_SETPCS	0		/* use |procopts_setpcs()| */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 #define	CF_LOGRECIP	0		/* use |logrecip()| */
 #define	CF_LOCSETENT	0		/* use |locinfo_setentry()| */
 #define	CF_LOOKADDR	1		/* use |lookaddr(3dam)| */
 #define	CF_ADDRCHECK	1		/* use |procrecip_addrcheck()| */
 #define	CF_SPAMBOX	1		/* use |procspambox()| */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace the previous
-        mail-delivery program for PCS, written around 1990 or so.
+	This code module was completely rewritten to replace the
+	previous mail-delivery program for PCS, written around 1990
+	or so.
 
 	= 2004-02-17, David A­D­ Morano
-        This was modified to add the MSGID object. That is a database that
-        stores message IDs. We used it to eliminate duplicate mail deliveries
-        which as of late are coming from several popular sources!
+	This was modified to add the MSGID object. That is a database
+	that stores message IDs. We used it to eliminate duplicate
+	mail deliveries which as of late are coming from several
+	popular sources!
 
 */
 
@@ -37,27 +39,23 @@
 
 /*******************************************************************************
 
-	This is the front-end subroutine (main) for the DMAIL and DMAILBOX
-	pograms.
-
+	This is the front-end subroutine (main) for the DMAIL and
+	DMAILBOX pograms.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
-#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<grp.h>
-
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<getbufsize.h>
@@ -93,13 +91,13 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
+#define	GETPW_UID	ucpwcache_uid
 #else
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #define	BUFLEN		MAX((2 * MAXHOSTNAMELEN),MSGBUFLEN)
 

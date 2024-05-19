@@ -1,10 +1,9 @@
-/* cmi SPPORT */
+/* cmi SUPPORT */
 /* lang=C++20 */
 
 /* read or audit a ComMandment Index (CMI) database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */
 
 /* revision history:
@@ -81,12 +80,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	isNotPresent(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-#endif
-
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwcpylc(char *,cchar *,int) ;
 extern char	*strnchr(cchar *,int,int) ;
@@ -125,10 +118,6 @@ static int	cmi_loadcmd(CMI *,CMI_ENT *,char *,int,int) noex ;
 static int	vtecmp(cvoid *,cvoid *) noex ;
 #endif
 
-#if	CF_DEBUGS
-static int	debugpresent(cchar *,cvoid *) noex ;
-#endif
-
 
 /* local variables */
 
@@ -149,9 +138,6 @@ int cmi_open(CMI *op,cchar *dbname) noex {
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_open: dbname=%s\n",dbname) ;
-#endif
 	memset(op,0,sizeof(CMI)) ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
@@ -162,9 +148,6 @@ int cmi_open(CMI *op,cchar *dbname) noex {
 	        const int	tl = rs ;
 	        if ((rs = uc_mallocstrw(tmpfname,tl,&cp)) >= 0) {
 	            op->fname = cp ;
-#if	CF_DEBUGS
-	            debugpresent("cmi_open: present{fname}=%d\n",op->fname) ;
-#endif
 	            if ((rs = cmi_loadbegin(op,dt)) >= 0) {
 	                nents = rs ;
 	                op->ti_lastcheck = dt ;
@@ -186,10 +169,6 @@ int cmi_open(CMI *op,cchar *dbname) noex {
 	    }
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("cmi_open: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? nents : rs ;
 }
 /* end subroutine (cmi_open) */
@@ -204,25 +183,8 @@ int cmi_close(CMI *op)
 
 	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_close: ent\n") ;
-#endif
-
-#if	CF_DEBUGS
-	rs1 = uc_mallpresent(op->fname) ;
-	if (rs >= 0) rs = rs1 ;
-	debugprintf("cmi_close: 0 rs=%d\n",rs) ;
-#endif
-
 	rs1 = cmi_loadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("cmi_close: 1 rs=%d\n",rs) ;
-	debugprintf("cmi_close: fname{%p}\n",op->fname) ;
-	debugprintf("cmi_close: fname=%s\n",op->fname) ;
-	debugpresent("cmi_close: present{fname}=%d\n",op->fname) ;
-#endif
 
 	if (op->fname != NULL) {
 	    rs1 = uc_free(op->fname) ;
@@ -230,19 +192,11 @@ int cmi_close(CMI *op)
 	    op->fname = NULL ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cmi_close: 2 rs=%d\n",rs) ;
-#endif
-
 	if (op->dbname != NULL) {
 	    rs1 = uc_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbname = NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("cmi_close: ret rs=%d\n",rs) ;
-#endif
 
 	op->magic = 0 ;
 	return rs ;
@@ -258,21 +212,11 @@ int cmi_audit(CMI *op)
 
 	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	if (rs >= 0) {
-	    rs = uc_mallpresent(op->fname) ;
-	}
-#endif
-
 /* verify that all list pointers and list entries are valid */
 
 	if (rs >= 0) {
 	    rs = cmi_auditvt(op) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("cmi_audit: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -333,10 +277,6 @@ int cmi_read(CMI *op,CMI_ENT *bvep,char *vbuf,int vlen,uint cn)
 
 	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_get: ent cn=%u\n",cn) ;
-#endif
-
 /* check for update */
 
 	if ((rs >= 0) && (op->ncursors == 0)) {
@@ -348,10 +288,6 @@ int cmi_read(CMI *op,CMI_ENT *bvep,char *vbuf,int vlen,uint cn)
 	        rs = cmi_loadcmd(op,bvep,vbuf,vlen,vi) ;
 	    }
 	} /* end if (ok) */
-
-#if	CF_DEBUGS
-	debugprintf("cmi_get: ret rs=%d vi=%u\n",rs,vi) ;
-#endif
 
 	return (rs >= 0) ? vi : rs ;
 }
@@ -411,12 +347,6 @@ int cmi_enum(CMI *op,CMI_CUR *curp,CMI_ENT *bvep,char *vbuf,int vlen)
 	vi = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	hip = &op->fhi ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_enum: ent vi=%d\n",vi) ;
-	debugprintf("cmi_enum: vilen=%d\n",hip->vilen) ;
-	debugprintf("cmi_enum: vllen=%d\n",hip->vllen) ;
-#endif
-
 	if (vi < hip->vilen) {
 	    if ((rs = cmi_loadcmd(op,bvep,vbuf,vlen,vi)) >= 0) {
 		nlines = rs ;
@@ -426,10 +356,6 @@ int cmi_enum(CMI *op,CMI_CUR *curp,CMI_ENT *bvep,char *vbuf,int vlen)
 	    rs = SR_NOTFOUND ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cmi_enum: ret rs=%d nl=%u\n",rs,nlines) ;
-#endif
-
 	return (rs >= 0) ? nlines : rs ;
 }
 /* end subroutine (cmi_enum) */
@@ -437,9 +363,7 @@ int cmi_enum(CMI *op,CMI_CUR *curp,CMI_ENT *bvep,char *vbuf,int vlen)
 
 /* private subroutines */
 
-
-static int cmi_loadbegin(CMI *op,time_t dt)
-{
+static int cmi_loadbegin(CMI *op,time_t dt) noex {
 	int		rs ;
 	int		nents = 0 ;
 
@@ -454,9 +378,7 @@ static int cmi_loadbegin(CMI *op,time_t dt)
 }
 /* end subroutine (cmi_loadbegin) */
 
-
-static int cmi_loadend(CMI *op)
-{
+static int cmi_loadend(CMI *op) noex {
 	CMI_FMI		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -471,9 +393,7 @@ static int cmi_loadend(CMI *op)
 }
 /* end subroutine (cmi_loadend) */
 
-
-static int cmi_mapcreate(CMI *op,time_t dt)
-{
+static int cmi_mapcreate(CMI *op,time_t dt) noex {
 	CMI_FMI		*mip = &op->fmi ;
 	int		rs ;
 
@@ -507,9 +427,7 @@ static int cmi_mapcreate(CMI *op,time_t dt)
 }
 /* end subroutine (cmi_mapcreate) */
 
-
-static int cmi_mapdestroy(CMI *op)
-{
+static int cmi_mapdestroy(CMI *op) noex {
 	CMI_FMI		*mip = &op->fmi ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -526,9 +444,7 @@ static int cmi_mapdestroy(CMI *op)
 }
 /* end subroutine (cmi_mapdestroy) */
 
-
-static int cmi_checkupdate(CMI *op,time_t dt)
-{
+static int cmi_checkupdate(CMI *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
@@ -555,9 +471,7 @@ static int cmi_checkupdate(CMI *op,time_t dt)
 }
 /* end subroutine (cmi_checkupdate) */
 
-
-static int cmi_proc(CMI *op,time_t dt)
-{
+static int cmi_proc(CMI *op,time_t dt) noex {
 	CMI_FMI		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	int		rs ;
@@ -570,17 +484,11 @@ static int cmi_proc(CMI *op,time_t dt)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cmi_proc: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? nents : rs ;
 }
 /* end subroutine (cmi_proc) */
 
-
-static int cmi_verify(CMI *op,time_t dt)
-{
+static int cmi_verify(CMI *op,time_t dt) noex {
 	CMI_FMI		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	int		rs = SR_OK ;
@@ -588,21 +496,6 @@ static int cmi_verify(CMI *op,time_t dt)
 	int		f = TRUE ;
 
 	f = f && (hip->idxsize == mip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: fsize=%u ms=%u f=%u\n",
-	    hip->idxsize,mip->mapsize,f) ;
-#endif
-
-#if	CF_DEBUGS
-	{
-	    const uint	utime = (uint) dt ;
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("cmi_verify: utime=%s sh=%u\n",
-	        timestr_log(((time_t) utime),timebuf),SHIFTINT) ;
-	}
-#endif
-
 	f = f && (hip->idxtime > 0) ;
 	if (f) {
 	    time_t	tt = (time_t) hip->idxtime ;
@@ -616,25 +509,9 @@ static int cmi_verify(CMI *op,time_t dt)
 	}
 #endif
 
-#if	CF_DEBUGS
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("cmi_verify: wtime=%s f=%u\n",
-	        timestr_log(((time_t) hip->idxtime),timebuf),f) ;
-	}
-#endif
-
 /* alignment restriction */
 
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: vioff=%u\n",hip->vioff) ;
-#endif
-
 	f = f && ((hip->vioff & (sizeof(int)-1)) == 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: 1 f=%d\n",f) ;
-#endif
 
 /* size restrictions */
 
@@ -642,21 +519,9 @@ static int cmi_verify(CMI *op,time_t dt)
 	size = hip->vilen * 4 * sizeof(uint) ;
 	f = f && ((hip->vioff + size) <= mip->mapsize) ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: 2 f=%d\n",f) ;
-#endif
-
 /* alignment restriction */
 
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: vloff=%u\n",hip->vloff) ;
-#endif
-
 	f = f && ((hip->vloff & (sizeof(int)-1)) == 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: 3 f=%d\n",f) ;
-#endif
 
 /* size restrictions */
 
@@ -664,33 +529,19 @@ static int cmi_verify(CMI *op,time_t dt)
 	size = (hip->vllen * 2 * sizeof(uint)) ;
 	f = f && ((hip->vloff + size) <= mip->mapsize) ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: 4 f=%d\n",f) ;
-#endif
-
 /* size restrictions */
 	f = f && (hip->vilen == hip->nents) ;
-
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: 5 f=%d\n",f) ;
-#endif
 
 /* get out */
 
 	if (! f)
 	    rs = SR_BADFMT ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_verify: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cmi_verify) */
 
-
-static int cmi_auditvt(CMI *op)
-{
+static int cmi_auditvt(CMI *op) noex {
 	CMI_FMI		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	uint		(*vt)[4] ;
@@ -724,17 +575,10 @@ static int cmi_auditvt(CMI *op)
 
 	} /* end for (record table entries) */
 
-#if	CF_DEBUGS
-	debugprintf("cmi_auditvt: ret rs=%d\n",rs) ;
-#endif
-
-	return rs ;
 }
 /* end subroutine (cmi_auditvt) */
 
-
-static int cmi_search(CMI *op,uint cn)
-{
+static int cmi_search(CMI *op,uint cn) noex {
 	CMI_FMI		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	uint		(*vt)[4] ;
@@ -744,18 +588,10 @@ static int cmi_search(CMI *op,uint cn)
 	int		vtlen ;
 	int		vi = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("cmi_search: ent cn=%u\n",cn) ;
-#endif
-
 	vt = mip->vt ;
 	vtlen = hip->vilen ;
 
 /* search for entry */
-
-#if	CF_DEBUGS
-	debugprintf("cmi_search: vtlen=%u\n",vtlen) ;
-#endif
 
 	vte[3] = citekey ;
 
@@ -777,17 +613,11 @@ static int cmi_search(CMI *op,uint cn)
 	}
 #endif /* CF_SEARCH */
 
-#if	CF_DEBUGS
-	debugprintf("cmi_search: ret rs=%d vi=%u\n",rs,vi) ;
-#endif
-
 	return (rs >= 0) ? vi : rs ;
 }
 /* end subroutine (cmi_search) */
 
-
-static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi)
-{
+static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi) noex {
 	CMI_LINE	*lines ;
 	CMI_FMI		*mip ;
 	CMIHDR		*hip ;
@@ -805,10 +635,6 @@ static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi)
 
 	if (elen <= 0) return SR_OVERFLOW ;
 
-#if	CF_DEBUGS
-	    debugprintf("cmi_loadcmd: ent vi=%d\n",vi) ;
-#endif
-
 	mip = &op->fmi ;
 	hip = &op->fhi ;
 
@@ -822,32 +648,14 @@ static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi)
 	bvep->nlines = ((vte[3] >> 16) & USHORT_MAX) ;
 	bvep->cn = ((vte[3] >> 0) & USHORT_MAX) ;
 
-#if	CF_DEBUGS
-	    debugprintf("cmi_loadcmd: cn=%u\n",bvep->cn) ;
-#endif
-
 /* load the lines */
 
 	li = vte[2] ;
 	nlines = bvep->nlines ;
 
-#if	CF_DEBUGS
-	    debugprintf("cmi_loadcmd: mid1 li=%u nlines=%u\n",li,nlines) ;
-	    debugprintf("cmi_loadcmd: vllen=%u\n",hip->vllen) ;
-#endif
-
 	if (li < hip->vllen) {
 
-#if	CF_DEBUGS
-	    debugprintf("cmi_loadcmd: li=%u\n",li) ;
-#endif
-
 	    bo = CMI_BO(uebuf) ;
-
-#if	CF_DEBUGS
-	    debugprintf("cmi_loadcmd: nlines=%u\n",nlines) ;
-	    debugprintf("cmi_loadcmd: cn=%u\n",bvep->cn) ;
-#endif
 
 	    linesize = ((nlines + 1) * sizeof(CMI_LINE)) ;
 	    if (linesize <= (elen - (bo-uebuf))) {
@@ -866,24 +674,19 @@ static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi)
 	            lines[i].llen = 0 ;
 	        }
 
-	    } else
+	    } else {
 	        rs = SR_OVERFLOW ;
-
-	} else
+	    }
+	} else {
 	    rs = SR_BADFMT ;
-
-#if	CF_DEBUGS
-	debugprintf("cmi_loadcmd: ret rs=%d nl=%u\n",rs,nlines) ;
-#endif
+	}
 
 	return (rs >= 0) ? nlines : rs ;
 }
 /* end subroutine (cmi_loadcmd) */
 
-
 #if	CF_SEARCH
-static int vtecmp(cvoid *v1p,cvoid *v2p)
-{
+static int vtecmp(cvoid *v1p,cvoid *v2p) noex {
 	uint		*vte1 = (uint *) v1p ;
 	uint		*vte2 = (uint *) v2p ;
 	uint		cn1, cn2 ;
@@ -893,16 +696,5 @@ static int vtecmp(cvoid *v1p,cvoid *v2p)
 }
 /* end subroutine (vtecmp) */
 #endif /* CF_SEARCH */
-
-
-#if	CF_DEBUGS
-static int debugpresent(cchar *s,cvoid *a)
-{
-	int	rs = uc_mallpresent(a) ;
-	debugprintf(s,rs) ;
-	return rs ;
-}
-/* end subroutine (debugpresent) */
-#endif /* CF_DEBUGS */
 
 

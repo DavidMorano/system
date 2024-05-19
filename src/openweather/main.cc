@@ -1,19 +1,16 @@
-/* owmain */
+/* main SUPPORT (OpenWeather) */
+/* lang=C++20 */
 
 /* open a file-descriptor to a weather METAR */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DIRGROUP	1		/* set GID on directories */
-
 
 /* revision history:
 
 	= 1998-07-10, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -21,46 +18,43 @@
 
 /******************************************************************************
 
+	Name:
+	openweather
+
+	Description:
 	This subroutine opens a file that contains a weather METAR.
 	Only the most current METAR is returned.
 
 	Synopsis:
-
 	int openweather(const char *pr,const char *ws,int oflags,int to)
 
 	Arguments:
-
 	pr		program-root
 	ws		weather station identification (eg: "kbos")
 	oflags		open flags (see 'open(2)')
 	to		time-out
 
 	Returns:
-
 	>=0		file descriptor to program STDIN and STDOUT
-	<0		error
+	<0		error code (system-return)
 
 	Note that all METARs are read-only.  Regardless of the type
 	of open-flags supplied only a read-only file-descriptor (FD)
 	is returned.
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<linefold.h>

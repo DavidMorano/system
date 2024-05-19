@@ -1,11 +1,10 @@
-/* emit_header */
+/* emit_header SUPPORT */
+/* lang=C++20 */
 
 /* print out a header value from the article */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUG	0		/* run-time debugging */
-#define	CF_UGETPW	1		/* use 'ugetpw(3uc)' */
-
+#define	CF_UCPWCACHE	1		/* use 'ugetpw(3uc)' */
 
 /* revision history:
 
@@ -24,14 +23,16 @@
 
 /*******************************************************************************
 
-	IMPORTANT: This subroutine is one of the "EMIT" subroutines used for 
-	"emitting" articles in different ways.
+	Name:
+	emit_header
 
-        This subroutine is used to print out the "subject" header (if present)
-        of a article.
+	Descrition:
+	This subroutine is one of the "EMIT" subroutines used for
+	"emitting" articles in different ways.  This subroutine is
+	used to print out the "subject" header (if present) of a
+	article.
 
 	Synopsis:
-
 	int emit_header(pip,dsp,ai,ap,ngdir,af)
 	PROGINFO	*pip ;
 	MKDIRLIST_ENT	*dsp ;
@@ -41,7 +42,6 @@
 	char		af[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		user structure pointer
 	ai		article index within newsgroup
@@ -50,23 +50,18 @@
 	af		article base file name
 
 	Returns:
-
 	-		??
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<string.h>
-#include	<pwd.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>
@@ -100,33 +95,21 @@
 #define	MAXFIELDLEN	(COLUMNS-2)
 #endif
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
+#define	GETPW_UID	ucpwcache_uid
 #else
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 
 /* external subroutines */
 
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfcenter(const char *,int,const char *,const char **) ;
-extern int	mkmailname(char *,int,cchar *,int) ;
-extern int	mkaddrfrom(char *,int,cchar *,int) ;
-extern int	hdrextid(char *,int,const char *,int) ;
-
-extern int	bbcpy(char *,const char *) ;
-extern int	mm_getfield() ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*timestr_edate(time_t,char *) ;
+extern "C" {
+    extern int	bbcpy(char *,cchar *) noex ;
+    extern int	mm_getfield() noex ;
+}
 
 
 /* external variables */
@@ -144,39 +127,36 @@ static int	emit_headerfrom(PROGINFO *,ARTLIST_ENT *) ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int emit_header(pip,dsp,ai,ap,ngdir,af)
 PROGINFO	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	af[] ;
+cchar	ngdir[] ;
+cchar	af[] ;
 {
-	struct ustat	mmsb ;
+	USTAT		mmsb ;
 	bfile		afile, *afp = &afile ;
-	const int	hlen = HEADBUFLEN ;
+	cint	hlen = HEADBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl ;
 	int		cl ;
-	const char	*nd = pip->newsdname ;
-	const char	*cp ;
+	cchar	*nd = pip->newsdname ;
+	cchar	*cp ;
 	char		hbuf[HEADBUFLEN + 1] ;
 	char		fname[MAXPATHLEN + 1] ;
 
-	if ((ngdir == NULL) || (*ngdir == '\0'))
+	if ((ngdir == nullptr) || (*ngdir == '\0'))
 	    return EMIT_OK ;
 
-	if (af == NULL)
+	if (af == nullptr)
 	    return EMIT_OK ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("emit_header: ent\n") ;
-#endif
 
 /* create the full path to this article file */
 
@@ -186,7 +166,7 @@ const char	af[] ;
 
 	if (pip->f.header) {
 	    bbcpy(hbuf,ngdir) ;
-	    pip->f.header = FALSE ;
+	    pip->f.header = false ;
 	    bprintf(pip->ofp,"newsgroup> %s\n",hbuf) ;
 	}
 
@@ -195,26 +175,20 @@ const char	af[] ;
 	if ((rs = bopen(afp,fname, "r",0666)) >= 0) {
 	    if ((rs = bcontrol(afp,BC_STAT,&mmsb)) >= 0) {
 		    cchar	*hk ;
-
-/* do whatever! */
-
+		    /* do whatever! */
 	            switch (pip->header) {
-
 	            case HI_ARTICLEID:
 	                bprintf(pip->ofp,"  %s\n",af) ;
 	                break ;
-
 	            case HI_SUBJECT:
-	                if (ap->subject != NULL) {
+	                if (ap->subject != nullptr) {
 			    rs = emit_headersubj(pip,ap) ;
 	                }
 	                break ;
-
 /* try to read out a "from" header from the posted article */
 	            case HI_FROM:
 			rs = emit_headerfrom(pip,ap) ;
 			break ;
-
 /* try to get the date out of the article */
 	            case HI_DATE:
 	                {
@@ -222,18 +196,8 @@ const char	af[] ;
 	                    char	timebuf[TIMEBUFLEN + 1] ;
 		 	    hk = HK_DATE ;
 	                    sl = mm_getfield(afp,0L,mmsb.st_size,hk,hbuf,hlen) ;
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("emit_header: hdate=>%t<\n",
-	                            hbuf,sl) ;
-#endif
 	                    if (sl > 0) {
 	                        rs = dater_setmsg(&pip->tmpdate,hbuf,sl) ;
-#if	CF_DEBUG
-	                        if (DEBUGLEVEL(4))
-	                            debugprintf("emit_header: "
-					"dater_setmsg() rs=%d\n", rs) ;
-#endif
 	                        if (rs >= 0) {
 	                            dater_gettime(&pip->tmpdate,&t) ;
 	                            bprintf(pip->ofp,"  %s\n",
@@ -248,24 +212,19 @@ const char	af[] ;
 	                    }
 	                } /* end block */
 	                break ;
-
 /* message-ID */
 	            case HI_MSGID:
 			hk = HK_MESSAGEID ;
 	                sl = mm_getfield(afp,0L,mmsb.st_size,hk,hbuf,hlen) ;
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("emit_header: hl=%d hb=%s\n",sl,hbuf) ;
-#endif
 	                if (sl > 0) {
-	                    const int	ilen = MAXNAMELEN ;
+	                    cint	ilen = MAXNAMELEN ;
 	                    char	ibuf[MAXNAMELEN+1] ;
 	                    cp = ibuf ;
 	                    if ((rs = hdrextid(ibuf,ilen,hbuf,sl)) == 0) {
-	                        const char	*tp ;
-	                        const char	*sp = hbuf ;
+	                        cchar	*tp ;
+	                        cchar	*sp = hbuf ;
 	                        int		sl = hlen ;
-	                        if ((tp = strnchr(sp,sl,',')) != NULL) {
+	                        if ((tp = strnchr(sp,sl,',')) != nullptr) {
 				    sl = (tp-hbuf) ;
 				}
 	                        if ((cl = sfcenter(sp,sl,"<>",&cp)) <= 0) {
@@ -274,10 +233,10 @@ const char	af[] ;
 	                        }
 	                    }
 #ifdef	COMMENT
-	                    if ((cp = strchr(hbuf,'<')) != NULL) {
+	                    if ((cp = strchr(hbuf,'<')) != nullptr) {
 	                        char	*cp2 ;
 	                        cp += 1 ;
-	                        if ((cp2 = strchr(cp,'>')) != NULL) {
+	                        if ((cp2 = strchr(cp,'>')) != nullptr) {
 	                            *cp2 = '\0' ;
 				}
 	                    } else {
@@ -286,18 +245,12 @@ const char	af[] ;
 	                    cp[MAXFIELDLEN] = '\0' ;
 #endif /* COMMENT */
 	                    if (cl > MAXFIELDLEN) cl = MAXFIELDLEN ;
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("emit_header: mid=%t\n",cp,cl) ;
-#endif
 	                    bprintf(pip->ofp,"  %t\n",cp,cl) ;
 	                } else {
 	                    bprintf(pip->ofp,"  ** article ID - %s\n",af) ;
 	                }
 	                break ;
-
 	            } /* end switch */
-
 	    } /* end if (bcontrol) */
 	    rs1 = bclose(afp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -310,40 +263,28 @@ const char	af[] ;
 
 /* local subroutines */
 
-
-static int emit_headersubj(PROGINFO *pip,ARTLIST_ENT *ap)
-{
+static int emit_headersubj(PROGINFO *pip,ARTLIST_ENT *ap) noex {
 	int		rs ;
 	cchar		*sp = ap->subject ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("emit_headersubj: ent\n") ;
-#endif
-	if (sp != NULL) {
-	    const int	c = strnlen(ap->subject,MAXFIELDLEN) ;
-	    const int	rlen = MAXFIELDLEN ;
+	if (sp != nullptr) {
+	    cint	c = strnlen(ap->subject,MAXFIELDLEN) ;
+	    cint	rlen = MAXFIELDLEN ;
 	    char	rbuf[MAXFIELDLEN+1] ;
 	    if ((rs = proghdr_trans(pip,rbuf,rlen,sp,-1,c)) >= 0) {
 	        rs = bprintf(pip->ofp,"  %t\n",rbuf,rs) ;
 	    }
 	}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("emit_headersubj: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (emit_headersubj) */
 
-
-static int emit_headerfrom(PROGINFO *pip,ARTLIST_ENT *ap)
-{
+static int emit_headerfrom(PROGINFO *pip,ARTLIST_ENT *ap) noex {
 	int		rs = SR_OK ;
 	int		hl ;
 	cchar		*hp ;
 	cchar		*hk = HK_FROM ;
-	if (ap->from != NULL) {
-	    const int	flen = strlen(ap->from) ;
+	if (ap->from != nullptr) {
+	    cint	flen = strlen(ap->from) ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 		int	c = flen ;
@@ -358,7 +299,7 @@ static int emit_headerfrom(PROGINFO *pip,ARTLIST_ENT *ap)
 	    if ((rs = mkpath2(fname,ap->ngdir,ap->name)) >= 0) {
 	        USTAT	sb ;
 	        if ((rs = uc_stat(fname,&sb)) >= 0) {
-		    const int	ulen = USERNAMELEN ;
+		    cint	ulen = USERNAMELEN ;
 		    char	ubuf[USERNAMELEN+1] ;
 		    if ((rs = getusername(ubuf,ulen,sb.st_uid)) >= 0) {
 		        rs = bprintf(pip->ofp,"  %t\n",ubuf,rs) ;

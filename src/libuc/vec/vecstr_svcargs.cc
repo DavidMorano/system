@@ -1,4 +1,4 @@
-/* vecstr_svcargs SUUPORT */
+/* vecstr_svcargs SUPPORT */
 /* lang=C++20 */
 
 /* load service arguments */
