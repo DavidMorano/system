@@ -1,7 +1,7 @@
 /* getsysname HEADER */
 /* lang=C20 */
 
-/* get the best approximation of the username of the current user */
+/* get the system-name of the operating system */
 /* version %I% last-modified %G% */
 
 

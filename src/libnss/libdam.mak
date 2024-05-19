@@ -1126,6 +1126,10 @@ isort.o:		isort.cc
 
 ctwords.o:		ctwords.cc ctwords.hh
 
+# UTILITY
+getostype.o:		getostype.cc getostype.h
+
+
 
 unlinkd.o:		$(*)/$(@)
 	make -C $(*) up

@@ -1,7 +1,7 @@
 /* strwcmp SUPPORT */
 /* lang=C++20 */
 
-/* compare the minimum common characters of two strings */
+/* compare a (NUL-terminated) base c-string with a counted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -32,7 +32,7 @@
 	s2len	length of second string
 
 	Returns:
-	>0	the first string is bigger than the second
+	>0	the first string is greater than the second
 	0	both strings are equal (as compared)
 	<0	first string is less than the second
 
@@ -76,35 +76,35 @@ namespace {
 	virtual int nleadxstr(cchar *,cchar *,int) noex ;
    } ; /* end struct (cmpx) */
    struct basecmpx : cmpx {
-	int tox(int ch) noex {
+	int tox(int ch) noex override {
 	    return ch ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	int strnxcmp(cchar *bs,cchar *sp,int sl) noex override {
 	   return strncmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex {
+	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex override {
 	    return nleadstr(s1,s2,s2len) ;
 	} ;
    } ;
    struct casecmpx : cmpx {
-	int tox(int ch) noex {
+	int tox(int ch) noex override {
 	    return tolc(ch) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	int strnxcmp(cchar *bs,cchar *sp,int sl) noex override {
 	   return strncasecmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex {
+	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex override {
 	    return nleadcasestr(s1,s2,s2len) ;
 	} ;
    } ;
    struct foldcmpx : cmpx {
-	int tox(int ch) noex {
+	int tox(int ch) noex override {
 	    return tofc(ch) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	int strnxcmp(cchar *bs,cchar *sp,int sl) noex override {
 	   return strnfoldcmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex {
+	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex override {
 	    return nleadfoldstr(s1,s2,s2len) ;
 	} ;
    } ;

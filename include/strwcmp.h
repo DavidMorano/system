@@ -1,7 +1,7 @@
 /* strwcmp HEADER */
 /* lang=C20 */
 
-/* string-copy variant */
+/* string-comparison variant */
 /* version %I% last-modified %G% */
 
 

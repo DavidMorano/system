@@ -93,7 +93,7 @@ constexpr namer_m	mems[] = {
 int getsysname(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    rs = SR_OVERFLOW ;
+	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
 	        namer	no(rbuf,rlen) ;
 	        rs = no ;
