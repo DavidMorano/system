@@ -26,6 +26,7 @@
 
 EXTERNC_begin
 
+extern int strnfoldcmp(cchar *,cchar *,int) noex ;
 extern int strnkeycmp(cchar *,cchar *,int) noex ;
 extern int strnleadcmp(cchar *,cchar *,int) noex ;
 extern int strnncmp(cchar *,int,cchar *,int) noex ;

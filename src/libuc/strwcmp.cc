@@ -43,9 +43,10 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<nleadstr.h>
+#include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
 #include	<toxc.h>
 #include	<mkchar.h>
-#include	<nleadstr.h>
 
 #include	"strwcmp.h"
 
@@ -59,6 +60,60 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+   struct cmpx {
+	virtual int x(cchar *,cchar *,int) noex ;
+	virtual int tox(int ch) noex ;
+	virtual int strnxcmp(cchar *,cchar *,int) noex ;
+	virtual int nleadxstr(cchar *,cchar *,int) noex ;
+   } ; /* end struct (cmpx) */
+   struct basecmpx : cmpx {
+	int tox(int ch) noex {
+	    return ch ;
+	} ;
+	int strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	   return strncmp(bs,sp,sl) ;
+	} ;
+	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex {
+	    return nleadstr(s1,s2,s2len) ;
+	} ;
+   } ;
+   struct casecmpx : cmpx {
+	int tox(int ch) noex {
+	    return tolc(ch) ;
+	} ;
+	int strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	   return strncasecmp(bs,sp,sl) ;
+	} ;
+	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex {
+	    return nleadcasestr(s1,s2,s2len) ;
+	} ;
+   } ;
+   struct foldcmpx : cmpx {
+	int tox(int ch) noex {
+	    return tofc(ch) ;
+	} ;
+	int strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	   return strnfoldcmp(bs,sp,sl) ;
+	} ;
+	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex {
+	    return nleadfoldstr(s1,s2,s2len) ;
+	} ;
+   } ;
+}
+
+
+/* forward references */
+
+
 /* local variables */
 
 
@@ -67,50 +122,60 @@
 
 /* exported subroutines */
 
-int strwcmpx(cchar *s1,cchar *s2,int s2len) noex {
-	int		rc = mkchar(s1[0]) ;
-	if (s2len < 0) s2len = strlen(s2) ;
-	if (s2len > 0) {
-	    cint	ch1 = mkchar(*s1) ;
-	    cint	ch2 = mkchar(*s2) ;
-	    if ((rc = (ch1 - ch2)) == 0) {
-	        if ((rc = strncmp(s1,s2,s2len)) == 0) {
-	            cint	m = nleadstr(s1,s2,s2len) ;
-	            if (m < s2len) {
-	    	        cint	m1 = mkchar(s1[m]) ;
-	    	        cint	m2 = mkchar(s2[m]) ;
-		        rc = (m1 - m2) ;
-		    } else {
-		        rc = mkchar(s1[m]) ;
-		    }
-		}
-	    }
-	}
-	return rc ;
+int strwbasecmpx(cchar *s1,cchar *s2,int s2len) noex {
+	basecmpx	co ;
+	return co.x(s1,s2,s2len) ;
 }
 /* end subroutine (strwcmpx) */
 
 int strwcasecmpx(cchar *s1,cchar *s2,int s2len) noex {
-	int		rc = tolc(s1[0]) ;
+	casecmpx	co ;
+	return co.x(s1,s2,s2len) ;
+}
+/* end subroutine (strwcasecmpx) */
+
+int strwfoldcmpx(cchar *s1,cchar *s2,int s2len) noex {
+	foldcmpx	co ;
+	return co.x(s1,s2,s2len) ;
+}
+/* end subroutine (strwfoldcmpx) */
+
+
+/* local subroutines */
+
+int cmpx::x(cchar *s1,cchar *s2,int s2len) noex {
+	int		rc = tox(s1[0]) ;
 	if (s2len < 0) s2len = strlen(s2) ;
 	if (s2len > 0) {
-	    cint	ch1 = tolc(*s1) ;
-	    cint	ch2 = tolc(*s2) ;
+	    cint	ch1 = tox(*s1) ;
+	    cint	ch2 = tox(*s2) ;
 	    if ((rc = (ch1 - ch2)) == 0) {
-	        if ((rc = strncasecmp(s1,s2,s2len)) == 0) {
-	            cint	m = nleadcasestr(s1,s2,s2len) ;
+	        if ((rc = strnxcmp(s1,s2,s2len)) == 0) {
+	            cint	m = nleadxstr(s1,s2,s2len) ;
 	            if (m < s2len) {
-	    	        cint	m1 = tolc(s1[m]) ;
-	    	        cint	m2 = tolc(s2[m]) ;
+	    	        cint	m1 = tox(s1[m]) ;
+	    	        cint	m2 = tox(s2[m]) ;
 		        rc = (m1 - m2) ;
 		    } else {
-		        rc = tolc(s1[m]) ;
+		        rc = tox(s1[m]) ;
 		    }
 		}
 	    }
 	}
 	return rc ;
 }
-/* end subroutine (strwcasecmpx) */
+/* end method (cmpx::x) */
+
+int cmpx::tox(int ch) noex {
+	return ch ;
+}
+
+int cmpx::strnxcmp(cchar *bs,cchar *sp,int sl) noex {
+	return strncmp(bs,sp,sl) ;
+}
+
+int cmpx::nleadxstr(cchar *bs,cchar *sp,int sl) noex {
+	return nleadstr(bs,sp,sl) ;
+}
 
 
