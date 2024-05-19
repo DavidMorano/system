@@ -112,7 +112,7 @@ struct subinfo_flags {
 struct subinfo {
 	void		*op ;
 	cchar		*pr ;
-	cchar		*modfn ;
+	cchar		*modfn ;	/* module-file-name */
 	mainv		syms ;
 	ids		id ;
 	SUBINFO_FL	f ;
@@ -197,6 +197,7 @@ constexpr cpcchar	sysprs[] = {
 constexpr cpcchar	exts[] = {
 	"so",
 	"o",
+	"dylib",	/* for Apple Darwin */
 	"",
 	nullptr
 } ;
@@ -497,9 +498,8 @@ static int subinfo_sofindpr(SI *sip,dirseen *dsp,int dlm,cchar *pr) noex {
 
 static int subinfo_sofindsdirs(SI *sip,dirseen *dsp,int dlm) noex {
 	int		rs = SR_NOENT ;
-	cchar		*dirname ;
 	for (int i = 0 ; sysprs[i] != nullptr ; i += 1) {
-	    dirname = sysprs[i] ;
+	    cchar	*dirname = sysprs[i] ;
 	    rs = subinfo_sofindpr(sip,dsp,dlm,dirname) ;
 	    if ((rs >= 0) || (! isNotPresent(rs))) break ;
 	} /* end for */
