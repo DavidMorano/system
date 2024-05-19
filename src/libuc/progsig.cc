@@ -26,6 +26,8 @@
 #include	<sys/param.h>
 #include	<poll.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<upt.h>
@@ -254,6 +256,9 @@ static constexpr int	sigints[] = {
 #endif
 	0
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

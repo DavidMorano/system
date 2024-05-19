@@ -7,7 +7,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-extern int	strnlen(const char *,int) noex ;
+extern int	strnlen(cchar *,int) noex ;
 #ifdef	__cplusplus
 }
 #endif

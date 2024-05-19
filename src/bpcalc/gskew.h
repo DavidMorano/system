@@ -1,4 +1,5 @@
-/* gskew */
+/* gskew HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,13 +11,14 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	GSKEW_INCLUDE
-#define	GSKEW_INCLUDE	1
+#define	GSKEW_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -25,11 +27,9 @@
 #define	GSKEW_STATS		struct gskew_stats
 
 /* more important defines */
-
 #define	GSKEW_COUNTBITS	2	/* counter bits */
 
 
-/* statistics */
 struct gskew_stats {
 	uint	tlen ;
 	uint	bits ;
@@ -49,9 +49,9 @@ struct gskew_banks {
 } ;
 
 struct gskew_head {
-	unsigned long		magic ;
 	struct gskew_stats	s ;
 	struct gskew_banks	*table ;
+	uint			magic ;
 	uint			bhistory ;	/* global branch history */
 	uint			tlen ;
 	int			n ;		/* 'n' from the papers ! :-) */
@@ -59,8 +59,7 @@ struct gskew_head {
 	uint			tmask, hmask ;
 } ;
 
-
-#if	(! defined(GSKEW_MASTER)) || (GSKEW_MASTER == 0)
+EXTERNC_begin
 
 extern int	gskew_init(GSKEW *,int,int,int,int) ;
 extern int	gskew_lookup(GSKEW *,uint) ;
@@ -70,7 +69,8 @@ extern int	gskew_zerostats(GSKEW *) ;
 extern int	gskew_stats(GSKEW *,GSKEW_STATS *) ;
 extern int	gskew_free(GSKEW *) ;
 
-#endif /* GSKEW_MASTER */
+EXTERNC_end
+
 
 #endif /* GSKEW_INCLUDE */
 

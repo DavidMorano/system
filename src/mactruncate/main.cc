@@ -5,6 +5,26 @@
 /* version %I% last-modified %G% */
 
 
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+	Name:
+	mactruncate
+
+	Description:
+	This little program will truncate files to a fixed length.
+
+	Synopsis:
+	$ mactruncate <file> <length>
+
+	Arguments:
+	<file>		file to truncate
+	<length>	decimal length to truncate
+
+*******************************************************************************/
+
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>

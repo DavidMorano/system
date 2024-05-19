@@ -1,8 +1,8 @@
 /* ucgetpuid SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* get the UID of a given process by its PID */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -31,7 +31,7 @@
 
 	Returns:
 	>=0		UID of process (as an integer)
-	<0		error
+	<0		error (system-return)
 
 	Notes:
 	Specifying a PID of zero (0) will be assumed to represent
@@ -74,6 +74,9 @@ static int	mkpidfname(char *,cchar *,pid_t) noex ;
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_getpuid(pid_t pid) noex {
@@ -105,7 +108,7 @@ int uc_getpuid(pid_t pid) noex {
 	    } else if (pid == 0) {
 	        uid = getuid() ;
 	    }
-	    r = (int) (uid & INT_MAX) ;
+	    r = int(uid & INT_MAX) ;
 	} /* end if (valid PID) */
 	return (rs >= 0) ? r : rs ;
 }

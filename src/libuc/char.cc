@@ -33,8 +33,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<bitset>		/* <- the money shot! */
-#include	<utypedefs.h>		/* <- for |uint| */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"char.h"
 

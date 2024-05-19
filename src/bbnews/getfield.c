@@ -1,18 +1,18 @@
-/* getfield */
+/* getfield SUPPORT */
+/* lang=C++20 */
 
 /* an old subroutine to get extra message header fields */
-
-
-#define	CF_DEBUG	0		/* run-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before. In other words, the same old story : old
-        garbage code needing to be replaced in entirety just to get something
-        working with new code interfaces. Can't we all think "reusuable" ??
+	This code module was completely rewritten to replace any
+	original garbage that was here before.  In other words, the
+	same old story: old garbage code needing to be replaced
+	in entirety just to get something working with new code
+	interfaces.  Cannot we all think "reusuable"?
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -57,65 +57,59 @@
 	This is because 'mm_getfield()' is NOT RFC-822 compliant.
 	We call that to do our work.
 
-
-*									
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<ctype.h>
-
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
 /* external subroutines */
 
-extern int	mm_getfield() ;
+extern "C" {
+    extern int	mm_getfield() noex ;
+}
 
 
 /* external variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int getfield(fname,key,vbuf,vlen)
-const char	fname[] ;
-const char	key[] ;
-char		vbuf[] ;
-int		vlen ;
-{
-	bfile	mmfile, *fp = &mmfile ;
-
-	int	rs ;
-
-	if (fname == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	vbuf[0] = '\0' ;
-
-	if ((rs = bopen(fp,fname,"r",0666)) >= 0) {
-	    struct ustat	sb ;
-
-	    if ((rs = bcontrol(fp,BC_STAT,&sb)) >= 0) {
-		int	fsize = (sb.st_size & INT_MAX) ;
-		rs = mm_getfield(fp,0L,fsize,key,vbuf,vlen) ;
-	    } /* end if */
-
-	    bclose(fp) ;
-	} /* end if (open-file) */
-
+int getfield(cchar *fname,cchar *key,char *vbuf,int vlen) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        bfile	mmfile, *fp = &mmfile ;
+	        vbuf[0] = '\0' ;
+	        if ((rs = bopen(fp,fname,"r",0666)) >= 0) {
+	            USTAT	sb ;
+	            if ((rs = bcontrol(fp,BC_STAT,&sb)) >= 0) {
+		        cint	cfsize = (sb.st_size & INT_MAX) ;
+		        rs = mm_getfield(fp,0L,fsize,key,vbuf,vlen) ;
+	            } /* end if */
+	            rs1 = bclose(fp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (open-file) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getfield) */
-
 
 

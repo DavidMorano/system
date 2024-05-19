@@ -20,7 +20,7 @@
 	snaddw
 
 	Description:
-	Add some c-string to the end of an existing string. Return the
+	Add some c-string to the end of an existing string.  Return the
 	incremental amount added.
 
 	Synopsis:
@@ -42,7 +42,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<storebuf.h>
 
 #include	"snaddw.h"
 

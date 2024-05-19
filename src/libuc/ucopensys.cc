@@ -1,4 +1,4 @@
-/* uc_opensys SUPPORT */
+/* ucopensys SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -126,62 +126,57 @@ static constexpr int	whiches[] = {
 
 /* exported subroutines */
 
-int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
-	int		rs = SR_OK ;
-	int		fl = -1 ;
-	int		fi ;
-	cchar		*tp ;
-
-/* take off any leading slashes */
-
-	while (fname[0] == '/') fname += 1 ;
-
-/* take off the '/sys' componenent */
-
-	if ((tp = strpbrk(fname,"/­")) != nullptr) {
-	    fl = (tp-fname) ;
-	}
-
-	{
-	    int	len ;
-	    if ((len = isRealName(fname,fl)) > 0) {
-		fl = len ;
+int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int oo) noex {
+	int		rs = SR_FAULT ;
+	(void) envv ;
+	(void) to ;
+	(void) oo ;
+	if (fname) {
+	    int		fl = -1 ;
+	    /* take off any leading slashes */
+	    while (fname[0] == '/') fname += 1 ;
+	    /* take off the '/sys' componenent */
+	    if (cchar *tp ; (tp = strpbrk(fname,"/­")) != nullptr) {
+	        fl = (tp-fname) ;
 	    }
-	}
-
-	if ((fi = matstr(sysnames,fname,fl)) >= 0) {
-	    switch (fi) {
-	    case sysname_userhomes:
-	    case sysname_usernames:
-	    case sysname_groupnames:
-	    case sysname_projectnames:
-	    case sysname_users:
-	    case sysname_groups:
-	    case sysname_projects:
-	    case sysname_passwd:
-	    case sysname_group:
-	    case sysname_project:
-	    case sysname_realname:
-	    case sysname_shells:
-	    case sysname_shadow:
-	    case sysname_userattr:
-		{
-	            int	w = whiches[fi] ;
-	            rs = opensysfs(w,of,-1) ;
-		}
-		break ;
-	    case sysname_banner:
-	    case sysname_bandate:
-		rs = opensys_banner(fname,of,om) ;
-		break ;
-	    default:
-		rs = SR_NOENT ;
-		break ;
-	    } /* end switch */
-	} else {
-	    rs = SR_NOENT ;
-	}
-
+	    {
+	        if (int len ; (len = isRealName(fname,fl)) > 0) {
+		    fl = len ;
+	        }
+	    }
+	    if (int fi ; (fi = matstr(sysnames,fname,fl)) >= 0) {
+	        switch (fi) {
+	        case sysname_userhomes:
+	        case sysname_usernames:
+	        case sysname_groupnames:
+	        case sysname_projectnames:
+	        case sysname_users:
+	        case sysname_groups:
+	        case sysname_projects:
+	        case sysname_passwd:
+	        case sysname_group:
+	        case sysname_project:
+	        case sysname_realname:
+	        case sysname_shells:
+	        case sysname_shadow:
+	        case sysname_userattr:
+		    {
+	                int	w = whiches[fi] ;
+	                rs = opensysfs(w,of,-1) ;
+		    }
+		    break ;
+	        case sysname_banner:
+	        case sysname_bandate:
+		    rs = opensys_banner(fname,of,om) ;
+		    break ;
+	        default:
+		    rs = SR_NOENT ;
+		    break ;
+	        } /* end switch */
+	    } else {
+	        rs = SR_NOENT ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_opensys) */

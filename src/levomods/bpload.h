@@ -1,4 +1,5 @@
-/* bpload */
+/* bpload HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,22 +11,19 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	BPLOAD_INCLUDE
-#define	BPLOAD_INCLUDE	1
+#define	BPLOAD_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
-/* object define */
-
 #define	BPLOAD			struct bpload
 
-
-/* this is what is put in the loadable module */
 
 struct bpload {
 	char	*name ;

@@ -34,12 +34,12 @@
 	int dupup(int fd,int min) noex
 
 	Arguments:
-	fd	file desciptor to duplicate
-	min	minimum level to get the duplicate at
+	fd		file desciptor to duplicate
+	min		minimum level to get the duplicate at
 
 	Returns:
-	>=0	the new file descriptor
-	<0	error
+	>=0		the new file descriptor
+	<0		error (system-return)
 
 
 	Name:
@@ -60,7 +60,7 @@
 
 	Returns:
 	>=0		the new FD
-	<0		error (original is *not* closed in this case)
+	<0		error (system-return)
 
 	Implementation note:
 	This subroutine needs to be able to execute after a |fork(2)|

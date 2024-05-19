@@ -1,5 +1,5 @@
-/* b_makesafe SPUPPORT */
-/* lang=C20 */
+/* b_makesafe SUPPORT */
+/* lang=C++20 */
 
 /* generic short program front-end */
 /* version %I% last-modified %G% */
@@ -32,11 +32,10 @@
 /*******************************************************************************
 
 	This is the main subroutine for MAKESAFE. This was a fairly
-	generic subroutine adpapted for this program. Note that
-	parallel processing is enabled by default. If you do not
+	generic subroutine adpapted for this program.  Note that
+	parallel processing is enabled by default.  If you do not
 	want parallel processing for some reason use the '-o'
 	invocation option to set the maximum parallelism to '1'.
-
 
 *******************************************************************************/
 

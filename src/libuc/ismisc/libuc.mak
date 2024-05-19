@@ -1145,6 +1145,7 @@ findfilepath.o:		findfilepath.cc findfilepath.h
 calstrs.o:		calstrs.cc calstrs.h
 ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
+ffbs.o:			ffbs.cc ffbs.h
 #
 isproc.o:		isproc.cc isproc.h
 #

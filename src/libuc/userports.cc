@@ -1,7 +1,7 @@
 /* userports SUPPORT */
 /* lang=C++20 */
 
-/* query the USERPOTS database for entries */
+/* query the USERPORTS database for entries */
 /* version %I% last-modified %G% */
 
 
@@ -24,7 +24,6 @@
 	to it.
 
 	Synopsis:
-
 	int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex
 
 	Arguments:
@@ -35,7 +34,7 @@
 
 	Returns:
 	>=0		query found
-	<0		error, likely protocol not found (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -53,6 +52,7 @@
 #include	<mallocxx.h>
 #include	<pwcache.h>
 #include	<filemap.h>
+#include	<terminit.hh>
 #include	<field.h>
 #include	<getax.h>
 #include	<nulstr.h>
@@ -122,6 +122,9 @@ struct entry_elem {
 	int		protoidx ;
 	int		portidx ;
 } ;
+
+typedef	ENTRY		entry ;
+typedef	ENTRY *		entryp ;
 
 struct vars {
 	int		usernamelen ;
@@ -199,16 +202,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr cchar		fterms[] = {
-	0x00, 0x02, 0x00, 0x00,
-	0x09, 0x10, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+constexpr terminit		ft("\t #,") ;
 
 static constexpr cpcchar	defprotos[] = {
 	"tcp",
@@ -287,7 +281,7 @@ int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex {
 		    void	*vp{} ;
 	            for (int i = 0 ; (rs = vg(elp,i,&vp)) >= 0 ; i += 1) {
 	                if (vp) {
-	        	    ENTRY	*ep = (ENTRY *) vp ;
+	        	    entry	*ep = entryp(vp) ;
 		            bool	f = true ;
 		            f = f && (uid == ep->uid) ;
 		            f = f && (port == ep->port) ;
@@ -334,7 +328,7 @@ int userports_enum(UP *op,USERPORTS_CUR *curp,
 	        i += 1 ;
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
-	        ENTRY	*ep = (ENTRY *) vp ;
+	        entry	*ep = entryp(vp) ;
 	        cchar	*cp{} ;
 	        entp->uid = ep->uid ;
 	        if (rs >= 0) {
@@ -361,13 +355,13 @@ int userports_fetch(UP *op,USERPORTS_CUR *curp,uid_t uid,
 	    i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
 	        if (vp) {
-		    ENTRY	*ep = (ENTRY *) vp ;;
+		    entry	*ep = entryp(vp) ;
 		    if (ep->uid == uid) break ;
 	        }
 	        i += 1 ;
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
-	        ENTRY	*ep = (ENTRY *) vp ;
+	        entry	*ep = entryp(vp) ;
 	        cchar	*cp ;
 	        entp->uid = ep->uid ;
 	        if (rs >= 0) {
@@ -395,7 +389,7 @@ static int userports_opener(UP *op,cchar *fname) noex {
 	int		rs ;
 	cchar		*cp ;
 	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	    cint	sz = sizeof(ENTRY) ;
+	    cint	sz = sizeof(entry) ;
 	    op->fname = cp ;
 	    if ((rs = vecobj_start(op->elp,sz,dents,vo)) >= 0) {
 	        if ((rs = vecpstr_start(op->plp,dents,dsize,0)) >= 0) {
@@ -473,7 +467,7 @@ static int userports_procline(UP *op,pwcache *pwcp,cc *lp,int ll) noex {
 	    if ((rs = field_start(&fsb,lp,ll)) >= 0) {
 	        int	fl ;
 	        cchar	*fp ;
-	        if ((fl = field_get(&fsb,fterms,&fp)) > 0) {
+	        if ((fl = field_get(&fsb,ft.terms,&fp)) > 0) {
 		    ucentpw	pw ;
 		    char	*ubuf{} ;
 		    if ((rs = malloc_un(&ubuf)) >= 0) {
@@ -481,9 +475,9 @@ static int userports_procline(UP *op,pwcache *pwcp,cc *lp,int ll) noex {
 			auto	pwl = pwcache_lookup ;
 	                strdcpy1w(ubuf,ulen,fp,fl) ;
 	                if ((rs = pwl(pwcp,&pw,pwbuf,pwlen,ubuf)) >= 0) {
-	                    uid_t	uid = pw.pw_uid ;
+	                    const uid_t		uid = pw.pw_uid ;
 		            while ((rs >= 0) && (fsb.term != '#')) {
-	                        fl = field_get(&fsb,fterms,&fp) ;
+	                        fl = field_get(&fsb,ft.terms,&fp) ;
 	                        if (fl == 0) continue ;
 			        if (fl < 0) break ;
 	                        rs = userports_procent(op,uid,fp,fl) ;
@@ -555,7 +549,7 @@ static int userports_procenter(UP *op,uid_t uid,cc *pn,cc *ps) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = getportnum(pn,ps)) >= 0) {
-	    ENTRY	e{} ;
+	    entry	e{} ;
 	    e.port = rs ;
 	    e.uid = uid ;
 	    f = true ;

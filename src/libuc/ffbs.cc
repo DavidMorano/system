@@ -23,8 +23,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |CHAR_BIT| */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<stdintx.h>
 
 #include	"ffbs.h"

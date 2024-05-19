@@ -19,13 +19,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+
+#include	<nextpowtwo.h>
 
 
 EXTERNC_begin
-
-extern int	nextpowtwo(int) noex ;
 
 static inline int ispowtwo(int v) noex {
 	return (v && !(v & (v - 1))) ;

@@ -1,14 +1,16 @@
-/* main (mkfindbit) */
+/* main SUPPORT (mkfindbit) */
+/* lang=C++20 */
 
+/* the the data arrays for finding bits (first and last) in integers */
+/* version %I% last-modified %G% */
 
-#define	CF_VERIFY	1		/* ? */
-#define	CF_MKLBS	0		/* mklbs */
 
 
 /* revision history:
 
 	= 1998-06-29, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -16,21 +18,21 @@
 
 /*******************************************************************************
 
-        This little program creates the lookup tables for the Find-First-Bit-Set
-        (ffbs) and the Find-Last-Bit-Set (flbs) subroutines. Other subroutines
-        in this family have to calculate the result the "hard way."
-
+	This little program creates the lookup tables for the
+	Find-First-Bit-Set (ffbs) and the Find-Last-Bit-Set (flbs)
+	subroutines. Other subroutines in this family have to
+	calculate the result the "hard way."
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstdio>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<ascii.h>
 
 
@@ -41,35 +43,28 @@
 
 /* forward references */
 
-static int	mktabfbs() ;
-static int	mktablbs() ;
+static int	mktabfbs() noex ;
+static int	mktablbs() noex ;
 
-static int	ffbsb(int), flbsb(int) ;
+static int	ffbsb(int) noex ;
+static int	flbsb(int) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
-
-
+int main(int,mainv,mainv) {
 	mktabfbs() ;
-
 	mktablbs() ;
-
-
-	return 0 ;
 }
 /* end subroutine (main) */
 
 
 /* local subroutines */
 
-
-static int mktabfbs()
-{
+static int mktabfbs() noex {
 	int		i, j ;
 	int		n ;
 	int		v ;
@@ -114,9 +109,7 @@ static int mktabfbs()
 }
 /* end subroutine (mktabfbs) */
 
-
-static int mktablbs()
-{
+static int mktablbs() noex {
 	int		i, j ;
 	int		n ;
 	int		v ;
@@ -161,31 +154,23 @@ static int mktablbs()
 }
 /* end subroutine (mktablbs) */
 
-
-static int ffbsb(int v)
-{
+static int ffbsb(int v) noex {
 	int		i = -1 ;
-
 	if (v) {
 	    for (i = 0 ; i < 8 ; i += 1) {
 	        if (v&1) break ;
 	        v >>= 1 ;
 	    }
 	}
-
 	return i ;
 }
 /* end subroutine (ffbsb) */
 
-
-static int flbsb(int v)
-{
+static int flbsb(int v) noex {
 	int		i ;
-
 	for (i = 7 ; i >= 0 ; i -= 1) {
 	    if ((v>>i) & 1) break ;
 	}
-
 	return i ;
 }
 /* end subroutine (flbsb) */

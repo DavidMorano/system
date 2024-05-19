@@ -1,4 +1,4 @@
-MAXTRUNC
+MACTRUNC
 
 This little program will truncate files to a fixed length.
 

@@ -45,7 +45,7 @@
 
 	Returns:
 	>=0		amount of data returned
-	<0		error
+	<0		error (system-return)
 
 	Note: All platforms we care about now have POSIX AIO. So
 	we so not have to worry about compile-time switches to dummy

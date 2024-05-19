@@ -1,4 +1,4 @@
-/* ucmallocx SUUPORT */
+/* ucmallocx SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -76,7 +76,7 @@
 
 	Returns:
 	>=0		nominally -> strnlen(sp,sl)
-	<0		error
+	<0		error code (system-return)
 
 *******************************************************************************/
 

@@ -46,9 +46,9 @@ struct strlistmks_flags {
 } ;
 
 struct strlistmks_head {
-	cchar 		*dbname ;
-	cchar		*idname ;
-	char		*nfname ;
+	cchar 		*dbname ;	/* data-base name */
+	cchar		*idname ;	/* index-directory-name */
+	char		*nfname ;	/* new-file-name */
 	strtab		*stp ;		/* string-tab-pointer */
 	rectab		*rtp ;		/* record-table-pointer */
 	STRLISTMKS_FL	f ;

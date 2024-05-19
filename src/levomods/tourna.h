@@ -1,4 +1,5 @@
-/* tourna */
+/* tourna HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,13 +11,14 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	TOURNA_INCLUDE
-#define	TOURNA_INCLUDE	1
+#define	TOURNA_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -25,7 +27,6 @@
 #define	TOURNA_STATS		struct tourna_stats
 
 
-/* statistics */
 struct tourna_stats {
 	uint			gpht ;		/* global length */
 	uint			lbht ;		/* local history length */
@@ -34,12 +35,12 @@ struct tourna_stats {
 } ;
 
 struct tourna_head {
-	unsigned long		magic ;
 	struct tourna_stats	s ;
 	uint			*lbht ;		/* local BHT */
 	uchar			*lpht ;		/* local PHT */
 	uchar			*cpht ;		/* choice PHT */
 	uchar			*gpht ;		/* global PHT */
+	uint			magic ;
 	uint			bhistory ;	/* global branch history */
 	uint			lhlen ;		/* local history length */
 	uint			lplen ;		/* local pattern length */
@@ -47,8 +48,7 @@ struct tourna_head {
 	uint			historymask ;
 } ;
 
-
-#if	(! defined(TOURNA_MASTER)) || (TOURNA_MASTER == 0)
+EXTERNC_begin
 
 extern int	tourna_init(TOURNA *,int,int,int) ;
 extern int	tourna_lookup(TOURNA *,uint) ;
@@ -58,7 +58,8 @@ extern int	tourna_zerostats(TOURNA *) ;
 extern int	tourna_stats(TOURNA *,TOURNA_STATS *) ;
 extern int	tourna_free(TOURNA *) ;
 
-#endif /* TOURNA_MASTER */
+EXTERNC_end
+
 
 #endif /* TOURNA_INCLUDE */
 

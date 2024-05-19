@@ -1,4 +1,5 @@
-/* ucfilename SIUPPORT */
+/* ucfilename SUPPORT */
+/* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
 /* version %I% last-modified %G% */

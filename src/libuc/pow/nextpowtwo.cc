@@ -4,6 +4,7 @@
 /* calculate the next higher power of two for a given number */
 /* version %I% last-modified %G% */
 
+#define	CF_POWCEIL	1		/* used ceiling-type bound */
 
 /* revision history:
 
@@ -36,13 +37,19 @@
 			value; it will be the same if the given
 			value is already at a power of two
 
+	Notes:
+	Yes, yes.  The subroutine |bit_ceil(3c++)| does not exactly
+	give the "next power of two" like the present subroutine
+	claims, but it is close enough (for government work).
+
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- |CHAR_BIT| */
 #include	<bit>			/* |countl_zero(3c++)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 #include	"nextpowtwo.h"
@@ -50,11 +57,16 @@
 
 /* local defines */
 
+#ifndef	CF_POWCEIL
+#define	CF_POWCEIL	1		/* used ceiling-type bound */
+#endif
+
 
 /* imported namespaces */
 
-using std::countl_zero ;
-using std::countl_one ;
+using std::countl_zero ;		/* subroutine-template */
+using std::countl_one ;			/* subroutine-template */
+using std::bit_ceil ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -72,9 +84,6 @@ extern "C" {
 
 /* forward references */
 
-
-/* local subroutine-template */
-
 static inline int flbsi(int v) noex {
 	cint		nbit = (sizeof(int) * CHAR_BIT) ;
 	uint		uv = uint(v) ;
@@ -88,6 +97,11 @@ static inline int flbsi(int v) noex {
 /* end subroutine-template (flbsi) */
 
 
+/* local variables */
+
+constexpr bool		f_powceil = CF_POWCEIL ;
+
+
 /* exported variables */
 
 
@@ -95,11 +109,16 @@ static inline int flbsi(int v) noex {
 
 int nextpowtwo(int v) noex {
 	int		nn = 0 ;
-	if (int lb ; (lb = flbsi(v)) >= 0) {
-	    uint	mask = ((1 << lb) - 1) ;
-	    if ((v & mask) && (lb < 31)) lb += 1 ;
-	    nn = (1 << lb) ;
-	}
+	if_constexpr (f_powceil) {
+	    uint	uv = uint(v) ;
+	    nn = bit_ceil(uv) ;
+	} else {
+	    if (int lb ; (lb = flbsi(v)) >= 0) {
+	        uint	mask = ((1 << lb) - 1) ;
+	        if ((v & mask) && (lb < 31)) lb += 1 ;
+	        nn = (1 << lb) ;
+	    } /* end if */
+	} /* end if_constexpr (f_powceil) */
 	return nn ;
 }
 /* end subroutine (nextpowtwo) */

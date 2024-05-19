@@ -1,4 +1,5 @@
-/* gspag */
+/* gspag HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,13 +11,14 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	GSPAG_INCLUDE
-#define	GSPAG_INCLUDE	1
+#define	GSPAG_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -26,11 +28,9 @@
 
 
 /* more important defines */
-
 #define	GSPAG_COUNTBITS	2	/* counter bits */
 
 
-/* statistics */
 struct gspag_stats {
 	uint			gpht ;		/* global length */
 	uint			lbht ;		/* local history length */
@@ -39,16 +39,15 @@ struct gspag_stats {
 } ;
 
 struct gspag_head {
-	unsigned long		magic ;
 	struct gspag_stats	s ;
 	uint			*lbht ;		/* local BHT */
 	uchar			*gpht ;		/* global PHT */
+	uint			magic ;
 	uint			bhlen ;		/* BHT length */
 	uint			phlen ;		/* GPHT length */
 } ;
 
-
-#if	(! defined(GSPAG_MASTER)) || (GSPAG_MASTER == 0)
+EXTERNC_begin
 
 extern int	gspag_init(GSPAG *,int,int) ;
 extern int	gspag_lookup(GSPAG *,uint) ;
@@ -58,7 +57,8 @@ extern int	gspag_zerostats(GSPAG *) ;
 extern int	gspag_stats(GSPAG *,GSPAG_STATS *) ;
 extern int	gspag_free(GSPAG *) ;
 
-#endif /* GSPAG_MASTER */
+EXTERNC_end
+
 
 #endif /* GSPAG_INCLUDE */
 

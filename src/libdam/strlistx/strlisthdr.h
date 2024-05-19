@@ -22,8 +22,8 @@
 
 #define	STRLISTHDR_FSUF		"si"	/* String-Index */
 #define	STRLISTHDR_MAGICSTR	"STRLIST"
-#define	STRLISTHDR_MAGICSIZE	16
-#define	STRLISTHDR_VERSION	0
+#define	STRLISTHDR_MAGICSIZE	16	/* the standard (pretty much) */
+#define	STRLISTHDR_VERSION	0	/* file (string-list) version */
 
 
 struct strlisthdr_head {
@@ -37,7 +37,7 @@ struct strlisthdr_head {
 	uint		itlen ;		/* index-table length (n-entries) */
 	uint		nstrs ;		/* total number of strings */
 	uint		nskip ;		/* a hash-lookup parameter */
-	char		vetu[4] ;
+	char		vetu[4] ;	/* relatively standard (V-E-T-U) ID */
 } ;
 
 typedef STRLISTHDR	strlisthdr ;

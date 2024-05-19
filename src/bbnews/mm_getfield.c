@@ -1,16 +1,15 @@
-/* mm_getfield */
+/* mm_getfield SUPPORT */
+/* lang=C++20 */
 
 /* get the value of the specified header within specified message */
-
-
-#define	CF_DEBUG	0		/* run-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -26,14 +25,12 @@
 	IMPORTANT NOTE:
 	This subroutine is NOT RFC-822 compliant!
 
-        This routine searches a mail message (MM) for a given header and returns
-        the value of the header to the caller. If the header appears in the
-        message more than once, all found header value strings are returned
-        separated by a comma.
-
+	This routine searches a mail message (MM) for a given header
+	and returns the value of the header to the caller.  If the
+	header appears in the message more than once, all found
+	header value strings are returned separated by a comma.
 
 	Arguments:
-
 		mfp	Basic I-O file pointer to mail message file
 		offset	byte offset from the beginning of the mail message
 			file to the start of the message.
@@ -50,18 +47,15 @@
 	return 'BAD' 
 		if that header is not found in the message
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -79,10 +73,6 @@ extern int	hmatch(cchar *,cchar *) ;
 
 /* external variables */
 
-#if	CF_DEBUG
-extern struct proginfo	g ;
-#endif
-
 
 /* forward references */
 
@@ -90,8 +80,10 @@ extern struct proginfo	g ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int mm_getfield(mfp,moff,mlen,h,fvalue,buflen)
 bfile		*mfp ;
@@ -104,14 +96,8 @@ int		buflen ;
 	int		rs ;
 	int		flen = 0 ;
 	int		f_bol, f_eol ;
-	int		f_lookmore = FALSE ;
-	int		f_boh = FALSE ;
-
-#if	CF_DEBUG
-	if (BATST(g.uo,UOV_CF_DEBUG)) 
-		errprintf(
-	    "mm_getfield: trying %s\n",h) ;
-#endif
+	int		f_lookmore = false ;
+	int		f_boh = false ;
 
 	if ((rs = bseek(mfp,moff,SEEK_SET)) >= 0) {
 	    const int	llen = LINEBUFLEN ;
@@ -122,23 +108,17 @@ int		buflen ;
 	buflen -= 3 ;
 	fvalue[0] = '\0' ;
 	len = 0 ;
-	f_bol = TRUE ;
+	f_bol = true ;
 	while ((len < mlen) && (flen < buflen) &&
 	    ((l = breadln(mfp,lbuf,llen)) > 0)) {
-
-#if	CF_DEBUG
-	    if (BATST(g.uo,UOV_CF_DEBUG)) 
-		errprintf(
-	        "mm_getfield: got line\n%W",lbuf,l) ;
-#endif
 
 	    len += l ;
 	    if (lbuf[0] == '\n') 
 		break ;
 
-	    f_eol = FALSE ;
+	    f_eol = false ;
 	    if (lbuf[l - 1] == '\n')
-	        ((f_eol = TRUE), (l -= 1)) ;
+	        ((f_eol = true), (l -= 1)) ;
 
 	    lbuf[l] = '\0' ;
 
@@ -155,8 +135,8 @@ int		buflen ;
 
 	        } else if ((i = hmatch(h,lbuf)) > 0) {
 
-	            f_lookmore = TRUE ;
-	            f_boh = TRUE ;
+	            f_lookmore = true ;
+	            f_boh = true ;
 	            cp = lbuf + i ;
 	            while (CHAR_ISWHITE(*cp)) 
 			cp += 1 ;
@@ -165,8 +145,8 @@ int		buflen ;
 
 	        } else {
 
-	            f_lookmore = FALSE ;
-	            f_boh = FALSE ;
+	            f_lookmore = false ;
+	            f_boh = false ;
 	        }
 
 	    } else if (f_lookmore) {
@@ -186,7 +166,7 @@ int		buflen ;
 	            fvalue[flen++] = ' ' ;
 	        }
 
-	        f_boh = FALSE ;
+	        f_boh = false ;
 	        strncpy(fvalue + flen,cp,ml) ;
 
 	        flen += ml ;
@@ -196,12 +176,6 @@ int		buflen ;
 
 	    f_bol = f_eol ;
 	} /* end while */
-
-#if	CF_DEBUG
-	if (BATST(g.uo,UOV_CF_DEBUG))
-	    errprintf("mm_getfield: returning OK w/ field \n\"%s\"\n",
-	        fvalue) ;
-#endif
 
 	fvalue[flen] = '\0' ;
 	} /* end if (bseek) */

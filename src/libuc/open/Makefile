@@ -37,17 +37,17 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += open.h
-
 
 LIBS +=
 
 
 INCDIRS=
 
-
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -59,7 +59,7 @@ LDFLAGS= $(MAKELDFLAGS)
 
 OBJ0_OPEN= openaddrinfo.o opensockaddr.o openshm.o
 OBJ1_OPEN= opendial.o openport.o openportmsg.o
-OBJ2_OPEN= opendefstds.o opensysfs.o opentmpfile.o
+OBJ2_OPEN= opendefstds.o opensysfs.o opentmp.o
 OBJ3_OPEN= openusd.o
 OBJ4_OPEN= openqotd.o opensys_banner.o
 
@@ -141,7 +141,7 @@ opendial.o:		opendial.cc opendial.h		$(INCS)
 openqotd.o:		openqotd.cc openqotd.h		$(INCS)
 openshm.o:		openshm.cc openshm.h		$(INCS)
 opensysfs.o:		opensysfs.cc opensysfs.h	$(INCS)
-opentmpfile.o:		opentmpfile.cc			$(INCS)
+opentmp.o:		opentmp.cc			$(INCS)
 openusd.o:		openusd.cc			$(INCS)
 opensys_banner.o:	opensys_banner.cc		$(INCS)
 
