@@ -1,6 +1,7 @@
 /* msgdata HEADER */
 /* lang=C++20 */
 
+/* miscellaneous message handling */
 /* version %I% last-modified %G% */
 
 
@@ -19,6 +20,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<sys/socket.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -35,17 +37,17 @@
 #endif
 
 #ifndef	CONMSGHDR
-#define	CONMSGHDR		srtuct cmsghdr
+#define	CONMSGHDR	srtuct cmsghdr
 #endif
 
 #define	MSGDATA		struct msgdata_head
 
 
 struct msgdata_head {
-	struct msghdr	msg ;
+	MSGHDR		msg ;
 	SOCKADDRESS	from ;
-	struct iovec	vecs[1] ;
-	CONMSGHDR		*cmsgp ;	/* Control-Message-Header */
+	IOVEC		vecs[1] ;
+	CONMSGHDR	*cmsgp ;	/* Control-Message-Header */
 	void		*a ;		/* allocation */
 	char		*mbuf ;		/* buffer */
 	int		clen ;		/* Control-Message length */

@@ -12,6 +12,9 @@
 
 */
 
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 #ifndef	VARITHMETIC_INCLUDE
 #define	VARITHMETIC_INCLUDE
 

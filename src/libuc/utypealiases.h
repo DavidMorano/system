@@ -152,7 +152,7 @@
 
 /* not constant - "Control-Message-Header" */
 #ifndef	CONMSGHDR
-#define	CONMSGHDR	const cmsghdr
+#define	CONMSGHDR	struct cmsghdr
 #endif
 
 #ifndef	TIMEVAL

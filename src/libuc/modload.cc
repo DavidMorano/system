@@ -214,7 +214,7 @@ constexpr cpcchar	extdirs[] = {
 
 static vars		var ;
 
-constexpr cchar		symsuf[] = "_mod" ;
+constexpr cchar		symsuf[] = MODLOAD_SYMSUF ;
 
 constexpr bool		f_darwin = F_DARWIN ;
 

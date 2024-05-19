@@ -19,9 +19,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<ctime>			/* |time_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 #define	PROGSIG_NENTS	30

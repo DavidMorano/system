@@ -1,6 +1,9 @@
 
 /* missing library subroutines */
 
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 #if	(!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0)
 #ifndef	SUBROUTINE_STRNLEN
 #define	SUBROUTINE_STRNLEN

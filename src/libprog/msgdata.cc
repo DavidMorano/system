@@ -1,7 +1,7 @@
 /* msgdata SUPPORT */
 /* lang=C++20 */
 
-/* library initialization for KSH built-in command libraries */
+/* miscellaneous message handling */
 /* version %I% last-modified %G% */
 
 
@@ -16,14 +16,18 @@
 
 /*******************************************************************************
 
-	Message support.
+	This module provides miscellaneous message support.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<sockaddress.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -35,6 +39,15 @@
 #ifndef	CMSGBUFLEN
 #define	CMSGBUFLEN	(2*256)
 #endif
+
+
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -53,6 +66,8 @@ static int	msgdata_setrecv(msgdata *) noex ;
 
 /* local variables */
 
+constexpr int		conmsghdr_len = int(sizeof(CONMSGHDR)) ;
+
 
 /* exported variables */
 
@@ -60,20 +75,20 @@ static int	msgdata_setrecv(msgdata *) noex ;
 /* exported subroutines */
 
 int msgdata_init(msgdata *mip,int mlen) noex {
-	cint		clen = MAX(CMSGBUFLEN,sizeof(CONMSGHDR)) ;
+	cint		clen = MAX(CMSGBUFLEN,conmsghdr_len) ;
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	int		ml = 0 ;
 	char		*bp ;
 
-	memset(mip,0,sizeof(MSGDATA)) ;
+	memclear(mip) ;
 	mip->ns = -1 ;
 
 	if (mlen < MSGBUFLEN) mlen = MSGBUFLEN ;
 
-	size += (clen+1) ;
-	size += (mlen+1) ;
-	if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	sz += (clen+1) ;
+	sz += (mlen+1) ;
+	if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    MSGHDR	*mp = &mip->msg ;
 	    mip->a = bp ;
 	    ml = mlen ;
@@ -91,7 +106,7 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 
 	    memset(mip->cmsgp,0,clen) ; /* clear control-message */
 
-	    memset(mp,0,sizeof(MSGHDR)) ;
+	    memclear(mp) ;
 	    mp->msg_name = &mip->from ;
 	    mp->msg_namelen = sizeof(SOCKADDRESS) ;
 	    mp->msg_control = mip->cmsgp ;
@@ -106,19 +121,21 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 /* end subroutine (msgdata_init) */
 
 int msgdata_fini(msgdata *mip) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (mip == nullptr) return SR_FAULT ;
-	if (mip->a != nullptr) {
-	    rs1 = uc_libfree(mip->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    mip->a = nullptr ;
+	if (mip) {
+	    rs = SR_OK ;
+	    if (mip->a) {
+	        rs1 = uc_libfree(mip->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        mip->a = nullptr ;
+	    }
 	    mip->mbuf = nullptr ;
 	    mip->mlen = 0 ;
 	    mip->ml = 0 ;
 	    mip->cmsgp = nullptr ;
 	    mip->clen = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (msgdata_fini) */
@@ -227,7 +244,7 @@ int msgdata_getpassfd(msgdata *mip) noex {
 
 int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 	cint		flen = sizeof(SOCKADDRESS) ;
-	int		rs ;
+	int		rs = SR_OK ;
 	if (sal <= flen) {
 	    memcpy(&mip->from,sap,sal) ;
 	    mip->msg.msg_namelen = sal ;
@@ -240,7 +257,7 @@ int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 
 int msgdata_rmeol(msgdata *mip) noex {
 	while (mip->ml > 0) {
-	    cint	ch = MKCHAR(mip->mbuf[mip->ml-1]) ;
+	    cint	ch = mkchar(mip->mbuf[mip->ml-1]) ;
  	    if (! iseol(ch)) break ;
 	    mip->ml -= 1 ;
 	}
@@ -261,6 +278,5 @@ static int msgdata_setrecv(msgdata *mip) noex {
 	return SR_OK ;
 }
 /* end subroutine (msgdata_setrecv) */
-
 
 

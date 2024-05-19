@@ -27,6 +27,7 @@
 
 enum errnomssings {
 	errnomissing_l2nsync = 1000,
+	errnomissing_l2hlt,
 	errnomissing_l3hlt,
 	errnomissing_l3rst,
 	errnomissing_badr,
@@ -120,7 +121,11 @@ enum errnomssings {
 #endif
 
 #define	SR_NOCSI	(- ENOCSI)	/* No CSI structure available */
+#ifdef	EL2HLT
 #define	SR_L2HLT	(- EL2HLT)	/* Level 2 halted */
+#else
+#define	SR_L2HLT	(- errnomissing_l2hlt)
+#endif
 #define	SR_DEADLK	(- EDEADLK)	/* Deadlock condition */
 #define	SR_NOLCK	(- ENOLCK)	/* No record locks available */
 #define	SR_CANCELED	(- ECANCELED)	/* Operation canceled */

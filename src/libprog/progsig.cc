@@ -30,12 +30,14 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<upt.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<sighand.h>
-#include	<sockaddress.h>
 #include	<raqhand.h>
+#include	<sockaddress.h>
+#include	<listenusd.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>
 #include	<mkdirs.h>
@@ -53,10 +55,6 @@
 
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-time multiplier */
-#endif
-
-#ifndef	MSGHDR
-#define	MSGHDR		srtuct msghdr
 #endif
 
 #ifndef	MSGBUFLEN
@@ -476,9 +474,10 @@ int progsig_noteread(PROGSIG_NOTE *rp,int ni) noex {
 	    PROGSIG	*uip = &progsig_data ;
 	    if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 	        if ((rs = progsig_mq(uip)) >= 0) {
-		    SN	*ep ;
-		    if ((rs = raqhand_acc(&uip->mq,ni,&ep)) >= 0) {
-			if (ep != nullptr) {
+		    void	*vp{} ;
+		    if ((rs = raqhand_acc(&uip->mq,ni,&vp)) >= 0) {
+			if (vp) {
+		    	    SN	*ep = (SN *) vp ;;
 			    rp->stime = ep->stime ;
 			    rp->type = ep->type ;
 			    rp->dlen = ep->dlen ;
@@ -551,28 +550,36 @@ static int progsig_end(PROGSIG *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->f_mq) {
-	    rs1 = progsig_entfins(uip) ;
-	    if (rs >= 0) rs = rs1 ;
+	    {
+	        rs1 = progsig_entfins(uip) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = raqhand_finish(&uip->mq) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    uip->f_mq = false ;
-	    rs1 = raqhand_finish(&uip->mq) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (progsig_end) */
 
 static int progsig_entfins(PROGSIG *uip) noex {
 	raqhand		*qlp = &uip->mq ;
-	SN	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-	for (i = 0 ; raqhand_get(qlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != nullptr) {
-		rs1 = snote_finish(ep) ;
-		if (rs >= 0) rs = rs1 ;
-		rs1 = uc_libfree(ep) ;
-		if (rs >= 0) rs = rs1 ;
+	void		*vp{} ;
+	for (int i = 0 ; raqhand_get(qlp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		SN	*ep = (SN *) vp ;
+		{
+		    rs1 = snote_finish(ep) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    rs1 = uc_libfree(ep) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
 	    } /* end if (non-null) */
 	} /* end for */
 	return rs ;
@@ -785,20 +792,33 @@ static int progsig_msgenter(PROGSIG *uip,SN *ep) noex {
 
 static int progsig_reqopen(PROGSIG *uip) noex {
 	int		rs ;
+	int		rs1 ;
+	int		rv = 0 ;
 	cchar		*dname = PROGSIG_SESDN ;
 	if ((rs = sdir(dname,(W_OK|X_OK))) >= 0) {
-	    pid_t	sid = getsid(0) ;
-	    char	sbuf[MAXPATHLEN+1] ;
-	    if ((rs = mksdname(sbuf,dname,sid)) >= 0) {
-		if (uip->reqfname == nullptr) {
-		    char	pbuf[MAXPATHLEN+1] ;
-	            if ((rs = progsig_mkreqfname(uip,pbuf,sbuf)) >= 0) {
-			rs = progsig_reqopener(uip,pbuf) ;
-		    } /* end if (progsig_mkreqfname) */
-		} /* end if (reqfname) */
-	    } /* end if (mksdname) */
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        cint	sz = ((rs + 1) * 2) ;
+	        cint	maxpath = rs ;
+	        int	ai = 0 ;
+	        char	*a{} ;
+	        if ((rs = uc_malloc(sz,&a)) >= 0) {
+	            pid_t	sid = getsid(0) ;
+	            char	*sbuf = (a + ((maxpath + 1) * ai++)) ;
+	            if ((rs = mksdname(sbuf,dname,sid)) >= 0) {
+		        if (uip->reqfname == nullptr) {
+		            char	*pbuf = (a + ((maxpath + 1) * ai++)) ;
+	                    if ((rs = progsig_mkreqfname(uip,pbuf,sbuf)) >= 0) {
+			        rs = progsig_reqopener(uip,pbuf) ;
+				rv = rs ;
+		            } /* end if (progsig_mkreqfname) */
+		        } /* end if (reqfname) */
+	            } /* end if (mksdname) */
+		    rs1 = uc_free(a) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (getbufsize) */
 	} /* end if (sdir) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (progsig_reqopen) */
 
@@ -1112,10 +1132,10 @@ static int libmalstrw(cchar *sp,int sl,cchar **rpp) noex {
 
 static int sdir(cchar *dname,int am) noex {
 	USTAT		sb ;
-	cmode		dm = 0777 ;
 	cint		nrs = SR_NOTFOUND ;
 	int		rs ;
 	int		f = false ;
+	cmode		dm = 0777 ;
 	if ((rs = uc_stat(dname,&sb)) == nrs) {
 	    f = true ;
 	    rs = mksdir(dname,dm) ;

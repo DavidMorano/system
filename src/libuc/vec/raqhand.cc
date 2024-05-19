@@ -65,10 +65,10 @@ int raqhand_start(raqhand *op,int n,int opts) noex {
 	    if (n <= 1) n = RAQHAND_DEFENTS ;
 	    memclear(op) ;
 	    if ((rs = raqhand_setopts(op,opts)) >= 0) {
-	        cint	size = ((n+1) * sizeof(void *)) ;
+	        cint	sz = ((n+1) * sizeof(void *)) ;
 	        void	*vp{} ;
-	        if ((rs = uc_libmalloc(size,&vp)) >= 0) {
-		    memclear(vp,size) ;
+	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+		    memclear(vp,sz) ;
 		    op->va = (cvoid **) vp ;
 	            op->n = n ;
 	        } /* end if (memory-allocation) */
@@ -295,16 +295,17 @@ static int raqhand_valid(raqhand *op,int i) noex {
 static int raqhand_extend(raqhand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
-	    int		nn, size ;
+	    int		nn ;
+	    int		sz ;
 	    void	*np ;
 	    if (op->va == nullptr) {
 	        nn = RAQHAND_DEFENTS ;
-	        size = (nn + 1) * sizeof(void **) ;
-	        rs = uc_libmalloc(size,&np) ;
+	        sz = (nn + 1) * sizeof(void **) ;
+	        rs = uc_libmalloc(sz,&np) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        size = (nn + 1) * sizeof(void **) ;
-	        rs = uc_librealloc(op->va,size,&np) ;
+	        sz = (nn + 1) * sizeof(void **) ;
+	        rs = uc_librealloc(op->va,sz,&np) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {

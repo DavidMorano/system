@@ -216,7 +216,7 @@ typedef time_t			unixtime ;
 #endif
 
 #ifndef	TYPEDEF_CUSTIME
-#define	TYPEDEF_USTIME
+#define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
 #endif
 

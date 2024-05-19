@@ -1,10 +1,8 @@
-/* listenusd */
+/* listenusd SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to listen on a UNIX® socket DGRAM port */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,43 +16,43 @@
 
 /*******************************************************************************
 
-        This subroutine listens on a UNIX® socket datagram (USD) for incoming
-        messages.
+	Name:
+	listenusd
+
+	Description:
+	This subroutine listens on a UNIX® socket datagram (USD)
+	for incoming messages.
 
 	Synopsis:
-
-	int listenusd(cchar *portspec,mode_t om,int lopts)
+	int listenusd(cchar *portspec,mode_t om,int lopts) noex
 
 	Arguments:
-
 	portspec	file-path to listen to
 	om		open-mode
 	lopts		0=nothing, 1=reuse-addr
 
 	Returns:
-
-	<0		error
 	>=0		file-descriptor of UNIX-domain socket
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<netdb.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
+
+#include	"listenusd.h"
 
 
 /* local defines */
@@ -73,25 +71,22 @@
 /* local structures */
 
 
+/* forward references */
+
+
 /* local variables */
 
 
-/* forward references */
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int listenusd(cchar *portspec,mode_t om,int lopts)
-{
-	const int	pf = PF_UNIX ;
-	const int	st = SOCK_DGRAM ;
+int listenusd(cchar *portspec,mode_t om,int lopts) noex {
+	cint	pf = PF_UNIX ;
+	cint	st = SOCK_DGRAM ;
 	int		rs ;
 	int		s = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("listenusd: portspec=%s\n",portspec) ;
-#endif
 
 	if (portspec == NULL) return SR_FAULT ;
 
@@ -101,15 +96,15 @@ int listenusd(cchar *portspec,mode_t om,int lopts)
 	    s = rs ;
 
 	    if (lopts & 1) {
-	        const int	so = SO_REUSEADDR ;
-	        const int	isize = sizeof(int) ;
+	        cint	so = SO_REUSEADDR ;
+	        cint	isize = sizeof(int) ;
 	        int		one = 1 ;
 	        rs = u_setsockopt(s,SOL_SOCKET,so,&one,isize) ;
 	    }
 
 	    if (rs >= 0) {
 	        sockaddress	sa ;
-	        const int	af = AF_UNIX ;
+	        cint	af = AF_UNIX ;
 	        if ((rs = sockaddress_start(&sa,af,portspec,0,0)) >= 0) {
 	            SOCKADDR	*sap = (SOCKADDR *) &sa ;
 	            int		sal = rs ;
