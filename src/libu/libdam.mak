@@ -1036,9 +1036,7 @@ fsdirtreestat.o:	fsdirtreestat.c fsdirtree.h
 
 userinfo.o:		userinfo.c userinfo.h storeitem.h char.h gecos.h
 
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getutmpterm.o:		getutmpterm.c getutmpent.h
+getutmpterm.o:		getutmpterm.cc getutmpterm.h
 
 getsysmisc.o:		getsysmisc.c getsysmisc.h
 
