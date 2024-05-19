@@ -838,10 +838,7 @@ LINEINDEX	*op ;
 }
 /* end subroutine (lineindex_fileclose) */
 
-
-static int lineindex_mkindex(op)
-LINEINDEX	*op ;
-{
+static int lineindex_mkindex(LINEINDEX *op) noex {
 	FILEMAP		lmap ;
 	bfile		ifile ;
 	off_t		headoff ;
@@ -854,7 +851,7 @@ LINEINDEX	*op ;
 	int		size ;
 	cchar		*cp ;
 	char		dfname[MAXPATHLEN + 1] ;
-	char		template[MAXPATHLEN + 1] ;
+	char		pat[MAXPATHLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 /* determine if the directory is writable */
@@ -881,13 +878,9 @@ LINEINDEX	*op ;
 
 /* make a temporary file for the index file */
 
-	mkpath2(template,dfname,"liXXXXXXXXXXXX") ;
+	mkpath2(pat,dfname,"liXXXXXXXXXXXX") ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: template=%s\n",template) ;
-#endif
-
-	rs = mktmpfile(tmpfname,op->operm,template) ;
+	rs = mktmpfile(tmpfname,op->operm,pat) ;
 
 #if	CF_DEBUGS
 	debugprintf("lineindex_mkindex: mktmpfile() rs=%d\n",rs) ;

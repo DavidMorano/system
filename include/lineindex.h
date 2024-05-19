@@ -1,4 +1,4 @@
-/* lineindex */
+/* lineindex HEADER */
 /* lang=C20 */
 
 /* line indexing object */
@@ -14,6 +14,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<time.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 

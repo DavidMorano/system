@@ -1,7 +1,8 @@
-/* mxalias */
+/* mxalias SUPPORT */
+/* lang=C++20 */
 
 /* manage a MXALIAS object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGFILE	0		/* file parsing */
@@ -12,13 +13,12 @@
 #define	CF_FILESYS	1		/* system-DB */
 #define	CF_FILEUSER	1		/* user-DB */
 
-
 /* revision history:
 
 	= 2003-06-11, David A­D­ Morano
-	I snarfed this file from some hardware research use since it seemed be
-	a pretty good match for the present algorithm needs.  We'll see how it
-	works out! :-|
+	I snarfed this file from some hardware research use since
+	it seemed be a pretty good match for the present algorithm
+	needs.  We will see how it works out! :-|
 
 */
 
@@ -28,26 +28,19 @@
 
 	This module is used to manage a MXALIAS object.
 
-
 *******************************************************************************/
 
-
-#define	MXALIAS_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<pwd.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<ids.h>

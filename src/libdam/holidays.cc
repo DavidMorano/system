@@ -26,8 +26,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<estrings.h>
