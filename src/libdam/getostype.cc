@@ -127,6 +127,8 @@ constexpr typer_m	mems[] = {
 
 /* exported variables */
 
+ostyper		ostype ;
+
 
 /* exported subroutines */
 
@@ -245,5 +247,13 @@ int typer::other() noex {
 	return rs ;
 }
 /* end method (typer::other) */
+
+ostyper::operator int () noex {
+	return getostype() ;
+}
+
+int ostyper::operator () () noex {
+	return getostype() ;
+}
 
 

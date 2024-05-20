@@ -434,8 +434,6 @@ static constexpr int	(*components[])(PROCINFO *) = {
 
 static vars		var ;
 
-constexpr bool		f_sysv = USERINFO_SYSV ;
-
 
 /* exported variables */
 
@@ -449,7 +447,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		len = 0 ;
 	if (uip) {
 	    memclear(uip) ;		/* dangerous */
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 		static cchar	*nn = getenv(VARNODE) ;
 	        uip->nodename = nn ;
@@ -521,17 +519,13 @@ static int userinfo_id(UI *uip) noex {
 	int		rs ;
 	if ((rs = uc_getpid()) >= 0) {
 	    uip->pid = rs ;
-	    if constexpr (f_sysv) {
-	        uip->f.sysv_ct = true ;
-	        uip->f.sysv_rt = true ;
-	    } else {
-	        uip->f.sysv_ct = false ;
-	        uip->f.sysv_rt = getostype() ;
-	    }
 	    uip->uid = getuid() ;
 	    uip->euid = geteuid() ;
 	    uip->gid = getgid() ;
 	    uip->egid = getegid() ;
+	    if ((rs = ostype) >= 0) {
+	        uip->ostype = uint(rs) ;
+	    }
 	} /* end if (uc_getpid) */
 	return rs ;
 }
@@ -1690,7 +1684,7 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	            if ((rs = storeitem_start(&si,ubuf,ulen)) >= 0) {
 	                cchar	*sp ;
 	                cchar	**rpp ;
-	                oup->f = u.f ;
+	                oup->ostype = u.ostype ;
 	                oup->pid = u.pid ;
 	                oup->uid = u.uid ;
 	                oup->euid = u.euid ;

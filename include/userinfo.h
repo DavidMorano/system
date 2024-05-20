@@ -24,16 +24,10 @@
 
 
 #define	USERINFO		struct userinfo_head
-#define	USERINFO_FL		struct userinfo_flags
 #define	USERINFO_MAGIC		0x33216271
 #define	USERINFO_LEN		((3 * 2048) + MAXHOSTNAMELEN)
 #define	USERINFO_LOGIDLEN	15
 
-
-struct userinfo_flags {
-	uint		sysv_rt:1 ;
-	uint		sysv_ct:1 ;
-} ;
 
 struct userinfo_head {
 	cchar		*sysname ;	/* UNAME OS system-name */
@@ -70,7 +64,7 @@ struct userinfo_head {
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
 	uint		magic ;
-	USERINFO_FL	f ;
+	int		ostype ;
 } ;
 
 typedef USERINFO	userinfo ;

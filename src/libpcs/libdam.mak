@@ -673,9 +673,7 @@ keyvals.o:		keyvals.c keyvals.h
 paramopt.o:		paramopt.c paramopt.h
 
 logfile.o:		logfile.c logfile.h
-
 logfile_userinfo.o:	logfile_userinfo.c logfile.h userinfo.h
-
 logfile_printfold.o:	logfile_printfold.c logfile.h
 
 lastlogfile.o:		lastlogfile.c lastlogfile.h
@@ -1034,7 +1032,7 @@ snflags.o:		snflags.c snflags.h
 
 fsdirtreestat.o:	fsdirtreestat.c fsdirtree.h
 
-userinfo.o:		userinfo.c userinfo.h storeitem.h char.h gecos.h
+userinfo.o:		userinfo.cc userinfo.h
 
 getutmpterm.o:		getutmpterm.cc getutmpterm.h
 

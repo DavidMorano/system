@@ -248,7 +248,7 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	if ((rs = strlistmks_ctor(op,dbname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) {
-		static int	rsv = mkvars() ;
+		static cint	rsv = mkvars() ;
 		if ((rs = rsv) >= 0) {
 	            cchar	*cp ;
 	            if (n < STRLISTMKS_NENTRIES) {

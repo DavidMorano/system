@@ -16,7 +16,22 @@
 
 /*******************************************************************************
 
-	Retrieve the type of operating system.
+	Name:
+	getostype
+
+	Description:
+	This subroutine returns the type of operating system it is
+	currently running on.
+
+	Synopsis:
+	int getostype() noex
+
+	Arguments:
+	-
+
+	Returns:
+	>=0		0=BSD, 1=SYSV
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -37,12 +52,20 @@ enum ostypes {
 	ostype_overlast
 } ;
 
-
 EXTERNC_begin
-
 extern int	getostype() noex ;
-
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+struct ostyper {
+    operator int () noex ;
+    int operator () () noex ;
+} ;
+
+extern ostyper	ostype ;
+
+#endif /* __cplusplus */
 
 
 #endif /* GETOSTYPE_INCLUDE */
