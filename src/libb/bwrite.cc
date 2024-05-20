@@ -45,7 +45,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
 #include	<strn.h>
@@ -58,6 +58,13 @@
 
 #define	MEMCPYLEN	100		/* minimum length for 'memcpy(3c)' */
 
+#ifndef	CF_CHUNKCPY
+#define	CF_CHUNKCPY	0		/* try chunk copy */
+#endif
+#ifndef	CF_FLUSHPART
+#define	CF_FLUSHPART	1		/* do partial flushes */
+#endif
+
 
 /* imported namespaces */
 
@@ -66,6 +73,10 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
+
+extern "C" {
+    int		bfile_write(bfile *,cvoid *,int) noex ;
+}
 
 
 /* external variables */
@@ -83,6 +94,9 @@ static int	bfile_bufcpy(bfile *,cchar *,int) noex ;
 
 /* local variables */
 
+constexpr bool		f_chunkcpy = CF_CHUNKCPY ;
+constexpr bool		f_flushpart = CF_FLUSHPART ;
+
 
 /* exported variables */
 
@@ -93,20 +107,25 @@ int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,abuf)) > 0) {
 	    if ((rs = bfile_wr(op)) >= 0) {
-	        cchar	*abp = charp(abuf) ;
-	        if (alen < 0) alen = strlen(abp) ;
-	        if (rs >= 0) {
-	            if (op->bm == bfilebm_none) {
-	                rs = bfile_wbig(op,abuf,alen) ;
-	            } else {
-	                rs = bfile_wreg(op,abuf,alen) ;
-	            }
-	        } /* end if (ok) */
+		rs = bfile_write(op,abuf,alen) ;
 	    } /* end if (access) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (bwrite) */
+
+int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
+	int		rs = SR_OK ;
+	cchar		*abp = charp(abuf) ;
+	if (alen < 0) alen = strlen(abp) ;
+	if (op->bm == bfilebm_none) {
+	    rs = bfile_wbig(op,abuf,alen) ;
+	} else {
+	    rs = bfile_wreg(op,abuf,alen) ;
+	}
+	return rs ;
+}
+/* end subroutine (bfile_wr) */
 
 
 /* local subroutines */
@@ -134,53 +153,44 @@ static int bfile_wreg(bfile *op,cvoid *abuf,int alen) noex {
 	int		alenr = alen ;
 	int		mlen ;
 	int		len ;
-	int		f_bufline = (op->bm == bfilebm_line) ;
-	cchar	*abp = (cchar *) abuf ;
-
+	bool		f_bufline = (op->bm == bfilebm_line) ;
+	cchar		*abp = (cchar *) abuf ;
 	while ((rs >= 0) && (alenr > 0)) {
-
-#if	CF_CHUNKCPY
-	    if ((rs >= 0) && (op->len == 0) && (alenr >= op->bsize)) {
-		while ((rs >= 0) && (alenr >= op->bsize)) {
-	            mlen = op->bsize ;
-		    rs = bfile_wbig(op,abuf,mlen)
-		    alenr -= mlen ;
-		}
-	    } /* end if */
-#endif /* CF_CHUNKCPY */
-
+	    if_constexpr (f_chunkcpy) {
+	        if ((rs >= 0) && (op->len == 0) && (alenr >= op->bsize)) {
+		    while ((rs >= 0) && (alenr >= op->bsize)) {
+	                mlen = op->bsize ;
+		        rs = bfile_wbig(op,abuf,mlen) ;
+		        alenr -= mlen ;
+		    }
+	        } /* end if */
+	    } /* end if_constexpr (f_chunkcpy) */
 	    if ((rs >= 0) && (alenr > 0)) {
 	        int	n = 0 ;
 	        int	blenr = (op->bdata + op->bsize - op->bp) ;
-
-	        mlen = MIN(alenr,blenr) ;
+	        mlen = min(alenr,blenr) ;
 	        if (f_bufline && (mlen > 0)) {
 	            cchar	*tp ;
-	            if ((tp = strnrchr(abp,mlen,'\n')) != NULL) {
+	            if ((tp = strnrchr(abp,mlen,'\n')) != nullptr) {
 	                n = (op->len + ((tp+1) - abp)) ;
 	            }
 	        }
-
 	        len = bfile_bufcpy(op,abp,mlen) ;
 	        abp += len ;
 	        alenr -= len ;
-
-#if	CF_FLUSHPART
-	        if (op->bp == (op->bdata + op->bsize)) {
-	            rs = bfile_flush(op) ;
-	        } else if (f_bufline && (n > 0)) {
-	            rs = bfile_flushn(op,n) ;
-	        }
-#else /* CF_FLUSHPART */
-	        if (op->bp == (op->bdata + op->bsize)) {
-	            rs = bfile_flush(op) ;
-		}
-#endif /* CF_FLUSHPART */
-
+		if_constexpr (f_flushpart) {
+	            if (op->bp == (op->bdata + op->bsize)) {
+	                rs = bfile_flush(op) ;
+	            } else if (f_bufline && (n > 0)) {
+	                rs = bfile_flushn(op,n) ;
+	            }
+		} else {
+	            if (op->bp == (op->bdata + op->bsize)) {
+	                rs = bfile_flush(op) ;
+		    }
+		} /* end if_constexpr (f_flushpart) */
 	    } /* end if */
-
 	} /* end while */
-
 	return (rs >= 0) ? alen : rs ;
 }
 /* end subroutine (bfile_wreg) */

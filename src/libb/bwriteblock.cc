@@ -16,14 +16,18 @@
 
 /*******************************************************************************
 
-        This subroutine copies the remainder of the input file to the output
-        file.
+	Name:
+	bwriteblock
+
+	Description:
+	This subroutine copies the remainder of the input file to
+	the output file.
 
 	Synospsis:
-	int bwriteblock(bfile *ofp,bfile *ifp,int ulen) noex
+	int bwriteblock(bfile *op,bfile *ifp,int ulen) noex
 
 	Arguments:
-	ofp		output file pointer to copy to
+	op		output file pointer to copy to
 	ifp		input file pointer to copy from
 	ulen		length of supplied buffer
 
@@ -34,8 +38,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<algorithm>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -47,7 +53,67 @@
 #define	BFILE_NPAGES	4
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    extern int	bfile_write(bfile *,cvoid *,int) noex ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct writer ;
+    struct writer_rd {
+	writer		*wrp = nullptr ;
+	void operator () (writer *p) noex {
+	    wrp = p ;
+	} ;
+	operator int () noex ;
+    } ;
+    struct writer {
+	writer_rd	rd ;
+	bfile		*op ;
+	bfile		*ifp ;
+	char		*tbuf ;		/* temporary buffer pointer */
+	int		tlen ;		/* temporary buffer length */
+	int		ulen ;
+	writer(bfile *p,bfile *ip,int ul) noex : op(p), ifp(ip), ulen(ul) { 
+	    rd(this) ;
+	} ;
+	operator int () noex ;
+	int abegin() noex ;
+	int aend() noex ;
+	int ird() noex {
+	    cint	rl = min(ulen,tlen) ;
+	    int		rs = SR_OK ;
+	    if (rl) {
+		rs = bread(ifp,tbuf,rl) ;
+	    }
+	    return rs ;
+	} ;
+    } ;
+}
+
+
+/* forward references */
+
+
+/* local varaibles */
 
 
 /* exported variables */
@@ -55,61 +121,67 @@
 
 /* exported subroutines */
 
-int bwriteblock(bfile *ofp,bfile *ifp,int ulen) noex {
-	int		rs = SR_OK ;
+int bwriteblock(bfile *op,bfile *ifp,int ulen) noex {
+	int		rs ;
 	int		wlen = 0 ;
-
-	if (ofp == NULL) return SR_FAULT ;
-	if (ifp == NULL) return SR_FAULT ;
-
-	if (ofp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-	if (ifp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if ((! ofp->f.nullfile) && (ulen != 0)) {
-	    int		bsize = (ofp->pagesize * BFILE_NPAGES) ;
-	    char	*buf ;
-	    if (ulen >= 0) {
-		if (ulen < bsize) bsize = ulen ;
-	    } else {
-	        ulen = INT_MAX ;
-	    }
-	    if ((rs = uc_valloc(bsize,&buf)) >= 0) {
-	        int	bl, len ;
-	        int	mlen ;
-		int	i ;
-
-	        while (wlen < ulen) {
-
-	            mlen = MIN((ulen - wlen),bsize) ;
-	            rs = bread(ifp,buf,mlen) ;
-	            len = rs ;
-	            if (rs <= 0) break ;
-
-	            i = 0 ;
-	            bl = len ;
-	            while ((bl > 0) && ((rs = bwrite(ofp,(buf+i),bl)) < bl)) {
-	                i += rs ;
-	                bl -= rs ;
-	                if (rs < 0) break ;
-	            } /* end while */
-
-	            wlen += len ;
-	            if (rs < 0) break ;
-	        } /* end while */
-
-	        uc_free(buf) ;
-	    } /* end if (memory-allocation) */
-	} /* end if (not nullfile) */
-
+	if ((rs = bfile_magic(op,ifp)) > 0) {
+	    if ((rs = bfile_wr(op)) >= 0) {
+	        if (ulen != 0) {
+		    writer	wo(op,ifp,ulen) ;
+		    rs = wo ;
+		    wlen = rs ;
+	        } /* end if (not nullfile) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bwriteblock) */
 
 
-int bcopyblock(bfile *ifp,bfile *ofp,int ulen)
-{
-	return bwriteblock(ofp,ifp,ulen) ;
+/* local subroutines */
+
+writer::operator int () noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	if ((rs = abegin()) >= 0) {
+	    while ((rs = rd) > 0) {
+		rs = bfile_write(op,tbuf,rs) ;
+		ulen -= rs ;
+		wlen += rs ;
+		if (rs < 0) break ;
+	    } /* end while */
+	    rs1 = aend() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (allocation) */
+	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (bcopyblock) */
+/* end method (writer::operator) */
+
+int writer::abegin() noex {
+	tlen = (op->pagesize * BFILE_NPAGES) ;
+	if (ulen >= 0) {
+	    if (ulen < tlen) tlen = ulen ;
+	} else {
+	    ulen = INT_MAX ;
+	}
+	return uc_valloc(tlen,&tbuf) ;
+}
+/* end method (writer::abegin) */
+
+int writer::aend() noex {
+	int		rs = SR_BUGCHECK ;
+	if (tbuf) {
+	    rs = uc_free(tbuf) ;
+	    tbuf = nullptr ;
+	    tlen = 0 ;
+	}
+	return rs ;
+}
+/* end method (writer::aend) */
+
+writer_rd::operator int () noex {
+	return wrp->ird() ;
+}
 
 

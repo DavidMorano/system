@@ -47,7 +47,10 @@
 /* local defines */
 
 
-/* exported variables */
+/* external subroutines */
+
+
+/* external variables */
 
 
 /* local variables */
@@ -65,12 +68,10 @@ int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
 	    rs = SR_INVALID ;
 	    if (ulen > 0) {
 		auto	bw = bwrite ;
-	        int	i{} ;
-	        int	bl ;
 	        while ((rs = bread(ifp,ubuf,ulen)) > 0) {
 	            cint	len = rs ;
-	            i = 0 ;
-	            bl = len ;
+		    int		i = 0 ;
+	            int		bl = rs ;
 	            while ((bl > 0) && ((rs = bw(ofp,(ubuf + i),bl)) < bl)) {
 	                i += rs ;
 	                bl -= rs ;
