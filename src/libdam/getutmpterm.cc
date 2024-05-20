@@ -60,7 +60,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<getutmpent.h>
+#include	<utmpent.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
@@ -97,23 +97,23 @@ int getutmpterm(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	cchar		*devdname = DEVDNAME ;
 	if (rbuf) {
-	    GETUTMPENT	ute ;
+	    utmpent	ute ;
 	    if ((rs = getutmpent(&ute,sid)) >= 0) {
-		static cint	dlen = strlen(DEVDNAME) ;
+		static cint	dlen = strlen(devdname) ;
 	        if_constexpr (f_darwin) {
 	            if (strncmp(ute.line,devdname,dlen) == 0) {
-	                rs = mknpath1(rbuf,rlen,ute.line) ;
+	                rs = mknpath(rbuf,rlen,ute.line) ;
 	            } else if (strchr(ute.line,'/') == nullptr) {
 	                cchar	*dp = DARWINPREFIX ;
-	                rs = sncpy4(rbuf,rlen,devdname,"/",dp,ute.line) ;
+	                rs = sncpy(rbuf,rlen,devdname,"/",dp,ute.line) ;
 	            } else {
-	                rs = mknpath2(rbuf,rlen,devdname,ute.line) ;
+	                rs = mknpath(rbuf,rlen,devdname,ute.line) ;
 		    }
 	        } else {
 	            if (strncmp(ute.line,devdname,dlen) == 0) {
-	                rs = mknpath1(rbuf,rlen,ute.line) ;
+	                rs = mknpath(rbuf,rlen,ute.line) ;
 	            } else {
-	                rs = mknpath2(rbuf,rlen,devdname,ute.line) ;
+	                rs = mknpath(rbuf,rlen,devdname,ute.line) ;
 		    }
 	        } /* end if_constexpr (f_darwin) */
 	    } /* end if (getutmpent) */
