@@ -77,6 +77,23 @@ using std::min ;			/* subroutine-template */
 
 /* local structures */
 
+namespace {
+    struct ufinder ;
+    typedef int (ufinder::*ufinder_m)() noex ;
+    struct ufinder {
+        utmpacc_ent	ae{} ;
+        char		*aebuf ;
+	pid_t		sid ;
+	int		aelen = AEBUFLEN ;
+	ufinder(pid_t i) noex : sid(i) { } ;
+	int start() noex ;
+	int finish() noex ;
+	operator int () noex ;
+	int trysid() noex ;
+	int tryline() noex ;
+    } ;
+}
+
 
 /* forward references */
 
@@ -85,6 +102,11 @@ static int utmpent_load(utmpent *,utmpacc_ent *) noex ;
 
 
 /* local variables */
+
+constexpr ufinder_m	mems[] = {
+	&ufinder::trysid,
+	&ufinder::tryline
+} ;
 
 
 /* exported variables */
@@ -115,7 +137,7 @@ int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
 	    utmpent	e{} ;
 	    if (rlen < 0) rlen = UTMPENT_LUSER ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	    if ((rs = getutmpent(&e,sid)) > 0) {
 	        rs = sncpy1(rbuf,rlen,e.user) ;
 	    }
 	} /* end if (non-null) */
@@ -129,7 +151,7 @@ int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 	    utmpent	e{} ;
 	    if (rlen < 0) rlen = UTMPENT_LHOST ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	    if ((rs = getutmpent(&e,sid)) > 0) {
 	        rs = sncpy1(rbuf,rlen,e.host) ;
 	    }
 	} /* end if (non-null) */
@@ -143,7 +165,7 @@ int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 	    utmpent	e{} ;
 	    if (rlen < 0) rlen = UTMPENT_LLINE ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	    if ((rs = getutmpent(&e,sid)) > 0) {
 	        rs = sncpy1(rbuf,rlen,e.line) ;
 	    }
 	} /* end if (non-null) */
@@ -153,28 +175,6 @@ int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 
 
 /* local subroutines */
-
-namespace {
-    struct ufinder ;
-    typedef int (ufinder::*ufinder_m)() noex ;
-    struct ufinder {
-        utmpacc_ent	ae{} ;
-        char		*aebuf ;
-	pid_t		sid ;
-	int		aelen = AEBUFLEN ;
-	ufinder(pid_t i) noex : sid(i) { } ;
-	int start() noex ;
-	int finish() noex ;
-	operator int () noex ;
-	int trysid() noex ;
-	int tryline() noex ;
-    } ;
-}
-
-constexpr ufinder_m	mems[] = {
-	&ufinder::trysid,
-	&ufinder::tryline
-} ;
 
 ufinder::operator int () noex {
 	int		rs = SR_OK ;
@@ -219,22 +219,23 @@ static int utmpent_utmpacc(utmpent *ep,pid_t sid) noex {
 	ufinder		fo(sid) ;
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		ffound = false ;
 	if ((rs = fo.start()) >= 0) {
 	    if ((rs = fo) > 0) {
+		ffound = true ;
 	        rs = utmpent_load(ep,&fo.ae) ;
-	        len = rs ;
 	    }
 	    rs1 = fo.finish() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ufinder) */
-	return (rs >= 0) ? len : rs ;
+	return (rs >= 0) ? ffound : rs ;
 }
 /* end subroutine (utmpent_utmpacc) */
 
 static int utmpent_load(utmpent *ep,utmpacc_ent *aep) noex {
 	int		rs = SR_FAULT ;
 	if (ep && aep) {
+	    rs = SR_OK ;
 	    strwcpy(ep->id,aep->id,min(UTMPENT_LID,UTMPACC_LID)) ;
 	    strwcpy(ep->user,aep->user,min(UTMPENT_LUSER,UTMPACC_LUSER)) ;
 	    strwcpy(ep->line,aep->line,min(UTMPENT_LLINE,UTMPACC_LLINE)) ;
