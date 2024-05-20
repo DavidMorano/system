@@ -296,7 +296,7 @@ OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
 OBJ172= getnodename.o getclustername.o getnodeinfo.o getdomainname.o getseed.o
 OBJ173= getnprocessors.o getarchitecture.o getnfile.o getpwd.o getrunlevel.o
-OBJ174= getlogname.o getloghost.o getutmpent.o getutmpterm.o getsocktype.o
+OBJ174= getlogname.o getloghost.o getutmpterm.o getsocktype.o
 OBJ175= getpwentry.o getpwlogname.o getgroupname.o getarchitecture.o
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 

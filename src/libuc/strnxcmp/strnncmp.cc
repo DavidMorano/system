@@ -44,8 +44,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- |strlen(3c)| + |strncmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"strnxcmp.h"
 
@@ -59,6 +60,9 @@ using std::min ;			/* type */
 
 
 /* local typedefs */
+
+
+/* local variables */
 
 
 /* exported variables */

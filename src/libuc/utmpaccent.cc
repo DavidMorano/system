@@ -87,7 +87,7 @@ constexpr int 	lhost = UTMPACCENT_LHOST ;
 
 /* exported subroutines */
 
-int utmpaccent_load(UTMPACCENT *uep,char *uebuf,int uelen,CFENT *suep) noex {
+int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && uebuf && suep) {
@@ -121,7 +121,7 @@ int utmpaccent_load(UTMPACCENT *uep,char *uebuf,int uelen,CFENT *suep) noex {
 }
 /* end subroutine (utmpaccent_load) */
 
-int utmpaccent_size(CUTMPACCENT *uep) noex {
+int utmpaccent_size(cutmpaccent *uep) noex {
 	int		rs = SR_FAULT ;
 	int		size = 0 ;
 	if (uep) {

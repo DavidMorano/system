@@ -1,44 +1,69 @@
 /* utmpent SUPPORT */
 /* lang=C++20 */
 
-/* methods for the utmpent object */
+/* get user information from UTMP database */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2000-07-19, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	= 1998-07-01, David A­D­ Morano
+	This subroutine was originally written.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This code provides the methods for the UTMPENT object.
+	Name
+	getutmpent
+
+	Description:
+	Get the user login name from the UTMP database.
+
+	Synopsis:
+	int getutmpent(utmpent *ep,pid_t sid) noex
+	int getutmpname(char *rbuf,int rlen,pid_t sid) noex
+	int getutmphost(char *rbuf,int rlen,pid_t sid) noex
+	int getutmpline(char *rbuf,int rlen,pid_t sid) noex
+
+	Arguments:
+	ep		pointer to UTMPENT object
+	rbuf		buffer to hold result
+	rlen		length of user supplied buffer
+	sid		session ID to lookup
+
+	Returns:
+	>=0		length of user buf
+	<0		error (system-return)
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* ordered first to configure */
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* <- for |min(3c++)| */
 #include	<usystem.h>
-#include	<strn.h>
-#include	<mkchar.h>
+#include	<utmpacc.h>
+#include	<strwcpy.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
-#include	<syshasutmpx.h>
 
 #include	"utmpent.h"
 
 
 /* local defines */
 
+#define	AEBUFLEN	sizeof(struct utmpx)
+#define	VARUTMPLINE	"UTMPLINE"
+
 
 /* imported namespaces */
+
+using std::min ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -47,14 +72,19 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
+
+static int utmpent_utmpacc(utmpent *,pid_t) noex ;
+static int utmpent_load(utmpent *,utmpacc_ent *) noex ;
 
 
 /* local variables */
-
-constexpr bool		f_utmpsession = SYSHASUTMP_SESSION ;
-constexpr bool		f_utmpsyslen = SYSHASUTMP_SYSLEN ;
-constexpr bool		f_utmpexit = SYSHASUTMP_EXIT ;
 
 
 /* exported variables */
@@ -62,173 +92,159 @@ constexpr bool		f_utmpexit = SYSHASUTMP_EXIT ;
 
 /* exported subroutines */
 
-int utmpent_start(utmpent *op) noex {
+int getutmpent(utmpent *ep,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = memclear(op) ;
+	if (ep) {
+	    ep->id[0] = '\0' ;
+	    ep->line[0] = '\0' ;
+	    ep->user[0] = '\0' ;
+	    ep->host[0] = '\0' ;
+	    ep->session = 0 ;
+	    ep->date = 0 ;
+	    if (sid <= 0) sid = getsid(0) ;
+	    ep->sid = sid ;
+	    rs = utmpent_utmpacc(ep,sid) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (utmpent_start) */
+/* end subroutine (getutmpent) */
 
-int utmpent_finish(utmpent *op) noex {
+int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = memclear(op) ;
+	if (rbuf) {
+	    utmpent	e{} ;
+	    if (rlen < 0) rlen = UTMPENT_LUSER ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	        rs = sncpy1(rbuf,rlen,e.user) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (utmpent_finish) */
+/* end subroutine (getutmpname) */
 
-int utmpent_settype(utmpent *op,int type) noex {
+int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
-	    op->ut_type = type ;
+	if (rbuf) {
+	    utmpent	e{} ;
+	    if (rlen < 0) rlen = UTMPENT_LHOST ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	        rs = sncpy1(rbuf,rlen,e.host) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (utmpent_settype) */
+/* end subroutine (getutmphost) */
 
-int utmpent_setpid(utmpent *op,pid_t sid) noex {
+int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
-	    op->ut_pid = sid ;
+	if (rbuf) {
+	    utmpent	e{} ;
+	    if (rlen < 0) rlen = UTMPENT_LLINE ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	        rs = sncpy1(rbuf,rlen,e.line) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (utmpent_setpid) */
+/* end subroutine (getutmpline) */
 
-int utmpent_setsession(utmpent *op,int sess) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
-	    if constexpr (f_utmpsession) {
-	        op->ut_session = sess ;
-	    } else {
-		(void) sess ;
-	    } /* end if-constexpr (f_utmpsession) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (utmpent_setsession) */
 
-int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = (strnwcpy(op->ut_id,UTMPENT_LID,sp,sl) - op->ut_id) ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (utmpent_setid) */
+/* local subroutines */
 
-int utmpent_setline(utmpent *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = (strnwcpy(op->ut_line,UTMPENT_LLINE,sp,sl) - op->ut_line) ;
-	} /* end if (non-null) */
-	return rs ;
+namespace {
+    struct ufinder ;
+    typedef int (ufinder::*ufinder_m)() noex ;
+    struct ufinder {
+        utmpacc_ent	ae{} ;
+        char		*aebuf ;
+	pid_t		sid ;
+	int		aelen = AEBUFLEN ;
+	ufinder(pid_t i) noex : sid(i) { } ;
+	int start() noex ;
+	int finish() noex ;
+	operator int () noex ;
+	int trysid() noex ;
+	int tryline() noex ;
+    } ;
 }
-/* end subroutine (utmpent_setline) */
 
-int utmpent_setuser(utmpent *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = (strnwcpy(op->ut_user,UTMPENT_LUSER,sp,sl) - op->ut_user) ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (utmpent_setuser) */
+constexpr ufinder_m	mems[] = {
+	&ufinder::trysid,
+	&ufinder::tryline
+} ;
 
-int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = (strnwcpy(op->ut_host,UTMPENT_LHOST,sp,sl) - op->ut_host) ;
-	    if constexpr (f_utmpsyslen) {
-	        op->ut_syslen = rs ;
-	    } /* end if-constexpr (f_utmpsyslen) */
-	} /* end if (non-null) */
+ufinder::operator int () noex {
+	int		rs = SR_OK ;
+	for (auto &m : mems) {
+	    rs = (this->*m)() ;
+	    if (rs != 0) break ;
+	} /* end for */
 	return rs ;
 }
-/* end subroutine (utmpent_sethost) */
+/* end method (ufinder::operator) */
 
-int utmpent_gettype(utmpent *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = mkchar(op->ut_type) ;
-	} /* end if (non-null) */
-	return rs ;
+int ufinder::start() noex {
+	return uc_malloc(aelen,&aebuf) ;
 }
-/* end subroutine (utmpent_gettype) */
 
-int utmpent_getpid(utmpent *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = op->ut_pid ;
-	} /* end if (non-null) */
+int ufinder::finish() noex {
+	int	rs = SR_BUGCHECK ;
+	if (aebuf) {
+	    rs = uc_free(aebuf) ;
+	    aebuf = nullptr ;
+	}
 	return rs ;
 }
-/* end subroutine (utmpent_getpid) */
 
-int utmpent_getsession(utmpent *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    if constexpr (f_utmpsession) {
-	        rs = op->ut_session ;
-	    } else {
-	        rs = SR_OK ;
-	    } /* end if-constexpr (f_utmpsession) */
-	} /* end if (non-null) */
-	return rs ;
+int ufinder::trysid() noex {
+	return utmpacc_entsid(&ae,aebuf,aelen,sid) ;
 }
-/* end subroutine (utmpent_getsession) */
 
-int utmpent_getid(utmpent *op,cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = strnlen(op->ut_id,UTMPENT_LID) ;
-	    if (rpp) *rpp = op->ut_id ;
-	} /* end if (non-null) */
+int ufinder::tryline() noex {
+	static int	oursid = getsid(0) ;
+	int		rs = SR_OK ;
+	if (sid == oursid) {
+	    static cchar	*line = getenv(VARUTMPLINE) ;
+	    if (line) {
+	        rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
+	    }
+	} /* end if (refering outseld) */
 	return rs ;
 }
-/* end subroutine (utmpent_getid) */
 
-int utmpent_getline(utmpent *op,cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = strnlen(op->ut_line,UTMPENT_LLINE) ;
-	    if (rpp) *rpp = op->ut_line ;
-	} /* end if (non-null) */
-	return rs ;
+static int utmpent_utmpacc(utmpent *ep,pid_t sid) noex {
+	ufinder		fo(sid) ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	if ((rs = fo.start()) >= 0) {
+	    if ((rs = fo) > 0) {
+	        rs = utmpent_load(ep,&fo.ae) ;
+	        len = rs ;
+	    }
+	    rs1 = fo.finish() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (ufinder) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (utmpent_getline) */
+/* end subroutine (utmpent_utmpacc) */
 
-int utmpent_getuser(utmpent *op,cchar **rpp) noex {
+static int utmpent_load(utmpent *ep,utmpacc_ent *aep) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = strnlen(op->ut_user,UTMPENT_LUSER) ;
-	    if (rpp) *rpp = op->ut_user ;
-	} /* end if (non-null) */
+	if (ep && aep) {
+	    strwcpy(ep->id,aep->id,min(UTMPENT_LID,UTMPACC_LID)) ;
+	    strwcpy(ep->user,aep->user,min(UTMPENT_LUSER,UTMPACC_LUSER)) ;
+	    strwcpy(ep->line,aep->line,min(UTMPENT_LLINE,UTMPACC_LLINE)) ;
+	    strwcpy(ep->host,aep->host,min(UTMPENT_LHOST,UTMPACC_LHOST)) ;
+	    ep->session = aep->session ;
+	    ep->date = aep->ctime ;
+	    ep->sid = aep->sid ;
+	} /* end if (utmpacc_entsid) */
 	return rs ;
 }
-/* end subroutine (utmpent_getuser) */
-
-int utmpent_gethost(utmpent *op,cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = strnlen(op->ut_host,UTMPENT_LHOST) ;
-	    if constexpr (f_utmpsyslen) {
-	        if (op->ut_syslen > 0) {
-	            if (rs > op->ut_syslen) {
-		        rs = op->ut_syslen ;
-		    }
-	        }
-	    } /* end if-constexpr (f_utmpsession) */
-	    if (rpp) *rpp = op->ut_host ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (utmpent_gethost) */
+/* end subroutine (utmpent_load) */
 
 
