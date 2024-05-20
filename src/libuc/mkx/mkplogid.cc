@@ -94,7 +94,7 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-		static int	rsm = ndigit(PID_MAX,10) ;
+		static cint	rsm = ndigit(PID_MAX,10) ;
 		if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rs ;
 		    int		modval ;

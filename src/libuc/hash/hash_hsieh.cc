@@ -4,10 +4,13 @@
 /* this is the "super-fast" hash function by Paul Hsieh (2004-2008) */
 /* version %I% last-modified %G% */
 
+
 #include	<envstandards.h>	/* first to configure */
-#include	<stdint.h>
-#include	<utypedefs.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdint>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"hash.h"
 

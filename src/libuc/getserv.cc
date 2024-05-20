@@ -41,7 +41,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getxx.h>
 #include	<localmisc.h>

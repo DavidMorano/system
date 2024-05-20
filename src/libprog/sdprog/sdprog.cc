@@ -164,50 +164,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar	 *,cchar	 *) ;
-extern int	sncpy1(char *,int,cchar	 *) ;
-extern int	sncpy2(char *,int,cchar	 *,cchar	 *) ;
-extern int	mkpath1w(char *,cchar	 *,int) ;
-extern int	mkpath1(char *,cchar	 *) ;
-extern int	mkpath2(char *,cchar	 *,cchar	 *) ;
-extern int	mkpath3(char *,cchar	 *,cchar	 *,cchar	 *) ;
-extern int	sfdirname(cchar	 *,int,cchar	 **) ;
-extern int	sfbasename(cchar	 *,int,cchar	 **) ;
-extern int	vstrkeycmp(cchar	 **,cchar	 **) ;
-extern int	matstr(cchar	 **,cchar	 *,int) ;
-extern int	matostr(cchar	 **,int,cchar	 *,int) ;
-extern int	pathclean(char *,cchar	 *,int) ;
-extern int	vstrkeycmp(cchar	 **,cchar	 **) ;
-extern int	cfdeci(cchar	 *,int,int *) ;
-extern int	cfdecui(cchar	 *,int,uint *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecl(char *,int,long) ;
-extern int	optbool(cchar	 *,int) ;
-extern int	gethz(int) ;
-extern int	getpwd(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	vecstr_adduniq(vecstr *,cchar	 *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,cchar	 *) ;
-extern int	vecstr_envset(VECSTR *,cchar	 *,cchar	 *,int) ;
-extern int	vecstr_envadd(VECSTR *,cchar	 *,cchar	 *,int) ;
-extern int	vecstr_envadds(VECSTR *,cchar	 *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	permsched(cchar	 **,vecstr *,char *,int,cchar	 *,int) ;
-extern int	getprogpath(IDS *,VECSTR *,char *,cchar	 *,int) ;
-extern int	msleep(uint) ;
-extern int	mkpr(char *,int,cchar	 *,cchar	 *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	hasalldig(cchar	 *,int) ;
-
-extern int	envs_procxe(ENVS *,EXPCOOK *,cchar	 **,vecstr *,cchar *) ;
-extern int	envs_subs(vecstr *,EXPCOOK *,VECSTR *,ENVS *) ;
-extern int	getnprocessors(cchar	 **,int) ;
-extern int	defproc(vecstr *,cchar	 **,EXPCOOK *,cchar	 *) ;
-
-extern char	*strwcpy(char *,cchar	 *,int) ;
-
 
 /* external variables */
 
@@ -358,17 +314,6 @@ static bool	haspmz(cchar *) noex ;
 static bool	hasmz(cchar *) noex ;
 
 
-/* global variables (module information) */
-
-SYSDIALER_INFO	prog = {
-	PROG_MNAME,
-	PROG_VERSION,
-	PROG_INAME,
-	sizeof(PROG),
-	PROG_FLAGS
-} ;
-
-
 /* local variables */
 
 enum argopts {
@@ -394,7 +339,7 @@ static constexpr cchar	 *argopts[] = {
 	"xf",
 	"ef",
 	"lf",
-	NULL
+	nullptr
 } ;
 
 enum procopts {
@@ -404,7 +349,7 @@ enum procopts {
 
 static constexpr cchar	 *procopts[] = {
 	"log",
-	NULL
+	nullptr
 } ;
 
 enum cparams {
@@ -414,7 +359,7 @@ enum cparams {
 
 static constexpr cchar	*cparams[] = {
 	"defprog",
-	NULL
+	nullptr
 } ;
 
 enum cooks {
@@ -464,21 +409,21 @@ static constexpr cchar	*cooks[] = {
 	"H",		/* INET hostname */
 	"R",		/* program-root */
 	"RN",		/* program root-name */
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*schedhconf[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*schedpconf[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*schedpfile[] = {
@@ -486,7 +431,7 @@ static constexpr cchar	*schedpfile[] = {
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%e/%f",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*schedhfile[] = {
@@ -494,7 +439,7 @@ static constexpr cchar	*schedhfile[] = {
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
 	"%h/%e/%f",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*pathvars[] = {
@@ -507,7 +452,7 @@ static constexpr cchar	*pathvars[] = {
 	"XUSERFILESEARCHPATH",
 	"MAILDIR",
 	"MAILDIRS",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*envbad[] = {
@@ -517,7 +462,7 @@ static constexpr cchar	*envbad[] = {
 	"A__z",
 	"RANDOM",
 	"TMOUT",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*envsys[] = {
@@ -532,7 +477,7 @@ static constexpr cchar	*envsys[] = {
 	"USERNAME",
 	"GROUPNAME",
 	"DOMAIN",
-	NULL
+	nullptr
 } ;
 
 enum envdialers {
@@ -548,11 +493,19 @@ static constexpr cchar	*envdialers[] = {
 	"SYSDIALER_HOST",
 	"SYSDIALER_SVC",
 	"SYSDIALER_SVCARGS",
-	NULL
+	nullptr
 } ;
 
 
 /* exported variables */
+
+SYSDIALER_INFO	prog_mod = {
+	PROG_MNAME,
+	PROG_VERSION,
+	PROG_INAME,
+	sizeof(PROG),
+	PROG_FLAGS
+} ;
 
 
 /* exported subroutines */
@@ -568,12 +521,12 @@ cchar		*av[] ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		opts = 0 ;
-	cchar		*progfname = NULL ;
+	cchar		*progfname = nullptr ;
 	char		progfnamebuf[MAXPATHLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (ap == NULL) return SR_FAULT ;
-	if (hostname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (ap == nullptr) return SR_FAULT ;
+	if (hostname == nullptr) return SR_FAULT ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
@@ -621,7 +574,7 @@ cchar		*av[] ;
 	if (rs < 0)
 	    goto baddefsinit ;
 
-	if ((sip->dfname != NULL) && (sip->dfname != '\0'))
+	if ((sip->dfname != nullptr) && (sip->dfname != '\0'))
 	    rs = loaddefsfile(sip,sip->dfname) ;
 
 	if (rs >= 0)
@@ -647,7 +600,7 @@ cchar		*av[] ;
 	if (rs >= 0)
 	    rs = loadxsched(sip,schedhfile) ;
 
-	if ((rs >= 0) && (sip->xfname != NULL) && (sip->xfname[0] != '\0'))
+	if ((rs >= 0) && (sip->xfname != nullptr) && (sip->xfname[0] != '\0'))
 	    rs = loadxfile(sip,sip->xfname) ;
 
 	if (rs < 0)
@@ -673,7 +626,7 @@ cchar		*av[] ;
 	    rs = procenvdef(sip) ;
 
 	if (rs >= 0)
-	    rs = procenvsys(sip,NULL) ;
+	    rs = procenvsys(sip,nullptr) ;
 
 	if (rs < 0)
 	    goto badprocenvsys ;
@@ -759,7 +712,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -782,7 +735,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -807,7 +760,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -829,7 +782,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -850,7 +803,7 @@ int		buflen ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -872,7 +825,7 @@ int		flags ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -896,7 +849,7 @@ int		salen ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -917,7 +870,7 @@ int		flags ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -935,7 +888,7 @@ int prog_shutdown(PROG *op,int cmd)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -954,7 +907,7 @@ int prog_close(PROG *op)
 	int		cstat ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
@@ -1017,7 +970,7 @@ cchar		svcname[] ;
 	    sip->ncpu = rs ;
 	    if ((rs = vecstr_start(&sip->stores,3,0)) >= 0) {
 		if ((rs = vecstr_start(&sip->aenvs,3,0)) >= 0) {
-		    if (ap != NULL) {
+		    if (ap != nullptr) {
 	    		rs = subinfo_procargs(sip) ;
 		    }
 		    if (rs < 0)
@@ -1044,22 +997,22 @@ static int subinfo_finish(SUBINFO *sip)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (sip->a.node != NULL) {
+	if (sip->a.node != nullptr) {
 	    rs1 = uc_free(sip->a.node) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.node = NULL ;
+	    sip->a.node = nullptr ;
 	}
 
-	if (sip->a.svc != NULL) {
+	if (sip->a.svc != nullptr) {
 	    rs1 = uc_free(sip->a.svc) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.svc = NULL ;
+	    sip->a.svc = nullptr ;
 	}
 
-	if (sip->a.pr != NULL) {
+	if (sip->a.pr != nullptr) {
 	    rs1 = uc_free(sip->a.pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.pr = NULL ;
+	    sip->a.pr = nullptr ;
 	}
 
 	rs1 = vecstr_finish(&sip->aenvs) ;
@@ -1083,14 +1036,14 @@ static int subinfo_procargs(SUBINFO *sip)
 	int		ai, ai_max, ai_pos ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_doubledash = FALSE ;
-	cchar		*argval = NULL ;
+	cchar		*argval = nullptr ;
 	cchar		**argv ;
 	cchar		*argp, *aop, *akp, *avp ;
 	char		argpresent[NARGPRESENT] ;
 
 	argv = ap->argv ;
 
-	for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 
 	sip->argc = argc ;
 	sip->argv = argv ;
@@ -1107,7 +1060,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = (argc - 1) ;
-	while ((rs >= 0) && (sip->program == NULL) && (argr > 0)) {
+	while ((rs >= 0) && (sip->program == nullptr) && (argr > 0)) {
 
 	    argp = argv[++ai] ;
 	    argr -= 1 ;
@@ -1134,14 +1087,14 @@ static int subinfo_procargs(SUBINFO *sip)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -1388,7 +1341,7 @@ static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
 
 	    if ((oi = matostr(procopts,2,kp,kl)) >= 0) {
 
-	        vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	        vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	        switch (oi) {
 	        case procopt_log:
@@ -1420,16 +1373,16 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar v[],int vlen)
 	int		vnlen = 0 ;
 	cchar		*cp ;
 
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
-	if (epp == NULL) return SR_INVALID ;
+	if (epp == nullptr) return SR_INVALID ;
 
 /* find existing entry for later deletion */
 
 	oi = -1 ;
-	if (*epp != NULL) {
+	if (*epp != nullptr) {
 	    for (i = 0 ; vecstr_get(&sip->stores,i,&cp) >= 0 ; i += 1) {
-	        if (cp != NULL) {
+	        if (cp != nullptr) {
 	            if (*epp == cp) {
 	                oi = i ;
 	                break ;
@@ -1440,7 +1393,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar v[],int vlen)
 
 /* add the new entry */
 
-	if (v != NULL) {
+	if (v != nullptr) {
 	    vnlen = strnlen(v,vlen) ;
 	    if ((rs = vecstr_add(&sip->stores,v,vnlen)) >= 0) {
 	        i = rs ;
@@ -1470,11 +1423,11 @@ static int subinfo_defaults(SUBINFO *sip)
 
 /* program-root */
 
-	if ((sip->pr == NULL) && (sip->prn != NULL) && (sip->prn[0] != '\0')) {
+	if ((sip->pr == nullptr) && (sip->prn != nullptr) && (sip->prn[0] != '\0')) {
 	    char	domainname[MAXHOSTNAMELEN + 1] ;
 	    char	pr[MAXPATHLEN + 1] ;
 
-	    rs1 = getnodedomain(NULL,domainname) ;
+	    rs1 = getnodedomain(nullptr,domainname) ;
 
 	    if (rs1 >= 0)
 	        rs1 = mkpr(pr,MAXPATHLEN,sip->prn,domainname) ;
@@ -1493,9 +1446,9 @@ static int subinfo_defaults(SUBINFO *sip)
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->pr == NULL)) {
+	if ((rs >= 0) && (sip->pr == nullptr)) {
 
-	    if ((vp = getenv(PROG_VARPR)) != NULL) {
+	    if ((vp = getenv(PROG_VARPR)) != nullptr) {
 	        rs = subinfo_dirok(sip,vp,-1) ;
 	        if (rs > 0)
 	            sip->pr = vp ;
@@ -1503,19 +1456,19 @@ static int subinfo_defaults(SUBINFO *sip)
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->pr == NULL)) {
+	if ((rs >= 0) && (sip->pr == nullptr)) {
 	    vp = PROG_PR ;
 	    rs = subinfo_dirok(sip,vp,-1) ;
 	    if (rs > 0)
 	        sip->pr = vp ;
 	} /* end if */
 
-	if (sip->pr == NULL)
+	if (sip->pr == nullptr)
 	    sip->pr = ap->pr ;
 
 /* program root-name */
 
-	if ((rs >= 0) && (sip->prn == NULL) && (sip->pr != NULL)) {
+	if ((rs >= 0) && (sip->prn == nullptr) && (sip->pr != nullptr)) {
 		cchar	*cp, **epp ;
 		int	cl ;
 		if ((cl = sfbasename(sip->pr,-1,&cp)) > 0) {
@@ -1526,12 +1479,12 @@ static int subinfo_defaults(SUBINFO *sip)
 
 /* search-name */
 
-	if (sip->searchname == NULL)
+	if (sip->searchname == nullptr)
 	    sip->searchname = PROG_SEARCHNAME ;
 
 /* log-file */
 
-	if ((rs >= 0) && (sip->logfname == NULL)) {
+	if ((rs >= 0) && (sip->logfname == nullptr)) {
 		sip->logfname = PROG_LOGFNAME ;
 	}
 
@@ -1549,7 +1502,7 @@ static int subinfo_userinfo(SUBINFO *sip)
 	    goto ret0 ;
 
 	sip->f.userinfo = TRUE ;
-	rs = userinfo(uip,sip->userinfobuf,USERINFO_LEN,NULL) ;
+	rs = userinfo(uip,sip->userinfobuf,USERINFO_LEN,nullptr) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -1586,15 +1539,15 @@ static int subinfo_findprog(SUBINFO *sip,char progfname[])
 
 	elp = &sip->exports ;
 	progfname[0] = '\0' ;
-	if (pnp == NULL) {
+	if (pnp == nullptr) {
 	    rs = procdefprog(sip,&pnp) ;
 	} /* end if */
 
-	if ((rs >= 0) && ((pnp == NULL) || (pnp[0] == '\0')))
+	if ((rs >= 0) && ((pnp == nullptr) || (pnp[0] == '\0')))
 	    rs = SR_NOENT ;
 
 	if (rs >= 0) {
-	if (strchr(pnp,'/') == NULL) {
+	if (strchr(pnp,'/') == nullptr) {
 	    rs = subinfo_search(sip,elp,progfname,pnp) ;
 	} else
 	    rs = mkpath1(progfname,pnp) ;
@@ -1640,10 +1593,10 @@ static int subinfo_envdialer(SUBINFO *sip)
 	int		i ;
 	int		size ;
 	cchar		*vp ;
-	char		*sabuf = NULL ;
+	char		*sabuf = nullptr ;
 
-	for (i = 0 ; envdialers[i] != NULL ; i += 1) {
-	    vp = NULL ;
+	for (i = 0 ; envdialers[i] != nullptr ; i += 1) {
+	    vp = nullptr ;
 	    switch (i) {
 	    case envdialer_root:
 		vp = sip->pr ;
@@ -1663,7 +1616,7 @@ static int subinfo_envdialer(SUBINFO *sip)
 		break ;
 	    } /* end switch */
 
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 
 	        rs = vecstr_envadd(elp,envdialers[i],vp,-1) ;
 
@@ -1672,7 +1625,7 @@ static int subinfo_envdialer(SUBINFO *sip)
 
 	} /* end for */
 
-	if (sabuf != NULL) {
+	if (sabuf != nullptr) {
 	    uc_free(sabuf) ;
 	}
 
@@ -1691,7 +1644,7 @@ static int subinfo_sasize(SUBINFO *sip)
 
 	argr = (sip->argc - sip->argi) ;
 	argv = (cchar	 **) (sip->argv + sip->argi) ;
-	for (i = 0 ; (i < argr) && (argv[i] != NULL) ; i += 1) {
+	for (i = 0 ; (i < argr) && (argv[i] != nullptr) ; i += 1) {
 	    if (i >= 1) {
 		size += (strlen(argv[i]) + 1) ;
 	    }
@@ -1712,7 +1665,7 @@ static int subinfo_sabuild(SUBINFO *sip,char sabuf[])
 
 	argr = (sip->argc - sip->argi) ;
 	argv = (cchar	 **) (sip->argv + sip->argi) ;
-	for (i = 0 ; (i < argr) && (argv[i] != NULL) ; i += 1) {
+	for (i = 0 ; (i < argr) && (argv[i] != nullptr) ; i += 1) {
 	    if (i >= 1) {
 		bp = strwcpy(bp,argv[i],-1) ;
 		*bp++ = ' ' ;
@@ -1745,8 +1698,8 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	cchar		**av ;
 	cchar		**ev ;
 	cchar		**argv ;
-	cchar		*azp = NULL ;
-	cchar		*abuf = NULL ;
+	cchar		*azp = nullptr ;
+	cchar		*abuf = nullptr ;
 
 	if (op->f.log) {
 	    logfile_printf(&op->lh,"prog=%s",progfname) ;
@@ -1765,7 +1718,7 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	if (rs < 0)
 	    goto ret0 ;
 
-	f_sa = ((argv == NULL) || (argv[0] == NULL)) ;
+	f_sa = ((argv == nullptr) || (argv[0] == nullptr)) ;
 	f_sa = f_sa || ((argr >= 0) && haspmz(argv[0])) ;
 #ifdef	COMMENT
 	f_sa = f_sa || (sip->progmode == 1) ;
@@ -1789,9 +1742,9 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 
 /* setup the zeroth argument */
 
-	f_m = ((argv == NULL) || (argv[0] == NULL)) && sip->f.progdash ;
+	f_m = ((argv == nullptr) || (argv[0] == nullptr)) && sip->f.progdash ;
 	f_m = f_m || 
-	    ((argv != NULL) && (argv[0] != NULL) && hasmz(argv[0])) ;
+	    ((argv != nullptr) && (argv[0] != nullptr) && hasmz(argv[0])) ;
 	if (f_m) {
 	    rs = buffer_char(&b,'-') ;
 	}
@@ -1809,8 +1762,8 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 
 /* setup all remaining arguments */
 
-	if (argv != NULL) {
-	    for (i = 1 ; (rs >= 0) && (argr > 0) && (argv[i] != NULL) ; 
+	if (argv != nullptr) {
+	    for (i = 1 ; (rs >= 0) && (argr > 0) && (argv[i] != nullptr) ; 
 	        i += 1) {
 
 	        argr -= 1 ;
@@ -1853,7 +1806,7 @@ static int subinfo_logfile(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*lnp ;
-	cchar		*lidp = NULL ;
+	cchar		*lidp = nullptr ;
 	char		logfname[MAXPATHLEN + 1] ;
 
 	if (! sip->f.log)
@@ -1899,7 +1852,7 @@ ret0:
 
 static int subinfo_dirok(SUBINFO *sip,cchar d[],int dlen)
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	NULSTR		ss ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1954,7 +1907,7 @@ static int loadarchitecture(SUBINFO *sip)
 	cchar		*cp = getenv(VARARCHITECTURE) ;
 
 #ifdef	SI_ARCHITECTURE
-	if (cp == NULL) {
+	if (cp == nullptr) {
 	    char	archbuf[ARCHBUFLEN + 1] ;
 	    rs = u_sysinfo(SI_ARCHITECTURE,archbuf,ARCHBUFLEN) ;
 	    if (rs >= 0) {
@@ -1964,7 +1917,7 @@ static int loadarchitecture(SUBINFO *sip)
 	}
 #endif /* SI_ARCHITECTURE */
 
-	if (cp != NULL) {
+	if (cp != nullptr) {
 	    rs = subinfo_setentry(sip,&sip->architecture,cp,cl) ;
 	}
 
@@ -1998,8 +1951,8 @@ static int loadcooks(SUBINFO *sip)
 	int		vl = 0 ;
 	cchar		*vp ;
 
-	for (i = 0 ; cooks[i] != NULL ; i += 1) {
-	    vp = NULL ;
+	for (i = 0 ; cooks[i] != nullptr ; i += 1) {
+	    vp = nullptr ;
 	    vl = -1 ;
 	    switch (i) {
 	    case cook_machine:
@@ -2083,7 +2036,7 @@ static int loadcooks(SUBINFO *sip)
 	        vp = sip->prn ;
 	        break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 	        rs = expcook_add(ckp,cooks[i],vp,vl) ;
 	    }
 	    if (rs < 0) break ;
@@ -2154,8 +2107,8 @@ static int loadparams(SUBINFO *sip)
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		vbuf[VBUFLEN + 1] ;
 
-	if ((rs >= 0) && (sip->defprog == NULL)) {
-	    if ((cp = getenv(VARDEFPROG)) != NULL) {
+	if ((rs >= 0) && (sip->defprog == nullptr)) {
+	    if ((cp = getenv(VARDEFPROG)) != nullptr) {
 	        if (cp[0] != '\0') {
 	            cchar	**vpp = &sip->defprog ;
 	            rs = subinfo_setentry(sip,vpp,cp,-1) ;
@@ -2168,7 +2121,7 @@ static int loadparams(SUBINFO *sip)
 
 /* parameter file */
 
-	if (sip->paramfname == NULL)
+	if (sip->paramfname == nullptr)
 	    rs1 = SR_NOTFOUND ;
 
 	if ((rs1 >= 0) && (sip->paramfname[0] == '\0'))
@@ -2189,7 +2142,7 @@ static int loadparams(SUBINFO *sip)
 	if ((rs1 >= 0) && (paramfile_open(&pf,ev,tmpfname) >= 0)) {
 	    const int	vlen = VBUFLEN ;
 
-	    for (i = 0 ; cparams[i] != NULL ; i += 1) {
+	    for (i = 0 ; cparams[i] != nullptr ; i += 1) {
 
 	        if ((paramfile_curbegin(&pf,&cur)) >= 0) {
 
@@ -2202,7 +2155,7 @@ static int loadparams(SUBINFO *sip)
 	            switch (i) {
 
 	            case cparam_defprog:
-	                if ((vl > 0) && (sip->defprog == NULL)) {
+	                if ((vl > 0) && (sip->defprog == nullptr)) {
 	                    mkpath1w(tmpfname,vbuf,vl) ;
 	                    rs1 = xfile(&sip->id,tmpfname) ;
 	                    if (rs1 >= 0) {
@@ -2226,7 +2179,7 @@ static int loadparams(SUBINFO *sip)
 	    paramfile_close(&pf) ;
 	} /* end if (parameter file) */
 
-	if ((rs >= 0) && (sip->defprog == NULL)) {
+	if ((rs >= 0) && (sip->defprog == nullptr)) {
 	    cp = PROG_DEFPROG ;
 	    rs = subinfo_setentry(sip,&sip->defprog,cp,-1) ;
 	}
@@ -2240,7 +2193,7 @@ ret0:
 
 static int loaddefsfile(SUBINFO *sip,cchar *dfname)
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		**envv = (cchar	 **) sip->envv ;
@@ -2283,7 +2236,7 @@ static int loaddefs(SUBINFO *sip,cchar **sched)
 
 static int loadxfile(SUBINFO *sip,cchar *xfname)
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f ;
@@ -2365,7 +2318,7 @@ SUBINFO		*sip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip == NULL)
+	if (sip == nullptr)
 	    return SR_FAULT ;
 
 	pvp = &sip->pvars ;
@@ -2388,19 +2341,19 @@ SUBINFO		*sip ;
 	cchar		*tp, *kp, *vp ;
 	cchar		*kname ;
 
-	for (i = 0 ; sip->envv[i] != NULL ; i += 1) {
+	for (i = 0 ; sip->envv[i] != nullptr ; i += 1) {
 
 	    kp = sip->envv[i] ;
 	    kl = -1 ;
-	    vp = NULL ;
+	    vp = nullptr ;
 	    vl = 0 ;
-	    if ((tp = strchr(kp,'=')) != NULL) {
+	    if ((tp = strchr(kp,'=')) != nullptr) {
 	        kl = (tp - kp) ;
 	        vp = (tp + 1) ;
 	        vl = -1 ;
 	    }
 
-	    if ((vp != NULL) && (matstr(envbad,kp,kl) < 0)) {
+	    if ((vp != nullptr) && (matstr(envbad,kp,kl) < 0)) {
 
 	        if ((rs = nulstr_start(&ns,kp,kl,&kname)) >= 0) {
 
@@ -2429,11 +2382,11 @@ SUBINFO		*sip ;
 	cchar		*ename ;
 	cchar		*tp ;
 
-	for (i = 0 ; envsys[i] != NULL ; i += 1) {
+	for (i = 0 ; envsys[i] != nullptr ; i += 1) {
 
 	    ename = envsys[i] ;
-	    if (vecstr_search(elp,ename,vstrkeycmp,NULL) == SR_NOTFOUND) {
-	        tp = NULL ;
+	    if (vecstr_search(elp,ename,vstrkeycmp,nullptr) == SR_NOTFOUND) {
+	        tp = nullptr ;
 	        switch ((int) ename[0]) {
 	        case 'S':
 	            tp = sip->usysname ;
@@ -2471,7 +2424,7 @@ SUBINFO		*sip ;
 	            tp = sip->domainname ;
 	            break ;
 	        } /* end switch */
-	        if (tp != NULL) {
+	        if (tp != nullptr) {
 	            n += 1 ;
 	            rs = vecstr_envadd(elp,ename,tp,-1) ;
 	        }
@@ -2528,16 +2481,16 @@ cchar		**rpp ;
 {
 	int		rs = SR_OK ;
 
-	if (rpp == NULL) return SR_FAULT ;
+	if (rpp == nullptr) return SR_FAULT ;
 
-	*rpp = NULL ;
-	if (sip->defprog == NULL) {
+	*rpp = nullptr ;
+	if (sip->defprog == nullptr) {
 
 	    rs = loadparams(sip) ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->defprog != NULL)) {
+	if ((rs >= 0) && (sip->defprog != nullptr)) {
 	    *rpp = sip->defprog ;
 	}
 
@@ -2582,7 +2535,7 @@ cchar		*pnames[] ;
 
 	if ((rs1 = vecstr_count(pvp)) == 0) {
 
-	    for (i = 0 ; pnames[i] != NULL ; i += 1) {
+	    for (i = 0 ; pnames[i] != nullptr ; i += 1) {
 	        rs = vecstr_adduniq(pvp,pnames[i],-1) ;
 	        if (rs < 0) break ;
 	    } /* end for */
@@ -2607,7 +2560,7 @@ VECSTR		*elp ;
 	    cchar	*tp ;
 
 	    rs = SR_NOENT ;
-	    if ((tp = strchr(pp,'=')) != NULL) {
+	    if ((tp = strchr(pp,'=')) != nullptr) {
 	        rs = loadpathcomp(sip,plp,(tp + 1)) ;
 	    }
 
@@ -2629,11 +2582,11 @@ cchar		*pp ;
 	cchar		*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	if (sip == NULL)
+	if (sip == nullptr)
 	    return SR_FAULT ;
 
 	c = 0 ;
-	while ((cp = strpbrk(pp,":;")) != NULL) {
+	while ((cp = strpbrk(pp,":;")) != nullptr) {
 
 	    cl = pathclean(tmpfname,pp,(cp - pp)) ;
 
@@ -2680,7 +2633,7 @@ cchar		pr[] ;
 
 	if ((rs = procxpath(lp,tmpfname)) >= 0) {
 	    char	*pp ;
-	    if ((pp = getenv(VARPATH)) != NULL) {
+	    if ((pp = getenv(VARPATH)) != nullptr) {
 	        rs = loadpath(lp,pp) ;
 	    }
 	}
@@ -2706,7 +2659,7 @@ static int loadpath(vecstr *lp,cchar *pp)
 	cchar		*tp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	while ((tp = strchr(pp,':')) != NULL) {
+	while ((tp = strchr(pp,':')) != nullptr) {
 
 	    pl = pathclean(tmpfname,pp,(tp - pp)) ;
 
@@ -2744,7 +2697,7 @@ static int setdefpath(vecstr *elp,cchar *pvp)
 	int		rs = SR_OK ;
 	cchar		*vp ;
 
-	if ((vp = getenv(pvp)) == NULL) {
+	if ((vp = getenv(pvp)) == nullptr) {
 	    vp = PROG_DEFPATH ;
 	} /* end if (making default) */
 
@@ -2756,19 +2709,15 @@ static int setdefpath(vecstr *elp,cchar *pvp)
 
 #endif /* COMMENT */
 
-
-static int xfile(IDS *idp,cchar *fname)
-{
-	struct ustat	sb ;
+static int xfile(IDS *idp,cchar *fname) noex {
+	USTAT		sb ;
 	int		rs ;
-
 	if ((rs = u_stat(fname,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
 	        rs = sperm(idp,&sb,X_OK) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (xfile) */

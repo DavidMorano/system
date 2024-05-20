@@ -20,8 +20,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 
@@ -44,14 +45,15 @@ struct raqhand_flags {
 
 struct raqhand_head {
 	cvoid		**va ;
+	RAQHAND_FL	f ;
 	int		c ;		/* count of items in list */
 	int		n ;		/* extent of array */
 	int		hi ;		/* head */
 	int		ti ;		/* tail */
-	RAQHAND_FL	f ;
 } ;
 
 typedef RAQHAND		raqhand ;
+typedef RAQHAND_FL	raqhand_fl ;
 
 EXTERNC_begin
 

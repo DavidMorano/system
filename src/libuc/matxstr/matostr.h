@@ -1,5 +1,5 @@
 /* matostr HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* Match-Option-String */
 /* version %I% last-modified %G% */
@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 

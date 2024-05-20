@@ -52,6 +52,8 @@
 
 /* local defines */
 
+#define	INDENT		2		/* indent 2 columns */
+
 
 /* external subroutines */
 
@@ -67,6 +69,8 @@
 
 /* local variables */
 
+constexpr int		ind = INDENT ;
+
 
 /* exported variables */
 
@@ -81,7 +85,7 @@ int bprintlns(bfile *op,int flen,cchar *lbuf,int llen) noex {
 	    if ((rs = bfile_wr(op)) >= 0) {
 		linefold	lf ;
 	        if (flen < 2) flen = COLUMNS ;
-		if ((rs = lf.start(flen,2,lbuf,llen)) >= 0) {
+		if ((rs = lf.start(flen,ind,lbuf,llen)) >= 0) {
 		    int		ll ;
 		    cchar	*lp ;
 		    for (int i = 0 ; (ll = lf.getln(i,&lp)) >= 0 ; i += 1) {

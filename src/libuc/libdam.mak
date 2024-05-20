@@ -296,7 +296,7 @@ OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
 OBJ172= getnodename.o getclustername.o getnodeinfo.o getdomainname.o getseed.o
 OBJ173= getnprocessors.o getarchitecture.o getnfile.o getpwd.o getrunlevel.o
-OBJ174= getlogname.o getloghost.o getutmpent.o getutmpterm.o getsocktype.o
+OBJ174= getlogname.o getloghost.o getutmpterm.o getsocktype.o
 OBJ175= getpwentry.o getpwlogname.o getgroupname.o getarchitecture.o
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
@@ -673,9 +673,7 @@ keyvals.o:		keyvals.c keyvals.h
 paramopt.o:		paramopt.c paramopt.h
 
 logfile.o:		logfile.c logfile.h
-
 logfile_userinfo.o:	logfile_userinfo.c logfile.h userinfo.h
-
 logfile_printfold.o:	logfile_printfold.c logfile.h
 
 lastlogfile.o:		lastlogfile.c lastlogfile.h
@@ -1034,11 +1032,9 @@ snflags.o:		snflags.c snflags.h
 
 fsdirtreestat.o:	fsdirtreestat.c fsdirtree.h
 
-userinfo.o:		userinfo.c userinfo.h storeitem.h char.h gecos.h
+userinfo.o:		userinfo.cc userinfo.h
 
-getutmpent.o:		getutmpent.c getutmpent.h
-
-getutmpterm.o:		getutmpterm.c getutmpent.h
+getutmpterm.o:		getutmpterm.cc getutmpterm.h
 
 getsysmisc.o:		getsysmisc.c getsysmisc.h
 
@@ -1125,6 +1121,10 @@ hasallunique.o:		hasallunique.cc
 isort.o:		isort.cc
 
 ctwords.o:		ctwords.cc ctwords.hh
+
+# UTILITY
+getostype.o:		getostype.cc getostype.h
+
 
 
 unlinkd.o:		$(*)/$(@)

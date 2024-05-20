@@ -72,7 +72,7 @@ struct utmpaccent_s {
 	short		e_exit ;
 	short		e_term ;
 	char		id[UTMPACCENT_LID+1] ;
-} ; /* end struct (utmpaccent) */
+} ; /* end struct (utmpaccent_s) */
 
 typedef UTMPACCENT	utmpaccent ;
 typedef CUTMPACCENT	cutmpaccent ;

@@ -37,14 +37,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= matxstr.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -60,10 +63,10 @@ OBJ2_MATXSTR= matsubstr.o matcasesubstr.o
 OBJ3_MATXSTR= matnstr.o
 
 
-OBJA_MATXSTR= obj0_matxstr.o obj1_matxstr.o
-OBJB_MATXSTR= obj2_matxstr.o obj3_matxstr.o
+OBJA_MATXSTR= obj0.o obj1.o
+OBJB_MATXSTR= obj2.o obj3.o
 
-OBJ_MATXSTR= $(OBJA_MATXSTR) $(OBJB_MATXSTR)
+OBJ_MATXSTR= obja.o objb.o
 
 
 default:		$(T).o
@@ -109,17 +112,24 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_matxstr.o:	$(OBJ0_MATXSTR)
+obj0.o:			$(OBJ0_MATXSTR)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MATXSTR)
 
-obj1_matxstr.o:	$(OBJ1_MATXSTR)
+obj1.o:			$(OBJ1_MATXSTR)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MATXSTR)
 
-obj2_matxstr.o:	$(OBJ2_MATXSTR)
+obj2.o:			$(OBJ2_MATXSTR)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MATXSTR)
 
-obj3_matxstr.o:	$(OBJ3_MATXSTR)
+obj3.o:			$(OBJ3_MATXSTR)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MATXSTR)
+
+
+obja.o:			$(OBJA_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MATXSTR)
+
+objb.o:			$(OBJB_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MATXSTR)
 
 
 matstr.o:		matstr.cc matstr.h		$(INCS)

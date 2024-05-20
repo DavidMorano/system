@@ -175,7 +175,7 @@ int gncache_start(GN *op,int nmax,int to) noex {
 	cint		defnum = GNCACHE_DEFENT ;
 	int		rs ;
 	if ((rs = gncache_ctor(op)) >= 0) {
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        if (nmax < 4) nmax = GNCACHE_DEFMAX ;
 	        if (to < 1) to = GNCACHE_DEFTTL ;

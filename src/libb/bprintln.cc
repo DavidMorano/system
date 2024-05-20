@@ -54,6 +54,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local variables */
 
 

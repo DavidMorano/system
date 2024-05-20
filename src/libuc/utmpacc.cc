@@ -430,8 +430,8 @@ int utmpacc::boottime(time_t *tp) noex {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
-	                    const time_t	dt = time(nullptr) ;
-	                    const int		to = UTMPACC_INTBOOT ;
+	                    custime	dt = time(nullptr) ;
+	                    cint	to = UTMPACC_INTBOOT ;
 	                    if ((dt - btime.t) >= to) {
 	                        rs = scan(dt) ;
 	                    } /* end if (timed-out) */
@@ -458,8 +458,8 @@ int utmpacc::irunlevel() noex {
 	    if ((rs = init) >= 0) {
 	        if ((rs = capbegin(-1)) >= 0) {
 		    if ((rs = begin) >= 0) {
-	                const time_t	dt = time(nullptr) ;
-	                const int	to = UTMPACC_INTRUNLEVEL ;
+	                custime		dt = time(nullptr) ;
+	                cint		to = UTMPACC_INTRUNLEVEL ;
 	                if ((dt - rlevel.t) >= to) {
 	                    rs = scan(dt) ;
 	                } /* end if */
@@ -486,8 +486,8 @@ int utmpacc::iusers(int w) noex {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
-	                    const time_t	dt = time(nullptr) ;
-	                    const int		to = UTMPACC_INTUSERS ;
+	                    custime	dt = time(nullptr) ;
+	                    cint	to = UTMPACC_INTUSERS ;
 	                    if ((dt - nusers[w].t) >= to) {
 	                        rs = scan(dt) ;
 	                    } /* end if */
@@ -508,6 +508,7 @@ int utmpacc::iusers(int w) noex {
 int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		ffound = false ;
 	if (ap && ap->uep && ap->uebuf) {
 	    sigblocker	b ;
 	    memclear(ap->uep) ;
@@ -519,6 +520,7 @@ int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 		        if ((rs = begin) >= 0) {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentsid(ap,sid) ;
+			    ffound = rs ;
 	                } /* end if */
 	                rs1 = capend ;
 	                if (rs >= 0) rs = rs1 ;
@@ -529,13 +531,14 @@ int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 	    } /* end if (sigblock) */
 	    if ((rs >= 0) && (ap->uep->line == nullptr)) rs = SR_NOTFOUND ;
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? ffound : rs ;
 }
 /* end method (utmpacc::entsid) */
 
 int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		ffound = false ;
 	if (ap && ap->uep && ap->uebuf && lp) {
 	    sigblocker	b ;
 	    memclear(ap->uep) ;
@@ -546,6 +549,7 @@ int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 		        if ((rs = begin) >= 0) {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentline(ap,lp,ll) ;
+			    ffound = rs ;
 	                } /* end if */
 	                rs1 = capend ;
 	                if (rs >= 0) rs = rs1 ;
@@ -556,7 +560,7 @@ int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 	    } /* end if (sigblock) */
 	    if ((rs >= 0) && (ap->uep->line == nullptr)) rs = SR_NOTFOUND ;
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? ffound : rs ;
 }
 /* end method (utmpacc::entline) */
 
@@ -751,7 +755,7 @@ int utmpacc::getextract(int fd) noex {
 	int		len = 0 ;
 	if ((rs = filer_start(&fb,fd,0z,0,0)) >= 0) {
 	    {
-	        constexpr int	ul = sizeof(UTMPX) ;
+	        cint	ul = sizeof(UTMPX) ;
 	        CUTMPX	*up ;
 	        setutxent() ;
 	        while ((up = getutxent()) != nullptr) {

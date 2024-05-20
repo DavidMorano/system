@@ -11,7 +11,7 @@
 	Originally written for Rightcore Network Services.
 
 	= 2020-03-26, David A­D­ Morano
-	I added (sort of for fun) a use of C++20 |if constexpr|.
+	I added (sort of for fun) a use of C++20 |if_constexpr|.
 	Yes, with only a relatively few used by me of this new
 	features, I can see that it is no where near capable of
 	eliminating all pre-propcessor symbols. But I try my best
@@ -58,12 +58,12 @@
 #include	<sys/utsname.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<sysauxinfo.h>
+#include	<ucsysauxinfo.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<timewatch.hh>
 #include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NODENAMELEN| */
 
 #include	"uinfo.h"
 
@@ -174,11 +174,11 @@ static int	uinfo_getaux(uinfo_tmpaux *) noex ;
 
 static uinfo		uinfo_data ;
 
-constexpr bool		f_architecture = F_ARCHITECTURE	;
-constexpr bool		f_platform = F_PLATFORM	;
-constexpr bool		f_hwprovider = F_HWPROVIDER ;
-constexpr bool		f_hwserial = F_HWSERIAL ;
-constexpr bool		f_srpcdomain = F_SRPCDOMAIN ;
+constexpr bool		f_architecture	= F_ARCHITECTURE ;
+constexpr bool		f_platform	= F_PLATFORM ;
+constexpr bool		f_hwprovider	= F_HWPROVIDER ;
+constexpr bool		f_hwserial	= F_HWSERIAL ;
+constexpr bool		f_srpcdomain	= F_SRPCDOMAIN ;
 
 
 /* exported variables */
@@ -297,21 +297,21 @@ int uinfo::getname(uinfo_infoname *unp) noex {
 	            uinfo_alloc		*uap = &a ;
 	            if (uap->name) {
 	                uinfo_infoname	tmpname ;
-	                cint		size = sizeof(UTSNAME) ;
+	                cint		sz = sizeof(UTSNAME) ;
 	                cchar		*nnamep = nullptr ;
 	                void		*p ;
-	                if ((rs = uc_libmalloc(size,&p)) >= 0) {
+	                if ((rs = uc_libmalloc(sz,&p)) >= 0) {
 	                    UTSNAME	*unp = (UTSNAME *) p ;
 	                    if ((rs = u_uname(unp)) >= 0) {
 	                        cint	nlen = NODENAMELEN ;
-	                        int	size = 0 ;
+	                        int	sz = 0 ;
 	                        char	*bp ;
-	                        size += (strnlen(unp->sysname,nlen) + 1) ;
-	                        size += (strnlen(unp->nodename,nlen) + 1) ;
-	                        size += (strnlen(unp->release,nlen) + 1) ;
-	                        size += (strnlen(unp->version,nlen) + 1) ;
-	                        size += (strnlen(unp->machine,nlen) + 1) ;
-	                        if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	                        sz += (strnlen(unp->sysname,nlen) + 1) ;
+	                        sz += (strnlen(unp->nodename,nlen) + 1) ;
+	                        sz += (strnlen(unp->release,nlen) + 1) ;
+	                        sz += (strnlen(unp->version,nlen) + 1) ;
+	                        sz += (strnlen(unp->machine,nlen) + 1) ;
+	                        if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	                            nnamep = bp ;
 	                            tmpname.sysname = bp ;
 	                            bp = (strwcpy(bp,unp->sysname,nlen) + 1) ;
@@ -368,39 +368,39 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 	            uinfo_alloc	*uap = &a ;
 	            if (uap->aux) {
 	                uinfo_infoaux	tmpaux ;
-	                cint		size = sizeof(uinfo_tmpaux) ;
+	                cint		sz = sizeof(uinfo_tmpaux) ;
 	                cchar		*nauxp = nullptr ;
 	                void		*p ;
-	                if ((rs = uc_libmalloc(size,&p)) >= 0) {
+	                if ((rs = uc_libmalloc(sz,&p)) >= 0) {
 	                    uinfo_tmpaux	*tap = (uinfo_tmpaux *) p ;
 	                    if ((rs = uinfo_getaux(tap)) >= 0) {
 	                        cint	nlen = NODENAMELEN ;
-	                        int	size = 0 ;
-			        cchar	*np ;
+	                        int	sz = 0 ;
+			        cchar	*sp ;
 	                        char	*bp ;
-	                        np = tap->architecture ;
-	                        size += (strnlen(np,nlen) + 1) ;
-	                        size += (strnlen(tap->platform,nlen) + 1) ;
-	                        size += (strnlen(tap->hwprovider,nlen) + 1) ;
-	                        size += (strnlen(tap->hwserial,nlen) + 1) ;
-	                        size += (strnlen(tap->nisdomain,nlen) + 1) ;
-	                        if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	                        sp = tap->architecture ;
+	                        sz += (strnlen(sp,nlen) + 1) ;
+	                        sz += (strnlen(tap->platform,nlen) + 1) ;
+	                        sz += (strnlen(tap->hwprovider,nlen) + 1) ;
+	                        sz += (strnlen(tap->hwserial,nlen) + 1) ;
+	                        sz += (strnlen(tap->nisdomain,nlen) + 1) ;
+	                        if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	                            nauxp = bp ;
 	                            tmpaux.architecture = bp ;
-	                            np = tap->architecture ;
-	                            bp = (strwcpy(bp,np,nlen) + 1) ;
+	                            sp = tap->architecture ;
+	                            bp = (strwcpy(bp,sp,nlen) + 1) ;
 	                            tmpaux.platform = bp ;
-	                            np = tap->platform ;
-	                            bp = (strwcpy(bp,np,nlen) + 1) ;
+	                            sp = tap->platform ;
+	                            bp = (strwcpy(bp,sp,nlen) + 1) ;
 	                            tmpaux.hwprovider = bp ;
-	                            np = tap->hwprovider ;
-	                            bp = (strwcpy(bp,np,nlen) + 1) ;
+	                            sp = tap->hwprovider ;
+	                            bp = (strwcpy(bp,sp,nlen) + 1) ;
 	                            tmpaux.hwserial = bp ;
-	                            np = tap->hwserial ;
-	                            bp = (strwcpy(bp,np,nlen) + 1) ;
+	                            sp = tap->hwserial ;
+	                            bp = (strwcpy(bp,sp,nlen) + 1) ;
 	                            tmpaux.nisdomain = bp ;
-	                            np = tap->nisdomain ;
-	                            bp = (strwcpy(bp,np,nlen) + 1) ;
+	                            sp = tap->nisdomain ;
+	                            bp = (strwcpy(bp,sp,nlen) + 1) ;
 	                        } /* end if (memory-allocation) */
 	                    } /* end if (uaux) */
 	                    if (rs >= 0) { /* resolve possible race */
@@ -447,31 +447,31 @@ static int uinfo_getaux(uinfo_tmpaux *tap) noex {
 	tap->hwprovider[0] = '\0' ;
 	tap->hwserial[0] = '\0' ;
 	tap->nisdomain[0] = '\0' ;
-	if constexpr (f_architecture) {
+	if_constexpr (f_architecture) {
 	    cint	req = SAI_ARCHITECTURE ;
 	    nbuf = tap->architecture ;
 	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
 	    if (rs1 < 0) nbuf[0] = '\0' ;
 	}
-	if constexpr (f_platform) {
+	if_constexpr (f_platform) {
 	    cint	req = SAI_PLATFORM ;
 	    nbuf = tap->platform ;
 	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
 	    if (rs1 < 0) nbuf[0] = '\0' ;
 	}
-	if constexpr (f_hwprovider) {
+	if_constexpr (f_hwprovider) {
 	    cint	req = SAI_HWPROVIDER ;
 	    nbuf = tap->hwprovider ;
 	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
 	    if (rs1 < 0) nbuf[0] = '\0' ;
 	}
-	if constexpr (f_hwserial) {
+	if_constexpr (f_hwserial) {
 	    cint	req = SAI_HWSERIAL ;
 	    nbuf = tap->hwserial ;
 	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
 	    if (rs1 < 0) nbuf[0] = '\0' ;
 	}
-	if constexpr (f_srpcdomain) {
+	if_constexpr (f_srpcdomain) {
 	    cint	req = SAI_SRPCDOMAIN ;
 	    nbuf = tap->nisdomain ;
 	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;

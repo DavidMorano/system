@@ -143,7 +143,7 @@ int logfile_userinfo(logfile *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = logfile_magic(op,uip)) >= 0) {
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 		loguser		lo(op,uip,dt,pn,vn) ;
 		rs = lo ;

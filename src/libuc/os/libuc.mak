@@ -127,7 +127,7 @@ OBJ062= bufsizevar.o digbfsizes.o
 OBJ063=
 
 OBJ064= getprotofamily.o geteaddrinfo.o getaf.o getaflen.o getpwd.o
-OBJ065= getnodedomain.o getutmpent.o getax.o 
+OBJ065= getnodedomain.o utmpent.o getax.o 
 OBJ066= getbufsize.o getbufsizenames.o gethz.o getngroups.o getproto.o getserv.o
 OBJ067= getusername.o getuserhome.o getgroupname.o getprojname.o
 OBJ068= getportnum.o getenver.o getourenv.o
@@ -332,7 +332,7 @@ UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
-UOBJ08= strkeycmp.o strwcmp.o
+UOBJ08= strkeycmp.o
 UOBJ09= readln.o ccfile.o
 UOBJ10= cfx.o sncpyx.o sncpyxc.o sncpyxw.o
 UOBJ11= strmgr.o strop.o field.o
@@ -730,10 +730,6 @@ getuserhome.o:		getuserhome.cc getuserhome.h
 getgroupname.o:		getgroupname.cc getgroupname.h
 getprojname.o:		getprojname.cc getprojname.h
 
-getutmpent.o:		getutmpent.cc getutmpent.h
-mkutmpid.o:		mkutmpid.cc mkutmpid.h
-
-
 memfile.o:		memfile.cc memfile.h
 filemap.o:		filemap.cc filemap.h
 
@@ -1123,6 +1119,7 @@ digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
 getxid.o:		getxid.cc getxid.h
 getngroups.o:		getngroups.cc getngroups.h
+getsysname.o:		getsysname.cc getsysname.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h
 getuserorg.o:		getuserorg.cc getuserorg.h
@@ -1137,7 +1134,7 @@ inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
 strenv.o:		strenv.cc strenv.hh
-strwcpy.o:		strwcmp.cc strwcmp.h
+strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
@@ -1146,6 +1143,8 @@ calstrs.o:		calstrs.cc calstrs.h
 ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
 ffbs.o:			ffbs.cc ffbs.h
+utmpent.o:		utmpent.cc utmpent.h
+mkutmpid.o:		mkutmpid.cc mkutmpid.h
 #
 isproc.o:		isproc.cc isproc.h
 #

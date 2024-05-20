@@ -117,7 +117,7 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-	        static int	rsm = ndigit(PID_MAX,10) ;
+	        static cint	rsm = ndigit(PID_MAX,10) ;
 	        if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rsm ;
 		    if ((rs = mkmaxstrlen(maxdigs,rlen)) >= 0) {

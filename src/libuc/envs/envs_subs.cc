@@ -136,7 +136,7 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (nlp && clp && pvp && evp) {
-	    static int	srs = mkvars() ;
+	    static cint	srs = mkvars() ;
 	    if ((rs = srs) >= 0) {
 	        SUBINFO		si, *sip = &si ;
 	        envs_cur	cur ;
