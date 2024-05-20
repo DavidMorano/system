@@ -23,10 +23,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<toxc.h>
-#include	<clanguage.h>
 
 #include	"snwcpyxc.h"
 

@@ -37,14 +37,17 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= snwcpy.h snwcpyx.h snwcpyxc.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -60,11 +63,11 @@ OBJ2_SNWCPYX= snwcpyshrink.o snwcpycompact.o
 OBJ3_SNWCPYX= snwcpyer.o snwcpyrev.o
 OBJ4_SNWCPYX= snwcpyhyphen.o snwcpywidehdr.o
 
-OBJA_SNWCPYX= obj0_snwcpyx.o obj1_snwcpyx.o
-OBJB_SNWCPYX= obj2_snwcpyx.o obj3_snwcpyx.o
-OBJC_SNWCPYX= obj4_snwcpyx.o
+OBJA_SNWCPYX= obj0.o obj1.o
+OBJB_SNWCPYX= obj2.o obj3.o
+OBJC_SNWCPYX= obj4.o
 
-OBJ_SNWCPYX= $(OBJA_SNWCPYX) $(OBJB_SNWCPYX) $(OBJC_SNWCPYX)
+OBJ_SNWCPYX= obja.o objb.o objc.o
 
 
 default:		$(T).o
@@ -110,19 +113,41 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_snwcpyx.o:	$(OBJ0_SNWCPYX)
+obj0.o:			$(OBJ0_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNWCPYX)
 
-obj1_snwcpyx.o:	$(OBJ1_SNWCPYX)
+obj1.o:			$(OBJ1_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNWCPYX)
 
-obj2_snwcpyx.o:	$(OBJ2_SNWCPYX)
+obj2.o:			$(OBJ2_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNWCPYX)
 
-obj3_snwcpyx.o:	$(OBJ3_SNWCPYX)
+obj3.o:			$(OBJ3_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNWCPYX)
 
-obj4_snwcpyx.o:	$(OBJ4_SNWCPYX)
+obj4.o:			$(OBJ4_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNWCPYX)
+
+
+obja.o:			$(OBJA_SNWCPYX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_SNWCPYX)
+
+objb.o:			$(OBJB_SNWCPYX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_SNWCPYX)
+
+objc.o:			$(OBJC_SNWCPYX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_SNWCPYX)
+
+
+snwcpyclean.o:		snwcpyclean.cc		$(INCS)
+snwcpycompact.o:	snwcpycompact.cc	$(INCS)
+snwcpyer.o:		snwcpyer.cc		$(INCS)
+snwcpyhyphen.o:		snwcpyhyphen.cc		$(INCS)
+snwcpylatin.o:		snwcpylatin.cc		$(INCS)
+snwcpyopaque.o:		snwcpyopaque.cc		$(INCS)
+snwcpyrev.o:		snwcpyrev.cc		$(INCS)
+snwcpyshrink.o:		snwcpyshrink.cc		$(INCS)
+snwcpywidehdr.o:	snwcpywidehdr.cc	$(INCS)
+snwcpyxc.o:		snwcpyxc.cc		$(INCS)
 
 
