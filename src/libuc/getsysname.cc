@@ -4,6 +4,7 @@
 /* get the name of the operating system */
 /* version %I% last-modified %G% */
 
+
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano

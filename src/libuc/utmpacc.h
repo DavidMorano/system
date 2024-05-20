@@ -36,9 +36,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<utmpx.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<localmisc.h>
 #include	<utmpaccent.h>		/* <- the money shot */
 

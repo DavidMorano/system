@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utmpx.h>		/* <- POSIX® (the money shot) */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<localmisc.h>
