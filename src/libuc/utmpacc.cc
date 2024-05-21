@@ -338,8 +338,33 @@ int utmpacc_curenum(utmpacc_cur *curp,utmpacc_ent *ep,char *eb,int el) noex {
 
 int utmpacc_curend(utmpacc_cur *curp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (curp) {
-	    rs = SR_OK ;
+	    rs = SR_NOTOPEN ;
+	    if (curp->icursor) {
+	        utmpacc_icur	*icurp = (utmpacc_icur *) curp->icursor ;
+		rs = SR_OK ;
+		if (icurp->magic == UTMPACC_CURMAGIC) {
+		    {
+		        filer	*fbp = &icurp->fb ;
+			rs1 = filer_finish(fbp) ;
+			if (rs >= 0) rs = rs1 ;
+		    }
+		    if (icurp->utmpfentp) {
+			rs1 = uc_free(icurp->utmpfentp) ;
+			if (rs >= 0) rs = rs1 ;
+			icurp->utmpfentp = nullptr ;
+		    }
+		    icurp->magic = 0 ;
+		} else {
+		    rs = SR_BADFMT ;
+		} /* end if (good cursor-magic) */
+		{
+		    rs1 = uc_free(curp->icursor) ;
+		    if (rs >= 0) rs = rs1 ;
+		    curp->icursor = nullptr ;
+		}
+	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return rs ;
 }
