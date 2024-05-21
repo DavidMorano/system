@@ -60,9 +60,9 @@
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>		/* <- |min(3c++)| */
 #include	<usysrets.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<ascii.h>
 #include	<sfx.h>
 #include	<strmgr.h>

@@ -57,10 +57,6 @@
 
 /* local defines */
 
-#ifndef	SOCKADDR
-#define	SOCKADDR	struct sockaddr
-#endif
-
 
 /* external subroutines */
 
@@ -86,6 +82,7 @@ int listenusd(cchar *portspec,mode_t om,int lopts) noex {
 	cint	pf = PF_UNIX ;
 	cint	st = SOCK_DGRAM ;
 	int		rs ;
+	int		rs1 ;
 	int		s = 0 ;
 
 	if (portspec == NULL) return SR_FAULT ;
@@ -115,12 +112,14 @@ int listenusd(cchar *portspec,mode_t om,int lopts) noex {
 	                rs = u_chmod(portspec,om) ;
 	            }
 
-	            sockaddress_finish(&sa) ;
+	            rs1 = sockaddress_finish(&sa) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sockaddress) */
 	    } /* end if (ok) */
 
-	    if (rs < 0)
+	    if (rs < 0) {
 	        u_close(s) ;
+	    }
 	} /* end if (socket) */
 
 	return (rs >= 0) ? s : rs ;

@@ -30,6 +30,18 @@
 #include	"strnxcmp.h"
 
 
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* local varabiables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strnleadcmp(cchar *s1,cchar *s2,int lr) noex {

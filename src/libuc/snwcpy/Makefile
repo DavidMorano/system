@@ -62,6 +62,7 @@ OBJ1_SNWCPYX= snwcpyclean.o snwcpylatin.o
 OBJ2_SNWCPYX= snwcpyshrink.o snwcpycompact.o
 OBJ3_SNWCPYX= snwcpyer.o snwcpyrev.o
 OBJ4_SNWCPYX= snwcpyhyphen.o snwcpywidehdr.o
+OBJ5_SNWCPYX=
 
 OBJA_SNWCPYX= obj0.o obj1.o
 OBJB_SNWCPYX= obj2.o obj3.o
@@ -127,6 +128,9 @@ obj3.o:			$(OBJ3_SNWCPYX)
 
 obj4.o:			$(OBJ4_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNWCPYX)
+
+obj5.o:			$(OBJ5_SNWCPYX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNWCPYX)
 
 
 obja.o:			$(OBJA_SNWCPYX)

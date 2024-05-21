@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<string.h>		/* |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -31,6 +32,10 @@ extern int strnkeycmp(cchar *,cchar *,int) noex ;
 extern int strnleadcmp(cchar *,cchar *,int) noex ;
 extern int strnncmp(cchar *,int,cchar *,int) noex ;
 extern int strnndictcmp(cchar *,int,cchar *,int) noex ;
+
+static inline int strnbasecmp(cchar *s1,cchar *s2,cchar *slen) noex {
+	return strncmp(s1,s2,slen) ;
+}
 
 EXTERNC_end
 

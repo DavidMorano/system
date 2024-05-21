@@ -4,7 +4,6 @@
 /* line indexing object */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1		/* safe mode */
 #define	CF_MEMSYNC	1		/* use memory synchronization? */
 #define	CF_FILEMAP	1		/* use FILEMAP object */
@@ -14,7 +13,7 @@
 
 	= 2003-06-11, David A­D­ Morano
 	I snarfed this file from the SS-Hammock crap since I thought
-	it might be a bit similar. We'll see how it works out!
+	it might be a bit similar.  We will see how it works out!
 
 */
 
@@ -22,12 +21,14 @@
 
 /*******************************************************************************
 
-	This object module manages a line-index database. It can
-	also create such a database if it is opened with the O_CREAT
-	option.
+	Name:
+	lineindex
 
-	Note that line indexing is so fast that trying to super-optimize
-	anything here is not really work it.
+	Description:
+	This object module manages a line-index database.  It can
+	also create such a database if it is opened with the O_CREAT
+	option.  Note that line indexing is so fast that trying to
+	super-optimize anything here is not really work it.
 
 *******************************************************************************/
 
@@ -49,14 +50,13 @@
 #include	<bfile.h>
 #include	<filemap.h>
 #include	<intceil.h>
-#include	<localmisc.h>
+#include	<intsat.h>
+#include	<localmisc.h>		/* |MODP2| */
 
 #include	"lineindex.h"
 
 
 /* local defines */
-
-#define	MODP2(v,n)	((v) & ((n) - 1))
 
 #define	TO_FILECOME	2
 #define	TO_OPEN		(60 * 60)
@@ -72,32 +72,26 @@
 #define	NRECS		(2 * 1024)
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef mode_t		om_t ;		/* open-mode */
+
+
 /* external subroutines */
-
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	randlc(int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	getpwd(char *,int) ;
-extern int	isfsremote(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* forward references */
 
-static int	lineindex_mkindex(LINEINDEX *) ;
-static int	lineindex_fileheader(LINEINDEX *) ;
-static int	lineindex_filemap(LINEINDEX *,time_t) ;
-static int	lineindex_fileunmap(LINEINDEX *) ;
+static int	lineindex_mkindex(lineindex *) noex ;
+static int	lineindex_fileheader(lineindex *) noex ;
+static int	lineindex_filemap(lineindex *,time_t) noex ;
+static int	lineindex_fileunmap(lineindex *) noex ;
 
-static int	lineindex_fileopen(LINEINDEX *,time_t) ;
-static int	lineindex_fileclose(LINEINDEX *) ;
+static int	lineindex_fileopen(lineindex *,time_t) noex ;
+static int	lineindex_fileclose(lineindex *) noex ;
 
 
 /* local variables */
@@ -110,57 +104,51 @@ enum headers {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int lineindex_open(op,idxfname,oflags,operm,txtfname)
-LINEINDEX	*op ;
-const char	idxfname[] ;
-const char	txtfname[] ;
-int		oflags ;
-mode_t		operm ;
-{
-	struct ustat	sb ;
+int lineindex_open(lineindex *op,cc *ifn,int of,om_t om,cc *tfn) noex {
+	USTAT		sb ;
 
 	time_t	dt = time(NULL) ;
 
 	int	rs ;
-	int	i ;
 	int	amode ;
-	int	prot, flags ;
-	int	size ;
+	int	sz ;
 
 
 	if (op == NULL)
 	    return SR_FAULT ;
 
-	if (idxfname == NULL)
+	if (ifn == NULL)
 	    return SR_FAULT ;
 
-	if (idxfname[0] == '\0')
+	if (ifn[0] == '\0')
 	    return SR_INVALID ;
 
-	memset(op,0,sizeof(LINEINDEX)) ;
+	memclear(op) ;
 
 	op->pagesize = getpagesize() ;
 	op->fd = -1 ;
-	op->oflags = oflags ;
-	op->operm = operm ;
+	op->of = of ;
+	op->om = om ;
 
-	amode = (oflags & O_ACCMODE) ;
+	amode = (of & O_ACCMODE) ;
 	op->f.wantwrite = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 
 /* store filename away */
 
-	op->idxfname = mallocstr(idxfname) ;
+	op->ifn = mallocstr(ifn) ;
 
-	if (op->idxfname == NULL) {
+	if (op->ifn == NULL) {
 	    rs = SR_NOMEM ;
 	    goto bad0 ;
 	}
 
-	if ((txtfname != NULL) && (txtfname[0] != '\0')) {
-	    if ((op->txtfname = mallocstr(txtfname)) == NULL) {
+	if ((tfn != NULL) && (tfn[0] != '\0')) {
+	    if ((op->tfn = mallocstr(tfn)) == NULL) {
 	        rs = SR_NOMEM ;
 	        goto bad1 ;
 	    }
@@ -179,58 +167,41 @@ mode_t		operm ;
 
 /* wait for the file to come in if it is not yet available */
 
-	size = 16 + 4 + (header_overlast * sizeof(int)) ;
+	sz = 16 + 4 + (header_overlast * sizeof(int)) ;
 
 	rs = u_fstat(op->fd,&sb) ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_open: filesize=%d headersize=%d\n",
-	    sb.st_size,size) ;
-#endif
-
-	for (i = 0 ; (i < TO_FILECOME) && (rs >= 0) && (sb.st_size < size) ;
-	    i += 1) {
-
-#if	CF_DEBUGS
-	    debugprintf("lineindex_open: wating for file i=%u\n",i) ;
-#endif
-
+	size_t	fsz = size_t(sb.st_size) ;
+	csize	hsz = size_t(sz) ;
+	int	to = TO_FILECOME ;
+	for (int i = 0 ; (i < to) && (rs >= 0) && (fsz < hsz) ; i += 1) {
 	    sleep(1) ;
-
 	    rs = u_fstat(op->fd,&sb) ;
-
+	    fsz = size_t(sb.st_size) ;
 	} /* end while */
 
 	if (rs < 0)
 	    goto bad2 ;
 
-	if ((i >= TO_FILECOME) || (sb.st_size < size)) {
+	if (fsz < hsz) {
 	    rs = SR_TIMEDOUT ;
 	    goto bad2 ;
 	}
 
 	op->mtime = sb.st_mtime ;
-	op->filesize = (uint) sb.st_size ;
+	op->filesize = intsat(sb.st_size) ;
 
 /* OK, continue on */
 
-	if (op->filesize >= size) {
+	if (op->filesize >= sz) {
 
 /* map it */
-
-#if	CF_DEBUGS
-	    debugprintf("lineindex_open: mapping file\n") ;
-#endif
-
-	    prot = PROT_READ ;
-	    flags = MAP_SHARED ;
+	    cnullptr	np{} ;
+	    int mp = PROT_READ ;
+	    int mf = MAP_SHARED ;
+	    csize	ms = op->mapsize ;
 	    op->mapsize = op->filesize ;
-	    rs = u_mmap(NULL,(size_t) op->mapsize,prot,flags,
-	        op->fd,0L,&op->mapbuf) ;
-
-#if	CF_DEBUGS
-	    debugprintf("lineindex_open: u_mmap() rs=%d\n",rs) ;
-#endif
+	    rs = u_mmapbegin(np,ms,mp,mf,op->fd,0L,&op->mapbuf) ;
 
 	    if (rs < 0)
 	        goto bad3 ;
@@ -248,10 +219,6 @@ mode_t		operm ;
 	    op->ti_access = dt ;
 	    op->f.fileinit = TRUE ;
 
-#if	CF_DEBUGS
-	    debugprintf("lineindex_open: header processing completed \n") ;
-#endif
-
 	} /* end if (file had some data) */
 
 /* we should be good */
@@ -262,11 +229,6 @@ ret1:
 	lineindex_fileclose(op) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 
 /* we're out of here */
@@ -277,11 +239,11 @@ bad3:
 	lineindex_fileclose(op) ;
 
 bad2:
-	if (op->txtfname != NULL)
-	    uc_free(op->txtfname) ;
+	if (op->tfn != NULL)
+	    uc_free(op->tfn) ;
 
 bad1:
-	uc_free(op->idxfname) ;
+	uc_free(op->ifn) ;
 
 bad0:
 	goto ret0 ;
@@ -289,12 +251,7 @@ bad0:
 }
 /* end subroutine (lineindex_open) */
 
-
-/* get the string count in the table */
-int lineindex_count(op)
-LINEINDEX	*op ;
-{
-
+int lineindex_count(lineindex *op) noex {
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != LINEINDEX_MAGIC) return SR_NOTOPEN ;
@@ -303,36 +260,25 @@ LINEINDEX	*op ;
 }
 /* end subroutine (lineindex_count) */
 
-
-/* initialize a cursor */
-int lineindex_curbegin(op,cp)
-LINEINDEX	*op ;
-LINEINDEX_CUR	*cp ;
-{
-
+int lineindex_curbegin(lineindex *op,lineindex_cur *curp) noex {
 	if (op == NULL) return SR_FAULT ;
-	if (cp == NULL) return SR_FAULT ;
+	if (curp == NULL) return SR_FAULT ;
 
 	if (op->magic != LINEINDEX_MAGIC) return SR_NOTOPEN ;
 
 	op->cursors += 1 ;
 	op->f.cursorlockbroken = FALSE ;
 	op->f.cursoracc = FALSE ;
-	cp->i = -1 ;
+	curp->i = -1 ;
 	return SR_OK ;
 }
 /* end subroutine (lineindex_curbegin) */
 
-
-/* free up a cursor */
-int lineindex_curend(op,cp)
-LINEINDEX	*op ;
-LINEINDEX_CUR	*cp ;
-{
+int lineindex_curend(lineindex *op,lineindex_cur *curp) noex {
 	const time_t	dt = time(NULL) ;
 
 	if (op == NULL) return SR_FAULT ;
-	if (cp == NULL) return SR_FAULT ;
+	if (curp == NULL) return SR_FAULT ;
 
 	if (op->magic != LINEINDEX_MAGIC) return SR_NOTOPEN ;
 
@@ -346,19 +292,13 @@ LINEINDEX_CUR	*cp ;
 	if (op->cursors > 0)
 	    op->cursors -= 1 ;
 
-	cp->i = -1 ;
+	curp->i = -1 ;
 
 	return SR_OK ;
 }
 /* end subroutine (lineindex_curend) */
 
-
-/* enumerate */
-int lineindex_enum(op,cup,rp)
-LINEINDEX	*op ;
-LINEINDEX_CUR	*cup ;
-off_t	*rp ;
-{
+int lineindex_enum(lineindex *op,lineindex_cur *curp,off_t *rp) noex {
 	int		rs = SR_OK ;
 	int		ri ;
 
@@ -373,10 +313,6 @@ off_t	*rp ;
 	if (op->cursors == 0) return SR_INVALID ;
 
 	ri = (cup->i < 0) ? 0 : (cup->i + 1) ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_enum: ri=%d\n",ri) ;
-#endif
 
 /* is the file mapped? */
 
@@ -403,13 +339,7 @@ off_t	*rp ;
 	    return SR_NOTFOUND ;
 
 	if (rp != NULL) {
-
 	    *rp = ntohl(op->rectab[ri]) ;
-
-#if	CF_DEBUGS
-	    debugprintf("lineindex_enum: off=%lu\n",*rp) ;
-#endif
-
 	}
 
 /* update the cursor */
@@ -421,30 +351,15 @@ ret0:
 }
 /* end subroutine (lineindex_enum) */
 
-
-/* get the entries (serially) */
-int lineindex_lookup(op,ri,rp)
-LINEINDEX	*op ;
-uint		ri ;
-off_t	*rp ;
-{
+int lineindex_lookup(lineindex *op,uint ri,off_t *rp) noex {
 	int		rs = SR_OK ;
 
 #if	CF_SAFE
 	if (op == NULL) return SR_FAULT ;
-
 	if (op->magic != LINEINDEX_MAGIC) return SR_NOTOPEN ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_lookup: ent 2\n") ;
-#endif
-
 	if (rp == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_lookup: ent ri=%d\n",ri) ;
-#endif
 
 	if (ri >= op->lines) return SR_NOTFOUND ;
 
@@ -458,7 +373,6 @@ off_t	*rp ;
 #endif
 
 	    rs = lineindex_filemap(op,dt) ;
-
 	    if (rs > 0)
 	        rs = lineindex_fileheader(op) ;
 
@@ -472,28 +386,16 @@ off_t	*rp ;
 	if (ri > 0)
 	    *rp = ntohl(op->rectab[ri]) ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_lookup: OK\n") ;
-#endif
-
 ret0:
 	return (rs >= 0) ? ri : rs ;
 }
 /* end subroutine (lineindex_lookup) */
 
-
-/* do some checking */
-int lineindex_check(op,dt)
-LINEINDEX	*op ;
-time_t		dt ;
-{
-	struct ustat	sb ;
+int lineindex_check(lineindex *op,time_t dt) noex {
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		f_changed = FALSE ;
-#if	CF_DEBUGS
-	char		timebuf[TIMEBUFLEN + 1] ;
-#endif
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -509,7 +411,7 @@ time_t		dt ;
 
 /* check for "unused" */
 
-	cp = (const char *) (op->mapbuf + 16 + 3) ;
+	cp = (cchar *) (op->mapbuf + 16 + 3) ;
 	if (*cp)
 	    goto closeit ;
 
@@ -521,7 +423,7 @@ time_t		dt ;
 	if ((dt - op->ti_check) > TO_CHECK) {
 
 	    op->ti_check = dt ;
-	    if ((rs = u_stat(op->idxfname,&sb)) >= 0) {
+	    if ((rs = u_stat(op->ifn,&sb)) >= 0) {
 
 	        if ((sb.st_mtime > op->mtime) ||
 	            (sb.st_size > op->filesize))
@@ -529,9 +431,9 @@ time_t		dt ;
 
 	    }
 
-	    if (op->txtfname != NULL) {
+	    if (op->tfn != NULL) {
 
-	        if ((rs = u_stat(op->txtfname,&sb)) >= 0) {
+	        if ((rs = u_stat(op->tfn,&sb)) >= 0) {
 
 	            if (sb.st_mtime > op->mtime)
 	                goto changed ;
@@ -592,18 +494,13 @@ LINEINDEX	*op ;
 	uint		recoff ;
 	int		rs = SR_OK ;
 	int		f ;
-	const char	*cp = (cchar *) op->mapbuf ;
+	cchar	*cp = (cchar *) op->mapbuf ;
 
 	f = (strncmp(cp,LINEINDEX_FILEMAGIC,LINEINDEX_FILEMAGICLEN) == 0) ;
 
 	f = f && (*(cp + LINEINDEX_FILEMAGICLEN) == '\n') ;
 
 	if (! f) {
-
-#if	CF_DEBUGS
-	    debugprintf("lineindex_fileheader: bad magic=>%t<\n",
-	        cp,strnlen(cp,14)) ;
-#endif
 
 	    rs = SR_BADFMT ;
 	    goto bad3 ;
@@ -634,10 +531,6 @@ LINEINDEX	*op ;
 
 	op->ropts = cp[2] ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_fileheader: ropts=%02x\n",op->ropts) ;
-#endif
-
 /* if looks good, read the header stuff */
 
 	table = (uint *) (op->mapbuf + 16 + 4) ;
@@ -646,20 +539,7 @@ LINEINDEX	*op ;
 	op->lines = ntohl(table[header_lines]) ;
 	op->wtime = ntohl(table[header_wtime]) ;
 
-#if	CF_DEBUGS
-	{
-		char	timebuf[TIMEBUFLEN + 1] ;
-	debugprintf("lineindex_fileheader: wtime=%s\n",
-		timestr_logz(op->wtime,timebuf)) ;
-	}
-#endif
-
 	op->rectab = (uint *) (op->mapbuf + recoff) ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_fileheader: recoff=%u lines=%u\n",
-	    recoff,op->lines) ;
-#endif
 
 ret0:
 	return rs ;
@@ -677,12 +557,6 @@ LINEINDEX	*op ;
 time_t		dt ;
 {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_filemap: ent\n") ;
-#endif
-
-/* do a map or a re-map */
 
 	if (op->mapbuf == NULL) {
 
@@ -737,42 +611,25 @@ static int lineindex_fileopen(op,dt)
 LINEINDEX	*op ;
 time_t		dt ;
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 
 	int	rs ;
-	int	oflags ;
+	int	of ;
 	int	f ;
 	int	f_create ;
 	int	f_changed = FALSE ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_fileopen: fname=%s\n",op->idxfname) ;
-#endif
-
 	if (op->fd < 0) {
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_fileopen: need open\n") ;
-#endif
+	of = op->of ;
+	of &= (~ (O_TRUNC | O_CREAT)) ;
+	rs = u_open(op->ifn,of,op->om) ;
 
-	oflags = op->oflags ;
-	oflags &= (~ (O_TRUNC | O_CREAT)) ;
-	rs = u_open(op->idxfname,oflags,op->operm) ;
+	f_create = (op->of & O_CREAT) ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_fileopen: u_open() rs=%d\n",rs) ;
-#endif
-
-	f_create = (op->oflags & O_CREAT) ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_fileopen: f_create=%u lfname=%s\n",
-	    f_create,op->txtfname) ;
-#endif
-
-	if ((rs == SR_NOENT) && f_create && (op->txtfname != NULL)) {
+	if ((rs == SR_NOENT) && f_create && (op->tfn != NULL)) {
 	    if ((rs = lineindex_mkindex(op)) >= 0) {
-	        rs = u_open(op->idxfname,oflags,op->operm) ;
+	        rs = u_open(op->ifn,of,op->om) ;
 	    }
 	}
 
@@ -823,23 +680,18 @@ bad0:
 }
 /* end subroutine (lineindex_fileopen) */
 
-
-static int lineindex_fileclose(op)
-LINEINDEX	*op ;
-{
+static int lineindex_fileclose(lineindex *op) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd >= 0) {
 	    rs = u_close(op->fd) ;
 	    op->fd = -1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (lineindex_fileclose) */
 
-static int lineindex_mkindex(LINEINDEX *op) noex {
-	FILEMAP		lmap ;
+static int lineindex_mkindex(lineindex *op) noex {
+	filemap		lmap ;
 	bfile		ifile ;
 	off_t		headoff ;
 	uint		recoff, lineoff ;
@@ -856,7 +708,7 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 
 /* determine if the directory is writable */
 
-	if ((cl = sfdirname(op->idxfname,-1,&cp)) > 0) {
+	if ((cl = sfdirname(op->ifn,-1,&cp)) > 0) {
 	    mkpath1w(dfname,cp,cl) ;
 	} else {
 	    mkpath1(dfname,".") ;
@@ -867,9 +719,9 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 	    goto ret0 ;
 
 #if	CF_FILEMAP
-	rs = filemap_open(&lmap,op->txtfname,FILEMAPSIZE) ;
+	rs = filemap_open(&lmap,op->tfn,FILEMAPSIZE) ;
 #else
-	rs = bopen(&lfile,op->txtfname,"r",0666) ;
+	rs = bopen(&lfile,op->tfn,"r",0666) ;
 
 #endif /* CF_FILEMAP */
 
@@ -880,24 +732,12 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 
 	mkpath2(pat,dfname,"liXXXXXXXXXXXX") ;
 
-	rs = mktmpfile(tmpfname,op->operm,pat) ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: mktmpfile() rs=%d\n",rs) ;
-#endif
+	rs = mktmpfile(tmpfname,op->om,pat) ;
 
 	if (rs < 0)
 	    goto ret1 ;
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: tmpfname=%s\n",tmpfname) ;
-#endif
-
-	rs = bopen(&ifile,tmpfname,"wct",op->operm) ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: bopen() rs=%d\n",rs) ;
-#endif
+	rs = bopen(&ifile,tmpfname,"wct",op->om) ;
 
 	if (rs < 0)
 	    goto ret2 ;
@@ -921,10 +761,6 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 	    if (rs >= 0)
 	    rs = bwrite(&ifile,vetu,4) ;
 
-#if	CF_DEBUGS
-	    debugprintf("lineindex_mkindex: bwrite() rs=%d\n",rs) ;
-#endif
-
 	    headoff = 20 ;
 	    headsize = header_overlast * sizeof(uint) ;
 	    recoff = 20 + headsize ;
@@ -941,7 +777,7 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 	lineoff = 0 ;
 	i = 0 ;
 	while (rs >= 0) {
-		const char	*lp ;
+		cchar	*lp ;
 
 #if	CF_FILEMAP
 		rs = filemap_getln(&lmap,&lp) ;
@@ -965,16 +801,6 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 	    }
 #endif /* CF_FILEMAP */
 
-#if	CF_DEBUGS && (! CF_FILEMAP)
-	    {
-	        int	ll = len ;
-	        if (linebuf[ll - 1] == '\n')
-	            ll -= 1 ;
-	        debugprintf("lineindex_mkindex: line=%u off=%lu >%t<\n",
-	            lines,lineoff,linebuf,MIN(ll,10)) ;
-	    }
-#endif /* CF_DEBUGS */
-
 	    recs[i++] = htonl(lineoff) ;
 	    if (i >= NRECS) {
 
@@ -989,28 +815,9 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: out-of-loop rs=%d i=%u\n",rs,i) ;
-#endif
-
 	if ((rs >= 0) && (i > 0)) {
-
 	    size = i * sizeof(uint) ;
 	    rs = bwrite(&ifile,recs,size) ;
-
-#if	CF_DEBUGS
-	    {
-	        struct ustat	sb ;
-	        debugprintf("lineindex_mkindex: final "
-			"wsize=%u bwrite() rs=%d\n",
-	            size,rs) ;
-	        bflush(&ifile) ;
-	        u_stat(tmpfname,&sb) ;
-	        debugprintf("lineindex_mkindex: filesize=%lu\n",
-			sb.st_size) ;
-	    }
-#endif /* CF_DEBUGS */
-
 	}
 
 /* seek back and write the header */
@@ -1034,39 +841,17 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 	    table[header_wtime] = htonl(dt) ;
 #endif
 
-#if	CF_DEBUGS
-	    debugprintf("lineindex_mkindex: headoff=%lu\n",headoff) ;
-#endif
-
 	    if ((rs = bseek(&ifile,headoff,SEEK_SET)) >= 0)
 	        rs = bwrite(&ifile,table,headsize) ;
 
 	} /* end block */
-
-#if	CF_DEBUGS
-	{
-	    off_t	off ;
-	    bseek(&ifile,0L,SEEK_END) ;
-	    btell(&ifile,&off) ;
-	    debugprintf("lineindex_mkindex: index filesize=%lu\n",off) ;
-	}
-#endif /* CF_DEBUGS */
 
 ret3:
 	bclose(&ifile) ;
 
 	if (rs >= 0) {
 
-#if	CF_DEBUGS
-	    debugprintf("lineindex_mkindex: rename tmpfname=%s\n",tmpfname) ;
-	    debugprintf("lineindex_mkindex: rename fname=%s\n",op->idxfname) ;
-#endif
-
-	    rs = u_rename(tmpfname,op->idxfname) ;
-
-#if	CF_DEBUGS
-	    debugprintf("lineindex_mkindex: u_rename() rs=%d\n",rs) ;
-#endif
+	    rs = u_rename(tmpfname,op->ifn) ;
 
 	    if (rs >= 0)
 		tmpfname[0] = '\0' ;

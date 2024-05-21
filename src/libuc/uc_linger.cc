@@ -33,29 +33,30 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_linger(int fd,int to)
-{
-	struct ustat	sb ;
+int uc_linger(int fd,int to) noex {
+	USTAT		sb ;
 	int		rs ;
-
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
 	    if (S_ISSOCK(sb.st_mode)) {
-	        struct linger	ls ;
-		const int	sol = SOL_SOCKET ;
-		const int	cmd = SO_LINGER ;
-		const int	llen = sizeof(struct linger) ;
-	        memset(&ls,0,sizeof(struct linger)) ;
+	        LINGER	ls{} ;
+		cint	sol = SOL_SOCKET ;
+		cint	cmd = SO_LINGER ;
+		cint	llen = sizeof(LINGER) ;
 		if (to >= 0) {
 	            ls.l_onoff = TRUE ;
 	            ls.l_linger = to ;
 		}
-	        rs = u_setsockopt(fd,sol,cmd,(cchar *) &ls,llen) ;
+		{
+		    cchar	*obuf = charp(&ls) ;
+	            rs = u_setsockopt(fd,sol,cmd,obuf,llen) ;
+		}
 	    } /* end if (socket) */
 	} /* end if (stat) */
-
 	return rs ;
 }
 /* end subroutine (uc_linger) */

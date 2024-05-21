@@ -1,7 +1,7 @@
-/* listenusd HEADER */
+/* getseed HEADER */
 /* lang=C20 */
 
-/* Listen-on-UNIX-Socket-Datagram */
+/* get a seed value for use in initializing a true RNG */
 /* version %I% last-modified %G% */
 
 
@@ -17,44 +17,39 @@
 /*******************************************************************************
 
 	Name:
-	listenusd
+	getseed
 
 	Description:
-	This subroutine listens on a UNIX® socket datagram (USD)
-	for incoming messages.
+	This subroutine returns a seed value for use in initializing
+	a true RNG.
 
 	Synopsis:
-	int listenusd(cchar *portspec,mode_t om,int lopts) noex
+	int getseed() noex
 
 	Arguments:
-	portspec	file-path to listen to
-	om		open-mode
-	lopts		0=nothing, 1=reuse-addr
+	-
 
 	Returns:
-	>=0		file-descriptor of UNIX-domain socket
+	>=0		0=BSD, 1=SYSV
 	<0		error (system-return)
 
 *******************************************************************************/
 
-#ifndef	LISTENUSD_INCLUDE
-#define	LISTENUSD_INCLUDE
+#ifndef	GETSEED_INCLUDE
+#define	GETSEED_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
 
 EXTERNC_begin
-
-extern int	listenusd(cchar *,mode_t,int) noex ;
-
+extern int	getseed(int) noex ;
 EXTERNC_end
 
 
-#endif /* LISTENUSD_INCLUDE */
+#endif /* GETSEED_INCLUDE */
 
 

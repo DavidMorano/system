@@ -38,10 +38,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"strdcpyx.h"
 

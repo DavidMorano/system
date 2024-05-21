@@ -45,6 +45,8 @@
 #include	<randlc.h>
 #include	<localmisc.h>
 
+#include	"getseed.h"
+
 
 /* local defines */
 

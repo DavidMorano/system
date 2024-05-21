@@ -21,8 +21,9 @@
 
 
 #define	LINEINDEX		struct lineindex_head
-#define	LINEINDEX_INFO		struct lineindex_i
-#define	LINEINDEX_CUR		struct lineindex_c
+#define	LINEINDEX_FL		struct lineindex_flags
+#define	LINEINDEX_INFO		struct lineindex_information
+#define	LINEINDEX_CUR		struct lineindex_cursor
 
 #define	LINEINDEX_MAGIC		0x23456787
 #define	LINEINDEX_FILEMAGIC	"LINEINDEX"
@@ -33,11 +34,11 @@
 #define	LINEINDEX_FILETYPE	0
 
 
-struct lineindex_c {
+struct lineindex_cursor {
 	int		i ;
 } ;
 
-struct lineindex_i {
+struct lineindex_information {
 	time_t		wtime ;		/* time DB written */
 	uint		lines ;		/* total number of entries */
 	uint		version ;
@@ -54,12 +55,10 @@ struct lineindex_flags {
 } ;
 
 struct lineindex_head {
-	uint		magic ;
-	const char	*idxfname ;
-	const char	*txtfname ;
-	caddr_t		mapbuf ;
+	cchar		*ifn ;		/* index-file-name */
+	cchar		*tfn ;		/* text-file-name */
 	uint		*rectab ;
-	struct lineindex_flags	f ;
+	caddr_t		mapbuf ;
 	time_t		wtime ;
 	time_t		mtime ;
 	time_t		ti_open ;
@@ -67,31 +66,35 @@ struct lineindex_head {
 	time_t		ti_check ;
 	time_t		ti_access ;
 	size_t		mapsize ;
-	uint		pagesize ;
-	uint		filesize ;
-	uint		lines ;
+	LINEINDEX_FL	f ;
+	uint		magic ;
+	int		pagesize ;
+	int		filesize ;
+	int		lines ;
 	int		cursors ;
 	int		fd ;
-	int		oflags, operm ;
+	int		of ;
 	int		ropts ;
+	mode_t		om ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	LINEINDEX		lineindex ;
+typedef	LINEINDEX_FL		lineindex_fl ;
+typedef	LINEINDEX_INFO		lineindex_info ;
+typedef	LINEINDEX_CUR		lineindex_cur ;
 
-extern int lineindex_open(LINEINDEX *,const char *,int,mode_t,const char *) ;
-extern int lineindex_lookup(LINEINDEX *,uint,off_t *) ;
-extern int lineindex_curbegin(LINEINDEX *,LINEINDEX_CUR *) ;
-extern int lineindex_curend(LINEINDEX *,LINEINDEX_CUR *) ;
-extern int lineindex_enum(LINEINDEX *,LINEINDEX_CUR *,off_t *) ;
-extern int lineindex_check(LINEINDEX *,time_t) ;
-extern int lineindex_count(LINEINDEX *) ;
-extern int lineindex_close(LINEINDEX *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int lineindex_open(lineindex *,cchar *,int,mode_t,cchar *) noex ;
+extern int lineindex_lookup(lineindex *,uint,off_t *) noex ;
+extern int lineindex_curbegin(lineindex *,lineindex_cur *) noex ;
+extern int lineindex_curend(lineindex *,lineindex_cur *) noex ;
+extern int lineindex_enum(lineindex *,lineindex_cur *,off_t *) noex ;
+extern int lineindex_check(lineindex *,time_t) noex ;
+extern int lineindex_count(lineindex *) noex ;
+extern int lineindex_close(lineindex *) noex ;
+
+EXTERNC_end
 
 
 #endif /* LINEINDEX_INCLUDE */

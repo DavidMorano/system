@@ -61,6 +61,9 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 /* end subroutine-template (snwcpyxc) */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 

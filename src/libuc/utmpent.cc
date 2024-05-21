@@ -211,7 +211,7 @@ int ufinder::tryline() noex {
 	    if (line) {
 	        rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
 	    }
-	} /* end if (refering outseld) */
+	} /* end if (referencing ourself) */
 	return rs ;
 }
 
