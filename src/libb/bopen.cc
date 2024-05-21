@@ -150,8 +150,8 @@ static int	bfile_mapend(bfile *) noex ;
 
 constexpr bool		f_mappable = CF_MAPPABLE ;
 
-static bufsizevar	maxlinelen(getbufsize_ml) ;
 static sysval		pagesize(sysval_ps) ;
+static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 
 /* exported variables */
@@ -164,6 +164,7 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	if (op && fn && os) {
 	    cnullptr	np{} ;
 	    memclear(op) ;
+	    op->fd = -1 ;
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
 		sub_bopen	bo(op,fn,os,om,to) ;

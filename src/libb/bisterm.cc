@@ -4,8 +4,6 @@
 /* determine is the current I-O stream is a terminal */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
@@ -28,16 +26,13 @@
 	Returns:
 	==0		NO (not a terminal)
 	>0		YES (a terminal)
-	<		error (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"bfile.h"
 

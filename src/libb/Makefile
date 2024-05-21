@@ -71,46 +71,17 @@ OBJ09= bwasteln.o
 OBJ10= 
 OBJ11=
 
-OBJ12=
-OBJ13=
-OBJ14=
+OBJ12= bminmod.o bflush.o breserve.o
+OBJ13= bseek.o brewind.o btell.o
+OBJ14= bisterm.o
 OBJ15=
 
-OBJ16= bminmod.o bflush.o breserve.o
-OBJ17= bseek.o brewind.o btell.o
-OBJ18= bisterm.o
-OBJ19=
+OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
+OBJB= $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
+OBJC= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) 
+OBJD= $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 
-OBJ20=
-OBJ21=
-OBJ22=
-OBJ23=
-
-OBJ24=
-OBJ25=
-OBJ26=
-OBJ27=
-OBJ28=
-OBJ29=
-OBJ30=
-OBJ31=
-
-OBJ32=
-OBJ33=
-OBJ34=
-OBJ35=
-OBJ36=
-OBJ37=
-OBJ38=
-OBJ39=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-
-OBJ= obja.o objb.o
+OBJ= obja.o objb.o objc.o objd.o
 
 
 default:		$(T).a
@@ -169,9 +140,6 @@ objc.o:			$(OBJC)
 objd.o:			$(OBJD)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
 
-obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
-
 
 bcontrol.o:		bcontrol.cc		$(INCS)
 bisterm.o:		bisterm.cc		$(INCS)
@@ -206,8 +174,5 @@ bdup.o:			bdup.cc			$(INCS)
 bminmod.o:		bminmod.cc		$(INCS)
 
 bsupport.o:		bsupport.cc		$(INCS)
-
-bfliner.o:		bfliner.cc bfliner.h
-snclean.o:		snclean.cc snclean.h
 
 
