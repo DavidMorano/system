@@ -43,13 +43,13 @@
 #include	<utmpaccent.h>		/* <- the money shot */
 
 
-#define	UTMPACC_ENT	UTMPACCENT
-#define	UTMPACC_SB	struct utmpacc_statistics
-#define	UTMPACC_CUR	struct utmpacc_cursor
-
-#define	UTMPACC_BUFLEN	332		/* large enough for all fields */
-#define	UTMPACC_MAX	20
-#define	UTMPACC_TTL	(20*60)
+#define	UTMPACC_ENT		UTMPACCENT
+#define	UTMPACC_SB		struct utmpacc_statistics
+#define	UTMPACC_CUR		struct utmpacc_cursor
+#define	UTMPACC_BUFLEN		332	/* large enough for all fields */
+#define	UTMPACC_MAX		20
+#define	UTMPACC_TTL		(20*60)
+#define	UTMPACC_CURMAGIC	0x97635148
 
 #if	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0))
 #define	UTMPACC_DEFUTMP	"/var/adm/utmpx"

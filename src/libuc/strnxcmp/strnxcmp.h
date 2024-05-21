@@ -33,7 +33,7 @@ extern int strnleadcmp(cchar *,cchar *,int) noex ;
 extern int strnncmp(cchar *,int,cchar *,int) noex ;
 extern int strnndictcmp(cchar *,int,cchar *,int) noex ;
 
-static inline int strnbasecmp(cchar *s1,cchar *s2,cchar *slen) noex {
+static inline int strnbasecmp(cchar *s1,cchar *s2,int slen) noex {
 	return strncmp(s1,s2,slen) ;
 }
 
