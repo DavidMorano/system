@@ -125,7 +125,7 @@ int bwriteblock(bfile *op,bfile *ifp,int ulen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(op,ifp)) > 0) {
-	    if ((rs = bfile_wr(op)) >= 0) {
+	    if ((rs = bfile_ckwr(op)) >= 0) {
 	        if (ulen != 0) {
 		    writer	wo(op,ifp,ulen) ;
 		    rs = wo ;

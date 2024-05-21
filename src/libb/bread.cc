@@ -79,7 +79,7 @@ constexpr bool		f_memcpy = CF_MEMCPY ;
 int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,ubuf)) > 0) {
-	    if ((rs = bfile_rd(op)) >= 0) {
+	    if ((rs = bfile_ckrd(op)) >= 0) {
 	        if (op->f.mapinit) {
 	            rs = bfile_rdmap(op,ubuf,ulen,to,opts) ;
 	        } else {

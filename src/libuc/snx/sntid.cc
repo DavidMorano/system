@@ -39,7 +39,9 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<stdint.h>		/* <- for |uintptr_t| */
+#include	<climits>		/* UINT_MAX */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdint>		/* <- for |uintptr_t| */
 #include	<usystem.h>
 #include	<ctdec.h>
 
@@ -70,7 +72,7 @@ int sntid(char *dp,int dl,pthread_t tid) noex {
 	uintptr_t	up = uintptr_t(tid) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
-	    uint	uv = static_cast<uint>(up) ;
+	    uint	uv = static_cast<uint>(up & UINT_MAX) ;
 	    rs = ctdecui(dp,dl,uv) ;
 	}
 	return rs ;

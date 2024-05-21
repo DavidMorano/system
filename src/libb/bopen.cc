@@ -32,7 +32,6 @@
 
 	- bopen
 	- bopene
-	- bopenprog
 	- bclose
 
 *******************************************************************************/
@@ -43,6 +42,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -132,7 +132,6 @@ namespace {
 	int openoffset() noex ;
 	int bufsize() noex ;
 	int openreg() noex ;
-	int openprog() noex ;
 	int iclose() noex ;
    } ;
 }
@@ -174,25 +173,6 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	return rs ;
 }
 /* end subroutine (bopene) */
-
-int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
-	int		rs = SR_FAULT ;
-	if (op && pname && os) {
-	    cint	osl = strlen(os) ;
-	    cmode	om = 0 ;
-	    memclear(op) ;
-	    rs = SR_INVALID ;
-	    if (pname[0]) {
-		char	nos[(osl+2)] ;
-		if ((rs = sncpy(nos,(osl+2),"p",os)) >= 0) {
-		    sub_bopen	bo(op,pname,nos,om,-1) ;
-		    rs = bo(argv,envv) ;
-		}
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (bopenprog) */
 
 int bopen(bfile *op,cchar *fn,cchar *os,mode_t om) noex {
 	return bopene(op,fn,os,om,-1) ;
@@ -257,11 +237,7 @@ int sub_bopen::getfile() noex {
 	} else if (rs == SR_EMPTY) {		/* "null" file */
 	    op->f.nullfile = true ;
 	} else if (rs != SR_DOM) {
-	    if (op->f.program) {
-		rs = openprog() ;
-	    } else {
-	        rs = openreg() ;
-	    }
+	    rs = openreg() ;
 	}
 	return rs ;
 }
@@ -380,69 +356,6 @@ int sub_bopen::openreg() noex {
 }
 /* end method (sub_bopen::openreg) */
 
-int sub_bopen::openprog() noex {
-	int		rs = SR_OK ;
-	return rs ;
-}
-/* end method (sub_bopen::openprog) */
-
-#ifdef	COMMENT
-int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
-	int		rs = SR_OK ;
-	int		oflags = 0 ;
-	int		boflags = 0 ;
-	cchar		*args[2] ;
-	char		progfname[MAXPATHLEN+1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pname == nullptr) return SR_FAULT ;
-	if (os == nullptr) return SR_FAULT ;
-
-	if (pname[0] == '\0') return SR_INVALID ;
-	if (os[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	op->fd = -1 ;
-	op->f.notseek = true ;
-
-	oflags = mkoflags(os,&boflags) ;
-	oflags |= O_CLOEXEC ;
-
-	if (argv == nullptr) {
-	    int	i = 0 ;
-	    argv = args ;
-	    args[i++] = pname ;
-	    args[i] = nullptr ;
-	}
-
-	if (strchr(pname,'/') == nullptr) {
-	    rs = findfilepath(nullptr,progfname,pname,X_OK) ;
-	    if (rs > 0) pname = progfname ;
-	}
-
-	if (rs >= 0) {
-	if ((rs = uc_openprog(pname,oflags,argv,envv)) >= 0) {
-	    op->fd = rs ;
-	    if ((rs = bfile_opts(op,oflags,0)) >= 0) {
-		    cint	bsize = MIN(LINEBUFLEN,2048) ;
-	            if ((rs = bfile_bufbegin(op,bsize)) >= 0) {
-			op->of = oflags ;
-		        op->bm = bfilebm_line ;
-	                op->magic = BFILE_MAGIC ;
-	            } /* end if (buffer-allocation) */
-	    }
-	    if (rs < 0) {
-		u_close(op->fd) ;
-		op->fd = -1 ;
-	    }
-	} /* end if (opened) */
-	} /* end if (ok) */
-
-	return rs ;
-}
-/* end subroutine (bopenprog) */
-#endif /* COMMENT */
-
 static int bfile_bufbegin(bfile *op,int bsize) noex {
 	int		rs ;
 	char		*p ;
@@ -509,19 +422,21 @@ static int bfile_mapbegin(bfile *op) noex {
 static int bfile_mapend(bfile *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (int i = 0 ; i < BFILE_NMAPS ; i += 1) {
-	    if ((op->maps[i].f.valid) && op->maps[i].bdata) {
-		void	*md = op->maps[i].bdata ;
-		csize	ms = op->maps[i].bsize ;
-	        rs1 = u_mmapend(md,ms) ;
-		if (rs >= 0) rs = rs1 ;
+	if (op->maps) {
+	    for (int i = 0 ; i < BFILE_NMAPS ; i += 1) {
+	        if ((op->maps[i].f.valid) && op->maps[i].bdata) {
+		    void	*md = op->maps[i].bdata ;
+		    csize	ms = op->maps[i].bsize ;
+	            rs1 = u_mmapend(md,ms) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end for */
+	    {
+	        rs1 = uc_free(op->maps) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->maps = nullptr ;
 	    }
-	} /* end for */
-	{
-	    rs1 = uc_free(op->maps) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->maps = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bfile_mapend) */

@@ -23,6 +23,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
 #include	<intfloor.h>
 #include	<localmisc.h>
@@ -57,15 +58,15 @@ int bfile_bufreset(bfile *op) noex {
 int bfile_acc(bfile *op,bool fwr) noex {
 	int		rs ;
 	if (fwr) {
-	    rs = bfile_rd(op) ;
+	    rs = bfile_ckrd(op) ;
 	} else {
-	    rs = bfile_wr(op) ;
+	    rs = bfile_ckwr(op) ;
 	}
 	return rs ;
 }
 /* end subroutine (bfile_acc) */
 
-int bfile_rd(bfile *op) noex {	
+int bfile_ckrd(bfile *op) noex {	
 	int		rs = SR_BADF ;
 	if (op->f.rd) {
 	    rs = SR_OK ;
@@ -76,9 +77,9 @@ int bfile_rd(bfile *op) noex {
 	} /* end if (access allowed) */
 	return rs ;
 }
-/* end subroutine (bfile_rd) */
+/* end subroutine (bfile_ckrd) */
 
-int bfile_wr(bfile *op) noex {	
+int bfile_ckwr(bfile *op) noex {	
 	int		rs = SR_BADF ;
 	if (op->f.wr) {
 	    rs = SR_OK ;
@@ -93,7 +94,7 @@ int bfile_wr(bfile *op) noex {
 	} /* end if (access allowed) */
 	return rs ;
 }
-/* end subroutine (bfile_wr) */
+/* end subroutine (bfile_ckwr) */
 
 int bfile_flushn(bfile *op,int n) noex {
 	int		rs = SR_OK ;

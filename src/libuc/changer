@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} prsetfname.h"
+NAMES="${NAMES} bwasteline "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/prsetfname.h/s//prmkfname.h/g
+g/bwasteline.h/s//bwasteln/g
 	w
 	q
 EOF

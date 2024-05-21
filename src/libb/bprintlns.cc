@@ -82,7 +82,7 @@ int bprintlns(bfile *op,int flen,cchar *lbuf,int llen) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(op,lbuf)) > 0) {
-	    if ((rs = bfile_wr(op)) >= 0) {
+	    if ((rs = bfile_ckwr(op)) >= 0) {
 		linefold	lf ;
 	        if (flen < 2) flen = COLUMNS ;
 		if ((rs = lf.start(flen,ind,lbuf,llen)) >= 0) {

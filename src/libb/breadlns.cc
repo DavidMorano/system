@@ -84,7 +84,7 @@ int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex {
 	int		rl = 0 ;	/* result-buffer length */
 	int		lines = 0 ;
 	if ((rs = bfile_magic(op,lbuf)) > 0) {
-	    if ((rs = bfile_rd(op)) >= 0) {
+	    if ((rs = bfile_ckrd(op)) >= 0) {
 	        bool	f_cont = false ;
 	        while ((lines == 0) || ((f_cont = ISCONT(lbuf,rl)))) {
 	            if (f_cont) rl -= 2 ;

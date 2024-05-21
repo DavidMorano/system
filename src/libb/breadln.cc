@@ -94,7 +94,7 @@ int breadlnto(bfile *op,char *ubuf,int ulen,int to) noex {
 	int		rs ;
 	int		rlen = 0 ;
 	if ((rs = bfile_magic(op,ubuf)) > 0) {
-	    if ((rs = bfile_rd(op)) >= 0) {
+	    if ((rs = bfile_ckrd(op)) >= 0) {
 		if (op->f.mapinit) {
 		    rs = breadlnmap(op,ubuf,ulen) ;
 		    rlen = rs ;
@@ -159,7 +159,7 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 	    if (mlen > 0) {
 	        char	*bp ;
 	        char	*lastp ;
-		if constexpr (f_memcpy) {
+		if_constexpr (f_memcpy) {
 	            if ((lastp = stpccpy(dbp,op->bp,'\n',mlen)) == np) {
 	                lastp = dbp + mlen ;
 	            }
@@ -226,7 +226,7 @@ static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	    if ((rs >= 0) && (mlen > 0)) {
 	        char	*bp ;
 	        char	*lastp ;
-		if constexpr (f_memcpy) {
+		if_constexpr (f_memcpy) {
 	            if ((lastp = stpccpy(dbp,op->bp,'\n',mlen)) == np) {
 	                lastp = dbp + mlen ;
 	            }

@@ -959,7 +959,7 @@ static int lineindex_mkindex(LINEINDEX *op) noex {
 			break ;
 
 	    if (linebuf[len - 1] != '\n') {
-	        rs = bwasteline(&lfile,linebuf,LINEBUFLEN) ;
+	        rs = bwastelln(&lfile,linebuf,LINEBUFLEN) ;
 	        if (rs > 0) len += rs ;
 	    }
 	    }

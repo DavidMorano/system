@@ -78,7 +78,7 @@ int bprintf(bfile *op,cchar *fmt,...) noex {
 /* end subroutine (bprintf) */
 
 int bvprintf(bfile *op,cchar *fmt,va_list ap) noex {
-	return bwritefmt(op,fmt,ap)  ;
+	return bwritefmt(op,fmt,ap) ;
 }
 /* end subroutine (bvprintf) */
 

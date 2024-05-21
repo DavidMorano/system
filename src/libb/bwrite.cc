@@ -106,7 +106,7 @@ constexpr bool		f_flushpart = CF_FLUSHPART ;
 int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,abuf)) > 0) {
-	    if ((rs = bfile_wr(op)) >= 0) {
+	    if ((rs = bfile_ckwr(op)) >= 0) {
 		rs = bfile_write(op,abuf,alen) ;
 	    } /* end if (access) */
 	} /* end if (magic) */
@@ -125,7 +125,7 @@ int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	}
 	return rs ;
 }
-/* end subroutine (bfile_wr) */
+/* end subroutine (bfile_write) */
 
 
 /* local subroutines */

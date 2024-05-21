@@ -92,8 +92,6 @@ extern char	*strnchr(const char *,int,int) ;
 static int	procdata(struct proginfo *,char *,int,uint *,int,
 			MEMFILE *,bfile *, const char *) ;
 
-static int	bwasteline(bfile *,char *,int) ;
-
 
 /* local variables */
 
@@ -238,26 +236,11 @@ const char	fname[] ;
 	        cp = strnchr(sp,sl,'\t') ;
 
 	        if ((cp == NULL) && (! f_eol)) {
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(5))
-	                debugprintf("procdata: wasting line\n") ;
-#endif
-
-	            bwasteline(ifp,lbuf,LINEBUFLEN) ;
-
+	            bwasteln(ifp,lbuf,LINEBUFLEN) ;
 	            f_bol = TRUE ;
 	            continue ;
 	        }
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("procdata: filespec=%t\n",
-	                lbuf,(cp - lbuf)) ;
-#endif
-
 	        rs = bwrite(nfp,lbuf,(cp - lbuf)) ;
-
 	        if (rs > 0) {
 	            nlen = (rs + 1) ;
 	            bputc(nfp,'\n') ;
@@ -452,32 +435,9 @@ const char	fname[] ;
 	bclose(ifp) ;
 	} /* end if (input-open) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) 
-	    debugprintf("procdata: ret rs=%d c=%u\n",rs, c) ;
-#endif
-
 ret0:
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procdata) */
-
-
-static int bwasteline(fp,lbuf,llen)
-bfile		*fp ;
-char		lbuf[] ;
-int		llen ;
-{
-	int	rs ;
-	int	len ;
-
-	while ((rs = breadln(fp,lbuf,llen)) > 0) {
-	    len = rs ;
-	    if (lbuf[len - 1] == '\n') break ;
-	} /* end while */
-
-	return rs ;
-}
-/* end subroutine (bwasteline) */
 
 

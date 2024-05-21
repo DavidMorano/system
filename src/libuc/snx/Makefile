@@ -54,7 +54,7 @@ OBJA_SNX= obj0_sfx.o obj1_sfx.o
 OBJB_SNX= obj2_sfx.o obj3_sfx.o
 OBJC_SNX= obj4_sfx.o obj5_sfx.o
 
-OBJ_SNX= $(OBJA_SNX) $(OBJB_SNX) $(OBJC_SNX)
+OBJ_SNX= obja.o objb.o objc.o
 
 
 default:		$(T).o
@@ -101,30 +101,41 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:	$(OBJ0_SNX) $(INCS)
+obj0_sfx.o:		$(OBJ0_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNX)
 
-obj1_sfx.o:	$(OBJ1_SNX) $(INCS)
+obj1_sfx.o:		$(OBJ1_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNX)
 
-obj2_sfx.o:	$(OBJ2_SNX) $(INCS)
+obj2_sfx.o:		$(OBJ2_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNX)
 
-obj3_sfx.o:	$(OBJ3_SNX) $(INCS)
+obj3_sfx.o:		$(OBJ3_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNX)
 
-obj4_sfx.o:	$(OBJ4_SNX) $(INCS)
+obj4_sfx.o:		$(OBJ4_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNX)
 
-obj5_sfx.o:	$(OBJ5_SNX) $(INCS)
+obj5_sfx.o:		$(OBJ5_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNX)
 
 
-snuuid.o:		snuuid.cc $(INCS)
-sntid.o:		sntid.cc $(INCS)
-snerrabbr.o:		snerrabbr.cc $(INCS)
+obja.o:			$(OBJA_SNX) $(INCS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_SNX)
+
+objb.o:			$(OBJB_SNX) $(INCS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_SNX)
+
+objc.o:			$(OBJC_SNX) $(INCS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_SNX)
+
+
+snuuid.o:		snuuid.cc		$(INCS)
+sntid.o:		sntid.cc		$(INCS)
+snerrabbr.o:		snerrabbr.cc		$(INCS)
 sntmtime.o:		sntmtime.cc sntmtime.h $(INCS)
-snaddw.o:		snaddw.cc snaddw.h $(INCS)
+snaddw.o:		snaddw.cc snaddw.h	$(INCS)
 snwprintf.o:		snwprintf.cc		$(INCS)
+snclean.o:		snclean.cc snclean.h	#(INCS)
 
 
