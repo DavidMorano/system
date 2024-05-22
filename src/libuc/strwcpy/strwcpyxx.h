@@ -25,7 +25,6 @@
 #include	<utypealiases.h>
 
 
-
 EXTERNC_begin
 
 extern char *strwcpyblanks(char *,int) noex ;

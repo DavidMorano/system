@@ -1090,7 +1090,7 @@ bufstr.o:		bufstr.cc bufstr.h
 
 
 # sring-comparisons
-vstrcmpx.o:		vstrcmpx.c vstrcmpx.h
+vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
 vstrkeycmpx.o:		vstrkeycmpx.c vstrkeycmpx.h
 vstrkeydictcmp.o:	vstrkeydictcmp.c vstrkeycmpx.h
 

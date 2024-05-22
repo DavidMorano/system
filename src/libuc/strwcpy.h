@@ -29,7 +29,7 @@
 
 #ifdef	__cplusplus
 
-inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
+inline char *strwcpy(char *dp,cchar *sp,int sl = -1) noex {
 	return strwcpybc(dp,sp,sl) ;
 }
 
