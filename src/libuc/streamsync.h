@@ -10,11 +10,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
 
 
 #define	STREAMSYNC_MAGIC	0x96817463
@@ -33,9 +31,9 @@ typedef STREAMSYNC	streamsync ;
 
 EXTERNC_begin
 
-extern int streamsync_start(STREAMSYNC *,cchar *,int) noex ;
-extern int streamsync_test(STREAMSYNC *,int) noex ;
-extern int streamsync_finish(STREAMSYNC *) noex ;
+extern int streamsync_start(streamsync *,cchar *,int) noex ;
+extern int streamsync_test(streamsync *,int) noex ;
+extern int streamsync_finish(streamsync *) noex ;
 
 EXTERNC_end
 

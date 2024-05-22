@@ -12,8 +12,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<vechand.h>
-#include	<localmisc.h>
 
 
 #define	STRPACK_MAGIC		0x42114683

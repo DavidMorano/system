@@ -72,6 +72,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int vstrcmpx(cchar **s1pp,cchar **s2pp) noex {
