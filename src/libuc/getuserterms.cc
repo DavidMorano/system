@@ -54,6 +54,7 @@
 #include	<tmpx.h>
 #include	<strwcpy.h>
 #include	<intsat.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getuserterms.h"
@@ -115,6 +116,8 @@ static int	revsortfunc(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
+
+constexpr int	lline = TMPX_LLINE ;
 
 
 /* exported variables */
@@ -193,8 +196,8 @@ int userterms::finish() noex {
 
 int userterms::load(vecstr *tlp) noex {
 	int		rs ;
-	void		*vp{} ;
 	if ((rs = vecobj_sort(&el,revsortfunc)) >= 0) {
+	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(&el,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
 		    TE	*ep = (TE *) vp ;
@@ -221,26 +224,24 @@ int userterms::entfins() noex {
 }
 
 int userterms::proc() noex {
-	tmpx		utmp ;
+	tmpx		tx ;
+	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = tmpx_open(&utmp,nullptr,O_RDONLY)) >= 0) {
+	if ((rs = tmpx_open(&tx,nullptr,of)) >= 0) {
 	    tmpx_cur	cur ;
 	    tmpx_ent	ue ;
-	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
-	        while (rs >= 0) {
+	    if ((rs = tmpx_curbegin(&tx,&cur)) >= 0) {
+		char	*bp = (tbuf + tl) ;
+	        while ((rs1 = tmpx_fetchuser(&tx,&cur,&ue,un)) > 0) {
 		    time_t	tia ;
 		    int		rl ;
 		    bool	f = false ;
-	            rs1 = tmpx_fetchuser(&utmp,&cur,&ue,un) ;
-		    if (rs1 == SR_NOTFOUND) break ;
-		    rs = rs1 ;
-		    if (rs < 0) break ;
 	            f = f || (ue.ut_type != TMPX_TPROCUSER) ;
 	            f = f || (ue.ut_line[0] == '\0') ;
 		    if (f) continue ;
-	            rl = strwcpy((tbuf + tl),ue.ut_line,32) - tbuf ;
+	            rl = strwcpy(bp,ue.ut_line,lline) - tbuf ;
 	            if ((rs = getatime(tbuf,&tia)) >= 0) {
 	                TE	te ;
 	                if ((rs = terment_start(&te,tbuf,rl,tia)) >= 0) {
@@ -251,11 +252,13 @@ int userterms::proc() noex {
 	                    terment_finish(&te) ;
 			}
 	            } /* end if (we had a better one) */
+		    if (rs < 0) break ;
 	        } /* end while (looping through entries) */
-	        rs1 = tmpx_curend(&utmp,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	        rs1 = tmpx_curend(&tx,&cur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
-	    rs1 = tmpx_close(&utmp) ;
+	    rs1 = tmpx_close(&tx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (UTMPX open) */
 	return (rs >= 0) ? c : rs ;
@@ -297,6 +300,8 @@ static int getatime(cc *termdev,time_t *tp) noex {
 	    if ((sb.st_mode & S_IWGRP) != S_IWGRP) {
 	        rs = SR_RDONLY ;
 	    }
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
 	} /* end if */
 	return rs ;
 }
