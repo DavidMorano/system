@@ -50,12 +50,18 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 struct locktype {
 	int		t ;
 	cchar		*n ;
 } ;
+
+
+/* forward references */
 
 
 /* local variables */
