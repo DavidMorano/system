@@ -12,22 +12,25 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* system-types */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
-#define	SHELLUNDER	struct shellunder
+#define	SHELLUNDER	struct shellunder_head
 
 
-struct shellunder {
+struct shellunder_head {
 	cchar		*progename ;	/* child program exec-name */
 	pid_t		pid ;		/* parent (shell) PID */
 } ;
 
+typedef	SHELLUNDER	shellunder ;
+
 EXTERNC_begin
 
-extern int	shellunder(SHELLUNDER *,cchar *) noex ;
+extern int	shellunder_wr(shellunder *,cchar *) noex ;
 
 EXTERNC_end
 

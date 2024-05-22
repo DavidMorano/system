@@ -1,5 +1,5 @@
-/* shellunder */
-/* lang=C20 */
+/* shellunder SUPPORT */
+/* lang=C++20 */
 
 /* parse out the shell-under information (as might be present) */
 /* version %I% last-modified %G% */
@@ -24,7 +24,7 @@
 	from a given string (containing the shell-under information).
 
 	Synopsis:
-	int shellunder(SHELLUNDER *opcchar *under) noex
+	int shellunder_wr(SHELLUNDER *opc,char *under) noex
 
 	Arguments:
 	op		pointer to object
@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0	length of program-execution filename
-	<0	error
+	<0	error (system-return)
 
 	= Implementation notes:
 	The "shell-under" string takes the form:
@@ -46,8 +46,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>		/* <- |strchr(3c) */
+#include	<sys/types.h>		/* system-types */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>		/* <- |strchr(3c)| */
 #include	<usystem.h>
 #include	<char.h>
 #include	<cfdec.h>
@@ -74,32 +75,36 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int shellunder(SHELLUNDER *op,cchar *under) noex {
+int shellunder_wr(shellunder *op,cchar *under) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	if (op && under) {
 	    rs = SR_OK ;
 	    op->pid = -1 ;
-	    op->progename = NULL ;
+	    op->progename = nullptr ;
 	    if (under[0] != '\0') {
 	        if (under[0] == '*') {
 	            int		dl = -1 ;
 	            cchar	*dp = (under+1) ;
 	            cchar	*tp = strchr(under,'*') ;
 	            if (tp) {
-	                int	v ;
 	                dl = (tp-dp) ;
 	                under = (tp+1) ;
-	                if ((rs = cfdeci(dp,dl,&v)) >= 0) {
-	                    op->pid = (pid_t) v ;
+	                if (int v ; (rs = cfdeci(dp,dl,&v)) >= 0) {
+	                    op->pid = pid_t(v) ;
 	                }
 	            } else
 	                rs = SR_INVALID ;
 	        }
 	        if ((rs >= 0) && (under[0] != '\0')) {
-	            while (CHAR_ISWHITE(*under)) under += 1 ;
+	            while (CHAR_ISWHITE(*under)) {
+			under += 1 ;
+		    }
 	            op->progename = under ;
 	            pl = strlen(under) ;
 	        }

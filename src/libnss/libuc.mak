@@ -1144,7 +1144,7 @@ ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
 ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
-mkutmpid.o:		mkutmpid.cc mkutmpid.h
+shellunder.o:		shellunder.cc shellunder.h
 #
 isproc.o:		isproc.cc isproc.h
 #

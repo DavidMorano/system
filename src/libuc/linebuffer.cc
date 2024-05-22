@@ -50,8 +50,8 @@ int linebuffer_start(linebuffer *op) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
 	if (op) {
-	    char	*cp ;
-	    if ((rs = malloc_ml(&cp)) >= 0) {
+	    if (char *cp ; (rs = malloc_ml(&cp)) >= 0) {
+		cl = rs ;
 		op->lbuf = cp ;
 		op->llen = rs ;
 	    } /* end if (memory-allocation) */
