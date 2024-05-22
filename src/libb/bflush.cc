@@ -21,10 +21,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"bfile.h"
 
@@ -33,10 +30,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	bfile_flushn(bfile *,int) noex ;
-}
 
 
 /* external variables */
@@ -50,25 +43,19 @@ extern "C" {
 
 /* exported subroutines */
 
-int bflushn(bfile *fp,int n) noex {
-	int		rs = SR_FAULT ;
-	if (fp) {
-	    rs = SR_NOTOPEN ;
-	    if (fp->magic == BFILE_MAGIC) {
-		rs = SR_OK ;
-	        if (! fp->f.nullfile) {
-	            if (fp->f.write && (fp->len > 0)) {
-	                rs = bfile_flushn(fp,n) ;
-		    }
-	        }
-	    } /* end if (open) */
-	} /* end if (non-null) */
+int bflushn(bfile *op,int n) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    if (op->f.writing && (op->len > 0)) {
+		rs = bfile_flushn(op,n) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (bflushn) */
 
-int bflush(bfile *fp) noex {
-	return bflushn(fp,-1) ;
+int bflush(bfile *op) noex {
+	return bflushn(op,-1) ;
 }
 /* end subroutine (bflush) */
 

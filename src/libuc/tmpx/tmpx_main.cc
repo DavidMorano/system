@@ -285,7 +285,7 @@ int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 	                } /* end for */
 	                if (f) break ;
 	            } /* end while */
-	            if ((rs >= 0) && f && (ep != nullptr)) {
+	            if ((rs >= 0) && f && ep) {
 	                memcpy(ep,up,TMPX_ENTSIZE) ;
 	            }
 	            if ((rs == SR_OK) && (! f)) {

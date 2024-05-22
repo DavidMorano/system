@@ -36,6 +36,7 @@
 
 #define	FILER		struct filer_head
 #define	FILER_FL	struct filer_flags
+#define	FILER_MAGIC	0x21387462
 #define	FILER_ONET	O_NETWORK	/* specify network FD */
 #define	FILER_RCNET	3		/* read-count for network */
 
@@ -50,6 +51,7 @@ struct filer_head {
 	char		*bp ;		/* goes up with use */
 	off_t		off ;		/* virtual file pointer */
 	FILER_FL	f ;
+	uint		magic ;
 	int		fd ;		/* file-descriptor */
 	int		of ;		/* open-flags */
 	int		dt ;		/* file-type ("DT_XXX" values)*/

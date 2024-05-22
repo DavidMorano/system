@@ -4,6 +4,7 @@
 /* get the name of the operating system */
 /* version %I% last-modified %G% */
 
+
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
@@ -42,6 +43,7 @@
 #include	<ucvariables.hh>
 #include	<uinfo.h>
 #include	<sfx.h>
+#include	<snwcpy.h>
 #include	<sncpyx.h>
 #include	<sncpyxw.h>
 #include	<localmisc.h>
@@ -123,7 +125,7 @@ int namer::tryenv() noex {
 	if (val) {
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfshrink(val,-1,&cp)) > 0) {
-		rs = sncpy1w(rbuf,rlen,cp,cl) ;
+		rs = snwcpy(rbuf,rlen,cp,cl) ;
 		len = rs ;
 	    }
 	}

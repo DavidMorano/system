@@ -23,10 +23,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<toxc.h>
-#include	<clanguage.h>
 
 #include	"snwcpyxc.h"
 
@@ -58,6 +59,9 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	return ((sl == 0) || (sp[i] == '\0')) ? (dp - dbuf) : SR_OVERFLOW ;
 }
 /* end subroutine-template (snwcpyxc) */
+
+
+/* local variables */
 
 
 /* exported variables */

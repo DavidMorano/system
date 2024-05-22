@@ -130,6 +130,10 @@
 #define	IOVEC		struct iovec
 #endif
 
+#ifndef	LINGER
+#define	LINGER		struct linger
+#endif
+
 #ifndef	SOCKADDR
 #define	SOCKADDR	struct sockaddr
 #endif
@@ -270,10 +274,6 @@
 #define	CSIGVAL		const SIGVAL
 #endif
 
-#ifndef	CAIOCB
-#define	CAIOCB		const AIOCB
-#endif
-
 #ifndef	CTIMEVAL
 #define	CTIMEVAL	const TIMEVAL
 #endif
@@ -310,6 +310,18 @@
 #define	CTERMIOS	const TERMIOS
 #endif
 
+#ifndef	CAIOCB
+#define	CAIOCB		const AIOCB
+#endif
+
+#ifndef	CIOVEC
+#define	CIOVEC		const IOVEC
+#endif
+
+#ifndef	CLINGER
+#define	CLINGER		const LINGER
+#endif
+
 #ifndef	CSOCKADDR
 #define	CSOCKADDR	const SOCKADDR
 #endif
@@ -320,10 +332,6 @@
 
 #ifndef	CRLIMIT
 #define	CRLIMIT		const RLIMIT
-#endif
-
-#ifndef	CIOVEC
-#define	CIOVEC		const IOVEC
 #endif
 
 #ifndef	CUTMPX

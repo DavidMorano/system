@@ -19,13 +19,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<vechand.h>
 #include	<lookaside.h>
 #include	<hdb.h>
-#include	<localmisc.h>
 
 
 #define	STRSTORE_MAGIC		0x42114682

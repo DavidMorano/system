@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
@@ -31,6 +32,23 @@ extern char	* strwcpyuc (char *,cchar *,int) noex ;
 extern char	* strwcpyfc (char *,cchar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline char	* strwcpybc (char *dp,cchar *sp) noex {
+	return strwcpybc(dp,sp) ;
+}
+inline char	* strwcpylc (char *dp,cchar *sp) noex {
+	return strwcpylc(dp,sp) ;
+}
+inline char	* strwcpyuc (char *dp,cchar *sp) noex {
+	return strwcpyuc(dp,sp) ;
+}
+inline char	* strwcpyfc (char *dp,cchar *sp) noex {
+	return strwcpyfc(dp,sp) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* STRWCPYXC_INCLUDE */

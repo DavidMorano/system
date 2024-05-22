@@ -86,7 +86,7 @@ int bseek(bfile *op,off_t wo,int w) noex {
 		ro = intsat(op->offset) ;
 		if ((rs = notappend(op,wo,w)) > 0) {
 		    off_t	ao = 0 ;
-	            if (op->f.write) {
+	            if (op->f.writing) {
 	                if (op->len > 0) {
 	                    rs = bfile_flush(op) ;
 	                }
@@ -96,8 +96,8 @@ int bseek(bfile *op,off_t wo,int w) noex {
 	                }
 	            } /* end if */
 	            if (rs >= 0) {
-		        const off_t	co = (wo + ao) ;
-		        off_t		soff{} ;
+		        coff	co = (wo + ao) ;
+		        off_t	soff{} ;
 	                op->bp = op->bdata ;
 	                op->len = 0 ;
 			rs = u_seeko(op->fd,co,w,&soff) ;

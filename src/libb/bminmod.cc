@@ -4,7 +4,6 @@
 /* "Basic I-O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
-#define	CF_MEMCPY	1		/* use 'memcpy(3c)' */
 
 /* revision history:
 
@@ -24,6 +23,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -46,19 +46,18 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int bminmod(bfile *fp,mode_t om) noex {
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->fd >= 0) {
-	    rs = uc_fminmod(fp->fd,om) ;
-	}
-
+int bminmod(bfile *op,mode_t om) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) >= 0) {
+	    if (op->fd >= 0) {
+	        rs = uc_fminmod(op->fd,om) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end routine (bminmod) */

@@ -103,8 +103,8 @@ namespace {
 
 /* forward references */
 
-static int	entry_start(terment *,cchar *,int,time_t) noex ;
-static int	entry_finish(terment *) noex ;
+static int	terment_start(terment *,cchar *,int,time_t) noex ;
+static int	terment_finish(terment *) noex ;
 
 static int	mktermfname(char *,int,cchar *,int) noex ;
 static int	getatime(cchar *,time_t *) noex ;
@@ -240,13 +240,13 @@ int subinfo::entproc(vecobj *elp,int tl) noex {
 	int		c = 0 ;
 	if ((rs1 = getatime(tbuf,&ti_access)) >= 0) {
 	    terment	te ;
-	    if ((rs = entry_start(&te,tbuf,tl,ti_access)) >= 0) {
+	    if ((rs = terment_start(&te,tbuf,tl,ti_access)) >= 0) {
 		c += 1 ;
 		rs = vecobj_add(elp,&te) ;
 		if (rs < 0)  {
-		    entry_finish(&te) ;
+		    terment_finish(&te) ;
 		}
-	    } /* end if (entry_start) */
+	    } /* end if (terment_start) */
 	} /* end if (we had a better one) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -276,7 +276,7 @@ int subinfo::entfins(vecobj *elp) noex {
 	    if (vp) {
 		terment	*ep = termentp(vp) ;
 		{
-	            rs1 = entry_finish(ep) ;
+	            rs1 = terment_finish(ep) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -285,7 +285,7 @@ int subinfo::entfins(vecobj *elp) noex {
 }
 /* end method (subinfo::entfins) */
 
-static int entry_start(terment *ep,cchar *fp,int fl,time_t t) noex {
+static int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (ep && fp) {
 	    cchar	*cp{} ;
@@ -296,9 +296,9 @@ static int entry_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (entry_start) */
+/* end subroutine (terment_start) */
 
-static int entry_finish(terment *ep) noex {
+static int terment_finish(terment *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
@@ -311,7 +311,7 @@ static int entry_finish(terment *ep) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (entry_finish) */
+/* end subroutine (terment_finish) */
 
 static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
 	return pathaddw(rbuf,ddnl,sp,sl) ; /* <- nice refactor here */

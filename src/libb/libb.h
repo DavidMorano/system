@@ -227,8 +227,8 @@ extern int	bclose(bfile *) noex ;
 
 extern int	bfile_bufreset(bfile *) noex ;
 extern int	bfile_acc(bfile *,bool) noex ;
-extern int	bfile_rd(bfile *) noex ;
-extern int	bfile_wr(bfile *) noex ;
+extern int	bfile_ckrd(bfile *) noex ;
+extern int	bfile_ckwr(bfile *) noex ;
 extern int	bfile_flush(bfile *) noex ;
 extern int	bfile_flushn(bfile *,int) noex ;
 extern int	bfile_pagein(bfile *,off_t,int) noex ;

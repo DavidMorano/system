@@ -26,44 +26,18 @@
 #include	<vecstr.h>
 
 
-/* object defines */
-#define	TMPX		struct tmpx_head
-#define	TMPX_FL		struct tmpx_flags
-#define	TMPX_CUR	struct tmpx_cursor
-#define	TMPX_ENT	struct utmpx
-#define	TMPX_MAGIC	1092387456
-#define	TMPX_ENTSIZE	sizeof(TMPX_ENT)
-
-/* other defines */
+/* UTMPX file */
 #if	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0))
-#define	TMPX_DEFUTMP	"/var/adm/utmpx"
+#define	UTMPX_DEFUTMP	"/var/adm/utmpx"
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#define	TMPX_DEFUTMP	"/var/run/utmpx"
+#define	UTMPX_DEFUTMP	"/var/run/utmpx"
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
+#define	UTMPX_DEFUTMP	"/var/run/utmpx"
 #else
-#define	TMPX_DEFUTMP	"/var/run/utmpx"
+#define	UTMPX_DEFUTMP	"/var/run/utmpx"
 #endif
 
-/* entry type values */
-#define	TMPX_TEMPTY		0	/* entry is unused */
-#define	TMPX_TRUNLEVEL		1
-#define	TMPX_TBOOTTIME		2
-#define	TMPX_TOLDTIME		3
-#define	TMPX_TNEWTIME		4
-#define	TMPX_TPROCINIT		5	/* process spawned by "init" */
-#define	TMPX_TPROCLOGIN		6	/* a "getty" waiting for login */
-#define	TMPX_TPROCUSER		7	/* a regular user process */
-#define	TMPX_TPROCDEAD		8	/* dead process (moved to WTMPX) */
-#define	TMPX_TACCOUNT		9	/* used in WTMPX only? */
-#define	TMPX_TSIGNATURE		10	/* used in WTMPX only? */
-
-/* entry lengths */
-#define	TMPX_LID		4
-#define	TMPX_LUSER		32
-#define	TMPX_LLINE		32
-#define	TMPX_LHOST		256
-
-/* UTMPX stuff (in theory could be different from above) */
+/* UTMPX stuff */
 #ifndef	UTMPX_TEMPTY
 #define	UTMPX_TEMPTY		0	/* entry is unused */
 #define	UTMPX_TRUNLEVEL		1
@@ -84,6 +58,34 @@
 #define	UTMPX_LLINE		32
 #define	UTMPX_LHOST		256
 #endif
+
+/* object defines */
+#define	TMPX		struct tmpx_head
+#define	TMPX_FL		struct tmpx_flags
+#define	TMPX_CUR	struct tmpx_cursor
+#define	TMPX_ENT	struct utmpx
+#define	TMPX_MAGIC	1092387456
+#define	TMPX_ENTSIZE	sizeof(TMPX_ENT)
+#define	TMPX_DEFUTMP	UTMPX_DEFUTMP
+
+/* entry-type values */
+#define	TMPX_TEMPTY	UTMPX_TEMPTY
+#define	TMPX_TRUNLEVEL	UTMPX_TRUNLEVEL
+#define	TMPX_TBOOTTIME	UTMPX_TBOOTTIME
+#define	TMPX_TOLDTIME	UTMPX_TOLDTIME
+#define	TMPX_TNEWTIME	UTMPX_TNEWTIME
+#define	TMPX_TPROCINIT	UTMPX_TPROCINIT
+#define	TMPX_TPROCLOGIN	UTMPX_TPROCLOGIN
+#define	TMPX_TPROCUSER	UTMPX_TPROCUSER
+#define	TMPX_TPROCDEAD	UTMPX_TPROCDEAD
+#define	TMPX_TACCOUNT	UTMPX_TACCOUNT
+#define	TMPX_TSIGNATURE	UTMPX_TSIGNATURE
+
+/* entry-legnth values */
+#define	TMPX_LID	UTMPX_LID
+#define	TMPX_LUSER	UTMPX_LUSER
+#define	TMPX_LLINE	UTMPX_LLINE
+#define	TMPX_LHOST	UTMPX_LHOST
 
 
 struct tmpx_cursor {

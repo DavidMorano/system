@@ -20,7 +20,8 @@
 	Name:
 	strdcpyclean
 
-	This is essentially the same as the 'strdcpy(3dam)' subroutine
+	Description:
+	This is essentially the same as the |strdcpy(3dam)| subroutine
 	except that garbage characters are replaced with a specified
 	substitute character.
 
@@ -44,10 +45,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<ascii.h>
 #include	<mkchar.h>
 #include	<ischarx.h>

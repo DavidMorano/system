@@ -72,6 +72,9 @@ static inline bool keyend(int ch) noex {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strnkeycmp(cchar *e1p,cchar *e2p,int n) noex {

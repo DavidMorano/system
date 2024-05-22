@@ -42,6 +42,9 @@
 /* external variables */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 
@@ -51,7 +54,7 @@ int bwasteln(bfile *fp,char *linebuf,int linelen) noex {
 	int		rs ;
 	int		tlen = 0 ;
 	while ((rs = breadln(fp,linebuf,linelen)) > 0) {
-	    int	len = rs ;
+	    cint	len = rs ;
 	    tlen += len ;
 	    if (linebuf[len - 1] == '\n') break ;
 	} /* end while */

@@ -119,10 +119,9 @@ int bwritechrs(bfile *op,int ch,int n) noex {
 static int bwritebuf(bfile *op,cchar *wbuf,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	int		mlen ;
 	int		blen = n ;
 	while ((rs >= 0) && (blen > 0)) {
-	    mlen = min(blen,nblanks) ;
+	    cint	mlen = min(blen,nblanks) ;
 	    rs = bwrite(op,wbuf,mlen) ;
 	    wlen += rs ;
 	    blen -= mlen ;

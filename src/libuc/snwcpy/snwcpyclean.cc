@@ -8,8 +8,8 @@
 /* revision history:
 
 	= 1998-07-08, David A­D­ Morano
-	This was written to clean up some problems with printing garbage
-	characters in a few places in some PCS utilities.
+	This was written to clean up some problems with printing
+	garbage characters in a few places in some PCS utilities.
 
 */
 

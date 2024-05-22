@@ -80,7 +80,7 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(op,lp)) > 0) {
-	    if ((rs = bfile_wr(op)) >= 0) {
+	    if ((rs = bfile_ckwr(op)) >= 0) {
 	        if (linelen <= 0) linelen = COLUMNS ;
 	        if (ll < 0) ll = strlen(lp) ;
 	        if constexpr (f_linefold) {

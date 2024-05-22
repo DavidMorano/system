@@ -20,8 +20,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stddef.h>		/* <- for |wchar_t| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin

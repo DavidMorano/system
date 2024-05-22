@@ -48,9 +48,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<storebuf.h>
 #include	<mkx.h>
 #include	<ids.h>
@@ -99,11 +101,11 @@ struct subinfo_flags {
 
 struct subinfo {
 	void		**ropp ;
-	mainv		dnames ;
+	void		*sop ;
 	cchar		*oname ;
+	mainv		dnames ;
 	mainv		exts ;
 	mainv		syms ;
-	void		*sop ;
 	SUBINFO_FL	f ;
 	ids		id ;
 	int		dlmode ;
@@ -112,26 +114,26 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,mv,cchar *,mv,mv,int,void **) noex ;
-static int	subinfo_soload(SUBINFO *) noex ;
-static int	subinfo_finish(SUBINFO *,int) noex ;
+static int	subinfo_start(subinfo *,mv,cchar *,mv,mv,int,void **) noex ;
+static int	subinfo_soload(subinfo *) noex ;
+static int	subinfo_finish(subinfo *,int) noex ;
 
-static int	subinfo_sofind(SUBINFO *) noex ;
-static int	subinfo_socheck(SUBINFO *,ids *,cchar *) noex ;
-static int	subinfo_checksyms(SUBINFO *) noex ;
-static int	subinfo_modclose(SUBINFO *) noex ;
+static int	subinfo_sofind(subinfo *) noex ;
+static int	subinfo_socheck(subinfo *,ids *,cchar *) noex ;
+static int	subinfo_checksyms(subinfo *) noex ;
+static int	subinfo_modclose(subinfo *) noex ;
 
 
 /* local variables */
 
-static constexpr cpcchar	defexts[] = {
+constexpr cpcchar	defexts[] = {
 	"so",
 	"o",
 	"",
 	nullptr
 } ;
 
-static constexpr cint	termrs[] = {
+constexpr cint		termrs[] = {
 	SR_FAULT,
 	SR_INVALID,
 	SR_NOMEM,
@@ -153,26 +155,24 @@ static constexpr cint	termrs[] = {
 /* exported subroutines */
 
 int attachso(cc **dnames,cc *oname,cc **exts,cc **syms,int m,void **ropp) noex {
-	SUBINFO		si ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f_abort ;
-
-	if (dnames == nullptr) return SR_FAULT ;
-	if (oname == nullptr) return SR_FAULT ;
-
-	if (oname[0] == '\0') return SR_INVALID ;
-
-	if ((rs = subinfo_start(&si,dnames,oname,exts,syms,m,ropp)) >= 0) {
-
-	    rs = subinfo_soload(&si) ;
-	    f_abort = (rs < 0) ;
-
-	    f_abort = (rs < 0) ;
-	    rs1 = subinfo_finish(&si,f_abort) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
+	if (dnames && oname) {
+	    rs = SR_INVALID ;
+	    if (oname[0]) {
+	        SUBINFO		si ;
+		auto		ss = subinfo_start ;
+	        if ((rs = ss(&si,dnames,oname,exts,syms,m,ropp)) >= 0) {
+	            int		f_abort ;
+	            {
+	                rs = subinfo_soload(&si) ;
+	                f_abort = (rs < 0) ;
+	            }
+	            rs1 = subinfo_finish(&si,f_abort) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (attachso) */
@@ -183,7 +183,6 @@ int attachso(cc **dnames,cc *oname,cc **exts,cc **syms,int m,void **ropp) noex {
 static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 			int m,void **ropp) noex {
 	if (exts == nullptr) exts = defexts ;
-
 	memclear(sip) ;
 	sip->dnames = dnames ;
 	sip->oname = oname ;
@@ -191,31 +190,29 @@ static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 	sip->syms = syms ;
 	sip->dlmode = m ;
 	sip->ropp = ropp ;
-
 	return SR_OK ;
 }
 /* end subroutine (subinfo_start) */
 
 static int subinfo_finish(SI *sip,int f_abort) noex {
-	if (f_abort && (sip->ropp != nullptr)) {
+	if (f_abort && sip->ropp) {
 	    void	*sop = (void *) *(sip->ropp) ;
-	    if ((sop != nullptr) && (! isSpecialObject(sop))) dlclose(sop) ;
+	    if (sop && (! isSpecialObject(sop))) {
+		dlclose(sop) ;
+	    }
 	    *(sip->ropp) = nullptr ;
 	}
-
 	return SR_OK ;
 }
 /* end subroutine (subinfo_finish) */
 
 static int subinfo_soload(SI *sip) noex {
 	int		rs ;
-
 	if ((rs = subinfo_sofind(sip)) >= 0) {
-	    if (sip->ropp != nullptr) {
+	    if (sip->ropp) {
 		*(sip->ropp) = sip->sop ;
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (subinfo_soload) */
@@ -224,10 +221,9 @@ static int subinfo_sofind(SI *sip) noex {
 	ids		id ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = ids_load(&id)) >= 0) {
 	    cint	soperm = (X_OK | R_OK) ;
-	    int		f_open = false ;
+	    bool	f_open = false ;
 	    mainv	dnames = sip->dnames ;
 	    cchar	*dname ;
 	    for (int i = 0 ; dnames[i] ; i += 1) {
@@ -237,7 +233,7 @@ static int subinfo_sofind(SI *sip) noex {
 			sip->sop = RTLD_SELF ;
 			rs = subinfo_checksyms(sip) ;
 		    } else {
-		        USTAT		sb ;
+		        USTAT	sb ;
 	                if ((rs = u_stat(dname,&sb)) >= 0) {
 	                    if (! S_ISDIR(sb.st_mode)) {
 			        rs = SR_NOTDIR ;
@@ -256,90 +252,80 @@ static int subinfo_sofind(SI *sip) noex {
 		subinfo_modclose(sip) ;
 	    }
 	} /* end if (IDs) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_sofind) */
 
-
 static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
-	USTAT		sb ;
-	cint		soperm = (R_OK | X_OK) ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_NOTFOUND ;
 	int		f = false ;
-	mainv		exts = sip->exts ;
-	char		sofname[MAXPATHLEN + 1] ;
-
-	sip->sop = nullptr ;
-	for (int j = 0 ; exts[j] ; j += 1) {
-	    cchar	*ext = exts[j] ;
-
-	    if ((rs1 = mksofname(sofname,dname,sip->oname,ext)) >= 0) {
-
-	        rs1 = u_stat(sofname,&sb) ;
-	        if ((rs1 >= 0) && (! S_ISREG(sb.st_mode))) {
-	            rs1 = SR_ISDIR ;
-		}
-
-	        if (rs1 >= 0)
-	            rs1 = sperm(idp,&sb,soperm) ;
-
-
-	        if (rs1 >= 0) {
-
-	            sip->sop = dlopen(sofname,sip->dlmode) ;
-
-	            if (sip->sop == nullptr) rs1 = SR_NOENT ;
-
-	            if (rs1 >= 0) {
-
-	                if ((rs1 = subinfo_checksyms(sip)) >= 0) {
-			    f = true ;
-	                } else {
-	                    if (sip->sop != nullptr) {
-	    		        if (! isSpecialObject(sip->sop)) {
-	                            dlclose(sip->sop) ;
-				}
-	                        sip->sop = nullptr ;
-	                    }
-	                    if (isOneOf(termrs,rs1)) rs = rs1 ;
-			}
-
-	            } /* end if (ok) */
-	        } /* end if (file and perms) */
-
-	    } /* end if (filename formed) */
-
-	    if (sip->sop != nullptr) break ;
-	    if (rs < 0) break ;
-	} /* end for (exts) */
-
-	if (rs >= 0) {
-	    if (sip->sop == nullptr) rs = rs1 ;
-	} else {
+	char		*sofname{} ;
+	if ((rs = malloc_mp(&sofname)) >= 0) {
+	    USTAT	sb ;
+	    cint	soperm = (R_OK | X_OK) ;
+	    mainv	exts = sip->exts ;
 	    sip->sop = nullptr ;
-	}
-
+	    for (int j = 0 ; exts[j] ; j += 1) {
+	        cchar	*ext = exts[j] ;
+	        if ((rs1 = mksofname(sofname,dname,sip->oname,ext)) >= 0) {
+	            rs1 = u_stat(sofname,&sb) ;
+	            if ((rs1 >= 0) && (! S_ISREG(sb.st_mode))) {
+	                rs1 = SR_ISDIR ;
+		    }
+	            if (rs1 >= 0) {
+	                rs1 = sperm(idp,&sb,soperm) ;
+		    }
+	            if (rs1 >= 0) {
+	                sip->sop = dlopen(sofname,sip->dlmode) ;
+	                if (sip->sop == nullptr) rs1 = SR_NOENT ;
+	                if (rs1 >= 0) {
+    
+	                    if ((rs1 = subinfo_checksyms(sip)) >= 0) {
+			        f = true ;
+	                    } else {
+	                        if (sip->sop != nullptr) {
+	    		            if (! isSpecialObject(sip->sop)) {
+	                                dlclose(sip->sop) ;
+				    }
+	                            sip->sop = nullptr ;
+	                        }
+	                        if (isOneOf(termrs,rs1)) rs = rs1 ;
+			    }
+    
+	                } /* end if (ok) */
+	            } /* end if (file and perms) */
+    
+	        } /* end if (filename formed) */
+    
+	        if (sip->sop != nullptr) break ;
+	        if (rs < 0) break ;
+	    } /* end for (exts) */
+	    if (rs >= 0) {
+	        if (sip->sop == nullptr) rs = rs1 ;
+	    } else {
+	        sip->sop = nullptr ;
+	    }
+	    rs1 = uc_free(sofname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (subinfo_socheck) */
 
 static int subinfo_checksyms(SI *sip) noex {
-	int		rs = SR_OK ;
-	mainv		syms = sip->syms ;
-
-	if (sip->sop == nullptr) return SR_FAULT ;
-
-	if (syms != nullptr) {
-	    const void	*symp ;
-	    int		i ;
-	    for (i = 0 ; (rs >= 0) && (syms[i] != nullptr) ; i += 1) {
-	        symp = dlsym(sip->sop,syms[i]) ;
-	        if (symp == nullptr) rs = SR_NOTFOUND ;
-	    } /* end for */
-	} /* end if (syms) */
-
+	int		rs = SR_FAULT ;
+	if (sip->sop) {
+	    mainv	syms = sip->syms ;
+	    rs = SR_OK ;
+	    if (syms) {
+	        cvoid	*symp ;
+	        for (int i = 0 ; (rs >= 0) && syms[i] ; i += 1) {
+	            symp = dlsym(sip->sop,syms[i]) ;
+	            if (symp == nullptr) rs = SR_NOTFOUND ;
+	        } /* end for */
+	    } /* end if (syms) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_checksyms) */

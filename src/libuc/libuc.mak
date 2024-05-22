@@ -332,13 +332,13 @@ UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
-UOBJ08= strkeycmp.o
+UOBJ08= strkeycmp.o ccfile.o strnul.o
 UOBJ09= readln.o ccfile.o
 UOBJ10= cfx.o sncpyx.o sncpyxc.o sncpyxw.o
 UOBJ11= strmgr.o strop.o field.o
 
 UOBJ12= ufstat.o ucttyname.o
-UOBJ13=
+UOBJ13= ulogerror.o
 UOBJ14= ucsys.o
 UOBJ15=
 
@@ -1090,7 +1090,7 @@ bufstr.o:		bufstr.cc bufstr.h
 
 
 # sring-comparisons
-vstrcmpx.o:		vstrcmpx.c vstrcmpx.h
+vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
 vstrkeycmpx.o:		vstrkeycmpx.c vstrkeycmpx.h
 vstrkeydictcmp.o:	vstrkeydictcmp.c vstrkeycmpx.h
 

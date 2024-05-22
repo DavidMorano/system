@@ -43,7 +43,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<rmx.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>

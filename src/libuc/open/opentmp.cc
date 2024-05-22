@@ -158,7 +158,7 @@ static strlibval	val_tmpdir(strlibval_tmpdir) ;
 
 static vars		var ;
 
-constexpr static cchar	platename[] = "otXXXXXXXXXXXX" ;
+constexpr cchar		platename[] = "otXXXXXXXXXXXX" ;
 
 constexpr bool		f_splitfname = CF_SPLITFNAME ;
 

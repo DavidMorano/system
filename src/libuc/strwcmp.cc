@@ -70,7 +70,7 @@
 
 namespace {
    struct cmpx {
-	virtual int x(cchar *,cchar *,int) noex ;
+	int x(cchar *,cchar *,int) noex ;
 	virtual int tox(int ch) noex ;
 	virtual int strnxcmp(cchar *,cchar *,int) noex ;
 	virtual int nleadxstr(cchar *,cchar *,int) noex ;

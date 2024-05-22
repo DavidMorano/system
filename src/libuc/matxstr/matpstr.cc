@@ -53,7 +53,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -92,7 +92,7 @@ namespace {
 	toxc_f		toxc ;
 	nleadxstr_f	nleadx ;
 	matxstr_f	matxstr ;
-	int matpxstr(cchar *const *,int,cchar *,int) noex ;
+	int matpxstr(mainv,int,cchar *,int) noex ;
 	mater(toxc_f t,nleadxstr_f n,matxstr_f m) noex { 
 	    toxc = t ;
 	    nleadx = n ;

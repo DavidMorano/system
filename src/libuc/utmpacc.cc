@@ -63,6 +63,7 @@
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<sigblocker.h>
+#include	<opentmp.h>
 #include	<filemap.h>
 #include	<filer.h>
 #include	<mkchar.h>
@@ -74,8 +75,8 @@
 
 /* local defines */
 
-#define	UTMPACC_ITEM	struct utmpacc_i
-#define	UTMPACC_NTYPES	4		/* number of process types */
+#define	UTMPACC_ITEM		struct utmpacc_i
+#define	UTMPACC_NTYPES		4	/* number of process types */
 
 /* intervals (seconds) */
 #define	UTMPACC_INTBOOT		(5*3600)
@@ -263,37 +264,144 @@ int utmpacc_extract(int fd) noex {
 	return utmpacc_data.extract(fd) ;
 }
 
+struct utmpacc_icur {
+	UTMPFENT	*utmpfentp ;
+	filer		fb ;
+	uint		magic ;
+	int		fd ;
+} ;
+
+int utmpacc_curbegin(utmpacc_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (curp) {
+	    cnullptr	np{} ;
+	    cint	csz = sizeof(utmpacc_icur) ;
+	    void	*vp{} ;
+	    curp->icursor = nullptr ;
+	    if ((rs = uc_malloc(csz,&vp)) >= 0) {
+		cint		usz = sizeof(UTMPFENT) ;
+	        utmpacc_icur	*icurp = (utmpacc_icur *) vp ;
+		memclear(icurp) ;
+		if ((rs = uc_malloc(usz,&vp)) >= 0) {
+		    UTMPFENT	*ufp = (UTMPFENT *) vp ;
+		    cint	of = (O_CLOEXEC | O_MINFD) ;
+		    cmode	om = 0664 ;
+		    if ((rs = opentmp(np,of,om)) >= 0) {
+		        filer	*fbp = &icurp->fb ;
+		        cint	fd = rs ;
+		        if ((rs = filer_start(fbp,fd,0z,0,0)) >= 0) {
+			    icurp->utmpfentp = ufp ;
+			    icurp->fd = fd ;
+			    icurp->magic = UTMPACC_CURMAGIC ;
+			    curp->icursor = icurp ;
+		        } /* end if (filer_start) */
+		        if (rs < 0) {
+			    uc_close(fd) ;
+		        }
+		    } /* end if (opentmp) */
+		    if (rs < 0) {
+			uc_free(ufp) ;
+			icurp->utmpfentp = nullptr ;
+		    }
+		} /* end if (memory-allocation) */
+		if (rs < 0) {
+		    uc_free(icurp) ;
+		    curp->icursor = nullptr ;
+		}
+	    } /* end if (mempory-allocation) */
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int utmpacc_curenum(utmpacc_cur *curp,utmpacc_ent *ep,char *eb,int el) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (curp && ep && eb) {
+	    utmpacc_icur	*icurp = (utmpacc_icur *) curp->icursor ;
+	    rs = SR_NOTOPEN ;
+	    memclear(ep) ;
+	    if (icurp) {
+	        rs = SR_BADFMT ;
+		if (icurp->magic == UTMPACC_CURMAGIC) {
+		    cint	usz = sizeof(UTMPFENT) ;
+		    filer	*fbp = &icurp->fb ;
+		    UTMPFENT	*ufp = icurp->utmpfentp ;
+		    if ((rs = filer_read(fbp,ufp,usz,-1)) >= 0) {
+			rs = utmpaccent_load(ep,eb,el,ufp) ;
+		        len = rs ;
+		    }
+		} /* end if (cursor-magic) */
+	    } /* end if (internal-cursor-pointer ok) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int utmpacc_curend(utmpacc_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (curp) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->icursor) {
+	        utmpacc_icur	*icurp = (utmpacc_icur *) curp->icursor ;
+		rs = SR_OK ;
+		if (icurp->magic == UTMPACC_CURMAGIC) {
+		    {
+		        filer	*fbp = &icurp->fb ;
+			rs1 = filer_finish(fbp) ;
+			if (rs >= 0) rs = rs1 ;
+		    }
+		    if (icurp->utmpfentp) {
+			rs1 = uc_free(icurp->utmpfentp) ;
+			if (rs >= 0) rs = rs1 ;
+			icurp->utmpfentp = nullptr ;
+		    }
+		    icurp->magic = 0 ;
+		} else {
+		    rs = SR_BADFMT ;
+		} /* end if (good cursor-magic) */
+		{
+		    rs1 = uc_free(curp->icursor) ;
+		    if (rs >= 0) rs = rs1 ;
+		    curp->icursor = nullptr ;
+		}
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
+	return rs ;
+}
+
 
 /* local subroutines */
 
 int utmpacc_co::callout(int v) noex {
-	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case utmpaccmem_init:
-	    rs = op->iinit() ;
-	    break ;
-	case utmpaccmem_fini:
-	    rs = op->ifini() ;
-	    break ;
-	case utmpaccmem_capbegin:
-	    rs = op->icapbegin(v) ;
-	    break ;
-	case utmpaccmem_capend:
-	    rs = op->icapend() ;
-	    break ;
-	case utmpaccmem_begin:
-	    rs = op->ibegin() ;
-	    break ;
-	case utmpaccmem_end:
-	    rs = op->iend() ;
-	    break ;
-	case utmpaccmem_runlevel:
-	    rs = op->irunlevel() ;
-	    break ;
-	case utmpaccmem_users:
-	    rs = op->iusers(v) ;
-	    break ;
-	} /* end switch */
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case utmpaccmem_init:
+	        rs = op->iinit() ;
+	        break ;
+	    case utmpaccmem_fini:
+	        rs = op->ifini() ;
+	        break ;
+	    case utmpaccmem_capbegin:
+	        rs = op->icapbegin(v) ;
+	        break ;
+	    case utmpaccmem_capend:
+	        rs = op->icapend() ;
+	        break ;
+	    case utmpaccmem_begin:
+	        rs = op->ibegin() ;
+	        break ;
+	    case utmpaccmem_end:
+	        rs = op->iend() ;
+	        break ;
+	    case utmpaccmem_runlevel:
+	        rs = op->irunlevel() ;
+	        break ;
+	    case utmpaccmem_users:
+	        rs = op->iusers(v) ;
+	        break ;
+	    } /* end switch */
+	} /* end if */
 	return rs ;
 }
 /* end method (utmpacc_co::callout) */
@@ -752,7 +860,7 @@ int utmpacc::getextract(int fd) noex {
 	filer		fb ;
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		wlen = 0 ;
 	if ((rs = filer_start(&fb,fd,0z,0,0)) >= 0) {
 	    {
 	        cint	ul = sizeof(UTMPX) ;
@@ -760,6 +868,7 @@ int utmpacc::getextract(int fd) noex {
 	        setutxent() ;
 	        while ((up = getutxent()) != nullptr) {
 		    rs = filer_write(&fb,up,ul) ;
+		    wlen += rs ;
 	            if (rs < 0) break ;
 	        } /* end while (reading UTMPX entries) */
 	        endutxent() ;
@@ -767,7 +876,7 @@ int utmpacc::getextract(int fd) noex {
 	    rs1 = filer_finish(&fb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-	return (rs >= 0) ? len : rs ;
+	return (rs >= 0) ? wlen : rs ;
 }
 /* end method (utmpacc::getextract) */
 

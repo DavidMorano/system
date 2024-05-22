@@ -77,7 +77,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -115,7 +116,7 @@ typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
 /* subroutine-templates */
 
 template<toxc_f toxc,nleadxstr_f nleadxstr>
-int matoxstr(cchar *const *a,int n,cchar *sp,int sl) noex {
+int matoxstr(mainv a,int n,cchar *sp,int sl) noex {
 	cint		lch = toxc(sp[0]) ;
 	int		i ;
 	int		m ;
@@ -139,17 +140,17 @@ int matoxstr(cchar *const *a,int n,cchar *sp,int sl) noex {
 
 /* exported subroutines */
 
-int matobasestr(cchar *const *a,int n,cchar *sp,int sl) noex {
+int matobasestr(mainv a,int n,cchar *sp,int sl) noex {
 	return matoxstr<tobc,nleadbasestr>(a,n,sp,sl) ;
 }
 /* end subroutine (matobasestr) */
 
-int matocasestr(cchar *const *a,int n,cchar *sp,int sl) noex {
+int matocasestr(mainv a,int n,cchar *sp,int sl) noex {
 	return matoxstr<tolc,nleadcasestr>(a,n,sp,sl) ;
 }
 /* end subroutine (matocasestr) */
 
-int matofoldstr(cchar *const *a,int n,cchar *sp,int sl) noex {
+int matofoldstr(mainv a,int n,cchar *sp,int sl) noex {
 	return matoxstr<tofc,nleadfoldstr>(a,n,sp,sl) ;
 }
 /* end subroutine (matofoldstr) */

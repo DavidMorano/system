@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<strwcpyx.h>
 #include	<strwcpyxc.h>
 #include	<strwcpyxx.h>
@@ -28,7 +29,7 @@
 
 #ifdef	__cplusplus
 
-inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
+inline char *strwcpy(char *dp,cchar *sp,int sl = -1) noex {
 	return strwcpybc(dp,sp,sl) ;
 }
 

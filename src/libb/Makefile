@@ -36,9 +36,7 @@ LINT=	lint
 
 DEFS +=
 
-
 INCS += libb.h bfile.h
-
 
 LIBS +=
 
@@ -46,6 +44,9 @@ LIBS +=
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -55,78 +56,32 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
+OBJ00= bsupport.o
+OBJ01= bopen.o
+OBJ02=
+OBJ03= bcontrol.o
 
-OBJ00= bopen.o bopentmp.o bopencmd.o bopenrcmd.o bopenlock.o 
-OBJ01= bopenmod.o bdup.o bminmod.o
-OBJ02= bopensched.o bopenshell.o bopenrcmde.o
-OBJ03= bwrite.o bwriteblock.o bwriteblanks.o 
-OBJ04= bprintf.o bprintline.o bprintlines.o bputc.o 
-OBJ05= bflush.o breserve.o
-OBJ06= bcontrol.o btruncate.o brewind.o bisterm.o
-OBJ07= bseek.o btell.o
+OBJ04= bwrite.o 
+OBJ05= bwriteblock.o bwriteblanks.o bwritefile.o
+OBJ06= bprintcleanln.o bprintcleanlns.o bprintf.o
+OBJ07= bprintln.o bprintlns.o bputc.o btruncate.o
 
 OBJ08= bread.o breadln.o breadlns.o bgetc.o 
-OBJ09= bwritefile.o
+OBJ09= bwasteln.o
 OBJ10= 
 OBJ11=
-OBJ12=
-OBJ13=
-OBJ14=
+
+OBJ12= bminmod.o bflush.o breserve.o
+OBJ13= bseek.o brewind.o btell.o
+OBJ14= bisterm.o
 OBJ15=
 
-OBJ16= bfliner.o
-OBJ17=
-OBJ18=
-OBJ19=
-OBJ20=
-OBJ21=
-OBJ22=
-OBJ23=
+OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
+OBJB= $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
+OBJC= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) 
+OBJD= $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 
-OBJ24=
-OBJ25=
-OBJ26=
-OBJ27=
-OBJ28=
-OBJ29=
-OBJ30=
-OBJ31=
-
-OBJ32=
-OBJ33=
-OBJ34=
-OBJ35=
-OBJ36=
-OBJ37=
-OBJ38=
-OBJ39=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-
-OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE)
-
-OBJS= obja.o objb.o
-
-
-obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
-
-objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
-
-objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
-
-objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
-
-obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
-
+OBJ= obja.o objb.o objc.o objd.o
 
 
 default:		$(T).a
@@ -149,10 +104,10 @@ all:			$(ALL)
 	$(CXX) $(CPPFLAGS) -c $(CCFLAGS) $<
 
 
-$(T).o:			$(OBJ_UCENT)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCENT)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_UCENT)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -173,9 +128,21 @@ control:
 	(uname -n ; date) > Control
 
 
+obja.o:			$(OBJA)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+
+objc.o:			$(OBJC)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
+
+objd.o:			$(OBJD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
+
+
 bcontrol.o:		bcontrol.cc		$(INCS)
 bisterm.o:		bisterm.cc		$(INCS)
-bcopyblock.o:		bcopyblock.cc		$(INCS)
 bflush.o:		bflush.cc		$(INCS)
 breserve.o:		breserve.cc		$(INCS)
 bgetc.o:		bgetc.cc		$(INCS)
@@ -204,9 +171,8 @@ bprintcleanline.o:	bprintcleanline.cc	$(INCS)
 bprintcleanlines.o:	bprintcleanlines.cc	$(INCS)
 brewind.o:		brewind.cc		$(INCS)
 bdup.o:			bdup.cc			$(INCS)
-bsupport.o:		bsupport.cc		$(INCS)
+bminmod.o:		bminmod.cc		$(INCS)
 
-bfliner.o:		bfliner.cc bfliner.h
-snclean.o:		snclean.cc snclean.h
+bsupport.o:		bsupport.cc		$(INCS)
 
 

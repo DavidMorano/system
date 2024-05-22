@@ -34,6 +34,7 @@
 #include	<sntmtime.h>
 #include	<snflags.h>
 #include	<snuuid.h>
+#include	<snclean.h>
 
 
 EXTERNC_begin

@@ -16,18 +16,24 @@
 
 /*******************************************************************************
 
-	Names:
+	Name:
 	listenusd
 
 	Description:
-	Listen on a UNIX® datagram socket.
+	This subroutine listens on a UNIX® socket datagram (USD)
+	for incoming messages.
 
 	Synopsis:
+	int listenusd(cchar *portspec,mode_t om,int lopts) noex
 
 	Arguments:
+	portspec	file-path to listen to
+	om		open-mode
+	lopts		0=nothing, 1=reuse-addr
 
 	Returns:
-	-		result
+	>=0		file-descriptor of UNIX-domain socket
+	<0		error (system-return)
 
 *******************************************************************************/
 

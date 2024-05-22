@@ -40,22 +40,20 @@
 
 /* exported subroutines */
 
-int breserve(bfile *fp,int n) noex {
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (n < 0) return SR_INVALID ;
-
-	if (! fp->f.nullfile) {
-	    if (fp->f.write) {
-	        int	blenr = (fp->bdata + fp->bsize - fp->bp) ;
-	        if (n > blenr) rs = bfile_flushn(fp,-1) ;
-	    }
-	}
-
+int breserve(bfile *op,int n) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    rs = SR_INVALID ;
+	    if (n >= 0) {
+		rs = SR_OK ;
+	        if (op->f.writing) {
+	            cint	blenr = (op->bdata + op->bsize - op->bp) ;
+	            if (n > blenr) {
+			rs = bfile_flushn(op,-1) ;
+		    }
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (breserve) */
