@@ -24,39 +24,41 @@
 
 #define	KEYOPT_MAGIC	0x84634270
 #define	KEYOPT		struct keyopt_head
-#define	KEYOPT_NAME	struct keyopt_name
-#define	KEYOPT_VALUE	struct keyopt_value
+#define	KEYOPT_NA	struct keyopt_name
+#define	KEYOPT_VAL	struct keyopt_value
 #define	KEYOPT_CUR	struct keyopt_cursor
 
 
 struct keyopt_value {
-	KEYOPT_VALUE	*next ;
+	KEYOPT_VAL	*next ;
 	cchar		*value ;
 } ;
 
 struct keyopt_name {
 	cchar		*name ;		/* the key */
-	KEYOPT_NAME	*next ;
-	KEYOPT_VALUE	*head ;		/* first */
-	KEYOPT_VALUE	*tail ;		/* last */
-	KEYOPT_VALUE	*current ;	/* used for interation only */
+	KEYOPT_NA	*next ;
+	KEYOPT_VAL	*head ;		/* first */
+	KEYOPT_VAL	*tail ;		/* last */
+	KEYOPT_VAL	*current ;	/* used for interation only */
 	int		count ;		/* count of values */
 } ;
 
 struct keyopt_cursor {
-	KEYOPT_NAME	*keyp ;
-	KEYOPT_VALUE	*valuep ;
+	KEYOPT_NA	*keyp ;
+	KEYOPT_VAL	*valuep ;
 } ;
 
 struct keyopt_head {
-	KEYOPT_NAME	*head ;
-	KEYOPT_NAME	*tail ;
+	KEYOPT_NA	*head ;
+	KEYOPT_NA	*tail ;
 	uint		magic ;
 	int		count ;		/* count of keys */
 } ;
 
 typedef KEYOPT		keyopt ;
+typedef	KEYOPT_NA	keyopt_na ;
 typedef KEYOPT_CUR	keyopt_cur ;
+typedef	KEYOPT_VAL	keyopt_val ;
 
 EXTERNC_begin
 

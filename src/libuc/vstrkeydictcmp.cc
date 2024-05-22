@@ -34,13 +34,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<utypedefs.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
-#include	<vstrkeycmpx.h>
+#include	"vstrkeycmpx.h"
 
 
 /* local defines */
@@ -48,7 +49,9 @@
 
 /* external subroutines */
 
-extern int	strkeydictcmp(cchar *,cchar *) noex ;
+extern "C" {
+    extern int	strkeydictcmp(cchar *,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -60,12 +63,15 @@ extern int	strkeydictcmp(cchar *,cchar *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	cchar		*s1 = (cchar *) *s1pp ;
-	cchar		*s2 = (cchar *) *s2pp ;
+	cchar		*s1 = charp(*s1pp) ;
+	cchar		*s2 = charp(*s2pp) ;
 	if (s1 || s2) {
 	    rc = 1 ;
 	    if (s1) {

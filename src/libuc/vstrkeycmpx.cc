@@ -1,5 +1,5 @@
 /* vstrkeycmpx SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* v-string key comparison (obverse and reverse) */
 /* version %I% last-modified %G% */
@@ -27,11 +27,23 @@
 	The 'A' would be the key, and the part 'the_dog_house' is
 	the value.
 
+	Synopsis:
+	int vstrkeycmpo(cchar **s1pp,cchar **s2pp) noex
+	int vstrkeycmpr(cchar **s1pp,cchar **s2pp) noex
+
+	Arguments:
+
+	Returns:
+	<0		less than
+	==0		equal
+	>0		greater
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
@@ -59,8 +71,8 @@
 
 static int vstrkeycmpx(cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	cchar		*s1 = (cchar *) *s1pp ;
-	cchar		*s2 = (cchar *) *s2pp ;
+	cchar		*s1 = charp(*s1pp) ;
+	cchar		*s2 = charp(*s2pp) ;
 	if (s1 || s2) {
 	    rc = 1 ;
 	    if (s1) {

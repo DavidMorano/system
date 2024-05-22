@@ -1,5 +1,5 @@
-/* strkeydictcmp */
-/* lang=C20 */
+/* strkeydictcmp SUPPORT */
+/* lang=C++20 */
 
 /* string key comparison */
 /* version %I% last-modified %G% */
@@ -42,12 +42,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<ischarx.h>
 #include	<localmisc.h>
+
+#include	"srtkeycmp.h"
 
 
 /* local defines */
@@ -55,8 +56,9 @@
 
 /* external subroutines */
 
-extern int	dictdiff(int,int) noex ;
-extern int	isdict(int) noex ;
+extern "C" {
+    extern int	dictdiff(int,int) noex ;
+}
 
 
 /* external variables */
@@ -69,6 +71,9 @@ extern int	isdict(int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

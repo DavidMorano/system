@@ -1,9 +1,8 @@
-/* termcharset */
+/* termcharset SUPPORT */
+/* lang=C++20 */
 
 /* set the terminal character sets */
-
-
-#define	CF_DEBUGS	0		/* compile-time */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,22 +16,17 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	termcharset
 
-        This subroutine formulates a string that constitutes a terminal escape
-        sequence to set the terminal character sets.
+	Description:
+	This subroutine formulates a string that constitutes a
+	terminal escape sequence to set the terminal character sets.
 
 	Synopsis:
-
-	int termcharset(dp,dl,setnum,f96,fontname)
-	char		*dp ;
-	int		dl ;
-	int		setnum ;
-	int		f96 ;
-	const char	*fontname ;
+	int termcharset(char *dp,int dl,int setnum,int f96,cc *fontname) noex
 
 	Arguments:
-
 	dp		destination buffer pointer
 	dl		destination buffer length
 	setnum		number of set to set:
@@ -45,19 +39,12 @@
 	fontname	string representing font to have set in place
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error
 
 *******************************************************************************/
 
-
-#define	TERMCHARSET_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<stdlib.h>
@@ -72,11 +59,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	ctdecui(char *,int,uint) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */

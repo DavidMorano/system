@@ -1,6 +1,8 @@
-/* termcharset */
+/* termcharset HEADER */
+/* lang=C20 */
 
 /* terminal-character-setter */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,29 +14,24 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	TERMCHARSET_INCLUDE
-#define	TERMCHARSET_INCLUDE	1
+#define	TERMCHARSET_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 
-#if	(! defined(TERMCHARSET_MASTER)) || (TERMCHARSET_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int termcharset(char *,int,int,int,cchar *) noex ;
 
-extern int termcharset(char *,int,int,int,cchar *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TERMCHARSET_MASTER */
 
 #endif /* TERMCHARSET_INCLUDE */
 

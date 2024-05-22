@@ -337,8 +337,8 @@ UOBJ09= readln.o ccfile.o
 UOBJ10= cfx.o sncpyx.o sncpyxc.o sncpyxw.o
 UOBJ11= strmgr.o strop.o field.o
 
-UOBJ12= ufstat.o ucttyname.o
-UOBJ13= ulogerror.o
+UOBJ12= ucttyname.o
+UOBJ13=
 UOBJ14= ucsys.o
 UOBJ15=
 
@@ -1091,8 +1091,8 @@ bufstr.o:		bufstr.cc bufstr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
-vstrkeycmpx.o:		vstrkeycmpx.c vstrkeycmpx.h
-vstrkeydictcmp.o:	vstrkeydictcmp.c vstrkeycmpx.h
+vstrkeycmpx.o:		vstrkeycmpx.cc vstrkeycmpx.h
+vstrkeydictcmp.o:	vstrkeydictcmp.cc vstrkeycmpx.h
 
 # string-constants
 stdfnames.o:		stdfnames.c stdfnames.h

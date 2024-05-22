@@ -1,6 +1,8 @@
-/* streamsync */
+/* streamsync HEADER */
+/* lang=C20 */
 
 /* data stream synchronization mechanism */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
