@@ -864,6 +864,14 @@ wsnx.o:			wsnx.dir
 wsnx.dir:
 	makesubdir $@
 
+wsix.o:			wsix.dir
+wsix.dir:
+	makesubdir $@
+
+wsx.o:			wsx.dir
+wsx.dir:
+	makesubdir $@
+
 # MATXSTR
 matxstr.o:		matxstr.dir
 matxstr.dir:

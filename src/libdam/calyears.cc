@@ -1,11 +1,9 @@
-/* calyears */
-/* lang=C20 */
+/* calyears SUPPORT */
+/* lang=C++20 */
 
 /* CALYEARS object implementation */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGCUR	0		/* debug cursor operation */
 #define	CF_SAFE		1		/* normal safety */
 #define	CF_TRANSHOL	1		/* translate holidays */
 #define	CF_MKDNAME	0		/* |mkdname()| */
@@ -124,27 +122,8 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matcasestr(cchar **,cchar *,int) ;
-extern int	matocasestr(cchar **,int,cchar *,int) ;
-extern int	matpcasestr(cchar **,int,cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isOneOf(cint *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
+/* external variables */
 
 
 /* local structures */
@@ -215,10 +194,6 @@ static int	calyears_dayname(CALYEARS *,CALCITE *,int,cchar *,int) ;
 static int	calyears_holidayer(CALYEARS *) ;
 #endif /* CF_TRANSHOL */
 
-#if	CF_DEBUGS && CF_DEBUGCUR
-static int	calyears_debugcur(CALYEARS *,vecobj *,cchar *) ;
-#endif
-
 static int	subinfo_start(SUBINFO *,CALYEARS *,time_t) ;
 static int	subinfo_finish(SUBINFO *) ;
 static int	subinfo_calscreate(SUBINFO *,cchar **,cchar **) ;
@@ -254,20 +229,20 @@ static int	isNotHols(int) ;
 
 /* exported variables */
 
-CALYEARS_OBJ	calyears = {
+calyears_obj	calyears_mod = {
 	"calyears",
-	sizeof(CALYEARS),
-	sizeof(CALYEARS_CUR)
+	sizeof(calyears),
+	sizeof(calyears_cur)
 } ;
 
 
 /* local variables */
 
-static cchar	*days[] = {
+constexpr cpcchar	days[] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", NULL
 } ;
 
-static cchar	*daytypes[] = {
+constexpr cpcchar	daytypes[] = {
 	"First", "Second", "Third", "Fourth", "Fifth", "Last", NULL
 } ;
 
@@ -292,24 +267,25 @@ enum tdays {
 	tday_overlast
 } ;
 
-static cint	rsnotorils[] = {
+constexpr cint	rsnotorils[] = {
 	SR_NOTFOUND,
 	SR_ILSEQ,
 	0
 } ;
 
-static cint	rsnothols[] = {
+constexpr cint	rsnothols[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int calyears_open(CALYEARS *op,cchar pr[],cchar *dns[],cchar *cns[])
-{
+int calyears_open(CALYEARS *op,cchar *pr,cchar **dns,cchar **cns) noex {
 	int		rs ;
 	int		c = 0 ;
 
@@ -317,10 +293,6 @@ int calyears_open(CALYEARS *op,cchar pr[],cchar *dns[],cchar *cns[])
 	if (op == NULL) return SR_FAULT ;
 #endif
 	if (pr == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("calyears_open: pr=%s\n",pr) ;
-#endif
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -352,10 +324,6 @@ int calyears_open(CALYEARS *op,cchar pr[],cchar *dns[],cchar *cns[])
 	    if (rs < 0)
 	        calyears_argend(op) ;
 	} /* end if (calyears_argbegin) */
-
-#if	CF_DEBUGS
-	debugprintf("calyears_open: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -394,10 +362,6 @@ int calyears_close(CALYEARS *op)
 
 	rs1 = calyears_argend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("calyears_close: ret rs=%d\n",rs) ;
-#endif
 
 	op->nentries = 0 ;
 	op->magic = 0 ;
@@ -519,11 +483,6 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 	if (qp->y >= 2038) return SR_DOM ;
 	if ((qp->y < 1970) && (qp->y != 0)) return SR_DOM ;
 
-#if	CF_DEBUGS
-	debugprintf("calyears_lookcite: q=(%u,%u,%u)\n",
-	    qp->y,qp->m,qp->d) ;
-#endif
-
 	if (curp->results != NULL) {
 	    calyears_resultfins(op,curp) ;
 	    uc_free(curp->results) ;
@@ -540,9 +499,6 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 	    vecobj	res ;
 	    cint	size = sizeof(CALENT) ;
 	    int 	vo = 0 ;
-#if	CF_DEBUGS
-	    debugprintf("calyears_lookcite: sizeof(CALENT)=%u\n",size) ;
-#endif
 	    vo |= VECOBJ_OORDERED ;
 	    vo |= VECOBJ_OSTATIONARY ;
 	    if ((rs = vecobj_start(&res,size,0,vo)) >= 0) {
@@ -553,19 +509,11 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 	            if (calp != NULL) {
 	                rs = calyears_lookmgr(op,&res,calp,qp) ;
 	                c += rs ;
-#if	CF_DEBUGS
-	                debugprintf("calyears_lookcite: i=%u "
-	                    "calyears_lookmgr() rs=%d\n",i,rs) ;
-#endif
 		    }
 	            if (rs < 0) break ;
 	        } /* end for */
 	        if (rs >= 0) {
 	            rs = calyears_mkresults(op,&res,curp) ;
-#if	CF_DEBUGS
-	            debugprintf("calyears_lookcite: "
-			"calyears_mkresults() rs=%d\n",rs) ;
-#endif
 	        }
 	        if ((rs < 0) || (c > 0)) {
 	            CALENT	*ep ;
@@ -578,10 +526,6 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 	        vecobj_finish(&res) ;
 	    } /* end if (res) */
 	} /* end if (ok) */
-
-#if	CF_DEBUGS
-	debugprintf("calyears_lookcite: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -605,15 +549,8 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 
 	if (curp->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("calyears_read: ent\n") ;
-#endif
-
 	if (curp->results != NULL) {
 	    cint	i = curp->i ;
-#if	CF_DEBUGS
-	    debugprintf("calyears_read: c_i=%d\n",i) ;
-#endif
 	    if ((i >= 0) && (i < curp->nresults)) {
 	        CALENT	*ep, *res = (CALENT *) curp->results ;
 		ep = (res+i) ;
@@ -621,15 +558,8 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 	        qp->m = ep->q.m ;
 	        qp->d = ep->q.d ;
 	        if (rbuf != NULL) {
-#if	CF_DEBUGS
-	            debugprintf("calyears_read: calyears_loadbuf()\n") ;
-#endif
 	            rs = calyears_loadbuf(op,rbuf,rlen,ep) ;
 	            len = rs ;
-#if	CF_DEBUGS
-	            debugprintf("calyears_read: calyears_loadbuf() rs=%d\n",
-	                rs) ;
-#endif
 	        } /* end if */
 	        if (rs >= 0)
 	            curp->i = (i + 1) ;
@@ -637,10 +567,6 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 	        rs = SR_NOTFOUND ;
 	} else
 	    rs = SR_NOTFOUND ;
-
-#if	CF_DEBUGS
-	debugprintf("calyears_read: ret rs=%d len=%u\n",rs,len) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
@@ -702,11 +628,6 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll)
 	int		ch ;
 	int		si = 0 ; /* this serves as the result flag */
 
-#if	CF_DEBUGS
-	debugprintf("calyears__havestart: >%t<\n",
-	    lp,strlinelen(lp,ll,40)) ;
-#endif
-
 	ch = MKCHAR(lp[0]) ;
 	if (! CHAR_ISWHITE(ch)) {
 	    if ((si = sibreak(lp,ll," \t")) >= 3) {
@@ -751,10 +672,6 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll)
 	    } else
 	        rs = SR_ILSEQ ;
 	} /* end if (not-white) */
-
-#if	CF_DEBUGS
-	debugprintf("calyears_havestart: ret rs=%d si=%u\n",rs,si) ;
-#endif
 
 	return (rs >= 0) ? si : rs ;
 }
@@ -845,10 +762,6 @@ static int calyears_lookmgr(CALYEARS *op,vecobj *rlp,CALMGR *calp,
 	rs = calmgr_lookup(calp,rlp,qp) ;
 	c = rs ;
 
-#if	CF_DEBUGS
-	debugprintf("calyears_lookmgr: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (calyears_lookmgr) */
@@ -859,10 +772,6 @@ static int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp)
 	int		rs = SR_OK ;
 	int		n ;
 	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("calyears_mkresults: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	vecobj_sort(rlp,vrcmp) ; /* sort results in ascending order */
@@ -875,19 +784,6 @@ static int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp)
 	        int	i ;
 		for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
 	    	    if (ep != NULL) {
-#if	CF_DEBUGS
-	            {
-	                CALENT_LINE	*lines = ep->lines ;
-	                int		j ;
-	                if (lines != NULL) {
-	                    for (j = 0 ; j < ep->i ; j += 1) {
-	                        debugprintf("calyears_mkresults: "
-	                            "i=%u j=%u loff=%u llen=%u\n",
-	                            i,j,lines[j].loff,lines[j].llen) ;
-	                    }
-	                }
-	            }
-#endif /* CF_DEBUGS */
 	            rp[c++] = *ep ;	 /* copy! */
 	            vecobj_del(rlp,i) ; /* entries are stationary */
 		    }
@@ -900,10 +796,6 @@ static int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp)
 	            uc_free(rp) ;
 	    } /* end if (m-a) */
 	} /* end if (greater-than-zero) */
-
-#if	CF_DEBUGS
-	debugprintf("calyears_mkresults: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -956,11 +848,6 @@ static int calyears_mkday(CALYEARS *op,int y,int m,cchar *cp,int cl)
 	if ((rs = calyars_domyear(op,y,&dmp)) >= 0) {
 	    rs = dayofmonth_mkday(dmp,m,cp,cl) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("calyears_mkday: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (calyears_mkday) */
@@ -986,9 +873,6 @@ static int calyars_domyear(CALYEARS *op,int y,DAYOFMONTH **rpp)
 	    }
 	} else if (rs == SR_NOTFOUND) {
 	    cint	dsize = sizeof(CALYEARS_DOMER) ;
-#if	CF_DEBUGS
-	    debugprintf("calyears_mkday: sizeof(CALYEARS_DOMER)=%u\n",dsize) ;
-#endif
 	    if ((rs = uc_malloc(dsize,&dop)) >= 0) {
 		int	f_ent = TRUE ;
 	        if ((rs = calyears_domerbegin(op,dop,y)) >= 0) {
@@ -1026,9 +910,6 @@ static int calyears_domerfins(CALYEARS *op)
 	int		rs1 ;
 	int		i ;
 	int		c = 0 ;
-#if	CF_DEBUGS
-	debugprintf("calyears_domerfins: ent\n") ;
-#endif
 	for (i = 0 ; vechand_get(dlp,i,&dep) >= 0 ; i += 1) {
 	    if (dep != NULL) {
 		c += 1 ;
@@ -1038,9 +919,6 @@ static int calyears_domerfins(CALYEARS *op)
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
-#if	CF_DEBUGS
-	debugprintf("calyears_domerfins: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (calyears_domerfins) */
@@ -1063,9 +941,6 @@ static int calyears_domerend(CALYEARS *op,CALYEARS_DOMER *dep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op == NULL) return SR_FAULT ;
-#if	CF_DEBUGS
-	debugprintf("calyears_domerend: ent\n") ;
-#endif
 	rs1 = dayofmonth_finish(&dep->dom) ;
 	if (rs >= 0) rs = rs1 ;
 	dep->year = 0 ;
@@ -1177,17 +1052,10 @@ static int calyears_loadbuf(CALYEARS *op,char *rbuf,int rlen,CALENT *ep)
 	    CALMGR	*calp ;
 	    vechand	*ilp = &op->cals ;
 	    cint	cidx = rs ;
-#if	CF_DEBUGS
-	    debugprintf("calyears_loadbuf: cidx=%d\n",cidx) ;
-#endif
 	    if ((rs = vechand_get(ilp,cidx,&calp)) >= 0) {
 	        rs = calmgr_loadbuf(calp,rbuf,rlen,ep) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("calyears_loadbuf: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1204,10 +1072,6 @@ static int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	cchar	*tp ;
 	cchar	*np ;
 
-#if	CF_DEBUGS
-	debugprintf("calyears/subinfo_transhol: >%t<\n",sp,sl) ;
-#endif
-
 	qp->m = 0 ;
 	qp->d = 0 ;
 	qp->y = (ushort) y ;
@@ -1220,14 +1084,6 @@ static int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	    sl = (tp - sp) ;
 	    f_negative = (tp[0] == '-') ;
 	}
-
-#if	CF_DEBUGS
-	if (np != NULL) {
-	    debugprintf("calyears/subinfo_transhol: n=>%t<\n",np,nl) ;
-	    debugprintf("calyears/subinfo_transhol: f_neg=%u\n",f_negative) ;
-	} else
-	    debugprintf("calyears/subinfo_transhol: *no_number*\n") ;
-#endif /* CF_DEBUGS */
 
 	if ((rs = calyears_dayname(op,qp,y,sp,sl)) > 0) {
 	    f_found = TRUE ;
@@ -1250,23 +1106,10 @@ static int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	                    qp->d = (uchar) tm.mday ;
 			    qp->y = (ushort) (tm.year+TM_YEAR_BASE) ;
 	                }
-
-#if	CF_DEBUGS
-	                debugprintf("calyears/subinfo_transhol: "
-	                    "adjusted q=(%u:%u:%u)\n",qp->y,qp->m,qp->d) ;
-#endif
-
 		    } /* end if (tmtime_localtime) */
 	        } /* end if (odays) */
 	    } /* end if (positive) */
 	} /* end if (day-offset required) */
-
-#if	CF_DEBUGS
-	debugprintf("calyears/subinfo_transhol: "
-	                    "ret q=(%u:%u:%u)\n",qp->y,qp->m,qp->d) ;
-	debugprintf("calyears/subinfo_transhol: ret rs=%d f_found=%u\n",
-	    rs,f_found) ;
-#endif
 
 	return (rs >= 0) ? f_found : rs ;
 }
@@ -1287,20 +1130,10 @@ static int calyears_dayname(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	    cint		hlen = HOLBUFLEN ;
 	    char		hbuf[HOLBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	    debugprintf("calyears/subinfo_transhol: fq=>%t<\n",sp,sl) ;
-#endif
-
 	    if ((rs = holidayer_curbegin(holp,&hcur)) >= 0) {
 		cint	nrs = SR_NOTFOUND ;
 
 	        rs = holidayer_fetchname(holp,y,sp,sl,&hcur,&hc,hbuf,hlen) ;
-
-#if	CF_DEBUGS
-	    debugprintf("calyears/subinfo_transhol: "
-			"holidayer_fetchname() rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0) {
 	            f = TRUE ;
 		    qp->y = (ushort) y ;
@@ -1313,12 +1146,6 @@ static int calyears_dayname(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	        rs1 = holidayer_curend(holp,&hcur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (holidayer-cur) */
-
-#if	CF_DEBUGS
-	    debugprintf("calyears/subinfo_transhol: un q=(%u:%u:%u)\n",
-	        qp->y,qp->m,qp->d) ;
-#endif
-
 	} /* end if (calyears_holidayer) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -1382,32 +1209,6 @@ static int calyears_checkupdate(CALYEARS *op,time_t dt)
 }
 /* end subroutine (calyears_checkupdate) */
 #endif /* COMMENT */
-
-
-#if	CF_DEBUGS && CF_DEBUGCUR
-static int calyears_debugcur(CALYEARS *op,vecobj *rlp,cchar s[])
-{
-	CALENT_LINE	*lines ;
-	CALENT		*ep ;
-	int		rs = SR_OK ;
-	int		n ;
-	int		i, j ;
-	n = vecobj_count(rlp) ;
-	debugprintf("calyears_debugcur: %s n=%u\n",s,n) ;
-	for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
-	    lines = ep->lines ;
-	    for (j = 0 ; j < ep->i ; j += 1) {
-	        debugprintf("calyears_debugcur: i=%u loff[%u]=%u\n",
-	            i,j,lines[j].loff) ;
-	        debugprintf("calyears_debugcur: i=%u llen[%u]=%u\n",
-	            i,j,lines[j].llen) ;
-	    }
-	} /* end for */
-	return rs ;
-}
-/* end subroutine (calyears_debugcur) */
-#endif /* CF_DEBUGS */
-
 
 static int subinfo_start(SUBINFO *sip,CALYEARS *op,time_t dt)
 {
@@ -1496,10 +1297,6 @@ static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
 	int		f_search = FALSE ;
 	cchar	**names = NULL ;
 
-#if	CF_DEBUGS
-	debugprintf("calyears_calscreater: dn=%s\n",dn) ;
-#endif
-
 	if (cns == NULL) {
 	    if ((rs = vecstr_start(&cals,1,0)) >= 0) {
 	        f_search = TRUE ;
@@ -1513,10 +1310,6 @@ static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
 	} else {
 	    names = cns ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("calyears_calscreater: mid rs=%d\n",rs) ;
-#endif
 
 	if (rs >= 0) {
 	    if ((rs = subinfo_ids(sip)) >= 0) {
@@ -1536,10 +1329,6 @@ static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
 	if (f_search) {
 	    vecstr_finish(&cals) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("calyears_calscreater: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -1561,9 +1350,6 @@ static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
 		if ((rs = subinfo_regacc(sip,tbuf,R_OK)) > 0) {
 		    CALMGR	*calp ;
 		    cint	size = sizeof(CALMGR) ;
-#if	CF_DEBUGS
-		    debugprintf("subinfo_calcreate: sizeof(CALMGR)=%u\n",size) ;
-#endif
 		    f = TRUE ;
 	    	    if ((rs = uc_malloc(size,&calp)) >= 0) {
 			vechand	*clp = &op->cals ;
@@ -1687,10 +1473,6 @@ static int subinfo_loadnames(SUBINFO *sip,vecstr *nlp,cchar dirname[])
 	int		rs1 ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("calyears_loadnames: dirname=%s\n",dirname) ;
-#endif
-
 	if (sip == NULL) return SR_FAULT ;
 	if ((rs = fsdir_open(&dir,dirname)) >= 0) {
 	    struct ustat	sb ;
@@ -1702,10 +1484,6 @@ static int subinfo_loadnames(SUBINFO *sip,vecstr *nlp,cchar dirname[])
 
 	    while ((rs = fsdir_read(&dir,&ds)) > 0) {
 	        if (ds.name[0] != '.') {
-
-#if	CF_DEBUGS
-	        debugprintf("calyears_loadnames: name=%s\n",ds.name) ;
-#endif
 
 	            if ((tp = strrchr(ds.name,'.')) != NULL) {
 		        if (strcmp((tp+1),calsuf) == 0) {
@@ -1847,15 +1625,8 @@ static int dayofmonth_mkday(DAYOFMONTH *dmp,uint m,cchar *cp,int cl)
 	    int		ch = MKCHAR(cp[0]) ;
 	    int		wday ;
 	    int		oday ;
-#if	CF_DEBUGS
-	    debugprintf("calyears/dayofmonth_mkday: m=%u >%t<\n",m,cp,cl) ;
-#endif
 	    if (isdigitlatin(ch)) {
 	        rs = cfdeci(cp,cl,&mday) ;
-#if	CF_DEBUGS
-	        debugprintf("calyears/dayofmonth_mkday: digit_day rs=%d\n",
-	            rs) ;
-#endif
 	    } else if (cl >= 3) {
 	        if ((wday = matcasestr(days,cp,3)) >= 0) {
 	            cp += 3 ;
@@ -1864,10 +1635,6 @@ static int dayofmonth_mkday(DAYOFMONTH *dmp,uint m,cchar *cp,int cl)
 	                rs = dayofmonth_lookup(dmp,m,wday,oday) ;
 	                mday = rs ;
 	            }
-#if	CF_DEBUGS
-	            debugprintf("calyears/dayofmonth_mkday: "
-	                "dayofmonth_lookup() rs=%d\n", rs) ;
-#endif
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
@@ -1877,10 +1644,6 @@ static int dayofmonth_mkday(DAYOFMONTH *dmp,uint m,cchar *cp,int cl)
 	} else {
 	    rs = SR_NOTFOUND ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("calyears/dayofmonth_mkday: ret rs=%d mday=%u\n",rs,mday) ;
-#endif
 
 	return (rs >= 0) ? mday : rs ;
 }

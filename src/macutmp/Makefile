@@ -36,13 +36,17 @@ LINT=	lint
 
 DEFS=
 
+INCS=
+
+LIBS= -lmacuser -lu
+
+
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS= -lmacuser
-#LIBS=
 
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -50,9 +54,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS=
 
 
 OBJ_UTMP= main.o

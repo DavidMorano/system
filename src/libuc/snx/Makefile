@@ -24,9 +24,7 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= snx.h
-
 
 LIBS=
 
@@ -34,6 +32,9 @@ LIBS=
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPTATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)

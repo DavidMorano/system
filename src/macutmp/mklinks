@@ -3,8 +3,8 @@
 
 CMDS=
 CMDS+=" utmp boottime nusers"
-CMDS+=" utmpid utmpname utmpline utmphost"
-CMDS+=" logid logname logline loghost"
+CMDS+=" utmpid utmpname utmpline utmphost utmpsid"
+CMDS+=" logid logname logline loghost logsid"
 CMDS+=" logged"
 
 LOCPROG=macutmp.x

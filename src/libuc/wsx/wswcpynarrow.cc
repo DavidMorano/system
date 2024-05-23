@@ -1,15 +1,16 @@
-/* wsnwcpynarrow */
+/* wswcpynarrow SUPPORT */
+/* lang=C++20 */
 
 /* copy a narrow source string to a wide-string recipient */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
+
 	Originally written for Rightcore Network Services.
+
 
 */
 
@@ -17,55 +18,72 @@
 
 /*******************************************************************************
 
+	Name:
+	wswcpynarrow
+
+	Description:
 	We copy a narrow source string to a wide-string destination.
 
 	Synopsis:
-
-	int wsnwcpynarrow(dp,dl,sp,sl)
-	wchar_t		*dp ;
-	int		dl ;
-	cchar		*sp ;
-	int		sl ;
+	int wswcpynarrow(wchar_t *wsp,cchar *sp,int sl) noex
 
 	Arguments:
-
 	dp	wide-string buffer that receives the copy
-	dl	size of destrination buffer
 	sp	the source narrow-string that is to be copied
 	sl	the maximum length of the source string to be copied
 
 	Returns:
-
-	<0	error (buffer overflow?)
 	>=0	number of characters copied
-
+	<0	error (buffer overflow?)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<stddef.h>		/* for 'wchar_t' */
+#include	<stddef.h>		/* presumable for 'wchar_t' type */
 #include	<usystem.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int wsnwcpynarrow(wchar_t *rarr,int rlen,cchar *sp,int sl)
-{
-	int		rs = SR_OK ;
+int wswcpynarrow(wchar_t *rarr,cchar *sp,int sl) noex {
 	int		c ;
-	int		ch ;
-	for (c = 0 ; (c < rlen) && (c < sl) && sp[c] ; c += 1) {
-	    ch = MKCHAR(sp[c]) ;
+	for (c = 0 ; (c < sl) && sp[c] ; c += 1) {
+	    cint	ch = mkchar(sp[c]) ;
 	    rarr[c] = ch ;
 	}
 	rarr[c] = '\0' ;
-	if ((c < sl) && (sp[c] != '\0')) rs = SR_OVERFLOW ;
-	return (rs >= 0) ? c : rs ;
+	return c ;
 }
-/* end subroutine (wsnwcpynarrow) */
+/* end subroutine (wswcpynarrow) */
 
 

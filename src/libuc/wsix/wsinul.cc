@@ -1,9 +1,8 @@
-/* wsinul */
+/* wsinul SUPPORT */
+/* lang=C++20 */
 
 /* get length of a wide-string */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,35 +16,61 @@
 
 /*******************************************************************************
 
+	Name:
+	wsinul
+
+	Description:
 	Calculate the length of a wide-string.
 
 	Synopsis:
-
-	int wsinul(const wchar_t *wsp)
+	int wsinul(const wchar_t *wsp) noex
 
 	Arguments:
-
 	wsp	the source string that is to be copied
 
 	Returns:
-
 	-	the character pointer to the end of the destination
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<stddef.h>		/* for 'wchar_t' */
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int wsinul(const wchar_t *wsp)
-{
+int wsinul(const wchar_t *wsp) noex {
 	int	i = 0 ;
 	while (wsp[i]) i += 1 ;
 	return i ;

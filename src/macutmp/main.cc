@@ -25,10 +25,12 @@
 	utmpname
 	utmpline
 	utmphost
+	utmpsid
 	logid
 	logname
 	logline
 	loghost
+	logsid
 	logged
 
 	Description:
@@ -132,9 +134,9 @@
 
 /* imported namespaces */
 
+using std::min ;			/* subroutine-template */
 using std::cout ;			/* variable */
 using std::cerr ;			/* variable */
-using std::min ;			/* subroutine */
 
 
 /* local typedefs */
@@ -182,10 +184,12 @@ enum progmodes {
 	progmode_utmpname,
 	progmode_utmpline,
 	progmode_utmphost,
+	progmode_utmpsid,
 	progmode_logid,
 	progmode_logname,
 	progmode_logline,
 	progmode_loghost,
+	progmode_logsid,
 	progmode_logged,
 	progmode_iverlast
 } ;
@@ -198,10 +202,12 @@ constexpr cpcchar	prognames[] = {
 	"utmpname",
 	"utmpline",
 	"utmphost",
+	"utmpsid",
 	"logid",
 	"logname",
 	"logline",
 	"loghost",
+	"logsid",
 	"logged",
 	nullptr
 } ;
@@ -257,6 +263,10 @@ int main(int argc,mainv argv,mainv) {
 		/* FALLTHROUGH */
 	    case progmode_loghost:
 		if (!fpm++) pm = progmode_utmphost ;
+		fallthrough ;
+		/* FALLTHROUGH */
+	    case progmode_logsid:
+		if (!fpm++) pm = progmode_utmpsid ;
 		fallthrough ;
 		/* FALLTHROUGH */
 	    default:
@@ -457,6 +467,9 @@ static int printutxval(int pm,UTMPX *up) noex {
 	    fl = int(sizeof(up->ut_host)) ;
 	    ml = min(olen,fl) ;
 	    strtcpy(obuf,up->ut_host,ml) ;
+	    break ;
+	case progmode_utmpsid:
+	    cout << up->ut_pid << '\n' ;
 	    break ;
 	case progmode_logged:
 	    break ;

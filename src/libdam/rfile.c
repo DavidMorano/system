@@ -30,8 +30,8 @@
 	Synopsis:
 
 	int rfile(rhost,auth,rfilename,flags,mode)
-	const char	rhost[] ;
-	const char	rfilename[] ;
+	cchar	rhost[] ;
+	cchar	rfilename[] ;
 	int		flags, mode ;
 	struct rex_auth {
 		char	*restrict ;
@@ -102,8 +102,8 @@ static int	hostequiv() ;
 
 
 int rfile(rhost,auth,rfilename,flags,mode)
-const char	rhost[] ;
-const char	rfilename[] ;
+cchar	rhost[] ;
+cchar	rfilename[] ;
 REX_AUTH	*auth ;
 int		flags, mode ;
 {
@@ -113,8 +113,8 @@ int		flags, mode ;
 	int		i, j ;
 	int		srs, rs, len, l ;
 	int		fd, fd2 ;
-	const char	*prog_shell = PROG_SHELL ;
-	const char	*args[4] ;
+	cchar	*prog_shell = PROG_SHELL ;
+	cchar	*args[4] ;
 
 	char	*cp, *cp1, *cp2 ;
 

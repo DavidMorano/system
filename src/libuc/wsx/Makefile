@@ -1,6 +1,6 @@
-# MAKEFILES (wsnx)
+# MAKEFILES (wsx)
 
-T= wsnx
+T= wsx
 
 ALL= $(T).o $(T).a
 
@@ -24,7 +24,7 @@ LINT=	lint
 
 DEFS=
 
-INCS= wsnx.h
+INCS= wsx.h
 
 LIBS=
 
@@ -44,7 +44,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_WSNX= wsncols.o wsnwcpynarrow.o
+OBJ0_WSNX=  wsfnext.o wswcpynarrow.o
 OBJ1_WSNX= 
 OBJ2_WSNX= 
 OBJ3_WSNX= 
@@ -131,7 +131,7 @@ objc.o:			$(OBJC_WSNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_WSNX)
 
 
-wsncols.o:		wsncols.cc		$(INCS)
-wsnwcpynarrow.o:	wsnwcpynarrow.cc	$(INCS)
+wsfnext.o:		wsfnext.cc		$(INCS)
+wswcpynarrow.o:		wswcpynarrow.cc		$(INCS)
 
 
