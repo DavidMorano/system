@@ -37,9 +37,7 @@ LINT= lint
 
 DEFS +=
 
-
 INCS +=
-
 
 LIBS=
 
@@ -49,13 +47,14 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
+LDRAPTH=
+
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
 
 
 OBJ0_SRC= 
@@ -124,5 +123,36 @@ obj2_src.o:	$(OBJ2_SRC)
 
 obj3_src.o:	$(OBJ3_SRC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SRC)
+
+
+# LIBU
+libu.o:			libu.dir
+libu.dir:
+	makesubdir $@
+
+# LIBUC
+libuc.o:		libuc.dir
+libuc.dir:
+	makesubdir $@
+
+# LIBDAM
+libdam.o:		libdam.dir
+libdam.dir:
+	makesubdir $@
+
+# LIBMAILMSG
+libmailmsg.o:		libmailmsg.dir
+libmailmsg.dir:
+	makesubdir $@
+
+# LIBPCS
+libpcs.o:		libpcs.dir
+libpcs.dir:
+	makesubdir $@
+
+# LIBPR
+libpr.o:		libpr.dir
+libpr.dir:
+	makesubdir $@
 
 

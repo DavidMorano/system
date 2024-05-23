@@ -97,12 +97,17 @@ void field::dtor() noex {
 }
 
 field_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case fieldmem_finish:
-	    rs = field_finish(op) ;
-	    break ;
-	} /* end switch */
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fieldmem_rem:
+	        rs = field_remaining(op,nullptr) ;
+	        break ;
+	    case fieldmem_finish:
+	        rs = field_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (field_co::operator) */

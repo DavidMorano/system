@@ -1,10 +1,8 @@
-/* partitionai */
-/* lang=C99 */
+/* partitionai SUPPORT */
+/* lang=C++20 */
 
 /* integer array partitioning function */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,56 +16,56 @@
 
 /*******************************************************************************
 
+	Name:
+	partitionai
+
+	Description:
 	Partition an array of integers.
 
 	Synopsis:
-
-	int partitionai(int *a,int al,partpred_t partpred,int)
+	int partitionai(int *a,int al,partpred_f partpred,int v) noex
 
 	Arguments:
-
 	a		array
 	al		array length
 	partpred	function to evaluate the predicate
-	int		value to pass to the predicate function
+	v		value to pass to the predicate function
 
 	Returns:
-
 	-	index of pivot (based from 'ri')
 
 	Notes:
-
-        + Everyone has their own! (funny!)
-
+        + everyone has their own! (funny!)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"partitionai.h"
 
 
 /* local defines */
 
 
-/* typedefs */
+/* local typedefs */
 
-typedef int	(*partpred_t)(int,int) ;
+extern "C" {
+typedef int	(*partpred_f)(int,int) noex ;
+}
 
 
 /* external subroutines */
 
-extern void	arrswapi(int *,int,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,cchar *,int) ;
-#endif
+extern "C" {
+    extern void	arrswapi(int *,int,int) noex ;
+}
 
 
 /* forward references */
@@ -76,12 +74,15 @@ extern int	strlinelen(cchar *,cchar *,int) ;
 /* local variables */
 
 
-int partitionai(int *a,int al,partpred_t fn,int pv)
-{
+/* exported variables */
+
+
+/* exported subroutines */
+
+int partitionai(int *a,int al,partpred_f fn,int pv) noex {
 	int		last = al ;
-	int		i ;
-	for (i = 0 ; i < last ; i += 1) {
-	    const int	f = (*fn)(a[i],pv) ;
+	for (int i = 0 ; i < last ; i += 1) {
+	    cbool	f = (*fn)(a[i],pv) ;
 	    if (! f) {
 		arrswapi(a,i--,--last) ;
 	    }

@@ -24,8 +24,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"strnxcmp.h"
 

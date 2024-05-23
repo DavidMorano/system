@@ -30,8 +30,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
@@ -49,6 +50,7 @@ struct field_head {
 
 #ifdef	__cplusplus
 enum fieldmems {
+	fieldmem_rem,
 	fieldmem_finish,
 	fieldmem_overlast
 } ;
@@ -67,7 +69,9 @@ struct field_co {
 } ; /* end struct (field_co) */
 struct field : field_head {
 	field_co	finish ;
+	field_co	rem ;
 	field() noex {
+	    rem(this,fieldmem_rem) ;
 	    finish(this,fieldmem_finish) ;
 	} ;
 	field(const field &) = delete ;

@@ -38,7 +38,7 @@ LINT= lint
 
 DEFS +=
 
-INCS += usyscalls.h localmisc.h
+INCS += libu.h
 
 LIBS +=
 

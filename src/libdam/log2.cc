@@ -1,9 +1,8 @@
-/* log2 */
+/* log2 SUPPORT */
+/* lang=C++20 */
 
 /* calculate the log-base-2 of a number */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,26 +19,19 @@
 	Find the log-base-2 of a number (v).
 
 	Synopsis:
-
 	double log2(double v)
 
 	Arguments:
-
 	v		number to take the log-base-2 of
 
 	Returns:
-
 	-		result
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<math.h>
-
 #include	<localmisc.h>
 
 
@@ -47,11 +39,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -66,11 +53,12 @@ extern int	strlinelen(cchar *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-double log2(double v)
-{
+double log2(double v) noex {
 	const double	n = log(v) ;
 	const double	d = log(2.0) ;
 	return (n/d) ;

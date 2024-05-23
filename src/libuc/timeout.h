@@ -19,7 +19,6 @@
 	This file provides the definition of the TIMEOUT object, and its
 	method declarations.
 
-
 *******************************************************************************/
 
 #ifndef	TIMEOUT_INCLUDE
@@ -28,6 +27,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<time.h>		/* |time_t| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -38,7 +38,7 @@
 
 EXTERNC_begin
 
-typedef int (*timeout_met)(void *,uint,int) noex ;
+typedef int (*timeout_m)(void *,uint,int) noex ;
 
 EXTERNC_end
 
@@ -49,7 +49,7 @@ enum timeoutcmds {
 } ;
 
 struct timeout_entry {
-	timeout_met	metf ;		/* nmethod function (C-linkage) */
+	timeout_m	metf ;		/* nmethod function (C-linkage) */
 	void		*objp ;		/* object pointer */
 	time_t		val ;
 	uint		tag ;
@@ -61,7 +61,7 @@ typedef TIMEOUT		timeout ;
 
 EXTERNC_begin
 
-extern int timeout_load(timeout *,time_t,void *,timeout_met,uint,int) noex ;
+extern int timeout_load(timeout *,time_t,void *,timeout_m,uint,int) noex ;
 extern int uc_timeout(int,timeout *) noex ;
 
 EXTERNC_end
