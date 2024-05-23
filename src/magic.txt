@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int logsys_magic(logsys *op,Args ... args) noex {
+static inline int schedvar_magic(schedvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LOGSYS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SCHEDVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (logsys_magic) */
+/* end subroutine (schedvar_magic) */

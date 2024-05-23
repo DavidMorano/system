@@ -67,13 +67,34 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef vecstr *	vecstrp ;
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
 
 
 /* forward references */
+
+template<typename ... Args>
+inline int schedvar_magic(schedvar *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SCHEDVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (schedvar_magic) */
 
 static int schedvar_exper(SV *,char *,int,cc *,int) noex ;
 
@@ -91,41 +112,58 @@ constexpr bool		f_search = CF_SEARCH ;
 int schedvar_start(SV *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	ve = SCHEDVAR_NE ;
-	    cint	vo = VECSTR_OSORTED ;
-	    rs = vecstr_start(op,ve,vo) ;
+	    cint	osz = sizeof(vecstr) ;
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(osz,&vp)) >= 0) {
+		vecstr	*slp = vecstrp(vp) ;
+	        cint	ve = SCHEDVAR_NE ;
+	        cint	vo = VECSTR_OSORTED ;
+	        if ((rs = vecstr_start(slp,ve,vo)) >= 0) {
+		    op->slp = slp ;
+		    op->magic = SCHEDVAR_MAGIC ;
+		}
+		if (rs < 0) {
+		    uc_free(slp) ;
+		}
+	    } /* end if (object allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (schedvar_start) */
 
 int schedvar_finish(SV *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (op) {
-	    rs = SR_OK ;
-	    {
-	        rs1 = vecstr_finish(op) ;
-	        if (rs >= 0) rs = rs1 ;
+	if ((rs = schedvar_magic(op)) >= 0) {
+	    if (op->slp) {
+	        {
+	            rs1 = vecstr_finish(op->slp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+		    rs1 = uc_free(op->slp) ;
+		    if (rs >= 0) rs = rs1 ;
+		    op->slp = nullptr ;
+	        }
 	    }
+	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (schedvar_finish) */
 
 int schedvar_add(SV *op,cc *key,cc *vp,int vl) noex {
-	int		rs = SR_FAULT ;
-	if (op && key && vp) {
-	    rs = vecstr_envset(op,key,vp,vl) ;
+	int		rs ;
+	if ((rs = schedvar_magic(op,key,vp)) >= 0) {
+	    rs = vecstr_envset(op->slp,key,vp,vl) ;
 	}
 	return rs ;
 }
 /* end subroutine (schedvar_add) */
 
 int schedvar_curbegin(SV *op,SV_C *curp) noex {
-	int		rs = SR_FAULT ;
-	if (op && curp) {
-	    rs = SR_OK ;
+	int		rs ;
+	if ((rs = schedvar_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
 	}
 	return rs ;
@@ -133,9 +171,8 @@ int schedvar_curbegin(SV *op,SV_C *curp) noex {
 /* end subroutine (schedvar_curbegin) */
 
 int schedvar_curend(SV *op,SV_C *curp) noex {
-	int		rs = SR_FAULT ;
-	if (op && curp) {
-	    rs = SR_OK ;
+	int		rs ;
+	if ((rs = schedvar_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
 	}
 	return rs ;
@@ -144,15 +181,16 @@ int schedvar_curend(SV *op,SV_C *curp) noex {
 
 int schedvar_enum(SV *op,SV_C *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		vl = 0 ;
-	if (op && curp && kbuf) {
+	if ((rs = schedvar_magic(op,curp,kbuf)) >= 0) {
+	    vecstr	*slp = op->slp ;
 	    cnullptr	np{} ;
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    cchar	*cp ;
 	    kbuf[0] = '\0' ;
 	    if (vbuf) vbuf[0] = '\0' ;
-	    while (((rs = vecstr_get(op,i,&cp)) >= 0) && (cp == np)) {
+	    while (((rs = vecstr_get(slp,i,&cp)) >= 0) && (cp == np)) {
 	        i += 1 ;
 	    }
 	    if (rs >= 0) {
@@ -176,12 +214,13 @@ int schedvar_enum(SV *op,SV_C *curp,char *kbuf,int klen,
 /* end subroutine (schedvar_enum) */
 
 int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = schedvar_magic(op,key)) >= 0) {
+	    vecstr	*slp = op->slp ;
 	    if_constexpr (f_search) {
-		rs = vecstr_search(op,key,vstrkeycmp,rpp) ;
+		rs = vecstr_search(slp,key,vstrkeycmp,rpp) ;
 	    } else {
-		rs = vecstr_finder(op,key,vstrkeycmp,rpp) ;
+		rs = vecstr_finder(slp,key,vstrkeycmp,rpp) ;
 	    }
 	}
 	return rs ;
@@ -189,10 +228,11 @@ int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
 /* end subroutine (schedvar_findkey) */
 
 int schedvar_del(SV *op,cc *key) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = vecstr_finder(op,key,vstrkeycmp,nullptr)) >= 0) {
-	        rs = vecstr_del(op,rs) ;
+	int		rs ;
+	if ((rs = schedvar_magic(op,key)) >= 0) {
+	    vecstr	*slp = op->slp ;
+	    if ((rs = vecstr_finder(slp,key,vstrkeycmp,nullptr)) >= 0) {
+	        rs = vecstr_del(slp,rs) ;
 	    }
 	}
 	return rs ;
@@ -200,9 +240,9 @@ int schedvar_del(SV *op,cc *key) noex {
 /* end subroutine (schedvar_del) */
 
 int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		len = 0 ;
-	if (op && dbuf && sp) {
+	if ((rs = schedvar_magic(op,dbuf,sp)) >= 0) {
 	    rs = SR_TOOBIG ;
 	    dbuf[0] = '\0' ;
 	    if (dlen > 0) {
@@ -223,6 +263,7 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	int		rs ;
 	int		len = 0 ;
         if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
+	    vecstr	*slp = op->slp ;
 	    cnullptr	np{} ;
             cchar	*lfp = (sp + sl) ;
             char	keybuf[2] ;
@@ -236,9 +277,9 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 			auto	vcf = vstrkeycmp ;
 			cchar	*cp ;
 			if_constexpr (f_search) {
-                            rs = vecstr_search(op,KEYBUF(*fp),vcf,&cp) ;
+                            rs = vecstr_search(slp,KEYBUF(*fp),vcf,&cp) ;
 			} else {
-                            rs = vecstr_finder(op,KEYBUF(*fp),vcf,&cp) ;
+                            rs = vecstr_finder(slp,KEYBUF(*fp),vcf,&cp) ;
 			}
                         if (rs >= 0) {
                             rs = 0 ;

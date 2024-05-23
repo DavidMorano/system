@@ -17,12 +17,18 @@
 #include	<vecstr.h>
 
 
-#define	SCHEDVAR	vecstr
+#define	SCHEDVAR	struct schedvar_head
 #define	SCHEDVAR_CUR	struct schedvar_cursor
+#define	SCHEDVAR_MAGIC	0x89362514
 
 
 struct schedvar_cursor {
 	int		i ;
+} ;
+
+struct schedvar_head {
+	vecstr		*slp ;
+	uint		magic ;
 } ;
 
 typedef	SCHEDVAR	schedvar ;

@@ -1,6 +1,8 @@
-/* uux */
+/* uux HEADER */
+/* lang=C++20 */
 
 /* SYSDIALER "uux" module */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,13 +16,17 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	UUX_INCLUDE
-#define	UUX_INCLUDE	1
+#define	UUX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<logfile.h>
 #include	<localmisc.h>
 
