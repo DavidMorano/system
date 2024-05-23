@@ -1,6 +1,8 @@
-/* sigdefaults */
+/* sigdefaults SUPPORT */
+/* lang=C++20 */
 
 /* set a given set of signals to their default disposition */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,13 +16,15 @@
 
 /*******************************************************************************
 
-        This subroutine sets the disposition of the specified set of signals
-	(given as an array of integers containing the desired signal numbers)
-	to their default condition.
+	Name:
+	sigdefaults
 
+	Description:
+	This subroutine sets the disposition of the specified set
+	of signals (given as an array of integers containing the
+	desired signal numbers) to their default condition.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -42,22 +46,19 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int sigdefaults(int *sigs)
-{
-	int		rs = SR_OK ;
-
-	if (sigs != NULL) {
-	    int	i ;
-	    for (i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
+int sigdefaults(int *sigs) noex {
+	int		rs = SR_FAULT ;
+	if (sigs) {
+	    rs = SR_OK ;
+	    for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
 		rs = uc_sigdefault(sigs[i]) ;
 	    }
-	} else {
-	    rs = SR_FAULT ;
-	}
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sigdefaults) */

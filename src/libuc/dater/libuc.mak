@@ -771,7 +771,7 @@ strcpyxc.o:		strcpyxc.cc strcpyxc.h
 
 opensysfs.o:		opensysfs.cc opensysfs.h
 
-quoteshellarg.o:	quoteshellarg.c
+quoteshellarg.o:	quoteshellarg.cc
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
 

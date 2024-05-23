@@ -1,4 +1,4 @@
-/* netorder */
+/* netorder HEADER */
 /* lang=C++20 */
 
 /* network byte order manipulations */
@@ -14,8 +14,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 

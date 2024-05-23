@@ -131,8 +131,10 @@ static const unsigned char 	remterms[32] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int systems_open(SYSTEMS *op,cchar sysfname[])
 {

@@ -12,9 +12,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<vecobj.h>
 
 
@@ -39,10 +41,10 @@ struct systems_ent {
 } ;
 
 struct systems_head {
-	uint		magic ;
 	vecobj		files ;
 	vecobj		entries ;
 	time_t		checktime ;
+	uint		magic ;
 } ;
 
 EXTERNC_begin

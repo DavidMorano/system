@@ -92,7 +92,7 @@
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
 
-/* namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::sort ;			/* subroutine-template */
@@ -584,11 +584,11 @@ int vecpstr_findaddr(vecpstr *op,cchar *addr) noex {
 
 int vecpstr_getsize(vecpstr *op) noex {
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if ((rs = vecpstr_magic(op)) >= 0) {
-	        if (op->stsize > 0) size = op->stsize ;
+	        if (op->stsize > 0) sz = op->stsize ;
 	} /* end if (magic) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (vecpstr_getsize) */
 
@@ -753,7 +753,7 @@ int vecpstr_getvec(vecpstr *op,mainv *rppp) noex {
 static int vecpstr_ctor(vecpstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->c = 0 ;
@@ -838,11 +838,11 @@ static int vecpstr_extstr(vecpstr *op,int amount) noex {
 /* end subroutine (vecpstr_extstr) */
 
 static int vecpstr_newchunk(vecpstr *op,int amount) noex {
-	cint		size = sizeof(vecpstr_ch) ;
+	cint		sz = sizeof(vecpstr_ch) ;
 	int		rs ;
 	void		*vp{} ;
 	op->ccp = nullptr ;
-	if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+	if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 	    op->ccp = (vecpstr_ch *) vp ;
 	    if (amount < op->chsize) amount = op->chsize ;
 	    if ((rs = chunk_start(op->ccp,amount)) >= 0) {

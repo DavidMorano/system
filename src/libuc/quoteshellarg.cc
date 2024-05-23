@@ -1,4 +1,4 @@
-/* quoteshellarg */
+/* quoteshellarg SUPPORT */
 /* lang=C20 */
 
 /* subroutine to quote arguments for safe passage through a SHELL */
@@ -29,7 +29,6 @@
 	int quoteshellarg(char *dp,int dl,cchar *ap.int al,char **nvpp) noex
 
 	Arguments:
-
 	dp		result buffer pointer
 	dl		result buffer length
 	ap		shell argument to be quoted
@@ -45,17 +44,24 @@
 **************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<usystem.h>
-#include	<field.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<mkquoted.h>
-#include	<localmisc.h>
+
+
+/* local defines */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int quoteshellarg(char *,int,cchar *,int,cchar **) noex ;
+}
+
+
+/* external variables */
 
 
 /* forward references */
@@ -64,11 +70,13 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int quoteshellarg(char *dp,int dl,cchar *ap,int al,char **nvpp) noex {
-	int		rs ;
-	rs = mkquoted(buf,buflen,arg,arglen) ;
+int quoteshellarg(char *dp,int dl,cchar *ap,int al,cchar **nvpp) noex {
+	cint		rs = mkquoted(dp,dl,ap,al) ;
 	if (nvpp) {
 	    *nvpp = (rs >= 0) ? dp : nullptr ;
 	}

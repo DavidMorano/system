@@ -1,4 +1,5 @@
-/* HEADER stackaddr */
+/* stackaddr HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,45 +12,39 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STACKADDR_INCLUDE
-#define	STACKADDR_INCLUDE	1
+#define	STACKADDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
-#include	<sys/types.h>
-#include	<sys/param.h>
 
-#include	<localmisc.h>
-
-
-#define	STACKADDR			struct stackaddr_head
+#define	STACKADDR	struct stackaddr_head
 
 
 struct stackaddr_head {
 	char		*dbuf ;
-	const char	*lhp ;
+	cchar		*lhp ;
 	int		lhl ;
 	int		dlen ;
 	int		i ;
 	int		ri ;
 } ;
 
+typedef	STACKADDR	stackaddr ;
 
-#if	(! defined(STACKADDR_MASTER)) || (STACKADDR_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	stackaddr_start(stackaddr *,char *,int) noex ;
+extern int	stackaddr_finish(stackaddr *) noex ;
+extern int	stackaddr_add(stackaddr *,cchar *,int,cchar *,int) noex ;
 
-extern int	stackaddr_start(STACKADDR *,char *,int) ;
-extern int	stackaddr_finish(STACKADDR *) ;
-extern int	stackaddr_add(STACKADDR *,cchar *,int,cchar *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* STACKADDR_MASTER */
 
 #endif /* STACKADDR_INCLUDE */
 
