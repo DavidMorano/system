@@ -1,11 +1,11 @@
-/* uux */
+/* uux SUPPORT */
+/* lang=C++20 */
 
 /* SYSDIALER "uux" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SOCKET	0		/* use socket or pipe */
-
 
 /* revision history:
 
@@ -18,37 +18,33 @@
 
 /*******************************************************************************
 
+	Name:
+	uux
+
+	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	uux [-R <pr>] [<node>!<svc>] [<arg(s)>]
 
 	Arguments:
-
 	-R <pr>		program-root
 	<node>		UU nodename
 	<svc>		service
 	<arg(s)>	dialer arguments
 
-
 *******************************************************************************/
 
-
-#define	UUX_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<vecstr.h>
@@ -100,37 +96,14 @@
 #define	VARPATH		"PATH"
 #endif
 
+#define	SI		struct subifo
 
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
-			const char *,const char *) ;
-extern int	isdigitlatin(int) ;
-
-extern int	dialuux(const char *,const char *,const char *,const char **,
-			const char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+    extern int dialuux(cc *,cc *,cc *,cc **,cc *,cc *,int) noex ;
+}
 
 
 /* external variables */
@@ -146,24 +119,24 @@ struct subinfo_flags {
 } ;
 
 struct subinfo_allocs {
-	const char	*node ;
-	const char	*svc ;
-	const char	*pr ;
+	cchar	*node ;
+	cchar	*svc ;
+	cchar	*pr ;
 } ;
 
 struct subinfo {
 	char		**args ;
-	const char	*pr ;
-	const char	*prn ;
-	const char	*searchname ;
-	const char	*hostname ;
-	const char	*svcname ;
-	const char	*node ;
-	const char	*logfname ;
-	const char	*username ;
-	const char	*grade ;
-	const char	**av ;
-	const char	**dav ;		/* allocated */
+	cchar	*pr ;
+	cchar	*prn ;
+	cchar	*searchname ;
+	cchar	*hostname ;
+	cchar	*svcname ;
+	cchar	*node ;
+	cchar	*logfname ;
+	cchar	*username ;
+	cchar	*grade ;
+	cchar	**av ;
+	cchar	**dav ;		/* allocated */
 	UUX		*op ;
 	SYSDIALER_ARGS	*ap ;
 	struct subinfo_allocs	a ;
@@ -174,21 +147,21 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(struct subinfo *,UUX *,SYSDIALER_ARGS *,
-			const char *,const char *,const char **) ;
-static int	subinfo_procargs(struct subinfo *) ;
-static int	subinfo_procspec(struct subinfo *,const char *) ;
-static int	subinfo_procopts(struct subinfo *,KEYOPT *) ;
-static int	subinfo_defaults(struct subinfo *) ;
-static int	subinfo_logfile(struct subinfo *) ;
-static int	subinfo_mkargs(struct subinfo *,const char **,const char ***) ;
-static int	subinfo_finish(struct subinfo *) ;
-static int	subinfo_dirok(struct subinfo *,const char *,int) ;
+static int	subinfo_start(SI *,UUX *,SYSDIALER_ARGS *,
+			cchar *,cchar *,cchar **) ;
+static int	subinfo_procargs(SI *) ;
+static int	subinfo_procspec(SI *,cchar *) ;
+static int	subinfo_procopts(SI *,keyopt *) ;
+static int	subinfo_defaults(SI *) ;
+static int	subinfo_logfile(SI *) ;
+static int	subinfo_mkargs(SI *,cchar **,cchar ***) ;
+static int	subinfo_finish(SI *) ;
+static int	subinfo_dirok(SI *,cchar *,int) ;
 
 
 /* global variables (module information) */
 
-SYSDIALER_INFO	uux = {
+SYSDIALER_INFO	uux_mod = {
 	UUX_MNAME,
 	UUX_VERSION,
 	UUX_INAME,
@@ -199,12 +172,12 @@ SYSDIALER_INFO	uux = {
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"RN",
 	"sn",
 	"lf",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -215,9 +188,9 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char *procopts[] = {
+static cchar *procopts[] = {
 	"log",
-	NULL
+	nullptr
 } ;
 
 enum procopts {
@@ -232,9 +205,9 @@ enum procopts {
 int uux_open(op,ap,hostname,svcname,av)
 UUX		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	struct subinfo	si, *sip = &si ;
 
@@ -242,9 +215,9 @@ const char	*av[] ;
 	int	opts = 0 ;
 
 
-	if (op == NULL) return SR_FAULT ;
-	if (ap == NULL) return SR_FAULT ;
-	if (hostname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (ap == nullptr) return SR_FAULT ;
+	if (hostname == nullptr) return SR_FAULT ;
 
 	memset(op,0,sizeof(UUX)) ;
 
@@ -255,7 +228,7 @@ const char	*av[] ;
 	    hostname,svcname) ;
 #endif
 
-	if (ap != NULL)
+	if (ap != nullptr)
 	    rs = subinfo_procargs(sip) ;
 
 	if (rs >= 0)
@@ -265,13 +238,13 @@ const char	*av[] ;
 	    rs = subinfo_logfile(sip) ;
 
 	if (rs >= 0) {
-	    const char	**dav = NULL ;
+	    cchar	**dav = nullptr ;
 	    if ((rs = subinfo_mkargs(sip,av,&dav)) >= 0) {
-	        const char	*pr = sip->pr ;
-	        const char	*nn = sip->node ;
-	        const char	*svc = sip->svcname ;
-		const char	*un = sip->username ;
-		const char	*grade = sip->grade ;
+	        cchar	*pr = sip->pr ;
+	        cchar	*nn = sip->node ;
+	        cchar	*svc = sip->svcname ;
+		cchar	*un = sip->username ;
+		cchar	*grade = sip->grade ;
 
 #if	CF_DEBUGS
 	    debugprintf("uux_open: pr=%s\n",sip->pr) ;
@@ -295,7 +268,7 @@ const char	*av[] ;
 	} /* end if (ok) */
 
 	if ((rs < 0) && op->f.log) {
-	    op->f.log = FALSE ;
+	    op->f.log = false ;
 	    logfile_printf(&op->lh,"failed (%d)",rs) ;
 	    logfile_close(&op->lh) ;
 	} /* end if */
@@ -320,7 +293,7 @@ UUX		*op ;
 	int	rs1 ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -330,7 +303,7 @@ UUX		*op ;
 	if (rs >= 0) rs = rs1 ;
 
 	if (op->f.log) {
-	    op->f.log = FALSE ;
+	    op->f.log = false ;
 	    logfile_printf(&op->lh,"bytes=%u",op->tlen) ;
 	    rs1 = logfile_close(&op->lh) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -351,7 +324,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -378,7 +351,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -407,7 +380,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -433,7 +406,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -452,13 +425,13 @@ int		to, opts ;
 
 int uux_write(op,buf,buflen)
 UUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -476,14 +449,14 @@ int		buflen ;
 
 int uux_send(op,buf,buflen,flags)
 UUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 {
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -501,7 +474,7 @@ int		flags ;
 
 int uux_sendto(op,buf,buflen,flags,sap,salen)
 UUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 void		*sap ;
@@ -510,7 +483,7 @@ int		salen ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -534,7 +507,7 @@ int		flags ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -557,7 +530,7 @@ int		cmd ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != UUX_MAGIC)
@@ -577,9 +550,9 @@ static int subinfo_start(sip,op,ap,hostname,svcname,av)
 struct subinfo	*sip ;
 UUX		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	int	rs = SR_OK ;
 
@@ -604,38 +577,38 @@ struct subinfo	*sip ;
 	int	rs1 ;
 
 
-	if (sip->dav != NULL) {
+	if (sip->dav != nullptr) {
 	    rs1 = uc_free(sip->dav) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->dav = NULL ;
+	    sip->dav = nullptr ;
 	}
 
 	if (sip->f.ids) {
-	    sip->f.ids = FALSE ;
+	    sip->f.ids = false ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (sip->a.node != NULL) {
+	if (sip->a.node != nullptr) {
 	    rs1 = uc_free(sip->a.node) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.node = NULL ;
+	    sip->a.node = nullptr ;
 	}
 
-	if (sip->a.svc != NULL) {
+	if (sip->a.svc != nullptr) {
 	    rs1 = uc_free(sip->a.svc) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.svc = NULL ;
+	    sip->a.svc = nullptr ;
 	}
 
-	if (sip->a.pr != NULL) {
+	if (sip->a.pr != nullptr) {
 	    rs1 = uc_free(sip->a.pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.pr = NULL ;
+	    sip->a.pr = nullptr ;
 	}
 
-	sip->op = NULL ;
-	sip->ap = NULL ;
+	sip->op = nullptr ;
+	sip->ap = nullptr ;
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
@@ -644,7 +617,7 @@ struct subinfo	*sip ;
 static int subinfo_procargs(sip)
 struct subinfo	*sip ;
 {
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 
 	SYSDIALER_ARGS	*ap ;
 
@@ -670,12 +643,12 @@ struct subinfo	*sip ;
 
 	argv = (char **) ap->argv ;
 
-	for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 
 #if	CF_DEBUGS
 	{
 	    debugprintf("uux_open: argr=%u\n",argr) ;
-	    for (ai = 0 ; argv[ai] != NULL ; ai += 1)
+	    for (ai = 0 ; argv[ai] != nullptr ; ai += 1)
 	        debugprintf("uux_open: argv[%u]=%s\n",ai,argv[ai]) ;
 	    debugprintf("uux_open: ai=%u\n",ai) ;
 	}
@@ -724,15 +697,15 @@ struct subinfo	*sip ;
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -747,7 +720,7 @@ struct subinfo	*sip ;
 	                case argopt_root:
 	                    if (f_optequal) {
 
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->pr = avp ;
 
@@ -773,7 +746,7 @@ struct subinfo	*sip ;
 	                case argopt_rn:
 	                    if (f_optequal) {
 
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->prn = avp ;
 
@@ -799,13 +772,13 @@ struct subinfo	*sip ;
 	                case argopt_sn:
 	                    if (f_optequal) {
 
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->searchname = avp ;
 
 	                    } else {
 
-	                        if (argv[ai + 1] == NULL) {
+	                        if (argv[ai + 1] == nullptr) {
 	                            rs = SR_INVALID ;
 	                            break ;
 	                        }
@@ -823,10 +796,10 @@ struct subinfo	*sip ;
 
 /* logfile */
 	                case argopt_lf:
-			    sip->f.log = TRUE ;
+			    sip->f.log = true ;
 	                    if (f_optequal) {
 
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->logfname = avp ;
 
@@ -925,11 +898,11 @@ struct subinfo	*sip ;
 	                        break ;
 
 	                    case 'r':
-	                        sip->f.queueonly = TRUE ;
+	                        sip->f.queueonly = true ;
 	                        break ;
 
 	                    case 'n':
-	                        sip->f.noreport = TRUE ;
+	                        sip->f.noreport = true ;
 	                        break ;
 
 	                    default:
@@ -1002,31 +975,25 @@ badarg:
 }
 /* end subroutine (subinfo_procargs) */
 
-
-static int subinfo_procopts(sip,kop)
-struct subinfo	*sip ;
-KEYOPT		*kop ;
-{
-	KEYOPT_CUR	kcur ;
-
-	int	rs ;
-	int	c = 0 ;
-
+static int subinfo_procopts(SI *sip,keyopt *kop) noex {
+	keyopt_cur	kcur ;
+	int		rs ;
+	int		c = 0 ;
 	if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	    int		oi ;
 	    int		kl, vl ;
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 
 	while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
 
-	    vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	    vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	    if ((oi = matostr(procopts,2,kp,kl)) >= 0) {
 
 	        switch (oi) {
 
 	        case procopt_log:
-	                sip->f.log = TRUE ;
+	                sip->f.log = true ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0))
 	                    sip->f.log = (rs > 0) ;
 	            break ;
@@ -1049,19 +1016,19 @@ KEYOPT		*kop ;
 
 static int subinfo_procspec(sip,spec)
 struct subinfo	*sip ;
-const char	spec[] ;
+cchar	spec[] ;
 {
 	int	rs = SR_OK ;
 	int	cl ;
 
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 
 	if (spec[0] == '\0')
 	    goto ret0 ;
 
-	if ((tp = strchr(spec,'!')) != NULL) {
+	if ((tp = strchr(spec,'!')) != nullptr) {
 
 	    cp = spec ;
 	    cl = (tp - spec) ;
@@ -1095,18 +1062,18 @@ struct subinfo	*sip ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	const char	*vp ;
+	cchar	*vp ;
 
 
 	ap = sip->ap ;
 
 /* program-root */
 
-	if ((sip->pr == NULL) && (sip->prn != NULL) && (sip->prn[0] != '\0')) {
+	if ((sip->pr == nullptr) && (sip->prn != nullptr) && (sip->prn[0] != '\0')) {
 	    char	domainname[MAXHOSTNAMELEN + 1] ;
 	    char	pr[MAXPATHLEN + 1] ;
 
-	    rs1 = getnodedomain(NULL,domainname) ;
+	    rs1 = getnodedomain(nullptr,domainname) ;
 
 	    if (rs1 >= 0)
 	        rs1 = mkpr(pr,MAXPATHLEN,sip->prn,domainname) ;
@@ -1125,9 +1092,9 @@ struct subinfo	*sip ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->pr == NULL)) {
+	if ((rs >= 0) && (sip->pr == nullptr)) {
 
-	    if ((vp = getenv(UUX_VARPR)) != NULL) {
+	    if ((vp = getenv(UUX_VARPR)) != nullptr) {
 
 	        rs = subinfo_dirok(sip,vp,-1) ;
 	        if (rs > 0)
@@ -1137,7 +1104,7 @@ struct subinfo	*sip ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->pr == NULL)) {
+	if ((rs >= 0) && (sip->pr == nullptr)) {
 
 	    vp = UUX_PR ;
 	    rs = subinfo_dirok(sip,vp,-1) ;
@@ -1146,17 +1113,17 @@ struct subinfo	*sip ;
 
 	} /* end if */
 
-	if (sip->pr == NULL)
+	if (sip->pr == nullptr)
 	    sip->pr = ap->pr ;
 
 /* search-name */
 
-	if (sip->searchname == NULL)
+	if (sip->searchname == nullptr)
 	    sip->searchname = UUX_SEARCHNAME ;
 
 /* log-file */
 
-	if ((rs >= 0) && (sip->logfname == NULL))
+	if ((rs >= 0) && (sip->logfname == nullptr))
 		sip->logfname = UUX_LOGFNAME ;
 
 /* out of here */
@@ -1174,8 +1141,8 @@ struct subinfo	*sip ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	const char	*lnp ;
-	const char	*lidp = NULL ;
+	cchar	*lnp ;
+	cchar	*lidp = nullptr ;
 
 	char	logfname[MAXPATHLEN + 1] ;
 
@@ -1183,7 +1150,7 @@ struct subinfo	*sip ;
 	if (! sip->f.log)
 	    goto ret0 ;
 
-	sip->f.log = TRUE ;
+	sip->f.log = true ;
 	lnp = sip->logfname ;
 	if (lnp[0] != '/') {
 	    rs = mkpath3(logfname,sip->pr,UUX_LOGDNAME,lnp) ;
@@ -1196,9 +1163,9 @@ struct subinfo	*sip ;
 	    if ((rs1 = logfile_open(&op->lh,lnp,0,0666,lidp)) >= 0) {
 	        USERINFO	u, *uip = &u ;
 	        char	userbuf[USERINFO_LEN + 1] ;
-	        op->f.log = TRUE ;
+	        op->f.log = true ;
 
-	        if ((rs1 = userinfo(uip,userbuf,USERINFO_LEN,NULL)) >= 0) {
+	        if ((rs1 = userinfo(uip,userbuf,USERINFO_LEN,nullptr)) >= 0) {
 
 	            logfile_userinfo(&op->lh,uip,0L,
 	                UUX_MNAME,UUX_VERSION) ;
@@ -1241,44 +1208,44 @@ ret0:
 
 static int subinfo_mkargs(sip,av,davp)
 struct subinfo	*sip ;
-const char	*av[] ;
-const char	***davp ;
+cchar	*av[] ;
+cchar	***davp ;
 {
 	int	rs = SR_OK ;
 	int	i ;
 	int	size ;
 	int	n = 0 ;
-	const char	**dav ;
+	cchar	**dav ;
 
 
-	*davp = NULL ;
-	if (sip->args != NULL) {
-	    for (i = 0 ; sip->args[i] != NULL ; i += 1)
+	*davp = nullptr ;
+	if (sip->args != nullptr) {
+	    for (i = 0 ; sip->args[i] != nullptr ; i += 1)
 	        n += 1 ;
 	}
 
-	if (av != NULL) {
-	    for (i = 0 ; av[i] != NULL ; i += 1)
+	if (av != nullptr) {
+	    for (i = 0 ; av[i] != nullptr ; i += 1)
 	        n += 1 ;
 	}
 
-	size = (n + 1) * sizeof(const char *) ;
+	size = (n + 1) * sizeof(cchar *) ;
 	if ((rs = uc_malloc(size,&dav)) >= 0) {
 	    int	j = 0 ;
 	    sip->dav = dav ;
 	    *davp = dav ;
 
-	    if (sip->args != NULL) {
-	        for (i = 0 ; sip->args[i] != NULL ; i += 1)
+	    if (sip->args != nullptr) {
+	        for (i = 0 ; sip->args[i] != nullptr ; i += 1)
 	            dav[j++] = sip->args[i] ;
 	    }
 
-	    if (av != NULL) {
-	        for (i = 0 ; av[i] != NULL ; i += 1)
+	    if (av != nullptr) {
+	        for (i = 0 ; av[i] != nullptr ; i += 1)
 	            dav[j++] = (char *) av[i] ;
 	    }
 
-	    dav[j] = NULL ;
+	    dav[j] = nullptr ;
 
 	} /* end if */
 
@@ -1289,22 +1256,22 @@ const char	***davp ;
 
 static int subinfo_dirok(sip,d,dlen)
 struct subinfo	*sip ;
-const char	d[] ;
+cchar	d[] ;
 int		dlen ;
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 
 	NULSTR	ss ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	f = FALSE ;
+	int	f = false ;
 
-	const char	*dnp ;
+	cchar	*dnp ;
 
 
 	if (! sip->f.ids) {
-	    sip->f.ids = TRUE ;
+	    sip->f.ids = true ;
 	    rs = ids_load(&sip->id) ;
 	}
 

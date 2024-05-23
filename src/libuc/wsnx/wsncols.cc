@@ -1,5 +1,5 @@
-/* wsncols */
-/* lang=C20 */
+/* wsncols SUPPORT */
+/* lang=C++20 */
 
 /* calculate the number of columns used by a wide-string */
 /* version %I% last-modified %G% */
@@ -23,8 +23,9 @@
 	wsncols
 
 	Description:
-	This subroutine calculates the number of columns that a wide-string
-	uses given a horizontal position in a line of columns.
+	This subroutine calculates the number of columns that a
+	wide-string uses given a horizontal position in a line of
+	columns.
 
 	Synopsis:
 	int wsncols(int ntab,int scol,const wchar_t *wsp,int wsl) noex
@@ -38,16 +39,16 @@
 	Returns:
 	-		number of columns used up
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<stddef.h>		/* for 'wchar_t' */
+#include	<cstddef>		/* for |wchar_t| */
 #include	<ascii.h>
 #include	<localmisc.h>
 #include	<tabcols.h>
+
+#include	"wsnx.h"
 
 
 /* local defines */
@@ -68,6 +69,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int wsncolstr(int ntab,int scol,const wchar_t *wsp,int wsl) noex {
@@ -79,7 +83,7 @@ int wsncolstr(int ntab,int scol,const wchar_t *wsp,int wsl) noex {
 		col += 1 ;
 	    }
 	} /* end while */
-	return (col-scol) ;
+	return (col - scol) ;
 }
 /* end subroutine (wsncols) */
 

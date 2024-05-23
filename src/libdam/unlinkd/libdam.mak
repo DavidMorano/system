@@ -1121,6 +1121,7 @@ hasallunique.o:		hasallunique.cc
 isort.o:		isort.cc
 
 ctwords.o:		ctwords.cc ctwords.hh
+holidayer.o:		holidayer.cc holidayer.h
 
 # UTILITY
 getostype.o:		getostype.cc getostype.h

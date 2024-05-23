@@ -4,8 +4,6 @@
 /* get machine dialing information from UUCP "Systems" DB */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGSFIELD	0		/* some other debugging */
 
 /* revision history:
 
@@ -58,17 +56,6 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	starmat(cchar *,cchar *) ;
-extern int	getpwd(char *,int) ;
-extern int	field_srvarg(FIELD *,const uchar *,char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif /* CF_DEBUGS */
-
 
 /* external variables */
 
@@ -76,11 +63,11 @@ extern int	strlinelen(cchar *,int,int) ;
 /* local structures */
 
 struct systems_file {
-	cchar	*fname ;
+	cchar		*fname ;
+	dev_t		dev ;
+	ino_t		ino ;
 	time_t		mtime ;
 	size_t		fsize ;
-	dev_t		dev ;
-	ino64_t		ino ;
 } ;
 
 
@@ -88,7 +75,7 @@ struct systems_file {
 
 static int systems_fileparse(SYSTEMS *,int,SYSTEMS_FILE *) ;
 static int systems_filealready(SYSTEMS *,dev_t,ino_t) ;
-static int systems_procline(SYSTEMS *,int,FIELD *) ;
+static int systems_procline(SYSTEMS *,int,field *) ;
 static int systems_delfes(SYSTEMS *,int) ;
 
 int	systems_close(SYSTEMS *) ;
@@ -136,26 +123,21 @@ static const unsigned char 	remterms[32] = {
 
 /* exported subroutines */
 
-int systems_open(SYSTEMS *op,cchar sysfname[])
-{
+int systems_open(SYSTEMS *op,cchar &sysfname) noex {
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		opts ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("systems_open: sysfname=%s\n",sysfname) ;
-#endif
-
-	size = sizeof(SYSTEMS_FILE) ;
+	sz = sizeof(SYSTEMS_FILE) ;
 	opts = VECOBJ_OREUSE ;
-	if ((rs = vecobj_start(&op->files,size,10,opts)) >= 0) {
-	    size = sizeof(SYSTEMS_ENT) ;
+	if ((rs = vecobj_start(&op->files,sz,10,opts)) >= 0) {
+	    sz = sizeof(SYSTEMS_ENT) ;
 	    opts = 0 ;
-	    if ((rs = vecobj_start(&op->entries,size,20,opts)) >= 0) {
+	    if ((rs = vecobj_start(&op->entries,sz,20,opts)) >= 0) {
 	        op->magic = SYSTEMS_MAGIC ;
-	        if (sysfname != NULL) {
+	        if (sysfname != nullptr) {
 	            rs = systems_fileadd(op,sysfname) ;
 	        }
 	        if (rs < 0) {
@@ -181,14 +163,14 @@ int systems_close(SYSTEMS *op)
 	int		rs1 ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
 
 /* free up all enties */
 
 	for (i = 0 ; vecobj_get(&op->entries,i,&dep) >= 0 ; i += 1) {
-	    if (dep != NULL) {
+	    if (dep != nullptr) {
 	        rs1 = entry_finish(dep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -200,8 +182,8 @@ int systems_close(SYSTEMS *op)
 /* free up the files */
 
 	for (i = 0 ; vecobj_get(&op->files,i,&fep) >= 0 ; i += 1) {
-	    if (fep != NULL) {
-	        if (fep->fname != NULL) {
+	    if (fep != nullptr) {
+	        if (fep->fname != nullptr) {
 	            rs1 = uc_free(fep->fname) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
@@ -224,13 +206,9 @@ int systems_fileadd(SYSTEMS *op,cchar sysfname[])
 	cchar	*np ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	if ((op == NULL) || (sysfname == NULL)) return SR_FAULT ;
+	if ((op == nullptr) || (sysfname == nullptr)) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("systems_fileadd: sysfname=%s\n",sysfname) ;
-#endif
 
 /* make a file pathname if necessary */
 
@@ -262,10 +240,6 @@ int systems_fileadd(SYSTEMS *op,cchar sysfname[])
 	    } /* end if (file_start) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("systems_fileadd: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (systems_fileadd) */
@@ -274,8 +248,8 @@ int systems_fileadd(SYSTEMS *op,cchar sysfname[])
 int systems_curbegin(SYSTEMS *op,SYSTEMS_CUR *curp)
 {
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
 
@@ -288,8 +262,8 @@ int systems_curbegin(SYSTEMS *op,SYSTEMS_CUR *curp)
 int systems_curend(SYSTEMS *op,SYSTEMS_CUR *curp)
 {
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
 
@@ -305,9 +279,9 @@ int systems_enum(SYSTEMS *op,SYSTEMS_CUR *curp,SYSTEMS_ENT **depp)
 	int		rs ;
 	int		ei ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (depp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (depp == nullptr) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
 
@@ -327,25 +301,17 @@ int systems_fetch(SYSTEMS *op,cchar *name,SYSTEMS_CUR *curp,SYSTEMS_ENT **depp)
 	int		rs ;
 	int		ei ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (depp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (depp == nullptr) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("systems_fetch: ent name=%s\n",name) ;
-#endif
 
 	ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 
 	while ((rs = vecobj_get(&op->entries,ei,depp)) >= 0) {
-	    if (*depp == NULL) continue ;
-
-#if	CF_DEBUGS
-	    debugprintf("systems_fetch: sysname=%s\n",(*depp)->sysname) ;
-#endif
+	    if (*depp == nullptr) continue ;
 
 	    if (starmat((*depp)->sysname,name))
 	        break ;
@@ -356,10 +322,6 @@ int systems_fetch(SYSTEMS *op,cchar *name,SYSTEMS_CUR *curp,SYSTEMS_ENT **depp)
 
 	if (rs >= 0)
 	    curp->i = ei ;
-
-#if	CF_DEBUGS
-	debugprintf("systems_fetch: ret rs=%d ei=%d\n",rs,ei) ;
-#endif
 
 	return (rs >= 0) ? ei : rs ;
 }
@@ -376,12 +338,12 @@ int systems_check(SYSTEMS *op,time_t dt)
 	int		c = 0 ;
 	int		f ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != SYSTEMS_MAGIC) return SR_NOTOPEN ;
 
 	if (dt <= 0)
-	    dt = time(NULL) ;
+	    dt = time(nullptr) ;
 
 /* should we even check? */
 
@@ -393,7 +355,7 @@ int systems_check(SYSTEMS *op,time_t dt)
 /* loop through files looking for a change */
 
 	for (i = 0 ; vecobj_get(&op->files,i,&fep) >= 0 ; i += 1) {
-	    if (fep == NULL) continue ;
+	    if (fep == nullptr) continue ;
 
 	    rs = u_stat(fep->fname,&sb) ;
 
@@ -411,10 +373,6 @@ int systems_check(SYSTEMS *op,time_t dt)
 	    } /* end if (file changed) */
 
 	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("systems_check: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return c ;
 }
@@ -437,21 +395,17 @@ static int systems_fileparse(SYSTEMS *op,int fi,SYSTEMS_FILE *fep)
 	    if ((rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) {
 		const dev_t	dev = sb.st_dev ;
 		const ino_t	ino = sb.st_ino ;
-#if	CF_DEBUGS
-		debugprintf("systems_fileparse: dev=\\x%08x ino=%llu\n",
-			dev,ino) ;
-#endif
 		if ((rs = systems_filealready(op,dev,ino)) == 0) {
-		    const int	llen = SYSLINELEN ;
+		    cint	llen = SYSLINELEN ;
 		    char	*lbuf ;
 		    if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-		        FIELD	fsb ;
+		        field	fsb ;
 		        int	len ;
 		        fep->mtime = sb.st_mtime ;
 		        fep->fsize = (size_t) (sb.st_size & UINT_MAX) ;
 		        fep->dev = sb.st_dev ;
 		        fep->ino = sb.st_ino ;
-		        while ((rs = breadlns(sfp,lbuf,llen,NULL)) > 0) {
+		        while ((rs = breadlns(sfp,lbuf,llen,nullptr)) > 0) {
 	    	            len = rs ;
 
 	    	        if (len == 1) continue ;	/* blank line */
@@ -469,11 +423,6 @@ static int systems_fileparse(SYSTEMS *op,int fi,SYSTEMS_FILE *fep)
 			    cchar	*fp ;
 
 	        	    fl = field_get(&fsb,fterms,&fp) ;
-
-#if	CF_DEBUGS && CF_DEBUGSFIELD
-	    	   	     debugprintf("systems_fp: field> %t\n",
-				fp,fl) ;
-#endif
 
 	        	    if ((fl > 0) && (fsb.term != '#')) {
 	            	        rs = systems_procline(op,fi,&fsb) ;
@@ -504,86 +453,53 @@ static int systems_filealready(SYSTEMS *op,dev_t dev,ino_t ino)
 	vecobj		*flp = &op->files ;
 	int		rs ;
 	int		i ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("systems_filealready: searching dev=\\x%08x ino=%llu\n",
-		dev,ino) ;
-#endif
+	int		f = false ;
 
 	for (i = 0 ; (rs = vecobj_get(flp,i,&fep)) >= 0 ; i += 1) {
-	    if (fep != NULL) {
+	    if (fep != nullptr) {
 		f = ((fep->dev == dev) && (fep->ino == ino)) ;
 		if (f) break ;
 	    }
 	} /* end for */
 	if (rs == SR_NOTFOUND) rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("systems_filealready: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (systems_filealready) */
 
-
-static int systems_procline(SYSTEMS *op,int fi,FIELD *fsp)
-{
+static int systems_procline(SYSTEMS *op,int fi,field *fsp) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if ((fsp->fl > 0) && (fsp->term != '#')) {
 	    SYSTEMS_ENT	e ;
 	    int		fl = fsp->fl ;
 	    cchar	*fp = (cchar *) fsp->fp ;
 	    if ((rs = entry_start(&e,fi,fp,fl)) >= 0) {
-		int	f_fin = TRUE ;
+		int	f_fin = true ;
 	        if ((fl = field_get(fsp,fterms,&fp)) > 0) {
 	            if ((rs = entry_dialer(&e,fp,fl)) >= 0) {
 	                if (fsp->term != '#') {
-	                    const int	alen = ARGSBUFLEN ;
-			    const uchar	*ft = remterms ;
+	                    cint	alen = ARGSBUFLEN ;
+			    cchar	*ft = remterms ;
 	                    char	abuf[ARGSBUFLEN + 1] ;
 	                    if ((rs = field_srvarg(fsp,ft,abuf,alen)) >= 0) {
-	                	const int	al = rs ;
+	                	cint	al = rs ;
 	                	if ((rs = entry_args(&e,abuf,al)) >= 0) {
 				    vecobj	*elp = &op->entries ;
 	                    	    if ((rs = vecobj_add(elp,&e)) >= 0) {
-					f = TRUE ;
-					f_fin = FALSE ;
+					f = true ;
+					f_fin = false ;
 				    }
-#if	CF_DEBUGS
-	debugprintf("systems_procline: mid5 rs=%d\n",rs) ;
-#endif
 			        }
-#if	CF_DEBUGS
-	debugprintf("systems_procline: mid6 rs=%d\n",rs) ;
-#endif
 	             	    } /* end if (field_srvarg) */
-#if	CF_DEBUGS
-	debugprintf("systems_procline: mid7 rs=%d\n",rs) ;
-#endif
 	                } /* end if (not a comment) */
-#if	CF_DEBUGS
-	debugprintf("systems_procline: mid8 rs=%d\n",rs) ;
-#endif
 	            } /* end if (entry_dialer) */
-#if	CF_DEBUGS
-	debugprintf("systems_procline: mid9 rs=%d\n",rs) ;
-#endif
 	        } /* end if (field_get) */
 	        if ((rs < 0) || f_fin)
 		    entry_finish(&e) ;
 	    } /* end if (entry_start) */
-#if	CF_DEBUGS
-	debugprintf("systems_procline: mid10 rs=%d\n",rs) ;
-#endif
 	} /* end if (possible) */
-
-#if	CF_DEBUGS
-	debugprintf("systems_procline: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -599,7 +515,7 @@ static int systems_delfes(SYSTEMS *op,int fi)
 	int		i ;
 
 	for (i = 0 ; vecobj_get(elp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	    if (ep != nullptr) {
 	        if (ep->fi == fi) {
 	            rs1 = entry_finish(ep) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -617,7 +533,7 @@ static int file_start(SYSTEMS_FILE *fep,cchar *fname) noex {
 	int		rs ;
 	cchar		*cp ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	memclear(fep) ;
 
@@ -635,12 +551,12 @@ static int file_finish(SYSTEMS_FILE *fep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (fep == NULL) return SR_FAULT ;
+	if (fep == nullptr) return SR_FAULT ;
 
-	if (fep->fname != NULL) {
+	if (fep->fname != nullptr) {
 	    rs1 = uc_free(fep->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    fep->fname = NULL ;
+	    fep->fname = nullptr ;
 	}
 
 	return rs ;
@@ -653,8 +569,7 @@ static int entry_start(SYSTEMS_ENT *ep,int fi,cchar *sp,int sl)
 	int		rs ;
 	cchar	*cp ;
 
-	memset(ep,0,sizeof(SYSTEMS_ENT)) ;
-
+	memclear(ep) ;
 	ep->fi = fi ;
 	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	    ep->sysnamelen = sl ;
@@ -665,21 +580,13 @@ static int entry_start(SYSTEMS_ENT *ep,int fi,cchar *sp,int sl)
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_dialer(SYSTEMS_ENT *ep,cchar *dp,int dl)
-{
+static int entry_dialer(SYSTEMS_ENT *ep,cchar *dp,int dl) noex {
 	int		rs ;
 	cchar		*cp ;
-
 	if ((rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
 	    ep->dialernamelen = dl ;
 	    ep->dialername = cp ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("entry_dialer: rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (entry_dialer) */
@@ -711,17 +618,17 @@ static int entry_finish(SYSTEMS_ENT *ep)
 	if (ep->sysnamelen <= 0)
 	    return SR_OK ;
 
-	if (ep->dialerargs != NULL) {
+	if (ep->dialerargs != nullptr) {
 	    rs1 = uc_free(ep->dialerargs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->dialername != NULL) {
+	if (ep->dialername != nullptr) {
 	    rs1 = uc_free(ep->dialername) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->sysname != NULL) {
+	if (ep->sysname != nullptr) {
 	    rs1 = uc_free(ep->sysname) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -735,7 +642,7 @@ static int entry_finish(SYSTEMS_ENT *ep)
 static int bdumpline(bfile *fp,char *lbuf,int llen)
 {
 	int		rs ;
-	while ((rs = breadlns(fp,lbuf,llen,NULL)) > 0) {
+	while ((rs = breadlns(fp,lbuf,llen,nullptr)) > 0) {
 	    if (lbuf[rs - 1] == '\n') break ;
 	}
 	return rs ;

@@ -49,16 +49,16 @@ struct systems_head {
 
 EXTERNC_begin
 
-extern int	systems_open(SYSTEMS *,cchar *) noex ;
-extern int	systems_fileadd(SYSTEMS *,cchar *) noex ;
-extern int	systems_filedel(SYSTEMS *,cchar *) noex ;
-extern int	systems_check(SYSTEMS *,time_t) noex ;
-extern int	systems_curbegin(SYSTEMS *,SYSTEMS_CUR *) noex ;
-extern int	systems_curend(SYSTEMS *,SYSTEMS_CUR *) noex ;
-extern int	systems_enum(SYSTEMS *,SYSTEMS_CUR *,SYSTEMS_ENT **) noex ;
-extern int	systems_fetch(SYSTEMS *,cchar *,SYSTEMS_CUR *,
-			SYSTEMS_ENT **) noex ;
-extern int	systems_close(SYSTEMS *) noex ;
+extern int	systems_open(systems *,cchar *) noex ;
+extern int	systems_fileadd(systems *,cchar *) noex ;
+extern int	systems_filedel(systems *,cchar *) noex ;
+extern int	systems_check(systems *,time_t) noex ;
+extern int	systems_curbegin(systems *,systems_cur *) noex ;
+extern int	systems_curend(systems *,systems_cur *) noex ;
+extern int	systems_enum(systems *,systems_cur *,systems_ent **) noex ;
+extern int	systems_fetch(systems *,cchar *,systems_cur *,
+			systems_ent **) noex ;
+extern int	systems_close(systems *) noex ;
 
 EXTERNC_end
 

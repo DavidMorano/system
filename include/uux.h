@@ -43,38 +43,33 @@ struct uux_flags {
 } ;
 
 struct uux_head {
-	uint		magic ;
 	LOGFILE		lh ;
 	UUX_FL		f ;
+	uint		magic ;
 	int		fd ;
 	int		tlen ;
 } ;
 
+typedef	UUX		uux ;
+typedef	UUX_FL		uux_fl ;
 
-#if	(! defined(UUX_MASTER)) || (UUX_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uux_open(UUX *,SYSDIALER_ARGS *,
-		const char *,const char *,const char **) ;
-extern int uux_reade(UUX *,char *,int,int,int) ;
-extern int uux_recve(UUX *,char *,int,int,int,int) ;
-extern int uux_recvfrome(UUX *,char *,int,int,void *,int *,int,int) ;
-extern int uux_recvmsge(UUX *,struct msghdr *,int,int,int) ;
-extern int uux_write(UUX *,const char *,int) ;
-extern int uux_send(UUX *,const char *,int,int) ;
-extern int uux_sendto(UUX *,const char *,int,int,void *,int) ;
-extern int uux_sendmsg(UUX *,struct msghdr *,int) ;
-extern int uux_shutdown(UUX *,int) ;
-extern int uux_close(UUX *) ;
+		cchar *,cchar *,cchar **) noex ;
+extern int uux_reade(UUX *,char *,int,int,int) noex ;
+extern int uux_recve(UUX *,char *,int,int,int,int) noex ;
+extern int uux_recvfrome(UUX *,char *,int,int,void *,int *,int,int) noex ;
+extern int uux_recvmsge(UUX *,MSGHDR *,int,int,int) noex ;
+extern int uux_write(UUX *,cchar *,int) noex ;
+extern int uux_send(UUX *,cchar *,int,int) noex ;
+extern int uux_sendto(UUX *,cchar *,int,int,void *,int) noex ;
+extern int uux_sendmsg(UUX *,MSGHDR *,int) noex ;
+extern int uux_shutdown(UUX *,int) noex ;
+extern int uux_close(UUX *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* UUX_MASTER */
 
 #endif /* UUX_INCLUDE */
 

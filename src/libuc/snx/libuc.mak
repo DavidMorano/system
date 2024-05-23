@@ -860,6 +860,10 @@ snwcpy.o:		snwcpy.dir
 snwcpy.dir:
 	makesubdir $@
 
+wsnx.o:			wsnx.dir
+wsnx.dir:
+	makesubdir $@
+
 # MATXSTR
 matxstr.o:		matxstr.dir
 matxstr.dir:

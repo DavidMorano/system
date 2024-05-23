@@ -78,34 +78,16 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	hasuc(const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
 
 /* exported variables */
 
-HOLIDAYS_OBJ	holidays = {
+holidays_obj	holidays_mod = {
 	"holidays",
-	sizeof(HOLIDAYS),
-	sizeof(HOLIDAYS_CUR)
+	sizeof(holidays),
+	sizeof(holidays_cur)
 } ;
 
 

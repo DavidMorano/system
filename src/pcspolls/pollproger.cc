@@ -1,9 +1,8 @@
-/* pollproger (POLLPROG) */
+/* pollproger SUPPORT (POLLPROG) */
+/* lang=C++20 */
 
 /* this is a PCSPOLLS module for running the PCSPOLL program */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,21 +19,21 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
 
-	This object is a PCSPOLLS module for running the PCSPOLL program.
+	Description:
+	This object is a PCSPOLLS module for running the PCSPOLL
+	program.
 
 	Synopsis:
-
 	int pollprog_start(op,pr,sn,envv,pcp)
 	PCSPOLLS	*op ;
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 
 	Arguments:
-
 	op		object pointer
 	pr		program-root
 	sn		search-name (of program calling us)
@@ -49,11 +48,11 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<pcsconf.h>
 #include	<storebuf.h>
@@ -70,38 +69,23 @@
 #define	POLLPROG_MAGIC	0x88773422
 
 
-/* typedefs */
+/* imported namespaces */
 
-typedef int	(*thrsub_t)(void *) ;
+
+/* local typedefs */
+
+extern "C" {
+    typedef int	(*thrsub_f)(void *) noex ;
+}
+
+typedef mainv	mv ;
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-
-extern int	pollprogcheck(cchar *,cchar *,cchar **,PCSCONF *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*timestr_log(time_t,char *) ;
+extern "C" {
+    extern int	pollprogcheck(cchar *,cchar *,cchar **,PCSCONF *) noex ;
+}
 
 
 /* external variables */
@@ -116,15 +100,15 @@ struct pollprog_flags {
 } ;
 
 struct pollprog_head {
-	uint		magic ;
-	POLLPROG_FL	f ;
+	cchar		*a ;		/* memory allocation */
+	cchar		*pr ;
+	cchar		*sn ;
+	mainv		envv ;
+	PCSCONF		*pcp ;
 	pid_t		pid ;
 	pthread_t	tid ;
-	const char	*a ;		/* memory allocation */
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
-	PCSCONF		*pcp ;
+	POLLPROG_FL	f ;
+	uint		magic ;
 	volatile int	f_exiting ;
 } ;
 
@@ -147,32 +131,23 @@ static int	pollprog_worker(POLLPROG *) ;
 
 /* exported variables */
 
-PCSPOLLS_NAME	pollprog = {
+pcspolls_name	pollprog_mod = {
 	"pollprog",
-	sizeof(POLLPROG),
+	sizeof(pollprog),
 	0
 } ;
 
 
 /* exported subroutines */
 
-
-int pollprog_start(POLLPROG *op,cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
-{
+int pollprog_start(POLLPROG *op,cc *pr,cc *sn,mv envv,PCSCONF *pcp) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("pollprog_start: ent\n") ;
-	debugprintf("pollprog_start: pr=%s\n",pr) ;
-	debugprintf("pollprog_start: sn=%s\n",sn) ;
-	debugprintf("pollprog_start: pcp={%p}\n",pcp) ;
-#endif
-
 	if (envv == NULL) envv = environ ;
 
-	memset(op,0,sizeof(POLLPROG)) ;
+	memclear(op) ;
 	op->envv = envv ;
 	op->pcp = pcp ;
 	op->pid = getpid() ;
@@ -180,7 +155,7 @@ int pollprog_start(POLLPROG *op,cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
 	if ((rs = pollprog_argsbegin(op,pr,sn)) >= 0) {
 	    if ((pr != NULL) && (sn != NULL)) {
 	        pthread_t	tid ;
-	        thrsub_t	thr = (thrsub_t) pollprog_worker ;
+	        thrsub_f	thr = (thrsub_f) pollprog_worker ;
 	        if ((rs = uptcreate(&tid,NULL,thr,op)) >= 0) {
 	            op->f.working = TRUE ;
 		    op->tid = tid ;
@@ -317,9 +292,9 @@ static int pollprog_worker(POLLPROG *op)
 {
 	PCSCONF		*pcp = op->pcp ;
 	int		rs ;
-	const char	**envv = op->envv ;
-	const char	*pr = op->pr ;
-	const char	*sn = op->sn ;
+	cchar	**envv = op->envv ;
+	cchar	*pr = op->pr ;
+	cchar	*sn = op->sn ;
 
 #if	CF_DEBUGS
 	debugprintf("pollprog_worker: ent\n") ;

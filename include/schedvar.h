@@ -1,6 +1,9 @@
 /* schedvar HEADER */
 /* lang=C20 */
 
+/* creates the substitution varaiables for 'scheduled' type operations */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

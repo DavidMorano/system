@@ -56,6 +56,8 @@
 #include	<utypealiases.h>
 #include	<localmisc.h>
 
+#include	"dfibonacci.h"
+
 
 /* local defines */
 
