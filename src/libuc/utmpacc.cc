@@ -66,8 +66,11 @@
 #include	<opentmp.h>
 #include	<filemap.h>
 #include	<filer.h>
-#include	<mkchar.h>
+#include	<snx.h>
 #include	<strnxcmp.h>		/* <- for |strnncmp(3uc)| */
+#include	<mkchar.h>
+#include	<isoneof.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"utmpacc.h"
@@ -87,6 +90,14 @@
 
 #define	ENT			utmpaccent
 #define	ARG			utmpacc_arg
+
+#ifndef	TERMBUFLEN
+#define	TERMBUFLEN		256	/* terminal-device buffer length */
+#endif
+
+#ifndef	DEVPREFIX
+#define	DEVPREFIX	"/dev/"
+#endif
 
 
 /* imported namespaces */
@@ -187,11 +198,13 @@ namespace {
 	int irunlevel() noex ;
 	int iusers(int) noex ;
 	int entsid(ARG *,pid_t) noex ;
+	int entstat(ARG *,pid_t) noex ;
 	int entline(ARG *,cchar *,int) noex ;
 	int stats(utmpacc_sb *) noex ;
 	int extract(int) noex ;
 	int scan(time_t) noex ;
 	int getentsid(ARG *,pid_t) noex ;
+	int getentstat(ARG *,pid_t) noex ;
 	int getentline(ARG *,cchar *,int) noex ;
 	int getextract(int) noex ;
     } ; /* end struct (utmpacc) */
@@ -206,9 +219,19 @@ extern "C" {
     static void	utmpacc_exit() noex ;
 }
 
-static int utmpx_eterm(CUTMPX *) noex ;
+static bool isourtype(UTMPX *up) noex {
+	bool	f = false ;
+	f = f || (up->ut_type == UTMPACC_TPROCINIT) ;
+	f = f || (up->ut_type == UTMPACC_TPROCUSER) ;
+	f = f || (up->ut_type == UTMPACC_TPROCLOGIN) ;
+	return f ;
+}
 
-static int utmpaccent_loada(ARG *,CUTMPX *) noex ;
+static int	utmpx_eterm(CUTMPX *) noex ;
+
+static int	utmpaccent_loada(ARG *,CUTMPX *) noex ;
+
+static bool	isNotTerm(int) noex ;
 
 
 /* local variables */
@@ -219,6 +242,14 @@ static int utmpaccent_loada(ARG *,CUTMPX *) noex ;
 [[maybe_unused]] constexpr int 		lhost = UTMPACCENT_LHOST ;
 
 static utmpacc		utmpacc_data ;
+
+constexpr int		rsnoterm[] = {
+	SR_BADF,
+	SR_BADFD,
+	SR_NOTTY,
+	SR_ACCESS,
+	0
+} ;
 
 
 /* exported variables */
@@ -249,6 +280,11 @@ int utmpacc_users(int w) noex {
 int utmpacc_entsid(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
 	utmpacc_arg	a(0,uep,uebuf,uelen) ;
 	return utmpacc_data.entsid(&a,sid) ;
+}
+
+int utmpacc_entstat(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
+	utmpacc_arg	a(0,uep,uebuf,uelen) ;
+	return utmpacc_data.entstat(&a,sid) ;
 }
 
 int utmpacc_entline(ENT *uep,char *uebuf,int uelen,cchar *lp,int ll) noex {
@@ -643,6 +679,36 @@ int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 }
 /* end method (utmpacc::entsid) */
 
+int utmpacc::entstat(ARG *ap,pid_t sid) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		ffound = false ;
+	if (ap && ap->uep && ap->uebuf) {
+	    sigblocker	b ;
+	    memclear(ap->uep) ;
+	    ap->uebuf[0] = '\0' ;
+	    if (sid <= 0) sid = getsid(0) ;
+	    if ((rs = b.start) >= 0) {
+	        if ((rs = init) >= 0) {
+	            if ((rs = capbegin(-1)) >= 0) {
+		        if ((rs = begin) >= 0) {	
+	                    ap->dt = time(nullptr) ;
+	                    rs = getentstat(ap,sid) ;
+			    ffound = rs ;
+	                } /* end if */
+	                rs1 = capend ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (capture-exclusion) */
+	        } /* end if (init) */
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigblock) */
+	    if ((rs >= 0) && (ap->uep->line == nullptr)) rs = SR_NOTFOUND ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? ffound : rs ;
+}
+/* end method (utmpacc::entstat) */
+
 int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -815,6 +881,47 @@ int utmpacc::getentsid(ARG *ap,pid_t sid) noex {
 }
 /* end method (utmpacc::getentsid) */
 
+int utmpacc::getentstat(ARG *ap,pid_t sid) noex {
+	UTMPX		*up ;
+	cint		tlen = TERMBUFLEN ;
+	int		rs ;
+	int		rs1 ;
+	int		ffound = false ;
+	cchar		*devprefix = DEVPREFIX ;
+	char		tbuf[tlen+1] ;
+	if ((rs = sncpy(tbuf,tlen,devprefix)) >= 0) {
+	    cint	tl = rs ;
+	    setutxent() ;
+	    while ((up = getutxent()) != nullptr) {
+	       if (isourtype(up)) {
+		    cint	ll = lline ;
+		    cchar	*lp = up->ut_line ;
+	            if ((rs = snaddw(tbuf,tlen,tl,lp,ll)) >= 0) {
+			cint	of = (O_RDONLY | O_NOCTTY) ;
+			cmode	om = 0666 ;
+			if ((rs = u_open(tbuf,of,om)) >= 0) {
+			    cint	fd = rs ;
+			    if ((rs = uc_tcgetsid(fd)) >= 0) {
+    				if (sid == rs) {
+				    ffound = true ;
+				    rs = utmpaccent_loada(ap,up) ;
+				}
+			    } else if (isNotTerm(rs)) {
+				rs = SR_OK ;
+			    } /* end if (uc_tcgetsid) */
+			    rs1 = u_close(fd) ;
+			    if (rs >= 0) rs = rs1 ;
+			} else if (isNotAccess(rs)) {
+			    rs = SR_OK ;
+			}
+		    } /* end if (snadd) */
+	       } /* end if (our-type) */
+	    } /* end while */
+	} /* end if (sncpy) */
+	return (rs >= 0) ? ffound : rs ;
+}
+/* end method (utmpacc::getentstat) */
+
 int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
 	CUTMPX		*up ;
 	int		rs = SR_OK ;
@@ -917,5 +1024,9 @@ static int utmpx_eterm(CUTMPX *) noex {
 }
 
 #endif /* defined(SYSHASUTMP_EXIT) && (SYSHASUTMP_EXIT > 0) */
+
+static bool isNotTerm(int rs) noex {
+	return isOneOf(rsnoterm,rs) ;
+}
 
 

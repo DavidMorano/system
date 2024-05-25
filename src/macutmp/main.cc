@@ -80,7 +80,7 @@
 #endif
 
 #ifndef	TERMBUFLEN
-#define	TERMBUFLEN	256
+#define	TERMBUFLEN	256		/* terminal-device buffer length */
 #endif
 
 #ifndef	HOSTLEN

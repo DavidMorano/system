@@ -9,7 +9,7 @@
 
 	= 1998-03-01, David A­D­ Morano
 	This object supports the FMTSTR facility and serves as the
-	measn to parse format-specifications.
+	means to parse format-specifications.
 
 */
 
@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	fmtspec
+
+	Description:
 	This object parses a format-specification from the |printf(3c)|
 	family-type subroutines.  This object, although it can be
 	used alone (for whatever purpose), normally serves as a
@@ -94,11 +98,8 @@ constexpr fmtproc_m	mems[] = {
 int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (ap && sp) {
-	    fmtspec_head	*hp = this ;
-	    if ((rs = memclear(hp)) >= 0) {
-	        fmtproc		fo(this,sp,sl) ;
-		rs = fo(ap) ;
-	    }
+	    fmtproc	fo(this,sp,sl) ;
+	    rs = fo(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? int(fcode) : rs ;
 }
@@ -152,7 +153,7 @@ int fmtproc::widther(va_list ap) noex {
 	short		width = -1 ;
         if (sl > 0) {
             if (*sp == '*') {
-                width = (int) va_arg(ap,int) ;
+                width = (short) va_arg(ap,int) ;
                 (sl--,sp++) ;
                 if (width < 0) {
                     width = -width ;
@@ -176,7 +177,7 @@ int fmtproc::precer(va_list ap) noex {
 	if ((sl > 0) && (*sp == '.')) {
             (sl--,sp += 1) ;
             if (*sp == '*') {
-                prec = (int) va_arg(ap,int) ;
+                prec = (short) va_arg(ap,int) ;
                 (sl--,sp += 1) ;
             } else { /* the default if nothing is zero-precision */
                 prec = 0 ; /* default if nothing specified */
@@ -243,15 +244,13 @@ int fmtproc::moder(va_list) noex {
 }
 
 int fmtproc::coder(va_list) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_INVALID ;
 	if (sl > 0) {
 	    op->f = f ;
             op->fcode = mkchar((sl--,*sp++)) ;
             op->skiplen = (sp - fsp) ;
 	    rs = int(op->fcode) ;
-        } else {
-            rs = SR_INVALID ;
-        } 
+        } /* end if (valid) */
 	return rs ;
 }
 
