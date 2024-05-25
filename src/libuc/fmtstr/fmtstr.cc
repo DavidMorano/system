@@ -1,4 +1,4 @@
-/* format */
+/* fmtstr SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -324,9 +324,12 @@ static T rshiftx(T v,int n) noex {
 static int	isourbad(int ch) noex ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
+int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	SUBINFO		si, *sip = &si ;
 	FMTSPEC		fs, *fsp = &fs ;
 	const int	tlen = BUFLEN ;

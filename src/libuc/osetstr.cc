@@ -74,6 +74,7 @@ int osetstr_start(osetstr *op,int n) noex {
 	if (op) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
 	    if (setstr *setp ; (setp = new(nothrow) setstr) != np) {
 	        op->setp = setp ;
 		op->magic = OSETSTR_MAGIC ;

@@ -140,8 +140,9 @@ template<typename ... Args>
 static int grmems_ctor(grmems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
+	    grmems_head	*hp = static_cast<grmems_head *>(op) ;
 	    cnullptr	np{} ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(hp) ;
 	    rs = SR_NOMEM ;
 	    if ((op->lrup = new(nothrow) pq) != np) {
 		rs = SR_OK ;

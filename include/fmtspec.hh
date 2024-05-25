@@ -31,9 +31,9 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstdint>
+#include	<cstdarg>
 #include	<cstring>
 #include	<wchar.h>
-#include	<stdarg.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -46,7 +46,7 @@
 #define	FMTSPEC_FL	struct fmtspec_flags
 
 
-enum lenmods {
+enum lenmods : short {
 	lenmod_none,
 	lenmod_half,
 	lenmod_long,
@@ -78,6 +78,7 @@ struct fmtspec_head {
 	short		width ;		/* <0 turns off */
 	short		prec ;		/* <0 turns off */
 	short		lenmod ;	/* length modifier */
+	short		skiplen ;	/* skip-specification-length */
 } ;
 
 struct fmtspec ;
@@ -85,7 +86,7 @@ struct fmtspec ;
 struct fmtspec_co {
 	fmtspec		*op = nullptr ;
 	int		w = -1 ;
-	void operator () (vecstr *p,int m) noex {
+	void operator () (fmtspec *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -98,8 +99,7 @@ struct fmtspec : fmtspec_head {
 	fmtspec() noex : fmtspec_head{} {
 	    finish(this,fmtspecmem_finish) ;
 	} ;
-	int start(cchar *,int) noex ;
-	int ifinish() noex ;
+	int start(va_list,cchar *,int) noex ;
 } ;
 
 typedef	FMTSPEC_FL	fmtspec_fl ;

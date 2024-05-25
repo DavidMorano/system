@@ -19,11 +19,13 @@
 
 /*******************************************************************************
 
+	This object parses a format-specification from the |print(3c)|
+	famnily-type subroutines.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cwhcar>		/* |wchar_t| */
+#include	<cwchar>		/* |wchar_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
@@ -36,7 +38,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"fmtspec.h"
+#include	"fmtspec.hh"
 
 
 /* local defines */
@@ -59,31 +61,35 @@
 
 /* exported subroutines */
 
-int fmtspec::start(cchar *sp,int sl) noex {
+int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
+	fmtspec_head	*hp = this ;
 	int		rs = SR_OK ;
-        op->width = -1 ;
-        op->prec = -1 ;
-        f_continue = true ;
+	cchar		*fsp = sp ;
+        bool		f_continue = true ;
+	(void) sl ;
+	memclear(hp) ;
+        width = -1 ;
+        prec = -1 ;
         while (f_continue) {
-            const int       ch = mkchar(sp[0]) ;
+            cint       ch = mkchar(sp[0]) ;
             switch (ch) {
             case '-':
-                op->f.left = true ;
+                f.left = true ;
                 break ;
             case '+':
-                op->f.plus = true ;
+                f.plus = true ;
                 break ;
             case '\'':
-                op->f.thousands = true ;
+                f.thousands = true ;
                 break ;
             case '0':
-                op->f.zerofill = true ;
+                f.zerofill = true ;
                 break ;
             case '#':
-                op->f.alternate = true ;
+                f.alternate = true ;
                 break ;
             case ' ':
-                op->f.space = true ;
+                f.space = true ;
                 break ;
             default:
                 f_continue = false ;
@@ -95,13 +101,12 @@ int fmtspec::start(cchar *sp,int sl) noex {
         } /* end while */
         /* now comes a digit string which may be a '*' */
         {
-            int     width = -1 ;
             if (*sp == '*') {
                 width = (int) va_arg(ap,int) ;
                 sp += 1 ;
                 if (width < 0) {
                     width = -width ;
-                    op->f.left = (! op->f.left) ;
+                    f.left = (! f.left) ;
                 }
             } else if ((*sp >= '0') && (*sp <= '9')) {
                 width = 0 ;
@@ -109,70 +114,69 @@ int fmtspec::start(cchar *sp,int sl) noex {
                     width = width * 10 + (*sp++ - '0') ;
                 }
             } /* end if (width) */
-
-            if (width >= 0) op->width = width ;
-
         } /* end if (width) */
-
         /* maybe a decimal point followed by more digits (or '*') */
-
         if (*sp == '.') {
-            int     prec = -1 ;
             sp += 1 ;
             if (*sp == '*') {
                 prec = (int) va_arg(ap,int) ;
-                fmt += 1 ;
+                sp += 1 ;
             } else { /* the default if nothing is zero-precision */
                 prec = 0 ; /* default if nothing specified */
                 while ((*sp >= '0') && (*sp <= '9')) {
                     prec = prec * 10 + (*sp++ - '0') ;
                 }
             }
-            if (prec >= 0) op->prec = prec ;
-
         } /* end if (a precision was specified) */
-
         /* check for a format length-modifier */
+	{
+	    int		nl = 0 ;
+	    f_continue = true ;
+            while (f_continue) {
+                cint	ch = mkchar(*sp) ;
+                switch (ch) {
+                case 'h':
+                    lenmod = lenmod_half ;
+                    break ;
+                case 'l':
+                    lenmod = lenmod_long ;
+		    nl += 1 ;
+                    break ;
+                case 'L':
+                    lenmod = lenmod_longlong ;
+                    break ;
+                case 'D':
+                    lenmod = lenmod_longdouble ;
+                    break ;
+                case 'w':
+                    lenmod = lenmod_wide ;
+                    break ;
+	        default:
+		    f_continue = false ;
+		    break ;
+                } /* end switch */
+	    } /* end while */
+	    if (nl > 1) {
+                lenmod = lenmod_longlong ;
+            } /* end if (longlong) */
+	} /* end block (possible format-length specifier) */
+        fcode = mkchar(*sp++) ;
+        skiplen = (sp - fsp) ;
+	return rs ;
+}
+/* end method (fmtspec::start) */
 
-        {
-            const int       ch = mkchar(*sp) ;
-
-            switch (ch) {
-            case 'h':
-                op->lenmod = lenmod_half ;
-                sp += 1 ;
-                break ;
-            case 'l':
-                op->lenmod = lenmod_long ;
-                sp += 1 ;
-                break ;
-            case 'L':
-                op->lenmod = lenmod_longlong ;
-                sp += 1 ;
-                break ;
-            case 'D':
-                op->lenmod = lenmod_longdouble ;
-                sp += 1 ;
-                break ;
-            case 'w':
-                op->lenmod = lenmod_wide ;
-                sp += 1 ;
-                break ;
-            } /* end switch */
-
-            if (*sp == 'l') {
-                enum lenmods m = op->lenmod ;
-                if (m == lenmod_long) {
-                    op->lenmod = lenmod_longlong ;
-                } else {
-                    op->lenmod = lenmod_long ;
-                }
-                sp += 1 ;
-            }
-
-        } /* end block (length specifier) */
-        op->fcode = mkchar(*sp++) ;
-        nfmt = (sp - fmt) ;
-        } /* end block (loading up the FMTSPEC object) */
+fmtspec_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fmtspecmem_finish:
+		rs = op->skiplen ;
+		break ;
+	    } /* end switch */
+	}
+	return rs ;
+}
+/* end method (fmtspec_co::operator) */
 
 
