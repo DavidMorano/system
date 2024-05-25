@@ -1,16 +1,16 @@
-/* rfile */
+/* rfile SUPPORT */
+/* lang=C++20 */
 
 /* subroutines to write to remote files or read from them */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	- 1996-11-21, Dave morano
-        This subroutine code was started by copying from some other program (one
-        of the other PCS remote host access programs or subroutines).
+	This subroutine code was started by copying from some other
+	program (one of the other PCS remote host access programs
+	or subroutines).
 
 */
 
@@ -18,17 +18,17 @@
 
 /*******************************************************************************
 
+	Name:
+	rfile
+
 	Description:
-
-        The subroutine either returns a FD for the remote file or it returns an
-        error which is indicated by a negative valued return.
-
-        Depending on the arguments to the subroutine call, both the INET 'exec'
-        or 'shell' services may be invoked to try and make a connection to the
-        remote host.
+	The subroutine either returns a FD for the remote file or
+	it returns an error which is indicated by a negative valued
+	return.  Depending on the arguments to the subroutine call,
+	both the INET 'exec' or 'shell' services may be invoked to
+	try and make a connection to the remote host.
 
 	Synopsis:
-
 	int rfile(rhost,auth,rfilename,flags,mode)
 	cchar	rhost[] ;
 	cchar	rfilename[] ;
@@ -47,9 +47,7 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -81,10 +79,14 @@
 
 /* external subroutines */
 
-extern int	reade() ;
-extern int	getehostname() ;
+extern "C" {
+    extern int	reade() noex ;
+    extern int	getehostname() noex ;
+}
 
-extern char	*strbasename() ;
+extern "C" {
+    extern char	*strbasename() noex ;
+}
 
 
 /* forward subroutines */
@@ -98,15 +100,12 @@ static int	hostequiv() ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int rfile(rhost,auth,rfilename,flags,mode)
-cchar	rhost[] ;
-cchar	rfilename[] ;
-REX_AUTH	*auth ;
-int		flags, mode ;
-{
+int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 	REX_FL		f ;
 	REX_AUTH	aa, *ap ;
 	NETFILE_ENT	*mp ;
@@ -139,10 +138,6 @@ int		flags, mode ;
 
 /* start by opening a connection to the remote machine */
 
-#if	CF_DEBUGS
-	debugprintf("rfile: creating remote command\n") ;
-#endif
-
 	f.keepalive = FALSE ;
 	if (flags & O_KEEPALIVE) 
 		f.keepalive = TRUE ;
@@ -154,10 +149,6 @@ int		flags, mode ;
 	args[2] = buf ;
 	args[3] = NULL ;
 	fd = rex(rhost,auth,&f,prog_shell,args,NULL,&mp) ;
-
-#if	CF_DEBUGS
-	debugprintf("rfile: REX rs=%d\n",fd) ;
-#endif
 
 	if (fd < 0) {
 
@@ -175,10 +166,6 @@ int		flags, mode ;
 /* we have a connection, let's try to make the best use of it ! */
 
 	if ((flags & O_WRONLY) || (flags & O_APPEND)) {
-
-#if	CF_DEBUGS
-	    debugprintf("rfile: writing only (or append)\n") ;
-#endif
 
 	    bp = buf ;
 	    len = 0 ;
@@ -213,17 +200,9 @@ int		flags, mode ;
 
 /* send it all over there */
 
-#if	CF_DEBUGS
-	    debugprintf("rfile: worm length=%d\n",len) ;
-#endif
-
 	    l = 0 ;
 	    while (((len - l) > 0) && ((rs = u_write(fd,buf + l,len - l)) > 0))
 	        l += rs ;
-
-#if	CF_DEBUGS
-	    debugprintf("rfile: back from 'write' w/ rs=%d\n",rs) ;
-#endif
 
 	    if (rs < 0)
 	        srs = rs ;
@@ -231,10 +210,6 @@ int		flags, mode ;
 /* send over the "write" program */
 
 	    if (srs >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("rfile: sending over the worm\n") ;
-#endif
 
 	        len = INCFILELEN_rfilewrite ;
 	        bp = (char *) incfile_rfilewrite ;
@@ -246,19 +221,11 @@ int		flags, mode ;
 	        if (rs < 0)
 	            srs = rs ;
 
-#if	CF_DEBUGS
-	        debugprintf("rfile: sent worm w/ srs=%d\n",srs) ;
-#endif
-
 	    } /* end if */
 
 	    close(fd) ;
 
 	} else {
-
-#if	CF_DEBUGS
-	    debugprintf("rfile: unimplemented file access mode\n") ;
-#endif
 
 	    close(fd) ;
 
@@ -266,10 +233,6 @@ int		flags, mode ;
 	}
 
 /* try to execute the worm */
-
-#if	CF_DEBUGS
-	debugprintf("rfile: thinking about executing the worm\n") ;
-#endif
 
 	fd = -1 ;
 	if (srs >= 0) {
@@ -279,47 +242,23 @@ int		flags, mode ;
 	    ap = auth ;
 	    if ((ap != NULL) && (mp != NULL)) {
 
-#if	CF_DEBUGS
-	        debugprintf("rfile: had authorization & NETRC entry\n") ;
-#endif
-
 	        memcpy(&aa,ap,sizeof(struct rex_auth)) ;
-
-#if	CF_DEBUGS
-	        debugprintf( "rfile: made AUTH copy\n") ;
-#endif
 
 	        aa.restrict = "rcmd" ;
 	        if (mp->login != NULL)
 	            aa.username = mp->login ;
 
-#if	CF_DEBUGS
-	        debugprintf( "rfile: made AUTH login copy\n") ;
-#endif
-
 	        if (mp->password != NULL)
 	            aa.password = mp->password ;
-
-#if	CF_DEBUGS
-	        debugprintf( "rfile: made AUTH password copy\n") ;
-#endif
 
 	        ap = &aa ;
 
 	    } /* end if (changing the authorization) */
 
-#if	CF_DEBUGS
-	    debugprintf( "rfile: about to execute REX (again)\n") ;
-#endif
-
 	    args[0] = "rfile" ;
 	    args[1] = jobfname ;
 	    args[2] = NULL ;
 	    fd = rex(rhost,ap,&f,"/bin/sh",args,&fd2,NULL) ;
-
-#if	CF_DEBUGS
-	    debugprintf("rfile: REX rs=%d\n",fd) ;
-#endif
 
 	    if (fd < 0) {
 
@@ -332,40 +271,24 @@ int		flags, mode ;
 
 /* check if we have the go ahead signal from the other end */
 
-#if	CF_DEBUGS
-	    debugprintf("rfile: check for signal from other end\n") ;
-#endif
-
 	    len = 0 ;
 	    while (((l = reade(fd2,buf + len,1,FM_NONE,15)) > 0)
 	        && (buf[len] != '\n'))
 	        len += l ;
 
-#if	CF_DEBUGS
-	    debugprintf("rfile: out of signal check 1, l=%d len=%d buf=%W\n",
-	        l,len,buf,len) ;
-#endif
-
-	    if (l < 0)
+	    if (l < 0) {
 	        srs = l ;
-
-	    else if ((len < 1) || (strncmp(buf,"OK",2) != 0))
+	    } else if ((len < 1) || (strncmp(buf,"OK",2) != 0)) {
 	        srs = SR_ACCES ;
-
-#if	CF_DEBUGS
-	    debugprintf("rfile: out of signal check, srs=%d\n",srs) ;
-#endif
+	    }
 
 	} /* end if (we attempted to execute the worm) */
 
-#if	CF_DEBUGS
-	debugprintf("rfile: finishing up\n") ;
-#endif
-
 	u_close(fd2) ;
 
-	if ((srs < 0) && (fd >= 0)) 
-		u_close(fd) ;
+	if ((srs < 0) && (fd >= 0))  {
+	    u_close(fd) ;
+	}
 
 	u_unlink(jobfname) ;
 

@@ -37,9 +37,7 @@ LINT= lint
 
 DEFS +=
 
-
 INCS += fmtstr.h
-
 
 LIBS +=
 
@@ -47,6 +45,9 @@ LIBS +=
 INCDIRS +=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)

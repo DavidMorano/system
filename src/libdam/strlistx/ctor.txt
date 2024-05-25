@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mailaddrquote_ctor(mailaddrquote *op,Args ... args) noex {
+static int sigman_ctor(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int mailaddrquote_ctor(mailaddrquote *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailaddrquote_ctor) */
+/* end subroutine (sigman_ctor) */
 
-static int mailaddrquote_dtor(mailaddrquote *op) noex {
+static int sigman_dtor(sigman *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailaddrquote_dtor) */
+/* end subroutine (sigman_dtor) */
 
 template<typename ... Args>
-static inline int mailaddrquote_magic(mailaddrquote *op,Args ... args) noex {
+static inline int sigman_magic(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailaddrquote_magic) */
+/* end subroutine (sigman_magic) */

@@ -56,12 +56,12 @@ LDFLAGS= $(MAKELDFLAGS)
 
 OBJ0_VARSUB= varsub_main.o
 OBJ1_VARSUB= varsub_loadfile.o
-OBJ2_VARSUB= varsub_extras.o
-OBJ3_VARSUB= varsub_dumpfd.o
+OBJ2_VARSUB= varsub_addvec.o
+OBJ3_VARSUB= 
 
 
 OBJA_VARSUB= obj0_varsub.o obj1_varsub.o
-OBJB_VARSUB= obj2_varsub.o obj3_varsub.o
+OBJB_VARSUB= obj2_varsub.o 
 
 OBJ_VARSUB= $(OBJA_VARSUB) $(OBJB_VARSUB)
 
@@ -123,8 +123,7 @@ obj3_varsub.o:	$(OBJ3_VARSUB)
 
 
 varsub_main.o:		varsub_main.cc		$(INCS)
-varsub_dumpfd.o:	varsub_dumpfd.cc	$(INCS)
-varsub_extras.o:	varsub_extras.cc	$(INCS)
+varsub_addvec.o:	varsub_addvec.cc	$(INCS)
 varsub_loadfile.o:	varsub_loadfile.cc	$(INCS)
 
 

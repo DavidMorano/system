@@ -114,6 +114,7 @@ int schedvar_start(SV *op) noex {
 	if (op) {
 	    cint	osz = sizeof(vecstr) ;
 	    void	*vp{} ;
+	    op->magic = 0 ;
 	    if ((rs = uc_malloc(osz,&vp)) >= 0) {
 		vecstr	*slp = vecstrp(vp) ;
 	        cint	ve = SCHEDVAR_NE ;

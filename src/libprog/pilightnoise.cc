@@ -1,12 +1,9 @@
-/* lightnoise SUPPORT */
+/* pilightnoise SUPPORT */
 /* lang=C20 */
 
 /* gather light noise */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable debug print-outs */
-#define	CF_DEBUGMALL	1		/* debug memory allocations */
 
 /* revision history:
 
@@ -20,13 +17,21 @@
 /*******************************************************************************
 
 	Description:
+	pilightnoise
+
+	Desxciption:
 	Gather light noise.
 
 	Synopsis:
-	int lightnoise(PROGINFO *pip,
+	int lightnoise(PROGINFO *pip,...) noex
 
-	$ ecover -d <infile> > <outfile>
+	Arguments:
+	pip		PROGINFO object pointer
+	-
 
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -34,36 +39,25 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<userinfo.h>
-#include	<localmisc.h>
 #include	<hash.h>
 #include	<cfdec.h>
+#include	<isnot.h>
+#include	<localmisc.h>
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proginfo.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	isNotAccess(int) ;
-extern int	isFailOpen(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -78,16 +72,17 @@ extern char	*getourenv(cchar **,cchar *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int lightnoise(PROGINFO *pip,USERINFO *uip,cchar *ofname)
-{
-	struct timeval	tod ;
-	SBUF		hb ;
+int pilightnoise(PROGINFO *pip,USERINFO *uip,cchar *ofname) noex {
+	TIMEVAL		tod ;
+	sbuf		hb ;
 	uint		v = 0 ;
 	uint		hv = 0 ;
-	const int	dlen = BUFLEN ;
+	cint		dlen = BUFLEN ;
 	int		rs ;
 	int		i ;
 	int		bl = 0 ;
@@ -96,32 +91,30 @@ int lightnoise(PROGINFO *pip,USERINFO *uip,cchar *ofname)
 	if ((rs = sbuf_start(&hb,dbuf,dlen)) >= 0) {
 	    pid_t	pid_parent = getppid() ;
 
-/* get some miscellaneous stuff */
-
-	    if (uip->username != NULL)
+	    if (uip->username)
 	        sbuf_strw(&hb,uip->username,-1) ;
 
-	    if (uip->homedname != NULL)
+	    if (uip->homedname)
 	        sbuf_strw(&hb,uip->homedname,-1) ;
 
-	    if (uip->nodename != NULL)
+	    if (uip->nodename)
 	        sbuf_strw(&hb,uip->nodename,-1) ;
 
-	    if (uip->domainname != NULL)
+	    if (uip->domainname)
 	        sbuf_strw(&hb,uip->domainname,-1) ;
 
-	    sbuf_deci(&hb,(int) uip->pid) ;
+	    sbuf_deci(&hb,int(uip->pid)) ;
 
-	    sbuf_decl(&hb,(long) pip->daytime) ;
+	    sbuf_decl(&hb,long(pip->daytime)) ;
 
-	    if (ofname != NULL)
+	    if (ofname)
 	        sbuf_strw(&hb,ofname,-1) ;
 
-	    sbuf_deci(&hb,(int) pid_parent) ;
+	    sbuf_deci(&hb,int(pid_parent)) ;
 
-	    uc_gettimeofday(&tod,NULL) ;
+	    uc_gettimeofday(&tod,nullptr) ;
 
-	    sbuf_buf(&hb,(char *) &tod,sizeof(struct timeval)) ;
+	    sbuf_buf(&hb,(char *) &tod,sizeof(TIMEVAL)) ;
 
 	    bl = sbuf_finish(&hb) ;
 	    if (rs >= 0) rs = bl ;
@@ -131,7 +124,7 @@ int lightnoise(PROGINFO *pip,USERINFO *uip,cchar *ofname)
 
 /* pop in our environment also! */
 
-	for (i = 0 ; pip->envv[i] != NULL ; i += 1) {
+	for (i = 0 ; pip->envv[i] ; i += 1) {
 	    v ^= hash_elf(pip->envv[i],-1) ;
 	}
 	hv ^= v ;
@@ -146,6 +139,6 @@ int lightnoise(PROGINFO *pip,USERINFO *uip,cchar *ofname)
 	pip->hv ;
 	return rs ;
 }
-/* end subroutine (lightnoise) */
+/* end subroutine (pilightnoise) */
 
 

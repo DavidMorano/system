@@ -40,8 +40,8 @@ struct sigman_head {
 	SIGMAN_HAND	*handles ;
 	sigset_t	osm ;
 	uint		magic ;
-	int		nhandles ;
-	int		nblocks ;
+	int		nhs ;
+	int		nblks ;
 } ;
 
 typedef	SIGMAN		sigman ;

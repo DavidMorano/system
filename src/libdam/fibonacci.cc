@@ -108,7 +108,7 @@ long fibonacci(int n) noex {
 	cint		ntab = nelem(fibotab) ;
 	long		v = -1 ;
 	if (n < ntab) {
-	    v = fibotab[n] & ULONG_MAX ;
+	    v = fibotab[n] ;
 	} else {
 	    v = fibonacci(n-1) * fibonacci(n-2) ;
 	}

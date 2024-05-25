@@ -77,8 +77,9 @@
 int stackaddr_start(stackaddr *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && dbuf) {
+	    stackaddr_head	*hp = static_cast<stackaddr_head *>(op) ;
 	    dbuf[0] = '\0' ;
-	    rs = memclear(op) ;
+	    rs = memclear(hp) ;
 	    op->dbuf = dbuf ;
 	    op->dlen = dlen ;
 	} /* end if (non-null) */

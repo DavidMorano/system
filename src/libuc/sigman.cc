@@ -60,6 +60,36 @@ typedef	sigman_hand *	handp ;
 
 /* forward references */
 
+template<typename ... Args>
+static int sigman_ctor(sigman *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    sigman_head		*hp = static_cast<sigman_head *>(op) ;
+	    rs = memclear(hp) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sigman_ctor) */
+
+static int sigman_dtor(sigman *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sigman_dtor) */
+
+template<typename ... Args>
+static inline int sigman_magic(sigman *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SIGMAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (sigman_magic) */
+
 
 /* local variables */
 
@@ -69,133 +99,122 @@ typedef	sigman_hand *	handp ;
 
 /* exported subroutines */
 
-int sigman_start(sigman *iap,cint *blocks,cint *ignores,cint *catches,
+int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 		sigmanhand_f handle) noex {
-	sigset_t	nsm ;
-	int		rs = SR_OK ;
-	int		i ;
-	int		nhandles = 0 ;
-	int		sz ;
-	void		*p ;
-
-	if (iap == nullptr) return SR_FAULT ;
-
-	memclear(iap) ;
-
-	if (handle == nullptr) {
-	    handle = reinterpret_cast<sigmanhand_f>(SIG_IGN) ;
-	}
-
-/* blocks */
-
-	if ((rs >= 0) && (blocks != nullptr)) {
-	    uc_sigsetempty(&nsm) ;
-	    for (i = 0 ; blocks[i] != 0 ; i += 1) {
-	        uc_sigsetadd(&nsm,blocks[i]) ;
+	int		rs ;
+	if ((rs = sigman_ctor(op)) >= 0) {
+	    sigset_t	nsm ;
+	    int		i ;
+	    int		nhs = 0 ;
+	    int		sz ;
+	    void	*p ;
+	    if (handle == nullptr) {
+	        handle = reinterpret_cast<sigmanhand_f>(SIG_IGN) ;
 	    }
-	    iap->nblocks = i ;
-	    pthread_sigmask(SIG_BLOCK,&nsm,&iap->osm) ;
-	} /* end if (blocks) */
-
-/* calculate the allocations size */
-
-	if (ignores != nullptr) {
-	    for (i = 0 ; ignores[i] != 0 ; i += 1) {
-	        nhandles += 1 ;
+	    if ((rs >= 0) && blks) {
+	        uc_sigsetempty(&nsm) ;
+	        for (i = 0 ; blks[i] != 0 ; i += 1) {
+	            uc_sigsetadd(&nsm,blks[i]) ;
+	        }
+	        op->nblks = i ;
+	        pthread_sigmask(SIG_BLOCK,&nsm,&op->osm) ;
+	    } /* end if (blks) */
+	    /* calculate the allocations size */
+	    if (igns) {
+	        for (i = 0 ; igns[i] != 0 ; i += 1) {
+	            nhs += 1 ;
+	        }
 	    }
-	}
-	if (catches != nullptr) {
-	    for (i = 0 ; catches[i] != 0 ; i += 1) {
-	        nhandles += 1 ;
+	    if (cats) {
+	        for (i = 0 ; cats[i] != 0 ; i += 1) {
+	            nhs += 1 ;
+	        }
 	    }
-	}
-
-	sz = (nhandles * sizeof(sigman_hand)) ;
-	if ((rs >= 0) && (nhandles > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
-	    sigman_hand		*hp = handp(p) ;
-	    SIGACTION		san{} ;
-	    SIGACTION		*sap ;
-	    int			hsig ;
-	    int			j = 0 ;
-	    iap->handles = handp(p) ;
-	    iap->nhandles = nhandles ;
-/* ignore these signals */
-	    uc_sigsetempty(&nsm) ;
-	    if (ignores != nullptr) {
-	        for (i = 0 ; ignores[i] != 0 ; i += 1) {
-	            hsig = ignores[i] ;
-	            hp[j].sig = hsig ;
-	            sap = &hp[j].action ;
-	            san.sa_handler = SIG_IGN ;
-	            san.sa_mask = nsm ;
-	            san.sa_flags = 0 ;
-	            rs = u_sigaction(hsig,&san,sap) ;
-	            if (rs < 0) break ;
-	            j += 1 ;
-	        } /* end for */
-	    } /* end if (ignores) */
-
-/* catch (interrupt on) these signals */
-
-	    if ((rs >= 0) && (catches != nullptr)) {
-	        for (i = 0 ; catches[i] != 0 ; i += 1) {
-	            hsig = catches[i] ;
-	            hp[j].sig = hsig ;
-	            sap = &hp[j].action ;
-	            memset(&san,0,sizeof(SIGACTION)) ;
-	            san.sa_handler = handle ;
-	            san.sa_mask = nsm ;
-	            san.sa_flags = 0 ;
-	            rs = u_sigaction(hsig,&san,sap) ;
-	            if (rs < 0) break ;
-	            j += 1 ;
-	        } /* end for */
-	    } /* end if (catches) */
-
+	    sz = (nhs * sizeof(sigman_hand)) ;
+	    if ((rs >= 0) && (nhs > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
+	        sigman_hand		*hp = handp(p) ;
+	        SIGACTION		san{} ;
+	        SIGACTION		*sap ;
+	        int			hsig ;
+	        int			j = 0 ;
+	        op->handles = handp(p) ;
+	        op->nhs = nhs ;
+	        /* ignore these signals */
+	        uc_sigsetempty(&nsm) ;
+	        if (igns) {
+	            for (i = 0 ; igns[i] != 0 ; i += 1) {
+	                hsig = igns[i] ;
+	                hp[j].sig = hsig ;
+	                sap = &hp[j].action ;
+	                san.sa_handler = SIG_IGN ;
+	                san.sa_mask = nsm ;
+	                san.sa_flags = 0 ;
+	                rs = u_sigaction(hsig,&san,sap) ;
+	                if (rs < 0) break ;
+	                j += 1 ;
+	            } /* end for */
+	        } /* end if (igns) */
+	        /* catch (interrupt on) these signals */
+	        if ((rs >= 0) && (cats != nullptr)) {
+	            for (i = 0 ; cats[i] != 0 ; i += 1) {
+	                hsig = cats[i] ;
+	                hp[j].sig = hsig ;
+	                sap = &hp[j].action ;
+	                memclear(&san) ;
+	                san.sa_handler = handle ;
+	                san.sa_mask = nsm ;
+	                san.sa_flags = 0 ;
+	                rs = u_sigaction(hsig,&san,sap) ;
+	                if (rs < 0) break ;
+	                j += 1 ;
+	            } /* end for */
+	        } /* end if (cats) */
+	        if (rs < 0) {
+		    for (i = (j-1) ; i >= 0 ; i -= 1) {
+	  	        hsig = hp[i].sig ;
+		        sap = &hp[i].action ;
+		        u_sigaction(hsig,sap,nullptr) ;
+		    } /* end if */
+	            uc_free(op->handles) ;
+	            op->handles = nullptr ;
+	        } /* end if (error) */
+	    } /* end if (memory allocations) */
+	    if (rs >= 0) {
+	        op->magic = SIGMAN_MAGIC ;
+	    }
 	    if (rs < 0) {
-		for (i = (j-1) ; i >= 0 ; i -= 1) {
-	  	    hsig = hp[i].sig ;
-		    sap = &hp[i].action ;
-		    u_sigaction(hsig,sap,nullptr) ;
-		}
-	        uc_free(iap->handles) ;
-	        iap->handles = nullptr ;
-	    } /* end if (error) */
-	} /* end if (memory allocations) */
-
-	if (rs >= 0) {
-	    iap->magic = SIGMAN_MAGIC ;
-	}
-
+		sigman_dtor(op) ;
+	    }
+	} /* end if (sigman_ctor) */
 	return rs ;
 }
 /* end subroutine (sigman_start) */
 
-int sigman_finish(sigman *iap) noex {
-	int		rs = SR_OK ;
+int sigman_finish(sigman *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (iap == nullptr) return SR_FAULT ;
-	if (iap->magic != SIGMAN_MAGIC) return SR_NOTOPEN ;
-
-	if (iap->handles != nullptr) {
-	    SIGACTION	*sap ;
-	    for (int i = (iap->nhandles-1)  ; i >= 0 ; i -= 1) {
-	        cint	hsig = iap->handles[i].sig ;
-	        sap = &iap->handles[i].action ;
-	        rs1 = u_sigaction(hsig,sap,nullptr) ;
+	if ((rs = sigman_magic(op)) >= 0) {
+	    if (op->handles) {
+	        SIGACTION	*sap ;
+	        for (int i = (op->nhs-1)  ; i >= 0 ; i -= 1) {
+	            cint	hsig = op->handles[i].sig ;
+	            sap = &op->handles[i].action ;
+	            rs1 = u_sigaction(hsig,sap,nullptr) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end for */
+	        rs1 = uc_free(op->handles) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end for */
-	    rs1 = uc_free(iap->handles) ;
-	    if (rs >= 0) rs = rs1 ;
-	    iap->handles = nullptr ;
-	} /* end if */
-
-	if (iap->nblocks > 0) {
-	    pthread_sigmask(SIG_SETMASK,&iap->osm,nullptr) ;
-	}
-
-	iap->magic = 0 ;
+	        op->handles = nullptr ;
+	    } /* end if */
+	    if (op->nblks > 0) {
+	        pthread_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
+	    }
+	    {
+		rs1 = sigman_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sigman_finish) */
