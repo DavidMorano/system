@@ -458,7 +458,7 @@ static int findstat(int pm) noex {
 		    cint	ll = utl_line ;
 		    cchar	*lp = up->ut_line ;
 	            if ((rs = snaddw(tbuf,tlen,tl,lp,ll)) >= 0) {
-			cint	of = O_RDONLY ;
+			cint	of = (O_RDONLY | O_NOCTTY) ;
 			cmode	om = 0666 ;
 			if ((rs = u_open(tbuf,of,om)) >= 0) {
 			    cint	fd = rs ;
