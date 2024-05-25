@@ -55,6 +55,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>		/* for |getsid(3c)| */
 #include	<climits>
+#include	<csignal>		/* |sig_atomic_t| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<atomic>
 #include	<usystem.h>
@@ -106,6 +108,8 @@ using std::atomic_int ;			/* type */
 
 
 /* local typedefs */
+
+typedef volatile sig_atomic_t	vint ;
 
 
 /* external subroutines */
@@ -173,7 +177,7 @@ namespace {
 	UTMPACC_ITEM	nusers[utxproctype_overlast] ;
 	int		maxusers ;
 	int		maxents ;
-	atomic_int	waiters ;
+	vint		waiters ;
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;

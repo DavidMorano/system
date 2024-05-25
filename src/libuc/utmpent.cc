@@ -91,6 +91,7 @@ namespace {
 	operator int () noex ;
 	int trysid() noex ;
 	int tryline() noex ;
+	int trystat() noex ;
     } ;
 }
 
@@ -105,7 +106,8 @@ static int utmpent_load(utmpent *,utmpacc_ent *) noex ;
 
 constexpr ufinder_m	mems[] = {
 	&ufinder::trysid,
-	&ufinder::tryline
+	&ufinder::tryline,
+	&ufinder::trystat,
 } ;
 
 
@@ -204,13 +206,23 @@ int ufinder::trysid() noex {
 }
 
 int ufinder::tryline() noex {
-	static int	oursid = getsid(0) ;
+	static cint	oursid = getsid(0) ;
 	int		rs = SR_OK ;
 	if (sid == oursid) {
 	    static cchar	*line = getenv(VARUTMPLINE) ;
 	    if (line) {
 	        rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
 	    }
+	} /* end if (referencing ourself) */
+	return rs ;
+}
+
+int ufinder::trystat() noex {
+	static cint	oursid = getsid(0) ;
+	int		rs = SR_OK ;
+	if (sid == oursid) {
+	    pid_t	pid = pid_t(oursid) ;
+	    rs = utmpacc_entstat(&ae,aebuf,aelen,pid) ;
 	} /* end if (referencing ourself) */
 	return rs ;
 }
