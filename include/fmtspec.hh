@@ -48,15 +48,19 @@
 
 enum lenmods : short {
 	lenmod_none,
+	lenmod_halfhalf,
 	lenmod_half,
 	lenmod_long,
 	lenmod_longlong,
+	lenmod_imax,
+	lenmod_imaxmax,
 	lenmod_longdouble,
 	lenmod_wide,
 	lenmod_overlast
 } ;
 
 enum fmtspecmems {
+	fmtspecmem_code,
 	fmtspecmem_finish,
 	fmtspecmem_overlast
 } ;
@@ -95,8 +99,10 @@ struct fmtspec_co {
 
 struct fmtspec : fmtspec_head {
 	friend		fmtspec_co ;
+	fmtspec_co	code ;
 	fmtspec_co	finish ;
 	fmtspec() noex : fmtspec_head{} {
+	    code(this,fmtspecmem_code) ;
 	    finish(this,fmtspecmem_finish) ;
 	} ;
 	int start(va_list,cchar *,int) noex ;

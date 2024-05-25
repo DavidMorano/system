@@ -63,6 +63,7 @@
 #include	<cstring>		/* <- |strncmp(3c)| + |strlen(3c)| */
 #include	<iostream>
 #include	<usystem.h>		/* for |u_fstat(3u)| */
+#include	<snx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
@@ -76,10 +77,6 @@
 
 #ifndef	FD_STDIN
 #define	FD_STDIN	0
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
 #endif
 
 #ifndef	TERMBUFLEN
@@ -156,6 +153,7 @@ static int boottime() noex ;
 static int findsid(int) noex ;
 static int findline(int) noex ;
 static int findenv(int) noex ;
+static int findstat(int) noex ;
 static int printutxval(int,UTMPX *) noex ;
 static int sirchr(cchar *,int,int) noex ;
 
@@ -167,7 +165,7 @@ static bool isourtype(UTMPX *up) noex {
 	return f ;
 }
 
-static bool	isNoTerm(int) noex ;
+static bool	isNotTerm(int) noex ;
 
 static char	*strtcpy(char *,cchar *,int) noex ;
 
@@ -222,6 +220,7 @@ constexpr int		rsnoterm[] = {
 	SR_BADF,
 	SR_BADFD,
 	SR_NOTTY,
+	SR_ACCESS,
 	0
 } ;
 
@@ -272,7 +271,9 @@ int main(int argc,mainv argv,mainv) {
 	    default:
 	        if ((rs = findsid(pm)) == rsn) {
 	            if ((rs = findline(pm)) == rsn) {
-			rs = findenv(pm) ;
+			if ((rs = findenv(pm)) == rsn) {
+			    rs = findstat(pm) ;
+			}
 		    }
 	        }
 		break ;
@@ -376,7 +377,7 @@ static int boottime() noex {
 static int findsid(int pm) noex {
 	cint		sid = getsid(0) ;	/* get our SID */
 	UTMPX		*up ;
-	int		rs = SR_NOENT ;
+	int		rs = SR_NOTFOUND ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	   if ((up->ut_pid == sid) && isourtype(up)) {
@@ -409,7 +410,7 @@ static int findline(int pm) noex {
 			rs = printutxval(pm,up) ;
 		    }
 		} /* end if (matched) */
-	    } else if (isNoTerm(rs)) {
+	    } else if (isNotTerm(rs)) {
 		rs = SR_OK ;
 	    } /* end if (ttyname) */
 	} else if (isNotAccess(rs)) {
@@ -439,6 +440,49 @@ static int findenv(int pm) noex {
 	return rs ;
 }
 /* end subroutine (findenv) */
+
+static int findstat(int pm) noex {
+	UTMPX		*up ;
+	static int	sid = getsid(0) ;
+	cint		tlen = TERMBUFLEN ;
+	int		rs ;
+	int		rs1 ;
+	cchar		*devprefix = DEVPREFIX ;
+	char		tbuf[tlen+1] ;
+	bool		f = false ;
+	if ((rs = sncpy(tbuf,tlen,devprefix)) >= 0) {
+	    cint	tl = rs ;
+	    setutxent() ;
+	    while ((up = getutxent()) != nullptr) {
+	       if (isourtype(up)) {
+		    cint	ll = utl_line ;
+		    cchar	*lp = up->ut_line ;
+	            if ((rs = snaddw(tbuf,tlen,tl,lp,ll)) >= 0) {
+			cint	of = O_RDONLY ;
+			cmode	om = 0666 ;
+			if ((rs = u_open(tbuf,of,om)) >= 0) {
+			    cint	fd = rs ;
+			    if ((rs = uc_tcgetsid(fd)) >= 0) {
+    				if (sid == rs) {
+				    f = true ;
+				    rs = printutxval(pm,up) ;
+				}
+			    } else if (isNotTerm(rs)) {
+				rs = SR_OK ;
+			    } /* end if (uc_tcgetsid) */
+			    rs1 = u_close(fd) ;
+			    if (rs >= 0) rs = rs1 ;
+			} else if (isNotAccess(rs)) {
+			    rs = SR_OK ;
+			}
+		    } /* end if (snadd) */
+	       } /* end if (our-type) */
+	    } /* end while */
+	} /* end if (sncpy) */
+	if ((rs >= 0) && (!f)) rs = SR_NOTFOUND ;
+	return rs ;
+}
+/* end subroutine (findstat) */
 
 static int printutxval(int pm,UTMPX *up) noex {
 	cint		olen = HOSTLEN ;
@@ -507,7 +551,7 @@ static char *strtcpy(char *dp,cchar *sp,int dl) noex {
 /* end subroutine (strtcpy) */
 
 static UTMPX *getutxliner(UTMPX *sup) noex {
-	const uid_t	uid = getuid() ;
+	static const uid_t	uid = getuid() ;
 	UTMPX		*up ;
 	PASSWD		*pwp ;
 	char		nbuf[utl_user+1] ;
@@ -528,7 +572,7 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 }
 /* end subroutine (getutxliner) */
 
-static bool isNoTerm(int rs) noex {
+static bool isNotTerm(int rs) noex {
 	return isOneOf(rsnoterm,rs) ;
 }
 

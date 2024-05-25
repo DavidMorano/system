@@ -329,15 +329,15 @@ UOBJ03= varnames.o syswords.o stdfnames.o
 
 UOBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 UOBJ05= nleadstr.o nleadkeystr.o
-UOBJ06= mapex.o strnul.o
-UOBJ07= getourenv.o
+UOBJ06= mapex.o getourenv.o strnul.o
+UOBJ07= sncpyx.o sncpyxw.o snaddw.o
 
 UOBJ08= strkeycmp.o ccfile.o strnul.o
 UOBJ09= readln.o ccfile.o
-UOBJ10= cfx.o sncpyx.o sncpyxc.o sncpyxw.o
+UOBJ10= cfx.o
 UOBJ11= strmgr.o strop.o field.o
 
-UOBJ12= ucttyname.o
+UOBJ12= ucttyname.o uctc.o tcx.o
 UOBJ13=
 UOBJ14= ucsys.o
 UOBJ15=

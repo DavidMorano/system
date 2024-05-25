@@ -8,10 +8,8 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	Of course, this subroutine was inspired by the UNIX®
-	equivalent, but this is my own version for a) when I do not
-	have the UNIX® libraries around, and b) to customize it to
-	what I want!
+	This object supports the FMTSTR facility and serves as the
+	measn to parse format-specifications.
 
 */
 
@@ -19,8 +17,11 @@
 
 /*******************************************************************************
 
-	This object parses a format-specification from the |print(3c)|
-	famnily-type subroutines.
+	This object parses a format-specification from the |printf(3c)|
+	family-type subroutines.  This object, although it can be
+	used alone (for whatever purpose), normally serves as a
+	helper object for the FMTSTR facility (which itself is a
+	sort of |snprintf(3c)| knock-off.
 
 *******************************************************************************/
 
@@ -49,11 +50,40 @@
 
 /* local structures */
 
+namespace {
+    struct fmtproc ;
+    typedef int (fmtproc::*fmtproc_m)(va_list) noex ;
+    struct fmtproc {
+	fmtspec		*op ;
+	cchar		*fsp ;
+	cchar		*sp ;
+	fmtspec_fl	f{} ;
+	int		sl ;
+	fmtproc(fmtspec *o,cchar *p,int l) noex : op(o), sp(p), sl(l) { 
+	    fsp = sp ;
+	} ;
+	int operator () (va_list) noex ;
+	int leader(va_list) noex ;
+	int widther(va_list) noex ;
+	int precer(va_list) noex ;
+	int moder(va_list) noex ;
+	int coder(va_list) noex ;
+    } ;
+}
+
 
 /* forward references */
 
 
 /* local variables */
+
+constexpr fmtproc_m	mems[] = {
+	&fmtproc::leader,
+	&fmtproc::widther,
+	&fmtproc::precer,
+	&fmtproc::moder,
+	&fmtproc::coder
+} ;
 
 
 /* exported variables */
@@ -62,15 +92,31 @@
 /* exported subroutines */
 
 int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
-	fmtspec_head	*hp = this ;
+	int		rs = SR_FAULT ;
+	if (ap && sp) {
+	    fmtspec_head	*hp = this ;
+	    if ((rs = memclear(hp)) >= 0) {
+	        fmtproc		fo(this,sp,sl) ;
+		rs = fo(ap) ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? int(fcode) : rs ;
+}
+/* end method (fmtspec::start) */
+
+int fmtproc::operator () (va_list ap) noex {
 	int		rs = SR_OK ;
-	cchar		*fsp = sp ;
-        bool		f_continue = true ;
-	(void) sl ;
-	memclear(hp) ;
-        width = -1 ;
-        prec = -1 ;
-        while (f_continue) {
+	for (auto m : mems) {
+	    rs = (this->*m)(ap) ;
+	    if (rs < 0) break ;
+	} /* end for */
+	return rs ;
+}
+
+int fmtproc::leader(va_list) noex {
+	int		rs = SR_OK ;
+        bool            fcont = true ;
+        while (fcont && (sl > 0)) {
             cint       ch = mkchar(sp[0]) ;
             switch (ch) {
             case '-':
@@ -92,18 +138,22 @@ int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
                 f.space = true ;
                 break ;
             default:
-                f_continue = false ;
+                fcont = false ;
                 break ;
             } /* end switch */
-            if (f_continue) {
-                sp += 1 ;
-            }
+            if (fcont) { sl-- ; sp++ ; }
         } /* end while */
-        /* now comes a digit string which may be a '*' */
-        {
+	return rs ;
+}
+
+/* now comes a digit string which may be a '*' */
+int fmtproc::widther(va_list ap) noex {
+	int		rs = SR_OK ;
+	short		width = -1 ;
+        if (sl > 0) {
             if (*sp == '*') {
                 width = (int) va_arg(ap,int) ;
-                sp += 1 ;
+                (sl--,sp++) ;
                 if (width < 0) {
                     width = -width ;
                     f.left = (! f.left) ;
@@ -111,36 +161,57 @@ int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
             } else if ((*sp >= '0') && (*sp <= '9')) {
                 width = 0 ;
                 while ((*sp >= '0') && (*sp <= '9')) {
-                    width = width * 10 + (*sp++ - '0') ;
+                    width = width * 10 + ((sl--,*sp++) - '0') ;
                 }
             } /* end if (width) */
         } /* end if (width) */
-        /* maybe a decimal point followed by more digits (or '*') */
-        if (*sp == '.') {
-            sp += 1 ;
+	op->width = width ;
+	return rs ;
+}
+
+/* maybe a decimal point followed by more digits (or '*') */
+int fmtproc::precer(va_list ap) noex {
+	int		rs = SR_OK ;
+	short		prec = -1 ;
+	if ((sl > 0) && (*sp == '.')) {
+            (sl--,sp += 1) ;
             if (*sp == '*') {
                 prec = (int) va_arg(ap,int) ;
-                sp += 1 ;
+                (sl--,sp += 1) ;
             } else { /* the default if nothing is zero-precision */
                 prec = 0 ; /* default if nothing specified */
                 while ((*sp >= '0') && (*sp <= '9')) {
-                    prec = prec * 10 + (*sp++ - '0') ;
+                    prec = prec * 10 + ((sl--,*sp++) - '0') ;
                 }
             }
-        } /* end if (a precision was specified) */
-        /* check for a format length-modifier */
-	{
-	    int		nl = 0 ;
-	    f_continue = true ;
-            while (f_continue) {
-                cint	ch = mkchar(*sp) ;
+	} /* end if (a precision was specified) */
+	op->prec = prec ;
+	return rs ;
+}
+
+/* check for a format length-modifier */
+int fmtproc::moder(va_list) noex {
+	int		rs = SR_OK ;
+	short		lenmod = 0 ;
+	if (sl > 0) {
+            schar       nhalf = 0 ;
+            schar       nlong = 0 ;
+            schar       nimax = 0 ;
+            bool	fcont = true ;
+            while (fcont && (sl > 0)) {
+                cint    ch = mkchar(*sp) ;
                 switch (ch) {
                 case 'h':
                     lenmod = lenmod_half ;
+                    nhalf += 1 ;
                     break ;
                 case 'l':
                     lenmod = lenmod_long ;
-		    nl += 1 ;
+                    nlong += 1 ;
+                    break ;
+                case 'j':
+                    lenmod = lenmod_imax ;
+                    nimax += 1 ;
                     break ;
                 case 'L':
                     lenmod = lenmod_longlong ;
@@ -151,27 +222,48 @@ int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
                 case 'w':
                     lenmod = lenmod_wide ;
                     break ;
-	        default:
-		    f_continue = false ;
-		    break ;
+                default:
+                    fcont = false ;
+                    break ;
                 } /* end switch */
-	    } /* end while */
-	    if (nl > 1) {
+                if (fcont) { sl-- ; sp++ ; }
+            } /* end while */
+            if (nhalf > 1) {
+                lenmod = lenmod_halfhalf ;
+            } /* end if (longlong) */
+            if (nlong > 1) {
                 lenmod = lenmod_longlong ;
             } /* end if (longlong) */
+            if (nimax > 1) {
+                lenmod = lenmod_imaxmax ;
+            } /* end if (longlong) */
+	    op->lenmod = lenmod ;
 	} /* end block (possible format-length specifier) */
-        fcode = mkchar(*sp++) ;
-        skiplen = (sp - fsp) ;
 	return rs ;
 }
-/* end method (fmtspec::start) */
+
+int fmtproc::coder(va_list) noex {
+	int		rs = SR_OK ;
+	if (sl > 0) {
+	    op->f = f ;
+            op->fcode = mkchar((sl--,*sp++)) ;
+            op->skiplen = (sp - fsp) ;
+	    rs = int(op->fcode) ;
+        } else {
+            rs = SR_INVALID ;
+        } 
+	return rs ;
+}
 
 fmtspec_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
+	    case fmtspecmem_code:
+		rs = int(op->fcode) ;
+		break ;
 	    case fmtspecmem_finish:
-		rs = op->skiplen ;
+		rs = int(op->skiplen) ;
 		break ;
 	    } /* end switch */
 	}
