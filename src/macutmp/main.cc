@@ -71,10 +71,6 @@
 
 /* local defines */
 
-#ifndef	noex
-#define	noex		noexcept
-#endif
-
 #ifndef	FD_STDIN
 #define	FD_STDIN	0
 #endif
@@ -165,11 +161,11 @@ static bool isourtype(UTMPX *up) noex {
 	return f ;
 }
 
-static bool	isNotTerm(int) noex ;
+static UTMPX	*getutxliner(UTMPX *) noex ;
 
 static char	*strtcpy(char *,cchar *,int) noex ;
 
-static UTMPX	*getutxliner(UTMPX *) noex ;
+static bool	isNotTerm(int) noex ;
 
 
 /* local variables */

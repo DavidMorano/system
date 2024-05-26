@@ -65,6 +65,16 @@
 	is encapulated within one subroutine call (via my very
 	extensive libraries for system-related operations).  So
 	please exuse both the mess and size of the code below.
+	Also, the implementation below of some functions is not the
+	most efficient.  For example, note that I unnecessarily
+	double-tap the system PASSWD database (effectively access
+	it twice in a row with the same key) in both the subroutines
+	|findutmp_stdin()| and |fundutmp_env()|.  These kinds of
+	suboptimal coding design choices occur due to programmer
+	fatigue (like I am experiencing right now).  Happlily, these
+	particular inefficiencies hardly matter for the intected
+	use context of this program (also the system PASSWD entry
+	will be cached on the second access w/ the same key).
 
 *******************************************************************************/
 
@@ -121,6 +131,13 @@
 #endif
 #ifndef	UT_HOSTSIZE
 #define	UT_HOSTSIZE	16
+#endif
+
+#ifndef	VARUTMPLINE
+#define	VARUTMPLINE	"UTMPLINE"
+#endif
+#ifndef	VARLOGLINE
+#define	VARLOGLINE	"LOGLINE"
 #endif
 
 
@@ -214,6 +231,11 @@ static bool	isNotTerm(int) noex ;
 
 
 /* local variables */
+
+constexpr cpcchar	utmpvars[] = {
+	VARUTMPLINE,
+	VARLOGLINE
+} ;
 
 constexpr int		rsnoterm[] = {
 	SR_BADF,
@@ -491,8 +513,29 @@ int userinfo::findutmp_stdin(uid_t uid) noex {
 }
 
 int userinfo::findutmp_env(uid_t uid) noex {
-	(void) uid ;
-	return SR_OK ;
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	for (auto &vn : utmpvars) {
+	    if (cchar *line ; (line = getenv(vn)) != nullptr) {
+	        if (line[0]) {
+		    char	nbuf[utl_user+1] ;
+	            UTMPX	ut{} ;
+	            UTMPX	*up ;
+		    PASSWD	*pwp ;
+	            strncpy(ut.ut_line,line,utl_line) ;
+	            if ((up = getutxliner(&ut)) != nullptr) {
+		        strtcpy(nbuf,up->ut_user,utl_user) ;
+		        if ((pwp = getpwnam(nbuf)) != nullptr) {
+		            if (pwp->pw_uid == uid) {
+			        len = load(pwp) ;
+		            } /* end if (UID match w/ us) */
+		        } /* end if (got PASSWD entry) */
+		    } /* end if ("line" match) */
+	        } /* end if (non-empty) */
+	    } /* end if (getenv) */
+	    if ((rs < 0) || (len > 0)) break ;
+	} /* end for (utmpvars) */
+	return (rs >= 0) ? len : rs ;
 }
 
 int userinfo::findutmp_stat(uid_t uid) noex {
