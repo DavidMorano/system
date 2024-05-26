@@ -1,7 +1,7 @@
-/* fmtstr HEADER */
+/* fmtopts HEADER */
 /* lang=C20 */
 
-/* header file for the FMTSTR subroutine */
+/* header file for the FMTOPTS subroutine */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	FMTSTR_INCLUDE
-#define	FMTSTR_INCLUDE
+#ifndef	FMTOPTS_INCLUDE
+#define	FMTOPTS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -24,16 +24,18 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-#include	<fmtopts.h>
+
+enum fmtsopts {
+	fmtopt_clean,			/* clean up the string-data */
+	fmtopt_nooverr,			/* no-overflow-error */
+	fmtopt_overlast
+} ;
 
 
-EXTERNC_begin
-
-extern int	fmtstr(char *,int,int,cchar *,va_list) noex ;
-
-EXTERNC_end
+#define	FMTOPTS_OCLEAN		(1 << fmtopt_clean)
+#define	FMTOPTS_ONOOVERR	(1 << fmtopt_nooverr)
 
 
-#endif /* FMTSTR_INCLUDE */
+#endif /* FMTOPTS_INCLUDE */
 
 

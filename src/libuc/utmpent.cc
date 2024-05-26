@@ -71,6 +71,7 @@
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -131,13 +132,13 @@ constexpr cpcchar	utmpenvs[] = {
 int getutmpent(utmpent *ep,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
+	    if (sid <= 0) sid = getsid(0) ;
 	    ep->id[0] = '\0' ;
 	    ep->line[0] = '\0' ;
 	    ep->user[0] = '\0' ;
 	    ep->host[0] = '\0' ;
 	    ep->session = 0 ;
 	    ep->date = 0 ;
-	    if (sid <= 0) sid = getsid(0) ;
 	    ep->sid = sid ;
 	    rs = utmpent_utmpacc(ep,sid) ;
 	} /* end if (non-null) */

@@ -31,9 +31,11 @@
 const char varnames::logid[] =		"LOGID" ;
 const char varnames::logname[] =	"LOGNAME" ;
 const char varnames::logline[] =	"LOGLINE" ;
+const char varnames::loghost[] =	"LOGHOST" ;
 const char varnames::utmpid[] =		"UTMPID" ;
 const char varnames::utmpname[] =	"UTMPNAME" ;
 const char varnames::utmpline[] =	"UTMPLINE" ;
+const char varnames::utmphost[] =	"UTMPHOST" ;
 const char varnames::username[] =	"USERNAME" ;
 const char varnames::groupname[] =	"GROUPNAME" ;
 const char varnames::projname[] =	"PROJNAME" ;

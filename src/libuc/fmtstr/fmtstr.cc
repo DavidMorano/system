@@ -110,9 +110,7 @@
 /* local defines */
 
 #define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
-
-#define	STRDATA		struct strdata
+#define	SUBINFO_FL	struct fmtsub_flags
 
 #undef	FD_WRITE
 #define	FD_WRITE	4
@@ -149,7 +147,7 @@ using std::max ;			/* type */
 
 /* local structures */
 
-struct subinfo_flags {
+struct fmtsub_flags {
 	uint		ov:1 ;		/* overflow */
 	uint		mclean:1 ;	/* mode: clean-up */
 	uint		mnooverr:1 ;	/* mode: return-error */
@@ -163,34 +161,24 @@ struct subinfo {
 	int		mode ;		/* format mode */
 } ;
 
-struct strdata {
-	const wint_t	*lsp ;
-	const wchar_t	*wsp ;
-	cchar		*sp ;
-	int		sl ;
-	int		f_wint ;
-	int		f_wchar ;
-} ;
-
-
 /* forward references */
 
-static int subinfo_start(SUBINFO *,char *,int,int) noex ;
-static int subinfo_finish(SUBINFO *) noex ;
-static int subinfo_strw(SUBINFO *,cchar *,int) noex ;
-static int subinfo_char(SUBINFO *,int) noex ;
-static int subinfo_blanks(SUBINFO *,int) noex ;
-static int subinfo_cleanstrw(SUBINFO *,cchar *,int) noex ;
-static int subinfo_emit(SUBINFO *,FMTSPEC *,cchar *,int) noex ;
-static int subinfo_fmtstr(SUBINFO *,FMTSPEC *,STRDATA *) noex ;
-static int subinfo_reserve(SUBINFO *,int) ;
+static int fmtsub_start(SUBINFO *,char *,int,int) noex ;
+static int fmtsub_finish(SUBINFO *) noex ;
+static int fmtsub_strw(SUBINFO *,cchar *,int) noex ;
+static int fmtsub_chr(SUBINFO *,int) noex ;
+static int fmtsub_blanks(SUBINFO *,int) noex ;
+static int fmtsub_cleanstrw(SUBINFO *,cchar *,int) noex ;
+static int fmtsub_emit(SUBINFO *,FMTSPEC *,cchar *,int) noex ;
+static int fmtsub_fmtstr(SUBINFO *,FMTSPEC *,STRDATA *) noex ;
+static int fmtsub_reserve(SUBINFO *,int) ;
 
 #if	CF_BINCHAR
 static int	binchar(ulong,int) ;
 #endif
 
 #if	CF_FLOAT && F_SUNOS
-static int	subinfo_float(SUBINFO *,int,double,int,int,int,char *) noex ;
+static int	fmtsub_float(SUBINFO *,int,double,int,int,int,char *) noex ;
 #endif
 
 #if	CF_CLEANSTR
@@ -236,7 +224,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	if (fmt[0] == '\0') return SR_INVALID ;
 
-	if ((rs = subinfo_start(sip,ubuf,ulen,mode)) >= 0) {
+	if ((rs = fmtsub_start(sip,ubuf,ulen,mode)) >= 0) {
 
 /* go through the loops */
 
@@ -247,7 +235,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        char	*bp = tbuf ;
 
 	        if ((tp-fmt) > 0) {
-	            rs = subinfo_cleanstrw(sip,fmt,(tp-fmt)) ;
+	            rs = fmtsub_cleanstrw(sip,fmt,(tp-fmt)) ;
 	        }
 	        fmt = (tp+1) ;
 	        if (rs < 0) break ;
@@ -268,7 +256,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	        case '%':
 	            fcode = 0 ;
-	            rs = subinfo_char(sip,'%') ;
+	            rs = fmtsub_chr(sip,'%') ;
 	            break ;
 
 		case '_':
@@ -317,7 +305,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                            ch = CH_BADSUB ;
 	                        }
 	                    }
-	                    rs = subinfo_char(sip,ch) ;
+	                    rs = fmtsub_chr(sip,ch) ;
 	                } else {
 	                    tbuf[0] = ch ;
 	                    bp = tbuf ;
@@ -379,7 +367,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                } /* end block */
 #endif /* COMMENT */
 
-	                rs = subinfo_fmtstr(sip,fsp,&sd) ;
+	                rs = fmtsub_fmtstr(sip,fsp,&sd) ;
 	                fcode = 0 ;
 	            }
 	            break ;
@@ -641,13 +629,13 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 			    cint	p = fsp->prec ;
 	                    int		fill = -1 ;
 	                    if (fsp->f.zerofill) fill = 0 ;
-	                    rs = subinfo_float(sip,fcode,dv,w,p,fill,tbuf) ;
+	                    rs = fmtsub_float(sip,fcode,dv,w,p,fill,tbuf) ;
 	                }
 #else
 	                {
 	                    cchar	*cp ;
 	                    cp = "* no floating support *" ;
-	                    rs = subinfo_strw(sip,cp,-1) ;
+	                    rs = fmtsub_strw(sip,cp,-1) ;
 	                }
 #endif /* CF_FLOAT */
 
@@ -666,16 +654,16 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* determine if there are characters to output based on 'fcode' variable */
 
 	        if ((rs >= 0) && (fcode != '\0') && (bp != nullptr)) {
-	            rs = subinfo_emit(sip,fsp,bp,bl) ;
+	            rs = fmtsub_emit(sip,fsp,bp,bl) ;
 	        }
 
 	    } /* end while (infinite loop) */
 
 	    if ((rs >= 0) && (*fmt != '\0')) {
-	        rs = subinfo_cleanstrw(sip,fmt,-1) ;
+	        rs = fmtsub_cleanstrw(sip,fmt,-1) ;
 	    }
 
-	    fmtlen = subinfo_finish(sip) ;
+	    fmtlen = fmtsub_finish(sip) ;
 	    if (rs >= 0) rs = fmtlen ;
 	} /* end if (subinfo) */
 
@@ -686,7 +674,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
+static int fmtsub_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
 	memclear(sip) ;
 	sip->ubuf = ubuf ;
 	sip->ulen = ulen ;
@@ -695,9 +683,9 @@ static int subinfo_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
 	sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
 	return SR_OK ;
 }
-/* end subroutine (subinfo_start) */
+/* end subroutine (fmtsub_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+static int fmtsub_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		len = sip->len ;
 	sip->ubuf[len] = '\0' ;
@@ -706,9 +694,9 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	}
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (subinfo_finish) */
+/* end subroutine (fmtsub_finish) */
 
-static int subinfo_reserve(SUBINFO *sip,int n) noex {
+static int fmtsub_reserve(SUBINFO *sip,int n) noex {
 	int		rs = SR_OVERFLOW ;
 	if (! sip->f.ov) {
 	    int		rlen = (sip->ulen - sip->len) ;
@@ -719,9 +707,9 @@ static int subinfo_reserve(SUBINFO *sip,int n) noex {
 	} /* end if (not overflow) */
 	return rs ;
 }
-/* end subroutine (subinfo_reserve) */
+/* end subroutine (fmtsub_reserve) */
 
-static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
+static int fmtsub_strw(SUBINFO *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		ml = 0 ;
 
@@ -743,34 +731,34 @@ static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
 
 	return (rs >= 0) ? ml : rs ;
 }
-/* end subroutine (subinfo_strw) */
+/* end subroutine (fmtsub_strw) */
 
-static int subinfo_char(SUBINFO *sip,int ch) noex {
+static int fmtsub_chr(SUBINFO *sip,int ch) noex {
 {
 	int		rs = SR_OK ;
 	char		buf[1] ;
 	if (ch != 0) {
 	    buf[0] = ch ;
-	    rs = subinfo_strw(sip,buf,1) ;
+	    rs = fmtsub_strw(sip,buf,1) ;
 	}
 	return rs ;
 }
-/* end subroutine (subinfo_char) */
+/* end subroutine (fmtsub_chr) */
  
-static int subinfo_blanks(SUBINFO *sip,int n) noex {
+static int fmtsub_blanks(SUBINFO *sip,int n) noex {
 	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_OK ;
 	int		nr = n ;
 	while ((rs >= 0) && (nr > 0)) {
 	    int 	m = min(nblanks,nr) ;
-	    rs = subinfo_strw(sip,blanks,m) ;
+	    rs = fmtsub_strw(sip,blanks,m) ;
 	    nr -= m ;
 	} /* end while */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (subinfo_blanks) */
+/* end subroutine (fmtsub_blanks) */
 
-static int subinfo_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
+static int fmtsub_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		*abuf = nullptr ;
@@ -800,15 +788,15 @@ static int subinfo_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
 	} /* end if (option-clean) */
 #endif /* CF_CLEANSTR */
 	if (rs >= 0) {
-	    rs = subinfo_strw(sip,sp,sl) ;
+	    rs = fmtsub_strw(sip,sp,sl) ;
 	    len = rs ;
 	}
 	if (abuf != nullptr) uc_free(abuf) ;
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (subinfo_cleanstrw) */
+/* end subroutine (fmtsub_cleanstrw) */
 
-static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
+static int fmtsub_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	int		rs = SR_OK ;
 	int		width = fsp->width ;
 	int		prec = fsp->width ;
@@ -906,17 +894,17 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 
 	if ((rs >= 0) && (! fsp->f.left)) {
 	    if ((width > 0) && (width > sl)) {
-	        rs = subinfo_blanks(sip,(width - sl)) ;
+	        rs = fmtsub_blanks(sip,(width - sl)) ;
 	    }
 	}
 
 	if (rs >= 0) {
-	    rs = subinfo_cleanstrw(sip,sp,sl) ;
+	    rs = fmtsub_cleanstrw(sip,sp,sl) ;
 	}
 
 	if ((rs >= 0) && fsp->f.left) {
 	    if ((width > 0) && (width > sl)) {
-	        rs = subinfo_blanks(sip,(width - sl)) ;
+	        rs = fmtsub_blanks(sip,(width - sl)) ;
 	    }
 	}
 
@@ -924,9 +912,9 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 
 	return (rs >= 0) ? fcode : rs ;
 }
-/* end subroutine (subinfo_fmtstr) */
+/* end subroutine (fmtsub_fmtstr) */
 
-static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
+static int fmtsub_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		fcode = fsp->fcode ;
 	int		width = fsp->width ;
@@ -1035,7 +1023,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 
 	    if ((rs >= 0) && (! fsp->f.left) && (! f_zerofill)) {
 	        if (npad > 0) {
-	            rs = subinfo_blanks(sip,npad) ;
+	            rs = fmtsub_blanks(sip,npad) ;
 	        }
 	    } /* end if */
 
@@ -1043,7 +1031,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 
 	    if ((rs >= 0) && f_plusminus) {
 	        int	ch = (f_minus) ? '-' : '+' ;
-	        rs = subinfo_char(sip,ch) ;
+	        rs = fmtsub_chr(sip,ch) ;
 	        width -= 1 ;
 	    } /* end if */
 
@@ -1053,11 +1041,11 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	        switch (fcode) {
 	        case 'x':
 	        case 'X':
-	            rs = subinfo_strw(sip,"0x",2) ;
+	            rs = fmtsub_strw(sip,"0x",2) ;
 	            break ;
 	        case 'o':
 	            if (sp[0] != '0') {
-	                rs = subinfo_char(sip,'0') ;
+	                rs = fmtsub_chr(sip,'0') ;
 	            }
 	            break ;
 	        } /* end switch */
@@ -1069,7 +1057,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	        int ch = (f_isdigital ? '0' : ' ') ;
 	        int	i ;
 	        for (i = 0 ; (rs >= 0) && (i < npad) ; i += 1) {
-	            rs = subinfo_char(sip,ch) ;
+	            rs = fmtsub_chr(sip,ch) ;
 	        }
 	    } /* end if */
 
@@ -1079,7 +1067,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	        int ch = (f_isdigital ? '0' : ' ') ;
 	        int	i ;
 	        for (i = 0 ; (rs >= 0) && (i < (prec - sl)) ; i += 1) {
-	            rs = subinfo_char(sip,ch) ;
+	            rs = fmtsub_chr(sip,ch) ;
 	        }
 	    } /* end if */
 
@@ -1093,27 +1081,27 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	                sl -= skip ;
 	            }
 	        }
-	        rs = subinfo_cleanstrw(sip,sp,sl) ;
+	        rs = fmtsub_cleanstrw(sip,sp,sl) ;
 	    } /* end if */
 
 /* send out trailing pad characters */
 
 	    if ((rs >= 0) && fsp->f.left && (npad > 0)) {
-	        rs = subinfo_blanks(sip,npad) ;
+	        rs = fmtsub_blanks(sip,npad) ;
 	    } /* end if */
 
 	} /* end if (fcode) */
 
 	return rs ;
 }
-/* end subroutine (subinfo_emit) */
+/* end subroutine (fmtsub_emit) */
 
 /* convert floating point numbers */
 
 #if	CF_FLOAT && F_SUNOS
 #define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
 #define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)
-static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
+static int fmtsub_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 		int fill,char *buf) noex {
 	int		rs = SR_OK ;
 	int		i, j ;
@@ -1144,7 +1132,7 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 /* fill up extra field width which may be specified (for some reason) */
 
 	while ((rs >= 0) && (width > DOFLOAT_STAGELEN)) {
-	    rs = subinfo_char(sip,' ') ;
+	    rs = fmtsub_chr(sip,' ') ;
 	    width -= 1 ;
 	} /* end while */
 
@@ -1255,14 +1243,14 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 /* copy the stage buffer to the output buffer */
 
 	    while ((rs >= 0) && (i < DOFLOAT_STAGELEN)) {
-	        rs = subinfo_char(sip,stage[i++]) ;
+	        rs = fmtsub_chr(sip,stage[i++]) ;
 	    }
 
 	} /* end if (ok) */
 
 	return rs ;
 }
-/* end subroutine (subinfo_float) */
+/* end subroutine (fmtsub_float) */
 #endif /* CF_FLOAT */
 
 #if	CF_BINCHAR

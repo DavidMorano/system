@@ -20,13 +20,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>
-#include	<clanguag.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-
-#define	FMTSTR_OCLEAN	(1<<0)		/* clean data */
-#define	FMTSTR_ONOOVERR	(1<<1)		/* do *not* return error on overflow */
+#include	<fmtopts.h>
 
 
 EXTERNC_begin

@@ -36,9 +36,11 @@ struct varnames {
 	static const char logid[] ;
 	static const char logname[] ;
 	static const char logline[] ;
+	static const char loghost[] ;
 	static const char utmpid[] ;
 	static const char utmpname[] ;
 	static const char utmpline[] ;
+	static const char utmphost[] ;
 	static const char username[] ;
 	static const char groupname[] ;
 	static const char projname[] ;
