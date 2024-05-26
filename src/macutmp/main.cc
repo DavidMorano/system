@@ -449,7 +449,7 @@ static int findenv(int pm) noex {
 
 static int findstat(int pm) noex {
 	UTMPX		*up ;
-	static int	sid = getsid(0) ;
+	static cint	sid = getsid(0) ;
 	cint		tlen = TERMBUFLEN ;
 	int		rs ;
 	int		rs1 ;
