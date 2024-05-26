@@ -97,6 +97,7 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<ccfile.hh>
+#include	<snx.h>
 #include	<hasx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
@@ -416,11 +417,10 @@ int userinfo::findenv(uid_t uid) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	for (int i = 0 ; envs[i] ; i += 1) {
-	    cchar	*rp ;
-	    if ((rp = getenv(envs[i])) != nullptr) {
-		int	cl ;
+	    cchar	*vn = envs[i] ;
+	    if (cchar *rp ; (rp = getenv(vn)) != nullptr) {
 		cchar	*cp{} ;
-		if ((cl = sfbasename(rp,-1,&cp)) > 0) {
+		if (int cl ; (cl = sfbasename(rp,-1,&cp)) > 0) {
 		    PASSWD	*pwp ;
 		    if ((pwp = getpwnam(rp)) != nullptr) {
 		        if (pwp->pw_uid == uid) {
@@ -515,10 +515,10 @@ int userinfo::findutmp_stdin(uid_t uid) noex {
 int userinfo::findutmp_env(uid_t uid) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
+	char		nbuf[utl_user+1] ;
 	for (auto const &vn : utmpvars) {
 	    if (cchar *line ; (line = getenv(vn)) != nullptr) {
 	        if (line[0]) {
-		    char	nbuf[utl_user+1] ;
 	            UTMPX	ut{} ;
 	            UTMPX	*up ;
 		    PASSWD	*pwp ;
@@ -539,8 +539,51 @@ int userinfo::findutmp_env(uid_t uid) noex {
 }
 
 int userinfo::findutmp_stat(uid_t uid) noex {
-	(void) uid ;
-	return SR_OK ;
+	static cint	sid = getsid(0) ;
+	cint		tlen = TERMBUFLEN ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	cchar		*devprefix = DEVPREFIX ;
+	char		tbuf[tlen+1] ;
+	if ((rs = sncpy(tbuf,tlen,devprefix)) >= 0) {
+	    char	nbuf[utl_user+1] ;
+	    UTMPX	*up ;
+	    cint	tl = rs ;
+	    setutxent() ;
+	    while ((up = getutxent()) != nullptr) {
+	       if (isourtype(up)) {
+		    cint	ll = utl_line ;
+		    cchar	*lp = up->ut_line ;
+	            if ((rs = snaddw(tbuf,tlen,tl,lp,ll)) >= 0) {
+			cint	of = (O_RDONLY | O_NOCTTY) ;
+			cmode	om = 0666 ;
+			if ((rs = u_open(tbuf,of,om)) >= 0) {
+			    cint	fd = rs ;
+			    if ((rs = uc_tcgetsid(fd)) >= 0) {
+    				if (sid == rs) {
+				    PASSWD	*pwp ;
+		                    strtcpy(nbuf,up->ut_user,utl_user) ;
+		                    if ((pwp = getpwnam(nbuf)) != nullptr) {
+		                        if (pwp->pw_uid == uid) {
+			                    len = load(pwp) ;
+		                        } /* end if (UID match w/ us) */
+		                    } /* end if (got PASSWD entry) */
+				} /* end if (SID match) */
+			    } else if (isNotTerm(rs)) {
+				rs = SR_OK ;
+			    } /* end if (uc_tcgetsid) */
+			    rs1 = u_close(fd) ;
+			    if (rs >= 0) rs = rs1 ;
+			} else if (isNotAccess(rs)) {
+			    rs = SR_OK ;
+			}
+		    } /* end if (snadd) */
+	        } /* end if (our-type) */
+		if ((rs < 0) || (len > 0)) break ;
+	    } /* end while */
+	} /* end if (sncpy) */
+	return (rs >= 0) ? len : rs ;
 }
 
 int userinfo::finduid(uid_t uid) noex {

@@ -150,7 +150,7 @@ static int getpm(int,mainv,mainv) noex ;
 static int utmp(bool) noex ;
 static int boottime() noex ;
 static int findsid(int) noex ;
-static int findline(int) noex ;
+static int findstdin(int) noex ;
 static int findenv(int) noex ;
 static int findstat(int) noex ;
 static int printutxval(int,UTMPX *) noex ;
@@ -274,7 +274,7 @@ int main(int argc,mainv argv,mainv) {
 		/* FALLTHROUGH */
 	    default:
 	        if ((rs = findsid(pm)) == rsn) {
-	            if ((rs = findline(pm)) == rsn) {
+	            if ((rs = findstdin(pm)) == rsn) {
 			if ((rs = findenv(pm)) == rsn) {
 			    rs = findstat(pm) ;
 			}
@@ -393,7 +393,7 @@ static int findsid(int pm) noex {
 }
 /* end subroutine (findsid) */
 
-static int findline(int pm) noex {
+static int findstdin(int pm) noex {
 	STAT		sb ;
 	cint		tlen = TERMBUFLEN ;
 	cint		fd = FD_STDIN ;
@@ -423,7 +423,7 @@ static int findline(int pm) noex {
 	if ((rs >= 0) && (!f)) rs = SR_NOTFOUND ;
 	return rs ;
 }
-/* end subroutine (findline) */
+/* end subroutine (findstdin) */
 
 static int findenv(int pm) noex {
 	int		rs = SR_OK ;
@@ -535,7 +535,7 @@ static int printutxval(int pm,UTMPX *up) noex {
 /* end subroutine (printutxval) */
 
 static int sirchr(cchar *sp,int sl,int sch) noex {
-	int		i = 0 ;
+	int		i ; /* used-afterwards */
 	if (sl < 0) sl = strlen(sp) ;
 	for (i = (sl-1) ; i >= 0 ; i -= 1) {
 	    if (sp[i] == sch) break ;
@@ -569,9 +569,9 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 /* end subroutine (getutxliner) */
 
 /* this is similar to |strwcpy(3uc)| */
-static char *strtcpy(char *dp,cchar *sp,int dl) noex {
-	if (dl >= 0) {
-	    dp = strncpy(dp,sp,dl) + dl ;
+static char *strtcpy(char *dp,cchar *sp,int sl) noex {
+	if (sl >= 0) {
+	    dp = strncpy(dp,sp,sl) + sl ;
 	    *dp = '\0' ;
 	} else {
 	    dp = nullptr ;
