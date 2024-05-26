@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was written from scratch. There are (or
+	This subroutine was written from scratch.  There are (or
 	may) be some other standard ones floating around like it
 	but I could not find one that was exactly what I needed
 	(sigh).
@@ -42,9 +42,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* for |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<strn.h>
 #include	<matkeystr.h>
 
@@ -54,15 +56,18 @@
 /* local defines */
 
 
+/* external subroutines */
+
+
 /* external variables */
 
 extern mainv	environ ;
 
 
-/* external subroutines */
-
-
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

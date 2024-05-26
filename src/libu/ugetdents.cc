@@ -1,4 +1,4 @@
-/* u_getdents SUPPORT */
+/* ugetdents SUPPORT */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */

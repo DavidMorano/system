@@ -37,7 +37,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -52,7 +52,7 @@
 
 /* local typedefs */
 
-typedef timeout_met	t_m ;
+typedef timeout_m	t_m ;
 
 
 /* external subroutines */

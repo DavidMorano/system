@@ -24,9 +24,7 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= snx.h
-
 
 LIBS=
 
@@ -34,6 +32,9 @@ LIBS=
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPTATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -133,9 +134,12 @@ objc.o:			$(OBJC_SNX) $(INCS)
 snuuid.o:		snuuid.cc		$(INCS)
 sntid.o:		sntid.cc		$(INCS)
 snerrabbr.o:		snerrabbr.cc		$(INCS)
-sntmtime.o:		sntmtime.cc sntmtime.h $(INCS)
+sntmtime.o:		sntmtime.cc sntmtime.h	$(INCS)
 snaddw.o:		snaddw.cc snaddw.h	$(INCS)
 snwprintf.o:		snwprintf.cc		$(INCS)
-snclean.o:		snclean.cc snclean.h	#(INCS)
+snclean.o:		snclean.cc snclean.h	$(INCS)
+sncpyx.o:		sncpyx.cc sncpyx.h	$(INCS)
+sncpyxw.o:		sncpyxw.cc sncpyxw.h	$(INCS)
+sncpyxc.o:		sncpyxc.cc sncpyxc.h	$(INCS)
 
 

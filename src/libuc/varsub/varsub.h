@@ -65,13 +65,14 @@ struct varsub_head {
 
 
 typedef VARSUB		varsub ;
+typedef	VARSUB_FL	varsub_fl ;
 typedef VARSUB_CUR	varsub_cur ;
 
 EXTERNC_begin
 
 extern int	varsub_start(varsub *,int) noex ;
 extern int	varsub_add(varsub *,cchar *,int,cchar *,int) noex ;
-extern int	varsub_addva(varsub *,cchar **) noex ;
+extern int	varsub_addva(varsub *,mainv) noex ;
 extern int	varsub_addquick(varsub *,cchar *,int,cchar *,int) noex ;
 extern int	varsub_addvaquick(varsub *,cchar **) noex ;
 extern int	varsub_curbegin(varsub *,varsub_cur *) noex ;

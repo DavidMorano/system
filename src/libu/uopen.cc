@@ -350,7 +350,7 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	    if ((rs >= 0) && (of & O_CLOEXEC)) {
 		rs = icloseonexec(fd) ;
 	    }
-	} /* end if-constexpr (f_sunos) */
+	} /* end if_constexpr (f_sunos) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end method (opener::openjack) */
@@ -359,7 +359,7 @@ int opener::iopen(cchar *fname,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	if (fname) {
 	    rs = SR_INVALID ;
-	    if (fname[0] && (of > 0)) {
+	    if (fname[0] && (of >= 0)) {
 	        if ((rs = open(fname,of,om)) < 0) {
 		    rs = (- errno) ;
 	        }
@@ -373,7 +373,7 @@ int opener::iopenat(cchar *fname,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	if (fname) {
 	    rs = SR_INVALID ;
-	    if (fname[0] && (of > 0)) {
+	    if (fname[0] && (of >= 0)) {
 	        if ((rs = openat(dfd,fname,of,om)) < 0) {
 		    rs = (- errno) ;
 	        }

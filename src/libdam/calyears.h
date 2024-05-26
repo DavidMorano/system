@@ -30,21 +30,21 @@
 
 #define	CALYEARS_MAGIC	0x99447245
 #define	CALYEARS	struct calyears_head
-#define	CALYEARS_OBJ	struct calyears_obj
+#define	CALYEARS_OBJ	struct calyears_object
 #define	CALYEARS_Q	CALCITE
 #define	CALYEARS_QUERY	CALCITE
 #define	CALYEARS_CITE	CALCITE
-#define	CALYEARS_CUR	struct calyears_c
+#define	CALYEARS_CUR	struct calyears_cursor
 #define	CALYEARS_FL	struct calyears_flags
 
 
-struct calyears_obj {
-	const char	*name ;
+struct calyears_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct calyears_c {
+struct calyears_cursor {
 	uint		magic ;
 	void		*results ;
 	uint		nresults ;
@@ -57,15 +57,15 @@ struct calyears_flags {
 } ;
 
 struct calyears_head {
-	uint		magic ;
 	cchar		*a ;			/* memory-allocation */
 	cchar		*pr ;
 	cchar		*tmpdname ;
-	CALYEARS_FL	f ;
-	CALYEARS_FL	init, open ;
 	HOLIDAYER	hols ;
 	vechand		doms ;
 	vechand		cals ;			/* calendars */
+	CALYEARS_FL	f ;
+	CALYEARS_FL	init, open ;
+	uint		magic ;
 	int		nentries ;
 	int		ncursors ;
 	int		year ;			/* current year */
@@ -73,25 +73,28 @@ struct calyears_head {
 	int		gmtoff ;		/* current offset from GMT */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	CALYEARS	calyears ;
+typedef	CALYEARS_FL	calyears_fl ;
+typedef	CALYEARS_OBJ	calyears_obj ;
+typedef	CALYEARS_CUR	calyears_cur ;
+typedef	CALYEARS_Q	calyears_q ;
 
-extern int calyears_open(CALYEARS *,cchar *,cchar **,cchar **) ;
-extern int calyears_count(CALYEARS *) ;
-extern int calyears_curbegin(CALYEARS *,CALYEARS_CUR *) ;
-extern int calyears_lookcite(CALYEARS *,CALYEARS_CUR *,CALYEARS_Q *) ;
-extern int calyears_read(CALYEARS *,CALYEARS_CUR *,CALYEARS_Q *,char *,int) ;
-extern int calyears_curend(CALYEARS *,CALYEARS_CUR *) ;
-extern int calyears_check(CALYEARS *,time_t) ;
-extern int calyears_audit(CALYEARS *) ;
-extern int calyears_close(CALYEARS *) ;
-extern int calyears_already(CALYEARS *,vecobj *,CALENT *) ;
-extern int calyears_havestart(CALYEARS *,CALCITE *,int,cchar *,int) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int calyears_open(calyears *,cchar *,cchar **,cchar **) noex ;
+extern int calyears_count(calyears *) noex ;
+extern int calyears_curbegin(calyears *,CALYEARS_CUR *) noex ;
+extern int calyears_lookcite(calyears *,CALYEARS_CUR *,CALYEARS_Q *) noex ;
+extern int calyears_read(calyears *,CALYEARS_CUR *,CALYEARS_Q *,
+		char *,int) noex ;
+extern int calyears_curend(calyears *,CALYEARS_CUR *) noex ;
+extern int calyears_check(calyears *,time_t) noex ;
+extern int calyears_audit(calyears *) noex ;
+extern int calyears_close(calyears *) noex ;
+extern int calyears_already(calyears *,vecobj *,CALENT *) noex ;
+extern int calyears_havestart(calyears *,CALCITE *,int,cchar *,int) noex ;
+
+EXTERNC_end
 
 
 #endif /* CALYEARS_INCLUDE */

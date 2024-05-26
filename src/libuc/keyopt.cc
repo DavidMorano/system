@@ -26,7 +26,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<char.h>
@@ -43,15 +43,15 @@
 
 #define	KEYBUFLEN	100
 
-#define	CUR		KEYOPT_CUR
-#define	VAL		KEYOPT_VALUE
-#define	NAM		KEYOPT_NAME
+#define	CUR		keyopt_cur
+#define	VAL		keyopt_val
+#define	NAM		keyopt_na
 
 
 /* external subroutines */
 
 
-/* local subroutines */
+/* external variables */
 
 
 /* forward references */
@@ -103,10 +103,10 @@ int keyopt_finish(keyopt *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = keyopt_magic(op)) >= 0) {
-	    NAM		*np, *nnp ;
+	    NAM		*sp, *nnp ;
 	    VAL		*vp, *nvp ;
-	    for (np = op->head ; np != nullptr ; np = nnp) {
-	        for (vp = np->head ; vp != nullptr ; vp = nvp) {
+	    for (sp = op->head ; sp != nullptr ; sp = nnp) {
+	        for (vp = sp->head ; vp != nullptr ; vp = nvp) {
 	            if (vp->value != nullptr) {
 	                rs1 = uc_free(vp->value) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -115,12 +115,12 @@ int keyopt_finish(keyopt *op) noex {
 	            rs1 = uc_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end for */
-	        if (np->name != nullptr) {
-	            rs1 = uc_free(np->name) ;
+	        if (sp->name) {
+	            rs1 = uc_free(sp->name) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
-	        nnp = np->next ;
-	        rs1 = uc_free(np) ;
+	        nnp = sp->next ;
+	        rs1 = uc_free(sp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end for */
 	    op->head = nullptr ;
@@ -136,7 +136,8 @@ int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = keyopt_magic(op,sp)) >= 0) {
-	    cchar	*cp, *tp ;
+	    cchar	*tp ;
+	    cchar	*cp ;
 	    int		cl ;
 	    if (sl <= 0) sl = strlen(sp) ;
 	    while ((tp = strnpbrk(sp,sl,",\t\n\r ")) != nullptr) {
@@ -173,8 +174,8 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	if ((rs = keyopt_magic(op,key)) >= 0) {
 	    VAL		*vp, *nvp ;
 	    NAM		*pp, *tpp ;
-	    cchar		*tp ;
-	    cchar		*cp ;
+	    cchar	*tp ;
+	    cchar	*cp ;
 	    int		klen ;
 /* clean up the value a little */
 	    if (vlen < 0) vlen = (vbuf) ? strlen(vbuf) : 0 ;

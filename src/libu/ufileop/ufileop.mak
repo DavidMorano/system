@@ -57,9 +57,9 @@ LDFLAGS= $(MAKELDFLAGS)
 
 
 OBJA_UFILEOP= ufileopbase.o ufiler.o
-OBJB_UFILEOP= 
+OBJB_UFILEOP= uutime.o uutimes.o
 
-OBJ_UFILEOP= obja_ufileop.o 
+OBJ_UFILEOP= obja_ufileop.o objb_ufileop.o
 
 
 default:		$(T).o
@@ -114,5 +114,7 @@ objb_ufileop.o:	$(OBJB_UFILEOP)
 
 ufileopbase.o:		ufileopbase.cc	$(INCS)
 ufiler.o:		ufiler.cc	$(INCS)
+uutime.o:		uutime.cc 	$(INCS)
+uutimes.o:		uutimes.cc 	$(INCS)
 
 

@@ -123,19 +123,19 @@ int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 
 int utmpaccent_size(cutmpaccent *uep) noex {
 	int		rs = SR_FAULT ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if (uep) {
 	    if (uep->user) {
-	        size += (strlen(uep->user)+1) ;
+	        sz += (strlen(uep->user)+1) ;
 	    }
 	    if (uep->line) {
-	        size += (strlen(uep->line)+1) ;
+	        sz += (strlen(uep->line)+1) ;
 	    }
 	    if (uep->host) {
-	        size += (strlen(uep->host)+1) ;
+	        sz += (strlen(uep->host)+1) ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (utmpaccent_size) */
 

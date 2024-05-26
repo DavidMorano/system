@@ -240,7 +240,7 @@ static constexpr cchar	uterm_uterms[] = {
 	0x00, 0x00, 0x00, 0x00, 
 } ;
 
-static constexpr cchar	varsub_fterms[32] = {
+static constexpr cchar	vs_fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x20,
 	0x00, 0x00, 0x00, 0x00,
@@ -274,8 +274,8 @@ int main(int argc,mainv argv,mainv) {
 	showterms(envs_vterms) ;
 	showterms(envs_dterms) ;
 	showterms(uterm_uterms) ;
-	printf("varsub_fterms\n") ;
-	showterms(varsub_fterms) ;
+	printf("vs_fterms\n") ;
+	showterms(vs_fterms) ;
 	if (argc > 1) {
 	    procfile(argv[1]) ;
 	} /* end if (argument) */

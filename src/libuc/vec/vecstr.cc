@@ -105,7 +105,7 @@
 
 /* imported namespaces */
 
-using std::sort ;
+using std::sort ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -170,9 +170,9 @@ int vecstr_start(vecstr *op,int n,int opts) noex {
 	if ((rs = vecstr_ctor(op)) >= 0) {
 	    op->n = n ;
 	    if ((rs = vecstr_setopts(op,opts)) >= 0) {
-	        cint	size = (n + 1) * sizeof(cchar **) ;
+	        cint	sz = (n + 1) * sizeof(cchar **) ;
 	        void	*va{} ;
-	        if ((rs = uc_libmalloc(size,&va)) >= 0) {
+	        if ((rs = uc_libmalloc(sz,&va)) >= 0) {
 	            op->va = (cchar **) va ;
 	            op->va[0] = nullptr ;
 	            op->stsize = 1 ;
@@ -264,15 +264,15 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	        rs = vecstr_extvec(op) ;
 	    }
 	    if (rs >= 0) {
-	        cint	size = (kl + 1 + vl + 1) ;
+	        cint	sz = (kl + 1 + vl + 1) ;
 	        char	*ap{} ;
-	        if ((rs = uc_libmalloc(size,&ap)) >= 0) {
+	        if ((rs = uc_libmalloc(sz,&ap)) >= 0) {
 		    char	*bp = ap ;
 	            bp = strwcpy(bp,kp,kl) ;
 	            *bp++ = '=' ;
 	            if (vp) bp = strwcpy(bp,vp,vl) ;
 	            *bp = '\0' ;
-	            op->stsize += size ;
+	            op->stsize += sz ;
 	            i = vecstr_addsp(op,ap) ;
 	        } /* end if (memory-allocation) */
 	    } /* end if (ok) */
@@ -291,11 +291,11 @@ int vecstr_store(vecstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	        rs = vecstr_extvec(op) ;
 	    }
 	    if (rs >= 0) {
-	        cint	size = (sl+1) ;
+	        cint	sz = (sl+1) ;
 	        char	*bp ;
-	        if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	        if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	            strwcpy(bp,sp,sl) ;
-	            op->stsize += size ;
+	            op->stsize += sz ;
 	            i = vecstr_addsp(op,bp) ;
 		    if (rpp) *rpp = bp ;
 	        } /* end if (m-a) */
@@ -752,10 +752,10 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int sl) noex {
 	        }
 	        if (rs >= 0) {
 	            char	*bp ;
-	            cint	size = (sl+1) ;
-	            if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	            cint	sz = (sl+1) ;
+	            if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	                strwcpy(bp,sp,sl) ;
-	                op->stsize += size ;
+	                op->stsize += sz ;
 	                i = vecstr_insertsp(op,ii,bp) ;
 	            }
 	        } /* end if (OK) */
@@ -804,16 +804,16 @@ static int vecstr_extvec(vecstr *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
-	    int		size ;
+	    int		sz ;
 	    void	*na{} ;
 	    if (op->va == nullptr) {
 	        nn = VECSTR_DEFENTS ;
-	        size = (nn + 1) * sizeof(char **) ;
-	        rs = uc_libmalloc(size,&na) ;
+	        sz = (nn + 1) * sizeof(char **) ;
+	        rs = uc_libmalloc(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        size = (nn + 1) * sizeof(char **) ;
-	        rs = uc_librealloc(op->va,size,&na) ;
+	        sz = (nn + 1) * sizeof(char **) ;
+	        rs = uc_librealloc(op->va,sz,&na) ;
 	    }
 	    if (rs >= 0) {
 	        op->va = (cchar **) na ;

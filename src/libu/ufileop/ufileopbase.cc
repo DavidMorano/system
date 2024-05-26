@@ -77,7 +77,8 @@ using std::nullptr_t ;			/* type */
 
 /* exported subroutines */
 
-int ufileopbase::operator () (cchar *fn) noex {
+namespace ufileop {
+    int ufileopbase::operator () (cchar *fn) noex {
 	int		rs = SR_BADF ;
 	if (fn) {
 	    rs = SR_INVALID ;
@@ -146,7 +147,7 @@ int ufileopbase::operator () (cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
+    } /* end method (ufileopbase::operator) */
 }
-/* end method (ufileopbase::operator) */
 
 

@@ -490,7 +490,7 @@ int sbuf_blanks(sbuf *sbp,int n) noex {
 int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp && fmt) {
+	if (sbp && fmt && ap) {
 	    rs = SR_INVALID ;
 	    if (fmt[0]) {
 	        if ((rs = SBUF_INDEX) >= 0) {
@@ -513,10 +513,12 @@ int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
 /* PRINTFLIKE2 */
 int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 	int		rs ;
-	va_list	ap ;
-	va_begin(ap,fmt) ;
-	rs = sbuf_vprintf(op,fmt,ap) ;
-	va_end(ap) ;
+	va_list		ap ;
+	{
+	    va_begin(ap,fmt) ;
+	    rs = sbuf_vprintf(op,fmt,ap) ;
+	    va_end(ap) ;
+	}
 	return rs ;
 }
 /* end subroutine (sbuf_printf) */

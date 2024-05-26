@@ -140,8 +140,9 @@ template<typename ... Args>
 static int grmems_ctor(grmems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
+	    grmems_head	*hp = static_cast<grmems_head *>(op) ;
 	    cnullptr	np{} ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(hp) ;
 	    rs = SR_NOMEM ;
 	    if ((op->lrup = new(nothrow) pq) != np) {
 		rs = SR_OK ;
@@ -654,9 +655,9 @@ static int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
 	if ((rs = grmems_mkug(op,dt)) >= 0) {
 	    grmems_ug	k, *ugp ;
 	    grmems_ug	*ugs = (grmems_ug *) op->usergids ;
-	    cint		esize = sizeof(grmems_ug) ;
-	    cint		n = op->nusergids ;
-	    stdsort_f		scf = stdsort_f(ugcmp) ;
+	    cint	esize = sizeof(grmems_ug) ;
+	    cint	n = op->nusergids ;
+	    stdsort_f	scf = stdsort_f(ugcmp) ;
 	    k.gid = gid ;
 	    ugp = (grmems_ug *) bsearch(&k,ugs,n,esize,scf) ;
 	    if (ugp != nullptr) {
@@ -1016,7 +1017,7 @@ static int record_loadgruns(grmems_rec *op,vecobj *ulp,GROUP *grp) noex {
 	    if (grp->gr_mem != nullptr) {
 	        cchar	**mems = (cchar **) grp->gr_mem ;
 	        for (int i = 0 ; mems[i] != nullptr ; i += 1) {
-	            grmems_u		u ;
+	            grmems_u	u ;
 	            u.up = mems[i] ;
 	            u.ul = -1 ;
 	            rs = vecobj_addouruniq(ulp,&u) ;

@@ -59,22 +59,6 @@ typedef	set<string>::iterator *	iterp ;
 
 /* forward references */
 
-template<typename ... Args>
-static inline int osetstr_magic(osetstr *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == OSETSTR_MAGIC) {
-		rs = SR_BUGCHECK ;
-		if (op->setp != nullptr) {
-		    rs = SR_OK ;
-		}
-	    }
-	}
-	return rs ;
-}
-/* end subroutine (osetstr_magic) */
-
 
 /* local variables */
 
@@ -90,6 +74,7 @@ int osetstr_start(osetstr *op,int n) noex {
 	if (op) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
 	    if (setstr *setp ; (setp = new(nothrow) setstr) != np) {
 	        op->setp = setp ;
 		op->magic = OSETSTR_MAGIC ;

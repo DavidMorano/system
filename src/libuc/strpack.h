@@ -50,6 +50,9 @@ extern int	strpack_count(strpack *) noex ;
 extern int	strpack_size(strpack *) noex ;
 extern int	strpack_finish(strpack *) noex ;
 
+extern int strpack_envstore(strpack *,cc *,cc *,int,cc **) noex ;
+extern int strpack_envstorer(strpack *,cc *,int,cc *,int,cc **) noex ;
+
 EXTERNC_end
 
 

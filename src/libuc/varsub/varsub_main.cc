@@ -78,8 +78,8 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 struct varsub_sub {
-	int		kl, vl ;
 	cchar		*kp, *vp ;
+	int		kl, vl ;
 } ;
 
 
@@ -89,10 +89,10 @@ typedef VARSUB_SUB	ent ;
 typedef ent		*entp ;
 
 template<typename ... Args>
-static inline int varsub_ctor(varsub *op,Args ... args) noex {
+static int varsub_ctor(varsub *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->slp = new(nothrow) vechand) != np) {
@@ -223,7 +223,7 @@ int varsub_add(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_add) */
 
-int varsub_addva(varsub *op,cchar **envv) noex {
+int varsub_addva(varsub *op,mainv envv) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = varsub_magic(op,envv)) >= 0) {
@@ -520,7 +520,7 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	                rs = buffer_char(bufp,'$') ;
 	                len += rs ;
 	            }
-	        }
+	        } /* end if (ok) */
 	    } /* end if (ok) */
 	    if (rs < 0) break ;
 	} /* end while */
@@ -537,10 +537,9 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 	int		len = 0 ;
 	if (kl > 0) {
 	    int		al = 0 ;
-	    cchar	*tp ;
 	    cchar	*cp{} ;
 	    cchar	*ap = nullptr ;
-	    if ((tp = strnchr(kp,kl,'=')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
 	        al = (kp + kl) - (tp + 1) ;
 	        kl = (tp - kp) ;
@@ -603,8 +602,9 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	                if (rs < 0)
 	                    entry_finish(ep) ;
 	            } /* end if (entry-start) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                uc_free(ep) ;
+		    }
 	        } /* end if (memory-allocation) */
 	    } else {
 	        rs = rs1 ;
@@ -626,8 +626,9 @@ static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	        if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
 	            op->f.sorted = false ;
 	            rs = vechand_add(elp,ep) ;
-	            if (rs < 0)
+	            if (rs < 0) {
 	                entry_finish(ep) ;
+		    }
 	        } /* end if (entry-start) */
 	        if (rs < 0) {
 	            uc_free(ep) ;
@@ -759,9 +760,9 @@ static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	}
 /* allocate buffers for the key and its value respectively */
 	if (kl > 0) {
-	    cint	size = (kl + 1) + (vl + 1) ;
+	    cint	sz = (kl + 1) + (vl + 1) ;
 	    char	*bp{} ;
-	    if ((rs = uc_malloc(size,&bp)) >= 0) {
+	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	        ep->kp = bp ;
 	        ep->kl = kl ;
 	        bp = (strwcpy(bp,kp,kl) + 1) ;
@@ -866,10 +867,12 @@ static int ventcmp(cvoid **ve1pp,cvoid **ve2pp) noex {
 	    if (e1p) {
 	        if (e2p) {
 		    rc = entry_keycmp(e1p,e2p) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = 1 ;
+	    }
 	}
 	return rc ;
 }

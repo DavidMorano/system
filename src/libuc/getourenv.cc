@@ -1,17 +1,18 @@
 /* getourenv SUPPORT */
 /* lang=C++20 */
 
-/* get (retrieve) a local environment variables */
+/* get (retrieve) a local environment variable */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code is generalized from one of my old programs. Why
-	the need for this? Because with the introduction of loadable
+	This code is generalized from one of my old programs.  Why
+	the need for this?  Because with the introduction of loadable
 	commands in Korn Shell (KSH), we also needed a local source
-	for an environment.
+	for an environment since the global one is indeterminate
+	(missing or incorrect).
 
 */
 

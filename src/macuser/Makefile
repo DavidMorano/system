@@ -100,6 +100,4 @@ control:
 
 main.o:			main.cc			$(INCS)
 
-ccfile.o:		ccfile.cc ccfile.hh
-
 

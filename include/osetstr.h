@@ -19,9 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 
 
 #define	OSETSTR_MAGIC	0x97351229
@@ -55,6 +56,25 @@ extern int osetstr_curend(osetstr *,osetstr_cur *) noex ;
 extern int osetstr_finish(osetstr *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline int osetstr_magic(osetstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == OSETSTR_MAGIC) {
+		rs = SR_BUGCHECK ;
+		if (op->setp != nullptr) {
+		    rs = SR_OK ;
+		}
+	    }
+	}
+	return rs ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* OSETSTR_INCLUDE */

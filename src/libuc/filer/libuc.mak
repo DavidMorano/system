@@ -329,16 +329,16 @@ UOBJ03= varnames.o syswords.o stdfnames.o
 
 UOBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 UOBJ05= nleadstr.o nleadkeystr.o
-UOBJ06= mapex.o strnul.o
-UOBJ07= getourenv.o
+UOBJ06= mapex.o getourenv.o strnul.o
+UOBJ07= sncpyx.o sncpyxw.o snaddw.o
 
 UOBJ08= strkeycmp.o ccfile.o strnul.o
 UOBJ09= readln.o ccfile.o
-UOBJ10= cfx.o sncpyx.o sncpyxc.o sncpyxw.o
+UOBJ10= cfx.o
 UOBJ11= strmgr.o strop.o field.o
 
-UOBJ12= ufstat.o ucttyname.o
-UOBJ13= ulogerror.o
+UOBJ12= ucttyname.o uctc.o tcx.o
+UOBJ13=
 UOBJ14= ucsys.o
 UOBJ15=
 
@@ -771,7 +771,7 @@ strcpyxc.o:		strcpyxc.cc strcpyxc.h
 
 opensysfs.o:		opensysfs.cc opensysfs.h
 
-quoteshellarg.o:	quoteshellarg.c
+quoteshellarg.o:	quoteshellarg.cc
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
 
@@ -858,6 +858,18 @@ snx.dir:
 
 snwcpy.o:		snwcpy.dir
 snwcpy.dir:
+	makesubdir $@
+
+wsnx.o:			wsnx.dir
+wsnx.dir:
+	makesubdir $@
+
+wsix.o:			wsix.dir
+wsix.dir:
+	makesubdir $@
+
+wsx.o:			wsx.dir
+wsx.dir:
 	makesubdir $@
 
 # MATXSTR
@@ -1091,8 +1103,8 @@ bufstr.o:		bufstr.cc bufstr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
-vstrkeycmpx.o:		vstrkeycmpx.c vstrkeycmpx.h
-vstrkeydictcmp.o:	vstrkeydictcmp.c vstrkeycmpx.h
+vstrkeycmpx.o:		vstrkeycmpx.cc vstrkeycmpx.h
+vstrkeydictcmp.o:	vstrkeydictcmp.cc vstrkeycmpx.h
 
 # string-constants
 stdfnames.o:		stdfnames.c stdfnames.h
@@ -1144,7 +1156,7 @@ ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
 ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
-mkutmpid.o:		mkutmpid.cc mkutmpid.h
+shellunder.o:		shellunder.cc shellunder.h
 #
 isproc.o:		isproc.cc isproc.h
 #

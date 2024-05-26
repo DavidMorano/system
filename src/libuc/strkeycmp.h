@@ -31,7 +31,7 @@
 EXTERNC_begin
 
 extern int strkeycmp(cchar *,cchar *) noex ;
-extern int strnkeycmp(cchar *,cchar *,int) noex ;
+extern int strkeydictcmp(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
