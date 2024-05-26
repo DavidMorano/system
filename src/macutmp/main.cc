@@ -168,8 +168,6 @@ static UTMPX	*getutxliner(UTMPX *) noex ;
 
 static char	*strtcpy(char *,cchar *,int) noex ;
 
-static bool	isNotTerm(int) noex ;
-
 
 /* local variables */
 
@@ -219,14 +217,6 @@ constexpr int		utl_user	= UT_NAMESIZE ;
 constexpr int		utl_line	= UT_LINESIZE ;
 constexpr int		utl_host	= UT_HOSTSIZE ;
 constexpr int		tlen = TIMEBUFLEN ;
-
-constexpr int		rsnoterm[] = {
-	SR_BADF,
-	SR_BADFD,
-	SR_NOTTY,
-	SR_ACCESS,
-	0
-} ;
 
 
 /* exported variables */
@@ -579,9 +569,5 @@ static char *strtcpy(char *dp,cchar *sp,int sl) noex {
 	return dp ;
 }
 /* end subroutine (strtcpy) */
-
-static bool isNotTerm(int rs) noex {
-	return isOneOf(rsnoterm,rs) ;
-}
 
 

@@ -228,22 +228,12 @@ static UTMPX	*getutxliner(UTMPX *) noex ;
 
 static char	*strtcpy(char *,cchar *,int) noex ;
 
-static bool	isNotTerm(int) noex ;
-
 
 /* local variables */
 
 constexpr cpcchar	utmpvars[] = {
 	VARUTMPLINE,
 	VARLOGLINE
-} ;
-
-constexpr int		rsnoterm[] = {
-	SR_BADF,
-	SR_BADFD,
-	SR_NOTTY,
-	SR_ACCESS,
-	0
 } ;
 
 constexpr gid_t		gidend = gid_t(-1) ;
@@ -264,7 +254,7 @@ constexpr cchar		fnshells[] = FNSHELLS ;
 int main(int argc,mainv argv,mainv) noex {
 	const uid_t	uid = getuid() ;
 	int		ex = EXIT_SUCCESS ;
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = getpn(argc,argv,prognames)) >= 0) {
 	    userinfo	ui ;
 	    cint	pm = rs ;
@@ -319,14 +309,12 @@ static int getpn(int argc,mainv argv,mainv names) noex {
 	if (argv) {
 	    rs = SR_NOMSG ;
 	    if ((argc > 0) && argv[0]) {
-	        int	bl ;
 	        cchar	*bp{} ;
-	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
-		    int		pl = rmchr(bp,bl,'.') ;
+	        if (int bl ; (bl = sfbasename(argv[0],-1,&bp)) > 0) {
+		    cint	pl = rmchr(bp,bl,'.') ;
 		    cchar	*pp = bp ;
 		    if (pl > 0) {
-			int	i ;
-	                if ((i = matstr(names,pp,pl)) >= 0) {
+	                if (int i ; (i = matstr(names,pp,pl)) >= 0) {
 		            rs = i ;
 	                }
 		    } /* end if (non-zero positive progname) */
@@ -452,12 +440,11 @@ int userinfo::findutmp_sid(uid_t uid) noex {
 	const pid_t	sid = getsid(0) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	utmpx		*up ;
-	cchar		*unp{} ;
+	UTMPX		*up ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	    if ((up->ut_pid == sid) && isourtype(up)) {
-		unp = up->ut_user ;
+		cchar	*unp = up->ut_user ;
 		if ((rs = strnlen(unp,sizeof(up->ut_user))) > 0) {
 	            PASSWD	*pwp ;
 	            char	ubuf[rs+1] ;
@@ -539,7 +526,7 @@ int userinfo::findutmp_env(uid_t uid) noex {
 }
 
 int userinfo::findutmp_stat(uid_t uid) noex {
-	static cint	sid = getsid(0) ;
+	cint		sid = getsid(0) ;
 	cint		tlen = TERMBUFLEN ;
 	int		rs ;
 	int		rs1 ;
@@ -647,9 +634,5 @@ static char *strtcpy(char *dp,cchar *sp,int dl) noex {
 	return dp ;
 }
 /* end subroutine (strtcpy) */
-
-static bool isNotTerm(int rs) noex {
-	return isOneOf(rsnoterm,rs) ;
-}
 
 

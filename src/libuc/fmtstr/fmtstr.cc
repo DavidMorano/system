@@ -8,11 +8,11 @@
 #define	CF_SPECIALHEX	1	/* perform special HEX function */
 #define	CF_CLEANSTR	1	/* clean strings */
 #define	CF_BINARYMIN	1	/* perform binary conversion minimally */
-#define	CF_BINCHAR	0	/* compile in 'binchar()' */
+#define	CF_BINCHAR	0	/* compile in |binchar()| */
 
 /* revision history:
 
-	= 1998-03-01, David AÂ­DÂ­ Morano
+	= 1998-03-01, David A­D­ Morano
 	Of course, this subroutine was inspired by the UNIX®
 	equivalent, but this is my own version for a) when I do not
 	have the UNIX® libraries around, and b. to customize it to
@@ -89,6 +89,7 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<cwchar>
+#include	<alogorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<ascii.h>
@@ -97,6 +98,7 @@
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<strdcpy.h>
+#include	<mkchar.h>
 #include	<hasnot.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -109,9 +111,6 @@
 
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
-
-#define	FMTSPEC		struct fmtspec
-#define	FMTSPEC_FL	struct fmtspec_flags
 
 #define	STRDATA		struct strdata
 
@@ -127,48 +126,22 @@
 
 #define	MAXLEN		(MAXPATHLEN + 40)
 
-#define	NDF		"format.nd"
-
-#define MAXDECDIG_I	10		/* decimal digits in 'int' */
-#define MAXDECDIG_UI	10		/* decimal digits in 'uint' */
-#define MAXDECDIG_L	10		/* decimal digits in 'long' */
-#define MAXDECDIG_UL	10		/* decimal digits in 'ulong' */
-#define MAXDECDIG_L64	19		/* decimal digits in 'long64' */
-#define MAXDECDIG_UL64	20		/* decimal digits in 'ulong64' */
-
-#define MAXDECDIG	MAXDECDIG_I	/* decimal digits in 'int' */
-
-#define MAXOCTDIG	11		/* maximum octal digits in a long */
-
-/* largest normal length positive integer */
-
-#ifndef	LONG_MIN
-#define	LONG_MIN	(-9223372036854775807L-1LL)
-#endif
-#ifndef	LONG_MAX
-#define	LONG_MAX	9223372036854775807LL
-#endif
-#ifndef	ULONG_MAX
-#define	ULONG_MAX	18446744073709551615ULL
-#endif
-
-/* largest power of 10 that can fit in whatever in unsigned form */
-
-#define SHORT_MAXPOW10	10000
-#define USHORT_MAXPOW10	10000
-#define INT_MAXPOW10	1000000000
-#define UINT_MAXPOW10	1000000000
-#define	LONG_MAXPOW10	1000000000000000000LL
-#define	ULONG_MAXPOW10	10000000000000000000LL
-
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
-#define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(LONG))+1))
-#define	BLANKSIZE	16		/* number of blanks in 'blanks' */
+#define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
 
-#ifndef	nullptrPOINTER
-#define	nullptrPOINTER	"(null)"
+#ifndef	NULLSTR
+#define	NULLSTR		"(null)"
 #endif
+
+
+/* imported namespaces */
+
+using std::min ;			/* type */
+using std::max ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -183,8 +156,8 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	SUBINFO_FL	f ;	/* flags */
 	char		*ubuf ;		/* user buffer */
+	SUBINFO_FL	f ;	/* flags */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current usage count */
 	int		mode ;		/* format mode */
@@ -193,7 +166,7 @@ struct subinfo {
 struct strdata {
 	const wint_t	*lsp ;
 	const wchar_t	*wsp ;
-	cchar	*sp ;
+	cchar		*sp ;
 	int		sl ;
 	int		f_wint ;
 	int		f_wchar ;
@@ -221,13 +194,13 @@ static int	subinfo_float(SUBINFO *,int,double,int,int,int,char *) noex ;
 #endif
 
 #if	CF_CLEANSTR
-static int	hasourbad(cchar *sp,int sl) noex ;
+static bool	hasourbad(cchar *sp,int sl) noex ;
 #endif /* CF_CLEANSTR */
 
 
 /* forward refernces */
 
-static int	isourbad(int ch) noex ;
+static bool	isourbad(int ch) noex ;
 
 template<typename T>
 static T rshiftx(T v,int n) noex {
@@ -241,7 +214,7 @@ static T rshiftx(T v,int n) noex {
 static cchar	digtable_hi[] = "0123456789ABCDEF" ;
 static cchar	digtable_lo[] = "0123456789abcdef" ;
 static cchar	blanks[] = "                " ;
-static cchar	*nullpointer = nullptrPOINTER ;
+static cchar	nullstr[] = NULLSTR ;
 
 
 /* exported variables */
@@ -283,130 +256,6 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 /* create the format specification that we will use later */
 
-	        {
-	            int	f_continue = false ;
-	            cchar	*fp = fmt ;
-
-	            memset(fsp,0,sizeof(FMTSPEC)) ;
-	            fsp->width = -1 ;
-	            fsp->prec = -1 ;
-
-	            f_continue = true ;
-	            while (f_continue) {
-	                cint	ch = MKCHAR(fp[0]) ;
-	                switch (ch) {
-	                case '-':
-	                    fsp->f.left = true ;
-	                    break ;
-	                case '+':
-	                    fsp->f.plus = true ;
-	                    break ;
-	                case '\'':
-	                    fsp->f.thousands = true ;
-	                    break ;
-	                case '0':
-	                    fsp->f.zerofill = true ;
-	                    break ;
-	                case '#':
-	                    fsp->f.alternate = true ;
-	                    break ;
-	                case ' ':
-	                    fsp->f.space = true ;
-	                    break ;
-	                default:
-	                    f_continue = false ;
-	                    break ;
-	                } /* end switch */
-	                if (f_continue) {
-	                    fp += 1 ;
-	                }
-	            } /* end while */
-
-/* now comes a digit string which may be a '*' */
-
-	            {
-	                int	width = -1 ;
-	                if (*fp == '*') {
-	                    width = (int) va_arg(ap,int) ;
-	                    fp += 1 ;
-	                    if (width < 0) {
-	                        width = -width ;
-	                        fsp->f.left = (! fsp->f.left) ;
-	                    }
-	                } else if ((*fp >= '0') && (*fp <= '9')) {
-	                    width = 0 ;
-	                    while ((*fp >= '0') && (*fp <= '9')) {
-	                        width = width * 10 + (*fp++ - '0') ;
-	                    }
-	                } /* end if (width) */
-
-	                if (width >= 0) fsp->width = width ;
-
-	            } /* end if (width) */
-
-/* maybe a decimal point followed by more digits (or '*') */
-
-	            if (*fp == '.') {
-	                int	prec = -1 ;
-	                fp += 1 ;
-	                if (*fp == '*') {
-	                    prec = (int) va_arg(ap,int) ;
-	                    fmt += 1 ;
-	                } else { /* the default if nothing is zero-precision */
-	                    prec = 0 ; /* default if nothing specified */
-	                    while ((*fp >= '0') && (*fp <= '9')) {
-	                        prec = prec * 10 + (*fp++ - '0') ;
-	                    }
-	                }
-	                if (prec >= 0) fsp->prec = prec ;
-
-	            } /* end if (a precision was specified) */
-
-/* check for a format length-modifier */
-
-	            {
-	                cint	ch = MKCHAR(*fp) ;
-
-	                switch (ch) {
-	                case 'h':
-	                    fsp->lenmod = lenmod_half ;
-	                    fp += 1 ;
-	                    break ;
-	                case 'l':
-	                    fsp->lenmod = lenmod_long ;
-	                    fp += 1 ;
-	                    break ;
-	                case 'L':
-	                    fsp->lenmod = lenmod_longlong ;
-	                    fp += 1 ;
-	                    break ;
-	                case 'D':
-	                    fsp->lenmod = lenmod_longdouble ;
-	                    fp += 1 ;
-	                    break ;
-	                case 'w':
-	                    fsp->lenmod = lenmod_wide ;
-	                    fp += 1 ;
-	                    break ;
-	                } /* end switch */
-
-	                if (*fp == 'l') {
-	                    enum lenmods m = fsp->lenmod ;
-	                    if (m == lenmod_long) {
-	                        fsp->lenmod = lenmod_longlong ;
-	                    } else {
-	                        fsp->lenmod = lenmod_long ;
-	                    }
-	                    fp += 1 ;
-	                }
-
-	            } /* end block (length specifier) */
-
-/* finally the format code itself */
-
-	            fsp->fcode = MKCHAR(*fp++) ;
-	            nfmt = (fp - fmt) ;
-	        } /* end block (loading up the FMTSPEC object) */
 	        if (nfmt == 0) break ;
 
 	        fmt += nfmt ;
@@ -485,9 +334,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        case 's':
 	        case 't':
 	            {
-	                STRDATA	sd ;
-
-	                memset(&sd,0,sizeof(STRDATA)) ;
+	                STRDATA	sd{} ;
 	                sd.sl = -1 ;
 
 	                if (fsp->fcode == 'S') {
@@ -526,7 +373,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                    if ((p == nullptr) && (sd.sl != 0)) {
 	                        sd.lsp = nullptr ;
 	                        sd.wsp = nullptr ;
-	                        sd.sp = nullpointer ;
+	                        sd.sp = nullstr ;
 	                        sd.sl = -1 ;
 	                    }
 	                } /* end block */
@@ -840,7 +687,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* local subroutines */
 
 static int subinfo_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->ubuf = ubuf ;
 	sip->ulen = ulen ;
 	sip->mode = mode ;
@@ -911,10 +758,11 @@ static int subinfo_char(SUBINFO *sip,int ch) noex {
 /* end subroutine (subinfo_char) */
  
 static int subinfo_blanks(SUBINFO *sip,int n) noex {
+	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_OK ;
 	int		nr = n ;
 	while ((rs >= 0) && (nr > 0)) {
-	    int 	m = MIN(BLANKSIZE,nr) ;
+	    int 	m = min(nblanks,nr) ;
 	    rs = subinfo_strw(sip,blanks,m) ;
 	    nr -= m ;
 	} /* end while */
@@ -940,7 +788,7 @@ static int subinfo_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
 	        if ((rs = uc_malloc(size,&abuf)) >= 0) {
 	            int		i, ch ;
 	            for (i = 0 ; (i < hl) && *sp ; i += 1) {
-	                ch = MKCHAR(sp[i]) ;
+	                ch = mkchar(sp[i]) ;
 	                if (isourbad(ch)) ch = CH_BADSUB ;
 	                abuf[i] = (char) ch ;
 	            }
@@ -1031,7 +879,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 /* continue with normal character processing */
 
 	    if ((sp == nullptr) && (sl != 0)) {
-	        sp = nullpointer ;
+	        sp = nullstr ;
 	        sl = -1 ;
 	        width = -1 ;
 	        prec = -1 ;
@@ -1426,10 +1274,10 @@ static int binchar(ulong num,int i) noex {
 #endif /* CF_BINCHAR */
 
 #if	CF_CLEANSTR
-static int hasourbad(cchar *sp,int sl) noex {
-	int		f = false ;
+static bool  hasourbad(cchar *sp,int sl) noex {
+	bool		f = false ;
 	while (sl && *sp) {
-	    cint	ch = MKCHAR(*sp) ;
+	    cint	ch = mkchar(*sp) ;
 	    f = isourbad(ch) ;
 	    if (f) break ;
 	    sp += 1 ;
@@ -1440,8 +1288,8 @@ static int hasourbad(cchar *sp,int sl) noex {
 /* end subroutine (hasourbad) */
 #endif /* CF_CLEANSTR */
 
-int isourbad(int ch) noex {
-	int		f = false ;
+static bool isourbad(int ch) noex {
+	bool		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == '\r') || (ch == '\n') ;
 	f = f || (ch == CH_BS) ;
