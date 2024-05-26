@@ -43,7 +43,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<algorithm>		/* <- for |min(3c++)| */
 #include	<usystem.h>
@@ -58,7 +59,13 @@
 /* local defines */
 
 #define	AEBUFLEN	sizeof(struct utmpx)
+
+#ifndef	VARUTMPLINE
 #define	VARUTMPLINE	"UTMPLINE"
+#endif
+#ifndef	VARLOGLINE
+#define	VARLOGLINE	"LOGLINE"
+#endif
 
 
 /* imported namespaces */
@@ -108,6 +115,11 @@ constexpr ufinder_m	mems[] = {
 	&ufinder::trysid,
 	&ufinder::tryline,
 	&ufinder::trystat
+} ;
+
+constexpr cpcchar	utmpenvs[] = {
+	VARUTMPLINE,
+	VARLOGLINE
 } ;
 
 
@@ -209,10 +221,12 @@ int ufinder::tryline() noex {
 	static cint	oursid = getsid(0) ;
 	int		rs = SR_OK ;
 	if (sid == oursid) {
-	    static cchar	*line = getenv(VARUTMPLINE) ;
-	    if (line) {
-	        rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
-	    }
+	    for (auto const &vn : utmpenvs) {
+	        if (cchar *line ; (line = getenv(vn)) != nullptr) {
+	            rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
+	        }
+		if (rs != 0) break ;
+	    } /* end for */
 	} /* end if (referencing ourself) */
 	return rs ;
 }
