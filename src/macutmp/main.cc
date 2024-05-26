@@ -123,6 +123,9 @@
 #ifndef	VARUTMPLINE
 #define	VARUTMPLINE	"UTMPLINE"
 #endif
+#ifndef	VARLOGLINE
+#define	VARLOGLINE	"LOGLINE"
+#endif
 
 
 /* imported namespaces */
@@ -204,6 +207,11 @@ constexpr cpcchar	prognames[] = {
 	"logsid",
 	"logged",
 	nullptr
+} ;
+
+constexpr cpcchar	utmpvars[] = {
+	VARUTMPLINE,
+	VARLOGLINE
 } ;
 
 constexpr int		utl_id		= UT_IDSIZE ;
@@ -419,19 +427,21 @@ static int findline(int pm) noex {
 
 static int findenv(int pm) noex {
 	int		rs = SR_OK ;
-	cchar		*vn = VARUTMPLINE ;
 	bool		f = false ;
-	if (cchar *line ; (line = getenv(vn)) != nullptr) {
-	    if (line[0]) {
-	        UTMPX	ut{} ;
-	        UTMPX	*up ;
-	        strncpy(ut.ut_line,line,utl_line) ;
-	        if ((up = getutxliner(&ut)) != nullptr) {
-		    f = true ;
-		    rs = printutxval(pm,up) ;
-	        }
-	    } /* end if (non-empty) */
-	} /* end if (getenv) */
+	for (auto const &vn : utmpvars) {
+	    if (cchar *line ; (line = getenv(vn)) != nullptr) {
+	        if (line[0]) {
+	            UTMPX	ut{} ;
+	            UTMPX	*up ;
+	            strncpy(ut.ut_line,line,utl_line) ;
+	            if ((up = getutxliner(&ut)) != nullptr) {
+		        f = true ;
+		        rs = printutxval(pm,up) ;
+	            }
+	        } /* end if (non-empty) */
+	    } /* end if (getenv) */
+	    if ((rs < 0) || f) break ;
+	} /* end for (utmpvars) */
 	if ((rs >= 0) && (!f)) rs = SR_NOTFOUND ;
 	return rs ;
 }

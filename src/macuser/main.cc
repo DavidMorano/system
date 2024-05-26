@@ -515,7 +515,7 @@ int userinfo::findutmp_stdin(uid_t uid) noex {
 int userinfo::findutmp_env(uid_t uid) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	for (auto &vn : utmpvars) {
+	for (auto const &vn : utmpvars) {
 	    if (cchar *line ; (line = getenv(vn)) != nullptr) {
 	        if (line[0]) {
 		    char	nbuf[utl_user+1] ;
