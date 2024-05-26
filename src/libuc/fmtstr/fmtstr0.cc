@@ -4,8 +4,17 @@
 /* subroutine to format string output */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUGZ	0	/* turn on debugging */
+#define	CF_DEBUGZZ	0	/* extra */
 #define	CF_FLOAT	1	/* do you want floating output conversions? */
+#define	CF_LPRINT	0	/* the local-print subroutines */
+#define	CF_LSPRINTF	1	/* use internal 'lsprintf(3c)' */
+#define	CF_LVSPRINTF	0	/* local 'vsprintf(3s)'? */
+#define	CF_LSNPRINTF	0	/* local 'snprintf(3s)'? */
+#define	CF_LVSNPRINTF	0	/* local 'vsnprintf(3s)'? */
+#define	CF_SUNCC	0	/* using Sun CC -- complains on 'lsprintf()' */
 #define	CF_SPECIALHEX	1	/* perform special HEX function */
+#define	CF_RESERVE	0	/* compile in 'subinfo_reserve()' */
 #define	CF_CLEANSTR	1	/* clean strings */
 #define	CF_BINARYMIN	1	/* perform binary conversion minimally */
 #define	CF_BINCHAR	0	/* compile in 'binchar()' */
@@ -13,10 +22,10 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	Of course, this subroutine was inspired by the UNIX�
-	equivalent, but this is my own version for a) when I do not
-	have the UNIX� libraries around, and b. to customize it to
-	what I want!
+	Of course, this subroutine was inspired by the UNIX®
+	equivalent, but this is my own version for a. when I don't
+	have the UNIX® libraries around, and b. to customize it
+	to what I want!
 
 */
 
@@ -25,7 +34,7 @@
 /*******************************************************************************
 
 	Description:
-	This subroutine is used by |printf(3c)| type routines to
+	This subroutine is used by 'printf()' type routines to
 	format an output string from a format specification.  Floating
 	point support is optional at compile time by using the
 	compile time switch "CF_FLOAT".
@@ -40,7 +49,9 @@
 	fmt		the format string
 	ap		argument-pointer (see STDARG)
 
+
 	Returns:
+	<0		error (if mode allows errors to be returned)
 	>=0		resulting length of filled call result buffer
 
 	Note on formatting 'modes':
@@ -79,30 +90,27 @@
 
 *******************************************************************************/
 
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<cstdarg>
 #include	<cstring>
-#include	<cwchar>
+#include	<wchar.h>
+#include	<cstdarg>
+
+#if	CF_FLOAT && F_SUNOS
+#include	<floatingpoint.h>
+#endif
+
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<ascii.h>
 #include	<stdintx.h>
-#include	<snx.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<hasnot.h>
-#include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"fmtstr.h"
-#include	"fmtspec.hh"
+#include	"format.h"
 
 
 /* local defines */
@@ -152,7 +160,7 @@
 #define	ULONG_MAX	18446744073709551615ULL
 #endif
 
-/* largest power of 10 that can fit in whatever in unsigned form */
+/* largest power of 10 that can fit in whatever is unsigned form */
 
 #define SHORT_MAXPOW10	10000
 #define USHORT_MAXPOW10	10000
@@ -165,13 +173,43 @@
 #define	MAXPREC		41		/* maximum floating precision */
 #define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(LONG))+1))
 #define	BLANKSIZE	16		/* number of blanks in 'blanks' */
+#define	DEBUGBUFLEN	1024
 
-#ifndef	nullptrPOINTER
-#define	nullptrPOINTER	"(null)"
+#ifndef	NULLPOINTER
+#define	NULLPOINTER	"(null)"
+#endif
+
+#ifndef	NULL
+#define	NULL		0
 #endif
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int	snwcpy(char *,int,const char *,int) ;
+    extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
+    extern int	strlinelen(const char *,int,int) ;
+    extern int	hasprintbad(const char *,int) ;
+    extern int	isprintbad(int) ;
+    extern int	isprintlatin(int) ;
+}
+
+#if	CF_DEBUGZ
+extern "C" {
+    extern int	zprint(cchar *,cchar *,int) ;
+    extern int	zprintf(cchar *,cchar *,...) ;
+    extern int	mkhexstr(char *,int,void *,int) ;
+    extern int	hexblock(const char *,void *,int) ;
+}
+#endif
+
+extern "C" {
+    extern char	*strwcpy(char *,const char *,int) ;
+    extern char	*strnchr(const char *,int,int) ;
+    extern char	*strdcpy1(char *,int,const char *) ;
+    extern char	*strdcpy1w(char *,int,const char *,int) ;
+}
 
 
 /* local structures */
@@ -184,19 +222,48 @@ struct subinfo_flags {
 
 struct subinfo {
 	SUBINFO_FL	f ;	/* flags */
-	char		*ubuf ;		/* user buffer */
+	char		*ubuf ;		/* user's buffer */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current usage count */
 	int		mode ;		/* format mode */
 } ;
 
+struct fmtspec_flags {
+	uint		alternate:1 ;	/* alternate form */
+	uint		zerofill:1 ;	/* zero fill on left */
+	uint		plus:1 ;	/* leading plus sign */
+	uint		minus:1 ;	/* leading minus sign */
+	uint		left:1 ;	/* left justified */
+	uint		thousands:1 ;	/* group by thousands */
+	uint		space:1 ;	/* leading space */
+	uint		isdigit:1 ;	/* is a digit-type character */
+} ;
+
+struct fmtspec {
+	FMTSPEC_FL	f ;
+	int		fcode ;		/* the format "code" */
+	int		width ;		/* <0 turns off */
+	int		prec ;		/* <0 turns off */
+	int		lenmod ;	/* length modifier */
+} ;
+
 struct strdata {
 	const wint_t	*lsp ;
 	const wchar_t	*wsp ;
-	cchar	*sp ;
+	const char	*sp ;
 	int		sl ;
 	int		f_wint ;
 	int		f_wchar ;
+} ;
+
+enum lenmods {
+	lenmod_none,
+	lenmod_half,
+	lenmod_long,
+	lenmod_longlong,
+	lenmod_longdouble,
+	lenmod_wide,
+	lenmod_overlast
 } ;
 
 
@@ -204,13 +271,16 @@ struct strdata {
 
 static int subinfo_start(SUBINFO *,char *,int,int) noex ;
 static int subinfo_finish(SUBINFO *) noex ;
-static int subinfo_strw(SUBINFO *,cchar *,int) noex ;
+static int subinfo_strw(SUBINFO *,const char *,int) noex ;
 static int subinfo_char(SUBINFO *,int) noex ;
 static int subinfo_blanks(SUBINFO *,int) noex ;
-static int subinfo_cleanstrw(SUBINFO *,cchar *,int) noex ;
-static int subinfo_emit(SUBINFO *,FMTSPEC *,cchar *,int) noex ;
+static int subinfo_cleanstrw(SUBINFO *,const char *,int) noex ;
+static int subinfo_emit(SUBINFO *,FMTSPEC *,const char *,int) noex ;
 static int subinfo_fmtstr(SUBINFO *,FMTSPEC *,STRDATA *) noex ;
+
+#if	CF_RESERVE
 static int subinfo_reserve(SUBINFO *,int) ;
+#endif
 
 #if	CF_BINCHAR
 static int	binchar(ulong,int) ;
@@ -224,10 +294,23 @@ static int	subinfo_float(SUBINFO *,int,double,int,int,int,char *) noex ;
 static int	hasourbad(cchar *sp,int sl) noex ;
 #endif /* CF_CLEANSTR */
 
+#if	CF_LPRINT
+#if	((CF_LSPRINTF || CF_LVSPRINTF || CF_LSNPRINTF || CF_LVSNPRINTF))
+#if	(! CF_SUNCC)
+static int	lsprintf(char *,const char *,...) noex ;
+#endif
+#endif
+#endif /* CF_LPRINT */
 
-/* forward refernces */
 
-static int	isourbad(int ch) noex ;
+/* local variables */
+
+static const char	digtable_hi[] = "0123456789ABCDEF" ;
+static const char	digtable_lo[] = "0123456789abcdef" ;
+static const char	blanks[] = "                " ;
+static const char	*nullpointer = NULLPOINTER ;
+
+/* subroutine-templaes */
 
 template<typename T>
 static T rshiftx(T v,int n) noex {
@@ -236,12 +319,9 @@ static T rshiftx(T v,int n) noex {
 /* end subroutine (rshiftx) */
 
 
-/* local variables */
+/* forward refernces */
 
-static cchar	digtable_hi[] = "0123456789ABCDEF" ;
-static cchar	digtable_lo[] = "0123456789abcdef" ;
-static cchar	blanks[] = "                " ;
-static cchar	*nullpointer = nullptrPOINTER ;
+static int	isourbad(int ch) noex ;
 
 
 /* exported variables */
@@ -252,14 +332,30 @@ static cchar	*nullpointer = nullptrPOINTER ;
 int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	SUBINFO		si, *sip = &si ;
 	FMTSPEC		fs, *fsp = &fs ;
-	cint	tlen = BUFLEN ;
+	const int	tlen = BUFLEN ;
 	int		rs = SR_OK ;
 	int		fmtlen = 0 ;
-	cchar	*tp ;
+	const char	*tp ;
+#if	CF_DEBUGZ
+	const int	dlen = DEBUGBUFLEN ;
+	char		dbuf[DEBUGBUFLEN+1] ;
+#endif
 	char		tbuf[BUFLEN+1] ;	/* must be > MAXDECDIG */
 
-	if (ubuf == nullptr) return SR_FAULT ;
-	if (fmt == nullptr) return SR_FAULT ;
+#if	CF_DEBUGZ
+	if (fmt != NULL) {
+	    int dl = strlinelen(fmt,-1,70) ;
+	    strdcpy1(dbuf,dlen,fmt) ;
+	    dbuf[dl] = '\0' ;
+	    zprintf(NDF,"format: ent dl=%d\n",dl) ;
+	    zprintf(NDF,"format: fmt=>%s<\n",dbuf) ;
+	} else {
+	    zprintf(NDF,"format: ent fmt=>%s<\n",nullpointer) ;
+	}
+#endif /* CF_DEBUGZ */
+
+	if (ubuf == NULL) return SR_FAULT ;
+	if (fmt == NULL) return SR_FAULT ;
 
 	if (fmt[0] == '\0') return SR_INVALID ;
 
@@ -267,7 +363,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 /* go through the loops */
 
-	    while ((rs >= 0) && *fmt && ((tp = strchr(fmt,'%')) != nullptr)) {
+	    while ((rs >= 0) && *fmt && ((tp = strchr(fmt,'%')) != NULL)) {
 	        int	bl = 0 ;
 	        int	nfmt ;
 	        int	fcode ;
@@ -284,43 +380,64 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* create the format specification that we will use later */
 
 	        {
-	            int	f_continue = false ;
+	            int	f_continue = FALSE ;
+#if	CF_DEBUGZ && CF_DEBUGZZ
+	            int	f_special = FALSE ;
+#endif
+
 	            cchar	*fp = fmt ;
 
 	            memset(fsp,0,sizeof(FMTSPEC)) ;
 	            fsp->width = -1 ;
 	            fsp->prec = -1 ;
 
-	            f_continue = true ;
+	            f_continue = TRUE ;
 	            while (f_continue) {
-	                cint	ch = MKCHAR(fp[0]) ;
+	                const int	ch = MKCHAR(fp[0]) ;
 	                switch (ch) {
 	                case '-':
-	                    fsp->f.left = true ;
+	                    fsp->f.left = TRUE ;
 	                    break ;
 	                case '+':
-	                    fsp->f.plus = true ;
+	                    fsp->f.plus = TRUE ;
 	                    break ;
 	                case '\'':
-	                    fsp->f.thousands = true ;
+	                    fsp->f.thousands = TRUE ;
 	                    break ;
 	                case '0':
-	                    fsp->f.zerofill = true ;
+	                    fsp->f.zerofill = TRUE ;
 	                    break ;
 	                case '#':
-	                    fsp->f.alternate = true ;
+	                    fsp->f.alternate = TRUE ;
 	                    break ;
 	                case ' ':
-	                    fsp->f.space = true ;
+	                    fsp->f.space = TRUE ;
 	                    break ;
 	                default:
-	                    f_continue = false ;
+	                    f_continue = FALSE ;
 	                    break ;
 	                } /* end switch */
 	                if (f_continue) {
+#if	CF_DEBUGZ && CF_DEBUGZZ
+	                    f_special = TRUE ;
+#endif
 	                    fp += 1 ;
 	                }
 	            } /* end while */
+
+#if	CF_DEBUGZ && CF_DEBUGZZ
+	            if (f_special) {
+	                zprintf(NDF,"format: f_left=%u\n",fsp->f.left) ;
+	                zprintf(NDF,"format: f_plus=%u\n",fsp->f.plus) ;
+	                zprintf(NDF,"format: f_thousands=%u\n",
+	                    fsp->f.thousands) ;
+	                zprintf(NDF,"format: f_zerofill=%u\n",
+	                    fsp->f.zerofill) ;
+	                zprintf(NDF,"format: f_alternate=%u\n",
+	                    fsp->f.alternate) ;
+	                zprintf(NDF,"format: f_space=%u\n",fsp->f.space) ;
+	            }
+#endif /* CF_DEBUGZ */
 
 /* now comes a digit string which may be a '*' */
 
@@ -365,7 +482,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* check for a format length-modifier */
 
 	            {
-	                cint	ch = MKCHAR(*fp) ;
+	                const int	ch = MKCHAR(*fp) ;
 
 	                switch (ch) {
 	                case 'h':
@@ -412,6 +529,14 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        fmt += nfmt ;
 	        fcode = fsp->fcode ;
 
+#if	CF_DEBUGZ
+	        {
+	            int	fc = (isprintlatin(fcode) ? fcode : '¿') ;
+	            zprintf(NDF,"format: switch fcode=%c (\\x%04X)\n",
+	                fc,fcode) ;
+	        }
+#endif /* CF_DEBUGZ */
+
 	        switch (fcode) {
 
 	        case 0:
@@ -434,20 +559,24 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        case 'c':
 	            {
 	                int	ch ;
-	                int	f_wchar = false ;
-	                int	f_wint = false ;
+	                int	f_wchar = FALSE ;
+	                int	f_wint = FALSE ;
+
+#if	CF_DEBUGZ
+	                zprintf(NDF,"format: got a character\n") ;
+#endif
 
 	                if (fsp->fcode != 'C') {
 	                    switch (fsp->lenmod) {
 	                    case lenmod_wide:
-	                        f_wchar = true ;
+	                        f_wchar = TRUE ;
 	                        break ;
 	                    case lenmod_long:
-	                        f_wint = true ;
+	                        f_wint = TRUE ;
 	                        break ;
 	                    }
 	                } else {
-	                    f_wchar = true ;
+	                    f_wchar = TRUE ;
 			}
 
 	                if (f_wint) {
@@ -491,14 +620,14 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                sd.sl = -1 ;
 
 	                if (fsp->fcode == 'S') {
-	                    sd.f_wchar = true ;
+	                    sd.f_wchar = TRUE ;
 	                } else {
 	                    switch (fsp->lenmod) {
 	                    case lenmod_long:
-	                        sd.f_wint = true ;
+	                        sd.f_wint = TRUE ;
 	                        break ;
 	                    case lenmod_wide:
-	                        sd.f_wchar = true ;
+	                        sd.f_wchar = TRUE ;
 	                        break ;
 	                    } /* end switch */
 	                } /* end if (wide or narrow) */
@@ -508,7 +637,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                } else if (sd.f_wchar) {
 	                    sd.wsp = (const wchar_t *) va_arg(ap,wchar_t *) ;
 	                } else {
-	                    sd.sp = (cchar *) va_arg(ap,char *) ;
+	                    sd.sp = (const char *) va_arg(ap,char *) ;
 	                }
 
 	                if (fsp->fcode == 't') {
@@ -517,20 +646,33 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 #ifdef	COMMENT /* null-pointer check (done later) */
 	                {
-	                    cvoid *p = sd.sp ;
+	                    const void *p = sd.sp ;
 	                    if (sd.f_wint) {
 	                        p = sd.lsp ;
 	                    } else if (sd.f_wchar) {
 	                        p = sd.wsp ;
 	                    }
-	                    if ((p == nullptr) && (sd.sl != 0)) {
-	                        sd.lsp = nullptr ;
-	                        sd.wsp = nullptr ;
+	                    if ((p == NULL) && (sd.sl != 0)) {
+	                        sd.lsp = NULL ;
+	                        sd.wsp = NULL ;
 	                        sd.sp = nullpointer ;
 	                        sd.sl = -1 ;
 	                    }
 	                } /* end block */
 #endif /* COMMENT */
+
+#if	CF_DEBUGZ
+	                {
+	                    int	dl ;
+			    if (sd.sp == NULL) sd.sp = "*NULL*" ;
+	                    dl = strlinelen(sd.sp,sd.sl,40) ;
+	                    strdcpy1(dbuf,dlen,sd.sp) ;
+	                    dbuf[dl] = '\0' ;
+	                    zprintf(NDF,"format: s sp{%p}\n",sd.sp) ;
+	                    zprintf(NDF,"format: s sl=%d sp{%p}=>%s<\n",
+	                        sd.sl,sd.sp,dbuf) ;
+	                }
+#endif /* CF_DEBUGZ */
 
 	                rs = subinfo_fmtstr(sip,fsp,&sd) ;
 	                fcode = 0 ;
@@ -573,6 +715,11 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                    unum >>= 3 ;
 	                } /* end for (making the digits) */
 	                if (i == 0) *--bp = '0' ;
+
+#if	CF_DEBUGZ
+			if (bp == NULL) bp = "*NULL*" ;
+	                zprintf(NDF,"format: nd=%u b=%s\n",nd,bp) ;
+#endif
 
 	                bl = ((tbuf+tlen) - bp) ;
 
@@ -629,6 +776,11 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                    if ((! f_special) && (unum == 0)) break ;
 	                } /* end for (making the digits) */
 
+#if	CF_DEBUGZ
+			if (bp == NULL) bp = "*NULL*" ;
+	                zprintf(NDF,"format: ndigits=%u b=%s\n",ndigits,bp) ;
+#endif
+
 	                bl = (bp-(tbuf+tlen)) ;
 
 	            } /* end block */
@@ -683,7 +835,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	                if (f_signed && (num < 0)) {
 	                    *--bp = '-' ;
-	                    fsp->f.minus = true ;
+	                    fsp->f.minus = TRUE ;
 	                }
 
 	                bl = ((tbuf+tlen) - bp) ;
@@ -701,8 +853,8 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 #else /* CF_BINARYMIN */
 	                int		f_special = CF_SPECIALHEX ;
 #endif /* CF_BINARYMIN */
-	                int		f_got = false ;
-	                cchar	*digtable = digtable_lo ;
+	                int		f_got = FALSE ;
+	                const char	*digtable = digtable_lo ;
 
 	                switch (fsp->lenmod) {
 	                case lenmod_longlong:
@@ -723,6 +875,10 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                    break ;
 	                } /* end switch */
 
+#if	CF_DEBUGZ
+	                zprintf(NDF,"format: binary ndigits=%u\n",ndigits) ;
+#endif
+
 #if	CF_BINARYMIN
 	                {
 	                    bp = tbuf ;
@@ -731,7 +887,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                        for (i = 63 ; i >= 32 ; i -= 1) {
 	                            ch = digtable[(unum>>i) & 1] ;
 	                            if (f_got || (ch != '0')) {
-	                                f_got = true ;
+	                                f_got = TRUE ;
 	                                *bp++ = ch ;
 	                            }
 	                        }
@@ -741,22 +897,30 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                        for (i = 31 ; i >= 16 ; i -= 1) {
 	                            ch = digtable[(unum>>i) & 1] ;
 	                            if (f_got || (ch != '0')) {
-	                                f_got = true ;
+	                                f_got = TRUE ;
 	                                *bp++ = ch ;
 	                            }
 	                        }
 	                    } /* end if */
+
 	                    for (i = 15 ; i >= 0 ; i -= 1) {
 	                        ch = digtable[(unum>>i) & 1] ;
 	                        if (f_got || (ch != '0')) {
-	                            f_got = true ;
+	                            f_got = TRUE ;
 	                            *bp++ = ch ;
 	                        }
 	                    } /* end for */
+
 	                    if (! f_got) {
 	                        *bp++ = '0' ;
 	                    }
+
 	                    *bp = '\0' ;
+
+#if	CF_DEBUGZ
+	                    zprintf(NDF,"format: tbuf=>%s<\n",tbuf) ;
+#endif
+
 	                    bl = (bp - tbuf) ;
 	                    bp = tbuf ;
 	                }
@@ -773,6 +937,12 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                        if ((! f_special) && (unum == 0)) break ;
 	                    } /* end for (making the digits) */
 
+#if	CF_DEBUGZ
+			    if (bp == NULL) bp = "*NULL*" ;
+	                    zprintf(NDF,"format: ndigits=%u b=%s\n",
+				ndigits,bp) ;
+#endif
+
 	                    bl = (bp-(tbuf+tlen)) ;
 	                }
 #endif /* CF_BINARYMIN */
@@ -786,19 +956,24 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        case 'g':
 	            {
 	                double	dv ;
+
+#if	CF_DEBUGZ
+	                zprintf(NDF,"format: float fcode=%c\n",fcode) ;
+#endif
+
 	                dv = (double) va_arg(ap,double) ;
 
 #if	CF_FLOAT && F_SUNOS
 	                {
-			    cint	w = fsp->width ;
-			    cint	p = fsp->prec ;
+			    const int	w = fsp->width ;
+			    const int	p = fsp->prec ;
 	                    int		fill = -1 ;
 	                    if (fsp->f.zerofill) fill = 0 ;
 	                    rs = subinfo_float(sip,fcode,dv,w,p,fill,tbuf) ;
 	                }
 #else
 	                {
-	                    cchar	*cp ;
+	                    const char	*cp ;
 	                    cp = "* no floating support *" ;
 	                    rs = subinfo_strw(sip,cp,-1) ;
 	                }
@@ -810,6 +985,84 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 #ifdef	COMMENT /* terminal codes are no longer supported! */
 
+/* handle terminal cursor positioning */
+	        case 'A':
+	        case 'B':
+	        case 'C':
+	        case 'D':
+	        case 'J':
+	        case 'K':
+	        case 'L':
+	        case 'M':
+	        case '@':
+	        case '~':
+	            {
+	                int	width = fsp->width ;
+
+	                if (width <= 1) {
+	                    rs = lsprintf(buf,"\033[%c",fcode) ;
+	                    bl = rs ;
+	                } else {
+	                    rs = lsprintf(buf,"\033[%u%c",width,fcode) ;
+	                    bl = rs ;
+	                }
+
+	                if (rs >= 0) {
+	                    if ((rs = subinfo_reserve(sip,bl)) >= 0) {
+	                        rs = subinfo_strw(sip,bp,bl) ;
+	                    }
+	                }
+
+	                fcode = 0 ;	/* no other output */
+	            } /* end block */
+	            break ;
+
+/* absolute terminal cursor positioning */
+	        case 'H':
+	            {
+	                int		width = fsp->width ;
+
+	                if (width <= 1) {
+	                    rs = lsprintf(buf,"\033[H") ;
+	                    bl = rs ;
+	                } else if (prec <= 1) {
+	                    rs = lsprintf(buf,"\033[%uH",width) ;
+	                    bl = rs ;
+	                } else {
+	                    rs = lsprintf(buf,"\033[%u;%uH",width,prec) ;
+	                    bl = rs ;
+	                }
+
+	                if (rs >= 0) {
+	                    rs = subinfo_reserve(sip,bl) ;
+	                    if (rs >= 0)
+	                        rs = subinfo_strw(sip,bp,bl) ;
+	                }
+
+	                fcode = 0 ;	/* no other output */
+	            } /* end block */
+	            break ;
+
+#endif /* COMMENT */ /* terminal codes are no longer supported! */
+
+#ifdef	COMMENT /* conflicts with another use of 'm' key letter! */
+
+/* character rendition */
+	        case 'm':
+	            {
+	                if (width <= 0) {
+	                    lsprintf(buf,"\033[%c",fcode) ;
+	                } else {
+	                    lsprintf(buf,"\033[%d%c",width,fcode) ;
+	                }
+	                rs = storestring(&ld,buf) ;
+	                fcode = 0 ;	/* no other output */
+	            }
+	            break ;
+
+#endif /* COMMENT */
+
+/* not a format-code character error out -- always */
 	        default:
 	            rs = SR_NOMSG ;
 	            break ;
@@ -818,11 +1071,25 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 /* determine if there are characters to output based on 'fcode' variable */
 
-	        if ((rs >= 0) && (fcode != '\0') && (bp != nullptr)) {
+#if	CF_DEBUGZ
+	        zprintf(NDF,"format: switch-out rs=%d fcode=%c (\\x%04X)\n",
+	            rs,(isprintlatin(fcode) ? fcode : '°'),fcode) ;
+#endif
+
+	        if ((rs >= 0) && (fcode != '\0') && (bp != NULL)) {
 	            rs = subinfo_emit(sip,fsp,bp,bl) ;
+
+#if	CF_DEBUGZ
+	            zprintf(NDF,"format: subinfo_emit() rs=%d\n",rs) ;
+#endif
+
 	        }
 
 	    } /* end while (infinite loop) */
+
+#if	CF_DEBUGZ
+	    zprintf(NDF,"format: while-out rs=%d\n",rs) ;
+#endif
 
 	    if ((rs >= 0) && (*fmt != '\0')) {
 	        rs = subinfo_cleanstrw(sip,fmt,-1) ;
@@ -831,6 +1098,22 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	    fmtlen = subinfo_finish(sip) ;
 	    if (rs >= 0) rs = fmtlen ;
 	} /* end if (subinfo) */
+
+#if	CF_DEBUGZ
+	zprintf(NDF,"format: subinfo_finish() rs=%d\n",rs) ;
+#endif
+
+/* we are out of here! */
+
+#if	CF_DEBUGZ
+	{
+	    int dl = strlinelen(ubuf,fmtlen,40) ;
+	    strdcpy1(dbuf,dlen,ubuf) ;
+	    dbuf[dl] = '\0' ;
+	    zprintf(NDF,"format: ubuf=>%s<\n",dbuf) ;
+	    zprintf(NDF,"format: ret rs=%d fmtlen=%u\n",rs,fmtlen) ;
+	}
+#endif /* CF_DEBUGZ */
 
 	return (rs >= 0) ? fmtlen : rs ;
 }
@@ -861,31 +1144,42 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
+
+#if	CF_RESERVE
 static int subinfo_reserve(SUBINFO *sip,int n) noex {
 	int		rs = SR_OVERFLOW ;
 	if (! sip->f.ov) {
 	    int		rlen = (sip->ulen - sip->len) ;
 	    rs = SR_OK ;
 	    if (n > rlen) {
-	        sip->f.ov = true ;
+	        sip->f.ov = TRUE ;
 	    }
 	} /* end if (not overflow) */
 	return rs ;
 }
 /* end subroutine (subinfo_reserve) */
+#endif /* CF_RESERVE */
 
 static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		ml = 0 ;
 
+#if	CF_DEBUGZ
+	if (sp == NULL) sp = "*NULL*" ;
+	zprintf(NDF,"format/subinfo_strw: ent sl=%d s=>%*s<\n",sl,sl,sp) ;
+#endif
+
 	if (! sip->f.ov) {
 	    int		rlen ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    rlen = (sip->ulen - sip->len) ;
-	    if (sl > rlen) sip->f.ov = true ;
+	    if (sl > rlen) sip->f.ov = TRUE ;
 	    ml = MIN(sl,rlen) ;
 	    if (ml > 0) {
 	        char	*bp = (sip->ubuf + sip->len) ;
+#if	CF_DEBUGZ
+	zprintf(NDF,"format/subinfo_strw: wri ml=%d s=>%*s<\n",ml,ml,sp) ;
+#endif
 	        memcpy(bp,sp,ml) ;
 	        sip->len += ml ;
 	    }
@@ -893,6 +1187,10 @@ static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
+
+#if	CF_DEBUGZ
+	zprintf(NDF,"format/subinfo_strw: ret rs=%d ml=%u\n",rs,ml) ;
+#endif
 
 	return (rs >= 0) ? ml : rs ;
 }
@@ -925,15 +1223,15 @@ static int subinfo_blanks(SUBINFO *sip,int n) noex {
 static int subinfo_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	char		*abuf = nullptr ;
+	char		*abuf = NULL ;
 	if (sl < 0) sl = strlen(sp) ;
 #if	CF_CLEANSTR
 	if (sip->f.mclean) {
 	    int		hl = sl ;
-	    int		f_eol = false ;
+	    int		f_eol = FALSE ;
 	    if ((sl > 0) && (sp[sl-1] == '\n')) {
 	        hl = (sl-1) ;
-	        f_eol = true ;
+	        f_eol = TRUE ;
 	    }
 	    if (hasourbad(sp,hl)) {
 	        int	size = (sl+1) ;
@@ -955,7 +1253,7 @@ static int subinfo_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
 	    rs = subinfo_strw(sip,sp,sl) ;
 	    len = rs ;
 	}
-	if (abuf != nullptr) uc_free(abuf) ;
+	if (abuf != NULL) uc_free(abuf) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_cleanstrw) */
@@ -967,9 +1265,13 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	int		sl = sdp->sl ;
 	int		f_wint = sdp->f_wint ;
 	int		f_wchar = sdp->f_wchar ;
-	int		f_memalloc = false ;
+	int		f_memalloc = FALSE ;
 	int		fcode = 0 ;
 	cchar		*sp = sdp->sp ;
+
+#if	CF_DEBUGZ
+	zprintf(NDF,"format/_fmtstr: ent\n") ;
+#endif
 
 /* possible necessary (at this time) conversion to regular characters */
 
@@ -977,9 +1279,9 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	    const wint_t	*lsp = sdp->lsp ;
 	    const wchar_t	*wsp = sdp->wsp ;
 	    int			i = 0 ;
-	    int			f_notnull = false ;
+	    int			f_notnull = FALSE ;
 	    if (f_wint) {
-	        f_notnull = (lsp != nullptr) ;
+	        f_notnull = (lsp != NULL) ;
 	        if (f_notnull) {
 	            while (sl && (lsp[i] != 0)) {
 	                i += 1 ;
@@ -987,7 +1289,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	            }
 	        }
 	    } else {
-	        f_notnull = (wsp != nullptr) ;
+	        f_notnull = (wsp != NULL) ;
 	        if (f_notnull) {
 	            while (sl && (wsp[i] != 0)) {
 	                i += 1 ;
@@ -1001,7 +1303,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
 	            int		j ;
 	            int		ch ;
-	            f_memalloc = true ;
+	            f_memalloc = TRUE ;
 	            sp = p ;
 	            sl = i ;
 	            if (f_wint) {
@@ -1030,7 +1332,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 
 /* continue with normal character processing */
 
-	    if ((sp == nullptr) && (sl != 0)) {
+	    if ((sp == NULL) && (sl != 0)) {
 	        sp = nullpointer ;
 	        sl = -1 ;
 	        width = -1 ;
@@ -1072,7 +1374,11 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	    }
 	}
 
-	if (f_memalloc && (sp != nullptr)) uc_free(sp) ;
+	if (f_memalloc && (sp != NULL)) uc_free(sp) ;
+
+#if	CF_DEBUGZ
+	zprintf(NDF,"format/_fmtstr: ret rs=%d fcode=\\x%04x\n",rs,fcode) ;
+#endif
 
 	return (rs >= 0) ? fcode : rs ;
 }
@@ -1087,14 +1393,34 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	int		f_zerofill = fsp->f.zerofill ;
 	int		f_plus = fsp->f.plus ;
 	int		f_minus = fsp->f.minus ;
-	int		f_plusminus = false ;
-	int		f_truncleft = false ;
-	int		f_isdigital = false ;
-	int		f_specialhex = false ;
+	int		f_plusminus = FALSE ;
+	int		f_truncleft = FALSE ;
+	int		f_isdigital = FALSE ;
+	int		f_specialhex = FALSE ;
 
-	if (sp == nullptr) return SR_FAULT ;
+	if (sp == NULL) return SR_FAULT ;
 
+#ifdef	COMMENT
+	sl = strnlen(sp,sl) ;
+#else
 	if (sl < 0) sl = strlen(sp) ;
+#endif
+
+#if	CF_DEBUGZ 
+	{
+	    int 	dl = strlinelen(sp,sl,40) ;
+	    char	dbuf[DEBUGBUFLEN + 1] ;
+	    strdcpy1w(dbuf,DEBUGBUFLEN,sp,dl) ;
+	    zprintf(NDF,"format/subinfo_emit: fcode=%c (\\x%04X)\n",
+	        fcode,fcode) ;
+	    zprintf(NDF,"format/subinfo_emit: sl=%d sp=>%s<\n",sl,dbuf) ;
+	    zprintf(NDF,"format/subinfo_emit: width=%d prec=%d\n",
+	        width,prec) ;
+	    zprintf(NDF,"format/subinfo_emit: f_zerofill=%u\n",f_zerofill) ;
+	}
+#endif /* CF_DEBUGZ */
+
+/* evaluate and setup */
 
 	switch (fcode) {
 	case 'S':
@@ -1109,7 +1435,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	case 'x':
 	case 'P':
 	case 'p':
-	    f_truncleft = true ;
+	    f_truncleft = TRUE ;
 	} /* end switch */
 
 	switch (fcode) {
@@ -1123,7 +1449,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	case 'f':
 	case 'E':
 	case 'G':
-	    f_isdigital = true ;
+	    f_isdigital = TRUE ;
 	} /* end switch */
 
 	switch (fcode) {
@@ -1132,10 +1458,10 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	case 'x':
 	case 'P':
 	case 'p':
-	    f_specialhex = true ;
+	    f_specialhex = TRUE ;
 	    if (width < 0) {
 	        width = sl ;
-	        f_zerofill = true ;
+	        f_zerofill = TRUE ;
 	    }
 	} /* end switch */
 
@@ -1182,6 +1508,11 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	        if (f_plusminus) ml += 1 ;
 	        if (width > ml) npad = (width - ml) ;
 	    } /* end block */
+
+#if	CF_DEBUGZ 
+	    zprintf(NDF,"format/subinfo_emit: npad=%d\n",npad) ;
+	    zprintf(NDF,"format/subinfo_emit: f_zerofill=%u\n",f_zerofill) ;
+#endif
 
 /* print out any leading padding (field width) */
 
@@ -1279,16 +1610,21 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 	int		f_varwidth ;
 	char		stage[DOFLOAT_STAGELEN + 1] ;
 
-	f_varprec = false ;
+#if	CF_DEBUGZ
+	zprintf(NDF,"format/subinfo_float: fcode=%c width=%d prec=%d\n",
+	    fcode,width,prec) ;
+#endif
+
+	f_varprec = FALSE ;
 	if (prec < 0) {
 	    prec = DOFLOAT_DEFPREC ;
-	    f_varprec = true ;
+	    f_varprec = TRUE ;
 	}
 
-	f_varwidth = false ;
+	f_varwidth = FALSE ;
 	if (width <= 0) {
 	    width = DOFLOAT_STAGELEN ;
-	    f_varwidth = true ;
+	    f_varwidth = TRUE ;
 	}
 
 	if (prec > MAXPREC) prec = MAXPREC ;
@@ -1319,6 +1655,10 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 	        break ;
 	    } /* end switch */
 
+#if	CF_DEBUGZ
+	    zprintf(NDF,"format/subinfo_float: xconvert() b=>%s<\n",buf) ;
+#endif
+
 	    remlen = width ;
 	    stagelen = prec + dpp ;
 	    i = DOFLOAT_STAGELEN ;
@@ -1330,7 +1670,7 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 	    while ((remlen > 0) && (outlen > 0)) {
 
 	        if ((! f_varprec) || (buf[j - 1] != '0')) {
-	            f_varprec = false ;
+	            f_varprec = FALSE ;
 	            stage[--i] = buf[--j] ;
 	            remlen -= 1 ;
 	            outlen -= 1 ;
@@ -1406,6 +1746,10 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 
 /* copy the stage buffer to the output buffer */
 
+#if	CF_DEBUGZ
+	    zprintf(NDF,"format/subinfo_float: stage=>%s<\n",(stage+i)) ;
+#endif
+
 	    while ((rs >= 0) && (i < DOFLOAT_STAGELEN)) {
 	        rs = subinfo_char(sip,stage[i++]) ;
 	    }
@@ -1417,6 +1761,53 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 /* end subroutine (subinfo_float) */
 #endif /* CF_FLOAT */
 
+#if	CF_LSPRINTF && CF_LPRINT
+static int lsprintf(char *buf,cchar *fmt,...) noex {
+{
+	int		rs ;
+	{
+	    va_list	ap ;
+	    va_begin(ap,fmt) ;
+	    rs = format(buf,MAXLEN,0,fmt,ap) ;
+	    va_end(ap) ;
+	}
+	return rs ;
+}
+/* end subroutine (lsprintf) */
+#endif /* CF_LSPRINTF */
+
+#if	CF_LVSPRINTF && CF_LPRINT
+static int lvsprintf(char *buf,cchar *fmt,va_list ap)
+{
+	int		rs = format(buf,MAXLEN,0,fmt,ap) ;
+	return rs ;
+}
+/* end subroutine (lvsprintf) */
+#endif /* CF_LVSPRINTF */
+
+#if	CF_LSNPRINTF && CF_LPRINT
+/* standard routine to format a string to a memory buffer */
+static int snprintf(char buf,int buflen,cchar *fmt,...) noex {
+	int		rs ;
+	if (buf == NULL) return SR_FAULT ;
+	{
+	    va_list	ap ;
+	    va_begin(ap,fmt) ;
+	    rs = format(buf,buflen,0,fmt,ap) ;
+	    va_end(ap) ;
+	}
+	return rs ;
+}
+/* end subroutine (snprintf) */
+#endif /* CF_LSNPRINTF */
+
+#if	CF_LVSNPRINTF && CF_LPRINT
+static int vsnprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
+	return format(rbuf,rlen,0,fmt,ap) ;
+}
+/* end subroutine (vsnprintf) */
+#endif /* CF_LVSNPRINTF */
+
 #if	CF_BINCHAR
 static int binchar(ulong num,int i) noex {
 	int		ch = (rshiftx(num,i) & 1) + '0' ;
@@ -1427,7 +1818,7 @@ static int binchar(ulong num,int i) noex {
 
 #if	CF_CLEANSTR
 static int hasourbad(cchar *sp,int sl) noex {
-	int		f = false ;
+	int		f = FALSE ;
 	while (sl && *sp) {
 	    cint	ch = MKCHAR(*sp) ;
 	    f = isourbad(ch) ;
@@ -1441,7 +1832,7 @@ static int hasourbad(cchar *sp,int sl) noex {
 #endif /* CF_CLEANSTR */
 
 int isourbad(int ch) noex {
-	int		f = false ;
+	int		f = FALSE ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == '\r') || (ch == '\n') ;
 	f = f || (ch == CH_BS) ;

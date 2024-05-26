@@ -210,10 +210,10 @@ constexpr cpcchar	prognames[] = {
 	nullptr
 } ;
 
-constexpr int		utl_id = UT_IDSIZE ;
-constexpr int		utl_user = UT_NAMESIZE ;
-constexpr int		utl_line = UT_LINESIZE ;
-constexpr int		utl_host = UT_HOSTSIZE ;
+constexpr int		utl_id		= UT_IDSIZE ;
+constexpr int		utl_user	= UT_NAMESIZE ;
+constexpr int		utl_line	= UT_LINESIZE ;
+constexpr int		utl_host	= UT_HOSTSIZE ;
 constexpr int		tlen = TIMEBUFLEN ;
 
 constexpr int		rsnoterm[] = {
@@ -538,18 +538,6 @@ static int sirchr(cchar *sp,int sl,int sch) noex {
 }
 /* end subroutine (sirchr) */
 
-/* this is (just) like |strwcpy(3uc)| */
-static char *strtcpy(char *dp,cchar *sp,int dl) noex {
-	if (dl >= 0) {
-	    dp = strncpy(dp,sp,dl) + dl ;
-	    *dp = '\0' ;
-	} else {
-	    dp = nullptr ;
-	}
-	return dp ;
-}
-/* end subroutine (strtcpy) */
-
 static UTMPX *getutxliner(UTMPX *sup) noex {
 	static const uid_t	uid = getuid() ;
 	UTMPX		*up ;
@@ -558,7 +546,9 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	   if (isourtype(up)) {
-		if (strncmp(up->ut_line,sup->ut_line,utl_line) == 0) {
+		cint	ll = utl_line ;
+		cchar	*lp = sup->ut_line ;
+		if (strncmp(up->ut_line,lp,ll) == 0) {
 		    strtcpy(nbuf,up->ut_user,utl_user) ;
 		    if ((pwp = getpwnam(nbuf)) != nullptr) {
 		        if (pwp->pw_uid == uid) {
@@ -571,6 +561,18 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 	return up ;
 }
 /* end subroutine (getutxliner) */
+
+/* this is similar to |strwcpy(3uc)| */
+static char *strtcpy(char *dp,cchar *sp,int dl) noex {
+	if (dl >= 0) {
+	    dp = strncpy(dp,sp,dl) + dl ;
+	    *dp = '\0' ;
+	} else {
+	    dp = nullptr ;
+	}
+	return dp ;
+}
+/* end subroutine (strtcpy) */
 
 static bool isNotTerm(int rs) noex {
 	return isOneOf(rsnoterm,rs) ;
