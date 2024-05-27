@@ -4,11 +4,9 @@
 /* subroutine to format string output */
 /* version %I% last-modified %G% */
 
-#define	CF_FLOAT	1	/* do you want floating output conversions? */
 #define	CF_SPECIALHEX	1	/* perform special HEX function */
 #define	CF_CLEANSTR	1	/* clean strings */
 #define	CF_BINARYMIN	1	/* perform binary conversion minimally */
-#define	CF_BINCHAR	0	/* compile in |binchar()| */
 
 /* revision history:
 
@@ -109,12 +107,6 @@
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct fmtsub_flags
-
-#undef	FD_WRITE
-#define	FD_WRITE	4
-
 #undef	CH_BADSUB
 #define	CH_BADSUB	'�'
 
@@ -126,7 +118,7 @@
 
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
-#define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
+#define	TBUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
 
 #ifndef	NULLSTR
 #define	NULLSTR		"(null)"
@@ -135,8 +127,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* type */
 using std::max ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -147,48 +141,10 @@ using std::max ;			/* type */
 
 /* local structures */
 
-struct fmtsub_flags {
-	uint		ov:1 ;		/* overflow */
-	uint		mclean:1 ;	/* mode: clean-up */
-	uint		mnooverr:1 ;	/* mode: return-error */
-} ;
-
-struct subinfo {
-	char		*ubuf ;		/* user buffer */
-	SUBINFO_FL	f ;	/* flags */
-	int		ulen ;		/* buffer length */
-	int		len ;		/* current usage count */
-	int		mode ;		/* format mode */
-} ;
-
-/* forward references */
-
-static int fmtsub_start(SUBINFO *,char *,int,int) noex ;
-static int fmtsub_finish(SUBINFO *) noex ;
-static int fmtsub_strw(SUBINFO *,cchar *,int) noex ;
-static int fmtsub_chr(SUBINFO *,int) noex ;
-static int fmtsub_blanks(SUBINFO *,int) noex ;
-static int fmtsub_cleanstrw(SUBINFO *,cchar *,int) noex ;
-static int fmtsub_emit(SUBINFO *,FMTSPEC *,cchar *,int) noex ;
-static int fmtsub_fmtstr(SUBINFO *,FMTSPEC *,STRDATA *) noex ;
-static int fmtsub_reserve(SUBINFO *,int) ;
-
-#if	CF_BINCHAR
 static int	binchar(ulong,int) ;
-#endif
-
-#if	CF_FLOAT && F_SUNOS
-static int	fmtsub_float(SUBINFO *,int,double,int,int,int,char *) noex ;
-#endif
-
-#if	CF_CLEANSTR
-static bool	hasourbad(cchar *sp,int sl) noex ;
-#endif /* CF_CLEANSTR */
 
 
 /* forward refernces */
-
-static bool	isourbad(int ch) noex ;
 
 template<typename T>
 static T rshiftx(T v,int n) noex {
@@ -199,10 +155,10 @@ static T rshiftx(T v,int n) noex {
 
 /* local variables */
 
-static cchar	digtable_hi[] = "0123456789ABCDEF" ;
-static cchar	digtable_lo[] = "0123456789abcdef" ;
-static cchar	blanks[] = "                " ;
-static cchar	nullstr[] = NULLSTR ;
+constexpr cchar	digtable_hi[] = "0123456789ABCDEF" ;
+constexpr cchar	digtable_lo[] = "0123456789abcdef" ;
+constexpr cchar	blanks[] = "                " ;
+constexpr cchar	nullstr[] = NULLSTR ;
 
 
 /* exported variables */
@@ -210,14 +166,78 @@ static cchar	nullstr[] = NULLSTR ;
 
 /* exported subroutines */
 
+int fmtstr(char *ubuf,int ulen,int fm,cchar *fmt,va_list ap) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (ubu && fmt && ap) {
+	    rs = SR_INVALID ;
+	    if (fmt[0]) {
+		fmtobj	fo(ubuf,ulen,fm,fmt) ;
+		rs = fo(ap) ;
+		len = rs ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (fmtstr) */
+
+namespace {
+    struct fmtobj {
+	fmtspec		fs ;
+	int		fm ;
+	int		ulen ;
+	int		tlen ;
+	char		*ubuf ;
+	char		*tbuf ;
+	cchar		*fmt ;
+	fmtobj(char *b,int l,int m,cchar *f) noex : ubuf(b), ulen(l) {
+	    fm = m ;
+	    fmt = f ;
+	} ;
+	operator int (va_list) noex ;
+	int start() noex ;
+	int finish() noex ;
+    } ; /* end struct (fmtobj) */
+}
+
+fmtobj::operator int () noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	if ((rs = start()) >= 0) {
+
+
+	    rs1 = finish() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
+	return (rs >= 0) ? len : rs ;
+}
+
+int fmtobj::start() noex {
+	int		rs = SR_NOMEM ;
+	if ((tbuf = new(nothrow) char[TBUFLEN+1]) != nullptr) {
+	    tlen = TBUFLEN ;
+	}
+	return rs ;
+}
+
+int fmtobj::finish() noex {
+	int		rs = SR_BUGCHECK ;
+	if (tbuf) {
+	    delete [] tbuf ;
+	    tbuf = nullptr ;
+	}
+	return rs ;
+}
+
 int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
-	SUBINFO		si, *sip = &si ;
-	FMTSPEC		fs, *fsp = &fs ;
-	cint	tlen = BUFLEN ;
+	fmtsub		si, *sip = &si ;
+	fmtspec		fs, *fsp = &fs ;
+	cint		tlen = TBUFLEN ;
 	int		rs = SR_OK ;
 	int		fmtlen = 0 ;
-	cchar	*tp ;
-	char		tbuf[BUFLEN+1] ;	/* must be > MAXDECDIG */
+	cchar		*tp ;
+	char		tbuf[TBUFLEN+1] ;	/* must be > MAXDECDIG */
 
 	if (ubuf == nullptr) return SR_FAULT ;
 	if (fmt == nullptr) return SR_FAULT ;
@@ -665,7 +685,7 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	    fmtlen = fmtsub_finish(sip) ;
 	    if (rs >= 0) rs = fmtlen ;
-	} /* end if (subinfo) */
+	} /* end if (fmtsub) */
 
 	return (rs >= 0) ? fmtlen : rs ;
 }
@@ -674,619 +694,10 @@ int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 /* local subroutines */
 
-static int fmtsub_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
-	memclear(sip) ;
-	sip->ubuf = ubuf ;
-	sip->ulen = ulen ;
-	sip->mode = mode ;
-	sip->f.mclean = (mode & FORMAT_OCLEAN) ;
-	sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
-	return SR_OK ;
-}
-/* end subroutine (fmtsub_start) */
-
-static int fmtsub_finish(SUBINFO *sip) noex {
-	int		rs = SR_OK ;
-	int		len = sip->len ;
-	sip->ubuf[len] = '\0' ;
-	if (sip->f.ov) {
-	    if (! sip->f.mnooverr) rs = SR_OVERFLOW ;
-	}
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fmtsub_finish) */
-
-static int fmtsub_reserve(SUBINFO *sip,int n) noex {
-	int		rs = SR_OVERFLOW ;
-	if (! sip->f.ov) {
-	    int		rlen = (sip->ulen - sip->len) ;
-	    rs = SR_OK ;
-	    if (n > rlen) {
-	        sip->f.ov = true ;
-	    }
-	} /* end if (not overflow) */
-	return rs ;
-}
-/* end subroutine (fmtsub_reserve) */
-
-static int fmtsub_strw(SUBINFO *sip,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		ml = 0 ;
-
-	if (! sip->f.ov) {
-	    int		rlen ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    rlen = (sip->ulen - sip->len) ;
-	    if (sl > rlen) sip->f.ov = true ;
-	    ml = MIN(sl,rlen) ;
-	    if (ml > 0) {
-	        char	*bp = (sip->ubuf + sip->len) ;
-	        memcpy(bp,sp,ml) ;
-	        sip->len += ml ;
-	    }
-	    if (sip->f.ov) rs = SR_OVERFLOW ;
-	} else {
-	    rs = SR_OVERFLOW ;
-	}
-
-	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (fmtsub_strw) */
-
-static int fmtsub_chr(SUBINFO *sip,int ch) noex {
-{
-	int		rs = SR_OK ;
-	char		buf[1] ;
-	if (ch != 0) {
-	    buf[0] = ch ;
-	    rs = fmtsub_strw(sip,buf,1) ;
-	}
-	return rs ;
-}
-/* end subroutine (fmtsub_chr) */
- 
-static int fmtsub_blanks(SUBINFO *sip,int n) noex {
-	static cint	nblanks = strlen(blanks) ;
-	int		rs = SR_OK ;
-	int		nr = n ;
-	while ((rs >= 0) && (nr > 0)) {
-	    int 	m = min(nblanks,nr) ;
-	    rs = fmtsub_strw(sip,blanks,m) ;
-	    nr -= m ;
-	} /* end while */
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fmtsub_blanks) */
-
-static int fmtsub_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		len = 0 ;
-	char		*abuf = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
-#if	CF_CLEANSTR
-	if (sip->f.mclean) {
-	    int		hl = sl ;
-	    int		f_eol = false ;
-	    if ((sl > 0) && (sp[sl-1] == '\n')) {
-	        hl = (sl-1) ;
-	        f_eol = true ;
-	    }
-	    if (hasourbad(sp,hl)) {
-	        int	size = (sl+1) ;
-	        if ((rs = uc_malloc(size,&abuf)) >= 0) {
-	            int		i, ch ;
-	            for (i = 0 ; (i < hl) && *sp ; i += 1) {
-	                ch = mkchar(sp[i]) ;
-	                if (isourbad(ch)) ch = CH_BADSUB ;
-	                abuf[i] = (char) ch ;
-	            }
-	            if (f_eol) abuf[i++] = '\n' ;
-	            sl = i ;
-	            sp = abuf ;
-	        }
-	    } /* end if (hasourbad) */
-	} /* end if (option-clean) */
-#endif /* CF_CLEANSTR */
-	if (rs >= 0) {
-	    rs = fmtsub_strw(sip,sp,sl) ;
-	    len = rs ;
-	}
-	if (abuf != nullptr) uc_free(abuf) ;
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fmtsub_cleanstrw) */
-
-static int fmtsub_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
-	int		rs = SR_OK ;
-	int		width = fsp->width ;
-	int		prec = fsp->width ;
-	int		sl = sdp->sl ;
-	int		f_wint = sdp->f_wint ;
-	int		f_wchar = sdp->f_wchar ;
-	int		f_memalloc = false ;
-	int		fcode = 0 ;
-	cchar		*sp = sdp->sp ;
-
-/* possible necessary (at this time) conversion to regular characters */
-
-	if (f_wint || f_wchar) {
-	    const wint_t	*lsp = sdp->lsp ;
-	    const wchar_t	*wsp = sdp->wsp ;
-	    int			i = 0 ;
-	    int			f_notnull = false ;
-	    if (f_wint) {
-	        f_notnull = (lsp != nullptr) ;
-	        if (f_notnull) {
-	            while (sl && (lsp[i] != 0)) {
-	                i += 1 ;
-	                sl -= 1 ;
-	            }
-	        }
-	    } else {
-	        f_notnull = (wsp != nullptr) ;
-	        if (f_notnull) {
-	            while (sl && (wsp[i] != 0)) {
-	                i += 1 ;
-	                sl -= 1 ;
-	            }
-	        }
-	    }
-	    if (f_notnull) {
-	        int 	size = (i + 1) * sizeof(char) ;
-	        char	*p ;
-	        if ((rs = uc_malloc(size,&p)) >= 0) {
-	            int		j ;
-	            int		ch ;
-	            f_memalloc = true ;
-	            sp = p ;
-	            sl = i ;
-	            if (f_wint) {
-	                for (j = 0 ; j < i ; j += 1) {
-	                    if ((ch = (int) lsp[j]) <= UCHAR_MAX) {
-	                        p[j] = (char) ch ;
-	                    } else {
-	                        p[j] = '¿' ;
-	                    }
-	                } /* end for */
-	            } else {
-	                for (j = 0 ; j < i ; j += 1) {
-	                    if ((ch = (int) wsp[j]) <= UCHAR_MAX) {
-	                        p[j] = (char) ch ;
-	                    } else {
-	                        p[j] = '¿' ;
-	                    }
-	                } /* end for */
-	            } /* end if */
-	            p[j] = 0 ;
-	        } /* end if (memory-allocation) */
-	    } /* end if (not-null) */
-	} /* end if ('wint' or 'wchar') */
-
-	if (rs >= 0) {
-
-/* continue with normal character processing */
-
-	    if ((sp == nullptr) && (sl != 0)) {
-	        sp = nullstr ;
-	        sl = -1 ;
-	        width = -1 ;
-	        prec = -1 ;
-	    }
-
-/* currently this is not needed if we did the string conversion above */
-
-	    if ((sl != 0) && (! (f_wint || f_wchar))) {
-	        sl = strnlen(sp,sl) ;
-	    }
-
-/* modify the string length based on the precision (truncate on left) */
-
-	    if ((prec >= 0) && (sl > prec)) {
-	        sp += (sl-prec) ;
-	        sl = prec ;
-	    }
-
-	    if ((width > 0) && (sl > width)) width = sl ; /* the standard! */
-
-	} /* end if (ok) */
-
-/* continue normally */
-
-	if ((rs >= 0) && (! fsp->f.left)) {
-	    if ((width > 0) && (width > sl)) {
-	        rs = fmtsub_blanks(sip,(width - sl)) ;
-	    }
-	}
-
-	if (rs >= 0) {
-	    rs = fmtsub_cleanstrw(sip,sp,sl) ;
-	}
-
-	if ((rs >= 0) && fsp->f.left) {
-	    if ((width > 0) && (width > sl)) {
-	        rs = fmtsub_blanks(sip,(width - sl)) ;
-	    }
-	}
-
-	if (f_memalloc && (sp != nullptr)) uc_free(sp) ;
-
-	return (rs >= 0) ? fcode : rs ;
-}
-/* end subroutine (fmtsub_fmtstr) */
-
-static int fmtsub_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		fcode = fsp->fcode ;
-	int		width = fsp->width ;
-	int		prec = fsp->prec ;
-	int		npad = 0 ;
-	int		f_zerofill = fsp->f.zerofill ;
-	int		f_plus = fsp->f.plus ;
-	int		f_minus = fsp->f.minus ;
-	int		f_plusminus = false ;
-	int		f_truncleft = false ;
-	int		f_isdigital = false ;
-	int		f_specialhex = false ;
-
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	switch (fcode) {
-	case 'S':
-	case 's':
-	case 't':
-	case 'i':
-	case 'd':
-	case 'u':
-	case SWUCHAR('ß'):
-	case 'o':
-	case 'X':
-	case 'x':
-	case 'P':
-	case 'p':
-	    f_truncleft = true ;
-	} /* end switch */
-
-	switch (fcode) {
-	case 'i':
-	case 'd':
-	case 'u':
-	case SWUCHAR('ß'):
-	case 'o':
-	case 'e':
-	case 'g':
-	case 'f':
-	case 'E':
-	case 'G':
-	    f_isdigital = true ;
-	} /* end switch */
-
-	switch (fcode) {
-	case SWUCHAR('ß'):
-	case 'X':
-	case 'x':
-	case 'P':
-	case 'p':
-	    f_specialhex = true ;
-	    if (width < 0) {
-	        width = sl ;
-	        f_zerofill = true ;
-	    }
-	} /* end switch */
-
-	if (fcode > 0) {
-
-	    if ((sl > 0) && f_isdigital) {
-	        int f_p = (*sp == '+') ;
-	        int f_m = (*sp == '-') ;
-	        if (f_p || f_m) {
-	            f_plus = f_p ;
-	            f_minus = f_m ;
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	    } /* end if */
-
-	    if (prec >= 0) {
-	        if (sl > prec) {
-	            if (f_truncleft) {
-	                sp += (sl-prec) ; /* truncate on left */
-	                sl -= (sl-prec) ;
-	            } else {
-	                sl = prec ; /* truncate on right */
-	            }
-	        }
-	    } /* end if */
-
-/* calculate the minimum field width */
-
-	    {
-	        int	ml = 0 ;
-	        if (! f_specialhex) ml = sl ;
-	        if ((prec >= 0) && (prec > ml)) ml = prec ;
-	        if (f_plus | f_minus) ml += 1 ;
-	        if (ml > width) width = ml ;
-	    }
-
-/* calculate any padding (blanks or zero-fills) */
-
-	    f_plusminus = (f_plus || f_minus) ;
-	    {
-	        int ml = sl ;
-	        if ((prec >= 0) && (prec > sl)) ml = prec ;
-	        if (f_plusminus) ml += 1 ;
-	        if (width > ml) npad = (width - ml) ;
-	    } /* end block */
-
-/* print out any leading padding (field width) */
-
-	    if ((rs >= 0) && (! fsp->f.left) && (! f_zerofill)) {
-	        if (npad > 0) {
-	            rs = fmtsub_blanks(sip,npad) ;
-	        }
-	    } /* end if */
-
-/* we may want to print a leading '-' before anything */
-
-	    if ((rs >= 0) && f_plusminus) {
-	        int	ch = (f_minus) ? '-' : '+' ;
-	        rs = fmtsub_chr(sip,ch) ;
-	        width -= 1 ;
-	    } /* end if */
-
-/* handle any alternates */
-
-	    if ((rs >= 0) && fsp->f.alternate) {
-	        switch (fcode) {
-	        case 'x':
-	        case 'X':
-	            rs = fmtsub_strw(sip,"0x",2) ;
-	            break ;
-	        case 'o':
-	            if (sp[0] != '0') {
-	                rs = fmtsub_chr(sip,'0') ;
-	            }
-	            break ;
-	        } /* end switch */
-	    } /* end if */
-
-/* any zero-fill due to field width */
-
-	    if ((rs >= 0) && (! fsp->f.left) && f_zerofill && (npad > 0)) {
-	        int ch = (f_isdigital ? '0' : ' ') ;
-	        int	i ;
-	        for (i = 0 ; (rs >= 0) && (i < npad) ; i += 1) {
-	            rs = fmtsub_chr(sip,ch) ;
-	        }
-	    } /* end if */
-
-/* send out any filling due to precision */
-
-	    if ((rs >= 0) && (prec >= 0) && (prec > sl)) {
-	        int ch = (f_isdigital ? '0' : ' ') ;
-	        int	i ;
-	        for (i = 0 ; (rs >= 0) && (i < (prec - sl)) ; i += 1) {
-	            rs = fmtsub_chr(sip,ch) ;
-	        }
-	    } /* end if */
-
-/* send out the string itself */
-
-	    if ((rs >= 0) && (sl > 0)) {
-	        if (f_specialhex) {
-	            if ((width >= 0) && (sl > width)) {
-	                int	skip = (sl - width) ;
-	                sp += skip ;
-	                sl -= skip ;
-	            }
-	        }
-	        rs = fmtsub_cleanstrw(sip,sp,sl) ;
-	    } /* end if */
-
-/* send out trailing pad characters */
-
-	    if ((rs >= 0) && fsp->f.left && (npad > 0)) {
-	        rs = fmtsub_blanks(sip,npad) ;
-	    } /* end if */
-
-	} /* end if (fcode) */
-
-	return rs ;
-}
-/* end subroutine (fmtsub_emit) */
-
-/* convert floating point numbers */
-
-#if	CF_FLOAT && F_SUNOS
-#define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
-#define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)
-static int fmtsub_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
-		int fill,char *buf) noex {
-	int		rs = SR_OK ;
-	int		i, j ;
-	int		dpp ;		/* (D)ecimal (P)oint (P)osition */
-	int		remlen ;
-	int		stagelen ;
-	int		outlen ;
-	int		f_sign ;
-	int		f_leading ;
-	int		f_varprec ;
-	int		f_varwidth ;
-	char		stage[DOFLOAT_STAGELEN + 1] ;
-
-	f_varprec = false ;
-	if (prec < 0) {
-	    prec = DOFLOAT_DEFPREC ;
-	    f_varprec = true ;
-	}
-
-	f_varwidth = false ;
-	if (width <= 0) {
-	    width = DOFLOAT_STAGELEN ;
-	    f_varwidth = true ;
-	}
-
-	if (prec > MAXPREC) prec = MAXPREC ;
-
-/* fill up extra field width which may be specified (for some reason) */
-
-	while ((rs >= 0) && (width > DOFLOAT_STAGELEN)) {
-	    rs = fmtsub_chr(sip,' ') ;
-	    width -= 1 ;
-	} /* end while */
-
-	if (rs >= 0) {
-
-/* do the floating decimal conversion */
-
-	    switch (fcode) {
-	    case 'e':
-	        econvert(v, prec, &dpp,&f_sign,buf) ;
-	        break ;
-	    case 'f':
-	        fconvert(v, prec, &dpp,&f_sign,buf) ;
-	        break ;
-	    case 'g':
-	        {
-	            int	trailing = (width > 0) ;
-	            gconvert(v, prec, trailing,buf) ;
-	        }
-	        break ;
-	    } /* end switch */
-
-	    remlen = width ;
-	    stagelen = prec + dpp ;
-	    i = DOFLOAT_STAGELEN ;
-	    j = stagelen ;
-
-/* output any characters in the floating buffer after the decimal point */
-
-	    outlen = MIN(stagelen,prec) ;
-	    while ((remlen > 0) && (outlen > 0)) {
-
-	        if ((! f_varprec) || (buf[j - 1] != '0')) {
-	            f_varprec = false ;
-	            stage[--i] = buf[--j] ;
-	            remlen -= 1 ;
-	            outlen -= 1 ;
-	        } else {
-	            j -= 1 ;
-	            outlen -= 1 ;
-	        }
-
-	    } /* end while */
-
-/* output any needed zeros after the decimal point */
-
-	    outlen = -dpp ;
-	    while ((remlen > 0) && (outlen > 0)) {
-	        if ((! f_varprec) || (outlen == 1)) {
-	            stage[--i] = '0' ;
-	            remlen -= 1 ;
-	        }
-	        outlen -= 1 ;
-	    } /* end while */
-
-/* output a decimal point */
-
-	    if (remlen > 0) {
-	        stage[--i] = '.' ;
-	        remlen -= 1 ;
-	    }
-
-/* output any digits from the float conversion before the decimal point */
-
-	    outlen = dpp ;
-	    f_leading = (outlen > 0) ;
-	    while ((remlen > 0) && (outlen > 0)) {
-	        stage[--i] = buf[--j] ;
-	        remlen -= 1 ;
-	        outlen -= 1 ;
-	    }
-
-/* output any leading zero digit if needed */
-
-	    if ((! f_leading) && (remlen > 0)) {
-	        stage[--i] = '0' ;
-	        remlen -= 1 ;
-	    }
-
-/* output any leading fill zeros if called for */
-
-	    while ((! f_varwidth) && (fill == 0) && (remlen > 1)) {
-	        stage[--i] = '0' ;
-	        remlen -= 1 ;
-	    }
-
-/* output any sign if called for */
-
-	    if (f_sign && (remlen > 0)) {
-	        stage[--i] = '-' ;
-	        remlen -= 1 ;
-	    }
-
-/* output any leading fill zeros if called for */
-
-	    while ((! f_varwidth) && (fill == 0) && (remlen > 0)) {
-	        stage[--i] = '0' ;
-	        remlen -= 1 ;
-	    }
-
-/* output any leading blanks */
-
-	    while ((! f_varwidth) && (remlen > 0)) {
-	        stage[--i] = ' ' ;
-	        remlen -= 1 ;
-	    }
-
-/* copy the stage buffer to the output buffer */
-
-	    while ((rs >= 0) && (i < DOFLOAT_STAGELEN)) {
-	        rs = fmtsub_chr(sip,stage[i++]) ;
-	    }
-
-	} /* end if (ok) */
-
-	return rs ;
-}
-/* end subroutine (fmtsub_float) */
-#endif /* CF_FLOAT */
-
-#if	CF_BINCHAR
-static int binchar(ulong num,int i) noex {
+static int [[maybe-unused]] binchar(ulong num,int i) noex {
 	int		ch = (rshiftx(num,i) & 1) + '0' ;
 	return ch ;
 }
 /* end subroutine (binchar) */
-#endif /* CF_BINCHAR */
-
-#if	CF_CLEANSTR
-static bool  hasourbad(cchar *sp,int sl) noex {
-	bool		f = false ;
-	while (sl && *sp) {
-	    cint	ch = mkchar(*sp) ;
-	    f = isourbad(ch) ;
-	    if (f) break ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	return f ;
-}
-/* end subroutine (hasourbad) */
-#endif /* CF_CLEANSTR */
-
-static bool isourbad(int ch) noex {
-	bool		f = false ;
-	f = f || isprintlatin(ch) ;
-	f = f || (ch == '\r') || (ch == '\n') ;
-	f = f || (ch == CH_BS) ;
-	f = f || (ch == CH_BELL) ;
-	f = f || (ch == CH_VT) || (ch == CH_FF) ;
-	f = f || (ch == CH_SI) || (ch == CH_SO) ;
-	f = f || (ch == CH_SS2) || (ch == CH_SS3) ;
-	return (! f) ;
-}
-/* end subroutine (isourbad) */
 
 

@@ -54,7 +54,48 @@ struct fmtsub_head {
 	int		mode ;		/* format mode */
 } ;
 
-typedef	FMTSUB		fmtsub ;
+enum fmtsubmems {
+	fmtsubmem_audit,
+	fmtsubmem_finish,
+	fmtsubmem_overlast
+} ;
+
+struct fmtsub ;
+
+struct fmtsub_co {
+	fmtsub		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (fmtsub *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (fmtsub_co) */
+
+struct fmtsub : fmtsub_head {
+	fmtsub_co	audit ;
+	fmtsub_co	finish ;
+	fmtsub() noex : fmtsub_head{} {
+	    audit(this,fmtsubmem_audit) ;
+	    finish(this,fmtsubmem_finish) ;
+	} ;
+	fmtsub(const fmtsub &) = delete ;
+	fmtsub &operator = (const fmtsub &) = delete ;
+	int start(char *,int,int) noex ;
+	int cleanstrw(cchar *,int = -1) noex ;
+	int strw(cchar *,int = -1) noex ;
+	int chr(int) noex ;
+	int emit(fmtspec *,cchar *,int) noex ;
+	int formstr(fmtspec *,fmtstrdata *) noex ;
+	void dtor() noex ;
+	~fmtsub() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (fmtsub) */
+
 typedef	FMTSUB_FL	fmtsub_fl ;
 
 EXTERNC_begin
@@ -66,8 +107,9 @@ extern int fmtsub_chr(fmtsub *,int) noex ;
 extern int fmtsub_blanks(fmtsub *,int) noex ;
 extern int fmtsub_cleanstrw(fmtsub *,cchar *,int) noex ;
 extern int fmtsub_emit(fmtsub *,fmtspec *,cchar *,int) noex ;
-extern int fmtsub_fmtstr(fmtsub *,fmtspec *,fmtstrdata *) noex ;
+extern int fmtsub_formstr(fmtsub *,fmtspec *,fmtstrdata *) noex ;
 extern int fmtsub_reserve(fmtsub *,int) noex ;
+extern int fmtsub_audit(fmtsub *) noex ;
 extern int fmtsub_float(fmtsub *,int,double,int,int,int,char *) noex ;
 
 EXTERNC_end

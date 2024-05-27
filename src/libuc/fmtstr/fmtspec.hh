@@ -19,6 +19,15 @@
 
 /*******************************************************************************
 
+	Name:
+	fmtspec
+
+	Description:
+	This object parses a format-specification from the |printf(3c)|
+	family-type subroutines.  This object, although it can be
+	used alone (for whatever purpose), normally serves as a
+	helper object for the FMTSTR facility (which itself is a
+	sort of |snprintf(3c)| knock-off).
 
 *******************************************************************************/
 
@@ -32,15 +41,10 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<cstdarg>
-#include	<cstring>
 #include	<wchar.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<ascii.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
 
 
 #define	FMTSPEC_FL	struct fmtspec_flags

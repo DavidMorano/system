@@ -23,8 +23,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -53,22 +51,9 @@
 
 /* local defines */
 
-#undef	CH_BADSUB
-#define	CH_BADSUB	'¿'
-
-#ifndef	SWUCHAR
-#define	SWUCHAR(ch)	((ch) & 0xff)
-#endif
-
-#define	MAXLEN		(MAXPATHLEN + 40)
-
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
 #define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
-
-#ifndef	NULLSTR
-#define	NULLSTR		"(null)"
-#endif
 
 #define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
 #define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)
@@ -94,21 +79,8 @@ using std::max ;			/* type */
 
 /* forward refernces */
 
-static bool	isourbad(int ch) noex ;
-
-template<typename T>
-static T rshiftx(T v,int n) noex {
-	return (v >> n) ;
-}
-/* end subroutine (rshiftx) */
-
 
 /* local variables */
-
-static cchar	digtable_hi[] = "0123456789ABCDEF" ;
-static cchar	digtable_lo[] = "0123456789abcdef" ;
-static cchar	blanks[] = "                " ;
-static cchar	nullstr[] = NULLSTR ;
 
 
 /* exported variables */
@@ -116,7 +88,7 @@ static cchar	nullstr[] = NULLSTR ;
 
 /* exported subroutines */
 
-static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
+int fmtsub_float(fmtsub *sip,int fcode,double vint ,width,intprec,
 		int fill,char *buf) noex {
 	int		rs = SR_OK ;
 	int		i, j ;
@@ -147,7 +119,7 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 /* fill up extra field width which may be specified (for some reason) */
 
 	while ((rs >= 0) && (width > DOFLOAT_STAGELEN)) {
-	    rs = subinfo_char(sip,' ') ;
+	    rs = fmtsub_chr(sip,' ') ;
 	    width -= 1 ;
 	} /* end while */
 
@@ -258,13 +230,13 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 /* copy the stage buffer to the output buffer */
 
 	    while ((rs >= 0) && (i < DOFLOAT_STAGELEN)) {
-	        rs = subinfo_char(sip,stage[i++]) ;
+	        rs = fmtsub_chr(sip,stage[i++]) ;
 	    }
 
 	} /* end if (ok) */
 
 	return rs ;
 }
-/* end subroutine (subinfo_float) */
+/* end subroutine (fmtsub_float) */
 
 

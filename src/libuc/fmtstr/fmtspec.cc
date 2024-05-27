@@ -37,8 +37,6 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usysflag.h>
-#include	<ascii.h>
 #include	<stdintx.h>
 #include	<mkchar.h>
 #include	<localmisc.h>

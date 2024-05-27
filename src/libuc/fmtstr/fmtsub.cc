@@ -36,7 +36,6 @@
 #include	<cwchar>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<usysflag.h>
 #include	<ascii.h>
 #include	<stdintx.h>
 #include	<snx.h>
@@ -56,10 +55,6 @@
 
 
 /* local defines */
-
-#ifndef	SWUCHAR
-#define	SWUCHAR(ch)	((ch) & 0xff)
-#endif
 
 #define	CH_BADSUB	'¿'
 #define	CH_ANYE		uchar('Ã')
@@ -118,15 +113,14 @@ constexpr bool	f_cleanstr = CF_CLEANSTR ;
 
 /* exported subroutines */
 
-int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int mode) noex {
+int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = memclear(op) ;
 	    op->ubuf = ubuf ;
 	    op->ulen = ulen ;
-	    op->mode = mode ;
-	    op->f.mclean = (mode & FMTOPTS_OCLEAN) ;
-	    op->f.mnooverr = (mode & FMTOPTS_ONOOVERR) ;
+	    op->mode = fm ;
+	    op->f.mclean = (fm & FMTOPTS_OCLEAN) ;
+	    op->f.mnooverr = (fm & FMTOPTS_ONOOVERR) ;
 	}
 	return rs ;
 }
@@ -159,13 +153,12 @@ int fmtsub_reserve(fmtsub *op,int n) noex {
 int fmtsub_strw(fmtsub *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		ml = 0 ;
-
 	if (! op->f.ov) {
 	    int		rlen ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    rlen = (op->ulen - op->len) ;
 	    if (sl > rlen) op->f.ov = true ;
-	    ml = MIN(sl,rlen) ;
+	    ml = min(sl,rlen) ;
 	    if (ml > 0) {
 	        char	*bp = (op->ubuf + op->len) ;
 	        memcpy(bp,sp,ml) ;
@@ -175,7 +168,6 @@ int fmtsub_strw(fmtsub *op,cchar *sp,int sl) noex {
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
-
 	return (rs >= 0) ? ml : rs ;
 }
 /* end subroutine (fmtsub_strw) */
@@ -237,12 +229,12 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	    rs = fmtsub_strw(op,sp,sl) ;
 	    len = rs ;
 	}
-	if (abuf != nullptr) uc_free(abuf) ;
+	if (abuf) uc_free(abuf) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (fmtsub_cleanstrw) */
 
-int fmtsub_fmtstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
+int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	int		rs = SR_OK ;
 	int		width = fsp->width ;
 	int		prec = fsp->prec ;
@@ -358,7 +350,7 @@ int fmtsub_fmtstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 
 	return (rs >= 0) ? fcode : rs ;
 }
-/* end subroutine (fmtsub_fmtstr) */
+/* end subroutine (fmtsub_formstr) */
 
 int fmtsub_emit(fmtsub *op,fmtspec *fsp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -501,8 +493,7 @@ int fmtsub_emit(fmtsub *op,fmtspec *fsp,cchar *sp,int sl) noex {
 
 	    if ((rs >= 0) && (! fsp->f.left) && f_zerofill && (npad > 0)) {
 	        int ch = (f_isdigital ? '0' : ' ') ;
-	        int	i ;
-	        for (i = 0 ; (rs >= 0) && (i < npad) ; i += 1) {
+	        for (int i = 0 ; (rs >= 0) && (i < npad) ; i += 1) {
 	            rs = fmtsub_chr(op,ch) ;
 	        }
 	    } /* end if */
@@ -511,8 +502,7 @@ int fmtsub_emit(fmtsub *op,fmtspec *fsp,cchar *sp,int sl) noex {
 
 	    if ((rs >= 0) && (prec >= 0) && (prec > sl)) {
 	        int ch = (f_isdigital ? '0' : ' ') ;
-	        int	i ;
-	        for (i = 0 ; (rs >= 0) && (i < (prec - sl)) ; i += 1) {
+	        for (int i = 0 ; (rs >= 0) && (i < (prec - sl)) ; i += 1) {
 	            rs = fmtsub_chr(op,ch) ;
 	        }
 	    } /* end if */
@@ -542,8 +532,55 @@ int fmtsub_emit(fmtsub *op,fmtspec *fsp,cchar *sp,int sl) noex {
 }
 /* end subroutine (fmtsub_emit) */
 
+int fmtsub_audit(fmtsub *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 
 /* local subroutines */
+
+int fmtsub::start(char *ubuf,int ulen,int fm) noex {
+	return fmtsub_start(this,ubuf,ulen,fm) ;
+}
+
+int fmtsub::cleanstrw(cchar *sp,int sl) noex {
+	return fmtsub_cleanstrw(this,sp,sl) ;
+}
+
+int fmtsub::strw(cchar *sp,int sl) noex {
+	return fmtsub_strw(this,sp,sl) ;
+}
+
+int fmtsub::chr(int ch) noex {
+	return fmtsub_chr(this,ch) ;
+}
+
+int fmtsub::emit(fmtspec *fsp,cchar *sp,int sl) noex {
+	return fmtsub_emit(this,fsp,sp,sl) ;
+}
+
+int fmtsub::formstr(fmtspec *fsp,fmtstrdata *sdp) noex {
+	return fmtsub_formstr(this,fsp,sdp) ;
+}
+
+fmtsub_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fmtsubmem_audit:
+	        rs = fmtsub_audit(op) ;
+	        break ;
+	    case fmtsubmem_finish:
+	        rs = fmtsub_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
 
 static bool  hasourbad(cchar *sp,int sl) noex {
 	bool		f = false ;
