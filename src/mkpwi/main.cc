@@ -126,7 +126,7 @@ extern char	*timestr_log(time_t,char *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

@@ -65,7 +65,7 @@ static int usage(struct proginfo *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

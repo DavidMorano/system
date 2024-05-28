@@ -79,7 +79,7 @@ static int	ext_id() ;
 static int	handle_enter() ;
 
 
-/* local global variables */
+/* external variables */
 
 
 /* local structures */

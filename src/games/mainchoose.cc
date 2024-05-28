@@ -50,7 +50,7 @@ extern "C" LONG	combinations(int,int) ;
 extern "C" LONG	factorial(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures (and methods) */

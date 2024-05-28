@@ -59,8 +59,6 @@
 #define	CH_BADSUB	'¿'
 #define	CH_ANYE		uchar('Ã')
 
-#define	MAXLEN		(MAXPATHLEN + 40)
-
 /* BUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
 #define	BUFLEN		MAX((310+MAXPREC+2),((8*sizeof(longlong))+1))
@@ -102,7 +100,7 @@ static bool	isourbad(int) noex ;
 
 constexpr cchar	digtable_hi[] = "0123456789ABCDEF" ;
 constexpr cchar	digtable_lo[] = "0123456789abcdef" ;
-constexpr cchar	blanks[] = "                " ;
+constexpr cchar	blanks[] = "        " ;
 constexpr cchar	nullstr[] = NULLSTR ;
 
 constexpr bool	f_cleanstr = CF_CLEANSTR ;
@@ -210,7 +208,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	            f_eol = true ;
 	        }
 	        if (hasourbad(sp,hl)) {
-	            int	sz = (sl+1) ;
+	            cint	sz = (sl+1) ;
 	            if ((rs = uc_malloc(sz,&abuf)) >= 0) {
 	                int	i ; /* used-afterwards */
 	                for (i = 0 ; (i < hl) && *sp ; i += 1) {
@@ -239,10 +237,10 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	int		width = fsp->width ;
 	int		prec = fsp->prec ;
 	int		sl = sdp->sl ;
-	int		f_wint = sdp->f.wint ;
-	int		f_wchar = sdp->f.wchar ;
-	int		f_memalloc = false ;
 	int		fcode = 0 ;
+	bool		f_wint = sdp->f.wint ;
+	bool		f_wchar = sdp->f.wchar ;
+	bool		f_memalloc = false ;
 	cchar		*sp = sdp->sp ;
 
 /* possible necessary (at this time) conversion to regular characters */
@@ -251,7 +249,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    const wint_t	*lsp = sdp->lsp ;
 	    const wchar_t	*wsp = sdp->wsp ;
 	    int			i = 0 ;
-	    int			f_notnull = false ;
+	    bool		f_notnull = false ;
 	    if (f_wint) {
 	        f_notnull = (lsp != nullptr) ;
 	        if (f_notnull) {
@@ -270,7 +268,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	        }
 	    }
 	    if (f_notnull) {
-	        int 	sz = (i + 1) * sizeof(char) ;
+	        cint 	sz = (i + 1) * sizeof(char) ;
 	        char	*p ;
 	        if ((rs = uc_malloc(sz,&p)) >= 0) {
 	            int		j ;

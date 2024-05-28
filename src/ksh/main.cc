@@ -85,7 +85,7 @@ extern char	*timestr_elapsed(time_t,char *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 struct gprog	g ;
 

@@ -26,7 +26,6 @@
 	uc_timerget(3rt)
 	uc_timerover(3rt)
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -92,6 +91,9 @@ struct uctimer {
 /* local variables */
 
 constexpr timer_t	tnull{} ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -167,7 +169,9 @@ int uctimer::operator () (timer_t tid) noex {
 int uctimer::create(timer_t) noex {
 	int		rs = SR_FAULT ;
 	if (tmp) {
-	    if ((rs = timer_create(cid,sep,tmp)) < 0) rs = (- errno) ;
+	    if ((rs = timer_create(cid,sep,tmp)) < 0) {
+		rs = (- errno) ;
+	    }
 	}
 	return rs ;
 }
@@ -175,7 +179,9 @@ int uctimer::create(timer_t) noex {
 
 int uctimer::destroy(timer_t tid) noex {
 	int		rs ;
-	if ((rs = timer_delete(tid)) < 0) rs = (- errno) ;
+	if ((rs = timer_delete(tid)) < 0) {
+	    rs = (- errno) ;
+	}
 	return rs ;
 }
 /* end method (uctimer::destroy) */
@@ -183,7 +189,9 @@ int uctimer::destroy(timer_t tid) noex {
 int uctimer::set(timer_t tid) noex {
 	int		rs = SR_FAULT ;
 	if (ntvp) {
-	    if ((rs = timer_settime(tid,tf,ntvp,otvp)) < 0) rs = (- errno) ;
+	    if ((rs = timer_settime(tid,tf,ntvp,otvp)) < 0) {
+		rs = (- errno) ;
+	    }
 	}
 	return rs ;
 }
@@ -192,7 +200,9 @@ int uctimer::set(timer_t tid) noex {
 int uctimer::get(timer_t tid) noex {
 	int		rs = SR_FAULT ;
 	if (otvp) {
-	    if ((rs = timer_gettime(tid,otvp)) < 0) rs = (- errno) ;
+	    if ((rs = timer_gettime(tid,otvp)) < 0) {
+		rs = (- errno) ;
+	    }
 	}
 	return rs ;
 }
@@ -200,7 +210,9 @@ int uctimer::get(timer_t tid) noex {
 
 int uctimer::over(timer_t tid) noex {
 	int		rs ;
-	if ((rs = timer_getoverrun(tid)) < 0) rs = (- errno) ;
+	if ((rs = timer_getoverrun(tid)) < 0) {
+	    rs = (- errno) ;
+	}
 	return rs ;
 }
 /* end method (uctimer::over) */

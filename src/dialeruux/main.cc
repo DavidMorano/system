@@ -121,7 +121,7 @@ static int	usage(struct proginfo *) ;
 static void	int_all() ;
 
 
-/* global variables */
+/* external variables */
 
 static volatile int	if_int ;
 

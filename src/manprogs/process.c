@@ -53,7 +53,7 @@ extern char	*strbasename() ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

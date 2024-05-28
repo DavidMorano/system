@@ -73,7 +73,7 @@ extern int	h_errno ;
 #endif
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

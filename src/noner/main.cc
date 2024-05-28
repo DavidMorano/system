@@ -79,7 +79,7 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 extern char	*strwcpy(char *,const char *,int) ;
 
 
-/* global variables */
+/* external variables */
 
 int	if_int ;
 

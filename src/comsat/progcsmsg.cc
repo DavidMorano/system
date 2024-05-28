@@ -224,7 +224,7 @@ static bool	isBadMsg(int) noex ;
 static bool	isBadTime(int) noex ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

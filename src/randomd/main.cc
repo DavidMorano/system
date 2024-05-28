@@ -136,7 +136,7 @@ static int	procfile(struct proginfo *,int (*)(char *,char *,VECSTR *),
 			char *,vecstr *,char *,VECSTR *) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

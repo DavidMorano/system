@@ -1,4 +1,5 @@
-/* help */
+/* help HEADER */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -10,9 +11,8 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	HELP_INCLUDE
-#define	HELP_INCLUDE	1
+#define	HELP_INCLUDE
 
 
 #define		HS_SEARCH	0

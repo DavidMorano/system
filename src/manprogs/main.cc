@@ -62,7 +62,7 @@ extern char	*strbasename() ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 struct global		g ;
 

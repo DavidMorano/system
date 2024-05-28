@@ -42,8 +42,7 @@
 	int		(*emit)() ;
 
  	Arguments:
-
-	pip		pointer to global variables
+	pip		PROGINFO pointer
 	sdp		Shown-Directory pointer
  	dsp 		pointer to user's board status structure to 
 			be processed

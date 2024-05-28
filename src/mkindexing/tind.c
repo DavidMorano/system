@@ -93,7 +93,7 @@ static int	txtindex_loadcalls(TXTINDEX *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

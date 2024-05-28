@@ -63,7 +63,7 @@ extern char	*strbasename() ;
 /* forward references */
 
 
-/* local global variables */
+/* external variables */
 
 
 /* local structures */

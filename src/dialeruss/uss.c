@@ -237,7 +237,7 @@ static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 static int	subinfo_finish(SUBINFO *) ;
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	uss = {
 	USS_MNAME,

@@ -26,8 +26,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<localmisc.h>
+
+#include	"usyscalls.h"
 
 
 /* local defines */

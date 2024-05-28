@@ -60,6 +60,8 @@
 
 /* imported namespaces */
 
+using namespace	usys ;			/* namespace */
+
 
 /* local typedefs */
 
@@ -72,17 +74,6 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 /* forward references */
 
 static int uuname_machine(UTSNAME *) noex ;
-
-static int sncpy(char *dbuf,int dlen,cchar *sp) noex {
-	csize		dsz = (dlen + 1) ;
-	int		rs ;
-	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
-	    rs = SR_OVERFLOW ;
-	} else {
-	    rs = int(rsz & INT_MAX) ;
-	}
-	return rs ;
-}
 
 
 /* local variables */

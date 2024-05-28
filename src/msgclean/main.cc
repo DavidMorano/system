@@ -86,7 +86,7 @@ extern int	strlinelen(const char *,int,int) ;
 extern char	*strwcpy(char *,const char *,int) ;
 
 
-/* global variables */
+/* external variables */
 
 static volatile int	if_exit ;
 static volatile int	if_int ;

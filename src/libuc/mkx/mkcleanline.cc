@@ -94,7 +94,7 @@ static int	ischarok(int) noex ;
 static int	isend(int) noex ;
 
 
-/* module global variables */
+/* external variables */
 
 
 /* local variables */

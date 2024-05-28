@@ -72,7 +72,7 @@ extern int	cfdeci(const char *,int,int *) ;
 /* forward references */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

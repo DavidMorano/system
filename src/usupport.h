@@ -97,6 +97,13 @@ EXTERNC_end
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
 
+#ifdef	__cplusplus
+namespace usys {
+    extern int sncpy(char *,int,cchar *) noex ;
+}
+#endif /* __cplusplus */
+
+
 #endif /* USUPPORT_INCLUDE */
 
 

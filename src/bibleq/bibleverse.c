@@ -88,7 +88,7 @@ static int	bibleverse_loadcalls(BIBLEVERSE *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

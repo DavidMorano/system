@@ -96,7 +96,7 @@ static int	bvs_loadcalls(BVS *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

@@ -1,4 +1,4 @@
-/* usysauxinfo_sunos SUPPORT */
+/* usysauxinfo_linux SUPPORT */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */
@@ -25,55 +25,45 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 
-/* USYSAUXINFO_SUNOS start */
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+/* USYSAUXINFO_LINUX start */
+#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 #include	<sys/types.h>
-#include	<sys/systeminfo.h>	/* <- where the stuff we want is */
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
+#include	<usupport.h>
 
-#include	"usysauxinfo_sunos.h"
+#include	"usysauxinfo_linux.h"
 
 
 /* SYSAUXINFO begin */
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
-EXTERNC_begin
-extern int snwcpy(char *,const char *,int) noex ;
-EXTERNC_end
-
 namespace usys {
+    using namespace	usys ;
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    int		r = -1 ;
+	    ccar	*vp = nullptr ;
 	    rs = SR_NOENT ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
-		r = SI_ARCHITECTURE ;
+	 	vp = "x86_64" ;
 		break ;
 	    case SAI_PLATFORM:
-		r = SI_PLATFORM ;
+	 	vp = "Mac-Mini" ;
 		break ;
 	    case SAI_HWPROVIDER:
-		r = SI_HW_PROVIDER ;
-		break ;
-	    case SAI_HWSERIAL:
-		r = SI_HW_SERIAL ;
-		break ;
-	    case SAI_SRPCDOMAIN:
-		r = SI_SRPC_DOMAIN ;
+	 	vp = "Apple" ;
 		break ;
 	    } /* end switch */
-	    if (r >= 0) {
-		rs = u_sysauxinfo(rbuf,rlen,r) ;
+	    if (vp) {
+		rs = sncpy(rbuf,rlen,vp) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -84,7 +74,7 @@ namespace usys {
 /* SYSAUXINFO end */
 
 
-#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
-/* USYSAUXINFO_SUNOS finish */
+#endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
+/* USYSAUXINFO_LINUX finish */
 
 

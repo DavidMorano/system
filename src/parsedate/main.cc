@@ -92,7 +92,7 @@ static void		openerrfile() ;
 static void		printout() ;
 
 
-/* local global variables */
+/* external variables */
 
 struct global	g ;
 

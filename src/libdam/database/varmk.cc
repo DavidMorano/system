@@ -72,7 +72,7 @@ static int	varmk_loadcalls(VARMK *,cchar *) noex ;
 static bool	isrequired(int) noex ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

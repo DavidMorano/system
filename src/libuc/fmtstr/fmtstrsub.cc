@@ -1,4 +1,4 @@
-/* fmtstr SUPPORT */
+/* fmtstrsub SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -29,7 +29,7 @@
 	compile time switch "CF_FLOAT".
 
 	Synopsis:
-	int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex
+	int fmtstr(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex
 
 	Arguments:
 	ubuf		call buffer to receive result

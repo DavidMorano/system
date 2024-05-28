@@ -51,7 +51,7 @@ extern int	p_lspell(int,const char **,const char **,void *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

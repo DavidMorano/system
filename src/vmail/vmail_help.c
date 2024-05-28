@@ -1,14 +1,12 @@
-/* help */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_DEBUG	0		/* run-time debug print-outs */
+/* help SUPPORT */
+/* lang=C++20 */
 
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -16,20 +14,18 @@
 
 /*******************************************************************************
 
-        This subroutine prints out short descriptions of the interactive
-        commands. This routine assumes that all relevant command names in
-        HELPFILE are started in column one. And that all other text associated
-        with a command starts in column two or more preceded by white space.
-
+	This subroutine prints out short descriptions of the
+	interactive commands.  This routine assumes that all relevant
+	command names in HELPFILE are started in column one. And
+	that all other text associated with a command starts in
+	column two or more preceded by white space.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
-
+#include	<cstddef>		/* |nullptr_t| */
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -44,9 +40,10 @@
 #define	NOTFULL(a)	(((a) != ' ') && ((a) != '\n'))
 
 
-/* external variables */
+/* external subroutines */
 
-extern struct proginfo	g ;
+
+/* external variables */
 
 
 /* local variables */
@@ -54,20 +51,15 @@ extern struct proginfo	g ;
 static int	page ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int help(dsp,cmd, pageno)
-DS	*dsp ;
-int	cmd ;
-int	pageno ;
-{
-	struct proginfo	*pip = dsp->pip ;
-
-	bfile	hfile, *hfp = &hfile ;
-
+int vmail_help(DS* dsp,int cmd,int pageno) noex {
+	PROGINFO	*pip = dsp->pip ;
+	bfile		hfile, *hfp = &hfile ;
 	off_t	offset ;
-
 	int	rs ;
 	int	ml, len, nextpage ;
 	int	f_gotone, f_eof = FALSE ;
@@ -75,34 +67,13 @@ int	pageno ;
 
 	char	helpline[LINEBUFLEN], *cp ;
 
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("help: ent w/ cmd=%04X\n",cmd) ;
-#endif
-
 	if (pip->hfname == NULL) 
 		return RHELP_NOFILE ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("help: no help file\n") ;
-#endif
-
 	if ((rs = bopen(hfp,g.hfname, "r",0666)) < 0) {
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("help: bad open rs=%d\n",rs) ;
-#endif
 
 		return RHELP_NOFILE ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("help: got a file\n") ;
-#endif
 
 	pages[0] = 0 ;
 	offset = 0 ;
@@ -119,21 +90,8 @@ int	pageno ;
 	if (pageno == 0) {
 
 	    f_first = TRUE ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("help: page=0 cmd=%04X\n",cmd) ;
-#endif
-
 	    if ((cmd != '?') && (cmd != '\0')) {
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	            debugprintf("help: fast forwarding to specific section\n") ;
-#endif
-
 /* fast forward to the command that we are looking for */
-
 	        while ((len = breadln(hfp,helpline, LINEBUFLEN)) > 0) {
 
 	            offset += len ;
@@ -149,38 +107,21 @@ int	pageno ;
 			return RHELP_NOCMD ;
 		}
 
-	    } else 
+	    } else {
 		pages[0] = 0 ;
-
-	} else 
+	    }
+	} else  {
 	    offset = (off_t) bseek(hfp, pages[pageno], SEEK_SET) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("help: we got to the start\n") ;
-#endif
+	}
 
 /* read out the text that we want */
-
 	f_done = FALSE ;
 	if ((cmd == '\0') || (cmd == '?')) {
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("help: command summary\n") ;
-#endif
 
 /* give command summary */
 
 	    for (ml = 0 ; ml < dsp->nm ; ml += 1) {
-
 /* get a line from the help file */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	            debugprintf("help: working on a displaying a line\n") ;
-#endif
-
 	        f_gotone = FALSE ;
 	        while ((! f_gotone) &&
 	            ((len = breadln(hfp,helpline, LINEBUFLEN)) > 0)) {
@@ -190,12 +131,11 @@ int	pageno ;
 	                f_gotone = TRUE ;
 	                cp = (helpline[0] == '\t') ? helpline + 1 : helpline ;
 
-	                if (helpline[len - 1] == '\n')
+	                if (helpline[len - 1] == '\n') {
 	                    helpline[len - 1] = '\0' ;
-
-	                else 
+	                } else {
 	                    helpline[len] = '\0' ;
-
+			}
 	                mvwprintw(dsp->w_viewer,ml,0,
 	                    "%s",cp) ;
 
@@ -223,11 +163,6 @@ int	pageno ;
 
 /* give full explanation */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("help: give full (specific) explanation\n") ;
-#endif
-
 	    ml = 0 ;
 	    while ((ml < dsp->nm) &&
 	        ((len = breadln(hfp,helpline, LINEBUFLEN)) > 0)) {
@@ -240,11 +175,6 @@ int	pageno ;
 
 	        else 
 	            helpline[len] = '\0' ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	            debugprintf("help: >%s\n",helpline) ;
-#endif
 
 	        mvwprintw(dsp->w_viewer,ml,0,
 	            "%s",helpline) ;
@@ -305,14 +235,8 @@ int	pageno ;
 
 	ds_refresh(dsp,(DSM_VIEWER | DSM_BACKGROUND)) ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("help: ret nextpage=%u\n",nextpage) ;
-#endif
-
 	return nextpage ;
 }
-/* end subroutine (help) */
-
+/* end subroutine (vmail_help) */
 
 

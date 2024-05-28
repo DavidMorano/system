@@ -80,6 +80,7 @@
 #include	<ucgetpid.h>
 #include	<ucrand.h>
 #include	<ucgetrandom.h>
+#include	<ucsysauxinfo.h>
 
 
 EXTERNC_begin

@@ -89,7 +89,7 @@ static int	calyear_loadcalls(CALYEAR *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

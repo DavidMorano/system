@@ -112,7 +112,7 @@ static int	uuname_loadcalls(uuname *,cchar *) noex ;
 static bool	isrequired(int) noex ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

@@ -30,7 +30,7 @@
 /*******************************************************************************
 
  parses the specified logical expression, placing the tokens into
-  global variables for use by "search" as follows:
+  external variables for use by "search" as follows:
   "isop" denotes whether a token is an operator or a HEADER:value.
   Each token is identified by a number in "etoken" which gives
   the operator number (as referenced into "operator") or 
@@ -45,16 +45,17 @@
 *******************************************************************************/
 
 
+/* local defines */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int leparse(exp)
-char	exp[] ;
-{
-	int k ;
-
-	char *valpt, *ep, headstr[50] ;
-
+int leparse(cchar *exp) noex {
+	int 		k ;
+	char		*valpt, *ep, headstr[50] ;
 
 	valpt = hvalues ;	/* start of next value in string space */
 	numletok = 0 ;
@@ -115,24 +116,16 @@ char	exp[] ;
 }
 /* end subroutine (leparse) */
 
-
 /* finds operator number of character.   returns -1 if not an operator */
-
-int findoperator(ch)
-int	ch ;
-{
+int findoperator(int ch) noex {
 	int	i ;
-
-
 	for (i = 0 ; i < (int) strlen(operator) ; i += 1) {
-
 	    if (ch == operator[i])
 	        return i ;
 	}
-
 	return -1 ;
 }
-/* end subroutine */
+/* end subroutine (findoperator) */
 
 
 /* finds  number of string.  returns -1 if not a .
@@ -140,13 +133,9 @@ int	ch ;
   match done on initial substring of str (so "FROM:schatz" matches "FROM:").
 */
 
-int find(str)
-char	str[] ;
-{
+int find(cchar *str) noex {
 	int k ;
-
 	char headonly[LINEBUFLEN] ;
-
 
 /* extract leading substring */
 
@@ -176,6 +165,5 @@ char	str[] ;
 	return -1 ;
 }
 /* end subroutine (find) */
-
 
 

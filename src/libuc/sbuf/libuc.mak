@@ -599,9 +599,12 @@ objt.o:			$(OBJT)
 	$(LD) -r -o $@ $(RLDFLAGS) $(OBJT)
 
 
+# SYSTEM
+ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
+ucgetpuid.o:		ucgetpuid.cc
+
 uc_safesleep.o:		uc_safesleep.c
 
-ucgetpuid.o:		ucgetpuid.cc
 
 uc_openinfo.o:		uc_openinfo.c opensysfs.h
 uc_openuser.o:		uc_openuser.c opensysfs.h
@@ -829,11 +832,6 @@ strwcpy.dir:
 # STRDCPY
 strdcpy.o:		strdcpy.dir
 strdcpy.dir:
-	makesubdir $@
-
-# system-auxillary-information
-ucsysauxinfo.o:		ucsysauxinfo.dir
-ucsysauxinfo.dir:
 	makesubdir $@
 
 open.o:			open.dir

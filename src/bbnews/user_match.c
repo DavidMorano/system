@@ -50,7 +50,7 @@
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* exported subroutines */

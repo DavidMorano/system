@@ -80,6 +80,8 @@ extern int u_statvfs(cchar *,STATVFS *) noex ;
 extern int u_symlink(cchar *,cchar *) noex ;
 extern int u_truncate(cchar *,off_t) noex ;
 extern int u_unlink(cchar *) noex ;
+extern int u_utime(cchar *,CUTIMBUF *) noex ;
+extern int u_utimes(cchar *,CTIMEVAL *) noex ;
 
 EXTERNC_end
 

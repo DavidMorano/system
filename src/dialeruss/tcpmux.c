@@ -105,7 +105,7 @@ struct afamily {
 /* forward references */
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	tcpmux = {
 	TCPMUX_MNAME,

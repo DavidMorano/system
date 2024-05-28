@@ -78,7 +78,7 @@ extern int	burn(randomvar	*,int,const char *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

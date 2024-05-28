@@ -127,7 +127,7 @@ static int ussnls_logend(USSNLS *) ;
 static int ussnls_logstuff(USSNLS *,USSINFO *) ;
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	ussnls = {
 	USSNLS_MNAME,

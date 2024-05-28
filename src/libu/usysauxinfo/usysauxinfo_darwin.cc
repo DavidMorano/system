@@ -37,6 +37,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
+#include	<usupport.h>
 
 #include	"usysauxinfo_darwin.h"
 
@@ -44,11 +45,8 @@
 /* SYSAUXINFO begin */
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
-EXTERNC_begin
-extern int sncpy1(char *,int,cchar *) noex ;
-EXTERNC_end
-
 namespace usys {
+    using namespace	usys ;
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
@@ -66,7 +64,7 @@ namespace usys {
 		break ;
 	    } /* end switch */
 	    if (vp) {
-		rs = sncpy1(rbuf,rlen,vp) ;
+		rs = sncpy(rbuf,rlen,vp) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

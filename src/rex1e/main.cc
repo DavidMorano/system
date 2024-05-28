@@ -115,7 +115,7 @@ static int	copymachines() ;
 extern char	makedate[] ;
 
 
-/* global variables (localled declared) */
+/* external variables (localled declared) */
 
 struct global	g ;
 

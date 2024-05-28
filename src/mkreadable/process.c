@@ -64,7 +64,7 @@ extern int	checkname() ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

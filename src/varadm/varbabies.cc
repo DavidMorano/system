@@ -118,7 +118,7 @@ static Namval_t *nextf(Namval_t *,Dt_t *,Namfun_t *) ;
 static Namval_t *typef(Namval_t *,Namfun_t *) ;
 
 
-/* global variables */
+/* external variables */
 
 KSHVAR	v_babies = {
 	"babies",

@@ -71,7 +71,7 @@ static int	babycalc_loadcalls(BABYCALC *,cchar *) noex ;
 static bool	isrequired(int) noex ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

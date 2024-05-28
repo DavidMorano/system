@@ -63,7 +63,7 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

@@ -77,7 +77,7 @@ extern int	unlinkd(const char *,int) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* forward references */

@@ -124,7 +124,7 @@ static int	isok(int) ;
 static void	int_all() ;
 
 
-/* global variables */
+/* external variables */
 
 static int	f_signal = FALSE ;
 static int	signal_num = 0 ;

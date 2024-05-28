@@ -136,7 +136,7 @@ static int	subinfo_checksyms(SUBINFO *) ;
 static int	subinfo_modclose(SUBINFO *) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

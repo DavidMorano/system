@@ -79,7 +79,7 @@ extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

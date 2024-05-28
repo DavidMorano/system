@@ -231,7 +231,7 @@ static int	subinfo_setentry(struct subinfo *,const char **,
 static int	subinfo_finish(struct subinfo *) ;
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	usd = {
 	USD_MNAME,

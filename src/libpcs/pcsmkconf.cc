@@ -106,7 +106,7 @@ static int	subinfo_conflocal(SUBINFO *,char *) noex ;
 static int	subinfo_proc(SUBINFO *) noex ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

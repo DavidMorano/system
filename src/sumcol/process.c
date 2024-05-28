@@ -74,7 +74,7 @@ extern char	*strnchr(cchar *,int,int) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

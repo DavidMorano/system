@@ -1,6 +1,6 @@
 # MAKEFILE
 
-T= ucsysauxinfo
+T= usysauxinfo
 
 ALL= $(T).o $(T).a
 
@@ -46,6 +46,7 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
+
 LDRPATH=
 
 # flag setting
@@ -56,14 +57,14 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_UCSYSAUXINFO= ucsub.o
+OBJ0_UCSYSAUXINFO=
 OBJ1_UCSYSAUXINFO= usysauxinfo_sunos.o
 OBJ2_UCSYSAUXINFO= usysauxinfo_darwin.o
 OBJ3_UCSYSAUXINFO= usysauxinfo_linux.o
 
 
-OBJA_UCSYSAUXINFO= obj0_ucsysauxinfo.o obj1_ucsysauxinfo.o
-OBJB_UCSYSAUXINFO= obj2_ucsysauxinfo.o obj3_ucsysauxinfo.o
+OBJA_UCSYSAUXINFO= obj1_usysauxinfo.o
+OBJB_UCSYSAUXINFO= obj2_usysauxinfo.o obj3_usysauxinfo.o
 
 OBJ_UCSYSAUXINFO= $(OBJA_UCSYSAUXINFO) $(OBJB_UCSYSAUXINFO)
 
@@ -111,20 +112,18 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_ucsysauxinfo.o:	$(OBJ0_UCSYSAUXINFO)
+obj0_usysauxinfo.o:	$(OBJ0_UCSYSAUXINFO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYSAUXINFO)
 
-obj1_ucsysauxinfo.o:	$(OBJ1_UCSYSAUXINFO)
+obj1_usysauxinfo.o:	$(OBJ1_UCSYSAUXINFO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSYSAUXINFO)
 
-obj2_ucsysauxinfo.o:	$(OBJ2_UCSYSAUXINFO)
+obj2_usysauxinfo.o:	$(OBJ2_UCSYSAUXINFO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSYSAUXINFO)
 
-obj3_ucsysauxinfo.o:	$(OBJ3_UCSYSAUXINFO)
+obj3_usysauxinfo.o:	$(OBJ3_UCSYSAUXINFO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSYSAUXINFO)
 
-
-ucsub.o:		ucsub.cc usysauxinfo.h $(INCS)
 
 usysauxinfo_sunos.o:	usysauxinfo_sunos.cc usysauxinfo_sunos.h $(INCS)
 usysauxinfo_darwin.o:	usysauxinfo_darwin.cc usysauxinfo_darwin.h $(INCS)

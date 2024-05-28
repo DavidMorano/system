@@ -103,7 +103,7 @@ static int	spellcheck_loadcalls(SPELLCHECK *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */
