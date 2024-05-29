@@ -20,9 +20,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<stdarg.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<stdintx.h>
 
 
@@ -36,7 +36,53 @@ struct buffer_head {
 	int		len ;		/* occupied length */
 } ;
 
+#ifdef	__cplusplus
+enum buffermems {
+	buffermem_strsize,
+	buffermem_reset,
+	buffermem_finish,
+	buffermem_overlast
+} ;
+struct buffer ;
+struct buffer_co {
+	buffer		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (buffer *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (buffer_co) */
+struct buffer : buffer_head {
+	buffer_co	strsize ;
+	buffer_co	reset;
+	buffer_co	finish ;
+	buffer() noex {
+	    strsize(this,buffermem_strsize) ;
+	    reset(this,buffermem_reset) ;
+	    finish(this,buffermem_finish) ;
+	} ;
+	buffer(const buffer &) = delete ;
+	buffer &operator = (const buffer &) = delete ;
+	int start(int = 0) noex ;
+	int adv(int = 1) noex ;
+	int strw(cchar *,int = -1) noex ;
+	int get(cchar **) noex ;
+	template<typename Binary> int bin(Binary) noex ;
+	template<typename Octal> int oct(Octal) noex ;
+	template<typename Decimal> int dec(Decimal) noex ;
+	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
+	void dtor() noex ;
+	~buffer() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (buffer) */
+#else	/* __cplusplus */
 typedef BUFFER		buffer ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -112,6 +158,19 @@ inline int buffer_hex(buffer *op,ulong v) noex {
 }
 inline int buffer_hex(buffer *op,ulonglong v) noex {
 	return buffer_hexull(op,v) ;
+}
+
+template<typename Binary> int buffer::bin(Binary v) noex {
+	return buffer_bin(this,v) ;
+}
+template<typename Octal> int buffer::oct(Octal v) noex {
+	return buffer_oct(this,v) ;
+}
+template<typename Decimal> int buffer::dec(Decimal v) noex {
+	return buffer_dec(this,v) ;
+}
+template<typename Hexadecimal> int buffer::hex(Hexadecimal v) noex {
+	return buffer_hex(this,v) ;
 }
 
 #endif /* __cplusplus */

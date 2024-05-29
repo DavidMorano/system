@@ -433,4 +433,46 @@ static int buffer_ext(buffer *op,int req) noex {
 }
 /* end subroutine (buffer_ext) */
 
+int buffer::start(int st) noex {
+	return buffer_start(this,st) ;
+}
+
+int buffer::adv(int v) noex {
+	return buffer_adv(this,v) ;
+}
+
+int buffer::strw(cchar *sp,int sl) noex {
+	return buffer_strw(this,sp,sl) ;
+}
+
+int buffer::get(cchar **rpp) noex {
+	return buffer_get(this,rpp) ;
+}
+
+void buffer::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("buffer",rs,"fini-finish") ;
+	}
+}
+
+buffer_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case buffermem_strsize:
+	        rs = buffer_get(op,nullptr) ;
+	        break ;
+	    case buffermem_reset:
+	        rs = buffer_reset(op) ;
+	        break ;
+	    case buffermem_finish:
+	        rs = buffer_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (buffer_co::operator) */
+
 

@@ -257,8 +257,7 @@ int posixdirent::dirread() noex {
 	int		rs ;
 	errno = 0 ;
 	if constexpr (f_readdirr) {
-	    int		ec ;
-	    if ((ec = readdir_r(dirp,debuf,&p)) == 0) {
+	    if (errno_t ec ; (ec = readdir_r(dirp,debuf,&p)) == 0) {
 		if (p) {
 	            cint	nl = int(p->d_namlen & INT_MAX) ;
 		    memcpy(dep,p,delen) ;

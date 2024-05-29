@@ -20,9 +20,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>		/* |va_list(3c)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<stdintx.h>
 
 
@@ -232,7 +232,7 @@ inline int sbuf_bin(sbuf *op,ulonglong v) noex {
 
 template<typename Binary> int sbuf::bin(Binary v) noex {
 	return sbuf_bin(this,v) ;
-} ;
+}
 
 inline int sbuf_oct(sbuf *op,int v) noex {
 	return sbuf_octi(op,v) ;
@@ -256,7 +256,7 @@ inline int sbuf_oct(sbuf *op,ulonglong v) noex {
 
 template<typename Octal> int sbuf::oct(Octal v) noex {
 	return sbuf_oct(this,v) ;
-} ;
+}
 
 inline int sbuf_dec(sbuf *op,int v) noex {
 	return sbuf_deci(op,v) ;
@@ -280,7 +280,7 @@ inline int sbuf_dec(sbuf *op,ulonglong v) noex {
 
 template<typename Decimal> int sbuf::dec(Decimal v) noex {
 	return sbuf_dec(this,v) ;
-} ;
+}
 
 inline int sbuf_hex(sbuf *op,int v) noex {
 	return sbuf_hexi(op,v) ;
@@ -304,7 +304,7 @@ inline int sbuf_hex(sbuf *op,ulonglong v) noex {
 
 template<typename Hexadecimal> int sbuf::hex(Hexadecimal v) noex {
 	return sbuf_hex(this,v) ;
-} ;
+}
 
 #endif /* __cplusplus */
 
