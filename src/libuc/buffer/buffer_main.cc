@@ -100,10 +100,10 @@ static inline int buffer_ctor(buffer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
-	    op->buf = nullptr ;
+	    op->dbuf = nullptr ;
 	    op->startlen = 0 ;
 	    op->len = 0 ;
-	    op->e = 0 ;
+	    op->dlen = 0 ;
 	}
 	return rs ;
 }
@@ -120,7 +120,7 @@ int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
 	int		len = 0 ;
 	if (op) {
 	    if ((rs = buffer_ext(op,dlen)) >= 0) {
-	        char	*bp = (op->buf + op->len) ;
+	        char	*bp = (op->dbuf + op->len) ;
 	        rs = ctxxx(bp,dlen,v) ;
 	        op->len += rs ;
 		len = rs ;
@@ -157,7 +157,7 @@ int buffer_start(buffer *op,int startlen) noex {
 	    op->startlen = max(startlen,BUFFER_STARTLEN) ;
 	    if constexpr (f_bufstart) {
 	        if ((rs = buffer_ext(op,-1)) >= 0) {
-	            op->buf[0] = '\0' ;
+	            op->dbuf[0] = '\0' ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -171,13 +171,13 @@ int buffer_finish(buffer *op) noex {
 	int		len = 0 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->buf) {
-	        rs1 = uc_libfree(op->buf) ;
+	    if (op->dbuf) {
+	        rs1 = uc_libfree(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->buf = nullptr ;
+	        op->dbuf = nullptr ;
 	    }
 	    len = op->len ;
-	    op->e = 0 ;
+	    op->dlen = 0 ;
 	    op->startlen = 0 ;
 	    op->len = 0 ;
 	} /* end if (magic) */
@@ -217,8 +217,8 @@ int buffer_char(buffer *op,int ch) noex {
 	if (op) {
 	    if ((rs = op->len) >= 0) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            op->buf[(op->len)++] = ch ;
-	            op->buf[op->len] = '\0' ;
+	            op->dbuf[(op->len)++] = ch ;
+	            op->dbuf[op->len] = '\0' ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -232,7 +232,7 @@ int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
 	    if ((rs = op->len) >= 0) {
 	        if (slen < 0) slen = strlen(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->buf + op->len) ;
+	            char	*bp = (op->dbuf + op->len) ;
 	            memcpy(bp,sbuf,slen) ;
 	            op->len += slen ;
 	        }
@@ -249,7 +249,7 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	    if ((rs = op->len) >= 0) {
 	        if (slen < 0) slen = strlen(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->buf + op->len) ;
+	            char	*bp = (op->dbuf + op->len) ;
 	            len = strwcpy(bp,sbuf,slen) - bp ;
 	            op->len += len ;
 	        }
@@ -298,7 +298,7 @@ int buffer_get(buffer *op,cchar **spp) noex {
 	    len = op->len ;
 	    if (spp) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            *spp = (rs >= 0) ? op->buf : nullptr ;
+	            *spp = (rs >= 0) ? op->dbuf : nullptr ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -311,7 +311,7 @@ int buffer_getprev(buffer *op) noex {
 	if (op) {
 	    if ((rs = op->len) > 0) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            rs = mkchar(op->buf[op->len-1]) ;
+	            rs = mkchar(op->dbuf[op->len-1]) ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -399,31 +399,31 @@ int buffer_hexull(buffer *sbp,ulonglong uv) noex {
 static int buffer_ext(buffer *op,int req) noex {
 	int		rs = SR_OK ;
 	int		need ;
-	int		ne ;
 	if (req < 0) req = op->startlen ;
-	need = ((op->len + (req+1)) - op->e) ;
+	need = ((op->len + (req+1)) - op->dlen) ;
 	if (need > 0) {
-	    char	*buf{} ;
-	    if (op->buf) {
-	        ne = max(op->startlen,need) ;
-	        if ((rs = uc_libmalloc(ne,&buf)) >= 0) {
-	            op->buf = buf ;
-		    op->e = ne ;
+	    int		nlen ;
+	    char	*nbuf{} ;
+	    if (op->dbuf) {
+	        nlen = max(op->startlen,need) ;
+	        if ((rs = uc_libmalloc((nlen+1),&nbuf)) >= 0) {
+	            op->dbuf = nbuf ;
+		    op->dlen = nlen ;
 	        } else {
 	            op->len = rs ;
 	        }
 	    } else {
-		ne = op->e ;
-	        while ((op->len + (req+1)) > ne) {
+		nlen = op->dlen ;
+	        while ((op->len + (req+1)) > nlen) {
 		    if constexpr (f_fastgrow) {
-	                ne = ((ne + 1) * 2) ;
+	                nlen = ((nlen + 1) * 2) ;
 		    } else {
-	                ne = (ne + BUFFER_STARTLEN) ;
+	                nlen = (nlen + BUFFER_STARTLEN) ;
 		    }
 	        } /* end while */
-	        if ((rs = uc_librealloc(op->buf,ne,&buf)) >= 0) {
-	            op->buf = buf ;
-		    op->e = ne ;
+	        if ((rs = uc_librealloc(op->dbuf,nlen,&nbuf)) >= 0) {
+	            op->dbuf = nbuf ;
+		    op->dlen = nlen ;
 	        } else {
 	            op->len = rs ;
 		}

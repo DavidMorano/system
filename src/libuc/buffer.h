@@ -30,10 +30,10 @@
 
 
 struct buffer_head {
-	char		*buf ;		/* the "buffer" */
+	char		*dbuf ;		/* the "buffer" */
+	int		dlen ;		/* current buffer extent */
 	int		startlen ;	/* saved for expansion purposes */
 	int		len ;		/* occupied length */
-	int		e ;		/* current buffer extent */
 } ;
 
 typedef BUFFER		buffer ;

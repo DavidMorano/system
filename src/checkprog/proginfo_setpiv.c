@@ -11,9 +11,7 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -21,8 +19,7 @@
 
 /*******************************************************************************
 
-        This subroutine is used for acquiring (setting) the program-root for KSH
-        built-in commands.
+        This subroutine is used for acquiring the program-root for a program.
 
 	Synopsis:
 
@@ -87,6 +84,12 @@ extern int	isNotPresent(int) ;
 
 extern int	proginfo_getenv(PROGINFO *,cchar *,int,cchar **) ;
 
+#if	CF_DEBUGS || CF_DEBUG
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
+#endif
+
 extern char	*strwcpy(char *,cchar *,int) ;
 
 
@@ -116,11 +119,25 @@ int proginfo_setpiv(PROGINFO *pip,cchar *pr,struct pivars *vars)
 {
 	IDS		id ;
 	int		rs ;
+	int		rs1 ;
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(3))
+	    debugprintf("proginfo_setpiv: ent\n") ;
+#endif
 
 	if ((rs = ids_load(&id)) >= 0) {
-	    rs = proginfo_setpiver(pip,&id,pr,vars) ;
-	    ids_release(&id) ;
+	    {
+	        rs = proginfo_setpiver(pip,&id,pr,vars) ;
+	    }
+	    rs1 = ids_release(&id) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(3))
+	    debugprintf("proginfo_setpiv: ret rs=%d\n",rs) ;
+#endif
 
 	return rs ;
 }
@@ -154,7 +171,7 @@ int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
 #endif /* CF_DEBUG */
 
 	if (pr == NULL) {
-	    int	i ;
+	    int		i ;
 
 	    pl = -1 ;
 	    rs1 = SR_NOTFOUND ;
@@ -282,19 +299,15 @@ int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
 /* end subroutine (proginfo_setpiver) */
 
 
-static int sfrootdirname(dp,dl,rpp)
-cchar	dp[] ;
-int		dl ;
-cchar	**rpp ;
+static int sfrootdirname(cchar *dp,int dl,cchar **rpp)
 {
 	int		bl ;
 	int		sl = -1 ;
 	int		f ;
-	cchar	*sp = NULL ;
-	cchar	*bp ;
+	cchar		*sp = NULL ;
+	cchar		*bp ;
 
-	if (rpp != NULL)
-	    *rpp = NULL ;
+	if (rpp != NULL) *rpp = NULL ;
 
 #if	CF_DEBUGS
 	debugprintf("sfrootdirname: d=%t\n",dp,dl) ;
@@ -308,8 +321,9 @@ cchar	**rpp ;
 
 	f = ((bl == 3) && (strncmp(bp,"bin",bl) == 0)) ;
 
-	if (! f)
+	if (! f) {
 	    f = ((bl == 4) && (strncmp(bp,"sbin",bl) == 0)) ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("sfrootdirname: f=%u\n",f) ;

@@ -47,7 +47,7 @@ typedef	BUFSTR		bufstr ;
 EXTERNC_begin
 
 extern int	bufstr_start(bufstr *) noex ;
-extern int	bufstr_char(bufstr *,int) noex ;
+extern int	bufstr_chr(bufstr *,int) noex ;
 extern int	bufstr_strw(bufstr *,cchar *,int) noex ;
 extern int	bufstr_buf(bufstr *,cchar *,int) noex ;
 extern int	bufstr_get(bufstr *,cchar **) noex ;

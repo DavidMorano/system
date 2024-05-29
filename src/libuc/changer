@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} global "
+NAMES="${NAMES} bufstr_char "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/global variables/s//external variables/g
+g/bufstr_char/s//bufstr_chr/g
 	w
 	q
 EOF

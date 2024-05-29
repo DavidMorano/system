@@ -386,9 +386,9 @@ struct bufstr	*bsp ;
 	    f_got = TRUE ;
 	    bufstr_buf(bsp,cp,cp1 - cp) ;
 
-	    bufstr_char(bsp,'\\') ;
+	    bufstr_chr(bsp,'\\') ;
 
-	    rs = bufstr_char(bsp,*cp1++) ;
+	    rs = bufstr_chr(bsp,*cp1++) ;
 
 	    if (rs < 0) return BAD ;
 

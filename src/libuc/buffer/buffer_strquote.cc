@@ -43,8 +43,9 @@
 #include	<ascii.h>
 #include	<strn.h>
 #include	<strwcpy.h>
-#include	<buffer.h>
 #include	<localmisc.h>
+
+#include	"buffer.h"
 
 
 /* local defines */
@@ -104,7 +105,7 @@ int buffer_strquote(buffer *bufp,cchar *sp,int sl) noex {
 		} /* end block */
 		rs1 = uc_free(ap) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (m-a-f) */
 	} else {
 	    rs = buffer_strw(bufp,sp,sl) ;
 	    len = rs ;

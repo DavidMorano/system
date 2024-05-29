@@ -1611,9 +1611,9 @@ BUFSTR		*bsp ;
 	    f_got = TRUE ;
 	    bufstr_buf(bsp,cp,(tp - cp)) ;
 
-	    bufstr_char(bsp,'\\') ;
+	    bufstr_chr(bsp,'\\') ;
 
-	    rs = bufstr_char(bsp,*tp++) ;
+	    rs = bufstr_chr(bsp,*tp++) ;
 
 	    cp = tp ;
 

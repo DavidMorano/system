@@ -100,7 +100,7 @@ int bufstr_finish(bufstr *op) noex {
 }
 /* end subroutine (bufstr_finish) */
 
-int bufstr_char(bufstr *op,int ch) noex {
+int bufstr_chr(bufstr *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    char	buf[2] = { char(ch) } ;
@@ -108,15 +108,14 @@ int bufstr_char(bufstr *op,int ch) noex {
 	}
 	return rs ;
 }
-/* end subroutine (bufstr_char) */
+/* end subroutine (bufstr_chr) */
 
 int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) {
-	    char	*bp ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = bufstr_extend(op,sl,&bp)) >= 0) {
+	    if (char *bp ; (rs = bufstr_extend(op,sl,&bp)) >= 0) {
 	        strwcpy(bp,sp,sl) ;
 	        op->len += sl ;
 	        len = op->len ;
