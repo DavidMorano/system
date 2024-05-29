@@ -86,7 +86,7 @@ static int	bibleq_loadcalls(BIBLEQ *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

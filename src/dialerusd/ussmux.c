@@ -128,7 +128,7 @@ static int ussmux_logend(USSMUX *) ;
 static int ussmux_logstuff(USSMUX *,USSINFO *) ;
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	ussmux = {
 	USSMUX_MNAME,

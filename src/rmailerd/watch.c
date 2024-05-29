@@ -106,7 +106,7 @@ extern char	*d_reventstr() ;
 static void	int_all(int) ;
 
 
-/* local global variables */
+/* external variables */
 
 int	f_exit = FALSE ;
 

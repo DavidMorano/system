@@ -87,7 +87,7 @@ extern char	*d_reventstr() ;
 extern int	errno ;
 
 
-/* global variables (localled declared) */
+/* external variables (localled declared) */
 
 struct global	g ;
 

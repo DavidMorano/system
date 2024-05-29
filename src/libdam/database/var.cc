@@ -105,7 +105,7 @@ static int	var_loadcalls(VAR *,cchar *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

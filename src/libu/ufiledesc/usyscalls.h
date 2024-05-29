@@ -63,6 +63,10 @@
 #include	<uprocess.h>
 #include	<uexec.h>
 
+EXTERNC_begin
+extern int u_getdents(int,DIRENT *,int) noex ;
+EXTERNC_end
+
 
 #endif /* USYSCALLS_INCLUDE */
 

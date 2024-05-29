@@ -92,7 +92,7 @@ static int	sreqdb_checkdir(SREQDB *) ;
 #endif /* CF_CHECKDIR */
 
 
-/* global variables */
+/* external variables */
 
 
 /* exported subroutines */

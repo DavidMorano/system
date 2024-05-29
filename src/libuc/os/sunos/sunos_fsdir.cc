@@ -1,4 +1,4 @@
-/* fsdir */
+/* fsdir SUPPORT */
 /* lang=C++20 */
 
 /* object to read directory entries in the UNIX® file system */
@@ -49,7 +49,7 @@
 #include	<cfdec.h>
 #include	<localmisc.h>
 
-#include	"sunos_fsdir.h"
+#include	"fsdir.h"
 
 
 /* local defines */
@@ -116,6 +116,9 @@ static int	fsdir_end(fsdir *) noex ;
 /* local variables */
 
 constexpr bool	f_sunos = F_SUNOS ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -230,15 +233,15 @@ int fsdir_tell(fsdir *op,off_t *offp) noex {
 int fsdir_seek(fsdir *op,off_t o) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-		rs = SR_INVALID ;
-	        if (o >= 0) {
-	            if ((rs = u_seek(op->dfd,o,SEEK_SET)) >= 0) {
-	                op->blen = 0 ;
-	                op->doff = int(o) ;
-	                op->eoff = int(o) ;
-	                op->ei = 0 ;
-	            }
-		} /* end if (valid) */
+	    rs = SR_INVALID ;
+	    if (o >= 0) {
+	        if ((rs = u_seek(op->dfd,o,SEEK_SET)) >= 0) {
+	            op->blen = 0 ;
+	            op->doff = int(o) ;
+	            op->eoff = int(o) ;
+	            op->ei = 0 ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -247,13 +250,13 @@ int fsdir_seek(fsdir *op,off_t o) noex {
 int fsdir_rewind(fsdir *op) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-	        if (op->doff > 0) {
-	            op->blen = 0 ;
-	            op->doff = 0 ;
-	            rs = u_rewind(op->dfd) ;
-	        }
-	        op->eoff = 0 ;
-	        op->ei = 0 ;
+	    if (op->doff > 0) {
+	        op->blen = 0 ;
+	        op->doff = 0 ;
+	        rs = u_rewind(op->dfd) ;
+	    }
+	    op->eoff = 0 ;
+	    op->ei = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

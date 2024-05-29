@@ -46,7 +46,7 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utime.h>		/* for 'u_utime(2)' */
+#include	<utime.h>		/* for |u_utime(2)| */
 #include	<pthread.h>
 #include	<termios.h>
 #include	<time.h>

@@ -101,9 +101,6 @@ static int	getobdate(PROGINFO *,cchar *,int,struct obdate *) ;
 static int	ismonthok(int,int) ;
 
 
-/* locally defined global variables */
-
-
 /* local variables */
 
 static const char	*argopts[] = {
@@ -119,11 +116,12 @@ enum argopts {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	PROGINFO	pi, *pip = &pi ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;

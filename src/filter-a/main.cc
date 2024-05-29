@@ -85,7 +85,7 @@ static int	helpfile(const char *,bfile *) ;
 /* local structures */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

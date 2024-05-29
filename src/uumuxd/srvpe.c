@@ -94,7 +94,7 @@ extern struct proginfo	g ;
 static int	expand(char *,int,SRVPE *,SRVPE_ARGS *,char *,int) ;
 
 
-/* local global variables */
+/* external variables */
 
 
 /* local structures */

@@ -58,7 +58,7 @@
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local forward references */

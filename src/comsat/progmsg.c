@@ -212,7 +212,7 @@ static int	isBadMsg(int) ;
 static int	isBadTime(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

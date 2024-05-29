@@ -79,7 +79,7 @@ extern int	namelen ;
 static int	dir_func() ;
 
 
-/* global variables */
+/* external variables */
 
 MKDIRLIST	*bull_bds ;
 

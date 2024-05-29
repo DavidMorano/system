@@ -71,10 +71,6 @@
 
 /* local defines */
 
-#ifndef	noex
-#define	noex		noexcept
-#endif
-
 #ifndef	FD_STDIN
 #define	FD_STDIN	0
 #endif
@@ -127,6 +123,9 @@
 #ifndef	VARUTMPLINE
 #define	VARUTMPLINE	"UTMPLINE"
 #endif
+#ifndef	VARLOGLINE
+#define	VARLOGLINE	"LOGLINE"
+#endif
 
 
 /* imported namespaces */
@@ -151,7 +150,7 @@ static int getpm(int,mainv,mainv) noex ;
 static int utmp(bool) noex ;
 static int boottime() noex ;
 static int findsid(int) noex ;
-static int findline(int) noex ;
+static int findstdin(int) noex ;
 static int findenv(int) noex ;
 static int findstat(int) noex ;
 static int printutxval(int,UTMPX *) noex ;
@@ -165,11 +164,9 @@ static bool isourtype(UTMPX *up) noex {
 	return f ;
 }
 
-static bool	isNotTerm(int) noex ;
+static UTMPX	*getutxliner(UTMPX *) noex ;
 
 static char	*strtcpy(char *,cchar *,int) noex ;
-
-static UTMPX	*getutxliner(UTMPX *) noex ;
 
 
 /* local variables */
@@ -210,19 +207,16 @@ constexpr cpcchar	prognames[] = {
 	nullptr
 } ;
 
-constexpr int		utl_id = UT_IDSIZE ;
-constexpr int		utl_user = UT_NAMESIZE ;
-constexpr int		utl_line = UT_LINESIZE ;
-constexpr int		utl_host = UT_HOSTSIZE ;
-constexpr int		tlen = TIMEBUFLEN ;
-
-constexpr int		rsnoterm[] = {
-	SR_BADF,
-	SR_BADFD,
-	SR_NOTTY,
-	SR_ACCESS,
-	0
+constexpr cpcchar	utmpvars[] = {
+	VARUTMPLINE,
+	VARLOGLINE
 } ;
+
+constexpr int		utl_id		= UT_IDSIZE ;
+constexpr int		utl_user	= UT_NAMESIZE ;
+constexpr int		utl_line	= UT_LINESIZE ;
+constexpr int		utl_host	= UT_HOSTSIZE ;
+constexpr int		tlen = TIMEBUFLEN ;
 
 
 /* exported variables */
@@ -270,7 +264,7 @@ int main(int argc,mainv argv,mainv) {
 		/* FALLTHROUGH */
 	    default:
 	        if ((rs = findsid(pm)) == rsn) {
-	            if ((rs = findline(pm)) == rsn) {
+	            if ((rs = findstdin(pm)) == rsn) {
 			if ((rs = findenv(pm)) == rsn) {
 			    rs = findstat(pm) ;
 			}
@@ -389,7 +383,7 @@ static int findsid(int pm) noex {
 }
 /* end subroutine (findsid) */
 
-static int findline(int pm) noex {
+static int findstdin(int pm) noex {
 	STAT		sb ;
 	cint		tlen = TERMBUFLEN ;
 	cint		fd = FD_STDIN ;
@@ -419,23 +413,25 @@ static int findline(int pm) noex {
 	if ((rs >= 0) && (!f)) rs = SR_NOTFOUND ;
 	return rs ;
 }
-/* end subroutine (findline) */
+/* end subroutine (findstdin) */
 
 static int findenv(int pm) noex {
 	int		rs = SR_OK ;
-	cchar		*vn = VARUTMPLINE ;
 	bool		f = false ;
-	if (cchar *line ; (line = getenv(vn)) != nullptr) {
-	    if (line[0]) {
-	        UTMPX	ut{} ;
-	        UTMPX	*up ;
-	        strncpy(ut.ut_line,line,utl_line) ;
-	        if ((up = getutxliner(&ut)) != nullptr) {
-		    f = true ;
-		    rs = printutxval(pm,up) ;
-	        }
-	    } /* end if (non-empty) */
-	} /* end if (getenv) */
+	for (auto const &vn : utmpvars) {
+	    if (cchar *line ; (line = getenv(vn)) != nullptr) {
+	        if (line[0]) {
+	            UTMPX	ut{} ;
+	            UTMPX	*up ;
+	            strncpy(ut.ut_line,line,utl_line) ;
+	            if ((up = getutxliner(&ut)) != nullptr) {
+		        f = true ;
+		        rs = printutxval(pm,up) ;
+	            }
+	        } /* end if (non-empty) */
+	    } /* end if (getenv) */
+	    if ((rs < 0) || f) break ;
+	} /* end for (utmpvars) */
 	if ((rs >= 0) && (!f)) rs = SR_NOTFOUND ;
 	return rs ;
 }
@@ -443,7 +439,7 @@ static int findenv(int pm) noex {
 
 static int findstat(int pm) noex {
 	UTMPX		*up ;
-	static int	sid = getsid(0) ;
+	static cint	sid = getsid(0) ;
 	cint		tlen = TERMBUFLEN ;
 	int		rs ;
 	int		rs1 ;
@@ -529,7 +525,7 @@ static int printutxval(int pm,UTMPX *up) noex {
 /* end subroutine (printutxval) */
 
 static int sirchr(cchar *sp,int sl,int sch) noex {
-	int		i = 0 ;
+	int		i ; /* used-afterwards */
 	if (sl < 0) sl = strlen(sp) ;
 	for (i = (sl-1) ; i >= 0 ; i -= 1) {
 	    if (sp[i] == sch) break ;
@@ -537,18 +533,6 @@ static int sirchr(cchar *sp,int sl,int sch) noex {
 	return i ;
 }
 /* end subroutine (sirchr) */
-
-/* this is (just) like |strwcpy(3uc)| */
-static char *strtcpy(char *dp,cchar *sp,int dl) noex {
-	if (dl >= 0) {
-	    dp = strncpy(dp,sp,dl) + dl ;
-	    *dp = '\0' ;
-	} else {
-	    dp = nullptr ;
-	}
-	return dp ;
-}
-/* end subroutine (strtcpy) */
 
 static UTMPX *getutxliner(UTMPX *sup) noex {
 	static const uid_t	uid = getuid() ;
@@ -558,7 +542,9 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	   if (isourtype(up)) {
-		if (strncmp(up->ut_line,sup->ut_line,utl_line) == 0) {
+		cint	ll = utl_line ;
+		cchar	*lp = sup->ut_line ;
+		if (strncmp(up->ut_line,lp,ll) == 0) {
 		    strtcpy(nbuf,up->ut_user,utl_user) ;
 		    if ((pwp = getpwnam(nbuf)) != nullptr) {
 		        if (pwp->pw_uid == uid) {
@@ -572,8 +558,16 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 }
 /* end subroutine (getutxliner) */
 
-static bool isNotTerm(int rs) noex {
-	return isOneOf(rsnoterm,rs) ;
+/* this is similar to |strwcpy(3uc)| */
+static char *strtcpy(char *dp,cchar *sp,int sl) noex {
+	if (sl >= 0) {
+	    dp = strncpy(dp,sp,sl) + sl ;
+	    *dp = '\0' ;
+	} else {
+	    dp = nullptr ;
+	}
+	return dp ;
 }
+/* end subroutine (strtcpy) */
 
 

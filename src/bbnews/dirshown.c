@@ -60,7 +60,7 @@
 static int	cmpdir(MKDIRLIST_ENT	*,MKDIRLIST_ENT *) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

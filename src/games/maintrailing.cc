@@ -60,7 +60,7 @@ extern "C" uint	factorial(uint) ;
 extern "C" int	sisub(cchar *,int,cchar *) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures (and methods) */

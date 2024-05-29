@@ -82,7 +82,7 @@ extern char	*timestr_elapsed(time_t, char *) ;
 /* local forward references */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

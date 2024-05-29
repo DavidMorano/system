@@ -78,7 +78,7 @@ static int	commandment_loadcalls(COMMANDMENT *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

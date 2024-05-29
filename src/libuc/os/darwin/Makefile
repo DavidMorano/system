@@ -1,4 +1,4 @@
-# MAKEFILE (usys)
+# MAKEFILE (darwin)
 
 T= darwin
 
@@ -9,22 +9,23 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+
 
 CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -34,14 +35,21 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
 
-LDRPATH= $(EXTRA)/lib
+INCS += 
+
+LIBS +=
+
+
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS=
 
+LDRPATH=
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -51,15 +59,12 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h
+OBJ0_DARWIN= darwin_fsdir.o
+OBJ1_DARWIN= darwin_getexecname.o
+OBJ2_DARWIN=
 
-
-OBJ0_USYS= darwin_fsdir.o
-OBJ1_USYS=
-OBJ2_USYS=
-
-#OBJ_USYS= obj0_ucent.o obj1_ucent.o obj2_ucent.o
-OBJ_USYS= obj0_ucent.o
+#OBJ_DARWIN= obj0.o obj1.o obj2.o
+OBJ_DARWIN= obj0.o obj1.o
 
 
 default:		$(T).o
@@ -82,10 +87,10 @@ all:			$(ALL)
 	$(CXX) $(CPPFLAGS) -c $(CCFLAGS) $<
 
 
-$(T).o:			$(OBJ_USYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_USYS)
+$(T).o:			$(OBJ_DARWIN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DARWIN)
 
-$(T).a:			$(OBJ_USYS)
+$(T).a:			$(OBJ_DARWIN)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -105,17 +110,18 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_ucent.o:	$(OBJ0_USYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_USYS)
 
-obj1_ucent.o:	$(OBJ1_USYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_USYS)
+obj0.o:			$(OBJ0_DARWIN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DARWIN)
 
-obj2_ucent.o:	$(OBJ2_USYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_USYS)
+obj1.o:			$(OBJ1_DARWIN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DARWIN)
+
+obj2.o:			$(OBJ2_DARWIN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DARWIN)
 
 
-posixdirent.o:		posixdirent.cc posixdirent.hh
 darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h
+darwin_getexecname.o:	darwin_getexecname.cc
 
 

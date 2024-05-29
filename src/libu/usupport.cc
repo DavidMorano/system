@@ -51,7 +51,7 @@
 #include	<poll.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<ctime>
-#include	<cstring>		/* <- for |memset(3c)| */
+#include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -153,5 +153,18 @@ static int isleep(int mto) noex {
 	return rs ;
 }
 /* end subroutine (isleep) */
+
+namespace usys {
+    int sncpy(char *dbuf,int dlen,cchar *sp) noex {
+	csize		dsz = (dlen + 1) ;
+	int		rs ;
+	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
+	    rs = SR_OVERFLOW ;
+	} else {
+	    rs = int(rsz & INT_MAX) ;
+	}
+	return rs ;
+    }
+}
 
 

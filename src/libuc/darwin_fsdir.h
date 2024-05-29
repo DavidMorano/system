@@ -54,7 +54,8 @@ struct fsdir_head {
 	int		dfd ;		/* directory file-descriptor */
 } ;
 
-typedef struct fsdir_entry	fsdir_ent ;
+typedef	FSDIR_FL	fsdir_fl ;
+typedef	FSDIR_ENT	fsdir_ent ;
 
 #ifdef	__cplusplus
 enum fsdirmems {

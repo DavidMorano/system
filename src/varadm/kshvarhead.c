@@ -138,7 +138,7 @@ static int	locinfo_finish(struct locinfo *) ;
 static void	sighand_int(int) ;
 
 
-/* global variables */
+/* external variables */
 
 KSHVAR	kshvar ;
 

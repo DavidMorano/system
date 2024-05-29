@@ -110,7 +110,7 @@ struct afamily {
 /* forward references */
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	tcp = {
 	TCP_MNAME,

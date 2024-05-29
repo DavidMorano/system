@@ -113,7 +113,7 @@ static int cpperr_ifname(CPPERR *,const char *,int) ;
 static int cpperr_finish(CPPERR *) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

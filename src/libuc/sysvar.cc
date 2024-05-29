@@ -138,7 +138,7 @@ static int	sysvar_defenum(sysvar *,SYSVAR_DEFCUR *,
 static bool	isrequired(int) noex ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

@@ -132,7 +132,7 @@ static int	process(PROGINFO *,bfile *,cchar *,cchar *,int, VECSTR *) ;
 static void	int_all() ;
 
 
-/* global variables */
+/* external variables */
 
 static volatile int	if_int ;
 

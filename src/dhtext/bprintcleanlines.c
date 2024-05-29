@@ -87,7 +87,7 @@ static int	bprintcleanliner(bfile *,int,const char *,int) ;
 static int	isend(int) ;
 
 
-/* module global variables */
+/* external variables */
 
 
 /* local variables */

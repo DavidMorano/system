@@ -1,12 +1,11 @@
-/* progconf */
+/* progconfig SUPPORT */
+/* lang=C++20 */
 
 /* program configuration */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -19,23 +18,20 @@
 
 /*******************************************************************************
 
-	This module contains the subroutines that manage program configuration.
-
+	This module contains the subroutines that manage program
+	configuration.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<netdb.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<paramfile.h>

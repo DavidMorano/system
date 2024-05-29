@@ -63,7 +63,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

@@ -98,7 +98,7 @@ static int	isrequired(int) ;
 static char	*strwcpyspecial(char *,cchar *,int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

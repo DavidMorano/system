@@ -91,7 +91,7 @@ static int	entry_finish(JOBDB_ENT *) ;
 static int	mkfile(cchar *,cchar **) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* exported subroutines */

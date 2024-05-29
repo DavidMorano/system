@@ -64,7 +64,7 @@ extern int	base64_e(const char *,int,char *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

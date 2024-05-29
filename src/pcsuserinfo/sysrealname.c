@@ -97,7 +97,7 @@ static int	sysrealname_curload(SYSREALNAME *,SYSREALNAME_CUR *,
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

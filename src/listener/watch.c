@@ -139,7 +139,7 @@ static void	int_exit(int) ;
 static void	int_child(int) ;
 
 
-/* local global variables */
+/* external variables */
 
 static int	f_exit, f_child ;
 

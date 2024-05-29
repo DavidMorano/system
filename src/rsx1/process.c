@@ -173,7 +173,7 @@ vecstr	*elp ;
 extern char	**environ ;
 
 
-/* local global variables */
+/* external variables */
 
 static struct	sockaddr_in asin = { 
 	AF_INET } ;

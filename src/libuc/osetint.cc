@@ -51,6 +51,9 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef	set<int>		setint ;
+typedef	set<int> *		setintp ;
+
 typedef set<int>::iterator	setit ;
 typedef set<int>::iterator *	setitp ;
 
@@ -70,10 +73,9 @@ int osetint_start(osetint *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cnullptr	np{} ;
-	    set<int>	*setp ;
 	    rs = SR_NOMEM ;
-	    if ((setp = new(nothrow) set<int>) != np) {
-	        op->setp = voidp(setp) ;
+	    if (setint *setp ; (setp = new(nothrow) setint) != np) {
+	        op->setp = setp ;
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
@@ -86,7 +88,7 @@ int osetint_finish(osetint *op) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-	        set<int>	*setp  = (set<int> *) op->setp ;
+	        setint		*setp  = setintp(op->setp) ;
 	        delete setp ;
 	        op->setp = nullptr ;
 		rs = SR_OK ;
@@ -102,8 +104,8 @@ int osetint_addval(osetint *op,int v) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-	        set<int>	*setp  = (set<int> *) op->setp ;
-	        pair<set<int>::iterator,bool>	ret ;
+	        setint		*setp  = setintp(op->setp) ;
+	        pair<setint::iterator,bool>	ret ;
 	        ret = setp->insert(v) ;
 	        if (ret.second == true) f = 0 ;
 		rs = SR_OK ;
@@ -118,7 +120,7 @@ int osetint_delval(osetint *op,int v) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-	        set<int>	*setp  = (set<int> *) op->setp ;
+	        setint	*setp  = setintp(op->setp) ;
 	        setp->erase(v) ;
 		rs = SR_OK ;
 	    } /* end if (valid) */
@@ -133,7 +135,7 @@ int osetint_count(osetint *op) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-	        set<int>	*setp  = (set<int> *) op->setp ;
+	        setint	*setp  = setintp(op->setp) ;
 	        c = setp->size() ;
 		rs = SR_OK ;
 	    } /* end if (valid) */
@@ -148,7 +150,7 @@ int osetint_extent(osetint *op) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-	        set<int>	*setp  = (set<int> *) op->setp ;
+	        setint	*setp  = setintp(op->setp) ;
 	        c = setp->max_size() ;
 		rs = SR_OK ;
 	    } /* end if (valid) */
@@ -163,11 +165,11 @@ int osetint_mkvec(osetint *op,int *va) noex {
 	if (op && va) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-		set<int>	*setp = (set<int> *) op->setp ;
+		setint	*setp = setintp(op->setp) ;
 		rs = SR_OK ;
 	        if (va) {
-	            set<int>::iterator it = setp->begin() ;
-	            set<int>::iterator it_end = setp->end() ;
+	            setint::iterator	it = setp->begin() ;
+	            setint::iterator	it_end = setp->end() ;
 	            while (it != it_end) {
 	                va[c++] = *it++ ;
 	            } /* end while */
@@ -186,10 +188,10 @@ int osetint_curbegin(osetint *op,osetint_cur *curp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
 		cnullptr	np{} ;
-		set<int>	*setp = (set<int> *) op->setp ;
-	        set<int>::iterator	*interp ;
+		setint		*setp = setintp(op->setp) ;
+	        setint::iterator	*interp ;
 		rs = SR_NOMEM ;
-	        if ((interp = new(nothrow) set<int>::iterator) != np) {
+	        if ((interp = new(nothrow) setint::iterator) != np) {
 	            *interp = setp->begin() ;
 	            curp->interp = voidp(interp) ;
 		    rs = SR_OK ;
@@ -224,7 +226,7 @@ int osetint_enum(osetint *op,osetint_cur *curp,int *rp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
 		rs = SR_BUGCHECK ;
-	        set<int>	*setp  = (set<int> *) op->setp ;
+	        setint		*setp  = setintp(op->setp) ;
 	        if (curp->interp) {
 		    setit	*interp = setitp(curp->interp) ;
 	            setit	it_end = setp->end() ;

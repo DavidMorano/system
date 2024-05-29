@@ -86,7 +86,7 @@ static int	biblepara_loadcalls(BIBLEPARA *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

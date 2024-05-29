@@ -129,7 +129,7 @@ static int	procopts(struct proginfo *,KEYOPT *,vecstr *) ;
 static void	int_all() ;
 
 
-/* global variables */
+/* external variables */
 
 static int	f_signal = FALSE ;
 static int	signal_num = 0 ;

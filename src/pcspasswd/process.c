@@ -83,7 +83,7 @@ extern int	passwdok(const char *,const char *) ;
 static int	userexists(struct proginfo *,PWFILE *,char *) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

@@ -159,7 +159,7 @@ static int	subinfo_finish(SI *) ;
 static int	subinfo_dirok(SI *,cchar *,int) ;
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 SYSDIALER_INFO	uux_mod = {
 	UUX_MNAME,

@@ -76,7 +76,7 @@ extern struct global	g ;
 static int	processargs(), expand() ;
 
 
-/* local global variables */
+/* external variables */
 
 
 /* local structures */

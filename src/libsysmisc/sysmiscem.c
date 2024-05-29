@@ -104,7 +104,7 @@ static int	istermrs(int) ;
 #endif /* COMMENT */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

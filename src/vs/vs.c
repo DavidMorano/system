@@ -44,7 +44,7 @@
 #include	"vs.h"
 
 
-/* global variables */
+/* external variables */
 
 struct vs_head	vshead ;		/* zeroed out by loader */
 

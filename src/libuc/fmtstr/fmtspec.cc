@@ -25,7 +25,7 @@
 	family-type subroutines.  This object, although it can be
 	used alone (for whatever purpose), normally serves as a
 	helper object for the FMTSTR facility (which itself is a
-	sort of |snprintf(3c)| knock-off.
+	sort of |snprintf(3c)| knock-off).
 
 *******************************************************************************/
 
@@ -37,8 +37,6 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usysflag.h>
-#include	<ascii.h>
 #include	<stdintx.h>
 #include	<mkchar.h>
 #include	<localmisc.h>

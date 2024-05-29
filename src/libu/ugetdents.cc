@@ -46,6 +46,8 @@
 #include	<usysflag.h>
 #include	<localmisc.h>
 
+#include	"usyscalls.h"
+
 
 /* local defines */
 
@@ -60,7 +62,9 @@
 int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
 	int		rs ;
 	repeat {
-	    if ((rs = getdents(fd,dbuf,dsz)) < 0) rs = (- errno) ;
+	    if ((rs = getdents(fd,dbuf,dsz)) < 0) {
+		rs = (- errno) ;
+	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
 }

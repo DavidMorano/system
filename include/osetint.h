@@ -29,7 +29,6 @@ struct osetint_head {
 	void		*setp ;
 } ;
 
-
 typedef OSETINT		osetint ;
 typedef OSETINT_CUR	osetint_cur ;
 

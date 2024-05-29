@@ -105,7 +105,7 @@ static int		dirtest() ;
 static void		int_term() ;
 
 
-/* local global variables */
+/* external variables */
 
 
 /* local structures */

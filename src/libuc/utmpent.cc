@@ -43,7 +43,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<algorithm>		/* <- for |min(3c++)| */
 #include	<usystem.h>
@@ -58,12 +59,19 @@
 /* local defines */
 
 #define	AEBUFLEN	sizeof(struct utmpx)
+
+#ifndef	VARUTMPLINE
 #define	VARUTMPLINE	"UTMPLINE"
+#endif
+#ifndef	VARLOGLINE
+#define	VARLOGLINE	"LOGLINE"
+#endif
 
 
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -107,7 +115,12 @@ static int utmpent_load(utmpent *,utmpacc_ent *) noex ;
 constexpr ufinder_m	mems[] = {
 	&ufinder::trysid,
 	&ufinder::tryline,
-	&ufinder::trystat,
+	&ufinder::trystat
+} ;
+
+constexpr cpcchar	utmpenvs[] = {
+	VARUTMPLINE,
+	VARLOGLINE
 } ;
 
 
@@ -119,13 +132,13 @@ constexpr ufinder_m	mems[] = {
 int getutmpent(utmpent *ep,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
+	    if (sid <= 0) sid = getsid(0) ;
 	    ep->id[0] = '\0' ;
 	    ep->line[0] = '\0' ;
 	    ep->user[0] = '\0' ;
 	    ep->host[0] = '\0' ;
 	    ep->session = 0 ;
 	    ep->date = 0 ;
-	    if (sid <= 0) sid = getsid(0) ;
 	    ep->sid = sid ;
 	    rs = utmpent_utmpacc(ep,sid) ;
 	} /* end if (non-null) */
@@ -140,7 +153,7 @@ int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
 	    if (rlen < 0) rlen = UTMPENT_LUSER ;
 	    rbuf[0] = '\0' ;
 	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy1(rbuf,rlen,e.user) ;
+	        rs = sncpy(rbuf,rlen,e.user) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -154,7 +167,7 @@ int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 	    if (rlen < 0) rlen = UTMPENT_LHOST ;
 	    rbuf[0] = '\0' ;
 	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy1(rbuf,rlen,e.host) ;
+	        rs = sncpy(rbuf,rlen,e.host) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -168,7 +181,7 @@ int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 	    if (rlen < 0) rlen = UTMPENT_LLINE ;
 	    rbuf[0] = '\0' ;
 	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy1(rbuf,rlen,e.line) ;
+	        rs = sncpy(rbuf,rlen,e.line) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -209,22 +222,18 @@ int ufinder::tryline() noex {
 	static cint	oursid = getsid(0) ;
 	int		rs = SR_OK ;
 	if (sid == oursid) {
-	    static cchar	*line = getenv(VARUTMPLINE) ;
-	    if (line) {
-	        rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
-	    }
+	    for (auto const &vn : utmpenvs) {
+	        if (cchar *line ; (line = getenv(vn)) != nullptr) {
+	            rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
+	        }
+		if (rs != 0) break ;
+	    } /* end for */
 	} /* end if (referencing ourself) */
 	return rs ;
 }
 
 int ufinder::trystat() noex {
-	static cint	oursid = getsid(0) ;
-	int		rs = SR_OK ;
-	if (sid == oursid) {
-	    pid_t	pid = pid_t(oursid) ;
-	    rs = utmpacc_entstat(&ae,aebuf,aelen,pid) ;
-	} /* end if (referencing ourself) */
-	return rs ;
+	return utmpacc_entstat(&ae,aebuf,aelen,sid) ;
 }
 
 static int utmpent_utmpacc(utmpent *ep,pid_t sid) noex {

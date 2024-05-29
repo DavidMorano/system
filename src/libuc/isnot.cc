@@ -65,7 +65,7 @@
 
 /* local variables */
 
-static constexpr int	npresent[] = {
+constexpr int	npresent[] = {
 	SR_NOENT,
 	SR_NETUNREACH,
 	SR_NETDOWN,
@@ -78,13 +78,13 @@ static constexpr int	npresent[] = {
 	0	
 } ;
 
-static constexpr int	naccess[] = {
+constexpr int	naccess[] = {
 	SR_ACCESS,
 	SR_PERM,
 	0	
 } ;
 
-static constexpr int	nvalid[] = {
+constexpr int	nvalid[] = {
 	SR_INVALID,
 	SR_DOM,
 	SR_RANGE,
@@ -100,6 +100,14 @@ static constexpr int	nlib[] = {
 	SR_NOTDIR,
 	SR_STALE,
 	0	
+} ;
+
+constexpr int		rsnoterm[] = {
+	SR_BADF,
+	SR_BADFD,
+	SR_NOTTY,
+	SR_ACCESS,
+	0
 } ;
 
 
@@ -130,5 +138,9 @@ bool isNotLib(int rs) noex {
 	return isOneOf(nlib,rs) ;
 }
 /* end subroutine (isNotLib) */
+
+bool isNotTerm(int rs) noex {
+	return isOneOf(rsnoterm,rs) ;
+}
 
 

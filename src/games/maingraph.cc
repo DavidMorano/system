@@ -68,7 +68,7 @@ using namespace std ;
 /* external subroutines */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures (and methods) */

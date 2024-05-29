@@ -64,82 +64,33 @@ LDFLAGS= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= 
-OBJ01= 
-OBJ02= 
-OBJ03= 
-OBJ04= 
-OBJ05= 
-OBJ06= 
-OBJ07= 
-OBJ08= 
-OBJ09= 
-OBJ10=
-OBJ11=
-OBJ12=
-OBJ13= 
-OBJ14=
-OBJ15= 
-OBJ16= 
-OBJ17= 
-OBJ18= 
-OBJ19= 
-OBJ20=
-OBJ21=
-OBJ22= 
-OBJ23= 
-OBJ24= 
-OBJ25= 
-OBJ26= 
-OBJ27= 
-OBJ28= 
-OBJ29= 
-OBJ30= 
-OBJ31= 
-OBJ32= 
-OBJ33=
-OBJ34= 
-OBJ35= 
-OBJ36= 
-OBJ37= 
-OBJ38= 
-OBJ39= 
-OBJ40=
-OBJ41=
-OBJ42=
-OBJ43= 
-OBJ44=
-OBJ45=
-OBJ46= 
-OBJ47=
+OBJ00= endian.o intsat.o satarith.o
+OBJ01= aflag.o errtimer.o 
+OBJ02= timewatch.o 
+OBJ03= timespec.o
 
-OBJ48= 
-OBJ50= 
-OBJ50=
-OBJ51=
-OBJ52=
-OBJ53=
-OBJ54=
-OBJ55=
+OBJ04= usupport.o 
+OBJ05= utimeout.o 
+OBJ06= utimeouts.o 
+OBJ07= ulogerror.o
 
-#OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
-#OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-#OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-#OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-#OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-#OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
-#OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
+OBJ08= usys.o 
+OBJ09= usysop.o uipc.o 
+OBJ10= usig.o uexec.o
+OBJ11= uopen.o ustr.o 
 
-#OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
+OBJ12= usysdata.o usysauxinfo.o
+OBJ13= ufiledesc.o um.o
+OBJ14= ufileop.o ugetdents.o
+OBJ15= ugetloadavg.o
 
-OBJA= usupport.o utimeout.o utimeouts.o timewatch.o timespec.o
-OBJB= usys.o usysop.o uipc.o usig.o uexec.o
-OBJC= uopen.o ustr.o usysdata.o ugetloadavg.o
-OBJD= aflag.o errtimer.o intsat.o ulogerror.o
-OBJE= ufiledesc.o ufileop.o uprocess.o endian.o
 
-#OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
-OBJ= obja.o objb.o objc.o objd.o obje.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
+OBJB= obj04.o obj05.o obj06.o obj07.o
+OBJC= obj08.o obj09.o obj10.o obj11.o
+OBJD= obj12.o obj13.o obj14.o obj15.o
+
+OBJ= obja.o objb.o objc.o objd.o
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -166,28 +117,6 @@ so:			$(T).so
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
-
-
-obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
-
-objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
-
-objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
-
-objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
-
-obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
-
-objf.o:			$(OBJF)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
-
-objg.o:			$(OBJG)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
 
 
 $(T).a:			$(OBJ)
@@ -230,20 +159,84 @@ control:
 	(uname -n ; date) > Control
 
 
+obj00.o:		$(OBJ00)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00)
+
+obj01.o:		$(OBJ01)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01)
+
+obj02.o:		$(OBJ02)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02)
+
+obj03.o:		$(OBJ03)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
+
+
+obj04.o:		$(OBJ04)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ04)
+
+obj05.o:		$(OBJ05)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ05)
+
+obj06.o:		$(OBJ06)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ06)
+
+obj07.o:		$(OBJ07)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ07)
+
+
+obj08.o:		$(OBJ08)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ08)
+
+obj09.o:		$(OBJ09)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ09)
+
+obj10.o:		$(OBJ10)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ10)
+
+obj11.o:		$(OBJ11)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ11)
+
+
+obj12.o:		$(OBJ12)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ12)
+
+obj13.o:		$(OBJ13)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ13)
+
+obj14.o:		$(OBJ14)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ14)
+
+obj15.o:		$(OBJ15)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ15)
+
+
+obja.o:			$(OBJA)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+
+objc.o:			$(OBJC)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
+
+objd.o:			$(OBJD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
+
+
 # SUPPORT
-utimeout.o:		utimeout.c utimeout.h
-utimeouts.o:		utimeouts.cc utimeouts.h
-usupport.o:		usupport.cc usupport.h
 timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
-intsat.o:		intsat.cc intsat.h
 endian.o:		endian.cc endian.h		$(INCS)
+intsat.o:		intsat.cc intsat.h
+satarith.o:		satarith.cc satarith.h
 mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
 
-# ADAPTATION
-usysauxinfo.o:		usysauxinfo.cc
+utimeout.o:		utimeout.c utimeout.h
+utimeouts.o:		utimeouts.cc utimeouts.h
+usupport.o:		usupport.cc usupport.h
 
 # USYS
 usys.o:			usys.dir
@@ -268,12 +261,19 @@ uipc.o:			uipc.dir
 uipc.dir:
 	makesubdir $@
 
+# USYSAUXINFO
+usysauxinfo.o:		usysauxinfo.dir
+usysauxinfo.dir:
+	makesubdir $@
+
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
+um.o:			um.cc um.h			$(INCS)
 usig.o:			usig.cc usig.h			$(INCS)
 uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
+ugetdents.o:		ugetdents.cc			$(INCS)
 
 

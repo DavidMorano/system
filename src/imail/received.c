@@ -77,7 +77,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 const char	*received_keys[] = {
 	"from",

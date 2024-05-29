@@ -126,7 +126,7 @@ int strwbasecmpx(cchar *s1,cchar *s2,int s2len) noex {
 	basecmpx	co ;
 	return co.x(s1,s2,s2len) ;
 }
-/* end subroutine (strwcmpx) */
+/* end subroutine (strwbasecmpx) */
 
 int strwcasecmpx(cchar *s1,cchar *s2,int s2len) noex {
 	casecmpx	co ;

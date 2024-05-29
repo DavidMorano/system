@@ -75,7 +75,7 @@ extern double	fhm(double *,int) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

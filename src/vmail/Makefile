@@ -152,7 +152,7 @@ INCS= config.h defs.h profile.h
 
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o proginfo_rootname.o
-OBJ01= progopts.o progconf.o progterm.o progmailget.o proguserlist.o
+OBJ01= progopts.o progconfig.o progterm.o progmailget.o proguserlist.o
 OBJ02= proglog.o progvmerr.o
 OBJ03= inter.o inter_trans.o
 OBJ04= display.o ds.o 

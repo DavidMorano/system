@@ -39,9 +39,7 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
-#include	<mkpathx.h>
 #include	<hasx.h>
-#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"dirempty.h"
@@ -62,7 +60,7 @@
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

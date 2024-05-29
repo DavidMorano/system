@@ -68,7 +68,7 @@ extern char	*strbasename(char *), *strshrink(char *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

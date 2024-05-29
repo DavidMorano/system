@@ -50,7 +50,7 @@
 #include	<localmisc.h>
 #include	<posixdirent.hh>
 
-#include	"darwin_fsdir.h"
+#include	"fsdir.h"
 
 
 /* local defines */

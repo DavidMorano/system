@@ -86,7 +86,7 @@ extern char	*strwcpy() ;
 extern struct global	g ;
 
 
-/* local global variables */
+/* external variables */
 
 
 /* local structures */

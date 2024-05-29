@@ -32,6 +32,7 @@
 	groupname
 	uid
 	sid
+	sessionid
 	shells
 
 	Description:
@@ -46,11 +47,34 @@
 	$ groupname
 	$ uid
 	$ sid
+	$ sessionid
 	$ shells
 
 	Returns:
 	EXIT_SUCCESS	user was found and processed successfully
 	EXIT_FAILURE	some kind of error (there could be many)
+
+	Notes:
+	This subroutine (whole program) is written in very low-level
+	functions and utilities.  So there is quite a bit of code
+	in order to get the functionality needed and required for
+	the uses this program will be subjected to.  Also this code
+	is written using very poor style and abstractions (which
+	are noramlly very important in my real-live code).  In the
+	real world (in real life) essentially all of the code below
+	is encapulated within one subroutine call (via my very
+	extensive libraries for system-related operations).  So
+	please exuse both the mess and size of the code below.
+	Also, the implementation below of some functions is not the
+	most efficient.  For example, note that I unnecessarily
+	double-tap the system PASSWD database (effectively access
+	it twice in a row with the same key) in both the subroutines
+	|findutmp_stdin()| and |fundutmp_env()|.  These kinds of
+	suboptimal coding design choices occur due to programmer
+	fatigue (like I am experiencing right now).  Happlily, these
+	particular inefficiencies hardly matter for the intected
+	use context of this program (also the system PASSWD entry
+	will be cached on the second access w/ the same key).
 
 *******************************************************************************/
 
@@ -69,18 +93,53 @@
 #include	<matstr.h>
 #include	<rmx.h>
 #include	<strwcpy.h>
-#include	<localmisc.h>
 #include	<utmpx.h>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<ccfile.hh>
+#include	<snx.h>
 #include	<hasx.h>
+#include	<isoneof.h>
+#include	<isnot.h>
+#include	<localmisc.h>
 
 
 /* local defines */
 
 #define	MAXLINE		(4*1024)
 #define	FNSHELLS	"/etc/shells"
+
+#ifndef	DEVPREFIX
+#define	DEVPREFIX	"/dev/"
+#endif
+
+#ifndef	FD_STDIN
+#define	FD_STDIN	0
+#endif
+
+#ifndef	TERMBUFLEN
+#define	TERMBUFLEN	256		/* terminal-device buffer length */
+#endif
+
+#ifndef	UT_IDSIZE
+#define	UT_IDSIZE	4
+#endif
+#ifndef	UT_NAMESIZE
+#define	UT_NAMESIZE	8
+#endif
+#ifndef	UT_LINESIZE
+#define	UT_LINESIZE	8
+#endif
+#ifndef	UT_HOSTSIZE
+#define	UT_HOSTSIZE	16
+#endif
+
+#ifndef	VARUTMPLINE
+#define	VARUTMPLINE	"UTMPLINE"
+#endif
+#ifndef	VARLOGLINE
+#define	VARLOGLINE	"LOGLINE"
+#endif
 
 
 /* imported namespaces */
@@ -117,7 +176,7 @@ enum prognames {
 	progmode_overlast
 } ;
 
-static constexpr cchar	*prognames[] = {
+static constexpr cpcchar	prognames[] = {
 	"username",
 	"userhome",
 	"usershell",
@@ -130,7 +189,7 @@ static constexpr cchar	*prognames[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*envs[] = {
+static constexpr cpcchar	envs[] = {
 	"USERNAME",
 	"USER",
 	"LOGNAME",
@@ -148,7 +207,12 @@ namespace {
 	int find(uid_t) noex ;
 	int findenv(uid_t) noex ;
 	int findutmp(uid_t) noex ;
+	int findutmp_sid(uid_t) noex ;
+	int findutmp_stdin(uid_t) noex ;
+	int findutmp_env(uid_t) noex ;
+	int findutmp_stat(uid_t) noex ;
 	int finduid(uid_t) noex ;
+	int load(PASSWD *) noex ;
     } ; /* end struct (userinfo) */
 }
 
@@ -160,10 +224,24 @@ static int	procgroup(int,const userinfo *) noex ;
 static int	printgroup(const userinfo *) noex ;
 static int	printshells() noex ;
 
+static UTMPX	*getutxliner(UTMPX *) noex ;
+
+static char	*strtcpy(char *,cchar *,int) noex ;
+
 
 /* local variables */
 
+constexpr cpcchar	utmpvars[] = {
+	VARUTMPLINE,
+	VARLOGLINE
+} ;
+
 constexpr gid_t		gidend = gid_t(-1) ;
+
+constexpr int		utl_id		= UT_IDSIZE ;
+constexpr int		utl_user	= UT_NAMESIZE ;
+constexpr int		utl_line	= UT_LINESIZE ;
+constexpr int		utl_host	= UT_HOSTSIZE ;
 
 constexpr cchar		fnshells[] = FNSHELLS ;
 
@@ -176,7 +254,7 @@ constexpr cchar		fnshells[] = FNSHELLS ;
 int main(int argc,mainv argv,mainv) noex {
 	const uid_t	uid = getuid() ;
 	int		ex = EXIT_SUCCESS ;
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = getpn(argc,argv,prognames)) >= 0) {
 	    userinfo	ui ;
 	    cint	pm = rs ;
@@ -231,14 +309,12 @@ static int getpn(int argc,mainv argv,mainv names) noex {
 	if (argv) {
 	    rs = SR_NOMSG ;
 	    if ((argc > 0) && argv[0]) {
-	        int	bl ;
 	        cchar	*bp{} ;
-	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
-		    int		pl = rmchr(bp,bl,'.') ;
+	        if (int bl ; (bl = sfbasename(argv[0],-1,&bp)) > 0) {
+		    cint	pl = rmchr(bp,bl,'.') ;
 		    cchar	*pp = bp ;
 		    if (pl > 0) {
-			int	i ;
-	                if ((i = matstr(names,pp,pl)) >= 0) {
+	                if (int i ; (i = matstr(names,pp,pl)) >= 0) {
 		            rs = i ;
 	                }
 		    } /* end if (non-zero positive progname) */
@@ -329,19 +405,14 @@ int userinfo::findenv(uid_t uid) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	for (int i = 0 ; envs[i] ; i += 1) {
-	    cchar	*rp ;
-	    if ((rp = getenv(envs[i])) != nullptr) {
-		int	cl ;
+	    cchar	*vn = envs[i] ;
+	    if (cchar *rp ; (rp = getenv(vn)) != nullptr) {
 		cchar	*cp{} ;
-		if ((cl = sfbasename(rp,-1,&cp)) > 0) {
+		if (int cl ; (cl = sfbasename(rp,-1,&cp)) > 0) {
 		    PASSWD	*pwp ;
 		    if ((pwp = getpwnam(rp)) != nullptr) {
 		        if (pwp->pw_uid == uid) {
-		            un = pwp->pw_name ;
-		            uh = pwp->pw_dir ;
-		            us = pwp->pw_shell ;
-	    		    gid = pwp->pw_gid ;
-			    len = un.length() ;
+	    		    len = load(pwp) ;
 		        } /* end if (match) */
 		    } /* end if (getpwnam) */
 		} /* end if (sfbasename) */
@@ -353,26 +424,34 @@ int userinfo::findenv(uid_t uid) noex {
 /* end method (userinfo::findenv) */
 
 int userinfo::findutmp(uid_t uid) noex {
+	int		rs ;
+	if ((rs = findutmp_sid(uid)) == 0) {
+	    if ((rs = findutmp_stdin(uid)) == 0) {
+	        if ((rs = findutmp_env(uid)) == 0) {
+	            rs = findutmp_stat(uid) ;
+	        }
+	    }
+	}
+	return rs ;
+}
+/* end method (userinfo::findutmp) */
+
+int userinfo::findutmp_sid(uid_t uid) noex {
 	const pid_t	sid = getsid(0) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	utmpx		*up ;
-	cchar		*unp{} ;
+	UTMPX		*up ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	    if ((up->ut_pid == sid) && isourtype(up)) {
-		unp = up->ut_user ;
+		cchar	*unp = up->ut_user ;
 		if ((rs = strnlen(unp,sizeof(up->ut_user))) > 0) {
 	            PASSWD	*pwp ;
 	            char	ubuf[rs+1] ;
 	            strwcpy(ubuf,unp,rs) ;
 	            if ((pwp = getpwnam(ubuf)) != nullptr) {
 			if (pwp->pw_uid == uid) {
-		            un = pwp->pw_name ;
-		            uh = pwp->pw_dir ;
-		            us = pwp->pw_shell ;
-	  	            gid = pwp->pw_gid ;
-		            len = un.length() ;
+	    		    len = load(pwp) ;
 			} /* end if (uid match) */
 	            } /* end if (getpwnam) */
 		} /* end if (non-zero positive) */
@@ -382,21 +461,178 @@ int userinfo::findutmp(uid_t uid) noex {
 	endutxent() ;
 	return (rs >= 0) ? len : rs ;
 }
-/* end method (userinfo::findutmp) */
+/* end method (userinfo::findutmp_sid) */
+
+int userinfo::findutmp_stdin(uid_t uid) noex {
+	USTAT		sb ;
+	cint		tlen = TERMBUFLEN ;
+	cint		fd = FD_STDIN ;
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    cchar	*devprefix = DEVPREFIX ;
+	    char	tbuf[tlen+1] ;
+	    if ((rs = uc_ttyname(fd,tbuf,tlen)) >= 0) {
+		cint	n = strlen(devprefix) ;
+		if (strncmp(tbuf,devprefix,n) == 0) {
+		    char	nbuf[utl_user+1] ;
+		    UTMPX	ut{} ;
+		    UTMPX	*up ;
+		    PASSWD	*pwp ;
+		    cchar	*line = (tbuf+n) ;
+		    strncpy(ut.ut_line,line,utl_line) ;
+		    if ((up = getutxliner(&ut)) != nullptr) {
+		        strtcpy(nbuf,up->ut_user,utl_user) ;
+		        if ((pwp = getpwnam(nbuf)) != nullptr) {
+		            if (pwp->pw_uid == uid) {
+			        len = load(pwp) ;
+		            } /* end if (UID match w/ us) */
+		        } /* end if (got PASSWD entry) */
+		    } /* end if ("line" match) */
+		} /* end if (have device) */
+	    } else if (isNotTerm(rs)) {
+		rs = SR_OK ;
+	    } /* end if (ttyname) */
+	} else if (isNotAccess(rs)) {
+	    rs = SR_OK ;
+	} /* end if (stat) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int userinfo::findutmp_env(uid_t uid) noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	char		nbuf[utl_user+1] ;
+	for (auto const &vn : utmpvars) {
+	    if (cchar *line ; (line = getenv(vn)) != nullptr) {
+	        if (line[0]) {
+	            UTMPX	ut{} ;
+	            UTMPX	*up ;
+		    PASSWD	*pwp ;
+	            strncpy(ut.ut_line,line,utl_line) ;
+	            if ((up = getutxliner(&ut)) != nullptr) {
+		        strtcpy(nbuf,up->ut_user,utl_user) ;
+		        if ((pwp = getpwnam(nbuf)) != nullptr) {
+		            if (pwp->pw_uid == uid) {
+			        len = load(pwp) ;
+		            } /* end if (UID match w/ us) */
+		        } /* end if (got PASSWD entry) */
+		    } /* end if ("line" match) */
+	        } /* end if (non-empty) */
+	    } /* end if (getenv) */
+	    if ((rs < 0) || (len > 0)) break ;
+	} /* end for (utmpvars) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int userinfo::findutmp_stat(uid_t uid) noex {
+	cint		sid = getsid(0) ;
+	cint		tlen = TERMBUFLEN ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	cchar		*devprefix = DEVPREFIX ;
+	char		tbuf[tlen+1] ;
+	if ((rs = sncpy(tbuf,tlen,devprefix)) >= 0) {
+	    char	nbuf[utl_user+1] ;
+	    UTMPX	*up ;
+	    cint	tl = rs ;
+	    setutxent() ;
+	    while ((up = getutxent()) != nullptr) {
+	       if (isourtype(up)) {
+		    cint	ll = utl_line ;
+		    cchar	*lp = up->ut_line ;
+	            if ((rs = snaddw(tbuf,tlen,tl,lp,ll)) >= 0) {
+			cint	of = (O_RDONLY | O_NOCTTY) ;
+			cmode	om = 0666 ;
+			if ((rs = u_open(tbuf,of,om)) >= 0) {
+			    cint	fd = rs ;
+			    if ((rs = uc_tcgetsid(fd)) >= 0) {
+    				if (sid == rs) {
+				    PASSWD	*pwp ;
+		                    strtcpy(nbuf,up->ut_user,utl_user) ;
+		                    if ((pwp = getpwnam(nbuf)) != nullptr) {
+		                        if (pwp->pw_uid == uid) {
+			                    len = load(pwp) ;
+		                        } /* end if (UID match w/ us) */
+		                    } /* end if (got PASSWD entry) */
+				} /* end if (SID match) */
+			    } else if (isNotTerm(rs)) {
+				rs = SR_OK ;
+			    } /* end if (uc_tcgetsid) */
+			    rs1 = u_close(fd) ;
+			    if (rs >= 0) rs = rs1 ;
+			} else if (isNotAccess(rs)) {
+			    rs = SR_OK ;
+			}
+		    } /* end if (snadd) */
+	        } /* end if (our-type) */
+		if ((rs < 0) || (len > 0)) break ;
+	    } /* end while */
+	} /* end if (sncpy) */
+	return (rs >= 0) ? len : rs ;
+}
 
 int userinfo::finduid(uid_t uid) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	PASSWD		*pwp ;
 	if ((pwp = getpwuid(uid)) != nullptr) {
+	    len = load(pwp) ;
+	} /* end if */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (userinfo::finduid) */
+
+int userinfo::load(PASSWD *pwp) noex {
+	int		rs = SR_NOTFOUND ;
+	int		len = 0 ;
+	if (pwp) {
+	    rs = SR_OK ;
 	    un = pwp->pw_name ;
 	    uh = pwp->pw_dir ;
 	    us = pwp->pw_shell ;
 	    gid = pwp->pw_gid ;
 	    len = un.length() ;
-	} /* end if */
+	}
 	return (rs >= 0) ? len : rs ;
 }
-/* end method (userinfo::finduid) */
+/* end method (userinfo::load) */
+
+static UTMPX *getutxliner(UTMPX *sup) noex {
+	static const uid_t	uid = getuid() ;
+	UTMPX		*up ;
+	PASSWD		*pwp ;
+	char		nbuf[utl_user+1] ;
+	setutxent() ;
+	while ((up = getutxent()) != nullptr) {
+	   if (isourtype(up)) {
+		cint	ll = utl_line ;
+		cchar	*lp = sup->ut_line ;
+		if (strncmp(up->ut_line,lp,ll) == 0) {
+		    strtcpy(nbuf,up->ut_user,utl_user) ;
+		    if ((pwp = getpwnam(nbuf)) != nullptr) {
+		        if (pwp->pw_uid == uid) {
+    			    break ;
+		        } /* end if (UID match w/ us) */
+		    } /* end if (got PASSWD entry) */
+		} /* end if ("line" match) */
+	   } /* end if (our type) */
+	} /* end while */
+	return up ;
+}
+/* end subroutine (getutxliner) */
+
+/* this is similar to |strwcpy(3uc)| */
+static char *strtcpy(char *dp,cchar *sp,int dl) noex {
+	if (dl >= 0) {
+	    dp = strncpy(dp,sp,dl) + dl ;
+	    *dp = '\0' ;
+	} else {
+	    dp = nullptr ;
+	}
+	return dp ;
+}
+/* end subroutine (strtcpy) */
 
 

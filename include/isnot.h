@@ -19,16 +19,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
 
-extern bool isNotPresent(int rs) noex ;
-extern bool isNotAccess(int rs) noex ;
-extern bool isNotValid(int rs) noex ;
-extern bool isNotLib(int rs) noex ;
+extern bool isNotPresent(int) noex ;
+extern bool isNotAccess(int) noex ;
+extern bool isNotValid(int) noex ;
+extern bool isNotLib(int) noex ;
+extern bool isNotTerm(int) noex ;
 
 static inline bool isInvalid(int rs) noex {
 	return isNotValid(rs) ;

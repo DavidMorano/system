@@ -63,7 +63,7 @@ extern int	cfdecf(const char *,int,double *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

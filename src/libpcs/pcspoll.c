@@ -103,7 +103,7 @@ static int	pcspoll_loadcalls(PCSPOLL *,const char *) ;
 static int	isrequired(int) ;
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

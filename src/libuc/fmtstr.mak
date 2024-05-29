@@ -104,6 +104,9 @@ control:
 	(uname -n ; date) > Control
 
 
-fmtsub..o:		fmtsub.cc fmtsub.h
+fmtstrsub.o:		fmtstrsub.o fmstr.h		fmtsub.hh fmtspec.hh
+fmtsub.o:		fmtsub.cc fmtsub.hh		fmtspec.hh fmtstrdata.h
+fmtstrdata.o:		fmtstrdata.cc fmtstrdata.h
+fmtspec.o:		fmtspec.cc fmtspec.hh
 
 

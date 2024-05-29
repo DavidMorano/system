@@ -239,7 +239,7 @@ static int	pcsconf_mkdir() ;
 #endif
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

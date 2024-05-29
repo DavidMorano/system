@@ -83,7 +83,7 @@ static void		onalarm(int) ;
 static char		*strindex() ;
 
 
-/* global variables */
+/* external variables */
 
 const char	*progname ;
 

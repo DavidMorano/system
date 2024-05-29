@@ -93,7 +93,7 @@ extern char	*timestr_logz(time_t, char *) ;
 /* local forward references */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

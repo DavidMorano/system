@@ -141,7 +141,7 @@ extern char	*timestr_logz(time_t,char *) ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local structures */

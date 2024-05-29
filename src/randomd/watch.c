@@ -107,7 +107,7 @@ static int	writeout() ;
 static void	int_all(int) ;
 
 
-/* local global variables */
+/* external variables */
 
 static int	f_exit ;
 

@@ -114,7 +114,7 @@ static int	copymachines() ;
 extern int	errno ;
 
 
-/* global variables (localled declared) */
+/* external variables (localled declared) */
 
 struct global	g ;
 

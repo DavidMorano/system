@@ -58,7 +58,7 @@ extern char	*timestr_log() ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 struct global		g ;
 

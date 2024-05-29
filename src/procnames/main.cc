@@ -75,7 +75,7 @@ extern int	process(PROGINFO *,const char *) ;
 /* forward references */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

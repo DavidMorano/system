@@ -112,7 +112,7 @@ static int	ussinfo_setentry(USSINFO *,const char **,
 			const char *,int) ;
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 
 /* local variables */

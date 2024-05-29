@@ -19,10 +19,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
 #include	<stdlib.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #if	(! defined(OSNAME_SunOS)) || (OSNAME_SunOS == 0)

@@ -113,7 +113,7 @@ static int	watch_newjob(struct proginfo *, struct serverinfo *,
 static void	int_all(int) ;
 
 
-/* local global variables */
+/* external variables */
 
 static int	f_exit ;
 

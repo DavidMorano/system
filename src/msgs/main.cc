@@ -193,7 +193,7 @@ void	ask() ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 typedef	int	bool_t ;
 

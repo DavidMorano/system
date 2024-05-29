@@ -64,7 +64,7 @@ extern char	*strshrink() ;
 /* external variables */
 
 
-/* global variables */
+/* external variables */
 
 
 /* local variables */

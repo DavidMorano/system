@@ -80,7 +80,7 @@ extern int	getpwd(char *,int) ;
 /* forward references */
 
 
-/* global variables (module information) */
+/* external variables (module information) */
 
 struct sinterface	fdesc = {
 	FDESC_MODNAME,
