@@ -41,7 +41,6 @@
 #include	"usys.h"
 #include	"usys_pipes.h"
 
-
 using usys::ucloseonexec ;		/* subroutine */
 using usys::unonblock ;			/* subroutine */
 

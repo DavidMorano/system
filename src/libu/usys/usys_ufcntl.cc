@@ -35,9 +35,7 @@
 
 #include	"usys_ucloseonexec.h"
 
-
 #define	FCNTL_TO	30		/* general timeout */
-
 
 constexpr ustime	onethousand = 1000 ;
 

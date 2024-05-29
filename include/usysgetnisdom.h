@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	ucloseonexec
+	ugetnisdom
 
 	Description:
 	This provides a means to get the NIS domain-name from the

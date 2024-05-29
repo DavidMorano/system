@@ -60,12 +60,21 @@
 #if	defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) 
 
 int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
-	int		rs ;
-	repeat {
-	    if ((rs = getdents(fd,dbuf,dsz)) < 0) {
-		rs = (- errno) ;
-	    }
-	} until (rs != SR_INTR) ;
+	csize		ssz = size_t(dsz) ;
+	int		rs = SR_FAULT ;
+	if (dbuf) {
+	    rs = SR_INVALID ;
+	    if (dsz >= 0) {
+		rs = SR_BADF ;
+		if (fd >= 0) {
+	            repeat {
+	                if ((rs = getdents(fd,dbuf,ssz)) < 0) {
+		            rs = (- errno) ;
+	                }
+	            } until (rs != SR_INTR) ;
+	        } /* end if (good FD) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_getdents) */

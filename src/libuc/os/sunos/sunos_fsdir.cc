@@ -83,7 +83,7 @@ extern "C" {
 /* forward referecnces */
 
 template<typename ... Args>
-static inline int fsdir_ctor(fsdir *op,Args ... args) noex {
+static int fsdir_ctor(fsdir *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
@@ -135,15 +135,15 @@ int fsdir_open(fsdir *op,cchar *dname) noex {
 		        if (S_ISDIR(sb.st_mode)) {
 	    	            cint	psize = getpagesize() ;
 	    	            int		dsize = (sb.st_size & INT_MAX) ;
-			    int		size ;
+			    int		sz ;
 	    	            char	*bp ;
 			    if (dsize < FSDIR_MINBUFLEN) {
 				    dsize = FSDIR_MINBUFLEN ;
 			    }
-			    size = MIN(psize,dsize) ;
-	                    if ((rs = uc_valloc(size,&bp)) >= 0) {
+			    sz = MIN(psize,dsize) ;
+	                    if ((rs = uc_valloc(sz,&bp)) >= 0) {
 		                op->bdata = bp ;
-			        op->bsize = size ;
+			        op->bsize = sz ;
 	                        op->magic = FSDIR_MAGIC ;
 	                    }
 		        } /* end if (direcyory indicated) */
@@ -265,7 +265,7 @@ int fsdir_rewind(fsdir *op) noex {
 int fsdir_audit(fsdir *op) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-	        if (op->bdata || (op->bsize == 0)) rs = SR_BADFMT ;
+	    if (op->bdata || (op->bsize == 0)) rs = SR_BADFMT ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -277,8 +277,7 @@ int fsdir_audit(fsdir *op) noex {
 static int fsdir_begin(fsdir *op,cchar *dname) noex {
 	int		rs ;
 	if (dname[0] == '*') {
-	    int		v ;
-	    if ((rs = cfdeci((dname+1),-1,&v)) >= 0) {
+	    if (int v ; (rs = cfdeci((dname+1),-1,&v)) >= 0) {
 		if ((rs = u_dup(v)) >= 0) {
 		    op->f.descname = TRUE ;
 		}

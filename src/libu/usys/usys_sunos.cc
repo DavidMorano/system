@@ -33,9 +33,7 @@
 /* USYS_SUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
-
 #include	<sys/systeminfo.h>
-
 
 sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -69,9 +67,7 @@ sysret_t sunos_ugetnisdom(char *rbuf,int rlen) noex {
 }
 /* end subroutine (sunos_ugetnisdom) */
 
-
 #else /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
-
 
 sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -94,7 +90,6 @@ unixret_t sunos_ugetnisdom(char *rbuf,int rlen) noex {
 	return sunos_sysinfo(rbuf,rlen,req) ;
 }
 /* end subroutine (sunos_ugetnisdom) */
-
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYS_SUNOS finish */

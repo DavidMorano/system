@@ -42,7 +42,6 @@
 
 #include	"usys_stime.h"
 
-
 unixret_t stime(const time_t *tp) noex {
 	unixret_t	rc = -1 ;
 	if (tp) {

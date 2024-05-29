@@ -81,15 +81,12 @@
 
 #include	"usys_streams.h"
 
-
 #define	SB	STRBUF
-
 
 /* STREAMS start */
 #if	(!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0)
 
-
-extern unixret_t isastream(int fd) noex {
+unixret_t isastream(int fd) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	if (fd >= 0) {
@@ -104,7 +101,7 @@ extern unixret_t isastream(int fd) noex {
 	return rc ;
 }
 
-extern unixret_t fattach(int fd,cchar *fname) noex {
+unixret_t fattach(int fd,cchar *fname) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	if (fd >= 0) {
@@ -127,7 +124,7 @@ extern unixret_t fattach(int fd,cchar *fname) noex {
 	return rc ;
 }
 
-extern unixret_t fdetach(cchar *fname) noex {
+unixret_t fdetach(cchar *fname) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	if (fname) {
@@ -146,7 +143,7 @@ extern unixret_t fdetach(cchar *fname) noex {
 	return rc ;
 }
 
-extern unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
+unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	if (fd >= 0) {
@@ -165,7 +162,7 @@ extern unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
 	return rc ;
 }
 
-extern unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
+unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	if (fd >= 0) {
@@ -184,7 +181,7 @@ extern unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	return rc ;
 }
 
-extern unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
+unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	(void) fl ;
@@ -204,7 +201,7 @@ extern unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	return rc ;
 }
 
-extern unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
+unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	unixret_t	rc = -1 ;
 	errno_t		ec = 0 ;
 	(void) fl ;
@@ -224,7 +221,6 @@ extern unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	}
 	return rc ;
 }
-
 
 #endif /* (!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0) */
 /* STREAMS end */
