@@ -51,41 +51,10 @@
 #include	<sys/auxv.h>
 
 
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-typedef char	*charp ;
-
-
-/* external subroutines */
-
-
-/* external variables */
-
-
-/* local typedefs */
-
-
-/* local structures */
-
-
-/* forward referecnces */
-
-
-/* local variables */
-
-
-/* exported subroutines */
-
 cchar *getexecname() noex {
-	culong	at = AT_EXECFN ;
-	ulong	r ;
-	cchar	*rp = nullprt ;
+	culong		at = AT_EXECFN ;
+	ulong		r ;
+	cchar		*rp = nullptr ;
 	if ((r = getauxval(at)) != 0) {
 	    rp = charp(r) ;
 	} /* end if (have entry) */

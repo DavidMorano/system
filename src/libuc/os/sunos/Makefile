@@ -1,6 +1,6 @@
-# MAKEFILE (darwin)
+# MAKEFILE (sunos)
 
-T= darwin
+T= sunos
 
 ALL= $(T).o $(T).a
 
@@ -37,7 +37,7 @@ LINT= lint
 
 DEFS +=
 
-INCS += 
+INCS +=
 
 LIBS +=
 
@@ -59,12 +59,12 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_DARWIN= darwin_fsdir.o
-OBJ1_DARWIN= darwin_getexecname.o
-OBJ2_DARWIN=
+OBJ0_SUNOS= sunos_fsdir.o
+OBJ1_SUNOS=
+OBJ2_SUNOS=
 
-#OBJ_DARWIN= obj0.o obj1.o obj2.o
-OBJ_DARWIN= obj0.o obj1.o
+#OBJ_SUNOS= obj0.o obj1.o obj2.o
+OBJ_SUNOS= obj0.o
 
 
 default:		$(T).o
@@ -87,10 +87,10 @@ all:			$(ALL)
 	$(CXX) $(CPPFLAGS) -c $(CCFLAGS) $<
 
 
-$(T).o:			$(OBJ_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DARWIN)
+$(T).o:			$(OBJ_SUNOS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SUNOS)
 
-$(T).a:			$(OBJ_DARWIN)
+$(T).a:			$(OBJ_SUNOS)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -111,17 +111,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DARWIN)
+obj0.o:			$(OBJ0_SUNOS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SUNOS)
 
-obj1.o:			$(OBJ1_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DARWIN)
+obj1.o:			$(OBJ1_SUNOS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SUNOS)
 
-obj2.o:			$(OBJ2_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DARWIN)
+obj2.o:			$(OBJ2_SUNOS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SUNOS)
 
 
-darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h
-darwin_getexecname.o:	darwin_getexecname.cc
+sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h
 
 

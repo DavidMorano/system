@@ -34,56 +34,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cerrno>
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getprogname(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
+#include	<getexecname.h>
 
 #if	defined(SYSHAS_Darwin) && (SYSHAS_Darwin > 0)
 
-#include	<sys/auxv.h>
-
-#include	"getexecname.h"
-
-
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external subroutines */
-
-
-/* external variables */
-
-
-/* local typedefs */
-
-
-/* local structures */
-
-
-/* forward referecnces */
-
-
-/* local variables */
-
-
-/* exported subroutines */
-
 cchar *getexecname() noex {
-	errno = ENOSYS ;
-	return nullptr ;
+	return getprogname() ;
 }
 /* end subroutine (getexecname) */
-
 
 #endif /* defined(SYSHAS_Darwin) && (SYSHAS_Darwin > 0) */
 

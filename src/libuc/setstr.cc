@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	setstr
+
+	Description:
 	This object provides am ordered set of integers. No two
 	strings can be the same (desired for these purposes).
 
@@ -92,8 +96,9 @@ int setstr_already(setstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		f = true ;
 	if (op && sp) {
-	    hdb_dat	key, val ;
-	    const int	rsn = SR_NOTFOUND ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
+	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
 	    key.len = sl ;
@@ -141,7 +146,8 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		f = false ;
 	if (op && sp) {
-	    hdb_dat	key, val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;

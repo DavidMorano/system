@@ -1,6 +1,6 @@
-# MAKEFILE (darwin)
+# MAKEFILE (linux)
 
-T= darwin
+T= linux
 
 ALL= $(T).o $(T).a
 
@@ -37,7 +37,8 @@ LINT= lint
 
 DEFS +=
 
-INCS += 
+
+INCS +=
 
 LIBS +=
 
@@ -59,12 +60,12 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_DARWIN= darwin_fsdir.o
-OBJ1_DARWIN= darwin_getexecname.o
-OBJ2_DARWIN=
+OBJ0_LINUX= linux_fsdir.o
+OBJ1_LINUX= linux_getexecname.o
+OBJ2_LINUX=
 
-#OBJ_DARWIN= obj0.o obj1.o obj2.o
-OBJ_DARWIN= obj0.o obj1.o
+#OBJ_LINUX= obj0.o obj1.o obj2.o
+OBJ_LINUX= obj0.o obj1.o
 
 
 default:		$(T).o
@@ -87,10 +88,10 @@ all:			$(ALL)
 	$(CXX) $(CPPFLAGS) -c $(CCFLAGS) $<
 
 
-$(T).o:			$(OBJ_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DARWIN)
+$(T).o:			$(OBJ_LINUX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LINUX)
 
-$(T).a:			$(OBJ_DARWIN)
+$(T).a:			$(OBJ_LINUX)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -111,17 +112,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DARWIN)
+obj0.o:			$(OBJ0_LINUX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LINUX)
 
-obj1.o:			$(OBJ1_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DARWIN)
+obj1.o:			$(OBJ1_LINUX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LINUX)
 
-obj2.o:			$(OBJ2_DARWIN)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DARWIN)
+obj2.o:			$(OBJ2_LINUX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LINUX)
 
 
-darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h
-darwin_getexecname.o:	darwin_getexecname.cc
+linux_fsdir.o:		linux_fsdir.cc linux_fsdir.h
+linux_getexecname.o:	linux_getexecname.cc
 
 

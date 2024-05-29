@@ -45,11 +45,13 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>
+#include	<clanguage.h>
+#include	<usupport.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<uclibsubs.h>
 #include	<usysrets.h>
 #include	<usysflag.h>
+#include	<uclibsubs.h>
 #include	<snwcpy.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
@@ -68,7 +70,8 @@
 
 /* imported namespaces */
 
-using std::max ;
+using std::min ;			/* type */
+using std::max ;			/* type */
 
 
 /* local typedefs */
@@ -89,6 +92,9 @@ using std::max ;
 /* local variables */
 
 constexpr bool		f_readdirr = F_READDIRR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -124,15 +130,15 @@ int posixdirent::close() noex {
 }
 /* end subroutine (posixdirent::close) */
 
-int posixdirent::read(dirent *ep,char *np,int nl) noex {
+int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	if (ep && np) {
+	if (ep && dbuf) {
 	    rs = SR_INVALID ;
-	    if (nl > 0) {
+	    if (dlen > 0) {
 	        m = &posixdirent::dirread ;
 		dep = ep ;
-	        nbuf = np ;
-	        nlen = nl ;
+	        nbuf = dbuf ;
+	        nlen = dlen ;
 	        rs = callout() ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */

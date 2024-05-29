@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	setint
+
+	Description:
 	This object provides a set of integers. No two elements can
 	be the same (desired for these purposes).
 
@@ -70,9 +74,8 @@ int setint_start(setint *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cnullptr	np{} ;
-	    usetint	*setp ;
 	    rs = SR_NOMEM ;
-	    if ((setp = new(nothrow) usetint) != np) {
+	    if (usetint *setp ; (setp = new(nothrow) usetint) != np) {
 	        op->setp = voidp(setp) ;
 	        rs = SR_OK ;
 	    } /* end if (new-usetint) */
@@ -103,7 +106,7 @@ int setint_addval(setint *op,int v) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
 	        usetint		*setp = usetintp(op->setp) ;
-	        pair<unordered_set<int>::iterator,bool>	ret ;
+	        pair<usetint::iterator,bool>	ret ;
 	        ret = setp->insert(v) ;
 	        if (ret.second == true) f = 0 ;
 		rs = SR_OK ;

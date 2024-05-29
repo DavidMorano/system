@@ -42,6 +42,7 @@
 #include	<ctime>
 #include	<cstring>		/* <- for |memcpy(3c)| */
 #include	<usystem.h>
+#include	<aflag.hh>
 #include	<localmisc.h>
 
 
@@ -63,6 +64,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -70,6 +74,8 @@
 
 
 /* local variables */
+
+static aflag		uctimeconvmx ;
 
 constexpr bool		f_reentrant = F_REENTRANT ;
 
@@ -81,21 +87,30 @@ constexpr bool		f_reentrant = F_REENTRANT ;
 
 int uc_localtime(const time_t *tp,TM *tsp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (tp && tsp) {
 	    TM		*rp ;
+	    rs = SR_OK ;
 	    errno = 0 ;
 	    if constexpr (f_reentrant) {
 	        if ((rp = localtime_r(tp,tsp)) == nullptr) {
 	            rs = (- errno) ;
 		}
 	    } else {
-	        if ((rp = localtime(tp)) == nullptr) {
-	            rs = (- errno) ;
-		}
-	        if (rs >= 0) {
-	            memcpy(tsp,rp,sizeof(TM)) ;
-		}
-	    } /* end if-constexpr */
+	        if ((rs = uc_forklockbegin(-1)) >= 0) {
+	            if ((rs = uctimeconvmx.lockbegin) >= 0) {
+	                if ((rp = localtime(tp)) == nullptr) {
+	                    rs = (- errno) ;
+		        } else {
+	                    memcpy(tsp,rp,sizeof(TM)) ;
+		        }
+		        rs1 = uctimeconvmx.lockend ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (uctimeconvlock) */
+	            rs1 = uc_forklockend() ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (fork-lock) */
+	    } /* end if_constexpr (f_reentrant) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -103,21 +118,30 @@ int uc_localtime(const time_t *tp,TM *tsp) noex {
 
 int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (tp && tsp) {
 	    TM		*rp ;
+	    rs = SR_OK ;
 	    errno = 0 ;
 	    if constexpr (f_reentrant) {
 	        if ((rp = gmtime_r(tp,tsp)) == nullptr) {
 	            rs = (- errno) ;
 		}
 	    } else {
-	        if ((rp = gmtime(tp)) == nullptr) {
-	            rs = (- errno) ;
-		}
-	        if (rs >= 0) {
-	            memcpy(tsp,rp,sizeof(TM)) ;
-		}
-	    } /* end if-constexpr (f_reentrant) */
+	        if ((rs = uc_forklockbegin(-1)) >= 0) {
+	            if ((rs = uctimeconvmx.lockbegin) >= 0) {
+	                if ((rp = gmtime(tp)) == nullptr) {
+	                    rs = (- errno) ;
+		        } else {
+	                    memcpy(tsp,rp,sizeof(TM)) ;
+		        }
+		        rs1 = uctimeconvmx.lockend ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (uctimeconvlock) */
+	            rs1 = uc_forklockend() ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (fork-lock) */
+	    } /* end if_constexpr (f_reentrant) */
 	} /* end if (non-null) */
 	return rs ;
 }
