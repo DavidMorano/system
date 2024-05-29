@@ -1097,6 +1097,9 @@ pwentry.o:		pwentry.cc	pwentry.h
 pwfile.o:		pwfile.cc	pwfile.h
 sif.o:			sif.cc		sif.hh
 bufstr.o:		bufstr.cc bufstr.h
+setint.o:		setint.cc setint.h
+osetint.o:		osetint.cc osetint.h
+osetstr.o:		osetstr.cc osetstr.h
 
 
 # sring-comparisons

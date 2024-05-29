@@ -12,9 +12,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<vecstr.h>
 #include	<modload.h>
 #include	<localmisc.h>
@@ -36,7 +36,8 @@ struct sysvar_cursor {
 	uint	magic ;
 } ;
 
-struct sysvar_callsubs {
+EXTERNC_begin
+    struct sysvar_callsubs {
 	int	(*open)(void *,cchar *,cchar *) ;
 	int	(*count)(void *) ;
 	int	(*curbegin)(void *,void *) ;
@@ -45,7 +46,8 @@ struct sysvar_callsubs {
 	int	(*curend)(void *,void *) ;
 	int	(*audit)(void *) ;
 	int	(*close)(void *) ;
-} ;
+    } ;
+EXTERNC_end
 
 struct sysvar_flags {
 	uint		defaults:1 ;

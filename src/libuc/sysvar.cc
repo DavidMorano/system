@@ -4,7 +4,6 @@
 /* SYSVAR management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
 /* revision history:
@@ -19,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	sysvar
+
+	Description:
 	This module implements an interface (a trivial one) that
 	provides access to the SYSVAR object (which is dynamically
 	loaded).
@@ -101,11 +104,6 @@ extern int	vecstr_envfile(vecstr *,cchar *) ;
 extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(cchar *,int,cchar *,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
@@ -202,12 +200,7 @@ int sysvar_open(sysvar *op,cchar *pr,cchar *dbname) noex {
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("sysvar_open: pr=%s dbname=%s\n",pr,dbname) ;
-#endif
-
-	memset(op,0,sizeof(SYSVAR)) ;
-
+	memclear(op) ;
 	if ((rs = sysvar_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
 	    	op->magic = SYSVAR_MAGIC ;
@@ -222,10 +215,6 @@ int sysvar_open(sysvar *op,cchar *pr,cchar *dbname) noex {
 	    		op->magic = SYSVAR_MAGIC ;
 		    }
 		}
-
-#if	CF_DEBUGS
-	debugprintf("sysvar_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -383,10 +372,6 @@ static int sysvar_objloadbegin(sysvar *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("sysvar_objloadbegin: ent pr=%s on=%s\n",pr,objname) ;
-#endif
-
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
 	    cint	snl = SYMNAMELEN ;
 	    int		f_modload = false ;
@@ -442,10 +427,6 @@ static int sysvar_objloadbegin(sysvar *op,cchar *pr,cchar *objname) noex {
 	        modload_close(lp) ;
 	} /* end if (modload_open) */
 
-#if	CF_DEBUGS
-	debugprintf("sysvar_objloadbegin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (sysvar_objloadbegin) */
@@ -485,12 +466,6 @@ static int sysvar_loadcalls(sysvar *op,cchar *soname) noex {
 	    }
 
 	    if (rs < 0) break ;
-
-#if	CF_DEBUGS
-	    debugprintf("sysvar_loadcalls: call=%s %c\n",
-		subs[i],
-		((snp != nullptr) ? 'Y' : 'N')) ;
-#endif
 
 	    if (snp != nullptr) {
 	        c += 1 ;
@@ -580,9 +555,6 @@ static int sysvar_defaults(sysvar *op) noex {
 	int		i ;
 	int		f ;
 
-#if	CF_DEBUGS
-	debugprintf("sysvar_defaults: ent\n") ;
-#endif
 	if ((rs = vecstr_start(&op->defaults,NDEFAULTS,0)) >= 0) {
 	op->f.defaults = (rs >= 0) ;
 	for (i = 0 ; sysfnames[i] != nullptr ; i += 1) {
@@ -601,9 +573,6 @@ static int sysvar_defaults(sysvar *op) noex {
 	    }
 	} /* end if (vecstr_start) */
 
-#if	CF_DEBUGS
-	debugprintf("sysvar_defaults: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (sysvar_defaults) */
@@ -741,14 +710,7 @@ static int sysvar_defenum(sysvar *op,SV_DC *dcp,char *kbuf,int klen,
 	    i += 1 ;
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("sysvar_defenum: mid rs=%d\n",rs) ;
-	if (rs >= 0)
-	debugprintf("sysvar_defenum: cp=>%t<\n",cp,strnlen(cp,40)) ;
-#endif
-
 	if (rs >= 0) {
-
 	    kl = -1 ;
 	    vp = nullptr ;
 	    if ((tp = strchr(cp,'=')) != nullptr) {
@@ -775,10 +737,6 @@ static int sysvar_defenum(sysvar *op,SV_DC *dcp,char *kbuf,int klen,
 	} else if (vbuf != nullptr) {
 	    vbuf[0] = '\0' ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("sysvar_defenum: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
 
 	return (rs >= 0) ? vl : rs ;
 }

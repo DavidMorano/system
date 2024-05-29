@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	osetint
+
+	Description:
 	This object provides am ordered set of strings.  No two
 	strings can be the same (desired for these purposes).
 
@@ -55,6 +59,9 @@ typedef	set<string>::iterator *	iterp ;
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* forward references */

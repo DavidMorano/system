@@ -16,14 +16,24 @@
 
 /*******************************************************************************
 
+	Names:
+	filer_writehdr
+	filer_writehdrkey
+	filer_printlncont
+
+	Description:
 	Here is provided some support routines for the FILER
-	objext that supports writing mail-message files.
+	object that supports writing mail-message files.
+
+	Synopses:
+	int filer_writehdr(filer *,cchar *,int) noex
+	int filer_writehdrkey(filer *,cchar *) noex
+	int filer_writehdrkey(filer *,cchar *) noex
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<mailmsghdrfold.h>
 #include	<strn.h>
