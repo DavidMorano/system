@@ -40,8 +40,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/dirent.h>
-#include	<errno.h>
+#include	<dirent.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
@@ -59,18 +59,15 @@
 
 #if	defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) 
 
-int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
-	csize		ssz = size_t(dsz) ;
+int u_getdents(int fd,DIRENT *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
-	    if (dsz >= 0) {
+	    if (dlen >= 0) {
 		rs = SR_BADF ;
 		if (fd >= 0) {
 	            repeat {
-	                if ((rs = getdents(fd,dbuf,ssz)) < 0) {
-		            rs = (- errno) ;
-	                }
+	                rs = ugetdents(fd,dbuf,dlen) ;
 	            } until (rs != SR_INTR) ;
 	        } /* end if (good FD) */
 	    } /* end if (valid) */
@@ -81,11 +78,11 @@ int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
 
 #else /* defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) */
 
-int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
+int u_getdents(int fd,DIRENT *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
-	    if (dsz >= 0) {
+	    if (dlen >= 0) {
 	        rs = SR_BADF ;
 	        if (fd >= 0) {
 	            rs = SR_NOSYS ;
