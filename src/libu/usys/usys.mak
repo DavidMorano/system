@@ -57,7 +57,7 @@ LDFLAGS= $(MAKELDFLAGS)
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_ugetnisdom.o usys_ufcntl.o
-OBJ3_USYS= usys_ugetdents.o
+OBJ3_USYS= usys_ugetdents.o usys_libstr.o
 
 OBJ4_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ5_USYS= usys_ttynamerp.o 
@@ -177,5 +177,6 @@ usys_streams.o:		usys_streams.cc usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc usys_pipes.h		$(INCS)
 usys_stat.o:		usys_stat.cc usys_stat.h		$(INCS)
 usys_ugetdents.o:	usys_ugetdents.cc usys_ugetdents.h	$(INCS)
+usys_libstr.o:		usys_libstr.cc usys_libstr.h		$(INCS)
 
 

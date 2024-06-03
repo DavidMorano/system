@@ -55,6 +55,7 @@
 #include	<usys_streams.h>
 #include	<usys_pipes.h>
 #include	<usys_stat.h>
+#include	<usys_libstr.h>
 
 
 #endif /* USYS_INCLUDE */

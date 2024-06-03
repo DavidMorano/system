@@ -26,9 +26,9 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
 
 
 /* local defines */
