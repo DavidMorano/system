@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} bufstr_char "
+NAMES="${NAMES} buffer_char "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/bufstr_char/s//bufstr_chr/g
+g/buffer_char/s//buffer_chr/g
 	w
 	q
 EOF

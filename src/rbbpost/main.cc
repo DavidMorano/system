@@ -2266,7 +2266,7 @@ static int locinfo_mkhdrfromaddr(LOCINFO *lip)
 	    {
 	        cchar	*cp = (cn != NULL) ? cn : nn ;
 	        buffer_strw(&b,pip->username,-1) ;
-	        buffer_char(&b,'@') ;
+	        buffer_chr(&b,'@') ;
 	        buffer_strw(&b,cp,-1) ;
 	    }
 
@@ -2277,10 +2277,10 @@ static int locinfo_mkhdrfromaddr(LOCINFO *lip)
 	    }
 
 	    if ((rs >= 0) && (lip->hdrfromname != NULL)) {
-	        buffer_char(&b,' ') ;
-	        buffer_char(&b,CH_LPAREN) ;
+	        buffer_chr(&b,' ') ;
+	        buffer_chr(&b,CH_LPAREN) ;
 	        buffer_strw(&b,lip->hdrfromname,-1) ;
-	        buffer_char(&b,CH_RPAREN) ;
+	        buffer_chr(&b,CH_RPAREN) ;
 	    } /* end if (adding name) */
 
 	    if (rs >= 0) {

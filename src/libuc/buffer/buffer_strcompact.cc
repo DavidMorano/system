@@ -83,7 +83,7 @@ int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex {
 	if (sl < 0) sl = strlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if (c++ > 0) {
-	        rs = buffer_char(bufp,CH_SP) ;
+	        rs = buffer_chr(bufp,CH_SP) ;
 	        len += rs ;
 	    }
 	    if (rs >= 0) {

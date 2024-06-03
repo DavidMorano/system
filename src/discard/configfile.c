@@ -696,7 +696,7 @@ char		configfname[] ;
 	                if (fsb.flen > 0) {
 
 	                    if (noptions > 0)
-	                        buffer_char(&options,',') ;
+	                        buffer_chr(&options,',') ;
 
 	                    buffer_strw(&options,fsb.fp,fsb.flen) ;
 

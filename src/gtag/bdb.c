@@ -1191,7 +1191,7 @@ static int bibentry_continue(struct bibentry *iep,cchar *vp,int vl)
 	if (rs > 0) {
 
 	    if (! CHAR_ISWHITE(bp[bl - 1])) {
-	        rs = buffer_char(&iep->vb,' ') ;
+	        rs = buffer_chr(&iep->vb,' ') ;
 	    }
 
 	} /* end if */

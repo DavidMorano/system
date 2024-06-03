@@ -283,7 +283,7 @@ int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
 	if ((rs = buffer_start(&b,c)) >= 0) {
 	    int		i ;
 	    const char	*k, *v ;
-	    buffer_char(&b,CH_LANGLE) ;
+	    buffer_chr(&b,CH_LANGLE) ;
 	    buffer_strw(&b,tag,-1) ;
 	    for (i = 0 ; i < 2 ; i += 1) {
 	        v = NULL ;
@@ -318,7 +318,7 @@ int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
 	            if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if (key-vals) */
-	    buffer_char(&b,CH_RANGLE) ;
+	    buffer_chr(&b,CH_RANGLE) ;
 	    if (rs >= 0) {
 		const char	*bp ;
 	        if ((rs = buffer_get(&b,&bp)) >= 0) {

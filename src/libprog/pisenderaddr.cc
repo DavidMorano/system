@@ -134,7 +134,7 @@ static int piloadsender(PROGINFO *pip) noex {
 	if ((rs = buffer_start(&b,MABUFLEN)) >= 0) {
 
 	    buffer_strw(&b,pip->username,-1) ;
-	    buffer_char(&b,'@') ;
+	    buffer_chr(&b,'@') ;
 	    buffer_strw(&b,pip->domainname,-1) ;
 
 /* add a name if we can find one */
@@ -142,10 +142,10 @@ static int piloadsender(PROGINFO *pip) noex {
 #if	CF_SENDERNAME
 	    if ((rs = mkfromname(pip)) >= 0) {
 	        if (pip->fromname != NULL) {
-	            buffer_char(&b,' ') ;
-	            buffer_char(&b,CH_LPAREN) ;
+	            buffer_chr(&b,' ') ;
+	            buffer_chr(&b,CH_LPAREN) ;
 	            buffer_strw(&b,pip->fromname,-1) ;
-	            buffer_char(&b,CH_RPAREN) ;
+	            buffer_chr(&b,CH_RPAREN) ;
 	        } /* end if (adding name) */
 	    } /* end if 9mkfromname) */
 #endif /* CF_SENDERNAME */

@@ -93,7 +93,7 @@ int buffer_chrs(buffer *bp,int ch,int n) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	while ((rs >= 0) && (n-- > 0)) {
-	    rs = buffer_char(bp,ch) ;
+	    rs = buffer_chr(bp,ch) ;
 	    len += rs ;
 	} /* end while */
 	return (rs >= 0) ? len : rs ;

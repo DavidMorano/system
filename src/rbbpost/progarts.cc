@@ -1824,10 +1824,10 @@ PROCDATA	*pdp ;
 		if (rs >= 0) {
 		    cchar	*bp ;
 		    buffer_strw(&b,dbuf,-1) ;
-		    buffer_char(&b,' ') ;
+		    buffer_chr(&b,' ') ;
 		    if (hp != NULL) {
 			buffer_strw(&b,hp,hl) ;
-		        buffer_char(&b,'!') ;
+		        buffer_chr(&b,'!') ;
 		    }
 		    buffer_strw(&b,fromp,froml) ;
 		    if ((rs = buffer_get(&b,&bp)) >= 0) {

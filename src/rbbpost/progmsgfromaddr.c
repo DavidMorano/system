@@ -149,7 +149,7 @@ struct proginfo	*pip ;
 	    const char	*bp ;
 
 	    buffer_strw(&b,pip->username,-1) ;
-	    buffer_char(&b,'@') ;
+	    buffer_chr(&b,'@') ;
 	    buffer_strw(&b,pip->domainname,-1) ;
 
 /* add a name if we can find one */
@@ -158,10 +158,10 @@ struct proginfo	*pip ;
 	        rs = progmsgfromname(pip) ;
 
 	    if ((rs >= 0) && (pip->msgfromname != NULL)) {
-	        buffer_char(&b,' ') ;
-	        buffer_char(&b,CH_LPAREN) ;
+	        buffer_chr(&b,' ') ;
+	        buffer_chr(&b,CH_LPAREN) ;
 	        buffer_strw(&b,pip->msgfromname,-1) ;
-	        buffer_char(&b,CH_RPAREN) ;
+	        buffer_chr(&b,CH_RPAREN) ;
 	    } /* end if (adding name) */
 
 	    if (rs >= 0) {

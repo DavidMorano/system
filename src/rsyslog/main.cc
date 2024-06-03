@@ -1764,7 +1764,7 @@ vecstr		*addrp ;
 	        rs1 = buffer_strw(&b,tmpfname,len) ;
 
 	        if (rs1 >= 0)
-	            buffer_char(&b,'\n') ;
+	            buffer_chr(&b,'\n') ;
 
 	    } /* end if */
 
@@ -1777,7 +1777,7 @@ vecstr		*addrp ;
 
 /* write the end-of-header */
 
-	    buffer_char(&b,'\n') ;
+	    buffer_chr(&b,'\n') ;
 
 /* prepapre the write everything out */
 

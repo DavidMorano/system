@@ -202,7 +202,7 @@ int		argr ;
 	    }
 
 	    if (f_m)
-	        rs = buffer_char(&b,'-') ;
+	        rs = buffer_chr(&b,'-') ;
 
 	    if (rs >= 0)
 	        rs = buffer_strw(&b,cp,cl) ;

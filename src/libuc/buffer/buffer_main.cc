@@ -212,7 +212,7 @@ int buffer_adv(buffer *op,int advlen) noex {
 }
 /* end subroutine (buffer_adv) */
 
-int buffer_char(buffer *op,int ch) noex {
+int buffer_chr(buffer *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if ((rs = op->len) >= 0) {
@@ -224,7 +224,7 @@ int buffer_char(buffer *op,int ch) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
 }
-/* end subroutine (buffer_char) */
+/* end subroutine (buffer_chr) */
 
 int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
@@ -443,6 +443,10 @@ int buffer::adv(int v) noex {
 
 int buffer::strw(cchar *sp,int sl) noex {
 	return buffer_strw(this,sp,sl) ;
+}
+
+int buffer::chr(int ch) noex {
+	return buffer_chr(this,ch) ;
 }
 
 int buffer::get(cchar **rpp) noex {

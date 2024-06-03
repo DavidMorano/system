@@ -298,7 +298,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	            sp = (tp+1) ;
 	            if (sl > 0) {
 	                if (sp[0] == sch) {
-	                    rs = buffer_char(bufp,sch) ;
+	                    rs = buffer_chr(bufp,sch) ;
 		  	    len += rs ;
 	                    sl -= 1 ;
 	                    sp += 1 ;
@@ -375,11 +375,11 @@ static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 static int buffer_keydef(buffer *bufp,int wch,cchar *kp,int kl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = buffer_char(bufp,wch)) >= 0) {
+	if ((rs = buffer_chr(bufp,wch)) >= 0) {
 	    len = rs ;
 	    if ((rs = buffer_strw(bufp,kp,kl)) >= 0) {
 		len += rs ;
-	        rs = buffer_char(bufp,wch) ;
+	        rs = buffer_chr(bufp,wch) ;
 		len += rs ;
 	    } /* end if */
 	} /* end if */

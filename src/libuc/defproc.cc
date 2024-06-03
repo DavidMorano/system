@@ -285,7 +285,7 @@ static int procvalues(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	        while ((fl = field_sharg(&fsb,fterms,fbuf,flen)) >= 0) {
 	            if (fl > 0) {
 	                if (c++ > 0) {
-	                    rs = buffer_char(bp,' ') ;
+	                    rs = buffer_chr(bp,' ') ;
 	                    len += rs ;
 	                }
 	                if (rs >= 0) {

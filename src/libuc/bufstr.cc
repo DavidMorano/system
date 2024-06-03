@@ -33,7 +33,11 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<ctbin.h>
+#include	<ctoct.h>
+#include	<ctdec.h>
+#include	<cthex.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"bufstr.h"
 
@@ -61,7 +65,39 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-static int	bufstr_extend(bufstr *,int,char **) noex ;
+static int	bufstr_extend(bufstr *,int,char ** = nullptr) noex ;
+
+template<typename T>
+int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
+	cint		dlen = DIGBUFLEN ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op) {
+	    if ((rs = bufstr_extend(op,dlen)) >= 0) {
+	        char	*bp = (op->dbuf + op->len) ;
+	        rs = ctxxx(bp,dlen,v) ;
+	        op->len += rs ;
+		len = rs ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine-template (bufstr_xxxx) */
+
+template<typename T>
+int bufstr_decx(bufstr *sbp,T v) noex {
+	return bufstr_xxxx(sbp,ctdec,v) ;
+}
+/* end subroutine-template (bufstr_decx) */
+
+template<typename T>
+int bufstr_hexx(bufstr *sbp,T v) noex {
+	return bufstr_xxxx(sbp,cthex,v) ;
+}
+/* end subroutine-template (bufstr_hexx) */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -85,6 +121,7 @@ int bufstr_start(bufstr *op) noex {
 int bufstr_finish(bufstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		len = 0 ;
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->dbuf) {
@@ -92,23 +129,13 @@ int bufstr_finish(bufstr *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
 	    }
-	    if (rs >= 0) rs = op->len ;
-	    op->len = 0 ;
+	    len = op->len ;
 	    op->dlen = 0 ;
+	    op->len = 0 ;
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bufstr_finish) */
-
-int bufstr_chr(bufstr *op,int ch) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    char	buf[2] = { char(ch) } ;
-	    rs = bufstr_strw(op,buf,1) ;
-	}
-	return rs ;
-}
-/* end subroutine (bufstr_chr) */
 
 int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -124,6 +151,16 @@ int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bufstr_strw) */
+
+int bufstr_chr(bufstr *op,int ch) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    char	buf[2] = { char(ch) } ;
+	    rs = bufstr_strw(op,buf,1) ;
+	}
+	return rs ;
+}
+/* end subroutine (bufstr_chr) */
 
 int bufstr_buf(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -155,19 +192,80 @@ int bufstr_get(bufstr *op,cchar **spp) noex {
 }
 /* end subroutine (bufstr_get) */
 
+int bufstr_deci(bufstr *sbp,int v) noex {
+	return bufstr_decx(sbp,v) ;
+}
+/* end subroutine (bufstr_deci) */
+
+int bufstr_decl(bufstr *sbp,long v) noex {
+	return bufstr_decx(sbp,v) ;
+}
+/* end subroutine (bufstr_decl) */
+
+int bufstr_decll(bufstr *sbp,longlong v) noex {
+	return bufstr_decx(sbp,v) ;
+}
+/* end subroutine (bufstr_decll) */
+
+int bufstr_decui(bufstr *sbp,uint v) noex {
+	return bufstr_decx(sbp,v) ;
+}
+/* end subroutine (bufstr_decui) */
+
+int bufstr_decul(bufstr *sbp,ulong v) noex {
+	return bufstr_decx(sbp,v) ;
+}
+/* end subroutine (bufstr_decul) */
+
+int bufstr_decull(bufstr *sbp,ulonglong v) noex {
+	return bufstr_decx(sbp,v) ;
+}
+/* end subroutine (bufstr_decull) */
+
+int bufstr_hexi(bufstr *sbp,int v) noex {
+	uint		uv = uint(v) ;
+	return bufstr_hexx(sbp,uv) ;
+}
+/* end subroutine (bufstr_hexi) */
+
+int bufstr_hexl(bufstr *sbp,long v) noex {
+	ulong		uv = ulong(v) ;
+	return bufstr_hexx(sbp,uv) ;
+}
+/* end subroutine (bufstr_hexl) */
+
+int bufstr_hexll(bufstr *sbp,longlong v) noex {
+	ulonglong	uv = ulonglong(v) ;
+	return bufstr_hexx(sbp,uv) ;
+}
+/* end subroutine (bufstr_hexll) */
+
+int bufstr_hexui(bufstr *sbp,uint uv) noex {
+	return bufstr_hexx(sbp,uv) ;
+}
+/* end subroutine (bufstr_hexui) */
+
+int bufstr_hexul(bufstr *sbp,ulong uv) noex {
+	return bufstr_hexx(sbp,uv) ;
+}
+/* end subroutine (bufstr_hexul) */
+
+int bufstr_hexull(bufstr *sbp,ulonglong uv) noex {
+	return bufstr_hexx(sbp,uv) ;
+}
+/* end subroutine (bufstr_hexull) */
+
 
 /* private subroutines */
 
 static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	cint		slen = BUFSTR_LEN ;
 	int		rs = SR_OK ;
-	int		dlen ;
-	int		rlen ;
-	char		*dp ;
+	char		*dp{} ;
 	if (op->dbuf) {
-	    rlen = (slen-op->len) ;
+	    cint	rlen = (slen-op->len) ;
 	    if (nlen > rlen) {
-	    	dlen = max((slen + nlen),(slen * 2)) ;
+	    	cint	dlen = max((slen + nlen),(slen * 2)) ;
 		if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
 		    op->dlen = dlen ;
 		    op->dbuf = dp ;
@@ -177,9 +275,9 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 		dp = (op->sbuf + op->len) ;
 	    }
 	} else {
-	    rlen = (op->dlen - op->len) ;
+	    cint	rlen = (op->dlen - op->len) ;
 	    if (nlen > rlen) {
-		dlen = (op->dlen + nlen+slen) ;
+		cint	dlen = (op->dlen + nlen+slen) ;
 		if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
 		    op->dbuf = dp ;
 		    op->dlen = dlen ;
@@ -194,5 +292,44 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	return rs ;
 }
 /* end subroutine (bufstr_extend) */
+
+int bufstr::strw(cchar *sp,int sl) noex {
+	return bufstr_strw(this,sp,sl) ;
+}
+
+int bufstr::chr(int ch) noex {
+	return bufstr_chr(this,ch) ;
+}
+
+int bufstr::get(cchar **rpp) noex {
+	return bufstr_get(this,rpp) ;
+}
+
+void bufstr::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("bufstr",rs,"fini-finish") ;
+	}
+}
+
+bufstr_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case bufstrmem_start:
+	        rs = bufstr_start(op) ;
+	        break ;
+	    case bufstrmem_strsize:
+	        rs = bufstr_get(op,nullptr) ;
+	        break ;
+	    case bufstrmem_finish:
+	        rs = bufstr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (bufstr_co::operator) */
+
 
 

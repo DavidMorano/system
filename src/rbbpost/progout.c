@@ -492,7 +492,7 @@ EMA_ENT		*ep ;
 #endif
 
 	    if ((rs >= 0) && (ep->ap != NULL) && (ep->al > 0)) {
-	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	        if (c++ > 0) rs = buffer_chr(bufp,CH_SP) ;
 	        if (rs >= 0)
 	            rs = buffer_stropaque(bufp,ep->ap,ep->al) ;
 	    }
@@ -504,13 +504,13 @@ EMA_ENT		*ep ;
 #endif
 
 	    if ((rs >= 0) && (ep->rp != NULL) && (ep->rl > 0)) {
-	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	        if (c++ > 0) rs = buffer_chr(bufp,CH_SP) ;
 	        if (rs >= 0)
-	            rs = buffer_char(bufp,CH_LANGLE) ;
+	            rs = buffer_chr(bufp,CH_LANGLE) ;
 	        if (rs >= 0)
 	            rs = buffer_stropaque(bufp,ep->rp,ep->rl) ;
 	        if (rs >= 0)
-	            rs = buffer_char(bufp,CH_RANGLE) ;
+	            rs = buffer_chr(bufp,CH_RANGLE) ;
 	    }
 
 #if	CF_DEBUG
@@ -520,13 +520,13 @@ EMA_ENT		*ep ;
 #endif
 
 	    if ((rs >= 0) && (ep->cp != NULL) && (ep->cl > 0)) {
-	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	        if (c++ > 0) rs = buffer_chr(bufp,CH_SP) ;
 	        if (rs >= 0)
-	            rs = buffer_char(bufp,CH_LPAREN) ;
+	            rs = buffer_chr(bufp,CH_LPAREN) ;
 	        if (rs >= 0)
 	            rs = buffer_strw(bufp,ep->cp,ep->cl) ;
 	        if (rs >= 0)
-	            rs = buffer_char(bufp,CH_RPAREN) ;
+	            rs = buffer_chr(bufp,CH_RPAREN) ;
 	    }
 
 	    if ((rs = buffer_get(bufp,&bp)) > 0) {

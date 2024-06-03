@@ -2785,7 +2785,7 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	        } /* end switch */
 	        if ((np != NULL) && (v > 0)) {
 	            if (c++ > 0) {
-	                buffer_char(&b,CH_COMMA) ;
+	                buffer_chr(&b,CH_COMMA) ;
 	            }
 	            rs = buffer_printf(&b,"%s=%d",np,v) ;
 	        }
@@ -2818,7 +2818,7 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	            } /* end switch */
 	            if (np != NULL) {
 	                if (c++ > 0) {
-	                    buffer_char(&b,CH_COMMA) ;
+	                    buffer_chr(&b,CH_COMMA) ;
 	                }
 	                rs = buffer_printf(&b,"%s=%s",np,vp) ;
 	            } /* end if (non-null) */
