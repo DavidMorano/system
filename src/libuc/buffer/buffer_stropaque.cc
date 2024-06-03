@@ -26,10 +26,10 @@
 	from it.
 
 	Synopsis:
-	int buffer_stropaque(buffer *bufp,cchar *sp,int sl) noex
+	int buffer_stropaque(buffer *op,cchar *sp,int sl) noex
 
 	Arguments:
-	bufp		pointer to BUFFER object
+	op		pointer to BUFFER object
 	sp		pointer to string
 	sl		length of string
 
@@ -76,14 +76,14 @@ extern "C" {
 
 /* exported subroutines */
 
-int buffer_stropaque(buffer *bufp,cchar *sp,int sl) noex {
+int buffer_stropaque(buffer *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		len = 0 ;
 	cchar		*cp{} ;
 	if (sl < 0) sl = strlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
-	    rs = buffer_strw(bufp,cp,cl) ;
+	    rs = buffer_strw(op,cp,cl) ;
 	    len += rs ;
 	    sl -= ((cp+cl)-sp) ;
 	    sp = (cp+cl) ;

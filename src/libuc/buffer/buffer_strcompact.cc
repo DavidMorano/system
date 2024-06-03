@@ -25,10 +25,10 @@
 	buffer object.
 
 	Synopsis:
-	int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex
+	int buffer_strcompact(buffer *op,cchar *sp,int sl) noex
 
 	Arguments:
-	bufp		pointer to BUFFER object
+	op		pointer to BUFFER object
 	sp		pointer to string
 	sl		length of string
 
@@ -76,7 +76,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex {
+int buffer_strcompact(buffer *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		len = 0 ;
@@ -85,11 +85,11 @@ int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex {
 	if (sl < 0) sl = strlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if (c++ > 0) {
-	        rs = buffer_chr(bufp,CH_SP) ;
+	        rs = buffer_chr(op,CH_SP) ;
 	        len += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = buffer_strw(bufp,cp,cl) ;
+	        rs = buffer_strw(op,cp,cl) ;
 	        len += rs ;
 	    }
 	    sl -= ((cp+cl)-sp) ;

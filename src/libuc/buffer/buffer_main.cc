@@ -129,14 +129,14 @@ int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (buffer_xxxx) */
 
 template<typename T>
-int buffer_decx(buffer *sbp,T v) noex {
-	return buffer_xxxx(sbp,ctdec,v) ;
+int buffer_decx(buffer *op,T v) noex {
+	return buffer_xxxx(op,ctdec,v) ;
 }
 /* end subroutine-template (buffer_decx) */
 
 template<typename T>
-int buffer_hexx(buffer *sbp,T v) noex {
-	return buffer_xxxx(sbp,cthex,v) ;
+int buffer_hexx(buffer *op,T v) noex {
+	return buffer_xxxx(op,cthex,v) ;
 }
 /* end subroutine-template (buffer_hexx) */
 
@@ -320,77 +320,77 @@ int buffer_getprev(buffer *op) noex {
 }
 /* end subroutine (buffer_getprev) */
 
-int buffer_deci(buffer *sbp,int v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_deci(buffer *op,int v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_deci) */
 
-int buffer_decl(buffer *sbp,long v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decl(buffer *op,long v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decl) */
 
-int buffer_decll(buffer *sbp,longlong v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decll(buffer *op,longlong v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decll) */
 
-int buffer_decui(buffer *sbp,uint v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decui(buffer *op,uint v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decui) */
 
-int buffer_decul(buffer *sbp,ulong v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decul(buffer *op,ulong v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decul) */
 
-int buffer_decull(buffer *sbp,ulonglong v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decull(buffer *op,ulonglong v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decull) */
 
-int buffer_hexc(buffer *sbp,int v) noex {
+int buffer_hexc(buffer *op,int v) noex {
 	uint		uv = uint(v) ;
-	return buffer_hexuc(sbp,uv) ;
+	return buffer_hexuc(op,uv) ;
 }
 /* end subroutine (buffer_hexc) */
 
-int buffer_hexi(buffer *sbp,int v) noex {
+int buffer_hexi(buffer *op,int v) noex {
 	uint		uv = uint(v) ;
-	return buffer_hexx(sbp,uv) ;
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexi) */
 
-int buffer_hexl(buffer *sbp,long v) noex {
+int buffer_hexl(buffer *op,long v) noex {
 	ulong		uv = ulong(v) ;
-	return buffer_hexx(sbp,uv) ;
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexl) */
 
-int buffer_hexll(buffer *sbp,longlong v) noex {
+int buffer_hexll(buffer *op,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
-	return buffer_hexx(sbp,uv) ;
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexll) */
 
-int buffer_hexuc(buffer *sbp,int uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexuc(buffer *op,int uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexc) */
 
-int buffer_hexui(buffer *sbp,uint uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexui(buffer *op,uint uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexui) */
 
-int buffer_hexul(buffer *sbp,ulong uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexul(buffer *op,ulong uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexul) */
 
-int buffer_hexull(buffer *sbp,ulonglong uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexull(buffer *op,ulonglong uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexull) */
 

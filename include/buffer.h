@@ -23,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<ascii.h>
 #include	<stdintx.h>
 
 
@@ -118,6 +119,12 @@ extern int	buffer_finish(buffer *) noex ;
 extern int	buffer_strcompact(buffer *,cchar *,int) noex ;
 extern int	buffer_stropaque(buffer *,cchar *,int) noex ;
 extern int	buffer_strquote(buffer *,cchar *,int) noex ;
+extern int	buffer_chrs(buffer *,int,int) noex ;
+extern int	buffer_blanks(buffer *,int) noex ;
+
+static inline int buffer_backs(buffer *op,int n) noex {
+	return buffer_chrs(op,CH_BS,n) ;
+}
 
 EXTERNC_end
 

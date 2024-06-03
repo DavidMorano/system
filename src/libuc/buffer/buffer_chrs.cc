@@ -41,6 +41,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ascii.h>
@@ -64,12 +65,6 @@ using std::max ;			/* subroutine-template */
 
 /* external subroutines */
 
-extern "C" {
-    int	buffer_chrs(buffer *,int,int) noex ;
-    int	buffer_blanks(buffer *,int) noex ;
-    int	buffer_backs(buffer *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -90,34 +85,29 @@ constexpr cchar		blanks[] = "        " ;
 
 /* exported subroutines */
 
-int buffer_chrs(buffer *bp,int ch,int n) noex {
+int buffer_chrs(buffer *op,int ch,int n) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	while ((rs >= 0) && (n-- > 0)) {
-	    rs = buffer_chr(bp,ch) ;
+	    rs = buffer_chr(op,ch) ;
 	    len += rs ;
 	} /* end while */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_chrs) */
 
-int buffer_blanks(buffer *bp,int n) noex {
+int buffer_blanks(buffer *op,int n) noex {
 	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	while ((rs >= 0) && (n > 0)) {
 	    cint	m = min(n,nblanks) ;
-	    rs = buffer_strw(bp,blanks,m) ;
+	    rs = buffer_strw(op,blanks,m) ;
 	    n -= m ;
 	    len += rs ;
 	} /* end while */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_blanks) */
-
-int buffer_backs(buffer *bp,int n) noex {
-	return buffer_chrs(bp,CH_BS,n) ;
-}
-/* end subroutine (buffer_backs) */
 
 
