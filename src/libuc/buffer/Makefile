@@ -115,16 +115,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_buffer.o:	$(OBJ0_BUFFER)
+
+obj0_buffer.o:		$(OBJ0_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_BUFFER)
 
-obj1_buffer.o:	$(OBJ1_BUFFER)
+obj1_buffer.o:		$(OBJ1_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_BUFFER)
 
-obj2_buffer.o:	$(OBJ2_BUFFER)
+obj2_buffer.o:		$(OBJ2_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_BUFFER)
 
-obj3_buffer.o:	$(OBJ3_BUFFER)
+obj3_buffer.o:		$(OBJ3_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_BUFFER)
 
 

@@ -48,13 +48,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
-#include	<algorithm>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<stdintx.h>
 #include	<format.h>
 #include	<strwcpy.h>
@@ -63,7 +63,6 @@
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<mkchar.h>
-#include	<libmallocxx.h>
 #include	<localmisc.h>
 
 #include	"buffer.h"
@@ -84,8 +83,9 @@
 
 /* imported namespaces */
 
-using std::min ;
-using std::max ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -110,9 +110,6 @@ static inline int buffer_ctor(buffer *op,Args ... args) noex {
 }
 
 static int	buffer_ext(buffer *,int) noex ;
-
-
-/* local subroutine-templates */
 
 template<typename T>
 int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
@@ -148,6 +145,9 @@ int buffer_hexx(buffer *sbp,T v) noex {
 
 constexpr bool		f_bufstart = CF_BUFSTART ;
 constexpr bool		f_fastgrow = CF_FASTGROW ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -213,6 +213,23 @@ int buffer_adv(buffer *op,int advlen) noex {
 }
 /* end subroutine (buffer_adv) */
 
+int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && sbuf) {
+	    if ((rs = op->len) >= 0) {
+	        if (slen < 0) slen = strlen(sbuf) ;
+	        if ((rs = buffer_ext(op,slen)) >= 0) {
+	            char	*bp = (op->dbuf + op->len) ;
+	            len = strwcpy(bp,sbuf,slen) - bp ;
+	            op->len += len ;
+	        }
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (buffer_strw) */
+
 int buffer_chr(buffer *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
@@ -242,23 +259,6 @@ int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
 	return (rs >= 0) ? slen : rs ;
 }
 /* end subroutine (buffer_buf) */
-
-int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (op && sbuf) {
-	    if ((rs = op->len) >= 0) {
-	        if (slen < 0) slen = strlen(sbuf) ;
-	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->dbuf + op->len) ;
-	            len = strwcpy(bp,sbuf,slen) - bp ;
-	            op->len += len ;
-	        }
-	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_strw) */
 
 int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -401,13 +401,13 @@ static int buffer_ext(buffer *op,int req) noex {
 	int		rs = SR_OK ;
 	int		need ;
 	if (req < 0) req = op->startlen ;
-	need = ((op->len + (req+1)) - op->dlen) ;
+	need = ((op->len + (req + 1)) - op->dlen) ;
 	if (need > 0) {
 	    int		nlen ;
 	    char	*nbuf{} ;
 	    if (op->dbuf) {
 	        nlen = max(op->startlen,need) ;
-	        if ((rs = uc_libmalloc((nlen+1),&nbuf)) >= 0) {
+	        if ((rs = uc_libmalloc((nlen + 1),&nbuf)) >= 0) {
 	            op->dbuf = nbuf ;
 		    op->dlen = nlen ;
 	        } else {
@@ -415,7 +415,7 @@ static int buffer_ext(buffer *op,int req) noex {
 	        }
 	    } else {
 		nlen = op->dlen ;
-	        while ((op->len + (req+1)) > nlen) {
+	        while ((op->len + (req + 1)) > nlen) {
 		    if constexpr (f_fastgrow) {
 	                nlen = ((nlen + 1) * 2) ;
 		    } else {
@@ -451,7 +451,7 @@ int buffer::get(cchar **rpp) noex {
 }
 
 void buffer::dtor() noex {
-	cint	rs = int(finish) ;
+	cint		rs = finish ;
 	if (rs < 0) {
 	    ulogerror("buffer",rs,"fini-finish") ;
 	}

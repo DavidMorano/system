@@ -92,8 +92,8 @@ EXTERNC_begin
 extern int	buffer_start(buffer *,int) noex ;
 extern int	buffer_reset(buffer *) noex ;
 extern int	buffer_adv(buffer *,int) noex ;
-extern int	buffer_chr(buffer *,int) noex ;
 extern int	buffer_strw(buffer *,cchar *,int) noex ;
+extern int	buffer_chr(buffer *,int) noex ;
 extern int	buffer_buf(buffer *,cchar *,int) noex ;
 extern int	buffer_deci(buffer *,int) noex ;
 extern int	buffer_decl(buffer *,long) noex ;

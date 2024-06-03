@@ -21,7 +21,8 @@
 	buffer_strcompact
 
 	Description:
-        Store a source string (which is not compacted) into the "buffer"
+        Store a source string (which is not compacted) into the 
+	buffer object.
 
 	Synopsis:
 	int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex
@@ -38,6 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>

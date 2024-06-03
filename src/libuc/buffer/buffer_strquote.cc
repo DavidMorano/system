@@ -38,6 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
@@ -81,15 +82,14 @@ int buffer_strquote(buffer *bufp,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
-	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != NULL) {
+	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != nullptr) {
 	    cint	sz = ((2*sl)+3) ;
-	    cchar	*tp ;
-	    char	*ap ;
-	    if ((rs = uc_malloc(sz,&ap)) >= 0) {
+	    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
+	        cchar	*tp ;
 		char	*bp = ap ;
 		{
 		    *bp++ = qch ;
-		    while ((tp = strnpbrk(sp,sl,"\"\\")) != NULL) {
+		    while ((tp = strnpbrk(sp,sl,"\"\\")) != nullptr) {
 		        bp = strwcpy(bp,sp,(tp-sp)) ;
 		        *bp++ = CH_BSLASH ;
 		        *bp++ = *tp ;
