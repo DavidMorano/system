@@ -30,7 +30,7 @@
 	be avoided.
 
 	Synopsis:
-	int u_getdents(int fd,struct dirent *dbuf,int dsz) noex
+	int u_getdents(int fd,dirent_t *dbuf,int dsz) noex
 
 	Returns:
 	>=0		size of data returned
@@ -39,58 +39,89 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<dirent.h>
 #include	<cerrno>
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 
-#include	"usyscalls.h"
+#include	"ufiledesc.h"
 
 
 /* local defines */
 
 
+/* imported namespaces */
+
+using namespace	ufiledesc ;		/* namespace */
+using namespace usys ;			/* namespace */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct udirop ;
+    typedef int (udirop::*udirop_m)(int) noex ;
+    struct udirop : ufiledescbase {
+	udirop_m	m ;
+	dirent_t	*dbuf ;
+	int		dlen ;
+	udirop(udirop_m mem,dirent_t *b,int l) noex : m(mem) { 
+	    dbuf = b ;
+	    dlen = l ;
+	} ;
+	int callstd(int fd) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fd) ;
+	    }
+	    return rs ;
+	} ;
+	int igetdents(int) noex ;
+    } ; /* end struct (udirop) */
+}
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-#if	defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) 
-
-int u_getdents(int fd,DIRENT *dbuf,int dlen) noex {
+int u_getdents(int fd,dirent_t *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
 	    if (dlen >= 0) {
-		rs = SR_BADF ;
-		if (fd >= 0) {
-	            repeat {
-	                rs = ugetdents(fd,dbuf,dlen) ;
-	            } until (rs != SR_INTR) ;
-	        } /* end if (good FD) */
+		udirop		diro(&udirop::igetdents,dbuf,dlen) ;
+		rs = diro(fd) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_getdents) */
 
-#else /* defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) */
 
-int u_getdents(int fd,DIRENT *dbuf,int dlen) noex {
-	int		rs = SR_FAULT ;
-	if (dbuf) {
-	    rs = SR_INVALID ;
-	    if (dlen >= 0) {
-	        rs = SR_BADF ;
-	        if (fd >= 0) {
-	            rs = SR_NOSYS ;
-	        } /* end if (not BADFD) */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
+/* local subroutines */
+
+int udirop::igetdents(int fd) noex {
+	return ugetdents(fd,dbuf,dlen) ;
 }
 
-#endif /* defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) */
 

@@ -56,10 +56,15 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJA_UFILEDESC= ufiledescbase.o usocket.o uconnect.o 
-OBJB_UFILEDESC= uregular.o ufcntl.o uacceptpass.o
+OBJ0= ufiledescbase.o usocket.o 
+OBJ1= uconnect.o uregular.o 
+OBJ2= ufcntl.o uacceptpass.o
+OBJ3= ugetdents.o
 
-OBJ_UFILEDESC= obja_ufiledesc.o objb_ufiledesc.o
+OBJA_UFILEDESC= obj0.o obj1.o
+OBJB_UFILEDESC= obj2.o obj3.o
+
+OBJ_UFILEDESC= obja.o objb.o
 
 
 default:		$(T).o
@@ -105,10 +110,24 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obja_ufiledesc.o:	$(OBJA_UFILEDESC)
+
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+
+
+obja.o:			$(OBJA_UFILEDESC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEDESC)
 
-objb_ufiledesc.o:	$(OBJB_UFILEDESC)
+objb.o:			$(OBJB_UFILEDESC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEDESC)
 
 
@@ -119,5 +138,6 @@ uconnect.o:		uconnect.cc		$(INCS)
 uregular.o:		uregular.cc		$(INCS)
 uacceptpass.o:		uacceptpass.cc		$(INCS)
 ufcntl.o:		ufcntl.cc		$(INCS)
+ugetdents.o:		ugetdents.cc		$(INCS)
 
 

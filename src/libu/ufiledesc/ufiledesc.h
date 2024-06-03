@@ -101,6 +101,7 @@ extern int u_readv(int,IOVEC *,int) noex ;
 extern int u_seeko(int,off_t,int,off_t *) noex ;
 extern int u_write(int,cvoid *,int) noex ;
 extern int u_writev(int,CIOVEC *,int) noex ;
+extern int u_getdents(int,dirent_t *,int) noex ;
 
 static inline int u_seek(int fd,off_t wo,int w) noex {
 	return u_seeko(fd,wo,w,nullptr) ;

@@ -81,7 +81,7 @@ OBJ11= uopen.o ustr.o
 
 OBJ12= usysdata.o usysauxinfo.o
 OBJ13= ufiledesc.o um.o
-OBJ14= ufileop.o ugetdents.o
+OBJ14= ufileop.o
 OBJ15= ugetloadavg.o
 
 
@@ -274,6 +274,5 @@ uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
-ugetdents.o:		ugetdents.cc			$(INCS)
 
 
