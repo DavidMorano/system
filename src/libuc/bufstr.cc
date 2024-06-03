@@ -28,6 +28,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -161,22 +162,6 @@ int bufstr_chr(bufstr *op,int ch) noex {
 	return rs ;
 }
 /* end subroutine (bufstr_chr) */
-
-int bufstr_buf(bufstr *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (op) {
-	    char	*bp ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = bufstr_extend(op,sl,&bp)) >= 0) {
-	        memcpy(bp,sp,sl) ;
-	        op->len += sl ;
-	        len = op->len ;
-	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bufstr_buf) */
 
 int bufstr_get(bufstr *op,cchar **spp) noex {
 	int		rs = SR_FAULT ;

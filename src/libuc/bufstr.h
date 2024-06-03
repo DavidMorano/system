@@ -93,8 +93,8 @@ typedef BUFFER		bufstr ;
 EXTERNC_begin
 
 extern int	bufstr_start(bufstr *) noex ;
-extern int	bufstr_chr(bufstr *,int) noex ;
 extern int	bufstr_strw(bufstr *,cchar *,int) noex ;
+extern int	bufstr_chr(bufstr *,int) noex ;
 extern int	bufstr_deci(bufstr *,int) noex ;
 extern int	bufstr_decl(bufstr *,long) noex ;
 extern int	bufstr_decll(bufstr *,longlong) noex ;
@@ -107,7 +107,6 @@ extern int	bufstr_hexll(bufstr *,longlong) noex ;
 extern int	bufstr_hexui(bufstr *,uint) noex ;
 extern int	bufstr_hexul(bufstr *,ulong) noex ;
 extern int	bufstr_hexull(bufstr *,ulonglong) noex ;
-extern int	bufstr_buf(bufstr *,cchar *,int) noex ;
 extern int	bufstr_get(bufstr *,cchar **) noex ;
 extern int	bufstr_finish(bufstr *) noex ;
 
