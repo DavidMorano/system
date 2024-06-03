@@ -19,13 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<hdbstr.h>
 #include	<buffer.h>
-#include	<localmisc.h>
 
 
 #define	EXPCOOK		struct expcook_head

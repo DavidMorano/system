@@ -1,4 +1,4 @@
-/* usys HEADER */
+/* usys_typedefs HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -26,39 +26,23 @@
 
 *******************************************************************************/
 
-#ifndef	USYS_INCLUDE
-#define	USYS_INCLUDE
+#ifndef	USYSTYPEDEFS_INCLUDE
+#define	USYSTYPEDEFS_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-#include	<usys_typedefs.h>	/* should be ordered first */
 
-#include	<usys_xxx.h>
-#include	<usys_sunos.h>
-#include	<usys_darwin.h>
-#include	<usys_linux.h>
+#if	(!defined(SYSHAS_TYPEDIRENT)) || (SYSHAS_TYPEDIRENT == 0)
 
-/* utilities */
-#include	<usys_ugetnisdom.h>
-#include	<usys_ufcntl.h>
-#include	<usys_ugetdents.h>
+#ifndef	TYPEDEF_DIRENT
+#define	TYPEDEF_DIRENT
+typedef struct dirent		dirent_t ;
+#endif
 
-/* missing operating system calls */
-#include	<usys_mqueue.h>
-#include	<usys_gethrtime.h>
-#include	<usys_getrandom.h>
-#include	<usys_ttynamerp.h>
-#include	<usys_stime.h>
-#include	<usys_resolvepath.h>
-#include	<usys_waitid.h>
-#include	<usys_sigx.h>
-#include	<usys_streams.h>
-#include	<usys_pipes.h>
-#include	<usys_stat.h>
-#include	<usys_libstr.h>
+#endif /* SYSHAS_TYPEDIRENT */
 
 
-#endif /* USYS_INCLUDE */
+#endif /* USYSTYPEDEFS_INCLUDE */
 
 

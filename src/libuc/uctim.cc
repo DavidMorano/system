@@ -1,4 +1,4 @@
-/* uctimeout SUPPORT */
+/* uctim SUPPORT */
 /* lang=C++11 */
 
 /* UNIX® time-out management */
@@ -12,7 +12,7 @@
 	Originally written for Rightcore Network Services.
 
 	= 2018-10-12, David A.D. Morano
-	Added some small error resiliency to |uctimeout_enterpri()|.
+	Added some small error resiliency to |uctim_enterpri()|.
 
 */
 
@@ -21,22 +21,26 @@
 /*******************************************************************************
 
 	Name:
-	uc_timeout
+	uc_timcreate
+	uc_timdestroy
+	uc_timset
+	uc_timget
 
 	Description:
-	This subroutine manages time-outs (registered call-backs).
-	This subroutine acts like a process-wide system call, and
-	can be used by all threads within the process for creating
-	time-out call-backs.  Of course this is thread-safe.
+	This module creates virtual time-of-day timers for callers.
 
 	Synopsis:
-	int uc_timeout(int cmd,TIMEOUT *val) noex
+	int uc_timcreate(callback *cb) noex
+	int uc_timdestroy(int id) noex
+	int uc_timset(int id,int,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex
+	int uc_timget(int id,ITIMERVAL *otvp) noex
+	int uc_timover(int id) noex
 
 	Arguments:
-	cmd		command:
-			    timeoutcmd_set,
-			    timeoutcmd_cancel
-	val		pointer to 'timeout' value
+	cb		callback object
+	id		timer identification
+	ntvp		new timer-value-pointer
+	otvp		old timer-value-pointer
 
 	Returns:
 	>=0		OK
@@ -76,16 +80,15 @@
 #define	CF_CHILDTHRS	0
 #endif
 
-#define	UCTIMEOUT	struct uctimeout
-#define	UCTIMEOUT_FL	struct uctimeout_flags
+#define	UCTIMEOUT	struct uctim
+#define	UCTIMEOUT_FL	struct uctim_flags
 #define	UCTIMEOUT_SCOPE	PTHREAD_SCOPE_SYSTEM
 
 #define	TO_CAPTURE	60		/* capture wait for threads */
 #define	TO_SIGWAIT	2		/* signal-process wait */
 #define	TO_DISPRECV	5		/* dispatch-process wait */
 
-
-#define	NDF		"uctimeout.deb"
+#define	NDF		"uctim.deb"
 
 
 /* imported namespaces */
@@ -110,7 +113,7 @@ extern "C" cchar	*strsigabbr(int) ;
 /* local structures */
 
 namespace {
-    struct uctimeout_flags {
+    struct uctim_flags {
 	uint		timer:1 ;	/* UNIX®-RT timer created */
 	uint		workready:1 ;
 	uint		thrs:1 ;
@@ -118,7 +121,7 @@ namespace {
 	uint		running_siger:1 ;
 	uint		running_disper:1 ;
     } ;
-    struct uctimeout {
+    struct uctim {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
 	vechand		ents ;
@@ -176,13 +179,13 @@ namespace {
 	int disprecv() noex ;
 	int disphandle() noex ;
 	int dispjobdel(TIMEOUT *) noex ;
-	~uctimeout() noex {
+	~uctim() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("uctimeout",rs,"dtor-fini") ;
+		ulogerror("uctim",rs,"dtor-fini") ;
 	    }
-	} ; /* end dtor (uctimeout) */
-    } ; /* end struct (uctimeout) */
+	} ; /* end dtor (uctim) */
+    } ; /* end struct (uctim) */
 }
 
 enum dispcmds {
@@ -196,16 +199,16 @@ enum dispcmds {
 /* forward references */
 
 extern "C" {
-    static int uctimeout_sigerworker(uctimeout *) noex ;
-    static int uctimeout_dispworker(uctimeout *) noex ;
-    static void	uctimeout_atforkbefore() noex ;
-    static void	uctimeout_atforkparent() noex ;
-    static void	uctimeout_atforkchild() noex ;
-    static void	uctimeout_exit() noex ;
+    static int uctim_sigerworker(uctim *) noex ;
+    static int uctim_dispworker(uctim *) noex ;
+    static void	uctim_atforkbefore() noex ;
+    static void	uctim_atforkparent() noex ;
+    static void	uctim_atforkchild() noex ;
+    static void	uctim_exit() noex ;
     static int	ourcmp(cvoid *,cvoid *) noex ;
 }
 
-consteval int uctimeout_voents() noex {
+consteval int uctim_voents() noex {
 	int	vo = 0 ;
 	vo |= VECHAND_OSTATIONARY ;
 	vo |= VECHAND_OREUSE ;
@@ -218,9 +221,9 @@ consteval int uctimeout_voents() noex {
 
 /* local variables */
 
-static uctimeout	uctimeout_data ;
+static uctim		uctim_data ;
 
-constexpr int		voents = uctimeout_voents() ;
+constexpr int		voents = uctim_voents() ;
 
 constexpr bool		f_childthrs = CF_CHILDTHRS ;
 
@@ -231,13 +234,13 @@ constexpr bool		f_childthrs = CF_CHILDTHRS ;
 /* exported subroutines */
 
 int uc_timeout(int cmd,TIMEOUT *valp) noex {
-	return uctimeout_data.cmdtimeout(cmd,valp) ;
+	return uctim_data.cmdtimeout(cmd,valp) ;
 }
 
 
 /* local subroutines */
 
-int uctimeout::cmdtimeout(int cmd,TIMEOUT *valp) noex {
+int uctim::cmdtimeout(int cmd,TIMEOUT *valp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		id = 0 ;
@@ -260,18 +263,18 @@ int uctimeout::cmdtimeout(int cmd,TIMEOUT *valp) noex {
 	                        rs = SR_INVALID ;
 	                        break ;
 	                    } /* end switch */
-	                } /* end if (uctimeout_workready) */
+	                } /* end if (uctim_workready) */
 	                rs1 = capend() ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (uctimeout-cap) */
-	        } /* end if (uctimeout_init) */
+	            } /* end if (uctim-cap) */
+	        } /* end if (uctim_init) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? id : rs ;
 }
-/* end subroutine (uctimeout::cmdtimeout) */
+/* end subroutine (uctim::cmdtimeout) */
 
-int uctimeout::init() noex {
+int uctim::init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! fvoid) {
@@ -280,11 +283,11 @@ int uctimeout::init() noex {
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
 	            if ((rs = cv.create) >= 0) {
-	                void_f	b = uctimeout_atforkbefore ;
-	                void_f	ap = uctimeout_atforkparent ;
-	                void_f	ac = uctimeout_atforkchild ;
+	                void_f	b = uctim_atforkbefore ;
+	                void_f	ap = uctim_atforkparent ;
+	                void_f	ac = uctim_atforkchild ;
 	                if ((rs = uc_atfork(b,ap,ac)) >= 0) {
-	                    if ((rs = uc_atexit(uctimeout_exit)) >= 0) {
+	                    if ((rs = uc_atexit(uctim_exit)) >= 0) {
 	                        finitdone = true ;
 	                        pid = getpid() ;
 	                        f = true ;
@@ -320,9 +323,9 @@ int uctimeout::init() noex {
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (uctimeout::init) */
+/* end subroutine (uctim::init) */
 
-int uctimeout::fini() noex {
+int uctim::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
@@ -332,9 +335,9 @@ int uctimeout::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = uctimeout_atforkbefore ;
-	        void_f	ap = uctimeout_atforkparent ;
-	        void_f	ac = uctimeout_atforkchild ;
+	        void_f	b = uctim_atforkbefore ;
+	        void_f	ap = uctim_atforkparent ;
+	        void_f	ac = uctim_atforkchild ;
 	        rs1 = uc_atforkexpunge(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -351,9 +354,9 @@ int uctimeout::fini() noex {
 	} /* end if (was initialized) */
 	return rs ;
 }
-/* end subroutine (uctimeout::fini) */
+/* end subroutine (uctim::fini) */
 
-int uctimeout::cmdset(TIMEOUT *valp) noex {
+int uctim::cmdset(TIMEOUT *valp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
@@ -383,9 +386,9 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uctimeout::cmdset) */
+/* end subroutine (uctim::cmdset) */
 
-int uctimeout::cmdcancel(TIMEOUT *valp) noex {
+int uctim::cmdcancel(TIMEOUT *valp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
@@ -418,9 +421,9 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	} /* end if (ptm) */
 	return rs ;
 }
-/* end subroutine (uctimeout_cmdcancel) */
+/* end subroutine (uctim_cmdcancel) */
 
-int uctimeout::enterpri(TIMEOUT *ep) noex {
+int uctim::enterpri(TIMEOUT *ep) noex {
 	int		rs ;
 	int		pi = 0 ;
 	if ((rs = vecsorthand_count(pqp)) > 0) {
@@ -430,9 +433,8 @@ int uctimeout::enterpri(TIMEOUT *ep) noex {
 	            if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
 	                pi = rs ;
 	                rs = timerset(ep->val) ;
-	                if (rs < 0) {
+	                if (rs < 0)
 	                    vecsorthand_del(pqp,pi) ;
-			}
 	            }
 	        } else {
 	            rs = vecsorthand_add(pqp,ep) ;
@@ -447,12 +449,12 @@ int uctimeout::enterpri(TIMEOUT *ep) noex {
 	            vecsorthand_del(pqp,pi) ;
 		}
 	    } /* end if (vecsorthand_add) */
-	} /* end if */
+	}
 	return (rs >= 0) ? pi : rs ;
 }
-/* end subroutine (uctimeout::enterpri) */
+/* end subroutine (uctim::enterpri) */
 
-int uctimeout::timerset(time_t val) noex {
+int uctim::timerset(time_t val) noex {
 	TIMESPEC	ts ;
 	int		rs ;
 	if ((rs = timespec_load(&ts,val,0)) >= 0) {
@@ -464,9 +466,9 @@ int uctimeout::timerset(time_t val) noex {
 	}
 	return rs ;
 }
-/* end subroutine (uctimeout::timerset) */
+/* end subroutine (uctim::timerset) */
 
-int uctimeout::capbegin(int to) noex {
+int uctim::capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin(to)) >= 0) {
@@ -483,9 +485,9 @@ int uctimeout::capbegin(int to) noex {
 	} /* end if (ptm) */
 	return rs ;
 }
-/* end subroutine (uctimeout::capbegin) */
+/* end subroutine (uctim::capbegin) */
 
-int uctimeout::capend() noex {
+int uctim::capend() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
@@ -498,9 +500,9 @@ int uctimeout::capend() noex {
 	} /* end if (ptm) */
 	return rs ;
 }
-/* end subroutine (uctimeout::capend) */
+/* end subroutine (uctim::capend) */
 
-int uctimeout::workready() noex {
+int uctim::workready() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
 	    rs = workbegin() ;
@@ -510,12 +512,12 @@ int uctimeout::workready() noex {
 	}
 	return rs ;
 }
-/* end subroutine (uctimeout::workready) */
+/* end subroutine (uctim::workready) */
 
-int uctimeout::workbegin() noex {
+int uctim::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
-	    static cint		vo = voents ;
+	    static int	vo = voents ;
 	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
@@ -531,15 +533,15 @@ int uctimeout::workbegin() noex {
 	                    if (rs < 0) {
 	                        timerend() ;
 	                    }
-	                } /* end if (uctimeout::timerbegin) */
+	                } /* end if (uctim::timerbegin) */
 	                if (rs < 0) {
 	                    sigend() ;
 			}
-	            } /* end if (uctimeout::sigbegin) */
+	            } /* end if (uctim::sigbegin) */
 	            if (rs < 0) {
 	                priqend() ;
 	            }
-	        } /* end if (uctimeout::pribegin) */
+	        } /* end if (uctim::pribegin) */
 	        if (rs < 0) {
 	            vechand_finish(&ents) ;
 	        }
@@ -547,9 +549,9 @@ int uctimeout::workbegin() noex {
 	} /* end if (needed) */
 	return rs ;
 }
-/* end subroutine (uctimeout::workbegin) */
+/* end subroutine (uctim::workbegin) */
 
-int uctimeout::workend() noex {
+int uctim::workend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (fl.workready) {
@@ -585,9 +587,9 @@ int uctimeout::workend() noex {
 	} /* end if (work-ready) */
 	return rs ;
 }
-/* end subroutine (uctimeout::workend) */
+/* end subroutine (uctim::workend) */
 
-int uctimeout::workfins() noex {
+int uctim::workfins() noex {
 	vechand		*elp = &ents ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -600,9 +602,9 @@ int uctimeout::workfins() noex {
 	} /* end for */
 	return rs ;
 }
-/* end subroutine (uctimeout_workfins) */
+/* end subroutine (uctim_workfins) */
 
-int uctimeout::workdump() noex {
+int uctim::workdump() noex {
         int             rs = SR_OK ;
         int             rs1 ;
         if (fl.workready) {
@@ -621,9 +623,9 @@ int uctimeout::workdump() noex {
         } /* end if (work-ready) */
         return rs ;
 }
-/* end subroutine (uctimeout::workdump) */
+/* end subroutine (uctim::workdump) */
 
-int uctimeout::priqbegin() noex {
+int uctim::priqbegin() noex {
 	cint		osize = sizeof(vecsorthand) ;
 	int		rs ;
 	void		*p ;
@@ -637,9 +639,9 @@ int uctimeout::priqbegin() noex {
 	} /* end if (m-a) */
 	return rs ;
 }
-/* end subroutine (uctimeout::priqbegin) */
+/* end subroutine (uctim::priqbegin) */
 
-int uctimeout::priqend() noex {
+int uctim::priqend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pqp) {
@@ -653,9 +655,9 @@ int uctimeout::priqend() noex {
 	}
 	return rs ;
 }
-/* end subroutine (uctimeout::priqend) */
+/* end subroutine (uctim::priqend) */
 
-int uctimeout::pridump() noex {
+int uctim::pridump() noex {
         int             rs = SR_OK ;
         int             rs1 ;
         void            *tep ;
@@ -668,11 +670,10 @@ int uctimeout::pridump() noex {
         if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
         return rs ;
 }
-/* end subroutine (uctimeout::pridump) */
+/* end subroutine (uctim::pridump) */
 
-int uctimeout::sigbegin() noex {
-	sigset_t	ss ;
-	sigset_t	oss ;
+int uctim::sigbegin() noex {
+	sigset_t	ss, oss ;
 	cint		scmd = SIG_BLOCK ;
 	cint		sig = SIGTIMEOUT ;
 	int		rs ;
@@ -685,9 +686,9 @@ int uctimeout::sigbegin() noex {
 	}
 	return rs ;
 }
-/* end subroutine (uctimeout::sigbegin) */
+/* end subroutine (uctim::sigbegin) */
 
-int uctimeout::sigend() noex {
+int uctim::sigend() noex {
 	int		rs = SR_OK ;
 	if (! fl.wasblocked) {
 	    sigset_t	ss ;
@@ -699,9 +700,9 @@ int uctimeout::sigend() noex {
 	}
 	return rs ;
 }
-/* end subroutine (uctimeout::sigend) */
+/* end subroutine (uctim::sigend) */
 
-int uctimeout::timerbegin() noex {
+int uctim::timerbegin() noex {
 	SIGEVENT	se ;
 	cint		st = SIGEV_SIGNAL ;
 	cint		sig = SIGTIMEOUT ;
@@ -717,9 +718,9 @@ int uctimeout::timerbegin() noex {
 	}
 	return rs ;
 }
-/* end subroutine (uctimeout::timerbegin) */
+/* end subroutine (uctim::timerbegin) */
 
-int uctimeout::timerend() noex {
+int uctim::timerend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -730,9 +731,9 @@ int uctimeout::timerend() noex {
 	fl.timer = false ;
 	return rs ;
 }
-/* end subroutine (uctimeout::timerend) */
+/* end subroutine (uctim::timerend) */
 
-int uctimeout::thrsbegin() noex {
+int uctim::thrsbegin() noex {
 	int		rs = SR_OK ;
 	if ((! fl.thrs) && (! freqexit)) {
 	    if ((rs = sigerbegin()) >= 0) {
@@ -746,9 +747,9 @@ int uctimeout::thrsbegin() noex {
 	} /* end if (needed) */
 	return rs ;
 }
-/* end subroutine (uctimeout::thrsbegin) */
+/* end subroutine (uctim::thrsbegin) */
 
-int uctimeout::thrsend() noex {
+int uctim::thrsend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (fl.thrs) {
@@ -765,9 +766,9 @@ int uctimeout::thrsend() noex {
 	} /* end if */
 	return rs ;
 }
-/* end subroutine (uctimeout::thrsend) */
+/* end subroutine (uctim::thrsend) */
 
-int uctimeout::sigerbegin() noex {
+int uctim::sigerbegin() noex {
 	pta		ta ;
 	int		rs ;
 	int		rs1 ;
@@ -776,7 +777,7 @@ int uctimeout::sigerbegin() noex {
 	    cint	scope = UCTIMEOUT_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
-	        tworker		wt = (tworker) uctimeout_sigerworker ;
+	        tworker		wt = (tworker) uctim_sigerworker ;
 	        if ((rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
 	            fl.running_siger = true ;
 	            tid_siger = tid ;
@@ -788,9 +789,9 @@ int uctimeout::sigerbegin() noex {
 	} /* end if (pta) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (uctimeout_sigerbegin) */
+/* end subroutine (uctim_sigerbegin) */
 
-int uctimeout::sigerend() noex {
+int uctim::sigerend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_siger) {
 	    pthread_t	tid = tid_siger ;
@@ -807,10 +808,10 @@ int uctimeout::sigerend() noex {
 	} /* end if (running) */
 	return rs ;
 }
-/* end subroutine (uctimeout_sigerend) */
+/* end subroutine (uctim_sigerend) */
 
 /* this is an independent thread of execution */
-int uctimeout::sigerworker() noex {
+int uctim::sigerworker() noex {
 	int		rs ;
 	while ((rs = sigerwait()) > 0) {
 	    if (freqexit) break ;
@@ -824,9 +825,9 @@ int uctimeout::sigerworker() noex {
 	fexitsiger = true ;
 	return rs ;
 }
-/* end subroutine (uctimeout::sigerworker) */
+/* end subroutine (uctim::sigerworker) */
 
-int uctimeout::sigerwait() noex {
+int uctim::sigerwait() noex {
 	TIMESPEC	ts ;
 	sigset_t	ss ;
 	siginfo_t	si ;
@@ -867,9 +868,9 @@ int uctimeout::sigerwait() noex {
 	} /* end if (ok) */
 	return (rs >= 0) ? cmd : rs ;
 }
-/* end subroutine (uctimeout::sigerwait) */
+/* end subroutine (uctim::sigerwait) */
 
-int uctimeout::sigerserve() noex {
+int uctim::sigerserve() noex {
 	cint		to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
@@ -894,9 +895,9 @@ int uctimeout::sigerserve() noex {
 	} /* end if (capture) */
 	return rs ;
 }
-/* end subroutine (uctimeout::sigerserve) */
+/* end subroutine (uctim::sigerserve) */
 
-int uctimeout::sigerdump() noex {
+int uctim::sigerdump() noex {
         ciq             *cqp = &pass ;
         int             rs = SR_OK ;
         int             rs1 ;
@@ -905,9 +906,9 @@ int uctimeout::sigerdump() noex {
         if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
         return rs ;
 }
-/* end subroutine (uctimeout::sigerdump) */
+/* end subroutine (uctim::sigerdump) */
 
-int uctimeout::dispbegin() noex {
+int uctim::dispbegin() noex {
 	pta		ta ;
 	int		rs ;
 	int		rs1 ;
@@ -916,7 +917,7 @@ int uctimeout::dispbegin() noex {
 	    cint	scope = UCTIMEOUT_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
-	        tworker		wt = (tworker) uctimeout_dispworker ;
+	        tworker		wt = (tworker) uctim_dispworker ;
 	        if ((rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
 	            fl.running_disper = true ;
 	            tid_disper = tid ;
@@ -928,9 +929,9 @@ int uctimeout::dispbegin() noex {
 	} /* end if (pta) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (uctimeout::dispbegin) */
+/* end subroutine (uctim::dispbegin) */
 
-int uctimeout::dispend() noex {
+int uctim::dispend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_disper) {
 	    pthread_t	tid = tid_disper ;
@@ -944,10 +945,10 @@ int uctimeout::dispend() noex {
 	} /* end if (running) */
 	return rs ;
 }
-/* end subroutine (uctimeout::dispend) */
+/* end subroutine (uctim::dispend) */
 
 /* it always takes a good bit of code to make this part look easy! */
-int uctimeout::dispworker() noex {
+int uctim::dispworker() noex {
 	int		rs ;
 	while ((rs = disprecv()) > 0) {
 	    switch (rs) {
@@ -962,9 +963,9 @@ int uctimeout::dispworker() noex {
 	fexitdisp = true ;
 	return rs ;
 }
-/* end subroutine (uctimeout::dispworker) */
+/* end subroutine (uctim::dispworker) */
 
-int uctimeout::disprecv() noex {
+int uctim::disprecv() noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = TO_DISPRECV ;
@@ -992,9 +993,9 @@ int uctimeout::disprecv() noex {
 	} /* end if (mutex-section) */
 	return (rs >= 0) ? cmd : rs ;
 }
-/* end subroutine (uctimeout::disprecv) */
+/* end subroutine (uctim::disprecv) */
 
-int uctimeout::disphandle() noex {
+int uctim::disphandle() noex {
 	TIMEOUT		*tep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1009,9 +1010,9 @@ int uctimeout::disphandle() noex {
 	if ((rs >= 0) && (rs1 != SR_EMPTY)) rs = rs1 ;
 	return rs ;
 }
-/* end subroutine (uctimeout::disphandle) */
+/* end subroutine (uctim::disphandle) */
 
-int uctimeout::dispjobdel(TIMEOUT *tep) noex {
+int uctim::dispjobdel(TIMEOUT *tep) noex {
         cint       	to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
@@ -1024,36 +1025,36 @@ int uctimeout::dispjobdel(TIMEOUT *tep) noex {
 	    }
 	    rs1 = capend() ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (uctimeout-cap) */
+	} /* end if (uctim-cap) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (uctimeout::dispjobdel) */
+/* end subroutine (uctim::dispjobdel) */
 
-static int uctimeout_sigerworker(uctimeout *uip) noex {
+static int uctim_sigerworker(uctim *uip) noex {
 	return uip->sigerworker() ;
 }
 
-static int uctimeout_dispworker(uctimeout *uip) noex {
+static int uctim_dispworker(uctim *uip) noex {
 	return uip->dispworker() ;
 }
 
-static void uctimeout_atforkbefore() noex {
-	uctimeout_data.mx.lockbegin() ;
+static void uctim_atforkbefore() noex {
+	uctim_data.mx.lockbegin() ;
 }
-/* end subroutine (uctimeout_atforkbefore) */
+/* end subroutine (uctim_atforkbefore) */
 
-static void uctimeout_atforkparent() noex {
-	uctimeout_data.mx.lockend() ;
+static void uctim_atforkparent() noex {
+	uctim_data.mx.lockend() ;
 }
-/* end subroutine (uctimeout_atforkparent) */
+/* end subroutine (uctim_atforkparent) */
 
-static void uctimeout_atforkchild() noex {
-        uctimeout       *uip = &uctimeout_data ;
+static void uctim_atforkchild() noex {
+        uctim       *uip = &uctim_data ;
         uip->pid = getpid() ;
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
             uip->fl.running_disper = false ;
-	    if_constexpr (f_childthrs) {
+	    if constexpr (f_childthrs) {
                 if (uip->fl.thrs) {
                     uip->fl.thrs = false ;
                     uip->thrsbegin() ;
@@ -1065,12 +1066,12 @@ static void uctimeout_atforkchild() noex {
         } /* end if (was "working") */
         uip->capend() ;
 }
-/* end subroutine (uctimeout_atforkchild) */
+/* end subroutine (uctim_atforkchild) */
 
-static void uctimeout_exit() noex {
-	uctimeout_data.fvoid = true ;
+static void uctim_exit() noex {
+	uctim_data.fvoid = true ;
 }
-/* end subroutine (uctimeout_atforkparent) */
+/* end subroutine (uctim_atforkparent) */
 
 static int ourcmp(cvoid *a1p,cvoid *a2p) noex {
 	TIMEOUT		**e1pp = (TIMEOUT **) a1p ;

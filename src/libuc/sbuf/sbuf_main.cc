@@ -609,7 +609,7 @@ int sbuf::chrs(int ch,int nc) noex {
 /* end subroutine (sbuf::chrs) */
 
 void sbuf::dtor() noex {
-	cint	rs = sbuf_finish(this) ;
+	cint		rs = sbuf_finish(this) ;
 	if (rs < 0) {
 	   ulogerror("sbuf",rs,"dtor-finish") ;
 	}

@@ -47,6 +47,7 @@
 /* local defines */
 
 #define	ITS	itimerspec
+#define	CITS	const itimerspec
 
 
 /* external subroutines */
@@ -119,14 +120,14 @@ int uc_timerdestroy(timer_t tid) noex {
 }
 /* end subroutine (uc_timerdestroy) */
 
-int uc_timerset(timer_t tid,int tf,const itimerspec *ntvp,itimerspec *otvp) noex {
+int uc_timerset(timer_t tid,int tf,CITS *ntvp,ITS *otvp) noex {
 	uctimer		uco(tf,otvp,ntvp) ;
 	uco.m = &uctimer::set ;
 	return uco(tid) ;
 }
 /* end method (uctimer::set) */
 
-int uc_timerget(timer_t tid,itimerspec *otvp) noex {
+int uc_timerget(timer_t tid,ITS *otvp) noex {
 	uctimer		uco(otvp) ;
 	uco.m = &uctimer::get ;
 	return uco(tid) ;

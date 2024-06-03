@@ -451,7 +451,7 @@ int buffer::get(cchar **rpp) noex {
 }
 
 void buffer::dtor() noex {
-	cint		rs = finish ;
+	cint		rs = buffer_finish(this) ;
 	if (rs < 0) {
 	    ulogerror("buffer",rs,"fini-finish") ;
 	}

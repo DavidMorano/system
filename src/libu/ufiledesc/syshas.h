@@ -179,7 +179,7 @@
 #define	SYSHAS_MUTEXROBUST	1
 
 /* Solaris®: strnlen(3c) */
-#define	SYSHAS_STRNLEN		0
+#define	SYSHAS_STRNLEN		1
 
 /* Solaris®: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
@@ -241,6 +241,9 @@
 #else
 #define	SYSHAS_PIPES		0
 #endif
+
+/* Solaris®: |dirent_t| */
+#define	SYSHAS_TYPEDIRENT	1
 
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -474,6 +477,9 @@
 /* Darwin: |pipe2(2)| */
 #define	SYSHAS_PIPES		0
 
+/* Darwin: |dirent_t| */
+#define	SYSHAS_TYPEDIRENT	0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -627,10 +633,10 @@
 #define	SYSHAS_MUTEXROBUST	1
 
 /* Linux: strnlen(3c) */
-#define	SYSHAS_STRNLEN		0
+#define	SYSHAS_STRNLEN		1	/* finally */
 
 /* Linux: strlcpy(3c) */
-#define	SYSHAS_STRLCPY		0
+#define	SYSHAS_STRLCPY		1	/* finally */
 
 /* Linux: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		1
@@ -685,6 +691,9 @@
 
 /* Linux: |pipe2(2)| */
 #define	SYSHAS_PIPES		1
+
+/* Linux: |dirent_t| */
+#define	SYSHAS_TYPEDIRENT	0
 
 /******************************************************************************/
 #endif /* OSNAME */

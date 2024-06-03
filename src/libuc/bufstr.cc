@@ -291,7 +291,7 @@ int bufstr::get(cchar **rpp) noex {
 }
 
 void bufstr::dtor() noex {
-	cint	rs = int(finish) ;
+	cint		rs = bufstr_finish(this) ;
 	if (rs < 0) {
 	    ulogerror("bufstr",rs,"fini-finish") ;
 	}
@@ -315,6 +315,5 @@ bufstr_co::operator int () noex {
 	return rs ;
 }
 /* end method (bufstr_co::operator) */
-
 
 

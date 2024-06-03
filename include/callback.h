@@ -1,4 +1,4 @@
-/* timeout HEADER */
+/* callback HEADER */
 /* lang=C99 */
 
 /* time-out interface */
@@ -16,13 +16,13 @@
 
 /*******************************************************************************
 
-	This file provides the definition of the TIMEOUT object, and its
+	This file provides the definition of the CALLBACK object, and its
 	method declarations.
 
 *******************************************************************************/
 
-#ifndef	TIMEOUT_INCLUDE
-#define	TIMEOUT_INCLUDE
+#ifndef	CALLBACK_INCLUDE
+#define	CALLBACK_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -32,41 +32,30 @@
 #include	<utypealiases.h>
 
 
-#define	TIMEOUT		struct timeout_entry
+#define	CALLBACK	struct callback_entry
 
 
 EXTERNC_begin
 
-typedef int (*timeout_f)(void *,uint,int) noex ;
+typedef int (*callback_f)(void *,int) noex ;
 
 EXTERNC_end
 
-enum timeoutcmds {
-	timeoutcmd_set,
-	timeoutcmd_cancel,
-	timeoutcmd_overlast
-} ;
-
-struct timeout_entry {
-	timeout_f	metf ;		/* method function (C-linkage) */
+struct callback_entry {
 	void		*objp ;		/* object pointer */
-	time_t		val ;
-	uint		tag ;
-	int		arg ;
-	int		id ;		/* created by the system */
+	callback_f	metf ;		/* function method (C-linkage) */
+	int		arg ;		/* function argument */
 } ;
 
-typedef TIMEOUT		timeout ;
+typedef CALLBACK	callback ;
 
 EXTERNC_begin
 
-extern int timeout_load(timeout *,time_t,void *,timeout_f,uint,int) noex ;
-
-extern int uc_timeout(int,timeout *) noex ;
+extern int callback_load(callback *,void *,callback_f,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* TIMEOUT_INCLUDE */
+#endif /* CALLBACK_INCLUDE */
 
 

@@ -63,7 +63,7 @@ static inline bool	isNotField(int) noex ;
 
 /* local variables */
 
-static cint		rsnofield[] = {
+constexpr cint		rsnofield[] = {
 	SR_NOENT,
 	SR_NOMSG,
 	0

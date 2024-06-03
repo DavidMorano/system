@@ -333,7 +333,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	        } /* end if (buf-add leading part) */
 	        if (rs < 0) break ;
 	    } /* end while (expanding) */
-/* copy over any remainder (trailing part) */
+	    /* copy over any remainder (trailing part) */
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = buffer_strw(bufp,sp,sl) ;
 	        len += rs ;

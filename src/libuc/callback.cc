@@ -1,4 +1,4 @@
-/* timeout SUPPORT */
+/* callback SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® signal event initialization */
@@ -17,13 +17,13 @@
 /*******************************************************************************
 
 	Name:
-	timeout_load
+	callback_load
 
 	Description:
 	This subroutine loads (initializes) a TIMEOUT object.
 
 	Synopsis:
-	int timeout_load(TIMEOUT *top,time_t sec,long nsec)
+	int callback_load(TIMEOUT *top,time_t sec,long nsec)
 
 	Arguments:
 	top		pointer to TIMEOUT
@@ -37,11 +37,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* |time_t| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"timeout.h"
+#include	"callback.h"
 
 
 /* local defines */
@@ -52,7 +51,7 @@
 
 /* local typedefs */
 
-typedef timeout_f	t_f ;
+typedef callback_f	t_f ;
 
 
 /* external subroutines */
@@ -75,19 +74,16 @@ typedef timeout_f	t_f ;
 
 /* exported subroutines */
 
-int timeout_load(timeout *top,time_t v,void *o,t_f m,uint tag,int arg) noex {
+int callback_load(callback *top,void *o,t_f m,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (top) {
 	    rs = SR_OK ;
-	    top->id = -1 ;
-	    top->val = v ;
 	    top->objp = o ;
 	    top->metf = m ;
-	    top->tag = tag ;
 	    top->arg = arg ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (timeout_load) */
+/* end subroutine (callback_load) */
 
 

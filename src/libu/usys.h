@@ -24,7 +24,6 @@
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
 
-
 *******************************************************************************/
 
 #ifndef	USYS_INCLUDE
@@ -32,6 +31,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+
+#include	<usys_typedefs.h>	/* should be ordered first */
 
 #include	<usys_xxx.h>
 #include	<usys_sunos.h>
