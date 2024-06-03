@@ -38,6 +38,7 @@ struct buffer_head {
 
 #ifdef	__cplusplus
 enum buffermems {
+	buffermem_start,
 	buffermem_strsize,
 	buffermem_reset,
 	buffermem_finish,
@@ -51,23 +52,24 @@ struct buffer_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	operator int () noex ;
-	int operator () () noex { 
-	    return operator int () ;
+	operator int () noex {
+	    return operator () () ;
 	} ;
+	int operator () (int = 0) noex ;
 } ; /* end struct (buffer_co) */
 struct buffer : buffer_head {
+	buffer_co	start ;
 	buffer_co	strsize ;
-	buffer_co	reset;
+	buffer_co	reset ;
 	buffer_co	finish ;
 	buffer() noex {
+	    strsize(this,buffermem_start) ;
 	    strsize(this,buffermem_strsize) ;
 	    reset(this,buffermem_reset) ;
 	    finish(this,buffermem_finish) ;
 	} ;
 	buffer(const buffer &) = delete ;
 	buffer &operator = (const buffer &) = delete ;
-	int start(int = 0) noex ;
 	int adv(int = 1) noex ;
 	int strw(cchar *,int = -1) noex ;
 	int chr(int) noex ;

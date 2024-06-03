@@ -433,10 +433,6 @@ static int buffer_ext(buffer *op,int req) noex {
 }
 /* end subroutine (buffer_ext) */
 
-int buffer::start(int st) noex {
-	return buffer_start(this,st) ;
-}
-
 int buffer::adv(int v) noex {
 	return buffer_adv(this,v) ;
 }
@@ -460,10 +456,13 @@ void buffer::dtor() noex {
 	}
 }
 
-buffer_co::operator int () noex {
+int buffer_co::operator () (int v) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
+	    case buffermem_start:
+	        rs = buffer_start(op,v) ;
+	        break ;
 	    case buffermem_strsize:
 	        rs = buffer_get(op,nullptr) ;
 	        break ;
