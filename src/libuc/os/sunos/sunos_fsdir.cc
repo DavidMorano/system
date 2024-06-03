@@ -20,18 +20,17 @@
 /*******************************************************************************
 
 	This code module provides a platform independent implementation
-	of UNIX® file system directory access.
-
-	This module uses the system call 'getdent(2)' to read the
-	directories and to format them into entries. This is on
-	Solaris® and perhaps some others (even some more but in
-	slightly different forms), but it is not generally portable.
-	A portable version of this object is located in |fsdirport(3dam)|.
-	It would have been colocated in this file (with appropriate
-	compile-time define switches) but it is just way too ugly
-	to look at. Besides, depending on platform, it itself is
-	not always multi-thread-safe or reentrant. If you want it
-	you know where to find it.
+	of UNIX® file system directory access.  This module uses
+	the system call |getdents(2)| to read the directories and
+	to format them into entries. This is on Solaris® and perhaps
+	some others (even some more but in slightly different forms),
+	but it is not generally portable.  A portable version of
+	this object is located in |fsdirport(3dam)|.  It would have
+	been colocated in this file (with appropriate compile-time
+	define switches) but it is just way too ugly to look at.
+	Besides, depending on platform, it itself is not always
+	multi-thread-safe or reentrant. If you want it you know
+	where to find it.
 
 *******************************************************************************/
 
@@ -41,15 +40,16 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dirent.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<snwcpy.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
 
-#include	"fsdir.h"
+#include	"sunos_fsdir.h"
 
 
 /* local defines */
@@ -64,10 +64,23 @@
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef	dirent_t *	direntp ;
+
+
 /* external subroutines */
 
 extern "C" {
-    extern int u_getdents(int,DIRENT *,int) noex ;
+    extern int u_getdents(int,dirent_t *,int) noex ;
 }
 
 
@@ -140,7 +153,7 @@ int fsdir_open(fsdir *op,cchar *dname) noex {
 			    if (dsize < FSDIR_MINBUFLEN) {
 				    dsize = FSDIR_MINBUFLEN ;
 			    }
-			    sz = MIN(psize,dsize) ;
+			    sz = min(psize,dsize) ;
 	                    if ((rs = uc_valloc(sz,&bp)) >= 0) {
 		                op->bdata = bp ;
 			        op->bsize = sz ;
@@ -162,14 +175,14 @@ int fsdir_close(fsdir *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-	        if (op->bdata) {
-	            rs1 = uc_free(op->bdata) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->bdata = NULL ;
-	        }
-	        rs1 = fsdir_end(op) ;
+	    if (op->bdata) {
+	        rs1 = uc_free(op->bdata) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->magic = 0 ;
+	        op->bdata = NULL ;
+	    }
+	    rs1 = fsdir_end(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -190,14 +203,14 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 		nbuf[0] = '\0' ;
 	        dep->name = nbuf ;
 	        if (op->ei >= op->blen) {
-	            DIRENT	*dp = (DIRENT *) op->bdata ;
+	            dirent_t	*dp = direntp(op->bdata) ;
 	            rs = u_getdents(op->dfd,dp,op->bsize) ;
 	            op->blen = rs ;
 	            op->doff += rs ;
 	            op->ei = 0 ;
 	        }
 	        if ((rs >= 0) && (op->blen > 0)) { /* greater-than-zero */
-	            DIRENT	*dp = (DIRENT *) (op->bdata + op->ei) ;
+	            dirent_t	*dp = direntp(op->bdata + op->ei) ;
 	            int		ml ;
 	            ml = (dp->d_reclen-18) ;
 	            dep->ino = (ino_t) dp->d_ino ;
@@ -205,7 +218,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	            dep->type = 0 ;
 	            if ((rs = snwcpy(nbuf,nlen,dp->d_name,ml)) >= 0) {
 #if	F_SUNOS
-	                    op->eoff = dp->d_off ;
+	                op->eoff = dp->d_off ;
 #endif /* F_SUNOS */
 		        op->ei += dp->d_reclen ;
 	            }
@@ -279,7 +292,7 @@ static int fsdir_begin(fsdir *op,cchar *dname) noex {
 	if (dname[0] == '*') {
 	    if (int v ; (rs = cfdeci((dname+1),-1,&v)) >= 0) {
 		if ((rs = u_dup(v)) >= 0) {
-		    op->f.descname = TRUE ;
+		    op->f.descname = true ;
 		}
 	    }
 	} else {
@@ -287,7 +300,7 @@ static int fsdir_begin(fsdir *op,cchar *dname) noex {
 	}
 	if (rs >= 0) {
 	    op->dfd = rs ;
-	    rs = uc_closeonexec(op->dfd,TRUE) ;
+	    rs = uc_closeonexec(op->dfd,true) ;
 	    if (rs < 0) {
 		u_close(op->dfd) ;
 		op->dfd = -1 ;

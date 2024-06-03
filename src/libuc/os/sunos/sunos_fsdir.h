@@ -26,8 +26,8 @@
 
 #define	FSDIR_MAGIC	0x31415926
 #define	FSDIR		struct fsdir_head
-#define	FSDIR_ENT	struct fsdir_entry
 #define	FSDIR_FL	struct fsdir_flags
+#define	FSDIR_ENT	struct fsdir_entry
 
 
 struct fsdir_entry {
@@ -42,9 +42,9 @@ struct fsdir_flags {
 } ;
 
 struct fsdir_head {
-	uint		magic ;
-	FSDIR_FL	f ;
 	char		*bdata ;	/* buffer pointer (fixed) */
+	FSDIR_FL	f ;
+	uint		magic ;
 	int		bsize ;		/* buffer size (fixed) */
 	int		blen ;		/* buffer length read */
 	int		doff ;		/* we do not handle "huge" dirs! */
@@ -54,11 +54,10 @@ struct fsdir_head {
 } ;
 
 typedef FSDIR		fsdir ;
+typedef FSDIR_FL	fsdir_fl ;
 typedef FSDIR_ENT	fsdir_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	fsdir_open(fsdir *,cchar *) noex ;
 extern int	fsdir_read(fsdir *,fsdir_ent *,char *,int) noex ;
@@ -68,9 +67,7 @@ extern int	fsdir_rewind(fsdir *) noex ;
 extern int	fsdir_audit(fsdir *) noex ;
 extern int	fsdir_close(fsdir *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FSDIR_INCLUDE */
