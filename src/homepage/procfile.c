@@ -300,7 +300,7 @@ const char	fname[] ;
 	        if (cl > 0) {
 
 	            if (c++ > 0)
-	                sbuf_char(&b,' ') ;
+	                sbuf_chr(&b,' ') ;
 
 	            sbuf_strw(&b,cp,cl) ;
 
@@ -480,7 +480,7 @@ const char	fname[] ;
 	        if (cl > 0) {
 
 	            if (c++ > 0)
-	                sbuf_char(&b,' ') ;
+	                sbuf_chr(&b,' ') ;
 
 	            sbuf_strw(&b,cp,cl) ;
 

@@ -1836,7 +1836,7 @@ int		vlen ;
 #endif
 
 	        if (j++ > 0)
-	            rs = sbuf_char(&b,' ') ;
+	            rs = sbuf_chr(&b,' ') ;
 
 	        if (rs >= 0)
 	            rs = sbuf_strw(&b,lp,ll) ;

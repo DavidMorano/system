@@ -197,7 +197,7 @@ int ucentpj::format(char *rbuf,int rlen) noex {
 	    sbuf	b ;
 	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	        for (int i = 0 ; i < 6 ; i += 1) {
-	            if (i > 0) rs = sbuf_char(&b,':') ;
+	            if (i > 0) rs = sbuf_chr(&b,':') ;
 	            if (rs >= 0) {
 	                int	v ;
 	                switch (i) {

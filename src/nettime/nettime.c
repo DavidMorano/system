@@ -1111,21 +1111,21 @@ struct sockaddr	*ssap ;
 	    if ((rs = sbuf_start(&b,printaddr,printaddrlen)) >= 0) {
 
 	        sbuf_deci(&b,af) ;
-	        sbuf_char(&b,'-') ;
+	        sbuf_chr(&b,'-') ;
 
 	        sbuf_deci(&b,port) ;
-	        sbuf_char(&b,'-') ;
+	        sbuf_chr(&b,'-') ;
 
 	        if (f_flow) {
 	            sbuf_hexui(&b,flow) ;
-	            sbuf_char(&b,'-') ;
+	            sbuf_chr(&b,'-') ;
 	        }
 
 	        n = (af == AF_INET6) ? 16 : 4 ;
 	        for (i = 0 ; i < n ; i += 1) {
 
 	            if ((i > 0) && ((i & 1) == 0)) {
-	                sbuf_char(&b,':') ;
+	                sbuf_chr(&b,':') ;
 		    }
 
 		    {
@@ -1187,7 +1187,7 @@ struct sockaddr	*ssap ;
 	if ((rs >= 0) && f_scope) {
 	    if ((rs = sbuf_start(&b,printaddr,printaddrlen)) >= 0) {
 	        sbuf_hexui(&b,scope) ;
-	        sbuf_char(&b,'-') ;
+	        sbuf_chr(&b,'-') ;
 	        sbuf_hexui(&b,extra) ;
 	        rs1 = sbuf_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;

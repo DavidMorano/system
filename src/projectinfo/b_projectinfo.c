@@ -1507,7 +1507,7 @@ static int mklist(char *rbuf,int rlen,char **names)
 	    int		i ;
 
 	    for (i = 0 ; (rs >= 0) && (names[i] != NULL) ; i += 1) {
-	        if (i > 0) rs = sbuf_char(&b,' ') ;
+	        if (i > 0) rs = sbuf_chr(&b,' ') ;
 	        if (rs >= 0) rs = sbuf_strw(&b,names[i],-1) ;
 	    } /* end for */
 

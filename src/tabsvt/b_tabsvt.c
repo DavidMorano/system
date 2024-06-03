@@ -1698,7 +1698,7 @@ time_t		daytime ;
 
 	        sbuf_strw(&b,
 	            timestr_std(daytime,timebuf),19) ;
-	        sbuf_char(&b,'\n') ;
+	        sbuf_chr(&b,'\n') ;
 	    }
 
 	} /* end block */
@@ -1952,7 +1952,7 @@ time_t		daytime ;
 
 	    sbuf_strw(&b,
 	        timestr_std(daytime,timebuf),19) ;
-	    sbuf_char(&b,'\n') ;
+	    sbuf_chr(&b,'\n') ;
 
 	}
 

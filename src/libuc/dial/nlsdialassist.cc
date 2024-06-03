@@ -71,7 +71,7 @@ int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen) noex {
 	if ((rs = sbuf_start(&svc,nlsbuf,nlslen)) >= 0) {
 	    sbuf_strw(&svc,NLPS_REQ2,-1) ;
 	    sbuf_strw(&svc,svcbuf,svclen) ;
-	    sbuf_char(&svc,0) ;
+	    sbuf_chr(&svc,0) ;
 	    len = sbuf_finish(&svc) ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (nlsbuf) */

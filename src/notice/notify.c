@@ -369,9 +369,9 @@ int		tlen ;
 /* form the notice to write out */
 
 	    if (pip->f.ringbell)
-	        sbuf_char(&out,CH_BELL) ;
+	        sbuf_chr(&out,CH_BELL) ;
 
-	    sbuf_char(&out,'\r') ;
+	    sbuf_chr(&out,'\r') ;
 
 	    sp = tbuf ;
 	    sl = tlen ;

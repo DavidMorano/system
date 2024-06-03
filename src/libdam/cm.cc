@@ -387,7 +387,7 @@ static int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
 	        SBUF	ab ;
 	        if ((rs = sbuf_start(&ab,argsbuf,sip->argslen)) >= 0) {
 	            for (i = 0 ; av[i] != NULL ; i += 1) {
-	                if (i > 0) sbuf_char(&ab,' ') ;
+	                if (i > 0) sbuf_chr(&ab,' ') ;
 	                sbuf_strw(&ab,av[i],-1) ;
 	            } /* end for */
 	            alen = sbuf_finish(&ab) ;

@@ -1088,7 +1088,7 @@ static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of)
 	                const char	*ap ;
 	                for (i = 0 ; vecstr_get(alp,i,&ap) >= 0 ; i += 1) {
 	                    if (ap != NULL) {
-	                        rs = sbuf_char(&b,' ') ;
+	                        rs = sbuf_chr(&b,' ') ;
 	                        if (rs >= 0) rs = sbuf_addquoted(&b,ap,-1) ;
 	                    }
 	                    if (rs < 0) break ;
@@ -1511,7 +1511,7 @@ static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl)
 	            rs = sbuf_blanks(&d,n) ;
 	            ci += (n-1) ;
 	        } else {
-	            rs = sbuf_char(&d,sp[i]) ;
+	            rs = sbuf_chr(&d,sp[i]) ;
 	        }
 	        ci += 1 ;
 	    } /* end for */

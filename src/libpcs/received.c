@@ -310,7 +310,7 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	            if (rs1 >= 0) {
 
 	                if (c > 0)
-	                    sbuf_char(&sb,'\0') ;
+	                    sbuf_chr(&sb,'\0') ;
 
 	                ki = rs1 ;
 	                wi = 0 ;
@@ -327,7 +327,7 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	                }
 
 	                if (wi > 0)
-	                    sbuf_char(&sb,' ') ;
+	                    sbuf_chr(&sb,' ') ;
 
 	                rs = sbuf_strw(&sb,fp,fl) ;
 	                wi += 1 ;
@@ -341,7 +341,7 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	            const char	*cp ;
 	            int		cl ;
 	            if (c > 0)
-	                sbuf_char(&sb,'\0') ;
+	                sbuf_chr(&sb,'\0') ;
 
 	            sbuf_getpoint(&sb,&cp) ;
 

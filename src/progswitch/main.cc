@@ -918,7 +918,7 @@ static int progmk(PROGINFO *pip,char *rbuf,int rlen,cchar *pp,int pl,cchar *pn)
 	    if (pl > 0) {
 	        sbuf_strw(&pbuf,pp,pl) ;
 	        if (pp[pl-1] != '/')
-	            sbuf_char(&pbuf,'/') ;
+	            sbuf_chr(&pbuf,'/') ;
 	    }
 
 	    sbuf_strw(&pbuf,pn,-1) ;

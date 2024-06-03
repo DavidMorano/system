@@ -696,10 +696,10 @@ static int debugprintlist(cchar *ids,const short *pp)
 	    int		i ;
 	    sbuf_strw(&b,ids,-1) ;
 	    for (i = 0 ; (i < 16) && (pp[i] != SHORT_MIN) ; i += 1) {
-	        sbuf_char(&b,' ') ;
+	        sbuf_chr(&b,' ') ;
 		sbuf_deci(&b,pp[i]) ;
 	    }
-	    sbuf_char(&b,'\n') ;
+	    sbuf_chr(&b,'\n') ;
 	    len = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */

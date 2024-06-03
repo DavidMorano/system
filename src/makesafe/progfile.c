@@ -809,9 +809,9 @@ static int mkdepname(char *rbuf,cchar *name)
 
 	            sbuf_strw(&dep,name,(tp - name)) ;
 
-	            sbuf_char(&dep,'.') ;
+	            sbuf_chr(&dep,'.') ;
 
-	            sbuf_char(&dep,'c') ;
+	            sbuf_chr(&dep,'c') ;
 
 	            len = sbuf_finish(&dep) ;
 	            if (rs >= 0) rs = len ;

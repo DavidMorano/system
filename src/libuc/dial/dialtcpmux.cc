@@ -272,7 +272,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 			cint	qlen = rs ;
 	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
 			    cchar	*sa = sargs[i] ;
-	                    sbuf_char(&b,' ') ;
+	                    sbuf_chr(&b,' ') ;
 	                    if ((rs = mkquoted(qbuf,qlen,sa,-1)) >= 0) {
 	                        len = rs ;
 	                        sbuf_buf(&b,qbuf,len) ;
@@ -284,9 +284,9 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 	        } /* end if (svc-args) */
 	        if (rs >= 0) {
 		    if constexpr (f_cr) {
-	                sbuf_char(&b,'\r') ;
+	                sbuf_chr(&b,'\r') ;
 		    }
-	            sbuf_char(&b,'\n') ;
+	            sbuf_chr(&b,'\n') ;
 	        } /* end if */
 	    } /* end if */
 	    len = sbuf_getlen(&b) ;

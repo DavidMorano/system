@@ -395,7 +395,7 @@ static int mkcomp(char *rp,int rl,cchar *kp,int kl,cchar *vp,int vl) noex {
 	    if ((rs = sbuf_start(&b,rp,rl)) >= 0) {
 	        {
 	            if (rs >= 0) rs = sbuf_strw(&b,kp,kl) ;
-	            if (rs >= 0) rs = sbuf_char(&b,'=') ;
+	            if (rs >= 0) rs = sbuf_chr(&b,'=') ;
 	            if (vp) {
 		        if (rs >= 0) rs = sbuf_strw(&b,vp,vl) ;
 		    }

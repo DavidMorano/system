@@ -2078,7 +2078,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	                cint	n = rs1 ;
 	                int		i ;
 	                for (i = 0 ; i < n ; i += 1) {
-	                    if (i > 0) sbuf_char(&b,' ') ;
+	                    if (i > 0) sbuf_chr(&b,' ') ;
 	                    sbuf_decui(&b,((uint) egids[i])) ;
 	                } /* end for */
 	            } /* end if (getgroups) */
@@ -2356,7 +2356,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	                cint	gnlen = GROUPNAMELEN ;
 	                n = rs1 ;
 	                for (i = 0 ; i < n ; i += 1) {
-	                    if (i > 0) sbuf_char(&b,' ') ;
+	                    if (i > 0) sbuf_chr(&b,' ') ;
 	                    v = egids[i] ;
 	                    if ((rs = getgroupname(gnbuf,gnlen,v)) >= 0) {
 	                        sbuf_strw(&b,gnbuf,rs) ;
@@ -4124,7 +4124,7 @@ static int datauser_mkgids(DATAUSER *dup,char *rbuf,int rlen)
 	        cchar	*cp ;
 	        for (i = 0 ; vecstr_get(glp,i,&cp) >= 0 ; i += 1) {
 	            if (cp != nullptr) {
-	                if (c++ > 0) sbuf_char(&b,' ') ;
+	                if (c++ > 0) sbuf_chr(&b,' ') ;
 	                if ((rs = mkgid(grbuf,grlen,cp)) >= 0) {
 	                    sbuf_deci(&b,rs) ;
 	                } else if (rs == SR_NOTFOUND) {
@@ -4286,7 +4286,7 @@ static int mkstrlist(char *cbuf,int clen,vecstr *lp)
 	    cchar	*cp ;
 	    for (i = 0 ; vecstr_get(lp,i,&cp) >= 0 ; i += 1) {
 	        if (cp != nullptr) {
-	            if (c++ > 0) sbuf_char(&b,' ') ;
+	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            rs = sbuf_strw(&b,cp,-1) ;
 	        }
 	        if (rs < 0) break ;

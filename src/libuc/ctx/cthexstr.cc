@@ -86,7 +86,7 @@ int cthexstring(char *dbuf,int dlen,int f,cchar *sp,int sl) noex {
 	        for (int i = 0 ; (rs >= 0) && (i < sl) ; i += 1) {
 	            cint	ch = vp[i] ;
 	            if (f && (i > 0)) {
-		        rs = sbuf_char(&b,' ') ;
+		        rs = sbuf_chr(&b,' ') ;
 	            }
 		    if (rs >= 0) {
 			rs = sbuf_hexc(&b,ch) ;

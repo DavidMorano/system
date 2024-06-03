@@ -1224,7 +1224,7 @@ static int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
 		    	    sl = strwcpylc(sufbuf,sp,SUFLEN) - sufbuf ;
 		    	    sp = sufbuf ;
 			}
-	                sbuf_char(&pbuf,'.') ;
+	                sbuf_chr(&pbuf,'.') ;
 	                sbuf_strw(&pbuf,sp,sl) ;
 		    }
 		}
@@ -1233,7 +1233,7 @@ static int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
 	    case suf_plus:
 		sp = lip->suffix ;
 		if (sp == NULL) sp = "xxx" ;
-	        sbuf_char(&pbuf,'.') ;
+	        sbuf_chr(&pbuf,'.') ;
 	        sbuf_strw(&pbuf,sp,-1) ;
 		break ;
 	    case suf_empty:

@@ -739,7 +739,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 	            } else if (f_inkey) {
 
 	                if (sbuf_getlen(&citekey) > 0) {
-	                    sbuf_char(&citekey,' ') ;
+	                    sbuf_chr(&citekey,' ') ;
 			}
 
 	                sbuf_strw(&citekey,lbuf,len) ;

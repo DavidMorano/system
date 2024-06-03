@@ -265,7 +265,7 @@ int		buflen ;
 
 	        if (*fp == '%') {
 
-	            rs = sbuf_char(&buffer,'%') ;
+	            rs = sbuf_chr(&buffer,'%') ;
 
 	        } else if (*fp == 'f') {
 
@@ -314,7 +314,7 @@ int		buflen ;
 			*fp) ;
 #endif
 
-	        rs = sbuf_char(&buffer,*fp) ;
+	        rs = sbuf_chr(&buffer,*fp) ;
 
 	    } /* end if */
 

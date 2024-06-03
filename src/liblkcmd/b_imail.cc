@@ -7658,26 +7658,26 @@ static int locinfo_mkmid(LOCINFO *lip,char *mbuf,int mlen)
 	    if (nl > USERNAMELEN) {
 	        rs1 = (int) gethostid() ;
 	        sbuf_hexi(&mb,rs1) ;
-	        sbuf_char(&mb,'-') ;
+	        sbuf_chr(&mb,'-') ;
 	    } else {
 	        sbuf_strw(&mb,nn,nl) ;
 	    }
 
 	    sbuf_decui(&mb,uv) ;
 
-	    sbuf_char(&mb,'.') ;
+	    sbuf_chr(&mb,'.') ;
 
 	    {
 	        uv = (uint) pip->daytime ;
 	        sbuf_hexui(&mb,uv) ;
 	    }
 
-	    sbuf_char(&mb,'.') ;
+	    sbuf_chr(&mb,'.') ;
 	    sbuf_deci(&mb,lip->kserial) ;
-	    sbuf_char(&mb,'.') ;
+	    sbuf_chr(&mb,'.') ;
 	    sbuf_deci(&mb,serial) ;
 
-	    sbuf_char(&mb,'@') ;
+	    sbuf_chr(&mb,'@') ;
 
 	    sbuf_strw(&mb,dn,-1) ;
 

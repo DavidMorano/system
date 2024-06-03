@@ -1019,7 +1019,7 @@ char		outbuf[] ;
 
 	sbuf_strw(&b,tmpdir,-1) ;
 
-	sbuf_char(&b,'/') ;
+	sbuf_chr(&b,'/') ;
 
 	sbuf_strw(&b,"pcspoll",-1) ;
 

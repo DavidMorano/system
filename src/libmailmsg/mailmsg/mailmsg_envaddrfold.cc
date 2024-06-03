@@ -119,7 +119,7 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	                if ((mep->r.ep != NULL) && (mep->r.el > 0)) {
 	                    cp = mep->r.ep ;
 	                    cl = mep->r.el ;
-	                    if (c > 0) rs = sbuf_char(&b,'!') ;
+	                    if (c > 0) rs = sbuf_chr(&b,'!') ;
 	                    if (rs >= 0) {
 	                        c += 1 ;
 	                        rs = sbuf_strw(&b,cp,cl) ;
@@ -156,7 +156,7 @@ static int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	        cint	at = rs ;
 	        if ((rs = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
 		    cint	al = rs ;
-		    if (c > 0) rs = sbuf_char(sbp,'!') ;
+		    if (c > 0) rs = sbuf_chr(sbp,'!') ;
 		    if (rs >= 0) {
 		        c += 1 ;
 		        rs = sbuf_strw(sbp,abuf,al) ;

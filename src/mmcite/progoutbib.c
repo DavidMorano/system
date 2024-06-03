@@ -362,11 +362,11 @@ int progoutbib(PROGINFO *pip,bfile *ofp,BDB_ENT *bep)
 
 	            sbuf_strw(&tb,bep->keyvals[i][1],-1) ;
 
-	            sbuf_char(&tb,CH_LPAREN) ;
+	            sbuf_chr(&tb,CH_LPAREN) ;
 
 	            sbuf_strw(&tb,bep->keyvals[ji][1],-1) ;
 
-	            sbuf_char(&tb,CH_RPAREN) ;
+	            sbuf_chr(&tb,CH_RPAREN) ;
 
 	            if (keytracker_more(&bibkeys,keys) > 0) {
 	                sbuf_strw(&tb,",",-1) ;
@@ -509,24 +509,24 @@ static int mkname(PROGINFO *pip,char *rbuf,int rlen,cchar *nameval)
 	        rs1 = realname_getfirst(&a,&cp) ;
 	        if (rs1 > 0) {
 	            c += 1 ;
-	            sbuf_char(&ab,touc(cp[0])) ;
-	            sbuf_char(&ab,'.') ;
+	            sbuf_chr(&ab,touc(cp[0])) ;
+	            sbuf_chr(&ab,'.') ;
 	        }
 
 	        rs1 = realname_getm1(&a,&cp) ;
 	        if (rs1 > 0) {
 	            c += 1 ;
-	            sbuf_char(&ab,touc(cp[0])) ;
-	            sbuf_char(&ab,'.') ;
+	            sbuf_chr(&ab,touc(cp[0])) ;
+	            sbuf_chr(&ab,'.') ;
 	        }
 
 	        if (c > 0)
-	            sbuf_char(&ab,' ') ;
+	            sbuf_chr(&ab,' ') ;
 
 	        rs = realname_getlast(&a,&cp) ;
 	        cl = rs ;
 	        if ((rs >= 0) && (cl > 0)) {
-	            sbuf_char(&ab,cp[0]) ;
+	            sbuf_chr(&ab,cp[0]) ;
 	            if (cl > 1)
 	                sbuf_strw(&ab,(cp + 1),(cl - 1)) ;
 	        }

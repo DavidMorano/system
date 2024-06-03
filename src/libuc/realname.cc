@@ -431,15 +431,15 @@ int realname_mailname(realname *rnp,char *rbuf,int rlen) noex {
 	        if ((rnp->first != nullptr) && (rnp->first[0] != '\0')) {
 	            f = true ;
 	            ch = tolc(rnp->first[0]) ;
-	            sbuf_char(&s,ch) ;
+	            sbuf_chr(&s,ch) ;
 	        }
 	        if ((rnp->m1 != nullptr) && (rnp->m1[0] != '\0')) {
-	            sbuf_char(&s,'.') ;
+	            sbuf_chr(&s,'.') ;
 	            ch = tolc(rnp->m1[0]) ;
-	            sbuf_char(&s,ch) ;
+	            sbuf_chr(&s,ch) ;
 	        }
 	        if ((rnp->last != nullptr) && (rnp->last[0] != '\0')) {
-	            if (f) sbuf_char(&s,'.') ;
+	            if (f) sbuf_chr(&s,'.') ;
 	            sp = rnp->last ;
 	            sl = rnp->len.last ;
 	            if ((rs1 = snwcpylc(nbuf,nlen,sp,sl)) > 0) {
@@ -466,27 +466,27 @@ int realname_fullname(realname *rnp,char *rbuf,int rlen) noex {
 	        if ((rnp->first != nullptr) && (rnp->first[0] != '\0')) {
 	            f = true ;
 	            sbuf_strw(&s,rnp->first,rnp->len.first) ;
-	            if (rnp->abv.first) sbuf_char(&s,'.') ;
+	            if (rnp->abv.first) sbuf_chr(&s,'.') ;
 	        }
 	        if ((rnp->m1 != nullptr) && (rnp->m1[0] != '\0')) {
-	            if (f) sbuf_char(&s,' ') ;
+	            if (f) sbuf_chr(&s,' ') ;
 	            sbuf_strw(&s,rnp->m1,rnp->len.m1) ;
-	            if (rnp->abv.m1) sbuf_char(&s,'.') ;
+	            if (rnp->abv.m1) sbuf_chr(&s,'.') ;
 	        }
 	        if ((rnp->m2 != nullptr) && (rnp->m2[0] != '\0')) {
-	            if (f) sbuf_char(&s,' ') ;
+	            if (f) sbuf_chr(&s,' ') ;
 	            sbuf_strw(&s,rnp->m2,rnp->len.m2) ;
-	            if (rnp->abv.m2) sbuf_char(&s,'.') ;
+	            if (rnp->abv.m2) sbuf_chr(&s,'.') ;
 	        }
 	        if ((rnp->m3 != nullptr) && (rnp->m3[0] != '\0')) {
-	            if (f) sbuf_char(&s,' ') ;
+	            if (f) sbuf_chr(&s,' ') ;
 	            sbuf_strw(&s,rnp->m3,rnp->len.m3) ;
-	            if (rnp->abv.m3) sbuf_char(&s,'.') ;
+	            if (rnp->abv.m3) sbuf_chr(&s,'.') ;
 	        }
 	        if ((rnp->last != nullptr) && (rnp->last[0] != '\0')) {
-	            if (f) sbuf_char(&s,' ') ;
+	            if (f) sbuf_chr(&s,' ') ;
 	            sbuf_strw(&s,rnp->last,rnp->len.last) ;
-	            if (rnp->abv.last) sbuf_char(&s,'.') ;
+	            if (rnp->abv.last) sbuf_chr(&s,'.') ;
 	        }
 	        len = sbuf_finish(&s) ;
 	        if (rs >= 0) rs = len ;
@@ -512,7 +512,7 @@ int realname_name(realname *rnp,char *rbuf,int rlen) noex {
 	        if ((rnp->first != nullptr) && (rnp->first[0] != '\0')) {
 	            f = true ;
 	            ch = touc(rnp->first[0]) ;
-	            sbuf_char(&s,ch) ;
+	            sbuf_chr(&s,ch) ;
 	            if (rnp->first[1] != '\0') {
 	                sp = (rnp->first + 1) ;
 	                sl = (rnp->len.first - 1) ;
@@ -526,27 +526,27 @@ int realname_name(realname *rnp,char *rbuf,int rlen) noex {
 	                sbuf_strw(&s,sp,sl) ;
 	            } /* end if */
 	            if (rnp->abv.first) {
-	                sbuf_char(&s,'.') ;
+	                sbuf_chr(&s,'.') ;
 		    }
 	        } /* end if (first name) */
 	        if ((rnp->m1 != nullptr) && (rnp->m1[0] != '\0')) {
 	            if (f) {
-	                sbuf_char(&s,' ') ;
+	                sbuf_chr(&s,' ') ;
 		    }
 	            f = true ;
 	            ch = mkchar(rnp->m1[0]) ;
 	            nch = (rnp->m1[1] != '\0') ? touc(ch) : ch ;
-	            sbuf_char(&s,nch) ;
+	            sbuf_chr(&s,nch) ;
 	            if (rnp->abv.m1 || isupperlatin(ch)) {
-	                sbuf_char(&s,'.') ;
+	                sbuf_chr(&s,'.') ;
 		    }
 	        } /* end if (middle name) */
 	        if ((rnp->last != nullptr) && (rnp->last[0] != '\0')) {
 	            if (f) {
-	                sbuf_char(&s,' ') ;
+	                sbuf_chr(&s,' ') ;
 		    }
 	            ch = touc(rnp->last[0]) ;
-	            sbuf_char(&s,ch) ;
+	            sbuf_chr(&s,ch) ;
 	            if (rnp->last[1] != '\0') {
 	                sp = (rnp->last + 1) ;
 	                sl = (rnp->len.last - 1) ;
@@ -560,7 +560,7 @@ int realname_name(realname *rnp,char *rbuf,int rlen) noex {
 	                sbuf_strw(&s,sp,sl) ;
 	            } /* end if */
 	            if (rnp->abv.last) {
-	                sbuf_char(&s,'.') ;
+	                sbuf_chr(&s,'.') ;
 		    }
 	        } /* end if (last name) */
 	        len = sbuf_finish(&s) ;

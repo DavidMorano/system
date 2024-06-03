@@ -456,7 +456,7 @@ const char	*title ;
 	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
 	    int		c ;
 	    const char	*k, *v ;
-	    sbuf_char(&b,CH_LANGLE) ;
+	    sbuf_chr(&b,CH_LANGLE) ;
 	    sbuf_strw(&b,tag,-1) ;
 	    for (c = 0 ; c < 4 ; c += 1) {
 	        switch (c) {
@@ -482,7 +482,7 @@ const char	*title ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end for */
-	    sbuf_char(&b,CH_RANGLE) ;
+	    sbuf_chr(&b,CH_RANGLE) ;
 	    if ((rs = sbuf_getlen(&b)) >= 0) {
 	        rs = shio_print(op->ofp,lbuf,rs) ;
 	        wlen += rs ;
@@ -553,7 +553,7 @@ int		w, h ;
 	    int		c ;
 	    cchar	*k ;
 	    cchar	*v ;
-	    sbuf_char(&b,CH_LANGLE) ;
+	    sbuf_chr(&b,CH_LANGLE) ;
 	    sbuf_strw(&b,tag,-1) ;
 	    for (c = 0 ; c < 5 ; c += 1) {
 	        v = NULL ;
@@ -591,7 +591,7 @@ int		w, h ;
 	        rs = sbuf_printf(&b," height=\"%d\"",h) ;
 	    }
 	    sbuf_strw(&b," /",2) ;
-	    sbuf_char(&b,CH_RANGLE) ;
+	    sbuf_chr(&b,CH_RANGLE) ;
 	    if (rs >= 0) {
 	        if ((rs = sbuf_getlen(&b)) >= 0) {
 	            rs = shio_print(op->ofp,lbuf,rs) ;
@@ -696,7 +696,7 @@ int htm_tagalone(HTM *op,cchar *tag,cchar *class,cchar *id)
 	    int		c ;
 	    cchar	*k ;
 	    cchar	*v ;
-	    sbuf_char(&b,CH_LANGLE) ;
+	    sbuf_chr(&b,CH_LANGLE) ;
 	    sbuf_strw(&b,tag,-1) ;
 	    for (c = 0 ; c < 2 ; c += 1) {
 	        v = NULL ;
@@ -716,7 +716,7 @@ int htm_tagalone(HTM *op,cchar *tag,cchar *class,cchar *id)
 	        if (rs < 0) break ;
 	    } /* end for */
 	    sbuf_strw(&b," /",2) ;
-	    sbuf_char(&b,CH_RANGLE) ;
+	    sbuf_chr(&b,CH_RANGLE) ;
 	    if (rs >= 0) {
 	        if ((rs = sbuf_getlen(&b)) >= 0) {
 	            rs = shio_print(op->ofp,lbuf,rs) ;

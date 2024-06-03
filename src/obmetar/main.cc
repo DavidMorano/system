@@ -626,7 +626,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	                if (cl > 0) {
 
-	                    sbuf_char(&b,' ') ;
+	                    sbuf_chr(&b,' ') ;
 
 	                    sbuf_strw(&b,cp,cl) ;
 

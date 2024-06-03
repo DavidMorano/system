@@ -136,7 +136,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                sl -= 1 ;
 	                if ((sl > 0) && (sp[0] != '\0')) {
 	                    if (c_comment == 0) {
-	                        sbuf_char(&b,*sp++) ;
+	                        sbuf_chr(&b,*sp++) ;
 	                        sl -= 1 ;
 	                    } else {
 	                        sp += 1 ;
@@ -145,7 +145,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                }
 	            } else {
 	                if (c_comment == 0) {
-	                    sbuf_char(&b,*sp++) ;
+	                    sbuf_chr(&b,*sp++) ;
 	                    sl -= 1 ;
 	                } else {
 	                    sp += 1 ;
@@ -165,7 +165,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                c_comment += 1 ;
 	            } else {
 	                if (c_comment == 0) {
-	                    sbuf_char(&b,*sp++) ;
+	                    sbuf_chr(&b,*sp++) ;
 	                    sl -= 1 ;
 	                } else {
 	                    sp += 1 ;
@@ -181,7 +181,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                    c_comment -= 1 ;
 	            } else {
 	                if (c_comment == 0) {
-	                    sbuf_char(&b,*sp++) ;
+	                    sbuf_chr(&b,*sp++) ;
 	                    sl -= 1 ;
 	                } else {
 	                    sp += 1 ;
@@ -199,7 +199,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	        case ' ':
 	        case '\t':
 	            if ((c_comment == 0) && (! f_wslast)) {
-	                sbuf_char(&b,*sp++) ;
+	                sbuf_chr(&b,*sp++) ;
 	                sl -= 1 ;
 	            } else {
 	                sp += 1 ;
@@ -209,7 +209,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	            break ;
 	        default:
 	            if (c_comment == 0) {
-	                sbuf_char(&b,*sp++) ;
+	                sbuf_chr(&b,*sp++) ;
 	                sl -= 1 ;
 	            } else {
 	                sp += 1 ;
