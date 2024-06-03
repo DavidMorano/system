@@ -32,6 +32,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>
+#include	<sys/wait.h>		/* <- type |idtype_t| is there */
+#include	<sys/time.h>		/* <- |TIMESPEC| is there */
+#include	<signal.h>
+#include	<time.h>
+#include	<pthread.h>
+#include	<semaphore.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -47,20 +54,10 @@ EXTERNC_end
 /* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<sys/types.h>
-#include	<sys/wait.h>		/* <- type |idtype_t| is there */
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<signal.h>
-#include	<time.h>
-#include	<pthread.h>
-#include	<semaphore.h>
-
-
 #ifndef	TYPEDEF_CCHAR
 #define	TYPEDEF_CCHAR
 typedef const char	cchar ;
 #endif
-
 
 #ifndef	SIGEVENT
 #define	SIGEVENT	struct sigevent
@@ -88,6 +85,8 @@ typedef const char	cchar ;
 typedef int		idop_t ;
 #endif
 
+#ifndef	STRUCT_PROCSET
+#define	STRUCT_PROCSET
 struct procset {
 	idop_t		p_op ;
 	idtype_t	p_lidtype ;
@@ -95,6 +94,7 @@ struct procset {
 	idtype_t	p_ridtype ;
 	id_t		p_rid ;
 } ;
+#endif /* STRUCT_PROCSET */
 
 #ifndef	TYPEDEF_PROCSET
 #define	TYPEDEF_PROCSET
@@ -162,7 +162,7 @@ EXTERNC_begin
 
 extern errno_t timer_create(clockid_t,SIGEVENT *,timer_t *) noex ;
 extern errno_t timer_delete(timer_t) noex ;
-extern errno_t timer_settime(timer_t,int,ITIMERSPEC *,ITIMERSPEC *) noex ;
+extern errno_t timer_settime(timer_t,int,CITIMERSPEC *,ITIMERSPEC *) noex ;
 extern errno_t timer_gettime(timer_t,ITIMERSPEC *) noex ;
 extern errno_t timer_getoverrun(timer_t) noex ;
 

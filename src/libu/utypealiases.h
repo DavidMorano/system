@@ -69,8 +69,6 @@
 #include	<user_attr.h>
 #endif
 
-#include	<usys.h>		/* <- auxillary OS support */
-
 #include	<stdintx.h>
 #include	<clanguage.h>
 #include	<usysdefs.h>

@@ -73,7 +73,7 @@ extern unixret_t mq_send(mqd_t,cchar *,int,int) noex ;
 extern unixret_t mq_receive(mqd_t,char *,int,uint *) noex ;
 extern unixret_t mq_setattr(mqd_t,const MQATTR *,MQATTR *) noex ;
 extern unixret_t mq_getattr(mqd_t,MQATTR *) noex ;
-extern unixret_t mq_notify(mqd_t,struct sigevent *) noex ;
+extern unixret_t mq_notify(mqd_t,SIGEVENT *) noex ;
 extern unixret_t mq_unlink(cchar *) noex ;
 
 EXTERNC_end

@@ -84,6 +84,8 @@ static int	isleep(int) noex ;
 
 /* local variables */
 
+constexpr int		onethousand = 1000 ;
+
 
 /* exported variables */
 
@@ -96,11 +98,11 @@ mtime_t mtime(void) noex {
 	mtime_t		m = 0 ;
 	if (gettimeofday(&tv,nullptr) >= 0) {
 	    t = tv.tv_sec ;
-	    m += (t*1000) ;
-	    m += (tv.tv_usec / 1000) ;
+	    m += (t * onethousand) ;
+	    m += (tv.tv_usec / onethousand) ;
 	} else {
 	    t = time(nullptr) ;
-	    m += (t*1000) ;
+	    m += (t * onethousand) ;
 	}
 	return m ;
 }

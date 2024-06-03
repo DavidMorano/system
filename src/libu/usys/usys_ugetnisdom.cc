@@ -48,6 +48,7 @@
 #include	"usys_sunos.h"
 #include	"usys_darwin.h"
 #include	"usys_linux.h"
+#include	"usys_xxx.h"
 
 #include	"usys_ugetnisdom.h"
 

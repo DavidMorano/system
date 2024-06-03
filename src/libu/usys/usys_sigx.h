@@ -67,12 +67,31 @@ EXTERNC_end
 /* SIGSENDSET begin */
 #if	(!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0)
 
+#ifndef	TYPEDEF_IDOP
+#define	TYPEDEF_IDOP
+typedef int		idop_t ;
+#endif
+
+#ifndef	STRUCT_PROCSET
+#define	STRUCT_PROCSET
+struct procset {
+	idop_t		p_op ;
+	idtype_t	p_lidtype ;
+	id_t		p_lid ;
+	idtype_t	p_ridtype ;
+	id_t		p_rid ;
+} ;
+#endif /* STRUCT_PROCSET */
+
+#ifndef	TYPEDEF_PROCSET
+#define	TYPEDEF_PROCSET
+typedef struct procset		procset_t ;
+#endif
+
 #ifndef	SUBROUTINE_SIGSENDSET
 #define	SUBROUTINE_SIGSENDSET
 EXTERNC_begin
-
 extern unixret_t sigsendset(procset_t *,int) noex ;
-
 EXTERNC_end
 #endif /* SUBROUTINE_SIGSENDSET */
 
@@ -85,9 +104,7 @@ EXTERNC_end
 #ifndef	SUBROUTINE_PTHREADSIGQUEUE
 #define	SUBROUTINE_PTHREADSIGQUEUE
 EXTERNC_begin
-
 extern errno_t pthread_sigqueue(pthread_t,int,const SIGVAL) noex ;
-
 EXTERNC_end
 #endif /* SUBROUTINE_PTHREADSIGQUEUE */
 

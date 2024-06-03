@@ -32,9 +32,10 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
 #include	<utimeout.h>
 #include	<utypealiases.h>
@@ -44,6 +45,8 @@
 
 
 /* local defines */
+
+#define	ITS	itimerspec
 
 
 /* external subroutines */
@@ -62,8 +65,8 @@ struct uctimer {
 	mem_f		m ;
 	sigevent	*sep ;
 	timer_t		*tmp ;
-	itimerspec	*otvp ;
-	itimerspec	*ntvp ;
+	ITS		*otvp ;
+	const ITS	*ntvp ;
 	clockid_t	cid ;
 	int		tf ;
 	uctimer() noex {} ;
@@ -71,11 +74,11 @@ struct uctimer {
 	    cid = c ;
 	    sep = sp ;
 	} ;
-	uctimer(int f,itimerspec *o,itimerspec *n) noex : tf(f) {
+	uctimer(int f,ITS *o,const ITS *n) noex : tf(f) {
 	    otvp = o ;
 	    ntvp = n ;
 	} ;
-	uctimer(itimerspec *o) noex : otvp(o) { } ;
+	uctimer(ITS *o) noex : otvp(o) { } ;
 	int operator () (timer_t) noex ;
 	int create(timer_t) noex ;
 	int destroy(timer_t) noex ;
@@ -116,7 +119,7 @@ int uc_timerdestroy(timer_t tid) noex {
 }
 /* end subroutine (uc_timerdestroy) */
 
-int uc_timerset(timer_t tid,int tf,itimerspec *ntvp,itimerspec *otvp) noex {
+int uc_timerset(timer_t tid,int tf,const itimerspec *ntvp,itimerspec *otvp) noex {
 	uctimer		uco(tf,otvp,ntvp) ;
 	uco.m = &uctimer::set ;
 	return uco(tid) ;

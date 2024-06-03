@@ -58,7 +58,7 @@ errno_t timer_create(clockid_t,SIGEVENT *,timer_t *tmp) noex {
 errno_t timer_delete(timer_t) noex {
     return ENOSYS ;
 }
-errno_t timer_settime(timer_t,int,ITIMERSPEC *ntvp,ITIMERSPEC *) noex {
+errno_t timer_settime(timer_t,int,CITIMERSPEC *ntvp,ITIMERSPEC *) noex {
 	errno_t		ec = EFAULT ;
 	if (ntvp) {
 	    ec = ENOSYS ;
