@@ -71,7 +71,7 @@
 #include	<sigevent.h>
 #include	<localmisc.h>
 
-#include	"timeout.h"
+#include	"callback.h"
 
 
 /* local defines */
@@ -80,13 +80,13 @@
 #define	CF_CHILDTHRS	0
 #endif
 
-#define	UCTIMEOUT	struct uctim
-#define	UCTIMEOUT_FL	struct uctim_flags
-#define	UCTIMEOUT_SCOPE	PTHREAD_SCOPE_SYSTEM
+#define	UCTIM	struct uctim
+#define	UCTIM_FL	struct uctim_flags
+#define	UCTIM_SCOPE	PTHREAD_SCOPE_SYSTEM
 
-#define	TO_CAPTURE	60		/* capture wait for threads */
-#define	TO_SIGWAIT	2		/* signal-process wait */
-#define	TO_DISPRECV	5		/* dispatch-process wait */
+#define	TO_CAPTURE	60		/* timeout: capture wait for threads */
+#define	TO_SIGWAIT	2		/* timeout: signal-process wait */
+#define	TO_DISPRECV	5		/* timeout: dispatch-process wait */
 
 #define	NDF		"uctim.deb"
 
@@ -104,8 +104,6 @@ typedef vecsorthand	prique ;
 
 
 /* external subroutines */
-
-extern "C" int		uc_timeout(int,TIMEOUT *) noex ;
 
 extern "C" cchar	*strsigabbr(int) ;
 
@@ -132,7 +130,7 @@ namespace {
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
 	timer_t		timerid ;
-	UCTIMEOUT_FL	fl ;
+	UCTIM_FL	fl ;
 	volatile int	waiters ;	/* n-waiters for general capture */
 	aflag		fvoid ;
 	aflag		finit ;
@@ -774,7 +772,7 @@ int uctim::sigerbegin() noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = pta_create(&ta)) >= 0) {
-	    cint	scope = UCTIMEOUT_SCOPE ;
+	    cint	scope = UCTIM_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
 	        tworker		wt = (tworker) uctim_sigerworker ;
@@ -914,7 +912,7 @@ int uctim::dispbegin() noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = pta_create(&ta)) >= 0) {
-	    cint	scope = UCTIMEOUT_SCOPE ;
+	    cint	scope = UCTIM_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
 	        tworker		wt = (tworker) uctim_dispworker ;

@@ -68,17 +68,17 @@
 
 /* exported subroutines */
 
-int sbuf_addquoted(sbuf *sbp,cchar *ap,int al) noex {
+int sbuf_addquoted(sbuf *sbp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (sbp && ap) {
-	    if (al < 0) al = strlen(ap) ;
+	if (sbp && sp) {
+	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        cint	qlen = ((al * 2) + 3) ;
+	        cint	qlen = ((sl * 2) + 3) ;
 	        char	*qbuf = nullptr ;
 	        if ((rs = uc_libmalloc((qlen+1),&qbuf)) >= 0) {
-	            if ((rs = mkquoted(qbuf,qlen,ap,al)) >= 0) {
+	            if ((rs = mkquoted(qbuf,qlen,sp,sl)) >= 0) {
 	                len = rs ;
 	                rs = sbuf_strw(sbp,qbuf,len) ;
 	            }

@@ -95,9 +95,6 @@ using std::max ;			/* subroutine-template */
 
 static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
-
-/* local subroutine-templates */
-
 template<typename T>
 int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
@@ -153,8 +150,6 @@ int sbuf_hexx(sbuf *sbp,T v) noex {
 /* local variables */
 
 constexpr cchar		blanks[] = "        " ;
-
-constexpr int		nblanks = strlen(blanks) ;
 
 
 /* exported variables */
@@ -470,6 +465,7 @@ int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 /* end subroutine (sbuf_chrs) */
 
 int sbuf_blanks(sbuf *sbp,int n) noex {
+	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp) {

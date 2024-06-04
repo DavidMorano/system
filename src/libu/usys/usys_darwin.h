@@ -142,7 +142,6 @@ struct itimerspec {
 	struct timespec	it_interval ;
 	struct timespec	it_value ;
 } ;
-typedef int	timer_t ;
 #endif /* TYPEDEF_ITIMERSPEC */
 
 #ifndef	TYPEDEF_TIMER
@@ -155,7 +154,7 @@ typedef int	timer_t ;
 #endif
 
 #ifndef	TIMER_ABSTIME
-#define	TIMER_ABSTIME	0		/* hack! */
+#define	TIMER_ABSTIME	1		/* hack! */
 #endif
 
 EXTERNC_begin

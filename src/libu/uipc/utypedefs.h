@@ -90,23 +90,43 @@
 /* the following unsigned typedefs are supposedly "System V" compatibility */
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 
-#ifndef	TYPEDEFS_PREDEFINEDUNSIGNED
-#define	TYPEDEFS_PREDEFINEDUNSIGNED
-
 #ifndef	TYPEDEF_USHORT
 #define	TYPEDEF_USHORT
+/* already typedef'ed on Darwin */
 #endif
 
 #ifndef	TYPEDEF_UINT
 #define	TYPEDEF_UINT
+/* already typedef'ed on Darwin */
 #endif
-
-#endif /* TYPEDEFS_PREDEFINEDUNSIGNED */
 
 #endif /* !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE) */
 /* PREDEFINED end */
 
-/* constants */
+/* PREDEFINED start */
+/* determine if some unsigned-related typedefs have already been made */
+/* the following unsigned typedefs are supposedly "System V" compatibility */
+#if !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__)
+
+#ifndef	TYPEDEF_USHORT
+#define	TYPEDEF_USHORT
+/* already typedef'ed on Solaris® */
+#endif
+
+#ifndef	TYPEDEF_UINT
+#define	TYPEDEF_UINT
+/* already typedef'ed on Solaris® */
+#endif
+
+#ifndef	TYPEDEF_ULONG
+#define	TYPEDEF_ULONG
+/* already typedef'ed on Solaris® */
+#endif
+
+#endif /* !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__) */
+/* PREDEFINED end */
+
+/* types */
 
 #ifndef	TYPEDEF_SCHAR
 #define	TYPEDEF_SCHAR

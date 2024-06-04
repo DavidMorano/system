@@ -107,7 +107,7 @@ namespace {
     struct gecoshelp ;
     typedef void (gecoshelp::*gecoshelp_m)() noex ;
     struct gecoshelp {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	gecos		*op ;
 	cchar		*sp ;
 	cchar		*bp{} ;
@@ -146,15 +146,15 @@ static int	gecos_storename(gecos *,sbuf *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr cchar		brkleft[] = {
+constexpr cchar		brkleft[] = {
 	CH_COMMA, CH_LPAREN, '\0'
 } ;
 
-static constexpr cchar		brkright[] = {
+constexpr cchar		brkright[] = {
 	CH_COMMA, CH_RPAREN, '\0'
 } ;
 
-static constexpr gecoshelp_m	gmems[] = {
+constexpr gecoshelp_m	gmems[] = {
 	&gecoshelp::organization,
 	&gecoshelp::realname,
 	&gecoshelp::account,

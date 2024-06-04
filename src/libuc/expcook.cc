@@ -78,7 +78,7 @@ using std::nothrow ;			/* constant */
 static inline int expcook_ctor(EX *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->hlp = new(nothrow) hdbstr) != np) {
@@ -159,7 +159,7 @@ int expcook_finish(EX *op) noex {
 /* end subroutine (expcook_finish) */
 
 int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = expcook_magic(op,kbuf)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
@@ -180,7 +180,7 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,curp)) >= 0) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
 	        hdbstr	*slp = op->hlp ;

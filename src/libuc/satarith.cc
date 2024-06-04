@@ -23,6 +23,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<climits>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<ucvariables.hh>	/* <- for variable |valuelimit| */
 #include	<localmisc.h>
 
@@ -42,6 +45,9 @@
 #ifndef	ULONGLONG_MAX
 #define	ULONGLONG_MAX	valuelimit.ullmax
 #endif
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -94,13 +100,13 @@ longlong lladdsat(longlong v1,longlong v2) noex {
 }
 /* end subroutine (lladdsat) */
 
-uint uaddsat(uint v1,uint v2) noex {
+uint uiaddsat(uint v1,uint v2) noex {
 	const uint	m = (~ INT_MAX) ;
 	uint		vr = (v1+v2) ;
 	if ((v1&m) && (v2&m)) vr = UINT_MAX ;
 	return vr ;
 }
-/* end subroutine (uaddsat) */
+/* end subroutine (uiaddsat) */
 
 ulong uladdsat(ulong v1,ulong v2) noex {
 	const ulong	m = (~ LONG_MAX) ;
@@ -116,6 +122,6 @@ ulonglong ulladdsat(ulonglong v1,ulonglong v2) noex {
 	if ((v1&m) && (v2&m)) vr = ULONGLONG_MAX ;
 	return vr ;
 }
-/* end subroutine (uladdsat) */
+/* end subroutine (ulladdsat) */
 
 

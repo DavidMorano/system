@@ -135,6 +135,30 @@ enum signalmissings {
 
 /* various limits (that might be missing) */
 
+#ifndef	SHORT_MIN
+#ifdef	SHRT_MIN
+#define	SHORT_MIN	SHRT_MIN
+#else
+#define	SHORT_MIN	(-32768)	/* min value of a "short int" */
+#endif
+#endif
+
+#ifndef	SHORT_MAX
+#ifdef	SHRT_MAX
+#define	SHORT_MAX	SHRT_MAX
+#else
+#define	SHORT_MAX	32767		/* max value of a "short int" */
+#endif
+#endif
+
+#ifndef	USHORT_MAX
+#ifdef	USHRT_MAX
+#define	USHORT_MAX	USHRT_MAX
+#else
+#define	USHORT_MAX	65535		/* max value of "unsigned short int" */
+#endif
+#endif
+
 #ifndef	SIZE_MAX
 #define	SIZE_MAX	ULONG_MAX
 #endif
