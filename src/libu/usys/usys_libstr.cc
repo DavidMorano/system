@@ -1,4 +1,4 @@
-/* usys_libstr HEADER */
+/* usys_libstr SUPPORT */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -22,10 +22,6 @@
 	the Apple Darwin operating system.
 
 *******************************************************************************/
-
-#ifndef	USYSLIBSTR_INCLUDE
-#define	USYSLIBSTR_INCLUDE
-
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
@@ -69,7 +65,7 @@ size_t strlcpy(char *dst,cchar *src,size_t msz) noex {
 	if (dst && src) {
 	    if (msz) {
 	        for (rsz = 0 ; (rsz < (msz - 1)) && *src ; msz += 1) {
-	            dst[i] = *src++ ;
+	            dst[rsz] = *src++ ;
 	        }
 	    }
 	    dst[rsz] = '\0' ;
@@ -83,8 +79,5 @@ size_t strlcpy(char *dst,cchar *src,size_t msz) noex {
 
 #endif /* (!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0) */
 /* STRLCPY end */
-
-
-#endif /* USYSLIBSTR_INCLUDE */
 
 

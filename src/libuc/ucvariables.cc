@@ -29,9 +29,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 
 #include	"ucvariables.hh"
 
@@ -57,14 +58,14 @@
 /* local variables */
 
 
-/* exported subroutines */
-
-
-/* exported (global) variables */
+/* exported variables */
 
 constinit const varnames	varname ;
 constinit const syswords	sysword ;
 constinit const valuelims	valuelimit ;
 constinit const digbufsizes	digbufsize ;
+
+
+/* exported subroutines */
 
 

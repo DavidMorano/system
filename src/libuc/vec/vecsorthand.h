@@ -12,10 +12,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
 
 
 #define	VECSORTHAND		struct vecsorthand_head
@@ -31,14 +31,14 @@ EXTERNC_end
 #endif /* TYPEDEF_VECENTCMP */
 
 struct vecsorthand_head {
-	vecentcmp_f	cmpfunc ;
+	vecentcmp_f	vcf ;
 	void		**va ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		e ;		/* extent of array */
 } ;
 
-typedef struct vecsorthand_head	vecsorthand ;
+typedef VECSORTHAND	vecsorthand ;
 
 EXTERNC_begin
 

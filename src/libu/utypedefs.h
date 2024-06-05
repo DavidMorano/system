@@ -88,6 +88,7 @@
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
 /* the following unsigned typedefs are supposedly "System V" compatibility */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 
 #ifndef	TYPEDEF_USHORT
@@ -101,11 +102,13 @@
 #endif
 
 #endif /* !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE) */
+#endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* PREDEFINED end */
 
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
 /* the following unsigned typedefs are supposedly "System V" compatibility */
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 #if !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__)
 
 #ifndef	TYPEDEF_USHORT
@@ -124,6 +127,7 @@
 #endif
 
 #endif /* !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__) */
+#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* PREDEFINED end */
 
 /* types */

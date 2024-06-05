@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* digit buffer sizes */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,9 +21,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 
 #include	"digbufsizes.hh"
 

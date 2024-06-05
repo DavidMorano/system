@@ -1158,6 +1158,7 @@ base64.o:		base64.cc base64.h
 ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
+callback.o:		callback.cc callback.h
 #
 isproc.o:		isproc.cc isproc.h
 #

@@ -30,14 +30,14 @@
 	This module creates virtual time-of-day timers for callers.
 
 	Synopsis:
-	int uc_timcreate(callback *cb) noex
+	int uc_timcreate(callback *cbp) noex
 	int uc_timdestroy(int id) noex
 	int uc_timset(int id,int,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex
 	int uc_timget(int id,ITIMERVAL *otvp) noex
 	int uc_timover(int id) noex
 
 	Arguments:
-	cb		callback object
+	cbp		callback object pointer
 	id		timer identification
 	ntvp		new timer-value-pointer
 	otvp		old timer-value-pointer
@@ -105,12 +105,21 @@ typedef vecsorthand	prique ;
 
 /* external subroutines */
 
-extern "C" cchar	*strsigabbr(int) ;
+
+/* external variables */
 
 
 /* local structures */
 
 namespace {
+    struct uctimarg {
+	callback	*cbp ;
+	CITIMERVAL	*ntcp ;
+	ITIMERVAL	*otcp ;
+	uctimarg(callback *c) noex : cbp(c) { } ;
+	uctimarg(ITIMERVAL *o,CITIMERVAL *n) noex : ntvp(n), otvp(o) { } ;
+	int operator (cmdsubs,int) noex ;
+    } ;
     struct uctim_flags {
 	uint		timer:1 ;	/* UNIX®-RT timer created */
 	uint		workready:1 ;
@@ -126,10 +135,8 @@ namespace {
 	ciq		pass ;
 	vecsorthand	*pqp ;
 	sigset_t	savemask ;
-	pid_t		pid ;
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
-	timer_t		timerid ;
 	UCTIM_FL	fl ;
 	volatile int	waiters ;	/* n-waiters for general capture */
 	aflag		fvoid ;
@@ -144,12 +151,13 @@ namespace {
 	aflag		fexitdisp ;	/* thread is exiting */
 	int init() noex ;
 	int fini() noex ;
-	int cmdset(TIMEOUT *) noex ;
-	int cmdcancel(TIMEOUT *) noex ;
-	int cmdtimeout(int,TIMEOUT *) noex ;
+	int cmdcreate(uctimarg *) noex ;
+	int cmddestroy(uctimarg *) noex ;
+	int cmdset(uctimarg *) noex ;
+	int cmdget(uctimarg *) noex ;
 	int capbegin(int = -1) noex ;
 	int capend() noex ;
-	int enterpri(TIMEOUT *) noex ;
+	int enterpri(callback *) noex ;
 	int timerset(time_t) noex ;
 	int workready() noex ;
 	int workbegin() noex ;
@@ -176,7 +184,7 @@ namespace {
 	int dispworker() noex ;
 	int disprecv() noex ;
 	int disphandle() noex ;
-	int dispjobdel(TIMEOUT *) noex ;
+	int dispjobdel(callback *) noex ;
 	~uctim() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
@@ -191,6 +199,14 @@ enum dispcmds {
 	dispcmd_timeout,
 	dispcmd_handle,
 	dispcmd_overlast
+} ;
+
+enum cmdsubs {
+	cmdsub_create,
+	cmdsub_destroy,
+	cmdsub_set,
+	cmdsub_get,
+	cmdsub_overlast
 } ;
 
 
@@ -231,31 +247,55 @@ constexpr bool		f_childthrs = CF_CHILDTHRS ;
 
 /* exported subroutines */
 
-int uc_timeout(int cmd,TIMEOUT *valp) noex {
-	return uctim_data.cmdtimeout(cmd,valp) ;
+int uc_timcreate(callback *cbp) noex {
+	uctimarg	ao(cbp) ;
+	return ao(cmdsub_create,0) ;
+}
+
+int uc_timdestroy(int id) noex {
+	uctimarg	ao ;
+	return ao(cmdsub_destroy,id) ;
+}
+
+int uc_timset(int id,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex {
+	uctimarg	ao(otvp,ntvp) ;
+	return ao(cmdsub_set,id) ;
+}
+
+int uc_timget(int id,ITIMERVAL *otvp) noex {
+	uctimarg	ao(otvp) ;
+	return ao(cmdsub_get,id) ;
 }
 
 
 /* local subroutines */
 
-int uctim::cmdtimeout(int cmd,TIMEOUT *valp) noex {
+int uctim::cmdsub(cmdsubs cmd,uctimarg *uap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		id = 0 ;
-	if (valp) {
+	if (uap) {
 	    rs = SR_INVALID ;
 	    if (cmd >= 0) {
 	        if ((rs = init()) >= 0) {
 	            if ((rs = capbegin()) >= 0) {
 	                if ((rs = workready()) >= 0) {
 	                    switch (cmd) {
-	                    case timeoutcmd_set:
-	                        rs = cmdset(valp) ;
+	                    case cmdsub_create:
+	                        rs = cmdcreate(uap) ;
 	                        id = rs ;
 	                        break ;
-	                    case timeoutcmd_cancel:
-	                        rs = cmdcancel(valp) ;
-	                        id = rs ;
+	                    case cmdsub_destroy:
+	                        rs = cmddestroy(uap) ;
+				id = rs ;
+	                        break ;
+	                    case cmdsub_set:
+	                        rs = cmdset(uap) ;
+				id = rs ;
+	                        break ;
+	                    case cmdsub_get:
+	                        rs = cmdget(uap) ;
+				id = rs ;
 	                        break ;
 	                    default:
 	                        rs = SR_INVALID ;
@@ -287,7 +327,6 @@ int uctim::init() noex {
 	                if ((rs = uc_atfork(b,ap,ac)) >= 0) {
 	                    if ((rs = uc_atexit(uctim_exit)) >= 0) {
 	                        finitdone = true ;
-	                        pid = getpid() ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
@@ -354,12 +393,12 @@ int uctim::fini() noex {
 }
 /* end subroutine (uctim::fini) */
 
-int uctim::cmdset(TIMEOUT *valp) noex {
+int uctim::cmdset(callback *valp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
-	    TIMEOUT	*ep ;
-	    cint	esize = sizeof(TIMEOUT) ;
+	    callback	*ep ;
+	    cint	esize = sizeof(callback) ;
 	    if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
 	            vechand	*elp = &ents ;
@@ -386,7 +425,7 @@ int uctim::cmdset(TIMEOUT *valp) noex {
 }
 /* end subroutine (uctim::cmdset) */
 
-int uctim::cmdcancel(TIMEOUT *valp) noex {
+int uctim::cmdcancel(callback *valp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
@@ -394,7 +433,7 @@ int uctim::cmdcancel(TIMEOUT *valp) noex {
 	    cint	id = valp->id ;
 	    void	*vp ;
 	    if ((rs = vechand_get(elp,id,&vp)) >= 0) {
-	        TIMEOUT	*ep = (TIMEOUT *) vp ;
+	        callback	*ep = (callback *) vp ;
 	        cint	ei = rs ;
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
 	            cint	nrs = SR_NOTFOUND ;
@@ -421,11 +460,11 @@ int uctim::cmdcancel(TIMEOUT *valp) noex {
 }
 /* end subroutine (uctim_cmdcancel) */
 
-int uctim::enterpri(TIMEOUT *ep) noex {
+int uctim::enterpri(callback *ep) noex {
 	int		rs ;
 	int		pi = 0 ;
 	if ((rs = vecsorthand_count(pqp)) > 0) {
-	    TIMEOUT	*tep ;
+	    callback	*tep ;
 	    if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	        if (ep->val < tep->val) {
 	            if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
@@ -515,7 +554,7 @@ int uctim::workready() noex {
 int uctim::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
-	    static int	vo = voents ;
+	    static cint		vo = voents ;
 	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
@@ -673,7 +712,7 @@ int uctim::pridump() noex {
 int uctim::sigbegin() noex {
 	sigset_t	ss, oss ;
 	cint		scmd = SIG_BLOCK ;
-	cint		sig = SIGTIMEOUT ;
+	cint		sig = SIGcallback ;
 	int		rs ;
 	uc_sigsetempty(&ss) ;
 	uc_sigsetadd(&ss,sig) ;
@@ -691,7 +730,7 @@ int uctim::sigend() noex {
 	if (! fl.wasblocked) {
 	    sigset_t	ss ;
 	    cint	scmd = SIG_UNBLOCK ;
-	    cint	sig = SIGTIMEOUT ;
+	    cint	sig = SIGcallback ;
 	    uc_sigsetempty(&ss) ;
 	    uc_sigsetadd(&ss,sig) ;
 	    rs = u_sigmask(scmd,&ss,nullptr) ;
@@ -703,7 +742,7 @@ int uctim::sigend() noex {
 int uctim::timerbegin() noex {
 	SIGEVENT	se ;
 	cint		st = SIGEV_SIGNAL ;
-	cint		sig = SIGTIMEOUT ;
+	cint		sig = SIGcallback ;
 	cint		val = 0 ; /* we do not (really) care about this */
 	int		rs ;
 	if ((rs = sigevent_load(&se,st,sig,val)) >= 0) {
@@ -793,7 +832,7 @@ int uctim::sigerend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_siger) {
 	    pthread_t	tid = tid_siger ;
-	    cint	sig = SIGTIMEOUT ;
+	    cint	sig = SIGcallback ;
 	    if ((rs = uptkill(tid,sig)) >= 0) {
 	        int	trs ;
 	        fl.running_siger = false ;
@@ -829,7 +868,7 @@ int uctim::sigerwait() noex {
 	TIMESPEC	ts ;
 	sigset_t	ss ;
 	siginfo_t	si ;
-	cint		sig = SIGTIMEOUT ;
+	cint		sig = SIGcallback ;
 	cint		to = TO_SIGWAIT ;
 	int		rs ;
 	int		cmd = 0 ;
@@ -875,7 +914,7 @@ int uctim::sigerserve() noex {
 	if ((rs = capbegin(to)) >= 0) {
 	    const time_t	dt = time(nullptr) ;
 	    while ((rs = vecsorthand_count(pqp)) > 0) {
-	        TIMEOUT		*tep ;
+	        callback		*tep ;
 	        if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
@@ -994,7 +1033,7 @@ int uctim::disprecv() noex {
 /* end subroutine (uctim::disprecv) */
 
 int uctim::disphandle() noex {
-	TIMEOUT		*tep ;
+	callback		*tep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	while ((rs1 = ciq_rem(&pass,&tep)) >= 0) {
@@ -1010,7 +1049,7 @@ int uctim::disphandle() noex {
 }
 /* end subroutine (uctim::disphandle) */
 
-int uctim::dispjobdel(TIMEOUT *tep) noex {
+int uctim::dispjobdel(callback *tep) noex {
         cint       	to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
@@ -1048,7 +1087,6 @@ static void uctim_atforkparent() noex {
 
 static void uctim_atforkchild() noex {
         uctim       *uip = &uctim_data ;
-        uip->pid = getpid() ;
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
             uip->fl.running_disper = false ;
@@ -1072,16 +1110,16 @@ static void uctim_exit() noex {
 /* end subroutine (uctim_atforkparent) */
 
 static int ourcmp(cvoid *a1p,cvoid *a2p) noex {
-	TIMEOUT		**e1pp = (TIMEOUT **) a1p ;
-	TIMEOUT		**e2pp = (TIMEOUT **) a2p ;
+	callback		**e1pp = (callback **) a1p ;
+	callback		**e2pp = (callback **) a2p ;
 	int		rc = 0 ;
 	if (*e1pp || *e2pp) {
 	    rc = 1 ;
 	    if (*e1pp) {
 		rc = -1 ;
 	        if (*e2pp) {
-	            TIMEOUT	*i1p = (TIMEOUT *) *e1pp ;
-	            TIMEOUT	*i2p = (TIMEOUT *) *e2pp ;
+	            callback	*i1p = (callback *) *e1pp ;
+	            callback	*i2p = (callback *) *e2pp ;
 	            rc = (i1p->val - i2p->val) ;
 	        }
 	    }

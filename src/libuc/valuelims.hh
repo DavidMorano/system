@@ -26,31 +26,32 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |CHAR_BIT| + others */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 
 struct valuelims {
-	short		smin = short(0x8000) ;
-	short		smax = short(0x7FFF) ;
-	int		imin = INT_MIN ;
-	int		imax = INT_MAX ;
-	long		lmin = LONG_MIN ;
-	long		lmax = LONG_MAX ;
+	cshort		smin = short(0x8000) ;
+	cshort		smax = short(0x7FFF) ;
+	cint		imin = INT_MIN ;
+	cint		imax = INT_MAX ;
+	clong		lmin = LONG_MIN ;
+	clong		lmax = LONG_MAX ;
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
-	ushort		usmax = ushort(0xFFFF) ;
-	uint		uimax = UINT_MAX ;
-	ulong		ulmax = ULONG_MAX ;
+	cushort		usmax = ushort(0xFFFF) ;
+	cuint		uimax = UINT_MAX ;
+	culong		ulmax = ULONG_MAX ;
 	ulonglong	ullmax = 0 ;
 	constexpr void mklonglong () noex {
-	    const longlong	one = 1 ;
-	    cint	n = int(8*sizeof(longlong)) ;
+	    clonglong	one = 1 ;
+	    cint	n = int(CHAR_BIT * sizeof(longlong)) ;
 	    ullmax = ~ullmax ;
-	    llmin = (one << (n-1)) ;
+	    llmin = (one << (n - 1)) ;
 	    llmax = longlong(ullmax >> 1) ;
 	} ;
 	constexpr valuelims() noex {

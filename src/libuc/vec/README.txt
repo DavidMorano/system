@@ -5,7 +5,7 @@ to the object file (with same base-name as the directory name)
 'vec.o'.
 
 Some of these objects are used at a very (quite low) level in the
-build hierarchy (before higher level functions are available). So
+build hierarchy (before higher level functions are available).  So
 for this reason, some of these objects try to only use some of the
 lowest level of function facilities available in order to not create
 function-data dependency loops.

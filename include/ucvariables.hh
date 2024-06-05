@@ -16,8 +16,8 @@
 
 /*******************************************************************************
 
-	This object contains various commonly used environment variable
-	names.
+	This object contains various commonly used environment
+	variable names.
 
 *******************************************************************************/
 
@@ -27,9 +27,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 
 #include	<syswords.hh>
 #include	<varnames.hh>

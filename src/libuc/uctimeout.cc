@@ -104,7 +104,8 @@ typedef vecsorthand	prique ;
 
 extern "C" int		uc_timeout(int,TIMEOUT *) noex ;
 
-extern "C" cchar	*strsigabbr(int) ;
+
+/* external variables */
 
 
 /* local structures */

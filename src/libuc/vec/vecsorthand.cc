@@ -23,9 +23,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -37,17 +38,46 @@
 #define	VECSORTHAND_DEFENTS	10
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static int	vecsorthand_ctor(vecsorthand *) noex ;
+template<typename ... Args>
+static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	    op->va = nullptr ;
+	    op->c = 0 ;
+	    op->i = 0 ;
+	    op->e = 0 ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (vecsorthand_ctor) */
+
 static int	vecsorthand_extend(vecsorthand *) noex ;
 
-extern "C" {
-    static int	defcmpfunc(cvoid *,cvoid *) noex ;
-}
+
+/* local variables */
 
 
 /* exported variables */
@@ -55,19 +85,19 @@ extern "C" {
 
 /* exported subroutines */
 
-int vecsorthand_start(vecsorthand *op,int n,vecentcmp_f cmpfunc) noex {
+int vecsorthand_start(vecsorthand *op,int vn,vecentcmp_f cmpfunc) noex {
 	int		rs = SR_FAULT ;
-	if (n <= 1) n = VECSORTHAND_DEFENTS ;
-	if ((rs = vecsorthand_ctor(op)) >= 0) {
-	    int		size = 0 ;
+	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
+	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
+	    int		sz = 0 ;
 	    void	*vp{} ;
-	    size += (sizeof(void **) * (n+1)) ;
-	    if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+	    sz += (sizeof(void **) * (vn + 1)) ;
+	    if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 	        op->va = (void **) vp ;
-	        op->e = n ;
+	        op->e = vn ;
 	        {
 	            op->va[0] = nullptr ;
-	            op->cmpfunc = (cmpfunc) ? cmpfunc : defcmpfunc ;
+	            op->vcf = cmpfunc ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
@@ -85,6 +115,7 @@ int vecsorthand_finish(vecsorthand *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    }
+	    op->c = 0 ;
 	    op->i = 0 ;
 	    op->e = 0 ;
 	} /* end if (non-null) */
@@ -102,10 +133,10 @@ int vecsorthand_add(vecsorthand *op,cvoid *buf) noex {
 	            int		bot, top ;
 	            op->c += 1 ;		/* increment list count */
 	            bot = 0 ;
-	            top = MAX((op->i - 1),0) ;
+	            top = max((op->i - 1),0) ;
 	            i = (bot + top) / 2 ;
 	            while ((top - bot) > 0) {
-	                if ((rs = (*op->cmpfunc)(&buf,(op->va+i))) < 0) {
+	                if ((rs = (*op->vcf)(&buf,(op->va+i))) < 0) {
 	                    top = i - 1 ;
 	                } else if (rs > 0) {
 	                    bot = i + 1 ;
@@ -115,7 +146,7 @@ int vecsorthand_add(vecsorthand *op,cvoid *buf) noex {
 	                i = (bot + top) / 2 ;
 	            } /* end while */
 	            if (i < op->i) {
-	                if ((*op->cmpfunc)(&buf,&op->va[i]) > 0) {
+	                if ((*op->vcf)(&buf,&op->va[i]) > 0) {
 	                    i += 1 ;
 	                }
 	                for (int j = (op->i - 1) ; j >= i ; j -= 1) {
@@ -215,7 +246,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	if (op && ep) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-		vecentcmp_f	cf = op->cmpfunc ;
+		vecentcmp_f	cf = op->vcf ;
 		void		**spp ;
 		rs = SR_NOTFOUND ;
 		spp = (void **) bsearch(&ep,op->va,op->i,esize,cf) ;
@@ -236,37 +267,24 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 
 /* private subroutines */
 
-static int vecsorthand_ctor(vecsorthand *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
-	    op->va = nullptr ;
-	    op->c = 0 ;
-	    op->i = 0 ;
-	    op->e = 0 ;
-	}
-	return rs ;
-}
-/* end subroutine (vecsorthand_ctor) */
-
 static int vecsorthand_extend(vecsorthand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->e) {
 	    cint	ndef = VECSORTHAND_DEFENTS ;
-	    int		size ;
+	    int		sz ;
 	    int		ne ;
-	    void	**np{} ;
+	    void	**nva{} ;
 	    if (op->e == 0) {
 	        ne = ndef ;
-	        size = (ndef*sizeof(void **)) ;
-	        rs = uc_libmalloc(size,&np) ;
+	        sz = (ndef*sizeof(void **)) ;
+	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        cint	ne = (op->e * 2) ;
-	        size = (ne*sizeof(void **)) ;
-	        rs = uc_librealloc(op->va,size,&np) ;
+	        sz = (ne*sizeof(void **)) ;
+	        rs = uc_librealloc(op->va,sz,&nva) ;
 	    }
 	    if (rs >= 0) {
-	        op->va = np ;
+	        op->va = nva ;
 	        op->e = ne ;
 		op->va[op->i] = nullptr ;
 	    }
@@ -274,12 +292,5 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	return rs ;
 }
 /* end subroutine (vecsorthand_extend) */
-
-static int defcmpfunc(cvoid *app,cvoid *bpp) noex {
-	cchar	**e1pp = (cchar **) app ;
-	cchar	**e2pp = (cchar **) bpp ;
-	return strcmp(*e1pp,*e2pp) ;
-}
-/* end subroutine (defcmpfunc) */
 
 
