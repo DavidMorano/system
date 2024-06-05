@@ -38,6 +38,16 @@
 #define	RECARR_OSORTED		(1 << 5)	/* keep sorted */
 #define	RECARR_OORDERED		(1 << 6)	/* keep ordered */
 
+enum recarr_os {
+    recarr_odefault 	= RECARR_ODEFAULT,
+    recarr_oreuse 	= RECARR_ODEFAULT,
+    recarr_ocompact	= RECARR_OCOMPACT,
+    recarr_oswap	= RECARR_OSWAP,
+    recarr_ostationary	= RECARR_OSTATIONARY,
+    recarr_oconserve	= RECARR_OCONSERVE,
+    recarr_osorted	= RECARR_OSORTED,
+    recarr_oordered	= RECARR_OORDERED
+} ;
 
 struct recarr_flags {
 	uint		issorted:1 ;
@@ -60,6 +70,7 @@ struct recarr_head {
 } ;
 
 typedef	RECARR		recarr ;
+typedef	RECARR_FL	recarr_fl ;
 
 EXTERNC_begin
 

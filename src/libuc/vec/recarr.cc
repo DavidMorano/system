@@ -26,9 +26,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>
+#include	<algorithm>		/* |sort(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -110,9 +110,9 @@ consteval int mkoptmask() noex {
 
 /* local variables */
 
-constexpr bool		f_qsort = CF_QSORT ;
-
 constexpr int		optmask = mkoptmask() ;
+
+constexpr bool		f_qsort = CF_QSORT ;
 
 
 /* exported variables */
@@ -491,19 +491,19 @@ static int recarr_extend(recarr *op,int n) noex {
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
 	    int		sz ;
-	    void	*ap{} ;
+	    void	*nva{} ;
 	    if (op->va == nullptr) {
 	        nn = (n) ? n : RECARR_DEFENTS ;
 	        sz = (nn + 1) * sizeof(void **) ;
-	        rs = uc_libmalloc(sz,&ap) ;
+	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * sizeof(void **) ;
-	        rs = uc_librealloc(op->va,sz,&ap) ;
+	        rs = uc_librealloc(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
-	        op->va = (void **) ap ;
+	        op->va = (void **) nva ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
 	    }

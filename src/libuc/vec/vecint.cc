@@ -28,7 +28,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -39,6 +39,11 @@
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -528,19 +533,20 @@ static int vecint_extend(vecint *op,int amount) noex {
 	int		rs = SR_OK ;
 	if (amount > 0) {
 	    cint		esize = sizeof(VECINT_TYPE) ;
-	    int			nn, size ;
-	    VECINT_TYPE		*va{} ;
+	    int			nn ;
+	    int			sz ;
+	    VECINT_TYPE		*nva{} ;
 	    if (op->va == nullptr) {
-	        nn = MAX(amount,VECINT_DEFENTS) ;
-	        size = ((nn + 1) * esize) ;
-	        rs = uc_malloc(size,&va) ;
+	        nn = max(amount,VECINT_DEFENTS) ;
+	        sz = ((nn + 1) * esize) ;
+	        rs = uc_malloc(sz,&nva) ;
 	    } else {
-	        nn = MAX((op->n+amount),(op->n*2)) ;
-	        size = ((nn + 1) * esize) ;
-	        rs = uc_realloc(op->va,size,&va) ;
+	        nn = max((op->n + amount),(op->n * 2)) ;
+	        sz = ((nn + 1) * esize) ;
+	        rs = uc_realloc(op->va,sz,&nva) ;
 	    } /* end if */
 	    if (rs >= 0) {
-	        op->va = va ;
+	        op->va = nva ;
 	        op->n = nn ;
 		op->va[op->i] = INT_MIN ;
 	    }
@@ -551,18 +557,18 @@ static int vecint_extend(vecint *op,int amount) noex {
 
 static int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 	if (ii < op->i) {
-	    int		i, j ;
-/* find */
+	    int		i ;
+	    /* find */
 	    for (i = (ii + 1) ; i < op->i ; i += 1) {
 		if (op->va[i] == INT_MIN) break ;
 	    }
-/* management */
+	    /* management */
 	    if (i == op->i) {
 	        op->i += 1 ;
 	        op->va[op->i] = INT_MIN ;
 	    }
-/* move-up */
-	    for (j = i ; j > ii ; j -= 1) {
+	    /* move-up */
+	    for (int j = i ; j > ii ; j -= 1) {
 		op->va[j] = op->va[j-1] ;
 	    }
 	} else if (ii == op->i) {
