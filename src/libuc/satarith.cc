@@ -26,7 +26,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<ucvariables.hh>	/* <- for variable |valuelimit| */
+#include	<usysdefs.h>
+#include	<uvariables.hh>		/* <- for variable |valuelimit| */
 #include	<localmisc.h>
 
 #include	"satarith.h"

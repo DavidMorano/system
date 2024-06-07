@@ -199,7 +199,7 @@ OBJ126= passwdent.o shadowent.o groupent.o projectent.o userattrent.o
 OBJ127= utmpaccent.o
 
 OBJ128= sigaction.o sigevent.o 
-OBJ129= timeval.o itimerspec.o timespec.o timeout.o
+OBJ129= timeout.o
 OBJ130= sigignores.o sigdefaults.o
 OBJ131= isfiledesc.o isinetaddr.o isindomain.o
 OBJ132=
@@ -325,7 +325,7 @@ OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
 UOBJ00= matxstr.o toxc.o char.o 
 UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o sif.o
 UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
-UOBJ03= varnames.o syswords.o stdfnames.o
+UOBJ03= syswords.o stdfnames.o
 
 UOBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 UOBJ05= nleadstr.o nleadkeystr.o
@@ -467,7 +467,7 @@ control:
 
 
 # base
-OBJ0_BASE= varnames.o syswords.o valuelims.o digbufsizes.o ucvariables.o
+OBJ0_BASE= uctimeout.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE= bufsizedata.o getbufsizenames.o
 OBJ3_BASE= getbufsize.o bufsizevar.o 
@@ -703,15 +703,10 @@ strmgr.o:		strmgr.cc strmgr.h
 serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
-
 getbufsize.o:		getbufsize.cc getbufsize.h getbufsizenames.h usysdefs.h
 getbufsize.o:		getbufsizenames.h usysdefs.h bufsizedata.hh
 
 getbufsizenames.o:	getbufsizenames.c getbufsizenames.h
-varnames.o:		varnames.cc varnames.hh
-syswords.o:		syswords.cc syswords.hh
-valuelims.o:		valuelims.cc valuelims.hh
-digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
@@ -719,9 +714,6 @@ mapex.o:		mapex.cc mapex.h
 
 sigevent.o:		sigevent.cc sigevent.h
 
-timeval.o:		timeval.cc timeval.h
-timespec.o:		timespec.cc timespec.h
-itimerspec.o:		itimerspec.cc itimerspec.h
 timeout.o:		timeout.cc timeout.h
 
 upt.o:			upt.cc upt.h

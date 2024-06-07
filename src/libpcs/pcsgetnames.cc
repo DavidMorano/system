@@ -73,7 +73,7 @@
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<bfile.h>

@@ -33,7 +33,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>		/* for |getenv(3c)| */
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
 #include	<getbufsize.h>

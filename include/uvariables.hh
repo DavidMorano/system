@@ -1,4 +1,4 @@
-/* ucvariables HEADER */
+/* uvariables HEADER */
 /* lang=C++20 */
 
 /* this is a database of commonly used global variables */
@@ -21,8 +21,8 @@
 
 *******************************************************************************/
 
-#ifndef	UCVARIABLES_INCLUDE
-#define	UCVARIABLES_INCLUDE
+#ifndef	UVARIABLES_INCLUDE
+#define	UVARIABLES_INCLUDE
 #ifdef	__cplusplus /* everything is C++ only */
 
 
@@ -45,6 +45,6 @@ extern const digbufsizes	digbufsize ;
 
 
 #endif	/* __cplusplus */
-#endif /* UCVARIABLES_INCLUDE */
+#endif /* UVARIABLES_INCLUDE */
 
 

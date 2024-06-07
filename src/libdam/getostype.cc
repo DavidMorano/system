@@ -40,7 +40,7 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<mallocxx.h>
 #include	<getsysname.h>
 #include	<sfx.h>

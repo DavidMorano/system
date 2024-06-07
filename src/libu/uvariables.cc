@@ -1,4 +1,4 @@
-/* ucvariables SUPPORT */
+/* uvariables SUPPORT */
 /* lang=C++20 */
 
 /* define various system (global) variables */
@@ -34,7 +34,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	"ucvariables.hh"
+#include	"uvariables.hh"
 
 
 /* local defines */

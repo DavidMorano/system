@@ -38,7 +38,7 @@
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<localmisc.h>
 
 #include	"getdig.h"

@@ -75,7 +75,7 @@
 #include	<cstdlib>		/* UNIX® system subroutines */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>
@@ -161,7 +161,7 @@ static void	addtime(ulong *,TIMEVAL *tvp) noex ;
 static int	rdulong(cchar *,int,ulong *) noex ;
 static int	wrulong(char *,int,ulong) noex ;
 
-static int mkprocrand() noex ;
+static int	mkprocrand() noex ;
 
 
 /* local variables */
@@ -169,7 +169,7 @@ static int mkprocrand() noex ;
 constexpr int	digsize = sizeof(RANDOMVAR_DIGIT) ;
 constexpr int	slen = RANDOMVAR_STATELEN ;
 
-static constexpr ulong	randtbl[] = {
+constexpr ulong	randtbl[] = {
 	0x991539b116a5bce3UL, 0x6774a4cd3e01511eUL, 
 	0x4e508aaa61048c05UL, 0xf5500617846b7115UL, 
 	0x6a19892c896a97afUL, 0xdb48f93614898454UL,
@@ -274,7 +274,7 @@ int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 	    if (bl >= slen) {
 		rs = SR_OK ;
 	        for (int i = 0 ; i < slen ; i += 1) {
-	            ulong	ulw = op->state[i]  ;
+	            const ulong		ulw = op->state[i]  ;
 	            if (int r ; (r = wrulong(bp,bl,ulw)) > 0) {
 		        bp += r ;
 		        bl -= r ;
@@ -296,7 +296,7 @@ int randomvar_addnoise(randomvar *op,cvoid *noise,int sl) noex {
 	    for (int i = 0 ; i < nmax ; i += 1) {
 	        ulong	ulw{} ;
 	        if (int r ; (r = rdulong(sp,sl,&ulw)) > 0) {
-	            int		ii = MOD(i) ;
+	            cint	ii = MOD(i) ;
 	            op->state[ii] ^= ulw ;
 		    sp += r ;
 		    sl -= r ;
@@ -326,9 +326,8 @@ int randomvar_setpoly(randomvar *op,int a,int b) noex {
 /* end subroutine (randomvar_setpoly) */
 
 int randomvar_getlong(randomvar *op,long *rp) noex {
-	ulong		res ;
 	int		rs ;
-	if ((rs = randomvar_getulong(op,&res)) >= 0) {
+	if (ulong res ; (rs = randomvar_getulong(op,&res)) >= 0) {
 	    if (rp) *rp = long(res >> 1) ;
 	} /* end if (randomvar_getulong) */
 	return rs ;
@@ -387,11 +386,10 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
 	        cint	wl = sizeof(ulong) ;
-	        ulong	rv ;
 	        char	*rp = charp(rbuf) ;
 		rs = SR_OK ;
 	        while ((rs >= 0) && (rlen > 0)) {
-		    if ((rs = randomvar_getulong(op,&rv)) >= 0) {
+		    if (ulong rv ; (rs = randomvar_getulong(op,&rv)) >= 0) {
 		        cint	ml = min(rlen,wl) ;
 		        for (int i = 0 ; i < ml ; i += 1) {
 			    *rp++ = char(rv) ;
@@ -410,8 +408,8 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 /* private subroutines */
 
 static int randomvar_initpseudo(randomvar *op,uint seed) noex {
+	const ulong	tv = ulong(randlc(seed)) ;
 	ulong		lseed = ulong(seed) ;
-	ulong		tv = ulong(randlc(seed)) ;
 	cint		tl = nelem(randtbl) ;
 	lseed |= (tv << 32) ;
 	for (int i = 0 ; i < min(tl,slen) ; i += 1) {
@@ -429,10 +427,10 @@ static int randomvar_initreal(randomvar *op,uint seed) noex {
 	arrlongs<NLS>	al ;
 	int		rs ;
 	if ((rs = rsr) >= 0) {
-	    uint	v ;
 	    cint	ninit = rs ;
+	    uint	v ;
 	    {
-	        TIMEVAL	tv ;
+	        TIMEVAL		tv ;
 	        gettimeofday(&tv,nullptr) ;
 	        v = randlc(tv.tv_usec) ; al.add(v) ;
 	        v = randlc(tv.tv_sec) ; al.add(v) ;
@@ -456,7 +454,7 @@ static int randomvar_maint(randomvar *op) noex {
 	if ((rs = randomvar_swapone(op)) >= 0) {
 	    op->maintcount = 0 ;
 	    if (! op->f.pseudo) {
-	        TIMEVAL	tv ;
+	        TIMEVAL		tv ;
 	        gettimeofday(&tv,nullptr) ;
 	        if ((tv.tv_sec - op->laststir) >= RANDOMVAR_STIRINT) {
 	            op->laststir = tv.tv_sec ;
@@ -469,34 +467,35 @@ static int randomvar_maint(randomvar *op) noex {
 /* end subroutine (randomvar_maint) */
 
 static int randomvar_swapone(randomvar *op) noex {
-	ulong		one = op->state[0] ;
-	ulong		one0, one1 ;
-	uint		s0, s1, t0, t1 ;
+	const ulong	one = op->state[0] ;
+	uint		s0, s1 ;
+	uint		t0, t1 ;
 	int		rs = SR_OK ;
 	s0 = uint(one >> 00) ;
 	s1 = uint(one >> 32) ;
 	t0 = randlc(s0) ;
 	t1 = randlc(s1) ;
-	one0 = ulong(t1) ;	/* swapped */
-	one1 = ulong(t0) ;	/* swapped */
-	one = ((one1 << 32) | (one0 << 00)) ;
-	op->state[0] = one ;
+	{
+	    const ulong	one0 = ulong(t1) ;	/* swapped */
+	    const ulong	one1 = ulong(t0) ;	/* swapped */
+	    op->state[0] = ((one1 << 32) | (one0 << 00)) ;
+	}
 	return rs ;
 }
 /* end subroutine (randomvar_swapone) */
 
 static void addtime(ulong *lp,TIMEVAL *tvp) noex {
-	ulong		cur = *lp ;
-	uint		t0 = uint(tvp->tv_sec) ;
-	uint		t1 = uint(tvp->tv_usec) ;
+	const ulong	cur = *lp ;
+	const uint	t0 = uint(tvp->tv_sec) ;
+	const uint	t1 = uint(tvp->tv_usec) ;
 	uint		c0, c1, n0, n1 ;
 	c0 = (cur >> 0) ;
 	c1 = (cur >> 32) ;
 	n0 = c0 ^ randlc(c0 ^ t0) ;
 	n1 = c1 ^ randlc(c1 ^ t1) ;
 	{
-	    ulong	ln0 = ulong(n0) ;
-	    ulong	ln1 = ulong(n1) ;
+	    const ulong	ln0 = ulong(n0) ;
+	    const ulong	ln1 = ulong(n1) ;
 	    ulong	stage ;
 	    stage = ((ln1 << 32) | ln0) ;
 	    *lp = stage ;
@@ -507,8 +506,8 @@ static void addtime(ulong *lp,TIMEVAL *tvp) noex {
 static int rdulong(cchar *sp,int sl,ulong *lp) noex {
 	int		r = 0 ;
 	if (sl > 0) {
+	    cint	mlen = min(sl,digsize) ;
 	    ulong	ulw = 0 ;
-	    int		mlen = min(sl,digsize) ;
 	    for (int i = 0 ; i < mlen ; i += 1) {
 		ulw <<= 8 ;
 		ulw |= uchar(*sp++) ;

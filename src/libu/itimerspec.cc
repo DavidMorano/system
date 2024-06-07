@@ -1,7 +1,7 @@
-/* timespec SUPPORT */
+/* itimerspec SUPPORT */
 /* lang=C++20 */
 
-/* UNIX® TIMESPEC object initialization */
+/* UNIX® ITIMERSPEC object initialization */
 /* version %I% last-modified %G% */
 
 
@@ -17,16 +17,16 @@
 /*******************************************************************************
 
 	Name:
-	timespec_load
+	itimerspec_load
 
 	Description:
-	These subroutines manipulate TIMESPEC objects.
+	These subroutines manipulate ITIMERSPEC objects.
 
 	Synopsis:
-	int timespec_load(TIMESPEC *tsp,time_t sec,long nsec) noex
+	int itimerspec_load(ITIMERSPEC *tsp,time_t sec,long nsec) noex
 
 	Arguments:
-	tsp		pointer to TIMESPEC
+	tsp		pointer to ITIMERSPEC
 	sec		seconds
 	nsec		nanoseconds
 
@@ -34,21 +34,24 @@
 	>=0		OK
 	<0		error (system-return)
 
+	Comments:
+	typedef struct itimerspec {		
+		struct timespec	it_interval;	
+		struct timespec	it_value;	
+	} itimerspec_t ;
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* |TIMESPEC| */
+#include	<sys/types.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"timespec.h"
+#include	"itimerspec.h"
 
 
 /* local defines */
-
-#ifndef	INTBILLION
-#define	INTBILLION	1000000000
-#endif
 
 
 /* external subroutines */
@@ -65,27 +68,25 @@
 
 /* local variables */
 
-const int	onebillion = INTBILLION ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int timespec_load(TIMESPEC *tsp,time_t sec,long nsec) noex {
+int itimerspec_load(ITIMERSPEC *tsp,CTIMESPEC *valp,CTIMESPEC *ivp) noex {
 	int		rs = SR_FAULT ;
 	if (tsp) {
-	    rs = SR_OK ;
-	    while (nsec >= onebillion) {
-	        sec += 1 ;
-	        nsec -= onebillion ;
-	    } /* end while */
-	    tsp->tv_sec = sec ;
-	    tsp->tv_nsec = nsec ;
+	    rs = memclear(tsp) ;
+	    if (valp) {
+	        tsp->it_value = *valp ;
+	    }
+	    if (ivp) {
+	        tsp->it_interval = *ivp ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (timespec_load) */
+/* end subroutine (itimerspec_load) */
 
 

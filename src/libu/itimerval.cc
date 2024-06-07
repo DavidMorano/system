@@ -1,7 +1,7 @@
-/* itimerspec SUPPORT */
+/* itimerval SUPPORT */
 /* lang=C++20 */
 
-/* UNIX® ITIMERSPEC object initialization */
+/* UNIX® ITIMERVAL object initialization */
 /* version %I% last-modified %G% */
 
 
@@ -17,16 +17,16 @@
 /*******************************************************************************
 
 	Name:
-	itimerspec_load
+	itimerval_load
 
 	Description:
-	These subroutines manipulate ITIMERSPEC objects.
+	These subroutines manipulate ITIMERVAL objects.
 
 	Synopsis:
-	int itimerspec_load(ITIMERSPEC *tsp,time_t sec,long nsec) noex
+	int itimerval_load(ITIMERVAL *tsp,time_t sec,long nsec) noex
 
 	Arguments:
-	tsp		pointer to ITIMERSPEC
+	tsp		pointer to ITIMERVAL
 	sec		seconds
 	nsec		nanoseconds
 
@@ -35,27 +35,29 @@
 	<0		error (system-return)
 
 	Comments:
-	typedef struct itimerspec {		
+	typedef struct itimerval {		
 		struct timespec	it_interval;	
 		struct timespec	it_value;	
-	} itimerspec_t ;
+	} itimerval_t ;
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<ctime>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"itimerspec.h"
+#include	"itimerval.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -67,21 +69,24 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int itimerspec_load(ITIMERSPEC *tsp,TIMESPEC *valp,TIMESPEC *intp) noex {
+int itimerval_load(ITIMERVAL *tsp,CTIMEVAL *valp,CTIMEVAL *ivp) noex {
 	int		rs = SR_FAULT ;
 	if (tsp) {
-	    memclear(tsp) ;
+	    rs = memclear(tsp) ;
 	    if (valp) {
 	        tsp->it_value = *valp ;
 	    }
-	    if (intp) {
-	        tsp->it_interval = *intp ;
+	    if (ivp) {
+	        tsp->it_interval = *ivp ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (itimerspec_load) */
+/* end subroutine (itimerval_load) */
 
 

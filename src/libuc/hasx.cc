@@ -306,7 +306,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<ascii.h>
 #include	<strn.h>
 #include	<char.h>
@@ -337,9 +337,9 @@ static bool	hasINET4Num(cchar *,int) noex ;
 
 /* local variables */
 
-constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
-
 static cint		maxbase = strlen(sysword.w_digtab) ;
+
+constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
 
 
 /* exported variables */
@@ -734,7 +734,7 @@ bool hasnotdots(cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp[0] == '.') {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if constexpr (f_hasnotdotswitch) {
+	    if_constexpr (f_hasnotdotswitch) {
 	        switch (sl) {
 	        case 1:
 	            f = false ;
@@ -748,7 +748,7 @@ bool hasnotdots(cchar *sp,int sl) noex {
 	            f = (sl != 1) ;
 	            if ((!f) && (sl == 2)) f = (sp[1] != '.') ;
 	        }
-	    } /* end if constexpr) */
+	    } /* end if_constexpr (f_hasnotdorswitch) */
 	} /* end if (had a leading dot) */
 	return f ;
 }

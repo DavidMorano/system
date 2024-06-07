@@ -1,4 +1,4 @@
-/* itimerspec HEADER */
+/* itimerval HEADER */
 /* lang=C99 */
 
 /* interval-timer object methods */
@@ -16,29 +16,29 @@
 
 /*******************************************************************************
 
-	Methods for the ITIMERSPEC object.
+	Methods for the ITIMERVAL object.
 
 *******************************************************************************/
 
-#ifndef	ITIMERSPEC_INCLUDE
-#define	ITIMERSPEC_INCLUDE
+#ifndef	ITIMERVAL_INCLUDE
+#define	ITIMERVAL_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<timespec.h>
 
 
 EXTERNC_begin
 
-extern int itimerspec_load(ITIMERSPEC *,TIMESPEC *,TIMESPEC *) noex ;
+extern int itimerval_load(ITIMERVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
 
 EXTERNC_end
 
 
-#endif /* ITIMERSPEC_INCLUDE */
+#endif /* ITIMERVAL_INCLUDE */
 
 

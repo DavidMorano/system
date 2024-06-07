@@ -40,7 +40,7 @@
 #include	<climits>		/* |LONG_MAX| + |LONG_MIN| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<localmisc.h>
 
 #include	"willaddover.h"

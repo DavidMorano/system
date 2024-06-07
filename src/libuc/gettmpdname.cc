@@ -40,7 +40,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<getourenv.h>
 #include	<localmisc.h>
 

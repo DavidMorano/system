@@ -45,7 +45,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<syswords.hh>
 #include	<hasx.h>
 

@@ -7,7 +7,7 @@
 
 /* revision history:
 
-	= 2010-12-01,  David A.D. Morano
+	= 2010-12-01,  David A-D- Morano
 	Module was originally written.
 
 */
@@ -25,7 +25,6 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -86,7 +85,7 @@ static int	vecsorthand_extend(vecsorthand *) noex ;
 /* exported subroutines */
 
 int vecsorthand_start(vecsorthand *op,int vn,vecentcmp_f cmpfunc) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
 	    int		sz = 0 ;
@@ -123,20 +122,19 @@ int vecsorthand_finish(vecsorthand *op) noex {
 }
 /* end subroutine (vecsorthand_finish) */
 
-int vecsorthand_add(vecsorthand *op,cvoid *buf) noex {
+int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && buf) {
+	if (op && nep) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 	        if ((rs = vecsorthand_extend(op)) >= 0) {
-	            int		bot, top ;
+	            int		bot = 0 ;
+	            int		top = max((op->i - 1),0) ;
 	            op->c += 1 ;		/* increment list count */
-	            bot = 0 ;
-	            top = max((op->i - 1),0) ;
 	            i = (bot + top) / 2 ;
 	            while ((top - bot) > 0) {
-	                if ((rs = (*op->vcf)(&buf,(op->va+i))) < 0) {
+	                if ((rs = (*op->vcf)(&nep,(op->va+i))) < 0) {
 	                    top = i - 1 ;
 	                } else if (rs > 0) {
 	                    bot = i + 1 ;
@@ -146,14 +144,14 @@ int vecsorthand_add(vecsorthand *op,cvoid *buf) noex {
 	                i = (bot + top) / 2 ;
 	            } /* end while */
 	            if (i < op->i) {
-	                if ((*op->vcf)(&buf,&op->va[i]) > 0) {
+	                if ((*op->vcf)(&nep,&op->va[i]) > 0) {
 	                    i += 1 ;
 	                }
 	                for (int j = (op->i - 1) ; j >= i ; j -= 1) {
 	                    op->va[j + 1] = op->va[j] ;
 	                }
 	            } /* end if */
-	            op->va[i] = (void *) buf ;
+	            op->va[i] = (void *) nep ;
 	            op->i += 1 ;
 	            op->va[op->i] = nullptr ;
 	        } /* end if (vecsorthand_extend) */
@@ -211,7 +209,7 @@ int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 	        cint	n = op->i ;
-	        int	i ;
+	        int	i ; /* used-afterwards */
 	        bool	f = false ;
 	        rs = SR_NOTFOUND ;
 	        for (i = 0 ; i < n ; i += 1) {
@@ -276,11 +274,11 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	    void	**nva{} ;
 	    if (op->e == 0) {
 	        ne = ndef ;
-	        sz = (ndef*sizeof(void **)) ;
+	        sz = (ndef * sizeof(void **)) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        cint	ne = (op->e * 2) ;
-	        sz = (ne*sizeof(void **)) ;
+	        sz = (ne * sizeof(void **)) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	    }
 	    if (rs >= 0) {
@@ -292,5 +290,43 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	return rs ;
 }
 /* end subroutine (vecsorthand_extend) */
+
+int vecsorthand::start(int ne,vecentcmp_f vcf) noex {
+	return vecsorthand_start(this,ne,vcf) ;
+}
+
+int vecsorthand::add(cvoid *nep) noex {
+	return vecsorthand_add(this,nep) ;
+}
+
+int vecsorthand::get(int ai,void *rvp) noex {
+	return vecsorthand_get(this,ai,rvp) ;
+}
+
+void vecsorthand::dtor() noex {
+	cint		rs = vecsorthand_finish(this) ;
+	if (rs < 0) {
+	    ulogerror("vecsorthand",rs,"fini-finish") ;
+	}
+}
+
+int vecsorthand_co::operator () (int ai) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vecsorthandmem_count:
+	        rs = vecsorthand_count(op) ;
+	        break ;
+	    case vecsorthandmem_del:
+	        rs = vecsorthand_del(op,ai) ;
+	        break ;
+	    case vecsorthandmem_finish:
+	        rs = vecsorthand_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (vecsorthand_co::operator) */
 
 

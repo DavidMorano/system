@@ -66,7 +66,7 @@
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<sncpyx.h>
 
 #include	"ctdec.h"

@@ -26,9 +26,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<ctime>			/* |TIMESPEC| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 EXTERNC_begin

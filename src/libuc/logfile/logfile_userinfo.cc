@@ -52,7 +52,7 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<logfile.h>
 #include	<userinfo.h>

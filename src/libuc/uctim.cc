@@ -80,7 +80,7 @@
 #define	CF_CHILDTHRS	0
 #endif
 
-#define	UCTIM	struct uctim
+#define	UCTIM		struct uctim
 #define	UCTIM_FL	struct uctim_flags
 #define	UCTIM_SCOPE	PTHREAD_SCOPE_SYSTEM
 
@@ -133,7 +133,7 @@ namespace {
 	ptc		cv ;		/* condition variable */
 	vechand		ents ;
 	ciq		pass ;
-	vecsorthand	*pqp ;
+	prique		*pqp ;
 	sigset_t	savemask ;
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
