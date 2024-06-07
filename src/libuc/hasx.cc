@@ -305,6 +305,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<uvariables.hh>
 #include	<ascii.h>
@@ -708,9 +709,7 @@ bool hascdpath(cchar *sp,int sl) noex {
 bool hasmacro(cchar *lp,int ll) noex {
 	bool		f = false ;
 	if ((ll > 1) && (lp[0] == '.')) {
-	    int		c ;
-	    char	tbuf[3] ;
-	    if ((c = twochars(tbuf,(lp+1),(ll-1))) > 1) {
+	    if (char tbuf[3] ; twochars(tbuf,(lp+1),(ll-1)) > 1) {
 	        f = (strcmp(tbuf,"\\\"") != 0) ;
 	    }
 	}
@@ -721,7 +720,7 @@ bool hasmacro(cchar *lp,int ll) noex {
 bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 	cint		ml = strlen(ms) ;
 	bool		f = false ;
-	if (tlen >= (ml+1)) {
+	if (tlen >= (ml + 1)) {
 	    f = true ;
 	    f = f && (strncmp(tbuf,ms,ml) == 0) ;
 	    f = f && (tbuf[ml] == '\n') ;
@@ -748,7 +747,7 @@ bool hasnotdots(cchar *sp,int sl) noex {
 	            f = (sl != 1) ;
 	            if ((!f) && (sl == 2)) f = (sp[1] != '.') ;
 	        }
-	    } /* end if_constexpr (f_hasnotdorswitch) */
+	    } /* end if_constexpr (f_hasnotdotswitch) */
 	} /* end if (had a leading dot) */
 	return f ;
 }

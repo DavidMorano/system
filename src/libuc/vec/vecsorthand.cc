@@ -269,15 +269,15 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->e) {
 	    cint	ndef = VECSORTHAND_DEFENTS ;
-	    int		sz ;
 	    int		ne ;
+	    int		sz ;
 	    void	**nva{} ;
 	    if (op->e == 0) {
 	        ne = ndef ;
-	        sz = (ndef * sizeof(void **)) ;
+	        sz = (ne * sizeof(void **)) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
-	        cint	ne = (op->e * 2) ;
+	        ne = (op->e * 2) ;
 	        sz = (ne * sizeof(void **)) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	    }

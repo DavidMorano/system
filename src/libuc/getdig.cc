@@ -36,8 +36,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<uvariables.hh>
 #include	<localmisc.h>
 
@@ -64,7 +65,7 @@
 
 /* local variables */
 
-static const int	maxbase = strlen(sysword.w_digtab) ;
+static cint	maxbase = strlen(sysword.w_digtab) ;
 
 
 /* exported variables */

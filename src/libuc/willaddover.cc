@@ -38,8 +38,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |LONG_MAX| + |LONG_MIN| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<uvariables.hh>
 #include	<localmisc.h>
 

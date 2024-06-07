@@ -43,6 +43,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* |gid_t| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
 #include	<usystem.h>

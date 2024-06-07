@@ -38,7 +38,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<usystem.h>
 #include	<uvariables.hh>
 #include	<uinfo.h>
