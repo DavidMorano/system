@@ -59,7 +59,7 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<bufsizevar.hh>
 #include	<strwcpy.h>
 #include	<storebuf.h>

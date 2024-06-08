@@ -384,11 +384,11 @@ struct bufstr	*bsp ;
 #endif
 
 	    f_got = TRUE ;
-	    bufstr_buf(bsp,cp,cp1 - cp) ;
+	    bufstr_strw(bsp,cp,cp1 - cp) ;
 
-	    bufstr_char(bsp,'\\') ;
+	    bufstr_chr(bsp,'\\') ;
 
-	    rs = bufstr_char(bsp,*cp1++) ;
+	    rs = bufstr_chr(bsp,*cp1++) ;
 
 	    if (rs < 0) return BAD ;
 
@@ -402,10 +402,10 @@ struct bufstr	*bsp ;
 	} /* end while */
 
 	if (f_got)
-	    rs = bufstr_buf(bsp,cp,-1) ;
+	    rs = bufstr_strw(bsp,cp,-1) ;
 
 	else
-	    rs = bufstr_buf(bsp,vs,-1) ;
+	    rs = bufstr_strw(bsp,vs,-1) ;
 
 	return rs ;
 }

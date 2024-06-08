@@ -1609,11 +1609,11 @@ BUFSTR		*bsp ;
 #endif
 
 	    f_got = TRUE ;
-	    bufstr_buf(bsp,cp,(tp - cp)) ;
+	    bufstr_strw(bsp,cp,(tp - cp)) ;
 
-	    bufstr_char(bsp,'\\') ;
+	    bufstr_chr(bsp,'\\') ;
 
-	    rs = bufstr_char(bsp,*tp++) ;
+	    rs = bufstr_chr(bsp,*tp++) ;
 
 	    cp = tp ;
 
@@ -1626,9 +1626,9 @@ BUFSTR		*bsp ;
 
 	if (rs >= 0) {
 	if (f_got) {
-	    rs = bufstr_buf(bsp,cp,-1) ;
+	    rs = bufstr_strw(bsp,cp,-1) ;
 	} else {
-	    rs = bufstr_buf(bsp,vs,-1) ;
+	    rs = bufstr_strw(bsp,vs,-1) ;
 	}
 	}
 

@@ -61,7 +61,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>

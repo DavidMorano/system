@@ -235,7 +235,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 			cint	qlen = rs ;
 	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
 			    cchar	*sa = sargs[i] ;
-	                    sbuf_char(&b,' ') ;
+	                    sbuf_chr(&b,' ') ;
 	                    if ((rs = mkquoted(qbuf,qlen,sa,-1)) >= 0) {
 	                        cint	ql = rs ;
 	                        sbuf_buf(&b,qbuf,ql) ;
@@ -247,9 +247,9 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 	        } /* end if */
 	        if (rs >= 0) {
 		    if constexpr (f_cr) {
-	                sbuf_char(&b,'\r') ;
+	                sbuf_chr(&b,'\r') ;
 		    } /* end if-constexpr (f_cr) */
-	            sbuf_char(&b,'\n') ;
+	            sbuf_chr(&b,'\n') ;
 	        } /* end if */
 	    } /* end if */
 	    len = sbuf_getlen(&b) ;

@@ -66,7 +66,7 @@ int main(int argc,const char **argv,const char **envv)
 	sbuf_strw(&b,TERMSTR_S_SD,-1) ; /* set status-display mode */
 #endif /* CF_SD */
 
-	sbuf_char(&b,'\r') ;
+	sbuf_chr(&b,'\r') ;
 
 	sbuf_strw(&b,"xxx",-1) ;
 

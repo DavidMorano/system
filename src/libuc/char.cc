@@ -32,6 +32,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<bitset>		/* <- the money shot! */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -111,7 +112,7 @@ constexpr void charinfo::mkisuc() noex {
 	    isuc.set(ch,true) ;
 	}
 	isuc.set(UC('×'),false) ;
-	islc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
+	isuc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
 }
 /* end method (charinfo::mkisuc) */
 

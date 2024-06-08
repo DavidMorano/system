@@ -40,7 +40,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>

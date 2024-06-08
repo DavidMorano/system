@@ -48,12 +48,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
-#include	<algorithm>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<stdintx.h>
 #include	<format.h>
 #include	<strwcpy.h>
@@ -62,7 +63,6 @@
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<mkchar.h>
-#include	<libmallocxx.h>
 #include	<localmisc.h>
 
 #include	"buffer.h"
@@ -83,8 +83,9 @@
 
 /* imported namespaces */
 
-using std::min ;
-using std::max ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -100,18 +101,15 @@ static inline int buffer_ctor(buffer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
-	    op->buf = nullptr ;
+	    op->dbuf = nullptr ;
 	    op->startlen = 0 ;
 	    op->len = 0 ;
-	    op->e = 0 ;
+	    op->dlen = 0 ;
 	}
 	return rs ;
 }
 
 static int	buffer_ext(buffer *,int) noex ;
-
-
-/* local subroutine-templates */
 
 template<typename T>
 int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
@@ -120,7 +118,7 @@ int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
 	int		len = 0 ;
 	if (op) {
 	    if ((rs = buffer_ext(op,dlen)) >= 0) {
-	        char	*bp = (op->buf + op->len) ;
+	        char	*bp = (op->dbuf + op->len) ;
 	        rs = ctxxx(bp,dlen,v) ;
 	        op->len += rs ;
 		len = rs ;
@@ -131,14 +129,14 @@ int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (buffer_xxxx) */
 
 template<typename T>
-int buffer_decx(buffer *sbp,T v) noex {
-	return buffer_xxxx(sbp,ctdec,v) ;
+int buffer_decx(buffer *op,T v) noex {
+	return buffer_xxxx(op,ctdec,v) ;
 }
 /* end subroutine-template (buffer_decx) */
 
 template<typename T>
-int buffer_hexx(buffer *sbp,T v) noex {
-	return buffer_xxxx(sbp,cthex,v) ;
+int buffer_hexx(buffer *op,T v) noex {
+	return buffer_xxxx(op,cthex,v) ;
 }
 /* end subroutine-template (buffer_hexx) */
 
@@ -149,6 +147,9 @@ constexpr bool		f_bufstart = CF_BUFSTART ;
 constexpr bool		f_fastgrow = CF_FASTGROW ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int buffer_start(buffer *op,int startlen) noex {
@@ -157,7 +158,7 @@ int buffer_start(buffer *op,int startlen) noex {
 	    op->startlen = max(startlen,BUFFER_STARTLEN) ;
 	    if constexpr (f_bufstart) {
 	        if ((rs = buffer_ext(op,-1)) >= 0) {
-	            op->buf[0] = '\0' ;
+	            op->dbuf[0] = '\0' ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -171,13 +172,13 @@ int buffer_finish(buffer *op) noex {
 	int		len = 0 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->buf) {
-	        rs1 = uc_libfree(op->buf) ;
+	    if (op->dbuf) {
+	        rs1 = uc_libfree(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->buf = nullptr ;
+	        op->dbuf = nullptr ;
 	    }
 	    len = op->len ;
-	    op->e = 0 ;
+	    op->dlen = 0 ;
 	    op->startlen = 0 ;
 	    op->len = 0 ;
 	} /* end if (magic) */
@@ -212,36 +213,6 @@ int buffer_adv(buffer *op,int advlen) noex {
 }
 /* end subroutine (buffer_adv) */
 
-int buffer_char(buffer *op,int ch) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = op->len) >= 0) {
-	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            op->buf[(op->len)++] = ch ;
-	            op->buf[op->len] = '\0' ;
-	        }
-	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? 1 : rs ;
-}
-/* end subroutine (buffer_char) */
-
-int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
-	int		rs = SR_FAULT ;
-	if (op && sbuf) {
-	    if ((rs = op->len) >= 0) {
-	        if (slen < 0) slen = strlen(sbuf) ;
-	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->buf + op->len) ;
-	            memcpy(bp,sbuf,slen) ;
-	            op->len += slen ;
-	        }
-	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? slen : rs ;
-}
-/* end subroutine (buffer_buf) */
-
 int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -249,7 +220,7 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	    if ((rs = op->len) >= 0) {
 	        if (slen < 0) slen = strlen(sbuf) ;
 	        if ((rs = buffer_ext(op,slen)) >= 0) {
-	            char	*bp = (op->buf + op->len) ;
+	            char	*bp = (op->dbuf + op->len) ;
 	            len = strwcpy(bp,sbuf,slen) - bp ;
 	            op->len += len ;
 	        }
@@ -258,6 +229,36 @@ int buffer_strw(buffer *op,cchar *sbuf,int slen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_strw) */
+
+int buffer_chr(buffer *op,int ch) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = op->len) >= 0) {
+	        if ((rs = buffer_ext(op,1)) >= 0) {
+	            op->dbuf[(op->len)++] = ch ;
+	            op->dbuf[op->len] = '\0' ;
+	        }
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? 1 : rs ;
+}
+/* end subroutine (buffer_chr) */
+
+int buffer_buf(buffer *op,cchar *sbuf,int slen) noex {
+	int		rs = SR_FAULT ;
+	if (op && sbuf) {
+	    if ((rs = op->len) >= 0) {
+	        if (slen < 0) slen = strlen(sbuf) ;
+	        if ((rs = buffer_ext(op,slen)) >= 0) {
+	            char	*bp = (op->dbuf + op->len) ;
+	            memcpy(bp,sbuf,slen) ;
+	            op->len += slen ;
+	        }
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? slen : rs ;
+}
+/* end subroutine (buffer_buf) */
 
 int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -298,7 +299,7 @@ int buffer_get(buffer *op,cchar **spp) noex {
 	    len = op->len ;
 	    if (spp) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            *spp = (rs >= 0) ? op->buf : nullptr ;
+	            *spp = (rs >= 0) ? op->dbuf : nullptr ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -311,7 +312,7 @@ int buffer_getprev(buffer *op) noex {
 	if (op) {
 	    if ((rs = op->len) > 0) {
 	        if ((rs = buffer_ext(op,1)) >= 0) {
-	            rs = mkchar(op->buf[op->len-1]) ;
+	            rs = mkchar(op->dbuf[op->len-1]) ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -319,77 +320,77 @@ int buffer_getprev(buffer *op) noex {
 }
 /* end subroutine (buffer_getprev) */
 
-int buffer_deci(buffer *sbp,int v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_deci(buffer *op,int v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_deci) */
 
-int buffer_decl(buffer *sbp,long v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decl(buffer *op,long v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decl) */
 
-int buffer_decll(buffer *sbp,longlong v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decll(buffer *op,longlong v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decll) */
 
-int buffer_decui(buffer *sbp,uint v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decui(buffer *op,uint v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decui) */
 
-int buffer_decul(buffer *sbp,ulong v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decul(buffer *op,ulong v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decul) */
 
-int buffer_decull(buffer *sbp,ulonglong v) noex {
-	return buffer_decx(sbp,v) ;
+int buffer_decull(buffer *op,ulonglong v) noex {
+	return buffer_decx(op,v) ;
 }
 /* end subroutine (buffer_decull) */
 
-int buffer_hexc(buffer *sbp,int v) noex {
+int buffer_hexc(buffer *op,int v) noex {
 	uint		uv = uint(v) ;
-	return buffer_hexuc(sbp,uv) ;
+	return buffer_hexuc(op,uv) ;
 }
 /* end subroutine (buffer_hexc) */
 
-int buffer_hexi(buffer *sbp,int v) noex {
+int buffer_hexi(buffer *op,int v) noex {
 	uint		uv = uint(v) ;
-	return buffer_hexx(sbp,uv) ;
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexi) */
 
-int buffer_hexl(buffer *sbp,long v) noex {
+int buffer_hexl(buffer *op,long v) noex {
 	ulong		uv = ulong(v) ;
-	return buffer_hexx(sbp,uv) ;
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexl) */
 
-int buffer_hexll(buffer *sbp,longlong v) noex {
+int buffer_hexll(buffer *op,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
-	return buffer_hexx(sbp,uv) ;
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexll) */
 
-int buffer_hexuc(buffer *sbp,int uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexuc(buffer *op,int uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexc) */
 
-int buffer_hexui(buffer *sbp,uint uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexui(buffer *op,uint uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexui) */
 
-int buffer_hexul(buffer *sbp,ulong uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexul(buffer *op,ulong uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexul) */
 
-int buffer_hexull(buffer *sbp,ulonglong uv) noex {
-	return buffer_hexx(sbp,uv) ;
+int buffer_hexull(buffer *op,ulonglong uv) noex {
+	return buffer_hexx(op,uv) ;
 }
 /* end subroutine (buffer_hexull) */
 
@@ -399,31 +400,31 @@ int buffer_hexull(buffer *sbp,ulonglong uv) noex {
 static int buffer_ext(buffer *op,int req) noex {
 	int		rs = SR_OK ;
 	int		need ;
-	int		ne ;
 	if (req < 0) req = op->startlen ;
-	need = ((op->len + (req+1)) - op->e) ;
+	need = ((op->len + (req + 1)) - op->dlen) ;
 	if (need > 0) {
-	    char	*buf{} ;
-	    if (op->buf) {
-	        ne = max(op->startlen,need) ;
-	        if ((rs = uc_libmalloc(ne,&buf)) >= 0) {
-	            op->buf = buf ;
-		    op->e = ne ;
+	    int		nlen ;
+	    char	*nbuf{} ;
+	    if (op->dbuf) {
+	        nlen = max(op->startlen,need) ;
+	        if ((rs = uc_libmalloc((nlen + 1),&nbuf)) >= 0) {
+	            op->dbuf = nbuf ;
+		    op->dlen = nlen ;
 	        } else {
 	            op->len = rs ;
 	        }
 	    } else {
-		ne = op->e ;
-	        while ((op->len + (req+1)) > ne) {
+		nlen = op->dlen ;
+	        while ((op->len + (req + 1)) > nlen) {
 		    if constexpr (f_fastgrow) {
-	                ne = ((ne + 1) * 2) ;
+	                nlen = ((nlen + 1) * 2) ;
 		    } else {
-	                ne = (ne + BUFFER_STARTLEN) ;
+	                nlen = (nlen + BUFFER_STARTLEN) ;
 		    }
 	        } /* end while */
-	        if ((rs = uc_librealloc(op->buf,ne,&buf)) >= 0) {
-	            op->buf = buf ;
-		    op->e = ne ;
+	        if ((rs = uc_librealloc(op->dbuf,nlen,&nbuf)) >= 0) {
+	            op->dbuf = nbuf ;
+		    op->dlen = nlen ;
 	        } else {
 	            op->len = rs ;
 		}
@@ -432,5 +433,50 @@ static int buffer_ext(buffer *op,int req) noex {
 	return rs ;
 }
 /* end subroutine (buffer_ext) */
+
+int buffer::adv(int v) noex {
+	return buffer_adv(this,v) ;
+}
+
+int buffer::strw(cchar *sp,int sl) noex {
+	return buffer_strw(this,sp,sl) ;
+}
+
+int buffer::chr(int ch) noex {
+	return buffer_chr(this,ch) ;
+}
+
+int buffer::get(cchar **rpp) noex {
+	return buffer_get(this,rpp) ;
+}
+
+void buffer::dtor() noex {
+	cint		rs = buffer_finish(this) ;
+	if (rs < 0) {
+	    ulogerror("buffer",rs,"fini-finish") ;
+	}
+}
+
+int buffer_co::operator () (int v) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case buffermem_start:
+	        rs = buffer_start(op,v) ;
+	        break ;
+	    case buffermem_strsize:
+	        rs = buffer_get(op,nullptr) ;
+	        break ;
+	    case buffermem_reset:
+	        rs = buffer_reset(op) ;
+	        break ;
+	    case buffermem_finish:
+	        rs = buffer_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (buffer_co::operator) */
 
 

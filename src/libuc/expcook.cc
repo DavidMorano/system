@@ -78,7 +78,7 @@ using std::nothrow ;			/* constant */
 static inline int expcook_ctor(EX *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->hlp = new(nothrow) hdbstr) != np) {
@@ -159,7 +159,7 @@ int expcook_finish(EX *op) noex {
 /* end subroutine (expcook_finish) */
 
 int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = expcook_magic(op,kbuf)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
@@ -180,7 +180,7 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,curp)) >= 0) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
 	        hdbstr	*slp = op->hlp ;
@@ -298,7 +298,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	            sp = (tp+1) ;
 	            if (sl > 0) {
 	                if (sp[0] == sch) {
-	                    rs = buffer_char(bufp,sch) ;
+	                    rs = buffer_chr(bufp,sch) ;
 		  	    len += rs ;
 	                    sl -= 1 ;
 	                    sp += 1 ;
@@ -333,7 +333,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	        } /* end if (buf-add leading part) */
 	        if (rs < 0) break ;
 	    } /* end while (expanding) */
-/* copy over any remainder (trailing part) */
+	    /* copy over any remainder (trailing part) */
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = buffer_strw(bufp,sp,sl) ;
 	        len += rs ;
@@ -375,11 +375,11 @@ static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 static int buffer_keydef(buffer *bufp,int wch,cchar *kp,int kl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = buffer_char(bufp,wch)) >= 0) {
+	if ((rs = buffer_chr(bufp,wch)) >= 0) {
 	    len = rs ;
 	    if ((rs = buffer_strw(bufp,kp,kl)) >= 0) {
 		len += rs ;
-	        rs = buffer_char(bufp,wch) ;
+	        rs = buffer_chr(bufp,wch) ;
 		len += rs ;
 	    } /* end if */
 	} /* end if */
@@ -395,7 +395,7 @@ static int mkcomp(char *rp,int rl,cchar *kp,int kl,cchar *vp,int vl) noex {
 	    if ((rs = sbuf_start(&b,rp,rl)) >= 0) {
 	        {
 	            if (rs >= 0) rs = sbuf_strw(&b,kp,kl) ;
-	            if (rs >= 0) rs = sbuf_char(&b,'=') ;
+	            if (rs >= 0) rs = sbuf_chr(&b,'=') ;
 	            if (vp) {
 		        if (rs >= 0) rs = sbuf_strw(&b,vp,vl) ;
 		    }

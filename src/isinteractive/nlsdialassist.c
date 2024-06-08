@@ -101,7 +101,7 @@ int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen)
 
 	    sbuf_strw(&svc,svcbuf,svclen) ;
 
-	    sbuf_char(&svc,0) ;
+	    sbuf_chr(&svc,0) ;
 
 	    len = sbuf_finish(&svc) ;
 	    if (rs >= 0) rs = len ;

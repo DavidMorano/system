@@ -88,25 +88,49 @@
 /* PREDEFINED start */
 /* determine if some unsigned-related typedefs have already been made */
 /* the following unsigned typedefs are supposedly "System V" compatibility */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-
-#ifndef	TYPEDEFS_PREDEFINEDUNSIGNED
-#define	TYPEDEFS_PREDEFINEDUNSIGNED
 
 #ifndef	TYPEDEF_USHORT
 #define	TYPEDEF_USHORT
+/* already typedef'ed on Darwin */
 #endif
 
 #ifndef	TYPEDEF_UINT
 #define	TYPEDEF_UINT
+/* already typedef'ed on Darwin */
 #endif
 
-#endif /* TYPEDEFS_PREDEFINEDUNSIGNED */
-
 #endif /* !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE) */
+#endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* PREDEFINED end */
 
-/* constants */
+/* PREDEFINED start */
+/* determine if some unsigned-related typedefs have already been made */
+/* the following unsigned typedefs are supposedly "System V" compatibility */
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+#if !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__)
+
+#ifndef	TYPEDEF_USHORT
+#define	TYPEDEF_USHORT
+/* already typedef'ed on Solaris® */
+#endif
+
+#ifndef	TYPEDEF_UINT
+#define	TYPEDEF_UINT
+/* already typedef'ed on Solaris® */
+#endif
+
+#ifndef	TYPEDEF_ULONG
+#define	TYPEDEF_ULONG
+/* already typedef'ed on Solaris® */
+#endif
+
+#endif /* !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__) */
+#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
+/* PREDEFINED end */
+
+/* types */
 
 #ifndef	TYPEDEF_SCHAR
 #define	TYPEDEF_SCHAR
@@ -374,11 +398,6 @@ typedef const wchar_t		cwchar ;
 #ifndef	TYPEDEF_MAINV
 #define	TYPEDEF_MAINV
 typedef const char *const *	mainv ;
-#endif
-
-#ifndef	TYPEDEF_DIRENT
-#define	TYPEDEF_DIRENT
-typedef struct dirent		dirent_t ;
 #endif
 
 #ifndef	TYPEDEF_IN4ADDRT

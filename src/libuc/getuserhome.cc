@@ -70,7 +70,7 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -156,14 +156,14 @@ static int	dirsearch(cchar *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	homednames[] = {
+constexpr cpcchar	homednames[] = {
 	"/home",
 	"/usr/add-on",
 	"/sysadm",
 	nullptr
 } ;
 
-static constexpr int	(*gethomes[])(SUBINFO *,char *,int) = {
+constexpr int		(*gethomes[])(SUBINFO *,char *,int) = {
 	subinfo_getvar,
 	subinfo_getdirsearch,
 	subinfo_getsysdb,

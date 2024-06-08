@@ -49,33 +49,27 @@
 
 #ifndef	STRUCT_MQATTR
 #define	STRUCT_MQATTR
-
 struct mq_attr {
 	uint	dummy ;
 } ;
-
 #endif /* STRUCT_MQATTR */
 
 #ifndef	TYPEDEF_MQDT
 #define	TYPEDEF_MQDT
-
 typedef uintptr_t	mqd_t ;
-
 #endif /* TYPEDEF_MQDT */
 
 #ifndef	SUBROUTINE_PMQ
 #define	SUBROUTINE_PMQ
 EXTERNC_begin
-
 extern mqd_t mq_open(cchar *,int,mode_t,const MQATTR *) noex ;
 extern unixret_t mq_close(mqd_t) noex ;
 extern unixret_t mq_send(mqd_t,cchar *,int,int) noex ;
 extern unixret_t mq_receive(mqd_t,char *,int,uint *) noex ;
 extern unixret_t mq_setattr(mqd_t,const MQATTR *,MQATTR *) noex ;
 extern unixret_t mq_getattr(mqd_t,MQATTR *) noex ;
-extern unixret_t mq_notify(mqd_t,struct sigevent *) noex ;
+extern unixret_t mq_notify(mqd_t,SIGEVENT *) noex ;
 extern unixret_t mq_unlink(cchar *) noex ;
-
 EXTERNC_end
 #endif /* SUBROUTINE_PMQ */
 

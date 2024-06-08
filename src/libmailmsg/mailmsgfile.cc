@@ -44,7 +44,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<mallocxx.h>

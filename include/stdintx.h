@@ -88,37 +88,37 @@ typedef const ulonglong *	culonglongp ;
 #include	<concepts>
 
 template<typename T>
-struct is_stdintx : std::false_type {} ;
+struct is_stdintx : std::false_type { } ;
 
 template<>
-struct is_stdintx<signed char> : std::true_type {} ;
+struct is_stdintx<signed char> : std::true_type { } ;
 
 template<>
-struct is_stdintx<signed short> : std::true_type {} ;
+struct is_stdintx<signed short> : std::true_type { } ;
 
 template<>
-struct is_stdintx<signed int> : std::true_type {} ;
+struct is_stdintx<signed int> : std::true_type { } ;
 
 template<>
-struct is_stdintx<signed long> : std::true_type {} ;
+struct is_stdintx<signed long> : std::true_type { } ;
 
 template<>
-struct is_stdintx<signed longlong> : std::true_type {} ;
+struct is_stdintx<signed longlong> : std::true_type { } ;
 
 template<>
-struct is_stdintx<unsigned char> : std::true_type {} ;
+struct is_stdintx<unsigned char> : std::true_type { } ;
 
 template<>
-struct is_stdintx<unsigned short> : std::true_type {} ;
+struct is_stdintx<unsigned short> : std::true_type { } ;
 
 template<>
-struct is_stdintx<unsigned int> : std::true_type {} ;
+struct is_stdintx<unsigned int> : std::true_type { } ;
 
 template<>
-struct is_stdintx<unsigned long> : std::true_type {} ;
+struct is_stdintx<unsigned long> : std::true_type { } ;
 
 template<>
-struct is_stdintx<unsigned longlong> : std::true_type {} ;
+struct is_stdintx<unsigned longlong> : std::true_type { } ;
 
 template<typename T>
 inline constexpr bool is_stdintx_v = is_stdintx<T>::value ;

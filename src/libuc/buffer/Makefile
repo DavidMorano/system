@@ -35,16 +35,21 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
+
+INCS += buffer.h
+
+LIBS +=
 
 
-INCS= buffer.h
-
-
-LIBS=
-
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -63,7 +68,8 @@ OBJ3_BUFFER= buffer_strcompact.o buffer_stropaque.o
 OBJA_BUFFER= obj0_buffer.o obj1_buffer.o
 OBJB_BUFFER= obj2_buffer.o obj3_buffer.o
 
-OBJ_BUFFER= $(OBJA_BUFFER) $(OBJB_BUFFER)
+
+OBJ_BUFFER= obja.o objb.o
 
 
 default:		$(T).o
@@ -109,17 +115,25 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_buffer.o:	$(OBJ0_BUFFER)
+
+obj0_buffer.o:		$(OBJ0_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_BUFFER)
 
-obj1_buffer.o:	$(OBJ1_BUFFER)
+obj1_buffer.o:		$(OBJ1_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_BUFFER)
 
-obj2_buffer.o:	$(OBJ2_BUFFER)
+obj2_buffer.o:		$(OBJ2_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_BUFFER)
 
-obj3_buffer.o:	$(OBJ3_BUFFER)
+obj3_buffer.o:		$(OBJ3_BUFFER)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_BUFFER)
+
+
+obja.o:			$(OBJA_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_BUFFER)
+
+objb.o:			$(OBJB_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_BUFFER)
 
 
 buffer_main.o:		buffer_main.cc		$(INCS)

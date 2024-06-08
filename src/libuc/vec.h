@@ -19,20 +19,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	<raqhand.h>
 #include	<recarr.h>
 #include	<vecelem.h>
 #include	<vechand.h>
-#include	<vecint.h>
 #include	<vecitem.h>
-#include	<veclong.h>
 #include	<vecobj.h>
 #include	<vecpstr.h>
 #include	<vecsorthand.h>
 #include	<vecstr.h>
+#include	<vecint.h>
+#include	<veclong.h>
 
 
 #endif /* VEC_INCLUDE */

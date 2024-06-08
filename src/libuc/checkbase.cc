@@ -41,12 +41,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<ucvariables.hh>
-#include	<syswords.hh>
+#include	<usysrets.h>
+#include	<uvariables.hh>
 #include	<hasx.h>
 
 #include	"checkbase.h"

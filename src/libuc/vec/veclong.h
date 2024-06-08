@@ -19,10 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 /* object defines */
@@ -71,6 +70,7 @@ struct veclong_head {
 } ;
 
 typedef VECLONG		veclong ;
+typedef VECLONG_FL	veclong_fl ;
 typedef VECLONG_CUR	veclong_cur ;
 
 EXTERNC_begin

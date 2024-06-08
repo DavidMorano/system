@@ -669,7 +669,7 @@ const char	configfname[] ;
 	                if (fl > 0) {
 
 	                    if (noptions > 0)
-	                        rs = buffer_char(&options,',') ;
+	                        rs = buffer_chr(&options,',') ;
 
 			    if (rs >= 0)
 	                        buffer_strw(&options,fp,fl) ;

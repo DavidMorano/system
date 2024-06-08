@@ -2302,14 +2302,14 @@ static int inter_checksusp(INTER *iap)
 	        char	tbuf[19+1] ;
 	        termconseq(tbuf,19,'m',ANSIGR_BOLD,ANSIGR_BLINK,-1,-1) ;
 	        sbuf_strw(&b,tbuf,-1) ;
-	        sbuf_char(&b,CH_SS3) ;
-	        sbuf_char(&b,0x40) ;
+	        sbuf_chr(&b,CH_SS3) ;
+	        sbuf_chr(&b,0x40) ;
 	        termconseq(tbuf,19,'m',ANSIGR_OFFALL,-1,-1,-1) ;
 	        sbuf_strw(&b,tbuf,-1) ;
-	        sbuf_char(&b,' ') ;
+	        sbuf_chr(&b,' ') ;
 	    } /* end if (graphics terminal) */
 	    sbuf_strw(&b,msg,-1) ;
-	    sbuf_char(&b,'\v') ;
+	    sbuf_chr(&b,'\v') ;
 	    rs1 = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dl = rs1 ;

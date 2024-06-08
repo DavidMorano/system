@@ -177,7 +177,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	            ch = mkchar(*fmt++) ;
 	            switch (ch) {
 	            case '%':
-	                rs = sbuf_char(ssp,ch) ;
+	                rs = sbuf_chr(ssp,ch) ;
 	                break ;
 	            case 'a':
 	                rs = sbuf_strw(ssp,d[tmp->wday],3) ;
@@ -229,10 +229,10 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                rs = sbuf_twodig(ssp,tmp->min) ;
 	                break ;
 	            case 'n':
-	                rs = sbuf_char(ssp,'\n') ;
+	                rs = sbuf_chr(ssp,'\n') ;
 	                break ;
 	            case 't':
-	                rs = sbuf_char(ssp,'\t') ;
+	                rs = sbuf_chr(ssp,'\t') ;
 	                break ;
 	            case 'r': /* this is what Free-BSD does */
 	                rs = sbuf_fmtstrs(ssp,tmp,"%I:%M:%S ") ;
@@ -318,7 +318,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            } /* end switch */
 	        } else {
-	            rs = sbuf_char(ssp,ch) ;
+	            rs = sbuf_chr(ssp,ch) ;
 	        }
 	    } /* end while */
 	} /* end if (non-null) */
@@ -382,10 +382,10 @@ static int sbuf_year(sbuf *ssp,TMTIME *tmp) noex {
 static int sbuf_coder(sbuf *ssp,TMTIME *tmp,int f_sec) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,tmp->hour)) >= 0) {
-	    if ((rs = sbuf_char(ssp,':')) >= 0) {
+	    if ((rs = sbuf_chr(ssp,':')) >= 0) {
 	        if ((rs = sbuf_twodig(ssp,tmp->min)) >= 0) {
 		    if (f_sec) {
-			if ((rs = sbuf_char(ssp,':')) >= 0) {
+			if ((rs = sbuf_chr(ssp,':')) >= 0) {
 	        	    rs = sbuf_twodig(ssp,tmp->sec) ;
 			}
 		    }
@@ -401,7 +401,7 @@ static int sbuf_zoff(sbuf *ssp,TMTIME *tmp) noex {
 	int		rs ;
 	{
 	    cint	ch = ((zo >= 0) ? '-' : '+') ;
-	    if ((rs = sbuf_char(ssp,ch)) >= 0) {
+	    if ((rs = sbuf_chr(ssp,ch)) >= 0) {
 	        cint	zh = abs(zo / 60) % 100 ;
 	        cint	zm = abs(zo % 60) ;
 	        if ((rs = sbuf_twodig(ssp,zh)) >= 0) {
@@ -416,9 +416,9 @@ static int sbuf_zoff(sbuf *ssp,TMTIME *tmp) noex {
 static int sbuf_dated(sbuf *ssp,TMTIME *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) {
-	    if ((rs = sbuf_char(ssp,'/')) >= 0) {
+	    if ((rs = sbuf_chr(ssp,'/')) >= 0) {
 	        if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
-	    	    if ((rs = sbuf_char(ssp,'/')) >= 0) {
+	    	    if ((rs = sbuf_chr(ssp,'/')) >= 0) {
 	        	int	y ;
 	        	y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	        	rs = sbuf_twodig(ssp,y) ;
@@ -433,9 +433,9 @@ static int sbuf_dated(sbuf *ssp,TMTIME *tmp) noex {
 static int sbuf_dater(sbuf *ssp,TMTIME *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_year(ssp,tmp)) >= 0) {
-	    if ((rs = sbuf_char(ssp,'-')) >= 0) {
+	    if ((rs = sbuf_chr(ssp,'-')) >= 0) {
 	        if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) {
-	    	    if ((rs = sbuf_char(ssp,'-')) >= 0) {
+	    	    if ((rs = sbuf_chr(ssp,'-')) >= 0) {
 			rs = sbuf_twodig(ssp,tmp->mday) ;
 		    }
 		}
@@ -448,10 +448,10 @@ static int sbuf_dater(sbuf *ssp,TMTIME *tmp) noex {
 static int sbuf_datex(sbuf *ssp,TMTIME *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
-	    if ((rs = sbuf_char(ssp,' ')) >= 0) {
+	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {
 		cchar	**m = calstrs_months ;
 	        if ((rs = sbuf_strw(ssp,m[tmp->mon],3)) >= 0) {
-	    	    if ((rs = sbuf_char(ssp,' ')) >= 0) {
+	    	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {
 	        	rs = sbuf_year(ssp,tmp) ;
 		    }
 		}

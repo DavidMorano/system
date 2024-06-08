@@ -165,7 +165,7 @@ int ucentsv::format(char *rbuf,int rlen) noex {
 	    sbuf	b ;
 	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	        for (int i = 0 ; i < 3 ; i += 1) {
-	            if (i > 0) rs = sbuf_char(&b,' ') ;
+	            if (i > 0) rs = sbuf_chr(&b,' ') ;
 	            if (rs >= 0) {
 	                switch (i) {
 	                case 0:
@@ -261,7 +261,7 @@ static int ucentsv_parsestrs(ucentsv *prp,SI *ibp,cchar *sp,int sl) noex {
 static int ucentsv_formatnum(SVE *op,sbuf *sbp) noex {
 	int		rs ;
 	if ((rs = sbuf_deci(sbp,op->s_port)) >= 0) {
-	    if ((rs = sbuf_char(sbp,'/')) >= 0) {
+	    if ((rs = sbuf_chr(sbp,'/')) >= 0) {
 		rs = sbuf_strw(sbp,op->s_proto,-1) ;
 	    }
 	}

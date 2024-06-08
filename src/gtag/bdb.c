@@ -739,7 +739,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 	            } else if (f_inkey) {
 
 	                if (sbuf_getlen(&citekey) > 0) {
-	                    sbuf_char(&citekey,' ') ;
+	                    sbuf_chr(&citekey,' ') ;
 			}
 
 	                sbuf_strw(&citekey,lbuf,len) ;
@@ -1191,7 +1191,7 @@ static int bibentry_continue(struct bibentry *iep,cchar *vp,int vl)
 	if (rs > 0) {
 
 	    if (! CHAR_ISWHITE(bp[bl - 1])) {
-	        rs = buffer_char(&iep->vb,' ') ;
+	        rs = buffer_chr(&iep->vb,' ') ;
 	    }
 
 	} /* end if */

@@ -483,16 +483,17 @@ static int vechand_setopts(vechand *op,int vo) noex {
 static int vechand_extend(vechand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
-	    int		nn, size ;
+	    int		nn ;
+	    int		sz ;
 	    void	*nva ;
 	    if (op->va == nullptr) {
 	        nn = VECHAND_DEFENTS ;
-	        size = (nn + 1) * sizeof(void **) ;
-	        rs = uc_libmalloc(size,&nva) ;
+	        sz = (nn + 1) * sizeof(void **) ;
+	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        size = (nn + 1) * sizeof(void **) ;
-	        rs = uc_librealloc(op->va,size,&nva) ;
+	        sz = (nn + 1) * sizeof(void **) ;
+	        rs = uc_librealloc(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {

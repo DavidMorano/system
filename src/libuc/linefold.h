@@ -21,7 +21,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	LINEFOLD_MAGIC		0x88431773

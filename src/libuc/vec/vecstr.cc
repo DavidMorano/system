@@ -105,6 +105,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::sort ;			/* subroutine-template */
 
 
@@ -122,6 +123,9 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int	vecstr_ctor(vecstr *) noex ;
@@ -131,9 +135,6 @@ static int	vecstr_addsp(vecstr *,cchar *) noex ;
 static int	vecstr_insertsp(vecstr *,int,cchar *) noex ;
 static int	vecstr_validx(vecstr *,int) noex ;
 static void	vecstr_arrsort(vecstr *,vecstr_vcmp) noex ;
-
-
-/* local subroutines */
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;

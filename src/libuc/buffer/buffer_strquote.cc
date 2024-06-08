@@ -24,10 +24,10 @@
 	inserts it into the "buffer" after it has been shell-quoted.
 
 	Synopsis:
-	int buffer_strquote(buffer *bufp,cchar *sp,int sl) noex
+	int buffer_strquote(buffer *op,cchar *sp,int sl) noex
 
 	Arguments:
-	bufp		pointer to BUFFER object
+	op		pointer to BUFFER object
 	sp		pointer to string
 	sl		length of string
 
@@ -38,13 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<strn.h>
 #include	<strwcpy.h>
-#include	<buffer.h>
 #include	<localmisc.h>
+
+#include	"buffer.h"
 
 
 /* local defines */
@@ -74,21 +76,20 @@ extern "C" {
 
 /* exported subroutines */
 
-int buffer_strquote(buffer *bufp,cchar *sp,int sl) noex {
+int buffer_strquote(buffer *op,cchar *sp,int sl) noex {
 	cint		qch = CH_DQUOTE ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
-	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != NULL) {
+	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != nullptr) {
 	    cint	sz = ((2*sl)+3) ;
-	    cchar	*tp ;
-	    char	*ap ;
-	    if ((rs = uc_malloc(sz,&ap)) >= 0) {
+	    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
+	        cchar	*tp ;
 		char	*bp = ap ;
 		{
 		    *bp++ = qch ;
-		    while ((tp = strnpbrk(sp,sl,"\"\\")) != NULL) {
+		    while ((tp = strnpbrk(sp,sl,"\"\\")) != nullptr) {
 		        bp = strwcpy(bp,sp,(tp-sp)) ;
 		        *bp++ = CH_BSLASH ;
 		        *bp++ = *tp ;
@@ -99,14 +100,14 @@ int buffer_strquote(buffer *bufp,cchar *sp,int sl) noex {
 		        bp = strwcpy(bp,sp,sl) ;
 		    }
 		    *bp++ = qch ;
-		    rs = buffer_strw(bufp,ap,(bp-ap)) ;
+		    rs = buffer_strw(op,ap,(bp-ap)) ;
 		    len = rs ;
 		} /* end block */
 		rs1 = uc_free(ap) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (m-a-f) */
 	} else {
-	    rs = buffer_strw(bufp,sp,sl) ;
+	    rs = buffer_strw(op,sp,sl) ;
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;

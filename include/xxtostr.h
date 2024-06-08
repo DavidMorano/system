@@ -56,7 +56,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<limits.h>
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<varnames.hh>
 #include	<stdintx.h>
 

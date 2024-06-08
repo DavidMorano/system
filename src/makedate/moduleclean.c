@@ -76,7 +76,7 @@ const char	inname[] ;
 
 	    while ((tp = strpbrk(np,"+-/")) != NULL) {
 	        sbuf_buf(&ubuf,np,(tp - np)) ;
-	        sbuf_char(&ubuf,'_') ;
+	        sbuf_chr(&ubuf,'_') ;
 	        np = (tp + 1) ;
 	        f = TRUE ;
 	    } /* end while */

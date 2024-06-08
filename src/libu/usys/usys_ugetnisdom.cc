@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	ucloseonexec
+	ugetnisdom
 
 	Description:
 	This provides a means to get the NIS domain-name from the
@@ -40,49 +40,21 @@
 #include	<cerrno>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usysflag.h>
-#include	<utypedefs.h>
 
 #include	"usys_sunos.h"
 #include	"usys_darwin.h"
 #include	"usys_linux.h"
+#include	"usys_xxx.h"
 
 #include	"usys_ugetnisdom.h"
-
-
-/* local defines */
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
 
 constexpr bool		f_sunos = F_SUNOS ;
 constexpr bool		f_darwin = F_DARWIN ;
 constexpr bool		f_linux = F_LINUX ;
-
-
-/* exported variables */
-
-
-/* exported subroutines */
 
 namespace usys {
     sysret_t ugetnisdom(char *rbuf,int rlen) noex {
@@ -91,7 +63,7 @@ namespace usys {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-		if constexpr (f_sunos) {
+		if_constexpr (f_sunos) {
 		    rs = sunos_ugetnisdom(rbuf,rlen) ;
 		    len = rs ;
 		} else if (f_darwin) {

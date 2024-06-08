@@ -58,7 +58,7 @@ errno_t timer_create(clockid_t,SIGEVENT *,timer_t *tmp) noex {
 errno_t timer_delete(timer_t) noex {
     return ENOSYS ;
 }
-errno_t timer_settime(timer_t,int,ITIMERSPEC *ntvp,ITIMERSPEC *) noex {
+errno_t timer_settime(timer_t,int,CITIMERSPEC *ntvp,ITIMERSPEC *) noex {
 	errno_t		ec = EFAULT ;
 	if (ntvp) {
 	    ec = ENOSYS ;
@@ -87,7 +87,7 @@ EXTERNC_end
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
 
-int pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
+errno_t pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 	errno_t		ec = EFAULT ;
 	if (op && mp) {
 	     ec = ENOSYS ;
@@ -102,7 +102,7 @@ int pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 
 /*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
-int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
+errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 	errno_t		ec = EFAULT ;
 	if (ma) {
 	    ec = EINVAL ;

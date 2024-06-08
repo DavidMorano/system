@@ -94,7 +94,7 @@ char *inet_ntoa_r(struct in_addr in,char *rbuf,int rlen)
 
 	    for (i = 0 ; (rs >= 0) && (i < INET4ADDRLEN) ; i += 1) {
 		const int	v = MKCHAR(*ap++) ;
-		if (i > 0) sbuf_char(&b,'.') ;
+		if (i > 0) sbuf_chr(&b,'.') ;
 		rs = sbuf_deci(&b,v) ;
 	    } /* end for */
 

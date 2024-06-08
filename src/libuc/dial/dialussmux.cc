@@ -108,7 +108,7 @@ static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 	    buffer_strw(&srvbuf,sp,sl) ;
 	    if ((rs = loadargs(&srvbuf,sargv)) >= 0) {
 		cchar	*bp{} ;
-	        buffer_char(&srvbuf,'\n') ;
+	        buffer_chr(&srvbuf,'\n') ;
 	        if ((rs = buffer_get(&srvbuf,&bp)) >= 0) {
 		    SIGACTION	osigs ;
 		    SIGACTION	sigs{} ;
@@ -161,7 +161,7 @@ static int loadargs(buffer *bp,mainv sargv) noex {
 	        for (int i = 0 ; sargv[i] ; i += 1) {
 	            rs = mkquoted(qbuf,qlen,sargv[i],-1) ;
 	            if (rs < 0) break ;
-	            buffer_char(bp,' ') ;
+	            buffer_chr(bp,' ') ;
 	            buffer_buf(bp,qbuf,rs) ;
 	        } /* end for */
 		rs1 = uc_free(qbuf) ;

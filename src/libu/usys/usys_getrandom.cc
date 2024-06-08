@@ -41,7 +41,6 @@
 
 #include	"usys_getrandom.h"
 
-
 #define	MAXRANDSIZE	256		/* limit imposed (else EIO) */
 
 using std::min ;			/* subroutine-template */
@@ -69,6 +68,7 @@ unixret_t getrandom(void *rbuf,size_t rlen,uint) noex {
 	} /* end if (non-null) */
 	return (rc >= 0) ? rl : rc ;
 }
+
 
 #endif /* (!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0) */
 /* GETRANDOM end */

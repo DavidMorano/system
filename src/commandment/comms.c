@@ -630,7 +630,7 @@ static int commandments_loadbuf(COMMANDMENTS *op,char rbuf[],int rlen,
 	    int			j ;
 	    const char		*ebp ;
 	    for (j = 0 ; j < ep->i ; j += 1) {
-	        if (j > 0) sbuf_char(&b,' ') ;
+	        if (j > 0) sbuf_chr(&b,' ') ;
 	        ebp = (op->mapdata + elp->loff) ;
 	        rs = sbuf_strw(&b,ebp,elp->llen) ;
 	        elp += 1 ;

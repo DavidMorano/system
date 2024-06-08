@@ -22,7 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysauxinfo.h>
+#include	<usysauxinfo.h>		/* <- from |libu| */
 
 
 EXTERNC_begin

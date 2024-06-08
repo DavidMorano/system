@@ -134,8 +134,9 @@ obj_vecobj.o:	$(OBJ_VECOBJ)
 # vecxx
 
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o obj_vecobj.o
-OBJB_VEC= vechand.o vecint.o vecitem.o vecsorthand.o
-OBJC_VEC= recarr.o raqhand.o 
+OBJB_VEC= vechand.o vecitem.o vecsorthand.o
+OBJC_VEC= vecint.o veclong.o
+OBJD_VEC= recarr.o raqhand.o 
 
 obja_vec.o:	$(OBJA_VEC)
 	$(LD) -r -o $@ $(OBJA_VEC)
@@ -146,8 +147,11 @@ objb_vec.o:	$(OBJB_VEC)
 objc_vec.o:	$(OBJC_VEC)
 	$(LD) -r -o $@ $(OBJC_VEC)
 
-OBJ_VEC= obja_vec.o objb_vec.o objc_vec.o
+objd_vec.o:	$(OBJD_VEC)
+	$(LD) -r -o $@ $(OBJD_VEC)
 
+
+OBJ_VEC= obja_vec.o objb_vec.o objc_vec.o objd_vec.o
 
 
 all:			$(ALL)

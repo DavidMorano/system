@@ -238,7 +238,7 @@ int calent_loadbuf(CALENT *ep,char rbuf[],int rlen,cchar *mp)
 
 	    for (i = 0 ; i < nlines ; i += 1) {
 
-	        if (i > 0) sbuf_char(&b,' ') ;
+	        if (i > 0) sbuf_chr(&b,' ') ;
 
 	        lp = (mp + lines[i].loff) ;
 	        ll = lines[i].llen ;

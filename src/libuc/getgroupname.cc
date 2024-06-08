@@ -43,10 +43,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* |gid_t| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
-#include	<ucvariables.hh>	/* |varname| */
+#include	<uvariables.hh>		/* |varname| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getax.h>
@@ -93,9 +94,9 @@ namespace {
 	int start(cchar *) noex ;
 	int finish() noex ;
 	operator int () noex ;
-	int isus() noex ;
-	int getgid() noex ;
-	int def() noex ;
+	int tryus() noex ;
+	int trygid() noex ;
+	int trydef() noex ;
     } ; /* end struct (helper) */
 }
 
@@ -107,17 +108,16 @@ static int	isNotOurs(int) noex ;
 
 /* local variables */
 
-constexpr int	rsnotours[] = {
+constexpr int		rsnotours[] = {
 	SR_SEARCH,
 	SR_NOTFOUND,
 	0
 } ;
 
 constexpr helper_m	mems[] = {
-	&helper::isus,
-	&helper::getgid,
-	&helper::def,
-	nullptr
+	&helper::tryus,
+	&helper::trygid,
+	&helper::trydef
 } ;
 
 constexpr gid_t		gidend = -1 ;
@@ -179,14 +179,15 @@ int helper::finish() noex {
 
 helper::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
-	    helper_m	m = mems[i] ;
+	for (auto const &m : mems) {
 	    rs = (this->*m)() ;
-	} /* end for */
+	    if (rs != SR_OK) break ;
+	}
 	return rs ;
 }
 
-int helper::isus() noex {
+
+int helper::tryus() noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if ((gid == ourgid) && vgn) {
@@ -202,7 +203,7 @@ int helper::isus() noex {
 	return (rs >= 0) ? len : rs ;
 }
 
-int helper::getgid() noex {
+int helper::trygid() noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = getgr_gid(&gr,grbuf,grlen,gid)) >= 0) {
@@ -215,7 +216,7 @@ int helper::getgid() noex {
 	return (rs >= 0) ? len : rs ;
 }
 
-int helper::def() noex {
+int helper::trydef() noex {
 	return snsd(rbuf,rlen,"G",gid) ;
 }
 

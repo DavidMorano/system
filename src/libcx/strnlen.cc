@@ -41,8 +41,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	"strn.h"
-
 
 /* local defines */
 

@@ -273,7 +273,7 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
                     fp += 1 ;
                     if (! *fp) break ;
                     if (*fp == '%') {
-                        rs = sbuf_char(&b,'%') ;
+                        rs = sbuf_chr(&b,'%') ;
                     } else {
 			auto	vcf = vstrkeycmp ;
 			cchar	*cp ;
@@ -290,7 +290,7 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
                         } /* end if */
                     } /* end if (tried to expand a key) */
                 } else {
-                    rs = sbuf_char(&b,*fp) ;
+                    rs = sbuf_chr(&b,*fp) ;
                 } /* end if */
             } /* end for */
             len = sbuf_finish(&b) ;

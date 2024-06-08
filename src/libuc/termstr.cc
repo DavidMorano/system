@@ -301,7 +301,7 @@ int termstr_writegr(termstr *op,int gr,cchar *bp,int bl) noex {
 int termstr_char(termstr *op,int ch) noex {
 	int		rs ;
 	if ((rs = termstr_magic(op)) >= 0) {
-	    rs = buffer_char(op->sbp,ch) ;
+	    rs = buffer_chr(op->sbp,ch) ;
 	} /* end if (magic) */
 	return rs ;
 }

@@ -54,7 +54,7 @@
 #include	<cstdlib>
 #include	<ctime>
 #include	<usystem.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>

@@ -36,7 +36,6 @@
 
 #include	"usys_xxx.h"
 
-
 /*----------------------------------------------------------------------------*/
 /* USERATTR begin */
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
@@ -80,7 +79,6 @@ EXTERNC_end
 /* USERATTR end */
 /*----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------*/
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
@@ -97,7 +95,6 @@ EXTERNC_end
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */
 /*----------------------------------------------------------------------------*/
-
 
 sysret_t xxx_ugetnisdom(char *rbuf,int rlen) noex {
 	errno_t		ec = EFAULT ;

@@ -37,7 +37,6 @@
 
 #include	"usys_sigx.h"
 
-
 /* SIGQUEUE start */
 #if	(!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0)
 

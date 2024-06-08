@@ -165,11 +165,11 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	                    sp += 1 ;
 	                    sl -= 1 ;
 	                    if ((sl > 0) && (sp[0] != '\0')) {
-	                        buffer_char((as + state),*sp++) ;
+	                        buffer_chr((as + state),*sp++) ;
 	                        sl -= 1 ;
 	                    }
 	                } else {
-	                    buffer_char((as + state),*sp++) ;
+	                    buffer_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
@@ -183,23 +183,23 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	                    if (c_comment == 0) {
 	                        pc = buffer_getprev(as + state) ;
 	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc))) {
-	                            buffer_char((as + state),' ') ;
+	                            buffer_chr((as + state),' ') ;
 				}
 	                        pstate = state ;
 	                        state = COMPARSE_SCOMMENT ;
 	                        pc = buffer_getprev(as + state) ;
 	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc))) {
-	                            buffer_char((as + state),' ') ;
+	                            buffer_chr((as + state),' ') ;
 				}
 	                        sp += 1 ;
 	                        sl -= 1 ;
 	                    } else {
-	                        buffer_char((as + state),*sp++) ;
+	                        buffer_chr((as + state),*sp++) ;
 	                        sl -= 1 ;
 	                    }
 	                    c_comment += 1 ;
 	                } else {
-	                    buffer_char((as + state),*sp++) ;
+	                    buffer_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
@@ -211,11 +211,11 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	                        sp += 1 ;
 	                        sl -= 1 ;
 	                    } else {
-	                        buffer_char((as + state),*sp++) ;
+	                        buffer_chr((as + state),*sp++) ;
 	                        sl -= 1 ;
 	                    }
 	                } else {
-	                    buffer_char((as + state),*sp++) ;
+	                    buffer_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
@@ -234,9 +234,9 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 			/* FALLTHROUGH */
 	            default:
 	                if (c_comment > 0) {
-	                    buffer_char((as + COMPARSE_SCOMMENT),*sp++) ;
+	                    buffer_chr((as + COMPARSE_SCOMMENT),*sp++) ;
 	                } else {
-	                    buffer_char((as + state),*sp++) ;
+	                    buffer_chr((as + state),*sp++) ;
 			}
 	                sl -= 1 ;
 	                break ;

@@ -106,7 +106,7 @@ int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial)
 	        if (nl > USERNAMELEN) {
 		    uv = (uint) gethostid() ;
 	            sbuf_hexui(&ubuf,uv) ;
-	            sbuf_char(&ubuf,'-') ;
+	            sbuf_chr(&ubuf,'-') ;
 	        } else {
 	            sbuf_strw(&ubuf,nn,nl) ;
 		}
@@ -118,17 +118,17 @@ int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial)
 	    uv = (uint) pid ;
 	    sbuf_decui(&ubuf,uv) ;
 
-	    sbuf_char(&ubuf,'.') ;
+	    sbuf_chr(&ubuf,'.') ;
 
 	    uv = (uint) dt ;
 	    sbuf_hexui(&ubuf,uv) ;
 
-	    sbuf_char(&ubuf,'.') ;
+	    sbuf_chr(&ubuf,'.') ;
 	    sbuf_deci(&ubuf,pip->pserial) ;
-	    sbuf_char(&ubuf,'.') ;
+	    sbuf_chr(&ubuf,'.') ;
 	    sbuf_deci(&ubuf,serial) ;
 
-	    sbuf_char(&ubuf,'@') ;
+	    sbuf_chr(&ubuf,'@') ;
 
 	    sbuf_strw(&ubuf,dn,-1) ;
 

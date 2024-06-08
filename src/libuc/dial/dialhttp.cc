@@ -353,17 +353,17 @@ static int mkurl(char *ubuf,int ulen,cc *hn,cc *ps,cc *svc,mainv sargv) noex {
 	    sbuf_strw(&url,"http://",-1) ;
 	    sbuf_strw(&url,hn,-1) ;
 	    if ((ps != nullptr) && (ps[0] != '\0')) {
-	        sbuf_char(&url,':') ;
+	        sbuf_chr(&url,':') ;
 	        sbuf_strw(&url,ps,-1) ;
 	    }
-	    sbuf_char(&url,'/') ;
+	    sbuf_chr(&url,'/') ;
 	    if ((svc != nullptr) && (svc[0] != '\0')) {
 	        if (svc[0] == '/') svc += 1 ;
 	        sbuf_strw(&url,svc,-1) ;
 	    } /* end if */
 	    if (sargv != nullptr) {
 	        for (int i = 0 ; sargv[i] ; i += 1) {
-	            sbuf_char(&url,'?') ;
+	            sbuf_chr(&url,'?') ;
 	            sbuf_buf(&url,sargv[i],-1) ;
 	        } /* end for */
 	    } /* end if */

@@ -1746,7 +1746,7 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	f_m = f_m || 
 	    ((argv != nullptr) && (argv[0] != nullptr) && hasmz(argv[0])) ;
 	if (f_m) {
-	    rs = buffer_char(&b,'-') ;
+	    rs = buffer_chr(&b,'-') ;
 	}
 
 	if (rs >= 0)

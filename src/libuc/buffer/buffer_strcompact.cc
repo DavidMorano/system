@@ -21,13 +21,14 @@
 	buffer_strcompact
 
 	Description:
-        Store a source string (which is not compacted) into the "buffer"
+        Store a source string (which is not compacted) into the 
+	buffer object.
 
 	Synopsis:
-	int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex
+	int buffer_strcompact(buffer *op,cchar *sp,int sl) noex
 
 	Arguments:
-	bufp		pointer to BUFFER object
+	op		pointer to BUFFER object
 	sp		pointer to string
 	sl		length of string
 
@@ -38,6 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
@@ -74,7 +76,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex {
+int buffer_strcompact(buffer *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		len = 0 ;
@@ -83,11 +85,11 @@ int buffer_strcompact(buffer *bufp,cchar *sp,int sl) noex {
 	if (sl < 0) sl = strlen(sp) ;
 	while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if (c++ > 0) {
-	        rs = buffer_char(bufp,CH_SP) ;
+	        rs = buffer_chr(op,CH_SP) ;
 	        len += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = buffer_strw(bufp,cp,cl) ;
+	        rs = buffer_strw(op,cp,cl) ;
 	        len += rs ;
 	    }
 	    sl -= ((cp+cl)-sp) ;

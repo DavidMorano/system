@@ -100,6 +100,8 @@ EXTERNC_end
 #ifdef	__cplusplus
 namespace usys {
     extern int sncpy(char *,int,cchar *) noex ;
+    extern int uitimer_get(int,ITIMERVAL *) noex ;
+    extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
 }
 #endif /* __cplusplus */
 

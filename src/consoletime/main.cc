@@ -1570,7 +1570,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
 
 	    if (f_terminal)
-	        sbuf_char(&b,'\r') ;
+	        sbuf_chr(&b,'\r') ;
 
 /* time */
 
@@ -1582,7 +1582,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 	    if (pip->f.o_time) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
 	        timestr_logz(pip->daytime,timebuf) ;
-	        if (c++ > 0) sbuf_char(&b,' ') ;
+	        if (c++ > 0) sbuf_chr(&b,' ') ;
 	        sbuf_strw(&b,timebuf,23) ;
 	    } /* end if (option-time) */
 
@@ -1590,7 +1590,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 	    if ((rs >= 0) && pip->f.o_node) {
 	        if ((rs = proginfo_nodename(pip)) >= 0) {
-	            if (c++ > 0) sbuf_char(&b,' ') ;
+	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            if (pip->f.o_nodetitle)
 	                sbuf_strw(&b,"node=",-1) ;
 	            sbuf_strw(&b,pip->nodename,-1) ;
@@ -1601,7 +1601,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 	    if ((rs >= 0) && pip->f.o_users) {
 	        if ((rs = procinfo_nusers(pip)) >= 0) {
-	            if (c++ > 0) sbuf_char(&b,' ') ;
+	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"users=",-1) ;
 	            sbuf_decui(&b,pip->nusers) ;
 	        }
@@ -1611,7 +1611,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 	    if ((rs >= 0) && pip->f.o_procs) {
 	        if ((rs = procinfo_nprocs(pip)) >= 0) {
-	            if (c++ > 0) sbuf_char(&b,' ') ;
+	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"procs=",-1) ;
 	            sbuf_decui(&b,pip->nprocs) ;
 	        }
@@ -1641,10 +1641,10 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 	            n100 = (mu * 100) ;
 	            percent = (n100 / mt) ;
 
-	            if (c++ > 0) sbuf_char(&b,' ') ;
+	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_strw(&b,"mem=",-1) ;
 	            sbuf_decui(&b,percent) ;
-	            sbuf_char(&b,'%') ;
+	            sbuf_chr(&b,'%') ;
 
 	        } /* end if */
 
@@ -1663,7 +1663,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 	                fmt = "la=(%5.1f %5.1f %5.1f)" ;
 	                ndigmax(dla,3,3) ;
 	            }
-	            if (c++ > 0) sbuf_char(&b,' ') ;
+	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            sbuf_printf(&b,fmt,dla[0],dla[1],dla[2]) ;
 	        } /* end if (load-averages) */
 	    } /* end if (option-loadaverages) */
@@ -1680,9 +1680,9 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 	    }
 
 	    if (f_terminal)
-	        sbuf_char(&b,'\r') ;
+	        sbuf_chr(&b,'\r') ;
 
-	    sbuf_char(&b,'\n') ;
+	    sbuf_chr(&b,'\n') ;
 
 	    rs1 = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;

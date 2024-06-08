@@ -20,9 +20,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<stdarg.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<ascii.h>
 #include	<stdintx.h>
 
 
@@ -30,21 +31,70 @@
 
 
 struct buffer_head {
-	char		*buf ;		/* the "buffer" */
+	char		*dbuf ;		/* the "buffer" */
+	int		dlen ;		/* current buffer extent */
 	int		startlen ;	/* saved for expansion purposes */
 	int		len ;		/* occupied length */
-	int		e ;		/* current buffer extent */
 } ;
 
+#ifdef	__cplusplus
+enum buffermems {
+	buffermem_start,
+	buffermem_strsize,
+	buffermem_reset,
+	buffermem_finish,
+	buffermem_overlast
+} ;
+struct buffer ;
+struct buffer_co {
+	buffer		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (buffer *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+	int operator () (int = 0) noex ;
+} ; /* end struct (buffer_co) */
+struct buffer : buffer_head {
+	buffer_co	start ;
+	buffer_co	strsize ;
+	buffer_co	reset ;
+	buffer_co	finish ;
+	buffer() noex {
+	    strsize(this,buffermem_start) ;
+	    strsize(this,buffermem_strsize) ;
+	    reset(this,buffermem_reset) ;
+	    finish(this,buffermem_finish) ;
+	} ;
+	buffer(const buffer &) = delete ;
+	buffer &operator = (const buffer &) = delete ;
+	int adv(int = 1) noex ;
+	int strw(cchar *,int = -1) noex ;
+	int chr(int) noex ;
+	int get(cchar **) noex ;
+	template<typename Binary> int bin(Binary) noex ;
+	template<typename Octal> int oct(Octal) noex ;
+	template<typename Decimal> int dec(Decimal) noex ;
+	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
+	void dtor() noex ;
+	~buffer() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (buffer) */
+#else	/* __cplusplus */
 typedef BUFFER		buffer ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
 extern int	buffer_start(buffer *,int) noex ;
 extern int	buffer_reset(buffer *) noex ;
 extern int	buffer_adv(buffer *,int) noex ;
-extern int	buffer_char(buffer *,int) noex ;
 extern int	buffer_strw(buffer *,cchar *,int) noex ;
+extern int	buffer_chr(buffer *,int) noex ;
 extern int	buffer_buf(buffer *,cchar *,int) noex ;
 extern int	buffer_deci(buffer *,int) noex ;
 extern int	buffer_decl(buffer *,long) noex ;
@@ -69,6 +119,12 @@ extern int	buffer_finish(buffer *) noex ;
 extern int	buffer_strcompact(buffer *,cchar *,int) noex ;
 extern int	buffer_stropaque(buffer *,cchar *,int) noex ;
 extern int	buffer_strquote(buffer *,cchar *,int) noex ;
+extern int	buffer_chrs(buffer *,int,int) noex ;
+extern int	buffer_blanks(buffer *,int) noex ;
+
+static inline int buffer_backs(buffer *op,int n) noex {
+	return buffer_chrs(op,CH_BS,n) ;
+}
 
 EXTERNC_end
 
@@ -112,6 +168,19 @@ inline int buffer_hex(buffer *op,ulong v) noex {
 }
 inline int buffer_hex(buffer *op,ulonglong v) noex {
 	return buffer_hexull(op,v) ;
+}
+
+template<typename Binary> int buffer::bin(Binary v) noex {
+	return buffer_bin(this,v) ;
+}
+template<typename Octal> int buffer::oct(Octal v) noex {
+	return buffer_oct(this,v) ;
+}
+template<typename Decimal> int buffer::dec(Decimal v) noex {
+	return buffer_dec(this,v) ;
+}
+template<typename Hexadecimal> int buffer::hex(Hexadecimal v) noex {
+	return buffer_hex(this,v) ;
 }
 
 #endif /* __cplusplus */

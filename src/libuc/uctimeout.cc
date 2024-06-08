@@ -27,7 +27,7 @@
 	This subroutine manages time-outs (registered call-backs).
 	This subroutine acts like a process-wide system call, and
 	can be used by all threads within the process for creating
-	time-out call-backs. Of course this is thread-safe.
+	time-out call-backs.  Of course this is thread-safe.
 
 	Synopsis:
 	int uc_timeout(int cmd,TIMEOUT *val) noex
@@ -49,8 +49,9 @@
 #include	<sys/stat.h>
 #include	<ucontext.h>
 #include	<csignal>
-#include	<cstring>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<queue>
 #include	<usystem.h>
 #include	<timewatch.hh>
@@ -103,7 +104,8 @@ typedef vecsorthand	prique ;
 
 extern "C" int		uc_timeout(int,TIMEOUT *) noex ;
 
-extern "C" cchar	*strsigabbr(int) ;
+
+/* external variables */
 
 
 /* local structures */
@@ -368,8 +370,9 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	                    ep->id = ei ;
 	                    rs = enterpri(ep) ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    vechand_del(elp,ei) ;
+			}
 	            } /* end if (vechand_add) */
 	            rs1 = mx.lockend ;
 	            if (rs >= 0) rs = rs1 ;
@@ -428,8 +431,9 @@ int uctimeout::enterpri(TIMEOUT *ep) noex {
 	            if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
 	                pi = rs ;
 	                rs = timerset(ep->val) ;
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    vecsorthand_del(pqp,pi) ;
+			}
 	            }
 	        } else {
 	            rs = vecsorthand_add(pqp,ep) ;
@@ -440,10 +444,11 @@ int uctimeout::enterpri(TIMEOUT *ep) noex {
 	    if ((rs = vecsorthand_add(pqp,ep)) >= 0) {
 	        pi = rs ;
 	        rs = timerset(ep->val) ;
-	        if (rs < 0)
+	        if (rs < 0) {
 	            vecsorthand_del(pqp,pi) ;
+		}
 	    } /* end if (vecsorthand_add) */
-	}
+	} /* end if */
 	return (rs >= 0) ? pi : rs ;
 }
 /* end subroutine (uctimeout::enterpri) */
@@ -511,7 +516,7 @@ int uctimeout::workready() noex {
 int uctimeout::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
-	    static constexpr int	vo = voents ;
+	    static cint		vo = voents ;
 	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
@@ -667,7 +672,8 @@ int uctimeout::pridump() noex {
 /* end subroutine (uctimeout::pridump) */
 
 int uctimeout::sigbegin() noex {
-	sigset_t	ss, oss ;
+	sigset_t	ss ;
+	sigset_t	oss ;
 	cint		scmd = SIG_BLOCK ;
 	cint		sig = SIGTIMEOUT ;
 	int		rs ;
@@ -995,7 +1001,7 @@ int uctimeout::disphandle() noex {
 	int		rs1 ;
 	while ((rs1 = ciq_rem(&pass,&tep)) >= 0) {
 	    if ((rs = dispjobdel(tep)) > 0) {
-	        timeout_met	met = (timeout_met) tep->metf ;
+	        timeout_f	met = (timeout_f) tep->metf ;
 	        rs = (*met)(tep->objp,tep->tag,tep->arg) ;
 	        uc_libfree(tep) ;
 	    } /* end if (still had job) */
@@ -1048,7 +1054,7 @@ static void uctimeout_atforkchild() noex {
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
             uip->fl.running_disper = false ;
-	    if constexpr (f_childthrs) {
+	    if_constexpr (f_childthrs) {
                 if (uip->fl.thrs) {
                     uip->fl.thrs = false ;
                     uip->thrsbegin() ;

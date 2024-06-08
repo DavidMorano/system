@@ -517,7 +517,7 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	            } else {
 	                sl -= ((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
-	                rs = buffer_char(bufp,'$') ;
+	                rs = buffer_chr(bufp,'$') ;
 	                len += rs ;
 	            }
 	        } /* end if (ok) */
@@ -553,11 +553,11 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 	            rs = buffer_strw(bufp,ap,al) ;
 	            len += rs ;
 		} else if (op->f.noblank) {
-		    if ((rs = buffer_char(bufp,'*')) >= 0) {
+		    if ((rs = buffer_chr(bufp,'*')) >= 0) {
 	            	len += rs ;
 	                if ((rs = buffer_strw(bufp,kp,kl)) >= 0) {
 	            	    len += rs ;
-		    	    rs = buffer_char(bufp,'*') ;
+		    	    rs = buffer_chr(bufp,'*') ;
 	            	    len += rs ;
 			}
 		    }

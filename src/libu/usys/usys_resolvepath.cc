@@ -38,7 +38,6 @@
 
 #include	"usys_resolvepath.h"
 
-
 unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	cint		rlen = int(rsz & INT_MAX) ;
 	unixret_t	rc = 0 ;

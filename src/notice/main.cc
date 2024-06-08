@@ -1117,7 +1117,7 @@ static int procgather(PROGINFO *pip,char mbuf[],int mlen,cchar ifname[])
 
 	                f_eol = (lbuf[i] == '\n') ;
 	                if ((i == 80) && (! f_eol))
-	                    sbuf_char(&b,'\n') ;
+	                    sbuf_chr(&b,'\n') ;
 
 			ch = MKCHAR(lbuf[i]) ;
 	                f = isprintlatin(ch) ;
@@ -1127,9 +1127,9 @@ static int procgather(PROGINFO *pip,char mbuf[],int mlen,cchar ifname[])
 	                f = f || (lbuf[i] == CH_BEL) ;
 
 	                if (f) {
-	                    sbuf_char(&b,lbuf[i]) ;
+	                    sbuf_chr(&b,lbuf[i]) ;
 	                } else
-	                    sbuf_char(&b,' ') ;
+	                    sbuf_chr(&b,' ') ;
 
 			rs = sbuf_getlen(&b) ;
 			if (rs < 0) break ;
@@ -1139,7 +1139,7 @@ static int procgather(PROGINFO *pip,char mbuf[],int mlen,cchar ifname[])
 	        } /* end while */
 
 	        if ((rs >= 0) && (len > 0) && (! f_eol))
-	            sbuf_char(&b,'\n') ;
+	            sbuf_chr(&b,'\n') ;
 
 	        bl = sbuf_finish(&b) ;
 	        if (rs >= 0) rs = bl ;
@@ -1634,9 +1634,9 @@ int		tlen ;
 /* form the notice to write out */
 
 	    if (pip->f.ringbell)
-	        sbuf_char(&out,CH_BELL) ;
+	        sbuf_chr(&out,CH_BELL) ;
 
-	    sbuf_char(&out,'\r') ;
+	    sbuf_chr(&out,'\r') ;
 
 	    sp = tbuf ;
 	    sl = tlen ;

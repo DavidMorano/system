@@ -194,7 +194,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 
 	            if (f_sa || f_m) {
 	                if (f_m)
-	                    rs = buffer_char(&b,'-') ;
+	                    rs = buffer_chr(&b,'-') ;
 	                if (rs >= 0)
 	                    rs = buffer_strw(&b,cp,cl) ;
 	                if (rs >= 0) {

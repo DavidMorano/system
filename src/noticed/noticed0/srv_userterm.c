@@ -183,7 +183,7 @@ int		fd_ipc ;
 
 /* form the notice to write out */
 
-	    sbuf_char(&out,'\r') ;
+	    sbuf_chr(&out,'\r') ;
 
 	    sp = tbuf ;
 	    len = tlen ;
@@ -208,7 +208,7 @@ int		fd_ipc ;
 
 	    }
 
-	    sbuf_char(&out,'\n') ;
+	    sbuf_chr(&out,'\n') ;
 
 	    wlen = sbuf_getlen(&out) ;
 

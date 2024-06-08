@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	osetint
+
+	Description:
 	This object provides am ordered set of integers.  No two
 	elements can be the same (desired for these purposes).
 

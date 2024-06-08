@@ -50,6 +50,66 @@ enum errnomssings {
 	errnomissing_overlast
 } ;
 
+#ifndef	EL2NSYNC
+#define	EL2NSYNC	errnomissing_l2nsync
+#endif
+#ifndef	EL3HLT
+#define	EL3HLT		errnomissing_l3hlt
+#endif
+#ifndef	EL3RST
+#define	EL3RST		errnomissing_l3rst
+#endif
+#ifndef	EUNATCH
+#define	EUNATCH		errnomissing_unatch
+#endif
+#ifndef	EL2HLT
+#define	EL2HLT		errnomissing_l2hlt
+#endif
+#ifndef	EBADR
+#define	EBADR		errnomissing_badr
+#endif
+#ifndef	ENOANO
+#define	ENOANO		errnomissing_noano
+#endif
+#ifndef	EBADRQC
+#define	EBADRQC		errnomissing_badrqc
+#endif
+#ifndef	EBADSLT
+#define	EBADSLT		errnomissing_badslt
+#endif
+#ifndef	EDEADLOCK
+#define	EDEADLOCK	errnomissing_deadlock
+#endif
+#ifndef	EBFONT
+#define	EBFONT		errnomissing_bfont
+#endif
+#ifndef	EOWNERDEAD
+#define	EOWNERDEAD	errnomising_ownerdead
+#endif
+#ifndef	ENOTRECOVERABLE
+#define	ENOTRECOVERABLE	errnomissing_notrecoverable
+#endif
+#ifndef	ENOSR
+#define	ENOSR		errnomissing_nosr
+#endif
+#ifndef	ENOPKG
+#define	ENOPKG		errnomissing_nopkg
+#endif
+#ifndef	EPROTO
+#define	EPROTO		errnomissing_proto
+#endif
+#ifndef	EBADFD
+#define	EBADFD		errnomissing_badfd
+#endif
+#ifndef	ELIBACC
+#define	ELIBACC		errnomissing_libacc
+#endif
+#ifndef	ELIBBAD
+#define	ELIBBAD		errnomissing_libbad
+#endif
+#ifndef	EHOSTDOWN
+#define	EHOSTDOWN	errnomissing_hostdown
+#endif
 
 /* status return codes (only used when explicit return status is requested) */
 
@@ -97,148 +157,49 @@ enum errnomssings {
 #define	SR_NOMSG	(- ENOMSG)	/* No message of desired type */
 #define	SR_IDRM		(- EIDRM)	/* Identifier removed */
 #define	SR_CHRNG	(- ECHRNG)	/* Channel number out of range */
-#ifdef	EL2NSYNC
 #define	SR_L2NSYNC	(- EL2NSYNC)	/* Level 2 not synchronized */
-#else
-#define	SR_L2NSYNC	(- errnomissing_l2nsync)
-#endif
-#ifdef	EL3HLT
 #define	SR_L3HLT	(- EL3HLT)	/* Level 3 halted */
-#else
-#define	SR_L3HLT	(- errnomissing_l3hlt)
-#endif
-#ifdef	EL3RST
 #define	SR_L3RST	(- EL3RST)	/* Level 3 reset */
-#else
-#define	SR_L3RST	(- errnomissing_l3rst)
-#endif
 #define	SR_LNRNG	(- ELNRNG)	/* Link number out of range */
-
-#ifdef	EUNATCH
 #define	SR_UNATCH	(- EUNATCH)	/* Protocol driver not attached */
-#else
-#define	SR_UNATCH	(- errnomissing_unatch)
-#endif
-
 #define	SR_NOCSI	(- ENOCSI)	/* No CSI structure available */
-#ifdef	EL2HLT
 #define	SR_L2HLT	(- EL2HLT)	/* Level 2 halted */
-#else
-#define	SR_L2HLT	(- errnomissing_l2hlt)
-#endif
 #define	SR_DEADLK	(- EDEADLK)	/* Deadlock condition */
 #define	SR_NOLCK	(- ENOLCK)	/* No record locks available */
 #define	SR_CANCELED	(- ECANCELED)	/* Operation canceled */
 #define	SR_NOTSUP	(- ENOTSUP)	/* Operation not supported */
 #define	SR_DQUOT	(- EDQUOT)	/* Disc quota exceeded */
 #define	SR_BADE		(- EBADE)	/* invalid exchange */
-
-#ifdef	EBADR
 #define	SR_BADR		(- EBADR)	/* invalid request descriptor */
-#else
-#define	SR_BADR		(- errnomissing_badr)
-#endif
-
 #define	SR_XFULL	(- EXFULL)	/* exchange full */
-
-#ifdef	ENOANO
 #define	SR_NOANO	(- ENOANO)	/* no anode */
-#else
-#define	SR_NOANO	(- errnomissing_noano)
-#endif /* ENOANO */
-
-#ifdef	EBADRQC
 #define	SR_BADRQC	(- EBADRQC)	/* invalid request code */
-#else
-#define	SR_BADRQC	(- errnomissing_badrqc)
-#endif
-
-#ifdef	EBADSLT
 #define	SR_BADSLT	(- EBADSLT)	/* invalid slot */
-#else
-#define	SR_BADSLT	(- errnomissing_badslt)
-#endif /* EBADSLT */
-
-#ifdef	EDEADLOCK
 #define	SR_DEADLOCK	(- EDEADLOCK)	/* file locking deadlock error */
-#else
-#define	SR_DEADLOCK	(- errnomissing_deadlock)
-#endif
-
-#ifdef	EBFONT
 #define	SR_BFONT	(- EBFONT)	/* bad font file fmt */
-#else
-#define	SR_BFONT	(- errnomissing_bfont)
-#endif /* EBFONT */
-
-#ifdef	EOWNERDEAD
 #define	SR_OWNERDEAD	(- EOWNERDEAD)	/* owner dead (for mutexes) */
-#else
-#define	SR_OWNERDEAD	(- errnomising_ownerdead)
-#endif /* EOWNERDEAD */
-
-#ifdef	ENOTRECOVERABLE
 #define	SR_NOTRECOVERABLE	(- ENOTRECOVERABLE)	/* not recoverable */
-#else
-#define	SR_NOTRECOVERABLE	(- errnomissing_notrecoverable)
-#endif /* ENOTRECOVERABLE */
-
 #define	SR_NOSTR	(- ENOSTR)	/* Device not a stream */
 #define	SR_NODATA	(- ENODATA)	/* no data (for no-delay io) */
 #define	SR_TIME		(- ETIME)	/* timer expired */
-
-#ifdef	ENOSR
 #define	SR_NOSR		(- ENOSR)	/* out of streams resources */
-#else
-#define	SR_NOSR		(- errnomissing_nosr)
-#endif
-
 #define	SR_NONET	(- ENONET)	/* Machine is not on the network */
-
-#ifdef	ENOPKG
 #define	SR_NOPKG	(- ENOPKG)	/* Package not installed */
-#else
-#define	SR_NOPKG	(- errnomissing_nopkg)
-#endif
-
 #define	SR_REMOTE	(- EREMOTE)	/* The object is remote */
 #define	SR_NOLINK	(- ENOLINK)	/* the link has been severed */
 #define	SR_ADV		(- EADV)	/* advertise error */
 #define	SR_SRMNT	(- ESRMNT)	/* srmount error */
 #define	SR_COMM		(- ECOMM)	/* Communication error on send */
-
-#ifdef	EPROTO
 #define	SR_PROTO	(- EPROTO)	/* Protocol error */
-#else
-#define	SR_PROTO	(- errnomissing_proto)
-#endif
-
 #define	SR_MULTIHOP	(- EMULTIHOP)	/* multihop attempted */
 #define	SR_BADMSG	(- EBADMSG)	/* trying to read unreadable message */
 #define	SR_NAMETOOLONG	(- ENAMETOOLONG)	/* path name is too long */
 #define	SR_OVERFLOW	(- EOVERFLOW)	/* value too large to be stored */
 #define	SR_NOTUNIQ	(- ENOTUNIQ)	/* given login name not unique */
-
-#ifdef	EBADFD
 #define	SR_BADFD	(- EBADFD)	/* FD invalid for this operation */
-#else
-#define	SR_BADFD	(- errnomissing_badfd)
-#endif
-
 #define	SR_REMCHG	(- EREMCHG)	/* Remote address changed */
-
-#ifdef	ELIBACC
 #define	SR_LIBACC	(- ELIBACC)	/* Can't access a needed shared lib */
-#else
-#define	SR_LIBACC	(- errnomissing_libacc)
-#endif
-
-#ifdef	ELIBBAD
 #define	SR_LIBBAD	(- ELIBBAD)	/* Accessing a corrupted shared lib */
-#else
-#define	SR_LIBBAD	(- errnomissing_libbad)
-#endif
-
 #define	SR_LIBSCN	(- ELIBSCN)	/* .lib section in a.out corrupted */
 #define	SR_LIBMAX	(- ELIBMAX)	/* Attempting link in too many libs */
 #define	SR_LIBEXEC	(- ELIBEXEC)	/* Attempting to exec shared library */
@@ -273,13 +234,7 @@ enum errnomssings {
 #define	SR_TOOMANYREFS	(- ETOOMANYREFS)	/* Too many: can't splice */
 #define	SR_TIMEDOUT	(- ETIMEDOUT)	/* Connection timed out */
 #define	SR_CONNREFUSED	(- ECONNREFUSED)	/* Connection refused */
-
-#ifdef	EHOSTDOWN
 #define	SR_HOSTDOWN	(- EHOSTDOWN)	/* Host is down */
-#else
-#define	SR_HOSTDOWN	(- errnomissing_hostdown)
-#endif
-
 #define	SR_HOSTUNREACH	(- EHOSTUNREACH)	/* No route to host */
 #define	SR_WOULDBLOCK	(- EAGAIN)	/* UNIX® synonym for AGAIN */
 #define	SR_ALREADY	(- EALREADY)	/* operation already in progress */
@@ -328,10 +283,6 @@ enum errnomssings {
 
 #ifndef	ETOOBIG
 #define	ETOOBIG		E2BIG
-#endif
-
-#ifndef	EBADFD
-#define	EBADFD		(- SR_BADFD)		/* bad-FD */
 #endif
 
 #ifndef	EBADFMT

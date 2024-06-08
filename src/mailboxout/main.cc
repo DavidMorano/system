@@ -2857,7 +2857,7 @@ uint		val ;
 
 	sbuf_strw(&b,up,ul) ;
 
-	sbuf_char(&b,'@') ;
+	sbuf_chr(&b,'@') ;
 
 	sbuf_deci(&b,val) ;
 

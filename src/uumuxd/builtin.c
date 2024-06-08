@@ -378,7 +378,7 @@ const char	*sargv[] ;
 	            debugprintf("builtin_help: bisvc=%s\n",bisvcs[i]) ;
 #endif
 	        buffer_buf(&bo,bisvcs[i],-1) ;
-	        buffer_char(&bo,'\n') ;
+	        buffer_chr(&bo,'\n') ;
 	    } /* end if */
 	} /* end for */
 
@@ -395,7 +395,7 @@ const char	*sargv[] ;
 
 	    if (matstr(bisvcs,svcbuf,-1) < 0) {
 	        buffer_buf(&bo,svcbuf,-1) ;
-	        buffer_char(&bo,'\n') ;
+	        buffer_chr(&bo,'\n') ;
 	    } /* end if (not already listed) */
 
 	} /* end while */

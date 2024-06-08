@@ -903,9 +903,9 @@ int		buflen ;
 
 	        buffer_buf(&pb,bp,(tp - bp)) ;
 
-	        buffer_char(&pb,'\r') ;
+	        buffer_chr(&pb,'\r') ;
 
-	        buffer_char(&pb,'\n') ;
+	        buffer_chr(&pb,'\n') ;
 
 	        bl -= ((tp + 1) - bp) ;
 	        bp = (tp + 1) ;
@@ -914,9 +914,9 @@ int		buflen ;
 
 	            buffer_buf(&pb,bp,(tp - bp)) ;
 
-	            buffer_char(&pb,'\r') ;
+	            buffer_chr(&pb,'\r') ;
 
-	            buffer_char(&pb,'\n') ;
+	            buffer_chr(&pb,'\n') ;
 
 	            bl -= ((tp + 1) - bp) ;
 	            bp = (tp + 1) ;

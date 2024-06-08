@@ -100,7 +100,7 @@ int pimkmsgbound(PROGINFO *pip,char *mbuf,int mlen) noex {
 	            sbuf_strw(&b,pip->nodename,-1) ;
 /* PID */
 	            sbuf_deci(&b,(int) pip->pid) ;
-	            sbuf_char(&b,'.') ;
+	            sbuf_chr(&b,'.') ;
 /* time-of-day */
 		    if constexpr (f_mtime) {
 	                dater_gettime(&pip->mdate,&t) ;
@@ -113,9 +113,9 @@ int pimkmsgbound(PROGINFO *pip,char *mbuf,int mlen) noex {
 	            sbuf_hexui(&b,hostid) ;
 /* random number */
 	            sbuf_hexull(&b,pip->rand) ;
-	            sbuf_char(&b,'.') ;
+	            sbuf_chr(&b,'.') ;
 	            sbuf_decui(&b,pip->serial) ;
-	            sbuf_char(&b,'@') ;
+	            sbuf_chr(&b,'@') ;
 	            if (pip->domainname) {
 	                sbuf_strw(&b,pip->domainname,-1) ;
 		    }

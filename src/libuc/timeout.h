@@ -26,11 +26,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<time.h>		/* |time_t| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #define	TIMEOUT		struct timeout_entry
@@ -38,7 +37,7 @@
 
 EXTERNC_begin
 
-typedef int (*timeout_m)(void *,uint,int) noex ;
+typedef int (*timeout_f)(void *,uint,int) noex ;
 
 EXTERNC_end
 
@@ -49,7 +48,7 @@ enum timeoutcmds {
 } ;
 
 struct timeout_entry {
-	timeout_m	metf ;		/* nmethod function (C-linkage) */
+	timeout_f	metf ;		/* method function (C-linkage) */
 	void		*objp ;		/* object pointer */
 	time_t		val ;
 	uint		tag ;
@@ -61,7 +60,8 @@ typedef TIMEOUT		timeout ;
 
 EXTERNC_begin
 
-extern int timeout_load(timeout *,time_t,void *,timeout_m,uint,int) noex ;
+extern int timeout_load(timeout *,time_t,void *,timeout_f,uint,int) noex ;
+
 extern int uc_timeout(int,timeout *) noex ;
 
 EXTERNC_end

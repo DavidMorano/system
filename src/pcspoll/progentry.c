@@ -870,7 +870,7 @@ char		outbuf[] ;
 
 	sbuf_strw(&b,tmpdname,-1) ;
 
-	sbuf_char(&b,'/') ;
+	sbuf_chr(&b,'/') ;
 
 	sbuf_strw(&b,"pcspoll",-1) ;
 

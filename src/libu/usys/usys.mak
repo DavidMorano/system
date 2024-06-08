@@ -57,15 +57,18 @@ LDFLAGS= $(MAKELDFLAGS)
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_ugetnisdom.o usys_ufcntl.o
-OBJ3_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
-OBJ4_USYS= usys_ttynamerp.o 
-OBJ5_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
-OBJ6_USYS= usys_sigx.o usys_streams.o
-OBJ7_USYS= usys_pipes.o
+OBJ3_USYS= usys_ugetdents.o usys_libstr.o
+
+OBJ4_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
+OBJ5_USYS= usys_ttynamerp.o 
+OBJ6_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
+OBJ7_USYS= usys_sigx.o usys_streams.o
+
+OBJ8_USYS= usys_pipes.o
 
 OBJA= obj0_usys.o obj1_usys.o obj2_usys.o 
 OBJB= obj3_usys.o obj4_usys.o obj5_usys.o
-OBJC= obj6_usys.o obj7_usys.o
+OBJC= obj6_usys.o obj7_usys.o obj8_usys.o
 
 OBJ_USYS= obja.o objb.o objc.o
 
@@ -173,5 +176,7 @@ usys_sigx.o:		usys_sigx.cc usys_sigx.h		$(INCS)
 usys_streams.o:		usys_streams.cc usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc usys_pipes.h		$(INCS)
 usys_stat.o:		usys_stat.cc usys_stat.h		$(INCS)
+usys_ugetdents.o:	usys_ugetdents.cc usys_ugetdents.h	$(INCS)
+usys_libstr.o:		usys_libstr.cc usys_libstr.h		$(INCS)
 
 

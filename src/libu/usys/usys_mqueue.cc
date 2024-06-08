@@ -29,39 +29,16 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	"usys_mqueue.h"
-
-
-/* local defines */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
 
 consteval mqd_t mkmqdbad() noex {
 	mqd_t	r = 0 ;
 	return (~r) ;
 }
 
-
-/* local variables */
-
 static constexpr mqd_t	mqdbad = mkmqdbad() ;
-
-
-/* exported subroutines */
 
 /* PMQ begin */
 #if	(!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0)

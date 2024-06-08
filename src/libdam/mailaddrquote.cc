@@ -144,7 +144,7 @@ int mailaddrquote_start(MAQ *op,cc *abuf,int alen,cc **rpp) noex {
 	int		len = 0 ;
 	cchar		*rp = nullptr ;
 	if ((rs = mailaddrquote_ctor(op,abuf)) >= 0) {
-	    static int	rsf = fieldterms(qterms,0,qchars) ;
+	    static cint		rsf = fieldterms(qterms,0,qchars) ;
 	    if (alen < 0) alen = strlen(abuf) ;
 	    if ((rs = rsf) >= 0) {
 	        cbool	f_white = haswhite(abuf,alen) ;
@@ -201,11 +201,11 @@ static int mailaddrquote_quote(MAQ *op,cc *abuf,int alen) noex {
 	    int		al = alen ;
 	    cchar	*ap = abuf ;
 	    op->f.qaddr = true ;
-	    bufstr_char(bsp,CH_DQUOTE) ;
+	    bufstr_chr(bsp,CH_DQUOTE) ;
 	    while ((rs >= 0) && ((si = siterm(ap,al,qterms)) >= 0)) {
 	        bufstr_strw(bsp,ap,si) ;
-	        bufstr_char(bsp,CH_BSLASH) ;
-	        rs = bufstr_char(bsp,ap[si]) ;
+	        bufstr_chr(bsp,CH_BSLASH) ;
+	        rs = bufstr_chr(bsp,ap[si]) ;
 	        ap += (si+1) ;
 	        al -= (si+1) ;
 	    } /* end while */
@@ -213,7 +213,7 @@ static int mailaddrquote_quote(MAQ *op,cc *abuf,int alen) noex {
 	        rs = bufstr_strw(bsp,ap,al) ;
 	    }
 	    if (rs >= 0) {
-	        rs = bufstr_char(bsp,CH_DQUOTE) ;
+	        rs = bufstr_chr(bsp,CH_DQUOTE) ;
 	    }
 	} /* end if (buffer_start) */
 	return rs ;

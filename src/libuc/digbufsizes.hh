@@ -20,9 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<bit>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 #include	<valuelims.hh>
 
@@ -50,33 +51,33 @@ constexpr int ndigitx(T v,int b) noex {
 	} /* end if (valid base) */
 	return n ;
 }
-/* end subroutine-template (xdigitx) */
+/* end subroutine-template (ndigitx) */
 
 constexpr int ndigits(int ntype,int base) noex {
-	int	n = 0 ;
+	int		n = 0 ;
 	if (base >= 2) {
 	    switch (ntype) {
 	    case 0:
 		{
-		    uchar	uc = 0xFF ;
+		    uchar	uc = 0xFFu ;
 		    n = ndigitx(uc,base) ;
 		}
 		break ;
 	    case 1:
 		{
-		    ushort	us = 0xFFFF ;
+		    ushort	us = 0xFFFFu ;
 		    n = ndigitx(us,base) ;
 		}
 		break ;
 	    case 2:
 		{
-		    uint	ui = 0xFFFFFFFFU ;
+		    uint	ui = 0xFFFFFFFFu ;
 		    n = ndigitx(ui,base) ;
 		}
 		break ;
 	    case 3:
 		{
-		    ulong	ul = 0xFFFFFFFFFFFFFFFFUL ;
+		    ulong	ul = 0xFFFFFFFFFFFFFFFFul ;
 		    n = ndigitx(ul,base) ;
 		}
 		break ;
@@ -86,25 +87,31 @@ constexpr int ndigits(int ntype,int base) noex {
 		    n = ndigitx(ull,base) ;
 		}
 		break ;
-	    case 5:
+	    case 5: /* 32 bytes */
 	        switch (base) {
 		case 2:
-		    n = 256 ;
+		    n = 256 ;	/* 256 ÷ 1 = 256 */
 		    break ;
 		case 4:
-		    n = 128 ;
+		    n = 128 ;	/* 256 ÷ 2 = 128 */
 		    break ;
 		case 8:
-		    n = 64 ;
+		    n = 86 ;	/* 256 ÷ 3 = 85.4 */
 		    break ;
 		case 16:
-		    n = 32 ;
+		    n = 64 ;	/* 256 ÷ 4 = 64 */
 		    break ;
 		case 32:
-		    n = 16 ;
+		    n = 53 ;	/* 256 ÷ 5 = 51.2 */
+		    break ;
+		case 64:
+		    n = 43 ;	/* 256 ÷ 6 = 42.6 */
+		    break ;
+		case 128:
+		    n = 37 ;	/* 256 ÷ 7 = 36.6 */
 		    break ;
 		case 256:
-		    n = 8 ;
+		    n = 32 ;	/* 256 ÷ 8 = 32 */
 		    break ;
 		default:
 		    n = ((1 << ntype) * 8) ;

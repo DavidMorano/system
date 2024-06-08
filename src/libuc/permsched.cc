@@ -172,7 +172,7 @@ static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 	            fp += 1 ;
 	            if (! *fp) break ;
 	            if (*fp == '%') {
-	                rs = sbuf_char(&b,'%') ;
+	                rs = sbuf_chr(&b,'%') ;
 	            } else {
 			kb[0] = *fp ;
 	                if (cc *cp{} ; (rs = vf(nsp,kb,vs,&cp)) >= 0) {
@@ -186,7 +186,7 @@ static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 			}
 	            } /* end if (tried to expand a key) */
 	        } else {
-	            rs = sbuf_char(&b,*fp) ;
+	            rs = sbuf_chr(&b,*fp) ;
 	        } /* end if (escape or regular character) */
 	    } /* end for */
 	    len = sbuf_finish(&b) ;

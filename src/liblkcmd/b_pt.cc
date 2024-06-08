@@ -2068,7 +2068,7 @@ int pathtry::mkreg(cchar *np,int nl)
 	if ((rs = sbuf_start(&b,bp,bl)) >= 0) {
 
 	    if (this->fname[0] != '\0')
-	        sbuf_char(&b,'/') ;
+	        sbuf_chr(&b,'/') ;
 
 	    sbuf_strw(&b,np,nl) ;
 
@@ -2092,18 +2092,18 @@ int pathtry::mkman(cchar *mname,cchar *sname)
 	if ((rs = sbuf_start(&b,bp,bl)) >= 0) {
 
 	    if (this->fname[0] != '\0')
-	        sbuf_char(&b,'/') ;
+	        sbuf_chr(&b,'/') ;
 
 	    sbuf_strw(&b,mname,-1) ;
 
 	    sbuf_strw(&b,sname,-1) ;
 
-	    sbuf_char(&b,'/') ;
+	    sbuf_chr(&b,'/') ;
 
 	    sbuf_strw(&b,this->name,this->namelen) ;
 
 	    if (sname[0] != '\0')
-	        sbuf_char(&b,'.') ;
+	        sbuf_chr(&b,'.') ;
 
 	    sbuf_strw(&b,sname,-1) ;
 
@@ -2127,7 +2127,7 @@ int pathtry::mkinc(cchar *np,int nl)
 	if ((rs = sbuf_start(&b,bp,bl)) >= 0) {
 
 	    if (this->fname[0] != '\0')
-	        sbuf_char(&b,'/') ;
+	        sbuf_chr(&b,'/') ;
 
 	    sbuf_strw(&b,np,nl) ;
 
@@ -2153,7 +2153,7 @@ int pathtry::mklib(cchar *pre,cchar *np,int nl,cchar *suf)
 	if ((rs = sbuf_start(&b,bp,bl)) >= 0) {
 
 	    if (this->fname[0] != '\0')
-	        sbuf_char(&b,'/') ;
+	        sbuf_chr(&b,'/') ;
 
 	    if (pre != NULL)
 	        sbuf_strw(&b,pre,-1) ;
@@ -2161,7 +2161,7 @@ int pathtry::mklib(cchar *pre,cchar *np,int nl,cchar *suf)
 	    sbuf_strw(&b,np,nl) ;
 
 	    if (suf != NULL) {
-	        sbuf_char(&b,'.') ;
+	        sbuf_chr(&b,'.') ;
 	        sbuf_strw(&b,suf,-1) ;
 	    }
 

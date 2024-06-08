@@ -549,7 +549,7 @@ static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll) noex {
 	                    bp = tmpbuf ;
 	                    bl = mkclean(tmpbuf,tmplen,cp,cl) ;
 	                }
-	                if ((rs = buffer_char(obp,'\r')) >= 0) {
+	                if ((rs = buffer_chr(obp,'\r')) >= 0) {
 	                    rs = buffer_strw(obp,bp,bl) ;
 		        }
 		        if (rs >= 0) {
@@ -578,7 +578,7 @@ static int termnote_bufextra(termnote *op,buffer *obp,int o) noex {
 	if (op && obp) {
 	    rs = SR_OK ;
 	    if (o & TERMNOTE_OBELL) {
-	        rs = buffer_char(obp,CH_BEL) ;
+	        rs = buffer_chr(obp,CH_BEL) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

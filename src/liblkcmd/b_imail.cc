@@ -7618,9 +7618,9 @@ static int locinfo_mkenv(LOCINFO *lip)
 		        cchar	*rbuf ;
 	                buffer_strw(&b,"From ",5) ;
 	                buffer_strw(&b,lip->envfrom,flen) ;
-	                buffer_char(&b,' ') ;
+	                buffer_chr(&b,' ') ;
 	                buffer_strw(&b,lip->envdate,dlen) ;
-	                buffer_char(&b,'\n') ;
+	                buffer_chr(&b,'\n') ;
 	                if ((rs = buffer_get(&b,&rbuf)) >= 0) {
 	                    cchar	**vpp = &lip->env ;
 	                    rl = rs ;
@@ -7658,26 +7658,26 @@ static int locinfo_mkmid(LOCINFO *lip,char *mbuf,int mlen)
 	    if (nl > USERNAMELEN) {
 	        rs1 = (int) gethostid() ;
 	        sbuf_hexi(&mb,rs1) ;
-	        sbuf_char(&mb,'-') ;
+	        sbuf_chr(&mb,'-') ;
 	    } else {
 	        sbuf_strw(&mb,nn,nl) ;
 	    }
 
 	    sbuf_decui(&mb,uv) ;
 
-	    sbuf_char(&mb,'.') ;
+	    sbuf_chr(&mb,'.') ;
 
 	    {
 	        uv = (uint) pip->daytime ;
 	        sbuf_hexui(&mb,uv) ;
 	    }
 
-	    sbuf_char(&mb,'.') ;
+	    sbuf_chr(&mb,'.') ;
 	    sbuf_deci(&mb,lip->kserial) ;
-	    sbuf_char(&mb,'.') ;
+	    sbuf_chr(&mb,'.') ;
 	    sbuf_deci(&mb,serial) ;
 
-	    sbuf_char(&mb,'@') ;
+	    sbuf_chr(&mb,'@') ;
 
 	    sbuf_strw(&mb,dn,-1) ;
 
@@ -7714,7 +7714,7 @@ static int locinfo_mkhdrsender(LOCINFO *lip)
 	        }
 
 	        buffer_strw(&b,pip->username,-1) ;
-	        buffer_char(&b,'@') ;
+	        buffer_chr(&b,'@') ;
 	        buffer_strw(&b,cn,-1) ;
 
 /* add a name if we can find one */
@@ -7724,10 +7724,10 @@ static int locinfo_mkhdrsender(LOCINFO *lip)
 	        }
 
 	        if ((rs1 >= 0) && (lip->hdrname_from != NULL)) {
-	            buffer_char(&b,' ') ;
-	            buffer_char(&b,CH_LPAREN) ;
+	            buffer_chr(&b,' ') ;
+	            buffer_chr(&b,CH_LPAREN) ;
 	            buffer_strw(&b,lip->hdrname_from,-1) ;
-	            buffer_char(&b,CH_RPAREN) ;
+	            buffer_chr(&b,CH_RPAREN) ;
 	        } /* end if (adding name) */
 
 	        if (rs >= 0) {
@@ -7981,7 +7981,7 @@ static int locinfo_mkhdraddrfrom(LOCINFO *lip)
 
 	        buffer_strw(&b,pip->username,-1) ;
 
-	        buffer_char(&b,'@') ;
+	        buffer_chr(&b,'@') ;
 
 	        cp = (cn != NULL) ? cn : nn ;
 	        buffer_strw(&b,cp,-1) ;
@@ -7992,10 +7992,10 @@ static int locinfo_mkhdraddrfrom(LOCINFO *lip)
 	            rs = locinfo_mkhdrname_from(lip) ;
 
 	        if ((rs >= 0) && (lip->hdrname_from != NULL)) {
-	            buffer_char(&b,' ') ;
-	            buffer_char(&b,CH_LPAREN) ;
+	            buffer_chr(&b,' ') ;
+	            buffer_chr(&b,CH_LPAREN) ;
 	            buffer_strw(&b,lip->hdrname_from,-1) ;
-	            buffer_char(&b,CH_RPAREN) ;
+	            buffer_chr(&b,CH_RPAREN) ;
 	        } /* end if (adding name) */
 
 	        if (rs >= 0) {

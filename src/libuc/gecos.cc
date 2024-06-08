@@ -107,7 +107,7 @@ namespace {
     struct gecoshelp ;
     typedef void (gecoshelp::*gecoshelp_m)() noex ;
     struct gecoshelp {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	gecos		*op ;
 	cchar		*sp ;
 	cchar		*bp{} ;
@@ -146,15 +146,15 @@ static int	gecos_storename(gecos *,sbuf *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr cchar		brkleft[] = {
+constexpr cchar		brkleft[] = {
 	CH_COMMA, CH_LPAREN, '\0'
 } ;
 
-static constexpr cchar		brkright[] = {
+constexpr cchar		brkright[] = {
 	CH_COMMA, CH_RPAREN, '\0'
 } ;
 
-static constexpr gecoshelp_m	gmems[] = {
+constexpr gecoshelp_m	gmems[] = {
 	&gecoshelp::organization,
 	&gecoshelp::realname,
 	&gecoshelp::account,
@@ -243,7 +243,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                 if ((op->vals[gecosval_account].vp != nullptr) || 
                     (op->vals[gecosval_bin].vp != nullptr)) {
                     fparen = true ;
-                    sbuf_char(&b,CH_LPAREN) ;
+                    sbuf_chr(&b,CH_LPAREN) ;
                 }
                 if (op->vals[gecosval_account].vp != nullptr) {
                     gecos_storeit(op,&b,gecosval_account) ;
@@ -253,7 +253,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                     gecos_storeit(op,&b,gecosval_bin) ;
                 }
                 if (fparen) {
-                    sbuf_char(&b,CH_RPAREN) ;
+                    sbuf_chr(&b,CH_RPAREN) ;
                 }
     /* do we have the old finger stuff */
                 if (op->vals[gecosval_office].vp != nullptr) {
@@ -305,7 +305,7 @@ static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	}
 /* make the substitution */
 	{
-	    sbuf_char(bp,'_') ;
+	    sbuf_chr(bp,'_') ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	}

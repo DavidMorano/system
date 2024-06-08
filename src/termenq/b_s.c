@@ -2005,7 +2005,7 @@ static int termdate(PROGINFO *pip,char *rbuf,int rlen,cchar *timebuf)
 	    } else {
 
 	        sbuf_strw(&b,timebuf,ntime) ;
-	        sbuf_char(&b,'\n') ;
+	        sbuf_chr(&b,'\n') ;
 
 	    } /* end if */
 
@@ -2323,7 +2323,7 @@ int		sl ;
 
 	sbuf_strw(bufp,TERMSTR_S_SD,-1) ; /* set status-display mode */
 
-	sbuf_char(bufp,'\r') ;
+	sbuf_chr(bufp,'\r') ;
 
 	if (x > 0) {
 	    const int	clen = CODEBUFLEN ;

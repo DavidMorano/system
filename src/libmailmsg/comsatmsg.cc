@@ -124,11 +124,11 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
 	} else { /* write */
 	    if ((rs = sbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
 	        sbuf_strw(&msgbuf,msp->username,-1) ;
-	        sbuf_char(&msgbuf,'@') ;
+	        sbuf_chr(&msgbuf,'@') ;
 	        ulv = msp->offset ;
 	        sbuf_decul(&msgbuf,ulv) ;
 	        if (msp->fname[0] != '\0') {
-	            sbuf_char(&msgbuf,':') ;
+	            sbuf_chr(&msgbuf,':') ;
 	            sbuf_strw(&msgbuf,msp->fname,-1) ;
 	        } /* end if */
 	        rs1 = sbuf_finish(&msgbuf) ;

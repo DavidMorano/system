@@ -373,7 +373,7 @@ static int pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	                } else {
 	                    sc = ':' ;
 			}
-	                rs = sbuf_char(&b,sc) ;
+	                rs = sbuf_chr(&b,sc) ;
 	            }
 	            if (rs >= 0) {
 	                rs = sbuf_strw(&b,cp,-1) ;

@@ -54,7 +54,7 @@
 #include	<stdintx.h>
 #include	<char.h>
 #include	<sfx.h>
-#include	<ucvariables.hh>
+#include	<uvariables.hh>
 #include	<checkbase.h>
 #include	<localmisc.h>
 

@@ -52,10 +52,13 @@
 
 /* local typedefs */
 
-typedef timeout_m	t_m ;
+typedef timeout_f	t_f ;
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -67,9 +70,12 @@ typedef timeout_m	t_m ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int timeout_load(timeout *top,time_t v,void *o,t_m m,uint tag,int arg) noex {
+int timeout_load(timeout *top,time_t v,void *o,t_f m,uint tag,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (top) {
 	    rs = SR_OK ;

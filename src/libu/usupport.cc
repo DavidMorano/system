@@ -49,8 +49,10 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<poll.h>
+#include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
@@ -82,6 +84,8 @@ static int	isleep(int) noex ;
 
 /* local variables */
 
+constexpr int		onethousand = 1000 ;
+
 
 /* exported variables */
 
@@ -94,11 +98,11 @@ mtime_t mtime(void) noex {
 	mtime_t		m = 0 ;
 	if (gettimeofday(&tv,nullptr) >= 0) {
 	    t = tv.tv_sec ;
-	    m += (t*1000) ;
-	    m += (tv.tv_usec / 1000) ;
+	    m += (t * onethousand) ;
+	    m += (tv.tv_usec / onethousand) ;
 	} else {
 	    t = time(nullptr) ;
-	    m += (t*1000) ;
+	    m += (t * onethousand) ;
 	}
 	return m ;
 }
@@ -131,6 +135,41 @@ int memclear(void *vp,size_t sz) noex {
 
 /* local subroutines */
 
+namespace usys {
+    int sncpy(char *dbuf,int dlen,cchar *sp) noex {
+	csize		dsz = (dlen + 1) ;
+	int		rs ;
+	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
+	    rs = SR_OVERFLOW ;
+	} else {
+	    rs = int(rsz & INT_MAX) ;
+	}
+	return rs ;
+    }
+    sysret_t uitimer_get(int w,ITIMERVAL *otvp) noex {
+	int		rs = SR_FAULT ;
+	if (otvp) {
+	    repeat {
+	        if ((rs = getitimer(w,otvp)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
+	return rs ;
+    }
+    sysret_t uitimer_set(int w,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex {
+	int		rs = SR_FAULT ;
+	if (ntvp && otvp) {
+	    repeat {
+	        if ((rs = setitimer(w,ntvp,otvp)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
+	return rs ;
+    }
+}
+
 static int isleep(int mto) noex {
 	POLLFD		fds[1] = {} ;
 	int		rs ;
@@ -153,18 +192,5 @@ static int isleep(int mto) noex {
 	return rs ;
 }
 /* end subroutine (isleep) */
-
-namespace usys {
-    int sncpy(char *dbuf,int dlen,cchar *sp) noex {
-	csize		dsz = (dlen + 1) ;
-	int		rs ;
-	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
-	    rs = SR_OVERFLOW ;
-	} else {
-	    rs = int(rsz & INT_MAX) ;
-	}
-	return rs ;
-    }
-}
 
 

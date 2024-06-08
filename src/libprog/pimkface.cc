@@ -114,7 +114,7 @@ int pimkface(PROGINFO *pip,char *fbuf,int flen) noex {
 
 	                    if ((cl = sfshrink(lbuf,len,&cp)) > 0) {
 				    if (c++ > 0) {
-	                                rs = sbuf_char(&b,' ') ;
+	                                rs = sbuf_chr(&b,' ') ;
 				    }
 				    if (rs >= 0) {
 	                                rs = sbuf_strw(&b,cp,cl) ;

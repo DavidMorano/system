@@ -269,7 +269,7 @@ static int confstr_defsbin(buffer *bdp) noex {
 	            if ((rs = buffer_get(bdp,&bp)) >= 0) {
 		        bl = rs ;
 		        if ((bl > 0) && (bp[bl-1] != ':')) {
-		            rs = buffer_char(bdp,':') ;
+		            rs = buffer_chr(bdp,':') ;
 		            rl += rs ;
 		        } /* end if (adding) */
 		    } /* end if (buffer_get) */
@@ -284,7 +284,7 @@ static int confstr_defer(buffer *bdp,int i,cchar *dname) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	if (i > 0) {
-	    rs = buffer_char(bdp,':') ;
+	    rs = buffer_chr(bdp,':') ;
 	    rl += rs ;
 	}
 	if (rs >= 0) {

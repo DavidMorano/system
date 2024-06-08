@@ -198,7 +198,7 @@ int ucentua::format(char *rbuf,int rlen) noex {
 	        sbuf	b ;
 	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 5 ; i += 1) {
-	                if (i > 0) rs = sbuf_char(&b,':') ;
+	                if (i > 0) rs = sbuf_chr(&b,':') ;
 	                if (rs >= 0) {
 	                    switch (i) {
 	                    case 0:
@@ -366,10 +366,10 @@ static int sbuf_fmtattrs(sbuf *bp,kva_t *attr) noex {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < n ; i += 1) {
 	        if (kv[i].key != nullptr) {
-	            if (i > 0) rs = sbuf_char(bp,sch) ;
+	            if (i > 0) rs = sbuf_chr(bp,sch) ;
 	            if (rs >= 0) rs = sbuf_strw(bp,kv[i].key,-1) ;
 	            if ((rs >= 0) && (kv[i].value != nullptr)) {
-	                rs = sbuf_char(bp,'=') ;
+	                rs = sbuf_chr(bp,'=') ;
 	                if (rs >= 0) rs = sbuf_strw(bp,kv[i].value,-1) ;
 	            }
 	        } /* end if */

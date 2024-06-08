@@ -118,22 +118,22 @@ int outema_ent(outema *ldp,EMA_ENT *ep) noex {
 	        int	bl ;
 	        int	c = 0 ;
 	        if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
-	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	            if (c++ > 0) rs = buffer_chr(bufp,CH_SP) ;
 	            if (rs >= 0) {
 	                rs = buffer_strquote(bufp,ep->ap,ep->al) ;
 		    }
 	        }
 	        if ((rs >= 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
-	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
-	            if (rs >= 0) rs = buffer_char(bufp,CH_LANGLE) ;
+	            if (c++ > 0) rs = buffer_chr(bufp,CH_SP) ;
+	            if (rs >= 0) rs = buffer_chr(bufp,CH_LANGLE) ;
 	            if (rs >= 0) rs = buffer_stropaque(bufp,ep->rp,ep->rl) ;
-	            if (rs >= 0) rs = buffer_char(bufp,CH_RANGLE) ;
+	            if (rs >= 0) rs = buffer_chr(bufp,CH_RANGLE) ;
 	        }
 	        if ((rs >= 0) && (ep->cp != nullptr) && (ep->cl > 0)) {
 	            cchar	*cp ;
 	            int		cl ;
 	            if ((cl = sfshrink(ep->cp,ep->cl,&cp)) > 0) {
-	                if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	                if (c++ > 0) rs = buffer_chr(bufp,CH_SP) ;
 	                if (rs >= 0) {
 	                    cint	sz = (cl+2+1) ;
 	                    char	*ap ;

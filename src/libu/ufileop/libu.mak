@@ -45,7 +45,7 @@ LIBS +=
 
 INCDIRS=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS=
 
 
 LDRPATH= $(USRLOCAL)
@@ -64,10 +64,10 @@ LDFLAGS= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o intsat.o satarith.o
+OBJ00= endian.o intsat.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o 
-OBJ03= timespec.o
+OBJ03= ugetloadavg.o 
 
 OBJ04= usupport.o 
 OBJ05= utimeout.o 
@@ -81,16 +81,21 @@ OBJ11= uopen.o ustr.o
 
 OBJ12= usysdata.o usysauxinfo.o
 OBJ13= ufiledesc.o um.o
-OBJ14= ufileop.o ugetdents.o
-OBJ15= ugetloadavg.o
+OBJ14= ufileop.o
+OBJ15= uvariables.o
 
+OBJ16= syswords.o varnames.o
+OBJ17= valuelims.o digbufsizes.o
+OBJ18= timeval.o itimerval.o
+OBJ19= timespec.o itimerspec.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
+OBJE= obj16.o obj17.o obj18.o obj19.o
 
-OBJ= obja.o objb.o objc.o objd.o
+OBJ= obja.o objb.o objc.o objd.o obje.o
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -211,6 +216,19 @@ obj15.o:		$(OBJ15)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ15)
 
 
+obj16.o:		$(OBJ16)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ16)
+
+obj17.o:		$(OBJ17)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ17)
+
+obj18.o:		$(OBJ18)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ18)
+
+obj19.o:		$(OBJ19)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ19)
+
+
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
 
@@ -223,6 +241,9 @@ objc.o:			$(OBJC)
 objd.o:			$(OBJD)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
 
+obje.o:			$(OBJE)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
+
 
 # SUPPORT
 timewatch.o:		timewatch.cc timewatch.hh
@@ -230,7 +251,6 @@ aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
 endian.o:		endian.cc endian.h		$(INCS)
 intsat.o:		intsat.cc intsat.h
-satarith.o:		satarith.cc satarith.h
 mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
 
@@ -274,6 +294,18 @@ uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
-ugetdents.o:		ugetdents.cc			$(INCS)
+
+syswords.o:		syswords.cc syswords.hh
+varnames.o:		varnames.cc varnames.hh
+valuelims.o:		valuelims.cc valuelims.hh
+digbufsizes.o:		digbufsizes.cc digbufsizes.hh
+
+uvariables.o:		uvariables.cc uvariables.hh
+
+timeval.o:		timeval.cc timeval.h
+itimerval.o:		itimerval.cc itimerval.h
+
+timespec.o:		timespec.cc timespec.h
+itimerspec.o:		itimerspec.cc itimerspec.h
 
 

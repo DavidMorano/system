@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int sigman_ctor(sigman *op,Args ... args) noex {
+static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int sigman_ctor(sigman *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sigman_ctor) */
+/* end subroutine (vecsorthand_ctor) */
 
-static int sigman_dtor(sigman *op) noex {
+static int vecsorthand_dtor(vecsorthand *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sigman_dtor) */
+/* end subroutine (vecsorthand_dtor) */
 
 template<typename ... Args>
-static inline int sigman_magic(sigman *op,Args ... args) noex {
+static inline int vecsorthand_magic(vecsorthand *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (sigman_magic) */
+/* end subroutine (vecsorthand_magic) */

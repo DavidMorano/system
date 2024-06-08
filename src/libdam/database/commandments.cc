@@ -1192,7 +1192,7 @@ static int commandments_loadbuf(COMMANDMENTS *op,CMI_ENT *vivp,
 	    for (i = 0 ; i < nlines ; i += 1) {
 
 	        if (i > 0)
-		    sbuf_char(&b,' ') ;
+		    sbuf_chr(&b,' ') ;
 
 	        lp = (op->data_db + lines[i].loff) ;
 	        ll = lines[i].llen ;

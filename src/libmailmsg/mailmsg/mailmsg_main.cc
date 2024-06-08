@@ -99,6 +99,8 @@
 #define	ISHDRCONT(c)	(((c) == ' ') || ((c) == '\t'))
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
 
+#define	DEFSTRLEN	1000
+
 
 /* imported namespaces */
 
@@ -236,7 +238,8 @@ static int msghdrinst_finish(MMHINST *) noex ;
 int mailmsg_start(mailmsg *op) noex {
 	int		rs ;
 	if ((rs = mailmsg_ctor(op)) >= 0) {
-	    if ((rs = strpack_start(op->slp,2000)) >= 0) {
+	    cint	deflen = DEFSTRLEN ;
+	    if ((rs = strpack_start(op->slp,deflen)) >= 0) {
 	        if ((rs = mailmsg_envbegin(op)) >= 0) {
 		    if ((rs = mailmsg_hdrbegin(op)) >= 0) {
 		        op->magic = MAILMSG_MAGIC ;
@@ -667,8 +670,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,
 }
 /* end subroutine (mailmsg_hdrmatch) */
 
-static int msghdrname_start(MMHNAME *hnp,cchar *hp,int hl,
-		cchar *vp,int vl) noex {
+static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *vp,int vl) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		isz = sizeof(MMHINST) ;
@@ -753,7 +755,7 @@ static int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 	void		*p ;
 	if ((rs = vecobj_addnew(ilp,&p)) >= 0) {
 	    MMHINST	*instp = (MMHINST *) p ;
-	    cint		i = rs ;
+	    cint	i = rs ;
 	    if ((rs = msghdrinst_start(instp,vp,vl)) >= 0) {
 	        hnp->lastinst = i ;
 		f = true ;
@@ -822,7 +824,7 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	if (hnp->vp == nullptr) {
 	    vecobj	*ilp = &hnp->insts ;
 	    MMHINST	*hip{} ;
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    cchar	*hivp = nullptr ;
 	    char	*bp{} ;
 	    void	*vp{} ;
@@ -830,11 +832,11 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	        if (vp) {
 		    hip = (MMHINST *) vp ;
 	            rs = msghdrinst_val(hip,&hivp) ;
-	            size += (rs + 2) ;
+	            sz += (rs + 2) ;
 		}
 	        if (rs < 0) break ;
 	    } /* end for */
-	    if ((rs >= 0) && ((rs = uc_malloc(size,&bp)) >= 0)) {
+	    if ((rs >= 0) && ((rs = uc_malloc(sz,&bp)) >= 0)) {
 	            int		n = 0 ;
 		    hnp->vp = bp ;
 	            hnp->f_alloc = true ;
@@ -922,16 +924,16 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		vl = hip->vl ;
 	if (hip->vp == nullptr) {
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    char	*bp{} ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(&hip->vals,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
 	    	    MMHVAL	*valp = (MMHVAL *) vp ;
-	            size += (valp->vl + 1) ;
+	            sz += (valp->vl + 1) ;
 		}
 	    } /* end for */
-	    if ((rs = uc_malloc(size,&bp)) >= 0) {
+	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
 		int	n = 0 ;
 		hip->vp = bp ;
 		hip->f_alloc = true ;

@@ -276,12 +276,12 @@ static int mklockinfo(PROGINFO *pip,char *rbuf,int rlen,time_t ti_now)
 /* line 1 */
 
 	    sbuf_deci(&b,pip->pid) ;
-	    sbuf_char(&b,'\n') ;
+	    sbuf_chr(&b,'\n') ;
 
 /* line 2 */
 
 	    sbuf_strw(&b,pip->lockaddr,-1) ;
-	    sbuf_char(&b,'\n') ;
+	    sbuf_chr(&b,'\n') ;
 
 /* line 3 */
 
@@ -289,16 +289,16 @@ static int mklockinfo(PROGINFO *pip,char *rbuf,int rlen,time_t ti_now)
 		char	tbuf[TIMEBUFLEN + 1] ;
 	        timestr_logz(ti_now,tbuf) ;
 	        sbuf_strw(&b,tbuf,-1) ;
-	        sbuf_char(&b,' ') ;
+	        sbuf_chr(&b,' ') ;
 	        sbuf_strw(&b,pip->progname,-1) ;
-	        sbuf_char(&b,'\n') ;
+	        sbuf_chr(&b,'\n') ;
 	    }
 
 /* line 4 */
 
 	    sbuf_strw(&b,"logid=",-1) ;
 	    sbuf_strw(&b,pip->logid,-1) ;
-	    sbuf_char(&b,'\n') ;
+	    sbuf_chr(&b,'\n') ;
 
 /* done */
 

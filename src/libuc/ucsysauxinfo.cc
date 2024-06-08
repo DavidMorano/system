@@ -38,8 +38,9 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
-
 #include	<usysauxinfo.h>		/* <- from |libu| */
+
+#include	"ucsysauxinfo.h"
 
 
 /* local defines */

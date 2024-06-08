@@ -207,7 +207,7 @@ int retpath_mk(RETPATH *plp,char *rbuf,int rlen)
 	    const char	*sp ;
 
 	    for (i = 0 ; vecstr_get(plp,i,&sp) >= 0 ; i += 1) {
-		if (i > 0) sbuf_char(&b,'!') ;
+		if (i > 0) sbuf_chr(&b,'!') ;
 		rs = sbuf_strw(&b,sp,-1) ;
 		if (rs < 0) break ;
 	    } /* end for */

@@ -172,34 +172,34 @@ static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	                sp += 1 ;
 	                if ((f_quote || c_comment) &&
 	                    (sl > 1) && (sp[0] != '\0')) {
-	                    sbuf_char((as + state),*sp++) ;
+	                    sbuf_chr((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
 	                break ;
 	            case CH_DQUOTE:
 	                f_quote = (! f_quote) ;
-	                sbuf_char((as + state),*sp++) ;
+	                sbuf_chr((as + state),*sp++) ;
 	                break ;
 	            case CH_LPAREN:
 	                if (! f_quote) {
 	                    if (c_comment == 0) {
 	                        pc = sbuf_getprev(as + state) ;
 	                        if ((pc >= 0) && (pc != ' ')) {
-	                            sbuf_char((as + state),' ') ;
+	                            sbuf_chr((as + state),' ') ;
 				}
 	                        pstate = state ;
 	                        state = MHCOM_SCOMMENT ;
 	                        pc = sbuf_getprev(as + state) ;
 	                        if ((pc >= 0) && (pc != ' ')) {
-	                            sbuf_char((as + state),' ') ;
+	                            sbuf_chr((as + state),' ') ;
 				}
 	                        sp += 1 ;
 	                    } else {
-	                        sbuf_char((as + state),*sp++) ;
+	                        sbuf_chr((as + state),*sp++) ;
 			    }
 	                    c_comment += 1 ;
 	                } else {
-	                    sbuf_char((as + state),*sp++) ;
+	                    sbuf_chr((as + state),*sp++) ;
 			}
 	                break ;
 	            case CH_RPAREN:
@@ -209,10 +209,10 @@ static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	                        state = pstate ;
 	                        sp += 1 ;
 	                    } else {
-	                        sbuf_char((as + state),*sp++) ;
+	                        sbuf_chr((as + state),*sp++) ;
 			    }
 	                } else {
-	                    sbuf_char((as + state),*sp++) ;
+	                    sbuf_chr((as + state),*sp++) ;
 			}
 	                break ;
 /* I think these cases are just optimizations (not required) */
@@ -239,9 +239,9 @@ static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 			/* FALLTHROUGH */
 	            default:
 	                if (c_comment) {
-	                    sbuf_char((as + MHCOM_SCOMMENT),*sp++) ;
+	                    sbuf_chr((as + MHCOM_SCOMMENT),*sp++) ;
 	                } else {
-	                    sbuf_char((as + state),*sp++) ;
+	                    sbuf_chr((as + state),*sp++) ;
 			}
 	                break ;
 	            } /* end switch */

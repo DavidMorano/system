@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	filer
+
+	Description:
         This little object supports some buffered file operations for
         low-overhead buffered I-O requirements.
 
@@ -232,15 +236,18 @@ int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 }
 /* end subroutine (filer_read) */
 
-#ifdef	COMMENT
-int filer_readp(filer op,void *buf,int buflen,off_t off,int to) noex {
-	int		rs = SR_NOSYS ;
+int filer_readp(filer *op,void *rbuf,int rlen,off_t off,int to) noex {
+	int		rs ;
 	int		tlen = 0 ;
-
-	return (rs >= 0) ? tlen : SR_NOSYS ;
+	if ((rs = filer_magic(op,rbuf)) >= 0) {
+	    (void) rlen ;
+	    (void) off ;
+	    (void) to ;
+	    rs = SR_NOSYS ;
+	} /* end if (magic) */
+	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (filer_readp) */
-#endif /* COMMENT */
 
 int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	int		rs ;

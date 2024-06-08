@@ -945,12 +945,12 @@ int		type ;
 
 	    sbuf_strw(&b,tmpdname,-1) ;
 
-	    sbuf_char(&b,'/') ;
+	    sbuf_chr(&b,'/') ;
 
 	    {
 		int	nu = 0 ;
 	        nu += sbuf_strw(&b,"pcspoll",-1) ;
-	        nu += sbuf_char(&b,type) ;
+	        nu += sbuf_chr(&b,type) ;
 	        sbuf_strw(&b,xes,(14-nu)) ;
 	    }
 

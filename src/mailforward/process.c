@@ -690,23 +690,23 @@ int		buflen ;
 
 	sbuf_deci(&b,(int) pip->pid) ;
 
-	sbuf_char(&b,'\n') ;
+	sbuf_chr(&b,'\n') ;
 
 /* line 2 */
 
 	sbuf_strw(&b,pip->lockaddr,-1) ;
 
-	sbuf_char(&b,'\n') ;
+	sbuf_chr(&b,'\n') ;
 
 /* line 3 */
 
 	sbuf_strw(&b,timestr_logz(daytime,timebuf),-1) ;
 
-	sbuf_char(&b,' ') ;
+	sbuf_chr(&b,' ') ;
 
 	sbuf_strw(&b,pip->progname,-1) ;
 
-	sbuf_char(&b,'\n') ;
+	sbuf_chr(&b,'\n') ;
 
 /* line 4 */
 
@@ -714,7 +714,7 @@ int		buflen ;
 
 	sbuf_strw(&b,pip->logid,-1) ;
 
-	sbuf_char(&b,'\n') ;
+	sbuf_chr(&b,'\n') ;
 
 	    rs1 = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;

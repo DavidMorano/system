@@ -125,22 +125,22 @@ static int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn)
 	    if (nl > USERNAMELEN) {
 	        const int	hid = gethostid() ;
 	        sbuf_hexi(&ubuf,hid) ;
-	        sbuf_char(&ubuf,'-') ;
+	        sbuf_chr(&ubuf,'-') ;
 	    } else {
 	        sbuf_strw(&ubuf,nn,nl) ;
 	    }
 
 	    sbuf_deci(&ubuf,pid) ;
 
-	    sbuf_char(&ubuf,'.') ;
+	    sbuf_chr(&ubuf,'.') ;
 
 	    sbuf_hexui(&ubuf,tv) ;
 
-	    sbuf_char(&ubuf,'.') ;
+	    sbuf_chr(&ubuf,'.') ;
 
 	    sbuf_deci(&ubuf,sn) ;
 
-	    sbuf_char(&ubuf,'@') ;
+	    sbuf_chr(&ubuf,'@') ;
 
 	    sbuf_strw(&ubuf,dn,-1) ;
 

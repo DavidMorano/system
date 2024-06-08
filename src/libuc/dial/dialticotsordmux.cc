@@ -125,14 +125,14 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
 	                        for (int i = 0 ; sargv[i] ; i += 1) {
 				    cchar	*sap = sargv[i] ;
 	                            if ((rs = mq(dbuf,dlen,sap,-1)) >= 0) {
-	                                buffer_char(&srv,' ') ;
+	                                buffer_chr(&srv,' ') ;
 	                                buffer_buf(&srv,dbuf,rs) ;
 	                            } /* end if (mkquoted) */
 				    if (rs < 0) break ;
 	                        } /* end for */
 	                    } /* end if */
 	                    if (rs >= 0) {
-	                        buffer_char(&srv,'\n') ;
+	                        buffer_chr(&srv,'\n') ;
 	                    }
 	                    if (rs >= 0) {
 	                        rs = dialer(&srv,abuf,alen,dbuf,dlen,to,opts) ;

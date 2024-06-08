@@ -37,7 +37,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>
+#include	<ctime>			/* |TIMESPEC| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -65,6 +65,8 @@
 
 /* local variables */
 
+const int	onebillion = INTBILLION ;
+
 
 /* exported variables */
 
@@ -74,9 +76,10 @@
 int timespec_load(TIMESPEC *tsp,time_t sec,long nsec) noex {
 	int		rs = SR_FAULT ;
 	if (tsp) {
-	    while (nsec >= INTBILLION) {
+	    rs = SR_OK ;
+	    while (nsec >= onebillion) {
 	        sec += 1 ;
-	        nsec -= INTBILLION ;
+	        nsec -= onebillion ;
 	    } /* end while */
 	    tsp->tv_sec = sec ;
 	    tsp->tv_nsec = nsec ;
