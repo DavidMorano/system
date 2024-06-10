@@ -1,10 +1,9 @@
-/* prognotify */
-/* lang=C20 */
+/* prognotify SUPPORT */
+/* lang=C++20 */
 
 /* fairly generic (PCS) subroutine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_ISSAMEHOST	1		/* use 'issamehostname(3dam)' */
 
 /* revision history:
@@ -30,17 +29,17 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -48,9 +47,11 @@
 #include	<vecobj.h>
 #include	<paramfile.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>
 #include	<hash.h>
+#include	<snx.h>
 #include	<strwcpy.h>
+#include	<isnot.h>
+#include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -85,13 +86,12 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	getportnum(cchar *,cchar *) ;
-extern int	getourhe(cchar *,cchar *,struct hostent *,char *,int) ;
-extern int	issamehostname(const char *,const char *,const char *) ;
-extern int	isNotPresent(int) ;
-
-extern int	parsenodespec(PROGINFO *,char *,const char *,int) ;
+extern "C" {
+    extern int	getportnum(cchar *,cchar *) noex ;
+    extern int	getourhe(cchar *,cchar *,HOSTENT *,char *,int) noex ;
+    extern int	issamehostname(cchar *,cchar *,cchar *) noex ;
+    extern int	parsenodespec(PROGINFO *,char *,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -122,22 +122,23 @@ typedef unsigned int	in_addr_t ;
 /* forward references */
 
 static int	prognotifyrecip(PROGINFO *,vecobj *,
-			REPORTINFO *,PARAMFILE *,RECIP *) ;
+			REPORTINFO *,PARAMFILE *,RECIP *) noex ;
 static int	prognotifyrecipnode(PROGINFO *,vecobj *,
-			REPORTINFO *,RECIP *,const char *,int) ;
-static int	report(PROGINFO *,REPORTINFO *) ;
+			REPORTINFO *,RECIP *,cchar *,int) noex ;
+static int	report(PROGINFO *,REPORTINFO *) noex ;
 
-static int	searchfunc() ;
+static int	searchfunc() noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
-{
+int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 	REPORTINFO	ri ;
 	PARAMFILE	mbtab ;
 	int		rs, rs1 ;
@@ -170,11 +171,6 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 	    rs = SR_OK ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("prognotify: defport=%d\n",defport) ;
-#endif
-
 	memset(&ri,0,sizeof(REPORTINFO)) ;
 	ri.defport = defport ;
 
@@ -188,9 +184,9 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 	}
 
 	if (rs >= 0) {
-	   const int	pf = PF_INET ;
-	   const int	st = SOCK_DGRAM ;
-	   const int	pnum = IPPROTO_UDP ;
+	   cint	pf = PF_INET ;
+	   cint	st = SOCK_DGRAM ;
+	   cint	pnum = IPPROTO_UDP ;
 
 /* initialze the message to send */
 
@@ -227,18 +223,12 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("prognotify: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (prognotify) */
 
 
 /* local subroutines */
-
 
 static int prognotifyrecip(pip,mip,rip,mbp,rp)
 PROGINFO	*pip ;
@@ -252,13 +242,7 @@ RECIP		*rp ;
 	int		rs1 ;
 	int		ul ;
 	int		c = 0 ;
-	const char	*up ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("prognotify: recip=%s rs=%d offset=%u\n",
-	        rp->recipient,rp->rs,rp->offset) ;
-#endif
+	cchar	*up ;
 
 	up = rp->recipient ;
 	ul = strlen(up) ;
@@ -270,8 +254,8 @@ RECIP		*rp ;
 /* loop through target machines for this mailuser (recipient) */
 
 	if ((rs = paramfile_curbegin(mbp,&cur)) >= 0) {
-	    const int	nslen = NSBUFLEN ;
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	nslen = NSBUFLEN ;
+	    cint	rsn = SR_NOTFOUND ;
 	    int		port ;
 	    int		nsl ;
 	    char	nsbuf[NSBUFLEN + 1] ;
@@ -307,26 +291,25 @@ RECIP		*rp ;
 }
 /* end subroutine (prognotifyrecip) */
 
-
 static int prognotifyrecipnode(pip,mip,rip,rp,nn,port)
 PROGINFO	*pip ;
 vecobj		*mip ;
 REPORTINFO	*rip ;
 RECIP		*rp ;
-const char	*nn ;
+cchar	*nn ;
 int		port ;
 {
-	struct hostent	he, *hep = &he ;
-	struct msginfo	mi, *iep = &mi ;
+	HOSTENT	he, *hep = &he ;
+	MSGINFO	mi, *iep = &mi ;
 	int		moff ;
-	const int	helen = getbufsize(getbufsize_he) ;
-	const int	af = AF_INET4 ;
+	cint	helen = getbufsize(getbufsize_he) ;
+	cint	af = AF_INET4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		k ;
 	int		ml ;
 	int		c = 0 ;
-	const char	*np = nn ;
+	cchar	*np = nn ;
 	char		*hebuf ;
 
 #if	CF_ISSAMEHOST
@@ -337,45 +320,17 @@ int		port ;
 	    np = LOCALHOST ;
 #endif
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("prognotify: i=%d np=%s\n",i,np) ;
-#endif
-
 	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
 	    if ((rs = getourhe(np,NULL,hep,hebuf,helen)) >= 0) {
 		if (hep->h_addrtype == AF_INET) {
-	    	    cchar	*a = (const char *) hep->h_addr ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        in_addr_t	ia ;
-	        memcpy(&ia,hep->h_addr,sizeof(int)) ;
-	        debugprintf("prognotify: got INET "
-	            "address=\\x%08x\n",
-	            ntohl(ia)) ;
-	    }
-#endif /* CF_DEBUG */
+	    	    cchar	*a = (cchar *) hep->h_addr ;
 
 	    if ((rs = sockaddress_start(&rip->sa,af,a,port,0)) >= 0) {
 	        rip->salen = rs ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("prognotify: sockaddress_start() "
-	                "rs=%d\n",
-	                rip->salen) ;
-#endif
-
 /* send the messages */
 
 	        for (k = 0 ; (ml = recip_getmo(rp,k,&moff)) >= 0 ; k += 1) {
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("prognotify: msg=%u mlen=%u\n", 
-	                    k,ml) ;
-#endif
 
 /* find this message in the MSGINFO list */
 
@@ -384,12 +339,6 @@ int		port ;
 	            rs1 = vecobj_search(mip,&mi,searchfunc,&iep) ;
 
 	            if (rs1 >= 0) {
-
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("prognotify: mlen=%u\n",
-	                        iep->mlen) ;
-#endif
 
 	                rip->m1.mlen = iep->mlen ;
 	                rip->m1.flags = 0 ;
@@ -424,16 +373,15 @@ int		port ;
 }
 /* end subroutine (prognotifyrecipnode) */
 
-
 static int report(PROGINFO *pip,struct reportinfo *rip)
 {
 	struct mcmsg_ack	m2 ;
-	struct sockaddr		*sap = (struct sockaddr *) &rip->sa ;
-	const int	mlen = MSGBUFLEN ;
-	const int	to = pip->to_msgread ;
-	const int	sflags = rip->sendflags ;
-	const int	sal = rip->salen ;
-	const int	n = MSGSENDTRIES ;
+	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
+	cint		mlen = MSGBUFLEN ;
+	cint		to = pip->to_msgread ;
+	cint		sflags = rip->sendflags ;
+	cint		sal = rip->salen ;
+	cint		n = MSGSENDTRIES ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i, blen ;
@@ -448,17 +396,8 @@ static int report(PROGINFO *pip,struct reportinfo *rip)
 	    blen = rs ;
 	    if (rs < 0) break ;
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        debugprintf("prognotify/report: fd=%u blen=%d sf=%08x\n",
-	            rip->fd,blen,rip->sendflags) ;
-	        debugprintf("prognotify/report: salen=%u\n",
-	            rip->salen) ;
-	    }
-#endif
-
 	    if ((rs = u_sendto(rip->fd,rip->buf,blen,sflags,sap,sal)) >= 0) {
-		const int	fm = FM_TIMED ;
+		cint	fm = FM_TIMED ;
 	        if ((rs1 = uc_recve(rip->fd,rip->buf,mlen,0,to,fm)) >= 0) {
 	            blen = mcmsg_ack(&m2,1,rip->buf,mlen) ;
 	            if ((blen > 0) && (m2.tag == rip->m1.tag)) f = TRUE ;
@@ -472,22 +411,21 @@ static int report(PROGINFO *pip,struct reportinfo *rip)
 }
 /* end subroutine (report) */
 
-
-/* compare MSGINFO records */
-static int searchfunc(e1pp,e2pp)
-struct msginfo	**e1pp, **e2pp ;
-{
+static int searchfunc(MSGINFO **e1pp,MSGINFO **e2pp) noex {
 	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
+	if (*e1pp || *e2pp) {
+	    if (*e1pp) {
+	        if (*e2pp) {
 	            rc = ((*e1pp)->moff - (*e2pp)->moff) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = 1 ;
-	} else
+	    }
+	} else {
 	    rc = 0 ;
+	}
 	return rc ;
 }
 /* end subroutine (searchfunc) */

@@ -427,8 +427,8 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 /* all other names */
 
 	    if (rs >= 0) {
-	        if ((hostinfo_curbegin(&hi,&hicur)) >= 0) {
-	            while (hostinfo_enumname(&hi,&hicur,&hp) >= 0) {
+	        if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
+	            while ((rs = hostinfo_enumname(&hi,&hicur,&hp)) > 0) {
 	                rs = connection_addname(cnp,nlp,hp,namebuf,nullptr) ;
 	                n += rs ;
 	                if (rs < 0) break ;
@@ -441,10 +441,10 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 
 	    if (rs >= 0) {
 		cint	nlen = MAXHOSTNAMELEN ;
-
 	        if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
 
-	        while ((al = hostinfo_enumaddr(&hi,&hicur,&ap)) >= 0) {
+	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) > 0) {
+		    int	al = rs ;
 	            if (al != INET4ADDRLEN) continue ;
 
 	            if ((rs = inetaddr_start(&ia,ap)) >= 0) {
@@ -533,7 +533,7 @@ static int connection_ip4lookup(CON *cnp,char *peerbuf,int peerlen) noex {
 	        cchar		*sp = nullptr ;
 	        if (cnp->domainname != nullptr) {
 	            if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	                while ((rs1 = hostent_enumname(&he,&hc,&sp)) >= 0) {
+	                while ((rs = hostent_enumname(&he,&hc,&sp)) > 0) {
 	                    if (isindomain(sp,cnp->domainname)) break ;
 	                } /* end while */
 	                hostent_curend(&he,&hc) ;

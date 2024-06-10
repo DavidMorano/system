@@ -1,7 +1,8 @@
-/* main (HOSTADDRINFO) */
+/* main SUPPORT (HOSTADDRINFO) */
+/* lang=C++20 */
 
 /* program to get a canonical host name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug switch */
 #define	CF_DEBUG	0		/* run-time debug switch */
@@ -10,7 +11,6 @@
 #define	CF_EFFECTIVE	1		/* effective-name */
 #define	CF_CANONICAL	1		/* canonical-name */
 #define	CF_ALIASES	1		/* alias-names */
-
 
 /* revision history:
 
@@ -24,15 +24,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ hostaddrinfo [<name(s)> ...] [-v[=n]] [-V]
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -40,11 +36,11 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<bits.h>
@@ -1120,16 +1116,11 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 
 #if	CF_ALIASES
 	        if (f_all) {
-		    int	nl ;
 	            if ((rs = hostinfo_curbegin(&hi,&cur)) >= 0) {
-
-	                while ((nl = hostinfo_enumname(&hi,&cur,&np)) >= 0) {
-	                    if (nl > 0) {
+	                while ((rs = hostinfo_enumname(&hi,&cur,&np)) > 0) {
 	                        rs = bprintf(ofp,"%salias=%s\n",indent,np) ;
-	                    }
 	                    if (rs < 0) break ;
 	                } /* end while */
-
 	                hostinfo_curend(&hi,&cur) ;
 	            } /* end if (cursor) */
 	        } /* end if (print all) */
@@ -1143,15 +1134,12 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 #endif
 
 	        if (rs >= 0) {
-
 	            if ((rs = hostinfo_curbegin(&hi,&cur)) >= 0) {
-
-	                while ((al = hostinfo_enumaddr(&hi,&cur,&ap)) >= 0) {
-
+	                while ((rs = hostinfo_enumaddr(&hi,&cur,&ap)) > 0) {
+			    al = rs ;
 	                    if (pip->verboselevel >= 2) {
 	                        bprintf(ofp,"%saddrlen=%u\n",indent,al) ;
 	                    }
-
 	                    if (al == INET4ADDRLEN) {
 	                        rs = procprint4(pip,ofp,indent,ap,al) ;
 	                    } else if (al == INET6ADDRLEN) {
@@ -1160,15 +1148,12 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 	                        rs = bprintf(ofp,"%saddr=(not known)\n",
 	                            indent) ;
 	                    }
-
 	                    if (rs < 0) break ;
 	                } /* end while */
-
-	                hostinfo_curend(&hi,&cur) ;
+	                rs1 = hostinfo_curend(&hi,&cur) ;
+	        	if (rs >= 0) rs = rs1 ;
 	            } /* end if (cursor) */
-
 	        } /* end if (ok) */
-
 	        rs1 = hostinfo_finish(&hi) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (hostinfo) */

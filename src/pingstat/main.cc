@@ -1733,14 +1733,13 @@ static int proclocnames_load(PROGINFO *pip)
 	            HOSTENT_CUR	cur ;
 
 	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
-	                const int	rsn = SR_NOTFOUND ;
-	                while ((rs1 = hostent_enumname(&he,&cur,&np)) >= 0) {
+	                cint	rsn = SR_NOTFOUND ;
+	                while ((rs = hostent_enumname(&he,&cur,&np)) > 0) {
 	                    if ((rs = vecstr_find(lnp,np)) == rsn) {
 	                        rs = vecstr_add(lnp,np,-1) ;
 	                    }
 	                    if (rs < 0) break ;
 	                } /* end while */
-	                if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	                rs1 = hostent_curend(&he,&cur) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (hostend-cur) */

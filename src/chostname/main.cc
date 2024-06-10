@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netinet/in.h>
@@ -29,9 +29,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -733,27 +734,24 @@ char		cname[] ;
 
 	    hostent_curbegin(&he,&hc) ;
 
-	    while (hostent_enumaddr(&he,&hc,&ap) >= 0) {
+	    while ((rs = hostent_enumaddr(&he,&hc,&ap)) > 0) {
 	        inetaddr	ia ;
 		in_addr_t	iwa, *iwap ;
 	        char		iabuf[IABUFLEN + 1] ;
 
 	        if (inetaddr_start(&ia,ap) >= 0) {
 
-	        rs1 = inetaddr_getdotaddr(&ia,iabuf,IABUFLEN) ;
-
-	        if (rs1 >= 0) {
-
+	        if ((rs1 = inetaddr_getdotaddr(&ia,iabuf,IABUFLEN)) >= 0) {
 			iwap = (in_addr_t *) ap ;
 			iwa = *iwap ;
 	            rs = bprintf(ofp,"\taddr=%s (\\x%08x)\n",iabuf,
 			iwa) ;
-
-	        } else
+	        } else {
 	            rs = bprintf(ofp,"\taddr=*\n") ;
+		}
 
 	        inetaddr_finish(&ia) ;
-		}
+		} /* end if */
 
 		if (rs < 0) break ;
 	    } /* end while */
@@ -762,16 +760,16 @@ char		cname[] ;
 
 /* alias names */
 
-	    hostent_curbegin(&he,&hc) ;
-
-	    while (hostent_enumname(&he,&hc,&np) >= 0) {
-	        rs = bprintf(ofp,"\talias=%s\n",np) ;
-		if (rs < 0) break ;
-	    } /* end while */
-
-	    hostent_curend(&he,&hc) ;
-	} /* end if (lookup) */
-	    uc_free(hebuf) ;
+	    if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
+	        while ((rs = hostent_enumname(&he,&hc,&np)) > 0) {
+	            rs = bprintf(ofp,"\talias=%s\n",np) ;
+		    if (rs < 0) break ;
+	        } /* end while */
+	        rs1 = hostent_curend(&he,&hc) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (lookup) */
+	    rs1 = uc_free(hebuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
 
 	return rs ;

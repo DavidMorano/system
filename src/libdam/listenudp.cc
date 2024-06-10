@@ -304,7 +304,7 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	int		f = false ;
 	if ((rs = hostinfo_curbegin(hip,&cur)) >= 0) {
 	    const uchar	*ap ;
-	    while ((rs = hostinfo_enumaddr(hip,&cur,&ap)) >= 0) {
+	    while ((rs = hostinfo_enumaddr(hip,&cur,&ap)) > 0) {
 		al = rs ;
 		switch (al) {
 		case INET4ADDRLEN:

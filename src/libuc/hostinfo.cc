@@ -19,8 +19,8 @@
 /*******************************************************************************
 
 	This object provides the functionality that was previosuly
-	supplied by the subroutine 'gethostbyname(3snl)'. That
-	subroutine only worked for INET4 class addresses. This
+	supplied by the subroutine 'gethostbyname(3snl)'.  That
+	subroutine only worked for INET4 class addresses.  This
 	object returns host-entry information for both INET4 and
 	INET6 class addresses.
 
@@ -451,7 +451,7 @@ int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	            bool	f_exit = false ;
 	            vog_f	vg = vecobj_get ;
 	            repeat {
-	                int	i ;
+	                int	i ; /* used-afterwards */
 		        void	*vp{} ;
 	                for (i = ci ; (rs = vg(nlp,i,&vp)) >= 0 ; i += 1) {
 		            nep = (HOSTINFO_N *) vp ;
@@ -831,10 +831,10 @@ static int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	    a.addrlen = alen ;
 	    if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
 	        vecobj		*alp = op->alp ;
-		const nullptr_t	np{} ;
-	        while ((rs1 = hostent_enumaddr(hep,&hc,&ap)) >= 0) {
-	            a.addrlen = rs1 ;
-	            memcpy(&a.addr,ap,rs1) ;
+		cnullptr	np{} ;
+	        while ((rs = hostent_enumaddr(hep,&hc,&ap)) > 0) {
+	            a.addrlen = rs ;
+	            memcpy(&a.addr,ap,rs) ;
 	            if ((rs = vecobj_search(alp,&a,vmataddr,np)) == nrs) {
 	                c += 1 ;
 	                a.af = af ;
@@ -875,8 +875,8 @@ static int hostinfo_loadnames(hostinfo *op,int af,HOSTENT *hep) noex {
 /* get all of the "alias" name(s) */
 	if (rs >= 0) {
 	    if ((hostent_curbegin(hep,&hc)) >= 0) {
-	        while ((sl = hostent_enumname(hep,&hc,&sp)) > 0) {
-	            rs = hostinfo_addname(op,sp,sl,af) ;
+	        while ((rs = hostent_enumname(hep,&hc,&sp)) > 0) {
+	            rs = hostinfo_addname(op,sp,rs,af) ;
 	            c += rs ;
 	            if (rs < 0) break ;
 	        } /* end while */
@@ -1048,7 +1048,7 @@ static int getinet_add(hostinfo *op,int af) noex {
 	        }
 	    } else {
 	        f_continue = (! isinetaddr(op->arg.hostname)) ;
-	    }
+	    } /* end if_constexpr (f_fastaddr) */
 	    if ((rs >= 0) && f_continue) {
 	        if ((rs = hostinfo_domain(op)) >= 0) {
 	            cchar	*hn = op->arg.hostname ;
@@ -1086,13 +1086,13 @@ static int getinet_rem(hostinfo *op,int af) noex {
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
-	}
+	} /* end if_constexpr (f_fastaddr) */
 	if ((rs >= 0) && f_continue) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    if (cchar *tp ; (tp = strchr(op->arg.hostname,'.')) != np) {
 	        if ((rs = hostinfo_domain(op)) >= 0) {
 	            if (isindomain(op->arg.hostname,op->domainname)) {
-	                int	cl = (tp - op->arg.hostname) ;
+	                cint	cl = (tp - op->arg.hostname) ;
 	                cchar	*cp = op->arg.hostname ;
 	                char	*hbuf{} ;
 			if ((rs = malloc_hn(&hbuf)) >= 0) {
@@ -1112,7 +1112,6 @@ static int getinet_rem(hostinfo *op,int af) noex {
 	        } /* end if (hostinfo_domain) */
 	    } /* end if (possible something) */
 	} /* end if (continue) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (getinet_rem) */
@@ -1129,9 +1128,9 @@ static int getinet_remlocal(hostinfo *op,int af) noex {
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
-	}
+	} /* end if_constexpr (f_fastaddr) */
 	if ((rs >= 0) && f_continue) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    if (cchar *tp ; (tp = strchr(op->arg.hostname,'.')) != np) {
 	        if (isindomain(op->arg.hostname,LOCALDOMAINNAME)) {
 	            int		hl = (tp - op->arg.hostname) ;
@@ -1167,7 +1166,7 @@ static int getinet_known(hostinfo *op,int af) noex {
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
-	} /* end if-constexpr (f_fastaddr) */
+	} /* end if_constexpr (f_fastaddr) */
 	if ((rs >= 0) && f_continue) {
 	    if ((af == af0) || (af == af4)) {
 	        if ((rs = hostinfo_domain(op)) >= 0) {
@@ -1189,17 +1188,17 @@ static int getinet_knowner(hostinfo *op,int af) noex {
 	cchar		*sp = op->arg.hostname ;
 	char		*hbuf{} ;
 	if ((rs = malloc_hn(&hbuf)) >= 0) {
-	    const nullptr_t	np{} ;
-            cint    hlen = rs ;
-            int     sl = strlen(sp) ;
+	    cnullptr	np{} ;
+            cint    	hlen = rs ;
+            int     	sl = strlen(sp) ;
             while ((sl > 0) && (sp[sl - 1] == '.')) {
                 sl -= 1 ;
             }
             if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != np) {
 		cint	mhlen = maxhostlen ;
-                cint        cl = ((sp + sl) - (tp + 1)) ;
-                cchar       *cp = (tp+1) ;
-                bool        f = false ;
+                cint	cl = ((sp + sl) - (tp + 1)) ;
+                cchar	*cp = (tp+1) ;
+                bool	f = false ;
                 strwcpy(hbuf,sp,min(sl,mhlen)) ;
                 f = f || isindomain(hbuf,op->domainname) ;
                 f = f || (strncmp(local,cp,cl) == 0) ;
@@ -1215,7 +1214,7 @@ static int getinet_knowner(hostinfo *op,int af) noex {
                         if ((rs >= 0) && (chn[0] == '\0')) {
                             rs = sncpy1(chn,hlen,hbuf) ;
                         }
-                    }
+                    } /* end if */
                 } /* end if (hit) */
             } else {
                 if ((i = matknown(sp,sl)) >= 0) {
@@ -1227,7 +1226,7 @@ static int getinet_knowner(hostinfo *op,int af) noex {
                         cchar       *dn = op->domainname ;
                         rs = snsds(op->chostname,hlen,sp,dn) ;
                     }
-                }
+                } /* end if */
             } /* end if */
             rs1 = uc_free(hbuf) ;
             if (rs >= 0) rs = rs1 ;

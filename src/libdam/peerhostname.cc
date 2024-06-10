@@ -1,11 +1,8 @@
-/* peerhostname */
+/* peerhostname SUPPORT */
+/* lang=C++20 */
 
 /* get a peer host name if there is one */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0
 
 
 /* revision history:
@@ -19,15 +16,12 @@
 
 /*******************************************************************************
 
-	This subroutine will take an INET socket and a local domain name and
-	find the hostname of the remote end of the socket.
-
+	This subroutine will take an INET socket and a local domain
+	name and find the hostname of the remote end of the socket.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -35,33 +29,29 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<uinet.h>		/* |INETXADDRLEN| */
 #include	<getbufsize.h>
+#include	<getxx.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<strwcpy.h>
+#include	<isindomain.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#ifndef	INETXADDRLEN
-#define	INETXADDRLEN	sizeof(struct in_addr)
-#endif
-
 
 /* external subroutines */
-
-extern int	isindomain(cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -73,11 +63,12 @@ extern char	*strwcpy(char *,cchar *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int peerhostname(int s,cchar *domainname,char *peername)
-{
+int peerhostname(int s,cchar *domainname,char *peername) noex {
 	sockaddress	sa ;
 	int		alen = sizeof(sockaddress) ;
 	int		rs ;
@@ -87,35 +78,36 @@ int peerhostname(int s,cchar *domainname,char *peername)
 	peername[0] = '\0' ;
 	if ((rs = u_getpeername(s,&sa,&alen)) >= 0) {
 	    if ((rs = sockaddress_getaf(&sa)) >= 0) {
-		const int	af = rs ;
+		cint	af = rs ;
 		if (af == AF_INET) {
-		    struct hostent	he ;
-		    struct in_addr	naddr ;
-		    const int		helen = getbufsize(getbufsize_he) ;
-		    const int		ialen = INETXADDRLEN ;
-		    char		*hebuf ;
+		    INADDR	naddr ;
+		    cint	helen = getbufsize(getbufsize_ho) ;
+		    cint	ialen = INETXADDRLEN ;
+		    char	*hebuf ;
 	    	    sockaddress_getaddr(&sa,&naddr,ialen) ;
 		    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-			cchar		*na = (cchar *) &naddr ;
-			const int	nlen = MAXHOSTNAMELEN ;
+			ucentho	he ;
+			cchar	*na = charp(&naddr) ;
+			cint	nlen = MAXHOSTNAMELEN ;
 
 /* lookup this IP (INET4) address */
 
-	    	        rs = uc_gethostbyaddr(na,ialen,af,&he,hebuf,helen) ;
+	    	        rs = getho_addr(&he,hebuf,helen,af,na,ialen) ;
 	    		if (rs >= 0) {
+			    /* hostent	*hep = ((hostent *) &he) ; */
 	        	    hostent_cur	hc ;
-	        	    const char	*np ;
+	        	    cchar	*np ;
 
 	        if (domainname != NULL) {
 	            if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	                while ((rs = hostent_enumname(&he,&hc,&np)) >= 0) {
+	                while ((rs = hostent_enumname(&he,&hc,&np)) > 0) {
 	                    if (isindomain(np,domainname)) break ;
 	                } /* end while */
 	                hostent_curend(&he,&hc) ;
 		    } /* end if (hostent) */
-	        } else
+	        } else {
 	            rs = SR_HOSTUNREACH ;
-
+		}
 	        if (rs >= 0) {
 		    cchar	*tp ;
 	            strwcpy(peername,np,nlen) ;

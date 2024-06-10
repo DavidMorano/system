@@ -1,10 +1,8 @@
-/* nlspeername */
+/* nlspeername SUPPORT */
+/* lang=C++20 */
 
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable */
 
 
 /* revision history:
@@ -18,15 +16,12 @@
 
 /*******************************************************************************
 
-	This subrotuine tries to find the peername for the given NLS (TLI)
-	address.
-
+	This subrotuine tries to find the peername for the given
+	NLS (TLI) address.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -34,12 +29,11 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
@@ -47,6 +41,9 @@
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<strwcpy.h>
+#include	<cfhex.h>
+#include	<isindomain.h>
 #include	<localmisc.h>
 
 
@@ -63,13 +60,9 @@
 
 /* external subroutines */
 
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,int *) ;
-extern int	cfhexs(const char *,int,char *) ;
-extern int	getheaddr(const void *,struct hostent *,char *,int) ;
-extern int	isindomain(cchar *,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+    extern int	getheaddr(cvoid *,HOSTENT *,char *,int) noex ;
+}
 
 
 /* external variables */
@@ -77,18 +70,19 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	nlspeername_unix(char *,cchar *,cchar *,int) ;
-static int	nlspeername_inet4(char *,cchar *,cchar *,int) ;
+static int	nlspeername_unix(char *,cchar *,cchar *,int) noex ;
+static int	nlspeername_inet4(char *,cchar *,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int nlspeername(cchar *addr,cchar *dn,char *pn)
-{
+int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 	int		rs = SR_OK ;
 	int		al ;
 	int		family ;
@@ -118,11 +112,8 @@ int nlspeername(cchar *addr,cchar *dn,char *pn)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al)
-{
-	const int	nlen = MAXHOSTNAMELEN ;
+static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
+	cint		nlen = MAXHOSTNAMELEN ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	al -= 4 ;
@@ -136,31 +127,29 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al)
 }
 /* end subroutine (nlspeername_unix) */
 
-
-static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al)
-{
+static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	uint		inetaddr ;
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = cfhexui(ap+8,8,&inetaddr)) >= 0) {
 	    HOSTENT	he ;
 	    HOSTENT_CUR	hc ;
-	    const int	helen = getbufsize(getbufsize_he) ;
-	    const int	family = rs ;
+	    cint	helen = getbufsize(getbufsize_he) ;
+	    cint	family = rs ;
 	    char	*hebuf ;
 	    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
 	        if ((rs = getheaddr(&inetaddr,&he,hebuf,helen)) >= 0) {
 	            if ((rs = hostent_getaf(&he)) >= 0) {
-	                const int	af = rs ;
+	                cint	af = rs ;
 	                if (af == family) {
-	                    const int	nlen = MAXHOSTNAMELEN ;
+	                    cint	nlen = MAXHOSTNAMELEN ;
 	                    cchar	*cp ;
-
-	                    if ((rs >= 0) && (dn != NULL)) {
+	                    if ((rs >= 0) && dn) {
 	                        if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	                            cchar	*np ;
-	                            while (hostent_enumname(&he,&hc,&np) >= 0) {
-	                                if (isindomain(np,dn)) {
+				    auto	henum = hostent_enum ;
+	                            cchar	*hp ;
+	                            while ((rs = henum(&he,&hc,&hp) > 0) {
+	                                if (isindomain(hp,dn)) {
 	                                    cp = strwcpy(pn,he.h_name,nlen) ;
 	                                    len = (cp - pn) ;
 	                                    break ;

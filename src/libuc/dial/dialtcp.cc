@@ -342,11 +342,7 @@ static int try_inet4(SUBINFO *sip) noex {
 	            int		c = 0 ;
 		    int		al ;
 		    cuchar	*ap ;
-	            while (rs >= 0) {
-	                al = hostinfo_enumaddr(&hi,&hc,&ap) ;
-	                if (al == SR_NOTFOUND) break ;
-	                rs = al ;
-	                if (rs < 0) break ;
+	            while ((rs = hostinfo_enumaddr(&hi,&hc,&ap)) > 0) {
 	                sockaddress_putaddr(&server,ap) ;
 	                c += 1 ;
 	                sip->count += 1 ;
@@ -389,7 +385,7 @@ static int try_inet6(SUBINFO *sip) noex {
 	    	    SOCKADDR	*sap ;
 	            int		c = 0 ;
 	    	    cuchar	*ap ;
-	            while ((rs1 = hostent_enumaddr(hep,&hc,&ap)) >= 0) {
+	            while ((rs = hostent_enumaddr(hep,&hc,&ap)) > 0) {
 	                sockaddress_putaddr(&server,ap) ;
 	                c += 1 ;
 	                sip->count += 1 ;
@@ -399,7 +395,6 @@ static int try_inet6(SUBINFO *sip) noex {
 	                if (fd >= 0) break ;
 	                if ((rs < 0) && (rs != SR_PFNOSUPPORT)) break ;
 	            } /* end while */
-	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	            rs1 = hostent_curend(hep,&hc) ;
 		    if (rs >= 0) rs = rs1 ;
 	            if ((rs >= 0) && (c == 0)) rs = SR_HOSTUNREACH ;

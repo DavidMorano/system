@@ -305,25 +305,19 @@ int		*pp ;
 
 	if ((rs = hostinfo_start(&hi,af,hostname)) >= 0) {
 	    HOSTINFO_CUR	hc ;
-
 	    if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
-		const int	aflen = getaflen(af) ;
+		cint		aflen = getaflen(af) ;
 		const uchar	*ap ;
-
-	        while ((rs = hostinfo_enumaddr(&hi,&hc,&ap)) >= 0) {
+	        while ((rs = hostinfo_enumaddr(&hi,&hc,&ap)) > 0) {
 		    al = rs ;
-
 	            if (al == aflen) {
 			memcpy(naddr,ap,aflen) ;
 			break ;
 	            }
-
 		} /* end while */
-
 	        rs1 = hostinfo_curend(&hi,&hc) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
-
 	    rs1 = hostinfo_finish(&hi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostinfo) */

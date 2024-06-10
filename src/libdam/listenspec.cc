@@ -1513,28 +1513,25 @@ static int listenspec_openportao(listenspec *op,char *addr,int af,
 		cc *hn) noex {
 	HOSTINFO	hi ;
 	HOSTINFO_CUR	hicur ;
+	cint		addrlen = getaddrlen(af) ;
 	int		rs ;
 	int		rs1 ;
-	int		addrlen ;
 
 	if (op == nullptr) return SR_NOANODE ;
 
 	if (af < 0) return SR_INVALID ;
 
 	addr[0] = '\0' ;
-	addrlen = getaddrlen(af) ;
 
 	if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
 	    if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
 	        const uchar	*ap ;
-
-	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) >= 0) {
+	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) > 0) {
 	            if (rs == addrlen) {
 	                memcpy(addr,ap,addrlen) ;
 	                break ;
 	            }
 	        } /* end while */
-
 	        rs1 = hostinfo_curend(&hi,&hicur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */

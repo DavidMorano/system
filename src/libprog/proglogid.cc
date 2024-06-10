@@ -4,8 +4,6 @@
 /* process the service names given us */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_SERIAL	1		/* serial or PID */
 
 /* revision history:
