@@ -20,17 +20,17 @@
 #include	<vecobj.h>
 
 
-#define	SYSTEMS_CUR	struct systems_c
-#define	SYSTEMS_ENT	struct systems_ent
 #define	SYSTEMS		struct systems_head
+#define	SYSTEMS_CUR	struct systems_cursor
+#define	SYSTEMS_ENT	struct systems_entry
 #define	SYSTEMS_MAGIC	31415926
 
 
-struct systems_c {
+struct systems_cursor {
 	int		i ;
 } ;
 
-struct systems_ent {
+struct systems_entry {
 	cchar		*sysname ;
 	cchar		*dialername ;
 	cchar		*dialerargs ;
@@ -46,6 +46,10 @@ struct systems_head {
 	time_t		checktime ;
 	uint		magic ;
 } ;
+
+typedef	SYSTEMS		systems ;
+typedef	SYSTEMS_CUR	systems_cur ;
+typedef	SYSTEMS_ENT	systems_ent ;
 
 EXTERNC_begin
 

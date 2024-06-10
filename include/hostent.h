@@ -45,7 +45,7 @@ extern int hostent_curend(HOSTENT *,hostent_cur *) noex ;
 extern int hostent_enumname(HOSTENT *,hostent_cur *,cchar **) noex ;
 extern int hostent_enumaddr(HOSTENT *,hostent_cur *,const uchar **) noex ;
 extern int hostent_size(HOSTENT *) noex ;
-extern int hostent_load(HOSTENT *,char *,int,HOSTENT *) noex ;
+extern int hostent_load(HOSTENT *,char *,int,const HOSTENT *) noex ;
 
 EXTERNC_end
 

@@ -51,7 +51,6 @@
 #include	<csignal>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
 #include	<queue>
 #include	<usystem.h>
 #include	<timewatch.hh>
@@ -459,7 +458,7 @@ int uctimeout::timerset(time_t val) noex {
 	if ((rs = timespec_load(&ts,val,0)) >= 0) {
 	    ITIMERSPEC	it ;
 	    if ((rs = itimerspec_load(&it,&ts,nullptr)) >= 0) {
-	        cint		tf = TIMER_ABSTIME ;
+	        cint	tf = TIMER_ABSTIME ;
 	        rs = uc_timerset(timerid,tf,&it,nullptr) ;
 	    }
 	}
@@ -842,8 +841,7 @@ int uctimeout::sigerwait() noex {
 	uc_sigsetadd(&ss,SIGALRM) ;
 	timespec_load(&ts,to,0) ;
 	repeat {
-	    rs = uc_sigwaitinfoto(&ss,&si,&ts) ;
-	    if (rs < 0) {
+	    if ((rs = uc_sigwaitinfoto(&ss,&si,&ts)) < 0) {
 	        switch (rs) {
 	        case SR_INTR:
 	            break ;
@@ -860,9 +858,9 @@ int uctimeout::sigerwait() noex {
 	if (rs >= 0) {
 	    if (! freqexit) {
 	        if (f_timedout) {
-	            cmd = 2 ;
+	            cmd = dispcmd_handle ;
 	        } else if (sig == si.si_signo) {
-	            cmd = 1 ;
+	            cmd = dispcmd_timeout ;
 	        }
 	    } /* end if (not exiting) */
 	} /* end if (ok) */
@@ -1062,7 +1060,7 @@ static void uctimeout_atforkchild() noex {
 	    } else {
                 uip->fl.thrs = false ;
                 uip->workdump() ;
-	    }
+	    } /* end if_constexpr (f_childthrs) */
         } /* end if (was "working") */
         uip->capend() ;
 }

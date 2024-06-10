@@ -405,7 +405,7 @@ void valstore::dtor() noex {
 /* end method (valstore::dtor) */
 
 valstore_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
+	int		rs = SR_BUGCHECK ;
 	switch (w) {
 	case valstoremem_init:
 	    rs = op->iinit() ;

@@ -96,10 +96,10 @@ static int cm_trysysargs(CM *,SI *,vecstr *,cchar *,int) noex ;
 /* exported subroutines */
 
 int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
-	SUBINFO		si ;
+	SUBINFO		si{} ;
 	SYSTEMS_CUR	cur ;
 	SYSTEMS_ENT	*sep ;
-	SYSDIALER_ARGS	da ;
+	SYSDIALER_ARGS	da{} ;
 	expcook		cooks ;
 	int		rs ;
 	int		rs1 ;
@@ -115,11 +115,7 @@ int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 
 	memclear(op) ;
 
-	memset(&si,0,sizeof(SUBINFO)) ;
-
 /* setup dialer arguments */
-
-	memclear(&da) ;
 	da.pr = ap->pr ;
 	da.prn = ap->prn ;
 	da.timeout = ap->timeout ;

@@ -88,8 +88,6 @@
 #define	TO_SIGWAIT	2		/* timeout: signal-process wait */
 #define	TO_DISPRECV	5		/* timeout: dispatch-process wait */
 
-#define	NDF		"uctim.deb"
-
 
 /* imported namespaces */
 
@@ -224,13 +222,15 @@ extern "C" {
 
 consteval int uctim_voents() noex {
 	int	vo = 0 ;
-	vo |= VECHAND_OSTATIONARY ;
 	vo |= VECHAND_OREUSE ;
 	vo |= VECHAND_OCOMPACT ;
 	vo |= VECHAND_OSWAP ;
+	vo |= VECHAND_OSTATIONARY ;
 	vo |= VECHAND_OCONSERVE ;
+	vo |= VECHAND_OSORTED ;
+	vo |= VECHAND_OORDERED ;
 	return vo ;
-}
+} ;
 
 
 /* local variables */
@@ -710,9 +710,10 @@ int uctim::pridump() noex {
 /* end subroutine (uctim::pridump) */
 
 int uctim::sigbegin() noex {
-	sigset_t	ss, oss ;
+	sigset_t	ss ;
+	sigset_t	oss ;
 	cint		scmd = SIG_BLOCK ;
-	cint		sig = SIGcallback ;
+	cint		sig = SIGALARM ;
 	int		rs ;
 	uc_sigsetempty(&ss) ;
 	uc_sigsetadd(&ss,sig) ;
@@ -730,7 +731,7 @@ int uctim::sigend() noex {
 	if (! fl.wasblocked) {
 	    sigset_t	ss ;
 	    cint	scmd = SIG_UNBLOCK ;
-	    cint	sig = SIGcallback ;
+	    cint	sig = SIGALARM ;
 	    uc_sigsetempty(&ss) ;
 	    uc_sigsetadd(&ss,sig) ;
 	    rs = u_sigmask(scmd,&ss,nullptr) ;
@@ -742,7 +743,7 @@ int uctim::sigend() noex {
 int uctim::timerbegin() noex {
 	SIGEVENT	se ;
 	cint		st = SIGEV_SIGNAL ;
-	cint		sig = SIGcallback ;
+	cint		sig = SIGALARM ;
 	cint		val = 0 ; /* we do not (really) care about this */
 	int		rs ;
 	if ((rs = sigevent_load(&se,st,sig,val)) >= 0) {
@@ -832,7 +833,7 @@ int uctim::sigerend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_siger) {
 	    pthread_t	tid = tid_siger ;
-	    cint	sig = SIGcallback ;
+	    cint	sig = SIGALARM ;
 	    if ((rs = uptkill(tid,sig)) >= 0) {
 	        int	trs ;
 	        fl.running_siger = false ;
@@ -868,7 +869,7 @@ int uctim::sigerwait() noex {
 	TIMESPEC	ts ;
 	sigset_t	ss ;
 	siginfo_t	si ;
-	cint		sig = SIGcallback ;
+	cint		sig = SIGALARM ;
 	cint		to = TO_SIGWAIT ;
 	int		rs ;
 	int		cmd = 0 ;
@@ -897,9 +898,9 @@ int uctim::sigerwait() noex {
 	if (rs >= 0) {
 	    if (! freqexit) {
 	        if (f_timedout) {
-	            cmd = 2 ;
+	            cmd = dispcmd_handle ;
 	        } else if (sig == si.si_signo) {
-	            cmd = 1 ;
+	            cmd = dispcmd_timeout ;
 	        }
 	    } /* end if (not exiting) */
 	} /* end if (ok) */

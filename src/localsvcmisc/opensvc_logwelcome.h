@@ -1,4 +1,8 @@
-/* config */
+/* opensvc_logwelcome HEADER */
+/* lang=C++20 */
+
+/* ADMIN-user open-service (logwelcome) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

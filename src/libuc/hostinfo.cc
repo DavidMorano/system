@@ -46,10 +46,10 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<bufsizevar.hh>
-#include	<vecobj.h>
 #include	<mallocxx.h>
+#include	<getxx.h>
 #include	<hostent.h>
-#include	<hostent.h>
+#include	<vecobj.h>
 #include	<strwcpy.h>
 #include	<strn.h>
 #include	<snxxx.h>
@@ -89,6 +89,7 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -211,7 +212,7 @@ extern "C" {
 
 /* local variables */
 
-static constexpr int	(*getinets[])(hostinfo *,int) = {
+constexpr int		(*getinets[])(hostinfo *,int) = {
 	getinet_rem,
 	getinet_remlocal,
 	getinet_straight,
@@ -220,7 +221,7 @@ static constexpr int	(*getinets[])(hostinfo *,int) = {
 	nullptr
 } ;
 
-static constexpr struct known	knowns[] = {
+constexpr known		knowns[] = {
 	{ "localhost", 0x7F000001 },
 	{ "anyhost",   0x00000000 },
 	{ "allhost",   0xFFFFFFFF },
@@ -711,7 +712,6 @@ static int hostinfo_findcanonical(hostinfo *op) noex {
 	            rs = sncpy1(op->chostname,hlen,op->ehostname) ;
 	        }
 	    } /* end if (desperate) */
-
 	} else {
 	    rs = strlen(op->chostname) ;
 	} /* end if (needed) */
@@ -723,50 +723,45 @@ static int hostinfo_getname(hostinfo *op,int af,cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
+	char		*hebuf{} ;
 	bool		f_inet4 = false ;
-	if constexpr (f_hostbyname) {
+	if_constexpr (f_hostbyname) {
 	    f_inet4 = (af == af4) ;
 	}
-	if ((rs = getbufsize(getbufsize_ho)) >= 0) {
-	    HOSTENT	he, *hep = nullptr ;
-	    cint	helen = rs ;
-	    char	*hebuf ;
-	    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	        int	flags ;
-	        bool	f_alloc = false ;
-	        if (f_inet4) {
-	            f_alloc = false ;
-	            hep = &he ;
-	            rs = uc_gethostbyname(hep,hebuf,helen,name) ;
-	        } else {
-	            f_alloc = true ;
-	            flags = 0 ;
-	            rs = uc_getipnodebyname(&hep,name,af,flags) ;
-	        } /* end if */
-	        if (rs >= 0) {
-	            if ((rs = hostinfo_loadnames(op,af,hep)) >= 0) {
-	                c = rs ;
-	                rs = hostinfo_loadaddrs(op,af,hep) ;
-	            }
-	            if ((rs >= 0) && (op->ehostname[0] == '\0')) {
-	                 int	sl ;
-	                 cchar	*sp ;
-	                if ((rs = hostent_getofficial(hep,&sp)) >= 0) {
-	                    cint	hlen = maxhostlen ;
-	                    sl = rs ;
-	                    rs = snwcpy(op->ehostname,hlen,sp,sl) ;
-	                }
-	            }
-	            if (f_alloc && (hep != nullptr)) {
-	                uc_freehostent(hep) ;
-	            }
-	        } else if (isNotPresent(rs)) {
-	            rs = SR_OK ;
-	        } /* end if (got host-entry) */
-	        rs1 = uc_free(hebuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
-	} /* end if (getbufsize) */
+        if ((rs = malloc_ho(&hebuf)) >= 0) {
+            HOSTENT         *hep{} ;
+            ucentho         he ;
+            cint            helen = rs ;
+            if (f_inet4) {
+                hep = &he ;
+                rs = getho_name(&he,hebuf,helen,name) ;
+            } else {
+                cint	flags = 0 ;
+                rs = uc_getipnodebyname(&hep,name,af,flags) ;
+            } /* end if */
+            if (rs >= 0) {
+                if ((rs = hostinfo_loadnames(op,af,hep)) >= 0) {
+                    c = rs ;
+                    rs = hostinfo_loadaddrs(op,af,hep) ;
+                }
+                if ((rs >= 0) && (op->ehostname[0] == '\0')) {
+                    int     sl ;
+                    cchar   *sp ;
+                    if ((rs = hostent_getofficial(hep,&sp)) >= 0) {
+                        cint        hlen = maxhostlen ;
+                        sl = rs ;
+                        rs = snwcpy(op->ehostname,hlen,sp,sl) ;
+                    }
+                }
+                if ((! f_inet4) && hep) {
+                    uc_freehostent(hep) ;
+                }
+            } else if (isNotPresent(rs)) {
+                rs = SR_OK ;
+            } /* end if (got host-entry) */
+            rs1 = uc_free(hebuf) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (hostinfo_getname) */
@@ -776,49 +771,47 @@ static int hostinfo_getaddr(hostinfo *op,int af) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	bool		f_inet4 = false ;
-	if constexpr (f_hostbyname) {
-	    f_inet4 = (af == af4 ) ;
+	if_constexpr (f_hostbyname) {
+	    f_inet4 = (af == af4) ;
 	}
 	if (op->f.addr && (af == op->addr.af)) {
-	    if ((rs = getbufsize(getbufsize_ho)) >= 0) {
-	        HOSTENT		he, *hep ;
+	    char	*hebuf{} ;
+	    if ((rs = malloc_ho(&hebuf)) >= 0) {
+	        HOSTENT		*hep{} ;
+	        ucentho		he ;
 	        cint		helen = rs ;
-	        char		*hebuf ;
-	        if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	            int		flags ;
-	            cchar	*name = op->arg.hostname ;
-	            if (f_inet4) {
-	                cint	alen = op->addr.addrlen ;
-	                cint	at = op->addr.af ;
-	                cchar	*abuf = op->addr.addr ;
-	                hep = &he ;
-	                rs = uc_gethostbyaddr(hep,hebuf,helen,abuf,alen,at) ;
-	            } else {
-	                flags = 0 ;
-	                rs = uc_getipnodebyname(&hep,name,af,flags) ;
-	            } /* end if */
-	            if (rs >= 0) {
-	                if ((rs = hostinfo_loadnames(op,af,hep)) >= 0) {
-	                    c = rs ;
-	                    rs = hostinfo_loadaddrs(op,af,hep) ;
+	        cchar		*name = op->arg.hostname ;
+	        if (f_inet4) {
+	            cint	alen = op->addr.addrlen ;
+	            cint	at = op->addr.af ;
+	            cchar	*abuf = op->addr.addr ;
+	            hep = &he ;
+	            rs = getho_addr(&he,hebuf,helen,at,abuf,alen) ;
+	        } else {
+	            cint	flags = 0 ;
+	            rs = uc_getipnodebyname(&hep,name,af,flags) ;
+	        } /* end if */
+	        if (rs >= 0) {
+	            if ((rs = hostinfo_loadnames(op,af,hep)) >= 0) {
+	                c = rs ;
+	                rs = hostinfo_loadaddrs(op,af,hep) ;
+	            }
+	            if ((rs >= 0) && (op->ehostname[0] == '\0')) {
+	                int	sl ;
+	                cchar	*sp ;
+	                if ((rs = hostent_getofficial(hep,&sp)) >= 0) {
+			    cint	hlen = maxhostlen ;
+	                    sl = rs ;
+	                    rs = snwcpy(op->ehostname,hlen,sp,sl) ;
 	                }
-	                if ((rs >= 0) && (op->ehostname[0] == '\0')) {
-	                    int		sl ;
-	                    cchar	*sp ;
-	                    if ((rs = hostent_getofficial(hep,&sp)) >= 0) {
-			        cint	hlen = maxhostlen ;
-	                        sl = rs ;
-	                        rs = snwcpy(op->ehostname,hlen,sp,sl) ;
-	                    }
-	                }
-	                if (! f_inet4) {
-	                    uc_freehostent(hep) ;
-	                }
-	            } /* end if (got host-entry) */
-	            rs1 = uc_free(hebuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a) */
-	    } /* end if (getbufsize) */
+	            }
+	            if ((! f_inet4) && hep) {
+	                uc_freehostent(hep) ;
+	            }
+	        } /* end if (got host-entry) */
+	        rs1 = uc_free(hebuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (enabled) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -1049,7 +1042,7 @@ static int getinet_add(hostinfo *op,int af) noex {
 	int		c = 0 ;
 	if (strchr(op->arg.hostname,'.') == nullptr) { /* nodename-only */
 	    bool	f_continue = false ;
-	    if constexpr (f_fastaddr) {
+	    if_constexpr (f_fastaddr) {
 	        if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
 	            f_continue = (! op->f.addr) ;
 	        }
@@ -1087,7 +1080,7 @@ static int getinet_rem(hostinfo *op,int af) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	bool		f_continue = false ;
-	if constexpr (f_fastaddr) {
+	if_constexpr (f_fastaddr) {
 	    if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
 	        f_continue = (! op->f.addr) ;
 	    }
@@ -1130,7 +1123,7 @@ static int getinet_remlocal(hostinfo *op,int af) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	bool		f_continue = false ;
-	if constexpr (f_fastaddr) {
+	if_constexpr (f_fastaddr) {
 	    if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
 	        f_continue = (! op->f.addr) ;
 	    }
@@ -1168,7 +1161,7 @@ static int getinet_known(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	bool		f_continue = false ;
-	if constexpr (f_fastaddr) {
+	if_constexpr (f_fastaddr) {
 	    if ((rs = hostinfo_addrbegin(op,af)) >= 0) {
 	        f_continue = (! op->f.addr) ;
 	    }

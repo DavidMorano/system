@@ -147,7 +147,7 @@ static int	indomain(int,int,int) noex ;
 /* local variables */
 
 /* Days-Of-Year (DOY) */
-static constexpr int	doy[12] = { 
+constexpr int		doy[12] = { 
 	0,31,59,90,120,151,181,212,243,273,304,334 
 } ;
 

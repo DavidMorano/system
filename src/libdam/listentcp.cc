@@ -86,7 +86,7 @@
 extern int	getprotofamily(int) ;
 extern int	getproto_name(cchar *,int) ;
 extern int	getnodedomain(const char *,const char *) ;
-extern int	getdomainname(const char *,int,const char *) ;
+extern int	getinetdomain(const char *,int,const char *) ;
 extern int	isOneOf(const int *,int) ;
 
 #if	CF_DEBUGS

@@ -23,9 +23,9 @@
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<localmisc.h>		/* |MAXNAMELEN| */
 
 #include	"systems.h"

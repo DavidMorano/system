@@ -79,7 +79,7 @@ extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
 extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getdomainname(char *,int,cchar *) ;
+extern int	getinetdomain(char *,int,cchar *) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 

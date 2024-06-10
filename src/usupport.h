@@ -15,7 +15,7 @@
 #include	<sys/types.h>
 #include	<sys/time.h>
 #include	<time.h>
-#include	<string.h>		/* <- for |memset(3c)| */
+#include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
 #include	<usys.h>		/* <- auxillary OS support */
 #include	<stdint.h>
 #include	<clanguage.h>
@@ -48,6 +48,20 @@ int memclear(T *op) noex {
 
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCLEAR */
+
+
+#ifndef	TEMPLATE_MEMCPY
+#define	TEMPLATE_MEMCPY
+#ifdef	__cplusplus
+
+template<typename T>
+void *memcpy(T *dp,void *sp) noex {
+	csize	dsz = sizeof(T) ;
+	return memcpy(dp,sp,dsz) ;
+}
+
+#endif /* __cplusplus */
+#endif /* TEMPLATE_MEMCPY */
 
 
 #ifndef	TYPEDEF_MTIME

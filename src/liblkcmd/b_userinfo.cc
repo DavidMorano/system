@@ -164,7 +164,7 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	udomain(cchar *,char *,int,cchar *) ;
-extern int	getdomainname(char *,int,cchar *) ;
+extern int	getinetdomain(char *,int,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getlogname(char *,int) ;
@@ -3105,7 +3105,7 @@ static int datasys_domain(DATASYS *dsp)
 	            cint	dlen = NODENAMELEN ;
 	            cchar	*nn = dsp->nodename ;
 	            char	dbuf[NODENAMELEN + 1] ;
-	            if ((rs = getdomainname(dbuf,dlen,nn)) >= 0) {
+	            if ((rs = getinetdomain(dbuf,dlen,nn)) >= 0) {
 	                cchar	**vpp = &dsp->domainname ;
 	                rs = datasys_setentry(dsp,vpp,dbuf,rs) ;
 	            }

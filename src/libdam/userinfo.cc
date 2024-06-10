@@ -1398,7 +1398,7 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	            }
 	        }
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            rs = getdomainname(dbuf,dlen) ;
+	            rs = getinetdomain(dbuf,dlen) ;
 	            dl = rs ;
 	            if (isNotPresent(rs)) {
 	                dbuf[0] = '\0' ;

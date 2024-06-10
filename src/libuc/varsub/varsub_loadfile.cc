@@ -43,7 +43,7 @@
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<stdfnames.h>		/* |SYDFNIN| */
+#include	<stdfnames.h>		/* |STDFNIN| */
 #include	<bfile.h>
 #include	<field.h>
 #include	<fieldterms.h>

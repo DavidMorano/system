@@ -23,7 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<snwcpyx.h>
+#include	<snwcpyxc.h>
 
 
 EXTERNC_begin

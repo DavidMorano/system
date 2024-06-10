@@ -116,6 +116,7 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -129,16 +130,15 @@ using std::min ;			/* subroutine-template */
 
 /* local structures */
 
-struct tryer_flags {
+namespace {
+    struct tryer_flags {
 	uint		initvarnode:1 ;
 	uint		inituname:1 ;
 	uint		initnode:1 ;
 	uint		varnode:1 ;
 	uint		uname:1 ;
 	uint		node:1 ;
-} ; /* end struct (tryer_flags) */
-
-namespace {
+    } ; /* end struct (tryer_flags) */
     struct tryer {
 	char		*nodename ;	/* passed caller argument (returned) */
 	char		*domainname ;	/* passed caller argument (returned) */
@@ -148,12 +148,11 @@ namespace {
 	TRY_FL		f ;
 	int		dlen ;
     } ; /* end struct (try) */
-}
-
-struct guess {
+    struct guess {
 	cchar		*name ;
 	cchar		*domain ;
-} ;
+    } ; /* end struct (guess) */
+}
 
 
 /* forward references */
@@ -185,7 +184,7 @@ static int	rmwhitedot(char *,int) noex ;
 
 /* local variables */
 
-static constexpr int	(*tries[])(TRY *) = {
+constexpr int		(*tries[])(TRY *) = {
 	try_vardomain,
 	try_varlocaldomain,
 	try_varnode,
@@ -196,7 +195,7 @@ static constexpr int	(*tries[])(TRY *) = {
 	nullptr
 } ;
 
-static constexpr int	(*systries[])(TRY *) = {
+constexpr int		(*systries[])(TRY *) = {
 	try_uname,
 	try_gethost,
 	try_resolve,
@@ -204,13 +203,13 @@ static constexpr int	(*systries[])(TRY *) = {
 	nullptr
 } ;
 
-static constexpr cpcchar	resolvefnames[] = {
+constexpr cpcchar	resolvefnames[] = {
 	RESOLVFNAME,			/* most operating systems */
 	"/var/run/resolv.conf",		/* for example: MacOS */
 	nullptr
 } ;
 
-static constexpr struct guess	ga[] = {
+constexpr struct guess	ga[] = {
 	{ "rc", "rightcore.com" },
 	{ "jig", "rightcore.com" },
 	{ "gateway", "ece.neu.com" },
@@ -243,19 +242,19 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 	if ((rs = maxhostlen) >= 0) {
 	    TRY		ti ;
 	    if ((rs = try_start(&ti,nbuf,dbuf,rs)) >= 0) {
-/* do we need a nodename? */
+		/* do we need a nodename? */
 	        if (nbuf != nullptr) {
 	            nbuf[0] = '\0' ;
 	            if (! ti.f.initnode) rs = try_initnode(&ti) ;
 	        } /* end if (trying to get a nodename) */
-/* do we need a domainname? */
+		/* do we need a domainname? */
 	        if ((rs >= 0) && (dbuf != nullptr)) {
 	            dbuf[0] = '\0' ;
 		    rs = SR_OK ;
 	            for (int i = 0 ; (rs == SR_OK) && tries[i] ; i += 1) {
 	                rs = (*tries[i])(&ti) ;
 	            } /* end for */
-/* remove any stupid trailing dots from the domain name if any */
+	            /* remove any stupid trailing dots if any */
 	            if ((rs >= 0) && (dbuf[0] != '\0')) {
 	                rs = rmwhitedot(dbuf,rs) ;
 		    }
@@ -276,12 +275,12 @@ int getsysdomain(char *dbuf,int dlen) noex {
 	    TRY		ti ;
 	    dbuf[0] = '\0' ;
 	    if ((rs = try_start(&ti,nullptr,dbuf,dlen)) >= 0) {
-/* do we need a domainname? */
+		/* do we need a domainname? */
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs == SR_OK) && systries[i] ; i += 1) {
 	            rs = (*systries[i])(&ti) ;
 	        } /* end for */
-/* remove any stupid trailing dots from the domain name if any */
+		/* remove any stupid trailing dots if any */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
 	            rs = rmwhitedot(dbuf,rs) ;
 		    len = rs ;

@@ -29,7 +29,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
@@ -599,8 +599,9 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	            if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
 	                op->f.sorted = false ;
 	                rs = vechand_add(elp,ep) ;
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    entry_finish(ep) ;
+			}
 	            } /* end if (entry-start) */
 	            if (rs < 0) {
 	                uc_free(ep) ;

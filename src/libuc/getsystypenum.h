@@ -1,7 +1,7 @@
-/* getmjd HEADER */
+/* getsystypenum HEADER */
 /* lang=C20 */
 
-/* get (calculate) a Modified-Julian-Day (MJD) */
+/* get the system type and OS number (if we can) */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETMJD_INCLUDE
-#define	GETMJD_INCLUDE
+#ifndef	GETSYSTYPENUM_INCLUDE
+#define	GETSYSTYPENUM_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,12 +26,11 @@
 
 EXTERNC_begin
 
-extern int	getmjd(int,int,int) noex ;
-extern int	getyrd(int,int,int) noex ;
+extern int	getsystypenum(char *,char *,cc *,cc *) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETMJD_INCLUDE */
+#endif /* GETSYSTYPENUM_INCLUDE */
 
 

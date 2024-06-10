@@ -35,7 +35,6 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<utimeout.h>
 #include	<utypealiases.h>

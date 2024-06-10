@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} ucvariables "
+NAMES="${NAMES} getdomainname"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/ucvariables/s//uvariables/g
+g/getdomainname/s//getinetdomain/g
 	w
 	q
 EOF

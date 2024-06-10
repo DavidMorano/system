@@ -31,6 +31,14 @@ extern int	snwcpy(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int snwcpy(char *dbuf,int dlen,cchar *sp) noex {
+	return snwcpy(dbuf,dlen,sp,-1) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* SNWCPY_INCLUDE */
 

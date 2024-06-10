@@ -37,14 +37,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= varsub.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LDRPATH=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -58,7 +61,6 @@ OBJ0_VARSUB= varsub_main.o
 OBJ1_VARSUB= varsub_loadfile.o
 OBJ2_VARSUB= varsub_addvec.o
 OBJ3_VARSUB= 
-
 
 OBJA_VARSUB= obj0_varsub.o obj1_varsub.o
 OBJB_VARSUB= obj2_varsub.o 
@@ -108,6 +110,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_varsub.o:	$(OBJ0_VARSUB)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_VARSUB)
