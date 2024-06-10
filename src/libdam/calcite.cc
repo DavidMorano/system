@@ -1,10 +1,10 @@
-/* calcite */
+/* calcite SUPPORT */
+/* lang=C++20 */
 
 /* calendar citation */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -19,17 +19,14 @@
 
 	This small object just holds a citation for a calendar entry.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -58,15 +55,15 @@ extern int	strlinelen(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int calcite_load(CALCITE *ep,int y,int m, int d)
-{
-
+int calcite_load(CALCITE *ep,int y,int m, int d) noex {
 	if (ep == NULL) return SR_FAULT ;
 
-	memset(ep,0,sizeof(CALCITE)) ;
+	memclear(ep) ;
 	ep->y = (ushort) y ;
 	ep->m = (uchar) m ;
 	ep->d = (uchar) d ;

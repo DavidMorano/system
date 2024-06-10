@@ -1,4 +1,5 @@
-/* handle_srventry */
+/* handle_srventry SUPPORT */
+/* lang=C++20 */
 
 /* handle a connect request for a service when we have a server entry */
 /* version %I% last-modified %G% */
@@ -25,11 +26,12 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<time.h>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>

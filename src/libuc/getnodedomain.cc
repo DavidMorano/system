@@ -533,7 +533,7 @@ static int try_gethost(TRY *tip) noex {
 	if ((rs >= 0) && tip->f.node) {
 	    char	*hbuf{} ;
 	    if ((rs = malloc_ho(&hbuf)) >= 0) {
-		const nullptr_t	np{} ;
+		cnullptr_t	np{} ;
 	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nodename ;
@@ -632,7 +632,7 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 static int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if constexpr (f_guess) {
+	if_constexpr (f_guess) {
 	    if (! tip->f.initnode) {
 	        rs = try_initnode(tip) ;
 	    }
