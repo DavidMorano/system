@@ -1,12 +1,10 @@
-/* listenudp */
+/* listenudp SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to listen on a UDP port */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_PROTOLOOKUP	0		/* lookup protocol spec? */
-
 
 /* revision history:
 
@@ -19,45 +17,39 @@
 
 /*******************************************************************************
 
-        This subroutine listens on a UDP socket that it finds and binds to
-        itself.
+	Name:
+	listenudp
+
+	Description:
+	This subroutine listens on a UDP socket that it finds and
+	binds to itself.
 
 	Synopsis:
-
-	int listenudp(af,hostname,portspec,opts)
-	int		af ;
-	const char	hostname[] ;
-	const char	portspec[] ;
-	int		opts ;
+	int listenudp(int af,cc *hostname,cc *portspec,int opts) noex
 
 	Arguments:
-
 	af			address family
 	hostname		address to bind to
 	portspec		port to bind to
 	opts			opts to use
 
 	Return:
-
 	>=0			FD of socket
-	<0			error
-
+	<0			error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
@@ -65,6 +57,8 @@
 #include	<hostinfo.h>
 #include	<hostaddr.h>
 #include	<localmisc.h>
+
+#include	"listenudp.h"
 
 
 /* local defines */
@@ -113,19 +107,6 @@
 #endif
 
 
-/* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mnwcpy(char *,int,const void *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
-extern int	getprotofamily(int) ;
-extern int	getproto_name(cchar *,int) ;
-
-
-/* external variables */
-
-
 /* local typedefs */
 
 #if	defined(IRIX) && (! defined(TYPEDEF_INADDRT))
@@ -134,51 +115,56 @@ typedef unsigned int	in_addr_t ;
 #endif /* SGI IRIX problem */
 
 
+/* external subroutines */
+
+extern "C" {
+    extern int	mnwcpy(char *,int,cvoid *,int) noex ;
+    extern int	getportnum(cchar *,cchar *) noex ;
+    extern int	getprotofamily(int) noex ;
+    extern int	getproto_name(cchar *,int) noex ;
+}
+
+
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
 
-static int	getaddr(char *,int,const char *) ;
+static int	getaddr(char *,int,cchar *) noex ;
 
-static int	hostinfo_findaf(HOSTINFO *,char *,int,int) ;
+static int	hostinfo_findaf(HOSTINFO *,char *,int,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int listenudp(int af,cchar *hostname,cchar *portspec,int opts)
-{
-	SOCKADDRESS	sa ;
+int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
+	sockaddress	sa ;
 	in_addr_t	inet4addr ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		proto = IPPROTO_UDP ;
 	int		pf ;
 	int		port = 0 ;
 	int		s = -1 ;
-	int		f_anyhost = FALSE ;
-	const char	*protoname = PROTONAME_UDP ;
+	int		f_anyhost = false ;
+	cchar		*protoname = PROTONAME_UDP ;
 	char		addr[INETXADDRLEN+1] ;
-
-
-#if	CF_DEBUGS
-	debugprintf("listenudp: ent af=%d\n",af) ;
-	debugprintf("listenudp: hostname=%s\n",hostname) ;
-	debugprintf("listenudp: portspec=%s\n",portspec) ;
-	debugprintf("listenudp: opts=%08x\n",opts) ;
-#endif
 
 	if (portspec == NULL) return SR_FAULT ;
 	if (portspec[0] == '\0') return SR_INVALID ;
 
 /* host */
 
-	if ((hostname != NULL) && (hostname[0] != '\0') && 
-	    (hostname[0] != '*')) {
-
+	if (hostname && (hostname[0] != '\0') && (hostname[0] != '*')) {
 	    if ((inet4addr = inet_addr(hostname)) != INETADDRBAD) {
 		f_anyhost = (inet4addr == INADDR_ANY) ;
 	        memcpy(addr,&inet4addr,INET4ADDRLEN) ;
@@ -188,34 +174,20 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts)
 		    rs = SR_AFNOSUPPORT ;
 		}
 	    } else {
-		int	f ;
-
+		bool	f = false ;
 		f = (strcmp(hostname,ANYHOST) == 0) ;
 		f = f || (strcmp(hostname,"*") == 0) ;
 	        if (! f) {
-
 		    rs = getaddr(addr,af,hostname) ;
 		    af = rs ;
-
-#if	CF_DEBUGS
-		    {
-			char	addrstr[INETX_ADDRSTRLEN+1] ;
-	        	debugprintf("listenudp: getaddr() rs=%d\n",rs) ;
-			sninetaddr(addrstr,INETX_ADDRSTRLEN,af,addr) ;
-	        	debugprintf("listenudp: addr=%s\n",addrstr) ;
-		    }
-#endif
-
 	        } else {
-	            f_anyhost = TRUE ;
+	            f_anyhost = true ;
 	            memset(addr,0,INETXADDRLEN) ; /* any-host */
 	    	    if (af == AF_UNSPEC) af = AF_INET6 ;
 		}
-
 	    } /* end if (inet_addr) */
-
 	} else {
-	    f_anyhost = TRUE ;
+	    f_anyhost = true ;
 	    memset(addr,0,INETXADDRLEN) ; /* any-host */
 	    if (af == AF_UNSPEC) af = AF_INET6 ;
 	}
@@ -226,10 +198,6 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts)
 	    rs = getportnum(protoname,portspec) ;
 	    port = rs ;
 	} /* end if (getting a port) */
-
-#if	CF_DEBUGS
-	debugprintf("listenudp: port=%d\n",port) ;
-#endif
 
 /* get protocol family (from address-family) */
 
@@ -265,21 +233,22 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts)
 /* opts */
 
 	if ((rs >= 0) && (opts & INETOPT_REUSEADDR)) {
-	    const int	onesize = sizeof(int) ;
+	    cint	osz = sizeof(int) ;
 	    int		one = 1 ;
-	    rs = u_setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&one,onesize) ;
+	    rs = u_setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&one,osz) ;
 	}
 
 /* bind */
 
 	if (rs >= 0) {
 	    if ((rs = sockaddress_start(&sa,af,addr,port,0)) >= 0) {
-	        struct sockaddr	*sap = (struct sockaddr *) &sa ;
-	        const int	sal = rs ;
-
-	        rs = u_bind(s,sap,sal) ;
-
-	        sockaddress_finish(&sa) ;
+	        SOCKADDR	*sap = (SOCKADDR *) &sa ;
+	        cint		sal = rs ;
+		{
+	            rs = u_bind(s,sap,sal) ;
+		}
+	        rs1 = sockaddress_finish(&sa) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (socketet) */
 	} /* end if */
 
@@ -289,10 +258,6 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts)
 	    u_close(s) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("listenudp: ret rs=%d fd=%u\n",rs,s) ;
-#endif
-
 	return (rs >= 0) ? s : rs ;
 }
 /* end subroutine (listenudp) */
@@ -300,17 +265,13 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts)
 
 /* local subroutines */
 
-
-static int getaddr(char *hap,int af,cchar *hn)
-{
+static int getaddr(char *hap,int af,cchar *hn) noex {
 	HOSTINFO	hi ;
 	int		rs ;
 	int		raf = 0 ;
-
 	memset(hap,0,INETXADDRLEN) ;
 	if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
-	    rs = 0 ;
-
+	    rs = SR_OK ;
 	    if ((rs == 0) || (rs == SR_NOTFOUND)) {
 	        raf = AF_INET6 ;
 	        if ((af == raf) || (af == AF_UNSPEC)) {
@@ -335,20 +296,16 @@ static int getaddr(char *hap,int af,cchar *hn)
 }
 /* end subroutine (getaddr) */
 
-
-static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af)
-{
-	HOSTINFO_CUR	cur ;
+static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
+	hostinfo_cur	cur ;
 	int		rs ;
+	int		rs1 ;
 	int		al = 0 ;
-	int		f = FALSE ;
-
+	int		f = false ;
 	if ((rs = hostinfo_curbegin(hip,&cur)) >= 0) {
 	    const uchar	*ap ;
-
 	    while ((rs = hostinfo_enumaddr(hip,&cur,&ap)) >= 0) {
 		al = rs ;
-
 		switch (al) {
 		case INET4ADDRLEN:
 		    f = (af == AF_INET4) || (af == AF_UNSPEC) ;
@@ -357,20 +314,17 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af)
 		    f = (af == AF_INET6) || (af == AF_UNSPEC) ;
 		    break ;
 		} /* end switch */
-
 		if (f) {
 		    rs = mnwcpy(abuf,alen,ap,al) ;
 		} else {
 		    al = 0 ;
 		}
-
 		if (f) break ;
 		if (rs < 0) break ;
 	    } /* end while */
-
-	    hostinfo_curend(hip,&cur) ;
-	} /* end if (cursor) */
-
+	    rs1 = hostinfo_curend(hip,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (hostinfo-cursor) */
 	return (rs >= 0) ? al : rs ;
 }
 /* end subroutine (hostinfo_findaf) */

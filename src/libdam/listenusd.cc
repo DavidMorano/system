@@ -78,50 +78,44 @@
 
 /* exported subroutines */
 
-int listenusd(cchar *portspec,mode_t om,int lopts) noex {
-	cint	pf = PF_UNIX ;
-	cint	st = SOCK_DGRAM ;
-	int		rs ;
+int listenusd(cchar *ps,mode_t om,int lopts) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		s = 0 ;
-
-	if (portspec == NULL) return SR_FAULT ;
-
-	if (portspec[0] == '\0') return SR_INVALID ;
-
-	if ((rs = u_socket(pf,st,0)) >= 0) {
-	    s = rs ;
-
-	    if (lopts & 1) {
-	        cint	so = SO_REUSEADDR ;
-	        cint	isize = sizeof(int) ;
-	        int		one = 1 ;
-	        rs = u_setsockopt(s,SOL_SOCKET,so,&one,isize) ;
-	    }
-
-	    if (rs >= 0) {
-	        sockaddress	sa ;
-	        cint	af = AF_UNIX ;
-	        if ((rs = sockaddress_start(&sa,af,portspec,0,0)) >= 0) {
-	            SOCKADDR	*sap = (SOCKADDR *) &sa ;
-	            int		sal = rs ;
-
-	            u_unlink(portspec) ;
-	            if ((rs = u_bind(s,sap,sal)) >= 0) {
-	                om &= S_IAMB ;
-	                rs = u_chmod(portspec,om) ;
+	if (ps) {
+	    rs = SR_INVALID ;
+	    if (ps[0]) {
+	        cint	pf = PF_UNIX ;
+	        cint	st = SOCK_DGRAM ;
+	        if ((rs = u_socket(pf,st,0)) >= 0) {
+	            s = rs ;
+	            if (lopts & 1) {
+	                cint	so = SO_REUSEADDR ;
+	                cint	isize = sizeof(int) ;
+	                int	one = 1 ;
+	                rs = u_setsockopt(s,SOL_SOCKET,so,&one,isize) ;
 	            }
-
-	            rs1 = sockaddress_finish(&sa) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (sockaddress) */
-	    } /* end if (ok) */
-
-	    if (rs < 0) {
-	        u_close(s) ;
-	    }
-	} /* end if (socket) */
-
+	            if (rs >= 0) {
+	                sockaddress	sa ;
+	                cint		af = AF_UNIX ;
+	                if ((rs = sockaddress_start(&sa,af,ps,0,0)) >= 0) {
+	                    SOCKADDR	*sap = (SOCKADDR *) &sa ;
+	                    int		sal = rs ;
+	                    u_unlink(ps) ;
+	                    if ((rs = u_bind(s,sap,sal)) >= 0) {
+	                        om &= S_IAMB ;
+	                        rs = u_chmod(ps,om) ;
+	                    }
+	                    rs1 = sockaddress_finish(&sa) ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (sockaddress) */
+	            } /* end if (ok) */
+	            if (rs < 0) {
+	                u_close(s) ;
+	            }
+	        } /* end if (socket) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? s : rs ;
 }
 /* end subroutine (listenusd) */

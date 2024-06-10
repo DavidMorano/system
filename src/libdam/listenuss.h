@@ -1,14 +1,14 @@
-/* listenusd HEADER */
+/* listenuss HEADER */
 /* lang=C20 */
 
-/* listen on a UNIX® Socket-Datagram port w/ a socket */
+/* listen on a UNIX® Socket-Stream port w/ a socket */
 /* version %I% last-modified %G% */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LISTENUSD_INCLUDE
-#define	LISTENUSD_INCLUDE
+#ifndef	LISTENUSS_INCLUDE
+#define	LISTENUSS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -21,11 +21,11 @@
 
 EXTERNC_begin
 
-extern int	listenusd(cchar *,mode_t,int) noex ;
+extern int	listenuss(cchar *,mode_t,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* LISTENUSD_INCLUDE */
+#endif /* LISTENUSS_INCLUDE */
 
 

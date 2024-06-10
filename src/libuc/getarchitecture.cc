@@ -1,5 +1,5 @@
 /* getarchitecture SUPPORT */
-/* version %I% last-modified %G% */
+/* lang=C++20 */
 
 /* get the machine architecture string */
 /* version %I% last-modified %G% */
@@ -26,7 +26,7 @@
 	int getarchitecture(char *rbuf,int rlen) noex
 
 	Arguments:
-	rbuf		result buffer
+	rbuf		result buffer pointer
 	rlen		result buffer length
 
 	Returns:
@@ -43,13 +43,16 @@
 #include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
 #include	<sfx.h>
 #include	<snwcpy.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"getarchitecture.h"
 
 
 /* local defines */
 
 #ifndef	ARCHITECTURE
-#define	ARCHITECTURE		"Armv9"
+#define	ARCHITECTURE	"Armv9"
 #endif
 
 
@@ -61,11 +64,33 @@
 
 /* local structures */
 
+namespace {
+    struct archer ;
+    typedef int (archer::*archer_m)() noex ;
+    struct archer {
+	char		*rbuf ;
+	int		rlen ;
+	archer(char *b,int l) noex : rbuf(b), rlen(l) { } ;
+	operator int () noex ;
+	int tryenv() noex ;
+	int trysys() noex ;
+	int trylib() noex ;
+	int trydef() noex ;
+    } ; /* end struct (archer) */
+}
+
 
 /* forward references */
 
 
 /* local variables */
+
+constexpr archer_m	mems[] = {
+	&archer::tryenv,
+	&archer::trysys,
+	&archer::trylib,
+	&archer::trydef
+} ;
 
 
 /* exported variables */
@@ -76,28 +101,65 @@
 int getarchitecture(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    static cchar	*vp = getenv(varname.architecture) ;
-	    rs = SR_OK ;
+	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    /* try first */
-	    if (vp) {
-	        cchar	*cp ;
-	        if (int cl ; (cl = sfshrink(vp,-1,&cp)) > 0) {
-	            rs = snwcpy(rbuf,rlen,cp,cl) ;
-	        }
-	    }
-	    /* try second */
-	    if ((rs >= 0) && (rbuf[0] == '\0')) {
-	        cint	cmd = usysauxinforeq_architecture ;
-	        rs = uc_sysauxinfo(rbuf,rlen,cmd) ;
-	    }
-	    /* try third */
-	    if ((rs >= 0) && (rbuf[0] == '\0')) {
-	        rs = snwcpy(rbuf,rlen,ARCHITECTURE) ;
+	    if (rlen >= 0) {
+	        archer	ao(rbuf,rlen) ;
+		rs = ao ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getarchitecture) */
+
+
+/* local subroutines */
+
+archer::operator int () noex {
+	int		rs = SR_OK ;
+	for (auto const &m : mems) {
+	    rs = (this->*m)() ;
+	    if (rs != SR_OK) break ;
+	} /* end for */
+	return rs ;
+}
+/* end method (archer::operator) */
+
+int archer::tryenv() noex {
+	static cchar	*vp = getenv(varname.architecture) ;
+	int		rs = SR_OK ;
+	if (vp) {
+	    cchar	*cp ;
+	    if (int cl ; (cl = sfshrink(vp,-1,&cp)) > 0) {
+	        rs = snwcpy(rbuf,rlen,cp,cl) ;
+	    }
+	}
+	return rs ;
+}
+/* end method (archer::tryenv) */
+
+int archer::trysys() noex {
+	cint		cmd = usysauxinforeq_architecture ;
+	int		rs ;
+	if ((rs = uc_sysauxinfo(rbuf,rlen,cmd)) >= 0) {
+	    /* nothing */
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
+	} else if (rs == SR_NOSYS) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end method (archer::trysys) */
+
+int archer::trylib() noex {
+	return uc_getarchitecture(rbuf,rlen) ;
+}
+/* end method (archer::trylib) */
+
+int archer::trydef() noex {
+	return snwcpy(rbuf,rlen,ARCHITECTURE) ;
+}
+/* end method (archer::trydef) */
 
 

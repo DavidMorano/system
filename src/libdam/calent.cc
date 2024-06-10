@@ -43,13 +43,13 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
-
-
-/* exported variables */
 
 
 /* local variables */
@@ -64,7 +64,7 @@ int calent_start(calent *ep,calent_q *qp,uint loff,int llen) noex {
 	int		rs = SR_FAULT ;
 	if (ep && qp) {
 	    calent_ln	*elp ;
-	    cint		ne = CALENT_NLE ;
+	    cint	ne = CALENT_NLE ;
 	    int		sz ;
 	    memclear(ep) ;
 	    ep->cidx = -1 ;
@@ -79,129 +79,142 @@ int calent_start(calent *ep,calent_q *qp,uint loff,int llen) noex {
 	        ep->magic = 0x99000001 ;
 	        elp->loff = loff ;
 	        elp->llen = llen ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calent_start) */
 
 int calent_finish(calent *ep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->e <= 0) return SR_NOTOPEN ;
-
-	if ((ep->i < 0) || (ep->i > ep->e)) return SR_BADFMT ;
-
-	if (ep->lines != nullptr) {
-	    rs1 = uc_free(ep->lines) ;
-	    if (rs >= 0) rs = rs1 ;
-	    ep->lines = nullptr ;
-	}
-
-	ep->i = 0 ;
-	ep->e = 0 ;
+	if (ep) {
+	    rs = SR_NOTOPEN ;
+	    if (ep->e > 0) {
+		rs = SR_BADFMT ;
+	        if ((ep->i >= 0) && (ep->i <= ep->e)) {
+		    rs = SR_OK ;
+	            if (ep->lines) {
+	                rs1 = uc_free(ep->lines) ;
+	                if (rs >= 0) rs = rs1 ;
+	                ep->lines = nullptr ;
+	            }
+	            ep->i = 0 ;
+	            ep->e = 0 ;
+	        } /* end if (good) */
+	    } /* end if (open) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calent_finish) */
 
 int calent_setidx(calent *ep,int cidx) noex {
-	if (ep == nullptr) return SR_FAULT ;
-
-	ep->cidx = cidx ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    rs = cidx ;
+	    ep->cidx = cidx ;
+	}
+	return rs ;
 }
 /* end subroutine (calent_setidx) */
 
 int calent_add(calent *ep,uint loff,int llen) noex {
-	calent_ln	*elp ;
-	int		rs = SR_OK ;
-	int		ne ;
-	int		sz ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->e <= 0) return SR_NOTOPEN ;
-
-	if ((ep->i < 0) || (ep->i > ep->e)) return SR_BADFMT ;
-
-	if (ep->i == ep->e) {
-	    ne = (ep->e * 2) + CALENT_NLE ;
-	    sz = ne * sizeof(calent_ln) ;
-	    if ((rs = uc_realloc(ep->lines,sz,&elp)) >= 0) {
-	        ep->e = ne ;
-	        ep->lines = elp ;
-	    }
-	}
-
-	if (rs >= 0) {
-	    ep->vlen = ((loff + llen) - ep->voff) ;
-	    elp = (ep->lines + ep->i) ;
-	    elp->loff = loff ;
-	    elp->llen = llen ;
-	    ep->i += 1 ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    rs = SR_NOTOPEN ;
+	    if (ep->e > 0) {
+		rs = SR_BADFMT ;
+	        if ((ep->i >= 0) && (ep->i <= ep->e)) {
+	            calent_ln	*elp ;
+	            int		sz ;
+		    rs = SR_OK ;
+	            if (ep->i == ep->e) {
+	                cint	ne = (ep->e * 2) + CALENT_NLE ;
+	                sz = ne * sizeof(calent_ln) ;
+	                if ((rs = uc_realloc(ep->lines,sz,&elp)) >= 0) {
+	                    ep->e = ne ;
+	                    ep->lines = elp ;
+	                }
+	            }
+	            if (rs >= 0) {
+	                ep->vlen = ((loff + llen) - ep->voff) ;
+	                elp = (ep->lines + ep->i) ;
+	                elp->loff = loff ;
+	                elp->llen = llen ;
+	                ep->i += 1 ;
+	            } /* end if (ok) */
+	        } /* end if (good) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calent_add) */
 
 int calent_samecite(calent *ep,CALENT *oep) noex {
+	int		rs = SR_FAULT ;
 	int		f = true ;
-	f = f && (ep->q.y == oep->q.y) ;
-	f = f && (ep->q.m == oep->q.m) ;
-	f = f && (ep->q.d == oep->q.d) ;
-	return f ;
+	if (ep && oep) {
+	    f = f && (ep->q.y == oep->q.y) ;
+	    f = f && (ep->q.m == oep->q.m) ;
+	    f = f && (ep->q.d == oep->q.d) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (calent_samecite) */
 
 int calent_mkhash(calent *ep,cchar *md) noex {
-	calent_ln	*elp = ep->lines ;
-	int		rs = SR_OK ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->e <= 0) return SR_NOTOPEN ;
-
-	if (ep->lines == nullptr) return SR_NOTOPEN ;
-
-	if (! ep->f.hash) {
-	    uint	hash = 0 ;
-	    int		i ;
-	    int		sl, cl ;
-	    cchar	*sp, *cp ;
-	        for (i = 0 ; i < ep->i ; i += 1) {
-	            sp = (md + elp[i].loff) ;
-	            sl = elp[i].llen ;
-	            while ((cl = nextfield(sp,sl,&cp)) > 0) {
-	                hash += hash_elf(cp,cl) ;
-	                sl -= ((cp + cl) - sp) ;
-	                sp = (cp + cl) ;
-	            } /* end while */
-	        } /* end for */
-	        ep->hash = hash ;
-	        ep->f.hash = true ;
-	} /* end if (needed) */
-
+	int		rs = SR_FAULT ;
+	if (ep && md) {
+	    rs = SR_NOTOPEN ;
+	    if (ep->e > 0) {
+		rs = SR_NOTOPEN ;
+	        if (ep->lines) {
+	            calent_ln	*elp = ep->lines ;
+	            rs = SR_OK ;
+	            if (! ep->f.hash) {
+	                uint	hash = 0 ;
+	                int	sl, cl ;
+	                cchar	*sp, *cp ;
+	                for (int i = 0 ; i < ep->i ; i += 1) {
+	                    sp = (md + elp[i].loff) ;
+	                    sl = elp[i].llen ;
+	                    while ((cl = nextfield(sp,sl,&cp)) > 0) {
+	                        hash += hash_elf(cp,cl) ;
+	                        sl -= ((cp + cl) - sp) ;
+	                        sp = (cp + cl) ;
+	                    } /* end while */
+	                } /* end for */
+	                ep->hash = hash ;
+	                ep->f.hash = true ;
+	           } /* end if (needed) */
+	        } /* end if (open) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calent_mkhash) */
 
 int calent_sethash(calent *ep,uint hash) noex {
-	ep->hash = hash ;
-	ep->f.hash = true ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    rs = SR_OK ;
+	    ep->hash = hash ;
+	    ep->f.hash = true ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (calent_sethash) */
 
 int calent_gethash(calent *ep,uint *rp) noex {
-	int		rs = SR_OK ;
-	int		f = ep->f.hash ;
-	if (rp != nullptr) {
-	    *rp = (f) ? ep->hash : 0 ;
-	}
+	int		rs = SR_FAULT ;
+	int		f = false ;
+	if (ep) {
+	    rs = SR_OK ;
+	    f = ep->f.hash ;
+	    if (rp) {
+	        *rp = (f) ? ep->hash : 0 ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (calent_gethash) */

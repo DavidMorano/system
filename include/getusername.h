@@ -22,7 +22,6 @@
 #include	<sys/types.h>		/* <- for |uid_t| */
 #include	<usystem.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 
 
 #ifndef	GETXUSER

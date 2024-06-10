@@ -23,6 +23,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
@@ -69,6 +70,7 @@ int uc_getarchitecture(char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
+		rs = SR_OK ;
 		if constexpr (f_sunos) {
 		    rs = sncpy1(rbuf,rlen,"sparc") ;
 		} else if constexpr (f_darwin) {
@@ -80,6 +82,6 @@ int uc_getarchitecture(char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uc_gethostname) */
+/* end subroutine (uc_getarchitecture) */
 
 
