@@ -16,8 +16,24 @@
 
 /*******************************************************************************
 
+	Name:
+	nlspeername
+
+	Description:
 	This subrotuine tries to find the peername for the given
 	NLS (TLI) address.
+
+	Synopsis:
+	int nlspeername(cchar *addr,cchar *dn,char *pn) noex
+
+	Arguments:
+	addr		address (in ASCII hexadecimal) of peer
+	dn		INET domain-name
+	pn		result buffer pointer
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -53,14 +69,6 @@
 
 /* local defines */
 
-#ifndef	INETXADDRLEN
-#define	INETXADDRLEN	sizeof(struct in_addr)
-#endif
-
-#ifndef	PEERNAMELEN
-#define	PEERNAMELEN	MAX(MAXHOSTNAMELEN,MAXPATHLEN)
-#endif
-
 
 /* external subroutines */
 
@@ -72,13 +80,24 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+struct vars {
+	int		maxhostlen ;
+} ;
+
+
 /* forward references */
 
 static int	nlspeername_unix(char *,cchar *,cchar *,int) noex ;
 static int	nlspeername_inet4(char *,cchar *,cchar *,int) noex ;
 
+static int	mkvars() noex ;
+
 
 /* local variables */
+
+static vars	var ;
 
 
 /* exported variables */
@@ -94,15 +113,18 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 	    rs = SR_INVALID ;
 	    pn[0] = '\0' ;
 	    if (al >= 16) {
-	        if (int af ; (rs = cfhexi(addr,4,&af)) >= 0) {
-	            if (af == AF_UNIX) {
-	                rs = nlspeername_unix(pn,dn,addr,al) ;
-			len = rs ;
-	            } else if (af == AF_INET4) {
-	                rs = nlspeername_inet4(pn,dn,addr,al) ;
-			len = rs ;
-	            } /* end if (recognized the address family) */
-	        } /* end if (cfhexi) */
+		static cint	rsv = mkvars() ;
+		if ((rs = rsv) >= 0) {
+	            if (int af ; (rs = cfhexi(addr,4,&af)) >= 0) {
+	                if (af == AF_UNIX) {
+	                    rs = nlspeername_unix(pn,dn,addr,al) ;
+			    len = rs ;
+	                } else if (af == AF_INET4) {
+	                    rs = nlspeername_inet4(pn,dn,addr,al) ;
+			    len = rs ;
+	                } /* end if (recognized the address family) */
+	            } /* end if (cfhexi) */
+		} /* end if (mkvars) */
 	    } /* end if (good) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -113,14 +135,15 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 /* local subroutines */
 
 static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
-	cint		nlen = MAXHOSTNAMELEN ;
+	cint		nlen = var.maxhostlen ;
+	cint		adv = 4 ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	(void) dn ;
-	al -= 4 ;
+	al -= adv ;
 	if ((al / 2) <= nlen) {
 	    uchar	*upn = ucharp(pn) ;
-	    rs = cfhexs((addr + 4),al,upn) ;
+	    rs = cfhexs((addr + adv),al,upn) ;
 	    len = rs ;
 	} else {
 	    rs = SR_TOOBIG ;
@@ -131,14 +154,15 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 
 static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	uint		inetaddr ;
+	uint		uv ;
 	cint		adv = 8 ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	al -= adv ;
-	if ((rs = cfhexui(ap+adv,al,&inetaddr)) >= 0) {
-	    HOSTENT_CUR	hc ;
-	    cint	family = rs ;
+	(void) al ;
+	if ((rs = cfhexui((ap + adv),8,&uv)) >= 0) {
+	    hostent_cur	hc ;
+	    cint	family = int(uv) ;
 	    char	*hebuf{} ;
 	    if ((rs = malloc_ho(&hebuf)) >= 0) {
 	        HOSTENT		he ;
@@ -147,7 +171,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	            if ((rs = hostent_getaf(&he)) >= 0) {
 	                cint	af = rs ;
 	                if (af == family) {
-	                    cint	nlen = MAXHOSTNAMELEN ;
+	                    cint	nlen = var.maxhostlen ;
 	                    cchar	*cp ;
 	                    if ((rs >= 0) && dn) {
 	                        if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
@@ -165,7 +189,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	                        } /* end if */
 	                    } /* end if (have a domain name) */
 	                    if (rs >= 0) {
-	                        if ((pn[0] == '\0') && (he.h_name != NULL)) {
+	                        if ((pn[0] == '\0') && he.h_name) {
 	                            cp = strwcpy(pn,he.h_name,nlen) ;
 	                            len = (cp - pn) ;
 	                        }
@@ -182,5 +206,14 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (nlspeername_inet4) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    var.maxhostlen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 

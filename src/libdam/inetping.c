@@ -101,7 +101,7 @@
 
 extern "C" {
    extern int	ctdeci(char *,int,int) noex ;
-   extern int	getourhe(cchar *,char *,HOSTENT *,char *,int) noex ;
+   extern int	getheour(cchar *,char *,HOSTENT *,char *,int) noex ;
    extern int	isNotPresent(int) noex ;
    extern int	isNotAccess(int) noex ;
 }
@@ -181,7 +181,7 @@ int inetping(cchar *rhost,int timeout) noex {
 	    if ((addr = inet_addr(rhost)) == ADDR_NOT) {
 	        f_numeric = FALSE ;
 	        hep = &he ;
-	        if ((rs = getourhe(rhost,NULL,hep,hebuf,helen)) >= 0) {
+	        if ((rs = getheour(rhost,NULL,hep,hebuf,helen)) >= 0) {
 	            if (hep->h_addrtype != AF_INET) {
 	                rs = SR_HOSTUNREACH ;
 	            }

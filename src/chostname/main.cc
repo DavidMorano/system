@@ -715,7 +715,7 @@ char		cname[] ;
 	char		*hebuf ;
 
 	if ((rs = uc_malloc((helen+1),&gebuf)) >= 0) {
-	if ((rs1 = getourhe(name,cname,&he,hebuf,helen)) >= 0) {
+	if ((rs1 = getheour(name,cname,&he,hebuf,helen)) >= 0) {
 	    hostent_cur	hc ;
 	    uchar	*ap ;
 	    char	*np ;

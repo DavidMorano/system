@@ -2155,7 +2155,7 @@ PROGINFO	*pip ;
 	    vecstr	*lnp = &pip->localnames ;
 	    for (int i = 0 ; i < 2 ; i += 1) {
 	        hnp = (i == 0) ? pip->nodename : hostnamebuf ;
-	        if ((rs = gethename(hnp,&he,hebuf,helen)) >= 0) {
+	        if ((rs = gethename(&he,hebuf,helen,hnp)) >= 0) {
 	            HOSTENT_CUR	cur ;
 	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
 		        cchar	*hp ;

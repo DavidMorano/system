@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} utypealiase.h"
+NAMES="${NAMES} getourhe"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/utypealiase.h/s//utypealiases.h/g
+g/getourhe/s//getheour/g
 	w
 	q
 EOF

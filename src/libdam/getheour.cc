@@ -1,12 +1,10 @@
-/* getourhe (Get Our Host Entry) */
+/* getheour SUPPORT (Get Our Host Entry) */
+/* lang=C++20 */
 
-/* get a host name that has an INET address */
+/* get a host name that has an INET address (of some sort: name or address) */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SNSDS	1		/* use 'snsds(3dam)' */
-
 
 /* revision history:
 
@@ -21,44 +19,39 @@
 
 	Get a host entry from the Name Server databases.
 
-        This subroutine is used to get a host entry struct for a host name. It
-        is not too fancy but will try to apply some standard defaults in order
-        to get an entry back. Names given to lookup will assume the current
-        domain if one is not supplied with the name. A NULL supplied name is
-        assumed to refer to the current host. A name specified in the INET style
-        dotted-decimal format is also acceptable.
+	This subroutine is used to get a host entry struct for a
+	host name.  It is not too fancy but will try to apply some
+	standard defaults in order to get an entry back.  Names given
+	to lookup will assume the current domain if one is not
+	supplied with the name.  A NULL supplied name is assumed to
+	refer to the current host.  A name specified in the INET
+	style dotted-decimal format is also acceptable.
 
-        Remember that a design goal is to MINIMIZE the number of DNS lookups
-        used. In general, DNS lookups are very slow.
+	Remember that a design goal is to MINIMIZE the number of
+	DNS lookups used.  In general, DNS lookups are very slow.
 
 	Synopsis:
-
-	int getourhe(name,hostname,hep,hostbuf,hostlen)
-	const char	name[] ;
+	int getheour(name,hostname,hep,hbuf,hlen)
+	cchar	name[] ;
 	char		hostname[] ;
-	struct hostent	*hep ;
-	char		hostbuf[] ;
-	int		hostlen ;
+	HOSTENT	*hep ;
+	char		hbuf[] ;
+	int		hlen ;
 
 	Arguments:
-
 	name		name to lookup an entry for
 	hostname	optional buffer to hold name actually used for lookup
 	hep		pointer to 'hostent' structure
-	hostbuf		user specified storage area for returned data
-	hostlen	length of user specified storage buffer
+	hbuf		user specified storage area for returned data
+	hlen		length of user specified storage buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
@@ -67,14 +60,18 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<snx.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>
+
+#include	"getheour.h"
 
 
 /* local defines */
@@ -82,15 +79,10 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	gethename(const char *,struct hostent *,char *,int) ;
-extern int	getheaddr(const void *,struct hostent *,char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+    extern int	gethename(HOSTENT *,char *,int,cchar *) noex ;
+    extern int	getheaddr(HOSTENT *,char *,int,cvoid *) noex ;
+}
 
 
 /* external variables */
@@ -107,20 +99,16 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* local variables */
 
-static const in_addr_t	anyaddr = 0 ;
+constexpr in_addr_t	anyaddr = 0 ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int getourhe(name,hostname,hep,hostbuf,hostlen)
-const char	name[] ;
-char		hostname[] ;
-struct hostent	*hep ;
-char		hostbuf[] ;
-int		hostlen ;
-{
-	struct utsname	uts ;
+int getheour(HOSTENT *hep,char *hbuf,int hlen,char *hostname,cc *name) noex {
+	UTSNAME		uts ;
 	in_addr_t	addr ;
 	int		rs ;
 	int		len ;
@@ -131,10 +119,6 @@ int		hostlen ;
 	char		*np = (char *) name ;
 	char		*ap ;
 	char		*cp ;
-
-#if	CF_DEBUGS
-	debugprintf("gethe: ent name=%s\n",name) ;
-#endif
 
 /* are we "doing" ourselves? */
 
@@ -169,12 +153,8 @@ int		hostlen ;
 
 	if ((addr = inet_addr(np)) != (~ 0)) {
 
-#if	CF_DEBUGS
-	debugprintf("gethe: address specified\n") ;
-#endif
-
 	    ap = (char *) &addr ;
-	    rs = getheaddr(ap,hep,hostbuf,hostlen) ;
+	    rs = getheaddr(ap,hep,hbuf,hlen) ;
 
 #ifdef	COMMENT
 	     if ((rs < 0) && 
@@ -185,18 +165,8 @@ int		hostlen ;
 #endif /* COMMENT */
 
 	} else {
-
-#if	CF_DEBUGS
-	debugprintf("gethe: name specified\n") ;
-#endif
-
-		rs = gethename(np,hep,hostbuf,hostlen) ;
-
+		rs = gethename(hep,hbuf,hlen,np) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("gethe: initial lookup returned rs=%d\n",rs) ;
-#endif
 
 	if (rs >= 0) {
 
@@ -208,15 +178,7 @@ int		hostlen ;
 	} else if (addr != (~ 0))
 		return SR_NOTFOUND ;
 
-#if	CF_DEBUGS
-	debugprintf("gethe: continuing\n") ;
-#endif /* CF_DEBUGS */
-
 /* get our local domain name */
-
-#if	CF_DEBUGS
-	debugprintf("gethe: getnodedomain\n") ;
-#endif
 
 	localdomain[0] = '\0' ;
 	getnodedomain(localnode,localdomain) ;
@@ -235,12 +197,7 @@ int		hostlen ;
 
 /* try it without our trailing local domain name */
 
-#if	CF_DEBUGS
-	debugprintf("gethe: gethename() newname=%s\n",newname) ;
-#endif
-
-	        rs = gethename(newname,hep,hostbuf,hostlen) ;
-
+	        rs = gethename(hep,hbuf,hlen,peername) ;
 		if (rs >= 0) {
 
 	            if (hostname != NULL)
@@ -248,10 +205,6 @@ int		hostlen ;
 
 	            return SR_OK ;
 	        }
-
-#if	CF_DEBUGS
-	debugprintf("gethe: gethename() rs=%d\n",rs) ;
-#endif
 
 	    } /* end if (domains are the same) */
 
@@ -265,35 +218,21 @@ int		hostlen ;
 	    sncpy3(newname,MAXHOSTNAMELEN,name,".",localdomain) ;
 #endif /* CF_SNSDS */
 
-#if	CF_DEBUGS
-	debugprintf("gethe: gethename() 2 newname=%s\n",newname) ;
-#endif
-
-	    rs = gethename(newname,hep,hostbuf,hostlen) ;
-
-	    if (rs >= 0) {
-
-	        if (hostname != NULL)
+	    if ((rs = gethename(hep,hbuf,hlen,newname)) >= 0) {
+	        if (hostname) {
 	            sncpy1(hostname,MAXHOSTNAMELEN,hep->h_name) ;
-
+		}
 	        return OK ;
 	    }
 
-#if	CF_DEBUGS
-	debugprintf("gethe: gethename() 2 rs=%d\n",rs) ;
-#endif
-
 	} /* end if */
 
-	if (hostname != NULL)
+	if (hostname) {
 	    hostname[0] = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("gethe: ret NOTFOUND\n") ;
-#endif
+	}
 
 	return SR_NOTFOUND ;
 }
-/* end subroutine (getourhe) */
+/* end subroutine (getheour) */
 
 

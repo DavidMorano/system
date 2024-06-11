@@ -100,7 +100,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getserial(const char *) ;
 extern int	getportnum(cchar *,cchar *) ;
-extern int	getourhe(cchar *,cchar *,struct hostent *,char *,int) ;
+extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
 extern int	issamehostname(const char *,const char *,const char *) ;
 extern int	isNotPresent(int) ;
 
@@ -363,7 +363,7 @@ int		port ;
 #endif
 
 	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	    if ((rs = getourhe(np,NULL,hep,hebuf,helen)) >= 0) {
+	    if ((rs = getheour(np,NULL,hep,hebuf,helen)) >= 0) {
 		if (hep->h_addrtype == AF_INET) {
 	    	    cchar	*a = (const char *) hep->h_addr ;
 

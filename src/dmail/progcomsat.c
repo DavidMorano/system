@@ -96,7 +96,7 @@ extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
 extern int	getserial(cchar *) ;
-extern int	getourhe(cchar *,cchar *,struct hostent *,char *,int) ;
+extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	mkrealame(char *,int,cchar *,int) ;
 extern int	mkuibang(char *,int,USERINFO *) ;
@@ -321,7 +321,7 @@ int		defport ;
 
 		    report_node(pip,np) ;
 
-	            if ((rs = getourhe(np,NULL,hep,hebuf,helen)) >= 0) {
+	            if ((rs = getheour(np,NULL,hep,hebuf,helen)) >= 0) {
 	                if (hep->h_addrtype == af) {
 	                    SOCKADDRESS	sa ;
 			    const int	ps = port ;

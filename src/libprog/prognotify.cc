@@ -88,7 +88,7 @@
 
 extern "C" {
     extern int	getportnum(cchar *,cchar *) noex ;
-    extern int	getourhe(cchar *,cchar *,HOSTENT *,char *,int) noex ;
+    extern int	getheour(cchar *,cchar *,HOSTENT *,char *,int) noex ;
     extern int	issamehostname(cchar *,cchar *,cchar *) noex ;
     extern int	parsenodespec(PROGINFO *,char *,cchar *,int) noex ;
 }
@@ -321,7 +321,7 @@ int		port ;
 #endif
 
 	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	    if ((rs = getourhe(np,NULL,hep,hebuf,helen)) >= 0) {
+	    if ((rs = getheour(np,NULL,hep,hebuf,helen)) >= 0) {
 		if (hep->h_addrtype == AF_INET) {
 	    	    cchar	*a = (cchar *) hep->h_addr ;
 

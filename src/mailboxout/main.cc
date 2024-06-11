@@ -103,7 +103,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	getfname(const char *,const char *,int,char *) ;
 extern int	getserial(const char *) ;
 extern int	getuid_name(cchar *,int) ;
-extern int	getourhe(cchar *,char *,struct hostent *,char *,int) ;
+extern int	getheour(cchar *,char *,struct hostent *,char *,int) ;
 extern int	pcsuserfile() ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 extern int	vecstr_loadfile(vecstr *,int,const char *) ;
@@ -2673,11 +2673,11 @@ vecobj		*mip ;
 #endif
 
 	        hep = &he ;
-	        rs = getourhe(np,NULL,hep,hostbuf,HOSTBUFLEN) ;
+	        rs = getheour(np,NULL,hep,hostbuf,HOSTBUFLEN) ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("comsat: getourhe() rs=%d\n",rs) ;
+	            debugprintf("comsat: getheour() rs=%d\n",rs) ;
 #endif
 
 	        if ((rs >= 0) && (hep->h_addrtype == AF_INET)) {
