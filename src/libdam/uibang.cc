@@ -97,7 +97,7 @@ int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
 	                    np = uip->fullname ;
 	                }
 	            }
-	        } /* end if-constexpr (f_fullname) */
+	        } /* end if_constexpr (f_fullname) */
 	        if (np == NULL) {
 	            if (uip->name && (uip->name[0] != '\0')) {
 	                np = uip->name ;
@@ -109,7 +109,7 @@ int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
 	                    np = uip->mailname ;
 	                }
 	            }
-	        } /* end if-constexpr (f_mailname) */
+	        } /* end if_constexpr (f_mailname) */
 	        if (np == NULL) {
 	            if (uip->fullname && (uip->fullname[0] != '\0')) {
 	                np = uip->fullname ;

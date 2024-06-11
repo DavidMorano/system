@@ -244,7 +244,7 @@ int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	if constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
@@ -276,7 +276,7 @@ int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -310,7 +310,7 @@ int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }

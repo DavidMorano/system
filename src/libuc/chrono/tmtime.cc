@@ -165,7 +165,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	            bool	f_isdst = (tc.tm_isdst > 0) ;
 	            op->gmtoff = (f_isdst) ? altzone : timezone ;
 	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
-	        } /* end if-constexpr (f_darwin) */
+	        } /* end if_constexpr (f_darwin) */
 	        rs = strwcpy(op->zname,zp,znamelen) - op->zname ;
 	    } /* end if (getting zone-name) */
 	} /* end if (non-null) */
@@ -190,7 +190,7 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	    if constexpr (f_darwin) {
 	        tmp->tm_gmtoff = op->gmtoff ;
 	        tmp->tm_zone = op->zname ;
-	    } /* end if-constexpr (f_darwin) */
+	    } /* end if_constexpr (f_darwin) */
 	} /* end if (non-null) */
 	return rs ;
 }

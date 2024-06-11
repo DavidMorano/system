@@ -128,7 +128,7 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	                    len = rs ;
 	                }
 	            }
-	        } /* end if-constexpr (f_ucprogdata) */
+	        } /* end if_constexpr (f_ucprogdata) */
 /* software facility (LOCAL) configuration */
 	        if ((rs >= 0) && (len == 0)) {
 	            cchar	*vardname = VARDNAME ;

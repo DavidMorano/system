@@ -122,7 +122,7 @@ int uc_userattrent(userattr **rpp) noex {
 		    ucentua	*ep = static_cast<ucentua *>(uap) ;
 		    rs = ep->size() ;
 	        }
-	    } /* end if-constexpr (f_userattr) */
+	    } /* end if_constexpr (f_userattr) */
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
@@ -143,7 +143,7 @@ int uc_userattrnam(userattr **rpp,cchar *un) noex {
 		    	ucentua	*ep = static_cast<ucentua *>(uap) ;
 		        rs = ep->size() ;
 	            }
-	 	} /* end if-constexpr (f_userattr) */
+	 	} /* end if_constexpr (f_userattr) */
 	    } /* end if (valid) */
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
@@ -165,7 +165,7 @@ int uc_userattruid(userattr **rpp,uid_t uid) noex {
 		        ucentua	*ep = static_cast<ucentua *>(uap) ;
 		        rs = ep->size() ;
 	            }
-		} /* end if-constexpr (f_userattr) */
+		} /* end if_constexpr (f_userattr) */
 	    } /* end if (valid) */
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
@@ -181,7 +181,7 @@ int uc_userattrfree(userattr *uap) noex {
 	        free_userattr(uap) ;
 	    } else {
 	        rs = SR_NOSYS ;
-	    } /* end if-constexpr (f_userattr) */
+	    } /* end if_constexpr (f_userattr) */
 	} /* end if (non-null) */
 	return rs ;
 }

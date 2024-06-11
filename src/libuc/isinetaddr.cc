@@ -103,7 +103,7 @@ bool isinetaddr(cchar *name) noex {
 	    f = (rs1 >= 0) ;
 	} else {
 	    f = (inet_addr(name) != inaddrbad) ;
-	} /* end if-constexpr (f_inet6) */
+	} /* end if_constexpr (f_inet6) */
 	return f ;
 }
 /* end subroutine (isinetaddr) */

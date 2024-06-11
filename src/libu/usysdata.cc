@@ -139,7 +139,7 @@ static int uuname_architecture(UTSNAME *up) noex {
 		cchar	*sp = "x86_64" ;
 	        rs = sncpy(abuf,alen,sp) ;
 	    }
-	} /* end if-constexpr (f_darwin) */
+	} /* end if_constexpr (f_darwin) */
 	return rs ;
 }
 /* end subroutine (uname_architecture) */

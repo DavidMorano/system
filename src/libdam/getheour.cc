@@ -19,7 +19,7 @@
 
 	Get a host entry from the Name Server databases.
 
-	This subroutine is used to get a host entry struct for a
+	This subroutine is used to get a host entry object for a
 	host name.  It is not too fancy but will try to apply some
 	standard defaults in order to get an entry back.  Names given
 	to lookup will assume the current domain if one is not
@@ -31,19 +31,14 @@
 	DNS lookups used.  In general, DNS lookups are very slow.
 
 	Synopsis:
-	int getheour(name,hostname,hep,hbuf,hlen)
-	cchar	name[] ;
-	char		hostname[] ;
-	HOSTENT	*hep ;
-	char		hbuf[] ;
-	int		hlen ;
+	int getheour(ucentho *hep,char *hbuf,int hlen,char *hb,cc *name) noex
 
 	Arguments:
-	name		name to lookup an entry for
-	hostname	optional buffer to hold name actually used for lookup
 	hep		pointer to 'hostent' structure
 	hbuf		user specified storage area for returned data
 	hlen		length of user specified storage buffer
+	hb		optional buffer to hold name actually used for lookup
+	name		name to lookup an entry for
 
 	Returns:
 	>=0		OK
@@ -66,6 +61,8 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<getnodename.h>		/* |getnodedomain(3uc)| */
 #include	<snx.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
@@ -77,11 +74,17 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
-    extern int	gethename(HOSTENT *,char *,int,cchar *) noex ;
-    extern int	getheaddr(HOSTENT *,char *,int,cvoid *) noex ;
+    extern int	gethename(ucentho *,char *,int,cchar *) noex ;
+    extern int	getheaddr(ucentho *,char *,int,cvoid *) noex ;
 }
 
 
@@ -107,46 +110,38 @@ constexpr in_addr_t	anyaddr = 0 ;
 
 /* exported subroutines */
 
-int getheour(HOSTENT *hep,char *hbuf,int hlen,char *hostname,cc *name) noex {
+int getheour(ucentho *hep,char *hbuf,int hlen,char *hostname,cc *name) noex {
 	UTSNAME		uts ;
 	in_addr_t	addr ;
 	int		rs ;
 	int		len ;
+	cchar		*np = (char *) name ;
 	char		localnode[NODENAMELEN + 1] ;
 	char		localdomain[MAXHOSTNAMELEN + 1] ;
 	char		newname[MAXHOSTNAMELEN + 1] ;
 	char		altname[MAXHOSTNAMELEN + 1] ;
-	char		*np = (char *) name ;
 	char		*ap ;
 	char		*cp ;
 
 /* are we "doing" ourselves? */
 
-	np = (char *) name ;
+	np = name ;
 	if (name == NULL) {
-
 	    if (u_uname(&uts) < 0) {
 	        np = "localhost" ;
-	    } else
+	    } else {
 	        np = uts.nodename ;
-
+	    }
 	} else {
-
-/* strip trailing dots */
-
+	    /* strip trailing dots */
 	    len = strnlen(np,MAXHOSTNAMELEN) ;
-
 	    if (name[len - 1] == '.') {
-
-	        while (len && (np[len - 1] == '.'))
+	        while (len && (np[len - 1] == '.')) {
 			len -= 1 ;
-
+		}
 	        snwcpy(altname,MAXHOSTNAMELEN,np,len) ;
-
 	        np = altname ;
-
 	    } /* end if */
-
 	} /* end if (stuff on the end) */
 
 /* is it a numeric address? */
@@ -154,13 +149,11 @@ int getheour(HOSTENT *hep,char *hbuf,int hlen,char *hostname,cc *name) noex {
 	if ((addr = inet_addr(np)) != (~ 0)) {
 
 	    ap = (char *) &addr ;
-	    rs = getheaddr(ap,hep,hbuf,hlen) ;
+	    rs = getheaddr(hep,hbuf,hlen,ap) ;
 
 #ifdef	COMMENT
 	     if ((rs < 0) && 
-		(memcmp(&addr,&anyaddr,sizeof(struct in_addr_t)) == 0)) {
-
-
+		(memcmp(&addr,&anyaddr,sizeof(INADDR)) == 0)) {
 	    }
 #endif /* COMMENT */
 
@@ -170,13 +163,14 @@ int getheour(HOSTENT *hep,char *hbuf,int hlen,char *hostname,cc *name) noex {
 
 	if (rs >= 0) {
 
-	    if (hostname != NULL)
+	    if (hostname != NULL) {
 	        sncpy1(hostname,MAXHOSTNAMELEN,np) ;
-
+	    }
 	    return SR_OK ;
 
-	} else if (addr != (~ 0))
+	} else if (addr != (~ 0)) {
 		return SR_NOTFOUND ;
+	}
 
 /* get our local domain name */
 
@@ -197,12 +191,10 @@ int getheour(HOSTENT *hep,char *hbuf,int hlen,char *hostname,cc *name) noex {
 
 /* try it without our trailing local domain name */
 
-	        rs = gethename(hep,hbuf,hlen,peername) ;
-		if (rs >= 0) {
-
-	            if (hostname != NULL)
+	        if ((rs = gethename(hep,hbuf,hlen,newname)) >= 0) {
+	            if (hostname) {
 	                sncpy1(hostname,MAXHOSTNAMELEN,hep->h_name) ;
-
+		    }
 	            return SR_OK ;
 	        }
 

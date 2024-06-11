@@ -138,7 +138,7 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 	                    f = f && (strncmp(allows[j],cs,2) == 0) ;
 			    if (f) break ;
 	                } /* end for */
-		    } /* end if-constexpr (f_allows) */
+		    } /* end if_constexpr (f_allows) */
 		} /* end if */
 	    } /* end if (more than one character) */
 	    if ((! f) && (cp[cl - 1] == CH_SQUOTE)) {

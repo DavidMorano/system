@@ -133,7 +133,7 @@ int dialpass(cchar *fname,int timeout,int) noex {
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (uc_open) */
 		    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
-		} /* end if-constexpr (f_streams) */
+		} /* end if_constexpr (f_streams) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;

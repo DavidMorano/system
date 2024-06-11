@@ -224,7 +224,7 @@ static int base64_dg(cchar *inbuf,char *outbuf) noex {
 	        outbuf[2] = mkchar(hold >> 0) ;
 	        dlen -= 1 ;
 	    }
-	} /* end if-constexpr */
+	} /* end if_constexpr */
 	return (rs >= 0) ? dlen : rs ;
 }
 /* end subroutine (base64_dg) */

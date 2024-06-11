@@ -201,7 +201,7 @@ int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 	            if ((rs == rsn) && (matstr(specials,keyname,-1) >= 0)) {
 	                rs = userattrdb_ud(op,rbuf,rlen) ;
 	            }
-		} /* end if-constexpr (f_udomain) */
+		} /* end if_constexpr (f_udomain) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;

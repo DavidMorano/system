@@ -166,7 +166,7 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 		            vpp = &uep->password ;
 	                    storeitem_strw(&ubuf,pep->pw_passwd,-1,vpp) ;
 	                }
-		    } /* end if-constexpr (f_shadow) */
+		    } /* end if_constexpr (f_shadow) */
 	            uep->uid = pep->pw_uid ;
 	            uep->gid = pep->pw_gid ;
 	            if ((rs >= 0) && (pep->pw_gecos != nullptr)) {
@@ -316,7 +316,7 @@ static int getpwentry_shadow(pwentry *uep,storeitem *sip,ucentpw *pep) noex {
 	    uep->inact = -1 ;
 	    uep->expire = 0 ;
 	    uep->flag = 0 ;
-	} /* end if-constexpr (f_shadow) */
+	} /* end if_constexpr (f_shadow) */
 	return rs ;
 }
 /* end subroutine (getpwentry_shadow) */

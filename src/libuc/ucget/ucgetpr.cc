@@ -248,7 +248,7 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	if constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
@@ -280,7 +280,7 @@ int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -313,7 +313,7 @@ int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }

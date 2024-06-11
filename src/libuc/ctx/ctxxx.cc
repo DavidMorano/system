@@ -142,7 +142,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 		    *--rp = sysword.w_digtab[di] ;
 	            v = nv ;
 	        } /* end while (regular) */
-	    } /* end if-constexpr (size-of-operand) */
+	    } /* end if_constexpr (size-of-operand) */
 	} else {
 	    *--rp = '0' ;
 	}

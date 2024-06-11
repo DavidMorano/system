@@ -48,8 +48,9 @@
 #include	<ctype.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<mallocstuff.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -64,7 +65,6 @@
 #include	<getax.h>
 #include	<getusername.h>
 #include	<exitcodes.h>
-#include	<mallocstuff.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -2134,25 +2134,20 @@ VECSTR		*elp ;
 }
 /* end subroutine (procfile) */
 
-
-/* get local names for this host (not as simple as one would think !) */
-static int getlocalnames(pip)
-PROGINFO	*pip ;
-{
-	HOSTENT		he ;
-	cint		helen = getbufsize(getbufsize_he) ;
+static int getlocalnames(PROGINFO *pip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n ;
 	char		hostnamebuf[MAXHOSTNAMELEN + 1], *hnp ;
 	char		*hebuf ;
 	char		*np ;
-
 	bufprintf(hostnamebuf,MAXHOSTNAMELEN,"%s.%s",
 	    pip->nodename,pip->domainname) ;
 
-	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
+	if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    ucentho	he ;
 	    vecstr	*lnp = &pip->localnames ;
+	    cint	helen = rs ;
 	    for (int i = 0 ; i < 2 ; i += 1) {
 	        hnp = (i == 0) ? pip->nodename : hostnamebuf ;
 	        if ((rs = gethename(&he,hebuf,helen,hnp)) >= 0) {

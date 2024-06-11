@@ -437,8 +437,8 @@ static int getxusername_utmp(getxuser *xup) noex {
 	        rs = getutmpname(xup->ubuf,xup->ulen,0) ;
 	    } else {
 	        rs = uc_getlogin(xup->ubuf,xup->ulen) ;
-	    } /* end if-constexpr (f_getutmpname) */
-	} /* end if-constexpr (f_utmpacc) */
+	    } /* end if_constexpr (f_getutmpname) */
+	} /* end if_constexpr (f_utmpacc) */
 	xup->unl = rs ;
 	if (rs >= 0) {
 	    cchar	*sp = xup->ubuf ;

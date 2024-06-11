@@ -124,7 +124,7 @@ char *strncasesub(cchar *sp,int sl,cchar *s2) noex {
 		        rp = strcasestr(sp,s2) ;
 		    } else {
 		        rp = strncasesub_local(sp,sl,s2,s2len) ;
-		    } /* end if-constexpr) */
+		    } /* end if_constexpr) */
 		} /* end if */
 	    } /* end if (positive) */
 	} /* end if (non-null) */

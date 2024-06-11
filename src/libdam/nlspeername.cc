@@ -105,7 +105,7 @@ static vars	var ;
 int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (addr && dn && pn) {
+	if (addr && pn) {
 	    cint	al = strlen(addr) ;
 	    rs = SR_INVALID ;
 	    pn[0] = '\0' ;
@@ -113,13 +113,16 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 		static cint	rsv = mkvars() ;
 		if ((rs = rsv) >= 0) {
 	            if (int af ; (rs = cfhexi(addr,4,&af)) >= 0) {
-	                if (af == AF_UNIX) {
+			switch (af) {
+	                case AF_UNIX:
 	                    rs = nlspeername_unix(pn,dn,addr,al) ;
 			    len = rs ;
-	                } else if (af == AF_INET4) {
+			    break ;
+			case AF_INET4:
 	                    rs = nlspeername_inet4(pn,dn,addr,al) ;
 			    len = rs ;
-	                } /* end if (recognized the address family) */
+			    break ;
+	                } /* end switch (recognized the address family) */
 	            } /* end if (cfhexi) */
 		} /* end if (mkvars) */
 	    } /* end if (good) */
@@ -157,11 +160,10 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	int		len = 0 ;
 	(void) al ;
 	if ((rs = cfhexui((ap + adv),8,&uv)) >= 0) {
-	    hostent_cur	hc ;
 	    cint	family = int(uv) ;
 	    char	*hebuf{} ;
 	    if ((rs = malloc_ho(&hebuf)) >= 0) {
-	        HOSTENT		he ;
+	        ucentho		he ;
 		cint		helen = rs ;
 	        if ((rs = getheaddr(&he,hebuf,helen,ap)) >= 0) {
 	            if ((rs = hostent_getaf(&he)) >= 0) {
@@ -169,7 +171,8 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	                if (af == family) {
 	                    cint	nlen = var.maxhostlen ;
 	                    cchar	*cp ;
-	                    if ((rs >= 0) && dn) {
+	                    if (dn) {
+	    			hostent_cur	hc ;
 	                        if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
 				    auto	henum = hostent_enumname ;
 	                            cchar	*hp ;

@@ -12,15 +12,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usystem.h>
 
 EXTERNC_begin
 
-extern int	getheour(HOSTENT *,char *,int,char *,cc *) noex ;
+extern int	getheour(ucentho *,char *,int,char *,cc *) noex ;
 
 EXTERNC_end
 

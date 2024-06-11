@@ -223,7 +223,7 @@ int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	if constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
@@ -255,7 +255,7 @@ int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }

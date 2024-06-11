@@ -59,6 +59,7 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<atomic>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -69,7 +70,9 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::atomic_int ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -80,6 +83,9 @@ using std::atomic_int ;			/* type */
 extern "C" {
     extern int uc_sysconf(int,long *) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */

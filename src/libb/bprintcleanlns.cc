@@ -89,7 +89,7 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 	        } else {
 	            rs = bprintcleanliner(op,linelen,lp,ll) ;
 	            wlen += rs ;
-	        } /* end if-constexpr (f_linefold) */
+	        } /* end if_constexpr (f_linefold) */
 	    } /* end if (writig) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;

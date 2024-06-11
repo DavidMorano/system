@@ -244,7 +244,7 @@ int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	if constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
@@ -276,7 +276,7 @@ int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -310,7 +310,7 @@ int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }

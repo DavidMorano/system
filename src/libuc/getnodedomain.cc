@@ -4,7 +4,7 @@
 /* get the local node-name and INET domain name */
 /* version %I% last-modified %G% */
 
-#define	CF_GUESS	0	/* try to guess domain names? */
+#define	CF_GUESS	1	/* try to guess domain names? */
 
 /* revision history:
 
@@ -209,19 +209,13 @@ constexpr cpcchar	resolvefnames[] = {
 	nullptr
 } ;
 
-constexpr struct guess	ga[] = {
+constexpr guess		ga[] = {
 	{ "rc", "rightcore.com" },
+	{ "rca", "rightcore.com" },
+	{ "rcb", "rightcore.com" },
+	{ "rcf", "rightcore.com" },
+	{ "rcg", "rightcore.com" },
 	{ "jig", "rightcore.com" },
-	{ "gateway", "ece.neu.com" },
-	{ "vinson", "ece.neu.com" },
-	{ "frodo", "ece.neu.com" },
-	{ "olive", "ece.neu.com" },
-	{ "gilmore", "ece.neu.com" },
-	{ "dr", "dr.lucent.com" },
-	{ "ho", "ho.lucent.com" },
-	{ "mh", "mh.lucent.com" },
-	{ "mt", "mt.lucent.com" },
-	{ "cb", "cb.lucent.com" },
 	{ nullptr, nullptr }
 } ;
 
@@ -533,26 +527,27 @@ static int try_gethost(TRY *tip) noex {
 	if ((rs >= 0) && tip->f.node) {
 	    char	*hbuf{} ;
 	    if ((rs = malloc_ho(&hbuf)) >= 0) {
-		cnullptr_t	np{} ;
+		cnullptr	np{} ;
 	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nodename ;
 	        if ((rs = uc_gethonam(&he,hbuf,hlen,nn)) >= 0) {
 		    cint	dlen = tip->dlen ;
 	            cchar	*tp{} ;
+		    char	*dbuf = tip->domainname ;
 		    bool	f = true ;
 		    rs = 0 ;
 	            f = f && (hep->h_name != np) ;
 		    f = f && ((tp = strchr(hep->h_name,'.')) != np) ;
 		    if (f) {
-	                rs = sncpy1(tip->domainname,dlen,(tp + 1)) ;
+	                rs = sncpy1(dbuf,dlen,(tp + 1)) ;
 			len = rs ;
 	            } /* end if (official name) */
 	            if ((rs == 0) && (hep->h_aliases != nullptr)) {
 	                for (int i = 0 ; hep->h_aliases[i] ; i += 1) {
 			    cchar	*ap = hep->h_aliases[i] ;
 	                    if ((tp = strchr(ap,'.')) != nullptr) {
-	                        rs = sncpy1(tip->domainname,dlen,(tp+1)) ;
+	                        rs = sncpy1(dbuf,dlen,(tp+1)) ;
 				len = rs ;
 	                    } /* end if */
 			    if (rs > 0) break ;
@@ -620,9 +615,10 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
             rs1 = filer_finish(&b) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (filer) */
-        if ((rs >= 0) && (len > 0)) {
+        if ((rs >= 0) && (len > 0) && dp) {
 	    cint	dlen = tip->dlen ;
-            rs = snwcpy(tip->domainname,dlen,dp,len) ;
+	    char	*dbuf = tip->domainname ;
+            rs = snwcpy(dbuf,dlen,dp,len) ;
         }
 	if (len < 0) len = 0 ;
 	return (rs >= 0) ? len : rs ;
@@ -656,7 +652,7 @@ static int try_guess(TRY *tip) noex {
 		    len = rs ;
 	        }
 	    } /* end if (have node) */
-	} /* end if-constexpr (f_guess) */
+	} /* end if_constexpr (f_guess) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (try_guess) */

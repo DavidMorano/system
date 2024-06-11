@@ -155,7 +155,7 @@ int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 		if ((rs = ptsname_r(fd,nbuf,nlen)) != 0) {
 		    rs = (- errno) ;
 		}
-	    } /* end if-constexpr (f_farwin || f_linux) */
+	    } /* end if_constexpr (f_farwin || f_linux) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }

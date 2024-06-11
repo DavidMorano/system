@@ -245,7 +245,7 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	if constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
@@ -277,7 +277,7 @@ int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -312,7 +312,7 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 	            } else {
 	                rs = (- errno) ;
 	            }
-	        } /* end if-constexpr (selection) */
+	        } /* end if_constexpr (selection) */
 	        if constexpr (f_sunos) {
 		    if (rs == SR_BADF) rs = SR_NOENT ;
 	        }

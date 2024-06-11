@@ -137,7 +137,7 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	    }
 	} else {
 	    hint.ai_protocol = IPPROTO_UDP ;
-	} /* end if-constexpr (f_proto) */
+	} /* end if_constexpr (f_proto) */
 	if ((rs >= 0) && (af > 0)) {
 	    if ((rs = getprotofamily(af)) >= 0) {
 	        hint.ai_family = rs ; /* PF */

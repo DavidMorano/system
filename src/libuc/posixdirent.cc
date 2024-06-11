@@ -191,7 +191,7 @@ int posixdirent::setup(cchar *fn) noex {
 	    } /* end if (uc_pathconf) */
 	} else {
 	    rs = SR_OK ;
-	} /* end if-constexpr (f_readdirr) */
+	} /* end if_constexpr (f_readdirr) */
 	return rs ;
 }
 /* end subroutine (posixdirent::setup) */
@@ -276,7 +276,7 @@ int posixdirent::dirread() noex {
 	    } else {
 	        rs = (-errno) ;		/* <- EOF condition */
 	    }
-	} /* end if-constexpr (f_readdirr) */
+	} /* end if_constexpr (f_readdirr) */
 	return rs ;
 }
 /* end subroutine (posixdirent::dirread) */

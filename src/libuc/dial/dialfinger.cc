@@ -248,7 +248,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 	        if (rs >= 0) {
 		    if constexpr (f_cr) {
 	                sbuf_chr(&b,'\r') ;
-		    } /* end if-constexpr (f_cr) */
+		    } /* end if_constexpr (f_cr) */
 	            sbuf_chr(&b,'\n') ;
 	        } /* end if */
 	    } /* end if */

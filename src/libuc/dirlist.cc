@@ -425,7 +425,7 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	                    if (dl > 0) {
 	                        bp = strwcpy(bp,dp,dl) ;
 	                    }
-		        } /* end if-constexpr */
+		        } /* end if_constexpr */
 	                c += 1 ;
 	            } else {
 	                f_semi = true ;

@@ -109,7 +109,7 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	                            if (c++ > 0) {
 	                                rs = b.chr(' ') ;
 			            }
-			        } /* end if-constexpr (f_nonstandard) */
+			        } /* end if_constexpr (f_nonstandard) */
 	                        if (rs >= 0) {
 	                            rs = b.strw(fp,fl) ;
 			        }

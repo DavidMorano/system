@@ -329,7 +329,7 @@ int openmgr::split(cchar *inname) noex {
 		basep = so.bp ;
 		basel = so.bl ;
 	    }
-	} /* end if-constexpr (f_splitfname) */
+	} /* end if_constexpr (f_splitfname) */
 	return rs ;
 }
 /* end method (openmgr::split) */

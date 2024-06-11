@@ -258,7 +258,7 @@ int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	return rs ;
 }
 /* end subroutine (ucgetpj::getpj_ent) */
@@ -287,7 +287,7 @@ int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -321,7 +321,7 @@ int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -354,7 +354,7 @@ int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }

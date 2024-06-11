@@ -340,7 +340,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	        } else {
 	            dbuf[0] = '\0' ;
 	            rs = SR_NOSYS ;
-	        } /* end if-constexpr (f_streams) */
+	        } /* end if_constexpr (f_streams) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs > 0) ? len : rs ;

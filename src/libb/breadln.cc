@@ -174,7 +174,7 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 	            }
 	            i = bp - op->bp ;
 	            op->bp += i ;
-		} /* end if-constexpr (f_memcpy) */
+		} /* end if_constexpr (f_memcpy) */
 	        op->len += i ;
 	        runoff += i ;
 	        tlen += i ;
@@ -241,7 +241,7 @@ static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	            } /* end while */
 	            i = bp - op->bp ;
 	            op->bp += i ;
-		} /* end if-constexpr (f_memcpy) */
+		} /* end if_constexpr (f_memcpy) */
 	        op->len -= i ;
 	        tlen += i ;
 	        if ((i > 0) && isoureol(dbp[-1])) break ;

@@ -194,7 +194,7 @@ static int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	            if ((i > 0) && ((i & 1) == 0)) dbuf[pl++] = ':' ;
 	            dbuf[pl++] = digbuf[6] ;
 	            dbuf[pl++] = digbuf[7] ;
-		} /* end if-constexpr */
+		} /* end if_constexpr */
 	    } /* end for */
 	} else {
 	    rs = SR_OVERFLOW ;

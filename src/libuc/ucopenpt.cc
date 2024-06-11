@@ -86,7 +86,7 @@ int uc_openpt(int oflags) noex {
 	    }
 	} else {
 	    rs = u_open(PTMXFNAME,oflags,0662) ;
-	} /* end if-constexpr (f_openpt) */
+	} /* end if_constexpr (f_openpt) */
 	return rs ;
 }
 /* end subroutine (uc_openpt) */

@@ -51,6 +51,7 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<ucmallreg.h>
+#include	<mallocxx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -1704,12 +1705,8 @@ static int proclocnames_end(PROGINFO *pip)
 }
 /* end subroutine (proclocnames_end) */
 
-
-static int proclocnames_load(PROGINFO *pip)
-{
-	HOSTENT		he ;
-	const int	helen = getbufsize(getbufsize_he) ;
-	const int	hlen = MAXPATHLEN ;
+static int proclocnames_load(PROGINFO *pip) noex {
+	cint		hlen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -1718,16 +1715,16 @@ static int proclocnames_load(PROGINFO *pip)
 
 	snsds(hbuf,hlen,pip->nodename,pip->domainname) ;
 
-	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
+	if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    ucentho	he ;
 	    vecstr	*lnp = &pip->localnames ;
+	    cint	helen = rs ;
 	    cchar	*np ;
 	    cchar	*hnp ;
 	    for (int i = 0 ; i < 2 ; i += 1) {
-
 	        hnp = (i == 0) ? pip->nodename : hbuf ;
 	        if ((rs1 = gethename(&he,hebuf,helen,hnp)) >= 0) {
-	            HOSTENT_CUR	cur ;
-
+	            hostent_cur		cur ;
 	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
 	                cint	rsn = SR_NOTFOUND ;
 	                while ((rs = hostent_enumname(&he,&cur,&np)) > 0) {
@@ -1739,16 +1736,12 @@ static int proclocnames_load(PROGINFO *pip)
 	                rs1 = hostent_curend(&he,&cur) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (hostend-cur) */
-
 	        } /* end if (gethename) */
-
 	        if (rs < 0) break ;
 	    } /* end for */
-
 	    if (rs >= 0) {
 	        n = vecstr_count(lnp) ;
 	    }
-
 	    rs1 = uc_free(hebuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */

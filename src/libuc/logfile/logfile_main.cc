@@ -199,7 +199,7 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	                        if (op->operm) {
 	                            u_fchmod(op->lfd,op->operm) ;
 		                }
-		            } /* end if-constexpr (f_chmod) */
+		            } /* end if_constexpr (f_chmod) */
 		            if (rs >= 0) {
 	                        if (logid && logid[0]) {
 	                            rs = logfile_loadid(op,logid) ;

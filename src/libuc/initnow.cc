@@ -112,7 +112,7 @@ int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
 	    } else {
 		rs = initnow_gettime(tbp,zbuf,zlen) ;
 		len = rs ;
-	    } /* end if-constexpr (f_ftime) */
+	    } /* end if_constexpr (f_ftime) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }

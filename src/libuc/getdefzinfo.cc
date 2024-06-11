@@ -69,7 +69,7 @@ int getdefzinfo(DEFZINFO *zip,int isdst) noex {
 	        f_daylight = (isdst >= 0) ? isdst : daylight ;
 	        zip->zoff = (((f_daylight) ? altzone : timezone) / 60) ;
 	        zp = (f_daylight) ? tzname[1] : tzname[0] ;
-	    } /* end if-constexpr (f_darwin) */
+	    } /* end if_constexpr (f_darwin) */
 	    if (rs >= 0) {
 		cint	znamelen = DEFZINFO_ZNAMELEN ;
 	        rs = strwcpy(zip->zname,zp,znamelen) - zip->zname ;

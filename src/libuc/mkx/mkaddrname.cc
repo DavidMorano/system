@@ -211,7 +211,7 @@ static int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
 		    break ;
 	        } /* end switch */
 	    } /* end if (positive) */
-	} /* end if-constexpr (f_massage) */
+	} /* end if_constexpr (f_massage) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (emaentry_addrname) */

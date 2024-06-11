@@ -105,7 +105,7 @@ int tmpx_getrunlevel(tmpx *op) noex {
 	            rs1 = tmpx_curend(op,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (tmpx-cursor) */
-	    } /* end if-constexpr (f_darwin) */
+	    } /* end if_constexpr (f_darwin) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? runlevel : rs ;
 }

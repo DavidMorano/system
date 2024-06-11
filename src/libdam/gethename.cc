@@ -62,21 +62,14 @@
 
 #include	"gethename.h"
 
-#if	CF_LOG
-#include	<logfile.h>
-#endif
-
 
 /* local defines */
 
-#ifndef	LOGIDLEN
-#define	LOGIDLEN	80
-#endif
 
-#define	LOGFNAME	"/tmp/gethostbyname.log"
-#define	SERIALFILE1	"/tmp/serial"
-#define	SERIALFILE2	"/tmp/gethename.serial"
-#define	DEFLOGSIZE	80000
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -99,93 +92,14 @@
 
 /* exported subroutines */
 
-int gethename(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
-
-#if	CF_LOG
-	logfile	lh ;
-#endif
-
-#if	CF_LOG
-	pid_t	pid ;
-#endif
-
-#if	CF_LOG
-	int	f_log = false ;
-#endif
-
-	int	rs ;
-
-#if	CF_LOG
-	char	logid[LOGIDLEN + 1] ;
-#endif
-
-
-	if ((hep == NULL) || (hebuf == NULL) || (name == nullptr))
-	    return SR_FAULT ;
-
-/* do we want logging performed? */
-
-#if	CF_LOG
-	if (u_access(LOGFNAME,W_OK) >= 0) {
-	    pid = uc_getpid() ;
-	    int		serial = -1 ;
-	    char	*cp ;
-
-	    if (serial < 0) {
-	        cp = SERIALFILE1 ;
-	        serial = getserial(cp) ;
-	    }
-	    if (serial < 0) {
-	        cp = SERIALFILE2 ;
-	        serial = getserial(cp) ;
-	    }
-
-	    if (serial == 0)
-	        u_chmod(cp,0666) ;
-
-	    if (serial < 0)
-	        serial = 0 ;
-
-	    snddd(logid,LOGIDLEN, pid,serial) ;
-
-	    rs = logfile_open(&lh,LOGFNAME,0,0666,logid) ;
-	    f_log = (rs >= 0) ;
-
-	    if (f_log)
-	        logfile_printf(&lh,
-			"name=%s\n",(name == NULL) ? STDFNNULL : name) ;
-
-	} /* end if */
-#endif /* CF_LOG */
-
-/* do the real work */
-
-	rs = uc_gethostbyname(hep,hebuf,helen,name) ;
-
-#if	CF_LOG
-	if (f_log) {
-	    if (rs == SR_TIMEDOUT) {
-	        logfile_printf(&lh,"network timeout (rs=%d)\n",rs) ;
-	    } else if (rs == SR_NOTFOUND) {
-	        logfile_printf(&lh,"entry not found (rs=%d)\n",rs) ;
-	    } else {
-	        logfile_printf(&lh,"result=%s (rs=%d)\n",
-	            ((rs >= 0) ? hep->h_name : STDFNNULL),rs) ;
-	    }
-	}
-#endif /* CF_LOG */
-
-ret1:
-
-#if	CF_LOG
-	if (f_log) {
-	    logfile_checksize(&lh,DEFLOGSIZE) ;
-	    logfile_close(&lh) ;
-	}
-#endif /* CF_LOG */
-
-ret0:
-
+int gethename(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
+	int		rs = SR_FAULT ;
+	if (hep && hebuf && name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        rs = getho_name(hep,hebuf,helen,name) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (gethename) */

@@ -119,7 +119,7 @@ int ipow(int b,int n) noex {
 	        for (int i = 0 ; i < n ; i += 1) {
 	            r *= b ;
 	        } /* end for */
-	    } /* end if-constexpr (f_dynamic) */
+	    } /* end if_constexpr (f_dynamic) */
 	} /* end if (base-specialization) */
 	return r ;
 }

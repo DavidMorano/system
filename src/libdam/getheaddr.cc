@@ -62,17 +62,11 @@
 
 /* imported namespaces */
 
-typedef ucentho *	ucenthop ;
-
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    int	getheaddr(HOSTENT *,char *,int,cchar *) noex ;
-}
 
 
 /* external variables */
@@ -92,13 +86,12 @@ extern "C" {
 
 /* exported subroutines */
 
-int getheaddr(HOSTENT *hep,char *hbuf,int hlen,cchar *ap) noex {
-	cint		af = AF_INET ;
+int getheaddr(ucentho *hep,char *hbuf,int hlen,cchar *ap) noex {
 	int		rs = SR_FAULT ;
 	if (hep && hbuf && ap) {
-	    ucentho	*hop = ucenthop(hep) ;
-	    cint	al = sizeof(struct in_addr) ;
-	    rs = getho_addr(hop,hbuf,hlen,af,ap,al) ;
+	    cint	af = AF_INET ;
+	    cint	al = sizeof(INADDR) ;
+	    rs = getho_addr(hep,hbuf,hlen,af,ap,al) ;
 	} /* end if (non-null) */
 	return rs ;
 }

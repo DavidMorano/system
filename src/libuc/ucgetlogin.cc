@@ -75,7 +75,7 @@ int uc_getlogin(char *rbuf,int rlen) noex {
 	                cchar	*rp = getlogin() ;
 	                rs = (rp != nullptr) ? 0 : (- errno) ;
 	                if (rs >= 0) rs = sncpy1(rbuf,rlen,rp) ;
-	            } /* end if-constexpr (f_getloginr) */
+	            } /* end if_constexpr (f_getloginr) */
 	        } /* end if (valid) */
 	    } /* end if (getbufsize) */
 	} /* end if (non-null) */

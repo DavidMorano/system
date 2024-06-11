@@ -192,7 +192,7 @@ static int makeconn(SUBINFO *gp,cchar addr[],int alen,int to) noex {
 	                if (rs >= 0) {
 	                    rs = pushmod(fd,"tirdwr") ;
 	                }
-		    } /* end if-constexpr */
+		    } /* end if_constexpr */
 	        } /* end if (bind) */
 	        if ((rs < 0) && (fd >= 0)) {
 	            u_close(fd) ;

@@ -221,7 +221,7 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	                            hdb_finish(op->hlp) ;
 	                            op->magic = 0 ;
 	                        }
-			    } /* end if-constexpr (f_prealloc) */
+			    } /* end if_constexpr (f_prealloc) */
 	                } /* end if (hdb-start) */
 	                if (rs < 0) {
 	                    lookaside_finish(op->lap) ;

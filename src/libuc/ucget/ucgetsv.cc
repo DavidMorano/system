@@ -231,7 +231,7 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	if constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
@@ -263,7 +263,7 @@ int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
+	    } /* end if_constexpr (selection) */
 	    if constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
@@ -298,7 +298,7 @@ int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
 	            } else {
 	                rs = (- errno) ;
 	            }
-	        } /* end if-constexpr (selection) */
+	        } /* end if_constexpr (selection) */
 	        if constexpr (f_sunos) {
 		    if (rs == SR_BADF) rs = SR_NOENT ;
 	        }

@@ -75,7 +75,7 @@ namespace usys {
 		} else {
 		    rs = xxx_ugetnisdom(rbuf,rlen) ;
 		    len = rs ;
-		} /* end if-constexpr (which OS) */
+		} /* end if_constexpr (which OS) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

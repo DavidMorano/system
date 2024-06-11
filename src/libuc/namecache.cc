@@ -510,7 +510,7 @@ static int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
 	            rl = realname_fullname(&rn,nbuf,nlen) ;
 		} else {
 	            rl = realname_name(&rn,nbuf,nlen) ;
-		} /* end if-constexpr (f_fullanem) */
+		} /* end if_constexpr (f_fullanem) */
 	        rs1 = realname_finish(&rn) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
