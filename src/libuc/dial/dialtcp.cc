@@ -240,7 +240,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 
 static int subinfo_proto(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	if constexpr (f_proto) {
+	if_constexpr (f_proto) {
 	    cchar	*pn = sip->pn ;
 	    if ((rs = getproto_name(pn,-1)) >= 0) {
 	        sip->proto = rs ;

@@ -139,7 +139,7 @@ int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
 	        cchar	*ns = nullptr ;
-	        if constexpr (f_fullname) {
+	        if_constexpr (f_fullname) {
 	            if (ns == nullptr) {
 	                if (uip->fullname && (uip->fullname[0] != '\0')) {
 	                    ns = uip->fullname ;
@@ -151,7 +151,7 @@ int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	                ns = uip->name ;
 	            }
 	        }
-	        if constexpr (f_mailname) {
+	        if_constexpr (f_mailname) {
 	            if (ns == nullptr) {
 	                if (uip->mailname && (uip->mailname[0] != '\0')) {
 	                    ns = uip->mailname ;

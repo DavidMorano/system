@@ -152,7 +152,7 @@ int dialmgr::okeepalive() noex {
 
 int dialmgr::olinger() noex {
 	int		rs = SR_OK ;
-	if constexpr (f_linger) {
+	if_constexpr (f_linger) {
 	    cint	to = LINGERTIME ;
 	    rs = uc_linger(fd,to) ;
 	} /* end if_constexpr (f_linger) */

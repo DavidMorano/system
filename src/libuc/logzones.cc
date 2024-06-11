@@ -200,7 +200,7 @@ int logzones_open(LZ *op,cchar *fname,int of,mode_t om) noex {
 	    if (fname[0]) {
 		memclear(op) ;
 	        op->fd = -1 ;
-	        if constexpr (f_creat) {
+	        if_constexpr (f_creat) {
 	            of |= O_CREAT ;
 	        } /* end if_constexpr (f_creat) */
 		if ((rs = pagesize) >= 0) {

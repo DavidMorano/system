@@ -4,7 +4,7 @@
 /* initialize both TIMEB and ZNAME */
 /* version %I% last-modified %G% */
 
-#define	CF_FTIME	0		/* actually call |uc_ftime(3dam)| */
+#define	CF_FTIME	1		/* actually call |uc_ftime(3uc)| */
 
 /* revision history:
 
@@ -22,7 +22,7 @@
 
 	Description:
 	This subroutine initializes a couple of time-related
-	variables. One of these variables is a TIMEB structure. The
+	variables.  One of these variables is a TIMEB structure.  The
 	other is a time-zone string.
 
 	Synopsis:
@@ -54,9 +54,10 @@
 #include	<sys/param.h>
 #include	<sys/timeb.h>		/* <- the money shot! */
 #include	<unistd.h>
+#include	<ctime>			/* structure |TIMEB| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |memset(3c)| */
-#include	<ctime>			/* structure |TIMEB| */
 #include	<usystem.h>		/* UNIX® structure aliases */
 #include	<tmtime.h>
 #include	<sncpyx.h>
@@ -84,6 +85,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int initnow_ftime(TIMEB *,char *,int) noex ;
@@ -106,7 +110,7 @@ int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
 	if (tbp) {
 	    memclear(tbp) ;
 	    if (zbuf) zbuf[0] = '\0' ;
-	    if constexpr (f_ftime) {
+	    if_constexpr (f_ftime) {
 		rs = initnow_ftime(tbp,zbuf,zlen) ;
 		len = rs ;
 	    } else {
@@ -126,7 +130,7 @@ static int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
 	int		len = 0 ;
 	if ((rs = uc_ftime(tbp)) >= 0) {
 	    if (zbuf) {
-	        TMTIME		tmt{} ;
+	        TMTIME		tmt ;
 	        if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
 	            rs = sncpy1(zbuf,zlen,tmt.zname) ;
 	            len = rs ;

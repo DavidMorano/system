@@ -147,7 +147,7 @@ int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 
 static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 	int		rs ;
-	if constexpr (f_cthexuc) {
+	if_constexpr (f_cthexuc) {
 	    rs = strdcpy1(dbuf,dlen,addr) - dbuf ;
 	} else {
 	    rs = sncpy1(dbuf,dlen,addr) ;
@@ -184,7 +184,7 @@ static int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	    char	digbuf[DIGBUFLEN+1] ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 		uch = mkchar(addr[i]) ;
-		if constexpr (f_cthexuc) {
+		if_constexpr (f_cthexuc) {
 	            rs = cthexuc(digbuf,diglen,uch) ; /* cannot fail! */
 	            if ((i > 0) && ((i & 1) == 0)) dbuf[pl++] = ':' ;
 	            dbuf[pl++] = digbuf[0] ;

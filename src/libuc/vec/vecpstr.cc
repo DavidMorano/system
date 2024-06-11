@@ -915,7 +915,7 @@ static int vecpstr_reset(vecpstr *op) noex {
 
 static void vecpstr_arrsort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	qsort_f		scf = qsort_f(vcf) ;
-	if constexpr (f_qsort) {
+	if_constexpr (f_qsort) {
 	    cint	esize = sizeof(char *) ;
 	    qsort(op->va,op->i,esize,scf) ;
 	} else {

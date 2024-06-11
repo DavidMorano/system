@@ -188,7 +188,7 @@ static int makeconn(SUBINFO *gp,cchar addr[],int alen,int to) noex {
 	            if ((rs == SR_BUSY) || (rs == SR_LOOK)) {
 	                rs = ut_look(fd) ;
 	            }
-	            if constexpr (f_pushmod) {
+	            if_constexpr (f_pushmod) {
 	                if (rs >= 0) {
 	                    rs = pushmod(fd,"tirdwr") ;
 	                }

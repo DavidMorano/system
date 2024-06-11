@@ -156,7 +156,7 @@ int buffer_start(buffer *op,int startlen) noex {
 	int		rs ;
 	if ((rs = buffer_ctor(op)) >= 0) {
 	    op->startlen = max(startlen,BUFFER_STARTLEN) ;
-	    if constexpr (f_bufstart) {
+	    if_constexpr (f_bufstart) {
 	        if ((rs = buffer_ext(op,-1)) >= 0) {
 	            op->dbuf[0] = '\0' ;
 	        }
@@ -416,7 +416,7 @@ static int buffer_ext(buffer *op,int req) noex {
 	    } else {
 		nlen = op->dlen ;
 	        while ((op->len + (req + 1)) > nlen) {
-		    if constexpr (f_fastgrow) {
+		    if_constexpr (f_fastgrow) {
 	                nlen = ((nlen + 1) * 2) ;
 		    } else {
 	                nlen = (nlen + BUFFER_STARTLEN) ;

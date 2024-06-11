@@ -79,7 +79,7 @@ int uc_openpt(int oflags) noex {
 	int		rs ;
 	oflags &= (~ O_ACCMODE) ;
 	oflags |= O_RDWR ;
-	if constexpr (f_openpt) {
+	if_constexpr (f_openpt) {
 	    errno = 0 ;
 	    if ((rs = posix_openpt(oflags)) < 0) {
 	        rs = (- errno) ;

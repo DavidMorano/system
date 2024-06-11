@@ -88,7 +88,7 @@ constexpr bool		f_randlc = CF_RANDLC ;
 uint hash_again(uint ohash,int c,int nskip) noex {
 	uint		nhash = ohash ;
 	if (c < nskip) {
-	    if constexpr (f_randlc) {
+	    if_constexpr (f_randlc) {
 	        nhash = randlc(ohash + c) ;
 	    } else {
 	        nhash = urotate(ohash,NROT) + c ;

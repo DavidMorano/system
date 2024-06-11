@@ -100,7 +100,7 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 	    bool	f = false ;
 	    sch &= UCHAR_MAX ;
 	    if (sl < 0) {
-	        if constexpr (f_strchr) {
+	        if_constexpr (f_strchr) {
 	            rsp = strchr(sp,sch) ;
 	        } else {
 	            while (*sp) {
@@ -111,7 +111,7 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 		    if (f) rsp = charp( sp) ;
 	        } /* end if_constexpr (f_strchr) */
 	    } else {
-		if constexpr (f_memchr) {
+		if_constexpr (f_memchr) {
 		    cchar	*tp = charp(memchr(sp,sch,sl)) ;
 		    if (tp) {
 			rsp = charp(tp) ;
@@ -137,7 +137,7 @@ char *strnrchr(cchar *sp,int sl,int sch) noex {
 	    bool	fdone = false ;
 	    sch &= UCHAR_MAX ;
 	    if (sl < 0) {
-		if constexpr (f_strrchr) {
+		if_constexpr (f_strrchr) {
 		    fdone = true ;
 	            rsp = strrchr(sp,sch) ;
 		} else {

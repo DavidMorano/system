@@ -21,8 +21,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring>
 #include	<ctime>			/* <- for |time(2)| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<strwcpy.h>
@@ -36,6 +36,12 @@
 
 
 /* external subroutines */
+
+
+/* external varaibles */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -54,9 +60,9 @@ constexpr bool		f_darwin = F_DARWIN ;
 int getdefzinfo(DEFZINFO *zip,int isdst) noex {
 	int		rs = SR_FAULT ;
 	if (zip) {
-	    cchar	*zp ;
-	    if constexpr (f_darwin) {
-		const time_t	dt = time(nullptr) ;
+	    cchar	*zp{} ;
+	    if_constexpr (f_darwin) {
+		custime		dt = time(nullptr) ;
 		TM		tmo ;
 	 	if ((rs = uc_localtime(&dt,&tmo)) >= 0) {
 	            zip->zoff = (tmo.tm_gmtoff / 60) ;
@@ -66,11 +72,13 @@ int getdefzinfo(DEFZINFO *zip,int isdst) noex {
 	        bool	f_daylight ;
 		rs = SR_OK ;
 	        tzset() ;
-	        f_daylight = (isdst >= 0) ? isdst : daylight ;
-	        zip->zoff = (((f_daylight) ? altzone : timezone) / 60) ;
-	        zp = (f_daylight) ? tzname[1] : tzname[0] ;
+		{
+	            f_daylight = (isdst >= 0) ? isdst : daylight ;
+	            zip->zoff = (((f_daylight) ? altzone : timezone) / 60) ;
+	            zp = (f_daylight) ? tzname[1] : tzname[0] ;
+		}
 	    } /* end if_constexpr (f_darwin) */
-	    if (rs >= 0) {
+	    if ((rs >= 0) && zp) {
 		cint	znamelen = DEFZINFO_ZNAMELEN ;
 	        rs = strwcpy(zip->zname,zp,znamelen) - zip->zname ;
 	    }

@@ -315,7 +315,7 @@ int openmgr::setft() noex {
 
 int openmgr::split(cchar *inname) noex {
 	int		rs = SR_OK ;
-	if constexpr (f_splitfname) {
+	if_constexpr (f_splitfname) {
 	    if ((dirl = sfdirname(inname,-1,&dirp)) >= 0) {
 	        rs = SR_ISDIR ;
 	        if ((basel = sfbasename(inname,-1,&basep)) > 0) {

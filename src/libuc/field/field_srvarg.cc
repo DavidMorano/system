@@ -289,7 +289,7 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	        ll -= 1 ;
 	    } /* end while */
 	    fl = (bp - abuf) ;
-	    if constexpr (f_trailwhite) {
+	    if_constexpr (f_trailwhite) {
 	        while ((fl > 0) && char_iswhite(abuf[fl - 1])) {
 		    fl -= 1 ;
 	        }

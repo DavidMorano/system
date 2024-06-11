@@ -102,7 +102,7 @@ int dialpass(cchar *fname,int timeout,int) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		rs = SR_NOSYS ;
-		if constexpr (f_streams) {
+		if_constexpr (f_streams) {
 	            cint	of = (O_WRONLY | O_NDELAY) ;
 	            if ((rs = uc_open(fname,of,0666)) >= 0) {
 	                USTAT	sb ;

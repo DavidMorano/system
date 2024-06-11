@@ -104,7 +104,7 @@ int mailmsgmathdr(cchar *sp,int sl,int *ip) noex {
 	        *ip = 0 ;
 	    }
 	    tl = sl ;
-	    if constexpr (f_alt) {
+	    if_constexpr (f_alt) {
 	        bool	f = false ;
 	        while (tl) {
 	            cint	ch = *tp ;

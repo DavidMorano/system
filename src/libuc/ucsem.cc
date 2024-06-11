@@ -270,7 +270,7 @@ int ucsem_unlink(ucsem *op) noex {
 		    rs = SR_OK ;
 	            if (op->name[0] != '\0') {
 	    		rs = unlinkucsem(op->name) ;
-		        if constexpr (f_condunlink) {
+		        if_constexpr (f_condunlink) {
 	    		    if (rs >= 0) {
 	        		ucsemdirrm(op->name) ;
 			    }
@@ -307,7 +307,7 @@ int ucsemunlink(cchar *name) noex {
 			    rs = (- errno) ;
 			}
 	            } until (rs != SR_INTR) ;
-		    if constexpr (f_condunlink) {
+		    if_constexpr (f_condunlink) {
 		        if (rs >= 0) {
 	    		    ucsemdirrm(name) ;
 		        }

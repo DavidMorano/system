@@ -210,7 +210,7 @@ static int base64_dg(cchar *inbuf,char *outbuf) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-	if constexpr (f_comment) {
+	if_constexpr (f_comment) {
 	    if (rs >= 0) {
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            outbuf[i] = mkchar(hold >> ((2 - i) * 6)) ;

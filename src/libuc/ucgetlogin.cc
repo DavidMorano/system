@@ -68,7 +68,7 @@ int uc_getlogin(char *rbuf,int rlen) noex {
 		cint	ulen = rs ;
 		rs = SR_OVERFLOW ;
 	        if ((rlen >= 0) && (rlen < ulen)) {
-	            if constexpr (f_getloginr) {
+	            if_constexpr (f_getloginr) {
 	                if ((rs = getlogin_r(rbuf,rlen)) != 0) rs = (- errno) ;
 	                if (rs >= 0) rs = strlen(rbuf) ;
 	            } else {

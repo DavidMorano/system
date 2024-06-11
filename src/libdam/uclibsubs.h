@@ -82,6 +82,7 @@
 #include	<ucgetrandom.h>
 #include	<ucsysauxinfo.h>
 #include	<uctimer.h>
+#include	<ucinetconv.h>
 
 #include	<getexecname.h>
 
@@ -307,9 +308,6 @@ extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
 /* miscellaneous */
-extern int	uc_inetnetpton(void *,int,int,cchar *) noex ;
-extern int	uc_inetpton(void *,int,cchar *) noex ;
-extern int	uc_inetntop(char *,int,int,cvoid *) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
 extern int	uc_getnetname(char *) noex ;
 

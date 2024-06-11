@@ -82,7 +82,7 @@ int tmpx_getrunlevel(tmpx *op) noex {
 	int		rs1 ;
 	int		runlevel = 0 ;
 	if (op) {
-	    if constexpr (f_darwin) {
+	    if_constexpr (f_darwin) {
 		runlevel = 3 ;
 	    } else {
 	        tmpx_ent	ue ;

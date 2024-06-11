@@ -320,7 +320,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	if (dbuf) {
 	    rs = SR_NOTOPEN ;
 	    if (fd >= 0) {
-	        if constexpr (f_streams) {
+	        if_constexpr (f_streams) {
 	            cint	clen = CMSGBUFLEN ;
 	            char	*cbuf{} ;
 	            if ((rs = uc_libmalloc((clen+1),&cbuf)) >= 0) {

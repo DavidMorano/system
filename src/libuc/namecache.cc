@@ -506,7 +506,7 @@ static int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
 	    realname	rn ;
 	    cint	gl = rs ;
 	    if ((rs = realname_start(&rn,gbuf,gl)) >= 0) {
-		if constexpr (f_fullname) {
+		if_constexpr (f_fullname) {
 	            rl = realname_fullname(&rn,nbuf,nlen) ;
 		} else {
 	            rl = realname_name(&rn,nbuf,nlen) ;

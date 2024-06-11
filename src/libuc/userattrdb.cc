@@ -196,7 +196,7 @@ int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 	    if (keyname[0]) {
 	        rbuf[0] = '\0' ;
 	        rs = userattrdb_sysdb(op,rbuf,rlen,keyname) ;
-		if constexpr (f_udomain) {
+		if_constexpr (f_udomain) {
 		    cint	rsn = SR_NOTOPEN ;
 	            if ((rs == rsn) && (matstr(specials,keyname,-1) >= 0)) {
 	                rs = userattrdb_ud(op,rbuf,rlen) ;

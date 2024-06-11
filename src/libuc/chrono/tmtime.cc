@@ -158,7 +158,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	        rs = uc_mktime(&tc,&t) ;
 	    } /* end if (need DST indicator) */
 	    if (rs >= 0) {
-	        if constexpr (f_darwin) {
+	        if_constexpr (f_darwin) {
 	            op->gmtoff = tc.tm_gmtoff ;
 	            zp = tc.tm_zone ;
 	        } else {
@@ -187,7 +187,7 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	    tmp->tm_wday = op->wday ;
 	    tmp->tm_yday = op->yday ;
 	    tmp->tm_isdst = op->isdst ;
-	    if constexpr (f_darwin) {
+	    if_constexpr (f_darwin) {
 	        tmp->tm_gmtoff = op->gmtoff ;
 	        tmp->tm_zone = op->zname ;
 	    } /* end if_constexpr (f_darwin) */

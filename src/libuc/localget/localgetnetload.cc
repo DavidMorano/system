@@ -121,7 +121,7 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	            }
 	        } /* end if (needed) */
 /* program cache */
-		if constexpr (f_ucprogdata) {
+		if_constexpr (f_ucprogdata) {
 	            if ((rs >= 0) && (len == 0)) {
 	                if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
 	                    len = rs ;
@@ -136,7 +136,7 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	                if ((rs = mkpath3(tfname,pr,vardname,nlname)) >= 0) {
 	                    if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
 	                        len = rs ;
-			        if constexpr (f_ucprogdata) {
+			        if_constexpr (f_ucprogdata) {
 		                    rs = ucprogdata_set(di,rbuf,len,ttl) ;
 			        }
 		            } else if (isNotPresent(rs)) {

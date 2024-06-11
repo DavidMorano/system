@@ -195,7 +195,7 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	            if ((rs = uc_malloc(op->bufsize,&p)) >= 0) {
 	                op->buf = charp(p) ;
 	                if ((rs = logfile_fileopen(op)) >= 0) {
-		            if constexpr (f_chmod) {
+		            if_constexpr (f_chmod) {
 	                        if (op->operm) {
 	                            u_fchmod(op->lfd,op->operm) ;
 		                }

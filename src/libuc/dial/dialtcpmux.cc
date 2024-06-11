@@ -283,7 +283,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 		    } /* end if (m-a-f) */
 	        } /* end if (svc-args) */
 	        if (rs >= 0) {
-		    if constexpr (f_cr) {
+		    if_constexpr (f_cr) {
 	                sbuf_chr(&b,'\r') ;
 		    }
 	            sbuf_chr(&b,'\n') ;

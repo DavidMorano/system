@@ -225,7 +225,7 @@ int ucgetho::operator () (ucentho *hop,char *hobuf,int holen) noex {
 int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_gethoxxxr) {
+	if_constexpr (f_gethoxxxr) {
 	    cint	ec = gethoent_rp(hop,hobuf,holen) ;
 	    if (ec == 0) {
 	        rs = hop->size() ;
@@ -246,7 +246,7 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	        rs = (- errno) ;
 	    }
 	} /* end if_constexpr (selection) */
-	if constexpr (f_sunos) {
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -257,7 +257,7 @@ int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_gethoxxxr) {
+	    if_constexpr (f_gethoxxxr) {
 	        cint	ec = gethonam_rp(hop,hobuf,holen,name) ;
 	        if (ec == 0) {
 	            rs = hop->size() ;
@@ -278,7 +278,7 @@ int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
 	            rs = (- errno) ;
 	        }
 	    } /* end if_constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -292,7 +292,7 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 	    rs = SR_INVALID ;
 	    if ((al >= 0) && (af >= 0)) {
 	        errno = 0 ;
-	        if constexpr (f_gethoxxxr) {
+	        if_constexpr (f_gethoxxxr) {
 	            cint	ec = gethoadd_rp(hop,hobuf,holen,af,ap,al) ;
 	            if (ec == 0) {
 	                rs = hop->size() ;
@@ -313,7 +313,7 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 	                rs = (- errno) ;
 	            }
 	        } /* end if_constexpr (selection) */
-	        if constexpr (f_sunos) {
+	        if_constexpr (f_sunos) {
 		    if (rs == SR_BADF) rs = SR_NOENT ;
 	        }
 	    } /* end if (valid) */

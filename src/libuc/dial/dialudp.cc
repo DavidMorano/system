@@ -129,7 +129,7 @@ int dialudp(cchar *hostname,cchar *portspec,int af,int to,int) noex {
 static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	ADDRINFO	hint{} ;
 	int		rs = SR_OK ;
-	if constexpr (f_proto) {
+	if_constexpr (f_proto) {
 	    int		rs ;
 	    cchar	*pn = PROTONAME ;
 	    if ((rs = getproto_name(pn,-1)) >= 0) {

@@ -11,7 +11,7 @@
 	This module was originally written.
 
 	= 2017-05-17, David A-D- Morano
-	I did some update to use C++11 ('if constexpr').
+	I did some update to use C++11 ('if_constexpr').
 
 */
 
@@ -224,7 +224,7 @@ int ucgetgr::operator () (ucentgr *grp,char *grbuf,int grlen) noex {
 int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getgrentr) {
+	if_constexpr (f_getgrentr) {
 	    cint	ec = getgrent_rp(grp,grbuf,grlen) ;
 	    if (ec == 0) {
 	        rs = grp->size() ;
@@ -245,7 +245,7 @@ int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	        rs = (- errno) ;
 	    }
 	} /* end if_constexpr (selection) */
-	if constexpr (f_sunos) {
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -256,7 +256,7 @@ int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getgrnamr) {
+	    if_constexpr (f_getgrnamr) {
 	        cint	ec = getgrnam_rp(grp,grbuf,grlen,name) ;
 	        if (ec == 0) {
 	            rs = grp->size() ;
@@ -277,7 +277,7 @@ int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
 	            rs = (- errno) ;
 	        }
 	    } /* end if_constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -290,7 +290,7 @@ int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
 	if (bit(gid,31)) gid = getgid() ;
 	if (gid != gidend) {
 	    errno = 0 ;
-	    if constexpr (f_getgrgidr) {
+	    if_constexpr (f_getgrgidr) {
 	        cint	ec = getgrgid_rp(grp,grbuf,grlen,gid) ;
 	        if (ec == 0) {
 	            rs = grp->size() ;
@@ -311,7 +311,7 @@ int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
 	            rs = (- errno) ;
 	        }
 	    } /* end if_constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (valid GID) */

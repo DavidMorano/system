@@ -883,7 +883,7 @@ static int vecstr_validx(vecstr *op,int i) noex {
 
 static void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 	qsort_f		scf = qsort_f(vcf) ;
-	if constexpr (f_qsort) {
+	if_constexpr (f_qsort) {
 	    cint	esize = sizeof(char *) ;
 	    qsort(op->va,op->i,esize,scf) ;
 	} else {

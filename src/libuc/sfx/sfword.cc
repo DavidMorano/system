@@ -121,7 +121,7 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 		}
 		if (! f) {
 	    	    int		i = (cl - 2) ;
-		    if constexpr (f_allows) {
+		    if_constexpr (f_allows) {
 			cchar	*cs = (cp+i) ;
 	                for (int j = 0 ; allows[j] ; j += 1) {
 			    f = (allows[j][0] == cs[0]) ;

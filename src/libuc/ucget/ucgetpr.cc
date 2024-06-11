@@ -228,7 +228,7 @@ int ucgetpr::operator () (ucentpr *prp,char *prbuf,int prlen) noex {
 int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getprxxxr) {
+	if_constexpr (f_getprxxxr) {
 	    cint	ec = getprent_rp(prp,prbuf,prlen) ;
 	    if (ec == 0) {
 	        rs = prp->size() ;
@@ -249,7 +249,7 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 	        rs = (- errno) ;
 	    }
 	} /* end if_constexpr (selection) */
-	if constexpr (f_sunos) {
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -260,7 +260,7 @@ int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getprxxxr) {
+	    if_constexpr (f_getprxxxr) {
 	        cint	ec = getprnam_rp(prp,prbuf,prlen,name) ;
 	        if (ec == 0) {
 	            rs = prp->size() ;
@@ -281,7 +281,7 @@ int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
 	            rs = (- errno) ;
 	        }
 	    } /* end if_constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -293,7 +293,7 @@ int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
 	int		rs = SR_INVALID ;
 	if (num >= 0) {
 	    errno = 0 ;
-	    if constexpr (f_getprxxxr) {
+	    if_constexpr (f_getprxxxr) {
 	        cint	ec = getprnum_rp(prp,prbuf,prlen,num) ;
 	        if (ec == 0) {
 	            rs = prp->size() ;
@@ -314,7 +314,7 @@ int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
 	            rs = (- errno) ;
 	        }
 	    } /* end if_constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (valid num) */

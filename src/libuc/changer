@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} if-constexpr"
+NAMES="${NAMES} constexpr"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/if-constexpr/s//if_constexpr/g
+g/if constexpr/s//if_constexpr/g
 	w
 	q
 EOF

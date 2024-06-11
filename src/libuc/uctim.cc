@@ -1091,7 +1091,7 @@ static void uctim_atforkchild() noex {
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
             uip->fl.running_disper = false ;
-	    if constexpr (f_childthrs) {
+	    if_constexpr (f_childthrs) {
                 if (uip->fl.thrs) {
                     uip->fl.thrs = false ;
                     uip->thrsbegin() ;

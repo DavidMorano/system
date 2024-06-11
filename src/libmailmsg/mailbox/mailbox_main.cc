@@ -616,7 +616,7 @@ static int mailbox_parse(mailbox *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
-	if constexpr (f_readto) {
+	if_constexpr (f_readto) {
 	    to = op->to_read ;
 	}
 	if ((rs = filer_start(&fb,op->mfd,soff,bsize,0)) >= 0) {

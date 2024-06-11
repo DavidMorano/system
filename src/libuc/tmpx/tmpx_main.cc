@@ -372,7 +372,7 @@ int tmpx_nusers(tmpx *op) noex {
 	int		nusers = 0 ;
 	if ((rs = tmpx_magic(op)) >= 0) {
 	        int	en ;
-	        if constexpr (f_dynents) {
+	        if_constexpr (f_dynents) {
 	            cint	esize = TMPX_ENTSIZE ;
 	            en = ((op->fsize / esize) + 1) ;
 	        } else {

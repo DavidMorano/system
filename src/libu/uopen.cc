@@ -346,7 +346,7 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-	if constexpr (f_sunos) {
+	if_constexpr (f_sunos) {
 	    if ((rs >= 0) && (of & O_CLOEXEC)) {
 		rs = icloseonexec(fd) ;
 	    }

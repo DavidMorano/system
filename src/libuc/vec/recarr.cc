@@ -381,7 +381,7 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	            op->f.issorted = true ;
 	            if (op->c > 1) {
 			qsort_f		qcmp = qsort_f(vcmp) ;
-			if constexpr (f_qsort) {
+			if_constexpr (f_qsort) {
 			    cint	esize = sizeof(void *) ;
 	                    qsort(op->va,op->i,esize,qcmp) ;
 			} else {

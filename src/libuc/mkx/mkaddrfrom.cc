@@ -187,7 +187,7 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	        nl = sfshrink(ep->rp,ep->rl,&rp) ;
 	    }
 	}
-	if constexpr (f_massage) {
+	if_constexpr (f_massage) {
 	    if ((rp != nullptr) && (nl > 0)) {
 	        int	cl ;
 	        cchar	*cp ;

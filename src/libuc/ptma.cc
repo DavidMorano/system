@@ -149,7 +149,7 @@ int ptma_setpshared(PTMA *op,int fn) noex {
 int ptma_getrobustnp(PTMA *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if constexpr (f_mutexrobust) {
+	    if_constexpr (f_mutexrobust) {
 	        if ((rs = pthread_mutexattr_getrobust_np(op,oldp)) > 0) {
 	            rs = (- rs) ;
 		}
@@ -165,7 +165,7 @@ int ptma_getrobustnp(PTMA *op,int *oldp) noex {
 int ptma_setrobustnp(PTMA *op,int fn) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if constexpr (f_mutexrobust) {
+	    if_constexpr (f_mutexrobust) {
 		if ((rs = pthread_mutexattr_setrobust_np(op,fn)) > 0) {
 		    rs = (- rs) ;
 		}

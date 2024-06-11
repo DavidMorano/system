@@ -77,7 +77,7 @@ int uc_kvamatch(kva_t *kva,cchar *keyname,cchar **rpp) noex {
 	    rs = SR_INVALID ;
 	    if (keyname[0]) {
 		rs = SR_OK ;
-	        if constexpr (f_userattr) {
+	        if_constexpr (f_userattr) {
 		    const nullptr_t	np{} ;
 		    char	*kp = (char *) keyname ;
 	            if ((rp = kva_match(kva,kp)) != np) {

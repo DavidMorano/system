@@ -120,7 +120,7 @@ static int uuname_machine(UTSNAME *up) noex {
 	char		*mbuf = up->machine ;
 	if (strcmp(mbuf,"x86_64") == 0) {
 	    cchar	*sp = "Intel" ;
-	    if constexpr (f_darwin) {
+	    if_constexpr (f_darwin) {
 	        sp = "Apple-Macintosh-Intel" ;
 	    }
 	    rs = sncpy(mbuf,mlen,sp) ;
@@ -134,7 +134,7 @@ static int uuname_architecture(UTSNAME *up) noex {
 	cint		alen = (sizeof(up->architecture)-1) ;
 	int		rs = SR_OK ;
 	cchar		*abuf = up->architecture ;
-	if constexpr (f_darwin) {
+	if_constexpr (f_darwin) {
 	    if (strcmp(abuf,"i386") == 0) {
 		cchar	*sp = "x86_64" ;
 	        rs = sncpy(abuf,alen,sp) ;

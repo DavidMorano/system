@@ -168,7 +168,7 @@ int ptc_timedwait(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_NOSYS ;
 	if (tp) {
-	    if constexpr (f_reltimedwait) {
+	    if_constexpr (f_reltimedwait) {
 		pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
 	        if ((rs = pthread_cond_reltimedwait_np(pop,mp,tp)) > 0) {
 	            rs = (- rs) ;
