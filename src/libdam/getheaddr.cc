@@ -25,13 +25,13 @@
 	on purpose.
 
 	Synopsis:
-	int getheaddr(cchar *addr,HOSTENT *hep,char *hbuf,int hlen) noex
+	int getheaddr(HOSTENT *hep,char *hbuf,int hlen,cvoid *addr) noex
 
 	Arguments:
-	- addr		address to lookup
 	- hep		pointer to 'hostent' structure
-	- hbuf		user supplied hbuffer to hold result
-	- hlen	length of user supplied hbuffer
+	- hbuf		host-entry buffer pointer
+	- hlen		host-entry buffer length
+	- addr		address to lookup
 
 	Returns:
 	>=0		host was found OK

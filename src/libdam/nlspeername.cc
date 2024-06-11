@@ -56,6 +56,7 @@
 #include	<bfile.h>
 #include	<field.h>
 #include	<hostent.h>
+#include	<gethe.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<strwcpy.h>
@@ -71,10 +72,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getheaddr(cvoid *,HOSTENT *,char *,int) noex ;
-}
 
 
 /* external variables */
@@ -153,7 +150,6 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 /* end subroutine (nlspeername_unix) */
 
 static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
-	uint		inetaddr ;
 	uint		uv ;
 	cint		adv = 8 ;
 	int		rs ;
@@ -167,7 +163,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	    if ((rs = malloc_ho(&hebuf)) >= 0) {
 	        HOSTENT		he ;
 		cint		helen = rs ;
-	        if ((rs = getheaddr(&inetaddr,&he,hebuf,helen)) >= 0) {
+	        if ((rs = getheaddr(&he,hebuf,helen,ap)) >= 0) {
 	            if ((rs = hostent_getaf(&he)) >= 0) {
 	                cint	af = rs ;
 	                if (af == family) {
