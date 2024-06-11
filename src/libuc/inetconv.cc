@@ -21,8 +21,8 @@
 	inetpton
 
 	Description:
-	This subroutines converts a string representation of an
-	INET address (either v4 or v6) into its binary form.
+	This subroutines converts a c-string (portable) representation
+	of an INET address (either v4 or v6) into its binary form.
 
 	Synopsis:
 	int inetpton(void *addrbuf,int addrlen,int af,cchar *sp,int sl) noex
@@ -43,17 +43,18 @@
 	inetntop
 
 	Description:
-	This subroutines converts a string representation of an
-	INET (either v4 or v6) address into its binary form.
+	This subroutines converts a network (binary) representation
+	of an INET (either v4 or v6) address into its ASCII c-string
+	(portable) form.
 
 	Synopsis:
 	int inetntop(char *rbuf,int rlen,int af,vcoid *binaddr) noex
 
 	Arguments:
-	rbuf		result buffer pointer
-	rlen		result buffer length
+	rbuf		result string-buffer pointer
+	rlen		result string-buffer length
 	af		address-family (AF) of source address
-	binaddr		byte-array representing the source address
+	binaddr		byte-array representing the binary source address
 
 	Returns:
 	>=0		length of resulting string
@@ -71,8 +72,8 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<cstring>
-#include	<algorithm>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -108,13 +109,13 @@ static inline int getaf(cchar *sp,int sl) noex {
 
 /* local variables */
 
-constexpr int			inet4addrlen = int(INET4ADDRLEN) ;
-constexpr int			inet6addrlen = int(INET6ADDRLEN) ;
-constexpr int			inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
+constexpr int		inet4addrlen = int(INET4ADDRLEN) ;
+constexpr int		inet6addrlen = int(INET6ADDRLEN) ;
+constexpr int		inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
 
-constexpr int			astrlen = int(INETX_ADDRSTRLEN) ;
+constexpr int		astrlen = int(INETX_ADDRSTRLEN) ;
 
-static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
+constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 
 /* exported variables */
@@ -127,10 +128,9 @@ int inetnetpton(void *dbuf,int dlen,int af,cchar *srcbuf,int srclen) noex {
 	if (dbuf && srcbuf) {
 	    rs = SR_INVALID ;
 	    if ((af >= 0) && (dlen > 0)) {
-	        int	sl ;
 	        cchar	*sp{} ;
 		rs = SR_DOM ;
-	        if ((sl = sfshrink(srcbuf,srclen,&sp)) > 0) {
+	        if (int sl ; (sl = sfshrink(srcbuf,srclen,&sp)) > 0) {
 	            char	astr[astrlen + 1] ;
 	            strwcpy(astr,sp,min(sl,astrlen)) ;
 	            if (af == AF_UNSPEC) {
@@ -149,10 +149,9 @@ int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 	if (addrbuf && srcbuf) {
 	    rs = SR_INVALID ;
 	    if ((af >= 0) && (addrlen > 0)) {
-	        int	sl ;
 	        cchar	*sp{} ;
 		rs = SR_DOM ;
-	        if ((sl = sfshrink(srcbuf,srclen,&sp)) > 0) {
+	        if (int sl ; (sl = sfshrink(srcbuf,srclen,&sp)) > 0) {
 	            char	astr[astrlen + 1] ;
 		    rs = SR_OVERFLOW ;
 	            strwcpy(astr,sp,min(sl,astrlen)) ;
