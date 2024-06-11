@@ -19,9 +19,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 
 #include	<cfbin.h>
@@ -36,6 +37,8 @@
 #include	<cfdecf.h>
 #include	<cfdecmf.h>
 #include	<cfnum.h>
+
+#include	<cfhexs.h>
 
 
 #endif /* CFX_INCLUDE */

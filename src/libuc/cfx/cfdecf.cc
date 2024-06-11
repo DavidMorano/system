@@ -24,6 +24,7 @@
 	values.
 
 	Synopsis:
+	int cfdecf(cchar *sp,int sl,double *rp) noex
 
 	Arguments:
 	sp		source string

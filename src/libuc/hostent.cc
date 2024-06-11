@@ -159,10 +159,9 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
 	if (hep && curp) {
-	    rs = SR_NOTFOUND ;
+	    rs = SR_OK ;
 	    if (curp == nullptr) {
 	        if (hep->h_name) {
-		    rs = SR_OK ;
 	            nlen = strlen(hep->h_name) ;
 	            if (rpp) {
 	                *rpp = hep->h_name ;
@@ -171,7 +170,6 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	    } else {
 	        if (curp->i < 0) {
 	            if (hep->h_name) {
-		        rs = SR_OK ;
 	                nlen = strlen(hep->h_name) ;
 	                if (rpp) {
 	                    *rpp = hep->h_name ;
@@ -180,7 +178,6 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	            }
 	        } else {
 	            if (hep->h_aliases && hep->h_aliases[curp->i]) {
-		        rs = SR_OK ;
 	                nlen = strlen(hep->h_aliases[curp->i]) ;
 	                if (rpp) {
 	                    *rpp = hep->h_aliases[curp->i] ;
@@ -202,12 +199,11 @@ int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		alen = 0 ;
 	if (hep && curp) {
-	    rs = SR_NOTFOUND ;
+	    rs = SR_OK ;
 	    alen = hep->h_length ;
 	    if (hep->h_addr_list != nullptr) {
 	        if (curp == nullptr) {
 	            if (hep->h_addr_list[0] != nullptr) {
-	                rs = SR_OK ;
 	                if (rpp) {
 	                    *rpp = (uchar *) hep->h_addr_list[0] ;
 		        }
@@ -215,7 +211,6 @@ int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
 	        } else {
 	            cint	ci = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 		    if (hep->h_addr_list[ci] != nullptr) {
-	                rs = SR_OK ;
 	                if (rpp) {
 	                    *rpp = (uchar *) hep->h_addr_list[ci] ;
 		        }

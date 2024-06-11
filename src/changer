@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} getdomainname"
+NAMES="${NAMES} utypealiase.h"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/getdomainname/s//getinetdomain/g
+g/utypealiase.h/s//utypealiases.h/g
 	w
 	q
 EOF

@@ -1,7 +1,7 @@
 /* nlspeername SUPPORT */
 /* lang=C++20 */
 
-/* handle a connect request for a service */
+/* try to find the peername for an NLS (XTI) connection */
 /* version %I% last-modified %G% */
 
 
@@ -36,6 +36,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<hostent.h>
@@ -43,8 +44,11 @@
 #include	<inetaddr.h>
 #include	<strwcpy.h>
 #include	<cfhex.h>
+#include	<cfhexs.h>
 #include	<isindomain.h>
 #include	<localmisc.h>
+
+#include	"nlspeername.h"
 
 
 /* local defines */
@@ -83,28 +87,24 @@ static int	nlspeername_inet4(char *,cchar *,cchar *,int) noex ;
 /* exported subroutines */
 
 int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
-	int		rs = SR_OK ;
-	int		al ;
-	int		family ;
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-
-	if (addr == NULL) return SR_FAULT ;
-	if (pn == NULL) return SR_FAULT ;
-
-	pn[0] = '\0' ;
-	al = strlen(addr) ;
-
-	if (al >= 16) {
-	    if ((rs = cfhexi(addr,4,&family)) >= 0) {
-	        if (family == AF_UNIX) {
-	            rs = nlspeername_unix(pn,dn,addr,al) ;
-	        } else if (family == AF_INET4) {
-	            rs = nlspeername_inet4(pn,dn,addr,al) ;
-	        } /* end if (recognized the address family) */
-	    } /* end if (cfhexi) */
-	} else
+	if (addr && dn && pn) {
+	    cint	al = strlen(addr) ;
 	    rs = SR_INVALID ;
-
+	    pn[0] = '\0' ;
+	    if (al >= 16) {
+	        if (int af ; (rs = cfhexi(addr,4,&af)) >= 0) {
+	            if (af == AF_UNIX) {
+	                rs = nlspeername_unix(pn,dn,addr,al) ;
+			len = rs ;
+	            } else if (af == AF_INET4) {
+	                rs = nlspeername_inet4(pn,dn,addr,al) ;
+			len = rs ;
+	            } /* end if (recognized the address family) */
+	        } /* end if (cfhexi) */
+	    } /* end if (good) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (nlspeername) */
@@ -116,9 +116,11 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 	cint		nlen = MAXHOSTNAMELEN ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
+	(void) dn ;
 	al -= 4 ;
 	if ((al / 2) <= nlen) {
-	    rs = cfhexs((addr + 4),al,pn) ;
+	    uchar	*upn = ucharp(pn) ;
+	    rs = cfhexs((addr + 4),al,upn) ;
 	    len = rs ;
 	} else {
 	    rs = SR_TOOBIG ;
@@ -129,15 +131,18 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 
 static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	uint		inetaddr ;
+	cint		adv = 8 ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = cfhexui(ap+8,8,&inetaddr)) >= 0) {
-	    HOSTENT	he ;
+	al -= adv ;
+	if ((rs = cfhexui(ap+adv,al,&inetaddr)) >= 0) {
 	    HOSTENT_CUR	hc ;
-	    cint	helen = getbufsize(getbufsize_he) ;
 	    cint	family = rs ;
-	    char	*hebuf ;
-	    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
+	    char	*hebuf{} ;
+	    if ((rs = malloc_ho(&hebuf)) >= 0) {
+	        HOSTENT		he ;
+		cint		helen = rs ;
 	        if ((rs = getheaddr(&inetaddr,&he,hebuf,helen)) >= 0) {
 	            if ((rs = hostent_getaf(&he)) >= 0) {
 	                cint	af = rs ;
@@ -146,32 +151,33 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	                    cchar	*cp ;
 	                    if ((rs >= 0) && dn) {
 	                        if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-				    auto	henum = hostent_enum ;
+				    auto	henum = hostent_enumname ;
 	                            cchar	*hp ;
-	                            while ((rs = henum(&he,&hc,&hp) > 0) {
+	                            while ((rs = henum(&he,&hc,&hp)) > 0) {
 	                                if (isindomain(hp,dn)) {
 	                                    cp = strwcpy(pn,he.h_name,nlen) ;
 	                                    len = (cp - pn) ;
 	                                    break ;
 	                                }
 	                            } /* end while */
-	                            hostent_curend(&he,&hc) ;
+	                            rs1 = hostent_curend(&he,&hc) ;
+				    if (rs >= 0) rs = rs1 ;
 	                        } /* end if */
 	                    } /* end if (have a domain name) */
-
 	                    if (rs >= 0) {
 	                        if ((pn[0] == '\0') && (he.h_name != NULL)) {
 	                            cp = strwcpy(pn,he.h_name,nlen) ;
 	                            len = (cp - pn) ;
 	                        }
-	                    }
-
-	                } else
+	                    } /* end if (ok) */
+	                } else {
 	                    rs = SR_NOTFOUND ;
+			}
 	            } /* end if (gethostent_af) */
 	        } /* end if (getheaddr) */
-	        uc_free(hebuf) ;
-	    } /* end if (m-a) */
+	        rs1 = uc_free(hebuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a,-f) */
 	} /* end if (cfhexui) */
 	return (rs >= 0) ? len : rs ;
 }

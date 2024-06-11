@@ -41,15 +41,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 
 #include	"cfsysx.hh"
 
 
 /* local defines */
+
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -70,10 +74,7 @@
 /* local variables */
 
 
-/* local subroutines */
-
-
-/* template-subroutines */
+/* exported variables */
 
 
 /* exported subroutines */

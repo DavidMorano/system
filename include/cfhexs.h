@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern int cfhexs(char *,int,uchar *) noex ;
+extern int cfhexs(cchar *,int,uchar *) noex ;
 
 EXTERNC_end
 

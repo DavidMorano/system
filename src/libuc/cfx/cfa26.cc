@@ -47,9 +47,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 
 #include	"cfalphax.hh"		/* <- the money shot! */

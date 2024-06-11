@@ -481,8 +481,6 @@ int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	                    nlen = nep->namelen ;
 	                    if (rpp != nullptr) *rpp = nep->name ;
 	                }
-	            } else if (rs == 0) {
-	                rs = SR_NOTFOUND ;
 	            } /* end if */
 	            if (f_cur) {
 	                rs = hostinfo_curend(op,&dcur) ;
@@ -544,8 +542,6 @@ int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	                    alen = aep->addrlen ;
 	                    if (rpp) *rpp = aep->addr ;
 	                }
-	            } else if (rs == 0) {
-	                rs = SR_NOTFOUND ;
 	            } /* end if */
 	            if (f_cur) {
 	                rs = hostinfo_curend(op,&dcur) ;
@@ -842,7 +838,8 @@ static int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	            } /* end if (entry not found) */
 	            if (rs < 0) break ;
 	        } /* end while */
-	        hostent_curend(hep,&hc) ;
+	        rs1 = hostent_curend(hep,&hc) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (hostent) */
 	} /* end if */
 	return (rs >= 0) ? c : rs ;
