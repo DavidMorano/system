@@ -67,7 +67,40 @@ struct userinfo_head {
 	int		ostype ;
 } ;
 
+#ifdef	__cplusplus
+enum userinfomems {
+	userinfomem_finish,
+	userinfomem_overlast
+} ;
+struct userinfo ;
+struct userinfo_co {
+	userinfo	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (userinfo *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (userinfo_co) */
+struct userinfo : userinfo_head {
+	userinfo_co	finish ;
+	userinfo() noex {
+	    finish(this,userinfomem_finish) ;
+	} ;
+	userinfo(const userinfo &) = delete ;
+	userinfo &operator = (const userinfo &) = delete ;
+	int start(cchar *) noex ;
+	void dtor() noex ;
+	~userinfo() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (userinfo) */
+#else	/* __cplusplus */
 typedef USERINFO	userinfo ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

@@ -24,8 +24,8 @@
 #define	REX_DEFEXECSERVICE		512
 
 /* 
-This flag is used in the same namespace as the 'open(2)'
-open flags and therefor is pretty dangerous, but we live on the edge!
+This flag is used in the same namespace as the |open(2)| open 
+flags and therefor is pretty dangerous, but we live on the edge!
 */
 
 #ifndef	O_KEEPALIVE
@@ -50,6 +50,12 @@ struct rex_auth {
 
 typedef	REX_FL		rex_fl ;
 typedef	REX_AU		rex_au ;
+
+EXTERNC_begin
+
+extern int rex(cc *,rex_au *,rex_fl *,cc *,mainv,int *,netfile_ent **mpp) noex ;
+
+EXTERNC_end
 
 
 #endif /* REX_INCLUDE */

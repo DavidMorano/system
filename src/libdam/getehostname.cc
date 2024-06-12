@@ -38,8 +38,8 @@
 	- name		given name to find a substitute for
 
 	Retruns:
-	OK		a valid substitute can be found
-	BAD		no valid substitute can be found
+	>=0		a valid substitute can be found
+	<0		error (system-return); no valid substitute can be found
 
 	Important note:
 
@@ -51,7 +51,7 @@
 	which take a hostname type argument, you should always make
 	sure that you pass it a name that CAN be translated into
 	an INET address, if indeed it can have one as indicated by
-	this subroutine.  Got it? Good. If not, look at the code
+	this subroutine.  Got it?  Good.  If not, look at the code
 	carefully and figure out what it is trying to test for and
 	do!
 

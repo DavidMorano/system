@@ -105,6 +105,10 @@
 /* local typedefs */
 
 typedef mainv		mv ;
+typedef NETFILE_ENT	ent ;
+typedef NETFILE_ENT *	entp ;
+typedef rex_au		au ;
+typedef rex_fl		fl ;
 
 
 /* external subroutines */
@@ -122,6 +126,28 @@ extern "C" {
 
 /* local structures */
 
+namespace {
+    struct rexer {
+	rex_au		*auth ;
+	rex_fl		*fp ; 
+	cchar		*rhost ;
+	cchar		*program ;
+	mainv		argv ;
+	int		*fd2p ;
+	netp		*mpp ;
+	userinfo	u ;
+	rexer(cc *r,au *a,fl *f,cc *p,mv v,int *d,entp *pp) noex {
+	    rhost = r ;
+	    auth = a ;
+	    fp = f ;
+	    argv = v ;
+	    fd2p = d ;
+	    mpp = pp ;
+	} ;
+	operator int () noex ;
+    } ; /* end struct (rexer) */
+}
+
 
 /* forward subroutines */
 
@@ -136,8 +162,20 @@ static int	hostequiv(cc *,cc *,cc *) noex ;
 
 /* exported subroutines */
 
-int rex(cc *rhost,rex_au *auth,rex_fl *f,cc *program,mv argv,int *fd2p,
-		NETFILE_ENT **mpp) noex {
+int rex(cc *rhost,au *auth,fl *f,cc *pg,mv av,int *fd2p,netp *mpp) noex {
+	rexer		ro(rhost,auth,f,pg,av,fd2p,mpp) ;
+	return ro ;
+}
+
+rexer::operator int () noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		s = -1 ;
+	if ((rs = u.start(un)userinfo_start(&u
+	return (rs >= 0) ? s : rs ;
+} ;
+
+int rexer::nainsub() noex {
 	ucentsv		se{} ;
 	ucentsv		*sp{} ;
 	USERINFO	u{} ;

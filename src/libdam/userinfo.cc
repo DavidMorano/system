@@ -346,6 +346,36 @@ struct vars {
 
 /* forward references */
 
+template<typename ... Args>
+static int userinfo_ctor(userinfo *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    userinfo_head	*hop = static_cast<userinfo_head *>(op) ;
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (userinfo_ctor) */
+
+static int userinfo_dtor(userinfo *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (userinfo_dtor) */
+
+template<typename ... Args>
+static inline int userinfo_magic(userinfo *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == USERINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (userinfo_magic) */
+
 static int	userinfo_process(UI *,strstore *,int *,cchar *) noex ;
 static int	userinfo_id(UI *uip) noex ;
 static int	userinfo_load(UI *,strstore *,int *) noex ;
@@ -445,8 +475,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (uip) {
-	    memclear(uip) ;		/* dangerous */
+	if ((rs = userinfo_ctor(uip)) >= 0) {
 	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 		static cchar	*nn = getenv(VARNODE) ;
@@ -471,26 +500,29 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	            if (rs >= 0) uip->magic = USERINFO_MAGIC ;
 	        } /* end if (userinfo_id) */
 	    } /* end if (mkvars) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		userinfo_dtor(uip) ;
+	    }
+	} /* end if (userinfo_ctor) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (userinfo_start) */
 
-int userinfo_finish(UI *uip) noex {
-	int		rs = SR_FAULT ;
+int userinfo_finish(UI *op) noex {
+	int		rs ;
 	int		rs1 ;
-	if (uip) {
-	    rs = SR_NOTOPEN ;
-	    if (uip->magic == USERINFO_MAGIC) {
-		rs = SR_OK ;
-	        if (uip->a) {
-	            rs1 = uc_free(uip->a) ;
-	            if (rs >= 0) rs = rs1 ;
-	            uip->a = nullptr ;
-	        }
-	        uip->magic = 0 ;
-	    } /* end if (magic) */
-	} /* end if (non-null) */
+	if ((rs = userinfo_magic(op)) >= 0) {
+	    if (op->a) {
+	        rs1 = uc_free(op->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->a = nullptr ;
+	    }
+	    {
+	        rs1 = userinfo_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (userinfo_finish) */
@@ -1653,6 +1685,30 @@ static int procinfo_uname(PROCINFO *pip) noex {
 }
 /* end subroutine (procinfo_uname) */
 #endif /* CF_UNAME */
+
+int userinfo::start(cchar *un) noex {
+	return userinfo_start(this,un) ;
+}
+
+void userinfo::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("userinfo",rs,"fini-finish") ;
+	}
+}
+
+userinfo_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case userinfomem_finish:
+	        rs = userinfo_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (userinfo_co::operator) */
 
 #ifdef	COMMENT
 static int checknul(cchar *emptyp,cchar **epp) noex {
