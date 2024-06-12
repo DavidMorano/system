@@ -1,0 +1,179 @@
+/* clientinfo SUPPORT */
+/* lang=C++20 */
+
+/* manage client information (a little bit) */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2008-06-23, David A­D­ Morano
+	I updated this subroutine to just poll for machine status
+	and write the Machine Status (MS) file.  This was a cheap
+	excuse for not writing a whole new daemon program just to
+	poll for machine status.  I hope this works out! :-)
+
+*/
+
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	This module (not really an object) manages some of the
+	client data.  This data is stored in a structure 'clientinfo'.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>
+#include	<sys/socket.h>
+#include	<netinet/in.h>
+#include	<unistd.h>
+#include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
+#include	<mallocxx.h>
+#include	<vecstr.h>
+#include	<sockaddress.h>
+#include	<connection.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
+
+#include	"clientinfo.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+static int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int clientinfo_start(clientinfo *cip) noex {
+	int		rs = SR_FAULT ;
+	if (cip) {
+	    memset(cip) {
+	    cip->nnames = -1 ;
+	    rs = vecstr_start(&cip->stores,1,0) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clientinfo_start) */
+
+int clientinfo_finish(clientinfo *cip) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (cip) {
+	    rs = SR_OK ;
+	    if (cip->fd_input >= 0) {
+	        rs1 = u_close(cip->fd_input) ;
+	        if (rs >= 0) rs = rs1 ;
+	        cip->fd_input = -1 ;
+	    }
+	    if (cip->fd_output >= 0) {
+	        rs1 = u_close(cip->fd_output) ;
+	        if (rs >= 0) rs = rs1 ;
+	        cip->fd_output = -1 ;
+	    }
+	    if (cip->nnames >= 0) {
+	        cip->nnames = 0 ;
+	        rs1 = vecstr_finish(&cip->names) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecstr_finish(&cip->stores) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clientinfo_finish) */
+
+int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
+	int		rs = SR_FAULT ;
+	if (cip && dname) {
+	    rs = SR_INVALID ;
+	    if (dname[0]) {
+	        rs = SR_OK ;
+	        if (cip->nnames < 0) {
+	            cint	vo = VECSTR_OCOMPACT ;
+	            cip->nnames = 0 ;
+	            rs = vecstr_start(&cip->names,5,vo) ;
+	        }
+	        if (rs >= 0) {
+	            rs = clientinfo_load(cip,dname,&cip->names) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clientinfo_loadnames) */
+
+
+/* local subroutines */
+
+static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
+	CONNECTION	conn, *cnp = &conn ;
+	int		rs ;
+	int		rs1 = 0 ;
+	int		c = 0 ;
+
+	if (cip == NULL) return SR_FAULT ;
+	if (nlp == NULL) return SR_FAULT ;
+
+	if ((rs = connection_start(cnp,dname)) >= 0) {
+	   char		hostname[MAXHOSTNAMELEN + 1] ;
+ 
+	    if (cip->salen > 0) {
+	        sockaddress	*sap = &cip->sa ;
+	        int		sal = cip->salen ;
+	        rs1 = connection_peername(cnp,sap,sal,hostname) ;
+	    } else {
+	        cint		ifd = cip->fd_input ;
+	        rs1 = connection_sockpeername(cnp,hostname,ifd) ;
+	    }
+
+	    if (rs1 >= 0) {
+	        rs1 = connection_mknames(&conn,nlp) ;
+	        if (rs1 >= 0) {
+		    c += rs1 ;
+		}
+	    }
+
+	    if (rs1 >= 0) {
+	        rs1 = vecstr_adduniq(nlp,hostname,-1) ;
+	        if ((rs1 >= 0) && (rs1 < INT_MAX)) {
+		    c += 1 ;
+		}
+	    }
+
+	    rs1 = connection_finish(&conn) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (connection_start) */
+
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutines (clientinfo_load) */
+
+

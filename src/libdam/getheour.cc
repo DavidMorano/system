@@ -62,9 +62,11 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>		/* |getnodedomain(3uc)| */
 #include	<getxx.h>
+#include	<hostent.h>
 #include	<snx.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
@@ -81,6 +83,8 @@
 
 
 /* local typedefs */
+
+typedef hostent *	hostentp ;
 
 
 /* external subroutines */
@@ -116,6 +120,7 @@ namespace {
 	operator int () noex ;
 	int trylocal() noex ;
 	int tryname(cchar *) noex ;
+	int findcanonical() noex ;
     } ; /* end struct (gether) */
 }
 
@@ -185,130 +190,31 @@ int gether::tryname(cchar *name) noex {
 	if (isinetaddr(name)) {
 	    cint	af = AF_UNSPEC ;
 	    rs = getho_addr(hep,hebuf,helen,af,name,-1) ;
-	    len = rs ;
 	} else {
 	    rs = getho_name(hep,hebuf,helen,name) ;
+	}
+	if ((rs >= 0) && hbuf) {
+	    rs = findcanonical() ;
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
-/* end method (gether::trynam) */
+/* end method (gether::tryname) */
 
-
-#ifdef	COMMENT
-
-	UTSNAME		uts ;
-	in_addr_t	addr ;
-	int		rs ;
-	int		len ;
-	cchar		*np = (char *) name ;
-	char		localnode[NODENAMELEN + 1] ;
-	char		localdomain[MAXHOSTNAMELEN + 1] ;
-	char		newname[MAXHOSTNAMELEN + 1] ;
-	char		altname[MAXHOSTNAMELEN + 1] ;
-	char		*ap ;
-	char		*cp ;
-
-/* are we "doing" ourselves? */
-
-	np = name ;
-	if (name == NULL) {
-	    if (u_uname(&uts) < 0) {
-	        np = "localhost" ;
-	    } else {
-	        np = uts.nodename ;
-	    }
-	} else {
-	    /* strip trailing dots */
-	    len = strnlen(np,MAXHOSTNAMELEN) ;
-	    if (name[len - 1] == '.') {
-	        while (len && (np[len - 1] == '.')) {
-			len -= 1 ;
-		}
-	        snwcpy(altname,MAXHOSTNAMELEN,np,len) ;
-	        np = altname ;
-	    } /* end if */
-	} /* end if (stuff on the end) */
-
-/* is it a numeric address? */
-
-	if ((addr = inet_addr(np)) != (~ 0)) {
-
-	    ap = (char *) &addr ;
-	    rs = getheaddr(hep,hbuf,hlen,ap) ;
-
-#ifdef	COMMENT
-	     if ((rs < 0) && 
-		(memcmp(&addr,&anyaddr,sizeof(INADDR)) == 0)) {
-	    }
-#endif /* COMMENT */
-
-	} else {
-		rs = gethename(hep,hbuf,hlen,np) ;
-	}
-
-	if (rs >= 0) {
-
-	    if (hostname != NULL) {
-	        sncpy1(hostname,MAXHOSTNAMELEN,np) ;
-	    }
-	    return SR_OK ;
-
-	} else if (addr != (~ 0)) {
-		return SR_NOTFOUND ;
-	}
-
-/* get our local domain name */
-
-	localdomain[0] = '\0' ;
-	getnodedomain(localnode,localdomain) ;
-
-/* does the given name have a domain already? */
-
-	if ((cp = strchr(np,'.')) != NULL) {
-
-/* is the given domain our local domain name? */
-
-	    if (strcmp((cp + 1),localdomain) == 0) {
-
-/* yes */
-
-	        snwcpy(newname,MAXHOSTNAMELEN,name,(cp - name)) ;
-
-/* try it without our trailing local domain name */
-
-	        if ((rs = gethename(hep,hbuf,hlen,newname)) >= 0) {
-	            if (hostname) {
-	                sncpy1(hostname,MAXHOSTNAMELEN,hep->h_name) ;
-		    }
-	            return SR_OK ;
-	        }
-
-	    } /* end if (domains are the same) */
-
-	} else {
-
-/* it didn't have a domain so we try it with our local domain on it */
-
-	    snsds(newname,MAXHOSTNAMELEN,name,localdomain) ;
-
-	    if ((rs = gethename(hep,hbuf,hlen,newname)) >= 0) {
-	        if (hostname) {
-	            sncpy1(hostname,MAXHOSTNAMELEN,hep->h_name) ;
-		}
-	        return OK ;
-	    }
-
-	} /* end if */
-
-	if (hostname) {
-	    hostname[0] = '\0' ;
-	}
-
-	return SR_NOTFOUND ;
+int gether::findcanonical() noex {
+	int		rs = SR_OK ;
+	if (hbuf) {
+	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+		cint	hlen = rs ;
+	        hostent	*hop = static_cast<hostentp>(hep) ;
+	        cchar	*canp ;
+	        if ((rs = hostent_getcanonical(hop,&canp)) >= 0) {
+		    rs = sncpy(hbuf,hlen,canp) ;
+	        } /* end if (hostent_getcanonical) */
+	    } /* end if (getbufsize) */
+	} /* end if (wanted) */
+	return rs ;
 }
-/* end subroutine (getheour) */
-
-#endif /* COMMENT */
+/* end method (gether::findcanonical) */
 
 

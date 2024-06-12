@@ -24,6 +24,16 @@
 	This subroutine will take an INET socket and a local domain
 	name and find the hostname of the remote end of the socket.
 
+	Synopses:
+	int connection_start(CON *cnp,cchar *domainname) noex
+	int connection_finish(CON *cnp) noex
+	int connection_socksrcname(CON *cnp,char *dp,int dl,int s) noex
+	int connection_sockpeername(CON *cnp,char *dp,int dl,int s) noex
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -76,6 +86,7 @@
 #define	HOSTBUFLEN	MAX(MAXHOSTNAMELEN,NI_MAXHOST)
 
 #define	CON		connection
+#define	SA		sockaddress
 
 
 /* imported namespaces */
@@ -186,29 +197,23 @@ int connection_socksrcname(CON *cnp,char *dp,int dl,int s) noex {
 	if (cnp && dp) {
 	    rs = SR_BADF ;
 	    if (s >= 0) {
-	USTAT		sb ;
-	sockaddress	*sap ;
-	cint		peerlen = CONNECTION_PEERNAMELEN ;
-	int		sal = sizeof(sockaddress) ;
-
-	cnp->s = s ;
-	sap = cnp->sap ;
-	if ((rs = u_getsockname(s,sap,&sal)) >= 0) {
-	    cnp->f.sa = true ;
-	    rs = connection_peername(cnp,sap,sal,peerbuf) ;
-	    len = rs ;
-	}
-
-#if	CF_LOCALFIFO
-	if ((peerbuf[0] == '\0') && (u_fstat(s,&sb) >= 0)) {
-	    if (S_ISFIFO(sb.st_mode)) {
-	        cchar	*lh = LOCALHOST ;
-	        rs = sncpy1(peerbuf,peerlen,lh) ;
-	        len = rs ;
-	    }
-	} /* end if (local pipe) */
-#endif /* CF_LOCALFIFO */
-
+		USTAT	sb ;
+	        if ((rs = uc_fstat(s,&sb)) >= 0) {
+		    if (S_ISSOCK(sb.st_mode)) {
+	                sockaddress	*sap = cnp->sap ;
+	                int		sal = sizeof(sockaddress) ;
+	                cnp->s = s ;
+	                if ((rs = u_getsockname(s,sap,&sal)) >= 0) {
+	                    cnp->f.sa = true ;
+	                    rs = connection_peername(cnp,sap,sal,dp,dl) ;
+	                    len = rs ;
+	                }
+	    	    } else if (S_ISFIFO(sb.st_mode)) {
+	                cchar	*lh = LOCALHOST ;
+	                rs = sncpy1(peerbuf,peerlen,lh) ;
+	                len = rs ;
+		    } /* end if */
+		} /* end if (uc_fstat) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -251,8 +256,7 @@ int connection_sockpeername(CON *cnp,char *peerbuf,int s) noex {
 }
 /* end subroutine (connection_sockpeername) */
 
-int connection_peername(CON *cnp,sockaddress *sap,int sal,
-		char *dp,int dl) noex {
+int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*lh = LOCALHOST ;
@@ -285,7 +289,7 @@ int connection_peername(CON *cnp,sockaddress *sap,int sal,
 	    int		alen = 0 ;
 	    cnp->f.sa = true ;
 	    cnp->f.addr = false ;
-	    memcpy(cnp->sap,sap,sizeof(sockaddress)) ;
+	    memcpy(cnp->sap,sap) ;
 	    switch (af) {
 	    case AF_UNIX:
 		alen = MAXPATHLEN ;
@@ -309,7 +313,7 @@ int connection_peername(CON *cnp,sockaddress *sap,int sal,
 	    case AF_INET6:
 	        cnp->f.inet = true ;
 	        {
-	            const SOCKADDR	*ssap = (SOCKADDR *) sap ;
+	            CSOCKADDR	*ssap = sockaddressp(sap) ;
 	            int		flags = NI_NOFQDN ;
 	            ushort	in6addr[8] ;
 	            rs = uc_getnameinfo(ssap,sal,tmpnamebuf,NI_MAXHOST,

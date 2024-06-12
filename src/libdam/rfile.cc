@@ -29,21 +29,26 @@
 	try and make a connection to the remote host.
 
 	Synopsis:
-	int rfile(rhost,auth,rfilename,flags,mode)
-	cchar	rhost[] ;
-	cchar	rfilename[] ;
-	int		flags, mode ;
+	int rfile(cc *rhost,rex_au *auth,cc *rfn,int flags,mode_t om) noex
+	
+	Arguments:
+	rhost		remote host
+	auth		pointer to REX_AU object
+	rfn		remote file-name
+	flags		option flags
+	om		open-mode
+
+	Returns:
+	>=0		OK (and ere is the socket to the file)
+	<0		error (system-return)
+
+	Notes:
 	struct rex_auth {
 		char	*restrict ;
 		char	*username ;
 		char	*password ;
 		NETFILE_ENT	**machinev ;
 	} *auth ;
-
-	Arguments:
-
-	Returns:
-
 
 *******************************************************************************/
 
@@ -66,6 +71,7 @@
 #include	<rex.h>
 #include	<localmisc.h>
 
+#include	"rfile.h"
 #include	"incfile_rfilewrite.h"
 
 
@@ -85,12 +91,15 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward subroutines */
 
-static int	hostequiv() ;
-
-
-/* external variables */
+static int	hostequiv() noex ;
 
 
 /* local variables */
