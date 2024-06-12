@@ -1,4 +1,4 @@
-/* main SUPPORT (REXEC) */
+/* main SUPPORT (REX) */
 /* lang=C++20 */
 
 /* program to INET REXEC a remote command */
@@ -70,25 +70,6 @@
 #define		USERBUFLEN	(NODENAMELEN + (2 * 1024))
 
 
-/* define command option words */
-
-static const char *argopts[] = {
-	"TMPDIR",
-	"VERSION",
-	"VERBOSE",
-	"ROOT",
-	"LOGFILE",
-	NULL,
-} ;
-
-
-#define	ARGOPT_TMPDIR	0
-#define	ARGOPT_VERSION	1
-#define	ARGOPT_VERBOSE	2
-#define	ARGOPT_ROOT	3
-#define	ARGOPT_LOGFILE	4
-
-
 /* external subroutines */
 
 extern int	getnodedomain() ;
@@ -106,9 +87,42 @@ extern char	*timestr_log() ;
 extern char	*d_reventstr() ;
 
 
-/* forward subroutines */
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 static int	copymachines() ;
+
+
+/* local variables */
+
+enum argopts {
+	argopt_tmpdir,
+	argopt_version,
+	argopt_verbose,
+	argopt_rooot,
+	argopt_logfile,
+	argopt_overlast
+} ;
+
+constexpr cpcchar	argopts[] = {
+	"TMPDIR",
+	"VERSION",
+	"VERBOSE",
+	"ROOT",
+	"LOGFILE",
+	nullptr
+} ;
+
+#define	ARGOPT_TMPDIR	argopt_tmpdir
+#define	ARGOPT_VERSION	argopt_version
+#define	ARGOPT_VERBOSE	argopt_verbose
+#define	ARGOPT_ROOT	argopt_root
+#define	ARGOPT_LOGFILE	argopt_logfile
 
 
 /* external variables */
@@ -116,28 +130,29 @@ static int	copymachines() ;
 extern char	makedate[] ;
 
 
-/* external variables (localled declared) */
+/* exported variables */
 
 struct global	g ;
 
 struct userinfo	u ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 	bfile		errfile, *efp = &errfile ;
-	struct ustat	sb, isb, osb, esb ;
-	struct tm	*timep ;
-	struct passwd	*pp ;
-	struct group	*gp ;
-	struct servent	*sp, se ;
-	struct pollfd	fds[NFDS] ;
-	struct vecelem	ne, tmp ;
-	struct netrc	*mp ;
-	struct worm	ws, *wip = NULL ;
+	USTAT		sb, isb, osb, esb ;
+	TM		*timep ;
+	PASSWD		*pp ;
+	GROUP		*gp ;
+	SERVENT		*sp, se ;
+	POLFD		fds[NFDS] ;
+	vecelem		ne, tmp ;
+	netrc		*mp ;
+	worm		ws, *wip = NULL ;
 	time_t		t_pollsanity, t_sanity ;
 	unsigned long	addr ;
 

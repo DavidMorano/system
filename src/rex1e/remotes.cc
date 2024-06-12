@@ -1,30 +1,27 @@
-/* remotes */
+/* remotes SUPPORT */
+/* lang=C++20 */
 
 /* subroutines to get to the remote machine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0
 #define	F_REXECL	1
 #define	F_RCMDU		1
 
-
 /* revision history:
 
-	- David A.D. Morano, 96/11/21
+	- 1996-11-21, David A-D- Morano
 	This program was started by copying from the RSLOW program.
 
-	- David A.D. Morano, 96/12/12
+	- 1996-12-12, David A-D- Morano
 	I modified the program to take the username and password
 	from a specified file (for better security).
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -34,15 +31,14 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<string.h>
-#include	<time.h>
+#include	<cerrno>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<netdb.h>
 #include	<poll.h>
-#include	<errno.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<userinfo.h>
@@ -63,24 +59,29 @@
 
 /* external subroutines */
 
-extern int	qualdisplay() ;
-
-
-/* forward subroutines */
+extern "C" {
+    extern int	qualdisplay() noex ;
+}
 
 
 /* external variables */
 
 extern struct global	g ;
 
-extern int		errno ;
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
 int rex_rexec(hostname,port,username,password,wip,cmd,fd2p)
 char	hostname[] ;

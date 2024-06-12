@@ -140,16 +140,18 @@ namespace {
 	cchar		*rhost ;
 	cchar		*program ;
 	mainv		argv ;
+	mainv		envv ;
 	int		*fd2p ;
 	entp		*mpp ;
 	userinfo	u ;
 	int		ro ;
-	rexer(cc *r,au *a,int f,cc *p,mv v,int *d,entp *pp) noex {
+	rexer(cc *r,au *a,int f,cc *p,mv av,mv ev,int *d,entp *pp) noex {
 	    rhost = r ;
 	    auth = a ;
 	    ro = f ;
 	    program = p ;
-	    argv = v ;
+	    argv = av ;
+	    envv = ev ;
 	    fd2p = d ;
 	    mpp = pp ;
 	} ;
@@ -172,8 +174,8 @@ static int	hostequiv(cc *,cc *,cc *) noex ;
 
 /* exported subroutines */
 
-int rex(cc *rhost,au *auth,int ro,cc *pg,mv av,int *fd2p,entp *mpp) noex {
-	rexer		rexo(rhost,auth,ro,pg,av,fd2p,mpp) ;
+int rex(cc *rh,au *auth,int ro,cc *pg,mv av,mv ev,int *fd2p,entp *mpp) noex {
+	rexer		rexo(rh,auth,ro,pg,av,ev,fd2p,mpp) ;
 	return rexo ;
 }
 
