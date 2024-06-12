@@ -150,7 +150,7 @@ static int process(cchar *ds,int f_top) noex {
 
 static int procfiler(filer *wfp,cchar *ds,int f_top) noex {
 	int		rs ;
-	if constexpr (f_filemap) {
+	if_constexpr (f_filemap) {
 	    rs = procfile_map(wfp,ds,f_top) ;
 	} else {
 	    rs = procfile_reg(wfp,ds,f_top) ;

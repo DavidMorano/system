@@ -89,7 +89,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getportnum(cchar *,cchar *) ;
-extern int	getourhe(cchar *,cchar *,struct hostent *,char *,int) ;
+extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
 extern int	issamehostname(const char *,const char *,const char *) ;
 extern int	isNotPresent(int) ;
 
@@ -194,7 +194,7 @@ static int comsat(int argc,cchar **argv,int port)
 		int	ai ;
 		for (ai = 1 ; argv[ai] != NULL ; ai += 1) {
 	    	    cchar	*hn = argv[ai] ;
-	            if ((rs = getourhe(hn,NULL,hep,hebuf,helen)) >= 0) {
+	            if ((rs = getheour(hn,NULL,hep,hebuf,helen)) >= 0) {
 	        	if (hep->h_addrtype == af) {
 		    	    const void	*ha = (const void *) hep->h_addr ;
 		    	    const int	ps = port ;
@@ -234,7 +234,7 @@ static int comsat(int argc,cchar **argv,int port)
 	                    } /* end if (sockaddress) */
 
 	                } /* end if (got an host address) */
-		    } /* end if (getourhe) */
+		    } /* end if (getheour) */
 	        } /* end for (looping through mail-hosts) */
 	        uc_free(hebuf) ;
 	    } /* end if (memory-allocation) */

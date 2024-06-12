@@ -200,7 +200,7 @@ static int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 
 	    if ((rs >= 0) && (op->len > 0)) {
 	        mlen = (op->len < ulen) ? op->len : ulen ;
-		if constexpr (f_memcpy) {
+		if_constexpr (f_memcpy) {
 	            memcpy(dbp,op->bp,mlen) ;
 	            op->bp += mlen ;
 	            dbp += mlen ;
@@ -208,7 +208,7 @@ static int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	            for (int i = 0 ; i < mlen ; i += 1) {
 	                *dbp++ = *(op->bp)++ ;
 	 	    }
-		} /* end if-constexpr (f_memcpy) */
+		} /* end if_constexpr (f_memcpy) */
 	        op->offset += mlen ;
 	        op->len -= mlen ;
 	        tlen += mlen ;

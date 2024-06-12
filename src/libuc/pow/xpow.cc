@@ -102,7 +102,7 @@ int ipow(int b,int n) noex {
 		r = 0 ;
 	    }
 	} else {
-	    if constexpr (f_dynamic) {
+	    if_constexpr (f_dynamic) {
 	        if (n == 1) {
 	            r = b ;
 	        } else if (n == 2) { /* common case */
@@ -119,7 +119,7 @@ int ipow(int b,int n) noex {
 	        for (int i = 0 ; i < n ; i += 1) {
 	            r *= b ;
 	        } /* end for */
-	    } /* end if-constexpr (f_dynamic) */
+	    } /* end if_constexpr (f_dynamic) */
 	} /* end if (base-specialization) */
 	return r ;
 }

@@ -1,20 +1,17 @@
-/* main */
+/* main SUPPORT */
+/* lang=C++20 */
 
 /* generic (pretty much) front-end program subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_PILOGFNAME	0		/* ? */
 
-
 /* revision history:
 
 	= 1994-09-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -24,22 +21,17 @@
 
 	This subroutine forms the front-end part of a generic PCS
 	type of program.  This front-end is used in a variety of
-	PCS programs.
-
-	This subroutine was originally part of the Personal
-	Communications Services (PCS) package but can also be used
-	independently from it.  Historically, this was developed as
-	part of an effort to maintain high function (and reliable)
-	email communications in the face of increasingly draconian
-	security restrictions imposed on the computers in the DEFINITY
-	development organization.
-
+	PCS programs.  This subroutine was originally part of the
+	Personal Communications Services (PCS) package but can also
+	be used independently from it.  Historically, this was
+	developed as part of an effort to maintain high function
+	(and reliable) email communications in the face of increasingly
+	draconian security restrictions imposed on the computers
+	in the DEFINITY development organization.
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -56,8 +48,9 @@
 #include	<ctype.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<mallocstuff.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -72,7 +65,6 @@
 #include	<getax.h>
 #include	<getusername.h>
 #include	<exitcodes.h>
-#include	<mallocstuff.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -2142,46 +2134,38 @@ VECSTR		*elp ;
 }
 /* end subroutine (procfile) */
 
-
-/* get local names for this host (not as simple as one would think !) */
-static int getlocalnames(pip)
-PROGINFO	*pip ;
-{
-	HOSTENT		he ;
-	const int	helen = getbufsize(getbufsize_he) ;
+static int getlocalnames(PROGINFO *pip) noex {
 	int		rs ;
+	int		rs1 ;
 	int		n ;
 	char		hostnamebuf[MAXHOSTNAMELEN + 1], *hnp ;
 	char		*hebuf ;
 	char		*np ;
-
 	bufprintf(hostnamebuf,MAXHOSTNAMELEN,"%s.%s",
 	    pip->nodename,pip->domainname) ;
 
-	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	    int	i ;
-	for (i = 0 ; i < 2 ; i += 1) {
-
-	    hnp = (i == 0) ? pip->nodename : hostnamebuf ;
-	    if ((rs = gethename(hnp,&he,hebuf,helen)) >= 0) {
-	        HOSTENT_CUR	cur ;
-	        if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
-
-	        while (hostent_enumname(&he,&cur,&np) >= 0) {
-		    const int	rsn = SR_NOTFOUND ;
-
-	            if (vecstr_find(&pip->localnames,np) == rsn) {
-	                vecstr_add(&pip->localnames,np,-1) ;
-		    }
-
-	        } /* end while */
-
-	        hostent_curend(&he,&cur) ;
-		} /* end if (hostent-cur) */
-	    } /* end if (gethename) */
-
-	} /* end for */
-	    uc_free(hebuf) ;
+	if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    ucentho	he ;
+	    vecstr	*lnp = &pip->localnames ;
+	    cint	helen = rs ;
+	    for (int i = 0 ; i < 2 ; i += 1) {
+	        hnp = (i == 0) ? pip->nodename : hostnamebuf ;
+	        if ((rs = gethename(&he,hebuf,helen,hnp)) >= 0) {
+	            HOSTENT_CUR	cur ;
+	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
+		        cchar	*hp ;
+	                while ((rs = hostent_enumname(&he,&cur,&hp) > 0) {
+		            cint	rsn = SR_NOTFOUND ;
+	                    if ((rs = vecstr_find(lnp,hp)) == rsn) {
+	                        vecstr_add(lnp,hp,-1) ;
+		            }
+	                } /* end while */
+	                hostent_curend(&he,&cur) ;
+		    } /* end if (hostent-cur) */
+	        } /* end if (gethename) */
+	    } /* end for */
+	    rs1 = uc_free(hebuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
 
 	if (rs >= 0) {

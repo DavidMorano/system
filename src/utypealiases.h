@@ -253,6 +253,15 @@
 #define	SEMUN		union semun		/* for UNIX® SysV-IPC SEM */
 #endif
 
+/* Internet */
+
+#ifndef	INADDR
+#define	INADDR		struct in_addr
+#endif
+
+#ifndef	INADDR4
+#define	INADDR4		struct in_addr
+#endif
 
 /* UTMPX */
 

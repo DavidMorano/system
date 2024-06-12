@@ -37,14 +37,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= cfxxxx.hh cfsysx.hh
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO=
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -54,7 +57,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_CFX= cfchars.o 
+OBJ0_CFX= cfchars.o cfhexs.o
 OBJ1_CFX= cfbin.o 
 OBJ2_CFX= cfoct.o
 OBJ3_CFX= cfdec.o cfdecf.o cfdecmf.o cfdect.o
@@ -148,19 +151,21 @@ objb_cfx.o:	$(OBJB_CFX)
 
 
 cfchars.o:			cfchars.cc cfchars.h cfcharsx.hh $(INCS)
-cfbin.o:			cfbin.cc cfbin.h $(INCS)
-cfoct.o:			cfoct.cc cfoct.h $(INCS)
-cfdec.o:			cfdec.cc cfdec.h $(INCS)
-cfdecf.o:			cfdecf.cc cfdecf.h $(INCS)
-cfdecmf.o:			cfdecmf.cc cfdecmf.h $(INCS)
-cfdect.o:			cfdect.cc cfdect.h $(INCS)
-cfhex.o:			cfhex.cc cfhex.h $(INCS)
-cfxxx.o:			cfxxx.cc cfxxx.h $(INCS)
+cfbin.o:			cfbin.cc cfbin.h	$(INCS)
+cfoct.o:			cfoct.cc cfoct.h	$(INCS)
+cfdec.o:			cfdec.cc cfdec.h	$(INCS)
+cfdecf.o:			cfdecf.cc cfdecf.h	$(INCS)
+cfdecmf.o:			cfdecmf.cc cfdecmf.h	$(INCS)
+cfdect.o:			cfdect.cc cfdect.h	$(INCS)
+cfhex.o:			cfhex.cc cfhex.h	$(INCS)
+cfxxx.o:			cfxxx.cc cfxxx.h	$(INCS)
 cfa26.o:			cfa26.cc cfa26.h cfalphax.hh $(INCS)
-cfnum.o:			cfnum.cc cfnum.h $(INCS)
+cfnum.o:			cfnum.cc cfnum.h	$(INCS)
 
 # algorithms
-cfxxxx.o:			cfxxxx.cc cfxxxx.hh $(INCS)
-cfsysx.o:			cfsysx.cc cfsysx.hh $(INCS)
+cfxxxx.o:			cfxxxx.cc cfxxxx.hh	$(INCS)
+cfsysx.o:			cfsysx.cc cfsysx.hh	$(INCS)
+
+cfhexs.o:			cfhex.cc cfhexs.h	$(INCS)
 
 

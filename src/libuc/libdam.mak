@@ -1013,18 +1013,6 @@ bcspec.o:		bcspec.c bcspec.h
 
 getax.o:		getax.c getax.h
 
-getpe.o:		getpe.c getpe.h
-
-gethe.o:		gethe.c gethe.h
-
-getse.o:		getse.c getse.h
-
-getne.o:		getne.c getne.h
-
-getus.o:		getus.c getus.h
-
-getua.o:		getua.c getua.h
-
 
 getdefzinfo.o:		getdefzinfo.c getdefzinfo.h
 
@@ -1126,6 +1114,10 @@ holidayer.o:		holidayer.cc holidayer.h
 # UTILITY
 getostype.o:		getostype.cc getostype.h
 
+# Internet (old)
+gethename.o:		gethename.cc gethename.h gethe.h
+getheaddr.o:		getheaddr.cc getheaddr.h gethe.h
+getheour.o:		getheour.cc  getheour.h  gethe.h
 
 
 unlinkd.o:		$(*)/$(@)

@@ -211,7 +211,7 @@ int ucgetsv::operator () (ucentsv *svp,char *svbuf,int svlen) noex {
 int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getsvxxxr) {
+	if_constexpr (f_getsvxxxr) {
 	    cint	ec = getsvent_rp(svp,svbuf,svlen) ;
 	    if (ec == 0) {
 	        rs = svp->size() ;
@@ -231,8 +231,8 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
-	if constexpr (f_sunos) {
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -243,7 +243,7 @@ int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
 	int		rs = SR_FAULT ;
 	if (name && proto) {
 	    errno = 0 ;
-	    if constexpr (f_getsvxxxr) {
+	    if_constexpr (f_getsvxxxr) {
 	        cint	ec = getsvnam_rp(svp,svbuf,svlen,name,proto) ;
 	        if (ec == 0) {
 	            rs = svp->size() ;
@@ -263,8 +263,8 @@ int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -278,7 +278,7 @@ int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
 	    rs = SR_INVALID ;
 	    if ((num >= 0) && proto[0]) {
 	        errno = 0 ;
-	        if constexpr (f_getsvxxxr) {
+	        if_constexpr (f_getsvxxxr) {
 	            cint	ec = getsvpor_rp(svp,svbuf,svlen,num,proto) ;
 	            if (ec == 0) {
 	                rs = svp->size() ;
@@ -298,8 +298,8 @@ int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
 	            } else {
 	                rs = (- errno) ;
 	            }
-	        } /* end if-constexpr (selection) */
-	        if constexpr (f_sunos) {
+	        } /* end if_constexpr (selection) */
+	        if_constexpr (f_sunos) {
 		    if (rs == SR_BADF) rs = SR_NOENT ;
 	        }
 	    } /* end if (valid) */

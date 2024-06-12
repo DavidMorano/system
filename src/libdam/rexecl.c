@@ -78,7 +78,7 @@ extern int	snsds(char *,int,const char *,const char *) ;
 extern int	snddd(char *,int,uint,uint) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getserial(const char *) ;
-extern int	getourhe(const char *,char *,struct hostent *,char *,int) ;
+extern int	getheour(const char *,char *,struct hostent *,char *,int) ;
 
 
 /* external variables */
@@ -299,7 +299,7 @@ int		*fd2p ;
 	if (addr == INETADDRBAD) {
 
 	    hep = &he ;
-	    if (getourhe(*ahost,NULL,hep,buf,BUFLEN) < 0) {
+	    if (getheour(*ahost,NULL,hep,buf,BUFLEN) < 0) {
 	        srs = SR_HOSTUNREACH ;
 	        goto badret ;
 	    }

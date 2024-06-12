@@ -1,13 +1,12 @@
-/* main (pingstat) */
+/* main SUPPORT (pingstat) */
+/* lang=C++20 */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,38 +19,39 @@
 
 /*******************************************************************************
 
-	This subroutine forms the front-end part of a generic PCS type of
-	program.  This front-end is used in a variety of PCS programs.
+	This subroutine forms the front-end part of a generic PCS
+	type of program.  This front-end is used in a variety of
+	PCS programs.
 
-	This subroutine was originally part of the Personal Communications
-	Services (PCS) package but can also be used independently from it.
-	Historically, this was developed as part of an effort to maintain high
-	function (and reliable) email communications in the face of
-	increasingly draconian security restrictions imposed on the computers
-	in the DEFINITY development organization.
-
+	This subroutine was originally part of the Personal
+	Communications Services (PCS) package but can also be used
+	independently from it.  Historically, this was developed
+	as part of an effort to maintain high function (and reliable)
+	email communications in the face of increasingly draconian
+	security restrictions imposed on the computers in the
+	DEFINITY development organization.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<ucmallreg.h>
+#include	<mallocxx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -64,7 +64,7 @@
 #include	<dater.h>
 #include	<sockaddress.h>
 #include	<lfm.h>
-#include	<ucmallreg.h>
+#include	<gethe.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -111,7 +111,6 @@ extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	bopenroot(bfile *,char *,char *,char *,char *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	chownsame(cchar *,cchar *) ;
-extern int	gethename(const char *,struct hostent *,char *,int) ;
 extern int	listenudp(int,const char *,const char *,int) ;
 extern int	opendefstds(int) ;
 extern int	openport(int,int,int,SOCKADDRESS *) ;
@@ -1706,12 +1705,8 @@ static int proclocnames_end(PROGINFO *pip)
 }
 /* end subroutine (proclocnames_end) */
 
-
-static int proclocnames_load(PROGINFO *pip)
-{
-	HOSTENT		he ;
-	const int	helen = getbufsize(getbufsize_he) ;
-	const int	hlen = MAXPATHLEN ;
+static int proclocnames_load(PROGINFO *pip) noex {
+	cint		hlen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -1720,40 +1715,33 @@ static int proclocnames_load(PROGINFO *pip)
 
 	snsds(hbuf,hlen,pip->nodename,pip->domainname) ;
 
-	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
+	if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    ucentho	he ;
 	    vecstr	*lnp = &pip->localnames ;
-	    int		i ;
+	    cint	helen = rs ;
 	    cchar	*np ;
 	    cchar	*hnp ;
-
-	    for (i = 0 ; i < 2 ; i += 1) {
-
+	    for (int i = 0 ; i < 2 ; i += 1) {
 	        hnp = (i == 0) ? pip->nodename : hbuf ;
-	        if ((rs1 = gethename(hnp,&he,hebuf,helen)) >= 0) {
-	            HOSTENT_CUR	cur ;
-
+	        if ((rs1 = gethename(&he,hebuf,helen,hnp)) >= 0) {
+	            hostent_cur		cur ;
 	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
-	                const int	rsn = SR_NOTFOUND ;
-	                while ((rs1 = hostent_enumname(&he,&cur,&np)) >= 0) {
+	                cint	rsn = SR_NOTFOUND ;
+	                while ((rs = hostent_enumname(&he,&cur,&np)) > 0) {
 	                    if ((rs = vecstr_find(lnp,np)) == rsn) {
 	                        rs = vecstr_add(lnp,np,-1) ;
 	                    }
 	                    if (rs < 0) break ;
 	                } /* end while */
-	                if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	                rs1 = hostent_curend(&he,&cur) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (hostend-cur) */
-
 	        } /* end if (gethename) */
-
 	        if (rs < 0) break ;
 	    } /* end for */
-
 	    if (rs >= 0) {
 	        n = vecstr_count(lnp) ;
 	    }
-
 	    rs1 = uc_free(hebuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */

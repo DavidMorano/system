@@ -81,6 +81,8 @@
 #include	<ucrand.h>
 #include	<ucgetrandom.h>
 #include	<ucsysauxinfo.h>
+#include	<uctimer.h>
+#include	<ucinetconv.h>
 
 #include	<getexecname.h>
 
@@ -106,15 +108,6 @@ extern int	uc_ftime(TIMEB *) noex ;
 extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
 extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
 extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
-
-#if	SYSHAS_TIMER && (SYSHAS_TIMER > 0)
-extern int uc_timercreate(clockid_t,struct sigevent *,timer_t *) noex ;
-extern int uc_timerdestroy(timer_t) noex ;
-extern int uc_timerdelete(timer_t) noex ;
-extern int uc_timerset(timer_t,int,ITIMERSPEC *,ITIMERSPEC *) noex ;
-extern int uc_timerget(timer_t,ITIMERSPEC *) noex ;
-extern int uc_timerover(timer_t) noex ;
-#endif /* SYSHAS_TIMER */
 
 extern int	uc_fork() noex ;
 extern int	uc_forklockbegin(int) noex ;
@@ -315,9 +308,6 @@ extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
 /* miscellaneous */
-extern int	uc_inetnetpton(void *,int,int,cchar *) noex ;
-extern int	uc_inetpton(void *,int,cchar *) noex ;
-extern int	uc_inetntop(char *,int,int,cvoid *) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
 extern int	uc_getnetname(char *) noex ;
 

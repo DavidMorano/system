@@ -370,13 +370,13 @@ static int boottime() noex {
 
 static int findsid(int pm) noex {
 	cint		sid = getsid(0) ;	/* get our SID */
-	UTMPX		*up ;
 	int		rs = SR_NOTFOUND ;
+	UTMPX		*up ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	   if ((up->ut_pid == sid) && isourtype(up)) {
 	        rs = printutxval(pm,up) ;
-		break ;
+	        if (rs < 0) break ;
 	   }
 	} /* end while */
 	return rs ;
@@ -472,7 +472,8 @@ static int findstat(int pm) noex {
 			    rs = SR_OK ;
 			}
 		    } /* end if (snadd) */
-	       } /* end if (our-type) */
+	        } /* end if (our-type) */
+		if (rs < 0) break ;
 	    } /* end while */
 	} /* end if (sncpy) */
 	if ((rs >= 0) && (!f)) rs = SR_NOTFOUND ;

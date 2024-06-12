@@ -110,7 +110,7 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 	*rp = '\0' ;
 	if (v != 0) {
 	    constexpr uint	ub = uint(base) ;
-	    if constexpr (sizeof(UT) > sizeof(ulong)) {
+	    if_constexpr (sizeof(UT) > sizeof(ulong)) {
 	        const UT	vmask(~ULONG_MAX) ;
 	        UT		nv ;
 	        while ((v & vmask) != 0UL) {

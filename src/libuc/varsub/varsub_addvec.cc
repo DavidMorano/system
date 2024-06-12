@@ -23,7 +23,7 @@
 	similar), then the variable name would end up in the exported
 	environment variables list as just a variable key with no
 	value!  I fixed this by not putting anything into the exported
-	environment if it does not  have a value (at least a value
+	environment if it does not have a value (at least a value
 	of zero length).  I *think* that a nullptr value and and a
 	zero-length value distinquish the case of the variable
 	having an empty value string from one where it did not have
@@ -49,7 +49,6 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>
@@ -69,6 +68,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

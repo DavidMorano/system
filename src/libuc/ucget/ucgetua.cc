@@ -11,7 +11,7 @@
 	This module was originally written.
 
 	= 2017-05-17, David A-D- Morano
-	I did some update to use C++11 ('if constexpr').
+	I did some update to use C++11 ('if_constexpr').
 
 */
 

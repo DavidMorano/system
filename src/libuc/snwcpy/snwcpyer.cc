@@ -86,6 +86,18 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {

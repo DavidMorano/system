@@ -104,7 +104,7 @@ endianhelp::endianhelp() noex {
 	} else {
 	    endianval = 2 ;
 	    endianstr = "2" ;
-	} /* end if-constexpr (endian) */
+	} /* end if_constexpr (endian) */
 }
 /* end ctor (endianhelp::endianhelp) */
 

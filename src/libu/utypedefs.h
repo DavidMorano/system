@@ -408,7 +408,10 @@ typedef in_addr_t		in4_addr_t ;
 /* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if	defined(OSNUM) && (OSNUM <= 7)
+#ifndef	TYPEDEF_ID
+#define	TYPEDEF_ID
 typedef int			id_t ;
+#endif /* TYPEDEF_ID */
 #endif
 #endif
 
@@ -435,12 +438,12 @@ EXTERNC_end
 
 #ifndef	TYPEDEF_FPERM
 #define	TYPEDEF_FPERM
-typedef mode_t		fsperm ;
+typedef mode_t			fsperm ;
 #endif /* TYPEDEF_FPERM */
 
 #ifndef	TYPEDEF_CFPERM
 #define	TYPEDEF_CFPERM
-typedef const mode_t	cfsperm ;
+typedef const mode_t		cfsperm ;
 #endif /* TYPEDEF_CFPERM */
 
 #ifndef	TYPEDEF_USTIME
@@ -455,17 +458,17 @@ typedef const time_t		custime ;
 
 #ifndef	TYPEDEF_ERRNO
 #define	TYPEDEF_ERRNO
-typedef int		errno_t ;
+typedef int			errno_t ;
 #endif /* TYPEDEF_ERRNO */
 
 #ifndef	TYPEDEF_UNIXRET
 #define	TYPEDEF_UNIXRET
-typedef int		unixret_t ;
+typedef int			unixret_t ;
 #endif /* TYPEDEF_UNIXRET */
 
 #ifndef	TYPEDEF_SYSRET
 #define	TYPEDEF_SYSRET
-typedef int		sysret_t ;
+typedef int			sysret_t ;
 #endif /* TYPEDEF_SYSRET */
 
 

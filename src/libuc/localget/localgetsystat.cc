@@ -122,13 +122,13 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	            }
 	        } /* end if (needed) */
 /* program cache */
-	        if constexpr (f_ucprogdata) {
+	        if_constexpr (f_ucprogdata) {
 	            if ((rs >= 0) && (len == 0)) {
 	                if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
 	                    len = rs ;
 	                }
 	            }
-	        } /* end if-constexpr (f_ucprogdata) */
+	        } /* end if_constexpr (f_ucprogdata) */
 /* software facility (LOCAL) configuration */
 	        if ((rs >= 0) && (len == 0)) {
 	            cchar	*vardname = VARDNAME ;
@@ -137,7 +137,7 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	                if ((rs = mkpath3(tfname,pr,vardname,ssn)) >= 0) {
 	                    if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
 	                        len = rs ;
-		                if constexpr (f_ucprogdata) {
+		                if_constexpr (f_ucprogdata) {
 	                            rs = ucprogdata_set(di,rbuf,len,ttl) ;
 		                }
 		            } else if (isNotPresent(rs)) {

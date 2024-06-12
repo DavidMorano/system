@@ -121,7 +121,7 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 		}
 		if (! f) {
 	    	    int		i = (cl - 2) ;
-		    if constexpr (f_allows) {
+		    if_constexpr (f_allows) {
 			cchar	*cs = (cp+i) ;
 	                for (int j = 0 ; allows[j] ; j += 1) {
 			    f = (allows[j][0] == cs[0]) ;
@@ -138,7 +138,7 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 	                    f = f && (strncmp(allows[j],cs,2) == 0) ;
 			    if (f) break ;
 	                } /* end for */
-		    } /* end if-constexpr (f_allows) */
+		    } /* end if_constexpr (f_allows) */
 		} /* end if */
 	    } /* end if (more than one character) */
 	    if ((! f) && (cp[cl - 1] == CH_SQUOTE)) {

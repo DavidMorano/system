@@ -11,7 +11,7 @@
 	This module was originally written.
 
 	= 2017-05-17, David A-D- Morano
-	I did some update to use C++11 ('if constexpr').
+	I did some update to use C++11 ('if_constexpr').
 
 */
 
@@ -224,7 +224,7 @@ int ucgetpw::operator () (ucentpw *pwp,char *pwbuf,int pwlen) noex {
 int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getpwentr) {
+	if_constexpr (f_getpwentr) {
 	    cint	ec = getpwent_rp(pwp,pwbuf,pwlen) ;
 	    if (ec == 0) {
 	        rs = pwp->size() ;
@@ -244,8 +244,8 @@ int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
-	if constexpr (f_sunos) {
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -256,7 +256,7 @@ int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getpwnamr) {
+	    if_constexpr (f_getpwnamr) {
 	        cint	ec = getpwnam_rp(pwp,pwbuf,pwlen,name) ;
 	        if (ec == 0) {
 	            rs = pwp->size() ;
@@ -276,8 +276,8 @@ int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -290,7 +290,7 @@ int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	if (bit(uid,31)) uid = getuid() ;
 	if (uid != uidend) {
 	    errno = 0 ;
-	    if constexpr (f_getpwuidr) {
+	    if_constexpr (f_getpwuidr) {
 	        cint	ec = getpwuid_rp(pwp,pwbuf,pwlen,uid) ;
 	        if (ec == 0) {
 	            rs = pwp->size() ;
@@ -310,8 +310,8 @@ int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (valid UID) */

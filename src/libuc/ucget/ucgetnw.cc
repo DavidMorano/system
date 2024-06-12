@@ -233,7 +233,7 @@ int ucgetnw::operator () (ucentnw *nwp,char *nwbuf,int nwlen) noex {
 int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getnwxxxr) {
+	if_constexpr (f_getnwxxxr) {
 	    cint	ec = getnwent_rp(nwp,nwbuf,nwlen) ;
 	    if (ec == 0) {
 	        rs = nwp->size() ;
@@ -253,8 +253,8 @@ int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
-	if constexpr (f_sunos) {
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -265,7 +265,7 @@ int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getnwxxxr) {
+	    if_constexpr (f_getnwxxxr) {
 	        cint	ec = getnwnam_rp(nwp,nwbuf,nwlen,name) ;
 	        if (ec == 0) {
 	            rs = nwp->size() ;
@@ -285,8 +285,8 @@ int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -298,7 +298,7 @@ int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	int		rs = SR_INVALID ;
 	if (type >= 0) {
 	    errno = 0 ;
-	    if constexpr (f_getnwxxxr) {
+	    if_constexpr (f_getnwxxxr) {
 	        cint	ec = getnwnum_rp(nwp,nwbuf,nwlen,type,num) ;
 	        if (ec == 0) {
 	            rs = nwp->size() ;
@@ -318,8 +318,8 @@ int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (valid num) */

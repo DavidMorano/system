@@ -790,24 +790,15 @@ char	*envv[] ;
 	        f_repeat = ((rs1 >= 0) && (mid.count > 0)) ;
 
 	        if (fromlen > 0) {
-
-	            struct mcmsg_ack	m2 ;
-
+	            struct mcmsg_ack	m2{} ;
 	            in_addr_t	addr1, addr2 ;
-
 	            int		af ;
-
 	            char	replybuf[MSGBUFLEN + 1] ;
 
-
 /* can we get the peername of the other end of this socket, if a socket? */
-
 	            connection_start(&conn,pip->domainname) ;
 
 /* send a reply */
-
-	            memset(&m2,0,sizeof(struct mcmsg_ack)) ;
-
 	            m2.tag = m1.tag ;
 	            m2.seq = m1.seq + 1 ;
 	            m2.rc = mcmsgrc_ok ;

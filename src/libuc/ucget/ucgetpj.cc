@@ -11,7 +11,7 @@
 	This module was originally written.
 
 	= 2017-05-17, David A-D- Morano
-	I did some update to use C++11 ('if constexpr').
+	I did some update to use C++11 ('if_constexpr').
 
 */
 
@@ -238,7 +238,7 @@ int ucgetpj::operator () (ucentpj *pjp,char *pjbuf,int pjlen) noex {
 int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getpjentr) {
+	if_constexpr (f_getpjentr) {
 	    cint	ec = getpjent_rp(pjp,pjbuf,pjlen) ;
 	    if (ec == 0) {
 	        rs = pjp->size() ;
@@ -258,7 +258,7 @@ int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
+	} /* end if_constexpr (selection) */
 	return rs ;
 }
 /* end subroutine (ucgetpj::getpj_ent) */
@@ -267,7 +267,7 @@ int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getpjnamr) {
+	    if_constexpr (f_getpjnamr) {
 	        cint	ec = getpjnam_rp(pjp,pjbuf,pjlen,name) ;
 	        if (ec == 0) {
 	            rs = pjp->size() ;
@@ -287,8 +287,8 @@ int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */
@@ -301,7 +301,7 @@ int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
 	if (bit(pjid,31)) pjid = getprojid() ;
 	if (pjid != projid_t(-1)) {
 	    errno = 0 ;
-	    if constexpr (f_getpjpidr) {
+	    if_constexpr (f_getpjpidr) {
 	        cint	ec = getpjpid_rp(pjp,pjbuf,pjlen,pjid) ;
 	        if (ec == 0) {
 	            rs = pjp->size() ;
@@ -321,8 +321,8 @@ int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (valid PID) */
@@ -334,7 +334,7 @@ int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getpjdefr) {
+	    if_constexpr (f_getpjdefr) {
 	        cint	ec = getpjdef_rp(pjp,pjbuf,pjlen,name) ;
 	        if (ec == 0) {
 	            rs = pjp->size() ;
@@ -354,8 +354,8 @@ int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */

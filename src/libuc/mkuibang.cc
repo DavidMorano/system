@@ -91,25 +91,25 @@ int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
 	        cchar	*np = nullptr ;
-	        if constexpr (f_fullname) {
+	        if_constexpr (f_fullname) {
 	            if (np == NULL) {
 	                if (uip->fullname && (uip->fullname[0] != '\0')) {
 	                    np = uip->fullname ;
 	                }
 	            }
-	        } /* end if-constexpr (f_fullname) */
+	        } /* end if_constexpr (f_fullname) */
 	        if (np == NULL) {
 	            if (uip->name && (uip->name[0] != '\0')) {
 	                np = uip->name ;
 	            }
 	        }
-	        if constexpr (f_mailname) {
+	        if_constexpr (f_mailname) {
 	            if (np == NULL) {
 	                if (uip->mailname && (uip->mailname[0] != '\0')) {
 	                    np = uip->mailname ;
 	                }
 	            }
-	        } /* end if-constexpr (f_mailname) */
+	        } /* end if_constexpr (f_mailname) */
 	        if (np == NULL) {
 	            if (uip->fullname && (uip->fullname[0] != '\0')) {
 	                np = uip->fullname ;

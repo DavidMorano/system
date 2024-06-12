@@ -100,7 +100,7 @@ extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_loadfile(vecstr *,int,const char *) ;
 extern int	getserial(const char *) ;
-extern int	getourhe(cchar *,cchar *,struct hostent *,char *,int) ;
+extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
 extern int	mkgecosname(char *,int,const char *) ;
 extern int	mkrealame(char *,int,const char *,int) ;
 extern int	mkuibang(char *,int,USERINFO *) ;
@@ -295,11 +295,11 @@ int		defport ;
 #endif
 
 	        hep = &he ;
-	        rs = getourhe(np,NULL,hep,hebuf,helen) ;
+	        rs = getheour(np,NULL,hep,hebuf,helen) ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("progcomsat/specs: getourhe() rs=%d\n",rs) ;
+	            debugprintf("progcomsat/specs: getheour() rs=%d\n",rs) ;
 #endif
 
 	        if ((rs >= 0) && (hep->h_addrtype == af)) {

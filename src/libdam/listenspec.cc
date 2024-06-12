@@ -4,7 +4,6 @@
 /* hold (or manage) a "listen" specification */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_SAFE		0		/* extra safe? */
 #define	CF_OPENPORT	1		/* use 'openport(3dam)' */
 #define	CF_NONBLOCK	0		/* set non-blocking on sockets */
@@ -44,6 +43,11 @@
 #include	<matxstr.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
+
+#include	<listentcp.h>
+#include	<listenudp.h>
+#include	<listenusd.h>
+#include	<listenuss.h>
 
 #include	"listenspec.h"
 
@@ -122,7 +126,7 @@ struct tcpaddr {
 
 static int	listenspec_parse(listenspec *,int,cchar **) noex ;
 
-static int	listenspec_tcpbegin(listenspec *,int,cchar **) noex ;
+static int	listenspec_tcpbegin(listenspec *,int,mainv) noex ;
 static int	listenspec_tcpaddrload(listenspec *,TCPADDR *,int) noex ;
 static int	listenspec_tcpend(listenspec *) noex ;
 static int	listenspec_tcpsame(listenspec *,LISTENSPEC *) noex ;
@@ -130,21 +134,21 @@ static int	listenspec_tcpactive(listenspec *,int,int) noex ;
 static int	listenspec_tcpaccept(listenspec *,void *,int *,int) noex ;
 static int	listenspec_tcpinfo(listenspec *,LISTENSPEC_INFO *) noex ;
 
-static int	listenspec_ussbegin(listenspec *,int,cchar **) noex ;
+static int	listenspec_ussbegin(listenspec *,int,mainv) noex ;
 static int	listenspec_ussend(listenspec *) noex ;
 static int	listenspec_usssame(listenspec *,LISTENSPEC *) noex ;
 static int	listenspec_ussactive(listenspec *,int,int) noex ;
 static int	listenspec_ussaccept(listenspec *,void *,int *,int) noex ;
 static int	listenspec_ussinfo(listenspec *,LISTENSPEC_INFO *) noex ;
 
-static int	listenspec_passbegin(listenspec *,int,cchar **) noex ;
+static int	listenspec_passbegin(listenspec *,int,mainv) noex ;
 static int	listenspec_passend(listenspec *) noex ;
 static int	listenspec_passsame(listenspec *,LISTENSPEC *) noex ;
 static int	listenspec_passactive(listenspec *,int,int) noex ;
 static int	listenspec_passaccept(listenspec *,void *,int *,int) noex ;
 static int	listenspec_passinfo(listenspec *,LISTENSPEC_INFO *) noex ;
 
-static int	listenspec_connbegin(listenspec *,int,cchar **) noex ;
+static int	listenspec_connbegin(listenspec *,int,mainv) noex ;
 static int	listenspec_connend(listenspec *) noex ;
 static int	listenspec_connsame(listenspec *,LISTENSPEC *) noex ;
 static int	listenspec_connactive(listenspec *,int,int) noex ;
@@ -159,7 +163,7 @@ static int	listenspec_openporter(listenspec *,cchar *,int,
 			cchar *,int,int) noex ;
 static int	listenspec_openportaddr(listenspec *,cchar *,
 			ADDRINFO *,char *,int,cchar *) noex ;
-static int	listenspec_openportaddrone(listenspec *,char *,int,cc *) noex ;
+static int	listenspec_openportao(listenspec *,char *,int,cc *) noex ;
 #endif /* CF_OPENPORT */
 
 static int	listenspec_prlocal(listenspec *) noex ;
@@ -216,7 +220,7 @@ constexpr cpcchar	lopts[] = {
 
 /* exported subroutines */
 
-int listenspec_start(listenspec *op,int ac,cchar **av) noex {
+int listenspec_start(listenspec *op,int ac,mainv av) noex {
 	int		rs ;
 	int		n = 0 ;
 
@@ -225,23 +229,11 @@ int listenspec_start(listenspec *op,int ac,cchar **av) noex {
 
 	if (ac <= 0) return SR_INVALID ;
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; i < ac ; i += 1)
-	        debugprintf("listenspec_start: av[%u]=>%s<\n",i,av[i]) ;
-	}
-#endif /* CF_DEBUGS */
-
 	memclear(op) ;
 	if ((rs = listenspec_parse(op,ac,av)) >= 0) {
 	    n = rs ;
 	    op->magic = LISTENSPEC_MAGIC ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_start: ret rs=%d n=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -250,10 +242,6 @@ int listenspec_start(listenspec *op,int ac,cchar **av) noex {
 int listenspec_finish(listenspec *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_finish: ent\n") ;
-#endif
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
@@ -295,10 +283,6 @@ int listenspec_finish(listenspec *op) noex {
 
 	op->ltype = 0 ;
 	op->magic = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_finish: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -355,12 +339,6 @@ int listenspec_active(listenspec *op,int opts,int f) noex {
 	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_active: ent f=%u\n",f) ;
-	debugprintf("listenspec_active: previous f_act=%u\n",op->f.active) ;
-	debugprintf("listenspec_active: ltype=%d\n",op->ltype) ;
-#endif
-
 	f_previous = op->f.active ;
 	switch (op->ltype) {
 	case ltype_tcp:
@@ -382,10 +360,6 @@ int listenspec_active(listenspec *op,int opts,int f) noex {
 
 /* if we just activated (rs > 0), then set Close-On-Exec */
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_active: mid2 rs=%d fd=%d\n",rs,op->fd) ;
-#endif
-
 	if ((rs > 0) && (op->fd >= 0) && op->f.active) {
 	    rs = uc_closeonexec(op->fd,TRUE) ;
 #if	CF_NONBLOCK
@@ -396,11 +370,6 @@ int listenspec_active(listenspec *op,int opts,int f) noex {
 	        listenspec_active(op,opts,false) ;
 	    }
 	} /* end if (just activated) */
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_active: ret rs=%d f_prev=%u fd=%d\n",
-	    rs,f_previous,op->fd) ;
-#endif
 
 	return (rs >= 0) ? f_previous : rs ;
 }
@@ -501,10 +470,6 @@ int listenspec_accept(listenspec *op,void *fromp,int *fromlenp,int to) noex {
 	    rs = SR_BADFD ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_accept: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (listenspec_accept) */
@@ -521,11 +486,6 @@ int listenspec_getinfo(listenspec *op,LISTENSPEC_INFO *lip) noex {
 
 	lip->type[0] = '\0' ;
 	lip->addr[0] = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_info: type=%s (%u)\n",
-	    ltypes[op->ltype],op->ltype) ;
-#endif
 
 	switch (op->ltype) {
 	case ltype_tcp:
@@ -555,10 +515,6 @@ int listenspec_getinfo(listenspec *op,LISTENSPEC_INFO *lip) noex {
 	        lip->state |= LISTENSPEC_MBROKEN ;
 	    strwcpy(lip->type,ltypes[op->ltype],LISTENSPEC_TYPELEN) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_info: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -598,17 +554,9 @@ static int listenspec_parse(listenspec *op,int ac,cchar **av) noex {
 	int		ti ;
 	int		n = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_parse: type=>%s< \n",av[0]) ;
-#endif
-
 	ti = matstr(ltypes,av[0],-1) ;
 	op->ltype = ti ;
 	ac -= 1 ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_parse: type=%s (%d)\n",av[0],ti) ;
-#endif
 
 /* allocate our information structure */
 
@@ -662,15 +610,11 @@ static int listenspec_parse(listenspec *op,int ac,cchar **av) noex {
 	    rs = SR_PROTONOSUPPORT ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_parse: ret rs=%d n=%u\n",rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (listenspec_parse) */
 
-static int listenspec_tcpbegin(listenspec *op,int ac,cchar **av) noex {
+static int listenspec_tcpbegin(listenspec *op,int ac,mainv av) noex {
 	TCPADDR		a ;
 	ARGINFO		ai, *aip = &ai ;
 	int		rs ;
@@ -713,20 +657,12 @@ static int listenspec_tcpbegin(listenspec *op,int ac,cchar **av) noex {
 
 	        if (n > 0) {
 	            rs = listenspec_tcpaddrload(op,&a,sz) ;
-#if	CF_DEBUGS
-	            debugprintf("listenspec_tcpbegin: "
-			"_tcpaddrload() rs=%d\n",rs) ;
-#endif
 	        }
 
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (arginfo) */
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_tcpbegin: ret rs=%d n=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -806,10 +742,6 @@ static int listenspec_tcpactive(listenspec *op,int opts,int f) noex {
 	int		rs = SR_OK ;
 	int		f_a = false ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_tcpactive: ent f=%u\n",f) ;
-#endif
-
 	if (f && (! op->f.active)) {
 	    LISTENSPEC_TCP *ip = (LISTENSPEC_TCP *) op->info ;
 	    int		af ;
@@ -838,31 +770,14 @@ static int listenspec_tcpactive(listenspec *op,int opts,int f) noex {
 
 /* activate */
 
-#if	CF_DEBUGS
-	    {
-		int	f_ra = (opts & LISTENSPEC_MREUSE)?1:0 ;
-	        debugprintf("listenspec_tcpactive: listen rs=%d ra=%u\n",
-		    rs,f_ra) ;
-	        debugprintf("listenspec_tcpactive: portspec=%s\n",
-		    portspec) ;
-	    }
-#endif
-
 	    if (rs >= 0) {
 	        int	lopts = (opts & LISTENSPEC_MREUSE) ? 1 : 0 ;
 	        rs = listentcp(af,hostspec,portspec,lopts) ;
 	        op->fd = rs ;
-#if	CF_DEBUGS
-	        debugprintf("listenspec_tcpactive: listentcp() rs=%d\n",rs) ;
-#endif
 #if	CF_OPENPORT
 	        if (rs == SR_ACCESS) {
 	            rs = listenspec_openport(op,af,hostspec,portspec,opts) ;
 	            op->fd = rs ;
-#if	CF_DEBUGS
-	            debugprintf("listenspec_tcpactive: _openport() rs=%d\n",
-			rs) ;
-#endif
 	        }
 #endif /* CF_OPENPORT */
 	    } /* end if */
@@ -882,11 +797,6 @@ static int listenspec_tcpactive(listenspec *op,int opts,int f) noex {
 	    }
 	    op->f.active = false ;
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_tcpactive: ret rs=%d f_acive=%u\n",
-		rs,op->f.active) ;
-#endif
 
 	return (rs >= 0) ? f_a : rs ;
 }
@@ -909,12 +819,6 @@ static int listenspec_tcpinfo(listenspec *op,LISTENSPEC_INFO *lip) noex {
 	int		bl = LISTENSPEC_ADDRLEN ;
 	int		i = 0 ;
 	char		*bp = lip->addr ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_tcpinfo: af=%s\n",ip->af) ;
-	debugprintf("listenspec_tcpinfo: host=%s\n",ip->host) ;
-	debugprintf("listenspec_tcpinfo: port=%s\n",ip->port) ;
-#endif
 
 	if ((rs >= 0) && (ip->af != nullptr)) {
 	    rs = storebuf_strw(bp,bl,i,ip->af,-1) ;
@@ -943,7 +847,7 @@ static int listenspec_tcpinfo(listenspec *op,LISTENSPEC_INFO *lip) noex {
 }
 /* end subroutine (listenspec_tcpinfo) */
 
-static int listenspec_ussbegin(listenspec *op,int ac,cchar **av) noex {
+static int listenspec_ussbegin(listenspec *op,int ac,mainv av) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	ARGINFO		ai, *aip = &ai ;
 	int		rs ;
@@ -982,13 +886,9 @@ static int listenspec_ussbegin(listenspec *op,int ac,cchar **av) noex {
 
 /* default arguments */
 
-#if	CF_DEBUGS
-	        debugprintf("listenspec_ussbegin: arg mode=%06o\n",
-	            (ip->mode & 0777)) ;
-#endif
-
-	        if (ip->mode < 0)
+	        if (ip->mode < 0) {
 	            ip->mode = 0666 ;
+		}
 
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
@@ -1032,14 +932,7 @@ static int listenspec_ussactive(listenspec *op,int opts,int f) noex {
 	int		rs = SR_OK ;
 	int		f_a = false ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_ussactive: ent lo=%04x f=%u\n",opts,f) ;
-#endif
-
 	if (f && (! op->f.active)) {
-#if	CF_DEBUGS
-	    debugprintf("listenspec_ussactive: fname=%s\n",ip->fname) ;
-#endif
 	    if ((rs = listenuss(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
 	        op->f.active = TRUE ;
@@ -1056,10 +949,6 @@ static int listenspec_ussactive(listenspec *op,int opts,int f) noex {
 	    }
 	    op->f.active = false ;
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_ussactive: ret rs=%d f_a=%u\n",rs,f_a) ;
-#endif
 
 	return (rs >= 0) ? f_a : rs ;
 }
@@ -1093,7 +982,7 @@ static int listenspec_ussinfo(listenspec *op,LISTENSPEC_INFO *lip) noex {
 }
 /* end subroutine (listenspec_ussinfo) */
 
-static int listenspec_passbegin(listenspec *op,int ac,cchar **av) noex {
+static int listenspec_passbegin(listenspec *op,int ac,mainv av) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	ARGINFO		ai, *aip = &ai ;
 	int		rs ;
@@ -1135,13 +1024,9 @@ static int listenspec_passbegin(listenspec *op,int ac,cchar **av) noex {
 
 /* default arguments */
 
-#if	CF_DEBUGS
-	        debugprintf("listenspec_passbegin: arg mode=%06o\n",
-	            (ip->mode & 0777)) ;
-#endif
-
-	        if (ip->mode < 0)
+	        if (ip->mode < 0) {
 	            ip->mode = 0666 ;
+		}
 
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
@@ -1157,19 +1042,11 @@ static int listenspec_passend(listenspec *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_passend: ent\n") ;
-#endif
-
 	if (ip->fname != nullptr) {
 	    rs1 = uc_free(ip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ip->fname = nullptr ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_passend: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1194,10 +1071,6 @@ static int listenspec_passactive(listenspec *op,int opts,int f) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		f_a = false ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_passactive: ent fn=%s\n",ip->fname) ;
-#endif
 
 	if (f && (! op->f.active)) {
 	    if ((rs = listenpass(ip->fname,ip->mode,opts)) >= 0) {
@@ -1257,7 +1130,7 @@ static int listenspec_passinfo(listenspec *op,LISTENSPEC_INFO *lip) noex {
 }
 /* end subroutine (listenspec_passinfo) */
 
-static int listenspec_connbegin(listenspec *op,int ac,cchar **av) noex {
+static int listenspec_connbegin(listenspec *op,int ac,mainv av) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	ARGINFO		ai, *aip = &ai ;
 	int		rs ;
@@ -1297,15 +1170,9 @@ static int listenspec_connbegin(listenspec *op,int ac,cchar **av) noex {
 	        } /* end while (positional arguments) */
 
 /* default arguments */
-
-#if	CF_DEBUGS
-	        debugprintf("listenspec_connbegin: arg mode=%06o\n",
-	            (ip->mode & 0777)) ;
-#endif
-
-	        if (ip->mode < 0)
+	        if (ip->mode < 0) {
 	            ip->mode = 0666 ;
-
+		}
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1320,19 +1187,11 @@ static int listenspec_connend(listenspec *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_connend: ent\n") ;
-#endif
-
 	if (ip->fname != nullptr) {
 	    rs1 = uc_free(ip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ip->fname = nullptr ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_connend: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1358,10 +1217,6 @@ static int listenspec_connactive(listenspec *op,int opts,int f) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_a = false ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_connactive: ent fn=%s\n",ip->fname) ;
-#endif
 
 	if (f && (! op->f.active)) {
 	    if ((rs = listenconn(ip->fname,ip->mode,opts)) >= 0) {
@@ -1450,11 +1305,6 @@ static int listenspec_procargs(listenspec *op,ARGINFO *aip,int ac,
 
 	    fp = av[ai] ;
 	    fl = strlen(fp) ;
-
-#if	CF_DEBUGS
-	    debugprintf("listenspec_procargs: fl=%u fp=>%t<\n",
-	        fl,fp,fl) ;
-#endif
 
 	    f_optminus = (fp[0] == '-') ;
 	    f_optplus = (fp[0] == '+') ;
@@ -1558,12 +1408,6 @@ static int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
 	cchar	*protoname = PROTONAME_TCP ;
 	cchar	*hp = hostspec ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_openport: af=%d\n",af) ;
-	debugprintf("listenspec_openport: hostspec=%s\n",hostspec) ;
-	debugprintf("listenspec_openport: portspec=%s\n",portspec) ;
-#endif
-
 	if (af < 0)
 	    return SR_INVALID ;
 
@@ -1585,10 +1429,6 @@ static int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
 	    rs = SR_INVALID ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_openport: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (listenspec_openport) */
@@ -1601,12 +1441,6 @@ static int listenspec_openporter(listenspec *op,cchar *pr,int af,cchar *hp,
 	int		fd = -1 ;
 	char		addr[INETXADDRLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_openporter: ent af=%u\n",af) ;
-	debugprintf("listenspec_openporter: pr=%s\n",pr) ;
-	debugprintf("listenspec_openporter: h=%s\n",hp) ;
-#endif
-
 	if ((rs = listenspec_openportaddr(op,pr,&ai,addr,af,hp)) >= 0) {
 	    SOCKADDRESS	sa ;
 	    cint	type = SOCK_STREAM ;
@@ -1615,49 +1449,21 @@ static int listenspec_openporter(listenspec *op,cchar *pr,int af,cchar *hp,
 	    int		alen = rs ;
 	    int		pf = ai.ai_family ;
 
-#if	CF_DEBUGS
-	    {
-		cchar	*id = "listenspec_openporter: a¬" ;
-	    debugprintf("listenspec_openporter: alen=%u\n",alen) ;
-	    debugprinthexblock(id,80,addr,alen) ;
-	    }
-#endif
-
 	    if ((rs = sockaddress_startaddr(&sa,af,addr,alen,port,flow)) >= 0) {
 
 		if ((rs = openport(pf,type,proto,&sa)) >= 0) {
 	            fd = rs ;
-
-#if	CF_DEBUGS
-	            debugprintf("listenspec_openporter: openport() rs=%d\n",
-			rs) ;
-#endif
-
 	            rs = u_listen(fd,10) ;
-
 		    if ((rs < 0) && (fd >= 0)) {
 			u_close(fd) ;
 			fd = -1 ;
 		    }
 	        } /* end if (openport) */
 
-#if	CF_DEBUGS
-	        debugprintf("listenspec_openporter: openport-ot rs=%d\n",
-			rs) ;
-#endif
-
 	        sockaddress_finish(&sa) ;
 	    } /* end if (sockaddress) */
 
-#if	CF_DEBUGS
-	    debugprintf("listenspec_openporter: sockaddress-out rs=%d\n",rs) ;
-#endif
-
 	} /* end if (open-port-addr) */
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_openporter: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
 
 	return (rs >= 0) ? fd : rs ;
 }
@@ -1670,11 +1476,6 @@ static int listenspec_openportaddr(listenspec *op,cchar *pr,ADDRINFO *aip,
 	int		raf = 0 ;
 	int		addrlen = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_openportaddr: ent af=%d\n",af) ;
-	debugprintf("listenspec_openportaddr: kn=%s\n",hn) ;
-#endif
-
 	if (af < 0) return SR_INVALID ;
 
 	addr[0] = '\0' ;
@@ -1682,27 +1483,17 @@ static int listenspec_openportaddr(listenspec *op,cchar *pr,ADDRINFO *aip,
 
 	if ((addrlen < 0) && ((af == AF_UNSPEC) || (af == AF_INET4))) {
 	    raf = AF_INET4 ;
-	    rs = listenspec_openportaddrone(op,addr,raf,hn) ;
+	    rs = listenspec_openportao(op,addr,raf,hn) ;
 	    addrlen = rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_openportaddr: mid1 rs=%d al=%d\n",
-		rs,addrlen) ;
-#endif
 
 	if ((addrlen < 0) || (rs == SR_NOTFOUND)) {
 	    if ((af == AF_UNSPEC) || (af == AF_INET6)) {
 	        raf = AF_INET6 ;
-	        rs = listenspec_openportaddrone(op,addr,raf,hn) ;
+	        rs = listenspec_openportao(op,addr,raf,hn) ;
 	        addrlen = rs ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_openportaddr: mid2 rs=%d al=%d\n",
-		rs,addrlen) ;
-#endif
 
 	if (rs >= 0) {
 	    if (raf > 0) {
@@ -1714,46 +1505,33 @@ static int listenspec_openportaddr(listenspec *op,cchar *pr,ADDRINFO *aip,
 	    }
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_openportaddr: ret rs=%d al=%u\n",
-		rs,addrlen) ;
-#endif
-
 	return (rs >= 0) ? addrlen : rs ;
 }
 /* end subroutine (listenspec_openportaddr) */
 
-static int listenspec_openportaddrone(listenspec *op,cc *addr,int af,
+static int listenspec_openportao(listenspec *op,char *addr,int af,
 		cc *hn) noex {
 	HOSTINFO	hi ;
 	HOSTINFO_CUR	hicur ;
+	cint		addrlen = getaddrlen(af) ;
 	int		rs ;
 	int		rs1 ;
-	int		addrlen ;
-
-#if	CF_DEBUGS
-	debugprintf("listenspec_openportaddrone: ent\n") ;
-	debugprintf("listenspec_openportaddrone: hn=%s\n",hn) ;
-#endif
 
 	if (op == nullptr) return SR_NOANODE ;
 
 	if (af < 0) return SR_INVALID ;
 
 	addr[0] = '\0' ;
-	addrlen = getaddrlen(af) ;
 
 	if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
 	    if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
 	        const uchar	*ap ;
-
-	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) >= 0) {
+	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) > 0) {
 	            if (rs == addrlen) {
 	                memcpy(addr,ap,addrlen) ;
 	                break ;
 	            }
 	        } /* end while */
-
 	        rs1 = hostinfo_curend(&hi,&hicur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
@@ -1761,14 +1539,9 @@ static int listenspec_openportaddrone(listenspec *op,cc *addr,int af,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostinfo) */
 
-#if	CF_DEBUGS
-	debugprintf("listenspec_openportaddrone: ret rs=%d al=%u\n",
-		rs,addrlen) ;
-#endif
-
 	return (rs >= 0) ? addrlen : rs ;
 }
-/* end subroutine (listenspec_openportaddrone) */
+/* end subroutine (listenspec_openportao) */
 
 #endif /* CF_OPENPORT */
 

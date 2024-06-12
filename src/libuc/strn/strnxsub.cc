@@ -98,7 +98,7 @@ char *strnsub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) {
 	    if (sl >= 0) {
-		if constexpr (f_strnstr) {
+		if_constexpr (f_strnstr) {
 		    rp = strnstr(sp,ss,sl) ;
 		} else {
 	            rp = strnsub_local(sp,sl,ss) ;
@@ -120,11 +120,11 @@ char *strncasesub(cchar *sp,int sl,cchar *s2) noex {
 		if (sl >= 0) {
 		    rp = strncasesub_local(sp,sl,s2,s2len) ;
 		} else {
-		    if constexpr (f_strcasestr) {
+		    if_constexpr (f_strcasestr) {
 		        rp = strcasestr(sp,s2) ;
 		    } else {
 		        rp = strncasesub_local(sp,sl,s2,s2len) ;
-		    } /* end if-constexpr) */
+		    } /* end if_constexpr) */
 		} /* end if */
 	    } /* end if (positive) */
 	} /* end if (non-null) */

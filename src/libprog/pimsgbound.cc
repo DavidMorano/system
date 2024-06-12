@@ -102,7 +102,7 @@ int pimkmsgbound(PROGINFO *pip,char *mbuf,int mlen) noex {
 	            sbuf_deci(&b,(int) pip->pid) ;
 	            sbuf_chr(&b,'.') ;
 /* time-of-day */
-		    if constexpr (f_mtime) {
+		    if_constexpr (f_mtime) {
 	                dater_gettime(&pip->mdate,&t) ;
 		    } else {
 	                t = pip->daytime ;

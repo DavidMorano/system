@@ -113,7 +113,7 @@
 
 static inline void ourstrwcpy(char *bp,cchar *sp,int sl) noex {
 	constexpr bool		f = CF_STRNCPY ;
-	if constexpr (f) {
+	if_constexpr (f) {
 	    strncpy(bp,sp,sl) ;
 	    bp[sl] = '\0' ;
 	} else {

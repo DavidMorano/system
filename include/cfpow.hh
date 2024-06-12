@@ -40,26 +40,26 @@
 #include	<ischarx.h>
 
 
-constexpr int	maxbase = 128 ;		/* limited by SYSWORD |w_digtab| */
+constexpr int	cfpow_maxbase = 128 ;	/* limited by SYSWORD |w_digtab| */
 
-struct llhelper {
+struct cfpow_helper {
 	const longlong	one = 1 ;
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
 	ulonglong	ullmax = 0 ;
-	ulonglong	cutoff[maxbase+1] = {} ;
-	int		cutlim[maxbase+1] = {} ;
-	constexpr llhelper() noex {
+	ulonglong	cutoff[cfpow_maxbase+1] = {} ;
+	int		cutlim[cfpow_maxbase+1] = {} ;
+	constexpr cfpow_helper() noex {
 	    const int	n = (CHAR_BIT * sizeof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n-1)) ;
 	    llmax = longlong(ullmax >> 1) ;
-	    for (uint b = 2 ; b <= maxbase ; b += 1) {
+	    for (uint b = 2 ; b <= cfpow_maxbase ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
 		cutlim[b] = (ullmax & b) ;
 	    } /* end for */
 	} ; /* end constructor */
-} ; /* end subroutine (llhelper) */
+} ; /* end subroutine (cfpow_helper) */
 
 template<typename T>
 struct cfpowshelp {

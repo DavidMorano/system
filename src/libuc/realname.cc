@@ -31,16 +31,16 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<storeitem.h>
 #include	<dstr.h>
 #include	<six.h>
 #include	<snwcpyx.h>
+#include	<toxc.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<toxc.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -172,9 +172,9 @@ int realname_startpieces(realname *rnp,cchar **sa,int sn) noex {
 	int		rs = SR_FAULT ;
 	if (rnp && sa) {
 	    int		c = 0 ;
-	    cchar		*pieces[REALNAME_NPARTS] ;
-	    cint		slen = REALNAME_STORELEN ;
-	    cint		nparts = REALNAME_NPARTS ;
+	    cchar	*pieces[REALNAME_NPARTS] ;
+	    cint	slen = REALNAME_STORELEN ;
+	    cint	nparts = REALNAME_NPARTS ;
 	    if (sn < 0) sn = INT_MAX ;
 	    {
 	        for (int i = 0 ; ( i < sn) && sa[i] && (c < nparts) ; i += 1) {
@@ -362,8 +362,8 @@ int realname_getm2(realname *rnp,cchar **rpp) noex {
 int realname_getm3(realname *rnp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (rnp) {
-	if (rpp != nullptr) *rpp = rnp->m3 ;
-	return rnp->len.m3 ;
+	    if (rpp) *rpp = rnp->m3 ;
+	    rs = rnp->len.m3 ;
 	}
 	return rs ;
 }
@@ -385,8 +385,8 @@ int realname_getpieces(realname *rnp,cchar **parts) noex {
 	if (rnp) {
 	    rs = SR_OK ;
 	    if (parts) {
-	        cchar	*cp = nullptr ;
 	        for (int i = 0 ; i < 5 ; i += 1) {
+	            cchar	*cp = nullptr ;
 	            switch (i) {
 	            case 0:
 	                cp = rnp->first ;
@@ -505,7 +505,8 @@ int realname_name(realname *rnp,char *rbuf,int rlen) noex {
 	    if ((rs = sbuf_start(&s,rbuf,rlen)) >= 0) {
 	        cint	nlen = REALNAME_STORELEN ;
 	        int	sl ;
-	        int	ch, nch ;
+	        int	ch ;
+	        int	nch ;
 	        bool	f = false ;
 	        cchar	*sp ;
 	        char	nbuf[REALNAME_STORELEN + 1] ;
@@ -607,7 +608,7 @@ static int namestr_skipwhite(namestr *sp) noex {
 
 static int namestr_break(namestr *nsp,cchar *bs,cchar **rpp) noex {
 	cint		si = sibreak(nsp->s,nsp->slen,bs) ;
-	*rpp = (si >= 0) ? (nsp->s+si) : nullptr ;
+	*rpp = (si >= 0) ? (nsp->s + si) : nullptr ;
 	return si ;
 }
 /* end subroutine (namestr_break) */
@@ -619,11 +620,10 @@ static int namestr_next(namestr *nsp,cchar **npp,int *fap,int *flp) noex {
 	*flp = false ;
 	namestr_skipwhite(nsp) ;
 	if (nsp->slen > 0) {
-	    int		i ;
 	    cchar	*sp ;
 	    cchar	*cp ;
 	    rs = SR_OK ;
-	    if ((i = namestr_break(nsp," \t.,­",&cp)) >= 0) {
+	    if (int i ; (i = namestr_break(nsp," \t.,­",&cp)) >= 0) {
 	        sp = nsp->s ;
 	        nlen = i ;
 	        nsp->s += nlen ;
@@ -648,7 +648,7 @@ static int namestr_next(namestr *nsp,cchar **npp,int *fap,int *flp) noex {
 	            nsp->slen -= 1 ;
 	        } /* end if */
 	        namestr_skipwhite(nsp) ;
-    /* eat any weirdo characters that are here */
+    		/* eat any weirdo characters that are here */
 	        while ((nsp->slen > 0) && 
 	            ((nsp->s[0] == ',') || (nsp->s[0] == '.'))) {
 	            nsp->s += 1 ;
@@ -687,7 +687,7 @@ static int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	int		rs = SR_INVALID ;
 	int		count = 0 ;
 	if ((nlen > 0) && ((op->li < 0) || (op->i != op->li))) {
-/* load this new one in */
+	    /* load this new one in */
 	    cchar	*cp{} ;
 	    if (op->a[op->i] != nullptr) {
 	        op->count -= 1 ;
@@ -701,7 +701,7 @@ static int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	        if (f_last) {
 	            op->li = op->i ;
 	        }
-/* saturate if we have not yet seen a last name */
+		/* saturate if we have not yet seen a last name */
 	        if ((op->count < nnames) || (op->li >= 0)) {
 	            op->i = (op->i + 1) % nnames ;
 	        } /* end if */

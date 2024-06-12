@@ -104,7 +104,7 @@ int mailmsgmathdr(cchar *sp,int sl,int *ip) noex {
 	        *ip = 0 ;
 	    }
 	    tl = sl ;
-	    if constexpr (f_alt) {
+	    if_constexpr (f_alt) {
 	        bool	f = false ;
 	        while (tl) {
 	            cint	ch = *tp ;
@@ -120,7 +120,7 @@ int mailmsgmathdr(cchar *sp,int sl,int *ip) noex {
 	            tp += 1 ;
 	            tl -= 1 ;
 	        } /* end while */
-	    } /* end if-constexpr (f_alt) */
+	    } /* end if_constexpr (f_alt) */
 	    kl = (tp - sp) ;
 	    while (tl && ishdrwht(*tp)) {
 	        tp += 1 ;

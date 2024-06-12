@@ -47,10 +47,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 #include	<char.h>
 
 #include	"digval.h"

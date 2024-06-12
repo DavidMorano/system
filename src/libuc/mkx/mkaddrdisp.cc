@@ -105,11 +105,11 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	                int		c = 0 ;
 	                while ((fl = field_sharg(&fsb,np,fbuf,flen)) >= 0) {
 	                    if (fl > 0) {
-				if constexpr (f_nonstandard) {
+				if_constexpr (f_nonstandard) {
 	                            if (c++ > 0) {
 	                                rs = b.chr(' ') ;
 			            }
-			        } /* end if-constexpr (f_nonstandard) */
+			        } /* end if_constexpr (f_nonstandard) */
 	                        if (rs >= 0) {
 	                            rs = b.strw(fp,fl) ;
 			        }

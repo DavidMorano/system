@@ -95,7 +95,7 @@ constexpr bool		f_mkdirp = F_MKDIRP ;
 
 int uc_mkdirp(cchar *fname,mode_t m) noex {
 	int		rs ;
-	if constexpr (f_mkdirp) {
+	if_constexpr (f_mkdirp) {
 	    rs = ucmkdirp(fname,m) ;
 	} else {
 	    rs = SR_NOSYS ;

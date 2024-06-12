@@ -63,6 +63,10 @@
 #define	HOSTENT		struct hostent
 #endif
 
+#ifndef	CHOSTENT
+#define	CHOSTENT	const HOSTENT
+#endif
+
 #define	SI		storeitem
 
 
@@ -77,8 +81,8 @@
 
 /* forward references */
 
-static int	si_copyaliases(SI *,HOSTENT *,HOSTENT *) noex ;
-static int	si_copyaddrs(SI *,HOSTENT *,HOSTENT *) noex ;
+static int	si_copyaliases(SI *,HOSTENT *,CHOSTENT *) noex ;
+static int	si_copyaddrs(SI *,HOSTENT *,CHOSTENT *) noex ;
 static int	si_copystr(SI *,char **,cchar *) noex ;
 static int	si_copybuf(SI *,char **,cchar *,int) noex ;
 
@@ -155,10 +159,9 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
 	if (hep && curp) {
-	    rs = SR_NOTFOUND ;
+	    rs = SR_OK ;
 	    if (curp == nullptr) {
 	        if (hep->h_name) {
-		    rs = SR_OK ;
 	            nlen = strlen(hep->h_name) ;
 	            if (rpp) {
 	                *rpp = hep->h_name ;
@@ -167,7 +170,6 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	    } else {
 	        if (curp->i < 0) {
 	            if (hep->h_name) {
-		        rs = SR_OK ;
 	                nlen = strlen(hep->h_name) ;
 	                if (rpp) {
 	                    *rpp = hep->h_name ;
@@ -176,7 +178,6 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	            }
 	        } else {
 	            if (hep->h_aliases && hep->h_aliases[curp->i]) {
-		        rs = SR_OK ;
 	                nlen = strlen(hep->h_aliases[curp->i]) ;
 	                if (rpp) {
 	                    *rpp = hep->h_aliases[curp->i] ;
@@ -198,12 +199,11 @@ int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		alen = 0 ;
 	if (hep && curp) {
-	    rs = SR_NOTFOUND ;
+	    rs = SR_OK ;
 	    alen = hep->h_length ;
 	    if (hep->h_addr_list != nullptr) {
 	        if (curp == nullptr) {
 	            if (hep->h_addr_list[0] != nullptr) {
-	                rs = SR_OK ;
 	                if (rpp) {
 	                    *rpp = (uchar *) hep->h_addr_list[0] ;
 		        }
@@ -211,7 +211,6 @@ int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
 	        } else {
 	            cint	ci = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 		    if (hep->h_addr_list[ci] != nullptr) {
-	                rs = SR_OK ;
 	                if (rpp) {
 	                    *rpp = (uchar *) hep->h_addr_list[ci] ;
 		        }
@@ -293,11 +292,11 @@ int hostent_size(HOSTENT *hep) noex {
 
 int hostent_load(HOSTENT *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 	int		rs = SR_FAULT ;
+	int		len = 0 ;
 	if (hep && hebuf && lp) {
 	    storeitem	ib ;
-	    memcpy(hep,lp,sizeof(HOSTENT)) ;
+	    memcpy(hep,lp) ;
 	    if ((rs = storeitem_start(&ib,hebuf,helen)) >= 0) {
-	        int	len ;
 	        if (rs >= 0) rs = si_copyaliases(&ib,hep,lp) ;
 	        if (rs >= 0) rs = si_copyaddrs(&ib,hep,lp) ;
 	        if (rs >= 0) rs = si_copystr(&ib,&hep->h_name,lp->h_name) ;
@@ -305,14 +304,14 @@ int hostent_load(HOSTENT *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 	        if (rs >= 0) rs = len ;
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (hostent_load) */
 
 
 /* private subroutines */
 
-static int si_copyaliases(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
+static int si_copyaliases(SI *ibp,HOSTENT *hep,CHOSTENT *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_aliases != nullptr) {
 	    int		n{} ;
@@ -337,14 +336,14 @@ static int si_copyaliases(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 }
 /* end subroutine (si_copyaliases) */
 
-static int si_copyaddrs(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
+static int si_copyaddrs(SI *ibp,HOSTENT *hep,CHOSTENT *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_addr_list != nullptr) {
 	    int		n{} ;
 	    void	**vpp ;
 	    for (n = 0 ; lp->h_addr_list[n] != nullptr ; n += 1) ;
 	    if ((rs = storeitem_ptab(ibp,n,&vpp)) >= 0) {
-	        int	i{} ;
+	        int	i{} ; /* used-afterwards */
 	        char	**cpp ;
 		cpp = (char **) vpp ;
 	        hep->h_addr_list = cpp ;

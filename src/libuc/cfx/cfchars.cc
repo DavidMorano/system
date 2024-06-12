@@ -43,9 +43,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<charconv>
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 #include	<cfcharsx.hh>		/* <- the money shot! */
 

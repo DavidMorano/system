@@ -43,10 +43,12 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<uinet.h>		/* |INETX_ADDRSTRLEN| */
 #include	<inaddrbad.hh>
 #include	<localmisc.h>
 
@@ -55,24 +57,25 @@
 
 /* local defines */
 
-#ifndef	ADDRBUFLEN
-#define	ADDRBUFLEN	64		/* size (in bytes) of c-str to hold */
-#endif
-
 #ifndef	CF_INET6
 #define	CF_INET6	0
 #endif
 
 
-/* external subroutines */
-
-extern int	inetpton(char *,int,int,cchar *,int) noex ;
-
-
-/* external variables */
+/* imported namespaces */
 
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+extern "C" {
+    extern int	inetpton(char *,int,int,cchar *,int) noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
@@ -83,9 +86,10 @@ extern int	inetpton(char *,int,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr bool			f_inet6 = CF_INET6 ;
+constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
-static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
+constexpr int		addrlen = INETX_ADDRSTRLEN ;
+constexpr bool		f_inet6 = CF_INET6 ;
 
 
 /* exported variables */
@@ -95,15 +99,15 @@ static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 bool isinetaddr(cchar *name) noex {
 	bool		f = false ;
-	if constexpr (f_inet6) {
+	if_constexpr (f_inet6) {
 	    cint	af = AF_UNSPEC ;
 	    int		rs1 ;
-	    char	addrbuf[ADDRBUFLEN + 1] ;
-	    rs1 = inetpton(addrbuf,ADDRBUFLEN,af,name,-1) ;
+	    char	addrbuf[addrlen + 1] ;
+	    rs1 = inetpton(addrbuf,addrlen,af,name,-1) ;
 	    f = (rs1 >= 0) ;
 	} else {
 	    f = (inet_addr(name) != inaddrbad) ;
-	} /* end if-constexpr (f_inet6) */
+	} /* end if_constexpr (f_inet6) */
 	return f ;
 }
 /* end subroutine (isinetaddr) */

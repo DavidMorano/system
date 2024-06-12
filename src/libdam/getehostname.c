@@ -95,7 +95,7 @@
 
 /* external subroutines */
 
-extern int	getourhe(const char *,char *,struct hostent *,char *,int) ;
+extern int	getheour(const char *,char *,struct hostent *,char *,int) ;
 
 
 /* forward references */
@@ -124,7 +124,7 @@ char		hostname[] ;
 	debugprintf("getehostname: ent name=%s\n",name) ;
 #endif
 
-	rs = getourhe(name,hostname,&he,hostbuf,HOSTBUFLEN) ;
+	rs = getheour(name,hostname,&he,hostbuf,HOSTBUFLEN) ;
 
 #if	CF_DEBUGS
 	debugprintf("getehostname: exiting hostname=%s\n",hostname) ;

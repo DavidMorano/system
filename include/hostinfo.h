@@ -26,8 +26,8 @@
 #define	HOSTINFO_MAGIC		0x73625196
 #define	HOSTINFO		struct hostinfo_head
 #define	HOSTINFO_FL		struct hostinfo_flags
-#define	HOSTINFO_ADDR		struct hostinfo_addr
-#define	HOSTINFO_ARGS		struct hostinfo_args
+#define	HOSTINFO_ADDR		struct hostinfo_address
+#define	HOSTINFO_ARGS		struct hostinfo_arguments
 #define	HOSTINFO_CUR		struct hostinfo_cursor
 
 
@@ -37,13 +37,13 @@ struct hostinfo_flags {
 	uint		addr:1 ;	/* was given an address */
 } ;
 
-struct hostinfo_addr {
+struct hostinfo_address {
 	cchar		*addr ;
 	int		addrlen ;
 	int		af ;
 } ;
 
-struct hostinfo_args {
+struct hostinfo_arguments {
 	cchar		*hostname ;	/* might be allocated */
 	int		af ;		/* caller-supplied argument */
 	int		hostnamelen ;

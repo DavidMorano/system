@@ -150,7 +150,7 @@ int strpack_start(strpack *op,int chsize) noex {
 	    if (chsize < STRPACK_CHSIZE) chsize = STRPACK_CHSIZE ;
 	    op->chsize = chsize ;
 	    if ((rs = vechand_start(op->clp,0,vo)) >= 0) {
-		if constexpr (f_prealloc) {
+		if_constexpr (f_prealloc) {
 	    	    rs = strpack_chunknew(op,0) ;
 		}
 	        if (rs >= 0) {

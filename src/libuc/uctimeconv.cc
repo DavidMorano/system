@@ -92,7 +92,7 @@ int uc_localtime(const time_t *tp,TM *tsp) noex {
 	    TM		*rp ;
 	    rs = SR_OK ;
 	    errno = 0 ;
-	    if constexpr (f_reentrant) {
+	    if_constexpr (f_reentrant) {
 	        if ((rp = localtime_r(tp,tsp)) == nullptr) {
 	            rs = (- errno) ;
 		}
@@ -123,7 +123,7 @@ int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	    TM		*rp ;
 	    rs = SR_OK ;
 	    errno = 0 ;
-	    if constexpr (f_reentrant) {
+	    if_constexpr (f_reentrant) {
 	        if ((rp = gmtime_r(tp,tsp)) == nullptr) {
 	            rs = (- errno) ;
 		}

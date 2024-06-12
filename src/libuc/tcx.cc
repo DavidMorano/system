@@ -320,7 +320,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	if (dbuf) {
 	    rs = SR_NOTOPEN ;
 	    if (fd >= 0) {
-	        if constexpr (f_streams) {
+	        if_constexpr (f_streams) {
 	            cint	clen = CMSGBUFLEN ;
 	            char	*cbuf{} ;
 	            if ((rs = uc_libmalloc((clen+1),&cbuf)) >= 0) {
@@ -340,7 +340,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	        } else {
 	            dbuf[0] = '\0' ;
 	            rs = SR_NOSYS ;
-	        } /* end if-constexpr (f_streams) */
+	        } /* end if_constexpr (f_streams) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs > 0) ? len : rs ;

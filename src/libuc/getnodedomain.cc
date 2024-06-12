@@ -4,7 +4,7 @@
 /* get the local node-name and INET domain name */
 /* version %I% last-modified %G% */
 
-#define	CF_GUESS	0	/* try to guess domain names? */
+#define	CF_GUESS	1	/* try to guess domain names? */
 
 /* revision history:
 
@@ -116,6 +116,7 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -129,16 +130,15 @@ using std::min ;			/* subroutine-template */
 
 /* local structures */
 
-struct tryer_flags {
+namespace {
+    struct tryer_flags {
 	uint		initvarnode:1 ;
 	uint		inituname:1 ;
 	uint		initnode:1 ;
 	uint		varnode:1 ;
 	uint		uname:1 ;
 	uint		node:1 ;
-} ; /* end struct (tryer_flags) */
-
-namespace {
+    } ; /* end struct (tryer_flags) */
     struct tryer {
 	char		*nodename ;	/* passed caller argument (returned) */
 	char		*domainname ;	/* passed caller argument (returned) */
@@ -148,12 +148,11 @@ namespace {
 	TRY_FL		f ;
 	int		dlen ;
     } ; /* end struct (try) */
-}
-
-struct guess {
+    struct guess {
 	cchar		*name ;
 	cchar		*domain ;
-} ;
+    } ; /* end struct (guess) */
+}
 
 
 /* forward references */
@@ -185,7 +184,7 @@ static int	rmwhitedot(char *,int) noex ;
 
 /* local variables */
 
-static constexpr int	(*tries[])(TRY *) = {
+constexpr int		(*tries[])(TRY *) = {
 	try_vardomain,
 	try_varlocaldomain,
 	try_varnode,
@@ -196,7 +195,7 @@ static constexpr int	(*tries[])(TRY *) = {
 	nullptr
 } ;
 
-static constexpr int	(*systries[])(TRY *) = {
+constexpr int		(*systries[])(TRY *) = {
 	try_uname,
 	try_gethost,
 	try_resolve,
@@ -204,25 +203,19 @@ static constexpr int	(*systries[])(TRY *) = {
 	nullptr
 } ;
 
-static constexpr cpcchar	resolvefnames[] = {
+constexpr cpcchar	resolvefnames[] = {
 	RESOLVFNAME,			/* most operating systems */
 	"/var/run/resolv.conf",		/* for example: MacOS */
 	nullptr
 } ;
 
-static constexpr struct guess	ga[] = {
+constexpr guess		ga[] = {
 	{ "rc", "rightcore.com" },
+	{ "rca", "rightcore.com" },
+	{ "rcb", "rightcore.com" },
+	{ "rcf", "rightcore.com" },
+	{ "rcg", "rightcore.com" },
 	{ "jig", "rightcore.com" },
-	{ "gateway", "ece.neu.com" },
-	{ "vinson", "ece.neu.com" },
-	{ "frodo", "ece.neu.com" },
-	{ "olive", "ece.neu.com" },
-	{ "gilmore", "ece.neu.com" },
-	{ "dr", "dr.lucent.com" },
-	{ "ho", "ho.lucent.com" },
-	{ "mh", "mh.lucent.com" },
-	{ "mt", "mt.lucent.com" },
-	{ "cb", "cb.lucent.com" },
 	{ nullptr, nullptr }
 } ;
 
@@ -243,19 +236,19 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 	if ((rs = maxhostlen) >= 0) {
 	    TRY		ti ;
 	    if ((rs = try_start(&ti,nbuf,dbuf,rs)) >= 0) {
-/* do we need a nodename? */
+		/* do we need a nodename? */
 	        if (nbuf != nullptr) {
 	            nbuf[0] = '\0' ;
 	            if (! ti.f.initnode) rs = try_initnode(&ti) ;
 	        } /* end if (trying to get a nodename) */
-/* do we need a domainname? */
+		/* do we need a domainname? */
 	        if ((rs >= 0) && (dbuf != nullptr)) {
 	            dbuf[0] = '\0' ;
 		    rs = SR_OK ;
 	            for (int i = 0 ; (rs == SR_OK) && tries[i] ; i += 1) {
 	                rs = (*tries[i])(&ti) ;
 	            } /* end for */
-/* remove any stupid trailing dots from the domain name if any */
+	            /* remove any stupid trailing dots if any */
 	            if ((rs >= 0) && (dbuf[0] != '\0')) {
 	                rs = rmwhitedot(dbuf,rs) ;
 		    }
@@ -276,12 +269,12 @@ int getsysdomain(char *dbuf,int dlen) noex {
 	    TRY		ti ;
 	    dbuf[0] = '\0' ;
 	    if ((rs = try_start(&ti,nullptr,dbuf,dlen)) >= 0) {
-/* do we need a domainname? */
+		/* do we need a domainname? */
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs == SR_OK) && systries[i] ; i += 1) {
 	            rs = (*systries[i])(&ti) ;
 	        } /* end for */
-/* remove any stupid trailing dots from the domain name if any */
+		/* remove any stupid trailing dots if any */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
 	            rs = rmwhitedot(dbuf,rs) ;
 		    len = rs ;
@@ -534,26 +527,27 @@ static int try_gethost(TRY *tip) noex {
 	if ((rs >= 0) && tip->f.node) {
 	    char	*hbuf{} ;
 	    if ((rs = malloc_ho(&hbuf)) >= 0) {
-		const nullptr_t	np{} ;
+		cnullptr	np{} ;
 	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nodename ;
 	        if ((rs = uc_gethonam(&he,hbuf,hlen,nn)) >= 0) {
 		    cint	dlen = tip->dlen ;
 	            cchar	*tp{} ;
+		    char	*dbuf = tip->domainname ;
 		    bool	f = true ;
 		    rs = 0 ;
 	            f = f && (hep->h_name != np) ;
 		    f = f && ((tp = strchr(hep->h_name,'.')) != np) ;
 		    if (f) {
-	                rs = sncpy1(tip->domainname,dlen,(tp + 1)) ;
+	                rs = sncpy1(dbuf,dlen,(tp + 1)) ;
 			len = rs ;
 	            } /* end if (official name) */
 	            if ((rs == 0) && (hep->h_aliases != nullptr)) {
 	                for (int i = 0 ; hep->h_aliases[i] ; i += 1) {
 			    cchar	*ap = hep->h_aliases[i] ;
 	                    if ((tp = strchr(ap,'.')) != nullptr) {
-	                        rs = sncpy1(tip->domainname,dlen,(tp+1)) ;
+	                        rs = sncpy1(dbuf,dlen,(tp+1)) ;
 				len = rs ;
 	                    } /* end if */
 			    if (rs > 0) break ;
@@ -621,9 +615,10 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
             rs1 = filer_finish(&b) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (filer) */
-        if ((rs >= 0) && (len > 0)) {
+        if ((rs >= 0) && (len > 0) && dp) {
 	    cint	dlen = tip->dlen ;
-            rs = snwcpy(tip->domainname,dlen,dp,len) ;
+	    char	*dbuf = tip->domainname ;
+            rs = snwcpy(dbuf,dlen,dp,len) ;
         }
 	if (len < 0) len = 0 ;
 	return (rs >= 0) ? len : rs ;
@@ -633,7 +628,7 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 static int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if constexpr (f_guess) {
+	if_constexpr (f_guess) {
 	    if (! tip->f.initnode) {
 	        rs = try_initnode(tip) ;
 	    }
@@ -657,7 +652,7 @@ static int try_guess(TRY *tip) noex {
 		    len = rs ;
 	        }
 	    } /* end if (have node) */
-	} /* end if-constexpr (f_guess) */
+	} /* end if_constexpr (f_guess) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (try_guess) */

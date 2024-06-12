@@ -82,7 +82,7 @@ static int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
 	*rp = '\0' ;
 	if (v != 0) {
 	    while (v != 0) {
-	        if constexpr (f_remainder) {
+	        if_constexpr (f_remainder) {
 	            *--rp = (char) ((v % base) + type) ;
 	            v = (v / base) ;
 		} else {

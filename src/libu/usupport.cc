@@ -84,7 +84,7 @@ static int	isleep(int) noex ;
 
 /* local variables */
 
-constexpr int		onethousand = 1000 ;
+constexpr int	onethousand = 1000 ;
 
 
 /* exported variables */

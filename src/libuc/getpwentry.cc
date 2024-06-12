@@ -161,12 +161,12 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 /* fill in the stuff that we got from the system */
 	            rs = storeitem_strw(&ubuf,pep->pw_name,-1,vpp) ;
 	            emptyp = (uep->username + rs) ;
-		    if constexpr (f_shadow) {
+		    if_constexpr (f_shadow) {
 	                if ((rs >= 0) && pep->pw_passwd) {
 		            vpp = &uep->password ;
 	                    storeitem_strw(&ubuf,pep->pw_passwd,-1,vpp) ;
 	                }
-		    } /* end if-constexpr (f_shadow) */
+		    } /* end if_constexpr (f_shadow) */
 	            uep->uid = pep->pw_uid ;
 	            uep->gid = pep->pw_gid ;
 	            if ((rs >= 0) && (pep->pw_gecos != nullptr)) {
@@ -272,7 +272,7 @@ static int getpwentry_gecos(pwentry *uep,storeitem *bp,cchar *gecosdata) noex {
 static int getpwentry_shadow(pwentry *uep,storeitem *sip,ucentpw *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if constexpr (f_shadow) {
+	if_constexpr (f_shadow) {
 	    char	*spbuf{} ;
 	    if ((rs = malloc_sp(&spbuf)) >= 0) {
 	        ucentsp	sd ;
@@ -316,7 +316,7 @@ static int getpwentry_shadow(pwentry *uep,storeitem *sip,ucentpw *pep) noex {
 	    uep->inact = -1 ;
 	    uep->expire = 0 ;
 	    uep->flag = 0 ;
-	} /* end if-constexpr (f_shadow) */
+	} /* end if_constexpr (f_shadow) */
 	return rs ;
 }
 /* end subroutine (getpwentry_shadow) */

@@ -175,7 +175,7 @@ int posixdirent::rewind() noex {
 
 int posixdirent::setup(cchar *fn) noex {
 	int		rs ;
-	if constexpr (f_readdirr) {
+	if_constexpr (f_readdirr) {
 	    cint	req = _PC_NAME_MAX ;
 	    if ((rs = uc_pathconf(fn,req,nullptr)) >= 0) {
 		cint	pl = rs ;
@@ -191,7 +191,7 @@ int posixdirent::setup(cchar *fn) noex {
 	    } /* end if (uc_pathconf) */
 	} else {
 	    rs = SR_OK ;
-	} /* end if-constexpr (f_readdirr) */
+	} /* end if_constexpr (f_readdirr) */
 	return rs ;
 }
 /* end subroutine (posixdirent::setup) */
@@ -256,7 +256,7 @@ int posixdirent::dirread() noex {
 	dirent		*p ;
 	int		rs ;
 	errno = 0 ;
-	if constexpr (f_readdirr) {
+	if_constexpr (f_readdirr) {
 	    if (errno_t ec ; (ec = readdir_r(dirp,debuf,&p)) == 0) {
 		if (p) {
 	            cint	nl = int(p->d_namlen & INT_MAX) ;
@@ -276,7 +276,7 @@ int posixdirent::dirread() noex {
 	    } else {
 	        rs = (-errno) ;		/* <- EOF condition */
 	    }
-	} /* end if-constexpr (f_readdirr) */
+	} /* end if_constexpr (f_readdirr) */
 	return rs ;
 }
 /* end subroutine (posixdirent::dirread) */

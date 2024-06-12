@@ -79,14 +79,14 @@ int uc_openpt(int oflags) noex {
 	int		rs ;
 	oflags &= (~ O_ACCMODE) ;
 	oflags |= O_RDWR ;
-	if constexpr (f_openpt) {
+	if_constexpr (f_openpt) {
 	    errno = 0 ;
 	    if ((rs = posix_openpt(oflags)) < 0) {
 	        rs = (- errno) ;
 	    }
 	} else {
 	    rs = u_open(PTMXFNAME,oflags,0662) ;
-	} /* end if-constexpr (f_openpt) */
+	} /* end if_constexpr (f_openpt) */
 	return rs ;
 }
 /* end subroutine (uc_openpt) */

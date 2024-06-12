@@ -420,7 +420,7 @@ static int getxusername_varenv(getxuser *xup) noex {
 
 static int getxusername_utmp(getxuser *xup) noex {
 	int		rs = SR_OK ;
-	if constexpr (f_utmpacc) {
+	if_constexpr (f_utmpacc) {
 	    utmpacc_ent	ue{} ;
 	    cint	uelen = UTMPACC_BUFLEN ;
 	    char	uebuf[UTMPACC_BUFLEN+1] ;
@@ -433,12 +433,12 @@ static int getxusername_utmp(getxuser *xup) noex {
 		}
 	    } /* end if (utmpacc-entsid) */
 	} else {
-	    if constexpr (f_getutmpname) {
+	    if_constexpr (f_getutmpname) {
 	        rs = getutmpname(xup->ubuf,xup->ulen,0) ;
 	    } else {
 	        rs = uc_getlogin(xup->ubuf,xup->ulen) ;
-	    } /* end if-constexpr (f_getutmpname) */
-	} /* end if-constexpr (f_utmpacc) */
+	    } /* end if_constexpr (f_getutmpname) */
+	} /* end if_constexpr (f_utmpacc) */
 	xup->unl = rs ;
 	if (rs >= 0) {
 	    cchar	*sp = xup->ubuf ;

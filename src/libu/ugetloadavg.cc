@@ -123,7 +123,7 @@ int u_getloadavg(uint *la,int n) noex {
 	    rs = SR_INVALID ;
 	    if (n > 0) {
 	        if (n > maxloadavgs) n = maxloadavgs ;
-		if constexpr (f_sunos) {
+		if_constexpr (f_sunos) {
 		    int		*ila = (int *) la ;
 	            if ((rs = __getloadavg(ila,n)) < 0) {
 	                rs = (- errno) ;

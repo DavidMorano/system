@@ -393,9 +393,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		v ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 	cchar		*argp, *aop, *akp, *avp ;
 	cchar		*argval = NULL ;
 	cchar		*pr = NULL ;
@@ -481,7 +481,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
@@ -520,7 +520,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -535,7 +535,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -553,7 +553,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -571,7 +571,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* configuration file */
 	                case argopt_cf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->cfname = avp ;
 	                    } else {
@@ -589,7 +589,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* log file name */
 	                case argopt_lf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->lfname = avp ;
 	                    } else {
@@ -609,7 +609,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    cp = NULL ;
 	                    cl = -1 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            cp = avp ;
 	                            cl = avl ;
@@ -636,7 +636,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* maximum idle time */
 	                case argopt_wto:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            idlespec = avp ;
 	                    } else {
@@ -657,7 +657,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    pip->have.reuseaddr = TRUE ;
 	                    pip->f.reuseaddr = TRUE ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            pip->f.reuseaddr = (rs > 0) ;
@@ -671,7 +671,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    pip->have.daemon = TRUE ;
 	                    pip->f.daemon = TRUE ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                                rs = cfdecti(avp,avl,&v) ;
 	                                pip->intrun = v ;
@@ -697,7 +697,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -744,7 +744,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        pip->final.background = TRUE ;
 	                        pip->f.background = TRUE ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = cfdecti(avp,avl,&v) ;
 	                                pip->intrun = v ;
@@ -820,7 +820,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -1089,19 +1089,19 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    bclose(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.aparams) {
-	    pip->open.aparams = FALSE ;
+	    pip->open.aparams = false ;
 	    paramopt_finish(&aparams) ;
 	}
 
 	if (pip->open.akopts) {
 	    keyopt_finish(&akopts) ;
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	}
 
 	bits_finish(&pargs) ;
@@ -1825,7 +1825,7 @@ static int procdaemonend(PROGINFO *pip)
 	int		rs1 ;
 
 	if (pip->open.listen && (pip->fd_msg >= 0)) {
-	    pip->open.listen = FALSE ;
+	    pip->open.listen = false ;
 	    rs1 = u_close(pip->fd_msg) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->fd_msg = -1 ;
@@ -1950,18 +1950,17 @@ static int openaddr(int af,cchar *addr,int port)
 }
 /* end subroutine (openaddr) */
 
-
-static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af)
-{
+static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	HOSTINFO_CUR	cur ;
 	int		rs ;
+	int		rs1 ;
 	int		al = 0 ;
 
 	if ((rs = hostinfo_curbegin(hip,&cur)) >= 0) {
-	    int		f = FALSE ;
+	    bool	f = false ;
 	    const uchar	*ap ;
 
-	    while ((rs = hostinfo_enumaddr(hip,&cur,&ap)) >= 0) {
+	    while ((rs = hostinfo_enumaddr(hip,&cur,&ap)) > 0) {
 	        al = rs ;
 
 	        switch (al) {
@@ -1982,7 +1981,8 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af)
 	        if (rs < 0) break ;
 	    } /* end while */
 
-	    hostinfo_curend(hip,&cur) ;
+	    rs1 = hostinfo_curend(hip,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 
 	return (rs >= 0) ? al : rs ;

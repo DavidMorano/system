@@ -60,7 +60,7 @@ struct listenspec_conpass {
 struct listenspec_conuss {
 	cchar		*fname ;	/* dynamic allocation */
 	int		mode ;
-	SOCKADDRESS	sa ;
+	sockaddress	sa ;
 } ;
 
 struct listenspec_contcp {
@@ -68,7 +68,7 @@ struct listenspec_contcp {
 	cchar		*af ;
 	cchar		*host ;
 	cchar		*port ;
-	SOCKADDRESS	sa ;
+	sockaddress	sa ;
 } ;
 
 struct listenspec_connect {
@@ -84,10 +84,10 @@ struct listenspec_flags {
 } ;
 
 struct listenspec_head {
-	uint		magic ;
 	void		*info ;		/* particular listener information */
 	cchar		*prlocal ;
 	LISTENSPEC_FL	f ;
+	uint		magic ;
 	int		ltype ;		/* "listen" type */
 	int		fd ;
 	int		rs_error ;
@@ -103,7 +103,7 @@ typedef	LISTENSPEC_CONN		listenspec_conn ;
 
 EXTERNC_begin
 
-extern int listenspec_start(listenspec *,int,cchar **) noex ;
+extern int listenspec_start(listenspec *,int,mainv) noex ;
 extern int listenspec_issame(listenspec *,listenspec *) noex ;
 extern int listenspec_active(listenspec *,int,int) noex ;
 extern int listenspec_isactive(listenspec *) noex ;

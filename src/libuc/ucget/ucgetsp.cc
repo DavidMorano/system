@@ -11,7 +11,7 @@
 	This module was originally written.
 
 	= 2017-05-17, David A-D- Morano
-	I did some update to use C++11 ('if constexpr').
+	I did some update to use C++11 ('if_constexpr').
 
 */
 
@@ -203,7 +203,7 @@ int ucgetsp::operator () (ucentsp *spp,char *spbuf,int splen) noex {
 int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
-	if constexpr (f_getspentr) {
+	if_constexpr (f_getspentr) {
 	    cint	ec = getspent_rp(spp,spbuf,splen) ;
 	    if (ec == 0) {
 	        rs = spp->size() ;
@@ -223,8 +223,8 @@ int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 	    } else {
 	        rs = (- errno) ;
 	    }
-	} /* end if-constexpr (selection) */
-	if constexpr (f_sunos) {
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
@@ -235,7 +235,7 @@ int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    errno = 0 ;
-	    if constexpr (f_getspnamr) {
+	    if_constexpr (f_getspnamr) {
 	        cint	ec = getspnam_rp(spp,spbuf,splen,name) ;
 	        if (ec == 0) {
 	            rs = spp->size() ;
@@ -255,8 +255,8 @@ int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
 	        } else {
 	            rs = (- errno) ;
 	        }
-	    } /* end if-constexpr (selection) */
-	    if constexpr (f_sunos) {
+	    } /* end if_constexpr (selection) */
+	    if_constexpr (f_sunos) {
 		if (rs == SR_BADF) rs = SR_NOENT ;
 	    }
 	} /* end if (non-null) */

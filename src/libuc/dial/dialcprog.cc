@@ -2230,7 +2230,6 @@ cchar	node[] ;
 	HOSTINFO_CUR	hc ;
 	cint	af = AF_UNSPEC ;
 	int		rs ;
-	int		nl ;
 	int		n = 0 ;
 	cchar	*np ;
 
@@ -2238,7 +2237,8 @@ cchar	node[] ;
 
 	    if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
 
-	        while ((nl = hostinfo_enumname(&hi,&hc,&np)) >= 0) {
+	        while ((rs = hostinfo_enumname(&hi,&hc,&np)) > 0) {
+		    int		nl = rs ;
 
 /* don't remove domain part since the node could be in another domain */
 

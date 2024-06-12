@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-	Names-defined:
+	Names:
 	uc_inetnetpton
 	uc_inetpton
 	uc_inetntop
@@ -81,10 +81,31 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
-static constexpr int		inet4addrlen = int(INET4ADDRLEN) ;
-static constexpr int		inet6addrlen = int(INET6ADDRLEN) ;
+constexpr int		inet4addrlen = int(INET4ADDRLEN) ;
+constexpr int		inet6addrlen = int(INET6ADDRLEN) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

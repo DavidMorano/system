@@ -93,7 +93,7 @@ constexpr int	nvalid[] = {
 	0	
 } ;
 
-static constexpr int	nlib[] = {
+constexpr int	nlib[] = {
 	SR_NOENT,
 	SR_ACCESS,
 	SR_LIBACC,
@@ -102,7 +102,7 @@ static constexpr int	nlib[] = {
 	0	
 } ;
 
-constexpr int		rsnoterm[] = {
+constexpr int	rsnoterm[] = {
 	SR_BADF,
 	SR_BADFD,
 	SR_NOTTY,

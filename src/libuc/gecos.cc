@@ -239,7 +239,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                         gecos_storeit(op,&b,gecosval_realname) ;
                     }
                 } /* end if (realname) */
-    /* do we have account and printer-bin information? */
+    		/* do we have account and printer-bin information? */
                 if ((op->vals[gecosval_account].vp != nullptr) || 
                     (op->vals[gecosval_bin].vp != nullptr)) {
                     fparen = true ;
@@ -255,7 +255,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                 if (fparen) {
                     sbuf_chr(&b,CH_RPAREN) ;
                 }
-    /* do we have the old finger stuff */
+    		/* do we have the old finger stuff */
                 if (op->vals[gecosval_office].vp != nullptr) {
                     if (! fparen) sbuf_strw(&b,",",1) ;
                     gecos_storeit(op,&b,gecosval_office) ;
@@ -284,9 +284,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
 /* private subroutines */
 
 static int gecos_storeit(gecos *op,sbuf *bp,int vi) noex {
-	int		rs ;
-	rs = sbuf_strw(bp,op->vals[vi].vp,op->vals[vi].vl) ;
-	return rs ;
+	return sbuf_strw(bp,op->vals[vi].vp,op->vals[vi].vl) ;
 }
 /* end subroutine (gecos_storeit) */
 
@@ -297,19 +295,19 @@ static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	cchar		*sp ;
 	sp = op->vals[vi].vp ;
 	sl = op->vals[vi].vl ;
-/* store the initial segment of the name */
+	/* store the initial segment of the name */
 	if ((tp - sp) > 0) {
 	    sbuf_strw(bp,sp,(tp - sp)) ;
 	    sl -= (tp - sp) ;
 	    sp = tp ;
 	}
-/* make the substitution */
+	/* make the substitution */
 	{
 	    sbuf_chr(bp,'_') ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-/* loop searching for other segments */
+	/* loop searching for other segments */
 	while ((tp = strnchr(sp,sl,'-')) != nullptr) {
 	    sbuf_strw(bp,sp,(tp - sp)) ;
 	    sl -= (tp - sp) ;
@@ -423,19 +421,19 @@ void gecoshelp::office() noex {
 
 void gecoshelp::wphone() noex {
 	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
-	        if (tp - bp) {
-	            n += 1 ;
-	            op->vals[gecosval_wphone].vp = bp ;
-	            op->vals[gecosval_wphone].vl = (tp - bp) ;
-	        }
-	        bp = (tp + 1) ;
-	        bl = (sp + sl) - (tp + 1) ;
-	    } else if (op->vals[gecosval_office].vp == nullptr) {
+	    if (tp - bp) {
 	        n += 1 ;
-	        op->vals[gecosval_office].vp = bp ;
-	        op->vals[gecosval_office].vl = bl ;
-	        bl = 0 ;
-	    } /* end if */
+	        op->vals[gecosval_wphone].vp = bp ;
+	        op->vals[gecosval_wphone].vl = (tp - bp) ;
+	    }
+	    bp = (tp + 1) ;
+	    bl = (sp + sl) - (tp + 1) ;
+	} else if (op->vals[gecosval_office].vp == nullptr) {
+	    n += 1 ;
+	    op->vals[gecosval_office].vp = bp ;
+	    op->vals[gecosval_office].vl = bl ;
+	    bl = 0 ;
+	} /* end if */
 }
 /* end method (gecoshelp::wphone) */
 

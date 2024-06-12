@@ -101,7 +101,7 @@
 
 extern "C" {
    extern int	ctdeci(char *,int,int) noex ;
-   extern int	getourhe(cchar *,char *,HOSTENT *,char *,int) noex ;
+   extern int	getheour(cchar *,char *,HOSTENT *,char *,int) noex ;
    extern int	isNotPresent(int) noex ;
    extern int	isNotAccess(int) noex ;
 }
@@ -181,26 +181,22 @@ int inetping(cchar *rhost,int timeout) noex {
 	    if ((addr = inet_addr(rhost)) == ADDR_NOT) {
 	        f_numeric = FALSE ;
 	        hep = &he ;
-	        if ((rs = getourhe(rhost,NULL,hep,hebuf,helen)) >= 0) {
+	        if ((rs = getheour(rhost,NULL,hep,hebuf,helen)) >= 0) {
 	            if (hep->h_addrtype != AF_INET) {
 	                rs = SR_HOSTUNREACH ;
 	            }
 	        }
 	    } /* end (non-numeric addresses) */
-/* find a "ping" program */
+	    /* find a "ping" program */
 	    if (rs >= 0) {
-	        int	i ;
+	        int	i ; /* used-afterwards */
 	        for (i = 0 ; pings[i] != NULL ; i += 1) {
 	            if (u_access(pings[i],X_OK) >= 0) break ;
 	        }
 	        if (pings[i] != NULL) {
 	            in_addr_t	*iap ;
 	            cchar	*pingprog = pings[i] ;
-#if	CF_DEBUGS
-	            debugprintf("inetping: ping i=%d prog=%s\n",
-			i,pingprog) ;
-#endif
-/* do the dirty deed! */
+		    /* do the dirty deed! */
 	            if (f_numeric) {
 	                iap = (in_addr_t *) &addr ;
 	                rs = pingone(pingprog,iap,timeout) ;
@@ -208,14 +204,14 @@ int inetping(cchar *rhost,int timeout) noex {
 	                hostent_cur	hc ;
 	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
 	            	    cuchar	*ap ;
-	                    while (hostent_enumaddr(&he,&hc,&ap) >= 0) {
+	                    while ((rs = hostent_enumaddr(&he,&hc,&ap)) > 0) {
 	                        iap = (in_addr_t *) ap ;
 	                        rs = pingone(pingprog,iap,timeout) ;
 	                        if (rs >= 0) break ;
 	                    } /* end while */
 	                    hostent_curend(&he,&hc) ;
 	                } /* end if (cursor) */
-	            }
+	            } /* end if */
 	        } else {
 	            rs = SR_NOTSUP ;
 	        }

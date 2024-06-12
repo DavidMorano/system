@@ -158,14 +158,14 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	        rs = uc_mktime(&tc,&t) ;
 	    } /* end if (need DST indicator) */
 	    if (rs >= 0) {
-	        if constexpr (f_darwin) {
+	        if_constexpr (f_darwin) {
 	            op->gmtoff = tc.tm_gmtoff ;
 	            zp = tc.tm_zone ;
 	        } else {
 	            bool	f_isdst = (tc.tm_isdst > 0) ;
 	            op->gmtoff = (f_isdst) ? altzone : timezone ;
 	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
-	        } /* end if-constexpr (f_darwin) */
+	        } /* end if_constexpr (f_darwin) */
 	        rs = strwcpy(op->zname,zp,znamelen) - op->zname ;
 	    } /* end if (getting zone-name) */
 	} /* end if (non-null) */
@@ -187,10 +187,10 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	    tmp->tm_wday = op->wday ;
 	    tmp->tm_yday = op->yday ;
 	    tmp->tm_isdst = op->isdst ;
-	    if constexpr (f_darwin) {
+	    if_constexpr (f_darwin) {
 	        tmp->tm_gmtoff = op->gmtoff ;
 	        tmp->tm_zone = op->zname ;
-	    } /* end if-constexpr (f_darwin) */
+	    } /* end if_constexpr (f_darwin) */
 	} /* end if (non-null) */
 	return rs ;
 }

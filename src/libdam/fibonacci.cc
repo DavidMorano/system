@@ -25,7 +25,7 @@
 	inputs -> stack overflow!).
 
 	Synopsis:
-	long fibonacci(uint n) noex
+	long fibonacci(int n) noex
 
 	Arguments:
 	n	number to return Fibonacci value for
@@ -36,7 +36,7 @@
 	Notes:
 	The original Fibonacci function:
 
-	longLONG fibonacci(int n) {
+	long fibonacci(int n) {
 	    long	v = 0 ;
 	    if ((n == 1) || (n == 2)) {
 	        n = 1 ;
@@ -59,8 +59,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
 
 #include	"fibonacci.h"
@@ -83,7 +84,7 @@
 
 /* local variables */
 
-static constexpr long	fibotab[] = {
+constexpr uint		fibotab[] = {
 	0x00000000, 0x00000001, 0x00000001, 0x00000002,
 	0x00000003, 0x00000005, 0x00000008, 0x0000000d,
 	0x00000015, 0x00000022, 0x00000037, 0x00000059,
