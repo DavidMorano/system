@@ -55,6 +55,7 @@
 #include	<mallocstuff.h>
 #include	<quoteshellarg.h>
 #include	<getchostname.h>
+#include	<getehostname.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -1117,7 +1118,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* is the target host reachable ? */
 
 	    cp2 = cp ;
-	    rs = getehostname(cp,buf) ;
+	    rs = getehostname(buf,cp) ;
 
 	    if ((rs < 0) && (cp != chostname)) {
 	        cp2 = chostname ;

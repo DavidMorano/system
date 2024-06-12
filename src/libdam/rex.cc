@@ -1,12 +1,11 @@
-/* rex */
+/* rex SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to open a FD to a remotely executing command */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_REXECL	1		/* use 'rxecl(3dam)' */
-#define	CF_RCMDU	1		/* use 'rcmdu(3dam)' */
-
+#define	CF_REXECL	1		/* use |rexecl(3dam)| */
+#define	CF_RCMDU	1		/* use |rcmdu(3dam)| */
 
 /* revision history:
 
@@ -14,8 +13,8 @@
 	This program was started by copying from the RSLOW program.
 
 	= 1996-12-12, David A­D­ Morano
-        I modified the program to take the username and password from a
-        specified file (for better security).
+	I modified the program to take the username and password
+	from a specified file (for better security).
 
 */
 
@@ -23,8 +22,10 @@
 
 /*******************************************************************************
 
-	Synopsis:
+	Name:
+	rex
 
+	Synopsis:
 	int rex(rhost,auth,f,program,argv,fd2p,mpp)
 	char	rhost[] ;
 	char	program[] ;
@@ -53,12 +54,9 @@
 	the INET 'exec' or 'shell' services may be invoked to
 	try and make a connection to the remote host.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -68,14 +66,19 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<netdb.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
-#include	<bfile.h>
 #include	<userinfo.h>
+#include	<getxx.h>
+#include	<getehostname.h>
 #include	<netfile.h>
+#include	<bfile.h>
+#include	<sfx.h>
+#include	<strwcpy.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"rex.h"
@@ -91,82 +94,81 @@
 #define	LEQUIV(a,b)	(((a) && (b)) || ((! (a)) && (! (b))))
 #endif
 
-#define	CF_USEREENTRANT	defined(POSIX) && defined(SOLARIS)
-
 #ifndef	INETADDRBAD
 #define	INETADDRBAD	((unsigned int) (~ 0))
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef mainv		mv ;
+
+
 /* external subroutines */
 
-#if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(const char *,const char *,int) ;
-#endif
-
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	getehostname() ;
-extern int	mkquoted(char *,int,const char *,int) ;
-
-
-/* forward subroutines */
-
-static int	hostequiv() ;
+extern "C" {
+    extern int mkquoted(char *,int,cchar *,int) noex ;
+    extern int bufprintf(char *,int,cchar *,...) noex ;
+    extern int rexecl(char **,int,cc *,cc *,cc *,int *) noex ;
+    extern int rcmdu(cc *,cc *,cc *,int *) noex ;
+}
 
 
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward subroutines */
+
+static int	hostequiv(cc *,cc *,cc *) noex ;
+
+
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int rex(rhost,auth,f,program,argv,fd2p,mpp)
-const char	rhost[] ;
-REX_AUTH	*auth ;
-REX_FL		*f ;
-const char	program[] ;
-const char	**argv ;
-int		*fd2p ;
-NETFILE_ENT	**mpp ;
-{
-	struct servent	*sp, se ;
-	USERINFO	u ;
+int rex(cc *rhost,rex_au *auth,rex_fl *f,cc *program,mv argv,int *fd2p,
+		NETFILE_ENT **mpp) noex {
+	ucentsv		se{} ;
+	ucentsv		*sp{} ;
+	USERINFO	u{} ;
 	NETFILE_ENT	*mp ;
 	int		rs = SR_OK ;
 	int		srs ;
-	int		i, j ;
+	int		i ;
 	int		len, l ;
-	int		childstat ;
 	int		rfd = -1 ;
 	int		port = -1 ;
-	const char	*args[2] ;
-	const char	*username = NULL ;
+	cchar	*args[2] ;
+	cchar	*username = NULL ;
 	char		userbuf[USERBUFLEN + 1] ;
 	char		buf[BUFLEN + 1], *bp ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
 	char		hostname[MAXHOSTNAMELEN + 1] ;
 	char		ahostname[MAXHOSTNAMELEN + 1] ;
-	const char	*password = NULL ;
-	const char	*authorization = "any" ;
-	const char	*cp, *cp1, *cp2 ;
+	cchar	*password = NULL ;
+	cchar	*authorization = "any" ;
+	cchar	*cp ;
 	char		*ahost = ahostname ;
-
-#if	CF_DEBUGS
-	debugprintf("rex: ent\n") ;
-#endif
 
 /* initialize some other common user stuff */
 
+#ifdef	COMMENT
 	if ((rs = userinfo(&u,userbuf,USERBUFLEN,NULL)) < 0) {
 	    if (u.domainname == NULL) u.domainname = "" ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("rex: goto user information\n") ;
-#endif
+#else
+	(void) userbuf ;
+#endif /* COMMENT */
 
 	if ((rhost == NULL) || (rhost[0] == '\0'))
 	    goto badhost ;
@@ -175,7 +177,7 @@ NETFILE_ENT	**mpp ;
 	    goto badprog ;
 
 	if (argv == NULL) {
-	    const char	*ccp ;
+	    cchar	*ccp ;
 
 	    sfbasename(program,-1,&ccp) ;
 
@@ -195,8 +197,8 @@ NETFILE_ENT	**mpp ;
 	    if (auth->password != NULL) 
 		password = auth->password ;
 
-	    if (auth->restrict != NULL) 
-		authorization = auth->restrict ;
+	    if (auth->res != NULL) 
+		authorization = auth->res ;
 
 	} /* end if */
 
@@ -214,54 +216,36 @@ NETFILE_ENT	**mpp ;
 
 	        port = -1 ;
 
-#if	CF_USEREENTRANT
-	        sp = getservbyname_r(cp, "tcp",
-	            &se,cmdbuf,CMDBUFLEN) ;
+#ifdef	COMMENT
+	        sp = getservbyname_r(cp, "tcp", &se,cmdbuf,CMDBUFLEN) ;
 #else
-	        sp = getservbyname(cp, "tcp") ;
+		rs = getsv_name(&se,cmdbuf,CMDBUFLEN,cp,"tcp") ;
 #endif
-
 	        if (sp != NULL) {
-
 	            port = (int) ntohs(sp->s_port) ;
-
-#if	CF_DEBUGS
-	            debugprintf("rex: service specified port=%d\n",
-	                port) ;
-#endif
-
 	        }
 
 	    } /* end if (bad decimal conversion) */
 
-#if	CF_DEBUGS
-	    debugprintf("rex: specified port=%d\n",
-	        port) ;
-#endif
-
-	} else
+	} else {
 	    strcpy(hostname,rhost) ;
+	}
 
 /* get the INET service port for the REXEC service */
 
 	if (port < 0) {
 
-#if	CF_USEREENTRANT
-	    sp = getservbyname_r("exec", "tcp",
-	        &se,cmdbuf,CMDBUFLEN) ;
+#ifdef	COMMENT
+	    sp = getservbyname_r("exec", "tcp", &se,cmdbuf,CMDBUFLEN) ;
 #else
-	    sp = getservbyname("exec", "tcp") ;
+	    rs = getsv_name(&se,cmdbuf,CMDBUFLEN,"exec","tcp") ;
 #endif
-
 	    if (sp == NULL) {
-
-#if	CF_USEREENTRANT
-	        sp = getservbyname_r("rexec", "tcp",
-	            &se,cmdbuf,CMDBUFLEN) ;
+#ifdef	COMMENT
+	        sp = getservbyname_r("rexec", "tcp", &se,cmdbuf,CMDBUFLEN) ;
 #else
-	        sp = getservbyname("rexec", "tcp") ;
+	        rs = getsv_name(&se,cmdbuf,CMDBUFLEN,"rexec","tcp") ;
 #endif
-
 	    }
 
 	    if (sp != NULL) {
@@ -274,29 +258,17 @@ NETFILE_ENT	**mpp ;
 
 /* create the remote command */
 
-#if	CF_DEBUGS
-	debugprintf("rex: creating remote command\n") ;
-#endif
-
 	len = bufprintf(cmdbuf,CMDBUFLEN,"%s",program) ;
 
 	if ((argv != NULL) && (argv[0] != NULL)) {
 
 	    for (i = 1 ; argv[i] != NULL ; i += 1) {
 
-#if	CF_DEBUGS
-	        debugprintf("rex: arg%d> %s\n",i,argv[i]) ;
-#endif
-
 		bp = buf ;
 	        l = mkquoted(buf,BUFLEN,argv[i],-1) ;
 
 	        if ((l < 0) || (l > (CMDBUFLEN - len)))
 	            goto badtoomuch ;
-
-#if	CF_DEBUGS
-	        debugprintf("rex: sharg%d> %W\n",i,bp,l) ;
-#endif
 
 	        cmdbuf[len++] = ' ' ;
 	        strwcpy(cmdbuf + len,bp,l) ;
@@ -307,10 +279,6 @@ NETFILE_ENT	**mpp ;
 
 	} /* end if ('argv' not NULL) */
 
-#if	CF_DEBUGS
-	debugprintf("rex: cmd=\"%s\"\n",cmdbuf) ;
-#endif
-
 /* now we want to make sure that our remote hostname is INET translatable */
 
 	{
@@ -318,12 +286,12 @@ NETFILE_ENT	**mpp ;
 
 	    addr = inet_addr(hostname) ;
 	    if (addr == INETADDRBAD) {
-
-	        if (getehostname(hostname,buf) < 0) 
+	        if (getehostname(buf,hostname) < 0) 
 		    goto badunreach ;
 
-	        if (strcmp(hostname,buf) != 0)
+	        if (strcmp(hostname,buf) != 0) {
 	            strcpy(hostname,buf) ;
+		}
 
 	    } /* end if */
 	} /* end block */
@@ -332,21 +300,8 @@ NETFILE_ENT	**mpp ;
 
 	if (password != NULL) {
 
-#if	CF_DEBUGS
-	    debugprintf("rex: executing REXEC on supplied password\n") ;
-#endif
-
-#if	CF_DEBUGS
-	    debugprintf("rex: supplied m=\"%s\" u=\"%s\" p=\"%s\"\n",
-	        hostname,username,password) ;
-#endif
-
 	    ahost = ahostname ;
 	    strcpy(ahostname,hostname) ;
-
-#if	CF_DEBUGS
-	    debugprintf("rex: calling REXECL\n") ;
-#endif
 
 #if	CF_REXECL
 	    rs = rexecl(&ahost,port,username,
@@ -358,11 +313,6 @@ NETFILE_ENT	**mpp ;
 	        password, cmdbuf,fd2p) ;
 #endif /* R_REXECL */
 
-#if	CF_DEBUGS
-	    debugprintf("rex: back from REXECL w/ rs=%d\n",
-	        rs) ;
-#endif
-
 	    rfd = rs ;
 	    if (rs >= 0) goto goodsupply ;
 
@@ -372,52 +322,20 @@ NETFILE_ENT	**mpp ;
 		goto badrexec ;
 
 /* process any NETRC files that we can find */
-
-#if	CF_DEBUGS
-	debugprintf("rex: about to process the NETRC files\n") ;
-#endif
-
 /* try to find a matching NETRC entry for the host/user pair that we have */
 
 	if ((auth != NULL) && (auth->machinev != NULL) &&
 	    (strncmp(authorization,"r",1) != 0)) {
 
-#if	CF_DEBUGS
-	    debugprintf("rex: m=%s u=%s\n",hostname,username) ;
-#endif
-
 	    rs = -1 ;
 	    for (i = 0 ; (mp = auth->machinev[i]) != NULL ; i += 1) {
-
-#if	CF_DEBUGS
-	        debugprintf("rex: entry i=%d\n", i) ;
-	        if (mp->machine != NULL)
-	            debugprintf("rex: m=\"%s\"\n",
-	                mp->machine) ;
-	        if (mp->login != NULL)
-	            debugprintf("rex: u=\"%s\"\n",
-	                mp->login) ;
-	        if (mp->password != NULL)
-	            debugprintf("rex: p=\"%s\"\n",
-	                mp->password) ;
-#endif /* CF_DEBUGS */
 
 	        if ((mp->machine == NULL) ||
 	            (mp->login == NULL) ||
 	            (mp->password == NULL)) continue ;
 
-#if	CF_DEBUGS
-	        debugprintf("rex: looking at entry m=\"%s\"\n",
-	            mp->machine) ;
-#endif
-
 	        if ((hostequiv(hostname,mp->machine,u.domainname)) &&
 	            (strcmp(mp->login,username) == 0)) {
-
-#if	CF_DEBUGS
-	            debugprintf("rex: trying entry m=\"%s\" u=\"%s\"\n",
-	                mp->machine,mp->login) ;
-#endif
 
 	            ahost = ahostname ;
 	            strcpy(ahostname,hostname) ;
@@ -442,10 +360,6 @@ NETFILE_ENT	**mpp ;
 
 	    if (rs >= 0) goto goodrexec ;
 
-#if	CF_DEBUGS
-	    debugprintf("rex: no matching NETRC entries\n") ;
-#endif
-
 	} /* end if (we have authorization machine entries) */
 
 	if (strncmp(authorization,"password",1) == 0) 
@@ -457,17 +371,9 @@ NETFILE_ENT	**mpp ;
 
 	if ((f == NULL) || ((f != NULL) && (! f->keepalive))) {
 
-#if	CF_DEBUGS
-	    debugprintf("rex: executing RCMDU u=%s\n",username) ;
-#endif
-
 	    rs = rcmdu(hostname,username, cmdbuf,fd2p) ;
 	    rfd = rs ;
 	    if (rs >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("rex: connected w/ RCMDU\n") ;
-#endif
 
 	        goto goodrcmdu ;
 	    }
@@ -483,10 +389,6 @@ NETFILE_ENT	**mpp ;
 		goto badrexec ;
 
 /* try no password on the specified username */
-
-#if	CF_DEBUGS
-	debugprintf("rex: executing REXEC with blank password\n") ;
-#endif
 
 	ahost = ahostname ;
 	strcpy(ahostname,hostname) ;
@@ -511,38 +413,14 @@ NETFILE_ENT	**mpp ;
 	if ((auth != NULL) && (auth->machinev != NULL) &&
 	    (strncmp(authorization,"r",1) != 0)) {
 
-#if	CF_DEBUGS
-	    debugprintf("rex: autologin m=%s\n",hostname) ;
-#endif
-
 	    rs = -1 ;
 	    for (i = 0 ; (mp = auth->machinev[i]) != NULL ; i += 1) {
-
-#if	CF_DEBUGS
-	        debugprintf("rex: entry i=%d\n", i) ;
-	        if (mp->machine != NULL)
-	            debugprintf("rex: m=\"%s\"\n", mp->machine) ;
-	        if (mp->login != NULL)
-	            debugprintf("rex: u=\"%s\"\n", mp->login) ;
-	        if (mp->password != NULL)
-	            debugprintf("rex: p=\"%s\"\n", mp->password) ;
-#endif /* F_DDEBUG */
 
 	        if ((mp->machine == NULL) ||
 	            (mp->login == NULL)) continue ;
 
-#if	CF_DEBUGS
-	        debugprintf("rex: looking at entry m=\"%s\"\n",
-	            mp->machine) ;
-#endif
-
 	        if (hostequiv(hostname,mp->machine,u.domainname) &&
 	            (strcasecmp(mp->login,username) != 0)) {
-
-#if	CF_DEBUGS
-	            debugprintf("rex: trying entry m=\"%s\" u=\"%s\"\n",
-	                mp->machine,mp->login) ;
-#endif
 
 	            ahost = ahostname ;
 	            strcpy(ahostname,hostname) ;
@@ -567,10 +445,6 @@ NETFILE_ENT	**mpp ;
 
 	    if (rs >= 0) goto goodrexec ;
 
-#if	CF_DEBUGS
-	    debugprintf("rex: couldn't find a NETRC entry \n") ;
-#endif
-
 	} /* end if (we had authorization NETRC information) */
 
 /* done with this try */
@@ -581,10 +455,6 @@ NETFILE_ENT	**mpp ;
 
 	if (((f == NULL) || ((f != NULL) && (! f->keepalive))) && 
 	    (strcmp(username,u.username) != 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("rex: use our own username w/ RCMDU\n") ;
-#endif
 
 	    rs = rcmdu(hostname,u.username,
 	        cmdbuf,fd2p) ;
@@ -601,10 +471,6 @@ NETFILE_ENT	**mpp ;
 
 /* we failed all attempts */
 
-#if	CF_DEBUGS
-	debugprintf("rex: failed all authorization attempts\n") ;
-#endif
-
 	goto badrexec ;
 
 /* we got in! */
@@ -620,10 +486,6 @@ goodrexec:
 	    *mpp = mp ;
 
 done:
-
-#if	CF_DEBUGS
-	debugprintf("rex: finishing up\n") ;
-#endif
 
 	return rfd ;
 
@@ -661,44 +523,10 @@ badunreach:
 
 /* local subroutines */
 
-
-/* hostequiv */
-
-/* rough equivalent host check */
-
-
-
-/* revision history:
-
-	- David A.D. Morano, 96/11/21
-	This program was started by copying from the RSLOW program.
-
-	- David A.D. Morano, 96/12/12
-	I modified the program to take the username and password
-	from a specified file (for better security).
-
-
-*/
-
-
-/**************************************************************************
-
-	Synopsis:
-
-
-**************************************************************************/
-
-
-/* compare host names */
-static int hostequiv(h1,h2,localdomain)
-char	h1[], h2[] ;
-char	localdomain[] ;
-{
+static int hostequiv(cc *h1,cc *h2,cc *localdomain) noex {
 	int	f_h1 = FALSE, f_h2 = FALSE ;
 	int	len1, len2 ;
-
-	char	*cp, *cp1, *cp2 ;
-
+	char	*cp1, *cp2 ;
 
 	if ((cp1 = strchr(h1,'.')) != NULL) 
 		f_h1 = TRUE ;

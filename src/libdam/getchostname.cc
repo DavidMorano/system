@@ -16,21 +16,24 @@
 
 /*******************************************************************************
 
+	Name:
+	getchostname
+
+	Description:
 	This subroutine is used to get a canonical INET hostname
-	for a supplied name. Note carefully that the returned
+	for a supplied name.  Note carefully that the returned
 	hostname, if any, may NOT be a name that can be translated
-	into a good INET address. In other words, this subroutine
+	into a good INET address.  In other words, this subroutine
 	uses its own definition of a "canonical" name and that
 	definition does NOT necessarily include the fact that the
 	resulting name can be translated into a good INET address.
 	If you want a name that is guaranteed to be translatable
 	into a valid INET address, then you want to investigate the
-	subroutine GETEHOSTNAME (Get Entry HostName).
-
-	Having said that the resuling name is not guaranteed to be
-	translatable, a good translation facility will generally
-	figure out that the given name is something that can be
-	translated given the existing host information.
+	subroutine GETEHOSTNAME (Get Entry HostName).  Having said
+	that the resuling name is not guaranteed to be translatable,
+	a good translation facility will generally figure out that
+	the given name is something that can be translated given
+	the existing host information.
 
 	Synopsis:
 	int getchostname(char *cbuf,cchar *name) noex
@@ -81,10 +84,13 @@
 /* external subroutines */
 
 
-/* forward references */
-
-
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

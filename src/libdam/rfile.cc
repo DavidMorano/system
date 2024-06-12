@@ -81,10 +81,6 @@
 
 extern "C" {
     extern int	reade() noex ;
-    extern int	getehostname() noex ;
-}
-
-extern "C" {
     extern char	*strbasename() noex ;
 }
 

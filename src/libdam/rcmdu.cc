@@ -1,21 +1,18 @@
-/* rcmdu */
+/* rcmdu SUPPORT */
+/* lang=C++20 */
 
 /* get connection to remote command (unpriviledged) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_TESTRCMD	0		/* first test the connection */
 #define	CF_PIPES	0		/* use System V pipes */
 #define	CF_CMDPATH	1		/* try PATH for finding cmd_rsh */
 
-
 /* revision history:
 
 	= 1998-07-10, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -26,12 +23,9 @@
 	This is a dialer to use the underlying RSH program to make
 	a "SHELL" remote connection to another machine.
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -39,14 +33,15 @@
 #include	<sys/wait.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getehostname.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -84,7 +79,6 @@ typedef unsigned int	in_addr_t ;
 
 /* external subroutines */
 
-extern int	getehostname(const char *,char *) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 
 #if	CF_DEBUGS
@@ -189,16 +183,12 @@ int		*fd2p ;
 /* test the host name for addressability */
 
 	if ((rs >= 0) && (inet_addr(rhost) == NOADDR)) {
-
-	    rs = getehostname(rhost,ehostname) ;
-
-	    if ((rs >= 0) && (strcmp(rhost,ehostname) != 0))
+	    rs = getehostname(ehostname,rhost) ;
+	    if ((rs >= 0) && (strcmp(rhost,ehostname) != 0)) {
 	        rhost = ehostname ;
-
+	    }
 	} /* end if */
-
-	if (rs < 0)
-	    goto ret0 ;
+	if (rs < 0) goto ret0 ;
 
 /* test the remote host for accessibility */
 

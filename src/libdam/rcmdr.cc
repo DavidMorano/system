@@ -1,14 +1,13 @@
-/* rcmdr */
+/* rcmdr SUPPORT */
+/* lang=C++20 */
 
 /* get connection to remote command (unpriviledged) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_TESTRCMD	0		/* run the access-test code? */
 #define	CF_PIPES	0		/* use System V pipes */
 #define	CF_CMDPATH	1		/* try PATH for finding cmd_rsh */
-
 
 /* revision history:
 
@@ -21,15 +20,12 @@
 
 /*******************************************************************************
 
-        This is a dialer to use the underlying RSH program to make a "SHELL"
-        remote login connection to another machine.
-
+	This is a dialer to use the underlying RSH program to make
+	a "SHELL" remote login connection to another machine.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -37,14 +33,15 @@
 #include	<sys/wait.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getehostname.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -76,7 +73,6 @@ typedef unsigned int	in_addr_t ;
 
 /* external subroutines */
 
-extern int	getehostname(const char *,char *) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 
 #if	CF_DEBUGS
@@ -186,17 +182,14 @@ int		*fd2p ;
 /* test the host name for addressability */
 
 	if ((rs >= 0) && (inet_addr(rhost) == NOADDR)) {
-
-	    if (getehostname(rhost,ehostname) < 0)
+	    if (getehostname(ehostname,rhost) < 0) {
 	        rs = SR_HOSTUNREACH ;
-
-	    if ((rs >= 0) && (strcmp(rhost,ehostname) != 0))
+	    }
+	    if ((rs >= 0) && (strcmp(rhost,ehostname) != 0)) {
 	        rhost = ehostname ;
-
+	    }
 	} /* end if (needed name service) */
-
-	if (rs < 0)
-	    goto ret0 ;
+	if (rs < 0) goto ret0 ;
 
 #if	CF_TESTRCMD
 
@@ -204,19 +197,11 @@ int		*fd2p ;
 
 	rs = SR_AGAIN ;
 	for (i = 0 ; i < NTRIES ; i += 1) {
-
-	    if (i > 0)
-	        sleep(NWAITINT) ;
-
+	    if (i > 0) sleep(NWAITINT) ;
 	    rs = testrcmdu(cmd_rsh,rhost,ruser) ;
-
-	    if (rs != SR_AGAIN)
-	        break ;
-
+	    if (rs != SR_AGAIN) break ;
 	} /* end for */
-
-	if (rs < 0)
-	    goto ret0 ;
+	if (rs < 0) goto ret0 ;
 
 #endif /* CF_TESTRCMD */
 

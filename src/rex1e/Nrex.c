@@ -67,17 +67,19 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cerrno>
 #include	<netdb.h>
 #include	<poll.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<errno.h>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<userinfo.h>
 #include	<mallocstuff.h>
+#include	<getehostname.h>
 #include	<quoteshellarg.h>
 #include	<localmisc.h>
 
@@ -96,7 +98,6 @@
 /* external subroutines */
 
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getehostname() ;
 extern int	qualdisplay() ;
 
 extern char	*strbasename() ;
@@ -413,7 +414,7 @@ struct netrc		**mpp ;
 
 	if (inet_addr(hostname) == 0xFFFFFFFF) {
 
-	    if (getehostname(hostname,buf) < 0) goto badunreach ;
+	    if (getehostname(buf,hostname) < 0) goto badunreach ;
 
 	    if (strcmp(hostname,buf) != 0)
 	        strcpy(hostname,buf) ;
@@ -424,22 +425,8 @@ struct netrc		**mpp ;
 
 	if (password != NULL) {
 
-#if	CF_DEBUG
-	    debugprintf("rex: executing REXEC on supplied password\n") ;
-#endif
-
-#if	CF_DEBUG
-	    debugprintf("rex: supplied m=\"%s\" u=\"%s\" p=\"%s\"\n",
-	        hostname,username,password) ;
-#endif
-
 	    rs = rex_rexec(hostname,port,username,
 	        password,wormfname,cmdbuf,fd2p) ;
-
-#if	CF_DEBUG
-	    debugprintf("rex: back from REXECL w/ rs=%d\n",
-	        rs) ;
-#endif
 
 	    rfd = rs ;
 	    if (rs >= 0) goto goodsupply ;

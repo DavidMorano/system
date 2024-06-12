@@ -1,7 +1,7 @@
 /* gethename HEADER */
 /* lang=C20 */
 
-/* try to find the peername for an NLS (XTI) connection */
+/* get a HOSTENT for a given INET (host) name */
 /* version %I% last-modified %G% */
 
 

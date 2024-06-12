@@ -1,16 +1,16 @@
-/* netfile */
+/* netfile SUPPORT */
+/* lang=C++20 */
 
 /* read a NETRC file and make its contents available */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-09-22, David A­D­ Morano
-	This subroutine module was adopted for use from a previous NETRC
-	reading program.  This version currently ignores all 'macdef' entries.
+	This subroutine module was adopted for use from a previous
+	NETRC reading program.  This version currently ignores all
+	'macdef' entries.
 
 */
 
@@ -18,57 +18,46 @@
 
 /*******************************************************************************
 
-	OK, here is the deal.  We ignore the 'macdef' key totally except to
-	process the fact that it has a value (which is supposed to be the name
-	of the newly defined macro) and the actual definition (or body of the
-	macro) on the next line.
+	OK, here is the deal.  We ignore the 'macdef' key totally
+	except to process the fact that it has a value (which is
+	supposed to be the name of the newly defined macro) and the
+	actual definition (or body of the macro) on the next line.
 
-	If there is no 'machine' key associated with some 'login' key, then we
-	make a fake NULL machine grouping, but only one of these within the
-	whole 'netrc' file!
+	If there is no 'machine' key associated with some 'login'
+	key, then we make a fake NULL machine grouping, but only
+	one of these within the whole 'netrc' file!
 
-	If there are more than one 'login', 'account', or what have you, key
-	associated with a single 'machine' key, then we ignore all but the
-	first.
+	If there are more than one 'login', 'account', or what have
+	you, key associated with a single 'machine' key, then we
+	ignore all but the first.
 
-	Finally, this may be more (except for the 'macdef' key) than what the
-	standard FTP and 'rexec(3)' NETRC file parsers do!
-
+	Finally, this may be more (except for the 'macdef' key)
+	than what the standard FTP and |rexec(3)| NETRC file parsers
+	do!
 
 *******************************************************************************/
 
-
-#define	CF_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<bfile.h>
 #include	<field.h>
-#include	<localmisc.h>
+#include	<matxstr.h>
+#include	<strwcpy.h>
+#include	<localmisc.h>		/* |LINEBUFLEN| */
 
 #include	"netfile.h"
 
 
 /* local defines */
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
 
 #define	KEYBUFLEN	10
 
@@ -76,21 +65,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	snwcpylc(char *,int,const char *,int) ;
-extern int	snwcpyuc(char *,int,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
 
 
 /* external variables */
@@ -108,32 +82,30 @@ enum netitems {
 
 struct netstate {
 	int		c ;
-	const char	*item[netitem_overlast] ;
+	cchar	*item[netitem_overlast] ;
 } ;
 
 
 /* forward references */
 
-int		netfile_close(NETFILE *) ;
+static int	netfile_parse(NETFILE *,NETSTATE *,cchar *) noex ;
+static int	netfile_item(NETFILE *,NETSTATE *,int,cchar *,int) noex ;
 
-static int	netfile_parse(NETFILE *,NETSTATE *,const char *) ;
-static int	netfile_item(NETFILE *,NETSTATE *,int,cchar *,int) ;
+static int	netstate_start(NETSTATE *) noex ;
+static int	netstate_reset(NETSTATE *) noex ;
+static int	netstate_item(NETSTATE *,int,cchar *,int) noex ;
+static int	netstate_ready(NETSTATE *) noex ;
+static int	netstate_finish(NETSTATE *) noex ;
 
-static int	netstate_start(NETSTATE *) ;
-static int	netstate_reset(NETSTATE *) ;
-static int	netstate_item(NETSTATE *,int,const char *,int) ;
-static int	netstate_ready(NETSTATE *) ;
-static int	netstate_finish(NETSTATE *) ;
+static int	entry_start(NETFILE_ENT *,NETSTATE *) noex ;
+static int	entry_finish(NETFILE_ENT *) noex ;
 
-static int	entry_start(NETFILE_ENT *,NETSTATE *) ;
-static int	entry_finish(NETFILE_ENT *) ;
-
-static int	getnii(int) ;
+static int	getnii(int) noex ;
 
 
 /* local variables */
 
-static const unsigned char 	fterms[32] = {
+constexpr char		fterms[32] = {
 	0x7F, 0xFE, 0xC0, 0xFE,
 	0x8B, 0x00, 0x00, 0x24, 
 	0x00, 0x00, 0x00, 0x00, 
@@ -142,17 +114,6 @@ static const unsigned char 	fterms[32] = {
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 
-} ;
-
-static const char *netkeys[] = {
-	"machine",
-	"login",
-	"username",
-	"password",
-	"account",
-	"macdef",
-	"default",
-	NULL
 } ;
 
 enum netkeys {
@@ -166,25 +127,33 @@ enum netkeys {
 	netkey_overlast
 } ;
 
-static const int	readies[] = {
+constexpr cpcchar	netkeys[] = {
+	"machine",
+	"login",
+	"username",
+	"password",
+	"account",
+	"macdef",
+	"default",
+	NULL
+} ;
+
+constexpr int		readies[] = {
 	netitem_machine,
 	netitem_login,
 	-1
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int netfile_open(NETFILE *vep,cchar netfname[])
-{
+int netfile_open(NETFILE *vep,cchar *netfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("netfile_open: ent fname=%s\n",netfname) ;
-#endif
 
 	if (vep == NULL)
 	    return SR_FAULT ;
@@ -192,7 +161,7 @@ int netfile_open(NETFILE *vep,cchar netfname[])
 /* initialize */
 
 	if ((rs = vecitem_start(vep,10,0)) >= 0) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    if ((rs = u_stat(netfname,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
 	            NETSTATE	ns ;
@@ -205,49 +174,38 @@ int netfile_open(NETFILE *vep,cchar netfname[])
 	        } else
 	            rs = SR_ISDIR ;
 	    } /* end if (stat) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vecitem_finish(vep) ;
+	    }
 	} /* end if (vecitem) */
-
-#if	CF_DEBUGS
-	debugprintf("netfile_open: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (netfile_open) */
 
-
-/* close this netfile data structure */
-int netfile_close(NETFILE *vep)
-{
+int netfile_close(NETFILE *vep) noex {
 	NETFILE_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vecitem_get(vep,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	for (int i = 0 ; vecitem_get(vep,i,&ep) >= 0 ; i += 1) {
+	    if (ep) {
 	        rs1 = entry_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end while */
-
-	rs1 = vecitem_finish(vep) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = vecitem_finish(vep) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (netfile_close) */
 
-
-/* get an entry */
-int netfile_get(NETFILE *vep,int i,NETFILE_ENT **epp)
-{
-	int		rs ;
-
-	rs = vecitem_get(vep,i,epp) ;
-
+int netfile_get(NETFILE *vep,int i,NETFILE_ENT **epp) noex {
+	int		rs = SR_FAULT ;
+	if (vep) {
+	    rs = vecitem_get(vep,i,epp) ;
+	}
 	return rs ;
 }
 /* end subroutine (netfile_get) */
@@ -255,16 +213,14 @@ int netfile_get(NETFILE *vep,int i,NETFILE_ENT **epp)
 
 /* private subroutines */
 
-
-static int netfile_parse(NETFILE *vep,NETSTATE *nsp,cchar netfname[])
-{
+static int netfile_parse(NETFILE *vep,NETSTATE *nsp,cchar *netfname) noex {
 	bfile		ourfile, *nfp = &ourfile ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = bopen(nfp,netfname,"r",0664)) >= 0) {
-	    FIELD	fsb ;
-	    const int	llen = LINEBUFLEN ;
+	    field	fsb ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		ch ;
 	    int		f_macdef = FALSE ;
@@ -279,9 +235,6 @@ static int netfile_parse(NETFILE *vep,NETSTATE *nsp,cchar netfname[])
 	            continue ;
 	        }
 	        len -= 1 ;
-#if	CF_DEBUGS
-	        debugprintf("netfile_open: line> %t",lbuf,len) ;
-#endif
 	        if (f_macdef) {
 	            if (len == 0) f_macdef = FALSE ;
 	            continue ;
@@ -289,7 +242,7 @@ static int netfile_parse(NETFILE *vep,NETSTATE *nsp,cchar netfname[])
 	        if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
 	            int		f_default = FALSE ;
 	            int		fl ;
-	            const char	*fp ;
+	            cchar	*fp ;
 	            while ((fl = field_get(&fsb,fterms,&fp)) > 0) {
 	                int	ml = MIN(KEYBUFLEN,fl) ;
 	                int	nki ;
@@ -339,28 +292,15 @@ static int netfile_parse(NETFILE *vep,NETSTATE *nsp,cchar netfname[])
 }
 /* end subroutine (netfile_parse) */
 
-
-static int netfile_item(NETFILE *vep,NETSTATE *nsp,int nki,cchar *sp,int sl)
-{
+static int netfile_item(NETFILE *vep,NETSTATE *nsp,int nki,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		nii = getnii(nki) ;
 
-#if	CF_DEBUGS
-	debugprintf("netfile_item: ent nii=%d s=>%t<\n",nii,sp,sl) ;
-#endif
-
 	if ((nii == netitem_machine) || (nii < 0)) {
-#if	CF_DEBUGS
-	debugprintf("netfile_item: machine\n") ;
-#endif
 	    if (netstate_ready(nsp) > 0) {
 		NETFILE_ENT	e ;
-#if	CF_DEBUGS
-	debugprintf("netfile_item: ready m=%s\n",nsp->item[0]) ;
-	debugprintf("netfile_item: ready l=%s\n",nsp->item[1]) ;
-#endif
 	        if ((rs = entry_start(&e,nsp)) >= 0) {
-		    const int	esize = sizeof(NETFILE_ENT) ;
+		    cint	esize = sizeof(NETFILE_ENT) ;
 	            if ((rs = vecitem_add(vep,&e,esize)) >= 0) {
 	                int	ei = rs ;
 	                rs = netstate_reset(nsp) ;
@@ -374,9 +314,6 @@ static int netfile_item(NETFILE *vep,NETSTATE *nsp,int nki,cchar *sp,int sl)
 	} /* end if */
 
 	if ((rs >= 0) && (nii >= 0) && (sp != NULL)) {
-#if	CF_DEBUGS
-	debugprintf("netfile_item: insert\n") ;
-#endif
 	    rs = netstate_item(nsp,nii,sp,sl) ;
 	}
 
@@ -384,46 +321,38 @@ static int netfile_item(NETFILE *vep,NETSTATE *nsp,int nki,cchar *sp,int sl)
 }
 /* end subroutine (netfile_item) */
 
-
-static int netstate_start(NETSTATE *nsp)
-{
-
-	memset(nsp,0,sizeof(NETSTATE)) ;
-
-	return SR_OK ;
+static int netstate_start(NETSTATE *nsp) noex {
+	int		rs = SR_FAULT ;
+	if (nsp) {
+	   rs = memclear(nsp) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (netstate_start) */
 
-
-static int netstate_reset(NETSTATE *nsp)
-{
+static int netstate_reset(NETSTATE *nsp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; i < netitem_overlast ; i += 1) {
+	for (int i = 0 ; i < netitem_overlast ; i += 1) {
 	    if (nsp->item[i] != NULL) {
 	        rs1 = uc_free(nsp->item[i]) ;
 	        if (rs >= 0) rs = rs1 ;
 	        nsp->item[i] = NULL ;
 	    }
 	} /* end for */
-
 	nsp->c = 0 ;
 	return rs ;
 }
 /* end subroutine (netstate_reset) */
 
-
-static int netstate_item(NETSTATE *nsp,int ki,cchar *sp,int sl)
-{
+static int netstate_item(NETSTATE *nsp,int ki,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 
 	if ((ki < 0) || (ki >= netitem_overlast))
 	    return SR_INVALID ;
 
 	if (sp != NULL) {
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (nsp->item[ki] != NULL) {
 	        uc_free(nsp->item[ki]) ;
@@ -441,54 +370,34 @@ static int netstate_item(NETSTATE *nsp,int ki,cchar *sp,int sl)
 }
 /* end subroutine (netstate_item) */
 
-
-static int netstate_ready(NETSTATE *nsp)
-{
-	int		i ;
-	const char	*sp ;
-
+static int netstate_ready(NETSTATE *nsp) noex {
+	int		i ; /* used-afterwards */
 	for (i = 0 ; readies[i] >= 0 ; i += 1) {
-	    sp = nsp->item[i] ;
+	    cchar 	*sp = nsp->item[i] ;
 	    if ((sp == NULL) || (sp[0] == '\0')) break ;
 	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("netstate_ready: i=%u readies=%d\n",i,readies[i]) ;
-#endif
-
 	return (readies[i] >= 0) ? FALSE : TRUE ;
 }
 /* end subroutine (netstate_ready) */
 
-
-static int netstate_finish(NETSTATE *nsp)
-{
+static int netstate_finish(NETSTATE *nsp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; i < netitem_overlast ; i += 1) {
+	for (int i = 0 ; i < netitem_overlast ; i += 1) {
 	    if (nsp->item[i] != NULL) {
 	        rs1 = uc_free(nsp->item[i]) ;
 	        if (rs >= 0) rs = rs1 ;
 	        nsp->item[i] = NULL ;
 	    }
 	} /* end for */
-
 	nsp->c = 0 ;
 	return rs ;
 }
 /* end subroutine (netstate_finish) */
 
-
-static int entry_start(NETFILE_ENT *ep,NETSTATE *nsp)
-{
-	const int	size = sizeof(NETFILE_ENT) ;
-	int		i ;
-
-	memset(ep,0,size) ;
-
-	for (i = 0 ; i < netitem_overlast ; i += 1) {
+static int entry_start(NETFILE_ENT *ep,NETSTATE *nsp) noex {
+	memclear(ep) ;
+	for (int i = 0 ; i < netitem_overlast ; i += 1) {
 	    switch (i) {
 	    case netitem_machine:
 	        ep->machine = nsp->item[i] ;	/* transfer */
@@ -505,50 +414,39 @@ static int entry_start(NETFILE_ENT *ep,NETSTATE *nsp)
 	    } /* end switch */
 	    nsp->item[i] = NULL ;
 	} /* end for */
-
 	return SR_OK ;
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_finish(NETFILE_ENT *mep)
-{
+static int entry_finish(NETFILE_ENT *mep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (mep->machine != NULL) {
+	if (mep->machine) {
 	    rs1 = uc_free(mep->machine) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mep->machine = NULL ;
 	}
-
-	if (mep->login != NULL) {
+	if (mep->login) {
 	    rs1 = uc_free(mep->login) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mep->login = NULL ;
 	}
-
-	if (mep->password != NULL) {
+	if (mep->password) {
 	    rs1 = uc_free(mep->password) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mep->password = NULL ;
 	}
-
-	if (mep->account != NULL) {
+	if (mep->account) {
 	    rs1 = uc_free(mep->account) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mep->account = NULL ;
 	}
-
 	return rs ;
 }
 /* end subroutine (entry_finish) */
 
-
-static int getnii(int nki)
-{
+static int getnii(int nki) noex {
 	int		nii = -1 ;
-
 	switch (nki) {
 	case netkey_machine:
 	    nii = netitem_machine ;
@@ -564,7 +462,6 @@ static int getnii(int nki)
 	    nii = netitem_account ;
 	    break ;
 	} /* end switch */
-
 	return nii ;
 }
 /* end subroutine (getnii) */
