@@ -73,6 +73,14 @@ enum userinfomems {
 	userinfomem_overlast
 } ;
 struct userinfo ;
+struct userinfo_cos {
+	userinfo	*op = nullptr ;
+	void operator () (userinfo *p) noex {
+	    op = p ;
+	} ;
+	operator int () noex ;
+	int operator () (ccharp = nullptr) noex ;
+} ;
 struct userinfo_co {
 	userinfo	*op = nullptr ;
 	int		w = -1 ;
@@ -86,13 +94,14 @@ struct userinfo_co {
 	} ;
 } ; /* end struct (userinfo_co) */
 struct userinfo : userinfo_head {
+	userinfo_cos	start ;
 	userinfo_co	finish ;
 	userinfo() noex {
+	    start(this) ;
 	    finish(this,userinfomem_finish) ;
 	} ;
 	userinfo(const userinfo &) = delete ;
 	userinfo &operator = (const userinfo &) = delete ;
-	int start(cchar *) noex ;
 	void dtor() noex ;
 	~userinfo() noex {
 	    dtor() ;

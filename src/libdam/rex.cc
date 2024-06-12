@@ -25,24 +25,7 @@
 	Name:
 	rex
 
-	Synopsis:
-	int rex(rhost,auth,f,program,argv,fd2p,mpp)
-	char	rhost[] ;
-	char	program[] ;
-	char	argv[] ;
-	int	*fd2p ;
-	struct rex_flags {
-		uint	keepalive:1 ;
-	} *f ;
-	struct rex_auth {
-		char	*restrict ;
-		char	*rusername ;
-		char	*rpassword ;
-		NETFILE_ENT	**machinev ;
-	} *auth ;
-	NETFILE_ENT		**mpp ;
-
-
+	Description:
 	The subroutine either returns a FD for the remote command's
 	standard input and standard output or it returns an error
 	which is indicated by a negative valued return.
@@ -53,6 +36,31 @@
 	Depending on the arguments to the subroutine call, both
 	the INET 'exec' or 'shell' services may be invoked to
 	try and make a connection to the remote host.
+
+	Synopsis:
+	int rex(cc *rhost,rex_au *ap,int ro,cc *pg,mv argv,int *fd2p,
+		netfile_ent **mpp) noex
+
+	Arguments:
+	rhost		remote host
+	ap		pointer to AUTH object
+	ro		REX options
+	pg		program to execute
+	mv		arguments to program (to execute)
+	fd2p		pointer to integer to get error-FD
+	mpp		result pointer to NETFILE_ENT object
+
+	Returns:
+	>=0		resulting socket to remote program STDIN & STDOUT
+	<0		error (system-return)
+
+	Notes:
+	struct rex_auth {
+		char	*restrict ;
+		char	*rusername ;
+		char	*rpassword ;
+		NETFILE_ENT	**machinev ;
+	} *auth ;
 
 *******************************************************************************/
 
@@ -129,22 +137,24 @@ extern "C" {
 namespace {
     struct rexer {
 	rex_au		*auth ;
-	rex_fl		*fp ; 
 	cchar		*rhost ;
 	cchar		*program ;
 	mainv		argv ;
 	int		*fd2p ;
-	netp		*mpp ;
+	entp		*mpp ;
 	userinfo	u ;
-	rexer(cc *r,au *a,fl *f,cc *p,mv v,int *d,entp *pp) noex {
+	int		ro ;
+	rexer(cc *r,au *a,int f,cc *p,mv v,int *d,entp *pp) noex {
 	    rhost = r ;
 	    auth = a ;
-	    fp = f ;
+	    ro = f ;
+	    program = p ;
 	    argv = v ;
 	    fd2p = d ;
 	    mpp = pp ;
 	} ;
 	operator int () noex ;
+	int mainsub() noex ;
     } ; /* end struct (rexer) */
 }
 
@@ -162,23 +172,29 @@ static int	hostequiv(cc *,cc *,cc *) noex ;
 
 /* exported subroutines */
 
-int rex(cc *rhost,au *auth,fl *f,cc *pg,mv av,int *fd2p,netp *mpp) noex {
-	rexer		ro(rhost,auth,f,pg,av,fd2p,mpp) ;
-	return ro ;
+int rex(cc *rhost,au *auth,int ro,cc *pg,mv av,int *fd2p,entp *mpp) noex {
+	rexer		rexo(rhost,auth,ro,pg,av,fd2p,mpp) ;
+	return rexo ;
 }
 
 rexer::operator int () noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		s = -1 ;
-	if ((rs = u.start(un)userinfo_start(&u
+	if ((rs = u.start) >= 0) {
+	    {
+		rs = mainsub() ;
+		s = rs ;
+	    }
+	    rs1 = u.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (userinfo) */
 	return (rs >= 0) ? s : rs ;
 } ;
 
-int rexer::nainsub() noex {
+int rexer::mainsub() noex {
 	ucentsv		se{} ;
 	ucentsv		*sp{} ;
-	USERINFO	u{} ;
 	NETFILE_ENT	*mp ;
 	int		rs = SR_OK ;
 	int		srs ;
@@ -188,7 +204,6 @@ int rexer::nainsub() noex {
 	int		port = -1 ;
 	cchar	*args[2] ;
 	cchar	*username = NULL ;
-	char		userbuf[USERBUFLEN + 1] ;
 	char		buf[BUFLEN + 1], *bp ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
 	char		hostname[MAXHOSTNAMELEN + 1] ;
@@ -197,16 +212,6 @@ int rexer::nainsub() noex {
 	cchar	*authorization = "any" ;
 	cchar	*cp ;
 	char		*ahost = ahostname ;
-
-/* initialize some other common user stuff */
-
-#ifdef	COMMENT
-	if ((rs = userinfo(&u,userbuf,USERBUFLEN,NULL)) < 0) {
-	    if (u.domainname == NULL) u.domainname = "" ;
-	}
-#else
-	(void) userbuf ;
-#endif /* COMMENT */
 
 	if ((rhost == NULL) || (rhost[0] == '\0'))
 	    goto badhost ;
@@ -407,7 +412,7 @@ int rexer::nainsub() noex {
 
 /* try RCMDU with the supplied username */
 
-	if ((f == NULL) || ((f != NULL) && (! f->keepalive))) {
+	if (! (ro & rexopt_keepalive)) {
 
 	    rs = rcmdu(hostname,username, cmdbuf,fd2p) ;
 	    rfd = rs ;
@@ -491,7 +496,7 @@ int rexer::nainsub() noex {
 
 /* finally we try to connect using RCMDU with our own username */
 
-	if (((f == NULL) || ((f != NULL) && (! f->keepalive))) && 
+	if ((! (ro & rexopt_keepalive)) && 
 	    (strcmp(username,u.username) != 0)) {
 
 	    rs = rcmdu(hostname,u.username,
@@ -556,7 +561,7 @@ badunreach:
 	goto badret ;
 
 }
-/* end subroutine (rex) */
+/* end subroutine (rexer::mainsub) */
 
 
 /* local subroutines */

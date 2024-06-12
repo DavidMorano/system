@@ -32,6 +32,11 @@ flags and therefor is pretty dangerous, but we live on the edge!
 #define	O_KEEPALIVE	0x01000000
 #endif /* O_KEEPALIVE */
 
+enum rexopts {
+	rexopt_keepalive = (1 << 0),
+	rexopt_changedir = (1 << 1)
+} ;
+
 #define	REX_FL		struct rex_flags
 #define	REX_AU		struct rex_auth
 
@@ -53,7 +58,7 @@ typedef	REX_AU		rex_au ;
 
 EXTERNC_begin
 
-extern int rex(cc *,rex_au *,rex_fl *,cc *,mainv,int *,netfile_ent **mpp) noex ;
+extern int rex(cc *,rex_au *,int,cc *,mainv,int *,netfile_ent **mpp) noex ;
 
 EXTERNC_end
 

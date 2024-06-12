@@ -1686,15 +1686,19 @@ static int procinfo_uname(PROCINFO *pip) noex {
 /* end subroutine (procinfo_uname) */
 #endif /* CF_UNAME */
 
-int userinfo::start(cchar *un) noex {
-	return userinfo_start(this,un) ;
-}
-
 void userinfo::dtor() noex {
 	cint	rs = int(finish) ;
 	if (rs < 0) {
 	    ulogerror("userinfo",rs,"fini-finish") ;
 	}
+}
+
+userinfo_cos::operator int () noex {
+	return userinfo_start(op,nullptr) ;
+}
+
+int userinfo_cos::operator () (cchar *un) noex {
+	return userinfo_start(op,un) ;
 }
 
 userinfo_co::operator int () noex {
