@@ -31,9 +31,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
-#include	<cstring>
 #include	<usystem.h>
 #include	<randlc.h>
 #include	<localmisc.h>
@@ -78,7 +76,7 @@
 
 /* local variables */
 
-static constexpr uint randtbl[] = {
+constexpr uint randtbl[] = {
 	0x991539b1, 0x16a5bce3, 0x6774a4cd, 0x3e01511e, 
 	0x4e508aaa, 0x61048c05, 0xf5500617, 0x846b7115, 
 	0x6a19892c, 0x896a97af, 0xdb48f936, 0x14898454,
@@ -89,11 +87,11 @@ static constexpr uint randtbl[] = {
 	0x4382aee7, 0x535b6b41, 0xf3bec5da, 0
 } ;
 
-static constexpr int degrees[LIBRANDOM_NTYPES] = {
+constexpr int degrees[LIBRANDOM_NTYPES] = {
 	DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 
 } ;
 
-static constexpr int seps[LIBRANDOM_NTYPES] = {
+constexpr int seps[LIBRANDOM_NTYPES] = {
 	SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 
 } ;
 
@@ -109,7 +107,7 @@ int librandom_start(librandom *rp,int type,uint seed) noex {
 	    rs = SR_NOTSUP ;
 	    if (type < LIBRANDOM_NTYPES) {
 	        ulong	hi, lo ;
-	        uint	ihi, ilo, uiw ;
+	        uint	ihi, ilo ;
 	        rs = memclear(rp) ;
 	        if (type < 0) {
 	            type = TYPE_4 ;

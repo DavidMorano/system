@@ -4,7 +4,6 @@
 /* manipulate INET connection information */
 /* version %I% last-modified %G% */
 
-#define	CF_LOCALFIFO	1		/* identify local FIFOs? */
 
 /* revision history:
 
@@ -25,7 +24,7 @@
 	name and find the hostname of the remote end of the socket.
 
 	Synopses:
-	int connection_start(CON *cnp,cchar *domainname) noex
+	int connection_start(CON *cnp,cchar *inetdomain) noex
 	int connection_finish(CON *cnp) noex
 	int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex
 	int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex
@@ -51,6 +50,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<uinet.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<mallocstuff.h>
@@ -71,19 +71,8 @@
 
 /* local defines */
 
-#ifndef	VARPRLOCAL
-#define	VARPRLOCAL	"LOCAL"
-#endif
-
 #undef	LOCALHOST
 #define	LOCALHOST	"localhost"
-
-#ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	sizeof(struct in_addr)
-#endif
-
-#undef	HOSTBUFLEN
-#define	HOSTBUFLEN	MAX(MAXHOSTNAMELEN,NI_MAXHOST)
 
 #define	CON		connection
 #define	SA		sockaddress
@@ -145,15 +134,15 @@ constexpr int		peerlen = CONNECTION_PEERNAMELEN ;
 
 /* exported subroutines */
 
-int connection_start(CON *cnp,cchar *domainname) noex {
+int connection_start(CON *cnp,cchar *inetdomain) noex {
 	int		rs = SR_FAULT ;
-	if (cnp && domainname) {
+	if (cnp && inetdomain) {
 	    static cint	rsv = mkvars() ;
 	    cint	ssz = sizeof(sockaddress) ;
 	    memclear(cnp) ;
 	    if ((rs = rsv) >= 0) {
 	        void	*vp{} ;
-	        cnp->domainname = charp(domainname) ;
+	        cnp->inetdomain = inetdomain ;
 	        cnp->f.inet = false ;
 	        cnp->s = -1 ;
 	        if ((rs = uc_libmalloc(ssz,&vp)) >= 0) {
@@ -170,11 +159,11 @@ int connection_finish(CON *cnp) noex {
 	int		rs1 ;
 	if (cnp) {
 	    rs = SR_OK ;
-	    if (cnp->f.domainname && cnp->domainname) {
-	        cnp->f.domainname = false ;
-	        rs1 = uc_free(cnp->domainname) ;
+	    if (cnp->f.inetdomain && cnp->inetdomain) {
+	        cnp->f.inetdomain = false ;
+	        rs1 = uc_free(cnp->inetdomain) ;
 	        if (rs >= 0) rs = rs1 ;
-	        cnp->domainname = nullptr ;
+	        cnp->inetdomain = nullptr ;
 	    }
 	    if (cnp->peername) {
 	        rs1 = uc_free(cnp->peername) ;
@@ -451,13 +440,15 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 	                rs = vecstr_adduniq(nlp,namebuf,-1) ;
 	                if (rs < INT_MAX) n += 1 ;
 
-	                inetaddr_finish(&ia) ;
+	                rs1 = inetaddr_finish(&ia) ;
+	    		if (rs >= 0) rs = rs1 ;
 	            } /* end if (inet4addr) */
 
 	            if (rs < 0) break ;
 	        } /* end while (addresses) */
 
-	        hostinfo_curend(&hi,&hicur) ;
+	            rs1 = hostinfo_curend(&hi,&hicur) ;
+	            if (rs >= 0) rs = rs1 ;
 		} /* end if (hostinfo-cur) */
 	    } /* end if (addresses) */
 
@@ -472,7 +463,8 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 	        inetaddr_getdotaddr(&ia,namebuf,MAXHOSTNAMELEN) ;
 	        rs = vecstr_adduniq(nlp,namebuf,-1) ;
 	        if (rs < INT_MAX) n += 1 ;
-	        inetaddr_finish(&ia) ;
+	        rs1 = inetaddr_finish(&ia) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (inetaddr) */
 	} /* end if (go) */
 
@@ -495,7 +487,7 @@ static int connection_addname(CON *cnp,vecstr *nlp,cc *name,
 	    rs = vecstr_add(nlp,name,-1) ;
 	}
 	if ((rs >= 0) && nbuf) {
-	    cchar	*dn = cnp->domainname ;
+	    cchar	*dn = cnp->inetdomain ;
 	    if (dn && isindomain(name,dn)) {
 	        int	nl = var.maxhostlen ;
 	        if (idp) *idp = true ;
@@ -520,7 +512,7 @@ static int connection_ip4lookup(CON *cnp,char *peerbuf,int peerlen) noex {
 	int		len = 0 ;
 	char		*hebuf ;
 	if ((rs = malloc_ho(&hebuf)) >= 0) {
-	    HOSTENT	he ;
+	    ucentho	he ;
 	    cint	helen = rs ;
 	    cint	af = AF_INET4 ;
 	    cint	al = INET4ADDRLEN ;
@@ -528,12 +520,13 @@ static int connection_ip4lookup(CON *cnp,char *peerbuf,int peerlen) noex {
 	    if ((rs = getho_addr(&he,hebuf,helen,af,ap,al)) >= 0) {
 	        hostent_cur	hc ;
 	        cchar		*sp = nullptr ;
-	        if (cnp->domainname != nullptr) {
+	        if (cnp->inetdomain != nullptr) {
 	            if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
 	                while ((rs = hostent_enumname(&he,&hc,&sp)) > 0) {
-	                    if (isindomain(sp,cnp->domainname)) break ;
+	                    if (isindomain(sp,cnp->inetdomain)) break ;
 	                } /* end while */
-	                hostent_curend(&he,&hc) ;
+	                rs1 = hostent_curend(&he,&hc) ;
+			if (rs >= 0) rs = rs1 ;
 	            } /* end if (hostent-cur) */
 	        } else {
 	            rs1 = SR_INVALID ;
@@ -541,7 +534,7 @@ static int connection_ip4lookup(CON *cnp,char *peerbuf,int peerlen) noex {
 		if (rs >= 0) {
 	           if (sp) {
 			cnullptr	np{} ;
-	                int	nl = -1 ;
+	                int		nl = -1 ;
 	                if (cchar *tp ; (tp = strchr(sp,'.')) != np) {
 			    nl = (tp-sp) ;
 			}

@@ -36,15 +36,15 @@ struct connection_flags {
 	uint		trans:1 ;
 	uint		sa:1 ;
 	uint		addr:1 ;
-	uint		domainname:1 ;	/* allocated */
+	uint		inetdomain:1 ;	/* allocated */
 } ;
 
 struct connection_head {
-	cchar		*domainname ;	/* local domain name */
+	cchar		*inetdomain ;	/* local domain name */
 	cchar		*peername ;	/* dynamically allocated */
 	cchar		*pr ;		/* dynamically allocated */
 	sockaddress	*sap ;
-	struct in_addr	netipaddr ;
+	INADDR		netipaddr ;
 	CONNECTION_FL	f ;
 	int		s ;
 } ;

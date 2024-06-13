@@ -1,14 +1,11 @@
-/* progserve */
+/* progserve SUPPORT */
+/* lang=C++20 */
 
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time print-outs */
-#define	CF_DEBUG	0		/* run-time print-outs */
 #define	CF_CHECKACCESS	1		/* check access permissions */
 #define	CF_ALLDEF	0		/* always allow default permissions */
-
 
 /* revision history:
 
@@ -23,12 +20,9 @@
 
 	This subroutine processes a new connection that just came in.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -36,12 +30,12 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<field.h>
@@ -163,10 +157,6 @@ extern int	proguseracctexec(PROGINFO *,CLIENTINFO *,struct passwd *) ;
 
 extern int	xfile(IDS *,const char *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-#endif
-
 extern cchar	*getourenv(cchar **,cchar *) ;
 
 extern char	*strdcpy1(char *,int,cchar *,int) ;
@@ -257,12 +247,6 @@ const char	*sav[] ;
 	char		stebuf[STEBUFLEN + 1] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve: ent peername=%s\n",
-	        cip->peername) ;
-#endif
-
 /* has a service been passed to us (overrides normal service) */
 
 	if ((pip->svcpass != NULL) && (pip->svcpass[0] != '\0'))
@@ -282,13 +266,6 @@ const char	*sav[] ;
 	    cip->service = svcbuf ;
 
 	} /* end if (subservice) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5)) {
-	    debugprintf("progserve: service=%s\n",cip->service) ;
-	    debugprintf("progserve: subservice=%s\n",cip->subservice) ;
-	}
-#endif
 
 /* do we need a default service? */
 
@@ -322,11 +299,6 @@ const char	*sav[] ;
 
 /* some environment management */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve: environment management\n") ;
-#endif
-
 	if (rs >= 0)
 	    rs = vecstr_envadd(&pip->exports,VARHOME,pip->homedname,-1) ;
 
@@ -352,18 +324,8 @@ const char	*sav[] ;
 
 	if ((rs >= 0) && (! f_served) && pip->open.svcfname) {
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve: service-table lookup\n") ;
-#endif
-
 	    rs1 = svcfile_fetch(&pip->stab,cip->service,NULL,
 	        &ste,stebuf,STEBUFLEN) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve: svcfile_fetch() rs=%d\n",rs1) ;
-#endif
 
 	    if (rs1 >= 0) {
 	        rs = procserver(pip,cip,&ste,sav) ;
@@ -383,11 +345,6 @@ const char	*sav[] ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            cchar	*svc = cip->service ;
 
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(5))
-	                debugprintf("progserve: user? svc=%s\n",svc) ;
-#endif
-
 	            if ((rs1 = proguseracctmat(pip,&pw,pwbuf,pwlen,svc)) >= 0) {
 
 	                rs = proguseracctexec(pip,cip,&pw) ;
@@ -405,17 +362,7 @@ const char	*sav[] ;
 
 	if ((rs >= 0) && (! f_served)) {
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve: builtin?\n") ;
-#endif
-
 	    if ((si = builtin_match(bop,cip->service)) >= 0) {
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("progserve: builtin found\n") ;
-#endif
 
 	        f_served = TRUE ;
 	        if (pip->open.logprog) {
@@ -474,12 +421,6 @@ ret1:
 	    proglog_flush(pip) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve: ret rs=%d f_served=%u\n",
-	        rs,f_served) ;
-#endif
-
 	return (rs >= 0) ? f_served : rs ;
 }
 /* end subroutine (progserve) */
@@ -495,7 +436,7 @@ SVCFILE_ENT	*step ;
 const char	*sav[] ;
 {
 	PROCSE		se ;
-	PROCSE_ARGS	sea ;
+	PROCSE_ARGS	sea{} ;
 	SVCKEY		sekeys ;
 	vecstr		alist ;
 	int		rs = SR_OK ;
@@ -512,36 +453,14 @@ const char	*sav[] ;
 	if (cip == NULL) return SR_FAULT ;
 	if (step == NULL) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver: service=%s\n",cip->service) ;
-	    debugprintf("procserver: subservice=%s\n",cip->subservice) ;
-	}
-#endif
-
 	rs = loadcooks(pip,cip,sav) ;
 	if (rs < 0)
 	    goto ret0 ;
 
 /* load up service values for further processing */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: svkey_load()\n") ;
-#endif
-
 	svckey_load(&sekeys,step) ;	/* convert to our form */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver: sekeys.pass=>%s<\n",sekeys.pass) ;
-	    debugprintf("procserver: sekeys.so=>%s<\n",sekeys.so) ;
-	    debugprintf("procserver: sekeys.p=>%s<\n",sekeys.p) ;
-	    debugprintf("procserver: sekeys.a=>%s<\n",sekeys.a) ;
-	}
-#endif
-
-	memset(&sea,0,sizeof(PROCSE_ARGS)) ;
 	sea.failcont = sekeys.failcont ;
 	sea.passfile = sekeys.pass ;
 	sea.sharedobj = sekeys.so ;
@@ -565,28 +484,12 @@ const char	*sav[] ;
 #if	CF_CHECKACCESS
 	if (cip->salen > 0) {
 	    rs = procaccperm(pip,cip,&se) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("procserver: procaccperm() rs=%d\n",rs) ;
-#endif
-
 	    if (rs < 0) goto badprocacc ;
 	    if (rs == 0) goto badnoperm ;
 	}
 #endif /* CF_CHECKACCESS */
 
 /* OK, find the server program file path and create its program arguments */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver: se passfile=>%s<\n",se.a.passfile) ;
-	    debugprintf("procserver: se sharedobj=>%s<\n",se.a.sharedobj) ;
-	    debugprintf("procserver: se program=>%s<\n",se.a.program) ;
-	    debugprintf("procserver: se srvargs=>%s<\n",se.a.srvargs) ;
-	}
-#endif
-
 /* break the server arguments up so that we can find the first one */
 
 	opts = VECSTR_OSTATIONARY ;
@@ -603,13 +506,6 @@ const char	*sav[] ;
 	        vecstr_get(&alist,0,&argz) ;
 
 	} /* end if (service-arguments) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver: progsrvargs() rs=%d\n",rs) ;
-	    debugprintf("procserver: argz=%s\n",argz) ;
-	}
-#endif
 
 	if (rs < 0)
 	    goto badnoprog ;
@@ -631,11 +527,6 @@ const char	*sav[] ;
 	    rs1 = procserverpass(pip,cip,&se,&alist,argz) ;
 	    f_served = (rs1 > 0) ;
 	    if ((rs >= 0) || (rs1 >= 0)) rs = rs1 ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("procserver: procserverpass() rs=%d\n",rs) ;
-#endif
 
 	    if ((rs1 < 0) && f_failcont) {
 	        f_cont = FALSE ;
@@ -707,7 +598,7 @@ PROCSE		*sep ;
 VECSTR		*alp ;
 const char	*argz ;
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	mode_t		operms ;
 	int		rs = SR_NOENT ;
 	int		pfd ;
@@ -715,12 +606,6 @@ const char	*argz ;
 	int		to = TO_SENDFD ;
 	int		f_served = FALSE ;
 	const char	*passfname = sep->a.passfile ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve/procserverpass: passfname=%s\n",
-	        passfname) ;
-#endif
 
 	if (passfname == NULL)
 	    goto ret0 ;
@@ -733,11 +618,6 @@ const char	*argz ;
 	rs = u_open(passfname,oflags,operms) ;
 	pfd = rs ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve/procserverpass: u_open() rs=%d\n",rs) ;
-#endif
-
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -748,28 +628,11 @@ const char	*argz ;
 	if ((rs >= 0) && (! S_ISFIFO(sb.st_mode)))
 	    rs = SR_NOENT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve/procserverpass: u_fstat() rs=%d\n",rs) ;
-#endif
-
 	if (rs >= 0) {
 	    rs = uc_waitwritable(pfd,to) ;
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve/procserverpass: "
-	            "uc_waitwritable() rs=%d\n",
-	            rs) ;
-#endif
-
 	    if (rs >= 0)
 	        rs = u_ioctl(pfd,I_SENDFD,cip->fd_input) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve/procserverpass: u_ioctl() rs=%d\n",rs) ;
-#endif
 
 	}
 
@@ -781,16 +644,9 @@ ret1:
 	}
 
 ret0:
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve/procserverpass: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? f_served : rs ;
 }
 /* end subroutine (procserverpass) */
-
 
 static int procserverlib(pip,cip,sep,alp,argz)
 PROGINFO	*pip ;
@@ -812,23 +668,12 @@ const char	*argz ;
 	char		shlibname[MAXNAMELEN + 1] ;
 	char		argzbuf[MAXNAMELEN + 1] ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver/procserverlib: ent argz=%s\n",argz) ;
-#endif
-
 /* get a program if we do not have one already */
 
 	if ((program == NULL) || (program[0] == '\0'))
 	    goto ret0 ;
 
 /* parse out the components of the 'shlib' specification */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver/procserverlib: program=>%s<\n",
-	        program) ;
-#endif
 
 	pnl = sfshrink(program,-1,&pnp) ;
 
@@ -841,13 +686,6 @@ const char	*argz ;
 	    pnl = (tp-pnp) ;
 	    while ((pnl > 0) && CHAR_ISWHITE(pnp[pnl-1])) pnl -= 1 ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver/procserverlib: shlib=%t\n",pnp,pnl) ;
-	    debugprintf("procserver/procserverlib: entry=%t\n",enp,enl) ;
-	}
-#endif
 
 	if (pnl == 0) {
 	    rs = SR_NOENT ;
@@ -867,12 +705,6 @@ const char	*argz ;
 	    }
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver/procserverlib: 2 entry=%t\n",enp,enl) ;
-	}
-#endif
-
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"server=%t",enp,enl) ;
 	}
@@ -891,15 +723,6 @@ const char	*argz ;
 	if (rs >= 0) {
 	    rs = procfindprog(pip,&pip->pathlib,prlibs,progfname,pnp,pnl) ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver/procserverlib: "
-	        "procfindprog() rs=%d\n",rs) ;
-	    debugprintf("procserver/procserverlib: progfname=%s\n",
-	        progfname) ;
-	}
-#endif
 
 	if (rs == 0) {
 	    if (pnp[0] != '/') {
@@ -922,13 +745,6 @@ const char	*argz ;
 	    goto badnoprog ;
 	} /* end if (could not find program) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver: past X check\n") ;
-	    debugprintf("procserver: shlib=%t\n",pnp,pnl) ;
-	}
-#endif
-
 /* get a basename for ARG0 */
 
 	if (argz != NULL) {
@@ -948,11 +764,6 @@ const char	*argz ;
 	        rs = vecstr_add(alp,argz,-1) ;
 	    }
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver/procserverlib: final argz=%s\n",argz) ;
-#endif
 
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"shlib=%s",progfname) ;
@@ -979,12 +790,6 @@ const char	*argz ;
 
 /* do it! */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver/procserverlib: progfname=%s\n",
-	        progfname) ;
-#endif
-
 	pip->daytime = time(NULL) ;
 
 	if (pip->open.logprog) {
@@ -1007,17 +812,7 @@ const char	*argz ;
 	    }
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver/procserverlib: progshlib()\n") ;
-#endif
-
 	rs = progshlib(pip,progfname,argz,alp,enp,enl) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: progshlib() rs=%d\n",rs) ;
-#endif
 
 	if (pip->f.logprog) {
 	    proglog_begin(pip,pip->uip) ;
@@ -1098,23 +893,11 @@ const char	*argz ;
 
 /* can we execute this service daemon? */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: X check pr=%s prog=%s\n",
-	        pip->pr,program) ;
-#endif
-
 	pnp = program ;
 	pnl = strlen(program) ;
 	while ((pnl > 0) && (pnp[pnl-1] == '/')) pnl -= 1 ;
 
 	rs = procfindprog(pip,&pip->pathexec,prbins,progfname,pnp,pnl) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: rs=%d progfname=%s\n",
-	        rs,progfname) ;
-#endif
 
 	if (rs == 0) {
 	    if (program[0] != '/') {
@@ -1136,13 +919,6 @@ const char	*argz ;
 	    goto badnoprog ;
 	} /* end if (could not find program) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("procserver: past X check\n") ;
-	    debugprintf("procserver: program=%t\n",pnp,pnl) ;
-	}
-#endif
-
 /* get a basename for ARG0 */
 
 	if (argz != NULL) {
@@ -1160,11 +936,6 @@ const char	*argz ;
 	        rs = vecstr_add(alp,argz,cl) ;
 	    }
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: final argz=%s\n",argz) ;
-#endif
 
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"pf=%s",progfname) ;
@@ -1190,11 +961,6 @@ const char	*argz ;
 	    goto badadd2 ;
 
 /* do it! */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: executing progfname=%s\n",program) ;
-#endif
 
 	pip->daytime = time(NULL) ;
 
@@ -1222,11 +988,6 @@ const char	*argz ;
 	}
 
 	rs = progexec(pip,progfname,argz,alp) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procserver: execute() rs=%d\n",rs) ;
-#endif
 
 	if (pip->f.logprog) {
 	    proglog_begin(pip,pip->uip) ;
@@ -1264,11 +1025,6 @@ int		pnl ;
 
 	while (pnl && (pnp[pnl-1] == '/')) pnl -= 1 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve/procfindprog: pn=%t\n",pnp,pnl) ;
-#endif
-
 	if (pnp[0] == '/') {
 
 	    if ((rs = mkpath1w(progfname,pnp,pnl)) >= 0) {
@@ -1286,11 +1042,6 @@ int		pnl ;
 		}
 	        if (rs >= 0) break ;
 	    } /* end for */
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve/procfindprog: mid rs=%d\n",rs) ;
-#endif
 
 	    if ((rs == SR_NOENT) || (rs == SR_ACCESS)) {
 	        rs = getprogpath(&pip->id,plp,progfname,pnp,pnl) ;
@@ -1331,11 +1082,6 @@ static int procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
 
 	acc = (sep->a.access != NULL) ? sep->a.access : pip->defacc ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("progserve/procaccperm: accgroups=>%s<\n",acc) ;
-#endif
-
 /* process the server access list */
 
 	if ((rs = loadaccgroups(pip,&netgroups,acc,-1)) >= 0) {
@@ -1351,51 +1097,15 @@ static int procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
 
 	} /* end if */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    int		i ;
-	    cchar	*cp ;
-	    debugprintf("progserve/procaccperm: netgroups:\n") ;
-	    for (i = 0 ; vecstr_get(&netgroups,i,&cp) >= 0 ; i+= 1) {
-	        debugprintf("progserve/procaccperm: ng=>%s<\n",cp) ;
-	    }
-	}
-#endif /* CF_DEBUG */
-
 	if (rs >= 0) {
 	    rs = loadpeernames(pip,cip,&names) ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    int	i ;
-	    cchar	*cp ;
-	    debugprintf("progserve/procaccperm: loadpeernames() rs=%d\n",
-	        rs) ;
-	    for (i = 0 ; vecstr_get(&names,i,&cp) >= 0 ; i += 1) {
-	        debugprintf("progserve/procaccperm: mname=>%s<\n",cp) ;
-	    }
-	}
-#endif /* CF_DEBUG */
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("progserve/procaccperm: open.accfname=%u\n",
-		pip->open.accfname) ;
-#endif
 
 /* try our own netgroups */
 
 	if ((rs >= 0) && pip->open.accfname) {
 	    rs = acctab_anyallowed(&pip->atab,&netgroups,&names,NULL,NULL) ;
 	    f = (rs > 0) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("progserve/procaccperm: "
-	            "acctab_anyallowed() rs=%d\n", rs) ;
-#endif
-
 	} /* end if */
 
 /* try the system netgroups (UNIX does not have one simple call as above!) */
@@ -1413,11 +1123,6 @@ ret2:
 ret1:
 	if ((rs >= 0) && (! f)) {
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("progserve: access denied\n") ;
-#endif
-
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: access denied\n",pip->progname) ;
 
@@ -1427,12 +1132,6 @@ ret1:
 	} /* end if */
 
 ret0:
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("progserve: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (procaccperm) */
@@ -1545,11 +1244,6 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 	if (cip == NULL) return SR_FAULT ;
 	if (nlp == NULL) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("loadpeernames: ent\n") ;
-#endif
-
 	peername[0] = '\0' ;
 
 /* use 'connection(3dam)' */
@@ -1559,20 +1253,10 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 	    rs1 = 0 ;
 	    if (cip->salen > 0) {
 	        rs1 = connection_peername(&conn,&cip->sa,cip->salen,peername) ;
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("loadpeernames: connection_peername() rs=%d\n",
-	                rs1) ;
-#endif
 	    }
 
 	    if (rs1 >= 0) {
 	        rs1 = connection_mknames(&conn,nlp) ;
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(5))
-	            debugprintf("loadpeernames: connection_mknames() rs=%d\n",
-	                rs1) ;
-#endif
 	        if (rs1 > 0) n += rs1 ;
 	    }
 
@@ -1597,11 +1281,6 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 	        }
 	    }
 	} /* end if */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("loadpeernames: ret rs=%d n=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -1630,11 +1309,6 @@ static int loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen)
 	                int	bl = fl ;
 	                cchar	*bp = fp ;
 	                while ((cl = nextfield(bp,bl,&cp)) > 0) {
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(5))
-	                        debugprintf("loadaccgroups: accgroup=>%s<\n",
-					cp) ;
-#endif
 	                    rs = vecstr_adduniq(glp,cp,cl) ;
 	                    if (rs < INT_MAX) c += 1 ;
 	                    bl -= ((cp + cl) - bp) ;

@@ -877,8 +877,6 @@ hostent.o:		hostent.c hostent.h
 
 inetaddr.o:		inetaddr.c inetaddr.h
 
-sockaddress.o:		sockaddress.c sockaddress.h
-
 lfm.o:			lfm.c lfm.h
 
 keyopt.o:		keyopt.c keyopt.h

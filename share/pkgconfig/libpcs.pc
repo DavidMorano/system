@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/libpcs
+
+Name:		libpcs
+Description:	Personal Communication Services (PCS) C-language library
+Version:	1.0.0
+Libs:		-L${libdir} -Wl,-rpath,${libdir} -lpcs
+Cflags:		-I${includedir}
