@@ -164,9 +164,7 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 
 /* local subroutine */
 
-
-static int deftmpdir(char *rbuf,int rlen)
-{
+static int deftmpdir(char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	cchar		*tmpdir = TMPDNAME ;
 	cchar		*cp = getenv(VARTMPDNAME) ;

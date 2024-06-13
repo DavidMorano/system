@@ -1,7 +1,7 @@
 /* getaddr HEADER */
 /* lang=C20 */
 
-/* get an address-family (and AF length) by name */
+/* get an address-family (or AF length) by name */
 /* version %I% last-modified %G% */
 
 
@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin

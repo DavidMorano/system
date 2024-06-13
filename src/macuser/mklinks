@@ -4,6 +4,7 @@
 CMDS=" username userhome usershell "
 CMDS+=" uid gid sid "
 CMDS+=" groupname sessionid shells"
+CMDS+=" userents groupent "
 
 LOCPROG=macuser.x
 TDIRS=" /usr/local /opt/local "

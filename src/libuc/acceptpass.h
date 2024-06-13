@@ -1,7 +1,7 @@
-/* getproto HEADER */
+/* acceptpass HEADER */
 /* lang=C20 */
 
-/* UNIX® Protocol-Family support */
+/* accept a passed file-descriptor (FD) from a UNIX® pipe */
 /* version %I% last-modified %G% */
 
 
@@ -24,25 +24,21 @@
 
 *******************************************************************************/
 
-#ifndef	GETPROTO_INCLUDE
-#define	GETPROTO_INCLUDE
+#ifndef	ACCEPTPASS_INCLUDE
+#define	ACCEPTPASS_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-
-#include	<getprotofamily.h>
+#include	<usystem.h>
 
 
 EXTERNC_begin
 
-extern int getproto_name(cchar *,int) noex ;
+extern int	acceptpass(int,STRRECVFD *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETPROTO_INCLUDE */
+#endif /* ACCEPTPASS_INCLUDE */
 
 

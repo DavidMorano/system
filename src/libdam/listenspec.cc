@@ -31,7 +31,11 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getnodename.h>
+#include	<getproto.h>
+#include	<getaddr.h>
+#include	<getportnum.h>
 #include	<getaf.h>
+#include	<acceptpass.h>
 #include	<openport.h>
 #include	<sockaddress.h>
 #include	<vechand.h>
@@ -1445,6 +1449,7 @@ static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 	int		rs1 ;
 	int		fd = -1 ;
 	char		addr[INETXADDRLEN + 1] ;
+	(void) opts ;
 
 	if ((rs = listenspec_openportaddr(op,pr,&ai,addr,af,hp)) >= 0) {
 	    SOCKADDRESS	sa ;
@@ -1477,6 +1482,7 @@ static int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
 	int		rs = SR_OK ;
 	int		raf = 0 ;
 	int		addrlen = -1 ;
+	(void) pr ;
 
 	if (af < 0) return SR_INVALID ;
 

@@ -7,7 +7,7 @@
 
 /* revision history:
 
-	= 1998-08-13, David A­D­ Morano
+	= 1998-01-13, David A­D­ Morano
 	This object module was originally written.
 
 */
@@ -16,15 +16,21 @@
 
 /*******************************************************************************
 
+	Name:
+	sockaddress
+
+	Description:
 	This little object allows for some basic manipulations of
-	socket addresses.
+	socket addresses.  This code was pretty much born out of
+	the frustration of dealing with different "socket-address"
+	types (structures), and strives to provode some (minimal)
+	uninimity in dealing with socket addresses.
 
 	Important notes:
 	The length of a UNIX® domain (AF_UNIX) socket address
 	includes both the two bytes of the address family field (as
 	everyone would expect) but it also includes the trailing
 	NUL byte at the end of the filepath string.
-
 
 *******************************************************************************/
 

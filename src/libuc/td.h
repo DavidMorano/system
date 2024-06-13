@@ -1,7 +1,7 @@
 /* td HEADER */
 /* lang=C++20 */
 
-/* terminal display manager */
+/* Terminal-Display manager */
 /* version %I% last-modified %G% */
 
 
@@ -20,9 +20,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>		/* |va_list| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<vecitem.h>
 #include	<termstr.h>
-#include	<localmisc.h>
 
 
 #define	TD		struct td_head

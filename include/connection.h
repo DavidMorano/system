@@ -46,6 +46,7 @@ struct connection_head {
 	sockaddress	*sap ;
 	INADDR		netipaddr ;
 	CONNECTION_FL	f ;
+	int		sal ;
 	int		s ;
 } ;
 

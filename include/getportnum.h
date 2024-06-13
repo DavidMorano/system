@@ -1,7 +1,7 @@
-/* getproto HEADER */
+/* getportnum HEADER */
 /* lang=C20 */
 
-/* UNIX® Protocol-Family support */
+/* retrieve an Internet port number */
 /* version %I% last-modified %G% */
 
 
@@ -10,22 +10,19 @@
 	= 1998-03-21, David A­D­ Morano
 	This module was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
-
 */
 
 /* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This file contains some support for the UNIX® Address-Familt
-	(AF) related operations.
+	This file contains some support for the UNIX® Internet-Address
+	 related operations.
 
 *******************************************************************************/
 
-#ifndef	GETPROTO_INCLUDE
-#define	GETPROTO_INCLUDE
+#ifndef	GETPORTNUM_INCLUDE
+#define	GETPORTNUM_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -33,16 +30,14 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-#include	<getprotofamily.h>
-
 
 EXTERNC_begin
 
-extern int getproto_name(cchar *,int) noex ;
+extern int	getportnum(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETPROTO_INCLUDE */
+#endif /* GETPORTNUM_INCLUDE */
 
 

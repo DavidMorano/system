@@ -388,11 +388,11 @@ a:			$(T).a
 libmacuser.a:		$(UOBJ)
 	$(AR) -rc $@ $?
 
-$(TT).a:		$(TOBJ)
-	$(AR) -rc $@ $?
-
 $(T).so:		$(SOBJ) Makefile $(T).a
 	$(LD) -G -o $@ $(SLDFLAGS) $(SOBJ) $(SLIBINFO)
+
+$(T).o:			$(OBJ)
+	$(LD) -G -o $@ $(LDFLAGS) $(SOBJ) $(SLIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

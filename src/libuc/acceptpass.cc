@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	acceptpass
+
+	Description:
 	This little subroutine accepts a file descriptor from some
 	type of FIFO, pipe, or other (weirdo) STREAMS-like thing.
 	This subroutine will not compile on a non-STREAMS system;
@@ -38,7 +42,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/conf.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>			/* |time(2)| */
@@ -47,12 +50,10 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"acceptpass.h"
+
 
 /* local defines */
-
-#ifndef STRRECVFD
-#define	STRRECVFD	struct strrecvfd
-#endif
 
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000
@@ -88,7 +89,7 @@ static int acceptpass_poll(int,STRRECVFD *,int) noex ;
 int acceptpass(int fd_pass,STRRECVFD *sp,int to) noex {
 	STRRECVFD	dummy ;
 	int		rs = SR_BADF ;
-	if (sp == nullptr) sp = &extra ;
+	if (sp == nullptr) sp = &dummy ;
 	if (fd_pass >= 0) {
 	    if (to >= 0) {
 	        rs = acceptpass_poll(fd_pass,sp,to) ;
@@ -111,14 +112,11 @@ static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	int		nfds = 0 ;
 	int		pfd = -1 ;
 	bool		f_timed = (to > 0) ;
-
 	pfds[nfds].fd = fd_pass ;
 	pfds[nfds].events = (POLLIN | POLLPRI) ;
 	nfds += 1 ;
-
 	ti_start = ti_now ;
 	while ((rs = u_poll(pfds,nfds,POLL_INTMULT)) >= 0) {
-
 	    ti_now = time(nullptr) ;
 	    if (rs > 0) {
 		for (int i = 0 ; (rs >= 0) && (i < nfds) ; i += 1) {
@@ -138,15 +136,12 @@ static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
 	    }
-
 	    if ((rs >= 0) && (pfd >= 0)) break ;
 	    if ((rs >= 0) && f_timed && ((ti_now - ti_start) >= to)) {
 		rs = SR_TIMEDOUT ;
 	    }
-
 	    if (rs < 0) break ;
 	} /* end while (polling) */
-
 	return (rs >= 0) ? pfd : rs ;
 }
 /* end subroutine (acceptpass_poll) */

@@ -5,8 +5,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1999,2008 David A­D­ Morano.  All rights reserved. */
-
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CLIENTINFO_INCLUDE
 #define	CLIENTINFO_INCLUDE

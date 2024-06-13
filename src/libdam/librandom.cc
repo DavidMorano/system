@@ -74,6 +74,12 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 constexpr uint randtbl[] = {

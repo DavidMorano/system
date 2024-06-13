@@ -46,12 +46,17 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<hasx.h>
 #include	<cfdec.h>
+#include	<hasx.h>
 #include	<localmisc.h>
+
+#include	"getportnum.h"
 
 
 /* local defines */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -64,9 +69,6 @@ extern "C" {
 /* external variables */
 
 
-/* local typedefs */
-
-
 /* local structures */
 
 
@@ -74,6 +76,9 @@ extern "C" {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

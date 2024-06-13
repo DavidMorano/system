@@ -4,6 +4,7 @@
 /* generic front-end for SHELL built-ins */
 /* version %I% last-modified %G% */
 
+#define	CF_GETUSERSHELL		1		/* use |getusershell(3c)| */
 
 /* revision history:
 
@@ -34,6 +35,8 @@
 	sid
 	sessionid
 	shells
+	userents
+	groupents
 
 	Description:
 	Print out the home directory (or some other user-related
@@ -49,6 +52,8 @@
 	$ sid
 	$ sessionid
 	$ shells
+	$ userents
+	$ groupents
 
 	Returns:
 	EXIT_SUCCESS	user was found and processed successfully
@@ -81,7 +86,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |getusershell(3c)| */
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| + |strnlen(3c)| */
@@ -141,6 +146,10 @@
 #define	VARLOGLINE	"LOGLINE"
 #endif
 
+#ifndef	CF_GETUSERSHELL
+#define	CF_GETUSERSHELL		1		/* use |getusershell(3c)| */
+#endif
+
 
 /* imported namespaces */
 
@@ -173,6 +182,8 @@ enum prognames {
 	progmode_sid,
 	progmode_sessionid,
 	progmode_shells,
+	progmode_userents,
+	progmode_groupents,
 	progmode_overlast
 } ;
 
@@ -186,6 +197,8 @@ static constexpr cpcchar	prognames[] = {
 	"sid",
 	"sessionid",
 	"shells",
+	"userents",
+	"groupents",
 	nullptr
 } ;
 
@@ -216,6 +229,8 @@ namespace {
     } ; /* end struct (userinfo) */
 }
 
+constexpr bool		f_getusershell = CF_GETUSERSHELL ;
+
 
 /* forward references */
 
@@ -223,6 +238,8 @@ static int	getpn(int,mainv,mainv) noex ;
 static int	procgroup(int,const userinfo *) noex ;
 static int	printgroup(const userinfo *) noex ;
 static int	printshells() noex ;
+static int	printuserents() noex ;
+static int	printgroupents() noex ;
 
 static UTMPX	*getutxliner(UTMPX *) noex ;
 
@@ -271,6 +288,12 @@ int main(int argc,mainv argv,mainv) noex {
 		break ;
 	    case progmode_shells:
 		rs = printshells() ;
+		break ;
+	    case progmode_userents:
+		rs = printuserents() ;
+		break ;
+	    case progmode_groupents:
+		rs = printgroupents() ;
 		break ;
 	    default:
 	        if ((rs = ui.find(uid)) > 0) {
@@ -356,30 +379,59 @@ static int printgroup(const userinfo *uip) noex {
 /* end subroutine (printgroup) */
 
 static int printshells() noex {
-	cint		llen = MAXLINE ;
 	char		*lbuf ;
 	int		rs = SR_NOMEM ;
 	int		rs1 ;
-	if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
-	    try {
-		ccfile		fis ;
-		if ((rs = fis.open(fnshells)) >= 0) {
-		    while ((rs = fis.readln(lbuf,llen)) > 0) {
-			if (hasnotempty(lbuf,rs) && (lbuf[0] != '#')) {
-			    cout << lbuf ;
-			} /* end if (hasnotempty) */
-		    } /* end while */
-		    rs1 = fis.close ;
-		    if (rs >= 0) rs = rs1 ;
- 	        } /* end if (opened) */
-	    } catch (...) {
-		rs = SR_IO ;
-	    }
-	    delete [] lbuf ;
-	} /* end if (m-a-f) */
+	if_constexpr (f_getusershell) {
+	    rs = SR_OK ;
+	    while ((lbuf = getusershell()) != nullptr) {
+		cout << lbuf << eol ;
+	    } /* end while */
+	} else {
+	    cint	llen = MAXLINE ;
+	    if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
+	        try {
+		    ccfile		fis ;
+		    if ((rs = fis.open(fnshells)) >= 0) {
+		        while ((rs = fis.readln(lbuf,llen)) > 0) {
+			    if (hasnotempty(lbuf,rs) && (lbuf[0] != '#')) {
+			        cout << lbuf ;
+			    } /* end if (hasnotempty) */
+		        } /* end while */
+		        rs1 = fis.close ;
+		        if (rs >= 0) rs = rs1 ;
+ 	            } /* end if (opened) */
+	        } catch (...) {
+		    rs = SR_IO ;
+	        }
+	        delete [] lbuf ;
+	    } /* end if (m-a-f) */
+	} /* end if_constexpr (f_getusershell) */
 	return rs ;
 }
 /* end subroutine (printshells) */
+
+static int printuserents() noex {
+	PASSWD		*pwp ;
+	int		rs = SR_OK ;
+	while ((pwp = getpwent()) != nullptr) {
+	   cchar	*un = pwp->pw_name ;
+	   cout << un << eol ;
+	} /* end while */
+	return rs ;
+}
+/* end subroutine (printuserents) */
+
+static int printgroupents() noex {
+	GROUP		*grp ;
+	int		rs = SR_OK ;
+	while ((grp = getgrent()) != nullptr) {
+	   cchar	*gn = grp->gr_name ;
+	   cout << gn << eol ;
+	} /* end while */
+	return rs ;
+}
+/* end subroutine (printgroupents) */
 
 static bool isourtype(const UTMPX *up) noex {
 	bool	f = false ;

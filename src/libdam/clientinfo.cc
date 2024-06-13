@@ -7,7 +7,7 @@
 
 /* revision history:
 
-	= 2008-06-23, David A­D­ Morano
+	= 1999-06-23, David A­D­ Morano
 	I updated this subroutine to just poll for machine status
 	and write the Machine Status (MS) file.  This was a cheap
 	excuse for not writing a whole new daemon program just to
@@ -15,7 +15,7 @@
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -73,7 +73,7 @@ static int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
 int clientinfo_start(clientinfo *cip) noex {
 	int		rs = SR_FAULT ;
 	if (cip) {
-	    memset(cip) {
+	    memclear(cip) ;
 	    cip->nnames = -1 ;
 	    rs = vecstr_start(&cip->stores,1,0) ;
 	} /* end if (non-null) */

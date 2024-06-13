@@ -12,8 +12,9 @@
 
 
 #include	<envstandards.h>	/* first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #define	DSTR		struct dstr_head
