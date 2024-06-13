@@ -134,44 +134,42 @@ int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 /* local subroutines */
 
 static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
-	CONNECTION	conn, *cnp = &conn ;
-	int		rs ;
-	int		rs1 = 0 ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	if (cip == NULL) return SR_FAULT ;
-	if (nlp == NULL) return SR_FAULT ;
-
-	if ((rs = connection_start(cnp,dname)) >= 0) {
-	   char		hostname[MAXHOSTNAMELEN + 1] ;
- 
-	    if (cip->salen > 0) {
-	        sockaddress	*sap = &cip->sa ;
-	        int		sal = cip->salen ;
-	        rs1 = connection_peername(cnp,sap,sal,hostname) ;
-	    } else {
-	        cint		ifd = cip->fd_input ;
-	        rs1 = connection_sockpeername(cnp,hostname,ifd) ;
-	    }
-
-	    if (rs1 >= 0) {
-	        rs1 = connection_mknames(&conn,nlp) ;
-	        if (rs1 >= 0) {
-		    c += rs1 ;
-		}
-	    }
-
-	    if (rs1 >= 0) {
-	        rs1 = vecstr_adduniq(nlp,hostname,-1) ;
-	        if ((rs1 >= 0) && (rs1 < INT_MAX)) {
-		    c += 1 ;
-		}
-	    }
-
-	    rs1 = connection_finish(&conn) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (connection_start) */
-
+	if (cip && nlp) {
+	    char	*hnbuf{} ;
+	    if ((rs = malloc_hn(&hnbuf)) >= 0) {
+		cint		hnlen = rs ;
+	        connection	conn, *cnp = &conn ;
+	        if ((rs = connection_start(cnp,dname)) >= 0) {
+	            if (cip->salen > 0) {
+	                sockaddress	*sap = &cip->sa ;
+	                int		sal = cip->salen ;
+	                rs1 = connection_peername(cnp,sap,sal,hnbuf,hnlen) ;
+	            } else {
+	                cint		ifd = cip->fd_input ;
+	                rs1 = connection_sockremname(cnp,hnbuf,hnlen,ifd) ;
+	            }
+	            if (rs1 >= 0) {
+	                rs1 = connection_mknames(&conn,nlp) ;
+	                if (rs1 >= 0) {
+		            c += rs1 ;
+		        }
+	            }
+	            if (rs1 >= 0) {
+	                rs1 = vecstr_adduniq(nlp,hnbuf,-1) ;
+	                if ((rs1 >= 0) && (rs1 < INT_MAX)) {
+		            c += 1 ;
+		        }
+	            }
+	            rs1 = connection_finish(&conn) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (connection_start) */
+		rs1 = uc_free(hnbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutines (clientinfo_load) */

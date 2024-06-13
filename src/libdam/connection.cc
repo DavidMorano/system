@@ -27,8 +27,8 @@
 	Synopses:
 	int connection_start(CON *cnp,cchar *domainname) noex
 	int connection_finish(CON *cnp) noex
-	int connection_socksrcname(CON *cnp,char *dp,int dl,int s) noex
-	int connection_sockpeername(CON *cnp,char *dp,int dl,int s) noex
+	int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex
+	int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex
 
 	Returns:
 	>=0		OK
@@ -191,7 +191,7 @@ int connection_finish(CON *cnp) noex {
 }
 /* end subroutine (connection_finish) */
 
-int connection_socksrcname(CON *cnp,char *dp,int dl,int s) noex {
+int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (cnp && dp) {
@@ -218,43 +218,36 @@ int connection_socksrcname(CON *cnp,char *dp,int dl,int s) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (connection_socksrcname) */
+/* end subroutine (connection_socklocname) */
 
-int connection_sockpeername(CON *cnp,char *peerbuf,int s) noex {
-	USTAT		sb ;
-	sockaddress	*sap ;
-	cint		peerlen = CONNECTION_PEERNAMELEN ;
-	int		sal = sizeof(sockaddress) ;
-	int		rs ;
+int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex {
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-
-	if (cnp == nullptr) return SR_FAULT ;
-
-	if (s < 0) return SR_BADF ;
-
-	cnp->s = s ;
-	sap = cnp->sap ;
-	if ((rs = u_getpeername(s,sap,&sal)) >= 0) {
-	    cnp->f.sa = true ;
-	    rs = connection_peername(cnp,sap,sal,peerbuf) ;
-	    len = rs ;
-	}
-
-#if	CF_LOCALFIFO
-	if ((peerbuf[0] == '\0') && (u_fstat(s,&sb) >= 0)) {
-
-	    if (S_ISFIFO(sb.st_mode)) {
-	        cchar	*lh = LOCALHOST ;
-	        rs = sncpy1(peerbuf,peerlen,lh) ;
-	        len = rs ;
-	    }
-
-	} /* end if (local pipe) */
-#endif /* CF_LOCALFIFO */
-
+	if (cnp && dp) {
+	    rs = SR_BADF ;
+	    if (s >= 0) {
+		USTAT	sb ;
+	        if ((rs = uc_fstat(s,&sb)) >= 0) {
+		    if (S_ISSOCK(sb.st_mode)) {
+	                sockaddress	*sap = cnp->sap ;
+	                int		sal = sizeof(sockaddress) ;
+	                cnp->s = s ;
+	                if ((rs = u_getpeername(s,sap,&sal)) >= 0) {
+	                    cnp->f.sa = true ;
+	                    rs = connection_peername(cnp,sap,sal,dp,dl) ;
+	                    len = rs ;
+	                }
+	    	    } else if (S_ISFIFO(sb.st_mode)) {
+	                cchar	*lh = LOCALHOST ;
+	                rs = sncpy1(peerbuf,peerlen,lh) ;
+	                len = rs ;
+		    } /* end if */
+		} /* end if (uc_fstat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (connection_sockpeername) */
+/* end subroutine (connection_sockremname) */
 
 int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex {
 	int		rs = SR_OK ;

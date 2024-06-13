@@ -376,8 +376,10 @@ struct clientinfo	*cip ;
 	            rs = connection_peername(&conn,
 	                cip->fromp,cip->fromlen,peername) ;
 
-	    } else
-	        rs = connection_sockpeername(&conn,peername,ifd) ;
+	    } else {
+		cint	dl = MAXHOSTNAMELEN ;
+	        rs = connection_sockremname(&conn,peername,dl,ifd) ;
+	    }
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
