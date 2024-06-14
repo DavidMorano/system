@@ -27,9 +27,9 @@
 
 
 struct clientinfo_head {
-	sockaddress	sa ;			/* peername socket address */
-	vecstr		names ;
-	vecstr		stores ;
+	sockaddress	*sap ;			/* peername socket address */
+	vecstr		*nlp ;
+	vecstr		*slp ;
 	cchar		*peername ;
 	cchar		*netuser ;
 	cchar		*netpass ;

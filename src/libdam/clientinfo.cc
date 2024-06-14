@@ -48,6 +48,15 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -58,6 +67,55 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static int clientinfo_ctor(clientinfo *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    clientinfo_head	*hop = static_cast<clientinfo_head *>(op) ;
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->sap = new(nothrow) sockaddress) != np) {
+	        if ((op->nlp = new(nothrow) vecstr) != np) {
+	            if ((op->slp = new(nothrow) vecstr) != np) {
+			rs = SR_OK ;
+	            } /* end if (new-vecstr) */
+		    if (rs < 0) {
+		        delete op->nlp ;
+		        op->nlp = nullptr ;
+		    }
+	        } /* end if (new-vecstr) */
+		if (rs < 0) {
+		    delete op->sap ;
+		    op->sap = nullptr ;
+		}
+	    } /* end if (new-sockaddress) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clientinfo_ctor) */
+
+static int clientinfo_dtor(clientinfo *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->slp) {
+		delete op->slp ;
+		op->slp = nullptr ;
+	    }
+	    if (op->nlp) {
+		delete op->nlp ;
+		op->nlp = nullptr ;
+	    }
+	    if (op->sap) {
+		delete op->sap ;
+		op->sap = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clientinfo_dtor) */
 
 static int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
 
@@ -71,12 +129,16 @@ static int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
 /* exported subroutines */
 
 int clientinfo_start(clientinfo *cip) noex {
-	int		rs = SR_FAULT ;
-	if (cip) {
-	    memclear(cip) ;
+	int		rs ;
+	if ((rs = clientinfo_ctor(cip)) >= 0) {
 	    cip->nnames = -1 ;
-	    rs = vecstr_start(&cip->stores,1,0) ;
-	} /* end if (non-null) */
+	    cip->fd_input = -1 ;
+	    cip->fd_output = -1 ;
+	    rs = vecstr_start(cip->slp,1,0) ;
+	    if (rs < 0) {
+		clientinfo_dtor(cip) ;
+	    }
+	} /* end if (clientinfo_ctor) */
 	return rs ;
 }
 /* end subroutine (clientinfo_start) */
@@ -96,13 +158,17 @@ int clientinfo_finish(clientinfo *cip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        cip->fd_output = -1 ;
 	    }
-	    if (cip->nnames >= 0) {
+	    if (cip->nlp && (cip->nnames >= 0)) {
 	        cip->nnames = 0 ;
-	        rs1 = vecstr_finish(&cip->names) ;
+	        rs1 = vecstr_finish(cip->nlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (cip->slp) {
+	        rs1 = vecstr_finish(cip->slp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecstr_finish(&cip->stores) ;
+	        rs1 = clientinfo_dtor(cip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -119,10 +185,10 @@ int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 	        if (cip->nnames < 0) {
 	            cint	vo = VECSTR_OCOMPACT ;
 	            cip->nnames = 0 ;
-	            rs = vecstr_start(&cip->names,5,vo) ;
+	            rs = vecstr_start(cip->nlp,5,vo) ;
 	        }
 	        if (rs >= 0) {
-	            rs = clientinfo_load(cip,dname,&cip->names) ;
+	            rs = clientinfo_load(cip,dname,cip->nlp) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -144,7 +210,7 @@ static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	        connection	conn, *cnp = &conn ;
 	        if ((rs = connection_start(cnp,dname)) >= 0) {
 	            if (cip->salen > 0) {
-	                sockaddress	*sap = &cip->sa ;
+	                sockaddress	*sap = cip->sap ;
 	                int		sal = cip->salen ;
 	                rs1 = connection_peername(cnp,sap,sal,hnbuf,hnlen) ;
 	            } else {

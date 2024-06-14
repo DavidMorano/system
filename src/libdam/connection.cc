@@ -1,7 +1,7 @@
 /* connection SUPPORT */
 /* lang=C++20 */
 
-/* manipulate INET connection information */
+/* try to provide some INET connection information */
 /* version %I% last-modified %G% */
 
 
@@ -9,7 +9,11 @@
 
 	= 1998-07-01, David A­D­ Morano
 	This code (an object) is updated from some previous code
-	that performed the approximate same functions.
+	that performed the approximate same functions.  This old
+	code (of which I did not change the API) is a kind of a
+	mess in terms of its architected interface.  Maybe 
+	someday a better API will come along to perform similar
+	functions.
 
 */
 
@@ -42,8 +46,8 @@
 	memory).  How can I tell?  I can kind of tell how old some
 	code is, or how old its predecessor was, from the style of
 	the code.  The style of this code dates from the late 1980s
-	or early 1990s.  I put it into its present form from the
-	prior code, but left many old stylistic features of the
+	or early 1990s.  I put it into its present form (1998) from
+	the prior code, but left many old stylistic features of the
 	prior code (because I am kind of lazy).
 
 *******************************************************************************/
@@ -57,6 +61,7 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
@@ -123,7 +128,7 @@ struct vars {
 
 /* forward references */
 
-static int connection_addname(CON *,vecstr *,cc *,char *) noex ;
+static int connection_addname(CON *,vecstr *,cc *) noex ;
 static int connection_ip4lookup(CON *,char *,int) noex ;
 static int connection_ip6lookup(CON *,char *,int) noex ;
 
@@ -151,8 +156,9 @@ int connection_start(CON *cnp,cchar *inetdomain) noex {
 	int		rs = SR_FAULT ;
 	if (cnp && inetdomain) {
 	    static cint	rsv = mkvars() ;
-	    cint	ssz = sizeof(sockaddress) ;
-	    memclear(cnp) ;
+	    connection_head	*hop = static_cast<connection *>(cnp) ;
+	    cint		ssz = sizeof(sockaddress) ;
+	    memclear(hop) ;
 	    if ((rs = rsv) >= 0) {
 	        void	*vp{} ;
 	        cnp->inetdomain = inetdomain ;
@@ -286,7 +292,47 @@ int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex {
 }
 /* end subroutine (connection_peername) */
 
+namespace {
+    struct sub_mknames {
+	CON	*cnp ;
+	vecstr	*nlp ;
+	sub_mknames(CON *o,vecstr *n) noex : cnp(o), nlp(n) { } ;
+	operator int () noex ;
+    } ; /* end struct (sub_mknames) */
+}
+
 int connection_mknames(CON *cnp,vecstr *nlp) noex {
+	int		rs = SR_FAULT ;
+	int		n = 0 ;
+	if (cnp && nlp) {
+	    sub_mknames		mko(cnp,nlp) ;
+	    rs = mko ;
+	    n = rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (connection_mknames) */
+
+sub_mknames::operator int () noex {
+	int		rs = SR_DESTADDRREQ ;
+	int		n = 0 ;
+	if (cnp->f.sa) {
+	    if ((rs = sockaddress_getaf(cnp->sap)) >= 0) {
+	        cint	af = rs ;
+	        switch (af) {
+	        case AF_UNIX:
+	            rs = connection_addname(cnp,nlp,LOCALHOST) ;
+		    n += (rs < INT_MAX) ;
+		    break ;
+		} /* end switch */
+	    } /* end if (sockaddress_getaf) */
+	} /* end if (have address) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end method (sub_mknames::operator) */
+
+#ifdef	COMMENT
+sub_mknames::operator int () noex {
 	hostinfo	hi ;
 	hostinfo_cur	hicur ;
 	inetaddr	ia ;
@@ -302,7 +348,7 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 	if (nlp == nullptr) return SR_FAULT ;
 
 	if ((cnp->peername != nullptr) && (cnp->peername[0] != '\0')) {
-	    rs = connection_addname(cnp,nlp,cnp->peername,namebuf) ;
+	    rs = connection_addname(cnp,nlp,cnp->peername) ;
 	    n += rs ;
 	}
 
@@ -323,7 +369,7 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 
 	if (af == AF_UNIX) {
 	    n = 1 ;
-	    rs = connection_addname(cnp,nlp,LOCALHOST,namebuf) ;
+	    rs = connection_addname(cnp,nlp,LOCALHOST) ;
 	    goto ret0 ;
 	}
 
@@ -342,14 +388,14 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 	    if (rs >= 0) {
 	        rs = hostinfo_geteffective(&hi,&hp) ;
 	        if (rs >= 0) {
-	            rs = connection_addname(cnp,nlp,hp,namebuf) ;
+	            rs = connection_addname(cnp,nlp,hp) ;
 	            n += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
 	        if ((rs = hostinfo_getcanonical(&hi,&hp)) >= 0) {
-	            rs = connection_addname(cnp,nlp,hp,namebuf) ;
+	            rs = connection_addname(cnp,nlp,hp) ;
 	            n += rs ;
 	        }
 	    }
@@ -359,7 +405,7 @@ int connection_mknames(CON *cnp,vecstr *nlp) noex {
 	    if (rs >= 0) {
 	        if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
 	            while ((rs = hostinfo_enumname(&hi,&hicur,&hp)) > 0) {
-	                rs = connection_addname(cnp,nlp,hp,namebuf) ;
+	                rs = connection_addname(cnp,nlp,hp) ;
 	                n += rs ;
 	                if (rs < 0) break ;
 	            } /* end while (names) */
@@ -416,33 +462,28 @@ ret0:
 
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (connection_mknames) */
+/* end method (sub_mknames::operator) */
+#endif /* COMMENT */
 
 
 /* private subroutines */
 
-static int connection_addname(CON *cnp,vecstr *nlp,cc *name,char *nbuf) noex {
-	cint		rsn = SR_NOTFOUND ;
+static int connection_addname(CON *cnp,vecstr *nlp,cc *name) noex {
+	int		nl = strlen(name) ;
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = vecstr_find(nlp,name)) == rsn) {
-	    n += 1 ;
-	    rs = vecstr_add(nlp,name,-1) ;
-	}
-	if ((rs >= 0) && nbuf) {
+	if ((rs = vecstr_adduniq(nlp,name,nl)) >= 0) {
 	    cchar	*dn = cnp->inetdomain ;
+	    n += (rs < INT_MAX) ;
 	    if (dn && isindomain(name,dn)) {
-	        int	nl = var.maxhostlen ;
-	        if (cchar *tp ; (tp = strchr(name,'.')) != nullptr) {
+		cnullptr	np{} ;
+	        if (cchar *tp ; (tp = strchr(name,'.')) != np) {
 		    nl = (tp - name) ;
 		}
-	        nl = strwcpy(nbuf,name,nl) - nbuf ;
-	        if ((rs = vecstr_findn(nlp,nbuf,nl)) == rsn) {
-	            n += 1 ;
-	            rs = vecstr_add(nlp,nbuf,nl) ;
-	        }
+		rs = vecstr_adduniq(nlp,name,nl) ;
+	    	n += (rs < INT_MAX) ;
 	    } /* end if (it is in our domain) */
-	} /* end if (non-null) */
+	} /* end if (vecstr_adduniq) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (connection_addname) */

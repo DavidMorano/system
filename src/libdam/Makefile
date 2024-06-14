@@ -18,7 +18,7 @@ CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
 
 
-CPP= cpp
+CPP= gcpp
 CC= gcc
 CXX= gpp
 LD= gld
@@ -365,7 +365,7 @@ OBJFILE2= objq.o objr.o objs.o objt.o obju.o objv.o
 OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.ls .i .ii .cx .cs
 
 
 default:		all

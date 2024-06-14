@@ -23,7 +23,7 @@
 #include	<usysrets.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>		/* various constants (below) */
+#include	<localmisc.h>		/* various constants (see below) */
 
 
 #define	CONNECTION		struct connection_head

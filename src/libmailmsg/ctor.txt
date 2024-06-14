@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int userinfo_ctor(userinfo *op,Args ... args) noex {
+static int clientinfo_ctor(clientinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int userinfo_ctor(userinfo *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (userinfo_ctor) */
+/* end subroutine (clientinfo_ctor) */
 
-static int userinfo_dtor(userinfo *op) noex {
+static int clientinfo_dtor(clientinfo *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (userinfo_dtor) */
+/* end subroutine (clientinfo_dtor) */
 
 template<typename ... Args>
-static inline int userinfo_magic(userinfo *op,Args ... args) noex {
+static inline int clientinfo_magic(clientinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (userinfo_magic) */
+/* end subroutine (clientinfo_magic) */
