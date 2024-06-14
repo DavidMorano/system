@@ -96,6 +96,10 @@
 
 #define	ARGINFO			struct arginfo
 
+#ifndef	CF_NONBLOCK
+#define	CF_NONBLOCK		0
+#endif
+
 
 /* imported namespaces */
 
@@ -103,6 +107,7 @@
 /* local typedefs */
 
 typedef mainv		mv ;
+typedef SOCKADDR *	sockaddrp ;
 
 
 /* external subroutines */
@@ -133,6 +138,36 @@ struct tcpaddr {
 
 /* forward references */
 
+template<typename ... Args>
+static int listenspec_ctor(listenspec *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    listenspec_head	*hop = static_cast<listenspec *>(op) ;
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (listenspec_ctor) */
+
+static int listenspec_dtor(listenspec *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (listenspec_dtor) */
+
+template<typename ... Args>
+static inline int listenspec_magic(listenspec *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LISTENSPEC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (listenspec_magic) */
+
 static int	listenspec_parse(LS *,int,mainv) noex ;
 
 static int	listenspec_tcpbegin(LS *,int,mainv) noex ;
@@ -141,28 +176,28 @@ static int	listenspec_tcpend(LS *) noex ;
 static int	listenspec_tcpsame(LS *,LISTENSPEC *) noex ;
 static int	listenspec_tcpactive(LS *,int,int) noex ;
 static int	listenspec_tcpaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_tcpinfo(LS *,LISTENSPEC_INFO *) noex ;
+static int	listenspec_tcpinfo(LS *,listenspec_info *) noex ;
 
 static int	listenspec_ussbegin(LS *,int,mainv) noex ;
 static int	listenspec_ussend(LS *) noex ;
 static int	listenspec_usssame(LS *,LISTENSPEC *) noex ;
 static int	listenspec_ussactive(LS *,int,int) noex ;
 static int	listenspec_ussaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_ussinfo(LS *,LISTENSPEC_INFO *) noex ;
+static int	listenspec_ussinfo(LS *,listenspec_info *) noex ;
 
 static int	listenspec_passbegin(LS *,int,mainv) noex ;
 static int	listenspec_passend(LS *) noex ;
 static int	listenspec_passsame(LS *,LISTENSPEC *) noex ;
 static int	listenspec_passactive(LS *,int,int) noex ;
 static int	listenspec_passaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_passinfo(LS *,LISTENSPEC_INFO *) noex ;
+static int	listenspec_passinfo(LS *,listenspec_info *) noex ;
 
 static int	listenspec_connbegin(LS *,int,mainv) noex ;
 static int	listenspec_connend(LS *) noex ;
 static int	listenspec_connsame(LS *,LISTENSPEC *) noex ;
 static int	listenspec_connactive(LS *,int,int) noex ;
 static int	listenspec_connaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_conninfo(LS *,LISTENSPEC_INFO *) noex ;
+static int	listenspec_conninfo(LS *,listenspec_info *) noex ;
 
 static int	listenspec_procargs(LS *,ARGINFO *,int,mainv) noex ;
 
@@ -223,6 +258,8 @@ constexpr cpcchar	lopts[] = {
 	nullptr
 } ;
 
+constexpr bool		f_nonblock = CF_NONBLOCK ;
+
 
 /* exported variables */
 
@@ -232,324 +269,266 @@ constexpr cpcchar	lopts[] = {
 int listenspec_start(LS *op,int ac,mv av) noex {
 	int		rs ;
 	int		n = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (av == nullptr) return SR_FAULT ;
-
-	if (ac <= 0) return SR_INVALID ;
-
-	memclear(op) ;
-	if ((rs = listenspec_parse(op,ac,av)) >= 0) {
-	    n = rs ;
-	    op->magic = LISTENSPEC_MAGIC ;
-	}
-
+	if ((rs = listenspec_ctor(op,av)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (ac > 0) {
+	        memclear(op) ;
+	        if ((rs = listenspec_parse(op,ac,av)) >= 0) {
+	            n = rs ;
+	            op->magic = LISTENSPEC_MAGIC ;
+	        }
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		listenspec_dtor(op) ;
+	    }
+	} /* end if (listenspec_start) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (listenspec_start) */
 
 int listenspec_finish(LS *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (op->f.active) {
-	    rs1 = listenspec_active(op,0,false) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (op->info != nullptr) {
-	    rs1 = 0 ;
-	    switch (op->ltype) {
-	    case ltype_tcp:
-	        rs1 = listenspec_tcpend(op) ;
-	        break ;
-	    case ltype_uss:
-	        rs1 = listenspec_ussend(op) ;
-	        break ;
-	    case ltype_pass:
-	        rs1 = listenspec_passend(op) ;
-	        break ;
-	    case ltype_conn:
-	        rs1 = listenspec_connend(op) ;
-	        break ;
-	    } /* end switch */
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->info) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->info = nullptr ;
-	} /* end if */
-
-	if (op->prlocal != nullptr) {
-	    rs1 = uc_free(op->prlocal) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->prlocal = nullptr ;
-	}
-
-	op->ltype = 0 ;
-	op->magic = 0 ;
-
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    if (op->f.active) {
+	        rs1 = listenspec_active(op,0,false) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->info) {
+	        rs1 = 0 ;
+	        switch (op->ltype) {
+	        case ltype_tcp:
+	            rs1 = listenspec_tcpend(op) ;
+	            break ;
+	        case ltype_uss:
+	            rs1 = listenspec_ussend(op) ;
+	            break ;
+	        case ltype_pass:
+	            rs1 = listenspec_passend(op) ;
+	            break ;
+	        case ltype_conn:
+	            rs1 = listenspec_connend(op) ;
+	            break ;
+	        } /* end switch */
+	        if (rs >= 0) rs = rs1 ;
+	        rs1 = uc_free(op->info) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->info = nullptr ;
+	    } /* end if */
+	    if (op->prlocal) {
+	        rs1 = uc_free(op->prlocal) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->prlocal = nullptr ;
+	    }
+	    {
+	        rs1 = listenspec_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->ltype = 0 ;
+	    op->magic = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (listenspec_finish) */
 
 int listenspec_issame(LS *op,LISTENSPEC *otherp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = false ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (otherp == nullptr) return SR_FAULT ;
-
-	if (otherp->magic != LISTENSPEC_MAGIC) return SR_INVALID ;
-
-	f = (op->ltype == otherp->ltype) ? 1 : 0 ;
-	if (f) {
-	    switch (op->ltype) {
-	    case ltype_tcp:
-	        rs = listenspec_tcpsame(op,otherp) ;
-	        f = (rs > 0) ;
-	        break ;
-	    case ltype_uss:
-	        rs = listenspec_usssame(op,otherp) ;
-	        f = (rs > 0) ;
-	        break ;
-	    case ltype_pass:
-	        rs = listenspec_passsame(op,otherp) ;
-	        f = (rs > 0) ;
-	        break ;
-	    case ltype_conn:
-	        rs = listenspec_connsame(op,otherp) ;
-	        f = (rs > 0) ;
-	        break ;
-	    default:
-	        rs = SR_DOM ;
-		break ;
-	    } /* end switch */
-	}
-
+	if ((rs = listenspec_magic(op,otherp)) >= 0) {
+	    f = (op->ltype == otherp->ltype) ;
+	    if (f) {
+	        switch (op->ltype) {
+	        case ltype_tcp:
+	            rs = listenspec_tcpsame(op,otherp) ;
+	            f = (rs > 0) ;
+	            break ;
+	        case ltype_uss:
+	            rs = listenspec_usssame(op,otherp) ;
+	            f = (rs > 0) ;
+	            break ;
+	        case ltype_pass:
+	            rs = listenspec_passsame(op,otherp) ;
+	            f = (rs > 0) ;
+	            break ;
+	        case ltype_conn:
+	            rs = listenspec_connsame(op,otherp) ;
+	            f = (rs > 0) ;
+	            break ;
+	        default:
+	            rs = SR_DOM ;
+		    break ;
+	        } /* end switch */
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (listenspec_issame) */
 
 int listenspec_active(LS *op,int opts,int f) noex {
-	int		rs = SR_OK ;
-	int		f_previous ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	f_previous = op->f.active ;
-	switch (op->ltype) {
-	case ltype_tcp:
-	    rs = listenspec_tcpactive(op,opts,f) ;
-	    break ;
-	case ltype_uss:
-	    rs = listenspec_ussactive(op,opts,f) ;
-	    break ;
-	case ltype_pass:
-	    rs = listenspec_passactive(op,opts,f) ;
-	    break ;
-	case ltype_conn:
-	    rs = listenspec_connactive(op,opts,f) ;
-	    break ;
-	default:
-	    rs = SR_DOM ;
-	    break ;
-	} /* end switch */
-
-/* if we just activated (rs > 0), then set Close-On-Exec */
-
-	if ((rs > 0) && (op->fd >= 0) && op->f.active) {
-	    rs = uc_closeonexec(op->fd,TRUE) ;
-#if	CF_NONBLOCK
-	    if (rs >= 0)
-	        rs = uc_nonblock(op->fd,TRUE) ;
-#endif
-	    if ((rs < 0) && f) {
-	        listenspec_active(op,opts,false) ;
-	    }
-	} /* end if (just activated) */
-
-	return (rs >= 0) ? f_previous : rs ;
-}
-/* end subroutine (listenspec_active) */
-
-int listenspec_isactive(LS *op) noex {
-	int		rs = SR_OK ;
-	int		f = false ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	f = op->f.active ;
-	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_isactive) */
-
-int listenspec_delset(LS *op,int f) noex {
-	int		rs = SR_OK ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	op->f.delmark = f ;
-	return rs ;
-}
-/* end subroutine (listenspec_delset) */
-
-int listenspec_delmarked(LS *op) noex {
-	int		rs = SR_OK ;
-	int		f = false ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	f = op->f.delmark ;
-	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_delmarked) */
-
-int listenspec_getfd(LS *op) noex {
-	int		rs = SR_BADFD ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (op->f.active) rs = op->fd ;
-	return rs ;
-}
-/* end subroutine (listenspec_getfd) */
-
-int listenspec_gettype(LS *op) noex {
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	return op->ltype ;
-}
-/* end subroutine (listenspec_gettype) */
-
-int listenspec_accept(LS *op,void *fromp,int *fromlenp,int to) noex {
-	int		rs = SR_OK ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (op->f.active) {
+	int		rs ;
+	int		f_previous = false ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    f_previous = op->f.active ;
 	    switch (op->ltype) {
 	    case ltype_tcp:
-	        rs = listenspec_tcpaccept(op,fromp,fromlenp,to) ;
+	        rs = listenspec_tcpactive(op,opts,f) ;
 	        break ;
 	    case ltype_uss:
-	        rs = listenspec_ussaccept(op,fromp,fromlenp,to) ;
+	        rs = listenspec_ussactive(op,opts,f) ;
 	        break ;
 	    case ltype_pass:
-	        rs = listenspec_passaccept(op,fromp,fromlenp,to) ;
+	        rs = listenspec_passactive(op,opts,f) ;
 	        break ;
 	    case ltype_conn:
-	        rs = listenspec_connaccept(op,fromp,fromlenp,to) ;
+	        rs = listenspec_connactive(op,opts,f) ;
 	        break ;
 	    default:
 	        rs = SR_DOM ;
 	        break ;
 	    } /* end switch */
-	} else {
-	    rs = SR_BADFD ;
-	}
+	    /* if we just activated (rs > 0), then set Close-On-Exec */
+	    if ((rs > 0) && (op->fd >= 0) && op->f.active) {
+	        rs = uc_closeonexec(op->fd,true) ;
+	        if_constexpr (f_nonblock) {
+	            if (rs >= 0) {
+	                rs = uc_nonblock(op->fd,true) ;
+	            }
+	        } /* end if_constexpr (f_nonblock) */
+	        if ((rs < 0) && f) {
+	            listenspec_active(op,opts,false) ;
+	        }
+	    } /* end if (just activated) */
+	} /* end if (magic) */
+	return (rs >= 0) ? f_previous : rs ;
+}
+/* end subroutine (listenspec_active) */
 
+int listenspec_isactive(LS *op) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    f = op->f.active ;
+	} /* end if (magic) */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (listenspec_isactive) */
+
+int listenspec_delset(LS *op,int f) noex {
+	int		rs ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    op->f.delmark = f ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (listenspec_delset) */
+
+int listenspec_delmarked(LS *op) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    f = op->f.delmark ;
+	} /* end if (magic) */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (listenspec_delmarked) */
+
+int listenspec_getfd(LS *op) noex {
+	int		rs ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    rs = (op->f.active) ? op->fd : SR_BADFD ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (listenspec_getfd) */
+
+int listenspec_gettype(LS *op) noex {
+	int		rs ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    rs = op->ltype ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (listenspec_gettype) */
+
+int listenspec_accept(LS *op,void *fromp,int *fromlenp,int to) noex {
+	int		rs ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    if (op->f.active) {
+	        switch (op->ltype) {
+	        case ltype_tcp:
+	            rs = listenspec_tcpaccept(op,fromp,fromlenp,to) ;
+	            break ;
+	        case ltype_uss:
+	            rs = listenspec_ussaccept(op,fromp,fromlenp,to) ;
+	            break ;
+	        case ltype_pass:
+	            rs = listenspec_passaccept(op,fromp,fromlenp,to) ;
+	            break ;
+	        case ltype_conn:
+	            rs = listenspec_connaccept(op,fromp,fromlenp,to) ;
+	            break ;
+	        default:
+	            rs = SR_DOM ;
+	            break ;
+	        } /* end switch */
+	    } else {
+	        rs = SR_BADFD ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (listenspec_accept) */
 
-int listenspec_getinfo(LS *op,LISTENSPEC_INFO *lip) noex {
-	int		rs = SR_OK ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (lip == nullptr) return SR_FAULT ;
-
-	lip->type[0] = '\0' ;
-	lip->addr[0] = '\0' ;
-
-	switch (op->ltype) {
-	case ltype_tcp:
-	    rs = listenspec_tcpinfo(op,lip) ;
-	    break ;
-	case ltype_uss:
-	    rs = listenspec_ussinfo(op,lip) ;
-	    break ;
-	case ltype_pass:
-	    rs = listenspec_passinfo(op,lip) ;
-	    break ;
-	case ltype_conn:
-	    rs = listenspec_conninfo(op,lip) ;
-	    break ;
-	default:
-	    rs = SR_INVALID ;
-	    break ;
-	} /* end switch */
-
-	if (rs >= 0) {
-	    lip->state = 0 ;
-	    if (op->f.active)
-	        lip->state |= LISTENSPEC_MACTIVE ;
-	    if (op->f.delmark)
-	        lip->state |= LISTENSPEC_MDELPEND ;
-	    if (op->f.broken)
-	        lip->state |= LISTENSPEC_MBROKEN ;
-	    strwcpy(lip->type,ltypes[op->ltype],LISTENSPEC_TYPELEN) ;
-	}
-
+int listenspec_getinfo(LS *op,listenspec_info *lip) noex {
+	int		rs ;
+	if ((rs = listenspec_magic(op,lip)) >= 0) {
+	    lip->type[0] = '\0' ;
+	    lip->addr[0] = '\0' ;
+	    switch (op->ltype) {
+	    case ltype_tcp:
+	        rs = listenspec_tcpinfo(op,lip) ;
+	        break ;
+	    case ltype_uss:
+	        rs = listenspec_ussinfo(op,lip) ;
+	        break ;
+	    case ltype_pass:
+	        rs = listenspec_passinfo(op,lip) ;
+	        break ;
+	    case ltype_conn:
+	        rs = listenspec_conninfo(op,lip) ;
+	        break ;
+	    default:
+	        rs = SR_INVALID ;
+	        break ;
+	    } /* end switch */
+	    if (rs >= 0) {
+	        lip->state = 0 ;
+	        if (op->f.active) lip->state |= LISTENSPEC_MACTIVE ;
+	        if (op->f.delmark) lip->state |= LISTENSPEC_MDELPEND ;
+	        if (op->f.broken) lip->state |= LISTENSPEC_MBROKEN ;
+	        strwcpy(lip->type,ltypes[op->ltype],LISTENSPEC_TYPELEN) ;
+	    } /* end if */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (listenspec_info) */
 
 int listenspec_geterr(LS *op,int *rp) noex {
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-	if (rp != nullptr) {
-	    *rp = op->rs_error ;
-	}
-	return SR_OK ;
+	int		rs ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    if (rp) {
+	        *rp = op->rs_error ;
+	    }
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (listenspec_geterr) */
 
 int listenspec_clear(LS *op) noex {
-	int		rs = SR_OK ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LISTENSPEC_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	op->f.broken = false ;
+	int		rs ;
+	if ((rs = listenspec_magic(op)) >= 0) {
+	    op->f.broken = false ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (listenspec_clear) */
@@ -727,7 +706,7 @@ static int listenspec_tcpsame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_TCP	*ip = (LISTENSPEC_TCP *) op->info ;
 	LISTENSPEC_TCP	*oip ;
 	int		rs = SR_OK ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	oip = (LISTENSPEC_TCP *) otherp->info ;
 	f = f && LEQUIV((ip->af != nullptr),(oip->af != nullptr)) ;
@@ -792,12 +771,12 @@ static int listenspec_tcpactive(LS *op,int opts,int f) noex {
 	    } /* end if */
 
 	    if (rs >= 0) {
-	        op->f.active = TRUE ;
+	        op->f.active = true ;
 	        op->f.broken = false ;
-		f_a = TRUE ;
+		f_a = true ;
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = TRUE ;
+	        op->f.broken = true ;
 	    }
 	} else if ((! f) && op->f.active) {
 	    if (op->fd >= 0) {
@@ -812,23 +791,17 @@ static int listenspec_tcpactive(LS *op,int opts,int f) noex {
 /* end subroutine (listenspec_tcpactive) */
 
 static int listenspec_tcpaccept(LS *op,void *fp,int *flp,int to) noex {
-	int		rs ;
-	int		fd = -1 ;
-
-	rs = uc_accepte(op->fd,fp,flp,to) ;
-	fd = rs ;
-
-	return (rs >= 0) ? fd : rs ;
+	SOCKADDR	*sap = sockaddrp(fp) ;
+	return uc_accepte(op->fd,sap,flp,to) ;
 }
 /* end subroutine (listenspec_tcpaccept) */
 
-static int listenspec_tcpinfo(LS *op,LISTENSPEC_INFO *lip) noex {
+static int listenspec_tcpinfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_TCP	*ip = (LISTENSPEC_TCP *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
 	int		i = 0 ;
 	char		*bp = lip->addr ;
-
 	if ((rs >= 0) && (ip->af != nullptr)) {
 	    rs = storebuf_strw(bp,bl,i,ip->af,-1) ;
 	    i += rs ;
@@ -837,7 +810,6 @@ static int listenspec_tcpinfo(LS *op,LISTENSPEC_INFO *lip) noex {
 	        i += rs ;
 	    }
 	}
-
 	if ((rs >= 0) && (ip->host != nullptr)) {
 	    rs = storebuf_strw(bp,bl,i,ip->host,-1) ;
 	    i += rs ;
@@ -846,12 +818,10 @@ static int listenspec_tcpinfo(LS *op,LISTENSPEC_INFO *lip) noex {
 	        i += rs ;
 	    }
 	}
-
 	if ((rs >= 0) && (ip->port != nullptr)) {
 	    rs = storebuf_strw(bp,bl,i,ip->port,-1) ;
 	    i += rs ;
 	}
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (listenspec_tcpinfo) */
@@ -925,7 +895,7 @@ static int listenspec_usssame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	LISTENSPEC_USS	*oip ;
 	int		rs = SR_OK ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	oip = (LISTENSPEC_USS *) otherp->info ;
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
@@ -944,12 +914,12 @@ static int listenspec_ussactive(LS *op,int opts,int f) noex {
 	if (f && (! op->f.active)) {
 	    if ((rs = listenuss(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
-	        op->f.active = TRUE ;
+	        op->f.active = true ;
 	        op->f.broken = false ;
-		f_a = TRUE ;
+		f_a = true ;
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = TRUE ;
+	        op->f.broken = true ;
 	    }
 	} else if ((! f) && op->f.active) {
 	    if (op->fd >= 0) {
@@ -964,17 +934,12 @@ static int listenspec_ussactive(LS *op,int opts,int f) noex {
 /* end subroutine (listenspec_ussactive) */
 
 static int listenspec_ussaccept(LS *op,void *fp,int *flp,int to) noex {
-	int		rs ;
-	int		fd = -1 ;
-
-	rs = uc_accepte(op->fd,fp,flp,to) ;
-	fd = rs ;
-
-	return (rs >= 0) ? fd : rs ;
+	SOCKADDR	*sap = sockaddrp(fp) ;
+	return uc_accepte(op->fd,sap,flp,to) ;
 }
 /* end subroutine (listenspec_ussaccept) */
 
-static int listenspec_ussinfo(LS *op,LISTENSPEC_INFO *lip) noex {
+static int listenspec_ussinfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
@@ -1065,7 +1030,7 @@ static int listenspec_passsame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	LISTENSPEC_PASS	*oip = (LISTENSPEC_PASS *) otherp->info ;
 	int		rs = SR_OK ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
@@ -1084,15 +1049,15 @@ static int listenspec_passactive(LS *op,int opts,int f) noex {
 	if (f && (! op->f.active)) {
 	    if ((rs = listenpass(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
-	        op->f.active = TRUE ;
+	        op->f.active = true ;
 	        op->f.broken = false ;
-		f_a = TRUE ;
+		f_a = true ;
 #if	SYSHAS_STREAMS
 	        u_ioctl(op->fd,I_SRDOPT,RMSGD) ;
 #endif
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = TRUE ;
+	        op->f.broken = true ;
 	    }
 	} else if ((! f) && op->f.active) {
 	    if (op->fd >= 0) {
@@ -1109,20 +1074,19 @@ static int listenspec_passactive(LS *op,int opts,int f) noex {
 static int listenspec_passaccept(LS *op,void *fp,int *flp,int to) noex {
 	int		rs ;
 	int		fd = -1 ;
-
-	if (fp != nullptr) {
+	if (fp) {
 	    *flp = sizeof(long) ;
 	    memset(fp,0,*flp) ;
 	}
-
-	rs = acceptpass(op->fd,nullptr,to) ;
-	fd = rs ;
-
+	{
+	    rs = acceptpass(op->fd,nullptr,to) ;
+	    fd = rs ;
+	}
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (listenspec_passaccept) */
 
-static int listenspec_passinfo(LS *op,LISTENSPEC_INFO *lip) noex {
+static int listenspec_passinfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
@@ -1210,7 +1174,7 @@ static int listenspec_connsame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	LISTENSPEC_CONN	*oip = (LISTENSPEC_CONN *) otherp->info ;
 	int		rs = SR_OK ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
@@ -1230,15 +1194,15 @@ static int listenspec_connactive(LS *op,int opts,int f) noex {
 	if (f && (! op->f.active)) {
 	    if ((rs = listenconn(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
-	        op->f.active = TRUE ;
+	        op->f.active = true ;
 	        op->f.broken = false ;
-		f_a = TRUE ;
+		f_a = true ;
 #if	SYSHAS_STREAMS
 	        u_ioctl(op->fd,I_SRDOPT,RMSGD) ;
 #endif
 	    } else {
 		op->rs_error = rs ;
-	        op->f.broken = TRUE ;
+	        op->f.broken = true ;
 	    }
 	} else if ((! f) && op->f.active) {
 	    if (ip->fname[0] != '\0') {
@@ -1259,20 +1223,19 @@ static int listenspec_connactive(LS *op,int opts,int f) noex {
 static int listenspec_connaccept(LS *op,void *fp,int *flp,int to) noex {
 	int		rs ;
 	int		fd = -1 ;
-
-	if (fp != nullptr) {
+	if (fp) {
 	    *flp = sizeof(long) ;
 	    memset(fp,0,*flp) ;
 	}
-
-	rs = acceptpass(op->fd,nullptr,to) ;
-	fd = rs ;
-
+	{
+	    rs = acceptpass(op->fd,nullptr,to) ;
+	    fd = rs ;
+	}
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (listenspec_connaccept) */
 
-static int listenspec_conninfo(LS *op,LISTENSPEC_INFO *lip) noex {
+static int listenspec_conninfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
@@ -1326,7 +1289,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 
 	        } else if (ach == '-') {
 
-	            aip->f_adash = TRUE ;
+	            aip->f_adash = true ;
 	            break ;
 
 	        } else {
@@ -1334,7 +1297,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	            akp = (fp + 1) ;
 	            f_optequal = false ;
 	            if ((avp = strchr(akp,'=')) != nullptr) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - akp ;
 	                avp += 1 ;
 	                avl = akp + (fl - 1) - avp ;
@@ -1351,7 +1314,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	                    break ;
 	                case lopt_reuse:
 	                case lopt_ra:
-	                    op->f.reuse = TRUE ;
+	                    op->f.reuse = true ;
 	                    break ;
 	                } /* end switch */
 

@@ -58,6 +58,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forward references */
 
 
@@ -69,43 +72,47 @@
 
 /* exported subroutines */
 
-int uc_accepte(int fd,cvoid *sap,int *salp,int to) noex {
-	int		rs = SR_OK ;
+int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex {
+	int		rs = SR_FAULT ;
 	int		s = -1 ;
-	if (to < 0) to = INT_MAX ;
-	if (to >= 0) {
-	    POLLFD	fds[1] = {} ;
-	    fds[0].fd = fd ;
-	    fds[0].events = POLLIN ;
-	    while (rs >= 0) {
-	        if ((rs = u_poll(fds,1,POLL_INTMULT)) >= 0) {
-	            if (rs > 0) {
-	                cint	re = fds[0].revents ;
-	                if (re & POLLIN) {
-	                    rs = u_accept(fd,sap,salp) ;
-	                    s = rs ;
-	                } else if (re & POLLHUP) {
-	                    rs = SR_HANGUP ;
-	                } else if (re & POLLERR) {
-	                    rs = SR_POLLERR ;
-	                } else if (re & POLLNVAL) {
-	                    rs = SR_NOTOPEN ;
-	                }
-
-	            } else
-	                to -= 1 ;
-
-	            if (to <= 0) break ;
-	            if (s >= 0) break ;
-	        } else if (rs == SR_INTR) rs = SR_OK ;
-	    } /* end while */
-	    if ((rs == 0) && (s < 0) && (to <= 0)) {
-	        rs = SR_TIMEDOUT ;
-	    }
-	} else {
-	    rs = u_accept(fd,sap,salp) ;
-	    s = rs ;
-	} /* end if */
+	if (sap && salp) {
+	    rs = SR_BADFD ;
+	    if (fd >= 0) {
+	        if (to < 0) to = INT_MAX ;
+	        if (to >= 0) {
+	            POLLFD	fds[1] = {} ;
+	            fds[0].fd = fd ;
+	            fds[0].events = POLLIN ;
+	            while (rs >= 0) {
+	                if ((rs = u_poll(fds,1,POLL_INTMULT)) >= 0) {
+	                    if (rs > 0) {
+	                        cint	re = fds[0].revents ;
+	                        if (re & POLLIN) {
+	                            rs = u_accept(fd,sap,salp) ;
+	                            s = rs ;
+	                        } else if (re & POLLHUP) {
+	                            rs = SR_HANGUP ;
+	                        } else if (re & POLLERR) {
+	                            rs = SR_POLLERR ;
+	                        } else if (re & POLLNVAL) {
+	                            rs = SR_NOTOPEN ;
+	                        }
+	                    } else {
+	                        to -= 1 ;
+        		    }
+	                    if (to <= 0) break ;
+	                    if (s >= 0) break ;
+	                } else if (rs == SR_INTR) rs = SR_OK ;
+	            } /* end while */
+	            if ((rs == 0) && (s < 0) && (to <= 0)) {
+	                rs = SR_TIMEDOUT ;
+	            }
+	        } else {
+	            rs = u_accept(fd,sap,salp) ;
+	            s = rs ;
+	        } /* end if */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? s : rs ;
 }
 /* end subroutine (uc_accepte) */

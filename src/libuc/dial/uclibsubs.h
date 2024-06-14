@@ -200,12 +200,12 @@ extern int	uc_lockf(int,int,off_t) noex ;
 extern int	uc_lockfile(int,int,off_t,off_t,int) noex ;
 
 extern int	uc_bind(int,void *,int) noex ;
-extern int	uc_accepte(int,cvoid *,int *,int) noex ;
+extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
+extern int	uc_accepte(int,SOCKADDR *,int *,int) noex ;
 extern int	uc_connect(int,cvoid *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
 extern int	uc_setsockopt(int,int,int,int *,int) noex ;
 extern int	uc_linger(int,int) noex ;
-extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
 
 extern int	uc_copy(int,int,int) noex ;
 
