@@ -63,6 +63,7 @@
 #include	<usystem.h>
 #include	<varnames.hh>
 #include	<getbufsize.h>
+#include	<getuserhome.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ids.h>
@@ -70,14 +71,18 @@
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getusername.h>
 #include	<fsdir.h>
-#include	<localmisc.h>
 #include	<sncpyx.h>
 #include	<sncpyxc.h>
 #include	<snwcpyxc.h>
 #include	<nleadstr.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
+#include	<xperm.h>
 #include	<hasx.h>
+#include	<isnot.h>
+#include	<localmisc.h>
+
+#include	"mkpr.h"
 
 
 /* local defines */
@@ -124,12 +129,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	sperm(IDS *,USTAT *,int) noex ;
-    extern int	getuserhome(char *,int,cchar *) noex ;
-    extern int	isNotPresent(int) noex ;
-}
-
 
 /* external variables */
 
@@ -161,11 +160,6 @@ struct domainbase {
 
 
 /* forward references */
-
-extern "C" {
-    int mkpr(char *,int,cchar *,cchar *) noex ;
-    int getrootdname(char *,int,cchar *,cchar *) noex ;
-}
 
 static int	subinfo_start(SI *,cchar *,cchar *) noex ;
 static int	subinfo_checkid(SI *) noex ;

@@ -52,6 +52,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getnodename.h>
 #include	<bufsizevar.hh>
 #include	<varnames.hh>
 #include	<mallocxx.h>
@@ -62,6 +63,7 @@
 #include	<strn.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
+#include	<mkpr.h>
 #include	<xperm.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -82,11 +84,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getnodedomain(char *,char *) noex ;
-    extern int	mkpr(char *,int,cchar *,cchar *) noex ;
-}
 
 
 /* external variables */

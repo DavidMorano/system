@@ -298,6 +298,9 @@ namespace {
 	vecstr	*nlp ;
 	sub_mknames(CON *o,vecstr *n) noex : cnp(o), nlp(n) { } ;
 	operator int () noex ;
+	int addstuff(int) noex ;
+	int addnames(hostinfo *) noex ;
+	int addresses(hostinfo *) noex ;
     } ; /* end struct (sub_mknames) */
 }
 
@@ -322,7 +325,12 @@ sub_mknames::operator int () noex {
 	        switch (af) {
 	        case AF_UNIX:
 	            rs = connection_addname(cnp,nlp,LOCALHOST) ;
-		    n += (rs < INT_MAX) ;
+		    n += rs ;
+		    break ;
+		case AF_INET4:
+		case AF_INET6:
+		    rs = addstuff(af) ;
+		    n += rs ;
 		    break ;
 		} /* end switch */
 	    } /* end if (sockaddress_getaf) */
@@ -331,138 +339,113 @@ sub_mknames::operator int () noex {
 }
 /* end method (sub_mknames::operator) */
 
-#ifdef	COMMENT
-sub_mknames::operator int () noex {
+int sub_mknames::addstuff(int af) noex {
 	hostinfo	hi ;
-	hostinfo_cur	hicur ;
-	inetaddr	ia ;
-	uint		af ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	const uchar	*ap ;
-	cchar		*hp ;
-	char		namebuf[MAXHOSTNAMELEN + 1] ;
-
-	if (cnp == nullptr) return SR_FAULT ;
-	if (nlp == nullptr) return SR_FAULT ;
-
-	if ((cnp->peername != nullptr) && (cnp->peername[0] != '\0')) {
-	    rs = connection_addname(cnp,nlp,cnp->peername) ;
-	    n += rs ;
-	}
-
-	if (rs < 0)
-	    goto ret0 ;
-
-	if (! cnp->f.sa) {
-	    rs = SR_DESTADDRREQ ;
-	    goto ret0 ;
-	}
-
-	rs = sockaddress_getaf(cnp->sap) ;
-	af = rs ;
-	if (rs < 0)
-	    goto ret0 ;
-
-/* UNIX family */
-
-	if (af == AF_UNIX) {
-	    n = 1 ;
-	    rs = connection_addname(cnp,nlp,LOCALHOST) ;
-	    goto ret0 ;
-	}
-
-/* prepare for INET hostname lookups */
-
-	if (cnp->peername == nullptr)
-	    goto ret0 ;
-
-	if (rs == 0)
-	    goto ret0 ;
-
-/* INET families? */
-
 	if ((rs = hostinfo_start(&hi,af,cnp->peername)) >= 0) {
-
-	    if (rs >= 0) {
-	        rs = hostinfo_geteffective(&hi,&hp) ;
-	        if (rs >= 0) {
-	            rs = connection_addname(cnp,nlp,hp) ;
-	            n += rs ;
-	        }
+	    if ((rs = addnames(&hi)) >= 0) {
+		n += rs ;
+		rs = addresses(&hi) ;
+		n += rs ;
 	    }
-
-	    if (rs >= 0) {
-	        if ((rs = hostinfo_getcanonical(&hi,&hp)) >= 0) {
-	            rs = connection_addname(cnp,nlp,hp) ;
-	            n += rs ;
-	        }
-	    }
-
-/* all other names */
-
-	    if (rs >= 0) {
-	        if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
-	            while ((rs = hostinfo_enumname(&hi,&hicur,&hp)) > 0) {
-	                rs = connection_addname(cnp,nlp,hp) ;
-	                n += rs ;
-	                if (rs < 0) break ;
-	            } /* end while (names) */
-	            hostinfo_curend(&hi,&hicur) ;
-	        } /* end if (hostinfo-cur) */
-	    } /* end if (names) */
-
-/* addresses as names */
-
-	    if (rs >= 0) {
-		cint	nlen = MAXHOSTNAMELEN ;
-	        if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
-
-	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) > 0) {
-		    int	al = rs ;
-	            if (al != INET4ADDRLEN) continue ;
-
-	            if ((rs = inetaddr_start(&ia,ap)) >= 0) {
-
-	                inetaddr_getdotaddr(&ia,namebuf,nlen) ;
-
-	                rs = vecstr_adduniq(nlp,namebuf,-1) ;
-	                if (rs < INT_MAX) n += 1 ;
-
-	                rs1 = inetaddr_finish(&ia) ;
-	    		if (rs >= 0) rs = rs1 ;
-	            } /* end if (inet4addr) */
-
-	            if (rs < 0) break ;
-	        } /* end while (addresses) */
-
-	            rs1 = hostinfo_curend(&hi,&hicur) ;
-	            if (rs >= 0) rs = rs1 ;
-		} /* end if (hostinfo-cur) */
-	    } /* end if (addresses) */
-
 	    rs1 = hostinfo_finish(&hi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostinfo) */
-
-/* store the INET "dot" address also! */
-
-	if ((rs >= 0) && (af == AF_INET4) && cnp->f.inet && cnp->f.addr) {
-	    if ((rs = inetaddr_start(&ia,&cnp->netipaddr)) >= 0) {
-	        inetaddr_getdotaddr(&ia,namebuf,MAXHOSTNAMELEN) ;
-	        rs = vecstr_adduniq(nlp,namebuf,-1) ;
-	        if (rs < INT_MAX) n += 1 ;
-	        rs1 = inetaddr_finish(&ia) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (inetaddr) */
-	} /* end if (go) */
-
-ret0:
-
 	return (rs >= 0) ? n : rs ;
 }
-/* end method (sub_mknames::operator) */
+/* end method (sub_mknames::addstuff) */
+
+int sub_mknames::addnames(hostinfo *hip) noex {
+	int		rs ;
+	int		rs1 ;
+	int		n = 0 ;
+	cchar		*hp ;
+	if ((rs = hostinfo_geteffective(hip,&hp)) >= 0) {
+	    if ((rs = connection_addname(cnp,nlp,hp)) >= 0) {
+	        n += rs ;
+	        if ((rs = hostinfo_getcanonical(hip,&hp)) >= 0) {
+		    hostinfo_cur	hc ;
+	            rs = connection_addname(cnp,nlp,hp) ;
+	            n += rs ;
+	            if ((rs = hostinfo_curbegin(hip,&hc)) >= 0) {
+	                while ((rs = hostinfo_enumname(hip,&hc,&hp)) > 0) {
+	                    rs = connection_addname(cnp,nlp,hp) ;
+	              	    n += rs ;
+	              	    if (rs < 0) break ;
+	            	} /* end while (names) */
+	                rs1 = hostinfo_curend(hip,&hc) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (hostinfo-cur) */
+	        } /* end if (names) */
+	    } /* end if (connection_addname) */
+	} /* end if (hostinfo_geteffective) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end method (sub_mknames::addnames) */
+
+int sub_mknames::addresses(hostinfo *hip) noex {
+	int		rs ;
+	int		rs1 ;
+	int		n = 0 ;
+	char		*nbuf{} ;
+	if ((rs = malloc_hn(&nbuf)) >= 0) {
+	    hostinfo_cur	hc ;
+	    cint		nlen = rs ;
+	    const uchar		*ap ;
+	    if ((rs = hostinfo_curbegin(hip,&hc)) >= 0) {
+	        while ((rs = hostinfo_enumaddr(hip,&hc,&ap)) > 0) {
+		    inetaddr	ia ;
+		    cint	al = rs ;
+	            if (al != INET4ADDRLEN) continue ;
+	            if ((rs = inetaddr_start(&ia,ap)) >= 0) {
+	                auto in_ga = inetaddr_getdotaddr ;
+	                if ((rs = in_ga(&ia,nbuf,nlen)) >= 0) {
+	                    rs = vecstr_adduniq(nlp,nbuf,-1) ;
+	                    if (rs < INT_MAX) n += 1 ;
+		        }
+	                rs1 = inetaddr_finish(&ia) ;
+	   	        if (rs >= 0) rs = rs1 ;
+	            } /* end if (inet4addr) */
+	            if (rs < 0) break ;
+	        } /* end while (addresses) */
+	        rs1 = hostinfo_curend(hip,&hc) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (hostinfo-cur) */
+	    rs1 = uc_free(&nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end method (sub_mknames::addresses) */
+
+#ifdef	COMMENT
+/* store the INET "dot" address also! */
+int sub_mknames::adddots(int af) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		n = 0 ;
+	if ((af == AF_INET4) && cnp->f.inet && cnp->f.addr) {
+	    char	*nbuf{} ;
+	    if ((rs = malloc_hn(&nbuf)) >= 0) {
+	        cint		nlen = rs ;
+	        inetaddr	ia ;
+	        if ((rs = inetaddr_start(&ia,&cnp->netipaddr)) >= 0) {
+	            if ((rs = inetaddr_getdotaddr(&ia,nbuf,nlen)) >= 0) {
+	                rs = vecstr_adduniq(nlp,nbuf,rs) ;
+	                if (rs < INT_MAX) n += 1 ;
+		    }
+	            rs1 = inetaddr_finish(&ia) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (inetaddr) */
+	        rs1 = uc_free(&nbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (go) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (connection_adddots) */
 #endif /* COMMENT */
 
 

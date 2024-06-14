@@ -45,6 +45,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"tmpmailboxes.h"
@@ -81,9 +82,6 @@ extern int	getnodedomain(char *,char *) ;
 extern int	getinetdomain(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isOneOf(const int *,int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
