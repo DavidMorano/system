@@ -1,11 +1,11 @@
 DAYTIME
 
-This program is really an INET server. It just prints the time of day in GMT. It
-is meant to be a server on INET service port 'daytime'.
+This program is really an INET server. It just prints the time of
+day in GMT. It is meant to be a server on INET service port 'daytime'.
 
-As an extra bonus, if optional positional arguments are supplied, they will be
-contacted for the 'daytime' service and all such contacted hosts will have their
-daytimes printed out.
+As an extra bonus, if optional positional arguments are supplied,
+they will be contacted for the 'daytime' service and all such
+contacted hosts will have their daytimes printed out.
 
 Synopsis:
 $ daytime [<hostname(s)>] [-d <dialer>[:<port>]] [-s <service>] [-x]

@@ -47,6 +47,7 @@ enum errnomssings {
 	errnomissing_libbad,
 	errnomissing_hostdown,
 	errnomissing_unatch,
+	errnomissing_noattr,
 	errnomissing_overlast
 } ;
 
@@ -58,9 +59,6 @@ enum errnomssings {
 #endif
 #ifndef	EL3RST
 #define	EL3RST		errnomissing_l3rst
-#endif
-#ifndef	EUNATCH
-#define	EUNATCH		errnomissing_unatch
 #endif
 #ifndef	EL2HLT
 #define	EL2HLT		errnomissing_l2hlt
@@ -109,6 +107,12 @@ enum errnomssings {
 #endif
 #ifndef	EHOSTDOWN
 #define	EHOSTDOWN	errnomissing_hostdown
+#endif
+#ifndef	EUNATCH
+#define	EUNATCH		errnomissing_unatch
+#endif
+#ifndef	ENOATTR
+#define	ENOATTR		errnomissing_noattr
 #endif
 
 /* status return codes (only used when explicit return status is requested) */
@@ -240,6 +244,7 @@ enum errnomssings {
 #define	SR_ALREADY	(- EALREADY)	/* operation already in progress */
 #define	SR_INPROGRESS	(- EINPROGRESS)	/* operation now in progress */
 #define	SR_STALE	(- ESTALE)	/* Stale NFS file handle */
+#define	SR_NOATTR	(- ENOATTR)	/* no (extended) attribute */
 
 /* our favorite aliases */
 

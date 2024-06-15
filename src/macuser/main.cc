@@ -93,6 +93,9 @@
 #include	<string>
 #include	<fstream>
 #include	<iostream>
+#include	<algorithm>
+#include	<unordered_set>
+#include	<utility>
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<matstr.h>
@@ -155,6 +158,8 @@
 
 using std::string ;			/* type */
 using std::ifstream ;			/* type */
+using std::unordered_set ;		/* type */
+using std::pair ;			/* type */
 using std::clog ;			/* variable */
 using std::cerr ;			/* variable */
 using std::cout ;			/* variable */
@@ -162,6 +167,8 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+using setiter = std::unordered_set<string>::iterator ;
 
 
 /* external subroutines */
@@ -412,23 +419,37 @@ static int printshells() noex {
 /* end subroutine (printshells) */
 
 static int printuserents() noex {
-	PASSWD		*pwp ;
+	unordered_set<string>	seen ;
+	pair<setiter,bool>	ret ;
 	int		rs = SR_OK ;
-	while ((pwp = getpwent()) != nullptr) {
-	   cchar	*un = pwp->pw_name ;
-	   cout << un << eol ;
-	} /* end while */
+	try {
+	    PASSWD	*pwp ;
+	    while ((pwp = getpwent()) != nullptr) {
+	        cchar	*un = pwp->pw_name ;
+		ret = seen.emplace(un) ;
+		if (ret.second) cout << un << eol ;
+	    } /* end while */
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
 	return rs ;
 }
 /* end subroutine (printuserents) */
 
 static int printgroupents() noex {
-	GROUP		*grp ;
+	unordered_set<string>	seen ;
+	pair<setiter,bool>	ret ;
 	int		rs = SR_OK ;
-	while ((grp = getgrent()) != nullptr) {
-	   cchar	*gn = grp->gr_name ;
-	   cout << gn << eol ;
-	} /* end while */
+	try {
+	    GROUP	*grp ;
+	    while ((grp = getgrent()) != nullptr) {
+		cchar	*gn = grp->gr_name ;
+		ret = seen.emplace(gn) ;
+		if (ret.second) cout << gn << eol ;
+	    } /* end while */
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
 	return rs ;
 }
 /* end subroutine (printgroupents) */
