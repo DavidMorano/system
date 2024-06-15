@@ -33,6 +33,12 @@
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getusername.h>
 #include	<opensysfs.h>
+#include	<snwcpy.h>
+#include	<mkpathx.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strdcpy.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 
@@ -47,8 +53,9 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern "C" {
+    extern int uc_openuserinfo(ucopeninfo *) noex ;
+}
 
 extern "C" {
     int	uc_openuserbase(struct ucopeninfo *oip) noex ;

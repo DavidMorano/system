@@ -207,23 +207,25 @@ static const struct addrfam	addrfamilies[] = {
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int getaf(cchar *np,int nl) noex {
+int getaf(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (np) {
+	if (sp) {
 	    rs = SR_INVALID ;
-	    if ((nl > 0) && np[0]) {
-	        if (hasalldig(np,nl)) {
-	            int		v ;
-	            if ((rs = cfdeci(np,nl,&v)) >= 0) {
+	    if ((sl > 0) && sp[0]) {
+	        if (hasalldig(sp,sl)) {
+	            if (int v ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
 	            }
 	        } else {
 	            cint	alen = AFNAMELEN ;
 	            int		al ;
 	            char	abuf[AFNAMELEN + 1] ;
-	            if ((al = (strdcpy1w(abuf,alen,np,nl)-abuf)) > 0) {
+	            if ((al = (strdcpy1w(abuf,alen,sp,sl)-abuf)) > 0) {
 	                CADDRFAM	*afs = addrfamilies ;
 	                cint		n = 2 ;
 	                int		i{} ;

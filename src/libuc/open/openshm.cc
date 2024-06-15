@@ -85,7 +85,8 @@ static int	mkshmname(char *,int,ulong) noex ;
 /* local variables */
 
 static bufsizevar	maxnamelen(getbufsize_mn) ;
-static const int	tmplen = strlen(sysword.w_tmpdir) ;
+
+static cint		tmplen = strlen(sysword.w_tmpdir) ;
 
 
 /* exported variables */

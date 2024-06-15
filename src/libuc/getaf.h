@@ -29,10 +29,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 EXTERNC_begin
@@ -42,6 +41,14 @@ extern int	getaflen(int) noex ;
 extern cchar	*strafname(int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int getaf(cchar *sp) noex {
+	return getaf(sp,-1) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* GETAF_INCLUDE */

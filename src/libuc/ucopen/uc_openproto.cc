@@ -94,6 +94,8 @@
 #include	<string.h>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getaf.h>
+#include	<openshm.h>
 #include	<ascii.h>
 #include	<vecstr.h>
 #include	<hostent.h>
@@ -104,6 +106,17 @@
 #include	<inetaddr.h>
 #include	<filer.h>
 #include	<linefold.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<snwcpy.h>
+#include	<sncpyx.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strdcpy.h>
+#include	<mkpathx.h>
+#include	<matxstr.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"ucopen.h"
@@ -163,45 +176,21 @@
 
 /* external subroutines */
 
-extern int	snwcpyclean(char *,int,int,cchar *,int) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matcasestr(cchar **,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	mkcleanline(char *,int,int) ;
-extern int	opentmp(cchar *,int,mode_t) ;
-extern int	openshmtmp(char *,int,mode_t) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isprintlatin(int) ;
-
-extern int	filer_writeblanks(FILER *,int) ;
-extern int	sbuf_addquoted(sbuf *,cchar *,int) ;
-
-extern int	getaf(cchar *) ;
-
 #if	CF_TICOTSORD
-extern int	dialticotsord(cchar *,int,int,int) ;
-extern int	dialticotsordnls(cchar *,int,cchar *,int,int) ;
-extern int	dialticotsordmux(cchar *,int,cchar *,cchar **,int,int) ;
+extern int dialticotsord(cchar *,int,int,int) noex ;
+extern int dialticotsordnls(cchar *,int,cchar *,int,int) noex ;
+extern int dialticotsordmux(cchar *,int,cchar *,mainv,int,int) noex ;
 #endif /* CF_TICOTSORD */
 
-extern int	dialuss(cchar *,int,int) ;
-extern int	dialussnls(cchar *,cchar *,int,int) ;
-extern int	dialussmux(cchar *,cchar *,cchar **,int,int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	dialtcpnls(cchar *,cchar *,int,cchar *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	dialudp(cchar *,cchar *,int,int,int) ;
-extern int	dialusd(cchar *,int,int) ;
-extern int	dialhttp(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*strdcpy2w(char *,int,cchar *,cchar *,int) ;
+extern int dialuss(cchar *,int,int) noex ;
+extern int dialussnls(cchar *,cchar *,int,int) noex ;
+extern int dialussmux(cchar *,cchar *,mainv,int,int) noex ;
+extern int dialtcp(cchar *,cchar *,int,int,int) noex ;
+extern int dialtcpnls(cchar *,cchar *,int,cchar *,int,int) noex ;
+extern int dialtcpmux(cchar *,cchar *,int,cchar *,mainv,int,int) noex ;
+extern int dialudp(cchar *,cchar *,int,int,int) noex ;
+extern int dialusd(cchar *,int,int) noex ;
+extern int dialhttp(cchar *,cchar *,int,cchar *,mainv,int,int) noex ;
 
 
 /* local structures */
@@ -343,8 +332,7 @@ static constexpr cpcchar	protonames[] = {
 
 /* exported subroutines */
 
-int uc_openproto(cchar *fname,int of,int to,int opts)
-{
+int uc_openproto(cchar *fname,int of,int to,int opts) noex {
 	SUBINFO		si ;
 	int		rs = SR_OK ;
 	int		pni ;
@@ -468,9 +456,7 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 
 /* local subroutines */
 
-
-static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no)
-{
+static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no) noex {
 	INETARGS	a ;
 	int		rs ;
 	int		rs1 ;
@@ -479,8 +465,8 @@ static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no)
 	if ((rs = inetargs_start(&a,ap)) >= 0) {
 	    if ((rs = getaf(a.afp)) >= 0) {
 	        cint	af = rs ;
-	        cchar		*hp = a.hostp ;
-	        cchar		*sp = a.svcp ;
+	        cchar	*hp = a.hostp ;
+	        cchar	*sp = a.svcp ;
 
 	        switch (pni) {
 	        case protoname_udp:
@@ -502,7 +488,7 @@ static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no)
 	                switch (pni) {
 	                case protoname_tcpmux:
 	                    {
-	                        cchar	**av = nullptr ;
+	                        mainv	av = nullptr ;
 	                        if (a.f_args) {
 	                            rs = vecstr_getvec(&a.args,&av) ;
 	                        }
@@ -530,23 +516,15 @@ static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no)
 }
 /* end subroutine (openproto_inet) */
 
-
 #if	CF_TICOTSORD
-static int openproto_ticotsord(sip,pni,of,to,opts)
-SUBINFO		*sip ;
-int		pni ;
-int		of ;
-int		to ;
-int		opts ;
-{
+static int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 	vecstr		args ;
 	int		rs = SR_OK ;
 	int		pl = -1 ;
 	int		f_args = false ;
-	cchar	*tp ;
-	cchar	*pp = sip->fpath ;
-	cchar	**av = nullptr ;
-
+	cchar		*tp ;
+	cchar		*pp = sip->fpath ;
+	mainv		av = nullptr ;
 	if ((tp = strchr(sip->fpath,0xAD)) != nullptr) {
 	    f_args = true ;
 	    pp = sip->fpath ;
@@ -605,36 +583,35 @@ int		opts ;
 /* end subroutine (openproto_ticotsord) */
 #else /* CF_TICOTSORD */
 /* ARGSUSED */
-static int openproto_ticotsord(sip,pni,of,to,opts)
-SUBINFO		*sip ;
-int		pni ;
-int		of ;
-int		to ;
-int		opts ;
-{
+static int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
+	(void) sip ;
+	(void) pni ;
+	(void) of ;
+	(void) to ;
+	(void) opts ;
 	return SR_NOSYS ;
 }
 #endif /* CF_TICOTSORD */
 
-static int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,int to,int no)
-{
+static int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,
+		int to,int no) noex {
 	int		rs = SR_OK ;
 	int		f_args = false ;
-	cchar	*tp ;
-	cchar	*pp = fpath ;
+	cchar		*tp ;
+	cchar		*pp = fpath ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
 	if (sip == nullptr) return SR_FAULT ;
 
 	if ((tp = strchr(fpath,0xAD)) != nullptr) {
 	    pp = pbuf ;
-	    rs = mkfpath1w(pbuf,fpath,(tp - fpath)) ;
+	    rs = mkpath1w(pbuf,fpath,(tp - fpath)) ;
 	    f_args = true ;
 	}
 
 	if (rs >= 0) {
 	    vecstr	args ;
-	    cchar	**av = nullptr ;
+	    mainv	av = nullptr ;
 	    if (f_args) {
 	        if ((rs = vecstr_start(&args,4,0)) >= 0) {
 	            if ((rs = loadargs(&args,(tp+1))) >= 0) {
@@ -654,9 +631,7 @@ static int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,int to,int no)
 }
 /* end subroutine (openproto_ussmux) */
 
-
-static int openproto_finger(SI *sip,cchar *sp,int of,int to)
-{
+static int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
 	INETARGS	a ;
 	int		rs ;
 	int		rs1 ;
@@ -677,7 +652,7 @@ static int openproto_finger(SI *sip,cchar *sp,int of,int to)
 	            }
 	        } /* end if (port-spec) */
 	        if (rs >= 0) {
-	            cchar	**av = nullptr ;
+	            mainv	av = nullptr ;
 	            if (a.f_args) {
 	                rs = vecstr_getvec(&a.args,&av) ;
 	            }
@@ -719,7 +694,7 @@ static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 	if ((rs = inetargs_start(&a,sp)) >= 0) {
 	    if ((rs = getaf(a.afp)) >= 0) {
 	        cint	af = rs ;
-	        cchar	**av = nullptr ;
+	        mainv	av = nullptr ;
 	        if (a.f_args) {
 	            rs = vecstr_getvec(&a.args,&av) ;
 	        }
@@ -737,14 +712,10 @@ static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 }
 /* end subroutine (openproto_http) */
 
-
-static int inetargs_start(INETARGS *iap,cchar *args)
-{
+static int inetargs_start(INETARGS *iap,cchar *args) noex {
 	int		rs = SR_OK ;
-	cchar	*tp, *sp ;
-
-	memset(iap,0,sizeof(INETARGS)) ;
-
+	cchar		*tp, *sp ;
+	memclear(iap) ;
 	sp = args ;
 	if ((tp = strchr(sp,'/')) != nullptr) {
 	    iap->afp = sp ;
@@ -815,13 +786,10 @@ static int inetargs_starter(INETARGS *iap,cchar *sp) noex {
 }
 /* end subroutine (inetargs_starter) */
 
-
-static int inetargs_finish(INETARGS *iap)
-{
+static int inetargs_finish(INETARGS *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (iap->a != nullptr) {
+	if (iap->a) {
 	    rs1 = uc_libfree(iap->a) ;
 	    iap->a = nullptr ;
 	    if (rs < 0) rs = rs1 ;
@@ -832,7 +800,6 @@ static int inetargs_finish(INETARGS *iap)
 	    rs1 = vecstr_finish(&iap->args) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (inetargs_finish) */
@@ -841,7 +808,6 @@ static int inetargs_alloc(INETARGS *iap) noex {
 	int		rs = SR_OK ;
 	int		sz = 0 ;
 	char		*bp ;
-
 #ifdef	COMMENT
 	if (iap->protop != nullptr) {
 	    sz += (strnlen(iap->protop,iap->protol) + 1) ;
@@ -862,7 +828,6 @@ static int inetargs_alloc(INETARGS *iap) noex {
 	if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    cchar	*cp ;
 	    iap->a = bp ;
-
 #ifdef	COMMENT
 	    if (iap->protop != nullptr) {
 	        cp = bp ;
@@ -890,9 +855,7 @@ static int inetargs_alloc(INETARGS *iap) noex {
 	        bp = (strwcpy(bp,iap->svcp,iap->svcl) + 1) ;
 	        iap->svcp = cp ;
 	    }
-
 	} /* end if (memory-allocation) */
-
 	return rs ;
 }
 /* end subroutine (inetargs_alloc) */
@@ -990,10 +953,9 @@ static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of) noex {
 	            }
 	            if (iap->f_args) {
 	                vecstr	*alp = &iap->args ;
-	                int		i ;
 	                cchar	*ap ;
-	                for (i = 0 ; vecstr_get(alp,i,&ap) >= 0 ; i += 1) {
-	                    if (ap != nullptr) {
+	                for (int i = 0 ; vecstr_get(alp,i,&ap) >= 0 ; i += 1) {
+	                    if (ap) {
 	                        rs = sbuf_chr(&b,' ') ;
 	                        if (rs >= 0) rs = sbuf_addquoted(&b,ap,-1) ;
 	                    }
@@ -1021,25 +983,19 @@ static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of) noex {
 }
 /* end subroutine (dialfinger) */
 
-
 #if	CF_FINGERCLEAN
 #if	CF_FINGERBACK
-static int fingerclean(int nfd)
-{
+static int fingerclean(int nfd) noex {
 	int		rs = SR_OK ;
 	int		pfds[2] ;
 	int		fd = -1 ;
-
 	if ((rs = u_pipe(pfds)) >= 0) {
-	    FINGERARGS	fa ;
-	    PTA		ta ;
+	    FINGERARGS	fa{} ;
+	    pta		ta ;
 	    pthread_t	tid ;
 	    fd = pfds[0] ; /* return read end */
-
-	    memset(&fa,0,sizeof(FINGERARGS)) ;
 	    fa.nfd = nfd ;
 	    fa.cfd = pfds[1] ; /* pass down write end */
-
 	    if ((rs = pta_create(&ta)) >= 0) {
 	        int	v = PTHREAD_CREATE_DETACHED ;
 	        if ((rs = pta_setdetachstate(&ta,v)) >= 0) {
@@ -1048,31 +1004,27 @@ static int fingerclean(int nfd)
 	        }
 	        pta_destroy(&ta) ;
 	    } /* end if (pthread-attribute) */
-
 	    if (rs < 0) {
 	        int	i ;
 	        for (i = 0 ; i < 2 ; i += 1) u_close(pfds[i]) ;
 	    }
 	} /* end if (pipe) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (fingerclean) */
 
-static int fingerworker(FINGERARGS *fap)
-{
-	FILER		out, *ofp = &out ;
-	cint	nfd = fap->nfd ;
-	cint	cfd = fap->cfd ;
-	cint	cols = COLUMNS ;
-	cint	ind = INDENT ;
-	cint	to = TO_READ ;
+static int fingerworker(FINGERARGS *fap) noex {
+	filer		out, *ofp = &out ;
+	cint		nfd = fap->nfd ;
+	cint		cfd = fap->cfd ;
+	cint		cols = COLUMNS ;
+	cint		ind = INDENT ;
+	cint		to = TO_READ ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
 	if ((rs = filer_start(ofp,cfd,0L,0,0)) >= 0) {
-	    FILER	fb ;
+	    filer	fb ;
 	    cint	fbo = FILER_ONET ;
 	    if ((rs = filer_start(&fb,nfd,0L,0,fbo)) >= 0) {
 	        {
@@ -1085,20 +1037,16 @@ static int fingerworker(FINGERARGS *fap)
 	    rs1 = filer_finish(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-
 	u_close(nfd) ;
 	u_close(cfd) ;
-
 	wlen &= INT_MAX ;
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (fingerworker) */
 
-
-static int fingerworker_loop(FINGERARGS *fap,FILER *ofp,FILER *ifp,
-int cols,int ind,int to)
-{
-	cint	llen = LINEBUFLEN ;
+static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
+		int cols,int ind,int to) noex {
+	cint		llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1142,31 +1090,20 @@ int cols,int ind,int to)
 	            rs = filer_println(ofp,lbuf,0) ;
 	            wlen += rs ;
 	        } /* end if (clen) */
-
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-
 	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (fingerworker_loop) */
 
-
-static int fingerworker_liner(fap,ofp,cols,ind,ln,sp,sl)
-FINGERARGS	*fap ;
-FILER		*ofp ;
-int		cols ;
-int		ind ;
-int		ln ;
-cchar	*sp ;
-int		sl ;
-{
+static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
+		int ind,int ln,cc *sp,int sl) noex {
 	int		rs ;
 	int		clen ;
-	int		size ;
+	int		sz ;
 	int		gcols ;
 	int		icols ;
 	int		wlen = 0 ;
@@ -1180,8 +1117,8 @@ int		sl ;
 	icols = (ln == 0) ? 0 : ind ;
 
 	clen = (2*cols) ;
-	size = (clen+1) ;
-	if ((rs = uc_libmalloc(size,&cbuf)) >= 0) {
+	sz = (clen+1) ;
+	if ((rs = uc_libmalloc(sz,&cbuf)) >= 0) {
 	    int		i = 0 ;
 	    int		ll, cl ;
 	    int		ncols = gcols ;
@@ -1351,7 +1288,6 @@ static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
 	sbuf		d ;
 	int		rs ;
 	int		len = 0 ;
-
 	if ((rs = sbuf_start(&d,dp,dl)) >= 0) {
 	    int		n ;
 	    for (int i = 0 ; (rs >= 0) && (i < sl) && *sp ; i += 1) {
@@ -1364,11 +1300,9 @@ static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
 	        }
 	        ci += 1 ;
 	    } /* end for */
-
 	    len = sbuf_finish(&d) ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkexpandtab) */
