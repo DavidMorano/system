@@ -417,7 +417,7 @@ int u_xattrget(cc *fn,cc *n,void *v,size_t sz,uint32_t foff,int o) noex {
 	return fo(fn) ;
 }
 
-int u_xattrset(cc *fn,cc *n,void *v,size_t sz,uint32_t foff,int o) noex {
+int u_xattrset(cc *fn,cc *n,cvoid *v,size_t sz,uint32_t foff,int o) noex {
 	ufiler		fo(n,v,sz,foff,o) ;
 	fo.m = &ufiler::ixattrset ;
 	return fo(fn) ;
