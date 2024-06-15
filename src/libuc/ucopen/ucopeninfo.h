@@ -30,9 +30,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
 #define	UCOPENINFO	ucopeninfo_head

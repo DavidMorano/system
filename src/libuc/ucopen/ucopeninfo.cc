@@ -92,6 +92,7 @@
 #include	<pwd.h>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<vecstr.h>
 #include	<getax.h>
 #include	<typenonpath.h>
@@ -163,27 +164,27 @@ extern cchar	**environ ;
 
 /* forward references */
 
-static int	u_openex(UCOPENINFO *) ;
+static int	u_openex(UCOPENINFO *) noex ;
 
-static int	open_eval(UCOPENINFO *) ;
-static int	open_otherlink(UCOPENINFO *,int *,char *) ;
-static int	open_othertry(UCOPENINFO *,int *,char *) ;
-static int	open_floatpath(UCOPENINFO *,int) ;
-static int	open_pseudopath(UCOPENINFO *,cchar *,int) ;
-static int	open_nonpath(UCOPENINFO *,int) ;
-static int	open_nonpather(UCOPENINFO *,int,cchar *,cchar *) ;
+static int	open_eval(UCOPENINFO *) noex ;
+static int	open_otherlink(UCOPENINFO *,int *,char *) noex ;
+static int	open_othertry(UCOPENINFO *,int *,char *) noex ;
+static int	open_floatpath(UCOPENINFO *,int) noex ;
+static int	open_pseudopath(UCOPENINFO *,cchar *,int) noex ;
+static int	open_nonpath(UCOPENINFO *,int) noex ;
+static int	open_nonpather(UCOPENINFO *,int,cchar *,cchar *) noex ;
 
 static int	openproger(cchar *,int,mainv) noex ;
-static int	accmode(int) ;
-static int	waitready(int,int,int) ;
-static int	pollok(int) ;
-static int	getprefixfs(cchar *,cchar **) ;
-static int	getnormalfs(cchar *,cchar **) ;
-static int	noexist(cchar *,int) ;
-static int	loadargs(vecstr *,cchar *) ;
+static int	accmode(int) noex ;
+static int	waitready(int,int,int) noex ;
+static int	pollok(int) noex ;
+static int	getprefixfs(cchar *,cchar **) noex ;
+static int	getnormalfs(cchar *,cchar **) noex ;
+static int	noexist(cchar *,int) noex ;
+static int	loadargs(vecstr *,cchar *) noex ;
 
 #if	CF_ISMORE
-extern int	isMorePossible(int) ;
+extern int	isMorePossible(int) noex ;
 #endif
 
 constexpr bool	issl(int ch) noex {
@@ -282,7 +283,7 @@ int uc_openinfo(ucopeninfo *oip) noex {
 
 	    if (hascdpath(oip->fname,-1)) {
 	        cint	tlen = MAXPATHLEN ;
-	        char		*tbuf ;
+	        char	*tbuf ;
 	        if ((rs = uc_libmalloc((tlen+1),&tbuf)) >= 0) {
 	            if ((rs = mkcdpath(tbuf,oip->fname,-1)) > 0) {
 			oip->fname = tbuf ;
@@ -376,7 +377,7 @@ static int open_eval(ucopeninfo *oip) noex {
 	            cint	sz = (MAXPATHLEN + 1) ;
 	            void	*p ;
 	            if ((rs = uc_libmalloc(sz,&p)) >= 0) {
-	                efname = p ;
+	                efname = charp(p) ;
 	                efname[0] = '\0' ;
 	                if ((rs = mkvarpath(efname,oip->fname,-1)) > 0) {
 	                    oip->fname = efname ;
@@ -393,7 +394,7 @@ static int open_eval(ucopeninfo *oip) noex {
 	            int		pi ;
 		    cchar	*fn = oip->fname ;
 	            cchar	*rp = nullptr ;
-	            if (issl(fsch) && ((pi = getprefixfs(fn,&rp)) >= 0)) {
+	            if (issl(fch) && ((pi = getprefixfs(fn,&rp)) >= 0)) {
 	                rs = open_pseudopath(oip,rp,pi) ;
 	                fd = rs ;
 	            } else if (issl(fch) && ((pi = getnormalfs(fn,&rp)) >= 0)) {

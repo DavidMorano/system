@@ -121,9 +121,18 @@
 #define	I_RECVFD	(I_STREAMBASE+4)
 #endif
 
-#ifndef	ISPTM		/* ask if FD is a pseudo-terminal */
-#define	ISPTM		(I_STREAMBASE+5)
+#ifndef	I_SRDOPT
+#define	I_SRDOPT	(I_STREAMBASE+5)
 #endif
+
+#ifndef	ISPTM		/* ask if FD is a pseudo-terminal */
+#define	ISPTM		(I_STREAMBASE+6)
+#endif
+
+#ifndef	RMSGD
+#define	RMSGD		(I_STREAMBASE+7)
+#endif
+
 
 struct strbuf {
 	char		*buf ;

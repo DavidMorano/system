@@ -71,7 +71,6 @@
 #include	<ucmemalloc.h>
 #include	<ucmallocx.h>
 #include	<ucstrtox.h>
-#include	<ucopeninfo.h>
 #include	<ucopen.h>
 #include	<uctc.h>		/* terminal interface */
 #include	<ucpts.h>		/* pseudo-terminal management */
@@ -146,36 +145,6 @@ extern int	uc_rename(cchar *,cchar *) noex ;
 extern int	uc_utime(cchar *,const UTIMBUF *) noex ;
 extern int	uc_realpath(cchar *,char *) noex ;
 extern int	uc_truncate(cchar *,off_t) noex ;
-
-/* open group */
-extern int	uc_create(cchar *,mode_t) noex ;
-extern int	uc_createfile(cchar *,mode_t) noex ;
-extern int	uc_open(cchar *,int,mode_t) noex ;
-extern int	uc_opene(cchar *,int,mode_t,int) noex ;
-extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
-extern int	uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
-extern int	uc_opensocket(cchar *,int,int) noex ;
-extern int	uc_openproto(cchar *,int,int,int) noex ;
-extern int	uc_openpass(cchar *,int,int,int) noex ;
-extern int	uc_openuser(cchar *,cchar *,int,mode_t,int) noex ;
-extern int	uc_openuserinfo(ucopeninfo *) noex ;
-extern int	uc_openprog(cchar *,int,mainv,mainv) noex ;
-extern int	uc_opendialer(cchar *,cchar *,int,mode_t,
-			cchar **,cchar **,int) noex ;
-extern int	uc_openfsvc(cchar *,cchar *,cchar *,int,mode_t,
-			cchar **,cchar **,int) noex ;
-extern int	uc_openusvc(cchar *,cchar *,cchar *,int,mode_t,
-			cchar **,cchar **,int) noex ;
-extern int	uc_openfint(cchar *,cchar *,cchar *,
-			cchar *, cchar *, int,mode_t,
-			cchar **,cchar **,int) noex ;
-extern int	uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
-extern int	uc_opendev(cchar *,int,mode_t,mainv,int,int) noex ;
-
-/* special open group */
-extern int	uc_opensysdb(int,int,mode_t) noex ;
-extern int	uc_openpt(int) noex ;
-extern int	uc_socket(int,int,int) noex ;
 
 /* use group */
 extern int	uc_fcntl(int,int,...) noex ;

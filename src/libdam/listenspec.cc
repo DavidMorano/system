@@ -4,7 +4,6 @@
 /* hold (or manage) a "listen" specification */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		0		/* extra safe? */
 #define	CF_OPENPORT	1		/* use 'openport(3dam)' */
 #define	CF_NONBLOCK	0		/* set non-blocking on sockets */
 
@@ -30,6 +29,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<getproto.h>
 #include	<getaddr.h>
@@ -98,6 +98,12 @@
 
 #ifndef	CF_NONBLOCK
 #define	CF_NONBLOCK		0
+#endif
+
+#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) 
+#define	F_STREAMS	1
+#else
+#define	F_STREAMS	0
 #endif
 
 
@@ -259,6 +265,7 @@ constexpr cpcchar	lopts[] = {
 } ;
 
 constexpr bool		f_nonblock = CF_NONBLOCK ;
+constexpr bool		f_streams = F_STREAMS ;
 
 
 /* exported variables */
@@ -537,17 +544,13 @@ int listenspec_clear(LS *op) noex {
 /* private subroutines */
 
 static int listenspec_parse(LS *op,int ac,mv av) noex {
+	cint		ti = matstr(ltypes,av[0],-1) ;
 	int		rs = SR_OK ;
 	int		sz = 0 ;
-	int		ti ;
 	int		n = 0 ;
-
-	ti = matstr(ltypes,av[0],-1) ;
 	op->ltype = ti ;
 	ac -= 1 ;
-
-/* allocate our information structure */
-
+	/* allocate our information structure */
 	switch (ti) {
 	case ltype_tcp:
 	    sz = sizeof(LISTENSPEC_TCP) ;
@@ -562,7 +565,6 @@ static int listenspec_parse(LS *op,int ac,mv av) noex {
 	    sz = sizeof(LISTENSPEC_CONN) ;
 	    break ;
 	} /* end switch */
-
 	if (sz > 0) {
 	    void	*p ;
 	    if ((rs = uc_malloc(sz,&p)) >= 0) {
@@ -597,7 +599,6 @@ static int listenspec_parse(LS *op,int ac,mv av) noex {
 	} else {
 	    rs = SR_PROTONOSUPPORT ;
 	}
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (listenspec_parse) */
@@ -608,9 +609,7 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
 	tcpaddr_load(&a,nullptr,0) ;
-
 	if ((rs = arginfo_start(aip)) >= 0) {
 	    if ((rs = listenspec_procargs(op,aip,ac,av)) >= 0) {
 		int	pan = 0 ;
@@ -618,9 +617,7 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 		int	sz = 0 ;
 		cchar	*ap ;
 		cchar	*cp ;
-
 	        while ((al = arginfo_get(aip,pan,&ap)) >= 0) {
-
 	            switch (pan) {
 	            case 0:
 	                if (al > 0) {
@@ -640,18 +637,14 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 	                break ;
 	            } /* end switch */
 	            pan += 1 ;
-
 	        } /* end while (positional arguments) */
-
 	        if (n > 0) {
 	            rs = listenspec_tcpaddrload(op,&a,sz) ;
 	        }
-
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (arginfo) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (listenspec_tcpbegin) */
@@ -1045,16 +1038,15 @@ static int listenspec_passactive(LS *op,int opts,int f) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		f_a = false ;
-
 	if (f && (! op->f.active)) {
 	    if ((rs = listenpass(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
 	        op->f.active = true ;
 	        op->f.broken = false ;
 		f_a = true ;
-#if	SYSHAS_STREAMS
-	        u_ioctl(op->fd,I_SRDOPT,RMSGD) ;
-#endif
+		if_constexpr (f_streams) {
+	            rs = u_ioctl(op->fd,I_SRDOPT,RMSGD) ;
+		}
 	    } else {
 		op->rs_error = rs ;
 	        op->f.broken = true ;
@@ -1066,7 +1058,6 @@ static int listenspec_passactive(LS *op,int opts,int f) noex {
 	    }
 	    op->f.active = false ;
 	} /* end if */
-
 	return (rs >= 0) ? f_a : rs ;
 }
 /* end subroutine (listenspec_passactive) */
@@ -1237,17 +1228,14 @@ static int listenspec_connaccept(LS *op,void *fp,int *flp,int to) noex {
 
 static int listenspec_conninfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
-	int		rs = SR_OK ;
-	int		bl = LISTENSPEC_ADDRLEN ;
+	int		rs = SR_NOTFOUND ;
 	int		len = 0 ;
-	char		*bp = lip->addr ;
-
-	if (ip->fname == nullptr) rs = SR_NOENT ;
-
-	if (rs >= 0) {
+	if (ip->fname) {
+	    int		bl = LISTENSPEC_ADDRLEN ;
+	    char	*bp = lip->addr ;
+	    rs = SR_OK ;
 	    len = strwcpy(bp,ip->fname,bl) - bp ;
-	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (listenspec_conninfo) */
@@ -1263,37 +1251,26 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	int		akl, avl ;
 	int		pan = 0 ;
 	int		f_optminus, f_optplus, f_optequal ;
-	cchar	*akp, *avp ;
-	cchar	*fp ;
-
+	cchar		*akp, *avp ;
+	cchar		*fp ;
 	aip->mode = -1 ;
-
-/* allocate buffer for further parsing */
-
+	/* allocate buffer for further parsing */
 	ar = ac ;
 	for (ai = 0 ; (ai < ac) && (av[ai] != nullptr) ; ai += 1) {
 	    ar -= 1 ;
-
 	    fp = av[ai] ;
 	    fl = strlen(fp) ;
-
 	    f_optminus = (fp[0] == '-') ;
 	    f_optplus = (fp[0] == '+') ;
 	    if ((fl > 1) && (f_optminus || f_optplus) && (! aip->f_adash)) {
 		cint	ach = mkchar(fp[1]) ;
-
 	        if (isdigitlatin(ach)) {
-
 	            rs1 = cfdecti((fp + 1),(fl - 1),&v) ;
 	            if (rs1 >= 0) aip->argvalue = v ;
-
 	        } else if (ach == '-') {
-
 	            aip->f_adash = true ;
 	            break ;
-
 	        } else {
-
 	            akp = (fp + 1) ;
 	            f_optequal = false ;
 	            if ((avp = strchr(akp,'=')) != nullptr) {
@@ -1306,9 +1283,7 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	                avl = 0 ;
 	                akl = (fl - 1) ;
 	            }
-
 	            if ((kwi = matostr(lopts,2,akp,akl)) >= 0) {
-
 	                switch (kwi) {
 	                case lopt_here:
 	                    break ;
@@ -1317,20 +1292,18 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	                    op->f.reuse = true ;
 	                    break ;
 	                } /* end switch */
-
 	            } else {
-
 	                while (akl--) {
 	                    cint	kc = mkchar(*akp) ;
-
 	                    switch (kc) {
 	                    case 'm':
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs1 = cfnumui(avp,avl,&uv) ;
-	                                if (rs1 >= 0)
+	                                if (rs1 >= 0) {
 	                                    aip->mode = (uv & 0777) ;
+					}
 	                            }
 	                        } else {
 	                            if (ar > 0) {
@@ -1339,32 +1312,25 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	                                fl = strlen(fp) ;
 	                                if (fl > 0) {
 	                                    rs1 = cfnumui(fp,fl,&uv) ;
-	                                    if (rs1 >= 0)
+	                                    if (rs1 >= 0) {
 	                                        aip->mode = (uv & 0777) ;
+					    }
 	                                }
 	                            }
 	                        } /* end if */
 	                        break ;
 	                    } /* end switch */
 	                    akp += 1 ;
-
 			    if (rs < 0) break ;
 	                } /* end while */
-
 	            } /* end if */
-
 	        } /* end if */
-
 	    } else {
-
 	        rs = arginfo_add(aip,fp) ;
 	        pan += 1 ;
-
 	    } /* end if */
-
 	    if (rs < 0) break ;
 	} /* end while */
-
 	return rs ;
 }
 /* end subroutine (listenspec_procargs) */
@@ -1374,32 +1340,30 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 /* note that the 'opts' argument is ignored; this always REUSEs the port */
 static int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
 		int opts) noex {
-	int		rs ;
+	int		rs = SR_INVALID ;
 	int		fd = -1 ;
-	cchar	*protoname = PROTONAME_TCP ;
-	cchar	*hp = hostspec ;
-
-	if (af < 0)
-	    return SR_INVALID ;
-
-	if (portspec[0] != '\0') {
-	    if ((rs = getportnum(protoname,portspec)) >= 0) {
-		cint	port = rs ;
-		if ((rs = listenspec_prlocal(op)) >= 0) {
-		     cchar	*pr = op->prlocal ;
-		     bool	f = false ;
-		     f = f || (hp == nullptr) ;
-		     f = f || (hp[0] == '\0') ;
-		     f = f || (strcmp(hp,"*") == 0) ;
-		     if (f) hp = ANYHOST ;
-		     rs = listenspec_openporter(op,pr,af,hp,port,opts) ;
-		     fd = rs ;
-		} /* end if (listenspec_prlocal) */
-	    } /* end if (getportnum) */
-	} else {
-	    rs = SR_INVALID ;
-	}
-
+	if (af >= 0) {
+	    cchar	*protoname = PROTONAME_TCP ;
+	    cchar	*hp = hostspec ;
+	    rs = SR_OK ;
+	    if (portspec[0] != '\0') {
+	        if ((rs = getportnum(protoname,portspec)) >= 0) {
+		    cint	port = rs ;
+		    if ((rs = listenspec_prlocal(op)) >= 0) {
+		         cchar	*pr = op->prlocal ;
+		         bool	f = false ;
+		         f = f || (hp == nullptr) ;
+		         f = f || (hp[0] == '\0') ;
+		         f = f || (strcmp(hp,"*") == 0) ;
+		         if (f) hp = ANYHOST ;
+		         rs = listenspec_openporter(op,pr,af,hp,port,opts) ;
+		         fd = rs ;
+		    } /* end if (listenspec_prlocal) */
+	        } /* end if (getportnum) */
+	    } else {
+	        rs = SR_INVALID ;
+	    }
+	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (listenspec_openport) */
@@ -1413,15 +1377,14 @@ static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 	int		fd = -1 ;
 	char		addr[INETXADDRLEN + 1] ;
 	(void) opts ;
-
 	if ((rs = listenspec_openportaddr(op,pr,&ai,addr,af,hp)) >= 0) {
-	    SOCKADDRESS	sa ;
+	    sockaddress	sa ;
 	    cint	type = SOCK_STREAM ;
 	    cint	proto = IPPROTO_TCP ;
 	    cint	flow = 0 ;
 	    int		alen = rs ;
-	    int		pf = ai.ai_family ;
 	    if ((rs = sockaddress_startaddr(&sa,af,addr,alen,port,flow)) >= 0) {
+	    	cint	pf = ai.ai_family ;
 		if ((rs = openport(pf,type,proto,&sa)) >= 0) {
 	            fd = rs ;
 	            rs = u_listen(fd,10) ;
@@ -1434,7 +1397,6 @@ static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
 	} /* end if (open-port-addr) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (listenspec_openporter) */
@@ -1442,74 +1404,70 @@ static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 /* ARGSUSED */
 static int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
 		char *addr,int af,cchar	*hn) noex {
-	int		rs = SR_OK ;
-	int		raf = 0 ;
+	int		rs = SR_INVALID ;
 	int		addrlen = -1 ;
 	(void) pr ;
-
-	if (af < 0) return SR_INVALID ;
-
-	addr[0] = '\0' ;
-	memclear(aip) ;
-
-	if ((addrlen < 0) && ((af == AF_UNSPEC) || (af == AF_INET4))) {
-	    raf = AF_INET4 ;
-	    rs = listenspec_openportao(op,addr,raf,hn) ;
-	    addrlen = rs ;
-	}
-
-	if ((addrlen < 0) || (rs == SR_NOTFOUND)) {
-	    if ((af == AF_UNSPEC) || (af == AF_INET6)) {
-	        raf = AF_INET6 ;
+	if (af >= 0) {
+	    int		raf = 0 ;
+	    addr[0] = '\0' ;
+	    rs = memclear(aip) ;
+	    if ((addrlen < 0) && ((af == AF_UNSPEC) || (af == AF_INET4))) {
+	        raf = AF_INET4 ;
 	        rs = listenspec_openportao(op,addr,raf,hn) ;
 	        addrlen = rs ;
 	    }
-	}
-
-	if (rs >= 0) {
-	    if (raf > 0) {
-	        if ((rs = getprotofamily(raf)) >= 0) {
-	            aip->ai_family = rs ;
+	    if ((addrlen < 0) || (rs == SR_NOTFOUND)) {
+	        if ((af == AF_UNSPEC) || (af == AF_INET6)) {
+	            raf = AF_INET6 ;
+	            rs = listenspec_openportao(op,addr,raf,hn) ;
+	            addrlen = rs ;
 	        }
-	    } else {
-		rs = SR_AFNOSUPPORT ;
 	    }
-	} /* end if (ok) */
-
+	    if (rs >= 0) {
+	        if (raf > 0) {
+	            if ((rs = getprotofamily(raf)) >= 0) {
+	                aip->ai_family = rs ;
+	            }
+	        } else {
+		    rs = SR_AFNOSUPPORT ;
+	        }
+	    } /* end if (ok) */
+	} /* end if (valid) */
 	return (rs >= 0) ? addrlen : rs ;
 }
 /* end subroutine (listenspec_openportaddr) */
 
-static int listenspec_openportao(LS *op,char *addr,int af,
-		cc *hn) noex {
-	HOSTINFO	hi ;
-	HOSTINFO_CUR	hicur ;
-	cint		addrlen = getaddrlen(af) ;
-	int		rs ;
+static int listenspec_openportao(LS *op,char *addr,int af,cc *hn) noex {
+	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_NOANODE ;
-
-	if (af < 0) return SR_INVALID ;
-
-	addr[0] = '\0' ;
-
-	if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
-	    if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
-	        const uchar	*ap ;
-	        while ((rs = hostinfo_enumaddr(&hi,&hicur,&ap)) > 0) {
-	            if (rs == addrlen) {
-	                memcpy(addr,ap,addrlen) ;
-	                break ;
-	            }
-	        } /* end while */
-	        rs1 = hostinfo_curend(&hi,&hicur) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-	    rs1 = hostinfo_finish(&hi) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (hostinfo) */
-
+	int		addrlen = 0 ;
+	if (op && addr && hn) {
+	    rs = SR_INVALID ;
+	    addr[0] = '\0' ;
+	    if (af >= 0) {
+		if ((rs = getaddrlen(af)) >= 0) {
+	            hostinfo	hi ;
+		    addrlen = rs ;
+	            if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
+	                hostinfo_cur	hicur ;
+	                if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
+	                    auto hi_ea = hostinfo_enumaddr ;
+	                    const uchar	*ap ;
+	                    while ((rs = hi_ea(&hi,&hicur,&ap)) > 0) {
+	                        if (rs == addrlen) {
+	                            memcpy(addr,ap,addrlen) ;
+	                            break ;
+	                        }
+	                    } /* end while */
+	                    rs1 = hostinfo_curend(&hi,&hicur) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (cursor) */
+	                rs1 = hostinfo_finish(&hi) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (hostinfo) */
+	        } /* end if (getaddrlen) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? addrlen : rs ;
 }
 /* end subroutine (listenspec_openportao) */
@@ -1518,24 +1476,31 @@ static int listenspec_openportao(LS *op,char *addr,int af,
 
 static int listenspec_prlocal(LS *op) noex {
 	int		rs ;
-	char		dn[MAXHOSTNAMELEN+1] ;
-
+	int		rs1 ;
 	if (op->prlocal == nullptr) {
-	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	        cint	plen = MAXPATHLEN ;
-	        char	pbuf[MAXPATHLEN+1] ;
-	        if ((rs = mkpr(pbuf,plen,PRNAME,dn)) >= 0) {
-		    cchar	*cp ;
-		    if ((rs = uc_mallocstrw(pbuf,rs,&cp)) >= 0) {
-		        op->prlocal = cp ;
-			rs = (rs-1) ;
-		    }
-	        }
-	    } /* end if (getrootdname) */
+	    char	*dbuf{} ;
+	    if ((rs = malloc_hn(&dbuf)) >= 0) {
+		cint	dlen = rs ;
+	        if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
+	            char	*pbuf{} ;
+		    if ((rs = malloc_mp(&pbuf)) >= 0) {
+			cint	plen = rs ;
+	                if ((rs = mkpr(pbuf,plen,PRNAME,dbuf)) >= 0) {
+		            cchar	*cp ;
+		            if ((rs = uc_mallocstrw(pbuf,rs,&cp)) >= 0) {
+		                op->prlocal = cp ;
+		            } /* end if (memory-allocation) */
+	                } /* end if (mkpr) */
+			rs1 = uc_free(pbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (getinetdname) */
+		rs1 = uc_free(dbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	    rs = strlen(op->prlocal) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (listenspec_prlocal) */
@@ -1544,15 +1509,15 @@ static int listenspec_prlocal(LS *op) noex {
 static int tcp_nfield(cchar *fp,int fl) noex {
 	int		n = 0 ;
 	if (fl > 0) {
-	    int		cl ;
 	    cchar	*cp ;
 	    n += 1 ;
-	    if ((cp = strnchr(fp,fl,':')) != nullptr) {
+	    if (int cl ; (cp = strnchr(fp,fl,':')) != nullptr) {
 	        n += 1 ;
 	        cp += 1 ;
 	        cl = ((fp + fl) - cp) ;
-	        if (strnchr(cp,cl,':') != nullptr)
+	        if (strnchr(cp,cl,':') != nullptr) {
 	            n += 1 ;
+		}
 	    } /* end if */
 	} /* end if (non-zero) */
 	return n ;
@@ -1570,40 +1535,30 @@ static int tcpaddr_load(TCPADDR *ap,cchar *sp,int sl) noex {
 	    cchar	*tp ;
 	    n += 1 ;
 	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
-
 	        n += 1 ;
 	        ap->af.sp = sp ;
 	        ap->af.sl = (tp - sp) ;
 	        ap->host.sp = sp ;
 	        ap->host.sl = (tp - sp) ;
-
 	        cp = (tp + 1) ;
 	        cl = ((sp + sl) - cp) ;
 	        if ((tp = strnchr(cp,cl,':')) != nullptr) {
-
 	            n += 1 ;
 	            ap->host.sp = cp ;
 	            ap->host.sl = (tp - cp) ;
 	            ap->port.sp = (tp + 1) ;
 	            ap->port.sl = ((sp + sl) - (tp + 1)) ;
-
 	        } else {
-
 	            ap->af.sp = nullptr ;
 	            ap->af.sl = 0 ;
 	            ap->port.sp = cp ;
 	            ap->port.sl = cl ;
-
 	        } /* end if */
-
 	    } else {
-
 	        ap->port.sp = sp ;
 	        ap->port.sl = sl ;
-
 	    } /* end if */
 	} /* end if (non-zero) */
-
 	return n ;
 }
 /* end subroutine (tcpaddr_load) */

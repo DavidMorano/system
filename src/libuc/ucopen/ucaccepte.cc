@@ -1,4 +1,4 @@
-/* uc_accepte SUPPORT */
+/* ucaccepte SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -8,8 +8,8 @@
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was first written to give a little bit to UNIX® what we have in our
-        own circuit pack OSes!
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit pack OSes!
 
 */
 
@@ -18,10 +18,11 @@
 /*******************************************************************************
 
 	Name:
+	uc_accepte
 
 	Description:
-        Accept a connection on a socket and time it also so that we can abort if
-        it times out.
+	Accept a connection on a socket and time it also so that
+	we can abort if it times out.
 
 	Synopsis:
 	int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex
@@ -45,20 +46,23 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
-#include	<bufprintf.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* ?? */
 
 
 /* local defines */
 
+#ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-time multiplier */
-#define	EBUFLEN		100
+#endif
 
 
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* local structuers */
 
 
 /* forward references */
@@ -78,13 +82,17 @@ int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex {
 	if (sap && salp) {
 	    rs = SR_BADFD ;
 	    if (fd >= 0) {
+		rs = SR_OK ;
 	        if (to < 0) to = INT_MAX ;
 	        if (to >= 0) {
 	            POLLFD	fds[1] = {} ;
-	            fds[0].fd = fd ;
-	            fds[0].events = POLLIN ;
+		    cint	mto = POLL_INTMULT ;
+		    int		nfd = 0 ;
+	            fds[nfd].fd = fd ;
+	            fds[nfd].events = POLLIN ;
+		    nfd += 1 ;
 	            while (rs >= 0) {
-	                if ((rs = u_poll(fds,1,POLL_INTMULT)) >= 0) {
+	                if ((rs = u_poll(fds,nfd,mto)) >= 0) {
 	                    if (rs > 0) {
 	                        cint	re = fds[0].revents ;
 	                        if (re & POLLIN) {

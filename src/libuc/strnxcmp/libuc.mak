@@ -892,6 +892,11 @@ ucenum.o:		ucenum.dir
 ucenum.dir:
 	makesubdir $@
 
+# UCOPEN
+ucopen.o:		ucopen.dir
+ucopen.dir:
+	makesubdir $@
+
 # STRN
 strn.o:			strn.dir
 strn.dir:

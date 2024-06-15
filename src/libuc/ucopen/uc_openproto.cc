@@ -4,7 +4,6 @@
 /* open a protocol */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_FINGERCLEAN	1		/* FINGER clean */
 #define	CF_FINGERBACK	0		/* FINGER clean in background */
 #define	CF_UNDERWORLD	0		/* print the "underworld" message */
@@ -50,16 +49,16 @@
 	ticotsord		/<addr>
 	ticotsordnls[:<svc>]	/<addr>[/<svc>]
 	ticotsordmux[:<svc>]	/<addr>[/<svc>]
-	uss			<path>
-	ussnls[:<svc>]		<path>
-	ussmux[:<svc>]		<path>[­<arg(s)>]
+	uss			<pxath>
+	ussnls[:<svc>]		<pxath>
+	ussmux[:<svc>]		<pxath>[­<arg(s)>]
 	tcp			/<af>/<host>/<svc>
 	tcpnls[:<port>]		/<af>/<host>[:<port>]/<svc>
 	tcpmux[:<port>]		/<af>/<host>[:<port>]/<svc>­<arg(s)>
 	udp[:<port>]		/<af>/<host>/<svc>
-	usd			<path>
+	usd			<pxath>
 	finger[:<port>]		/<af>/<host>[:<port>]/<query>[+<ss>]­<arg(s)>
-	http[:<port>]		/<af>/<host>/<path>
+	http[:<port>]		/<af>/<host>/<pxath>
 
 	where:
 
@@ -74,16 +73,13 @@
 	<addr>		TLI address
 
 	Examples:
-
 	/proto/finger:5501/inet/rca/daytime
 	/proto/tcpmux:5108/inet/rca/daytime
 	/proto/tcp/inet/rca/daytime
 	/proto/uss:daytime/tmp/local/tcpmuxd/srv
 	/proto/http/inet/rca/robots.txt
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -110,6 +106,7 @@
 #include	<linefold.h>
 #include	<localmisc.h>
 
+#include	"ucopen.h"
 #include	"upt.h"
 
 
@@ -161,24 +158,25 @@
 #define	TO_DIAL		30
 #define	TO_READ		(1*60)
 
+#define	SI		SUBINFO
+
 
 /* external subroutines */
 
 extern int	snwcpyclean(char *,int,int,cchar *,int) ;
 extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	mkcleanline(char *,int,int) ;
 extern int	opentmp(cchar *,int,mode_t) ;
 extern int	openshmtmp(char *,int,mode_t) ;
-extern int	hasalldig(const char *,int) ;
+extern int	hasalldig(cchar *,int) ;
 extern int	isprintlatin(int) ;
 
 extern int	filer_writeblanks(FILER *,int) ;
-extern int	sbuf_addquoted(SBUF *,const char *,int) ;
+extern int	sbuf_addquoted(sbuf *,cchar *,int) ;
 
 extern int	getaf(cchar *) ;
 
@@ -188,46 +186,41 @@ extern int	dialticotsordnls(cchar *,int,cchar *,int,int) ;
 extern int	dialticotsordmux(cchar *,int,cchar *,cchar **,int,int) ;
 #endif /* CF_TICOTSORD */
 
-extern int	dialuss(const char *,int,int) ;
-extern int	dialussnls(const char *,const char *,int,int) ;
-extern int	dialussmux(const char *,const char *,const char **,int,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
+extern int	dialuss(cchar *,int,int) ;
+extern int	dialussnls(cchar *,cchar *,int,int) ;
+extern int	dialussmux(cchar *,cchar *,cchar **,int,int) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) ;
+extern int	dialtcpnls(cchar *,cchar *,int,cchar *,int,int) ;
 extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	dialudp(const char *,const char *,int,int,int) ;
-extern int	dialusd(const char *,int,int) ;
+extern int	dialudp(cchar *,cchar *,int,int,int) ;
+extern int	dialusd(cchar *,int,int) ;
 extern int	dialhttp(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strdcpy2w(char *,int,const char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strdcpy2w(char *,int,cchar *,cchar *,int) ;
 
 
 /* local structures */
 
 struct subinfo {
-	const char	*path ;		/* caller supplied (path after proto) */
-	const char	*pnp ;		/* caller supplied (protocol-name) */
-	const char	*pap ;		/* caller supplied (protocol-args) */
+	cchar		*fpath ;	/* caller supplied */
+	cchar		*pnp ;		/* caller supplied (protocol-name) */
+	cchar		*pap ;		/* caller supplied (protocol-args) */
 	int		pnl ;
 	int		pal ;
 } ;
 
 struct inetargs {
-	const char	*protop ;	/* only specially used */
-	const char	*afp ;
-	const char	*hostp ;
-	const char	*portp ;
-	const char	*svcp ;
-	const char	*a ;		/* memory allocation */
+	cchar		*protop ;	/* only specially used */
+	cchar		*afp ;
+	cchar		*hostp ;
+	cchar		*portp ;
+	cchar		*svcp ;
+	cchar		*a ;		/* memory allocation */
 	vecstr		args ;
 	int		protol ;
 	int		afl ;
@@ -238,9 +231,9 @@ struct inetargs {
 } ;
 
 struct ticotsordargs {
-	STOREITEM	ss ;
-	const char	*addr ;
-	const char	*svc ;
+	storeitem	ss ;
+	cchar		*addr ;
+	cchar		*svc ;
 	int		c ;
 } ;
 
@@ -250,7 +243,7 @@ struct socktype {
 } ;
 
 struct spacename {
-	const char	*name ;
+	cchar		*name ;
 	int		af ;
 } ;
 
@@ -262,74 +255,53 @@ struct fingerargs {
 
 /* forward references */
 
-static int	openproto_ussmux(SUBINFO *,const char *,const char *,int,int) ;
-static int	openproto_finger(SUBINFO *,const char *,int,int) ;
-static int	openproto_http(SUBINFO *,const char *,int,int) ;
-static int	openproto_ticotsord(SUBINFO *,int,int,int,int) ;
-static int	openproto_inet(SUBINFO *,int,cchar *,int,int) ;
+static int	openproto_ussmux(SI *,cchar *,cchar *,int,int) noex ;
+static int	openproto_finger(SI *,cchar *,int,int) noex ;
+static int	openproto_http(SI *,cchar *,int,int) noex ;
+static int	openproto_ticotsord(SI *,int,int,int,int) noex ;
+static int	openproto_inet(SI *,int,cchar *,int,int) noex ;
 
-static int	inetargs_start(INETARGS *,cchar *) ;
-static int	inetargs_starter(INETARGS *,cchar *) ;
-static int	inetargs_alloc(INETARGS *) ;
-static int	inetargs_finish(INETARGS *) ;
+static int	inetargs_start(INETARGS *,cchar *) noex ;
+static int	inetargs_starter(INETARGS *,cchar *) noex ;
+static int	inetargs_alloc(INETARGS *) noex ;
+static int	inetargs_finish(INETARGS *) noex ;
 
 #if	CF_TICOTSORD
-static int	ticotsordargs_start(TICOTSORDARGS *,char *,int,cchar *,int) ;
-static int	ticotsordargs_load(TICOTSORDARGS *,const char *,int) ;
-static int	ticotsordargs_finish(TICOTSORDARGS *) ;
+static int ticotsordargs_start(TICOTSORDARGS *,char *,int,cchar *,int) noex ;
+static int ticotsordargs_load(TICOTSORDARGS *,cchar *,int) noex ;
+static int ticotsordargs_finish(TICOTSORDARGS *) noex ;
 #endif /* CF_TICOTSORD */
 
-static int	loadargs(vecstr *,const char *) ;
-static int	sockshut(int,int) ;
+static int	loadargs(vecstr *,cchar *) noex ;
+static int	sockshut(int,int) noex ;
 
-static int	dialfinger(INETARGS *,const char *,int,int,int) ;
+static int	dialfinger(INETARGS *,cchar *,int,int,int) noex ;
 
 #if	CF_FINGERCLEAN
-static int	fingerclean(int) ;
+static int	fingerclean(int) noex ;
 #if	CF_FINERBACK
-static int	fingerworker(FINGERARGS *) ;
+static int	fingerworker(FINGERARGS *) noex ;
 static int	fingerworker_loop(FINGERARGS *,FILER *,FILER *,
-int,int,int) ;
+			int,int,int) noex ;
 static int	fingerworker_liner(FINGERARGS *,FILER *,
-int,int,int,cchar *,int) ;
+			int,int,int,cchar *,int) noex ;
 #endif /* CF_FINERBACK */
 #endif /* CF_FINGERCLEAN */
 
 #if	CF_FINGERCLEAN
 #if	CF_FINGERBACK
-static int	getline(int,const char *,int) ;
-static int	mkexpandtab(char *,int,int,const char *,int) ;
+static int	getline(int,cchar *,int) noex ;
+static int	mkexpandtab(char *,int,int,cchar *,int) noex ;
 #endif /* CF_FINGERBACK */
-static int	hasdirty(cchar *,int) ;
-static int	hasmseol(cchar *,int) ;
-static int	isdirty(int) ;
+static bool	hasdirty(cchar *,int) noex ;
+static bool	hasmseol(cchar *,int) noex ;
+static bool	isdirty(int) noex ;
 #endif /* CF_FINGERCLEAN */
 
-static int	hasBadOflags(int) ;
-
-#if	CF_DEBUGS
-static int makeint(const void *) ;
-#endif
+static bool	hasBadOflags(int) noex ;
 
 
 /* local variables */
-
-static cchar	*protonames[] = {
-	"ticotsord",
-	"ticotsordnls",
-	"ticotsordmux",
-	"uss",
-	"ussnls",
-	"ussmux",
-	"tcp",
-	"tcpnls",
-	"tcpmux",
-	"usd",
-	"udp",
-	"finger",
-	"http",
-	NULL
-} ;
 
 enum protonames {
 	protoname_ticotsord,
@@ -348,9 +320,28 @@ enum protonames {
 	protoname_overlast
 } ;
 
+static constexpr cpcchar	protonames[] = {
+	"ticotsord",
+	"ticotsordnls",
+	"ticotsordmux",
+	"uss",
+	"ussnls",
+	"ussmux",
+	"tcp",
+	"tcpnls",
+	"tcpmux",
+	"usd",
+	"udp",
+	"finger",
+	"http",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
-
 
 int uc_openproto(cchar *fname,int of,int to,int opts)
 {
@@ -359,16 +350,12 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 	int		pni ;
 	int		pnl, pal ;
 	int		fd = -1 ;
-	const char	*path ;
-	const char	*pnp, *pap ;
-	const char	*tp ;
-	const char	*sp ;
+	cchar	*fpath ;
+	cchar	*pnp, *pap ;
+	cchar	*tp ;
+	cchar	*sp ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_openproto: fname=%s\n",fname) ;
-#endif
-
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -382,15 +369,15 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 	    pnp += 1 ;
 	}
 
-	if ((tp = strchr(pnp,'/')) != NULL) {
+	if ((tp = strchr(pnp,'/')) != nullptr) {
 
-	    path = tp ;
+	    fpath = tp ;
 	    sp = (tp + 1) ;
 
 /* is there a protocol argument? */
 
 	    pal = 0 ;
-	    if ((pap = strnchr(pnp,(tp - pnp),':')) != NULL) {
+	    if ((pap = strnchr(pnp,(tp - pnp),':')) != nullptr) {
 	        pnl = (pap - pnp) ;
 	        pap += 1 ;
 	        pal = (tp - pap) ;
@@ -398,15 +385,8 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 	        pnl = (tp - pnp) ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto: path=%s\n",path) ;
-	    debugprintf("uc_openproto: protocol=%t\n",pnp,pnl) ;
-	    if (pal >= 0)
-	        debugprintf("uc_openproto: protocol arg=%t\n",pap,pal) ;
-#endif
-
-	    memset(&si,0,sizeof(SUBINFO)) ;
-	    si.path = path ;
+	    memclear(&si) ;
+	    si.fpath = fpath ;
 	    si.pnp = pnp ;
 	    si.pnl = pnl ;
 	    si.pap = pap ;
@@ -415,10 +395,6 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 /* lookup the protocol name */
 
 	    pni = matcasestr(protonames,pnp,pnl) ;
-
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto: protocol=%t(%u)\n",pnp,pnl,pni) ;
-#endif
 
 	    switch (pni) {
 	    case protoname_ticotsord:
@@ -437,13 +413,13 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 	        }
 	        break ;
 	    case protoname_usd:
-	        if ((rs = dialusd(path,to,opts)) >= 0) {
+	        if ((rs = dialusd(fpath,to,opts)) >= 0) {
 	            fd = rs ;
 	            rs = sockshut(fd,of) ;
 	        }
 	        break ;
 	    case protoname_uss:
-	        if ((rs = dialuss(path,to,opts)) >= 0) {
+	        if ((rs = dialuss(fpath,to,opts)) >= 0) {
 	            fd = rs ;
 	            rs = sockshut(fd,of) ;
 	        }
@@ -452,16 +428,12 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 	    case protoname_ussmux:
 	        {
 	            char	svcspec[SVCLEN + 1] ;
-	            if (pap != NULL) {
+	            if (pap != nullptr) {
 	                strdcpy1w(svcspec,SVCLEN,pap,pal) ;
-#if	CF_DEBUGS
-	                debugprintf("uc_openproto: USS path=%s\n",path) ;
-	                debugprintf("uc_openproto: USS svc=%s\n",svcspec) ;
-#endif
 	                if (pni == protoname_ussmux) {
-	                    rs = openproto_ussmux(&si,path,svcspec,to,opts) ;
+	                    rs = openproto_ussmux(&si,fpath,svcspec,to,opts) ;
 	                } else {
-	                    rs = dialussnls(path,svcspec,to,opts) ;
+	                    rs = dialussnls(fpath,svcspec,to,opts) ;
 	                }
 	                if (rs >= 0) {
 	                    fd = rs ;
@@ -489,10 +461,6 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 	    rs = SR_INVALID ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("uc_openproto: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (uc_openproto) */
@@ -501,34 +469,18 @@ int uc_openproto(cchar *fname,int of,int to,int opts)
 /* local subroutines */
 
 
-static int openproto_inet(SUBINFO *sip,int pni,cchar *ap,int to,int no)
+static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no)
 {
 	INETARGS	a ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_openproto: INET protocol=%s(%u)\n",
-	    protonames[pni],pni) ;
-#endif
-
 	if ((rs = inetargs_start(&a,ap)) >= 0) {
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto: ­%d­ af=%t\n",
-	        a.afl,a.afp,a.afl) ;
-#endif
 	    if ((rs = getaf(a.afp)) >= 0) {
-	        const int	af = rs ;
+	        cint	af = rs ;
 	        cchar		*hp = a.hostp ;
 	        cchar		*sp = a.svcp ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_openproto: af=%t\n",a.afp,a.afl) ;
-	        debugprintf("uc_openproto: host=%t\n",a.hostp,a.hostl) ;
-	        debugprintf("uc_openproto: port=%t\n",a.portp,a.portl) ;
-	        debugprintf("uc_openproto: svc=%t\n",a.svcp,a.svcl) ;
-#endif
 
 	        switch (pni) {
 	        case protoname_udp:
@@ -543,14 +495,14 @@ static int openproto_inet(SUBINFO *sip,int pni,cchar *ap,int to,int no)
 	                cchar	*ps ;
 	                char	pbuf[SVCLEN + 1] ;
 	                ps = a.portp ;
-	                if ((ps == NULL) && (sip->pap != NULL)) {
+	                if ((ps == nullptr) && (sip->pap != nullptr)) {
 	                    ps = pbuf ;
 	                    strdcpy1w(pbuf,SVCLEN,sip->pap,sip->pal) ;
 	                }
 	                switch (pni) {
 	                case protoname_tcpmux:
 	                    {
-	                        const char	**av = NULL ;
+	                        cchar	**av = nullptr ;
 	                        if (a.f_args) {
 	                            rs = vecstr_getvec(&a.args,&av) ;
 	                        }
@@ -590,21 +542,21 @@ int		opts ;
 	vecstr		args ;
 	int		rs = SR_OK ;
 	int		pl = -1 ;
-	int		f_args = FALSE ;
-	const char	*tp ;
-	const char	*pp = sip->path ;
-	const char	**av = NULL ;
+	int		f_args = false ;
+	cchar	*tp ;
+	cchar	*pp = sip->fpath ;
+	cchar	**av = nullptr ;
 
-	if ((tp = strchr(sip->path,0xAD)) != NULL) {
-	    f_args = TRUE ;
-	    pp = sip->path ;
-	    pl = (tp-sip->path) ;
+	if ((tp = strchr(sip->fpath,0xAD)) != nullptr) {
+	    f_args = true ;
+	    pp = sip->fpath ;
+	    pl = (tp-sip->fpath) ;
 	    if ((rs = vecstr_start(&args,4,0)) >= 0) {
 	        if ((rs = loadargs(&args,(tp+1))) >= 0) {
 	            rs = vecstr_getvec(&args,&av) ;
 	        }
 	        if (rs < 0) {
-	            f_args = FALSE ;
+	            f_args = false ;
 	            vecstr_finish(&args) ;
 	        }
 	    } /* end if (vecstr) */
@@ -612,13 +564,13 @@ int		opts ;
 
 	if (rs >= 0) {
 	    TICOTSORDARGS	targs, *tap = &targs ;
-	    const int		alen = MAXPATHLEN ;
+	    cint		alen = MAXPATHLEN ;
 	    char		abuf[MAXPATHLEN + 1] ;
 	    if ((rs = ticotsordargs_start(&targs,abuf,alen,pp,pl)) >= 0) {
-	        const char	*svc = tap->svc ;
-	        const int	ai = rs ;
-	        if (tap->svc == NULL) {
-	            const char	*pap = sip->pap ;
+	        cchar	*svc = tap->svc ;
+	        cint	ai = rs ;
+	        if (tap->svc == nullptr) {
+	            cchar	*pap = sip->pap ;
 	            int		pal = sip->pal ;
 	            svc = (abuf+ai) ;
 #ifdef	COMMENT
@@ -627,11 +579,6 @@ int		opts ;
 	            rs = snwcpy((abuf+ai),(alen-ai),pap,pal) ;
 #endif /* COMMENT */
 	        }
-#if	CF_DEBUGS
-	        debugprintf("openproto_ticotsord: addr=>%s<\n",tap->addr) ;
-	        debugprintf("openproto_ticotsord: svc=>%s<\n",svc) ;
-	        debugprintf("openproto_ticotsord: pni=%u\n",pni) ;
-#endif
 	        if (rs >= 0) {
 	            switch (pni) {
 	            case protoname_ticotsord:
@@ -649,12 +596,9 @@ int		opts ;
 	    } /* end if (ticotsordargs) */
 	} /* end if */
 
-	if (f_args)
+	if (f_args) {
 	    vecstr_finish(&args) ;
-
-#if	CF_DEBUGS
-	debugprintf("openproto_ticotsord: ret rs=%d\n",rs) ;
-#endif
+	}
 
 	return rs ;
 }
@@ -672,26 +616,25 @@ int		opts ;
 }
 #endif /* CF_TICOTSORD */
 
-
-static int openproto_ussmux(SUBINFO *sip,cchar *path,cchar *svc,int to,int no)
+static int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,int to,int no)
 {
 	int		rs = SR_OK ;
-	int		f_args = FALSE ;
-	const char	*tp ;
-	const char	*pp = path ;
+	int		f_args = false ;
+	cchar	*tp ;
+	cchar	*pp = fpath ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
-	if ((tp = strchr(path,0xAD)) != NULL) {
+	if ((tp = strchr(fpath,0xAD)) != nullptr) {
 	    pp = pbuf ;
-	    rs = mkpath1w(pbuf,path,(tp - path)) ;
-	    f_args = TRUE ;
+	    rs = mkfpath1w(pbuf,fpath,(tp - fpath)) ;
+	    f_args = true ;
 	}
 
 	if (rs >= 0) {
 	    vecstr	args ;
-	    cchar	**av = NULL ;
+	    cchar	**av = nullptr ;
 	    if (f_args) {
 	        if ((rs = vecstr_start(&args,4,0)) >= 0) {
 	            if ((rs = loadargs(&args,(tp+1))) >= 0) {
@@ -712,7 +655,7 @@ static int openproto_ussmux(SUBINFO *sip,cchar *path,cchar *svc,int to,int no)
 /* end subroutine (openproto_ussmux) */
 
 
-static int openproto_finger(SUBINFO *sip,cchar *sp,int of,int to)
+static int openproto_finger(SI *sip,cchar *sp,int of,int to)
 {
 	INETARGS	a ;
 	int		rs ;
@@ -723,18 +666,18 @@ static int openproto_finger(SUBINFO *sip,cchar *sp,int of,int to)
 
 	if ((rs = inetargs_start(&a,sp)) >= 0) {
 	    if ((rs = getaf(a.afp)) >= 0) {
-	        const int	af = rs ;
-	        cchar		*psp = NULL ;
+	        cint	af = rs ;
+	        cchar		*psp = nullptr ;
 	        char		pbuf[SVCLEN + 1] ;
 	        psp = a.portp ;
-	        if ((psp == NULL) || (psp[0] == '\0')) {
-	            if (sip->pap != NULL) {
+	        if ((psp == nullptr) || (psp[0] == '\0')) {
+	            if (sip->pap != nullptr) {
 	                psp = pbuf ;
 	                strdcpy1w(pbuf,SVCLEN,sip->pap,sip->pal) ;
 	            }
 	        } /* end if (port-spec) */
 	        if (rs >= 0) {
-	            const char	**av = NULL ;
+	            cchar	**av = nullptr ;
 	            if (a.f_args) {
 	                rs = vecstr_getvec(&a.args,&av) ;
 	            }
@@ -763,22 +706,20 @@ static int openproto_finger(SUBINFO *sip,cchar *sp,int of,int to)
 }
 /* end subroutine (openproto_finger) */
 
-
-static int openproto_http(SUBINFO *sip,cchar *sp,int of,int to)
-{
+static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 	INETARGS	a ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
 
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
 	if (hasBadOflags(of)) return SR_ROFS ;
 
 	if ((rs = inetargs_start(&a,sp)) >= 0) {
 	    if ((rs = getaf(a.afp)) >= 0) {
-	        const int	af = rs ;
-	        cchar		**av = NULL ;
+	        cint	af = rs ;
+	        cchar	**av = nullptr ;
 	        if (a.f_args) {
 	            rs = vecstr_getvec(&a.args,&av) ;
 	        }
@@ -800,79 +741,61 @@ static int openproto_http(SUBINFO *sip,cchar *sp,int of,int to)
 static int inetargs_start(INETARGS *iap,cchar *args)
 {
 	int		rs = SR_OK ;
-	const char	*tp, *sp ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_openproto/inetargs_start: args=%s\n",args) ;
-#endif
+	cchar	*tp, *sp ;
 
 	memset(iap,0,sizeof(INETARGS)) ;
 
 	sp = args ;
-	if ((tp = strchr(sp,'/')) != NULL) {
+	if ((tp = strchr(sp,'/')) != nullptr) {
 	    iap->afp = sp ;
 	    iap->afl = (tp - sp) ;
 	    if (iap->afl > 0) {
 	        sp = (tp + 1) ;
-	        if ((tp = strchr(sp,'/')) != NULL) {
+	        if ((tp = strchr(sp,'/')) != nullptr) {
 	            iap->hostp = sp ;
 	            iap->hostl = (tp - sp) ;
 	            if (iap->hostl > 0) {
 	                cchar	*pp ;
 	                cchar	*hp = iap->hostp ;
 	                cchar	hl = iap->hostl ;
-	                iap->portp = NULL ;
+	                iap->portp = nullptr ;
 	                iap->portl = 0 ;
 	                sp = (tp + 1) ;
-	                if ((pp = strnchr(hp,hl,':')) != NULL) {
+	                if ((pp = strnchr(hp,hl,':')) != nullptr) {
 	                    iap->portp = (pp + 1) ;
 	                    iap->portl = (hp + hl) - (pp + 1) ;
 	                    iap->hostl = (pp - hp) ;
 	                }
 	                rs = inetargs_starter(iap,sp) ;
-	            } else
+	            } else {
 	                rs = SR_INVALID ;
-	        } else
+		    }
+	        } else {
 	            rs = SR_INVALID ;
-	    } else
+		}
+	    } else {
 	        rs = SR_INVALID ;
-	} else
+	    }
+	} else {
 	    rs = SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_openproto/inetargs_start: ret rs=%d\n",rs) ;
-#endif
+	}
 
 	return rs ;
 }
 /* end subroutine (inetargs_start) */
 
-
-static int inetargs_starter(INETARGS *iap,cchar *sp)
-{
-	const int	vo = VECSTR_OCOMPACT ;
+static int inetargs_starter(INETARGS *iap,cchar *sp) noex {
+	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	if ((rs = vecstr_start(&iap->args,4,vo)) >= 0) {
 	    cchar	*tp ;
-	    iap->f_args = TRUE ;
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto/inetargs_start: args\n") ;
-#endif
-/* service-name */
+	    iap->f_args = true ;
+	    /* service-name */
 	    iap->svcp = sp ;
 	    iap->svcl = -1 ;
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto/inetargs_start: svc=%t\n",
-	        iap->svcp,iap->svcl) ;
-#endif
-
-	    if ((tp = strchr(sp,0xAD)) != NULL) {
+	    if ((tp = strchr(sp,0xAD)) != nullptr) {
 	        iap->svcl = (tp - sp) ;
 	        rs = loadargs(&iap->args,(tp+1)) ;
-#if	CF_DEBUGS
-	        debugprintf("uc_openproto/inetargs_start: "
-	            "loadargs() rs=%d\n",rs) ;
-#endif
 	    } /* end if (had dialer arguments) */
 	    if (rs >= 0) {
 	        if (iap->svcp[0] != '\0') {
@@ -883,7 +806,7 @@ static int inetargs_starter(INETARGS *iap,cchar *sp)
 	    }
 	    if (rs < 0) {
 	        if (iap->f_args) {
-	            iap->f_args = FALSE ;
+	            iap->f_args = false ;
 	            vecstr_finish(&iap->args) ;
 	        }
 	    }
@@ -898,77 +821,71 @@ static int inetargs_finish(INETARGS *iap)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (iap->a != NULL) {
+	if (iap->a != nullptr) {
 	    rs1 = uc_libfree(iap->a) ;
-	    iap->a = NULL ;
+	    iap->a = nullptr ;
 	    if (rs < 0) rs = rs1 ;
 	}
 
 	if (iap->f_args) {
-	    iap->f_args = FALSE ;
+	    iap->f_args = false ;
 	    rs1 = vecstr_finish(&iap->args) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("uc_openproto/inetargs_finish: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (inetargs_finish) */
 
-
-static int inetargs_alloc(INETARGS *iap)
-{
+static int inetargs_alloc(INETARGS *iap) noex {
 	int		rs = SR_OK ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp ;
 
 #ifdef	COMMENT
-	if (iap->protop != NULL) {
-	    size += (strnlen(iap->protop,iap->protol) + 1) ;
+	if (iap->protop != nullptr) {
+	    sz += (strnlen(iap->protop,iap->protol) + 1) ;
 	}
 #endif /* COMMENT */
-	if (iap->afp != NULL) {
-	    size += (strnlen(iap->afp,iap->afl) + 1) ;
+	if (iap->afp != nullptr) {
+	    sz += (strnlen(iap->afp,iap->afl) + 1) ;
 	}
-	if (iap->hostp != NULL) {
-	    size += (strnlen(iap->hostp,iap->hostl) + 1) ;
+	if (iap->hostp != nullptr) {
+	    sz += (strnlen(iap->hostp,iap->hostl) + 1) ;
 	}
-	if (iap->portp != NULL) {
-	    size += (strnlen(iap->portp,iap->portl) + 1) ;
+	if (iap->portp != nullptr) {
+	    sz += (strnlen(iap->portp,iap->portl) + 1) ;
 	}
-	if (iap->svcp != NULL) {
-	    size += (strnlen(iap->svcp,iap->svcl) + 1) ;
+	if (iap->svcp != nullptr) {
+	    sz += (strnlen(iap->svcp,iap->svcl) + 1) ;
 	}
-	if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    cchar	*cp ;
 	    iap->a = bp ;
 
 #ifdef	COMMENT
-	    if (iap->protop != NULL) {
+	    if (iap->protop != nullptr) {
 	        cp = bp ;
 	        bp = (strwcpy(bp,iap->protop,iap->protol) + 1) ;
 	        iap->protop = cp ;
 	    }
 #endif /* COMMENT */
-	    if (iap->afp != NULL) {
+	    if (iap->afp != nullptr) {
 	        cp = bp ;
 	        bp = (strwcpy(bp,iap->afp,iap->afl) + 1) ;
 	        iap->afp = cp ;
 	    }
-	    if (iap->hostp != NULL) {
+	    if (iap->hostp != nullptr) {
 	        cp = bp ;
 	        bp = (strwcpy(bp,iap->hostp,iap->hostl) + 1) ;
 	        iap->hostp = cp ;
 	    }
-	    if (iap->portp != NULL) {
+	    if (iap->portp != nullptr) {
 	        cp = bp ;
 	        bp = (strwcpy(bp,iap->portp,iap->portl) + 1) ;
 	        iap->portp = cp ;
 	    }
-	    if (iap->svcp != NULL) {
+	    if (iap->svcp != nullptr) {
 	        cp = bp ;
 	        bp = (strwcpy(bp,iap->svcp,iap->svcl) + 1) ;
 	        iap->svcp = cp ;
@@ -980,46 +897,42 @@ static int inetargs_alloc(INETARGS *iap)
 }
 /* end subroutine (inetargs_alloc) */
 
-
 #if	CF_TICOTSORD
 
 static int ticotsordargs_start(TICOTSORDARGS *tap,char *abuf,int alen,
-cchar *pp,int pl)
-{
+		cchar *pp,int pl) noex {
 	int		rs ;
-	memset(tap,0,sizeof(TICOTSORDARGS)) ;
+	memclear(tap) ;
 	if (pl < 0) pl = strlen(pp) ;
 	if ((rs = storeitem_start(&tap->ss,abuf,alen)) >= 0) {
-	    const char	*tp ;
+	    cchar	*tp ;
 	    while (pl && (pp[0] == '/')) {
 	        pp += 1 ;
 	        pl -= 1 ;
 	    }
-	    while ((tp = strnchr(pp,pl,'/')) != NULL) {
+	    while ((tp = strnchr(pp,pl,'/')) != nullptr) {
 	        rs = ticotsordargs_load(tap,pp,(tp-pp)) ;
 	        pl -= ((tp+1)-pp) ;
 	        pp = (tp+1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-	    if ((rs >= 0) && pl)
+	    if ((rs >= 0) && pl) {
 	        rs = ticotsordargs_load(tap,pp,pl) ;
-	    if (rs >= 0)
+	    }
+	    if (rs >= 0) {
 	        rs = storeitem_getlen(&tap->ss) ;
+	    }
 	} /* end if (storeitem) */
 	return rs ;
 }
 /* end subroutine (ticotsordargs_start) */
 
-
-static int ticotsordargs_finish(TICOTSORDARGS *tap)
-{
+static int ticotsordargs_finish(TICOTSORDARGS *tap) noex {
 	return storeitem_finish(&tap->ss) ;
 }
 /* end subroutine (ticotsordargs_finish) */
 
-
-static int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl)
-{
+static int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl > 0) {
 	    switch (tap->c++) {
@@ -1037,22 +950,15 @@ static int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl)
 
 #endif /* CF_TICOTSORD */
 
-
-static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of)
-{
-	const int	reqlen = REQBUFLEN ;
+static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of) noex {
+	cint		reqlen = REQBUFLEN ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
-	const char	*portspec = NULL ;
+	cchar		*portspec = nullptr ;
 	char		reqbuf[REQBUFLEN + 1], *rp = reqbuf ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_openproto/dialfinger: ps=%s port=%t\n",
-	    psp,iap->portp,iap->portl) ;
-#endif
-
-	if (portspec == NULL) {
-	    if ((iap->portp != NULL) && (iap->portp[0] != '\0')) {
+	if (portspec == nullptr) {
+	    if ((iap->portp != nullptr) && (iap->portp[0] != '\0')) {
 #ifdef	COMMENT
 	        portspec = argbuf ;
 	        rs = snwcpy(argbuf,arglen,iap->portp,iap->portl) ;
@@ -1062,19 +968,19 @@ static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of)
 	    }
 	}
 
-	if (portspec == NULL) {
-	    if (psp != NULL) {
+	if (portspec == nullptr) {
+	    if (psp != nullptr) {
 	        portspec = psp ;
 	    }
 	}
 
-	if (portspec == NULL) {
+	if (portspec == nullptr) {
 	    portspec = PORTSPEC_FINGER ;
 	}
 
 	if (rs >= 0) {
 	    if ((rs = dialtcp(iap->hostp,portspec,af,to,0)) >= 0) {
-	        SBUF	b ;
+	        sbuf	b ;
 	        int	rl ;
 	        fd = rs ;
 	        if ((rs = sbuf_start(&b,reqbuf,reqlen)) >= 0) {
@@ -1085,9 +991,9 @@ static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of)
 	            if (iap->f_args) {
 	                vecstr	*alp = &iap->args ;
 	                int		i ;
-	                const char	*ap ;
+	                cchar	*ap ;
 	                for (i = 0 ; vecstr_get(alp,i,&ap) >= 0 ; i += 1) {
-	                    if (ap != NULL) {
+	                    if (ap != nullptr) {
 	                        rs = sbuf_chr(&b,' ') ;
 	                        if (rs >= 0) rs = sbuf_addquoted(&b,ap,-1) ;
 	                    }
@@ -1101,10 +1007,6 @@ static int dialfinger(INETARGS *iap,cchar *psp,int af,int to,int of)
 	            if (rs >= 0) rs = rl ;
 	        } /* end if (sbuf) */
 	        if (rs >= 0) {
-#if	CF_DEBUGS
-	            debugprintf("uc_openproto/dialfinger: q=>%t<\n",
-	                rp,strlinelen(rp,rl,40)) ;
-#endif
 	            rs = uc_writen(fd,rp,rl) ;
 	        }
 	        if (rs >= 0) {
@@ -1160,18 +1062,18 @@ static int fingerclean(int nfd)
 static int fingerworker(FINGERARGS *fap)
 {
 	FILER		out, *ofp = &out ;
-	const int	nfd = fap->nfd ;
-	const int	cfd = fap->cfd ;
-	const int	cols = COLUMNS ;
-	const int	ind = INDENT ;
-	const int	to = TO_READ ;
+	cint	nfd = fap->nfd ;
+	cint	cfd = fap->cfd ;
+	cint	cols = COLUMNS ;
+	cint	ind = INDENT ;
+	cint	to = TO_READ ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
 	if ((rs = filer_start(ofp,cfd,0L,0,0)) >= 0) {
 	    FILER	fb ;
-	    const int	fbo = FILER_ONET ;
+	    cint	fbo = FILER_ONET ;
 	    if ((rs = filer_start(&fb,nfd,0L,0,fbo)) >= 0) {
 	        {
 	            rs = fingerworker_loop(fap,ofp,&fb,cols,ind,to) ;
@@ -1196,7 +1098,7 @@ static int fingerworker(FINGERARGS *fap)
 static int fingerworker_loop(FINGERARGS *fap,FILER *ofp,FILER *ifp,
 int cols,int ind,int to)
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1210,10 +1112,6 @@ int cols,int ind,int to)
 	    while ((rs = filer_readln(ifp,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 	        clen = mkcleanline(lbuf,len,0) ;
-#if	CF_DEBUGS
-	        debugprintf("uc_openproto: clen=%u cline=>%t<\n",
-	            clen,lbuf,strlinelen(lbuf,clen,40)) ;
-#endif
 	        if (clen > 0) {
 	            LINEFOLD	lf ;
 	            lp = lbuf ;
@@ -1221,10 +1119,6 @@ int cols,int ind,int to)
 	            if ((rs = linefold_start(&lf,cols,ind,lp,ll)) >= 0) {
 	                int	i = 0 ;
 	                while ((sl = linefold_get(&lf,i,&sp)) >= 0) {
-#if	CF_DEBUGS
-	                    debugprintf("uc_openproto: get=%u line=>%t<\n",
-	                        i,sp,strlinelen(sp,sl,40)) ;
-#endif
 #ifdef	COMMENT
 	                    if ((sl == 0) || (sp[sl-1] != '\n')) {
 	                        char *cp = colbuf ;
@@ -1239,18 +1133,11 @@ int cols,int ind,int to)
 #endif /* COMMENT */
 	                    rs = fingerworker_liner(fap,ofp,cols,ind,i,sp,sl) ;
 	                    wlen += rs ;
-#if	CF_DEBUGS
-	                    debugprintf("uc_openproto: "
-	                        "fingerworlder_line() rs=%d\n",rs) ;
-#endif
 	                    i += 1 ;
 	                    if (rs < 0) break ;
 	                } /* end while */
 	                linefold_finish(&lf) ;
 	            } /* end if */
-#if	CF_DEBUGS
-	            debugprintf("uc_openproto: if-end rs=%d\n",rs) ;
-#endif
 	        } else {
 	            rs = filer_println(ofp,lbuf,0) ;
 	            wlen += rs ;
@@ -1274,7 +1161,7 @@ FILER		*ofp ;
 int		cols ;
 int		ind ;
 int		ln ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	int		rs ;
@@ -1285,7 +1172,7 @@ int		sl ;
 	int		wlen = 0 ;
 	char		*cbuf ;
 
-	if (fap == NULL) return SR_FAULT ;
+	if (fap == nullptr) return SR_FAULT ;
 
 	if (cols <= 0) cols = 1 ;
 
@@ -1299,24 +1186,19 @@ int		sl ;
 	    int		ll, cl ;
 	    int		ncols = gcols ;
 	    int		nind = icols ;
-	    const char	*lp, *cp ;
-	    const char	*tp ;
+	    cchar	*lp, *cp ;
+	    cchar	*tp ;
 
 	    while ((ll = getline(ncols,sp,sl)) >= 0) {
 	        if ((ll == 0) && (i > 0)) break ;
 	        lp = sp ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_openproto/fingerworker_liner: ol=>%t<\n",
-	            lp,strlinelen(lp,ll,30)) ;
-#endif
 
 	        cp = lp ;
 	        cl = ll ;
 	        while (cl && CHAR_ISEND(cp[sl-1])) cl -= 1 ;
 
 #if	CF_EXPANDTAB
-	        if ((tp = strnchr(lp,ll,'\t')) != NULL) {
+	        if ((tp = strnchr(lp,ll,'\t')) != nullptr) {
 	            char	*bp = strwcpy(cbuf,lp,(tp-lp)) ;
 	            int	bl ;
 	            bl = (bp-cbuf) ;
@@ -1325,13 +1207,6 @@ int		sl ;
 	            cp = cbuf ;
 	        }
 #endif /* CF_EXPANDTAB */
-
-#if	CF_DEBUGS
-	        debugprintf("uc_openproto/fingerworker_liner: el=>%t<\n",
-	            cp,strlinelen(cp,cl,40)) ;
-	        debugprintf("uc_openproto/fingerworker_liner: nind=%d\n",
-	            nind) ;
-#endif
 
 	        if ((rs >= 0) && (nind > 0)) {
 	            rs = filer_writeblanks(ofp,nind) ;
@@ -1355,36 +1230,30 @@ int		sl ;
 	    uc_libfree(cbuf) ;
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("uc_openproto/fingerworker_liner: ret rs=%d wlen=%u\n",
-	    rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (fingerworker_liner) */
 #else /* CF_FINGERBACK */
-static int fingerclean(const int fd)
-{
-	const mode_t	om = 0664 ;
+static int fingerclean(cint fd) noex {
+	cmode		om = 0664 ;
 	int		rs ;
 	int		rs1 ;
 	int		nfd = -1 ;
-	if ((rs = openshmtmp(NULL,0,om)) >= 0) {
-	    const int	fo = FILER_ONET ;
+	if ((rs = openshmtmp(nullptr,0,om)) >= 0) {
+	    cint	fo = FILER_ONET ;
 	    FILER	b ;
 	    nfd = rs ;
 	    if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	        const int	to = (1*60) ;
-	        const int	llen = LINEBUFLEN ;
-	        const int	clen = LINEBUFLEN ;
-	        int		size = 0 ;
+	        cint	to = (1*60) ;
+	        cint	llen = LINEBUFLEN ;
+	        cint	clen = LINEBUFLEN ;
+	        int		sz = 0 ;
 	        char		*bp ;
 	        char		*lbuf ;
 	        char		*cbuf ;
-	        size += (llen+1) ;
-	        size += (clen+1) ;
-	        if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	        sz += (llen+1) ;
+	        sz += (clen+1) ;
+	        if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	            lbuf = bp ;
 	            cbuf = (bp+(llen+1)) ;
 	            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
@@ -1394,7 +1263,7 @@ static int fingerclean(const int fd)
 	                    lbuf[len-1] = CH_NL ;
 	                }
 	                if (hasdirty(lbuf,len)) {
-	                    const int	cl = clen ;
+	                    cint	cl = clen ;
 	                    char	*cp = cbuf ;
 	                    if ((rs = snwcpyclean(cp,cl,'¿',lbuf,len)) >= 0) {
 	                        len = rs ;
@@ -1420,17 +1289,11 @@ static int fingerclean(const int fd)
 #endif /* CF_FINGERBACK */
 #endif /* CF_FINGERCLEAN */
 
-
-static int loadargs(vecstr *alp,cchar *sp)
-{
+static int loadargs(vecstr *alp,cchar *sp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*tp ;
-
-	while ((tp = strchr(sp,0xAD)) != NULL) {
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto/loadargs: a%u=>%t<\n",c,sp,(tp-sp)) ;
-#endif
+	cchar		*tp ;
+	while ((tp = strchr(sp,0xAD)) != nullptr) {
 	    c += 1 ;
 	    rs = vecstr_add(alp,sp,(tp - sp)) ;
 	    sp = (tp+1) ;
@@ -1438,9 +1301,6 @@ static int loadargs(vecstr *alp,cchar *sp)
 	} /* end while */
 
 	if ((rs >= 0) && (sp[0] != '\0')) {
-#if	CF_DEBUGS
-	    debugprintf("uc_openproto/loadargs: a%u=>%t<\n",c,sp,-1) ;
-#endif
 	    c += 1 ;
 	    rs = vecstr_add(alp,sp,-1) ;
 	}
@@ -1449,12 +1309,9 @@ static int loadargs(vecstr *alp,cchar *sp)
 }
 /* end subroutine (loadargs) */
 
-
-static int sockshut(int fd,int of)
-{
-	const int	am = (of & O_ACCMODE) ;
+static int sockshut(int fd,int of) noex {
+	cint		am = (of & O_ACCMODE) ;
 	int		rs = SR_OK ;
-
 	switch (am) {
 	case O_WRONLY:
 	    rs = u_shutdown(fd,SHUT_RD) ;
@@ -1463,24 +1320,20 @@ static int sockshut(int fd,int of)
 	    rs = u_shutdown(fd,SHUT_WR) ;
 	    break ;
 	} /* end switch */
-
 	return rs ;
 }
 /* end subroutine (sockshut) */
-
 
 #if	CF_FINGERCLEAN
 
 #if	CF_FINGERBACK
 
-static int getline(int linelen,cchar *sp,int sl)
-{
+static int getline(int linelen,cchar *sp,int sl) noex {
 	int		len = 0 ;
-
 	if (sl > 0) {
-	    const char	*tp ;
+	    cchar	*tp ;
 	    len = MIN(sl,linelen) ;
-	    if ((tp = strnpbrk(sp,len,"\r\n")) != NULL) {
+	    if ((tp = strnpbrk(sp,len,"\r\n")) != nullptr) {
 	        len = ((tp + 1) - sp) ;
 	    }
 	    if ((len > 0) && (len < sl) && CHAR_ISEND(sp[len])) {
@@ -1490,22 +1343,18 @@ static int getline(int linelen,cchar *sp,int sl)
 	        }
 	    }
 	} /* end if (non-zero) */
-
 	return len ;
 }
 /* end subroutine (getline) */
 
-
-static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl)
-{
-	SBUF		d ;
+static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
+	sbuf		d ;
 	int		rs ;
 	int		len = 0 ;
 
 	if ((rs = sbuf_start(&d,dp,dl)) >= 0) {
-	    int		n, i ;
-
-	    for (i = 0 ; (rs >= 0) && (i < sl) && *sp ; i += 1) {
+	    int		n ;
+	    for (int i = 0 ; (rs >= 0) && (i < sl) && *sp ; i += 1) {
 	        if (sp[i] == '\t') {
 	            n = (8 - (ci % 8)) ;
 	            rs = sbuf_blanks(&d,n) ;
@@ -1526,9 +1375,8 @@ static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl)
 
 #endif /* CF_FINGERBACK */
 
-static int hasmseol(cchar *lp,int ll)
-{
-	int	f = FALSE ;
+static bool hasmseol(cchar *lp,int ll) noex {
+	bool		f = false ;
 	if (ll >= 2) {
 	    f = ((lp[ll-2] == CH_CR) && (lp[ll-1] == CH_NL)) ;
 	}
@@ -1536,13 +1384,11 @@ static int hasmseol(cchar *lp,int ll)
 }
 /* end subroutine (hasmseol) */
 
-static int hasdirty(cchar *lp,int ll)
-{
+static bool hasdirty(cchar *lp,int ll) noex {
 	int		ch ;
-	int		f = FALSE ;
-	int		i ;
-	for (i = 0 ; (i < ll) && (lp[i] != '\0')  ; i += 1) {
-	    ch = MKCHAR(lp[i]) ;
+	bool		f = false ;
+	for (int i = 0 ; (i < ll) && (lp[i] != '\0')  ; i += 1) {
+	    ch = mkchar(lp[i]) ;
 	    f = isdirty(ch) ;
 	    if (f) break ;
 	} /* end for */
@@ -1550,9 +1396,8 @@ static int hasdirty(cchar *lp,int ll)
 }
 /* end subroutine (hasdirty) */
 
-static int isdirty(int ch)
-{
-	int	f = FALSE ;
+static bool isdirty(int ch) noex {
+	bool		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == CH_BEL) ;
 	f = f || (ch == CH_BS) ;
@@ -1567,24 +1412,20 @@ static int isdirty(int ch)
 
 /* DEBUG subroutines */
 
-
-#if	CF_DEBUGS
-static int makeint(const void *addr)
-{
+#if	COMMENT
+static int makeint(const void *addr) noex {
 	int	hi = 0 ;
 	uchar	*us = (uchar *) addr ;
-	hi |= (MKCHAR(us[0]) << 24) ;
-	hi |= (MKCHAR(us[1]) << 16) ;
-	hi |= (MKCHAR(us[2]) << 8) ;
-	hi |= (MKCHAR(us[3]) << 0) ;
+	hi |= (mkchar(us[0]) << 24) ;
+	hi |= (mkchar(us[1]) << 16) ;
+	hi |= (mkchar(us[2]) << 8) ;
+	hi |= (mkchar(us[3]) << 0) ;
 	return hi ;
 }
 #endif /* CF_DEBUGS */
 
-
-static int hasBadOflags(int of)
-{
-	int	f = FALSE ;
+static bool hasBadOflags(int of) noex {
+	bool		f = false ;
 	f = f || (of & O_WRONLY) ;
 	f = f || (of & O_RDWR) ;
 	f = f || (of & O_CREAT) ;
