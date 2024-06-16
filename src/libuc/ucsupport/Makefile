@@ -2,7 +2,7 @@
 
 T= ucsupport
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR= $(REPOROOT)/bin
@@ -37,12 +37,12 @@ LINT= lint
 
 DEFS=
 
-
 INCS= ucsupport.h
-
 
 LIBS=
 
+
+LDRPATH=
 
 LIBDIRS= -L$(LIBDIR)
 
@@ -54,16 +54,15 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_UCSUPPORT= 
-OBJ1_UCSUPPORT= 
-OBJ2_UCSUPPORT= 
-OBJ3_UCSUPPORT= 
+OBJ00= spwd.o ucproject.o
+OBJ01= 
+OBJ02= 
+OBJ03= 
 
+OBJA= obj00.o
+#OBJB= obj02.o obj03.o
 
-OBJA_UCSUPPORT= obj0_ucsupport.o obj1_ucsupport.o
-OBJB_UCSUPPORT= obj2_ucsupport.o obj3_ucsupport.o
-
-OBJ_UCSUPPORT= $(OBJA_UCSUPPORT) $(OBJB_UCSUPPORT)
+OBJ_UCSUPPORT= obja.o
 
 
 default:		$(T).o
@@ -110,16 +109,24 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_ucsupport.o:	$(OBJ0_UCSUPPORT)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSUPPORT)
+obj00.o:		$(OBJ00)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
 
-obj1_ucsupport.o:	$(OBJ1_UCSUPPORT)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSUPPORT)
+obj01.o:		$(OBJ01)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
 
-obj2_ucsupport.o:	$(OBJ2_UCSUPPORT)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSUPPORT)
+obj02.o:		$(OBJ02)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
 
-obj3_ucsupport.o:	$(OBJ3_UCSUPPORT)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSUPPORT)
+obj03.o:		$(OBJ03)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
+
+
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+
+spwd.o:			spwd.cc		$(INCS)
+ucproject.o:		ucproject.cc	$(INCS)
 
 

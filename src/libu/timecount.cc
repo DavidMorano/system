@@ -21,17 +21,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usupport.h>
 #include	<usyscalls.h>
-#include	<clanguage.h>
 
 #include	"timecount.hh"
 
 
 /* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
 
 
 /* local variables */
@@ -40,7 +46,7 @@
 /* exported variables */
 
 
-/* external subroutines */
+/* exported subroutines */
 
 timecount::operator int () noex {
         int         rs = SR_TIMEDOUT ;

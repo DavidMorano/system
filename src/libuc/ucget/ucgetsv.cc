@@ -17,20 +17,25 @@
 /*******************************************************************************
 
 	Name:
+	uc_getsvbegin
 	uc_getsvent
 	uc_getsvnam
 	uc_getsvnum
+	uc_getsvend
 
 	Description:
 	This subroutine is a platform independent subroutine to get an
 	INET service (and retrieve it into the object |ucentsv|).
 
 	Synopsis:
+	int uc_getsvbegin(int so) noex
+	int uc_getsvend() noex
 	int uc_getsvent(ucentsv *svp,char *svbuf,int svlen) noex
 	int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cc *n,cc *p) noex
 	int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int u,cc *p) noex
 
 	Arguments:
+	- so		"stay-open" flag
 	- svp		pointer to 'hostent' structure
 	- svbuf		service-entry buffer pointer
 	- svlen		service-entry buffer length

@@ -1,4 +1,5 @@
-/* stdint.h */
+/* stdint HEADER */
+/* lang=C20 */
  
  
 /* revision history:
@@ -12,15 +13,12 @@
 
 /*******************************************************************************
 
-        This is a total hack. I tried to find out what is supposed to be in here
-        and made up guesses (based on standards printed on the web).
-
-	Mostly: if it is not defined below, it is probably already defined in
-	existing system headers.
-
+	This is a total hack.  I tried to find out what is supposed
+	to be in here and made up guesses (based on standards printed
+	on the web).  Mostly: if it is not defined below, it is
+	probably already defined in existing system headers.
 
 *******************************************************************************/
-
 
 #ifndef _STDINT_H_
 #define _STDINT_H_	1
@@ -33,9 +31,7 @@
 #include	<sys/int_const.h>
 #endif
 
-
 /* the new required type-defs */
-
 typedef int8_t		int_least8_t ;
 typedef int16_t		int_least16_t ;
 typedef int32_t		int_least32_t ;

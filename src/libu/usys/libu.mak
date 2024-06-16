@@ -66,13 +66,13 @@ SOFL= -shared
 
 OBJ00= endian.o intsat.o
 OBJ01= aflag.o errtimer.o 
-OBJ02= timewatch.o 
+OBJ02= timewatch.o timecount.o
 OBJ03= ugetloadavg.o 
 
 OBJ04= usupport.o 
 OBJ05= utimeout.o 
 OBJ06= utimeouts.o 
-OBJ07= ulogerror.o
+OBJ07= ulogerror.o uinet.o
 
 OBJ08= usys.o 
 OBJ09= usysop.o uipc.o 
@@ -294,6 +294,7 @@ uprocess.o:		uprocess.cc uprocess.h		$(INCS)
 usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
+uinet.o:		uinet.cc uinet.h		$(INCS)
 
 syswords.o:		syswords.cc syswords.hh
 varnames.o:		varnames.cc varnames.hh
@@ -307,5 +308,7 @@ itimerval.o:		itimerval.cc itimerval.h
 
 timespec.o:		timespec.cc timespec.h
 itimerspec.o:		itimerspec.cc itimerspec.h
+
+timecount.o:		timecount.cc timecount.hh
 
 

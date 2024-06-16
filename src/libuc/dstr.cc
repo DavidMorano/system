@@ -42,14 +42,29 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	sop->sbuf = nullptr ;
-	sop->slen = 0 ;
 	if (sop && sp) {
 	    cchar	*rp{} ;
+	    sop->sbuf = nullptr ;
+	    sop->slen = 0 ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = uc_mallocstrw(sp,sl,&rp)) >= 0) {
 		sop->slen = rs ;
@@ -78,7 +93,7 @@ int dstr_finish(dstr *sop) noex {
 
 int dstr_assign(dstr *sop,dstr *sop2) noex {
 	int		rs = SR_FAULT ;
-	if (sop2) {
+	if (sop && sop2) {
 	    if ((rs = dstr_finish(sop)) >= 0) {
 	        rs = dstr_start(sop,sop2->sbuf,sop2->slen) ;
 	    }

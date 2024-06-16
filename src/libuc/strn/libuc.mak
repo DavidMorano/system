@@ -388,11 +388,11 @@ a:			$(T).a
 libmacuser.a:		$(UOBJ)
 	$(AR) -rc $@ $?
 
-$(TT).a:		$(TOBJ)
-	$(AR) -rc $@ $?
-
 $(T).so:		$(SOBJ) Makefile $(T).a
 	$(LD) -G -o $@ $(SLDFLAGS) $(SOBJ) $(SLIBINFO)
+
+$(T).o:			$(OBJ)
+	$(LD) -G -o $@ $(LDFLAGS) $(SOBJ) $(SLIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -816,6 +816,11 @@ hasx.o:			hasx.cc hasx.h char.h ischarx.h
 # RMX
 rmx.o:			rmx.cc rmx.h
 
+# UCSUPPORT
+ucsupport.o:		ucsupport.dir
+ucsupport.dir:
+	makesubdir $@
+
 # STRWCPY
 strwcpy.o:		strwcpy.dir
 strwcpy.dir:
@@ -890,6 +895,11 @@ ucget.dir:
 # UCENUM
 ucenum.o:		ucenum.dir
 ucenum.dir:
+	makesubdir $@
+
+# UCOPEN
+ucopen.o:		ucopen.dir
+ucopen.dir:
 	makesubdir $@
 
 # STRN

@@ -2,7 +2,7 @@
 
 T= six
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR= $(REPOROOT)/bin
@@ -37,14 +37,15 @@ LINT=	lint
 
 DEFS +=
 
-
 INCS += six.h
-
 
 LIBS +=
 
 
 INCDIRS +=
+
+LDRATPH=
+
 
 LIBDIRS += -L$(LIBDIR)
 

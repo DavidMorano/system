@@ -1,7 +1,7 @@
 /* uinet HEADER */
 /* lang=C20 */
 
-/* UNIX® UINET support */
+/* UNIX® Internet-Address support */
 /* version %I% last-modified %G% */
 
 
@@ -10,17 +10,14 @@
 	= 1998-03-21, David A­D­ Morano
 	This module was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
-
 */
 
 /* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This file contains some support for the UNIX® UINET related
-	operations.
+	This file contains some support for the UNIX® Internet-Address
+	 related operations.
 
 *******************************************************************************/
 
@@ -77,6 +74,14 @@
 #ifndef	INETX_ADDRSTRLEN
 #define	INETX_ADDRSTRLEN	MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
 #endif
+
+
+EXTERNC_begin
+
+extern bool	isin4mapped(ushort *) noex ;
+extern bool	isin6loopback(ushort *) noex ;
+
+EXTERNC_end
 
 
 #endif /* UINET_INCLUDE */

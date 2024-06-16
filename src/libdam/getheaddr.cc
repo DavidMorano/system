@@ -89,9 +89,12 @@
 int getheaddr(ucentho *hep,char *hbuf,int hlen,cchar *ap) noex {
 	int		rs = SR_FAULT ;
 	if (hep && hbuf && ap) {
-	    cint	af = AF_INET ;
-	    cint	al = sizeof(INADDR) ;
-	    rs = getho_addr(hep,hbuf,hlen,af,ap,al) ;
+	    rs = SR_INVALID ;
+	    if (ap[0]) {
+	        cint	af = AF_INET ;
+	        cint	al = sizeof(INADDR) ;
+	        rs = getho_addr(hep,hbuf,hlen,af,ap,al) ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }

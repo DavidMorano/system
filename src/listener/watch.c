@@ -12,9 +12,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
@@ -22,13 +20,14 @@
 
 /*******************************************************************************
 
-	This subroutine is responsible for listening on the given socket and
-	spawning off a program to handle any incoming connection.
+	Description:
+	This subroutine is responsible for listening on the given
+	socket and spawning off a program to handle any incoming
+	connection.
 
 	Synopsis:
-
 	int watch(pip,fd_listen,char *,char *)
-	struct proginfo	*pip ;
+	PROGINFO	*pip ;
 	int		fd_listen ;
 	char		progfname[] ;
 	char		username[] ;
@@ -131,8 +130,8 @@ struct clientinfo {
 
 /* forward references */
 
-static int	spawnserver(struct proginfo *,int,struct clientinfo *) ;
-static int	mktmp(struct proginfo *,char *) ;
+static int	spawnserver(PROGINFO *,int,struct clientinfo *) ;
+static int	mktmp(PROGINFO *,char *) ;
 static int	writeout() ;
 
 static void	int_exit(int) ;
@@ -147,19 +146,21 @@ static int	f_exit, f_child ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
 int watch(pip,fd_listen,progfname,username)
-struct proginfo	*pip ;
+PROGINFO	*pip ;
 int		fd_listen ;
 char		progfname[] ;
 char		username[] ;
 {
-	struct sigaction	sigs ;
-	struct clientinfo	ci ;
-	struct ustat	sb ;
-	struct pollfd	fds[4] ;
+	SIGACTION	sigs ;
+	CLIENTINFO	ci ;
+	USTAT		sb ;
+	POLLFD		fds[4] ;
 	SOCKADDRESS	from ;
 	CONNECTION	conn ;
 	sigset_t	signalmask ;
@@ -173,25 +174,15 @@ char		username[] ;
 	char	tmpbuf[100] ;
 	char	*sp ;
 
-
 	f_exit = FALSE ;
 	f_child = FALSE ;
 
-
 	(void) sigemptyset(&signalmask) ;
 
 	sigs.sa_handler = int_exit ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	sigaction(SIGTERM,&sigs,NULL) ;
-
-
-	(void) sigemptyset(&signalmask) ;
-
-	sigs.sa_handler = int_exit ;
-	sigs.sa_mask = signalmask ;
-	sigs.sa_flags = 0 ;
-	sigaction(SIGHUP,&sigs,NULL) ;
+	u_sigaction(SIGTERM,&sigs,NULL) ;
 
 
 	(void) sigemptyset(&signalmask) ;
@@ -199,7 +190,14 @@ char		username[] ;
 	sigs.sa_handler = int_exit ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	sigaction(SIGINT,&sigs,NULL) ;
+	u_sigaction(SIGHUP,&sigs,NULL) ;
+
+	(void) sigemptyset(&signalmask) ;
+
+	sigs.sa_handler = int_exit ;
+	sigs.sa_mask = signalmask ;
+	sigs.sa_flags = 0 ;
+	u_sigaction(SIGINT,&sigs,NULL) ;
 
 
 #if	CF_SIGCHILD
@@ -278,12 +276,6 @@ char		username[] ;
 
 	                    flen = sizeof(SOCKADDRESS) ;
 	                    rs = u_accept(fd_listen,&from,&flen) ;
-
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("watch: u_accept() rs=%d\n",rs) ;
-#endif
-
 	                    fd = rs ;
 	                    if (rs >= 0) {
 	                        ci.progfname = progfname ;
@@ -317,9 +309,8 @@ char		username[] ;
 
 /* local subroutines */
 
-
 static int spawnserver(pip,fd_listen,cip)
-struct proginfo		*pip ;
+PROGINFO		*pip ;
 int			fd_listen ;
 struct clientinfo	*cip ;
 {
@@ -341,12 +332,7 @@ struct clientinfo	*cip ;
 
 	    connection_start(&conn,pip->domainname) ;
 
-/* can we get the peername of the other end o f this socket, if a socket ? */
-
-#if	CF_DEBUG
-	    if (pip->debuglevel > 1)
-	        debugprintf("main: connection_peername()\n") ;
-#endif
+/* can we get the peername of the other end of this socket, if a socket? */
 
 	    if (cip->fromlen > 0) {
 	        int		af ;
@@ -355,7 +341,7 @@ struct clientinfo	*cip ;
 	        rs = sockaddress_getaf(cip->fromp) ;
 		af = rs ;
 
-	        if ((rs >= 0) && (af == ACF_INET)) {
+	        if ((rs >= 0) && (af == AF_INET)) {
 
 	            rs = sockaddress_getaddr(cip->fromp,
 	                (char *) &addr1,sizeof(in_addr_t)) ;
@@ -372,18 +358,15 @@ struct clientinfo	*cip ;
 
 	        } /* end if (address family INET4) */
 
-	        if (rs < 0)
+	        if (rs < 0) {
 	            rs = connection_peername(&conn,
 	                cip->fromp,cip->fromlen,peername) ;
+		}
 
-	    } else
-	        rs = connection_sockpeername(&conn,peername,ifd) ;
-
-#if	CF_DEBUG
-	    if (pip->debuglevel > 1)
-	        debugprintf("main: connection_peername rs=%d\n",
-	            rs) ;
-#endif
+	    } else {
+		cint	dl = MAXHOSTNAMELEN ;
+	        rs = connection_sockremname(&conn,peername,dl,ifd) ;
+	    }
 
 	    if (rs > 0) {
 	        logfile_printf(&pip->lh,"from host=%s\n",
@@ -415,7 +398,7 @@ struct clientinfo	*cip ;
 	        u_close(cip->fd) ;
 
 	        {
-	            struct passwd	pe ;
+	            PASSWD	pe ;
 	            char	pwdbuf[PWDBUFLEN + 1] ;
 
 	            username = cip->username ;
@@ -424,8 +407,7 @@ struct clientinfo	*cip ;
 	                rs = getpw_name(&pe,pwdbuf,PWDBUFLEN,username) ;
 
 	                if (rs < 0)
-	                    logfile_printf(&
-	                        pip->lh,
+	                    logfile_printf(&pip->lh,
 	                        "notfound username=%s\n",
 	                        username) ;
 
@@ -437,8 +419,7 @@ struct clientinfo	*cip ;
 	                rs = getpw_name(&pe,pwdbuf,PWDBUFLEN,username) ;
 
 	                if (rs < 0)
-	                    logfile_printf(&
-	                        pip->lh,
+	                    logfile_printf(&pip->lh,
 	                        "notfound username=%s\n",
 	                        username) ;
 
@@ -524,7 +505,7 @@ int	sn ;
 
 /* write out the output files from the executed program */
 static int writeout(pip,fd,s)
-struct proginfo	*pip ;
+PROGINFO	*pip ;
 int	fd ;
 char	s[] ;
 {
@@ -564,7 +545,7 @@ char	s[] ;
 
 /* make the private TMP area */
 static int mktmp(pip,jobdname)
-struct proginfo	*pip ;
+PROGINFO	*pip ;
 char		jobdname[] ;
 {
 	int	rs ;
@@ -578,11 +559,8 @@ char		jobdname[] ;
 	bnlen = sfbasename(pip->programroot,-1,&bn) ;
 
 	if (bn[bnlen] != '\0') {
-
 	    strwcpy(buf,bn,bnlen) ;
-
 	    bn = buf ;
-
 	}
 
 	len = mkpath3(jobdname,pip->tmpdname,bn,pip->searchname) ;

@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/libu
+
+Name:		libu
+Description:	UNIX® C-language system call interface
+Version:	1.0.0
+Libs:		-L${libdir} -Wl,-rpath,${libdir} -lu
+Cflags:		-I${includedir}

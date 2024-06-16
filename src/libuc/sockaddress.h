@@ -7,7 +7,7 @@
 
 /* revision history:
 
-	= 1998-08-13, David A­D­ Morano
+	= 1998-01-13, David A­D­ Morano
 	This object module was originally written.
 
 */
@@ -29,6 +29,7 @@
 
 
 #define	SOCKADDRESS		union sockaddress_head
+#define	SOCKADDRESS_PA		struct sockaddress_path
 #define	SOCKADDRESS_IN4		struct sockaddress_inet4
 #define	SOCKADDRESS_IN6		struct sockaddress_inet6
 
@@ -58,17 +59,18 @@ struct sockaddress_inet6 {
 } ;
 
 union sockaddress_head {
-	SOCKADDR			a_unspec ;
-	SOCKADDR_UN			a_unix ;
-	SOCKADDR_IN4			a_in ;
-	SOCKADDR_IN6			a_in6 ;
-	struct sockaddress_inet4	a_inet4 ;
-	struct sockaddress_inet6	a_inet6 ;
-	struct sockaddress_path		a_path ;
-	unsigned char			str[32] ; /* general future */
+	SOCKADDR		a_unspec ;
+	SOCKADDR_UN		a_unix ;
+	SOCKADDR_IN4		a_in ;
+	SOCKADDR_IN6		a_in6 ;
+	SOCKADDRESS_PA		a_path ;
+	SOCKADDRESS_IN4		a_inet4 ;
+	SOCKADDRESS_IN6		a_inet6 ;
+	unsigned char		str[32] ; /* general future */
 } ;
 
 typedef	SOCKADDRESS		sockaddress ;
+typedef	SOCKADDRESS_PA		sockaddress_pa ;
 typedef	SOCKADDRESS_IN4		sockaddress_in4 ;
 typedef	SOCKADDRESS_IN6		sockaddress_in6 ;
 

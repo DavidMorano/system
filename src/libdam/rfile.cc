@@ -29,21 +29,26 @@
 	try and make a connection to the remote host.
 
 	Synopsis:
-	int rfile(rhost,auth,rfilename,flags,mode)
-	cchar	rhost[] ;
-	cchar	rfilename[] ;
-	int		flags, mode ;
+	int rfile(cc *rhost,rex_au *auth,cc *rfn,int flags,mode_t om) noex
+	
+	Arguments:
+	rhost		remote host
+	auth		pointer to REX_AU object
+	rfn		remote file-name
+	flags		option flags
+	om		open-mode
+
+	Returns:
+	>=0		OK (and ere is the socket to the file)
+	<0		error (system-return)
+
+	Notes:
 	struct rex_auth {
 		char	*restrict ;
 		char	*username ;
 		char	*password ;
 		NETFILE_ENT	**machinev ;
 	} *auth ;
-
-	Arguments:
-
-	Returns:
-
 
 *******************************************************************************/
 
@@ -56,16 +61,17 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<netfile.h>
+#include	<rex.h>
 #include	<localmisc.h>
 
-#include	"rex.h"
+#include	"rfile.h"
 #include	"incfile_rfilewrite.h"
 
 
@@ -81,20 +87,19 @@
 
 extern "C" {
     extern int	reade() noex ;
-    extern int	getehostname() noex ;
-}
-
-extern "C" {
     extern char	*strbasename() noex ;
 }
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward subroutines */
 
-static int	hostequiv() ;
-
-
-/* external variables */
+static int	hostequiv() noex ;
 
 
 /* local variables */
@@ -106,14 +111,14 @@ static int	hostequiv() ;
 /* exported subroutines */
 
 int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
-	REX_FL		f ;
 	REX_AUTH	aa, *ap ;
 	NETFILE_ENT	*mp ;
+	cnullptr	np{} ;
 	int		i, j ;
 	int		srs, rs, len, l ;
 	int		fd, fd2 ;
 	cchar	*prog_shell = PROG_SHELL ;
-	cchar	*args[4] ;
+	cchar	*args[4] = {} ;
 
 	char	*cp, *cp1, *cp2 ;
 
@@ -122,10 +127,10 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 	char	jobfname[MAXPATHLEN + 1], *jobid ;
 
 
-	if ((rhost == NULL) || (rhost[0] == '\0'))
+	if ((rhost == nullptr) || (rhost[0] == '\0'))
 	    goto badhost ;
 
-	if ((rfilename == NULL) || (rfilename[0] == '\0'))
+	if ((rfilename == nullptr) || (rfilename[0] == '\0'))
 	    goto badfile ;
 
 
@@ -138,17 +143,17 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 
 /* start by opening a connection to the remote machine */
 
-	f.keepalive = FALSE ;
+	f.keepalive = false ;
 	if (flags & O_KEEPALIVE) 
-		f.keepalive = TRUE ;
+		f.keepalive = true ;
 
 	bufprintf(buf,BUFLEN,"/bin/cat > %s",jobfname) ;
 
 	args[0] = "sh" ;
 	args[1] = "-c" ;
 	args[2] = buf ;
-	args[3] = NULL ;
-	fd = rex(rhost,auth,&f,prog_shell,args,NULL,&mp) ;
+	args[3] = nullptr ;
+	fd = rex(rhost,auth,0,prog_shell,args,np,np,&mp) ;
 
 	if (fd < 0) {
 
@@ -240,15 +245,15 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 /* can we arrange for a short-cut for the REX connection? */
 
 	    ap = auth ;
-	    if ((ap != NULL) && (mp != NULL)) {
+	    if ((ap != nullptr) && (mp != nullptr)) {
 
-	        memcpy(&aa,ap,sizeof(struct rex_auth)) ;
+	        memcpy(&aa,ap) ;
 
-	        aa.restrict = "rcmd" ;
-	        if (mp->login != NULL)
+	        aa.res = "rcmd" ;
+	        if (mp->login != nullptr)
 	            aa.username = mp->login ;
 
-	        if (mp->password != NULL)
+	        if (mp->password != nullptr)
 	            aa.password = mp->password ;
 
 	        ap = &aa ;
@@ -257,8 +262,8 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 
 	    args[0] = "rfile" ;
 	    args[1] = jobfname ;
-	    args[2] = NULL ;
-	    fd = rex(rhost,ap,&f,"/bin/sh",args,&fd2,NULL) ;
+	    args[2] = nullptr ;
+	    fd = rex(rhost,ap,0,"/bin/sh",args,np,&fd2,nullptr) ;
 
 	    if (fd < 0) {
 

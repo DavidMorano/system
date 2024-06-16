@@ -38,6 +38,8 @@
 	u_symlink
 	u_truncate
 	u_unlink
+	u_xattrget
+	u_xattrset
 
 
 	Name:
@@ -75,6 +77,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>		/* |S_IFMT| */
+#include	<sys/xattr.h>		/* is this now ubiquitous? */
 #include	<unistd.h>
 #include	<climits>
 #include	<cerrno>
@@ -124,11 +127,23 @@ namespace {
     struct ufiler : ufileopbase {
 	ufiler_m	m = nullptr ;
 	cchar		*dfn ;
+	cchar		*xaname ;
+	cvoid		*xaval ;
 	dev_t		dev ;
+	size_t		sz ;
+	uint32_t	foff ;
+	int		oo ;
 	mode_t		fm ;
 	ufiler() noex { } ;
 	ufiler(mode_t m,dev_t d = 0) noex : fm(m), dev(d) { } ;
 	ufiler(cchar *d) noex : dfn(d) { } ;
+	ufiler(cc *n,cvoid *v,size_t s,uint32_t fo,int o) noex {
+	    xaname = n ;
+	    xaval = v ;
+	    sz = s ;
+	    foff = fo ;
+	    oo = o ;
+	} ;
 	int callstd(cchar *fn) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -144,6 +159,8 @@ namespace {
 	int irename(cchar *) noex ;
 	int irmdir(cchar *) noex ;
 	int isymlink(cchar *) noex ;
+	int ixattrget(cchar *) noex ;
+	int ixattrset(cchar *) noex ;
     } ; /* end struct (ufiler) */
 }
 
@@ -394,6 +411,18 @@ int u_unlink(cchar *fname) noex {
 }
 /* end subroutine (u_unlink) */
 
+int u_xattrget(cc *fn,cc *n,void *v,size_t sz,uint32_t foff,int o) noex {
+	ufiler		fo(n,v,sz,foff,o) ;
+	fo.m = &ufiler::ixattrget ;
+	return fo(fn) ;
+}
+
+int u_xattrset(cc *fn,cc *n,cvoid *v,size_t sz,uint32_t foff,int o) noex {
+	ufiler		fo(n,v,sz,foff,o) ;
+	fo.m = &ufiler::ixattrset ;
+	return fo(fn) ;
+}
+
 
 /* local subroutines */
 
@@ -441,5 +470,24 @@ int ufiler::isymlink(cchar *fn) noex {
 	return rs ;
 }
 /* end method (ufiler::isymlink) */
+
+int ufiler::ixattrget(cchar *fn) noex {
+	void		*val = const_cast<voidp>(xaval) ;
+	int		rs ;
+	if ((rs = getxattr(fn,xaname,val,sz,foff,oo)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiler::ixattrget) */
+
+int ufiler::ixattrset(cchar *fn) noex {
+	int		rs ;
+	if ((rs = setxattr(fn,xaname,xaval,sz,foff,oo)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiler::ixattrset) */
 
 

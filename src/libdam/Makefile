@@ -18,7 +18,7 @@ CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
 
 
-CPP= cpp
+CPP= gcpp
 CC= gcc
 CXX= gpp
 LD= gld
@@ -365,7 +365,7 @@ OBJFILE2= objq.o objr.o objs.o objt.o obju.o objv.o
 OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.ls .i .ii .cx .cs
 
 
 default:		all
@@ -877,8 +877,6 @@ hostent.o:		hostent.c hostent.h
 
 inetaddr.o:		inetaddr.c inetaddr.h
 
-sockaddress.o:		sockaddress.c sockaddress.h
-
 lfm.o:			lfm.c lfm.h
 
 keyopt.o:		keyopt.c keyopt.h
@@ -1110,6 +1108,7 @@ isort.o:		isort.cc
 
 ctwords.o:		ctwords.cc ctwords.hh
 holidayer.o:		holidayer.cc holidayer.h
+connection.o:		connection.cc connection.h
 
 # UTILITY
 getostype.o:		getostype.cc getostype.h

@@ -97,25 +97,42 @@
 
 #else /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 
-#ifndef	I_PEEK
-#define	I_PEEK		0
+#ifndef	I_STREAMBASE
+#define	I_STREAMBASE	('S'+100)
 #endif
 
 #ifndef	I_STR
-#define	I_STR		1
+#define	I_STR		(I_STREAMBASE+0)
+#endif
+
+#ifndef	I_PUSH
+#define	I_PUSH		(I_STREAMBASE+1)
+#endif
+
+#ifndef	I_PEEK
+#define	I_PEEK		(I_STREAMBASE+2)
 #endif
 
 #ifndef	I_SENDFD
-#define	I_SENDFD	2
+#define	I_SENDFD	(I_STREAMBASE+3)
 #endif
 
 #ifndef	I_RECVFD
-#define	I_RECVFD	3
+#define	I_RECVFD	(I_STREAMBASE+4)
 #endif
 
-#ifndef	ISPTM
-#define	ISPTM		0		/* ask if FD is a pseudo-terminal */
+#ifndef	I_SRDOPT
+#define	I_SRDOPT	(I_STREAMBASE+5)
 #endif
+
+#ifndef	ISPTM		/* ask if FD is a pseudo-terminal */
+#define	ISPTM		(I_STREAMBASE+6)
+#endif
+
+#ifndef	RMSGD
+#define	RMSGD		(I_STREAMBASE+7)
+#endif
+
 
 struct strbuf {
 	char		*buf ;

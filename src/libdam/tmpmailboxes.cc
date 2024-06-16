@@ -20,7 +20,7 @@
 	tmpmailboxes
 
 	Description:
-	FInd or create the TMP-MAIL (mailboxes) directory.
+	Find or create the TMP-MAIL (mailboxes) directory.
 
 	Synopsis:
 	int tmpmailboxes(char *rbuf,int rlen) noex
@@ -44,7 +44,13 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<uvariables.hh>
+#include	<getnodename.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
+#include	<mkpr.h>
+#include	<xperm.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"tmpmailboxes.h"
@@ -53,14 +59,6 @@
 /* local defines */
 
 #define	PRNAME		"PCS" /* Personal Communication Services */
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME 	"TMPDIR"
-#endif
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
 
 #ifndef	TMPMAILBOXES
 #define	TMPMAILBOXES	"/var/tmp/mailboxes"
@@ -72,23 +70,6 @@
 
 
 /* external subroutines */
-
-extern int	sfsubstance(const char *,int,const char **) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getinetdomain(char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isOneOf(const int *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* external variables */
@@ -112,51 +93,49 @@ static int	chownpcs(cchar *) noex ;
 /* exported subroutines */
 
 int tmpmailboxes(char *rbuf,int rlen) noex {
-	USTAT		sb ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	cchar		*tmpmb = TMPMAILBOXES ;
-
-	if (rbuf == NULL) return SR_FAULT ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = uc_stat(tmpmb,&sb)) >= 0) {
-	    if (S_ISDIR(sb.st_mode)) {
-		const int	am = (R_OK|W_OK|X_OK) ;
-		if ((rs = perm(tmpmb,-1,-1,NULL,am)) >= 0) {
-	            rs = sncpy1(rbuf,rlen,tmpmb) ;
-		    rl = rs ;
-		} else if (isNotAccess(rs)) {
+	if (rbuf) {
+	    USTAT	sb ;
+	    cchar	*tmpmb = TMPMAILBOXES ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = uc_stat(tmpmb,&sb)) >= 0) {
+	        if (S_ISDIR(sb.st_mode)) {
+		    cint	am = (R_OK|W_OK|X_OK) ;
+		    if ((rs = perm(tmpmb,-1,-1,nullptr,am)) >= 0) {
+	                rs = sncpy1(rbuf,rlen,tmpmb) ;
+		        rl = rs ;
+		    } else if (isNotAccess(rs)) {
+	                rs = deftmpdir(rbuf,rlen) ;
+		        rl = rs ;
+		    }
+	        } else {
 	            rs = deftmpdir(rbuf,rlen) ;
 		    rl = rs ;
-		}
-	    } else {
-	        rs = deftmpdir(rbuf,rlen) ;
-		rl = rs ;
-	    }
-	} else if (isNotPresent(rs)) {
-	    const mode_t	dm = (0777|S_ISVTX) ;
-	    if ((rs = uc_mkdir(tmpmb,dm)) >= 0) {
-		if ((rs = uc_minmod(tmpmb,dm)) >= 0) {
-		    const int	n = PC_CHOWNRES ; /* chown-restricted */
-		    rl = strlen(tmpmb) ;
-	            if ((rs = uc_pathconf(tmpmb,n,NULL)) == 0) {
-			if ((rs = chownpcs(tmpmb)) >= 0) {
-			    rs = SR_OK ;
-			} else if (isNotPresent(rs)) {
-			    rs = SR_OK ;
-			}
+	        }
+	    } else if (isNotPresent(rs)) {
+	        cmode	dm = (0777 | S_ISVTX) ;
+	        if ((rs = uc_mkdir(tmpmb,dm)) >= 0) {
+		    if ((rs = uc_minmod(tmpmb,dm)) >= 0) {
+		        cint	n = PC_CHOWNRES ; /* chown-restricted */
+		        rl = strlen(tmpmb) ;
+	                if ((rs = uc_pathconf(tmpmb,n,nullptr)) == 0) {
+			    if ((rs = chownpcs(tmpmb)) >= 0) {
+			        rs = SR_OK ;
+			    } else if (isNotPresent(rs)) {
+			        rs = SR_OK ;
+			    }
+		        }
+		    } else if (isNotAccess(rs)) {
+	                rs = deftmpdir(rbuf,rlen) ;
+	                rl = rs ;
 		    }
-		} else if (isNotAccess(rs)) {
+	        } else if (isNotPresent(rs)) {
 	            rs = deftmpdir(rbuf,rlen) ;
 	            rl = rs ;
-		}
-	    } else if (isNotPresent(rs)) {
-	        rs = deftmpdir(rbuf,rlen) ;
-	        rl = rs ;
-	    }
-	}
-
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (tmpmailboxes) */
@@ -164,18 +143,16 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 
 /* local subroutine */
 
-
-static int deftmpdir(char *rbuf,int rlen)
-{
+static int deftmpdir(char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
-	cchar		*tmpdir = TMPDNAME ;
-	cchar		*cp = getenv(VARTMPDNAME) ;
-	if (cp != NULL) {
+	cchar		*tmpdir = sysword.w_tmpdir ;
+	static cchar	*cp = getenv(varname.tmpdir) ;
+	if (cp) {
 	    USTAT	sb ;
 	    if ((rs = uc_stat(cp,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
-		    const int	am = (R_OK|W_OK|X_OK) ;
-		    if ((rs = perm(cp,-1,-1,NULL,am)) >= 0) {
+		    cint	am = (R_OK|W_OK|X_OK) ;
+		    if ((rs = perm(cp,-1,-1,nullptr,am)) >= 0) {
 	                rs = sncpy1(rbuf,rlen,cp) ;
 		    } else if (isNotAccess(rs)) {
 	                rs = sncpy1(rbuf,rlen,tmpdir) ;
@@ -195,22 +172,30 @@ static int deftmpdir(char *rbuf,int rlen)
 
 static int chownpcs(cchar *dname) noex {
 	int		rs ;
-	char		domain[MAXHOSTNAMELEN+1] ;
-	if ((rs = getnodedomain(NULL,domain)) >= 0) {
-	    const int	prlen = MAXPATHLEN ;
-	    cchar	*prname = PRNAME ;
-	    char	prbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
-	 	USTAT	sb ;
-		if ((rs = uc_stat(prbuf,&sb)) >= 0) {
-		    {
-		        const uid_t	uid_pcs = sb.st_uid ;
-		        const gid_t	gid_pcs = sb.st_gid ;
-		        rs = uc_chown(dname,uid_pcs,gid_pcs) ;
-		    }
-		} /* end if (uc_stat) */
-	    } /* end if (mkpr) */
-	} /* end if (getnodedomain) */
+	int		rs1 ;
+	char		*dbuf{} ;
+	if ((rs = malloc_hn(&dbuf)) >= 0) {
+	    cint	dlen = rs ;
+	    if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
+	        char	*prbuf{} ;
+		if ((rs = malloc_mp(&prbuf)) >= 0) {
+	             cint	prlen = rs ;
+	    	     cchar	*prname = PRNAME ;
+	             if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
+	 	         USTAT	sb ;
+		         if ((rs = uc_stat(prbuf,&sb)) >= 0) {
+		             const uid_t	uid_pcs = sb.st_uid ;
+		             const gid_t	gid_pcs = sb.st_gid ;
+		             rs = uc_chown(dname,uid_pcs,gid_pcs) ;
+		        } /* end if (uc_stat) */
+	            } /* end if (mkpr) */
+	    	    rs1 = uc_free(prbuf) ;
+	    	    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (getinetdomain) */
+	    rs1 = uc_free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (chownpcs) */

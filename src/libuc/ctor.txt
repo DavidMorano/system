@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
+static int listenspec_ctor(listenspec *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (vecsorthand_ctor) */
+/* end subroutine (listenspec_ctor) */
 
-static int vecsorthand_dtor(vecsorthand *op) noex {
+static int listenspec_dtor(listenspec *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (vecsorthand_dtor) */
+/* end subroutine (listenspec_dtor) */
 
 template<typename ... Args>
-static inline int vecsorthand_magic(vecsorthand *op,Args ... args) noex {
+static inline int listenspec_magic(listenspec *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == LISTENSPEC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (vecsorthand_magic) */
+/* end subroutine (listenspec_magic) */

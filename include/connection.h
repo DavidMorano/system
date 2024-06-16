@@ -23,7 +23,7 @@
 #include	<usysrets.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>		/* various constants (below) */
+#include	<localmisc.h>		/* various constants (see below) */
 
 
 #define	CONNECTION		struct connection_head
@@ -36,16 +36,17 @@ struct connection_flags {
 	uint		trans:1 ;
 	uint		sa:1 ;
 	uint		addr:1 ;
-	uint		domainname:1 ;	/* allocated */
+	uint		inetdomain:1 ;	/* allocated */
 } ;
 
 struct connection_head {
-	cchar		*domainname ;	/* local domain name */
+	cchar		*inetdomain ;	/* local domain name */
 	cchar		*peername ;	/* dynamically allocated */
 	cchar		*pr ;		/* dynamically allocated */
 	sockaddress	*sap ;
-	struct in_addr	netipaddr ;
+	INADDR		netipaddr ;
 	CONNECTION_FL	f ;
+	int		sal ;
 	int		s ;
 } ;
 
@@ -55,8 +56,8 @@ typedef	CONNECTION_FL	connection_fl ;
 EXTERNC_begin
 
 extern int connection_start(connection *,cchar *) noex ;
-extern int connection_sockpeername(connection *,char *,int) noex ;
-extern int connection_socksrcname(connection *,char *,int,int) noex ;
+extern int connection_socklocname(connection *,char *,int,int) noex ;
+extern int connection_sockremname(connection *,char *,int,int) noex ;
 extern int connection_peername(connection *,sockaddress *,int,char *,int) noex ;
 extern int connection_mknames(connection *,vecstr *) noex ;
 extern int connection_finish(connection *) noex ;

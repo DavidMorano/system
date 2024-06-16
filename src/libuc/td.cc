@@ -20,14 +20,14 @@
 	This object module facilitates managing a terminal display.
 	This object contains routines (not unlike in the UNIX
 	'curses' library) to display information in "windows" on a
-	terminal display. The major difference between this terminal
+	terminal display.  The major difference between this terminal
 	display library and the standard UNIX 'curses' library is
 	that THIS LIBRARY WORKS!
 
 	Other notes:
 
 	An 'xterm' terminal is almost en entire complete 'vt102'
-	terminal. It pretty much only lacks the blinking character
+	terminal.  It pretty much only lacks the blinking character
 	attribute and the double height-width characters.
 
 *******************************************************************************/
@@ -727,7 +727,7 @@ static int td_starter(td *tdp,int tfd,cchar *termname,int r,int c) noex {
         tdp->f.statusdisplay = false ;
         tdp->f.meol = false ;
         tdp->f.linebuf = false ;
-        if ((rs = uc_tcgetattr(tfd,&termconf)) >= 0) {
+        if ((rs = uc_tcattrget(tfd,&termconf)) >= 0) {
             cchar       *cp ;
             tdp->f.nlcr = (termconf.c_oflag & ONLCR) ? true : false ;
             if ((rs = uc_mallocstrw(termname,-1,&cp)) >= 0) {

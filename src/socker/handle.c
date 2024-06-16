@@ -184,11 +184,14 @@ struct clientinfo	*cip ;
 
 	    } /* end if (address family INET4) */
 
-	    if (rs < 0)
+	    if (rs < 0) {
 	        rs = connection_peername(&conn,&cip->sa,cip->salen,peername) ;
+	    }
 
-	} else
-	    rs = connection_sockpeername(&conn,peername,ifd) ;
+	} else {
+	    cint	dl = MAXHOSTNAMELEN ;
+	    rs = connection_sockremname(&conn,peername,dl,ifd) ;
+	}
 
 	if ((rs < 0) && ((cp = getenv("NLSADDR")) != NULL)) {
 
