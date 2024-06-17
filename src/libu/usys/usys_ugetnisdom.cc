@@ -10,6 +10,12 @@
 	= 2001-04-11, David D-A- Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2025-06-17, David D-A- Morano
+	As far as I know, Oracle Solaris® (formerly Sun-Microsystems
+	Solaris®) does have the |getdomainame(3c)| subroutine.
+	But it is hidden within the NSL library without being
+	documented.
+
 */
 
 /* Copyright © 2001 David D-A- Morano.  All rights reserved. */
@@ -21,7 +27,7 @@
 
 	Description:
 	This provides a means to get the NIS domain-name from the
-	operating system in an OS-independent way by regualr callers.
+	operating system in an OS-independent way by regular callers.
 
 	Synosis:
 	int ugetnisdom(char *rbuf,int rlen) noex
@@ -37,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<unistd.h>		/* |getdomainname(3c)| */
 #include	<cerrno>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
@@ -45,41 +52,70 @@
 #include	<usysrets.h>
 #include	<usysflag.h>
 
-#include	"usys_sunos.h"
-#include	"usys_darwin.h"
-#include	"usys_linux.h"
-#include	"usys_xxx.h"
-
 #include	"usys_ugetnisdom.h"
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
+namespace {
+    sysret_t local_ugetnisdom(char *rbuf,int rlen) noex {
+	csize		rsz = size_t(rlen) ;
+	int		rs ;
+	if ((rs = getdomainname(rbuf,rsz)) >= 0) {
+	    rbuf[rsz] = '\0' ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+    } /* end subroutine */
+}
 
-namespace usys {
-    sysret_t ugetnisdom(char *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+
+/****
+Solaris® has the subroutine, but w/ a different function signature.
+The size of the supplied buffer is gieven as an |int| rather than
+|size_z|.  This function signature (the one provided by Solaris®)
+is actually the one we like the most, but we work with what we 
+have.
+****/
+
+extern "C" {
+    extern unixret_t getdomainname(char *,int) noex ;
+}
+
+sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+	int		rs ;
+	if ((rs = getdomainname(rbuf,rlen)) >= 0) {
+	    rbuf[rlen] = '\0' ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+
+#elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+
+sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+	return local_ugetnisdom(rbuf,rlen) ;
+}
+
+#elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
+
+sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
+	return local_ugetnisdom(rbuf,rlen) ;
+
+#else
+
+sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+	errno_t		ec = EFAULT ;
 	if (rbuf) {
-	    rs = SR_INVALID ;
+	    ec = EINVAL ;
 	    if (rlen >= 0) {
-		if_constexpr (f_sunos) {
-		    rs = sunos_ugetnisdom(rbuf,rlen) ;
-		    len = rs ;
-		} else if (f_darwin) {
-		    rs = darwin_ugetnisdom(rbuf,rlen) ;
-		    len = rs ;
-		} else if (f_linux) {
-		    rs = linux_ugetnisdom(rbuf,rlen) ;
-		    len = rs ;
-		} else {
-		    rs = xxx_ugetnisdom(rbuf,rlen) ;
-		    len = rs ;
-		} /* end if_constexpr (which OS) */
+		ec = ENOSYS ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-    } /* end subroutine (ugetnisdom) */
+	if (ec) errno = ec ;
+	return (- ec) ;
 }
+
+#endif /* which operating system */
 
 

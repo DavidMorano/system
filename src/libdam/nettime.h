@@ -1,38 +1,45 @@
-/* nettime */
+/* nettime HEADER */
+/* lang=C20 */
+
+/* program to get time from a network time server host */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	NETTIME_INCLUDE
-#define	NETTIME_INCLUDE		1
+#define	NETTIME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/time.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 
-#define	NETTIME		struct nettime
+#define	NETTIME		struct nettime_head
 
 
-struct nettime {
-	struct timeval	trip ;		/* one-round-trip time */
-	struct timeval	off ;		/* offset between net and us */
+struct nettime_head {
+	TIMEVAL		trip ;		/* one-round-trip time */
+	TIMEVAL		off ;		/* offset between net and us */
 	int		proto ;
 	int		pf ;
 } ;
 
+typedef	NETIME		nettime ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int nettime(struct nettime *,int,int,const char *,const char *,int) ;
+extern int nettime(nettime *,int,int,cchar *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* NETTIME_INCLUDE */
 

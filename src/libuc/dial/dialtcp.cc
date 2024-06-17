@@ -340,7 +340,6 @@ static int try_inet4(SUBINFO *sip) noex {
 	        if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
 		    SOCKADDR	*sap ;
 	            int		c = 0 ;
-		    int		al ;
 		    cuchar	*ap ;
 	            while ((rs = hostinfo_enumaddr(&hi,&hc,&ap)) > 0) {
 	                sockaddress_putaddr(&server,ap) ;

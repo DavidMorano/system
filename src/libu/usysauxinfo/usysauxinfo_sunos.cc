@@ -29,7 +29,6 @@
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 #include	<sys/types.h>
-#include	<sys/systeminfo.h>	/* <- where the stuff we want is */
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
@@ -47,7 +46,6 @@
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
 namespace usys {
-    using namespace	usys ;
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {

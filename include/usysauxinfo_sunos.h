@@ -35,6 +35,7 @@
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 #include	<sys/types.h>
+#include	<sys/systeminfo.h>	/* <- where the stuff we want is */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

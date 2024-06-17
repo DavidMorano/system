@@ -43,14 +43,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-
-EXTERNC_begin
-
-extern sysret_t darwin_ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
-
-
 /* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 

@@ -96,17 +96,4 @@ EXTERNC_end
 /* MEMPLOCK end */
 /*----------------------------------------------------------------------------*/
 
-sysret_t xxx_ugetnisdom(char *rbuf,int rlen) noex {
-	errno_t		ec = EFAULT ;
-	if (rbuf) {
-	    ec = EINVAL ;
-	    if (rlen >= 0) {
-		ec = ENOSYS ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-	return (- ec) ;
-}
-/* end subroutine (xxx_ugetnisdom) */
-
 

@@ -122,7 +122,7 @@ bool aflag_co::operator () (bool a) noex {
 	return rf ;
 }
 
-int aflag_gu::operator () (int to) noex {
+int aflag_mx::operator () (int to) noex {
 	int		rs = SR_BUGCHECK ;
 	switch (w) {
 	case aflagmx_lockbegin:
@@ -134,7 +134,7 @@ int aflag_gu::operator () (int to) noex {
 	} /* end switch */
 	return rs ;
 }
-/* end method (aflag_gu::operator) */
+/* end method (aflag_mx::operator) */
 
 int aflag::ilockbegin(int to) noex {
 	int		rs = SR_OK ;

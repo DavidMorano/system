@@ -1,16 +1,15 @@
-/* nettime */
+/* nettime SUPPORT */
+/* lang=C++20 */
 
 /* program to get time from a network time server host */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_FETCHPROTO	0		/* fetch protocol (no!) */
 #define	CF_USEUDP	1		/* use UDP */
 #define	CF_UDPMUX	1		/* pretend using UDPMUX */
 #define	CF_SOLARIS	1		/* broken Solaris */
 #define	CF_CONNECTUDP	0		/* make UDP connection */
 #define	CF_SLEEP	0		/* debug-sleep */
-
 
 /* revision history:
 
@@ -23,58 +22,50 @@
 
 /*******************************************************************************
 
-	This subroutine will get the time-of-day from a time server specified
-	by a hostname given on the command line.  The subroutine tries to
-	connect to a TCP listener on the time server and will read 4 bytes out
-	of the socket.  These four bytes, when organized as a long word in
-	network byte order, represent the time in seconds since Jan 1, 1900.
-	We will subtract the value "86400 * ((365 * 70) + 17)" to get the time
-	in seconds since Jan 1, 1970 (the UNIX epoch).
+	Name:
+	nettime
+
+	Description:
+	This subroutine will get the time-of-day from a time server
+	specified by a hostname given on the command line.  The
+	subroutine tries to connect to a TCP listener on the time
+	server and will read 4 bytes out of the socket.  These four
+	bytes, when organized as a long word in network byte order,
+	represent the time in seconds since Jan 1, 1900.  We will
+	subtract the value "86400 * ((365 * 70) + 17)" to get the
+	time in seconds since Jan 1, 1970 (the UNIX epoch).
 
 	Synopsis:
-
-	int nettime(ntp,proto,af,hostname,svc,to)
-	NETTIME		*ntp ;
-	int		proto ;
-	int		af ;
-	cchar		hostname[] ;
-	cchar		svc[] ;
-	int		to ;
+	int nettime(nettime *ntp,int proto,int af,cc *hn,cc *svc,int to)
 
 	Arguments:
-
 	ntp		pointer to result structure
 	proto		protocol number ( UDP, TCP )
 	af		address family
-	hostname	host-name
+	hn		host-name
 	svc		service-name
 	to		timeout
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<signal.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<hostaddr.h>
 #include	<sockaddress.h>
@@ -130,11 +121,6 @@ extern int	matostr(cchar **,cchar *,int) ;
 extern int	getprotofamily(int) ;
 extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -147,7 +133,7 @@ struct udpargs {
 	cchar		*hostname ;
 	cchar		*svc ;
 	struct nettime	*ntp ;
-	struct timeval	*nsp, *nep ;
+	TIMECAL	*nsp, *nep ;
 	int		proto ;
 	int		pf ;
 	int		af ;
@@ -165,33 +151,28 @@ static int	nettime_udptrythem(struct udpargs *,char *) ;
 static int	nettime_udptrysome(struct udpargs *,char *,
 			VECHAND *,HOSTADDR *,int) ;
 static int	nettime_udptryone(struct udpargs *,char *,
-			struct addrinfo *) ;
+			ADDRINFO *) ;
 static int	nettime_udptryoner(struct udpargs *,char *,
-			struct addrinfo *,int) ;
+			ADDRINFO *,int) ;
 
 static uint64_t	gettime_inet(cchar *) ;
 
-static uint64_t	utime_timeval(struct timeval *) ;
+static uint64_t	utime_timeval(TIMECAL *) ;
 static uint64_t	utime_tcpcalc(uint64_t,uint64_t) ;
 static uint64_t	utime_udpcalc(uint64_t,uint64_t) ;
 
-static int	tv_loadusec(struct timeval *,int64_t) ;
+static int	tv_loadusec(TIMECAL *,int64_t) ;
 
 static int	vechand_already(VECHAND *,void *) ;
 
 static int	connagain(int) ;
 
-static int	isaddrsame(const void *,const void *) ;
-
-#if	CF_DEBUGS
-static int	mkprintaddr(char *,int,struct sockaddr *) ;
-static int	mkprintscope(char *,int,struct sockaddr *) ;
-#endif
+static int	isaddrsame(cvoid *,cvoid *) ;
 
 
 /* local variables */
 
-static const int	connagains[] = {
+constexpr int	connagains[] = {
 	SR_NOENT,
 	SR_HOSTUNREACH,
 	SR_HOSTDOWN,
@@ -204,70 +185,41 @@ static const int	connagains[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int nettime(ntp,proto,af,hostname,svc,to)
-NETTIME		*ntp ;
-int		proto ;
-int		af ;
-cchar		hostname[] ;
-cchar		svc[] ;
-int		to ;
-{
+int nettime(nettime *ntp,int proto,int af,cc *hostname,cc *svc,int to) noex {
 	int		rs = SR_OK ;
 	int		f ;
-	int		f_got = FALSE ;
+	int		f_got = false ;
 	cchar		*inetsvc = INETSVC_TIME ;
 
-	if (ntp == NULL) return SR_FAULT ;
-	if (hostname == NULL) return SR_FAULT ;
+	if (ntp == nullptr) return SR_FAULT ;
+	if (hostname == nullptr) return SR_FAULT ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-	if ((svc == NULL) || (svc[0] == '\0'))
+	if ((svc == nullptr) || (svc[0] == '\0'))
 	    svc = inetsvc ;
 
 	if (af < 0)
 	    af = AF_UNSPEC ;
 
-#if	CF_DEBUGS
-	debugprintf("nettime: proto=%d\n",proto) ;
-	debugprintf("nettime: af=%d\n",af) ;
-	debugprintf("nettime: host=%s\n",hostname) ;
-	debugprintf("nettime: svc=%s\n",svc) ;
-	debugprintf("nettime: to=%d\n",to) ;
-#endif
-
-	memset(ntp,0,sizeof(NETTIME)) ;
+	memclear(ntp) ;
 
 	f = ((proto == IPPROTO_UDP) || (proto <= 0)) ;
 	if ((! f_got) && f) {
-
 	    rs = nettime_udp(ntp,af,hostname,svc,to) ;
 	    f_got = (rs > 0) ;
-
-#if	CF_DEBUGS
-	    debugprintf("nettime: nettime_udp() rs=%d\n",rs) ;
-#endif
-
 	} /* end if */
 
 	f = ((proto == IPPROTO_TCP) || (proto <= 0)) ;
 	if ((! f_got) && f && ((rs >= 0) || connagain(rs))) {
-
 	    rs = nettime_tcp(ntp,af,hostname,svc,to) ;
 	    f_got = (rs > 0) ;
-
-#if	CF_DEBUGS
-	    debugprintf("nettime: nettime_tcp() rs=%d\n",rs) ;
-#endif
-
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("nettime: ret rs=%d f_got=%u\n",rs,f_got) ;
-#endif
 
 	return (rs >= 0) ? f_got : rs ;
 }
@@ -276,22 +228,12 @@ int		to ;
 
 /* local subroutines */
 
-
-static int nettime_udp(ntp,af,hostname,svc,to)
-NETTIME		*ntp ;
-int		af ;
-cchar		hostname[] ;
-cchar		svc[] ;
-int		to ;
-{
-	struct timeval	netstart, netend ;
+static int nettime_udp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
+	TIMEVAL		netstart ;
+	TIMEVAL		netend ;
 	int		rs = SR_OK ;
-	int		f_got = FALSE ;
+	int		f_got = false ;
 	char		timebuf[TIMEBUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udp: af=%d host=%s svc=%s\n",af,hostname,svc) ;
-#endif
 
 	ntp->proto = IPPROTO_UDP ;
 
@@ -316,10 +258,6 @@ int		to ;
 	rs = SR_PROTONOSUPPORT ;
 #endif /* CF_USEUDP */
 
-#if	CF_DEBUGS
-	debugprintf("nettime_udp: mid rs=%d\n",rs) ;
-#endif
-
 	if ((rs >= 0) && f_got) {
 	    uint64_t	uti_start, uti_end ;
 	    uint64_t	uti_inet, uti_local ;
@@ -334,11 +272,6 @@ int		to ;
 
 	    {
 	        uint64_t	t = gettime_inet(timebuf) ;
-
-#if	CF_DEBUGS
-	        debugprintf("nettime_udp: t=%llu\n",t) ;
-#endif
-
 	        uti_inet = t * 1000000 ;
 	        uti_off = uti_inet - uti_local ;
 	        tv_loadusec(&ntp->off,uti_off) ;
@@ -347,83 +280,46 @@ int		to ;
 	    uti_trip = uti_end - uti_start ;
 	    tv_loadusec(&ntp->trip,uti_trip) ;
 
-#if	CF_DEBUGS
-	    debugprintf("nettime_udp: s-usec=%llu\n",uti_start) ;
-	    debugprintf("nettime_udp: e-usec=%llu\n",uti_end) ;
-	    debugprintf("nettime_udp: ustrip=%llu\n",uti_trip) ;
-	    debugprintf("nettime_udp: e-inet=%llu\n",uti_inet) ;
-	    debugprintf("nettime_udp: e-loca=%llu\n",uti_local) ;
-	    debugprintf("nettime_udp: usoffe=%lld\n",uti_off) ;
-#endif
-
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udp: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_udp) */
 
-
-static int nettime_tcp(ntp,af,hostname,svc,to)
-NETTIME		*ntp ;
-int		af ;
-cchar		hostname[] ;
-cchar		svc[] ;
-int		to ;
-{
-	struct timeval	netstart, netend ;
+static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
+	TIMEVAL		netstart, netend ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		s = -1 ;
 	int		pf ;
 	int		raf ;
 	int		len ;
-	int		f_got = FALSE ;
+	int		f_got = false ;
 	char		timebuf[TIMEBUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("nettime_tcp: af=%d host=%s svc=%s\n",af,hostname,svc) ;
-	debugprintf("nettime_tcp: to=%d\n",to) ;
-#endif
 
 	ntp->proto = IPPROTO_TCP ;
 
 /* retrieve network data */
 
-	gettimeofday(&netstart,NULL) ;
+	gettimeofday(&netstart,nullptr) ;
 
 	if ((af == AF_UNSPEC) || (af == AF_INET4)) {
-#if	CF_DEBUGS
-	debugprintf("nettime_tcp: af=INET4\n") ;
-#endif
 	    raf = AF_INET4 ;
 	    pf = PF_UNSPEC ;
 	    if ((rs1 = getprotofamily(raf)) >= 0) pf = rs1 ;
 	    ntp->pf = pf ;
 	    rs = dialtcp(hostname,svc,raf,to,0) ;
 	    s = rs ;
-#if	CF_DEBUGS
-	debugprintf("nettime_tcp: INET4 dialtcp() rs=%d\n",rs) ;
-#endif
 	}
 
 	if ((((s < 0) && (rs >= 0)) || ((rs < 0) && connagain(rs))) &&
 	    ((af == AF_UNSPEC) || (af == AF_INET6))) {
-#if	CF_DEBUGS
-	debugprintf("nettime_tcp: af=INET6\n") ;
-#endif
 	    raf = AF_INET6 ;
 	    pf = PF_UNSPEC ;
 	    if ((rs1 = getprotofamily(raf)) >= 0) pf = rs1 ;
 	    ntp->pf = pf ;
 	    rs = dialtcp(hostname,svc,raf,to,0) ;
 	    s = rs ;
-#if	CF_DEBUGS
-	debugprintf("nettime_tcp: INET6 dialtcp() rs=%d\n",rs) ;
-#endif
 	}
 
 	if (rs >= 0) {
@@ -431,8 +327,8 @@ int		to ;
 	    if ((rs = uc_reade(s,timebuf,TIMEBUFLEN,to,FM_EXACT)) >= 0) {
 	        len = rs ;
 	        if (len == NETTIMELEN) {
-	            f_got = TRUE ;
-	            gettimeofday(&netend,NULL) ;
+	            f_got = true ;
+	            gettimeofday(&netend,nullptr) ;
 	        } else {
 	            rs = SR_BADMSG ;
 		}
@@ -457,11 +353,6 @@ int		to ;
 
 	    {
 	        uint64_t	t = gettime_inet(timebuf) ;
-
-#if	CF_DEBUGS
-	        debugprintf("nettime_tcp: t=%llu\n",t) ;
-#endif
-
 	        uti_inet = t * 1000000 ;
 	        uti_off = uti_inet - uti_local ;
 	        tv_loadusec(&ntp->off,uti_off) ;
@@ -472,14 +363,9 @@ int		to ;
 
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("nettime_tcp: ret rs=%d f_got=%u\n",rs,f_got) ;
-#endif
-
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_tcp) */
-
 
 #if	CF_USEUDP
 
@@ -487,14 +373,14 @@ static int nettime_udptrythem(uap,timebuf)
 struct udpargs	*uap ;
 char		timebuf[] ;
 {
-	struct addrinfo	hint ;
+	ADDRINFO	hint ;
 	VECHAND		alist ;
 	HOSTADDR	ha ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		proto = 0 ;
 	int		pf ;
-	int		f_got = FALSE ;
+	int		f_got = false ;
 
 /* get the protocol number */
 
@@ -511,15 +397,11 @@ char		timebuf[] ;
 
 	uap->proto = proto ;
 
-#if	CF_DEBUGS
-	debugprintf("nettime_udptrythem: proto=%u\n",proto) ;
-#endif
-
 	if (rs < 0) goto ret0 ;
 
 /* setup search restrictions */
 
-	memset(&hint,0,sizeof(struct addrinfo)) ;
+	memset(&hint,0,sizeof(ADDRINFO)) ;
 	hint.ai_protocol = proto ;
 
 	if (uap->af >= 0) {
@@ -529,10 +411,6 @@ char		timebuf[] ;
 	        hint.ai_family = pf ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udptrythem: hint_pf=%u\n",hint.ai_family) ;
-#endif
 
 	if ((rs = vechand_start(&alist,2,0)) >= 0) {
 	    cchar	*hn = uap->hostname ;
@@ -573,11 +451,6 @@ char		timebuf[] ;
 	} /* end if (vechand) */
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udptrythem: ret rs=%d f_got=%u\n",rs,f_got) ;
-#endif
-
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_udptrythem) */
@@ -593,25 +466,14 @@ int		pf ;
 	HOSTADDR_CUR	cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_got = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udptrysome: ent pf=%d\n",pf) ;
-#endif
+	int		f_got = false ;
 
 	if ((rs = hostaddr_curbegin(hap,&cur)) >= 0) {
-	    struct addrinfo	*aip ;
-	    int			proto ;
-	    int			f ;
+	    ADDRINFO	*aip ;
+	    int		proto ;
+	    int		f ;
 
 	    while (hostaddr_enum(hap,&cur,&aip) >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("nettime_udptrysome: aip=%p\n",aip) ;
-	        debugprintf("nettime_udptrysome: pf=%d\n",aip->ai_family) ;
-	        debugprintf("nettime_udptrysome: proto=%u\n",
-	            aip->ai_protocol) ;
-#endif
 
 	        proto = aip->ai_protocol ;
 	        f = ((proto == uap->proto) || (proto <= 0)) ;
@@ -632,11 +494,6 @@ int		pf ;
 	                f_got = (rs > 0) ;
 	            }
 
-#if	CF_DEBUGS
-	            debugprintf("nettime_udptrysome: _udptryone() rs=%d\n",
-	                rs) ;
-#endif
-
 	            if (f_got) break ;
 	        } /* end if (match) */
 
@@ -645,45 +502,21 @@ int		pf ;
 	    hostaddr_curend(hap,&cur) ;
 	} /* end if (cursor) */
 
-#if	CF_DEBUGS
-	debugprintf("nettime_udptrysome: ret rs=%d f_got=%u\n",rs,f_got) ;
-#endif
-
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_udptrysome) */
 
-
 static int nettime_udptryone(uap,timebuf,aip)
 struct udpargs	*uap ;
 char		timebuf[] ;
-struct addrinfo	*aip ;
+ADDRINFO	*aip ;
 {
 	int		rs = SR_OK ;
 	int		pf ;
 	int		st ;
 	int		proto ;
 	int		i ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udptryone: enter\n") ;
-	debugprintf("nettime_udptryone: rproto=%d\n",uap->proto) ;
-	debugprintf("nettime_udptryone: pf=%d\n",aip->ai_family) ;
-	debugprintf("nettime_udptryone: st=%d\n",aip->ai_socktype) ;
-	debugprintf("nettime_udptryone: proto=%d\n",aip->ai_protocol) ;
-	{
-	    int		rs1 ;
-	    char	printaddr[PRINTADDRLEN + 1] ;
-	    rs1 = mkprintaddr(printaddr,PRINTADDRLEN,aip->ai_addr) ;
-	    debugprintf("nettime_udptryone: rs1=%d addrlen=%u\n",
-	        rs1,aip->ai_addrlen) ;
-	    debugprintf("nettime_udptryone: addr=%s\n",printaddr) ;
-	    rs1 = mkprintscope(printaddr,PRINTADDRLEN,aip->ai_addr) ;
-	    if (rs1 >= 0)
-	        debugprintf("nettime_udptryone: scope=%s\n",printaddr) ;
-	}
-#endif /* CF_DEBUGS */
+	int		f = false ;
 
 	uap->ntp->pf = aip->ai_family ;
 	pf = aip->ai_family ;
@@ -698,16 +531,8 @@ struct addrinfo	*aip ;
 
 	    for (i = 0 ; (rs >= 0) && (i < NTRIES) ; i += 1) {
 
-#if	CF_DEBUGS
-	        debugprintf("nettime_udptryone: i=%u\n",i) ;
-#endif
-
 	        rs = nettime_udptryoner(uap,timebuf,aip,fd) ;
 	        f = (rs > 0) ;
-
-#if	CF_DEBUGS
-	        debugprintf("nettime_udptryone: _udptryoner() rs=%d\n",rs) ;
-#endif
 
 #if	CF_SOLARIS
 	        if (f || ((rs < 0) && (! connagain(rs))))
@@ -722,11 +547,6 @@ struct addrinfo	*aip ;
 	    u_close(fd) ;
 	} /* end if (opened socket) */
 
-#if	CF_DEBUGS
-	debugprintf("nettime_udptryone: ret rs=%d f=%u i=%u\n",
-	    rs,f,i) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (nettime_udptryone) */
@@ -735,7 +555,7 @@ struct addrinfo	*aip ;
 static int nettime_udptryoner(uap,timebuf,aip,fd)
 struct udpargs	*uap ;
 char		timebuf[] ;
-struct addrinfo	*aip ;
+ADDRINFO	*aip ;
 int		fd ;
 {
 	SOCKADDRESS	from ;
@@ -744,21 +564,11 @@ int		fd ;
 	int		fromlen ;
 	int		netlen ;
 	int		c ;
-	int		f = FALSE ;
+	int		f = false ;
 	char		netbuf[NETBUFLEN + 1] ;
 
 	timebuf[0] = '\0' ;
-	gettimeofday(uap->nsp,NULL) ;
-
-#if	CF_DEBUGS
-	{
-	    struct timeval	*tvp = uap->nsp ;
-	    debugprintf("nettime_udptryoner: s-sec=%ld\n",
-	        tvp->tv_sec) ;
-	    debugprintf("nettime_udptryoner: s-usec=%ld\n",
-	        tvp->tv_usec) ;
-	}
-#endif /* CF_DEBUGS */
+	gettimeofday(uap->nsp,nullptr) ;
 
 #if	CF_UDPMUX
 	rs = sncpy2(netbuf,NETBUFLEN,INETSVC_TIME,"\n") ;
@@ -767,11 +577,6 @@ int		fd ;
 	netbuf[0] ;
 	netlen = 0 ;
 #endif /* CF_UDPMUX */
-
-#if	CF_DEBUGS
-	debugprintf("nettime_udptryoner: netlen=%u\n",netlen) ;
-	debugprintf("nettime_udptryoner: addrlen=%u\n", aip->ai_addrlen) ;
-#endif
 
 	if (rs >= 0) {
 	    int		addrlen = aip->ai_addrlen ;
@@ -782,13 +587,6 @@ int		fd ;
 	    rs = u_sendto(fd,netbuf,netlen,0,aip->ai_addr,addrlen) ;
 #endif
 
-#if	CF_DEBUGS
-	    debugprintf("nettime_udptryoner: u_sendto() rs=%d\n",rs) ;
-#if	CF_SLEEP
-	    sleep(10) ;
-#endif
-#endif
-
 	} /* end if (send message) */
 
 	if (rs >= 0) {
@@ -796,47 +594,18 @@ int		fd ;
 	    c = 0 ;
 	    while (rs >= 0) {
 
-#if	CF_DEBUGS
-	        debugprintf("nettime_udptryoner: c=%u\n",c) ;
-#endif
-
 	        fromlen = sizeof(SOCKADDRESS) ;
 	        rs = uc_recvfrome(fd,netbuf,NETBUFLEN,0,&from,&fromlen,to,0) ;
 	        netlen = rs ;
-
-#if	CF_DEBUGS
-	        debugprintf("nettime_udptryoner: "
-	            "uc_recvfrome() rs=%d\n",rs) ;
-#endif
-
-	        if (rs < 0)
-	            break ;
-
-#if	CF_DEBUGS
-	        {
-	            struct sockaddr	*sap = (struct sockaddr *) &from ;
-	            int		rs1 ;
-	            char	printaddr[PRINTADDRLEN + 1] ;
-	            rs1 = mkprintaddr(printaddr,PRINTADDRLEN,sap) ;
-	            debugprintf("nettime_udptryone: FROM rs1=%d\n", rs1) ;
-	            debugprintf("nettime_udptryone: addr=%s\n",printaddr) ;
-	            rs1 = mkprintscope(printaddr,PRINTADDRLEN,sap) ;
-	            if (rs1 >= 0)
-	                debugprintf("nettime_udptryone: scope=%s\n",printaddr) ;
-	        }
-#endif /* CF_DEBUGS */
+	        if (rs < 0) break ;
 
 	        f = isaddrsame(&from,aip->ai_addr) ;
-
-#if	CF_DEBUGS
-	        debugprintf("nettime_udptryone: isaddrsame=%u\n",f) ;
-#endif
-
 	        if (f) {
 	            if (netlen == NETTIMELEN) {
-	                f = TRUE ;
-	            } else
+	                f = true ;
+	            } else {
 	                rs = SR_BADMSG ;
+		    }
 	            break ;
 	        }
 
@@ -847,19 +616,9 @@ int		fd ;
 	} /* end if */
 
 	if ((rs >= 0) && f) {
-	    gettimeofday(uap->nep,NULL) ;
+	    gettimeofday(uap->nep,nullptr) ;
 	    memcpy(timebuf,netbuf,NETTIMELEN) ;
 	}
-
-#if	CF_DEBUGS
-	if (rs >= 0) {
-	    struct timeval	*tvp = uap->nep ;
-	    debugprintf("nettime_udptryoner: e-sec=%ld\n",
-	        tvp->tv_sec) ;
-	    debugprintf("nettime_udptryoner: e-usec=%ld\n",
-	        tvp->tv_usec) ;
-	}
-#endif /* CF_DEBUGS */
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -867,15 +626,13 @@ int		fd ;
 
 #endif /* CF_USEUDP */
 
-
-static uint64_t gettime_inet(cchar buf[])
-{
+static uint64_t gettime_inet(cchar *buf) noex {
 	uint64_t	net = 0 ;
 	uint64_t	netoff = 2208988800ULL ;
 	uint64_t	rtime = 0 ;
 	uchar		*ubuf = (uchar *) buf ;
 
-	if (buf == NULL)
+	if (buf == nullptr)
 	    return 0 ;
 
 	net = (net << 8) | ubuf[0] ;
@@ -889,41 +646,22 @@ static uint64_t gettime_inet(cchar buf[])
 
 	rtime = (net - netoff) ;
 
-#if	CF_DEBUGS
-	debugprintf("gettime_inet: net=%llu\n",net) ;
-	debugprintf("gettime_inet: off=%llu\n",netoff) ;
-	debugprintf("gettime_inet: rti=%llu\n",rtime) ;
-#endif
-
 	return rtime ;
 }
 /* end subroutine (gettime_inet) */
 
-
-static uint64_t utime_timeval(struct timeval *tvp)
-{
+static uint64_t utime_timeval(TIMEVAL *tvp) noex {
 	uint64_t	r ;
-
-#if	CF_DEBUGS
-	debugprintf("utime_timeval: i-sec=%lu\n",tvp->tv_sec) ;
-	debugprintf("utime_timeval: u-usec=%lu\n",tvp->tv_usec) ;
-#endif
 
 	r = 1000000 ;
 	r *= tvp->tv_sec ;
 	r += tvp->tv_usec ;
 
-#if	CF_DEBUGS
-	debugprintf("utime_timeval: r=%llu\n",r) ;
-#endif
-
 	return r ;
 }
 /* end subroutine (utime_timeval) */
 
-
-static uint64_t utime_tcpcalc(uint64_t uti2,uint64_t uti1)
-{
+static uint64_t utime_tcpcalc(uint64_t uti2,uint64_t uti1) noex (
 	uint64_t	utid ;
 	uint64_t	r ;
 	double		d ;
@@ -955,11 +693,8 @@ static uint64_t utime_udpcalc(uint64_t uti2,uint64_t uti1)
 }
 /* end subroutine (utime_udpcalc) */
 
-
-static int tv_loadusec(struct timeval *tvp,int64_t uti)
-{
-
-	if (tvp == NULL) return SR_FAULT ;
+static int tv_loadusec(TIMECAL *tvp,int64_t uti) noex {
+	if (tvp == nullptr) return SR_FAULT ;
 
 	tvp->tv_sec = (uti / 1000000) ;
 	tvp->tv_usec = (uti % 1000000) ;
@@ -967,14 +702,11 @@ static int tv_loadusec(struct timeval *tvp,int64_t uti)
 }
 /* end subroutine (tv_loadusec) */
 
-
-static int vechand_already(VECHAND *alp,void *aip)
-{
+static int vechand_already(VECHAND *alp,void *aip) noex {
 	int		rs ;
-	int		i ;
 	void		*ep ;
-	for (i = 0 ; (rs = vechand_get(alp,i,&ep)) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	for (int i = 0 ; (rs = vechand_get(alp,i,&ep)) >= 0 ; i += 1) {
+	    if (ep != nullptr) {
 	        if (ep == aip) break ;
 	    }
 	} /* end for */
@@ -982,12 +714,9 @@ static int vechand_already(VECHAND *alp,void *aip)
 }
 /* end subroutine (vechand_already) */
 
-
-static int connagain(int rs)
-{
-	int	i ;
-	int	f = FALSE ;
-	for (i = 0 ; connagains[i] != 0 ; i += 1) {
+static int connagain(int rs) noex {
+	int	f = false ;
+	for (int i = 0 ; connagains[i] != 0 ; i += 1) {
 	    f = (rs == connagains[i]) ;
 	    if (f) break ;
 	}
@@ -995,16 +724,14 @@ static int connagain(int rs)
 }
 /* end subroutine (connagain) */
 
-
-static int isaddrsame(const void *addr1,const void *addr2)
-{
+static int isaddrsame(cvoid *addr1,cvoid *addr2) noex {
 	SOCKADDRESS	*sa1p = (SOCKADDRESS *) addr1 ;
 	SOCKADDRESS	*sa2p = (SOCKADDRESS *) addr2 ;
 	uint		af1, af2 ;
 	uint		p1, p2 ;
 	int		rs = SR_OK ;
 	int		addrlen ;
-	int		f = FALSE ;
+	int		f = false ;
 	char		addrbuf1[ADDRBUFLEN + 1] ;
 	char		addrbuf2[ADDRBUFLEN + 1] ;
 
@@ -1020,49 +747,25 @@ static int isaddrsame(const void *addr1,const void *addr2)
 	    goto ret0 ;
 
 	addrlen = sockaddress_getaddrlen(sa1p) ;
-
-#if	CF_DEBUGS
-	debugprintf("isaddrsame: addrlen=%u\n",addrlen) ;
-#endif
-
 	f = (af1 == af2) ;
-
-#if	CF_DEBUGS
-	debugprintf("isaddrsame: f=%u af1=%u af2=%u\n",f,af1,af2) ;
-#endif
-
 	if (f) {
 	    p1 = sockaddress_getport(sa1p) ;
 	    p2 = sockaddress_getport(sa2p) ;
 	    f = (p1 == p2) ;
-
-#if	CF_DEBUGS
-	    debugprintf("isaddrsame: f=%u p1=%u p2=%u\n",f,p1,p2) ;
-#endif
-
 	}
 
 	if (f) {
 	    sockaddress_getaddr(sa1p,addrbuf1,ADDRBUFLEN) ;
 	    sockaddress_getaddr(sa2p,addrbuf2,ADDRBUFLEN) ;
 	    f = (memcmp(addrbuf1,addrbuf2,addrlen) == 0) ;
-#if	CF_DEBUGS
-	    debugprintf("isaddrsame: MEM f=%u\n",f) ;
-#endif
 	}
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("isaddrsame: ret f=%u\n",f) ;
-#endif
-
 	return f ;
 }
 /* end subroutine (isaddrsame) */
 
-
-#if	CF_DEBUGS
+#ifdef	COMMENT
 
 static int mkprintaddr(printaddr,printaddrlen,ssap)
 char		printaddr[] ;
@@ -1079,7 +782,7 @@ struct sockaddr	*ssap ;
 	int		rs1 ;
 	int		n, i ;
 	int		addrlen = 0 ;
-	int		f_flow = FALSE ;
+	int		f_flow = false ;
 	char		addrbuf[ADDRBUFLEN + 1] ;
 
 
@@ -1160,7 +863,7 @@ struct sockaddr	*ssap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		addrlen = 0 ;
-	int		f_scope = FALSE ;
+	int		f_scope = false ;
 
 	printaddr[0] = '\0' ;
 	sap = (SOCKADDRESS *) ssap ;
@@ -1198,6 +901,6 @@ struct sockaddr	*ssap ;
 }
 /* end subroutine (mkprintscope) */
 
-#endif /* CF_DEBUGS */
+#endif /* COMMENT */
 
 

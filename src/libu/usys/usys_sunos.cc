@@ -28,7 +28,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-#include	"usys_sunos.h"
+#include	"usys.h"
 
 /* USYS_SUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)

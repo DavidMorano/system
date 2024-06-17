@@ -2,8 +2,7 @@
 
 T= libu
 
-#ALL= $(T).so $(T).a
-ALL= $(T).a $(T).o
+ALL= $(T).o $(T).so
 
 
 BINDIR= $(REPOROOT)/bin

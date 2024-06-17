@@ -41,13 +41,6 @@
 #include	<usysrets.h>
 
 
-EXTERNC_begin
-
-extern int linux_ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
-
-
 /* USYSLINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 

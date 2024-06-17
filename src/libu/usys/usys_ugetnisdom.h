@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error code (- errno)
+	<0		error code (system-return)
 
 *******************************************************************************/
 

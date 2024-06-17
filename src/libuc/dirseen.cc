@@ -54,6 +54,9 @@ using std::nothrow ;			/* constant */
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
@@ -96,6 +99,9 @@ static int vcmpdevino(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

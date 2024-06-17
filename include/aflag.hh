@@ -21,8 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<atomic>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 enum aflagmems {
@@ -54,7 +55,7 @@ struct aflag_co {
 	    return operator () () ;
 	} ;
 } ; /* end struct (aglag_co) */
-struct aflag_gu {
+struct aflag_mx {
 	aflag		*op = nullptr ;
 	int		w = -1 ;
 	constexpr void operator () (aflag *p,int m) noex {
@@ -65,9 +66,9 @@ struct aflag_gu {
 	operator int () noex {
 	    return operator () () ;
 	} ;
-} ; /* end struct (aglag_gu) */
+} ; /* end struct (aglag_mx) */
 struct aflag {
-	friend		aflag_gu ;
+	friend		aflag_mx ;
 	aflag_co	set ;
 	aflag_co	clear ;
 	aflag_co	test ;
@@ -75,8 +76,8 @@ struct aflag {
 	aflag_co	wait ;
 	aflag_co	notify ;
 	aflag_co	notifyall ;
-	aflag_gu	lockbegin ;
-	aflag_gu	lockend ;
+	aflag_mx	lockbegin ;
+	aflag_mx	lockend ;
 	std::atomic_flag	af{} ;
 	constexpr aflag() noex {
 	    set(this,aflagmem_set) ;

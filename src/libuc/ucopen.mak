@@ -65,13 +65,13 @@ OBJ06= uc_openfs.o uc_openpass.o
 OBJ07= uc_openprog.o uc_openproto.o
 
 OBJ08= uc_openpsem.o uc_openusvc.o
-OBJ09=
+OBJ09= uc_create.o
 OBJ10=
 OBJ11=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
-OBJC= obj08.o
+OBJC= obj08.o obj09.o
 
 OBJ_UCOPEN= obja.o objb.o objc.o
 
@@ -168,6 +168,7 @@ ucopensys.o:		ucopensys.cc		$(INCS)
 ucopensysdb.o:		ucopensysdb.cc		$(INCS)
 ucopenuser.o:		ucopenuser.cc		$(INCS)
 
+uc_create.o:		uc_create.cc		$(INCS)
 uc_opendev.o:		uc_opendev.cc		$(INCS)
 uc_opendialer.o:	uc_opendialer.cc	$(INCS)
 uc_openfint.o:		uc_openfint.cc		$(INCS)

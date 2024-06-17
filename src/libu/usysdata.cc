@@ -50,6 +50,7 @@
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usysflag.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"usysdata.h"
@@ -71,6 +72,19 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structuers */
+
+namespace {
+    struct umachiner {
+	char	*mbuf ;
+	int	mlen ;
+    } ; /* end struct (umachiner) */
+}
+
+
 /* forward references */
 
 static int uuname_machine(UTSNAME *) noex ;
@@ -82,6 +96,10 @@ static constexpr uname_f	usubs[] = {
 	uuname_machine,
 	nullptr
 } ;
+
+#ifdef	COMMENT
+static umachiner	um ;
+#endif
 
 constexpr bool		f_sunos = F_SUNOS ;
 constexpr bool		f_darwin = F_DARWIN ;

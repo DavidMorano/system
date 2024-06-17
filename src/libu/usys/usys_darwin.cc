@@ -116,34 +116,6 @@ errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 /*----------------------------------------------------------------------------*/
 
 
-sysret_t darwin_ugetnisdom(char *rbuf,int rlen) noex {
-	csize		rsz = size_t(rlen+1) ;
-	int		rs ;
-	if ((rs = getdomainname(rbuf,rsz)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end subroutine (darwin_ugetnisdom) */
-
-
-#else /* other operating systems */
-
-
-sysret_t darwin_ugetnisdom(char *rbuf,int rlen) noex {
-	int		ec = EFAULT ;
-	if (rbuf) {
-	    ec = EINVAL ;
-	    if (rlen >= 0) {
-		ec = ENOSYS ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-	return (- ec) ;
-}
-/* end subroutine (darwin_ugetnisdom) */
-
-
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYS_DARWIN finish */
 

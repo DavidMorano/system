@@ -30,8 +30,8 @@
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
 #include	<cerrno>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -46,7 +46,6 @@
 #if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
 
 namespace usys {
-    using namespace	usys ;
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
