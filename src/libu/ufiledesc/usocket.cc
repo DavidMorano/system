@@ -27,6 +27,7 @@
 	u_send
 	u_sendmsg
 	u_sendto
+	u_sendfile
 	u_recv
 	u_recvmsg
 	u_recvfrom
@@ -116,7 +117,9 @@ constexpr nullptr_t		np{} ;
 
 namespace {
     struct usocket ;
+    struct usender ;
     typedef int (usocket::*usocket_m)(int) noex ;
+    typedef int (usender::*usender_m)(int) noex ;
     struct usocket : ufiledescbase {
 	usocket_m	m = nullptr ;
 	CSOCKADDR	*sap ;
@@ -182,11 +185,35 @@ namespace {
 	int isend(int) noex ;
 	int isendmsg(int) noex ;
 	int isendto(int) noex ;
+	int isendfile(int) noex ;
 	int irecv(int) noex ;
 	int irecvmsg(int) noex ;
 	int irecvfrom(int) noex ;
 	int ishutdown(int) noex ;
     } ; /* end struct (usocket) */
+    struct usender : usocket {
+	usender_m	m = nullptr ;
+	SFHDTR		*hdrp ;
+	off_t		*fop ;
+	off_t		fo ;
+	int		s ;
+	int		fl ;
+	usender(int as,off_t afo,off_t *afop,SFHDTR *ap,int afl) noex {
+	    s = as ;
+	    fo = afo ;
+	    fop = afop ;
+	    hdrp = ap ;
+	    fl = afl ;
+	} ;
+	int callstd(int fd) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fd) ;
+	    }
+	    return rs ;
+	} ;
+	int isendfile(int) noex ;
+    } ; /* end struct (usender) */
 }
 
 
@@ -283,6 +310,17 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	return rs ;
 }
 /* end subroutine (u_sendto) */
+
+int u_sendfile(int fd,int s,off_t fo,off_t *fop,SFHDTR *hdrp,int fl) noex {
+	int		rs = SR_FAULT ;
+	if (fop) {
+	    usender	so(s,fo,fop,hdrp,fl) ;
+	    so.m = &usender::isendfile ;
+	    rs = so(fd) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_sendfile) */
 
 int u_recv(int fd,void *rbuf,int rlen,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -472,5 +510,14 @@ int usocket::ishutdown(int fd) noex {
 	return rs ;
 }
 /* end method (usocket::ishutdown) */
+
+int usender::isendfile(int fd) noex {
+	int		rs ;
+	if ((rs = sendfile(fd,s,fo,fop,hdrp,fl)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usender::isendfile) */
 
 

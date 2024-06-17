@@ -150,7 +150,7 @@ int ufiledescbase::operator () (int fd) noex {
                         break ;
                     } /* end switch */
 		    rs = r ;
-                } /* end if (error) */
+                } /* end if (callstd) */
 	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (valid) */
 	return rs ;

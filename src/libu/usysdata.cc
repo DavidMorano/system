@@ -101,9 +101,9 @@ static constexpr uname_f	usubs[] = {
 static umachiner	um ;
 #endif
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
 
 
 /* exported variables */
