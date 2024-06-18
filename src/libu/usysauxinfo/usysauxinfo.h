@@ -36,8 +36,8 @@
 #define SAI_RPCDOMAIN		usysauxinforeq_rpcdomain
 
 
-namespace usysauxifo {
-    extern int usysauxinfo(char *,int,int) noex ;
+namespace usysauxinfo {
+    extern int ugetauxinfo(char *,int,int) noex ;
 }
 
 

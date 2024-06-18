@@ -51,6 +51,7 @@
 #include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<usupport.h>
+#include	<usysauxinfo.h>		/* the request codes */
 #include	<localmisc.h>
 
 #include	"usysdata.h"
@@ -61,7 +62,8 @@
 
 /* imported namespaces */
 
-using namespace	libu ;			/* namespace */
+using libu::sncpy ;			/* subroutine */
+using usysauxinfo::ugetauxinfo ;	/* subroutine */
 
 
 /* local typedefs */
@@ -75,12 +77,21 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 /* external variables */
 
 
-/* local structuers */
+/* local structures */
 
 namespace {
     struct umachiner {
-	char	*mbuf ;
-	int	mlen ;
+	cchar		*architecture ;
+	cchar		*machine ;
+	cchar		*platform ;
+	~umachiner() {
+	    delete mbuf ;
+	    mbuf = nullptr ;
+ 	} ;
+	int getauxinfo(char *,int,int) noex ;
+    private:
+	char		*mbuf = nullptr ;
+	int		mlen ;
     } ; /* end struct (umachiner) */
 }
 
@@ -97,9 +108,7 @@ static constexpr uname_f	usubs[] = {
 	nullptr
 } ;
 
-#ifdef	COMMENT
 static umachiner	um ;
-#endif
 
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
@@ -128,6 +137,27 @@ int u_uname(UTSNAME *up) noex {
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (u_uname) */
+
+int u_getauxinfo(char *rbuf,int rlen,int req) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf) {
+	    switch (req) {
+	    case usysauxinforeq_architecture:
+	    case usysauxinforeq_machine:
+	    case usysauxinforeq_platform:
+		rs = um.getauxinfo(rbuf,rlen,req) ;
+		len = rs ;
+		break ;
+	    default:
+		rs = ugetauxinfo(rbuf,rlen,req) ;
+		len = rs ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (u_getauxinfo) */
 
 
 /* local subroutines */
@@ -162,5 +192,16 @@ static int uuname_architecture(UTSNAME *up) noex {
 }
 /* end subroutine (uname_architecture) */
 #endif /* COMMENT */
+
+int umachiner::getauxinfo(char *rbuf,int rlen,int req) noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	(void) rbuf ;
+	(void) rlen ;
+	(void) req ;
+
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (umachiner::getauxcache) */
 
 

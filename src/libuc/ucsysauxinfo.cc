@@ -48,8 +48,6 @@
 
 /* imported namespaces */
 
-using usys::usysauxinfo ;		/* subroutines */
-
 
 /* local typedefs */
 
@@ -75,7 +73,7 @@ using usys::usysauxinfo ;		/* subroutines */
 /* exported subroutines */
 
 int uc_sysauxinfo(char *rbuf,int rlen,int req) noex {
-	return usysauxinfo(rbuf,rlen,req) ;
+	return u_sysauxinfo(rbuf,rlen,req) ;
 }
 
 

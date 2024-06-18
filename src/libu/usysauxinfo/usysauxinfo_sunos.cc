@@ -29,6 +29,7 @@
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 #include	<sys/types.h>
+#include	<sys/systeminfo.h>	/* <- where the stuff we want is */
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
@@ -44,7 +45,7 @@
 using namespace	libu ;
 
 namespace usysauxinfo {
-    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
+    sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    int		r = -1 ;
@@ -74,7 +75,7 @@ namespace usysauxinfo {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (usysauxinfo) */
+    } /* end subroutine (ugetauxinfo) */
 }
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */

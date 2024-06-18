@@ -43,7 +43,7 @@
 using namespace	libu ;
 
 namespace usysauxinfo {
-    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
+    sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    ccar	*vp = nullptr ;
@@ -67,7 +67,7 @@ namespace usysauxinfo {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (usysauxinfo) */
+    } /* end subroutine (ugetauxinfo) */
 }
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
