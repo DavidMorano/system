@@ -645,6 +645,7 @@ int userinfo::findutmp_stat(uid_t uid) noex {
 	} /* end if (sncpy) */
 	return (rs >= 0) ? len : rs ;
 }
+/* end method (userinfo::findutmp_stat) */
 
 int userinfo::finduid(uid_t uid) noex {
 	int		rs = SR_OK ;

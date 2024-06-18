@@ -59,6 +59,9 @@
 using std::endian ;			/* enumeration */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 

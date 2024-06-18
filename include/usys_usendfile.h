@@ -1,7 +1,7 @@
-/* usys_ugetnisdom HEADER */
+/* usys_usendfile HEADER */
 /* lang=C20 */
 
-/* operating support for retrieving the NIS domain-name */
+/* operating support for the common |sendfile(3c)| subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -17,42 +17,45 @@
 /*******************************************************************************
 
 	Name:
-	ugetnisdom
+	usendfile
 
 	Description:
-	This provides a means to get the NIS domain-name from the
-	operating system in an OS-independent way by regualr callers.
+	This follows the version on both Linux and Solaris® (and
+	its derivatives).
 
 	Synosis:
-	int ugetnisdom(char *rbuf,int rlen) noex
+	int usendfile(int fd,int s,off_t fo,size_t c) noex
 
 	Arguments:
-	rbuf		result buffer pointer
-	rlen		result buffer length
+	fd		file-descriptor (to read from)
+	s		socket (to write to)
+	fo		starting file offset
+	c		count of bytes to send
 
 	Returns:
 	>=0		length of result
-	<0		error code (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
-#ifndef	USYSUGETNISDOM_INCLUDE
-#define	USYSUGETNISDOM_INCLUDE
+#ifndef	USYSUSENDFILE_INCLUDE
+#define	USYSUSENDFILE_INCLUDE
 #ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<dirent.h>		/* |dirent| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
 
-namespace libu {
-    extern sysret_t ugetnisdom(char *,int) noex ;
+namespace usys {
+    extern sysret_t usendfile(int,int,off_t,size_t) noex ;
 }
 
 
 #endif /* __cplusplus */
-#endif /* USYSUGETNISDOM_INCLUDE */
+#endif /* USYSUSENDFILE_INCLUDE */
 
 

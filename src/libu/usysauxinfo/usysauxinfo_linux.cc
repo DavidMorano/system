@@ -40,11 +40,9 @@
 
 #include	"usysauxinfo_linux.h"
 
+using namespace	libu ;
 
-/* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
-
-namespace usys {
+namespace usysauxinfo {
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
@@ -53,6 +51,9 @@ namespace usys {
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
 	 	vp = "x86_64" ;
+		break ;
+	    case SAI_MACHINE:
+	 	vp = "Intel(R) Core(TM) i7" ;
 		break ;
 	    case SAI_PLATFORM:
 	 	vp = "Mac-Mini" ;
@@ -68,10 +69,6 @@ namespace usys {
 	return rs ;
     } /* end subroutine (usysauxinfo) */
 }
-
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
-
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
 /* USYSAUXINFO_LINUX finish */

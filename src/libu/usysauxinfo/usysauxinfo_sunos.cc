@@ -41,11 +41,9 @@
 
 #include	"usysauxinfo_sunos.h"
 
+using namespace	libu ;
 
-/* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
-
-namespace usys {
+namespace usysauxinfo {
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
@@ -54,6 +52,9 @@ namespace usys {
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
 		r = SI_ARCHITECTURE ;
+		break ;
+	    case SAI_MACHINE:
+		r = SI_MACHINE ;
 		break ;
 	    case SAI_PLATFORM:
 		r = SI_PLATFORM ;
@@ -75,10 +76,6 @@ namespace usys {
 	return rs ;
     } /* end subroutine (usysauxinfo) */
 }
-
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
-
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYSAUXINFO_SUNOS finish */

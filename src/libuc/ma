@@ -80,14 +80,16 @@ function getflags {
 }
 
 
+: ${ARCHITECTURE:=$( architecture )}
 : ${SYSNAME:=$( uname -s )}
 : ${RELEASE:=$( uname -r )}
-: ${ARCHITECTURE:=$( uname -p )}
-export SYSNAME RELEASE ARCHITECTURE
+export ARCHITECTURE SYSNAME RELEASE 
 
 : ${OSNAME:=${SYSNAME}}
+: ${OSTYPE:=$( systype )}
+: ${OSRELEASE:=${RELEASE%%.*}}
 : ${OSNUM:=${RELEASE%%.*}}
-export OSNAME OSNUM
+export OSNAME OSRELEASE OSNUM
 
 
 # compile for a library 

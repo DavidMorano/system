@@ -251,6 +251,9 @@ static constexpr MAPEX	mapexs[] = {
 constexpr int		maxpathlen = MAXPATH ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int main(int argc,mainv argv,mainv envv) noexcept {

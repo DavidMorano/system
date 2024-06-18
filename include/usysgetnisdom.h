@@ -47,7 +47,7 @@
 #include	<utypealiases.h>
 
 
-namespace usys {
+namespace libu {
     extern sysret_t ugetnisdom(char *,int) noex ;
 }
 

@@ -81,7 +81,8 @@ extern "C" {
     extern unixret_t getdomainname(char *,int) noex ;
 }
 
-sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+namespace libu {
+    sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = getdomainname(rbuf,rlen)) >= 0) {
 	    rbuf[rlen] = '\0' ;
@@ -89,22 +90,29 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
+    }
 }
 
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+namespace libu {
+    sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	return local_ugetnisdom(rbuf,rlen) ;
+    }
 }
 
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
-sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
+namespace libu {
+    sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	return local_ugetnisdom(rbuf,rlen) ;
+    }
+}
 
 #else
 
-sysret_t ugetnisdom(char *rbuf,int rlen) noex {
+namespace libu {
+    sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	errno_t		ec = EFAULT ;
 	if (rbuf) {
 	    ec = EINVAL ;
@@ -114,6 +122,7 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
 	return (- ec) ;
+    }
 }
 
 #endif /* which operating system */

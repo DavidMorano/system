@@ -33,20 +33,8 @@
 
 /* general operating-system definitions */
 
-#ifndef	OSNAME
-#define	OSNAME				Darwin
-#endif
-
 #ifndef	OSNAME_Darwin
 #define	OSNAME_Darwin			19
-#endif
-
-#ifndef	OSNUM
-#define	OSNUM				19
-#endif
-
-#ifndef	OSTYPE_SYSV
-#define	OSTYPE_SYSV			0
 #endif
 
 /* compilation environment definitions */

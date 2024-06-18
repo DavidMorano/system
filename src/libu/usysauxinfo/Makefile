@@ -112,6 +112,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_usysauxinfo.o:	$(OBJ0_UCSYSAUXINFO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYSAUXINFO)
 

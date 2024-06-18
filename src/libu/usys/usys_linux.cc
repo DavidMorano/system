@@ -38,33 +38,6 @@
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 
-sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
-	csize		rsz = size_t(rlen+1) ;
-	int		rs ;
-	if ((rs = getdomainname(rbuf,rsz)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end subroutine (linux_ugetnisdom) */
-
-
-#else /* other operating systems */
-
-
-sysret_t linux_ugetnisdom(char *rbuf,int rlen) noex {
-	errno_t		ec = EFAULT ;
-	if (rbuf) {
-	    ec = EINVAL ;
-	    if (rlen >= 0) {
-		ec = ENOSYS ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-	return (- ec) ;
-}
-/* end subroutine (linux_ugetnisdom) */
-
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
 /* USYS_LINUX finish */

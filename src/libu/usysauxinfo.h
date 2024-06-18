@@ -27,14 +27,16 @@
 #include	<usysauxinforeqs.h>
 
 
+/* System-Auxillary-Information (SAI) */
 #define	SAI_ARCHITECTURE	usysauxinforeq_architecture
+#define SAI_MACHINE		usysauxinforeq_machine
 #define	SAI_PLATFORM		usysauxinforeq_platform
 #define	SAI_HWPROVIDER		usysauxinforeq_hwprovider
 #define SAI_HWSERIAL		usysauxinforeq_hwserial
-#define SAI_SRPCDOMAIN		usysauxinforeq_srpcdomain
+#define SAI_RPCDOMAIN		usysauxinforeq_rpcdomain
 
 
-namespace usys {
+namespace usysauxifo {
     extern int usysauxinfo(char *,int,int) noex ;
 }
 

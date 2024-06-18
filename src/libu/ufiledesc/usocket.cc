@@ -69,6 +69,18 @@
 	>=0	OK
 	<0	error code (system-return)
 
+	Notes:
+	On the |sendfile(3c)| subroutine signature, although Apple
+	Darwin pretty much claims that they invented this interface,
+	no one else has an interface (function signature) that
+	matches that on Darwin.  Both Linux and Solaris® (and its
+	derivatives) both have the signature that I am provinding 
+	below.  The Apple Darwin subroutine (signature) is a sort
+	of "IO-vector" flavored animal.  In as such, it is a superset
+	of what everyone else has implemented.  Solaris® has implemented
+	a seperate "IO-vector" flavored version, but theirs is
+	called |sendfilev(3c)| (good for Solaris®).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -98,6 +110,7 @@
 /* imported namespaces */
 
 using namespace	ufiledesc ;		/* namespace */
+using namespace	usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
 
@@ -185,7 +198,6 @@ namespace {
 	int isend(int) noex ;
 	int isendmsg(int) noex ;
 	int isendto(int) noex ;
-	int isendfile(int) noex ;
 	int irecv(int) noex ;
 	int irecvmsg(int) noex ;
 	int irecvfrom(int) noex ;
@@ -194,16 +206,13 @@ namespace {
     struct usender : usocket {
 	usender_m	m = nullptr ;
 	SFHDTR		*hdrp ;
-	off_t		*fop ;
 	off_t		fo ;
+	size_t		c ;
 	int		s ;
-	int		fl ;
-	usender(int as,off_t afo,off_t *afop,SFHDTR *ap,int afl) noex {
+	usender(int as,off_t afo,size_t ac) noex {
 	    s = as ;
 	    fo = afo ;
-	    fop = afop ;
-	    hdrp = ap ;
-	    fl = afl ;
+	    c = ac ;
 	} ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
@@ -311,10 +320,10 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 }
 /* end subroutine (u_sendto) */
 
-int u_sendfile(int fd,int s,off_t fo,off_t *fop,SFHDTR *hdrp,int fl) noex {
+int u_sendfile(int fd,int s,off_t fo,size_t c) noex {
 	int		rs = SR_FAULT ;
-	if (fop) {
-	    usender	so(s,fo,fop,hdrp,fl) ;
+	if (fo >= 0) {
+	    usender	so(s,fo,c) ;
 	    so.m = &usender::isendfile ;
 	    rs = so(fd) ;
 	}
@@ -512,11 +521,7 @@ int usocket::ishutdown(int fd) noex {
 /* end method (usocket::ishutdown) */
 
 int usender::isendfile(int fd) noex {
-	int		rs ;
-	if ((rs = sendfile(fd,s,fo,fop,hdrp,fl)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
+	return usendfile(fd,s,fo,c) ;
 }
 /* end method (usender::isendfile) */
 

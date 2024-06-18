@@ -132,17 +132,43 @@ int memclear(void *vp,size_t sz) noex {
 }
 /* end subroutine (memclear) */
 
+namespace libu {
+    char *strwcpy(char *dp,cchar *sp,int sl) noex {
+	if (sl >= 0) {
+	    while (sl-- && *sp) *dp++ = *sp++ ;
+	} else {
+	    while (*sp) *dp++ = *sp++ ;
+	} /* end if */
+	*dp = '\0' ;
+	return dp ;
+    }
+}
 
-/* local subroutines */
-
-namespace usys {
-    int sncpy(char *dbuf,int dlen,cchar *sp) noex {
+namespace libu {
+    int sncpy1(char *dbuf,int dlen,cchar *sp) noex {
 	csize		dsz = (dlen + 1) ;
 	int		rs ;
 	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
 	    rs = SR_OVERFLOW ;
 	} else {
 	    rs = int(rsz & INT_MAX) ;
+	}
+	return rs ;
+    }
+    int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
+	int		rs ;
+	if (dl >= 0) {
+	    if (sl >= 0) {
+	        if (sl > dl) {
+	            rs = sncpy1(dp,dl,sp) ;
+	        } else {
+	            rs = strwcpy(dp,sp,sl) - dp ;
+		}
+	    } else {
+	        rs = sncpy1(dp,dl,sp) ;
+	    }
+	} else {
+	    rs = strwcpy(dp,sp,sl) - dp ;
 	}
 	return rs ;
     }
@@ -169,6 +195,9 @@ namespace usys {
 	return rs ;
     }
 }
+
+
+/* local subroutines */
 
 static int isleep(int mto) noex {
 	POLLFD		fds[1] = {} ;

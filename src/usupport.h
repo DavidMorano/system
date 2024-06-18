@@ -112,10 +112,15 @@ EXTERNC_end
 
 
 #ifdef	__cplusplus
-namespace usys {
-    extern int sncpy(char *,int,cchar *) noex ;
+namespace libu {
+    extern int snwcpy(char *,int,cchar *,int = -1) noex ;
+    extern int sncpy1(char *,int,cchar *) noex ;
+    extern char *strwcpy(char *,cchar *,int) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
+    static inline int sncpy(char *dp,int dl,cchar *sp) noex {
+	return sncpy1(dp,dl,sp) ;
+    }
 }
 #endif /* __cplusplus */
 

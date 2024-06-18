@@ -1,7 +1,7 @@
 /* usysauxinforeqs HEADER */
 /* lang=C20 */
 
-/* UNIX® system-auxillary-information */
+/* UNIX® System-Auxillary-Information (SAI) */
 /* version %I% last-modified %G% */
 
 
@@ -52,12 +52,14 @@
 #include	<utypealiases.h>
 
 
+/* System-Auxillary-Information (SAI) */
 enum usysauxinforeqs {
 	usysauxinforeq_architecture,
+	usysauxinforeq_machine,
 	usysauxinforeq_platform,
 	usysauxinforeq_hwprovider,
 	usysauxinforeq_hwserial,
-	usysauxinforeq_srpcdomain,
+	usysauxinforeq_rpcdomain,
 	usysauxinforeq_overlast
 } ;
 

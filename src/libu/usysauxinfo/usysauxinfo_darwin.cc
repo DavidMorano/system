@@ -30,49 +30,73 @@
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
+#include	<sys/sysctl.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cerrno>
+#include	<new>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usupport.h>
+#include	<intsat.h>
 
 #include	"usysauxinfo_darwin.h"
 
+using namespace	libu ;
 
-/* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
+static int	usysctl(char *rbuf,int rlen,cchar *req) noex ;
 
-namespace usys {
+namespace usysauxinfo {
     sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    cchar	*vp = nullptr ;
-	    rs = SR_NOENT ;
+	    cchar	*name = nullptr ;
+	    rs = SR_OK ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
-	 	vp = "x86_64" ;
+		name = "hw.machine" ;
+		break ;
+	    case SAI_MACHINE:
+		name = "machdep.cpu.brand_string" ;
 		break ;
 	    case SAI_PLATFORM:
-	 	vp = "Mac-Mini" ;
+		name = "hw.model" ;
 		break ;
 	    case SAI_HWPROVIDER:
 	 	vp = "Apple" ;
 		break ;
+	    default:
+		rs = SR_NOTFOUND ;
+		break ;
 	    } /* end switch */
-	    if (vp) {
-		rs = sncpy(rbuf,rlen,vp) ;
-	    }
+	    if (rs >= 0) {
+		if (name) {
+		    rs = usysctl(rbuf,rlen,name) ;
+	        } else if (vp) {
+		    rs = sncpy(rbuf,rlen,vp) ;
+	        }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (usysauxinfo) */
 }
 
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
-
+static sysret_t usysctl(char *obuf,int olen,cchar *name) noex {
+ 	cnullptr    	np{} ;
+	int		rs ;
+	int		len = 0 ;
+        size_t  	osz = olen ;
+        if ((rs = sysctlbyname(name,obuf,&osz,np,0z)) >= 0) {
+            len = intsat(osz) ;
+            obuf[len] = '\0' ;
+        } else {
+                rs = (- errno) ;
+        }
+	return (rs >= 0) ? len : rs ;
+}
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYSAUXINFO_DARWIN finish */

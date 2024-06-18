@@ -61,7 +61,7 @@
 
 /* imported namespaces */
 
-using namespace	usys ;			/* namespace */
+using namespace	libu ;			/* namespace */
 
 
 /* local typedefs */

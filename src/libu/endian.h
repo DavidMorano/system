@@ -46,7 +46,7 @@ extern cchar	*endianstr ;
 
 #ifdef	__cplusplus
 
-#include	<bit>
+#include	<bit>			/* |endian(3c++)| */
 
 struct machendianinfo {
 	cbool islittle	= (std::endian::native == std::endian::little) ;
