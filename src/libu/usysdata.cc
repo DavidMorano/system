@@ -97,6 +97,7 @@ namespace {
 	~umachiner() {
 	    delete mbuf ;
 	    mbuf = nullptr ;
+	    mlen = 0 ;
  	} ;
 	int setup() noex ;
     private:
@@ -112,7 +113,7 @@ namespace {
 	~datobj() {
 	    (void) finish() ;
  	} ;
-    } ;
+    } ; /* end struct (datobj) */
 }
 
 
@@ -139,6 +140,8 @@ constexpr int		reqs[] = {
 } ;
 
 constexpr int		datlen = REALNAMELEN ;
+
+constexpr cchar		defmachine[] = "Intel(R) Core(TM) i7" ;
 
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
@@ -200,29 +203,12 @@ static int uuname_machine(UTSNAME *up) noex {
 	    if_constexpr (f_darwin) {
 	        rs = ugetauxinfo(mbuf,mlen,reqs[1]) ;
 	    } else {
-	        cchar	*sp = "Intel(R) Core(TM) i7" ;
-	        rs = sncpy(mbuf,mlen,sp) ;
+	        rs = sncpy(mbuf,mlen,defmachine) ;
 	    }
 	} /* end if (compared equal) */
 	return rs ;
 }
 /* end subroutine (uname_machine) */
-
-#ifdef	COMMENT
-static int uuname_architecture(UTSNAME *up) noex {
-	cint		alen = (sizeof(up->architecture)-1) ;
-	int		rs = SR_OK ;
-	cchar		*abuf = up->architecture ;
-	if_constexpr (f_darwin) {
-	    if (strcmp(abuf,"i386") == 0) {
-		cchar	*sp = "x86_64" ;
-	        rs = sncpy(abuf,alen,sp) ;
-	    }
-	} /* end if_constexpr (f_darwin) */
-	return rs ;
-}
-/* end subroutine (uname_architecture) */
-#endif /* COMMENT */
 
 static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 	static cint	rsx = setup_sysauxinfo() ;
@@ -259,9 +245,9 @@ int umachiner::setup() noex {
 	int		rs1 ;
 	if ((rs = dob.start()) >= 0) {
 	    if ((rs = dob.load()) >= 0) {
-		cint	sz = (rs + 1) ;
+		mlen = rs ;
 		rs = SR_NOMEM ;
-		if ((mbuf = new(nothrow) char[sz]) != nullptr) {
+		if ((mbuf = new(nothrow) char[mlen+1]) != nullptr) {
 		    char	*bp = mbuf ;
 		    rs = SR_OK ;
 		    for (int i = 0 ; i < nitems ; i += 1) {
@@ -304,10 +290,11 @@ int datobj::start() noex {
 /* end method (datobj::start) */
 
 int datobj::finish() noex {
-	int		rs = SR_OK ;
+	int		rs = SR_NOTOPEN ;
 	if (a) {
 	    delete [] a ;
 	    a = nullptr ;
+	    rs = SR_OK ;
 	}
 	return rs ;
 }

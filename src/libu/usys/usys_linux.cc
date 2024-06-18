@@ -24,6 +24,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+
+#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
+
+
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
@@ -34,8 +38,6 @@
 #include	<utypealiases.h>
 
 #include	"usys_linux.h"
-
-#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 
 

@@ -41,7 +41,7 @@
 EXTERNC_begin
 
 extern int u_uname(UTSNAME *) noex ;
-extern int u_sysauxinfo(char *,int,int) noex ;
+extern int u_getauxinfo(char *,int,int) noex ;
 
 EXTERNC_end
 

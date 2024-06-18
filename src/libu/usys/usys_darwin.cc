@@ -24,7 +24,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+
+/* USYS_DARWIN start */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+
+
 #include	<sys/types.h>
+#include	<sys/mman.h>
+#include	<unistd.h>		/* |getdomainname(3darwin)| */
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
@@ -34,13 +41,6 @@
 #include	<intsat.h>
 
 #include	"usys_darwin.h"
-
-
-/* USYS_DARWIN start */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-
-#include	<sys/mman.h>
-#include	<unistd.h>		/* |getdomainname(3darwin)| */
 
 
 /*----------------------------------------------------------------------------*/

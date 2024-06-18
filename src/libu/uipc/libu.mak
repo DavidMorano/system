@@ -250,9 +250,10 @@ intsat.o:		intsat.cc intsat.h
 mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
 
-utimeout.o:		utimeout.c utimeout.h
-utimeouts.o:		utimeouts.cc utimeouts.h
-usupport.o:		usupport.cc usupport.h
+utimeout.o:		utimeout.c utimeout.h		$(INCS)
+utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
+usupport.o:		usupport.cc usupport.h		#(INCS)
+usysdata.o:		usysdata.cc usysdata.h		$(INCS)
 
 # USYS
 usys.o:			usys.dir

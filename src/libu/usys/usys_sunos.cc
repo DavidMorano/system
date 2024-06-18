@@ -21,6 +21,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+
+/* USYS_SUNOS start */
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+
+
+#include	<sys/systeminfo.h>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<clanguage.h>
@@ -30,10 +36,6 @@
 
 #include	"usys.h"
 
-/* USYS_SUNOS start */
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-
-#include	<sys/systeminfo.h>
 
 static sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;

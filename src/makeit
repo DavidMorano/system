@@ -8,6 +8,18 @@ BUILDTYPE=develope
 #BUILDTYPE=deliver
 
 
+: ${ARCHITECTURE:=$( architecture )}
+: ${SYSNAME:=$( uname -s )}
+: ${RELEASE:=$( uname -r )}
+export ARCHITECTURE SYSNAME RELEASE 
+
+: ${OSNAME:=${SYSNAME}}
+: ${OSTYPE:=$( systype )}
+: ${OSRELEASE:=${RELEASE%%.*}}
+: ${OSNUM:=${RELEASE%%.*}}
+export OSNAME OSTYPE OSRELEASE OSNUM
+
+
 : ${CGS_BINDIR:=${REPOROOT}/bin}
 : ${CGS_INCDIR:=${REPOROOT}/include}
 : ${CGS_CRTDIR:=${REPOROOT}/lib}
@@ -78,21 +90,6 @@ function getflags {
     fi
   fi
 }
-
-
-: ${ARCHITECTURE:=$( architecture )}
-: ${SYSNAME:=$( uname -s )}
-: ${RELEASE:=$( uname -r )}
-export ARCHITECTURE SYSNAME RELEASE 
-
-: ${OSNAME:=${SYSNAME}}
-: ${OSTYPE:=$( systype )}
-: ${OSRELEASE:=${RELEASE%%.*}}
-: ${OSNUM:=${RELEASE%%.*}}
-export OSNAME OSRELEASE OSNUM
-
-
-# compile for a library 
 
 case ${OSNAME}:${OSNUM} in
 Darwin:*)
