@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -37,14 +37,17 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= sfx.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -62,7 +65,6 @@ OBJ4_SFX= sfcasesub.o sfsubstance.o sfthing.o
 OBJ5_SFX= sfwhitedot.o sfword.o sfprogname.o
 OBJ6_SFX= sfnext.o sfnextqtok.o sfkeyval.o 
 OBJ7_SFX= sfsign.o
-
 
 OBJA_SFX= obj0_sfx.o obj1_sfx.o
 OBJB_SFX= obj2_sfx.o obj3_sfx.o

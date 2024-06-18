@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP= cpp
@@ -37,14 +37,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= ucenum.h ucenumxx.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -104,6 +107,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_ucenum.o:	$(OBJ0_UCENUM)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCENUM)

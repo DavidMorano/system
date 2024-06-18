@@ -16,6 +16,7 @@ LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -44,10 +45,10 @@ LIBS +=
 
 INCDIRS +=
 
-LDRATPH=
-
-
 LIBDIRS += -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -62,7 +63,6 @@ OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
 OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
 OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
 OBJ4_SIX= sifext.o
-
 
 OBJA_SIX= obj0_six.o obj1_six.o
 OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
@@ -112,6 +112,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_six.o:	$(OBJ0_SIX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)

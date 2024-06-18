@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -37,9 +37,7 @@ LINT=	lint
 
 DEFS +=
 
-
 INCS += pow.h
-
 
 LIBS +=
 
@@ -47,6 +45,9 @@ LIBS +=
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -61,7 +62,6 @@ OBJ1_POW=
 OBJ2_POW= 
 OBJ3_POW= 
 OBJ4_POW= 
-
 
 OBJA_POW= obj0_pow.o
 OBJB_POW=
@@ -111,6 +111,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_pow.o:	$(OBJ0_POW)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_POW)

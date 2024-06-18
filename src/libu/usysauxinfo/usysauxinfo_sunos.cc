@@ -44,6 +44,8 @@
 
 using namespace	libu ;
 
+static sysret_t sunos_getauxinfo(char *,int,int) noex ;
+
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -71,11 +73,22 @@ namespace usysauxinfo {
 		break ;
 	    } /* end switch */
 	    if (r >= 0) {
-		rs = u_sysauxinfo(rbuf,rlen,r) ; /* Solaris® specific */
+		rs = sunos_getauxinfo(rbuf,rlen,r) ; /* Solaris® specific */
 	    }
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetauxinfo) */
+}
+
+static sysret_t sunos_getauxinfo(char *rbuf,int rlen,int req) noex {
+	csize		rsz(rlen + 1) ;
+	int		rs ;
+	if ((rs = sysinfo(req,rbuf,rsz)) > rsz) {
+	    rs = SR_OVERFLOW ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
 }
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */

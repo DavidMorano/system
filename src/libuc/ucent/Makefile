@@ -16,6 +16,7 @@ LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP= cpp
@@ -37,14 +38,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= ucent.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -103,6 +107,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_ucent.o:	$(OBJ0_UCENT)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCENT)

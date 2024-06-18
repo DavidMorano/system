@@ -6,5 +6,5 @@ all users -- located in the '/Users' directory -- have:
 	"Public/Drop Box"
 	"rje"
 
-all both existing and with the proper permissions.
+and all existing and with the proper permissions.
 

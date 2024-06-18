@@ -41,8 +41,8 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename T>
-int memclear(T *op) noex {
-	cint	osz = sizeof(T) ;
+inline int memclear(T *op) noex {
+	csize	osz = sizeof(T) ;
 	return memclear(op,osz) ;
 }
 
@@ -55,7 +55,7 @@ int memclear(T *op) noex {
 #ifdef	__cplusplus
 
 template<typename T>
-void *memcpy(T *dp,void *sp) noex {
+inline void *memcpy(T *dp,void *sp) noex {
 	csize	dsz = sizeof(T) ;
 	return memcpy(dp,sp,dsz) ;
 }

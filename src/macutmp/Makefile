@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
 
-
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+RUNDIR= $(USRLOCAL)/lib
+
 
 CPP=	cpp
 CC=	gcc
@@ -41,12 +41,12 @@ INCS=
 LIBS= -lmacuser -lu
 
 
-LDRPATH= $(EXTRA)/lib
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
 
-LDRPATH=
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -80,7 +80,7 @@ all:			$(ALL)
 
 
 $(T).x:			$(OBJ_UTMP)
-	$(LD) $(LDFLAGS) -o $@ $(LIBDIRS) $(LIBS) $(OBJ_UTMP)
+	$(LD) -o $@ $(LDFLAGS) $(OBJ_UTMP) $(LIBINFO)
 
 $(T).o:			$(OBJ_UTMP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UTMP)
