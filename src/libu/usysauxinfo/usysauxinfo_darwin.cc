@@ -30,7 +30,7 @@
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
-#include	<sys/sysctl.h>
+#include	<sys/sysctl.h>		/* <- Darwin |sysctl(3c)| */
 #include	<unistd.h>
 #include	<climits>
 #include	<cerrno>
@@ -46,7 +46,7 @@
 
 using namespace	libu ;
 
-static int	usysctl(char *rbuf,int rlen,cchar *req) noex ;
+using libu::darwin_usysctl ;
 
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
@@ -74,7 +74,7 @@ namespace usysauxinfo {
 	    } /* end switch */
 	    if (rs >= 0) {
 		if (name) {
-		    rs = usysctl(rbuf,rlen,name) ;
+		    rs = darwin_usysctl(rbuf,rlen,name) ;
 	        } else if (vp) {
 		    rs = sncpy(rbuf,rlen,vp) ;
 	        }
@@ -82,20 +82,6 @@ namespace usysauxinfo {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetauxinfo) */
-}
-
-static sysret_t usysctl(char *obuf,int olen,cchar *name) noex {
- 	cnullptr    	np{} ;
-	int		rs ;
-	int		len = 0 ;
-        size_t  	osz = olen ;
-        if ((rs = sysctlbyname(name,obuf,&osz,np,0z)) >= 0) {
-            len = intsat(osz) ;
-            obuf[len] = '\0' ;
-        } else {
-                rs = (- errno) ;
-        }
-	return (rs >= 0) ? len : rs ;
 }
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */

@@ -204,7 +204,7 @@ int ucsysconf::mconfsys(int req) noex {
 	errno = 0 ;
 	if ((result = sysconf(req)) >= 0) {
 	    if (lp) *lp = result ;
-	    rs = int(result & INT_MAX) ;
+	    rs = intsat(result) ;
 	} else {
 	    rs = (errno) ? (- errno) : SR_NOTSUP ;
 	}

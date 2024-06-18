@@ -19,15 +19,20 @@
 
 	Name:
 	u_uname
+	u_getauxinfo
 
 	Description:
 	Retrieve some operating system and machine information.
 
 	Synopsis:
 	int u_uname(UTSNAME up) noex
+	int u_getauxinfo(char *rbuf,int rlen,int req) noex
 
 	Arguments:
 	up		UTSNAME object pointer
+	rbuf		result buffer pointer
+	rlen		result buffer length
+	req		request code
 
 	Returns:
 	>=0		OK
@@ -52,7 +57,7 @@
 #include	<usysflag.h>
 #include	<usupport.h>
 #include	<usysauxinfo.h>		/* the request codes */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"usysdata.h"
 
@@ -62,8 +67,12 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using libu::sncpy ;			/* subroutine */
+using libu::snwcpy ;			/* subroutine */
+using libu::strwcpy ;			/* subroutine */
 using usysauxinfo::ugetauxinfo ;	/* subroutine */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -80,6 +89,7 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 /* local structures */
 
 namespace {
+    constexpr int	nitems = 3 ;
     struct umachiner {
 	cchar		*architecture ;
 	cchar		*machine ;
@@ -88,17 +98,29 @@ namespace {
 	    delete mbuf ;
 	    mbuf = nullptr ;
  	} ;
-	int getauxinfo(char *,int,int) noex ;
+	int setup() noex ;
     private:
 	char		*mbuf = nullptr ;
 	int		mlen ;
     } ; /* end struct (umachiner) */
+    struct datobj {
+	char		*s[nitems] ;
+	char		*a ;
+	int start() noex ;
+	int finish() noex ;
+	int load() noex ;
+	~datobj() {
+	    (void) finish() ;
+ 	} ;
+    } ;
 }
 
 
 /* forward references */
 
+static int local_getauxinfo(char *,int,int) noex ;
 static int uuname_machine(UTSNAME *) noex ;
+static int setup_sysauxinfo() noex ;
 
 
 /* local variables */
@@ -109,6 +131,14 @@ static constexpr uname_f	usubs[] = {
 } ;
 
 static umachiner	um ;
+
+constexpr int		reqs[] = {
+	SAI_ARCHITECTURE,
+	SAI_MACHINE,
+	SAI_PLATFORM
+} ;
+
+constexpr int		datlen = REALNAMELEN ;
 
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
@@ -146,7 +176,7 @@ int u_getauxinfo(char *rbuf,int rlen,int req) noex {
 	    case usysauxinforeq_architecture:
 	    case usysauxinforeq_machine:
 	    case usysauxinforeq_platform:
-		rs = um.getauxinfo(rbuf,rlen,req) ;
+		rs = local_getauxinfo(rbuf,rlen,req) ;
 		len = rs ;
 		break ;
 	    default:
@@ -167,12 +197,13 @@ static int uuname_machine(UTSNAME *up) noex {
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
 	if (strcmp(mbuf,"x86_64") == 0) {
-	    cchar	*sp = "Intel" ;
 	    if_constexpr (f_darwin) {
-	        sp = "Apple-Macintosh-Intel" ;
+	        rs = ugetauxinfo(mbuf,mlen,reqs[1]) ;
+	    } else {
+	        cchar	*sp = "Intel(R) Core(TM) i7" ;
+	        rs = sncpy(mbuf,mlen,sp) ;
 	    }
-	    rs = sncpy(mbuf,mlen,sp) ;
-	}
+	} /* end if (compared equal) */
 	return rs ;
 }
 /* end subroutine (uname_machine) */
@@ -193,15 +224,105 @@ static int uuname_architecture(UTSNAME *up) noex {
 /* end subroutine (uname_architecture) */
 #endif /* COMMENT */
 
-int umachiner::getauxinfo(char *rbuf,int rlen,int req) noex {
-	int		rs = SR_OK ;
+static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
+	static cint	rsx = setup_sysauxinfo() ;
+	int		rs ;
 	int		len = 0 ;
-	(void) rbuf ;
-	(void) rlen ;
-	(void) req ;
-
+	if ((rs = rsx) >= 0) {
+	    cchar	*valp = nullptr ;
+	    switch (req) {
+	    case usysauxinforeq_architecture:
+		valp = um.architecture ;
+		break ;
+	    case usysauxinforeq_machine:
+		valp = um.machine ;
+		break ;
+	    case usysauxinforeq_platform:
+		valp = um.platform ;
+		break ;
+	    } /* end switch */
+	    if (valp) {
+		rs = snwcpy(rbuf,rlen,valp) ;
+		len = rs ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end method (umachiner::getauxcache) */
+
+static int setup_sysauxinfo() noex {
+	return um.setup() ;
+}
+
+int umachiner::setup() noex {
+	datobj		dob ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = dob.start()) >= 0) {
+	    if ((rs = dob.load()) >= 0) {
+		cint	sz = (rs + 1) ;
+		rs = SR_NOMEM ;
+		if ((mbuf = new(nothrow) char[sz]) != nullptr) {
+		    char	*bp = mbuf ;
+		    rs = SR_OK ;
+		    for (int i = 0 ; i < nitems ; i += 1) {
+			cchar	*sp = dob.s[i] ;
+			switch (i) {
+			case 0:
+			    architecture = bp ;
+			    break ;
+			case 1:
+			    machine = bp ;
+			    break ;
+			case 2:
+			    platform = bp ;
+			    break ;
+			} /* end switch */
+			bp = (strwcpy(bp,sp) + 1) ;
+		    } /* end for */
+		} /* end if (memory-allocation) */
+	        rs1 = dob.finish() ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (dob.load) */
+	} /* end if (dataobj) */
+	return rs ;
+}
+/* end method (umachiner::setup) */
+
+int datobj::start() noex {
+	cnullptr	np{} ;
+	cint		sz = ((datlen + 1) * nitems) ;
+	int		rs = SR_NOMEM ;
+	if ((a = new(nothrow) char[sz]) != np) {
+	    cint	n = nitems ;
+	    rs = SR_OK ;
+	    for (int i = 0 ; i < n ; i += 1) {
+	        s[i] = (a + (i * (datlen + 1))) ;
+	    }
+	} /* end if (new-char) */
+	return rs ;
+}
+/* end method (datobj::start) */
+
+int datobj::finish() noex {
+	int		rs = SR_OK ;
+	if (a) {
+	    delete [] a ;
+	    a = nullptr ;
+	}
+	return rs ;
+}
+/* end method (datobj::finish) */
+
+int datobj::load() noex {
+	cint		n = nitems ;
+	int		rs = SR_OK ;
+	int		rsz = 0 ;
+	for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
+	    rs = ugetauxinfo(s[i],datlen,reqs[i]) ;
+	    rsz += (rs + 1) ;
+	} /* end for */
+	return (rs >= 0) ? rsz : rs ;
+}
+/* end method (datobj::load) */
 
 

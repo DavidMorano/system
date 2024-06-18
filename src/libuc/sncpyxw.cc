@@ -36,9 +36,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstring>
 #include	<cstdarg>
 #include	<utypedefs.h>
@@ -98,14 +96,14 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	int		rs = SR_FAULT ;
 	char		*bp = dp ;
 	if (dl < 0) dl = (INT_MAX - 1) ;
-	if (dp != NULL) {
+	if (dp) {
 	    va_list	ap ;
-	    int		rlen = (dl+1) ;
+	    size_t	rlen = (dl+1) ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    dp[0] = '\0' ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		int	ml ;
+		size_t	ml ;
 	        cc	*sp = (const char *) va_arg(ap,char *) ;
 	        if (i < (n-1)) {
 	            ml = strlcpy(bp,sp,rlen) ;

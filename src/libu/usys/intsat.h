@@ -23,8 +23,9 @@
 #include	<limits.h>
 #include	<stddef.h>
 #include	<stdint.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<stdintx.h>
 
 

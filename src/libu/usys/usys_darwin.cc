@@ -31,6 +31,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<intsat.h>
 
 #include	"usys_darwin.h"
 
@@ -115,6 +116,21 @@ errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 /* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
 
+namespace libu {
+    sysret_t darwin_usysctl(char *obuf,int olen,cchar *name) noex {
+ 	cnullptr    	np{} ;
+	int		rs ;
+	int		len = 0 ;
+        size_t  	osz = olen ;
+        if ((rs = sysctlbyname(name,obuf,&osz,np,0z)) >= 0) {
+            len = intsat(osz) ;
+            obuf[len] = '\0' ;
+        } else {
+            rs = (- errno) ;
+        }
+	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (usysctl) */
+}
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYS_DARWIN finish */
