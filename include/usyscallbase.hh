@@ -33,7 +33,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
 
 
 namespace libu {
@@ -46,7 +45,7 @@ namespace libu {
 	usyscallbaseflags	f{} ;
 	int		fd = 0 ;
 	usyscallbase() noex { } ;
-	virtual int callstd() noex ;
+	virtual int callstd() noex = 0 ;
 	int handler() noex ;
 	int uwrcheck() noex ;
     } ; /* end struct (usyscallbase) */

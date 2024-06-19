@@ -47,7 +47,7 @@
 #include	<envstandards.h>	/* MUST be frsit to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |gethostid(3c)| */
 #include	<poll.h>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
@@ -169,6 +169,14 @@ namespace libu {
 	    }
 	} else {
 	    rs = strwcpy(dp,sp,sl) - dp ;
+	}
+	return rs ;
+    }
+    sysret_t ugethostid(long *idp) noex {
+	int		rs = SR_FAULT ;
+	if (idp) {
+	    clong	res = gethostid() ;
+	    *idp = res ;
 	}
 	return rs ;
     }

@@ -39,6 +39,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usyscallbase.hh>
+#include	<usysrets.h>
 #include	<intsat.h>
 
 #include	"usys_darwin.h"

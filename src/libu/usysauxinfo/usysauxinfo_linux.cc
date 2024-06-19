@@ -42,6 +42,8 @@
 
 using namespace	libu ;
 
+extern ugetnisdom(char *,int) noex ;
+
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -60,6 +62,11 @@ namespace usysauxinfo {
 		break ;
 	    case SAI_HWPROVIDER:
 	 	vp = "Apple" ;
+		break ;
+	    case SAI_HWSERIAL:
+		break ;
+	    case SAI_RPCDOMAIN:
+		rs = ugetnisdom(rbuf,rlen) ;
 		break ;
 	    } /* end switch */
 	    if (vp) {

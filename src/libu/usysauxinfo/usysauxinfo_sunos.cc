@@ -68,7 +68,7 @@ namespace usysauxinfo {
 	    case SAI_HWSERIAL:
 		r = SI_HW_SERIAL ;
 		break ;
-	    case SAI_SRPCDOMAIN:
+	    case SAI_RPCDOMAIN:
 		r = SI_SRPC_DOMAIN ;
 		break ;
 	    } /* end switch */

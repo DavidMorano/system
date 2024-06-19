@@ -69,6 +69,11 @@ namespace usysauxinfo {
 	    case SAI_HWPROVIDER:
 	 	vp = "Apple" ;
 		break ;
+	    case SAI_HWSERIAL:
+		break ;
+	    case SAI_RPCDOMAIN:
+		name = "kern.nisdomainname" ;
+		break ;
 	    default:
 		rs = SR_NOTFOUND ;
 		break ;

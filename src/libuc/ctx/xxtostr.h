@@ -54,8 +54,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
-#include	<usystem.h>
+#include	<limits.h>		/* |LONG_MAX| */
+#include	<string.h>		/* |strlen(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<uvariables.hh>
 #include	<varnames.hh>
 #include	<stdintx.h>

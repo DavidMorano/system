@@ -118,6 +118,7 @@ namespace libu {
     extern int snwcpy(char *,int,cchar *,int = -1) noex ;
     extern int sncpy1(char *,int,cchar *) noex ;
     extern char *strwcpy(char *,cchar *,int = -1) noex ;
+    extern int ugethostid(long *) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
     static inline int sncpy(char *dp,int dl,cchar *sp) noex {

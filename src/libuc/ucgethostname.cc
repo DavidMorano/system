@@ -18,7 +18,6 @@
 
 	This subroutine gets the 'hostname' of the current machine.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -58,6 +57,11 @@
 
 
 /* exported subroutines */
+
+int uc_gethostid(long *lp) noex {
+	return u_gethostid(lp) ;
+}
+/* end subroutine (uc_gethostid) */
 
 int uc_gethostname(char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;

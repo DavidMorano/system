@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
 	u_uname
 	u_getauxinfo
 
@@ -45,10 +45,10 @@
 	during the entire time that the operating system is running.
 	So, why not cache those values?  On some platforms and
 	operating systems (like possibly on Apple Darwin) there can
-	be a substantial savings in caching some of these values
-	rather trying to extract them from the OS everytime they
-	are requested.  And YES, I recognize that if every caller
-	used the (so-called) UINFO interface (see |uinfo(3uc)|)
+	be a substantial time savings in caching some of these
+	values rather trying to extract them from the OS everytime
+	they are requested.  And YES, I recognize that if every
+	caller used the (so-called) UINFO interface (see |uinfo(3uc)|)
 	these values are even more cached and accessable through
 	that interface than they even are through this present
 	(below) caching interface.  I say, the more the merrier!
@@ -90,6 +90,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using libu::ugethostid ;		/* subroutine */
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
@@ -214,6 +215,11 @@ int u_getauxinfo(char *rbuf,int rlen,int req) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (u_getauxinfo) */
+
+int u_gethostid(long *idp) noex {
+	return ugethostid(idp) ;
 }
 /* end subroutine (u_getauxinfo) */
 

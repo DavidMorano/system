@@ -82,6 +82,12 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	if_consteval
+#define	if_consteval		if consteval
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	cast_static
 #define	cast_static		static_cast
 #define	cast_dynamic		dynamic_cast
