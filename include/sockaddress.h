@@ -40,7 +40,7 @@
 
 struct sockaddress_path {
 	ushort	naf ;			/* address space */
-	char	path[SOCKADDRESS_MAXPATH + 1] ;
+	char	fpath[SOCKADDRESS_MAXPATH + 1] ;
 } ;
 
 struct sockaddress_inet4 {

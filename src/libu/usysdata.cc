@@ -25,7 +25,7 @@
 	Retrieve some operating system and machine information.
 
 	Synopsis:
-	int u_uname(UTSNAME up) noex
+	int u_uname(UTSNAME *up) noex
 	int u_getauxinfo(char *rbuf,int rlen,int req) noex
 
 	Arguments:
@@ -38,24 +38,46 @@
 	>=0		OK
 	<0		error (system-return)
 
+	Notes:
+	Yes, a good bit (most of) the stuff below is the caching
+	mechanism for four of the possible requests.  Those four
+	requests are for information that will not (cannot) change
+	during the entire time that the operating system is running.
+	So, why not cache those values?  On some platforms and
+	operating systems (like possibly on Apple Darwin) there can
+	be a substantial savings in caching some of these values
+	rather trying to extract them from the OS everytime they
+	are requested.  And YES, I recognize that if every caller
+	used the (so-called) UINFO interface (see |uinfo(3uc)|)
+	these values are even more cached and accessable through
+	that interface than they even are through this present
+	(below) caching interface.  I say, the more the merrier!
+	Currently, or should I say originally (at the time of this
+	original writing), I am caching the following four request
+	values:
+	    usysauxinforeq_architecture
+	    usysauxinforeq_machine
+	    usysauxinforeq_platform
+	    usysauxinforeq_hwprovider
+	Enjoy!
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/utsname.h>
-#include	<fcntl.h>
-#include	<poll.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* <- for |strcmp(3c)| */
+#include	<utility>		/* |unreachable(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usysflag.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* <- most of |libu| namespace */
 #include	<usysauxinfo.h>		/* the request codes */
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
@@ -89,11 +111,12 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 /* local structures */
 
 namespace {
-    constexpr int	nitems = 3 ;
+    constexpr int	nitems = 4 ;
     struct umachiner {
 	cchar		*architecture ;
 	cchar		*machine ;
 	cchar		*platform ;
+	cchar		*hwprovider ;
 	~umachiner() {
 	    delete mbuf ;
 	    mbuf = nullptr ;
@@ -136,7 +159,8 @@ static umachiner	um ;
 constexpr int		reqs[] = {
 	SAI_ARCHITECTURE,
 	SAI_MACHINE,
-	SAI_PLATFORM
+	SAI_PLATFORM,
+	SAI_HWPROVIDER
 } ;
 
 constexpr int		datlen = REALNAMELEN ;
@@ -179,6 +203,7 @@ int u_getauxinfo(char *rbuf,int rlen,int req) noex {
 	    case usysauxinforeq_architecture:
 	    case usysauxinforeq_machine:
 	    case usysauxinforeq_platform:
+	    case usysauxinforeq_hwprovider:
 		rs = local_getauxinfo(rbuf,rlen,req) ;
 		len = rs ;
 		break ;
@@ -201,7 +226,8 @@ static int uuname_machine(UTSNAME *up) noex {
 	char		*mbuf = up->machine ;
 	if (strcmp(mbuf,"x86_64") == 0) {
 	    if_constexpr (f_darwin) {
-	        rs = ugetauxinfo(mbuf,mlen,reqs[1]) ;
+		cint	req = SAI_MACHINE ;
+	        rs = ugetauxinfo(mbuf,mlen,req) ;
 	    } else {
 	        rs = sncpy(mbuf,mlen,defmachine) ;
 	    }
@@ -225,6 +251,9 @@ static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 		break ;
 	    case usysauxinforeq_platform:
 		valp = um.platform ;
+		break ;
+	    case usysauxinforeq_hwprovider:
+		valp = um.hwprovider ;
 		break ;
 	    } /* end switch */
 	    if (valp) {
@@ -262,6 +291,11 @@ int umachiner::setup() noex {
 			case 2:
 			    platform = bp ;
 			    break ;
+			case 3:
+			    hwprovider = bp ;
+			    break ;
+			default:
+			    std::unreachable() ; /* <- stupid compiler */
 			} /* end switch */
 			bp = (strwcpy(bp,sp) + 1) ;
 		    } /* end for */

@@ -27,7 +27,7 @@
 	u_send
 	u_sendmsg
 	u_sendto
-	u_sendfile
+	u_sendfiler
 	u_recv
 	u_recvmsg
 	u_recvfrom
@@ -320,7 +320,7 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 }
 /* end subroutine (u_sendto) */
 
-int u_sendfile(int fd,int s,off_t fo,size_t c) noex {
+int u_sendfiler(int s,int fd,off_t fo,size_t c) noex {
 	int		rs = SR_FAULT ;
 	if (fo >= 0) {
 	    usender	so(s,fo,c) ;

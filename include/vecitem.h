@@ -25,22 +25,20 @@
 
 
 /* object defines */
-
 #define	VECITEM			struct vecitem_head
 #define	VECITEM_FL		struct vecitem_flags
 #define	VECITEM_CUR		struct vecitem_cursor
 #define	VECITEM_DEFENTS		10
 
 /* options */
-
-#define	VECITEM_ODEFAULT	0x0000
-#define	VECITEM_OREUSE		0x0001
-#define	VECITEM_OCOMPACT	0x0002		/* means NOHOLES */
-#define	VECITEM_OSWAP		0x0004
-#define	VECITEM_OSTATIONARY	0x0008
-#define	VECITEM_OCONSERVE	0x0010
-#define	VECITEM_OSORTED		0x0020
-#define	VECITEM_OORDERED	0x0040
+#define	VECITEM_ODEFAULT	0
+#define	VECITEM_OREUSE		(1 << 0)
+#define	VECITEM_OCOMPACT	(1 << 1)	/* means NOHOLES */
+#define	VECITEM_OSWAP		(1 << 2)
+#define	VECITEM_OSTATIONARY	(1 << 3)
+#define	VECITEM_OCONSERVE	(1 << 4)
+#define	VECITEM_OSORTED		(1 << 5)
+#define	VECITEM_OORDERED	(1 << 6)
 
 
 struct vecitem_flags {

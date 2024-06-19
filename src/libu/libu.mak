@@ -292,13 +292,12 @@ usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
+uvariables.o:		uvariables.cc uvariables.hh
 
 syswords.o:		syswords.cc syswords.hh
 varnames.o:		varnames.cc varnames.hh
 valuelims.o:		valuelims.cc valuelims.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
-
-uvariables.o:		uvariables.cc uvariables.hh
 
 timeval.o:		timeval.cc timeval.h
 itimerval.o:		itimerval.cc itimerval.h

@@ -144,10 +144,10 @@ int getostype() noex {
 
 static int mktype() noex {
 	int		rs ;
-	if_constexpr (f_darwin) {
-	    rs = ostype_darwin ;
-	} else if_constexpr (f_sunos) {
+	if_constexpr (f_sunos) {
 	    rs = ostype_sysv ;
+	} else if_constexpr (f_darwin) {
+	    rs = ostype_darwin ;
 	} else if_constexpr (f_linux) {
 	    rs = ostype_linux ;
 	} else {

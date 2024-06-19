@@ -27,7 +27,7 @@
 
 EXTERNC_begin
 
-    extern int uc_sysauxinfo(char *,int,int) noex ;
+extern int uc_sysauxinfo(char *,int,int) noex ;
 
 EXTERNC_end
 
