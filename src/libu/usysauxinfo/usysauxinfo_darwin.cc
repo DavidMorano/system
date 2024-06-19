@@ -46,8 +46,6 @@
 
 using namespace	libu ;
 
-using libu::darwin_usysctl ;
-
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -70,6 +68,7 @@ namespace usysauxinfo {
 	 	vp = "Apple" ;
 		break ;
 	    case SAI_HWSERIAL:
+		rs = loadhostid(rbuf,rlen) ;
 		break ;
 	    case SAI_RPCDOMAIN:
 		name = "kern.nisdomainname" ;

@@ -58,7 +58,7 @@
 
 /* exported subroutines */
 
-int uc_gethostid(long *lp) noex {
+int uc_gethostid(ulong *lp) noex {
 	return u_gethostid(lp) ;
 }
 /* end subroutine (uc_gethostid) */

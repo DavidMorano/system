@@ -218,7 +218,7 @@ int u_getauxinfo(char *rbuf,int rlen,int req) noex {
 }
 /* end subroutine (u_getauxinfo) */
 
-int u_gethostid(long *idp) noex {
+int u_gethostid(ulong *idp) noex {
 	return ugethostid(idp) ;
 }
 /* end subroutine (u_getauxinfo) */

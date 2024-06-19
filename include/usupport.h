@@ -121,21 +121,24 @@ namespace libu {
     extern char *strwcpy(char *,cchar *,int = -1) noex ;
     extern int ctdecui(char *,int,uint) noex ;
     extern int ctdecul(char *,int,ulong) noex ;
-    extern int ugethostid(long *) noex ;
-    extern int uitimer_get(int,ITIMERVAL *) noex ;
-    extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
     static inline int sncpy(char *dp,int dl,cchar *sp) noex {
 	return sncpy1(dp,dl,sp) ;
     }
-    template<typename T> int ctdec(char *,int,T v) noex {
+    template<typename T> inline int ctdec(char *,int,T v) noex {
 	return 0 ;
     }
-    template<> int ctdec(char *dp,int dl,uint v) noex {
+    template<> inline int ctdec(char *dp,int dl,uint v) noex {
 	return ctdecui(dp,dl,v) ;
     }
-    template<> int ctdec(char *dp,int dl,ulong v) noex {
+    template<> inline int ctdec(char *dp,int dl,ulong v) noex {
 	return ctdecul(dp,dl,v) ;
     }
+}
+namespace libu {
+    extern int loadhostid(char *,int) noex ;
+    extern int ugethostid(ulong *) noex ;
+    extern int uitimer_get(int,ITIMERVAL *) noex ;
+    extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
 }
 #endif /* __cplusplus */
 

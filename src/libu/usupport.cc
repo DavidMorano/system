@@ -182,14 +182,6 @@ namespace libu {
 	}
 	return rs ;
     }
-    sysret_t ugethostid(long *idp) noex {
-	int		rs = SR_FAULT ;
-	if (idp) {
-	    clong	res = gethostid() ;
-	    *idp = res ;
-	}
-	return rs ;
-    }
     sysret_t uitimer_get(int w,ITIMERVAL *otvp) noex {
 	int		rs = SR_FAULT ;
 	if (otvp) {
@@ -210,6 +202,26 @@ namespace libu {
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
+	return rs ;
+    }
+}
+
+namespace libu {
+    sysret_t loadhostid(char *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
+		rs = ctdec(dp,dl,hid) ;
+	    }
+	}
+	return rs ;
+    }
+    sysret_t ugethostid(ulong *idp) noex {
+	int		rs = SR_FAULT ;
+	if (idp) {
+	    clong	res = gethostid() ;
+	    *idp = ulong(res) ;
+	}
 	return rs ;
     }
 }

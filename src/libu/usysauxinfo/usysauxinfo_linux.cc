@@ -64,6 +64,7 @@ namespace usysauxinfo {
 	 	vp = "Apple" ;
 		break ;
 	    case SAI_HWSERIAL:
+		rs = loadhostid(rbuf,rlen) ;
 		break ;
 	    case SAI_RPCDOMAIN:
 		rs = ugetnisdom(rbuf,rlen) ;
