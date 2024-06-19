@@ -60,7 +60,7 @@ LDFLAGS= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o intsat.o
+OBJ00= endian.o intsat.o xxtostr.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
 OBJ03= ugetloadavg.o 
@@ -307,5 +307,6 @@ timespec.o:		timespec.cc timespec.h
 itimerspec.o:		itimerspec.cc itimerspec.h
 
 timecount.o:		timecount.cc timecount.hh
+xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
 
 

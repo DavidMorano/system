@@ -54,18 +54,28 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
+#include	<new>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usyscalls.h>
 #include	<clanguage.h>
 #include	<intsat.h>
-#include	<localmisc.h>
+#include	<xxtostr.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"usupport.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -204,6 +214,30 @@ namespace libu {
     }
 }
 
+namespace libu {
+    int ctdecui(char *dp,int dl,uint uv) noex {
+	cnullptr	np{} ;
+	cint		dlen = DIGBUFLEN ;
+	int		rs = SR_NOMEM ;
+	if (char *dbuf ; (dbuf = new(nothrow) char[dlen+1]) != np) {
+	    char	*bp = uitostr(uv,(dbuf+dlen)) ;
+	    rs = sncpy(dp,dl,bp) ;
+	    delete [] dbuf ;
+	} /* end if (new-char) */
+	return rs ;
+    }
+    int ctdecul(char *dp,int dl,ulong uv) noex {
+	cnullptr	np{} ;
+	cint		dlen = DIGBUFLEN ;
+	int		rs = SR_NOMEM ;
+	if (char *dbuf ; (dbuf = new(nothrow) char[dlen+1]) != np) {
+	    char	*bp = ultostr(uv,(dbuf+dlen)) ;
+	    rs = sncpy(dp,dl,bp) ;
+	    delete [] dbuf ;
+	} /* end if (new-char) */
+	return rs ;
+    }
+}
 
 /* local subroutines */
 
