@@ -65,7 +65,7 @@ OBJ01= aflag.o errtimer.o
 OBJ02= timewatch.o timecount.o
 OBJ03= ugetloadavg.o 
 
-OBJ04= usupport.o 
+OBJ04= usupport.o usyscallbase.o
 OBJ05= utimeout.o 
 OBJ06= utimeouts.o 
 OBJ07= ulogerror.o uinet.o
@@ -253,6 +253,7 @@ timespec.o:		timespec.cc timespec.h		$(INCS)
 utimeout.o:		utimeout.c utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
 usupport.o:		usupport.cc usupport.h		#(INCS)
+usyscallbase.o:		usyscallbase.cc usyscallbase.hh	#(INCS)
 usysdata.o:		usysdata.cc usysdata.h		$(INCS)
 
 # USYS

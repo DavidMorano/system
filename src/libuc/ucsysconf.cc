@@ -199,12 +199,11 @@ int ucsysconf::operator () (int req) noex {
 /* end subroutine (ucsysconf::operator) */
 
 int ucsysconf::mconfsys(int req) noex {
-	long		result = 0 ;
 	int		rs = SR_OK ;
 	errno = 0 ;
-	if ((result = sysconf(req)) >= 0) {
-	    if (lp) *lp = result ;
-	    rs = intsat(result) ;
+	if (long res ; (res = sysconf(req)) >= 0) {
+	    if (lp) *lp = res ;
+	    rs = intsat(res) ;
 	} else {
 	    rs = (errno) ? (- errno) : SR_NOTSUP ;
 	}
@@ -213,24 +212,29 @@ int ucsysconf::mconfsys(int req) noex {
 /* end subroutine (ucsysconf::mconfsys) */
 
 int ucsysconf::mconfstr(int req) noex {
-	int		rs = SR_OVERFLOW ;
+	csize		res_bad = size_t(-1) ;
+	size_t		res ;
+	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (rbuf == nullptr) rlen = 0 ; /* indicate return length only */
-	if ((rbuf == nullptr) || (rlen >= 1)) {
-	    csize	res_bad = size_t(-1) ;
-	    size_t	result ;
-	    size_t	llen = (rlen+1) ;
-	    rs = SR_OK ;
-	    errno = 0 ;
-	    if ((result = confstr(req,rbuf,llen)) == res_bad) {
+	errno = 0 ;
+	if (rbuf && (rlen >= 1)) {
+	    size_t	rsz = (rlen+1) ;
+	    if ((res = confstr(req,rbuf,rsz)) == res_bad) {
 	        rs = (errno) ? (- errno) : SR_NOTSUP ;
 	    } else {
-	        if (result <= llen) {
-	            len = int(result-1) ;
+	        if (res <= rsz) {
+	            len = intsat(res-1) ;
 	        } else {
 		    rs = SR_OVERFLOW ;
 		}
 	    } /* end if */
+	} else {
+	    cnullptr	np{} ;
+	    if ((res = confstr(req,np,0uz)) == res_bad) {
+	        rs = (errno) ? (- errno) : SR_NOTSUP ;
+	    } else {
+	        len = intsat(res-1) ;
+	    }
 	} /* end if (try) */
 	return (rs >= 0) ? len : rs ;
 }

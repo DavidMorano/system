@@ -55,6 +55,7 @@ namespace usysauxinfo {
 	    cchar	*vp = nullptr ;
 	    cchar	*name = nullptr ;
 	    rs = SR_OK ;
+	    rbuf[0] = '\0' ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
 		name = "hw.machine" ;

@@ -49,10 +49,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
 
 #ifndef	SIGEVENT
 #define	SIGEVENT	struct sigevent
