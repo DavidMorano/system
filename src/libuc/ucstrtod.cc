@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,6 +21,15 @@
 #include	<usystem.h>
 
 #include	"ucstrtod.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

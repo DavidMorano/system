@@ -225,7 +225,7 @@ OBJ151= dialprog.o dialhttp.o dialfinger.o
 
 OBJ152= openshmtmp.o
 OBJ153= mallocxx.o
-OBJ154= strtoxlonglong.o
+OBJ154=
 OBJ155=
 OBJ156=
 OBJ157=
@@ -523,17 +523,15 @@ ucprogdata.o:		ucprogdata.cc ucprogdata.h
 ucclustername.o:	ucclustername.cc ucclustername.h
 uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
+ucsysconf.o:		ucsysconf.cc
 
 # UNIX C-language system library string-to-integer interface
-ucstrtox.o:		ucstrtox.cc ucstrtox.h strtox.h
+# string-to-x
+ucstrtox.o:		ucstrtox.cc ucstrtox.h
 ucstrtod.o:		ucstrtod.cc ucstrtod.h
 
-# string-to-x
-ucstr.o:	ucstrtox.o ucstrtod.o
-ucsysconf.o:	ucsysconf.cc
-
 # uctimeout (time-out call-backs)
-uctimeout.o:	uctimeout.cc
+uctimeout.o:		uctimeout.cc
 
 
 obja.o:			$(OBJA)
@@ -782,9 +780,6 @@ checkbase.o:		checkbase.cc
 # malloc
 mallocxx.o:		mallocxx.cc mallocxx.h
 mallocstuff.o:		mallocstuff.cc mallocstuff.h
-
-# part of string-to-integer interface
-strtox.o:		strtox.cc strtox.h
 
 # UNIX C-language system library data-base interface (support)
 spwd.o:			spwd.cc spwd.h

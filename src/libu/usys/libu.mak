@@ -63,10 +63,10 @@ SOFL= -shared
 OBJ00= endian.o intsat.o xxtostr.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= ugetloadavg.o 
+OBJ03= strtox.o
 
 OBJ04= usupport.o usyscallbase.o
-OBJ05= utimeout.o 
+OBJ05= utimeout.o ugetloadavg.o
 OBJ06= utimeouts.o 
 OBJ07= ulogerror.o uinet.o
 
@@ -307,6 +307,7 @@ timespec.o:		timespec.cc timespec.h
 itimerspec.o:		itimerspec.cc itimerspec.h
 
 timecount.o:		timecount.cc timecount.hh
+strtox.o:		strtox.cc strtox.h		$(INCS)
 xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
 
 

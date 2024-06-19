@@ -29,6 +29,7 @@
 #include	<aflag.hh>
 #include	<intsat.h>
 #include	<xxtostr.h>
+#include	<strtox.h>
 
 
 #ifndef	SUBROUTINE_MEMCLEAR

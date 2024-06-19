@@ -88,6 +88,12 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local variables */
 
 constexpr int	maxbase = 36 ;		/* must be classic value */
