@@ -20,8 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<stdintx.h>
 
 

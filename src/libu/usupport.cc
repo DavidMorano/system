@@ -61,6 +61,7 @@
 #include	<usyscalls.h>
 #include	<clanguage.h>
 #include	<intsat.h>
+#include	<stdintx.h>
 #include	<xxtostr.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
@@ -227,27 +228,25 @@ namespace libu {
 }
 
 namespace libu {
-    int ctdecui(char *dp,int dl,uint uv) noex {
-	cnullptr	np{} ;
-	cint		dlen = DIGBUFLEN ;
-	int		rs = SR_NOMEM ;
-	if (char *dbuf ; (dbuf = new(nothrow) char[dlen+1]) != np) {
-	    char	*bp = uitostr(uv,(dbuf+dlen)) ;
+    template<typename T>
+    int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    cint	dlen = DIGBUFLEN ;
+	    char	dbuf[DIGBUFLEN + 1] ;
+	    char	*bp = ctx(uv,(dbuf+dlen)) ;
 	    rs = sncpy(dp,dl,bp) ;
-	    delete [] dbuf ;
-	} /* end if (new-char) */
+	}
 	return rs ;
     }
+    int ctdecui(char *dp,int dl,uint uv) noex {
+	return ctdecx(uitostr,dp,dl,uv) ;
+    }
     int ctdecul(char *dp,int dl,ulong uv) noex {
-	cnullptr	np{} ;
-	cint		dlen = DIGBUFLEN ;
-	int		rs = SR_NOMEM ;
-	if (char *dbuf ; (dbuf = new(nothrow) char[dlen+1]) != np) {
-	    char	*bp = ultostr(uv,(dbuf+dlen)) ;
-	    rs = sncpy(dp,dl,bp) ;
-	    delete [] dbuf ;
-	} /* end if (new-char) */
-	return rs ;
+	return ctdecx(ultostr,dp,dl,uv) ;
+    }
+    int ctdecull(char *dp,int dl,ulonglong uv) noex {
+	return ctdecx(ulltostr,dp,dl,uv) ;
     }
 }
 

@@ -58,7 +58,6 @@
 	required machine instructions) this present implemtnation
 	is adequate.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -87,6 +86,9 @@ using std::countr_zero ;		/* subroutine-template */
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

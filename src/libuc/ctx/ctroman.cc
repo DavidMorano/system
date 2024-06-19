@@ -52,6 +52,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -100,6 +103,9 @@ static constexpr cchar	*ones[] = {
 	"VIII",
 	"IX"
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
