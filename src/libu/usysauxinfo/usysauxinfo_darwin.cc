@@ -73,6 +73,9 @@ namespace usysauxinfo {
 	    case SAI_RPCDOMAIN:
 		name = "kern.nisdomainname" ;
 		break ;
+	    case SAI_UUID:
+		name = "kern.uuid" ;
+		break ;
 	    default:
 		rs = SR_NOTFOUND ;
 		break ;

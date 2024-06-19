@@ -60,6 +60,7 @@ enum usysauxinforeqs {
 	usysauxinforeq_hwprovider,
 	usysauxinforeq_hwserial,
 	usysauxinforeq_rpcdomain,
+	usysauxinforeq_uuid,
 	usysauxinforeq_overlast
 } ;
 

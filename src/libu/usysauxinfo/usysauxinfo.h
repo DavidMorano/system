@@ -34,6 +34,7 @@
 #define	SAI_HWPROVIDER		usysauxinforeq_hwprovider
 #define SAI_HWSERIAL		usysauxinforeq_hwserial
 #define SAI_RPCDOMAIN		usysauxinforeq_rpcdomain
+#define SAI_UUID		usysauxinforeq_uuid
 
 
 namespace usysauxinfo {
