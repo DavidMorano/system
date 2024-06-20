@@ -416,7 +416,7 @@ static int uinfo_getaux(uinfo_tmpaux *tap) noex {
 	tap->hwprovider[0] = '\0' ;
 	tap->hwserial[0] = '\0' ;
 	tap->nisdomain[0] = '\0' ;
-	for (const auto &req : sais) {
+	for (cauto &req : sais) {
 	    char	*nbuf = nullptr ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
@@ -443,10 +443,12 @@ static int uinfo_getaux(uinfo_tmpaux *tap) noex {
 		    sz += 1 ;		/* for the NUL character */
 	            nbuf[0] = '\0' ;
 		}
+	    } else {
+		sz += 1 ;
 	    } /* end if */
 	    if (rs < 0) break ;
 	} /* end for */
-	return rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uinfo_getaux) */
 
