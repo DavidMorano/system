@@ -285,6 +285,10 @@
 #define	CSIGVAL		const SIGVAL
 #endif
 
+#ifndef	CUSTAT
+#define	CUSTAT		const USTAT
+#endif
+
 #ifndef	CTIMEVAL
 #define	CTIMEVAL	const TIMEVAL
 #endif

@@ -60,12 +60,12 @@
 #ifndef	STRUCT_USTAT
 #define	STRUCT_USTAT
 #if	defined(_LARGEFILE_SOURCE)
-#define	ustat	stat
+#define	ustat		stat
 #else
 #if	defined(_LARGEFILE64_SOURCE)
 #define	ustat	stat64
 #else
-#define	ustat	stat
+#define	ustat		stat
 #endif
 #endif
 #endif

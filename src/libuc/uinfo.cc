@@ -74,47 +74,15 @@
 #define	NODENAMELEN	256
 #endif
 
-#if	defined(SAI_ARCHITECTURE)
-#define	F_ARCHITECTURE		1
-#else
-#define	F_ARCHITECTURE		0
-#define	SAI_ARCHITECTURE	0
-#endif
-
-#if	defined(SAI_PLATFORM)
-#define	F_PLATFORM		1
-#else
-#define	F_PLATFORM		0	
-#define	SAI_PLATFORM		0
-#endif
-
-#if	defined(SAI_HWPROVIDER)
-#define	F_HWPROVIDER		1
-#else
-#define	F_HWPROVIDER		0
-#define	SAI_HWPROVIDER		0
-#endif
-
-#if	defined(SAI_HWSERIAL)
-#define	F_HWSERIAL		1
-#else
-#define	F_HWSERIAL		0
-#define	SAI_HWSERIAL		0
-#endif
-
-#if	defined(SAI_RPCDOMAIN)
-#define	F_RPCDOMAIN		1
-#else
-#define	F_RPCDOMAIN		0
-#define	SAI_RPCDOMAIN		0
-#endif
-
 
 /* external subroutines */
 
 extern "C" {
    extern int uc_sysauxinfo(char *,int,int) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */
@@ -174,11 +142,13 @@ static int	uinfo_getaux(uinfo_tmpaux *) noex ;
 
 static uinfo		uinfo_data ;
 
-constexpr bool		f_architecture	= F_ARCHITECTURE ;
-constexpr bool		f_platform	= F_PLATFORM ;
-constexpr bool		f_hwprovider	= F_HWPROVIDER ;
-constexpr bool		f_hwserial	= F_HWSERIAL ;
-constexpr bool		f_srpcdomain	= F_RPCDOMAIN ;
+constexpr int		sais[] = {
+	SAI_ARCHITECTURE,
+	SAI_PLATFORM,
+	SAI_HWPROVIDER,
+	SAI_HWSERIAL,
+	SAI_RPCDOMAIN
+} ;
 
 
 /* exported variables */
@@ -438,45 +408,44 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 /* local subroutines */
 
 static int uinfo_getaux(uinfo_tmpaux *tap) noex {
-	[[maybe_unused]] char	*nbuf = nullptr ;
-	[[maybe_unused]] cint	nlen = NODENAMELEN ;
-	int			rs = SR_OK ;
-	[[maybe_unused]] int	rs1 ;
+	cint		nlen = NODENAMELEN ;
+	int		rs = SR_OK ;
+	int		sz = 0 ;
 	tap->architecture[0] = '\0' ;
 	tap->platform[0] = '\0' ;
 	tap->hwprovider[0] = '\0' ;
 	tap->hwserial[0] = '\0' ;
 	tap->nisdomain[0] = '\0' ;
-	if_constexpr (f_architecture) {
-	    cint	req = SAI_ARCHITECTURE ;
-	    nbuf = tap->architecture ;
-	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
-	    if (rs1 < 0) nbuf[0] = '\0' ;
-	}
-	if_constexpr (f_platform) {
-	    cint	req = SAI_PLATFORM ;
-	    nbuf = tap->platform ;
-	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
-	    if (rs1 < 0) nbuf[0] = '\0' ;
-	}
-	if_constexpr (f_hwprovider) {
-	    cint	req = SAI_HWPROVIDER ;
-	    nbuf = tap->hwprovider ;
-	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
-	    if (rs1 < 0) nbuf[0] = '\0' ;
-	}
-	if_constexpr (f_hwserial) {
-	    cint	req = SAI_HWSERIAL ;
-	    nbuf = tap->hwserial ;
-	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
-	    if (rs1 < 0) nbuf[0] = '\0' ;
-	}
-	if_constexpr (f_srpcdomain) {
-	    cint	req = SAI_RPCDOMAIN ;
-	    nbuf = tap->nisdomain ;
-	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
-	    if (rs1 < 0) nbuf[0] = '\0' ;
-	}
+	for (const auto &req : sais) {
+	    char	*nbuf = nullptr ;
+	    switch (req) {
+	    case SAI_ARCHITECTURE:
+	        nbuf = tap->architecture ;
+		break ;
+	    case SAI_PLATFORM:
+	        nbuf = tap->platform ;
+		break ;
+	    case SAI_HWPROVIDER:
+	        nbuf = tap->hwprovider ;
+		break ;
+	    case SAI_HWSERIAL:
+	        nbuf = tap->hwserial ;
+		break ;
+	    case SAI_RPCDOMAIN:
+	        nbuf = tap->nisdomain ;
+		break ;
+	    } /* end switch */
+	    if ((req >= 0) && nbuf) {
+	        if ((rs = uc_sysauxinfo(nbuf,nlen,req)) >= 0) {
+		    sz += (rs + 1) ;
+		} else if (rs == SR_NOTFOUND) {
+		    rs = SR_OK ;
+		    sz += 1 ;		/* for the NUL character */
+	            nbuf[0] = '\0' ;
+		}
+	    } /* end if */
+	    if (rs < 0) break ;
+	} /* end for */
 	return rs ;
 }
 /* end subroutine (uinfo_getaux) */

@@ -29,7 +29,7 @@
 
 	Returns:
 	>=0		ok
-	<		error (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -63,10 +63,7 @@ using std::nothrow ;			/* constant */
 
 typedef decltype(std::nothrow)	nothrow_t ;
 
-typedef const nothrow_t		cnothrow ;
-
 typedef fonce::stype::iterator		setiter ;
-typedef const fonce::stype::iterator	csetiter ;
 
 
 /* external subroutines */
@@ -92,13 +89,13 @@ typedef const fonce::stype::iterator	csetiter ;
 int fonce::istart(int n) noex {
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
-	    rs = SR_NOMEM ;
 	    if (n == 0) n = FONCE_DEFTABLEN ;
 	    try {
 		cnullptr	np{} ;
+	        rs = SR_NOMEM ;
 	        if ((setp = new(nothrow) stype(n)) != np) {
 	            rs = SR_OK ;
-	        }
+	        } /* end if (new-stype) */
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
@@ -117,16 +114,20 @@ int fonce::ifinish() noex {
 	return rs ;
 }
 
-int fonce::checkin(const USTAT *sbp) noex {
+int fonce::checkin(CUSTAT *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (sbp) {
 	    fonce_devino	k(sbp->st_dev,sbp->st_ino) ;
 	    rs = SR_BUGCHECK ;
 	    if (setp) {
-	        pair<setiter,bool>	ret = setp->insert(k) ;
-		rs = SR_OK ;
-		f = ret.second ;
+		try {
+	            pair<setiter,bool>	ret = setp->insert(k) ;
+		    rs = SR_OK ;
+		    f = ret.second ;
+		} catch (...) {
+		    rs = SR_NOMEM ;
+		}
 	    } /* end if (initialize) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;

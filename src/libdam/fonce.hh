@@ -83,9 +83,6 @@ namespace std {
     } ; /* end struct-template (hash<fonce_devino>) */
 }
 
-/* forward references */
-
-
 enum foncemems {
 	foncemem_start,
 	foncemem_finish,
@@ -126,7 +123,7 @@ struct fonce {
 	~fonce() noex {
 	    (void) ifinish() ;
 	} ; /* end dtor */
-	int		checkin(const USTAT *) noex ;
+	int		checkin(CUSTAT *) noex ;
 	int		istart(int) noex ;
 	int		ifinish() noex ;
 	int		icount() noex ;
