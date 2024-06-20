@@ -1,4 +1,4 @@
-/* uerrtimer (UNIX® System V IPC) */
+/* uerrtimer SUPPORT */
 /* lang=C++20 */
 
 /* error-timer */

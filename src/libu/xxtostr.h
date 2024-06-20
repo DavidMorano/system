@@ -77,11 +77,11 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	char		*rp = endp ;
 	if (endp) {
 	    rs = SR_NOTSUP ;
+	    *rp = '\0' ;
 	    if ((b >= 2) && (b <= xxtostr_maxbase)) {
-	        *rp = '\0' ;
 	        if (v != 0) {
                     int		di ;
-	            if constexpr (sizeof(UT) > sizeof(ulong)) {
+	            if_constexpr (sizeof(UT) > sizeof(ulong)) {
 	                const UT	vmask(~LONG_MAX) ;
 		        UT		nv ;
 	                while ((v & vmask) != 0L) {

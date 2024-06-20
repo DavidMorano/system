@@ -1,7 +1,7 @@
 /* usupport HEADER */
 /* lang=C20 */
 
-/* UNIX-kernal support subroutines */
+/* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -117,9 +117,11 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 namespace libu {
+    extern char *strwcpy(char *,cchar *,int = -1) noex ;
+}
+namespace libu {
     extern int snwcpy(char *,int,cchar *,int = -1) noex ;
     extern int sncpy1(char *,int,cchar *) noex ;
-    extern char *strwcpy(char *,cchar *,int = -1) noex ;
     extern int ctdecui(char *,int,uint) noex ;
     extern int ctdecul(char *,int,ulong) noex ;
     extern int ctdecull(char *,int,ulonglong) noex ;

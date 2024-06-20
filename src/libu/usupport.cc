@@ -1,7 +1,7 @@
 /* usupport SUPPORT */
 /* lang=C++20 */
 
-/* UNIX-kernal support subroutines */
+/* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -249,6 +249,7 @@ namespace libu {
 	return ctdecx(ulltostr,dp,dl,uv) ;
     }
 }
+
 
 /* local subroutines */
 

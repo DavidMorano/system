@@ -102,11 +102,11 @@
 #define	SAI_HWSERIAL		0
 #endif
 
-#if	defined(SAI_SRPCDOMAIN)
-#define	F_SRPCDOMAIN		1
+#if	defined(SAI_RPCDOMAIN)
+#define	F_RPCDOMAIN		1
 #else
-#define	F_SRPCDOMAIN		0
-#define	SAI_SRPCDOMAIN		0
+#define	F_RPCDOMAIN		0
+#define	SAI_RPCDOMAIN		0
 #endif
 
 
@@ -178,7 +178,7 @@ constexpr bool		f_architecture	= F_ARCHITECTURE ;
 constexpr bool		f_platform	= F_PLATFORM ;
 constexpr bool		f_hwprovider	= F_HWPROVIDER ;
 constexpr bool		f_hwserial	= F_HWSERIAL ;
-constexpr bool		f_srpcdomain	= F_SRPCDOMAIN ;
+constexpr bool		f_srpcdomain	= F_RPCDOMAIN ;
 
 
 /* exported variables */
@@ -472,7 +472,7 @@ static int uinfo_getaux(uinfo_tmpaux *tap) noex {
 	    if (rs1 < 0) nbuf[0] = '\0' ;
 	}
 	if_constexpr (f_srpcdomain) {
-	    cint	req = SAI_SRPCDOMAIN ;
+	    cint	req = SAI_RPCDOMAIN ;
 	    nbuf = tap->nisdomain ;
 	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
 	    if (rs1 < 0) nbuf[0] = '\0' ;
