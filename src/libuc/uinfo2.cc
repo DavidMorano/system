@@ -74,8 +74,47 @@
 #define	NODENAMELEN	256
 #endif
 
+#if	defined(SAI_ARCHITECTURE)
+#define	F_ARCHITECTURE		1
+#else
+#define	F_ARCHITECTURE		0
+#define	SAI_ARCHITECTURE	0
+#endif
+
+#if	defined(SAI_PLATFORM)
+#define	F_PLATFORM		1
+#else
+#define	F_PLATFORM		0	
+#define	SAI_PLATFORM		0
+#endif
+
+#if	defined(SAI_HWPROVIDER)
+#define	F_HWPROVIDER		1
+#else
+#define	F_HWPROVIDER		0
+#define	SAI_HWPROVIDER		0
+#endif
+
+#if	defined(SAI_HWSERIAL)
+#define	F_HWSERIAL		1
+#else
+#define	F_HWSERIAL		0
+#define	SAI_HWSERIAL		0
+#endif
+
+#if	defined(SAI_RPCDOMAIN)
+#define	F_RPCDOMAIN		1
+#else
+#define	F_RPCDOMAIN		0
+#define	SAI_RPCDOMAIN		0
+#endif
+
 
 /* external subroutines */
+
+extern "C" {
+   extern int uc_sysauxinfo(char *,int,int) noex ;
+}
 
 
 /* external variables */
@@ -84,26 +123,6 @@
 /* local structures */
 
 namespace {
-    struct setname {
-	uinfo_infoname	tmpname ;
-	char		*strp = nullptr ;
-	~setname() {
-	    if (strp) {
-	        uc_free(strp) ;
-	        strp = nullptr ;
-	    }
-	}
-    } ;
-    struct setaux {
-	uinfo_infoaux	tmpaux ;
-	char		*strp = nullptr ;
-	~setaux() {
-	    if (strp) {
-	        uc_free(strp) ;
-	        strp = nullptr ;
-	    }
-	}
-    } ;
     struct uinfo_tmpaux {
 	char		architecture[NODENAMELEN+1] ;
 	char		platform[NODENAMELEN+1] ;
@@ -126,9 +145,6 @@ namespace {
 	int init() noex ;
 	int fini() noex ;
 	int getname(uinfo_infoname *) noex ;
-	int getname_setup() noex ;
-	int getname_load(setname *) noex ;
-	int getname_install(setname *) noex ;
 	int getaux(uinfo_infoaux *) noex ;
 	void atforkbefore() noex {
 	    mx.lockbegin() ;
@@ -161,13 +177,11 @@ static int	uinfo_getaux(uinfo_tmpaux *) noex ;
 
 static uinfo		uinfo_data ;
 
-constexpr int		sais[] = {
-	SAI_ARCHITECTURE,
-	SAI_PLATFORM,
-	SAI_HWPROVIDER,
-	SAI_HWSERIAL,
-	SAI_RPCDOMAIN
-} ;
+constexpr bool		f_architecture	= F_ARCHITECTURE ;
+constexpr bool		f_platform	= F_PLATFORM ;
+constexpr bool		f_hwprovider	= F_HWPROVIDER ;
+constexpr bool		f_hwserial	= F_HWSERIAL ;
+constexpr bool		f_srpcdomain	= F_RPCDOMAIN ;
 
 
 /* exported variables */
@@ -277,94 +291,73 @@ int uinfo::fini() noex {
 int uinfo::getname(uinfo_infoname *unp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		f = true ;
 	if (unp) {
 	    sigblocker	b ;
 	    memclear(unp) ;
 	    if ((rs = b.start) >= 0) {
 	        if ((rs = init()) >= 0) {
-		    if ((rs = getname_setup()) >= 0) {
-			*unp = name ;
-		    }
+	            uinfo_alloc		*uap = &a ;
+	            if (uap->name) {
+	                uinfo_infoname	tmpname ;
+	                cint		sz = sizeof(UTSNAME) ;
+	                cchar		*nnamep = nullptr ;
+	                void		*p ;
+	                if ((rs = uc_libmalloc(sz,&p)) >= 0) {
+	                    UTSNAME	*unp = (UTSNAME *) p ;
+	                    if ((rs = u_uname(unp)) >= 0) {
+	                        cint	nlen = NODENAMELEN ;
+	                        int	sz = 0 ;
+	                        char	*bp ;
+	                        sz += (strnlen(unp->sysname,nlen) + 1) ;
+	                        sz += (strnlen(unp->nodename,nlen) + 1) ;
+	                        sz += (strnlen(unp->release,nlen) + 1) ;
+	                        sz += (strnlen(unp->version,nlen) + 1) ;
+	                        sz += (strnlen(unp->machine,nlen) + 1) ;
+	                        if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
+	                            nnamep = bp ;
+	                            tmpname.sysname = bp ;
+	                            bp = (strwcpy(bp,unp->sysname,nlen) + 1) ;
+	                            tmpname.nodename = bp ;
+	                            bp = (strwcpy(bp,unp->nodename,nlen) + 1) ;
+	                            tmpname.release = bp ;
+	                            bp = (strwcpy(bp,unp->release,nlen) + 1) ;
+	                            tmpname.version = bp ;
+	                            bp = (strwcpy(bp,unp->version,nlen) + 1) ;
+	                            tmpname.machine = bp ;
+	                            bp = (strwcpy(bp,unp->machine,nlen) + 1) ;
+	                        } /* end if (memory-allocation) */
+	                    } /* end if (uname) */
+	                    if (rs >= 0) {
+	                        if ((rs = uc_forklockbegin(-1)) >= 0) {
+	                            if ((rs = mx.lockbegin) >= 0) {
+	                                if (uap->name) {
+	                                    uap->name = nnamep ;
+	                                    name = tmpname ;
+	                                    nnamep = nullptr ;
+	                                    f = false ;
+	                                }
+	                                rs1 = mx.lockend ;
+					if (rs >= 0) rs = rs1 ;
+	                            } /* end if (mutex) */
+	                            rs1 = uc_forklockend() ;
+				    if (rs >= 0) rs = rs1 ;
+	                        } /* end if (forklock) */
+	                    } /* end if (ok) */
+	                    if (nnamep) uc_libfree(nnamep) ;
+	                    rs1 = uc_libfree(unp) ;
+			    if (rs >= 0) rs = rs1 ;
+	                } /* end if (memory-allocation-free) */
+	            } /* end if (need to get information) */
+	            if (rs >= 0) *unp = name ;
 	        } /* end if (init) */
 	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (uinfo::getname) */
-
-int uinfo::getname_setup() noex {
-	int		rs = SR_OK ;
-	if (a.name == nullptr) {
-	    setname	tmp ;
-	    if ((rs = getname_load(&tmp)) >= 0) {
-		rs = getname_install(&tmp) ;
-	    } /* end if (ok) */
-	} /* end if (setup needed) */
-	return rs ;
-}
-/* end method (uinfo::getname_setup) */
-
-int uinfo::getname_load(setname *setp) noex {
-	cint		usz = sizeof(UTSNAME) ;
-	void		*vp{} ;
-	int		rs ;
-	int		rs1 ;
-	if ((rs = uc_libmalloc(usz,&vp)) >= 0) {
-	    UTSNAME	*utsp = (UTSNAME *) vp ;
-            if ((rs = u_uname(utsp)) >= 0) {
-                cint    nlen = NODENAMELEN ;
-                int     sz = 0 ;
-                char    *bp ;
-                sz += (strnlen(utsp->sysname,nlen) + 1) ;
-                sz += (strnlen(utsp->nodename,nlen) + 1) ;
-                sz += (strnlen(utsp->release,nlen) + 1) ;
-                sz += (strnlen(utsp->version,nlen) + 1) ;
-                sz += (strnlen(utsp->machine,nlen) + 1) ;
-                if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
-                    setp->strp = bp ;
-                    setp->tmpname.sysname = bp ;
-                    bp = (strwcpy(bp,utsp->sysname,nlen) + 1) ;
-                    setp->tmpname.nodename = bp ;
-                    bp = (strwcpy(bp,utsp->nodename,nlen) + 1) ;
-                    setp->tmpname.release = bp ;
-                    bp = (strwcpy(bp,utsp->release,nlen) + 1) ;
-                    setp->tmpname.version = bp ;
-                    bp = (strwcpy(bp,utsp->version,nlen) + 1) ;
-                    setp->tmpname.machine = bp ;
-                    bp = (strwcpy(bp,utsp->machine,nlen) + 1) ;
-                } /* end if (memory-allocation) */
-            } /* end if (uname) */
-	    rs1 = uc_libfree(utsp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return rs ;
-}
-/* end method (uinfo::getname_load) */
-
-int uinfo::getname_install(setname *setp) noex {
-	int		rs ;
-	int		rs1 ;
-        if ((rs = uc_forklockbegin(-1)) >= 0) {
-            if ((rs = mx.lockbegin) >= 0) {
-                if (a.name == nullptr) {
-                    a.name = setp->strp ;
-                    name = setp->tmpname ;
-                    setp->strp = nullptr ;
-		} else {
-		    uc_free(setp->strp) ;
-		    setp->strp = nullptr ;
-                }
-                rs1 = mx.lockend ;
-                if (rs >= 0) rs = rs1 ;
-            } /* end if (mutex) */
-            rs1 = uc_forklockend() ;
-            if (rs >= 0) rs = rs1 ;
-        } /* end if (forklock) */
-	return rs ;
-}
-/* end method (uinfo::getname_install) */
 
 int uinfo::getaux(uinfo_infoaux *uxp) noex {
 	int		rs = SR_FAULT ;
@@ -448,47 +441,46 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 /* local subroutines */
 
 static int uinfo_getaux(uinfo_tmpaux *tap) noex {
-	cint		nlen = NODENAMELEN ;
-	int		rs = SR_OK ;
-	int		sz = 0 ;
+	[[maybe_unused]] char	*nbuf = nullptr ;
+	[[maybe_unused]] cint	nlen = NODENAMELEN ;
+	int			rs = SR_OK ;
+	[[maybe_unused]] int	rs1 ;
 	tap->architecture[0] = '\0' ;
 	tap->platform[0] = '\0' ;
 	tap->hwprovider[0] = '\0' ;
 	tap->hwserial[0] = '\0' ;
 	tap->nisdomain[0] = '\0' ;
-	for (cauto &req : sais) {
-	    char	*nbuf = nullptr ;
-	    switch (req) {
-	    case SAI_ARCHITECTURE:
-	        nbuf = tap->architecture ;
-		break ;
-	    case SAI_PLATFORM:
-	        nbuf = tap->platform ;
-		break ;
-	    case SAI_HWPROVIDER:
-	        nbuf = tap->hwprovider ;
-		break ;
-	    case SAI_HWSERIAL:
-	        nbuf = tap->hwserial ;
-		break ;
-	    case SAI_RPCDOMAIN:
-	        nbuf = tap->nisdomain ;
-		break ;
-	    } /* end switch */
-	    if ((req >= 0) && nbuf) {
-	        if ((rs = uc_sysauxinfo(nbuf,nlen,req)) >= 0) {
-		    sz += (rs + 1) ;
-		} else if (rs == SR_NOTFOUND) {
-		    rs = SR_OK ;
-		    sz += 1 ;		/* for the NUL character */
-	            nbuf[0] = '\0' ;
-		}
-	    } else {
-		sz += 1 ;
-	    } /* end if */
-	    if (rs < 0) break ;
-	} /* end for */
-	return (rs >= 0) ? sz : rs ;
+	if_constexpr (f_architecture) {
+	    cint	req = SAI_ARCHITECTURE ;
+	    nbuf = tap->architecture ;
+	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
+	    if (rs1 < 0) nbuf[0] = '\0' ;
+	}
+	if_constexpr (f_platform) {
+	    cint	req = SAI_PLATFORM ;
+	    nbuf = tap->platform ;
+	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
+	    if (rs1 < 0) nbuf[0] = '\0' ;
+	}
+	if_constexpr (f_hwprovider) {
+	    cint	req = SAI_HWPROVIDER ;
+	    nbuf = tap->hwprovider ;
+	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
+	    if (rs1 < 0) nbuf[0] = '\0' ;
+	}
+	if_constexpr (f_hwserial) {
+	    cint	req = SAI_HWSERIAL ;
+	    nbuf = tap->hwserial ;
+	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
+	    if (rs1 < 0) nbuf[0] = '\0' ;
+	}
+	if_constexpr (f_srpcdomain) {
+	    cint	req = SAI_RPCDOMAIN ;
+	    nbuf = tap->nisdomain ;
+	    rs1 = uc_sysauxinfo(nbuf,nlen,req) ;
+	    if (rs1 < 0) nbuf[0] = '\0' ;
+	}
+	return rs ;
 }
 /* end subroutine (uinfo_getaux) */
 
