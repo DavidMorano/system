@@ -15,7 +15,7 @@ export ARCHITECTURE SYSNAME RELEASE
 
 : ${OSNAME:=${SYSNAME}}
 : ${OSTYPE:=$( systype )}
-: ${OSRELEASE:=${RELEASE%%.*}}
+: ${OSRELEASE:=${RELEASE}}
 : ${OSNUM:=${RELEASE%%.*}}
 export OSNAME OSTYPE OSRELEASE OSNUM
 
@@ -26,6 +26,7 @@ export OSNAME OSTYPE OSRELEASE OSNUM
 : ${CGS_VALDIR:=${REPOROOT}/lib}
 : ${CGS_LIBDIR:=${REPOROOT}/lib}
 : ${CGS_MANDIR:=${REPOROOT}/man}
+: ${CGS_RUNDIR:=${USRLOCAL}/lib}
 
 : ${CGS_INFODIR:=${REPOROOT}/info}
 : ${CGS_HELPDIR:=${REPOROOT}/share/help}
@@ -56,6 +57,7 @@ export CGS_CRTDIR
 export CGS_VALDIR
 export CGS_LIBDIR
 export CGS_MANDIR
+export CGS_RUNDIR
 
 export CGS_INFODIR
 export CGS_HELPDIR
