@@ -16,6 +16,7 @@ LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP= cpp
@@ -42,9 +43,12 @@ INCS= usys.h
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
 
-LDRPATH= $(USRLOCAL)/lib
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -56,8 +60,8 @@ LDFLAGS= $(MAKELDFLAGS)
 
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
-OBJ2_USYS= usys_ugetnisdom.o usys_ufcntl.o
-OBJ3_USYS= usys_ugetdents.o usys_libstr.o
+OBJ2_USYS= usys_ufcntl.o usys_ugetdents.o usys_ugetnisdom.o
+OBJ3_USYS= usys_usendfile.o usys_libstr.o
 
 OBJ4_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ5_USYS= usys_ttynamerp.o 
@@ -161,8 +165,10 @@ usys_darwin.o:		usys_darwin.cc usys_darwin.h		$(INCS)
 usys_linux.o:		usys_linux.cc usys_linux.h		$(INCS)
 
 # utilities
-usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
 usys_ufcntl.o:		usys_ufcntl.cc usys_ufcntl.h 		$(INCS)
+usys_ugetdents.o:	usys_ugetdents.cc usys_ugetdents.h	$(INCS)
+usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
+usys_usendfile.o:	usys_usendfile.cc usys_usendfile.h	$(INCS)
 
 # missing operating system calls
 usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h		$(INCS)
@@ -176,7 +182,6 @@ usys_sigx.o:		usys_sigx.cc usys_sigx.h		$(INCS)
 usys_streams.o:		usys_streams.cc usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc usys_pipes.h		$(INCS)
 usys_stat.o:		usys_stat.cc usys_stat.h		$(INCS)
-usys_ugetdents.o:	usys_ugetdents.cc usys_ugetdents.h	$(INCS)
 usys_libstr.o:		usys_libstr.cc usys_libstr.h		$(INCS)
 
 

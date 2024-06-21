@@ -102,12 +102,13 @@ constexpr cpcchar	typestrs[] = {
 	"bsd",
 	"sysv",
 	"linux",
+	"darwin",
 	nullptr
 } ;
 
 constexpr osguess	guesses[] = {
 	{ "sunos", ostype_sysv },
-	{ "darwin", ostype_bsd },
+	{ "darwin", ostype_darwin },
 	{ "linux", ostype_linux },
 	{ "sysv", ostype_sysv }
 } ;
@@ -143,10 +144,10 @@ int getostype() noex {
 
 static int mktype() noex {
 	int		rs ;
-	if_constexpr (f_darwin) {
-	    rs = ostype_bsd ;
-	} else if_constexpr (f_sunos) {
+	if_constexpr (f_sunos) {
 	    rs = ostype_sysv ;
+	} else if_constexpr (f_darwin) {
+	    rs = ostype_darwin ;
 	} else if_constexpr (f_linux) {
 	    rs = ostype_linux ;
 	} else {

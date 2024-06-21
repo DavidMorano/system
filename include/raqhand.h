@@ -29,6 +29,16 @@
 #define	RAQHAND		struct raqhand_head
 #define	RAQHAND_FL	struct raqhand_flags
 
+/* options */
+#define	RAQHAND_ODEFAULT	0
+#define	RAQHAND_OREUSE		(1 << 0)	/* reuse empty slots */
+#define	RAQHAND_OCOMPACT	(1 << 1)	/* means NOHOLES */
+#define	RAQHAND_OSWAP		(1 << 2)	/* use swapping */
+#define	RAQHAND_OSTATIONARY	(1 << 3)	/* entries should not move */
+#define	RAQHAND_OCONSERVE	(1 << 4)	/* conserve space */
+#define	RAQHAND_OSORTED		(1 << 5)	/* keep sorted */
+#define	RAQHAND_OORDERED	(1 << 6)	/* keep ordered */
+
 
 struct raqhand_flags {
 	uint		issorted:1 ;

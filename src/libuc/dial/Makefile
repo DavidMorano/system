@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+LDRPATH= $(REPOROOT)/lib
 
 
 CPP=	cpp
@@ -35,12 +35,9 @@ TOUCH=	touch
 LINT=	lint
 
 
-
 DEFS +=
 
-
 INCS += dial.h dialopts.h
-
 
 LIBS +=
 
@@ -48,6 +45,9 @@ LIBS +=
 INCDIRS= 
 
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)

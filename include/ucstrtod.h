@@ -16,9 +16,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdintx.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<stdintx.h>
 
 
 #ifdef	__cplusplus

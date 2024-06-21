@@ -36,7 +36,7 @@
 
 /* local defines */
 
-#define	MKNPATH_MAXPATHLEN	(4*1024)
+#define	MKNPATH_MAXPATHLEN	(4*1024)	/* default value (only) */
 
 
 /* imported namespaces */

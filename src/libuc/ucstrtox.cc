@@ -49,6 +49,12 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local subroutine-templates */
 
 template<typename T>

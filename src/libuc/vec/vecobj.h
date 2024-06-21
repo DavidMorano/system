@@ -26,14 +26,12 @@
 
 
 /* object defines */
-
 #define	VECOBJ			struct vecobj_head
 #define	VECOBJ_CUR		struct vecobj_cursor
 #define	VECOBJ_FL		struct vecobj_flags
 #define	VECOBJ_DEFENTS		10
 
 /* options */
-
 #define	VECOBJ_ODEFAULT		0
 #define	VECOBJ_OREUSE		(1 << 0)	/* reuse empty slots */
 #define	VECOBJ_OCOMPACT		(1 << 1)	/* means NOHOLES */

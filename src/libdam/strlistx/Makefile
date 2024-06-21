@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP= cpp
@@ -47,7 +47,7 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
-LDRPATH=
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -61,7 +61,6 @@ OBJ0_STRLIST= strlist.o
 OBJ1_STRLIST= strlisthdr.o
 OBJ2_STRLIST= strlistmk.o
 OBJ3_STRLIST= strlistmks.o rectab.o
-
 
 OBJA_STRLIST= obj0.o obj1.o
 OBJB_STRLIST= obj2.o obj3.o
@@ -111,6 +110,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0.o:			$(OBJ0_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRLIST)

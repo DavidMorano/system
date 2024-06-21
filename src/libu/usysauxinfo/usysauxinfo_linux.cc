@@ -40,13 +40,12 @@
 
 #include	"usysauxinfo_linux.h"
 
+using namespace	libu ;
 
-/* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
+extern ugetnisdom(char *,int) noex ;
 
-namespace usys {
-    using namespace	usys ;
-    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
+namespace usysauxinfo {
+    sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    ccar	*vp = nullptr ;
@@ -55,11 +54,20 @@ namespace usys {
 	    case SAI_ARCHITECTURE:
 	 	vp = "x86_64" ;
 		break ;
+	    case SAI_MACHINE:
+	 	vp = "Intel(R) Core(TM) i7" ;
+		break ;
 	    case SAI_PLATFORM:
 	 	vp = "Mac-Mini" ;
 		break ;
 	    case SAI_HWPROVIDER:
 	 	vp = "Apple" ;
+		break ;
+	    case SAI_HWSERIAL:
+		rs = loadhostid(rbuf,rlen) ;
+		break ;
+	    case SAI_RPCDOMAIN:
+		rs = ugetnisdom(rbuf,rlen) ;
 		break ;
 	    } /* end switch */
 	    if (vp) {
@@ -67,12 +75,8 @@ namespace usys {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (usysauxinfo) */
+    } /* end subroutine (ugetauxinfo) */
 }
-
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
-
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
 /* USYSAUXINFO_LINUX finish */

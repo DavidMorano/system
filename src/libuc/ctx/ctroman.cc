@@ -52,6 +52,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -100,6 +103,9 @@ static constexpr cchar	*ones[] = {
 	"VIII",
 	"IX"
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -156,7 +162,7 @@ static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
 	    ulonglong	n = 1000 ;
 	    if (v >= n) {
 	        cint		i = (v/n) ;
-	        rs = sbuf_nchar(&b,'M',i) ;
+	        rs = sbuf_chrs(&b,'M',i) ;
 	        v = (v%n) ;
 	    }
 	    n /= 10 ;

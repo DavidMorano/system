@@ -78,6 +78,9 @@ static constexpr sysvalcmds	cmds ;
 static constinit sysvaldata	data ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 sysval::operator int () noex {

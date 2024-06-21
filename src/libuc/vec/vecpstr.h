@@ -27,7 +27,6 @@
 
 
 /* object defines */
-
 #define	VECPSTR_MAGIC		0x88776215
 #define	VECPSTR			struct vecpstr_head
 #define	VECPSTR_CH		struct vecpstr_chunk
@@ -35,7 +34,6 @@
 #define	VECPSTR_DEFENTS		10
 
 /* options */
-
 #define	VECPSTR_ODEFAULT	0
 #define	VECPSTR_OREUSE		(1 << 0)	/* reuse empty slots */
 #define	VECPSTR_OCOMPACT	(1 << 1)	/* means NOHOLES */

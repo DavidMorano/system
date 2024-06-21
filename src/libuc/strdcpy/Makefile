@@ -16,6 +16,7 @@ LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -37,14 +38,17 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= strdcpy.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -58,7 +62,6 @@ OBJ0_DTRDCPY= strdcpyx.o strdcpyxw.o
 OBJ1_STRDCPY= strdcpyclean.o
 OBJ2_STRDCPY= strdcpycompact.o
 OBJ3_STRDCPY= strdcpyopaque.o
-
 
 OBJA_STRDCPY= obj0_strd.o obj1_strd.o
 OBJB_STRDCPY= obj2_strd.o obj3_strd.o

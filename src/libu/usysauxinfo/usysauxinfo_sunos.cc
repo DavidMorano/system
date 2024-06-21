@@ -42,13 +42,12 @@
 
 #include	"usysauxinfo_sunos.h"
 
+using namespace	libu ;
 
-/* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
+static sysret_t sunos_getauxinfo(char *,int,int) noex ;
 
-namespace usys {
-    using namespace	usys ;
-    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
+namespace usysauxinfo {
+    sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    int		r = -1 ;
@@ -56,6 +55,9 @@ namespace usys {
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
 		r = SI_ARCHITECTURE ;
+		break ;
+	    case SAI_MACHINE:
+		r = SI_MACHINE ;
 		break ;
 	    case SAI_PLATFORM:
 		r = SI_PLATFORM ;
@@ -66,21 +68,28 @@ namespace usys {
 	    case SAI_HWSERIAL:
 		r = SI_HW_SERIAL ;
 		break ;
-	    case SAI_SRPCDOMAIN:
+	    case SAI_RPCDOMAIN:
 		r = SI_SRPC_DOMAIN ;
 		break ;
 	    } /* end switch */
 	    if (r >= 0) {
-		rs = u_sysauxinfo(rbuf,rlen,r) ; /* Solaris® specific */
+		rs = sunos_getauxinfo(rbuf,rlen,r) ; /* Solaris® specific */
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (usysauxinfo) */
+    } /* end subroutine (ugetauxinfo) */
 }
 
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
-
+static sysret_t sunos_getauxinfo(char *rbuf,int rlen,int req) noex {
+	csize		rsz(rlen + 1) ;
+	int		rs ;
+	if ((rs = sysinfo(req,rbuf,rsz)) > rsz) {
+	    rs = SR_OVERFLOW ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYSAUXINFO_SUNOS finish */

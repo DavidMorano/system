@@ -4,9 +4,7 @@
 /* get user information from various databases */
 /* version %I% last-modified %G% */
 
-#define	CF_UINFO	1		/* include |uinfo(3uc)| */
-#define	CF_UNAME	0		/* include |u_uname(3u)| */
-#define	CF_OLDUSERINFO	1		/* compile-in old |userinfo(3dam)| */
+#define	CF_OLDUSERINFO	0		/* compile-in old |userinfo(3dam)| */
 #define	CF_UCPWCACHE	0		/* use |ugetpw(3uc)| */
 
 /* revision history:
@@ -408,12 +406,7 @@ static int	procinfo_realname(PROCINFO *) noex ;
 static int	procinfo_mailname(PROCINFO *) noex ;
 static int	procinfo_name(PROCINFO *) noex ;
 static int	procinfo_fullname(PROCINFO *) noex ;
-#if	CF_UINFO
 static int	procinfo_uinfo(PROCINFO *) noex ;
-#endif
-#if	CF_UNAME
-static int	procinfo_uname(PROCINFO *) noex ;
-#endif
 static int	procinfo_nodename(PROCINFO *) noex ;
 static int	procinfo_domainname(PROCINFO *) noex ;
 static int	procinfo_project(PROCINFO *) noex ;
@@ -421,11 +414,6 @@ static int	procinfo_tz(PROCINFO *) noex ;
 static int	procinfo_md(PROCINFO *) noex ;
 static int	procinfo_wstation(PROCINFO *) noex ;
 static int	procinfo_logid(PROCINFO *) noex ;
-
-#ifdef	COMMENT
-static int	checknul(cchar *,cchar **) noex ;
-static int	empty(cchar *) noex ;
-#endif
 
 static int	mkvars() noex ;
 
@@ -446,12 +434,7 @@ static constexpr int	(*components[])(PROCINFO *) = {
 	procinfo_mailname,
 	procinfo_name,
 	procinfo_fullname,
-#if	CF_UINFO
 	procinfo_uinfo,
-#endif
-#if	CF_UNAME
-	procinfo_uname,
-#endif
 	procinfo_nodename,
 	procinfo_domainname,
 	procinfo_project,
@@ -680,41 +663,6 @@ static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (userinfo_load) */
-
-#ifdef	COMMENT
-static int userinfo_setnuls(USERINFO *uep,cchar *emptyp) noex {
-	checknul(emptyp,&uep->sysname) ;
-	checknul(emptyp,&uep->release) ;
-	checknul(emptyp,&uep->version) ;
-	checknul(emptyp,&uep->machine) ;
-	checknul(emptyp,&uep->nodename) ;
-	checknul(emptyp,&uep->domainname) ;
-	checknul(emptyp,&uep->username) ;
-	checknul(emptyp,&uep->password) ;
-	checknul(emptyp,&uep->gecos) ;
-	checknul(emptyp,&uep->homedname) ;
-	checknul(emptyp,&uep->shell) ;
-	checknul(emptyp,&uep->organization) ;
-	checknul(emptyp,&uep->gecosname) ;
-	checknul(emptyp,&uep->account) ;
-	checknul(emptyp,&uep->bin) ;
-	checknul(emptyp,&uep->office) ;
-	checknul(emptyp,&uep->wphone) ;
-	checknul(emptyp,&uep->hphone) ;
-	checknul(emptyp,&uep->printer) ;
-	checknul(emptyp,&uep->realname) ;
-	checknul(emptyp,&uep->mailname) ;
-	checknul(emptyp,&uep->fullname) ;
-	checknul(emptyp,&uep->name) ;
-	checknul(emptyp,&uep->groupname) ;
-	checknul(emptyp,&uep->logid) ;
-	checknul(emptyp,&uep->projname) ;
-	checknul(emptyp,&uep->tz) ;
-	checknul(emptyp,&uep->wstation) ;
-	return 0 ;
-}
-/* end subroutine (userinfo_setnuls) */
-#endif /* COMMENT */
 
 static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	cint		pwlen = var.pwlen ;
@@ -1617,7 +1565,6 @@ static int procinfo_logid(PROCINFO *pip) noex {
 }
 /* end subroutine (procinfo_logid) */
 
-#if	CF_UINFO
 static int procinfo_uinfo(PROCINFO *pip) noex {
 	int		rs ;
 	if ((rs = uinfo_name(&pip->unixinfo)) >= 0) {
@@ -1635,56 +1582,6 @@ static int procinfo_uinfo(PROCINFO *pip) noex {
 	return rs ;
 }
 /* end subroutine (procinfo_uinfo) */
-#endif /* CF_UINFO */
-
-#if	CF_UNAME
-static int procinfo_uname(PROCINFO *pip) noex {
-	UTSNAME		un ;
-	int		rs ;
-	if ((rs = u_uname(&un)) >= 0) {
-	    userinfo	*uip = pip->uip ;
-	    for (int i = 0 ; i < 5 ; i += 1) {
-	        int	uit = -1 ;
-	        cchar	*vp = nullptr ;
-	        switch (i) {
-	        case 0:
-	            uit = uit_sysname ;
-	            vp = un.sysname ;
-	            break ;
-	        case 1:
-	            uit = uit_nodename ;
-	            if (uip->nodename == nullptr) {
-	                vp = un.nodename ;
-	                if (pip->nodename[0] == '\0') {
-	                    cint	nlen = var.nodenamelen ;
-	                    char	*nbuf = pip->nodename ;
-	                    strwcpy(nbuf,vp,nlen) ;
-	                }
-	            }
-	            break ;
-	        case 2:
-	            uit = uit_release ;
-	            vp = un.release ;
-	            break ;
-	        case 3:
-	            uit = uit_version ;
-	            vp = un.version ;
-	            break ;
-	        case 4:
-	            uit = uit_machine ;
-	            vp = un.machine ;
-	            break ;
-	        } /* end switch */
-	        if (vp != nullptr) {
-	            rs = procinfo_store(pip,uit,vp,-1,nullptr) ;
-	        }
-	        if (rs < 0) break ;
-	    } /* end for */
-	} /* end if (uname) */
-	return rs ;
-}
-/* end subroutine (procinfo_uname) */
-#endif /* CF_UNAME */
 
 void userinfo::dtor() noex {
 	cint	rs = int(finish) ;
@@ -1713,21 +1610,6 @@ userinfo_co::operator int () noex {
 	return rs ;
 }
 /* end method (userinfo_co::operator) */
-
-#ifdef	COMMENT
-static int checknul(cchar *emptyp,cchar **epp) noex {
-	if (*epp == nullptr) {
-	    *epp = emptyp ;
-	}
-	return 0 ;
-}
-/* end subroutine (checknul) */
-
-static int empty(cchar *cp) noex {
-	return ((cp == nullptr) || (cp[0] == '\0')) ;
-}
-/* end subroutine (empty) */
-#endif /* COMMENT */
 
 #if	CF_OLDUSERINFO
 int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {

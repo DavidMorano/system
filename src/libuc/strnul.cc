@@ -50,6 +50,12 @@ using std::nothrow ;			/* constant */
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 

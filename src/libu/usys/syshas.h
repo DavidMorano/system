@@ -208,9 +208,6 @@
 /* Solaris®: Relative-Timed-Wait feature */
 #define	SYSHAS_RELTIMEDWAIT	1
 
-/* Solaris®: System-Auxillary-Information feature */
-#define	SYSHAS_SYSAUXINFO	1
-
 /* Solaris®: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		1
 
@@ -236,7 +233,7 @@
 #define	SYSHAS_WAITID		1
 
 /* Solaris®: |pipe2(2)| */
-#if	defined(OSNUM) && (OSNUM >= 9)
+#if	defined(OSNUM_Solaris) && (OSNUM_Solaris >= 9)
 #define	SYSHAS_PIPES		1
 #else
 #define	SYSHAS_PIPES		0
@@ -255,14 +252,14 @@
 #define	SYSHAS_PROJECT		0
 
 /* Darwin: system has |statvfs(2)| call and friends */
-#if	defined(OSNUM) && (OSNUM >= 8)
+#if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
 #define	SYSHAS_STATVFS		1
 #else
 #define	SYSHAS_STATVFS		0
 #endif
 
 /* Darwin: system has |poll(2)| call and friends */
-#if	defined(OSNUM) && (OSNUM >= 8)
+#if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
 #define	SYSHAS_POLL		1
 #else
 #define	SYSHAS_POLL		0
@@ -297,7 +294,7 @@
 #define	SYSHAS_GETCWD		1
 
 /* Darwin: AIO */
-#if	defined(OSNUM) && (OSNUM >= 8)
+#if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
 #define	SYSHAS_AIO		1
 #else
 #define	SYSHAS_AIO		0
@@ -311,7 +308,7 @@
 #define	SYSHAS_TASK		0
 
 /* Darwin: UTMPX */
-#if	defined(OSNUM) && (OSNUM >= 8)
+#if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
 #define	SYSHAS_UTMPX		1
 #else
 #define	SYSHAS_UTMPX		0
@@ -319,7 +316,7 @@
 
 /* Darwin: UTMP-name */
 #define	SYSHAS_UTMPNAME		0
-#if	defined(OSNUM) && (OSNUM >= 9)
+#if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 9)
 #define	SYSHAS_UTMPXNAME	1
 #else
 #define	SYSHAS_UTMPXNAME	0
@@ -446,9 +443,6 @@
 
 /* Darwin: Relative-Timed-Wait feature */
 #define	SYSHAS_RELTIMEDWAIT	0
-
-/* Darwin: System-Auxillary-Information feature */
-#define	SYSHAS_SYSAUXINFO	1
 
 /* Darwin: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		0
@@ -661,9 +655,6 @@
 
 /* Linux: Relative-Timed-Wait feature */
 #define	SYSHAS_RELTIMEDWAIT	0
-
-/* Linux: System-Auxillary-Information feature */
-#define	SYSHAS_SYSAUXINFO	0
 
 /* Linux: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		0

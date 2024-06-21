@@ -9,17 +9,17 @@ HELPFILE= $(T).help
 SRCROOT= $(LOCAL)
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-HELPDIR= $(SRCROOT)/share/help
-MAXDIR= $(SRCROOT)/man
+BINDIR= $(REPOROOT)/bin
+INCDIR= $(REPOROOT)/include
+LIBDIR= $(REPOROOT)/lib
+MANDIR= $(REPOROOT)/man
 
-#LDCRTDIR= /opt/SUNWspro/WS6/lib
-#LDCRTDIR= /opt/SUNWspro/SC5.0/lib
-#LDCRTDIR= /opt/SUNWspro/SC4.0/lib
-#LDCRTDIR= /opt/SUNWspro/lib
-LDCRTDIR= $(SRCROOT)/lib
+INFODIR= $(REPOROOT)/info
+HELPDIR= $(REPOROOT)/share/help
+
+CRTDIR= $(CGS_CRTDIR)
+VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CC= gcc

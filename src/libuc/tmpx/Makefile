@@ -16,6 +16,7 @@ LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -37,14 +38,17 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= tmpx.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -59,7 +63,6 @@ OBJ1_TMPX= tmpx_getboottime.o
 OBJ2_TMPX= tmpx_getrunlevel.o
 OBJ3_TMPX= tmpx_getuserlines.o
 OBJ4_TMPX= tmpx_getuserterms.o
-
 
 OBJA_TMPX= obj0_tmpx.o obj1_tmpx.o
 OBJB_TMPX= obj2_tmpx.o obj3_tmpx.o obj4_tmpx.o
@@ -109,6 +112,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_tmpx.o:	$(OBJ0_TMPX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_TMPX)

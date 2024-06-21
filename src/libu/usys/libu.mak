@@ -2,14 +2,12 @@
 
 T= libu
 
-#ALL= $(T).so $(T).a
-ALL= $(T).a $(T).o
+ALL= $(T).o $(T).so
 
 
 BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
-RUNDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
@@ -17,7 +15,7 @@ HELPDIR= $(REPOROOT)/share/help
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 CPP= cpp
 CC= gcc
@@ -48,8 +46,6 @@ INCDIRS=
 LIBDIRS=
 
 
-LDRPATH= $(USRLOCAL)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -64,13 +60,13 @@ LDFLAGS= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o intsat.o
+OBJ00= endian.o intsat.o xxtostr.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= ugetloadavg.o 
+OBJ03= strtox.o
 
-OBJ04= usupport.o 
-OBJ05= utimeout.o 
+OBJ04= usupport.o usyscallbase.o
+OBJ05= utimeout.o ugetloadavg.o
 OBJ06= utimeouts.o 
 OBJ07= ulogerror.o uinet.o
 
@@ -254,9 +250,11 @@ intsat.o:		intsat.cc intsat.h
 mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
 
-utimeout.o:		utimeout.c utimeout.h
-utimeouts.o:		utimeouts.cc utimeouts.h
-usupport.o:		usupport.cc usupport.h
+utimeout.o:		utimeout.c utimeout.h		$(INCS)
+utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
+usupport.o:		usupport.cc usupport.h		#(INCS)
+usyscallbase.o:		usyscallbase.cc usyscallbase.hh	#(INCS)
+usysdata.o:		usysdata.cc usysdata.h		$(INCS)
 
 # USYS
 usys.o:			usys.dir
@@ -295,13 +293,12 @@ usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
+uvariables.o:		uvariables.cc uvariables.hh
 
 syswords.o:		syswords.cc syswords.hh
 varnames.o:		varnames.cc varnames.hh
 valuelims.o:		valuelims.cc valuelims.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
-
-uvariables.o:		uvariables.cc uvariables.hh
 
 timeval.o:		timeval.cc timeval.h
 itimerval.o:		itimerval.cc itimerval.h
@@ -310,5 +307,7 @@ timespec.o:		timespec.cc timespec.h
 itimerspec.o:		itimerspec.cc itimerspec.h
 
 timecount.o:		timecount.cc timecount.hh
+strtox.o:		strtox.cc strtox.h		$(INCS)
+xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
 
 

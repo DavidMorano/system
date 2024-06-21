@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -47,7 +47,7 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
-LDRPATH=
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -113,6 +113,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0.o:			$(OBJ0_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNWCPYX)

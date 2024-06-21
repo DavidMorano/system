@@ -44,13 +44,6 @@
 #include	<usysauxinfo.h>
 
 
-/* SYSAUXINFO begin */
-#if	(!defined(SYSHAS_SYSAUXINFO)) || (SYSHAS_SYSAUXINFO == 0)
-
-
-#endif
-
-
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYSAUXINFO_DARWIN finish */
 

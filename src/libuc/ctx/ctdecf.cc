@@ -114,6 +114,9 @@ namespace {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {

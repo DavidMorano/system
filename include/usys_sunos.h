@@ -34,14 +34,6 @@
 #include	<utypealiases.h>
 
 
-EXTERNC_begin
-
-extern int	sunos_sysinfo(char *,int,int) noex ;
-extern int	sunos_ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
-
-
 /* USYSSUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 

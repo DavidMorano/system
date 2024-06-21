@@ -112,6 +112,9 @@ int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 /* end subroutine (ctdecpx) */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ctdecpui(char *dp,int dl,int p,uint uv) noex {

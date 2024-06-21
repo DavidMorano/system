@@ -35,19 +35,12 @@
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 #include	<sys/types.h>
+#include	<sys/systeminfo.h>	/* <- where the stuff we want is */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
 #include	<sysauxinfo.h>
-
-
-/* SYSAUXINFO begin */
-#if	(!defined(SYSHAS_SYSAUXINFO)) || (SYSHAS_SYSAUXINFO == 0)
-
-
-#endif /* (!defined(SYSHAS_SYSAUXINFO)) || (SYSHAS_SYSAUXINFO == 0) */
-/* SYSAUXINFO end */
 
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */

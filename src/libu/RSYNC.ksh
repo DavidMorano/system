@@ -3,7 +3,7 @@
 
 
 RHOST=rcf
-RDIR=src/libu32
+RDIR=src/libu
 
 
 if [[ $# -gt 0 ]] ; then

@@ -81,6 +81,29 @@
 #endif
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+#ifndef	if_consteval
+#define	if_consteval		if consteval
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	cast_static
+#define	cast_static		static_cast
+#define	cast_dynamic		dynamic_cast
+#define	cast_const		const_cast
+#define	cast_reinterpret	reinterpet_cast
+#define	cast_bit		bit_cast
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	cauto
+#define	cauto			const auto
+#endif
+#endif /* __cplusplus */
+
+
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
 #define	EXTERNC_begin	extern "C" {

@@ -1,7 +1,7 @@
 /* usupport SUPPORT */
 /* lang=C++20 */
 
-/* UNIX-kernal support subroutines */
+/* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -47,25 +47,36 @@
 #include	<envstandards.h>	/* MUST be frsit to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |gethostid(3c)| */
 #include	<poll.h>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
+#include	<new>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usyscalls.h>
 #include	<clanguage.h>
 #include	<intsat.h>
-#include	<localmisc.h>
+#include	<stdintx.h>
+#include	<xxtostr.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"usupport.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -132,17 +143,43 @@ int memclear(void *vp,size_t sz) noex {
 }
 /* end subroutine (memclear) */
 
+namespace libu {
+    char *strwcpy(char *dp,cchar *sp,int sl) noex {
+	if (sl >= 0) {
+	    while (sl-- && *sp) *dp++ = *sp++ ;
+	} else {
+	    while (*sp) *dp++ = *sp++ ;
+	} /* end if */
+	*dp = '\0' ;
+	return dp ;
+    }
+}
 
-/* local subroutines */
-
-namespace usys {
-    int sncpy(char *dbuf,int dlen,cchar *sp) noex {
+namespace libu {
+    int sncpy1(char *dbuf,int dlen,cchar *sp) noex {
 	csize		dsz = (dlen + 1) ;
 	int		rs ;
 	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
 	    rs = SR_OVERFLOW ;
 	} else {
 	    rs = int(rsz & INT_MAX) ;
+	}
+	return rs ;
+    }
+    int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
+	int		rs ;
+	if (dl >= 0) {
+	    if (sl >= 0) {
+	        if (sl > dl) {
+	            rs = sncpy1(dp,dl,sp) ;
+	        } else {
+	            rs = strwcpy(dp,sp,sl) - dp ;
+		}
+	    } else {
+	        rs = sncpy1(dp,dl,sp) ;
+	    }
+	} else {
+	    rs = strwcpy(dp,sp,sl) - dp ;
 	}
 	return rs ;
     }
@@ -169,6 +206,52 @@ namespace usys {
 	return rs ;
     }
 }
+
+namespace libu {
+    sysret_t loadhostid(char *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
+		rs = ctdec(dp,dl,hid) ;
+	    }
+	}
+	return rs ;
+    }
+    sysret_t ugethostid(ulong *idp) noex {
+	int		rs = SR_FAULT ;
+	if (idp) {
+	    clong	res = gethostid() ;
+	    *idp = ulong(res) ;
+	}
+	return rs ;
+    }
+}
+
+namespace libu {
+    template<typename T>
+    int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    cint	dlen = DIGBUFLEN ;
+	    char	dbuf[DIGBUFLEN + 1] ;
+	    char	*bp = ctx(uv,(dbuf+dlen)) ;
+	    rs = sncpy(dp,dl,bp) ;
+	}
+	return rs ;
+    }
+    int ctdecui(char *dp,int dl,uint uv) noex {
+	return ctdecx(uitostr,dp,dl,uv) ;
+    }
+    int ctdecul(char *dp,int dl,ulong uv) noex {
+	return ctdecx(ultostr,dp,dl,uv) ;
+    }
+    int ctdecull(char *dp,int dl,ulonglong uv) noex {
+	return ctdecx(ulltostr,dp,dl,uv) ;
+    }
+}
+
+
+/* local subroutines */
 
 static int isleep(int mto) noex {
 	POLLFD		fds[1] = {} ;

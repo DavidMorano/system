@@ -42,13 +42,6 @@
 #include	<sysauxinfo.h>
 
 
-/* SYSAUXINFO begin */
-#if	(!defined(SYSHAS_SYSAUXINFO)) || (SYSHAS_SYSAUXINFO == 0)
-
-
-#endif
-
-
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0)*/
 /* USYSAUXINFO_LINUX finish */
 

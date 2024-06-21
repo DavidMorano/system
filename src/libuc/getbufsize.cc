@@ -94,14 +94,14 @@
 /* local typedefs */
 
 
-/* external variables */
-
-
 /* external subroutines */
 
 extern "C" {
     extern int	vecstr_envfile(vecstr *,cchar *) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */

@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error code (- errno)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -47,7 +47,7 @@
 #include	<utypealiases.h>
 
 
-namespace usys {
+namespace libu {
     extern sysret_t ugetnisdom(char *,int) noex ;
 }
 

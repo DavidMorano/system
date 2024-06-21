@@ -49,10 +49,16 @@
 #ifndef	_SC_ARG_MAX
 #define	_SC_ARG_MAX		-1
 #endif
+#ifndef	_SC_NAME_MAX
+#define	_SC_NAME_MAX		-1
+#endif
+#ifndef	_SC_PATH_MAX
+#define	_SC_PATH_MAX		-1
+#endif
 #ifndef	_SC_LINE_MAX
 #define	_SC_LINE_MAX		-1
 #endif
-#ifndef	_SC_HOST_NAME_MAX
+#ifndef	_SC_HOST_NAME_MAX		/* really the "nodename" length */
 #define	_SC_HOST_NAME_MAX	-1
 #endif
 #ifndef	_SC_LOGIN_NAME_MAX
@@ -98,9 +104,11 @@ constexpr bufsizedata::bufsizedata() noex {
 		ip->defval = ARBUFLEN ;
 	        break ;
 	    case getbufsize_mn:		/* max-name */
+	        ip->name = _SC_NAME_MAX ;
 		ip->defval = MNBUFLEN ;
 	        break ;
 	    case getbufsize_mp:		/* max-path */
+	        ip->name = _SC_PATH_MAX ;
 	        ip->defval = MPBUFLEN ;
 	        break ;
 	    case getbufsize_ml:		/* max-line */
@@ -108,7 +116,7 @@ constexpr bufsizedata::bufsizedata() noex {
 		ip->defval = MLBUFLEN ;
 	        break ;
 	    case getbufsize_nn:		/* node-name */
-	        ip->name = _SC_HOST_NAME_MAX ;
+	        ip->name = _SC_HOST_NAME_MAX ; /* <- really is "nodename" */
 		ip->defval = NNBUFLEN ;
 	        break ;
 	    case getbufsize_hn:		/* host-name */

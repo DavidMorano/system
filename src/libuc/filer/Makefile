@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP= cpp
@@ -37,14 +37,17 @@ LINT= lint
 
 DEFS=
 
-
 INCS= filer.h
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)

@@ -24,23 +24,53 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+
+/* USYS_DARWIN start */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+
+
 #include	<sys/types.h>
+#include	<sys/mman.h>
+#include	<unistd.h>		/* |getdomainname(3darwin)| */
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usyscallbase.hh>
+#include	<usysrets.h>
+#include	<intsat.h>
 
 #include	"usys_darwin.h"
 
 
-/* USYS_DARWIN start */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+using namespace	libu ;
 
-#include	<sys/mman.h>
-#include	<unistd.h>		/* |getdomainname(3darwin)| */
-
+namespace {
+    struct syscaller ;
+    typedef int (syscaller::*syscaller_m)() noex ;
+    struct syscaller : usyscallbase {
+	syscaller_m	m = nullptr ;
+	cchar		*name ;
+	char		*obuf ;
+	int		olen ;
+	int operator () (char *b,int l,cchar *n) noex {
+	    name = n ;
+	    obuf = b ;
+	    olen = l ;
+	    return handler() ;
+	} ;
+        int callstd() noex override {
+            int         rs = SR_BUGCHECK ;
+            if (m) {
+                rs = (this->*m)() ;
+            }
+            return rs ;
+        } ;
+	int isysctl() noex ;
+    } ; /* end struct (syscaller) */
+}
 
 /*----------------------------------------------------------------------------*/
 /* TIMER begin */
@@ -115,34 +145,35 @@ errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 /* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
 
+namespace libu {
+    sysret_t darwin_usysctl(char *obuf,int olen,cchar *name) noex {
+	syscaller	syscall ;
+	int		rs = SR_FAULT ;
+	syscall.m = &syscaller::isysctl ;
+	if (obuf && name) {
+	    rs = SR_INVALID ;
+	    if (olen >= 0) {
+	        rs = syscall(obuf,olen,name) ;
+	    }
+	}
+	return rs ;
+    } /* end subroutine (darwin_usysctl) */
+}
 
-sysret_t darwin_ugetnisdom(char *rbuf,int rlen) noex {
-	csize		rsz = size_t(rlen+1) ;
+int syscaller::isysctl() noex {
+	cnullptr	np{} ;
+	size_t		osz = size_t(olen) ;
 	int		rs ;
-	if ((rs = getdomainname(rbuf,rsz)) < 0) {
-	    rs = (- errno) ;
+	int		len = 0 ;
+        if ((rs = sysctlbyname(name,obuf,&osz,np,0uz)) >= 0) {
+            len = intsat(osz) ;
+            obuf[len] = '\0' ;
+        } else {
+            rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end subroutine (darwin_ugetnisdom) */
-
-
-#else /* other operating systems */
-
-
-sysret_t darwin_ugetnisdom(char *rbuf,int rlen) noex {
-	int		ec = EFAULT ;
-	if (rbuf) {
-	    ec = EINVAL ;
-	    if (rlen >= 0) {
-		ec = ENOSYS ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-	return (- ec) ;
-}
-/* end subroutine (darwin_ugetnisdom) */
-
+/* end method (syscaller:isysctl) */
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYS_DARWIN finish */

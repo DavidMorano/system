@@ -27,6 +27,7 @@
 	u_send
 	u_sendmsg
 	u_sendto
+	u_sendfiler
 	u_recv
 	u_recvmsg
 	u_recvfrom
@@ -68,6 +69,18 @@
 	>=0	OK
 	<0	error code (system-return)
 
+	Notes:
+	On the |sendfile(3c)| subroutine signature, although Apple
+	Darwin pretty much claims that they invented this interface,
+	no one else has an interface (function signature) that
+	matches that on Darwin.  Both Linux and Solaris® (and its
+	derivatives) both have the signature that I am provinding 
+	below.  The Apple Darwin subroutine (signature) is a sort
+	of "IO-vector" flavored animal.  In as such, it is a superset
+	of what everyone else has implemented.  Solaris® has implemented
+	a seperate "IO-vector" flavored version, but theirs is
+	called |sendfilev(3c)| (good for Solaris®).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -97,6 +110,7 @@
 /* imported namespaces */
 
 using namespace	ufiledesc ;		/* namespace */
+using namespace	usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
 
@@ -116,7 +130,9 @@ constexpr nullptr_t		np{} ;
 
 namespace {
     struct usocket ;
+    struct usender ;
     typedef int (usocket::*usocket_m)(int) noex ;
+    typedef int (usender::*usender_m)(int) noex ;
     struct usocket : ufiledescbase {
 	usocket_m	m = nullptr ;
 	CSOCKADDR	*sap ;
@@ -187,6 +203,26 @@ namespace {
 	int irecvfrom(int) noex ;
 	int ishutdown(int) noex ;
     } ; /* end struct (usocket) */
+    struct usender : usocket {
+	usender_m	m = nullptr ;
+	SFHDTR		*hdrp ;
+	off_t		fo ;
+	size_t		c ;
+	int		s ;
+	usender(int as,off_t afo,size_t ac) noex {
+	    s = as ;
+	    fo = afo ;
+	    c = ac ;
+	} ;
+	int callstd(int fd) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fd) ;
+	    }
+	    return rs ;
+	} ;
+	int isendfile(int) noex ;
+    } ; /* end struct (usender) */
 }
 
 
@@ -283,6 +319,17 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	return rs ;
 }
 /* end subroutine (u_sendto) */
+
+int u_sendfiler(int s,int fd,off_t fo,size_t c) noex {
+	int		rs = SR_FAULT ;
+	if (fo >= 0) {
+	    usender	so(s,fo,c) ;
+	    so.m = &usender::isendfile ;
+	    rs = so(fd) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_sendfile) */
 
 int u_recv(int fd,void *rbuf,int rlen,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -472,5 +519,10 @@ int usocket::ishutdown(int fd) noex {
 	return rs ;
 }
 /* end method (usocket::ishutdown) */
+
+int usender::isendfile(int fd) noex {
+	return usendfile(fd,s,fo,c) ;
+}
+/* end method (usender::isendfile) */
 
 

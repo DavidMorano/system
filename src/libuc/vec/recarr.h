@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdint.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -38,7 +39,7 @@
 #define	RECARR_OSORTED		(1 << 5)	/* keep sorted */
 #define	RECARR_OORDERED		(1 << 6)	/* keep ordered */
 
-enum recarr_os {
+enum recarr_os : uint16_t {
     recarr_odefault 	= RECARR_ODEFAULT,
     recarr_oreuse 	= RECARR_ODEFAULT,
     recarr_ocompact	= RECARR_OCOMPACT,

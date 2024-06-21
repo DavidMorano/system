@@ -40,9 +40,10 @@
 #include	<usys_linux.h>
 
 /* utilities */
-#include	<usys_ugetnisdom.h>
 #include	<usys_ufcntl.h>
 #include	<usys_ugetdents.h>
+#include	<usys_ugetnisdom.h>
+#include	<usys_usendfile.h>
 
 /* missing operating system calls */
 #include	<usys_mqueue.h>

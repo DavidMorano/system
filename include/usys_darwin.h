@@ -32,9 +32,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+
+/* USYSDARWIN start */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+
+
 #include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
+#include	<sys/sysctl.h>		/* <- Darwin |sysctl(2)| */
 #include	<signal.h>
 #include	<time.h>
 #include	<pthread.h>
@@ -43,21 +49,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-
-EXTERNC_begin
-
-extern sysret_t darwin_ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
-
-
-/* USYSDARWIN start */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
 
 #ifndef	SIGEVENT
 #define	SIGEVENT	struct sigevent
@@ -305,6 +296,11 @@ EXTERNC_end
 #endif
 #endif /* COMMENT */
 /*----------------------------------------------------------------------------*/
+
+
+namespace libu {
+    extern sysret_t darwin_usysctl(char *,int,cchar *) noex ;
+}
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */

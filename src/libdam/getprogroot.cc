@@ -94,8 +94,8 @@
 struct subinfo {
 	ids		id ;
 	dirseen		dirs ;
-	uint		f_dirs:1 ;
 	int		prlen ;
+	uint		f_dirs:1 ;
 } ;
 
 

@@ -13,9 +13,9 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/socket.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
 

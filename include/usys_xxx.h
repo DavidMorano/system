@@ -42,13 +42,6 @@
 #include	<utypealiases.h>
 
 
-EXTERNC_begin
-
-extern sysret_t xxx_ugetnisdom(char *,int) noex ;
-
-EXTERNC_end
-
-
 /*----------------------------------------------------------------------------*/
 /* SECDB begin */
 #if	(!defined(SYSHAS_SECDB)) || (SYSHAS_SECDB == 0)

@@ -30,50 +30,67 @@
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
-#include	<climits>
+#include	<sys/sysctl.h>		/* <- Darwin |sysctl(3c)| */
 #include	<unistd.h>
+#include	<climits>
 #include	<cerrno>
+#include	<new>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usupport.h>
+#include	<intsat.h>
 
 #include	"usysauxinfo_darwin.h"
 
+using namespace	libu ;
 
-/* SYSAUXINFO begin */
-#if	defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0)
-
-namespace usys {
-    using namespace	usys ;
-    sysret_t usysauxinfo(char *rbuf,int rlen,int req) noex {
+namespace usysauxinfo {
+    sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    cchar	*vp = nullptr ;
-	    rs = SR_NOENT ;
+	    cchar	*name = nullptr ;
+	    rs = SR_OK ;
+	    rbuf[0] = '\0' ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
-	 	vp = "x86_64" ;
+		name = "hw.machine" ;
+		break ;
+	    case SAI_MACHINE:
+		name = "machdep.cpu.brand_string" ;
 		break ;
 	    case SAI_PLATFORM:
-	 	vp = "Mac-Mini" ;
+		name = "hw.model" ;
 		break ;
 	    case SAI_HWPROVIDER:
 	 	vp = "Apple" ;
 		break ;
+	    case SAI_HWSERIAL:
+		rs = loadhostid(rbuf,rlen) ;
+		break ;
+	    case SAI_RPCDOMAIN:
+		name = "kern.nisdomainname" ;
+		break ;
+	    case SAI_UUID:
+		name = "kern.uuid" ;
+		break ;
+	    default:
+		rs = SR_NOTFOUND ;
+		break ;
 	    } /* end switch */
-	    if (vp) {
-		rs = sncpy(rbuf,rlen,vp) ;
-	    }
+	    if (rs >= 0) {
+		if (name) {
+		    rs = darwin_usysctl(rbuf,rlen,name) ;
+	        } else if (vp) {
+		    rs = sncpy(rbuf,rlen,vp) ;
+	        }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (usysauxinfo) */
+    } /* end subroutine (ugetauxinfo) */
 }
-
-#endif /* defined(SYSHAS_SYSAUXINFO) && (SYSHAS_SYSAUXINFO > 0) */
-/* SYSAUXINFO end */
-
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYSAUXINFO_DARWIN finish */

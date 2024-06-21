@@ -30,18 +30,19 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* |adjtime(2)| */
-#include	<unistd.h>
-#include	<time.h>		/* |time(2)| */
+#include	<sys/utsname.h>		/* |UTSNAME| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usupport.h>
+
+#include	<usysauxinfo.h>		/* the request codes */
 
 
 EXTERNC_begin
 
 extern int u_uname(UTSNAME *) noex ;
+extern int u_getauxinfo(char *,int,int) noex ;
+extern int u_gethostid(ulong *) noex ;
 
 EXTERNC_end
 

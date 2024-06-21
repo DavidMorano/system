@@ -49,6 +49,7 @@ enum ostypes {
 	ostype_bsd,
 	ostype_sysv,
 	ostype_linux,
+	ostype_darwin,
 	ostype_overlast
 } ;
 

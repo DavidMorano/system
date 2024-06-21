@@ -1,7 +1,7 @@
 /* usupport HEADER */
 /* lang=C20 */
 
-/* UNIX-kernal support subroutines */
+/* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -22,10 +22,14 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<utimeout.h>
-#include	<timecount.hh>
 #include	<ulogerror.h>
+#include	<usys.h>
+#include	<timecount.hh>
 #include	<filetype.h>
 #include	<aflag.hh>
+#include	<intsat.h>
+#include	<xxtostr.h>
+#include	<strtox.h>
 
 
 #ifndef	SUBROUTINE_MEMCLEAR
@@ -41,8 +45,8 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename T>
-int memclear(T *op) noex {
-	cint	osz = sizeof(T) ;
+inline int memclear(T *op) noex {
+	csize	osz = sizeof(T) ;
 	return memclear(op,osz) ;
 }
 
@@ -55,7 +59,7 @@ int memclear(T *op) noex {
 #ifdef	__cplusplus
 
 template<typename T>
-void *memcpy(T *dp,void *sp) noex {
+inline void *memcpy(T *dp,void *sp) noex {
 	csize	dsz = sizeof(T) ;
 	return memcpy(dp,sp,dsz) ;
 }
@@ -112,8 +116,34 @@ EXTERNC_end
 
 
 #ifdef	__cplusplus
-namespace usys {
-    extern int sncpy(char *,int,cchar *) noex ;
+namespace libu {
+    extern char *strwcpy(char *,cchar *,int = -1) noex ;
+}
+namespace libu {
+    extern int snwcpy(char *,int,cchar *,int = -1) noex ;
+    extern int sncpy1(char *,int,cchar *) noex ;
+    extern int ctdecui(char *,int,uint) noex ;
+    extern int ctdecul(char *,int,ulong) noex ;
+    extern int ctdecull(char *,int,ulonglong) noex ;
+    static inline int sncpy(char *dp,int dl,cchar *sp) noex {
+	return sncpy1(dp,dl,sp) ;
+    }
+    template<typename T> inline int ctdec(char *,int,T v) noex {
+	return 0 ;
+    }
+    template<> inline int ctdec(char *dp,int dl,uint v) noex {
+	return ctdecui(dp,dl,v) ;
+    }
+    template<> inline int ctdec(char *dp,int dl,ulong v) noex {
+	return ctdecul(dp,dl,v) ;
+    }
+    template<> inline int ctdec(char *dp,int dl,ulonglong v) noex {
+	return ctdecull(dp,dl,v) ;
+    }
+}
+namespace libu {
+    extern int loadhostid(char *,int) noex ;
+    extern int ugethostid(ulong *) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
 }

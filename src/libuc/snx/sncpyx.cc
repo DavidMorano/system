@@ -40,9 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstring>
 #include	<cstdarg>
 #include	<utypedefs.h>
@@ -50,6 +48,9 @@
 #include	<clanguage.h>
 
 #include	"sncpyx.h"
+
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -112,12 +113,12 @@ int sncpyx(char *dp,int dl,int n,...) noex {
 	if (dl < 0) dl = (INT_MAX - 1) ;
 	if (dp) {
 	    va_list	ap ;
-	    int		rlen = (dl+1) ;
+	    size_t	rlen = (dl+1) ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    dp[0] = '\0' ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		int	ml ;
+		size_t	ml ;
 	        cc	*sp = (cc *) va_arg(ap,cc *) ;
 	        if ((ml = strlcpy(bp,sp,rlen)) >= rlen) {
 	            rs = SR_OVERFLOW ;

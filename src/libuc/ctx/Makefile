@@ -12,10 +12,10 @@ MANDIR= $(REPOROOT)/man
 
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
+RUNDIR= $(USRLOCAL)/lib
 
 
 CPP=	cpp
@@ -37,14 +37,17 @@ LINT=	lint
 
 DEFS=
 
-
 INCS= cvtdig.hh
-
 
 LIBS=
 
 
+INCDIRS=
+
 LIBDIRS= -L${LIBDIR}
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -62,7 +65,7 @@ OBJ3_CTX= ctdec.o ctdecp.o ctdecf.o
 OBJ4_CTX= cthex.o
 OBJ5_CTX= cta26.o
 OBJ6_CTX= ctroman.o ctwords.o
-OBJ7_CTX= xxtostr.o cvtdig.o
+OBJ7_CTX= cvtdig.o
 
 
 OBJA_CTX= obj0ctx.o obj1ctx.o obj2ctx.o obj3ctx.o
@@ -160,7 +163,6 @@ cta26.o:			cta26.cc cta26.h $(INCS)
 ctxxx.o:			ctxxx.cc ctxxx.h $(INCS)
 ctroman.o:			ctroman.cc ctroman.h $(INCS)
 ctwords.o:			ctwords.cc ctwords.hh
-xxtostr.o:			xxtostr.cc xxtostr.h $(INCS)
 cvtdig.o:			cvtdig.cc $(INCS)
 
 

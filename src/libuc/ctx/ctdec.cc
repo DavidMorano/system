@@ -58,7 +58,6 @@
 	required machine instructions) this present implemtnation
 	is adequate.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -89,6 +88,9 @@ using std::countr_zero ;		/* subroutine-template */
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static inline constexpr int ffbsi(int b) noex {
@@ -114,9 +116,9 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 	        const UT	vmask(~ULONG_MAX) ;
 	        UT		nv ;
 	        while ((v & vmask) != 0UL) {
-	                nv = v / ub ;
-	                *--rp = (char) ((v - (nv * ub)) + '0') ;
-	                v = nv ;
+	            nv = v / ub ;
+	            *--rp = (char) ((v - (nv * ub)) + '0') ;
+	            v = nv ;
 	        } /* end while (slower) */
 	        {
 		    ulong	lv = (ulong) v ;

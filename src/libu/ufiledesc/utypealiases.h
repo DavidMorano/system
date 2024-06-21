@@ -157,6 +157,10 @@
 #define	CONMSGHDR	struct cmsghdr
 #endif
 
+#ifndef	SFHDTR
+#define	SFHDTR		struct sf_hdtr
+#endif
+
 #ifndef	TIMEVAL
 #define	TIMEVAL		struct timeval
 #endif
@@ -281,6 +285,10 @@
 #define	CSIGVAL		const SIGVAL
 #endif
 
+#ifndef	CUSTAT
+#define	CUSTAT		const USTAT
+#endif
+
 #ifndef	CTIMEVAL
 #define	CTIMEVAL	const TIMEVAL
 #endif
@@ -335,6 +343,10 @@
 
 #ifndef	CMSGHDR
 #define	CMSGHDR		const MSGHDR
+#endif
+
+#ifndef	CSFHDTR
+#define	CSFHDTR		const SFHDTR
 #endif
 
 #ifndef	CRLIMIT

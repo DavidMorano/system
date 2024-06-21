@@ -42,6 +42,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using namespace	libu ;			/* |ugetnisdom(3u)| */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 

@@ -61,9 +61,10 @@ struct varnames {
 	static const char version[] ;
 	static const char machine[] ;
 	static const char osname[] ;
+	static const char ostype[] ;
+	static const char osrelease[] ;
 	static const char osnum[] ;
 	static const char osrel[] ;
-	static const char ostype[] ;
 	static const char osvers[] ;
 	static const char mail[] ;
 	static const char node[] ;
@@ -86,10 +87,15 @@ struct varnames {
 	static const char termprogram[] ;
 	static const char tz[] ;
 	static const char printer[] ;
+	static const char printerbin[] ;
 	static const char pager[] ;
 	static const char organization[] ;
 	static const char orgloc[] ;
 	static const char orgcode[] ;
+	static const char office[] ;
+	static const char name[] ;
+	static const char fullname[] ;
+	static const char mailname[] ;
 	static const char tmout[] ;
 	static const char editor[] ;
 	static const char visual[] ;

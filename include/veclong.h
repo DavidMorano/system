@@ -33,14 +33,14 @@
 #define	VECLONG_TYPE		long
 
 /* options */
-#define	VECLONG_ODEFAULT	0x0000
-#define	VECLONG_OREUSE		0x0001		/* reuse empty slots */
-#define	VECLONG_OCOMPACT	0x0002		/* means NOHOLES */
-#define	VECLONG_OSWAP		0x0004		/* use swapping */
-#define	VECLONG_OSTATIONARY	0x0008		/* entries should not move */
-#define	VECLONG_OCONSERVE	0x0010		/* conserve space */
-#define	VECLONG_OSORTED		0x0020		/* keep sorted */
-#define	VECLONG_OORDERED	0x0040		/* keep ordered */
+#define	VECLONG_ODEFAULT	0
+#define	VECLONG_OREUSE		(1 << 0)	/* reuse empty slots */
+#define	VECLONG_OCOMPACT	(1 << 1)	/* means NOHOLES */
+#define	VECLONG_OSWAP		(1 << 2)	/* use swapping */
+#define	VECLONG_OSTATIONARY	(1 << 3)	/* entries should not move */
+#define	VECLONG_OCONSERVE	(1 << 4)	/* conserve space */
+#define	VECLONG_OSORTED		(1 << 5)	/* keep sorted */
+#define	VECLONG_OORDERED	(1 << 6)	/* keep ordered */
 
 
 struct veclong_cursor {

@@ -89,7 +89,7 @@
 EXTERNC_begin
 
 /* system group */
-extern int	uc_gethostid(unsigned int *) noex ;
+extern int	uc_gethostid(ulong *) noex ;
 extern int	uc_gethostname(char *,int) noex ;
 extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_getnisdomain(char *,int) noex ;

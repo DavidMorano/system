@@ -38,7 +38,6 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
-#include	<usysauxinfo.h>		/* <- from |libu| */
 
 #include	"ucsysauxinfo.h"
 
@@ -47,8 +46,6 @@
 
 
 /* imported namespaces */
-
-using usys::usysauxinfo ;		/* subroutines */
 
 
 /* local typedefs */
@@ -75,7 +72,7 @@ using usys::usysauxinfo ;		/* subroutines */
 /* exported subroutines */
 
 int uc_sysauxinfo(char *rbuf,int rlen,int req) noex {
-	return usysauxinfo(rbuf,rlen,req) ;
+	return u_getauxinfo(rbuf,rlen,req) ;
 }
 
 

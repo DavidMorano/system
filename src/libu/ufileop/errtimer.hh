@@ -1,4 +1,4 @@
-/* errtimer HEADER (UNIX® System V System C Inter-Process-Communication) */
+/* errtimer HEADER */
 /* lang=C20 */
 
 /* error-timer */
@@ -32,12 +32,12 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<clanguage.h>		
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
-#include	<clanguage.h>		/* |POLL_INTMULT| */
 
 
 struct errtimer ;
