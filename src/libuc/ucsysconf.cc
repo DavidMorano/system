@@ -103,9 +103,9 @@ namespace {
 	atomic_int	d[dataitem_overlast] ;
     } ; /* end struct (ucconfdatas) */
     struct ucsysconf ;
-    typedef int (ucsysconf::*mem_f)(int) ;
+    typedef int (ucsysconf::*usysconf_m)(int) ;
     struct ucsysconf {
-	mem_f		m ;
+	usysconf_m	m ;
 	char		*rbuf ;
 	long		*lp ;
 	int		rlen ;
