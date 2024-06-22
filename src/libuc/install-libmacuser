@@ -1,0 +1,6 @@
+#!/usr/extra/bin/ksh
+# INSTALL-LIBMACUSER
+
+install -S -p -m 0664 libmacuser.a /usr/local/lib 
+install -S -p -m 0664 libmacuser.a ~/gh/system/lib 
+

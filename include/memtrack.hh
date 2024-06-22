@@ -62,7 +62,7 @@ enum memtrackmems {
 
 struct memtrack_ent {
 	cvoid		*addr ;
-	int		size ;
+	int		asize ;
 } ;
 
 struct memtrack ;
@@ -82,7 +82,8 @@ struct memtrack_co {
 
 struct memtrack {
 	typedef memtrack_ent	ent ;
-	mapblock<uintptr_t,memtrack_ent>	t ; /* <- the "tracker" */
+	typedef mapblock<uintptr_t,memtrack_ent> track_t ;
+	mapblock<uintptr_t,memtrack_ent>	*tp = nullptr ;
 	memtrack_co	start ;
 	memtrack_co	count ;
 	memtrack_co	finish ;

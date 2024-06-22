@@ -115,6 +115,13 @@
 	the command-requests take a |uintptr_t| (or similar) type
 	of argument.  So there is no problem with just passing a
 	promoted argument of |uintptr_t| or similar.
+	4. On Apple Darwin (yes, that OS again) the |u_fstat|
+	subroutine below can return an |ENOTTY| on an access failure
+	on the file-descriptor (presumably when that file-descriptor
+	is pointing to a terminal).  This is in violation of the
+	Apple Darwin documentation for that subroutine.  So I fix
+	this (only on Apple Darwin) to return EACCES when I get
+	a ENOTTY from the kernel call.
 
 *******************************************************************************/
 
@@ -255,6 +262,7 @@ namespace {
 
 constexpr bool		f_acl = F_ACL ; /* future use */
 constexpr bool		f_sunos = F_SUNOS ; /* this is really Solaris® */
+constexpr bool		f_darwin = F_DARWIN ; /* this is really Solaris® */
 
 
 /* exported variables */
@@ -395,6 +403,9 @@ int u_fstat(int fd,USTAT *ssp) noex {
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
+	if_constexpr (f_darwin) {
+	    if (rs == SR_NOTTY) rs = SR_ACCESS ;
+	}
 	return rs ;
 }
 /* end subroutine (u_fstat) */

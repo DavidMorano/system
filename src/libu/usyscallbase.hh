@@ -17,6 +17,7 @@
 /*******************************************************************************
 
 	Names:
+	usyscallbase
 
 	Description:
 	All of the UNIX® system calls that use (operate on) a
@@ -50,6 +51,7 @@ namespace libu {
 	int uwrcheck() noex ;
     } ; /* end struct (usyscallbase) */
 }
+
 
 #endif /* __cplusplus */
 #endif /* USYSCALLBASE_INCLUDE */

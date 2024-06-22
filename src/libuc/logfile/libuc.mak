@@ -18,7 +18,7 @@ VALDIR= $(CGS_VALDIR)
 RUNDIR= $(USRLOCAL)/lib
 
 
-CPP= cpp
+CPP= gcpp
 CC= gcc
 CXX= gpp
 LD= gld
@@ -332,7 +332,7 @@ UOBJ07= sncpyx.o sncpyxw.o snaddw.o
 
 UOBJ08= strkeycmp.o ccfile.o strnul.o
 UOBJ09= readln.o ccfile.o
-UOBJ10= cfx.o
+UOBJ10= cfx.o memtrack.o addrset.o mapblock.o
 UOBJ11= strmgr.o strop.o field.o
 
 UOBJ12= ucttyname.o uctc.o tcx.o
@@ -347,7 +347,7 @@ UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
 UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.ls .i .ii .cx .cs
 
 
 default:		all
@@ -794,6 +794,7 @@ libmallocxx.o:		libmallocxx.cc libmallocxx.h
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.cc mapblock.hh
 memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
+addrset.o:		addrset.cc addrset.hh
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh mapblock.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 

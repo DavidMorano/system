@@ -269,7 +269,7 @@ int outema_printf(outema *ldp,cchar *fmt,...) noex {
 	if ((rs = outema_magic(ldp,fmt)) >= 0) {
 	    va_list	ap ;
 	    char	*fbuf{} ;
-	    if ((rs = malloc_addr(&fbuf)) >= 0) {
+	    if ((rs = malloc_mailaddr(&fbuf)) >= 0) {
 	        va_begin(ap,fmt) ;
 	        cint	flen = rs ;
 	        if ((rs = bufvprintf(fbuf,flen,fmt,ap)) >= 0) {

@@ -20,7 +20,7 @@
 	libmallocxx
 
 	Description:
-	This subroutine is similar to 'uc_malloc(3uc)' except that
+	This subroutine is similar to |uc_malloc(3uc)| except that
 	it takes a string argument and copies it into the newly
 	allocated space.
 
@@ -56,10 +56,13 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
-
-
-/* local subroutines */
 
 
 /* exported variables */
