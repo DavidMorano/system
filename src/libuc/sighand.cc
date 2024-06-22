@@ -103,14 +103,14 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
                     nhandles += 1 ;
                 }
             }
-            sz = (nhandles * sizeof(SIGHAND_HANDLE)) ;
+            sz = (nhandles * sizeof(sighand_ha)) ;
             if ((rs >= 0) && (sz > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
-                SIGHAND_HANDLE      *hp = (SIGHAND_HANDLE *) p ;
+                sighand_ha      *hp = (sighand_ha *) p ;
                 SIGACTION           san{} ;
                 SIGACTION           *sap ;
                 int                 hsig ;
                 int                 j = 0 ;
-                iap->handles = (SIGHAND_HANDLE *) p ;
+                iap->handles = (sighand_ha *) p ;
                 iap->nhandles = nhandles ;
                 uc_sigsetempty(&nsm) ;
                 if (igns != nullptr) {

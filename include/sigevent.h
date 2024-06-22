@@ -25,13 +25,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<signal.h>
-#include	<localmisc.h>
-
-
-#ifndef	SIGEVENT
-#define	SIGEVENT	struct sigevent
-#endif
+#include	<usystem.h>
 
 
 EXTERNC_begin

@@ -54,11 +54,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<string>
+#include	<string_view>
 #include	<istream>
 #include	<usystem.h>
 #include	<storebuf.h>		/* <- not used! */
 #include	<sncpyx.h>		/* <- not used! */
 #include	<snwcpy.h>
+#include	<strnul.hh>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -80,13 +82,16 @@ using std::ios_base ;			/* type */
 using std::basic_ios ;			/* type */
 using std::error_code ;			/* type */
 using std::ios ;			/* type (|basic_ios<char>|) */
-using std::string ;			/* type (|basic_ios<char>|) */
+using std::string ;			/* type */
+using std::string_view ;		/* type */
 using std::nothrow ;			/* constant */
 
 using openmode = std::ios_base::openmode ; /* type */
 
 
 /* local typedefs */
+
+typedef string_view	strview ;
 
 
 /* external subroutines */
@@ -132,6 +137,21 @@ int ccfile::open(cchar *fn,cchar *ofs,mode_t) noex {
 		} /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ccfile::open) */
+
+int ccfile::open(strview sv,cchar *ofs,mode_t om) noex {
+	csize		svz = sv.length() ;
+	cchar		*svp = sv.data() ;
+	int		rs = SR_FAULT ;
+	if (svp && ofs) {
+	    cint	svl = int(svz) ;
+	    {
+	        strnul	fn(svp,svl) ;
+		rs = open(fn,ofs,om) ;
+	    } /* end block */
+	}
 	return rs ;
 }
 /* end method (ccfile::open) */

@@ -21,10 +21,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<limits.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* constants */
 
 
 /* service name */

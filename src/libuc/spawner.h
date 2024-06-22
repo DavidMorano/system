@@ -20,9 +20,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<envhelp.h>
-#include	<localmisc.h>
 
 
 #define	SPAWNER		struct spawner_head

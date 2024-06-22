@@ -21,8 +21,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #define	STOREITEM	struct storeitem_head

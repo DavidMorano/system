@@ -43,7 +43,7 @@
 
 /* imported namespaces */
 
-typedef	sigman_hand *	handp ;
+typedef	sigman_ha *	handp ;
 
 
 /* local typedefs */
@@ -130,9 +130,9 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	            nhs += 1 ;
 	        }
 	    }
-	    sz = (nhs * sizeof(sigman_hand)) ;
+	    sz = (nhs * sizeof(sigman_ha)) ;
 	    if ((rs >= 0) && (nhs > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
-	        sigman_hand		*hp = handp(p) ;
+	        sigman_ha		*hp = handp(p) ;
 	        SIGACTION		san{} ;
 	        SIGACTION		*sap ;
 	        int			hsig ;

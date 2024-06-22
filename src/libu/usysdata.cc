@@ -125,12 +125,12 @@ namespace {
  	} ;
 	int setup() noex ;
     private:
-	char		*mbuf = nullptr ;
+	char		*mbuf ;
 	int		mlen ;
     } ; /* end struct (umachiner) */
     struct datobj {
 	char		*s[nitems] ;
-	char		*a ;
+	char		*a = nullptr ;
 	int start() noex ;
 	int finish() noex ;
 	int load() noex ;
@@ -227,7 +227,7 @@ int u_gethostid(ulong *idp) noex {
 /* local subroutines */
 
 static int uuname_machine(UTSNAME *up) noex {
-	cint		mlen = (sizeof(up->machine)-1) ;
+	cint		mlen = int(sizeof(up->machine)-1) ;
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
 	if (strcmp(mbuf,"x86_64") == 0) {
