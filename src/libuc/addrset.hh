@@ -96,6 +96,11 @@ struct addrset_co {
 	} ;
 } ; /* end struct (addrset_co) */
 
+struct addrset_cur {
+	void		*vitcp ;		/* iterator-current */
+	void		*vitep ;		/* iterator-end */
+} ;
+
 struct addrset {
 	typedef addrset_ent	ent ;
 	addrset_co	start ;
@@ -114,6 +119,9 @@ struct addrset {
 	int	rem(cvoid *) noex ;
 	int	present(cvoid *) noex ;
 	int	get(cvoid *,ent *) noex ;
+	int	curbegin(addrset_cur *) noex ;
+	int	curenum(addrset_cur *,ent *) noex ;
+	int	curend(addrset_cur *) noex ;
 	int	istart(int = 0) noex ;
 	int	ifinish() noex ;
 	int	icount() noex ;

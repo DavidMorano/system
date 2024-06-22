@@ -26,6 +26,10 @@
 	addrset::rem
 	addrset::present
 	addrset::get
+	addrset::curbegin
+	addrset::curenum
+	addrset::curend
+
 	addrset::istart
 	addrset::icount
 	addrset::ifinish
@@ -89,7 +93,9 @@ using std::nothrow ;			/* constant */
 typedef unordered_set<addrset_ent>	track ;
 typedef unordered_set<addrset_ent> *	trackp ;
 typedef track::iterator			setiter ;
+typedef track::iterator	 *		setiterp ;
 typedef pair<setiter,bool>		setret ;
+typedef addrset_cur			cur ;
 
 
 /* external subroutines */
@@ -184,10 +190,81 @@ int addrset::get(cvoid *addr,addrset_ent *ep) noex {
 		}
 	    } /* end if (valid addr) */
 	    if (ep) *ep = e ;
-	} /* end if (was open) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end method (addrset::get) */
+
+int addrset::curbegin(cur *curp) noex {
+	int		rs = SR_NOTOPEN ;
+	if (magic == addrset_magic) {
+	    rs = SR_FAULT ;
+	    if (curp) {
+	        cnullptr	np{} ;
+	        trackp		tp = trackp(setp) ;
+	        *curp = {} ;
+		rs = SR_NOMEM ;
+	        if (setiter *itcp ; (itcp = new(nothrow) setiter) != np) {
+		    *itcp = tp->begin() ;
+	            if (setiter *itep ; (itep = new(nothrow) setiter) != np) {
+		        *itep = tp->end() ;
+		        curp->vitcp = itcp ;
+		        curp->vitep = itep ;
+		        rs = SR_OK ;
+		    } /* end if (new-setiter) */
+		    if (rs < 0) {
+			delete itcp ;
+		    }
+	        } /* end if (new-setiter) */
+	    } /* end if (non-null) */
+	} /* end if (magic) */
+	return rs ;
+}
+/* end method (addrset::curbegin) */
+
+int addrset::curend(cur *curp) noex {
+	int		rs = SR_NOTOPEN ;
+	if (magic == addrset_magic) {
+	    rs = SR_FAULT ;
+	    if (curp) {
+	        setiter		*itcp = setiterp(curp->vitcp) ;
+	        setiter		*itep = setiterp(curp->vitep) ;
+		delete itcp ;
+		delete itep ;
+		*curp = {} ;
+		rs = SR_OK ;
+	    } /* end if (non-null) */
+	} /* end if (magic) */
+	return rs ;
+}
+/* end method (addrset::curend) */
+
+int addrset::curenum(cur *curp,ent *ep) noex {
+	int		rs = SR_NOTOPEN ;
+	if (magic == addrset_magic) {
+	    rs = SR_FAULT ;
+	    if (curp && ep) {
+		rs = SR_NOTOPEN ;
+		if (curp->vitcp && curp->vitep) {
+	            setiter	*itcp = setiterp(curp->vitcp) ;
+	            setiter	*itep = setiterp(curp->vitep) ;
+		    {
+			setiter	&itc = *itcp ;
+			setiter	&ite = *itep ;
+			if (itc != ite) {
+			    *ep = *itc++ ;
+	            	    rs = SR_OK ;
+			} else {
+			    *ep = {} ;
+			    rs = SR_NOTFOUND ;
+			}
+		    } /* end block */
+		} /* end if (open) */
+	    } /* end if (non-null) */
+	} /* end if (magic) */
+	return rs ;
+}
+/* end method (addrset::curenum) */
 
 
 /* local subroutines */
