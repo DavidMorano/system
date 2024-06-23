@@ -1,0 +1,10 @@
+#!/usr/extra/bin/ksh
+# INSTALL-LIBU
+
+LIB=libu.so
+TDIRS=" /usr/local/lib ${HOME}/github/system/lib ${HOME}/lib "
+
+for TD in ${TDIRS} ; do
+  install -S -p -m 0775 ${LIB} ${TD}
+done
+

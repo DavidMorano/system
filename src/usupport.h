@@ -97,6 +97,25 @@ EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
 
 
+#ifndef	TEMPLATE_GETUSTIME
+#define	TEMPLATE_GETUSTIME
+#ifdef	__cplusplus
+
+struct ugetustime {
+	operator time_t () noex {
+	    return time(nullptr) ;
+	} ;
+	static time_t operator () () noex {
+	    return time(nullptr) ;
+	} ;
+} ; /* end struct (getustime) */
+
+extern ugetustime	getustime ;
+
+#endif /* __cplusplus */
+#endif /* TEMPLATE_GETUSTIME */
+
+
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 

@@ -100,6 +100,8 @@ constexpr int	onethousand = 1000 ;
 
 /* exported variables */
 
+ugetustime	getustime ;
+
 
 /* exported subroutines */
 

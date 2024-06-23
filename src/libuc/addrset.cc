@@ -254,10 +254,10 @@ int addrset::curenum(cur *curp,ent *ep) noex {
 			setiter	&ite = *itep ;
 			if (itc != ite) {
 			    *ep = *itc++ ;
-	            	    rs = SR_OK ;
+	            	    rs = intsat(ep->asize) ;
 			} else {
 			    *ep = {} ;
-			    rs = SR_NOTFOUND ;
+			    rs = SR_OK ;
 			}
 		    } /* end block */
 		} /* end if (open) */
