@@ -85,6 +85,7 @@ extern int	addrset_finish() noex ;
 using std::nullptr_t ;			/* type */
 using std::unordered_set ;		/* type */
 using std::pair ;			/* type */
+using std::cerr ;			/* variable */
 using std::nothrow ;			/* constant */
 
 

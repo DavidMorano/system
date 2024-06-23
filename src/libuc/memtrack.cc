@@ -128,7 +128,7 @@ int memtrack::rem(cvoid *addr) noex {
 	} /* end if (was open) */
 	return rs ;
 }
-/* end method (memtrack::present) */
+/* end method (memtrack::rem) */
 
 int memtrack::present(cvoid *addr) noex {
 	int		rs = SR_NOTOPEN ;
