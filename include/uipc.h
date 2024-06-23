@@ -43,10 +43,10 @@
 #include	<sys/msg.h>		/* UNIX® System V IPC - MSG */
 #include	<sys/sem.h>		/* UNIX® System V IPC - SEM */
 #include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |intptr_t| */
+#include	<limits.h>		/* |INT_MAX| */
+#include	<errno.h>
+#include	<stddef.h>		/* |nullptr_t| */
+#include	<stdint.h>		/* |intptr_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

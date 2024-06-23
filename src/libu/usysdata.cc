@@ -19,6 +19,7 @@
 
 	Names:
 	u_uname
+	u_getnodename
 	u_getauxinfo
 
 	Description:
@@ -26,6 +27,7 @@
 
 	Synopsis:
 	int u_uname(UTSNAME *up) noex
+	int u_getnodename(char *rbuf,int rlen) noex
 	int u_getauxinfo(char *rbuf,int rlen,int req) noex
 
 	Arguments:
@@ -144,15 +146,16 @@ namespace {
 /* forward references */
 
 static int local_getauxinfo(char *,int,int) noex ;
-static int uuname_machine(UTSNAME *) noex ;
+static int uname_machine(UTSNAME *) noex ;
+static int uname_nodename(UTSNAME *) noex ;
 static int setup_sysauxinfo() noex ;
 
 
 /* local variables */
 
 static constexpr uname_f	usubs[] = {
-	uuname_machine,
-	nullptr
+	uname_machine,
+	uname_nodename
 } ;
 
 static umachiner	um ;
@@ -184,15 +187,32 @@ int u_uname(UTSNAME *up) noex {
 	if (up) {
 	    if ((rs = uname(up)) >= 0) {
 		rc = rs ;
-		for (int i = 0 ; (rs >= 0) && usubs[i] ; i += 1) {
-		    uname_f	func = usubs[i] ;
-		    rs = func(up) ;
+		for (cauto &f : usubs) {
+		    if ((rs = f(up)) < 0) break ;
 		} /* end for */
 	    } else {
 	        rs = (- errno) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
+}
+/* end subroutine (u_uname) */
+
+int u_getnodename(char *rbuf,int rlen) noex {
+	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf) {
+	    rs = SR_NOMEM ;
+	    if (utsname *utsp ; (utsp = new(nothrow) utsname) != np) {
+		if ((rs = u_uname(utsp)) >= 0) {
+	            rs = sncpy(rbuf,rlen,utsp->nodename) ;
+		    len = rs ;
+		}
+	        delete utsp ;
+	    } /* end if (new-utsname) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (u_uname) */
 
@@ -226,7 +246,7 @@ int u_gethostid(ulong *idp) noex {
 
 /* local subroutines */
 
-static int uuname_machine(UTSNAME *up) noex {
+static int uname_machine(UTSNAME *up) noex {
 	cint		mlen = int(sizeof(up->machine)-1) ;
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
@@ -241,6 +261,16 @@ static int uuname_machine(UTSNAME *up) noex {
 	return rs ;
 }
 /* end subroutine (uname_machine) */
+
+static int uname_nodename(UTSNAME *up) noex {
+	int		rs = SR_OK ;
+	char		*nn = up->nodename ;
+	if (char *tp ; (tp = strchr(nn,'.')) != nullptr) {
+	    *tp = '\0' ;
+	}
+	return rs ;
+}
+/* end subroutine (uname_nodename) */
 
 static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 	static cint	rsx = setup_sysauxinfo() ;
@@ -263,7 +293,7 @@ static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 		break ;
 	    } /* end switch */
 	    if (valp) {
-		rs = snwcpy(rbuf,rlen,valp) ;
+		rs = sncpy(rbuf,rlen,valp) ;
 		len = rs ;
 	    }
 	} /* end if (non-null) */

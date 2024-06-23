@@ -159,13 +159,18 @@ namespace libu {
 
 namespace libu {
     int sncpy1(char *dbuf,int dlen,cchar *sp) noex {
-	csize		dsz = (dlen + 1) ;
-	int		rs ;
-	if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
-	    rs = SR_OVERFLOW ;
-	} else {
-	    rs = int(rsz & INT_MAX) ;
-	}
+	int		rs = SR_FAULT ;
+	if (dbuf) {
+	    rs = SR_INVALID ;
+	    if (dlen >= 0) {
+	        csize	dsz = (dlen + 1) ;
+	        if (size_t rsz ; (rsz = strlcpy(dbuf,sp,dsz)) >= dsz) {
+	            rs = SR_OVERFLOW ;
+	        } else {
+	            rs = intsat(rsz) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
     }
     int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
@@ -224,6 +229,19 @@ namespace libu {
 	if (idp) {
 	    clong	res = gethostid() ;
 	    *idp = ulong(res) ;
+	}
+	return rs ;
+    }
+}
+
+namespace libu {
+    sysret_t ustrftime(char *dbuf,int dlen,cchar *fmt,CTM *tmp) noex {
+	csize		dsz = size_t(dlen + 1) ;
+	int		rs ;
+	if (size_t rsz ; (rsz = strftime(dbuf,dsz,fmt,tmp)) > 0) {
+	    rs = intsat(rsz) ;
+	} else if (rsz == 0) {
+	    rs = SR_OVERFLOW ;
 	}
 	return rs ;
     }

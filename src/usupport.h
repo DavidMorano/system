@@ -163,6 +163,7 @@ namespace libu {
 namespace libu {
     extern int loadhostid(char *,int) noex ;
     extern int ugethostid(ulong *) noex ;
+    extern int ustrftime(char *,int,cchar *,CTM *) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
 }

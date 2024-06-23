@@ -24,6 +24,7 @@
 	u_fstatvfs
 	u_fpathconf
 	u_fsync
+	u_ftruncate
 	u_ioctl
 	u_lockf
 	u_pread
@@ -229,7 +230,8 @@ namespace {
 	uregular(POLLFD *s,int an,int t) noex : fds(s), n(an), to(t) { } ;
 	uregular(IOVEC *p,int an) noex : iop(p), n(an) { } ;
 	uregular(int c,caddr_t aa) noex : cmd(c), anyarg(aa) { } ;
-	uregular(int c,int s) noex : cmd(c), sz(s) { } ;
+	uregular(int c,off_t s) noex : cmd(c), sz(s) { } ;
+	uregular(off_t s) noex : sz(s) { } ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -243,6 +245,7 @@ namespace {
 	int iclose(int) noex ;
 	int ipoll(int) noex ;
 	int ifsync(int) noex ;
+	int iftruncate(int) noex ;
 	int ilockf(int) noex ;
 	int ipread(int) noex ;
 	int ipwrite(int) noex ;
@@ -468,6 +471,13 @@ int u_fsync(int fd) noex {
 }
 /* end subroutine (u_fsync) */
 
+int u_ftruncate(int fd,off_t fo) noex {
+	uregular	ro(fo) ;
+	ro.m = &uregular::iftruncate ;
+	return ro(fd) ;
+}
+/* end subroutine (u_ftruncate) */
+
 int u_ioctl(int fd,int cmd,...) noex {
 	va_list		ap ;
 	int		rs = SR_INVALID ;
@@ -595,6 +605,15 @@ int uregular::ipoll(int) noex {
 int uregular::ifsync(int fd) noex {
 	int		rs ;
 	if ((rs = fsync(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiledesc::ifsync) */
+
+int uregular::iftruncate(int fd) noex {
+	int		rs ;
+	if ((rs = ftruncate(fd,sz)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
