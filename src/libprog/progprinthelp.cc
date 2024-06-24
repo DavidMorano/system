@@ -1,48 +1,45 @@
-/* progprinthelp */
+/* progprinthelp SUPPORT */
+/* lang=C++20 */
 
 /* print out a help file if we have one */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1997-11-01, David A­D­ Morano
-        The subroutine was written to get some common code for the printing of
-        help files.
+	The subroutine was written to get some common code for the
+	printing of help files.
 
 */
 
 /* Copyright © 1997 David A­D­ Morano.  All rights reserved. */
 
-/*******************************************************************************
+/******************************************************************************
 
-        This subroutine will search for a program helpfile and print it out (by
-        default to STDOUT). A root filename is supplied (usually 'help') but
-        along with a program root. The "standard" places within the program root
-        directory tree are scanned for the help file.
+	Name:
+	progprinthelp
+
+	Descrption:
+	This subroutine will search for a program helpfile and print
+	it out (by default to STDOUT). A root filename is supplied
+	(usually 'help') but along with a program root. The "standard"
+	places within the program root directory tree are scanned
+	for the help file.
 
 	Synopsis:
-
-	int progprinthelp(pip,fp,helpfname)
-	PROGINFO	*pip ;
-	void		*fp ;
-	const char	helpfname[] ;
+	int progprinthelp(PI *pip,void *fp,cc *helpfname) noex
 
 	Arguments:
-
 	pip		program-information-pointer
 	fp		open file pointer (BFILE or SFIO)
 	helpfname	program help filename
 
 	Returns:
-
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
-
-*******************************************************************************/
+******************************************************************************/
 
 
 #if	defined(SFIO) && (SFIO > 0)
@@ -63,6 +60,7 @@
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<time.h>
 
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -86,10 +84,6 @@
 
 #ifndef	LIBCNAME
 #define	LIBCNAME	"lib"
-#endif
-
-#ifndef	DEBUGFNAME
-#define	DEBUGFNAME	"progprinthelp.deb"
 #endif
 
 
@@ -129,21 +123,15 @@ static const char	*schedule[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progprinthelp(pip,fp,helpfname)
-PROGINFO	*pip ;
-void		*fp ;
-const char	helpfname[] ;
-{
+int progprinthelp(PROGINFO *pip,void *fp,cchar *helpfname) noex {
 	int		rs = SR_OK ;
-	const char	*fname ;
+	cchar		*fname ;
 	char		tmpfname[MAXPATHLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("progprinthelp: SFIO=%u\n",CF_SFIO) ;
-#endif
 
 	if ((helpfname == NULL) || (helpfname[0] == '\0'))
 	    helpfname = HELPFNAME ;
@@ -151,39 +139,20 @@ const char	helpfname[] ;
 #if	CF_SFIO
 	if (fp == NULL) {
 
-#if	CF_DEBUGS
-	    debugprintf("progprinthelp: no output file handle (SFIO mode)\n") ;
-#endif
-
 	    rs = SR_INVALID ;
 	    goto ret0 ;
 	}
 #endif /* CF_SFIO */
 
-#if	CF_DEBUGS
-	debugprintf("progprinthelp: pr=%s\n",pr) ;
-	debugprintf("progprinthelp: sn=%s\n",pip->searchname) ;
-	debugprintf("progprinthelp: helpfname=%s\n",helpfname) ;
-#endif
-
 	fname = helpfname ;
 	rs = SR_NOTFOUND ;
 	if ((pip->pr != NULL) && (helpfname[0] != '/')) {
-
-#if	CF_DEBUGS
-	    debugprintf("progprinthelp: partial fname=%s\n",helpfname) ;
-#endif
 
 	    if (strchr(helpfname,'/') != NULL) {
 	        fname = tmpfname ;
 	        rs = mkpath2(tmpfname,pip->pr,helpfname) ;
 	        if (rs >= 0)
 	            rs = u_access(tmpfname,R_OK) ;
-
-#if	CF_DEBUGS
-	        debugprintf("progprinthelp: partial rs=%d helpfname=%s\n",
-	            rs,tmpfname) ;
-#endif
 
 	    } /* end if */
 
@@ -194,18 +163,10 @@ const char	helpfname[] ;
 
 	} /* end if (searching for file) */
 
-#if	CF_DEBUGS
-	debugprintf("progprinthelp: attempt_open rs=%d fname=%s\n",rs,fname) ;
-#endif
-
 	if (rs >= 0)
 	    rs = printout(fp,tmpfname,MAXPATHLEN,fname) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("progprinthelp: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -228,10 +189,6 @@ const char	*helpfname ;
 	int		opts ;
 	int		f_hs = FALSE ;
 	const char	**spp ;
-
-#if	CF_DEBUGS
-	debugprintf("progprinthelp: full fname=%s\n",helpfname) ;
-#endif
 
 /* first see if there is a "help schedule" in the ETC directory */
 
@@ -272,11 +229,6 @@ const char	*helpfname ;
 	            rs1 = permsched(schedule,&svars,
 	                tmpfname,MAXPATHLEN, helpfname,R_OK) ;
 
-#if	CF_DEBUGS
-	        debugprintf("progprinthelp: permsched() rs=%d tmpfname=%s\n",
-	            rs,tmpfname) ;
-#endif
-
 	        vecstr_finish(&svars) ;
 	    } /* end if (schedule variables) */
 
@@ -292,7 +244,8 @@ const char	*helpfname ;
 
 static int loadscheds(vecstr *slp,const char *pr,const char *sn)
 {
-	int		rs = SR_OK ;
+	int	rs = SR_OK ;
+
 
 	if (pr != NULL) rs = vecstr_envadd(slp,"r",pr,-1) ;
 
@@ -337,10 +290,6 @@ const char	*fname ;
 	            len = rs ;
 
 	            rs = sfwrite(fp,lbuf,len) ;
-
-#if	CF_DEBUGS
-	            debugprintf("progprinthelp: sfwrite() rs=%d\n",rs) ;
-#endif
 
 	            if (rs < 0) break ;
 		    wlen += rs ;

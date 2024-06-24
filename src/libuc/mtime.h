@@ -29,6 +29,24 @@ extern mtime_t	mtime(void) noex ;
 
 EXTERNC_end
 
+#ifndef	OBJECT_GETMTIME
+#define	OBJECT_GETMTIME
+#ifdef	__cplusplus
+
+struct usys_mtime {
+	operator mtime_t () noex {
+	    return mtime() ;
+	} ;
+	static mtime_t operator () () noex {
+	    return mtime() ;
+	} ;
+} ; /* end struct (getustime) */
+
+extern usys_mtime	getmtime ;
+
+#endif /* __cplusplus */
+#endif /* OBJECT_GETMTIME */
+
 
 #endif /* MTIME_INCLUDE */
 

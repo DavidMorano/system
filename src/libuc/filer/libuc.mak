@@ -321,7 +321,7 @@ OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
 
 
 UOBJ00= matxstr.o toxc.o char.o 
-UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o sif.o
+UOBJ01= strn.o strnxcmp.o sif.o
 UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
 UOBJ03= syswords.o stdfnames.o
 
@@ -340,11 +340,17 @@ UOBJ13=
 UOBJ14= ucsys.o
 UOBJ15=
 
+UOBJ16 += wsix.o wsnx.o wsx.o
+UOBJ17 += six.o snx.o sfx.o rmx.o
+UOBJ18 +=
+UOBJ19 +=
+
 UOBJ=
-UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
-UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
-UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
-UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
+UOBJ += $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
+UOBJ += $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
+UOBJ += $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
+UOBJ += $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
+UOBJ += $(UOBJ16) $(UOBJ17) $(UOBJ18) $(UOBJ19)
 
 
 .SUFFIXES:		.ls .i .ii .cx .cs

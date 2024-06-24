@@ -37,10 +37,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
+#include	<utimeout.h>
 #include	<errtimer.hh>
-#include	<localmisc.h>
 
 #include	"usyscallbase.hh"
 
@@ -59,6 +57,11 @@ using std::nullptr_t ;			/* type */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int	u_poll(POLLFD *,int,int) noex ;
+    extern int	msleep(int) noex ;
+}
 
 
 /* external variables */
@@ -159,7 +162,7 @@ int usyscallbase::uwrcheck() noex {
 	int		rs ;
 	int		n = 0 ;
 	fds[n++].fd = fd ;
-	if ((rs = u_poll(fds,nfds_t(n),0)) > 0) {
+	if ((rs = u_poll(fds,n,0)) > 0) {
 	    cint	re = fds[0].revents ;
 	    if (re & POLLHUP) {
 		rs = SR_HANGUP ;	/* same as SR_IO */

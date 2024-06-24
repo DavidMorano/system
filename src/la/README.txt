@@ -1,7 +1,7 @@
 LA
 
-This is a KSH shell built-in command.  It prints out load-average values
-according to what is requested as an invocation argument.
+This is a KSH shell built-in command.  It prints out load-average
+values according to what is requested as an invocation argument.
 
 Synopsis:
 $ la [<spec(s)> ...] [-af <afile>] [-f <file>]

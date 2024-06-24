@@ -941,7 +941,7 @@ struct standing_callout	*cop ;
 int		rc ;
 {
 	PROGINFO	*pip = sop->pip ;
-	struct sysmisc_loadave	m6 ;
+	struct sysmisc_loadave	m6{} ;
 	int		rs = SR_OK ;
 	int		salen ;
 	int		blen = 0 ;
@@ -955,7 +955,6 @@ int		rc ;
 	    }
 	    if (rs >= 0) {
 	        sop->c.ti_access = daytime ;
-	        memset(&m6,0,sizeof(struct sysmisc_loadave)) ;
 	        m6.tag = cop->tag ;
 	        m6.rc = rc ;
 	        m6.timestamp = daytime ;

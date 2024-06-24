@@ -23,9 +23,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"mtime.h"
 
@@ -34,6 +34,15 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

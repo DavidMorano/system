@@ -24,6 +24,7 @@
 #include	<utimeout.h>
 #include	<ulogerror.h>
 #include	<usys.h>
+#include	<usysutility.hh>
 #include	<timecount.hh>
 #include	<filetype.h>
 #include	<aflag.hh>
@@ -97,8 +98,8 @@ EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
 
 
-#ifndef	TEMPLATE_GETUSTIME
-#define	TEMPLATE_GETUSTIME
+#ifndef	OBJECT_GETUSTIME
+#define	OBJECT_GETUSTIME
 #ifdef	__cplusplus
 
 struct ugetustime {
@@ -113,7 +114,7 @@ struct ugetustime {
 extern ugetustime	getustime ;
 
 #endif /* __cplusplus */
-#endif /* TEMPLATE_GETUSTIME */
+#endif /* OBJECT_GETUSTIME */
 
 
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)

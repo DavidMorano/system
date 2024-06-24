@@ -81,24 +81,24 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	snfsflags(const char *,int,ulong) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpcasestr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
+extern int	snfsflags(cchar *,int,ulong) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matpcasestr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
 extern int	ctdecull(char *,int,ULONG *) ;
 extern int	ctdecll(char *,int,LONG *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	sbuf_termconseq(SBUF *,int,int,int,int,int) ;
 extern int	isdigitlatin(int) ;
@@ -112,19 +112,19 @@ extern int	ndig(double *,int) ;
 extern int	ndigmax(double *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpyuc(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
@@ -163,47 +163,32 @@ struct locinfo {
 	uint		la[3] ;		/* raw load-averages from kernel */
 	int		nusers ;
 	int		nprocs ;
-	const char	*string ;
+	cchar	*string ;
 	char		strbuf[STRBUFLEN+1] ;
 } ;
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+static int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+static int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,cchar *) ;
-static int	procprint(PROGINFO *,SHIO *) ;
-static int	procbuf(PROGINFO *,char *,int) ;
+static int	procopts(PROGINFO *,KEYOPT *) noex ;
+static int	process(PROGINFO *,cchar *) noex ;
+static int	procprint(PROGINFO *,SHIO *) noex ;
+static int	procbuf(PROGINFO *,char *,int) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_utmpbegin(LOCINFO *) ;
-static int	locinfo_nusers(LOCINFO *) ;
-static int	locinfo_nprocs(LOCINFO *) ;
-static int	locinfo_loadavgs(LOCINFO *) ;
-static int	locinfo_utmpend(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+static int	locinfo_utmpbegin(LOCINFO *) noex ;
+static int	locinfo_nusers(LOCINFO *) noex ;
+static int	locinfo_nprocs(LOCINFO *) noex ;
+static int	locinfo_loadavgs(LOCINFO *) noex ;
+static int	locinfo_utmpend(LOCINFO *) noex ;
+static int	locinfo_finish(LOCINFO *) noex ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"utf",
-	"db",
-	"nocache",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -217,6 +202,21 @@ enum argopts {
 	argopt_utf,
 	argopt_db,
 	argopt_overlast
+} ;
+
+static cchar	*argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"utf",
+	"db",
+	"nocache",
+	NULL
 } ;
 
 static const PIVARS	initvars = {
@@ -241,24 +241,6 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
-	"str",
-	"date",
-	"time",
-	"users",
-	"procs",
-	"mem",
-	"load",
-	"la",
-	"name",
-	"nodetitle",
-	"node",
-	"term",
-	"mesg",
-	"to",
-	NULL
-} ;
-
 enum progopts {
 	progopt_str,
 	progopt_date,
@@ -277,7 +259,25 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	*ansiterms[] = {
+static cchar	*progopts[] = {
+	"str",
+	"date",
+	"time",
+	"users",
+	"procs",
+	"mem",
+	"load",
+	"la",
+	"name",
+	"nodetitle",
+	"node",
+	"term",
+	"mesg",
+	"to",
+	NULL
+} ;
+
+static cchar	*ansiterms[] = {
 	"ansi",
 	"sun",
 	"screen",
@@ -300,17 +300,18 @@ static const char	*ansiterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_loginblurb(int argc,cchar *argv[],void *contextp)
-{
+int b_loginblurb(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -358,15 +359,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*termtype = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*termtype = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -931,8 +932,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-s <string>] [-of <ofile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -946,13 +947,11 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
+static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1218,9 +1217,8 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 	    if ((rs >= 0) && lip->f.o_load) {
 	        if ((rs = locinfo_loadavgs(lip)) >= 0) {
 	            double	dla[3] ;
-	            int		i ;
 	            cchar	*fmt ;
-	            for (i = 0 ; i < 3 ; i += 1) {
+	            for (int i = 0 ; i < 3 ; i += 1) {
 	                dla[i] = ((double) lip->la[i]) / FSCALE ;
 	            }
 	            fmt = "la=(%4.1f %4.1f %4.1f)" ;
@@ -1250,58 +1248,43 @@ static int procbuf(PROGINFO *pip,char *lbuf,int llen)
 }
 /* end subroutine (procbuf) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
-
-	if (lip == NULL) return SR_FAULT ;
-
-	memset(lip,0,sizeof(LOCINFO)) ;
-	lip->pip = pip ;
-	lip->f.o_string = TRUE ;
-	lip->f.o_time = FALSE ;
-	lip->f.o_node = TRUE ;
-	lip->f.o_users = TRUE ;
-	lip->f.o_procs = TRUE ;
-	lip->f.o_mem = TRUE ;
-	lip->f.o_load = TRUE ;
-
-	return SR_OK ;
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+	int		rs = SR_FAULT ;
+	if (lip) {
+	    rs = memclear(lip) ;
+	    lip->pip = pip ;
+	    lip->f.o_string = TRUE ;
+	    lip->f.o_time = FALSE ;
+	    lip->f.o_node = TRUE ;
+	    lip->f.o_users = TRUE ;
+	    lip->f.o_procs = TRUE ;
+	    lip->f.o_mem = TRUE ;
+	    lip->f.o_load = TRUE ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
-
 	if (lip == NULL) return SR_FAULT ;
-
 	return rs ;
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_utmpbegin(LOCINFO *lip)
-{
+static int locinfo_utmpbegin(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
-
 	if (lip == NULL) return SR_FAULT ;
-
 	return rs ;
 }
 /* end subroutine (locinfo_utmpbegin) */
 
-
-static int locinfo_loadavgs(LOCINFO *lip)
-{
+static int locinfo_loadavgs(LOCINFO *lip) noex {
 	return u_getloadavg(lip->la,3) ;
 }
 /* end subroutine (Locinfo_loadavgs) */
 
-
-static int locinfo_nprocs(LOCINFO *lip)
-{
+static int locinfo_nprocs(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	const int	to = 5 ; /* "get" time-out? */
 	int		rs = SR_OK ;

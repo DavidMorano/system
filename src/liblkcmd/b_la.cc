@@ -4,9 +4,6 @@
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_PERCACHE	1		/* use persistent cache */
 
 /* revision history:
@@ -160,13 +157,6 @@ extern int	isNotPresent(int) ;
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 extern cchar	*getourenv(cchar **,cchar *) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
@@ -243,41 +233,41 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+static int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+static int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procspec(PROGINFO *,void *, cchar *,int) ;
-static int	procfs(PROGINFO *,char *,int,int,cchar *,int) ;
-static int	procla(PROGINFO *,SHIO *,char *,int,int) ;
-static int	procout(PROGINFO *,SHIO *,cchar *,int) ;
+static int	procopts(PROGINFO *,KEYOPT *) noex ;
+static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) noex ;
+static int	procspecs(PROGINFO *,void *,cchar *,int) noex ;
+static int	procspec(PROGINFO *,void *, cchar *,int) noex ;
+static int	procfs(PROGINFO *,char *,int,int,cchar *,int) noex ;
+static int	procla(PROGINFO *,SHIO *,char *,int,int) noex ;
+static int	procout(PROGINFO *,SHIO *,cchar *,int) noex ;
 
-static int	getla(PROGINFO *) ;
-static int	getsysmisc(PROGINFO *) ;
-static int	getnusers(PROGINFO *) ;
-static int	getnprocs(PROGINFO *,int) ;
-static int	getnprocs_all(PROGINFO *) ;
-static int	getncpus(PROGINFO *) ;
-static int	getbtime(PROGINFO *) ;
-static int	getrnum(PROGINFO *) ;
-static int	getmem(PROGINFO *) ;
+static int	getla(PROGINFO *) noex ;
+static int	getsysmisc(PROGINFO *) noex ;
+static int	getnusers(PROGINFO *) noex ;
+static int	getnprocs(PROGINFO *,int) noex ;
+static int	getnprocs_all(PROGINFO *) noex ;
+static int	getncpus(PROGINFO *) noex ;
+static int	getbtime(PROGINFO *) noex ;
+static int	getrnum(PROGINFO *) noex ;
+static int	getmem(PROGINFO *) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_utfname(LOCINFO *,cchar *) ;
-static int	locinfo_flags(LOCINFO *,int,int) ;
-static int	locinfo_to(LOCINFO *,int) ;
-static int	locinfo_defaults(LOCINFO *) ;
-static int	locinfo_uname(LOCINFO *) ;
-static int	locinfo_uaux(LOCINFO *) ;
-static int	locinfo_sysdomain(LOCINFO *) ;
-static int	locinfo_fsdir(LOCINFO *) ;
-static int	locinfo_hostid(LOCINFO *) ;
-static int	locinfo_pagesize(LOCINFO *) ;
+static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+static int	locinfo_finish(LOCINFO *) noex ;
+static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) noex ;
+static int	locinfo_utfname(LOCINFO *,cchar *) noex ;
+static int	locinfo_flags(LOCINFO *,int,int) noex ;
+static int	locinfo_to(LOCINFO *,int) noex ;
+static int	locinfo_defaults(LOCINFO *) noex ;
+static int	locinfo_uname(LOCINFO *) noex ;
+static int	locinfo_uaux(LOCINFO *) noex ;
+static int	locinfo_sysdomain(LOCINFO *) noex ;
+static int	locinfo_fsdir(LOCINFO *) noex ;
+static int	locinfo_hostid(LOCINFO *) noex ;
+static int	locinfo_pagesize(LOCINFO *) noex ;
 
 #if	CF_PERCACHE
 static void	ourfini() ;
@@ -285,21 +275,6 @@ static void	ourfini() ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"utf",
-	"db",
-	"nocache",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -314,6 +289,21 @@ enum argopts {
 	argopt_db,
 	argopt_nocache,
 	argopt_overlast
+} ;
+
+static cchar	*argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"utf",
+	"db",
+	"nocache",
+	nullptr
 } ;
 
 static const PIVARS	initvars = {
@@ -338,10 +328,10 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"utf",
 	"db",
-	NULL
+	nullptr
 } ;
 
 enum akonames {
@@ -351,7 +341,7 @@ enum akonames {
 } ;
 
 /* define the configuration keywords */
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"sysname",
 	"nodename",
 	"release",
@@ -397,7 +387,7 @@ static const char	*qopts[] = {
 	"fsflags",
 	"hostid",
 	"romserial",
-	NULL
+	nullptr
 } ;
 
 enum qopts {
@@ -470,7 +460,7 @@ int b_la(int argc,cchar *argv[],void *contextp)
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
@@ -504,10 +494,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	KEYOPT		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uint		mo_start = 0 ;
-#endif
-
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs, rs1 ;
@@ -522,27 +508,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_nocache = FALSE ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*utfname = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*utfname = nullptr ;
 	cchar		*cp ;
-
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("b_la: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uc_mallset(1) ;
-	uc_mallout(&mo_start) ;
-#endif
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -550,13 +523,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -576,7 +549,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -587,7 +560,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -604,14 +577,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -634,7 +607,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -652,7 +625,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
@@ -747,7 +720,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_nocache:
-	                    f_nocache = TRUE ;
+	                    f_nocache = true ;
 	                    break ;
 
 /* handle all keyword defaults */
@@ -760,7 +733,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -778,7 +751,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -795,7 +768,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* file-name (for FS operations) */
@@ -812,7 +785,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* special initialization for persistent cache */
 	                    case 'i':
-	                        f_init = TRUE ;
+	                        f_init = true ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -867,7 +840,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -895,23 +868,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (rs < 0)
 	    goto badarg ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_la: debuglevel=%u\n",pip->debuglevel) ;
-#endif
 
 	if (f_version) {
 	    shio_printf(pip->efp,"%s: version %s\n",
@@ -945,7 +913,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    rs = printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    rs = printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -957,12 +925,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* initialization */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
 	if (rs >= 0) {
 	    if ((rs = locinfo_utfname(lip,utfname)) >= 0) {
@@ -1032,10 +1000,10 @@ retearly:
 	        pip->progname,ex,rs) ;
 	}
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -1052,19 +1020,6 @@ badlocstart:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	{
-	    uint	mo ;
-	    uc_mallout(&mo) ;
-	    debugprintf("b_la: final mallout=%u\n",(mo-mo_start)) ;
-	    uc_mallset(0) ;
-	}
-#endif /* CF_DEBUGMALL */
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
 
 	return ex ;
 
@@ -1122,7 +1077,7 @@ static int usage(PROGINFO *pip)
 	    wlen += rs ;
 	}
 
-	for (i = 0 ; (rs >= 0) && (qopts[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (qopts[i] != nullptr) ; i += 1) {
 
 	    if ((rs >= 0) && ((i % USAGECOLS) == 0)) {
 	        rs = shio_printf(pip->efp,"%s: \t",pn) ;
@@ -1159,7 +1114,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(pip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -1174,15 +1129,15 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 
 	                case akoname_utf:
 	                case akoname_db:
 	                    if (! lip->final.utfname) {
-	                        lip->have.utfname = TRUE ;
-	                        lip->final.utfname = TRUE ;
+	                        lip->have.utfname = true ;
+	                        lip->final.utfname = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->utfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1217,7 +1172,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
@@ -1231,7 +1186,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	            f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	            if (f) {
 	                cp = aip->argv[ai] ;
 	                if (cp[0] != '\0') {
@@ -1254,14 +1209,14 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    } /* end if (ok) */
 
-	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	        SHIO	afile, *afp = &afile ;
 
 	        if (strcmp(afn,"-") == 0)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1282,7 +1237,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	                    }
 	                }
 
-	                pip->daytime = time(NULL) ;
+	                pip->daytime = time(nullptr) ;
 	                if (rs >= 0) rs = lib_sigterm() ;
 	                if (rs >= 0) rs = lib_sigintr() ;
 	                if (rs < 0) break ;
@@ -1343,7 +1298,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	vlen = CVTBUFLEN ;
+	cint	vlen = CVTBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ri ;
@@ -1351,35 +1306,17 @@ static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	int		cbl = -1 ;
 	int		wlen = 0 ;
 	cchar		*tp ;
-	cchar		*vp = NULL ;
-	cchar		*cbp = NULL ;
+	cchar		*vp = nullptr ;
+	cchar		*cbp = nullptr ;
 	char		vbuf[CVTBUFLEN + 1] ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_la/procspec: req=>%s<\n",req) ;
-#endif
 
 	if (rl < 0) rl = strlen(rp) ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/procspec: req=>%t<\n",rp,rl) ;
-#endif
-
-	if ((tp = strnchr(rp,rl,'=')) != NULL) {
+	if ((tp = strnchr(rp,rl,'=')) != nullptr) {
 	    vl = ((rp+rl)-(tp+1)) ;
 	    if (vl) vp = (tp+1) ;
 	    rl = (tp-rp) ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2)) {
-	    debugprintf("b_la/procspec: rk=%t\n",rp,rl) ;
-	    if (vp != NULL)
-	        debugprintf("b_la/procspec: rv=%t\n",vp,vl) ;
-	}
-#endif
 
 	vbuf[0] = '\0' ;
 	wlen = 0 ;
@@ -1415,10 +1352,6 @@ static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	            break ;
 	        } /* end switch */
 	    } /* end if (uname) */
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("b_sysval/procspec: locinfo_uname() rs=%d\n",rs) ;
-#endif
 	    break ;
 	case qopt_architecture:
 	case qopt_platform:
@@ -1444,10 +1377,6 @@ static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	            break ;
 	        } /* end switch */
 	    } /* end if (uaux) */
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("b_sysval/procspec: locinfo_uaux() rs=%d\n",rs) ;
-#endif
 	    break ;
 	case qopt_domainname:
 	    if ((rs = locinfo_sysdomain(lip)) >= 0) {
@@ -1466,9 +1395,8 @@ static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	case qopt_lax:
 	    cbp = vbuf ;
 	    {
-	        int	i ;
-	        int	ris[3] = { qopt_la1min, qopt_la5min, qopt_la15min } ; 
-		for (i = 0 ; i < 3 ; i += 1) {
+	        cint	ris[3] = { qopt_la1min, qopt_la5min, qopt_la15min } ; 
+		for (int i = 0 ; i < 3 ; i += 1) {
 	            ri = ris[i] ;
 	            rs = procla(pip,ofp,vbuf,vlen,ri) ;
 	            wlen += rs ;
@@ -1607,11 +1535,6 @@ static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_la/procspec: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procspec) */
@@ -1623,7 +1546,7 @@ static int procfs(PROGINFO *pip,char vbuf[],int vlen,int ri,cchar *sp,int sl)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cbl = 0 ;
-	if ((sp == NULL) || (sl == 0)) {
+	if ((sp == nullptr) || (sl == 0)) {
 	    rs = locinfo_fsdir(lip) ;
 	    sl = rs ;
 	    sp = lip->fname ;
@@ -1706,9 +1629,7 @@ static int procfs(PROGINFO *pip,char vbuf[],int vlen,int ri,cchar *sp,int sl)
 }
 /* end subroutine (procfs) */
 
-
-static int procla(PROGINFO *pip,SHIO *ofp,char vbuf[],int vlen,int ri)
-{
+static int procla(PROGINFO *pip,SHIO *ofp,char vbuf[],int vlen,int ri) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -1731,7 +1652,7 @@ static int procla(PROGINFO *pip,SHIO *ofp,char vbuf[],int vlen,int ri)
 
 	    if (v > -0.5) {
 	        if ((rs = ctdecf(vbuf,vlen,v,'f',7,3,-1)) >= 0) {
-		    const int	vl = rs ;
+		    cint	vl = rs ;
 		    if (pip->verboselevel > 0) {
 	    		rs = procout(pip,ofp,vbuf,vl) ;
 	    		wlen += rs ;
@@ -1752,7 +1673,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 	int		wlen = 0 ;
 
 	if (pip->verboselevel > 0) {
-	    if (sp == NULL) {
+	    if (sp == nullptr) {
 	        sp = "*" ;
 	        sl = 1 ;
 	    }
@@ -1769,13 +1690,13 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 
-	lip->f.percache = TRUE ;
+	lip->f.percache = true ;
 
 	return rs ;
 }
@@ -1787,7 +1708,7 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 #if	CF_PERCACHE /* register |ourfini()| for mod-unload */
 	if (lip->f.percache) {
@@ -1798,17 +1719,17 @@ static int locinfo_finish(LOCINFO *lip)
 	}
 #endif /* CF_PERCACHE */
 
-	if ((lip->fname != NULL) && lip->f.allocfname) {
+	if ((lip->fname != nullptr) && lip->f.allocfname) {
 	    rs1 = uc_free(lip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    lip->fname = NULL ;
+	    lip->fname = nullptr ;
 	    lip->f.allocfname = FALSE ;
 	}
 
-	if (lip->sysdomain != NULL) {
+	if (lip->sysdomain != nullptr) {
 	    rs1 = uc_free(lip->sysdomain) ;
 	    if (rs >= 0) rs = rs1 ;
-	    lip->sysdomain = NULL ;
+	    lip->sysdomain = nullptr ;
 	}
 
 	if (lip->open.stores) {
@@ -1828,8 +1749,8 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	slp = &lip->stores ;
 	if (! lip->open.stores) {
@@ -1839,14 +1760,14 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 
 	if (rs >= 0) {
 	    int	oi = -1 ;
-	    if (*epp != NULL) {
+	    if (*epp != nullptr) {
 		oi = vecstr_findaddr(slp,*epp) ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        len = strnlen(vp,vl) ;
 	        rs = vecstr_store(slp,vp,len,epp) ;
 	    } else {
-	        *epp = NULL ;
+	        *epp = nullptr ;
 	    }
 	    if ((rs >= 0) && (oi >= 0)) {
 	        vecstr_del(slp,oi) ;
@@ -1861,11 +1782,11 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 {
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
-	if (utfname != NULL) {
-	    lip->have.utfname = TRUE ;
-	    lip->final.utfname = TRUE ;
+	if (utfname != nullptr) {
+	    lip->have.utfname = true ;
+	    lip->final.utfname = true ;
 	    lip->utfname = utfname ;
 	}
 
@@ -1879,7 +1800,7 @@ static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	lip->f.init = f_init ;
 	lip->f.nocache = f_nocache ;
@@ -1910,11 +1831,11 @@ static int locinfo_defaults(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
-	if ((rs >= 0) && (lip->utfname == NULL) && (! lip->final.utfname)) {
+	if ((rs >= 0) && (lip->utfname == nullptr) && (! lip->final.utfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARUTFNAME) ;
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        cchar	**vpp = &lip->utfname ;
 	        rs = locinfo_setentry(lip,vpp,cp,-1) ;
 	    }
@@ -1930,7 +1851,7 @@ static int locinfo_uname(LOCINFO *lip)
 	int		rs = 1 ; /* cache-hit indication */
 
 	if (! lip->f.uname) {
-	    lip->f.uname = TRUE ;
+	    lip->f.uname = true ;
 	    rs = uinfo_name(&lip->uname) ;
 	}
 
@@ -1944,7 +1865,7 @@ static int locinfo_uaux(LOCINFO *lip)
 	int		rs = 1 ; /* cache-hit indication */
 
 	if (! lip->f.uaux) {
-	    lip->f.uaux = TRUE ;
+	    lip->f.uaux = true ;
 	    rs = uinfo_aux(&lip->uaux) ;
 	}
 
@@ -1959,16 +1880,10 @@ static int locinfo_sysdomain(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("sysval/locinfo_sysdomain: ent dn=%s\n",
-	        lip->sysdomain) ;
-#endif
-
-	if (lip->sysdomain == NULL) {
-	    const int	dlen = MAXHOSTNAMELEN ;
+	if (lip->sysdomain == nullptr) {
+	    cint	dlen = MAXHOSTNAMELEN ;
 	    char	dbuf[MAXHOSTNAMELEN+1] ;
 	    if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
 	        cchar	*cp ;
@@ -1981,14 +1896,6 @@ static int locinfo_sysdomain(LOCINFO *lip)
 	    len = strlen(lip->sysdomain) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5)) {
-	    debugprintf("sysval/locinfo_sysdomain: ret dn=%s\n",
-	        lip->sysdomain) ;
-	    debugprintf("sysval/locinfo_sysdomain: ret rs=%d l=%u\n",rs,len) ;
-	}
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (locinfo_sysdomain) */
@@ -1998,13 +1905,13 @@ static int locinfo_fsdir(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
-	if (lip->fname == NULL) {
-	    const int	hlen = MAXPATHLEN ;
+	if (lip->fname == nullptr) {
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 	    if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
 	        cchar	**vpp = &lip->fname ;
 	        if ((rs = locinfo_setentry(lip,vpp,hbuf,rs)) >= 0) {
-	            lip->f.allocfname = TRUE ;
+	            lip->f.allocfname = true ;
 	        }
 	    }
 	} else {
@@ -2023,22 +1930,10 @@ static int locinfo_hostid(LOCINFO *lip)
 	int		to = lip->to ;
 	int		f_hostid = lip->init.hostid ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("locinfo_hostid: init-hostid=%u\n",lip->init.hostid) ;
-	    debugprintf("locinfo_hostid: f_percache=%u\n",lip->f.percache) ;
-	}
-#endif
-
 	if ((! f_hostid) || ((pip->daytime - lip->ti_hostid) >= to)) {
 	    uint	uv = 0 ;
-	    lip->init.hostid = TRUE ;
+	    lip->init.hostid = true ;
 	    lip->ti_hostid = pip->daytime ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("locinfo_hostid: inside\n") ;
-#endif
 
 #if	CF_PERCACHE
 	    if (lip->f.percache) {
@@ -2067,19 +1962,15 @@ static int locinfo_pagesize(LOCINFO *lip)
 }
 /* end subroutine (locinfo_pagesize) */
 
-
-static int getla(PROGINFO *pip)
-{
+static int getla(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
-	const int	to = TO_LOADAVG ;
+	cint		to = TO_LOADAVG ;
 	int		rs = SR_OK ;
-
 	if ((! lip->init.fla) || ((pip->daytime - lip->ti_la) >= to)) {
-	    lip->init.fla = TRUE ;
+	    lip->init.fla = true ;
 	    lip->ti_la = pip->daytime ;
 	    rs = uc_getloadavg(lip->fla,3) ;
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (getla) */
@@ -2110,7 +2001,7 @@ static int getncpus(PROGINFO *pip)
 	to = lip->to ;
 	f_to = ((pip->daytime - lip->ti_ncpus) >= to) ;
 	if ((! lip->init.ncpus) || f_to) {
-	    lip->init.ncpus = TRUE ;
+	    lip->init.ncpus = true ;
 	    lip->ti_ncpus = pip->daytime ;
 
 	    rs = getnprocessors(pip->envv,0) ;
@@ -2134,13 +2025,8 @@ static int getnprocs(PROGINFO *pip,int w)
 	to = lip->to ;
 	f_to = ((pip->daytime - lip->ti_nprocs[w]) >= to) ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_la/getnprocs: w=%u f_to=%u\n",w,f_to) ;
-#endif
-
 	if ((! lip->init.nprocs) || f_to) {
-	    lip->init.nprocs = TRUE ;
+	    lip->init.nprocs = true ;
 	    lip->ti_nprocs[w] = pip->daytime ;
 	    switch (w) {
 	    case 0:
@@ -2152,10 +2038,6 @@ static int getnprocs(PROGINFO *pip,int w)
 	    case 3:
 	        rs = uc_nprocs(w) ;
 	        lip->nprocs[w] = rs ;
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(3))
-	            debugprintf("b_la/getnprocs: uc_nprocs() rs=%d\n",rs) ;
-#endif
 	        break ;
 	    default:
 	        rs = SR_NOSYS ;
@@ -2163,11 +2045,6 @@ static int getnprocs(PROGINFO *pip,int w)
 	    } /* end switch */
 	} /* end if (needed to get some stuff) */
 	n = lip->nprocs[w] ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_la/getnprocs: rs=%d n=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -2206,7 +2083,7 @@ static int getbtime(PROGINFO *pip)
 	to = lip->to ;
 	if ((! lip->init.btime) || ((pip->daytime - lip->ti_btime) >= to)) {
 	    time_t	bt = 0 ;
-	    lip->init.btime = TRUE ;
+	    lip->init.btime = true ;
 	    lip->ti_btime = pip->daytime ;
 
 #if	CF_PERCACHE
@@ -2236,7 +2113,7 @@ static int getnusers(PROGINFO *pip)
 	to = lip->to ;
 	if ((! lip->init.nusers) || ((pip->daytime - lip->ti_nusers) >= to)) {
 	    int		nu = 0 ;
-	    lip->init.nusers = TRUE ;
+	    lip->init.nusers = true ;
 	    lip->ti_nusers = pip->daytime ;
 
 #if	CF_PERCACHE
@@ -2273,7 +2150,7 @@ static int getrnum(PROGINFO *pip)
 
 	if (! lip->init.rnum) {
 
-	    lip->init.rnum = TRUE ;
+	    lip->init.rnum = true ;
 	    rv = 0 ;
 
 /* these are the same on a given triplet of node-user-process */
@@ -2308,7 +2185,7 @@ static int getrnum(PROGINFO *pip)
 
 /* these are somewhat cyclical at the low end */
 
-	uc_gettimeofday(&tod,NULL) ; /* cannot fail? */
+	uc_gettimeofday(&tod,nullptr) ; /* cannot fail? */
 	rv ^= tod.tv_sec ;
 	rv += tod.tv_usec ;
 
@@ -2318,9 +2195,7 @@ static int getrnum(PROGINFO *pip)
 }
 /* end subroutine (getrnum) */
 
-
-static int getmem(PROGINFO *pip)
-{
+static int getmem(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		f_to ;
@@ -2329,8 +2204,8 @@ static int getmem(PROGINFO *pip)
 	if ((! lip->init.mem) || f_to) {
 	    if ((rs = locinfo_pagesize(lip)) >= 0) {
 		SYSMEMUTIL	sm ;
-		const int	ps = rs ;
-		lip->init.mem = TRUE ;
+		cint		ps = rs ;
+		lip->init.mem = true ;
 		lip->ti_mem = pip->daytime ;
 		if ((rs = sysmemutil(&sm)) >= 0) {
 		    const long	ppm = ((1024 * 1024) / ps) ;

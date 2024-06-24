@@ -1,16 +1,16 @@
-/* sysmemutil */
+/* sysmemutil SUPPORT */
+/* lang=C++20 */
 
 /* retrieve the utilization (in a percentage of total) of system memory */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-11-18, David A­D­ Morano
-	This little subroutine was put together to get the system physical
-	memory utilization in terms of a percentage of the total.
+	This little subroutine was put together to get the system
+	physical memory utilization in terms of a percentage of the
+	total.
 
 */
 
@@ -18,22 +18,19 @@
 
 /*******************************************************************************
 
-        We hope that the OS has some 'sysconf(3c)' subroutines to help us here.
-        We really are tired of searching through the kernel for this sort of
-        information. We return SR_NOSYS if the OS does not provide an easy want
-        to get this stuff.
+	We hope that the OS has some |sysconf(3c)| subroutines to
+	help us here.  We really are tired of searching through the
+	kernel for this sort of information. We return SR_NOSYS if
+	the OS does not provide an easy want to get this stuff.
 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -58,11 +55,12 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int sysmemutil(SYSMEMUTIL *mup)
-{
+int sysmemutil(sysmemutil_dat *mup) noex {
 	int		rs = SR_OK ;
 	int		percent = 0 ;
 	int		f = FALSE ;
