@@ -121,8 +121,13 @@ namespace {
     struct syscaller : usyscallbase {
 	syscaller_m	m = nullptr ;
 	utsname		*utsp ;
+	ulong		*idp ;
 	int operator () (utsname *p) noex {
 	    utsp = p ;
+	    return handler() ;
+	} ;
+	int operator () (ulong *p) noex {
+	    idp = p ;
 	    return handler() ;
 	} ;
         int callstd() noex override {
@@ -133,6 +138,7 @@ namespace {
             return rs ;
         } ;
 	int std_uname() noex ;
+	int std_gethostid() noex ;
     } ; /* end struct (syscaller) */
 }
 
@@ -266,6 +272,27 @@ int u_gethostid(ulong *idp) noex {
 	return ugethostid(idp) ;
 }
 /* end subroutine (u_getauxinfo) */
+
+namespace libu {
+    sysret_t loadhostid(char *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
+		rs = ctdec(dp,dl,hid) ;
+	    }
+	}
+	return rs ;
+    }
+    sysret_t ugethostid(ulong *idp) noex {
+	int		rs = SR_FAULT ;
+	if (idp) {
+	    syscaller	sc ;
+	    sc.m = &syscaller::std_gethostid ;
+	    rs = sc(idp) ;
+	} /* end if (non-null) */
+	return rs ;
+    }
+}
 
 
 /* local subroutines */
@@ -421,5 +448,16 @@ int syscaller::std_uname() noex {
 	return rs ;
 }		
 /* end method (syscaller::std_uname) */
+
+int syscaller::std_gethostid() noex {
+	int		rs = SR_OK ;
+	if (long res ; (res = gethostid()) >= 0) {
+	    *idp = ulong(res) ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (syscaller::std_gethostid) */
 
 

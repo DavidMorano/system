@@ -8,8 +8,9 @@
 /* revision history:
 
 	= 2023-10-08, David A.D. Morano
-	This is a new thing, because, why now?
-	
+	This is written as some interim hack for some code that
+	cannot otherwise be linked with the main LIBUC code library.
+
 */
 
 /* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
@@ -23,13 +24,13 @@
 	Convert a |double| to a string.
 
 	Synopsis:
-	int ctdecf(char *rbuf,int rlen,cchar *fmt,...) noex
+	int ctdecf(char *rbuf,int rlen,int prec,double v) noex
 
 	Arguments:
 	rbuf		result buffer pointer
 	rlen		result buffer length
-	fmt		format string
-	...		value to convert
+	prec		precision (places after decimal point)
+	v		value to convert
 
 	Returns:
 	>=0		OK
@@ -67,7 +68,7 @@ using std::string ;			/* type */
 using libu::usyscallbase ;		/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::to_string ;			/* subroutine */
+using std::to_string ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -81,7 +82,7 @@ extern "C" {
 }
 
 namespace libu {
-    extern int	snwcpy(char *,int,cchar *,int) noex ;
+    extern int	snwcpy(char *,int,cchar *,int = -1) noex ;
 }
 
 
@@ -116,6 +117,8 @@ namespace {
 
 /* forward references */
 
+static int std_vsnprintf(char *,int,cc *,va_list) noex ;
+
 
 /* local variables */
 
@@ -143,24 +146,13 @@ namespace libu {
 namespace libu {
     int snuvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
 	if (rbuf && fmt && ap) {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) {
-		csize	rsz = size_t(rlen + 1) ;
 		int	to_nomem = utimeout[uto_nomem] ;
 		bool	fexit = false ;
 		repeat {
-		    if ((rs = vsnprintf(rbuf,rsz,fmt,ap)) >= 0) {
-			if (rs > rlen) {
-			    rs = SR_OVERFLOW ;
-			} else {
-		            len = rs ;
-			}
-		    } else {
-		        rs = SR_BADFMT ;
-		    } /* end if */
-		    if (rs < 0) {
+		    if ((rs = std_vsnprintf(rbuf,rlen,fmt,ap)) < 0) {
 			switch (rs) {
 			case SR_NOMEM:
 			    if (to_nomem-- > 0) {
@@ -177,7 +169,7 @@ namespace libu {
 		} until ((rs >= 0) || fexit) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
     } /* end subroutine (snuvprintf) */
     int snuprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
@@ -256,5 +248,19 @@ int syscaller::std_getloadavg() noex {
 	return rs ;
 }		
 /* end method (syscaller::std_getloadavg) */
+
+static int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
+	csize		rsz = size_t(rlen + 1) ;
+	int		rs ;
+	if ((rs = vsnprintf(rbuf,rsz,fmt,ap)) >= 0) {
+	    if (rs > rlen) {
+	        rs = SR_OVERFLOW ;
+	    }
+	} else {
+	    rs = (- errno) ;
+	} /* end if */
+	return rs ;
+}
+/* end subroutine (std_vsnprintf) */
 
 

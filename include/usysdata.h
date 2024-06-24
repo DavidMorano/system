@@ -47,6 +47,15 @@ extern int u_gethostid(ulong *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+namespace libu {
+    extern int loadhostid(char *,int) noex ;
+    extern int ugethostid(ulong *) noex ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* USYSDATA_INCLUDE */
 

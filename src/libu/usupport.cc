@@ -215,34 +215,20 @@ namespace libu {
 }
 
 namespace libu {
-    sysret_t loadhostid(char *dp,int dl) noex {
-	int		rs = SR_FAULT ;
-	if (dp) {
-	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
-		rs = ctdec(dp,dl,hid) ;
-	    }
-	}
-	return rs ;
-    }
-    sysret_t ugethostid(ulong *idp) noex {
-	int		rs = SR_FAULT ;
-	if (idp) {
-	    clong	res = gethostid() ;
-	    *idp = ulong(res) ;
-	}
-	return rs ;
-    }
-}
-
-namespace libu {
     sysret_t ustrftime(char *dbuf,int dlen,cchar *fmt,CTM *tmp) noex {
-	csize		dsz = size_t(dlen + 1) ;
-	int		rs ;
-	if (size_t rsz ; (rsz = strftime(dbuf,dsz,fmt,tmp)) > 0) {
-	    rs = intsat(rsz) ;
-	} else if (rsz == 0) {
-	    rs = SR_OVERFLOW ;
-	}
+	int		rs = SR_FAULT ;
+	if (dbuf && fmt && tmp) {
+	    rs = SR_INVALID ;
+	    if (dlen >= 0) {
+	        csize	dsz = size_t(dlen + 1) ;
+	        if (size_t rsz ; (rsz = strftime(dbuf,dsz,fmt,tmp)) > 0) {
+	            rs = intsat(rsz) ;
+	        } else if (rsz == 0) {
+	            dbuf[0] = '\0' ;
+	            rs = SR_OVERFLOW ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
     }
 }
