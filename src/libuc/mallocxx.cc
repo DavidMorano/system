@@ -158,9 +158,9 @@ int malloc_ps(char **rpp) noex {
 	return (rs >= 0) ? sz : rs ;
 }
 
-int malloc_addr(char **rpp) noex {
+int malloc_mailaddr(char **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		al = 0 ;
+	int		mal = 0 ;		/* mail-address length */
 	if (rpp) {
 	    int		w = getbufsize_hn ;
 	    if ((rs = getbufsize(w)) >= 0) {
@@ -168,12 +168,12 @@ int malloc_addr(char **rpp) noex {
 		w = getbufsize_nn ;
 		if ((rs = getbufsize(w)) >= 0) {
 		    cint	nnl = rs ;
-		    al = (hnl + (2 * nnl)) ;
-		    rs = uc_malloc((al+1),rpp) ;
+		    mal = (hnl + (2 * nnl)) ;
+		    rs = uc_malloc((mal+1),rpp) ;
 		} /* end if */
 	    } /* end if */
 	} /* end if (non-null) */
-	return (rs >= 0) ? al : rs ;
+	return (rs >= 0) ? mal : rs ;
 }
 
 

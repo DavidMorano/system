@@ -77,6 +77,9 @@ using std::max ;		/* subroutine-template */
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
@@ -112,6 +115,7 @@ static charp strdcpyu(char *dp,int dl,cchar *sp) noex {
 	}
 	return rp ;
 }
+/* end subroutine (strdcpyu) */
 
 
 /* local variables */
@@ -135,6 +139,7 @@ int ulogerror(cchar *id,int err,cchar *msg) noex {
 	}
 	return f ;
 }
+/* end subroutine (ulogerror) */
 
 
 /* local subroutines */
@@ -160,8 +165,7 @@ void ulogerrmgr::fini() noex {
 	static cint	fd = FD_STDERR ;
 	cchar		*announce = "ulogerror: dump\n" ;
 	cchar		*fmt = "ulogerror: %s (%3d) %s\n" ;
-	cchar		*vp ;
-	if ((vp = getenv(var)) != nullptr) {
+	if (cchar *vp ; (vp = getenv(var)) != nullptr) {
 	    if (vp[0] && (c > 0)) {
 		auto	snfmt = snprintf ;
 		char	wbuf[wlen+1] ;

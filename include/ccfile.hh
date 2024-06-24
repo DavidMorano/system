@@ -24,6 +24,7 @@
 #include	<istream>
 #include	<fstream>
 #include	<string>
+#include	<string_view>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -51,6 +52,7 @@ struct ccfile_co {
 } ; /* end struct (ccfile_co) */
 
 struct ccfile : std::fstream {
+	typedef std::string_view	strview ;
 	friend		ccfile_co ;
 	ccfile_co	rewind ;
 	ccfile_co	close ;
@@ -62,6 +64,7 @@ struct ccfile : std::fstream {
 	ccfile(const ccfile &) = delete ;
 	ccfile &operator = (const ccfile &) = delete ;
 	int open(cchar *,cchar * = nullptr,mode_t = 0) noex ;
+	int open(const strview,cchar * = nullptr,mode_t = 0) noex ;
 	int readln(char *,int,int = eol) noex ;
 	int readln(std::string &,int = eol) noex ;
 	int seek(off_t = 0z,int = -1) noex ;

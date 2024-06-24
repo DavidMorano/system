@@ -380,6 +380,10 @@ enum signalmissings {
 #define	PID_MAX		99999		/* historic value (in decimal) */
 #endif
 
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000		/* poll-interval-multiplier (to secs) */
+#endif
+
 /* C-C++ memory order */
 #ifndef	memord_relaxed
 #define	memord_relaxed	std::memory_order_relaxed

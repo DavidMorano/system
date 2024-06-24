@@ -18,7 +18,7 @@ VALDIR= $(CGS_VALDIR)
 RUNDIR= $(USRLOCAL)/lib
 
 
-CPP= cpp
+CPP= gcpp
 CC= gcc
 CXX= gpp
 LD= gld
@@ -321,7 +321,7 @@ OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
 
 
 UOBJ00= matxstr.o toxc.o char.o 
-UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o sif.o
+UOBJ01= strn.o strnxcmp.o sif.o
 UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
 UOBJ03= syswords.o stdfnames.o
 
@@ -332,7 +332,7 @@ UOBJ07= sncpyx.o sncpyxw.o snaddw.o
 
 UOBJ08= strkeycmp.o ccfile.o strnul.o
 UOBJ09= readln.o ccfile.o
-UOBJ10= cfx.o
+UOBJ10= cfx.o memtrack.o addrset.o mapblock.o
 UOBJ11= strmgr.o strop.o field.o
 
 UOBJ12= ucttyname.o uctc.o tcx.o
@@ -340,14 +340,20 @@ UOBJ13=
 UOBJ14= ucsys.o
 UOBJ15=
 
+UOBJ16 += wsix.o wsnx.o wsx.o
+UOBJ17 += six.o snx.o sfx.o rmx.o
+UOBJ18 +=
+UOBJ19 +=
+
 UOBJ=
-UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
-UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
-UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
-UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
+UOBJ += $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
+UOBJ += $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
+UOBJ += $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
+UOBJ += $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
+UOBJ += $(UOBJ16) $(UOBJ17) $(UOBJ18) $(UOBJ19)
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.ls .i .ii .cx .cs
 
 
 default:		all
@@ -794,6 +800,7 @@ libmallocxx.o:		libmallocxx.cc libmallocxx.h
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.cc mapblock.hh
 memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
+addrset.o:		addrset.cc addrset.hh
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh mapblock.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 

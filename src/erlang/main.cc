@@ -1,33 +1,38 @@
-/* main */
+/* main SUPPORT (erlang) */
+/* lang=C++20 */
 
-/* deal with digital line terminations */
-
+/* some sort of tersting? */
+/* version %I% last-modified %G% */
 
 
 /* revistion history :
 
 	= August 1988, David A­D­ Morano
-
-
-*/
-
-
-/* 
+	Soe test frameword.
 
 */
 
+/*******************************************************************************
 
+	Oh.  Who knows why I created this (crap)?
 
+*******************************************************************************/
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<fcntl.h>
 #include	<math.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<bfile.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 
-
+/* local defines */
 
 #define		DATA_EOF	0x1A
 
@@ -37,20 +42,40 @@
 #define		TERMTIMEOUT	10L
 
 
-
-long int factorial() ;
-
+/* local defines */
 
 
+/* local namespaces */
 
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+static long factorial(int n) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int main(int argc,mainv,mainv) {
 	bfile		error, *efp = &error ;
 	bfile		output, *ofp = &output ;
-
 	double	a = 3.0 ;
 	double	pb, pb_n, pb_d ;
 	double	pq ;
@@ -58,9 +83,7 @@ char	*argv[] ;
 	double	p0, p0_a, p0_b ;
 	double	nq, dq ;
 	double	lam = 0.1 ;
-
-
-	long	int	i, n, m = 5 ;
+	long	i, n, m = 5 ;
 	int		rs ;
 
 
@@ -109,16 +132,17 @@ bad_exit:
 
 	return BAD ;
 }
+/* end subroutine (main) */
 
 
-long int factorial(n)
-long int	n ;
-{
+/* local subroutines */
 
-	if (n <= 1)  return 1 ;
-
-	return (n * factorial(n - 1)) ;
+static long factorial(int n) noex {
+	long		res = 1 ;
+	if (n > 1) {
+	    res = (n * factorial(n - 1)) ;
+	}
+	return res ;
 }
-
 
 

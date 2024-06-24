@@ -22,7 +22,6 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<fifostr.h>
-#include	<localmisc.h>
 
 
 #define	SFILL		struct sfill_head

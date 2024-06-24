@@ -74,6 +74,7 @@
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -203,7 +204,7 @@ int subinfo::addfloat(int fcode,double v,
 	    case 'g':
 	        {
 	            cint	trailing = (width > 0) ;
-	            convertg(v, prec, trailing,buf) ;
+	            convertg(v,prec,trailing,buf) ;
 	        }
 	        break ;
 	    } /* end switch */

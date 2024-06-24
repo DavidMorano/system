@@ -24,6 +24,7 @@
 #include	<utimeout.h>
 #include	<ulogerror.h>
 #include	<usys.h>
+#include	<usysutility.hh>
 #include	<timecount.hh>
 #include	<filetype.h>
 #include	<aflag.hh>
@@ -97,6 +98,25 @@ EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
 
 
+#ifndef	OBJECT_GETUSTIME
+#define	OBJECT_GETUSTIME
+#ifdef	__cplusplus
+
+struct ugetustime {
+	operator time_t () noex {
+	    return time(nullptr) ;
+	} ;
+	static time_t operator () () noex {
+	    return time(nullptr) ;
+	} ;
+} ; /* end struct (getustime) */
+
+extern ugetustime	getustime ;
+
+#endif /* __cplusplus */
+#endif /* OBJECT_GETUSTIME */
+
+
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
@@ -142,8 +162,7 @@ namespace libu {
     }
 }
 namespace libu {
-    extern int loadhostid(char *,int) noex ;
-    extern int ugethostid(ulong *) noex ;
+    extern int ustrftime(char *,int,cchar *,CTM *) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
 }

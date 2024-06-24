@@ -20,15 +20,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<signal.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 #define	SIGHAND_MAGIC	0x66938271
 #define	SIGHAND		struct sighand_head
-#define	SIGHAND_HANDLE	struct sighand_handle
+#define	SIGHAND_HA	struct sighand_handle
 
 
 struct sighand_handle {
@@ -37,7 +35,7 @@ struct sighand_handle {
 } ;
 
 struct sighand_head {
-	SIGHAND_HANDLE	*handles ;
+	SIGHAND_HA	*handles ;
 	sigset_t	osm ;
 	uint		magic ;
 	int		nhandles ;
@@ -45,6 +43,7 @@ struct sighand_head {
 } ;
 
 typedef SIGHAND		sighand ;
+typedef	SIGHAND_HA	sighand_ha ;
 
 EXTERNC_begin
 

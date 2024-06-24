@@ -19,13 +19,15 @@
 
 	Names:
 	u_uname
+	u_getnodename
 	u_getauxinfo
 
 	Description:
 	Retrieve some operating system and machine information.
 
 	Synopsis:
-	int u_uname(UTSNAME *up) noex
+	int u_uname(utsname *up) noex
+	int u_getnodename(char *rbuf,int rlen) noex
 	int u_getauxinfo(char *rbuf,int rlen,int req) noex
 
 	Arguments:
@@ -79,7 +81,8 @@
 #include	<usysflag.h>
 #include	<usupport.h>		/* <- most of |libu| namespace */
 #include	<usysauxinfo.h>		/* the request codes */
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<usyscallbase.hh>
+#include	<localmisc.h>		/* |NODENAMELEN| */
 
 #include	"usysdata.h"
 
@@ -90,6 +93,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using libu::usyscallbase ;		/* type */
 using libu::ugethostid ;		/* subroutine */
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
@@ -100,7 +104,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef int (*uname_f)(UTSNAME *) noex ;
+typedef int (*uname_f)(utsname *) noex ;
 
 
 /* external subroutines */
@@ -110,6 +114,33 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 
 
 /* local structures */
+
+namespace {
+    struct syscaller ;
+    typedef int (syscaller::*syscaller_m)() noex ;
+    struct syscaller : usyscallbase {
+	syscaller_m	m = nullptr ;
+	utsname		*utsp ;
+	ulong		*idp ;
+	int operator () (utsname *p) noex {
+	    utsp = p ;
+	    return handler() ;
+	} ;
+	int operator () (ulong *p) noex {
+	    idp = p ;
+	    return handler() ;
+	} ;
+        int callstd() noex override {
+            int         rs = SR_BUGCHECK ;
+            if (m) {
+                rs = (this->*m)() ;
+            }
+            return rs ;
+        } ;
+	int std_uname() noex ;
+	int std_gethostid() noex ;
+    } ; /* end struct (syscaller) */
+}
 
 namespace {
     constexpr int	nitems = 4 ;
@@ -125,12 +156,12 @@ namespace {
  	} ;
 	int setup() noex ;
     private:
-	char		*mbuf = nullptr ;
+	char		*mbuf ;
 	int		mlen ;
     } ; /* end struct (umachiner) */
     struct datobj {
 	char		*s[nitems] ;
-	char		*a ;
+	char		*a = nullptr ;
 	int start() noex ;
 	int finish() noex ;
 	int load() noex ;
@@ -143,16 +174,18 @@ namespace {
 
 /* forward references */
 
+static int usys_uname(utsname *) noex ;
+static int uname_machine(utsname *) noex ;
+static int uname_nodename(utsname *) noex ;
 static int local_getauxinfo(char *,int,int) noex ;
-static int uuname_machine(UTSNAME *) noex ;
 static int setup_sysauxinfo() noex ;
 
 
 /* local variables */
 
 static constexpr uname_f	usubs[] = {
-	uuname_machine,
-	nullptr
+	uname_machine,
+	uname_nodename
 } ;
 
 static umachiner	um ;
@@ -164,7 +197,7 @@ constexpr int		reqs[] = {
 	SAI_HWPROVIDER
 } ;
 
-constexpr int		datlen = REALNAMELEN ;
+constexpr int		datlen = NODENAMELEN ;
 
 constexpr cchar		defmachine[] = "Intel(R) Core(TM) i7" ;
 
@@ -178,21 +211,38 @@ constexpr bool		f_linux		= F_LINUX ;
 
 /* exported subroutines */
 
-int u_uname(UTSNAME *up) noex {
+int u_uname(utsname *up) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (up) {
-	    if ((rs = uname(up)) >= 0) {
+	    if ((rs = usys_uname(up)) >= 0) {
 		rc = rs ;
-		for (int i = 0 ; (rs >= 0) && usubs[i] ; i += 1) {
-		    uname_f	func = usubs[i] ;
-		    rs = func(up) ;
+		for (cauto &f : usubs) {
+		    if ((rs = f(up)) < 0) break ;
 		} /* end for */
 	    } else {
 	        rs = (- errno) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
+}
+/* end subroutine (u_uname) */
+
+int u_getnodename(char *rbuf,int rlen) noex {
+	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf) {
+	    rs = SR_NOMEM ;
+	    if (utsname *utsp ; (utsp = new(nothrow) utsname) != np) {
+		if ((rs = u_uname(utsp)) >= 0) {
+	            rs = sncpy(rbuf,rlen,utsp->nodename) ;
+		    len = rs ;
+		}
+	        delete utsp ;
+	    } /* end if (new-utsname) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (u_uname) */
 
@@ -223,11 +273,39 @@ int u_gethostid(ulong *idp) noex {
 }
 /* end subroutine (u_getauxinfo) */
 
+namespace libu {
+    sysret_t loadhostid(char *dp,int dl) noex {
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) {	
+		rs = ctdec(dp,dl,hid) ;
+	    }
+	}
+	return rs ;
+    }
+    sysret_t ugethostid(ulong *idp) noex {
+	int		rs = SR_FAULT ;
+	if (idp) {
+	    syscaller	sc ;
+	    sc.m = &syscaller::std_gethostid ;
+	    rs = sc(idp) ;
+	} /* end if (non-null) */
+	return rs ;
+    }
+}
+
 
 /* local subroutines */
 
-static int uuname_machine(UTSNAME *up) noex {
-	cint		mlen = (sizeof(up->machine)-1) ;
+static int usys_uname(utsname *utsp) noex {
+	syscaller	sc ;
+	sc.m = &syscaller::std_uname ;
+	return sc(utsp) ;
+}
+/* end subroutine (usys_uname) */
+
+static int uname_machine(utsname *up) noex {
+	cint		mlen = int(sizeof(up->machine)-1) ;
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
 	if (strcmp(mbuf,"x86_64") == 0) {
@@ -241,6 +319,16 @@ static int uuname_machine(UTSNAME *up) noex {
 	return rs ;
 }
 /* end subroutine (uname_machine) */
+
+static int uname_nodename(utsname *up) noex {
+	int		rs = SR_OK ;
+	char		*nn = up->nodename ;
+	if (char *tp ; (tp = strchr(nn,'.')) != nullptr) {
+	    *tp = '\0' ;
+	}
+	return rs ;
+}
+/* end subroutine (uname_nodename) */
 
 static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 	static cint	rsx = setup_sysauxinfo() ;
@@ -263,7 +351,7 @@ static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 		break ;
 	    } /* end switch */
 	    if (valp) {
-		rs = snwcpy(rbuf,rlen,valp) ;
+		rs = sncpy(rbuf,rlen,valp) ;
 		len = rs ;
 	    }
 	} /* end if (non-null) */
@@ -351,5 +439,25 @@ int datobj::load() noex {
 	return (rs >= 0) ? rsz : rs ;
 }
 /* end method (datobj::load) */
+
+int syscaller::std_uname() noex {
+	int		rs ;
+	if ((rs = uname(utsp)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}		
+/* end method (syscaller::std_uname) */
+
+int syscaller::std_gethostid() noex {
+	int		rs = SR_OK ;
+	if (long res ; (res = gethostid()) >= 0) {
+	    *idp = ulong(res) ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (syscaller::std_gethostid) */
 
 

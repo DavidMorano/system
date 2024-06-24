@@ -298,9 +298,13 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 
+#ifdef	__cplusplus
+
 namespace libu {
     extern sysret_t darwin_usysctl(char *,int,cchar *) noex ;
 }
+
+#endif /* __cplusplus */
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */

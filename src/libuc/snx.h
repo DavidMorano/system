@@ -21,8 +21,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* types (see below) */
 #include	<stdarg.h>		/* |va_list| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	<sncpy.h>
 #include	<sncpyx.h>		/* repeat? */

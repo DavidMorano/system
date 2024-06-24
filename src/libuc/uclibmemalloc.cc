@@ -126,8 +126,8 @@ int uc_libmalloc(int sz,void *vp) noex {
 }
 /* end subroutine (uc_libmalloc) */
 
-int uc_libcalloc(int nelem,int esize,void *vp) noex {
-	cint		sz = (nelem * esize) ;
+int uc_libcalloc(int ne,int esize,void *vp) noex {
+	cint		sz = (ne * esize) ;
 	int		rs ;
 	if ((rs = uc_libmalloc(sz,vp)) >= 0) {
 	    memset(vp,0,sz) ;

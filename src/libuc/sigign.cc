@@ -35,10 +35,6 @@
 
 /* local defines */
 
-#ifndef	SIGIGN_HANDLE
-#define	SIGIGN_HANDLE	struct sigign_handle
-#endif
-
 
 /* external subroutines */
 
@@ -79,16 +75,16 @@ int sigign_start(SIGIGN *iap,cint *ignores) noex {
 	        }
 	        nhandles = i ;
 	        if (nhandles > 0) {
-	            cint	size = (nhandles * sizeof(SIGIGN_HANDLE)) ;
+	            cint	size = (nhandles * sizeof(sigign_ha)) ;
 	            void	*vp ;
 	            iap->nhandles = nhandles ;
 	            if ((rs = uc_malloc(size,&vp)) >= 0) {
 	                SIGACTION	san, *sap ;
 	                sigset_t	nsm ;
-	                iap->handles = (SIGIGN_HANDLE *) vp ;
+	                iap->handles = (sigign_ha *) vp ;
 	                uc_sigsetempty(&nsm) ;
 	                if (ignores != nullptr) {
-	                    SIGIGN_HANDLE	*hp = iap->handles ;
+	                    sigign_ha	*hp = iap->handles ;
 	                    int		hsig ;
 	                    for (i = 0 ; ignores[i] != 0 ; i += 1) {
 	                        hsig = ignores[i] ;

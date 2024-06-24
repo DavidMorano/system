@@ -20,24 +20,22 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<signal.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 #define	SIGMAN_MAGIC	0x66938271
 #define	SIGMAN		struct sigman_head
-#define	SIGMAN_HAND	struct sigman_handle
+#define	SIGMAN_HA	struct sigman_hale
 
 
-struct sigman_handle {
+struct sigman_hale {
 	SIGACTION	action ;
 	int		sig ;
 } ;
 
 struct sigman_head {
-	SIGMAN_HAND	*handles ;
+	SIGMAN_HA	*handles ;
 	sigset_t	osm ;
 	uint		magic ;
 	int		nhs ;
@@ -45,7 +43,7 @@ struct sigman_head {
 } ;
 
 typedef	SIGMAN		sigman ;
-typedef	SIGMAN_HAND	sigman_hand ;
+typedef	SIGMAN_HA	sigman_ha ;
 
 EXTERNC_begin
 

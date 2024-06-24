@@ -11,12 +11,10 @@
 	Originally written for Rightcore Network Services.
 
 	= 2020-03-26, David A­D­ Morano
-	I added (sort of for fun) a use of C++20 |if_constexpr|.
-	Yes, with only a relatively few used by me of this new
-	features, I can see that it is no where near capable of
-	eliminating all pre-propcessor symbols. But I try my best
-	(since I do not like pre-processor symbols any more than
-	the next guy).
+	I refactored the |uinfo_getaux| subroutine below.  It
+	previously used a proprietary interface to get that auxillary
+	information, but now it uses a generic interface (suitable
+	for most all UNIX®-like systems).
 
 */
 
@@ -466,9 +464,6 @@ int uinfo::getaux_install(setaux *setp) noex {
 	return rs ;
 }
 /* end method (uinfo::getaux_install) */
-
-
-/* local subroutines */
 
 static int uinfo_getaux(uinfo_tmpaux *tap) noex {
 	cint    	nlen = int(sizeof(tap->architecture) - 1) ;

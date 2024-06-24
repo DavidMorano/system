@@ -4,7 +4,6 @@
 /* generic front-end for SHELL built-ins */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGN	0		/* special debugging */
 #define	CF_UTIL		0		/* run the utility worker */
 
 /* revision history:
@@ -79,11 +78,6 @@ extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	msleep(int) ;
 extern int	haslc(cchar *,int) ;
 extern int	hasuc(cchar *,int) ;
-
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 extern cchar	*strsigabbr(int) ;
@@ -172,43 +166,19 @@ int main(int argc,mainv argv,mainv envv) {
 	int		rs1 ;
 	int		ex = EX_INFO ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"main: ent\n") ;
-#endif
-
 	if (argv != nullptr) {
 	    MAININFO	mi, *mip = &mi ;
 	    if ((rs = maininfo_start(mip,argc,argv)) >= 0) {
 		maininfohand_t	sh = main_sighand ;
 	        if ((rs = maininfo_sigbegin(mip,sh,sigcatches)) >= 0) {
-#if	CF_DEBUGN
-	            nprintf(NDF,"main: sig-begin\n") ;
-#endif
 	            if ((rs = lib_initmemalloc(f_lockmemalloc)) >= 0) {
 	                if ((rs = lib_mainbegin(envv,nullptr)) >= 0) {
 	                    if ((rs = maininfo_utilbegin(mip,f_util)) >= 0) {
 	                        cchar	*srch ;
 
-#if	CF_DEBUGN
-	                        nprintf(NDF,"main: maininfo_srchname()\n") ;
-#endif
-
 	                        if ((rs = maininfo_srchname(mip,&srch)) >= 0) {
-#if	CF_DEBUGN
-	                            nprintf(NDF,"main: srch=%s\n",srch) ;
-#endif
 	                            ex = lib_callcmd(srch,argc,argv,envv,nullptr) ;
-#if	CF_DEBUGN
-	                            nprintf(NDF,"main: lib_callcmd() ex=%u\n",
-	                                ex) ;
-#endif
 	                        } /* end if */
-
-#if	CF_DEBUGN
-	                        nprintf(NDF,
-				"main: maininfo_srchname-out rs=%d ex=%u\n",
-				rs,ex) ;
-#endif
 
 	                        rs1 = maininfo_utilend(mip) ;
 	                        if (rs >= 0) rs = rs1 ;
@@ -217,9 +187,6 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (lib-main) */
 	            } /* end if (lib_initmemalloc) */
-#if	CF_DEBUGN
-	            nprintf(NDF,"main: sig-end\n") ;
-#endif
 	            rs1 = maininfo_sigend(&mi) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (maininfo-sig) */
@@ -235,10 +202,6 @@ int main(int argc,mainv argv,mainv envv) {
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
 	}
-
-#if	CF_DEBUGN
-	nprintf(NDF,"main: ret rs=%d ex=%u\n",rs,ex) ;
-#endif
 
 	return ex ;
 }
@@ -286,9 +249,6 @@ static int main_sigdump(siginfo_t *sip) noex {
 	cchar	*fmt ;
 	char		wbuf[LINEBUFLEN+1] ;
 	char		abuf[16+1] ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: signo=%d\n",si_signo) ;
-#endif
 	switch (si_signo) {
 	case SIGILL:
 	    scs = strsigcode(sigcode_ill,si_code) ;
@@ -311,13 +271,7 @@ static int main_sigdump(siginfo_t *sip) noex {
 	    break ;
 	} /* end switch */
 	fmt = "SIG=%s code=%d(%s) addr=%s\n" ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: bufprintf() sn=%s\n",sn) ;
-#endif
 	wl = bufprintf(wbuf,wlen,fmt,sn,si_code,scs,as) ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: bufprintf() rs=%d\n",wl) ;
-#endif
 	write(2,wbuf,wl) ;
 	return 0 ;
 }

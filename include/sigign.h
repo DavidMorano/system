@@ -19,13 +19,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
 #include	<signal.h>
 #include	<usystem.h>
 
 
 #define	SIGIGN_MAGIC	0x66938271
 #define	SIGIGN		struct sigign_head
-#define	SIGIGN_HANDLE	struct sigign_handle
+#define	SIGIGN_HA	struct sigign_handle
 
 
 struct sigign_handle {
@@ -36,17 +37,18 @@ struct sigign_handle {
 struct sigign_head {
 	uint		magic ;
 	sigset_t	osm ;
-	SIGIGN_HANDLE	*handles ;
+	SIGIGN_HA	*handles ;
 	int		nhandles ;
 	int		nblocks ;
 } ;
 
 typedef	SIGIGN		sigign ;
+typedef	SIGIGN_HA	sigign_ha ;
 
 EXTERNC_begin
 
-extern int	sigign_start(SIGIGN *,cint *) noex ;
-extern int	sigign_finish(SIGIGN *) noex ;
+extern int	sigign_start(sigign *,cint *) noex ;
+extern int	sigign_finish(sigign *) noex ;
 
 EXTERNC_end
 

@@ -20,11 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
-#define	SILETTER	struct siletter_result 
+#define	SILETTER_RES	struct siletter_result 
 
 
 struct siletter_result {
@@ -32,7 +33,7 @@ struct siletter_result {
 	int		ll ;
 } ;
 
-typedef SILETTER	siletter_res ;
+typedef SILETTER_RES	siletter_res ;
 
 EXTERNC_begin
 

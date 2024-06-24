@@ -13,9 +13,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |uid_t| + |gid_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>

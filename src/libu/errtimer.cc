@@ -27,14 +27,10 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"errtimer.hh"
 
@@ -49,6 +45,13 @@
 
 
 /* external subroutines */
+
+#ifndef	SUBROUTINE_MSLEEP
+#define	SUBROUTINE_MSLEEP
+EXTERNC_begin
+extern int	msleep(int) noex ;
+EXTERNC_end
+#endif
 
 
 /* external variables */

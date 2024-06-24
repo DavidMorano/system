@@ -24,7 +24,7 @@
 	managed by the object itself.
 
 	Synosis:
-	int ucmemla_macquire(ucmemla *op,size_t us,void **rpp) noex ;
+	int ucmemla_acquire(ucmemla *op,size_t us,void **rpp) noex ;
 	int ucmemla_release(ucmemla *op) noex ;
 
 	Arguments:

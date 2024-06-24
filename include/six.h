@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	<sifext.h>
 
@@ -40,7 +41,6 @@ extern int sihyphen(cchar *,int) noex ;
 extern int siskipwhite(cchar *,int) noex ;
 extern int sispan(cchar *,int,cchar *) noex ;
 extern int sisub(cchar *,int,cchar *) noex ;
-extern int sirec(cchar *,int,int) noex ;
 extern int sicite(cchar *,int,cchar *,int) noex ;
 extern int siterm(cchar *,int,cchar *) noex ;
 

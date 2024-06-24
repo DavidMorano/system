@@ -24,6 +24,7 @@
 	u_fstatvfs
 	u_fpathconf
 	u_fsync
+	u_ftruncate
 	u_ioctl
 	u_lockf
 	u_pread
@@ -115,6 +116,13 @@
 	the command-requests take a |uintptr_t| (or similar) type
 	of argument.  So there is no problem with just passing a
 	promoted argument of |uintptr_t| or similar.
+	4. On Apple Darwin (yes, that OS again) the |u_fstat|
+	subroutine below can return an |ENOTTY| on an access failure
+	on the file-descriptor (presumably when that file-descriptor
+	is pointing to a terminal).  This is in violation of the
+	Apple Darwin documentation for that subroutine.  So I fix
+	this (only on Apple Darwin) to return EACCES when I get
+	a ENOTTY from the kernel call.
 
 *******************************************************************************/
 
@@ -222,7 +230,8 @@ namespace {
 	uregular(POLLFD *s,int an,int t) noex : fds(s), n(an), to(t) { } ;
 	uregular(IOVEC *p,int an) noex : iop(p), n(an) { } ;
 	uregular(int c,caddr_t aa) noex : cmd(c), anyarg(aa) { } ;
-	uregular(int c,int s) noex : cmd(c), sz(s) { } ;
+	uregular(int c,off_t s) noex : cmd(c), sz(s) { } ;
+	uregular(off_t s) noex : sz(s) { } ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -236,6 +245,7 @@ namespace {
 	int iclose(int) noex ;
 	int ipoll(int) noex ;
 	int ifsync(int) noex ;
+	int iftruncate(int) noex ;
 	int ilockf(int) noex ;
 	int ipread(int) noex ;
 	int ipwrite(int) noex ;
@@ -255,6 +265,7 @@ namespace {
 
 constexpr bool		f_acl = F_ACL ; /* future use */
 constexpr bool		f_sunos = F_SUNOS ; /* this is really Solaris® */
+constexpr bool		f_darwin = F_DARWIN ; /* this is really Solaris® */
 
 
 /* exported variables */
@@ -395,6 +406,9 @@ int u_fstat(int fd,USTAT *ssp) noex {
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
+	if_constexpr (f_darwin) {
+	    if (rs == SR_NOTTY) rs = SR_ACCESS ;
+	}
 	return rs ;
 }
 /* end subroutine (u_fstat) */
@@ -456,6 +470,13 @@ int u_fsync(int fd) noex {
 	return ro(fd) ;
 }
 /* end subroutine (u_fsync) */
+
+int u_ftruncate(int fd,off_t fo) noex {
+	uregular	ro(fo) ;
+	ro.m = &uregular::iftruncate ;
+	return ro(fd) ;
+}
+/* end subroutine (u_ftruncate) */
 
 int u_ioctl(int fd,int cmd,...) noex {
 	va_list		ap ;
@@ -584,6 +605,15 @@ int uregular::ipoll(int) noex {
 int uregular::ifsync(int fd) noex {
 	int		rs ;
 	if ((rs = fsync(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiledesc::ifsync) */
+
+int uregular::iftruncate(int fd) noex {
+	int		rs ;
+	if ((rs = ftruncate(fd,sz)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;

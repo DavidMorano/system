@@ -40,15 +40,18 @@
 	n		suggested starting size
 
 	Returns:
-	-		the current process PID
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |uintptr_t| */
+#include	<cstdint>
 #include	<cstring>
+#include	<utility>		/* |std::unreachable()| */
+#include	<new>
 #include	<usystem.h>
 
 #include	"memtrack.hh"
@@ -59,10 +62,10 @@
 #ifdef	COMMENT
 struct memtrack_ent {
 	void	*addr ;
-	int	size ;
+	int	asize ;
 } ;
 extern int	memtrack_start(int) noex ;
-extern int	memtrack_ins(void *,int size) noex ;
+extern int	memtrack_ins(void *,int) noex ;
 extern int	memtrack_rem(void *) noex ;
 extern int	memtrack_get(void *,memtrack_ent *) noex ;
 extern int	memtrack_finish() noex ;
@@ -73,6 +76,9 @@ extern int	memtrack_finish() noex ;
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -97,14 +103,14 @@ constexpr uint		memtrack_magic = MEMTRACK_MAGIC ;
 
 /* exported subroutines */
 
-int memtrack::ins(cvoid *addr,int size) noex {
+int memtrack::ins(cvoid *addr,int asize) noex {
 	int		rs = SR_NOTOPEN ;
 	if (magic == memtrack_magic) {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
-	    if (addr && (size > 0)) {
-		const ent	e = { addr, size } ;
-		rs = t.ins(a,e) ;
+	    if (addr && (asize > 0)) {
+		const ent	e = { addr, asize } ;
+		rs = tp->ins(a,e) ;
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
@@ -117,12 +123,12 @@ int memtrack::rem(cvoid *addr) noex {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
-		rs = t.rem(a) ;
+		rs = tp->rem(a) ;
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
 }
-/* end method (memtrack::present) */
+/* end method (memtrack::rem) */
 
 int memtrack::present(cvoid *addr) noex {
 	int		rs = SR_NOTOPEN ;
@@ -131,8 +137,8 @@ int memtrack::present(cvoid *addr) noex {
 	    rs = SR_INVALID ;
 	    if (addr) {
 		ent	e ;
-		if ((rs = t.get(a,&e)) >= 0) {
-		    rs = e.size ;
+		if ((rs = tp->get(a,&e)) >= 0) {
+		    rs = e.asize ;
 		}
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
@@ -147,8 +153,8 @@ int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	    rs = SR_INVALID ;
 	    if (addr) {
 		ent	e ;
-		if ((rs = t.get(a,&e)) >= 0) {
-		    rs = e.size ;
+		if ((rs = tp->get(a,&e)) >= 0) {
+		    rs = e.asize ;
 		    if (ep) *ep = e ;
 		}
 	    } /* end if (valid addr) */
@@ -163,9 +169,15 @@ int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 int memtrack::istart(int n) noex {
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
-	    if ((rs = t.start(n)) >= 0) {
-		magic = memtrack_magic ;
-	    }
+	    if ((tp = new(nothrow) track_t) != nullptr) {
+	        if ((rs = tp->start(n)) >= 0) {
+		    magic = memtrack_magic ;
+	        }
+		if (rs < 0) {
+		    delete tp ;
+		    tp = nullptr ;
+		}
+	    } /* end if (new-mapblock) */
 	} /* end if (valid) */
 	return rs ;
 }
@@ -173,9 +185,18 @@ int memtrack::istart(int n) noex {
 
 int memtrack::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
+	int		rs1 ;
 	if (magic == memtrack_magic) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = tp->finish() ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		delete tp ;
+		tp = nullptr ;
+	    }
 	    magic = 0 ;
-	    rs = t.finish() ;
 	} /* end if (was open) */
 	return rs ;
 }
@@ -184,7 +205,7 @@ int memtrack::ifinish() noex {
 int memtrack::icount() noex {
 	int		rs = SR_NOTOPEN ;
 	if (magic == memtrack_magic) {
-	    rs = t.count() ;
+	    rs = tp->count() ;
 	} /* end if (was open) */
 	return rs ;
 }
@@ -214,6 +235,8 @@ int memtrack_co::operator () (int a) noex {
 	    case memtrackmem_finish:
 		rs = op->ifinish() ;
 		break ;
+	    default:
+		std::unreachable() ;
 	    } /* end switch */
 	} /* end if (valid) */
 	return rs ;
