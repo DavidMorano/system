@@ -192,7 +192,7 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (snuprintf) */
-    int	snuloadavg(char *rbuf,int rlen,int prec,double *dlap,int dlan) noex {
+    int	snuloadavgd(char *rbuf,int rlen,int prec,double *dlap,int dlan) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && dlap) {
@@ -222,7 +222,7 @@ namespace libu {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-    }
+    } /* end subroutine (snuloadavgd) */
     int ctdecf(char *rbuf,int rlen,int prec,double v) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;

@@ -29,8 +29,12 @@
 namespace libu {
     extern int	uloadavgd(double *,int) noex ;
     extern int	snuprintf(char *,int,cchar *,...) noex ;
-    extern int	snuloadavg(char *,int,int,double *,int) noex ;
+    extern int	snuloadavgd(char *,int,int,double *,int) noex ;
     extern int	ctdecf(char *,int,int,double) noex ;
+    static inline int snuloadavg(char *dp,int dl,int pr,
+		double *dlap,int dlan) noex {
+	return snuloadavgd(dp,dl,pr,dlap,dlan) ;
+    }
 }
 
 

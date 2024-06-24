@@ -81,7 +81,7 @@
 /* local defines */
 
 #ifndef	LOADAVG_NSTATS
-#define LOADAVG_NSTATS	3	/* maximum load-averages avilable */
+#define LOADAVG_NSTATS	3	/* maximum load-averages available */
 #endif
 
 

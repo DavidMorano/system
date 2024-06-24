@@ -82,7 +82,7 @@
 #include	<usupport.h>		/* <- most of |libu| namespace */
 #include	<usysauxinfo.h>		/* the request codes */
 #include	<usyscallbase.hh>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<localmisc.h>		/* |NODENAMELEN| */
 
 #include	"usysdata.h"
 
@@ -191,7 +191,7 @@ constexpr int		reqs[] = {
 	SAI_HWPROVIDER
 } ;
 
-constexpr int		datlen = REALNAMELEN ;
+constexpr int		datlen = NODENAMELEN ;
 
 constexpr cchar		defmachine[] = "Intel(R) Core(TM) i7" ;
 
