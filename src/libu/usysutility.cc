@@ -62,13 +62,13 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;		/* type */
-using std::string ;		/* type */
-using libu::usyscallbase ;	/* type */
-using std::min ;		/* subroutine-template */
-using std::max ;		/* subroutine-template */
-using std::to_string ;		/* subroutine */
-using std::nothrow ;		/* constant */
+using std::nullptr_t ;			/* type */
+using std::string ;			/* type */
+using libu::usyscallbase ;		/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::to_string ;			/* subroutine */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */

@@ -26,7 +26,7 @@
 	Retrieve some operating system and machine information.
 
 	Synopsis:
-	int u_uname(UTSNAME *up) noex
+	int u_uname(utsname *up) noex
 	int u_getnodename(char *rbuf,int rlen) noex
 	int u_getauxinfo(char *rbuf,int rlen,int req) noex
 
@@ -81,6 +81,7 @@
 #include	<usysflag.h>
 #include	<usupport.h>		/* <- most of |libu| namespace */
 #include	<usysauxinfo.h>		/* the request codes */
+#include	<usyscallbase.hh>
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"usysdata.h"
@@ -92,6 +93,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using libu::usyscallbase ;		/* type */
 using libu::ugethostid ;		/* subroutine */
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
@@ -102,7 +104,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef int (*uname_f)(UTSNAME *) noex ;
+typedef int (*uname_f)(utsname *) noex ;
 
 
 /* external subroutines */
@@ -112,6 +114,27 @@ typedef int (*uname_f)(UTSNAME *) noex ;
 
 
 /* local structures */
+
+namespace {
+    struct syscaller ;
+    typedef int (syscaller::*syscaller_m)() noex ;
+    struct syscaller : usyscallbase {
+	syscaller_m	m = nullptr ;
+	utsname		*utsp ;
+	int operator () (utsname *p) noex {
+	    utsp = p ;
+	    return handler() ;
+	} ;
+        int callstd() noex override {
+            int         rs = SR_BUGCHECK ;
+            if (m) {
+                rs = (this->*m)() ;
+            }
+            return rs ;
+        } ;
+	int std_uname() noex ;
+    } ; /* end struct (syscaller) */
+}
 
 namespace {
     constexpr int	nitems = 4 ;
@@ -145,9 +168,10 @@ namespace {
 
 /* forward references */
 
+static int usys_uname(utsname *) noex ;
+static int uname_machine(utsname *) noex ;
+static int uname_nodename(utsname *) noex ;
 static int local_getauxinfo(char *,int,int) noex ;
-static int uname_machine(UTSNAME *) noex ;
-static int uname_nodename(UTSNAME *) noex ;
 static int setup_sysauxinfo() noex ;
 
 
@@ -181,11 +205,11 @@ constexpr bool		f_linux		= F_LINUX ;
 
 /* exported subroutines */
 
-int u_uname(UTSNAME *up) noex {
+int u_uname(utsname *up) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (up) {
-	    if ((rs = uname(up)) >= 0) {
+	    if ((rs = usys_uname(up)) >= 0) {
 		rc = rs ;
 		for (cauto &f : usubs) {
 		    if ((rs = f(up)) < 0) break ;
@@ -246,7 +270,14 @@ int u_gethostid(ulong *idp) noex {
 
 /* local subroutines */
 
-static int uname_machine(UTSNAME *up) noex {
+static int usys_uname(utsname *utsp) noex {
+	syscaller	sc ;
+	sc.m = &syscaller::std_uname ;
+	return sc(utsp) ;
+}
+/* end subroutine (usys_uname) */
+
+static int uname_machine(utsname *up) noex {
 	cint		mlen = int(sizeof(up->machine)-1) ;
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
@@ -262,7 +293,7 @@ static int uname_machine(UTSNAME *up) noex {
 }
 /* end subroutine (uname_machine) */
 
-static int uname_nodename(UTSNAME *up) noex {
+static int uname_nodename(utsname *up) noex {
 	int		rs = SR_OK ;
 	char		*nn = up->nodename ;
 	if (char *tp ; (tp = strchr(nn,'.')) != nullptr) {
@@ -381,5 +412,14 @@ int datobj::load() noex {
 	return (rs >= 0) ? rsz : rs ;
 }
 /* end method (datobj::load) */
+
+int syscaller::std_uname() noex {
+	int		rs ;
+	if ((rs = uname(utsp)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}		
+/* end method (syscaller::std_uname) */
 
 
