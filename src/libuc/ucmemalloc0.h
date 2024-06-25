@@ -27,12 +27,6 @@
 #define	UCMEMALLOC_STATS	struct ucmemalloc_status
 
 
-enum ucmallsets {
-	ucmallset_off,
-	ucmallset_on,
-	ucmallset_overlast
-} ;
-
 struct ucmemalloc_status {
 	ulong		err_underflow ;
 	ulong		err_overflow ;

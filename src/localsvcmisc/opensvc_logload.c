@@ -4,8 +4,6 @@
 /* GENSERV-user open-service (logload) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_PRNUSER	1		/* use 'prn' as user */
 #define	CF_CTDECF	1		/* use 'ctdecf(3dam)' */
 
@@ -153,7 +151,7 @@ int		to ;
 {
 	double		dla[3] ;
 	const int	ulen = USERNAMELEN ;
-	const int	clen = CLUSTERNAMELEN ;
+	const int	clen = NODENAMELEN ;
 	const int	nlen = NETLOADLEN ;
 	const int	slen = SYSTATLEN ;
 	const int	llen = LINEBUFLEN ;
@@ -173,14 +171,10 @@ int		to ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 	char		prlocal[MAXPATHLEN+1] ;
 	char		ubuf[USERNAMELEN+1] ;
-	char		cbuf[CLUSTERNAMELEN+1] ;
+	char		cbuf[NODENAMELEN+1] ;
 	char		nbuf[NETLOADLEN+1] ;
 	char		sbuf[SYSTATLEN+1] ;
 	char		lbuf[LINEBUFLEN+2] ;
-
-#if	CF_DEBUGN
-	nprintf(NDEBFNAME,"opensvc_logload: entered prn=%s\n",prn) ;
-#endif
 
 /* find the number of allowable columns (for line-length limiting) */
 
@@ -200,10 +194,6 @@ int		to ;
 	}
 
 /* default user as necessary */
-
-#if	CF_DEBUGN
-	nprintf(NDEBFNAME,"opensvc_logload: 0 un=%s\n",un) ;
-#endif
 
 #if	CF_PRNUSER /* more reliable in general */
 
@@ -256,10 +246,6 @@ int		to ;
 
 /* get the network-load */
 
-#if	CF_DEBUGN
-	nprintf(NDEBFNAME,"opensvc_logload: netload rs=%d\n",rs) ;
-#endif
-
 	nbuf[0] = '\0' ;
 	if (rs >= 0) {
 	    rs = localgetnetload(prlocal,nbuf,nlen) ;
@@ -269,10 +255,6 @@ int		to ;
 		rs = SR_OK ;
 	    }
 	}
-
-#if	CF_DEBUGN
-	nprintf(NDEBFNAME,"opensvc_logload: netload() rs=%d\n",rs) ;
-#endif
 
 /* get the system-status */
 

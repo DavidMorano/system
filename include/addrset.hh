@@ -40,9 +40,8 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |uintptr_t| */
 #include	<utility>		/* |hash(3c++)| */
 #include	<usysdefs.h>
 #include	<utypedefs.h>
@@ -102,6 +101,7 @@ struct addrset_cur {
 } ;
 
 struct addrset {
+	friend		addrset_co ;
 	typedef addrset_ent	ent ;
 	addrset_co	start ;
 	addrset_co	count ;
@@ -122,13 +122,14 @@ struct addrset {
 	int	curbegin(addrset_cur *) noex ;
 	int	curenum(addrset_cur *,ent *) noex ;
 	int	curend(addrset_cur *) noex ;
+	~addrset() noex {
+	    dtor() ;
+	} ; /* end if (dtor) */
+    private:
 	int	istart(int = 0) noex ;
 	int	ifinish() noex ;
 	int	icount() noex ;
 	void	dtor() noex ;
-	~addrset() noex {
-	    dtor() ;
-	} ; /* end if (dtor) */
 } ; /* end struct (addrset) */
 
 

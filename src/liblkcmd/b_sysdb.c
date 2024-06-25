@@ -989,7 +989,7 @@ badprogstart:
 	        debugprintf("b_sysdb: MInotalloc=%u\n",mi[ucmallreg_notalloc]) ;
 	        debugprintf("b_sysdb: MInotfree=%u\n",mi[ucmallreg_notfree]) ;
 	        ucmallreg_curbegin(&cur) ;
-	        while (ucmallreg_enum(&cur,&reg) >= 0) {
+	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("b_sysdb: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("b_sysdb: MIreg.size=%u\n",reg.size) ;
 	            debugprinthexblock(ids,80,reg.addr,reg.size) ;

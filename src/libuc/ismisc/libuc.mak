@@ -18,21 +18,20 @@ VALDIR= $(CGS_VALDIR)
 RUNDIR= $(USRLOCAL)/lib
 
 
-CPP= gcpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
+CPP=	gcpp
+CC=	gcc
+CXX=	gpp
+LD=	gld
+RANLIB=	granlib
+AR=	gar
+NM=	gnm
+COV=	gcov
 
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+LORDER=	lorder
+TSORT=	tsort
+LINT=	lint
+RM=	rm -f
+TOUCH=	touch
 
 
 DEFS +=
@@ -47,6 +46,8 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
+
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 

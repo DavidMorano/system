@@ -39,7 +39,19 @@
 /* local typedefs */
 
 
-/* subroutine templates */
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

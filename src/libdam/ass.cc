@@ -28,7 +28,7 @@
 
 /* exported subroutines */
 
-int ass_start(ASS *asp) noex {
+int ass_start(ass *asp) noex {
 	int		rs = SR_FAULT ;
 	if (asp) {
 	    asp->len = 0 ;
@@ -38,7 +38,7 @@ int ass_start(ASS *asp) noex {
 	return rs ;
 }
 
-int ass_add(ASS *asp,int c) noex {
+int ass_add(ass *asp,int c) noex {
 	int		rs = SR_FAULT ;
 	int		sz ;
 	if (asp) {
@@ -61,7 +61,7 @@ int ass_add(ASS *asp,int c) noex {
 	return (rs >= 0) ? asp->len : rs ;
 }
 
-int ass_finish(ASS *asp) noex {
+int ass_finish(ass *asp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (asp) {

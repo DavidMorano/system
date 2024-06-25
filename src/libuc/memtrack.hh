@@ -40,13 +40,13 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>		/* |uintptr_t| */
-#include	<usysdefs.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 #include	<mapblock.hh>
 
 

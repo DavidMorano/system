@@ -28,16 +28,16 @@
 	itself is not so important, as long as we have a convenient
 	subroutine (like this present one) that will return that
 	location for us.  That is one of the purposes for this
-	present subroutine, to return the location in the syhstem
+	present subroutine, to return the location in the system
 	filesystem for each of the special SYSDB files.  But
 	additioanlly, and this is a pure hack specialization for
 	our particular callers, if we are called with a filename
-	(presumably the filename of a SYSDB files), we honor that
+	(presumably the filename of a SYSDB file), we honor that
 	and simply return it.  This is a bone to the fact that we
-	are pretty called by one (or one type) of caller, and we
-	may as well provide any additioanl small service that they
-	(the callers) may like.  We are thread and fork safe, et
-	cetera. We are not (like almost everybody else) not
+	are pretty much called by one (or one type) of caller, and
+	we may as well provide any additional small service that
+	they (the callers) may like.  We are thread and fork safe,
+	et cetera.  We are not (like almost everybody else)
 	async-signal-safe (it is just not needed in the current
 	world).
 

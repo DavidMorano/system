@@ -42,16 +42,15 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<new>
 #include	<utility>
 #include	<unordered_map>
 #include	<functional>
-#include	<iostream>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<clanguage.h>
 
 
 template<typename K,typename B> class mapblock ;

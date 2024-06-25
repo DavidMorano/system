@@ -161,11 +161,11 @@ static int parts_round(PARTS *pp,int prec) noex {
 	case 3: /* no change needed */
 	    break ;
 	case 2:
-	    r = (pp->partf%10) ;
+	    r = (pp->partf % 10) ;
 	    if (r >= 5) pp->partf += (10-r) ;
 	    break ;
 	case 1:
-	    r = (pp->partf%100) ;
+	    r = (pp->partf % 100) ;
 	    if (r >= 50) pp->partf += (100-r) ;
 	    break ;
 	case 0:

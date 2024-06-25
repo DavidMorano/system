@@ -23,14 +23,13 @@
 	kernel for this sort of information. We return SR_NOSYS if
 	the OS does not provide an easy want to get this stuff.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -38,6 +37,13 @@
 
 
 /* local defines */
+
+#ifndef	_SC_PHYS_PAGES
+#define	_SC_PHYS_PAGES		-1
+#endif
+#ifndef	_SC_AVPHYS_PAGES
+#define	_SC_AVPHYS_PAGES	-1
+#endif
 
 
 /* external subroutines */
@@ -54,6 +60,9 @@
 
 /* local variables */
 
+constexpr int	cmd = _SC_PHYS_PAGES ;
+constexpr int	acmd = _SC_AVPHYS_PAGES ;
+
 
 /* exported variables */
 
@@ -61,41 +70,30 @@
 /* exported subroutines */
 
 int sysmemutil(sysmemutil_dat *mup) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_NOSYS ;
 	int		percent = 0 ;
-	int		f = FALSE ;
-
-#if	defined(_SC_PHYS_PAGES) && defined(_SC_AVPHYS_PAGES)
-	{
-	    long	mt, ma ;
-	    if ((rs = uc_sysconf(_SC_PHYS_PAGES,&mt)) >= 0) {
-	        if ((rs = uc_sysconf(_SC_AVPHYS_PAGES,&ma)) >= 0) {
+	if_constexpr ((cmd >= 0) && (acmd >= 0)) {
+	    long	mt{} ;
+	    if ((rs = uc_confsys(cmd,&mt)) >= 0) {
+	        long	ma{} ;
+	        if ((rs = uc_confsys(acmd,&ma)) >= 0) {
+	      	    ulong	mu100 ;
 	    	    if (mt > 0) {
-	        	ulong	mu100, mu ;
-	        	mu = (mt - ma) ;
+	        	ulong	mu = (mt - ma) ;
 	        	mu100 = (mu * 100) ;
 	        	percent = (mu100 / mt) ;
-		        if (mup != NULL) {
-			    memset(mup,0,sizeof(SYSMEMUTIL)) ;
+		        if (mup) {
+			    memclear(mup) ;
 			    mup->mt = mt ;
 			    mup->ma = ma ;
 			    mup->mu = percent ;
 			}
-		    } else {
-			f = TRUE ;
 		    }
 		} /* end if (sysconf) */
 	    } /* end if (sysconf) */
-
-	} /* end if (memory usage) */
-#else
-	rs = SR_NOSYS ;
-#endif /* defined(_SC_PHYS_PAGES) && defined(_SC_AVPHYS_PAGES) */
-
-	if (((rs < 0) || f) && (mup != NULL)) {
-	    memset(mup,0,sizeof(SYSMEMUTIL)) ;
-	}
-
+	} else {
+	    memclear(mup) ;
+	} /* end if_constexpr (_SC_PHUS_PAGES) */
 	return (rs >= 0) ? percent : rs ;
 }
 /* end subroutine (sysmemutil) */

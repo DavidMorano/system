@@ -928,7 +928,7 @@ badprogstart:
 	        debugprintf("b_rest: MInotalloc=%u\n",mi[ucmallreg_notalloc]) ;
 	        debugprintf("b_rest: MInotfree=%u\n",mi[ucmallreg_notfree]) ;
 	        ucmallreg_curbegin(&cur) ;
-	        while (ucmallreg_enum(&cur,&reg) >= 0) {
+	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("b_rest: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("b_rest: MIreg.size=%u\n",reg.size) ;
 	            debugprinthexblock(ids,80,reg.addr,reg.size) ;

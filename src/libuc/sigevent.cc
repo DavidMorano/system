@@ -23,7 +23,7 @@
 	These subroutines manipulate SIGEVENT objects.
 
 	Synopsis:
-	int sigevent_init(SIGEVENT *sep,int notify,int signo,int val) noex
+	int sigevent_load(SIGEVENT *sep,int notify,int signo,int val) noex
 
 	Arguments:
 	sep		pointer to SIGEVENT
@@ -55,6 +55,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -62,6 +65,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

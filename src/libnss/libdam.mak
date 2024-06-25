@@ -32,7 +32,6 @@ TSORT= tsort
 LINT= lint
 RM= rm -f
 TOUCH= touch
-LINT= lint
 
 
 DEFS +=
@@ -72,6 +71,8 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
 
+
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 

@@ -1617,7 +1617,7 @@ badprogstart:
 	        debugprintf("b_homepage: MInotfree=%u\n",
 	            mi[ucmallreg_notfree]) ;
 	        ucmallreg_curbegin(&cur) ;
-	        while (ucmallreg_enum(&cur,&reg) >= 0) {
+	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("b_homepage: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("b_homepage: MIreg.size=%u\n",reg.size) ;
 	            debugprinthexblock(ids,80,reg.addr,reg.size) ;

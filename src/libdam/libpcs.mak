@@ -9,13 +9,14 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
 
-
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+RUNDIR= $(USRLOCAL)/lib
+
 
 CPP= cpp
 CC= gcc
@@ -31,17 +32,23 @@ TSORT= tsort
 LINT= lint
 RM= rm -f
 TOUCH= touch
-LINT= lint
 
 
 DEFS=
 
-LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
+INCS= libpcs.h
 
 LIBS=
 
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(EUNDIR)
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -51,14 +58,10 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= libpcs.h
-
-
 OBJ0_LIBPCS= 
 OBJ1_LIBPCS= 
 OBJ2_LIBPCS= 
 OBJ3_LIBPCS= 
-
 
 OBJA_LIBPCS= obj0_libpcs.o obj1_libpcs.o
 OBJB_LIBPCS= obj2_libpcs.o obj3_libpcs.o
@@ -108,6 +111,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_libpcs.o:	$(OBJ0_LIBPCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBPCS)
