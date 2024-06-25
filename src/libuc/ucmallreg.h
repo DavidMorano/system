@@ -26,7 +26,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define		UCMALLREG_CUR	struct ucmallreg_cursor
@@ -39,7 +43,7 @@ struct ucmallreg_cursor {
 
 struct ucmallreg_entry {
 	caddr_t		addr ;
-	size_t		size ;
+	size_t		asize ;
 } ;
 
 typedef	UCMALLREG_CUR	ucmallreg_cur ;
@@ -49,7 +53,7 @@ EXTERNC_begin
 
 extern int ucmallreg_curbegin(ucmallreg_cur *) noex ;
 extern int ucmallreg_curend(ucmallreg_cur *) noex ;
-extern int ucmallreg_enum(ucmallreg_cur *,ucmallreg_ent *) noex ;
+extern int ucmallreg_curenum(ucmallreg_cur *,ucmallreg_ent *) noex ;
 
 EXTERNC_end
 

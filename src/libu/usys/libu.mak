@@ -9,13 +9,14 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
 RUNDIR= $(USRLOCAL)/lib
+
 
 CPP= cpp
 CC= gcc
@@ -45,6 +46,8 @@ INCDIRS=
 
 LIBDIRS=
 
+
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 

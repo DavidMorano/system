@@ -1,6 +1,9 @@
 /* sysmemutil HEADER */
 /* lang=C++20 */
 
+/* retrieve the utilization (in a percentage of total) of system memory */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
@@ -27,7 +30,7 @@ struct sysmemutil_data {
 	int		mu ;		/* as a percentage */
 } ;
 
-typedef SYSMEMYTIL_DAT	sysmemutil_dat ;
+typedef SYSMEMUTIL_DAT	sysmemutil_dat ;
 
 EXTERNC_begin
 

@@ -68,7 +68,7 @@ extern "C" {
 
 extern int ucmallreg_curbegin(UCMALLREG_CUR *) ;
 extern int ucmallreg_curend(UCMALLREG_CUR *) ;
-extern int ucmallreg_enum(UCMALLREG_CUR *,UCMALLREG_REG *) ;
+extern int ucmallreg_curenum(UCMALLREG_CUR *,UCMALLREG_REG *) ;
 
 #ifdef	__cplusplus
 }

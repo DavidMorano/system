@@ -52,7 +52,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>
 #include	<cstring>
 #include	<utility>		/* |std::unreachable()| */
 #include	<new>
@@ -85,7 +84,6 @@ extern int	addrset_finish() noex ;
 using std::nullptr_t ;			/* type */
 using std::unordered_set ;		/* type */
 using std::pair ;			/* type */
-using std::cerr ;			/* variable */
 using std::nothrow ;			/* constant */
 
 

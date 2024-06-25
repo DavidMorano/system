@@ -19,6 +19,7 @@
 
 #define	STROP		struct strop_head
 
+
 struct strop_head {
 	cchar		*sp ;
 	int		sl ;

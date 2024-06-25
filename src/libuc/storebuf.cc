@@ -79,7 +79,10 @@
 /* external variables */
 
 
-/* local subroutine-templates */
+/* local structures */
+
+
+/* forward references */
 
 template<typename T>
 int storebuf_xxxx(char *rp,int rl,int i,int (*ctxxx)(char *,int,T),T v) noex {

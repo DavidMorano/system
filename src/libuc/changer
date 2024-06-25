@@ -2,8 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} TCALL "
-
+NAMES="${NAMES} ucmallreg_enum"
 
 DN=/dev/null
 
@@ -12,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/TCALL/s//UTCALL/g
+g/ucmallreg_enum/s//ucmallreg_curenum/g
 	w
 	q
 EOF

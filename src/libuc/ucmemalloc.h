@@ -22,11 +22,16 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
 
 
 #define	UCMEMALLOC_STATS	struct ucmemalloc_status
 
+
+enum ucmallsets {
+	ucmallset_off,
+	ucmallset_on,
+	ucmallset_overlast
+} ;
 
 struct ucmemalloc_status {
 	ulong		err_underflow ;

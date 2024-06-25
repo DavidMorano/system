@@ -95,11 +95,11 @@ function getflags {
 
 case ${OSNAME}:${OSNUM} in
 Darwin:*)
-  : ${CO_GCCALL:="-pthread"}
+  : ${CO_GCCALL:=""}
   : ${CO_GCCDEB:="-Wall -Wextra"}
   : ${CO_GCCOPT:=""}
   : ${CO_GCCLIB:="-fpic"}
-  : ${CO_GPPALL:="-pthread"}
+  : ${CO_GPPALL:=""}
   : ${CO_GPPDEB:="-Wall -Wextra"}
   : ${CO_GPPOPT:=""}
   : ${CO_GPPLIB:="-fpic"}
@@ -115,7 +115,7 @@ Darwin:*)
   esac
   ;;
 SunOS:*)
-  : ${CO_GCCALL:="-pthread"}
+  : ${CO_GCCALL:=""}
   case "${ARCHITECTURE}" in
   sparc)
     CO_GCOPARC="-mcpu=v9"
@@ -165,7 +165,7 @@ develope|debug)
   MAKECPPFLAGS=
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCDEB} ${CO_GCCOPT} ${CO_GCCLIB}"
   MAKECCFLAGS="${CO_GPPALL} ${CO_GPPDEB} ${CO_GPPOPT} ${CO_GPPLIB}"
-  MAKELDFLAGS="-pthread"
+  MAKELDFLAGS=
   ;;
 test)
   ;;
@@ -178,7 +178,7 @@ deliver)
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCOPT} ${CO_GCCLIB}"
   MAKECCFLAGS="${CO_GPPALL} ${CO_GPPOPT} ${CO_GPPLIB}"
   MAKELDFLAGS=
-  MAKELDFLAGS="-pthread"
+  MAKELDFLAGS=
   ;;
 esac
 
