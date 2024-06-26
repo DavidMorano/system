@@ -31,22 +31,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 
-#if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
+#ifndef	LOADAVG_NSTATS
+#define LOADAVG_NSTATS		3	/* maximum load-averages available */
+#endif
 
-/* NOTHING for now */
-
-#else /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
-
-EXTERNC_begin /* Solaris® placeholder */
-extern int __getloadavg(int *,int) noex ;
-EXTERNC_end
-
-#endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
 #ifdef	__cplusplus
 namespace libu {

@@ -30,9 +30,9 @@
 #include	<climits>
 #include	<cstring>
 #include	<clanguage.h>
-#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	"usys_xxx.h"
 

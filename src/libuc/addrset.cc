@@ -89,12 +89,14 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef	decltype(std::nothrow)		nothrow_t ;
 typedef unordered_set<addrset_ent>	track ;
 typedef unordered_set<addrset_ent> *	trackp ;
 typedef track::iterator			setiter ;
 typedef track::iterator	 *		setiterp ;
 typedef pair<setiter,bool>		setret ;
 typedef addrset_cur			cur ;
+typedef const nothrow_t			cnothrow ;
 
 
 /* external subroutines */
@@ -200,21 +202,26 @@ int addrset::curbegin(cur *curp) noex {
 	    rs = SR_FAULT ;
 	    if (curp) {
 	        cnullptr	np{} ;
+		cnothrow	nt = nothrow ;
 	        trackp		tp = trackp(setp) ;
 	        *curp = {} ;
 		rs = SR_NOMEM ;
-	        if (setiter *itcp ; (itcp = new(nothrow) setiter) != np) {
-		    *itcp = tp->begin() ;
-	            if (setiter *itep ; (itep = new(nothrow) setiter) != np) {
-		        *itep = tp->end() ;
-		        curp->vitcp = itcp ;
-		        curp->vitep = itep ;
-		        rs = SR_OK ;
-		    } /* end if (new-setiter) */
-		    if (rs < 0) {
-			delete itcp ;
-		    }
-	        } /* end if (new-setiter) */
+		try {
+	            if (setiter *itcp ; (itcp = new(nt) setiter) != np) {
+		        *itcp = tp->begin() ;
+	                if (setiter *itep ; (itep = new(nt) setiter) != np) {
+		            *itep = tp->end() ;
+		            curp->vitcp = itcp ;
+		            curp->vitep = itep ;
+		            rs = SR_OK ;
+		        } /* end if (new-setiter) */
+		        if (rs < 0) {
+			    delete itcp ;
+		        }
+	            } /* end if (new-setiter) */
+		} catch (...) {
+		    rs = SR_NOMEM ;
+		}
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;

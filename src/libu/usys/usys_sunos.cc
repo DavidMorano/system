@@ -30,9 +30,10 @@
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<clanguage.h>
-#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<intsat.h>
 
 #include	"usys.h"
 
@@ -50,7 +51,7 @@ static sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 			if (res > usz) {
 			    rs = SR_OVERFLOW ;
 			} else {
-			    rs = int(res & INT_MAX) ;
+			    rs = intsat(res) ;
 			    len = rs ;
 			}
 		    } else {
@@ -68,6 +69,20 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	return sunos_sysinfo(rbuf,rlen,req) ;
 }
 /* end subroutine (sunos_ugetnisdom) */
+
+
+/*----------------------------------------------------------------------------*/
+/* LOADAVGINT begin */
+#if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
+
+unixret_t kloadavg(int *la,int n) noex {
+	return __getloadavg(la,n) ;
+}
+
+#endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
+/* LOADAVGINT end */
+/*----------------------------------------------------------------------------*/
+
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYS_SUNOS finish */

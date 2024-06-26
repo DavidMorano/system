@@ -26,6 +26,10 @@
 	addrset::rem
 	addrset::present
 	addrset::get
+	addrset::curbegin
+	addrset::curenum
+	addrset::curend
+
 	addrset::istart
 	addrset::icount
 	addrset::ifinish

@@ -130,7 +130,7 @@ namespace {
 	typedef ucmemalloc_stats	statblock ;
 	ptm		mx ;		/* object mutex */
 	memtrack	mt ;
-	statblock	st{} ;
+	statblock	st ;
 	ucmemalloc_co	init ;
 	ucmemalloc_co	fini ;
 	aflag		fvoid ;
@@ -475,10 +475,10 @@ int ucmemalloc::mallset(int cmd) noex {
 	int		rs ;
 	if ((rs = init) >= 0) {
 	    switch (cmd) {
-	    case 0:
+	    case ucmallset_off:
 	        rs = trackfinish() ;
 	        break ;
-	    case 1:
+	    case ucmallset_on:
 	        rs = trackstart(cmd) ;
 	        break ;
 	    default:

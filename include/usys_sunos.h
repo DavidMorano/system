@@ -74,6 +74,22 @@ typedef userattr_t	userattr ;
 /*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
+/* LOADAVGINT begin */
+#if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
+
+#ifndef	SUBROUTINE_KLOADAVG
+#define	SUBROUTINE_KLOADAVG
+EXTERNC_begin
+extern unixret_t kloadavg(int *,int) noex ;
+EXTERNC_end
+#endif /* SUBROUTINE_KLOADAVG */
+
+#endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
+/* LOADAVGINT end */
+/*----------------------------------------------------------------------------*/
+
+
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYSSUNOS finish */
 

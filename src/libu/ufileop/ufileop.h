@@ -64,6 +64,7 @@ EXTERNC_begin
 extern int u_access(cchar *,int) noex ;
 extern int u_chdir(cchar *) noex ;
 extern int u_chmod(cchar *,mode_t) noex ;
+extern int u_minmod(cchar *,mode_t) noex ;
 extern int u_chown(cchar *,uid_t,gid_t) noex ;
 extern int u_lchown(cchar *,uid_t,gid_t) noex ;
 extern int u_link(cchar *,cchar *) noex ;

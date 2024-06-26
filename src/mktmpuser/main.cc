@@ -1,11 +1,11 @@
-/* main (mktmpuser) */
+/* main SUPPORT (mktmpuser) */
+/* lang=C++20 */
 
 /* front-end subroutine for the MKTMPUSER program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* switchable */
-
 
 /* revision history:
 
@@ -19,15 +19,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ mktmpuser [<dir(s)>] [-V]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -35,7 +31,6 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
@@ -109,19 +104,6 @@ static int	dirok(const char *) ;
 
 /* local variables */
 
-static cchar	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -135,7 +117,20 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	NULL
+} ;
+
+constexpr struct pivars		initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -143,7 +138,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr MAPEX			mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -158,12 +153,12 @@ static const struct mapex	mapexs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	USERINFO	u ;
 	BITS		pargs ;
@@ -1013,6 +1008,5 @@ mode_t		m ;
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ensuremode) */
-
 
 

@@ -60,6 +60,7 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<usysflag.h>
+#include	<errtimer.hh>
 #include	<aflag.hh>
 #include	<localmisc.h>
 
@@ -131,6 +132,7 @@ namespace {
 	} ;
 	int openreg(cchar *,int,mode_t) noex ;
 	int openjack(cchar *,int,mode_t) noex ;
+	int callstd(cchar *,int,mode_t) noex ;
 	int iopen(cchar *,int,mode_t) noex ;
 	int iopenat(cchar *,int,mode_t) noex ;
 	int isocket(cchar *,int,mode_t) noex ;
@@ -288,64 +290,77 @@ int opener::openreg(cchar *fname,int of,mode_t om) noex {
 }
 /* end method (opener::openreg) */
 
-int opener::openjack(cchar *fname,int of,mode_t om) noex {
+int opener::callstd(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		to_nosr = utimeout[uto_nosr] ;
-	int		to_mfile = utimeout[uto_mfile] ;
-	int		to_nfile = utimeout[uto_nfile] ;
-	int		to_again = utimeout[uto_again] ;
-	int		fd = -1 ;
-	int		f_exit = false ;
 	of &= (~ OF_SPECIALMASK) ;
+	if ((rs = (this->*m)(fname,of,om)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (opener::callstd) */
+
+int opener::openjack(cchar *fname,int of,mode_t om) noex {
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer	to_busy		= utimeout[uto_busy] ;
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	errtimer	to_nosr		= utimeout[uto_nosr] ;
+	errtimer	to_nobufs	= utimeout[uto_nobufs] ;
+	errtimer	to_mfile	= utimeout[uto_mfile] ;
+	errtimer	to_nfile	= utimeout[uto_nfile] ;
+	errtimer	to_nolck	= utimeout[uto_nolck] ;
+	errtimer	to_nospc	= utimeout[uto_nospc] ;
+	errtimer	to_dquot	= utimeout[uto_dquot] ;
+	errtimer	to_io		= utimeout[uto_io] ;
+	reterr		r ;
+	int		rs ;
+	int		fd = -1 ;
 	repeat {
-	    if ((rs = (this->*m)(fname,of,om)) < 0) rs = (- errno) ;
-	    fd = rs ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-		    break ;
-	            case SR_MFILE:
-	                if (to_mfile-- > 0) {
-			    msleep(1000) ;
-		        } else {
-			    f_exit = true ;
-		        }
-	                break ;
-	            case SR_NFILE:
-	                if (to_nfile-- > 0) {
-			    msleep(1000) ;
-		        } else {
-			    f_exit = true ;
-		        }
-	                break ;
-	            case SR_AGAIN:
-	                if (to_again-- > 0) {
-			    msleep(1000) ;
-		        } else {
-			    f_exit = true ;
-		        }
-	                break ;
-	        case SR_INTR:
-		    break ;
-		default:
-		    f_exit = true ;
-		    break ;
-	        } /* end switch */
+	    if ((rs = callstd(fname,of,om)) < 0) {
+                r(rs) ;                 /* <- default causes exit */
+                switch (rs) {
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSR:
+                    r = to_nosr(rs) ;
+                    break ;
+                case SR_NOBUFS:
+                    r = to_nobufs(rs) ;
+                    break ;
+                case SR_MFILE:
+                    r = to_mfile(rs) ;
+                    break ;
+                case SR_NFILE:
+                    r = to_nfile(rs) ;
+                    break ;
+                case SR_NOLCK:
+                    r = to_nolck(rs) ;
+                    break ;
+                case SR_NOSPC:
+                    r = to_nospc(rs) ;
+                    break ;
+                case SR_DQUOT:
+                    r = to_dquot(rs) ;
+                    break ;
+                case SR_IO:
+                    r = to_io(rs) ;
+                    break ;
+                case SR_INPROGRESS:
+                case SR_INTR:
+                    r(false) ;
+                    break ;
+                } /* end switch */
+                rs = r ;
 	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
+	fd = rs ;
 	if_constexpr (f_sunos) {
 	    if ((rs >= 0) && (of & O_CLOEXEC)) {
 		rs = icloseonexec(fd) ;
