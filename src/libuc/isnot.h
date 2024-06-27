@@ -31,6 +31,7 @@ extern bool isNotAccess(int) noex ;
 extern bool isNotValid(int) noex ;
 extern bool isNotLib(int) noex ;
 extern bool isNotTerm(int) noex ;
+extern bool isNotSupport(int) noex ;
 
 static inline bool isInvalid(int rs) noex {
 	return isNotValid(rs) ;

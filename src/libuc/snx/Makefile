@@ -57,7 +57,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_SNX= snabbr.o snaddw.o sncpyarray.o
+OBJ0_SNX= snabbr.o snadd.o snaddw.o sncpyarray.o
 OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o snerrabbr.o
 OBJ2_SNX= snfilemode.o snflags.o snfsflags.o sninetaddr.o
 OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o
@@ -148,6 +148,7 @@ snuuid.o:		snuuid.cc		$(INCS)
 sntid.o:		sntid.cc		$(INCS)
 snerrabbr.o:		snerrabbr.cc		$(INCS)
 sntmtime.o:		sntmtime.cc sntmtime.h	$(INCS)
+snadd.o:		snadd.cc snadd.h	$(INCS)
 snaddw.o:		snaddw.cc snaddw.h	$(INCS)
 snwprintf.o:		snwprintf.cc		$(INCS)
 snclean.o:		snclean.cc snclean.h	$(INCS)

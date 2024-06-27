@@ -21,6 +21,8 @@
 	isNotAcces
 	isNotValid
 	isNotLib
+	isNotTerm
+	isNotSupport
 
 	Description:
 	This subroutine determines if a file is not present from its
@@ -110,6 +112,17 @@ constexpr int	rsnoterm[] = {
 	0
 } ;
 
+constexpr int	rsnosupport[] = {
+	SR_NOSYS,
+	SR_NOTSUP,
+	SR_PROTONOSUPPORT,
+	SR_SOCKTNOSUPPORT,
+	SR_OPNOTSUPP,
+	SR_PFNOSUPPORT,
+	SR_AFNOSUPPORT,
+	0
+} ;
+
 
 /* exported variables */
 
@@ -141,6 +154,10 @@ bool isNotLib(int rs) noex {
 
 bool isNotTerm(int rs) noex {
 	return isOneOf(rsnoterm,rs) ;
+}
+
+bool isNotSupport(int rs) noex {
+	return isOneOf(rsnosupport,rs) ;
 }
 
 
