@@ -1,10 +1,23 @@
 #!/usr/extra/bin/ksh
 # INSTALL-LIBU
 
-LIB=libu.so
-TDIRS=" /usr/local/lib ${HOME}/github/system/lib ${HOME}/lib "
+LIBS="libu.so libu.a"
 
-for TD in ${TDIRS} ; do
-  install -S -p -m 0775 ${LIB} ${TD}
+TDIRS+=" ${HOME}/github/system/lib ${HOME}/lib "
+TDIRS+=" /usr/extra/lib "
+TDIRS+=" /usr/local/lib "
+
+for LIB in ${LIBS} ; do
+  if [[ -r "${LIB}" ]] ; then
+    for TD in ${TDIRS} ; do
+      if [[ -d "${TD}" ]] ; then
+        M=0664
+	if [[ ${LIB} == *.so ]] ; then
+	  M=0775
+        fi
+        install -S -p -m ${M} ${LIB} ${TD}
+      fi
+    done
+  fi
 done
 

@@ -336,10 +336,10 @@ UOBJ09= readln.o ccfile.o
 UOBJ10= cfx.o memtrack.o addrset.o mapblock.o
 UOBJ11= strmgr.o strop.o field.o
 
-UOBJ12= ucttyname.o uctc.o tcx.o
+UOBJ12= ucttyname.o uctc.o ucsysconf.o
 UOBJ13=
 UOBJ14= ucsys.o
-UOBJ15=
+UOBJ15= tcx.o
 
 UOBJ16 += wsix.o wsnx.o wsx.o
 UOBJ17 += six.o snx.o sfx.o rmx.o
