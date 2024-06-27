@@ -1,4 +1,4 @@
-/* ugetloadavg SUPPORT */
+/* make_ugetloadavg SUPPORT */
 /* lang=C++20 */
 
 /* get the standard load averages maintained by the kernel */
@@ -53,17 +53,16 @@
 
 	CAUTION:
 	This subroutine uses a secret and undocumented new system
-	call introduced maybe with Solaris-8. This function could
-	go away at any time so don't get to comfortable with using
-	it! Don't give up your day job but rather instead keep your
-	old 'kstat(3kstat)' stuff around for getting load averages
+	call introduced maybe with Solaris-8.  This function could
+	go away at any time so do nt get to comfortable with using
+	it!  Do not give up your day job but rather instead keep your
+	old |kstat(3kstat)| stuff around for getting load averages
 	when this new thing suddenly "goes away"!
 
 	Extra information:
 	If you can stand to get the load averages converted to the
 	type double (an array of doubles rather than an array of
-	ints), then check out |getloadavg(3c)|.
-
+	|int|s), then check out |getloadavg(3c)|.
 
 *******************************************************************************/
 
@@ -73,6 +72,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usysflag.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ugetloadavg.h"
@@ -80,9 +80,11 @@
 
 /* local defines */
 
-#ifndef	LOADAVG_NSTATS
-#define LOADAVG_NSTATS	3	/* maximum load-averages available */
-#endif
+#if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
+#define	F_KLOADAVG		1
+#else
+#define	F_KLOADAVG		0
+#endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
 
 /* imported namespaces */
@@ -102,14 +104,15 @@
 
 /* forward references */
 
-static int	ugetloadavg(uint *,int) noex ;
+static int	make_ugetloadavg(uint *,int) noex ;
+static sysret_t	std_getloadavg(double *,int) noex ;
 
 
 /* local variables */
 
 constexpr int		maxloadavgs = LOADAVG_NSTATS ;
 
-constexpr bool		f_sunos = F_SUNOS ;
+constexpr bool		f_kloadavg = F_KLOADAVG ;
 
 
 /* exported variables */
@@ -123,13 +126,13 @@ int u_getloadavg(uint *la,int n) noex {
 	    rs = SR_INVALID ;
 	    if (n > 0) {
 	        if (n > maxloadavgs) n = maxloadavgs ;
-		if_constexpr (f_sunos) {
+		if_constexpr (f_kloadavg) {
 		    int		*ila = (int *) la ;
-	            if ((rs = __getloadavg(ila,n)) < 0) {
+	            if ((rs = kloadavg(ila,n)) < 0) {
 	                rs = (- errno) ;
 	            }
 		} else {
-		    rs = ugetloadavg(la,n) ;
+		    rs = make_ugetloadavg(la,n) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -139,30 +142,31 @@ int u_getloadavg(uint *la,int n) noex {
 
 namespace libu {
     sysret_t dloadavg(double *dla,int n) noex {
-	int		to_again = utimeout[uto_again] ;
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer	to_busy		= utimeout[uto_busy] ;
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	reterr		r ;
 	int		rs ;
-	bool		f_exit = false ;
 	repeat {
-	    if ((rs = getloadavg(dla,n)) < 0) {
-		rs = (- errno) ;
-	    }
-	    if (rs < 0) {
+	   if ((rs = std_getloadavg(dla,n)) < 0) {
+		r(rs) ;			/* <- default causes exit */
 	        switch (rs) {
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-			msleep(100) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
 	        case SR_INTR:
+		    r(false) ;
 	            break ;
-		default:
-		    f_exit = true ;
-		    break ;
 	        } /* end switch */
+		rs = r ;
 	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
     } /* end subroutine (dloadavg) */
 }
@@ -170,7 +174,7 @@ namespace libu {
 
 /* local subroutines */
 
-static sysret_t ugetloadavg(uint *la,int n) noex {
+static sysret_t make_ugetloadavg(uint *la,int n) noex {
 	cint		nmax = maxloadavgs ;
 	int		rs = SR_FAULT ;
 	int		rn = 0 ;
@@ -189,6 +193,15 @@ static sysret_t ugetloadavg(uint *la,int n) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rn : rs ;
 }
-/* end subroutine (ugetloadavg) */
+/* end subroutine (make_ugetloadavg) */
+
+sysret_t std_getloadavg(double *dla,int n) noex {
+	int		rs ;
+	if ((rs = getloadavg(dla,n)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (std_getloadavg) */
 
 

@@ -75,9 +75,9 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<usysflag.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysflag.h>
 
 #include	"usys_streams.h"
 

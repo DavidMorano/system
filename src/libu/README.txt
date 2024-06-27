@@ -5,7 +5,7 @@ The idea is that the subroutines in this library are front-ends for
 UNIX® section-2 calls.  This library actually only provides the lower
 half of the whole UNIX® iterface.  The upper half is provided by
 the LIBUC library (see |libuc|).  Emulating UNIX® is not always
-easy and doing it in two layers provided some sanitary relief.
+easy and doing it in two layers provided some sanity relief.
 
 Further, and most troubling, this library tries to make up for the
 many failings of some operating systems that do not provide a full
@@ -39,6 +39,6 @@ operating systems) are themselves not thread-safe or not atomic.
 Most operating systems are actually quite poor about the precise
 details on which "kernel" calls are thread-safe and which ones are
 not.  In this regard, Solaris® is the best, but even there (with
-Solaris®) some older kernel interface are ambiguous about their
+Solaris®) some older kernel interfaces are ambiguous about their
 thread-safety status.  Sigh.
 

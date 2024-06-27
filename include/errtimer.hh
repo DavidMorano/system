@@ -33,7 +33,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<clanguage.h>		
-#include	<utypedefs.h>
+#include	<utypedefs.h>		/* |POLL_INTMULT| */
 #include	<utypealiases.h>
 #include	<usysrets.h>
 

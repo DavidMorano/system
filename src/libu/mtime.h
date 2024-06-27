@@ -23,11 +23,12 @@
 typedef int64_t		mtime_t ;
 #endif
 
+#ifndef	SUBROUTINE_MTIME
+#define	SUBROUTINE_MTIME
 EXTERNC_begin
-
 extern mtime_t	mtime(void) noex ;
-
 EXTERNC_end
+#endif
 
 #ifndef	OBJECT_GETMTIME
 #define	OBJECT_GETMTIME

@@ -15,8 +15,9 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>		/* |S_IFMT| */
 #include	<dirent.h>		/* possielbe preprocesor 'DT_{x}' */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 #ifndef	S_IFMT

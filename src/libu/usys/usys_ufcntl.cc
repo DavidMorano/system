@@ -27,9 +27,9 @@
 #include	<cstdint>		/* |uintptr_t| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<usysflag.h>
 #include	<utypedefs.h>		/* |ustime| */
 #include	<utypealiases.h>	/* |TIMESPEC| */
+#include	<usysflag.h>
 #include	<timespec.h>		/* |timespec_load(3u)| */
 #include	<localmisc.h>		/* |LEQUIV| */
 

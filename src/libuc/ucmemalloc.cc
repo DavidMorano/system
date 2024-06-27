@@ -56,11 +56,11 @@
 
 	API:
 	uc_mallset()	turns on memory tracking
-	uc_malloc()	analogous to the standard 'malloc(3c)'
-	uc_valloc()	analogous to the standard 'valloc(3c)'
-	uc_calloc()	analogous to the standard 'calloc(3c)'
-	uc_realloc()	analogous to the standard 'realloc(3c)'
-	uc_free()	analogous to the standard 'free(3c)'
+	uc_malloc()	analogous to the standard |malloc(3c)|
+	uc_valloc()	analogous to the standard |valloc(3c)|
+	uc_calloc()	analogous to the standard |calloc(3c)|
+	uc_realloc()	analogous to the standard |realloc(3c)|
+	uc_free()	analogous to the standard |free(3c)|
 	uc_mallpresent(cvoid *a) noex
 	uc_mallout(ulong *rp) noex
 	uc_mallstats(ucmemalloc_stats *statp) noex
@@ -85,7 +85,7 @@
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<sysval.hh>
-#include	<memtrack.hh>
+#include	<addrset.hh>
 #include	<localmisc.h>
 
 #include	"uclibmemalloc.h"
@@ -129,7 +129,7 @@ namespace {
     struct ucmemalloc {
 	typedef ucmemalloc_stats	statblock ;
 	ptm		mx ;		/* object mutex */
-	memtrack	mt ;
+	addrset		mt ;
 	statblock	st ;
 	ucmemalloc_co	init ;
 	ucmemalloc_co	fini ;
@@ -330,7 +330,7 @@ int ucmallreg_curbegin(ucmallreg_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (curp) {
 	    rs = SR_NOMEM ;
-	    if ((curp->mcp = new(nothrow) memtrack_iter) != nullptr) {
+	    if ((curp->mcp = new(nothrow) addrset_iter) != nullptr) {
 	        rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
@@ -360,7 +360,7 @@ int ucmallreg_curenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
 	if ((rs = ucmemalloc_init()) >= 0) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
-	            int		ci = (curp->i < 0) ? 0 : (curp->i + 1) ;
+	            cint	ci = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	            if (ci < uip->regs_total) {
 	                while (ci < uip->regs_total) {
 	                    if (uip->regs[ci].a) {

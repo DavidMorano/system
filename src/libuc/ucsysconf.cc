@@ -201,7 +201,7 @@ int ucsysconf::operator () (int req) noex {
 int ucsysconf::mconfsys(int req) noex {
 	int		rs = SR_OK ;
 	errno = 0 ;
-	if (long res ; (res = sysconf(req)) >= 0) {
+	if (long res ; (res = sysconf(req)) >= 0L) {
 	    if (lp) *lp = res ;
 	    rs = intsat(res) ;
 	} else {
@@ -212,30 +212,37 @@ int ucsysconf::mconfsys(int req) noex {
 /* end subroutine (ucsysconf::mconfsys) */
 
 int ucsysconf::mconfstr(int req) noex {
-	csize		res_bad = size_t(-1) ;
 	size_t		res ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	errno = 0 ;
-	if (rbuf && (rlen >= 1)) {
-	    size_t	rsz = (rlen+1) ;
-	    if ((res = confstr(req,rbuf,rsz)) == res_bad) {
-	        rs = (errno) ? (- errno) : SR_NOTSUP ;
-	    } else {
-	        if (res <= rsz) {
-	            len = intsat(res-1) ;
-	        } else {
-		    rs = SR_OVERFLOW ;
-		}
-	    } /* end if */
+	if (rlen > 0) {
+	    rs = SR_FAULT ;
+	    if (rbuf) {
+	        csize	rsz = (rlen+1) ;
+		rs = SR_OK ;
+	        if ((res = confstr(req,rbuf,rsz)) == 0uz) {
+	            rs = (errno) ? (- errno) : SR_NOTSUP ;
+	        } else if (res > 0) {
+	            if (res <= rsz) {
+	                len = intsat(res-1) ;
+	            } else {
+		        rs = SR_OVERFLOW ;
+		    }
+		} else {
+		    rs = SR_NOSYS ;	/* not defined in documentation */
+	        } /* end if */
+	    } /* end if (non-null) */
 	} else {
 	    cnullptr	np{} ;
-	    if ((res = confstr(req,np,0uz)) == res_bad) {
+	    if ((res = confstr(req,np,0uz)) == 0uz) {
 	        rs = (errno) ? (- errno) : SR_NOTSUP ;
-	    } else {
+	    } else if (res > 0) {
 	        len = intsat(res-1) ;
+	    } else {
+		rs = SR_NOSYS ;
 	    }
-	} /* end if (try) */
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (ucsysconf::mconfstr) */

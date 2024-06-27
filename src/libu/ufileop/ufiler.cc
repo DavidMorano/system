@@ -21,6 +21,7 @@
 	u_access
 	u_chdir
 	u_chmod
+	u_minmod
 	u_chown
 	u_lchown
 	u_link
@@ -211,6 +212,27 @@ int u_chmod(cchar *name,mode_t m) noex {
 	return rs ;
 }
 /* end subroutine (u_chmod) */
+
+int u_minmod(cchar *name,mode_t m) noex {
+	int		rs = SR_FAULT ;
+	int		fchanged = false ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        USTAT	sb ;
+	        if ((rs = u_stat(name,&sb)) >= 0) {
+	            cmode	om = (sb.st_mode & (~ S_IFMT)) ;
+	            cmode	nm = (m & (~ S_IFMT)) ;
+	            if ((om & nm) != nm) {
+			fchanged = true ;
+		        rs = u_chmod(name,(om | nm)) ;
+	            }
+	        } /* end if (u_stat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fchanged : rs ;
+}
+/* end subroutine (u_minmod) */
 
 int u_chown(cchar *name,uid_t uid,gid_t gid) noex {
 	int		rs ;

@@ -45,8 +45,9 @@
 #include	<cstring>		/* |strncpy(3c)| + |strlcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<usysflag.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysflag.h>
 #include	<usysrets.h>
 #include	<aflag.hh>		/* mutex-flag */
 

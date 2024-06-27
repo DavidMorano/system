@@ -31,7 +31,6 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
