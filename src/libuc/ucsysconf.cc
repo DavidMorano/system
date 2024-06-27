@@ -17,14 +17,14 @@
 /*******************************************************************************
 
 	Name:
-	uc_confsys
+	uc_sysconfval
 
 	Description:
 	This subroutine returns system-related values (as opposed
-	to strings as |uc_confstr(3uc)| does).
+	to strings as |uc_sysconfstr(3uc)| does).
 
 	Synopsis:
-	int uc_confsys(int req,long *rp) noex
+	int uc_sysconfval(int req,long *rp) noex
 
 	Arguments:
 	req		requested value to return
@@ -32,7 +32,7 @@
 
 
 	Name:
-	uc_confstr
+	uc_sysconfstr
 
 	Description:
 	This subroutine is NOT the same as the UNIX®-System version.
@@ -40,7 +40,7 @@
 	buffer is not big enough to hold the associated value.
 
 	Synopsis:
-	int uc_confstr(char *rbuf,int rlen,int req) noex
+	int uc_sysconfstr(char *rbuf,int rlen,int req) noex
 
 	Arguments:
 	rbuf		user supplied buffer to hold result
@@ -64,6 +64,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"ucsysconf.h"
+
 
 /* local defines */
 
@@ -79,10 +81,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_sysconf(int,long *) noex ;
-}
 
 
 /* external variables */
@@ -132,7 +130,7 @@ static ucconfdatas	ucdata ;
 
 /* exported subroutines */
 
-int uc_confsys(int req,long *rp) noex {
+int uc_sysconfval(int req,long *rp) noex {
 	ucsysconf	sco(rp) ;
 	int		rs = SR_OK ;
 	sco.m = &ucsysconf::mconfsys ;
@@ -149,24 +147,14 @@ int uc_confsys(int req,long *rp) noex {
 	} /* end switch */
 	return rs ;
 }
-/* end subroutine (uc_confsys) */
+/* end subroutine (uc_sysconfval) */
 
-int uc_confmaxline() noex {
-	cint		cmd = _SC_LINE_MAX ;
-	return uc_confsys(cmd,nullptr) ;
-}
-/* end subroutine (uc_conmaxline) */
-
-int uc_confstr(char *rbuf,int rlen,int req) noex {
+int uc_sysconfstr(char *rbuf,int rlen,int req) noex {
 	ucsysconf	sco(rbuf,rlen) ;
 	sco.m = &ucsysconf::mconfstr ;
 	return sco(req) ;
 }
-/* end subroutine (uc_confstr) */
-
-int uc_sysconf(int req,long *rp) noex {
-	return uc_confsys(req,rp) ;
-}
+/* end subroutine (uc_sysconfstr) */
 
 
 /* local subroutines */

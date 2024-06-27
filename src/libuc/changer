@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} ucmallreg_enum"
+NAMES="${NAMES} uc_confstr"
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/ucmallreg_enum/s//ucmallreg_curenum/g
+g/uc_confstr/s//uc_sysconfstr/g
 	w
 	q
 EOF

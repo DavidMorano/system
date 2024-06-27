@@ -193,7 +193,7 @@ int hzmgr::tryconf(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_conf))) {
 	    if (int req ; (req = _SC_CLK_TCK) >= 0) {
-	        if ((rs = uc_confsys(req,nullptr)) >= 0) {
+	        if ((rs = uc_sysconfval(req,nullptr)) >= 0) {
 		    hz = rs ;
 	        } else if (isNotValid(rs)) {
 		    rs = SR_OK ;

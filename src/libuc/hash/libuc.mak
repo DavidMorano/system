@@ -530,7 +530,7 @@ ucprogdata.o:		ucprogdata.cc ucprogdata.h
 ucclustername.o:	ucclustername.cc ucclustername.h
 uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
-ucsysconf.o:		ucsysconf.cc
+ucsysconf.o:		ucsysconf.cc ucsysconf.h
 
 # UNIX C-language system library string-to-integer interface
 # string-to-x

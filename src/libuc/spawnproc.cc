@@ -523,7 +523,7 @@ static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,
 	        char	*pbuf ;
 	        if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 		    cint	cs = _CS_PATH ;
-	            if ((rs = uc_confstr(pbuf,plen,cs)) >= 0) {
+	            if ((rs = uc_sysconfstr(pbuf,plen,cs)) >= 0) {
 	                rs = envhelp_envset(ehp,var,pbuf,rs) ;
 	            } /* end if */
 	            uc_free(pbuf) ;

@@ -56,10 +56,10 @@
 
 	Notes:
 
-	1. We use |gethz()| rather than |uc_confsys()| because it
+	1. We use |gethz()| rather than |uc_sysconfval()| because it
 	may be faster.  The |gethz()| function caches its value
 	internally without having to go to the kernel. In some
-	implementations, |uc_confsys()| also caches some of its
+	implementations, |uc_sysconfval()| also caches some of its
 	values, but we can never be sure.
 
 	2. The compile-time CF_DEFPATH allows for grabbing a default
@@ -68,7 +68,7 @@
 	idea.  A better idea is to use some sort of system-call or
 	pseudo system-call that stores that (LOGIN configuration)
 	value.  Something along these lines of using the system
-	call |uc_confsys()| to grab the CS_PATH value, which in
+	call |uc_sysconfval()| to grab the CS_PATH value, which in
 	some systems caches a default path (the CS_PATH) valiable.
 
 *******************************************************************************/
@@ -710,7 +710,7 @@ static int mkprogenv_cspath(mkprogenv *op,envlist *etp) noex {
 	char		*pbuf{} ;
 	if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 	    cint	req = _CS_PATH ;
-	    if ((rs = uc_confstr(pbuf,plen,req)) >= 0) {
+	    if ((rs = uc_sysconfstr(pbuf,plen,req)) >= 0) {
 	        rs = mkprogenv_envadd(op,etp,varpath,pbuf,rs) ;
 	        n += rs ;
 	    } /* end if */

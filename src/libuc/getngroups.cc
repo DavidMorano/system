@@ -114,7 +114,7 @@ groupinfo::operator int () noex {
 	int		rs ;
 	if ((rs = ng) == 0) {
 	    cint	cmd = _SC_NGROUPS_MAX ;
-	    if ((rs = uc_confsys(cmd,nullptr)) >= 0) {
+	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 	        ng = rs ;
 	    }
 	} /* end if (needed value) */

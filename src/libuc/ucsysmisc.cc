@@ -108,7 +108,7 @@ int uc_nprocessors(int w) noex {
         } /* end switch */
 	if (rs >= 0) {
 	    long	rn ;
-	    rs = uc_confsys(cmd,&rn) ;
+	    rs = uc_sysconfval(cmd,&rn) ;
 	    n = (rn & INT_MAX) ;
 	    if (rs == SR_INVALID) rs = SR_NOTSUP ;
 	}
@@ -133,7 +133,7 @@ int uc_gethz(int w) noex {
 #endif
 #if	defined(_SC_CLK_TCK) 
 	if ((hz < 0) && ((w == 0) || (w == 3))) {
-	    rs = uc_confsys(_SC_CLK_TCK,&hz) ;
+	    rs = uc_sysconfval(_SC_CLK_TCK,&hz) ;
 	}
 #endif
 	if (rs >= 0) rs = (hz & INT_MAX) ;
@@ -164,7 +164,7 @@ int uc_syspages(int w) noex {
 	    break ;
         } /* end switch */
 	if (rs >= 0) {
-	    rs = uc_confsys(cmd,&rn) ;
+	    rs = uc_sysconfval(cmd,&rn) ;
 	    n = (rn & INT_MAX) ;
 	    if (rs == SR_INVALID) rs = SR_NOTSUP ;
 	}

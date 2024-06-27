@@ -2027,7 +2027,7 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	case qopt_cspath:
 	    {
 	        const int	name = _CS_PATH ;
-	        if ((rs = uc_confstr(name,cvtbuf,cvtlen)) > 0) {
+	        if ((rs = uc_sysconfstr(name,cvtbuf,cvtlen)) > 0) {
 	            cbp = cvtbuf ;
 	            cbl = rs ;
 	        }
