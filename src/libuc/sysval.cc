@@ -118,7 +118,7 @@ constexpr int sysvaldata::operator [] (int name) noex {
 	    cint	cmd = cmds.cmd[name] ;
 	    rs = SR_NOSYS ;
 	    if (cmd >= 0) {
-		if ((rs = uc_confsys(cmd,nullptr)) >= 0) {
+		if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 		    vals[name] = rs ;
 		}
 	    } /* end if (valid command) */

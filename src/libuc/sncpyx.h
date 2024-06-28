@@ -42,7 +42,7 @@ EXTERNC_end
 
 template<typename ... Args>
 inline int sncpy(char *dp,int dl,Args ... args) noex {
-	cint	na = npack(Args) ;
+	cint		na = npack(Args) ;
 	return sncpyx(dp,dl,na,args ...) ;
 }
 

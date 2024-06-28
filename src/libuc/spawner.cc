@@ -849,7 +849,7 @@ static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
 	        char	*pbuf ;
 	        if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 		    cint	req = _CS_PATH ;
-	            if ((rs = uc_confstr(pbuf,plen,req)) >= 0) {
+	            if ((rs = uc_sysconfstr(pbuf,plen,req)) >= 0) {
 		        rs = envhelp_envset(ehp,var,pbuf,rs) ;
 	            } /* end if */
 	            rs1 = uc_free(pbuf) ;

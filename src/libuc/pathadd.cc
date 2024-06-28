@@ -18,6 +18,7 @@
 
 	Name:
 	pathaddw
+	pathaddx
 	pathadd
 
 	Description:
@@ -28,11 +29,13 @@
 
 	Synopses:
 	int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex
+	int pathaddx(char *pbuf,int pl,int,cchar *sp) noex
 	int pathadd(char *pbuf,int pl,cchar *sp) noex
 
 	Arguments:
 	pbuf		result buffer pointer
 	pl		length of result buffer that is already filled
+	n		number of arguments
 	sp		new-componment c-string pointer
 	sl		new-componment c-string length
 
@@ -65,6 +68,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
@@ -124,5 +129,24 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (pathaddw) */
+
+int pathaddx(char *pbuf,int pl,int n,...) noex {
+	va_list		ap ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (pbuf) {
+	    va_begin(ap,n) ;
+	    rs = SR_OK ;
+	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
+		cchar	*sp = (char *) va_arg(ap,char *) ;
+		rs = pathadd(pbuf,pl,sp) ;
+		len += rs ;
+		pl += rs ;
+	    } /* end for */
+	    va_end(ap) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (pathaddx) */
 
 

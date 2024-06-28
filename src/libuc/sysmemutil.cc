@@ -74,9 +74,9 @@ int sysmemutil(sysmemutil_dat *mup) noex {
 	int		percent = 0 ;
 	if_constexpr ((cmd >= 0) && (acmd >= 0)) {
 	    long	mt{} ;
-	    if ((rs = uc_confsys(cmd,&mt)) >= 0) {
+	    if ((rs = uc_sysconfval(cmd,&mt)) >= 0) {
 	        long	ma{} ;
-	        if ((rs = uc_confsys(acmd,&ma)) >= 0) {
+	        if ((rs = uc_sysconfval(acmd,&ma)) >= 0) {
 	      	    ulong	mu100 ;
 	    	    if (mt > 0) {
 	        	ulong	mu = (mt - ma) ;

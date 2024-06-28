@@ -31,7 +31,7 @@
 #include	<sncpyxw.h>		/* repeat? */
 #include	<snxxx.h>
 #include	<snuuid.h>
-#include	<snaddw.h>
+#include	<snadd.h>
 #include	<sntmtime.h>
 #include	<snflags.h>
 #include	<snuuid.h>

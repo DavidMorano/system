@@ -79,8 +79,8 @@ OBJ10= usig.o uexec.o
 OBJ11= uopen.o ustr.o 
 
 OBJ12= usysdata.o usysauxinfo.o usysutility.o
-OBJ13= ufiledesc.o um.o
-OBJ14= ufileop.o
+OBJ13= ufileop.o ufiledesc.o 
+OBJ14= um.o uprocess.o
 OBJ15= uvariables.o
 
 OBJ16= syswords.o varnames.o

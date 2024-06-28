@@ -1,7 +1,7 @@
 /* snaddw HEADER */
 /* lang=C20 */
 
-/* make string version of some flags */
+/* append a counted c-string to existing counted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,8 @@
 
 /******************************************************************************
 
-	Ths object is used in the creation of flags strings.
+	This subroutine adds a c-string to the end of an existing
+	string.  Return the incremental amount added.
 
 ******************************************************************************/
 
@@ -34,11 +35,15 @@ EXTERNC_begin
 
 extern int snaddw(char *,int,int,cchar *,int) noex ;
 
-static inline int snadd(char *rbuf,int rlen,int rl,cchar *sp) noex {
-	return snaddw(rbuf,rlen,rl,sp,-1) ;
+EXTERNC_end
+
+#ifdef	__cplusplus
+
+static inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
+	return snaddw(dbuf,dlen,dl,sp,-1) ;
 }
 
-EXTERNC_end
+#endif /* __cplusplus */
 
 
 #endif /* SNADDW_INCLUDE */

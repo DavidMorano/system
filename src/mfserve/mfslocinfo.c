@@ -1183,7 +1183,7 @@ static int locinfo_envdefs(LOCINFO *lip)
 	                const int	plen = (2*MAXPATHLEN) ;
 	                char		*pbuf ;
 	                if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
-	                    if ((rs = uc_confstr(_CS_PATH,pbuf,plen)) >= 0) {
+	                    if ((rs = uc_sysconfstr(_CS_PATH,pbuf,plen)) >= 0) {
 	                        rs = envhelp_envset(ehp,var,pbuf,rs) ;
 	                    } /* end if */
 	                    uc_free(pbuf) ;

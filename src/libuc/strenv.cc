@@ -368,10 +368,10 @@ int valstore::valpath(int aw) noex {
 			        cint	clen = (tlen - (tl+rs)) ;
 			        char	*cbuf = (tbuf + (tl+rs)) ;
 			        tl += rs ;
-		                if ((rs = uc_confstr(cbuf,clen,cmd)) >= 0) {
+		                if ((rs = uc_sysconfstr(cbuf,clen,cmd)) >= 0) {
 			            tl += rs ;
 			            a[aw] = mallocstrw(tbuf,tl) ;
-		                } /* end if (uc_confstr) */
+		                } /* end if (uc_sysconfstr) */
 			    } /* end if (sncpy) */
 		        } /* end if (mkpath) */
 		        rs1 = uc_free(tbuf) ;

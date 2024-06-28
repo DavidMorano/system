@@ -82,6 +82,7 @@
 #include	<ucsysauxinfo.h>
 #include	<uctimer.h>
 #include	<ucinetconv.h>
+#include	<ucsysconf.h>
 
 #include	<getexecname.h>
 
@@ -97,9 +98,6 @@ extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocessors(int) noex ;
 extern int	uc_syspages(int) noex ;
 extern int	uc_nprocs(int) noex ;
-extern int	uc_confsys(int,long *) noex ;
-extern int	uc_confstr(char *,int,int) noex ;
-extern int	uc_confmaxline() noex ;
 
 /* time group */
 extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;

@@ -1,7 +1,7 @@
-/* snaddw HEADER */
+/* snadd HEADER */
 /* lang=C20 */
 
-/* append a counted c-string to existing counted c-string */
+/* append a c-string to a given counted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -16,13 +16,13 @@
 
 /******************************************************************************
 
-	This subroutine adds a c-string to the end of an existing
-	string.  Return the incremental amount added.
+	Ths object is used to concatenate a new c-string to
+	an existing counted c-string.
 
 ******************************************************************************/
 
-#ifndef	SNADDW_INCLUDE
-#define	SNADDW_INCLUDE
+#ifndef	SNADD_INCLUDE
+#define	SNADD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -30,22 +30,30 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
+#include	<snaddw.h>
+
 
 EXTERNC_begin
 
-extern int snaddw(char *,int,int,cchar *,int) noex ;
+extern int snaddx(char *,int,int,int,...) noex ;
+
+static inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
+	return snaddw(dbuf,dlen,dl,sp,-1) ;
+}
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
-	return snaddw(dbuf,dlen,dl,sp,-1) ;
+template<typename ... Args>
+inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
+	cint		na = npack(Args) ;
+	return snaddx(dbuf,dlen,dl,na,args ...) ;
 }
 
 #endif /* __cplusplus */
 
 
-#endif /* SNADDW_INCLUDE */
+#endif /* SNADD_INCLUDE */
 
 

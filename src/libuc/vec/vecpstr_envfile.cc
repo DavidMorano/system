@@ -306,7 +306,7 @@ static int mkterms() noex {
 static int mkvars() noex {
 	int		rs ;
 	cint		cmd = _SC_LINE_MAX ;
-	if ((rs = uc_confsys(cmd,nullptr)) >= 0) {
+	if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 	    var.linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;

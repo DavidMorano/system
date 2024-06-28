@@ -1,12 +1,8 @@
-/* b_sysfs */
+/* b_sysfs SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to create the sys-users database */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGMALL	1		/* debug memory allocation */
 
 
 /* revision history:
@@ -21,12 +17,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ sysfs [<w>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -83,6 +76,8 @@
 #define	PROCUSERS	struct procusers
 #define	PROCUSERS_FL	struct procusers_flags
 
+#define	PU		PROCUSERS
+
 #define	SYSMODE		0664
 
 
@@ -113,13 +108,6 @@ extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
@@ -168,7 +156,7 @@ struct procusers {
 	int		plen ;
 	int		llen ;
 	int		uhl ;
-	const void	*a ;
+	cvoid		*a ;
 	char		*pwbuf ;
 	char		*uhbuf ;
 	char		*utfname ;
@@ -179,43 +167,43 @@ struct procusers {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+static int	mainsub(int,mainv,mainv,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+static int	usage(PROGINFO *) noex ;
 
-static int	procsysdir(PROGINFO *) ;
-static int	procdirgroup(PROGINFO *,cchar *,struct ustat *) ;
-static int	procuhdir(PROGINFO *,char *,int,cchar *) ;
-static int	proctmpfile(PROGINFO *,char *,cchar *,mode_t) ;
-static int	process(PROGINFO *,int) ;
-static int	procwarg(PROGINFO *,int) ;
-static int	procusers(PROGINFO *,int) ;
-static int	procusers_begin(PROGINFO *,PROCUSERS *) ;
-static int	procusers_allocbegin(PROGINFO *,PROCUSERS *) ;
-static int	procusers_allocend(PROGINFO *,PROCUSERS *) ;
-static int	procusers_beginer(PROGINFO *,PROCUSERS *,cchar *,mode_t) ;
-static int	procusers_ent(PROGINFO *,PROCUSERS *,struct passwd *) ;
-static int	procusers_end(PROGINFO *,PROCUSERS *) ;
-static int	procuserlink(PROGINFO *,char *,int,struct passwd *) ;
-static int	procgroups(PROGINFO *,int) ;
-static int	procgroups_load(PROGINFO *,bfile *,bfile *) ;
+static int	procsysdir(PROGINFO *) noex ;
+static int	procdirgroup(PROGINFO *,cchar *,USTAT *) noex ;
+static int	procuhdir(PROGINFO *,char *,int,cchar *) noex ;
+static int	proctmpfile(PROGINFO *,char *,cchar *,mode_t) noex ;
+static int	process(PROGINFO *,int) noex ;
+static int	procwarg(PROGINFO *,int) noex ;
+static int	procusers(PROGINFO *,int) noex ;
+static int	procusers_begin(PROGINFO *,PU *) noex ;
+static int	procusers_allocbegin(PROGINFO *,PU *) noex ;
+static int	procusers_allocend(PROGINFO *,PU *) noex ;
+static int	procusers_beginer(PROGINFO *,PU *,cchar *,mode_t) noex ;
+static int	procusers_ent(PROGINFO *,PU *,PASSWD *) noex ;
+static int	procusers_end(PROGINFO *,PU *) noex ;
+static int	procuserlink(PROGINFO *,char *,int,PASSWD *) noex ;
+static int	procgroups(PROGINFO *,int) noex ;
+static int	procgroups_load(PROGINFO *,bfile *,bfile *) noex ;
 static int	procgroups_ent(PROGINFO *,bfile *,bfile *,
-			char *,int,struct group *) ;
-static int	procprojects(PROGINFO *,int) ;
-static int	procprojects_load(PROGINFO *,bfile *,bfile *) ;
-static int	procshells(PROGINFO *,int) ;
-static int	procshadow(PROGINFO *,int) ;
-static int	procuserattr(PROGINFO *,int) ;
+			char *,int,GROUP *) noex ;
+static int	procprojects(PROGINFO *,int) noex ;
+static int	procprojects_load(PROGINFO *,bfile *,bfile *) noex ;
+static int	procshells(PROGINFO *,int) noex ;
+static int	procshadow(PROGINFO *,int) noex ;
+static int	procuserattr(PROGINFO *,int) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,KEYOPT *) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_warg(LOCINFO *,int) ;
-static int	locinfo_dbfname(LOCINFO *,cchar *) ;
-static int	locinfo_to(LOCINFO *,int) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_defaults(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+static int	locinfo_warg(LOCINFO *,int) noex ;
+static int	locinfo_dbfname(LOCINFO *,cchar *) noex ;
+static int	locinfo_to(LOCINFO *,int) noex ;
+static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) noex ;
+static int	locinfo_defaults(LOCINFO *) noex ;
+static int	locinfo_finish(LOCINFO *) noex ;
 
 
 /* local variables */
@@ -230,7 +218,7 @@ static const char	*argopts[] = {
 	"ef",
 	"of",
 	"db",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -271,7 +259,7 @@ static const MAPEX	mapexs[] = {
 static const char	*akonames[] = {
 	"utf",
 	"db",
-	NULL
+	nullptr
 } ;
 
 enum akonames {
@@ -293,7 +281,7 @@ static const char	*wopts[] = {
 	"shells",
 	"shadow",
 	"userattr",
-	NULL
+	nullptr
 } ;
 
 enum wopts {
@@ -312,31 +300,27 @@ enum wopts {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_sysfs(int argc,cchar *argv[],void *contextp)
-{
+int b_sysfs(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
-
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ksh) */
-
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
-
 	return ex ;
 }
 /* end subroutine (b_sysfs) */
 
-
-int p_sysfs(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_sysfs(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_sysfs) */
@@ -344,18 +328,12 @@ int p_sysfs(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
 	SHIO		errfile ;
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uint		mo_start = 0 ;
-#endif
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		pan = 0 ;
@@ -364,33 +342,20 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		v ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 	int		f ;
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*dbfname = NULL ;
-	cchar		*wspec = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*dbfname = nullptr ;
+	cchar		*wspec = nullptr ;
 	cchar		*cp ;
-
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("b_sysfs: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uc_mallset(1) ;
-	uc_mallout(&mo_start) ;
-#endif
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -398,13 +363,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -424,7 +389,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -435,7 +400,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -451,15 +416,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -482,7 +447,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -491,7 +456,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -500,13 +465,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -524,7 +489,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -542,7 +507,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -560,7 +525,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -578,7 +543,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* DB file */
 	                case argopt_db:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            dbfname = avp ;
 	                    } else {
@@ -603,7 +568,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -611,7 +576,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -621,7 +586,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -638,7 +603,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* file-name (for FS operations) */
@@ -689,7 +654,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -698,7 +663,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -726,23 +691,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (rs < 0)
 	    goto badarg ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_sysfs: debuglevel=%u\n",pip->debuglevel) ;
-#endif
 
 	if (f_version) {
 	    shio_printf(pip->efp,"%s: version %s\n",pip->progname,VERSION) ;
@@ -775,7 +735,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    rs = printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    rs = printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -787,12 +747,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* initialization */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
 	if ((rs = locinfo_dbfname(lip,dbfname)) >= 0) {
 	    if ((rs = locinfo_to(lip,to)) >= 0) {
@@ -811,10 +771,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        for (ai = 1 ; ai < argc ; ai += 1) {
 
 	            f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	            f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	            f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	            if (f) {
 	                wspec = argv[ai] ;
-	                if (wspec != NULL) {
+	                if (wspec != nullptr) {
 	                    int	wch = MKCHAR(wspec[0]) ;
 	                    pan += 1 ;
 	                    if (isdigitlatin(wch)) {
@@ -827,7 +787,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    }
 	                    if (rs >= 0)
 	                        rs = process(pip,w) ;
-	                } /* end if (non-NULL w-spec) */
+	                } /* end if (non-nullptr w-spec) */
 	            } /* end if */
 
 	            if (rs < 0) break ;
@@ -881,15 +841,15 @@ retearly:
 	        pip->progname,ex,rs) ;
 	}
 
-	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	if (pip->efp != nullptr) {
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 baderropen:
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -902,19 +862,6 @@ badlocstart:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	{
-	    uint	mo ;
-	    uc_mallout(&mo) ;
-	    debugprintf("b_sysfs: final mallout=%u\n",(mo-mo_start)) ;
-	    uc_mallset(0) ;
-	}
-#endif /* CF_DEBUGMALL */
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
 
 	return ex ;
 
@@ -929,9 +876,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -949,16 +894,14 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
+static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(pip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -973,14 +916,14 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_utf:
 	                case akoname_db:
 	                    if (! lip->final.dbfname) {
-	                        lip->have.dbfname = TRUE ;
-	                        lip->final.dbfname = TRUE ;
+	                        lip->have.dbfname = true ;
+	                        lip->final.dbfname = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->dbfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1005,11 +948,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 }
 /* end subroutine (procopts) */
 
-
-static int procsysdir(PROGINFO *pip)
-{
-	struct ustat	sb ;
-	const mode_t	dm = (0777 | S_ISGID|S_IXGRP) ;
+static int procsysdir(PROGINFO *pip) noex {
+	USTAT		sb ;
+	cmode	dm = (0777 | S_ISGID|S_IXGRP) ;
 	int		rs ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
 
@@ -1032,25 +973,18 @@ static int procsysdir(PROGINFO *pip)
 	    }
 	} /* end if */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procsysdir: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procsysdir) */
 
-
-static int procdirgroup(PROGINFO *pip,cchar sdname[],struct ustat *sbp)
-{
-	struct ustat	psb ;
+static int procdirgroup(PROGINFO *pip,cchar *sdname,USTAT *sbp) noex {
+	USTAT		psb ;
 	int		rs = SR_OK ;
 	int		cl ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*cp ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if ((cl = sfdirname(sdname,-1,&cp)) > 0) {
 	    NULSTR	dstr ;
@@ -1059,7 +993,7 @@ static int procdirgroup(PROGINFO *pip,cchar sdname[],struct ustat *sbp)
 	        if ((rs = u_stat(dname,&psb)) >= 0) {
 	            if (psb.st_gid != sbp->st_gid) {
 	                if ((u_chown(sdname,-1,psb.st_gid)) >= 0) {
-	                    f = TRUE ;
+	                    f = true ;
 	                }
 	            }
 	        } /* end if (stat) */
@@ -1071,15 +1005,8 @@ static int procdirgroup(PROGINFO *pip,cchar sdname[],struct ustat *sbp)
 }
 /* end subrotine (procdirgroup) */
 
-
-static int process(PROGINFO *pip,int w)
-{
+static int process(PROGINFO *pip,int w) noex {
 	int		rs ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/process: w=%u\n",w) ;
-#endif
 
 	if ((rs = procwarg(pip,w)) > 0) {
 	    if (pip->debuglevel > 0) {
@@ -1116,27 +1043,21 @@ static int process(PROGINFO *pip,int w)
 	    } /* end switch */
 	} /* end if (proc-warg) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/process: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (process) */
 
-
-static int procwarg(PROGINFO *pip,int w)
-{
+static int procwarg(PROGINFO *pip,int w) noex {
 	LOCINFO		*lip = pip->lip ;
-	const int wusers[] = { wopt_userhomes, wopt_usernames, 
+	cint wusers[] = { wopt_userhomes, wopt_usernames, 
 	            wopt_passwd, -1 } ;
-	const int wgroups[] = { wopt_groupnames, wopt_group, -1 } ;
-	const int wprojects[] = { wopt_projectnames, wopt_project, -1 } ;
+	cint wgroups[] = { wopt_groupnames, wopt_group, -1 } ;
+	cint wprojects[] = { wopt_projectnames, wopt_project, -1 } ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if ((rs = locinfo_warg(lip,w)) > 0) {
-	    const int	*was = NULL ;
+	    cint	*was = nullptr ;
 	    f = rs ;
 	    switch (w) {
 	    case wopt_userhomes:
@@ -1153,7 +1074,7 @@ static int procwarg(PROGINFO *pip,int w)
 	        was = wprojects ;
 	        break ;
 	    } /* end switch */
-	    if (was != NULL) {
+	    if (was != nullptr) {
 	        int	i ;
 	        for (i = 0 ; (rs >= 0) && (was[i] >= 0) ; i += 1) {
 	            rs = locinfo_warg(lip,was[i]) ;
@@ -1165,18 +1086,16 @@ static int procwarg(PROGINFO *pip,int w)
 }
 /* end subroutine (procwarg) */
 
-
-static int procusers(PROGINFO *pip,int w)
-{
+static int procusers(PROGINFO *pip,int w) noex {
 	PROCUSERS	pu ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
 	if ((rs = procusers_begin(pip,&pu)) >= 0) {
-	    struct passwd	pw ;
-	    const int		pwlen = pu.pwlen ;
-	    char		*pwbuf = pu.pwbuf ;
+	    PASSWD	pw ;
+	    cint	pwlen = pu.pwlen ;
+	    char	*pwbuf = pu.pwbuf ;
 	    if ((rs = getpw_begin()) >= 0) {
 	        while ((rs = getpw_ent(&pw,pwbuf,pwlen)) > 0) {
 	            rs = procusers_ent(pip,&pu,&pw) ;
@@ -1189,36 +1108,23 @@ static int procusers(PROGINFO *pip,int w)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (procusers) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/procusers: out rs=%d dl=%u c=%u\n",
-	        rs,pip->debuglevel,c) ;
-#endif
-
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
 	    shio_printf(pip->efp,"%s: (%u) nusers=%u\n",pip->progname,w,c) ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/procusers: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procusers) */
 
-
-static int procusers_begin(PROGINFO *pip,PROCUSERS *pup)
-{
+static int procusers_begin(PROGINFO *pip,PU *pup) noex {
 	int		rs ;
 	cchar		*sd = OPENSYSFS_SYSDNAME ;
 	cchar		*uh = OPENSYSFS_FUSERHOMES ;
 
 	if ((rs = procusers_allocbegin(pip,pup)) >= 0) {
-	    const int	uhlen = pup->plen ;
+	    cint	uhlen = pup->plen ;
 	    if ((rs = procuhdir(pip,pup->uhbuf,uhlen,uh)) >= 0) {
-		const mode_t	om = SYSMODE ;
+		cmode	om = SYSMODE ;
 	        char		*uf = pup->utfname ;
 	        pup->uhl = rs ;
 	        if ((rs = proctmpfile(pip,uf,sd,om)) >= 0) {
@@ -1231,25 +1137,18 @@ static int procusers_begin(PROGINFO *pip,PROCUSERS *pup)
 		procusers_allocend(pip,pup) ;
 	} /* end if (procusers_allocbegin) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/procusers_begin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutines (procusers_begin) */
 
-
-static int procusers_allocbegin(PROGINFO *pip,PROCUSERS *pup)
-{
-	const int	pwlen = getbufsize(getbufsize_pw) ;
-	const int	plen = MAXPATHLEN ;
+static int procusers_allocbegin(PROGINFO *pip,PU *pup) noex {
+	cint		pwlen = getbufsize(getbufsize_pw) ;
+	cint		plen = MAXPATHLEN ;
 	int		rs ;
 	int		llen ;
 	int		size = 0 ;
 	char		*bp ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	llen = (pwlen+LINEBUFLEN) ;
 	size += (pwlen+1) ;
 	size += (3*(plen+1)) ;
@@ -1269,16 +1168,14 @@ static int procusers_allocbegin(PROGINFO *pip,PROCUSERS *pup)
 }
 /* end subroutines (procusers_allocbegin) */
 
-
-static int procusers_allocend(PROGINFO *pip,PROCUSERS *pup)
-{
+static int procusers_allocend(PROGINFO *pip,PU *pup) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip == NULL) return SR_FAULT ;
-	if (pup->a != NULL) {
+	if (pip == nullptr) return SR_FAULT ;
+	if (pup->a != nullptr) {
 	    rs1 = uc_free(pup->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    pup->a = NULL ;
+	    pup->a = nullptr ;
 	    pup->pwlen = 0 ;
 	    pup->plen = 0 ;
 	    pup->llen = 0 ;
@@ -1287,10 +1184,8 @@ static int procusers_allocend(PROGINFO *pip,PROCUSERS *pup)
 }
 /* end subroutines (procusers_allocend) */
 
-
-static int procusers_beginer(PROGINFO *pip,PROCUSERS *pup,cchar *sd,mode_t om)
-{
-	const int	n = 50 ;
+static int procusers_beginer(PROGINFO *pip,PU *pup,cc *sd,mode_t om) noex {
+	cint		n = 50 ;
 	int		rs ;
 	cchar		*ufn = pup->utfname ;
 	if ((rs = bopenmod(&pup->utfile,ufn,"wct",om)) >= 0) {
@@ -1298,7 +1193,7 @@ static int procusers_beginer(PROGINFO *pip,PROCUSERS *pup,cchar *sd,mode_t om)
 	    if ((rs = proctmpfile(pip,pfn,sd,om)) >= 0) {
 		if ((rs = bopenmod(&pup->ptfile,pfn,"wct",om)) >= 0) {
 		    if ((rs = setstr_start(&pup->users,n)) >= 0) {
-			pup->open.users = TRUE ;
+			pup->open.users = true ;
 		    }
 		    if (rs < 0) {
 			bclose(&pup->ptfile) ;
@@ -1314,17 +1209,15 @@ static int procusers_beginer(PROGINFO *pip,PROCUSERS *pup,cchar *sd,mode_t om)
 }
 /* end subroutine (procusers_beginer) */
 
-
-static int procusers_end(PROGINFO *pip,PROCUSERS *pup)
-{
+static int procusers_end(PROGINFO *pip,PU *pup) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (pup->open.users) {
-	    pup->open.users = FALSE ;
+	    pup->open.users = false ;
 	    rs1 = setstr_finish(&pup->users) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1360,31 +1253,24 @@ static int procusers_end(PROGINFO *pip,PROCUSERS *pup)
 }
 /* end subroutine (procusers_end) */
 
-
-static int procusers_ent(PROGINFO *pip,PROCUSERS *pup,struct passwd *pwp)
-{
+static int procusers_ent(PROGINFO *pip,PU *pup,PASSWD *pwp) noex {
 	setstr		*usp = &pup->users ;
 	bfile		*ufp = &pup->utfile ;
 	bfile		*pfp = &pup->ptfile ;
-	const int	unl = strlen(pwp->pw_name) ;
+	cint		unl = strlen(pwp->pw_name) ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*unp = pwp->pw_name ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/procuser: ent\n") ;
-#endif
-
 	if ((rs = setstr_add(usp,unp,unl)) > 0) {
 	    c = 1 ;
 	    if ((rs = bprintln(ufp,unp,unl)) >= 0) {
-	        const int	llen = pup->llen ;
+	        cint	llen = pup->llen ;
 	        char		*lbuf = pup->lbuf ;
 	        if ((rs = passwdent_format(pwp,lbuf,llen)) >= 0) {
-	            const int	ll = rs ;
+	            cint	ll = rs ;
 	            if ((rs = bprintln(pfp,lbuf,ll)) >= 0) {
-	                const int	uhl = pup->uhl ;
+	                cint	uhl = pup->uhl ;
 	                char		*uhbuf = pup->uhbuf ;
 	                rs = procuserlink(pip,uhbuf,uhl,pwp) ;
 	            }
@@ -1392,72 +1278,35 @@ static int procusers_ent(PROGINFO *pip,PROCUSERS *pup,struct passwd *pwp)
 	    } /* end if (print-out) */
 	} /* end if (setstr_add) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/procuser: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procuser_ent) */
 
-
-static int procuserlink(PROGINFO *pip,char uhbuf[],int uhlen,struct passwd *pwp)
-{
+static int procuserlink(PROGINFO *pip,char *uhbuf,int uhlen,PASSWD *pwp) noex {
 	int		rs ;
 
-	if (pip == NULL) return SR_FAULT ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("b_sysfs/procuserlink: w=%s\n",pwp->pw_name) ;
-	    debugprintf("b_sysfs/procuserlink: uhlen=%u uhbuf=%t\n",
-	        uhlen,uhbuf,uhlen) ;
-	}
-#endif
+	if (pip == nullptr) return SR_FAULT ;
 
 	if ((rs = pathadd(uhbuf,uhlen,pwp->pw_name)) >= 0) {
-	    const int	rlen = MAXPATHLEN ;
+	    cint	rlen = MAXPATHLEN ;
 	    char	rbuf[MAXPATHLEN+1] ;
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("b_sysfs/procuserlink: read uhbuf=%s\n",uhbuf) ;
-#endif
 	    if ((rs = u_readlink(uhbuf,rbuf,rlen)) >= 0) {
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4)) {
-	            debugprintf("b_sysfs/procuserlink: u_readlink() rs=%d\n",
-	                rs) ;
-	            debugprintf("b_sysfs/procuserlink: rbuf=%s\n",rbuf) ;
-	        }
-#endif
 	        if (strcmp(rbuf,pwp->pw_dir) != 0) {
 	            if ((rs = u_unlink(uhbuf)) >= 0) {
 	                rs = u_symlink(pwp->pw_dir,uhbuf) ;
 	            }
 	        }
 	    } else if (rs == SR_NOENT) {
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("b_sysfs/procuserlink: no-entry\n") ;
-#endif
 	        rs = u_symlink(pwp->pw_dir,uhbuf) ;
 	    }
 	} /* end if (mkpath) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/procuserlink: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (procuserlink) */
 
-
-static int procgroups(PROGINFO *pip,int w)
-{
-	const mode_t	om = SYSMODE ;
+static int procgroups(PROGINFO *pip,int w) noex {
+	cmode		om = SYSMODE ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1504,22 +1353,15 @@ static int procgroups(PROGINFO *pip,int w)
 	    shio_printf(pip->efp,"%s: (%u) ngroups=%u\n",pip->progname,w,c) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procgroups: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procgroups) */
 
-
-static int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp)
-{
-	struct group	gr ;
+static int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp) noex {
+	GROUP		gr ;
 	setstr		groups, *gsp = &groups ;
-	const int	n = 40 ;
-	const int	grlen = getbufsize(getbufsize_gr) ;
+	cint		n = 40 ;
+	cint		grlen = getbufsize(getbufsize_gr) ;
 	int		rs ;
 	int		rs1 ;
 	int		llen ;
@@ -1528,7 +1370,7 @@ static int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp)
 	char		*grbuf ;
 	char		*lbuf ;
 	char		*bp ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	llen = (grlen+LINEBUFLEN) ;
 	size = ((grlen+1)+(llen+1)) ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
@@ -1555,14 +1397,12 @@ static int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp)
 }
 /* end subroutine (procgroups_load) */
 
-
 static int procgroups_ent(PROGINFO *pip,bfile *gsfp,bfile *grfp,
-	char *lbuf,int llen,struct group *grp)
-{
+	char *lbuf,int llen,GROUP *grp) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*gn = grp->gr_name ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if ((rs = bprintln(gsfp,gn,-1)) >= 0) {
 	    if ((rs = groupent_format(grp,lbuf,llen)) >= 0) {
 		c = 1 ;
@@ -1573,10 +1413,8 @@ static int procgroups_ent(PROGINFO *pip,bfile *gsfp,bfile *grfp,
 }
 /* end subroutine (procgroups_ent) */
 
-
-static int procprojects(PROGINFO *pip,int w)
-{
-	const mode_t	om = SYSMODE ;
+static int procprojects(PROGINFO *pip,int w) noex {
+	cmode		om = SYSMODE ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1623,20 +1461,13 @@ static int procprojects(PROGINFO *pip,int w)
 	    shio_printf(pip->efp,"%s: (%u) nprojects=%u\n",pip->progname,w,c) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procprojects: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procprojects) */
 
-
-static int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp)
-{
-	struct project	pj ;
-	const int	pjlen = getbufsize(getbufsize_pj) ;
+static int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp) noex {
+	PROJECT		pj ;
+	cint	pjlen = getbufsize(getbufsize_pj) ;
 	int		rs ;
 	int		c = 0 ;
 	int		llen ;
@@ -1644,7 +1475,7 @@ static int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp)
 	char		*pjbuf ;
 	char		*lbuf ;
 	char		*bp ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	llen = (pjlen+LINEBUFLEN) ;
 	size = ((pjlen+1)+(llen+1)) ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
@@ -1669,10 +1500,8 @@ static int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp)
 }
 /* end subroutine (procprojects_load) */
 
-
-static int procshells(PROGINFO *pip,int w)
-{
-	const mode_t	om = SYSMODE ;
+static int procshells(PROGINFO *pip,int w) noex {
+	cmode		om = SYSMODE ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1682,7 +1511,7 @@ static int procshells(PROGINFO *pip,int w)
 	if ((rs = proctmpfile(pip,tmpusfname,sdname,om)) >= 0) {
 	    bfile	usfile, *usfp = &usfile ;
 	    if ((rs = bopenmod(usfp,tmpusfname,"wct",om)) >= 0) {
-	        const int	rlen = MAXPATHLEN ;
+	        cint	rlen = MAXPATHLEN ;
 	        char		rbuf[MAXPATHLEN+1] ;
 	        if ((rs = getus_begin()) >= 0) {
 	            while ((rs = getus_ent(rbuf,rlen)) > 0) {
@@ -1711,40 +1540,28 @@ static int procshells(PROGINFO *pip,int w)
 	    shio_printf(pip->efp,"%s: (%u) nshells=%u\n",pip->progname,w,c) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procshells: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procshells) */
 
-
-static int procshadow(PROGINFO *pip,int w)
-{
-	const mode_t	om = 0660 ;
+static int procshadow(PROGINFO *pip,int w) noex {
+	cmode		om = 0660 ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procshadow: ent\n") ;
-#endif
-
 	if ((rs = proctmpfile(pip,tmpfname,sdname,om)) >= 0) {
 	    bfile	sfile, *sfp = &sfile ;
 	    if ((rs = bopenmod(sfp,tmpfname,"wct",om)) >= 0) {
 	        struct spwd	sp ;
-	        const int	splen = getbufsize(getbufsize_sp) ;
+	        cint	splen = getbufsize(getbufsize_sp) ;
 	        char		*spbuf ;
 		if ((rs = uc_malloc((splen+1),&spbuf)) >= 0) {
 	            if ((rs = getsp_begin()) >= 0) {
 	                while ((rs = getsp_ent(&sp,spbuf,splen)) > 0) {
-	                    const int	llen = LINEBUFLEN ;
+	                    cint	llen = LINEBUFLEN ;
 	                    char	lbuf[LINEBUFLEN+1] ;
 	                    if ((rs = shadowent_format(&sp,lbuf,llen)) >= 0) {
 	                        c += 1 ;
@@ -1775,40 +1592,28 @@ static int procshadow(PROGINFO *pip,int w)
 	    shio_printf(pip->efp,"%s: (%u) nshadow=%u\n",pip->progname,w,c) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procshadow: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procshadow) */
 
-
-static int procuserattr(PROGINFO *pip,int w)
-{
-	const mode_t	om = 0664 ;
+static int procuserattr(PROGINFO *pip,int w) noex {
+	cmode		om = 0664 ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procuserattr: ent\n") ;
-#endif
-
 	if ((rs = proctmpfile(pip,tmpfname,sdname,om)) >= 0) {
 	    bfile	sfile, *sfp = &sfile ;
 	    if ((rs = bopenmod(sfp,tmpfname,"wct",om)) >= 0) {
 	        userattr_t	ua ;
-	        const int	ualen = getbufsize(getbufsize_ua) ;
+	        cint	ualen = getbufsize(getbufsize_ua) ;
 	        char		*uabuf ;
 		if ((rs = uc_malloc((ualen+1),&uabuf)) >= 0) {
 	            if ((rs = getua_begin()) >= 0) {
 	                while ((rs = getua_ent(&ua,uabuf,ualen)) > 0) {
-	                    const int	llen = LINEBUFLEN ;
+	                    cint	llen = LINEBUFLEN ;
 	                    char	lbuf[LINEBUFLEN+1] ;
 	                    if ((rs = userattrent_format(&ua,lbuf,llen)) > 0) {
 	                        c += 1 ;
@@ -1839,27 +1644,20 @@ static int procuserattr(PROGINFO *pip,int w)
 	    shio_printf(pip->efp,"%s: (%u) nuserattr=%u\n",pip->progname,w,c) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysfs/procuserattr: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procuserattr) */
 
-
-static int procuhdir(PROGINFO *pip,char *uhbuf,int uhlen,cchar *uhfname)
-{
-	const mode_t	dm = 0777 ;
+static int procuhdir(PROGINFO *pip,char *uhbuf,int uhlen,cchar *uhfname) noex {
+	cmode		dm = 0777 ;
 	int		rs ;
 	int		unl = 0 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if ((rs = mknpath2(uhbuf,uhlen,sdname,uhfname)) >= 0) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    unl = rs ;
 
 	    if ((rs = u_stat(uhbuf,&sb)) >= 0) {
@@ -1877,23 +1675,16 @@ static int procuhdir(PROGINFO *pip,char *uhbuf,int uhlen,cchar *uhfname)
 
 	} /* end if (mkpath user-home dir) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysfs/prouhdir: ret rs=%d unl=%u\n",rs,unl) ;
-#endif
-
 	return (rs >= 0) ? unl : rs ;
 }
 /* end subroutine (procuhdir) */
 
-
-static int proctmpfile(PROGINFO *pip,char *tbuf,cchar *sdname,mode_t om)
-{
+static int proctmpfile(PROGINFO *pip,char *tbuf,cchar *sdname,mode_t om) noex {
 	int		rs ;
 	cchar		*cname = ".sysfsXXXXXXXX" ;
 	char		template[MAXPATHLEN+1] ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if ((rs = mkpath2(template,sdname,cname)) >= 0) {
 	    rs = mktmpfile(tbuf,om,template) ;
@@ -1903,12 +1694,10 @@ static int proctmpfile(PROGINFO *pip,char *tbuf,cchar *sdname,mode_t om)
 }
 /* end subroutine (proctmpfile) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
@@ -1918,16 +1707,14 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1936,15 +1723,13 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	slp = &lip->stores ;
 	if (! lip->open.stores) {
@@ -1954,14 +1739,14 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 
 	if (rs >= 0) {
 	    int	oi = -1 ;
-	    if (*epp != NULL) {
+	    if (*epp != nullptr) {
 		oi = vecstr_findaddr(slp,*epp) ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        len = strnlen(vp,vl) ;
 	        rs = vecstr_store(slp,vp,len,epp) ;
 	    } else {
-	        *epp = NULL ;
+	        *epp = nullptr ;
 	    }
 	    if ((rs >= 0) && (oi >= 0)) {
 	        vecstr_del(slp,oi) ;
@@ -1972,14 +1757,12 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_setentry) */
 
-
-static int locinfo_warg(LOCINFO *lip,int w)
-{
+static int locinfo_warg(LOCINFO *lip,int w) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if ((rs = bwtst(lip->wargs,w)) == 0) {
-	    f = TRUE ;
+	    f = true ;
 	    rs = bwset(lip->wargs,w) ;
 	}
 
@@ -1987,16 +1770,12 @@ static int locinfo_warg(LOCINFO *lip,int w)
 }
 /* end subroutine (locinfo_warg) */
 
+static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
+	if (lip == nullptr) return SR_FAULT ;
 
-static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname)
-{
-
-	if (lip == NULL)
-	    return SR_FAULT ;
-
-	if (dbfname != NULL) {
-	    lip->have.dbfname = TRUE ;
-	    lip->final.dbfname = TRUE ;
+	if (dbfname != nullptr) {
+	    lip->have.dbfname = true ;
+	    lip->final.dbfname = true ;
 	    lip->dbfname = dbfname ;
 	}
 
@@ -2004,10 +1783,7 @@ static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname)
 }
 /* end subroutine (locinfo_dbfname) */
 
-
-static int locinfo_to(LOCINFO *lip,int to)
-{
-
+static int locinfo_to(LOCINFO *lip,int to) noex {
 	if (to < 0) to = TO_CACHE ;
 
 	lip->to = to ;
@@ -2015,18 +1791,16 @@ static int locinfo_to(LOCINFO *lip,int to)
 }
 /* end subroutine (locinfo_to) */
 
-
-static int locinfo_defaults(LOCINFO *lip)
-{
+static int locinfo_defaults(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (lip == NULL)
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	if ((lip->dbfname == NULL) && (! lip->final.dbfname)) {
+	if ((lip->dbfname == nullptr) && (! lip->final.dbfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARDBFNAME) ;
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        cchar	**vpp = &lip->dbfname ;
 	        rs = locinfo_setentry(lip,vpp,cp,-1) ;
 	    }

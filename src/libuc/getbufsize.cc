@@ -266,7 +266,7 @@ int ubufsize::def(int w) noex {
 int ubufsize::sysbs(int w,int name) noex {
 	int		rs = bs[w] ;
 	if (bs[w] == 0) {
-	    if ((rs = uc_confsys(name,nullptr)) >= 0) {
+	    if ((rs = uc_sysconfval(name,nullptr)) >= 0) {
 	        bs[w] = rs ;
 	    } else if (rs == SR_NOENT) {
 		rs = 0 ; /* specifies no-entry available */
