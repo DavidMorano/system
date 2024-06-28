@@ -1,7 +1,7 @@
 /* snaddw HEADER */
 /* lang=C20 */
 
-/* concatenate c-string to existing counted c-string */
+/* append a counted c-string to existing counted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -16,8 +16,8 @@
 
 /******************************************************************************
 
-	Ths object is used to concatenate a new c-string to
-	an existing counted c-string.
+	This subroutine adds a c-string to the end of an existing
+	string.  Return the incremental amount added.
 
 ******************************************************************************/
 

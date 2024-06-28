@@ -1,7 +1,7 @@
 /* snadd HEADER */
 /* lang=C20 */
 
-/* concatenate c-string to existing counted c-string */
+/* append a c-string to a given counted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -26,7 +26,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

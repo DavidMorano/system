@@ -62,6 +62,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<atomic>
 #include	<usystem.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ucsysconf.h"
@@ -109,7 +110,7 @@ namespace {
 	int		rlen ;
 	ucsysconf(char *rp,int rl) noex : rbuf(rp), rlen(rl) { } ;
 	ucsysconf(long *p) noex : lp(p) { } ;
-	int mconfsys(int) noex ;
+	int mconfval(int) noex ;
 	int mconfstr(int) noex ;
 	int operator () (int) noex ;
 	int cache(int) noex ;
@@ -133,7 +134,7 @@ static ucconfdatas	ucdata ;
 int uc_sysconfval(int req,long *rp) noex {
 	ucsysconf	sco(rp) ;
 	int		rs = SR_OK ;
-	sco.m = &ucsysconf::mconfsys ;
+	sco.m = &ucsysconf::mconfval ;
 	switch (req) {
 	case _SC_ARG_MAX:
 	case _SC_LINE_MAX:
@@ -160,33 +161,36 @@ int uc_sysconfstr(char *rbuf,int rlen,int req) noex {
 /* local subroutines */
 
 int ucsysconf::operator () (int req) noex {
-	int		to_nomem = utimeout[uto_nomem] ;
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer	to_busy		= utimeout[uto_busy] ;
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	reterr		r ;
 	int		rs ;
-	bool		f_exit = false ;
 	repeat {
 	    if ((rs = (this->*m)(req)) < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-		    if (to_nomem-- > 0) {
-	                msleep(1000) ;
-	 	    } else {
-		        f_exit = true ;
-		    }
-		    break ;
-	        case SR_AGAIN:
+		r(rs) ;			/* <- default causes exit */
+                switch (rs) {
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
 	        case SR_INTR:
+		    r(false) ;
 	            break ;
-		default:
-		    f_exit = true ;
-		    break ;
 	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+		rs = r ;
+	    } /* end if (std-call) */
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end subroutine (ucsysconf::operator) */
 
-int ucsysconf::mconfsys(int req) noex {
+int ucsysconf::mconfval(int req) noex {
 	int		rs = SR_OK ;
 	errno = 0 ;
 	if (long res ; (res = sysconf(req)) >= 0L) {
@@ -197,7 +201,7 @@ int ucsysconf::mconfsys(int req) noex {
 	}
 	return rs ;
 }
-/* end subroutine (ucsysconf::mconfsys) */
+/* end subroutine (ucsysconf::mconfval) */
 
 int ucsysconf::mconfstr(int req) noex {
 	size_t		res ;
@@ -221,7 +225,7 @@ int ucsysconf::mconfstr(int req) noex {
 		    rs = SR_NOSYS ;	/* not defined in documentation */
 	        } /* end if */
 	    } /* end if (non-null) */
-	} else {
+	} else if (rlen == 0) {
 	    cnullptr	np{} ;
 	    if ((res = confstr(req,np,0uz)) == 0uz) {
 	        rs = (errno) ? (- errno) : SR_NOTSUP ;
@@ -230,6 +234,8 @@ int ucsysconf::mconfstr(int req) noex {
 	    } else {
 		rs = SR_NOSYS ;
 	    }
+	} else {
+	    rs = SR_INVALID ;
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
 }

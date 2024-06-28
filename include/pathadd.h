@@ -19,13 +19,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 EXTERNC_begin
 
 extern int pathaddw(char *,int,cchar *,int) noex ;
+extern int pathaddx(char *,int,int,cchar *,...) noex ;
 
 static inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
 	return pathaddw(pbuf,pl,sp,-1) ;
@@ -37,6 +39,12 @@ EXTERNC_end
 
 static inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
 	return pathaddw(pbuf,pl,sp,sl) ;
+}
+
+template<typename ... Args>
+inline int pathadd(char *dbuf,int dl,Args ... args) noex {
+	cint		na = npack(Args) ;
+	return pathaddx(dbuf,dl,na,args ...) ;
 }
 
 #endif /* __cplusplus */
