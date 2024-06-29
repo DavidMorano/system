@@ -271,11 +271,6 @@ int uc_realloc(cvoid *cp,int sz,void *vp) noex {
 	} else {
 	    rs = uc_librealloc(cp,sz,vp) ;
 	}
-	if (rs >= 0) {
-	    uip->st.num_frees += 1 ;
-	    uip->st.num_realloc += 1 ;
-	}
-	uip->rserr(rs) ;
 	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_realloc) */
@@ -483,7 +478,7 @@ int ucmemalloc::mallset(int cmd) noex {
 /* end subroutine (ucmemalloc::mallset) */
 
 int ucmemalloc::trackstart(int opts) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_INPROGRESS ;
 	int		rs1 ;
 	int		rv = 0 ;
 	if (! ftrack) {
@@ -511,7 +506,7 @@ int ucmemalloc::trackstarter(int) noex {
 /* end subroutine (ucmemalloc_trackstarter) */
 
 int ucmemalloc::trackfinish() noex {
-	int		rs = SR_OK ;
+	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 	if (ftrack) {
 	    if ((rs = mx.lockbegin) >= 0) {
