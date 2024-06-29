@@ -51,6 +51,9 @@ extern int storebuf_hexui(char *,int,int,uint) noex ;
 extern int storebuf_hexul(char *,int,int,ulong) noex ;
 extern int storebuf_hexull(char *,int,int,ulonglong) noex ;
 
+static inline int storebuf_str(char *bp,int bl,int i,cchar *sp) noex {
+	return storebuf_strw(bp,bl,i,sp,-1) ;
+}
 static inline int storebuf_char(char *bp,int bl,int i,int ch) noex {
 	return storebuf_chr(bp,bl,i,ch) ;
 }
@@ -79,26 +82,6 @@ inline int storebuf_bin(char *bp,int bl,int i,ulonglong uv) noex {
 	return storebuf_binull(bp,bl,i,uv) ;
 }
 
-inline int storebuf_dec(char *bp,int bl,int i,int v) noex {
-	return storebuf_deci(bp,bl,i,v) ;
-}
-inline int storebuf_dec(char *bp,int bl,int i,long v) noex {
-	return storebuf_decl(bp,bl,i,v) ;
-}
-inline int storebuf_dec(char *bp,int bl,int i,longlong v) noex {
-	return storebuf_decll(bp,bl,i,v) ;
-}
-
-inline int storebuf_dec(char *bp,int bl,int i,uint uv) noex {
-	return storebuf_decui(bp,bl,i,uv) ;
-}
-inline int storebuf_dec(char *bp,int bl,int i,ulong uv) noex {
-	return storebuf_decul(bp,bl,i,uv) ;
-}
-inline int storebuf_dec(char *bp,int bl,int i,ulonglong uv) noex {
-	return storebuf_decull(bp,bl,i,uv) ;
-}
-
 inline int storebuf_oct(char *bp,int bl,int i,int v) noex {
 	return storebuf_octi(bp,bl,i,v) ;
 }
@@ -117,6 +100,26 @@ inline int storebuf_oct(char *bp,int bl,int i,ulong uv) noex {
 }
 inline int storebuf_oct(char *bp,int bl,int i,ulonglong uv) noex {
 	return storebuf_octull(bp,bl,i,uv) ;
+}
+
+inline int storebuf_dec(char *bp,int bl,int i,int v) noex {
+	return storebuf_deci(bp,bl,i,v) ;
+}
+inline int storebuf_dec(char *bp,int bl,int i,long v) noex {
+	return storebuf_decl(bp,bl,i,v) ;
+}
+inline int storebuf_dec(char *bp,int bl,int i,longlong v) noex {
+	return storebuf_decll(bp,bl,i,v) ;
+}
+
+inline int storebuf_dec(char *bp,int bl,int i,uint uv) noex {
+	return storebuf_decui(bp,bl,i,uv) ;
+}
+inline int storebuf_dec(char *bp,int bl,int i,ulong uv) noex {
+	return storebuf_decul(bp,bl,i,uv) ;
+}
+inline int storebuf_dec(char *bp,int bl,int i,ulonglong uv) noex {
+	return storebuf_decull(bp,bl,i,uv) ;
 }
 
 inline int storebuf_hex(char *bp,int bl,int i,int v) noex {

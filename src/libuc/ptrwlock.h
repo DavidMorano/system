@@ -1,8 +1,8 @@
 /* ptrwlock HEADER */
 /* lang=C20 */
 
-/* Posix Semaphore (PTRWLOCK) */
-/* broken on SOLARIS! */
+/* POSIX® Thread Read-Write Lock (PTRWLOCK) */
+/* ** broken on SOLARIS®! ** */
 /* version %I% last-modified %G% */
 
 

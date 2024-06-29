@@ -94,6 +94,7 @@
 #define	cast_const		const_cast
 #define	cast_reinterpret	reinterpret_cast
 #define	cast_bit		bit_cast
+#define	cast_saturate		saturate_cast
 #endif
 #endif /* __cplusplus */
 

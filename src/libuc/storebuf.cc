@@ -65,7 +65,7 @@
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"storebuf.h"
 
@@ -171,7 +171,7 @@ int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf && sp) {
 	    rs = SR_INVALID ;
 	    if (i >= 0) {
 	        char	*bp = (rbuf + i) ;

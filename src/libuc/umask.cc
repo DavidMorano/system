@@ -60,7 +60,7 @@ namespace {
 	int init() noex ;
 	int fini() noex ;
 	int get() noex ;
-	int set(mode_t) noex ;
+	int setmode(mode_t) noex ;
 	void forkbefore() noex {
 	    mx.lockbegin() ;
 	} ;
@@ -128,9 +128,9 @@ int umaskset(mode_t cmask) noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	if ((rs = b.start) >= 0) {
 	    {
-		rs = umask_data.set(cmask) ;
+		rs = umask_data.setmode(cmask) ;
 		omask = rs ;
 	    }
 	    rs1 = b.finish ;
@@ -139,6 +139,7 @@ int umaskset(mode_t cmask) noex {
 	return (rs >= 0) ? omask : rs ;
 }
 /* end subroutine (umaskset) */
+
 
 /* local subroutines */
 
@@ -230,7 +231,7 @@ int umasker::get() noex {
 }
 /* end method (umasker::get) */
 
-int umasker::set(mode_t cmask) noex {
+int umasker::setmode(mode_t cmask) noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;

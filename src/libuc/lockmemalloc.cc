@@ -94,8 +94,9 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<localmisc.h>
@@ -107,16 +108,11 @@
 
 #define	LOCKMEMALLOC	struct lockmemalloc
 
-#define	NDF		"lockmemalloc.deb"
-
-#define	TO_AGAIN	(5 * 60)
-
 
 /* external subroutines */
 
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) noex ;
-#endif
+
+/* external variables */
 
 
 /* local structures */
@@ -155,6 +151,9 @@ static void	lockmemalloc_exit() noex ;
 /* local vaiables */
 
 static LOCKMEMALLOC	lockmemalloc_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -237,62 +236,62 @@ int lockmemalloc_set(int cmd) noex {
 
 int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if (sp && rpp) {
 	    char	*bp{} ;
 	    rs = SR_OK ;
 	    *rpp = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    size = (sl + 1) ;
-	    if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	    sz = (sl + 1) ;
+	    if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	        *rpp = bp ;
 	        strncpy(bp,sp,sl) ;
 	        bp[sl] = '\0' ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_libmallocstrw) */
 
-int uc_libmalloc(int size,void *vp) noex {
+int uc_libmalloc(int sz,void *vp) noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	int		rs ;
 	if (uip->f_lock) {
-	    rs = lockmemalloc_lockmalloc(size,vp) ;
+	    rs = lockmemalloc_lockmalloc(sz,vp) ;
 	} else {
-	    rs = lockmemalloc_basemalloc(size,vp) ;
+	    rs = lockmemalloc_basemalloc(sz,vp) ;
 	}
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_libmalloc) */
 
 int uc_libcalloc(int nelem,int esize,void *vp) noex {
-	cint	size = (nelem*esize) ;
-	return uc_libmalloc(size,vp) ;
+	cint	sz = (nelem*esize) ;
+	return uc_libmalloc(sz,vp) ;
 }
 /* end subroutine (uc_libcalloc) */
 
-int uc_libvalloc(int size,void *vp) noex {
+int uc_libvalloc(int sz,void *vp) noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	int		rs ;
 	if (uip->f_lock) {
-	    rs = lockmemalloc_lockvalloc(size,vp) ;
+	    rs = lockmemalloc_lockvalloc(sz,vp) ;
 	} else {
-	    rs = lockmemalloc_basevalloc(size,vp) ;
+	    rs = lockmemalloc_basevalloc(sz,vp) ;
 	}
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_libvalloc) */
 
-int uc_librealloc(cvoid *cp,int size,void *vp) noex {
+int uc_librealloc(cvoid *cp,int sz,void *vp) noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	int		rs ;
 	if (uip->f_lock) {
-	    rs = lockmemalloc_lockrealloc(cp,size,vp) ;
+	    rs = lockmemalloc_lockrealloc(cp,sz,vp) ;
 	} else {
-	    rs = lockmemalloc_baserealloc(cp,size,vp) ;
+	    rs = lockmemalloc_baserealloc(cp,sz,vp) ;
 	}
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_librealloc) */
 
@@ -311,13 +310,13 @@ int uc_libfree(cvoid *vp) noex {
 
 /* local subroutines */
 
-static int lockmemalloc_basemalloc(int size,void *vp) noex {
+static int lockmemalloc_basemalloc(int sz,void *vp) noex {
 	void		**rpp = (void **) vp ;
 	int		rs = SR_FAULT ;
 	if (vp) {
 	    rs = SR_INVALID ;
-	    if (size > 0) {
-	csize		msize = size ;
+	    if (sz > 0) {
+	csize		msize = sz ;
 	int		to_again = utimeout[uto_again] ;
 	bool		f_exit = false ;
 	void		*rp ;
@@ -345,18 +344,18 @@ static int lockmemalloc_basemalloc(int size,void *vp) noex {
 	} until ((rs >= 0) || f_exit) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (lockmemalloc_basemalloc) */
 
-static int lockmemalloc_basevalloc(int size,void *vp) noex {
+static int lockmemalloc_basevalloc(int sz,void *vp) noex {
 	void		**rpp = (void **) vp ;
 	int		rs = SR_FAULT ;
 	if (vp) {
 	    *rpp = nullptr ;
 	    rs = SR_INVALID ;
-	    if (size > 0) {
-	csize		msize = size ;
+	    if (sz > 0) {
+	csize		msize = sz ;
 	int		to_again = utimeout[uto_again] ;
 	bool		f_exit = false ;
 	void		*rp ;
@@ -384,19 +383,19 @@ static int lockmemalloc_basevalloc(int size,void *vp) noex {
 	} until ((rs >= 0) || f_exit) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (lockmemalloc_basevalloc) */
 
-static int lockmemalloc_baserealloc(cvoid *cp,int size,void *vp) noex {
+static int lockmemalloc_baserealloc(cvoid *cp,int sz,void *vp) noex {
 	void		*argp = (void *) cp ;
 	void		**rpp = (void **) vp ;
 	int		rs = SR_FAULT ;
 	if (cp && vp) {
 	    rs = SR_INVALID ;
 	    *rpp = nullptr ;
-	    if (size > 0) {
-	csize		msize = size ;
+	    if (sz > 0) {
+	csize		msize = sz ;
 	int		to_again = utimeout[uto_again] ;
 	int		f_exit = false ;
 	void		*rp ;
@@ -424,7 +423,7 @@ static int lockmemalloc_baserealloc(cvoid *cp,int size,void *vp) noex {
 	} until ((rs >= 0) || f_exit) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (lockmemalloc_baserealloc) */
 
@@ -443,14 +442,14 @@ static int lockmemalloc_basefree(cvoid *vp) noex {
 }
 /* end subroutine (lockmemalloc_basefree) */
 
-static int lockmemalloc_lockmalloc(int size,void *vp) noex {
+static int lockmemalloc_lockmalloc(int sz,void *vp) noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockmemalloc_init()) >= 0) {
 	    if ((rs = uip->mx.lockbegin) >= 0) {
 		{
-	            rs = lockmemalloc_basemalloc(size,vp) ;
+	            rs = lockmemalloc_basemalloc(sz,vp) ;
 		}
 	        rs1 = uip->mx.lockend ;
 		if (rs >= 0) rs = rs1 ;
@@ -460,14 +459,14 @@ static int lockmemalloc_lockmalloc(int size,void *vp) noex {
 }
 /* end subroutine (lockmemalloc_lockmalloc) */
 
-static int lockmemalloc_lockvalloc(int size,void *vp) noex {
+static int lockmemalloc_lockvalloc(int sz,void *vp) noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockmemalloc_init()) >= 0) {
 	    if ((rs = uip->mx.lockbegin) >= 0) {
 		{
-	            rs = lockmemalloc_basevalloc(size,vp) ;
+	            rs = lockmemalloc_basevalloc(sz,vp) ;
 		}
 	        rs1 = uip->mx.lockend ;
 		if (rs >= 0) rs = rs1 ;
@@ -477,14 +476,14 @@ static int lockmemalloc_lockvalloc(int size,void *vp) noex {
 }
 /* end subroutine (lockmemalloc_lockvalloc) */
 
-static int lockmemalloc_lockrealloc(cvoid *cp,int size,void *vp) noex {
+static int lockmemalloc_lockrealloc(cvoid *cp,int sz,void *vp) noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockmemalloc_init()) >= 0) {
 	    if ((rs = uip->mx.lockbegin) >= 0) {
 		{
-	            rs = lockmemalloc_baserealloc(cp,size,vp) ;
+	            rs = lockmemalloc_baserealloc(cp,sz,vp) ;
 		}
 	        rs1 = uip->mx.lockend ;
 		if (rs >= 0) rs = rs1 ;

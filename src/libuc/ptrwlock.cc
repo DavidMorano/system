@@ -2,7 +2,7 @@
 /* lang=C++20 */
 /* ** broken on SOLARIS®! ** */
 
-/* POSIX® Thread Read-Weite Lock (PRWLOCK) */
+/* POSIX® Thread Read-Weite Lock (PTRWLOCK) */
 /* version %I% last-modified %G% */
 
 

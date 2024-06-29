@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int listenspec_ctor(listenspec *op,Args ... args) noex {
+static int csro_ctor(csro *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int listenspec_ctor(listenspec *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (listenspec_ctor) */
+/* end subroutine (csro_ctor) */
 
-static int listenspec_dtor(listenspec *op) noex {
+static int csro_dtor(csro *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (listenspec_dtor) */
+/* end subroutine (csro_dtor) */
 
 template<typename ... Args>
-static inline int listenspec_magic(listenspec *op,Args ... args) noex {
+static inline int csro_magic(csro *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LISTENSPEC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CSRO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (listenspec_magic) */
+/* end subroutine (csro_magic) */

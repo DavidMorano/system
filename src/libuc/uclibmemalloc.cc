@@ -37,6 +37,7 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"uclibmemalloc.h"
@@ -63,8 +64,8 @@ namespace {
     struct uclibmemalloc ;
     typedef int (uclibmemalloc::*uclibmalloc_m)(int,void *) noex ;
     struct uclibmemalloc {
-	uclibmalloc_m		m ;
-	cvoid			*cp ;
+	uclibmalloc_m	m ;
+	cvoid		*cp ;
 	uclibmemalloc(cvoid *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
 	int stdmalloc(int,void *) noex ;
@@ -177,38 +178,34 @@ int uc_libfree(cvoid *cp) noex {
 /* local subroutines */
 
 int uclibmemalloc::operator () (int sz,void *vp) noex {
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer	to_busy		= utimeout[uto_busy] ;
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	reterr		r ;
 	int     	rs = SR_FAULT ;
 	if (vp) {
 	    rs = SR_INVALID ;
 	    if (sz > 0) {
-	        int     to_again = utimeout[uto_again] ;
-	        int     to_nomem = utimeout[uto_nomem] ;
-	        bool    f_exit = false ;
 	        repeat {
 	            if ((rs = (this->*m)(sz,vp)) < 0) {
-	                switch (rs) {
-	                case SR_AGAIN:
-	                    if (to_again-- > 0) {
-			        msleep(1000) ;
-	                    } else {
-			        f_exit = true ;
-	                    }
-	                    break ;
-	                case SR_NOMEM:
-	                    if (to_nomem-- > 0) {
-			        msleep(1000) ;
-	                    } else {
-			        f_exit = true ;
-	                    }
-	                    break ;
+		        r(rs) ;			/* <- default causes exit */
+                        switch (rs) {
+                        case SR_AGAIN:
+                            r = to_again(rs) ;
+                            break ;
+                        case SR_BUSY:
+                            r = to_busy(rs) ;
+                            break ;
+                        case SR_NOMEM:
+                            r = to_nomem(rs) ;
+                            break ;
 	                case SR_INTR:
+		            r(false) ;
 	                    break ;
-	                default:
-	                    f_exit = true ;
-	                    break ;
-	                } /* end switch */
-	            } /* end if (error) */
-	        } until ((rs >= 0) || f_exit) ;
+			} /* end switch */
+			rs = r ;
+	            } /* end if (std-call) */
+	        } until ((rs >= 0) || r.fexit) ;
 	    } /* end if (valid size) */
 	} /* end if (non-null) */
 	return rs ;

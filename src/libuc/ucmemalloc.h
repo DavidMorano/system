@@ -57,7 +57,6 @@ EXTERNC_begin
 extern int uc_malloc(int,void *) noex ;
 extern int uc_calloc(int,int,void *) noex ;
 extern int uc_valloc(int,void *) noex ;
-extern int uc_valloc(int,void *) noex ;
 extern int uc_realloc(cvoid *,int,void *) noex ;
 extern int uc_free(cvoid *vp) noex ;
 extern int uc_mallset(int) noex ;

@@ -29,7 +29,7 @@
 
 	Synopses:
 	int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex
-	int pathaddx(char *pbuf,int pl,int,cchar *sp) noex
+	int pathaddx(char *pbuf,int pl,int n,cchar *sp) noex
 	int pathadd(char *pbuf,int pl,cchar *sp) noex
 
 	Arguments:
@@ -48,10 +48,11 @@
 	that resides in the given path-result-buffer.  If you want
 	a subroutine that returns just the added part, then check
 	out the |storebuf(3uc)| facility or the |snadd(3uc)| facility,
-	or simply create your own using the various |snx(3uc)| 
-	subroutines (and other methods also).  In these subroutines,
-	the length of the supplied buffer for the added-to path is
-	assumed to be MAXPATHLEN (determined dynamically).
+	or simply create your own using the various |snx(3uc)|
+	subroutines (and other methods also).  In the subroutines
+	presented here, the length of the supplied buffer for the
+	added-to path is assumed to be MAXPATHLEN (determined
+	dynamically), and so is not needed as a call argument.
 
 	Extra:
 	The |pathaddw| subroutine is almost equivalent to:
@@ -97,6 +98,8 @@
 
 /* forward references */
 
+static int		local_pathadd(char *,int,int,cchar *,int) noex ;
+
 
 /* local variables */
 
@@ -115,14 +118,8 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	    if (pl >= 0) {
 	        if ((rs = maxpathlen) >= 0) {
 		    cint	plen = rs ;
-	            if ((pl > 0) && (pbuf[pl-1] != '/')) {
-	                rs = storebuf_chr(pbuf,plen,pl,'/') ;
-	                pl += rs ;
-	            }
-	            if (rs >= 0) {
-	                rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
-	                pl += rs ;
-	            }
+		    rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
+		    pl = rs ;
 	        } /* end if (maxpathlen) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -131,22 +128,42 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 /* end subroutine (pathaddw) */
 
 int pathaddx(char *pbuf,int pl,int n,...) noex {
-	va_list		ap ;
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
 	if (pbuf) {
-	    va_begin(ap,n) ;
-	    rs = SR_OK ;
-	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		cchar	*sp = (char *) va_arg(ap,char *) ;
-		rs = pathadd(pbuf,pl,sp) ;
-		len += rs ;
-		pl += rs ;
-	    } /* end for */
-	    va_end(ap) ;
+	    rs = SR_INVALID ;
+	    if (pl >= 0) {
+	        if ((rs = maxpathlen) >= 0) {
+		    va_list	ap ;
+		    cint	plen = rs ;
+	            va_begin(ap,n) ;
+	            for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
+		        cchar	*sp = (char *) va_arg(ap,char *) ;
+		        rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
+		        pl = rs ;
+	            } /* end for */
+	            va_end(ap) ;
+	        } /* end if (maxpathlen) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (pathaddx) */
+
+
+/* local subroutines */
+
+static int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+	int		rs = SR_OK ;
+	if ((pl > 0) && (pbuf[pl-1] != '/')) {
+	    rs = storebuf_chr(pbuf,plen,pl,'/') ;
+	    pl += rs ;
+	}
+	if (rs >= 0) {
+	    rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
+	    pl += rs ;
+	}
+	return (rs >= 0) ? pl : rs ;
+}
+/* end subroutine (local_pathadd) */
 
 
