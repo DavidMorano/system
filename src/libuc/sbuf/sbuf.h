@@ -202,6 +202,9 @@ extern int	sbuf_vprintf(sbuf *,cchar *,va_list) noex ;
 extern int	sbuf_termconseq(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted(sbuf *,cchar *,int) noex ;
 
+static inline int sbuf_str(sbuf *op,cchar *sp) noex {
+	return sbuf_strw(op,sp,-1) ;
+}
 static inline int sbuf_char(sbuf *op,int ch) noex {
 	return sbuf_chr(op,ch) ;
 }
