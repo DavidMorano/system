@@ -76,13 +76,14 @@ template<typename ... Args>
 static inline int lockrw_ctor(lockrw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->readers = 0 ;
 	    op->writers = 0 ;
 	    op->waitwriters = 0 ;
 	    op->waitreaders = 0 ;
+	    op->cvp = nullptr ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->cvp = new(nothrow) ptc) != np) {
 		    rs = SR_OK ;
@@ -127,6 +128,9 @@ static int	lockrw_notready(lockrw *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -236,15 +240,15 @@ int lockrw_unlock(lockrw *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockrw_magic(op)) >= 0) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
-	            if (op->readers > 0) op->readers -= 1 ;
-	            if (op->writers > 0) op->writers -= 1 ;
-	            if ((op->waitreaders > 0) || (op->waitwriters > 0)) {
-	                rs = ptc_broadcast(op->cvp) ;
-	            }
-	            rs1 = ptm_unlock(op->mxp) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mutex-lock) */
+	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	        if (op->readers > 0) op->readers -= 1 ;
+	        if (op->writers > 0) op->writers -= 1 ;
+	        if ((op->waitreaders > 0) || (op->waitwriters > 0)) {
+	            rs = ptc_broadcast(op->cvp) ;
+	        }
+	        rs1 = ptm_unlock(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -255,11 +259,13 @@ int lockrw_readers(lockrw *op) noex {
 	int		rs1 ;
 	int		v = 0 ;
 	if ((rs = lockrw_magic(op)) >= 0) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+		{
 	            v = op->readers ; /* this is really already atomic! */
-	            rs1 = ptm_unlock(op->mxp) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mutex-lock) */
+		}
+	        rs1 = ptm_unlock(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
 }

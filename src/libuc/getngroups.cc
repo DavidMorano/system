@@ -24,13 +24,16 @@
 	getngroupsx
 
 	Description:
-	Here we get the maximum number of supplemtary groups (GIDs)
-	allowed per process.  The number is cached on the first
-	fetch and then accessed from the cache on subsequent requests.
-	Yes, we are multithread safe.  This number (maximum groups)
-	cannot (usually) change without an intervening reboot of
-	the system (thus it being completely acceptable to cache
-	forever).
+	[getngroups] Here we get the maximum number of supplemtary
+	groups (GIDs) allowed per process.  The number is cached
+	on the first fetch and then accessed from the cache on
+	subsequent requests.  Yes, we are multithread safe.  This
+	number (maximum groups) cannot (usually) change without an
+	intervening reboot of the system (thus it being completely
+	acceptable to cache forever).
+	[getngroupsx] The given value is a command:
+		0	return value (cached or otherwise)
+		1	invalidate any cached value
 
 	Synopsis:
 	int getngroups() noex
@@ -93,6 +96,9 @@ namespace {
 /* local variables */
 
 static groupinfo	getngroups_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
