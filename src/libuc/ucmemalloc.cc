@@ -19,8 +19,8 @@
 	one is coding day and night.  The changes are:
 
 	1. I removed support for linking in the |libmalloc| debugging
-	library (was supplied by some vendors).  Find other ways to
-	debug if you have to. There was not really much to this in
+	library (was supplied by some vendor).  Find other ways to
+	debug if you have to.  There was not really much to that in
 	the first place, so I do not think it will be largely missed.
 
 	2. I replaced my own beloved memory usage tracking code
@@ -250,6 +250,16 @@ int uc_malloc(int sz,void *vp) noex {
 }
 /* end subroutine (uc_malloc) */
 
+int uc_calloc(int ne,int esize,void *vp) noex {
+	cint		sz = (ne * esize) ;
+	int		rs ;
+	if ((rs = uc_malloc(sz,vp)) >= 0) {
+	    memset(vp,0,sz) ;
+	}
+	return (rs >= 0) ? sz : rs ;
+}
+/* end subroutine (uc_calloc) */
+
 int uc_valloc(int sz,void *vp) noex {
 	ucmemalloc	*uip = &ucmemalloc_data ;
 	int		rs ;
@@ -261,16 +271,6 @@ int uc_valloc(int sz,void *vp) noex {
 	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_valloc) */
-
-int uc_calloc(int ne,int esize,void *vp) noex {
-	cint		sz = (ne * esize) ;
-	int		rs ;
-	if ((rs = uc_malloc(sz,vp)) >= 0) {
-	    memset(vp,0,sz) ;
-	}
-	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (uc_calloc) */
 
 int uc_realloc(cvoid *cp,int sz,void *vp) noex {
 	ucmemalloc	*uip = &ucmemalloc_data ;
