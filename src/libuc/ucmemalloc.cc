@@ -16,7 +16,7 @@
 
 	= 2011-04-12, David A­D­ Morano
 	I made a few changes for the new decade.  Ya, time flies when
-	one is coding day and night. The changes are:
+	one is coding day and night.  The changes are:
 
 	1. I removed support for linking in the |libmalloc| debugging
 	library (was supplied by some vendors).  Find other ways to
@@ -81,6 +81,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
 #include	<usystem.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
@@ -94,6 +95,12 @@
 
 
 /* local defines */
+
+
+/* namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -154,6 +161,7 @@ namespace {
 	int trackrealloc(cvoid *,int,void *) noex ;
 	int trackfree(cvoid *) noex ;
 	int trackpresent(cvoid *) noex ;	/* track-present */
+	int trackcurenum(ucmallreg_cur *,ucmallreg_ent *) noex ;
 	int trackreg(cvoid *,int) noex ;	/* track-register */
 	int trackrel(cvoid *) noex ;		/* track-release */
 	int trackout(ulong *) noex ;
@@ -162,6 +170,7 @@ namespace {
 	int callrealloc(cvoid *,int,void *) noex ;
 	int callfree(cvoid *,int,void *) noex ;
 	int callpresent(cvoid *,int,void *) noex ;
+	int callcurenum(ucmallreg_cur *,ucmallreg_ent *) noex ;
 	int iinit() noex ; 
 	int ifini() noex ;
 	void atforkbefore() noex {
@@ -311,15 +320,20 @@ int uc_mallstats(ucmemalloc_stats *statp) noex {
 }
 /* end subroutine (uc_mallstats) */
 
-#ifdef	COMMENT
-
 int ucmallreg_curbegin(ucmallreg_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (curp) {
+	    addrset_cur	*acp ;
 	    rs = SR_NOMEM ;
-	    if ((curp->mcp = new(nothrow) addrset_iter) != nullptr) {
-	        rs = SR_OK ;
-	    }
+	    if ((acp = new(nothrow) addrset_cur) != nullptr) {
+	        addrset		*aop = &ucmemalloc_data.mt ;
+		if ((rs = aop->curbegin(acp)) >= 0) {
+		   curp->mcp = acp ;
+		}
+		if (rs < 0) {
+		    delete acp ;
+		}
+	    } /* end if (new-addrset_cur) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -327,10 +341,19 @@ int ucmallreg_curbegin(ucmallreg_cur *curp) noex {
 
 int ucmallreg_curend(ucmallreg_cur *curp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (curp) {
 	    rs = SR_OK ;
 	    if (curp->mcp) {
-		delete curp->mcp ;
+	        addrset		*aop = &ucmemalloc_data.mt ;
+	        addrset_cur	*acp = (addrset_cur *) curp->mcp ;
+		{
+		    rs1 = aop->curend(acp) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    delete acp ;
+		}
 		curp->mcp = nullptr ;
 	    }
 	} /* end if (non-null) */
@@ -340,42 +363,12 @@ int ucmallreg_curend(ucmallreg_cur *curp) noex {
 
 int ucmallreg_curenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	if (curp && rp) {
-	    int		rsize = 0 ;
-	    ucmemalloc	*uip = &ucmemalloc_data ;
-	    if ((rs = ucmemalloc_init()) >= 0) {
-	        if ((rs = uc_forklockbegin(-1)) >= 0) {
-	            if ((rs = mx.lockbegin) >= 0) {
-	                cint	ci = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	                if (ci < uip->regs_total) {
-	                    while (ci < uip->regs_total) {
-	                        if (uip->regs[ci].a) {
-	                            rp->addr = uip->regs[ci].a ;
-	                            rp->size = uip->regs[ci].size ;
-	                            rsize = uip->regs[ci].size ;
-	                            curp->i = ci ;
-	                            break ;
-	                        }
-	                        ci += 1 ;
-	                    } /* end while */
-	                    if (ci >= uip->regs_total) rs = SR_NOTFOUND ;
-	                } else {
-	                    rs = SR_NOTFOUND ;
-		        }
-	                rs1 = mx.lockend ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (mutex) */
-	            rs1 = uc_forklockend() ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (forklock) */
-	    } /* end if (init) */
+	    rs = ucmemalloc_data.trackcurenum(curp,rp) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? rsize : rs ;
+	return rs ;
 }
 /* end subroutine (ucmallreg_curenum) */
-
-#endif /* COMMENT */
 
 
 /* local subroutines */
@@ -574,6 +567,28 @@ int ucmemalloc::trackpresent(cvoid *cp) noex {
 }
 /* end subroutine (ucmemalloc::trackpresent) */
 
+int ucmemalloc::trackcurenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		rsize = 0 ;
+	if ((rs = init) >= 0) {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) {
+	        if ((rs = mx.lockbegin) >= 0) {
+		    {
+			rs = callcurenum(curp,rp) ;
+			rsize = rs ;
+		    }
+	            rs1 = mx.lockend ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (mutex) */
+	        rs1 = uc_forklockend() ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (forklock) */
+	} /* end if (init) */
+	return (rs >= 0) ? rsize : rs ;
+}
+/* end method (ucmemalloc::trackcurenum) */
+
 int ucmemalloc::callxalloc(cvoid *,int sz,void *vp) noex {
 	int		rs ;
 	int		rv = 0 ;
@@ -597,18 +612,16 @@ int ucmemalloc::callrealloc(cvoid *cp,int sz,void *vp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = uc_librealloc(cp,sz,vp)) >= 0) {
-	    caddr_t	a = *((caddr_t *) vp) ;
-	    rv = rs ;
-	    {
-		rs1 = trackrel(cp) ;
-		if (rs >= 0) rs = rs1 ;
-	    }
-	    {
-		rs1 = trackreg(a,sz) ;
-		if (rs >= 0) rs = rs1 ;
-	    }
-	} /* end if (librealloc) */
+	if ((rs = trackrel(cp)) >= 0) {
+	    if ((rs = uc_librealloc(cp,sz,vp)) >= 0) {
+	        caddr_t	a = *((caddr_t *) vp) ;
+	        rv = rs ;
+	        {
+		    rs1 = trackreg(a,sz) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end if (librealloc) */
+	} /* end if (trackrel) */
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (ucmemalloc::callrealloc) */
@@ -636,6 +649,21 @@ int ucmemalloc::callpresent(cvoid *cp,int,void *) noex {
 }
 /* end subroutine (ucmemalloc::callpresent) */
 
+int ucmemalloc::callcurenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
+	addrset		*aop = &mt ;
+	addrset_cur	*acp = (addrset_cur *) curp->mcp ;
+	addrset_ent	e{} ;
+	int		rs ;
+	int		rsize = 0 ;
+	if ((rs = aop->curenum(acp,&e)) >= 0) {
+	    rp->addr = caddr_t(e.addr) ;
+	    rp->asize = e.asize ;
+	    rsize = intsat(e.asize) ;
+	} /* end if */
+	return (rs >= 0) ? rsize : rs ;
+}
+/* end subroutine (ucmemalloc::callcurenum) */
+
 /* track-register (address-size) */
 int ucmemalloc::trackreg(cvoid *a,int sz) noex {
 	int		rs = SR_OK ;
@@ -660,7 +688,7 @@ int ucmemalloc::trackout(ulong *rp) noex {
 	if (rp) {
 	    *rp = st.out_size ;
 	}
-	return int(st.out_size & INT_MAX) ;
+	return intsat(st.out_size) ;
 }
 /* end subroutine (ucmemalloc::trackout) */
 
@@ -672,7 +700,7 @@ int ucmemalloc::mallstats(ucmemalloc_stats *statp) noex {
 	    if ((rs = mx.lockbegin) >= 0) {
 		{
 		    *statp = st ;
-	    	    rv = int(st.out_size & INT_MAX) ;
+	    	    rv = intsat(st.out_size) ;
 		}
 	        rs1 = mx.lockend ;
 	        if (rs >= 0) rs = rs1 ;

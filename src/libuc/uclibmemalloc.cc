@@ -64,8 +64,8 @@ namespace {
     struct uclibmemalloc ;
     typedef int (uclibmemalloc::*uclibmalloc_m)(int,void *) noex ;
     struct uclibmemalloc {
-	uclibmalloc_m		m ;
-	cvoid			*cp ;
+	uclibmalloc_m	m ;
+	cvoid		*cp ;
 	uclibmemalloc(cvoid *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
 	int stdmalloc(int,void *) noex ;
