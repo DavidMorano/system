@@ -802,7 +802,7 @@ libmallocxx.o:		libmallocxx.cc libmallocxx.h
 mapblock.o:		mapblock.cc mapblock.hh
 memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
 addrset.o:		addrset.cc addrset.hh
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h addrset.hh
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h addrset.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management
