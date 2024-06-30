@@ -33,6 +33,7 @@
 				2 -> environment variable 'HZ'
 				3 -> 'CLK_TCK' define (or facility) only
 				4 -> |sysconf(3c)| 'CLK_TCK' only
+				4 -> guess value
 
 	Returns:
 	>0		HZ value
