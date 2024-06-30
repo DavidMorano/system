@@ -158,10 +158,8 @@ int dw_start(DW *dwp,cchar *dirname) noex {
 /* end subroutine (dw_start) */
 
 int dw_finish(DW *dwp) noex {
-	IENTRY		*iep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
 
 	if (dwp == nullptr) return SR_FAULT ;
 
@@ -169,16 +167,18 @@ int dw_finish(DW *dwp) noex {
 
 /* directory entries */
 
-	for (i = 0 ; vecobj_get(&dwp->e,i,&iep) >= 0 ; i += 1) {
-	    if (iep != nullptr) {
+	void		*vp{} ;
+	for (int i = 0 ; vecobj_get(&dwp->e,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		IENTRY	*iep = (IENTRY *) vp ;
 	        rs1 = ientry_finish(iep,dwp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
-
-	rs1 = vecobj_finish(&dwp->e) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = vecobj_finish(&dwp->e) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	if (dwp->dirname != nullptr) {
 	    rs1 = uc_free(dwp->dirname) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -224,7 +224,7 @@ int dw_curend(DW *dwp,DW_CUR *cp) noex {
 /* end subroutine (dw_curend) */
 
 int dw_enum(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
-	IENTRY		*iep ;
+	IENTRY		*iep = nullptr ;
 	int		rs ;
 	int		i ;
 	int		nlen ;
@@ -241,24 +241,24 @@ int dw_enum(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
 	    i = cp->i + 1 ;
 	}
 
-	while ((rs = vecobj_get(&dwp->e,i,&iep)) >= 0) {
-	    if (iep != nullptr) break ;
+	void		*vp{} ;
+	while ((rs = vecobj_get(&dwp->e,i,&vp)) >= 0) {
+	    iep = (IENTRY *) vp ;
+	    if (vp) break ;
 	    i += 1 ;
 	} /* end while */
 
-	if (rs >= 0) {
-
-	    if (dep != nullptr) {
+	if ((rs >= 0) && iep) {
+	    if (dep) {
 	        rs = entry_load(dep,iep) ;
 	    }
-
 	    nlen = rs ;
-	    if ((rs >= 0) && (cp != nullptr))
+	    if ((rs >= 0) && cp) {
 	        cp->i = i ;
-
+	    }
 	} /* end if (ok) */
 
-	if ((cp != nullptr) && (rs >= 0)) {
+	if ((rs >= 0) && cp) {
 	    cp->i = i ;
 	}
 
@@ -267,18 +267,26 @@ int dw_enum(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
 /* end subroutine (dw_enum) */
 
 int dw_del(DW *dwp,DW_CUR *cp) noex {
-	IENTRY		*iep = nullptr ;
 	int		rs ;
+	int		rs1 ;
 
 	if (dwp == nullptr) return SR_FAULT ;
 	if (cp == nullptr) return SR_FAULT ;
 
 	if (dwp->magic != DW_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vecobj_get(&dwp->e,cp->i,&iep)) >= 0) {
-	    if (iep != nullptr) {
-	        ientry_finish(iep,dwp) ;
-	        rs = vecobj_del(&dwp->e,cp->i) ;
+	void		*vp{} ;
+	if ((rs = vecobj_get(&dwp->e,cp->i,&vp)) >= 0) {
+	    if (vp) {
+		IENTRY	*iep = (IENTRY *) vp ;
+		{
+	            rs1 = ientry_finish(iep,dwp) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = vecobj_del(&dwp->e,cp->i) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
 	    }
 	} /* end if */
 
@@ -287,7 +295,8 @@ int dw_del(DW *dwp,DW_CUR *cp) noex {
 /* end subroutine (dw_del) */
 
 int dw_find(DW *dwp,cchar *name,DW_ENT *dep) noex {
-	IENTRY		ie, *iep ;
+	IENTRY		ie{} ;
+	IENTRY		*iep = nullptr ;
 	int		rs ;
 	int		i = 0 ;
 
@@ -298,20 +307,23 @@ int dw_find(DW *dwp,cchar *name,DW_ENT *dep) noex {
 
 	if (name[0] == '\0') return SR_NOTFOUND ;
 
+	void		*vp{} ;
 #if	CF_FNAMECMP
 	ie.name = (char *) name ;
-	rs = vecobj_search(&dwp->e,&ie,fnamecmp,&iep) ;
+	if ((rs = vecobj_search(&dwp->e,&ie,fnamecmp,&vp) {
+	    iep = (IENTRY *) vp ;
+	}
 #else /* CF_FNAMECMP */
-	for (i = 0 ; (rs = vecobj_get(&dwp->e,i,&iep)) >= 0 ; i += 1) {
-	    if (iep != nullptr) {
-
+	for (i = 0 ; (rs = vecobj_get(&dwp->e,i,&vp)) >= 0 ; i += 1) {
+	    if (vp) {
+		iep = (IENTRY *) vp ;
 	        if (strcmp(name,iep->name) == 0) break ;
 
 	    }
 	} /* end for (looping through entries) */
 #endif /* CF_FNAMECMP */
 
-	if ((rs >= 0) && (dep != nullptr)) {
+	if ((rs >= 0) && dep && iep) {
 	    rs = entry_load(dep,iep) ;
 	}
 
@@ -321,7 +333,7 @@ int dw_find(DW *dwp,cchar *name,DW_ENT *dep) noex {
 
 /* enumerate those entries that are "checkable" */
 int dw_enumcheckable(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
-	IENTRY		*iep ;
+	IENTRY		*iep = nullptr ;
 	int		rs ;
 	int		i ;
 
@@ -337,20 +349,21 @@ int dw_enumcheckable(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
 	    i = cp->i + 1 ;
 	}
 
-	while ((rs = vecobj_get(&dwp->e,i,&iep)) >= 0) {
-	    if ((iep != nullptr) && (iep->state == DW_SCHECK)) break ;
+	while ((rs = vecobj_get(&dwp->e,i,&vp)) >= 0) {
+	    if (vp) {
+		iep = (IENTRY *) vp ;
+		if (iep->state == DW_SCHECK) break ;
+	    }
 	    i += 1 ;
 	} /* end while */
 
 	if (rs >= 0) {
-
-	    if (dep != nullptr) {
+	    if (dep && iep) {
 	        rs = entry_load(dep,iep) ;
 	    }
-
-	    if ((rs >= 0) && (cp != nullptr))
+	    if ((rs >= 0) && cp) {
 	        cp->i = i ;
-
+	    }
 	} /* end if */
 
 	return (rs >= 0) ? i : rs ;
