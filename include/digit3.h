@@ -1,9 +1,7 @@
 /* digit3 HEADER */
 /* lang=C20 */
 
-/* format a number for a three-column-wide field fpr the VMAIL program */
-/* version %I% last-modified %G% */
-
+/* format a number for a three-column-wide field for the VMAIL program */
 /* version %I% last-modified %G% */
 
 

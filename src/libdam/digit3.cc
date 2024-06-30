@@ -1,7 +1,7 @@
 /* digit3 SUPPORT */
 /* lang=C++20 */
 
-/* format a number for a three-column-wide field fpr the VMAIL program */
+/* format a number for a three-column-wide field for the VMAIL program */
 /* version %I% last-modified %G% */
 
 
@@ -9,7 +9,8 @@
 
 	= 1992-03-01, Walter Pitio
 	This code module was originally written (to bring some
-	sanity to the way large numbers of lines are displayed).
+	sanity to the way large numbers of lines are displayed
+	within the VMAIL program).
 
 	= 1992-03-10, David A­D­ Morano
 	This code module was modified for integration for use within
@@ -27,15 +28,15 @@
 	Description:
 	This subroutine creates a little string (stored in a
 	caller-supplied buffer) that indicates the specified number
-	passed. The number is supposed to be the number of lines
+	passed.  The number is supposed to be the number of lines
 	in a message, but that does not really matter to us what
 	it represents.
 
 	Synopsis:
-	int digit3(char *str_ptr,int number) noex
+	int digit3(char *dbuf,int number) noex
 
 	Arguments:
-	str_ptr		result buffer pointer (to store resulting string)
+	dbuf		result buffer pointer (to store resulting string)
 	number		number to represent in buffer
 
 	Returns:
@@ -57,13 +58,13 @@
 
 /* local defines */
 
-#define	DIGSTRLEN	3
+#define	DIGSTRLEN	3		/* field-width (columns) in VMAIL */
 
 
 /* external subroutines */
 
 extern "C" {
-    extern int	bufprintf(char *,int,cchar *,...) noex ;
+    extern int	snwprintf(char *,int,cchar *,...) noex ;
 }
 
 
@@ -78,38 +79,39 @@ extern "C" {
 
 /* local variables */
 
+constexpr int		dlen = DIGSTRLEN ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int digit3(char *str_ptr,int number) noex {
-	int	rs = SR_OK ;
-	int	temp = number ;
-	int	digits ;
+int digit3(char *dbuf,int number) noex {
+	int		rs = SR_OK ;
+	int		temp = number ;
+	int		digits = 0 ;
 
 /* Handle negative and zero */
 
 	if (number < 0) {
 
-	    rs = sncpy1(str_ptr,DIGSTRLEN,"---") ;
+	    rs = sncpy1(dbuf,dlen,"---") ;
 
 	} else if (number == 0) {
 
-	    rs = sncpy1(str_ptr,DIGSTRLEN,"  0") ;
+	    rs = sncpy1(dbuf,dlen,"  0") ;
 
 	} else {
 
 /* Count the number of digits in the number */
 
-	    digits = 0;		/* Initialize number of digits */
 	    while (temp > 0) {
 	        temp /= 10 ;
-	        ++digits ;
-	    }
+	        digits += 1 ;
+	    } /* end while */
 
-/* No process output based on number of digits in number */
+/* process output based on number of digits in number */
 
 	    switch (digits) {
 
@@ -117,40 +119,40 @@ int digit3(char *str_ptr,int number) noex {
 	    case 1:
 	    case 2:
 	    case 3:
-	        rs = bufprintf(str_ptr,DIGSTRLEN,"%3u",number) ;
+	        rs = snwprintf(dbuf,dlen,"%3u",number) ;
 	        break ;
 
 /*	1,000 - 9,999:			" nK" */
 /*	10,000 - 99,999:		"nnK" */
 	    case 4:
 	    case 5:
-	        rs = bufprintf(str_ptr,DIGSTRLEN,"%2uk",(number/1000)) ;
+	        rs = snwprintf(dbuf,dlen,"%2dk",(number/1000)) ;
 	        break ;
 
 /* 	100,000 - 999,999:		".nM" */
 	    case 6:
-	        rs = bufprintf(str_ptr,DIGSTRLEN,".%1um",(number/100000)) ;
+	        rs = snwprintf(dbuf,dlen,".%1dm",(number/100000)) ;
 	        break ;
 
 /*	1,000,000 - 9,999,999:		" nM" */
 /*	10,000,000 - 99,999,999:	"nnM" */
 	    case 7:
 	    case 8:
-	        rs = bufprintf(str_ptr,DIGSTRLEN,"%2um",(number/1000000)) ;
+	        rs = snwprintf(dbuf,dlen,"%2dm",(number/1000000)) ;
 	        break ;
 
 /*	100,000,000 - 999,999,999:	".nG" */
 	    case 9:
-	        rs = bufprintf(str_ptr,DIGSTRLEN,".%1dg",(number/100000000)) ;
+	        rs = snwprintf(dbuf,dlen,".%1dg",(number/100000000)) ;
 	        break ;
 
 /*	1,000,000,000 - max long int:	" nG" */
 	    case 10:
-	        rs = bufprintf(str_ptr,DIGSTRLEN,"%2ug",(number/1000000000)) ;
+	        rs = snwprintf(dbuf,dlen,"%2dg",(number/1000000000)) ;
 	        break ;
 
 	    default:
-	        rs = sncpy1(str_ptr,DIGSTRLEN,"***") ;
+	        rs = sncpy1(dbuf,dlen,"***") ;
 	        break ;
 
 	    } /* end switch */
@@ -158,7 +160,7 @@ int digit3(char *str_ptr,int number) noex {
 	} /* end if */
 
 	if (rs < 0)
-	    str_ptr[0] = '\0' ;
+	    dbuf[0] = '\0' ;
 
 	return rs ;
 }
