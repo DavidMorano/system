@@ -4,12 +4,10 @@
 /* program to get time from a network time server host */
 /* version %I% last-modified %G% */
 
-#define	CF_FETCHPROTO	0		/* fetch protocol (no!) */
 #define	CF_USEUDP	1		/* use UDP */
 #define	CF_UDPMUX	1		/* pretend using UDPMUX */
 #define	CF_SOLARIS	1		/* broken Solaris */
 #define	CF_CONNECTUDP	0		/* make UDP connection */
-#define	CF_SLEEP	0		/* debug-sleep */
 
 /* revision history:
 
@@ -23,7 +21,7 @@
 /*******************************************************************************
 
 	Name:
-	nettime
+	getnettime
 
 	Description:
 	This subroutine will get the time-of-day from a time server
@@ -36,7 +34,7 @@
 	time in seconds since Jan 1, 1970 (the UNIX epoch).
 
 	Synopsis:
-	int nettime(nettime *ntp,int proto,int af,cc *hn,cc *svc,int to)
+	int getnettime(nettime *ntp,int proto,int af,cc *hn,cc *svc,int to)
 
 	Arguments:
 	ntp		pointer to result structure
@@ -67,12 +65,15 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getprotofamily.h>
+#include	<dialtcp.h>
 #include	<hostaddr.h>
 #include	<sockaddress.h>
 #include	<vechand.h>
 #include	<sbuf.h>
 #include	<cthex.h>
-#include	<localmisc.h>
+#include	<sncpyx.h>
+#include	<localmisc.h>		/* |MAXPATHLEN| */
 
 #include	"nettime.h"
 
@@ -84,7 +85,6 @@
 #endif
 
 #define	NETBUFLEN	1024
-#define	HEXBUFLEN	100
 
 #define	PRINTADDRLEN	100
 
@@ -101,8 +101,6 @@
 #define	NYEARS_CENTURY	100
 #endif
 
-#define	NETTIME		struct nettime
-
 #ifndef	INETSVC_TIME
 #define	INETSVC_TIME	"time"
 #endif
@@ -111,17 +109,10 @@
 
 #define	NTRIES		2
 
+#define	UDPARGS		struct udpargs
+
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matostr(cchar **,cchar *,int) ;
-extern int	getprotofamily(int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -132,42 +123,42 @@ extern char	*timestr_logz(time_t,char *) ;
 struct udpargs {
 	cchar		*hostname ;
 	cchar		*svc ;
-	struct nettime	*ntp ;
-	TIMECAL	*nsp, *nep ;
+	nettime		*ntp ;
+	TIMEVAL		*nsp, *nep ;
 	int		proto ;
 	int		pf ;
 	int		af ;
 	int		fd ;
 	int		to ;
 	int		c ;
-} ;
+} ; /* end struct (udpargs) */
 
 
 /* forward references */
 
-static int	nettime_tcp(NETTIME *,int,cchar *,cchar *,int) ;
-static int	nettime_udp(NETTIME *,int,cchar *,cchar *,int) ;
-static int	nettime_udptrythem(struct udpargs *,char *) ;
-static int	nettime_udptrysome(struct udpargs *,char *,
-			VECHAND *,HOSTADDR *,int) ;
-static int	nettime_udptryone(struct udpargs *,char *,
-			ADDRINFO *) ;
-static int	nettime_udptryoner(struct udpargs *,char *,
-			ADDRINFO *,int) ;
+static int	nettime_tcp(NETTIME *,int,cchar *,cchar *,int) noex ;
+static int	nettime_udp(NETTIME *,int,cchar *,cchar *,int) noex ;
+static int	nettime_udptrythem(UDPARGS *,char *) noex ;
+static int	nettime_udptrysome(UDPARGS *,char *,
+			vechand *,HOSTADDR *,int) noex ;
+static int	nettime_udptryone(UDPARGS *,char *,
+			ADDRINFO *) noex ;
+static int	nettime_udptryoner(UDPARGS *,char *,
+			ADDRINFO *,int) noex ;
 
-static uint64_t	gettime_inet(cchar *) ;
+static uint64_t	gettime_inet(cchar *) noex ;
 
-static uint64_t	utime_timeval(TIMECAL *) ;
-static uint64_t	utime_tcpcalc(uint64_t,uint64_t) ;
-static uint64_t	utime_udpcalc(uint64_t,uint64_t) ;
+static uint64_t	utime_timeval(TIMEVAL *) noex ;
+static uint64_t	utime_tcpcalc(uint64_t,uint64_t) noex ;
+static uint64_t	utime_udpcalc(uint64_t,uint64_t) noex ;
 
-static int	tv_loadusec(TIMECAL *,int64_t) ;
+static int	tv_loadusec(TIMEVAL *,int64_t) noex ;
 
-static int	vechand_already(VECHAND *,void *) ;
+static int	vechand_already(vechand *,void *) noex ;
 
-static int	connagain(int) ;
+static int	connagain(int) noex ;
 
-static int	isaddrsame(cvoid *,cvoid *) ;
+static int	isaddrsame(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
@@ -190,7 +181,7 @@ constexpr int	connagains[] = {
 
 /* exported subroutines */
 
-int nettime(nettime *ntp,int proto,int af,cc *hostname,cc *svc,int to) noex {
+int getnettime(nettime *ntp,int proto,int af,cc *hostname,cc *svc,int to) noex {
 	int		rs = SR_OK ;
 	int		f ;
 	int		f_got = false ;
@@ -239,9 +230,7 @@ static int nettime_udp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 
 #if	CF_USEUDP
 	{
-	    struct udpargs	ua ;
-
-	    memset(&ua,0,sizeof(struct udpargs)) ;
+	    UDPARGS	ua{} ;
 	    ua.ntp = ntp ;
 	    ua.proto = ntp->proto ;
 	    ua.af = af ;
@@ -369,39 +358,17 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 
 #if	CF_USEUDP
 
-static int nettime_udptrythem(uap,timebuf)
-struct udpargs	*uap ;
-char		timebuf[] ;
-{
-	ADDRINFO	hint ;
-	VECHAND		alist ;
+static int nettime_udptrythem(UDPARGS *uap,char *timebuf) noex {
+	ADDRINFO	hint{} ;
+	vechand		alist ;
 	HOSTADDR	ha ;
+	cint		proto = IPPROTO_UDP ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		proto = 0 ;
 	int		pf ;
 	int		f_got = false ;
 
-/* get the protocol number */
-
-#if	CF_FETCHPROTO
-	{
-	    cchar	*pn = PROTONAME_UDP ;
-	    if ((rs = getproto_name(pn,-1)) >= 0) {
-	        proto = rs ;
-	    }
-	}
-#else
-	proto = IPPROTO_UDP ;
-#endif /* CF_FETCHPROTO */
-
 	uap->proto = proto ;
-
-	if (rs < 0) goto ret0 ;
-
-/* setup search restrictions */
-
-	memset(&hint,0,sizeof(ADDRINFO)) ;
 	hint.ai_protocol = proto ;
 
 	if (uap->af >= 0) {
@@ -450,20 +417,13 @@ char		timebuf[] ;
 	    vechand_finish(&alist) ;
 	} /* end if (vechand) */
 
-ret0:
 	return (rs >= 0) ? f_got : rs ;
 }
 /* end subroutine (nettime_udptrythem) */
 
-
-static int nettime_udptrysome(uap,timebuf,alp,hap,pf)
-struct udpargs	*uap ;
-char		timebuf[] ;
-VECHAND		*alp ;
-HOSTADDR	*hap ;
-int		pf ;
-{
-	HOSTADDR_CUR	cur ;
+static int nettime_udptrysome(UDPARGS *uap,char *timebuf,vechand *alp,
+		HOSTADDR *hap,int pf) noex {
+	hostaddr_cur	cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_got = false ;
@@ -506,11 +466,7 @@ int		pf ;
 }
 /* end subroutine (nettime_udptrysome) */
 
-static int nettime_udptryone(uap,timebuf,aip)
-struct udpargs	*uap ;
-char		timebuf[] ;
-ADDRINFO	*aip ;
-{
+static int nettime_udptryone(UDPARGS *uap,char *timebuf,ADDRINFO *aip) noex {
 	int		rs = SR_OK ;
 	int		pf ;
 	int		st ;
@@ -551,14 +507,9 @@ ADDRINFO	*aip ;
 }
 /* end subroutine (nettime_udptryone) */
 
-
-static int nettime_udptryoner(uap,timebuf,aip,fd)
-struct udpargs	*uap ;
-char		timebuf[] ;
-ADDRINFO	*aip ;
-int		fd ;
-{
-	SOCKADDRESS	from ;
+static int nettime_udptryoner(UDPARGS *uap,char *timebuf,
+		ADDRINFO *aip,int fd) noex {
+	sockaddress	from ;
 	int		rs = SR_OK ;
 	int		to = uap->to ;
 	int		fromlen ;
@@ -594,7 +545,7 @@ int		fd ;
 	    c = 0 ;
 	    while (rs >= 0) {
 
-	        fromlen = sizeof(SOCKADDRESS) ;
+	        fromlen = sizeof(sockaddress) ;
 	        rs = uc_recvfrome(fd,netbuf,NETBUFLEN,0,&from,&fromlen,to,0) ;
 	        netlen = rs ;
 	        if (rs < 0) break ;
@@ -661,7 +612,7 @@ static uint64_t utime_timeval(TIMEVAL *tvp) noex {
 }
 /* end subroutine (utime_timeval) */
 
-static uint64_t utime_tcpcalc(uint64_t uti2,uint64_t uti1) noex (
+static uint64_t utime_tcpcalc(uint64_t uti2,uint64_t uti1) noex {
 	uint64_t	utid ;
 	uint64_t	r ;
 	double		d ;
@@ -676,9 +627,7 @@ static uint64_t utime_tcpcalc(uint64_t uti2,uint64_t uti1) noex (
 }
 /* end subroutine (utime_tcpcalc) */
 
-
-static uint64_t utime_udpcalc(uint64_t uti2,uint64_t uti1)
-{
+static uint64_t utime_udpcalc(uint64_t uti2,uint64_t uti1) noex {
 	uint64_t	utid ;
 	uint64_t	r ;
 	double		d ;
@@ -693,7 +642,7 @@ static uint64_t utime_udpcalc(uint64_t uti2,uint64_t uti1)
 }
 /* end subroutine (utime_udpcalc) */
 
-static int tv_loadusec(TIMECAL *tvp,int64_t uti) noex {
+static int tv_loadusec(TIMEVAL *tvp,int64_t uti) noex {
 	if (tvp == nullptr) return SR_FAULT ;
 
 	tvp->tv_sec = (uti / 1000000) ;
@@ -702,7 +651,7 @@ static int tv_loadusec(TIMECAL *tvp,int64_t uti) noex {
 }
 /* end subroutine (tv_loadusec) */
 
-static int vechand_already(VECHAND *alp,void *aip) noex {
+static int vechand_already(vechand *alp,void *aip) noex {
 	int		rs ;
 	void		*ep ;
 	for (int i = 0 ; (rs = vechand_get(alp,i,&ep)) >= 0 ; i += 1) {
@@ -725,8 +674,8 @@ static int connagain(int rs) noex {
 /* end subroutine (connagain) */
 
 static int isaddrsame(cvoid *addr1,cvoid *addr2) noex {
-	SOCKADDRESS	*sa1p = (SOCKADDRESS *) addr1 ;
-	SOCKADDRESS	*sa2p = (SOCKADDRESS *) addr2 ;
+	sockaddress	*sa1p = (sockaddress *) addr1 ;
+	sockaddress	*sa2p = (sockaddress *) addr2 ;
 	uint		af1, af2 ;
 	uint		p1, p2 ;
 	int		rs = SR_OK ;
@@ -767,13 +716,9 @@ ret0:
 
 #ifdef	COMMENT
 
-static int mkprintaddr(printaddr,printaddrlen,ssap)
-char		printaddr[] ;
-int		printaddrlen ;
-struct sockaddr	*ssap ;
-{
-	SOCKADDRESS	*sap = (SOCKADDRESS *) ssap ;
-	SBUF		b ;
+static int mkprintaddr(char *printaddr,int printaddrlen,SOCKADDR *ssap) noex {
+	sockaddress	*sap = (sockaddress *) ssap ;
+	sbuf		b ;
 	uint		af ;
 	uint		port ;
 	uint		flow ;
@@ -851,13 +796,9 @@ struct sockaddr	*ssap ;
 }
 /* end subroutine (mkprintaddr) */
 
-static int mkprintscope(printaddr,printaddrlen,ssap)
-char		printaddr[] ;
-int		printaddrlen ;
-struct sockaddr	*ssap ;
-{
-	SOCKADDRESS	*sap ;
-	SBUF		b ;
+static int mkprintscope(char *printaddr,int printaddrlen,SOCKADDR *ssap) noex {
+	sockaddress	*sap ;
+	sbuf		b ;
 	uint		af ;
 	uint		scope, extra ;
 	int		rs = SR_OK ;
@@ -866,7 +807,7 @@ struct sockaddr	*ssap ;
 	int		f_scope = false ;
 
 	printaddr[0] = '\0' ;
-	sap = (SOCKADDRESS *) ssap ;
+	sap = (sockaddress *) ssap ;
 
 	if (rs >= 0) {
 	    rs = sockaddress_getlen(sap) ;

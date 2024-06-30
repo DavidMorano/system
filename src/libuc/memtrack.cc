@@ -87,6 +87,9 @@ using std::nothrow ;			/* constant */
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -136,8 +139,7 @@ int memtrack::present(cvoid *addr) noex {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
-		ent	e ;
-		if ((rs = tp->get(a,&e)) >= 0) {
+		if (ent e{} ; (rs = tp->get(a,&e)) >= 0) {
 		    rs = e.asize ;
 		}
 	    } /* end if (valid addr) */
@@ -152,8 +154,7 @@ int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
-		ent	e ;
-		if ((rs = tp->get(a,&e)) >= 0) {
+		if (ent e{} ; (rs = tp->get(a,&e)) >= 0) {
 		    rs = e.asize ;
 		    if (ep) *ep = e ;
 		}
@@ -213,7 +214,7 @@ int memtrack::icount() noex {
 
 void memtrack::dtor() noex {
 	ulogerror("memtrack",SR_BUGCHECK,"dtor called") ;
-	if (magic) {
+	if (magic == memtrack_magic) {
 	    cint	rs = ifinish() ;
 	    if (rs < 0) {
 		ulogerror("memtrack",rs,"dtor-finish") ;
@@ -224,7 +225,7 @@ void memtrack::dtor() noex {
 
 int memtrack_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if ((w >= 0) && op) {
+	if (op && (w >= 0)) {
 	    switch (w) {
 	    case memtrackmem_start:
 		rs = op->istart(a) ;

@@ -28,7 +28,7 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<sncpyx.h>
@@ -45,6 +45,7 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -159,7 +160,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,sp,sbp)) >= 0) {
 	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
-	    const nullptr_t	np{} ;
+	    cnullptr		np{} ;
 	    cint		rsn = SR_NOTFOUND ;
 	    if ((rs = vecobj_search(op->dlistp,&e,vcmpdevino,np)) == rsn) {
 	        dev_t	dev = sbp->st_dev ;
