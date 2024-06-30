@@ -36,6 +36,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<fsdir.h>
@@ -102,6 +104,10 @@ static int	fnamecmp(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
+
+static bufsizevar		maxnamelen(getbufsize_mn) ;
+
+constexpr int			rsn = SR_NOTFOUND ;
 
 
 /* exported variables */
@@ -575,7 +581,7 @@ static int dw_scanfull(DW *dwp) noex {
 	fsdir_ent	ds ;
 	time_t		daytime = time(nullptr) ;
 	int		rs ;
-	int		nlen ;
+	int		rs1 ;
 	int		n = 0 ;
 	char		dnamebuf[MAXPATHLEN + 1], *dbp ;
 
@@ -585,13 +591,15 @@ static int dw_scanfull(DW *dwp) noex {
 
 /* "do" the outer directory */
 
+	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	    cint	nlen = 0 ;
 	if ((rs = fsdir_open(&d,dwp->dirname)) >= 0) {
-
 	    dbp = dnamebuf ;
 	    dbp = strwcpy(dbp,dwp->dirname,-1) ;
 
 	    *dbp++ = '/' ;
-	    while ((nlen = fsdir_read(&d,&ds)) > 0) {
+	    while ((rs = fsdir_read(&d,&ds,nbuf,nlen)) > 0) {
+	    cint	nl = rs ;
 	        if (ds.name[0] == '.') continue ;
 
 	        {
@@ -610,8 +618,10 @@ static int dw_scanfull(DW *dwp) noex {
 	            }
 
 	            if (rs >= 0) {
-	                if (vecstr_find(&dwp->subdirs,dbp) == SR_NOTFOUND)
-	                    rs = vecstr_add(&dwp->subdirs,dbp,nlen) ;
+			vecstr	*slp = &dwp->subdirs ;
+	                if (vecstr_find(slp,dbp) == rsn) {
+	                    rs = vecstr_add(slp,dbp,nl) ;
+			}
 	            }
 
 	        } else if (dw_findi(dwp,dbp,&iep) < 0) {
@@ -633,8 +643,12 @@ static int dw_scanfull(DW *dwp) noex {
 
 	    } /* end while (reading directory entries) */
 
-	    fsdir_close(&d) ;
+	    rs1 = fsdir_close(&d) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (outer directory) */
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 
 /* do the subdirectories */
 
@@ -660,7 +674,7 @@ static int dw_scansub(DW *dwp,cchar *subdname,time_t daytime) noex {
 	fsdir_ent	ds ;
 	int		rs ;
 	int		rs1 ;
-	int		nlen, dlen ;
+	int		dlen ;
 	int		n = 0 ;
 	char		dnamebuf[MAXPATHLEN + 1], *dbp ;
 	char		*sdbp ;
@@ -686,13 +700,16 @@ static int dw_scansub(DW *dwp,cchar *subdname,time_t daytime) noex {
 
 /* "do" the subdirectory */
 
+	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	    cint	nlen = 0 ;
 	if ((rs = fsdir_open(&d,dnamebuf)) >= 0) {
 	    cint	rsn = SR_NOENT ;
 
-	    while ((nlen = fsdir_read(&d,&ds)) > 0) {
+	    while ((rs = fsdir_read(&d,&ds,nbuf,nlen)) > 0) {
+		cint	nl = rs ;
 	        if (ds.name[0] == '.') continue ;
 
-	        dlen = strwcpy(sdbp,ds.name,nlen) - dbp ;
+	        dlen = strwcpy(sdbp,ds.name,nl) - dbp ;
 
 	        if (u_stat(dnamebuf,&sb) < 0) continue ;
 
@@ -705,12 +722,13 @@ static int dw_scansub(DW *dwp,cchar *subdname,time_t daytime) noex {
 	            }
 
 	            if (rs >= 0) {
-	                if ((rs = vecstr_find(&dwp->subdirs,dbp)) == rsn) {
-	                    rs = vecstr_add(&dwp->subdirs,dbp,dlen) ;
+			vecstr	*slp = &dwp->subdirs ;
+	                if ((rs = vecstr_find(slp,dbp)) == rsn) {
+	                    rs = vecstr_add(slp,dbp,dlen) ;
 			}
 	            }
 
-	        } else if (dw_findi(dwp,dbp,&iep) == SR_NOTFOUND) {
+	        } else if (dw_findi(dwp,dbp,&iep) == rsn) {
 
 	            dwp->count_new += 1 ;
 	            ientry_start(&ie,dwp,dbp,&sb) ;
@@ -733,7 +751,10 @@ static int dw_scansub(DW *dwp,cchar *subdname,time_t daytime) noex {
 
 	    rs1 = fsdir_close(&d) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subdirectory) */
+	} /* end if (fsdir) */
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 
 	return (rs >= 0) ? n : rs ;
 }
