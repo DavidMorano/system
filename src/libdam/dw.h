@@ -72,7 +72,7 @@ struct dw_head {
 	time_t		removetime ;		/* last checked for removed */
 	DW_FL		f ;
 	uint		magic ;
-	int		checkinterval ;		/* file check interval */
+	int		checkint ;		/* file check interval */
 	int		fd ;			/* cached directory FD */
 	int		count_new ;
 	int		count_checkable ;

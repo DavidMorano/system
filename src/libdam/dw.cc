@@ -123,7 +123,7 @@ int dw_start(DW *dwp,cchar *dirname) noex {
 	dwp->fd = -1 ;
 	dwp->count_new = 0 ;
 	dwp->count_checkable = 0 ;
-	dwp->checkinterval = DW_DEFCHECKTIME ;
+	dwp->checkint = DW_DEFCHECKTIME ;
 	dwp->f.subdirs = false ;
 
 /* initialize */
@@ -310,7 +310,7 @@ int dw_find(DW *dwp,cchar *name,DW_ENT *dep) noex {
 	void		*vp{} ;
 #if	CF_FNAMECMP
 	ie.name = (char *) name ;
-	if ((rs = vecobj_search(&dwp->e,&ie,fnamecmp,&vp) {
+	if ((rs = vecobj_search(&dwp->e,&ie,fnamecmp,&vp)) >= 0) {
 	    iep = (IENTRY *) vp ;
 	}
 #else /* CF_FNAMECMP */
@@ -349,6 +349,7 @@ int dw_enumcheckable(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
 	    i = cp->i + 1 ;
 	}
 
+	void		*vp{} ;
 	while ((rs = vecobj_get(&dwp->e,i,&vp)) >= 0) {
 	    if (vp) {
 		iep = (IENTRY *) vp ;
@@ -373,7 +374,6 @@ int dw_enumcheckable(DW *dwp,DW_CUR *cp,DW_ENT *dep) noex {
 /* check if the directory (and any subdirectories) has changed */
 int dw_check(DW *dwp,time_t daytime) noex {
 	USTAT		sb ;
-	IENTRY		*iep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
@@ -466,30 +466,28 @@ int dw_check(DW *dwp,time_t daytime) noex {
 	    dbp = strwcpy(dbp,dwp->dirname,-1) ;
 
 	    *dbp++ = '/' ;
-	    for (i = 0 ; vecobj_get(&dwp->e,i,&iep) >= 0 ; i += 1) {
-	        if (iep == nullptr) continue ;
+	    void	*vp{} ;
+	    for (i = 0 ; vecobj_get(&dwp->e,i,&vp) >= 0 ; i += 1) {
+	        if (vp) {
+		    IENTRY	*iep = (IENTRY *) vp ;
+	            if (iep->state == DW_SNEW) {
+	                if ((daytime - iep->itime) > (dwp->checkint / 4)) {
+	                    {
+	                        cint	rl = (MAXPATHLEN - (dbp-dnamebuf)) ;
+	                        strdcpy1(dbp,rl,iep->name) ;
+	                    }
+	                    if ((u_stat(dnamebuf,&sb) >= 0) &&
+	                        ((daytime - sb.st_mtime) > dwp->checkint)) {
 
-	        if (iep->state != DW_SNEW) continue ;
+	                        iep->state = DW_SCHECK ;
+	                        dwp->count_new -= 1 ;
+	                        dwp->count_checkable += 1 ;
+	                        n += 1 ;
 
-	        if ((daytime - iep->itime) > (dwp->checkinterval / 4)) {
-
-	            {
-	                int	rl = (MAXPATHLEN - (dbp-dnamebuf)) ;
-	                strdcpy1(dbp,rl,iep->name) ;
-	            }
-
-	            if ((u_stat(dnamebuf,&sb) >= 0) &&
-	                ((daytime - sb.st_mtime) > dwp->checkinterval)) {
-
-	                iep->state = DW_SCHECK ;
-	                dwp->count_new -= 1 ;
-	                dwp->count_checkable += 1 ;
-	                n += 1 ;
-
-	            } /* end if */
-
-	        } /* end if (checkinterval) */
-
+	                    } /* end if */
+	                } /* end if (checkint) */
+		    } /* end if (equal) */
+		} /* end if (non-null) */
 	    } /* end for */
 
 	} /* end if */
@@ -506,26 +504,22 @@ int dw_check(DW *dwp,time_t daytime) noex {
 	    dbp = strwcpy(dbp,dwp->dirname,-1) ;
 
 	    *dbp++ = '/' ;
-	    for (i = 0 ; vecobj_get(&dwp->e,i,&iep) >= 0 ; i += 1) {
-	        if (iep == nullptr) continue ;
-
-	        if ((daytime - iep->itime) <= MAXIDLETIME)
-	            continue ;
-
-	        iep->itime = daytime ;
-	        {
-	            int	rl = (MAXPATHLEN - (dbp-dnamebuf)) ;
-	            strdcpy1(dbp,rl,iep->name) ;
-	        }
-
-	        if (u_stat(dnamebuf,&sb) < 0) {
-
-	            ientry_finish(iep,dwp) ;
-
-	            vecobj_del(&dwp->e,i--) ;
-
-	        } /* end if (could not 'stat') */
-
+	    void	*vp{} ;
+	    for (i = 0 ; vecobj_get(&dwp->e,i,&vp) >= 0 ; i += 1) {
+		if (vp) {
+		    IENTRY	*iep = (IENTRY *) vp ;
+	            if ((daytime - iep->itime) >= MAXIDLETIME) {
+	                iep->itime = daytime ;
+	                {
+	                    cint	rl = (MAXPATHLEN - (dbp-dnamebuf)) ;
+	                    strdcpy1(dbp,rl,iep->name) ;
+	                }
+	                if (u_stat(dnamebuf,&sb) < 0) {
+	                    ientry_finish(iep,dwp) ;
+	                    vecobj_del(&dwp->e,i--) ;
+	                } /* end if (could not 'stat') */
+		    } /* end if (got time-out) */
+		} /* end if (non-null) */
 	    } /* end for */
 
 	} /* end if (checking for removed files) */
@@ -551,7 +545,6 @@ int dw_callback(DW *op,dwcallback_f func,void *argp) noex {
 /* end subroutine (dw_callback) */
 
 extern int dw_state(DW *op,int i,int state) noex {
-	IENTRY		*iep ;
 	int		rs ;
 	int		state_prev = 0 ;
 
@@ -561,7 +554,9 @@ extern int dw_state(DW *op,int i,int state) noex {
 
 	if (state < 0) return SR_INVALID ;
 
-	if ((rs = vecobj_get(&op->e,i,&iep)) >= 0) {
+	void		*vp{} ;
+	if ((rs = vecobj_get(&op->e,i,&vp)) >= 0) {
+	    IENTRY	*iep = (IENTRY *) vp ;
 	    state_prev = iep->state ;
 	    iep->state = state ;
 	}
@@ -580,7 +575,7 @@ static int dw_scanfull(DW *dwp) noex {
 	fsdir_ent	ds ;
 	time_t		daytime = time(nullptr) ;
 	int		rs ;
-	int		nlen, i ;
+	int		nlen ;
 	int		n = 0 ;
 	char		dnamebuf[MAXPATHLEN + 1], *dbp ;
 
@@ -627,7 +622,7 @@ static int dw_scanfull(DW *dwp) noex {
 	            rs = vecobj_add(&dwp->e,&ie) ;
 
 	        } else if ((iep->state == DW_SNEW) &&
-	            ((daytime - sb.st_mtime) > dwp->checkinterval)) {
+	            ((daytime - sb.st_mtime) > dwp->checkint)) {
 
 	            iep->state = DW_SCHECK ;
 	            dwp->count_new -= 1 ;
@@ -645,15 +640,13 @@ static int dw_scanfull(DW *dwp) noex {
 
 	if ((rs >= 0) && dwp->f.subdirs) {
 	    cchar	*dnp ;
-
-	    for (i = 0 ; vecstr_get(&dwp->subdirs,i,&dnp) >= 0 ; i += 1) {
-	        if (dnp != nullptr) {
+	    for (int i = 0 ; vecstr_get(&dwp->subdirs,i,&dnp) >= 0 ; i += 1) {
+	        if (dnp) {
 	            rs = dw_scansub(dwp,dnp,daytime) ;
 	            n += rs ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end for */
-
 	} /* end if (subdirectories) */
 
 	return (rs >= 0) ? n : rs ;
@@ -725,17 +718,13 @@ static int dw_scansub(DW *dwp,cchar *subdname,time_t daytime) noex {
 	            rs = vecobj_add(&dwp->e,&ie) ;
 
 	        } else if (iep->state == DW_SNEW) {
-
 	            iep->itime = daytime ;
-	            if ((daytime - sb.st_mtime) > dwp->checkinterval) {
-
+	            if ((daytime - sb.st_mtime) > dwp->checkint) {
 	                iep->state = DW_SCHECK ;
 	                dwp->count_new -= 1 ;
 	                dwp->count_checkable += 1 ;
 	                n += 1 ;
-
 	            } /* end if */
-
 	        } else {
 	            iep->itime = daytime ;
 	        }
@@ -774,7 +763,11 @@ static int dw_findi(DW *dwp,cchar *name,IENTRY **iepp) noex {
 	int		rs ;
 
 	ie.name = (char *) name ;
-	rs = vecobj_search(&dwp->e,&ie,fnamecmp,iepp) ;
+	void		*vp{} ;
+	if ((rs = vecobj_search(&dwp->e,&ie,fnamecmp,&vp)) >= 0) {
+	    IENTRY	*iep = (IENTRY *) vp ;
+	    *iepp = iep ;
+	}
 
 	return rs ;
 }
