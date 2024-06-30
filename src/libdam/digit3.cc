@@ -1,20 +1,19 @@
-/* digit3 */
+/* digit3 SUPPORT */
+/* lang=C++20 */
 
+/* format a number for a three-column-wide field fpr the VMAIL program */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
 
 	= 1992-03-01, Walter Pitio
-        This code module was originally written (to bring some sanity to the way
-        large numbers of lines are displayed).
+	This code module was originally written (to bring some
+	sanity to the way large numbers of lines are displayed).
 
 	= 1992-03-10, David A­D­ Morano
-        This code module was modified for integration for use within PCS-VMAIL
-        (as was originally intended).
+	This code module was modified for integration for use within
+	PCS-VMAIL (as was originally intended).
 
 */
 
@@ -22,38 +21,38 @@
 
 /*******************************************************************************
 
-        This subroutine creates a little string (stored in a caller-supplied
-        buffer) that indicates the specified number passed. The number is
-        supposed to be the number of lines in a message, but that does not
-        really matter to us what it represents.
+	Name:
+	digit3
+
+	Description:
+	This subroutine creates a little string (stored in a
+	caller-supplied buffer) that indicates the specified number
+	passed. The number is supposed to be the number of lines
+	in a message, but that does not really matter to us what
+	it represents.
 
 	Synopsis:
-
-	int digit3(str_ptr,number)
-	char		str_ptr[] ;
-	int		number ;
+	int digit3(char *str_ptr,int number) noex
 
 	Arguments:
-
-	str_ptr		buffer to store resulting string
+	str_ptr		result buffer pointer (to store resulting string)
 	number		number to represent in buffer
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
+
+#include	"digit3.h"
 
 
 /* local defines */
@@ -61,10 +60,14 @@
 #define	DIGSTRLEN	3
 
 
-/* external subroutine */
+/* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern "C" {
+    extern int	bufprintf(char *,int,cchar *,...) noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
@@ -76,13 +79,12 @@ extern int	bufprintf(char *,int,const char *,...) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int digit3(str_ptr,number)
-char		str_ptr[] ;
-int		number ;
-{
+int digit3(char *str_ptr,int number) noex {
 	int	rs = SR_OK ;
 	int	temp = number ;
 	int	digits ;
@@ -128,7 +130,6 @@ int		number ;
 /* 	100,000 - 999,999:		".nM" */
 	    case 6:
 	        rs = bufprintf(str_ptr,DIGSTRLEN,".%1um",(number/100000)) ;
-
 	        break ;
 
 /*	1,000,000 - 9,999,999:		" nM" */
@@ -136,7 +137,6 @@ int		number ;
 	    case 7:
 	    case 8:
 	        rs = bufprintf(str_ptr,DIGSTRLEN,"%2um",(number/1000000)) ;
-
 	        break ;
 
 /*	100,000,000 - 999,999,999:	".nG" */
