@@ -55,8 +55,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* <- |strstr(3c)| + |strnstr(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<char.h>
 #include	<nleadstr.h>
 

@@ -19,9 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<stdintx.h>
 
 

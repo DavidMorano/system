@@ -23,9 +23,10 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
-#include	<utypedefs.h>
-#include	<usysrets.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<toxc.h>
 
 #include	"sncpyxc.h"

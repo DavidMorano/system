@@ -39,9 +39,10 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstring>
 #include	<cstdarg>
-#include	<utypedefs.h>
-#include	<usysrets.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	"sncpyxw.h"
 

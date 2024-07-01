@@ -23,7 +23,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<vechand.h>
-#include	<localmisc.h>
 
 
 /* object defines */

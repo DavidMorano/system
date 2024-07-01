@@ -40,8 +40,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strchr(3c)| + |strpbrk(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<mkchar.h>
 
 #include	"strnxpbrk.h"

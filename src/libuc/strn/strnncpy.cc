@@ -44,9 +44,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strncpy(3c)| | |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"strn.h"
 
@@ -64,10 +64,6 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern char	*strwcpy(char *,cchar *,int) noex ;
-}
 
 
 /* external variables */

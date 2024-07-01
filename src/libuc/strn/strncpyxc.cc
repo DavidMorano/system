@@ -43,8 +43,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |memset(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<toxc.h>
 
 #include	"strcpyxc.h"
@@ -52,6 +53,9 @@
 
 
 /* local defines */
+
+
+/* namespaces */
 
 
 /* local typedefs */

@@ -39,8 +39,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* <- for |strncmp(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<estrings.h>
 
 #include	"sfx.h"

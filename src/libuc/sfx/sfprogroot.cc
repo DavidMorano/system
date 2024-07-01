@@ -55,8 +55,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strncmp(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<strnxcmp.h>
 
 #include	"sfx.h"

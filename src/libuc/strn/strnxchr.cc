@@ -43,8 +43,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstring>		/* |strlen(3c)| + |strchr(3c)| + ... */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<mkchar.h>
 
 #include	"strnxchr.h"

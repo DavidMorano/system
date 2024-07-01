@@ -161,7 +161,8 @@ int ucgetpid::init() noex {
 	            void_f	ap = ucgetpid_atforkparent ;
 	            void_f	ac = ucgetpid_atforkchild ;
 	            if ((rs = uc_atforkrecord(b,ap,ac)) >= 0) {
-	                if ((rs = uc_atexit(ucgetpid_exit)) >= 0) {
+			void_f	e = ucgetpid_exit ;
+	                if ((rs = uc_atexit(e)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
 	                }

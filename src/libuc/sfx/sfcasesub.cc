@@ -42,8 +42,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
 #include	<char.h>
 #include	<toxc.h>
