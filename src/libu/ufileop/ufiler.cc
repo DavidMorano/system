@@ -302,7 +302,7 @@ int u_pathconf(cchar *fn,int name,long *rp) noex {
                 errno = 0 ;
                 if ((lw = pathconf(fn,name)) < 0) {
                     if_constexpr (f_sunos) {
-                        if ((name == _PC_CHOWN_RESTRICTED) && (lw == -1)) {
+                        if ((name == _PC_CHOWN_RESTRICTED) && (lw == -1L)) {
                             lw = 0 ;
                         }
                     } /* end if_constexpr (f_sunos) */

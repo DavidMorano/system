@@ -312,7 +312,7 @@ int		to ;
 /* continue */
 
 	if (rs >= 0) {
-	if ((rs = uc_piper(pipes,3)) >= 0) {
+	if ((rs = uc_piper(pipes,0,3)) >= 0) {
 	    int	wfd = pipes[1] ;
 	    int	ex ;
 	    int (*callfunc)(int(*)(),int,cchar **,cchar **,void *) ;

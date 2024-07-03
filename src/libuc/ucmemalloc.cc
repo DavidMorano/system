@@ -384,7 +384,8 @@ int ucmemalloc::iinit() noex {
 	            void_f	b = ucmemalloc_atforkbefore ;
 	            void_f	a = ucmemalloc_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(ucmemalloc_exit)) >= 0) {
+			void_f	e = ucmemalloc_exit ;
+	                if ((rs = uc_atexit(e)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
 	                }

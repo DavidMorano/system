@@ -41,8 +41,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* <- not needed */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"sfx.h"
 

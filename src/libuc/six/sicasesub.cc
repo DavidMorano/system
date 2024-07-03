@@ -50,8 +50,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strlen(¾c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<ascii.h>
 #include	<nleadstr.h>
 #include	<toxc.h>

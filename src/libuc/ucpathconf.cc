@@ -29,15 +29,24 @@
 /* external subroutines */
 
 extern "C" {
+    extern int	uc_pathconf(cchar *,int,long *) noex ;
     extern int	mkexpandpath(char *,cchar *,int) noex ;
 }
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
-extern "C" {
-   extern int uc_pathconf(cchar *,int,long *) noex ;
-}
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -85,6 +85,7 @@
 #include	<ucsysconf.h>
 
 #include	<getexecname.h>
+#include	<termios_cf.h>
 
 
 EXTERNC_begin
@@ -129,7 +130,8 @@ extern int	uc_procpid(cchar *,uid_t) noex ;
 
 /* double-special open group */
 extern int	uc_pipe(int *) noex ;
-extern int	uc_pipe2(int *,int) noex ;
+extern int	uc_pipes(int *,int) noex ;
+extern int	uc_piper(int *,int,int) noex ;
 extern int	uc_sockpair(int,int,int,int *) noex ;
 
 /* operate group */
@@ -247,7 +249,6 @@ extern int	uc_gmtime(const time_t *,TM *) noex ;
 extern int	uc_localtime(const time_t *,TM *) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
 extern int	uc_mkfifo(cchar *,mode_t) noex ;
-extern int	uc_piper(int *,int) noex ;
 
 /* memory allocation (user-space) */
 

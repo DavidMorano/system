@@ -40,8 +40,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strnlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"strn.h"
 

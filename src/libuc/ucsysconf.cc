@@ -30,6 +30,9 @@
 	req		requested value to return
 	rp		pointer to value-type |long| for received value
 
+	Returns:
+	>=0		OK and this is the requested value
+	<0		error (system-return)
 
 	Name:
 	uc_sysconfstr
@@ -50,7 +53,7 @@
 	Returns:
 	>0		valid and the value is returned with this length
 	0		valid but there was no value associated
-	<0		the requested configuration value was invalid
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -94,6 +97,9 @@ enum dataitems {
 	dataitem_maxline,
 	dataitem_maxlogin,
 	dataitem_maxhost,
+	dataitem_maxtzname,
+	dataitem_ngroups,
+	dataitem_clk,
 	dataitem_overlast
 } ;
 
@@ -140,6 +146,9 @@ int uc_sysconfval(int req,long *rp) noex {
 	case _SC_LINE_MAX:
 	case _SC_HOST_NAME_MAX:
 	case _SC_LOGIN_NAME_MAX:
+	case _SC_TZNAME_MAX:
+	case _SC_NGROUPS_MAX:
+	case _SC_CLK_TCK:
 	    rs = sco.cache(req) ;
 	    break ;
 	default:
@@ -245,12 +254,17 @@ int ucsysconf::cache(int req) noex {
 	int		rs = SR_OK ;
 	int		ii = -1 ;
 	switch (req) {
-	case _SC_ARG_MAX: ii = dataitem_maxarg ; break ;
-	case _SC_LINE_MAX: ii = dataitem_maxline ; break ;
-	case _SC_HOST_NAME_MAX: ii = dataitem_maxhost ; break ;
-	case _SC_LOGIN_NAME_MAX: ii = dataitem_maxlogin ; break ;
-	default:
+	case _SC_ARG_MAX:		ii = dataitem_maxarg ; break ;
+	case _SC_LINE_MAX:		ii = dataitem_maxline ; break ;
+	case _SC_HOST_NAME_MAX:		ii = dataitem_maxhost ; break ;
+	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; break ;
+	case _SC_TZNAME_MAX:		ii = dataitem_maxtzname ; break ;
+	case _SC_NGROUPS_MAX:		ii = dataitem_ngroups ; break ;
+	case _SC_CLK_TCK:		ii = dataitem_clk ; break ;
 	    rs = (*this)(req) ;
+	    break ;
+	default:
+	    rs = SR_BUGCHECK;
 	    break ;
 	} /* end switch */
 	if ((rs >= 0) && (ii >= 0)) {

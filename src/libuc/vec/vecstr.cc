@@ -8,12 +8,16 @@
 
 /* revision history:
 
-	= 1998-12-01, David A­D­ Morano
+	= 1998-02-13, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 	= 2023-10-07, David A­D­ Morano
-	I updated this to match the updates applied to this object
-	back in 2018 in other projects (that used this same object).
+	I updated this to match the updates applied to this (named)
+	object back in 2018 but which were coded in another project
+	(that used this same object name).  But no code from that
+	other project (no names will be given here) were able to
+	ever see the light of day (other than living on within my
+	own memory).
 
 */
 
@@ -21,13 +25,12 @@
 
 /*******************************************************************************
 
-	These routines are used when the caller wants to store a
-	COPY of the passed string data into a vector.  These routines
-	will copy and store the copied data in the list.  The
-	advantage is that the caller does not have to keep the
-	orginal data around in order for the list data to be accessed
-	later.  String data (unlike "element" data) can not contain
-	nullptr characters-bytes.
+	This object is used when the caller wants to store a COPY
+	of the passed string data into a vector-like container (how
+	this object is implemented).  A copy of the caller-supplied
+	string is stored in the (vector) list.  The advantage is
+	that the caller does not have to keep the orginal data
+	around in order for the list data to be accessed later.
 
 	Notes:
 	The method |vecstr_find| is equivalent to:

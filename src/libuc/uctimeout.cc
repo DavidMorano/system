@@ -125,7 +125,6 @@ namespace {
 	ciq		pass ;
 	vecsorthand	*pqp ;
 	sigset_t	savemask ;
-	pid_t		pid ;
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
 	timer_t		timerid ;
@@ -196,8 +195,8 @@ enum dispcmds {
 /* forward references */
 
 extern "C" {
-    static int uctimeout_sigerworker(uctimeout *) noex ;
-    static int uctimeout_dispworker(uctimeout *) noex ;
+    static int	uctimeout_sigerworker(uctimeout *) noex ;
+    static int	uctimeout_dispworker(uctimeout *) noex ;
     static void	uctimeout_atforkbefore() noex ;
     static void	uctimeout_atforkparent() noex ;
     static void	uctimeout_atforkchild() noex ;
@@ -284,9 +283,9 @@ int uctimeout::init() noex {
 	                void_f	ap = uctimeout_atforkparent ;
 	                void_f	ac = uctimeout_atforkchild ;
 	                if ((rs = uc_atfork(b,ap,ac)) >= 0) {
-	                    if ((rs = uc_atexit(uctimeout_exit)) >= 0) {
+			    void_f	e = uctimeout_exit ;
+	                    if ((rs = uc_atexit(e)) >= 0) {
 	                        finitdone = true ;
-	                        pid = getpid() ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
@@ -325,8 +324,7 @@ int uctimeout::init() noex {
 int uctimeout::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (finitdone) {
-	    fvoid = true ;
+	if (finitdone && (! fvoid.testandset)) {
 	    {
 	        rs1 = workend() ;
 		if (rs >= 0) rs = rs1 ;
@@ -1048,7 +1046,6 @@ static void uctimeout_atforkparent() noex {
 
 static void uctimeout_atforkchild() noex {
         uctimeout       *uip = &uctimeout_data ;
-        uip->pid = getpid() ;
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
             uip->fl.running_disper = false ;

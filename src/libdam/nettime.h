@@ -32,11 +32,11 @@ struct nettime_head {
 	int		pf ;
 } ;
 
-typedef	NETIME		nettime ;
+typedef	NETTIME		nettime ;
 
 EXTERNC_begin
 
-extern int nettime(nettime *,int,int,cchar *,cchar *,int) noex ;
+extern int getnettime(nettime *,int,int,cchar *,cchar *,int) noex ;
 
 EXTERNC_end
 

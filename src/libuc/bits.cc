@@ -7,7 +7,7 @@
 
 /* revistion history:
 
-	= 1998-05-27, David A­D­ Morano
+	= 1998-02-15, David A­D­ Morano
 	This subroutine was originally written.
 
 */
@@ -25,17 +25,16 @@
 	Implemention-node:
 	I switch between "short-bit-optimization" and regular
 	allocated bit storage as the need develops.  The old bits
-	in non-allocated storage as not carried over to any allocation
+	in non-allocated storage are not carried over to any allocation
 	but rather are continued to be used in place.  Was this the
-	proper design decision? My initial guess was NO, it was
-	not. But I went ahead and coded it up anyway.
+	proper design decision?  My initial guess was NO, it was
+	not.  But I went ahead and coded it up anyway.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |CHAR_BIT| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<bit>			/* <- |countr_zero(3c++)| */
 #include	<usystem.h>
 #include	<stdintx.h>
@@ -130,7 +129,7 @@ int bits_finish(bits *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->a) {
-	        rs1 = uc_free(op->a) ;
+	        rs1 = uc_libfree(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
@@ -188,9 +187,9 @@ int bits_clear(bits *op,int i) noex {
 		    }
 	        } /* end if (ok) */
 	    } else { /* <- clear all bits */
-		cint	nbytes = ((op->nwords - nawords) * sizeof(digit)) ;
 		bits_naclear(op) ;
 	        if (op->a) {
+		    cint nbytes = ((op->nwords - nawords) * sizeof(digit)) ;
 		    memclear(op->a,nbytes) ;
 	        }
 	    } /* end if (valid) */
@@ -228,7 +227,7 @@ int bits_anyset(bits *op) noex {
 	        for (int w = 0 ; w > nawords ; w += 1) {
 	            f = (op->a[w] != 0) ;
 	            if (f) break ;
-	        }
+	        } /* end for */
 	    }
 	    if (!f) {
 	        for (int w = 0 ; w < (op->nwords - nawords) ; w += 1) {
@@ -309,7 +308,7 @@ static int bits_alloc(bits *op,int nn) noex {
 /* end subroutine (bits_alloc) */
 
 void bits::dtor() noex {
-	cint	rs = finish ;
+	cint		rs = finish ;
 	if (rs < 0) {
 	    ulogerror("bits",rs,"dtor-finish") ;
 	}
@@ -318,35 +317,37 @@ void bits::dtor() noex {
 
 int bits_co::operator () (int a) noex {
 	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case bitsmem_start:
-	    rs = bits_start(op,a) ;
-	    break ;
-	case bitsmem_finish:
-	    rs = bits_finish(op) ;
-	    break ;
-	case bitsmem_set:
-	    rs = bits_set(op,a) ;
-	    break ;
-	case bitsmem_clear:
-	    rs = bits_clear(op,a) ;
-	    break ;
-	case bitsmem_test:
-	    rs = bits_test(op,a) ;
-	    break ;
-	case bitsmem_anyset:
-	    rs = bits_anyset(op) ;
-	    break ;
-	case bitsmem_ffbs:
-	    rs = bits_ffbs(op) ;
-	    break ;
-	case bitsmem_extent:
-	    rs = bits_extent(op) ;
-	    break ;
-	case bitsmem_count:
-	    rs = bits_count(op) ;
-	    break ;
-	} /* end switch */
+	if (op) {
+	    switch (w) {
+	    case bitsmem_start:
+	        rs = bits_start(op,a) ;
+	        break ;
+	    case bitsmem_finish:
+	        rs = bits_finish(op) ;
+	        break ;
+	    case bitsmem_set:
+	        rs = bits_set(op,a) ;
+	        break ;
+	    case bitsmem_clear:
+	        rs = bits_clear(op,a) ;
+	        break ;
+	    case bitsmem_test:
+	        rs = bits_test(op,a) ;
+	        break ;
+	    case bitsmem_anyset:
+	        rs = bits_anyset(op) ;
+	        break ;
+	    case bitsmem_ffbs:
+	        rs = bits_ffbs(op) ;
+	        break ;
+	    case bitsmem_extent:
+	        rs = bits_extent(op) ;
+	        break ;
+	    case bitsmem_count:
+	        rs = bits_count(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (bits_co::operator) */
@@ -362,11 +363,11 @@ int alloc::resize(int nsize) noex {
 	if (nsize > asize) {
 	    caddr_t	na{} ;
 	    if (a == nullptr) {
-	        if ((rs = uc_malloc(nsize,&na)) >= 0) {
+	        if ((rs = uc_libmalloc(nsize,&na)) >= 0) {
 	            memclear(na,nsize) ;
 		}
 	    } else {
-	        if ((rs = uc_realloc(a,nsize,&na)) >= 0) {
+	        if ((rs = uc_librealloc(a,nsize,&na)) >= 0) {
 	            memclear((na + asize),(nsize - asize)) ;
 		}
 	    }

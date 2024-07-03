@@ -49,8 +49,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strncpy(3c)| + |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<strwcpy.h>
 
 #include	"strn.h"

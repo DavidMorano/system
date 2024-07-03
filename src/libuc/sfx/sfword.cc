@@ -55,8 +55,9 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstring>		/* <- for |strncmp(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<ascii.h>
 #include	<char.h>
 #include	<strn.h>

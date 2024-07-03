@@ -165,7 +165,7 @@ int opentermnote(cchar *pr,cchar **recips,int max,int opts)
 	    debugprintf("opentermnote: r[%u]=%s\n",i,recips[i]) ;
 #endif
 
-	if ((rs = uc_piper(pipes,3)) >= 0) {
+	if ((rs = uc_piper(pipes,0,3)) >= 0) {
 	    TARGS	*tap ;
 	    const int	size = sizeof(TARGS) ;
 	    int		i ;

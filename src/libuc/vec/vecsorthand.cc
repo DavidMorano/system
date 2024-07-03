@@ -7,18 +7,20 @@
 
 /* revision history:
 
-	= 2010-12-01,  David A-D- Morano
+	= 1998-02-28,  David A-D- Morano
 	Module was originally written.
 
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	These routines are used when the caller just wants to store
-	an item in a sorted list.  The item us usually just a pointer
-	to the user's real data.
+	This object is used when the caller just wants to store an
+	item in a sorted (flat) list.  This object is a vector-type
+	object that stores pointers to the caller data objects to
+	be stored.  But the list is maintained in a sorted order
+	(using a comparison subroutine given by the caller).
 
 *******************************************************************************/
 

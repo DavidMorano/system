@@ -33,6 +33,7 @@
 				2 -> environment variable 'HZ'
 				3 -> 'CLK_TCK' define (or facility) only
 				4 -> |sysconf(3c)| 'CLK_TCK' only
+				4 -> guess value
 
 	Returns:
 	>0		HZ value
@@ -78,6 +79,8 @@
 #define	VARHZ		"HZ"
 #endif
 
+#define	HZ_GUESS	100		/* guessed value */
+
 
 /* external subroutines */
 
@@ -91,13 +94,14 @@ namespace {
     struct hzmgr ;
     typedef int (hzmgr::*hzmgr_m)(int) noex ;
     struct hzmgr {
-	int	hz ;
+	int		hz ;
 	int operator () (int) noex ;
 	int getval(int) noex ;
 	int tryconst(int) noex ;
 	int tryenv(int) noex ;
 	int trytck(int) noex ;
 	int tryconf(int) noex ;
+	int tryguess(int) noex ;
     } ; /* end struct (hzmgr) */
 }
 
@@ -105,7 +109,8 @@ constexpr hzmgr_m	mems[] = {
 	&hzmgr::tryconst,
 	&hzmgr::tryenv,
 	&hzmgr::trytck,
-	&hzmgr::tryconf
+	&hzmgr::tryconf,
+	&hzmgr::tryguess
 } ;
 
 
@@ -195,7 +200,7 @@ int hzmgr::tryconf(int w) noex {
 	    if (int req ; (req = _SC_CLK_TCK) >= 0) {
 	        if ((rs = uc_sysconfval(req,nullptr)) >= 0) {
 		    hz = rs ;
-	        } else if (isNotValid(rs)) {
+	        } else if (isNotValid(rs) || isNotSupport(rs)) {
 		    rs = SR_OK ;
 		}
 	    }
@@ -203,6 +208,15 @@ int hzmgr::tryconf(int w) noex {
 	return rs ;
 }
 /* end method (hzmgr::tryconf) */
+
+int hzmgr::tryguess(int w) noex {
+	int		rs = SR_OK ;
+	if ((hz == 0) && ((w == gethz_any) || (w == gethz_guess))) {
+	    rs = HZ_GUESS ;
+	}
+	return rs ;
+}
+/* end method (hzmgr::tryguess) */
 
 static int decval(cchar *s) noex {
 	int		rs ;

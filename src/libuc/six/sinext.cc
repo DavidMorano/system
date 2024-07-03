@@ -38,8 +38,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<ascii.h>
 #include	<toxc.h>
 #include	<mkchar.h>

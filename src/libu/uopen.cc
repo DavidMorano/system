@@ -29,6 +29,7 @@
 	u_dup2
 	u_socketpair
 	u_pipe
+	u_pipe2
 	u_piper
 
 
@@ -117,7 +118,7 @@ namespace {
 	opener(int afd,SOCKADDR *fp,int *lp) noex : dfd(afd), sap(fp) {
 	   lenp = lp ;
 	} ;
-	opener(int *apipes) noex : pipes(apipes) { 
+	opener(int *apipes,int mfd = 0) noex : pipes(apipes), tfd(mfd) { 
 	    if (pipes) {
 		pipes[0] = -1 ;
 		pipes[1] = -1 ;
@@ -144,6 +145,7 @@ namespace {
 	int idupminer(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
+	int ipipe2(cchar *,int,mode_t) noex ;
 	int ipiper(cchar *,int,mode_t) noex ;
 	int icloseonexec(int) noex ;
 	void fderror(int) noex ;
@@ -262,9 +264,17 @@ int u_pipe(int *pipes) noex {
 	return oo ;
 }
 
-int u_piper(int *pipes,int of) noex {
+int u_pipe2(int *pipes,int of) noex {
 	cnullptr	np{} ;
 	opener		oo(pipes) ;
+	oo.m = &opener::ipipe2 ;
+	oo.flavor = flavor_pipes ;
+	return oo(np,of,0) ;
+}
+
+int u_piper(int *pipes,int of,int mfd) noex {
+	cnullptr	np{} ;
+	opener		oo(pipes,mfd) ;
 	oo.m = &opener::ipiper ;
 	oo.flavor = flavor_pipes ;
 	return oo(np,of,0) ;
@@ -506,6 +516,17 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 	return rs ;
 }
 /* end method (opener::ipipe) */
+
+int opener::ipipe2(cchar *,int of,mode_t) noex {
+	int		rs = SR_FAULT ;
+	if (pipes) {
+	    if ((rs = pipe2(pipes,of)) < 0) {
+		rs = (- errno) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+}
+/* end method (opener::ipipe2) */
 
 int opener::ipiper(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;

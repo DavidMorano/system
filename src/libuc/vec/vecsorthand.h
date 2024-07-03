@@ -5,7 +5,14 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1998-02-28,  David A-D- Morano
+	Module was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	VECSORTHAND_INCLUDE
 #define	VECSORTHAND_INCLUDE

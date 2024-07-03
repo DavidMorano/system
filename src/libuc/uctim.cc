@@ -211,8 +211,8 @@ enum cmdsubs {
 /* forward references */
 
 extern "C" {
-    static int uctim_sigerworker(uctim *) noex ;
-    static int uctim_dispworker(uctim *) noex ;
+    static int	uctim_sigerworker(uctim *) noex ;
+    static int	uctim_dispworker(uctim *) noex ;
     static void	uctim_atforkbefore() noex ;
     static void	uctim_atforkparent() noex ;
     static void	uctim_atforkchild() noex ;
@@ -325,7 +325,8 @@ int uctim::init() noex {
 	                void_f	ap = uctim_atforkparent ;
 	                void_f	ac = uctim_atforkchild ;
 	                if ((rs = uc_atfork(b,ap,ac)) >= 0) {
-	                    if ((rs = uc_atexit(uctim_exit)) >= 0) {
+			    void_f	e = uctim_exit ;
+	                    if ((rs = uc_atexit(e)) >= 0) {
 	                        finitdone = true ;
 	                        f = true ;
 	                    }
@@ -365,8 +366,7 @@ int uctim::init() noex {
 int uctim::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (finitdone) {
-	    fvoid = true ;
+	if (finitdone && (! fvoid.testandset)) {
 	    {
 	        rs1 = workend() ;
 		if (rs >= 0) rs = rs1 ;

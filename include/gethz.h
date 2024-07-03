@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 enum gethzes {
@@ -29,6 +30,7 @@ enum gethzes {
 	gethz_env,
 	gethz_tck,
 	gethz_conf,
+	gethz_guess,
 	gethz_overlast
 } ;
 

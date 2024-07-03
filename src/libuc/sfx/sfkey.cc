@@ -43,8 +43,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<strn.h>
 #include	<char.h>
 
@@ -77,9 +78,8 @@
 int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	int		kl = -1 ;
 	if (sp) {
-	    cchar	*tp ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((tp = strnchr(sp,sl,'=')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        kl = (tp - sp) ;
 	        while ((kl > 0) && CHAR_ISWHITE(sp[kl - 1])) {
 	            kl -= 1 ;

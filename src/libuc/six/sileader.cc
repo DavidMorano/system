@@ -22,8 +22,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<ascii.h>

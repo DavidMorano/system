@@ -174,7 +174,7 @@ int vecstr_addcspath(vecstr *vsp) noex {
 	int		c = 0 ;
 	if (vsp) {
 	    if ((rs = maxpathlen) >= 0) {
-		cint	plen = (2*rs) ;
+		cint	plen = (2 * rs) ;
 	        char	*pbuf ;
 	        if ((rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
 		    cint	req = _CS_PATH ;
