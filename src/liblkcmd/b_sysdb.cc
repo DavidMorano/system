@@ -1,13 +1,12 @@
-/* b_sysdb */
+/* b_sysdb SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to query system databases */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
-
 
 /* revision history:
 
@@ -21,12 +20,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ sysdb <db> [<queries>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -50,6 +46,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
+#include	<exitcodes.h>
 #include	<getbufsize.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -64,7 +61,7 @@
 #include	<getse.h>
 #include	<getua.h>
 #include	<getus.h>
-#include	<ucmallreg.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -222,20 +219,6 @@ static int procuas_end(PROGINFO *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"if",
-	"db",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -250,7 +233,21 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"if",
+	"db",
+	nullptr
+} ;
+
+constexpr  PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -258,7 +255,7 @@ static const PIVARS	initvars = {
 	VARPRNAME
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -272,27 +269,16 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
-	"utf",
-	"db",
-	NULL
-} ;
-
 enum akonames {
 	akoname_utf,
 	akoname_db,
 	akoname_overlast
 } ;
 
-/* define the configuration keywords */
-static const char	*dbnames[] = {
-	"shells",
-	"protocols",
-	"networks",
-	"hosts",
-	"services",
-	"userattrs",
-	NULL
+constexpr cpcchar	akonames[] = {
+	"utf",
+	"db",
+	nullptr
 } ;
 
 enum dbnames {
@@ -303,6 +289,16 @@ enum dbnames {
 	dbname_services,
 	dbname_userattrs,
 	dbname_overlast
+} ;
+
+constexpr cpcchar	dbnames[] = {
+	"shells",
+	"protocols",
+	"networks",
+	"hosts",
+	"services",
+	"userattrs",
+	nullptr
 } ;
 
 static const uchar	aterms[] = {
@@ -317,16 +313,17 @@ static const uchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_sysdb(int argc,cchar *argv[],void *contextp)
-{
+int b_sysdb(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
@@ -339,9 +336,7 @@ int b_sysdb(int argc,cchar *argv[],void *contextp)
 }
 /* end subroutine (b_sysdb) */
 
-
-int p_sysdb(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_sysdb(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_sysdb) */
@@ -349,10 +344,7 @@ int p_sysdb(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -379,18 +371,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*dbfname = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*dbfname = nullptr ;
 	cchar		*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_sysdb: starting DFD=%d\n",rs) ;
 	}
@@ -407,13 +399,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -433,7 +425,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -461,14 +453,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -763,8 +755,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -812,7 +804,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    rs = printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    rs = printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -824,12 +816,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* initialization */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
 	if (rs >= 0) {
 	    if ((rs = locinfo_dbfname(lip,dbfname)) >= 0) {
@@ -844,7 +836,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	    for (ai = ai_continue ; ai < argc ; ai += 1) {
 	        f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	        f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = argv[ai] ;
 	            ai_continue = (ai+1) ;
@@ -941,10 +933,10 @@ retearly:
 	        pip->progname,ex,rs) ;
 	}
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -1046,7 +1038,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(pip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -1061,7 +1053,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_utf:
@@ -1102,7 +1094,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn,
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
@@ -1278,7 +1270,7 @@ static int procsome(PROGINFO *pip,int w,void *ofp,ARGINFO *aip,BITS *bop,
 	    for (ai = aip->ai_continue ; ai < aip->argc ; ai += 1) {
 
 	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = aip->argv[ai] ;
 	            if (cp[0] != '\0') {
@@ -1294,7 +1286,7 @@ static int procsome(PROGINFO *pip,int w,void *ofp,ARGINFO *aip,BITS *bop,
 	    } /* end for */
 	} /* end if */
 
-	if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	    SHIO	afile, *afp = &afile ;
 
 	    if (strcmp(afn,"-") == 0)
@@ -1337,9 +1329,7 @@ static int procsome(PROGINFO *pip,int w,void *ofp,ARGINFO *aip,BITS *bop,
 }
 /* end subroutine (procsome) */
 
-
-static int procspecs(PROGINFO *pip,void *ofp,int w,cchar *lbuf,int llen)
-{
+static int procspecs(PROGINFO *pip,void *ofp,int w,cchar *lbuf,int llen) noex {
 	FIELD		fsb ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -1360,9 +1350,7 @@ static int procspecs(PROGINFO *pip,void *ofp,int w,cchar *lbuf,int llen)
 }
 /* end subroutine (procspecs) */
 
-
-static int procspec(PROGINFO *pip,void *ofp,int w,cchar *sp,int sl)
-{
+static int procspec(PROGINFO *pip,void *ofp,int w,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 
 	switch (w) {
@@ -1372,7 +1360,7 @@ static int procspec(PROGINFO *pip,void *ofp,int w,cchar *sp,int sl)
 	case dbname_protocols:
 	    rs = procprotos_query(pip,w,ofp,sp,sl) ;
 	    break ;
-	case dbname_networks:
+	
 	    rs = procnets_query(pip,w,ofp,sp,sl) ;
 	    break ;
 	case dbname_hosts:
@@ -1398,10 +1386,8 @@ static int procspec(PROGINFO *pip,void *ofp,int w,cchar *sp,int sl)
 }
 /* end subroutine (procspec) */
 
-
 /* ARGSUSED */
-static int procshells_begin(PROGINFO *pip,int w)
-{
+static int procshells_begin(PROGINFO *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procshells_begin: ent\n") ;
@@ -1410,8 +1396,7 @@ static int procshells_begin(PROGINFO *pip,int w)
 }
 
 /* ARGSUSED */
-static int procshells_end(PROGINFO *pip,int w)
-{
+static int procshells_end(PROGINFO *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procshells_end: ent\n") ;
@@ -1420,8 +1405,7 @@ static int procshells_end(PROGINFO *pip,int w)
 }
 
 /* ARGSUSED */
-static int procshells_all(PROGINFO *pip,int w,void *ofp)
-{
+static int procshells_all(PROGINFO *pip,int w,void *ofp) noex {
 	const int	uslen = MAXPATHLEN ;
 	int		rs ;
 	char		usbuf[MAXPATHLEN+1] ;
@@ -1433,15 +1417,12 @@ static int procshells_all(PROGINFO *pip,int w,void *ofp)
 }
 
 /* ARGSUSED */
-static int procshells_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
-{
+static int procshells_query(PROGINFO *pip,int w,void *ofp,cc *sp,int sl) noex {
 	return SR_INVALID ;
 }
 
-
 /* ARGSUSED */
-static int procprotos_begin(PROGINFO *pip,int w)
-{
+static int procprotos_begin(PROGINFO *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procprotos_begin: ent\n") ;
@@ -1450,8 +1431,7 @@ static int procprotos_begin(PROGINFO *pip,int w)
 }
 
 /* ARGSUSED */
-static int procprotos_end(PROGINFO *pip,int w)
-{
+static int procprotos_end(PROGINFO *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procprotos_end: ent\n") ;
@@ -1460,8 +1440,7 @@ static int procprotos_end(PROGINFO *pip,int w)
 }
 
 /* ARGSUSED */
-static int procprotos_all(PROGINFO *pip,int w,void *ofp)
-{
+static int procprotos_all(PROGINFO *pip,int w,void *ofp) noex {
 	struct protoent	pe ;
 	const int	pelen = getbufsize(getbufsize_pe) ;
 	int		rs ;
@@ -1496,9 +1475,8 @@ static int procprotos_all(PROGINFO *pip,int w,void *ofp)
 }
 
 /* ARGSUSED */
-static int procprotos_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
-{
-	NULSTR		s ;
+static int procprotos_query(PROGINFO *pip,int w,void *ofp,cc *sp,int sl) noex {
+	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
@@ -1519,20 +1497,17 @@ static int procprotos_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
 }
 
 /* ARGSUSED */
-static int procnets_begin(PROGINFO *pip,int w)
-{
+static int procnets_begin(PROGINFO *pip,int w) noex {
 	return getne_begin(TRUE) ;
 }
 
 /* ARGSUSED */
-static int procnets_end(PROGINFO *pip,int w)
-{
+static int procnets_end(PROGINFO *pip,int w) noex {
 	return getne_end() ;
 }
 
 /* ARGSUSED */
-static int procnets_all(PROGINFO *pip,int w,void *ofp)
-{
+static int procnets_all(PROGINFO *pip,int w,void *ofp) noex {
 	struct netent	ne ;
 	const int	nelen = getbufsize(getbufsize_ne) ;
 	int		rs ;
@@ -1559,9 +1534,8 @@ static int procnets_all(PROGINFO *pip,int w,void *ofp)
 }
 
 /* ARGSUSED */
-static int procnets_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
-{
-	NULSTR		s ;
+static int procnets_query(PROGINFO *pip,int w,void *ofp,cc *sp,int sl) noex {
+	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
@@ -1582,20 +1556,17 @@ static int procnets_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
 }
 
 /* ARGSUSED */
-static int prochosts_begin(PROGINFO *pip,int w)
-{
+static int prochosts_begin(PROGINFO *pip,int w) noex {
 	return gethe_begin(FALSE) ;
 }
 
 /* ARGSUSED */
-static int prochosts_end(PROGINFO *pip,int w)
-{
+static int prochosts_end(PROGINFO *pip,int w) noex {
 	return gethe_end() ;
 }
 
 /* ARGSUSED */
-static int prochosts_all(PROGINFO *pip,int w,void *ofp)
-{
+static int prochosts_all(PROGINFO *pip,int w,void *ofp) noex {
 	struct hostent	he ;
 	const int	helen = getbufsize(getbufsize_he) ;
 	int		rs ;
@@ -1622,9 +1593,8 @@ static int prochosts_all(PROGINFO *pip,int w,void *ofp)
 }
 
 /* ARGSUSED */
-static int prochosts_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
-{
-	NULSTR		s ;
+static int prochosts_query(PROGINFO *pip,int w,void *ofp,cc *sp,int sl) noex {
+	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
@@ -1645,20 +1615,17 @@ static int prochosts_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
 }
 
 /* ARGSUSED */
-static int procsvcs_begin(PROGINFO *pip,int w)
-{
+static int procsvcs_begin(PROGINFO *pip,int w) noex {
 	return getse_begin(FALSE) ;
 }
 
 /* ARGSUSED */
-static int procsvcs_end(PROGINFO *pip,int w)
-{
+static int procsvcs_end(PROGINFO *pip,int w) noex {
 	return getse_end() ;
 }
 
 /* ARGSUSED */
-static int procsvcs_all(PROGINFO *pip,int w,void *ofp)
-{
+static int procsvcs_all(PROGINFO *pip,int w,void *ofp) noex {
 	struct servent	se ;
 	const int	selen = getbufsize(getbufsize_se) ;
 	int		rs ;
@@ -1685,10 +1652,9 @@ static int procsvcs_all(PROGINFO *pip,int w,void *ofp)
 }
 
 /* ARGSUSED */
-static int procsvcs_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
-{
+static int procsvcs_query(PROGINFO *pip,int w,void *ofp,cc *sp,int sl) noex {
 	LOCINFO		*lip = pip->lip ;
-	NULSTR		s ;
+	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
@@ -1710,20 +1676,17 @@ static int procsvcs_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
 }
 
 /* ARGSUSED */
-static int procuas_begin(PROGINFO *pip,int w)
-{
+static int procuas_begin(PROGINFO *pip,int w) noex {
 	return getua_begin(FALSE) ;
 }
 
 /* ARGSUSED */
-static int procuas_end(PROGINFO *pip,int w)
-{
+static int procuas_end(PROGINFO *pip,int w) noex {
 	return getua_end() ;
 }
 
 /* ARGSUSED */
-static int procuas_all(PROGINFO *pip,int w,void *ofp)
-{
+static int procuas_all(PROGINFO *pip,int w,void *ofp) noex {
 	userattr_t	ua ;
 	const int	ualen = getbufsize(getbufsize_ua) ;
 	int		rs ;
@@ -1753,9 +1716,8 @@ static int procuas_all(PROGINFO *pip,int w,void *ofp)
 }
 
 /* ARGSUSED */
-static int procuas_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
-{
-	NULSTR		s ;
+static int procuas_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl) noex {
+	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
@@ -1776,12 +1738,10 @@ static int procuas_query(PROGINFO *pip,int w,void *ofp,cchar *sp,int sl)
 }
 /* end subroutine (procus_query) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
-	if (lip == NULL)
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -1793,13 +1753,11 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL)
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
 	if (lip->open.stores) {
@@ -1811,15 +1769,13 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	slp = &lip->stores ;
 	if (! lip->open.stores) {
@@ -1829,14 +1785,14 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 
 	if (rs >= 0) {
 	    int	oi = -1 ;
-	    if (*epp != NULL) {
+	    if (*epp != nullptr) {
 		oi = vecstr_findaddr(slp,*epp) ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        len = strnlen(vp,vl) ;
 	        rs = vecstr_store(slp,vp,len,epp) ;
 	    } else {
-	        *epp = NULL ;
+	        *epp = nullptr ;
 	    }
 	    if ((rs >= 0) && (oi >= 0)) {
 	        vecstr_del(slp,oi) ;
@@ -1847,14 +1803,11 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_setentry) */
 
-
-static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname)
-{
-
-	if (lip == NULL)
+static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	if (dbfname != NULL) {
+	if (dbfname != nullptr) {
 	    lip->have.dbfname = TRUE ;
 	    lip->final.dbfname = TRUE ;
 	    lip->dbfname = dbfname ;
@@ -1864,10 +1817,7 @@ static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname)
 }
 /* end subroutine (locinfo_dbfname) */
 
-
-static int locinfo_to(LOCINFO *lip,int to)
-{
-
+static int locinfo_to(LOCINFO *lip,int to) noex {
 	if (to < 0) to = TO_CACHE ;
 
 	lip->to = to ;
@@ -1875,18 +1825,16 @@ static int locinfo_to(LOCINFO *lip,int to)
 }
 /* end subroutine (locinfo_to) */
 
-
-static int locinfo_defaults(LOCINFO *lip)
-{
+static int locinfo_defaults(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (lip == NULL)
+	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	if ((lip->dbfname == NULL) && (! lip->final.dbfname)) {
+	if ((lip->dbfname == nullptr) && (! lip->final.dbfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARDBFNAME) ;
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        cchar	**vpp = &lip->dbfname ;
 	        rs = locinfo_setentry(lip,vpp,cp,-1) ;
 	    }

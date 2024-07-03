@@ -50,14 +50,13 @@
 #include	<bwops.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<getax.h>
-#include	<getus.h>
-#include	<getua.h>
+#include	<getxx.h>
 #include	<passwdent.h>
 #include	<shadowent.h>
 #include	<groupent.h>
 #include	<projectent.h>
 #include	<userattrent.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
