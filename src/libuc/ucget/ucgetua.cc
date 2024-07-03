@@ -96,7 +96,7 @@ int uc_getuaend() noex {
 int uc_getuaent(ucentua *uap,char *uabuf,int ualen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if (uap && uabuf) {
 	    rs = SR_INVALID ;
 	    if (ualen > 0) {
@@ -105,21 +105,21 @@ int uc_getuaent(ucentua *uap,char *uabuf,int ualen) noex {
 		    {
 			ucentua	*oep = static_cast<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
-			size = rs ;
+			sz = rs ;
 		    }
 		    rs1 = uc_userattrfree(ep) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (uc_getuserattrent) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_getuaent) */
 
 int uc_getuanam(ucentua *uap,char *uabuf,int ualen,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if (uap && uabuf && name) {
 	    rs = SR_INVALID ;
 	    if (ualen > 0) {
@@ -128,21 +128,21 @@ int uc_getuanam(ucentua *uap,char *uabuf,int ualen,cchar *name) noex {
 		    {
 			ucentua	*oep = static_cast<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
-			size = rs ;
+			sz = rs ;
 		    }
 		    rs1 = uc_userattrfree(ep) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (uc_userattrname) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_getuanam) */
 
 int uc_getuauid(ucentua *uap,char *uabuf,int ualen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if (uap && uabuf) {
 	    rs = SR_INVALID ;
 	    if (ualen > 0) {
@@ -151,14 +151,14 @@ int uc_getuauid(ucentua *uap,char *uabuf,int ualen,uid_t uid) noex {
 		    {
 			ucentua	*oep = static_cast<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
-			size = rs ;
+			sz = rs ;
 		    }
 		    rs1 = uc_userattrfree(ep) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (uc_getuserattr) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_getuauid) */
 
