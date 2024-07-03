@@ -153,6 +153,9 @@ struct storebuf {
 	int strw(int i,cchar *sp,int sl = -1) noex {
 	    return storebuf_strw(bufp,bufl,i,sp,sl) ;
 	} ;
+	int str(int i,cchar *sp) noex {
+	    return storebuf_str(bufp,bufl,i,sp) ;
+	} ;
 	int buf(int i,cchar *sp,int sl = -1) noex {
 	    return storebuf_buf(bufp,bufl,i,sp,sl) ;
 	} ;

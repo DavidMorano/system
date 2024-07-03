@@ -211,8 +211,8 @@ enum cmdsubs {
 /* forward references */
 
 extern "C" {
-    static int uctim_sigerworker(uctim *) noex ;
-    static int uctim_dispworker(uctim *) noex ;
+    static int	uctim_sigerworker(uctim *) noex ;
+    static int	uctim_dispworker(uctim *) noex ;
     static void	uctim_atforkbefore() noex ;
     static void	uctim_atforkparent() noex ;
     static void	uctim_atforkchild() noex ;

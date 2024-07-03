@@ -267,7 +267,7 @@ int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
 
 	if (fname[0] == '\0') return SR_INVAL ;
 
-	memset(op,0,sizeof(SPAWNER)) ;
+	memclear(op) ;
 	op->argv = argv ;
 	op->pid = -1 ;
 
@@ -284,9 +284,9 @@ int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
 	if (rs >= 0) {
 	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
-	        cint		size = sizeof(scmd) ;
+	        cint		sz = sizeof(scmd) ;
 	        op->execfname = cp ;
-	        if ((rs = vecobj_start(&op->cmds,size,2,0)) >= 0) {
+	        if ((rs = vecobj_start(&op->cmds,sz,2,0)) >= 0) {
 	            envhelp	*ehp = &op->env ;
 	            if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
 	                rs = envhelp_load(ehp,pwd,efname,argv) ;
@@ -571,7 +571,7 @@ int spawner_fdcreate(spawner *op,int cfd) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if ((rs = uc_piper(pipes,3)) >= 0) {
+	if ((rs = uc_piper(pipes,0,3)) >= 0) {
 	    sc.cmd = cmd_fdcreate ;
 	    sc.pfdend = pipes[0] ;
 	    sc.pfd = pipes[1] ;

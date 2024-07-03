@@ -28,6 +28,7 @@
 	u_dup2
 	u_socketpair
 	u_pipe
+	u_pipe2
 	u_piper
 
 	Description:
@@ -106,7 +107,12 @@ extern int u_dupminer(int,int,int) noex ;
 /* special */
 extern int u_socketpair(int,int,int,int *) noex ;
 extern int u_pipe(int *) noex ;
-extern int u_piper(int *,int) noex ;
+extern int u_pipe2(int *,int) noex ;
+extern int u_piper(int *,int,int) noex ;
+
+static inline int u_pipes(int *pipes,int of) noex {
+	return u_pipe2(pipes,of) ;
+}
 
 EXTERNC_end
 

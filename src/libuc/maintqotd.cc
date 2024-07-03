@@ -1632,7 +1632,7 @@ static int opendef(MAINTQOTD *sip) noex {
 	int		rs ;
 	int		pipes[2] ;
 	int		fd = -1 ;
-	if ((rs = uc_piper(pipes,3)) >= 0) {
+	if ((rs = uc_piper(pipes,0,3)) >= 0) {
 	    int		wfd = pipes[0] ;
 	    int		sl ;
 	    cchar	*sp = "hello world!\n" ;

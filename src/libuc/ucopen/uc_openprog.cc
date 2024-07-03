@@ -1,13 +1,11 @@
-/* uc_openprog */
+/* uc_openprog SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* connect to a local program */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_ENVLOAD	0		/* |mkprogenv_load()| */
-
 
 /* revision history:
 
@@ -20,59 +18,57 @@
 
 /*******************************************************************************
 
+	Name:
+	uc_openprog
+
+	Description:
 	This is a dialer to connect to a local program.
 
 	Synopsis:
-
 	int uc_openprog(fname,oflags,argv,envv)
-	const char	fname[] ;
+	cchar	fname[] ;
 	int		oflags ;
-	const char	*argv[] ;
-	const char	*envv[] ;
+	cchar	*argv[] ;
+	cchar	*envv[] ;
 
 	Arguments:
-
 	fname		program to execute
 	oflags		options to specify read-only or write-only
 	argv		arguments to program
 	envv		environment to program
 
 	Returns:
-
 	>=0		file descriptor to program STDIN and STDOUT
-	<0		error
-
+	<0		error (system-return)
 
 	Note:
 
-	On BSD systems, 'pipe(2)' does not open both ends of the pipe for both
-	reading and writing, so we observe the old BSD behavior of the zeroth
-	element FD being only open for reading and the oneth element FD only
-	open for writing.
+	On BSD flavored systems, |pipe(2)| does not open both ends
+	of the pipe for both reading and writing, so we observe the
+	old BSD behavior of the zeroth element FD being only open
+	for reading and the oneth element FD only open for writing.
 
 	Importand note on debugging:
 
-	One some (maybe many) OS systems, turning on any debugging in this
-	subroutine can cause hangs after the 'fork(2)'.  This is due to the
-	famous (infamous) fork-safety problem on many UNIX®i®.  One UNIX® OS
-	that has fork-safe lib-C subroutines (for the greater most part) is
-	Solaris®.  They (the Solaris® people) seem to be among the only ones
-	who took fork-safety seriously in their OS.
-
+	One some (maybe many) OS systems, turning on any debugging
+	in this subroutine can cause hangs after the |fork(2)|.
+	This is due to the famous (infamous) fork-safety problem
+	on many UNIX®i®.  One UNIX® OS that has fork-safe lib-C
+	subroutines (for the greater most part) is Solaris®.  They
+	(the Solaris® people) seem to be among the only ones who
+	took fork-safety seriously in their OS.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ids.h>
@@ -88,32 +84,27 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy3w(char *,int,const char *,const char *,const char *,int) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	sncpy3w(char *,int,cchar *,cchar *,cchar *,int) ;
 extern int	snshellunder(char *,int,pid_t,cchar *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(const char **,const char *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	matkeystr(cchar **,cchar *,int) ;
 extern int	vstrkeycmp(const void **,const void **) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	strkeycmp(cchar *,cchar *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	hasvarpathprefix(const char *,int) ;
-extern int	mkvarpath(char *,const char *,int) ;
-extern int	mkuserpath(char *,const char *,const char *,int) ;
+extern int	hasvarpathprefix(cchar *,int) ;
+extern int	mkvarpath(char *,cchar *,int) ;
+extern int	mkuserpath(char *,cchar *,cchar *,int) ;
 extern int	getprogpath(IDS *,VECSTR *,char *,cchar *,int) ;
 extern int	vecstr_addcspath(vecstr *) ;
-extern int	ignoresigs(const int *) ;
+extern int	ignoresigs(cint *) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -144,23 +135,14 @@ enum accmodes {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_openprogerr(cchar *pfn,int of,cchar **argv,cchar **envv,int *efdp)
-{
+int uc_openprogerr(cchar *pfn,int of,cchar **argv,cchar **envv,int *efdp) noex {
 	int		rs ;
 	int		fd = -1 ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_openprogerr: ent pfn=%s\n",pfn) ;
-	if (argv != NULL) {
-	    int	i ;
-	    for (i = 0 ; argv[i] != NULL; i += 1) {
-		debugprintf("uc_openprogerr: a[%u]=%s\n",i,argv[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	if (pfn == NULL) return SR_FAULT ;
 
@@ -181,20 +163,11 @@ int uc_openprogerr(cchar *pfn,int of,cchar **argv,cchar **envv,int *efdp)
 	    } /* end if (mkepath) */
 	} /* end if (accmode) */
 
-#if	CF_DEBUGS
-	debugprintf("uc_openprogerr: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (uc_openprogerr) */
 
-
-int uc_openprog(cchar *pfn,int of,cchar **argv,cchar **envv)
-{
-#if	CF_DEBUGS
-	debugprintf("uc_openprog: ent pfn=%s\n",pfn) ;
-#endif
+int uc_openprog(cchar *pfn,int of,cchar **argv,cchar **envv) noex {
 	return uc_openprogerr(pfn,of,argv,envv,NULL) ;
 }
 /* end subroutine (uc_openprog) */
@@ -202,14 +175,9 @@ int uc_openprog(cchar *pfn,int of,cchar **argv,cchar **envv)
 
 /* local subroutines */
 
-
-static int mkepath(char *ebuf,cchar *pfn)
-{
+static int mkepath(char *ebuf,cchar *pfn) noex {
 	int		rs ;
 	int		el = 0 ;
-#if	CF_DEBUGS
-	debugprintf("uc_openprog/mkepath: ent pfn=%s\n",pfn) ;
-#endif
 	if ((rs = mkvarpath(ebuf,pfn,-1)) >= 0) {
 	    if (rs > 0) {
 	        el = rs ;
@@ -224,7 +192,7 @@ static int mkepath(char *ebuf,cchar *pfn)
 		}
 	    }
 	    if ((rs >= 0) && (strchr(pfn,'/') == NULL)) {
-		const int	rsn = SR_NOENT ;
+		cint	rsn = SR_NOENT ;
 		if ((rs = perm(pfn,-1,-1,NULL,X_OK)) == rsn) {
 		    cchar	*tp ;
 		    if ((tp = strchr(pfn,':')) != NULL) {
@@ -237,17 +205,12 @@ static int mkepath(char *ebuf,cchar *pfn)
 		} /* end if (perm) */
 	    } /* end if (ok) */
 	} /* end if (mkvarpath) */
-#if	CF_DEBUGS
-	debugprintf("uc_openprog/mkepath: ret rs=%d el=%u\n",rs,el) ;
-#endif
 	return (rs >= 0) ? el : rs ;
 }
 /* end subroutine (mkepath) */
 
-
-static int mkfindpath(char *ebuf,cchar *pfn)
-{
-	IDS		id ;
+static int mkfindpath(char *ebuf,cchar *pfn) noex {
+	ids		id ;
 	int		rs ;
 	int		rs1 ;
 	int		el = 0 ;
@@ -268,16 +231,11 @@ static int mkfindpath(char *ebuf,cchar *pfn)
 }
 /* end subroutine (mkfindpath) */
 
-
-static int openproger(cchar *pfn,int of,cchar **argv,cchar **envv,int *efdp)
-{
+static int openproger(cc *pfn,int of,cc **argv,cc **envv,int *efdp) noex {
 	MKPROGENV	pe ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-#if	CF_DEBUGS
-	debugprintf("uc_openprog/openproger: ent pfn=%s\n",pfn) ;
-#endif
 	if ((rs = mkprogenv_start(&pe,envv)) >= 0) {
 	    cchar	**ev ;
 	    if ((rs = mkprogenv_getvec(&pe,&ev)) >= 0) {
@@ -288,17 +246,12 @@ static int openproger(cchar *pfn,int of,cchar **argv,cchar **envv,int *efdp)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mkprogenv) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-#if	CF_DEBUGS
-	debugprintf("uc_openprog/openproger: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (openproger) */
 
-
 #if	CF_ENVLOAD
-static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,cchar **argv)
-{
+static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,cchar **argv) noex {
 	int		rs ;
 	if ((rs = mkprogenv_envset(pep,"_EF",pfn,-1)) >= 0) {
 	    int		al = -1 ;
@@ -306,7 +259,7 @@ static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,cchar **argv)
 	    if (argv != NULL) ap = argv[0] ;
 	    if (ap == NULL) al = sfbasename(pfn,-1,&ap) ;
 	    if ((rs = mkprogenv_envset(pep,"_A0",ap,al)) >= 0) {
-		const int	sulen = (strlen(pfn)+22) ;
+		cint	sulen = (strlen(pfn)+22) ;
 		char		*subuf ;
 		if ((rs = uc_malloc((sulen+1),&subuf)) >= 0) {
 	    	    const pid_t	pid = ugetpid() ;
@@ -322,19 +275,13 @@ static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,cchar **argv)
 /* end subroutine (mkprogenv_load) */
 #endif /* CF_ENVLOAD */
 
-
-int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p)
-{
+int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p) noex {
 	int		rs ;
 	int		fd = -1 ;
 	int		pout[2] ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_openprogerr/spawnit: ent pfn=%s\n",pfn) ;
-#endif
-
-	if ((rs = uc_piper(pout,3)) >= 0) {
-	    if ((of&O_NDELAY) || (of&O_NONBLOCK)) {
+	if ((rs = uc_piper(pout,0,3)) >= 0) {
+	    if ((of & O_NDELAY) || (of & O_NONBLOCK)) {
 		if ((rs >= 0) && (of & O_NDELAY)) {
 		    rs = uc_ndelay(pout[0],TRUE) ;
 		}
@@ -358,9 +305,6 @@ int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p)
 		    ps.opts |= SPAWNPROC_OIGNINTR ;
 		    ps.opts |= SPAWNPROC_OSETSID ;
 		}
-#if	CF_DEBUGS
-		debugprintf("uc_openprogerr/spawnit: spawnproc()\n") ;
-#endif
 	   	if ((rs = spawnproc(&ps,pfn,argv,envv)) >= 0) {
 		    fd = pout[0] ;
 		    u_close(pout[1]) ;
@@ -369,9 +313,6 @@ int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p)
 			*fd2p = ps.fd[2] ;
 		    }
 		} /* end if (spawnproc) */
-#if	CF_DEBUGS
-	debugprintf("uc_openprogerr/spawnit: spawnproc-out rs=%d\n",rs) ;
-#endif
 	    } /* end if (ok) */
 	    if (rs < 0) {
 		int	i ;
@@ -384,18 +325,12 @@ int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p)
 	    } /* end if (error-cleanup) */
 	} /* end if (uc_piper) */
 
-#if	CF_DEBUGS
-	debugprintf("uc_openprogerr/spawnit: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (spawnit) */
 
-
-static int accmode(int oflags)
-{
-	const int	am = (oflags & O_ACCMODE) ;
+static int accmode(int oflags) noex {
+	cint		am = (oflags & O_ACCMODE) ;
 	int		rs = SR_INVALID ;
 	switch (am) {
 	case O_RDONLY:

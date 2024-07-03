@@ -95,7 +95,7 @@ OBJ032= ucgetdefaultproj.o ucinproj.o
 OBJ033= ucgetuserattr.o uckvamatch.o
 
 OBJ034= ucnprocs.o ucinetconv.o
-OBJ035= uc_cfsetispeed.o uc_cfsetospeed.o
+OBJ035=
 OBJ036= uc_openpt.o uc_grantpt.o uc_unlockpt.o uc_ptsname.o uc_ttyname.o
 OBJ037= uc_truncate.o uc_ftruncate.o
 OBJ038=
@@ -113,7 +113,7 @@ OBJ049= uc_gethostid.o uc_confstr.o uc_gethostname.o
 OBJ050= uc_mallocstrw.o uc_mallocbuf.o
 OBJ051= uc_waitwritable.o
 OBJ052= 
-OBJ053= uc_piper.o
+OBJ053=
 OBJ054=
 OBJ055=
 OBJ056= uc_libmemalloc.o

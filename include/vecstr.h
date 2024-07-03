@@ -7,7 +7,7 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1998-02-13, David A­D­ Morano
 	This subroutine was originally written.
 
 */
@@ -16,9 +16,8 @@
 
 /*******************************************************************************
 
-	This object implements a vector of strings. This are C-styled strings
-	(of course, and as it should be).
-
+	This object implements a vector of strings.  This are C-styled
+	strings (of course, and as it should be).
 
 *******************************************************************************/
 

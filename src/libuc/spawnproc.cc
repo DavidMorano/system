@@ -276,7 +276,7 @@ static int spawnproc_pipes(scon *psap,cchar *fname,
 
 /* process the file descriptors as specified */
 
-	if ((rs = uc_piper(con,3)) >= 0) {
+	if ((rs = uc_piper(con,0,3)) >= 0) {
 	    cint	pfd = con[0] ;
 	    cint	cfd = con[1] ;
 	    if ((rs = uc_closeonexec(cfd,true)) >= 0) {

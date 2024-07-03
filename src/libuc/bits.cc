@@ -7,7 +7,7 @@
 
 /* revistion history:
 
-	= 1998-05-27, David A­D­ Morano
+	= 1998-02-15, David A­D­ Morano
 	This subroutine was originally written.
 
 */
@@ -187,9 +187,9 @@ int bits_clear(bits *op,int i) noex {
 		    }
 	        } /* end if (ok) */
 	    } else { /* <- clear all bits */
-		cint	nbytes = ((op->nwords - nawords) * sizeof(digit)) ;
 		bits_naclear(op) ;
 	        if (op->a) {
+		    cint nbytes = ((op->nwords - nawords) * sizeof(digit)) ;
 		    memclear(op->a,nbytes) ;
 	        }
 	    } /* end if (valid) */
@@ -227,7 +227,7 @@ int bits_anyset(bits *op) noex {
 	        for (int w = 0 ; w > nawords ; w += 1) {
 	            f = (op->a[w] != 0) ;
 	            if (f) break ;
-	        }
+	        } /* end for */
 	    }
 	    if (!f) {
 	        for (int w = 0 ; w < (op->nwords - nawords) ; w += 1) {

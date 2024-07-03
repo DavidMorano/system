@@ -321,6 +321,7 @@ int mapblock_co<K,B>::operator () (int a) noex {
 }
 /* end method (mapblock_co::operator) */
 
+
 #endif	/* __cplusplus */
 #endif /* MAPBLOCK_INCLUDE */
 

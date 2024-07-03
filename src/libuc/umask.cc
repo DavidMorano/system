@@ -154,7 +154,8 @@ int umasker::init() noex {
 	            void_f	b = umask_atforkbefore ;
 	            void_f	a = umask_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(umask_exit)) >= 0) {
+			void_f	e = umask_exit ;
+	                if ((rs = uc_atexit(e)) >= 0) {
 	    	            finitdone = true ;
 		            f = true ;
 		        }
