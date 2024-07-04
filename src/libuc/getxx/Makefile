@@ -47,6 +47,8 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
+RUNINFO= -rpath $(RUNDIR)
+
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,7 +59,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_GETXX= getho.o
+OBJ0_GETXX= getho.o getax.o
 OBJ1_GETXX= getnw.o
 OBJ2_GETXX= getpr.o
 OBJ3_GETXX= getsv.o getus.o
@@ -125,10 +127,13 @@ obj3_getxx.o:	$(OBJ3_GETXX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_GETXX)
 
 
+getax.o:		getax.cc getax.h $(INCS)
+
+getus.o:		getus.cc getus.h $(INCS)
+
 getho.o:		getho.cc getho.h $(INCS)
 getnw.o:		getnw.cc getnw.h $(INCS)
 getpr.o:		getpr.cc getpr.h $(INCS)
 getse.o:		getse.cc getsv.h $(INCS)
-getus.o:		getus.cc getus.h $(INCS)
 
 

@@ -44,6 +44,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
+#include	"six.h"
+
 
 /* local defines */
 

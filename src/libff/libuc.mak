@@ -126,7 +126,7 @@ OBJ062= bufsizevar.o digbfsizes.o
 OBJ063=
 
 OBJ064= getprotofamily.o geteaddrinfo.o getaf.o getaflen.o getpwd.o
-OBJ065= getnodedomain.o utmpent.o getax.o 
+OBJ065= getnodedomain.o utmpent.o
 OBJ066= getbufsize.o getbufsizenames.o gethz.o getngroups.o getproto.o getserv.o
 OBJ067= getusername.o getuserhome.o getgroupname.o getprojname.o
 OBJ068= getportnum.o getenver.o getourenv.o
@@ -732,14 +732,6 @@ memfile.o:		memfile.cc memfile.h
 filemap.o:		filemap.cc filemap.h
 
 numsign.o:		numsign.cc numsign.h
-
-
-# GETXX
-getax.o:		getax.cc getax.h
-getpe.o:		getpe.cc getpe.h
-getne.o:		getne.cc getne.h
-gethe.o:		gethe.cc gethe.h
-getse.o:		getse.cc getse.h
 
 passwdent.o:		passwdent.cc passwdent.h
 spwdent.o:		spwdent.cc spwdent.h
