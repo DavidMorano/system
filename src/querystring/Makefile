@@ -20,11 +20,11 @@ VALDIR= $(CGS_VALDIR)
 CC= $(CGS_CC)
 GPP= $(CGS_GPP)
 
-GPPFLAGS= $(CGS_CCFLAGS)
+GPPFLAGS= $(CGS_CXXFLAGS)
 CCOPTS_GCCALL= -pthreads -fexceptions
 CCOPTS_CCALL= -MT
 
-CCOPTS_GCCOPTSGPP= $(CGS_CCFLAGS)
+CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
 CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
 CCOPTS_GCCLIBSPARC= -mno-app-regs
 
@@ -72,7 +72,7 @@ INCDIRS= -I$(INCDIR)
 CPPFLAGS= $(DEFS) $(INCDIRS)
 
 CFLAGS= $(CCOPTS)
-CCFLAGS= $(GPPFLAGS) $(CFLAGS)
+CXXFLAGS= $(GPPFLAGS) $(CFLAGS)
 
 #LD= $(CC)
 #LD= cc
@@ -307,6 +307,6 @@ lastlogfile.o:		lastlogfile.c lastlogfile.h
 tmpx.o:			tmpx.c tmpx.h
 
 querystring.o:		querystring.cc querystring.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) querystring.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) querystring.cc
 
 

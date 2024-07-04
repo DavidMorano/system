@@ -2,16 +2,16 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} uc_confstr"
+NAMES="${NAMES} CCFLAGS "
 
 DN=/dev/null
 
 for F in "${@}" ; do
   if [[ -r "${F}" ]] ; then
     for N in ${NAMES} ; do
-      if fgrep "${N}" $F > ${DN} ; then
+      if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/uc_confstr/s//uc_sysconfstr/g
+g/CCFLAGS/s//CXXFLAGS/g
 	w
 	q
 EOF

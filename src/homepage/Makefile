@@ -20,11 +20,11 @@ VALDIR= $(CGS_VALDIR)
 CC= $(CGS_CC)
 GPP= $(CGS_GPP)
 
-GPPFLAGS= $(CGS_CCFLAGS)
+GPPFLAGS= $(CGS_CXXFLAGS)
 CCOPTS_GCCALL= -pthreads -fexceptions
 CCOPTS_CCALL= -MT
 
-CCOPTS_GCCOPTSGPP= $(CGS_CCFLAGS)
+CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
 CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
 CCOPTS_GCCLIBSPARC= -mno-app-regs
 
@@ -72,7 +72,7 @@ INCDIRS= -I$(INCDIR)
 CPPFLAGS= $(DEFS) $(INCDIRS)
 
 CFLAGS= $(CCOPTS)
-CCFLAGS= $(GPPFLAGS) $(CCOPTS)
+CXXFLAGS= $(GPPFLAGS) $(CCOPTS)
 
 #LD= $(CC)
 #LD= cc
@@ -386,6 +386,6 @@ spawner.o:		spawner.c spawner.h
 useraccdb.o:		useraccdb.c useraccdb.h
 
 querystring.o:		querystring.cc querystring.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) querystring.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) querystring.cc
 
 

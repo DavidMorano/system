@@ -20,11 +20,11 @@ VALDIR= $(CGS_VALDIR)
 CC= $(CGS_CC)
 GPP= $(CGS_GPP)
 
-GPPFLAGS= $(CGS_CCFLAGS)
+GPPFLAGS= $(CGS_CXXFLAGS)
 CCOPTS_GCCALL= -pthreads -fexceptions
 CCOPTS_CCALL= -MT
 
-CCOPTS_GCCOPTSGPP= $(CGS_CCFLAGS)
+CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
 CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
 CCOPTS_GCCLIBSPARC= -mno-app-regs
 
@@ -71,7 +71,7 @@ INCDIRS= -I$(INCDIR)
 
 CPPFLAGS= $(DEFS) $(INCDIRS)
 CFLAGS= $(CCOPTS)
-CCFLAGS= $(GPPFLAGS) $(CCOPTS)
+CXXFLAGS= $(GPPFLAGS) $(CCOPTS)
 
 #LD= $(CC)
 #LD= cc
@@ -322,9 +322,9 @@ paramfile.o:		paramfile.c paramfile.h
 paramopt.o:		paramopt.c paramopt.h
 
 mailalias.o:		mailalias.cc mailalias.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) mailalias.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) mailalias.cc
 
 m.o:			m.cc m.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) m.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) m.cc
 
 

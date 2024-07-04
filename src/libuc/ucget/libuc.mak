@@ -54,7 +54,7 @@ LIBINFO= $(LIBDIRS) $(LIBS)
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
-CCFLAGS= $(MAKECCFLAGS)
+CXXFLAGS= $(MAKECXXFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
@@ -354,7 +354,7 @@ UOBJ += $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
 UOBJ += $(UOBJ16) $(UOBJ17) $(UOBJ18) $(UOBJ19)
 
 
-.SUFFIXES:		.ls .i .ii .cx .cs
+.SUFFIXES:		.ls .ii .cx .cs
 
 
 default:		all
@@ -381,13 +381,13 @@ a:			$(T).a
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
 .cc.s:
-	$(CXX) -S $(CPPFLAGS) $(CCFLAGS) $<
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 .cc.o:
-	$(CXX) -c $(CPPFLAGS) $(CCFLAGS) $<
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 libmacuser.a:		$(UOBJ)

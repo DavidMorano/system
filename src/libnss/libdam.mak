@@ -79,7 +79,7 @@ LIBINFO= $(LIBDIRS) $(LIBS)
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
-CCFLAGS= $(MAKECCFLAGS)
+CXXFLAGS= $(MAKECXXFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
@@ -391,13 +391,13 @@ a:			$(T).a
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
 .cc.s:
-	$(CXX) -S $(CPPFLAGS) $(CCFLAGS) $<
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 .cc.o:
-	$(CXX) -c $(CPPFLAGS) $(CCFLAGS) $<
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 libmacuser.a:		$(UOBJ)
