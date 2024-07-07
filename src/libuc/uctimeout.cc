@@ -1072,17 +1072,19 @@ static int ourcmp(cvoid *a1p,cvoid *a2p) noex {
 	TIMEOUT		**e1pp = (TIMEOUT **) a1p ;
 	TIMEOUT		**e2pp = (TIMEOUT **) a2p ;
 	int		rc = 0 ;
-	if (*e1pp || *e2pp) {
-	    rc = 1 ;
-	    if (*e1pp) {
-		rc = -1 ;
-	        if (*e2pp) {
-	            TIMEOUT	*i1p = (TIMEOUT *) *e1pp ;
-	            TIMEOUT	*i2p = (TIMEOUT *) *e2pp ;
-	            rc = (i1p->val - i2p->val) ;
+	{
+	    TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
+	    TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
+	    if (e1p || e2p) {
+	        rc = 1 ;
+	        if (e1p) {
+		    rc = -1 ;
+	            if (e2p) {
+	                rc = (e1p->val - e2p->val) ;
+	            }
 	        }
 	    }
-	}
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (ourcmp) */

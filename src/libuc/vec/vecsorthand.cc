@@ -49,6 +49,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef vecsorthand_vcf		vc_f ;
+
 
 /* external subroutines */
 
@@ -86,7 +88,7 @@ static int	vecsorthand_extend(vecsorthand *) noex ;
 
 /* exported subroutines */
 
-int vecsorthand_start(vecsorthand *op,int vn,vecentcmp_f cmpfunc) noex {
+int vecsorthand_start(vecsorthand *op,int vn,vc_f cmpfunc) noex {
 	int		rs ;
 	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
@@ -246,7 +248,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	if (op && ep) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-		vecentcmp_f	cf = op->vcf ;
+		vc_f		cf = op->vcf ;
 		void		**spp ;
 		rs = SR_NOTFOUND ;
 		spp = (void **) bsearch(&ep,op->va,op->i,esize,cf) ;
@@ -255,7 +257,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	    	    rs = SR_OK ;
 		}
 		if (vrp) {
-	    	    void	**rpp = (void **) vrp ;
+	    	    void	**rpp = voidpp(vrp) ;
 	    	    *rpp = ((rs >= 0) ? op->va[i] : nullptr) ;
 		}
 	    } /* end if (open) */
@@ -293,7 +295,7 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 }
 /* end subroutine (vecsorthand_extend) */
 
-int vecsorthand::start(int ne,vecentcmp_f vcf) noex {
+int vecsorthand::start(int ne,vc_f vcf) noex {
 	return vecsorthand_start(this,ne,vcf) ;
 }
 
