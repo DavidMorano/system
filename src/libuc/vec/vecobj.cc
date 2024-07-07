@@ -517,8 +517,8 @@ namespace {
 	    ep = e ;
 	    rpp = r ;
 	} ;
-	int fetchfirst(cur *) noex ;
-	int fetchnext(cur *) noex ;
+	int first(cur *) noex ;
+	int next(cur *) noex ;
     } ; /* end struct (sub_fetch) */
 }
 
@@ -536,10 +536,10 @@ int vecobj_fetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 	            curp->i = -1 ;
 	        }
 	        if (curp->i < 0) {
-		    rs = so.fetchfirst(curp) ;
+		    rs = so.first(curp) ;
 		    i = rs ;
 	        } else {
-		    rs = so.fetchnext(curp) ;
+		    rs = so.next(curp) ;
 		    i = rs ;
 	        } /* end if (first or subsequent fetch) */
 		if (rs < 0) {
@@ -746,7 +746,7 @@ static int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 }
 /* end subroutine (vecobj_sorted) */
 
-int sub_fetch::fetchfirst(cur *curp) noex {
+int sub_fetch::first(cur *curp) noex {
 	int		rs ;
 	int		i = 0 ;
 	void		*rep{} ;
@@ -772,10 +772,10 @@ int sub_fetch::fetchfirst(cur *curp) noex {
 	}
 	return (rs >= 0) ? i : rs ;
 }
-/* end method (sub_fetch::fetchfirst) */
+/* end method (sub_fetch::first) */
 
-int sub_fetch::fetchnext(cur *curp) noex {
-	int		rs = SR_OK ;
+int sub_fetch::next(cur *curp) noex {
+	int		rs ;
 	int		i = (curp->i + 1) ; 
 	void		*rep{} ;
 	while ((rs = vecobj_iget(op,i,&rep)) >= 0) {
@@ -791,6 +791,6 @@ int sub_fetch::fetchnext(cur *curp) noex {
 	}
 	return (rs >= 0) ? i : rs ;
 }
-/* end method (sub_fetch::fetchnext) */
+/* end method (sub_fetch::next) */
 
 
