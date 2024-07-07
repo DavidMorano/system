@@ -867,25 +867,20 @@ density.o:		density.c density.h
 dialtab.o:		dialtab.c dialtab.h
 
 clusterdb.o:		clusterdb.c clusterdb.h
-
-hostinfo.o:		hostinfo.c hostinfo.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-hostent.o:		hostent.c hostent.h
-
+hostinfo.o:		hostinfo.cc hostinfo.h
+hostaddr.o:		hostaddr.cc hostaddr.h
+hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.c inetaddr.h
 
-lfm.o:			lfm.c lfm.h
+lfm.o:			lfm.cc lfm.h
 
-keyopt.o:		keyopt.c keyopt.h
+keyopt.o:		keyopt.cc keyopt.h
 
 strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
-strstore.o:		strstore.c strstore.h
+strstore.o:		strstore.cc strstore.h
 
 userattr.o:		userattr.c userattr.h
-
 pwfile.o:		pwfile.c pwfile.h pwentry.h
 
 ipasswd.o:		ipasswd.c ipasswd.h

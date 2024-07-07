@@ -22,10 +22,11 @@ export OSNAME OSTYPE OSRELEASE OSNUM
 
 : ${CGS_BINDIR:=${REPOROOT}/bin}
 : ${CGS_INCDIR:=${REPOROOT}/include}
-: ${CGS_CRTDIR:=${REPOROOT}/lib}
-: ${CGS_VALDIR:=${REPOROOT}/lib}
 : ${CGS_LIBDIR:=${REPOROOT}/lib}
 : ${CGS_MANDIR:=${REPOROOT}/man}
+
+: ${CGS_CRTDIR:=${USRLOCAL}/lib}
+: ${CGS_VALDIR:=${USRLOCAL}/lib}
 : ${CGS_RUNDIR:=${USRLOCAL}/lib}
 
 : ${CGS_INFODIR:=${REPOROOT}/info}
@@ -39,16 +40,17 @@ export OSNAME OSTYPE OSRELEASE OSNUM
 : ${CGS_RANLIB:=ranlib}
 : ${CGS_AR:=ar}
 : ${CGS_NM:=nm}
+: ${CGS_COV:=cov}
 : ${CGS_SZ:=sz}
 
-: ${CGS_GCPP:=gcpp13}
-: ${CGS_GCC:=gcc13}
-: ${CGS_GPP:=gpp13}
-: ${CGS_GLD:=gld13}
-: ${CGS_GRANLIB:=granlib13}
-: ${CGS_GAR:=gar13}
-: ${CGS_GNM:=gnm13}
-: ${CGS_GCOV:=gcov13}
+: ${CGS_GCPP:=gcpp}
+: ${CGS_GCC:=gcc}
+: ${CGS_GPP:=gpp}
+: ${CGS_GLD:=gld}
+: ${CGS_GRANLIB:=granlib}
+: ${CGS_GAR:=gar}
+: ${CGS_GNM:=gnm}
+: ${CGS_GCOV:=gcov}
 : ${CGS_GSZ:=gsz}
 
 export CGS_BINDIR
@@ -155,6 +157,35 @@ export CO_GPPALL
 export CO_GPPDEB
 export CO_GPPOPT
 export CO_GPPLIB
+
+
+export BINDIR=${REPOROOT}/bin
+export INCDIR=${REPOROOT}/include
+export LIBDIR=${REPOROOT}/lib
+export MANDIR=${REPOROOT}/man
+export INFODIR=${REPOROOT}/info
+export HELPDIR=${REPOROOT}/share/help
+export CRTDIR=${CGS_CRTDIR}
+export VALDIR=${CGS_VALDIR}
+export RUNDIR=${CGS_RUNDIR}
+
+
+export CPP=${CGS_GCPP}
+export CC=${CGS_GCC}
+export CXX=${CGS_GPP}
+export LD=${CGS_GLD}
+export AR=${CGS_GAR}
+export NM=${CGS_GNM}
+export RANLIB=${CGS_GRANLIB}
+export COV=${CGS_GCOV}
+export SZ=${CGS_GSZ}
+export LORDER="lorder"
+export TSORT="tsort"
+export LINT="lint"
+export RM="rm -f"
+export TOUCH="touch"
+export LINT="lint"
+
 
 # compiler and flags seletion for MAKE
 CFLAGS=

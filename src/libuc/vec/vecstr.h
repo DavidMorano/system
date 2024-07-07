@@ -181,6 +181,7 @@ extern int vecstr_adduniq(vecstr *,cchar *,int) noex ;
 extern int vecstr_addkeyval(vecstr *,cchar *,int,cchar *,int) noex ;
 extern int vecstr_insert(vecstr *,int,cchar *,int) noex ;
 extern int vecstr_store(vecstr *,cchar *,int,cchar **) noex ;
+extern int vecstr_already(vecstr *,cchar *,int) noex ;
 extern int vecstr_get(vecstr *,int,cchar **) noex ;
 extern int vecstr_getlast(vecstr *,cchar **) noex ;
 extern int vecstr_del(vecstr *,int) noex ;
@@ -199,6 +200,7 @@ extern int vecstr_strmk(vecstr *,char *,int) noex ;
 extern int vecstr_recsize(vecstr *) noex ;
 extern int vecstr_recmk(vecstr *,int *,int) noex ;
 extern int vecstr_recmkstr(vecstr *,int *,int,char *,int) noex ;
+extern int vecstr_avmkstr(vecstr *,cchar **,int,char *,int) noex ;
 extern int vecstr_audit(vecstr *) noex ;
 extern int vecstr_finish(vecstr *) noex ;
 /* extras (so-called) */

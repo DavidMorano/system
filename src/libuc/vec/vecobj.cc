@@ -51,11 +51,11 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef vecobj_cur	cur ;
 typedef vecobj_vcf	c_f ;
 
 extern "C" {
     typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
-    typedef int (*rawc_f)(void **,void **) noex ;
     typedef int (*vg_f)(vecobj *,int,void **) noex ;
 }
 
@@ -67,6 +67,7 @@ static int	vecobj_dtor(vecobj *) noex ;
 static int	vecobj_setopts(vecobj *,int) noex ;
 static int	vecobj_extend(vecobj *) noex ;
 static int	vecobj_iget(vecobj *,int,void **) noex ;
+static int	vecobj_sorted(vecobj *,vecobj_vcf) noex ;
 
 
 /* local subroutines */
@@ -310,10 +311,9 @@ int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 }
 /* end subroutine (vecobj_inorder) */
 
-int vecobj_get(vecobj *op,int i,void *rp) noex {
-	void		**rpp = (void **) rp ;
+int vecobj_get(vecobj *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && rp) {
+	if (op && rpp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 		rs = SR_OK ;
@@ -329,13 +329,13 @@ int vecobj_get(vecobj *op,int i,void *rp) noex {
 }
 /* end subroutine (vecobj_get) */
 
-int vecobj_store(vecobj *op,cvoid *s,void *rp) noex {
+int vecobj_store(vecobj *op,cvoid *s,void **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecobj_add(op,s)) >= 0) {
 	    i = rs ;
-	    if (rp) {
-	        rs = vecobj_get(op,i,rp) ;
+	    if (rpp) {
+	        rs = vecobj_get(op,i,rpp) ;
 	    }
 	}
 	return (rs >= 0) ? i : rs ;
@@ -507,95 +507,57 @@ int vecobj_curend(vecobj *op,vecobj_cur *curp) noex {
 }
 /* end subroutine (vecobj_curend) */
 
-int vecobj_fetch(vecobj *op,void *ep,vecobj_cur *curp,c_f vcf,void *rp) noex {
+namespace {
+    struct sub_fetch {
+	vecobj		*op ;
+	vecobj_vcf	vcf ;
+	cvoid		*ep ;
+	void		**rpp ;
+	sub_fetch(vecobj *p,cvoid *e,c_f c,void **r) noex : op(p), vcf(c) {
+	    ep = e ;
+	    rpp = r ;
+	} ;
+	int fetchfirst(cur *) noex ;
+	int fetchnext(cur *) noex ;
+    } ; /* end struct (sub_fetch) */
+}
+
+int vecobj_fetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep && vcf) {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) {
-	        vecobj_cur	cur ;
-	        int		j ;
-	        rawc_f		raw = rawc_f(vcf) ;
-	        void		**rpp = (void **) rp ;
-	        void		*ep2 ;
+	 	sub_fetch	so(op,ep,vcf,rpp) ;
+	        vecobj_cur	tmpcur{} ;
+	        void		*rep{} ;
 		rs = SR_OK ;
 	        if (curp == nullptr) {
-	            curp = &cur ;
+	            curp = &tmpcur ;
 	            curp->i = -1 ;
 	        }
 	        if (curp->i < 0) {
-	            curp->c = 0 ;
-	            if (rpp) rpp = &ep2 ;
-	            if ((rs = vecobj_search(op,ep,vcf,rpp)) >= 0) {
-		        cint	js = (rs-1) ;
-	                if (op->f.osorted) {
-			    vg_f	v = vecobj_iget ;
-	                    void	*last = *rpp ;
-	                    for (j = js ;
-	                        (j >= 0) && ((rs = v(op,j,rpp)) >= 0) ; 
-	                        j -= 1) {
-	                        if (raw(&ep,rpp) != 0) break ;
-	                        last = *rpp ;
-	                    } /* end for */
-	                    curp->i = j + 1 ;
-	                    rs = curp->i ;
-	                    *rpp = last ;
-	                } else {
-	                    curp->i = rs ;
-		        }
-	            } /* end if */
-	            if (rs >= 0) {
-	                curp->i = rs ;
-	                curp->c = 1 ;
-	            }
+		    rs = so.fetchfirst(curp) ;
+		    i = rs ;
 	        } else {
 	            if (op->f.osorted) {
-	                if (! op->f.issorted) {
-	                    int		si ;
-	                    op->f.issorted = true ;
-	                    if (op->c > 1) {
-	                        cint		esize = sizeof(void *) ;
-		                qsort_f		scf = qsort_f(vcf) ;
-	                        qsort(op->va,op->i,esize,scf) ;
-	                    }
-	                    if ((si = vecobj_search(op,ep,vcf,rpp)) >= 0) {
-	                        i = si ;
-	                        if (si > 0) {
-	                            void	*last = *rpp ;
-	                            for (j = (si - 1) ;
-	                                (j >= 0) && 
-	                                ((rs = vecobj_iget(op,j,rpp)) >= 0) ; 
-	                                j -= 1) {
-	                                if (raw(&ep,rpp) != 0) break ;
-	                                last = *rpp ;
-	                            } /* end for */
-	                            i = j + 1 ;
-	                            *rpp = last ;
-	                        } /* end if */
-	                        i += (curp->c - 1) ;
-	                        curp->i = i ;
-	                    } else {
-	                        curp->i = op->i ;
-		            }
-	                } /* end if (it was out-of-order) */
-	                i = curp->i + 1 ;
-	                if ((rs = vecobj_iget(op,i,&ep2)) >= 0) {
-	                    if (raw(&ep,&ep2) != 0) {
-	                        rs = SR_NOTFOUND ;
-		            }
-	                } /* end if */
+		        rs = so.fetchnext(curp) ;
+		        i = rs ;
 	            } else {
-	                for (i = (curp->i + 1) ; 
-	                    (rs = vecobj_iget(op,i,&ep2)) >= 0 ; i += 1) {
-	                    if (ep2) {
-	                        if (raw(&ep,&ep2) == 0) break ;
+	                i = (curp->i + 1) ; 
+			while ((rs = vecobj_iget(op,i,&rep)) >= 0) {
+	                    if (rep) {
+				cvoid	*cep = cvoidp(rep) ;
+	                        if (vcf(&ep,&cep) == 0) break ;
 		            }
+			    i += 1 ;
 	                } /* end for */
 	            } /* end if (sorted policy or not) */
 	            if (rs >= 0) {
-	                rs = curp->i = i ;
+	                rs = i ;
+	                curp->i = i ;
 	                curp->c += 1 ;
-	                if (rpp) *rpp = ep2 ;
+	                if (rpp) *rpp = rep ;
 	            } /* end if (ok) */
 	        } /* end if (first or subsequent fetch) */
 	        if (rs < 0) {
@@ -608,37 +570,27 @@ int vecobj_fetch(vecobj *op,void *ep,vecobj_cur *curp,c_f vcf,void *rp) noex {
 }
 /* end subroutine (vecobj_fetch) */
 
-int vecobj_search(vecobj *op,void *ep,vecobj_vcf vcf,void *vrp) noex {
+int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && ep && vcf) {
+	if (op && ep && rpp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-	        void	**rpp = (void **) vrp ;
-		rs = SR_OK ;
-	        if (op->f.osorted && (! op->f.issorted)) {
-	            op->f.issorted = true ;
-	            if (op->c > 1) {
-	                cint	esize = sizeof(void *) ;
-		        qsort_f	scf = qsort_f(vcf) ;
-	                qsort(op->va,op->i,esize,scf) ;
-	            }
-	        } /* end if (sorting) */
-	        if (op->f.issorted) {
+		if ((rs = vecobj_sorted(op,vcf)) > 0) {
 	            cint	esize = sizeof(void *) ;
 	            qsort_f	scf = qsort_f(vcf) ;
-	            void	**rpp2 ;
-	            rpp2 = (void **) bsearch(&ep,op->va,op->i,esize,scf) ;
+	            void	**sepp ;
+	            sepp = (void **) bsearch(&ep,op->va,op->i,esize,scf) ;
 	            rs = SR_NOTFOUND ;
-	            if (rpp2) {
+	            if (sepp) {
 	                rs = SR_OK ;
-	                i = ((char **) rpp2) - ((char **) op->va) ;
+	                i = charpp(sepp) - charpp(op->va) ;
 	            }
 	        } else {
-	            rawc_f	raw = rawc_f(vcf) ;
 	            for (i = 0 ; i < op->i ; i += 1) {
 	                if (op->va[i]) {
-	                    if (raw(&ep,(op->va + i)) == 0) break ;
+			    cvoid	**cvpp = cvoidpp(op->va + i) ;
+	                    if (vcf(&ep,cvpp) == 0) break ;
 		        }
 	            } /* end for */
 	            rs = (i < op->i) ? SR_OK : SR_NOTFOUND ;
@@ -784,16 +736,104 @@ static int vecobj_extend(vecobj *op) noex {
 }
 /* end subroutine (vecobj_extend) */
 
-static int vecobj_iget(vecobj *op,int i,void **spp) noex {
+static int vecobj_iget(vecobj *op,int i,void **rpp) noex {
 	int		rs = SR_NOTFOUND ;
 	if ((i >= 0) && (i < op->i)) {
-	    *spp = op->va[i] ;
+	    *rpp = op->va[i] ;
 	    rs = i ;
 	} else {
-	    *spp = nullptr ;
+	    *rpp = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (vecobj_iget) */
+
+static int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
+	int		rs = SR_OK ;
+	int		fsorted ;
+	if (op->f.osorted && (! op->f.issorted)) {
+	    op->f.issorted = true ;
+	    if (op->c > 1) {
+	        cint	esize = sizeof(void *) ;
+		qsort_f	scf = qsort_f(vcf) ;
+		qsort(op->va,op->i,esize,scf) ;
+	    }
+	} /* end if (sorting) */
+	fsorted = op->f.issorted ;
+	return (rs >= 0) ? fsorted : rs ;
+}
+/* end subroutine (vecobj_sorted) */
+
+int sub_fetch::fetchfirst(cur *curp) noex {
+	int		rs ;
+	int		i = 0 ;
+	void		*rep{} ;
+	if ((rs = vecobj_search(op,ep,vcf,&rep)) >= 0) {
+	    if (op->f.osorted) {
+		vg_f	v = vecobj_iget ;
+		int	j = (rs - 1) ; /* used-afterwards */
+		void	*first = rep ;
+	        while ((j >= 0) && ((rs = v(op,j,&rep)) >= 0)) {
+		    cvoid	*cep = cvoidp(rep) ;
+		    if (vcf(&ep,&cep) != 0) break ;
+		    first = rep ;
+		    j -= 1 ;
+		} /* end while */
+		curp->i = (j + 1) ;
+		rs = curp->i ;
+		*rpp = first ;
+	    } else {
+	        curp->i = rs ;
+	    }
+	} /* end if */
+	if (rs >= 0) {
+	    curp->i = rs ;
+	}
+	return (rs >= 0) ? i : rs ;
+}
+/* end method (sub_fetch::fetchfirst) */
+
+int sub_fetch::fetchnext(cur *curp) noex {
+	int		rs = SR_OK ;
+	int		i = 0 ;
+	void		*rep{} ;
+        if (! op->f.issorted) {
+            op->f.issorted = true ;
+            if (op->c > 1) {
+                cint            esize = sizeof(void *) ;
+                qsort_f         scf = qsort_f(vcf) ;
+                qsort(op->va,op->i,esize,scf) ;
+            }
+            if ((rs = vecobj_search(op,ep,vcf,rpp)) >= 0) {
+                i = rs ;
+                if (rs > 0) {
+		    int		j = (rs - 1) ;
+                    void        *last = *rpp ;
+		    while ((j >= 0) && ((rs = vecobj_iget(op,j,&rep)) >= 0)) {
+	    	        cvoid	*cep = cvoidp(rep) ;
+                        if (vcf(&ep,&cep) != 0) break ;
+                        last = *rpp ;
+			j -= 1 ;
+                    } /* end for */
+                    i = (j + 1) ;
+                    *rpp = last ;
+                } /* end if */
+                curp->i = i ;
+            } else {
+                curp->i = op->i ;
+            }
+        } /* end if (it was out-of-order) */
+	if (rs >= 0) {
+            i = (curp->i + 1) ;
+            if ((rs = vecobj_iget(op,i,&rep)) >= 0) {
+	        cvoid	*cep = cvoidp(rep) ;
+                if (vcf(&ep,&cep) != 0) {
+                    rs = SR_NOTFOUND ;
+                }
+            } /* end if */
+	} /* end if (ok) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end method (sub_fetch::fetchnext) */
 
 

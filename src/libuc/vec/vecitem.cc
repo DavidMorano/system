@@ -51,9 +51,6 @@ extern "C" {
 }
 
 typedef vecitem_cur	cur ;
-typedef cvoid *		cvoidp ;
-typedef void **		voidpp ;
-typedef cvoid **	cvoidpp ;
 
 
 /* local structures */

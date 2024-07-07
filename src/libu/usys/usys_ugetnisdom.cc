@@ -70,11 +70,11 @@ namespace {
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 /****
-Solaris® has the subroutine, but w/ a different function signature.
-The size of the supplied buffer is gieven as an |int| rather than
-|size_z|.  This function signature (the one provided by Solaris®)
-is actually the one we like the most, but we work with what we 
-have.
+Solaris® has the subroutine, but w/ a different function signature
+(than what Darwin and Linux have).  The size of the supplied buffer
+is gieven as an |int| rather than |size_t|.  This function signature
+(the one provided by Solaris®) is actually the one we like the most,
+but we work with what we have.
 ****/
 
 extern "C" {

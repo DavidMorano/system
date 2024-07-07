@@ -5,34 +5,31 @@ T= sfx
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP=	cpp
-CC=	gcc
-CXX=	gpp
-LD=	gld
-RANLIB=	granlib
-AR=	gar
-NM=	gnm
-COV=	gcov
-
-LORDER=	lorder
-TSORT=	tsort
-LINT=	lint
-RM=	rm -f
-TOUCH=	touch
-LINT=	lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gpp
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS=

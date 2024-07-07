@@ -5,34 +5,31 @@ T= vec
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gpp
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS=
@@ -47,17 +44,16 @@ INCDIRS +=
 LIBDIRS= -L$(LIBDIR)
 
 
+RUNINFO= -tpath $(RUNDIR)
+
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
-
-
-default:		$(T).o
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 # vecstr
@@ -68,25 +64,8 @@ OBJD_VECSTR= vecstr_adds.o vecstr_foilcmp.o
 OBJE_VECSTR= vecstr_srvargs.o vecstr_svcargs.o
 OBJF_VECSTR= vecstr_loadgrusers.o vecstr_addsubdirs.o
 
-obja_vecstr.o:	$(OBJA_VECSTR)
-	$(LD) -r -o $@ $(OBJA_VECSTR)
-objb_vecstr.o:	$(OBJB_VECSTR)
-	$(LD) -r -o $@ $(OBJB_VECSTR)
-objc_vecstr.o:	$(OBJC_VECSTR)
-	$(LD) -r -o $@ $(OBJC_VECSTR)
-objd_vecstr.o:	$(OBJD_VECSTR)
-	$(LD) -r -o $@ $(OBJD_VECSTR)
-obje_vecstr.o:	$(OBJE_VECSTR)
-	$(LD) -r -o $@ $(OBJE_VECSTR)
-objf_vecstr.o:	$(OBJF_VECSTR)
-	$(LD) -r -o $@ $(OBJF_VECSTR)
-
 OBJ_VECSTR+= obja_vecstr.o objb_vecstr.o objc_vecstr.o
 OBJ_VECSTR+= objd_vecstr.o obje_vecstr.o objf_vecstr.o
-
-obj_vecstr.o:	$(OBJ_VECSTR)
-	$(LD) -r -o $@ $(OBJ_VECSTR)
-
 
 # vecpstr
 OBJA_VECPSTR= vecpstr.o vecpstr_env.o vecpstr_envfile.o 
@@ -96,81 +75,48 @@ OBJD_VECPSTR= vecpstr_adds.o vecpstr_foilcmp.o
 OBJE_VECPSTR= vecpstr_srvargs.o vecpstr_svcargs.o
 OBJF_VECPSTR= vecpstr_loadgrusers.o vecpstr_addsubdirs.o
 
-obja_vecpstr.o:	$(OBJA_VECPSTR)
-	$(LD) -r -o $@ $(OBJA_VECPSTR)
-objb_vecpstr.o:	$(OBJB_VECPSTR)
-	$(LD) -r -o $@ $(OBJB_VECPSTR)
-objc_vecpstr.o:	$(OBJC_VECPSTR)
-	$(LD) -r -o $@ $(OBJC_VECPSTR)
-objd_vecpstr.o:	$(OBJD_VECPSTR)
-	$(LD) -r -o $@ $(OBJD_VECPSTR)
-obje_vecpstr.o:	$(OBJE_VECPSTR)
-	$(LD) -r -o $@ $(OBJE_VECPSTR)
-objf_vecpstr.o:	$(OBJF_VECPSTR)
-	$(LD) -r -o $@ $(OBJF_VECPSTR)
-
 OBJ_VECPSTR+= obja_vecpstr.o objb_vecpstr.o objc_vecpstr.o 
 OBJ_VECPSTR+= objd_vecpstr.o obje_vecpstr.o objf_vecpstr.o 
 
-obj_vecpstr.o:	$(OBJ_VECPSTR)
-	$(LD) -r -o $@ $(OBJ_VECPSTR)
-
-
 # vecobj
-OBJA_VECOBJ= vecobj.o vecobj_hsort.o
-OBJB_VECOBJ= vecobj_recip.o vecobj_stringsort.o
-
-obja_vecobj.o:	$(OBJA_VECOBJ)
-	$(LD) -r -o $@ $(OBJA_VECOBJ)
-
-objb_vecobj.o:	$(OBJB_VECOBJ)
-	$(LD) -r -o $@ $(OBJB_VECOBJ)
+OBJA_VECOBJ= vecobj.o
+OBJB_VECOBJ= vecobj_recip.o
 
 OBJ_VECOBJ+= obja_vecobj.o objb_vecobj.o
 
-obj_vecobj.o:	$(OBJ_VECOBJ)
-	$(LD) -r -o $@ $(OBJ_VECOBJ)
-
 
 # vecxx
-
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o obj_vecobj.o
 OBJB_VEC= vechand.o vecitem.o vecsorthand.o
 OBJC_VEC= vecint.o veclong.o
 OBJD_VEC= recarr.o raqhand.o 
 
-obja_vec.o:	$(OBJA_VEC)
-	$(LD) -r -o $@ $(OBJA_VEC)
-
-objb_vec.o:	$(OBJB_VEC)
-	$(LD) -r -o $@ $(OBJB_VEC)
-
-objc_vec.o:	$(OBJC_VEC)
-	$(LD) -r -o $@ $(OBJC_VEC)
-
-objd_vec.o:	$(OBJD_VEC)
-	$(LD) -r -o $@ $(OBJD_VEC)
-
 
 OBJ_VEC= obja_vec.o objb_vec.o objc_vec.o objd_vec.o
 
 
+default:		$(T).o
+
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
 
 
 $(T).o:			$(OBJ_VEC)
@@ -195,6 +141,56 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
+
+obja_vecstr.o:	$(OBJA_VECSTR)
+	$(LD) -r -o $@ $(OBJA_VECSTR)
+objb_vecstr.o:	$(OBJB_VECSTR)
+	$(LD) -r -o $@ $(OBJB_VECSTR)
+objc_vecstr.o:	$(OBJC_VECSTR)
+	$(LD) -r -o $@ $(OBJC_VECSTR)
+objd_vecstr.o:	$(OBJD_VECSTR)
+	$(LD) -r -o $@ $(OBJD_VECSTR)
+obje_vecstr.o:	$(OBJE_VECSTR)
+	$(LD) -r -o $@ $(OBJE_VECSTR)
+objf_vecstr.o:	$(OBJF_VECSTR)
+	$(LD) -r -o $@ $(OBJF_VECSTR)
+
+obj_vecstr.o:	$(OBJ_VECSTR)
+	$(LD) -r -o $@ $(OBJ_VECSTR)
+
+obja_vecpstr.o:	$(OBJA_VECPSTR)
+	$(LD) -r -o $@ $(OBJA_VECPSTR)
+objb_vecpstr.o:	$(OBJB_VECPSTR)
+	$(LD) -r -o $@ $(OBJB_VECPSTR)
+objc_vecpstr.o:	$(OBJC_VECPSTR)
+	$(LD) -r -o $@ $(OBJC_VECPSTR)
+objd_vecpstr.o:	$(OBJD_VECPSTR)
+	$(LD) -r -o $@ $(OBJD_VECPSTR)
+obje_vecpstr.o:	$(OBJE_VECPSTR)
+	$(LD) -r -o $@ $(OBJE_VECPSTR)
+objf_vecpstr.o:	$(OBJF_VECPSTR)
+	$(LD) -r -o $@ $(OBJF_VECPSTR)
+
+obj_vecpstr.o:	$(OBJ_VECPSTR)
+	$(LD) -r -o $@ $(OBJ_VECPSTR)
+
+obja_vecobj.o:	$(OBJA_VECOBJ)
+	$(LD) -r -o $@ $(OBJA_VECOBJ)
+objb_vecobj.o:	$(OBJB_VECOBJ)
+	$(LD) -r -o $@ $(OBJB_VECOBJ)
+
+obj_vecobj.o:	$(OBJ_VECOBJ)
+	$(LD) -r -o $@ $(OBJ_VECOBJ)
+
+obja_vec.o:	$(OBJA_VEC)
+	$(LD) -r -o $@ $(OBJA_VEC)
+objb_vec.o:	$(OBJB_VEC)
+	$(LD) -r -o $@ $(OBJB_VEC)
+objc_vec.o:	$(OBJC_VEC)
+	$(LD) -r -o $@ $(OBJC_VEC)
+objd_vec.o:	$(OBJD_VEC)
+	$(LD) -r -o $@ $(OBJD_VEC)
 
 
 vecstr.o:		vecstr.cc		vecstr.h
@@ -232,6 +228,7 @@ vecobj_stringsort.o:	vecobj_stringsort.cc	vecobj.h
 
 vechand.o:		vechand.cc vechand.h
 vecint.o:		vecint.cc vecint.h
+veclong.o:		veclong.cc veclong.h
 vecitem.o:		vecitem.cc vecitem.h
 vecsorthand.o:		vecsorthand.cc vecsorthand.h
 

@@ -5,34 +5,31 @@ T= libu
 ALL= $(T).o $(T).a $(T).so
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gpp
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
@@ -52,11 +49,11 @@ RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 #SOFL= -shared -Xlinker -flat_namespace -Xlinker -undefined -Xlinker suppress
 #SOFL= -shared -Xlinker -undefined -Xlinker dynamic_lookup
@@ -97,7 +94,7 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJ= obja.o objb.o objc.o objd.o obje.o
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii
 
 
 default:		all
@@ -107,20 +104,23 @@ all:			$(ALL)
 so:			$(T).so
 
 
-.cc.o:
-	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-.c.o:
-	$(CC) -c $(CXXFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
-
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
+
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
 
 
 $(T).a:			$(OBJ)

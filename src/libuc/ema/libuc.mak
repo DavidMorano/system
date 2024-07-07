@@ -5,33 +5,31 @@ T= libuc
 ALL= $(T).so $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP=	gcpp
-CC=	gcc
-CXX=	gpp
-LD=	gld
-RANLIB=	granlib
-AR=	gar
-NM=	gnm
-COV=	gcov
-
-LORDER=	lorder
-TSORT=	tsort
-LINT=	lint
-RM=	rm -f
-TOUCH=	touch
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gpp
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
@@ -52,11 +50,11 @@ RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ001= uclibmemalloc.o ucmemalloc.o ucmallocx.o
@@ -354,7 +352,7 @@ UOBJ += $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
 UOBJ += $(UOBJ16) $(UOBJ17) $(UOBJ18) $(UOBJ19)
 
 
-.SUFFIXES:		.ls .ii .cx .cs
+.SUFFIXES:		.hh .ii
 
 
 default:		all
@@ -365,11 +363,6 @@ so:			$(T).so
 
 a:			$(T).a
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -384,10 +377,10 @@ a:			$(T).a
 	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $<
+	$(COMPILE.cc) $<
 
 
 libmacuser.a:		$(UOBJ)

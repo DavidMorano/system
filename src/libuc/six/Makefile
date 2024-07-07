@@ -9,30 +9,27 @@ BINDIR		?= $(REPOROOT)/bin
 INCDIR		?= $(REPOROOT)/include
 LIBDIR		?= $(REPOROOT)/lib
 MANDIR		?= $(REPOROOT)/man
-
 INFODIR		?= $(REPOROOT)/info
 HELPDIR		?= $(REPOROOT)/share/help
-LDRPATH		?= $(REPOROOT)/lib
-
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
-RUNDIR		?= $(USRLOCAL)/lib
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP	?= cpp
-CC	?= gcc
-CXX	?= gpp
-LD	?= gld
-RANLIB	?= granlib
-AR	?= gar
-NM	?= gnm
-COV	?= gcov
-LORDER	?= lorder
-TSORT	?= tsort
-LINT	?= lint
-RM	?= rm -f
-TOUCH	?= touch
-LINT	?= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gpp
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
@@ -46,6 +43,8 @@ INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
+
+RUNINFO= -tpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -70,15 +69,25 @@ OBJB= obj3.o obj4.o obj5.o
 OBJ= $(OBJA) $(OBJB)
 
 
+.SUFFIXES:		.hh .ii
+
+
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
 .c.o:
 	$(COMPILE.c) $<
