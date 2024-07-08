@@ -118,11 +118,11 @@ struct vecsorthand : vecsorthand_head {
 	int delhand(cvoid *) noex ;
 	int search(cvoid *,void *) noex ;
 	vecsorthand_iter begin() noex {
-	    vecsorthand_iter		it(va,0,i) ;
+	    vecsorthand_iter	it(va,0,i) ;
 	    return it ;
 	} ;
 	vecsorthand_iter end() noex {
-	    vecsorthand_iter		it(va,i,i) ;
+	    vecsorthand_iter	it(va,i,i) ;
 	    return it ;
 	} ;
 	void dtor() noex ;

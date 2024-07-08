@@ -155,7 +155,7 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	                    op->va[j + 1] = op->va[j] ;
 	                }
 	            } /* end if */
-	            op->va[i] = (void *) nep ;
+	            op->va[i] = voidpp(nep) ;
 	            op->i += 1 ;
 	            op->va[op->i] = nullptr ;
 	        } /* end if (vecsorthand_extend) */
@@ -170,14 +170,14 @@ int vecsorthand_get(vecsorthand *op,int i,void *vp) noex {
 	if (op && vp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-		cvoid		*rval = nullptr ;
+		void		*rval = nullptr ;
 		rs = SR_NOTFOUND ;
 		if ((i >= 0) && (i < op->i)) {
 	    	    rval = op->va[i] ;
 	    	    rs = i ;
 		}
 	        if (vp) {
-	            cvoid	**rpp = (cvoid **) vp ;
+	            void	**rpp = voidpp(vp) ;
 	            *rpp = rval ;
 	        }
 	    } /* end if (open) */
