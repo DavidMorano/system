@@ -160,6 +160,7 @@ constexpr cpcchar	homednames[] = {
 	"/home",
 	"/usr/add-on",
 	"/sysadm",
+	"/Users",
 	nullptr
 } ;
 
