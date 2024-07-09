@@ -1,0 +1,9 @@
+
+for X in u v w x y z ; do
+  XX=$( print -- $X | caseupper )
+  print -- X=${X} XX=${XX}
+  print -- "obj${X}.o:	\$(OBJ${XX})"
+  print -- '	$(LD) -r -o $@ $(LDFLAGS) $(OBJ'${XX}')'
+done
+
+
