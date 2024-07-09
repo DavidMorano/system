@@ -45,7 +45,7 @@ export OSNAME OSTYPE OSRELEASE OSNUM
 
 : ${CGS_GCPP:=gcpp}
 : ${CGS_GCC:=gcc}
-: ${CGS_GPP:=gpp}
+: ${CGS_GXX:=gxx}
 : ${CGS_GLD:=gld}
 : ${CGS_GRANLIB:=granlib}
 : ${CGS_GAR:=gar}
@@ -76,7 +76,7 @@ export CGS_SZ
 
 export CGS_GCPP
 export CGS_GCC
-export CGS_GPP
+export CGS_GXX
 export CGS_GLD
 export CGS_GAR
 export CGS_GNM
@@ -101,18 +101,18 @@ Darwin:*)
   : ${CO_GCCDEB:="-Wall -Wextra"}
   : ${CO_GCCOPT:=""}
   : ${CO_GCCLIB:="-fpic"}
-  : ${CO_GPPALL:=""}
-  : ${CO_GPPDEB:="-Wall -Wextra"}
-  : ${CO_GPPOPT:=""}
-  : ${CO_GPPLIB:="-fpic"}
+  : ${CO_GXXALL:=""}
+  : ${CO_GXXDEB:="-Wall -Wextra"}
+  : ${CO_GXXOPT:=""}
+  : ${CO_GXXLIB:="-fpic"}
   case ${BUILDTYPE} in
   debug)
     CO_GCCOPT="-g"
-    CO_GPPOPT="-g"
+    CO_GXXOPT="-g"
     ;;
   deliver)
     CO_GCCOPT="-O"
-    CO_GPPOPT="-O"
+    CO_GXXOPT="-O"
     ;;
   esac
   ;;
@@ -153,10 +153,10 @@ export CO_GCCDEB
 export CO_GCCOPT
 export CO_GCCLIB
 
-export CO_GPPALL 
-export CO_GPPDEB
-export CO_GPPOPT
-export CO_GPPLIB
+export CO_GXXALL 
+export CO_GXXDEB
+export CO_GXXOPT
+export CO_GXXLIB
 
 
 export BINDIR=${REPOROOT}/bin
@@ -172,7 +172,7 @@ export RUNDIR=${CGS_RUNDIR}
 
 export CPP=${CGS_GCPP}
 export CC=${CGS_GCC}
-export CXX=${CGS_GPP}
+export CXX=${CGS_GXX}
 export LD=${CGS_GLD}
 export AR=${CGS_GAR}
 export NM=${CGS_GNM}
@@ -195,7 +195,7 @@ case ${BUILDTYPE} in
 develope|debug)
   MAKECPPFLAGS=
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCDEB} ${CO_GCCOPT} ${CO_GCCLIB}"
-  MAKECXXFLAGS="${CO_GPPALL} ${CO_GPPDEB} ${CO_GPPOPT} ${CO_GPPLIB}"
+  MAKECXXFLAGS="${CO_GXXALL} ${CO_GXXDEB} ${CO_GXXOPT} ${CO_GXXLIB}"
   MAKELDFLAGS=
   ;;
 test)
@@ -207,7 +207,7 @@ profile)
 deliver)
   MAKECPPFLAGS=
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCOPT} ${CO_GCCLIB}"
-  MAKECXXFLAGS="${CO_GPPALL} ${CO_GPPOPT} ${CO_GPPLIB}"
+  MAKECXXFLAGS="${CO_GXXALL} ${CO_GXXOPT} ${CO_GXXLIB}"
   MAKELDFLAGS=
   MAKELDFLAGS=
   ;;
@@ -221,7 +221,7 @@ export MAKELDFLAGS
 
 
 #print -- CGS_CC=${CGS_CC}
-#print -- CGS_GPP=${CGS_GPP}
+#print -- CGS_GXX=${CGS_GXX}
 #print -- REPOROOT=${REPOROOT}
 
 export PATH=${REPOROOT}/bin:${PATH}
