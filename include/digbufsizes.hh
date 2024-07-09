@@ -102,7 +102,7 @@ constexpr int digbufsizes_ndigits(int ntype,int base) noex {
 		    n = 64 ;	/* 256 ÷ 4 = 64 */
 		    break ;
 		case 32:
-		    n = 53 ;	/* 256 ÷ 5 = 51.2 */
+		    n = 52 ;	/* 256 ÷ 5 = 51.2 */
 		    break ;
 		case 64:
 		    n = 43 ;	/* 256 ÷ 6 = 42.6 */

@@ -322,7 +322,7 @@ OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
 UOBJ00= matxstr.o toxc.o char.o 
 UOBJ01= strn.o strnxcmp.o sif.o
 UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
-UOBJ03= syswords.o stdfnames.o
+UOBJ03= stdfnames.o
 
 UOBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 UOBJ05= nleadstr.o nleadkeystr.o
