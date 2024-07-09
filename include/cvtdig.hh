@@ -60,6 +60,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<uvariables.hh>
 #include	<usysrets.h>
@@ -82,7 +84,7 @@ constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	int		rs = SR_INVALID ;
 	int		ndig = 0 ;
 	if ((b > 1) && (b <= cvtdig_maxbase)) {
-	    ndig = ((n*8)+nshift-1)/nshift ;
+	    ndig = ((n * CHAR_BIT) + nshift - 1) / nshift ;
 	    rs = SR_OVERFLOW ;
 	    if (ndig <= rlen) {
 	        cuint	mask = uint(b-1) ;
