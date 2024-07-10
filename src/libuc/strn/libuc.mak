@@ -202,76 +202,6 @@ control:
 	(uname -n ; date) > Control
 
 
-# base
-OBJ0_BASE= uctimeout.o
-OBJ1_BASE= ucsysconf.o 
-OBJ2_BASE= bufsizedata.o getbufsizenames.o
-OBJ3_BASE= getbufsize.o bufsizevar.o 
-
-OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
-
-obj0_base.o:	$(OBJ0_BASE)
-	$(LD) -r -o $@ $(OBJ0_BASE)
-
-obj1_base.o:	$(OBJ1_BASE)
-	$(LD) -r -o $@ $(OBJ1_BASE)
-
-obj2_base.o:	$(OBJ2_BASE)
-	$(LD) -r -o $@ $(OBJ2_BASE)
-
-obj3_base.o:	$(OBJ3_BASE)
-	$(LD) -r -o $@ $(OBJ3_BASE)
-
-base.o:		$(OBJ_BASE)
-	$(LD) -r -o $@ $(OBJ_BASE)
-
-
-# CHARACTER
-OBJA_CHAR= toxc.o char.o rmeol.o
-OBJB_CHAR= ischarx.o hasx.o
-
-OBJ_CHAR= obja_char.o objb_char.o
-
-obja_char.o:	$(OBJA_CHAR)
-	$(LD) -r -o $@ $(OBJA_CHAR)
-
-objb_char.o:	$(OBJB_CHAR)
-	$(LD) -r -o $@ $(OBJB_CHAR)
-
-character.o:	$(OBJ_CHAR)
-	$(LD) -r -o $@ $(OBJ_CHAR)
-
-
-# LIBU
-ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h
-
-# LIBUC
-ucsysmisc.o:		ucsysmisc.cc
-ucnprocs.o:		ucnprocs.cc
-ucpathconf.o:		ucpathconf.cc
-ucmain.o:		ucmain.cc
-ucatfork.o:		ucatfork.cc
-ucatexit.o:		ucatexit.cc
-ucfork.o:		ucfork.cc
-ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
-ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
-ucgetpid.o:		ucgetpid.cc ucgetpid.h
-ucproguser.o:		ucproguser.cc ucproguser.h
-ucprogdata.o:		ucprogdata.cc ucprogdata.h
-ucclustername.o:	ucclustername.cc ucclustername.h
-uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
-ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
-ucsysconf.o:		ucsysconf.cc ucsysconf.h
-
-# UNIX C-language system library string-to-integer interface
-# string-to-x
-ucstrtox.o:		ucstrtox.cc ucstrtox.h
-ucstrtod.o:		ucstrtod.cc ucstrtod.h
-
-# uctimeout (time-out call-backs)
-uctimeout.o:		uctimeout.cc
-
-
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(RLDFLAGS) $(OBJA)
 
@@ -350,6 +280,72 @@ objy.o:			$(OBJY)
 objz.o:			$(OBJZ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJZ)
 
+
+# base
+OBJ0_BASE= uctimeout.o
+OBJ1_BASE= ucsysconf.o 
+OBJ2_BASE= bufsizedata.o getbufsizenames.o
+OBJ3_BASE= getbufsize.o bufsizevar.o 
+
+OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
+
+obj0_base.o:	$(OBJ0_BASE)
+	$(LD) -r -o $@ $(OBJ0_BASE)
+
+obj1_base.o:	$(OBJ1_BASE)
+	$(LD) -r -o $@ $(OBJ1_BASE)
+
+obj2_base.o:	$(OBJ2_BASE)
+	$(LD) -r -o $@ $(OBJ2_BASE)
+
+obj3_base.o:	$(OBJ3_BASE)
+	$(LD) -r -o $@ $(OBJ3_BASE)
+
+base.o:		$(OBJ_BASE)
+	$(LD) -r -o $@ $(OBJ_BASE)
+
+
+# CHARACTER
+OBJA_CHAR= toxc.o char.o rmeol.o
+OBJB_CHAR= ischarx.o hasx.o
+
+OBJ_CHAR= obja_char.o objb_char.o
+
+obja_char.o:	$(OBJA_CHAR)
+	$(LD) -r -o $@ $(OBJA_CHAR)
+
+objb_char.o:	$(OBJB_CHAR)
+	$(LD) -r -o $@ $(OBJB_CHAR)
+
+character.o:	$(OBJ_CHAR)
+	$(LD) -r -o $@ $(OBJ_CHAR)
+
+
+# LIBUC
+ucsysmisc.o:		ucsysmisc.cc
+ucnprocs.o:		ucnprocs.cc
+ucpathconf.o:		ucpathconf.cc
+ucmain.o:		ucmain.cc
+ucatfork.o:		ucatfork.cc
+ucatexit.o:		ucatexit.cc
+ucfork.o:		ucfork.cc
+ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
+ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
+ucgetpid.o:		ucgetpid.cc ucgetpid.h
+ucproguser.o:		ucproguser.cc ucproguser.h
+ucprogdata.o:		ucprogdata.cc ucprogdata.h
+ucclustername.o:	ucclustername.cc ucclustername.h
+uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
+ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
+ucsysconf.o:		ucsysconf.cc ucsysconf.h
+
+# UNIX C-language system library string-to-integer interface
+# string-to-x
+ucstrtox.o:		ucstrtox.cc ucstrtox.h
+ucstrtod.o:		ucstrtod.cc ucstrtod.h
+
+# uctimeout (time-out call-backs)
+uctimeout.o:		uctimeout.cc
 
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
@@ -774,7 +770,6 @@ timestr.dir:
 pow.o:			pow.dir
 pow.dir:
 	makesubdir $@
-
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h

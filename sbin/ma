@@ -4,13 +4,13 @@
 : ${REPOROOT:=${HOME}/github/system}
 export REPOROOT
 
-BUILDTYPE=develope
+BUILDTYPE=develop
 #BUILDTYPE=deliver
 
 
 : ${ARCHITECTURE:=$( architecture )}
-: ${SYSNAME:=$( uname -s )}
-: ${RELEASE:=$( uname -r )}
+: ${SYSNAME:=$( sysname )}
+: ${RELEASE:=$( release )}
 export ARCHITECTURE SYSNAME RELEASE 
 
 : ${OSNAME:=${SYSNAME}}
@@ -18,6 +18,23 @@ export ARCHITECTURE SYSNAME RELEASE
 : ${OSRELEASE:=${RELEASE}}
 : ${OSNUM:=${RELEASE%%.*}}
 export OSNAME OSTYPE OSRELEASE OSNUM
+
+
+integer i=0
+typeset -a DIRS
+DIRS[i++]=${GH}/other/include
+DIRS[i++]=${GH}/research/include
+DIRS[i++]=${GH}/system/include
+DIRS[i++]=${GH}/test/include
+
+VPATH=
+for (( i = 0 ; i < ${#DIRS[@]} ; i += 1 )) ; do
+  if [[ $i > 0 ]] ; then
+    VPATH+=":"
+  fi
+  VPATH+="${DIRS[i]}"
+done
+export VPATH
 
 
 : ${CGS_BINDIR:=${REPOROOT}/bin}
@@ -192,7 +209,7 @@ CFLAGS=
 CXXFLAGS=
 
 case ${BUILDTYPE} in
-develope|debug)
+develop|debug)
   MAKECPPFLAGS=
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCDEB} ${CO_GCCOPT} ${CO_GCCLIB}"
   MAKECXXFLAGS="${CO_GXXALL} ${CO_GXXDEB} ${CO_GXXOPT} ${CO_GXXLIB}"

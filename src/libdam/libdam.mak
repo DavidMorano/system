@@ -5,37 +5,34 @@ T= libdam
 ALL= $(T).so $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP= gcpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
-
 
 I00= vsystem.h exitcodes.h localmisc.h
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
@@ -63,8 +60,7 @@ INCF= $(I20) $(I21) $(I22) $(I32)
 
 INCS= $(INCA) $(INCB) $(INCC) $(INCD) $(INCE) $(INCF) 
 
-
-LIBS=
+LIBS +=
 
 
 INCDIRS=
@@ -77,11 +73,11 @@ RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 INSTALLINC0= install-inca install-incb install-incc install-incd
@@ -364,7 +360,7 @@ OBJFILE2= objq.o objr.o objs.o objt.o obju.o objv.o
 OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 
 
-.SUFFIXES:		.ls .i .ii .cx .cs
+.SUFFIXES:		.hh .ii
 
 
 default:		all
@@ -374,12 +370,6 @@ all:			$(ALL)
 so:			$(T).so
 
 a:			$(T).a
-
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -394,20 +384,14 @@ a:			$(T).a
 	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $<
+	$(COMPILE.cc) $<
 
 
-libmacuser.a:		$(UOBJ)
-	$(AR) -rc $@ $?
-
-$(TT).a:		$(TOBJ)
-	$(AR) -rc $@ $?
-
-$(T).so:		$(SOBJ) Makefile $(T).a
-	$(LD) -G -o $@ $(SLDFLAGS) $(SOBJ) $(SLIBINFO)
+$(T).so:		$(OBJ) Makefile $(T).a
+	$(LD) -G -o $@ $(SLDFLAGS) $(OBJ) $(SLIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -683,61 +667,24 @@ egs.o:			egs.c egs.h
 
 sha1.o:			sha1.c sha1.h
 
-buffer.o:		buffer.c buffer.h
-
-buffer_blanks.o:	buffer_blanks.c buffer.h
-
-buffer_extras.o:	buffer_extras.c buffer.h
-
-buffer_stropaque.o:	buffer_stropaque.c buffer.h
-
-buffer_strcompact.o:	buffer_strcompact.c buffer.h
-
-buffer_strquote.o:	buffer_strquote.c buffer.h
-
-sbuf.o:			sbuf.c sbuf.h
-
-sbuf_loadstrs.o:	sbuf_loadstrs.c sbuf.h
-
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-
-sbuf_termconseq.o:	sbuf_termconseq.c sbuf.h
-
-sbuf_blanks.o:		sbuf_blanks.c sbuf.h
-
-bufstr.o:		bufstr.c bufstr.h
-
 outstore.o:		outstore.c outstore.h
+outbuf.o:		outbuf.c outbuf.h
 
 strmgr.o:		strmgr.c strmgr.h
 
 lookaside.o:		lookaside.c lookaside.h
 
-q.o:			q.c q.h
-
-plainq.o:		plainq.c plainq.h
-
-pq.o:			pq.c pq.h
-
 cpq.o:			cpq.c cpq.h
-
-charq.o:		charq.c charq.h
 
 intiq.o:		intiq.c intiq.h
 
-cq.o:			cq.c cq.h
-
 piq.o:			piq.c piq.h
-
-ciq.o:			ciq.c ciq.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
 
 netorder.o:		netorder.c netorder.h
 
 storeitem.o:		storeitem.c storeitem.h
-
-outbuf.o:		outbuf.c outbuf.h
 
 matenv.o:		matenv.c matenv.h
 

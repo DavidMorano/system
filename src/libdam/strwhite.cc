@@ -1,10 +1,8 @@
-/* strwhite */
+/* strwhite SUPPORT */
+/* lang=C++20 */
 
 /* find the next white space character in a string */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_FASTER	1		/* cheap attempt as faster */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,39 +16,33 @@
 
 /*******************************************************************************
 
+	Name:
+	strwhite
+
+	Description:
 	This subroutine will scan a string and return the first
-	white-space-like character found.  This subroutine is really just a
-	short cut for something like:
+	white-space-like character found.  This subroutine is really
+	just a short cut for something like:
 
 		char *strpbrk(s," \v\t\r\n")
 		const char	s[] ;
 
 	Synopsis:
-
-	char *strwhite(s)
-	const char	*s ;
+	char *strwhite(cchar *s) noex
 
 	Arguments:
-
 	s		string to search in
 
 	Returns:
-
 	NULL		if no white space was found
 	!= NULL		the pointer to the first white space character
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -70,21 +62,13 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-char *strwhite(cchar *s)
-{
-
-#if	CF_FASTER
+char *strwhite(cchar *s) noex {
 	return strpbrk(s," \t\r\n\v") ;
-#else
-	while ((*s != '\0') && (! CHAR_ISWHITE(*s)))
-	    s += 1 ;
-
-	return ((s != '\0') ? s : NULL) ;
-#endif
-
 }
 /* end subroutine (strwhite) */
 

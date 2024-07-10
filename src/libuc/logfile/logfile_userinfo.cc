@@ -54,11 +54,13 @@
 #include	<usystem.h>
 #include	<uvariables.hh>
 #include	<getbufsize.h>
-#include	<logfile.h>
 #include	<userinfo.h>
+#include	<getostype.h>
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
+
+#include	"logfile.h"
 
 
 /* local defines */
@@ -172,8 +174,11 @@ int loguser::first() noex {
 	char		timebuf[TIMEBUFLEN + 1] ;
 	{
 	    cchar	*ts = timestr_logz(dt,timebuf) ;
-	    cchar	*st = (uip->f.sysv_ct) ? "SYSV" : "BSD" ;
+	    cchar	*st = "-" ;
 	    cchar	*fmt ;
+	    if (uip->ostype < ostype_overlast) {
+		st = ostypenames[uip->ostype] ;
+	    }
 	    if ((pn[0] != '\0') || (vn[0] != '\0')) {
 	        fmt = "%s %s %s/%s" ;
 	    } else {

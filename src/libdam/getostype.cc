@@ -98,14 +98,6 @@ static int	findtype() noex ;
 
 /* local variables */
 
-constexpr cpcchar	typestrs[] = {
-	"bsd",
-	"sysv",
-	"linux",
-	"darwin",
-	nullptr
-} ;
-
 constexpr osguess	guesses[] = {
 	{ "sunos", ostype_sysv },
 	{ "darwin", ostype_darwin },
@@ -129,6 +121,14 @@ constexpr typer_m	mems[] = {
 /* exported variables */
 
 ostyper		ostype ;
+
+cpcchar		ostypenames[] = {
+	"bsd",
+	"sysv",
+	"linux",
+	"darwin",
+	nullptr
+} ;
 
 
 /* exported subroutines */
@@ -179,7 +179,7 @@ int typer::envostype() noex {
 	if (eot) {
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfshrink(eot,-1,&cp)) > 0) {
-		if (int idx ; (idx = matcasestr(typestrs,cp,cl)) >= 0) {
+		if (int idx ; (idx = matcasestr(ostypenames,cp,cl)) >= 0) {
 		    rs = idx ;
 		    fgot = true ;
 		}
