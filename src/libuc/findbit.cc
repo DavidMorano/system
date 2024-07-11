@@ -16,7 +16,7 @@
 	= 2001-02-11, David A­D­ Morano
 	I removed the long (32k-byte) look-up table and instead I
 	am now using an algorithm that uses a 128-byte look-up
-	table. I felt that wasting 32k bytes for something so
+	table.  I felt that wasting 32k bytes for something so
 	relatively unused was not the best use of in-core memory.
 	And yes, these things invariably end up in in-core memory
 	due to use in shared objects or something else that indirectly
@@ -39,17 +39,17 @@
 	Notes:
 
 	There are (obviously) a lot of ways to implement these sorts
-	of functions. Doing these functions in hardware used to be
-	the norm in the olden days. But the reach for the modern
+	of functions.  Doing these functions in hardware used to be
+	the norm in the olden days.  But the reach for the modern
 	RISC (we no longer count machines like the CDC [67]600
 	variations) screwed that pooch! For the |ffbsx()| functions
 	we have traditionally done a bit more work since they are
-	more commonly used than the others. We used to use a
+	more commonly used than the others.  We used to use a
 	relatively larger look-up table for it, but we have now
-	scaled back to using only a 128 byte look-up table. We now
+	scaled back to using only a 128 byte look-up table.  We now
 	do the same for the |flbsx()| functions since they are also
 	rather commonly used (eg: finding higher powers of two).
-	We feel that we are fast enough for our present needs. If
+	We feel that we are fast enough for our present needs.  If
 	you need faster performance, you are welcome to do your
 	own!
 
@@ -57,9 +57,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<stdintx.h>
 
 
@@ -70,6 +70,18 @@
 
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

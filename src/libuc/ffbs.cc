@@ -39,6 +39,9 @@
 using std::countr_zero ;		/* subroutine-template */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 
