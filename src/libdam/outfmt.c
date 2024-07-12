@@ -1,5 +1,8 @@
-/* outfmt */
+/* outfmt SUPPORT */
+/* lang=C++20 */
+
 /* output formats */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,7 +17,12 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
+
+#include	"outfmt.h"
 
 
 const char	*outfmts[] = {
@@ -23,6 +31,5 @@ const char	*outfmts[] = {
 	"bible",
 	NULL
 } ;
-
 
 

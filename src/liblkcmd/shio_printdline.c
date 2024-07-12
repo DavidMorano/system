@@ -1,9 +1,8 @@
-/* shio_printdline */
+/* shio_printdline SUPPORT */
+/* lang=C++20 */
 
 /* print a double-high double-wide line */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,9 +18,7 @@
 
 	This subroutine prints a double-high double-wide line.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -72,11 +69,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	msleep(int) ;
 extern int	termescseq(char *,int,int,int,int,int,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 extern char	*strnchr(const char *,int,int) ;
 extern char	*strnrchr(const char *,int,int) ;
 
@@ -114,10 +106,6 @@ int		llen ;
 	    rs = shio_printdpart(ofp,'6','4',lbuf,llen) ;
 	    wlen += rs ;
 	}
-
-#if	CF_DEBUGS
-	    debugprintf("shio_printdline: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -174,6 +162,5 @@ int		llen ;
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (shio_printdpart) */
-
 
 

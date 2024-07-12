@@ -6,8 +6,7 @@
 
 /* revision history:
 
-	= 1991-11-01, David A­D­ Morano
-
+	= David A.D. Morano, November 1991
 	This subroutine was originally written.
 
 
@@ -21,28 +20,20 @@
 	(parsed out) field is placed into the return buffer provided.
 
 	Arguments:
-
 	- buffer to receive resultant parsed out string
 	- length of buffer receiving parsed out string
 	- buffer containing the string to be parsed
 	- length of string to be parsed
 
 	Returns:
-
 	- length of parsed out string
 
 
 *****************************************************************************/
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 
 #include	<ascii.h>
-#include	<char.h>
 #include	<baops.h>
 
 #include	"localmisc.h"
@@ -51,7 +42,7 @@
 
 /* static data */
 
-static const uchar	terms[] = {
+static unsigned char	terms[] = {
 	0x00, 0x02, 0x00, 0x00,
 	0x77, 0x10, 0x00, 0x7C,
 	0x00, 0x00, 0x00, 0x00,
@@ -61,7 +52,6 @@ static const uchar	terms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 } ;
-
 
 
 
@@ -75,10 +65,10 @@ int	rlen, len ;
 	char	*rbp = rbuf ;
 	char	*bp = buf ;
 
-
 /* fast forward to a non-blank type character */
 
-	while ((len > 0) && ((*bp == CH_SP) || (*bp == CH_TAB))) {
+	while ((len > 0) && ((*bp == C_SP) || (*bp == C_TAB))) {
+
 	    bp += 1 ;
 	    len -= 1 ;
 	}
