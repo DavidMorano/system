@@ -1,9 +1,8 @@
-/* securefile */
+/* securefile SUPPORT */
+/* lang=C++20 */
 
 /* check if a given file name is SUID and owned by our effective UID */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revistion history:
@@ -17,41 +16,36 @@
 
 /******************************************************************************
 
-        This subroutine will check if a given file name is SUID and owned by our
-        effective UID.
+	Name:
+	checksecure
+
+	Description:
+	This subroutine will check if a given file name is SUID and
+	owned by our effective UID.
 
 	Synopsis:
-
-	int securefile(name,euid,egid)
-	const char	name[] ;
-	uid_t		euid ;
-	gid_t		egid ;
+	int securefile(cchar *name,uid_t euid,gid_t egid) noex
 
 	Arguments:
-
 	name		filename
 	euid		current EUID
 	egid		current EGID
 
 	Returns:
-
 	>0		secure
 	==0		not secure
 	<0		error and also not secure
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -62,25 +56,26 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int securefile(name,euid,egid)
-const char	name[] ;
-int		euid, egid ;
-{
-	struct ustat	sb ;
-
-	int	rs ;
-	int	f = FALSE ;
-
+int securefile(cchar *name,uid_t euid,gid_t egid) noex {
+	USTAT		sb ;
+	int		rs ;
+	int		f = FALSE ;
 
 	if (name == NULL)
 	    return SR_INVALID ;
 
-	rs = u_stat(name,&sb) ;
-
-	if (rs >= 0) {
+	if ((rs = u_stat(name,&sb)) >= 0) {
 
 	    f = (sb.st_uid == euid) && 
 		(sb.st_mode & S_IXUSR) && (sb.st_mode & S_ISUID) ;

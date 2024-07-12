@@ -29,6 +29,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -37,8 +38,7 @@
 #include	<useraccdb.h>
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proguserlist.h"
 
 
 /* local defines */
@@ -83,10 +83,13 @@ struct userlist {
 
 /* forward references */
 
-static int	proguserlist_worker(PROGINFO *) ;
+static int	proguserlist_worker(PROGINFO *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported variables */

@@ -1,6 +1,8 @@
-/* proguserlist */
+/* proguserlist HEADER */
+/* lang=C20 */
 
 /* program-user-list-ing */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,32 +21,26 @@
 
 *******************************************************************************/
 
-
 #ifndef	PROGUSERLIST_INCLUDE
-#define	PROGUSERLIST_INCLUDE	1
+#define	PROGUSERLIST_INCLUDE
 
 
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"defs.h"
 
 
-#if	(! defined(PROGUSERLIST_MASTER)) || (PROGUSERLIST_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	proguserlist_begin(PROGINFO *) ;
 extern int	proguserlist_end(PROGINFO *) ;
  
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* PROGUSERLIST_MASTER */
 
 #endif /* PROGUSERLIST_INCLUDE */
 

@@ -1,17 +1,15 @@
-/* freadline */
+/* freadln SUPPORT */
+/* lang=C++20 */
 
 /* read a coded line from the STDIO stream */
-
+/* version %I% last-modified %G% */
 
 #define	CF_FGETS	1		/* faster or not? */
-
 
 /* revision history:
 
 	= 1998-08-17, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -29,20 +27,17 @@
 	supplied length of bytes.
 
 	Notes:
-
 	The IRIX operating system is messed up somehow.  An attempt
 	to correct for this is below.
 
-
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<string.h>
-#include	<stdio.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdio>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -54,16 +49,13 @@
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int freadline(fp,buf,len)
-FILE	*fp ;
-char	buf[] ;
-int	len ;
-{
+int freadln(FILE *fp,char *buf,int len) noex {
 	int	i = 0 ;
-
 
 	if (len == 0)
 	    return 0 ;
@@ -110,19 +102,11 @@ int	len ;
 
 	return i ;
 }
-/* end subroutine (freadline) */
+/* end subroutine (freadln) */
 
-
-int fgetline(fp,buf,len)
-FILE	*fp ;
-char	buf[] ;
-int	len ;
-{
-
-
-	return freadline(fp,buf,len) ;
+int fgetline(FILE *fp,char *buf,int len) noex {
+	return freadln(fp,buf,len) ;
 }
 /* end subroutine (fgetline) */
-
 
 
