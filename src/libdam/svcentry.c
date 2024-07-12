@@ -653,7 +653,7 @@ int		outlen ;		/* output buffer length */
 	ibp = inbuf ;
 	if (pep->ssp != NULL) {
 
-	    rs = varsub_expand(pep->ssp, vbuf,OUTBUFLEN, inbuf,-1) ;
+	    rs = varsub_exp(pep->ssp, vbuf,OUTBUFLEN, inbuf,-1) ;
 	    vlen = rs ;
 	    if (rs >= 0)
 	        ibp = vbuf ;

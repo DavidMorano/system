@@ -207,7 +207,7 @@ static int process(PROCSE *pep,EXPCOOK *ecp,cchar *inbuf,cchar **opp) noex {
 	    int		vl = 0 ;
 	    char	vbuf[BUFLEN + 1] ;
 	    if (pep->vsp != nullptr) {
-	        rs = varsub_expand(pep->vsp,vbuf,vlen,inbuf,-1) ;
+	        rs = varsub_exp(pep->vsp,vbuf,vlen,inbuf,-1) ;
 	        vl = rs ;
 	    } else {
 	        rs = sncpy1(vbuf,vlen,inbuf) ;

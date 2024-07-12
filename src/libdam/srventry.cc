@@ -227,7 +227,7 @@ char		**opp ;
 	char	*fp ;
 
 	*opp = nullptr ;
-	rs = varsub_expand(vsp, vbuf,BUFLEN, inbuf,-1) ;
+	rs = varsub_exp(vsp, vbuf,BUFLEN, inbuf,-1) ;
 	vlen = rs ;
 	if (rs < 0)
 	    goto ret0 ;

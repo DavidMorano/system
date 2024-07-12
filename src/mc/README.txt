@@ -1,4 +1,4 @@
-MC (not finished)
+MC
 
 This program (MailCheck) checks for mail and sends a message (someplace)
 if mail is detected.

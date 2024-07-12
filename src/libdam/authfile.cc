@@ -1,9 +1,8 @@
-/* authfile */
+/* authfile SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to read the authorization file */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,54 +16,47 @@
 
 /*******************************************************************************
 
-        This subroutine reads the authorization file (if supplied by the
-        invoking user) and returns (possibly) a username, a password, one, none,
-        or both of these.
+	Name:
+	authfile
+
+	Description:
+	This subroutine reads the authorization file (if supplied
+	by the invoking user) and returns (possibly) a username, a
+	password, one, none, or both of these.
 
 	Synospsis:
-
 	int authfile(char *username,char *password,cchar *fname)
 
 	Arguments:
-
 	username	result sername
 	password	result passwordA
 	fname		authorization file
 
 	Returns:
-
 	>0		success
 	==		not-successful
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
-#include	<localmisc.h>
+#include	<strdcpyx.h>
+#include	<localmisc.h>		/* |LINEBUFLEN| */
+
+#include	"authfile.h"
 
 
 /* local defines */
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
 
 #ifndef	MAXAUTHLEN
 #define	MAXAUTHLEN	64
@@ -73,22 +65,19 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-
-
-/* forward subroutines */
-
 
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
-static const uchar	fterms[32] = {
+constexpr cchar		fterms[32] = {
 	0x00, 0x02, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x20,
 	0x00, 0x00, 0x00, 0x00,
@@ -100,11 +89,12 @@ static const uchar	fterms[32] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int authfile(char *username,char *password,cchar *fname)
-{
+int authfile(char *username,char *password,cchar *fname) noex {
 	bfile		afile, *afp = &afile ;
 	int		rs ;
 	int		rs1 ;
@@ -119,15 +109,15 @@ int authfile(char *username,char *password,cchar *fname)
 	password[0] = '\0' ;
 
 	if ((rs = bopen(afp,fname,"r",0666)) >= 0) {
-	    FIELD	fsb ;
-	    const int	llen = LINEBUFLEN ;
+	    field	fsb ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		type ;
 	    int		fl ;
 	    const char	*fp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
-	    while ((rs = breadln(afp,lbuf,LINEBUFLEN)) > 0) {
+	    while ((rs = breadln(afp,lbuf,llen)) > 0) {
 	        len = rs ;
 
 	        if (lbuf[len - 1] == '\n') len -= 1 ;

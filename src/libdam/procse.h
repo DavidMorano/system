@@ -42,11 +42,14 @@ struct procse_head {
 	PROCSE_ARGS	a ;
 } ;
 
+typedef	PROCSE		procse ;
+typedef	PROCSE_ARGS	procse_args ;
+
 EXTERNC_begin
 
-extern int procse_start(PROCSE *,cchar **,varsub *,PROCSE_ARGS *) noex ;
-extern int procse_process(PROCSE *,EXPCOOK *) noex ;
-extern int procse_finish(PROCSE *) noex ;
+extern int procse_start(procse *,cchar **,varsub *,procse_args *) noex ;
+extern int procse_process(procse *,expcook *) noex ;
+extern int procse_finish(procse *) noex ;
 
 EXTERNC_end
 

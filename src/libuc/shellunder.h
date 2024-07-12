@@ -18,19 +18,19 @@
 #include	<utypealiases.h>
 
 
-#define	SHELLUNDER	struct shellunder_head
+#define	SHELLUNDER_DAT	struct shellunder_data
 
 
-struct shellunder_head {
+struct shellunder_data {
 	cchar		*progename ;	/* child program exec-name */
 	pid_t		pid ;		/* parent (shell) PID */
 } ;
 
-typedef	SHELLUNDER	shellunder ;
+typedef	SHELLUNDER_DAT	shellunder_dat ;
 
 EXTERNC_begin
 
-extern int	shellunder_wr(shellunder *,cchar *) noex ;
+extern int	shellunder_wr(shellunder_dat *,cchar *) noex ;
 
 EXTERNC_end
 
