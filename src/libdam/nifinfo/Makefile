@@ -110,9 +110,7 @@ NMFLAGS= -xs
 CPP= cpp
 
 
-UPINCS=
-
-INCS= ifaddrlist.h
+INCS= nifinfo.h ifaddrlist.h
 
 
 OBJ00= nifinfomain.o
@@ -195,7 +193,7 @@ control:
 	date >> Control
 
 
-nifinfomain.o:		nifinfomain.c $(INCS)
+nifinfo_obj.o:		nifinfo_obj.c		$(INCS)
 
 
 vecstr_loadfile.o:	vecstr_loadfile.c

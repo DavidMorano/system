@@ -1,9 +1,8 @@
-/* procse */
+/* procse SUPPORT */
+/* lang=C++20 */
 
 /* build up a server entry piece-meal as it were */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,30 +16,28 @@
 
 /*******************************************************************************
 
-        This little object is used to create a server entry and to populate
-        aspects of it with different operations on the object. This object is
-        used in "server" types of programs. This object is usually created from
-        elements taken from the parsing of a server file.
-
+	This little object is used to create a server entry and to
+	populate aspects of it with different operations on the
+	object.  This object is used in "server" types of programs.
+	This object is usually created from elements taken from the
+	parsing of a server file.
 
 *******************************************************************************/
 
-
-#define	PROCSE_MASTER		1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<expcook.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"procse.h"
@@ -62,14 +59,19 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static int	process(PROCSE *,EXPCOOK *,const char *,const char **) ;
+static int	process(PROCSE *,EXPCOOK *,cchar *,cchar **) noex ;
+
+
+/* local variables */
 
 
 /* external variables */
@@ -77,12 +79,9 @@ static int	process(PROCSE *,EXPCOOK *,const char *,const char **) ;
 
 /* exported subroutines */
 
-
-int procse_start(PROCSE *pep,cchar **envv,varsub *vsp,PROCSE_ARGS *esap)
-{
-
-	if (pep == NULL) return SR_FAULT ;
-	if (esap == NULL) return SR_FAULT ;
+int procse_start(PROCSE *pep,cchar **envv,varsub *vsp,PROCSE_ARGS *esap) noex {
+	if (pep == nullptr) return SR_FAULT ;
+	if (esap == nullptr) return SR_FAULT ;
 
 	memset(pep,0,sizeof(PROCSE)) ;
 	pep->envv = envv ;
@@ -93,55 +92,53 @@ int procse_start(PROCSE *pep,cchar **envv,varsub *vsp,PROCSE_ARGS *esap)
 }
 /* end subroutine (procse_start) */
 
-
-int procse_finish(PROCSE *pep)
-{
+int procse_finish(PROCSE *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pep == NULL) return SR_FAULT ;
+	if (pep == nullptr) return SR_FAULT ;
 
-	if (pep->a.passfile != NULL) {
+	if (pep->a.passfile != nullptr) {
 	    rs1 = uc_free(pep->a.passfile) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.sharedobj != NULL) {
+	if (pep->a.sharedobj != nullptr) {
 	    rs1 = uc_free(pep->a.sharedobj) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.program != NULL) {
+	if (pep->a.program != nullptr) {
 	    rs1 = uc_free(pep->a.program) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.srvargs != NULL) {
+	if (pep->a.srvargs != nullptr) {
 	    rs1 = uc_free(pep->a.srvargs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.username != NULL) {
+	if (pep->a.username != nullptr) {
 	    rs1 = uc_free(pep->a.username) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.groupname != NULL) {
+	if (pep->a.groupname != nullptr) {
 	    rs1 = uc_free(pep->a.groupname) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.options != NULL) {
+	if (pep->a.options != nullptr) {
 	    rs1 = uc_free(pep->a.options) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.access != NULL) {
+	if (pep->a.access != nullptr) {
 	    rs1 = uc_free(pep->a.access) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (pep->a.failcont != NULL) {
+	if (pep->a.failcont != nullptr) {
 	    rs1 = uc_free(pep->a.failcont) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -152,68 +149,41 @@ int procse_finish(PROCSE *pep)
 }
 /* end subroutine (procse_finish) */
 
-
-/* process server entry */
-int procse_process(PROCSE *pep,EXPCOOK *ecp)
-{
+int procse_process(PROCSE *pep,EXPCOOK *ecp) noex {
 	PROCSE_ARGS	*ap ;
 	int		rs = SR_OK ;
 
-	if (pep == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("procse_process: ent\n") ;
-#endif
+	if (pep == nullptr) return SR_FAULT ;
 
 	ap = pep->ap ;
 
 /* pop them */
 
-#if	CF_DEBUGS
-	debugprintf("procse_process: in-program=>%s<\n",
-	    ap->program) ;
-#endif
-
-	if ((rs >= 0) && (ap->passfile != NULL))
+	if ((rs >= 0) && (ap->passfile != nullptr))
 	    rs = process(pep,ecp,ap->passfile,&pep->a.passfile) ;
 
-	if ((rs >= 0) && (ap->sharedobj != NULL))
+	if ((rs >= 0) && (ap->sharedobj != nullptr))
 	    rs = process(pep,ecp,ap->sharedobj,&pep->a.sharedobj) ;
 
-	if ((rs >= 0) && (ap->program != NULL))
+	if ((rs >= 0) && (ap->program != nullptr))
 	    rs = process(pep,ecp,ap->program,&pep->a.program) ;
 
-#if	CF_DEBUGS
-	debugprintf("procse_process: process() rs=%d out-program=>%s<\n",
-	    rs,pep->program) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("procse_process: in-srvargs=>%s<\n",
-	    ap->srvargs) ;
-#endif
-
-	if ((rs >= 0) && (ap->srvargs != NULL))
+	if ((rs >= 0) && (ap->srvargs != nullptr))
 	    rs = process(pep,ecp,ap->srvargs,&pep->a.srvargs) ;
 
-#if	CF_DEBUGS
-	debugprintf("procse_process: process() rs=%d out-srvargs=>%s<\n",
-	    rs,pep->srvargs) ;
-#endif
-
-	if ((rs >= 0) && (ap->username != NULL))
+	if ((rs >= 0) && (ap->username != nullptr))
 	    rs = process(pep,ecp,ap->username,&pep->a.username) ;
 
-	if ((rs >= 0) && (ap->groupname != NULL))
+	if ((rs >= 0) && (ap->groupname != nullptr))
 	    rs = process(pep,ecp,ap->groupname,&pep->a.groupname) ;
 
-	if ((rs >= 0) && (ap->options != NULL))
+	if ((rs >= 0) && (ap->options != nullptr))
 	    process(pep,ecp,ap->options,&pep->a.options) ;
 
-	if ((rs >= 0) && (ap->access != NULL))
+	if ((rs >= 0) && (ap->access != nullptr))
 	    rs = process(pep,ecp,ap->access,&pep->a.access) ;
 
-	if ((rs >= 0) && (ap->failcont != NULL))
+	if ((rs >= 0) && (ap->failcont != nullptr))
 	    rs = process(pep,ecp,ap->failcont,&pep->a.failcont) ;
 
 	return rs ;
@@ -223,26 +193,20 @@ int procse_process(PROCSE *pep,EXPCOOK *ecp)
 
 /* local subroutines */
 
-
-static int process(PROCSE *pep,EXPCOOK *ecp,cchar *inbuf,cchar **opp)
-{
+static int process(PROCSE *pep,EXPCOOK *ecp,cchar *inbuf,cchar **opp) noex {
 	int		rs = SR_OK ;
 	char		fl = 0 ;
-	const char	*ccp ;
-	const char	*fp ;
+	cchar		*ccp ;
+	cchar		*fp ;
 
-#if	CF_DEBUGS
-	debugprintf("procse/process: ent inbuf=>%s<\n",inbuf) ;
-#endif
+	if (opp == nullptr) return SR_FAULT ;
 
-	if (opp == NULL) return SR_FAULT ;
-
-	*opp = NULL ;
+	*opp = nullptr ;
 	if (rs >= 0) {
-	    const int	vlen = BUFLEN ;
+	    cint	vlen = BUFLEN ;
 	    int		vl = 0 ;
 	    char	vbuf[BUFLEN + 1] ;
-	    if (pep->vsp != NULL) {
+	    if (pep->vsp != nullptr) {
 	        rs = varsub_expand(pep->vsp,vbuf,vlen,inbuf,-1) ;
 	        vl = rs ;
 	    } else {
@@ -250,10 +214,10 @@ static int process(PROCSE *pep,EXPCOOK *ecp,cchar *inbuf,cchar **opp)
 	        vl = rs ;
 	    }
 	    if (rs >= 0) {
-		const int	elen = BUFLEN ;
-		int		el = 0 ;
-	        char		ebuf[BUFLEN + 1] ;
-	        if (ecp != NULL) {
+		cint	elen = BUFLEN ;
+		int	el = 0 ;
+	        char	ebuf[BUFLEN + 1] ;
+	        if (ecp != nullptr) {
 	            rs = expcook_exp(ecp,0,ebuf,elen,vbuf,vl) ;
 	            el = rs ;
 	        } else {
@@ -268,10 +232,6 @@ static int process(PROCSE *pep,EXPCOOK *ecp,cchar *inbuf,cchar **opp)
 	        }
 	    } /* end if (ok) */
 	} /* end if (ok) */
-
-#if	CF_DEBUGS
-	debugprintf("procse/process: ret rs=%d fl=%u\n",rs,fl) ;
-#endif
 
 	return (rs >= 0) ? fl : rs ;
 }

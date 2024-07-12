@@ -1,17 +1,14 @@
-/* srventry */
+/* srventry SUPPORT */
+/* lang=C++20 */
 
 /* build up a server entry piece-meal as it were */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1996-09-01, David Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -25,25 +22,20 @@
 	This object is usually created from elements taken from the
 	parsing of a server file.
 
-
 *******************************************************************************/
 
-
-#define	SRVENTRY_MASTER		1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<mallocstuff.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"srvtab.h"
@@ -59,70 +51,67 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,char **) ;
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static int	process(varsub *,char *,SRVENTRY_ARGS *,char **) ;
-static int	expand() ;
+static int	process(varsub *,char *,SRVENTRY_ARGS *,char **) noex ;
+static int	expand() noex ;
 
-static void	freeit(char **) ;
+static void	freeit(char **) noex ;
 
 
 /* external variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int srventry_start(sep)
-SRVENTRY	*sep ;
-{
-
-
-	memset(sep,0,sizeof(SRVENTRY)) ;
-	sep->program = NULL ;
-	sep->srvargs = NULL ;
-	sep->username = NULL ;
-	sep->groupname = NULL ;
-	sep->options = NULL ;
-	sep->access = NULL ;
-
-	return SR_OK ;
+int srventry_start(SRVENTRY *sep) noex {
+	int		rs = SR_FAULT ;
+	if (sep) {
+	    rs = memclear(sep) ;
+	    sep->program = nullptr ;
+	    sep->srvargs = nullptr ;
+	    sep->username = nullptr ;
+	    sep->groupname = nullptr ;
+	    sep->options = nullptr ;
+	    sep->access = nullptr ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (srventry_init) */
 
-
-int srventry_finish(sep)
-SRVENTRY	*sep ;
-{
-
-
-	if (sep->program != NULL)
+int srventry_finish(SRVENTRY *sep) noex {
+	if (sep->program != nullptr)
 	    free(sep->program) ;
 
-	if (sep->srvargs != NULL)
+	if (sep->srvargs != nullptr)
 	    free(sep->srvargs) ;
 
-	if (sep->username != NULL)
+	if (sep->username != nullptr)
 	    free(sep->username) ;
 
-	if (sep->groupname != NULL)
+	if (sep->groupname != nullptr)
 	    free(sep->groupname) ;
 
-	if (sep->options != NULL)
+	if (sep->options != nullptr)
 	    free(sep->options) ;
 
-	if (sep->access != NULL)
+	if (sep->access != nullptr)
 	    free(sep->access) ;
 
 	return SR_OK ;
 }
 /* end subroutine (srventry_free) */
 
-
-/* process server entry */
 int srventry_process(sep,ssp,envv,step,esap)
 SRVENTRY	*sep ;
 varsub		*ssp ;
@@ -132,47 +121,25 @@ SRVENTRY_ARGS	*esap ;
 {
 
 
-#if	CF_DEBUGS
-	debugprintf("srventry_process: entered\n") ;
-#endif
-
-
-/* pop them */
-
-	if (step->program != NULL)
+	if (step->program != nullptr)
 	    process(ssp,step->program,esap,&sep->program) ;
 
-#if	CF_DEBUGS
-	debugprintf("srventry_process: svcarg=>%s<\n",
-	    step->args) ;
-#endif
-
-	if (step->args != NULL) {
-
-#if	CF_DEBUGS
-	    debugprintf("srventry_process: processing srvargs=>%s<\n",
-	        step->args) ;
-#endif
+	if (step->args != nullptr) {
 
 	    process(ssp,step->args,esap,&sep->srvargs) ;
 
-#if	CF_DEBUGS
-	    debugprintf("srventry_process: srvargs=>%s<\n",
-	        sep->srvargs) ;
-#endif
-
 	}
 
-	if (step->username != NULL)
+	if (step->username != nullptr)
 	    process(ssp,step->username,esap,&sep->username) ;
 
-	if (step->groupname != NULL)
+	if (step->groupname != nullptr)
 	    process(ssp,step->groupname,esap,&sep->groupname) ;
 
-	if (step->options != NULL)
+	if (step->options != nullptr)
 	    process(ssp,step->options,esap,&sep->options) ;
 
-	if (step->access != NULL)
+	if (step->access != nullptr)
 	    process(ssp,step->access,esap,&sep->access) ;
 
 	return SR_OK ;
@@ -188,7 +155,7 @@ char		program[] ;
 
 	sep->program = mallocstr(program) ;
 
-	return ((sep->program != NULL) ? SR_OK : SR_NOMEM) ;
+	return ((sep->program != nullptr) ? SR_OK : SR_NOMEM) ;
 }
 
 
@@ -200,7 +167,7 @@ char		srvargs[] ;
 
 	sep->srvargs = mallocstr(srvargs) ;
 
-	return ((sep->srvargs != NULL) ? SR_OK : SR_NOMEM) ;
+	return ((sep->srvargs != nullptr) ? SR_OK : SR_NOMEM) ;
 }
 
 
@@ -212,7 +179,7 @@ char		username[] ;
 
 	sep->username = mallocstr(username) ;
 
-	return ((sep->username != NULL) ? SR_OK : SR_NOMEM) ;
+	return ((sep->username != nullptr) ? SR_OK : SR_NOMEM) ;
 }
 
 
@@ -224,7 +191,7 @@ char		groupname[] ;
 
 	sep->groupname = mallocstr(groupname) ;
 
-	return ((sep->groupname != NULL) ? SR_OK : SR_NOMEM) ;
+	return ((sep->groupname != nullptr) ? SR_OK : SR_NOMEM) ;
 }
 
 
@@ -236,7 +203,7 @@ char		options[] ;
 
 	sep->options = mallocstr(options) ;
 
-	return ((sep->options != NULL) ? SR_OK : SR_NOMEM) ;
+	return ((sep->options != nullptr) ? SR_OK : SR_NOMEM) ;
 }
 /* end subroutine (srventry_addoptions) */
 
@@ -259,28 +226,15 @@ char		**opp ;
 	char	ebuf[BUFLEN + 1] ;
 	char	*fp ;
 
-
-#if	CF_DEBUGS
-	debugprintf("srventry/process: entered\n") ;
-#endif
-
-	*opp = NULL ;
+	*opp = nullptr ;
 	rs = varsub_expand(vsp, vbuf,BUFLEN, inbuf,-1) ;
 	vlen = rs ;
 	if (rs < 0)
 	    goto ret0 ;
 
-#if	CF_DEBUGS
-	debugprintf("srventry/process: vlen=%d\n",vlen) ;
-#endif
-
 	elen = expand(vbuf,vlen,esap,ebuf,BUFLEN) ;
 	if (elen < 0)
 	    rs = SR_OVERFLOW ;
-
-#if	CF_DEBUGS
-	debugprintf("srventry/process: elen=%d\n",elen) ;
-#endif
 
 	if (rs >= 0) {
 
@@ -291,10 +245,6 @@ char		**opp ;
 	} /* end if */
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("srventry/process: ret rs=%d fl=%u\n",rs,fl) ;
-#endif
 
 	return (fl >= 0) ? rs : fl ;
 }
@@ -337,20 +287,6 @@ SRVENTRY_ARGS	*esap ;
 	char	*bp = buf ;
 	char	*cp ;
 
-
-#if	CF_DEBUGS
-	    debugprintf("srventry/expand: entered >%W<\n",buf,len) ;
-#endif
-
-#if	CF_DEBUGS
-	    if (buf == NULL)
-	        debugprintf("srventry/expand: buf is NULL\n") ;
-
-	    if (rbuf == NULL)
-	        debugprintf("srventry/expand: rbuf is NULL\n") ;
-
-#endif /* CF_DEBUGS */
-
 	rbuf[0] = '\0' ;
 	if (len == 0)
 	    return 0 ;
@@ -358,19 +294,10 @@ SRVENTRY_ARGS	*esap ;
 	if (len < 0)
 	    len = strlen(buf) ;
 
-#if	CF_DEBUGS
-	    debugprintf("srventry/expand: top of while\n") ;
-#endif
-
 	rlen -= 1 ;			/* reserve for zero terminator */
 	while ((len > 0) && (elen < rlen)) {
 
-#if	CF_DEBUGS
-	        debugprintf("srventry/expand: switching on >%c<\n",*bp) ;
-#endif
-
 	    switch ((int) *bp) {
-
 	    case '%':
 	        bp += 1 ;
 	        len -= 1 ;
@@ -412,7 +339,7 @@ SRVENTRY_ARGS	*esap ;
 
 	        case 'H':
 	            sl = -1 ;
-	            if (esap->hostname == NULL) {
+	            if (esap->hostname == nullptr) {
 
 	                cp = hostbuf ;
 	                sl = bufprintf(hostbuf,MAXHOSTNAMELEN,"%s.%s",
@@ -428,60 +355,50 @@ SRVENTRY_ARGS	*esap ;
 
 		case 'U':
 	            cp = esap->username ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 
 		    break ;
 
 	        case 'P':
 	            cp = esap->peername ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
-
-#if	CF_DEBUGS
-	                debugprintf("srventry/expand: peername >%s<\n",
-				cp) ;
-#endif
 
 	            break ;
 
 	        case 's':
 	            cp = esap->service ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 
 	            break ;
 
 	        case 'a':
 
-#if	CF_DEBUGS
-	            if (g.debuglevel > 2)
-	                debugprintf("srventry/expand: svcargs >%s<\n",
-	                    esap->svcargs) ;
-#endif
 	            cp = esap->svcargs ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 
 	            break ;
 
 	        case 'h':
 	            cp = esap->nethost ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 
 	            break ;
 
 	        case 'u':
 	            cp = esap->netuser ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 
 	            break ;
 
 	        case 'p':
 	            cp = esap->netpass ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 
 	            break ;
@@ -511,35 +428,19 @@ SRVENTRY_ARGS	*esap ;
 
 	    } /* end switch */
 
-#if	CF_DEBUGS
-	        debugprintf("srventry/expand: bottom while\n") ;
-#endif
-
 	} /* end while */
-
-#if	CF_DEBUGS
-	    debugprintf("srventry/expand: normal exit >%W<\n",rbuf,elen) ;
-#endif
 
 	rbuf[elen] = '\0' ;
 	return elen ;
 }
 /* end subroutine (expand) */
 
-
-static void freeit(pp)
-char	**pp ;
-{
-
-
-	if (*pp != NULL) {
-
+static void freeit(char **pp) noex {
+	if (*pp != nullptr) {
 	    free(*pp) ;
-
-	    *pp = NULL ;
+	    *pp = nullptr ;
 	}
 }
 /* end subroutine (freeit) */
-
 
 
