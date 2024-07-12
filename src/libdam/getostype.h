@@ -65,6 +65,7 @@ struct ostyper {
 } ;
 
 extern ostyper	ostype ;
+extern cpcchar	ostypenames[] ;
 
 #endif /* __cplusplus */
 

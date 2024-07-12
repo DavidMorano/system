@@ -43,10 +43,10 @@ struct valuelims {
 	clong		lmax = LONG_MAX ;
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
-	cushort		usmax = ushort(0xFFFF) ;
-	cuint		uimax = UINT_MAX ;
-	culong		ulmax = ULONG_MAX ;
-	ulonglong	ullmax = 0 ;
+	cushort		usmax = ushort(0xFFFF) ;	/* unsigned */
+	cuint		uimax = UINT_MAX ;		/* unsigned */
+	culong		ulmax = ULONG_MAX ;		/* unsigned */
+	ulonglong	ullmax = 0 ;			/* unsigned */
 	constexpr void mklonglong () noex {
 	    clonglong	one = 1 ;
 	    cint	n = int(CHAR_BIT * sizeof(longlong)) ;

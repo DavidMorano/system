@@ -20,8 +20,8 @@
 	rmeol
 	rmochr
 	rmrchr
-	rmext
 	rmtrailchr
+	rmext
 	rmcomment
 
 	Description:
@@ -33,8 +33,8 @@
 	int rmeol(cchar *sp,int sl) noex
 	int rmochr(cchar *sp,int sl,int sch) noex
 	int rmrchr(cchar *sp,int sl,int sch) noex
-	int rmext(cchar *sp,int sl) noex
 	int rmtrailchr(cchar *sp,int sl,int sch) noex
+	int rmext(cchar *sp,int sl) noex
 	int rmcomment(cchar *sp,int sl) noex
 
 	Arguments:
@@ -143,7 +143,7 @@ int rmext(cchar *sp,int sl) noex {
 
 int rmtrailchr(cchar *sp,int sl,int sch) noex {
 	if (sl < 0) sl = strlen(sp) ;
-	while ((sl > 0) && (sp[sl-1] == sch)) {
+	while ((sl > 1) && (sp[sl-1] == sch)) {
 	   sl -= 1 ;
 	}
 	return sl ;

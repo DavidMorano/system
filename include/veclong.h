@@ -80,7 +80,7 @@ extern int veclong_finish(veclong *) noex ;
 extern int veclong_add(veclong *,VECLONG_TYPE) noex ;
 extern int veclong_addlist(veclong *,const VECLONG_TYPE *,int) noex ;
 extern int veclong_adduniq(veclong *,VECLONG_TYPE) noex ;
-extern int veclong_insert(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_insert(veclong *,int,VECLONG_TYPE) noex ;
 extern int veclong_assign(veclong *,int,VECLONG_TYPE) noex ;
 extern int veclong_resize(veclong *,int) noex ;
 extern int veclong_del(veclong *,int) noex ;

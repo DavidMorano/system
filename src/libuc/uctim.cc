@@ -1111,20 +1111,22 @@ static void uctim_exit() noex {
 /* end subroutine (uctim_atforkparent) */
 
 static int ourcmp(cvoid *a1p,cvoid *a2p) noex {
-	callback		**e1pp = (callback **) a1p ;
-	callback		**e2pp = (callback **) a2p ;
+	callback	**e1pp = (callback **) a1p ;
+	callback	**e2pp = (callback **) a2p ;
 	int		rc = 0 ;
-	if (*e1pp || *e2pp) {
-	    rc = 1 ;
-	    if (*e1pp) {
-		rc = -1 ;
-	        if (*e2pp) {
-	            callback	*i1p = (callback *) *e1pp ;
-	            callback	*i2p = (callback *) *e2pp ;
-	            rc = (i1p->val - i2p->val) ;
+	{
+	    callback	*e1p = *e1pp ;
+	    callback	*e2p = *e2pp ;
+	    if (e1p || e2p) {
+	        rc = 1 ;
+	        if (e1p) {
+		    rc = -1 ;
+	            if (e2p) {
+	                rc = (e1p->val - e2p->val) ;
+	            }
 	        }
 	    }
-	}
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (ourcmp) */

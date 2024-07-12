@@ -1,0 +1,13 @@
+MAKE
+
+= Automatic variables
+
+$@	target
+$%	archive member
+$<	first member of the set of prerequisites
+$?	all prerequisites that are newer than the target
+$^	all prerequisites with duplicates removed
+$+	all prerequisites including any duplicates
+$!	order-only prerequisites
+$*	stem
+

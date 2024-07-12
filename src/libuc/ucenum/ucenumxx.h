@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<filemap.h>
-#include	<localmisc.h>
 
 
 #define	UCENUMXX	struct ucenumxx_head

@@ -39,13 +39,19 @@
 using std::countr_zero ;		/* subroutine-template */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
-/* subroutine-templates */
+/* local structures */
+
+
+/* forward references */
 
 template<typename T>
 int ffbsx(T uv) noex {
@@ -56,9 +62,6 @@ int ffbsx(T uv) noex {
 	return n ;
 }
 /* end subroutine-template (ffbsx) */
-
-
-/* forward references */
 
 
 /* local variables */

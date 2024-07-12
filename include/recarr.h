@@ -80,7 +80,7 @@ typedef int (*recarr_cf)(cvoid **,cvoid **) noex ;
 extern int recarr_start(recarr *,int,int) noex ;
 extern int recarr_add(recarr *,cvoid *) noex ;
 extern int recarr_count(recarr *) noex ;
-extern int recarr_sort(recarr *, int (*)()) noex ;
+extern int recarr_sort(recarr *,recarr_cf) noex ;
 extern int recarr_setsorted(recarr *) noex ;
 extern int recarr_get(recarr *,int,cvoid *) noex ; 
 extern int recarr_getlast(recarr *,cvoid *) noex ; 

@@ -19,9 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	<mknpathx.h>
 #include	<mknpathxw.h>

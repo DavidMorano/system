@@ -5,35 +5,31 @@ T= six
 ALL= $(T).o
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP=	cpp
-CC=	gcc
-CXX=	gpp
-LD=	gld
-RANLIB=	granlib
-AR=	gar
-NM=	gnm
-COV=	gcov
-
-LORDER=	lorder
-TSORT=	tsort
-LINT=	lint
-RM=	rm -f
-TOUCH=	touch
-LINT=	lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gpp
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
@@ -48,52 +44,62 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
+RUNINFO= -tpath $(RUNDIR)
+
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CCFLAGS= $(MAKECCFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_SIX= sifext.o
+OBJ0= sialnum.o sialpha.o sibasename.o sibreak.o
+OBJ1= sixchr.o sicasechr.o sicite.o sidigit.o 
+OBJ2= sihyphen.o silbrace.o sileader.o
+OBJ3= siskipwhite.o sispan.o sisub.o sicasesub.o 
+OBJ4= sifext.o sinext.o
+OBJ5= sidquote.o siterm.o
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
+OBJA= obj0.o obj1.o obj2.o 
+OBJB= obj3.o obj4.o obj5.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ= $(OBJA) $(OBJB)
+
+
+.SUFFIXES:		.hh .ii
 
 
 default:		$(T).o
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
+	$(COMPILE.cc) $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -105,7 +111,7 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(ALL)
+	$(RM) $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -114,22 +120,43 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
-obj4_six.o:	$(OBJ4_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-sifext.o:		sifext.cc sifext.h
+sifext.o:		sifext.cc sifext.h	$(INCS)
+sialnum.o:		sialnum.cc		$(INCS)
+sialpha.o:		sialpha.cc		$(INCS)
+sibasename.o:		sibasename.cc		$(INCS)
+sibreak.o:		sibreak.cc		$(INCS)
+sicasechr.o:		sicasechr.cc		$(INCS)
+sicasesub.o:		sicasesub.cc		$(INCS)
+sicite.o:		sicite.cc		$(INCS)
+sidigit.o:		sidigit.cc		$(INCS)
+sidquote.o:		sidquote.cc		$(INCS)
+sihyphen.o:		sihyphen.cc		$(INCS)
+silbrace.o:		silbrace.cc		$(INCS)
+sileader.o:		sileader.cc		$(INCS)
+sinext.o:		sinext.cc		$(INCS)
+siskipwhite.o:		siskipwhite.cc		$(INCS)
+sispan.o:		sispan.cc		$(INCS)
+sisub.o:		sisub.cc		$(INCS)
+siterm.o:		siterm.cc		$(INCS)
+sixchr.o:		sixchr.cc		$(INCS)
 
 

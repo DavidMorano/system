@@ -5,33 +5,31 @@ T= libuc
 ALL= $(T).so $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP=	gcpp
-CC=	gcc
-CXX=	gpp
-LD=	gld
-RANLIB=	granlib
-AR=	gar
-NM=	gnm
-COV=	gcov
-
-LORDER=	lorder
-TSORT=	tsort
-LINT=	lint
-RM=	rm -f
-TOUCH=	touch
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
@@ -52,309 +50,47 @@ RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CCFLAGS= $(MAKECCFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ001= uclibmemalloc.o ucmemalloc.o ucmallocx.o
-OBJ002= uc_open.o uc_openinfo.o 
-OBJ003= uc_opensocket.o uc_openproto.o uc_openprog.o uc_openpass.o uc_openuser.o
-OBJ004= uc_openfsvc.o uc_openfint.o uc_openusvc.o uc_opendialer.o
-OBJ005= uc_opensys.o uc_opendev.o uc_create.o uc_createfile.o uc_joinus.o
-OBJ006= uc_readn.o uc_reade.o uc_readline.o 
-OBJ007= uc_write.o uc_writen.o uc_writefile.o uc_writedesc.o
-OBJ008= uc_recve.o uc_recvfrome.o uc_recvmsge.o
-OBJ009= uc_remove.o uc_connecte.o uc_stat.o uc_lstat.o uc_statvfs.o uc_fstat.o
-OBJ010= uc_fsync.o uc_fdatasync.o uc_fchmodsuid.o uc_chmodsuid.o uc_fsize.o
-OBJ011= uc_moveup.o uc_closeonexec.o uc_setappend.o uc_keepalive.o
-OBJ012= uc_nonblock.o uc_ndelay.o uc_msgdiscard.o uc_reuseaddr.o uc_linger.o
-OBJ013=
-OBJ014= uc_fattach.o uc_fdetach.o ucmkfifo.o uc_msync.o
-OBJ015= uc_accepte.o uc_lockf.o uc_lockfile.o uc_lockend.o uc_fpassfd.o
-OBJ016= uc_close.o
-OBJ017= uc_realpath.o uc_readlink.o uc_rename.o
-OBJ018= uc_getcwd.o uc_initgroups.o uc_getnetname.o uc_procpid.o
-OBJ019= uc_chmod.o uc_chown.o
-OBJ020= uc_getproto.o uc_getnet.o uc_gethost.o uc_getserv.o 
-OBJ021= uc_getipnodeby.o uc_getnameinfo.o uc_getaddrinfo.o 
-OBJ022=
-OBJ023= uc_ftime.o uc_mktime.o uc_clock.o
-OBJ024= uc_getlogin.o uc_getrusage.o uc_getloadavg.o
-OBJ025= uc_system.o uc_localtime.o uc_gmtime.o ucztime.o uc_sigset.o 
-OBJ026=
-OBJ027= uc_raise.o uc_killpg.o uc_sigqueue.o uc_syncer.o
-OBJ028= uc_sigwaitinfo.o uc_sigpause.o
-OBJ029= uc_sigdefault.o uc_sigignore.o uc_sighold.o uc_sigrelease.o
-OBJ030= uc_settimeofday.o uc_gettimeofday.o
+OBJ00= matxstr.o toxc.o char.o 
+OBJ01= strn.o strnxcmp.o sif.o
+OBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
+OBJ03= stdfnames.o
 
-OBJ031=
-OBJ032= ucgetdefaultproj.o ucinproj.o 
-OBJ033= ucgetuserattr.o uckvamatch.o
+OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
+OBJ05= nleadstr.o nleadkeystr.o
+OBJ06= mapex.o getourenv.o strnul.o
+OBJ07= sncpyx.o sncpyxw.o snaddw.o
 
-OBJ034= ucnprocs.o ucinetconv.o
-OBJ035=
-OBJ036= uc_openpt.o uc_grantpt.o uc_unlockpt.o uc_ptsname.o uc_ttyname.o
-OBJ037= uc_truncate.o uc_ftruncate.o
-OBJ038=
-OBJ039= uc_safesleep.o uc_exit.o 
-OBJ040= uc_setpriority.o uc_getpriority.o 
-OBJ041= uc_openshm.o uc_openshmto.o uc_unlinkshm.o 
-OBJ042= uc_openpsem.o uc_unlinkpsem.o
-OBJ043= uc_isatty.o uc_fminmod.o uc_minmod.o uc_link.o uc_symlink.o uc_unlink.o 
-OBJ044= uc_mkdir.o uc_rmdir.o uc_access.o uc_utime.o uc_utimes.o
-OBJ045= 
-OBJ046= uc_madvise.o uc_mlock.o uc_munlock.o uc_mlockall.o uc_munlockall.o
-OBJ047= uc_plock.o 
-OBJ048= uc_fork.o uc_execve.o uc_isaexecve.o 
-OBJ049= uc_gethostid.o uc_confstr.o uc_gethostname.o
-OBJ050= uc_mallocstrw.o uc_mallocbuf.o
-OBJ051= uc_waitwritable.o
-OBJ052= 
-OBJ053=
-OBJ054=
-OBJ055=
-OBJ056= uc_libmemalloc.o
-OBJ057= uc_getrandom.o uc_getsocktype.o
-OBJ058=
-OBJ059= pt_sigmask.o pt_atfork.o
-OBJ060=
-OBJ061= getrandom.o
-OBJ062= bufsizevar.o digbfsizes.o
-OBJ063=
+OBJ08= strkeycmp.o ccfile.o strnul.o
+OBJ09= readln.o ccfile.o
+OBJ10= cfx.o memtrack.o addrset.o mapblock.o
+OBJ11= strmgr.o strop.o field.o
 
-OBJ064= getprotofamily.o geteaddrinfo.o getaf.o getaflen.o getpwd.o
-OBJ065= getnodedomain.o utmpent.o getax.o 
-OBJ066= getbufsize.o getbufsizenames.o gethz.o getngroups.o getproto.o getserv.o
-OBJ067= getusername.o getuserhome.o getgroupname.o getprojname.o
-OBJ068= getportnum.o getenver.o getourenv.o
-OBJ069= nextpowtwo.o ndigits.o ipow.o llpow.o findbit.o
-OBJ070= isFailOpen.o isFailConn.o
-OBJ071= isnot.o iserror.o isoneof.o
+OBJ12= ucttyname.o uctc.o ucsysconf.o
+OBJ13=
+OBJ14= ucsys.o
+OBJ15= tcx.o
 
-OBJ072= 
-OBJ073= inetpton.o xperm.o getprogpath.o findxfile.o xfile.o
-OBJ074=
-OBJ075=
-OBJ076=
-OBJ077=
-OBJ078= pta.o ptm.o ptma.o ptc.o ptca.o psem.o lockrw.o envhelp.o
-OBJ079= storeitem.o storebuf.o buffer.o field.o char.o mkprogenv.o
+OBJ16 += wsix.o wsnx.o wsx.o
+OBJ17 += six.o snx.o sfx.o rmx.o
+OBJ18 +=
+OBJ19 +=
 
-OBJ080= fsdir.o pmq.o sigblock.o userattr.o filemap.o uname.o 
-OBJ081=
-OBJ082= envlist.o hdb.o lookaside.o ids.o linefold.o nulstr.o 
-OBJ083= dirseen.o dirseen_not.o
-OBJ084= strpack.o strmgr.o strtab.o
-OBJ085= varray.o randomvar.o sigign.o ucsem.o
-OBJ086= sbuf.o
-OBJ087= hostinfo.o hostaddr.o hostent.o inetaddr.o sockaddress.o ucpwcache.o
-
-OBJ088= strsub.o
-OBJ089=
-OBJ090=
-OBJ091=
-OBJ092=
-OBJ093=
-OBJ094= strnxcmp.o
-OBJ095=
-
-OBJ096=
-OBJ097=
-OBJ098=
-OBJ099=
-OBJ100= pathadd.o pathclean.o
-OBJ101=
-OBJ102= mkvarpath.o mkuserpath.o mkcdpath.o mkexpandpath.o
-OBJ103= mkquoted.o mksofname.o 
-
-OBJ104= six.o rmx.o
-OBJ105=
-OBJ106=
-OBJ107=
-OBJ108=
-OBJ109= matstr.o matostr.o matkeystr.o 
-OBJ110= strkeycmp.o strwcmp.o
-OBJ111= vstrcmpx.o vstrkeycmpx.o vstrkeydictcmp.o
-
-OBJ112= strcpyxc.o
-OBJ113=
-OBJ114=
-OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o
-OBJ116= mkcleanline.o checkbase.o ncol.o tabexpand.o tabcols.o 
-OBJ117= mapex.o calstrs.o
-OBJ118=
-OBJ119= toxc.o base64.o 
-
-OBJ120= uinfo.o umask.o uxygetpw.o utmpacc.o ucproguser.o ucprogdata.o
-OBJ121= nisdomainname.o
-OBJ122= opentmpfile.o opensysfs.o opensys_banner.o
-OBJ123= opensockaddr.o openaddrinfo.o
-OBJ124=
-OBJ125= getxid.o
-OBJ126= passwdent.o shadowent.o groupent.o projectent.o userattrent.o
-OBJ127= utmpaccent.o
-
-OBJ128= sigaction.o sigevent.o 
-OBJ129= timeout.o
-OBJ130= sigignores.o sigdefaults.o
-OBJ131= isfiledesc.o isinetaddr.o isindomain.o
-OBJ132=
-OBJ133= nleadstr.o nleadkeystr.o
-OBJ134= format.o
-OBJ135= getrootdname.o getdig.o randlc.o
-
-OBJ136= ctxxx.o ctbin.o ctoct.o ctdec.o cthex.o ctdecp.o ctdecf.o cvtdig.o
-OBJ137= cfxxx.o cfbin.o cfoct.o cfhex.o cfdec.o cfdecmf.o cfdect.o cfxxxx.o 
-OBJ138= cfnum.o cfhexs.o
-OBJ139= digval.o
-OBJ140=
-OBJ141=
-OBJ142=
-OBJ143=
-
-OBJ144= intceil.o intfloor.o intsat.o
-OBJ145= ucontext_rtn.o
-OBJ146= dialopts.o
-OBJ147=
-OBJ148= dialuss.o dialussmux.o dialussnls.o
-OBJ149= dialtcp.o dialtcpmux.o dialtcpnls.o 
-OBJ150= dialudp.o dialusd.o dialpass.o
-OBJ151= dialprog.o dialhttp.o dialfinger.o
-
-OBJ152= openshmtmp.o
-OBJ153= mallocxx.o
-OBJ154=
-OBJ155=
-OBJ156=
-OBJ157=
-OBJ158=
-OBJ159=
-
-OBJAa= $(OBJ000) $(OBJ001) $(OBJ002) $(OBJ003)
-OBJAb= $(OBJ004) $(OBJ005) $(OBJ006) $(OBJ007) 
-OBJA= $(OBJAa) $(OBJAb)
-
-OBJBa= $(OBJ008) $(OBJ009) $(OBJ010) $(OBJ011)
-OBJBb= $(OBJ012) $(OBJ013) $(OBJ014) $(OBJ015)
-OBJB= $(OBJBa) $(OBJBb)
-
-OBJCa= $(OBJ016) $(OBJ017) $(OBJ018) $(OBJ019)
-OBJCb= $(OBJ020) $(OBJ021) $(OBJ022) $(OBJ023)
-OBJC= $(OBJCa) $(OBJCb)
-
-OBJDa= $(OBJ024) $(OBJ025) $(OBJ026) $(OBJ027)
-OBJDb= $(OBJ028) $(OBJ029) $(OBJ030) $(OBJ031)
-OBJD= $(OBJDa) $(OBJDb)
-
-OBJEa= $(OBJ032) $(OBJ033) $(OBJ034) $(OBJ035)
-OBJEb= $(OBJ036) $(OBJ037) $(OBJ038) $(OBJ039)
-OBJE= $(OBJEa) $(OBJEb)
-
-OBJFa= $(OBJ040) $(OBJ041) $(OBJ042) $(OBJ043)
-OBJFb= $(OBJ044) $(OBJ045) $(OBJ046) $(OBJ047)
-OBJF= $(OBJFa) $(OBJFb)
-
-OBJGa= $(OBJ048) $(OBJ049) $(OBJ050) $(OBJ051)
-OBJGb= $(OBJ052) $(OBJ053) $(OBJ054) $(OBJ055)
-OBJG= $(OBJGa) $(OBJGb)
-
-OBJHa= $(OBJ056) $(OBJ057) $(OBJ058) $(OBJ059)
-OBJHb= $(OBJ060) $(OBJ061) $(OBJ062) $(OBJ063)
-OBJH= $(OBJHa) $(OBJHb)
-
-OBJIa= $(OBJ064) $(OBJ065) $(OBJ066) $(OBJ067)
-OBJIb= $(OBJ068) $(OBJ069) $(OBJ070) $(OBJ071)
-OBJI= $(OBJIa) $(OBJIb)
-
-OBJJa= $(OBJ072) $(OBJ073) $(OBJ074) $(OBJ075)
-OBJJb= $(OBJ076) $(OBJ077) $(OBJ078) $(OBJ079)
-OBJJ= $(OBJJa) $(OBJJb)
-
-OBJKa= $(OBJ080) $(OBJ081) $(OBJ082) $(OBJ083)
-OBJKb= $(OBJ084) $(OBJ085) $(OBJ086) $(OBJ087)
-OBJK= $(OBJKa) $(OBJKb)
-
-OBJLa= $(OBJ088) $(OBJ089) $(OBJ090) $(OBJ091)
-OBJLb= $(OBJ092) $(OBJ093) $(OBJ094) $(OBJ095)
-OBJL= $(OBJLa) $(OBJLb)
-
-OBJMa= $(OBJ096) $(OBJ097) $(OBJ098) $(OBJ099)
-OBJMb= $(OBJ100) $(OBJ101) $(OBJ102) $(OBJ103)
-OBJM= $(OBJMa) $(OBJMb)
-
-OBJNa= $(OBJ104) $(OBJ105) $(OBJ106) $(OBJ107)
-OBJNb= $(OBJ108) $(OBJ109) $(OBJ110) $(OBJ111)
-OBJN= $(OBJNa) $(OBJNb)
-
-OBJOa= $(OBJ112) $(OBJ113) $(OBJ114) $(OBJ115)
-OBJOb= $(OBJ116) $(OBJ117) $(OBJ118) $(OBJ119)
-OBJO= $(OBJOa) $(OBJOb)
-
-OBJPa= $(OBJ120) $(OBJ121) $(OBJ122) $(OBJ123)
-OBJPb= $(OBJ124) $(OBJ125) $(OBJ126) $(OBJ127)
-OBJP= $(OBJPa) $(OBJPb)
-
-OBJQa= $(OBJ128) $(OBJ129) $(OBJ130) $(OBJ131)
-OBJQb= $(OBJ132) $(OBJ133) $(OBJ134) $(OBJ135)
-OBJQ= $(OBJQa) $(OBJQb)
-
-OBJRa= $(OBJ136) $(OBJ137) $(OBJ138) $(OBJ139)
-OBJRb= $(OBJ140) $(OBJ141) $(OBJ142) $(OBJ143)
-OBJR= $(OBJRa) $(OBJRb)
-
-OBJSa= $(OBJ144) $(OBJ145) $(OBJ146) $(OBJ147)
-OBJSb= $(OBJ148) $(OBJ149) $(OBJ150) $(OBJ151)
-OBJS= $(OBJSa) $(OBJSb)
-
-OBJTa= $(OBJ152) $(OBJ153) $(OBJ154) $(OBJ155)
-OBJTb= $(OBJ156) $(OBJ157) $(OBJ158) $(OBJ159)
-OBJT= $(OBJTa) $(OBJTb)
+OBJ=
+OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
+OBJ += $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
+OBJ += $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11)
+OBJ += $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
+OBJ += $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19)
 
 
-OBJg0= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG) $(OBJH) 
-OBJg1= $(OBJI) $(OBJJ) $(OBJK) $(OBJL) $(OBJM) $(OBJN) $(OBJO) $(OBJP)
-OBJg2= $(OBJQ) $(OBJR) $(OBJS) $(OBJT)
-
-OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
-
-
-UOBJ00= matxstr.o toxc.o char.o 
-UOBJ01= strn.o strnxcmp.o sif.o
-UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
-UOBJ03= syswords.o stdfnames.o
-
-UOBJ04= isnot.o isoneof.o hasx.o ischarx.o 
-UOBJ05= nleadstr.o nleadkeystr.o
-UOBJ06= mapex.o getourenv.o strnul.o
-UOBJ07= sncpyx.o sncpyxw.o snaddw.o
-
-UOBJ08= strkeycmp.o ccfile.o strnul.o
-UOBJ09= readln.o ccfile.o
-UOBJ10= cfx.o memtrack.o addrset.o mapblock.o
-UOBJ11= strmgr.o strop.o field.o
-
-UOBJ12= ucttyname.o uctc.o ucsysconf.o
-UOBJ13=
-UOBJ14= ucsys.o
-UOBJ15= tcx.o
-
-UOBJ16 += wsix.o wsnx.o wsx.o
-UOBJ17 += six.o snx.o sfx.o rmx.o
-UOBJ18 +=
-UOBJ19 +=
-
-UOBJ=
-UOBJ += $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
-UOBJ += $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
-UOBJ += $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
-UOBJ += $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
-UOBJ += $(UOBJ16) $(UOBJ17) $(UOBJ18) $(UOBJ19)
-
-
-.SUFFIXES:		.ls .i .ii .cx .cs
+.SUFFIXES:		.hh .ii
 
 
 default:		all
@@ -365,11 +101,6 @@ so:			$(T).so
 
 a:			$(T).a
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -381,23 +112,23 @@ a:			$(T).a
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
 .cc.s:
-	$(CXX) -S $(CPPFLAGS) $(CCFLAGS) $<
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX) -c $(CPPFLAGS) $(CCFLAGS) $<
+	$(COMPILE.cc) $<
 
 
-libmacuser.a:		$(UOBJ)
+libmacuser.a:		$(OBJ)
 	$(AR) -rc $@ $?
 
-$(T).so:		$(SOBJ) Makefile $(T).a
-	$(LD) -G -o $@ $(SLDFLAGS) $(SOBJ) $(SLIBINFO)
+$(T).so:		$(OBJ) Makefile
+	$(LD) -G -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).o:			$(OBJ)
-	$(LD) -G -o $@ $(LDFLAGS) $(SOBJ) $(SLIBINFO)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -471,76 +202,6 @@ control:
 	(uname -n ; date) > Control
 
 
-# base
-OBJ0_BASE= uctimeout.o
-OBJ1_BASE= ucsysconf.o 
-OBJ2_BASE= bufsizedata.o getbufsizenames.o
-OBJ3_BASE= getbufsize.o bufsizevar.o 
-
-OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
-
-obj0_base.o:	$(OBJ0_BASE)
-	$(LD) -r -o $@ $(OBJ0_BASE)
-
-obj1_base.o:	$(OBJ1_BASE)
-	$(LD) -r -o $@ $(OBJ1_BASE)
-
-obj2_base.o:	$(OBJ2_BASE)
-	$(LD) -r -o $@ $(OBJ2_BASE)
-
-obj3_base.o:	$(OBJ3_BASE)
-	$(LD) -r -o $@ $(OBJ3_BASE)
-
-base.o:		$(OBJ_BASE)
-	$(LD) -r -o $@ $(OBJ_BASE)
-
-
-# CHARACTER
-OBJA_CHAR= toxc.o char.o rmeol.o
-OBJB_CHAR= ischarx.o hasx.o
-
-OBJ_CHAR= obja_char.o objb_char.o
-
-obja_char.o:	$(OBJA_CHAR)
-	$(LD) -r -o $@ $(OBJA_CHAR)
-
-objb_char.o:	$(OBJB_CHAR)
-	$(LD) -r -o $@ $(OBJB_CHAR)
-
-character.o:	$(OBJ_CHAR)
-	$(LD) -r -o $@ $(OBJ_CHAR)
-
-
-# LIBU
-ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h
-
-# LIBUC
-ucsysmisc.o:		ucsysmisc.cc
-ucnprocs.o:		ucnprocs.cc
-ucpathconf.o:		ucpathconf.cc
-ucmain.o:		ucmain.cc
-ucatfork.o:		ucatfork.cc
-ucatexit.o:		ucatexit.cc
-ucfork.o:		ucfork.cc
-ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
-ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
-ucgetpid.o:		ucgetpid.cc ucgetpid.h
-ucproguser.o:		ucproguser.cc ucproguser.h
-ucprogdata.o:		ucprogdata.cc ucprogdata.h
-ucclustername.o:	ucclustername.cc ucclustername.h
-uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
-ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
-ucsysconf.o:		ucsysconf.cc ucsysconf.h
-
-# UNIX C-language system library string-to-integer interface
-# string-to-x
-ucstrtox.o:		ucstrtox.cc ucstrtox.h
-ucstrtod.o:		ucstrtod.cc ucstrtod.h
-
-# uctimeout (time-out call-backs)
-uctimeout.o:		uctimeout.cc
-
-
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(RLDFLAGS) $(OBJA)
 
@@ -601,6 +262,90 @@ objs.o:			$(OBJS)
 objt.o:			$(OBJT)
 	$(LD) -r -o $@ $(RLDFLAGS) $(OBJT)
 
+obju.o:			$(OBJU)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJU)
+
+objv.o:			$(OBJV)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJV)
+
+objw.o:			$(OBJW)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJW)
+
+objx.o:			$(OBJX)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJX)
+
+objy.o:			$(OBJY)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJY)
+
+objz.o:			$(OBJZ)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJZ)
+
+
+# base
+OBJ0_BASE= uctimeout.o
+OBJ1_BASE= ucsysconf.o 
+OBJ2_BASE= bufsizedata.o getbufsizenames.o
+OBJ3_BASE= getbufsize.o bufsizevar.o 
+
+OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
+
+obj0_base.o:	$(OBJ0_BASE)
+	$(LD) -r -o $@ $(OBJ0_BASE)
+
+obj1_base.o:	$(OBJ1_BASE)
+	$(LD) -r -o $@ $(OBJ1_BASE)
+
+obj2_base.o:	$(OBJ2_BASE)
+	$(LD) -r -o $@ $(OBJ2_BASE)
+
+obj3_base.o:	$(OBJ3_BASE)
+	$(LD) -r -o $@ $(OBJ3_BASE)
+
+base.o:		$(OBJ_BASE)
+	$(LD) -r -o $@ $(OBJ_BASE)
+
+
+# CHARACTER
+OBJA_CHAR= toxc.o char.o rmeol.o
+OBJB_CHAR= ischarx.o hasx.o
+
+OBJ_CHAR= obja_char.o objb_char.o
+
+obja_char.o:	$(OBJA_CHAR)
+	$(LD) -r -o $@ $(OBJA_CHAR)
+
+objb_char.o:	$(OBJB_CHAR)
+	$(LD) -r -o $@ $(OBJB_CHAR)
+
+character.o:	$(OBJ_CHAR)
+	$(LD) -r -o $@ $(OBJ_CHAR)
+
+
+# LIBUC
+ucsysmisc.o:		ucsysmisc.cc
+ucnprocs.o:		ucnprocs.cc
+ucpathconf.o:		ucpathconf.cc
+ucmain.o:		ucmain.cc
+ucatfork.o:		ucatfork.cc
+ucatexit.o:		ucatexit.cc
+ucfork.o:		ucfork.cc
+ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
+ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
+ucgetpid.o:		ucgetpid.cc ucgetpid.h
+ucproguser.o:		ucproguser.cc ucproguser.h
+ucprogdata.o:		ucprogdata.cc ucprogdata.h
+ucclustername.o:	ucclustername.cc ucclustername.h
+uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
+ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
+ucsysconf.o:		ucsysconf.cc ucsysconf.h
+
+# UNIX C-language system library string-to-integer interface
+# string-to-x
+ucstrtox.o:		ucstrtox.cc ucstrtox.h
+ucstrtod.o:		ucstrtod.cc ucstrtod.h
+
+# uctimeout (time-out call-backs)
+uctimeout.o:		uctimeout.cc
 
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
@@ -611,10 +356,6 @@ uc_safesleep.o:		uc_safesleep.c
 
 uc_openinfo.o:		uc_openinfo.c opensysfs.h
 uc_openuser.o:		uc_openuser.c opensysfs.h
-
-uc_timeout.o:		uc_timeout.cc timeout.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) uc_timeout.cc
-
 
 # FSDIR
 posixdirent.o:		posixdirent.cc posixdirent.hh
@@ -732,14 +473,6 @@ memfile.o:		memfile.cc memfile.h
 filemap.o:		filemap.cc filemap.h
 
 numsign.o:		numsign.cc numsign.h
-
-
-# GETXX
-getax.o:		getax.cc getax.h
-getpe.o:		getpe.cc getpe.h
-getne.o:		getne.cc getne.h
-gethe.o:		gethe.cc gethe.h
-getse.o:		getse.cc getse.h
 
 passwdent.o:		passwdent.cc passwdent.h
 spwdent.o:		spwdent.cc spwdent.h
@@ -1037,7 +770,6 @@ timestr.dir:
 pow.o:			pow.dir
 pow.dir:
 	makesubdir $@
-
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h

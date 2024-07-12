@@ -63,7 +63,8 @@ struct vecitem_head {
 } ;
 
 struct vecitem_cursor  {
-	int		i, c ;
+	int		i ;
+	int		c ;
 } ;
 
 typedef VECITEM		vecitem ;

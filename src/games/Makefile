@@ -19,11 +19,11 @@ VALDIR= $(CGS_VALDIR)
 CC= $(CGS_CC)
 GPP= $(CGS_GPP)
 
-GPPFLAGS= $(CGS_CCFLAGS)
+GPPFLAGS= $(CGS_CXXFLAGS)
 CCOPTS_GCCALL= -pthreads -fexceptions 
 CCOPTS_CCALL= -MT
 
-CCOPTS_GCCOPTSGPP= $(CGS_CCFLAGS)
+CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
 CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
 CCOPTS_GCCLIBSPARC= -mno-app-regs
 
@@ -64,7 +64,7 @@ XFLAGS= $(CCOPTS_GCCALL)
 XXFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS_GCCALL) 
 
 CFLAGS= $(CCOPTS)
-CCFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS) 
+CXXFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS) 
 GPPFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS) 
 
 #LD= $(CC)
@@ -222,7 +222,7 @@ control:
 
 
 main.o:			main.cc $(INCS)
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main.cc
 
 whatinfo.o:		whatinfo.c config.h
 
@@ -257,7 +257,7 @@ $(T01).x:		Makefile $(T01OBJ)
 	$(GPP) -o $@ $(T01OBJS) $(TLIBINFO)
 
 $(T01).o:		testsethand.cc sethand.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) testsethand.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) testsethand.cc
 
 
 T02= testsetint
@@ -275,7 +275,7 @@ $(T02).x:		Makefile $(T02OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T02OBJS) $(TLIBINFO) > $(T02).lm
 
 $(T02).o:		testsetint.cc setint.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) testsetint.cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) testsetint.cc
 
 
 T03= testop
@@ -293,7 +293,7 @@ $(T03).x:		Makefile $(T03OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T03OBJS) $(TLIBINFO) > $(T03).lm
 
 $(T03).o:		$(T03).cc setint.h
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) $(T03).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) $(T03).cc
 
 
 T04= choose
@@ -311,7 +311,7 @@ $(T04).x:		Makefile $(T04OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T04OBJS) $(TLIBINFO) > $(T04).lm
 
 main$(T04).o:		main$(T04).cc
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main$(T04).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T04).cc
 
 
 T05= graph
@@ -329,7 +329,7 @@ $(T05).x:		Makefile $(T05OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T05OBJS) $(TLIBINFO) > $(T05).lm
 
 main$(T05).o:		main$(T05).cc
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main$(T05).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T05).cc
 
 
 T06= trailing
@@ -347,7 +347,7 @@ $(T06).x:		Makefile $(T06OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T06OBJS) $(TLIBINFO) > $(T06).lm
 
 main$(T06).o:		main$(T06).cc
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main$(T06).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T06).cc
 
 
 T07= web
@@ -365,7 +365,7 @@ $(T07).x:		Makefile $(T07OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T07OBJS) $(TLIBINFO) > $(T07).lm
 
 main$(T07).o:		main$(T07).cc
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main$(T07).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T07).cc
 
 
 T08= bal
@@ -383,7 +383,7 @@ $(T08).x:		Makefile $(T08OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T08OBJS) $(TLIBINFO) > $(T08).lm
 
 main$(T08).o:		main$(T08).cc
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main$(T08).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T08).cc
 
 
 T09= strs
@@ -401,7 +401,7 @@ $(T09).x:		Makefile $(T09OBJ)
 	$(LD) -o $@ $(LDFLAGS) -z defs $(T09OBJS) $(TLIBINFO) > $(T09).lm
 
 main$(T09).o:		main$(T09).cc
-	$(GPP) -c $(CCFLAGS) $(CPPFLAGS) main$(T09).cc
+	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T09).cc
 
 
 T10= minsquares

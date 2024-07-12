@@ -109,6 +109,7 @@ extern int vecpstr_strmk(vecpstr *,char *,int) noex ;
 extern int vecpstr_recsize(vecpstr *) noex ;
 extern int vecpstr_recmk(vecpstr *,int *,int) noex ;
 extern int vecpstr_recmkstr(vecpstr *,int *,int,char *,int) noex ;
+extern int vecpstr_avmkstr(vecpstr *,cchar **,int,char *,int) noex ;
 extern int vecpstr_indlen(vecpstr *) noex ;
 extern int vecpstr_indsize(vecpstr *) noex ;
 extern int vecpstr_indmk(vecpstr *,int (*)[3],int,int) noex ;

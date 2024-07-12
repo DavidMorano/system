@@ -19,19 +19,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<ucentua.h>
 
 
 EXTERNC_begin
 
-extern int	uc_userattrbegin() noex ;
+extern int	uc_getuabegin() noex ;
 extern int	uc_getuaent(ucentua *,char *,int) noex ;
 extern int	uc_getuanam(ucentua *,char *,int,cchar *) noex ;
 extern int	uc_getuauid(ucentua *,char *,int,uid_t) noex ;
-extern int	uc_userattrend() noex ;
+extern int	uc_getuaend() noex ;
 
 EXTERNC_end
 

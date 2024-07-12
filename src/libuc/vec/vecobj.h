@@ -87,12 +87,11 @@ extern int vecobj_sort(vecobj *,vecobj_vcf) noex ;
 extern int vecobj_setsorted(vecobj *) noex ;
 extern int vecobj_find(vecobj *,cvoid *) noex ;
 extern int vecobj_curbegin(vecobj *,vecobj_cur *) noex ;
-extern int vecobj_fetch(vecobj *,cvoid *,vecobj_cur *,vecobj_vcf,
-		void **) noex ;
+extern int vecobj_fetch(vecobj *,cvoid *,vecobj_cur *,vecobj_vcf,void **) noex ;
 extern int vecobj_curend(vecobj *,vecobj_cur *) noex ;
 extern int vecobj_search(vecobj *,cvoid *,vecobj_vcf,void **) noex ;
 extern int vecobj_get(vecobj *,int,void **) noex ;
-extern int vecobj_store(vecobj *,cvoid *,cvoid **) noex ;
+extern int vecobj_store(vecobj *,cvoid *,void **) noex ;
 extern int vecobj_getvec(vecobj *,void ***) noex ;
 extern int vecobj_audit(vecobj *) noex ;
 extern int vecobj_finish(vecobj *) noex ;

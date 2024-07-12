@@ -36,7 +36,7 @@ constexpr int	digbufsizes_ntypes = 10 ;	/* up to types w/ 1024 bits */
 constexpr int	digbufsizes_nbases = (digbufsizes_maxbase+1) ;
 
 template<typename T>
-constexpr int ndigitx(T v,int b) noex {
+constexpr int digbufsizes_ndigitx(T v,int b) noex {
 	const uint	ub(b) ;	/* unsigned division faster than signed */
 	int		n = 0 ;
 	if (b >= 2) {
@@ -51,40 +51,40 @@ constexpr int ndigitx(T v,int b) noex {
 	} /* end if (valid base) */
 	return n ;
 }
-/* end subroutine-template (ndigitx) */
+/* end subroutine-template (digbufsizes_ndigitx) */
 
-constexpr int ndigits(int ntype,int base) noex {
+constexpr int digbufsizes_ndigits(int ntype,int base) noex {
 	int		n = 0 ;
 	if (base >= 2) {
 	    switch (ntype) {
 	    case 0:
 		{
 		    uchar	uc = 0xFFu ;
-		    n = ndigitx(uc,base) ;
+		    n = digbufsizes_ndigitx(uc,base) ;
 		}
 		break ;
 	    case 1:
 		{
 		    ushort	us = 0xFFFFu ;
-		    n = ndigitx(us,base) ;
+		    n = digbufsizes_ndigitx(us,base) ;
 		}
 		break ;
 	    case 2:
 		{
 		    uint	ui = 0xFFFFFFFFu ;
-		    n = ndigitx(ui,base) ;
+		    n = digbufsizes_ndigitx(ui,base) ;
 		}
 		break ;
 	    case 3:
 		{
 		    ulong	ul = 0xFFFFFFFFFFFFFFFFul ;
-		    n = ndigitx(ul,base) ;
+		    n = digbufsizes_ndigitx(ul,base) ;
 		}
 		break ;
 	    case 4:
 		{
 		    ulonglong	ull = valuelimit.ullmax ;
-		    n = ndigitx(ull,base) ;
+		    n = digbufsizes_ndigitx(ull,base) ;
 		}
 		break ;
 	    case 5: /* 32 bytes */
@@ -102,7 +102,7 @@ constexpr int ndigits(int ntype,int base) noex {
 		    n = 64 ;	/* 256 ÷ 4 = 64 */
 		    break ;
 		case 32:
-		    n = 53 ;	/* 256 ÷ 5 = 51.2 */
+		    n = 52 ;	/* 256 ÷ 5 = 51.2 */
 		    break ;
 		case 64:
 		    n = 43 ;	/* 256 ÷ 6 = 42.6 */
@@ -124,7 +124,7 @@ constexpr int ndigits(int ntype,int base) noex {
 	    } /* end switch */
 	} /* end if (valid base) */
 	return n ;
-} /* end subroutine (ndigits) */
+} /* end subroutine (digbufsizes_ndigits) */
 
 struct digbufsizes {
 	cint		nbases = digbufsizes_nbases ;
@@ -133,7 +133,7 @@ struct digbufsizes {
 	constexpr digbufsizes() noex {
 	    for (int b = 0 ; b < digbufsizes_nbases ; b += 1) {
 	        for (int t = 0 ; t < digbufsizes_ntypes ; t += 1) {
-		    bufsize[t][b] = (ndigits(t,b) + 1) ; /* plus sign char */
+		    bufsize[t][b] = (digbufsizes_ndigits(t,b) + 1) ;
 	        }
 	    }
 	} ; /* end constructor (digbufsizes) */

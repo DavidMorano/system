@@ -44,7 +44,10 @@
 /* external subroutines */
 
 
-/* local subroutine-templates */
+/* external variables */
+
+
+/* forward references */
 
 template<int (*toxc)(int)>
 int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
