@@ -26,15 +26,15 @@
 
 
 #define	SLIST		struct slist_head
-#define	SLIST_ENT	struct slist_ent
-#define	SLIST_CUR	struct slist_cur
+#define	SLIST_ENT	struct slist_entry
+#define	SLIST_CUR	struct slist_cursor
 
 
-struct slist_cur {
+struct slist_cursor {
 	SLIST_ENT	*entp ;
 } ;
 
-struct slist_ent {
+struct slist_entry {
 	SLIST_ENT	*next ;
 } ;
 
