@@ -1,17 +1,16 @@
-/* getuserterm */
+/* getuserterm SUPPORT */
+/* lang=C++20 */
 
 /* get the name of the controlling terminal for the current session */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1999-01-10, David A­D­ Morano
-        This subroutine was originally written. It was prompted by the failure
-        of other terminal message programs from finding the proper controlling
-        terminal.
+	This subroutine was originally written.  It was prompted by
+	the failure of other terminal message programs from finding
+	the proper controlling terminal.
 
 */
 
@@ -19,12 +18,15 @@
 
 /*******************************************************************************
 
-        This subroutine will find and return an open FD for the controlling
-        terminal for the given username, if that user is logged in and even has
-        a controlling terminal.
+	Name:
+	getuserterm
+
+	Description:
+	This subroutine will find and return an open FD for the
+	controlling terminal for the given username, if that user
+	is logged in and even has a controlling terminal.
 
 	Synopsis:
-
 	int getuserterm(tbuf,tlen,fdp,username)
 	char		tbuf[] ;
 	int		tlen ;
@@ -32,32 +34,27 @@
 	const char	username[] ;
 
 	Arguments:
-
 	- tbuf		user buffer to receive name of controlling terminal
 	- tlen		length of user supplied buffer
 	- fdp		pointer to open file-descriptor
 	- username	session ID to find controlling terminal for
 
 	Returns:
-
 	>=	length of name of controlling terminal
-	<0	error
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<tmpx.h>
 #include	<localmisc.h>
@@ -84,8 +81,10 @@ extern char	*strwcpy(char *,const char *,int) ;
 static int	openatime(char *,time_t,time_t *) ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int getuserterm(tbuf,tlen,fdp,username)
 const char	username[] ;
@@ -116,17 +115,9 @@ int		*fdp ;
 	if (username == NULL)
 	    return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("getuserterm: entered, sid=%d\n",sid) ;
-#endif
-
 	tbuf[0] = '\0' ;
 	if (username[0] == '\0')
 	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("getuserterm: username=%s\n",username) ;
-#endif
 
 	termdev[0] = '\0' ;
 	fd_termdev = -1 ;
@@ -135,10 +126,6 @@ int		*fdp ;
 	    TMPX_CUR	cur ;
 	    TMPX_ENT	ue ;
 
-#if	CF_DEBUGS
-	    debugprintf("getuserterm: tmpx_open() rs=%d\n",rs) ;
-#endif
-
 	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
 
 	        while (rs >= 0) {
@@ -146,10 +133,6 @@ int		*fdp ;
 		    if (rs1 == SR_NOTFOUND) break ;
 		    rs = rs1 ;
 		    if (rs < 0) break ;
-
-#if	CF_DEBUGS
-	            debugprintf("getuserterm: tmpx_fetchuser() rs=%d\n",rs) ;
-#endif
 
 	            f = FALSE ;
 	            f = f || (ue.ut_type != TMPX_TUSERPROC) ;
@@ -204,12 +187,6 @@ int		*fdp ;
 	    u_close(fd_termdev) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("getuserterm: ret rs=%d len=%d\n",rs,len) ;
-	if (rs >= 0)
-	    debugprintf("getuserterm: term=>%t<\n",tbuf,len) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
