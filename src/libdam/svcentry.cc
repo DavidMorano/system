@@ -116,8 +116,7 @@ static inline int svcentry_magic(svcentry *op,Args ... args) noex {
 }
 /* end subroutine (svcentry_magic) */
 
-static int	svcentry_process(SVCENTRY *,cchar *,ARGS *,
-			char *,int) noex ;
+static int	svcentry_process(SVCENTRY *,cchar *,ARGS *,char *,int) noex ;
 static int	svcentry_mkfile(SVCENTRY *,cchar *,int) noex ;
 
 static int	expand(ARGS *,cchar *,int,char *,int) noex ;
@@ -149,19 +148,6 @@ int svcentry_start(svcentry *pep,varsub *ssp,ENT *sep,ARGS * esap) noex {
 
 	if (pep == nullptr) return SR_FAULT ;
 	if (sep == nullptr) return SR_FAULT ;
-	pep->magic = 0 ;
-	pep->pid = 0 ;
-	pep->interval = 0 ;
-
-	pep->program = nullptr ;
-	pep->username = nullptr ;
-	pep->groupname = nullptr ;
-	pep->options = nullptr ;
-	pep->access = nullptr ;
-	pep->efname = nullptr ;
-	pep->ofname = nullptr ;
-
-	pep->f = {} ;
 	pep->name[0] = '\0' ;
 	pep->jobid[0] = '\0' ;
 
@@ -264,13 +250,13 @@ int svcentry_finish(svcentry *pep) noex {
 	int		rs1 ;
 	if ((rs = svcentry_ctor(pep)) >= 0) {
 	    if (pep->ofname != nullptr) {
-	        if (pep->ofname[0] != '\0') u_unlink(pep->ofname) ;
+	        if (pep->ofname[0] != '\0') uc_unlink(pep->ofname) ;
 	        rs1 = uc_free(pep->ofname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        pep->ofname = nullptr ;
 	    }
 	    if (pep->efname != nullptr) {
-	        if (pep->efname[0] != '\0') u_unlink(pep->efname) ;
+	        if (pep->efname[0] != '\0') uc_unlink(pep->efname) ;
 	        rs1 = uc_free(pep->efname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        pep->efname = nullptr ;
@@ -518,12 +504,12 @@ bad3:
 
 bad2:
 	if ((pep->efname != nullptr) && (pep->efname[0] != '\0')) {
-	    u_unlink(pep->efname) ;
+	    uc_unlink(pep->efname) ;
 	}
 
 bad1:
 	if ((pep->ofname != nullptr) && (pep->ofname[0] != '\0')) {
-	    u_unlink(pep->ofname) ;
+	    uc_unlink(pep->ofname) ;
 	}
 
 bad0:

@@ -4,9 +4,6 @@
 /* perform service table file related functions */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_DEBUGSFIELD	0		/* other debug? */
-#define	CF_REGEX	0		/* BROKEN !!! */
 
 /* revision history:
 
@@ -82,24 +79,24 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* forward references */
 
-static int	srvtab_fileparse(SRVTAB *,time_t,VECITEM *) ;
-static int	srvtab_filedump(SRVTAB *) ;
+static int	srvtab_fileparse(SRVTAB *,time_t,VECITEM *) noex ;
+static int	srvtab_filedump(SRVTAB *) noex ;
 
-static int	entry_start(SRVTAB_ENT *) ;
-static int	entry_groupsload(SRVTAB_ENT *,cchar *,int) ;
-static int	entry_groupadd(SRVTAB_ENT *,cchar *) ;
-static int	entry_enough(SRVTAB_ENT *) ;
-static int	entry_finish(SRVTAB_ENT *) ;
+static int	entry_start(SRVTAB_ENT *) noex ;
+static int	entry_groupsload(SRVTAB_ENT *,cchar *,int) noex ;
+static int	entry_groupadd(SRVTAB_ENT *,cchar *) noex ;
+static int	entry_enough(SRVTAB_ENT *) noex ;
+static int	entry_finish(SRVTAB_ENT *) noex ;
 
-static int	stradd(cchar **,cchar *,int) ;
+static int	stradd(cchar **,cchar *,int) noex ;
 
-static void	freeit(cchar **) ;
+static void	freeit(cchar **) noex ;
 
 
 /* local variables */
 
 /* key field terminators ('#', ',', ':', '=') */
-static const unsigned char 	key_terms[32] = {
+constexpr cchar		key_terms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x08, 0x10, 0x00, 0x24,
 	0x00, 0x00, 0x00, 0x00,
@@ -111,7 +108,7 @@ static const unsigned char 	key_terms[32] = {
 } ;
 
 /* argument field terminators (pound '#' and comma ',') */
-static const unsigned char 	saterms[32] = {
+constexpr cchar		saterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x08, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -120,23 +117,6 @@ static const unsigned char 	saterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
-
-static cchar	*srvkeys[] = {
-	"program",
-	"arguments",
-	"args",
-	"username",
-	"groupname",
-	"options",
-	"opts",
-	"groups",
-	"access",
-	"interval",
-	"addr",
-	"passfile",
-	"project",
-	NULL
 } ;
 
 enum srvkeys {
@@ -153,8 +133,28 @@ enum srvkeys {
 	srvkey_addr,
 	srvkey_passfile,
 	srvkey_project,
-	srbkey_overlast
+	srvkey_overlast
 } ;
+
+constexpr cpcchar	srvkeys[] = {
+	"program",
+	"arguments",
+	"args",
+	"username",
+	"groupname",
+	"options",
+	"opts",
+	"groups",
+	"access",
+	"interval",
+	"addr",
+	"passfile",
+	"project",
+	NULL
+} ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -244,10 +244,6 @@ int srvtab_close(srvtab *op) noex {
 	    uc_free(op->fname) ;
 	    op->fname = NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_close: ret\n") ;
-#endif
 
 	op->magic = 0 ;
 	return SR_OK ;
@@ -342,28 +338,16 @@ SRVTAB_ENT	**sepp ;
 	if (sepp == NULL)
 	    sepp = &ep ;
 
-#if	CF_DEBUGS
-	debugprintf("srvsearch: ent, service=%s\n",service) ;
-#endif
-
 	slp = &op->e ;
 	for (i = 0 ; vecitem_get(slp,i,sepp) >= 0 ; i += 1) {
 	    if (*sepp == NULL) continue ;
 
 	    sp = (*sepp)->service ;
 
-#if	CF_DEBUGS
-	    debugprintf("srvsearch: got entry=\"%s\"\n",sp) ;
-#endif
-
 	    if (strcmp(service,sp) == 0)
 	        return i ;
 
 	} /* end for (looping through entries) */
-
-#if	CF_DEBUGS
-	debugprintf("srvsearch: did not match any entry\n") ;
-#endif
 
 	return -1 ;
 }
@@ -386,10 +370,6 @@ SRVTAB_ENT	**sepp ;
 
 	if (op->magic != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_get: ent, i=%d\n",i) ;
-#endif
 
 	slp = &op->e ;
 	rs = vecitem_get(slp,i,sepp) ;
@@ -442,23 +422,11 @@ VECITEM		*eep ;
 
 /* check the modification time on the file */
 
-#if	CF_DEBUGS
-	debugprintf("srvtab_check: open check\n") ;
-#endif
-
 	rs = u_fstat(op->fd,&sb) ;
 	if (rs < 0) goto ret0 ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab_check: modification time\n") ;
-#endif
-
 	if ((sb.st_mtime > op->mtime) &&
 	    ((daytime - sb.st_mtime) >= TI_FILECHANGE)) {
-
-#if	CF_DEBUGS
-	    debugprintf("srvtab_check: file changed\n") ;
-#endif
 
 	    rs = srvtab_filedump(op) ;
 
@@ -473,11 +441,6 @@ VECITEM		*eep ;
 	}
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_check: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (srvtab_check) */
@@ -514,12 +477,6 @@ VECITEM		*eep ;
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	linebuf2[LINEBUFLEN + 1] ;
 
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_fileparse: ent srvtab=%s\n",
-	    op->fname) ;
-#endif
-
 	slp = &op->e ;
 	if (op->fd >= 0) {
 
@@ -527,12 +484,9 @@ VECITEM		*eep ;
 	    if (rs >= 0)
 	        bseek(sfp,0L,SEEK_SET) ;
 
-	} else
+	} else {
 	    rs = bopen(sfp,op->fname,"r",0664) ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_fileparse: bopen rs=%d\n", rs) ;
-#endif
+	}
 
 	if (rs < 0)
 	    goto badopen ;
@@ -554,10 +508,6 @@ VECITEM		*eep ;
 	op->mtime = sb.st_mtime ;
 
 /* start processing the file */
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_fileparse: start processing\n") ;
-#endif
 
 	while ((rs = breadln(sfp,linebuf,LINEBUFLEN)) > 0) {
 
@@ -582,10 +532,6 @@ VECITEM		*eep ;
 	    if ((*cp == '\0') || (*cp == '#'))
 	        continue ;
 
-#if	CF_DEBUGSFIELD
-	    debugprintf("srvtab_fileparse: line> %t\n",cp,cl) ;
-#endif
-
 	    if ((rs = field_start(&fsb,cp,cl)) >= 0) {
 		int		fl ;
 		cchar	*fp ;
@@ -594,20 +540,9 @@ VECITEM		*eep ;
 
 	        if (fsb.term == ':') {
 
-#if	CF_DEBUGS
-	            debugprintf("srvtab_fileparse: got a service >%t<\n",
-	                fp,fl) ;
-#endif
-
 	            if (f_ent) {
 
 			if (entry_enough(&se) > 0) {
-
-#if	CF_DEBUGS
-	                debugprintf("srvtab_fileparse: checked enough\n") ;
-	                debugprintf("srvtab_fileparse: service=%s SERVICE=%p\n",
-	                    se.service,se.service) ;
-#endif
 
 	                rs = vecitem_add(slp, &se,sizeof(SRVTAB_ENT)) ;
 	                if (rs < 0) {
@@ -615,11 +550,6 @@ VECITEM		*eep ;
 	                    entry_finish(&se) ;
 	                    break ;
 			}
-
-#if	CF_DEBUGS
-	                debugprintf("srvtab_fileparse: previous \"%s\"\n",
-	                    se.service) ;
-#endif
 
 	            } else {
 			f_ent = FALSE ;
@@ -642,11 +572,6 @@ VECITEM		*eep ;
 	            malloclog_alloc(se.service,-1,"srvtab_fileparse:service") ;
 #endif
 
-#if	CF_DEBUGS
-	            debugprintf("srvtab_fileparse: new service=%s SERVICE=%p\n",
-	                se.service,se.service) ;
-#endif
-
 /* compile the expression also */
 
 #if	SRVTAB_REGEX
@@ -664,27 +589,16 @@ VECITEM		*eep ;
 	                    (se.matchcode + SRVTAB_RGXLEN)) ;
 
 	                if (cp != NULL) {
-
-#if	CF_DEBUGS
-	                    debugprintf("srvtab_fileparse: good compile\n") ;
-#endif
-
 	                    se.matchcode = cp ;
 	                    se.matchlen = SRVTAB_RGXLEN ;
-
 	                } else {
-
-#if	CF_DEBUGS
-	                    debugprintf("srvtab_fileparse: bad compile\n") ;
-#endif
-
 	                    se.matchlen = 0 ;
 	                    freeit(&se.matchcode) ;
-
 	                } /* end if (compiling RE) */
 
-	            } else
+	            } else {
 	                se.matchcode = NULL ;
+		    }
 #endif /* SRVTAB_REGEX */
 
 		    } /* end if (new entry) */
@@ -701,19 +615,10 @@ VECITEM		*eep ;
 	        while ((rs >= 0) && (fl >= 0)) {
 		    int	ki = matstr(srvkeys,fp,fl) ;
 
-#if	CF_DEBUGS
-	            debugprintf("srvtab_fileparse: srvkeys i=%d\n", i) ;
-#endif
-
 	            if (fsb.term != ',') {
 
 			fp = linebuf2 ;
 	                fl = field_srvarg(&fsb,saterms,linebuf2,LINEBUFLEN) ;
-
-#if	CF_DEBUGS
-	                debugprintf("srvtab_fileparse: fieldarg=>%t<\n",
-	                    fp,fl) ;
-#endif
 
 	            } else
 	                fp = NULL ;
@@ -876,11 +781,6 @@ VECITEM		*eep ;
 	bclose(sfp) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("srvtab_fileparse: ret rs=%d n=%u\n", rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 
 /* done with configuration file processing */
@@ -936,74 +836,29 @@ static int entry_start(SRVTAB_ENT *sep) noex {
 static int entry_finish(SRVTAB_ENT *sep) noex {
 	int	i ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: service=%s SERVICE=%p\n",
-	    sep->service, sep->service) ;
-#endif
-
 	if (sep->service == NULL)
 	    return SR_OK ;
 
 	freeit(&sep->service) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: matchcode\n") ;
-#endif
-
 	freeit(&sep->matchcode) ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: program\n") ;
-#endif
 
 	freeit(&sep->program) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: args\n") ;
-#endif
-
 	freeit(&sep->args) ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: options\n") ;
-#endif
 
 	freeit(&sep->options) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: username\n") ;
-#endif
-
 	freeit(&sep->username) ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: groupname\n") ;
-#endif
 
 	freeit(&sep->groupname) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: groupnames\n") ;
-#endif
-
-	for (i = 0 ; sep->groupnames[i] != NULL ; i += 1)
+	for (i = 0 ; sep->groupnames[i] != NULL ; i += 1) {
 	    freeit(sep->groupnames + i) ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: access\n") ;
-#endif
-
+	}
 	freeit(&sep->access) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: interval\n") ;
-#endif
-
 	freeit(&sep->interval) ;
-
-#if	CF_DEBUGS
-	debugprintf("srvtab/entry_finish: ret\n") ;
-#endif
 
 	freeit(&sep->addr) ;
 
@@ -1014,13 +869,7 @@ static int entry_finish(SRVTAB_ENT *sep) noex {
 }
 /* end subroutine (entry_finish) */
 
-
-/* is there enough of a service entry to keep it? */
-static int entry_enough(sep)
-SRVTAB_ENT	*sep ;
-{
-
-
+static int entry_enough(srvtab_ent *sep) noex {
 	if ((sep->service == NULL) || (sep->service[0] == '\0'))
 	    return FALSE ;
 
