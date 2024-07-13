@@ -1,17 +1,18 @@
-/* srvtab */
+/* srvtab SUPPORT */
+/* lang=C++20 */
 
 /* perform service table file related functions */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGSFIELD	0		/* other debug? */
 #define	CF_REGEX	0		/* BROKEN !!! */
 
-
 /* revision history:
 
 	= 1999-07-01, David A­D­ Morano
-	This subroutine was adopted for use in the 'rexecd' daemon program.
+	This subroutine was adopted for use in the 'rexecd' daemon
+	program.
 
 */
 
@@ -19,35 +20,28 @@
 
 /******************************************************************************
 
-        This object reads in a service table file and stores the information
-        parsed from that file.
-
+	This object reads in a service table file and stores the
+	information parsed from that file.
 
 ******************************************************************************/
 
-
-#define	SRVTAB_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<regexpr.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecitem.h>
-#include	<char.h>
 #include	<ascii.h>
 #include	<mallocstuff.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"srvtab.h"
@@ -74,13 +68,13 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	field_srvarg(FIELD *,const uchar *,char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	field_srvarg(field *,const uchar *,char *,int) ;
 extern int	getpwd(char *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -92,14 +86,14 @@ static int	srvtab_fileparse(SRVTAB *,time_t,VECITEM *) ;
 static int	srvtab_filedump(SRVTAB *) ;
 
 static int	entry_start(SRVTAB_ENT *) ;
-static int	entry_groupsload(SRVTAB_ENT *,const char *,int) ;
-static int	entry_groupadd(SRVTAB_ENT *,const char *) ;
+static int	entry_groupsload(SRVTAB_ENT *,cchar *,int) ;
+static int	entry_groupadd(SRVTAB_ENT *,cchar *) ;
 static int	entry_enough(SRVTAB_ENT *) ;
 static int	entry_finish(SRVTAB_ENT *) ;
 
-static int	stradd(const char **,const char *,int) ;
+static int	stradd(cchar **,cchar *,int) ;
 
-static void	freeit(const char **) ;
+static void	freeit(cchar **) ;
 
 
 /* local variables */
@@ -128,7 +122,7 @@ static const unsigned char 	saterms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*srvkeys[] = {
+static cchar	*srvkeys[] = {
 	"program",
 	"arguments",
 	"args",
@@ -165,22 +159,13 @@ enum srvkeys {
 
 /* exported subroutines */
 
-
-int srvtab_open(op,fname,eep)
-SRVTAB		*op ;
-const char	fname[] ;
-VECITEM		*eep ;
-{
-	time_t	daytime = time(NULL) ;
-
-	int	rs = SR_OK ;
-	int	fnl = -1 ;
-
-	const char	*fnp ;
-	const char	*cp ;
-
-	char	tmpfname[MAXPATHLEN + 1] ;
-
+int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
+	time_t		daytime = time(NULL) ;
+	int		rs = SR_OK ;
+	int		fnl = -1 ;
+	cchar		*fnp ;
+	cchar		*cp ;
+	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (op == NULL)
 	    return SR_FAULT ;
@@ -240,15 +225,8 @@ bad0:
 }
 /* end subroutine (srvtab_open) */
 
-
-/* free up the resources occupied by a SRVTAB list */
-int srvtab_close(op)
-SRVTAB		*op ;
-{
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
+int srvtab_close(srvtab *op) noex {
+	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
@@ -280,7 +258,7 @@ SRVTAB		*op ;
 /* search the service table for a service match (input is a RE) */
 int srvtab_match(op,service,sepp)
 SRVTAB		*op ;
-const char	service[] ;
+cchar	service[] ;
 SRVTAB_ENT	**sepp ;
 {
 	VECITEM	*slp ;
@@ -289,7 +267,7 @@ SRVTAB_ENT	**sepp ;
 	int	sl, l1, l2 ;
 	int	i ;
 
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 
 	if (op == NULL)
@@ -340,7 +318,7 @@ SRVTAB_ENT	**sepp ;
 /* search the service table for a service match (input is a straight name) */
 int srvtab_find(op,service,sepp)
 SRVTAB		*op ;
-const char	service[] ;
+cchar	service[] ;
 SRVTAB_ENT	**sepp ;
 {
 	VECITEM	*slp ;
@@ -349,7 +327,7 @@ SRVTAB_ENT	**sepp ;
 
 	int	i ;
 
-	const char	*sp ;
+	cchar	*sp ;
 
 
 	if (op == NULL)
@@ -520,7 +498,7 @@ VECITEM		*eep ;
 
 	SRVTAB_ENT	se ;
 
-	FIELD	fsb ;
+	field		fsb ;
 
 	bfile	sfile, *sfp = &sfile ;
 
@@ -531,7 +509,7 @@ VECITEM		*eep ;
 	int	f_closed = FALSE ;
 	int	f_ent = FALSE ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	linebuf2[LINEBUFLEN + 1] ;
@@ -610,7 +588,7 @@ VECITEM		*eep ;
 
 	    if ((rs = field_start(&fsb,cp,cl)) >= 0) {
 		int		fl ;
-		const char	*fp ;
+		cchar	*fp ;
 
 	        if ((fl = field_get(&fsb,key_terms,&fp)) > 0) {
 
@@ -671,7 +649,7 @@ VECITEM		*eep ;
 
 /* compile the expression also */
 
-#if	SRCTAB_REGEX
+#if	SRVTAB_REGEX
 	            se.matchlen = 0 ;
 	            rs = uc_malloc(SRVTAB_RGXLEN,&se.matchcode) ;
 
@@ -926,52 +904,37 @@ badopen:
 }
 /* end subroutine (srvtab_fileparse) */
 
-
-static int srvtab_filedump(op)
-SRVTAB		*op ;
-{
+static int srvtab_filedump(SRVTAB *op) noex {
 	SRVTAB_ENT	*ep ;
-
-	int	rs = SR_OK ;
-	int	rs1 ;
-	int	i ;
-
-
-	for (i = 0 ; vecitem_get(&op->e,i,&ep) >= 0 ; i += 1) {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	for (int i = 0 ; vecitem_get(&op->e,i,&ep) >= 0 ; i += 1) {
 	    if (ep == NULL) continue ;
-
-	    rs1 = entry_finish(ep) ;
-	    if (rs >= 0) rs = rs1 ;
-
-	    rs1 = vecitem_del(&op->e,i--) ;
-	    if (rs >= 0) rs = rs1 ;
-
+	    {
+	        rs1 = entry_finish(ep) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecitem_del(&op->e,i--) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	} /* end for */
 
 	return rs ;
 }
 /* end subroutine (srvtab_filedump) */
 
-
-/* initialize an entry */
-static int entry_start(sep)
-SRVTAB_ENT	*sep ;
-{
-
-
-	memset(sep,0,sizeof(SRVTAB_ENT)) ;
-
-	return 0 ;
+static int entry_start(SRVTAB_ENT *sep) noex {
+	int		rs = SR_FAULT ;
+	if (sep) {
+	    rs = memclear(sep) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_start) */
 
-
-/* free up an entry */
-static int entry_finish(sep)
-SRVTAB_ENT	*sep ;
-{
+static int entry_finish(SRVTAB_ENT *sep) noex {
 	int	i ;
-
 
 #if	CF_DEBUGS
 	debugprintf("srvtab/entry_finish: service=%s SERVICE=%p\n",
@@ -1075,16 +1038,13 @@ SRVTAB_ENT	*sep ;
 /* load up some groups into the current entry */
 static int entry_groupsload(sep,buf,buflen)
 SRVTAB_ENT	*sep ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
-	FIELD	fsb ;
-
+	field		fsb ;
 	int	rs ;
 	int	fl ;
-
-	const char	*fp ;
-
+	cchar	*fp ;
 
 	if ((rs = field_start(&fsb,buf,buflen)) >= 0) {
 
@@ -1099,31 +1059,21 @@ int		buflen ;
 	field_finish(&fsb) ;
 	} /* end if (field) */
 
-ret0:
 	return rs ;
 }
 /* end subroutine (entry_groupsload) */
 
-
 /* add another (single) group to the current entry */
-static int entry_groupadd(sep,name)
-SRVTAB_ENT	*sep ;
-const char	name[] ;
-{
-	int	rs = SR_OK ;
-	int	i ;
-
-
-/* enter the raw group name into a group slot */
-
-	i = 0 ;
-	while ((i < NGROUPS_MAX) && (sep->groupnames[i] != NULL))
+static int entry_groupadd(SEVTAB_ENT *sep,cchar *name) noex {
+	int		rs = SR_OK ;
+	int		i = 0 ;
+	/* enter the raw group name into a group slot */
+	while ((i < NGROUPS_MAX) && (sep->groupnames[i] != NULL)) {
 	    i += 1 ;
-
+	}
 	rs = i ;
 	if (i < NGROUPS_MAX) {
-	    const char	*sp ;
-
+	    cchar	*sp ;
 	    rs = uc_mallocstrw(name,-1,&sp) ;
 
 	    if (rs >= 0) {
@@ -1141,19 +1091,12 @@ const char	name[] ;
 }
 /* end subroutine (entry_groupadd) */
 
-
 /* add something to an existing string */
-static int stradd(spp,s,slen)
-const char	**spp ;
-const char	s[] ;
-int		slen ;
-{
+static int stradd(cchar **spp,cchar *s,int slen) noex {
 	int	rs = SR_OK ;
 	int	sl ;
 	int	len = 0 ;
-
-	const char	*sp = *spp ;
-
+	cchar	*sp = *spp ;
 
 	len = (slen + 1) ;
 	if (sp != NULL) {
@@ -1185,12 +1128,7 @@ int		slen ;
 }
 /* end subroutine (stradd) */
 
-
-static void freeit(pp)
-const char	**pp ;
-{
-
-
+static void freeit(cchar **pp) noex {
 	if (*pp != NULL) {
 
 #ifdef	MALLOCLOG
@@ -1202,7 +1140,6 @@ const char	**pp ;
 #endif
 
 	    uc_free(*pp) ;
-
 	    *pp = NULL ;
 	}
 }

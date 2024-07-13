@@ -56,15 +56,15 @@ typedef	SRVENTRY_ARGS	srventry_args ;
 
 EXTERNC_begin
 
-extern int srventry_start(seventry *) noex ;
-extern int srventry_finish(seventry *) noex ;
-extern int srventry_process(seventry *,varsub *,char **,
-			SRVTAB_ENTRY *,srventry_args *) noex ;
-extern int srventry_addprogram(seventry *,cchar *) noex ;
-extern int srventry_addsrvargs(seventry *,cchar *) noex ;
-extern int srventry_addusername(seventry *,cchar *) noex ;
-extern int srventry_addgroupname(seventry *,char *) noex ;
-extern int srventry_addoptions(seventry *,cchar *) noex ;
+extern int srventry_start(srventry *) noex ;
+extern int srventry_finish(srventry *) noex ;
+extern int srventry_process(srventry *,varsub *,mainv,
+			srvtab_ent *,srventry_args *) noex ;
+extern int srventry_addprogram(srventry *,cchar *) noex ;
+extern int srventry_addsrvargs(srventry *,cchar *) noex ;
+extern int srventry_addusername(srventry *,cchar *) noex ;
+extern int srventry_addgroupname(srventry *,char *) noex ;
+extern int srventry_addoptions(srventry *,cchar *) noex ;
 
 EXTERNC_end
 

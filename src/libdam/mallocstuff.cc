@@ -42,13 +42,14 @@
 
 /* local typedefs */
 
-typedef char	*charp ;
-
 
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* local structues */
 
 
 /* forward references */

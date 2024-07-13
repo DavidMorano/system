@@ -36,6 +36,7 @@
 #include	<varsub.h>
 #include	<mallocstuff.h>
 #include	<sfx.h>
+#include	<snx.h>
 #include	<localmisc.h>
 
 #include	"srvtab.h"
@@ -44,8 +45,7 @@
 
 /* local defines */
 
-#undef	BUFLEN
-#define	BUFLEN		(10 * MAXPATHLEN)
+#define	EBUFLEN		(10 * MAXPATHLEN)
 
 
 /* external subroutines */
@@ -59,10 +59,8 @@
 
 /* forward references */
 
-static int	process(varsub *,char *,SRVENTRY_ARGS *,char **) noex ;
-static int	expand() noex ;
-
-static void	freeit(char **) noex ;
+static int	process(varsub *,cchar *,SRVENTRY_ARGS *,cchar **) noex ;
+static int	expand(cchar *,int,srventry_args *,char *,int) noex ;
 
 
 /* external variables */
@@ -93,56 +91,53 @@ int srventry_finish(srventry *sep) noex {
 	if (sep) {
 	    rs = SR_OK ;
 	    if (sep->program != nullptr) {
-	        free(sep->program) ;
+	        uc_free(sep->program) ;
 	    }
 	    if (sep->srvargs != nullptr) {
-	        free(sep->srvargs) ;
+	        uc_free(sep->srvargs) ;
 	    }
 	    if (sep->username != nullptr) {
-	        free(sep->username) ;
+	        uc_free(sep->username) ;
 	    }
 	    if (sep->groupname != nullptr) {
-	        free(sep->groupname) ;
+	        uc_free(sep->groupname) ;
 	    }
 	    if (sep->options != nullptr) {
-	        free(sep->options) ;
+	        uc_free(sep->options) ;
 	    }
 	    if (sep->access != nullptr) {
-	        free(sep->access) ;
+	        uc_free(sep->access) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (srventry_free) */
+/* end subroutine (srventry_uc_free) */
 
-int srventry_process(sep,ssp,envv,step,esap)
-SRVENTRY	*sep ;
-varsub		*ssp ;
-char		**envv ;
-SRVTAB_ENTRY	*step ;
-SRVENTRY_ARGS	*esap ;
-{
-
-
-	if (step->program != nullptr) {
-	    process(ssp,step->program,esap,&sep->program) ;
-	}
-	if (step->args != nullptr) {
-	    process(ssp,step->args,esap,&sep->srvargs) ;
-	}
-	if (step->username != nullptr) {
-	    process(ssp,step->username,esap,&sep->username) ;
-	}
-	if (step->groupname != nullptr) {
-	    process(ssp,step->groupname,esap,&sep->groupname) ;
-	}
-	if (step->options != nullptr) {
-	    process(ssp,step->options,esap,&sep->options) ;
-	}
-	if (step->access != nullptr) {
-	    process(ssp,step->access,esap,&sep->access) ;
-	}
-	return SR_OK ;
+int srventry_process(srventry *sep,varsub *ssp,mainv envv,
+		srvtab_ent *step,srventry_args *esap) noex {
+	int		rs = SR_FAULT ;
+	if (sep && sep && envv && step && esap) {
+	    rs = SR_OK ;
+	    if (step->program != nullptr) {
+	        process(ssp,step->program,esap,&sep->program) ;
+	    }
+	    if (step->args != nullptr) {
+	        process(ssp,step->args,esap,&sep->srvargs) ;
+	    }
+	    if (step->username != nullptr) {
+	        process(ssp,step->username,esap,&sep->username) ;
+	    }
+	    if (step->groupname != nullptr) {
+	        process(ssp,step->groupname,esap,&sep->groupname) ;
+	    }
+	    if (step->options != nullptr) {
+	        process(ssp,step->options,esap,&sep->options) ;
+	    }
+	    if (step->access != nullptr) {
+	        process(ssp,step->access,esap,&sep->access) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (srventry_process) */
 
@@ -199,50 +194,32 @@ int srventry_addoptions(srventry *sep,cchar *options) noex {
 
 /* local subroutines */
 
-static int process(vsp,inbuf,esap,opp)
-varsub		*vsp ;
-char		inbuf[] ;
-SRVENTRY_ARGS	*esap ;
-char		**opp ;
-{
-	int	rs ;
-
-	int	vlen, elen ;
-	int	fl ;
-
-	char	vbuf[BUFLEN + 1] ;
-	char	ebuf[BUFLEN + 1] ;
-	char	*fp ;
+static int process(varsub *vsp,cchar *inbuf,srventry_args *esap,
+		cchar **opp) noex {
+	int		rs ;
+	int		fl = 0 ;
+	char		vbuf[EBUFLEN + 1] ;
+	char		ebuf[EBUFLEN + 1] ;
 
 	*opp = nullptr ;
-	rs = varsub_exp(vsp, vbuf,BUFLEN, inbuf,-1) ;
-	vlen = rs ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	elen = expand(vbuf,vlen,esap,ebuf,BUFLEN) ;
-	if (elen < 0)
-	    rs = SR_OVERFLOW ;
-
-	if (rs >= 0) {
-
-	    fl = sfshrink(ebuf,elen,&fp) ;
-
-	    *opp = mallocstrw(fp,fl) ;
-
-	} /* end if */
-
-ret0:
+	if ((rs = varsub_exp(vsp,vbuf,EBUFLEN,inbuf,-1)) >= 0) {
+	    cint	vlen = rs ;
+	    if ((rs = expand(vbuf,vlen,esap,ebuf,EBUFLEN)) >= 0) {
+	        cint	elen = rs ;
+		cchar	*fp{} ;
+	        fl = sfshrink(ebuf,elen,&fp) ;
+	        *opp = mallocstrw(fp,fl) ;
+	    } /* end if */
+	} /* end if (varsub_exp) */
 
 	return (fl >= 0) ? rs : fl ;
 }
 /* end subroutine (process) */
 
-
 /* expand out a program argument with the substitution parameters */
 
 /*
-#	The following substitutions are made on command strings :
+#	The following substitutions are made on command strings:
 
 #		%V	Directory Watcher version string
 #		%S	search name
@@ -263,17 +240,15 @@ ret0:
 #
 */
 
-static int expand(buf,len,esap,rbuf,rlen)
-char		rbuf[], buf[] ;
-int		rlen, len ;
-SRVENTRY_ARGS	*esap ;
-{
-	int	elen = 0, sl ;
+static int expand(cchar *buf,int len,srventry_args *esap,
+		char *rbuf,int rlen) noex {
+	int		elen = 0 ;
+	int		sl ;
 
 	char	hostbuf[MAXHOSTNAMELEN + 1] ;
 	char	*rbp = rbuf ;
-	char	*bp = buf ;
-	char	*cp ;
+	cchar	*bp = buf ;
+	cchar	*cp ;
 
 	rbuf[0] = '\0' ;
 	if (len == 0)
@@ -294,51 +269,40 @@ SRVENTRY_ARGS	*esap ;
 
 	        sl = 0 ;
 	        switch ((int) *bp) {
-
 	        case 'V':
 	            cp = esap->version ;
 	            sl = strlen(cp) ;
-
 	            break ;
-
 	        case 'S':
 	            cp = esap->searchname ;
 	            sl = strlen(cp) ;
-
 	            break ;
-
 	        case 'R':
 	            cp = esap->programroot ;
 	            sl = strlen(cp) ;
-
 	            break ;
-
 	        case 'N':
 	            cp = esap->nodename ;
 	            sl = strlen(cp) ;
-
 	            break ;
-
 	        case 'D':
 	            cp = esap->domainname ;
 	            sl = strlen(cp) ;
-
 	            break ;
-
 	        case 'H':
 	            sl = -1 ;
 	            if (esap->hostname == nullptr) {
-
+			cint	hlen = MAXHOSTNAMELEN ;
+			cchar	*s1 = esap->nodename ;
+			cchar	*s2 = esap->domainname ;
 	                cp = hostbuf ;
-	                sl = bufprintf(hostbuf,MAXHOSTNAMELEN,"%s.%s",
-	                    esap->nodename,esap->domainname) ;
-
-	            } else
+			sl = snsds(hostbuf,hlen,s1,s2) ;
+	            } else {
 	                cp = esap->hostname ;
-
-	            if (sl < 0)
+		    }
+	            if (sl < 0) {
 	                sl = strlen(cp) ;
-
+		    }
 	            break ;
 
 		case 'U':
@@ -422,13 +386,5 @@ SRVENTRY_ARGS	*esap ;
 	return elen ;
 }
 /* end subroutine (expand) */
-
-static void freeit(char **pp) noex {
-	if (*pp != nullptr) {
-	    free(*pp) ;
-	    *pp = nullptr ;
-	}
-}
-/* end subroutine (freeit) */
 
 

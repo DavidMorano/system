@@ -763,37 +763,31 @@ openport.o:		openport.c openport.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
 
-pmq.o:			pmq.c pmq.h
+pmq.o:			pmq.cc pmq.h
 
-ucsem.o:		ucsem.c ucsem.h
-
-fmq.o:			fmq.c fmq.h
+fmq.o:			fmq.cc fmq.h
 
 sigblock.o:		sigblock.c sigblock.h
-
 sigman.o:		sigman.c sigman.h
-
 sighand.o:		sighand.c sighand.h
 
-paramfile.o:		paramfile.c paramfile.h
+paramfile.o:		paramfile.cc paramfile.h
 
-kvsfile.o:		kvsfile.c kvsfile.h
+kvsfile.o:		kvsfile.cc kvsfile.h
 
-svcfile.o:		svcfile.c svcfile.h
+svcfile.o:		svcfile.cc svcfile.h
+srvtab.o:		srvtab.cc srvtab.h
+acctab.o:		acctab.cc acctab.h
 
-acctab.o:		acctab.c acctab.h
+schedvar.o:		schedvar.cc schedvar.h
 
-srvtab.o:		srvtab.c srvtab.h
+varsub.o:		varsub.cc varsub.h
 
-schedvar.o:		schedvar.c schedvar.h
+memfile.o:		memfile.cc memfile.h
 
-varsub.o:		varsub.c varsub.h
+baops.o:		baops.cc baops.h
 
-memfile.o:		memfile.c memfile.h
-
-baops.o:		baops.c baops.h
-
-bits.o:			bits.c bits.h baops.h
+bits.o:			bits.cc bits.h baops.h
 
 msgenv.o:		msgenv.c msgenv.h
 
