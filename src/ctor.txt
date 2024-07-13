@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int fsi_ctor(fsi *op,Args ... args) noex {
+static int svcentry_ctor(svcentry *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int fsi_ctor(fsi *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (fsi_ctor) */
+/* end subroutine (svcentry_ctor) */
 
-static int fsi_dtor(fsi *op) noex {
+static int svcentry_dtor(svcentry *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (fsi_dtor) */
+/* end subroutine (svcentry_dtor) */
 
 template<typename ... Args>
-static inline int fsi_magic(fsi *op,Args ... args) noex {
+static inline int svcentry_magic(svcentry *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == FSI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SVCENTRY_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (fsi_magic) */
+/* end subroutine (svcentry_magic) */

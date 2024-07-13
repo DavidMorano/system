@@ -1,9 +1,9 @@
-/* svcentry */
+/* svcentry SUPPORT */
+/* lang=C++20 */
 
 /* build up a program entry piece-meal as it were */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGS2	0		/* more */
 
 /* revision history:
 
@@ -28,17 +28,24 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<sbuf.h>
 #include	<svcfile.h>
+#include	<snx.h>
+#include	<sfx.h>
+#include	<mktmp.h>
+#include	<strwcpy.h>
+#include	<cfdec.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -48,8 +55,6 @@
 
 /* local defines */
 
-#define	SVCENTRY_MAGIC	0x76452376
-
 #define	STEBUFLEN	(2 * MAXPATHLEN)
 
 #undef	OUTBUFLEN
@@ -57,21 +62,14 @@
 
 #define	FBUFLEN		(2 * MAXPATHLEN)
 
+#define	ARGS		svcentry_args
+#define	ENT		svcfile_ent
+
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -79,15 +77,54 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	svcentry_process(SVCENTRY *,const char *,SVCENTRY_ARGS *,
-			char *,int) ;
-static int	svcentry_mkfile(SVCENTRY *,const char *,int) ;
+template<typename ... Args>
+static int svcentry_ctor(svcentry *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    SVCENTRY	*hep = (SVCENTRY *) op ;
+	    cnullptr	np{} ;
+	    memclear(hep) ;
+	    rs = SR_NOMEM ;
+	    if ((op->sap = new(nothrow) vecstr) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vecstr) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (svcentry_ctor) */
 
-static int	expand(SVCENTRY_ARGS *,const char *,int,char *,int) ;
-static int	vecstr_procargs(vecstr *,char *) ;
-static int	mkfile(char *,const char *,int) ;
+static int svcentry_dtor(svcentry *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    {
+		delete op->sap ;
+		op->sap = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (svcentry_dtor) */
 
-static void	freeit(const char **) ;
+template<typename ... Args>
+static inline int svcentry_magic(svcentry *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SVCENTRY_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (svcentry_magic) */
+
+static int	svcentry_process(SVCENTRY *,cchar *,ARGS *,
+			char *,int) noex ;
+static int	svcentry_mkfile(SVCENTRY *,cchar *,int) noex ;
+
+static int	expand(ARGS *,cchar *,int,char *,int) noex ;
+static int	vecstr_procargs(vecstr *,char *) noex ;
+static int	mkfile(char *,cchar *,int) noex ;
+
+static void	freeit(cchar **) noex ;
 
 
 /* external variables */
@@ -95,48 +132,36 @@ static void	freeit(const char **) ;
 
 /* local variables */
 
-static const char	xes[] = "XXXXXXXXXXXXXX" ;
+constexpr cchar		xes[] = "XXXXXXXXXXXXXX" ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int svcentry_start(pep,ssp,sep,esap)
-SVCENTRY	*pep ;
-varsub		*ssp ;
-SVCFILE_ENT	*sep ;
-SVCENTRY_ARGS	*esap ;
-{
-	struct svckey	sk ;
-	const int	outlen = OUTBUFLEN ;
+int svcentry_start(svcentry *pep,varsub *ssp,ENT *sep,ARGS * esap) noex {
+	svckey		sk ;
+	cint		outlen = OUTBUFLEN ;
 	int		rs = SR_OK ;
 	int		sl ;
 	char		outbuf[OUTBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_start: ent OUTBUFLEN=%d\n",outlen) ;
-#endif
-
-	if (pep == NULL) return SR_FAULT ;
-	if (sep == NULL) return SR_FAULT ;
-
-#ifdef	OPTIONAL
-	memset(pep,0,sizeof(SVCENTRY)) ;
-#endif
-
+	if (pep == nullptr) return SR_FAULT ;
+	if (sep == nullptr) return SR_FAULT ;
 	pep->magic = 0 ;
 	pep->pid = 0 ;
 	pep->interval = 0 ;
 
-	pep->program = NULL ;
-	pep->username = NULL ;
-	pep->groupname = NULL ;
-	pep->options = NULL ;
-	pep->access = NULL ;
-	pep->efname = NULL ;
-	pep->ofname = NULL ;
+	pep->program = nullptr ;
+	pep->username = nullptr ;
+	pep->groupname = nullptr ;
+	pep->options = nullptr ;
+	pep->access = nullptr ;
+	pep->efname = nullptr ;
+	pep->ofname = nullptr ;
 
-	memset(&pep->f,0,sizeof(struct svcentry_flags)) ;
-
+	pep->f = {} ;
 	pep->name[0] = '\0' ;
 	pep->jobid[0] = '\0' ;
 
@@ -155,7 +180,7 @@ SVCENTRY_ARGS	*esap ;
 
 /* process the access field */
 
-	if ((rs >= 0) && (sk.acc != NULL)) {
+	if ((rs >= 0) && (sk.acc != nullptr)) {
 
 	    rs = svcentry_process(pep,sk.acc,esap,outbuf,outlen) ;
 	    sl = rs ;
@@ -170,7 +195,7 @@ SVCENTRY_ARGS	*esap ;
 
 /* process the interval field */
 
-	if ((rs >= 0) && (sk.interval != NULL)) {
+	if ((rs >= 0) && (sk.interval != nullptr)) {
 
 	    rs = svcentry_process(pep,sk.interval,esap,outbuf,outlen) ;
 	    if (rs < 0)
@@ -179,11 +204,6 @@ SVCENTRY_ARGS	*esap ;
 /* convert the interval string to an integer */
 
 	    rs = cfdecti(outbuf,rs,&pep->interval) ;
-
-#if	CF_DEBUGS
-	    debugprintf("svcentry_start: cfdecti() rs=%d v=%d\n",
-	        rs,pep->interval) ;
-#endif
 
 	    pep->interval = (rs >= 0) ? pep->interval : -1 ;
 	    rs = SR_OK ;
@@ -200,9 +220,9 @@ ret0:
 
 /* bad stuff happened */
 bad1:
-	if (pep->access != NULL) {
+	if (pep->access != nullptr) {
 	    uc_free(pep->access) ;
-	    pep->access = NULL ;
+	    pep->access = nullptr ;
 	}
 
 bad0:
@@ -210,155 +230,103 @@ bad0:
 }
 /* end subroutine (svcentry_start) */
 
-
-/* retrieve for caller the access groups for this entry */
-int svcentry_getaccess(pep,rpp)
-SVCENTRY	*pep ;
-const char	**rpp ;
-{
-
-	if (pep == NULL) return SR_FAULT ;
-
-	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	if (rpp != NULL) *rpp = pep->access ;
-
-	return (pep->access != NULL) ? SR_OK : SR_EMPTY ;
+int svcentry_getaccess(svcentry *pep,cchar **rpp) noex {
+	int		rs ;
+	if ((rs = svcentry_ctor(pep)) >= 0) {
+	    if (rpp) *rpp = pep->access ;
+	    rs = (pep->access) ? SR_OK : SR_EMPTY ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (svcentry_getaccess) */
 
-
 /* retrieve for caller the execution interval for this entry */
-int svcentry_getinterval(pep,rp)
-SVCENTRY	*pep ;
-int		*rp ;
-{
-
-	if (pep == NULL) return SR_FAULT ;
-
-	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	if (rp != NULL) *rp = pep->interval ;
-
-	return SR_OK ;
+int svcentry_getinterval(svcentry *pep,int *rp) noex {
+	int		rs ;
+	if ((rs = svcentry_ctor(pep)) >= 0) {
+	    if (rp) *rp = pep->interval ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (svcentry_getinterval) */
 
-
-int svcentry_getargs(pep,avp)
-SVCENTRY	*pep ;
-const char	***avp ;
-{
+int svcentry_getargs(svcentry *pep,mainv *avp) noex {
 	int		rs ;
-
-	if (pep == NULL) return SR_FAULT ;
-	if (avp == NULL) return SR_FAULT ;
-
-	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	rs = vecstr_getvec(&pep->srvargs,avp) ;
-
+	if ((rs = svcentry_ctor(pep,avp)) >= 0) {
+	    rs = vecstr_getvec(pep->sap,avp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcentry_getargs) */
 
-
-/* free up this entry */
-int svcentry_finish(pep)
-SVCENTRY	*pep ;
-{
-	int		rs = SR_OK ;
+int svcentry_finish(svcentry *pep) noex {
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("svcentry_finish: ent\n") ;
-#endif
-
-	if (pep == NULL) return SR_FAULT ;
-
-	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	if (pep->ofname != NULL) {
-	    if (pep->ofname[0] != '\0') u_unlink(pep->ofname) ;
-	    rs1 = uc_free(pep->ofname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->ofname = NULL ;
-	}
-
-	if (pep->efname != NULL) {
-	    if (pep->efname[0] != '\0') u_unlink(pep->efname) ;
-	    rs1 = uc_free(pep->efname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->efname = NULL ;
-	}
-
-	if (pep->f.srvargs) {
-	    pep->f.srvargs = FALSE ;
-	    rs1 = vecstr_finish(&pep->srvargs) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (pep->program != NULL) {
-	    rs1 = uc_free(pep->program) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->program = NULL ;
-	}
-
-	if (pep->username != NULL) {
-	    rs1 = uc_free(pep->username) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->username = NULL ;
-	}
-
-	if (pep->groupname != NULL) {
-	    rs1 = uc_free(pep->groupname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->groupname = NULL ;
-	}
-
-	if (pep->options != NULL) {
-	    rs1 = uc_free(pep->options) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->options = NULL ;
-	}
-
-	if (pep->access != NULL) {
-	    rs1 = uc_free(pep->access) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pep->access = NULL ;
-	}
-
-	pep->program = NULL ;
-	pep->magic = 0 ;
+	if ((rs = svcentry_ctor(pep)) >= 0) {
+	    if (pep->ofname != nullptr) {
+	        if (pep->ofname[0] != '\0') u_unlink(pep->ofname) ;
+	        rs1 = uc_free(pep->ofname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->ofname = nullptr ;
+	    }
+	    if (pep->efname != nullptr) {
+	        if (pep->efname[0] != '\0') u_unlink(pep->efname) ;
+	        rs1 = uc_free(pep->efname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->efname = nullptr ;
+	    }
+	    if (pep->f.srvargs) {
+	        pep->f.srvargs = false ;
+	        rs1 = vecstr_finish(pep->sap) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (pep->program != nullptr) {
+	        rs1 = uc_free(pep->program) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->program = nullptr ;
+	    }
+	    if (pep->username != nullptr) {
+	        rs1 = uc_free(pep->username) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->username = nullptr ;
+	    }
+	    if (pep->groupname != nullptr) {
+	        rs1 = uc_free(pep->groupname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->groupname = nullptr ;
+	    }
+	    if (pep->options != nullptr) {
+	        rs1 = uc_free(pep->options) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->options = nullptr ;
+	    }
+	    if (pep->access != nullptr) {
+	        rs1 = uc_free(pep->access) ;
+	        if (rs >= 0) rs = rs1 ;
+	        pep->access = nullptr ;
+	    }
+	    pep->program = nullptr ;
+	    pep->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcentry_finish) */
 
-
-/* expand out the service entry */
-int svcentry_expand(pep,sep,esap)
-SVCENTRY	*pep ;
-SVCFILE_ENT	*sep ;
-SVCENTRY_ARGS	*esap ;
-{
-	struct svckey	sk ;
+int svcentry_expand(svcentry *pep,ENT *sep,ARGS *esap) noex {
+	svckey		sk ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl, cl ;
 	int		opts ;
-	const char	*oldservice, *oldinterval ;
-	const char	*argz ;
-	const char	*tmpdname ;
-	const char	*ccp ;
-	const char	*cp ;
+	cchar		*oldservice ;
+	cchar		*oldinterval ;
+	cchar		*argz ;
+	cchar		*tmpdname ;
+	cchar		*ccp ;
+	cchar		*cp ;
 	char		outbuf[OUTBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: ent\n") ;
-	debugprintf("svcentry_expand: tmpdname=%s\n",esap->tmpdname) ;
-#endif
-
-	if (pep == NULL) return SR_FAULT ;
+	if (pep == nullptr) return SR_FAULT ;
 
 	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
 
@@ -372,16 +340,12 @@ SVCENTRY_ARGS	*esap ;
 
 /* load the job ID if one was supplied */
 
-	if (esap->jobid != NULL)
+	if (esap->jobid != nullptr)
 	    strwcpy(pep->jobid,esap->jobid,SVCENTRY_IDLEN) ;
 
 /* did they supply a TMPDIR? */
 
-	tmpdname = (esap->tmpdname != NULL) ? esap->tmpdname : SVCENTRY_TMPDIR ;
-
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: tmpfname=%s\n",tmpdname) ;
-#endif
+	tmpdname = (esap->tmpdname) ? esap->tmpdname : SVCENTRY_TMPDIR ;
 
 /* make some temporary files for program file input and output */
 
@@ -391,13 +355,9 @@ SVCENTRY_ARGS	*esap ;
 	rs = svcentry_mkfile(pep,tmpdname,'e') ;
 	if (rs < 0) goto bad1 ;
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: process rs=%d\n",rs) ;
-#endif
-
 /* process them */
 
-	if (sk.p != NULL) {
+	if (sk.p != nullptr) {
 
 	    rs = svcentry_process(pep,sk.p,esap,outbuf,OUTBUFLEN) ;
 	    sl = rs ;
@@ -415,8 +375,8 @@ SVCENTRY_ARGS	*esap ;
 
 	} /* end if (program path) */
 
-	argz = NULL ;
-	if (sk.a != NULL) {
+	argz = nullptr ;
+	if (sk.a != nullptr) {
 
 	    rs = svcentry_process(pep,sk.a,esap,outbuf,OUTBUFLEN) ;
 	    sl = rs ;
@@ -424,28 +384,24 @@ SVCENTRY_ARGS	*esap ;
 	        goto bad3 ;
 
 	    opts = VECSTR_OCOMPACT ;
-	    rs = vecstr_start(&pep->srvargs,6,opts) ;
+	    rs = vecstr_start(pep->sap,6,opts) ;
 	    if (rs < 0)
 	        goto bad3 ;
 
-	    pep->f.srvargs = TRUE ;
-	    if ((rs = vecstr_procargs(&pep->srvargs,outbuf)) > 0) {
+	    pep->f.srvargs = true ;
+	    if ((rs = vecstr_procargs(pep->sap,outbuf)) > 0) {
 
-	        rs1 = vecstr_get(&pep->srvargs,0,&argz) ;
+	        rs1 = vecstr_get(pep->sap,0,&argz) ;
 	        if (rs1 < 0)
-	            argz = NULL ;
+	            argz = nullptr ;
 
 	    } /* end if */
 
 	} /* end if (program arguments) */
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: 4 rs=%d\n",rs) ;
-#endif
-
 	if (rs < 0) goto bad4 ;
 
-	if (sk.u != NULL) {
+	if (sk.u != nullptr) {
 
 	    rs = svcentry_process(pep,sk.u,esap,outbuf,OUTBUFLEN) ;
 	    sl = rs ;
@@ -460,7 +416,7 @@ SVCENTRY_ARGS	*esap ;
 
 	} /* end if (username field) */
 
-	if (sk.g != NULL) {
+	if (sk.g != nullptr) {
 
 	    rs = svcentry_process(pep,sk.g,esap,outbuf,OUTBUFLEN) ;
 	    sl = rs ;
@@ -475,7 +431,7 @@ SVCENTRY_ARGS	*esap ;
 
 	}
 
-	if (sk.opts != NULL) {
+	if (sk.opts != nullptr) {
 
 	    rs = svcentry_process(pep,sk.opts,esap,outbuf,OUTBUFLEN) ;
 	    sl = rs ;
@@ -490,13 +446,9 @@ SVCENTRY_ARGS	*esap ;
 
 	}
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: fixups rs=%d\n",rs) ;
-#endif
-
 /* OK, perform some fixups */
 
-	if ((pep->program == NULL) && (argz != NULL)) {
+	if ((pep->program == nullptr) && (argz != nullptr)) {
 
 	    cl = sfshrink(argz,-1,&cp) ;
 
@@ -510,34 +462,30 @@ SVCENTRY_ARGS	*esap ;
 
 /* are we OK for a go? */
 
-	if (pep->program == NULL)
+	if (pep->program == nullptr)
 	    goto bad7 ;
-
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: go rs=%d\n",rs) ;
-#endif
 
 /* set at least one program argument if we have none so far */
 
 	rs = SR_OK ;
 	if (pep->f.srvargs) {
-	    rs = vecstr_count(&pep->srvargs) ;
+	    rs = vecstr_count(pep->sap) ;
 	}
 
-	if ((rs == 0) && (pep->program != NULL)) {
+	if ((rs == 0) && (pep->program != nullptr)) {
 
 	    if (sfbasename(pep->program,-1,&cp) > 0) {
 
 	        if (! pep->f.srvargs) {
 
-	            rs = vecstr_start(&pep->srvargs,2,0) ;
+	            rs = vecstr_start(pep->sap,2,0) ;
 	            if (rs >= 0)
-	                pep->f.srvargs = TRUE ;
+	                pep->f.srvargs = true ;
 
 	        }
 
 	        if (pep->f.srvargs)
-	            rs = vecstr_add(&pep->srvargs,cp,-1) ;
+	            rs = vecstr_add(pep->sap,cp,-1) ;
 
 	    }
 
@@ -560,21 +508,21 @@ bad5:
 
 bad4:
 	if (pep->f.srvargs) {
-	    pep->f.srvargs = FALSE ;
-	    vecstr_finish(&pep->srvargs) ;
+	    pep->f.srvargs = false ;
+	    vecstr_finish(pep->sap) ;
 	}
 
 bad3:
-	if (pep->program != NULL)
+	if (pep->program != nullptr)
 	    freeit(&pep->program) ;
 
 bad2:
-	if ((pep->efname != NULL) && (pep->efname[0] != '\0')) {
+	if ((pep->efname != nullptr) && (pep->efname[0] != '\0')) {
 	    u_unlink(pep->efname) ;
 	}
 
 bad1:
-	if ((pep->ofname != NULL) && (pep->ofname[0] != '\0')) {
+	if ((pep->ofname != nullptr) && (pep->ofname[0] != '\0')) {
 	    u_unlink(pep->ofname) ;
 	}
 
@@ -583,44 +531,24 @@ retok:
 	esap->interval = oldinterval ;
 	esap->service = oldservice ;
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_expand: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (svcentry_expand) */
 
-
-int svcentry_arrival(pep,tp)
-SVCENTRY	*pep ;
-time_t		*tp ;
-{
-	int	rs = SR_OK ;
-
-
-	if (pep == NULL) return SR_FAULT ;
-
-	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	if (tp != NULL) *tp = pep->atime ;
-
+int svcentry_arrival(svcentry *pep,time_t *tp) noex {
+	int		rs ;
+	if ((rs = svcentry_ctor(pep)) >= 0) {
+	    if (tp) *tp = pep->atime ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcentry_arrival) */
 
-
-int svcentry_stime(pep,daytime)
-SVCENTRY	*pep ;
-time_t		daytime ;
-{
-	int		rs = SR_OK ;
-
-	if (pep == NULL) return SR_FAULT ;
-
-	if (pep->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	pep->stime = daytime ;
+int svcentry_stime(svcentry *pep,time_t daytime) noex {
+	int		rs ;
+	if ((rs = svcentry_ctor(pep)) >= 0) {
+	    pep->stime = daytime ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcentry_stime) */
@@ -628,30 +556,18 @@ time_t		daytime ;
 
 /* private subroutines */
 
-
-/* expand out one program string entry */
-static int svcentry_process(pep,inbuf,esap,outbuf,outlen)
-SVCENTRY	*pep ;
-const char	inbuf[] ;		/* input string */
-SVCENTRY_ARGS	*esap ;			/* key-type arguments */
-char		outbuf[] ;		/* output buffer */
-int		outlen ;		/* output buffer length */
-{
+static int svcentry_process(svcentry *pep,cc *inbuf,ARGS *esap,
+		char *outbuf,int outlen) noex {
 	int		rs = SR_OK ;
 	int		vlen ;
 	int		elen = 0 ;
-	const char	*ibp ;
+	cchar		*ibp ;
 	char		vbuf[OUTBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_process: ent, outlen=%d\n",outlen) ;
-	debugprintf("svcentry_process: inbuf=>%s<\n",inbuf) ;
-#endif
-
-	if (inbuf == NULL) return SR_FAULT ;
+	if (inbuf == nullptr) return SR_FAULT ;
 
 	ibp = inbuf ;
-	if (pep->ssp != NULL) {
+	if (pep->ssp != nullptr) {
 
 	    rs = varsub_exp(pep->ssp, vbuf,OUTBUFLEN, inbuf,-1) ;
 	    vlen = rs ;
@@ -662,33 +578,23 @@ int		outlen ;		/* output buffer length */
 	    vlen = strlen(ibp) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_process: vlen=%d\n",vlen) ;
-#endif
-
 	if (rs >= 0) {
 	    elen = expand(esap,ibp,vlen,outbuf,outlen) ;
 	    if (elen < 0)
 	        rs = SR_TOOBIG ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("svcentry_process: ret rs=%d elen=%d\n",rs,elen) ;
-#endif
-
 	return (rs >= 0) ? elen : rs ;
 }
 /* end subroutine (svcentry_process) */
 
-
-static int svcentry_mkfile(SVCENTRY *pep,const char *tmpdname,int type)
-{
+static int svcentry_mkfile(SVCENTRY *pep,cchar *tmpdname,int type) noex {
 	int		rs ;
 	char		tfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkfile(tfname,tmpdname,type)) >= 0) {
-	    int	fl = rs ;
-	    const char	*cp ;
+	    cint	fl = rs ;
+	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(tfname,fl,&cp)) >= 0) {
 		switch (type) {
 		case 'o':
@@ -705,11 +611,10 @@ static int svcentry_mkfile(SVCENTRY *pep,const char *tmpdname,int type)
 }
 /* end subroutine (svcentry_mkfile) */
 
-
 /* expand out a program argument with the substitution parameters */
 
 /*
-#	The following substitutions are made on command strings :
+#	The following substitutions are made on command strings:
 
 #		%V	Directory Watcher version string
 #		%R	program root
@@ -724,31 +629,13 @@ static int svcentry_mkfile(SVCENTRY *pep,const char *tmpdname,int type)
 #
 */
 
-static int expand(esap,buf,len,rbuf,rlen)
-SVCENTRY_ARGS	*esap ;
-const char	buf[] ;
-int		len ;
-char		rbuf[] ;
-int		rlen ;
-{
+static int expand(ARGS *esap,cc *buf,int len,char *rbuf,int rlen) noex {
 	int		elen, sl ;
 	int		ch ;
-	const char	*bp = buf ;
-	const char	*cp ;
+	cchar		*bp = buf ;
+	cchar		*cp ;
 	char		hostbuf[MAXHOSTNAMELEN + 1] ;
 	char		*rbp = rbuf ;
-
-#if	CF_DEBUGS2
-	debugprintf("svcentry/expand: ent >%t<\n",buf,len) ;
-	debugprintf("svcentry/expand: rbuflen=%d\n",rlen) ;
-#endif
-
-#if	CF_DEBUGS2
-	if (buf == NULL)
-	    debugprintf("svcentry/expand: buf is NULL\n") ;
-	if (rbuf == NULL)
-	    debugprintf("svcentry/expand: rbuf is NULL\n") ;
-#endif /* CF_DEBUGS2 */
 
 	rbuf[0] = '\0' ;
 	if (len == 0)
@@ -757,17 +644,9 @@ int		rlen ;
 	if (len < 0)
 	    len = strlen(buf) ;
 
-#if	CF_DEBUGS2
-	debugprintf("svcentry/expand: before while\n") ;
-#endif
-
 	elen = 0 ;
 	rlen -= 1 ;			/* reserve for zero terminator */
 	while ((len > 0) && (elen < rlen)) {
-
-#if	CF_DEBUGS2
-	    debugprintf("svcentry/expand: switching on >%c<\n",*bp) ;
-#endif
 
 	    ch = MKCHAR(*bp) ;
 	    switch (ch) {
@@ -799,8 +678,8 @@ int		rlen ;
 	            break ;
 	        case 'H':
 	            sl = -1 ;
-	            if (esap->hostname == NULL) {
-			const int	hlen = MAXHOSTNAMELEN ;
+	            if (esap->hostname == nullptr) {
+			cint	hlen = MAXHOSTNAMELEN ;
 			cchar		*nn = esap->nodename ;
 			cchar		*dn = esap->domainname ;
 	                cp = hostbuf ;
@@ -820,13 +699,13 @@ int		rlen ;
 	            break ;
 	        case 's':
 	            cp = esap->service ;
-	            if (cp != NULL)
+	            if (cp != nullptr)
 	                sl = strlen(cp) ;
 	            break ;
 	        case 'i':
-	            if (esap->interval != NULL) {
+	            if (esap->interval != nullptr) {
 	                cp = esap->interval ;
-	                if (cp != NULL)
+	                if (cp != nullptr)
 	                    sl = strlen(cp) ;
 	            } else {
 	                cp = "1" ;
@@ -856,52 +735,34 @@ int		rlen ;
 
 	    } /* end switch */
 
-#if	CF_DEBUGS2
-	    debugprintf("svcentry/expand: bottom while\n") ;
-#endif
-
 	} /* end while */
-
-#if	CF_DEBUGS2
-	debugprintf("svcentry/expand: normal exit >%t<\n",rbuf,elen) ;
-#endif
 
 	rbuf[elen] = '\0' ;
 	return elen ;
 }
 /* end subroutine (expand) */
 
-
-static void freeit(cchar **pp)
-{
-	if (*pp != NULL) {
+static void freeit(cchar **pp) noex {
+	if (*pp != nullptr) {
 	    uc_free(*pp) ;
-	    *pp = NULL ;
+	    *pp = nullptr ;
 	}
 }
 /* end subroutine (freeit) */
 
-
 /* process an argument list */
-static int vecstr_procargs(alp,abuf)
-vecstr		*alp ;
-char		abuf[] ;
-{
+static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 
-	if (alp == NULL) return SR_FAULT ;
+	if (alp == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("svcentry/processargs: args=>%s<\n",abuf) ;
-#endif
-
-	if ((abuf != NULL) && (abuf[0] != '\0')) {
+	if ((abuf != nullptr) && (abuf[0] != '\0')) {
 	    field	fsb ;
 	    cint	alen = strlen(abuf) ;
-	    uchar	terms[32] ;
+	    char	terms[32] ;
 
-	    fieldterms(terms,FALSE," \t") ;
+	    fieldterms(terms,false," \t") ;
 
 	    if ((rs = field_start(&fsb,abuf,alen)) >= 0) {
 	        cint	flen = alen ;
@@ -921,27 +782,18 @@ char		abuf[] ;
 
 	} /* end if (non-empty arguments) */
 
-#if	CF_DEBUGS
-	debugprintf("svcentry/processargs: ret rs=%d i=%u\n",i) ;
-#endif
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (processargs) */
 
-
 /* make our little files for input and output of the server programs */
-static int mkfile(outbuf,tmpdname,type)
-char		outbuf[] ;
-const char	tmpdname[] ;
-int		type ;
-{
-	SBUF		b ;
+static int mkfile(char *outbuf,cc *tmpdname,int type) noex {
+	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
-	char		template[MAXPATHLEN + 2] ;
+	char		plat[MAXPATHLEN + 2] ;
 
-	if ((rs = sbuf_start(&b,template,MAXPATHLEN)) >= 0) {
+	if ((rs = sbuf_start(&b,plat,MAXPATHLEN)) >= 0) {
 
 	    sbuf_strw(&b,tmpdname,-1) ;
 
@@ -959,18 +811,9 @@ int		type ;
 	} /* end if (sbuf) */
 
 	if (rs >= 0) {
-#if	CF_DEBUGS
-	debugprintf("svcentry/mkfile: template=%s\n",template) ;
-#endif
-	    rs = mktmpfile(outbuf,0600,template) ;
-#if	CF_DEBUGS
-	debugprintf("svcentry/mkfile: mkfile() rs=%d\n",rs) ;
-#endif
+	    rs = mktmpfile(outbuf,plat,0600) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("svcentry/mkfile: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (mkfile) */

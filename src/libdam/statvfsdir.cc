@@ -16,16 +16,19 @@
 
 /******************************************************************************
 
-        This subroutine performs almost exactly like |statvfs(2)|. 
-	The
-        difference is that if zero total-blocks are returned by the OS we assume
-        that an unmounted automount point was accessed. 
-	In this case we will try
-        to access something inside the directory in order to get it mounted so
-        that a second attempt will succeed.
+	Name:
+	statvfsdir
+
+	Description:
+	This subroutine performs almost exactly like |statvfs(2)|.
+	The difference is that if zero total-blocks are returned
+	by the OS we assume that an unmounted automount point was
+	accessed.  In this case we will try to access something
+	inside the directory in order to get it mounted so that a
+	second attempt will succeed.
 
 	Synopsis:
-	int statvfsdir(cchar *fname,strict statvfs *sbp) noex
+	int statvfsdir(cchar *fname,STATVFS *sbp) noex
 
 	Arguments:
 	fname		source string
@@ -50,7 +53,10 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
+
+#include	"statvfsdir.h"
 
 
 /* local defines */
@@ -78,34 +84,39 @@ static int	trytouch(cchar *) noex ;
 
 /* exported subroutines */
 
-int statvfsdir(cchar *fname,struct statvfs *sbp) noex {
-	USTAT		sb ;
-	int		rs ;
+int statvfsdir(cchar *fname,STATVFS *sbp) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if ((rs = uc_statvfs(fname,sbp)) >= 0) {
-
-	    if (sbp->f_blocks == 0) {
-	        if (((rs = u_stat(fname,&sb)) >= 0) && S_ISDIR(sb.st_mode)) {
-	            char	tmpfname[MAXPATHLEN + 1] ;
-	            rs1 = SR_NOENT ;
-	            if ((rs = mkpath2(tmpfname,fname,".")) >= 0) {
-	                if ((rs1 = u_stat(tmpfname,&sb)) >= 0) {
-	                    rs = uc_statvfs(fname,sbp) ;
-	                }
-	            }
-	            if (rs >= 0) {
-	                if ((rs1 == SR_NOENT) || (rs1 == SR_ACCESS)) {
-	                    if ((rs1 = trytouch(fname)) >= 0) {
-	                        rs = uc_statvfs(fname,sbp) ;
-	                    }
-	                }
-	            }
-	        }
-	    } /* end if */
-
-	} /* end if (uc_statvfs) */
-
+	if (fname && sbp) {
+	    USTAT	sb ;
+	    if ((rs = uc_statvfs(fname,sbp)) >= 0) {
+	        if (sbp->f_blocks == 0) {
+	            if ((rs = uc_stat(fname,&sb)) >= 0) {
+			if (S_ISDIR(sb.st_mode)) {
+	                     char	*tbuf{} ;
+		             if ((rs = malloc_mp(&tbuf)) >= 0) {
+	                         rs1 = SR_NOENT ;
+	                         if ((rs = mkpath2(tbuf,fname,".")) >= 0) {
+	                             if ((rs1 = u_stat(tbuf,&sb)) >= 0) {
+	                                 rs = uc_statvfs(fname,sbp) ;
+	                             }
+	                         }
+	                         if (rs >= 0) {
+	                             if ((rs1 == SR_NOENT) || 
+						(rs1 == SR_ACCESS)) {
+	                                 if ((rs1 = trytouch(fname)) >= 0) {
+	                                     rs = uc_statvfs(fname,sbp) ;
+	                                 }
+	                             }
+	                         } /* end if (ok) */
+		                 rs1 = uc_free(tbuf) ;
+		                 if (rs >= 0) rs = rs1 ;
+		             } /* end if (m-a-f) */
+			} /* end if (is-dir) */
+	            } /* end if (uc_stat) */
+	        } /* end if (blocks) */
+	    } /* end if (uc_statvfs) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (statvfsdir) */
@@ -122,7 +133,7 @@ static int trytouch(cchar *fname) noex {
 	if ((rs = malloc_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if ((rs = fsdir_open(&dir,fname)) >= 0) {
-	        while (fsdir_read(&dir,&ds,nbuf,nlen) > 0) {
+	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
 	            cchar	*sp = ds.name ;
 	            if (sp[0] != '.') break ;
 	            if ((sp[1] != '\0') && (sp[1] != '.')) break ;

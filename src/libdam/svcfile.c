@@ -1,6 +1,8 @@
-/* svcfile */
+/* svcfile SUPPORT */
+/* lang=C++20 */
 
 /* service table file manager */
+/* version %I% last-modified %G% */
 
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
@@ -14,7 +16,8 @@
 /* revision history:
 
 	- 2004-05-25, David A­D­ Morano
-	This subroutine was adopted for use as a general key-value file reader.
+	This subroutine was adopted for use as a general key-value
+	file reader.
 
 */
 
@@ -22,18 +25,13 @@
 
 /******************************************************************************
 
-	This object processes an access table for use by daemon multiplexing
-	server programs that want to control access to their sub-servers.
-
+	This object processes an access table for use by daemon
+	multiplexing server programs that want to control access
+	to their sub-servers.
 
 ******************************************************************************/
 
-
-#define	SVCFILE_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -98,17 +96,17 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	field_srvarg(FIELD *,const uchar *,char *,int) ;
 extern int	getpwd(char *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -118,12 +116,12 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct svcfile_svcname {
-	const char	*svcname ;
+	cchar	*svcname ;
 	int		count ;
 } ;
 
 struct xsvcfile_file {
-	const char	*fname ;
+	cchar	*fname ;
 	time_t		mtime ;
 	ino_t		ino ;
 	dev_t		dev ;
@@ -131,40 +129,40 @@ struct xsvcfile_file {
 } ;
 
 struct svcfile_keyname {
-	const char	*kname ;
+	cchar	*kname ;
 	int		count ;
 } ;
 
 struct svcfile_ie {
-	const char	*(*keyvals)[2] ;
-	const char	*svc ;
+	cchar	*(*keyvals)[2] ;
+	cchar	*svc ;
 	int		nkeys ;			/* number of keys */
-	int		size ;			/* total size */
+	int		sz ;			/* total size */
 	int		fi ;			/* file index */
 } ;
 
 struct svcentry {
 	vecobj		keys ;
-	const char	*svc ;
+	cchar	*svc ;
 } ;
 
 struct svcentry_key {
-	const char	*kname ;
-	const char	*args ;
+	cchar	*kname ;
+	cchar	*args ;
 	int		kl, al ;
 } ;
 
 
 /* forward references */
 
-int		svcfile_fileadd(SVCFILE *,const char *) ;
+int		svcfile_fileadd(SVCFILE *,cchar *) ;
 int		svcfile_check(SVCFILE *,time_t) ;
-int		svcfile_fetch(SVCFILE *,const char *,SVCFILE_CUR *,
+int		svcfile_fetch(SVCFILE *,cchar *,SVCFILE_CUR *,
 			SVCFILE_ENT *,char *,int) ;
 
 static int	svcfile_filefins(SVCFILE *) ;
 static int	svcfile_fileparse(SVCFILE *,int) ;
-static int	svcfile_fileparser(SVCFILE *,int,const char *) ;
+static int	svcfile_fileparser(SVCFILE *,int,cchar *) ;
 static int	svcfile_filedump(SVCFILE *,int) ;
 
 #if	CF_FILEDEL
@@ -174,12 +172,12 @@ static int	svcfile_filedel(SVCFILE *,int) ;
 static int	svcfile_addentry(SVCFILE *,int,SVCENTRY *) ;
 static int	svcfile_checkfiles(SVCFILE *,time_t) ;
 
-static int	svcfile_svcadd(SVCFILE *,const char *) ;
-static int	svcfile_svcdel(SVCFILE *,const char *) ;
+static int	svcfile_svcadd(SVCFILE *,cchar *) ;
+static int	svcfile_svcdel(SVCFILE *,cchar *) ;
 static int	svcfile_svcfins(SVCFILE *) ;
 
 #if	CF_ALREADY
-static int	svcfile_already(SVCFILE *,const char *) ;
+static int	svcfile_already(SVCFILE *,cchar *) ;
 #endif
 
 #if	CF_DEVINO
@@ -192,10 +190,10 @@ static int	svcentry_nkeys(SVCENTRY *) ;
 static int	svcentry_size(SVCENTRY *) ;
 static int	svcentry_finish(SVCENTRY *) ;
 
-static int	file_start(SVCFILE_FILE *,const char *) ;
+static int	file_start(SVCFILE_FILE *,cchar *) ;
 static int	file_finish(SVCFILE_FILE *) ;
 
-static int	svcname_start(SVCFILE_SVCNAME *,const char *) ;
+static int	svcname_start(SVCFILE_SVCNAME *,cchar *) ;
 static int	svcname_incr(SVCFILE_SVCNAME *) ;
 static int	svcname_decr(SVCFILE_SVCNAME *) ;
 static int	svcname_finish(SVCFILE_SVCNAME *) ;
@@ -356,7 +354,7 @@ int svcfile_fileadd(SVCFILE *op,cchar *fname)
 {
 	int		rs = SR_OK ;
 	int		fi = 0 ;
-	const char	*np ;
+	cchar	*np ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -368,7 +366,7 @@ int svcfile_fileadd(SVCFILE *op,cchar *fname)
 	debugprintf("svcfile_fileadd: fname=%s\n",fname) ;
 #endif
 
-	np = (const char *) fname ;
+	np = (cchar *) fname ;
 	if (fname[0] != '/') {
 	    char	pwdbuf[MAXPATHLEN+1] ;
 	    np = tmpfname ;
@@ -385,7 +383,7 @@ int svcfile_fileadd(SVCFILE *op,cchar *fname)
 	    SVCFILE_FILE	fe ;
 	    vecobj		*flp = &op->files ;
 	    if ((rs = file_start(&fe,np)) >= 0) {
-	        const int	nrs = SR_NOTFOUND ;
+	        cint	nrs = SR_NOTFOUND ;
 	        int		f_fin = FALSE ;
 	        if ((rs = vecobj_search(flp,&fe,cmpfname,NULL)) == nrs) {
 	            if ((rs = vecobj_add(flp,&fe)) >= 0) {
@@ -535,7 +533,7 @@ int		elen ;
 
 #if	CF_DEBUGS
 	    debugprintf("svcfile_enum: ie size=%u nkeys=%u svc=%s\n",
-	        iep->size,iep->nkeys,iep->svc) ;
+	        iep->sz,iep->nkeys,iep->svc) ;
 #endif
 
 	    if ((ep != NULL) && (ebuf != NULL)) {
@@ -563,7 +561,7 @@ int		elen ;
 
 int svcfile_fetch(op,svcname,curp,ep,ebuf,elen)
 SVCFILE		*op ;
-const char	svcname[] ;
+cchar	svcname[] ;
 SVCFILE_CUR	*curp ;
 SVCFILE_ENT	*ep ;
 char		ebuf[] ;
@@ -650,7 +648,7 @@ int		elen ;
 /* check if the access tables files have changed */
 int svcfile_check(SVCFILE *op,time_t daytime)
 {
-	const int	to = SVCFILE_INTCHECK ;
+	cint	to = SVCFILE_INTCHECK ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -726,7 +724,7 @@ static int svcfile_checkfiles(SVCFILE *op,time_t daytime)
 {
 	struct ustat	sb ;
 	SVCFILE_FILE	*fep ;
-	const int	wt = SVCFILE_INTWAIT ;
+	cint	wt = SVCFILE_INTWAIT ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -792,13 +790,13 @@ static int svcfile_fileparse(SVCFILE *op,int fi)
 	if ((rs = vecobj_get(&op->files,fi,&fep)) >= 0) {
 	    if (fep != NULL) {
 	        struct ustat	sb ;
-	        const char	*fname = fep->fname ;
+	        cchar	*fname = fep->fname ;
 	        if ((rs = u_stat(fname,&sb)) >= 0) {
 	            if (sb.st_mtime > fep->mtime) {
 	                fep->dev = sb.st_dev ;
 	                fep->ino = sb.st_ino ;
 	                fep->mtime = sb.st_mtime ;
-	                fep->size = sb.st_size ;
+	                fep->sz = sb.st_size ;
 	                rs = svcfile_fileparser(op,fi,fname) ;
 	                c = rs ;
 	            } /* end if (need new parsing) */
@@ -824,8 +822,8 @@ static int svcfile_fileparser(SVCFILE *op,int fi,cchar *fname)
 	int		rs1 ;
 	int		fl, kl, al ;
 	int		c = 0 ;
-	const char	*fp ;
-	const char	*kp ;
+	cchar	*fp ;
+	cchar	*kp ;
 
 #if	CF_DEBUGS
 	debugprintf("svcfile_fileparse: ent fi=%u\n",fi) ;
@@ -834,8 +832,8 @@ static int svcfile_fileparser(SVCFILE *op,int fi,cchar *fname)
 	if ((rs = bopen(lfp,fname,"r",0664)) >= 0) {
 	    SVCENTRY	se ;
 	    FIELD	fsb ;
-	    const int	llen = LINEBUFLEN ;
-	    const int	alen = ABUFLEN ;
+	    cint	llen = LINEBUFLEN ;
+	    cint	alen = ABUFLEN ;
 	    int		fn = 0 ;
 	    int		len ;
 	    int		cl ;
@@ -1049,7 +1047,7 @@ static int svcfile_addentry(SVCFILE *op,int fi,SVCENTRY *nep)
 	    f_added = TRUE ;
 	    size = sizeof(SVCFILE_IENT) ;
 	    if ((rs = uc_malloc(size,&iep)) >= 0) {
-	        const int	n = svcentry_nkeys(nep) ;
+	        cint	n = svcentry_nkeys(nep) ;
 	        void		*p ;
 	        iep->fi = fi ;
 	        size = (n+1) * 2 * sizeof(char *) ;
@@ -1059,10 +1057,10 @@ static int svcfile_addentry(SVCFILE *op,int fi,SVCENTRY *nep)
 	            iep->keyvals = p ;
 	            size = svcentry_size(nep) ;
 	            if ((rs = uc_malloc(size,&bp)) >= 0) {
-	                iep->size = size ;
+	                iep->sz = size ;
 	                if ((rs = ientry_loadstr(iep,bp,nep)) >= 0) {
 	                    HDB_DATUM	key, val ;
-	                    const int	sl = rs ;
+	                    cint	sl = rs ;
 	                    key.buf = iep->svc ;
 	                    key.len = sl ;
 	                    val.buf = iep ;
@@ -1304,7 +1302,7 @@ static int svcfile_svcfins(SVCFILE *op)
 static int file_start(SVCFILE_FILE *fep,cchar *fname)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (fname == NULL) return SR_FAULT ;
 
@@ -1337,10 +1335,10 @@ static int file_finish(SVCFILE_FILE *fep)
 /* end subroutine (file_finish) */
 
 
-static int svcname_start(SVCFILE_SVCNAME *snp,const char *svc)
+static int svcname_start(SVCFILE_SVCNAME *snp,cchar *svc)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 #if	CF_DEBUGS
 	debugprintf("svcname_start: svc=%s\n",svc) ;
 #endif
@@ -1356,7 +1354,7 @@ static int svcname_start(SVCFILE_SVCNAME *snp,const char *svc)
 
 static int svcname_finish(SVCFILE_SVCNAME *snp)
 {
-	const int	c = snp->count ;
+	cint	c = snp->count ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 #if	CF_DEBUGS
@@ -1375,7 +1373,7 @@ static int svcname_finish(SVCFILE_SVCNAME *snp)
 
 static int svcname_incr(SVCFILE_SVCNAME *snp)
 {
-	const int	c = snp->count ;
+	cint	c = snp->count ;
 	snp->count += 1 ;
 	return c ;
 }
@@ -1408,12 +1406,12 @@ static int svcname_decr(SVCFILE_SVCNAME *snp)
 static int svcentry_start(SVCENTRY *sep,cchar *svc)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	memset(sep,0,sizeof(SVCENTRY)) ;
 
 	if ((rs = uc_mallocstrw(svc,-1,&cp)) >= 0) {
-	    const int	size = sizeof(SVCENTRY_KEY) ;
+	    cint	size = sizeof(SVCENTRY_KEY) ;
 	    sep->svc = cp ;
 	    rs = vecobj_start(&sep->keys,size,5,VECOBJ_OORDERED) ;
 	    if (rs < 0) {
@@ -1600,8 +1598,8 @@ static int entry_load(SVCFILE_ENT *ep,char *ebuf,int elen,SVCFILE_IENT *iep)
 	int		rs = SR_OK ;
 	int		bo, i, kal ;
 	int		rlen = 0 ;
-	const char	*(*keyvals)[2] ;
-	const char	*kp, *vp ;
+	cchar	*(*keyvals)[2] ;
+	cchar	*kp, *vp ;
 	char		*bp ;
 
 	if (iep == NULL) return SR_FAULT ;
@@ -1614,9 +1612,9 @@ static int entry_load(SVCFILE_ENT *ep,char *ebuf,int elen,SVCFILE_IENT *iep)
 	debugprintf("entry_load: bo=%u\n",bo) ;
 #endif
 
-	if (iep->size <= (elen - bo)) {
+	if (iep->sz <= (elen - bo)) {
 
-	    keyvals = (const char *(*)[2]) (ebuf + bo) ;
+	    keyvals = (cchar *(*)[2]) (ebuf + bo) ;
 	    kal = (iep->nkeys + 1) * 2 * sizeof(char *) ;
 	    bp = (char *) (ebuf + bo + kal) ;
 #ifdef	COMMENT
@@ -1673,7 +1671,7 @@ static int entry_load(SVCFILE_ENT *ep,char *ebuf,int elen,SVCFILE_IENT *iep)
 	    ep->keyvals = keyvals ;
 	    ep->fi = iep->fi ;
 	    ep->nkeys = iep->nkeys ;
-	    ep->size = iep->size ;
+	    ep->sz = iep->sz ;
 
 	} else {
 	    rs = SR_OVERFLOW ;

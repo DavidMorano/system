@@ -42,11 +42,10 @@
 #include	"srventry.h"
 
 
-/* local object defines */
+/* local defines */
 
 #undef	BUFLEN
 #define	BUFLEN		(10 * MAXPATHLEN)
-
 
 
 /* external subroutines */
@@ -74,7 +73,7 @@ static void	freeit(char **) noex ;
 
 /* exported subroutines */
 
-int srventry_start(SRVENTRY *sep) noex {
+int srventry_start(srventry *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    rs = memclear(sep) ;
@@ -89,26 +88,30 @@ int srventry_start(SRVENTRY *sep) noex {
 }
 /* end subroutine (srventry_init) */
 
-int srventry_finish(SRVENTRY *sep) noex {
-	if (sep->program != nullptr)
-	    free(sep->program) ;
-
-	if (sep->srvargs != nullptr)
-	    free(sep->srvargs) ;
-
-	if (sep->username != nullptr)
-	    free(sep->username) ;
-
-	if (sep->groupname != nullptr)
-	    free(sep->groupname) ;
-
-	if (sep->options != nullptr)
-	    free(sep->options) ;
-
-	if (sep->access != nullptr)
-	    free(sep->access) ;
-
-	return SR_OK ;
+int srventry_finish(srventry *sep) noex {
+	int		rs = SR_FAULT ;
+	if (sep) {
+	    rs = SR_OK ;
+	    if (sep->program != nullptr) {
+	        free(sep->program) ;
+	    }
+	    if (sep->srvargs != nullptr) {
+	        free(sep->srvargs) ;
+	    }
+	    if (sep->username != nullptr) {
+	        free(sep->username) ;
+	    }
+	    if (sep->groupname != nullptr) {
+	        free(sep->groupname) ;
+	    }
+	    if (sep->options != nullptr) {
+	        free(sep->options) ;
+	    }
+	    if (sep->access != nullptr) {
+	        free(sep->access) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (srventry_free) */
 
@@ -121,95 +124,80 @@ SRVENTRY_ARGS	*esap ;
 {
 
 
-	if (step->program != nullptr)
+	if (step->program != nullptr) {
 	    process(ssp,step->program,esap,&sep->program) ;
-
-	if (step->args != nullptr) {
-
-	    process(ssp,step->args,esap,&sep->srvargs) ;
-
 	}
-
-	if (step->username != nullptr)
+	if (step->args != nullptr) {
+	    process(ssp,step->args,esap,&sep->srvargs) ;
+	}
+	if (step->username != nullptr) {
 	    process(ssp,step->username,esap,&sep->username) ;
-
-	if (step->groupname != nullptr)
+	}
+	if (step->groupname != nullptr) {
 	    process(ssp,step->groupname,esap,&sep->groupname) ;
-
-	if (step->options != nullptr)
+	}
+	if (step->options != nullptr) {
 	    process(ssp,step->options,esap,&sep->options) ;
-
-	if (step->access != nullptr)
+	}
+	if (step->access != nullptr) {
 	    process(ssp,step->access,esap,&sep->access) ;
-
+	}
 	return SR_OK ;
 }
 /* end subroutine (srventry_process) */
 
-
-int srventry_addprogram(sep,program)
-SRVENTRY	*sep ;
-char		program[] ;
-{
-
-
-	sep->program = mallocstr(program) ;
-
-	return ((sep->program != nullptr) ? SR_OK : SR_NOMEM) ;
+int srventry_addprogram(srventry *sep,cchar *program) noex {
+	int		rs = SR_FAULT ;
+	if (sep && program) {
+	    sep->program = mallocstr(program) ;
+	    rs = ((sep->program) ? SR_OK : SR_NOMEM) ;
+	} /* end if (non-null) */
+	return rs ;
 }
+/* end subroutine (srventry_addprogram) */
 
-
-int srventry_addsrvargs(sep,srvargs)
-SRVENTRY	*sep ;
-char		srvargs[] ;
-{
-
-
-	sep->srvargs = mallocstr(srvargs) ;
-
-	return ((sep->srvargs != nullptr) ? SR_OK : SR_NOMEM) ;
+int srventry_addsrvargs(srventry *sep,cchar *srvargs) noex {
+	int		rs = SR_FAULT ;
+	if (sep && srvargs) {
+	    sep->srvargs = mallocstr(srvargs) ;
+	    rs = ((sep->srvargs) ? SR_OK : SR_NOMEM) ;
+	} /* end if (non-null) */
+	return rs ;
 }
+/* end subroutine (srventry_addsrvargs) */
 
-
-int srventry_addusername(sep,username)
-SRVENTRY	*sep ;
-char		username[] ;
-{
-
-
-	sep->username = mallocstr(username) ;
-
-	return ((sep->username != nullptr) ? SR_OK : SR_NOMEM) ;
+int srventry_addusername(srventry *sep,cchar *username) noex {
+	int		rs = SR_FAULT ;
+	if (sep && username) {
+	    sep->username = mallocstr(username) ;
+	    rs = ((sep->username) ? SR_OK : SR_NOMEM) ;
+	} /* end if (non-null) */
+	return rs ;
 }
+/* end subroutine (srventry_addusername) */
 
-
-int srventry_addgroupname(sep,groupname)
-SRVENTRY	*sep ;
-char		groupname[] ;
-{
-
-
-	sep->groupname = mallocstr(groupname) ;
-
-	return ((sep->groupname != nullptr) ? SR_OK : SR_NOMEM) ;
+int srventry_addgroupname(srventry *sep,cchar *groupname) noex {
+	int		rs = SR_FAULT ;
+	if (sep && groupname) {
+	    sep->groupname = mallocstr(groupname) ;
+	    rs = ((sep->groupname) ? SR_OK : SR_NOMEM) ;
+	} /* end if (non-null) */
+	return rs ;
 }
+/* end subroutine (srventry_addgroupname) */
 
-
-int srventry_addoptions(sep,options)
-SRVENTRY	*sep ;
-char		options[] ;
-{
-
-
-	sep->options = mallocstr(options) ;
-
-	return ((sep->options != nullptr) ? SR_OK : SR_NOMEM) ;
+int srventry_addoptions(srventry *sep,cchar *options) noex {
+	int		rs = SR_FAULT ;
+	if (sep && options) {
+	    sep->options = mallocstr(options) ;
+	    rs = ((sep->options) ? SR_OK : SR_NOMEM) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (srventry_addoptions) */
 
 
 /* local subroutines */
-
 
 static int process(vsp,inbuf,esap,opp)
 varsub		*vsp ;

@@ -60,11 +60,11 @@ extern int srventry_start(seventry *) noex ;
 extern int srventry_finish(seventry *) noex ;
 extern int srventry_process(seventry *,varsub *,char **,
 			SRVTAB_ENTRY *,srventry_args *) noex ;
-extern int srventry_addprogram(seventry *,char *) noex ;
-extern int srventry_addsrvargs(seventry *,char *) noex ;
-extern int srventry_addusername(seventry *,char *) noex ;
+extern int srventry_addprogram(seventry *,cchar *) noex ;
+extern int srventry_addsrvargs(seventry *,cchar *) noex ;
+extern int srventry_addusername(seventry *,cchar *) noex ;
 extern int srventry_addgroupname(seventry *,char *) noex ;
-extern int srventry_addoptions(seventry *,char *) noex ;
+extern int srventry_addoptions(seventry *,cchar *) noex ;
 
 EXTERNC_end
 

@@ -1,5 +1,5 @@
 /* outfmt HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* output formats */
 /* version %I% last-modified %G% */
