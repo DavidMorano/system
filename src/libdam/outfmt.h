@@ -16,9 +16,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 
 
 enum ofis {
@@ -28,7 +25,7 @@ enum ofis {
 	outfmt_overlast
 } ;
 
-extern const char	*outfmts[] ;
+extern cpcchar		outfmts[] ;
 
 
 #endif /* OUTFMT_INCLUDE */

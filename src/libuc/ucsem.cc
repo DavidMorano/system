@@ -79,6 +79,12 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 int		ucsemunlink(cchar *) noex ;
@@ -104,6 +110,9 @@ static int	getucsemgid(void) noex ;
 /* local variables */
 
 constexpr bool		f_condunlink = CF_CONDUNLINK ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

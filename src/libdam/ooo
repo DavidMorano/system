@@ -1,0 +1,2 @@
+int statvfsdir(cchar *fname,struct statvfs *sbp) noex {
+

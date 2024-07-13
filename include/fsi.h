@@ -1,6 +1,8 @@
-/* fsi */
+/* fsi HEADER */
+/* lang=C++20 */
 
 /* FIFO-String-Interlocked */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,52 +18,41 @@
 
 	Manage interlocked string-FIFO operations.
 
-
 *******************************************************************************/
 
-
 #ifndef	FSI_INCLUDE
-#define	FSI_INCLUDE	1
+#define	FSI_INCLUDE
 
 
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
-
 #include	<usystem.h>
 #include	<fifostr.h>
 #include	<ptm.h>
-#include	<localmisc.h>
 
 
-#define	FSI		struct fsi
+#define	FSI		struct fsi_head
 
 
-struct fsi {
-	FIFOSTR		q ;
-	PTM		m ;
+struct fsi_head {
+	ptm		*mxp ;
+	fifostr		*qsp ;
 } ;
 
+typedef FSI		fsi ;
 
-#if	(! defined(FSI_MASTER)) || (FSI_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	fsi_start(fsi *) noex ;
+extern int	fsi_add(fsi *,cchar *,int) noex ;
+extern int	fsi_remove(fsi *,char *,int) noex ;
+extern int	fsi_count(fsi *) noex ;
+extern int	fsi_finish(fsi *) noex ;
 
-extern int	fsi_start(FSI *) ;
-extern int	fsi_add(FSI *,cchar *,int) ;
-extern int	fsi_remove(FSI *,char *,int) ;
-extern int	fsi_count(FSI *) ;
-extern int	fsi_finish(FSI *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* FSI_MASTER */
 
 #endif /* FSI_INCLUDE */
 

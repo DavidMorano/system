@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int csro_ctor(csro *op,Args ... args) noex {
+static int fsi_ctor(fsi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int csro_ctor(csro *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (csro_ctor) */
+/* end subroutine (fsi_ctor) */
 
-static int csro_dtor(csro *op) noex {
+static int fsi_dtor(fsi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (csro_dtor) */
+/* end subroutine (fsi_dtor) */
 
 template<typename ... Args>
-static inline int csro_magic(csro *op,Args ... args) noex {
+static inline int fsi_magic(fsi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CSRO_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FSI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (csro_magic) */
+/* end subroutine (fsi_magic) */

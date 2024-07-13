@@ -1,17 +1,14 @@
-/* statvfsdir */
+/* statvfsdir SUPPORT */
+/* lang=C++20 */
 
-/* like 'statvfs(2)' but will not return zero blocks on automounts */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* like |statvfs(2)| but will not return zero blocks on automounts */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-
 	The subroutine was written from scratch.
-
 
 */
 
@@ -19,44 +16,39 @@
 
 /******************************************************************************
 
-        This subroutine performs almost exactly like 'statvfs(2)'. The
+        This subroutine performs almost exactly like |statvfs(2)|. 
+	The
         difference is that if zero total-blocks are returned by the OS we assume
-        that an unmounted automount point was accessed. In this case we will try
+        that an unmounted automount point was accessed. 
+	In this case we will try
         to access something inside the directory in order to get it mounted so
         that a second attempt will succeed.
 
 	Synopsis:
-
-	int statvfsdir(fname,sbp)
-	const char	*fname ;
-	struct statvfs	*sbp ;
+	int statvfsdir(cchar *fname,strict statvfs *sbp) noex
 
 	Arguments:
-
 	fname		source string
 	sbp		pointer to 'statvfs' structure
 
 	Return:
-
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<fsdir.h>
 #include	<localmisc.h>
 
@@ -65,11 +57,6 @@
 
 
 /* external subroutines */
-
-extern int	isNotAccess(int) ;
-
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -80,18 +67,19 @@ extern char	*strnrchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	trytouch(const char *) ;
+static int	trytouch(cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int statvfsdir(cchar *fname,struct statvfs *sbp)
-{
-	struct ustat	sb ;
+int statvfsdir(cchar *fname,struct statvfs *sbp) noex {
+	USTAT		sb ;
 	int		rs ;
 	int		rs1 ;
 
@@ -125,25 +113,26 @@ int statvfsdir(cchar *fname,struct statvfs *sbp)
 
 /* local subroutines */
 
-
-static int trytouch(cchar *fname)
-{
-	FSDIR		dir ;
-	FSDIR_ENT	ds ;
+static int trytouch(cchar *fname) noex {
+	fsdir		dir ;
+	fsdir_ent	ds ;
 	int		rs ;
-	const char	*np ;
-
-	if ((rs = fsdir_open(&dir,fname)) >= 0) {
-
-	    while (fsdir_read(&dir,&ds) > 0) {
-	        np = ds.name ;
-	        if (np[0] != '.') break ;
-	        if ((np[1] != '\0') && (np[1] != '.')) break ;
-	    }
-
-	    fsdir_close(&dir) ;
-	} /* end if (fsdir) */
-
+	int		rs1 ;
+	char		*nbuf{} ;
+	if ((rs = malloc_mn(&nbuf)) >= 0) {
+	    cint	nlen = rs ;
+	    if ((rs = fsdir_open(&dir,fname)) >= 0) {
+	        while (fsdir_read(&dir,&ds,nbuf,nlen) > 0) {
+	            cchar	*sp = ds.name ;
+	            if (sp[0] != '.') break ;
+	            if ((sp[1] != '\0') && (sp[1] != '.')) break ;
+	        } /* end while */
+	        rs1 = fsdir_close(&dir) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (fsdir) */
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (trytouch) */

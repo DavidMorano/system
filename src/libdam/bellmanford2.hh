@@ -1,7 +1,8 @@
-/* bellmanford-2 */
+/* bellmanford-2 HEADER */
 /* lang=C++11 */
 
 /* Bellman-Ford algorithm for shortest path through graph */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,36 +18,24 @@
 
 	Bellman-Ford (using array of edges)
 
-
 *******************************************************************************/
 
 #ifndef	BELLMANFORD2_INCLUDE
-#define	BELLMANFORD2_INCLUDE	1
+#define	BELLMANFORD2_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<vector>
 #include	<list>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 #include	"graph.hh"
 
 
-/* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-
-/* local structures */
-
-
-extern int bellmanford2(graph_res *,
-	        struct graph_edger *,
-		int,int) ;
+extern int bellmanford2(graph_res *, struct graph_edger *, int,int) noex ;
 
 
 #endif /* BELLMANFORD2_INCLUDE */
