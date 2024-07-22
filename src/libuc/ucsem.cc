@@ -124,7 +124,7 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && name) {
-	    memset(op,0,sizeof(UCSEM)) ;
+	    memclear(op) ;
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		char	*altname = nullptr ;
@@ -174,11 +174,11 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 	                    } /* end if (error) */
 	                } until ((rs >= 0) || f_exit) ;
 	                if (rs >= 0) {
-			    char	*np ;
-			    if ((rs = malloc_mn(&np)) >= 0) {
+			    char	*bp ;
+			    if ((rs = malloc_mn(&bp)) >= 0) {
 				cint	mnlen = rs ;
-				op->name = np ;
-	                        strwcpy(np,name,mnlen) ;
+				op->name = bp ;
+	                        strwcpy(bp,name,mnlen) ;
 	                        if (oflag & O_CREAT) ucsemdiradd(name,om) ;
 	                        op->magic = UCSEM_MAGIC ;
 			    }

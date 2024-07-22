@@ -151,7 +151,7 @@ struct sbuf : sbuf_head {
 	} ;
 } ; /* end struct (sbuf) */
 #else	/* __cplusplus */
-typedef struct sbuf_head	sbuf ;
+typedef SBUF		sbuf ;
 #endif /* __cplusplus */
 
 EXTERNC_begin

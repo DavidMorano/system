@@ -67,6 +67,7 @@
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<ismisc.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"fsdirtree.h"
@@ -241,7 +242,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 
 	if (rlen < 0) rlen = MAXPATHLEN ;
 
-	while ((rs >= 0) && (! op->f.eof)) {
+	while ((rs >= 0) && (! op->f.feof)) {
 	    cdnp = nullptr ;
 	    if ((rs = fsdir_read(&op->dir,&de)) > 0) {
 	        int	enl = rs ;
@@ -330,7 +331,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	                cdnp = nullptr ;
 	                rs = SR_OK ;
 	                len = 0 ;
-	                op->f.eof = true ;
+	                op->f.feof = true ;
 	                break ;
 	            }
 	            cdnp[len] = '\0' ; /* not needed? */
@@ -345,7 +346,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	    } /* end if (directory-read) */
 	} /* end while (outer) */
 	rbuf[0] = '\0' ;
-	if ((rs >= 0) && (cdnp != nullptr) && (! op->f.eof)) {
+	if ((rs >= 0) && (cdnp != nullptr) && (! op->f.feof)) {
 	    rs = mknpath1(rbuf,rlen,cdnp) ;
 	    len = rs ;
 	}
@@ -410,14 +411,14 @@ static int fsdirtree_diradd(fsdirtree *pip,dev_t dev,ino_t ino) noex {
 	HDB		*dbp = &pip->dirids ;
 	HDB_DATUM	key, val ;
 	DIRID		*dip ;
-	const int	size = sizeof(DIRID) ;
+	cint		sz = sizeof(DIRID) ;
 	int		rs ;
-	if ((rs = uc_malloc(size,&dip)) >= 0) {
+	if ((rs = uc_malloc(sz,&dip)) >= 0) {
 	    if ((rs = dirid_start(dip,dev,ino)) >= 0) {
 	        key.buf = dip ;
 	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	        val.buf = dip ;
-	        val.len = size ;
+	        val.len = sz ;
 	        rs = hdb_store(dbp,key,val) ;
 	        if (rs < 0)
 	            dirid_finish(dip) ;

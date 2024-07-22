@@ -16,7 +16,6 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 #define	PTCA		pthread_condattr_t

@@ -125,6 +125,9 @@ extern int	buffer_blanks(buffer *,int) noex ;
 static inline int buffer_backs(buffer *op,int n) noex {
 	return buffer_chrs(op,CH_BS,n) ;
 }
+static inline int buffer_str(buffer *op,cchar *sp) noex {
+	return buffer_strw(op,sp,-1) ;
+}
 
 EXTERNC_end
 

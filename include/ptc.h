@@ -23,9 +23,10 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<time.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 
 #include	"ptm.h"			/* needed for interface */
 #include	"ptca.h"

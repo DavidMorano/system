@@ -13,8 +13,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<pq.h>
-#include	<localmisc.h>		/* extra types */
 
 
 #define	PCSNSRECS_MAGIC		0x98643168

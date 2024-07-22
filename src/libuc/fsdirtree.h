@@ -50,7 +50,7 @@
 
 
 struct fsdirtree_flags {
-	uint		eof:1 ;
+	uint		feof:1 ;
 	uint		dir:1 ;
 	uint		dirids:1 ;	/* dir-id tracking */
 } ;
@@ -73,6 +73,8 @@ struct fsdirtree_head {
 } ;
 
 typedef FSDIRTREE	fsdirtree ;
+typedef	FSDIRTREE_FL	fsdirtree_fl ;
+typedef	FSDIRTREE_STAT	fsdirtree_stat ;
 
 EXTERNC_begin
 
