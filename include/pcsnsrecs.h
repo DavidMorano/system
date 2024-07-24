@@ -22,14 +22,14 @@
 
 #define	PCSNSRECS_MAGIC		0x98643168
 #define	PCSNSRECS		struct pcsnsrecs_head
-#define	PCSNSRECS_ST		struct pcsnsrecs_s
+#define	PCSNSRECS_ST		struct pcsnsrecs_stats
 
 #define	PCSNSRECS_DEFENTS	10	/* default entries */
 #define	PCSNSRECS_DEFMAX	20	/* default maximum entries */
 #define	PCSNSRECS_DEFTTL	(10*60)	/* default time-to-live */
 
 
-struct pcsnsrecs_s {
+struct pcsnsrecs_stats {
 	uint		nentries ;		/* number of current entries */
 	uint		total ;			/* accesses */
 	uint		refreshes ;		/* refreshes */
@@ -49,16 +49,17 @@ struct pcsnsrecs_head {
 } ;
 
 typedef PCSNSRECS	pcsnsrecs ;
+typedef	PCSNSRECS_ST	pcsnsrecs_st ;
 
 EXTERNC_begin
 
-extern int pcsnsrecs_start(PCSNSRECS *,int,int) noex ;
-extern int pcsnsrecs_store(PCSNSRECS *,cchar *,int,cchar *,int,int) noex ;
-extern int pcsnsrecs_lookup(PCSNSRECS *,char *,int,cchar *,int) noex ;
-extern int pcsnsrecs_invalidate(PCSNSRECS *,cchar *,int) noex ;
-extern int pcsnsrecs_check(PCSNSRECS *,time_t) noex ;
-extern int pcsnsrecs_stats(PCSNSRECS *,PCSNSRECS_ST *) noex ;
-extern int pcsnsrecs_finish(PCSNSRECS *) noex ;
+extern int pcsnsrecs_start(pcsnsrecs *,int,int) noex ;
+extern int pcsnsrecs_store(pcsnsrecs *,cchar *,int,cchar *,int,int) noex ;
+extern int pcsnsrecs_lookup(pcsnsrecs *,char *,int,cchar *,int) noex ;
+extern int pcsnsrecs_invalidate(pcsnsrecs *,cchar *,int) noex ;
+extern int pcsnsrecs_check(pcsnsrecs *,time_t) noex ;
+extern int pcsnsrecs_stats(pcsnsrecs *,pcsnsrecs_st *) noex ;
+extern int pcsnsrecs_finish(pcsnsrecs *) noex ;
 
 EXTERNC_end
 

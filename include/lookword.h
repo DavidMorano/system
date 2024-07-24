@@ -12,7 +12,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -55,8 +54,8 @@ struct lookword_cursor {
 } ;
 
 typedef	LOOKWORD	lookword ;
-typedef	LOOKWORD_CUR	lookword_cur ;
 typedef	LOOKWORD_FL	lookword_fl ;
+typedef	LOOKWORD_CUR	lookword_cur ;
 typedef	LOOKWORD_WORD	lookword_word ;
 
 EXTERNC_begin

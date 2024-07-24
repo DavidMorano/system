@@ -1,10 +1,11 @@
-/* pcsnsreq */
+/* pcsnsreq HEADER */
+/* lang=C20 */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSNSREQ_INCLUDE
-#define	PCSNSREQ_INCLUDE	1
+#define	PCSNSREQ_INCLUDE
 
 
 enum pcsnsreqs {

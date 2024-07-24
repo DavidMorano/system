@@ -1,4 +1,5 @@
-/* pcsconfs */
+/* pcsconfs HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -12,34 +13,36 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSCONFS_INCLUDE
-#define	PCSCONFS_INCLUDE	1
+#define	PCSCONFS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"var.h"
 
 
 #define	PCSCONFS		struct pcsconfs_head
-#define	PCSCONFS_CUR		struct pcsconfs_c
-#define	PCSCONFS_OBJ		struct pcsconfs_obj
+#define	PCSCONFS_CUR		struct pcsconfs_cursor
+#define	PCSCONFS_OBJ		struct pcsconfs_object
 #define	PCSCONFS_MAGIC		0x99889298
 #define	PCSCONFS_CURMAGIC	0x99889299
 
 
-struct pcsconfs_obj {
-	const char	*name ;
+struct pcsconfs_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct pcsconfs_c {
+struct pcsconfs_cursor {
 	uint		magic ;
-	VAR_CUR		vcur ;
+	var_cur		vcur ;
 } ;
 
 struct pcsconfs_flags {
@@ -49,37 +52,32 @@ struct pcsconfs_flags {
 
 struct pcsconfs_head {
 	uint		magic ;
-	const char	**envv ;
-	const char	*pr ;			/* program-root */
-	const char	*cfname ;		/* DB database name */
-	const char	*a ;			/* memory allocation */
-	struct pcsconfs_flags	f ;
-	VAR		db ;
+	cchar		**envv ;
+	cchar		*pr ;			/* program-root */
+	cchar		*cfname ;		/* DB database name */
+	cchar		*a ;			/* memory allocation */
+	PCSCONFS_FL	f ;
+	var		db ;
 	time_t		ti_conf ;		/* DB mtime */
 	int		ncursors ;
 } ;
 
+typedef	PCSCONFS	pcsconfs ;
+typedef	PCSCONFS_CUR	pcsconfs_cur ;
+typedef	PCSCONFS_OBJ	pcsconfs_obj ;
 
-#if	(! defined(PCSCONFS_MASTER)) || (PCSCONFS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsconfs_start(pcsconfs *,cchar *,cchar **,cchar *) noex ;
+extern int pcsconfs_curbegin(pcsconfs *,pcsconfs_cur *) noex ;
+extern int pcsconfs_fetch(pcsconfs *, cchar *,int,pcsconfs_cur *,
+				char *,int) noex ;
+extern int pcsconfs_enum(pcsconfs *,pcsconfs_cur *,char *,int,char *,int) noex ;
+extern int pcsconfs_curend(pcsconfs *,pcsconfs_cur *) noex ;
+extern int pcsconfs_audit(pcsconfs *) noex ;
+extern int pcsconfs_finish(pcsconfs *) noex ;
 
-extern int pcsconfs_start(PCSCONFS *,const char *,const char **,const char *) ;
-extern int pcsconfs_curbegin(PCSCONFS *,PCSCONFS_CUR *) ;
-extern int pcsconfs_fetch(PCSCONFS *, const char *,int,PCSCONFS_CUR *,
-				char *,int) ;
-extern int pcsconfs_enum(PCSCONFS *,PCSCONFS_CUR *,char *,int,char *,int) ;
-extern int pcsconfs_curend(PCSCONFS *,PCSCONFS_CUR *) ;
-extern int pcsconfs_audit(PCSCONFS *) ;
-extern int pcsconfs_finish(PCSCONFS *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSCONFS_MASTER */
+EXTERNC_end
 
 
 #endif /* PCSCONFS_INCLUDE */

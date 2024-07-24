@@ -1,4 +1,5 @@
-/* received */
+/* received HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,15 +12,16 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	RECEIVED_INCLUDE
-#define	RECEIVED_INCLUDE	1
+#define	RECEIVED_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
-
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	RECEIVED_MAGIC	0x97634587
@@ -40,41 +42,20 @@ enum received_keys {
 struct received_head {
 	uint		magic ;
 	char		*a ;
-	const char	*key[received_keyoverlast] ;
+	cchar	*key[received_keyoverlast] ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(RECEIVED_MASTER)) || (RECEIVED_MASTER == 0)
+extern int received_start(RECEIVED *,cchar *,int) noex ;
+extern int received_getkey(RECEIVED *,int,cchar **) noex ;
+extern int received_getitem(RECEIVED *,int,cchar **) noex ;
+extern int received_finish(RECEIVED *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int received_start(RECEIVED *,const char *,int) ;
-extern int received_getkey(RECEIVED *,int,const char **) ;
-extern int received_getitem(RECEIVED *,int,const char **) ;
-extern int received_finish(RECEIVED *) ;
+extern cchar	*received_keys[] ;
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* RECEIVED_MASTER */
-
-
-#if	(! defined(RECEIVED_MASTER))
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern const char	*received_keys[] ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* RECEIVED_MASTER */
 
 #endif /* RECEIVED_INCLUDE */
 

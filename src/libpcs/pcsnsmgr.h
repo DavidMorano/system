@@ -25,14 +25,13 @@
 #include	<usysrets.h>
 
 
-#define	PCSNSMGR_STATS		struct pcsnsmgr_stats
-
+#define	PCSNSMGR_STAT		struct pcsnsmgr_status
 #define	PCSNSMGR_MAX		120		/* max cache entries */
 #define	PCSNSMGR_TTL		(20*60)		/* entry time-out in seconds */
 #define	PCSNSMGR_TOLOCK		5
 
 
-struct pcsnsmgr_stats {
+struct pcsnsmgr_status {
 	uint		max ;
 	uint		ttl ;
 	uint		nent ;
@@ -41,13 +40,15 @@ struct pcsnsmgr_stats {
 	uint		pmis, nmis ;
 } ;
 
+typedef	PCSNSMGR_STAT	pcsnsmgr_stat ;
+
 EXTERNC_begin
 
 extern int pcsnsmgr_init() noex ;
 extern int pcsnsmgr_set(cchar *,int,cchar *,int,int) noex ;
 extern int pcsnsmgr_get(char *,int,cchar *,int) noex ;
 extern int pcsnsmgr_invalidate(cchar *,int) noex ;
-extern int pcsnsmgr_stats(PCSNSMGR_STATS *) noex ;
+extern int pcsnsmgr_stats(pcsnsmgr_stat *) noex ;
 extern int pcsnsmgr_fini() noex ;
 
 EXTERNC_end

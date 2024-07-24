@@ -1,13 +1,12 @@
-/* received */
+/* received SUPPORT */
+/* lang=C++20 */
 
 /* manage a "received" object */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		0		/* run in "safe" mode */
 #define	CF_EMPTYVALUE	0		/* allow for empty values */
 #define	CF_FIELDWORD	1		/* used 'field_word(3dam)' */
-
 
 /* revision history:
 
@@ -20,42 +19,40 @@
 
 /*******************************************************************************
 
-	This object module processes and stores the information in a "received"
-	header field for mail messages.
+	This object module processes and stores the information in
+	a "received" header field for mail messages.
 
-	Note that some (stupid) mailers put characters like quote characters
-	and other weirdo characters into some of the value fields of the
-	RECEIVED header.  I don't know how many of these weirdo characters are
-	legal in an RFC-822 value (if any) but we are currently using
-	'field_word(3dam)' with only the semi-colon character as a terminator
-	to try to handle these wirdo cases.  If quote characters are not
-	allowed to represent a regular legal character (without any escape
-	quoting), then maybe 'field_get(3dam)' should be used.
+	Note that some (stupid) mailers put characters like quote
+	characters and other weirdo characters into some of the
+	value fields of the RECEIVED header.  I don't know how many
+	of these weirdo characters are legal in an RFC-822 value
+	(if any) but we are currently using 'field_word(3dam)' with
+	only the semi-colon character as a terminator to try to
+	handle these wirdo cases.  If quote characters are not
+	allowed to represent a regular legal character (without any
+	escape quoting), then maybe 'field_get(3dam)' should be
+	used.
 
-	Note also that all RFC-822 comments are removed from the RECEIVED
-	header value before trying to parse it out into components.  Doing full
-	tokenization on these strings while preserving comments would make this
-	crap as hard as it is for mail addresses (where we preserve comments
-	associated with each address)!
-
+	Note also that all RFC-822 comments are removed from the
+	RECEIVED header value before trying to parse it out into
+	components.  Doing full tokenization on these strings while
+	preserving comments would make this crap as hard as it is
+	for mail addresses (where we preserve comments associated
+	with each address)!
 
 *******************************************************************************/
 
-
-#define	RECEIVED_MASTER		0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<stdlib.h>
 #include	<strings.h>
-
 #include	<usystem.h>
 #include	<field.h>
 #include	<sbuf.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"mhcom.h"
@@ -67,28 +64,8 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* external variables */
-
-
-/* external variables */
-
-const char	*received_keys[] = {
-	"from",
-	"by",
-	"with",
-	"id",
-	"for",
-	"date",
-	"via",
-	NULL
-} ;
 
 
 /* local structures */
@@ -96,12 +73,23 @@ const char	*received_keys[] = {
 
 /* forward references */
 
-static int received_bake(RECEIVED *,int,const char *,int) ;
+static int received_bake(RECEIVED *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
-/*
+constexpr cpcchar	received_keys[] = {
+	"from",
+	"by",
+	"with",
+	"id",
+	"for",
+	"date",
+	"via",
+	nullptr
+} ;
+
+/****
 
 	  9	(tab)
 	 10	(new line)
@@ -111,9 +99,9 @@ static int received_bake(RECEIVED *,int,const char *,int) ;
 	 32	(space)
 	 59	;
 
-*/
+****/
 
-static const uchar	fterms[] = {
+constexpr cchar		fterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x01, 0x00, 0x00, 0x08,
 	0x00, 0x00, 0x00, 0x00,
@@ -125,72 +113,47 @@ static const uchar	fterms[] = {
 } ;
 
 
+/* external variables */
+
+
 /* exported subroutines */
 
-
-int received_start(RECEIVED *op,cchar hbuf[],int hlen)
+int received_start(RECEIVED *op,cchar *hbuf,int hlen) noex {
 {
 	MHCOM		com ;
 	int		rs ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("received_start: ent\n") ;
-#endif
+	if (op == nullptr) return SR_FAULT ;
+	if (hbuf == nullptr) return SR_FAULT ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("received_start: got object pointer\n") ;
-#endif
-
-	memset(op,0,sizeof(RECEIVED)) ;
+	memclear(op) ;
 
 	if (hlen < 0)
 	    hlen = strlen(hbuf) ;
 
-#if	CF_DEBUGS
-	debugprintf("received_start: slen=%d s=>%t<\n",slen,s,slen) ;
-#endif
-
 /* prepare a MHCOM object for comment parsing */
 
 	if ((rs = mhcom_start(&com,hbuf,hlen)) >= 0) {
-	    const char	*sp ;
+	    cchar	*sp ;
 	    int		sl ;
 	    if ((sl = mhcom_getval(&com,&sp)) > 0) {
-	        const int	size = (sl + 1) ;
-	        void		*p ;
-	        if ((rs = uc_malloc(size,&p)) >= 0) {
+	        cint	sz = (sl + 1) ;
+	        void	*p ;
+	        if ((rs = uc_malloc(sz,&p)) >= 0) {
 	            op->a = p ;
-	            if ((rs = received_bake(op,size,sp,sl)) >= 0) {
+	            if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
 	                c = rs ;
 	                op->magic = RECEIVED_MAGIC ;
 	            }
 	            if (rs < 0) {
 	                uc_free(op->a) ;
-	                op->a = NULL ;
+	                op->a = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
 	    } /* end if (non-zero content) */
 	    mhcom_finish(&com) ;
 	} /* end if (mhcom) */
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; i < received_keyoverlast ; i += 1) {
-	        if (op->key[i] != NULL)
-	            debugprintf("received_start: k=%s v=>%s<\n",
-	                received_keys[i],op->key[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	debugprintf("received_start: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -204,20 +167,16 @@ int received_finish(RECEIVED *op)
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != RECEIVED_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (op->a != NULL) {
+	if (op->a != nullptr) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
+	    op->a = nullptr ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("received_finish: ret rs=%d\n",rs) ;
-#endif
 
 	op->magic = 0 ;
 	return rs ;
@@ -230,7 +189,7 @@ int received_getkey(RECEIVED *op,int ki,cchar **rpp)
 	int		cl = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != RECEIVED_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -239,9 +198,9 @@ int received_getkey(RECEIVED *op,int ki,cchar **rpp)
 
 	if (ki >= received_keyoverlast) return SR_NOENT ;
 
-	cl = (op->key[ki] != NULL) ? strlen(op->key[ki]) : 0 ;
+	cl = (op->key[ki] != nullptr) ? strlen(op->key[ki]) : 0 ;
 
-	if (rpp != NULL) {
+	if (rpp != nullptr) {
 	    *rpp = op->key[ki] ;
 	}
 
@@ -260,23 +219,21 @@ int received_getitem(RECEIVED *op,int ki,cchar **rpp)
 
 /* private subroutines */
 
-
-static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
-{
-	SBUF		sb ;
+static int received_bake(RECEIVED *op,int sz,cchar *sp,int sl) noex {
+	sbuf		sb ;
 	int		rs ;
 	int		rs1 ;
 	int		ki = -1 ;
 	int		wi = 0 ;
 	int		c = 0 ;
-	int		f_prevmatch = FALSE ;
+	int		f_prevmatch = false ;
 
-	if ((rs = sbuf_start(&sb,op->a,size)) >= 0) {
-	    FIELD	fsb ;
+	if ((rs = sbuf_start(&sb,op->a,sz)) >= 0) {
+	    field	fsb ;
 
 	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	        const char	*fp ;
-	        int		fl ;
+	        cchar	*fp ;
+	        int	fl ;
 
 	        while (rs >= 0) {
 
@@ -289,19 +246,9 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	            if (fl <= 0)
 	                break ;
 
-#if	CF_DEBUGS
-	            debugprintf("received_start: "
-			"c=%u ki=%d wi=%u w=%t term=>%c<\n",
-	                c,ki,wi,fp,fl,fsb.term) ;
-#endif
-
 	            rs1 = -1 ;
 	            if (! f_prevmatch)
 	                rs1 = matcasestr(received_keys,fp,fl) ;
-
-#if	CF_DEBUGS
-	            debugprintf("received_start: match=%d\n",rs1) ;
-#endif
 
 #if	(! CF_EMPTYVALUE)
 	            f_prevmatch = (rs1 >= 0) ;
@@ -318,7 +265,7 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	            } else if (ki >= 0) {
 
 	                if ((wi == 0) && (ki >= 0)) {
-	                    const char	*cp ;
+	                    cchar	*cp ;
 
 	                    sbuf_getpoint(&sb,&cp) ;
 
@@ -338,7 +285,7 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	        } /* end while */
 
 	        if ((rs >= 0) && (fsb.term == ';')) {
-	            const char	*cp ;
+	            cchar	*cp ;
 	            int		cl ;
 	            if (c > 0)
 	                sbuf_chr(&sb,'\0') ;
@@ -348,7 +295,7 @@ static int received_bake(RECEIVED *op,int size,const char *sp,int sl)
 	            op->key[received_keydate] = cp ;
 	            c += 1 ;
 
-	            cp = (const char *) fsb.lp ;
+	            cp = (cchar *) fsb.lp ;
 	            cl = fsb.ll ;
 	            sbuf_strw(&sb,cp,cl) ;
 

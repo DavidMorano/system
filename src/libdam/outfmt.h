@@ -12,7 +12,6 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

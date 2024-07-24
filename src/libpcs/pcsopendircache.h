@@ -1,5 +1,5 @@
 /* pcsopendircache HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* open a channel (file-descriptor) to the directory-cache of a directory */
 /* version %I% last-modified %G% */
@@ -19,9 +19,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
@@ -32,6 +33,5 @@ EXTERNC_end
 
 
 #endif /* PCSOPENDIRCACHE_INCLUDE */
-
 
 

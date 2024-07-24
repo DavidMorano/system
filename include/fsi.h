@@ -1,5 +1,5 @@
 /* fsi HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* FIFO-String-Interlocked */
 /* version %I% last-modified %G% */

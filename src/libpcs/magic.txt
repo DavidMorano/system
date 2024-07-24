@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int sigman_magic(sigman *op,Args ... args) noex {
+static inline int lookword_magic(lookword *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SIGMAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == LOOKWORD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (sigman_magic) */
+/* end subroutine (lookword_magic) */

@@ -1,4 +1,8 @@
-/* pcsmsg */
+/* pcsmsg HEADER */
+/* lang=C20 */
+
+/* messages for PCS requests-responses */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,15 +14,18 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	PCSMSG_INCLUDE
-#define	PCSMSG_INCLUDE	1
+#define	PCSMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<realname.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |USERNAMELEN| */
 
 
 #ifndef	PCSMSG_KEYLEN
@@ -126,7 +133,6 @@ struct pcsmsg_ack {
 	uchar	rc ;
 } ;
 
-
 /* request types */
 enum pcsmsgtypes {
 	pcsmsgtype_status,	/* 0 */
@@ -145,7 +151,6 @@ enum pcsmsgtypes {
 	pcsmsgtype_overlast
 } ;
 
-
 /* response codes */
 enum pcsmsgrcs {
 	pcsmsgrc_ok,
@@ -156,12 +161,7 @@ enum pcsmsgrcs {
 	pcsmsgrc_overlast
 } ;
 
-
-#if	(! defined(PCSMSG_MASTER)) || (PCSMSG_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pcsmsg_getstatus(struct pcsmsg_getstatus *,int,char *,int) ;
 extern int pcsmsg_gethelp(struct pcsmsg_gethelp *,int,char *,int) ;
@@ -177,11 +177,8 @@ extern int pcsmsg_name(struct pcsmsg_name *,int,char *,int) ;
 extern int pcsmsg_user(struct pcsmsg_user *,int,char *,int) ;
 extern int pcsmsg_ack(struct pcsmsg_ack *,int,char *,int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* PCSMSG_MASTER */
 
 #endif /* PCSMSG_INCLUDE */
 

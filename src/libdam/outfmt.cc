@@ -14,9 +14,13 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	These are (below) the output formats for something.
+
+*******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
