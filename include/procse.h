@@ -20,10 +20,10 @@
 
 
 #define	PROCSE		struct procse_head
-#define	PROCSE_ARGS	struct procse_a
+#define	PROCSE_ARGS	struct procse_arguments
 
 
-struct procse_a {
+struct procse_arguments {
 	cchar		*passfile ;		/* pass-file */
 	cchar		*sharedobj ;		/* shared-object path */
 	cchar		*program ;		/* server program path */
