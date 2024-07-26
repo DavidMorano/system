@@ -35,13 +35,13 @@
 	+ uc_libfree(3uc)
 
 	since we deal with data that is persistent across full
-	instances of command executions. That is: our data stays
+	instances of command executions.  That is: our data stays
 	valid throughout the start and complete exit of a command
-	program. Therefore normal conventions about what data was
+	program.  Therefore normal conventions about what data was
 	allocated and left un-freed do not apply to our dynamic
-	memory usage(s). To someone looking at this code to add or
+	memory usage(s).  To someone looking at this code to add or
 	modify it, it means that these memory allocations are not
-	tracked like normal ones are. Therefore try not to mess up
+	tracked like normal ones are.  Therefore try not to mess up
 	by creating memory leaks, where there are *none* right now!
 	Get it?
 
@@ -53,10 +53,10 @@
 	This program can operate as both a regular program (is
 	flushed from system memory when it exits) or it can be
 	operated as sort of a terminate-stay-resident (TSR) program
-	(its data is not flushed when the command exists). We detect
+	(its data is not flushed when the command exists).  We detect
 	which it is (which mode we are executing in) dynamically.
 	We do this by simply looking at the persistent data and
-	seeing if elements of it are non-zero. Any non-zero data
+	seeing if elements of it are non-zero.  Any non-zero data
 	indicates that we have already been executed in the past.
 	This data is allocated in the BSS section of our process
 	memory map so it is initialized to all-zero on program-load
@@ -65,33 +65,33 @@
 	Hopefully, everything else now makes sense upon inspection
 	with this understanding.
 
-	Why do this? Because it speeds things up. Everything in
+	Why do this? Because it speeds things up.  Everything in
 	this program is already quite fast, but we have the chance
 	of reducing some file-access work with the introduction of
-	a persistent data cache. It is hard to get faster than a
+	a persistent data cache.  It is hard to get faster than a
 	single file-access (like a shared-memory cache), so anything
-	worth doing has to be a good bit faster than that. Hence,
+	worth doing has to be a good bit faster than that.  Hence,
 	pretty much only TSR behavior can beat a single file access.
 
 	Parallelism? There is not any; so we do not have to worry
-	about using mutexes or semaphores. Maybe someday we will
+	about using mutexes or semaphores.  Maybe someday we will
 	have to think about parallelism, but probably not any time
 	soon!
 
-	OK, now for some of the unpleasantness. We have to release
+	OK, now for some of the unpleasantness.  We have to release
 	persistent data that was dynamically allocated with the
-	PERCACHE facility. We do this by calling |percache_fini()|
-	on our particular data handle. But this should be done at
+	PERCACHE facility.  We do this by calling |percache_fini()|
+	on our particular data handle.  But this should be done at
 	module unload time, so we need to register a subroutine to
-	do this that is called at module-unload time. That subroutine
-	will be |ourfini()|. The registration is only done when we
-	are *exiting* this command. This is done so that we do not
+	do this that is called at module-unload time.  That subroutine
+	will be |ourfini()|.  The registration is only done when we
+	are *exiting* this command.  This is done so that we do not
 	perform the registration if the PERCACHE facility was never
-	used. The cache facility keeps track within itself whether
+	used.  The cache facility keeps track within itself whether
 	it was used or not (among all possible simulraneously users
-	also). We ask its opinion on that and act accordingly. Only
+	also).  We ask its opinion on that and act accordingly.  Only
 	one "user" (command) within the same module will be given
-	notice to perform a registration. However if multiple users
+	notice to perform a registration.  However if multiple users
 	(commands) do register a |fini()| (needlessly) it is dealt
 	with without problems (extras are ignored as expected).
 	Welcome to TSR management when in a very dynamic execution
@@ -115,6 +115,7 @@
 #include	<usystem.h>
 #include	<getnodename.h>
 #include	<utmpacc.h>
+#include	<localget.h>
 #include	<strwcpy.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -136,7 +137,7 @@
 
 /* forward references */
 
-static int	isNoProcs(int rs) noex ;
+static bool	isNoProcs(int rs) noex ;
 
 
 /* local variables */
@@ -459,8 +460,8 @@ int percache_systat(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 }
 /* end subroutine (percache_systat) */
 
-static int isNoProcs(int rs) noex {
-	int		f = false ;
+static bool isNoProcs(int rs) noex {
+	bool		f = false ;
 	f = f || isNotPresent(rs) ;
 	f = f || (rs == SR_NOSYS) ;
 	return f ;

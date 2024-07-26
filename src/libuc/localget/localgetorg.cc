@@ -94,9 +94,6 @@
 /* local typedefs */
 
 
-/* external variables */
-
-
 /* external subroutines */
 
 

@@ -85,7 +85,8 @@ template<typename ... Args>
 static int pwfile_ctor(pwfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    memclear(op) ;
+	    PWFILE	*hop = (PWFILE *) op ;
+	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->alp = new(nothrow) vecitem) != nullptr) {
 	        if ((op->ulp = new(nothrow) hdb) != nullptr) {
@@ -199,7 +200,7 @@ int pwfile_close(pwfile *op) noex {
 }
 /* end subroutine (pwfile_close) */
 
-int pwfile_enum(pwfile *op,pwfile_cur *curp,pwentry *uep,
+int pwfile_curenum(pwfile *op,pwfile_cur *curp,pwentry *uep,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = pwfile_magic(op,curp,uep,rbuf)) >= 0) {
@@ -217,7 +218,7 @@ int pwfile_enum(pwfile *op,pwfile_cur *curp,pwentry *uep,
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (pwfile_enum) */
+/* end subroutine (pwfile_curenum) */
 
 /* fetch the next entry that matches the specified username */
 int pwfile_fetchuser(pwfile *op,cc *username,pwfile_cur *curp,

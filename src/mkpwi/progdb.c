@@ -1,7 +1,8 @@
-/* progdb */
+/* progdb SUPPORT */
+/* lang=C++20 */
 
 /* process the system password data and write out to the index file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
@@ -9,17 +10,16 @@
 #define	CF_MKGECOSNAME	1		/* "should" be much faster? */
 #define	CF_USEREALNAME	1		/* use realname from |pwfile| */
 
-
 /* revision history:
 
 	= 2002-04-29, David A­D­ Morano
-        This subroutine was inspired by something previous (I do not remember
-	what it was).
+	This subroutine was inspired by something previous (I do
+	not remember what it was).
 
 	= 2017-09-12, David A­D­ Morano
-        Small enhancement to allocate the (on-stack) buffer for the index file
-        magic string to be PWIHDR_MAGICSIZE instead of just 16 (what that
-        define is anyway).
+	Small enhancement to allocate the (on-stack) buffer for the
+	index file magic string to be PWIHDR_MAGICSIZE instead of
+	just 16 (what that define is anyway).
 
 */
 
@@ -27,21 +27,18 @@
 
 /*******************************************************************************
 
-	This subroutine reads the system PASSWD database and creates an inverse
-	password database file (ipasswd) that maps real names to usernames.
-
+	This subroutine reads the system PASSWD database and creates
+	an inverse password database file (ipasswd) that maps real
+	names to usernames.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<getbufsize.h>
@@ -82,6 +79,8 @@
 #endif
 
 #define	WRCACHE		struct wrcache
+
+#define	PI		PROGINFO
 
 
 /* external subroutines */
@@ -138,41 +137,42 @@ struct wrcache {
 
 /* forward references */
 
-static int	progdber(PROGINFO *,bfile *,cchar *,cchar *,int,int) ;
-static int	procpw(PROGINFO *,STRTAB *,RECORDER *) ;
-static int	procpwfile(PROGINFO *,STRTAB *,RECORDER *) ;
-static int	procpwfiler(PROGINFO *,STRTAB *,RECORDER *,PWFILE_ENT *) ;
-static int	procpwsys(PROGINFO *,STRTAB *,RECORDER *) ;
+static int	progdber(PI *,bfile *,cchar *,cchar *,int,int) ;
+static int	procpw(PI *,STRTAB *,RECORDER *) ;
+static int	procpwfile(PI *,STRTAB *,RECORDER *) ;
+static int	procpwfiler(PI *,STRTAB *,RECORDER *,PWFILE_ENT *) ;
+static int	procpwsys(PI *,STRTAB *,RECORDER *) ;
 
-static int	procentry(PROGINFO *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
-static int	wrcache(PROGINFO *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
-static int	wrfile(PROGINFO *,WRCACHE *,cchar *) ;
-static int	wrsetup(PROGINFO *,WRCACHE *) ;
-static int	wrstuff(PROGINFO *,WRCACHE *) ;
-static int	wridx(PROGINFO *,WRCACHE *) ;
-static int	wridxer(PROGINFO *,WRCACHE *) ;
-static int	wrstats(PROGINFO *,bfile *,RECORDER *) ;
+static int	procentry(PI *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
+static int	wrcache(PI *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
+static int	wrfile(PI *,WRCACHE *,cchar *) ;
+static int	wrsetup(PI *,WRCACHE *) ;
+static int	wrstuff(PI *,WRCACHE *) ;
+static int	wridx(PI *,WRCACHE *) ;
+static int	wridxer(PI *,WRCACHE *) ;
+static int	wrstats(PI *,bfile *,RECORDER *) ;
 
 static int	mkourtmp(char *,cchar *,cchar *,cchar *,mode_t) ;
 static int	ourchmod(cchar *) ;
 
 static int	mkpwihdr(uint *,int) ;
-static int	mkro(PROGINFO *) ;
+static int	mkro(PI *) ;
 
 #if	CF_DEBUG && CF_DEBUGFILE
-static int	progdb_debugfile(PROGINFO *,cchar *) ;
+static int	progdb_debugfile(PI *,cchar *) ;
 #endif
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progdb(PROGINFO *pip,bfile *ofp,cchar *dbname)
-{
-	const int	n = NREC_GUESS ;
+int progdb(PI *pip,bfile *ofp,cchar *dbname) noex {
+	cint		n = NREC_GUESS ;
 	int		rs = SR_OK ;
 	int		dnl ;
 	int		c = 0 ;
@@ -190,10 +190,10 @@ int progdb(PROGINFO *pip,bfile *ofp,cchar *dbname)
 	if ((dnl = sfdirname(dbname,-1,&dnp)) > 0) {
 	    char	dbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) {
-	        const int	am = (X_OK|W_OK) ;
+	        cint	am = (X_OK|W_OK) ;
 	        if ((rs = perm(dbuf,-1,-1,NULL,am)) >= 0) {
 	            if ((rs = mkro(pip)) >= 0) {
-	                const int	ro = rs ;
+	                cint	ro = rs ;
 	                rs = progdber(pip,ofp,dbuf,dbname,ro,n) ;
 	                c = rs ;
 	            } /* end if (mkro) */
@@ -216,9 +216,7 @@ int progdb(PROGINFO *pip,bfile *ofp,cchar *dbname)
 }
 /* end subroutine (progdb) */
 
-
-static int progdber(PROGINFO *pip,bfile *ofp,cchar *dn,cchar *db,int ro,int n)
-{
+static int progdber(PI *pip,bfile *ofp,cchar *dn,cchar *db,int ro,int n) noex {
 	STRTAB		st ;
 	int		rs ;
 	int		rs1 ;
@@ -257,9 +255,7 @@ static int progdber(PROGINFO *pip,bfile *ofp,cchar *dn,cchar *db,int ro,int n)
 }
 /* end subroutine (progdber) */
 
-
-static int procpw(PROGINFO *pip,STRTAB *stp,RECORDER *rp)
-{
+static int procpw(PI *pip,STRTAB *stp,RECORDER *rp) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((pip->pwfname != NULL) && (pip->pwfname[0] != '-')) {
@@ -273,9 +269,7 @@ static int procpw(PROGINFO *pip,STRTAB *stp,RECORDER *rp)
 }
 /* end subroutine (procpw) */
 
-
-static int procpwfile(PROGINFO *pip,STRTAB *stp,RECORDER *rtp)
-{
+static int procpwfile(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 	PWFILE		pf ;
 	PWFILE_CUR	cur ;
 	PWFILE_ENT	pw ;
@@ -290,10 +284,10 @@ static int procpwfile(PROGINFO *pip,STRTAB *stp,RECORDER *rtp)
 
 	if ((rs = pwfile_open(&pf,pip->pwfname)) >= 0) {
 	    if ((rs = pwfile_curbegin(&pf,&cur)) >= 0) {
-	        const int	pwlen = getbufsize(getbufsize_pw) ;
-	        char		*pwbuf ;
+	        cint	pwlen = getbufsize(getbufsize_pw) ;
+	        char	*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	            while ((rs = pwfile_enum(&pf,&cur,&pw,pwbuf,pwlen)) > 0) {
+	            while ((rs = pwfile_curenum(&pf,&cur,&pw,pwbuf,pwlen)) > 0) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -329,9 +323,8 @@ static int procpwfile(PROGINFO *pip,STRTAB *stp,RECORDER *rtp)
 }
 /* end subroutine (procpwfile) */
 
-
-static int procpwfiler(PROGINFO *pip,STRTAB *stp,RECORDER *rtp,PWFILE_ENT *pwp)
-{
+static int procpwfiler(PI *pip,STRTAB *stp,RECORDER *rtp,
+		PWFILE_ENT *pwp) noex {
 	int		rs = SR_OK ;
 	int		nl = -1 ;
 	int		c = 0 ;
@@ -375,7 +368,7 @@ static int procpwfiler(PROGINFO *pip,STRTAB *stp,RECORDER *rtp,PWFILE_ENT *pwp)
 	{
 	    GECOS	ge ;
 	    if ((rs = gecos_start(&ge,pwp->gecos,-1)) >= 0) {
-	        const int	req = gecosval_realname ;
+	        cint	req = gecosval_realname ;
 	        if ((nl = gecos_getval(&ge,req,&np)) > 0) {
 	            char	nbuf[nl + 1] ;
 	            if (strnchr(np,nl,'-') != NULL) {
@@ -398,19 +391,17 @@ static int procpwfiler(PROGINFO *pip,STRTAB *stp,RECORDER *rtp,PWFILE_ENT *pwp)
 }
 /* end subroutine (procpwfiler) */
 
-
-static int procpwsys(PROGINFO *pip,STRTAB *stp,RECORDER *rtp)
-{
+static int procpwsys(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 	SETSTR		u ;
-	const int	n = 100 ;
+	cint		n = 100 ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
 	if ((rs = setstr_start(&u,n)) >= 0) {
-	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
-	    char		*pwbuf ;
+	    PASSWD	pw ;
+	    cint	pwlen = getbufsize(getbufsize_pw) ;
+	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpw_begin()) >= 0) {
 	            while ((rs = getpw_ent(&pw,pwbuf,pwlen)) > 0) {
@@ -419,7 +410,7 @@ static int procpwsys(PROGINFO *pip,STRTAB *stp,RECORDER *rtp)
 	                    GECOS	ge ;
 	                    cchar	*gecos = pw.pw_gecos ;
 	                    if ((rs = gecos_start(&ge,gecos,-1)) >= 0) {
-	                        const int	req = gecosval_realname ;
+	                        cint	req = gecosval_realname ;
 	                        int		nl ;
 	                        cchar		*np ;
 	                        if ((nl = gecos_getval(&ge,req,&np)) > 0) {
@@ -477,15 +468,8 @@ static int procpwsys(PROGINFO *pip,STRTAB *stp,RECORDER *rtp)
 }
 /* end subroutine (procpwsys) */
 
-
-static int procentry(pip,stp,rtp,username,nbuf,nlen)
-PROGINFO	*pip ;
-STRTAB		*stp ;
-RECORDER	*rtp ;
-cchar		username[] ;
-cchar		nbuf[] ;
-int		nlen ;
-{
+static int procentry(PI *pip,STRTAB *stp,RECORDER *rtp,cchar *username,
+		cchar *nbuf,int nlen) noex {
 	REALNAME	rn ;
 	int		rs ;
 	int		rs1 ;
@@ -627,12 +611,9 @@ int		nlen ;
 }
 /* end subroutine (procentry) */
 
-
-/* write out the cache file */
-static int wrcache(PROGINFO *pip,STRTAB *stp,RECORDER *rp,
-		cchar *dn,cchar *db,int ro)
-{
-	const mode_t	fm = 0664 ;
+static int wrcache(PI *pip,STRTAB *stp,RECORDER *rp,
+		cchar *dn,cchar *db,int ro) noex {
+	cmode		fm = 0664 ;
 	int		rs ;
 	cchar		*suf = DBSUF ;
 	cchar		*es = ENDIANSTR ;
@@ -675,14 +656,12 @@ static int wrcache(PROGINFO *pip,STRTAB *stp,RECORDER *rp,
 }
 /* end subroutine (wrcache) */
 
-
-static int wrfile(PROGINFO *pip,WRCACHE *wcp,cchar *fn)
-{
+static int wrfile(PI *pip,WRCACHE *wcp,cchar *fn) noex {
 	bfile		*ifp = &wcp->ifile ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = bopen(ifp,fn,"wct",0664)) >= 0) {
-	    const int	ml = PWIHDR_MAGICSIZE ;
+	    cint	ml = PWIHDR_MAGICSIZE ;
 	    cchar	*ms = PWIHDR_MAGICSTR ;
 	    char	vetu[PWIHDR_MAGICSIZE+1] ;
 	    if ((rs = mkmagic(vetu,ml,ms)) >= 0) {
@@ -713,9 +692,7 @@ static int wrfile(PROGINFO *pip,WRCACHE *wcp,cchar *fn)
 }
 /* end subroutine (wrfile) */
 
-
-static int wrsetup(PROGINFO *pip,WRCACHE *wcp)
-{
+static int wrsetup(PI *pip,WRCACHE *wcp) noex {
 	RECORDER	*rp = wcp->rp ;
 	RECORDER_ENT	*rectab ;
 	int		rs ;
@@ -728,7 +705,7 @@ static int wrsetup(PROGINFO *pip,WRCACHE *wcp)
 	    if ((rs = recorder_rtlen(rp)) >= 0) {
 	        hdr[pwihdr_reclen] = rs ;
 	        if ((rs = strtab_strsize(stp)) >= 0) {
-	            const int	stsize = rs ;
+	            cint	stsize = rs ;
 	            char	*stab ;
 	            if ((rs = uc_malloc(stsize,&stab)) >= 0) {
 	                hdr[pwihdr_strsize] = stsize ;
@@ -766,11 +743,9 @@ static int wrsetup(PROGINFO *pip,WRCACHE *wcp)
 }
 /* end subroutine (wrsetup) */
 
-
-static int wrstuff(PROGINFO *pip,WRCACHE *wcp)
-{
+static int wrstuff(PI *pip,WRCACHE *wcp) noex {
 	bfile		*ifp = &wcp->ifile ;
-	const int	hdrsize = (pwihdr_overlast * sizeof(uint)) ;
+	cint		hdrsize = (pwihdr_overlast * sizeof(uint)) ;
 	uint		*hdrp = wcp->hdr ;
 	int		rs ;
 	int		fto = wcp->fto ;
@@ -787,9 +762,9 @@ static int wrstuff(PROGINFO *pip,WRCACHE *wcp)
 #endif
 	    if ((rs = bwrite(ifp,hdrp,hdrsize)) >= 0) {
 	        RECORDER_ENT	*rectab = wcp->rectab ;
-	        const int	rtsize = hdrp[pwihdr_recsize] ;
+	        cint	rtsize = hdrp[pwihdr_recsize] ;
 	        if ((rs = bwrite(ifp,rectab,rtsize)) >= 0) {
-	            const int	stsize = hdrp[pwihdr_strsize] ;
+	            cint	stsize = hdrp[pwihdr_strsize] ;
 	            char	*stab = wcp->stab ;
 	            if ((rs = bwrite(ifp,stab,stsize)) >= 0) {
 	                rs = wridx(pip,wcp) ;
@@ -801,9 +776,7 @@ static int wrstuff(PROGINFO *pip,WRCACHE *wcp)
 }
 /* end subroutine (wrstuff) */
 
-
-static int wridx(PROGINFO *pip,WRCACHE *wcp)
-{
+static int wridx(PI *pip,WRCACHE *wcp) noex {
 	bfile		*ifp = &wcp->ifile ;
 	uint		(*recind)[2] ;
 	uint		*hdrp = wcp->hdr ;
@@ -832,9 +805,7 @@ static int wridx(PROGINFO *pip,WRCACHE *wcp)
 }
 /* end subroutine (wridx) */
 
-
-static int wridxer(PROGINFO *pip,WRCACHE *wcp)
-{
+static int wridxer(PI *pip,WRCACHE *wcp) noex {
 	RECORDER	*rp = wcp->rp ;
 	bfile		*ifp = &wcp->ifile ;
 	uint		(*recind)[2] = wcp->recind ;
@@ -848,7 +819,7 @@ static int wridxer(PROGINFO *pip,WRCACHE *wcp)
 	    if ((rs = bwrite(ifp,recind,idxsize)) >= 0) {
 	        if ((rs = recorder_mkindfl3(rp,stab,recind,idxsize)) >= 0) {
 	            if ((rs = bwrite(ifp,recind,idxsize)) >= 0) {
-	                const int	ris = hdrp[pwihdr_idxsize] ;
+	                cint	ris = hdrp[pwihdr_idxsize] ;
 	                if ((rs = recorder_mkindun(rp,stab,recind,ris)) >= 0) {
 	                    rs = bwrite(ifp,recind,idxsize) ;
 	                }
@@ -860,9 +831,7 @@ static int wridxer(PROGINFO *pip,WRCACHE *wcp)
 }
 /* end subroutine (wridxer) */
 
-
-static int wrstats(PROGINFO *pip,bfile *ofp,RECORDER *recp)
-{
+static int wrstats(PI *pip,bfile *ofp,RECORDER *recp) noex {
 	RECORDER_INFO	s ;
 	int		rs ;
 
@@ -899,9 +868,7 @@ static int wrstats(PROGINFO *pip,bfile *ofp,RECORDER *recp)
 }
 /* end subroutine (wrstats) */
 
-
-static int mkpwihdr(uint *hdrp,int fto)
-{
+static int mkpwihdr(uint *hdrp,int fto) noex {
 	hdrp[pwihdr_wrcount] = 0 ;
 	hdrp[pwihdr_rectab] = fto ;
 	fto += hdrp[pwihdr_recsize] ;
@@ -921,10 +888,8 @@ static int mkpwihdr(uint *hdrp,int fto)
 }
 /* end subroutine (mkpwihdr) */
 
-
-static int mkourtmp(char *rbuf,cchar *dbuf,cchar *suf,cchar *es,mode_t fm)
-{
-	const int	clen = MAXNAMELEN ;
+static int mkourtmp(char *rbuf,cc *dbuf,cc *suf,cc *es,mode_t fm) noex {
+	cint		clen = MAXNAMELEN ;
 	int		rs ;
 	cchar		*xx = "progdbXX" ;
 	char		cbuf[MAXNAMELEN+1] ;
@@ -938,9 +903,7 @@ static int mkourtmp(char *rbuf,cchar *dbuf,cchar *suf,cchar *es,mode_t fm)
 }
 /* end subroutine (mkourtmp) */
 
-
-static int mkro(PROGINFO *pip)
-{
+static int mkro(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		ro = (RECORDER_OSEC | RECORDER_ORANDLC) ;
 	if ((pip->typespec != NULL) && (pip->typespec[0] != '\0')) {
@@ -966,13 +929,11 @@ static int mkro(PROGINFO *pip)
 }
 /* end subroutine (mkro) */
 
-
-static int ourchmod(cchar *fn)
-{
+static int ourchmod(cchar *fn) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = uc_stat(fn,&sb)) >= 0) {
-	    const mode_t fm = (S_IREAD|S_IWRITE|S_IRGRP|S_IWGRP|S_IROTH) ;
+	    cmode	fm = (S_IREAD|S_IWRITE|S_IRGRP|S_IWGRP|S_IROTH) ;
 	    if ((sb.st_mode & fm) != fm) {
 	        rs = u_chmod(fn,(sb.st_mode | fm)) ;
 	    }
@@ -981,16 +942,14 @@ static int ourchmod(cchar *fn)
 }
 /* end subroutine (ourchmod) */
 
-
 #if	CF_DEBUG && CF_DEBUGFILE
-static int progdb_debugfile(PROGINFO *pip,cchar *dbname)
-{
+static int progdb_debugfile(PI *pip,cchar *dbname) noex {
 	int		rs = SR_OK ;
 	if (DEBUGLEVEL(4)) {
 	    IPASSWD	pwi ;
 	    IPASSWD_CUR	cur ;
-	    const int	rlen = REALNAMELEN ;
-	    const int	nlen = REALNAMELEN ;
+	    cint	rlen = REALNAMELEN ;
+	    cint	nlen = REALNAMELEN ;
 	    int		rs1 ;
 	    int		rs2 ;
 	    cchar	*sa[6] ;

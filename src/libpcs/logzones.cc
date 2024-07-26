@@ -183,7 +183,7 @@ static bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 
 static sysval		pagesize(sysval_ps) ;
 
-static cchar		blanks[] = "                       " ;
+constexpr cchar		blanks[] = "                       " ;
 
 constexpr bool		f_creat = CF_CREAT ;
 
@@ -270,7 +270,7 @@ int logzones_curend(LZ *op,LZ_CUR *curp) noex {
 }
 /* end subroutine (logzones_curend) */
 
-int logzones_enum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
+int logzones_curenum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = logzones_magic(op,curp)) >= 0) {
@@ -318,18 +318,18 @@ int logzones_enum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
-/* end subroutine (logzones_enum) */
+/* end subroutine (logzones_curenum) */
 
 int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ei ;
 	if ((rs = logzones_magic(op,znb)) >= 0) {
-	    const time_t	dt = time(nullptr) ;
-	    LZ_ENT		e ;
-	    cint		ebl = LZ_ENTLEN ;
-	    char		ebp[LZ_ENTLEN + 1] ;
-	    char		*bp ;
+	    custime	dt = time(nullptr) ;
+	    LZ_ENT	e ;
+	    cint	ebl = LZ_ENTLEN ;
+	    char	ebp[LZ_ENTLEN + 1] ;
+	    char	*bp ;
 	    if ((rs = logzones_enteropen(op,dt)) >= 0) {
 /* capture the lock if we do not already have it */
 	        if ((! op->f.lockedread) && (! op->f.lockedwrite)) {

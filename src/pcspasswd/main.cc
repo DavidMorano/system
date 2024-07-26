@@ -597,38 +597,24 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	        {
 	            PWFILE_CUR	cur ;
-
 		PWFILE_ENT	pe ;
-
 		char	pebuf[PWFILE_RECLEN + 1] ;
 
-
 	            pwfile_curbegin(pfp,&cur) ;
-
 	        debugprintf("main: &pe %08lX pebuf %08lX\n",&pe,pebuf) ;
 
-	            while (pwfile_enum(pfp,&cur,
+	            while (pwfile_curenum(pfp,&cur,
 			&pe,pebuf,PWFILE_RECLEN) >= 0) {
 
-
 	                debugprintf("username=%s\n",pe.username) ;
-
 	                debugprintf("password=%s\n",pe.password) ;
-
 	                debugprintf("gecos=%s\n",pe.gecos) ;
-
 	                debugprintf("realname=%s\n",pe.realname) ;
-
 	                debugprintf("account=%s\n",pe.account) ;
-
 	                debugprintf("office=%s\n",pe.office) ;
-
 	                debugprintf("home phone=%s\n",pe.hphone) ;
-
 	            } /* end while */
-
 	            pwfile_curend(pfp,&cur) ;
-
 	        } /* end block */
 
 	    } /* end if */

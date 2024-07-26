@@ -684,7 +684,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        debugprintf(fmt,pwfname,rs) ;
 	            pwfile_curbegin(pfp,&cur) ;
 	            debugprintf("main: &pe %08lX pwbuf %08lX\n",&pe,pwbuf) ;
-	            while (pwfile_enum(pfp,&cur,
+	            while (pwfile_curenum(pfp,&cur,
 	                &pe,pwbuf,pwlen) >= 0) {
 	                debugprintf("username=%s\n",pe.username) ;
 	                debugprintf("password=%s\n",pe.password) ;

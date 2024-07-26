@@ -67,7 +67,7 @@ EXTERNC_begin
 extern int pwfile_open(pwfile *,cchar *) noex ;
 extern int pwfile_curbegin(pwfile *,pwfile_cur *) noex ;
 extern int pwfile_curend(pwfile *,pwfile_cur *) noex ;
-extern int pwfile_enum(pwfile *,pwfile_cur *,pwfile_ent *,char *,int) noex ;
+extern int pwfile_curenum(pwfile *,pwfile_cur *,pwfile_ent *,char *,int) noex ;
 extern int pwfile_fetchuser(pwfile *,cchar *,pwfile_cur *,
 		pwfile_ent *,char *,int) noex ;
 extern int pwfile_lock(pwfile *,int,int) noex ;

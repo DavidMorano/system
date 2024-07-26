@@ -8,14 +8,14 @@
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This subroutine is originally written. This is a minimal
+	This subroutine is originally written.  This is a minimal
 	implementation.
 
 	= 2018-09-14, David A-D- Morano
 	I modified this to use |snabbr(3dam)| instead of a local
 	custom thing which did the same thing, only not as well.
 	So we go with the library solution instead of the local
-	custom one. Note for future: might want to refactor a bit
+	custom one.  Note for future: might want to refactor a bit
 	to get a loop of attempts to find the ORGCODE rather than
 	the current (older) list-like code pattern.
 
@@ -30,7 +30,7 @@
 
 	Description:
 	This subroutine is used to (try to) get the LOCAL software
-	distribution organization-code (ORGCODE). An (so-called)
+	distribution organization-code (ORGCODE).  An (so-called)
 	ORGCODE is normally an abbreviation of an organiztion name
 	(itself normally multiple words) consisting of the first
 	letter of each word, but capitalized.
