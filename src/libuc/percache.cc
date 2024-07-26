@@ -162,7 +162,7 @@ static constexpr cint	timeouts[] = {
 /* exported subroutines */
 
 int percache_init(PERCACHE *pcp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	if (! pcp->f_init) {
 	    rs = SR_OK ;
 	    pcp->f_init = true ;
@@ -211,7 +211,7 @@ int percache_invalidate(PERCACHE *pcp) noex {
 	if (pcp) {
 	    rs = SR_OK ;
 	    if (pcp->f_init) {
-	        cint	sz = (sizeof(PERCACHE_ITEM) * pertype_overlast) ;
+	        cint	sz = int(sizeof(PERCACHE_ITEM) * pertype_overlast) ;
 	        memset(pcp->items,0,sz) ;
 	        if (pcp->sysdomain != nullptr) {
 	            rs1 = uc_libfree(pcp->sysdomain) ;
@@ -260,7 +260,7 @@ int percache_getnprocs(PERCACHE *pcp,time_t dt) noex {
 		    }
 	            pcp->items[pt].t = dt ;
 	            pcp->items[pt].v = n ;
-	        } /* end if */
+	        } /* end if (update needed) */
 	    } /* end if (init) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
@@ -280,7 +280,7 @@ int percache_getbtime(PERCACHE *pcp,time_t dt,time_t *btp) noex {
 	                pcp->items[pt].t = dt ;
 	                pcp->items[pt].v = bt ;
 	            }
-	        } /* end if */
+	        } /* end if (update needed) */
 	        *btp = pcp->items[pt].v ;
 	    } /* end if (init) */
 	} /* end if (non-null) */
@@ -303,7 +303,7 @@ int percache_getrunlevel(PERCACHE *pcp,time_t dt) noex {
 	                pcp->items[pt].t = dt ;
 	                pcp->items[pt].v = n ;
 	            }
-	        } /* end if */
+	        } /* end if (update needed) */
 	    } /* end if (init) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
@@ -325,7 +325,7 @@ int percache_getnusers(PERCACHE *pcp,time_t dt) noex {
 	                pcp->items[pt].t = dt ;
 	                pcp->items[pt].v = n ;
 	            }
-	        } /* end if */
+	        } /* end if (update needed) */
 	    } /* end if (init) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
@@ -363,7 +363,7 @@ int percache_getsysdomain(PERCACHE *pcp,time_t dt,cchar **rpp) noex {
 		        rs1 = uc_free(dbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
-	        } /* end if (updated needed) */
+	        } /* end if (update needed) */
 	        if (rpp) {
 		    *rpp = (rs >= 0) ? pcp->sysdomain : nullptr ;
 	        }
@@ -404,7 +404,7 @@ int percache_netload(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 		        rs1 = uc_free(dbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
-	        } /* end if (updated needed) */
+	        } /* end if (update needed) */
 	        if (rpp) {
 		    *rpp = (rs >= 0) ? pcp->netload : nullptr ;
 	        }
@@ -445,7 +445,7 @@ int percache_systat(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 		        rs1 = uc_free(dbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
-	        } /* end if (updated needed) */
+	        } /* end if (update needed) */
 	        if (rpp) {
 		    *rpp = (rs >= 0) ? pcp->systat : nullptr ;
 	        }
