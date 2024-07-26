@@ -27,11 +27,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* system types */
+#include	<unistd.h>		/* system types */
 #include	<stdarg.h>		/* |va_list(3c)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	FILER		struct filer_head
@@ -94,6 +98,19 @@ extern int	filer_writehdrkey(filer *,cchar *) noex ;
 extern int	filer_printlncont(filer *,int,cchar *,int) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+
+template<typename ... Args>
+static inline int filer_magic(filer *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == FILER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* FILER_INCLUDE */

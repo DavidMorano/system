@@ -107,16 +107,6 @@ static int filer_dtor(filer *op) noex {
 }
 /* end subroutine (filer_dtor) */
 
-template<typename ... Args>
-static inline int filer_magic(filer *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == FILER_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (filer_magic) */
-
 static int	filer_adjbuf(filer *,int) noex ;
 static int	filer_bufcpy(filer *,cchar *,int) noex ;
 
@@ -133,7 +123,7 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 /* exported subroutines */
 
-int filer_start(filer *op,int fd,off_t coff,int bsz,int of) noex {
+int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 	int		rs ;
 	if ((rs = filer_ctor(op)) >= 0) {
 	    rs = SR_INVALID ;
@@ -145,9 +135,11 @@ int filer_start(filer *op,int fd,off_t coff,int bsz,int of) noex {
 	            if ((rs = uc_libvalloc(bsz,&p)) >= 0) {
 	                op->dbuf = p ;
 	                op->bp = p ;
-	                if (coff < 0) rs = u_tell(fd,&coff) ;
+	                if (foff < 0) {
+			    rs = u_tell(fd,&foff) ;
+			}
 	                if (rs >= 0) {
-		            op->off = coff ;
+		            op->off = foff ;
 		            if (of & FILER_ONET) op->f.net = true ;
 			    op->magic = FILER_MAGIC ;
 	                } /* end if (ok) */
@@ -197,7 +189,7 @@ int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 	    cint	fmo = FM_TIMED ;
 	    int		rc = (op->f.net) ? FILER_RCNET : 1 ;
 	    bool	f_timedout = false ;
-	    char	*dbp = (char *) rbuf ;
+	    char	*dbp = charp(rbuf) ;
 	    char	*bp, *lastp ;
 	    while (tlen < rlen) {
 	        int	mlen ;

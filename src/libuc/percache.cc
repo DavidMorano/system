@@ -113,8 +113,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<getnodename.h>
 #include	<utmpacc.h>
+#include	<mallocxx.h>
+#include	<getnodename.h>
 #include	<localget.h>
 #include	<strwcpy.h>
 #include	<isnot.h>
@@ -163,6 +164,7 @@ static constexpr cint	timeouts[] = {
 int percache_init(PERCACHE *pcp) noex {
 	int		rs = SR_OK ;
 	if (! pcp->f_init) {
+	    rs = SR_OK ;
 	    pcp->f_init = true ;
 	    pcp->f_initdone = true ;
 	} /* end if (needed initialization) */
@@ -171,291 +173,284 @@ int percache_init(PERCACHE *pcp) noex {
 /* end subroutine (percache_init) */
 
 int percache_fini(PERCACHE *pcp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pcp->f_initdone) {
-	    if (pcp->sysdomain != nullptr) {
-		rs1 = uc_libfree(pcp->sysdomain) ;
-		if (rs >= 0) rs = rs1 ;
-		pcp->sysdomain = nullptr ;
-	    }
-	    memset(pcp,0,sizeof(PERCACHE)) ;
-	} /* end if (was inited) */
+	if (pcp) {
+	    rs = SR_OK ;
+	    if (pcp->f_initdone) {
+	        if (pcp->sysdomain != nullptr) {
+		    rs1 = uc_libfree(pcp->sysdomain) ;
+		    if (rs >= 0) rs = rs1 ;
+		    pcp->sysdomain = nullptr ;
+	        }
+	        memclear(pcp) ;
+	    } /* end if (was inited) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (percache_fini) */
 
 /* is a "fini" registration required? */
 int percache_finireg(PERCACHE *pcp) noex {
+	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (pcp->f_init) {
-	    f = ((! pcp->f_finireg) && (pcp->sysdomain != nullptr)) ;
-	    if (f) pcp->f_finireg = true ;
-	}
-	return f ;
+	if (pcp) {
+	    rs = SR_OK ;
+	    if (pcp->f_init) {
+	        f = ((! pcp->f_finireg) && (pcp->sysdomain != nullptr)) ;
+	        if (f) pcp->f_finireg = true ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (percache_finireg) */
 
 int percache_invalidate(PERCACHE *pcp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pcp->f_init) {
-	    cint	size = (sizeof(PERCACHE_ITEM) * pertype_overlast) ;
-	    memset(pcp->items,0,size) ;
-	    if (pcp->sysdomain != nullptr) {
-	        rs1 = uc_libfree(pcp->sysdomain) ;
-	        if (rs >= 0) rs = rs1 ;
-	        pcp->sysdomain = nullptr ;
-	    }
-	} /* end if (initialized) */
+	if (pcp) {
+	    rs = SR_OK ;
+	    if (pcp->f_init) {
+	        cint	sz = (sizeof(PERCACHE_ITEM) * pertype_overlast) ;
+	        memset(pcp->items,0,sz) ;
+	        if (pcp->sysdomain != nullptr) {
+	            rs1 = uc_libfree(pcp->sysdomain) ;
+	            if (rs >= 0) rs = rs1 ;
+	            pcp->sysdomain = nullptr ;
+	        }
+	    } /* end if (initialized) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (percache_invalidate) */
 
 int percache_gethostid(PERCACHE *pcp,time_t dt,uint *hip) noex {
-	cint	pt = pertype_hostid ;
-	int		rs ;
-
-	if (pcp == nullptr) return SR_FAULT ;
-
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    to = timeouts[pt] ;
-	    if ((dt - vt) > to) {
-	        uint	uv = gethostid() ;
-	        pcp->items[pt].t = dt ;
-	        pcp->items[pt].v = uv ;
-	    } /* end if */
-	    *hip = pcp->items[pt].v ;
-	} /* end if (init) */
-
+	cint		pt = pertype_hostid ;
+	int		rs = SR_FAULT ;
+	if (pcp && hip) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        if ((dt - vt) > to) {
+	            uint	uv = gethostid() ;
+	            pcp->items[pt].t = dt ;
+	            pcp->items[pt].v = uv ;
+	        } /* end if */
+	        *hip = pcp->items[pt].v ;
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (percache_gethostid) */
 
 int percache_getnprocs(PERCACHE *pcp,time_t dt) noex {
 	cint		pt = pertype_nprocs ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		n = 0 ;
-
-	if (pcp == nullptr) return SR_FAULT ;
-
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    n = pcp->items[pt].v ;
-	    to = timeouts[pt] ;
-	    if ((dt - vt) > to) {
-	        if ((rs = uc_nprocs(0)) >= 0) {
-	            n = rs ;
-	        } else if (isNoProcs(rs)) {
-		    rs = SR_OK ;
-		}
-	        pcp->items[pt].t = dt ;
-	        pcp->items[pt].v = n ;
-	    } /* end if */
-	} /* end if (init) */
-
+	if (pcp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        n = pcp->items[pt].v ;
+	        if ((dt - vt) > to) {
+	            if ((rs = uc_nprocs(0)) >= 0) {
+	                n = rs ;
+	            } else if (isNoProcs(rs)) {
+		        rs = SR_OK ;
+		    }
+	            pcp->items[pt].t = dt ;
+	            pcp->items[pt].v = n ;
+	        } /* end if */
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (percache_getnprocs) */
 
 int percache_getbtime(PERCACHE *pcp,time_t dt,time_t *btp) noex {
 	cint		pt = pertype_btime ;
-	int		rs ;
-
-	if (pcp == nullptr) return SR_FAULT ;
-
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    to = timeouts[pt] ;
-	    if ((dt - vt) > to) {
-	        time_t	bt ;
-	        if ((rs = utmpacc_boottime(&bt)) >= 0) {
-	            pcp->items[pt].t = dt ;
-	            pcp->items[pt].v = bt ;
-	        }
-	    } /* end if */
-	    *btp = pcp->items[pt].v ;
-	} /* end if (init) */
-
+	int		rs = SR_FAULT ;
+	if (pcp && btp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        if ((dt - vt) > to) {
+	            time_t	bt ;
+	            if ((rs = utmpacc_boottime(&bt)) >= 0) {
+	                pcp->items[pt].t = dt ;
+	                pcp->items[pt].v = bt ;
+	            }
+	        } /* end if */
+	        *btp = pcp->items[pt].v ;
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (percache_getbtime) */
 
 int percache_getrunlevel(PERCACHE *pcp,time_t dt) noex {
 	cint		pt = pertype_runlevel ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		n = 0 ;
-
-	if (pcp == nullptr) return SR_FAULT ;
-
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    n = pcp->items[pt].v ;
-	    to = timeouts[pt] ;
-	    if ((dt - vt) > to) {
-	        if ((rs = utmpacc_runlevel()) >= 0) {
-	            n = rs ;
-	            pcp->items[pt].t = dt ;
-	            pcp->items[pt].v = n ;
-	        }
-	    } /* end if */
-	} /* end if (init) */
-
+	if (pcp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime	vt = pcp->items[pt].t ;
+	        cint	to = timeouts[pt] ;
+	        n = pcp->items[pt].v ;
+	        if ((dt - vt) > to) {
+	            if ((rs = utmpacc_runlevel()) >= 0) {
+	                n = rs ;
+	                pcp->items[pt].t = dt ;
+	                pcp->items[pt].v = n ;
+	            }
+	        } /* end if */
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (percache_getrunlevel) */
 
 int percache_getnusers(PERCACHE *pcp,time_t dt) noex {
 	cint		pt = pertype_nusers ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		n = 0 ;
-
-	if (pcp == nullptr) return SR_FAULT ;
-
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    n = pcp->items[pt].v ;
-	    to = timeouts[pt] ;
-	    if ((dt - vt) > to) {
-	        if ((rs = utmpacc_users(0)) >= 0) {
-	            n = rs ;
-	            pcp->items[pt].t = dt ;
-	            pcp->items[pt].v = n ;
-	        }
-	    } /* end if */
-	} /* end if (init) */
-
+	if (pcp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        n = pcp->items[pt].v ;
+	        if ((dt - vt) > to) {
+	            if ((rs = utmpacc_users(0)) >= 0) {
+	                n = rs ;
+	                pcp->items[pt].t = dt ;
+	                pcp->items[pt].v = n ;
+	            }
+	        } /* end if */
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (percache_getnusers) */
 
 int percache_getsysdomain(PERCACHE *pcp,time_t dt,cchar **rpp) noex {
 	cint		pt = pertype_sysdomain ;
-	int		rs ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-
-	if (pcp == nullptr) return SR_FAULT ;
-
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    len = pcp->items[pt].v ;
-	    to = timeouts[pt] ;
-	    if (((dt - vt) > to) || (pcp->sysdomain == nullptr)) {
-	        cint	dlen = MAXHOSTNAMELEN ;
-	        char	dbuf[MAXHOSTNAMELEN+1] ;
-		if (pcp->sysdomain != nullptr) {
-		    uc_libfree(pcp->sysdomain) ;
-		    pcp->sysdomain = nullptr ;
-		}
-	        if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
-		    char	*bp ;
-		    if ((rs = uc_libmalloc((rs+1),&bp)) >= 0) {
-		        len = (rs-1) ;
-			strwcpy(bp,dbuf,len) ;
-		        pcp->sysdomain = bp ;
-	                pcp->items[pt].t = dt ;
-	    	        pcp->items[pt].v = len ;
-	            } /* end if (memory-allocation) */
-		} /* end if (getsysdomain) */
-	    } else {
-		len = pcp->items[pt].v ;
-	    }
-	    if (rpp) {
-		*rpp = (rs >= 0) ? pcp->sysdomain : nullptr ;
-	    }
-	} /* end if (init) */
-
+	if (pcp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        len = pcp->items[pt].v ;
+	        if (((dt - vt) > to) || (pcp->sysdomain == nullptr)) {
+	            char	*dbuf{} ;
+		    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	                cint	dlen = rs ;
+		        if (pcp->sysdomain != nullptr) {
+		            uc_libfree(pcp->sysdomain) ;
+		            pcp->sysdomain = nullptr ;
+		        }
+	                if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
+		            char	*bp ;
+		            len = rs ;
+		            if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
+			        strwcpy(bp,dbuf,len) ;
+		                pcp->sysdomain = bp ;
+	                        pcp->items[pt].t = dt ;
+	    	                pcp->items[pt].v = len ;
+	                    } /* end if (memory-allocation) */
+		        } /* end if (getsysdomain) */
+		        rs1 = uc_free(dbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (updated needed) */
+	        if (rpp) {
+		    *rpp = (rs >= 0) ? pcp->sysdomain : nullptr ;
+	        }
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (percache_getsysdomain) */
 
 int percache_netload(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	cint		pt = pertype_netload ;
-	int		rs ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-	if (pcp == nullptr) return SR_FAULT ;
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    len = pcp->items[pt].v ;
-	    to = timeouts[pt] ;
-	    if (((dt - vt) > to) || (pcp->netload == nullptr)) {
-	        cint	dlen = MAXHOSTNAMELEN ;
-	        char	dbuf[MAXHOSTNAMELEN+1] ;
-		if (pcp->netload != nullptr) {
-		    uc_libfree(pcp->netload) ;
-		    pcp->netload = nullptr ;
-		}
-	        if ((rs = localgetnetload(pr,dbuf,dlen)) >= 0) {
-		    char	*bp ;
-		    if ((rs = uc_libmalloc((rs+1),&bp)) >= 0) {
-		        len = (rs-1) ;
-			strwcpy(bp,dbuf,len) ;
-		        pcp->netload = bp ;
-	                pcp->items[pt].t = dt ;
-	    	        pcp->items[pt].v = len ;
-	            } /* end if (memory-allocation) */
-		} /* end if (localgetnetload) */
-	    } else {
-		len = pcp->items[pt].v ;
-	    }
-	    if (rpp) {
-		*rpp = (rs >= 0) ? pcp->netload : nullptr ;
-	    }
-	} /* end if (init) */
+	if (pcp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        len = pcp->items[pt].v ;
+	        if (((dt - vt) > to) || (pcp->netload == nullptr)) {
+	            char	*dbuf{} ;
+		    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	                cint	dlen = rs ;
+		        if (pcp->netload != nullptr) {
+		            uc_libfree(pcp->netload) ;
+		            pcp->netload = nullptr ;
+		        }
+	                if ((rs = localgetnetload(pr,dbuf,dlen)) >= 0) {
+		            char	*bp ;
+		            len = rs ;
+		            if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
+			        strwcpy(bp,dbuf,len) ;
+		                pcp->netload = bp ;
+	                        pcp->items[pt].t = dt ;
+	    	                pcp->items[pt].v = len ;
+	                    } /* end if (memory-allocation) */
+		        } /* end if (localgetnetload) */
+		        rs1 = uc_free(dbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (updated needed) */
+	        if (rpp) {
+		    *rpp = (rs >= 0) ? pcp->netload : nullptr ;
+	        }
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (percache_netload) */
 
 int percache_systat(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	cint		pt = pertype_systat ;
-	int		rs ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-	if (pcp == nullptr) return SR_FAULT ;
-	if ((rs = percache_init(pcp)) >= 0) {
-	    time_t	vt ;
-	    int		to ;
-	    vt = pcp->items[pt].t ;
-	    len = pcp->items[pt].v ;
-	    to = timeouts[pt] ;
-	    if (((dt - vt) > to) || (pcp->systat == nullptr)) {
-	        cint	dlen = MAXHOSTNAMELEN ;
-	        char	dbuf[MAXHOSTNAMELEN+1] ;
-		if (pcp->systat != nullptr) {
-		    uc_libfree(pcp->systat) ;
-		    pcp->systat = nullptr ;
-		}
-	        if ((rs = localgetsystat(pr,dbuf,dlen)) >= 0) {
-		    char	*bp ;
-		    if ((rs = uc_libmalloc((rs+1),&bp)) >= 0) {
-		        len = (rs-1) ;
-			strwcpy(bp,dbuf,len) ;
-		        pcp->systat = bp ;
-	                pcp->items[pt].t = dt ;
-	    	        pcp->items[pt].v = len ;
-	            } /* end if (memory-allocation) */
-		} /* end if (localgetsystat) */
-	    } else {
-		len = pcp->items[pt].v ;
-	    }
-	    if (rpp) {
-		*rpp = (rs >= 0) ? pcp->systat : nullptr ;
-	    }
-	} /* end if (init) */
+	if (pcp) {
+	    if ((rs = percache_init(pcp)) >= 0) {
+	        custime		vt = pcp->items[pt].t ;
+	        cint		to = timeouts[pt] ;
+	        len = pcp->items[pt].v ;
+	        if (((dt - vt) > to) || (pcp->systat == nullptr)) {
+	            char	*dbuf{} ;
+		    if ((rs = malloc_hn(&dbuf)) >= 0) {
+		        cint	dlen = rs ;
+		        if (pcp->systat != nullptr) {
+		            uc_libfree(pcp->systat) ;
+		            pcp->systat = nullptr ;
+		        }
+	                if ((rs = localgetsystat(pr,dbuf,dlen)) >= 0) {
+		            char	*bp ;
+			    len = rs ;
+		            if ((rs = uc_libmalloc((len+1),&bp)) >= 0) {
+			        strwcpy(bp,dbuf,len) ;
+		                pcp->systat = bp ;
+	                        pcp->items[pt].t = dt ;
+	    	                pcp->items[pt].v = len ;
+	                    } /* end if (memory-allocation) */
+		        } /* end if (localgetsystat) */
+		        rs1 = uc_free(dbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (updated needed) */
+	        if (rpp) {
+		    *rpp = (rs >= 0) ? pcp->systat : nullptr ;
+	        }
+	    } /* end if (init) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (percache_systat) */

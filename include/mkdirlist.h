@@ -21,7 +21,6 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* |mode_t| */
-#include	<limits.h>
 #include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 #include	<vechand.h>
