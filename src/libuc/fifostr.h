@@ -22,9 +22,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 
 
 #define	FIFOSTR_MAGIC	0x12345678
@@ -69,7 +70,7 @@ extern int fifostr_remove(fifostr *,char *,int) noex ;
 extern int fifostr_count(fifostr *) noex ;
 extern int fifostr_curbegin(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_curend(fifostr *,fifostr_cur *) noex ;
-extern int fifostr_enum(fifostr *,fifostr_cur *,char *,int) noex ;
+extern int fifostr_curenum(fifostr *,fifostr_cur *,char *,int) noex ;
 extern int fifostr_del(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_finish(fifostr *) noex ;
 

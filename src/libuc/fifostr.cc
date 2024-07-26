@@ -265,7 +265,7 @@ int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
 }
 /* end subroutine (fifostr_curend) */
 
-int fifostr_enum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
+int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op,curp)) >= 0) {
@@ -296,7 +296,7 @@ int fifostr_enum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
-/* end subroutine (fifostr_enum) */
+/* end subroutine (fifostr_curenum) */
 
 int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
@@ -361,7 +361,7 @@ int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 	    fifostr_cur	cur{} ;
 	    if ((rs = fifostr_curbegin(op,&cur)) >= 0) {
 	        cchar	*rp{} ;
-	        while ((rs = fifostr_enum(op,&cur,&rp)) >= 0) {
+	        while ((rs = fifostr_curenum(op,&cur,&rp)) >= 0) {
 	            if ((*cmpfunc)(s,rp) == 0) break ;
 	        } /* end while */
 	        if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;

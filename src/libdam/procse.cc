@@ -32,6 +32,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<expcook.h>
@@ -57,10 +59,16 @@
 
 /* local structures */
 
+struct vars {
+	int		ebuflen ;
+} ;
+
 
 /* forward references */
 
 static int	process(PROCSE *,expcook *,cchar *,cchar **) noex ;
+
+static int	mkvars() noex ;
 
 
 /* local variables */

@@ -25,12 +25,9 @@
 
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 #include	<usystem.h>
-#include	<fifostr.h>
 #include	<ptm.h>
+#include	<fifostr.h>
 
 
 #define	FSI		struct fsi_head

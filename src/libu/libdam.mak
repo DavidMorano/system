@@ -937,6 +937,7 @@ sesmsg.o:		sesmsg.c sesmsg.h
 msgdata.o:		msgdata.c msgdata.h
 
 cachetime.o:		cachetime.c cachetime.h
+fsi.o:			fsi.cc fsi.h
 
 
 ids.o:			ids.c ids.h

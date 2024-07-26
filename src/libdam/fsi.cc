@@ -21,12 +21,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<usystem.h>
-#include	<fifostr.h>
 #include	<ptm.h>
+#include	<fifostr.h>
 #include	<localmisc.h>
 
 #include	"fsi.h"
