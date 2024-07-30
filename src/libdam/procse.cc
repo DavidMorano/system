@@ -47,6 +47,8 @@
 
 /* local defines */
 
+#define	BUF_MULT	10
+
 #undef	BUFLEN
 #define	BUFLEN		(10 * MAXPATHLEN)
 
@@ -60,18 +62,19 @@
 /* local structures */
 
 struct vars {
+	int		maxpathlen ;
 	int		ebuflen ;
 } ;
 
 
 /* forward references */
 
-static int	process(PROCSE *,expcook *,cchar *,cchar **) noex ;
-
 static int	mkvars() noex ;
 
 
 /* local variables */
+
+static vars	var ;
 
 
 /* external variables */
@@ -82,10 +85,13 @@ static int	mkvars() noex ;
 int procse_start(procse *pep,cchar **envv,varsub *vsp,procse_args *esap) noex {
 	int		rs = SR_FAULT ;
 	if (pep && esap) {
-	    rs = memclear(pep) ;
-	    pep->envv = envv ;
-	    pep->vsp = vsp ;
-	    pep->ap = esap ;
+	    static int	rsv = mkvars() ;
+	    memclear(pep) ;
+	    if ((rs = rsv) >= 0) {
+	        pep->envv = envv ;
+	        pep->vsp = vsp ;
+	        pep->ap = esap ;
+	    } /* end if (mkvars) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -138,89 +144,147 @@ int procse_finish(procse *pep) noex {
 }
 /* end subroutine (procse_finish) */
 
+namespace {
+    struct subproc {
+	procse	*pep ;
+	expcook	*ecp ;
+	char	*vbuf = nullptr ;
+	char	*ebuf = nullptr ;
+	int	vlen ;
+	int	elen ;
+	subproc(procse *pp,expcook *ep) noex : pep(pp), ecp(ep) { } ;
+	int start() noex ;
+	int finish() noex ;
+	int proc(cchar *,cchar **) noex ;
+	int stageone(procse *,cc *) noex ;
+	int stagetwo(expcook *,int,cchar **) noex ;
+    } ; /* end struct (subproc) */
+}
+
+int subproc::start() noex {
+	cint		sz = (var.ebuflen + 1) ;
+	int		rs ;
+	if ((rs = uc_malloc(sz,&vbuf)) >= 0) {
+	    rs = uc_malloc(sz,&ebuf) ;
+	    if (rs < 0) {
+		uc_free(vbuf) ;
+		vbuf = nullptr ;
+	    }
+	} /* end if (malloc-vbuf) */
+	return rs ;
+}
+
+int subproc::finish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (ebuf) {
+	    rs1 = uc_free(ebuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    ebuf = nullptr ;
+	}
+	if (vbuf) {
+	    rs1 = uc_free(vbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    vbuf = nullptr ;
+	}
+	return rs ;
+}
+
+int subproc::stageone(procse *pep,cc *inbuf) noex {
+	int		rs = SR_OK ;
+	int		vl = 0 ;
+	if (pep->vsp != nullptr) {
+	        rs = varsub_exp(pep->vsp,vbuf,vlen,inbuf,-1) ;
+	        vl = rs ;
+	} else {
+	        rs = sncpy1(vbuf,vlen,inbuf) ;
+	        vl = rs ;
+	}
+	return (rs >= 0) ? vl : rs ;
+}
+
+int subproc::stagetwo(expcook *ecp,int vl,cchar **opp) noex {
+	int		rs = SR_OK ;
+	int		el = 0 ;
+	int		fl = 0 ;
+	if (ecp != nullptr) {
+	    rs = expcook_exp(ecp,0,ebuf,elen,vbuf,vl) ;
+	    el = rs ;
+	} else {
+	    rs = snwcpy(ebuf,elen,vbuf,vl) ;
+	    el = rs ;
+	}
+	if (rs >= 0) {
+	    cchar	*fp ;
+	    fl = sfshrink(ebuf,el,&fp) ;
+	    if (cc *cp ; (rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
+		*opp = cp ;
+	    }
+	}
+	return (rs >= 0) ? fl : rs ;
+}
+
+int subproc::proc(cchar *inbuf,cchar **opp) noex {
+	int		rs ;
+	char		fl = 0 ;
+	*opp = nullptr ;
+	if ((rs = stageone(pep,inbuf)) >= 0) {
+	    rs = stagetwo(ecp,rs,opp) ;
+	    fl = rs ;
+	} /* end if (ok) */
+	return (rs >= 0) ? fl : rs ;
+}
+/* end method (subproc::proc) */
+
 int procse_process(procse *pep,expcook *ecp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (pep) {
 	    procse_args	*ap = pep->ap ;
-	    rs = SR_OK ;
-	    /* pop them */
-	    if ((rs >= 0) && (ap->passfile != nullptr)) {
-	        rs = process(pep,ecp,ap->passfile,&pep->a.passfile) ;
-	    }
-	    if ((rs >= 0) && (ap->sharedobj != nullptr)) {
-	        rs = process(pep,ecp,ap->sharedobj,&pep->a.sharedobj) ;
-	    }
-	    if ((rs >= 0) && (ap->program != nullptr)) {
-	        rs = process(pep,ecp,ap->program,&pep->a.program) ;
-	    }
-	    if ((rs >= 0) && (ap->srvargs != nullptr)) {
-	        rs = process(pep,ecp,ap->srvargs,&pep->a.srvargs) ;
-	    }
-	    if ((rs >= 0) && (ap->username != nullptr)) {
-	        rs = process(pep,ecp,ap->username,&pep->a.username) ;
-	    }
-	    if ((rs >= 0) && (ap->groupname != nullptr)) {
-	        rs = process(pep,ecp,ap->groupname,&pep->a.groupname) ;
-	    }
-	    if ((rs >= 0) && (ap->options != nullptr)) {
-	        process(pep,ecp,ap->options,&pep->a.options) ;
-	    }
-	    if ((rs >= 0) && (ap->access != nullptr)) {
-	        rs = process(pep,ecp,ap->access,&pep->a.access) ;
-	    }
-	    if ((rs >= 0) && (ap->failcont != nullptr)) {
-	        rs = process(pep,ecp,ap->failcont,&pep->a.failcont) ;
-	    }
+	    subproc	so(pep,ecp) ;
+	    if ((rs = so.start()) >= 0) {
+	        if ((rs >= 0) && (ap->passfile != nullptr)) {
+	            rs = so.proc(ap->passfile,&pep->a.passfile) ;
+	        }
+	        if ((rs >= 0) && (ap->sharedobj != nullptr)) {
+	            rs = so.proc(ap->sharedobj,&pep->a.sharedobj) ;
+	        }
+	        if ((rs >= 0) && (ap->program != nullptr)) {
+	            rs = so.proc(ap->program,&pep->a.program) ;
+	        }
+	        if ((rs >= 0) && (ap->srvargs != nullptr)) {
+	            rs = so.proc(ap->srvargs,&pep->a.srvargs) ;
+	        }
+	        if ((rs >= 0) && (ap->username != nullptr)) {
+	            rs = so.proc(ap->username,&pep->a.username) ;
+	        }
+	        if ((rs >= 0) && (ap->groupname != nullptr)) {
+	            rs = so.proc(ap->groupname,&pep->a.groupname) ;
+	        }
+	        if ((rs >= 0) && (ap->options != nullptr)) {
+	            rs = so.proc(ap->options,&pep->a.options) ;
+	        }
+	        if ((rs >= 0) && (ap->access != nullptr)) {
+	            rs = so.proc(ap->access,&pep->a.access) ;
+	        }
+	        if ((rs >= 0) && (ap->failcont != nullptr)) {
+	            rs = so.proc(ap->failcont,&pep->a.failcont) ;
+	        }
+	        rs1 = so.finish() ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (so) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (procse_process) */
 
-
-/* local subroutines */
-
-static int process(procse *pep,expcook *ecp,cchar *inbuf,cchar **opp) noex {
-	int		rs = SR_OK ;
-	char		fl = 0 ;
-	cchar		*ccp ;
-	cchar		*fp ;
-
-	if (opp == nullptr) return SR_FAULT ;
-
-	*opp = nullptr ;
-	if (rs >= 0) {
-	    cint	vlen = BUFLEN ;
-	    int		vl = 0 ;
-	    char	vbuf[BUFLEN + 1] ;
-	    if (pep->vsp != nullptr) {
-	        rs = varsub_exp(pep->vsp,vbuf,vlen,inbuf,-1) ;
-	        vl = rs ;
-	    } else {
-	        rs = sncpy1(vbuf,vlen,inbuf) ;
-	        vl = rs ;
-	    }
-	    if (rs >= 0) {
-		cint	elen = BUFLEN ;
-		int	el = 0 ;
-	        char	ebuf[BUFLEN + 1] ;
-	        if (ecp != nullptr) {
-	            rs = expcook_exp(ecp,0,ebuf,elen,vbuf,vl) ;
-	            el = rs ;
-	        } else {
-	            rs = snwcpy(ebuf,elen,vbuf,vl) ;
-	            el = rs ;
-	        }
-	        if (rs >= 0) {
-	            fl = sfshrink(ebuf,el,&fp) ;
-	            if ((rs = uc_mallocstrw(fp,fl,&ccp)) >= 0) {
-	                *opp = ccp ;
-	            }
-	        }
-	    } /* end if (ok) */
-	} /* end if (ok) */
-
-	return (rs >= 0) ? fl : rs ;
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    var.maxpathlen = rs ;
+	    var.ebuflen = (rs * BUF_MULT) ;
+	}
+	return rs ;
 }
-/* end subroutine (process) */
-
+/* end subroutine (mkvars) */
 
