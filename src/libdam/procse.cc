@@ -25,15 +25,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<expcook.h>
@@ -47,10 +42,7 @@
 
 /* local defines */
 
-#define	BUF_MULT	10
-
-#undef	BUFLEN
-#define	BUFLEN		(10 * MAXPATHLEN)
+#define	BUF_MULT	10		/* multiplier for buffer length */
 
 
 /* external subroutines */
@@ -62,7 +54,7 @@
 /* local structures */
 
 struct vars {
-	int		maxpathlen ;
+	int		maxpathlen ;	/* set but not currently used */
 	int		ebuflen ;
 } ;
 
@@ -86,7 +78,7 @@ int procse_start(procse *pep,cchar **envv,varsub *vsp,procse_args *esap) noex {
 	int		rs = SR_FAULT ;
 	if (pep && esap) {
 	    static int	rsv = mkvars() ;
-	    memclear(pep) ;
+	    memclear(pep) ; /* potentionally dangerous */
 	    if ((rs = rsv) >= 0) {
 	        pep->envv = envv ;
 	        pep->vsp = vsp ;
@@ -173,6 +165,7 @@ int subproc::start() noex {
 	} /* end if (malloc-vbuf) */
 	return rs ;
 }
+/* end method (subproc::start) */
 
 int subproc::finish() noex {
 	int		rs = SR_OK ;
@@ -189,19 +182,21 @@ int subproc::finish() noex {
 	}
 	return rs ;
 }
+/* end method (subproc::finish) */
 
 int subproc::stageone(procse *pep,cc *inbuf) noex {
 	int		rs = SR_OK ;
 	int		vl = 0 ;
 	if (pep->vsp != nullptr) {
-	        rs = varsub_exp(pep->vsp,vbuf,vlen,inbuf,-1) ;
-	        vl = rs ;
+	    rs = varsub_exp(pep->vsp,vbuf,vlen,inbuf,-1) ;
+	    vl = rs ;
 	} else {
-	        rs = sncpy1(vbuf,vlen,inbuf) ;
-	        vl = rs ;
+	    rs = sncpy1(vbuf,vlen,inbuf) ;
+	    vl = rs ;
 	}
 	return (rs >= 0) ? vl : rs ;
 }
+/* end method (subproc::stageone) */
 
 int subproc::stagetwo(expcook *ecp,int vl,cchar **opp) noex {
 	int		rs = SR_OK ;
@@ -223,6 +218,7 @@ int subproc::stagetwo(expcook *ecp,int vl,cchar **opp) noex {
 	}
 	return (rs >= 0) ? fl : rs ;
 }
+/* end method (subproc::stagetwo) */
 
 int subproc::proc(cchar *inbuf,cchar **opp) noex {
 	int		rs ;

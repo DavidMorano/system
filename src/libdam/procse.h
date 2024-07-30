@@ -1,7 +1,7 @@
 /* procse HEADER */
 /* lang=C20 */
 
-/* expanded server entry */
+/* expand server entry */
 /* version %I% last-modified %G% */
 
 
@@ -15,6 +15,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<varsub.h>
 #include	<expcook.h>
 

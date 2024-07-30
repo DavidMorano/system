@@ -1048,6 +1048,7 @@ connection.o:		connection.cc connection.h
 
 # UTILITY
 getostype.o:		getostype.cc getostype.h
+procse.o:		procse.cc procse.h
 
 # Internet (old)
 gethename.o:		gethename.cc gethename.h gethe.h
