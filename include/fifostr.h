@@ -71,7 +71,7 @@ extern int fifostr_count(fifostr *) noex ;
 extern int fifostr_curbegin(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_curend(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_curenum(fifostr *,fifostr_cur *,char *,int) noex ;
-extern int fifostr_del(fifostr *,fifostr_cur *) noex ;
+extern int fifostr_curdel(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_finish(fifostr *) noex ;
 
 EXTERNC_end

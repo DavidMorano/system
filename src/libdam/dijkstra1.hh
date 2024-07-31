@@ -35,7 +35,7 @@
 
 extern int dijkstra1(graph_res *,
 		std::vector<std::list<graph_edge>> &,
-		int,int) ;
+		int,int) noex ;
 
 
 #endif /* DIJKSTRA1_INCLUDE */

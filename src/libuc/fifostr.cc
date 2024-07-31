@@ -90,7 +90,7 @@ int fifostr_start(fifostr *op) noex {
 int fifostr_finish(fifostr *op) noex {
 	int		rs ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-	    while ((rs = fifostr_del(op,nullptr)) >= 0) ;
+	    while ((rs = fifostr_curdel(op,nullptr)) >= 0) ;
 	    if (rs == SR_NOTFOUND) rs = SR_OK ;
 	    op->magic = 0 ;
 	} /* end if (magic) */
@@ -298,7 +298,7 @@ int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 }
 /* end subroutine (fifostr_curenum) */
 
-int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
+int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -341,7 +341,7 @@ int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (fifostr_del) */
+/* end subroutine (fifostr_curdel) */
 
 int fifostr_count(fifostr *op) noex {
 	int		rs ;

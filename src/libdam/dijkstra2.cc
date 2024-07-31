@@ -115,6 +115,9 @@ typedef priority_queue<nodeval,vector<nodeval>,nodevalcmp>	ourmin ;
 /* forward refereces */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 

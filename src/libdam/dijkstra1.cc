@@ -72,7 +72,7 @@ typedef list<edge_t>::iterator	edgeit_t ;
 
 /* forward refereces */
 
-static int minvertex(bool *,res_t *,int) ;
+static int minvertex(bool *,res_t *,int) noex ;
 
 
 /* local variables */
@@ -92,7 +92,9 @@ int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart) noex {
 	    cint	ne = edges.size() ;
 	    int		i ;
 
-	    for (i = 0 ; i < vertices ; i += 1) visited[i] = false ;
+	    for (i = 0 ; i < vertices ; i += 1) {
+		visited[i] = false ;
+	    }
 
 	    for (i = 0 ; i < vertices ; i += 1) {
 	        resp[i].dist = INT_MAX ;

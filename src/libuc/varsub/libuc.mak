@@ -429,9 +429,6 @@ lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
-fdliner.o:		fdliner.cc fdliner.h
-fbliner.o:		fbliner.cc fbliner.h
-
 dirlist.o:		dirlist.cc dirlist.h
 
 dirseen.o:		dirseen.cc dirseen.h
@@ -754,6 +751,11 @@ logfile.dir:
 # FILER
 filer.o:		filer.dir
 filer.dir:
+	makesubdir $@
+
+# LINER
+liner.o:		liner.dir
+liner.dir:
 	makesubdir $@
 
 # TMPX
