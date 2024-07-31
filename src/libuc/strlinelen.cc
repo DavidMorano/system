@@ -1,7 +1,7 @@
 /* strlinelen SUPPORT */
 /* lang=C++20 */
 
-/* special hack -- mostly for debugging */
+/* calculate the number of characters in a c-string up to a given maximum */
 /* version %I% last-modified %G% */
 
 
@@ -40,6 +40,8 @@
 #include	<usystem.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 
+#include	"strlinelen.h"
+
 
 /* local defines */
 
@@ -51,6 +53,18 @@ using std::min ;			/* subroutine-template */
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

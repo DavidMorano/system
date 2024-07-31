@@ -71,6 +71,17 @@
 
 /* local structures */
 
+namespace {
+    struct suber {
+	char	*username ;
+	char	*password ;
+	cchar	*fname ;
+	suber(char *up,char *pp,cchar *fn) noex : username(up), password(pp) {
+	    fname =- fn ;
+	} ;
+    } ; /* end struct (suber) */
+}
+
 
 /* forward references */
 
@@ -95,19 +106,31 @@ constexpr cchar		fterms[32] = {
 /* exported subroutines */
 
 int authfile(char *username,char *password,cchar *fname) noex {
-	bfile		afile, *afp = &afile ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
+	if (fname && username && password) {
+	    rs = SR_INVALID ;
+	    username[0] = '\0' ;
+	    password[0] = '\0' ;
+	    if (fname[0]) {
+		subder	so(username,password,fname) ;
+		if ((rs = so.start()) >= 0) {
 
-	if (fname == NULL) return SR_FAULT ;
-	if (username == NULL) return SR_FAULT ;
-	if (password == NULL) return SR_FAULT ;
 
-	if (fname[0] == '\0') return SR_INVALID ;
 
-	username[0] = '\0' ;
-	password[0] = '\0' ;
+		    rs1 = so.finish() ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (so) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (authfile) */
 
+	
+
+
+	bfile		afile, *afp = &afile ;
 	if ((rs = bopen(afp,fname,"r",0666)) >= 0) {
 	    field	fsb ;
 	    cint	llen = LINEBUFLEN ;
@@ -153,9 +176,5 @@ int authfile(char *username,char *password,cchar *fname) noex {
 	    rs1 = bclose(afp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
-
-	return rs ;
-}
-/* end subroutine (authfile) */
 
 
