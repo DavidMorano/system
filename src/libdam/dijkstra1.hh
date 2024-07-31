@@ -1,7 +1,8 @@
-/* dijkstra-1 */
+/* dijkstra-1 HEADER */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,11 +18,10 @@
 
 	Dijkstra-1 (shorted path through graph)
 
-
 *******************************************************************************/
 
 #ifndef	DIJKSTRA1_INCLUDE
-#define	DIJKSTRA1_INCLUDE	1
+#define	DIJKSTRA1_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -31,17 +31,6 @@
 #include	<localmisc.h>
 
 #include	"graph.hh"
-
-
-/* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-
-/* local structures */
 
 
 extern int dijkstra1(graph_res *,

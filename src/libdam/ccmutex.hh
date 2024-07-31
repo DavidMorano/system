@@ -1,7 +1,8 @@
-/* ccmutex */
+/* ccmutex HEADER */
 /* lang=C++11 */
 
 /* CCMUTEX object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,10 +19,10 @@
         This object implments a MUTEX using the POSIX mutex as a base.
 
 	Q. Why do we need this?
-	A. Because the (blank...blank) C++ committee did not realize that
-	there already was a 'struct mutex' in standard UNIX® systems (as part
-	of POSIX®) and that it gets in the way of the C++ |mutex| object!
-
+	A. Because the (blank...blank) C++ committee did not realize
+	that there already was a 'struct mutex' in standard UNIX®
+	systems (as part of POSIX®) and that it gets in the way of
+	the C++ |mutex| object!
 
 *******************************************************************************/
 
@@ -31,29 +32,6 @@
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<localmisc.h>
-
-
-/* local defines */
-
-
-/* default name spaces */
-
-
-/* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,int,int) ;
-#endif
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* exported */
 
 
 class ccmutex {
@@ -73,7 +51,6 @@ public:
 	    return ptm_unlock(&m) ;
 	} ;
 } ; /* end class (ccmutex) */
-
 
 class guardmutex {
 	ccmutex		&rm ;

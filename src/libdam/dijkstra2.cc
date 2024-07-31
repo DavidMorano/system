@@ -1,45 +1,37 @@
-/* dijkstra2 */
+/* dijkstra2 SUPPORT */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2013-03-03, David AÂ­DÂ­ Morano
+	= 2013-03-03, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 2013 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This executes the Dijkstra algorithm to find the sortest path through a
-        weighted graph.
-
+	Description:
+	This executes the Dijkstra algorithm to find the sortest
+	path through a weighted graph.
 
 	Fatures:
-
 	+ close to optimal speed because we used a queue for our future work
 
-
 	Complexity:
-
 	O ( |v| + |v|log|e| )
 
 	Implementation:
-
-	We we a priority queue. We (apparently) used to use our own min-heap,
-	but it was swapped out for the standard STL |priority_queue| at some
-	point (a good idea I think).
-
+	We we a priority queue.  We (apparently) used to use our own
+	min-heap, but it was swapped out for the standard STL
+	|priority_queue| at some point (a good idea I think).
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -68,10 +60,8 @@ using namespace	std ;
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
+
+/* external variables */
 
 
 /* local structures */
@@ -125,15 +115,16 @@ typedef priority_queue<nodeval,vector<nodeval>,nodevalcmp>	ourmin ;
 /* forward refereces */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart)
-{
+int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) noex {
 	int		rs = SR_OK ;
 	bool		*visited ;
-	if ((visited = new(nothrow) bool [vertices+1]) != NULL) {
-	    const int	ne = edges.size() ;
+	if ((visited = new(nothrow) bool[vertices+1]) != NULL) {
+	    cint	ne = edges.size() ;
 	    ourmin	pq ; /* min-heap */
 	    nodeval	nv ;
 	    edgeit_t	elit ; /* edge-list-iterator */
@@ -164,10 +155,10 @@ int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart)
 		    visited[u] = true ;
 
 	            while (elit != end) {
-	                const int	v = (*elit).dst ; /* dst vertex */
+	                cint	v = (*elit).dst ; /* dst vertex */
 	                if ((! visited[v]) && (resp[u].dist != INT_MAX)) {
-	                    const int	d = resp[u].dist ;
-	                    const int	w = (*elit).weight ;
+	                    cint	d = resp[u].dist ;
+	                    cint	w = (*elit).weight ;
 
 	                    if ((d+w) < resp[v].dist) {
 	                        resp[v].dist = (d+w) ;

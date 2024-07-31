@@ -19,6 +19,12 @@
 	Name:
 	strlinelen
 
+	Descrption:
+	This subroutine calculates the number of characters within
+	a given counted c-string up to a given maximum value or up
+	to the end-of-line.  Any end-of-line is not included in the
+	returned character count.
+
 	Synopsis:
 	int strlinelen(cchar *sp,int sl,int mlen) noex
 

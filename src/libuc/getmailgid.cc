@@ -8,7 +8,8 @@
 /* revision history:
 
 	= 1998-08-20, David A­D­ Morano
-	This was written to collect this code into one subroutines.
+	This was written to provide this function in a single
+	subroutine.
 
 */
 
@@ -17,6 +18,7 @@
 /*******************************************************************************
 
 	Name:
+	getmailgid
 
 	Description:
 	This subroutine returns a GID for a specified groupname.
@@ -53,6 +55,15 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

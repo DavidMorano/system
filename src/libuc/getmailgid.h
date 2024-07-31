@@ -8,7 +8,8 @@
 /* revision history:
 
 	= 1998-08-20, David A­D­ Morano
-	This was written to collect this code into one subroutine.
+	This was written to provide this function in a single
+	subroutine.
 
 */
 

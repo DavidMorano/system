@@ -1,7 +1,8 @@
-/* bellmanford-1 */
+/* bellmanford-1 HEADER */
 /* lang=C++11 */
 
 /* Bellman-Ford algorithm for shortest path through graph */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,11 +18,10 @@
 
 	Bellman-Ford (using adjacency list, C++STL style)
 
-
 *******************************************************************************/
 
 #ifndef	BELLMANFORD1_INCLUDE
-#define	BELLMANFORD1_INCLUDE	1
+#define	BELLMANFORD1_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -31,17 +31,6 @@
 #include	<localmisc.h>
 
 #include	"graph.hh"
-
-
-/* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-
-/* local structures */
 
 
 extern int bellmanford1(graph_res *,

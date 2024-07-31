@@ -1,39 +1,32 @@
-/* dijkstra1 */
+/* dijkstra1 SUPPORT */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2013-03-03, David AÂ­DÂ­ Morano
+	= 2013-03-03, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 2013 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This executes the Dijkstra algorithm to find the sortest path through a
-        weighted graph.
-
+	Description:
+	This executes the Dijkstra algorithm to find the sortest
+	path through a weighted graph.
 
 	Fatures:
-
 	+ pretty close to optimal speed (no queue, just linear search)
 
-
 	Complexity:
-
 	O ( |v| + |v|log|e| )
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -59,12 +52,13 @@
 using namespace	std ;
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
+
+/* external variables */
 
 
 /* local structures */
@@ -81,17 +75,21 @@ typedef list<edge_t>::iterator	edgeit_t ;
 static int minvertex(bool *,res_t *,int) ;
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart)
-{
+int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart) noex {
 	int		rs = SR_OK ;
 	bool		*visited ;
 	if ((visited = new(nothrow) bool [vertices+1]) != NULL) {
 	    edgeit_t	elit ; /* edge-list-iterator */
 	    edgeit_t	end ; /* edge-list-iterator */
-	    const int	ne = edges.size() ;
+	    cint	ne = edges.size() ;
 	    int		i ;
 
 	    for (i = 0 ; i < vertices ; i += 1) visited[i] = false ;
@@ -104,17 +102,17 @@ int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart)
 	    resp[vstart].dist = 0 ;
 
 	    for (i = 0 ; i < (vertices-1) ; i += 1) {
-	        const int	u = minvertex(visited,resp,vertices) ;
+	        cint	u = minvertex(visited,resp,vertices) ;
 	        if ((u >= 0) && (u < ne)) {
 	            elit = edges[u].begin() ; /* this is 'list.begin()' */
 	            end = edges[u].end() ; /* this is 'list.end()' */
 
 		    visited[u] = true ;
 	            while (elit != end) {
-	                const int	v = (*elit).dst ; /* dst vertex */
+	                cint	v = (*elit).dst ; /* dst vertex */
 	                if ((! visited[v]) && (resp[u].dist != INT_MAX)) {
-	                    const int	d = resp[u].dist ;
-	                    const int	w = (*elit).weight ;
+	                    cint	d = resp[u].dist ;
+	                    cint	w = (*elit).weight ;
 
 	                    if ((d+w) < resp[v].dist) {
 	                        resp[v].dist = (d+w) ;
@@ -138,16 +136,14 @@ int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart)
 
 /* local subroutines */
 
-
-static int minvertex(bool *visited,res_t *resp,int n)
-{
-	int	min = INT_MAX ;
+static int minvertex(bool *visited,res_t *resp,int n) noex {
+	int	minval = INT_MAX ;
 	int	v = -1 ;
 	int	i ;
    	for (i = 0 ; i < n ; i += 1) {
             if (! visited[i]) {
-		if (resp[i].dist <= min) {
-		    min = resp[i].dist ;
+		if (resp[i].dist <= minval) {
+		    minval = resp[i].dist ;
 		    v = i ;
 		}
 	    }

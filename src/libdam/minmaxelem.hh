@@ -1,8 +1,8 @@
-/* minmaxelem (include-header) */
+/* minmaxelem HEADER */
 /* lang=C++98 */
 
-
-#define	CF_DEBUGS	1		/* compile-time debugging */
+/* calculate the minimum and maximum at the same time */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -23,13 +23,18 @@
 	We find both the minimum and the maximum element in a range of a
 	container.
 
-
 *******************************************************************************/
+
+#ifndef	MINMAXELEM_INCLUDE
+#define	MINMAXELEM_INCLUDE
+#ifdef	__cplusplus
+
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<new>
 #include	<utility>
 #include	<functional>
@@ -39,42 +44,25 @@
 #include	<localmisc.h>
 
 
-/* local defines */
-
-
-/* name-spaces */
-
-
-/* type-defs */
-
-
-/* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-
-/* local structures */
-
 template<typename I,typename T>
-pair<T,T> minmaxelem(const I &bit,const I &eit) 
-{
+pair<T,T> minmaxelem(const I &bit,const I &eit) noex {
 	pair<T,T>	res ;
 	I		it ;
-	int		min = INT_MAX ;
-	int		max = 0 ;
-
+	int		minval = INT_MAX ;
+	int		maxval = 0 ;
 	for (it = bit ; it != eit ; it += 1) {
 	    int	e = (*it) ;
-	    if (e < min) min = e ;
-	    if (e > max) max = e ;
-	}
-	res.first = min ;
-	res.second = max ;
+	    if (e < minval) minval = e ;
+	    if (e > maxval) maxval = e ;
+	} /* end for */
+	res.first = minval ;
+	res.second = maxval ;
 	return res ;
 }
-/* end subroutine (minmaxelem) */
+/* end subroutine-template (minmaxelem) */
+
+
+#endif /* __cplusplus */
+#endif /* MINMAXELEM_INCLUDE */
 
 
