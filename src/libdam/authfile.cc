@@ -48,9 +48,11 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<linebuffer.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<strdcpyx.h>
+#include	<mkchar.h>
 #include	<localmisc.h>		/* |LINEBUFLEN| */
 
 #include	"authfile.h"
@@ -73,12 +75,17 @@
 
 namespace {
     struct suber {
-	char	*username ;
-	char	*password ;
-	cchar	*fname ;
+	char		*username ;
+	char		*password ;
+	cchar		*fname ;
+	linebuffer	lb ;
 	suber(char *up,char *pp,cchar *fn) noex : username(up), password(pp) {
-	    fname =- fn ;
+	    fname = fn ;
 	} ;
+	int start() noex ;
+	int finish() noex ;
+	int procfile(cchar *) noex ;
+	int procline(int) noex ;
     } ; /* end struct (suber) */
 }
 
@@ -113,11 +120,11 @@ int authfile(char *username,char *password,cchar *fname) noex {
 	    username[0] = '\0' ;
 	    password[0] = '\0' ;
 	    if (fname[0]) {
-		subder	so(username,password,fname) ;
+		suber	so(username,password,fname) ;
 		if ((rs = so.start()) >= 0) {
-
-
-
+		    {
+			rs = so.procfile(fname) ;
+		    } /* end block */
 		    rs1 = so.finish() ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (so) */
@@ -127,54 +134,67 @@ int authfile(char *username,char *password,cchar *fname) noex {
 }
 /* end subroutine (authfile) */
 
-	
 
+/* local subroutines */
 
+int suber::start() noex {
+	return lb.start ;
+}
+
+int suber::finish() noex {
+	return lb.finish ;
+}
+
+int suber::procfile(cchar *fname) noex {
+	int		rs ;
+	int		rs1 ;
 	bfile		afile, *afp = &afile ;
 	if ((rs = bopen(afp,fname,"r",0666)) >= 0) {
-	    field	fsb ;
-	    cint	llen = LINEBUFLEN ;
-	    int		len ;
-	    int		type ;
-	    int		fl ;
-	    const char	*fp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-	    while ((rs = breadln(afp,lbuf,llen)) > 0) {
-	        len = rs ;
-
-	        if (lbuf[len - 1] == '\n') len -= 1 ;
-	        lbuf[len] = '\0' ;
-
-	        if ((len > 0) && (lbuf[0] != '#')) {
-	            if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
-	                while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
-	                    if (fl > 0) {
-	                        type = fp[0] ;
-	                        if ((fl = field_get(&fsb,fterms,&fp)) > 0) {
-	                            switch (type) {
-	                            case 'u':
-	                            case 'l':
-	                                strdcpy1w(username,MAXAUTHLEN,fp,fl) ;
-	                                break ;
-	                            case 'p':
-	                                strdcpy1w(password,MAXAUTHLEN,fp,fl) ;
-	                                break ;
-	                            } /* end switch */
-	                        } /* end if (had a value for the key) */
-	                    } /* end if (positive) */
-	                    if (fsb.term == '#') break ;
-	                } /* end while (parsing fields) */
-	                field_finish(&fsb) ;
-	            } /* end if (field) */
-		} /* end if (positive) */
-
+	    while ((rs = breadln(afp,lb.lbuf,lb.llen)) > 0) {
+		{
+		    rs = procline(rs) ;
+		}
 	        if ((username[0] != '\0') && (password[0] != '\0')) break ;
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-
 	    rs1 = bclose(afp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
+	return rs ;
+}
+/* end method (suber::procfile) */
+
+int suber::procline(int len) noex {
+	field		fsb ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = field_start(&fsb,lb.lbuf,len)) >= 0) {
+	    int		fl ;
+	    cchar	*fp ;
+	    while ((rs = field_get(&fsb,fterms,&fp)) >= 0) {
+		if ((fl = rs) > 0) {
+		    cint	type = mkchar(fp[0]) ;
+		    if ((rs = field_get(&fsb,fterms,&fp)) > 0) {
+			fl = rs ;
+	                switch (type) {
+	                case 'u':
+	                case 'l':
+	                    strdcpy1w(username,MAXAUTHLEN,fp,fl) ;
+	                    break ;
+	                case 'p':
+	                    strdcpy1w(password,MAXAUTHLEN,fp,fl) ;
+	                    break ;
+	                } /* end switch */
+		    } /* end if (had a value for the key) */
+		} /* end if (positive) */
+		if (fsb.term == '#') break ;
+		if (rs < 0) break ;
+	    } /* end while (parsing fields) */
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (field) */
+	return rs ;
+}
+/* end method (suber::procline) */
 
 
