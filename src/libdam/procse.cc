@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	procse
+
+	Description:
 	This little object is used to create a server entry and to
 	populate aspects of it with different operations on the
 	object.  This object is used in "server" types of programs.

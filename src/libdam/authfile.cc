@@ -1,7 +1,7 @@
 /* authfile SUPPORT */
 /* lang=C++20 */
 
-/* subroutine to read the authorization file */
+/* subroutine to read an authorization file */
 /* version %I% last-modified %G% */
 
 
@@ -172,7 +172,7 @@ int suber::procline(int len) noex {
 	    int		fl ;
 	    cchar	*fp ;
 	    while ((rs = field_get(&fsb,fterms,&fp)) >= 0) {
-		if ((fl = rs) > 0) {
+		if (rs > 0) {
 		    cint	type = mkchar(fp[0]) ;
 		    if ((rs = field_get(&fsb,fterms,&fp)) > 0) {
 			fl = rs ;

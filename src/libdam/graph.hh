@@ -22,15 +22,17 @@
 
 #ifndef	GRAPH_INCLUDE
 #define	GRAPH_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<vector>
+#include	<list>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<vector>
-#include	<list>
+#include	<localmisc.h>
 
 
 struct graph_edger {
@@ -42,28 +44,31 @@ struct graph_edger {
 struct graph_edge {
 	int		dst ;	/* destination vertex */
 	int		weight ; /* weight of edge to this vertex */
-	graph_edge() : dst(0), weight(0) { } ;
-	graph_edge(int adst,int aweight = 0) : dst(adst), weight(aweight) { } ;
+	graph_edge() noex : dst(0), weight(0) { } ;
+	graph_edge(int adst,int aweight = 0) noex : dst(adst), weight(aweight) {
+	} ;
 } ;
 
 struct graph_res {
 	int		dist ; /* distance (summed weight) to present vertex */
 	int		prev ; /* previous vertex */
-	graph_res() : dist(0), prev(-1) { } ;
-	graph_res(int adist,int aprev = -1) : dist(adist), prev(aprev) { } ;
-	graph_res &operator = (const graph_res &other) {
+	graph_res() noex : dist(0), prev(-1) { } ;
+	graph_res(int adist,int aprev = -1) noex : dist(adist), prev(aprev) {
+	} noex ;
+	graph_res &operator = (const graph_res &other) noex {
 	    dist = other.dist ;
 	    prev = other.prev ;
 	    return (*this) ;
-	} ;
-	graph_res &operator = (int adist) {
+	} noex ;
+	graph_res &operator = (int adist) noex {
 	    dist = adist ;
 	    prev = -1 ;
 	    return (*this) ;
-	} ;
+	} noex ;
 } ;
 
 
+#endif /* __cplusplus */
 #endif /* GRAPH_INCLUDE */
 
 

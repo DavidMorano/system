@@ -1,7 +1,7 @@
 /* authfile HEADER */
 /* lang=C20 */
 
-/* subroutine to read the authorization file */
+/* subroutine to read an authorization file */
 /* version %I% last-modified %G% */
 
 
