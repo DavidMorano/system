@@ -25,11 +25,11 @@
 	password, one, none, or both of these.
 
 	Synospsis:
-	int authfile(char *username,char *password,cchar *fname)
+	int authfile(char *username,char *password,cchar *fname) noex
 
 	Arguments:
-	username	result sername
-	password	result passwordA
+	username	result servname
+	password	result password
 	fname		authorization file
 
 	Returns:

@@ -25,10 +25,10 @@
 
 
 struct procse_arguments {
-	cchar		*passfile ;		/* pass-file */
-	cchar		*sharedobj ;		/* shared-object path */
-	cchar		*program ;		/* server program path */
-	cchar		*srvargs ;		/* server program arguments */
+	cchar		*passfile ;	/* pass-file */
+	cchar		*sharedobj ;	/* shared-object path */
+	cchar		*program ;	/* server program path */
+	cchar		*srvargs ;	/* server program arguments */
 	cchar		*username ;
 	cchar		*groupname ;
 	cchar		*options ;

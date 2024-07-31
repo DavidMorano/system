@@ -130,7 +130,7 @@ int procse_finish(procse *pep) noex {
 	        rs1 = uc_free(pep->a.failcont) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    memclear(pep) ;
+	    pep->a = {} ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -140,11 +140,15 @@ namespace {
     struct subproc {
 	procse	*pep ;
 	expcook	*ecp ;
+	char	*a = nullptr ;
 	char	*vbuf = nullptr ;
 	char	*ebuf = nullptr ;
 	int	vlen ;
 	int	elen ;
-	subproc(procse *pp,expcook *ep) noex : pep(pp), ecp(ep) { } ;
+	subproc(procse *pp,expcook *ep) noex : pep(pp), ecp(ep) { 
+	    vlen = var.ebuflen ;
+	    elen = var.ebuflen ;
+	} ;
 	int start() noex ;
 	int finish() noex ;
 	int proc(cchar *,cchar **) noex ;
@@ -154,15 +158,12 @@ namespace {
 }
 
 int subproc::start() noex {
-	cint		sz = (var.ebuflen + 1) ;
+	cint		sz = (vlen+1) + (elen+1) ;
 	int		rs ;
-	if ((rs = uc_malloc(sz,&vbuf)) >= 0) {
-	    rs = uc_malloc(sz,&ebuf) ;
-	    if (rs < 0) {
-		uc_free(vbuf) ;
-		vbuf = nullptr ;
-	    }
-	} /* end if (malloc-vbuf) */
+	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    vbuf = a ;
+	    ebuf = (a + (vlen+1)) ;
+	} /* end if (malloc-{x}buf) */
 	return rs ;
 }
 /* end method (subproc::start) */
@@ -170,15 +171,14 @@ int subproc::start() noex {
 int subproc::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ebuf) {
-	    rs1 = uc_free(ebuf) ;
+	if (a) {
+	    rs1 = uc_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ebuf = nullptr ;
-	}
-	if (vbuf) {
-	    rs1 = uc_free(vbuf) ;
-	    if (rs >= 0) rs = rs1 ;
+	    a = nullptr ;
 	    vbuf = nullptr ;
+	    ebuf = nullptr ;
+	    vlen = 0 ;
+	    elen = 0 ;
 	}
 	return rs ;
 }
@@ -236,9 +236,9 @@ int procse_process(procse *pep,expcook *ecp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pep) {
-	    procse_args	*ap = pep->ap ;
 	    subproc	so(pep,ecp) ;
 	    if ((rs = so.start()) >= 0) {
+	        procse_args	*ap = pep->ap ;
 	        if ((rs >= 0) && (ap->passfile != nullptr)) {
 	            rs = so.proc(ap->passfile,&pep->a.passfile) ;
 	        }
@@ -283,4 +283,5 @@ static int mkvars() noex {
 	return rs ;
 }
 /* end subroutine (mkvars) */
+
 
