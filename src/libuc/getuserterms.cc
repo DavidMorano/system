@@ -21,7 +21,7 @@
 	Name:
 	getuserterms
 
-	Descrption:
+	Description:
 	This subroutine will find and return a list (in a VECSTR
 	object) of the logged-in terminals of the given username.
 

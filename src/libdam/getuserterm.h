@@ -1,7 +1,7 @@
 /* getuserterm HEADER */
 /* lang=C20 */
 
-/* get a list (returned as vector of c-strings) of the logged in user terms */
+/* get the name of the most recently accessed controlling terminal */
 /* version %I% last-modified %G% */
 
 

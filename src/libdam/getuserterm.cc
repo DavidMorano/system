@@ -1,20 +1,18 @@
 /* getuserterm SUPPORT */
 /* lang=C++20 */
 
-/* get the name of the controlling terminal for the current session */
+/* get the name of the most recently accessed controlling terminal */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1999-01-10, David A­D­ Morano
-	This subroutine was originally written.  It was prompted by
-	the failure of other terminal message programs from finding
-	the proper controlling terminal.
+	This subroutine was originally written.  
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
