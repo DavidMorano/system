@@ -1,4 +1,4 @@
-/* usys_ugetdents HEADER */
+/* usys_ufstype HEADER */
 /* lang=C20 */
 
 /* operating support for retrieving the NIS domain-name */
@@ -17,46 +17,44 @@
 /*******************************************************************************
 
 	Name:
-	ugetdents
+	ufstype
 
 	Description:
-	This provides a means to get the NIS domain-name from the
-	operating system in an OS-independent way by regualr callers.
+	This provides a means to retrieve the file-system type-string
+	from the underlying operating system.
 
 	Synosis:
-	int ugetdents(int fd,dirent *rbuf,int rlen) noex
+	int ufstype(char *rbuf,int rlen,int fd) noex
 
 	Arguments:
-	fd		file-descriptor
 	rbuf		result buffer pointer
 	rlen		result buffer length
+	fd		file-descriptor
 
 	Returns:
 	>=0		length of result
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-#ifndef	USYSUGETDENTS_INCLUDE
-#define	USYSUGETDENTS_INCLUDE
+#ifndef	USYSUFSTYPE_INCLUDE
+#define	USYSUFSTYPE_INCLUDE
 #ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<dirent.h>		/* |dirent| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<usys_typedefs.h>	/* |dirent_t| */
 
 
-namespace usys {
-    extern sysret_t ugetdents(int,dirent_t *,int) noex ;
+namespace libu {
+    extern sysret_t ufstype(char *,int,int) noex ;
 }
 
 
 #endif /* __cplusplus */
-#endif /* USYSUGETDENTS_INCLUDE */
+#endif /* USYSUFSTYPE_INCLUDE */
 
 

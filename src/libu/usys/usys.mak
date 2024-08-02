@@ -59,7 +59,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_ufcntl.o usys_ugetdents.o usys_ugetnisdom.o
-OBJ3_USYS= usys_usendfile.o usys_libstr.o
+OBJ3_USYS= usys_usendfile.o usys_ufstype.o usys_libstr.o
 
 OBJ4_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ5_USYS= usys_ttynamerp.o 
@@ -173,6 +173,7 @@ usys_ufcntl.o:		usys_ufcntl.cc usys_ufcntl.h 		$(INCS)
 usys_ugetdents.o:	usys_ugetdents.cc usys_ugetdents.h	$(INCS)
 usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
 usys_usendfile.o:	usys_usendfile.cc usys_usendfile.h	$(INCS)
+usys_ufstype.o:		usys_ufstype.cc usys_ufstype.h		$(INCS)
 
 # missing operating system calls
 usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h		$(INCS)

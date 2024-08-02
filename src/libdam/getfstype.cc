@@ -25,7 +25,6 @@
 #include	<sys/types.h>
 #include	<sys/statvfs.h>
 #include	<usystem.h>
-#include	<snwcpy.h>
 #include	<localmisc.h>
 
 
@@ -53,16 +52,7 @@
 /* exported subroutines */
 
 int getfstype(char *nbuf,int nlen,int fd) noex {
-	int		rs = SR_FAULT ;
-	if (nbuf) {
-	    STATVFS	vsb ;
-	    if ((rs = u_fstatvfs(fd,&vsb)) >= 0) {
-	        cchar	*cp = vsb.f_basetype ;
-	        int	cl = strnlen(vsb.f_basetype,FSTYPSZ) ;
-	        rs = snwcpy(nbuf,nlen,cp,cl) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
+	return u_fstype(fd,nbuf,nlen) ;
 }
 /* end subroutine (getfstype) */
 

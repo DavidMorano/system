@@ -20,23 +20,23 @@
 
 	= 2003-06-26, David A­D­ Morano
 	Although this object works, it was only a micracle that it
-	did. There is a feature-bug in Solaris that doesn't allow
+	did.  There is a feature-bug in Solaris that does not allow
 	a file to be both mapped and locked at the same time (in
-	either order). But there seems to be a crack in the stupid
-	Solaris implementation because it doesn't enforce its stupid
+	either order).  But there seems to be a crack in the stupid
+	Solaris implementation because it does not enforce its stupid
 	bug carefully enough and this object here fell through the
-	cracks and continued working by accident. We were locking
+	cracks and continued working by accident.  We were locking
 	the whole file beyond its end and that appears to get by
 	the Solaris police-state bug-patrol and was accidentally
-	being allowed. I reworked a good bit of this code to eliminate
+	being allowed.  I reworked a good bit of this code to eliminate
 	any file mapping (so that we can continue to use file-record
-	locks). This whole Solaris crap (this is being done on
+	locks).  This whole Solaris crap (this is being done on
 	Solaris 8 right now) is really a pain and Sun should face
 	punitive charges for inhumanity to the programmer community.
 	Solaris has some nice things since it was derived from the
 	older (and better) System V UNIX®, but has really messed
 	it up by not allowing what used to be allowed in the old
-	days with things like the old RFS facility. Oh, while we're
+	days with things like the old RFS facility.  Oh, while we are
 	on the subject: NFS sucks cock meat!
 
 */
@@ -148,8 +148,11 @@
 #include	<mapstrint.h>
 #include	<stdorder.h>
 #include	<mkx.h>
-#include	<hasx.h>
 #include	<matxstr.h>
+#include	<lockfile.h>
+#include	<hasx.h>
+#include	<isnot.h>
+#include	<isfiledesc.h>
 #include	<localmisc.h>
 
 #include	"msfile.h"
@@ -187,19 +190,11 @@
 
 /* external subroutines */
 
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	getfstype(char *,int,int) ;
-extern int	iceil(int,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	stroflags(char *,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -1535,13 +1530,10 @@ static int msfile_filesetinfo(MSFILE *op) noex {
 	amode = (op->oflags & O_ACCMODE) ;
 	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	    cint	fslen = USERNAMELEN ;
-	    char	fstype[USERNAMELEN + 1] ;
 	    op->ti_mod = sb.st_mtime ;
 	    op->filesize = sb.st_size ;
-	    if ((rs = getfstype(fstype,fslen,op->fd)) >= 0) {
-	        cbool	f = (matlocalfs(fstype,rs) >= 0) ;
-	        op->f.remote = (! f) ; /* remote if not local! */
+	    if ((rs = isfsremote(op->fd)) > 0) {
+	        op->f.remote = true ;
 	    }
 	} /* end if (stat) */
 	return rs ;

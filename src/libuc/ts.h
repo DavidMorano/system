@@ -13,8 +13,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<mapstrint.h>
-#include	<localmisc.h>
 
 #include	"tse.h"
 #include	"ebuf.h"

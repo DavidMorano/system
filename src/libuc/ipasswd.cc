@@ -87,6 +87,7 @@
 #include	<randlc.h>
 #include	<matxstr.h>
 #include	<mkx.h>
+#include	<getfstype.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -118,7 +119,8 @@
 
 /* external subroutines */
 
-extern int	getfstype(char *,int,int) ;
+
+/* external variables */
 
 
 /* local structures */

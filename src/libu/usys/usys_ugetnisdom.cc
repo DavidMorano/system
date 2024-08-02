@@ -7,18 +7,12 @@
 
 /* revision history:
 
-	= 2001-04-11, David D-A- Morano
-	This subroutine was written for Rightcore Network Services.
-
-	= 2025-06-17, David D-A- Morano
-	As far as I know, Oracle Solaris® (formerly Sun-Microsystems
-	Solaris®) does have the |getdomainame(3c)| subroutine.
-	But it is hidden within the NSL library without being
-	documented.
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
 
 */
 
-/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -38,7 +32,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error code (- errno)
+	<0		error code (system-return)
 
 *******************************************************************************/
 

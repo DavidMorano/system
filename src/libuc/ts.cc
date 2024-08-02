@@ -147,6 +147,9 @@
 #include	<strwcpy.h>
 #include	<strdcpyx.h>
 #include	<matxstr.h>
+#include	<lockfile.h>
+#include	<getfstype.h>
+#include	<isnot.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"ts.h"
@@ -172,12 +175,6 @@
 
 
 /* external subroutines */
-
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	getfstype(char *,int,int) ;
-extern int	isNotPresent(int) ;
-
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -1429,29 +1426,14 @@ TS		*op ;
 }
 /* end subroutine (ts_fileclose) */
 
-
-static int ts_filesetinfo(op,dt)
-TS		*op ;
-time_t		dt ;
-{
+static int ts_filesetinfo(RS *op,time_t dt) noex {
 	USTAT	sb ;
-
 	int	rs ;
-	int	amode ;
-
-
-	amode = (op->oflags & O_ACCMODE) ;
+	int	amode = (op->oflags & O_ACCMODE) ;
 	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
-
-	rs = u_fstat(op->fd,&sb) ;
-	if (rs < 0) goto ret0 ;
-
-	op->ti_mod = sb.st_mtime ;
-	op->filesize = sb.st_size ;
-
-/* is the file on a local or remote filesystem? */
-
-	{
+	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	    op->ti_mod = sb.st_mtime ;
+	    op->filesize = sb.st_size ;
 	    char	fstype[USERNAMELEN + 1] ;
 	    int		fslen = USERNAMELEN ;
 	    if ((rs = getfstype(fstype,fslen,op->fd)) >= 0) {
@@ -1459,74 +1441,48 @@ time_t		dt ;
 		cbool	f = (matlocalfs(fstype,fsl) >= 0) ;
 	        op->f.remote = (! f) ; /* remote if not local! */
 	    }
+	} /* end if (u_fstat) */
 
-	} /* end block */
-
-ret0:
 	return rs ;
 }
 /* end subroutine (ts_filesetinfo) */
 
-
-static int ts_ebufstart(op)
-TS		*op ;
-{
-	uint	soff ;
-
+static int ts_ebufstart(TS *op) noex {
 	int	rs = SR_OK ;
-	int	esize, nways, n ;
-
-
 	if (! op->f.ebuf) {
 	    if (op->fd >= 0) {
-
-		soff = TS_TABOFF ;
-		esize = TS_ENTSIZE ;
-		nways = TS_NWAYS ;
-		n = TS_NEPW ;
+		const uint	soff = TS_TABOFF ;
+		cint		esize = TS_ENTSIZE ;
+		cint		nways = TS_NWAYS ;
+		cint		n = TS_NEPW ;
 		rs = ebuf_start(&op->ebm,op->fd,soff,esize,nways,n) ;
 		op->f.ebuf = (rs >= 0) ;
-
-	    } else
+	    } else {
 		rs = SR_NOANODE ;
+	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (ts_ebufstart) */
 
-
-static int ts_ebuffinish(op)
-TS		*op ;
-{
+static int ts_ebuffinish(TS *op) noex {
 	int		rs = SR_OK ;
-	in		rs1 ;
-
+	int		rs1 ;
 	if (op->f.ebuf) {
 	    op->f.ebuf = false ;
 	    rs1 = ebuf_finish(&op->ebm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (ts_ebuffinish) */
 
-
-static int ts_readentry(op,ei,rpp)
-TS		*op ;
-int		ei ;
-char		**rpp ;
-{
-	int	rs ;
-
-	char	*bp ;
-
+static int ts_readentry(TS *op,int ei,char **rpp) noex {
+	int		rs ;
+	char		*bp ;
 
 	rs = ebuf_read(&op->ebm,ei,&bp) ;
-
-	if (rs < 0)
-	    goto ret0 ;
+	if (rs < 0) goto ret0 ;
 
 	if (rs == 0) rs = SR_NOTFOUND ;
 
