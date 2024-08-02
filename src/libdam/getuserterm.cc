@@ -28,8 +28,8 @@
 	int getuserterm(char *rbuf,int rlen,cchar *username) noex
 
 	Arguments:
-	- rbuf		user buffer to receive name of controlling terminal
-	- rlen		length of user supplied buffer
+	- rbuf		result buffer to receive name of controlling terminal
+	- rlen		result buffer length
 	- username	session ID to find controlling terminal for
 
 	Returns:
@@ -91,7 +91,7 @@ namespace {
 /* forward references */
 
 static int	load(char *,int,tmpx_ent *) noex ;
-static int	newer(char *,const time_t,time_t *) noex ;
+static int	newer(char *,time_t *) noex ;
 
 
 /* local variables */
@@ -164,21 +164,17 @@ int suber::tmpenum() noex {
 	    tmpx_cur	cur ;
 	    tmpx_ent	ue ;
 	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
-		bool	f ;
 	        while (rs >= 0) {
+		    bool	f = true ;
 	            rs1 = tmpx_fetchuser(&utmp,&cur,&ue,username) ;
 		    if (rs1 == SR_NOTFOUND) break ;
 		    rs = rs1 ;
 		    if (rs < 0) break ;
-	            f = true ;
 	            f = f && (ue.ut_type == TMPX_TPROCUSER) ;
 	            f = f && (ue.ut_line[0] != '\0') ;
 	            if (f) {
 	                if ((rs = load(tbuf,tlen,&ue)) >= 0) {
-			    time_t	titmp ;
-			    len = rs ;
-	                    if ((rs = newer(tbuf,tiacc,&titmp)) > 0) {
-	                        tiacc = titmp ;
+	                    if ((rs = newer(tbuf,&tiacc)) > 0) {
 	                        rs = sncpy1(rbuf,rlen,tbuf) ;
 	                        len = rs ;
 	                    } /* end if (we had a better one) */
@@ -201,10 +197,11 @@ int suber::tmpenum() noex {
 
 static int load(char *tbuf,int tlen,tmpx_ent *uep) noex {
 	cint		ulen = TMPX_LLINE ;
-	return mknpath2w(tbuf,tlen,devdname,uep->ut_line,ulen) ;
+	return mknpathw(tbuf,tlen,devdname,uep->ut_line,ulen) ;
 }
+/* end subroutine (load) */
 
-static int newer(char *termdev,const time_t current,time_t *tp) noex {
+static int newer(char *termdev,time_t *tp) noex {
 	cint		of = O_WRONLY ;
 	int		rs ;
 	int		rs1 ;
@@ -216,7 +213,7 @@ static int newer(char *termdev,const time_t current,time_t *tp) noex {
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 		f = true ;
 	        f = f && ((sb.st_mode & S_IWGRP) == S_IWGRP) ;
-	        f = f && (sb.st_atime > current) ;
+	        f = f && (sb.st_atime > *tp) ;
 		if (f) *tp = sb.st_atime ;
 	    } /* end if */
 	    rs1 = u_close(fd) ;
