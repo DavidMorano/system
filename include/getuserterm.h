@@ -27,7 +27,7 @@
 
 EXTERNC_begin
 
-extern int	getuserterm(char *,int,int *,cchar *) noex ;
+extern int	getuserterm(char *rbuf,int rlen,cchar *username) noex ;
 
 EXTERNC_end
 

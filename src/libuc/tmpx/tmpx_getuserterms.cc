@@ -127,7 +127,7 @@ int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
 	if (op && lp && username) {
 	    rs = SR_INVALID ;
 	    if (username[0]) {
-		subinfo	go(op,lp,username) ;
+		subinfo		go(op,lp,username) ;
 		rs = go ;
 		c = rs ;
 	    } /* end if (valid) */
