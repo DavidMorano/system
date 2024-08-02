@@ -1,6 +1,8 @@
 /* svcent HEADER */
+/* lang=C20 */
 
 /* subroutines for simple SVCFILE_ENT object management */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,28 +16,28 @@
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SVCENT_INCLUDE
-#define	SVCENT_INCLUDE	1
+#define	SVCENT_INCLUDE
 
 
 #include	<envstandards.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<svcfile.h>
-#include	<localmisc.h>
 
 
 #define	SVCENT	SVCFILE_ENT
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	svcent_islib(SVCENT *,cchar **) ;
-extern int	svcent_getval(SVCENT *,cchar *,cchar **) ;
-extern int	svcent_getdeval(SVCENT *,cchar *,cchar **) ;
+extern int	svcent_islib(SVCENT *,cchar **) noex ;
+extern int	svcent_getval(SVCENT *,cchar *,cchar **) noex ;
+extern int	svcent_getdeval(SVCENT *,cchar *,cchar **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* SVCENT_INCLUDE */
 

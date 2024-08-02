@@ -13,12 +13,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vecitem.h>
-#include	<localmisc.h>
 
 
 #define	SRVTAB_MAGIC	0x31415926
@@ -68,9 +68,9 @@ typedef SRVTAB_ENT	srvtab_ent ;
 
 EXTERNC_begin
 
-extern int srvtab_open(srvtab *,cchar	 *,vecitem *) noex ;
-extern int srvtab_match(srvtab *,cchar	 *,srvtab_ent **) noex ;
-extern int srvtab_find(srvtab *,cchar	 *,srvtab_ent **) noex ;
+extern int srvtab_open(srvtab *,cchar *,vecitem *) noex ;
+extern int srvtab_match(srvtab *,cchar *,srvtab_ent **) noex ;
+extern int srvtab_find(srvtab *,cchar *,srvtab_ent **) noex ;
 extern int srvtab_get(srvtab *,int,srvtab_ent **) noex ;
 extern int srvtab_check(srvtab *,time_t,vecitem *) noex ;
 extern int srvtab_close(srvtab *) noex ;

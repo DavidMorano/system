@@ -24,6 +24,7 @@
 #include	<hdb.h>
 #include	<vecobj.h>
 #include	<vechand.h>
+#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 
 
 /* object defines */
