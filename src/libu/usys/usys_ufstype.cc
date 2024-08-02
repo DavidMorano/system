@@ -105,13 +105,17 @@ namespace libu {
 
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
+/****
+Linux just does not have an easy way to get a file-system type c-string.
+****/
+
 namespace libu {
     sysret_t ufstype(char *rbuf,int rlen,int) noex {
 	return sncpy(rbuf,rlen,"remote") ;
     }
 }
 
-#else
+#else /* all other operating systems */
 
 namespace libu {
     sysret_t ufstype(char *rbuf,int rlen,int) noex {

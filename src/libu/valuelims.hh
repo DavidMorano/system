@@ -15,8 +15,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
-	This object provides various value limits on various integer
-	types.
+	This object provides value limits on various integer types.
 
 *******************************************************************************/
 
