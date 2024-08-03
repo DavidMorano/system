@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |caddr_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -43,7 +43,7 @@
 
 /* database ("read") options */
 #define	IPASSWD_ROSEC		0x01	/* use second hash */
-#define	IPASSWD_RORANDLC	0x02	/* use 'randlc()' */
+#define	IPASSWD_RORANDLC	0x02	/* use |randlc(3uc)| */
 
 /* fetch options */
 #define	IPASSWD_FOLASTFULL	0x01	/* require full last name for match */

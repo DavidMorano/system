@@ -19,18 +19,31 @@
 
 /*******************************************************************************
 
+	Name:
+	randlc
+
+	Description:
 	You may want to note that this RNG is pretty bad as compared
-	with some "good" ones. Do not use this if you can help it!
+	with some "good" ones.  Do not use this if you can help it!
 	The redeeming grace of this RNG (if any) is that it is not
 	an object and does not require any persistent state.
+
+	Synopsis:
+	int randlc(int v) noex
+
+	Arguments:
+	v		value to transform into new pseudo random number
+
+	Returns:
+	-		new pseudo random number
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 
 #include	"randlc.h"
 
@@ -38,7 +51,13 @@
 /* local defines */
 
 
+/* local structures */
+
+
 /* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
