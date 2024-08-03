@@ -77,7 +77,7 @@
 
 int isfsremote(int fd) noex {
 	int		rs ;
-	bool		f = false ;
+	int		f = false ;
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	    cint	fslen = rs ;
 	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */

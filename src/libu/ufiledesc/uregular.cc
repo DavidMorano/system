@@ -265,9 +265,9 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_acl = F_ACL ; /* future use */
-constexpr bool		f_sunos = F_SUNOS ; /* this is really Solaris® */
-constexpr bool		f_darwin = F_DARWIN ; /* this is really Solaris® */
+constexpr bool		f_acl = F_ACL ;		/* future use */
+constexpr bool		f_sunos = F_SUNOS ;	/* this is really Solaris® */
+constexpr bool		f_darwin = F_DARWIN ;
 
 
 /* exported variables */

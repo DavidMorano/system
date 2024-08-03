@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int lookword_magic(lookword *op,Args ... args) noex {
+static inline int ipasswd_magic(ipasswd *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LOOKWORD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == IPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (lookword_magic) */
+/* end subroutine (ipasswd_magic) */

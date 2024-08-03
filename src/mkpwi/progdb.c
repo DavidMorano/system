@@ -960,16 +960,10 @@ static int progdb_debugfile(PI *pip,cchar *dbname) noex {
 	    debugprintf("progdb: ipasswd_open() rs=%d\n",rs1) ;
 	    if ((rs2 = ipasswd_curbegin(&pwi,&cur)) >= 0) {
 	        while (TRUE) {
-	            rs2 = ipasswd_enum(&pwi,&cur,
+	            rs2 = ipasswd_curenum(&pwi,&cur,
 	                ubuf,sa,rbuf,rlen) ;
-	            debugprintf("progdb: "
-	                "ipasswd_enum() rs=%d\n",rs2) ;
 	            if (rs2 < 0) break ;
-	            debugprintf("progdb: username=%s\n",
-	                ubuf) ;
 	            snrealname(nbuf,nlen,sa,-1) ;
-	            debugprintf("main: name=%s\n",
-	                nbuf) ;
 	        }
 	        ipasswd_curend(&pwi,&cur) ;
 	    } /* end if (enumerating) */

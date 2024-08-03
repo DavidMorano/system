@@ -20,10 +20,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<realname.h>
-#include	<localmisc.h>
 
 
 #define	IPASSWD			struct ipasswd_head
@@ -94,22 +95,22 @@ struct ipasswd_head {
 	uint		(*recind[IPASSWD_NINDICES])[2] ;
 	caddr_t		mapdata ;
 	IPASSWD_ENT	*rectab ;
-	IPASSWD_FL	f ;
 	time_t		mtime ;
 	time_t		ti_open ;
 	time_t		ti_access ;
 	time_t		ti_map ;
 	size_t		mapsize ;
+	IPASSWD_FL	f ;
 	uint		magic ;
-	uint		pagesize ;
-	uint		filesize ;
-	uint		stcount ;
-	uint		stsize ;
-	uint		rtlen ;
-	uint		rtsize ;
-	uint		rilen ;
-	uint		collisions ;
 	uint		ropts ;
+	int		pagesize ;
+	int		filesize ;
+	int		stcount ;
+	int		stsize ;
+	int		rtlen ;
+	int		rtsize ;
+	int		rilen ;
+	int		collisions ;
 	int		fd ;
 	int		oflags ;
 	int		operm ;
@@ -128,8 +129,9 @@ extern int ipasswd_open(ipasswd *,cchar *) noex ;
 extern int ipasswd_getinfo(ipasswd *,ipasswd_info *) noex ;
 extern int ipasswd_curbegin(ipasswd *,ipasswd_cur *) noex ;
 extern int ipasswd_curend(ipasswd *,ipasswd_cur *) noex ;
-extern int ipasswd_enum(ipasswd *,ipasswd_cur *,char *,cc **,char *,int) noex ;
-extern int ipasswd_fetcher(ipasswd *,ipasswd_cur *,int,char *,cc **,int) noex ;
+extern int ipasswd_curenum(ipasswd *,ipasswd_cur *,char *,cc **,
+		char *,int) noex ;
+extern int ipasswd_curfetch(ipasswd *,ipasswd_cur *,int,char *,cc **,int) noex ;
 extern int ipasswd_fetch(ipasswd *,realname *,ipasswd_cur *,int,char *) noex ;
 extern int ipasswd_close(ipasswd *) noex ;
 

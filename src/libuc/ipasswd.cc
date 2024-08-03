@@ -53,8 +53,8 @@
 	up		result buffer (at least USERNAMELEN+1 in size)
 
 	Returns:
-	<0		error
 	>=0		found
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -116,6 +116,10 @@
 
 #define	NSHIFT		6		/* shift bits for secondary hash */
 
+#define	SI_STA		storeitem_start
+#define	SI_STR		storeitem_strw
+#define	SI_FIN		storeitem_finish
+
 
 /* external subroutines */
 
@@ -128,26 +132,36 @@
 
 /* forward references */
 
-static int	ipasswd_hdrload(IPASSWD *) noex ;
-static int	ipasswd_hdrloader(IPASSWD *) noex ;
-static int	ipasswd_enterbegin(IPASSWD *,time_t) noex ;
-static int	ipasswd_enterend(IPASSWD *,time_t) noex ;
+template<typename ... Args>
+static inline int ipasswd_magic(ipasswd *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == IPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (ipasswd_magic) */
 
-static int	ipasswd_fileopen(IPASSWD *,time_t) noex ;
-static int	ipasswd_fileclose(IPASSWD *) noex ;
-static int	ipasswd_mapbegin(IPASSWD *,time_t) noex ;
-static int	ipasswd_mapend(IPASSWD *) noex ;
-static int	ipasswd_remotefs(IPASSWD *) noex ;
-static int	ipasswd_keymatchfl3(IPASSWD *,int,int,realname *) noex ;
-static int	ipasswd_keymatchl3(IPASSWD *,int,int,realname *) noex ;
-static int	ipasswd_keymatchl1(IPASSWD *,int,int,realname *) noex ;
-static int	ipasswd_keymatchf(IPASSWD *,int,int,realname *) noex ;
-static int	ipasswd_keymatchall(IPASSWD *,int,int,realname *) noex ;
+static int	ipasswd_hdrload(ipasswd *) noex ;
+static int	ipasswd_hdrloader(ipasswd *) noex ;
+static int	ipasswd_enterbegin(ipasswd *,time_t) noex ;
+static int	ipasswd_enterend(ipasswd *,time_t) noex ;
 
-static int	ipaswd_mapcheck(IPASSWD *,time_t) noex ;
+static int	ipasswd_fileopen(ipasswd *,time_t) noex ;
+static int	ipasswd_fileclose(ipasswd *) noex ;
+static int	ipasswd_mapbegin(ipasswd *,time_t) noex ;
+static int	ipasswd_mapend(ipasswd *) noex ;
+static int	ipasswd_remotefs(ipasswd *) noex ;
+static int	ipasswd_keymatchfl3(ipasswd *,int,int,realname *) noex ;
+static int	ipasswd_keymatchl3(ipasswd *,int,int,realname *) noex ;
+static int	ipasswd_keymatchl1(ipasswd *,int,int,realname *) noex ;
+static int	ipasswd_keymatchf(ipasswd *,int,int,realname *) noex ;
+static int	ipasswd_keymatchall(ipasswd *,int,int,realname *) noex ;
+
+static int	ipaswd_mapcheck(ipasswd *,time_t) noex ;
 
 #ifdef	COMMENT
-static int	ipasswd_keymatchlast(IPASSWD *,int,int,char *,int) noex ;
+static int	ipasswd_keymatchlast(ipasswd *,int,int,char *,int) noex ;
 #endif
 
 static int	mkourfname(char *,cchar *) noex ;
@@ -170,7 +184,7 @@ enum indices {
 /* exported variables */
 
 #ifdef	COMMENT
-IPASSWD_OBJ	ipasswd = {
+IPASSWD_OBJ	ipasswd_mod = {
 	"ipasswd",
 	sizeof(ipasswd),
 	sizeof(ipasswd_cur)
@@ -180,7 +194,7 @@ IPASSWD_OBJ	ipasswd = {
 
 /* exported subroutines */
 
-int ipasswd_open(IPASSWD *op,cchar *dbname) noex {
+int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		rs1 ;
@@ -224,217 +238,163 @@ int ipasswd_open(IPASSWD *op,cchar *dbname) noex {
 }
 /* end subroutine (ipasswd_open) */
 
-int ipasswd_close(IPASSWD *op) noex {
-	int		rs = SR_OK ;
+int ipasswd_close(ipasswd *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
-
-	if (op->mapdata != nullptr) {
-	    rs1 = ipasswd_mapend(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (op->fd >= 0) {
-	    rs1 = u_close(op->fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fd = -1 ;
-	}
-
-	if (op->fname != nullptr) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = ipasswd_magic(op)) >= 0) {
+	    if (op->mapdata != nullptr) {
+	        rs1 = ipasswd_mapend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fd >= 0) {
+	        rs1 = u_close(op->fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fd = -1 ;
+	    }
+	    if (op->fname != nullptr) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ipasswd_close) */
 
-int ipasswd_count(IPASSWD *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
-
-	return (op->rtlen - 1) ;
+int ipasswd_count(ipasswd *op) noex {
+	int		rs ;
+	if ((rs = ipasswd_magic(op)) >= 0) {
+	    rs = (op->rtlen - 1) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (ipasswd_count) */
 
-int ipasswd_countindex(IPASSWD *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
-
-	return op->rilen ;
+int ipasswd_countindex(ipasswd *op) noex {
+	int		rs ;
+	if ((rs = ipasswd_magic(op)) >= 0) {
+	    rs = op->rilen ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (ipasswd_countindex) */
 
-int ipasswd_curbegin(IPASSWD *op,IPASSWD_CUR *curp) noex {
-	int		i ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	op->f.cursor = true ;
-	op->f.cursoracc = false ;
-
-	for (i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
-	    curp->i[i] = -1 ;
-	}
-
-	curp->magic = IPASSWD_CURMAGIC ;
-	return SR_OK ;
+int ipasswd_curbegin(ipasswd *op,IPASSWD_CUR *curp) noex {
+	int		rs ;
+	if ((rs = ipasswd_magic(op,curp)) >= 0) {
+	    op->f.cursor = true ;
+	    op->f.cursoracc = false ;
+	    for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
+	        curp->i[i] = -1 ;
+	    }
+	    curp->magic = IPASSWD_CURMAGIC ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (ipasswd_curbegin) */
 
-int ipasswd_curend(IPASSWD *op,IPASSWD_CUR *curp) noex {
+int ipasswd_curend(ipasswd *op,IPASSWD_CUR *curp) noex {
 	const time_t	dt = time(nullptr) ;
-	int		rs = SR_OK ;
-	int		i ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->f.cursoracc)
-	    op->ti_access = dt ;
-
-	op->f.cursor = false ;
-	for (i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
-	    curp->i[i] = -1 ;
-	}
-
-	curp->magic = 0 ;
+	int		rs ;
+	if ((rs = ipasswd_magic(op,curp)) >= 0) {
+	    if (curp->magic == IPASSWD_CURMAGIC) {
+	        if (op->f.cursoracc) op->ti_access = dt ;
+	        op->f.cursor = false ;
+	        for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
+	            curp->i[i] = -1 ;
+	        }
+	        curp->magic = 0 ;
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ipasswd_curend) */
 
-int ipasswd_enum(IPASSWD *op,IPASSWD_CUR *curp,char *ubuf,cc *sa,
+int ipasswd_curenum(ipasswd *op,IPASSWD_CUR *curp,char *ubuf,cc **sa,
 		char *rbuf,int rlen) noex {
-	time_t		dt = 0 ;
 	int		rs ;
 	int		rs1 ;
-	int		ri ;
 	int		ul = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (curp == nullptr) return SR_FAULT ;
-	if (ubuf == nullptr) return SR_FAULT ;
-	if (sa == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
-
-	if (! op->f.cursor) return SR_INVALID ;
-
-	ri = (curp->i[0] < 1) ? 1 : (curp->i[0] + 1) ;
-
-/* capture a hold on the file */
-
-	if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
-	    if (ri < op->rtlen) {
-	        int	si ;
-	        int	ui ;
-	        cchar	*cp ;
-
-	        if (sa != nullptr) {
-	            STOREITEM	sio ;
-	            DSTR	ss[5] ;
-
-/* first */
-
-	            si = op->rectab[ri].first ;
-	            ss[0].sbuf = (char *) (op->stab + si) ;
-	            ss[0].slen = -1 ;
-
-/* middle-1 */
-
-	            si = op->rectab[ri].m1 ;
-	            ss[1].sbuf = (char *) (op->stab + si) ;
-	            ss[1].slen = -1 ;
-
-/* middle-2 */
-
-	            si = op->rectab[ri].m2 ;
-	            ss[2].sbuf = (char *) (op->stab + si) ;
-	            ss[2].slen = -1 ;
-
-/* middle=3 */
-
-	            ss[3].sbuf = nullptr ;
-	            ss[3].slen = 0 ;
-
-/* last */
-
-	            si = op->rectab[ri].last ;
-	            ss[4].sbuf = (char *) (op->stab + si) ;
-	            ss[4].slen = -1 ;
-
-/* done */
-
-	            if ((rs = storeitem_start(&sio,rbuf,rlen)) >= 0) {
-	                int		j ;
-	                int		sl ;
-	                int		c = 0 ;
-	                cchar	*sp ;
-	                cchar	**spp ;
-	                for (j = 0 ; (rs >= 0) && (j < 5) ; j += 1) {
-	                    sp = ss[j].sbuf ;
-	                    sl = ss[j].slen ;
-	                    if ((sp != nullptr) && (sl != 0) && (*sp != '\0')) {
-				cint	ssl = ss[j].slen ;
-				cchar		*ssp = ss[j].sbuf ;
-	                        spp = (sa+c++) ;
-	                        rs = storeitem_strw(&sio,ssp,ssl,spp) ;
-	                    }
-	                } /* end for */
-	                sa[c] = nullptr ;
-	                rs1 = storeitem_finish(&sio) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (storeitem) */
-	        } /* end if */
-
-	        if (rs >= 0) {
-
-	            ui = op->rectab[ri].username ;
-
-	            if (ubuf != nullptr) {
-			cint	ulen = IPASSWD_USERNAMELEN ;
-	                cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
-	                ul = (cp - ubuf) ;
-	            } else {
-	                ul = strlen(op->stab + ui) ;
-	            }
-
-/* update the cursor */
-
-	            curp->i[0] = ri ;
-
-	        } /* end if */
-
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    } /* end if (valid) */
-	    rs1 = ipasswd_enterend(op,dt) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ipasswd-enter) */
-
+	if ((rs = ipasswd_magic(op,curp,ubuf,sa,rbuf)) >= 0) {
+	    if (curp->magic == IPASSWD_CURMAGIC) {
+		rs = SR_INVALID ;
+	        if (op->f.cursor) {
+		    time_t	dt = 0 ;
+		    int		ri = (curp->i[0] < 1) ? 1 : (curp->i[0] + 1) ;
+		    /* capture a hold on the file */
+		    if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
+	                if (ri < op->rtlen) {
+	                    int		si ;
+	                    if (sa != nullptr) {
+	                        storeitem	sio ;
+	                        dstr	ss[5] ;
+			            /* first */
+	                        si = op->rectab[ri].first ;
+	                        ss[0].sbuf = charp(op->stab + si) ;
+	                        ss[0].slen = -1 ;
+			            /* middle-1 */
+	                        si = op->rectab[ri].m1 ;
+	                        ss[1].sbuf = charp(op->stab + si) ;
+	                        ss[1].slen = -1 ;
+			            /* middle-2 */
+	                        si = op->rectab[ri].m2 ;
+	                        ss[2].sbuf = charp(op->stab + si) ;
+	                        ss[2].slen = -1 ;
+			            /* middle-3 */
+	                        ss[3].sbuf = nullptr ;
+	                        ss[3].slen = 0 ;
+			            /* last */
+	                        si = op->rectab[ri].last ;
+	                        ss[4].sbuf = charp(op->stab + si) ;
+	                        ss[4].slen = -1 ;
+			            /* done */
+				if ((rs = SI_STA(&sio,rbuf,rlen)) >= 0) {
+	                	    int		c = 0 ;
+	                	    for (int j = 0 ; j < 5 ; j += 1) {
+	                    	        cchar	*sp = ss[j].sbuf ;
+	                    	        cint	sl = ss[j].slen ;
+	                    	        if (sp && (sl != 0) && (*sp != '\0')) {
+					    cint	ssl = ss[j].slen ;
+					    cchar	*ssp = ss[j].sbuf ;
+	                        	    cchar	**spp = (sa+c++) ;
+	                        	    rs = SI_STR(&sio,ssp,ssl,spp) ;
+	                    	        }
+			    	        if (rs < 0) break ;
+	                	    } /* end for */
+	                	    sa[c] = nullptr ;
+	                	    rs1 = SI_FIN(&sio) ;
+	                	    if (rs >= 0) rs = rs1 ;
+	            	        } /* end if (storeitem) */
+	        	    } /* end if */
+	                    if (rs >= 0) {
+	                        cint	ui = op->rectab[ri].username ;
+				cchar	*cp ;
+	                        if (ubuf != nullptr) {
+			            cint	ulen = IPASSWD_USERNAMELEN ;
+	                            cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
+	                            ul = (cp - ubuf) ;
+	                        } else {
+	                            ul = strlen(op->stab + ui) ;
+	                        }
+				/* update the cursor */
+	            		curp->i[0] = ri ;
+	        	    } /* end if (ok) */
+	    		} else {
+	        	    rs = SR_NOTFOUND ;
+	    		} /* end if (valid) */
+	    		rs1 = ipasswd_enterend(op,dt) ;
+	    		if (rs >= 0) rs = rs1 ;
+		    } /* end if (ipasswd-enter) */
+	        } /* end if (valid) */
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return (rs >= 0) ? ul : rs ;
 }
-/* end subroutine (ipasswd_enum) */
-
+/* end subroutine (ipasswd_curenum) */
 
 /* fetch an entry by a real-name key lookup */
-int ipasswd_fetch(IPASSWD *op,realname *rp,IPASSWD_CUR *curp,
+int ipasswd_fetch(ipasswd *op,realname *rp,IPASSWD_CUR *curp,
 		int opts,char *up) noex {
 	IPASSWD_CUR	cur ;
 	time_t		dt = 0 ;
@@ -666,7 +626,7 @@ int ipasswd_fetch(IPASSWD *op,realname *rp,IPASSWD_CUR *curp,
 
 
 /* fetch an entry by an array of real-name component strings */
-int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
+int ipasswd_curfetch(ipasswd *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 		cchar **sa,int sn) noex {
 	IPASSWD_CUR	cur ;
 	time_t		dt = 0 ;
@@ -956,7 +916,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 }
 /* end subroutine (ipasswd_fetcher) */
 
-int ipasswd_getinfo(IPASSWD *op,IPASSWD_INFO *rp) noex {
+int ipasswd_getinfo(ipasswd *op,IPASSWD_INFO *rp) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -972,7 +932,7 @@ int ipasswd_getinfo(IPASSWD *op,IPASSWD_INFO *rp) noex {
 }
 /* end subroutine (ipasswd_info) */
 
-int ipasswd_check(IPASSWD *op,time_t dt) noex {
+int ipasswd_check(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 
@@ -997,7 +957,7 @@ int ipasswd_check(IPASSWD *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int ipasswd_hdrload(IPASSWD *op) noex {
+static int ipasswd_hdrload(ipasswd *op) noex {
 	int		rs = SR_OK ;
 	cchar	*cp = (cchar *) op->mapdata ;
 
@@ -1060,7 +1020,7 @@ static int ipasswd_hdrload(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_hdrload) */
 
-static int ipasswd_hdrloader(IPASSWD *op) noex {
+static int ipasswd_hdrloader(ipasswd *op) noex {
 	uint		*table = (uint *) (op->mapdata + IPASSWD_IDLEN) ;
 	int		rs = SR_OK ;
 
@@ -1120,7 +1080,7 @@ static int ipasswd_hdrloader(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_hdrloader) */
 
-static int ipasswd_enterbegin(IPASSWD *op,time_t dt) noex {
+static int ipasswd_enterbegin(ipasswd *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
 
@@ -1137,7 +1097,7 @@ static int ipasswd_enterbegin(IPASSWD *op,time_t dt) noex {
 }
 /* end subroutine (ipasswd_enterbegin) */
 
-static int ipasswd_enterend(IPASSWD *op,time_t dt) noex {
+static int ipasswd_enterend(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	(void) dt ;
 	if (op->f.held) {
@@ -1147,7 +1107,7 @@ static int ipasswd_enterend(IPASSWD *op,time_t dt) noex {
 }
 /* end subroutine (ipasswd_enterend) */
 
-static int ipasswd_fileopen(IPASSWD *op,time_t dt) noex {
+static int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if ((rs = uc_open(op->fname,op->oflags,op->operm)) >= 0) {
@@ -1180,7 +1140,7 @@ static int ipasswd_fileopen(IPASSWD *op,time_t dt) noex {
 }
 /* end subroutine (ipasswd_fileopen) */
 
-static int ipasswd_fileclose(IPASSWD *op) noex {
+static int ipasswd_fileclose(ipasswd *op) noex {
 	int		rs = SR_OK ;
 	if (op->fd >= 0) {
 	    rs = u_close(op->fd) ;
@@ -1191,7 +1151,7 @@ static int ipasswd_fileclose(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_fileclose) */
 
-static int ipasswd_mapbegin(IPASSWD *op,time_t dt) noex {
+static int ipasswd_mapbegin(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->mapdata == nullptr) {
@@ -1213,7 +1173,7 @@ static int ipasswd_mapbegin(IPASSWD *op,time_t dt) noex {
 }
 /* end subroutine (ipasswd_mapbegin) */
 
-static int ipasswd_mapend(IPASSWD *op) noex {
+static int ipasswd_mapend(ipasswd *op) noex {
 	int		rs = SR_OK ;
 	if (op->mapdata != nullptr) {
 	    void	*ma = voidp(op->mapdata) ;
@@ -1226,7 +1186,7 @@ static int ipasswd_mapend(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_mapend) */
 
-static int ipasswd_remotefs(IPASSWD *op) noex {
+static int ipasswd_remotefs(ipasswd *op) noex {
 	int		rs ;
 	int		fslen = USERNAMELEN ;
 	int		f = false ;
@@ -1240,7 +1200,7 @@ static int ipasswd_remotefs(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_remotefs) */
 
-static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,realname *rp) noex {
+static int ipasswd_keymatchfl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	int		si = op->rectab[ri].last ;
 	int		f ;
 
@@ -1255,7 +1215,7 @@ static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,realname *rp) noex {
 }
 /* end subroutine (ipasswd_keymatchfl3) */
 
-static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,realname *rp) noex {
+static int ipasswd_keymatchl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f ;
 
@@ -1266,7 +1226,7 @@ static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,realname *rp) noex {
 }
 /* end subroutine (ipasswd_keymatchl3) */
 
-static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,realname *rp) noex {
+static int ipasswd_keymatchl1(ipasswd *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f ;
 
@@ -1277,7 +1237,7 @@ static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,realname *rp) noex {
 }
 /* end subroutine (ipasswd_keymatchl1) */
 
-static int ipasswd_keymatchf(IPASSWD *op,int opts,int ri,realname *rp) noex {
+static int ipasswd_keymatchf(ipasswd *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f ;
 
@@ -1289,7 +1249,7 @@ static int ipasswd_keymatchf(IPASSWD *op,int opts,int ri,realname *rp) noex {
 /* end subroutine (ipasswd_keymatchf) */
 
 #ifdef	COMMENT
-static int ipasswd_keymatchlast(IPASSWD *op,int opts,int ri,
+static int ipasswd_keymatchlast(ipasswd *op,int opts,int ri,
 		char *sp,int hl) noex {
 	int		si ;
 	int		f ;
@@ -1308,7 +1268,7 @@ static int ipasswd_keymatchlast(IPASSWD *op,int opts,int ri,
 
 #endif /* COMMENT */
 
-static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *rp) noex {
+static int ipasswd_keymatchall(ipasswd *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f = true ;
 	cchar	*s = op->stab ;
@@ -1363,7 +1323,7 @@ static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *rp) noex {
 }
 /* end subroutine (ipasswd_keymatchall) */
 
-static int ipaswd_mapcheck(IPASSWD *op,time_t dt) noex {
+static int ipaswd_mapcheck(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->mapdata == nullptr) {
