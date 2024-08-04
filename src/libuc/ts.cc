@@ -18,23 +18,23 @@
 
 	= 2003-06-26, David A­D­ Morano
 	Although this object works, it was only a micracle that it
-	did. There is a feature-bug in Solaris that doesn't allow
+	did.  There is a feature-bug in Solaris that does not allow
 	a file to be both mapped and locked at the same time (in
-	either order). But there seems to be a crack in the stupid
-	Solaris implementation because it doesn't enforce its stupid
+	either order).  But there seems to be a crack in the stupid
+	Solaris implementation because it does not enforce its stupid
 	bug carefully enough and this object here fell through the
-	cracks and continued working by accident. We were locking
+	cracks and continued working by accident.  We were locking
 	the whole file beyond its end and that appears to get by
 	the Solaris police-state bug-patrol and was accidentally
 	being allowed.  I reworked a good bit of this code to
 	eliminate any file mapping (so that we can continue to use
-	file-record locks). This whole Solaris crap (this is being
+	file-record locks).  This whole Solaris crap (this is being
 	done on Solaris 8 right now) is really a pain and Sun should
 	face punitive charges for inhumanity to the programmer
 	community.  Solaris has some nice things since it was derived
 	from the older (and better?) System V UNIX®, but has really
 	messed it up by not allowing what used to be allowed in the
-	old days with things like the old RFS facility. Oh, while
+	old days with things like the old RFS facility.  Oh, while
 	we're on the subject: NFS sucks cock meat!
 
 */
@@ -43,7 +43,7 @@
 
 /******************************************************************************
 
-	This subroutine maintains a TS file.  
+	This subroutine maintains a Time-Stamp (TS) file.  
 
 	Format of file records:
 
@@ -51,17 +51,17 @@
 
 	Design note: 
 
-	In summary, Solaris sucks cock meat! Solaris does not allow
+	In summary, Solaris sucks cock meat!  Solaris does not allow
 	a file to be memory-mapped from an NFS remote server *and*
-	also be file-locked at the same time. A lot of stupid Solaris
+	also be file-locked at the same time.  A lot of stupid Solaris
 	documentation notes say something to the effect that the
 	Solaris VM system cannot handle a remote file that is both
-	mapped and subject to file-locking at the same time. They
+	mapped and subject to file-locking at the same time.  They
 	use some sort of stupid circular reasoning that if any file
 	is being file-locked, then obviously it cannot be memory-mapped
 	since the file locking indicates that file-locking is taking
 	place, and that obviously any file that is being file-locked
-	cannot therefore also be memory mapped. That is pretty much
+	cannot therefore also be memory mapped.  That is pretty much
 	their reasoning -- I kid you not!
 
 	Unfortunately, code, like this code here, that was first
@@ -69,15 +69,15 @@
 	memory mapping together really needs to be changed to
 	eliminate either the file locking or the memory mapping.
 	Remote files were cross mounted in the late 80s and very
-	early 90s using RFS (not stupid NFS). The use of RFS provided
+	early 90s using RFS (not stupid NFS).  The use of RFS provided
 	many advantages not the least of them being full UFS
 	file-system semantics, but it is not clear why Solaris took
 	a step backward from simply allowing remote files to be
-	both memory-mapped and file-locked at the same time. Some
+	both memory-mapped and file-locked at the same time.  Some
 	bright light-bulb of a software developer must have gotten
 	his underwear in a bunch at some point and decided to
 	disallow both of these from ever occurring at the same time
-	in Solaris. We all have suffered from these dumb-butt Solaris
+	in Solaris.  We all have suffered from these dumb-butt Solaris
 	developers since we have to take time out to re-debug-write
 	old code (like this code here) to handle the case of stupid
 	Solaris not allowing memory mapping for a file that is also
@@ -86,16 +86,16 @@
 	Implementation note:
 
 	The code was actually running when files were being locked
-	in their entirety and beyond their ends. There was some
+	in their entirety and beyond their ends.  There was some
 	sort of loop-hole in the stupid Solaris code that allowed
 	a file to be both file-locked and memory mapped at the same
-	time under certain circumstances. However, there seemed to
+	time under certain circumstances.  However, there seemed to
 	be problems with this code when other parties on other
-	(remote) systems tried to do the same thing. They sometimes
+	(remote) systems tried to do the same thing.  They sometimes
 	failed with dead-lock types of errors (I forget the details).
 	As a result, I decided to change the code to fully comply
 	with the stupid Solaris requirements that no remote file
-	be both memory mapped and file locked at the same time. Any
+	be both memory mapped and file locked at the same time.  Any
 	code that is here now that has to be with mapping of files
 	is really just code that now allocates local private memory.
 	This is done instead of using the process heap but was
@@ -107,10 +107,10 @@
 	Final note:
 
 	Solaris sucks cock meat! Give me back simultaneous memory
-	mapping and file locking. And while you're at it, give me
+	mapping and file locking.  And while you're at it, give me
 	back RFS also! And to you stupid Solaris VM developers, get
-	out of Solaris development. Either get a new job somewhere
-	else or think about committing suicide. Either way, we can
+	out of Solaris development.  Either get a new job somewhere
+	else or think about committing suicide.  Either way, we can
 	all be happier with one (or more) of those alternatives.
 
 	Anecdotal note:
@@ -118,7 +118,7 @@
 	Hey, you stupid Solaris developers: give me back the ability
 	to push SOCKMOD on a TPI endpoint also! Since you're so
 	stupid, I know that you forgot that this was possible at
-	one time. You hosed that ability away when you botched up
+	one time.  You hosed that ability away when you botched up
 	making Solaris 2.6.
 
 ******************************************************************************/
@@ -182,33 +182,33 @@
 
 /* forward references */
 
-static int	ts_fileopen(TS *,time_t) ;
-static int	ts_fileclose(TS *) ;
-static int	ts_filesetinfo(TS *,time_t) ;
-static int	ts_lockget(TS *,time_t,int) ;
-static int	ts_lockrelease(TS *) ;
-static int	ts_filebegin(TS *,time_t) ;
-static int	ts_acquire(TS *,time_t,int) ;
-static int	ts_filecheck(TS *,time_t) ;
-static int	ts_ebufstart(TS *) ;
-static int	ts_ebuffinish(TS *) ;
+static int	ts_fileopen(TS *,time_t) noex ;
+static int	ts_fileclose(TS *) noex ;
+static int	ts_filesetinfo(TS *,time_t) noex ;
+static int	ts_lockget(TS *,time_t,int) noex ;
+static int	ts_lockrelease(TS *) noex ;
+static int	ts_filebegin(TS *,time_t) noex ;
+static int	ts_acquire(TS *,time_t,int) noex ;
+static int	ts_filecheck(TS *,time_t) noex ;
+static int	ts_ebufstart(TS *) noex ;
+static int	ts_ebuffinish(TS *) noex ;
 
-static int	ts_filetopwrite(TS *,time_t) ;
-static int	ts_filetopread(TS *) ;
-static int	ts_fileverify(TS *) ;
-static int	ts_headtab(TS *,int) ;
+static int	ts_filetopwrite(TS *,time_t) noex ;
+static int	ts_filetopread(TS *) noex ;
+static int	ts_fileverify(TS *) noex ;
+static int	ts_headtab(TS *,int) noex ;
 
-static int	ts_findname(TS *,const char *,int,char **) ;
-static int	ts_search(TS *,const char *,int,char **) ;
-static int	ts_readentry(TS *,int,char **) ;
+static int	ts_findname(TS *,cchar *,int,char **) noex ;
+static int	ts_search(TS *,cchar *,int,char **) noex ;
+static int	ts_readentry(TS *,int,char **) noex ;
 
 #if	CF_NISEARCH
-static int	ts_index(TS *,const char *,int,int) ;
+static int	ts_index(TS *,cchar *,int,int) noex ;
 #endif
 
-static int	ts_headwrite(TS *) ;
+static int	ts_headwrite(TS *) noex ;
 
-static int	namematch(const char *,const char *,int) ;
+static int	namematch(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -266,9 +266,7 @@ int ts_open(TS *op,cchar *fname,int oflags,mode_t operm) noex {
 }
 /* end subroutine (ts_open) */
 
-
-int ts_close(TS *op)
-{
+int ts_close(TS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -295,10 +293,8 @@ int ts_close(TS *op)
 }
 /* end subroutine (ts_close) */
 
-
 /* get a count of the number of entries */
-int ts_count(TS *op)
-{
+int ts_count(TS *op) noex {
 	int		rs = SR_OK ;
 	int		c ;
 
@@ -314,10 +310,9 @@ int ts_count(TS *op)
 }
 /* end subroutine (ts_count) */
 
-
 /* initialize a cursor */
-int ts_curbegin(TS *op,TS_CUR *cp)
-{
+int ts_curbegin(TS *op,TS_CUR *cp) noex {
+	int		rs = SR_OK ;
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
@@ -331,14 +326,12 @@ int ts_curbegin(TS *op,TS_CUR *cp)
 	op->f.cursorlockbroken = false ;
 	op->f.cursoracc = false ;
 	cp->i = -1 ;
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (ts_curbegin) */
 
-
 /* free up a cursor */
-int ts_curend(TS *op,TS_CUR *cp)
-{
+int ts_curend(TS *op,TS_CUR *cp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	time_t		dt = 0 ;
@@ -369,12 +362,10 @@ int ts_curend(TS *op,TS_CUR *cp)
 }
 /* end subroutine (ts_curend) */
 
-
 /* enumerate the entries */
-int ts_enum(TS *op,TS_CUR *curp,TS_ENT *ep)
-{
+int ts_enum(TS *op,TS_CUR *curp,TS_ENT *ep) noex {
+	cint		ebs = TS_ENTSIZE ;
 	time_t		dt = 0 ;
-	const int	ebs = TS_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		ei ;
 	char		*bp ;
@@ -419,16 +410,9 @@ ret0:
 }
 /* end subroutine (ts_enum) */
 
-
 /* match on a key-name */
-int ts_match(op,dt,nnp,nnl,ep)
-TS		*op ;
-time_t		dt ;
-const char	nnp[] ;
-int		nnl ;
-TS_ENT	*ep ;
-{
-	const int	ebs = TS_ENTSIZE ;
+int ts_match(TS *op,time_t dt,cchar *nnp,int nnl,TS_ENT *ep) noex {
+	cint		ebs = TS_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		ei = 0 ;
@@ -484,17 +468,9 @@ ret0:
 }
 /* end subroutine (ts_match) */
 
-
 /* write an entry (match on a key-name) */
-int ts_write(op,dt,nnp,nnl,ep)
-TS		*op ;
-time_t		dt ;
-const char	nnp[] ;
-int		nnl ;
-TS_ENT	*ep ;
-{
-	const int	ebs = TS_ENTSIZE ;
-
+int ts_write(TS *op,time_t dt,cchar *nnp,int nnl,RS_ENT *ep) noex {
+	cint		ebs = TS_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		ei ;
@@ -621,21 +597,16 @@ ret0:
 }
 /* end subroutine (ts_write) */
 
-
 /* update an entry */
-int ts_update(op,dt,ep)
-TS		*op ;
-time_t		dt ;
-TS_ENT		*ep ;
-{
-	const int	ebs = TS_ENTSIZE ;
+int ts_update(TS *op,time_t dt,TS_ENT *ep) noex {
+	cint		ebs = TS_ENTSIZE ;
 
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nnl ;
 	int		ei ;
 	int		f_newentry = false ;
-	const char	*nnp ;
+	cchar	*nnp ;
 	char		ebuf[TS_ENTSIZE + 2] ;
 	char		*bp ;
 
@@ -748,10 +719,8 @@ bad0:
 }
 /* end subroutine (ts_update) */
 
-
 /* do some checking */
-int ts_check(TS *op,time_t dt)
-{
+int ts_check(TS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 
@@ -779,13 +748,7 @@ int ts_check(TS *op,time_t dt)
 
 /* private subroutines */
 
-
-static int ts_findname(op,nnp,nnl,rpp)
-TS		*op ;
-const char	*nnp ;
-int		nnl ;
-char		**rpp ;
-{
+static int ts_findname(TS *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs ;
 	int		ei = 0 ;
 	char		*bp = nullptr ;
@@ -829,15 +792,9 @@ char		**rpp ;
 }
 /* end subroutine (ts_findname) */
 
-
 /* search for an entry */
-static int ts_search(op,nnp,nnl,rpp)
-TS		*op ;
-const char	nnp[] ;
-int		nnl ;
-char		**rpp ;
-{
-	const int	ebs = TS_ENTSIZE ;
+static int ts_search(TS *op,cchar *nnp,int nnl,char **rpp) noex {
+	cint		ebs = TS_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		ne, ei ;
@@ -892,14 +849,8 @@ char		**rpp ;
 }
 /* end subroutine (ts_search) */
 
-
-static int ts_acquire(op,dt,f_read)
-TS		*op ;
-int		f_read ;
-time_t		dt ;
-{
-	const int	ebs = TS_ENTSIZE ;
-
+static int ts_acquire(TS *op,time_t dt,int f_read) noex {
+	cint		ebs = TS_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 	int		f ;
@@ -935,12 +886,8 @@ time_t		dt ;
 }
 /* end subroutine (ts_acquire) */
 
-
 /* initialize the file header (either read it only or write it) */
-static int ts_filebegin(op,dt)
-TS		*op ;
-time_t		dt ;
-{
+static int ts_filebegin(TS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_locked = false ;
 	int		f ;
@@ -997,19 +944,13 @@ time_t		dt ;
 
 /* we're out of here */
 ret0:
-
 	return rs ;
 }
 /* end subroutine (ts_filebegin) */
 
-
-static int ts_filecheck(op,dt)
-TS		*op ;
-time_t		dt ;
-{
+static int ts_filecheck(TS *op,time_t dt) noex {
 	int	rs = SR_OK ;
 	int	f_changed = false ;
-
 
 	if (op->filesize < TS_TABOFF) {
 
@@ -1031,18 +972,11 @@ time_t		dt ;
 	    }
 
 	} /* end if */
-
-/* we're out of here */
-ret0:
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (ts_filecheck) */
 
-
-static int ts_filetopwrite(op,dt)
-TS		*op ;
-time_t		dt ;
-{
+static int ts_filetopwrite(TS *op,time_t dt) noex {
 	off_t	poff ;
 
 	int	rs = SR_OK ;
@@ -1088,16 +1022,10 @@ ret0:
 }
 /* end subroutine (ts_filetopwrite) */
 
+static int ts_filetopread(TS *op) noex {
+	const off_t	poff = 0L ;
+	int		rs ;
 
-static int ts_filetopread(op)
-TS		*op ;
-{
-	off_t	poff ;
-
-	int	rs ;
-
-
-	poff = 0L ;
 	rs = u_pread(op->fd,op->topbuf,TS_TOPLEN,poff) ;
 	op->topsize = rs ;
 
@@ -1148,15 +1076,10 @@ ret0:
 }
 /* end subroutine (ts_fileverify) */
 
-
 /* read or write the file header */
-static int ts_headtab(op,f_read)
-TS		*op ;
-int		f_read ;
-{
+static int ts_headtab(TS *op,int f_read) noex {
 	int	rs = SR_OK ;
 	int	f_changed = false ;
-
 	char	*bp = (op->topbuf + TS_HEADTABOFF) ;
 
 
@@ -1197,13 +1120,8 @@ int		f_read ;
 }
 /* end subroutine (ts_headtab) */
 
-
 /* acquire access to the file */
-static int ts_lockget(op,dt,f_read)
-TS		*op ;
-int		f_read ;
-time_t		dt ;
-{
+static int ts_lockget(TS *op,time_t dt,int f_read) noex {
 	USTAT	sb ;
 
 	int	rs = SR_OK ;
@@ -1321,12 +1239,8 @@ bad0:
 }
 /* end subroutine (ts_lockget) */
 
-
-static int ts_lockrelease(op)
-TS		*op ;
-{
+static int ts_lockrelease(TS *op) noex {
 	int	rs = SR_OK ;
-
 
 	if ((op->f.lockedread || op->f.lockedwrite)) {
 
@@ -1356,11 +1270,7 @@ TS		*op ;
 }
 /* end subroutine (ts_lockrelease) */
 
-
-static int ts_fileopen(op,dt)
-TS		*op ;
-time_t		dt ;
-{
+static int ts_fileopen(TS *op,time_t dt) noex {
 	int	rs = SR_OK ;
 	int	oflags ;
 	int	f_created = false ;
@@ -1401,13 +1311,9 @@ ret0:
 }
 /* end subroutine (ts_fileopen) */
 
-
-int ts_fileclose(op)
-TS		*op ;
-{
+int ts_fileclose(TS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
 
 	if (op->f.ebuf) {
 	    rs1 = ts_ebuffinish(op) ;
@@ -1513,16 +1419,10 @@ ret0:
 #if	CF_NISEARCH
 
 /* add to the name-index if necessary */
-static int ts_index(op,np,nl,ei)
-TS		*op ;
-const char	nodename[] ;
-int		nl ;
-int		ei ;
-{
+static int ts_index(TS *op,cchar *np,int nl,int ei) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	ei2 ;
-
 
 	if (nl < 0)
 	    nl = strlen(np) ;
@@ -1530,21 +1430,13 @@ int		ei ;
 	        rs1 = mapstrint_fetch(&op->ni,np,nl,nullptr,&ei2) ;
 
 	        if ((rs1 >= 0) && (ei != ei2)) {
-
 	            rs1 = SR_NOTFOUND ;
 	            mapstrint_delkey(&op->ni,np,nl) ;
-
 	        }
 
 	        if (rs1 == SR_NOTFOUND) {
-
-	            int	nl2 ;
-
-
-	            nl2 = strnlen(np,TSE_LKEYNAME) ;
-
+	            int		nl2 = strnlen(np,TSE_LKEYNAME) ;
 	            mapstrint_add(&op->ni,np,nl2,ei) ;
-
 	        } /* end if (not found) */
 
 	return rs ;
@@ -1553,48 +1445,26 @@ int		ei ;
 
 #endif /* CF_NISEARCH */
 
-
-static int ts_headwrite(op)
-TS		*op ;
-{
-	off_t	poff ;
-
+static int ts_headwrite(TS *op) noex {
 	int	rs ;
 	int	toff = TS_TABOFF ;
 	int	htoff = TS_HEADTABOFF ;
-	int	bl ;
-
-	const char	*bp ;
-
-
-	rs = ts_headtab(op,0) ;	/* format into buffer */
-
-	if (rs >= 0) {
-	    bp = (op->topbuf + htoff) ;
-	    bl = (toff - htoff) ;
-	    poff = htoff ;
+	if ((rs = ts_headtab(op,0)) >= 0) {
+	    cchar	*bp = (op->topbuf + htoff) ;
+	    cint	bl = (toff - htoff) ;
+	    coff	poff = htoff ;
 	    rs = u_pwrite(op->fd,bp,bl,poff) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (ts_headwrite) */
 
-
-static int namematch(np,nnp,nnl)
-const char	np[] ;
-const char	nnp[] ;
-int		nnl ;
-{
+static int namematch(cc *np,cc *nnp,int nnl) noex {
 	int	f = false ;
-
-	if (nnl > TSE_LKEYNAME)
-	    goto ret0 ;
-
+	if (nnl <= TSE_LKEYNAME) {
 	f = (strncmp(np,nnp,nnl) == 0) ;
 	f = f && (np[nnl] == '\0') ;
-
-ret0:
+	}
 	return f ;
 }
 /* end subroutine (namematch) */

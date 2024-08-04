@@ -27,7 +27,7 @@
 #define	TS			struct ts_head
 #define	TS_FL			struct ts_flags
 #define	TS_CUR			struct ts_cursor
-#define	TS_H			struct ts_h
+#define	TS_HDR			struct ts_header
 #define	TS_ENT			TSE_ALL
 
 #define	TS_FILEMAGIC		"TIMESTAMP"
@@ -45,7 +45,7 @@
 #define	TS_FPMAVAIL		0x04	/* flag-percent_memory_available */
 
 
-struct ts_h {
+struct ts_header {
 	uint		nentries ;
 	uint		wtime ;
 	uint		wcount ;
@@ -70,7 +70,7 @@ struct ts_head {
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
-	TS_H		h ;
+	TS_HDR		h ;
 	TS_FL		f ;
 	uint		magic ;
 	int		oflags ;
@@ -84,13 +84,13 @@ struct ts_head {
 	char		topbuf[TS_TOPLEN + 1] ;	/* top-buffer */
 } ;
 
-struct ts_c {
+struct ts_cursor {
 	int		i ;
 } ;
 
 typedef	TS		ts ;
 typedef	TS_FL		ts_fl ;
-typedef	TS_H		ts_h ;
+typedef	TS_HDR		ts_hdr ;
 typedef	TS_CUR		ts_cur ;
 typedef	TS_ENT		ts_ent ;
 
