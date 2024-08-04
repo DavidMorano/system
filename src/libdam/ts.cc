@@ -130,14 +130,18 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |getpagesize(3c)| */
 #include	<fcntl.h>
 #include	<climits>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cinttypes>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<new>
 #include	<usystem.h>
+#include	<sysval.hh>
+#include	<getbufsize.h>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<mapstrint.h>
@@ -174,6 +178,15 @@
 #define	TO_LOCK		30		/* seconds */
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -184,6 +197,56 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static int ts_ctor(ts *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    ts_head	*hop = op ;
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->ebmp = new(nothrow) ebuf) != np) {
+	        if ((op->nip = new(nothrow) mapstrint) != np) {
+		    op->pagesize = getpagesize() ;
+		    rs = SR_OK ;
+		} /* end if (new-mapstrint) */
+		if (rs < 0) {
+		    delete op->ebmp ;
+		    op->ebmp = nullptr ;
+		}
+	    } /* end if (new-ebuf) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (ts_ctor) */
+
+static int ts_dtor(ts *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->nip) {
+		delete op->nip ;
+		op->nip = nullptr ;
+	    }
+	    if (op->ebmp) {
+		delete op->ebmp ;
+		op->ebmp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (ts_dtor) */
+
+template<typename ... Args>
+static inline int ts_magic(ts *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (ts_magic) */
 
 static int	ts_fileopen(ts *,time_t) noex ;
 static int	ts_fileclose(ts *) noex ;
@@ -219,6 +282,7 @@ static int	namematch(cchar *,cchar *,int) noex ;
 constexpr int		toplen = TS_TOPLEN ;
 constexpr int		taboff = TS_TABOFF ;
 constexpr int		entsize = TS_ENTSIZE ;
+constexpr int		nidxent = TS_NIDXENT ;
 
 
 /* exported variables */
@@ -230,18 +294,10 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	time_t		dt = time(nullptr) ;
 	int		rs ;
 	int		f_created = false ;
+	if ((rs = ts_ctor(op,fname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
 	cchar		*cp ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-#endif /* CF_SAFE */
-
-	if (fname == nullptr) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	op->pagesize = getpagesize() ;
 	op->fd = -1 ;
 	op->oflags = oflags ;
 	op->operm = operm ;
@@ -255,7 +311,7 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 /* try to open the file */
 	    if ((rs = ts_fileopen(op,dt)) >= 0) {
 		if ((rs = ts_filebegin(op,dt)) >= 0) {
-		    if ((rs = mapstrint_start(&op->ni,TS_NIDXENT)) >= 0) {
+		    if ((rs = mapstrint_start(op->nip,nidxent)) >= 0) {
 			op->magic = TS_MAGIC ;
 		    }
 		}
@@ -269,33 +325,38 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	    }
 	}
 
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		ts_dtor(op) ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? f_created : rs ;
 }
 /* end subroutine (ts_open) */
 
 int ts_close(ts *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	rs1 = mapstrint_finish(&op->ni) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = ts_fileclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fname != nullptr) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = ts_magic(op)) >= 0) {
+	    {
+	        rs1 = mapstrint_finish(op->nip) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ts_fileclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    {
+		rs1 = ts_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ts_close) */
@@ -529,7 +590,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 
 	    tse_all(&ew,0,bp,entsize) ;
 
-	    rs = ebuf_write(&op->ebm,ei,nullptr) ; /* sync */
+	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 
 	} else if (rs == SR_NOTFOUND) {
 	    ts_ent	ew ;
@@ -553,7 +614,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    tse_all(&ew,0,ebuf,entsize) ;
 
 	    ei = op->h.nentries ;
-	    rs = ebuf_write(&op->ebm,ei,ebuf) ;
+	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
 
 	} /* end if (existing or new entry) */
 
@@ -572,7 +633,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	        op->filesize += entsize ;
 	    }
 	    if ((rs = ts_headwrite(op)) >= 0) {
-		rs = ebuf_sync(&op->ebm) ;
+		rs = ebuf_sync(op->ebmp) ;
 	    }
 
 	} /* end if (updating header-table) */
@@ -646,7 +707,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	    ew.count += 1 ;
 	    tse_all(&ew,0,bp,entsize) ;
 
-	    rs = ebuf_write(&op->ebm,ei,nullptr) ; /* sync */
+	    rs = ebuf_write(op->ebmp,ei,nullptr) ; /* sync */
 
 	} else if (rs == SR_NOTFOUND) {
 	    ts_ent	ew = *ep ;
@@ -660,7 +721,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	    tse_all(&ew,0,ebuf,entsize) ;
 
 	    ei = op->h.nentries ;
-	    rs = ebuf_write(&op->ebm,ei,ebuf) ;
+	    rs = ebuf_write(op->ebmp,ei,ebuf) ;
 
 	} /* end if (entry update) */
 
@@ -681,7 +742,7 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	    rs = ts_headwrite(op) ;
 
 	    if (rs >= 0)
-		rs = ebuf_sync(&op->ebm) ;
+		rs = ebuf_sync(op->ebmp) ;
 
 	} /* end if (updating header-table) */
 
@@ -740,11 +801,11 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	char		*bp = nullptr ;
 	char		*np ;
 
-	rs = mapstrint_fetch(&op->ni,nnp,nnl,nullptr,&ei) ;
+	rs = mapstrint_fetch(op->nip,nnp,nnl,nullptr,&ei) ;
 
 	if (rs >= 0) {
 
-	    rs = ebuf_read(&op->ebm,ei,&bp) ;
+	    rs = ebuf_read(op->ebmp,ei,&bp) ;
 
 	    if (rs > 0) {
 
@@ -752,7 +813,7 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	        if (! namematch(np,nnp,nnl)) {
 
 	            rs = SR_NOTFOUND ;
-	            mapstrint_delkey(&op->ni,nnp,nnl) ;
+	            mapstrint_delkey(op->nip,nnp,nnl) ;
 
 	        } /* end if */
 
@@ -766,7 +827,7 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	    rs = ts_search(op,nnp,nnl,&bp) ;
 	    ei = rs ;
 	    if (rs >= 0) {
-	        rs = mapstrint_add(&op->ni,nnp,nnl,ei) ;
+	        rs = mapstrint_add(op->nip,nnp,nnl,ei) ;
 	    }
 
 	} /* end if */
@@ -795,7 +856,7 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	f_found = false ;
 	while ((rs >= 0) && (! f_found)) {
 
-	    rs = ebuf_read(&op->ebm,ei,&bp) ;
+	    rs = ebuf_read(op->ebmp,ei,&bp) ;
 	    ne = rs ;
 
 	    if (rs <= 0)
@@ -861,7 +922,7 @@ static int ts_acquire(ts *op,time_t dt,int f_read) noex {
 	        f_changed = f_changed || (rs > 0) ;
 	        if ((rs >= 0) && f_changed) {
 		    int n = (op->filesize - toplen) / entsize ;
-	            rs = ebuf_invalidate(&op->ebm,n) ;
+	            rs = ebuf_invalidate(op->ebmp,n) ;
 		}
 	    }
 	} /* end if (need lock) */
@@ -1330,7 +1391,7 @@ static int ts_ebufstart(ts *op) noex {
 		cint		esize = TS_ENTSIZE ;
 		cint		nways = TS_NWAYS ;
 		cint		n = TS_NEPW ;
-		rs = ebuf_start(&op->ebm,op->fd,soff,esize,nways,n) ;
+		rs = ebuf_start(op->ebmp,op->fd,soff,esize,nways,n) ;
 		op->f.ebuf = (rs >= 0) ;
 	    } else {
 		rs = SR_NOANODE ;
@@ -1345,7 +1406,7 @@ static int ts_ebuffinish(ts *op) noex {
 	int		rs1 ;
 	if (op->f.ebuf) {
 	    op->f.ebuf = false ;
-	    rs1 = ebuf_finish(&op->ebm) ;
+	    rs1 = ebuf_finish(op->ebmp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -1356,7 +1417,7 @@ static int ts_readentry(ts *op,int ei,char **rpp) noex {
 	int		rs ;
 	char		*bp ;
 
-	rs = ebuf_read(&op->ebm,ei,&bp) ;
+	rs = ebuf_read(op->ebmp,ei,&bp) ;
 	if (rs < 0) goto ret0 ;
 
 	if (rs == 0) rs = SR_NOTFOUND ;
@@ -1396,16 +1457,16 @@ static int ts_index(ts *op,cchar *np,int nl,int ei) noex {
 	if (nl < 0)
 	    nl = strlen(np) ;
 
-	        rs1 = mapstrint_fetch(&op->ni,np,nl,nullptr,&ei2) ;
+	        rs1 = mapstrint_fetch(op->nip,np,nl,nullptr,&ei2) ;
 
 	        if ((rs1 >= 0) && (ei != ei2)) {
 	            rs1 = SR_NOTFOUND ;
-	            mapstrint_delkey(&op->ni,np,nl) ;
+	            mapstrint_delkey(op->nip,np,nl) ;
 	        }
 
 	        if (rs1 == SR_NOTFOUND) {
 	            int		nl2 = strnlen(np,TSE_LKEYNAME) ;
-	            mapstrint_add(&op->ni,np,nl2,ei) ;
+	            mapstrint_add(op->nip,np,nl2,ei) ;
 	        } /* end if (not found) */
 
 	return rs ;

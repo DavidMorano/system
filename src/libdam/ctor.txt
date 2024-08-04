@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int svcentry_ctor(svcentry *op,Args ... args) noex {
+static int ts_ctor(ts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int svcentry_ctor(svcentry *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (svcentry_ctor) */
+/* end subroutine (ts_ctor) */
 
-static int svcentry_dtor(svcentry *op) noex {
+static int ts_dtor(ts *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (svcentry_dtor) */
+/* end subroutine (ts_dtor) */
 
 template<typename ... Args>
-static inline int svcentry_magic(svcentry *op,Args ... args) noex {
+static inline int ts_magic(ts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SVCENTRY_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (svcentry_magic) */
+/* end subroutine (ts_magic) */

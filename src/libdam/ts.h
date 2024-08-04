@@ -65,8 +65,8 @@ struct ts_flags {
 
 struct ts_head {
 	cchar		*fname ;
-	ebuf		ebm ;			/* entry-buffer-manager */
-	mapstrint	ni ;			/* nodename index */
+	ebuf		*ebmp ;			/* entry-buffer-manager */
+	mapstrint	*nip ;			/* nodename index */
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
