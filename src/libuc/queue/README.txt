@@ -6,9 +6,9 @@ This directory contains queue-type objects.
 fifostr		FIFO object for strings, stores data
 fsi		FIFO object for strings, stores data, thread-safe
 fifoitem	FIFO object for variable sized items
-slq		Q: pointer, relo, single
-piq		Q: pointer, relo, double, count, magic, thread
+slq		Q: doubly linked circular pointer queue (not relocatable)
 plainq		Q: self-rel, relo, double, count, magic
+piq		Q: pointer, relo, double, count, magic, thread
 q		Q: self-rel, relo, double, count, thread
 aiq		Q: self-rel, relo, double, count, magic, thread, async
 pq		Q: pointer, relo, double, count, not-circular

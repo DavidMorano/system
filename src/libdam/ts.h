@@ -99,7 +99,7 @@ EXTERNC_begin
 extern int ts_open(ts *,cchar *,int,mode_t) noex ;
 extern int ts_curbegin(ts *,ts_cur *) noex ;
 extern int ts_curend(ts *,ts_cur *) noex ;
-extern int ts_enum(ts *,ts_cur *,ts_ent *) noex ;
+extern int ts_curenum(ts *,ts_cur *,ts_ent *) noex ;
 extern int ts_match(ts *,time_t,cchar *,int,ts_ent *) noex ;
 extern int ts_write(ts *,time_t,cchar *,int,ts_ent *) noex ;
 extern int ts_update(ts *,time_t,ts_ent *) noex ;

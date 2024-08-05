@@ -1,7 +1,7 @@
-/* slq SUPPORT */
+/* dpq SUPPORT */
 /* lang=C++20 */
 
-/* Circular-Pointer-Queue - regular (no-frills) pointer queue */
+/* Double-Pointer-Queue - regular (no-frills) double circular pointer queue */
 /* version %I% last-modified %G% */
 
 
@@ -17,23 +17,37 @@
 /*******************************************************************************
 
 	This is a regular, pointer based, no-frills circular doubly
-	linked list queue. Note that this object CANNOT be moved
+	linked list queue.  Note that this object CANNOT be moved
 	(copied) since there may be pointers pointing back at the
 	list head (located in the object).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
 
-#include	"slq.h"
+#include	"dpq.h"
+
+
+/* local defines */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int slq_start(slq *op) noex {
+int dpq_start(dpq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -42,9 +56,9 @@ int slq_start(slq *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_start) */
+/* end subroutine (dpq_start) */
 
-int slq_finish(slq *op) noex {
+int dpq_finish(dpq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -53,15 +67,15 @@ int slq_finish(slq *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_finish) */
+/* end subroutine (dpq_finish) */
 
-int slq_ins(slq *op,slq_ent *ep) noex {
+int dpq_ins(dpq *op,dpq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	if (op && ep) {
 	    ep->next = nullptr ;
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
-	        slq_ent		*pep = op->tail ;
+	        dpq_ent		*pep = op->tail ;
 		pep->next = ep ;
 	        op->tail = ep ;
 	    } else {
@@ -75,9 +89,9 @@ int slq_ins(slq *op,slq_ent *ep) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_ins) */
+/* end subroutine (dpq_ins) */
 
-int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
+int dpq_insgroup(dpq *op,void *vp,int esz,int n) noex {
 	caddr_t		ca = caddr_t(vp) ;
 	int		rs = SR_FAULT ;
 	if (op && ca) {
@@ -85,22 +99,22 @@ int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
 	    if (esz > 0) {
 	        rs = SR_OK ;
 	        for (int i = 0 ; (rs == SR_OK) && (i < n) ; i += 1) {
-		    slq_ent	*ep = (slq_ent *) ca ;
-		    rs = slq_ins(op,ep) ;
+		    dpq_ent	*ep = (dpq_ent *) ca ;
+		    rs = dpq_ins(op,ep) ;
 		    ca += esz ;
 	        } /* end for */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_insgroup) */
+/* end subroutine (dpq_insgroup) */
 
-int slq_rem(slq *op,slq_ent **epp) noex {
+int dpq_rem(dpq *op,dpq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	if (op && epp) {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
-	        slq_ent		*hep = op->head ;
+	        dpq_ent		*hep = op->head ;
 	        *epp = hep ;
 		op->head = hep->next ;
 	    } else {
@@ -113,9 +127,9 @@ int slq_rem(slq *op,slq_ent **epp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_rem) */
+/* end subroutine (dpq_rem) */
 
-int slq_gettail(slq *op,slq_ent **epp) noex {
+int dpq_gettail(dpq *op,dpq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	if (op && epp) {
 	    rs = SR_OK ;
@@ -131,9 +145,9 @@ int slq_gettail(slq *op,slq_ent **epp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_gettail) */
+/* end subroutine (dpq_gettail) */
 
-int slq_audit(slq *op) noex {
+int dpq_audit(dpq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -145,6 +159,6 @@ int slq_audit(slq *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (slq_audit) */
+/* end subroutine (dpq_audit) */
 
 

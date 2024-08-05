@@ -4,7 +4,6 @@
 /* time-stamp file manager */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		1		/* safer? */
 #define	CF_CREAT	0		/* always create the file? */
 #define	CF_LOCKF	0		/* use 'lockf(3c)' */
 #define	CF_SOLARISBUG	1		/* work around Solaris MMAP bug */
@@ -177,6 +176,10 @@
 #define	TO_ACCESS	(2 * 60)	/* maximum access idle time */
 #define	TO_LOCK		30		/* seconds */
 
+#ifndef	CF_CREAT
+#define	CF_CREAT	0		/* always create the file? */
+#endif
+
 
 /* imported namespaces */
 
@@ -284,6 +287,8 @@ constexpr int		taboff = TS_TABOFF ;
 constexpr int		entsize = TS_ENTSIZE ;
 constexpr int		nidxent = TS_NIDXENT ;
 
+constexpr bool		f_creat = CF_CREAT ;
+
 
 /* exported variables */
 
@@ -297,34 +302,32 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	if ((rs = ts_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	cchar		*cp ;
-	op->fd = -1 ;
-	op->oflags = oflags ;
-	op->operm = operm ;
+	        cchar		*cp ;
+	        op->fd = -1 ;
+	        op->oflags = oflags ;
+	        op->operm = operm ;
 
-#if	CF_CREAT
-	oflags |= O_CREAT ;
-#endif
-	oflags = (oflags & (~ O_TRUNC)) ;
-	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	    op->fname = cp ;
-/* try to open the file */
-	    if ((rs = ts_fileopen(op,dt)) >= 0) {
-		if ((rs = ts_filebegin(op,dt)) >= 0) {
-		    if ((rs = mapstrint_start(op->nip,nidxent)) >= 0) {
-			op->magic = TS_MAGIC ;
-		    }
+		if_constexpr (f_creat) {
+	            oflags |= O_CREAT ;
 		}
-		if (rs < 0) {
-		    ts_fileclose(op) ;
-		}
-	    }
-	    if (rs < 0) {
-	        uc_free(op->fname) ;
-	        op->fname = nullptr ;
-	    }
-	}
-
+	        oflags = (oflags & (~ O_TRUNC)) ;
+	        if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	            op->fname = cp ;
+	            if ((rs = ts_fileopen(op,dt)) >= 0) {
+		        if ((rs = ts_filebegin(op,dt)) >= 0) {
+		            if ((rs = mapstrint_start(op->nip,nidxent)) >= 0) {
+			        op->magic = TS_MAGIC ;
+		            }
+		        }
+		        if (rs < 0) {
+		            ts_fileclose(op) ;
+		        }
+	            }
+	            if (rs < 0) {
+	                uc_free(op->fname) ;
+	                op->fname = nullptr ;
+	            }
+	        } /* end if (mallocstr) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		ts_dtor(op) ;
@@ -361,121 +364,73 @@ int ts_close(ts *op) noex {
 }
 /* end subroutine (ts_close) */
 
-/* get a count of the number of entries */
 int ts_count(ts *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		c ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	c = (op->filesize - taboff) / entsize ;
-
+	if ((rs = ts_magic(op)) >= 0) {
+	    c = (op->filesize - taboff) / entsize ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (ts_count) */
 
-/* initialize a cursor */
-int ts_curbegin(ts *op,ts_cur *cp) noex {
-	int		rs = SR_OK ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (cp == nullptr) return SR_FAULT ;
-
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	op->ncursors += 1 ;
-
-	op->f.cursorlockbroken = false ;
-	op->f.cursoracc = false ;
-	cp->i = -1 ;
+int ts_curbegin(ts *op,ts_cur *curp) noex {
+	int		rs ;
+	if ((rs = ts_magic(op,curp)) >= 0) {
+	    op->ncursors += 1 ;
+	    op->f.cursorlockbroken = false ;
+	    op->f.cursoracc = false ;
+	    curp->i = -1 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ts_curbegin) */
 
-/* free up a cursor */
-int ts_curend(ts *op,ts_cur *cp) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
+int ts_curend(ts *op,ts_cur *curp) noex {
 	time_t		dt = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (cp == nullptr) return SR_FAULT ;
-
-	if (op->f.cursoracc) {
-	    dt = time(nullptr) ;
-	    op->ti_access = dt ;
-	} /* end if */
-
-	if (op->ncursors > 0)
-	    op->ncursors -= 1 ;
-
-	if ((op->ncursors == 0) && (op->f.lockedread || op->f.lockedwrite)) {
-	    rs1 = ts_lockrelease(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	cp->i = -1 ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = ts_magic(op,curp)) >= 0) {
+	    bool	f = true ;
+	    if (op->f.cursoracc) {
+	        dt = time(nullptr) ;
+	        op->ti_access = dt ;
+	    } /* end if */
+	    if (op->ncursors > 0) {
+	        op->ncursors -= 1 ;
+	    }
+	    f = f && (op->ncursors == 0) ;
+	    f = f && (op->f.lockedread || op->f.lockedwrite) ;
+	    if (f) {
+	        rs1 = ts_lockrelease(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    curp->i = -1 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ts_curend) */
 
-/* enumerate the entries */
-int ts_enum(ts *op,ts_cur *curp,ts_ent *ep) noex {
-	time_t		dt = 0 ;
-	int		rs = SR_OK ;
-	int		ei ;
-	char		*bp ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (dt == 0) dt = time(nullptr) ;
-
-	rs = ts_acquire(op,dt,1) ;
-
-	if (rs < 0)
-	     goto ret0 ;
-
-/* OK, give an entry back to caller */
-
-	ei = (curp->i < 0) ? 0 : curp->i + 1 ;
-
-	rs = ts_readentry(op,ei,&bp) ;
-
-/* copy entry to caller buffer */
-
-	if ((rs >= 0) && (ep != nullptr) && (bp != nullptr)) {
-	    rs = tse_all(ep,1,bp,entsize) ;
-	} /* end if */
-
-/* commit the cursor movement? */
-
-	if (rs >= 0)
-	    curp->i = ei ;
-
-	op->f.cursoracc = true ;
-
-ret0:
-
+int ts_curenum(ts *op,ts_cur *curp,ts_ent *ep) noex {
+	int		rs ;
+	int		ei = 0 ;
+	if ((rs = ts_magic(op,curp)) >= 0) {
+	    time_t	dt = 0 ;
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((rs = ts_acquire(op,dt,1)) >= 0) {
+	        char	*bp ;
+	        ei = (curp->i < 0) ? 0 : curp->i + 1 ;
+	        rs = ts_readentry(op,ei,&bp) ;
+	        if ((rs >= 0) && (ep != nullptr) && (bp != nullptr)) {
+	            rs = tse_all(ep,1,bp,entsize) ;
+	        } /* end if */
+	        if (rs >= 0) curp->i = ei ;
+	        op->f.cursoracc = true ;
+	    } /* end if (acquire) */
+	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
-/* end subroutine (ts_enum) */
+/* end subroutine (ts_curenum) */
 
 /* match on a key-name */
 int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
@@ -484,11 +439,8 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	int		ei = 0 ;
 	char		*bp ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
 
 	if (nnp == nullptr) return SR_FAULT ;
 
@@ -540,11 +492,8 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	int		f_newentry = false ;
 	char		*bp ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
 
 	if (nnp == nullptr) return SR_FAULT ;
 
@@ -668,11 +617,8 @@ int ts_update(ts *op,time_t dt,ts_ent *ep) noex {
 	char		ebuf[TS_ENTSIZE + 2] ;
 	char		*bp ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
 
 	if (ep == nullptr) return SR_FAULT ;
 
@@ -758,8 +704,9 @@ ret2:
 	if (op->ncursors == 0) {
 	    if (dt == 0) dt = time(nullptr) ;
 	    op->ti_access = dt ;
-	} else
+	} else {
 	    op->f.cursoracc = true ;
+	}
 
 ret0:
 	return (rs >= 0) ? ei : rs ;
@@ -768,26 +715,20 @@ ret0:
 
 /* do some checking */
 int ts_check(ts *op,time_t dt) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = false ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (op->fd < 0) return SR_OK ;
-
-	if ((! op->f.lockedread) && (! op->f.lockedwrite)) {
-	    if (dt == 0) dt = time(nullptr) ;
-	    f = ((dt - op->ti_access) >= TO_ACCESS) ;
-	    f = f || ((dt - op->ti_open) >= TO_OPEN) ;
-	    if (f) {
-	        rs = ts_fileclose(op) ;
-	    }
-	}
-
+	if ((rs = ts_magic(op)) >= 0) {
+	    if (op->fd >= 0) {
+	        if ((! op->f.lockedread) && (! op->f.lockedwrite)) {
+	            if (dt == 0) dt = time(nullptr) ;
+	            f = ((dt - op->ti_access) >= TO_ACCESS) ;
+	            f = f || ((dt - op->ti_open) >= TO_OPEN) ;
+	            if (f) {
+	                rs = ts_fileclose(op) ;
+	            }
+	        }
+	    } /* end if (file-desc) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ts_check) */
@@ -796,45 +737,27 @@ int ts_check(ts *op,time_t dt) noex {
 /* private subroutines */
 
 static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		ei = 0 ;
 	char		*bp = nullptr ;
-	char		*np ;
-
-	rs = mapstrint_fetch(op->nip,nnp,nnl,nullptr,&ei) ;
-
-	if (rs >= 0) {
-
-	    rs = ebuf_read(op->ebmp,ei,&bp) ;
-
-	    if (rs > 0) {
-
-	        np = bp + TSE_OKEYNAME ;
-	        if (! namematch(np,nnp,nnl)) {
-
+	if ((rs = mapstrint_fetch(op->nip,nnp,nnl,np,&ei)) >= 0) {
+	    if ((rs = ebuf_read(op->ebmp,ei,&bp)) > 0) {
+	        cchar	*sp = bp + TSE_OKEYNAME ;
+	        if (! namematch(sp,nnp,nnl)) {
 	            rs = SR_NOTFOUND ;
 	            mapstrint_delkey(op->nip,nnp,nnl) ;
-
 	        } /* end if */
-
-	    } else
-	        rs = SR_NOTFOUND ;
-
-	} /* end if (was in the index) */
-
-	if (rs == SR_NOTFOUND) {
-
-	    rs = ts_search(op,nnp,nnl,&bp) ;
-	    ei = rs ;
-	    if (rs >= 0) {
-	        rs = mapstrint_add(op->nip,nnp,nnl,ei) ;
-	    }
-
-	} /* end if */
-
-	if (rpp != nullptr)
+	    } else {
+	        if ((rs = ts_search(op,nnp,nnl,&bp)) >= 0) {
+	            ei = rs ;
+	            rs = mapstrint_add(op->nip,nnp,nnl,ei) ;
+	        }
+	    } /* end if */
+	} /* end if (fetch) */
+	if (rpp) {
 	    *rpp = (rs >= 0) ? bp : nullptr ;
-
+	}
 	return (rs >= 0) ? ei : rs ;
 }
 /* end subroutine (ts_findname) */
@@ -843,32 +766,24 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs = SR_OK ;
 	int		i ;
-	int		ne, ei ;
-	int		f_found ;
-	char		*bp ;
-	char		*np = nullptr ;
+	int		ne = 0 ;
+	int		ei = 0 ;
+	int		f_found = false ;
+	char		*bp = nullptr ;
 
-	if (nnl < 0)
-	    nnl = strlen(nnp) ;
+	if (nnl < 0) nnl = strlen(nnp) ;
 
-	ei = 0 ;
-	ne = 0 ;
-	f_found = false ;
 	while ((rs >= 0) && (! f_found)) {
 
 	    rs = ebuf_read(op->ebmp,ei,&bp) ;
 	    ne = rs ;
-
-	    if (rs <= 0)
-	        break ;
+	    if (rs <= 0) break ;
 
 	    for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
 
-	        np = bp + TSE_OKEYNAME ;
-
+	        cchar	*sp = bp + TSE_OKEYNAME ;
 /* is this a match for what we want? */
-
-	        if (namematch(np,nnp,nnl)) {
+	        if (namematch(sp,nnp,nnl)) {
 		    f_found = true ;
 	            break ;
 		}
@@ -884,8 +799,9 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 
 	if (rs >= 0) {
 	    if ((ne != 0) && f_found) {
-		if (rpp != nullptr)
+		if (rpp) {
 		    *rpp = bp ;
+		}
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }

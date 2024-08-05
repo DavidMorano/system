@@ -61,7 +61,7 @@ OBJ0_QUEUE= plainq.o q.o aiq.o
 OBJ1_QUEUE= pq.o ciq.o piq.o
 OBJ2_QUEUE= cq.o
 OBJ3_QUEUE= charq.o chariq.o
-OBJ4_QUEUE= slq.o
+OBJ4_QUEUE= dpq.o fifostr.o
 
 OBJA_QUEUE= obj0_queue.o obj1_queue.o obj2_queue.o 
 OBJB_QUEUE= obj3_queue.o obj4_queue.o
@@ -136,8 +136,8 @@ obj4_queue.o:	$(OBJ4_QUEUE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_QUEUE)
 
 
-# single-link forward list-queue */
-slq.o:			slq.cc slq.h
+# double-pointer-queue (doubly linked circular pointer queue) */
+dpq.o:			dpq.cc dpq.h
 
 # self-relaltive
 plainq.o:		plainq.cc plainq.h
@@ -155,5 +155,8 @@ chariq.o:		chariq.cc chariq.h charq.h
 
 # container
 cq.o:			cq.cc cq.h
+
+# composite
+fifostr.o:		fifostr.cc fifostr.h
 
 

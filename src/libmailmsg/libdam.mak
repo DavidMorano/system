@@ -229,7 +229,7 @@ OBJ115=
 OBJ116= setint.o osetint.o setstr.o osetstr.o mapstrs.o
 OBJ117= msfile.o msfilee.o ebuf.o nodedb.o clusterdb.o kinfo.o
 OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o ema.o fsi.o
-OBJ119= q.o plainq.o cpq.o cq.o piq.o fifostr.o fifoitem.o charq.o intiq.o
+OBJ119= q.o plainq.o cq.o fifostr.o fifoitem.o charq.o intiq.o
 
 OBJ120= kvsfile.o paramfile.o strtab.o strstore.o svcfile.o querystr.o
 OBJ121= mailmsgmatenv.o mailmsgmathdr.o mailmsgfrom.o mailmsgstage.o
@@ -674,11 +674,8 @@ strmgr.o:		strmgr.c strmgr.h
 
 lookaside.o:		lookaside.c lookaside.h
 
-cpq.o:			cpq.c cpq.h
-
-intiq.o:		intiq.c intiq.h
-
-piq.o:			piq.c piq.h
+fsi.o:			fsi.cc fsi.h
+intiq.o:		intiq.cc intiq.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
 
@@ -823,273 +820,15 @@ strstore.o:		strstore.cc strstore.h
 
 userattr.o:		userattr.c userattr.h
 pwfile.o:		pwfile.c pwfile.h pwentry.h
+ts.o:			ts.cc ts.h
 
-ipasswd.o:		ipasswd.c ipasswd.h
-
-wordfill.o:		wordfill.c wordfill.h
-
-linefold.o:		linefold.c linefold.h
-
-tmstrs.o:		tmstrs.c tmstrs.h
-
-rmermsg.o:		rmermsg.c rmermsg.h
-
-modload.o:		modload.c modload.h
-
-dirseen.o:		dirseen.c dirseen.h
-
-dirseen_not.o:		dirseen_not.c dirseen.h
-
-sysmiscem.o:		sysmiscem.c sysmiscem.h
-
-sysmiscfh.o:		sysmiscfh.c sysmiscfh.h
-
-csem.o:			csem.c csem.h
-
-lockrw.o:		lockrw.c lockrw.h
-
-termnote.o:		termnote.c termnote.h
-
-dirlist.o:		dirlist.c dirlist.h
-
-finduid.o:		finduid.c finduid.h
-
-pwcache.o:		pwcache.c pwcache.h
-
-grcache.o:		grcache.c grcache.h
-
-gncache.o:		gncache.c gncache.h
-
-namecache.o:		namecache.c namecache.h
-
-useraccdb.o:		useraccdb.c useraccdb.h
-
-grmems.o:		grmems.c grmems.h
-
-termtrans.o:		termtrans.cc termtrans.h 
-
-termout.o:		termout.cc termout.h ansigr.h
-
-hdrdecode.o:		hdrdecode.cc hdrdecode.h 
-
-qpdecoder.o:		qpdecoder.cc qpdecoder.h char.h
-
-b64decoder.o:		b64decoder.cc b64decoder.h
-
-hexdecoder.o:		hexdecoder.cc hexdecoder.h 
-
-utf8decoder.o:		utf8decoder.cc utf8decoder.h 
-
-obuf.o:			obuf.cc obuf.h
-
-setint.o:		setint.cc setint.h
-
-osetint.o:		osetint.cc osetint.h
-
-osetstr.o:		osetstr.cc osetstr.h
-
-querystr.o:		querystr.cc querystr.h
-
-linehist.o:		linehist.cc linehist.h
-
-langstate.o:		langstate.cc langstate.h
-
-setstr.o:		setstr.c setstr.h
-
-mapstrs.o:		mapstrs.c mapstrs.h
-
-vsetstr.o:		vsetstr.c vsetstr.h
-
-setstr.o:		setstr.c setstr.h
-
-chartrans.o:		chartrans.c chartrans.h 
-
-uiconv.o:		uiconv.c uiconv.h 
-
-tmtime.o:		tmtime.c tmtime.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-tmpx_getrunlevel.o:	tmpx_getrunlevel.c tmpx.h
-
-tmpx_getuserlines.o:	tmpx_getuserlines.c tmpx.h
-
-tmpx_getsessions.o:	tmpx_getsessions.c tmpx.h
-
-envs.o:			envs.c envs.h
-
-envs_procxe.o:		envs_procxe.c envs.h
-
-envs_subs.o:		envs_subs.c envs.h
-
-pwi.o:			pwi.c pwi.h ipasswd.h
-
-thrcomm.o:		thrcomm.c thrcomm.h
-
-thrbase.o:		thrbase.c thrbase.h
-
-filecounts.o:		filecounts.c filecounts.h
-
-expcook.o:		expcook.c expcook.h
-
-sesmsg.o:		sesmsg.c sesmsg.h
-
-msgdata.o:		msgdata.c msgdata.h
-
-cachetime.o:		cachetime.c cachetime.h
-fsi.o:			fsi.cc fsi.h
-
-
-ids.o:			ids.c ids.h
-
-bcspec.o:		bcspec.c bcspec.h
-
-
-getax.o:		getax.c getax.h
-
-
-getdefzinfo.o:		getdefzinfo.c getdefzinfo.h
-
-snflags.o:		snflags.c snflags.h
-
-fsdirtreestat.o:	fsdirtreestat.c fsdirtree.h
-
-userinfo.o:		userinfo.cc userinfo.h
-
-getutmpterm.o:		getutmpterm.cc getutmpterm.h
-
-getsysmisc.o:		getsysmisc.c getsysmisc.h
-
-shellunder.o:		shellunder.c shellunder.h
-
-udomain.o:		udomain.c
-
-cpuspeed.o:		cpuspeed.c
-
-ncpu.o:			ncpu.c 
-
-rfile.o:		rfile.c incfile_rfilewrite.h
-
-mkuiname.o:		mkuiname.c userinfo.h
-
-mkuibang.o:		mkuibang.c userinfo.h
-
-newobj.o:		newobj.c newobj.h
-
-emainfo.o:		emainfo.c emainfo.h
-
-sysmemutil.o:		sysmemutil.c sysmemutil.h
-
-address.o:		address.c address.h
-
-
-incfile_rfilewrite.h:	rfilewrite
-	mkincfile rfilewrite
-
-pwentry.o:		pwentry.c pwentry.h
-
-getpwentry.o:		getpwentry.c getpwentry.h pwentry.h
-
-getxusername.o:		getxusername.c getxusername.h
-
-getpwlogname.o:		getpwlogname.c
-
-getlogname.o:		getlogname.c
-
-getloghost.o:		getloghost.c
-
-pwilookup.o:		pwilookup.c pwi.h
-
-dialtcp.o:		dialtcp.c
-
-dialtcpnls.o:		dialtcpnls.c
-
-dialtcpmux.o:		dialtcpmux.c
-
-dialudp.o:		dialudp.c
-
-dialticotsord.o:	dialticotsord.c
-
-dialticotsordnls.o:	dialticotsordnls.c
-
-dialuss.o:		dialuss.c
-
-dialussnls.o:		dialussnls.c
-
-dialussmux.o:		dialussmux.c
-
-dialusd.o:		dialusd.c
-
-mkuuid.o:		mkuuid.c mkuuid.h
-
-snfsflags.o:		snfsflags.c snflags.h
-
-snopenflags.o:		snopenflags.c snflags.h
-
-snpollflags.o:		snpollflags.c snflags.h
-
-snfilemode.o:		snfilemode.c snflags.h
-
-sntmtime.o:		sntmtime.c tmtime.h
-
-snmkuuid.o:		snmkuuid.c snmkuuid.h mkuuid.h
-
-calstrs.o:		calstrs.c calstrs.h
-
-findbit.o:		findbit.c findbit.h
-
-hasallunique.o:		hasallunique.cc
-
-isort.o:		isort.cc
-
-ctwords.o:		ctwords.cc ctwords.hh
-holidayer.o:		holidayer.cc holidayer.h
-connection.o:		connection.cc connection.h
-
-# UTILITY
-getostype.o:		getostype.cc getostype.h
-procse.o:		procse.cc procse.h
-
-# Internet (old)
-gethename.o:		gethename.cc gethename.h gethe.h
-getheaddr.o:		getheaddr.cc getheaddr.h gethe.h
-getheour.o:		getheour.cc  getheour.h  gethe.h
-
-
-unlinkd.o:		$(*)/$(@)
-	make -C $(*) up
-
-nifinfo.o:		$(*)/$(@)
-	make -C $(*) up
-
-belowincs:
-	makebelow upincs
-
-below:
-	makebelow
-
-# MAILALIS
-mailalias.o:		mailalias.dir
-mailalias.dir:
+dir:
 	makesubdir $@
 
-# STRLISTX
-strlistx.o:		strlistx.dir
-strlistx.dir:
+# IPAASWD
+ipasswd.o:		ipasswd.dir
+ipasswd.dir:
 	makesubdir $@
-
-
-
-# other targets
-
-T01= ipasswd
-
-T01OBJ= $(T01).o 
-
-$(T01).o:	$(T01).c $(T01).h
-
-$(T01).so:	$(T01OBJ)
-	$(LD) -G -o $@ $(T01OBJ) $(XLIBINFO)
 
 
 # testing
