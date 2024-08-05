@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2005 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	FIFOITEM_INCLUDE
 #define	FIFOITEM_INCLUDE
@@ -46,11 +46,11 @@ extern int fifoitem_finish(fifoitem *) noex ;
 extern int fifoitem_ins(fifoitem *,cvoid *,int) noex ;
 extern int fifoitem_rem(fifoitem *,void *,int) noex ;
 extern int fifoitem_count(fifoitem *) noex ;
-extern int fifoitem_enum(fifoitem *,fifoitem_cur *,cvoid **) noex ;
 extern int fifoitem_curbegin(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curend(fifoitem *,fifoitem_cur *) noex ;
-extern int fifoitem_del(fifoitem *,fifoitem_cur *) noex ;
-extern int fifoitem_fetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
+extern int fifoitem_curdel(fifoitem *,fifoitem_cur *) noex ;
+extern int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
+extern int fifoitem_curenum(fifoitem *,fifoitem_cur *,cvoid **) noex ;
 extern int fifoitem_finder(fifoitem *,cvoid *,int (*)(),cvoid **) noex ;
 
 EXTERNC_end
