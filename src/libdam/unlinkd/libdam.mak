@@ -825,6 +825,11 @@ ts.o:			ts.cc ts.h
 dir:
 	makesubdir $@
 
+# DATABASE
+database.o:		database.dir
+database.dir:
+	makesubdir $@
+
 # IPAASWD
 ipasswd.o:		ipasswd.dir
 ipasswd.dir:
