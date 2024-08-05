@@ -51,6 +51,7 @@ extern int fifoitem_curend(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curdel(fifoitem *,fifoitem_cur *) noex ;
 extern int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
 extern int fifoitem_curenum(fifoitem *,fifoitem_cur *,cvoid **) noex ;
+extern int fifoitem_del(fifoitem *) noex ;
 extern int fifoitem_finder(fifoitem *,cvoid *,int (*)(),cvoid **) noex ;
 
 EXTERNC_end

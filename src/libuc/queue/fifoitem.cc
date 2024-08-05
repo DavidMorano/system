@@ -97,8 +97,12 @@ int fifoitem_start(fifoitem *op) noex {
 int fifoitem_finish(fifoitem *op) noex {
 	int		rs ;
 	if ((rs = fifoitem_magic(op)) >= 0) {
-	    while ((rs = fifoitem_curdel(op,nullptr)) >= 0) ;
-	    if (rs == SR_NOTFOUND) rs = SR_OK ;
+	    if (op->head && op->tail) {
+	        while ((rs = fifoitem_del(op)) >= 0) ;
+		if (rs == SR_NOENT) rs = SR_OK ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -263,6 +267,34 @@ int fifoitem_count(fifoitem *op) noex {
 	return rs ;
 }
 /* end subroutine (fifoitem_count) */
+
+int fifoitem_del(fifoitem *op) noex {
+	int		rs ;
+	int		rs1 ;
+	int		n = 0 ;
+	if ((rs = fifoitem_magic(op)) >= 0) {
+	    rs = SR_NOTFOUND ;
+	    if (op->head && op->tail) {
+	        fifoitem_ent	*ep = op->head ;
+		rs = SR_OK ;
+	        op->head = ep->next ;
+	        {
+	            rs1 = entry_finish(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = uc_free(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        op->n -= 1 ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
+	    } /* end if (had entry) */
+	    n = op->n ;
+	} /* end if (magic) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (fifoitem_del) */
 
 int fifoitem_finder(fifoitem *op,cchar *s,cmpfun_f cmpfunc,cchar **rpp) noex {
 	int		rs ;
