@@ -1,4 +1,5 @@
-/* bvcitekey */
+/* bvcitekey HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,12 +12,14 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BVCITEKEY_INCLUDE
-#define	BVCITEKEY_INCLUDE	1
+#define	BVCITEKEY_INCLUDE
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	BVCITEKEY		struct bvcitekey_head
@@ -29,21 +32,15 @@ struct bvcitekey_head {
 	uchar		v ;
  } ;
 
+typedef BVCITEKEY	bvcitekey ;
 
-#if	(! defined(BVCITEKEY_MASTER)) || (BVCITEKEY_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	bvcitekey_set(bvcitekey *,uint *) noex ;
+extern int	bvcitekey_get(bvcitekey *,uint *) noex ;
 
-extern int	bvcitekey_set(BVCITEKEY *,uint *) ;
-extern int	bvcitekey_get(BVCITEKEY *,uint *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BVCITEKEY_MASTER */
 
 #endif /* BVCITEKEY_INCLUDE */
 

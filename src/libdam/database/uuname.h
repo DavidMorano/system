@@ -19,10 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 #include	<modload.h>
 #include	<localmisc.h>
 
@@ -40,16 +40,18 @@ struct uuname_cursor {
 	uint		magic ;
 } ;
 
-struct uuname_caller {
-	int	(*open)(void *,cchar *,cchar *) ;
-	int	(*count)(void *) ;
-	int	(*exists)(void *,cchar *,int) ;
-	int	(*curbegin)(void *,void *) ;
-	int	(*enumerate)(void *,void *,char *,int) ;
-	int	(*curend)(void *,void *) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
-} ;
+extern "C" {
+    struct uuname_caller {
+	int	(*open)(void *,cchar *,cchar *) noex ;
+	int	(*count)(void *) noex ;
+	int	(*exists)(void *,cchar *,int) noex ;
+	int	(*curbegin)(void *,void *) noex ;
+	int	(*enumerate)(void *,void *,char *,int) noex ;
+	int	(*curend)(void *,void *) noex ;
+	int	(*audit)(void *) noex ;
+	int	(*close)(void *) noex ;
+    } ;
+}
 
 struct uuname_head {
 	void		*obj ;		/* object pointer */

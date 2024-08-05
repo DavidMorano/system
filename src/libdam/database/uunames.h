@@ -1,6 +1,9 @@
 /* uunames HEADER */
 /* lang=C20 */
 
+/* uunames-query database manager */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -17,11 +20,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	UUNAMES_MAGIC	0x99889298
