@@ -117,14 +117,16 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	    if ((rs = uc_malloc(esize,&vp)) >= 0) {
 	        fifoitem_ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
-	            if (op->head == nullptr) {
-	                op->head = ep ;
-	                op->tail = ep ;
-	                ep->prev = ep->next = nullptr ;
-	            } else {
+		    if (op->head && op->tail) {
 	                ep->prev = op->tail ;
 	                (op->tail)->next = ep ;
 	                op->tail = ep ;
+		    } else if (op->head || op->tail) {
+			rs = SR_BADFMT ;
+	            } else {
+	                op->head = ep ;
+	                op->tail = ep ;
+	                ep->prev = ep->next = nullptr ;
 	            } /* end if */
 	            op->n += 1 ;
 	        } /* end if (entry_start) */
@@ -143,7 +145,7 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	int		dl = 0 ;
 	if ((rs = fifoitem_magic(op,vbuf)) >= 0) {
 	    rs = SR_NOENT ;
-	    if (op->head) {
+	    if (op->head && op->tail) {
 	        fifoitem_ent	*ep = op->head ;
 		rs = SR_OVERFLOW ;
 	        if ((vlen < 0) || (ep->dl <= vlen)) {
@@ -166,6 +168,8 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	            }
 	            op->n -= 1 ;
 		} /* end if (not-overflow) */
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
 	    } /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
@@ -357,7 +361,7 @@ static int entry_finish(fifoitem_ent *ep) noex {
 
 static int defaultcmp(cchar **e1pp,cchar **e2pp) noex {
 	int		rc = 0 ;
-	if (*e1pp || *e2pp ) {
+	if (*e1pp || *e2pp) {
 	    if (*e1pp == nullptr) {
 	        rc = 1 ;
 	    } else if (*e2pp == nullptr) {
