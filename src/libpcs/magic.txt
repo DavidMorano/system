@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int ipasswd_magic(ipasswd *op,Args ... args) noex {
+static inline int fifoitem_magic(fifoitem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == IPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FIFOITEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (ipasswd_magic) */
+/* end subroutine (fifoitem_magic) */
