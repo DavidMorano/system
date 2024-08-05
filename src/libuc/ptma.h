@@ -16,6 +16,9 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	PTMA		pthread_mutexattr_t

@@ -1,32 +1,34 @@
-/* srvrege */
+/* srvrege HEADER */
+/* lang=C20 */
 
 /* machine status entry */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SRVREGE_INCLUDE
-#define	SRVREGE_INCLUDE	1
+#define	SRVREGE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netdb.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 
 
 /* object defines */
-
-#define	SRVREGE_ALL		struct srvrege_all
-#define	SRVREGE_UTIME		struct srvrege_utime
-
+#define	SRVREGE_ALL		struct srvrege_allstuff
+#define	SRVREGE_UT		struct srvrege_utime
+#define	SRVREGE_ADDR		struct srvrege_address
 
 /* the interface types for users */
-
 #define	SRVREGE_TEMPTY		0	/* entry is unused */
 #define	SRVREGE_TDISABLED	1	/* currently disabled (not serving) */
 #define	SRVREGE_TFIFO		2	/* FIFO file */
@@ -40,14 +42,8 @@
 #define	SRVREGE_TSOCKDGRAM	10	/* socket DGRAM */
 #define	SRVREGE_TPMQ		11	/* POSIX message queue */
 
-
 /* other (for user) */
-
 #define	SRVREGE_TAGLEN	14
-
-
-/* the rest of these defines are for internal usage (mostly I think) */
-
 
 /* entry field lengths */
 #define	SRVREGE_LSTIME		4
@@ -63,9 +59,8 @@
 #define	SRVREGE_LSS		MAXNAMELEN
 #define	SRVREGE_LHOST		MAXHOSTNAMELEN
 
-
 /* entry field offsets */
-/* do this carefully ! */
+/* do this carefully! */
 /* there is no good automatic way to do this in C language (sigh) */
 /* the C language does not have all of the advantages of assembly language */
 
@@ -86,47 +81,43 @@
 #define	SRVREGE_SIZE		(SRVREGE_OHOST + SRVREGE_LHOST)
 
 
-union srvrege_addr {
-	SOCKADDRESS	sa ;			/* socket address */
+union srvrege_address {
+	sockaddress	sa ;			/* socket address */
 	char		fp[MAXPATHLEN + 1] ;	/* file path */
 	char		nb[MAXPATHLEN + 1] ;	/* net-addr buffer */
 } ;
 
-struct srvrege_all {
-	uint	utime ;			/* update time */
-	uint	stime ;			/* starting time */
-	uint	hostid ;		/* host ID */
-	uint	itype ;			/* interface type */
-	uint	pf ;			/* protocol family (for sockets) */
-	uint	ptype ;			/* protocol type */
-	uint	proto ;			/* protocol number (if used) */
-	uint	pid ;			/* PID of server */
-	union	srvrege_addr	a ;
-	char	tag[SRVREGE_TAGLEN + 1] ;	/* service tag */
-	char	svc[MAXNAMELEN + 1] ;	/* service name */
-	char	ss[MAXNAMELEN + 1] ;	/* subservice name */
-	char	host[MAXHOSTNAMELEN + 1] ;
+struct srvrege_allstuff {
+	uint		utime ;			/* update time */
+	uint		stime ;			/* starting time */
+	uint		hostid ;		/* host ID */
+	uint		itype ;			/* interface type */
+	uint		pf ;			/* protocol family */
+	uint		ptype ;			/* protocol type */
+	uint		proto ;			/* protocol number (if used) */
+	uint		pid ;			/* PID of server */
+	SRVREGE_ADDR	a ;
+	char		tag[SRVREGE_TAGLEN + 1] ;	/* service tag */
+	char		svc[MAXNAMELEN + 1] ;	/* service name */
+	char		ss[MAXNAMELEN + 1] ;	/* subservice name */
+	char		host[MAXHOSTNAMELEN + 1] ;
 } ;
 
 struct srvrege_utime {
 	uint	utime ;
 } ;
 
+typedef	SRVREGE_ALL		srvrege_all ;
+typedef	SRVREGE_UT		srvrege_ut ;
+typedef	SRVREGE_ADDR		srvrege_addr ;
 
-#if	(! defined(SRVREGE_MASTER)) || (SRVREGE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int srvrege_all(char *,int,int,srvrege_all *) noex ;
+extern int srvrege_utime(char *,int,int,srvrege_ut *) noex ;
 
-extern int srvrege_all(char *,int,int,struct srvrege_all *) ;
-extern int srvrege_utime(char *,int,int,struct srvrege_utime *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SRVREGE_MASTER */
 
 #endif /* SRVREGE_INCLUDE */
 

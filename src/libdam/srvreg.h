@@ -1,20 +1,22 @@
-/* srvreg */
+/* srvreg HEADER */
+/* lang=C++20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SRVREG_INCLUDE
-#define	SRVREG_INCLUDE	1
+#define	SRVREG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netdb.h>
 #include	<time.h>
-
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	"srvrege.h"
 
@@ -23,7 +25,10 @@
 
 #define	SRVREG_MAGIC		1092837456
 #define	SRVREG			struct srvreg_head
-#define	SRVREG_CUR		struct srvreg_c
+#define	SRVREG_FL		struct srvreg_flags
+#define	SRVREG_FILE		struct srvreg_filehead
+#define	SRVREG_BUF		struct srvreg_buffer
+#define	SRVREG_CUR		struct srvreg_cursor
 #define	SRVREG_ENT		SRVREGE_ALL
 
 #define	SRVREG_FILEPATH		"/tmp/srvreg"
@@ -71,14 +76,14 @@ struct srvreg_flags {
 } ;
 
 struct srvreg_head {
-	uint		magic ;
-	const char	*fname ;
-	struct srvreg_flags	f ;
-	struct srvreg_filehead	h ;
-	struct srvreg_buffer	b ;	/* file buffer */
+	cchar		*fname ;
 	time_t		opentime ;		/* file open time */
 	time_t		accesstime ;		/* file access time */
 	time_t		mtime ;			/* file modification time */
+	SRVREG_FL	f ;
+	SRVREG_FILE	h ;
+	SVCREG_BUF	b ;	/* file buffer */
+	uint		magic ;
 	int		oflags, operm ;
 	int		pagesize ;
 	int		filesize ;
@@ -86,31 +91,29 @@ struct srvreg_head {
 	int		cursors ;
 } ;
 
-struct srvreg_c {
+struct srvreg_cursor {
 	int		i ;
 } ;
 
+typedef	SRVREG			struct srvreg_head
+typedef	SRVREG_FL		struct srvreg_flags
+typedef	SRVREG_FILE		struct srvreg_filehead
+typedef	SRVREG_BUF		struct srvreg_buffer
+typedef	SRVREG_CUR		struct srvreg_cursor
 
-#if	(! defined(SRVREG_MASTER)) || (SRVREG_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int srvreg_open(srvreg *,cchar *,int,int) noex ;
+extern int srvreg_check(srvreg *,time_t) noex ;
+extern int srvreg_close(srvreg *) noex ;
+extern int srvreg_curbegin(srvreg *,srvreg_cur *) noex ;
+extern int srvreg_curend(srvreg *,srvreg_cur *) noex ;
+extern int srvreg_enum(srvreg *,srvreg_cur *,srvreg_ent *) noex ;
+extern int srvreg_fetchsvc(srvreg *,cchar *,srvreg_cur *,srvreg_ent *) noex ;
+extern int srvreg_write(srvreg *,int,srvreg_ent *) noex ;
 
-int srvreg_open(SRVREG *,const char *,int,int) ;
-int srvreg_check(SRVREG *,time_t) ;
-int srvreg_close(SRVREG *) ;
-int srvreg_curbegin(SRVREG *,SRVREG_CUR *) ;
-int srvreg_curend(SRVREG *,SRVREG_CUR *) ;
-int srvreg_enum(SRVREG *,SRVREG_CUR *,SRVREG_ENT *) ;
-int srvreg_fetchsvc(SRVREG *,const char *,SRVREG_CUR *,SRVREG_ENT *) ;
-int srvreg_write(SRVREG *,int,SRVREG_ENT *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SRVREG_MASTER */
 
 #endif /* SRVREG_INCLUDE */
 

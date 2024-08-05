@@ -49,7 +49,9 @@
 #include	<cstring>
 #include	<bit>
 #include	<usystem.h>
+#include	<ctdec.h>
 #include	<intceil.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"storeitem.h"
@@ -67,11 +69,6 @@ using std::has_single_bit ;		/* subroutine-template */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	snwcpy(char *,int,cchar *,int) noex ;
-    extern int	ctdeci(char *,int,int) noex ;
-}
 
 
 /* external variables */

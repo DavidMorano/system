@@ -23,9 +23,9 @@ export OSNAME OSTYPE OSRELEASE OSNUM
 integer i=0
 typeset -a DIRS
 DIRS[i++]=${GH}/other/include
-DIRS[i++]=${GH}/research/include
 DIRS[i++]=${GH}/system/include
 DIRS[i++]=${GH}/test/include
+DIRS[i++]=${GH}/research/include
 
 VPATH=
 for (( i = 0 ; i < ${#DIRS[@]} ; i += 1 )) ; do

@@ -1,20 +1,18 @@
 /* getuserterm SUPPORT */
 /* lang=C++20 */
 
-/* get the name of the controlling terminal for the current session */
+/* get the name of the most recently accessed controlling terminal */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1999-01-10, David A­D­ Morano
-	This subroutine was originally written.  It was prompted by
-	the failure of other terminal message programs from finding
-	the proper controlling terminal.
+	This subroutine was originally written.  
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -27,16 +25,11 @@
 	is logged in and even has a controlling terminal.
 
 	Synopsis:
-	int getuserterm(tbuf,tlen,fdp,username)
-	char		tbuf[] ;
-	int		tlen ;
-	int		*fdp ;
-	const char	username[] ;
+	int getuserterm(char *rbuf,int rlen,cchar *username) noex
 
 	Arguments:
-	- tbuf		user buffer to receive name of controlling terminal
-	- tlen		length of user supplied buffer
-	- fdp		pointer to open file-descriptor
+	- rbuf		result buffer to receive name of controlling terminal
+	- rlen		result buffer length
 	- username	session ID to find controlling terminal for
 
 	Returns:
@@ -56,8 +49,13 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<tmpx.h>
+#include	<snx.h>
+#include	<mkx.h>
 #include	<localmisc.h>
+
+#include	"getuserterm.h"
 
 
 /* local defines */
@@ -67,18 +65,38 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct suber {
+	cchar		*username ;
+	char		*rbuf ;
+	char		*tbuf ;
+	int		rlen ;
+	int		tlen ;
+	suber(char *tp,int tl,cchar *up) noex : rbuf(tp), rlen(tl) {
+	    username = up ;
+	} ;
+	int start() noex ;
+	int finish() noex ;
+	int tmpenum() noex ;
+    } ; /* end struct (suber) */
+}
 
 
 /* forward references */
 
-static int	openatime(char *,time_t,time_t *) ;
+static int	load(char *,int,tmpx_ent *) noex ;
+static int	newer(char *,time_t *) noex ;
+
+
+/* local variables */
+
+constexpr cchar		devdname[] = DEVDNAME ;
 
 
 /* exported variables */
@@ -86,108 +104,25 @@ static int	openatime(char *,time_t,time_t *) ;
 
 /* exported subroutines */
 
-int getuserterm(tbuf,tlen,fdp,username)
-const char	username[] ;
-char		tbuf[] ;
-int		tlen ;
-int		*fdp ;
-{
-	TMPX		utmp ;
-
-	time_t	ti_tmp ;
-	time_t	ti_access = 0 ;
-
+int getuserterm(char *rbuf,int rlen,cchar *username) noex {
 	int	rs ;
 	int	rs1 ;
 	int	len = 0 ;
-	int	fd_termdev = -1 ;
-	int	f ;
-
-	const char	*devdname = DEVDNAME ;
-
-	char	tmptermdev[MAXPATHLEN + 1] ;
-	char	termdev[MAXPATHLEN + 1] ;
-
-
-	if (tbuf == NULL)
-	    return SR_FAULT ;
-
-	if (username == NULL)
-	    return SR_FAULT ;
-
-	tbuf[0] = '\0' ;
-	if (username[0] == '\0')
-	    return SR_INVALID ;
-
-	termdev[0] = '\0' ;
-	fd_termdev = -1 ;
-	ti_access = 0 ;
-	if ((rs = tmpx_open(&utmp,NULL,O_RDONLY)) >= 0) {
-	    TMPX_CUR	cur ;
-	    TMPX_ENT	ue ;
-
-	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
-
-	        while (rs >= 0) {
-	            rs1 = tmpx_fetchuser(&utmp,&cur,&ue,username) ;
-		    if (rs1 == SR_NOTFOUND) break ;
-		    rs = rs1 ;
-		    if (rs < 0) break ;
-
-	            f = FALSE ;
-	            f = f || (ue.ut_type != TMPX_TUSERPROC) ;
-	            f = f || (ue.ut_line[0] == '\0') ;
-	            if (f) continue ;
-
-	            rs = mkpath2w(tmptermdev,devdname,ue.ut_line,32) ;
-
-/* check the access time of this terminal and if it is enabled for notices */
-
-	            if (rs >= 0) {
-
-	                rs1 = openatime(tmptermdev,ti_access,&ti_tmp) ;
-
-	                if (rs1 >= 0) {
-	                    if (fd_termdev >= 0) u_close(fd_termdev) ;
-	                    fd_termdev = rs1 ;
-
-	                    ti_access = ti_tmp ;
-	                    rs = sncpy1(tbuf,tlen,tmptermdev) ;
-	                    len = rs ;
-
-	                } /* end if (we had a better one) */
-
-	            } /* end if */
-
-	            if (rs < 0) break ;
-
-	        } /* end while (looping through entries) */
-
-	        tmpx_curend(&utmp,&cur) ;
-	    } /* end if */
-
-	    tmpx_close(&utmp) ;
-	} /* end if (UTMPX open) */
-
-	if (rs < 0) goto ret0 ;
-
-	if (tbuf[0] == '\0') {
-	    rs = SR_NOTFOUND ;
-	    if (fd_termdev >= 0) {
-	        u_close(fd_termdev) ;
-	        fd_termdev = -1 ;
-	    }
-	} /* end if */
-
-/* finish up */
-
-	if (fdp != NULL) {
-	    *fdp = (rs >= 0) ? fd_termdev : -1 ;
-	} else if (fd_termdev >= 0)
-	    u_close(fd_termdev) ;
-
-ret0:
-
+	if (rbuf && username) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (username[0]) {
+		suber	so(rbuf,rlen,username) ;
+		if ((rs = so.start()) >= 0) {
+		    {
+			rs = so.tmpenum() ;
+			len = rs ;
+		    }
+		    rs1 = so.finish() ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (so) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getuserterm) */
@@ -195,36 +130,97 @@ ret0:
 
 /* local subroutines */
 
-
-static int openatime(termdev,current,tp)
-char	termdev[] ;
-time_t	current ;
-time_t	*tp ;
-{
-	struct ustat	sb ;
+int suber::start() noex {
 	int		rs ;
-	int		fd = -1 ;
-
-	rs = u_open(termdev,O_WRONLY,0666) ;
-	fd = rs ;
-	if (rs < 0) goto ret0 ;
-
-	if ((rs = u_fstat(fd,&sb)) >= 0) {
-
-	    *tp = sb.st_atime ;
-	    if (((sb.st_mode & S_IWGRP) != S_IWGRP) ||
-	        (sb.st_atime <= current))
-	        rs = SR_INVALID ;
-
-	} /* end if */
-
-	if (rs < 0)
-	    u_close(fd) ;
-
-ret0:
-	return (rs >= 0) ? fd : rs ;
+	char		*p{} ;
+	if ((rs = malloc_mp(&p)) >= 0) {
+	    tbuf = p ;
+	    tlen = rs ;
+	}
+	return rs ;
 }
-/* end subroutine (openatime) */
+/* end method (suber::start) */
 
+int suber::finish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (tbuf) {
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    tbuf = nullptr ;
+	    tlen = 0 ;
+	}
+	return rs ;
+}
+/* end method (suber::finish) */
+
+int suber::tmpenum() noex {
+	tmpx		utmp ;
+	time_t		tiacc = 0 ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	if ((rs = tmpx_open(&utmp,nullptr,O_RDONLY)) >= 0) {
+	    tmpx_cur	cur ;
+	    tmpx_ent	ue ;
+	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
+	        while (rs >= 0) {
+		    bool	f = true ;
+	            rs1 = tmpx_fetchuser(&utmp,&cur,&ue,username) ;
+		    if (rs1 == SR_NOTFOUND) break ;
+		    rs = rs1 ;
+		    if (rs < 0) break ;
+	            f = f && (ue.ut_type == TMPX_TPROCUSER) ;
+	            f = f && (ue.ut_line[0] != '\0') ;
+	            if (f) {
+	                if ((rs = load(tbuf,tlen,&ue)) >= 0) {
+	                    if ((rs = newer(tbuf,&tiacc)) > 0) {
+	                        rs = sncpy1(rbuf,rlen,tbuf) ;
+	                        len = rs ;
+	                    } /* end if (we had a better one) */
+	                } /* end if */
+		    }
+	            if (rs < 0) break ;
+	        } /* end while (looping through entries) */
+	        rs1 = tmpx_curend(&utmp,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if */
+	    rs1 = tmpx_close(&utmp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (UTMPX open) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (suber::tmpenum) */
+
+
+/* local subroutines */
+
+static int load(char *tbuf,int tlen,tmpx_ent *uep) noex {
+	cint		ulen = TMPX_LLINE ;
+	return mknpathw(tbuf,tlen,devdname,uep->ut_line,ulen) ;
+}
+/* end subroutine (load) */
+
+static int newer(char *termdev,time_t *tp) noex {
+	cint		of = O_WRONLY ;
+	int		rs ;
+	int		rs1 ;
+	int		f = false ;
+	cmode		om = 0666 ;
+	if ((rs = u_open(termdev,of,om)) >= 0) {
+	    USTAT	sb ;
+	    cint	fd = rs ;
+	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+		f = true ;
+	        f = f && ((sb.st_mode & S_IWGRP) == S_IWGRP) ;
+	        f = f && (sb.st_atime > *tp) ;
+		if (f) *tp = sb.st_atime ;
+	    } /* end if */
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (open) */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (newer) */
 
 

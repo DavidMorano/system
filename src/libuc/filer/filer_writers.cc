@@ -23,10 +23,10 @@
 	Write a specified number of blanks to a FILER object.
 
 	Synopsis:
-	int filer_writeblanks(FILER *fbp,int n)
+	int filer_writeblanks(FILER *op,int n)
 
 	Arguments:
-	fbp		pointer to object
+	op		pointer to object
 	n		number of bytes to write
 
 	Returns:
@@ -98,10 +98,10 @@
 	file-descriptor and write it to the present buffered-file.
 
 	Synosis:
-	int filer_writefd(filer *fbp,char *bp,int bl,int mfd,int len) noex
+	int filer_writefd(filer *op,char *bp,int bl,int mfd,int len) noex
 
 	Arguments:
-	fbp		the present FILER object pointer
+	op		the present FILER object pointer
 	bp		buffer pointer to use as staging
 	bl		buffer length to use as staging
 	mfd		file-descriptor to read from
@@ -182,14 +182,16 @@ constexpr cchar			zerobuf[zsize] = { } ;
 
 /* exported subroutines */
 
-int filer_writeblanks(filer *fbp,int n) noex {
-	int		rs = SR_OK ;
+int filer_writeblanks(filer *op,int n) noex {
+	int		rs ;
 	int		wlen = 0 ;
-	while ((rs >= 0) && (wlen < n)) {
-	    cint	ml = min((n-wlen),bo.l) ;
-	    rs = filer_write(fbp,bo.p,ml) ;
-	    wlen += rs ;
-	} /* end while */
+	if ((rs = filer_magic(op)) >= 0) {
+	    while ((rs >= 0) && (wlen < n)) {
+	        cint	ml = min((n-wlen),bo.l) ;
+	        rs = filer_write(op,bo.p,ml) ;
+	        wlen += rs ;
+	    } /* end while */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_writeblanks) */
@@ -197,64 +199,73 @@ int filer_writeblanks(filer *fbp,int n) noex {
 int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if (sl < 0) sl = (strlen(sp) + 1) ;
-	if ((rs = filer_write(op,sp,sl)) >= 0) {
-	    cint	asize = sizeof(int) ;
-	    wlen = rs ;
-	    rs = filer_writealign(op,asize) ;
-	    wlen += rs ;
-	}
+	if ((rs = filer_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = (strlen(sp) + 1) ;
+	    if ((rs = filer_write(op,sp,sl)) >= 0) {
+	        cint	asize = sizeof(int) ;
+	        wlen = rs ;
+	        rs = filer_writealign(op,asize) ;
+	        wlen += rs ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_writefill) */
 
-int filer_writealign(filer *bp,int asize) noex {
-	off_t		foff ;
+int filer_writealign(filer *op,int asize) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filer_tell(bp,&foff)) >= 0) {
-	    cint	r = int(foff & (asize - 1)) ;
-	    if (r > 0) {
-	        cint	nzero = (asize - r) ;
-	        if (nzero > 0) {
-	            rs = filer_writezero(bp,nzero) ;
-	            wlen += rs ;
+	if ((rs = filer_magic(op)) >= 0) {
+	    if (off_t foff ; (rs = filer_tell(op,&foff)) >= 0) {
+	        cint	r = int(foff & (asize - 1)) ;
+	        if (r > 0) {
+	            cint	nzero = (asize - r) ;
+	            if (nzero > 0) {
+	                rs = filer_writezero(op,nzero) ;
+	                wlen += rs ;
+	            }
 	        }
-	    }
-	} /* end if (filer_tell) */
+	    } /* end if (filer_tell) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_writeallign) */
 
-int filer_writezero(filer *fp,int zlen) noex {
-	int		rs = SR_OK ;
+int filer_writezero(filer *op,int zlen) noex {
+	int		rs ;
 	int		wlen = 0 ;
-	while ((rs >= 0) && (zlen > 0)) {
-	    cint	ml = min(zlen,zsize) ;
-	    rs = filer_write(fp,zerobuf,ml) ;
-	    zlen -= rs ;
-	    wlen += rs ;
-	} /* end while */
+	if ((rs = filer_magic(op)) >= 0) {
+	    while ((rs >= 0) && (zlen > 0)) {
+	        cint	ml = min(zlen,zsize) ;
+	        rs = filer_write(op,zerobuf,ml) ;
+	        zlen -= rs ;
+	        wlen += rs ;
+	    } /* end while */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_writezero) */
 
-int filer_writefd(filer *fbp,char *bp,int bl,int mfd,int len) noex {
-	int		rs = SR_OK ;
-	int		rlen = len ;
-	int		rl ;
+int filer_writefd(filer *op,char *bp,int bl,int mfd,int len) noex {
+	int		rs ;
 	int		wlen = 0 ;
-	while ((rs >= 0) && (rlen > 0)) {
-	    cint	ml = min(rlen,bl) ;
-	    rs = u_read(mfd,bp,ml) ;
-	    rl = rs ;
-	    if (rs <= 0) break ;
-	    {
-	        rs = filer_write(fbp,bp,rl) ;
+	if ((rs = filer_magic(op,bp)) >= 0) {
+	    int		rlen = len ;
+	    auto read = [mfd,bp,bl] (int rlen) {
+		int	rs = SR_OK ;
+		if (rlen > 0) {
+	            cint	ml = min(rlen,bl) ;
+	            rs = u_read(mfd,bp,ml) ;
+		}
+		return rs ;
+	    } ;
+	    while ((rs = read(rlen)) > 0) {
+	        rs = filer_write(op,bp,rs) ;
 	        wlen += rs ;
-	    }
-	    rlen -= rl ;
-	} /* end while */
+	        rlen -= rs ;
+		if (rs < 0) break ;
+	    } /* end while */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_writefd) */

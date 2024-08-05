@@ -1,7 +1,8 @@
-/* dfs-1 */
+/* dfs-1 HEADER */
 /* lang=C++11 */
 
 /* Depth-First-Search (visit all nodes through un-weighted graph) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -21,7 +22,7 @@
 *******************************************************************************/
 
 #ifndef	DFS1_INCLUDE
-#define	DFS1_INCLUDE	1
+#define	DFS1_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -29,18 +30,7 @@
 #include	<vector>
 #include	<list>
 #include	<usystem.h>
-#include	<localmisc.h>
 
-
-/* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-
-/* local structures */
 
 struct dfs1_edge {
 	int		dst ;	/* destination vertex */
@@ -51,7 +41,6 @@ struct dfs1_res {
 	int		prev ; /* previous vertex */
 	int		dist ; /* distance (summed weight) to present vertex */
 } ;
-
 
 extern int dfs1(dfs1_res *,
 		std::vector<std::list<dfs1_edge>> *,

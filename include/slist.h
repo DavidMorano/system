@@ -26,15 +26,15 @@
 
 
 #define	SLIST		struct slist_head
-#define	SLIST_ENT	struct slist_ent
-#define	SLIST_CUR	struct slist_cur
+#define	SLIST_ENT	struct slist_entry
+#define	SLIST_CUR	struct slist_cursor
 
 
-struct slist_cur {
+struct slist_cursor {
 	SLIST_ENT	*entp ;
 } ;
 
-struct slist_ent {
+struct slist_entry {
 	SLIST_ENT	*next ;
 } ;
 
@@ -54,12 +54,13 @@ extern int slist_start(slist *) noex ;
 extern int slist_ins(slist *,slist_ent *) noex ;
 extern int slist_insgroup(slist *,slist_ent *,int,int) noex ;
 extern int slist_present(slist *,slist_ent *) noex ;
+extern int slist_gethead(slist *,slist_ent **) noex ;
 extern int slist_gettail(slist *,slist_ent **) noex ;
 extern int slist_rem(slist *,slist_ent **) noex ;
 extern int slist_unlink(slist *,slist_ent *) noex ;
 extern int slist_curbegin(slist *,slist_cur *) noex ;
 extern int slist_curend(slist *,slist_cur *) noex ;
-extern int slist_enum(slist *,slist_cur *,slist_ent **) noex ;
+extern int slist_curenum(slist *,slist_cur *,slist_ent **) noex ;
 extern int slist_count(slist *) noex ;
 extern int slist_audit(slist *) noex ;
 extern int slist_finish(slist *) noex ;

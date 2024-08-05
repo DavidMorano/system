@@ -23,6 +23,7 @@
 	u_fstatfs
 	u_fstatvfs
 	u_fpathconf
+	u_fstype
 	u_fsync
 	u_ftruncate
 	u_ioctl
@@ -184,6 +185,7 @@ using namespace	ufiledesc ;		/* namespace */
 using namespace usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
+using libu::ufstype ;			/* subroutine */
 
 
 /* local typedefs */
@@ -263,9 +265,9 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_acl = F_ACL ; /* future use */
-constexpr bool		f_sunos = F_SUNOS ; /* this is really Solaris® */
-constexpr bool		f_darwin = F_DARWIN ; /* this is really Solaris® */
+constexpr bool		f_acl = F_ACL ;		/* future use */
+constexpr bool		f_sunos = F_SUNOS ;	/* this is really Solaris® */
+constexpr bool		f_darwin = F_DARWIN ;
 
 
 /* exported variables */
@@ -463,6 +465,11 @@ int u_fpathconf(int fd,int name,long *rp) noex {
 	return rs ;
 }
 /* end subroutine (u_fpathconf) */
+
+int u_fstype(int fd,char *rbuf,int rlen) noex {
+	return ufstype(rbuf,rlen,fd) ;
+}
+/* end subroutine (u_fstype) */
 
 int u_fsync(int fd) noex {
 	uregular	ro ;

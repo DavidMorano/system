@@ -47,6 +47,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<usys_typedefs.h>	/* |dirent_t| */
 
 

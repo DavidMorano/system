@@ -22,7 +22,6 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<usystem.h>
-#include	<clanguage.h>
 
 
 #define	PMQ		struct pmq_head

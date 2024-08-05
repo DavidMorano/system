@@ -16,15 +16,15 @@
 
 /*******************************************************************************
 
-        This is a container object that implements FIFO access. It is
+        This is a container object that implements FIFO access.  It is
         interlocked for multi-thread use.
 
 	Usage note:
 
 	Note that we delete all of the entries upon the object
-	itself being freed. If the entries are not opaque (as they
+	itself being freed.  If the entries are not opaque (as they
 	usually are not), this will result in lost memory (memory
-	leaks). It is the responsibility of the caller the delete
+	leaks).  It is the responsibility of the caller the delete
 	any non-opaque element objects.
 
 *******************************************************************************/
@@ -38,8 +38,6 @@
 
 
 /* local defines */
-
-#define	CIQ_ENT		struct ciq_ent
 
 
 /* imported namespaces */
@@ -59,8 +57,7 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct ciq_ent {
-	pq_ent		dummy ;		/* meta */
+struct ciq_ent : pq_ent {
 	void		*vp ;		/* caller supplied pointer */
 } ;
 
@@ -126,6 +123,9 @@ static int ciq_magic(ciq *op,Args ... args) noex {
 static int	ciq_findent(ciq *,pq_ent **,cvoid *) noex ;
 
 static int	pq_finishup(pq *) noex ;
+
+
+/* exported variables */
 
 
 /* exported variables */

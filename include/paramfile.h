@@ -21,10 +21,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<limits.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<varsub.h>
-#include	<localmisc.h>
 
 
 #define	PARAMFILE		struct paramfile_head

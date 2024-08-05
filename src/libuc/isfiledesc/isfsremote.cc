@@ -40,6 +40,7 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<matxstr.h>		/* |matlocalfs(3uc)| */
+#include	<getfstype.h>
 #include	<localmisc.h>
 
 #include	"isfiledesc.h"
@@ -55,10 +56,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getfstype(char *,int,int) noex ;
-}
 
 
 /* external variables */
@@ -80,7 +77,7 @@ extern "C" {
 
 int isfsremote(int fd) noex {
 	int		rs ;
-	bool		f = false ;
+	int		f = false ;
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	    cint	fslen = rs ;
 	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */

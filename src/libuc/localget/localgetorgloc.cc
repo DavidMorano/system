@@ -8,12 +8,12 @@
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This subroutine is originally written. This is a minimal
-	implementation, but at least there is something here. ORGLOCs
+	This subroutine is originally written.  This is a minimal
+	implementation, but at least there is something here.  ORGLOCs
 	are not currently a part of the system-user-database system
 	('passwd', 'user_attr', et cetera) so currently this
 	subroutine does not look anywhere in those places for an
-	ORGLOC. I guess that an ORGLOC should be added to the
+	ORGLOC.  I guess that an ORGLOC should be added to the
 	'user_attr' database but this practice has not yet begun,
 	if it ever will be.
 
@@ -28,11 +28,11 @@
 
 	Descrption:
 	This subroutine is used to (try to) get the LOCAL software
-	distribution organization location (ORGLOC). This particular
+	distribution organization location (ORGLOC).  This particular
 	value is not often set in the LOCAL software distribution
 	and also this subroutine does not look hard in other places
-	to find a possible location. So an ORGLOC is not often
-	returned. But nonetheless there are places (pieces of code,
+	to find a possible location.  So an ORGLOC is not often
+	returned.  But nonetheless there are places (pieces of code,
 	middleware et cetera) that still call this subroutine rather
 	regularly.
 

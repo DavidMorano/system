@@ -101,7 +101,7 @@ char		*infname, *outfname ;
 	    bfile	infile, *ifp = &infile ;
 	    if ((rs = bopen(ifp,infname,"r",0666)) >= 0) {
 		{
-		    rs = varsub_expandfile(vshp,ifp,ofp) ;
+		    rs = varsub_expfile(vshp,ifp,ofp) ;
 		}
 	        rs1 = bclose(ifp) ;
 		if (rs >= 0) rs = rs1 ;

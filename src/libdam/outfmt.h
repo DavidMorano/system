@@ -1,5 +1,5 @@
 /* outfmt HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* output formats */
 /* version %I% last-modified %G% */
@@ -12,13 +12,9 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
 
 
 enum ofis {
@@ -28,7 +24,7 @@ enum ofis {
 	outfmt_overlast
 } ;
 
-extern const char	*outfmts[] ;
+extern cpcchar		outfmts[] ;
 
 
 #endif /* OUTFMT_INCLUDE */

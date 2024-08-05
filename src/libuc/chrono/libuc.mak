@@ -429,9 +429,6 @@ lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
-fdliner.o:		fdliner.cc fdliner.h
-fbliner.o:		fbliner.cc fbliner.h
-
 dirlist.o:		dirlist.cc dirlist.h
 
 dirseen.o:		dirseen.cc dirseen.h
@@ -756,6 +753,11 @@ filer.o:		filer.dir
 filer.dir:
 	makesubdir $@
 
+# LINER
+liner.o:		liner.dir
+liner.dir:
+	makesubdir $@
+
 # TMPX
 tmpx.o:			tmpx.dir
 tmpx.dir:
@@ -894,6 +896,7 @@ ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
+filelines.o:		filelines.cc filelines.h
 #
 isproc.o:		isproc.cc isproc.h
 #

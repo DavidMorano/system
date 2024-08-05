@@ -40,6 +40,15 @@ using std::nullptr_t ;
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 static int	liner(int,size_t) noex ;
@@ -60,7 +69,8 @@ int filelines(cchar *fn) noex {
 	if (fn) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-		if ((rs = uc_open(fn,O_RDONLY,0)) >= 0) {
+		cint	of = O_RDONLY ;
+		if ((rs = uc_open(fn,of,0)) >= 0) {
 		    USTAT	sb ;
 		    cint	fd = rs ;
 		    if ((rs = uc_fstat(fd,&sb)) >= 0) {

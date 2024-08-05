@@ -29,9 +29,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |off_t| */
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<filer.h>
 
 

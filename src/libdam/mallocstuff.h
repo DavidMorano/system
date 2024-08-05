@@ -1,35 +1,39 @@
-/* mallocstuff */
+/* mallocstuff HEADER */
+/* lang=C20 */
 
-/* variation on the 'malloc(3)' theme */
+/* miscellaneous |malloc(3c)| related */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-06-11, David A­D­ Morano
-	These subroutines were was originally written (inspired by others).
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MALLOCSTUFF_INCLUDE
-#define	MALLOCSTUFF_INCLUDE	1
+#define	MALLOCSTUFF_INCLUDE
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
-extern char	*mallocbuf(void *,int) ;
-extern char	*mallocstr(const char *) ;
-extern char	*mallocstrw(const char *,int) ;
-extern char	*mallocstrw(const char *,int) ;
-extern char	*mallocint(int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_begin
 
-#endif /* MALLOCSTFF_INCLUDE */
+extern char	*mallocbuf(void *,int) noex ;
+extern char	*mallocstr(cchar *) noex ;
+extern char	*mallocstrw(cchar *,int) noex ;
+extern char	*malloctest(int) noex ;
+
+EXTERNC_end
+
+
+#endif /* MALLOCSTUFF_INCLUDE */
 
 

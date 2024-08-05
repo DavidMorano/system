@@ -1,4 +1,5 @@
-/* intiq */
+/* intiq HEADER */
+/* lang=C20 */
 
 /* Integer-Interlocked Queue */
 /* version %I% last-modified %G% */
@@ -17,51 +18,42 @@
 
 	Manage interlocked FIFO-integer operations.
 
-
 *******************************************************************************/
 
-
 #ifndef	INTIQ_INCLUDE
-#define	INTIQ_INCLUDE	1
+#define	INTIQ_INCLUDE
 
 
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<ptm.h>
 #include	<fifoitem.h>
-#include	<localmisc.h>
 
 
 /* local defines */
+#define	INTIQ		struct intiq_head
 
-#define	INTIQ		struct intiq
 
-
-struct intiq {
-	PTM		m ;
-	FIFOITEM	q ;
+struct intiq_head {
+	ptm		m ;
+	fifoitem	q ;
 } ;
 
+typedef INTIQ		intiq ;
 
-#if	(! defined(INTIQ_MASTER)) || (INTIQ_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	intiq_start(intiq *) noex ;
+extern int	intiq_ins(intiq *,int) noex ;
+extern int	intiq_rem(intiq *,int *) noex ;
+extern int	intiq_count(intiq *) noex ;
+extern int	intiq_finish(intiq *) noex ;
 
-extern int	intiq_start(INTIQ *) ;
-extern int	intiq_ins(INTIQ *,int) ;
-extern int	intiq_rem(INTIQ *,int *) ;
-extern int	intiq_count(INTIQ *) ;
-extern int	intiq_finish(INTIQ *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* INTIQ_MASTER */
 
 #endif /* INTIQ_INCLUDE */
 

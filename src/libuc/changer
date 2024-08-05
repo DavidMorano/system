@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} CCFLAGS "
+NAMES="${NAMES} varsub_expand "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/CCFLAGS/s//CXXFLAGS/g
+g/varsub_expand/s//varsub_exp/g
 	w
 	q
 EOF

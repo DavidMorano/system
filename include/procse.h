@@ -1,7 +1,7 @@
 /* procse HEADER */
 /* lang=C20 */
 
-/* expanded server entry */
+/* expand server entry */
 /* version %I% last-modified %G% */
 
 
@@ -15,19 +15,20 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<varsub.h>
 #include	<expcook.h>
 
 
 #define	PROCSE		struct procse_head
-#define	PROCSE_ARGS	struct procse_a
+#define	PROCSE_ARGS	struct procse_arguments
 
 
-struct procse_a {
-	cchar		*passfile ;		/* pass-file */
-	cchar		*sharedobj ;		/* shared-object path */
-	cchar		*program ;		/* server program path */
-	cchar		*srvargs ;		/* server program arguments */
+struct procse_arguments {
+	cchar		*passfile ;	/* pass-file */
+	cchar		*sharedobj ;	/* shared-object path */
+	cchar		*program ;	/* server program path */
+	cchar		*srvargs ;	/* server program arguments */
 	cchar		*username ;
 	cchar		*groupname ;
 	cchar		*options ;
@@ -42,11 +43,14 @@ struct procse_head {
 	PROCSE_ARGS	a ;
 } ;
 
+typedef	PROCSE		procse ;
+typedef	PROCSE_ARGS	procse_args ;
+
 EXTERNC_begin
 
-extern int procse_start(PROCSE *,cchar **,varsub *,PROCSE_ARGS *) noex ;
-extern int procse_process(PROCSE *,EXPCOOK *) noex ;
-extern int procse_finish(PROCSE *) noex ;
+extern int procse_start(procse *,cchar **,varsub *,procse_args *) noex ;
+extern int procse_process(procse *,expcook *) noex ;
+extern int procse_finish(procse *) noex ;
 
 EXTERNC_end
 

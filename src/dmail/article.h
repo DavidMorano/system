@@ -1,4 +1,5 @@
-/* article */
+/* article HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,19 +12,20 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ARTICLE_INCLUDE
-#define	ARTICLE_INCLUDE	1
+#define	ARTICLE_INCLUDE
 
 
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vechand.h>
 #include	<retpath.h>
 #include	<dater.h>
 #include	<ema.h>
-#include	<localmisc.h>
 
 #include	"ng.h"
 
@@ -67,9 +69,9 @@ struct article_head {
 	RETPATH		path ;
 	NG		ngs ;
 	VECHAND		envdates ;
-	DATER		msgdate ;
-	EMA		addr[articleaddr_overlast] ;
-	const char	*strs[articlestr_overlast] ;
+	dater		msgdate ;
+	ema		addr[articleaddr_overlast] ;
+	cchar		*strs[articlestr_overlast] ;
 	ARTICLE_FL	f ;
 	uint		aoff ;
 	uint		alen ;
@@ -78,32 +80,24 @@ struct article_head {
 	char		af[articleaddr_overlast] ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(ARTICLE_MASTER)) || (ARTICLE_MASTER == 0)
+extern int article_start(ARTICLE *) noex ;
+extern int article_addenvdate(ARTICLE *,dater *) noex ;
+extern int article_addmsgdate(ARTICLE *,dater *) noex ;
+extern int article_addpath(ARTICLE *,cchar *,int) noex ;
+extern int article_addng(ARTICLE *,cchar *,int) noex ;
+extern int article_addstr(ARTICLE *,int,cchar *,int) noex ;
+extern int article_addaddr(ARTICLE *,int,cchar *,int) noex ;
+extern int article_ao(ARTICLE *,uint,uint) noex ;
+extern int article_countenvdate(ARTICLE *) noex ;
+extern int article_getenvdate(ARTICLE *,int,dater **) noex ;
+extern int article_getstr(ARTICLE *,int,cchar **) noex ;
+extern int article_getaddrema(ARTICLE *,int,ema **) noex ;
+extern int article_finish(ARTICLE *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int article_start(ARTICLE *) ;
-extern int article_addenvdate(ARTICLE *,DATER *) ;
-extern int article_addmsgdate(ARTICLE *,DATER *) ;
-extern int article_addpath(ARTICLE *,const char *,int) ;
-extern int article_addng(ARTICLE *,const char *,int) ;
-extern int article_addstr(ARTICLE *,int,const char *,int) ;
-extern int article_addaddr(ARTICLE *,int,const char *,int) ;
-extern int article_ao(ARTICLE *,uint,uint) ;
-extern int article_countenvdate(ARTICLE *) ;
-extern int article_getenvdate(ARTICLE *,int,DATER **) ;
-extern int article_getstr(ARTICLE *,int,const char **) ;
-extern int article_getaddrema(ARTICLE *,int,EMA **) ;
-extern int article_finish(ARTICLE *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* ARTICLE_MASTER */
 
 #endif /* ARTICLE_INCLUDE */
 

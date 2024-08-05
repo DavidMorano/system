@@ -25,7 +25,7 @@
 	name that are assume to be local file-systems.
 
 	Synopsis:
-	int matlocalfs(cchar *,sp,int sl noex
+	int matlocalfs(cchar *,sp,int sl) noex
 
 	Arguments:
 	sp		name pointer

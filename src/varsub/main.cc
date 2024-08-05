@@ -1304,7 +1304,7 @@ int		fl ;
 	    bfile	infile, *ifp = &infile ;
 	    if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
 		{
-	            rs = varsub_expandfile(vsp,ifp,ofp) ;
+	            rs = varsub_expfile(vsp,ifp,ofp) ;
 	            wlen += rs ;
 		}
 	        rs1 = bclose(ifp) ;

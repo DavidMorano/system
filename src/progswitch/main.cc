@@ -752,7 +752,7 @@ static int procfind_withmapper(PROGINFO *pip,varsub *sdp,char *pbuf)
 #endif
 
 	            if (rs >= 0) {
-	                if ((rs = varsub_expand(sdp,pbuf,plen,vbuf,vl)) >= 0) {
+	                if ((rs = varsub_exp(sdp,pbuf,plen,vbuf,vl)) >= 0) {
 	                    const int	pl = rs ;
 
 #if	CF_DEBUG
@@ -771,7 +771,7 @@ static int procfind_withmapper(PROGINFO *pip,varsub *sdp,char *pbuf)
 	                            len = pl ;
 	                        }
 	                    }
-	                } /* end if (varsub_expand) */
+	                } /* end if (varsub_exp) */
 	            } /* end if (ok) */
 	            if (len > 0) break ;
 	        } /* end while */

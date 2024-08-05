@@ -16,6 +16,9 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	PTRWA		pthread_rwlockattr_t

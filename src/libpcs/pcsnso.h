@@ -13,18 +13,23 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<ids.h>
 #include	<pcsnsc.h>
 #include	<localmisc.h>
+
 #include	"pcsnsreq.h"
 
 
 #define	PCSNSO_MAGIC	0x99889298
 #define	PCSNSO		struct pcsnso_head
-#define	PCSNSO_CUR	struct pcsnso_c
-#define	PCSNSO_OBJ	struct pcsnso_obj
+#define	PCSNSO_CUR	struct pcsnso_cursor
+#define	PCSNSO_OBJ	struct pcsnso_object
 #define	PCSNSO_FL	struct pcsnso_flags
-#define	PCSNSO_PWD	struct pcsnso_pwd
+#define	PCSNSO_PWD	struct pcsnso_pwdir
 #define	PCSNSO_TO	7
 
 /* query options */
@@ -32,13 +37,13 @@
 #define	PCSNSO_OPREFIX	(1<<1)		/* prefix match */
 
 
-struct pcsnso_obj {
-	const char	*name ;
+struct pcsnso_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct pcsnso_c {
+struct pcsnso_cursor {
 	uint		*verses ;		/* file-offsets to tags */
 	uint		nverses ;
 	int		i ;
@@ -51,45 +56,43 @@ struct pcsnso_flags {
 } ;
 
 struct pcsnso_pwd {
-	struct passwd	pw ;
 	char		*pwbuf ;
+	PASSWD		pw ;
 	int		pwlen ;
 } ;
 
 struct pcsnso_head {
-	uint		magic ;
 	cchar		*a ;			/* memory allocation */
 	cchar		*pr ;			/* stored argument */
 	PCSNSO_FL	f, open ;
 	PCSNSO_PWD	pwd ;
-	IDS		id ;
+	ids		id ;
 	PCSNSC		client ;		/* the PCS-client object */
 	time_t		ti_lastcheck ;		/* server-open check */
+	uint		magic ;
 	int		ncursors ;
 	int		opts ;
 } ;
 
+typedef	PCSNSO		pcsnso ;
+typedef	PCSNSO_CUR	pcsnso_cur ;
+typedef	PCSNSO_OBJ	pcsnso_obj ;
+typedef	PCSNSO_FL	pcsnso_fl ;
+typedef	PCSNSO_PWD	pcsnso_pwd ;
 
-#if	(! defined(PCSNSO_MASTER)) || (PCSNSO_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsnso_open(pcsnso *,cchar *) noex ;
+extern int pcsnso_setopts(pcsnso *,int) noex ;
+extern int pcsnso_get(pcsnso *,char *,int,cchar *,int) noex ;
+extern int pcsnso_curbegin(pcsnso *,pcsnso_cur *) noex ;
+extern int pcsnso_read(pcsnso *,pcsnso_cur *,char *,int,int) noex ;
+extern int pcsnso_curend(pcsnso *,pcsnso_cur *) noex ;
+extern int pcsnso_audit(pcsnso *) noex ;
+extern int pcsnso_close(pcsnso *) noex ;
 
-extern int pcsnso_open(PCSNSO *,cchar *) ;
-extern int pcsnso_setopts(PCSNSO *,int) ;
-extern int pcsnso_get(PCSNSO *,char *,int,cchar *,int) ;
-extern int pcsnso_curbegin(PCSNSO *,PCSNSO_CUR *) ;
-extern int pcsnso_read(PCSNSO *,PCSNSO_CUR *,char *,int,int) ;
-extern int pcsnso_curend(PCSNSO *,PCSNSO_CUR *) ;
-extern int pcsnso_audit(PCSNSO *) ;
-extern int pcsnso_close(PCSNSO *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSNSO_MASTER */
 
 #endif /* PCSNSO_INCLUDE */
 

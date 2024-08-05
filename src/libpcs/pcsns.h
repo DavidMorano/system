@@ -1,4 +1,5 @@
-/* pcsns */
+/* pcsns HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,15 +11,16 @@
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	PCSNS_INCLUDE
-#define	PCSNS_INCLUDE	1
+#define	PCSNS_INCLUDE
 
 
 #include	<envstandards.h>
-
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<modload.h>
 #include	<localmisc.h>
 
@@ -28,61 +30,56 @@
 
 #define	PCSNS_MAGIC	0x99447244
 #define	PCSNS		struct pcsns_head
-#define	PCSNS_CUR	struct pcsns_c
-#define	PCSNS_CALLS	struct pcsns_calls
+#define	PCSNS_CUR	struct pcsns_cursor
+#define	PCSNS_CALLS	struct pcsns_callsubs
 
 /* query options */
-
 #define	PCSNS_ONOSERV	PCSNSO_ONOSERV	/* do not call the server */
 #define	PCSNS_OPREFIX	PCSNSO_OPREFIX	/* prefix match */
 
 
-struct pcsns_c {
-	uint	magic ;
+struct pcsns_cursor {
 	void	*scp ;		/* SO-cursor pointer */
+	uint	magic ;
 } ;
 
-struct pcsns_calls {
-	int	(*open)(void *,cchar *) ;
-	int	(*setopts)(void *,int) ;
-	int	(*get)(void *,char *,int,cchar *,int) ;
-	int	(*curbegin)(void *,void *) ;
-	int	(*enumerate)(void *,void *,char *,int,int) ;
-	int	(*curend)(void *,void *) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
+struct pcsns_callsubs {
+	int	(*open)(void *,cchar *) noex ;
+	int	(*setopts)(void *,int) noex ;
+	int	(*get)(void *,char *,int,cchar *,int) noex ;
+	int	(*curbegin)(void *,void *) noex ;
+	int	(*enumerate)(void *,void *,char *,int,int) noex ;
+	int	(*curend)(void *,void *) noex ;
+	int	(*audit)(void *) noex ;
+	int	(*close)(void *) noex ;
 } ;
 
 struct pcsns_head {
-	uint		magic ;
-	MODLOAD		loader ;
+	modload		loader ;
 	PCSNS_CALLS	call ;
 	void		*obj ;		/* object pointer */
+	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ;
 
+typedef	PCSNS		pcsns ;
+typedef	PCSNS_CUR	pcsns_cur ;
+typedef	PCSNS_CALLS	pcsns_calls ;
 
-#if	(! defined(PCSNS_MASTER)) || (PCSNS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsns_open(PCSNS *,cchar *) noex ;
+extern int pcsns_setopts(PCSNS *,int) noex ;
+extern int pcsns_get(PCSNS *,char *,int,cchar *,int) noex ;
+extern int pcsns_curbegin(PCSNS *,PCSNS_CUR *) noex ;
+extern int pcsns_enum(PCSNS *,PCSNS_CUR *,char *,int,int) noex ;
+extern int pcsns_curend(PCSNS *,PCSNS_CUR *) noex ;
+extern int pcsns_audit(PCSNS *) noex ;
+extern int pcsns_close(PCSNS *) noex ;
 
-extern int pcsns_open(PCSNS *,cchar *) ;
-extern int pcsns_setopts(PCSNS *,int) ;
-extern int pcsns_get(PCSNS *,char *,int,cchar *,int) ;
-extern int pcsns_curbegin(PCSNS *,PCSNS_CUR *) ;
-extern int pcsns_enum(PCSNS *,PCSNS_CUR *,char *,int,int) ;
-extern int pcsns_curend(PCSNS *,PCSNS_CUR *) ;
-extern int pcsns_audit(PCSNS *) ;
-extern int pcsns_close(PCSNS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSNS_MASTER */
 
 #endif /* PCSNS_INCLUDE */
 

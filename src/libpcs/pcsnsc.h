@@ -1,6 +1,8 @@
-/* pcsnsc */
+/* pcsnsc HEADER */
+/* lang=C20 */
 
 /* PCS Name-Server-Client */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,11 +15,15 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSNSC_INCLUDE
-#define	PCSNSC_INCLUDE	1
+#define	PCSNSC_INCLUDE
 
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<realname.h>
 #include	<pcsnsreq.h>
 #include	<localmisc.h>
@@ -25,12 +31,12 @@
 
 #define	PCSNSC_MAGIC	0x58261221
 #define	PCSNSC		struct pcsnsc_head
-#define	PCSNSC_OBJ	struct pcsnsc_obj
+#define	PCSNSC_OBJ	struct pcsnsc_object
 #define	PCSNSC_FL	struct pcsnsc_flags
-#define	PCSNSC_STATUS	struct pcsnsc_status
+#define	PCSNSC_STAT	struct pcsnsc_status
 
 
-struct pcsnsc_obj {
+struct pcsnsc_object {
 	char		*name ;
 	uint		objsize ;
 } ;
@@ -45,39 +51,31 @@ struct pcsnsc_flags {
 } ;
 
 struct pcsnsc_head {
-	uint		magic ;
-	const char	*pr ;
-	const char	*srcfname ;
-	const char	*srvfname ;
+	cchar		*pr ;
+	cchar		*srcfname ;
+	cchar		*srvfname ;
 	char		*mbuf ;
 	PCSNSC_FL	f ;
 	pid_t		pid ;
+	uint		magic ;
 	int		mlen ;
 	int		fd ;
 	int		to ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(PCSNSC_MASTER)) || (PCSNSC_MASTER == 0)
+extern int pcsnsc_open(PCSNSC *,cchar *,int) noex ;
+extern int pcsnsc_status(PCSNSC *,PCSNSC_STAT *) noex ;
+extern int pcsnsc_help(PCSNSC *,char *,int,int) noex ;
+extern int pcsnsc_getval(PCSNSC *,char *,int,cchar *,int) noex ;
+extern int pcsnsc_getname(PCSNSC *,char *,int,cchar *) noex ;
+extern int pcsnsc_mark(PCSNSC *) noex ;
+extern int pcsnsc_exit(PCSNSC *,cchar *) noex ;
+extern int pcsnsc_close(PCSNSC *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int pcsnsc_open(PCSNSC *,cchar *,int) ;
-extern int pcsnsc_status(PCSNSC *,PCSNSC_STATUS *) ;
-extern int pcsnsc_help(PCSNSC *,char *,int,int) ;
-extern int pcsnsc_getval(PCSNSC *,char *,int,cchar *,int) ;
-extern int pcsnsc_getname(PCSNSC *,char *,int,cchar *) ;
-extern int pcsnsc_mark(PCSNSC *) ;
-extern int pcsnsc_exit(PCSNSC *,cchar *) ;
-extern int pcsnsc_close(PCSNSC *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSNSC_MASTER */
 
 #endif /* PCSNSC_INCLUDE */
 

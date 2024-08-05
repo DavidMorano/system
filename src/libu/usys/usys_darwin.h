@@ -48,6 +48,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #ifndef	SIGEVENT

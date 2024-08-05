@@ -19,10 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
 
 
 #define	LOGZONES		struct logzones_head
@@ -86,7 +86,7 @@ EXTERNC_begin
 extern int logzones_open(logzones *,cchar *,int,mode_t) noex ;
 extern int logzones_curbegin(logzones *,logzones_cur *) noex ;
 extern int logzones_curend(logzones *,logzones_cur *) noex ;
-extern int logzones_enum(logzones *,logzones_cur *,logzones_ent *) noex ;
+extern int logzones_curenum(logzones *,logzones_cur *,logzones_ent *) noex ;
 extern int logzones_match(logzones *,cchar *,int,int,logzones_ent *) noex ;
 extern int logzones_update(logzones *,cchar *,int,int,cchar *) noex ;
 extern int logzones_check(logzones *,time_t) noex ;

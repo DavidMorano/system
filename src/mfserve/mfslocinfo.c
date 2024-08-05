@@ -996,7 +996,7 @@ int locinfo_varsub(LOCINFO *lip,char *rbuf,int rlen,cchar *sp,int sl)
 	    varsub	*vsp = &lip->subs ;
 	    const int	vlen = VBUFLEN ;
 	    char	vbuf[VBUFLEN+1] ;
-	    if ((rs = varsub_expand(vsp,vbuf,vlen,sp,sl)) >= 0) {
+	    if ((rs = varsub_exp(vsp,vbuf,vlen,sp,sl)) >= 0) {
 	        EXPCOOK	*ecp = &lip->cooks ;
 	        rs = expcook_exp(ecp,0,rbuf,rlen,vbuf,rs) ;
 	        rl = rs ;

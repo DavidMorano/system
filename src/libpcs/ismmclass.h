@@ -1,13 +1,15 @@
-/* ismmclass */
+/* ismmclass HEADER */
+/* lang=C20 */
 
 /* character classes for mail content purposes */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-        The subroutine set was written from scratch to do what the previous
-        program by the same name did.
+	The subroutine set was written from scratch to do what the
+	previous program by the same name did.
 
 */
 
@@ -15,49 +17,31 @@
 
 /*******************************************************************************
 
-        These subroutines check a character to see if it is part of a special
-        character class. See the code for details!
-
+	These subroutines check a character to see if it is part
+	of a special character class.  See the code for details!
 
 *******************************************************************************/
 
-
 #ifndef	ISMMCLASS_INCLUDE
-#define	ISMMCLASS_INCLUDE	1
+#define	ISMMCLASS_INCLUDE
 
 
 #include	<envstandards.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
 
 
-/* local defines */
+EXTERNC_begin
 
+extern int ismmclass_7bit(int) noex ;
+extern int ismmclass_8bit(int) noex ;
+extern int ismmclass_binary(int) noex ;
 
-/* external subroutines */
+EXTERNC_end
 
-
-/* external variables */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* exported subroutines */
-
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int ismmclass_7bit(int) ;
-extern int ismmclass_8bit(int) ;
-extern int ismmclass_binary(int) ;
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* ISMMCLASS_INCLUDE */
 

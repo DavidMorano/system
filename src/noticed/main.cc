@@ -2120,7 +2120,7 @@ char	*argv[], *envv[] ;
 
 	    while (TRUE) {
 
-	        rs = pwfile_enum(&passwd,&cur,
+	        rs = pwfile_curenum(&passwd,&cur,
 	            &pe,pwentrybuf,PWENTRY_RECLEN) ;
 
 	        if (rs < 0)

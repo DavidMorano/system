@@ -20,23 +20,36 @@
 	This is a regular, pointer based, no-frills doubly linked
 	list queue.  Note that this object CAN be moved (copied)
 	since there are no pointers pointing back at the list head
-	(located in the object). This object (header) is NOT
+	(located in the object).  This object (header) is NOT
 	circularly linked.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
-#include	<usysrets.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	"pq.h"
+
+
+/* local defines */
 
 
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -68,14 +81,14 @@ int pq_finish(pq *qhp) noex {
 }
 /* end subroutine (pq_finish) */
 
-int pq_ins(pq *qhp,PQ_ENT *ep) noex {
+int pq_ins(pq *qhp,pq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (qhp) {
 	    rs = SR_OK ;
 	    if (qhp->head && qhp->tail) {
 	        if (qhp->head != qhp->tail) {
-	            PQ_ENT	*pep = qhp->tail ;
+	            pq_ent	*pep = qhp->tail ;
 	            ep->next = nullptr ;
 	            ep->prev = qhp->tail ;
 	            pep->next = ep ;
@@ -98,15 +111,15 @@ int pq_ins(pq *qhp,PQ_ENT *ep) noex {
 /* end subroutine (pq_ins) */
 
 /* insert a group into queue (at the tail) */
-int pq_insgroup(pq *qhp,PQ_ENT *gp,int esize,int n) noex {
+int pq_insgroup(pq *qhp,pq_ent *gp,int esize,int n) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && gp) {
 	    caddr_t		p = (caddr_t) gp ;
 	    rs = SR_INVALID ;
 	    if ((n > 0) && (esize > 0)) {
-	        PQ_ENT		*ep = (PQ_ENT *) p ;
-	        PQ_ENT		*pep ;
+	        pq_ent		*ep = (pq_ent *) p ;
+	        pq_ent		*pep ;
 		rs = SR_OK ;
 	        if (qhp->head && qhp->tail) {
 		    if (qhp->head != qhp->tail) {
@@ -124,7 +137,7 @@ int pq_insgroup(pq *qhp,PQ_ENT *gp,int esize,int n) noex {
 	            pep = ep ;
 	            p += esize ;
 	            for (int i = 1 ; i < n ; i += 1) {
-	                ep = (PQ_ENT *) p ;
+	                ep = (pq_ent *) p ;
 	                pep->next = ep ;
 	                ep->prev = pep ;
 	                p += esize ;
@@ -143,11 +156,11 @@ int pq_insgroup(pq *qhp,PQ_ENT *gp,int esize,int n) noex {
 }
 /* end subroutine (pq_insgroup) */
 
-int pq_gettail(pq *qhp,PQ_ENT **epp) noex {
+int pq_gettail(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (qhp) {
-	    PQ_ENT	*ep = nullptr ;
+	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 		rs = SR_OK ;
@@ -168,18 +181,18 @@ int pq_gettail(pq *qhp,PQ_ENT **epp) noex {
 }
 /* end subroutine (pq_gettail) */
 
-int pq_rem(pq *qhp,PQ_ENT **epp) noex {
+int pq_rem(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (qhp) {
-	    PQ_ENT	*ep = nullptr ;
+	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 	        ep = qhp->head ;
 		if (qhp->head != qhp->tail) {
 		    rs = SR_BADFMT ;
 	            if (ep->next && (ep->prev == nullptr)) {
-	                PQ_ENT	*nep = ep->next ;
+	                pq_ent	*nep = ep->next ;
 			rs = SR_OK ;
 	                nep->prev = nullptr ;
 	                qhp->head = nep ;
@@ -206,11 +219,11 @@ int pq_rem(pq *qhp,PQ_ENT **epp) noex {
 /* end subroutine (pq_rem) */
 
 /* remove from the TAIL of queue (to get "stack-like" behavior) */
-int pq_remtail(pq *qhp,PQ_ENT **epp) noex {
+int pq_remtail(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (qhp) {
-	    PQ_ENT	*ep = nullptr ;
+	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 	        rs = SR_BADFMT ;
@@ -218,7 +231,7 @@ int pq_remtail(pq *qhp,PQ_ENT **epp) noex {
 		if (qhp->head != qhp->tail) {
 		    rs = SR_BADFMT ;
 	            if ((ep->next == nullptr) && ep->prev) {
-	                PQ_ENT	*pep = ep->prev ;
+	                pq_ent	*pep = ep->prev ;
 			rs = SR_OK ;
 	                pep->next = nullptr ;
 	                qhp->tail = pep ;
@@ -245,13 +258,13 @@ int pq_remtail(pq *qhp,PQ_ENT **epp) noex {
 /* end subroutine (pq_remtail) */
 
 /* we apply some special care here to make sure we actually were in the Q */
-int pq_unlink(pq *qhp,PQ_ENT *ep) noex {
+int pq_unlink(pq *qhp,pq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
 	if (qhp && ep) {
 	     rs = SR_EMPTY ;
 	     if (qhp->head && qhp->tail) {
-	         PQ_ENT		*nep, *pep ;
+	         pq_ent		*nep, *pep ;
 	         rs = SR_OK ;
 	         if (ep->next != nullptr) {
 	             if (ep->prev != nullptr) {
@@ -316,10 +329,10 @@ int pq_audit(pq *qhp) noex {
 	if (qhp) {
 	    rs = SR_OK ;
 	    if (qhp->head && qhp->tail) {
-	        PQ_ENT		*ep = qhp->head ;
+	        pq_ent		*ep = qhp->head ;
 		rs = SR_BADFMT ;
 	        if (ep->prev) {
-	            PQ_ENT	*pep = ep ;
+	            pq_ent	*pep = ep ;
 	            rs = SR_OK ;
 	            ep = ep->next ;
 	            while (ep) {
@@ -362,14 +375,14 @@ int pq_curend(pq *qhp,pq_cur *curp) noex {
 }
 /* end subroutine (pq_curend) */
 
-int pq_enum(pq *qhp,pq_cur *curp,PQ_ENT **rpp) noex {
+int pq_enum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp && curp) {
 	    rs = SR_NOTFOUND ;
 	    if (qhp->head && qhp->tail) {
-	        PQ_ENT	*nep ;
+	        pq_ent	*nep ;
 	        if (curp->entp != nullptr) {
-	            PQ_ENT	*ep = curp->entp ;
+	            pq_ent	*ep = curp->entp ;
 		    nep = ep->next ;
 	        } else {
 	            nep = qhp->head ;

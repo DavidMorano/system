@@ -57,7 +57,7 @@ template<typename ... Args>
 static inline int q_ctor(q *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->pqp = new(nothrow) plainq) != np) {

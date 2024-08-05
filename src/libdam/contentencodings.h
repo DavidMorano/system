@@ -16,8 +16,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	CF_NONE		0
@@ -39,7 +41,7 @@ enum contentencodings {
 	contentencoding_overlast
 } ;
 
-extern const char	*contentencodings[] ;
+extern cchar	*contentencodings[] ;
 
 
 #endif /* CONTENTENCODINGS */

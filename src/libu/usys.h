@@ -44,6 +44,7 @@
 #include	<usys_ugetdents.h>
 #include	<usys_ugetnisdom.h>
 #include	<usys_usendfile.h>
+#include	<usys_ufstype.h>
 
 /* missing operating system calls */
 #include	<usys_mqueue.h>
