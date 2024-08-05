@@ -44,7 +44,8 @@
 
 /* local typedefs */
 
-typedef int	(*cmpfun_t)(cvoid *,cvoid *) noex ;
+typedef int		(*cmpfun_f)(cvoid *,cvoid *) noex ;
+typedef fifoitem_ent *	entp ;
 
 
 /* external subroutines */
@@ -105,71 +106,64 @@ int fifoitem_finish(fifoitem *op) noex {
 /* end subroutine (fifoitem_finish) */
 
 int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
-	cint		esize = sizeof(fifoitem_ent) ;
 	int		rs ;
-	void		*vp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-	if (op->magic != FIFOITEM_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = uc_malloc(esize,&vp)) >= 0) {
-	    fifoitem_ent	*ep = (fifoitem_ent *) vp ;
-	    if ((rs = entry_start(ep,sp,sl)) >= 0) {
-	        if (op->head == nullptr) {
-	            op->head = ep ;
-	            op->tail = ep ;
-	            ep->prev = ep->next = nullptr ;
-	        } else {
-	            ep->prev = op->tail ;
-	            (op->tail)->next = ep ;
-	            op->tail = ep ;
-	        } /* end if */
-	        op->n += 1 ;
-	    } /* end if (entry_start) */
-	    if (rs < 0) {
-	        uc_free(vp) ;
-	    }
-	} /* end if (m-a) */
-
+	if ((rs = fifoitem_magic(op,sp)) >= 0) {
+	    cint	esize = sizeof(fifoitem_ent) ;
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(esize,&vp)) >= 0) {
+	        fifoitem_ent	*ep = entp(vp) ;
+	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
+	            if (op->head == nullptr) {
+	                op->head = ep ;
+	                op->tail = ep ;
+	                ep->prev = ep->next = nullptr ;
+	            } else {
+	                ep->prev = op->tail ;
+	                (op->tail)->next = ep ;
+	                op->tail = ep ;
+	            } /* end if */
+	            op->n += 1 ;
+	        } /* end if (entry_start) */
+	        if (rs < 0) {
+	            uc_free(vp) ;
+	        }
+	    } /* end if (m-a) */
+	} /* end if (magic) */
 	return (rs >= 0) ? op->n : rs ;
 }
 /* end subroutine (fifoitem_ins) */
 
 int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
-	fifoitem_ent	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		dl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (vbuf == nullptr) return SR_FAULT ;
-	if (op->magic != FIFOITEM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->head == nullptr)
-	    return SR_NOENT ;
-
-	ep = op->head ;
-	if ((vlen >= 0) && (ep->dl > vlen))
-	    return SR_OVERFLOW ;
-
-	dl = ep->dl ;
-	memcpy(vbuf,ep->dp,ep->dl) ;
-
-	op->head = ep->next ;
-	if (op->head == nullptr) {
-	    op->tail = nullptr ;
-	} else {
-	    (op->head)->prev = nullptr ;
-	}
-
-	rs1 = entry_finish(ep) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = uc_free(ep) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->n -= 1 ;
+	if ((rs = fifoitem_magic(op,vbuf)) >= 0) {
+	    rs = SR_NOENT ;
+	    if (op->head) {
+	        fifoitem_ent	*ep = op->head ;
+		rs = SR_OVERFLOW ;
+	        if ((vlen < 0) || (ep->dl <= vlen)) {
+		    rs = SR_OK ;
+	            dl = ep->dl ;
+	            memcpy(vbuf,ep->dp,ep->dl) ;
+	            op->head = ep->next ;
+	            if (op->head == nullptr) {
+	                op->tail = nullptr ;
+	            } else {
+	                (op->head)->prev = nullptr ;
+	            }
+	            {
+	                rs1 = entry_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	            {
+	                rs1 = uc_free(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	            op->n -= 1 ;
+		} /* end if (not-overflow) */
+	    } /* end if (not-empty) */
+	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
 }
 /* end subroutine (fifoitem_rem) */
@@ -270,13 +264,13 @@ int fifoitem_count(fifoitem *op) noex {
 }
 /* end subroutine (fifoitem_count) */
 
-int fifoitem_finder(fifoitem *op,cchar *s,cmpfun_t cmpfunc,cchar **rpp) noex {
+int fifoitem_finder(fifoitem *op,cchar *s,cmpfun_f cmpfunc,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
 	if ((rs = fifoitem_magic(op,s)) >= 0) {
 	    fifoitem_cur	cur ;
-	    if (cmpfunc == nullptr) cmpfunc = (cmpfun_t) defaultcmp ;
+	    if (cmpfunc == nullptr) cmpfunc = (cmpfun_f) defaultcmp ;
 	    if ((rs = fifoitem_curbegin(op,&cur)) >= 0) {
 	        fifoitem_ent	*ep ;
 	        while ((rs = fifoitem_curfetch(op,&cur,&ep)) >= 0) {
