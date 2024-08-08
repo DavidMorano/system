@@ -1,7 +1,7 @@
 /* database HEADER */
 /* lang=C20 */
 
-/* Integer-Interlocked Queue */
+/* provide a variæty of database files */
 /* version %I% last-modified %G% */
 
 
