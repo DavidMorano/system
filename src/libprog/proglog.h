@@ -25,7 +25,6 @@
 
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<stdarg.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -34,6 +33,11 @@
 #include	<userinfo.h>
 
 #include	<proginfo.h>
+
+
+#ifndef	LOGCNAME
+#define	LOGCNAME	"log"
+#endif
 
 
 EXTERNC_begin

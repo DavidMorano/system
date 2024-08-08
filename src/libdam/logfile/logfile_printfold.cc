@@ -50,7 +50,7 @@
 
 /* forward references */
 
-static int logfile_printfi(logfile *,int,cchar *,int,cchar *,int) noex ;
+static int logfile_pfi(logfile *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -74,13 +74,13 @@ int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 	    for (int i = 0 ; (rs = linefold_getln(&fo,i,&sp)) > 0 ; i += 1) {
 		int	sl = rs ;
 		while (sl > n) {
-	            rs = logfile_printfi(lhp,c++,pre,pl,sp,n) ;
+	            rs = logfile_pfi(lhp,c++,pre,pl,sp,n) ;
 		    sl -= n ;
 		    sp = (sp+n) ;
 		    if (rs < 0) break ;
 		} /* end while */
 		if ((rs >= 0) && (sl > 0)) {
-	            rs = logfile_printfi(lhp,c++,pre,pl,sp,sl) ;
+	            rs = logfile_pfi(lhp,c++,pre,pl,sp,sl) ;
 		} /* end if */
 		if (rs < 0) break ;
 	    } /* end for */
@@ -94,8 +94,7 @@ int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int logfile_printfi(logfile *lhp,int li,cchar *pp,int pl,
-		cchar *sp,int sl) noex {
+static int logfile_pfi(logfile *lhp,int li,cc *pp,int pl,cc *sp,int sl) noex {
 	int		rs ;
 	if (li == 0) {
 	    cchar	*f0 = "%s| %t" ;
@@ -106,6 +105,6 @@ static int logfile_printfi(logfile *lhp,int li,cchar *pp,int pl,
 	}
 	return rs ;
 }
-/* end subroutine (logfile_printfi) */
+/* end subroutine (logfile_pfi) */
 
 

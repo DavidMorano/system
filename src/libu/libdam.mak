@@ -217,7 +217,7 @@ OBJ104= sesmsg.o msgdata.o
 OBJ105= dater.o dater_getdate.o date.o cachetime.o
 OBJ106= field.o field_word.o field_wordphrase.o field_srvarg.o field_svcargs.o
 OBJ107= lfm.o lastlogfile.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
-OBJ108= logfile.o logfile_userinfo.o logfile_printfold.o
+OBJ108= logfile.o
 OBJ109= vecstr_adds.o vecstr_foilcmp.o vecstr_svcargs.o vecstr_srvargs.o
 OBJ110= vecstr_avmkstr.o
 OBJ111= vecpstr_loadgrusers.o vecpstr_loadpjusers.o vecpstr_addsubdirs.o
@@ -655,10 +655,6 @@ keyvals.o:		keyvals.c keyvals.h
 
 paramopt.o:		paramopt.c paramopt.h
 
-logfile.o:		logfile.c logfile.h
-logfile_userinfo.o:	logfile_userinfo.c logfile.h userinfo.h
-logfile_printfold.o:	logfile_printfold.c logfile.h
-
 lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 loadave.o:		loadave.c loadave.h
@@ -829,6 +825,11 @@ database.dir:
 # IPAASWD
 ipasswd.o:		ipasswd.dir
 ipasswd.dir:
+	makesubdir $@
+
+# LOGFILE
+logfile.o:		logfile.dir
+logfile.dir:
 	makesubdir $@
 
 printhelp.o:		printhelp.cc printhelp.hh

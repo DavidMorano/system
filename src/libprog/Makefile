@@ -2,7 +2,8 @@
 
 T= libprog
 
-ALL= $(T).so $(T).a
+#ALL= $(T).so $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -36,7 +37,8 @@ DEFS +=
 
 INCS += libprog.h proginfo.h
 
-LIBS=
+#LIBS= -ldam -luc -lu
+LIBS= -lu
 
 
 INCDIRS=
@@ -56,8 +58,8 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= proginfo.o printhelp.o
-OBJ01= 
+OBJ00= proginfo.o proglog.o proguserlist.o
+OBJ01=
 OBJ02= 
 OBJ03= 
 
@@ -128,14 +130,15 @@ OBJ55=
 
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
-OBJA= 
+OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03)
 OBJB= 
 OBJC= 
 OBJD= 
 OBJE= 
 
 #OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
-OBJ= obja.o objb.o objc.o objd.o obje.o
+#OBJ= obja.o objb.o objc.o objd.o obje.o
+OBJ= obja.o 
 
 
 .SUFFIXES:		.hh .ii
@@ -229,6 +232,8 @@ control:
 	(uname -n ; date) > Control
 
 
-proginfo.o:	proginfo.cc		$(INCS)
+proginfo.o:	proginfo.cc			$(INCS)
+proglog.o:	proglog.cc proglog.h		$(INCS)
+proguserlist.o:	proguserlist.cc proguserlist.h	$(INCS)
 
 

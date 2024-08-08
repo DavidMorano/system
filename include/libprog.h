@@ -33,6 +33,7 @@
 #include	<proginfo.h>
 #include	<proglog.h>
 #include	<proguserlist.h>
+#include	<printhelp.hh>
 
 
 #endif /* LIBPROG_INCLUDE */

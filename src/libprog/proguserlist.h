@@ -18,7 +18,6 @@
 
 	Manage a program user-list operation.
 
-
 *******************************************************************************/
 
 #ifndef	PROGUSERLIST_INCLUDE
@@ -26,18 +25,18 @@
 
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
-#include	"defs.h"
+#include	<proginfo.h>
 
 
 EXTERNC_begin
 
-extern int	proguserlist_begin(PROGINFO *) ;
-extern int	proguserlist_end(PROGINFO *) ;
+extern int	proguserlist_begin(proginfo *) noex ;
+extern int	proguserlist_end(proginfo *) noex ;
  
 EXTERNC_end
 

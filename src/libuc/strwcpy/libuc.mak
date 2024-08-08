@@ -743,11 +743,6 @@ envs.o:			envs.dir
 envs.dir:
 	makesubdir $@
 
-# LOGFILE
-logfile.o:		logfile.dir
-logfile.dir:
-	makesubdir $@
-
 # FILER
 filer.o:		filer.dir
 filer.dir:
