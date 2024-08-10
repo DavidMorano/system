@@ -22,6 +22,11 @@
 #define	PROGINFO_FL	struct proginfo_flags
 
 
+enum proginfomems {
+	proginfomem_ncpu,
+	proginfomem_overlast
+} ;
+
 struct proginfo_head ;
 
 struct proginfo_flags {
@@ -75,7 +80,7 @@ struct proginfo_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	int operator () () noex ;
+	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
 	} ;
@@ -136,7 +141,6 @@ struct proginfo_vals {
 	int		debuglevel ;
 	int		verboselevel ;
 	int		quietlevel ;
-	int		ncpu ;
 	int		to ;		/* general time-out */
 	int		to_open ;	/* open time-out */
 	int		to_read ;	/* read time-out */
@@ -150,11 +154,13 @@ struct proginfo_vals {
 	int		intdis ;	/* interval disable */
 	int		pserial ;	/* "pserial" serial number */
 	int		serial ;	/* serial number */
+	int		ncpus ;		/* internal storage */
 	proginfo_vals() noex ;
 } ; /* end struct (proginfo_vals) */
 
 struct proginfo_head : proginfo_vals {
 	proginfo_hwser	hwserial ;
+	proginfo_co	ncpu ;
 	vecstr		*sip ;		/* store-info-pointer */
 	ids		*idp ;
 	logfile		*lhp ;
@@ -174,6 +180,7 @@ struct proginfo_head : proginfo_vals {
 	int		pwdlen ;
 	proginfo_head() noex ;
 	void args(int ac,mainv av,mainv ev) noex ;
+	int incpu() noex ;
 } ;
 
 typedef	PROGINFO	proginfo ;
