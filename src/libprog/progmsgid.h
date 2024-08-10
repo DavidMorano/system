@@ -1,7 +1,7 @@
-/* libprog HEADER */
+/* progmsgid HEADER */
 /* lang=C20 */
 
-/* program library */
+/* create a mail message ID */
 /* version %I% last-modified %G% */
 
 
@@ -16,26 +16,40 @@
 
 /*******************************************************************************
 
-	Manage program logging operations.
+	Name:
+	progmsgid
+
+	Description:
+	This subroutine is used to create a mail message ID for
+	certain PCS programs.
+
+	Synopsis:
+	int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex
 
 *******************************************************************************/
 
-#ifndef	LIBPROG_INCLUDE
-#define	LIBPROG_INCLUDE
+#ifndef	PROGMSGID_INCLUDE
+#define	PROGMSGID_INCLUDE
 
 
 #include	<envstandards.h>	/* must be before others */
+#include	<stdarg.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
+#include	<userinfo.h>
 
-#include	<proginfo.hh>
-#include	<proglog.h>
-#include	<proguserlist.h>
-#include	<progmsgid.h>
+#include	<proginfo.h>
 
 
-#endif /* LIBPROG_INCLUDE */
+EXTERNC_begin
+
+extern int progmsgid(proginfo *,char *,int,int) noex ;
+
+EXTERNC_end
+
+
+#endif /* PROGMSGID_INCLUDE */
 
 

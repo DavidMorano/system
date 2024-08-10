@@ -30,10 +30,10 @@
 #include	<utypealiases.h>
 #include	<usysrets.h>
 
-#include	<proginfo.h>
+#include	<proginfo.hh>
 #include	<proglog.h>
 #include	<proguserlist.h>
-#include	<printhelp.hh>
+#include	<progmsgid.h>
 
 
 #endif /* LIBPROG_INCLUDE */
