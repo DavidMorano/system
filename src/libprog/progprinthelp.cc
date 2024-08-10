@@ -41,38 +41,27 @@
 
 ******************************************************************************/
 
-
-#if	defined(SFIO) && (SFIO > 0)
-#define	CF_SFIO	1
-#else
-#define	CF_SFIO	0
-#endif
-
-#if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
-#include	<shell.h>
-#endif
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<bfile.h>
+#include	<mkpathx.h>
+#include	<xperm.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"defs.h"
+#include	"proginfo.h"
 
 
 /* local defines */
-
-#undef	COMMENT
 
 #ifndef	HELPSCHEDFNAME
 #define	HELPSCHEDFNAME	"etc/progprinthelp.filesched"
@@ -89,25 +78,23 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_loadfile(VECSTR *,int,const char *) ;
-extern int	isNotPresent(int) ;
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static int	findhelpfile(const char *,const char *,char *,const char *) ;
-static int	loadscheds(vecstr *,const char *,const char *) ;
-static int	printout(void *,char *,int,const char *) ;
+static int	findhelpfile(cchar *,cchar *,char *,cchar *) noex ;
+static int	loadscheds(vecstr *,cchar *,cchar *) noex ;
+static int	printout(void *,char *,int,cchar *) noex ;
 
 
 /* local variables */
 
-static const char	*schedule[] = {
+constexpr cpcchar	schedule[] = {
 	"%r/%l/%n/%n.%f",
 	"%r/%l/%n/%f",
 	"%r/share/help/%n.%f",
@@ -119,7 +106,7 @@ static const char	*schedule[] = {
 	"%r/%l/%n.%f",
 	"%r/%n.%f",
 	"%n.%f",
-	NULL
+	nullptr
 } ;
 
 
@@ -128,46 +115,33 @@ static const char	*schedule[] = {
 
 /* exported subroutines */
 
-int progprinthelp(PROGINFO *pip,void *fp,cchar *helpfname) noex {
+int progprinthelp(proginfo *pip,void *fp,cchar *helpfname) noex {
 	int		rs = SR_OK ;
-	cchar		*fname ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-
-	if ((helpfname == NULL) || (helpfname[0] == '\0'))
+	if ((helpfname == nullptr) || (helpfname[0] == '\0')) {
 	    helpfname = HELPFNAME ;
-
-#if	CF_SFIO
-	if (fp == NULL) {
-
-	    rs = SR_INVALID ;
-	    goto ret0 ;
 	}
-#endif /* CF_SFIO */
-
-	fname = helpfname ;
-	rs = SR_NOTFOUND ;
-	if ((pip->pr != NULL) && (helpfname[0] != '/')) {
-
-	    if (strchr(helpfname,'/') != NULL) {
-	        fname = tmpfname ;
-	        rs = mkpath2(tmpfname,pip->pr,helpfname) ;
-	        if (rs >= 0)
-	            rs = u_access(tmpfname,R_OK) ;
-
-	    } /* end if */
-
-	    if ((rs < 0) && isNotPresent(rs)) {
-	        fname = tmpfname ;
-	        rs = findhelpfile(pip->pr,pip->searchname,tmpfname,helpfname) ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    cint	tlen = rs ;
+	    cchar	*fname = helpfname ;
+	    rs = SR_NOTFOUND ;
+	    if ((pip->pr != nullptr) && (helpfname[0] != '/')) {
+	        if (strchr(helpfname,'/') != nullptr) {
+	            fname = tbuf ;
+	            if ((rs = mkpath2(tbuf,pip->pr,helpfname)) >= 0) {
+	                rs = u_access(tbuf,R_OK) ;
+		    }
+	        } /* end if */
+	        if ((rs < 0) && isNotPresent(rs)) {
+	            fname = tbuf ;
+	            rs = findhelpfile(pip->pr,pip->searchname,tbuf,helpfname) ;
+	        }
+	    } /* end if (searching for file) */
+	    if (rs >= 0) {
+	        rs = printout(fp,tbuf,tlen,fname) ;
 	    }
-
-	} /* end if (searching for file) */
-
-	if (rs >= 0)
-	    rs = printout(fp,tmpfname,MAXPATHLEN,fname) ;
-
-ret0:
-
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (progprinthelp) */
@@ -175,41 +149,28 @@ ret0:
 
 /* local subroutines */
 
-
-static int findhelpfile(pr,sn,tmpfname,helpfname)
-const char	*pr ;
-const char	*sn ;
-char		tmpfname[] ;
-const char	*helpfname ;
-{
+static int findhelpfile(cc *pr,cc *sn,char *tbuf,cc *helpfname) noex {
 	vecstr		svars ;
 	vecstr		hs ;
 	int		rs ;
 	int		rs1 ;
-	int		opts ;
-	int		f_hs = FALSE ;
-	const char	**spp ;
+	int		f_hs = false ;
+	cchar		**spp = schedule ;
 
 /* first see if there is a "help schedule" in the ETC directory */
 
-	spp = schedule ;
-	rs = mkpath2(tmpfname,pr,HELPSCHEDFNAME) ;
-
-	if (rs >= 0)
-	    rs = perm(tmpfname,-1,-1,NULL,R_OK) ;
-
-	if (rs >= 0) {
-
-	    opts = VECSTR_OCOMPACT ;
-	    rs = vecstr_start(&hs,15,opts) ;
-	    f_hs = (rs >= 0) ;
-	    if (rs >= 0) {
-	        rs1 = vecstr_loadfile(&hs,FALSE,tmpfname) ;
-	        if (rs1 >= 0)
-	            vecstr_getvec(&hs,&spp) ;
-	    }
-
-	} /* end if (could access) */
+	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
+	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
+		cint	ve = 15 ;
+	        cint	vo = VECSTR_OCOMPACT ;
+	        if ((rs = vecstr_start(&hs,ve,vo)) >= 0) {
+	            f_hs = true ;
+	            if ((rs1 = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
+	                vecstr_getvec(&hs,&spp) ;
+		    }
+	        }
+	    } /* end if (could access) */
+	}
 
 /* create the values for the file schedule searching and find the file */
 
@@ -221,13 +182,14 @@ const char	*helpfname ;
 
 /* OK, do the look-up */
 
-	        if (rs >= 0)
+	        if (rs >= 0) {
 	            rs = permsched(spp,&svars,
-	                tmpfname,MAXPATHLEN, helpfname,R_OK) ;
-
-	        if (isNotPresent(rs) && (spp != schedule))
+	                tbuf,MAXPATHLEN, helpfname,R_OK) ;
+		}
+	        if (isNotPresent(rs) && (spp != schedule)) {
 	            rs1 = permsched(schedule,&svars,
-	                tmpfname,MAXPATHLEN, helpfname,R_OK) ;
+	                tbuf,MAXPATHLEN, helpfname,R_OK) ;
+		}
 
 	        vecstr_finish(&svars) ;
 	    } /* end if (schedule variables) */
@@ -241,39 +203,31 @@ const char	*helpfname ;
 }
 /* end subroutine (findhelpfile) */
 
-
-static int loadscheds(vecstr *slp,const char *pr,const char *sn)
-{
+static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	int	rs = SR_OK ;
-
-
-	if (pr != NULL) rs = vecstr_envadd(slp,"r",pr,-1) ;
-
-	if (rs >= 0) rs = vecstr_envadd(slp,"l",LIBCNAME,-1) ;
-
-	if ((rs >= 0) && (sn != NULL))
+	if (pr != nullptr) {
+	    rs = vecstr_envadd(slp,"r",pr,-1) ;
+	}
+	if (rs >= 0) {
+	    rs = vecstr_envadd(slp,"l",LIBCNAME,-1) ;
+	}
+	if ((rs >= 0) && (sn != nullptr)) {
 	    rs = vecstr_envadd(slp,"n",sn,-1) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (loadscheds) */
 
-
-static int printout(fp,lbuf,llen,fname)
-void		*fp ;
-char		lbuf[] ;
-int		llen ;
-const char	*fname ;
-{
+static int printout(void *fp,char *lbuf,int llen,cchar *fname) noex {
 	bfile		outfile ;
 	bfile		helpfile, *hfp = &helpfile ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	int		f_open = FALSE ;
+	int		f_open = false ;
 
-	if (lbuf == NULL) return SR_FAULT ;
+	if (lbuf == nullptr) return SR_FAULT ;
 
-	if (fp == NULL) {
+	if (fp == nullptr) {
 	    fp = &outfile ;
 	    rs = bopen(fp,BFILE_STDOUT,"w",0666) ;
 	    f_open = (rs >= 0) ;

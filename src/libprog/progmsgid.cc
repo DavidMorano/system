@@ -25,7 +25,7 @@
 	certain PCS programs.
 
 	Synopsis:
-	int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial)
+	int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial) noex
 
 	Arguments:
 	pip		pointer to program information
@@ -40,9 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |gethostid(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -77,10 +75,12 @@ struct vars {
 
 /* forward references */
 
-static int	mkvars() ;
+static int	mkvars() noex ;
 
 
 /* local variables */
+
+static vars		var ;
 
 constexpr bool		f_hostid = CF_HOSTID ;
 
@@ -118,7 +118,7 @@ int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial) noex {
 	                }
 		        {
 	                    uv = uint(pid) ;
-	                    ub.decui(uv) ;
+	                    ub.dec(uv) ;
     		        }
 	                ub.chr('.') ;
     	                {

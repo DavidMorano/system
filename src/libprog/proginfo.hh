@@ -1,5 +1,8 @@
 /* proginfo HEADER */
-/* lang=C20 */
+/* lang=C++20 */
+
+/* program information */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -9,35 +12,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usystem.h>
 #include	<vecstr.h>
 #include	<ids.h>
 #include	<logfile.h>
-#include	<localmisc.h>
 
 
 #define	PROGINFO	struct proginfo_head
 #define	PROGINFO_FL	struct proginfo_flags
 
 
-struct arginfo {
-	cchar		**argv ;
-	int		argc ;
-	int		ai, ai_max, ai_pos ;
-	int		ai_continue ;
-} ;
-
-struct pivars {
-	cchar		*vpr1 ;
-	cchar		*vpr2 ;
-	cchar		*vpr3 ;
-	cchar		*pr ;
-	cchar		*vprname ;
-} ;
+struct proginfo_head ;
 
 struct proginfo_flags {
 	uint		progdash:1 ;	/* leading dash on program-name */
@@ -76,6 +61,26 @@ struct proginfo_flags {
 	uint		to:1 ;
 } ;
 
+struct proginfo_hwser {
+	proginfo_head	*op = nullptr ;
+	uint		val ;
+	void operator () (proginfo_head *) noex ;
+	operator uint() noex ;
+} ;
+
+struct proginfo_co {
+	proginfo_head	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (proginfo_head *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () () noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ;
+
 struct proginfo_vals {
 	cchar		*argz ;
 	cchar		*progename ;	/* execution filename */
@@ -93,7 +98,6 @@ struct proginfo_vals {
 	cchar		*architecture ;	/* UAUX machine architecture */
 	cchar		*platform ;	/* UAUX machine platform */
 	cchar		*provider ;	/* UAUX machine provider */
-	cchar		*hwserial ;	/* UAUX machine hwserial */
 	cchar		*nisdomain ;	/* UAUX machine nisdomain */
 	cchar		*hz ;		/* OS HZ */
 	cchar		*nodename ;	/* USERINFO */
@@ -144,17 +148,23 @@ struct proginfo_vals {
 	int		intmark ;	/* interval mark */
 	int		intlock ;	/* interval lock */
 	int		intdis ;	/* interval disable */
-} ;
+	int		pserial ;	/* "pserial" serial number */
+	int		serial ;	/* serial number */
+	proginfo_vals() noex ;
+} ; /* end struct (proginfo_vals) */
 
 struct proginfo_head : proginfo_vals {
+	proginfo_hwser	hwserial ;
 	vecstr		*sip ;		/* store-info-pointer */
 	ids		*idp ;
 	logfile		*lhp ;
 	mainv		argv ;
 	mainv		envv ;
 	cchar		*pwd ;
-	PROGINFO_FL	have, pf, changed ;
-	PROGINFO_FL	open ;
+	PROGINFO_FL	have{} ;
+	PROGINFO_FL	pf{} ;
+	PROGINFO_FL	changed{} ;
+	PROGINFO_FL	open{} ;
 	TIMEB		now ;
 	time_t		daytime ;
 	pid_t		pid ;
@@ -162,9 +172,12 @@ struct proginfo_head : proginfo_vals {
 	gid_t		gid, egid ;
 	int		argc ;
 	int		pwdlen ;
+	proginfo_head() noex ;
+	void args(int ac,mainv av,mainv ev) noex ;
 } ;
 
 typedef	PROGINFO	proginfo ;
+typedef	PROGINFO_FL	proginfo_fl ;
 
 EXTERNC_begin
 
