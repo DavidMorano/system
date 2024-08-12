@@ -1,11 +1,8 @@
-/* uc_waitwritable */
+/* uc_waitwritable SUPPORT */
+/* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* wait for an FD to become writable */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -19,41 +16,37 @@
 
 /*******************************************************************************
 
+	Name:
 	Wait for an FD to become writable.
 
-	Synopsis:
+	Description:
+	Wait for a file-descriptor to become writable.
 
-	int uc_waitwritable(fd,to)
-	int		fd ;
-	int		to ;
+	Synopsis:
+	int uc_waitwritable(int fd,int to) noex
 
 	Arguments:
-
 	fd		FD to wait on
 	to 		time-out in seconds to wait for
 
 	Returns:
-
 	>=0		file descriptor
-	<0		error in dialing
-
+	<0		error in dialing (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/poll.h>
 #include	<sys/socket.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -71,6 +64,17 @@
 #endif
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -86,54 +90,31 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_waitwritable(int fd,int timeout)
-{
-	struct pollfd	polls[2] ;
+int uc_waitwritable(int fd,int timeout) noex {
+	POLLFD		polls[2] ;
 	time_t		dt = 0 ;
 	time_t		ti_timeout = 0 ;
 	int		rs = SR_OK ;
-	int		pollto = (INTPOLL*POLL_INTMULT) ;
+	int		pollto = (INTPOLL * POLL_INTMULT) ;
 	int		nfds = 0 ;
 	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("dialpass/waitready: timeout=%d\n",timeout) ;
-	debugprintf("dialpass/waitready: fd=%d\n",fd) ;
-#endif
-
 	if (timeout >= 0) {
-	    dt = time(NULL) ;
+	    dt = time(nullptr) ;
 	    ti_timeout = (dt + timeout) ;
-	    pollto = MIN(timeout,5) * POLL_INTMULT ;
+	    pollto = min(timeout,5) * POLL_INTMULT ;
 	}
-
 	polls[nfds].fd = fd ;
 	polls[nfds].events = (POLLOUT | POLLWRBAND) ;
 	polls[nfds].revents = 0 ;
 	nfds += 1 ;
-
-/* CONSTCOND */
-
 	while (rs >= 0) {
-
-#if	CF_DEBUGS
-	    debugprintf("dialpass/waitready: pollto=%d\n",pollto) ;
-#endif
-
 	    if ((rs = u_poll(polls,nfds,pollto)) > 0) {
-		const int	re = polls[0].revents ;
-
-#if	CF_DEBUGS
-	        {
-	            char	buf[BUFLEN + 1] ;
-	            debugprintf("dialpass/waitready: revents=%s\n",
-	                d_reventstr(re,buf,BUFLEN)) ;
-	        }
-#endif /* CF_DEBUGS */
-
+		cint	re = polls[0].revents ;
 	        if (re & POLLHUP) {
 	            rs = SR_HANGUP ;
 	        } else if (re & POLLERR) {
@@ -143,23 +124,15 @@ int uc_waitwritable(int fd,int timeout)
 	        } else if ((re & POLLOUT) || (re & POLLWRBAND)) {
 		    f = TRUE ;
 		}
-
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
 	    }
-
 	    if ((rs >= 0) && (! f) && (timeout >= 0)) {
-	            dt = time(NULL) ;
-		    if (dt >= ti_timeout) rs = SR_TIMEDOUT ;
+	        dt = time(nullptr) ;
+		if (dt >= ti_timeout) rs = SR_TIMEDOUT ;
 	    }
-
 	    if ((rs >= 0) && f) break ;
 	} /* end while */
-
-#if	CF_DEBUGS
-	debugprintf("dialpass/waitready: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (uc_waitwritable) */

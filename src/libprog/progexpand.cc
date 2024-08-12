@@ -1,10 +1,8 @@
-/* expander */
+/* progexpand SUPPORT */
+/* lang=C++20 */
 
 /* expand out some per program parameters */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,10 +16,13 @@
 
 /*******************************************************************************
 
-        This subroutine expands out some per program (the daemon program)
-        parameters into the configuration strings. Actually this little
-        subroutine is used by many programs.
+	Name:
+	progexpand
 
+	Descrption: 
+	This subroutine expands out some per program (the daemon
+	program) parameters into the configuration strings.  Actually
+	this little subroutine is used by many programs.
 
 #	The following substitutions are made on command strings:
 
@@ -37,25 +38,33 @@
 #		%R	program root directory
 #
 
+	Synopsis:
+	int progexpand(proginfo *pip,char *rbuf,int rlen,cchar *sp,int sl) noex
+
+	Arguments:
+	pip		program-information-pointer
+	rbuf		result buffer pointer
+	rlen		result buffer length
+	sp		source pointer
+	sl		source length
+
+	Returns:
+	>=0		resulting length
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<netdb.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
+#include	<snx.h>
 #include	<localmisc.h>
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proginfo.h"
 
 
 /* local defines */
@@ -63,49 +72,37 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-
 
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int expander(app,sbuf,slen,rbuf,rlen)
-PROGINFO	*app ;
-const char	sbuf[] ;
-char		rbuf[] ;
-int		slen ;
-int		rlen ;
-{
-	int		rs = SR_OK ;
-	int		len ;
-	int		cl ;
-	int		ch ;
+int progexpand(proginfo *pip,char *rbuf,int rlen,cchar *sbuf,int slen) noex {
+	int		rs = SR_FAULT ;
 	int		elen = 0 ;
-	const char	*bp = sbuf ;
-	const char	*cp ;
-	char		hostname[MAXHOSTNAMELEN + 1] ;
+	if (pip && rbuf && sbuf) {
+	cint		hlen = MAXHOSTNAMELEN ;
+	int		len = strnlen(sbuf,slen) ;
+	int		cl ;
+	cchar		*bp = sbuf ;
+	cchar		*cp ;
+	char		hbuf[MAXHOSTNAMELEN + 1] ;
 	char		*rbp = rbuf ;
-
-#if	CF_DEBUGS
-	debugprintf("expnader: ent buflen=%d rbuflen=%d\n",
-	    buflen,rlen) ;
-#endif
-
-	if (app == NULL) return SR_FAULT ;
-	if (sbuf == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	len = strnlen(sbuf,slen) ;
-
-#if	CF_DEBUGS
-	debugprintf("expnader: buf=>%t<\n",sbuf,len) ;
-#endif
-
 	while ((len > 0) && (elen < rlen)) {
-	    ch = MKCHAR(*bp) ;
+	    cint	ch = MKCHAR(*bp) ;
 	    switch (ch) {
 	    case '%':
 	        bp += 1 ;
@@ -114,48 +111,53 @@ int		rlen ;
 		cl = 0 ;
 	        switch (ch) {
 	        case 'V':
-	            cp = app->version ;
+	            cp = pip->version ;
 	            cl = strlen(cp) ;
 	            break ;
 #if	defined(DEFS_ROOTNAME) && (DEFS_ROOTNAME > 0)
 	        case 'B':
-		    if ((cp = app->rootname) != NULL)
+		    if ((cp = pip->rootname) != NULL) {
 	            	cl = strlen(cp) ;
+		    }
 	            break ;
 #endif /* P_RCPMUXD */
 	        case 'P':
-	            cp = app->progname ;
+	            cp = pip->progname ;
 	            cl = strlen(cp) ;
 	            break ;
 	        case 'S':
-		    if ((cp = app->searchname) != NULL)
+		    if ((cp = pip->searchname) != NULL) {
 	            	cl = strlen(cp) ;
+		    }
 	            break ;
 	        case 'N':
-	            cp = app->nodename ;
+	            cp = pip->nodename ;
 	            cl = strlen(cp) ;
 	            break ;
 	        case 'D':
-	            cp = app->domainname ;
+	            cp = pip->domainname ;
 	            cl = strlen(cp) ;
 	            break ;
 	        case 'H':
-	            cp = hostname ;
-	            cl = snsds(hostname,MAXHOSTNAMELEN,
-	                app->nodename,app->domainname) ;
+	            cp = hbuf ;
+	            rs = snsds(hbuf,hlen,pip->nodename,pip->domainname) ;
+		    cl = rs ;
 	            break ;
 /* handle the expansion of our program root */
 	        case 'R':
-	            if ((cp = app->pr) != NULL)
+	            if ((cp = pip->pr) != NULL) {
 	                cl = strlen(cp) ;
+		    }
 	            break ;
 	        case 'U':
-		    if ((cp = app->username) != NULL)
+		    if ((cp = pip->username) != NULL) {
 			cl = strlen(cp) ;
+		    }
 	            break ;
 	        case 'G':
-		    if ((cp = app->groupname) != NULL)
+		    if ((cp = pip->groupname) != NULL) {
 			cl = strlen(cp) ;
+		    }
 	            break ;
 	        default:
 	            cp = bp ;
@@ -179,20 +181,13 @@ int		rlen ;
 		break ;
 	    } /* end switch */
 	} /* end while */
-
-	if ((rs >= 0) && (elen >= rlen))
+	if ((rs >= 0) && (elen >= rlen)) {
 	    rs = SR_OVERFLOW ;
-
+	}
 	rbuf[elen] = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("expander: ret rs=%d elen=%d\n",rs,elen) ;
-	if (rs >= 0)
-	debugprintf("expnader: ebuf=>%t<\n",rbuf,elen) ;
-#endif
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? elen : rs ;
 }
-/* end subroutine (expander) */
+/* end subroutine (progexpand) */
 
 

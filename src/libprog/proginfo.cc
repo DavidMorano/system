@@ -89,11 +89,11 @@ extern int	debugprintf(cchar *,...) noex ;
 
 /* forward references */
 
-static int	proginfo_setdefnames(PROGINFO *) noex ;
+static int	proginfo_setdefnames(proginfo *) noex ;
 
 #ifdef	COMMENT
-static int	proginfo_setdefdn(PROGINFO *) ;
-static int	proginfo_setdefpn(PROGINFO *) ;
+static int	proginfo_setdefdn(proginfo *) ;
+static int	proginfo_setdefpn(proginfo *) ;
 #endif
 
 static bool	hasourbad(cchar *,int) noex ;
@@ -107,7 +107,7 @@ static bool	hasourbad(cchar *,int) noex ;
 
 /* exported subroutines */
 
-int proginfo_start(PROGINFO *pip,mainv envv,mainv argv,cc *ver) noex {
+int proginfo_start(proginfo *pip,mainv envv,mainv argv,cc *ver) noex {
 	int		rs ;
 	int		opts ;
 
@@ -141,7 +141,7 @@ int proginfo_start(PROGINFO *pip,mainv envv,mainv argv,cc *ver) noex {
 }
 /* end subroutine (proginfo_start) */
 
-int proginfo_finish(PROGINFO *pip) noex {
+int proginfo_finish(proginfo *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -154,7 +154,7 @@ int proginfo_finish(PROGINFO *pip) noex {
 }
 /* end subroutine (proginfo_finish) */
 
-int proginfo_setentry(PROGINFO *pip,cchar **epp,cchar *vp,int vl) noex {
+int proginfo_setentry(proginfo *pip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*vsp = pip->sip ;
 	int		rs = SR_OK ;
 	int		oi = -1 ;
@@ -180,7 +180,7 @@ int proginfo_setentry(PROGINFO *pip,cchar **epp,cchar *vp,int vl) noex {
 }
 /* end subroutine (proginfo_setentry) */
 
-int proginfo_setversion(PROGINFO *pip,cchar *v) noex {
+int proginfo_setversion(proginfo *pip,cchar *v) noex {
 	int		rs ;
 
 	if (pip == nullptr) return SR_FAULT ;
@@ -195,7 +195,7 @@ int proginfo_setversion(PROGINFO *pip,cchar *v) noex {
 }
 /* end subroutine (proginfo_setversion) */
 
-int proginfo_setbanner(PROGINFO *pip,cchar *v) noex {
+int proginfo_setbanner(proginfo *pip,cchar *v) noex {
 	int		rs ;
 
 	if (pip == nullptr) return SR_FAULT ;
@@ -210,7 +210,7 @@ int proginfo_setbanner(PROGINFO *pip,cchar *v) noex {
 }
 /* end subroutine (proginfo_setbanner) */
 
-int proginfo_setsearchname(PROGINFO *pip,cchar *var,cchar *value) noex {
+int proginfo_setsearchname(proginfo *pip,cchar *var,cchar *value) noex {
 	int		rs = SR_OK ;
 	int		cl = -1 ;
 	cchar		*cp = value ;
@@ -254,7 +254,7 @@ int proginfo_setsearchname(PROGINFO *pip,cchar *var,cchar *value) noex {
 /* end subroutine (proginfo_setsearchname) */
 
 /* set program directory and program name (as might be possible) */
-int proginfo_setprogname(PROGINFO *pip,cchar *ap) noex {
+int proginfo_setprogname(proginfo *pip,cchar *ap) noex {
 	int		rs = SR_OK ;
 	int		al ;
 	int		dl, bl ;
@@ -374,7 +374,7 @@ int proginfo_setprogname(PROGINFO *pip,cchar *ap) noex {
 }
 /* end subroutine (proginfo_setprogname) */
 
-int proginfo_setprogroot(PROGINFO *pip,cchar *prp,int prl) noex {
+int proginfo_setprogroot(proginfo *pip,cchar *prp,int prl) noex {
 	int		rs = SR_OK ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
@@ -399,7 +399,7 @@ int proginfo_setprogroot(PROGINFO *pip,cchar *prp,int prl) noex {
 }
 /* end subroutine (proginfo_setprogroot) */
 
-int proginfo_setexecname(PROGINFO *pip,cchar *enp) noex {
+int proginfo_setexecname(proginfo *pip,cchar *enp) noex {
 	int		rs = SR_OK ;
 
 	if (enp == nullptr) return SR_FAULT ;
@@ -421,7 +421,7 @@ int proginfo_setexecname(PROGINFO *pip,cchar *enp) noex {
 }
 /* end subroutine (proginfo_setexecname) */
 
-int proginfo_pwd(PROGINFO *pip) noex {
+int proginfo_pwd(proginfo *pip) noex {
 	int		rs = SR_OK ;
 	int		pwdlen = 0 ;
 
@@ -441,7 +441,7 @@ int proginfo_pwd(PROGINFO *pip) noex {
 }
 /* end subroutine (proginfo_pwd) */
 
-int proginfo_progdname(PROGINFO *pip) noex {
+int proginfo_progdname(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->progdname == nullptr) {
@@ -476,7 +476,7 @@ int proginfo_progdname(PROGINFO *pip) noex {
 }
 /* end subroutine (proginfo_progdname) */
 
-int proginfo_progename(PROGINFO *pip) noex {
+int proginfo_progename(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
@@ -536,7 +536,7 @@ int proginfo_progename(PROGINFO *pip) noex {
 }
 /* end subroutine (proginfo_progename) */
 
-int proginfo_nodename(PROGINFO *pip) noex {
+int proginfo_nodename(proginfo *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nl = 0 ;
@@ -559,7 +559,7 @@ int proginfo_nodename(PROGINFO *pip) noex {
 }
 /* end subroutine (proginfo_nodename) */
 
-int proginfo_getename(PROGINFO *pip,char *rbuf,int rlen) noex {
+int proginfo_getename(proginfo *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
@@ -585,7 +585,7 @@ int proginfo_getename(PROGINFO *pip,char *rbuf,int rlen) noex {
 }
 /* end subroutine (proginfo_getename) */
 
-int proginfo_getpwd(PROGINFO *pip,char *rbuf,int rlen) noex {
+int proginfo_getpwd(proginfo *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 
 	if (pip == nullptr) return SR_FAULT ;
@@ -608,7 +608,7 @@ int proginfo_getpwd(PROGINFO *pip,char *rbuf,int rlen) noex {
 }
 /* end subroutine (proginfo_getpwd) */
 
-int proginfo_getenv(PROGINFO *pip,cchar *sp,int sl,cchar **rpp) noex {
+int proginfo_getenv(proginfo *pip,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_NOTFOUND ;
 	if (sp == nullptr) return SR_FAULT ;
 	if (pip->envv != nullptr) {
@@ -621,7 +621,7 @@ int proginfo_getenv(PROGINFO *pip,cchar *sp,int sl,cchar **rpp) noex {
 
 /* local subroutines */
 
-static int proginfo_setdefnames(PROGINFO *pip) noex {
+static int proginfo_setdefnames(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->progname == nullptr) {
@@ -640,7 +640,7 @@ static int proginfo_setdefnames(PROGINFO *pip) noex {
 #ifdef	COMMENT
 
 /* Set Default (program) Directory-Name */
-static int proginfo_setdefdn(PROGINFO *pip) noex {
+static int proginfo_setdefdn(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->progdname == nullptr) {
@@ -659,7 +659,7 @@ static int proginfo_setdefdn(PROGINFO *pip) noex {
 /* end subroutine (proginfo_setdefdn) */
 
 /* Set Default Program-Name */
-static int proginfo_setdefpn(PROGINFO *pip) noex {
+static int proginfo_setdefpn(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->progname == nullptr) {

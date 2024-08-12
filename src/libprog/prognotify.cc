@@ -84,6 +84,9 @@
 #define	MSGSENDTRIES	5
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -111,18 +114,10 @@ struct reportinfo {
 } ;
 
 
-/* local typedefs */
-
-#if	defined(IRIX) && (! defined(TYPEDECF_INADDRT))
-#define	TYPEDECF_INADDRT	1
-typedef unsigned int	in_addr_t ;
-#endif
-
-
 /* forward references */
 
 static int	prognotifyrecip(PROGINFO *,vecobj *,
-			REPORTINFO *,PARAMFILE *,RECIP *) noex ;
+			REPORTINFO *,paramfile *,RECIP *) noex ;
 static int	prognotifyrecipnode(PROGINFO *,vecobj *,
 			REPORTINFO *,RECIP *,cchar *,int) noex ;
 static int	report(PROGINFO *,REPORTINFO *) noex ;
@@ -139,9 +134,10 @@ static int	searchfunc() noex ;
 /* exported subroutines */
 
 int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
-	REPORTINFO	ri ;
-	PARAMFILE	mbtab ;
-	int		rs, rs1 ;
+	REPORTINFO	ri{} ;
+	paramfile	mbtab ;
+	int		rs ;
+	int		rs1 ;
 	int		defport ;
 	int		cl ;
 	int		c = 0 ;
@@ -151,7 +147,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 
 /* do we have a MBTAB database? */
 
-	if ((pip->mbfname == NULL) || (! pip->f.mbtab))
+	if ((pip->mbfname == nullptr) || (! pip->f.mbtab))
 	    return SR_OK ;
 
 	if (pip->debuglevel > 0) {
@@ -171,12 +167,11 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 	    rs = SR_OK ;
 	}
 
-	memset(&ri,0,sizeof(REPORTINFO)) ;
 	ri.defport = defport ;
 
 /* set some stuff that is relatively constant and used later */
 
-	if (cluster == NULL) cluster = pip->nodename ;
+	if (cluster == nullptr) cluster = pip->nodename ;
 	{
 	    char	hashbuf[MAXHOSTNAMELEN+ 1] ;
 	    cl = snsds(hashbuf,MAXHOSTNAMELEN,cluster,pip->logid) ;
@@ -190,7 +185,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 
 /* initialze the message to send */
 
-	memset(&ri.m1,0,sizeof(struct mcmsg_report)) ;
+	ri.m1 = {} ;
 	ri.m1.tag = ri.tag ;
 	ri.m1.rc = mcmsgrc_ok ;
 	strwcpy(ri.m1.cluster,cluster,MCMSG_LCLUSTER) ;
@@ -207,7 +202,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 	        int	i ;
 
 	        for (i = 0 ; vecobj_get(rsp,i,&rp) >= 0 ; i += 1) {
-	            if (rp != NULL) {
+	            if (rp != nullptr) {
 	                if (rp->ds >= 0) {
 	                    rs = prognotifyrecip(pip,mip,&ri,&mbtab,rp) ;
 	                }
@@ -215,10 +210,12 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 	            if (rs < 0) break ;
 	        } /* end for (recipients) */
 
-	        paramfile_close(&mbtab) ;
+	        rs1 = paramfile_close(&mbtab) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (paramfile) */
 
-	    u_close(ri.fd) ;
+	    rs1 = u_close(ri.fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (socket) */
 
 	} /* end if (ok) */
@@ -230,14 +227,9 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 
 /* local subroutines */
 
-static int prognotifyrecip(pip,mip,rip,mbp,rp)
-PROGINFO	*pip ;
-vecobj		*mip ;
-REPORTINFO	*rip ;
-PARAMFILE	*mbp ;
-RECIP		*rp ;
-{
-	PARAMFILE_CUR	cur ;
+static int prognotifyrecip(proginfo *pip,vecobj *mip,REPORTINFO *rip,
+		paramfile *mbp,RECIP *rp) noex {
+	paramfile_cur	cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ul ;
@@ -291,25 +283,19 @@ RECIP		*rp ;
 }
 /* end subroutine (prognotifyrecip) */
 
-static int prognotifyrecipnode(pip,mip,rip,rp,nn,port)
-PROGINFO	*pip ;
-vecobj		*mip ;
-REPORTINFO	*rip ;
-RECIP		*rp ;
-cchar	*nn ;
-int		port ;
-{
-	HOSTENT	he, *hep = &he ;
-	MSGINFO	mi, *iep = &mi ;
+static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
+		RECIP *rp,cc *nn,int port) noex {
+	HOSTENT		he, *hep = &he ;
+	MSGINFO		mi, *iep = &mi ;
 	int		moff ;
-	cint	helen = getbufsize(getbufsize_he) ;
-	cint	af = AF_INET4 ;
+	cint		helen = getbufsize(getbufsize_he) ;
+	cint		af = AF_INET4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		k ;
 	int		ml ;
 	int		c = 0 ;
-	cchar	*np = nn ;
+	cchar		*np = nn ;
 	char		*hebuf ;
 
 #if	CF_ISSAMEHOST
@@ -321,7 +307,7 @@ int		port ;
 #endif
 
 	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	    if ((rs = getheour(np,NULL,hep,hebuf,helen)) >= 0) {
+	    if ((rs = getheour(np,nullptr,hep,hebuf,helen)) >= 0) {
 		if (hep->h_addrtype == AF_INET) {
 	    	    cchar	*a = (cchar *) hep->h_addr ;
 
@@ -331,50 +317,41 @@ int		port ;
 /* send the messages */
 
 	        for (k = 0 ; (ml = recip_getmo(rp,k,&moff)) >= 0 ; k += 1) {
-
-/* find this message in the MSGINFO list */
-
+		    /* find this message in the MSGINFO list */
 	            mi.moff = moff ;
 	            mi.mlen = ml ;
 	            rs1 = vecobj_search(mip,&mi,searchfunc,&iep) ;
-
 	            if (rs1 >= 0) {
-
 	                rip->m1.mlen = iep->mlen ;
 	                rip->m1.flags = 0 ;
 	                rip->m1.flags |= (iep->f.spam) ? 1 : 0 ;
 	                rip->m1.flags |= (iep->f.messageid) ? 2 : 0 ;
-	                strwcpy(rip->m1.msgid,iep->h_messageid,
-	                    MCMSG_LMSGID) ;
-
-	                strwcpy(rip->m1.from,iep->h_from,
-	                    MCMSG_LFROM) ;
-
-/* send the report */
-
+	                strwcpy(rip->m1.msgid,iep->h_messageid,MCMSG_LMSGID) ;
+	                strwcpy(rip->m1.from,iep->h_from,MCMSG_LFROM) ;
+			/* send the report */
 	                rs = report(pip,rip) ;
 	                if (rs > 0) c += 1 ;
-
 	            } /* end if (found message) */
 
 	        } /* end for (messages) */
 
-	        sockaddress_finish(&rip->sa) ;
+	        rs1 = sockaddress_finish(&rip->sa) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 
 	    } /* end if (ver=inet4) */
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	}
-	    uc_free(hebuf) ;
+	    rs1 = uc_free(hebuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (prognotifyrecipnode) */
 
-static int report(PROGINFO *pip,struct reportinfo *rip)
-{
+static int report(PROGINFO *pip,REPORTINFO *rip) noex {
 	struct mcmsg_ack	m2 ;
 	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
 	cint		mlen = MSGBUFLEN ;
@@ -384,29 +361,23 @@ static int report(PROGINFO *pip,struct reportinfo *rip)
 	cint		n = MSGSENDTRIES ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i, blen ;
-	int		f = FALSE ;
-
-	for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-
+	int		blen ;
+	int		f = false ;
+	for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	    rip->m1.seq = (uchar) i ;
-	    rip->m1.timestamp = (uint) time(NULL) ;
-
+	    rip->m1.timestamp = (uint) time(nullptr) ;
 	    rs = mcmsg_report(&rip->m1,0,rip->buf,mlen) ;
 	    blen = rs ;
 	    if (rs < 0) break ;
-
 	    if ((rs = u_sendto(rip->fd,rip->buf,blen,sflags,sap,sal)) >= 0) {
 		cint	fm = FM_TIMED ;
 	        if ((rs1 = uc_recve(rip->fd,rip->buf,mlen,0,to,fm)) >= 0) {
 	            blen = mcmsg_ack(&m2,1,rip->buf,mlen) ;
-	            if ((blen > 0) && (m2.tag == rip->m1.tag)) f = TRUE ;
+	            if ((blen > 0) && (m2.tag == rip->m1.tag)) f = true ;
 	        }
 	    }
-
 	    if (f) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (report) */

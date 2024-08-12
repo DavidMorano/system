@@ -205,6 +205,8 @@ extern int proginfo_getename(proginfo *,char *,int) noex ;
 extern int proginfo_nodename(proginfo *) noex ;
 extern int proginfo_finish(proginfo *) noex ;
 
+extern int progexpand(proginfo *,char *,int,cchar *,int) noex ;
+
 EXTERNC_end
 
 
