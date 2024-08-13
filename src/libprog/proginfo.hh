@@ -9,6 +9,7 @@
 
 #ifndef	PROGINFO_INCLUDE
 #define	PROGINFO_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -17,8 +18,11 @@
 #include	<ids.h>
 #include	<logfile.h>
 
+#include	<proglog.hh>
+#include	<progmsgid.hh>
+#include	<proguserlist.hh>
 
-#define	PROGINFO	struct proginfo_head
+
 #define	PROGINFO_FL	struct proginfo_flags
 
 
@@ -27,7 +31,7 @@ enum proginfomems {
 	proginfomem_overlast
 } ;
 
-struct proginfo_head ;
+struct proginfo ;
 
 struct proginfo_flags {
 	uint		progdash:1 ;	/* leading dash on program-name */
@@ -52,7 +56,7 @@ struct proginfo_flags {
 	uint		disable:1 ;
 	uint		all:1 ;
 	uint		def:1 ;
-	uint		list:1 ;
+	uint		lister:1 ;
 	uint		bufwhole:1 ;
 	uint		bufline:1 ;
 	uint		bufnone:1 ;
@@ -67,16 +71,16 @@ struct proginfo_flags {
 } ;
 
 struct proginfo_hwser {
-	proginfo_head	*op = nullptr ;
+	proginfo	*op = nullptr ;
 	uint		val ;
-	void operator () (proginfo_head *) noex ;
+	void operator () (proginfo *) noex ;
 	operator uint() noex ;
 } ;
 
 struct proginfo_co {
-	proginfo_head	*op = nullptr ;
+	proginfo	*op = nullptr ;
 	int		w = -1 ;
-	void operator () (proginfo_head *p,int m) noex {
+	void operator () (proginfo *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -87,13 +91,13 @@ struct proginfo_co {
 } ;
 
 struct proginfo_vals {
-	cchar		*argz ;
-	cchar		*progename ;	/* execution filename */
+	cchar		*argz ;		/* raw ARGZ */
+	cchar		*execname ;	/* execution filename */
+	cchar		*progname ;	/* program name */
 	cchar		*progdname ;	/* dirname of arg[0] */
-	cchar		*progname ;	/* basename of arg[0] */
+	cchar		*searchname ;
 	cchar		*pr ;		/* program root */
 	cchar		*rootname ;	/* distribution name */
-	cchar		*searchname ;
 	cchar		*version ;
 	cchar		*banner ;
 	cchar		*umachine ;	/* UNAME machine name */
@@ -158,15 +162,19 @@ struct proginfo_vals {
 	proginfo_vals() noex ;
 } ; /* end struct (proginfo_vals) */
 
-struct proginfo_head : proginfo_vals {
+struct proginfo : proginfo_vals {
+	friend		proginfo_co ;
 	proginfo_hwser	hwserial ;
 	proginfo_co	ncpu ;
-	vecstr		*sip ;		/* store-info-pointer */
+	proginfo_co	finish ;
+	proginfo_co	rootdname ;
+	proginfo_co	progename ;
+	proginfo_co	nodename ;
+	vecstr		*sdp ;		/* store-data-pointer */
 	ids		*idp ;
 	logfile		*lhp ;
 	mainv		argv ;
 	mainv		envv ;
-	cchar		*pwd ;
 	PROGINFO_FL	have{} ;
 	PROGINFO_FL	pf{} ;
 	PROGINFO_FL	changed{} ;
@@ -177,39 +185,32 @@ struct proginfo_head : proginfo_vals {
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
 	int		argc ;
-	int		pwdlen ;
-	proginfo_head() noex ;
+	proginfo() noex ;
 	void args(int ac,mainv av,mainv ev) noex ;
+	int start(mainv,mainv,cchar *) noex ;
+	int setprogroot(cchar *,int) noex ;
+	int rootexecname(cchar *) noex ;
+	int setentry(cchar **,cchar *,int) noex ;
+	int setversion(cchar *) noex ;
+	int setbanner(cchar *) noex ;
+	int setsearchname(cchar *,cchar *) noex ;
+	int setprogname(cchar *) noex ;
+	int setexecname(cchar *) noex ;
+	int getpwd(char *,int) noex ;
+	int getename(char *,int) noex ;
+	int finish() noex ;
+	int expand(char *,int,cchar *,int) noex ;
+   private:
 	int incpu() noex ;
-} ;
+	int irootdname() noex ;
+	int iprogename() noex ;
+	int inodename() noex ;
+} /* end struct (proginfo) */
 
-typedef	PROGINFO	proginfo ;
 typedef	PROGINFO_FL	proginfo_fl ;
 
-EXTERNC_begin
 
-extern int proginfo_start(proginfo *,mainv,mainv,cchar *) noex ;
-extern int proginfo_setprogroot(proginfo *,cchar *,int) noex ;
-extern int proginfo_rootprogdname(proginfo *) noex ;
-extern int proginfo_rootexecname(proginfo *,cchar *) noex ;
-extern int proginfo_progename(proginfo *) noex ;
-extern int proginfo_setentry(proginfo *,cchar **,cchar *,int) noex ;
-extern int proginfo_setversion(proginfo *,cchar *) noex ;
-extern int proginfo_setbanner(proginfo *,cchar *) noex ;
-extern int proginfo_setsearchname(proginfo *,cchar *,cchar *) noex ;
-extern int proginfo_setprogname(proginfo *,cchar *) noex ;
-extern int proginfo_setexecname(proginfo *,cchar *) noex ;
-extern int proginfo_pwd(proginfo *) noex ;
-extern int proginfo_getpwd(proginfo *,char *,int) noex ;
-extern int proginfo_getename(proginfo *,char *,int) noex ;
-extern int proginfo_nodename(proginfo *) noex ;
-extern int proginfo_finish(proginfo *) noex ;
-
-extern int progexpand(proginfo *,char *,int,cchar *,int) noex ;
-
-EXTERNC_end
-
-
+#endif /* __cplusplus */
 #endif /* PROGINFO_INCLUDE */
 
 

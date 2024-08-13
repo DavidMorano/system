@@ -650,12 +650,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'l':
 	                        pip->final.list = TRUE ;
 	                        pip->have.list = TRUE ;
-	                        pip->f.list = TRUE ;
+	                        pip->pf.lister = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.list = (rs > 0) ;
+	                                pip->pf.lister = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -789,7 +789,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (ofname == NULL) ofname = getourenv(envv,VAROFNAME) ;
 
-	if (pip->f.all) pip->f.list = TRUE ;
+	if (pip->f.all) pip->pf.lister = TRUE ;
 
 	gn = NULL ;
 	ai_continue = 1 ;
@@ -981,7 +981,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if (pip->f.list) {
+	    if (pip->pf.lister) {
 	        if (pip->debuglevel > 0) {
 	            cchar	*ms = (pip->f.all) ? "all" : "list" ;
 	            fmt = "%s: mode=%s\n" ;

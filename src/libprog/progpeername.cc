@@ -56,7 +56,7 @@
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
-#include	"proginfo.h"
+#include	"progpeername.h"
 
 
 /* local defines */

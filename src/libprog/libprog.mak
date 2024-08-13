@@ -233,6 +233,7 @@ control:
 
 
 proginfo.o:	proginfo.cc			$(INCS)
+progmsgid.o:	progmsgid.cc progmsgid.h	$(INCS)
 proglog.o:	proglog.cc proglog.h		$(INCS)
 proguserlist.o:	proguserlist.cc proguserlist.h	$(INCS)
 progexpand.o:	progexpand.cc			$(INCS)

@@ -33,7 +33,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<algorithm>		/* |max(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>

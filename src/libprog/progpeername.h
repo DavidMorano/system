@@ -1,48 +1,49 @@
-/* proguserlist HEADER */
+/* proglog HEADER */
 /* lang=C++20 */
 
-/* program-user-list-ing */
+/* program-logging */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1999-03-01, David A­D­ Morano
+	= 2008-09-01, David A­D­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Manage a program user-list operation.
+	Manage program logging operations.
 
 *******************************************************************************/
 
-#ifndef	PROGUSERLIST_INCLUDE
-#define	PROGUSERLIST_INCLUDE
+#ifndef	PROGLOG_INCLUDE
+#define	PROGLOG_INCLUDE
 #ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* must be before others */
+#include	<stdarg.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
+#include	<clientinfo.h>
 
 #include	<proginfo.hh>
 
 
 EXTERNC_begin
 
-extern int	proguserlist_begin(proginfo *) noex ;
-extern int	proguserlist_end(proginfo *) noex ;
+extern int progpeername(proginfo *,clientinfo *,char *,int) noex ;
  
 EXTERNC_end
 
 
 #endif /* __cplusplus */
-#endif /* PROGUSERLIST_INCLUDE */
+#endif /* PROGLOG_INCLUDE */
 
 

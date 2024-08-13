@@ -4,7 +4,6 @@
 /* program information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_GETEXECNAME	1		/* use 'getexecname()' */
 
 /* revision history:
@@ -33,7 +32,8 @@
 #include	<unistd.h>		/* |gethostid(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strnlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
@@ -74,11 +74,15 @@
 #endif
 
 
-/* external subroutines */
+/* imported namespaces */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) noex ;
-#endif
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -88,6 +92,53 @@ extern int	debugprintf(cchar *,...) noex ;
 
 
 /* forward references */
+
+template<typename ... Args>
+static int proginfo_ctor(proginfo *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    if ((op->sdp = new(nothrow) vecstr) != np) {
+	        if ((op->idp = new(nothrow) ids) != np) {
+	            if ((op->lhp = new(nothrow) ids) != np) {
+			rs = SR_OK ;
+		    } /* end if (new-logfile) */
+		    if (rs < 0) {
+		        delete op->idp ;
+		        op->idp = nullptr ;
+		    }
+		} /* end if (new-ids) */
+		if (rs < 0) {
+		    delete op->sdp ;
+		    op->sdp = nullptr ;
+		}
+	    } /* end if (new-vecstr) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (proginfo_ctor) */
+
+static int proginfo_dtor(proginfo *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->lhp) {
+		delete op->lhp ;
+		op->lhp = nullptr ;
+	    }
+	    if (op->idp) {
+		delete op->idp ;
+		op->idp = nullptr ;
+	    }
+	    if (op->sdp) {
+		delete op->sdp ;
+		op->sdp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (proginfo_dtor) */
 
 static int	proginfo_setdefnames(proginfo *) noex ;
 
@@ -107,130 +158,118 @@ static bool	hasourbad(cchar *,int) noex ;
 
 /* exported subroutines */
 
-int proginfo_start(proginfo *pip,mainv envv,mainv argv,cc *ver) noex {
-	int		rs ;
-	int		opts ;
-
-	if (pip == nullptr) return SR_FAULT ;
-
-	memclear(pip) ;
-
-	pip->envv = envv ;
-	pip->argv = argv ;
-
-	opts = (VECSTR_OCONSERVE | VECSTR_OREUSE | VECSTR_OSWAP) ;
-	if ((rs = vecstr_start(pip->sip,10,opts)) >= 0) {
-	    if ((rs = proginfo_pwd(pip)) >= 0) {
-	        if (pip->argz != nullptr) {
-	            rs = proginfo_setprogname(pip,pip->argz) ;
-	        }
-	        if (rs >= 0) {
-	            if ((rs = proginfo_setdefnames(pip)) >= 0) {
-	                if (ver != nullptr) {
-	                    cchar	**vpp = &pip->version ;
-	                    rs = proginfo_setentry(pip,vpp,ver,-1) ;
-	                }
+int proginfo::start(mainv av,mainv ev,cc *ver) noex {
+	int		rs = SR_FAULT ;
+	if (argv && envv && ver) {
+	    cint	vo = (VECSTR_OCONSERVE | VECSTR_OREUSE | VECSTR_OSWAP) ;
+	    cint	vn = 10 ;
+	    argv = av ;
+	    envv = ev ;
+	    if ((rs = vecstr_start(sdp,vn,vo)) >= 0) {
+	        if ((rs = proginfo_pwd(pip)) >= 0) {
+	            if (pip->argz != nullptr) {
+	                rs = proginfo_setprogname(pip,pip->argz) ;
 	            }
-	        } /* end if (ok) */
+	            if (rs >= 0) {
+	                if ((rs = proginfo_setdefnames(pip)) >= 0) {
+	                    if (ver != nullptr) {
+	                        cchar	**vpp = &pip->version ;
+	                        rs = proginfo_setentry(pip,vpp,ver,-1) ;
+	                    }
+	                }
+	            } /* end if (ok) */
+	        }
+	        if (rs < 0) {
+	            vecstr_finish(pip->sdp) ;
+	        }
+	    } /* end if (vecstr-stores) */
+	    if (rs < 0) {
+		proginfo_dtor(op) ;
 	    }
-	    if (rs < 0)
-	        vecstr_finish(pip->sip) ;
-	} /* end if (vecstr-stores) */
-
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (proginfo_start) */
+/* end subroutine (proginfo::start) */
 
-int proginfo_finish(proginfo *pip) noex {
+int proginfo::ifinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (pip == nullptr) return SR_FAULT ;
-
-	rs1 = vecstr_finish(pip->sip) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (lhp) {
+	    rs1 = logfile_finish(lhp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (idp) {
+	    rs1 = ids_finish(idp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (sdp) {
+	    rs1 = vecstr_finish(sdp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = proginfo_dtor(this) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
-/* end subroutine (proginfo_finish) */
+/* end subroutine (proginfo::finish) */
 
-int proginfo_setentry(proginfo *pip,cchar **epp,cchar *vp,int vl) noex {
-	vecstr		*vsp = pip->sip ;
-	int		rs = SR_OK ;
-	int		oi = -1 ;
+int proginfo::setentry(cchar **epp,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-
-	if (pip == nullptr) return SR_FAULT ;
-	if (epp == nullptr) return SR_FAULT ;
-
-	if (*epp != nullptr) {
-	    oi = vecstr_findaddr(vsp,*epp) ;
-	}
-	if (vp != nullptr) {
-	    len = strnlen(vp,vl) ;
-	    rs = vecstr_store(vsp,vp,len,epp) ;
-	} else {
-	    *epp = nullptr ;
-	}
-	if ((rs >= 0) && (oi >= 0)) {
-	    vecstr_del(vsp,oi) ;
-	}
-
+	if (epp) {
+	    int		oi = -1 ;
+	    if (*epp != nullptr) {
+	        oi = vecstr_findaddr(sdp,*epp) ;
+	    }
+	    if (vp != nullptr) {
+	        len = strnlen(vp,vl) ;
+	        rs = vecstr_store(sdp,vp,len,epp) ;
+	    } else {
+	        *epp = nullptr ;
+	    }
+	    if ((rs >= 0) && (oi >= 0)) {
+	        vecstr_del(sdp,oi) ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (proginfo_setentry) */
 
-int proginfo_setversion(proginfo *pip,cchar *v) noex {
-	int		rs ;
-
-	if (pip == nullptr) return SR_FAULT ;
-	if (v == nullptr) return SR_FAULT ;
-
-	{
+int proginfo::setversion(cchar *valp) noex {
+	int		rs = SR_FAULT ;
+	if (ver) {
 	    cchar	**vpp = &pip->version ;
-	    rs = proginfo_setentry(pip,vpp,v,-1) ;
+	    rs = proginfo_setentry(pip,vpp,valp,-1) ;
 	}
-
 	return rs ;
 }
-/* end subroutine (proginfo_setversion) */
+/* end subroutine (proginfo::setversion) */
 
-int proginfo_setbanner(proginfo *pip,cchar *v) noex {
-	int		rs ;
-
-	if (pip == nullptr) return SR_FAULT ;
-	if (v == nullptr) return SR_FAULT ;
-
-	{
+int proginfo::setbanner(cchar *valp) noex {
+	int		rs = SR_FAULT ;
+	if (valp) {
 	    cchar	**vpp = &pip->banner ;
-	    rs = proginfo_setentry(pip,vpp,v,-1) ;
+	    rs = proginfo_setentry(pip,vpp,valp,-1) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (proginfo_setbanner) */
 
-int proginfo_setsearchname(proginfo *pip,cchar *var,cchar *value) noex {
-	int		rs = SR_OK ;
+int proginfo::setsearchname(cchar *var,cchar *valp) noex {
+	int		rs = SR_FAULT ;
 	int		cl = -1 ;
-	cchar		*cp = value ;
-
-	if (pip == nullptr) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("proginfo_setsearchname: ent var=%s val=%s\n",var,value) ;
-#endif
+	cchar		*cp = valp ;
 
 	if ((cp == nullptr) && (var != nullptr)) {
-	    cp = getourenv(pip->envv,var) ;
+	    cp = getourenv(envv,var) ;
 	    if (hasourbad(cp,-1) || ((cp != nullptr) && (cp[0] == '\0')))
 	        cp = nullptr ;
 	}
 
 	if ((cp == nullptr) && (pip->progname != nullptr)) {
-	    cchar	*tp ;
 	    cp = pip->progname ;
-	    if ((tp = strrchr(cp,'.')) != nullptr) {
+	    if (cchar *tp ; (tp = strrchr(cp,'.')) != nullptr) {
 	        cl = (tp - cp) ;
 	    }
 	}
@@ -251,7 +290,7 @@ int proginfo_setsearchname(proginfo *pip,cchar *var,cchar *value) noex {
 
 	return rs ;
 }
-/* end subroutine (proginfo_setsearchname) */
+/* end subroutine (proginfo::setsearchname) */
 
 /* set program directory and program name (as might be possible) */
 int proginfo_setprogname(proginfo *pip,cchar *ap) noex {
@@ -261,10 +300,6 @@ int proginfo_setprogname(proginfo *pip,cchar *ap) noex {
 	cchar		*en ;
 	cchar		*dn ;
 	cchar		*dp, *bp ;
-
-#if	CF_DEBUGS
-	debugprintf("proginfo_setprogname: ent ap=%s\n",ap) ;
-#endif
 
 	if (ap == nullptr) return SR_FAULT ;
 
@@ -365,11 +400,6 @@ int proginfo_setprogname(proginfo *pip,cchar *ap) noex {
 
 	} /* end if (basename) */
 
-#if	CF_DEBUGS
-	debugprintf("proginfo_setprogname: ent rs=%d\n",rs) ;
-	debugprintf("proginfo_setprogname: pn=%s\n",pip->progname) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (proginfo_setprogname) */
@@ -448,10 +478,6 @@ int proginfo_progdname(proginfo *pip) noex {
 
 	    rs = proginfo_progename(pip) ;
 
-#if	CF_DEBUGS
-	    debugprintf("proginfo_progdname: progename=%s\n",pip->progename) ;
-#endif
-
 	    if ((rs >= 0) && (pip->progename != nullptr)) {
 	        int	dl ;
 	        cchar	*dp ;
@@ -479,11 +505,6 @@ int proginfo_progdname(proginfo *pip) noex {
 int proginfo_progename(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("proginfo_progename: ent\n") ;
-	debugprintf("proginfo_progename: pe=%s\n",pip->progename) ;
-#endif
-
 	if (pip->progename == nullptr) {
 	    shellunder_dat	su ;
 	    cchar		*efn = nullptr ;
@@ -510,7 +531,9 @@ int proginfo_progename(proginfo *pip) noex {
 	    if ((rs >= 0) && (efn != nullptr)) {
 	        char	ebuf[MAXPATHLEN+1] ;
 	        if (efn[0] != '/') {
-	            if (pip->pwd == nullptr) rs = proginfo_pwd(pip) ;
+	            if (pip->pwd == nullptr) {
+			rs = proginfo_pwd(pip) ;
+		    }
 	            if (rs >= 0) {
 	                rs = mkpath2(ebuf,pip->pwd,efn) ;
 	                efn = ebuf ;
@@ -526,11 +549,6 @@ int proginfo_progename(proginfo *pip) noex {
 	        rs = strlen(pip->progename) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("proginfo_progename: ret rs=%d\n",rs) ;
-	debugprintf("proginfo_progename: ret en=%s\n",pip->progename) ;
-#endif
 
 	return rs ;
 }
@@ -562,10 +580,6 @@ int proginfo_nodename(proginfo *pip) noex {
 int proginfo_getename(proginfo *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("proginfo_getename: ent pe=%s\n",pip->progename) ;
-#endif
-
 	if (pip == nullptr) return SR_FAULT ;
 	if (rbuf == nullptr) return SR_FAULT ;
 
@@ -575,11 +589,6 @@ int proginfo_getename(proginfo *pip,char *rbuf,int rlen) noex {
 	        rs = sncpy1(rbuf,rlen,pip->progename) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("proginfo_getename: ret rs=%d\n",rs) ;
-	debugprintf("proginfo_getename: ret pe=%s\n",pip->progename) ;
-#endif
 
 	return rs ;
 }
@@ -719,6 +728,14 @@ proginfo_hwser::operator uint () noex {
 }
 
 proginfo_head::proginfo_head() noex {
+	argc = 0 ;
+	argv = nullptr ;
+	envv = nullptr ;
+	pwd = nullptr ;
+	sdp = nullptr ;
+	idp = nullptr ;
+	lhp = nullptr ;
+	now = {} ;
 	hwserial(this) ;
 	ncpu(this,proginfomem_ncpu) ;
 }

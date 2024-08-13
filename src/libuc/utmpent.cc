@@ -46,7 +46,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<algorithm>		/* <- for |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<utmpacc.h>
 #include	<strwcpy.h>

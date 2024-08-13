@@ -36,7 +36,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<ctime>			/* |time(2)| */
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<hdb.h>

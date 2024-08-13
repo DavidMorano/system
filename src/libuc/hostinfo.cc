@@ -41,7 +41,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(4c)| */
 #include	<new>
-#include	<algorithm>		/* <- for |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>

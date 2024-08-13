@@ -29,7 +29,7 @@
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
-#include	<algorithm>		/* < for |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<digval.h>		/* <- for |hexval(3uc)| */
 #include	<six.h>

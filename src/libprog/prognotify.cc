@@ -53,8 +53,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proginfo.h"
 #include	"mcmsg.h"
 #include	"recip.h"
 
