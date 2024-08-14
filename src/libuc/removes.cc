@@ -51,8 +51,9 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -79,6 +80,9 @@
 extern "C" {
     extern int	mkexpandpath(char *,cchar *,int) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */
@@ -122,10 +126,6 @@ int removes(cchar *tardname) noex {
 	return rs ;
 }
 /* end subroutine (removes) */
-
-int rmdirs(cchar *dn) noex {
-	return removes(dn) ;
-}
 
 
 /* local subroutines */
