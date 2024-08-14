@@ -31,9 +31,9 @@
 #include	<usysrets.h>
 
 #include	<proginfo.hh>
-#include	<proglog.h>
-#include	<proguserlist.h>
-#include	<progmsgid.h>
+#include	<proglog.hh>
+#include	<proguserlist.hh>
+#include	<progmsgid.hh>
 
 
 #endif /* LIBPROG_INCLUDE */
