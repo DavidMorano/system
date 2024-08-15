@@ -39,12 +39,12 @@ struct sdprog_flags {
 } ;
 
 struct sdprog_head {
-	logfile		lh ;
+	logfile		*lhp ;
 	pid_t		pid ;
+	SDPROG_FL	f ;
 	uint		magic ;
 	int		fd ;
 	int		tlen ;
-	SDPROG_FL	f ;
 	char		efname[MAXPATHLEN + 1] ;
 } ;
 
