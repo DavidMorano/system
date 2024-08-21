@@ -83,6 +83,9 @@
 #define	MSGSENDTRIES	5
 
 
+/* imported namespaces */
+
+
 /* local typedefs */
 
 
@@ -92,7 +95,7 @@ extern "C" {
     extern int	getportnum(cchar *,cchar *) noex ;
     extern int	getheour(cchar *,cchar *,HOSTENT *,char *,int) noex ;
     extern int	issamehostname(cchar *,cchar *,cchar *) noex ;
-    extern int	parsenodespec(PROGINFO *,char *,cchar *,int) noex ;
+    extern int	parsenodespec(proginfo *,char *,cchar *,int) noex ;
 }
 
 
@@ -102,8 +105,8 @@ extern "C" {
 /* local structures */
 
 struct reportinfo {
-	SOCKADDRESS	sa ;
 	struct mcmsg_report	m1 ;
+	sockaddress	sa ;
 	uint		tag ;
 	int		defport ;
 	int		salen ;
@@ -115,11 +118,11 @@ struct reportinfo {
 
 /* forward references */
 
-static int	prognotifyrecip(PROGINFO *,vecobj *,
+static int	prognotifyrecip(proginfo *,vecobj *,
 			REPORTINFO *,paramfile *,RECIP *) noex ;
-static int	prognotifyrecipnode(PROGINFO *,vecobj *,
+static int	prognotifyrecipnode(proginfo *,vecobj *,
 			REPORTINFO *,RECIP *,cchar *,int) noex ;
-static int	report(PROGINFO *,REPORTINFO *) noex ;
+static int	report(proginfo *,REPORTINFO *) noex ;
 
 static int	searchfunc() noex ;
 
@@ -132,7 +135,7 @@ static int	searchfunc() noex ;
 
 /* exported subroutines */
 
-int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
+int prognotify(proginfo *pip,vecobj *mip,vecobj *rsp) noex {
 	REPORTINFO	ri{} ;
 	paramfile	mbtab ;
 	int		rs ;
@@ -198,9 +201,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 
 	    if ((rs = paramfile_open(&mbtab,envv,mbfname)) >= 0) {
 	        RECIP	*rp ;
-	        int	i ;
-
-	        for (i = 0 ; vecobj_get(rsp,i,&rp) >= 0 ; i += 1) {
+	        for (int i = 0 ; vecobj_get(rsp,i,&rp) >= 0 ; i += 1) {
 	            if (rp != nullptr) {
 	                if (rp->ds >= 0) {
 	                    rs = prognotifyrecip(pip,mip,&ri,&mbtab,rp) ;
@@ -208,11 +209,9 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp) noex {
 		    }
 	            if (rs < 0) break ;
 	        } /* end for (recipients) */
-
 	        rs1 = paramfile_close(&mbtab) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (paramfile) */
-
 	    rs1 = u_close(ri.fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (socket) */
@@ -253,29 +252,25 @@ static int prognotifyrecip(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 	    char	nn[NODENAMELEN + 1] ;
 
 	    while (rs >= 0) {
-
 	        nsl = paramfile_fetch(mbp,up,&cur,nsbuf,nslen) ;
 	        if (nsl == rsn) break ;
 	        rs = nsl ;
 	        if (rs < 0) break ;
-
-/* separate the node-spec into node and port */
-
+		/* separate the node-spec into node and port */
 	        if ((rs1 = parsenodespec(pip,nn,nsbuf,nsl)) >= 0) {
 	            port = rs1 ;
 	        } else if (rs1 == rsn) {
 	            port = rip->defport ;
-	        } else
+	        } else {
 	            rs = rs1 ;
-
+		}
 	        if ((rs >= 0) && (nn[0] != '\0')) {
 	            rs = prognotifyrecipnode(pip,mip,rip,rp,nn,port) ;
 	            if (rs > 0) c += 1 ;
 	        }
-
 	    } /* end while (target machines) */
-
-	    paramfile_curend(mbp,&cur) ;
+	    rs1 = paramfile_curend(mbp,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 
 	return (rs >= 0) ? c : rs ;
@@ -350,7 +345,7 @@ static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 }
 /* end subroutine (prognotifyrecipnode) */
 
-static int report(PROGINFO *pip,REPORTINFO *rip) noex {
+static int report(proginfo *pip,REPORTINFO *rip) noex {
 	struct mcmsg_ack	m2 ;
 	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
 	cint		mlen = MSGBUFLEN ;

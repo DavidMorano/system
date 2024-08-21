@@ -1,7 +1,7 @@
 /* proginfo_real SUPPORT */
 /* lang=C++20 */
 
-/* proginfo-information functions */
+/* proginfo-information real-UID functions */
 /* version %I% last-modified %G% */
 
 
@@ -57,7 +57,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"proginfo.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
@@ -87,11 +87,11 @@ int proginfo_realbegin(proginfo *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
-	    if (pip->f.setuid) {
+	    if (pip->pf.setuid) {
 	        const uid_t	euid = geteuid() ;
 	        if (euid != pip->uid) u_seteuid(pip->uid) ;
 	    }
-	    if (pip->f.setgid) {
+	    if (pip->pf.setgid) {
 	        const gid_t	egid = getegid() ;
 	        if (egid != pip->gid) u_setegid(pip->gid) ;
 	    }
@@ -100,18 +100,18 @@ int proginfo_realbegin(proginfo *pip) noex {
 }
 /* end subroutine (proginfo_realbegin) */
 
-int proginfo_realend(proginfo **pip) noex {
+int proginfo_realend(proginfo *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
-	    if (pip->f.setuid) {
-	        const uid_t	euid = geteuid() ;
-	        if (euid != pip->euid) u_seteuid(pip->euid) ;
-	    } /* end if (setuid) */
-	    if (pip->f.setgid) {
+	    if (pip->pf.setgid) {
 	        const gid_t	egid = getegid() ;
 	        if (egid != pip->egid) u_setegid(pip->egid) ;
 	    } /* end if (setgid) */
+	    if (pip->pf.setuid) {
+	        const uid_t	euid = geteuid() ;
+	        if (euid != pip->euid) u_seteuid(pip->euid) ;
+	    } /* end if (setuid) */
 	} /* end if (non-null) */
 	return rs ;
 }

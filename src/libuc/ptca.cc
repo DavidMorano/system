@@ -19,7 +19,6 @@
 	This is a cleaned up version of the p-threads condition-variable
 	attribute set of subroutines (object).
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -77,28 +76,34 @@ int ptca_create(ptca *op) noex {
 /* end subroutine (ptca_create) */
 
 int ptca_destroy(ptca *op) noex {
-	int		rs ;
-	if ((rs = pthread_condattr_destroy(op)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_condattr_destroy(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptca_destroy) */
 
 int ptca_getpshared(ptca *op,int *oldp) noex {
-	int		rs ;
-	if ((rs = pthread_condattr_getpshared(op,oldp)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_condattr_getpshared(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptca_getpshared) */
 
 int ptca_setpshared(ptca *op,int fl) noex {
-	int		rs ;
-	if ((rs = pthread_condattr_setpshared(op,fl)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_condattr_setpshared(op,fl)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptca_setpshared) */

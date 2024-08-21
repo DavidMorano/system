@@ -209,6 +209,13 @@ struct proginfo : proginfo_vals {
 
 typedef	PROGINFO_FL	proginfo_fl ;
 
+EXTERNC_begin
+
+extern int	proginfo_realbegin(proginfo *) noex ;
+extern int	proginfo_realend(proginfo *) noex ;
+
+EXTERNC_end
+
 
 #endif /* __cplusplus */
 #endif /* PROGINFO_INCLUDE */

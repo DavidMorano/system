@@ -35,7 +35,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += libprog.h proginfo.h
+INCS += libprog.h proginfo.hh
 
 #LIBS= -ldam -luc -lu
 LIBS= -lu

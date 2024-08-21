@@ -4,7 +4,6 @@
 /* key-value type functions */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -20,14 +19,16 @@
 
 	We perform some light key-value type management.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<nleadstr.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"svckv.h"
@@ -36,35 +37,13 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfdequote(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	nchr(cchar *,int,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	msleep(int) ;
-extern int	tolc(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -75,20 +54,15 @@ extern char	*strnrpbrk(cchar *,int,cchar *) ;
 
 /* forward references */
 
-static int	ourmat(cchar *,cchar *,int) ;
+static bool	ourmat(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
 
-static char	*isexecs[] = {
+static constexpr cpcchar	isexecs[] = {
 	"program",
 	"args",
-	NULL
-} ;
-
-static cchar	*svcopts[] = {
-	"termout",
-	NULL
+	nullptr
 } ;
 
 enum svcopts {
@@ -96,20 +70,25 @@ enum svcopts {
 	svcopt_overlast
 } ;
 
+static constexpr cpcchar	svcopts[] = {
+	"termout",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int svckv_val(cchar *(*kv)[2],int n,cchar *np,cchar **vpp)
-{
-	int		i ;
+int svckv_val(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	int		vl = 0 ;
-	if (vpp != NULL) *vpp = NULL ;
-	for (i = 0 ; i < n ; i += 1) {
-	    const int	kl = strlen(kv[i][0]) ;
+	if (vpp) *vpp = nullptr ;
+	for (int i = 0 ; i < n ; i += 1) {
+	    cint	kl = strlen(kv[i][0]) ;
 	    cchar	*kp = kv[i][0] ;
-	    if (ourmat(np,kp,kl)) {
-	        if (vpp != NULL) *vpp = kv[i][1] ;
+	    if (ourmat(sp,kp,kl)) {
+	        if (vpp != nullptr) *vpp = kv[i][1] ;
 	        vl = strlen(kv[i][1]) ;
 	        break ;
 	    }
@@ -118,24 +97,20 @@ int svckv_val(cchar *(*kv)[2],int n,cchar *np,cchar **vpp)
 }
 /* end subroutine (svckv_val) */
 
-
-int svckv_dequote(cchar *(*kv)[2],int n,cchar *np,cchar **vpp)
-{
+int svckv_dequote(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	int		cl = 0 ;
 	int		vl ;
 	cchar		*vp ;
-	cchar		*cp = NULL ;
-	if ((vl = svckv_val(kv,n,np,&vp)) > 0) {
+	cchar		*cp = nullptr ;
+	if ((vl = svckv_val(kv,n,sp,&vp)) > 0) {
 	    cl = sfdequote(vp,vl,&cp) ;
 	}
-	if (vpp != NULL) *vpp = cp ;
+	if (vpp != nullptr) *vpp = cp ;
 	return cl ;
 }
 /* end subroutine (svckv_dequote) */
 
-
-int svckv_isfile(cchar *(*kv)[2],int n,cchar **vpp)
-{
+int svckv_isfile(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl ;
 	cchar		*sp = "file" ;
 	vl = svckv_val(kv,n,sp,vpp) ;
@@ -143,9 +118,7 @@ int svckv_isfile(cchar *(*kv)[2],int n,cchar **vpp)
 }
 /* end subroutine (svckv_isfile) */
 
-
-int svckv_ispass(cchar *(*kv)[2],int n,cchar **vpp)
-{
+int svckv_ispass(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl ;
 	cchar		*sp = "passfile" ;
 	vl = svckv_val(kv,n,sp,vpp) ;
@@ -153,10 +126,8 @@ int svckv_ispass(cchar *(*kv)[2],int n,cchar **vpp)
 }
 /* end subroutine (svckv_ispass) */
 
-
 #ifdef	COMMENT
-int svckv_islib(cchar *(*kv)[2],int n,cchar **vpp)
-{
+int svckv_islib(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl ;
 	cchar		*sp = "so" ;
 	vl = svckv_val(kv,n,sp,vpp) ;
@@ -165,12 +136,9 @@ int svckv_islib(cchar *(*kv)[2],int n,cchar **vpp)
 /* end subroutine (svckv_islib) */
 #endif /* COMMENT */
 
-
-int svckv_isprog(cchar *(*kv)[2],int n,cchar **vpp)
-{
-	int		i ;
+int svckv_isprog(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl = 0 ;
-	for (i = 0 ; isexecs[i] != NULL ; i += 1) {
+	for (int i = 0 ; isexecs[i] != nullptr ; i += 1) {
 	    vl = svckv_val(kv,n,isexecs[i],vpp) ;
 	    if (vl > 0) break ;
 	}
@@ -178,23 +146,20 @@ int svckv_isprog(cchar *(*kv)[2],int n,cchar **vpp)
 }
 /* end subroutine (svckv_isprog) */
 
-
 /* return (as the integer return value) a bit-set of options from the SVCENT */
-int svckv_svcopts(cchar *(*kv)[2],int n)
-{
+int svckv_svcopts(cchar *(*kv)[2],int n) noex {
 	int		vl ;
 	int		ow = 0 ;
 	cchar		*k = "opts" ;
 	cchar		*vp ;
 	if ((vl = svckv_val(kv,n,k,&vp)) > 0) {
-	    int		i ;
 	    int		cl ;
 	    cchar	*cp ;
 	    cchar	*tp ;
-	    while ((tp = strnpbrk(vp,vl," ,")) != NULL) {
+	    while ((tp = strnpbrk(vp,vl," ,")) != nullptr) {
 	        if ((cl = sfshrink(vp,(tp-vp),&cp)) > 0) {
-	            if ((i = matstr(svcopts,cp,cl)) >= 0) {
-	                ow |= (1<<i) ;
+	            if (int ii ; (ii = matstr(svcopts,cp,cl)) >= 0) {
+	                ow |= (1 << ii) ;
 	            }
 	        }
 	        vl -= ((tp+1)-vp) ;
@@ -202,8 +167,8 @@ int svckv_svcopts(cchar *(*kv)[2],int n)
 	    } /* end while */
 	    if (vl > 0) {
 	        if ((cl = sfshrink(vp,vl,&cp)) > 0) {
-	            if ((i = matstr(svcopts,cp,cl)) >= 0) {
-	                ow |= (1<<i) ;
+	            if (int ii ; (ii = matstr(svcopts,cp,cl)) >= 0) {
+	                ow |= (1 << ii) ;
 	            }
 	        }
 	    }
@@ -215,12 +180,9 @@ int svckv_svcopts(cchar *(*kv)[2],int n)
 
 /* local subrouties */
 
-
-static int ourmat(cchar *sk,cchar *np,int nl)
-{
-	int		m ;
-	int		f = FALSE ;
-	if ((m = nleadstr(sk,np,nl)) >= 1) {
+static bool ourmat(cchar *sk,cchar *sp,int nl) noex {
+	bool		f = false ;
+	if (int m ; (m = nleadstr(sk,sp,nl)) >= 1) {
 	    f = (m == nl) ;
 	}
 	return f ;
