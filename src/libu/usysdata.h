@@ -34,6 +34,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	<usysauxinfo.h>		/* the request codes */
 

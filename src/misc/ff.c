@@ -1,3 +1,5 @@
+/* ff SUPPORT (main) */
+
 /* find form feed */
 
 /*
@@ -48,10 +50,7 @@
 
 
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+int main(int argc,mainv argv,mainv)
 	bfile		errfile, *efp = &errfile ;
 
 	bfile		infile, *ifp = &infile ;

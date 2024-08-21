@@ -22,7 +22,7 @@
 	are not used directly by any public interface, but rather
 	provide a consistent set of numerical values for use in
 	defining preprocessir symbols for use in the public interface
-	of |uc_sysauxinfo(3uc)|. For each operating system that is
+	of |uc_sysauxinfo(3uc)|.  For each operating system that is
 	supported, the code that supports any particular operaring
 	system defines some preprocessor symbols that represent
 	those items that are supported by the operaring system being
@@ -34,7 +34,7 @@
 	system wants to provide the system-auxilliary-information
 	(SAI) item by the name of 'SAI_ARCHITECTURE', it would
 	define that proprocessor symbol to be equal to the enumberation
-	'sysauxinforeq_architecture'. Strictly this equivalence between
+	'sysauxinforeq_architecture'.  Strictly this equivalence between
 	the value of a preprocessor symbol and the enumerations
 	below is not neccessary, it provides the added benefit that
 	all preprocessor symbols for all operating systems will

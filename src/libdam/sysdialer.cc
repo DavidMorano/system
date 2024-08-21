@@ -107,19 +107,19 @@ struct fext {
 
 static int	sysdialer_sofind(sysdialer *,cchar *,cchar *,
 			sysdialer_ent *) noex ;
-static int	sysdialer_sofindprs(sysdialer *,IDS *,dirseen *,
+static int	sysdialer_sofindprs(sysdialer *,ids *,dirseen *,
 			cchar *,sysdialer_ent *) noex ;
-static int	sysdialer_sofindpr(sysdialer *,IDS *,dirseen *,cchar *,
+static int	sysdialer_sofindpr(sysdialer *,ids *,dirseen *,cchar *,
 			cchar *,sysdialer_ent *) noex ;
-static int	sysdialer_sofindvar(sysdialer *,IDS *,dirseen *,
+static int	sysdialer_sofindvar(sysdialer *,ids *,dirseen *,
 			cchar *,sysdialer_ent *) noex ;
-static int	sysdialer_socheckvarc(sysdialer *,IDS *,dirseen *,
+static int	sysdialer_socheckvarc(sysdialer *,ids *,dirseen *,
 			cchar *,int, cchar *,sysdialer_ent *) noex ;
-static int	sysdialer_sochecklib(sysdialer *,IDS *,dirseen *,cchar *,
+static int	sysdialer_sochecklib(sysdialer *,ids *,dirseen *,cchar *,
 			cchar *,sysdialer_ent *) noex ;
 
 #if	CF_LOOKSELF
-static int	sysdialer_sofindloc(sysdialer *,IDS *,
+static int	sysdialer_sofindloc(sysdialer *,ids *,
 			cchar *,sysdialer_ent *) noex ;
 #endif
 
@@ -127,9 +127,9 @@ static int	sysdialer_sofindloc(sysdialer *,IDS *,
 static int	sysdialer_sotest(sysdialer *,cchar *) noex ;
 #endif
 
-static int	prcache_start(PRCACHE *) noex ;
-static int	prcache_lookup(PRCACHE *,int,cchar **) noex ;
-static int	prcache_finish(PRCACHE *) noex ;
+static int	prcache_start(prcache *) noex ;
+static int	prcache_lookup(prcache *,int,cchar **) noex ;
+static int	prcache_finish(prcache *) noex ;
 
 static int	entry_start(sysdialer_ent *,cchar *,cchar *,
 			sysdialer_mod *) noex ;
@@ -400,8 +400,7 @@ int sysdialer_loadin(sysdialer *op,cchar *name,sysdialer_ent **depp) noex {
 	sysdialer_mod	*mp ;
 	SYSDIALER_ENT	se, e, *dep ;
 	int		rs ;
-	int		i ;
-	int		size ;
+	int		osize ;
 	int		f_alloc = FALSE ;
 	void		*dhp ;
 
@@ -419,7 +418,7 @@ int sysdialer_loadin(sysdialer *op,cchar *name,sysdialer_ent **depp) noex {
 /* search for it in any modules that we have already loaded */
 
 #if	CF_SAMEMODULE
-	for (i = 0 ; (rs = vecobj_get(&op->entries,i,&dep)) >= 0 ; i += 1) {
+	for (int i = 0 ; (rs = vecobj_get(&op->entries,i,&dep)) >= 0 ; i += 1) {
 	    if (dep != nullptr) {
 	        mp = dep->mp ;
 	        dhp = mp->dhp ;
@@ -444,13 +443,14 @@ int sysdialer_loadin(sysdialer *op,cchar *name,sysdialer_ent **depp) noex {
 
 /* create a new load module descriptor */
 
-	size = sizeof(sysdialer_mod) ;
-	rs = uc_malloc(size,&mp) ;
+	osize = sizeof(sysdialer_mod) ;
+	rs = uc_malloc(osize,&mp) ;
+
 	if (rs < 0)
 	    goto bad0 ;
 
 	f_alloc = TRUE ;
-	memset(mp,0,size) ;
+	memset(mp,0,osize) ;
 
 /* initialize a sysdialer entry */
 
@@ -843,7 +843,7 @@ static int sysdialer_sotest(sysdialer *op,cc *soname) noex {
 
 #if	CF_PRCACHE
 
-static int prcache_start(PRCACHE *pcp) noex {
+static int prcache_start(prcache *pcp) noex {
 	int		rs ;
 	int		osize ;
 	pcp->domainname = nullptr ;
@@ -855,7 +855,7 @@ static int prcache_start(PRCACHE *pcp) noex {
 }
 /* end subroutine (prcache_start) */
 
-static int prcache_finish(PRCACHE *pcp) noex {
+static int prcache_finish(prcache *pcp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pcp->domainname != nullptr) {
@@ -878,7 +878,7 @@ static int prcache_finish(PRCACHE *pcp) noex {
 }
 /* end subroutine (prcache_finish) */
 
-static int prcache_lookup(PRCACHE *pcp,int i,cchar **rpp) noex {
+static int prcache_lookup(prcache *pcp,int i,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		osize ;
@@ -1176,24 +1176,16 @@ static int vecstr_loadexts(vecstr *lp,cc *dname,cc *name,int namelen) noex {
 		    fext	e ;
 		    cint	dnl = rs ;
 	            cchar	*dnp = slot.name ;
-	            if (dnl < namelen)
-	                continue ;
-    
+	            if (dnl < namelen) continue ;
 		    nl = getext(&e,dnp,dnl) ;
-    
-	            if (nl != namelen)
-	                continue ;
-    
- 		    if (strncmp(dnp,name,namelen) != 0)
-	                continue ;
-    
+	            if (nl != namelen) continue ;
+ 		    if (strncmp(dnp,name,namelen) != 0) continue ;
 	            if ((e.exl == 0) || (matstr(exts,e.exp,e.exl) >= 0)) {
 	                c += 1 ;
 	                if ((rs = vecstr_add(lp,e.exp,e.exl)) >= 0) {
 	                    if (c >= NEXTS) break ;
 			}
 	            } /* end if (got a match) */
-    
 		    if (rs < 0) break ;
 	        } /* end while (directory entries) */
 	        rs1 = fsdir_close(&dir) ;

@@ -40,11 +40,14 @@
 #include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<usupport.h>
-#include	<intsat.h>
 
 #include	"usysauxinfo_darwin.h"
 
 using namespace	libu ;
+
+namespace libu {
+    extern sysret_t loadhostid(char *,int) noex ;
+}
 
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {

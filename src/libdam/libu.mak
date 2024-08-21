@@ -2,7 +2,7 @@
 
 T= libu
 
-ALL= $(T).o $(T).a $(T).so
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -286,6 +286,11 @@ uipc.dir:
 # USYSAUXINFO
 usysauxinfo.o:		usysauxinfo.dir
 usysauxinfo.dir:
+	makesubdir $@
+
+# USYNC
+usync.o:		usync.dir
+usync.dir:
 	makesubdir $@
 
 # OTHER

@@ -44,6 +44,10 @@ using namespace	libu ;
 
 extern ugetnisdom(char *,int) noex ;
 
+namespace libu {
+    extern sysret_t loadhostid(char *,int) noex ;
+}
+
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;

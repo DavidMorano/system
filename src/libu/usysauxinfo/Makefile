@@ -58,16 +58,16 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_UCSYSAUXINFO=
-OBJ1_UCSYSAUXINFO= usysauxinfo_sunos.o
-OBJ2_UCSYSAUXINFO= usysauxinfo_darwin.o
-OBJ3_UCSYSAUXINFO= usysauxinfo_linux.o
+OBJ0=
+OBJ1= usysauxinfo_sunos.o
+OBJ2= usysauxinfo_darwin.o
+OBJ3= usysauxinfo_linux.o
 
 
-OBJA_UCSYSAUXINFO= obj1_usysauxinfo.o
-OBJB_UCSYSAUXINFO= obj2_usysauxinfo.o obj3_usysauxinfo.o
+OBJA= obj1.o
+OBJB= obj2.o obj3.o
 
-OBJ_UCSYSAUXINFO= $(OBJA_UCSYSAUXINFO) $(OBJB_UCSYSAUXINFO)
+OBJ= $(OBJA) $(OBJB)
 
 
 default:		$(T).o
@@ -90,10 +90,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_UCSYSAUXINFO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSYSAUXINFO)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_UCSYSAUXINFO)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -114,17 +114,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_usysauxinfo.o:	$(OBJ0_UCSYSAUXINFO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYSAUXINFO)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1_usysauxinfo.o:	$(OBJ1_UCSYSAUXINFO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSYSAUXINFO)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2_usysauxinfo.o:	$(OBJ2_UCSYSAUXINFO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSYSAUXINFO)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3_usysauxinfo.o:	$(OBJ3_UCSYSAUXINFO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSYSAUXINFO)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
 
 usysauxinfo_sunos.o:	usysauxinfo_sunos.cc usysauxinfo_sunos.h $(INCS)
