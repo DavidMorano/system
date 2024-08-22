@@ -1,14 +1,14 @@
-/* strxcmp HEADER */
+/* strfieldcmp HEADER */
 /* lang=C20 */
 
-/* define file types according to the S_IFMT field of |mode_t| */
+/* string field comparisons */
 /* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRXCMP_INCLUDE
-#define	STRXCMP_INCLUDE
+#ifndef	STRFIELDCMP_INCLUDE
+#define	STRFIELDCMP_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -25,6 +25,6 @@ extern int	strnvaluecmp(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 
-#endif /* STRXCMP_INCLUDE */
+#endif /* STRFIELDCMP_INCLUDE */
 
 

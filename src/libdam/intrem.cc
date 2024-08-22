@@ -67,7 +67,7 @@ int irem(int v,int m) noex {
 }
 /* end subroutine (irem) */
 
-long lrem(long v,long m) noex {
+long lrem(long v,int m) noex {
 	const long	q = (v/m) ;
 	return (v-(q*m)) ;
 }

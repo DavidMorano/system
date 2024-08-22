@@ -1,10 +1,8 @@
-/* stremacmp */
+/* stremacmp SUPPORT */
+/* lang=C++20 */
 
 /* string key comparison */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -18,33 +16,34 @@
 
 /*******************************************************************************
 
+	Name:
+	stremacmp
+
+	Description:
 	We compare two EMA strings.
 
 	Synopsis:
-
-	int stremacmp(e1p,e2p)
-	const char	*e1p, *e2p ;
+	int stremacmp(cchar *e1p,cchar *e2p) noex
 
 	Arguments:
-
 	e1p		first string
 	e2p		second string
 
 	Returns:
-
 	>0		the second is greater than the first
 	0		the strings are equal
 	<0		the first is less than the second
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<localmisc.h>
+
+#include	"strxcmp.h"
 
 
 /* local defines */
@@ -56,7 +55,9 @@
 
 /* external subroutines */
 
-extern int	strnncmp(cchar *,int,cchar *,int) ;
+extern "C" {
+    extern int	strnncmp(cchar *,int,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -67,26 +68,29 @@ extern int	strnncmp(cchar *,int,cchar *,int) ;
 
 /* forward references */
 
-static int	stremacmp_main(cchar *,cchar *) ;
+static int	stremacmp_main(cchar *,cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int stremacmp(cchar *e1p,cchar *e2p)
-{
+int stremacmp(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
-	if ((e1p != NULL) || (e2p != NULL)) {
-	    if (e1p != NULL) {
-		if (e1p != NULL) {
+	if (e1p || e2p ) {
+	    if (e1p) {
+		if (e1p) {
 		    rc = stremacmp_main(e1p,e2p) ;
-		} else
+		} else {
 		    rc = -1 ;
-	    } else
+		}
+	    } else {
 		rc = 1 ;
+	    }
 	}
 	return rc ;
 }
@@ -95,9 +99,7 @@ int stremacmp(cchar *e1p,cchar *e2p)
 
 /* local subroutines */
 
-
-static int stremacmp_main(cchar *e1p,cchar *e2p)
-{
+static int stremacmp_main(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
 	cchar		*t1p = strchr(e1p,CH_AT) ;
 	cchar		*t2p = strchr(e2p,CH_AT) ;

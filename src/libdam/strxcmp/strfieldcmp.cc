@@ -1,7 +1,7 @@
 /* strfieldcmp SUPPORT */
 /* lang=C++20 */
 
-/* string field comparison */
+/* string field comparisons */
 /* version %I% last-modified %G% */
 
 

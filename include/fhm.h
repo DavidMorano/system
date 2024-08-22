@@ -1,14 +1,14 @@
-/* strfieldcmp HEADER */
+/* fhm HEADER */
 /* lang=C20 */
 
-/* string field comparisons */
+/* -c-string comparisons */
 /* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRFIELDCMP_INCLUDE
-#define	STRFIELDCMP_INCLUDE
+#ifndef	FHM_INCLUDE
+#define	FHM_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -19,12 +19,11 @@
 
 EXTERNC_begin
 
-extern int	strnkeycmp(cchar *,cchar *,int) noex ;
-extern int	strnvaluecmp(cchar *,cchar *,int) noex ;
+extern double	fhm(double *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* STRFIELDCMP_INCLUDE */
+#endif /* FHM_INCLUDE */
 
 

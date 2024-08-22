@@ -832,6 +832,14 @@ logfile.o:		logfile.dir
 logfile.dir:
 	makesubdir $@
 
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
+
 printhelp.o:		printhelp.cc printhelp.hh
+
+fhm.o:			fhm.cc fhm.h
+intrem.o:		intrem.cc intrem.h
 
 
