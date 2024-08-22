@@ -30,8 +30,10 @@ enum errnomssings {
 	errnomissing_l2hlt,
 	errnomissing_l3hlt,
 	errnomissing_l3rst,
-	errnomissing_badr,
 	errnomissing_noano,
+	errnomissing_bad,
+	errnomissing_badr,
+	errnomissing_bade,
 	errnomissing_badrqc,
 	errnomissing_badslt,
 	errnomissing_deadlock,
@@ -39,15 +41,30 @@ enum errnomssings {
 	errnomissing_ownerdead,
 	errnomissing_unavailable,
 	errnomissing_notrecoverable,
-	errnomissing_nosr,
-	errnomissing_nopkg,
+	errnomissing_notuniq,
 	errnomissing_proto,
 	errnomissing_badfd,
 	errnomissing_libacc,
 	errnomissing_libbad,
+	errnomissing_libscn,
+	errnomissing_libmax,
+	errnomissing_libexec,
 	errnomissing_hostdown,
 	errnomissing_unatch,
+	errnomissing_nosr,
+	errnomissing_nopkg,
 	errnomissing_noattr,
+	errnomissing_nocsi,
+	errnomissing_nonet,
+	errnomissing_chrng,
+	errnomissing_lnrng,
+	errnomissing_srmnt,
+	errnomissing_xfull,
+	errnomissing_adv,
+	errnomissing_comm,
+	errnomissing_remchg,
+	errnomissing_restart,
+	errnomissing_strpipe,
 	errnomissing_overlast
 } ;
 
@@ -63,11 +80,17 @@ enum errnomssings {
 #ifndef	EL2HLT
 #define	EL2HLT		errnomissing_l2hlt
 #endif
+#ifndef	ENOANO
+#define	ENOANO		errnomissing_noano
+#endif
+#ifndef	EBAD
+#define	EBAD		errnomissing_bad
+#endif
 #ifndef	EBADR
 #define	EBADR		errnomissing_badr
 #endif
-#ifndef	ENOANO
-#define	ENOANO		errnomissing_noano
+#ifndef	EBADE
+#define	EBADE		errnomissing_bade
 #endif
 #ifndef	EBADRQC
 #define	EBADRQC		errnomissing_badrqc
@@ -87,11 +110,8 @@ enum errnomssings {
 #ifndef	ENOTRECOVERABLE
 #define	ENOTRECOVERABLE	errnomissing_notrecoverable
 #endif
-#ifndef	ENOSR
-#define	ENOSR		errnomissing_nosr
-#endif
-#ifndef	ENOPKG
-#define	ENOPKG		errnomissing_nopkg
+#ifndef	ENOTUNIQ
+#define	ENOTUNIQ	errnomissing_notuniq
 #endif
 #ifndef	EPROTO
 #define	EPROTO		errnomissing_proto
@@ -105,14 +125,64 @@ enum errnomssings {
 #ifndef	ELIBBAD
 #define	ELIBBAD		errnomissing_libbad
 #endif
+#ifndef	ELIBSCN
+#define	ELIBSCN		errnomissing_libscn
+#endif
+#ifndef	ELIBMAX
+#define	ELIBMAX		errnomissing_libmax
+#endif
+#ifndef	ELIBEXEC
+#define	ELIBEXEC	errnomissing_libexec
+#endif
 #ifndef	EHOSTDOWN
 #define	EHOSTDOWN	errnomissing_hostdown
 #endif
 #ifndef	EUNATCH
 #define	EUNATCH		errnomissing_unatch
 #endif
+#ifndef	ENOSR
+#define	ENOSR		errnomissing_nosr
+#endif
+#ifndef	ENOPKG
+#define	ENOPKG		errnomissing_nopkg
+#endif
 #ifndef	ENOATTR
 #define	ENOATTR		errnomissing_noattr
+#endif
+
+#ifndef	ENOCSI
+#define	ENOCSI		errnomissing_nocsi
+#endif
+#ifndef	ENONET
+#define	ENONET		errnomissing_nonet
+#endif
+
+#ifndef	ECHRNG
+#define	ECHRNG		errnomissing_chrng
+#endif
+#ifndef	ELNRNG
+#define	ELNRNG		errnomissing_lnrng
+#endif
+#ifndef	ESRMNT
+#define	ESRMNT		errnomissing_srmnt
+#endif
+#ifndef	EXFULL
+#define	EXFULL		errnomissing_xfull
+#endif
+#ifndef	EADV
+#define	EADV		errnomissing_adv
+#endif
+#ifndef	ECOMM
+#define	ECOMM		errnomissing_comm
+#endif
+#ifndef	EREMCHG
+#define	EREMCHG		errnomissing_remchg
+#endif
+#ifndef	ERESTART
+#define	ERESTART	errnomissing_restart
+#endif
+#ifndef	ESTRPIPE
+#define	ESTRPIPE	errnomissing_strpipe
 #endif
 
 /* status return codes (only used when explicit return status is requested) */
@@ -132,6 +202,7 @@ enum errnomssings {
 #define	SR_NXIO		(- ENXIO)	/* No such device or address */
 #define	SR_2BIG		(- E2BIG)	/* Arg list too long */
 #define	SR_NOEXEC	(- ENOEXEC)	/* Exec format error */
+#define	SR_BAD		(- EBAD)	/* Bad ?? */
 #define	SR_BADF		(- EBADF)	/* Bad file number */
 #define	SR_CHILD	(- ECHILD)	/* No children */
 #define	SR_AGAIN	(- EAGAIN)	/* Resource temporarily unavailable */

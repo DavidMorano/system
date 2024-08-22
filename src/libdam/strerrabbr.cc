@@ -1,9 +1,8 @@
-/* strerrabbr */
+/* strerrabbr SUPPORT */
+/* lang=C++20 */
 
 /* return an abbreviation string given a system-error return number */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,11 +16,15 @@
 
 /*******************************************************************************
 
-        We take a system-error return number and we return a corresponding
-        abbreviation string.
+	Name:
+	strerrabbr
+
+	Description:
+	We take a system-error return number and we return a
+	corresponding abbreviation string.
 
 	Synopsis:
-	cchar *strerrabbr(uint n)
+	cchar *strerrabbr(uint n) noex
 
 	Arguments:
 	n		system-error return number to lookup
@@ -29,27 +32,45 @@
 	Returns:
 	-		character-string representation of system-error return
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"strerrabbr.h"
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
 
 /* local structures */
 
 struct sysret {
 	int		n ;
-	const char	*s ;
+	cchar		*s ;
 } ;
+
+
+/* forward references */
 
 
 /* local variables */
 
-static const struct sysret	cvts[] = {
+static constexpr struct sysret	cvts[] = {
 	{ SR_PERM, "PERM" },
 	{ SR_NOENT, "NOENT" },
 	{ SR_SRCH, "SRCH" },
@@ -210,20 +231,19 @@ static const struct sysret	cvts[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-const char *strerrabbr(int rs)
-{
-	int		i ;
-	int		f = FALSE ;
-	const char	*s ;
-
+cchar *strerrabbr(int rs) noex {
+	int		i ; /* used-afterwards */
+	int		f = false ;
+	cchar		*s ;
 	for (i = 0 ; cvts[i].s != 0 ; i += 1) {
 	    f = (cvts[i].n == rs) ;
 	    if (f) break ;
 	} /* end for */
-
 	s = (f) ? cvts[i].s : "*UNK*" ;
 	return s ;
 }

@@ -1,22 +1,31 @@
-/* main */
-
+/* strip SUPPORT */
+/* lang=C++20 */
 
 /* program to strip comments from an assemble language program */
+/* version %I% last-modified %G% */
 
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /*******************************************************************************
 
-	This program will remove all comment lines and all
-	empty lines from the input file.
-	Comment lines have '.' characters in them.
-
+	This program will remove all comment lines and all empty
+	lines from the input file.  Comment lines have '.' characters
+	in them.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
-#include	<stdio.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdio>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -25,16 +34,13 @@
 #define		EOL	'\n'		/* end of line mark */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int		argc ;
-const char	*argv[] ;
-const char	*env[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	int	c ;
-
 
 /* come to start a new line */
 top:
