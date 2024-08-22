@@ -56,14 +56,14 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= stremacmp.o
-OBJ1= 
+OBJ0= stremacmp.o strfieldcmp.o strpcmp.o
+OBJ1= strleadcmp.o
 OBJ2= 
 OBJ3= 
 OBJ4= 
 OBJ5= 
 
-OBJA= obj0.o 
+OBJA= obj0.o  obj1.o
 #OBJA= obj0.o obj1.o obj2.o 
 #OBJB= obj3.o obj4.o obj5.o
 
@@ -141,5 +141,8 @@ obj5.o:			$(OBJ5)
 
 
 stremacmp.o:		stremacmp.cc 	$(INCS)
+strfieldcmp.o:		strfieldcmp.cc	$(INCS)
+strpcmp.o:		strpcmp.cc	$(INCS)
+strleadcmp.o:		strleadcmp.cc	$(INCS)
 
 
