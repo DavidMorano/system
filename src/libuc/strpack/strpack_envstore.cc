@@ -24,6 +24,7 @@
 	This is a little add-on to the STRPACK object to add an
 	environment variable in the form of a key-value pair.
 
+	Synopsis:
 	int strpack_envstore(SP *op,cc *kp,cc *vp,int vl,cc **rpp) noex
 
 	Arguments:

@@ -1,13 +1,16 @@
-/* strdirname */
+/* strdirname SUPPORT */
+/* lang=C++20 */
 
 /* get the directory part out of a file name path */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-08-27, David A­D­ Morano
-        This is a replacement for some systems (UNIX yes, but not all others --
-        hence this code up) that do not have a 'dirname(3c)' type of subroutine.
+	This is a replacement for some systems (UNIX yes, but not
+	all others -- hence this code up) that do not have a
+	|dirname(3c)| type of subroutine.
 
 */
 
@@ -15,48 +18,55 @@
 
 /*******************************************************************************
 
-	This routine returns the directory portion of a file name path.
+	Name:
+	strdirname
+
+	Description:
+	This routine returns the directory portion of a file name
+	path.
 
 	Synopsis:
-
-	char *strdirname(s)
-	char	s[] ;
+	char *strdirname(char *s) noex
 
 	Arguments:
-
 	s	string buffer address
 
 	Returns:
-
 	-	pointer to directory part of modified string buffer
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<localmisc.h>
 
-#include	<sys/types.h>
-#include	<string.h>
+
+/* local defines */
 
 
 /* local variables */
 
-static const char	*const strdirname_dot = "." ;
+static constexpr cchar		strdirname_dot[] = "." ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-char *strdirname(char *s)
-{
+char *strdirname(char *s) noex {
 	int		si ;
 	int		sl = strlen(s) ;
 
 /* remove trailing slash characters */
 
-	while ((sl > 1) && (s[sl - 1] == '/'))
+	while ((sl > 1) && (s[sl - 1] == '/')) {
 	    sl -= 1 ;
+	}
 
 /* find the next previous slash character (if there is one) */
 

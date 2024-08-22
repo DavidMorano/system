@@ -436,7 +436,6 @@ dirseen_not.o:		dirseen_not.cc dirseen.h
 
 randomvar.o:		randomvar.cc randomvar.h
 
-strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
 strstore.o:		strstore.cc strstore.h
 strmgr.o:		strmgr.cc strmgr.h
@@ -753,6 +752,11 @@ liner.o:		liner.dir
 liner.dir:
 	makesubdir $@
 
+# STRPACK
+strpack.o:		strpack.dir
+strpack.dir:
+	makesubdir $@
+
 # TMPX
 tmpx.o:			tmpx.dir
 tmpx.dir:
@@ -808,7 +812,6 @@ unameo.o:		unameo.cc	unameo.h
 hostaddr.o:		hostaddr.cc	hostaddr.h
 b64decoder.o:		b64decoder.cc	b64decoder.h
 lookaside.o:		lookaside.cc	lookaside.h
-strpack.o:		strpack.cc	strpack.h
 strtab.o:		strtab.cc	strtab.h
 strstore.o:		strstore.cc	strstore.h
 expcook.o:		expcook.cc	expcook.h
