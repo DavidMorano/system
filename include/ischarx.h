@@ -41,16 +41,13 @@ extern bool isprintlatin(int) noex ;
 extern bool isprintterm(int) noex ;
 extern bool iscmdstart(int) noex ;
 extern bool ishdrkey(int) noex ;
+extern bool	 ismmclass_7bit(int) noex ;
+extern bool	 ismmclass_8bit(int) noex ;
+extern bool	 ismmclass_binary(int) noex ;
 
 static inline bool isspacetab(int ch) noex {
 	return ((ch == ' ') || (ch == '\t')) ;
 }
-
-#ifdef	COMMENT
-extern bool ismmclass_7bit(int) noex ;
-extern bool ismmclass_8bit(int) noex ;
-extern bool ismmclass_binary(int) noex ;
-#endif /* COMMENT */
 
 EXTERNC_end
 

@@ -63,7 +63,7 @@
 	isprintbad
 	iswhite
 	isdict
-	ismmclass
+	ismmclass_{x}
 	iscmdstart
 	iseol
 	iszero
