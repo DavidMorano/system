@@ -36,7 +36,16 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -107,5 +116,39 @@ int ptca_setpshared(ptca *op,int fl) noex {
 	return rs ;
 }
 /* end subroutine (ptca_setpshared) */
+
+
+/* local subroutines */
+
+void ptca::dtor() noex {
+	int		rs = ptca_destroy(this) ;
+	if (rs < 0) {
+	    ulogerror("ptca",rs,"dtor-destroy") ;
+	}
+} 
+/* end method (ptca::dtor) */
+
+int ptca_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ptcamem_create:
+	        rs = ptca_create(op) ;
+	        break ;
+	    case ptcamem_destroy:
+	        rs = ptca_destroy(op) ;
+	        break ;
+	    case ptcamem_setpshared:
+	        rs = ptca_setpshared(op,a) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ptca_co::operator) */
+
+int ptca::getpshared(int *rp) noex {
+	return ptca_getpshared(this,rp) ;
+}
 
 

@@ -63,6 +63,9 @@ namespace {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ptm_create(ptm *op,ptma *ap) noex {
@@ -73,28 +76,34 @@ int ptm_create(ptm *op,ptma *ap) noex {
 /* end subroutine (ptm_create) */
 
 int ptm_destroy(ptm *op) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_destroy(op)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutex_destroy(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptm_destroy) */
 
 int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_setprioceiling(op,npri,oldp)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutex_setprioceiling(op,npri,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptm_setprioceiling) */
 
 int ptm_getprioceiling(ptm *op,int *oldp) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_getprioceiling(op,oldp)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutex_getprioceiling(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptm_getprioceiling) */
@@ -126,10 +135,12 @@ int ptm_locktry(ptm *op) noex {
 /* end subroutine (ptm_locktry) */
 
 int ptm_unlock(ptm *op) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_unlock(op)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutex_unlock(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptm_unlock) */
@@ -181,11 +192,9 @@ int ucptm::operator () (ptm *op) noex {
 /* end subroutine (ucptm::operator) */
 
 int ucptm::create(ptm *op) noex {
-	int		rs = SR_FAULT ;
-	if (ap) {
-	    if ((rs = pthread_mutex_init(op,ap)) > 0) {
-		rs = (- rs) ;
-	    }
+	int		rs ;
+	if ((rs = pthread_mutex_init(op,ap)) > 0) {
+	    rs = (- rs) ;
 	}
 	return rs ;
 }
@@ -218,27 +227,25 @@ void ptm::dtor() noex {
 /* end method (ptm::dtor) */
 
 int ptm_creater::operator () (ptma *ap) noex {
-	int	rs = SR_BUGCHECK ;
-	if (op) {
-	    rs = ptm_create(op,ap) ;
-	}
-	return rs ;
+	return ptm_create(op,ap) ;
 }
 /* end method (ptm_creater::operator) */
 
 int ptm_co::operator () (int to) noex {
 	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case ptmmem_destroy:
-	    rs = ptm_destroy(op) ;
-	    break ;
-	case ptmmem_lockbegin:
-	    rs = ptm_lockto(op,to) ;
-	    break ;
-	case ptmmem_lockend:
-	    rs = ptm_unlock(op) ;
-	    break ;
-	} /* end switch */
+	if (op) {
+	    switch (w) {
+	    case ptmmem_destroy:
+	        rs = ptm_destroy(op) ;
+	        break ;
+	    case ptmmem_lockbegin:
+	        rs = ptm_lockto(op,to) ;
+	        break ;
+	    case ptmmem_lockend:
+	        rs = ptm_unlock(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (ptm_co::operator) */

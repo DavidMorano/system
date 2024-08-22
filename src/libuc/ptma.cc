@@ -42,9 +42,13 @@
 /* external subroutines */
 
 
-/* forward references */
+/* external variables */
 
-int		ptma_create(PTMA *) noex ;
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -52,9 +56,12 @@ int		ptma_create(PTMA *) noex ;
 constexpr bool	f_mutexrobust = F_MUTEXROBUST ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int ptma_create(PTMA *op) noex {
+int ptma_create(ptma *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		to_nomem = utimeout[uto_nomem] ;
@@ -85,68 +92,84 @@ int ptma_create(PTMA *op) noex {
 }
 /* end subroutine (ptma_create) */
 
-int ptma_destroy(PTMA *op) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_destroy(op)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_destroy(ptma *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_destroy(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_destroy) */
 
-int ptma_getprioceiling(PTMA *op,int *oldp) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_getprioceiling(op,oldp)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_getprioceiling(ptma *op,int *oldp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_getprioceiling(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_getprioceiling) */
 
-int ptma_setprioceiling(PTMA *op,int fn) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_setprioceiling(op,fn)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_setprioceiling(ptma *op,int fn) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_setprioceiling(op,fn)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_setprioceiling) */
 
-int ptma_getprotocol(PTMA *op,int *oldp) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_getprotocol(op,oldp)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_getprotocol(ptma *op,int *oldp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_getprotocol(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_getprotocol) */
 
-int ptma_setprotocol(PTMA *op,int fn) noex {
-	int		rs ;
-	rs = pthread_mutexattr_setprotocol(op,fn) ;
-	if (rs > 0) rs = (- rs) ;
+int ptma_setprotocol(ptma *op,int fn) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_setprotocol(op,fn)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_setprotocol) */
 
-int ptma_getpshared(PTMA *op,int *oldp) noex {
-	int		rs ;
-	rs = pthread_mutexattr_getpshared(op,oldp) ;
-	if (rs > 0) rs = (- rs) ;
+int ptma_getpshared(ptma *op,int *oldp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_getpshared(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_getpshared) */
 
-int ptma_setpshared(PTMA *op,int fn) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_setpshared(op,fn)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_setpshared(ptma *op,int fn) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_setpshared(op,fn)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_setpshared) */
 
-int ptma_getrobustnp(PTMA *op,int *oldp) noex {
+int ptma_getrobustnp(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if_constexpr (f_mutexrobust) {
@@ -162,7 +185,7 @@ int ptma_getrobustnp(PTMA *op,int *oldp) noex {
 }
 /* end subroutine (ptma_getrobustnp) */
 
-int ptma_setrobustnp(PTMA *op,int fn) noex {
+int ptma_setrobustnp(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if_constexpr (f_mutexrobust) {
@@ -178,22 +201,88 @@ int ptma_setrobustnp(PTMA *op,int fn) noex {
 }
 /* end subroutine (ptma_setrobustnp) */
 
-int ptma_gettype(PTMA *op,int *oldp) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_gettype(op,oldp)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_gettype(ptma *op,int *oldp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_gettype(op,oldp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_gettype) */
 
-int ptma_settype(PTMA *op,int nf) noex {
-	int		rs ;
-	if ((rs = pthread_mutexattr_settype(op,nf)) > 0) {
-	    rs = (- rs) ;
-	}
+int ptma_settype(ptma *op,int nf) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutexattr_settype(op,nf)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptma_settype) */
+
+
+/* local subroutines */
+
+void ptma::dtor() noex {
+	int		rs = ptma_destroy(this) ;
+	if (rs < 0) {
+	    ulogerror("ptma",rs,"dtor-destroy") ;
+	}
+} 
+/* end method (ptma::dtor) */
+
+int ptma_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ptmamem_create:
+	        rs = ptma_create(op) ;
+	        break ;
+	    case ptmamem_destroy:
+	        rs = ptma_destroy(op) ;
+	        break ;
+	    case ptmamem_setprioceiling:
+	        rs = ptma_setprioceiling(op,a) ;
+	        break ;
+	    case ptmamem_setprotocol:
+	        rs = ptma_setprotocol(op,a) ;
+	        break ;
+	    case ptmamem_setpshared:
+	        rs = ptma_setpshared(op,a) ;
+	        break ;
+	    case ptmamem_setrobustnp:
+	        rs = ptma_setrobustnp(op,a) ;
+	        break ;
+	    case ptmamem_settype:
+	        rs = ptma_settype(op,a) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ptma_co::operator) */
+
+int ptma::getprioceiling(int *rp) noex {
+	return ptma_getprioceiling(this,rp) ;
+}
+
+int ptma::getprotocol(int *rp) noex {
+	return ptma_getprotocol(this,rp) ;
+}
+
+int ptma::getpshared(int *rp) noex {
+	return ptma_getpshared(this,rp) ;
+}
+
+int ptma::getrobustnp(int *rp) noex {
+	return ptma_getrobustnp(this,rp) ;
+}
+
+int ptma::gettype(int *rp) noex {
+	return ptma_gettype(this,rp) ;
+}
 
 
