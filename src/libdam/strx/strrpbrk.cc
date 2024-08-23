@@ -46,6 +46,8 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+#include	"strx.h"
+
 
 /* local defines */
 

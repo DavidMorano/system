@@ -21,8 +21,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |INT_MIN| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<localmisc.h>
 

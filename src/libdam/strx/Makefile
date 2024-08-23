@@ -56,7 +56,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strwildsub.o
+OBJ0= strwildsub.o strrpbrk.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -138,5 +138,6 @@ obj5.o:			$(OBJ5)
 
 
 strwildsub.o:		strwildsub.cc	$(INCS)
+strrpbrk.o:		strrpbrk.cc	$(INCS)
 
 

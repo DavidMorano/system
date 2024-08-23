@@ -34,15 +34,15 @@
 
 
 struct valuelims {
-	cshort		smin = short(0x8000) ;
-	cshort		smax = short(0x7FFF) ;
+	cshort		smin = short(SHORT_MIN) ;
+	cshort		smax = short(SHORT_MAX) ;
 	cint		imin = INT_MIN ;
 	cint		imax = INT_MAX ;
 	clong		lmin = LONG_MIN ;
 	clong		lmax = LONG_MAX ;
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
-	cushort		usmax = ushort(0xFFFF) ;	/* unsigned */
+	cushort		usmax = ushort(USHORT_MAX) ;	/* unsigned */
 	cuint		uimax = UINT_MAX ;		/* unsigned */
 	culong		ulmax = ULONG_MAX ;		/* unsigned */
 	ulonglong	ullmax = 0 ;			/* unsigned */

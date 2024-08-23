@@ -846,5 +846,8 @@ printhelp.o:		printhelp.cc printhelp.hh
 
 fhm.o:			fhm.cc fhm.h
 intrem.o:		intrem.cc intrem.h
+addsat.o:		addsat.cc addsat.h
+removename.o:		removename.cc removename.h
+wdt.o:			wdt.cc wdt.h
 
 
