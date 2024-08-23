@@ -42,7 +42,7 @@ I04= egs.h randmwc.o random.h
 I05= dater.h zdb.h zos.h tmz.h zoffparts.h
 I06= termstr.h
 I07= kinfo.h loadave.h fsdir.h fsdirtree.h
-I08= logfile.h lfm.h lastlogfile.h tmpx.h
+I08= logfile.h lfm.h tmpx.h
 I09= storeitem.h 
 I10= mallocstuff.h userinfo.h openport.h
 I11= char.h ansigr.h baops.h bwops.h
@@ -216,7 +216,7 @@ OBJ103= dw.o fmq.o useraccdb.o csem.o
 OBJ104= sesmsg.o msgdata.o
 OBJ105= dater.o dater_getdate.o date.o cachetime.o
 OBJ106= field.o field_word.o field_wordphrase.o field_srvarg.o field_svcargs.o
-OBJ107= lfm.o lastlogfile.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
+OBJ107= lfm.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
 OBJ108= logfile.o
 OBJ109= vecstr_adds.o vecstr_foilcmp.o vecstr_svcargs.o vecstr_srvargs.o
 OBJ110= vecstr_avmkstr.o
@@ -654,8 +654,6 @@ hdbstr.o:		hdbstr.c hdbstr.h
 keyvals.o:		keyvals.c keyvals.h
 
 paramopt.o:		paramopt.c paramopt.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 loadave.o:		loadave.c loadave.h
 

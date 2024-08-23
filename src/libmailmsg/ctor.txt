@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int proginfo_ctor(proginfo *op,Args ... args) noex {
+static int lastlogfile_ctor(lastlogfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int proginfo_ctor(proginfo *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (proginfo_ctor) */
+/* end subroutine (lastlogfile_ctor) */
 
-static int proginfo_dtor(proginfo *op) noex {
+static int lastlogfile_dtor(lastlogfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (proginfo_dtor) */
+/* end subroutine (lastlogfile_dtor) */
 
 template<typename ... Args>
-static inline int proginfo_magic(proginfo *op,Args ... args) noex {
+static inline int lastlogfile_magic(lastlogfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == LASTLOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (proginfo_magic) */
+/* end subroutine (lastlogfile_magic) */
