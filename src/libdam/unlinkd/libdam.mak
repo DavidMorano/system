@@ -813,6 +813,7 @@ strstore.o:		strstore.cc strstore.h
 userattr.o:		userattr.c userattr.h
 pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
+envlist.o:		envlist.cc envlist.h
 
 dir:
 	makesubdir $@
