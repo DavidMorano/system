@@ -837,6 +837,11 @@ strxcmp.o:		strxcmp.dir
 strxcmp.dir:
 	makesubdir $@
 
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
+
 printhelp.o:		printhelp.cc printhelp.hh
 
 fhm.o:			fhm.cc fhm.h

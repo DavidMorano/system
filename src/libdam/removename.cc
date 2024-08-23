@@ -1,16 +1,15 @@
-/* removename */
+/* removename SUPPORT */
+/* lang=C++20 */
 
 /* remove a named file-system object (and its descendants) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-        The subroutine was adapated from other programs that do similar types of
-        functions.
+	The subroutine was adapated from other programs that do
+	similar types of functions.
 
 */
 
@@ -18,43 +17,37 @@
 
 /******************************************************************************
 
-	This function removes a named UNIX file-system object along with
-	all of its descendents (if any).
+	Name:
+	removename
+
+	Description:
+	This function removes a named UNIX file-system object along
+	with all of its descendents (if any).
 
 	Synopsis:
-
-	int removename(name,rvp,opts,bcount)
-	const char	name[] ;
-	randomvar	*rvp ;
-	int		opts ;
-	int		bcount ;
+	int removename(cchar *name,randomvar *rvp,int opts,int bcount) noex
 
 	Arguments:
-
 	name		name of FS object to remove
 	rvp		pointer to RADNDOMVAR object
 	opts		options
 	bcount		burn-count (number of times to burn files)
 
 	Returns:
-
 	>=0		count of objects (files or directories) removed
-	<0		error
-
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<wdt.h>
 #include	<vecpstr.h>
@@ -70,9 +63,19 @@
 #define	REMOVEINFO_FL	struct removeinfo_flags
 
 
+/* imported namespaces */
+
+extern "C" {
+    typedef int (*wdt_f)() noex ;
+}
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	burn(randomvar	*,int,const char *) ;
+extern int	burn(randomvar *,int,cchar *) noex ;
 
 
 /* external variables */
@@ -91,7 +94,7 @@ struct removeinfo_flags {
 struct removeinfo {
 	randomvar	*rvp ;
 	REMOVEINFO_FL	f ;
-	VECPSTR		dirs ;
+	vecpstr		dirs ;
 	uint		c_removed ;
 	int		bcount ;
 } ;
@@ -99,33 +102,27 @@ struct removeinfo {
 
 /* forward references */
 
-static int	removeit(cchar *,USTAT *,REMOVEINFO *) ;
-static int	rmdirs(REMOVEINFO *) ;
+static int	removeit(cchar *,USTAT *,REMOVEINFO *) noex ;
+static int	rmdirs(REMOVEINFO *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int removename(rvp,bcount,opts,name)
-randomvar	*rvp ;
-int		bcount ;
-int		opts ;
-const char	name[] ;
-{
+int removename(randomvar *rvp,int bcount,int opts,cchar *name) noex {
+	void_f		vuf = void_f(removeit) ;
 	USTAT		sb, sb2 ;
-	REMOVEINFO	ri ;
+	REMOVEINFO	ri{} ;
 	randomvar	x ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wopts = 0 ;
-	int		f_rv = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("removename: opts=%04x bcount=%d\n",opts,bcount) ;
-#endif
+	bool		f_rv = false ;
 
 	if (name == NULL)
 	    return SR_FAULT ;
@@ -134,67 +131,45 @@ const char	name[] ;
 	if (rs < 0)
 	    goto ret0 ;
 
-/* initialize the "removeinfo" object */
-
-	memset(&ri,0,sizeof(struct removeinfo)) ;
-
 	ri.f.burn = (opts & REMOVENAME_MBURN) ? 1 : 0 ;
 	ri.f.follow = (opts & REMOVENAME_MFOLLOW) ? 1 : 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("removename: burn=%d follow=%d\n",
-	    ri.f.burn,ri.f.follow) ;
-#endif
-
 	ri.rvp = rvp ;
 	ri.bcount = bcount ;
 	ri.c_removed = 0 ;
 
 	if (ri.f.burn && (rvp == NULL)) {
 
-	    rs = randomvar_start(&x,FALSE,opts) ;
+	    rs = randomvar_start(&x,false,opts) ;
 	    if (rs < 0)
 	        goto ret0 ;
 
-	    f_rv = TRUE ;
+	    f_rv = true ;
 	    ri.rvp = &x ;
 
 	} /* end if (we need our own random variable) */
 
 	if ((rs = vecpstr_start(&ri.dirs,10,0,0)) >= 0) {
+	    wdt_f		wuf = wdt_f(vuf) ;
 
 /* continue with our processing */
-
-#if	CF_DEBUGS
-	    debugprintf("removename: name=\"%s\" mode=%0o\n",
-	        name,sb.st_mode) ;
-#endif
 
 	    if (S_ISLNK(sb.st_mode)) {
 
 	        if (ri.f.follow &&
 	            (u_stat(name,&sb2) >= 0) && S_ISDIR(sb2.st_mode)) {
 
-#if	CF_DEBUGS
-	            debugprintf("removename: wdt() name=%s\n",name) ;
-#endif
-
 	            wopts |= ((ri.f.follow) ? WDT_MFOLLOW : 0) ;
-	            rs = wdt(name,wopts,removeit,&ri) ;
-
-	            if (rs >= 0)
+	            if ((rs = wdt(name,wopts,wuf,&ri)) >= 0) {
 	                rs = vecpstr_add(&ri.dirs,name,-1) ;
-
+		    }
 	        } else {
-
 	            rs = removeit(name,&sb,&ri) ;
-
 	        } /* end if */
 
 	    } else if (S_ISDIR(sb.st_mode)) {
 
 	        wopts |= ((ri.f.follow) ? WDT_MFOLLOW : 0) ;
-	        rs = wdt(name,wopts,removeit,&ri) ;
+	        rs = wdt(name,wopts,wuf,&ri) ;
 
 	        if (rs >= 0)
 	            rs = vecpstr_add(&ri.dirs,name,-1) ;
@@ -207,13 +182,9 @@ const char	name[] ;
 
 /* remove the directories */
 
-#if	CF_DEBUGS
-	    debugprintf("removename: remove the directories\n") ;
-#endif
-
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        rs = rmdirs(&ri) ;
-
+	    }
 	    rs1 = vecpstr_finish(&ri.dirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecpstr) */
@@ -225,10 +196,6 @@ const char	name[] ;
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("removename: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? ri.c_removed : rs ;
 }
 /* end subroutine (removename) */
@@ -236,90 +203,58 @@ ret0:
 
 /* local subroutines */
 
-
-static int removeit(name,sbp,rip)
-const char		name[] ;
-struct ustat		*sbp ;
-struct removeinfo	*rip ;
-{
-	USTAT		sb2 ;
+static int removeit(cchar *name,USTAT *sbp,removeinfo *rip) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("removeit: name=%s\n",name) ;
-#endif
-
 	if (S_ISLNK(sbp->st_mode)) {
-
-#if	CF_DEBUGS
-	    debugprintf("removeit: got symlink=%s\n",name) ;
-#endif
-
+	    USTAT	sb2 ;
+	    bool	f = true ;
 	    rs = (rip->f.follow) ? 0 : 1 ;
-	    if (rip->f.follow &&
-	        (u_stat(name,&sb2) >= 0) && S_ISDIR(sb2.st_mode)) {
-
-#if	CF_DEBUGS
-	        debugprintf("removeit: adding=%s\n",name) ;
-#endif
-
+	    f = f && rip->f.follow ;
+	    f = f && (u_stat(name,&sb2) >= 0) ;
+	    f = f && S_ISDIR(sb2.st_mode) ;
+	    if (f) {
 	        rs = vecpstr_add(&rip->dirs,name,-1) ;
-
 	    } else {
-
-	        rs = u_unlink(name) ;
-	        if (rs >= 0)
+	        if ((rs = u_unlink(name)) >= 0) {
 	            rip->c_removed += 1 ;
-
+		}
 	    } /* end if */
-
 	} else if (S_ISDIR(sbp->st_mode)) {
-
 	    rs = vecpstr_add(&rip->dirs,name,-1) ;
-
 	} else {
-
-	    if (rip->f.burn && S_ISREG(sbp->st_mode))
+	    if (rip->f.burn && S_ISREG(sbp->st_mode)) {
 	        rs = burn(rip->rvp,rip->bcount,name) ;
-
+	    }
 	    if (rs >= 0) {
-
-	        rs = u_unlink(name) ;
-	        if (rs >= 0)
+	        if ((rs = u_unlink(name)) >= 0) {
 	            rip->c_removed += 1 ;
-
+		}
 	    } /* end if */
-
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (removeit) */
 
-
-static int rmdirs(REMOVEINFO *rip)
-{
-	VECPSTR		*dlp = &rip->dirs ;
+static int rmdirs(REMOVEINFO *rip) noex {
+	vecpstr		*dlp = &rip->dirs ;
 	int		rs ;
 	int		n = 0 ;
-	const char	*cp ;
-
 	if ((rs = vecpstr_count(dlp)) > 0) {
 	    n = rs ;
 	    if ((rs = vecpstr_sort(dlp,NULL)) >= 0) {
-	        int	i ;
-	        for (i = (n - 1) ; i >= 0 ; i -= 1) {
+		cchar	*cp ;
+	        for (int i = (n - 1) ; i >= 0 ; i -= 1) {
 	            if (vecpstr_get(dlp,i,&cp) >= 0) {
-	                if (cp != NULL) {
-	                    rs = u_rmdir(cp) ;
-	                    if (rs >= 0)
+	                if (cp) {
+	                    if ((rs = u_rmdir(cp)) >= 0) {
 	                        rip->c_removed += 1 ;
+			    }
 	                }
 	            }
+		    if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if */
 	} /* end if */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (rmdirs) */
