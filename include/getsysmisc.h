@@ -32,7 +32,7 @@ typedef GETSYSMISC	sysmisc ;
 
 EXTERNC_begin
 
-extern int getsysmisc(sysmisc *,time_t) noex ;
+extern int getsysmisc_get(sysmisc *,time_t) noex ;
 
 EXTERNC_end
 

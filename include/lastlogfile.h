@@ -17,7 +17,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utmp.h>
+#include	<utmpx.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

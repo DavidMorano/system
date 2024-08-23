@@ -289,8 +289,8 @@ usysauxinfo.dir:
 	makesubdir $@
 
 # USYNC
-usync.o:		usync.dir
-usync.dir:
+ulock.o:		ulock.dir
+ulock.dir:
 	makesubdir $@
 
 # OTHER

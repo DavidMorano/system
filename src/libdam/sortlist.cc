@@ -1,10 +1,8 @@
-/* sortlist */
-/* lang=C99 */
+/* sortlist SUPPORT */
+/* lang=C++20 */
 
 /* sorted list operations */
-
-
-#define	CF_DEBUGS	1		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,23 +16,28 @@
 
 /*******************************************************************************
 
-        These routines are used when the caller just wants to store an item in a
-        sorted list. The item us usually just a pointer to the user's real data.
-        Items have keys and values, like with a hash table structure except that
-        we use a balanced binary tree to store everything.
+	Name:
+	sortlist
 
+	Description:
+	These routines are used when the caller just wants to store
+	an item in a sorted list.  The item us usually just a pointer
+	to the user's real data.  Items have keys and values, like
+	with a hash table structure except that we use a balanced
+	binary tree to store everything.
 
 *******************************************************************************/
 
-
-#define	SORTLIST_MASTER		1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"sortlist.h"
@@ -46,8 +49,16 @@
 /* external subroutines */
 
 
-/* exported subroutines */
+/* external variables */
 
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 int sortlist_init(slp,cmpfunc)
 SORTLIST	*slp ;

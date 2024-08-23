@@ -4,10 +4,6 @@
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* switchable at invocation */
-
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
@@ -19,78 +15,50 @@
 
 /*******************************************************************************
 
-        This subroutine is used for acquiring the program-root for a program.
+	Name:
+	proginfo_setpiv
+
+	Description:
+	This subroutine is used for acquiring the program-root for
+	a program.
 
 	Synopsis:
-
-	int proginfo_setpiv(pip,pr,vars)
-	PROGINFO	*pip ;
-	cchar		pr[] ;
-	struct pivars	*vars ;
+	int proginfo_setpiv(proginfo *pip,cchar *pr,pivars *vars) noex
 
 	Arguments:
-
 	pip		program-information pointer
 	pr		program root
 	vars		array of program parameters
 
 	Returns:
-
-	<0	error
 	>=0	length of PR
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<localmisc.h>
 
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
 
-#ifndef	DEBUGLEVEL
-#define	DEBUGLEVEL(n)	(pip->debuglevel >= (n))
-#endif
+#define	PIVARS		struct pivars
+
+#define	PI		proginfo
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getrootdname(char *,int,cchar *,cchar *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	isNotPresent(int) ;
-
-extern int	proginfo_getenv(PROGINFO *,cchar *,int,cchar **) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -101,30 +69,26 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* forward references */
 
-static int	proginfo_setpiver(PROGINFO *,IDS *,cchar *,struct pivars *) ;
+static int	proginfo_setpiver(proginfo *,ids *,cchar *,PIVARS *) noex ;
 
-static int	sfrootdirname(cchar *,int,cchar **) ;
+static int	sfrootdirname(cchar *,int,cchar **) noex ;
 
-static int	dircheck(IDS *,cchar *) ;
-static int	isNotGoodDir(int) ;
+static int	dircheck(ids *,cchar *) noex ;
+static bool	isNotGoodDir(int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int proginfo_setpiv(PROGINFO *pip,cchar *pr,struct pivars *vars)
-{
-	IDS		id ;
+int proginfo_setpiv(PI *pip,cchar *pr,PIVARS *vars) noex {
+	ids		id ;
 	int		rs ;
 	int		rs1 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginfo_setpiv: ent\n") ;
-#endif
 
 	if ((rs = ids_load(&id)) >= 0) {
 	    {
@@ -134,11 +98,6 @@ int proginfo_setpiv(PROGINFO *pip,cchar *pr,struct pivars *vars)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginfo_setpiv: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (proginfo_setpiv) */
@@ -146,10 +105,8 @@ int proginfo_setpiv(PROGINFO *pip,cchar *pr,struct pivars *vars)
 
 /* local subroutines */
 
-
-int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
-{
-	const int	plen = MAXPATHLEN ;
+int proginfo_setpiver(PI *pip,ids *idp,cchar *pr,PIVARS *vars) noex {
+	cint		plen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pl = -1 ;
@@ -157,22 +114,8 @@ int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
 	cchar		*cp = NULL ;
 	char		rdn[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    debugprintf("proginfo_setpiv: pr=%s\n",pr) ;
-	    if (vars != NULL) {
-	        debugprintf("proginfo_setpiv: vpr1=%s\n",vars->vpr1) ;
-	        debugprintf("proginfo_setpiv: vpr2=%s\n",vars->vpr2) ;
-	        debugprintf("proginfo_setpiv: vpr3=%s\n",vars->vpr3) ;
-	        debugprintf("proginfo_setpiv: pr=%s\n",vars->pr) ;
-	        debugprintf("proginfo_setpiv: vprname=%s\n",vars->vprname) ;
-	    }
-	}
-#endif /* CF_DEBUG */
-
 	if (pr == NULL) {
 	    int		i ;
-
 	    pl = -1 ;
 	    rs1 = SR_NOTFOUND ;
 	    for (i = 1 ; (rs >= 0) && isNotGoodDir(rs1) && (i <= 3) ; i += 1) {
@@ -213,15 +156,9 @@ int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
 	            }
 	        }
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(3))
-	            debugprintf("proginfo_setpiv: "
-	                "getrootdname() rs=%d rootdname=%s\n",
-	                rs1,rdn) ;
-#endif
-
-	        if ((rs >= 0) && (rs1 > 0))
+	        if ((rs >= 0) && (rs1 > 0)) {
 	            pr = rdn ;
+		}
 
 	    } /* end if (getnodedomain) */
 
@@ -231,48 +168,17 @@ int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
 
 	if ((rs >= 0) && (pr == NULL)) {
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3)) {
-	        debugprintf("proginfo_setpiv: progename=%s\n",pip->progename) ;
-	        debugprintf("proginfo_setpiv: progdname=%s\n",pip->progdname) ;
-	    }
-#endif
-
-	    if (pip->progdname == NULL)
+	    if (pip->progdname == NULL) {
 	        rs = proginfo_progdname(pip) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("proginfo_setpiv: _progdname() "
-	            "rs=%d progdname=%s\n",
-	            rs,pip->progdname) ;
-#endif
+	    }
 
 	    if ((rs >= 0) && (pip->progdname != NULL)) {
 	        cchar	*cp ;
 	        pl = sfrootdirname(pip->progdname,-1,&cp) ;
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(3)) {
-	            debugprintf("proginfo_setpiv: sfrootdirname() pl=%d\n",pl) ;
-	            debugprintf("proginfo_setpiv: p=>%t<\n",cp,pl) ;
-	        }
-#endif
-
 	        if (pl > 0) pr = cp ;
 	    }
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("proginfo_setpiv: sfrootdirname() "
-	            "rs=%d pr=%s\n",rs,pr) ;
-#endif
-
 	} /* end if (set program-root from program d-name) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginfo_setpiv: mid pr=%s\n",pr) ;
-#endif
 
 /* default is a fixed string (from the initialization variables) */
 
@@ -287,12 +193,6 @@ int proginfo_setpiver(PROGINFO *pip,IDS *idp,cchar *pr,struct pivars *vars)
 	    rs = proginfo_setprogroot(pip,pr,pl) ;
 	    prlen = rs ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginfo_setpiv: ret rs=%d prlen=%u pr=%s\n",
-	        rs,prlen,pip->pr) ;
-#endif
 
 	return (rs >= 0) ? prlen : rs ;
 }
@@ -309,15 +209,7 @@ static int sfrootdirname(cchar *dp,int dl,cchar **rpp)
 
 	if (rpp != NULL) *rpp = NULL ;
 
-#if	CF_DEBUGS
-	debugprintf("sfrootdirname: d=%t\n",dp,dl) ;
-#endif
-
 	bl = sfbasename(dp,dl,&bp) ;
-
-#if	CF_DEBUGS
-	debugprintf("sfrootdirname: b=%t\n",bp,bl) ;
-#endif
 
 	f = ((bl == 3) && (strncmp(bp,"bin",bl) == 0)) ;
 
@@ -325,34 +217,22 @@ static int sfrootdirname(cchar *dp,int dl,cchar **rpp)
 	    f = ((bl == 4) && (strncmp(bp,"sbin",bl) == 0)) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("sfrootdirname: f=%u\n",f) ;
-#endif
-
 	if (f) {
 	    sl = sfdirname(dp,dl,&sp) ;
 
-#if	CF_DEBUGS
-	    debugprintf("sfrootdirname: pr=%t\n",sp,sl) ;
-#endif
 	    if ((sl >= 0) && (rpp != NULL)) *rpp = sp ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("sfrootdirname: ret sl=%d\n",sl) ;
-#endif
 	return sl ;
 }
 /* end subroutine (sfrootdirname) */
 
-
-static int dircheck(IDS *idp,cchar *dname)
-{
-	struct ustat	sb ;
+static int dircheck(ids *idp,cchar *dname) noex {
+	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_stat(dname,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-	        const int	am = (R_OK|X_OK) ;
+	        cint	am = (R_OK|X_OK) ;
 	        rs = sperm(idp,&sb,am) ;
 	    } else {
 	        rs = SR_NOTDIR ;
@@ -362,10 +242,8 @@ static int dircheck(IDS *idp,cchar *dname)
 }
 /* end subroutine (dircheck) */
 
-
-static int isNotGoodDir(int rs)
-{
-	int		f = FALSE ;
+static bool isNotGoodDir(int rs) noex {
+	bool		f = false ;
 	f = f || isNotPresent(rs) ;
 	f = f || (rs == SR_NOTDIR) ;
 	return f ;
