@@ -109,7 +109,7 @@ char *strdcpyx(char *dp,int dl,int n,...) noex {
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	        cc	*sp = (cc *) va_arg(ap,char *) ;
+	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 	        while ((dl > 0) && (sp[0] != '\0')) {
 		    *dp++ = *sp++ ;
 		    dl -= 1 ;

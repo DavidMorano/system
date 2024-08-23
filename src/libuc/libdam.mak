@@ -184,7 +184,7 @@ OBJ75= snfsflags.o snopenflags.o snpollflags.o snfilemode.o snshellunder.o
 OBJ76= snsigabbr.o snerrabbr.o snloadavg.o sninetaddr.o sntmtime.o snmkuuid.o
 OBJ77= sntid.o sncat1.o sncat2.o
 OBJ78= strdcpy.o strdcpyw.o strdcpycompact.o strdcpyopaque.o strdcpyclean.o
-OBJ79= strnwcpy.o strnncpy.o strnset.o strdfill.o
+OBJ79= strnwcpy.o strnncpy.o strnset.o
 
 OBJ80=  nathai.o
 OBJ81= 
