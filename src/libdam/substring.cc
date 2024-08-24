@@ -54,7 +54,7 @@
 /* external subroutines */
 
 extern "C" {
-   int		substring(cchar *,int,cchar *) noex ;
+    int		substring(cchar *,int,cchar *) noex ;
 }
 
 

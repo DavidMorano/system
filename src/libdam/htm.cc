@@ -1,9 +1,8 @@
-/* htm (HTML creation and output) */
+/* htm SUPPORT (HTML creation and output) */
+/* lang=C++20 */
 
 /* hack to output HTML */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,37 +18,25 @@
 
 	This is a hack to create and output some basic HTML.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#if	defined(SFIO) && (SFIO > 0)
-#define	CF_SFIO	1
-#else
-#define	CF_SFIO	0
-#endif
-
-#if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
-#include	<shell.h>
-#endif
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<time.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<shio.h>
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<ascii.h>
 #include	<linefold.h>
+#include	<bufprintf.h>
+#include	<ctdec.h>
 #include	<localmisc.h>
 
 #include	"htm.h"
@@ -79,84 +66,92 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	msleep(int) ;
-extern int	isOneOf(const int *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	htm_tagalone(HTM *,const char *,const char *,const char *) ;
-static int	htm_printout(HTM *,int,const char *,int) ;
+template<typename ... Args>
+static int htm_ctor(htm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (htm_ctor) */
 
+static int htm_dtor(htm *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (htm_dtor) */
 
-/* static writable data */
+template<typename ... Args>
+static inline int htm_magic(htm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (htm_magic) */
+
+static int	htm_tagalone(HTM *,cchar *,cchar *,cchar *) noex ;
+static int	htm_printout(HTM *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int htm_start(HTM *op,SHIO *ofp,cchar *lang)
-{
+int htm_start(HTM *op,shio *ofp,cchar *lang) noex {
 	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (ofp == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("htm_start: lang=%s\n",lang) ;
-#endif
-
-	memset(op,0,sizeof(HTM)) ;
-	op->ofp = ofp ;
-	if ((rs = shio_print(op->ofp,"<!doctype html>",-1)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
-	    char	lbuf[LINEBUFLEN+1] ;
-	    wlen += rs ;
-	    if ((lang != NULL) && (lang[0] != '\0')) {
-	        rs = bufprintf(lbuf,llen,"<html lang=\"%s\">",lang) ;
-	    } else {
-	        rs = bufprintf(lbuf,llen,"<html>") ;
-	    }
-	    if (rs >= 0) {
-	        rs = shio_print(op->ofp,lbuf,rs) ;
+	if ((rs = htm_ctor(op,ofp)) >= 0) {
+	    op->ofp = ofp ;
+	    if ((rs = shio_print(op->ofp,"<!doctype html>",-1)) >= 0) {
+	        char	*lbuf{} ;
 	        wlen += rs ;
+		if ((rs = malloc_ml(&lbuf)) >= 0) {
+		    cint	llen = rs ;
+		    cchar	*fmt ;
+	            if ((lang != NULL) && (lang[0] != '\0')) {
+			fmt = "<html lang=\"%s\">" ;
+	                rs = bufprintf(lbuf,llen,fmt,lang) ;
+	            } else {
+			fmt = "<html>" ;
+	                rs = bufprintf(lbuf,llen,fmt) ;
+	            }
+	            if (rs >= 0) {
+	                if ((rs = shio_print(op->ofp,lbuf,rs)) >= 0) {
+	                    wlen += rs ;
+	    		    op->magic = HTM_MAGIC ;
+		        }
+	            }
+		    rs1 = uc_free(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (doctype) */
+	    op->wlen += wlen ;
+	    if (rs < 0) {
+		htm_dtor(op) ;;
 	    }
-	} /* end if (doctype) */
-	if (rs >= 0) op->magic = HTM_MAGIC ;
-
-#if	CF_DEBUGS
-	debugprintf("htm_start: ret rs=%d\n",rs) ;
-#endif
-
-	op->wlen += wlen ;
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (htm_start) */
 
-
-int htm_finish(HTM *op)
-{
+int htm_finish(HTM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen ;
@@ -174,21 +169,19 @@ int htm_finish(HTM *op)
 }
 /* end subroutine (htm_finish) */
 
-
-int htm_headbegin(HTM *op,const char *cfname)
-{
+int htm_headbegin(HTM *op,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const char	*sp = "<head>" ;
+	cchar	*sp = "<head>" ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
 	if ((rs = shio_print(op->ofp,sp,-1)) >= 0) {
 	    wlen += rs ;
 	    if ((cfname != NULL) && (cfname[0] != '\0')) {
-	        SHIO	cf ;
+	        shio	cf ;
 	        if ((rs = shio_open(&cf,cfname,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN+1] ;
 	            while ((rs = shio_read(&cf,lbuf,llen)) > 0) {
 	                rs = shio_write(op->ofp,lbuf,rs) ;
@@ -206,12 +199,10 @@ int htm_headbegin(HTM *op,const char *cfname)
 }
 /* end subroutine (htm_headbegin) */
 
-
-int htm_headend(HTM *op)
-{
+int htm_headend(HTM *op) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	const char	*sp = "</head>" ;
+	cchar	*sp = "</head>" ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
 	rs = shio_print(op->ofp,sp,-1) ;
@@ -221,21 +212,19 @@ int htm_headend(HTM *op)
 }
 /* end subroutine (htm_headend) */
 
-
-int htm_bodybegin(HTM *op,cchar *cfname)
-{
+int htm_bodybegin(HTM *op,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const char	*sp = "<body>" ;
+	cchar	*sp = "<body>" ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
 	if ((rs = shio_print(op->ofp,sp,-1)) >= 0) {
 	    wlen += rs ;
 	    if ((cfname != NULL) && (cfname[0] != '\0')) {
-	        SHIO	cf ;
+	        shio	cf ;
 	        if ((rs = shio_open(&cf,cfname,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN+1] ;
 	            while ((rs = shio_read(&cf,lbuf,llen)) > 0) {
 	                rs = shio_write(op->ofp,lbuf,rs) ;
@@ -253,12 +242,10 @@ int htm_bodybegin(HTM *op,cchar *cfname)
 }
 /* end subroutine (htm_bodybegin) */
 
-
-int htm_bodyend(HTM *op)
-{
+int htm_bodyend(HTM *op) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	const char	*sp = "</body>" ;
+	cchar	*sp = "</body>" ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
 	rs = shio_print(op->ofp,sp,-1) ;
@@ -268,11 +255,9 @@ int htm_bodyend(HTM *op)
 }
 /* end subroutine (htm_bodyend) */
 
-
-int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
-{
-	BUFFER		b ;
-	const int	c = COLUMNS ;
+int htm_tagbegin(HTM *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
+	buffer		b ;
+	cint	c = COLUMNS ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -282,7 +267,7 @@ int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
 	if (tag[0] == '\0') return SR_INVALID ;
 	if ((rs = buffer_start(&b,c)) >= 0) {
 	    int		i ;
-	    const char	*k, *v ;
+	    cchar	*k, *v ;
 	    buffer_chr(&b,CH_LANGLE) ;
 	    buffer_strw(&b,tag,-1) ;
 	    for (i = 0 ; i < 2 ; i += 1) {
@@ -290,7 +275,7 @@ int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
 	        switch (i) {
 	        case 0:
 	            k = "class" ;
-	            v = class ;
+	            v = eclass ;
 	            break ;
 	        case 1:
 	            k = "id" ;
@@ -320,7 +305,7 @@ int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
 	    } /* end if (key-vals) */
 	    buffer_chr(&b,CH_RANGLE) ;
 	    if (rs >= 0) {
-		const char	*bp ;
+		cchar	*bp ;
 	        if ((rs = buffer_get(&b,&bp)) >= 0) {
 		    rs = htm_printout(op,c,bp,rs) ;
 		    wlen += rs ;
@@ -334,10 +319,8 @@ int htm_tagbegin(HTM *op,cchar *tag,cchar *class,cchar *id,cchar *(*kv)[2])
 }
 /* end subroutine (htm_tagbegin) */
 
-
-int htm_tagend(HTM *op,const char *tag)
-{
-	const int	llen = LINEBUFLEN ;
+int htm_tagend(HTM *op,cchar *tag) noex {
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		lbuf[LINEBUFLEN+1] ;
@@ -354,21 +337,15 @@ int htm_tagend(HTM *op,const char *tag)
 }
 /* end subroutine (htm_tagend) */
 
-
-int htm_textbegin(op,class,id,title,r,c,tkv)
-HTM		*op ;
-const char	*class ;
-const char	*id ;
-const char	*title ;
-int		r,c ;
-const char	*(*tkv)[2] ;
-{
-	const int	dlen = DIGBUFLEN ;
+int htm_textbegin(HTM *op,cc *eclass,cc *id,cc *title,
+		int r,int c,cchar *(*tkv)[2]) noex {
+	cint	dlen = DIGBUFLEN ;
 	int		rs ;
-	int		size = 0 ;
+	int		rs1 ;
+	int		bsz = 0 ;
 	int		kvsize = 0 ;
-	const char	*tag = "textarea" ;
-	void		*p ;
+	cchar	*tag = "textarea" ;
+	void		*vp ;
 
 	if (tkv != NULL) {
 	    int	i ;
@@ -376,12 +353,12 @@ const char	*(*tkv)[2] ;
 	    kvsize = (i*(2*sizeof(cchar *))) ;
 	}
 	kvsize += (6*(2*sizeof(cchar *))) ;
-	size += kvsize ;
+	bsz += kvsize ;
 
-	size += ((dlen+1)*2) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    const char	*(*kv)[2] ;
-	    char	*bp = p ;
+	bsz += ((dlen+1)*2) ;
+	if ((rs = uc_malloc(bsz,&vp)) >= 0) {
+	    cchar	*(*kv)[2] ;
+	    char	*bp = charp(vp) ;
 	    char	*d0, *d1 ;
 
 	    kv = (cchar *(*)[2]) bp ;
@@ -415,39 +392,31 @@ const char	*(*tkv)[2] ;
 		    } /* end if (have extras) */
 	            kv[i][0] = NULL ;
 	            kv[i][1] = NULL ;
-	            rs = htm_tagbegin(op,tag,class,id,kv) ;
+	            rs = htm_tagbegin(op,tag,eclass,id,kv) ;
 	        } /* end if (ctdeci) */
 	    } /* end if (ctdeci) */
 
-	    uc_free(p) ;
-	} /* end if (m-a) */
+	    rs1 = uc_free(vp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 
 	return rs ;
 }
 /* end subroutine (htm_textbegin) */
 
-
-int htm_textend(HTM *op)
-{
+int htm_textend(HTM *op) noex {
 	cchar	*tag = "textarea" ;
 	return htm_tagend(op,tag) ;
 }
 /* end subroutine (htm_textend) */
 
-
-int htm_abegin(op,class,id,href,title)
-HTM		*op ;
-const char	*class ;
-const char	*id ;
-const char	*href ;
-const char	*title ;
-{
-	SBUF		b ;
-	const int	llen = LINEBUFLEN ;
+int htm_abegin(HTM *op,cc *eclass,cc *id,cc *href,cc *title) noex {
+	sbuf		b ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const char	*tag = "a" ;
+	cchar	*tag = "a" ;
 	char		lbuf[LINEBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ;
 	if (href == NULL) return SR_FAULT ;
@@ -455,14 +424,14 @@ const char	*title ;
 	if (href[0] == '\0') return SR_INVALID ;
 	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
 	    int		c ;
-	    const char	*k, *v ;
+	    cchar	*k, *v ;
 	    sbuf_chr(&b,CH_LANGLE) ;
 	    sbuf_strw(&b,tag,-1) ;
 	    for (c = 0 ; c < 4 ; c += 1) {
 	        switch (c) {
 	        case 0:
 	            k = "class" ;
-	            v = class ;
+	            v = eclass ;
 	            break ;
 	        case 1:
 	            k = "id" ;
@@ -495,13 +464,11 @@ const char	*title ;
 }
 /* end subroutine (htm_abegin) */
 
-
-int htm_aend(HTM *op)
-{
-	const int	llen = LINEBUFLEN ;
+int htm_aend(HTM *op) noex {
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
-	const char	*tag = "a" ;
+	cchar	*tag = "a" ;
 	char		lbuf[LINEBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
@@ -514,36 +481,24 @@ int htm_aend(HTM *op)
 }
 /* end subroutine (htm_aend) */
 
-
-int htm_hr(HTM *op,cchar *class,cchar *id)
-{
-	return htm_tagalone(op,"hr",class,id) ;
+int htm_hr(HTM *op,cchar *eclass,cchar *id) noex {
+	return htm_tagalone(op,"hr",eclass,id) ;
 }
 /* end subroutine (htm_hr) */
 
-
-int htm_br(HTM *op,cchar *class,cchar *id)
-{
-	return htm_tagalone(op,"br",class,id) ;
+int htm_br(HTM *op,cchar *eclass,cchar *id) noex {
+	return htm_tagalone(op,"br",eclass,id) ;
 }
 /* end subroutine (htm_br) */
 
-
-int htm_img(op,class,id,src,title,alt,w,h)
-HTM		*op ;
-const char	*class ;
-const char	*id ;
-const char	*src ;
-const char	*title ;
-const char	*alt ;
-int		w, h ;
-{
-	SBUF		b ;
-	const int	llen = LINEBUFLEN ;
+int htm_img(HTM *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
+		int w,int h) noex {
+	sbuf		b ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const char	*tag = "img" ;
+	cchar	*tag = "img" ;
 	char		lbuf[LINEBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ;
 	if (src == NULL) return SR_FAULT ;
@@ -560,7 +515,7 @@ int		w, h ;
 	        switch (c) {
 	        case 0:
 	            k = "class" ;
-	            v = class ;
+	            v = eclass ;
 	            break ;
 	        case 1:
 	            k = "id" ;
@@ -606,9 +561,7 @@ int		w, h ;
 }
 /* end subroutine (htm_img) */
 
-
-int htm_write(HTM *op,const void *lbuf,int llen)
-{
+int htm_write(HTM *op,cvoid *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (op == NULL) return SR_FAULT ;
@@ -621,9 +574,7 @@ int htm_write(HTM *op,const void *lbuf,int llen)
 }
 /* end subroutine (htm_write) */
 
-
-int htm_printline(HTM *op,cchar *lbuf,int llen)
-{
+int htm_printline(HTM *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (op == NULL) return SR_FAULT ;
@@ -636,21 +587,19 @@ int htm_printline(HTM *op,cchar *lbuf,int llen)
 }
 /* end subroutine (htm_printline) */
 
-
-int htm_printf(HTM *op,cchar *fmt,...)
-{
+int htm_printf(HTM *op,cchar *fmt,...) noex {
+	int		rs = SR_FAULT ;
 	va_list		ap ;
-	int		rs ;
-	va_begin(ap,fmt) ;
-	rs = htm_vprintf(op,fmt,ap) ;
-	va_end(ap) ;
+	if (op) {
+	    va_begin(ap,fmt) ;
+	    rs = htm_vprintf(op,fmt,ap) ;
+	    va_end(ap) ;
+	}
 	return rs ;
 }
 /* end subroutine (htm_printf) */
 
-
-int htm_vprintf(HTM *op,cchar *fmt,va_list ap)
-{
+int htm_vprintf(HTM *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (op == NULL) return SR_FAULT ;
@@ -662,16 +611,14 @@ int htm_vprintf(HTM *op,cchar *fmt,va_list ap)
 }
 /* end subroutine (htm_vprintf) */
 
-
-int htm_putc(HTM *op,int ch)
-{
+int htm_putc(HTM *op,int ch) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
-	rs = shio_putc(op->ofp,ch) ;
-	wlen += rs ;
-	op->wlen += wlen ;
+	if ((rs = htm_magic(op)) >= 0) {
+	    rs = shio_putc(op->ofp,ch) ;
+	    wlen += rs ;
+	    op->wlen += wlen ;
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (htm_putc) */
@@ -679,70 +626,70 @@ int htm_putc(HTM *op,int ch)
 
 /* private subroutines */
 
-
-int htm_tagalone(HTM *op,cchar *tag,cchar *class,cchar *id)
-{
-	SBUF		b ;
-	const int	llen = LINEBUFLEN ;
+int htm_tagalone(HTM *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		lbuf[LINEBUFLEN+1] ;
-	if (op == NULL) return SR_FAULT ;
-	if (tag == NULL) return SR_FAULT ;
-	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
-	if (tag[0] == '\0') return SR_INVALID ;
-	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
-	    int		c ;
-	    cchar	*k ;
-	    cchar	*v ;
-	    sbuf_chr(&b,CH_LANGLE) ;
-	    sbuf_strw(&b,tag,-1) ;
-	    for (c = 0 ; c < 2 ; c += 1) {
-	        v = NULL ;
-	        switch (c) {
-	        case 0:
-	            k = "class" ;
-	            v = class ;
-	            break ;
-	        case 1:
-	            k  = "id" ;
-	            v  = id ;
-	            break ;
-	        } /* end switch */
-	        if ((v != NULL) && (v[0] != '\0')) {
-	            rs = sbuf_printf(&b," %s=\"%s\"",k,v) ;
-	        }
-	        if (rs < 0) break ;
-	    } /* end for */
-	    sbuf_strw(&b," /",2) ;
-	    sbuf_chr(&b,CH_RANGLE) ;
-	    if (rs >= 0) {
-	        if ((rs = sbuf_getlen(&b)) >= 0) {
-	            rs = shio_print(op->ofp,lbuf,rs) ;
-	            wlen += rs ;
-	        }
-	    }
-	    rs1 = sbuf_finish(&b) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (sbuf) */
-	op->wlen += wlen ;
+	if ((rs = htm_magic(op,tag)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (tag[0]) {
+	        char	*lbuf{} ;
+	        if ((rs = malloc_ml(&lbuf)) >= 0) {
+	            sbuf	b ;
+		    cint	llen = rs ;
+	            if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
+	                int		c ;
+	                cchar	*k ;
+	                cchar	*v ;
+	                sbuf_chr(&b,CH_LANGLE) ;
+	                sbuf_strw(&b,tag,-1) ;
+	                for (c = 0 ; c < 2 ; c += 1) {
+	                    v = NULL ;
+	                    switch (c) {
+	                    case 0:
+	                        k = "class" ;
+	                        v = eclass ;
+	                        break ;
+	                    case 1:
+	                        k  = "id" ;
+	                        v  = id ;
+	                        break ;
+	                    } /* end switch */
+	                    if ((v != NULL) && (v[0] != '\0')) {
+	                        rs = sbuf_printf(&b," %s=\"%s\"",k,v) ;
+	                    }
+	                    if (rs < 0) break ;
+	                } /* end for */
+	                sbuf_strw(&b," /",2) ;
+	                sbuf_chr(&b,CH_RANGLE) ;
+	                if (rs >= 0) {
+	                    if ((rs = sbuf_getlen(&b)) >= 0) {
+	                        rs = shio_print(op->ofp,lbuf,rs) ;
+	                        wlen += rs ;
+	                    }
+	                }
+	                rs1 = sbuf_finish(&b) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (sbuf) */
+		    op->wlen += wlen ;
+		    rs1 = uc_free(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (htm_tagalone) */
 
-
-static int htm_printout(HTM *op,int c,cchar *bp,int bl)
-{
-	LINEFOLD	f ;
+static int htm_printout(HTM *op,int c,cchar *bp,int bl) noex {
+	linefold	f ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = linefold_start(&f,c,1,bp,bl)) >= 0) {
-	    int		i ;
 	    int		ll ;
 	    cchar	*lp ;
-	    for (i = 0 ; (ll = linefold_get(&f,i,&lp)) >= 0 ; i += 1) {
+	    for (int i = 0 ; (ll = linefold_get(&f,i,&lp)) >= 0 ; i += 1) {
 		if (i > 0) {
 		    rs = shio_putc(op->ofp,CH_SP) ;
 		    wlen += rs ;

@@ -1,9 +1,8 @@
-/* cksum */
+/* cksum SUPPORT */
+/* lang=C++20 */
 
 /* perform the POSIX 1003.2 CRC checksum algorithm */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,11 +11,12 @@
 	This object module was originally written.
 
 	= 2017-08-17, David A­D­ Morano
-        I simplified from two (usage mode) state bits to only one state bit. I
-        tested this but am still not sure if it is the same behavior as before
-        or not. I am not even sure if the previous behavior (if it is indeed
-        different) was a correct one, or a desired one. This was a small change
-        in any event.
+	I simplified from two (usage mode) state bits to only one
+	state bit.  I tested this but am still not sure if it is
+	the same behavior as before or not.  I am not even sure if
+	the previous behavior (if it is indeed different) was a
+	correct one, or a desired one.  This was a small change in
+	any event.
 
 */
 
@@ -24,24 +24,27 @@
 
 /*******************************************************************************
 
-        This object provides a way to accumulate a check sum like what the UNIX®
-        System V utility program 'cksum(1)' does.
+	This object provides a way to accumulate a check sum like
+	what the UNIX® System V utility program |cksum(1)| does.
 
-        The caller initializes this object and then applies the |cksum_accum|
-        subroutine for as much data as desired. A call to |cksum_getsum|
-        retrieves the accumulated check sum.
+	The caller initializes this object and then applies the
+	|cksum_accum| subroutine for as much data as desired.  A
+	call to |cksum_getsum| retrieves the accumulated check sum.
 
-        This routine provides only the POSIX 1003.2 version of CKSUM. Any other
-        options that your UNIX© |cksum(1)| program may have other than the
-        POSIX© 1003.2 basic function is not provided by this object.
+	This routine provides only the POSIX 1003.2 version of
+	CKSUM.  Any other options that your UNIX© |cksum(1)| program
+	may have other than the POSIX© 1003.2 basic function is not
+	provided by this object.
 
-        In the interest of avoiding any further confusion than I have caused
-        already, the polynomial used for this check-sum is:
+	In the interest of avoiding any further confusion than I
+	have caused already, the polynomial used for this check-sum
+	is:
 
 		x32+x26+x22+x16+x12+x11+x10+x8+x7+x5+x4+x2+x1+1
 
-        An individual file CRC checksum along with a total CRC checksum across
-        several files can be done concurrently with something like:
+	An individual file CRC checksum along with a total CRC
+	checksum across several files can be done concurrently with
+	something like:
 
 		cksum_start()
 
@@ -79,7 +82,6 @@
 
 		cksum_finish()
 
-
 	More typically, just one block of data is check summed with:
 
 		cksum_start()
@@ -92,23 +94,16 @@
 
 		cksum_finish() ;
 
-
 *******************************************************************************/
 
-
-#define	CKSUM_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"cksum.h"
@@ -119,15 +114,29 @@
 #define	ADDSUM(sum,ch)	(sum) = ((sum) << 8) ^ table[((sum) >> 24) ^ (ch)]
 
 
+/* local typedefs */
+
+#ifndef	TYPEDEF_UCHARP
+#define	TYPEDEF_UCHARP
+typedef unsigned char *ucharp ;
+#endif
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
-static const uint	table[] = {
+static constexpr uint	table[] = {
 	0x00000000,
 	0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
 	0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6,
@@ -183,160 +192,125 @@ static const uint	table[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cksum_start(CKSUM *csp)
-{
-
-	if (csp == NULL) return SR_FAULT ;
-
-	memset(csp,0,sizeof(CKSUM)) ;
-	return SR_OK ;
+int cksum_start(cksum *csp) noex {
+	int		rs = SR_FAULT ;
+	if (csp) {
+	    rs = memclear(csp) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (cksum_start) */
 
-
-int cksum_finish(CKSUM *csp)
-{
-
-	if (csp == NULL) return SR_FAULT ;
-
-	return SR_OK ;
+int cksum_finish(cksum *csp) noex {
+	int		rs = SR_FAULT ;
+	if (csp) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (cksum_finish) */
 
-
-int cksum_begin(CKSUM *csp)
-{
-
-	if (csp == NULL) return SR_FAULT ;
-
-	csp->f.local = TRUE ;
-	csp->local.len = 0 ;
-	csp->local.sum = 0 ;
-	return SR_OK ;
+int cksum_begin(cksum *csp) noex {
+	int		rs = SR_FAULT ;
+	if (csp) {
+	    rs = SR_OK ;
+	    csp->f.local = true ;
+	    csp->local.len = 0 ;
+	    csp->local.sum = 0 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (cksum_begin) */
 
+int cksum_accum(cksum *csp,void *abuf,int alen) noex {
+	int		rs = SR_FAULT ;
+	if (csp && abuf) {
+	    uint	ch ;
+	    uchar	*olp ;
+	    uchar	*bp = (uchar *) abuf ;
+	    olp = (bp + alen) ;
+	    if (csp->f.local) {
+	        csp->local.len += alen ;
+	        csp->total.len += alen ;
+	        while (bp < olp) {
+		    ch = mkchar(*bp) ;
+	            ADDSUM(csp->local.sum,ch) ;
+	            ADDSUM(csp->total.sum,ch) ;
+	            bp += 1 ;
+	        } /* end while */
+	    } else {
+	        csp->local.len += alen ;
+	        while (bp < olp) {
+		    ch = mkchar(*bp) ;
+	            ADDSUM(csp->local.sum,ch) ;
+	            bp += 1 ;
+	        } /* end while */
+	    } /* end if (started) */
 
-int cksum_accum(CKSUM *csp,void *abuf,int alen)
-{
-	uint		ch ;
-	int		rs = SR_OK ;
-	uchar		*olp, *bp ;
-
-#if	CF_DEBUGS
-	debugprintf("cksum_accum: ent\n") ;
-#endif
-
-	if (csp == NULL) return SR_FAULT ;
-	if (abuf == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("cksum_accum: alen=%d len=%d\n",alen,csp->local.len) ;
-#endif
-
-	bp = (uchar *) abuf ;
-	olp = (bp + alen) ;
-	if (csp->f.local) {
-	    csp->local.len += alen ;
-	    csp->total.len += alen ;
-	    while (bp < olp) {
-		ch = MKCHAR(*bp) ;
-	        ADDSUM(csp->local.sum,ch) ;
-	        ADDSUM(csp->total.sum,ch) ;
-	        bp += 1 ;
-	    } /* end while */
-	} else {
-	    csp->local.len += alen ;
-	    while (bp < olp) {
-		ch = MKCHAR(*bp) ;
-	        ADDSUM(csp->local.sum,ch) ;
-	        bp += 1 ;
-	    } /* end while */
-	} /* end if (started) */
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_accum) */
 
-
-int cksum_end(CKSUM *csp)
-{
-
-	if (csp == NULL) return SR_FAULT ;
-
-	csp->f.local = FALSE ;
-	return SR_OK ;
+int cksum_end(cksum *csp) noex {
+	int		rs = SR_FAULT ;
+	if (csp) {
+	    rs = SR_OK ;
+	    csp->f.local = false ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (cksum_end) */
 
-
-int cksum_getlen(CKSUM *csp,uint *rp)
-{
-
-	if (csp == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
-
-	*rp = csp->local.len ;
-	return SR_OK ;
+int cksum_getlen(cksum *csp,uint *rp) noex {
+	int		rs = SR_FAULT ;
+	if (csp && rp) {
+	    rs = SR_OK ;
+	    *rp = csp->local.len ;
+	}
+	return rs ;
 }
 /* end subroutine (cksum_getlen) */
 
-
 /* get the cksum accummulated so far */
-int cksum_getsum(CKSUM *csp,uint *rp)
-{
-	uint		sum ;
-	uint		v ;
-	uint		ch ;
-	int		rs = SR_OK ;
-	int		i = 0 ;
-
-	if (csp == NULL) return SR_FAULT ;
-
-/* only include the smallest number of bytes needed to hold the length! */
-
-	v = csp->local.len ;
-	sum = csp->local.sum ;
-	while ((v != 0) && (i < sizeof(uint))) {
-	    ch = MKCHAR(v) ;
-	    ADDSUM(sum,ch) ;
-	    v = (v >> 8) ;		/* unsigned shift, zero fill */
-	    i += 1 ;
-	} /* end while */
-
-	if (rp != NULL) *rp = (~ sum) ;
-	if (rs >= 0) rs = (csp->local.len & INT_MAX) ;
+int cksum_getsum(cksum *csp,uint *rp) noex {
+	int		rs = SR_FAULT ;
+	if (csp) {
+	    uint	sum = csp->local.sum ;
+	    uint	v = csp->local.len ;
+	    cint	n = sizeof(uint) ;
+	    for (int i = 0 ; (v != 0) && (i < n) ; i += 1) {
+	        cint	ch = mkchar(v) ;
+	        ADDSUM(sum,ch) ;
+	        v = (v >> 8) ;		/* unsigned shift, zero fill */
+	    } /* end while */
+	    if (rp) *rp = (~ sum) ;
+	    rs = (csp->local.len & INT_MAX) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_getsum) */
 
-
 /* get the total checksum and total length */
-int cksum_getsumall(CKSUM *csp,uint *rp)
-{
-	uint		sum ;
-	uint		v ;
-	uint		ch ;
-	int		i = 0 ;
-	int		rs ;
-	if (csp == NULL) return SR_FAULT ;
-
-/* only include the smallest number of bytes needed to hold the length! */
-
-	v = csp->total.len ;
-	sum = csp->total.sum ;
-	while ((v != 0) && (i < sizeof(uint))) {
-	    ch = MKCHAR(v) ;
-	    ADDSUM(sum,ch) ;
-	    v = (v >> 8) ;		/* unsigned shift, zero fill */
-	    i += 1 ;
-	} /* end while */
-
-	if (rp != NULL) *rp = (~ sum) ;
-	rs = (csp->total.len & INT_MAX) ;
+int cksum_getsumall(cksum *csp,uint *rp) noex {
+	int		rs = SR_FAULT ;
+	if (csp) {
+	    uint	sum = csp->total.sum ;
+	    uint	v = csp->total.len ;
+	    cint	n = sizeof(uint) ;
+	    for (int i = 0 ; (v != 0) && (i < n) ; i += 1) {
+	        cint	ch = mkchar(v) ;
+	        ADDSUM(sum,ch) ;
+	        v = (v >> 8) ;		/* unsigned shift, zero fill */
+	    } /* end for */
+	    if (rp) *rp = (~ sum) ;
+	    rs = (csp->total.len & INT_MAX) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cksum_getsumall) */
