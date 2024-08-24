@@ -35,8 +35,10 @@ struct htm_flags {
 
 struct htm_head {
 	shio		*ofp ;
+	char		*lbuf ;
 	HTM_FL		f ;
 	uint		magic ;
+	int		llen ;
 	int		wlen ;
 } ;
 
