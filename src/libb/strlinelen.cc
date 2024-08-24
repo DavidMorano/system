@@ -1,0 +1,98 @@
+/* strlinelen SUPPORT */
+/* lang=C++20 */
+
+/* calculate the number of characters in a c-string up to a given maximum */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-02-01, David A­D­ Morano
+	This subroutine was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	strlinelen
+
+	Descrption:
+	This subroutine calculates the number of characters within
+	a given counted c-string up to a given maximum value or up
+	to the end-of-line.  Any end-of-line is not included in the
+	returned character count.
+
+	Synopsis:
+	int strlinelen(cchar *sp,int sl,int mlen) noex
+
+	Arguments:
+	sp	c-string pointer
+	sl	c-string length
+	mlen	maximum length desired to be returned
+
+	Returns:
+	-	maximum length of the string up to its first NL character
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<usystem.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
+
+#include	"strlinelen.h"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int strlinelen(cchar *sp,int sl,int mlen) noex {
+	int		len = 0 ;
+	if (mlen < 0) mlen = 0 ;
+	if ((sp != nullptr) && (sl != 0) && (mlen > 0)) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    len = min(sl,mlen) ;
+	    if (cchar *tp ; (tp = strnchr(sp,len,'\n')) != nullptr) {
+	        len = (tp - sp) ;
+  	        while ((len > 0) && (sp[len-1] == '\r')) {
+		    len -= 1 ;
+		}
+	    }
+	} /* end if (have stuff) */
+	return len ;
+}
+/* end subroutine (strlinelen) */
+
+

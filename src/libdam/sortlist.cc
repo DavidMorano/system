@@ -45,6 +45,14 @@
 
 /* local defines */
 
+#define	SL		sortlist
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -52,7 +60,48 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+template<typename ... Args>
+static int sortlist_ctor(sortlist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_OK ;
+
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sortlist_ctor) */
+
+static int sortlist_dtor(sortlist *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sortlist_dtor) */
+
+template<typename ... Args>
+static inline int sortlist_magic(sortlist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SORTLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (sortlist_magic) */
+
+
 /* local variables */
+
+struct subclass {
+	int
+} ;
 
 
 /* exported variables */
@@ -60,55 +109,49 @@
 
 /* exported subroutines */
 
-int sortlist_init(slp,cmpfunc)
-SORTLIST	*slp ;
-int		(*cmpfunc)(void *,void *) ;
-{
-
-	if (slp == NULL) return SR_FAULT ;
-
-	slp->balance = 0 ;
-	slp->root = NULL ;
-	slp->magic = MAGIC ;
-
-	return OK ;
+int sortlist_start(SL *op,sortlist_f cmpfunc) noex {
+	int		rs = SR_FAULT ;
+	if ((rs = sortlist_ctor(op,cmpfunc)) >= 0) {
+	    op->balance = 0 ;
+	    op->root = nullptr ;
+	    op->magic = SORTLIST_MAGIC ;
+	    if (rs < 0) {
+		sortlist_dtor(op) ;
+	    }
+	} /* end if (sortlist_ctor) */
+	return rs ;
 }
-/* end subroutine (sortlist_init) */
+/* end subroutine (sortlist_start) */
 
+int sortlist_finish(SL *op) noex {
+	int		rs = SR_OK ;
 
-int sortlist_free(slp)
-sortlist	*slp ;
-{
-	int		i ;
+	if (op == nullptr) return BAD ;
 
-	if (slp == NULL) return BAD ;
+	if (op->va != nullptr) {
 
-	if (slp->va != NULL) {
+	    for (int i = 0 ; i < op->i ; i += 1) {
 
-	    for (i = 0 ; i < slp->i ; i += 1) {
-
-	        if ((slp->va)[i] != NULL)
-	            free((slp->va)[i]) ;
+	        if ((op->va)[i] != nullptr)
+	            free((op->va)[i]) ;
 
 	    } /* end while */
 
 /* free the sortlist array itself */
 
-	    free(slp->va) ;
+	    free(op->va) ;
 
-	    slp->va = NULL ;
+	    op->va = nullptr ;
 	}
 
-	slp->i = 0 ;
-	slp->e = 0 ;
+	op->i = 0 ;
+	op->e = 0 ;
 	return OK ;
 }
-/* end subroutine (sortlist_free) */
+/* end subroutine (sortlist_finish) */
 
-
-/* add an entry to this sorted list */
-int sortlist_add(slp,p,cmpfunc)
-sortlist	*slp ;
+int sortlist_add(op,p,cmpfunc)
+sortlist	*op ;
 void		*p ;
 int		(*cmpfunc)() ;
 {
@@ -122,17 +165,17 @@ int		(*cmpfunc)() ;
 	debugprintf("sortlistadd: ent\n") ;
 #endif
 
-	if (slp == NULL) return -1 ;
+	if (op == nullptr) return -1 ;
 
 #if	CF_DEBUGS
-	debugprintf("sortlistadd: ent, i=%d\n",slp->i) ;
+	debugprintf("sortlistadd: ent, i=%d\n",op->i) ;
 #endif
 
 /* do we have to grow the sortlist array ? */
 
-	if ((slp->i + 1) > slp->e) {
+	if ((op->i + 1) > op->e) {
 
-	    if (slp->e == 0) {
+	    if (op->e == 0) {
 
 	        nn = SORTLIST_DEFENTRIES ;
 	        ep = (void **)
@@ -140,31 +183,31 @@ int		(*cmpfunc)() ;
 
 	    } else {
 
-	        nn = slp->e * 2 ;
+	        nn = op->e * 2 ;
 	        ep = (void **)
-	            realloc(slp->va,sizeof(char **) * (nn + 1)) ;
+	            realloc(op->va,sizeof(char **) * (nn + 1)) ;
 
 	    }
 
-	    if (ep == NULL) return -1 ;
+	    if (ep == nullptr) return -1 ;
 
-	    slp->va = ep ;
-	    slp->e = nn ;
+	    op->va = ep ;
+	    op->e = nn ;
 
 	} /* end if */
 
 /* do the regular thing */
 
-	slp->c += 1 ;			/* increment list count */
+	op->c += 1 ;			/* increment list count */
 
 /* link into the list structure */
 
-	if (cmpfunc == NULL) cmpfunc = strcmp ;
+	if (cmpfunc == nullptr) cmpfunc = strcmp ;
 
 /* find the place in the existing list where this new item should be added */
 
 	bot = 0 ;
-	top = MAX((slp->i - 1),0) ;
+	top = MAX((op->i - 1),0) ;
 	ii = (bot + top) / 2 ;
 
 #if	CF_DEBUGS
@@ -173,7 +216,7 @@ int		(*cmpfunc)() ;
 
 	while ((top - bot) > 0) {
 
-	    if ((rs = (*cmpfunc)(p,slp->va[ii])) < 0) {
+	    if ((rs = (*cmpfunc)(p,op->va[ii])) < 0) {
 	        top = ii - 1 ;
 
 	    } else if (rs > 0) {
@@ -190,24 +233,24 @@ int		(*cmpfunc)() ;
 	debugprintf("sortlistadd: found bot=%d top=%d ii=%d\n",bot,top,ii) ;
 #endif
 
-	if (ii < slp->i) {
+	if (ii < op->i) {
 
-	    if ((*cmpfunc)(p,slp->va[ii]) > 0)
+	    if ((*cmpfunc)(p,op->va[ii]) > 0)
 	        ii += 1 ;
 
-/* move all entries from "ii" through "slp->i - 1" down one */
+/* move all entries from "ii" through "op->i - 1" down one */
 
-	    for (j = (slp->i - 1) ; j >= ii ; j -= 1) {
-	        (slp->va)[j + 1] = (slp->va)[j] ;
+	    for (j = (op->i - 1) ; j >= ii ; j -= 1) {
+	        (op->va)[j + 1] = (op->va)[j] ;
 	    }
 
 	} /* end if */
 
 /* load the new entry */
 
-	(slp->va)[ii] = p ;
-	slp->i += 1 ;
-	(slp->va)[slp->i] = NULL ;
+	(op->va)[ii] = p ;
+	op->i += 1 ;
+	(op->va)[op->i] = nullptr ;
 
 	return ii ;
 }
@@ -215,8 +258,8 @@ int		(*cmpfunc)() ;
 
 
 /* get an entry (enumerated) from the vector list */
-int sortlist_get(slp,i,pp)
-sortlist	*slp ;
+int sortlist_get(op,i,pp)
+sortlist	*op ;
 int		i ;
 void		**pp ;
 {
@@ -225,26 +268,26 @@ void		**pp ;
 	debugprintf("sortlistget: ent\n") ;
 #endif
 
-	if (slp == NULL) return BAD ;
+	if (op == nullptr) return BAD ;
 
 #if	CF_DEBUGS
 	debugprintf("sortlistget: i=%d\n",i) ;
 #endif
 
-	*pp = NULL ;
-	if ((i < 0) || (i >= slp->i)) return BAD ;
+	*pp = nullptr ;
+	if ((i < 0) || (i >= op->i)) return BAD ;
 
 #if	CF_DEBUGS
 	debugprintf("sortlistget: 2\n") ;
 #endif
 
-	if (slp->va == NULL) return BAD ;
+	if (op->va == nullptr) return BAD ;
 
 #if	CF_DEBUGS
 	debugprintf("sortlistget: 3\n") ;
 #endif
 
-	*pp = (slp->va)[i] ;
+	*pp = (op->va)[i] ;
 
 #if	CF_DEBUGS
 	debugprintf("sortlistget: 4\n") ;
@@ -256,46 +299,46 @@ void		**pp ;
 
 
 /* delete an entry */
-int sortlist_del(slp,i)
-sortlist	*slp ;
+int sortlist_del(op,i)
+sortlist	*op ;
 int		i ;
 {
 	int		j ;
 
-	if (slp == NULL) return BAD ;
+	if (op == nullptr) return BAD ;
 
-	if ((i < 0) || (i >= slp->i)) return BAD ;
+	if ((i < 0) || (i >= op->i)) return BAD ;
 
-	if (slp->va == NULL) return OK ;
+	if (op->va == nullptr) return OK ;
 
-	slp->i -= 1 ;
-	for (j = i ; j < slp->i ; j += 1) {
-	    (slp->va)[j] = (slp->va)[j + 1] ;
+	op->i -= 1 ;
+	for (j = i ; j < op->i ; j += 1) {
+	    (op->va)[j] = (op->va)[j + 1] ;
 	}
 
-	(slp->va)[slp->i] = NULL ;
+	(op->va)[op->i] = nullptr ;
 
-	slp->c -= 1 ;		/* decrement list count */
+	op->c -= 1 ;		/* decrement list count */
 	return OK ;
 }
 /* end subroutine (sortlist_del) */
 
 
 /* return the count of the number of items in this list */
-int sortlist_count(slp)
-sortlist	*slp ;
+int sortlist_count(op)
+sortlist	*op ;
 {
 
-	if (slp == NULL) return BAD ;
+	if (op == nullptr) return BAD ;
 
-	return slp->c ;
+	return op->c ;
 }
 /* end subroutine (sortlist_count) */
 
 
 /* search for an entry in the vector list */
-int sortlist_search(slp,ep,cmpfunc,pp)
-sortlist	*slp ;
+int sortlist_search(op,ep,cmpfunc,pp)
+sortlist	*op ;
 void		*ep ;
 int		(*cmpfunc)() ;
 void		**pp ;
@@ -305,25 +348,25 @@ void		**pp ;
 	void		*ep2 ;
 	void		**rp ;
 
-	if (slp == NULL) return BAD ;
-	if (ep == NULL) return BAD ;
-	if (pp == NULL) return BAD ;
+	if (op == nullptr) return BAD ;
+	if (ep == nullptr) return BAD ;
+	if (pp == nullptr) return BAD ;
 
-	if (slp->va == NULL) return BAD ;
+	if (op->va == nullptr) return BAD ;
 
-	rp = (void **) bsearch(&ep,slp->va,slp->i,
+	rp = (void **) bsearch(&ep,op->va,op->i,
 	    sizeof(void *),cmpfunc) ;
 
 	rs = BAD ;
-	if (rp != NULL) {
+	if (rp != nullptr) {
 
-	    i = (rp - slp->va) ;
+	    i = (rp - op->va) ;
 	    rs = OK ;
 
 	}
 
-	*pp = NULL ;
-	if (rs >= 0) *pp = slp->va[i] ;
+	*pp = nullptr ;
+	if (rs >= 0) *pp = op->va[i] ;
 
 	return (rs >= 0) ? i : rs ;
 }

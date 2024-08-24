@@ -38,7 +38,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 
 
 /* object defines */
@@ -46,6 +45,10 @@
 #define	SORTLIST	struct sortlist_head
 #define	SORTLIST_ENT	struct sortlist_ent
 
+
+EXTERNC_begin
+typedef int (*sortlist_f)(cvoid **,cvoid **) noex ;
+EXTERNC_end
 
 struct sortllist_ent {
 	SORTLIST_ENT	*left ;
@@ -56,22 +59,24 @@ struct sortllist_ent {
 } ;
 
 struct sortlist_head {
-	int		magic ;
-	int		(*cmpfunc)(void *,void *) ;
 	SORTLIST_ENT	*root ;
+	sortlist_f	cmpfunc ;
+	uint		magic ;
 } ;
 
 
-typedef struct sortlist_head	sortlist ;
+typedef SORTLIST	sortlist ;
 
 EXTERNC_begin
 
-extern int sortlist_start(sortlist *,int (*)()) noex ;
+typedef int (*sortlist_f)(cvoid **,cvoid **) noex ;
+
+extern int sortlist_start(sortlist *,sortlist_f) noex ;
 extern int sortlist_add(sortlist *,void *,void *,int) noex ;
 extern int sortlist_get(sortlist *,void *,int,void **) noex ;
 extern int sortlist_del(sortlist *,void *) noex ;
 extern int sortlist_count(sortlist *) noex ;
-extern int sortlist_search(sortlist *,void *,int (*)(),void *) noex ;
+extern int sortlist_search(sortlist *,void *,sortlist_f,void *) noex ;
 extern int sortlist_finish(sortlist *) noex ;
 
 EXTERNC_end
