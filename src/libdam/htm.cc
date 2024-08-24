@@ -327,67 +327,62 @@ int htm_tagend(htm *op,cchar *tag) noex {
 
 int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 		int r,int c,cchar *(*tkv)[2]) noex {
-	cint	dlen = DIGBUFLEN ;
 	int		rs ;
 	int		rs1 ;
-	int		bsz = 0 ;
-	int		kvsize = 0 ;
-	cchar	*tag = "textarea" ;
-	void		*vp ;
-
-	if (tkv != nullptr) {
-	    int	i ;
-	    for (i = 0 ; tkv[i][0] != nullptr ; i += 1) ;
-	    kvsize = (i*(2*sizeof(cchar *))) ;
-	}
-	kvsize += (6*(2*sizeof(cchar *))) ;
-	bsz += kvsize ;
-
-	bsz += ((dlen+1)*2) ;
-	if ((rs = uc_malloc(bsz,&vp)) >= 0) {
-	    cchar	*(*kv)[2] ;
-	    char	*bp = charp(vp) ;
-	    char	*d0, *d1 ;
-
-	    kv = (cchar *(*)[2]) bp ;
-	    bp += kvsize ;
-	    d0 = bp ;
-	    bp += (dlen+1) ;
-	    d1 = bp ;
-	    bp += (dlen+1) ;
-
-	    if ((rs = ctdeci(d0,dlen,r)) >= 0) {
-	        if ((rs = ctdeci(d1,dlen,c)) >= 0) {
-		    int	i = 0 ;
-	            kv[i][0] = "rows" ;
-	            kv[i][1] = d0 ;
-		    i += 1 ;
-	            kv[i][0] = "cols" ;
-	            kv[i][1] = d1 ;
-		    i += 1 ;
-		    if (title != nullptr) {
-	                kv[i][0] = "title" ;
-	                kv[i][1] = title ;
+	if ((rs = htm_magic(op)) >= 0) {
+	    cint	dlen = DIGBUFLEN ;
+	    int		bsz = 0 ;
+	    int		kvsize = 0 ;
+	    cchar	*tag = "textarea" ;
+	    void	*vp ;
+	    if (tkv != nullptr) {
+	        int	i ; /* used-afterwards */
+	        for (i = 0 ; tkv[i][0] != nullptr ; i += 1) ;
+	        kvsize = (i*(2*sizeof(cchar *))) ;
+	    }
+	    kvsize += (6*(2*sizeof(cchar *))) ;
+	    bsz += kvsize ;
+	    bsz += ((dlen+1)*2) ;
+	    if ((rs = uc_malloc(bsz,&vp)) >= 0) {
+	        cchar	*(*kv)[2] ;
+	        char	*bp = charp(vp) ;
+	        char	*d0, *d1 ;
+	        kv = (cchar *(*)[2]) bp ;
+	        bp += kvsize ;
+	        d0 = bp ;
+	        bp += (dlen+1) ;
+	        d1 = bp ;
+	        bp += (dlen+1) ;
+	        if ((rs = ctdeci(d0,dlen,r)) >= 0) {
+	            if ((rs = ctdeci(d1,dlen,c)) >= 0) {
+		        int	i = 0 ;
+	                kv[i][0] = "rows" ;
+	                kv[i][1] = d0 ;
 		        i += 1 ;
-		    }
-		    if (tkv != nullptr) {
-			int	j ;
-			for (j = 0 ; tkv[j][0] != nullptr ; j += 1) {
-			    kv[i][0] = tkv[j][0] ;
-			    kv[i][1] = tkv[j][1] ;
-			    i += 1 ;
-			} /* end for */
-		    } /* end if (have extras) */
-	            kv[i][0] = nullptr ;
-	            kv[i][1] = nullptr ;
-	            rs = htm_tagbegin(op,tag,eclass,id,kv) ;
+	                kv[i][0] = "cols" ;
+	                kv[i][1] = d1 ;
+		        i += 1 ;
+		        if (title != nullptr) {
+	                    kv[i][0] = "title" ;
+	                    kv[i][1] = title ;
+		            i += 1 ;
+		        }
+		        if (tkv != nullptr) {
+			    for (int j = 0 ; tkv[j][0] != nullptr ; j += 1) {
+			        kv[i][0] = tkv[j][0] ;
+			        kv[i][1] = tkv[j][1] ;
+			        i += 1 ;
+			    } /* end for */
+		        } /* end if (have extras) */
+	                kv[i][0] = nullptr ;
+	                kv[i][1] = nullptr ;
+	                rs = htm_tagbegin(op,tag,eclass,id,kv) ;
+	            } /* end if (ctdeci) */
 	        } /* end if (ctdeci) */
-	    } /* end if (ctdeci) */
-
-	    rs1 = uc_free(vp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-
+	        rs1 = uc_free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (htm_textbegin) */
@@ -399,55 +394,55 @@ int htm_textend(htm *op) noex {
 /* end subroutine (htm_textend) */
 
 int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
-	sbuf		b ;
-	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	cchar	*tag = "a" ;
-	char		lbuf[LINEBUFLEN+1] ;
-	if (op == nullptr) return SR_FAULT ;
-	if (href == nullptr) return SR_FAULT ;
-	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
-	if (href[0] == '\0') return SR_INVALID ;
-	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
-	    int		c ;
-	    cchar	*k, *v ;
-	    sbuf_chr(&b,CH_LANGLE) ;
-	    sbuf_strw(&b,tag,-1) ;
-	    for (c = 0 ; c < 4 ; c += 1) {
-	        switch (c) {
-	        case 0:
-	            k = "class" ;
-	            v = eclass ;
-	            break ;
-	        case 1:
-	            k = "id" ;
-	            v = id ;
-	            break ;
-	        case 2:
-	            k = "href" ;
-	            v = href ;
-	            break ;
-	        case 3:
-	            k = "title" ;
-	            v = title ;
-	            break ;
-	        } /* end switch */
-	        if ((v != nullptr) && (v[0] != '\0')) {
-	            rs = sbuf_printf(&b,"\n %s=\"%s\"",k,v) ;
-	        }
-	        if (rs < 0) break ;
-	    } /* end for */
-	    sbuf_chr(&b,CH_RANGLE) ;
-	    if ((rs = sbuf_getlen(&b)) >= 0) {
-	        rs = shio_print(op->ofp,lbuf,rs) ;
-	        wlen += rs ;
-	    }
-	    rs1 = sbuf_finish(&b) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (sbuf) */
-	op->wlen += wlen ;
+	if ((rs = htm_magic(op,href)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (href[0]) {
+	        sbuf	b ;
+	        if ((rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+	            cchar	*tag = "a" ;
+	            sbuf_chr(&b,CH_LANGLE) ;
+	            sbuf_strw(&b,tag,-1) ;
+	            for (int c = 0 ; c < 4 ; c += 1) {
+	                cchar	*k = nullptr ;
+	                cchar	*v = nullptr ;
+	                switch (c) {
+	                case 0:
+	                    k = "class" ;
+	                    v = eclass ;
+	                    break ;
+	                case 1:
+	                    k = "id" ;
+	                    v = id ;
+	                    break ;
+	                case 2:
+	                    k = "href" ;
+	                    v = href ;
+	                    break ;
+	                case 3:
+	                    k = "title" ;
+	                    v = title ;
+	                    break ;
+	                } /* end switch */
+	                if ((v != nullptr) && (v[0] != '\0')) {
+			    cchar	*fmt = "\n %s=\"%s\"" ;
+	                    rs = sbuf_printf(&b,fmt,k,v) ;
+	                }
+	                if (rs < 0) break ;
+	            } /* end for */
+	            sbuf_chr(&b,CH_RANGLE) ;
+	            if ((rs = sbuf_getlen(&b)) >= 0) {
+	                rs = shio_print(op->ofp,op->lbuf,rs) ;
+	                wlen += rs ;
+	            }
+	            rs1 = sbuf_finish(&b) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (sbuf) */
+	        op->wlen += wlen ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (htm_abegin) */
@@ -479,70 +474,67 @@ int htm_br(htm *op,cchar *eclass,cchar *id) noex {
 
 int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 		int w,int h) noex {
-	sbuf		b ;
-	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	cchar	*tag = "img" ;
-	char		lbuf[LINEBUFLEN+1] ;
-	if (op == nullptr) return SR_FAULT ;
-	if (src == nullptr) return SR_FAULT ;
-	if (op->magic != HTM_MAGIC) return SR_NOTOPEN ;
-	if (tag[0] == '\0') return SR_INVALID ;
-	if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
-	    int		c ;
-	    cchar	*k ;
-	    cchar	*v ;
-	    sbuf_chr(&b,CH_LANGLE) ;
-	    sbuf_strw(&b,tag,-1) ;
-	    for (c = 0 ; c < 5 ; c += 1) {
-	        v = nullptr ;
-	        switch (c) {
-	        case 0:
-	            k = "class" ;
-	            v = eclass ;
-	            break ;
-	        case 1:
-	            k = "id" ;
-	            v = id ;
-	            break ;
-	        case 2:
-	            k = "src" ;
-	            v = src ;
-	            break ;
-	        case 3:
-	            k = "title" ;
-	            v = title ;
-	            break ;
-	        case 4:
-	            k = "alt" ;
-	            v = alt ;
-	            break ;
-	        } /* end switch */
-	        if ((v != nullptr) && (v[0] != '\0')) {
-	            rs = sbuf_printf(&b,"\n %s=\"%s\"",k,v) ;
-	        }
-	        if (rs < 0) break ;
-	    } /* end for */
-	    if ((rs >= 0) && (w >= 0)) {
-	        rs = sbuf_printf(&b," width=\"%d\"",w) ;
-	    }
-	    if ((rs >= 0) && (h >= 0)) {
-	        rs = sbuf_printf(&b," height=\"%d\"",h) ;
-	    }
-	    sbuf_strw(&b," /",2) ;
-	    sbuf_chr(&b,CH_RANGLE) ;
-	    if (rs >= 0) {
-	        if ((rs = sbuf_getlen(&b)) >= 0) {
-	            rs = shio_print(op->ofp,lbuf,rs) ;
-	            wlen += rs ;
-	        }
-	    }
-	    rs1 = sbuf_finish(&b) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (sbuf) */
-	op->wlen += wlen ;
+	if ((rs = htm_magic(op,src)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (src[0]) {
+	        sbuf		b ;
+	        if ((rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+	            cchar	*tag = "img" ;
+	            sbuf_chr(&b,CH_LANGLE) ;
+	            sbuf_strw(&b,tag,-1) ;
+	            for (int c = 0 ; c < 5 ; c += 1) {
+	                cchar	*k = nullptr ;
+	                cchar	*v = nullptr ;
+	                switch (c) {
+	                case 0:
+	                    k = "class" ;
+	                    v = eclass ;
+	                    break ;
+	                case 1:
+	                    k = "id" ;
+	                    v = id ;
+	                    break ;
+	                case 2:
+	                    k = "src" ;
+	                    v = src ;
+	                    break ;
+	                case 3:
+	                    k = "title" ;
+	                    v = title ;
+	                    break ;
+	                case 4:
+	                    k = "alt" ;
+	                    v = alt ;
+	                    break ;
+	                } /* end switch */
+	                if ((v != nullptr) && (v[0] != '\0')) {
+	                    rs = sbuf_printf(&b,"\n %s=\"%s\"",k,v) ;
+	                }
+	                if (rs < 0) break ;
+	            } /* end for */
+	            if ((rs >= 0) && (w >= 0)) {
+	                rs = sbuf_printf(&b," width=\"%d\"",w) ;
+	            }
+	            if ((rs >= 0) && (h >= 0)) {
+	                rs = sbuf_printf(&b," height=\"%d\"",h) ;
+	            }
+	            sbuf_strw(&b," /",2) ;
+	            sbuf_chr(&b,CH_RANGLE) ;
+	            if (rs >= 0) {
+	                if ((rs = sbuf_getlen(&b)) >= 0) {
+	                    rs = shio_print(op->ofp,op->lbuf,rs) ;
+	                    wlen += rs ;
+	                }
+	            }
+	            rs1 = sbuf_finish(&b) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (sbuf) */
+	        op->wlen += wlen ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (htm_img) */
@@ -617,48 +609,39 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	if ((rs = htm_magic(op,tag)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (tag[0]) {
-	        char	*lbuf{} ;
-	        if ((rs = malloc_ml(&lbuf)) >= 0) {
-	            sbuf	b ;
-		    cint	llen = rs ;
-	            if ((rs = sbuf_start(&b,lbuf,llen)) >= 0) {
-	                int		c ;
-	                cchar	*k ;
-	                cchar	*v ;
-	                sbuf_chr(&b,CH_LANGLE) ;
-	                sbuf_strw(&b,tag,-1) ;
-	                for (c = 0 ; c < 2 ; c += 1) {
-	                    v = nullptr ;
-	                    switch (c) {
-	                    case 0:
-	                        k = "class" ;
-	                        v = eclass ;
-	                        break ;
-	                    case 1:
-	                        k  = "id" ;
-	                        v  = id ;
-	                        break ;
-	                    } /* end switch */
-	                    if ((v != nullptr) && (v[0] != '\0')) {
-	                        rs = sbuf_printf(&b," %s=\"%s\"",k,v) ;
-	                    }
-	                    if (rs < 0) break ;
-	                } /* end for */
-	                sbuf_strw(&b," /",2) ;
-	                sbuf_chr(&b,CH_RANGLE) ;
-	                if (rs >= 0) {
-	                    if ((rs = sbuf_getlen(&b)) >= 0) {
-	                        rs = shio_print(op->ofp,lbuf,rs) ;
-	                        wlen += rs ;
-	                    }
-	                }
-	                rs1 = sbuf_finish(&b) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (sbuf) */
-		    op->wlen += wlen ;
-		    rs1 = uc_free(lbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
+                sbuf        b ;
+                if ((rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+                    sbuf_chr(&b,CH_LANGLE) ;
+                    sbuf_strw(&b,tag,-1) ;
+                    for (int c = 0 ; c < 2 ; c += 1) {
+                        cchar       *k = nullptr ;
+                        cchar       *v = nullptr ;
+                        switch (c) {
+                        case 0:
+                            k = "class" ;
+                            v = eclass ;
+                            break ;
+                        case 1:
+                            k  = "id" ;
+                            v  = id ;
+                            break ;
+                        } /* end switch */
+                        if ((v != nullptr) && (v[0] != '\0')) {
+                            rs = sbuf_printf(&b," %s=\"%s\"",k,v) ;
+                        }
+                        if (rs < 0) break ;
+                    } /* end for */
+                    sbuf_strw(&b," /",2) ;
+                    sbuf_chr(&b,CH_RANGLE) ;
+                    if (rs >= 0) {
+                        if ((rs = sbuf_getlen(&b)) >= 0) {
+                            rs = shio_print(op->ofp,op->lbuf,rs) ;
+                            wlen += rs ;
+                        }
+                    }
+                    rs1 = sbuf_finish(&b) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (sbuf) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
@@ -695,16 +678,16 @@ static int htm_wrfile(htm *op,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-            shio    cf ;
-            if ((rs = shio_open(&cf,cfname,"r",0666)) >= 0) {
-                while ((rs = shio_read(&cf,op->lbuf,op->llen)) > 0) {
-                    rs = shio_write(op->ofp,op->lbuf,rs) ;
-                    wlen += rs ;
-                    if (rs < 0) break ;
-                } /* end while (reading lines) */
-                rs1 = shio_close(&cf) ;
-                if (rs >= 0) rs = rs1 ;
-            } /* end if (copy-content-file) */
+        shio    cf ;
+        if ((rs = shio_open(&cf,cfname,"r",0666)) >= 0) {
+            while ((rs = shio_read(&cf,op->lbuf,op->llen)) > 0) {
+                rs = shio_write(op->ofp,op->lbuf,rs) ;
+                wlen += rs ;
+                if (rs < 0) break ;
+            } /* end while (reading lines) */
+            rs1 = shio_close(&cf) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (copy-content-file) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (htm_wrfile) */
