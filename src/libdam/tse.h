@@ -1,20 +1,21 @@
-/* tse */
+/* tse HEADER */
+/* lang=C20 */
 
 /* machine status entry */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TSE_INCLUDE
-#define	TSE_INCLUDE	1
+#define	TSE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 /* object defines */
@@ -57,21 +58,13 @@ struct tse_update {
 	uint		utime ;
 } ;
 
-
-#if	(! defined(TSE_MASTER)) || (TSE_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int tse_all(struct tse_all *,int,char *,int) ;
 extern int tse_update(struct tse_update *,int,char *,int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* TSE_MASTER */
 
 #endif /* TSE_INCLUDE */
 

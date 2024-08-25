@@ -3,9 +3,6 @@
 /* create a mail message ID (for PCS) */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
@@ -99,10 +96,6 @@ int pcsmsgid(cchar *pr,char *rbuf,int rlen)
 	        rs = mkstr(rbuf,rlen,dn,nn,sn) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("pcsmsgid: ret rs=%d msgid=>%s<\n",rs,rbuf) ;
-#endif
 
 	return rs ;
 }

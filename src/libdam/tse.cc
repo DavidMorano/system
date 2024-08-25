@@ -1,9 +1,8 @@
-/* tse (Time-Stamp Entry) */
+/* tse SUPPORT (Time-Stamp Entry) */
+/* lang=C++20 */
 
 /* time-stamp entry marshalling */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,24 +17,22 @@
 
 /******************************************************************************
 
-        These little module implements the messages (reads and writes) to the TS
-        (Time-Stamp) database file. These subroutines actually do the argument
-        marshalling for the file reads and writes.
+	Name:
+	tse
 
+	Description:
+	These little module implements the messages (reads and
+	writes) to the TS (Time-Stamp) database file.  These
+	subroutines actually do the argument marshalling for the
+	file reads and writes.
 
 ******************************************************************************/
 
-
-#define	TSE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<inttypes.h>
-
+#include	<cinttypes>
 #include	<usystem.h>
 #include	<serialbuf.h>
 #include	<localmisc.h>
@@ -46,8 +43,31 @@
 /* local defines */
 
 
-/* exported subroutines */
+/* local namespaces */
 
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 int tse_all(ep,f_read,abuf,alen)
 char		abuf[] ;
@@ -55,7 +75,7 @@ int		alen ;
 int		f_read ;
 TSE_ALL		*ep ;
 {
-	SERIALBUF	m, *mp = &m ;
+	serialbuf	m, *mp = &m ;
 	int		rs ;
 	int		rs1 ;
 
@@ -93,7 +113,7 @@ int		alen ;
 int		f_read ;
 TSE_UPDATE	*ep ;
 {
-	SERIALBUF	m, *mp = &m ;
+	serialbuf	m, *mp = &m ;
 	int		rs ;
 	int		rs1 ;
 
