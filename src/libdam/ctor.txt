@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int htm_ctor(htm *op,Args ... args) noex {
+static int fmq_ctor(fmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int htm_ctor(htm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (htm_ctor) */
+/* end subroutine (fmq_ctor) */
 
-static int htm_dtor(htm *op) noex {
+static int fmq_dtor(fmq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (htm_dtor) */
+/* end subroutine (fmq_dtor) */
 
 template<typename ... Args>
-static inline int htm_magic(htm *op,Args ... args) noex {
+static inline int fmq_magic(fmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FMQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (htm_magic) */
+/* end subroutine (fmq_magic) */
