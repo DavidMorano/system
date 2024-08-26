@@ -50,6 +50,8 @@
 #include	<utypealiases.h>
 #include	<localmisc.h>
 
+#include	"strx.h"
+
 
 /* local defines */
 

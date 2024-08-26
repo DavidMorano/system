@@ -61,7 +61,7 @@ OBJ1= strcasestr.o strwhite.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o
 #OBJB= obj3.o obj4.o obj5.o
 
 OBJ= $(OBJA)
