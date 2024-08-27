@@ -59,6 +59,9 @@ typedef unordered_set<int>::iterator	usetintit ;
 typedef unordered_set<int>::iterator *	usetintitp ;
 
 
+/* local structures */
+
+
 /* forward references */
 
 
