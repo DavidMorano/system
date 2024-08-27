@@ -94,7 +94,7 @@ int bellmanford1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	resp[vstart].dist = 0 ;
 
 	for (int i = 0 ; i < (vertices-1) ; i += 1) {
-	    int		f_nochange = true ;
+	    bool	f_nochange = true ;
 	    for (int u = 0 ; u < ne ; u += 1) { /* edges(u,v) */
 	        elit = edges[u].begin() ; /* this is 'list.begin()' */
 	        end = edges[u].end() ; /* this is 'list.end()' */
