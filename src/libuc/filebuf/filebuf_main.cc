@@ -32,7 +32,7 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>

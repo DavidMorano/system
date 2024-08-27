@@ -43,12 +43,13 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
 #include	<list>
 #include	<array>

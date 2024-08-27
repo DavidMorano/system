@@ -29,7 +29,7 @@
 #include	<climits>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<digval.h>
 #include	<mkchar.h>

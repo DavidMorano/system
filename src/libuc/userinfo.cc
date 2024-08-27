@@ -64,7 +64,7 @@
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>

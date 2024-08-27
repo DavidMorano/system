@@ -55,7 +55,7 @@
 #include	<sys/param.h>
 #include	<cstring>
 #include	<cstdarg>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<format.h>
 #include	<ctdec.h>

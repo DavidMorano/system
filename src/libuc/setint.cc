@@ -32,7 +32,7 @@
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<unordered_set>
 #include	<usystem.h>
 #include	<localmisc.h>

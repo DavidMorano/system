@@ -31,7 +31,7 @@
 #include	<cstring>
 #include	<vector>
 #include	<new>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<intfloor.h>

@@ -19,13 +19,15 @@
 
 /*******************************************************************************
 
+	Name:
+	pmq
+
+	Description:
 	This module provides a sanitized version of the standard
 	POSIX® Message-Queue facility provided with some newer
 	UNIX®i.  Some operating system problems are managed within
 	these routines for the common stuff that happens when a
-	poorly configured OS gets overloaded!
-
-	Enjoy!
+	poorly configured OS gets overloaded!  Enjoy!
 
 *******************************************************************************/
 
@@ -90,6 +92,9 @@ extern "C" {
     extern int	getgid_group(cchar *,int) noex ;
     extern int	isNotValid(int) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */

@@ -57,7 +57,7 @@
 #include	<climits>
 #include	<cinttypes>
 #include	<new>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<functional>
 #include	<list>
 #include	<vector>

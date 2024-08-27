@@ -36,7 +36,7 @@
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
 #include	<usystem.h>
 #include	<localmisc.h>

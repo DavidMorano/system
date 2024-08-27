@@ -41,7 +41,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>
 #include	<usysrets.h>
 #include	<utypedefs.h>

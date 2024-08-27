@@ -29,7 +29,7 @@
 #include	<utypealiases.h>
 #include	<localmisc.h>
 
-#include	"addsat.h"
+#include	"addsatx.h"
 
 
 /* local defines */
@@ -76,5 +76,17 @@ T addsatx(T v1,T v2) noex {
 	return vr ;
 }
 /* end subroutine (addsatx) */
+
+extern int	iaddsat(int v1,int v2) noex {
+	return addsatx(v1,v2) ;
+}
+
+extern long	laddsat(long v1,long v2) noex {
+	return addsatx(v1,v2) ;
+}
+
+extern longlong	lladdsat(longlong v1,longlong v2) noex {
+	return addsatx(v1,v2) ;
+}
 
 

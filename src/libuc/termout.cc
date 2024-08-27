@@ -43,7 +43,7 @@
 #include	<cstring>
 #include	<new>
 #include	<initializer_list>
-#include	<algorithm>		/* |min(3c++)| + |nax(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
 #include	<string>
 #include	<usystem.h>

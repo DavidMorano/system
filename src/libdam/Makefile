@@ -754,8 +754,6 @@ openport.o:		openport.c openport.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
 
-pmq.o:			pmq.cc pmq.h
-
 fmq.o:			fmq.cc fmq.h
 
 sigblock.o:		sigblock.c sigblock.h
@@ -841,9 +839,10 @@ strx.o:			strx.dir
 strx.dir:
 	makesubdir $@
 
-printhelp.o:		printhelp.cc printhelp.hh
-
 fhm.o:			fhm.cc fhm.h
+ba.o:			ba.cc ba.h
+
+printhelp.o:		printhelp.cc printhelp.hh
 intrem.o:		intrem.cc intrem.h
 addsat.o:		addsat.cc addsat.h
 removename.o:		removename.cc removename.h

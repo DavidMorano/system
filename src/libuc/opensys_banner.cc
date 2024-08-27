@@ -28,7 +28,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<tmtime.h>

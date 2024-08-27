@@ -138,6 +138,7 @@ static int	fmq_filebegin(fmq *,time_t) noex ;
 static int	fmq_filechanged(fmq *) noex ;
 static int	fmq_lockget(fmq *,time_t,int) noex ;
 static int	fmq_lockrelease(fmq *) noex ;
+static int	fmq_fileready(fmq *,time_t) noex ;
 static int	fmq_fileopen(fmq *,time_t) noex ;
 static int	fmq_fileclose(fmq *) noex ;
 static int	fmq_bufbegin(fmq *) noex ;
@@ -151,7 +152,7 @@ static int	fmq_headread(fmq *) noex ;
 #endif
 
 static int	filemagic(char *,int,fmq_fm *) noex ;
-static int	filehead(char *,int,FMQ_FH *) noex ;
+static int	filehead(char *,int,fmq_fh *) noex ;
 
 
 /* local variables */
@@ -170,9 +171,9 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        USTAT		sb ;
-	        time_t		dt = time(nullptr) ;
+	        time_t		dt = getustime ;
 	        int		amode ;
-	        int		f_create = FALSE ;
+	        int		f_create = false ;
 	        if (bufsize < FMQ_BUFSIZE) bufsize = FMQ_BUFSIZE ;
 
 #if	CF_ALWAYSCREATE
@@ -181,9 +182,9 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 
 	of = (of & (~ O_TRUNC)) ;
 
-	op->f.create = (of & O_CREAT) ? TRUE : FALSE ;
-	op->f.ndelay = (of & O_NDELAY) ? TRUE : FALSE ;
-	op->f.nonblock = (of & O_NONBLOCK) ? TRUE : FALSE ;
+	op->f.create = (of & O_CREAT) ? true : false ;
+	op->f.ndelay = (of & O_NDELAY) ? true : false ;
+	op->f.nonblock = (of & O_NONBLOCK) ? true : false ;
 
 	of = (of & (~ (O_NDELAY | O_NONBLOCK))) ;
 
@@ -210,7 +211,7 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 
 	if ((rs < 0) && (op->oflags & O_CREAT)) {
 
-	    f_create = TRUE ;
+	    f_create = true ;
 	    of = op->oflags ;
 	    rs = u_open(op->fname,of,operm) ;
 
@@ -265,12 +266,14 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 
 /* out of here */
 
+ret0:
 	op->magic = FMQ_MAGIC ;
+	    
+	    } /* end if (valid) */
 	    if (rs < 0) {
 		fmq_dtor(op) ;
 	    }
 	} /* end if (fmq_ctor) */
-ret0:
 	return (rs >= 0) ? f_create : rs ;
 
 /* bad things */
@@ -290,257 +293,146 @@ bad0:
 }
 /* end subroutine (fmq_open) */
 
-
-int fmq_close(fmq *op)
-{
-	int		rs = SR_OK ;
+int fmq_close(fmq *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	rs1 = fmq_bufend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fd >= 0) {
-	    rs1 = u_close(op->fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fd = -1 ;
-	}
-
-	rs1 = uc_free(op->fname) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = fmq_magic(op)) >= 0) {
+	    {
+	        rs1 = fmq_bufend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fd >= 0) {
+	        rs1 = u_close(op->fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fd = -1 ;
+	    }
+	    {
+	       rs1 = uc_free(op->fname) ;
+	       if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fmq_close) */
 
-
-/* get a count of the number of entries */
-int fmq_count(fmq *op)
-{
-	int		rs = SR_OK ;
+int fmq_count(fmq *op) noex {
+	int		rs ;
 	int		c = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
+	if ((rs = fmq_magic(op,fname)) >= 0) {
+	    c = op->count ;
+	}
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (fmq_count) */
 
-
-/* send a message */
-int fmq_send(fmq *op,cvoid *buf,int buflen)
-{
+int fmq_send(fmq *op,cvoid *buf,int buflen) noex {
 	int		rs ;
-	int		to ;
 	int		tlen = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (buf == nullptr) return SR_FAULT ;
-
-	if (! op->f.writable)
-	    return SR_RDONLY ;
-
-/* continue with normal operation */
-
-	to = -1 ;
-	rs = fmq_sende(op,buf,buflen,to,0) ;
-	tlen = rs ;
-
+	if ((rs = fmq_magic(op,buf)) >= 0) {
+	    rs = SR_RDONLY ;
+	    if (op->f.writable)
+	        cint	to = -1 ;
+	        rs = fmq_sende(op,buf,buflen,to,0) ;
+	        tlen = rs ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (fmq_send) */
 
-
-/* send a message */
-int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts)
-{
-	ulong		starttime, endtime, dt ;
+int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts) noex {
 	int		rs ;
-	int		f_infinite = FALSE ;
 	int		tlen = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (buf == nullptr) return SR_FAULT ;
-
-	if (! op->f.writable)
-	    return SR_RDONLY ;
-
-/* continue with the real work */
-
-	if (to < 0) {
-	    f_infinite = TRUE ;
-	    to = INT_MAX ;
-	}
-
-	starttime = time(nullptr) ;
-
-	endtime = starttime + to ;
-	if (endtime < starttime)
-	    endtime = INT_MAX ;
-
-/* CONSTCOND */
-
-	while (TRUE) {
-
-	    rs = fmq_isend(op,buf,buflen,opts) ;
-	    tlen = rs ;
-	    if (rs >= 0)
-	        break ;
-
-	    if (rs != SR_AGAIN)
-	        break ;
-
-	    if (f_infinite && (op->f.ndelay || op->f.nonblock))
-	        break ;
-
-	    if (to <= 0)
-	        break ;
-
-	    msleep(1000) ;
-
-	    dt = time(nullptr) ;
-
-	    if (dt >= endtime) break ;
-	} /* end while */
-
-	if ((rs == SR_AGAIN) && op->f.ndelay) {
-	    tlen = 0 ;
-	    rs = SR_OK ;
-	}
-
-ret0:
+	if ((rs = fmq_magic(op,buf)) >= 0) {
+	    rs = SR_RDONLY ;
+	    if (op->f.writable) {
+	        time_t		dt = getustime ;
+	        time_t		starttime, endtime ;
+	        bool		f_infinite = false ;
+	        if (to < 0) {
+	            f_infinite = true ;
+	            to = INT_MAX ;
+	        }
+	        starttime = dt ;
+	        endtime = (starttime + to) ;
+	        if (endtime < starttime) {
+	            endtime = INT_MAX ;
+	        }
+	        while (true) {
+	            rs = fmq_isend(op,buf,buflen,opts) ;
+	            tlen = rs ;
+	            if (rs >= 0) break ;
+	            if (rs != SR_AGAIN) break ;
+	            if (f_infinite && (op->f.ndelay || op->f.nonblock)) break ;
+	            if (to <= 0) break ;
+	            msleep(1000) ;
+	            dt = getustime ;
+	            if (dt >= endtime) break ;
+	        } /* end while */
+	        if ((rs == SR_AGAIN) && op->f.ndelay) {
+	            tlen = 0 ;
+	            rs = SR_OK ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (fmq_sende) */
 
-
-/* receive a message */
-int fmq_recv(fmq *op,void *buf,int buflen)
-{
-	int		rs = SR_OK ;
-	int		to ;
+int fmq_recv(fmq *op,void *buf,int buflen) noex {
+	int		rs ;
 	int		tlen = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (buf == nullptr) return SR_FAULT ;
-
-	if (! op->f.writable)
-	    return SR_RDONLY ;
-
-/* continue with normal operation */
-
-	to = -1 ;
-	rs = fmq_recve(op,buf,buflen,to,0) ;
-	tlen = rs ;
-
+	if ((rs = fmq_magic(op,buf)) >= 0) {
+	    cint	to = -1 ;
+	    rs = fmq_recve(op,buf,buflen,to,0) ;
+	    tlen = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (fmq_recv) */
 
-
-/* receive a message */
-int fmq_recve(fmq *op,void *buf,int buflen,int to,int opts)
-{
-	int		rs = SR_OK ;
+int fmq_recve(fmq *op,void *buf,int buflen,int to,int opts) noex {
+	int		rs ;
 	int		tlen = 0 ;
-	int		f_infinite = FALSE ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (buf == nullptr) return SR_FAULT ;
-
-	if (! op->f.writable)
-	    return SR_RDONLY ;
-
-/* continue with the real work */
-
-	if (to < 0) {
-	    f_infinite = TRUE ;
-	    to = INT_MAX ;
-	}
-
-	while (to >= 0) {
-
-	    rs = fmq_irecv(op,buf,buflen,opts) ;
-	    tlen = rs ;
-	    if (rs >= 0)
-	        break ;
-
-	    if (rs != SR_AGAIN)
-	        break ;
-
-	    if (f_infinite && (op->f.ndelay || op->f.nonblock))
-	        break ;
-
-	    if (to <= 0)
-	        break ;
-
-	    to -= 1 ;
-	    sleep(1) ;
-
-	} /* end while */
-
-	if ((rs == SR_AGAIN) && op->f.ndelay) {
-	    tlen = 0 ;
-	    rs = SR_OK ;
-	}
-
-ret0:
+	if ((rs = fmq_magic(op,buf)) >= 0) {
+	    bool	f_infinite = false ;
+	    if (to < 0) {
+	        f_infinite = true ;
+	        to = INT_MAX ;
+	    }
+	    while (to >= 0) {
+	        rs = fmq_irecv(op,buf,buflen,opts) ;
+	        tlen = rs ;
+	        if (rs >= 0) break ;
+	        if (rs != SR_AGAIN) break ;
+	        if (f_infinite && (op->f.ndelay || op->f.nonblock)) break ;
+	        if (to <= 0) break ;
+	        to -= 1 ;
+	        msleep(1000) ;
+	    } /* end while */
+	    if ((rs == SR_AGAIN) && op->f.ndelay) {
+	        tlen = 0 ;
+	        rs = SR_OK ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (fmq_recve) */
 
-
-/* do some checking */
-int fmq_check(fmq *op,time_t dt)
-{
-	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != FMQ_MAGIC) return SR_NOTOPEN ;
-#endif /* CF_SAFE */
-
-	if (op->fd >= 0) {
-	    if ((! op->f.readlocked) && (! op->f.writelocked)) {
-	        if ((dt - op->accesstime) >= TO_ACCESS) {
-	            f = TRUE ;
-		    rs = fmq_fileclose(op) ;
-		}
+int fmq_check(fmq *op,time_t dt) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = fmq_magic(op)) >= 0) {
+	    if (op->fd >= 0) {
+	        if ((! op->f.readlocked) && (! op->f.writelocked)) {
+	            if ((dt - op->accesstime) >= TO_ACCESS) {
+	                f = true ;
+		        rs = fmq_fileclose(op) ;
+		    }
+	        }
 	    }
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (fmq_check) */
@@ -548,31 +440,19 @@ int fmq_check(fmq *op,time_t dt)
 
 /* private subroutines */
 
-
-/* send a message */
-/* ARGSUSED */
-static int fmq_isend(fmq *op,cvoid *buf,int buflen,int opts)
-{
+static int fmq_isend(fmq *op,cvoid *buf,int buflen,int opts) noex {
 	IOVEC		v[3] ;
 	sigset_t	oldsigmask ;
-	off_t	uoff ;
-	time_t		dt = time(nullptr) ;
+	off_t		uoff ;
+	time_t		dt = getustime ;
 	uint		eoff ;
 	uint		llen, dlen, len ;
 	int		rs ;
 	char		lenbuf[4 + 1] ;
 	char		*cbuf = (char *) buf ;
-
 	fmq_di(op,&oldsigmask) ;
-
-/* do we have proper file access? */
-
-	rs = fmq_filecheck(op,dt,0,0) ;
-	if (rs < 0)
-	    goto ret1 ;
-
+	if ((rs = fmq_filecheck(op,dt,0,0)) >= 0) {
 /* is the file initialized? */
-
 	if (! op->f.fileinit) {
 
 #if	CF_SENDCREATE
@@ -581,84 +461,61 @@ static int fmq_isend(fmq *op,cvoid *buf,int buflen,int opts)
 	        goto ret1 ;
 #endif /* CF_SENDCREATE */
 
-	    if (dt == 0)
-	        dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 
 	    rs = fmq_filebegin(op,dt) ;
 	    if (rs < 0)
 	        goto ret1 ;
 
 	}
-
 /* prepare the message header (the length) */
-
 	llen = stdorder_wui(lenbuf,buflen) ;
-
 /* can we even write this message? */
-
-	if ((buflen + llen) > (op->h.size - op->h.blen)) {
-	    rs = ((buflen + llen) > op->h.size) ? SR_TOOBIG : SR_AGAIN ;
+	if ((buflen + llen) > (op->h.bsz - op->h.blen)) {
+	    rs = ((buflen + llen) > op->h.bsz) ? SR_TOOBIG : SR_AGAIN ;
 	    goto ret1 ;
 	}
-
 /* prepare to write */
-
 	if (op->h.wi < op->h.ri) {
 	    dlen = op->h.ri - op->h.wi ;
 	} else {
-	    dlen = op->h.size - op->h.wi ;
+	    dlen = op->h.bsz - op->h.wi ;
 	}
-
 	dlen -= llen ;
-	if (buflen < dlen)
+	if (buflen < dlen) {
 	    dlen = buflen ;
-
+	}
 /* set up the write buffers */
-
 	v[0].iov_base = lenbuf ;
 	v[0].iov_len = llen ;
-
 	v[1].iov_base = (caddr_t) cbuf ;
 	v[1].iov_len = dlen ;
-
 	v[2].iov_base = nullptr ;
 	v[2].iov_len = 0 ;
-
 	eoff = FMQ_BUFOFF + op->h.wi ;
 	uoff = eoff ;
 	rs = u_seek(op->fd,uoff,SEEK_SET) ;
-
-	if (rs >= 0)
+	if (rs >= 0) {
 	    rs = u_writev(op->fd,v,2) ;
-
+	}
 	if ((rs >= 0) && (dlen < buflen)) {
-
 	    v[0].iov_base = (caddr_t) (cbuf + dlen) ;
 	    v[0].iov_len = (buflen - dlen) ;
-
 	    v[1].iov_base = nullptr ;
 	    v[1].iov_len = 0 ;
-
 	    eoff = FMQ_BUFOFF ;
 	    uoff = eoff ;
 	    if ((rs = u_seek(op->fd,uoff,SEEK_SET)) >= 0) {
 	        rs = u_writev(op->fd,v,1) ;
 	    }
-
 	} /* end if (wrapped around) */
-
 	if (rs > 0) {
-
 	    len = uceil((llen + buflen),llen) ;
-
-	    op->h.wi = (op->h.wi + len) % op->h.size ;
+	    op->h.wi = (op->h.wi + len) % op->h.bsz ;
 	    op->h.blen += len ;
 	    op->h.len += buflen ;
 	    op->h.nmsg += 1 ;
-
-	    if (dt == 0)
-	        dt = time(nullptr) ;
-
+	    if (dt == 0) dt = getustime ;
 	    op->h.wcount += 1 ;
 	    op->h.wtime = dt ;
 
@@ -666,7 +523,6 @@ static int fmq_isend(fmq *op,cvoid *buf,int buflen,int opts)
 
 	    if ((rs >= 0) && op->f.remote)
 	        u_fsync(op->fd) ;
-
 	} /* end if (data write was successful) */
 
 ret1:
@@ -675,6 +531,7 @@ ret1:
 ret0:
 	fmq_ei(op,&oldsigmask) ;
 
+	} /* end if (filecheck) */
 	return (rs >= 0) ? buflen : rs ;
 }
 /* end subroutine (fmq_isend) */
@@ -720,7 +577,7 @@ static int fmq_irecv(fmq *op,void *buf,int buflen,int opts)
 /* do we have proper file access? */
 
 	if (dt == 0)
-	    dt = time(nullptr) ;
+	    dt = getustime ;
 
 	rs = fmq_filecheck(op,dt,0,opts) ;
 	if (rs < 0)
@@ -731,7 +588,7 @@ static int fmq_irecv(fmq *op,void *buf,int buflen,int opts)
 	if (! op->f.fileinit) {
 
 	    if (dt == 0)
-	        dt = time(nullptr) ;
+	        dt = getustime ;
 
 	    rs = fmq_filebegin(op,dt) ;
 	    if (rs < 0)
@@ -753,7 +610,7 @@ static int fmq_irecv(fmq *op,void *buf,int buflen,int opts)
 	if (op->h.ri >= op->h.wi) {
 	    dlen = op->h.wi - op->h.ri ;
 	} else {
-	    dlen = op->h.size - op->h.ri ;
+	    dlen = op->h.bsz - op->h.ri ;
 	}
 
 	dlen -= llen ;
@@ -816,13 +673,13 @@ static int fmq_irecv(fmq *op,void *buf,int buflen,int opts)
 
 	    len = uceil((llen + mlen),llen) ;
 
-	    op->h.ri = (op->h.ri + len) % op->h.size ;
+	    op->h.ri = (op->h.ri + len) % op->h.bsz ;
 	    op->h.blen -= len ;
 	    op->h.len -= mlen ;
 	    op->h.nmsg -= 1 ;
 
 	    if (dt == 0)
-	        dt = time(nullptr) ;
+	        dt = getustime ;
 
 	    op->h.wcount += 1 ;
 	    op->h.wtime = dt ;
@@ -845,84 +702,31 @@ ret0:
 }
 /* end subroutine (fmq_irecv) */
 
-
-/* check the file for coherency */
-/* ARGSUSED */
-static int fmq_filecheck(fmq *op,time_t dt,int f_read,int opts)
-{
-	int		rs = SR_OK ;
-	int		f_changed = FALSE ;
-
-/* is the file open */
-
-	if (op->fd < 0) {
-
-	    if (dt == 0)
-	        dt = time(nullptr) ;
-
-	    rs = fmq_fileopen(op,dt) ;
-	    if (rs < 0)
-	        goto ret0 ;
-
-	}
-
-/* check for optional slow-poll mode */
-
-#ifdef	COMMENT
-	if ((opts & FM_SLOWPOLL) && (op->h.nmsg <= 0)) {
-
-	    rs = u_fstat(op->fd,&sb) ;
-	    if (rs < 0)
-	        goto bad0 ;
-
-	    f_changed = (sb.st_size != op->filesize) ||
-	        (sb.st_mtime != op->mtime) ;
-
-	    if (! f_changed)
-	        goto ret0 ;
-
-	} /* end if (optional slow-poll mode) */
-#endif /* COMMENT */
-
-/* capture the lock if we do not already have it */
-
-	if ((! op->f.readlocked) && (! op->f.writelocked)) {
-
-	    if (dt == 0)
-	        dt = time(nullptr) ;
-
-	    rs = fmq_lockget(op,dt,f_read) ;
-	    if (rs < 0)
-	        goto ret0 ;
-
-	    rs = fmq_filechanged(op) ;
-	    if (rs < 0)
-	        goto bad1 ;
-
-	    f_changed = (rs > 0) ;
-
-	} /* end if (capture lock) */
-
-ret0:
+static int fmq_filecheck(fmq *op,time_t dt,int f_read,int opts) noex {
+	int		rs ;
+	int		f_changed = false ;
+	if (dt == 0) dt = getustime ;
+	if ((rs = fmq_fileready(op,dt)) >= 0) {
+	    if ((! op->f.readlocked) && (! op->f.writelocked)) {
+	        if ((rs = fmq_lockget(op,dt,f_read)) >= 0) {
+	            rs = fmq_filechanged(op) ;
+	            f_changed = (rs > 0) ;
+		    if (rs < 0) {
+			fmq_lockrelease(op) ;
+		    }
+	        } /* end if (lockget) */
+	    } /* end if (capture lock) */
+	} /* end if (fileready) */
 	return (rs >= 0) ? f_changed : rs ;
-
-/* bad stuff */
-bad1:
-	fmq_lockrelease(op) ;
-
-bad0:
-	return rs ;
 }
 /* end subroutine (fmq_filecheck) */
 
-
 /* has the file changed at all? */
-static int fmq_filechanged(fmq *op)
-{
+static int fmq_filechanged(fmq *op) noex {
 	USTAT		sb ;
 	int		rs ;
-	int		f_statchanged = FALSE ;
-	int		f_headchanged = FALSE ;
+	int		f_statchanged = false ;
+	int		f_headchanged = false ;
 
 /* has the file changed at all? */
 
@@ -937,7 +741,7 @@ static int fmq_filechanged(fmq *op)
 	    goto bad2 ;
 
 	if (sb.st_size < FMQ_BUFOFF)
-	    op->f.fileinit = FALSE ;
+	    op->f.fileinit = false ;
 
 	f_statchanged = (! op->f.fileinit) ||
 	    (sb.st_size != op->filesize) ||
@@ -946,7 +750,7 @@ static int fmq_filechanged(fmq *op)
 /* read the file header for write indications */
 
 	if (op->f.fileinit) {
-	    FMQ_FH	h ;
+	    fmq_fh	h ;
 	    char	hbuf[FMQ_TOPLEN + 1] ;
 
 	    rs = u_pread(op->fd,hbuf,FMQ_TOPLEN,0L) ;
@@ -955,7 +759,7 @@ static int fmq_filechanged(fmq *op)
 	        goto bad2 ;
 
 	    if (rs < FMQ_TOPLEN)
-	        op->f.fileinit = FALSE ;
+	        op->f.fileinit = false ;
 
 	    if (rs > 0) {
 
@@ -975,7 +779,7 @@ static int fmq_filechanged(fmq *op)
 /* OK, we're done */
 
 	if (f_statchanged) {
-	    op->f.bufvalid = FALSE ;
+	    op->f.bufvalid = false ;
 	    op->filesize = sb.st_size ;
 	    op->mtime = sb.st_mtime ;
 	}
@@ -994,7 +798,7 @@ bad0:
 static int fmq_bufbegin(fmq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    op->f.bufvalid = FALSE ;
+	    op->f.bufvalid = false ;
 	    op->b = {} ;
 	    op->b.bsz = FMQ_BUFSIZE ;
 	    rs = uc_malloc(op->b.bsz,&op->b.buf) ;
@@ -1024,7 +828,7 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 	sigset_t	oldsigmask ;
 	int		rs = SR_OK ;
 	int		bl ;
-	int		f_locked = FALSE ;
+	int		f_locked = false ;
 	char		fbuf[FBUFLEN + 1] ;
 
 	fmq_di(op,&oldsigmask) ;
@@ -1033,7 +837,7 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 
 	    u_seek(op->fd,0L,SEEK_SET) ;
 
-	    op->f.fileinit = FALSE ;
+	    op->f.fileinit = false ;
 	    if (op->f.writable && op->f.create) {
 
 	        if (! op->f.writelocked) {
@@ -1042,7 +846,7 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 	            if (rs < 0)
 	                goto ret0 ;
 
-	            f_locked = TRUE ;
+	            f_locked = true ;
 	        }
 
 /* write the file header stuff */
@@ -1053,28 +857,19 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 	        fm.vetu[1] = FMQ_ENDIAN ;
 	        fm.vetu[2] = 0 ;
 	        fm.vetu[3] = 0 ;
-
 	        bl = 0 ;
 	        bl += filemagic((fbuf + bl),0,&fm) ;
-
-	        memset(&op->h,0,sizeof(FMQ_FH)) ;
-
-	        op->h.size = op->bufsize ;
-
+	        op->h = {} ;
+	        op->h.bsz = op->bufsize ;
 	        bl += filehead((fbuf + bl),0,&op->h) ;
-
-	        rs = u_pwrite(op->fd,fbuf,bl,0L) ;
-
-	        if (rs > 0) {
+	        if ((rs = u_pwrite(op->fd,fbuf,bl,0L)) > 0) {
 	            op->filesize = rs ;
 	            op->mtime = dt ;
 	            if (op->f.remote) {
 	                u_fsync(op->fd) ;
 		    }
 	        }
-
 	        op->f.fileinit = (rs >= 0) ;
-
 	    } /* end if (writing) */
 
 	} else if (op->filesize >= FMQ_BUFOFF) {
@@ -1088,7 +883,7 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 	        if (rs < 0)
 	            goto ret0 ;
 
-	        f_locked = TRUE ;
+	        f_locked = true ;
 	    }
 
 	    rs = u_pread(op->fd,fbuf,FBUFLEN,0L) ;
@@ -1125,62 +920,34 @@ ret0:
 }
 /* end subroutine (fmq_filebegin) */
 
-
-/* acquire access to the file */
-static int fmq_lockget(fmq *op,time_t dt,int f_read)
-{
-	int		rs = SR_OK ;
-	int		lockcmd ;
-	int		f_already = FALSE ;
-
-	if (op->fd < 0) {
-
-	    rs = fmq_fileopen(op,dt) ;
-
-	    if (rs < 0)
-	        goto bad0 ;
-
-	} /* end if (needed to open the file) */
-
-/* acquire a file record lock */
-
-	if (f_read || (! op->f.writable)) {
-
-	    f_already = op->f.readlocked ;
-	    op->f.readlocked = TRUE ;
-	    op->f.writelocked = FALSE ;
-	    lockcmd = F_RLOCK ;
-
-	} else {
-
-	    f_already = op->f.writelocked ;
-	    op->f.readlocked = FALSE ;
-	    op->f.writelocked = TRUE ;
-	    lockcmd = F_WLOCK ;
-
-	}
-
-/* get out if we have the lock that we want already */
-
-	if (f_already) {
-	    rs = SR_OK ;
-	    goto ret0 ;
-	}
-
-/* we need to actually do the lock */
-
-	{
-	    off_t	fs = op->filesize ;
-	    rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
-	}
-
-ret0:
+static int fmq_lockget(fmq *op,time_t dt,int f_read) noex {
+	int		rs ;
+	int		f_already = false ;
+	if ((rs = fmq_fileready(op,dt)) >= 0) {
+	    int		lockcmd ;
+	    if (f_read || (! op->f.writable)) {
+	        f_already = op->f.readlocked ;
+	        op->f.readlocked = true ;
+	        op->f.writelocked = false ;
+	        lockcmd = F_RLOCK ;
+	    } else {
+	        f_already = op->f.writelocked ;
+	        op->f.readlocked = false ;
+	        op->f.writelocked = true ;
+	        lockcmd = F_WLOCK ;
+	    }
+    	    /* get out if we have the lock that we want already */
+	    if (! f_already) {
+	        off_t	fs = op->filesize ;
+	        rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
+	    }
+	} /* end if (fmq_fileready) */
 	return rs ;
 
 /* bad stuff */
 bad1:
-	op->f.readlocked = FALSE ;
-	op->f.writelocked = FALSE ;
+	op->f.readlocked = false ;
+	op->f.writelocked = false ;
 
 bad0:
 	goto ret0 ;
@@ -1194,19 +961,29 @@ static int fmq_lockrelease(fmq *op) noex {
 		off_t	fs = op->filesize ;
 	        rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
 	    }
-	    op->f.readlocked = FALSE ;
-	    op->f.writelocked = FALSE ;
+	    op->f.readlocked = false ;
+	    op->f.writelocked = false ;
 	}
 	return rs ;
 }
 /* end subroutine (fmq_lockrelease) */
+
+static int fmq_fileready(fmq *op,time_t dt) noex {
+	int		rs = SR_OK ;
+	if (op->fd < 0) {
+	    if (dt == 0) dt = getustime ;
+	    rs = fmq_fileopen(op,dt) ;
+	}
+	return rs ;
+}
+/* end subroutine (fmq_filready) */
 
 static int fmq_fileopen(fmq *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if ((rs = u_open(op->fname,op->oflags,op->operm)) >= 0) {
 		op->fd = rs ;
-		uc_closeonexec(op->fd,TRUE) ;
+		uc_closeonexec(op->fd,true) ;
 		op->opentime = dt ;
 	    }
 	}
@@ -1233,7 +1010,7 @@ static int fmq_headwrite(fmq *op) noex {
 	char		fbuf[FBUFLEN + 1] ;
 	if ((rs = filehead(fbuf,0,&op->h)) >= 0) {
 	    bl = rs ;
-	   rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
+	    rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
 	}
 	return rs ;
 }
@@ -1260,13 +1037,12 @@ static int fmq_ei(fmq *op,sigset_t *smp) noex {
 static int filemagic(char *buf,int f_read,fmq_fm *mp) noex {
 	int		rs = SR_BADFMT ;
 	if (buf && mp) {
-	char	*bp = buf ;
-	char	*cp ;
+	    char	*bp = buf ;
 	    rs = 20 ;
 	    if (f_read) {
 	        bp[15] = '\0' ;
 	        strncpy(mp->magic,bp,15) ;
-	        if ((cp = strchr(mp->magic,'\n')) != nullptr) {
+	        if (char *cp ; (cp = strchr(mp->magic,'\n')) != nullptr) {
 	            *cp = '\0' ;
 	        }
 	        bp += 16 ;
@@ -1284,7 +1060,7 @@ static int filemagic(char *buf,int f_read,fmq_fm *mp) noex {
 /* end subroutine (filemagic) */
 
 /* encode or decode the file header */
-static int filehead(char *buf,int f_read,FMQ_FH *hp) noex {
+static int filehead(char *buf,int f_read,fmq_fh *hp) noex {
 	uint		*table = (uint *) buf ;
 	int		rs = SR_BADFMT ;
 	if (buf) {

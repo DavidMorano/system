@@ -94,12 +94,13 @@ struct fmq_head {
 	time_t		accesstime ;	/* file access time */
 	time_t		mtime ;		/* file modification time */
 	uint		magic ;
-	int		oflags, operm ;
+	int		oflags ;
 	int		pagesize ;
 	int		filesize ;
 	int		bufsize ;	/* user hint at open time */
 	int		fd ;
-	int		cursors ;
+	int		count ;
+	mode_t		operm ;
 } ;
 
 typedef	FMQ		fmq ;

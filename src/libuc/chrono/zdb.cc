@@ -25,7 +25,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<estrings.h>
