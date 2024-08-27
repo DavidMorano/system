@@ -1,0 +1,22 @@
+#!/usr/extra/bin/ksh
+# SUBCLEAN
+
+DN=/dev/null
+
+function procdir {
+  typeset N B D=${1}
+  print -- D=$D
+  ls ${D}/*.cc 2> $DN | while read FP ; do
+    B=$( basename $FP )
+    print -- B=$B
+    if [[ -f $B ]] ; then
+      rm $B
+    fi
+  done
+}
+
+
+files_d | while read D ; do
+  procdir $D
+done
+
