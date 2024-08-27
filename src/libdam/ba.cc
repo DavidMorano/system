@@ -24,8 +24,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -158,7 +157,7 @@ int ba_countdown(ba *op) noex {
 int ba_and(ba *op1,ba *op2) noex {
 	int		rs = SR_FAULT ;
 	if (op1 && op2) {
-	    cint	nw = MIN(op1->nwords,op2->nwords) ;
+	    cint	nw = min(op1->nwords,op2->nwords) ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < nw ; i += 1) {
 	        op1->a[i] = op1->a[i] & op2->a[i] ;
@@ -192,14 +191,16 @@ int ba_numones(ba *op) noex {
 
 int banum_prepare(ba_num *cnp) noex {
 	cint		asz = (BA_MAX16 * sizeof(int)) ;
-	int		rs ;
-	void		*vp{} ;
-	if ((rs = uc_malloc(asz,&vp)) >= 0) {
-	    cnp->num = intp(vp) ;
-	    for (int i = 0 ; i < BA_MAX16 ; i += 1) {
-	        cnp->num[i] = numbits(i) ;
-	    }
-	}
+	int		rs = SR_FAULT ;
+	if (cnp) {
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(asz,&vp)) >= 0) {
+	        cnp->num = intp(vp) ;
+	        for (int i = 0 ; i < BA_MAX16 ; i += 1) {
+	            cnp->num[i] = numbits(i) ;
+	        }
+	    } /* end if (memory-allocation) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (banum_prepare) */
