@@ -839,6 +839,11 @@ strx.o:			strx.dir
 strx.dir:
 	makesubdir $@
 
+# CONFIGVARS
+configvars.o:		configvars.dir
+configvars.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 

@@ -1,11 +1,11 @@
-# MAKEFILES (mailbox)
+# MAKEFILES (configvars)
 
-T= mailbox
+T= configvars
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
-INDIR		?= $(REPOROOT)/bin
+BINDIR		?= $(REPOROOT)/bin
 INCDIR		?= $(REPOROOT)/include
 LIBDIR		?= $(REPOROOT)/lib
 MANDIR		?= $(REPOROOT)/man
@@ -18,7 +18,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gxx
+CXX		?= gpp
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -32,19 +32,19 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= mailbox.h
+INCS += configvars.h
 
-LIBS=
-
-
-LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
+LIBS +=
 
 
-RUNINFO= -rpath $(RUNDIR)
+INCDIRS +=
+
+LIBDIRS += -L$(LIBDIR)
+
+
+RUNINFO= -tpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -56,14 +56,19 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_MAILBOX= mailbox_main.o
-OBJ1_MAILBOX= mailbox_fromaddr.o
-OBJ2_MAILBOX= mailbox_getfrom.o
+OBJ0= configvars_main.o configvars_parse.o configvars_sub.o
+OBJ1= configvars_file.o configvars_var.o
+OBJ2= configvars_aux.o
+OBJ3=
+OBJ4=
+OBJ5=
+OBJ6=
+OBJ7=
 
-OBJA_MAILBOX= obj0_mailbox.o obj1_mailbox.o
-OBJB_MAILBOX= obj2_mailbox.o
+OBJA= obj0.o obj1.o obj2.o
+#OBJB= obj4.o obj5.o obj6.o obj7.o
 
-OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
+OBJ= $(OBJA) $(OBJB)
 
 
 .SUFFIXES:		.hh .ii
@@ -72,6 +77,7 @@ OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -92,10 +98,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 
-$(T).o:			$(OBJ_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILBOX)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_MAILBOX)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -107,7 +113,7 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(ALL)
+	$(RM) $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -115,18 +121,37 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_mailbox.o:	$(OBJ0_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILBOX)
 
-obj1_mailbox.o:	$(OBJ1_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILBOX)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj2_mailbox.o:	$(OBJ2_MAILBOX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILBOX)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+
+obj6.o:			$(OBJ6)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
+
+obj7.o:			$(OBJ7)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
 
 
-mailbox_main.o:		mailbox_main.cc		$(INCS)
-mailbox_fromaddr.o:	mailbox_fromaddr.cc	$(INCS)
-mailbox_getfrom.o:	mailbox_getfrom.cc	$(INCS)
+configvars_main.o:	configvars_main.cc	$(INCS)
+configvars_parse.o:	configvars_parse.cc	$(INCS)
+configvars_sub.o:	configvars_sub.cc	$(INCS)
+configvars_file.o:	configvars_file.cc	$(INCS)
+configvars_var.o:	configvars_var.cc	$(INCS)
+configvars_aux.o:	configvars_aux.cc	$(INCS)
 
 

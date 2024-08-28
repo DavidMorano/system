@@ -1,4 +1,7 @@
-static int configvars_parsefile(CV *cvp,int fi,vecitem *eep) noex {
+
+namespace configvars_obj {
+
+    int configvars_parse(CV *cvp,int fi,vecitem *eep) noex {
 	USTAT		sb ;
 	CV_FILE	*fep ;
 	CV_FILE	ve ;
@@ -202,5 +205,8 @@ done:
 
 	return rs ;
 }
-/* end subroutine (configvars_parsefile) */
+/* end subroutine (configvars_parse) */
+
+} /* end namespace (configvars_obj) */
+
 
