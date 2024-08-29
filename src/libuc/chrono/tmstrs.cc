@@ -76,6 +76,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -118,9 +121,6 @@ int tmstrsday(cchar *sp,int sl) noex {
 	    case TWOCHARS('S', 'a'):
 	        rs = 6 ;
 	        break ;
-	    default:
-	        rs = SR_INVALID ;
-	        break ;
 	    } /* end switch */
 	} /* end if (possible) */
 	return rs ;
@@ -161,9 +161,6 @@ int tmstrsmonth(cchar *sp,int sl) noex {
 	        break ;
 	    case TWOCHARS('D', 'e'):
 	        rs = 11 ;
-	        break ;
-	    default:
-	        rs = SR_INVALID ;		/* bad month name */
 	        break ;
 	    } /* end switch */
 	} /* end if (possible) */
