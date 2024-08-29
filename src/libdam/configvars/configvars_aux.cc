@@ -43,7 +43,7 @@
 #include	<matostr.h>
 #include	<localmisc.h>
 
-#include	"configvars.h"
+#include	"configvarsobj.h"
 
 
 /* local defines */

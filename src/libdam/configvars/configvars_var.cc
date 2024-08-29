@@ -43,18 +43,7 @@
 #include	<matostr.h>
 #include	<localmisc.h>
 
-#include	"configvars.h"
-
-
-/* local defines */
-#define	CONFxIGVARS_WSETS	0
-#define	CONFxIGVARS_WVARS	1
-
-#define	CV		configvars
-#define	CV_VAR		configvars_var
-#define	CV_FILE		configvars_file
-#define	CV_CUR		configvars_cur
-#define	CV_ERR		configvars_err
+#include	"configvarsobj.h"
 
 
 /* local namespaces */
