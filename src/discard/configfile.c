@@ -3,88 +3,81 @@
 /* parse a configuration file */
 
 
-#define	CF_DEBUGS	0
+#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGSFIELD	0
+#define	CF_EXPORTEQUAL	0		/* add equal for empty-value exports */
 
 
 /* revision history:
 
-	= 91/06/01, David A­D­ Morano
-
-	This subroutine was originally written.
-
-
-	= 00/01/21, David A­D­ Morano
-
+	= 2000-01-21, David A­D­ Morano
 	This subroutine was enhanced for use by LevoSim.
-
 
 */
 
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
-	This is the old configuration file reader object.  It is cheap,
-	it is ill-conceived, it is a mess, it works well enough to be
-	used for cheap code.  I didn't want to use this junk for the
-	Levo machine simulator but time pressure decided for us !
+	This is the old configuration file reader object.  It is
+	cheap, it is ill-conceived, it is a mess, it works well
+	enough to be used for cheap code.  I did not want to use
+	this junk for the Levo machine simulator but time pressure
+	decided for us!
 
 	Although this whole configuration scheme is messy, it gives
 	us enough of what we need to get some configuration information
 	into the Levo machine simulator and to get a parameter file
 	name.  This is good enough for now.
 
+*******************************************************************************/
 
-******************************************************************************/
-
-
-#define	CONFIGFILE_MASTER	1
-
-
+#include	<envstandards.h>
 #include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<sys/param.h>
+#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<field.h>
 #include	<vecstr.h>
+#include	<field.h>
 #include	<buffer.h>
 #include	<mallocstuff.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"configfile.h"
-
-#if	CF_DEBUGS
-#include	"config.h"
-#include	"defs.h"
-#endif
-
 
 
 /* local defines */
 
 #define	CONFIGFILE_MAGIC	0x04311633
 
-#undef	LINELEN
-#define	LINELEN		128
-#undef	BUFLEN
-#define	BUFLEN		(LINELEN * 2)
+#ifndef	LINEBUFLEN
+#ifdef	LINE_MAX
+#define	LINEBUFLEN	MAX(LINE_MAX,2048)
+#else
+#define	LINEBUFLEN	2048
+#endif
+#endif
 
+#undef	BUFLEN
+#define	BUFLEN		(LINEBUFLEN * 2)
 
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
 
-extern char	*strncpylow(char *,const char *,int) ;
+extern char	*strncpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -97,34 +90,38 @@ extern char	*strncpylow(char *,const char *,int) ;
 
 static void	checkfree() ;
 
+#if	CF_DEBUGS
+static int vardump(cchar *,int) ;
+#endif
 
-/* local static data */
+
+/* local variables */
 
 /* these are the terminators for most everything */
 static const unsigned char 	fterms[32] = {
-	    0x7F, 0xFE, 0xC0, 0xFE,
-	    0x8B, 0x00, 0x00, 0x24, 
-	    0x00, 0x00, 0x00, 0x00, 
-	    0x00, 0x00, 0x00, 0x80,
-	    0x00, 0x00, 0x00, 0x00, 
-	    0x00, 0x00, 0x00, 0x00, 
-	    0x00, 0x00, 0x00, 0x00, 
-	    0x00, 0x00, 0x00, 0x00, 
+	0x7F, 0xFE, 0xC0, 0xFE,
+	0x8B, 0x00, 0x00, 0x24, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x80,
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
 } ;
 
 /* these are the terminators for options */
 static const unsigned char 	oterms[32] = {
-	    0x00, 0x0B, 0x00, 0x00,
-	    0x09, 0x10, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00
+	0x00, 0x0B, 0x00, 0x00,
+	0x09, 0x10, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
 } ;
 
-static char	*const configkeys[] = {
+static cchar	*configkeys[] = {
 	"define",
 	"export",
 	"tmpdir",
@@ -153,90 +150,101 @@ static char	*const configkeys[] = {
 	"acctab",
 	"paramfile",
 	"nrecips",
-	    "helpfile",
-	    "paramtab",
-	    "pingtab",
-	    "pingstat",
-	    "option",
-	    "mintexec",
-	    "interval",
-	    "stampdir",
-	    "maxjobs",
-	    "directory",
-	    "interrupt",
-	    "polltime",
-	    "filetime",
+	"helpfile",
+	"paramtab",
+	"pingtab",
+	"pingstat",
+	"option",
+	"mintexec",
+	"interval",
+	"stampdir",
+	"maxjobs",
+	"directory",
+	"interrupt",
+	"polltime",
+	"filetime",
 	"passfile",
-	    NULL
+	NULL
+} ;
+
+enum configkeys {
+	configkey_define,
+	configkey_export,
+	configkey_tmpdir,
+	configkey_root,
+	configkey_pidfile,
+	configkey_lockfile,
+	configkey_log,
+	configkey_loglen,
+	configkey_workdir,
+	configkey_port,
+	configkey_user,
+	configkey_group,
+	configkey_userpass,
+	configkey_machpass,
+	configkey_srvtab,
+	configkey_sendmail,
+	configkey_envfile,
+	configkey_pathfile,
+	configkey_devicefile,
+	configkey_seedfile,
+	configkey_logsize,
+	configkey_organization,
+	configkey_unset,
+	configkey_timeout,
+	configkey_removemul,
+	configkey_acctab,
+	configkey_paramfile,
+	configkey_nrecips,
+	configkey_helpfile,
+	configkey_paramtab,
+	configkey_pingtab,
+	configkey_pingstat,
+	configkey_option,
+	configkey_mintexec,
+	configkey_interval,
+	configkey_stampdir,
+	configkey_maxjobs,
+	configkey_directory,
+	configkey_interrupt,
+	configkey_polltime,
+	configkey_filetime,
+	configkey_passfile,
+	configkey_eigenfile,
+	configkey_minwordlen,
+	configkey_maxwordlen,
+	configkey_keys,
+	configkey_overlast
 } ;
 
 
-#define	CONFIGKEY_DEFINE	0
-#define	CONFIGKEY_EXPORT	1
-#define	CONFIGKEY_TMPDIR	2
-#define	CONFIGKEY_ROOT		3
-#define	CONFIGKEY_PIDFILE	4
-#define	CONFIGKEY_LOCKFILE	5
-#define	CONFIGKEY_LOG		6
-#define	CONFIGKEY_LOGLEN	7
-#define	CONFIGKEY_WORKDIR	8
-#define	CONFIGKEY_PORT		9
-#define	CONFIGKEY_USER		10
-#define	CONFIGKEY_GROUP		11
-#define	CONFIGKEY_USERPASS	12
-#define	CONFIGKEY_MACHPASS	13
-#define	CONFIGKEY_SRVTAB	14
-#define	CONFIGKEY_SENDMAIL	15
-#define	CONFIGKEY_ENVFILE	16
-#define	CONFIGKEY_PATHFILE	17
-#define	CONFIGKEY_DEVICEFILE	18
-#define	CONFIGKEY_SEEDFILE	19
-#define	CONFIGKEY_LOGSIZE	20
-#define	CONFIGKEY_ORGANIZATION	21
-#define	CONFIGKEY_UNSET		22
-#define	CONFIGKEY_TIMEOUT	23
-#define	CONFIGKEY_REMOVEMUL	24
-#define	CONFIGKEY_ACCTAB	25
-#define	CONFIGKEY_PARAMFILE	26
-#define	CONFIGKEY_NRECIPS	27
-#define	CONFIGKEY_HELPFILE	28
-#define	CONFIGKEY_PARAMTAB	29
-#define	CONFIGKEY_PINGTAB	30
-#define	CONFIGKEY_PINGSTAT	31
-#define	CONFIGKEY_OPTION	32
-#define	CONFIGKEY_MINTEXEC	33
-#define	CONFIGKEY_INTERVAL	34
-#define	CONFIGKEY_STAMPDIR	35
-#define	CONFIGKEY_MAXJOBS	36
-#define	CONFIGKEY_DIRECTORY	37
-#define	CONFIGKEY_INTERRUPT	38
-#define	CONFIGKEY_POLLTIME	39
-#define	CONFIGKEY_FILETIME	40
-#define	CONFIGKEY_PASSFILE	41
-
-
-
-
+/* exported subroutines */
 
 
 int configfile_start(csp,configfname)
 CONFIGFILE	*csp ;
-char		configfname[] ;
+cchar	configfname[] ;
 {
-	bfile	configfile, *cfp = &configfile ;
-
 	BUFFER	options ;
 
 	FIELD	fsb ;
 
+	bfile	cfile, *cfp = &cfile ;
+
 	vecstr	*vsp ;
 
-	int	srs, rs = SR_OK ;
+	int	rs = SR_OK ;
+	int	rs1 ;
 	int	i ;
-	int	c, len1, len, line = 0 ;
+	int	c, len1, len ;
+	int	bl, cl ;
+	int	fl ;
+	int	line = 0 ;
 	int	noptions = 0 ;
 
-	char	linebuf[LINELEN + 1] ;
+	cchar	*fp ;
+
+	char	linebuf[LINEBUFLEN + 1] ;
 	char	buf[BUFLEN + 1] ;
 	char	buf2[BUFLEN + 1] ;
 	char	*bp, *cp ;
@@ -249,22 +257,10 @@ char		configfname[] ;
 	if (csp == NULL)
 	    return SR_FAULT ;
 
-	csp->magic = 0 ;
+	memset(csp,0,sizeof(CONFIGFILE)) ;
+
 	if ((configfname == NULL) || (configfname[0] == '\0'))
 	    return SR_NOEXIST ;
-
-	(void) memset(csp,0,sizeof(CONFIGFILE)) ;
-
-/* open configuration file */
-
-#if	CF_DEBUGS
-	debugprintf("configfile_start: opened file\n") ;
-#endif
-
-	csp->srs = 0 ;
-	csp->badline = -1 ;
-	if ((rs = bopen(cfp,configfname,"r",0664)) < 0)
-	    goto badopen ;
 
 /* initialize */
 
@@ -272,53 +268,40 @@ char		configfname[] ;
 	debugprintf("configfile_start: initializing\n") ;
 #endif
 
-	csp->root = NULL ;
-	csp->tmpdir = NULL ;
-	csp->pidfname = NULL ;
-	csp->lockfname = NULL ;
-	csp->logfname = NULL ;
+	csp->srs = 0 ;
+	csp->badline = -1 ;
 	csp->loglen = -1 ;
-	csp->workdir = NULL ;
-	csp->port = NULL ;
-	csp->user = NULL ;
-	csp->group = NULL ;
-	csp->userpass = NULL ;
-	csp->machpass = NULL ;
-	csp->srvtab = NULL ;
-	csp->sendmail = NULL ;
-	csp->envfname = NULL ;
-	csp->pathfname = NULL ;
-	csp->devicefname = NULL ;
-	csp->seedfname = NULL ;
-	csp->logsize = NULL ;
-	csp->organization = NULL ;
-	csp->timeout = NULL ;
-	csp->removemul = NULL ;
-	csp->acctab = NULL ;
-	csp->paramfname = NULL ;
-	csp->nrecips = NULL ;
-	csp->helpfname = NULL ;
-	csp->statfname = NULL ;
-	csp->options = NULL ;
-	csp->interval = NULL ;
-	csp->stampdir = NULL ;
-	csp->maxjobs = NULL ;
-	csp->directory = NULL ;
-	csp->interrupt = NULL ;
-	csp->polltime = NULL ;
-	csp->filetime = NULL ;
-	csp->passfname = NULL ;
+	csp->minwordlen = -1 ;
+	csp->maxwordlen = -1 ;
+	csp->keys = -1 ;
 
-	buffer_start(&options,-1) ;
+	rs = vecstr_start(&csp->defines,10,0) ;
+	if (rs < 0)
+	    goto bad0 ;
 
-	if ((rs = vecstr_start(&csp->defines,10,0)) < 0)
-	    goto baddefines ;
+	rs = vecstr_start(&csp->unsets,10,0) ;
+	if (rs < 0)
+	    goto bad1 ;
 
-	if ((rs = vecstr_start(&csp->unsets,10,0)) < 0)
-	    goto badunsets ;
+	rs = vecstr_start(&csp->exports,10,0) ;
+	if (rs < 0)
+	    goto bad2 ;
 
-	if ((rs = vecstr_start(&csp->exports,10,0)) < 0)
-	    goto badexports ;
+/* buffer initialization */
+
+	rs = buffer_start(&options,-1) ;
+	if (rs < 0)
+		goto bad3 ;
+
+/* open configuration file */
+
+#if	CF_DEBUGS
+	debugprintf("configfile_start: opened file\n") ;
+#endif
+
+	rs = bopen(cfp,configfname,"r",0664) ;
+	if (rs < 0)
+	    goto ret1 ;
 
 /* start processing the configuration file */
 
@@ -326,12 +309,13 @@ char		configfname[] ;
 	debugprintf("configfile_start: reading lines\n") ;
 #endif
 
-	while ((len = breadln(cfp,linebuf,LINELEN)) > 0) {
+	while ((rs = breadln(cfp,linebuf,LINEBUFLEN)) > 0) {
 
+	    len = rs ;
 	    line += 1 ;
 	    if (len == 1) continue ;	/* blank line */
 
-	    if (linebuf[len - 1] != '\n') {
+	    if (linebuf[--len] != '\n') {
 
 #ifdef	COMMENT
 	        f_trunc = TRUE ;
@@ -342,38 +326,19 @@ char		configfname[] ;
 	        continue ;
 	    }
 
-	    fsb.lp = linebuf ;
-	    fsb.rlen = len - 1 ;
+	    if ((len == 0) || (linebuf[0] == '#'))
+	        continue ;
 
-#if	CF_DEBUGS
-	    debugprintf("configfile_start: line> %W\n",fsb.lp,fsb.rlen) ;
-#endif
+	    if ((rs = field_start(&fsb,linebuf,len)) >= 0) {
 
-	    field_get(&fsb,fterms) ;
-
-#if	CF_DEBUGS
-	    {
-	        if (fsb.flen >= 0) {
-	            debugprintf("configfile_start: field> %W\n",
-	                fsb.fp,fsb.flen) ;
-	        } else
-	            debugprintf("configfile_start: field> *none*\n") ;
-	    }
-#endif /* CF_DEBUGSFIELD */
-
-/* empty or comment only line */
-
-	    if (fsb.flen <= 0) continue ;
+	    	fl = field_get(&fsb,fterms,&fp) ;
 
 /* convert key to lower case */
 
-	    strncpylow(buf,fsb.fp,fsb.flen) ;
+	    bl = MIN(fl,BUFLEN) ;
+	    strncpylc(buf,fp,bl) ;
 
-	    buf[fsb.flen] = '\0' ;
-
-/* check if key is a valid one, ignore invalid keys */
-
-	    i = matstr(configkeys,buf,fsb.flen) ;
+	    i = matpstr(configkeys,1,buf,bl) ;
 
 	    if (i >= 0) {
 
@@ -384,100 +349,101 @@ char		configfname[] ;
 
 	        switch (i) {
 
-	        case CONFIGKEY_ROOT:
-	        case CONFIGKEY_TMPDIR:
-	        case CONFIGKEY_LOG:
-	        case CONFIGKEY_WORKDIR:
-	        case CONFIGKEY_PIDFILE:
-	        case CONFIGKEY_LOCKFILE:
-	        case CONFIGKEY_USER:
-	        case CONFIGKEY_GROUP:
-	        case CONFIGKEY_PORT:
-	        case CONFIGKEY_USERPASS:
-	        case CONFIGKEY_MACHPASS:
-	        case CONFIGKEY_SRVTAB:
-	        case CONFIGKEY_SENDMAIL:
-	        case CONFIGKEY_MINTEXEC:
-	        case CONFIGKEY_ENVFILE:
-	        case CONFIGKEY_PATHFILE:
-	        case CONFIGKEY_LOGSIZE:
-	        case CONFIGKEY_ORGANIZATION:
-	        case CONFIGKEY_TIMEOUT:
-	        case CONFIGKEY_REMOVEMUL:
-	        case CONFIGKEY_ACCTAB:
-	        case CONFIGKEY_PARAMFILE:
-	        case CONFIGKEY_PARAMTAB:
-	        case CONFIGKEY_NRECIPS:
-	        case CONFIGKEY_HELPFILE:
-	        case CONFIGKEY_PINGTAB:
-	        case CONFIGKEY_PINGSTAT:
-	        case CONFIGKEY_INTERVAL:
-	        case CONFIGKEY_STAMPDIR:
-	        case CONFIGKEY_MAXJOBS:
-	        case CONFIGKEY_DIRECTORY:
-	        case CONFIGKEY_INTERRUPT:
-	        case CONFIGKEY_POLLTIME:
-	        case CONFIGKEY_FILETIME:
-	        case CONFIGKEY_PASSFILE:
-	            field_get(&fsb,fterms) ;
+	        case configkey_root:
+	        case configkey_tmpdir:
+	        case configkey_log:
+	        case configkey_workdir:
+	        case configkey_pidfile:
+	        case configkey_lockfile:
+	        case configkey_user:
+	        case configkey_group:
+	        case configkey_port:
+	        case configkey_userpass:
+	        case configkey_machpass:
+	        case configkey_srvtab:
+	        case configkey_sendmail:
+	        case configkey_mintexec:
+	        case configkey_envfile:
+	        case configkey_pathfile:
+	        case configkey_logsize:
+	        case configkey_organization:
+	        case configkey_timeout:
+	        case configkey_removemul:
+	        case configkey_acctab:
+	        case configkey_paramfile:
+	        case configkey_paramtab:
+	        case configkey_nrecips:
+	        case configkey_helpfile:
+	        case configkey_pingtab:
+	        case configkey_pingstat:
+	        case configkey_interval:
+	        case configkey_stampdir:
+	        case configkey_maxjobs:
+	        case configkey_directory:
+	        case configkey_interrupt:
+	        case configkey_polltime:
+	        case configkey_filetime:
+	        case configkey_passfile:
+	        case configkey_eigenfile:
+	            fl = field_get(&fsb,fterms,&fp) ;
 
-	            if (fsb.flen > 0)
-	                bp = mallocstrw(fsb.fp,fsb.flen) ;
+	            if (fl > 0)
+	                bp = mallocstrw(fp,fl) ;
 
 	            else 
 	                bp = mallocstrw(buf,0) ;
 
-#if	CF_DEBUGSFIELD
+#if	CF_DEBUGS && CF_DEBUGSFIELD
 	            debugprintf("configfile_start: bp=%s\n",bp) ;
 #endif
 
 	            switch (i) {
 
-	            case CONFIGKEY_ROOT:
+	            case configkey_root:
 	                if (csp->root != NULL)
-	                    free(csp->root) ;
+	                    uc_free(csp->root) ;
 
 	                csp->root = bp ;
 	                break ;
 
-	            case CONFIGKEY_LOG:
+	            case configkey_log:
 	                if (csp->logfname != NULL)
-	                    free(csp->logfname) ;
+	                    uc_free(csp->logfname) ;
 
 	                csp->logfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_TMPDIR:
+	            case configkey_tmpdir:
 	                if (csp->tmpdir != NULL)
-	                    free(csp->tmpdir) ;
+	                    uc_free(csp->tmpdir) ;
 
 	                csp->tmpdir = bp ;
 	                break ;
 
-	            case CONFIGKEY_WORKDIR:
+	            case configkey_workdir:
 	                if (csp->workdir != NULL)
-	                    free(csp->workdir) ;
+	                    uc_free(csp->workdir) ;
 
 	                csp->workdir = bp ;
 	                break ;
 
-	            case CONFIGKEY_USER:
+	            case configkey_user:
 	                if (csp->user != NULL)
-	                    free(csp->user) ;
+	                    uc_free(csp->user) ;
 
 	                csp->user = bp ;
 	                break ;
 
-	            case CONFIGKEY_GROUP:
+	            case configkey_group:
 	                if (csp->group != NULL)
-	                    free(csp->group) ;
+	                    uc_free(csp->group) ;
 
 	                csp->group = bp ;
 	                break ;
 
-	            case CONFIGKEY_PIDFILE:
+	            case configkey_pidfile:
 	                if (csp->pidfname != NULL)
-	                    free(csp->pidfname) ;
+	                    uc_free(csp->pidfname) ;
 
 	                csp->pidfname = bp ;
 #if	CF_DEBUGS
@@ -486,196 +452,203 @@ char		configfname[] ;
 
 	                break ;
 
-	            case CONFIGKEY_LOCKFILE:
+	            case configkey_lockfile:
 	                if (csp->lockfname != NULL)
-	                    free(csp->lockfname) ;
+	                    uc_free(csp->lockfname) ;
 
 	                csp->lockfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_PORT:
+	            case configkey_port:
 	                if (csp->port != NULL)
-	                    free(csp->port) ;
+	                    uc_free(csp->port) ;
 
 	                csp->port = bp ;
 	                break ;
 
-	            case CONFIGKEY_USERPASS:
+	            case configkey_userpass:
 	                if (csp->userpass != NULL)
-	                    free(csp->userpass) ;
+	                    uc_free(csp->userpass) ;
 
 	                csp->userpass = bp ;
 	                break ;
 
-	            case CONFIGKEY_MACHPASS:
+	            case configkey_machpass:
 	                if (csp->machpass != NULL)
-	                    free(csp->machpass) ;
+	                    uc_free(csp->machpass) ;
 
 	                csp->machpass = bp ;
 	                break ;
 
-	            case CONFIGKEY_SRVTAB:
+	            case configkey_srvtab:
 	                if (csp->srvtab != NULL)
-	                    free(csp->srvtab) ;
+	                    uc_free(csp->srvtab) ;
 
 	                csp->srvtab = bp ;
 	                break ;
 
-	            case CONFIGKEY_SENDMAIL:
-	            case CONFIGKEY_MINTEXEC:
+	            case configkey_sendmail:
+	            case configkey_mintexec:
 	                if (csp->sendmail != NULL)
-	                    free(csp->sendmail) ;
+	                    uc_free(csp->sendmail) ;
 
 	                csp->sendmail = bp ;
 	                break ;
 
-	            case CONFIGKEY_ENVFILE:
+	            case configkey_envfile:
 	                if (csp->envfname != NULL)
-	                    free(csp->envfname) ;
+	                    uc_free(csp->envfname) ;
 
 	                csp->envfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_PATHFILE:
+	            case configkey_pathfile:
 	                if (csp->pathfname != NULL)
-	                    free(csp->pathfname) ;
+	                    uc_free(csp->pathfname) ;
 
 	                csp->pathfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_DEVICEFILE:
+	            case configkey_devicefile:
 	                if (csp->devicefname != NULL)
-	                    free(csp->devicefname) ;
+	                    uc_free(csp->devicefname) ;
 
 	                csp->devicefname = bp ;
 	                break ;
 
-	            case CONFIGKEY_SEEDFILE:
+	            case configkey_seedfile:
 	                if (csp->seedfname != NULL)
-	                    free(csp->seedfname) ;
+	                    uc_free(csp->seedfname) ;
 
 	                csp->seedfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_LOGSIZE:
+	            case configkey_logsize:
 	                if (csp->logsize != NULL)
-	                    free(csp->logsize) ;
+	                    uc_free(csp->logsize) ;
 
 	                csp->logsize = bp ;
 	                break ;
 
-	            case CONFIGKEY_ORGANIZATION:
+	            case configkey_organization:
 	                if (csp->organization != NULL)
-	                    free(csp->organization) ;
+	                    uc_free(csp->organization) ;
 
 	                csp->organization = bp ;
 	                break ;
 
-	            case CONFIGKEY_TIMEOUT:
+	            case configkey_timeout:
 	                if (csp->timeout != NULL)
-	                    free(csp->timeout) ;
+	                    uc_free(csp->timeout) ;
 
 	                csp->timeout = bp ;
 	                break ;
 
-	            case CONFIGKEY_INTERVAL:
+	            case configkey_interval:
 	                if (csp->interval != NULL)
-	                    free(csp->interval) ;
+	                    uc_free(csp->interval) ;
 
 	                csp->interval = bp ;
 	                break ;
 
-	            case CONFIGKEY_REMOVEMUL:
+	            case configkey_removemul:
 	                if (csp->removemul != NULL)
-	                    free(csp->removemul) ;
+	                    uc_free(csp->removemul) ;
 
 	                csp->removemul = bp ;
 	                break ;
 
-	            case CONFIGKEY_ACCTAB:
+	            case configkey_acctab:
 	                if (csp->acctab != NULL)
-	                    free(csp->acctab) ;
+	                    uc_free(csp->acctab) ;
 
 	                csp->acctab = bp ;
 	                break ;
 
-	            case CONFIGKEY_PARAMFILE:
-	            case CONFIGKEY_PARAMTAB:
-	            case CONFIGKEY_PINGTAB:
+	            case configkey_paramfile:
+	            case configkey_paramtab:
+	            case configkey_pingtab:
 	                if (csp->paramfname != NULL)
-	                    free(csp->paramfname) ;
+	                    uc_free(csp->paramfname) ;
 
 	                csp->paramfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_NRECIPS:
+	            case configkey_nrecips:
 	                if (csp->nrecips != NULL)
-	                    free(csp->nrecips) ;
+	                    uc_free(csp->nrecips) ;
 
 	                csp->nrecips = bp ;
 	                break ;
 
-	            case CONFIGKEY_HELPFILE:
+	            case configkey_helpfile:
 	                if (csp->helpfname != NULL)
-	                    free(csp->helpfname) ;
+	                    uc_free(csp->helpfname) ;
 
 	                csp->helpfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_PINGSTAT:
+	            case configkey_pingstat:
 	                if (csp->statfname != NULL)
-	                    free(csp->statfname) ;
+	                    uc_free(csp->statfname) ;
 
 	                csp->statfname = bp ;
 	                break ;
 
-	            case CONFIGKEY_STAMPDIR:
+	            case configkey_stampdir:
 	                if (csp->stampdir != NULL)
-	                    free(csp->stampdir) ;
+	                    uc_free(csp->stampdir) ;
 
 	                csp->stampdir = bp ;
 	                break ;
 
-	            case CONFIGKEY_MAXJOBS:
+	            case configkey_maxjobs:
 	                if (csp->maxjobs != NULL)
-	                    free(csp->maxjobs) ;
+	                    uc_free(csp->maxjobs) ;
 
 	                csp->maxjobs = bp ;
 	                break ;
 
-	            case CONFIGKEY_DIRECTORY:
+	            case configkey_directory:
 	                if (csp->directory != NULL)
-	                    free(csp->directory) ;
+	                    uc_free(csp->directory) ;
 
 	                csp->directory = bp ;
 	                break ;
 
-	            case CONFIGKEY_INTERRUPT:
+	            case configkey_interrupt:
 	                if (csp->interrupt != NULL)
-	                    free(csp->interrupt) ;
+	                    uc_free(csp->interrupt) ;
 
 	                csp->interrupt = bp ;
 	                break ;
 
-	            case CONFIGKEY_POLLTIME:
+	            case configkey_polltime:
 	                if (csp->polltime != NULL)
-	                    free(csp->polltime) ;
+	                    uc_free(csp->polltime) ;
 
 	                csp->polltime = bp ;
 	                break ;
 
-	            case CONFIGKEY_FILETIME:
+	            case configkey_filetime:
 	                if (csp->filetime != NULL)
-	                    free(csp->filetime) ;
+	                    uc_free(csp->filetime) ;
 
 	                csp->filetime = bp ;
 	                break ;
 
-	            case CONFIGKEY_PASSFILE:
+	            case configkey_passfile:
 	                if (csp->passfname != NULL)
-	                    free(csp->passfname) ;
+	                    uc_free(csp->passfname) ;
 
 	                csp->passfname = bp ;
+	                break ;
+
+	            case configkey_eigenfile:
+	                if (csp->eigenfname != NULL)
+	                    uc_free(csp->eigenfname) ;
+
+	                csp->eigenfname = bp ;
 	                break ;
 
 	            } /* end switch (inner) */
@@ -683,22 +656,17 @@ char		configfname[] ;
 	            break ;
 
 /* options */
-	        case CONFIGKEY_OPTION:
-
-#if	CF_DEBUGS
-	            debugprintf("configfile_start: option=>%W<\n",
-	                fsb.fp,fsb.flen) ;
-#endif
-
+	        case configkey_option:
 	            while ((fsb.term != '#') &&
-	                (field_get(&fsb,oterms) >= 0)) {
+	                ((fl = field_get(&fsb,oterms,&fp)) >= 0)) {
 
-	                if (fsb.flen > 0) {
+	                if (fl > 0) {
 
 	                    if (noptions > 0)
-	                        buffer_chr(&options,',') ;
+	                        rs = buffer_chr(&options,',') ;
 
-	                    buffer_strw(&options,fsb.fp,fsb.flen) ;
+			    if (rs >= 0)
+	                        buffer_strw(&options,fp,fl) ;
 
 	                    noptions += 1 ;
 	                }
@@ -708,216 +676,262 @@ char		configfname[] ;
 	            break ;
 
 /* unsets */
-	        case CONFIGKEY_UNSET:
-	            field_get(&fsb,fterms) ;
+	        case configkey_unset:
+	            fl = field_get(&fsb,fterms,&fp) ;
 
-	            if (fsb.flen > 0) {
-
-	                if ((rs = vecstr_add(&csp->unsets,fsb.fp,fsb.flen)) < 0)
-	                    goto badalloc ;
-
-	            }
+	            if (fl > 0)
+	                rs = vecstr_add(&csp->unsets,fp,fl) ;
 
 	            break ;
 
 /* export environment */
-	        case CONFIGKEY_DEFINE:
-	        case CONFIGKEY_EXPORT:
-	            bp = buf2 ;
+	        case configkey_define:
+	        case configkey_export:
+	            {
+	                int	index, f1l, f2l ;
+			int	f_equal, f ;
+
+	                char	*f1p, *f2p ;
+
 
 /* get first part */
 
-#if	CF_DEBUGS
-	            debugprintf("configfile_start: D/E first part\n") ;
-#endif
+	                fl = field_get(&fsb,fterms,&fp) ;
 
-	            field_get(&fsb,fterms) ;
+	                if (fl <= 0) {
+	                    rs = SR_INVALID ;
+	                    csp->badline = line ;
+	                    break ;
+	                }
 
-#if	CF_DEBUGS
-	            debugprintf("configfile_start: D/E first part flen=%d\n",
-	                fsb.flen) ;
-#endif
+	                if (fsb.term == '#')
+	                    break ;
 
-	            if (fsb.flen <= 0) {
-
-	                rs = SR_INVALID ;
-	                csp->badline = line ;
-	                goto badconfig  ;
-	            }
-
-	            len1 = fsb.flen ;
-	            strncpy(bp,fsb.fp,fsb.flen) ;
-
-	            bp += fsb.flen ;
+			f_equal = (fsb.term == '=') ;
+	                len1 = fl ;
+	                f1p = (char *) fp ;
+	                f1l = fl ;
 
 /* get second part */
 
-	            field_get(&fsb,fterms) ;
+	                fl = field_get(&fsb,fterms,&fp) ;
 
-	            if (fsb.flen >= 0) {
+	                f2l = 0 ;
+	                if (fl >= 0) {
+	                    f2p = (char *) fp ;
+	                    f2l = fl ;
+	                } /* end if */
 
-#if	CF_DEBUGS
-	                debugprintf("configfile_start: D/E field >%W<\n",
-	                    fsb.fp,fsb.flen) ;
-#endif
+#if	CF_EXPORTEQUAL
+	                f1p[f1l] = '\0' ;
+	                if (f2l > 0) {
 
-	                *bp++ = '=' ;
-	                strncpy(bp,fsb.fp,fsb.flen) ;
+	                    f2p[f2l] = '\0' ;
+	                    rs1 = sncpy3(buf2,BUFLEN,f1p,"=",f2p) ;
 
-	                bp += fsb.flen ;
+	                } else
+	                    rs1 = sncpy2(buf2,BUFLEN,f1p,"=") ;
 
-	            }
+#else /* CF_EXPORTEQUAL */
 
-	            *bp++ = '\0' ;
+	                f1p[f1l] = '\0' ;
+	                if (f2l > 0) {
+
+	                    f2p[f2l] = '\0' ;
+	                    rs1 = sncpy3(buf2,BUFLEN,f1p,"=",f2p) ;
+
+			} else if (f_equal) {
+
+	                    rs1 = sncpy2(buf2,BUFLEN,f1p,"=") ;
+
+	                } else
+	                    rs1 = sncpy1(buf2,BUFLEN,f1p) ;
+
+#endif /* CF_EXPORTEQUAL */
 
 /* store it away */
 
-	            if (i == CONFIGKEY_EXPORT)
-	                vsp = &csp->exports ;
+	                if (i == configkey_export)
+	                    vsp = &csp->exports ;
 
-	            else
-	                vsp = &csp->defines ;
+	                else
+	                    vsp = &csp->defines ;
 
 #if	CF_DEBUGS
-	            debugprintf("configfile_start: about to add >%s<\n",buf2) ;
+	                debugprintf("configfile_start: about to add >%s<\n",buf2) ;
 #endif
 
-	            if ((rs = vecstr_add(vsp,buf2,-1)) < 0)
-	                goto badalloc ;
+			f = (rs1 > 0) ;
+
+#if	CF_EXPORTEQUAL
+			f = f && (strchr(buf2,'=') != NULL) ;
+#endif
+
+			if (f) {
+
+	                    rs = vecstr_add(vsp,buf2,rs1) ;
+
+	                    index = rs ;
+	                    if (rs < 0)
+	                        break ;
 
 #if	CF_DEBUGS
-	            debugprintf("configfile_start: added, rs=%d\n",
-	                rs) ;
+	                    debugprintf("configfile_start: added rs=%d\n", rs) ;
 #endif
 
 /* if this is an export variable, we do extra stuff */
 
-	            if (i == CONFIGKEY_EXPORT) {
-
-	                int	index ;
-
-
-	                index = rs ;
+	                    if (f_equal && (i == configkey_export)) {
 
 #if	CF_DEBUGS
-	                debugprintf("configfile_start: export=>%s< i=%d\n", 
-	                    buf2,index) ;
+	                        debugprintf("configfile_start: export=>%s< i=%d\n", 
+	                            buf2,index) ;
 #endif
 
 /* check for our favorite environment variables */
 
-	                if (strncmp(buf2,"TMPDIR",len1) == 0) {
+	                        if (strncmp(buf2,"TMPDIR",len1) == 0) {
 
 #if	CF_DEBUGS
-	                    debugprintf("configfile_start: TMPDIR=>%s< i=%d\n", 
-	                        buf2,index) ;
+	                            debugprintf("configfile_start: TMPDIR=>%s< "
+					"i=%d\n",
+	                                buf2,index) ;
 #endif
 
-	                    if (csp->tmpdir != NULL)
-	                        free(csp->tmpdir) ;
+	                            if (csp->tmpdir != NULL)
+	                                uc_free(csp->tmpdir) ;
 
-	                    csp->tmpdir = mallocstr((csp->exports).va[index]) ;
+	                            csp->tmpdir = 
+	                                mallocstr((csp->exports).va[index]) ;
 
-	                } /* end if (handling TMPDIR specially) */
+	                        } /* end if (handling TMPDIR specially) */
 
-	            } /* end if (got an export) */
+	                    } /* end if (got an export) */
+
+	                } /* end if */
+
+	            } /* end block */
 
 	            break ;
 
-	        case CONFIGKEY_LOGLEN:
-	            field_get(&fsb,fterms) ;
+	        case configkey_loglen:
+	            fl = field_get(&fsb,fterms,&fp) ;
 
-	            if ((fsb.flen <= 0) ||
-	                (cfdecmfi(fsb.fp,fsb.flen,&csp->loglen) < 0)) {
+	            if ((fl <= 0) ||
+	                (cfdecmfi(fp,fl,&csp->loglen) < 0)) {
 
 	                csp->badline = line ;
 	                rs = SR_INVALID ;
-	                goto badconfig ;
+	                break ;
+	            }
+
+	            break ;
+
+	        case configkey_minwordlen:
+	            fl = field_get(&fsb,fterms,&fp) ;
+
+	            if ((fl <= 0) ||
+	                (cfdecmfi(fp,fl,&csp->minwordlen) < 0)) {
+
+	                csp->badline = line ;
+	                rs = SR_INVALID ;
+	                break ;
+	            }
+
+	            break ;
+
+	        case configkey_maxwordlen:
+	            fl = field_get(&fsb,fterms,&fp) ;
+
+	            if ((fl <= 0) ||
+	                (cfdecmfi(fp,fl,&csp->maxwordlen) < 0)) {
+
+	                csp->badline = line ;
+	                rs = SR_INVALID ;
+	                break ;
+	            }
+
+	            break ;
+
+	        case configkey_keys:
+	            fl = field_get(&fsb,fterms,&fp) ;
+
+	            if ((fl <= 0) ||
+	                (cfdecmfi(fp,fl,&csp->keys) < 0)) {
+
+	                csp->badline = line ;
+	                rs = SR_INVALID ;
+	                break ;
 	            }
 
 	            break ;
 
 	        default:
 	            rs = SR_NOTSUP ;
-	            goto badprogram ;
+	            break ;
 
 	        } /* end switch */
 
 	    } /* end if (valid key) */
 
+	    field_finish(&fsb) ;
+
+	    } /* end if */
+
+	    if (rs < 0)
+	        break ;
+
 	} /* end while (reading lines) */
 
-#if	CF_DEBUGS
-	debugprintf("configfile_start: done reading lines\n") ;
-#endif
-
 	bclose(cfp) ;
-
-	srs = len ;
-	if (len < 0) {
-
-	    rs = len ;
-	    goto badread ;
-	}
-
 
 /* load up the options if we got any */
 
-	if (noptions > 0) {
+	if ((rs >= 0) && (noptions > 0)) {
 
-	    len = buffer_get(&options,&cp) ;
+	    cl = buffer_get(&options,&cp) ;
 
 #if	CF_DEBUGS
-	    debugprintf("configfile_start: final options=>%W<\n",cp,len) ;
-#endif
+	debugprintf("procfilepaths: final options\n") ;
+	vardump(cp,cl) ;
+#endif /* CF_DEBUGS */
 
-	    if (len > 0)
-	        csp->options = mallocstrw(cp,len) ;
+	    if (cl > 0)
+	        csp->options = mallocstrw(cp,cl) ;
 
 	} /* end if (options) */
 
-
 /* done with configuration file processing */
 
+	if (rs >= 0)
+	    csp->magic = CONFIGFILE_MAGIC ;
+
+ret1:
 	buffer_finish(&options) ;
 
-#if	CF_DEBUGS
-	debugprintf("configfile_start: exiting OK\n") ;
-#endif
+	if (rs < 0)
+		goto bad3 ;
 
-	csp->magic = CONFIGFILE_MAGIC ;
-	return SR_OK ;
-
-/* handle bad things */
-badalloc:
-badprogram:
-badread:
-badconfig:
-	csp->badline = line ;
-	vecstr_finish(&csp->exports) ;
-
-badexports:
-	vecstr_finish(&csp->unsets) ;
-
-badunsets:
-	vecstr_finish(&csp->defines) ;
-
-baddefines:
-	bclose(cfp) ;
-
-	buffer_finish(&options) ;
-
-badopen:
+ret0:
 
 #if	CF_DEBUGS
-	debugprintf("configfile_start: exiting bad rs=%d\n",rs) ;
+	debugprintf("configfile_start: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
 
-badkey:
-	rs = SR_INVALID ;
-	goto badprogram ;
+/* handle bad things */
+bad3:
+	vecstr_finish(&csp->exports) ;
+
+bad2:
+	vecstr_finish(&csp->unsets) ;
+
+bad1:
+	vecstr_finish(&csp->defines) ;
+
+bad0:
+	goto ret0 ;
 }
 /* end subroutine (configfile_start) */
 
@@ -934,11 +948,11 @@ CONFIGFILE	*csp ;
 	if (csp->magic != CONFIGFILE_MAGIC)
 	    return SR_NOTOPEN ;
 
-	csp->magic = 0 ;
-
 /* free up the complex data types */
 
 	vecstr_finish(&csp->defines) ;
+
+	vecstr_finish(&csp->unsets) ;
 
 	vecstr_finish(&csp->exports) ;
 
@@ -1014,30 +1028,53 @@ CONFIGFILE	*csp ;
 
 	checkfree(&csp->passfname) ;
 
+	checkfree(&csp->eigenfname) ;
+
+	csp->magic = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (configfile_finish) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-/* free up the resources occupied by a CONFIG_STRUCTURE */
-static void checkfree(vp)
-char	**vp ;
-{
-
-
+static void checkfree(char **vp) noex {
 	if (*vp != NULL) {
-
-	    free(*vp) ;
-
+	    uc_free(*vp) ;
 	    *vp = NULL ;
 	}
 }
 /* end subroutine (checkfree) */
+
+#if	CF_DEBUGS
+
+static int vardump(pathbuf,pbi)
+cchar	pathbuf[] ;
+int		pbi ;
+	{
+	int	rs = SR_OK ;
+		int	mlen, rlen = pbi ;
+	int	wlen = 0 ;
+		cchar	*pp = pathbuf ;
+
+		while (rlen > 0) {
+			mlen = MIN(rlen,40) ;
+			rs = debugprintf("configfile: var| %t\n",
+				pp,mlen) ;
+
+			wlen += rs ;
+			if (rs < 0)
+				break ;
+
+			pp += mlen ;
+			rlen -= mlen ;
+		}
+
+	return (rs >= 0) ? wlen : rs ;
+	}
+/* end subroutine (vardump) */
+
+#endif /* CF_DEBUGS */
 
 
 

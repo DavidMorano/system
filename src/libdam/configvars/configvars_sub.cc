@@ -1,10 +1,9 @@
 /* configvars_sub SUPPORT */
 /* lang=C++20 */
 
-/* Configuration-Variables */
+/* Configuration-Variables - Subsidiary-Functions */
 /* version %I% last-modified %G% */
 
-#define	CF_ALLOCFILENAME	1
 
 /* revision history:
 
@@ -43,23 +42,10 @@
 #include	<matostr.h>
 #include	<localmisc.h>
 
-#include	"configvars.h"
+#include	"configvarsobj.h"
 
 
 /* local defines */
-#define	CONFxIGVARS_WSETS	0
-#define	CONFxIGVARS_WVARS	1
-
-#define	CV		configvars
-#define	CV_VAR		configvars_var
-#define	CV_FILE		configvars_file
-#define	CV_CUR		configvars_cur
-#define	CV_ERR		configvars_err
-
-#undef	BUFLEN
-#define	BUFLEN		(LINEBUFLEN * 2)
-
-#define	KEYBUFLEN	20
 
 #define	ISCONT(b,bl)	\
 	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
@@ -131,10 +117,9 @@ namespace configvars_obj {
 	int		idx = 0 ;
 	if (cvp && kp) {
 	    CV_VAR	v{} ;
-	    cint	vsz = sizeof(CV_VAR) ;
 	    if ((rs = var_start(&v,fi,kp,kl,vp,vl)) >= 0) {
 	        vecobj		*slp = (w) ? cvp->setp : cvp->varp ;
-	        if ((rs = vecobj_add(slp,&v,vsz)) >= 0) {
+	        if ((rs = vecobj_add(slp,&v)) >= 0) {
 		    idx = rs ;
 		}
 	        if (rs < 0) {
@@ -161,7 +146,7 @@ namespace configvars_obj {
 		void	*vp{} ;
 	        for (int i = 0 ; vecobj_get(slp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
-	    	        CV_VAR	*cep = (CF_VAR *) vp ;
+	    	        CV_VAR	*cep = (CV_VAR *) vp ;
 	                rs1 = var_finish(cep) ;
 		        if (rs >= 0) rs = rs1 ;
 	 	    }
@@ -183,7 +168,7 @@ namespace configvars_obj {
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(slp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
-	    	    CV_VAR	*cfp = (CF_VAR *) vp ;
+	    	    CV_FILE	*cfp = (CV_FILE *) vp ;
 	            rs1 = file_finish(cfp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }

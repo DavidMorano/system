@@ -43,12 +43,10 @@
 #include	<matostr.h>
 #include	<localmisc.h>
 
-#include	"configvars.h"
+#include	"configvarsobj.h"
 
 
 /* local defines */
-#define	CONFxIGVARS_WSETS	0
-#define	CONFxIGVARS_WVARS	1
 
 #undef	BUFLEN
 #define	BUFLEN		(LINEBUFLEN * 2)
@@ -92,33 +90,33 @@ static inline int configvars_ctor(configvars *op,Args ... args) noex {
 	    op->magic = 0 ;
 	    op->checktime = time(nullptr) ;
 	    if ((op->fesp = new(nothrow) vecobj) != np) {
-	        if ((op->defp = new(nothrow) vecobj) != np) {
-	            if ((op->unvp = new(nothrow) vecobj) != np) {
-	                if ((op->expp = new(nothrow) vecobj) != np) {
-	                    if ((op->setp = new(nothrow) vecobj) != np) {
-	                        if ((op->varp = new(nothrow) vecobj) != np) {
+		if ((op->varp = new(nothrow) vecobj) != np) {
+	            if ((op->defp = new(nothrow) vecobj) != np) {
+	                if ((op->setp = new(nothrow) vecobj) != np) {
+	                    if ((op->expp = new(nothrow) vecobj) != np) {
+	            		if ((op->unvp = new(nothrow) vecobj) != np) {
 				    rs = SR_OK ;
-	                        } /* end if (new-var) */
-				if (rs < 0) {
-				    delete op->setp ;
-				    op->setp = np ;
-				}
-	                    } /* end if (new-set) */
+	                        } /* end if (new-unv) */
+			        if (rs < 0) {
+				    delete op->expp ;
+				    op->expp = np ;
+			        }
+	                    } /* end if (new-exp) */
 			    if (rs < 0) {
-				delete op->expp ;
-				op->expp = np ;
+				delete op->setp ;
+				op->setp = np ;
 			    }
-	                } /* end if (new-exp) */
-			if (rs < 0) {
-			    delete op->unvp ;
-			    op->unvp = np ;
-			}
-	            } /* end if (new-unv) */
+	                } /* end if (new-set) */
+		        if (rs < 0) {
+			    delete op->defp ;
+			    op->defp = np ;
+		        }
+	            } /* end if (new-def) */
 		    if (rs < 0) {
-			delete op->defp ;
-			op->defp = np ;
+			delete op->varp ;
+			op->varp = np ;
 		    }
-	        } /* end if (new-def) */
+	        } /* end if (new-var) */
 		if (rs < 0) {
 		    delete op->fesp ;
 		    op->fesp = np ;
@@ -132,25 +130,25 @@ static inline int configvars_ctor(configvars *op,Args ... args) noex {
 static int configvars_dtor(configvars *op) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	if (op->varp) {
-	    delete op->varp ;
-	    op->varp = np ;
-	}
-	if (op->setp) {
-	    delete op->setp ;
-	    op->setp = np ;
+	if (op->unvp) {
+	    delete op->unvp ;
+	    op->unvp = np ;
 	}
 	if (op->expp) {
 	    delete op->expp ;
 	    op->expp = np ;
 	}
-	if (op->unvp) {
-	    delete op->unvp ;
-	    op->unvp = np ;
+	if (op->setp) {
+	    delete op->setp ;
+	    op->setp = np ;
 	}
 	if (op->defp) {
 	    delete op->defp ;
 	    op->defp = np ;
+	}
+	if (op->varp) {
+	    delete op->varp ;
+	    op->varp = np ;
 	}
 	if (op->fesp) {
 	    delete op->fesp ;
@@ -204,17 +202,17 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 	    vip = cvp->fesp ;
 	    vsz = sizeof(CV_FILE) ;
 	    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-	        vip = cvp->defp ;
+	  	vsz = sizeof(CV_VAR) ;
+	        vip = cvp->varp ;
 	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-	            vip = cvp->expp ;
+	      	    vip = cvp->defp ;
 	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-	                vip = cvp->unvp ;
+	                vip = cvp->setp ;
 		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-	    		    vsz = sizeof(CV_VAR) ;
+	            	    vip = cvp->expp ;
 			    vo = VECOBJ_OSORTED ;
-	                    vip = cvp->varp ;
 			    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-	                        vip = cvp->setp ;
+	                        vip = cvp->unvp ;
 				if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 				    cvp->magic = CONFIGVARS_MAGIC ;
 				    if (cfn && cfn[0]) {
@@ -224,25 +222,25 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 					}
 				    }
 				    if (rs < 0) {
-					vecobj_finish(cvp->setp) ;
+				        vecobj_finish(cvp->unvp) ;
 				    }
-				} /* end if (sets) */
+				} /* end if (unv) */
 				if (rs < 0) {
-				    vecobj_finish(cvp->varp) ;
+			            vecobj_finish(cvp->expp) ;
 				}
-			    } /* end if (vars) */
+			    } /* end if (exp) */
 			    if (rs < 0) {
-				vecobj_finish(cvp->unvp) ;
+				vecobj_finish(cvp->setp) ;
 			    }
-			} /* end if (unsets) */
+			} /* end if (set) */
 			if (rs < 0) {
-			    vecobj_finish(cvp->expp) ;
+			    vecobj_finish(cvp->defp) ;
 			}
-		    } /* end if (exports) */
+		    } /* end if (def) */
 		    if (rs < 0) {
-			vecobj_finish(cvp->defp) ;
+			vecobj_finish(cvp->varp) ;
 		    }
-		} /* end if (defines) */
+		} /* end if (var) */
 		if (rs < 0) {
 		    vecobj_finish(cvp->fesp) ;
 		}
@@ -286,7 +284,6 @@ int configvars_addfile(CV *cvp,cchar *cfname,vecobj *eep) noex {
 			if (vr < isz) {
 			    CV_FILE	fe ;
 			    if ((rs = file_start(&fe,cfname)) >= 0) {
-				[[maybe_unused]] cint	fsz = sizeof(CV_FILE) ;
 				vecobj	*vip = cvp->fesp ;
 				if ((rs = vecobj_add(vip,&fe)) >= 0) {
 				    cint	fi = rs ;

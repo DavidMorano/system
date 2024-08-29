@@ -19,24 +19,20 @@
 
 /*******************************************************************************
 
-        This is the old configuration file reader object. It is cheap, it is
-        ill-conceived, it is a mess, it works well enough to be used for cheap
-        code. I didn't want to use this junk for the Levo machine simulator but
-        time pressure decided for us !
+	This is the old configuration file reader object.  It is
+	cheap, it is ill-conceived, it is a mess, it works well
+	enough to be used for cheap code.  I did not want to use
+	this junk for the Levo machine simulator but time pressure
+	decided for us!
 
-        Although this whole configuration scheme is messy, it gives us enough of
-        what we need to get some configuration information into the Levo machine
-        simulator and to get a parameter file name. This is good enough for now.
-
+	Although this whole configuration scheme is messy, it gives
+	us enough of what we need to get some configuration information
+	into the Levo machine simulator and to get a parameter file
+	name.  This is good enough for now.
 
 *******************************************************************************/
 
-
-#define	CONFIGFILE_MASTER	1
-
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -44,7 +40,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -58,6 +53,8 @@
 
 
 /* local defines */
+
+#define	CONFIGFILE_MAGIC	0x04311633
 
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX
@@ -73,14 +70,14 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
 
-extern char	*strncpylc(char *,const char *,int) ;
+extern char	*strncpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -94,7 +91,7 @@ extern char	*strncpylc(char *,const char *,int) ;
 static void	checkfree() ;
 
 #if	CF_DEBUGS
-static int vardump(const char *,int) ;
+static int vardump(cchar *,int) ;
 #endif
 
 
@@ -124,7 +121,7 @@ static const unsigned char 	oterms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*configkeys[] = {
+static cchar	*configkeys[] = {
 	"define",
 	"export",
 	"tmpdir",
@@ -226,31 +223,35 @@ enum configkeys {
 
 int configfile_start(csp,configfname)
 CONFIGFILE	*csp ;
-const char	configfname[] ;
+cchar	configfname[] ;
 {
-	BUFFER		options ;
-	FIELD		fsb ;
-	bfile		cfile, *cfp = &cfile ;
-	vecstr		*vsp ;
-	const int	llen = LINEBUFLEN ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		i ;
-	int		c, len1, len ;
-	int		bl, cl ;
-	int		fl ;
-	int		line = 0 ;
-	int		noptions = 0 ;
+	BUFFER	options ;
 
-	const char	*fp ;
-	const char	*cp ;
-	char		lbuf[LINEBUFLEN + 1] ;
-	char		buf[BUFLEN + 1] ;
-	char		buf2[BUFLEN + 1] ;
-	char		*bp ;
+	FIELD	fsb ;
+
+	bfile	cfile, *cfp = &cfile ;
+
+	vecstr	*vsp ;
+
+	int	rs = SR_OK ;
+	int	rs1 ;
+	int	i ;
+	int	c, len1, len ;
+	int	bl, cl ;
+	int	fl ;
+	int	line = 0 ;
+	int	noptions = 0 ;
+
+	cchar	*fp ;
+
+	char	linebuf[LINEBUFLEN + 1] ;
+	char	buf[BUFLEN + 1] ;
+	char	buf2[BUFLEN + 1] ;
+	char	*bp, *cp ;
+
 
 #if	CF_DEBUGS
-	debugprintf("configfile_start: ent filename=%s\n",configfname) ;
+	debugprintf("configfile_start: entered filename=%s\n",configfname) ;
 #endif
 
 	if (csp == NULL)
@@ -308,13 +309,13 @@ const char	configfname[] ;
 	debugprintf("configfile_start: reading lines\n") ;
 #endif
 
-	while ((rs = breadln(cfp,lbuf,llen)) > 0) {
-	    len = rs ;
+	while ((rs = breadln(cfp,linebuf,LINEBUFLEN)) > 0) {
 
+	    len = rs ;
 	    line += 1 ;
 	    if (len == 1) continue ;	/* blank line */
 
-	    if (lbuf[--len] != '\n') {
+	    if (linebuf[--len] != '\n') {
 
 #ifdef	COMMENT
 	        f_trunc = TRUE ;
@@ -325,10 +326,10 @@ const char	configfname[] ;
 	        continue ;
 	    }
 
-	    if ((len == 0) || (lbuf[0] == '#'))
+	    if ((len == 0) || (linebuf[0] == '#'))
 	        continue ;
 
-	    if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
+	    if ((rs = field_start(&fsb,linebuf,len)) >= 0) {
 
 	    	fl = field_get(&fsb,fterms,&fp) ;
 
@@ -1035,39 +1036,26 @@ CONFIGFILE	*csp ;
 /* end subroutine (configfile_finish) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-/* free up the resources occupied by a CONFIG_STRUCTURE */
-static void checkfree(vp)
-char	**vp ;
-{
-
-
+static void checkfree(char **vp) noex {
 	if (*vp != NULL) {
-
 	    uc_free(*vp) ;
-
 	    *vp = NULL ;
 	}
 }
 /* end subroutine (checkfree) */
 
-
 #if	CF_DEBUGS
 
 static int vardump(pathbuf,pbi)
-const char	pathbuf[] ;
+cchar	pathbuf[] ;
 int		pbi ;
 	{
 	int	rs = SR_OK ;
 		int	mlen, rlen = pbi ;
 	int	wlen = 0 ;
-
-		const char	*pp = pathbuf ;
-
+		cchar	*pp = pathbuf ;
 
 		while (rlen > 0) {
 			mlen = MIN(rlen,40) ;

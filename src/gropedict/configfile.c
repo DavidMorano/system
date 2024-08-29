@@ -11,43 +11,35 @@
 /* revision history:
 
 	= 2000-01-21, David A­D­ Morano
-
 	This subroutine was enhanced for use by LevoSim.
-
 
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
-	This is the old configuration file reader object.  It is cheap,
-	it is ill-conceived, it is a mess, it works well enough to be
-	used for cheap code.  I didn't want to use this junk for the
-	Levo machine simulator but time pressure decided for us !
+	This is the old configuration file reader object.  It is
+	cheap, it is ill-conceived, it is a mess, it works well
+	enough to be used for cheap code.  I did not want to use
+	this junk for the Levo machine simulator but time pressure
+	decided for us!
 
 	Although this whole configuration scheme is messy, it gives
 	us enough of what we need to get some configuration information
 	into the Levo machine simulator and to get a parameter file
 	name.  This is good enough for now.
 
-
-******************************************************************************/
-
-
-#define	CONFIGFILE_MASTER	1
-
+*******************************************************************************/
 
 #include	<envstandards.h>
-
 #include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<sys/param.h>
+#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -78,14 +70,14 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
 
-extern char	*strncpylc(char *,const char *,int) ;
+extern char	*strncpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -99,7 +91,7 @@ extern char	*strncpylc(char *,const char *,int) ;
 static void	checkfree() ;
 
 #if	CF_DEBUGS
-static int vardump(const char *,int) ;
+static int vardump(cchar *,int) ;
 #endif
 
 
@@ -129,7 +121,7 @@ static const unsigned char 	oterms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*configkeys[] = {
+static cchar	*configkeys[] = {
 	"define",
 	"export",
 	"tmpdir",
@@ -231,7 +223,7 @@ enum configkeys {
 
 int configfile_start(csp,configfname)
 CONFIGFILE	*csp ;
-const char	configfname[] ;
+cchar	configfname[] ;
 {
 	BUFFER	options ;
 
@@ -250,13 +242,12 @@ const char	configfname[] ;
 	int	line = 0 ;
 	int	noptions = 0 ;
 
-	const char	*fp ;
-	const char	*cp ;
+	cchar	*fp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	buf[BUFLEN + 1] ;
 	char	buf2[BUFLEN + 1] ;
-	char	*bp ;
+	char	*bp, *cp ;
 
 
 #if	CF_DEBUGS
@@ -396,10 +387,10 @@ const char	configfname[] ;
 	        case configkey_eigenfile:
 	            fl = field_get(&fsb,fterms,&fp) ;
 
-	            if (fl > 0) {
+	            if (fl > 0)
 	                bp = mallocstrw(fp,fl) ;
 
-	            } else 
+	            else 
 	                bp = mallocstrw(buf,0) ;
 
 #if	CF_DEBUGS && CF_DEBUGSFIELD
@@ -760,14 +751,14 @@ const char	configfname[] ;
 
 /* store it away */
 
-	                if (i == configkey_export) {
+	                if (i == configkey_export)
 	                    vsp = &csp->exports ;
-	                } else
+
+	                else
 	                    vsp = &csp->defines ;
 
 #if	CF_DEBUGS
-	                debugprintf("configfile_start: about to add >%s<\n",
-			buf2) ;
+	                debugprintf("configfile_start: about to add >%s<\n",buf2) ;
 #endif
 
 			f = (rs1 > 0) ;
@@ -785,8 +776,7 @@ const char	configfname[] ;
 	                        break ;
 
 #if	CF_DEBUGS
-	                    debugprintf("configfile_start: added rs=%d\n", 
-				rs) ;
+	                    debugprintf("configfile_start: added rs=%d\n", rs) ;
 #endif
 
 /* if this is an export variable, we do extra stuff */
@@ -794,8 +784,7 @@ const char	configfname[] ;
 	                    if (f_equal && (i == configkey_export)) {
 
 #if	CF_DEBUGS
-	                        debugprintf("configfile_start: "
-				"export=>%s< i=%d\n", 
+	                        debugprintf("configfile_start: export=>%s< i=%d\n", 
 	                            buf2,index) ;
 #endif
 
@@ -886,6 +875,7 @@ const char	configfname[] ;
 	    } /* end if (valid key) */
 
 	    field_finish(&fsb) ;
+
 	    } /* end if */
 
 	    if (rs < 0)
@@ -1046,39 +1036,26 @@ CONFIGFILE	*csp ;
 /* end subroutine (configfile_finish) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-/* free up the resources occupied by a CONFIG_STRUCTURE */
-static void checkfree(vp)
-char	**vp ;
-{
-
-
+static void checkfree(char **vp) noex {
 	if (*vp != NULL) {
-
 	    uc_free(*vp) ;
-
 	    *vp = NULL ;
 	}
 }
 /* end subroutine (checkfree) */
 
-
 #if	CF_DEBUGS
 
 static int vardump(pathbuf,pbi)
-const char	pathbuf[] ;
+cchar	pathbuf[] ;
 int		pbi ;
 	{
 	int	rs = SR_OK ;
 		int	mlen, rlen = pbi ;
 	int	wlen = 0 ;
-
-		const char	*pp = pathbuf ;
-
+		cchar	*pp = pathbuf ;
 
 		while (rlen > 0) {
 			mlen = MIN(rlen,40) ;

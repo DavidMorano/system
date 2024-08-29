@@ -9,16 +9,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
 
 
-#define	CONFIGFILE_MAGIC	0x04311633
-#define	CONFIGFILE		struct configfile
+#define	CONFIGFILE		struct configfile_head
 
 
-struct configfile {
-	uint		magic ;		/* magic number */
+struct configfile_head {
 	vecstr	defines ;	/* defined variables */
 	vecstr	unsets ;	/* unset ENV variables */
 	vecstr	exports ;	/* environment variables */
@@ -58,6 +59,7 @@ struct configfile {
 	char	*interval ;		/* poll interval */
 	char	*stampdir ;		/* timestamp directory */
 	char	*maxjobs ;		/* maximum jobs */
+	uint		magic ;		/* magic number */
 	int	badline ;	/* line number of bad thing */
 	int	srs ;		/* secondary return status */
 	int	loglen ;	/* log file length */
@@ -66,21 +68,13 @@ struct configfile {
 	int	keys ;
 } ;
 
+EXTERNC_begin
 
-#ifndef	CONFIGFILE_MASTER
+extern int configfile_start(CONFIGFILE *,cchar *) noex ;
+extern int configfile_finish(CONFIGFILE *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int configfile_start(CONFIGFILE *,const char *) ;
-extern int configfile_finish(CONFIGFILE *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CONFIGFILE_MASTER */
 
 #endif /* CONFIGFILE_INCLUDE */
 

@@ -1,7 +1,122 @@
+/* configvars_parse SUPPORT */
+/* lang=C++20 */
+
+/* Configuration-Variables - Parse */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-06-01, David A­D­ Morano
+	This subroutine was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	This is an object that reads configuration files and organizes
+	the content into the object for structured access.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>
+#include	<sys/stat.h>
+#include	<unistd.h>
+#include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<usystem.h>
+#include	<usupport.h>
+#include	<mallocstuff.h>
+#include	<bfile.h>
+#include	<strwcpy.h>
+#include	<char.h>
+#include	<field.h>
+#include	<matostr.h>
+#include	<localmisc.h>
+
+#include	"configvarsobj.h"
+
+
+/* local defines */
+
+#undef	BUFLEN
+#define	BUFLEN		(LINEBUFLEN * 2)
+
+#define	KEYBUFLEN	20
+
+#define	ISCONT(b,bl)	\
+	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine (template) */
+using std::max ;			/* subroutine (template) */
+using std::nothrow ;			/* constant */
+
+using namespace		configvars_obj ;
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+enum configkeys {
+	configkey_define,
+	configkey_export,
+	configkey_set,
+	configkey_unset,
+	configkey_overlast
+} ;
+
+constexpr cpcchar	configkeys[] = {
+	"define",
+	"export",
+	"set",
+	"unset",
+	nullptr
+} ;
+
+enum vartypes {
+	vartype_set,
+	vartype_var,
+	vartype_export,
+	vartype_define,
+	vartype_unset,
+	vartype_overlast
+} ; /* end enum (vartypes) */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 namespace configvars_obj {
 
-    int configvars_parse(CV *cvp,int fi,vecitem *eep) noex {
+    int configvars_parse(CV *cvp,int fi,vecobj *eep) noex {
 	USTAT		sb ;
 	CV_FILE	*fep ;
 	CV_FILE	ve ;
@@ -21,7 +136,7 @@ namespace configvars_obj {
 
 /* get the pointer to our own file structure */
 
-	if ((rs = vecitem_get(cvp->fesp,fi,&fep)) < 0)
+	if ((rs = vecobj_get(cvp->fesp,fi,&fep)) < 0)
 	    return rs ;
 
 	if (fep == nullptr)
@@ -49,21 +164,13 @@ namespace configvars_obj {
 	    if (len == 1) continue ;	/* blank line */
 
 	    if (lbuf[len - 1] != '\n') {
-
-#ifdef	COMMENT
-	        f_trunc = TRUE ;
-#endif
 	        while ((c = bgetc(fp)) >= 0) {
-
-	            if (c == '\n') 
-			break ;
-
+	            if (c == '\n') break ;
 		}
-
 	        continue ;
-
-	    } else
+	    } else {
 		len -= 1 ;
+	    }
 
 /* pre-process this a little bit */
 
@@ -137,9 +244,9 @@ namespace configvars_obj {
 	            field_get(&fsb,fterms) ;
 	            if (fsb.flen <= 0) {
 	                rs = SR_INVALID ;
-	                if (eep != nullptr)
+	                if (eep != nullptr) {
 	                    badline(eep,fep->filename,line) ;
-
+			}
 	                break ;
 	            }
 

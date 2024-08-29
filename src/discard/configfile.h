@@ -1,24 +1,25 @@
 /* configfile */
 
 
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+
 #ifndef	CONFIGFILE_INCLUDE
 #define	CONFIGFILE_INCLUDE
 
 
-
-/* object defines */
-
-#define	CONFIGFILE		struct configfile
-
-
-
-
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
 
 
+#define	CONFIGFILE		struct configfile_head
 
-struct configfile {
-	unsigned long	magic ;		/* magic number */
+
+struct configfile_head {
 	vecstr	defines ;	/* defined variables */
 	vecstr	unsets ;	/* unset ENV variables */
 	vecstr	exports ;	/* environment variables */
@@ -53,26 +54,28 @@ struct configfile {
 	char	*helpfname ;
 	char	*statfname ;		/* status file name */
 	char	*passfname ;		/* pass-FD file name */
+	char	*eigenfname ;
 	char	*options ;
 	char	*interval ;		/* poll interval */
 	char	*stampdir ;		/* timestamp directory */
 	char	*maxjobs ;		/* maximum jobs */
+	uint		magic ;		/* magic number */
 	int	badline ;	/* line number of bad thing */
 	int	srs ;		/* secondary return status */
 	int	loglen ;	/* log file length */
+	int	minwordlen ;
+	int	maxwordlen ;
+	int	keys ;
 } ;
 
+EXTERNC_begin
 
+extern int configfile_start(CONFIGFILE *,cchar *) noex ;
+extern int configfile_finish(CONFIGFILE *) noex ;
 
-#ifndef	CONFIGFILE_MASTER
-
-extern int configfile_start(CONFIGFILE *,char *) ;
-extern int configfile_finish(CONFIGFILE *) ;
-
-#endif /* CONFIGFILE_MASTER */
+EXTERNC_end
 
 
 #endif /* CONFIGFILE_INCLUDE */
-
 
 

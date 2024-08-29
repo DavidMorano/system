@@ -4,7 +4,6 @@
 /* Configuration-Variables */
 /* version %I% last-modified %G% */
 
-#define	CF_ALLOCFILENAME	1
 
 /* revision history:
 
@@ -43,19 +42,10 @@
 #include	<matostr.h>
 #include	<localmisc.h>
 
-#include	"configvars.h"
+#include	"configvarsobj.h"
 
 
 /* local defines */
-
-#define	CONFxIGVARS_WSETS	0
-#define	CONFxIGVARS_WVARS	1
-
-#define	CV		configvars
-#define	CV_VAR		configvars_var
-#define	CV_FILE		configvars_file
-#define	CV_CUR		configvars_cur
-#define	CV_ERR		configvars_err
 
 #undef	BUFLEN
 #define	BUFLEN		(LINEBUFLEN * 2)
@@ -117,12 +107,15 @@ namespace configvars_obj {
 	    rs = SR_NOMEM ;
 	    if ((cfp->filename = mallocstr(filename)) != nullptr) {
 	        vecobj		*vip{} ;
+		cint		vsz = sizeof(CV_VAR) ;
+		cint		vn = 0 ;
+		cint		vo = 0 ;
 	        vip = &cfp->defines ;
-	        if ((rs = vecobj_start(vip,0,0)) >= 0) {
+	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	            vip = &cfp->exports ;
-	            if ((rs = vecobj_start(vip,0,0)) >= 0) {
+	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	                vip = &cfp->unsets ;
-		        if ((rs = vecobj_start(vip,0,0)) >= 0) {
+		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 			    rs = strlen(filename) ;
 		        }
 		        if (rs < 0) {
@@ -189,7 +182,6 @@ namespace configvars_obj {
 	CV_VAR		ve{} ;
 	int		rs ;
 	if ((rs = var_start(&ve,fi,key,klen,value,vlen)) >= 0) {
-	    [[maybe_unused]] cint	vsz = sizeof(CV_FILE) ;
 	    vecobj	*vlp{} ;
 	    switch (type) {
 	    case vartype_define: vlp = &cfp->defines ; break ;
