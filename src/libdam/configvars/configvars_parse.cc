@@ -34,7 +34,6 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>
-#include	<mallocstuff.h>
 #include	<bfile.h>
 #include	<strwcpy.h>
 #include	<char.h>
