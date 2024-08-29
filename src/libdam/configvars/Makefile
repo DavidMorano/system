@@ -147,11 +147,11 @@ obj7.o:			$(OBJ7)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
 
 
-configvars_main.o:	configvars_main.cc	$(INCS)
-configvars_parse.o:	configvars_parse.cc	$(INCS)
-configvars_sub.o:	configvars_sub.cc	$(INCS)
-configvars_file.o:	configvars_file.cc	$(INCS)
-configvars_var.o:	configvars_var.cc	$(INCS)
-configvars_aux.o:	configvars_aux.cc	$(INCS)
+configvars_main.o:	configvars_main.cc	$(INCS) configvarsobj.hh
+configvars_parse.o:	configvars_parse.cc	$(INCS) configvarsobj.hh
+configvars_sub.o:	configvars_sub.cc	$(INCS) configvarsobj.hh
+configvars_file.o:	configvars_file.cc	$(INCS) configvarsobj.hh
+configvars_var.o:	configvars_var.cc	$(INCS) configvarsobj.hh
+configvars_aux.o:	configvars_aux.cc	$(INCS) configvarsobj.hh
 
 

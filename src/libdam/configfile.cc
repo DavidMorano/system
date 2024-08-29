@@ -1,12 +1,10 @@
-/* configfile */
+/* configfile SUPPORT */
+/* lang=C++20 */
 
 /* parse a configuration file */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGSFIELD	0
 #define	CF_EXPORTEQUAL	0		/* add equal for empty-value exports */
-
 
 /* revision history:
 
@@ -32,15 +30,15 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<vecstr.h>
@@ -88,17 +86,13 @@ extern char	*strncpylc(char *,cchar *,int) ;
 
 /* forward references */
 
-static void	checkfree() ;
-
-#if	CF_DEBUGS
-static int vardump(cchar *,int) ;
-#endif
+static void	checkfree() noex ;
 
 
 /* local variables */
 
 /* these are the terminators for most everything */
-static const unsigned char 	fterms[32] = {
+constexpr cchar		fterms[32] = {
 	0x7F, 0xFE, 0xC0, 0xFE,
 	0x8B, 0x00, 0x00, 0x24, 
 	0x00, 0x00, 0x00, 0x00, 
@@ -110,7 +104,7 @@ static const unsigned char 	fterms[32] = {
 } ;
 
 /* these are the terminators for options */
-static const unsigned char 	oterms[32] = {
+constexpr cchar		oterms[32] = {
 	0x00, 0x0B, 0x00, 0x00,
 	0x09, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -119,52 +113,6 @@ static const unsigned char 	oterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
-
-static cchar	*configkeys[] = {
-	"define",
-	"export",
-	"tmpdir",
-	"root",
-	"pidfile",
-	"lockfile",
-	"log",
-	"loglen",
-	"workdir",
-	"port",
-	"username",
-	"groupname",
-	"userpassword",
-	"machpassword",
-	"srvtab",
-	"sendmail",
-	"envfile",
-	"pathfile",
-	"devicefile",
-	"seedfile",
-	"logsize",
-	"organization",
-	"unset",
-	"timeout",
-	"removemul",
-	"acctab",
-	"paramfile",
-	"nrecips",
-	"helpfile",
-	"paramtab",
-	"pingtab",
-	"pingstat",
-	"option",
-	"mintexec",
-	"interval",
-	"stampdir",
-	"maxjobs",
-	"directory",
-	"interrupt",
-	"polltime",
-	"filetime",
-	"passfile",
-	NULL
 } ;
 
 enum configkeys {
@@ -217,9 +165,57 @@ enum configkeys {
 	configkey_overlast
 } ;
 
+constexpr cpcchar	configkeys[] = {
+	"define",
+	"export",
+	"tmpdir",
+	"root",
+	"pidfile",
+	"lockfile",
+	"log",
+	"loglen",
+	"workdir",
+	"port",
+	"username",
+	"groupname",
+	"userpassword",
+	"machpassword",
+	"srvtab",
+	"sendmail",
+	"envfile",
+	"pathfile",
+	"devicefile",
+	"seedfile",
+	"logsize",
+	"organization",
+	"unset",
+	"timeout",
+	"removemul",
+	"acctab",
+	"paramfile",
+	"nrecips",
+	"helpfile",
+	"paramtab",
+	"pingtab",
+	"pingstat",
+	"option",
+	"mintexec",
+	"interval",
+	"stampdir",
+	"maxjobs",
+	"directory",
+	"interrupt",
+	"polltime",
+	"filetime",
+	"passfile",
+	NULL
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
-
 
 int configfile_start(csp,configfname)
 CONFIGFILE	*csp ;
@@ -249,11 +245,6 @@ cchar	configfname[] ;
 	char	buf2[BUFLEN + 1] ;
 	char	*bp, *cp ;
 
-
-#if	CF_DEBUGS
-	debugprintf("configfile_start: entered filename=%s\n",configfname) ;
-#endif
-
 	if (csp == NULL)
 	    return SR_FAULT ;
 
@@ -263,10 +254,6 @@ cchar	configfname[] ;
 	    return SR_NOEXIST ;
 
 /* initialize */
-
-#if	CF_DEBUGS
-	debugprintf("configfile_start: initializing\n") ;
-#endif
 
 	csp->srs = 0 ;
 	csp->badline = -1 ;
@@ -295,19 +282,11 @@ cchar	configfname[] ;
 
 /* open configuration file */
 
-#if	CF_DEBUGS
-	debugprintf("configfile_start: opened file\n") ;
-#endif
-
 	rs = bopen(cfp,configfname,"r",0664) ;
 	if (rs < 0)
 	    goto ret1 ;
 
 /* start processing the configuration file */
-
-#if	CF_DEBUGS
-	debugprintf("configfile_start: reading lines\n") ;
-#endif
 
 	while ((rs = breadln(cfp,linebuf,LINEBUFLEN)) > 0) {
 
@@ -338,17 +317,8 @@ cchar	configfname[] ;
 	    bl = MIN(fl,BUFLEN) ;
 	    strncpylc(buf,fp,bl) ;
 
-	    i = matpstr(configkeys,1,buf,bl) ;
-
-	    if (i >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("configfile_start: i=%d keyword=%s\n",
-	            i,configkeys[i]) ;
-#endif
-
+	    if ((i = matpstr(configkeys,1,buf,bl)) >= 0) {
 	        switch (i) {
-
 	        case configkey_root:
 	        case configkey_tmpdir:
 	        case configkey_log:
@@ -392,10 +362,6 @@ cchar	configfname[] ;
 
 	            else 
 	                bp = mallocstrw(buf,0) ;
-
-#if	CF_DEBUGS && CF_DEBUGSFIELD
-	            debugprintf("configfile_start: bp=%s\n",bp) ;
-#endif
 
 	            switch (i) {
 
@@ -446,10 +412,6 @@ cchar	configfname[] ;
 	                    uc_free(csp->pidfname) ;
 
 	                csp->pidfname = bp ;
-#if	CF_DEBUGS
-	                debugprintf("configfile_start: pidfname=%s\n",bp) ;
-#endif
-
 	                break ;
 
 	            case configkey_lockfile:
@@ -690,9 +652,7 @@ cchar	configfname[] ;
 	            {
 	                int	index, f1l, f2l ;
 			int	f_equal, f ;
-
 	                char	*f1p, *f2p ;
-
 
 /* get first part */
 
@@ -725,12 +685,11 @@ cchar	configfname[] ;
 #if	CF_EXPORTEQUAL
 	                f1p[f1l] = '\0' ;
 	                if (f2l > 0) {
-
 	                    f2p[f2l] = '\0' ;
 	                    rs1 = sncpy3(buf2,BUFLEN,f1p,"=",f2p) ;
-
-	                } else
+	                } else {
 	                    rs1 = sncpy2(buf2,BUFLEN,f1p,"=") ;
+			}
 
 #else /* CF_EXPORTEQUAL */
 
@@ -741,11 +700,10 @@ cchar	configfname[] ;
 	                    rs1 = sncpy3(buf2,BUFLEN,f1p,"=",f2p) ;
 
 			} else if (f_equal) {
-
 	                    rs1 = sncpy2(buf2,BUFLEN,f1p,"=") ;
-
-	                } else
+	                } else {
 	                    rs1 = sncpy1(buf2,BUFLEN,f1p) ;
+			}
 
 #endif /* CF_EXPORTEQUAL */
 
@@ -756,10 +714,6 @@ cchar	configfname[] ;
 
 	                else
 	                    vsp = &csp->defines ;
-
-#if	CF_DEBUGS
-	                debugprintf("configfile_start: about to add >%s<\n",buf2) ;
-#endif
 
 			f = (rs1 > 0) ;
 
@@ -775,28 +729,13 @@ cchar	configfname[] ;
 	                    if (rs < 0)
 	                        break ;
 
-#if	CF_DEBUGS
-	                    debugprintf("configfile_start: added rs=%d\n", rs) ;
-#endif
-
 /* if this is an export variable, we do extra stuff */
 
 	                    if (f_equal && (i == configkey_export)) {
 
-#if	CF_DEBUGS
-	                        debugprintf("configfile_start: export=>%s< i=%d\n", 
-	                            buf2,index) ;
-#endif
-
 /* check for our favorite environment variables */
 
 	                        if (strncmp(buf2,"TMPDIR",len1) == 0) {
-
-#if	CF_DEBUGS
-	                            debugprintf("configfile_start: TMPDIR=>%s< "
-					"i=%d\n",
-	                                buf2,index) ;
-#endif
 
 	                            if (csp->tmpdir != NULL)
 	                                uc_free(csp->tmpdir) ;
@@ -891,11 +830,6 @@ cchar	configfname[] ;
 
 	    cl = buffer_get(&options,&cp) ;
 
-#if	CF_DEBUGS
-	debugprintf("procfilepaths: final options\n") ;
-	vardump(cp,cl) ;
-#endif /* CF_DEBUGS */
-
 	    if (cl > 0)
 	        csp->options = mallocstrw(cp,cl) ;
 
@@ -913,11 +847,6 @@ ret1:
 		goto bad3 ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("configfile_start: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 
 /* handle bad things */
@@ -1045,36 +974,5 @@ static void checkfree(char **vp) noex {
 	}
 }
 /* end subroutine (checkfree) */
-
-#if	CF_DEBUGS
-
-static int vardump(pathbuf,pbi)
-cchar	pathbuf[] ;
-int		pbi ;
-	{
-	int	rs = SR_OK ;
-		int	mlen, rlen = pbi ;
-	int	wlen = 0 ;
-		cchar	*pp = pathbuf ;
-
-		while (rlen > 0) {
-			mlen = MIN(rlen,40) ;
-			rs = debugprintf("configfile: var| %t\n",
-				pp,mlen) ;
-
-			wlen += rs ;
-			if (rs < 0)
-				break ;
-
-			pp += mlen ;
-			rlen -= mlen ;
-		}
-
-	return (rs >= 0) ? wlen : rs ;
-	}
-/* end subroutine (vardump) */
-
-#endif /* CF_DEBUGS */
-
 
 
