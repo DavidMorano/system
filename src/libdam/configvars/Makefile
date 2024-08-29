@@ -58,14 +58,14 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0= configvars_main.o configvars_parse.o configvars_sub.o
 OBJ1= configvars_file.o configvars_var.o
-OBJ2= configvars_aux.o
+OBJ2= 
 OBJ3=
 OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o 
 #OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= $(OBJA) $(OBJB)
@@ -152,6 +152,5 @@ configvars_parse.o:	configvars_parse.cc	$(INCS) configvarsobj.hh
 configvars_sub.o:	configvars_sub.cc	$(INCS) configvarsobj.hh
 configvars_file.o:	configvars_file.cc	$(INCS) configvarsobj.hh
 configvars_var.o:	configvars_var.cc	$(INCS) configvarsobj.hh
-configvars_aux.o:	configvars_aux.cc	$(INCS) configvarsobj.hh
 
 

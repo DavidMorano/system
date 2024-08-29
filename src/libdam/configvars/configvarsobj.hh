@@ -67,7 +67,6 @@ namespace configvars_obj {
 
 namespace configvars_obj {
     extern void	badline(vecobj *,char *,int) noex ;
-    extern void	freeit(char **) noex ;
 }
 
 #endif /* __cplusplus */

@@ -70,6 +70,8 @@ using namespace		configvars_obj ;
 
 /* forward references */
 
+static void	freeit(char **) noex ;
+
 
 /* local variables */
 
@@ -124,5 +126,12 @@ namespace configvars_obj {
 	return rs ;
     } /* end subroutine (var_finish) */
 } /* end namespace (configvars_obj) */
+
+static void freeit(char **vp) noex {
+	if (*vp) {
+	    uc_free(*vp) ;
+	    *vp = nullptr ;
+	}
+} /* end subroutine (freeit) */
 
 
