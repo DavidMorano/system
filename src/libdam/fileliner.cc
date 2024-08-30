@@ -1,4 +1,4 @@
-/* filelines SUPPORT */
+/* fileliner SUPPORT */
 /* lang=C++20 */
 
 /* determine the number of lines in a file */

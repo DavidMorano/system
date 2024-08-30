@@ -11,6 +11,13 @@
 #define	FILELINER_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+
+
 EXTERNC_begin
 
 extern int	fileliner(cchar *,int) noex ;

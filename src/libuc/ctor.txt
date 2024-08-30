@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int htm_ctor(htm *op,Args ... args) noex {
+static int uiconv_ctor(uiconv *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int htm_ctor(htm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (htm_ctor) */
+/* end subroutine (uiconv_ctor) */
 
-static int htm_dtor(htm *op) noex {
+static int uiconv_dtor(uiconv *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (htm_dtor) */
+/* end subroutine (uiconv_dtor) */
 
 template<typename ... Args>
-static inline int htm_magic(htm *op,Args ... args) noex {
+static inline int uiconv_magic(uiconv *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == UICONV_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (htm_magic) */
+/* end subroutine (uiconv_magic) */
