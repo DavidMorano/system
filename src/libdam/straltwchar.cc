@@ -1,9 +1,8 @@
-/* straltwchar */
+/* straltwchar SUPPORT */
+/* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,9 +11,9 @@
 	This was written from scratch.
 
 	= 2017-12-23, David A.D. Morano
-        I added some additional characters to the database. I also sped up the
-        search for possible replacement characters by implementing a binary
-        search.
+	I added some additional characters to the database.  I also
+	sped up the search for possible replacement characters by
+	implementing a binary search.
 
 */
 
@@ -22,45 +21,39 @@
 
 /*******************************************************************************
 
+	Name:
+	straltwchar
+
+	Description:
 	Find a reasonable substitute string for a given wide-character.
 
 	Synopsis:
-
-	cchar *straltwchar(int wch)
+	cchar *straltwchar(int wch) noex
 
 	Arguments:
-
 	wch		wide-character to look-up
 
 	Returns:
-
-	<0		error
 	>=0		resulting string length
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stddef.h>		/* presumably for 'wchar_t' type */
-
+#include	<climits>
+#include	<cstddef>		/* presumably for 'wchar_t' type */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
+
+#include	"straltwchar.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -70,7 +63,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 struct special {
 	uint		code ;
-	char		*ss ;
+	cchar		*ss ;
 } ;
 
 
@@ -79,7 +72,7 @@ struct special {
 
 /* local variables */
 
-static const struct special	specials[] = {
+constexpr struct special	specials[] = {
 	{ 0x041C, "C" },
 	{ 0x041D, "T" },
 	{ 0x041E, "y" },
@@ -268,19 +261,19 @@ static const struct special	specials[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-cchar *straltwchar(uint sch)
-{
-	uint		ch ;
+cchar *straltwchar(int sch) noex {
 	int		front = 0 ;
 	int		back = (nelem(specials)-1) ;
 	int		i ;
 	cchar		*ss = NULL ;
 	i = (front + ((back-front)/2)) ;
 	while (front < back) {
-	    ch = specials[i].code ;
+	    cint	ch = specials[i].code ;
 	    if (sch > ch) {
 		front = (i+1) ;
 	    } else if (sch < ch) {
