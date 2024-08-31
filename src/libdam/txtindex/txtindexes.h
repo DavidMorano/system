@@ -98,8 +98,8 @@ struct txtindexes_head {
 } ;
 
 typedef	TXTINDEXES		txtindexes ;
-typedef	TXTINDEXES_OBJ		txtindexes_object ;
-typedef	TXTINDEXES_CUR		txtindexes_cursor ;
+typedef	TXTINDEXES_OBJ		txtindexes_obj ;
+typedef	TXTINDEXES_CUR		txtindexes_cur ;
 typedef	TXTINDEXES_TAG		txtindexes_tag ;
 typedef	TXTINDEXES_FI		txtindexes_fi ;
 typedef	TXTINDEXES_MI		txtindexes_mi ;
@@ -110,12 +110,12 @@ EXTERNC_begin
 extern int	txtindexes_open(txtindexes *,cchar *) noex ;
 extern int	txtindexes_count(txtindexes *) noex ;
 extern int	txtindexes_neigen(txtindexes *) noex ;
-extern int	txtindexes_info(txtindexes *,TXTINDEXES_INFO *) noex ;
+extern int	txtindexes_getinfo(txtindexes *,txtindexes_info *) noex ;
 extern int	txtindexes_iseigen(txtindexes *,cchar *,int) noex ;
 extern int	txtindexes_curbegin(txtindexes *,txtindexes_cur *) noex ;
 extern int	txtindexes_lookup(txtindexes *,txtindexes_cur *,cchar **) noex ;
 extern int	txtindexes_read(txtindexes *,txtindexes_cur *,
-			TXTINDEXES_TAG *) noex ;
+			txtindexes_tag *) noex ;
 extern int	txtindexes_curend(txtindexes *,txtindexes_cur *) noex ;
 extern int	txtindexes_audit(txtindexes *) noex ;
 extern int	txtindexes_close(txtindexes *) noex ;

@@ -34,7 +34,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += txtindex.h
+INCS += txtindex.h txtindexmk.h
 
 LIBS +=
 

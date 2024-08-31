@@ -46,11 +46,11 @@ EXTERNC_begin
 	int	(*open)(void *,cchar *) ;
 	int	(*count)(void *) ;
 	int	(*neigen)(void *) ;
-	int	(*info)(void *,TXTINDEXES_INFO *) ;
+	int	(*getinfo)(void *,txtindexes_info *) ;
 	int	(*iseigen)(void *,cchar *,int) ;
 	int	(*curbegin)(void *,void *) ;
 	int	(*lookup)(void *,void *,cchar **) ;
-	int	(*read)(void *,void *,TXTINDEXES_TAG *) ;
+	int	(*read)(void *,void *,txtindexes_tag *) ;
 	int	(*curend)(void *,void *) ;
 	int	(*audit)(void *) ;
 	int	(*close)(void *) ;
@@ -58,7 +58,7 @@ EXTERNC_begin
 EXTERNC_end
 
 struct txtindex_head {
-	modload		loader ;
+	modload		*loaderp ;
 	TXTINDEX_CALLS	call ;
 	void		*obj ;		/* object pointer */
 	uint		magic ;
@@ -69,17 +69,19 @@ struct txtindex_head {
 typedef	TXTINDEX	txtindex ;
 typedef	TXTINDEX_CUR	txtindex_cur ;
 typedef	TXTINDEX_CALLS	txtindex_calls ;
+typedef	TXTINDEX_TAG	txtindex_tag ;
+typedef	TXTINDEX_INFO	txtindex_info ;
 
 EXTERNC_begin
 
 extern int	txtindex_open(txtindex *,cchar *,cchar *) noex ;
 extern int	txtindex_count(txtindex *) noex ;
 extern int	txtindex_neigen(txtindex *) noex ;
-extern int	txtindex_info(txtindex *,TXTINDEX_INFO *) noex ;
+extern int	txtindex_getinfo(txtindex *,txtindex_info *) noex ;
 extern int	txtindex_iseigen(txtindex *,cchar *,int) noex ;
 extern int	txtindex_curbegin(txtindex *,txtindex_cur *) noex ;
 extern int	txtindex_lookup(txtindex *,txtindex_cur *,cchar **) noex ;
-extern int	txtindex_read(txtindex *,txtindex_cur *,TXTINDEX_TAG *) noex ;
+extern int	txtindex_read(txtindex *,txtindex_cur *,txtindex_tag *) noex ;
 extern int	txtindex_curend(txtindex *,txtindex_cur *) noex ;
 extern int	txtindex_audit(txtindex *) noex ;
 extern int	txtindex_close(txtindex *) noex ;

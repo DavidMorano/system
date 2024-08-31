@@ -26,17 +26,14 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecstr.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"txtindex.h"
@@ -60,19 +57,21 @@
 #define	TIS_TAG			TXTINDEXES_TAG
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	pathclean(char *,const char *,int) ;
+
+/* external variables */
 
 
 /* local structures */
@@ -80,11 +79,49 @@ extern int	pathclean(char *,const char *,int) ;
 
 /* forward references */
 
-static int	txtindex_objloadbegin(TXTINDEX *,const char *,const char *) ;
-static int	txtindex_objloadend(TXTINDEX *) ;
-static int	txtindex_loadcalls(TXTINDEX *,const char *) ;
+template<typename ... Args>
+static int txtindex_ctor(txtindex *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ; /* dangerous! */
+	    if ((op->loaderp = new(nothrow) modload) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindex_ctor) */
 
-static int	isrequired(int) ;
+static int txtindex_dtor(txtindex *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->loaderp) {
+		delete op->loaderp ;
+		op->loaderp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindex_dtor) */
+
+template<typename ... Args>
+static inline int txtindex_magic(txtindex *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TXTINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (txtindex_magic) */
+
+static int	txtindex_objloadbegin(txtindex *,cchar *,cchar *) noex ;
+static int	txtindex_objloadend(txtindex *) noex ;
+static int	txtindex_loadcalls(txtindex *,cchar *) noex ;
+
+static bool	isrequired(int) noex ;
 
 
 /* global variables */
@@ -92,26 +129,11 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static const char	*subs[] = {
-	"open",
-	"count",
-	"neigen",
-	"info",
-	"iseigen",
-	"curbegin",
-	"lookup",
-	"read",
-	"curend",
-	"audit",
-	"close",
-	NULL
-} ;
-
 enum subs {
 	sub_open,
 	sub_count,
 	sub_neigen,
-	sub_info,
+	sub_getinfo,
 	sub_iseigen,
 	sub_curbegin,
 	sub_lookup,
@@ -122,216 +144,188 @@ enum subs {
 	sub_overlast
 } ;
 
+constexpr cpcchar	subs[] = {
+	"open",
+	"count",
+	"neigen",
+	"getinfo",
+	"iseigen",
+	"curbegin",
+	"lookup",
+	"read",
+	"curend",
+	"audit",
+	"close",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int txtindex_open(TXTINDEX *op,cchar pr[],cchar dbname[])
-{
+int txtindex_open(txtindex *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	const char	*objname = TXTINDEX_OBJNAME ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(TXTINDEX)) ;
-
-	if ((rs = txtindex_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
-		op->magic = TXTINDEX_MAGIC ;
+	if ((rs = txtindex_ctor(op,pr,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbname[0]) {
+	        cchar	*objname = TXTINDEX_OBJNAME ;
+	        if ((rs = txtindex_objloadbegin(op,pr,objname)) >= 0) {
+	            if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
+		        op->magic = TXTINDEX_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        txtindex_objloadend(op) ;
+	            }
+	        } /* end if (txtindex_objloadbegin) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		txtindex_dtor(op) ;
 	    }
-	    if (rs < 0)
-		txtindex_objloadend(op) ;
-	} /* end if (txtindex_objloadbegin) */
-
+	} /* end if (txtindex_ctor) */
 	return rs ;
 }
 /* end subroutine (txtindex_open) */
 
-
-/* free up the entire vector string data structure object */
-int txtindex_close(TXTINDEX *op)
-{
-	int		rs = SR_OK ;
+int txtindex_close(txtindex *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = txtindex_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = txtindex_magic(op)) >= 0) {
+	    {
+	        rs1 = (*op->call.close)(op->obj) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = txtindex_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_close) */
 
-
-int txtindex_audit(TXTINDEX *op)
-{
+int txtindex_audit(txtindex *op) noex {
 	int		rs = SR_NOSYS ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.audit != NULL) {
-	    rs = (*op->call.audit)(op->obj) ;
-	}
-
+	if ((rs = txtindex_magic(op)) >= 0) {
+	    rs = SR_NOSYS ;
+	    if (op->call.audit) {
+	        rs = (*op->call.audit)(op->obj) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_audit) */
 
-
-int txtindex_count(TXTINDEX *op)
-{
-	int		rs = SR_NOSYS ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.count != NULL) {
-	    rs = (*op->call.count)(op->obj) ;
-	}
-
+int txtindex_count(txtindex *op) noex {
+	int		rs ;
+	if ((rs = txtindex_magic(op)) >= 0) {
+	    rs = SR_NOSYS ;
+	    if (op->call.count) {
+	        rs = (*op->call.count)(op->obj) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_count) */
 
-
-int txtindex_neigen(TXTINDEX *op)
-{
-	int		rs = SR_NOSYS ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.neigen != NULL) {
-	    rs = (*op->call.neigen)(op->obj) ;
-	}
-
+int txtindex_neigen(txtindex *op) noex {
+	int		rs ;
+	if ((rs = txtindex_magic(op)) >= 0) {
+	    rs = SR_NOSYS ;
+	    if (op->call.neigen) {
+	        rs = (*op->call.neigen)(op->obj) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_neigen) */
 
-
-int txtindex_info(TXTINDEX *op,TXTINDEX_INFO *ip)
-{
-	int		rs = SR_NOSYS ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.info != NULL) {
-	    rs = (*op->call.info)(op->obj,ip) ;
-	}
-
+int txtindex_getinfo(txtindex *op,TXTINDEX_INFO *ip) noex {
+	int		rs ;
+	if ((rs = txtindex_magic(op,ip)) >= 0) {
+	    rs = SR_NOSYS ;
+	    if (op->call.getinfo) {
+	        rs = (*op->call.getinfo)(op->obj,ip) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (txtindex_info) */
+/* end subroutine (txtindex_getinfo) */
 
-
-int txtindex_curbegin(TXTINDEX *op,TXTINDEX_CUR *curp)
-{
-	int		rs = SR_NOSYS ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(TXTINDEX_CUR)) ;
-
-	if (op->call.curbegin != NULL) {
-	    void	*p ;
-	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
-		curp->scp = p ;
-		if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-	    	    curp->magic = TXTINDEX_MAGIC ;
-		}
-	        if (rs < 0) {
-	    	    uc_free(curp->scp) ;
-	    	    curp->scp = NULL ;
-		}
-	    } /* end if (m-a) */
-	} else
-	    rs = SR_NOSYS ;
-
+int txtindex_curbegin(txtindex *op,txtindex_cur *curp) noex {
+	int		rs ;
+	if ((rs = txtindex_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    if (op->call.curbegin) {
+	        void	*vp ;
+	        if ((rs = uc_malloc(op->cursize,&vp)) >= 0) {
+		    curp->scp = vp ;
+		    if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
+	    	        curp->magic = TXTINDEX_MAGIC ;
+		    }
+	            if (rs < 0) {
+	    	        uc_free(curp->scp) ;
+	    	        curp->scp = nullptr ;
+		    }
+	        } /* end if (m-a) */
+	    } else {
+	        rs = SR_NOSYS ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_curbegin) */
 
-
-int txtindex_curend(TXTINDEX *op,TXTINDEX_CUR *curp)
-{
-	int		rs = SR_OK ;
+int txtindex_curend(txtindex *op,txtindex_cur *curp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	if (curp->scp == NULL) return SR_NOTSOCK ;
-
-	if (op->call.curend != NULL) {
-	    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = uc_free(curp->scp) ;
-	if (rs >= 0) rs = rs1 ;
-	curp->scp = NULL ;
-
-	curp->magic = 0 ;
+	if ((rs = txtindex_magic(op,curp)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == TXTINDEX_MAGIC) {
+	        rs = SR_BUGCHECK ;
+	        if (curp->scp) {
+		    rs = SR_OK ;
+	            if (op->call.curend) {
+	                rs1 = (*op->call.curend)(op->obj,curp->scp) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	            {
+	                rs1 = uc_free(curp->scp) ;
+	                if (rs >= 0) rs = rs1 ;
+	                curp->scp = nullptr ;
+	            }
+	            curp->magic = 0 ;
+	        } /* end if (valid) */
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_curend) */
 
-
-/* lookup tags by strings */
-int txtindex_lookup(TXTINDEX *op,TXTINDEX_CUR *curp,cchar **klp)
-{
+int txtindex_lookup(txtindex *op,txtindex_cur *curp,cchar **klp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (klp == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
-
-	rs = (*op->call.lookup)(op->obj,curp->scp,klp) ;
-
+	if ((rs = txtindex_magic(op,curp,klp)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == TXTINDEX_MAGIC) {
+		rs = (*op->call.lookup)(op->obj,curp->scp,klp) ;
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindex_lookup) */
 
-
-/* read entries */
-int txtindex_read(TXTINDEX *op,TXTINDEX_CUR *curp,TXTINDEX_TAG *tagp)
-{
+int txtindex_read(txtindex *op,txtindex_cur *curp,TXTINDEX_TAG *tagp) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.read != NULL) {
+	if (op->call.read != nullptr) {
 	    rs = (*op->call.read)(op->obj,curp->scp,tagp) ;
 	}
 
@@ -342,24 +336,20 @@ int txtindex_read(TXTINDEX *op,TXTINDEX_CUR *curp,TXTINDEX_TAG *tagp)
 
 /* private subroutines */
 
-
-/* find and load the DB-access object */
-static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objname) noex {
+	modload		*lp = op->loaderp ;
+	vecstr		syms ;
+	cint		n = nelem(subs) ;
+	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
-	    int		i ;
-	    int		f_modload = FALSE ;
+	    cint	nlen = SYMNAMELEN ;
+	    bool	f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (int i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -369,9 +359,9 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		mainv	sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = TXTINDEX_MODBNAME ;
+	            cchar	*modbname = TXTINDEX_MODBNAME ;
 	            int	mo = (MODLOAD_OLIBVAR | MODLOAD_OPRS | MODLOAD_OSDIRS) ;
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		    f_modload = (rs >= 0) ;
@@ -396,7 +386,7 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 		    rs = txtindex_loadcalls(op,objname) ;
 		    if (rs < 0) {
 			uc_free(op->obj) ;
-			op->obj = NULL ;
+			op->obj = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (modload_getmva) */
@@ -408,55 +398,51 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 }
 /* end subroutine (txtindex_objloadbegin) */
 
-
-static int txtindex_objloadend(TXTINDEX *op)
-{
+static int txtindex_objloadend(txtindex *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
-	rs1 = modload_close(&op->loader) ;
+	rs1 = modload_close(op->loaderp) ;
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
 }
 /* end subroutine (txtindex_objloadend) */
 
-
-static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
-{
-	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+static int txtindex_loadcalls(txtindex *op,cchar *objname) noex {
+	modload		*lp = op->loaderp ;
+	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
 	const void	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
 
 	    if (rs < 0) break ;
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
 
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *)) snp ;
+			(int (*)(void *,cchar *)) snp ;
 		    break ;
 
 		case sub_count:
@@ -467,12 +453,12 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 		    op->call.neigen = (int (*)(void *)) snp ;
 		    break ;
 
-		case sub_info:
-		    op->call.info = (int (*)(void *,TXTINDEXES_INFO *)) snp ;
+		case sub_getinfo:
+		    op->call.getinfo = (int (*)(void *,txtindexes_info *)) snp ;
 		    break ;
 
 		case sub_iseigen:
-		    op->call.iseigen = (int (*)(void *,const char *,int)) snp ;
+		    op->call.iseigen = (int (*)(void *,cchar *,int)) snp ;
 		    break ;
 
 		case sub_curbegin:
@@ -482,7 +468,7 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 
 		case sub_lookup:
 		    op->call.lookup = 
-			(int (*)(void *,void *,const char **)) snp ;
+			(int (*)(void *,void *,cchar **)) snp ;
 		    break ;
 
 		case sub_enum:
@@ -513,11 +499,8 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 }
 /* end subroutine (txtindex_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
-
+static bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_neigen:
@@ -527,10 +510,9 @@ static int isrequired(int i)
 	case sub_enum:
 	case sub_curend:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
-
 	return f ;
 }
 /* end subroutine (isrequired) */
