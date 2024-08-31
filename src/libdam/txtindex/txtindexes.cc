@@ -4,7 +4,6 @@
 /* read or audit a TXTINDEX database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SORT		1		/* sort primary tags */
 #define	CF_DYNACOMPACT	1		/* try dynamic compacting */
 #define	CF_SORTKEYS	0		/* sort hash keys (not needed!) */
@@ -21,15 +20,16 @@
 
 /*******************************************************************************
 
+	Name:
+	txtindexes
+
 	Description:
 	This subroutine opens and allows for reading or auditing
 	of a TXTINDEX database (which currently consists of two
 	files).
 
 	Synopsis:
-	int txtindexes_open(op,dbname)
-	TXTINDEXES	*op ;
-	const char	dbname[] ;
+	int txtindexes_open(txtindexes *op,cchar *cchardbname) noex
 
 	Arguments:
 	- op		object pointer
@@ -128,12 +128,6 @@ extern char	*strwcpylc(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
 extern char	*strnpbrk(const char *,int,const char *) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	timestr_log(time_t,char *) ;
-#endif
-
 
 /* external variables */
 
@@ -171,10 +165,6 @@ static int	txtindexes_hdrverify(TXTINDEXES *,time_t) ;
 static int	txtindexes_audithash(TXTINDEXES *,OFFINDEX *) ;
 static int	txtindexes_auditeigen(TXTINDEXES *) ;
 
-#if	CF_DEBUGS
-static int	txtindexes_printeigens(TXTINDEXES *) ;
-#endif
-
 static int	offindex_tags(OFFINDEX *,const char *,int) ;
 
 static int	tag_parse(TXTINDEXES_TAG *,const char *,int) ;
@@ -198,21 +188,18 @@ static int	vcmpkey(const char **,const char **) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int txtindexes_open(TXTINDEXES *op,cchar *dbname)
-{
-	const time_t	dt = time(NULL) ;
+int txtindexes_open(TXTINDEXES *op,cchar *dbname) noex {
+	custime		dt = time(NULL) ;
 	int		rs = SR_OK ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (dbname == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_open: dbname=%s\n",dbname) ;
-#endif
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
@@ -233,14 +220,6 @@ int txtindexes_open(TXTINDEXES *op,cchar *dbname)
 	        op->dbname = NULL ;
 	    }
 	} /* end if (m-a) */
-
-#if	CF_DEBUGS
-	txtindexes_printeigens(op) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -285,32 +264,11 @@ int txtindexes_audit(TXTINDEXES *op)
 
 	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS && 0
-	{
-	    TXTINDEXES_MI	*mip = &op->mi ;
-	    int	i ;
-	    debugprintf("txtindexes_audit: sdn=%s\n",mip->sdn) ;
-	    debugprintf("txtindexes_audit: sfn=%s\n",mip->sfn) ;
-	    debugprintf("txtindexes_audit: taglen=%u\n",op->ifi.taglen) ;
-	    debugprintf("txtindexes_audit: minlen=%u\n",op->ifi.minlen) ;
-	    debugprintf("txtindexes_audit: maxlen=%u\n",op->ifi.maxlen) ;
-	    debugprintf("txtindexes_audit: tablen=%u\n",op->ifi.tablen) ;
-	    for (i = 0 ; i < op->ifi.tablen ; i += 1) {
-	        debugprintf("txtindexes_audit: table[%u]=%u\n",
-	            i,mip->table[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
 /* line-index the TAG file */
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_audit: offindex_start() \n") ;
-#endif
 
 	n = op->ifi.taglen ;
 	if ((rs = offindex_start(&oi,n)) >= 0) {
-	    const int	sl = op->tf.mapsize ;
+	    cint	sl = op->tf.mapsize ;
 	    cchar	*sp = op->tf.mapdata ;
 	    if ((rs = offindex_tags(&oi,sp,sl)) >= 0) {
 	        const int	taglen = rs ;
@@ -326,10 +284,6 @@ int txtindexes_audit(TXTINDEXES *op)
 	if (rs >= 0) {
 	    rs = txtindexes_auditeigen(op) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_audit: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -491,25 +445,11 @@ int txtindexes_lookup(TXTINDEXES *op,TXTINDEXES_CUR *curp,cchar **klp)
 	int		rs1 ;
 	int		taglen = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_lookup: ent\n") ;
-#endif
-
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 	if (klp == NULL) return SR_FAULT ;
 
 	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    debugprintf("txtindexes_lookup: keys¬\n") ;
-	    for (i = 0 ; klp[i] != NULL ; i += 1) {
-	        debugprintf("txtindexes_lookup: key=%s\n",klp[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	curp->taglen = 0 ;
 	if (curp->taglist != NULL) {
@@ -524,9 +464,6 @@ int txtindexes_lookup(TXTINDEXES *op,TXTINDEXES_CUR *curp,cchar **klp)
 	    if ((rs = txtindexes_mkhashkeys(op,&hkeys,klp)) >= 0) {
 	        if ((rs = txtindexes_mktaglist(op,&taglist,&hkeys)) >= 0) {
 	            taglen = rs ;
-#if	CF_DEBUGS
-	            debugprintf("txtindexes_lookup: taglen=%d\n",taglen) ;
-#endif
 	            if (taglist != NULL) {
 	                curp->taglist = taglist ;
 	                curp->taglen = taglen ;
@@ -538,10 +475,6 @@ int txtindexes_lookup(TXTINDEXES *op,TXTINDEXES_CUR *curp,cchar **klp)
 	    rs1 = vecstr_finish(&hkeys) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hkeys) */
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_lookup: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? taglen : rs ;
 }
@@ -563,10 +496,6 @@ int txtindexes_read(TXTINDEXES *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 	if (tagp == NULL) return SR_FAULT ;
 
 	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_read: c_i=%d\n",curp->i) ;
-#endif
 
 	fip = &op->tf ;
 	if ((curp->taglist == NULL) || (curp->taglen == 0)) {
@@ -592,15 +521,7 @@ int txtindexes_read(TXTINDEXES *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 	        }
 
 	        if (i < curp->taglen) {
-
 	            tagoff = curp->taglist[i] ;
-
-#if	CF_DEBUGS
-	            debugprintf("txtindexes_read: tagfile size=%u\n",
-	                fip->mapsize) ;
-	            debugprintf("txtindexes_read: tagoff=%u\n",tagoff) ;
-#endif
-
 	            if (tagoff < fip->mapsize) {
 	                tagbuf = (fip->mapdata + tagoff) ;
 	                rs = tag_parse(tagp,tagbuf,-1) ;
@@ -621,10 +542,6 @@ int txtindexes_read(TXTINDEXES *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_read: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (txtindexes_read) */
@@ -632,9 +549,7 @@ int txtindexes_read(TXTINDEXES *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 
 /* private subroutines */
 
-
-static int txtindexes_dbloadcreate(TXTINDEXES *op,time_t dt)
-{
+static int txtindexes_dbloadcreate(TXTINDEXES *op,time_t dt) noex {
 	int		rs ;
 
 	if ((rs = txtindexes_dbmapcreate(op,dt)) >= 0) {
@@ -643,17 +558,11 @@ static int txtindexes_dbloadcreate(TXTINDEXES *op,time_t dt)
 	        txtindexes_dbmapdestroy(op) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_dbloadcreate: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (txtindexes_dbloadcreate) */
 
-
-static int txtindexes_dbloaddestroy(TXTINDEXES *op)
-{
+static int txtindexes_dbloaddestroy(TXTINDEXES *op) noex {
 	TXTINDEXES_MI	*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -685,10 +594,6 @@ static int txtindexes_dbmapcreate(TXTINDEXES *op,time_t dt)
 	            txtindexes_filemapdestroy(op,0) ;
 	    } /* end if (txtindexes_filemapcreate) */
 	}
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_dbmapcreate: ret rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 
 	return rs ;
 }
@@ -787,10 +692,6 @@ static int txtindexes_dbproc(TXTINDEXES *op,time_t dt)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_dbproc: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexes_dbproc) */
@@ -812,19 +713,10 @@ static int txtindexes_mkhashkeys(TXTINDEXES *op,vecstr *clp,cchar **klp)
 	minwlen = op->ifi.minwlen ;
 	maxwlen = op->ifi.maxwlen ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_mkhashkeys: maxwlen=%u\n",maxwlen) ;
-#endif
-
 	for (i = 0 ; (kp = klp[i]) != NULL ; i += 1) {
 	    if (kp != NULL) {
 
 	        kl = strnlen(kp,klen) ;	/* also prevents overflow */
-
-#if	CF_DEBUGS
-	    debugprintf("txtindexes_mkhashkeys: k=>%t<\n",kp,kl) ;
-#endif
-
 	        if (kl >= minwlen) {
 
 	            if (hasuc(kp,kl)) {
@@ -851,10 +743,6 @@ static int txtindexes_mkhashkeys(TXTINDEXES *op,vecstr *clp,cchar **klp)
 	    vecstr_sort(clp,vcmpkey) ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_mkhashkeys: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexes_mkhashkeys) */
@@ -873,9 +761,6 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 	    int		n = rs ;
 	    int		size ;
 
-#if	CF_DEBUGS
-	    debugprintf("txtindexes_mktaglist: n=%d\n",n) ;
-#endif
 	    size = n * sizeof(LISTDESC) ;
 	    if ((rs = uc_malloc(size,&lists)) >= 0) {
 	        uint	*table = op->mi.table ;
@@ -893,19 +778,10 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 		int	i ;
 		int	c = 0 ;
 
-#if	CF_DEBUGS
-	        debugprintf("txtindexes_mktaglist: size=%u list={%p}\n",
-		size,lists) ;
-#endif
-
 /* fill in the tag-list array with results */
 
 	        for (i = 0 ; vecstr_get(hlp,i,&kp) >= 0 ; i += 1) {
 	            if (kp != NULL) {
-
-#if	CF_DEBUGS
-	                debugprintf("txtindexes_mktaglist: kp=%s\n",kp) ;
-#endif
 
 	                hv = hash_elf(kp,-1) ;
 
@@ -931,11 +807,6 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 
 	                    uip = (uint *) (op->hf.mapdata + listoff) ;
 	                    ntags = *uip++ ;
-
-#if	CF_DEBUGS
-	                    debugprintf("txtindexes_mktaglist: i=%u ntags=%u\n",
-				i,ntags) ;
-#endif
 
 	                    if (ntags > 0) {
 
@@ -965,10 +836,6 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 	        } /* end for */
 	        n = c ;
 
-#if	CF_DEBUGS
-	        debugprintf("txtindexes_mktaglist: rs=%d n=%u\n",rs,n) ;
-#endif
-
 /* sort the list-descriptors by number of tag entries */
 
 #if	CF_SORTLISTS /* optional but strongly recommended, for performance */
@@ -995,12 +862,6 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 	                if ((rs = uc_malloc(size,&taglist)) >= 0) {
 	                    memcpy(taglist,uip,size) ;
 	                }
-
-#if	CF_DEBUGS
-	                debugprintf("txtindexes_mktaglist: "
-	                    "size=%u taglist={%p}\n",
-	                    size,taglist) ;
-#endif
 
 	            } else {
 			int	j ;
@@ -1052,10 +913,6 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 
 	        } /* end for (looping through hash keys) */
 
-#if	CF_DEBUGS
-	        debugprintf("txtindexes_mktaglist: tagcount=%u \n",tagcount) ;
-#endif
-
 /* finishing */
 
 	        if ((rs >= 0) && (taglist != NULL)) {
@@ -1097,11 +954,6 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 
 	    } /* end if (m-a) */
 	} /* end if (positive) */
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_mktaglist: ret rs=%d tagcount=%u\n",
-	    rs,tagcount) ;
-#endif
 
 	return (rs >= 0) ? tagcount : rs ;
 }
@@ -1147,85 +999,25 @@ static int txtindexes_hdrverify(TXTINDEXES *op,time_t dt)
 	tfsize = hip->tfsize ;
 	tabsize = (hip->tablen * sizeof(uint)) ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: htsize=%u\n",fip->mapsize) ;
-	debugprintf("txtindexes_hdrverify: tablen=%u\n",hip->tablen) ;
-	debugprintf("txtindexes_hdrverify: taglen=%u\n",hip->taglen) ;
-	debugprintf("txtindexes_hdrverify: maxtags=%u\n",hip->maxtags) ;
-	debugprintf("txtindexes_hdrverify: tabsize=%u\n",tabsize) ;
-#endif
-
 	f = f && (hfsize == fip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: hfsize=%u f=%u\n",
-	    hfsize,f) ;
-#endif
-
 	f = f && (tfsize == op->tf.mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: tfsize=%u f=%u\n",
-	    tfsize,f) ;
-#endif
-
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-
-#if	CF_DEBUGS
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("txtindexes_hdrverify: wtime=%s f=%u\n",
-	        timestr_log(((time_t) hip->wtime),timebuf),f) ;
-	}
-#endif
-
 	f = f && (hip->sdnoff <= fip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: sdnoff=%u f=%u\n",
-	    hip->sdnoff,f) ;
-#endif
-
 	f = f && (hip->sfnoff <= fip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: sfnoff=%u f=%u\n",
-	    hip->sfnoff,f) ;
-#endif
 
 /* alignment restriction */
 	f = f && ((hip->listoff & (sizeof(int)-1)) == 0) ;
 /* size restrictions */
 	f = f && (hip->listoff <= fip->mapsize) ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: listoff=%u f=%u\n",
-	    hip->listoff,f) ;
-#endif
-
 /* alignment restriction */
 	f = f && ((hip->taboff & (sizeof(int)-1)) == 0) ;
 /* size restrictions */
 	f = f && (hip->taboff <= fip->mapsize) ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: taboff=%u f=%u\n",
-	    hip->taboff,f) ;
-#endif
-
 	f = f && (tabsize <= fip->mapsize) ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: tabsize=%u f=%u\n",
-	    tabsize,f) ;
-#endif
-
 	f = f && ((hip->taboff + tabsize) <= fip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: tablastoff=%u f=%u\n",
-	    (hip->taboff + tabsize),f) ;
-#endif
 
 	if (f) {
 
@@ -1245,24 +1037,10 @@ static int txtindexes_hdrverify(TXTINDEXES *op,time_t dt)
 	    f = f && ((hip->eroff + (erlen * sizeof(int))) <= hfsize) ;
 	    f = f && ((hip->eioff + (eilen * 3 * sizeof(int))) <= hfsize) ;
 
-#if	CF_DEBUGS
-	    debugprintf("txtindexes_hdrverify: f=%u\n",f) ;
-	    debugprintf("txtindexes_hdrverify: hfsize=%u esoff=%u essize=%u\n",
-	        hfsize,hip->esoff,essize) ;
-	    debugprintf("txtindexes_hdrverify: hfsize=%u eroff=%u erlen=%u\n",
-	        hfsize,hip->eroff,erlen) ;
-	    debugprintf("txtindexes_hdrverify: hfsize=%u eioff=%u eilen=%u\n",
-	        hfsize,hip->eioff,eilen) ;
-#endif
-
 	} /* end if */
 
 	if (! f)
 	    rs = SR_BADFMT ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_hdrverify: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1296,19 +1074,7 @@ static int txtindexes_audithash(TXTINDEXES *op,OFFINDEX *oip)
 	    listoff = mip->table[i] ;
 	    if (listoff == 0) continue ;
 
-#if	CF_DEBUGS
-	    debugprintf("txtindexes_audithash: listoff=%u\n",
-	        listoff) ;
-#endif
-
 	    if (listoff >= hfsize) {
-
-#if	CF_DEBUGS
-	        debugprintf("txtindexes_audithash: "
-	            "hash-table list-offset=%u too big\n",
-	            listoff) ;
-#endif
-
 	        rs = SR_BADFMT ;
 	        break ;
 
@@ -1316,33 +1082,17 @@ static int txtindexes_audithash(TXTINDEXES *op,OFFINDEX *oip)
 
 	    if ((listoff & 3) != 0) {
 
-#if	CF_DEBUGS
-	        debugprintf("txtindexes_audithash: "
-	            "hash-table list-offset=%08lx is unaligned\n",
-	            listoff) ;
-#endif
-
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
 
 	    uip = (uint *) (fip->mapdata + listoff) ;
 
-#if	CF_DEBUGS
-	    debugprintf("txtindexes_audithash: uip=%p\n",uip) ;
-#endif
-
 	    ntags = *uip++ ;
 
 	    if (ntags > 0) {
 
 	        if (ntags > hip->taglen) {
-
-#if	CF_DEBUGS
-	            debugprintf("txtindexes_audithash: "
-	                "number of list-tags=%u too many\n",
-	                ntags) ;
-#endif
 
 	            rs = SR_BADFMT ;
 	            break ;
@@ -1351,12 +1101,6 @@ static int txtindexes_audithash(TXTINDEXES *op,OFFINDEX *oip)
 
 	        listsize = (ntags + 1) * sizeof(uint) ;
 	        if ((listsize + listoff) >= hfsize) {
-
-#if	CF_DEBUGS
-	            debugprintf("txtindexes_audithash: "
-	                "hash-table list-size=%u too big\n",
-	                listsize) ;
-#endif
 
 	            rs = SR_BADFMT ;
 	            break ;
@@ -1367,27 +1111,11 @@ static int txtindexes_audithash(TXTINDEXES *op,OFFINDEX *oip)
 
 	            tagoff = *uip++ ;
 	            if (tagoff >= tfsize) {
-
-#if	CF_DEBUGS
-	                debugprintf("txtindexes_audithash: "
-	                    "tag-offset too big\n",
-	                    tagoff) ;
-#endif
-
 	                rs = SR_BADFMT ;
 	                break ;
-
 	            } /* end if (error) */
 
 	            rs = offindex_lookup(oip,tagoff) ;
-
-#if	CF_DEBUGS
-	            if (rs < 0)
-	                debugprintf("txtindexes_audithash: "
-	                    "tag-offset=%u does not exist!\n",
-	                    tagoff) ;
-#endif
-
 	            if (rs < 0) break ;
 	        } /* end for (tag-list entries) */
 
@@ -1437,11 +1165,6 @@ static int txtindexes_auditeigen(TXTINDEXES *op)
 	if ((rs >= 0) && (estab[0] != '\0')) {
 	    rs = SR_BADFMT ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("txtindexes_auditeigen: initial rt 1 rs=%d\n",
-	    rs) ;
-#endif
 
 	if (rs >= 0) {
 	    nskip = hip->eiskip ;
