@@ -1,9 +1,8 @@
-/* txtindexhdr */
+/* txtindexhdr SUPPORT */
+/* lang=C++20 */
 
 /* text-index hash file */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,39 +19,31 @@
 
 /*******************************************************************************
 
+	Name:
+	txtindexhdr
+
+	Description:
 	This subroutine writes out the hash file.
 
 	Synopsis:
-
-	int txtindexhdr(ep,f,hbuf,hlen)
-	TXTINDEXHDR	*ep ;
-	int		f ;
-	char		hbuf[] ;
-	int		hlen ;
+	int txtindexhdr(txtindexhdr *ep,int f,char *hbuf,int hlen) noex
 
 	Arguments:
-
 	- ep		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<localmisc.h>
@@ -68,7 +59,7 @@
 extern int	mkmagic(char *,int,cchar *) ;
 extern int	isValidMagic(cchar *,int,cchar *) ;
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -108,17 +99,18 @@ enum his {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int txtindexhdr(TXTINDEXHDR *ep,int f,char *hbuf,int hlen)
-{
+int txtindexhdr(TXTINDEXHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = TXTINDEXHDR_MAGICSIZE ;
+	cint		headsize = hi_overlast * sizeof(uint) ;
+	cint		magicsize = TXTINDEXHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	const char	*magicstr = TXTINDEXHDR_MAGICSTR ;
+	cchar		*magicstr = TXTINDEXHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
