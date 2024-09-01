@@ -1,4 +1,4 @@
-/* txtindexes */
+/* txtindexes SUPPORT */
 /* lang=C20 */
 
 /* read or audit a TXTINDEX database */
@@ -37,7 +37,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error code
+	<0		error code (system-return)
 
 	Notes:
 	Compile-time options include:
@@ -67,18 +67,25 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>		/* |UINT_MAX| */
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<snwcpy.h>
+#include	<strwcpy.h>
+#include	<strn.h>
 #include	<hash.h>
+#include	<mkfname.h>
+#include	<cfdec.h>
+#include	<char.h>
+#include	<hasx.h>
+#include	<localmisc.h>
 
 #include	"txtindexes.h"
 #include	"txtindexhdr.h"
@@ -105,28 +112,15 @@
 
 #define	LISTDESC	struct listdesc
 
+#define	TI_CUR		txtindexes_cur
+#define	TI_TAG		txtindexes_tag
+
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	strtabfind(cchar *,int (*)[3],int,int,cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern "C" {
+    extern int	strtabfind(cchar *,int (*)[3],int,int,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -134,10 +128,10 @@ extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 /* exported variables */
 
-TXTINDEXES_OBJ	txtindexes = {
+TXTINDEXES_OBJ	txtindexes_mod = {
 	"txtindexes",
-	    sizeof(TXTINDEXES),
-	    sizeof(TXTINDEXES_CUR)
+	sizeof(txtindexes),
+	sizeof(txtindexes_cur)
 } ;
 
 
@@ -151,37 +145,37 @@ struct listdesc {
 
 /* forward references */
 
-static int	txtindexes_dbloadcreate(TXTINDEXES *,time_t) ;
-static int	txtindexes_dbloaddestroy(TXTINDEXES *) ;
-static int	txtindexes_filemapcreate(TXTINDEXES *,int,cchar *,time_t) ;
-static int	txtindexes_filemapdestroy(TXTINDEXES *,int) ;
-static int	txtindexes_dbmapcreate(TXTINDEXES *,time_t) ;
-static int	txtindexes_dbmapdestroy(TXTINDEXES *) ;
-static int	txtindexes_dbproc(TXTINDEXES *,time_t) ;
-static int	txtindexes_mkhashkeys(TXTINDEXES *,vecstr *,cchar **) ;
-static int	txtindexes_mktaglist(TXTINDEXES *,uint **,vecstr *) ;
-static int	txtindexes_oureigen(TXTINDEXES *,cchar *,int) ;
-static int	txtindexes_hdrverify(TXTINDEXES *,time_t) ;
-static int	txtindexes_audithash(TXTINDEXES *,OFFINDEX *) ;
-static int	txtindexes_auditeigen(TXTINDEXES *) ;
+static int	txtindexes_dbloadcreate(txtindexes *,time_t) noex ;
+static int	txtindexes_dbloaddestroy(txtindexes *) noex ;
+static int	txtindexes_fimapcreate(txtindexes *,int,cchar *,time_t) noex ;
+static int	txtindexes_fimapdestroy(txtindexes *,int) noex ;
+static int	txtindexes_dbmapcreate(txtindexes *,time_t) noex ;
+static int	txtindexes_dbmapdestroy(txtindexes *) noex ;
+static int	txtindexes_dbproc(txtindexes *,time_t) noex ;
+static int	txtindexes_mkhashkeys(txtindexes *,vecstr *,cchar **) noex ;
+static int	txtindexes_mktaglist(txtindexes *,uint **,vecstr *) noex ;
+static int	txtindexes_oureigen(txtindexes *,cchar *,int) noex ;
+static int	txtindexes_hdrverify(txtindexes *,time_t) noex ;
+static int	txtindexes_audithash(txtindexes *,OFFINDEX *) noex ;
+static int	txtindexes_auditeigen(txtindexes *) noex ;
 
-static int	offindex_tags(OFFINDEX *,cchar *,int) ;
+static int	offindex_tags(OFFINDEX *,cchar *,int) noex ;
 
-static int	tag_parse(TXTINDEXES_TAG *,cchar *,int) ;
+static int	tag_parse(TXTINDEXES_TAG *,cchar *,int) noex ;
 
 #if	CF_DYNACOMPACT
 #else
-static int	taglist_compact(uint *,int) ;
+static int	taglist_compact(uint *,int) noex ;
 #endif
 
-static int	vcmpuint(const void *,const void *) ;
+static int	vcmpuint(cvoid *,cvoid *) noex ;
 
 #if	CF_SORTLISTS
-static int	cmplistdesc(const LISTDESC *,const LISTDESC *) ;
+static int	cmplistdesc(const LISTDESC *,const LISTDESC *) noex ;
 #endif /* CF_SORTLISTS */
 
 #if	CF_SORTKEYS
-static int	vcmpkey(cchar **,cchar **) ;
+static int	vcmpkey(cchar **,cchar **) noex ;
 #endif
 
 
@@ -193,7 +187,7 @@ static int	vcmpkey(cchar **,cchar **) ;
 
 /* exported subroutines */
 
-int txtindexes_open(TXTINDEXES *op,cchar *dbname) noex {
+int txtindexes_open(txtindexes *op,cchar *dbname) noex {
 	custime		dt = time(NULL) ;
 	int		rs = SR_OK ;
 	cchar		*cp ;
@@ -226,7 +220,7 @@ int txtindexes_open(TXTINDEXES *op,cchar *dbname) noex {
 /* end subroutine (txtindexes_open) */
 
 
-int txtindexes_close(TXTINDEXES *op)
+int txtindexes_close(txtindexes *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -253,7 +247,7 @@ int txtindexes_close(TXTINDEXES *op)
 /* end subroutine (txtindexes_close) */
 
 
-int txtindexes_audit(TXTINDEXES *op)
+int txtindexes_audit(txtindexes *op)
 {
 	OFFINDEX	oi ;
 	int		rs = SR_OK ;
@@ -271,7 +265,7 @@ int txtindexes_audit(TXTINDEXES *op)
 	    cint	sl = op->tf.mapsize ;
 	    cchar	*sp = op->tf.mapdata ;
 	    if ((rs = offindex_tags(&oi,sp,sl)) >= 0) {
-	        const int	taglen = rs ;
+	        cint	taglen = rs ;
 	        if (taglen == op->ifi.taglen) {
 	            rs = txtindexes_audithash(op,&oi) ;
 	        } else {
@@ -290,7 +284,7 @@ int txtindexes_audit(TXTINDEXES *op)
 /* end subroutine (txtindexes_audit) */
 
 
-int txtindexes_count(TXTINDEXES *op)
+int txtindexes_count(txtindexes *op)
 {
 	int		rs = SR_OK ;
 	int		n = 0 ;
@@ -306,7 +300,7 @@ int txtindexes_count(TXTINDEXES *op)
 /* end subroutine (txtindexes_count) */
 
 
-int txtindexes_neigen(TXTINDEXES *op)
+int txtindexes_neigen(txtindexes *op)
 {
 	int		rs = SR_OK ;
 	int		n = 0 ;
@@ -321,7 +315,7 @@ int txtindexes_neigen(TXTINDEXES *op)
 }
 /* end subroutine (txtindexes_neigen) */
 
-int txtindexes_getinfo(TXTINDEXES *op,TXTINDEXES_INFO *ip) noex {
+int txtindexes_getinfo(txtindexes *op,TXTINDEXES_INFO *ip) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	cchar	*sp ;
@@ -333,7 +327,7 @@ int txtindexes_getinfo(TXTINDEXES *op,TXTINDEXES_INFO *ip) noex {
 	n = op->ifi.taglen ;
 	if (ip != NULL) {
 	    TXTINDEXES_FI	*fip = &op->hf ;
-	    const int		plen = MAXPATHLEN ;
+	    cint		plen = MAXPATHLEN ;
 	    memset(ip,0,sizeof(TXTINDEXES_INFO)) ;
 	    ip->ctime = (time_t) op->ifi.wtime ;
 	    ip->mtime = fip->ti_mod ;
@@ -356,7 +350,7 @@ int txtindexes_getinfo(TXTINDEXES *op,TXTINDEXES_INFO *ip) noex {
 /* end subroutine (txtindexes_info) */
 
 
-int txtindexes_iseigen(TXTINDEXES *op,cchar *kp,int kl)
+int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl)
 {
 	int		rs ;
 	int		klen = KEYBUFLEN ;
@@ -383,7 +377,7 @@ int txtindexes_iseigen(TXTINDEXES *op,cchar *kp,int kl)
 
 
 /* amazingly the only thread-shared data is the 'ncursors' variable here! */
-int txtindexes_curbegin(TXTINDEXES *op,TXTINDEXES_CUR *curp)
+int txtindexes_curbegin(txtindexes *op,TXTINDEXES_CUR *curp)
 {
 	int		rs ;
 
@@ -404,7 +398,7 @@ int txtindexes_curbegin(TXTINDEXES *op,TXTINDEXES_CUR *curp)
 /* end subroutine (txtindexes_curbegin) */
 
 
-int txtindexes_curend(TXTINDEXES *op,TXTINDEXES_CUR *curp)
+int txtindexes_curend(txtindexes *op,TXTINDEXES_CUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -435,7 +429,7 @@ int txtindexes_curend(TXTINDEXES *op,TXTINDEXES_CUR *curp)
 /* end subroutine (txtindexes_curend) */
 
 
-int txtindexes_lookup(TXTINDEXES *op,TXTINDEXES_CUR *curp,cchar **klp)
+int txtindexes_lookup(txtindexes *op,TXTINDEXES_CUR *curp,cchar **klp)
 {
 	vecstr		hkeys ;
 	uint		*taglist = NULL ;
@@ -478,9 +472,8 @@ int txtindexes_lookup(TXTINDEXES *op,TXTINDEXES_CUR *curp,cchar **klp)
 }
 /* end subroutine (txtindexes_lookup) */
 
-
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_read(TXTINDEXES *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
+int txtindexes_read(txtindexes *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 {
 	TXTINDEXES_FI	*fip ;
 	uint		tagoff ;
@@ -547,7 +540,7 @@ int txtindexes_read(TXTINDEXES *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 
 /* private subroutines */
 
-static int txtindexes_dbloadcreate(TXTINDEXES *op,time_t dt) noex {
+static int txtindexes_dbloadcreate(txtindexes *op,time_t dt) noex {
 	int		rs ;
 
 	if ((rs = txtindexes_dbmapcreate(op,dt)) >= 0) {
@@ -560,14 +553,14 @@ static int txtindexes_dbloadcreate(TXTINDEXES *op,time_t dt) noex {
 }
 /* end subroutine (txtindexes_dbloadcreate) */
 
-static int txtindexes_dbloaddestroy(TXTINDEXES *op) noex {
+static int txtindexes_dbloaddestroy(txtindexes *op) noex {
 	TXTINDEXES_MI	*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = txtindexes_dbmapdestroy(op) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = txtindexes_dbmapdestroy(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	mip = &op->mi ;
 	mip->table = NULL ;
 	mip->estab = NULL ;
@@ -577,45 +570,40 @@ static int txtindexes_dbloaddestroy(TXTINDEXES *op) noex {
 }
 /* end subroutine (txtindexes_dbloaddestroy) */
 
-
-static int txtindexes_dbmapcreate(TXTINDEXES *op,time_t dt)
-{
+static int txtindexes_dbmapcreate(txtindexes *op,time_t dt) noex {
 	int		rs ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 	if ((rs = mkfnamesuf2(tbuf,op->dbname,FE_HASH,ENDIANSTR)) >= 0) {
-	    if ((rs = txtindexes_filemapcreate(op,0,tbuf,dt)) >= 0) {
+	    if ((rs = txtindexes_fimapcreate(op,0,tbuf,dt)) >= 0) {
 	        if ((rs = mkfnamesuf1(tbuf,op->dbname,FE_TAG)) >= 0) {
-	            rs = txtindexes_filemapcreate(op,1,tbuf,dt) ;
+	            rs = txtindexes_fimapcreate(op,1,tbuf,dt) ;
 	        }
 	        if (rs < 0)
-	            txtindexes_filemapdestroy(op,0) ;
-	    } /* end if (txtindexes_filemapcreate) */
+	            txtindexes_fimapdestroy(op,0) ;
+	    } /* end if (txtindexes_fimapcreate) */
 	}
 
 	return rs ;
 }
 /* end subroutine (txtindexes_dbmapcreate) */
 
-
-static int txtindexes_dbmapdestroy(TXTINDEXES *op)
-{
+static int txtindexes_dbmapdestroy(txtindexes *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = txtindexes_filemapdestroy(op,1) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = txtindexes_filemapdestroy(op,0) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = txtindexes_fimapdestroy(op,1) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = txtindexes_fimapdestroy(op,0) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (txtindexes_dbmapdestroy) */
 
-
-static int txtindexes_filemapcreate(TXTINDEXES *op,int w,cchar *fn,time_t dt)
-{
+static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
 	TXTINDEXES_FI	*fip = (w) ? &op->tf : &op->hf ;
 	int		rs ;
 
@@ -646,11 +634,9 @@ static int txtindexes_filemapcreate(TXTINDEXES *op,int w,cchar *fn,time_t dt)
 
 	return rs ;
 }
-/* end subroutine (txtindexes_filemapcreate) */
+/* end subroutine (txtindexes_fimapcreate) */
 
-
-static int txtindexes_filemapdestroy(TXTINDEXES *op,int w)
-{
+static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
 	TXTINDEXES_FI	*fip ;
 	int		rs = SR_OK ;
 
@@ -665,11 +651,9 @@ static int txtindexes_filemapdestroy(TXTINDEXES *op,int w)
 
 	return rs ;
 }
-/* end subroutine (txtindexes_filemapdestroy) */
+/* end subroutine (txtindexes_fimapdestroy) */
 
-
-static int txtindexes_dbproc(TXTINDEXES *op,time_t dt)
-{
+static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
 	TXTINDEXES_FI	*fip = &op->hf ;
 	TXTINDEXES_MI	*mip = &op->mi ;
 	TXTINDEXHDR	*hip ;
@@ -694,11 +678,9 @@ static int txtindexes_dbproc(TXTINDEXES *op,time_t dt)
 }
 /* end subroutine (txtindexes_dbproc) */
 
-
-static int txtindexes_mkhashkeys(TXTINDEXES *op,vecstr *clp,cchar **klp)
-{
-	const int	klen = KEYBUFLEN ;
-	const int	nrs = SR_NOTFOUND ;
+static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,cchar **klp) noex {
+	cint		klen = KEYBUFLEN ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		minwlen ;
 	int		maxwlen ;
@@ -724,7 +706,7 @@ static int txtindexes_mkhashkeys(TXTINDEXES *op,vecstr *clp,cchar **klp)
 
 	    	    if ((rs = txtindexes_oureigen(op,kp,kl)) == 0) {
 			if (kl > maxwlen) kl = maxwlen ;
-	                if ((rs = vecstr_findn(clp,kp,kl)) == nrs) {
+	                if ((rs = vecstr_findn(clp,kp,kl)) == rsn) {
 	                    c += 1 ;
 	                    rs = vecstr_add(clp,kp,kl) ;
 	                }
@@ -745,9 +727,7 @@ static int txtindexes_mkhashkeys(TXTINDEXES *op,vecstr *clp,cchar **klp)
 }
 /* end subroutine (txtindexes_mkhashkeys) */
 
-
-static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
-{
+static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 	TXTINDEXHDR	*hip = &op->ifi ;
 	int		rs ;
 	int		tagcount = 0 ;
@@ -838,8 +818,8 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 
 #if	CF_SORTLISTS /* optional but strongly recommended, for performance */
 	        if ((rs >= 0) && (n > 1)) {
-	            int	(*cfn)(const void *,const void *) ;
-	            cfn = (int (*)(const void *,const void *)) cmplistdesc ;
+	            int	(*cfn)(cvoid *,cvoid *) ;
+	            cfn = (int (*)(cvoid *,cvoid *)) cmplistdesc ;
 	            qsort(lists,n,sizeof(LISTDESC),cfn) ;
 	        }
 #endif /* CF_SORTLISTS */
@@ -957,11 +937,9 @@ static int txtindexes_mktaglist(TXTINDEXES *op,uint **tlpp,vecstr *hlp)
 }
 /* end subroutine (txtindexes_mktaglist) */
 
-
-int txtindexes_oureigen(TXTINDEXES *op,cchar *kp,int kl)
-{
+int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
 	TXTINDEXES_MI	*mip = &op->mi ;
-	const int	nrs = SR_NOTFOUND ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		(*eitab)[3] ;
 	int		eilen ;
@@ -973,7 +951,7 @@ int txtindexes_oureigen(TXTINDEXES *op,cchar *kp,int kl)
 	eitab = mip->eitab ;
 	eilen = op->ifi.eilen ;
 	nskip = op->ifi.eiskip ;
-	if ((rs = strtabfind(estab,eitab,eilen,nskip,kp,kl)) == nrs) {
+	if ((rs = strtabfind(estab,eitab,eilen,nskip,kp,kl)) == rsn) {
 	    f = FALSE ;
 	    rs = SR_OK ;
 	}
@@ -982,9 +960,7 @@ int txtindexes_oureigen(TXTINDEXES *op,cchar *kp,int kl)
 }
 /* end subroutine (txtindexes_oureigen) */
 
-
-static int txtindexes_hdrverify(TXTINDEXES *op,time_t dt)
-{
+static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 	TXTINDEXES_FI	*fip = &op->hf ;
 	TXTINDEXHDR	*hip = &op->ifi ;
 	uint		utime = (uint) dt ;
@@ -1044,9 +1020,7 @@ static int txtindexes_hdrverify(TXTINDEXES *op,time_t dt)
 }
 /* end subroutine (txtindexes_hdrverify) */
 
-
-static int txtindexes_audithash(TXTINDEXES *op,OFFINDEX *oip)
-{
+static int txtindexes_audithash(txtindexes *op,OFFINDEX *oip) noex {
 	TXTINDEXES_FI	*fip = &op->hf ;
 	TXTINDEXES_MI	*mip = &op->mi ;
 	TXTINDEXHDR	*hip ;
@@ -1126,9 +1100,7 @@ static int txtindexes_audithash(TXTINDEXES *op,OFFINDEX *oip)
 }
 /* end subroutine (txtindexes_audithash) */
 
-
-static int txtindexes_auditeigen(TXTINDEXES *op)
-{
+static int txtindexes_auditeigen(txtindexes *op) noex {
 	TXTINDEXHDR	*hip ;
 	TXTINDEXES_MI	*mip ;
 	int		rs = SR_OK ;
@@ -1330,16 +1302,15 @@ static int tag_parse(TXTINDEXES_TAG *tagp,cchar *sp,int sl) noex {
 
 	            } /* end if (ok) */
 
-	        } else
+	        } else {
 	            rs = SR_BADFMT ;
-
+	 	}
 	    } /* end if (ok) */
 
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (tag_parse) */
-
 
 #if	CF_DYNACOMPACT
 #else
@@ -1365,7 +1336,7 @@ static int taglist_compact(uint *taglist,int taglen) noex {
 /* end subroutine (taglist_compact) */
 #endif /* CF_DYNACOMPACT */
 
-static int vcmpuint(const void *v1p,const void *v2p) noex {
+static int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 	const uint	*i1p = (const uint *) v1p ;
 	const uint	*i2p = (const uint *) v2p ;
 	int		rc = 0 ;
@@ -1394,19 +1365,21 @@ static int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
 	            l1 = strlen(s1) ;
 	            l2 = strlen(s2) ;
 	            rc = (l2 - l1) ;
-	            if (rc == 0)
+	            if (rc == 0) {
 	                rc = strcmp(s2,s1) ;
-	        } else
+		    }
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = +1 ;
+	    }
 	}
 	return rc ;
 }
 /* end subroutine (vcmpkey) */
 
 #endif /* CF_SORTKEYS */
-
 
 #if	CF_SORTLISTS
 static int cmplistdesc(const LISTDESC *l1p,const LISTDESC *l2p) noex {

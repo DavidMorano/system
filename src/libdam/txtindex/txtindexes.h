@@ -38,7 +38,7 @@
 #define	TXTINDEXES_INFO		struct txtindexes_information
 
 
-struct txtindexes_objext {
+struct txtindexes_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
