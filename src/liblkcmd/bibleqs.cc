@@ -1,7 +1,8 @@
-/* bibleqs */
+/* bibleqs SUPPORT */
+/* lang=C++20 */
 
 /* bible-query database manager */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUGSTART	0		/* debug |isstart()| */
@@ -14,7 +15,6 @@
 #define	CF_SINGLEWORD	1		/* treat extra words as single */
 #define	CF_MKBIBLEQSI	0		/* |bibleqs_mkbibleqsi()| */
 
-
 /* revision history:
 
 	- 2008-10-01, David A­D­ Morano
@@ -26,41 +26,41 @@
 
 /*******************************************************************************
 
-	This little object provides access to the BIBLEQS database and index
-	(if any).
+	This little object provides access to the BIBLEQS database
+	and index (if any).
 
 	Note on Strong's eigen-words: There is a compile-time switch
-	('CF_EXTRASTRONG') that chooses between using an internal list of
-	Strong's 1980 set of eigen-words; or, alternatively, to use an
-	eigen-database on the current system.  Using the Strong's list (an
-	internally stored list) has the advantage of giving consistent query 
-	results with what would be returned if one was to actually use Strong's
-        concordance. The disadvantage of using the internal list (Strong's list)
-        is that it is small and may make queries a little bit more time
-        consuming than would be the case when using a typical system eigen-word
-        list (although this should be a very small effect at best).
+	('CF_EXTRASTRONG') that chooses between using an internal
+	list of Strong's 1980 set of eigen-words; or, alternatively,
+	to use an eigen-database on the current system.  Using the
+	Strong's list (an internally stored list) has the advantage
+	of giving consistent query results with what would be
+	returned if one was to actually use Strong's concordance.
+	The disadvantage of using the internal list (Strong's list)
+	is that it is small and may make queries a little bit more
+	time consuming than would be the case when using a typical
+	system eigen-word list (although this should be a very small
+	effect at best).
 
-	Note that any eigen-word list can be used because the list is stored in
-	the index of the DB so that the same list is always used on queries as
-	was used in the original creation of the index itself.  The DB proper
-	only stores the real data, no eigen-words; so eigen-word lists can be
-	changed on every recreation of the index.
-
+	Note that any eigen-word list can be used because the list
+	is stored in the index of the DB so that the same list is
+	always used on queries as was used in the original creation
+	of the index itself.  The DB proper only stores the real
+	data, no eigen-words; so eigen-word lists can be changed
+	on every recreation of the index.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<char.h>
@@ -203,34 +203,34 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	snwcpylc(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
+extern int	sncpylc(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	snwcpylc(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	siskipwhite(cchar *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	mkdirs(cchar *,mode_t) ;
 extern int	chownsame(cchar *,cchar *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	hasuc(const char *,int) ;
+extern int	sperm(IDS *,USTAT	 *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isalnumlatin(int) ;
 extern int	isdigitlatin(int) ;
-extern int	strpcmp(const char *,const char *) ;
-extern int	isOneOf(const int *,int) ;
+extern int	strpcmp(cchar *,cchar *) ;
+extern int	isOneOf(cint *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -238,10 +238,10 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* exported variables */
@@ -286,7 +286,7 @@ struct ktag_head {
 
 /* forward references */
 
-static int	bibleqs_infoloadbegin(BIBLEQS *,const char *,const char *) ;
+static int	bibleqs_infoloadbegin(BIBLEQS *,cchar *,cchar *) ;
 static int	bibleqs_infoloadend(BIBLEQS *) ;
 static int	bibleqs_indopen(BIBLEQS *,SUBINFO *) ;
 
@@ -298,9 +298,9 @@ static int	bibleqs_dbmapcreate(BIBLEQS *,time_t) ;
 static int	bibleqs_dbmapdestroy(BIBLEQS *) ;
 static int	bibleqs_havekeys(BIBLEQS *,TXTINDEX_TAG *,int,SEARCHKEYS *) ;
 static int	bibleqs_havekeysline(BIBLEQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
-			const char *,int) ;
+			cchar *,int) ;
 static int	bibleqs_matchkeys(BIBLEQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
-			const char *,int) ;
+			cchar *,int) ;
 static int	bibleqs_loadbuf(BIBLEQS *,uint,char *,int) ;
 static int	bibleqs_mkhkeys(BIBLEQS *,vecstr *,SEARCHKEYS *) ;
 static int	bibleqs_indopenseq(BIBLEQS *,SUBINFO *) ;
@@ -313,7 +313,7 @@ static int	bibleqs_dirok(BIBLEQS *,DIRSEEN *,IDS *,cchar *,int) ;
 static int	bibleqs_mkdir(BIBLEQS *,cchar *) ;
 
 #if	CF_MKBIBLEQSI
-static int	bibleqs_mkbibleqsi(BIBLEQS *,const char *) ;
+static int	bibleqs_mkbibleqsi(BIBLEQS *,cchar *) ;
 #endif
 
 #if	CF_EXTRASTRONG
@@ -325,7 +325,7 @@ static int	bibleqs_lookuper(BIBLEQS *,BIBLEQS_CUR *,int,
 			SEARCHKEYS *,VECSTR *) ;
 
 #ifdef	COMMENT
-static int	bibleqs_mksysvarsi(BIBLEQS *,const char *) ;
+static int	bibleqs_mksysvarsi(BIBLEQS *,cchar *) ;
 #endif
 
 static int	subinfo_start(SUBINFO *) ;
@@ -335,26 +335,26 @@ static int	subinfo_finish(SUBINFO *) ;
 static int	subinfo_ids(SUBINFO *) ;
 #endif
 
-static int	ktag_start(KTAG *,KTAG_PARAMS *,size_t,const char *,int) ;
-static int	ktag_add(KTAG *,const char *,int) ;
-static int	ktag_procline(KTAG *,const char *,int) ;
+static int	ktag_start(KTAG *,KTAG_PARAMS *,size_t,cchar *,int) ;
+static int	ktag_add(KTAG *,cchar *,int) ;
+static int	ktag_procline(KTAG *,cchar *,int) ;
 static int	ktag_mktag(KTAG *,size_t,TXTINDEXMK_TAG *) ;
 static int	ktag_finish(KTAG *) ;
-static int	ktag_procword(KTAG *,const char *,int) ;
-static int	ktag_storelc(KTAG *,const char **,const char *,int) ;
+static int	ktag_procword(KTAG *,cchar *,int) ;
+static int	ktag_storelc(KTAG *,cchar **,cchar *,int) ;
 
 static int	mkdname(cchar *,mode_t) ;
-static int	checkdname(const char *) ;
+static int	checkdname(cchar *) ;
 
 #if	CF_EXTRASTRONG
-static int	eigenfind(EIGENDB *,const char *,const char *,int) ;
+static int	eigenfind(EIGENDB *,cchar *,cchar *,int) ;
 #endif
 
-static int	isstart(const char *,int,BIBLEQS_Q *,int *) ;
+static int	isstart(cchar *,int,BIBLEQS_Q *,int *) ;
 static int	mkfieldterms(uchar *) ;
 
 static int	vesrch(cvoid *,cvoid *) ;
-static int	vcmpint(const int *,const int *) ;
+static int	vcmpint(cint *,cint *) ;
 
 static int	isNeedIndex(int) ;
 
@@ -362,7 +362,7 @@ static int	isNeedIndex(int) ;
 /* local variables */
 
 #if	CF_MKBIBLEQSI
-static const char	*envchild[] = {
+static cchar	*envchild[] = {
 	VARSYSNAME,
 	VARRELEASE,
 	VARVERSION,
@@ -382,7 +382,7 @@ static const char	*envchild[] = {
 
 /* use fixed locations for security reasons (like we care!) */
 #if	CF_MKBIBLEQSI
-static const char	*prbins[] = {
+static cchar	*prbins[] = {
 	"bin",
 	"sbin",
 	NULL
@@ -401,7 +401,7 @@ static cchar	*idxdirs[] = {
 
 #if	CF_EXTRASTRONG
 
-static const char	*eigenfnames[] = {
+static cchar	*eigenfnames[] = {
 	"lib/bibleqs/%n.%f",
 	"lib/bibleqs/%f",
 	"share/dict/%n.%f",
@@ -415,7 +415,7 @@ static const char	*eigenfnames[] = {
 #else /* CF_EXTRASTRONG */
 
 /* these are not likely to change since their publication in 1890! */
-static const char	*strongseigens[] = {
+static cchar	*strongseigens[] = {
 	"a", "an", "and", "are", "as", "be", "but", "by", "for",
 	"from", "he", "her", "him", "his", "i", "in", "is", "it",
 	"me", "my", "not", "o", "of", "our", "out", "shall", "shalt",
@@ -427,7 +427,7 @@ static const char	*strongseigens[] = {
 
 #endif /* CF_EXTRASTRONG */
 
-static const int	rsneeds[] = {
+static cint	rsneeds[] = {
 	SR_STALE,
 	0
 } ;
@@ -651,7 +651,7 @@ int bibleqs_lookup(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp)
 	}
 
 	if ((rs = searchkeys_start(&sk,qsp)) >= 0) {
-	    const int	vopts = (VECSTR_OCOMPACT) ;
+	    cint	vopts = (VECSTR_OCOMPACT) ;
 	    if ((rs = vecstr_start(&hkeys,10,vopts)) >= 0) {
 	        if ((rs = bibleqs_mkhkeys(op,&hkeys,&sk)) >= 0) {
 		    rs = bibleqs_lookuper(op,curp,qo,&sk,&hkeys) ;
@@ -695,7 +695,7 @@ int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 	    int		ei = (curp->i >= 0) ? curp->i : 0 ;
 	    int		si ;
 	    int		ml ;
-	    const char	*mp ;
+	    cchar	*mp ;
 
 
 #if	CF_DEBUGS
@@ -709,7 +709,7 @@ int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 	    debugprintf("bibleqs_read: recoff=%u\n",recoff) ;
 #endif
 
-	    mp = (const char *) (op->dbmdata + recoff) ;
+	    mp = (cchar *) (op->dbmdata + recoff) ;
 	    ml = (op->dbmsize - recoff) ;
 
 #if	CF_DEBUGS
@@ -777,13 +777,13 @@ static int bibleqs_infoloadbegin(BIBLEQS *op,cchar *pr,cchar *dbname)
 	if ((rs = mkpath3(tmpfname,pr,BIBLEQS_DBDNAME,dbname)) >= 0) {
 	    char	dbfname[MAXPATHLEN + 1] ;
 	    if ((rs = mkfnamesuf1(dbfname,tmpfname,DBSUF)) >= 0) {
-		const char	*cp ;
+		cchar	*cp ;
 		int		fnl = rs ;
 #if	CF_DEBUGS
 	        debugprintf("bibleqs_infoloadbegin: dbfname=%s\n",dbfname) ;
 #endif
 	        if ((rs = uc_mallocstrw(dbfname,fnl,&cp)) >= 0) {
-	            struct ustat	sb ;
+	            USTAT		sb ;
 		    op->dbfname = cp ;
 	            if ((rs = u_stat(op->dbfname,&sb)) >= 0) {
 	                if (S_ISREG(sb.st_mode)) {
@@ -832,8 +832,8 @@ static int bibleqs_dbmapcreate(BIBLEQS *op,time_t dt)
 #endif
 
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
-	    const int		fd = rs ;
+	    USTAT		sb ;
+	    cint		fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 		size_t	fsize = (size_t) (sb.st_size & INT_MAX) ;
 		if (S_ISREG(sb.st_mode) && (sb.st_size >= 0)) {
@@ -843,7 +843,7 @@ static int bibleqs_dbmapcreate(BIBLEQS *op,time_t dt)
 	    		void	*md ;
 			op->ti_db = sb.st_mtime ;
 	                if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
-		            const int	madv = MADV_RANDOM ;
+		            cint	madv = MADV_RANDOM ;
 		            const caddr_t	ma = md ;
 	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                        op->dbmdata = md ;
@@ -928,7 +928,7 @@ static int bibleqs_indopenseqer(BIBLEQS *op,SUBINFO *sip,
 		DIRSEEN *dsp,EXPCOOK *ckp)
 {
 	IDS		id ;
-	const int	elen = MAXPATHLEN ;
+	cint	elen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -976,14 +976,14 @@ static int bibleqs_indopenseqer(BIBLEQS *op,SUBINFO *sip,
 static int bibleqs_dirok(BIBLEQS *op,DIRSEEN *dsp,IDS *idp,
 		cchar *dp,int dl)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		f_ok = FALSE ;
 	if ((rs = dirseen_havename(dsp,dp,dl)) == rsn) {
 	    USTAT	sb ;
 	    if ((rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
-		    const int	am = (W_OK|R_OK|X_OK) ;
+		    cint	am = (W_OK|R_OK|X_OK) ;
 		    if ((rs = sperm(idp,&sb,am)) >= 0) {
 			f_ok = TRUE ;
 		    } else if (isNotPresent(rs)) {
@@ -1149,7 +1149,7 @@ static int bibleqs_indmk(BIBLEQS *op,cchar *dname,time_t dt)
 		TXTINDEXMK	mk ;
 		TXTINDEXMK_PA	ta ;
 		const mode_t	om = BIBLEQS_IDXMODE ;
-		const int	of = 0 ; /* auto-make */
+		cint	of = 0 ; /* auto-make */
 
 		memset(&ta,0,sizeof(TXTINDEXMK_PA)) ;
 		ta.tablen = 0 ;			/* use default! */
@@ -1191,7 +1191,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 	EIGENDB_CUR	ecur ;
 	EIGENDB		*edbp = &op->edb ;
 	TXTINDEXMK_KEY	*keys = NULL ;
-	const int	nkeys = BIBLEQS_NEIGEN ;
+	cint	nkeys = BIBLEQS_NEIGEN ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1201,11 +1201,11 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 #endif
 
 	if (op->f.edb) {
-	    const int	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
+	    cint	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
 	if ((rs = uc_malloc(size,&keys)) >= 0) {
 	    int	i = 0 ;
 	int		wl ;
-	const char	*wp ;
+	cchar	*wp ;
 
 	    if ((rs = eigendb_curbegin(edbp,&ecur)) >= 0) {
 
@@ -1253,7 +1253,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 {
 	TXTINDEXMK_KEY	*keys = NULL ;
-	const int	nkeys = nelem(strongseigens) ;
+	cint	nkeys = nelem(strongseigens) ;
 	int		rs ;
 	int		rs1 ;
 	int		size ;
@@ -1264,7 +1264,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
 	if ((rs = uc_malloc(size,&keys)) >= 0) {
 	    int		wl ;
-	    const char	*wp ;
+	    cchar	*wp ;
 
 /* populate */
 
@@ -1317,7 +1317,7 @@ static int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip)
 	    int			si ;
 	    int			len ;
 	    int			f_ent = FALSE ;
-	    const char		*tp, *mp, *lp ;
+	    cchar		*tp, *mp, *lp ;
 
 /* paramters for KTAGing */
 
@@ -1481,7 +1481,7 @@ static int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname)
 	if ((rs = mkpath2(dbname,dname,op->dbname)) >= 0) {
 	pid_t		cpid = 0 ;
 	int		i, cstat ;
-	const char	*prog = PROG_MKBIBLEQSI ;
+	cchar	*prog = PROG_MKBIBLEQSI ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
 	for (i = 0 ; prbins[i] != NULL ; i += 1) {
@@ -1499,7 +1499,7 @@ static int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname)
 
 	if (rs >= 0) {
 	    vecstr	envs ;
-	    const int	vo = VECSTR_OCOMPACT ;
+	    cint	vo = VECSTR_OCOMPACT ;
 
 	if ((rs = vecstr_start(&envs,20,VECSTR_OCOMPACT)) >= 0) {
 	    if (rs >= 0) {
@@ -1520,7 +1520,7 @@ static int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname)
 		    cchar	**ev ;
 	            if ((rs = vecstr_getvec(&envs,&ev)) >= 0) {
 			SPAWNPROC	ps ;
-			const char	*av[10] ;
+			cchar	*av[10] ;
 	    		i = 0 ;
 	    		av[i++] = prog ;
 	    		av[i++] = NULL ;
@@ -1585,7 +1585,7 @@ int		qo ;
 SEARCHKEYS	*skp ;
 {
 	SEARCHKEYS_POP	pkeys ;
-	const int	f_prefix = (qo & BIBLEQS_OPREFIX) ;
+	cint	f_prefix = (qo & BIBLEQS_OPREFIX) ;
 	int		rs ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -1596,13 +1596,13 @@ SEARCHKEYS	*skp ;
 	    int		si ;
 	    int		len ;
 	    int		ml, ll ;
-	    const char	*tp, *mp, *lp ;
+	    cchar	*tp, *mp, *lp ;
 
 	    if (c == 0) f = TRUE ;
 
 /* process this tag */
 
-	    mp = (const char *) (op->dbmdata + tagp->recoff) ;
+	    mp = (cchar *) (op->dbmdata + tagp->recoff) ;
 	    ml = tagp->reclen ;
 
 	    while ((! f) && ((tp = strnchr(mp,ml,'\n')) != NULL)) {
@@ -1659,7 +1659,7 @@ static int bibleqs_havekeysline(op,skp,pkp,lp,ll)
 BIBLEQS		*op ;
 SEARCHKEYS	*skp ;
 SEARCHKEYS_POP	*pkp ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	FIELD		fsb ;
@@ -1673,7 +1673,7 @@ int		ll ;
 
 	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
 	    int		fl, kl ;
-	    const char	*fp, *kp ;
+	    cchar	*fp, *kp ;
 	    char	keybuf[KEYBUFLEN + 1] ;
 
 	    while ((fl = field_word(&fsb,op->wterms,&fp)) >= 0) {
@@ -1736,7 +1736,7 @@ static int bibleqs_matchkeys(op,skp,pkp,sp,sl)
 BIBLEQS		*op ;
 SEARCHKEYS	*skp ;
 SEARCHKEYS_POP	*pkp ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	XWORDS		xw ;
@@ -1809,19 +1809,19 @@ int		vlen ;
 	int		rs ;
 	int		ml ;
 	int		len = 0 ;
-	const char	*mp ;
+	cchar	*mp ;
 
 #if	CF_DEBUGS
 	debugprintf("bibleqs_loadbuf: ent\n") ;
 #endif
 
-	mp = (const char *) (op->dbmdata + recoff) ;
+	mp = (cchar *) (op->dbmdata + recoff) ;
 	ml = (op->dbmsize - recoff) ;
 
 	if ((rs = sbuf_start(&b,vbuf,vlen)) >= 0) {
 	    int		ll ;
 	    int		j = 0 ;
-	    const char	*tp, *lp ;
+	    cchar	*tp, *lp ;
 
 	    while ((tp = strnchr(mp,ml,'\n')) != NULL) {
 
@@ -1914,13 +1914,9 @@ VECSTR		*hkp ;
 	int		c = 0 ;
 
 	if ((rs = vecint_start(&recoffs,10,0)) >= 0) {
-	    const char	**hkeya ;
+	    cchar	**hkeya ;
 	    if ((rs = vecstr_getvec(hkp,&hkeya)) >= 0) {
 	        TXTINDEX_CUR	tcur ;
-
-#if	CF_DEBUGS
-	        debugprintf("bibleqs_lookup: txtindex_curbegin()\n") ;
-#endif
 
 	        if ((rs = txtindex_curbegin(&op->ind,&tcur)) >= 0) {
 	            TXTINDEX_TAG	ttag ;
@@ -1929,47 +1925,31 @@ VECSTR		*hkp ;
 	            rs = txtindex_lookup(&op->ind,&tcur,hkeya) ;
 	            ntags = rs ;
 
-#if	CF_DEBUGS
-	            debugprintf("bibleqs_lookup: txtindex_lookup() rs=%d\n",
-			rs) ;
-#endif
-
 	            while ((rs >= 0) && (ntags-- > 0)) {
-
 	                rs1 = txtindex_read(&op->ind,&tcur,&ttag) ;
 	                if (rs1 == SR_NOTFOUND) break ;
 	                rs = rs1 ;
-
 	                if (rs >= 0) {
 	                    if ((rs = bibleqs_havekeys(op,&ttag,qo,skp)) > 0) {
 	                        c += 1 ;
 	                        rs = vecint_add(&recoffs,ttag.recoff) ;
 	                    }
 	                }
-
 	            } /* end while */
-
-#if	CF_DEBUGS
-	            debugprintf("bibleqs_lookup: while-out rs=%d\n",rs) ;
-#endif
-
 	            rs1 = txtindex_curend(&op->ind,&tcur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
 
-#if	CF_DEBUGS
-	        debugprintf("bibleqs_lookup: txtindex_cur out rs=%d\n",rs) ;
-#endif
-
 /* sort the secondary tags */
 
-	        if ((rs >= 0) && (c > 1))
+	        if ((rs >= 0) && (c > 1)) {
 	            vecint_sort(&recoffs,vcmpint) ;
+		}
 
 /* store results (file-record offsets) */
 
 	        if (rs >= 0) {
-	            const int	size = (c + 1) * sizeof(uint) ;
+	            cint	size = (c + 1) * sizeof(uint) ;
 	            if ((rs = uc_malloc(size,&curp->verses)) >= 0) {
 	                int *a ;
 	                if ((rs = vecint_getvec(&recoffs,&a)) >= 0) {
@@ -2003,7 +1983,7 @@ SEARCHKEYS	*skp ;
 
 	if ((rs = searchkeys_curbegin(skp,&cur)) >= 0) {
 	    int		kl ;
-	    const char	*kp ;
+	    cchar	*kp ;
 
 	    while (rs >= 0) {
 
@@ -2110,7 +2090,7 @@ static int ktag_start(KTAG *kop,KTAG_PARAMS *kap,size_t soff,cchar *lp,int ll)
 
 static int ktag_add(kop,lp,ll)
 KTAG		*kop ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	int		rs ;
@@ -2179,7 +2159,7 @@ TXTINDEXMK_TAG	*tagp ;
 
 static int ktag_procline(kop,lp,ll)
 KTAG		*kop ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	FIELD		fsb ;
@@ -2195,9 +2175,9 @@ int		ll ;
 	    XWORDS	w ;
 	    int		fl, sl ;
 	    int		wl ;
-	    const char	*fp ;
-	    const char	*wp ;
-	    const char	*sp ;
+	    cchar	*fp ;
+	    cchar	*wp ;
+	    cchar	*sp ;
 
 	    while ((fl = field_word(&fsb,kap->wterms,&fp)) >= 0) {
 
@@ -2258,16 +2238,16 @@ int		ll ;
 
 static int ktag_procword(kop,cp,cl)
 KTAG		*kop ;
-const char	*cp ;
+cchar	*cp ;
 int		cl ;
 {
 	VECOBJ		*klp = &kop->keys ;
 	KTAG_KEY	key ;
-	const int	nrs = SR_NOTFOUND ;
+	cint	nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		f_needstore = FALSE ;
 	int		f_cont = TRUE ;
-	const char	*lcp ;
+	cchar	*lcp ;
 	char		kbuf[KEYBUFLEN + 1] ;
 
 #if	CF_DEBUGS && CF_DEBUGPW
@@ -2374,7 +2354,7 @@ static int ktag_finish(KTAG *kop)
 
 static int mkdname(cchar *dname,mode_t dm)
 {
-	const int	nrs = SR_NOENT ;
+	cint	nrs = SR_NOENT ;
 	int		rs ;
 	if ((rs = checkdname(dname)) == nrs) {
 	    rs = mkdirs(dname,dm) ;
@@ -2393,7 +2373,7 @@ static int checkdname(cchar *dname)
 #endif
 
 	if (dname[0] == '/') {
-	    struct ustat	sb ;
+	    USTAT		sb ;
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 		if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
 		if (rs >= 0) {
@@ -2419,7 +2399,7 @@ static int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 	int		ch ;
 	int		si = 0 ;
 	int		f = FALSE ;
-	const char	*sp = lp ;
+	cchar	*sp = lp ;
 
 #if	CF_DEBUGS && CF_DEBUGSTART
 	    debugprintf("bibleqs/isstart: ent l=>%t<\n",lp,
@@ -2500,8 +2480,8 @@ static int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 
 static int eigenfind(edbp,pr,dbname,minwlen)
 EIGENDB		*edbp ;
-const char	pr[] ;
-const char	dbname[] ;
+cchar	pr[] ;
+cchar	dbname[] ;
 int		minwlen ;
 {
 	IDS		id ;
@@ -2516,10 +2496,10 @@ int		minwlen ;
 	}
 
 	if (rs >= 0) {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		i ;
 	int		efl ;
-	const char	*efp = NULL ;
+	cchar	*efp = NULL ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		efname[MAXPATHLEN + 1] ;
 
@@ -2618,26 +2598,24 @@ static int vesrch(cvoid *v1p,cvoid *v2p) noex {
 }
 /* end subroutine (vesrch) */
 
-
-static int vcmpint(const int *i1p,const int *i2p)
-{
+static int vcmpint(cint *i1p,cint *i2p) noex {
 	int		rc = 0 ;
-	if ((i1p != NULL) || (i2p != NULL)) {
-	    if (i1p != NULL) {
-	        if (i2p != NULL) {
+	if (i1p || i2p) {
+	    if (i1p) {
+	        if (i2p) {
 	            rc = (*i1p - *i2p) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = 1 ;
+	    }
 	}
 	return rc ;
 }
 /* end subroutine (vcmpint) */
 
-
-static int isNeedIndex(int rs)
-{
+static int isNeedIndex(int rs) noex {
 	int		f = FALSE ;
 	f = f || isOneOf(rsneeds,rs) ;
 	f = f || isNotPresent(rs) ;

@@ -1,4 +1,5 @@
-/* bibleqs */
+/* bibleqs HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,15 +11,12 @@
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	BIBLEQS_INCLUDE
-#define	BIBLEQS_INCLUDE	1
+#define	BIBLEQS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
 #include	<eigendb.h>
 #include	<localmisc.h>
 
@@ -35,7 +33,6 @@
 #define	BIBLEQS_FL	struct bibleqs_flags
 
 /* query options */
-
 #define	BIBLEQS_OPREFIX	0x01		/* prefix match */
 
 
@@ -44,7 +41,7 @@ struct bibleqs_q {
 } ;
 
 struct bibleqs_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -64,9 +61,9 @@ struct bibleqs_flags {
 
 struct bibleqs_head {
 	uint		magic ;
-	const char	*pr ;
-	const char	*dbname ;		/* DB database name */
-	const char	*dbfname ;		/* DB filename */
+	cchar		*pr ;
+	cchar		*dbname ;		/* DB database name */
+	cchar		*dbfname ;		/* DB filename */
 	char		*dbmdata ;		/* DB map-data */
 	BIBLEQS_FL	f ;
 	EIGENDB		edb ;
@@ -81,27 +78,19 @@ struct bibleqs_head {
 	uchar		wterms[32] ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(BIBLEQS_MASTER)) || (BIBLEQS_MASTER == 0)
+extern int bibleqs_open(BIBLEQS *,cchar	 *,cchar *) noex ;
+extern int bibleqs_count(BIBLEQS *) noex ;
+extern int bibleqs_audit(BIBLEQS *) noex ;
+extern int bibleqs_curbegin(BIBLEQS *,BIBLEQS_CUR *) noex ;
+extern int bibleqs_lookup(BIBLEQS *,BIBLEQS_CUR *,int,cchar **) noex ;
+extern int bibleqs_read(BIBLEQS *,BIBLEQS_CUR *,BIBLEQS_Q *,char *,int) noex ;
+extern int bibleqs_curend(BIBLEQS *,BIBLEQS_CUR *) noex ;
+extern int bibleqs_close(BIBLEQS *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int bibleqs_open(BIBLEQS *,const char *,const char *) ;
-extern int bibleqs_count(BIBLEQS *) ;
-extern int bibleqs_audit(BIBLEQS *) ;
-extern int bibleqs_curbegin(BIBLEQS *,BIBLEQS_CUR *) ;
-extern int bibleqs_lookup(BIBLEQS *,BIBLEQS_CUR *,int,const char **) ;
-extern int bibleqs_read(BIBLEQS *,BIBLEQS_CUR *,BIBLEQS_Q *,char *,int) ;
-extern int bibleqs_curend(BIBLEQS *,BIBLEQS_CUR *) ;
-extern int bibleqs_close(BIBLEQS *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BIBLEQS_MASTER */
 
 #endif /* BIBLEQS_INCLUDE */
 
