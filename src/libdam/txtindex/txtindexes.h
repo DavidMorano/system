@@ -91,7 +91,7 @@ struct txtindexes_head {
 	TXTINDEXES_FI	tf ;
 	TXTINDEXES_MI	mi ;
 	TXTINDEXHDR	ifi ;		/* index-file (header) information */
-	ptm		m ;
+	ptm		mx ;
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;

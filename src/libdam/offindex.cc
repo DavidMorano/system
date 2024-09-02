@@ -1,6 +1,8 @@
-/* offindex */
+/* offindex SUPPORT */
+/* lang=C++20 */
 
 /* offset-index object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,20 +16,23 @@
 
 /*******************************************************************************
 
-	This object is used to create a line-index of the TXTINDEX "tag" file.
-	The line-index consists of file offsets of the beginning of each line
-	in the file.  Each line corresponds with a "tag" record.   The length
-	of each "record" is also stored.
+	Name:
+	offindex
 
+	Description:
+	This object is used to create a line-index of the TXTINDEX
+	"tag" file.  The line-index consists of file offsets of the
+	beginning of each line in the file.  Each line corresponds
+	with a "tag" record.   The length of each "record" is also
+	stored.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-#include	<string.h>
-
+#include	<unistd.h>		/* |off_t| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<localmisc.h>
@@ -51,25 +56,26 @@
 /* local structures */
 
 struct offindex_e {
-	off_t	lineoff ;
+	off_t		lineoff ;
 	int		linelen ;
 } ;
 
 
 /* forward references */
 
-static int	vecmp(struct offindex_e **,struct offindex_e **) ;
+static int	vecmp(offindex_e **,offindex_e **) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int offindex_start(OFFINDEX *op,int n)
-{
-	const int	size = sizeof(OFFINDEX_E) ;
+int offindex_start(offindex *op,int n) noex {
+	cint		sz = sizeof(OFFINDEX_E) ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -77,9 +83,9 @@ int offindex_start(OFFINDEX *op,int n)
 	if (n < NDEF)
 	    n = NDEF ;
 
-	memset(op,0,sizeof(OFFINDEX)) ;
+	memclear(op) ;
 
-	if ((rs = vecobj_start(&op->list,size,n,0)) >= 0) {
+	if ((rs = vecobj_start(&op->list,sz,n,0)) >= 0) {
 	    op->magic = OFFINDEX_MAGIC ;
 	}
 
@@ -87,9 +93,7 @@ int offindex_start(OFFINDEX *op,int n)
 }
 /* end subroutine (offindex_start) */
 
-
-int offindex_finish(OFFINDEX *op)
-{
+int offindex_finish(offindex *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -105,9 +109,7 @@ int offindex_finish(OFFINDEX *op)
 }
 /* end subroutine (offindex_finish) */
 
-
-int offindex_add(OFFINDEX *op,off_t off,int len)
-{
+int offindex_add(offindex *op,off_t off,int len) noex {
 	OFFINDEX_E	e ;
 	int		rs ;
 
@@ -123,9 +125,7 @@ int offindex_add(OFFINDEX *op,off_t off,int len)
 }
 /* end subroutine (offindex_add) */
 
-
-int offindex_lookup(OFFINDEX *op,off_t off)
-{
+int offindex_lookup(offindex *op,off_t off) noex {
 	OFFINDEX_E	*oep ;
 	OFFINDEX_E	key ;
 	int		(*vcmp)(void *,void *) ;
@@ -159,19 +159,17 @@ int offindex_lookup(OFFINDEX *op,off_t off)
 
 /* private subroutines */
 
-
-static int vecmp(OFFINDEX_E **e1pp,OFFINDEX_E **e2pp)
-{
-	int		rc ;
-
+static int vecmp(OFFINDEX_E **e1pp,OFFINDEX_E **e2pp) noex {
+	int		rc = 0 ;
 	if (*e1pp != NULL) {
 	    if (*e2pp != NULL) {
 	        rc = ((*e1pp)->lineoff - (*e2pp)->lineoff) ;
-	    } else
+	    } else {
 	        rc = -1 ;
-	} else
+	    }
+	} else {
 	    rc = 1 ;
-
+	}
 	return rc ;
 }
 /* end subroutine (vecmp) */

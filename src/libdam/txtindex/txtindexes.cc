@@ -83,6 +83,7 @@
 #include	<hash.h>
 #include	<mkfname.h>
 #include	<cfdec.h>
+#include	<offindex.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -128,7 +129,7 @@ extern "C" {
 
 /* exported variables */
 
-TXTINDEXES_OBJ	txtindexes_mod = {
+TI_TAG_OBJ	txtindexes_mod = {
 	"txtindexes",
 	sizeof(txtindexes),
 	sizeof(txtindexes_cur)
@@ -161,7 +162,7 @@ static int	txtindexes_auditeigen(txtindexes *) noex ;
 
 static int	offindex_tags(OFFINDEX *,cchar *,int) noex ;
 
-static int	tag_parse(TXTINDEXES_TAG *,cchar *,int) noex ;
+static int	tag_parse(TI_TAG *,cchar *,int) noex ;
 
 #if	CF_DYNACOMPACT
 #else
@@ -197,17 +198,17 @@ int txtindexes_open(txtindexes *op,cchar *dbname) noex {
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(TXTINDEXES)) ;
+	memset(op,0,sizeof(TI_TAG)) ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 	    op->dbname = cp ;
-	    if ((rs = ptm_create(&op->m,NULL)) >= 0) {
+	    if ((rs = ptm_create(&op->mx,NULL)) >= 0) {
 	        if ((rs = txtindexes_dbloadcreate(op,dt)) >= 0) {
 	            op->ti_lastcheck = dt ;
-	            op->magic = TXTINDEXES_MAGIC ;
+	            op->magic = TI_TAG_MAGIC ;
 	        }
 	        if (rs < 0)
-	            ptm_destroy(&op->m) ;
+	            ptm_destroy(&op->mx) ;
 	    }
 	    if (rs < 0) {
 	        uc_free(op->dbname) ;
@@ -227,12 +228,12 @@ int txtindexes_close(txtindexes *op)
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = txtindexes_dbloaddestroy(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = ptm_destroy(&op->m) ;
+	rs1 = ptm_destroy(&op->mx) ;
 	if (rs >= 0) rs = rs1 ;
 
 	if (op->dbname != NULL) {
@@ -256,7 +257,7 @@ int txtindexes_audit(txtindexes *op)
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 /* line-index the TAG file */
 
@@ -291,7 +292,7 @@ int txtindexes_count(txtindexes *op)
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	n = op->ifi.taglen ;
 
@@ -307,7 +308,7 @@ int txtindexes_neigen(txtindexes *op)
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	n = (op->ifi.erlen - 1) ;
 
@@ -315,20 +316,20 @@ int txtindexes_neigen(txtindexes *op)
 }
 /* end subroutine (txtindexes_neigen) */
 
-int txtindexes_getinfo(txtindexes *op,TXTINDEXES_INFO *ip) noex {
+int txtindexes_getinfo(txtindexes *op,TI_TAG_INFO *ip) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	cchar	*sp ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	n = op->ifi.taglen ;
 	if (ip != NULL) {
-	    TXTINDEXES_FI	*fip = &op->hf ;
+	    TI_TAG_FI	*fip = &op->hf ;
 	    cint		plen = MAXPATHLEN ;
-	    memset(ip,0,sizeof(TXTINDEXES_INFO)) ;
+	    memset(ip,0,sizeof(TI_TAG_INFO)) ;
 	    ip->ctime = (time_t) op->ifi.wtime ;
 	    ip->mtime = fip->ti_mod ;
 	    ip->count = n ;
@@ -359,7 +360,7 @@ int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl)
 	if (op == NULL) return SR_FAULT ;
 	if (kp == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	if (kl < 0) kl = strlen(kp) ;
 	if (kl > klen) kl = klen ;
@@ -377,20 +378,20 @@ int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl)
 
 
 /* amazingly the only thread-shared data is the 'ncursors' variable here! */
-int txtindexes_curbegin(txtindexes *op,TXTINDEXES_CUR *curp)
+int txtindexes_curbegin(txtindexes *op,TI_TAG_CUR *curp)
 {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(TXTINDEXES_CUR)) ;
+	memset(curp,0,sizeof(TI_TAG_CUR)) ;
 
-	if ((rs = ptm_lock(&op->m)) >= 0) {
+	if ((rs = ptm_lock(&op->mx)) >= 0) {
 	    op->ncursors += 1 ;
-	    ptm_unlock(&op->m) ;
+	    ptm_unlock(&op->mx) ;
 	} /* end if */
 
 	return rs ;
@@ -398,7 +399,7 @@ int txtindexes_curbegin(txtindexes *op,TXTINDEXES_CUR *curp)
 /* end subroutine (txtindexes_curbegin) */
 
 
-int txtindexes_curend(txtindexes *op,TXTINDEXES_CUR *curp)
+int txtindexes_curend(txtindexes *op,TI_TAG_CUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -406,7 +407,7 @@ int txtindexes_curend(txtindexes *op,TXTINDEXES_CUR *curp)
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->taglist != NULL) {
 	    rs1 = uc_free(curp->taglist) ;
@@ -416,11 +417,11 @@ int txtindexes_curend(txtindexes *op,TXTINDEXES_CUR *curp)
 
 	curp->taglen = 0 ;
 
-	if ((rs1 = ptm_lock(&op->m)) >= 0) {
+	if ((rs1 = ptm_lock(&op->mx)) >= 0) {
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
 	    }
-	    ptm_unlock(&op->m) ;
+	    ptm_unlock(&op->mx) ;
 	} /* end if */
 	if (rs >= 0) rs = rs1 ;
 
@@ -429,7 +430,7 @@ int txtindexes_curend(txtindexes *op,TXTINDEXES_CUR *curp)
 /* end subroutine (txtindexes_curend) */
 
 
-int txtindexes_lookup(txtindexes *op,TXTINDEXES_CUR *curp,cchar **klp)
+int txtindexes_lookup(txtindexes *op,TI_TAG_CUR *curp,cchar **klp)
 {
 	vecstr		hkeys ;
 	uint		*taglist = NULL ;
@@ -441,7 +442,7 @@ int txtindexes_lookup(txtindexes *op,TXTINDEXES_CUR *curp,cchar **klp)
 	if (curp == NULL) return SR_FAULT ;
 	if (klp == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	curp->taglen = 0 ;
 	if (curp->taglist != NULL) {
@@ -473,9 +474,9 @@ int txtindexes_lookup(txtindexes *op,TXTINDEXES_CUR *curp,cchar **klp)
 /* end subroutine (txtindexes_lookup) */
 
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_read(txtindexes *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
+int txtindexes_read(txtindexes *op,TI_TAG_CUR *curp,TI_TAG *tagp)
 {
-	TXTINDEXES_FI	*fip ;
+	TI_TAG_FI	*fip ;
 	uint		tagoff ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -486,7 +487,7 @@ int txtindexes_read(txtindexes *op,TXTINDEXES_CUR *curp,TXTINDEXES_TAG *tagp)
 	if (curp == NULL) return SR_FAULT ;
 	if (tagp == NULL) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
 
 	fip = &op->tf ;
 	if ((curp->taglist == NULL) || (curp->taglen == 0)) {
@@ -554,7 +555,7 @@ static int txtindexes_dbloadcreate(txtindexes *op,time_t dt) noex {
 /* end subroutine (txtindexes_dbloadcreate) */
 
 static int txtindexes_dbloaddestroy(txtindexes *op) noex {
-	TXTINDEXES_MI	*mip ;
+	TI_TAG_MI	*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -604,7 +605,7 @@ static int txtindexes_dbmapdestroy(txtindexes *op) noex {
 /* end subroutine (txtindexes_dbmapdestroy) */
 
 static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
-	TXTINDEXES_FI	*fip = (w) ? &op->tf : &op->hf ;
+	TI_TAG_FI	*fip = (w) ? &op->tf : &op->hf ;
 	int		rs ;
 
 	{
@@ -637,7 +638,7 @@ static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
 /* end subroutine (txtindexes_fimapcreate) */
 
 static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
-	TXTINDEXES_FI	*fip ;
+	TI_TAG_FI	*fip ;
 	int		rs = SR_OK ;
 
 	fip = (w) ? &op->tf : &op->hf ;
@@ -654,8 +655,8 @@ static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
 /* end subroutine (txtindexes_fimapdestroy) */
 
 static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
-	TXTINDEXES_FI	*fip = &op->hf ;
-	TXTINDEXES_MI	*mip = &op->mi ;
+	TI_TAG_FI	*fip = &op->hf ;
+	TI_TAG_MI	*mip = &op->mi ;
 	TXTINDEXHDR	*hip ;
 	int		rs ;
 	int		c = 0 ;
@@ -938,7 +939,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 /* end subroutine (txtindexes_mktaglist) */
 
 int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
-	TXTINDEXES_MI	*mip = &op->mi ;
+	TI_TAG_MI	*mip = &op->mi ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		(*eitab)[3] ;
@@ -961,7 +962,7 @@ int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
 /* end subroutine (txtindexes_oureigen) */
 
 static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
-	TXTINDEXES_FI	*fip = &op->hf ;
+	TI_TAG_FI	*fip = &op->hf ;
 	TXTINDEXHDR	*hip = &op->ifi ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
@@ -1021,8 +1022,8 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 /* end subroutine (txtindexes_hdrverify) */
 
 static int txtindexes_audithash(txtindexes *op,OFFINDEX *oip) noex {
-	TXTINDEXES_FI	*fip = &op->hf ;
-	TXTINDEXES_MI	*mip = &op->mi ;
+	TI_TAG_FI	*fip = &op->hf ;
+	TI_TAG_MI	*mip = &op->mi ;
 	TXTINDEXHDR	*hip ;
 	uint		listoff ;
 	uint		tagoff ;
@@ -1102,7 +1103,7 @@ static int txtindexes_audithash(txtindexes *op,OFFINDEX *oip) noex {
 
 static int txtindexes_auditeigen(txtindexes *op) noex {
 	TXTINDEXHDR	*hip ;
-	TXTINDEXES_MI	*mip ;
+	TI_TAG_MI	*mip ;
 	int		rs = SR_OK ;
 	int		i, si, nhi ;
 	int		cl ;
@@ -1253,7 +1254,7 @@ static int offindex_tags(OFFINDEX *oip,cchar *fp,int fl) noex {
 }
 /* end subroutine (offindex_tags) */
 
-static int tag_parse(TXTINDEXES_TAG *tagp,cchar *sp,int sl) noex {
+static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar	*tp ;
