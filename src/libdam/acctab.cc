@@ -1,44 +1,42 @@
-/* acctab */
+/* acctab SUPPORT */
+/* lang=C++20 */
 
 /* perform access table file related functions */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_REGEX	0		/* stupid UNIX REGEX? (buggy) */
-
 
 /* revision history:
 
-	= 1998-06-01, David AÂ­DÂ­ Morano
+	= 1998-06-01, David A­D­ Morano
 	This code was originally written (and largely forgotten).
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This object processes an access table for use by daemon multiplexing
-        server programs that want to control access to their sub-servers.
+	Name:
+	acctab
 
+	Description:
+	This object processes an access table for use by daemon
+	multiplexing server programs that want to control access
+	to their sub-servers.
 
 *******************************************************************************/
 
-
-#define	ACCTAB_MASTER	1
-
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -46,6 +44,7 @@
 #include	<vecitem.h>
 #include	<vecstr.h>
 #include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"acctab.h"
@@ -79,16 +78,10 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	starmat(const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	starmat(cchar *,cchar *) ;
 extern int	getpwd(char *,int) ;
 extern int	isalnumlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -97,17 +90,17 @@ extern int	strlinelen(const char *,int,int) ;
 /* local structures */
 
 struct acctab_file {
-	const char	*fname ;
+	cchar		*fname ;
 	time_t		mtime ;
 	dev_t		dev ;
-	ino64_t		ino ;
+	ino_t		ino ;
 	int		len ;
 } ;
 
 
 /* forward references */
 
-int		acctab_fileadd(ACCTAB *,cchar *) ;
+int		acctab_fileadd(ACCTAB *,cchar *) noex ;
 
 static int	acctab_filefins(ACCTAB *) ;
 static int	acctab_freeentries(ACCTAB *) ;
@@ -124,17 +117,17 @@ static int	entry_mat2(ACCTAB_ENT *,ACCTAB_ENT *) ;
 static int	entry_mat3(ACCTAB_ENT *,ACCTAB_ENT *) ;
 static int	entry_finish(ACCTAB_ENT *) ;
 
-static int	file_start(ACCTAB_FILE *,const char *) ;
+static int	file_start(ACCTAB_FILE *,cchar *) ;
 static int	file_release(ACCTAB_FILE *) ;
 static int	file_finish(ACCTAB_FILE *) ;
 
 static int	part_start(struct acctab_part *) ;
 static int	part_copy(struct acctab_part *,struct acctab_part *) ;
-static int	part_compile(struct acctab_part *,const char *,int) ;
-static int	part_match(struct acctab_part *,const char *) ;
+static int	part_compile(struct acctab_part *,cchar *,int) ;
+static int	part_match(struct acctab_part *,cchar *) ;
 static int	part_finish(struct acctab_part *) ;
 
-static int	parttype(const char *) ;
+static int	parttype(cchar *) ;
 static int	cmpent(ACCTAB_ENT **,ACCTAB_ENT **) ;
 
 static int	freeit(cchar **) ;
@@ -177,10 +170,6 @@ int acctab_open(ACCTAB *op,cchar *fname)
 	int		rs ;
 	int		size ;
 	int		vo ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab_open: ent fname=%s\n",fname) ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -266,10 +255,6 @@ int acctab_fileadd(ACCTAB *op,cchar *fname)
 
 	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_fileadd: ent, file=%s\n",fname) ;
-#endif
-
 	np = fname ;
 	if (fname[0] != '/') {
 	    char	pwdbuf[MAXPATHLEN+1] ;
@@ -278,10 +263,6 @@ int acctab_fileadd(ACCTAB *op,cchar *fname)
 	        rs = mkpath2(tmpfname,pwdbuf,fname) ;
 	    }
 	} /* end if (rooting file) */
-
-#if	CF_DEBUGS
-	debugprintf("acctab_fileadd: np=%s\n",np) ;
-#endif
 
 	if (rs >= 0) {
 	    if ((rs = file_start(&fe,np)) >= 0) {
@@ -297,10 +278,6 @@ int acctab_fileadd(ACCTAB *op,cchar *fname)
 	    } /* end if (vecobj_add) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("acctab_fileadd: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (acctab_fileadd) */
@@ -310,7 +287,7 @@ int acctab_fileadd(ACCTAB *op,cchar *fname)
 int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw)
 {
 	time_t		dt = time(NULL) ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -321,20 +298,11 @@ int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw)
 
 	if (ma == NULL) return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_allowed: ent ng=%s ma=%u\n",ng,ma) ;
-	debugprintf("acctab_allowed: un=%s pw=%u\n",un,pw) ;
-#endif
-
 /* should we check for changes to underlying file? */
 
 	if ((dt - op->checktime) > ACCTAB_MINCHECKTIME) {
 	    rs = acctab_checkfiles(op,dt) ;
 	} /* end if (we needed to check) */
-
-#if	CF_DEBUGS
-	debugprintf("acctab_allowed: mid1 rs=%d\n",rs) ;
-#endif
 
 	if (rs >= 0) {
 	    ACCTAB_ENT	ae, *aep ;
@@ -347,25 +315,14 @@ int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw)
 	    if ((rs = entry_start(&ae)) >= 0) {
 	        if ((rs = entry_load(&ae,ng,ma,un,pw)) >= 0) {
 
-#if	CF_DEBUGS
-	    debugprintf("acctab_allowed: entry_load() rs=%d\n",rs) ;
-#endif
-
 /* search the STD entries first */
 
 	    slp = &op->aes_std ;
 	    if ((rs = vecitem_curbegin(slp,&cur)) >= 0) {
 
-#if	CF_DEBUGS
-	        debugprintf("acctab_allowed: vecitem_curbegin() rs=%d\n",rs) ;
-#endif
-
 	        while ((rs1 = vecitem_fetch(slp,&ae,&cur,cmpent,&aep)) >= 0) {
 	            if (aep != NULL) {
 	                f = entry_mat2(aep,&ae) ;
-#if	CF_DEBUGS
-	                debugprintf("acctab_allowed: entry_mat2() f=%u\n",f) ;
-#endif
 	                if (f) break ;
 	            }
 	        } /* end while */
@@ -373,10 +330,6 @@ int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw)
 
 	        vecitem_curend(slp,&cur) ;
 	    } /* end if (vecitem-cur) */
-
-#if	CF_DEBUGS
-	    debugprintf("acctab_allowed: mid2 rs=%d\n",rs) ;
-#endif
 
 /* search the RGX entries (if necessary) */
 
@@ -397,10 +350,6 @@ int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("acctab_allowed: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (acctab_allowed) */
@@ -409,7 +358,7 @@ int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw)
 /* search the netgroup table for any netgroup match */
 int acctab_anyallowed(ACCTAB *op,vecstr *ngp,vecstr *mnp,cchar *un,cchar *pw)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rs2 ;
@@ -417,10 +366,6 @@ int acctab_anyallowed(ACCTAB *op,vecstr *ngp,vecstr *mnp,cchar *un,cchar *pw)
 	int		f = FALSE ;
 	cchar		*np ; /* netgroup pointer */
 	cchar		*mp ; /* machine pointer */
-
-#if	CF_DEBUGS
-	debugprintf("acctab_anyallowed: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -456,43 +401,27 @@ int acctab_anyallowed(ACCTAB *op,vecstr *ngp,vecstr *mnp,cchar *un,cchar *pw)
 /* search the netgroup table for a netgroup match */
 int acctab_find(op,netgroup,sepp)
 ACCTAB		*op ;
-const char	netgroup[] ;
+cchar	netgroup[] ;
 ACCTAB_ENT	**sepp ;
 {
 	VECITEM		*slp ;
 	int		i ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_find: ent, netgroup=%s\n",netgroup) ;
-#endif
-
 	slp = &op->e ;
 	for (i = 0 ; vecitem_get(slp,i,sepp) >= 0 ; i += 1) {
 	    if (*sepp == NULL) continue ;
 
-#if	CF_DEBUGS
-	    debugprintf("acctab_find: loop i=%d\n",i) ;
-#endif
-
 	    sp = (*sepp)->netgroup ;
-
-#if	CF_DEBUGS
-	    debugprintf("acctab_find: got entry=\"%s\"\n",sp) ;
-#endif
 
 	    if (strcmp(netgroup,sp) == 0)
 	        return i ;
 
 	} /* end for (looping through entries) */
-
-#if	CF_DEBUGS
-	debugprintf("acctab_find: did not match any entry\n") ;
-#endif
 
 	return -1 ;
 }
@@ -541,19 +470,11 @@ int acctab_enum(ACCTAB *op,ACCTAB_CUR *cp,ACCTAB_ENT **sepp)
 
 	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_enum: ent, i=%d\n",cp->i) ;
-#endif
-
 	if (sepp == NULL)
 	    sepp = &aep ;
 
 	rs = SR_NOTFOUND ;
 	if (cp->i <= 0) {
-
-#if	CF_DEBUGS
-	    debugprintf("acctab_enum: STD entries\n") ;
-#endif
 
 	    slp = &op->aes_std ;
 	    cp->j = (cp->j < 0) ? 0 : (cp->j + 1) ;
@@ -561,37 +482,17 @@ int acctab_enum(ACCTAB *op,ACCTAB_CUR *cp,ACCTAB_ENT **sepp)
 	        if (*sepp != NULL) break ;
 	    } /* end for */
 
-#if	CF_DEBUGS
-	    debugprintf("acctab_enum: vecitem_get rs=%d j=%d\n",rs,j) ;
-#endif
-
 	    if (rs < 0) {
 	        cp->j = -1 ;
 	        cp->i = 1 ;
 	    } else {
-#if	CF_DEBUGS
-	        debugprintf("acctab_enum: STD n=%s m=%s u=%s p=%s\n",
-	            (*sepp)->netgroup.std,
-	            (*sepp)->machine.std,
-	            (*sepp)->username.std,
-	            (*sepp)->password.std) ;
-#endif
 	        cp->i = 0 ;
 	        cp->j = j ;
 	    } /* end if */
 
 	} /* end if (cursor needed initialization) */
 
-#if	CF_DEBUGS
-	debugprintf("acctab_enum: intermediate rs=%d cur_i=%d cur_j=%d\n",
-	    rs,cp->i,cp->j) ;
-#endif
-
 	if (cp->i == 1) {
-
-#if	CF_DEBUGS
-	    debugprintf("acctab_enum: RGX entries\n") ;
-#endif
 
 	    slp = &op->aes_rgx ;
 	    cp->j = (cp->j < 0) ? 0 : cp->j + 1 ;
@@ -603,31 +504,18 @@ int acctab_enum(ACCTAB *op,ACCTAB_CUR *cp,ACCTAB_ENT **sepp)
 	        cp->j = -1 ;
 	        cp->i += 1 ;
 	    } else {
-#if	CF_DEBUGS
-	        debugprintf("acctab_enum: RGX n=%s m=%s u=%s p=%s\n",
-	            (*sepp)->netgroup.rgx,
-	            (*sepp)->machine.rgx,
-	            (*sepp)->username.rgx,
-	            (*sepp)->password.rgx) ;
-#endif
 	        cp->j = j ;
 	    } /* end if */
 
 	} /* end if (RGX entries) */
 
-#if	CF_DEBUGS
-	debugprintf("acctab_enum: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (acctab_enum) */
 
-
 /* check if the access tables files have changed */
-int acctab_check(ACCTAB *op)
-{
-	const time_t	dt = time(NULL) ;
+int acctab_check(ACCTAB *op) noex {
+	custime		dt = time(NULL) ;
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -639,10 +527,6 @@ int acctab_check(ACCTAB *op)
 	if ((dt - op->checktime) > ACCTAB_CHECKTIME) {
 	    rs = acctab_checkfiles(op,dt) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("acctab_check: ret rs=%d\n", rs) ;
-#endif
 
 	return rs ;
 }
@@ -681,35 +565,18 @@ static int acctab_checkfiles(ACCTAB *op,time_t dt)
 	int		i ;
 	int		c_changed = FALSE ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_checkfiles: ent\n") ;
-#endif
-
 	for (i = 0 ; vecobj_get(&op->files,i,&fep) >= 0 ; i += 1) {
 	    if (fep != NULL) {
 	    if ((u_stat(fep->fname,&sb) >= 0) &&
 	        (sb.st_mtime > fep->mtime) &&
 	        ((dt - sb.st_mtime) >= ACCTAB_CHANGETIME)) {
 
-#if	CF_DEBUGS
-	        debugprintf("acctab_checkfiles: file=%d changed\n",i) ;
-	        debugprintf("acctab_checkfiles: freeing file entries\n") ;
-#endif
-
 	        acctab_filedump(op,i) ;
-
-#if	CF_DEBUGS
-	        debugprintf("acctab_checkfiles: parsing the file again\n") ;
-#endif
 
 	        rs = acctab_fileparse(op,i) ;
 
 	        if (rs >= 0)
 	            c_changed += 1 ;
-
-#if	CF_DEBUGS
-	        debugprintf("acctab_checkfiles: acctab_fileparse rs=%d\n",rs) ;
-#endif
 
 	    } /* end if */
 	    } /end if (non-NULL) */
@@ -717,26 +584,15 @@ static int acctab_checkfiles(ACCTAB *op,time_t dt)
 	} /* end for */
 
 	if ((rs >= 0) && c_changed) {
-#if	CF_DEBUGS
-	    debugprintf("acctab_checkfiles: sorting STD entries\n") ;
-#endif
 	    rs = vecitem_sort(&op->aes_std,cmpent) ;
 	} /* end if (something changed) */
-
 	op->checktime = dt ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab_checkfiles: ret rs=%d changed=%d\n",rs,c_changed) ;
-#endif
-
 	return (rs >= 0) ? c_changed : rs ;
 }
 /* end subroutine (acctab_checkfiles) */
 
-
 /* parse an access server file */
-static int acctab_fileparse(ACCTAB *op,int fi)
-{
+static int acctab_fileparse(ACCTAB *op,int fi) noex {
 	PARTTYPE	netgroup ;
 	bfile		file, *fp = &file ;
 	ACCTAB_FILE	*fep ;
@@ -748,27 +604,15 @@ static int acctab_fileparse(ACCTAB *op,int fi)
 	int		cl, len ;
 	int		line = 0 ;
 	int		c_added = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: ent fi=%u\n",fi) ;
-#endif
-
 	rs = vecobj_get(&op->files,fi,&fep) ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: vecobj_get() rs=%d\n",rs) ;
-#endif
 
 	if (rs < 0)
 	    goto ret0 ;
 
 	rs = bopen(fp,fep->fname,"r",0664) ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: bopen() rs=%d\n", rs) ;
-#endif
 
 	if (rs < 0)
 	    goto ret0 ;
@@ -779,17 +623,9 @@ static int acctab_fileparse(ACCTAB *op,int fi)
 
 /* have we already parsed this one? */
 
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: 4\n") ;
-#endif
-
 	rs = SR_OK ;
 	if (fep->mtime >= sb.st_mtime)
 	    goto done ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: 5\n") ;
-#endif
 
 	fep->dev = sb.st_dev ;
 	fep->ino = sb.st_ino ;
@@ -797,10 +633,6 @@ static int acctab_fileparse(ACCTAB *op,int fi)
 	fep->len = sb.st_size ;
 
 /* start processing the configuration file */
-
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: start processing\n") ;
-#endif
 
 	part_compile(&netgroup,ACCTAB_DEFNETGROUP,-1) ;
 
@@ -840,35 +672,18 @@ static int acctab_fileparse(ACCTAB *op,int fi)
 
 	            se.fi = fi ;
 	            if (fsb.term == ':') {
-
-#if	CF_DEBUGS
-	                debugprintf("acctab_fileparse: new netgroup\n") ;
-#endif
-
 	                part_finish(&netgroup) ;
-
 	                rs = part_compile(&netgroup,fp,fl) ;
-
 	                fl = field_get(&fsb,arg_terms,&fp) ;
-
 	            } /* end if */
 
 /* see if there is a machine on this same line */
 
 	            if (fl > 0) {
 
-#if	CF_DEBUGS
-	                debugprintf("acctab_fileparse: non-empty line\n") ;
-#endif
-
 	                part_copy(&se.netgroup,&netgroup) ;
 
 /* there is something else on this line */
-
-#if	CF_DEBUGS
-	                debugprintf("acctab_fileparse: machine> %t\n",
-	                    fp,fl) ;
-#endif
 
 	                rs = part_compile(&se.machine,fp,fl) ;
 
@@ -893,18 +708,7 @@ static int acctab_fileparse(ACCTAB *op,int fi)
 
 	                }
 
-#if	CF_DEBUGS
-	                debugprintf("acctab_fileparse: adding so far rs=%d\n",rs) ;
-	                debugprintf("acctab_fileparse: n=%s m=%s\n",
-	                    se.netgroup.std,
-	                    se.machine.std) ;
-#endif
-
 	                rs = acctab_addentry(op,&se) ;
-
-#if	CF_DEBUGS
-	                debugprintf("acctab_fileparse: added entry?, rs=%d\n",rs) ;
-#endif
 
 	                if (rs >= 0)
 	                    c_added += 1 ;
@@ -929,12 +733,6 @@ done:
 	bclose(fp) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("acctab_fileparse: ret rs=%d added=%d\n",
-	    rs,c_added) ;
-#endif
-
 	return (rs >= 0) ? c_added : rs ;
 
 /* handle bad things */
@@ -957,9 +755,6 @@ static int acctab_addentry(ACCTAB *op,ACCTAB_ENT *sep)
 	int		rs ;
 
 	if (parttype(sep->netgroup.std) == PARTTYPE_STD) {
-#if	CF_DEBUGS
-	    debugprintf("acctab_addentry: has plain s=%s\n",sep->netgroup.std) ;
-#endif
 	    rs = vecitem_add(&op->aes_std,sep,sizeof(ACCTAB_ENT)) ;
 	} else {
 	    rs = vecitem_add(&op->aes_rgx,sep,sizeof(ACCTAB_ENT)) ;
@@ -979,25 +774,13 @@ static int acctab_filedump(ACCTAB *op,int fi)
 	int		rs1 ;
 	int		i, j ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab_filedump: want to delete all fi=%d\n",fi) ;
-#endif
-
 	for (j = 0 ; j < 2 ; j += 1) {
 
 	    slp = (j == 0) ? &op->aes_std : &op->aes_rgx ;
 	    for (i = 0 ; (rs = vecitem_get(slp,i,&sep)) >= 0 ; i += 1) {
 	        if (sep != NULL) {
 
-#if	CF_DEBUGS
-	            debugprintf("acctab_filedump: i=%d fi=%d\n",i,sep->fi) ;
-#endif
-
 	            if ((sep->fi == fi) || (fi < 0)) {
-
-#if	CF_DEBUGS
-	                debugprintf("acctab_filedump: got one\n") ;
-#endif
 
 	                rs1 = entry_finish(sep) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -1010,15 +793,7 @@ static int acctab_filedump(ACCTAB *op,int fi)
 	        }
 	    } /* end for (looping through entries) */
 
-#if	CF_DEBUGS
-	    debugprintf("acctab_filedump: popped up to, rs=%d i=%d\n",rs,i) ;
-#endif
-
 	} /* end for (looping on the different types of entries) */
-
-#if	CF_DEBUGS
-	debugprintf("acctab_filedump: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1138,10 +913,6 @@ static int entry_finish(ACCTAB_ENT *sep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab/entry_finish: ent\n") ;
-#endif
-
 	if (sep->fi >= 0) {
 	    rs1 = part_finish(&sep->netgroup) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1161,10 +932,10 @@ static int entry_finish(ACCTAB_ENT *sep)
 
 static int entry_load(aep,netgroup,machine,username,password)
 ACCTAB_ENT	*aep ;
-const char	netgroup[] ;
-const char	machine[] ;
-const char	username[] ;
-const char	password[] ;
+cchar	netgroup[] ;
+cchar	machine[] ;
+cchar	username[] ;
+cchar	password[] ;
 {
 
 	aep->netgroup.std = (char *) netgroup ;
@@ -1186,43 +957,19 @@ static int entry_mat2(e1p,e2p)
 ACCTAB_ENT	*e1p, *e2p ;
 {
 
-#if	CF_DEBUGS
-	debugprintf("acctab/entry_mat2: ent\n") ;
-	debugprintf("acctab/entry_mat2: m=%s u=%s p=%s\n",
-	    e2p->machine.std,
-	    e2p->username.std,
-	    e2p->password.std) ;
-#endif
-
 #ifdef	OPTIONAL
 	if (! part_match(&e1p->netgroup,e2p->netgroup.std))
 	    return FALSE ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("acctab/entry_mat2: machine?\n") ;
-#endif
-
 	if (! part_match(&e1p->machine,e2p->machine.std))
 	    return FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab/entry_mat2: user?\n") ;
-#endif
 
 	if (! part_match(&e1p->username,e2p->username.std))
 	    return FALSE ;
 
-#if	CF_DEBUGS
-	debugprintf("acctab/entry_mat2: password?\n") ;
-#endif
-
 	if (! part_match(&e1p->password,e2p->password.std))
 	    return FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab/entry_mat2: succeeded!\n") ;
-#endif
 
 	return TRUE ;
 }
@@ -1279,12 +1026,6 @@ static int part_copy(PARTTYPE *p1p,PARTTYPE *p2p)
 
 #if	ACCTAB_REGEX
 
-#if	CF_DEBUGS
-	debugprintf("acctab/part_copy: >%t<\n",
-	    p2p->rgx,
-	    ((p2p->rgx != NULL) ? strnlen(p2p->rgx,10) : 0)) ;
-#endif
-
 	if (rs >= 0) {
 	    if (p2p->rgx != NULL) {
 	        if ((rs = uc_mallocstrw(p2p->rgx,p2p->rgxlen,&cp)) >= 0) {
@@ -1302,10 +1043,6 @@ static int part_copy(PARTTYPE *p1p,PARTTYPE *p2p)
 	}
 
 #endif	/* ACCTAB_REGEX */
-
-#if	CF_DEBUGS
-	debugprintf("acctab/part_copy: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1361,12 +1098,7 @@ static int part_match(PARTTYPE *pp,cchar *s)
 {
 	int		sl, sl1, sl2 ;
 	int		f = FALSE ;
-	const char	*cp ;
-
-#if	CF_DEBUGS
-	debugprintf("acctab/part_match: ent, type=%d s=%s\n",
-	    pp->type,s) ;
-#endif
+	cchar	*cp ;
 
 	if (pp->std == NULL) return TRUE ;
 
@@ -1375,52 +1107,26 @@ static int part_match(PARTTYPE *pp,cchar *s)
 
 	if (pp->rgx == NULL) {
 
-#if	CF_DEBUGS
-	    debugprintf("acctab/part_match: plain, s1=%s s2=%s\n",
-	        pp->std,s) ;
-#endif
-
 	    f = (strcmp(pp->std,s) == 0) ;
-	    if (! f)
+	    if (! f) {
 	        f = starmat(pp->std,s) ;
+	    }
 
 	} else {
 
 	    if (pp->type == 1) {
 
-#if	CF_DEBUGS
-	        debugprintf("acctab/part_match: type 1, s1=%s s2=%s\n",
-	            pp->std,s) ;
-#endif
-
 	        if ((cp = strchr(pp->std,'*')) != NULL) {
-
-#if	CF_DEBUGS
-	            debugprintf("acctab/part_match: got a star, cp=%s\n",cp) ;
-#endif
 
 	            f = FALSE ;
 	            if (strncmp(s,pp->std,(cp - pp->std)) == 0) {
-
-#if	CF_DEBUGS
-	                debugprintf("acctab/part_match: leading matched\n") ;
-#endif
 
 	                cp += 1 ;
 	                sl1 = strlen(s) ;
 
 	                sl2 = strlen(pp->std) ;
 
-#if	CF_DEBUGS
-	                debugprintf("acctab/part_match: sl1=%d sl2=%d\n",
-	                    sl1,sl2) ;
-#endif
-
 	                sl = pp->std + sl2 - cp ;
-
-#if	CF_DEBUGS
-	                debugprintf("acctab/part_match: sl=%d\n",sl) ;
-#endif
 
 	                f = (strncmp(s + sl1 - sl,cp,sl) == 0) ;
 
@@ -1431,11 +1137,6 @@ static int part_match(PARTTYPE *pp,cchar *s)
 	        }
 
 	    } else {
-
-#if	CF_DEBUGS
-	        debugprintf("acctab/part_match: type 2, s1=%s s2=%s\n",
-	            pp->std,s) ;
-#endif
 
 #if	ACCTAB_REGEX
 	        f = advance(pp->rgx,s) ;
@@ -1451,34 +1152,27 @@ static int part_match(PARTTYPE *pp,cchar *s)
 
 	} /* end if (STD or RGX) */
 
-#if	CF_DEBUGS
-	debugprintf("acctab/part_match: ret f=%u\n",f) ;
-#endif
-
 	return f ;
 }
 /* end subroutine (part_match) */
 
-
-static int part_finish(PARTTYPE *pp)
-{
+static int part_finish(PARTTYPE *pp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = freeit(&pp->std) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = freeit(&pp->rgx) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = freeit(&pp->std) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = freeit(&pp->rgx) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	pp->rgxlen = 0 ;
 	return rs ;
 }
 /* end subroutine (part_finish) */
 
-
-static int freeit(cchar **pp)
-{
+static int freeit(cchar **pp) noex {
 	int		rs = SR_OK ;
 	if (*pp != NULL) {
 	    rs = uc_free(*pp) ;
@@ -1488,10 +1182,8 @@ static int freeit(cchar **pp)
 }
 /* end subroutine (freeit) */
 
-
 /* compare just the 'netgroup' part of entries (used for sorting) */
-static int cmpent(ACCTAB_ENT **e1pp,ACCTAB_ENT **e2pp)
-{
+static int cmpent(ACCTAB_ENT **e1pp,ACCTAB_ENT **e2pp) noex {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
@@ -1506,15 +1198,12 @@ static int cmpent(ACCTAB_ENT **e1pp,ACCTAB_ENT **e2pp)
 }
 /* end subroutine (cmpent) */
 
-
 /* determine the type of this string part */
-static int parttype(cchar *s)
-{
+static int parttype(cchar *s) noex {
 	int		type = PARTTYPE_STD ;
-	int		f = FALSE ;
-
+	bool		f = FALSE ;
 	for ( ; *s ; s += 1) {
-	    const int	ch = MKCHAR(*s) ;
+	    cint	ch = MKCHAR(*s) ;
 	    f = f || isalnumlatin(ch) ;
 	    f = f || (*s == '-') ;
 	    f = f || (*s == '_') ;
@@ -1524,7 +1213,6 @@ static int parttype(cchar *s)
 	    }
 	    if (! f) break ;
 	} /* end for */
-
 	return (*s == '\0') ? type : PARTTYPE_UNKNOWN ;
 }
 /* end subroutine (parttype) */

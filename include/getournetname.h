@@ -1,7 +1,7 @@
-/* getidname HEADER */
+/* getournetname HEADER */
 /* lang=C20 */
 
-/* get the certain system IDs based on a specified name */
+/* get the RPC net-name for a user */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETIDNAME_INCLUDE
-#define	GETIDNAME_INCLUDE
+#ifndef	GETOUTNETNAME_INCLUDE
+#define	GETOUTNETNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -24,17 +24,14 @@
 #include	<utypealiases.h>
 #include	<usysrets.h>
 
-#include	<getuid.h>
-#include	<getgid.h>
-
 
 EXTERNC_begin
 
-extern int	getpjid_name(cchar *,int) noex ;
+extern int	getournetname(char *,int,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETIDNAME_INCLUDE */
+#endif /* GETOUTNETNAME_INCLUDE */
 
 

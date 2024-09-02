@@ -38,6 +38,8 @@
 #include	<vecitem.h>
 #include	<ascii.h>
 #include	<mallocstuff.h>
+#include	<getpwd.h>
+#include	<matstr.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -67,9 +69,6 @@
 
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	field_srvarg(field *,const uchar *,char *,int) ;
-extern int	getpwd(char *,int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
 

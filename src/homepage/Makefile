@@ -156,7 +156,7 @@ OBJ06=
 OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
 OBJ08=
 OBJ09=
-OBJ10= querystring.o
+OBJ10= querystr.o
 OBJ11= cgi.o htm.o
 OBJ12= svckv.o svcent.o
 OBJ13= 
@@ -385,7 +385,6 @@ spawner.o:		spawner.c spawner.h
 
 useraccdb.o:		useraccdb.c useraccdb.h
 
-querystring.o:		querystring.cc querystring.h
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) querystring.cc
+querystr.o:		querystr.cc querystr.h
 
 

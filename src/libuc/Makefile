@@ -772,6 +772,11 @@ pow.o:			pow.dir
 pow.dir:
 	makesubdir $@
 
+# GETUTMP
+getutmp.o:		getutmp.dir
+getutmp.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
