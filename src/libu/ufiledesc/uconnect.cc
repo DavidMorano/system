@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-02-14, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1998-03-26, David A­D­ Morano
 	This subroutine was updated to handle the case where a file

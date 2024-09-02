@@ -10,7 +10,7 @@
 
 	= 97/05/01, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 	= 98/05/20, David A­D­ Morano

@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2013-04-20, David A­D­ Morano
-        This subroutine was originally written. It obviously just takes
+        This code was originally written. It obviously just takes
         advantange of the |termnote(3dam)| object.
 
 */

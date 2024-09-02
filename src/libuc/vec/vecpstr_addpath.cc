@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2023-10-27, David A­D­ Morano
 	I changed to make the MAXPATHLEN value dynamic.

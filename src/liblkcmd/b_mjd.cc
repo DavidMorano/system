@@ -14,7 +14,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written as a KSH built-in
+	This code was originally written as a KSH built-in
 	command.
 
 */

@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-08-01, David A­D­ Morano
-	This subroutine was originally written.  This subroutine
+	This code was originally written.  This subroutine
 	serves to create the date-string that is expected to be
 	seen in the msg-scan line of the display.  I have to provide
 	the msg-date-string that the program has previously displayed.

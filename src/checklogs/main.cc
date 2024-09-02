@@ -23,7 +23,7 @@
 	This subroutine forms the front-end part of a generic PCS type of
 	program.  This front-end is used in a variety of PCS programs.
 
-	This subroutine was originally part of the Personal Communication
+	This code was originally part of the Personal Communication
 	Services (PCS) package but can also be used independently from it.
 	Historically, this was developed as part of an effort to maintain high
 	function (and reliable) email communications in the face of

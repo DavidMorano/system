@@ -10,7 +10,7 @@
 /* revision history :
 
 	= Dave Morano, August 1998
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */

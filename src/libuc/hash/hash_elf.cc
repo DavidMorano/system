@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine was originally written.  The idea of this
+	This code was originally written.  The idea of this
 	hash is taken from the ELF-type object manipulation procedures.
 
 */

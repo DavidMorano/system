@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-12-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1999-07-12, David A­D­ Morano
 	Believe it or not I did not like the treatment that zero

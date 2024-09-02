@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2017-08-15, David A­D­ Morano
 	Rewrote to use the sbuf object.

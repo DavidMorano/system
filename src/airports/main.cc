@@ -12,7 +12,7 @@
 /* revision history:
 
 	= 1989-03-01, David A­D­ Morano
-	This subroutine was originally written.  
+	This code was originally written.  
 
 	= 1998-06-01, David A­D­ Morano
 	I enhanced the program a little to print out some other information.
@@ -21,7 +21,7 @@
 	I enhanced the program a little to to do something (I forget what).
 
 	= 2004-01-10, David A­D­ Morano
-	This subroutine was originally written.  
+	This code was originally written.  
         The KSH program switched to using a fakey "large file" (64-bit fake-out
         mode) compilation mode on Solaris. This required some checking to see if
         any references to 'u_stat()' had to be updated to work with the new KSH.

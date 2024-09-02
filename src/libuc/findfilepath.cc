@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This subroutine was originally written.  It is based loosely
+	This code was originally written.  It is based loosely
 	on sinilar functions that I had before but not in as nice
 	an interface.
 

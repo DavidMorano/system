@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} pip->f.list"
+NAMES="${NAMES} originally "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/pip->f.list/s//pip->pf.lister/g
+g/This subroutine was originally/s//This code was originally/g
 	w
 	q
 EOF

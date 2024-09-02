@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 1999-02-04, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 

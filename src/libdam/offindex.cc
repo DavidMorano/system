@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -48,6 +48,7 @@
 
 #define	NDEF		100
 
+
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
@@ -70,6 +71,8 @@ using std::nothrow ;			/* constant */
 struct offindex_e {
 	off_t		lineoff ;
 	int		linelen ;
+	offindex_e() = default ;
+	offindex_e(off_t o,int l) noex : lineoff(o), linelen(l) { } ;
 } ;
 
 
@@ -125,12 +128,13 @@ static int vecmpe(OFFINDEX_E **,OFFINDEX_E **) noex ;
 
 /* exported subroutines */
 
-int offindex_start(offindex *op,int n) noex {
+int offindex_start(offindex *op,int vn) noex {
 	int		rs ;
-	if (n < NDEF) n = NDEF ;
+	if (vn < NDEF) vn = NDEF ;
 	if ((rs = offindex_ctor(op)) >= 0) {
-	    cint	sz = sizeof(OFFINDEX_E) ;
-	    if ((rs = vecobj_start(op->oip,sz,n,0)) >= 0) {
+	    cint	vsz = sizeof(OFFINDEX_E) ;
+	    cint	vo = 0 ;
+	    if ((rs = vecobj_start(op->oip,vsz,vn,vo)) >= 0) {
 	        op->magic = OFFINDEX_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -205,6 +209,7 @@ static int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
 	OFFINDEX_E	**e2pp = (OFFINDEX_E **) v2pp ;
 	return vecmpe(e1pp,e2pp) ;
 }
+/* end subroutine (vecmp) */
 
 static int vecmpe(OFFINDEX_E **e1pp,OFFINDEX_E **e2pp) noex {
 	OFFINDEX_E	*e1p = *e1pp ;
@@ -223,6 +228,6 @@ static int vecmpe(OFFINDEX_E **e1pp,OFFINDEX_E **e2pp) noex {
 	}
 	return rc ;
 }
-/* end subroutine (vecmp) */
+/* end subroutine (vecmpe) */
 
 

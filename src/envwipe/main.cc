@@ -11,7 +11,7 @@
 /* revision history :
 
 	= 1990-11-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2001-04-11, David A­D­ Morano
 	This old dog program has been enhanced to serve as the

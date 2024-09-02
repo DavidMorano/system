@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1999-01-10, David A­D­ Morano
-	This subroutine was originally written.  It was prompted
+	This code was originally written.  It was prompted
 	by the failure of other system subroutines from finding the
 	proper controlling terminal (on Solaris)!  Maybe they fixed
 	their stuff -- and maybe they have not yet!

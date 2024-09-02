@@ -11,7 +11,7 @@
 
 	= 01/09/01, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */

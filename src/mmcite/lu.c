@@ -11,7 +11,7 @@
 /* revision history:
 
 	= 1992-03-10, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1998-09-10, David A­D­ Morano
         This subroutine was modified to be able to handle the response from the

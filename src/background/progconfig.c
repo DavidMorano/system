@@ -14,7 +14,7 @@
 
 	= 89/03/01, David A­D­ Morano
 
-	This subroutine was originally written.  
+	This code was originally written.  
 
 
 	= 98/06/01, David A­D­ Morano

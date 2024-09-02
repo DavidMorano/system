@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2018-10-19, David A.D. Morano
 	Did some cleanup and error robustness, to bring it up to

@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2018-03-13, David A­D­ Morano
 	I prefixed the exported symbols w/ 'calstrs_'.

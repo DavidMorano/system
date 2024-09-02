@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 2001-03-14, David A­D­ Morano
-        This subroutine was originally rwritten.
+        This code was originally rwritten.
 
 */
 

@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-85, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2001-02-01, David A­D­ Morano
 	I expanded the storage table size somewhat for larger

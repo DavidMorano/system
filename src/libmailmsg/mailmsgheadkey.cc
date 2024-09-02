@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2024-05-20, David A-D- Morano
 	In review, I could not find any subroutines (anywhere) that

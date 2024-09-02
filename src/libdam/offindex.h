@@ -5,7 +5,14 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1998-03-01, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OFFINDEX_INCLUDE
 #define	OFFINDEX_INCLUDE

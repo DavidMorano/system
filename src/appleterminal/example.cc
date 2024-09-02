@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1989-03-01, David A.D. Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2007-08-22, David A.D. Morano
 	I refactored and enhanced this for use on MacOS.  MacOS is

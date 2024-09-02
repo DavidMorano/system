@@ -16,7 +16,7 @@
 /* revision history:
 
 	= 1999-06-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2003-06-26, David A­D­ Morano
 	Although this object works, it was only a micracle that it

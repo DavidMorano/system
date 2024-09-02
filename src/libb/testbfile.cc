@@ -11,7 +11,7 @@
 /* revision history:
 
 	= 1988-02-01, David A­D­ Morano
-	This subroutine was originally written to do some testing
+	This code was originally written to do some testing
 	on the BIO package.
 
 	= 2015-02-22, David A­D­ Morano

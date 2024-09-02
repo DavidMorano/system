@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-08-10, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1999-04-19, David A­D­ Morano
 	I made a correction for short filenames when the host name

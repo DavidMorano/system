@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-08-12, David A­D­ Morano
-	This subroutine was originally adopted from a similar
+	This code was originally adopted from a similar
 	subroutine that was a part of the PCS package distribution.
 	However, the original was garbage so this version is
 	essentially a complete rewrite of the original.  Also the
