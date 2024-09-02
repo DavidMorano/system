@@ -203,7 +203,7 @@ OBJ10= osetstr.o osetstr_loadfile.o
 OBJ11= vecstr_svcargs.o vecstr_srvargs.o vecstr_avmkstr.o
 OBJ12= intiq.o
 OBJ13=
-OBJ14= listenspec.o poller.o
+OBJ14= poller.o
 OBJ15= msfile.o msfilee.o ebuf.o msghdr.o cmsghdr.o
 
 OBJ16= spawnproc.o cpuspeed.o securefile.o strval.o
@@ -474,8 +474,6 @@ ebuf.o:			ebuf.c ebuf.h
 serialbuf.o:		serialbuf.c serialbuf.h
 
 spawner.o:		spawner.c spawner.h
-
-listenspec.o:		listenspec.c listenspec.h
 
 poller.o:		poller.c poller.h
 

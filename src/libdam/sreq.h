@@ -26,7 +26,7 @@
 #include	"svcentsub.h"
 
 
-#define	SREQ		struct sreq
+#define	SREQ		struct sreq_head
 #define	SREQ_FL		struct sreq_flags
 #define	SREQ_SNCUR	struct sreq_sncursor
 #define	SREQ_MAGIC	0x65918233

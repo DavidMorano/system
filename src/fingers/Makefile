@@ -174,7 +174,7 @@ OBJ14= envs.o envs_procxe.o envs_subs.o
 OBJ15= lfm.o svcfile.o acctab.o logfile.o
 
 OBJ16= jobdb.o svckey.o connection.o hostinfo.o
-OBJ17= sysvar.o dirseen.o linefold.o poller.o listenspec.o
+OBJ17= sysvar.o dirseen.o linefold.o poller.o
 OBJ18= openportmsg.o
 OBJ19= vecitem.o
 OBJ20= sfthing.o getfname.o securefile.o nlspeername.o 
@@ -376,7 +376,7 @@ progacc.o:		progacc.c $(INCS)
 
 proglog.o:		proglog.c $(INCS)
 
-progwatch.o:		progwatch.c $(INCS) poller.h listenspec.h
+progwatch.o:		progwatch.c $(INCS) poller.h
 
 progipc.o:		progipc.c $(INCS)
 
@@ -463,8 +463,6 @@ sockaddress.o:		sockaddress.c sockaddress.h
 linefold.o:		linefold.c linefold.h
 
 poller.o:		poller.c poller.h
-
-listenspec.o:		listenspec.c listenspec.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
 

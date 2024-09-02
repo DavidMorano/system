@@ -197,7 +197,7 @@ int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
 	if (rs < 0) goto bad1 ;
 	op->fname = cp ;
 
-	rs = vecitem_start(&op->e,10,VECITEM_PSWAP) ;
+	rs = vecitem_start(&op->e,10,VECITEM_OSWAP) ;
 	if (rs < 0)
 	    goto bad2 ;
 

@@ -38,13 +38,17 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getpwd.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
 #include	<vecitem.h>
 #include	<vecstr.h>
+#include	<mkpathx.h>
+#include	<starmat.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"acctab.h"
@@ -57,7 +61,7 @@
 #define	ACCTAB_CHANGETIME	3	/* wait change interval (seconds) */
 #define	ACCTAB_DEFNETGROUP	"DEFAULT"
 #define	ACCTAB_RGXLEN		256
-#define	ACCTAB_FILE		struct acctab_file
+#define	ACCTAB_FI		struct acctab_file
 
 #define	PARTTYPE		struct acctab_part
 #define	PARTTYPE_STD		0
@@ -78,11 +82,6 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	starmat(cchar *,cchar *) ;
-extern int	getpwd(char *,int) ;
-extern int	isalnumlatin(int) ;
-
 
 /* external variables */
 
@@ -100,44 +99,40 @@ struct acctab_file {
 
 /* forward references */
 
-int		acctab_fileadd(ACCTAB *,cchar *) noex ;
+static int	acctab_filefins(ACCTAB *) noex ;
+static int	acctab_freeentries(ACCTAB *) noex ;
+static int	acctab_fileparse(ACCTAB *,int) noex ;
+static int	acctab_filedump(ACCTAB *,int) noex ;
+static int	acctab_filedel(ACCTAB *,int) noex ;
+static int	acctab_addentry() noex ;
+static int	acctab_addentry(ACCTAB *,ACCTAB_ENT *) noex ;
+static int	acctab_checkfiles(ACCTAB *,time_t) noex ;
 
-static int	acctab_filefins(ACCTAB *) ;
-static int	acctab_freeentries(ACCTAB *) ;
-static int	acctab_fileparse(ACCTAB *,int) ;
-static int	acctab_filedump(ACCTAB *,int) ;
-static int	acctab_filedel(ACCTAB *,int) ;
-static int	acctab_addentry() ;
-static int	acctab_addentry(ACCTAB *,ACCTAB_ENT *) ;
-static int	acctab_checkfiles(ACCTAB *,time_t) ;
+static int	entry_start(ACCTAB_ENT *) noex ;
+static int	entry_load(ACCTAB_ENT *,cchar *,cchar *,cchar *,cchar *) noex ;
+static int	entry_mat2(ACCTAB_ENT *,ACCTAB_ENT *) noex ;
+static int	entry_mat3(ACCTAB_ENT *,ACCTAB_ENT *) noex ;
+static int	entry_finish(ACCTAB_ENT *) noex ;
 
-static int	entry_start(ACCTAB_ENT *) ;
-static int	entry_load(ACCTAB_ENT *,cchar *,cchar *,cchar *,cchar *) ;
-static int	entry_mat2(ACCTAB_ENT *,ACCTAB_ENT *) ;
-static int	entry_mat3(ACCTAB_ENT *,ACCTAB_ENT *) ;
-static int	entry_finish(ACCTAB_ENT *) ;
+static int	file_start(ACCTAB_FI *,cchar *) noex ;
+static int	file_release(ACCTAB_FI *) noex ;
+static int	file_finish(ACCTAB_FI *) noex ;
 
-static int	file_start(ACCTAB_FILE *,cchar *) ;
-static int	file_release(ACCTAB_FILE *) ;
-static int	file_finish(ACCTAB_FILE *) ;
+static int	part_start(ACCTAB_PA *) noex ;
+static int	part_copy(ACCTAB_PA *,ACCTAB_PA *) noex ;
+static int	part_compile(ACCTAB_PA *,cchar *,int) noex ;
+static int	part_match(ACCTAB_PA *,cchar *) noex ;
+static int	part_finish(ACCTAB_PA *) noex ;
 
-static int	part_start(struct acctab_part *) ;
-static int	part_copy(struct acctab_part *,struct acctab_part *) ;
-static int	part_compile(struct acctab_part *,cchar *,int) ;
-static int	part_match(struct acctab_part *,cchar *) ;
-static int	part_finish(struct acctab_part *) ;
+static int	parttype(cchar *) noex ;
+static int	cmpent(ACCTAB_ENT **,ACCTAB_ENT **) noex ;
 
-static int	parttype(cchar *) ;
-static int	cmpent(ACCTAB_ENT **,ACCTAB_ENT **) ;
-
-static int	freeit(cchar **) ;
+static int	freeit(cchar **) noex ;
 
 
 /* local static data */
 
-/* key field terminators (pound, colon, and all white space) */
-
-static const unsigned char 	group_terms[32] = {
+constexpr cchar		group_terms[32] = {
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x04,
 	0x00, 0x00, 0x00, 0x00,
@@ -148,9 +143,7 @@ static const unsigned char 	group_terms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-/* argument field terminators (pound and all white space) */
-
-static const unsigned char 	arg_terms[32] = {
+constexpr cchar		arg_terms[32] = {
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -162,25 +155,26 @@ static const unsigned char 	arg_terms[32] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int acctab_open(ACCTAB *op,cchar *fname)
-{
+int acctab_open(ACCTAB *op,cchar *fname) noex {
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		vo ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(ACCTAB)) ;
+	memclear(op) ;
 	op->checktime = time(NULL) ;
 
 /* the vector of files should use a fixed position policy */
 
-	size = sizeof(struct acctab_file) ;
+	sz = sizeof(struct acctab_file) ;
 	vo = VECOBJ_OREUSE ;
-	if ((rs = vecobj_start(&op->files,size,10,vo)) >= 0) {
+	if ((rs = vecobj_start(&op->files,sz,10,vo)) >= 0) {
 	    vo = VECITEM_PSORTED ;
 	    if ((rs = vecitem_start(&op->aes_std,10,vo)) >= 0) {
 	        vo = VECITEM_PNOHOLES ;
@@ -194,21 +188,20 @@ int acctab_open(ACCTAB *op,cchar *fname)
 	                vecitem_finish(&op->aes_rgx) ;
 	            }
 	        } /* end if (rgx) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            vecitem_finish(&op->aes_std) ;
+		}
 	    } /* end if (std) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vecobj_finish(&op->files) ;
+	    }
 	} /* end if (files) */
 
 	return rs ;
 }
 /* end subroutine (acctab_open) */
 
-
-/* free up the resources occupied by an ACCTAB list object */
-int acctab_close(ACCTAB *op)
-{
+int acctab_close(ACCTAB *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -244,7 +237,7 @@ int acctab_close(ACCTAB *op)
 /* add a file to the list of files */
 int acctab_fileadd(ACCTAB *op,cchar *fname)
 {
-	ACCTAB_FILE	fe ;
+	ACCTAB_FI	fe ;
 	int		rs = SR_OK ;
 	int		fi ;
 	cchar		*np ;
@@ -539,7 +532,7 @@ int acctab_check(ACCTAB *op) noex {
 /* free up all of the files in this ACCTAB list */
 static int acctab_filefins(ACCTAB *op)
 {
-	ACCTAB_FILE	*fep ;
+	ACCTAB_FI	*fep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -560,7 +553,7 @@ static int acctab_filefins(ACCTAB *op)
 static int acctab_checkfiles(ACCTAB *op,time_t dt)
 {
 	struct ustat	sb ;
-	ACCTAB_FILE	*fep ;
+	ACCTAB_FI	*fep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c_changed = FALSE ;
@@ -580,7 +573,7 @@ static int acctab_checkfiles(ACCTAB *op,time_t dt)
 
 	    } /* end if */
 	    } /end if (non-NULL) */
-`	    if (rs < 0) break ;
+	    if (rs < 0) break ;
 	} /* end for */
 
 	if ((rs >= 0) && c_changed) {
@@ -595,7 +588,7 @@ static int acctab_checkfiles(ACCTAB *op,time_t dt)
 static int acctab_fileparse(ACCTAB *op,int fi) noex {
 	PARTTYPE	netgroup ;
 	bfile		file, *fp = &file ;
-	ACCTAB_FILE	*fep ;
+	ACCTAB_FI	*fep ;
 	ACCTAB_ENT	se ;
 	struct ustat	sb ;
 	FIELD		fsb ;
@@ -802,7 +795,7 @@ static int acctab_filedump(ACCTAB *op,int fi)
 
 static int acctab_filedel(ACCTAB *op,int fi)
 {
-	ACCTAB_FILE	*fep ;
+	ACCTAB_FI	*fep ;
 	int		rs ;
 
 	if ((rs = vecobj_get(&op->files,fi,&fep)) >= 0) {
@@ -816,10 +809,7 @@ static int acctab_filedel(ACCTAB *op,int fi)
 }
 /* end subroutine (acctab_filedel) */
 
-
-/* free up all of the entries in this ACCTAB list */
-static int acctab_freeentries(ACCTAB *op)
-{
+static int acctab_freeentries(ACCTAB *op) noex {
 	ACCTAB_ENT	*sep ;
 	VECITEM		*slp ;
 	int		rs = SR_OK ;
@@ -840,15 +830,13 @@ static int acctab_freeentries(ACCTAB *op)
 }
 /* end subroutine (acctab_freeentries) */
 
-
-static int file_start(ACCTAB_FILE *fep,cchar *fname)
-{
+static int file_start(ACCTAB_FI *fep,cchar *fname) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
 
 	if (fname == NULL) return SR_FAULT ;
 
-	memset(fep,0,sizeof(ACCTAB_FILE)) ;
+	memclear(fep) ;
 
 	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	    fep->fname = cp ;
@@ -858,18 +846,13 @@ static int file_start(ACCTAB_FILE *fep,cchar *fname)
 }
 /* end subroutine (file_start) */
 
-
-static int file_release(ACCTAB_FILE *fep)
-{
-
+static int file_release(ACCTAB_FI *fep) noex {
 	fep->fname = NULL ;
 	return SR_OK ;
 }
 /* end subroutine (file_release) */
 
-
-static int file_finish(ACCTAB_FILE *fep)
-{
+static int file_finish(ACCTAB_FI *fep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -885,13 +868,10 @@ static int file_finish(ACCTAB_FILE *fep)
 }
 /* end subroutine (file_finish) */
 
-
-/* initialize an entry */
-static int entry_start(ACCTAB_ENT *sep)
-{
+static int entry_start(ACCTAB_ENT *sep) noex {
 	int		rs = SR_OK ;
 
-	memset(sep,0,sizeof(ACCTAB_ENT)) ;
+	memclear(sep) ;
 	sep->fi = -1 ;
 
 	part_start(&sep->netgroup) ;
@@ -906,10 +886,7 @@ static int entry_start(ACCTAB_ENT *sep)
 }
 /* end subroutine (entry_start) */
 
-
-/* free up an entry */
-static int entry_finish(ACCTAB_ENT *sep)
-{
+static int entry_finish(ACCTAB_ENT *sep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -953,9 +930,7 @@ cchar	password[] ;
 
 
 /* compare if all but the netgroup are equal (or matched) */
-static int entry_mat2(e1p,e2p)
-ACCTAB_ENT	*e1p, *e2p ;
-{
+static int entry_mat2(ACCTAB_ENT *e1p,ACCTAB_ENT *e2p) noex {
 
 #ifdef	OPTIONAL
 	if (! part_match(&e1p->netgroup,e2p->netgroup.std))
@@ -977,9 +952,7 @@ ACCTAB_ENT	*e1p, *e2p ;
 
 
 /* compare if all of the entry is equal (or matched) */
-static int entry_mat3(e1p,e2p)
-ACCTAB_ENT	*e1p, *e2p ;
-{
+static int entry_mat3(ACCTAB_ENT *e1p,ACCTAB_ENT *e2p) noex {
 
 	if (! part_match(&e1p->netgroup,e2p->netgroup.std))
 	    return FALSE ;
@@ -997,10 +970,7 @@ ACCTAB_ENT	*e1p, *e2p ;
 }
 /* end subroutine (entry_mat3) */
 
-
-static int part_start(PARTTYPE *pp)
-{
-
+static int part_start(PARTTYPE *pp) noex {
 	pp->type = 0 ;
 	pp->std = NULL ;
 	pp->rgx = NULL ;
@@ -1008,14 +978,12 @@ static int part_start(PARTTYPE *pp)
 }
 /* end subroutine (part_start) */
 
-
 /* p1 gets loaded up (from p2) */
-static int part_copy(PARTTYPE *p1p,PARTTYPE *p2p)
-{
+static int part_copy(PARTTYPE *p1p,PARTTYPE *p2p) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
 
-	memset(p1p,0,sizeof(struct acctab_part)) ;
+	memclear(p1p) ;
 
 	p1p->type = p2p->type ;
 	if (p2p->std != NULL) {
@@ -1048,10 +1016,7 @@ static int part_copy(PARTTYPE *p1p,PARTTYPE *p2p)
 }
 /* end subroutine (part_copy) */
 
-
-/* compile this part */
-static int part_compile(PARTTYPE *pp,cchar *sp,int sl)
-{
+static int part_compile(PARTTYPE *pp,cchar *sp,int sl) noex {
 	int		rs ;
 	cchar		*cp ;
 
@@ -1092,10 +1057,7 @@ static int part_compile(PARTTYPE *pp,cchar *sp,int sl)
 }
 /* end subroutine (part_compile) */
 
-
-/* see if we have a match on a part */
-static int part_match(PARTTYPE *pp,cchar *s)
-{
+static int part_match(PARTTYPE *pp,cchar *s) noex {
 	int		sl, sl1, sl2 ;
 	int		f = FALSE ;
 	cchar	*cp ;
