@@ -130,7 +130,7 @@ $(T).o:			$(OBJ) Makefile localmisc.h
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).so:		$(OBJ) Makefile localmisc.h
-	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) $(SOFL) -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

@@ -97,7 +97,7 @@ OBJ= obja.o objb.o objc.o objd.o obje.o
 .SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 

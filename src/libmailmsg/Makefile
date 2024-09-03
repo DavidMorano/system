@@ -2,7 +2,7 @@
 
 T= libmailmsg
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so
 
 
 INDIR		?= $(REPOROOT)/bin
@@ -74,7 +74,7 @@ OBJ= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG) $(OBJC_LIBMAILMSG)
 .SUFFIXES:		.hh .ii
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -98,11 +98,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
-
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+
+$(T).so:		$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
