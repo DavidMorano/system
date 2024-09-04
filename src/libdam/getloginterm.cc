@@ -111,7 +111,7 @@ int getloginterm(char *dbuf,int dlen,pid_t sid) noex {
 	                    if (dlen >= 6) {
 				int	i ; /* used-afterwards */
 	                        strcpy(dbuf,devdir) ;
-	                        for (i = 0 ; i < MIN(32,dlen) ; i += 1) {
+	                        for (i = 0 ; i < min(32,dlen) ; i += 1) {
 			            if (ue.ut_line[i] == '\0') break ;
 	                            dbuf[5 + i] = ue.ut_line[i] ;
 			        } /* end for */

@@ -138,6 +138,7 @@
 #include	<cinttypes>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<new>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<getbufsize.h>
@@ -184,8 +185,9 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 

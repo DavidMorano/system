@@ -1,7 +1,7 @@
 /* sreq SUPPORT */
-/* version %I% last-modified %G% */
+/* lang=C++20 */
 
-/* perform various functions on a job */
+/* Service-Request manager */
 /* version %I% last-modified %G% */
 
 
@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	sreq
+
+	Description:
 	This module is responsible for providing means to store a
 	job and to retrieve it later by its PID.  This is the lower
 	half of a pair.  The SREQDB calls on this object for support.
@@ -59,15 +63,15 @@
 #endif
 
 
-/* impored namespaces */
+/* imported namespaces */
 
 
-/* local type-defs */
+/* local typedefs */
 
-typedef int	(*objstart_t)(void *,cchar *,SREQ *,cchar **,cchar **) ;
-typedef int	(*objcheck_t)(void *) ;
-typedef int	(*objabort_t)(void *) ;
-typedef int	(*objfinish_t)(void *) ;
+typedef int	(*objstart_t)(void *,cchar *,SREQ *,cchar **,cchar **) noex ;
+typedef int	(*objcheck_t)(void *) noex ;
+typedef int	(*objabort_t)(void *) noex ;
+typedef int	(*objfinish_t)(void *) noex ;
 
 
 /* external subroutines */
@@ -81,8 +85,8 @@ typedef int	(*objfinish_t)(void *) ;
 
 /* forward references */
 
-static int	sreq_fdfins(SREQ *) noex ;
-static int	sreq_builtdone(SREQ *) noex ;
+static int	sreq_fdfins(sreq *) noex ;
+static int	sreq_builtdone(sreq *) noex ;
 
 static int	mkfile(cchar *,cchar **) noex ;
 
@@ -95,117 +99,117 @@ static int	mkfile(cchar *,cchar **) noex ;
 
 /* exported subroutines */
 
-int sreq_start(SREQ *jep,cchar *tpat,cchar *jobid,int ifd,int ofd) noex {
+int sreq_start(sreq *op,cchar *tpat,cchar *jobid,int ifd,int ofd) noex {
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	cchar		*cp ;
 
-	if (jep == nullptr) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (tpat == nullptr) return SR_FAULT ;
 	if (jobid == nullptr) return SR_FAULT ;
 
-	memclear(jep) ;
-	jep->ifd = ifd ;
-	jep->ofd = ofd ;
-	jep->efd = -1 ;
-	jep->pid = -1 ;
-	jep->stime = dt ;
+	memclear(op) ;
+	op->ifd = ifd ;
+	op->ofd = ofd ;
+	op->efd = -1 ;
+	op->pid = -1 ;
+	op->stime = dt ;
 
-	strwcpy(jep->logid,jobid,SREQ_JOBIDLEN) ;
+	strwcpy(op->logid,jobid,SREQ_JOBIDLEN) ;
 
 	if ((rs = mkfile(tpat,&cp)) >= 0) {
-	    jep->efname = (char *) cp ;
-	    jep->magic = SREQ_MAGIC ;
+	    op->efname = (char *) cp ;
+	    op->magic = SREQ_MAGIC ;
 	} /* end if */
 
 	return rs ;
 }
 /* end subroutine (sreq_start) */
 
-int sreq_finish(SREQ *jep) noex {
+int sreq_finish(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
 
-	rs1 = sreq_builtdone(jep) ;
+	rs1 = sreq_builtdone(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = sreq_thrdone(jep) ;
+	rs1 = sreq_thrdone(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = sreq_fdfins(jep) ;
+	rs1 = sreq_fdfins(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = sreq_stderrend(jep) ;
+	rs1 = sreq_stderrend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (jep->av != nullptr) {
-	    rs1 = uc_free(jep->av) ;
+	if (op->av != nullptr) {
+	    rs1 = uc_free(op->av) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->av = nullptr ;
+	    op->av = nullptr ;
 	}
 
-	if (jep->argstab != nullptr) {
-	    rs1 = uc_free(jep->argstab) ;
+	if (op->argstab != nullptr) {
+	    rs1 = uc_free(op->argstab) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->argstab = nullptr ;
+	    op->argstab = nullptr ;
 	}
 
-	if (jep->open.namesvcs) {
-	    rs1 = sreq_sndestroy(jep) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (jep->f.ss) {
-	    rs1 = sreq_svcentend(jep) ;
+	if (op->open.namesvcs) {
+	    rs1 = sreq_sndestroy(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (jep->svcbuf != nullptr) {
-	    rs1 = uc_free(jep->svcbuf) ;
+	if (op->f.ss) {
+	    rs1 = sreq_svcentend(op) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->svcbuf = nullptr ;
 	}
 
-	if (jep->efname != nullptr) {
-	    if (jep->efname[0] != '\0') {
-	        u_unlink(jep->efname) ;
-	        jep->efname[0] = '\0' ;
+	if (op->svcbuf != nullptr) {
+	    rs1 = uc_free(op->svcbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->svcbuf = nullptr ;
+	}
+
+	if (op->efname != nullptr) {
+	    if (op->efname[0] != '\0') {
+	        u_unlink(op->efname) ;
+	        op->efname[0] = '\0' ;
 	    }
-	    rs1 = uc_free(jep->efname) ;
+	    rs1 = uc_free(op->efname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->efname = nullptr ;
+	    op->efname = nullptr ;
 	}
 
-	if (jep->svc != nullptr) {
-	    rs1 = uc_free(jep->svc) ;
+	if (op->svc != nullptr) {
+	    rs1 = uc_free(op->svc) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->svc = nullptr ;
+	    op->svc = nullptr ;
 	}
 
-	jep->pid = -1 ;
-	jep->logid[0] = '\0' ;
+	op->pid = -1 ;
+	op->logid[0] = '\0' ;
 
-	jep->magic = 0 ;
+	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (sreq_finish) */
 
-int sreq_typeset(SREQ *op,int jt,int st) noex {
+int sreq_typeset(sreq *op,int jt,int st) noex {
 	op->jtype = jt ;
 	op->stype = st ;
 	return SR_OK ;
 }
 /* end subroutine (sreq_typeset) */
 
-int sreq_getfd(SREQ *op) noex {
+int sreq_getfd(sreq *op) noex {
 	return op->ifd ;
 }
 /* end subroutine (sreq_getfd) */
 
-int sreq_havefd(SREQ *op,int fd) noex {
+int sreq_havefd(sreq *op,int fd) noex {
 	int		f = false ;
 	f = f || ((op->ifd >= 0) && (op->ifd == fd)) ;
 	f = f || ((op->ofd >= 0) && (op->ofd == fd)) ;
@@ -213,7 +217,7 @@ int sreq_havefd(SREQ *op,int fd) noex {
 }
 /* end subroutine (sreq_havefd) */
 
-int sreq_svcaccum(SREQ *op,cchar *sp,int sl) noex {
+int sreq_svcaccum(sreq *op,cchar *sp,int sl) noex {
 	int		rs ;
 	char		*bp ;
 	if (sl < 0) sl = strlen(sp) ;
@@ -239,16 +243,16 @@ int sreq_svcaccum(SREQ *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (sreq_svcaccun) */
 
-int sreq_svcmunge(SREQ *jep) noex {
+int sreq_svcmunge(sreq *op) noex {
 	vecstr		sa ; /* server arguments */
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = vecstr_start(&sa,1,0)) >= 0) {
 	    int	f_long = false ;
-	    if ((rs = vecstr_svcargs(&sa,&f_long,jep->svcbuf)) >= 0) {
+	    if ((rs = vecstr_svcargs(&sa,&f_long,op->svcbuf)) >= 0) {
 	        c = rs ;
-	        if ((rs = sreq_svcparse(jep,f_long)) >= 0) {
+	        if ((rs = sreq_svcparse(op,f_long)) >= 0) {
 	            cint	ts = vecstr_strsize(&sa) ;
 	            int		as ;
 	            cchar	**av = nullptr ;
@@ -259,9 +263,9 @@ int sreq_svcmunge(SREQ *jep) noex {
 	                if ((rs = uc_malloc(ts,&at)) >= 0) {
 
 	                    if ((rs = vecstr_avmkstr(&sa,av,as,at,ts)) >= 0) {
-	                        jep->nav = (c+1) ;
-	                        jep->av = av ;
-	                        jep->argstab = at ;
+	                        op->nav = (c+1) ;
+	                        op->av = av ;
+	                        op->argstab = at ;
 	                    }
 
 	                    if (rs < 0) uc_free(at) ;
@@ -282,7 +286,7 @@ int sreq_svcmunge(SREQ *jep) noex {
 /* end subroutine (sreq_svcmunge) */
 
 /* extract the service from the "service-buffer" and alloc-store in 'svc' */
-int sreq_svcparse(SREQ *op,int f_long) noex {
+int sreq_svcparse(sreq *op,int f_long) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op->svc == nullptr) {
@@ -318,13 +322,13 @@ int sreq_svcparse(SREQ *op,int f_long) noex {
 }
 /* end subroutine (sreq_svcparse) */
 
-int sreq_setlong(SREQ *op,int f) noex {
+int sreq_setlong(sreq *op,int f) noex {
 	op->f.longopt = MKBOOL(f) ;
 	return SR_OK ;
 }
 /* end subroutine (sreq_setlong) */
 
-int sreq_setstate(SREQ *op,int state) noex {
+int sreq_setstate(sreq *op,int state) noex {
 	op->state = state ;
 	if (state == sreqstate_done) {
 	    op->etime = time(nullptr) ;
@@ -334,19 +338,19 @@ int sreq_setstate(SREQ *op,int state) noex {
 }
 /* end subroutine (sreq_setstate) */
 
-int sreq_getjsn(SREQ *jep) noex {
-	return jep->jsn ;
+int sreq_getjsn(sreq *op) noex {
+	return op->jsn ;
 }
 /* end subroutine (sreq_getjsn) */
 
-int sreq_getsvc(SREQ *op,cchar **rpp) noex {
+int sreq_getsvc(sreq *op,cchar **rpp) noex {
 	int		sl = strlen(op->svc) ;
 	if (rpp != nullptr) *rpp = op->svc ;
 	return sl ;
 }
 /* end subroutine (sreq_getsvc) */
 
-int sreq_getsubsvc(SREQ *op,cchar **rpp) noex {
+int sreq_getsubsvc(sreq *op,cchar **rpp) noex {
 	int		sl ;
 	if (rpp != nullptr) *rpp = op->subsvc ;
 	sl = strlen(op->subsvc) ;
@@ -354,55 +358,55 @@ int sreq_getsubsvc(SREQ *op,cchar **rpp) noex {
 }
 /* end subroutine (sreq_getsubsvc) */
 
-int sreq_getstate(SREQ *op) noex {
+int sreq_getstate(sreq *op) noex {
 	return op->state ;
 }
 /* end subroutine (sreq_getstate) */
 
-int sreq_getav(SREQ *jep,cchar ***avp) noex {
-	cint	nav = jep->nav ;
-	if (avp != nullptr) *avp = jep->av ;
+int sreq_getav(sreq *op,cchar ***avp) noex {
+	cint	nav = op->nav ;
+	if (avp != nullptr) *avp = op->av ;
 	return  nav ;
 }
 /* end subroutine (sreq_getav) */
 
-int sreq_ofd(SREQ *op) noex {
+int sreq_ofd(sreq *op) noex {
 	if (op->ofd < 0) op->ofd = op->ifd ;
 	return op->ofd ;
 }
 /* end subroutine (sreq_ofd) */
 
-int sreq_getstdin(SREQ *jep) noex {
-	return jep->ifd ;
+int sreq_getstdin(sreq *op) noex {
+	return op->ifd ;
 }
 /* end subroutine (sreq_getstdin) */
 
-int sreq_getstdout(SREQ *op) noex {
+int sreq_getstdout(sreq *op) noex {
 	if (op->ofd < 0) op->ofd = op->ifd ;
 	return op->ofd ;
 }
 /* end subroutine (sreq_getstdout) */
 
-int sreq_closefds(SREQ *jep) noex {
-	return sreq_fdfins(jep) ;
+int sreq_closefds(sreq *op) noex {
+	return sreq_fdfins(op) ;
 }
 /* end subroutine (sreq_closefds) */
 
-int sreq_svcentbegin(SREQ *jep,LOCINFO *lip,SVCENT *sep) noex {
+int sreq_svcentbegin(sreq *op,LOCINFO *lip,SVCENT *sep) noex {
 	int		rs ;
-	if ((rs = svcentsub_start(&jep->ss,lip,sep)) >= 0) {
-	    jep->f.ss = true ;
+	if ((rs = svcentsub_start(&op->ss,lip,sep)) >= 0) {
+	    op->f.ss = true ;
 	}
 	return rs ;
 }
 /* end subroutine (sreq_evcentbegin) */
 
-int sreq_svcentend(SREQ *jep) noex {
+int sreq_svcentend(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->f.ss) {
-	    jep->f.ss = false ;
-	    rs1 = svcentsub_finish(&jep->ss) ;
+	if (op->f.ss) {
+	    op->f.ss = false ;
+	    rs1 = svcentsub_finish(&op->ss) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -410,28 +414,28 @@ int sreq_svcentend(SREQ *jep) noex {
 /* end subroutine (sreq_svcentend) */
 
 /* spawned thread calls this from its exit-handler */
-int sreq_exiting(SREQ *jep) noex {
+int sreq_exiting(sreq *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (jep) {
+	if (op) {
 	    rs = SR_OK ;
 	    {
-	        rs1 = sreq_fdfins(jep) ;
+	        rs1 = sreq_fdfins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    jep->f_exiting = true ;
+	    op->f_exiting = true ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sreq_exiting) */
 
-int sreq_thrdone(SREQ *jep) noex {
+int sreq_thrdone(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->f.thread) {
-	    pthread_t	tid = jep->tid ;
+	if (op->f.thread) {
+	    pthread_t	tid = op->tid ;
 	    int		trs ;
-	    jep->f.thread = false ;
+	    op->f.thread = false ;
 	    rs1 = uptjoin(tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if (rs >= 0) rs = trs ;
@@ -441,13 +445,13 @@ int sreq_thrdone(SREQ *jep) noex {
 /* end subroutine (sreq_thrdone) */
 
 /* services-name - |help| service helper - create new instance */
-int sreq_sncreate(SREQ *jep) noex {
+int sreq_sncreate(sreq *op) noex {
 	int		rs = SR_OK ;
-	if (! jep->open.namesvcs) {
-	    OSETSTR	*ssp = &jep->namesvcs ;
+	if (! op->open.namesvcs) {
+	    osetstr	*ssp = &op->namesvcs ;
 	    cint	ne = 50 ;
 	    if ((rs = osetstr_start(ssp,ne)) >= 0) {
-	        jep->open.namesvcs = true ;
+	        op->open.namesvcs = true ;
 	    }
 	}
 	return rs ;
@@ -455,12 +459,12 @@ int sreq_sncreate(SREQ *jep) noex {
 /* end subroutine (sreq_sncreate) */
 
 /* services-name - |help| service helper - destroy existing instance */
-int sreq_sndestroy(SREQ *jep) noex {
+int sreq_sndestroy(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->open.namesvcs) {
-	    OSETSTR	*ssp = &jep->namesvcs ;
-	    jep->open.namesvcs = false ;
+	if (op->open.namesvcs) {
+	    osetstr	*ssp = &op->namesvcs ;
+	    op->open.namesvcs = false ;
 	    rs1 = osetstr_finish(ssp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -469,10 +473,10 @@ int sreq_sndestroy(SREQ *jep) noex {
 /* end subroutine (sreq_sndestroy) */
 
 /* services-name - |help| service helper - add a service name */
-int sreq_snadd(SREQ *jep,cchar *sp,int sl) noex {
+int sreq_snadd(sreq *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	if (jep->open.namesvcs) {
-	    OSETSTR	*ssp = &jep->namesvcs ;
+	if (op->open.namesvcs) {
+	    osetstr	*ssp = &op->namesvcs ;
 	    rs = osetstr_add(ssp,sp,sl) ;
 	}
 	return rs ;
@@ -480,11 +484,11 @@ int sreq_snadd(SREQ *jep,cchar *sp,int sl) noex {
 /* end subroutine (sreq_snadd) */
 
 /* services-name - |help| service helper - begin enumerate */
-int sreq_snbegin(SREQ *jep,SREQ_SNCUR *scp) noex {
+int sreq_snbegin(sreq *op,SREQ_SNCUR *scp) noex {
 	int		rs = SR_OK ;
-	if (jep->open.namesvcs) {
-	    OSETSTR	*ssp = &jep->namesvcs ;
-	    OSETSTR_CUR	*curp = &scp->cur ;
+	if (op->open.namesvcs) {
+	    osetstr	*ssp = &op->namesvcs ;
+	    osetstr_cur	*curp = &scp->cur ;
 	    rs = osetstr_curbegin(ssp,curp) ;
 	}
 	return rs ;
@@ -492,12 +496,12 @@ int sreq_snbegin(SREQ *jep,SREQ_SNCUR *scp) noex {
 /* end subroutine (sreq_snbegin) */
 
 /* services-name - |help| service helper - end enumerate */
-int sreq_snend(SREQ *jep,SREQ_SNCUR *scp) noex {
+int sreq_snend(sreq *op,SREQ_SNCUR *scp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->open.namesvcs) {
-	    OSETSTR	*ssp = &jep->namesvcs ;
-	    OSETSTR_CUR	*curp = &scp->cur ;
+	if (op->open.namesvcs) {
+	    osetstr	*ssp = &op->namesvcs ;
+	    osetstr_cur	*curp = &scp->cur ;
 	    rs1 = osetstr_curend(ssp,curp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -506,11 +510,11 @@ int sreq_snend(SREQ *jep,SREQ_SNCUR *scp) noex {
 /* end subroutine (sreq_snend) */
 
 /* services-name - |help| service helper - execute enumerate */
-int sreq_snenum(SREQ *jep,SREQ_SNCUR *scp,cchar **rpp) noex {
+int sreq_snenum(sreq *op,SREQ_SNCUR *scp,cchar **rpp) noex {
 	int		rs = SR_OK ;
-	if (jep->open.namesvcs) {
-	    OSETSTR	*ssp = &jep->namesvcs ;
-	    OSETSTR_CUR	*curp = &scp->cur ;
+	if (op->open.namesvcs) {
+	    osetstr	*ssp = &op->namesvcs ;
+	    osetstr_cur	*curp = &scp->cur ;
 	    rs = osetstr_enum(ssp,curp,rpp) ;
 	}
 	return rs ;
@@ -518,31 +522,31 @@ int sreq_snenum(SREQ *jep,SREQ_SNCUR *scp,cchar **rpp) noex {
 /* end subroutine (sreq_snenum) */
 
 /* biltin operation */
-int sreq_builtload(SREQ *jep,MFSERVE_INFO *ip) noex {
+int sreq_builtload(sreq *op,MFSERVE_INFO *ip) noex {
 	cint		osize = ip->objsize ;
 	int		rs ;
 	void		*p ;
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
 	if ((rs = uc_malloc(osize,&p)) >= 0) {
-	    jep->binfo = *ip ;
-	    jep->objp = p ;
+	    op->binfo = *ip ;
+	    op->objp = p ;
 	}
 	return rs ;
 }
 /* end subroutine (sreq_builtload) */
 
 /* biltin operation */
-int sreq_builtrelease(SREQ *jep) noex {
+int sreq_builtrelease(sreq *op) noex {
 	int		rs = SR_OK ;
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
-	if (jep->objp != nullptr) {
-	    if ((rs = uc_free(jep->objp)) >= 0) {
-	        jep->objp = nullptr ;
-	        jep->binfo.objsize = 0 ;
-	        jep->f.builtout = false ;
-	        jep->f.builtdone = false ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op->objp != nullptr) {
+	    if ((rs = uc_free(op->objp)) >= 0) {
+	        op->objp = nullptr ;
+	        op->binfo.objsize = 0 ;
+	        op->f.builtout = false ;
+	        op->f.builtdone = false ;
 	        rs = 1 ;
 	    }
 	}
@@ -551,16 +555,16 @@ int sreq_builtrelease(SREQ *jep) noex {
 /* end subroutine (sreq_builtrelease) */
 
 /* biltin operation */
-int sreq_objstart(SREQ *jep,cchar *pr,cchar **envv) noex {
+int sreq_objstart(sreq *op,cchar *pr,cchar **envv) noex {
 	int		rs = SR_OK ;
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
-	if (jep->objp != nullptr) {
-	    if (! jep->f.builtout) {
-	        objstart_t	m = (objstart_t) jep->binfo.start ;
-	        cchar	**av = jep->av ;
-	        if ((rs = (*m)(jep->objp,pr,jep,av,envv)) >= 0) {
-	            jep->f.builtout = true ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op->objp != nullptr) {
+	    if (! op->f.builtout) {
+	        objstart_t	m = (objstart_t) op->binfo.start ;
+	        cchar	**av = op->av ;
+	        if ((rs = (*m)(op->objp,pr,op,av,envv)) >= 0) {
+	            op->f.builtout = true ;
 	        }
 	    } else {
 	        rs = SR_NOANODE ;
@@ -573,16 +577,16 @@ int sreq_objstart(SREQ *jep,cchar *pr,cchar **envv) noex {
 /* end subroutine (sreq_objstart) */
 
 /* biltin operation, returns 0=not_done, (!0)=done */
-int sreq_objcheck(SREQ *jep) noex {
+int sreq_objcheck(sreq *op) noex {
 	int		rs = SR_OK ;
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
-	if (jep->objp != nullptr) {
-	    if (jep->f.builtout) {
-	        if (! jep->f.builtdone) {
-	            objcheck_t	m = (objcheck_t) jep->binfo.check ;
-	            if ((rs = (*m)(jep->objp)) > 0) {
-	                jep->f.builtdone = true ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op->objp != nullptr) {
+	    if (op->f.builtout) {
+	        if (! op->f.builtdone) {
+	            objcheck_t	m = (objcheck_t) op->binfo.check ;
+	            if ((rs = (*m)(op->objp)) > 0) {
+	                op->f.builtdone = true ;
 	            }
 	        } else {
 	            rs = true ;
@@ -595,15 +599,15 @@ int sreq_objcheck(SREQ *jep) noex {
 }
 /* end subroutine (sreq_objcheck) */
 
-int sreq_objabort(SREQ *jep) noex {
+int sreq_objabort(sreq *op) noex {
 	int		rs = SR_OK ;
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
-	if (jep->objp != nullptr) {
-	    if (jep->f.builtout) {
-	        if (! jep->f.builtdone) {
-	            objabort_t	m = (objabort_t) jep->binfo.abort ;
-	            rs = (*m)(jep->objp) ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op->objp != nullptr) {
+	    if (op->f.builtout) {
+	        if (! op->f.builtdone) {
+	            objabort_t	m = (objabort_t) op->binfo.abort ;
+	            rs = (*m)(op->objp) ;
 	        } else {
 	            rs = true ;
 	        }
@@ -615,16 +619,16 @@ int sreq_objabort(SREQ *jep) noex {
 }
 /* end subroutine (sreq_objstart) */
 
-int sreq_objfinish(SREQ *jep) noex {
+int sreq_objfinish(sreq *op) noex {
 	int		rs = SR_OK ;
-	if (jep == nullptr) return SR_FAULT ;
-	if (jep->magic != SREQ_MAGIC) return SR_NOTFOUND ;
-	if (jep->objp != nullptr) {
-	    if (jep->f.builtout) {
-	        objfinish_t	m = (objfinish_t) jep->binfo.finish ;
-	        if ((rs = (*m)(jep->objp)) >= 0) {
-	            jep->f.builtdone = false ;
-	            jep->f.builtout = false ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SREQ_MAGIC) return SR_NOTFOUND ;
+	if (op->objp != nullptr) {
+	    if (op->f.builtout) {
+	        objfinish_t	m = (objfinish_t) op->binfo.finish ;
+	        if ((rs = (*m)(op->objp)) >= 0) {
+	            op->f.builtdone = false ;
+	            op->f.builtout = false ;
 	        }
 	    }
 	} else {
@@ -634,7 +638,7 @@ int sreq_objfinish(SREQ *jep) noex {
 }
 /* end subroutine (sreq_objfinish) */
 
-int sreq_stderrbegin(SREQ *jep,cchar *edname) noex {
+int sreq_stderrbegin(sreq *op,cchar *edname) noex {
 	cint		elen = MAXPATHLEN ;
 	int		rs ;
 	int		fd = -1 ;
@@ -643,8 +647,8 @@ int sreq_stderrbegin(SREQ *jep,cchar *edname) noex {
 	if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 	    cint	dlen = DIGBUFLEN ;
 	    char	dbuf[DIGBUFLEN+1] ;
-	    jep->efname = ebuf ; /* load address */
-	    if ((rs = ctdeci(dbuf,dlen,jep->jsn)) >= 0) {
+	    op->efname = ebuf ; /* load address */
+	    if ((rs = ctdeci(dbuf,dlen,op->jsn)) >= 0) {
 	        cint	clen = MAXNAMELEN ;
 	        cchar		*x = "XXXXXX" ;
 	        char		cbuf[MAXNAMELEN+1] ;
@@ -653,53 +657,53 @@ int sreq_stderrbegin(SREQ *jep,cchar *edname) noex {
 	            if ((rs = mkpath2(tbuf,edname,cbuf)) >= 0) {
 	                const mode_t	om = 0664 ;
 	                cint	of = (O_CREAT|O_WRONLY|O_TRUNC) ;
-	                char		*ebuf = jep->efname ;
+	                char		*ebuf = op->efname ;
 	                if ((rs = opentmpfile(tbuf,of,om,ebuf)) >= 0) {
-	                    jep->efd = rs ;
+	                    op->efd = rs ;
 	                    fd = rs ;
 	                } /* end if (uc_open) */
 	            } /* end if (mkpath) */
 	        } /* end if (sncpy) */
 	    } /* end if (cfdeci) */
 	    if (rs < 0) {
-	        uc_free(jep->efname) ;
-	        jep->efname = nullptr ;
+	        uc_free(op->efname) ;
+	        op->efname = nullptr ;
 	    }
 	} /* end if (m-a) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (sreq_stderrbegin) */
 
-int sreq_stderrclose(SREQ *jep) noex {
+int sreq_stderrclose(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->efd >= 0) {
-	    rs1 = u_close(jep->efd) ;
+	if (op->efd >= 0) {
+	    rs1 = u_close(op->efd) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->efd = -1 ;
+	    op->efd = -1 ;
 	}
 	return rs ;
 }
 /* end subroutine (sreq_stderrclose) */
 
-int sreq_stderrend(SREQ *jep) noex {
+int sreq_stderrend(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->efd >= 0) {
-	    rs1 = u_close(jep->efd) ;
+	if (op->efd >= 0) {
+	    rs1 = u_close(op->efd) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->efd = -1 ;
+	    op->efd = -1 ;
 	}
-	if (jep->efname != nullptr) {
-	    if (jep->efname[0] != '\0') {
+	if (op->efname != nullptr) {
+	    if (op->efname[0] != '\0') {
 	        cint	rsn = SR_NOTFOUND ;
-	        rs1 = uc_unlink(jep->efname) ;
+	        rs1 = uc_unlink(op->efname) ;
 	        if (rs1 == rsn) rs1 = SR_OK ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    rs1 = uc_free(jep->efname) ;
+	    rs1 = uc_free(op->efname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->efname = nullptr ;
+	    op->efname = nullptr ;
 	}
 	return rs ;
 }
@@ -708,15 +712,15 @@ int sreq_stderrend(SREQ *jep) noex {
 
 /* private subroutines */
 
-static int sreq_builtdone(SREQ *jep) noex {
+static int sreq_builtdone(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (jep->objp != nullptr) {
-	    if ((rs = sreq_objabort(jep)) >= 0) {
-	        if ((rs = sreq_objfinish(jep)) >= 0) {
-	            rs1 = uc_free(jep->objp) ;
+	if (op->objp != nullptr) {
+	    if ((rs = sreq_objabort(op)) >= 0) {
+	        if ((rs = sreq_objfinish(op)) >= 0) {
+	            rs1 = uc_free(op->objp) ;
 	            if (rs >= 0) rs = rs1 ;
-	            jep->objp = nullptr ;
+	            op->objp = nullptr ;
 	        }
 	    }
 	}
@@ -724,24 +728,24 @@ static int sreq_builtdone(SREQ *jep) noex {
 }
 /* end subroutine (sreq_builtdone) */
 
-static int sreq_fdfins(SREQ *jep) noex {
+static int sreq_fdfins(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	    rs1 = sreq_stderrclose(jep) ;
+	    rs1 = sreq_stderrclose(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (jep->ofd >= 0) {
-	    if (jep->ofd != jep->ifd) {
-	        rs1 = u_close(jep->ofd) ;
+	if (op->ofd >= 0) {
+	    if (op->ofd != op->ifd) {
+	        rs1 = u_close(op->ofd) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    jep->ofd = -1 ;
+	    op->ofd = -1 ;
 	}
-	if (jep->ifd >= 0) {
-	    rs1 = u_close(jep->ifd) ;
+	if (op->ifd >= 0) {
+	    rs1 = u_close(op->ifd) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->ifd = -1 ;
+	    op->ifd = -1 ;
 	}
 
 	return rs ;

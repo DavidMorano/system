@@ -35,8 +35,8 @@ struct strfilter_flags {
 } ;
 
 struct strfilter_head {
-	vecstr		sslist ;	/* select */
-	vecstr		sxlist ;	/* exclude */
+	vecstr		*sslp ;	/* select list pointer */
+	vecstr		*sxlp ;	/* exclude list pointer */
 	STRFILTER_FL	f ;
 } ;
 

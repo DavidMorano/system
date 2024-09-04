@@ -2,7 +2,7 @@
 
 T= mkx
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin

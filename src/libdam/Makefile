@@ -2,7 +2,7 @@
 
 T= libdam
 
-ALL= $(T).so $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -363,7 +363,7 @@ OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 .SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -390,8 +390,11 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 
-$(T).so:		$(OBJ) Makefile $(T).a
-	$(LD) -G -o $@ $(SLDFLAGS) $(OBJ) $(SLIBINFO)
+$(T).o:			$(OBJ) Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+
+$(T).so:		$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

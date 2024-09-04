@@ -20,8 +20,8 @@
 	mkstrunique
 
 	Description:
-	We modify the given sring in place to remove any duplicates
-	found.
+	We modify the given sring in place to remove any duplicate
+	characters found.
 
 	Synopsis:
 	int mkstrunique(char *bp,int bl) noex
@@ -37,8 +37,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<utypedefs.h>
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<usysrets.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -59,39 +61,36 @@
 
 /* forward references */
 
-static void	bool_init(bool *,int) noex ;
-
 
 /* local variables */
+
+constexpr int		nchars = UCHAR_MAX ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int mkstrunique(char *bp,int bl) noex {
+	int		rl = 0 ;
 	if (bl > 1) {
-	    bool	seen[256] ;
-	    int		tail = 1 ;
-	    bool_init(seen,256) ;
+	    bool	seen[nchars] = {} ;
 	    while (bl-- && *bp) {
 	        cint	ch = mkchar(*bp) ;
 		if (!seen[ch]) {
-		    bp[tail++] = ch ;
+		    bp[rl++] = ch ;
 	            seen[ch] = true ;
 		}
 	        bp += 1 ;
 	    } /* end while */
-	    bp[tail] = '\0' ;
+	    bp[rl] = '\0' ;
 	} /* end if */
-	return bl ;
+	return rl ;
 }
 /* end subroutine (mkstrunique) */
 
 
 /* local subroutines */
-
-static void bool_init(bool *bp,int bl) noex {
-	for (int i = 0 ; i < bl ; i += 1) bp[i] = false ;
-}
-/* end subroutine (bool_init) */
 
 

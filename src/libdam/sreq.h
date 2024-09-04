@@ -1,7 +1,7 @@
 /* sreq HEADER */
 /* lang=C++20 */
 
-/* Service-Request */
+/* Service-Request manager */
 /* version %I% last-modified %G% */
 
 
