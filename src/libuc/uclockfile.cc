@@ -1,9 +1,10 @@
-/* uc_lockfile(3uc) */
-/* lang=C20 */
+/* uclockfile(3uc) */
+/* lang=C++20 */
 
 /* UNIX® System V file-record locking */
 /* version %I% last-modified %G% */
 
+#define	CF_OLDUNIXBUG	0		/* old UNIX® bug */
 
 /* revision history:
 
@@ -18,22 +19,24 @@
 
 /*******************************************************************************
 
+	Name:
+	uc_lockfile
+
+	Description:
 	This subroutine is similar to something like |lockf(2)| but
 	has different arguments for different options.  A time-out
 	can be supplied with this subroutine.  A negative time-out
 	is taken to be a reasonable default but may eventually
 	time-out none-the-less. Read locks can also be manipulated
-	with this routine unlike with |lockf(3c)|.
-
-	If the 'start' argument is negative, then the function
-	behaves essentially the same as |lockf(3c)| and all locks
-	are relative with respect to the current file offset position.
-	Also, a zero-sized lock is equivalent to locking from the
-	specified starting position (possibly the current position)
-	to (and beyond) the end of the file.
-
-	A negative 'time-out' is equivalent to a default time-out.
-	A 'time-out' of zero is zero!
+	with this routine unlike with |lockf(3c)|.  If the 'start'
+	argument is negative, then the function behaves essentially
+	the same as |lockf(3c)| and all locks are relative with
+	respect to the current file offset position.  Also, a
+	zero-sized lock is equivalent to locking from the specified
+	starting position (possibly the current position) to (and
+	beyond) the end of the file.  A negative 'time-out' is
+	equivalent to a default time-out.  A 'time-out' of zero is
+	zero!
 
 	Synopsis:
 	int uc_lockfile(int fd,int cmd,off_t start,off_t size,int to) noex
@@ -57,12 +60,10 @@
 	to		time-out in seconds to wait for the lock
 
 	Returns:
-
 	>=0	succeeded
-	<0	failed w/ system error code returned
+	<0	failed w/ system error code returned (system-return)
 
 	Notes:
-
 	If the starting offset is given as negative then the region
 	to be locked is taken as relative to the current file
 	position.
@@ -81,7 +82,7 @@
 	file-locking does not "prevent" reading memory (from a
 	process that has the same file memory-mapped), but neither
 	does file-locking prevent another process from reading the
-	same file using 'read(2)'!!   Do you get it solaris boys?
+	same file using |read(2)|!  Do you get it solaris boys?
 
 *******************************************************************************/
 
@@ -91,8 +92,9 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 
 
@@ -107,6 +109,10 @@
 #define	F_TEST	3
 #endif
 
+#ifndef	CF_OLDUNIXBUG
+#define	CF_OLDUNIXBUG	0		/* old UNIX® bug */
+#endif
+
 
 /* local structures */
 
@@ -115,6 +121,8 @@
 
 
 /* local variables */
+
+constexpr bool		f_oldunixbug = CF_OLDUNIXBUG ;
 
 #ifdef	COMMENT
 static const struct lockcmd	cmdlu[] = {
@@ -133,14 +141,17 @@ static const struct lockcmd	cmdlu[] = {
 #endif /* COMMENT */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int uc_lockfile(int fd,int cmd,off_t start,off_t size,int to) noex {
+int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 	FLOCK		fl = {} ;
 	int		rs = SR_OK ;
 	fl.l_whence = (start >= 0) ? SEEK_SET : SEEK_CUR ;
 	fl.l_start = (start >= 0) ? start : 0 ;
-	fl.l_len = size ;
+	fl.l_len = sz ;
 	if (to < 0) to = DEFTIMEOUT ;
 	switch (cmd) {
 	case F_RTEST:
@@ -189,7 +200,11 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t size,int to) noex {
 	    rs = SR_INVAL ;
 	    break ;
 	} /* end switch */
-	if (rs == SR_ACCES) rs = SR_AGAIN ; /* old UNIX® compatibility bug! */
+	if_constexpr (f_oldunixbug) {
+	    if (rs == SR_ACCES) {
+	        rs = SR_AGAIN ; /* old UNIX® compatibility bug! */
+	    }
+	} /* end if_constexpr (f_oldunixbug) */
 	return rs ;
 }
 /* end subroutine (uc_lockfile) */
@@ -199,7 +214,7 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t size,int to) noex {
 
 #ifdef	COMMENT
 static int debugprintstat(cchar *s,int fd) noex {
-	USYAY		sb ;
+	USTAT		sb ;
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = u_fstat(fd,&sb)) >= 0) {

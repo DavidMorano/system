@@ -42,6 +42,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<sysval.hh>
 #include	<getbufsize.h>
 
 #include	"libmallocxx.h"
@@ -63,6 +64,8 @@
 
 
 /* local variables */
+
+static sysval		pagesize(sysval_ps) ;
 
 
 /* exported variables */
@@ -142,9 +145,23 @@ int libmalloc_sv(char **rpp) noex {
 	cint	w = getbufsize_sv ;
 	return uc_libmallocsys(w,rpp) ;
 }
+int libmalloc_fs(char **rpp) noex {
+	cint	w = getbufsize_fs ;
+	return uc_libmallocsys(w,rpp) ;
+}
 int libmalloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_libmallocsys(w,rpp) ;
 }
+
+int libmalloc_ps(char **rpp) noex {
+	int		rs ;
+	if ((rs = pagesize) >= 0) {
+	    cint	sz = (rs + 1) ;
+	    rs = uc_libmalloc(sz,rpp) ;
+	}
+	return rs ;
+}
+/* end if (libmalloc_ps) */
 
 

@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	lockfile
+
+	Description:
 	This subroutine is similar to something like |lockf(2)| but
 	has different arguments for different options.  A timeout
 	can be supplied with this subroutine.  A negative timeout
@@ -113,8 +117,8 @@
 
 /* exported subroutines */
 
-int lockfile(int fd,int cmd,off_t start,off_t size,int to) noex {
-	return uc_lockfile(fd,cmd,start,size,to) ;
+int lockfile(int fd,int cmd,off_t start,off_t off,int to) noex {
+	return uc_lockfile(fd,cmd,start,off,to) ;
 }
 /* end subroutine (lockfile) */
 

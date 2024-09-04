@@ -138,6 +138,10 @@ int malloc_sv(char **rpp) noex {
 	cint	w = getbufsize_sv ;
 	return uc_mallocsys(w,rpp) ;
 }
+int malloc_fs(char **rpp) noex {
+	cint	w = getbufsize_fs ;
+	return uc_mallocsys(w,rpp) ;
+}
 int malloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_mallocsys(w,rpp) ;

@@ -52,6 +52,7 @@ cchar *getbufsizenames[] = {
 	[getbufsize_nw] = "NW",		/* network-ent */
 	[getbufsize_ho] = "HO",		/* host-ent */
 	[getbufsize_sv] = "SV",		/* service-ent */
+	[getbufsize_fs] = "FS",		/* filesystem-type */
 	[getbufsize_zn] = "ZN",		/* zone-name (from Zone-Info) */
 	nullptr
 } ; /* end array (getbufsizenames) */
