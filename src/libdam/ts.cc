@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_CREAT	0		/* always create the file? */
-#define	CF_LOCKF	0		/* use 'lockf(3c)' */
+#define	CF_LOCKF	0		/* use |lockf(3c)| */
 #define	CF_SOLARISBUG	1		/* work around Solaris MMAP bug */
 #define	CF_NIENUM	0		/* perform NI updates on ENUM */
 #define	CF_NISEARCH	0		/* perform NI updates on SEARCH */
@@ -292,7 +292,9 @@ constexpr int		maglen = TS_FILEMAGICSIZE ;
 constexpr bool		f_sunos = F_SUNOS ;
 
 constexpr bool		f_creat = CF_CREAT ;
+constexpr bool		f_lockf = CF_LOCKF ;
 constexpr bool		f_nienum = CF_NIENUM ;
+constexpr bool		f_solarisbug = CF_SOLARISBUG ;
 
 
 /* exported variables */
@@ -1073,18 +1075,16 @@ static int ts_lockget(ts *op,time_t dt,int f_read) noex {
 
 /* we need to actually do the lock */
 
-#if	CF_LOCKF
-	rs = uc_lockf(op->fd,F_LOCK,0L) ;
-#else /* CF_LOCKF */
-#if	CF_SOLARISBUG
-	rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
-#else
-	{
-	    off_t	fs = op->filesize ;
-	    rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
-	}
-#endif /* CF_SOLARISBUF */
-#endif /* CF_LOCKF */
+	if_constexpr (f_lockf) {
+	    rs = uc_lockf(op->fd,F_LOCK,0L) ;
+	} else {
+	    if_constexpr (f_solarisbug) {
+	        rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
+	    } else {
+	        coff	fs = op->filesize ;
+	        rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
+	    } /* end if_constexpr (f_solarisbug) */
+	} /* end if_constexpr (f_lockf) */
 
 	if (rs < 0)
 	    goto bad2 ;
@@ -1149,32 +1149,24 @@ bad0:
 /* end subroutine (ts_lockget) */
 
 static int ts_lockrelease(ts *op) noex {
-	int	rs = SR_OK ;
-
+	int		rs = SR_OK ;
 	if ((op->f.lockedread || op->f.lockedwrite)) {
-
 	    if (op->fd >= 0) {
-
-#if	CF_LOCKF
-	        rs = uc_lockf(op->fd,F_ULOCK,0L) ;
-#else /* CF_LOCKF */
-#if	CF_SOLARISBUG
-	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
-#else
-		{
-		    off_t	fs = op->filesize ;
-	            rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
-		}
-#endif /* CF_SOLARISBUF */
-#endif /* CF_LOCKF */
-
+		cint	cmd = F_ULOCK ;
+		if_constexpr (f_lockf) {
+	            rs = uc_lockf(op->fd,cmd,0L) ;
+	 	} else {
+	            if_constexpr (f_solarisbug) {
+	                rs = lockfile(op->fd,cmd,0L,0L,TO_LOCK) ;
+	            } else {
+		        coff	fs = op->filesize ;
+	                rs = lockfile(op->fd,cmd,0L,fs,TO_LOCK) ;
+		    } /* end if_constexpr (f_solarisbug) */
+		} /* end if_constexpr (f_lockf) */
 	    } /* end if (file was open) */
-
 	    op->f.lockedread = false ;
 	    op->f.lockedwrite = false ;
-
 	} /* end if (there was a possible lock set) */
-
 	return rs ;
 }
 /* end subroutine (ts_lockrelease) */
@@ -1286,21 +1278,20 @@ static int ts_ebuffinish(ts *op) noex {
 
 static int ts_readentry(ts *op,int ei,char **rpp) noex {
 	int		rs ;
-	char		*bp ;
-	if ((rs = ebuf_read(op->ebmp,ei,&bp)) >= 0) {
-	    if (rs == 0) rs = SR_NOTFOUND ;
-	    if (rpp) {
-	        *rpp = (rs >= 0) ? bp : nullptr ;
-	    }
+	char		*bp = nullptr ;
+	if ((rs = ebuf_read(op->ebmp,ei,&bp)) > 0) {
 	    if_constexpr (f_nienum) {
-	        if (rs >= 0) {
-	            int		nl ;
-	            char	*sp = bp + TSE_OKEYNAME ;
-	            nl = strnlen(sp,TSE_LKEYNAME) ;
-	            rs = ts_index(op,sp,nl,ei) ;
-	        } /* end if (got an entry) */
+	        int	nl ;
+	        char	*sp = bp + TSE_OKEYNAME ;
+	        nl = strnlen(sp,TSE_LKEYNAME) ;
+	        rs = ts_index(op,sp,nl,ei) ;
 	    } /* end if_constexpr (f_nienum) */
-	} /* end if (enuf_read) */
+	} else if (rs == 0) {
+	    rs = SR_NOTFOUND ;
+	} /* end if (ebuf_read) */
+	if (rpp) {
+	    *rpp = (rs >= 0) ? bp : nullptr ;
+	}
 	return rs ;
 }
 /* end subroutine (ts_readentry) */
