@@ -648,7 +648,6 @@ veclong.o:		veclong.c veclong.h
 vecelem.o:		vecelem.c vecelem.h
 
 hdb.o:			hdb.c hdb.h
-
 hdbstr.o:		hdbstr.c hdbstr.h
 
 keyvals.o:		keyvals.c keyvals.h

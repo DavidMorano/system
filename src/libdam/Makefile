@@ -36,7 +36,7 @@ DEFS +=
 
 I00= vsystem.h exitcodes.h localmisc.h
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
-I02= hdb.h lookaside.h pq.h plainq.h
+I02=
 I03= field.h 
 I04= egs.h randmwc.o random.h
 I05= dater.h zdb.h zos.h tmz.h zoffparts.h
@@ -246,7 +246,7 @@ OBJ130= sbuf_termconseq.o sbuf_blanks.o
 OBJ131= paramopt.o paramopt_loadone.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
 OBJ133= bufstr.o stackaddr.o outstore.o
-OBJ134= hdbstr.o mapstrint.o keyopt.o keyvals.o
+OBJ134= mapstrint.o keyopt.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
 OBJ136= isSpecialObject.o isDotDir.o isValidMagic.o isStrEmpty.o
@@ -649,10 +649,6 @@ vecint.o:		vecint.c vecint.h
 veclong.o:		veclong.c veclong.h
 
 vecelem.o:		vecelem.c vecelem.h
-
-hdb.o:			hdb.c hdb.h
-
-hdbstr.o:		hdbstr.c hdbstr.h
 
 keyvals.o:		keyvals.c keyvals.h
 

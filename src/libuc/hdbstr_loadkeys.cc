@@ -27,6 +27,9 @@
 	values) into the container object.
 
 	Synopsis:
+	int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex
+
+	Arguments:
 
 	Returns:
 	>=0		number of keys loaded
@@ -87,6 +90,9 @@ constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 static char		fterms[termsize] ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
