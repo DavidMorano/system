@@ -38,6 +38,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
+#include	<bitset>		/* |bitset(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<usysrets.h>
@@ -48,6 +49,15 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+using std::nullptr_t ;			/* type */
+using std::bitset ;			/* type */
 
 
 /* external subroutines */
@@ -64,7 +74,7 @@
 
 /* local variables */
 
-constexpr int		nchars = UCHAR_MAX ;
+constexpr int		nchars = (UCHAR_MAX + 1) ;
 
 
 /* exported variables */
@@ -75,7 +85,7 @@ constexpr int		nchars = UCHAR_MAX ;
 int mkstrunique(char *bp,int bl) noex {
 	int		rl = 0 ;
 	if (bl > 1) {
-	    bool	seen[nchars] = {} ;
+	    bitset<nchars>	seen ;
 	    while (bl-- && *bp) {
 	        cint	ch = mkchar(*bp) ;
 		if (!seen[ch]) {

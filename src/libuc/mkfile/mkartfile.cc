@@ -34,13 +34,11 @@
 
 	Returns:
 	>=0	success and length of created file name
-	<0	failure w/ error number
+	<0	failure w/ error number (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* for |UCHAR_MAX| */
@@ -82,6 +80,9 @@ static int	mkoutname(char *,cchar *,uint,int,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkartfile(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex {
@@ -89,8 +90,8 @@ int mkartfile(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex {
 	if (rbuf && dname && prefix) {
 	    rs = SR_INVALID ;
 	    if (dname[0] && prefix[0] && (serial >= 0)) {
-	        const time_t	dt = time(nullptr) ;
-	        const mode_t	fm = (om & S_IAMB) ;
+	        custime		dt = getustime ;
+	        cmode		fm = (om & S_IAMB) ;
 	        if ((rs = mkpath1(rbuf,dname)) >= 0) {
 	            cint	rl = rs ;
 	            for (uint ts = uint(dt) ; rs >= 0 ; ts += 1) {
@@ -162,7 +163,6 @@ static int mkoutname(char *rfname,cchar *pre,uint ts,int ss,int es) noex {
 	    } /* end for */
 	    bp += n ;
 	} /* end block */
-/* done */
 	*bp = '\0' ;
 	return (bp - rfname) ;
 }
