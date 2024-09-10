@@ -21,11 +21,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |pid_t| */
 #include	<sys/param.h>
-#include	<time.h>
+#include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 
 
-#define	GETUTMPENT		struct getutmpent_head
+#define	UTMPENTX	struct utmpentx_head
 
 /* UTMP entry types */
 #ifndef	GETUTMPENT_TEMPTY
@@ -51,7 +51,7 @@
 #endif
 
 
-struct getutmpent_head {
+struct utmpentx_head {
 	time_t		date ;
 	pid_t		sid ;
 	int		session ;
@@ -61,9 +61,11 @@ struct getutmpent_head {
 	char		host[GETUTMPENT_LHOST + 1] ;
 } ;
 
+typedef	UTMPENTX	utmpentx ;
+
 EXTERNC_begin
 
-extern int getutmpent(GETUTMPENT *,pid_t) noex ;
+extern int getutmpent(utmpentx *,pid_t) noex ;
 
 extern int getutmpid(char *,int,pid_t) noex ;
 extern int getutmpname(char *,int,pid_t) noex ;

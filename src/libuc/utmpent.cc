@@ -1,80 +1,46 @@
 /* utmpent SUPPORT */
 /* lang=C++20 */
 
-/* get user information from UTMP database */
+/* methods for the UTMPENT object */
 /* version %I% last-modified %G% */
 
+#define	CF_DYNENTRIES	1		/* dynamic entries per read */
 
 /* revision history:
 
-	= 1998-07-01, David A­D­ Morano
-	This code was originally written.
+	= 2000-07-19, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Name
-	getutmpent
+	Name:
+	utmpent
 
 	Description:
-	Get the user login name from the UTMP database.
-
-	Synopsis:
-	int getutmpent(utmpent *ep,pid_t sid) noex
-	int getutmpname(char *rbuf,int rlen,pid_t sid) noex
-	int getutmphost(char *rbuf,int rlen,pid_t sid) noex
-	int getutmpline(char *rbuf,int rlen,pid_t sid) noex
-
-	Arguments:
-	ep		pointer to UTMPENT object
-	rbuf		buffer to hold result
-	rlen		length of user supplied buffer
-	sid		session ID to lookup
-
-	Returns:
-	>=0		length of user buf
-	<0		error (system-return)
+        This code provides the methods for the UTMPENT object.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<unistd.h>
+#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<utmpacc.h>
 #include	<strwcpy.h>
-#include	<sncpyx.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"utmpent.h"
 
 
 /* local defines */
-
-#define	AEBUFLEN	sizeof(struct utmpx)
-
-#ifndef	VARUTMPLINE
-#define	VARUTMPLINE	"UTMPLINE"
-#endif
-#ifndef	VARLOGLINE
-#define	VARLOGLINE	"LOGLINE"
-#endif
-
-
-/* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
-
-
-/* local typedefs */
 
 
 /* external subroutines */
@@ -85,43 +51,11 @@ using std::max ;			/* subroutine-template */
 
 /* local structures */
 
-namespace {
-    struct ufinder ;
-    typedef int (ufinder::*ufinder_m)() noex ;
-    struct ufinder {
-        utmpacc_ent	ae{} ;
-        char		*aebuf ;
-	pid_t		sid ;
-	int		aelen = AEBUFLEN ;
-	ufinder(pid_t i) noex : sid(i) { } ;
-	int start() noex ;
-	int finish() noex ;
-	operator int () noex ;
-	int trysid() noex ;
-	int tryline() noex ;
-	int trystat() noex ;
-    } ;
-}
-
 
 /* forward references */
 
-static int utmpent_utmpacc(utmpent *,pid_t) noex ;
-static int utmpent_load(utmpent *,utmpacc_ent *) noex ;
-
 
 /* local variables */
-
-constexpr ufinder_m	mems[] = {
-	&ufinder::trysid,
-	&ufinder::tryline,
-	&ufinder::trystat
-} ;
-
-constexpr cpcchar	utmpenvs[] = {
-	VARUTMPLINE,
-	VARLOGLINE
-} ;
 
 
 /* exported variables */
@@ -129,144 +63,178 @@ constexpr cpcchar	utmpenvs[] = {
 
 /* exported subroutines */
 
-int getutmpent(utmpent *ep,pid_t sid) noex {
+int utmpent_start(utmpent *op) noex {
 	int		rs = SR_FAULT ;
-	if (ep) {
-	    if (sid <= 0) sid = getsid(0) ;
-	    ep->id[0] = '\0' ;
-	    ep->line[0] = '\0' ;
-	    ep->user[0] = '\0' ;
-	    ep->host[0] = '\0' ;
-	    ep->session = 0 ;
-	    ep->date = 0 ;
-	    ep->sid = sid ;
-	    rs = utmpent_utmpacc(ep,sid) ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (getutmpent) */
-
-int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
-	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    utmpent	e{} ;
-	    if (rlen < 0) rlen = UTMPENT_LUSER ;
-	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy(rbuf,rlen,e.user) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (getutmpname) */
-
-int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
-	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    utmpent	e{} ;
-	    if (rlen < 0) rlen = UTMPENT_LHOST ;
-	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy(rbuf,rlen,e.host) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (getutmphost) */
-
-int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
-	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    utmpent	e{} ;
-	    if (rlen < 0) rlen = UTMPENT_LLINE ;
-	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy(rbuf,rlen,e.line) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (getutmpline) */
-
-
-/* local subroutines */
-
-ufinder::operator int () noex {
-	int		rs = SR_OK ;
-	for (auto &m : mems) {
-	    rs = (this->*m)() ;
-	    if (rs != 0) break ;
-	} /* end for */
-	return rs ;
-}
-/* end method (ufinder::operator) */
-
-int ufinder::start() noex {
-	return uc_malloc(aelen,&aebuf) ;
-}
-
-int ufinder::finish() noex {
-	int	rs = SR_BUGCHECK ;
-	if (aebuf) {
-	    rs = uc_free(aebuf) ;
-	    aebuf = nullptr ;
+	if (op) {
+	    rs = memclear(op) ;
 	}
 	return rs ;
 }
+/* end subroutine (utmpent_start) */
 
-int ufinder::trysid() noex {
-	return utmpacc_entsid(&ae,aebuf,aelen,sid) ;
-}
-
-int ufinder::tryline() noex {
-	static cint	oursid = getsid(0) ;
-	int		rs = SR_OK ;
-	if (sid == oursid) {
-	    for (auto const &vn : utmpenvs) {
-	        if (cchar *line ; (line = getenv(vn)) != nullptr) {
-	            rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
-	        }
-		if (rs != 0) break ;
-	    } /* end for */
-	} /* end if (referencing ourself) */
-	return rs ;
-}
-
-int ufinder::trystat() noex {
-	return utmpacc_entstat(&ae,aebuf,aelen,sid) ;
-}
-
-static int utmpent_utmpacc(utmpent *ep,pid_t sid) noex {
-	ufinder		fo(sid) ;
-	int		rs ;
-	int		rs1 ;
-	int		ffound = false ;
-	if ((rs = fo.start()) >= 0) {
-	    if ((rs = fo) > 0) {
-		ffound = true ;
-	        rs = utmpent_load(ep,&fo.ae) ;
-	    }
-	    rs1 = fo.finish() ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ufinder) */
-	return (rs >= 0) ? ffound : rs ;
-}
-/* end subroutine (utmpent_utmpacc) */
-
-static int utmpent_load(utmpent *ep,utmpacc_ent *aep) noex {
+int utmpent_finish(utmpent *op) noex {
 	int		rs = SR_FAULT ;
-	if (ep && aep) {
+	if (op) {
 	    rs = SR_OK ;
-	    strwcpy(ep->id,aep->id,min(UTMPENT_LID,UTMPACC_LID)) ;
-	    strwcpy(ep->user,aep->user,min(UTMPENT_LUSER,UTMPACC_LUSER)) ;
-	    strwcpy(ep->line,aep->line,min(UTMPENT_LLINE,UTMPACC_LLINE)) ;
-	    strwcpy(ep->host,aep->host,min(UTMPENT_LHOST,UTMPACC_LHOST)) ;
-	    ep->session = aep->session ;
-	    ep->date = aep->ctime ;
-	    ep->sid = aep->sid ;
-	} /* end if (utmpacc_entsid) */
+	}
 	return rs ;
 }
-/* end subroutine (utmpent_load) */
+/* end subroutine (utmpent_finish) */
+
+int utmpent_settype(utmpent *op,int type) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    op->ut_type = type ;
+	    rs ¯ SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_settype) */
+
+int utmpent_setpid(utmpent *op,pid_t sid) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    op->ut_pid = sid ;
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_setpid) */
+
+int utmpent_setsession(utmpent *op,int lines) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    op->ut_session = lines ;
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_setsession) */
+
+int utmpent_setcols(utmpent *op,int cols) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    op->cols = cols ;
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_setcols) */
+
+int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = (strnwcpy(op->ut_id,UTMPENT_LID,sp,sl) - op->ut_id) ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_setid) */
+
+int utmpent_setline(utmpent *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = (strnwcpy(op->ut_line,UTMPENT_LLINE,sp,sl) - op->ut_line) ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_setline) */
+
+int utmpent_setuser(utmpent *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = (strnwcpy(op->ut_user,UTMPENT_LUSER,sp,sl) - op->ut_user) ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_setuser) */
+
+int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = (strnwcpy(op->ut_host,UTMPENT_LHOST,sp,sl) - op->ut_host) ;
+	    op->ut_syslen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_sethost) */
+
+int utmpent_gettype(utmpent *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = mkchar(op->ut_type) ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_gettype) */
+
+int utmpent_getpid(utmpent *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->ut_pid ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_getpid) */
+
+int utmpent_getsession(utmpent *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->ut_session ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_getsession) */
+
+int utmpent_getcols(utmpent *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->cols ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_getcols) */
+
+int utmpent_getid(utmpent *op,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = strnlen(op->ut_id,UTMPENT_LID) ;
+	    if (rpp) *rpp = op->ut_id ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_getid) */
+
+int utmpent_getline(utmpent *op,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = strnlen(op->ut_line,UTMPENT_LLINE) ;
+	    if (rpp) *rpp = op->ut_line ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_getline) */
+
+int utmpent_getuser(utmpent *op,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = strnlen(op->ut_user,UTMPENT_LUSER) ;
+	    if (rpp) *rpp = op->ut_user ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_getuser) */
+
+int utmpent_gethost(utmpent *op,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = strnlen(op->ut_host,UTMPENT_LHOST) ;
+	    if (op->ut_syslen > 0) {
+	        if (rs > op->ut_syslen) rs = op->ut_syslen ;
+	    }
+	    if (rpp) *rpp = op->ut_host ;
+	}
+	return rs ;
+}
+/* end subroutine (utmpent_gethost) */
 
 

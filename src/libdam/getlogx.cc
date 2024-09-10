@@ -1,4 +1,4 @@
-/* getloginterm SUPPORT */
+/* getlogterm SUPPORT */
 /* lang=C++20 */
 
 /* get the name of the controlling terminal for the current session */
@@ -19,29 +19,32 @@
 /*******************************************************************************
 
 	Name:
-	getloginterm
+	getlogname
+	getlogterm
 
 	Description:
-	This subroutine will find and return the name of the controlling
-	terminal for the given session ID.
+	This subroutine will find and return the name of the
+	controlling {name, terminal, host} for the given session
+	ID.
 
 	Synopsis:
-	int getloginterm(char *dbuf,int dlen,pid_t sid) noex
+	int getlogname(char *rbuf,int rlen,pid_t sid) noex
+	int getlogterm(char *rbuf,int rlen,pid_t sid) noex
+	int getloghost(char *rbuf,int rlen,pid_t sid) noex
 
 	Arguments:
-	dbuf	user buffer to receive name of controlling terminal
-	dlen	length of user supplied buffer
-	sid	session ID to find controlling terminal for
+	rbuf		result buffer pointer
+	rlen		result buffer length
+	sid		session ID
 
 	Returns :
-	>=	length of name of controlling terminal
+	>=	length of returned c-string
 	<0	error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -51,9 +54,10 @@
 #include	<usystem.h>
 #include	<tmpx.h>
 #include	<strwcpy.h>
+#include	<getutmpent.h>
 #include	<localmisc.h>
 
-#include	"getloginterm.h"
+#include	"getlogx.h"
 
 
 /* local defines */
@@ -93,7 +97,20 @@ constexpr cchar		devdir[] = DEVDIR ;
 
 /* exported subroutines */
 
-int getloginterm(char *dbuf,int dlen,pid_t sid) noex {
+int getlogname(char *rbuf,int rlen,pid_t sid) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    utmpent	e ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	        rs = sncpy1(rbuf,rlen,e.user) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (getlogname) */
+
+int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -136,6 +153,19 @@ int getloginterm(char *dbuf,int dlen,pid_t sid) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (getloginterm) */
+/* end subroutine (getlogterm) */
+
+int getloghost(char *rbuf,int rlen,pid_t sid) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    utmpent	e ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = getutmpent(&e,sid)) >= 0) {
+	        rs = sncpy1(rbuf,rlen,e.host) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (getloghost) */
 
 

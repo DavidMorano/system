@@ -161,7 +161,7 @@ static constexpr cint	timeouts[] = {
 
 /* exported subroutines */
 
-int percache_init(PERCACHE *pcp) noex {
+int percache_init(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	if (! pcp->f_init) {
 	    rs = SR_OK ;
@@ -172,7 +172,7 @@ int percache_init(PERCACHE *pcp) noex {
 }
 /* end subroutine (percache_init) */
 
-int percache_fini(PERCACHE *pcp) noex {
+int percache_fini(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pcp) {
@@ -191,7 +191,7 @@ int percache_fini(PERCACHE *pcp) noex {
 /* end subroutine (percache_fini) */
 
 /* is a "fini" registration required? */
-int percache_finireg(PERCACHE *pcp) noex {
+int percache_finireg(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (pcp) {
@@ -205,7 +205,7 @@ int percache_finireg(PERCACHE *pcp) noex {
 }
 /* end subroutine (percache_finireg) */
 
-int percache_invalidate(PERCACHE *pcp) noex {
+int percache_invalidate(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pcp) {
@@ -224,7 +224,7 @@ int percache_invalidate(PERCACHE *pcp) noex {
 }
 /* end subroutine (percache_invalidate) */
 
-int percache_gethostid(PERCACHE *pcp,time_t dt,uint *hip) noex {
+int percache_gethostid(percache *pcp,time_t dt,uint *hip) noex {
 	cint		pt = pertype_hostid ;
 	int		rs = SR_FAULT ;
 	if (pcp && hip) {
@@ -243,7 +243,7 @@ int percache_gethostid(PERCACHE *pcp,time_t dt,uint *hip) noex {
 }
 /* end subroutine (percache_gethostid) */
 
-int percache_getnprocs(PERCACHE *pcp,time_t dt) noex {
+int percache_getnprocs(percache *pcp,time_t dt) noex {
 	cint		pt = pertype_nprocs ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
@@ -267,7 +267,7 @@ int percache_getnprocs(PERCACHE *pcp,time_t dt) noex {
 }
 /* end subroutine (percache_getnprocs) */
 
-int percache_getbtime(PERCACHE *pcp,time_t dt,time_t *btp) noex {
+int percache_getbtime(percache *pcp,time_t dt,time_t *btp) noex {
 	cint		pt = pertype_btime ;
 	int		rs = SR_FAULT ;
 	if (pcp && btp) {
@@ -288,7 +288,7 @@ int percache_getbtime(PERCACHE *pcp,time_t dt,time_t *btp) noex {
 }
 /* end subroutine (percache_getbtime) */
 
-int percache_getrunlevel(PERCACHE *pcp,time_t dt) noex {
+int percache_getrunlevel(percache *pcp,time_t dt) noex {
 	cint		pt = pertype_runlevel ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
@@ -310,7 +310,7 @@ int percache_getrunlevel(PERCACHE *pcp,time_t dt) noex {
 }
 /* end subroutine (percache_getrunlevel) */
 
-int percache_getnusers(PERCACHE *pcp,time_t dt) noex {
+int percache_getnusers(percache *pcp,time_t dt) noex {
 	cint		pt = pertype_nusers ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
@@ -332,7 +332,7 @@ int percache_getnusers(PERCACHE *pcp,time_t dt) noex {
 }
 /* end subroutine (percache_getnusers) */
 
-int percache_getsysdomain(PERCACHE *pcp,time_t dt,cchar **rpp) noex {
+int percache_getsysdomain(percache *pcp,time_t dt,cchar **rpp) noex {
 	cint		pt = pertype_sysdomain ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -373,7 +373,7 @@ int percache_getsysdomain(PERCACHE *pcp,time_t dt,cchar **rpp) noex {
 }
 /* end subroutine (percache_getsysdomain) */
 
-int percache_netload(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
+int percache_netload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	cint		pt = pertype_netload ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -414,7 +414,7 @@ int percache_netload(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 }
 /* end subroutine (percache_netload) */
 
-int percache_systat(PERCACHE *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
+int percache_systat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	cint		pt = pertype_systat ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;

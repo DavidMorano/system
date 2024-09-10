@@ -20,8 +20,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdio.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
