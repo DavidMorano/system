@@ -1,5 +1,5 @@
 /* opendial HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 
 /* revision history:

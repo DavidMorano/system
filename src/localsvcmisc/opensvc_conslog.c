@@ -1,10 +1,8 @@
-/* opensvc_conslog */
+/* opensvc_conslog SUPPORT */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (conslog) */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGN	0		/* extra-special debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,11 +18,14 @@
 
 /*******************************************************************************
 
+	Name:
+	opensvc_conslog
+
+	Description:
         This is an user open-service module. This little diddy supplies a fast
         little "issue" message for programs that perform logins onto the host.
 
 	Synopsis:
-
 	int opensvc_conslog(pr,prn,of,om,argv,envv,to)
 	const char	*pr ;
 	const char	*prn ;
@@ -35,7 +36,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -45,13 +45,10 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -69,6 +66,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<filer.h>
+#include	<getsyslogx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -97,7 +95,6 @@ extern int	sncpy1w(char *,int,const char *,int) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	matkeystr(const char **,const char *,int) ;
-extern int	getlogfac(const char *,int) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,const char *) ;
@@ -107,14 +104,6 @@ extern int	localgetorgloc(const char *,char *,int,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 extern cchar	*getourenv(const char **,const char *) ;
 
@@ -333,11 +322,6 @@ int		to ;
 
 	if (rs < 0) goto badarg ;
 
-#if	CF_DEBUGN
-	nprintf(NDEBFNAME,"opensvc_conslog: ai_pos=%u ai_max=%u\n",
-		ai_pos,ai_max) ;
-#endif
-
 /* check arguments */
 
 	if ((am == O_RDONLY) || (am == O_RDWR)) {
@@ -368,7 +352,7 @@ int		to ;
 /* optional facility and priority */
 
 	if ((rs >= 0) && ((facspec != NULL) && (facspec[0] != '\0'))) {
-	    rs = getlogfac(facspec,-1) ;
+	    rs = getsyslogfac(facspec,-1) ;
 	    fac = rs ;
 	} /* end if */
 
@@ -401,11 +385,6 @@ badarg:
 	bits_finish(&pargs) ;
 
 badpargs:
-
-#if	CF_DEBUGN
-	nprintf(NDEBFNAME,"opensvc_conslog: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opensvc_conslog) */
