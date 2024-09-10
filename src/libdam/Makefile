@@ -191,7 +191,7 @@ OBJ81=
 OBJ82= density.o densitystati.o densitystatll.o denpercents.o
 OBJ83= tmstrs.o shellunder.o udomain.o
 OBJ84= mktmpuserdir.o mkcaselower.o mkfmtphone.o
-OBJ85= mklogid.o mkplogid.o mksublogid.o mkquoted.o mkutmpid.o mkmagic.o 
+OBJ85=
 OBJ86= mktmpfile.o mktmplock.o mkjobfile.o mkdatefile.o mkuuid.o mkchar.o
 OBJ87= nchr.o mnwcpy.o
 
@@ -291,7 +291,7 @@ OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
 OBJ172= getnodename.o getclustername.o getnodeinfo.o getdomainname.o getseed.o
 OBJ173= getnprocessors.o getarchitecture.o getnfile.o getpwd.o getrunlevel.o
-OBJ174= getlogname.o getloghost.o getutmpterm.o getsocktype.o
+OBJ174= getsocktype.o
 OBJ175= getpwentry.o getpwlogname.o getgroupname.o getarchitecture.o
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 

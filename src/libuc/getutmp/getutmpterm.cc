@@ -65,6 +65,7 @@
 #include	<mkpathx.h>
 #include	<localmisc.h>
 
+#include	"getutmpent.h"
 #include	"getutmpterm.h"
 
 
@@ -78,6 +79,12 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -97,7 +104,7 @@ int getutmpterm(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	cchar		*devdname = DEVDNAME ;
 	if (rbuf) {
-	    utmpent	ute ;
+	    utmpentx	ute ;
 	    if ((rs = getutmpent(&ute,sid)) >= 0) {
 		static cint	dlen = strlen(devdname) ;
 	        if_constexpr (f_darwin) {

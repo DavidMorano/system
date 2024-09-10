@@ -1,4 +1,4 @@
-/* getutmpentx SUPPORT */
+/* getutmpent SUPPORT */
 /* lang=C++20 */
 
 /* get user information from UTMP database */
@@ -42,7 +42,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |getsid(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>

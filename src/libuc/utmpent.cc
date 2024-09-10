@@ -4,7 +4,8 @@
 /* methods for the UTMPENT object */
 /* version %I% last-modified %G% */
 
-#define	CF_DYNENTRIES	1		/* dynamic entries per read */
+#define	CF_SESSION	0			/* ut_session */
+#define	CF_SUSLEN	0			/* ut_syslen session */
 
 /* revision history:
 
@@ -35,6 +36,7 @@
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<strn.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"utmpent.h"
@@ -85,7 +87,7 @@ int utmpent_settype(utmpent *op,int type) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    op->ut_type = type ;
-	    rs ¯ SR_OK ;
+	    rs = SR_OK ;
 	}
 	return rs ;
 }
@@ -104,22 +106,16 @@ int utmpent_setpid(utmpent *op,pid_t sid) noex {
 int utmpent_setsession(utmpent *op,int lines) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
+#if	CF_SESSION
 	    op->ut_session = lines ;
+#else
+	    (void) lines ;
+#endif /* CF_SESSION */
 	    rs = SR_OK ;
 	}
 	return rs ;
 }
 /* end subroutine (utmpent_setsession) */
-
-int utmpent_setcols(utmpent *op,int cols) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    op->cols = cols ;
-	    rs = SR_OK ;
-	}
-	return rs ;
-}
-/* end subroutine (utmpent_setcols) */
 
 int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -152,7 +148,9 @@ int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = (strnwcpy(op->ut_host,UTMPENT_LHOST,sp,sl) - op->ut_host) ;
+#if	CF_SYSLEN
 	    op->ut_syslen = rs ;
+#endif /* CF_SYSLEN */
 	}
 	return rs ;
 }
@@ -179,20 +177,15 @@ int utmpent_getpid(utmpent *op) noex {
 int utmpent_getsession(utmpent *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
+#if	CF_SESSION
 	    rs = op->ut_session ;
+#else
+	    rs = SR_OK ;
+#endif /* CF_SESSION */
 	}
 	return rs ;
 }
 /* end subroutine (utmpent_getsession) */
-
-int utmpent_getcols(utmpent *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = op->cols ;
-	}
-	return rs ;
-}
-/* end subroutine (utmpent_getcols) */
 
 int utmpent_getid(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -228,9 +221,11 @@ int utmpent_gethost(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = strnlen(op->ut_host,UTMPENT_LHOST) ;
+#if	CF_SYSLEN
 	    if (op->ut_syslen > 0) {
 	        if (rs > op->ut_syslen) rs = op->ut_syslen ;
 	    }
+#endif /* CF_SYSLEN */
 	    if (rpp) *rpp = op->ut_host ;
 	}
 	return rs ;

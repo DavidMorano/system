@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |pid_t| */
 #include	<utmpx.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -29,7 +29,7 @@
 
 /* object defines */
 #ifndef	UTMPENT
-#define	UTMPENT		struct futmpx
+#define	UTMPENT		struct utmpx
 #endif
 
 /* entry type values */
@@ -51,7 +51,7 @@
 #define	UTMPENT_LLINE		32
 #define	UTMPENT_LHOST		256
 
-typedef	UTMPENT		utmpent
+typedef	UTMPENT		utmpent ;
 
 EXTERNC_begin
 
@@ -60,7 +60,6 @@ extern int utmpent_settype(utmpent *,int) noex ;
 extern int utmpent_setpid(utmpent *,pid_t) noex ;
 extern int utmpent_setsession(utmpent *,int) noex ;
 extern int utmpent_setlines(utmpent *,int) noex ;
-extern int utmpent_setcols(utmpent *,int) noex ;
 extern int utmpent_setid(utmpent *,cchar *,int) noex ;
 extern int utmpent_setline(utmpent *,cchar *,int) noex ;
 extern int utmpent_setuser(utmpent *,cchar *,int) noex ;
@@ -69,7 +68,6 @@ extern int utmpent_gettype(utmpent *) noex ;
 extern int utmpent_getpid(utmpent *) noex ;
 extern int utmpent_getsession(utmpent *) noex ;
 extern int utmpent_getlines(utmpent *) noex ;
-extern int utmpent_getcols(utmpent *) noex ;
 extern int utmpent_getid(utmpent *,cchar **) noex ;
 extern int utmpent_getline(utmpent *,cchar **) noex ;
 extern int utmpent_getuser(utmpent *,cchar **) noex ;
