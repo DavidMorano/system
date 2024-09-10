@@ -1,14 +1,13 @@
-/* b_temp */
+/* b_temp SUPPORT */
+/* lang=C++20 */
 
 /* this is a SHELL built-in version of 'temp(1)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* compile |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -22,18 +21,14 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ temp[<temp(s)>] [-af <afile>] [-V]
 
 	Arguments:
-
 	<temp(s)>	form: <v>[c|f]
 	-af <afile>	argument file of <temp(s)>
 	-V		print command version to standard-error and then exit
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

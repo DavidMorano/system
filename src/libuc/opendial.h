@@ -1,25 +1,32 @@
-/* opendial */
+/* opendial HEADER */
+/* lang=C++20 */
 
 
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	OPENDIAL_INCLUDE
-#define	OPENDIAL_INCLUDE	1
+#define	OPENDIAL_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 /* options */
 #define	OPENDIAL_OLONG		(1<<0)		/* FINGER "long" option */
 
 
-/* dialers (by the number) */
 enum opendialers {
 	opendialer_unspec,
 	opendialer_udp,
@@ -38,21 +45,12 @@ enum opendialers {
 	opendialer_overlast
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(OPENDIAL_MASTER)) || (OPENDIAL_MASTER == 0)
+extern int opendial(int,int,cc *,cc *,cc *,mainv,mainv,int,int) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int opendial(int,int,cchar *,cchar *,cchar *,
-		cchar **,cchar **,int,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* OPENDIAL_MASTER */
 
 #endif /* OPENDIAL_INCLUDE */
 

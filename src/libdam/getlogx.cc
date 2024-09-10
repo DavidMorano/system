@@ -55,6 +55,7 @@
 #include	<tmpx.h>
 #include	<strwcpy.h>
 #include	<getutmpent.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"getlogx.h"
@@ -100,10 +101,10 @@ constexpr cchar		devdir[] = DEVDIR ;
 int getlogname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    utmpent	e ;
+	    utmpentx	e ;
 	    rbuf[0] = '\0' ;
 	    if ((rs = getutmpent(&e,sid)) >= 0) {
-	        rs = sncpy1(rbuf,rlen,e.user) ;
+	        rs = sncpy(rbuf,rlen,e.user) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -158,10 +159,10 @@ int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 int getloghost(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    utmpent	e ;
+	    utmpentx	e ;
 	    rbuf[0] = '\0' ;
 	    if ((rs = getutmpent(&e,sid)) >= 0) {
-	        rs = sncpy1(rbuf,rlen,e.host) ;
+	        rs = sncpy(rbuf,rlen,e.host) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

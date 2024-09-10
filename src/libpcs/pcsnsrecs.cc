@@ -25,6 +25,7 @@
 #include	<sys/param.h>
 #include	<cstdlib>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<recarr.h>
@@ -48,6 +49,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -111,31 +115,31 @@ static int record_get(PCSNSRECS_REC *,char *,int) noex ;
 
 /* exported subroutines */
 
-int pcsnsrecs_start(RECS *op,int max,int ttl) noex {
+int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (max < PCSNSRECS_DEFMAX)
-	    max = PCSNSRECS_DEFMAX ;
+	if (nmax < PCSNSRECS_DEFMAX)
+	    nmax = PCSNSRECS_DEFMAX ;
 
 	if (ttl < PCSNSRECS_DEFTTL)
 	    ttl = PCSNSRECS_DEFTTL ;
 
-	memset(op,0,sizeof(PCSNSRECS)) ;
+	memclear(op) ;
 
 	{
-	    cint	size = sizeof(RECARR) ;
+	    cint	sz = sizeof(RECARR) ;
 	    char	*p ;
-	    if ((rs = uc_libmalloc(size,&p)) >= 0) {
+	    if ((rs = uc_libmalloc(sz,&p)) >= 0) {
 	        int	ro = 0 ;
 	        ro |= RECARR_OSTATIONARY ;
 	        ro |= RECARR_OREUSE ;
 	        ro |= RECARR_OCONSERVE ;
 	        op->recs = p ;
-	        if ((rs = recarr_start(op->recs,max,ro)) >= 0) {
+	        if ((rs = recarr_start(op->recs,nmax,ro)) >= 0) {
 	            if ((rs = pq_start(&op->lru)) >= 0) {
-	                op->max = max ;
+	                op->nmax = nmax ;
 	                op->ttl = ttl ;
 	                op->ti_check = time(NULL) ;
 	                op->magic = PCSNSRECS_MAGIC ;
@@ -190,8 +194,8 @@ int pcsnsrecs_finish(RECS *op) noex {
 
 int pcsnsrecs_store(RECS *op,cchar *vbuf,int vlen,cchar *un,
 		int w,int ttl) noex {
-	RECINFO		ri ;
-	const time_t	dt = time(NULL) ;
+	RECINFO		ri{} ;
+	custime		dt = getustime ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -203,7 +207,6 @@ int pcsnsrecs_store(RECS *op,cchar *vbuf,int vlen,cchar *un,
 	if (vlen < 1) return SR_INVALID ;
 	if (un[0] == '\0') return SR_INVALID ;
 
-	memset(&ri,0,sizeof(RECINFO)) ;
 	ri.un = un ;
 	ri.vbuf = vbuf ;
 	ri.vlen = vlen ;
@@ -380,7 +383,7 @@ static int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 	if ((rs = recarr_count(op->recs)) >= 0) {
 	    pq_ent	*pep ;
 	    cint	n = rs ;
-	    if (n >= op->max) {
+	    if (n >= op->nmax) {
 	        if ((rs = pq_rem(&op->lru,&pep)) >= 0) {
 	            PCSNSRECS_REC	*ep = (PCSNSRECS_REC *) pep ;
 	            if ((rs = pcsnsrecs_recdel(op,ep)) >= 0) {
@@ -536,7 +539,7 @@ static int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 
 	vlen = rip->vlen ;
 
-	memset(ep,0,sizeof(PCSNSRECS_REC)) ;
+	memclear(ep) ;
 	ep->w = rip->w ;
 	strwcpy(ep->un,rip->un,USERNAMELEN) ;
 

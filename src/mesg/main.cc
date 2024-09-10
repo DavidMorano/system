@@ -18,30 +18,31 @@
 
 /*******************************************************************************
 
-        This is the front-end (main) subroutine for the MESG program. This
-        program is so small that this subroutine is pretty much it!
-
+	This is the front-end (main) subroutine for the MESG program.
+	This program is so small that this subroutine is pretty
+	much it!
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<bfile.h>
 #include	<userinfo.h>
 #include	<baops.h>
 #include	<field.h>
+#include	<getlogx.h>
+#include	<matstr.h>
+#include	<mkpathx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -57,30 +58,22 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	getloginterm(int,char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-
 extern char	*strbasename(char *) ;
 
 
-/* local forward references */
-
-
 /* external variables */
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
-
-static const char *argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	NULL
-} ;
 
 enum argopts {
 	argopt_version,
@@ -90,11 +83,20 @@ enum argopts {
 } ;
 
 
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	nullptr
+} ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	bfile	errfile, *efp = &errfile ;
 	bfile	outfile, *ofp = &outfile ;
 
@@ -119,12 +121,12 @@ int main(int argc,cchar **argv,cchar **envv)
 	char	termdevbuf1[MAXPATHLEN + 2] ;
 	char	termdevbuf2[MAXPATHLEN + 2] ;
 	char	*devbase = DEVBASE ;
-	char	*termdevice = NULL ;
-	char	*newstate = NULL ;
+	char	*termdevice = nullptr ;
+	char	*newstate = nullptr ;
 	char	*cp ;
 
 
-	if (((cp = getenv("ERROR_FD")) != NULL) &&
+	if (((cp = getenv("ERROR_FD")) != nullptr) &&
 	    (cfdeci(cp,-1,&err_fd) >= 0))
 	    esetfd(err_fd) ;
 
@@ -143,7 +145,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	pip->efp = efp ;
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
-	pip->tmpdir = NULL ;
+	pip->tmpdir = nullptr ;
 
 	pip->f.quiet = FALSE ;
 
@@ -176,7 +178,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 
 #if	F_DEBUGS
 	                eprintf("main: got an option key w/ a value\n") ;
@@ -493,14 +495,14 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* what is the terminal device we want to pop ? */
 
-	if ((termdevice == NULL) || (termdevice[0] == '\0')) {
+	if ((termdevice == nullptr) || (termdevice[0] == '\0')) {
 
-	    if ((termdevice = getenv(TERMDEVICEVAR1)) == NULL)
+	    if ((termdevice = getenv(TERMDEVICEVAR1)) == nullptr)
 	    	termdevice = getenv(TERMDEVICEVAR2) ;
 
-	    if (termdevice == NULL) {
+	    if (termdevice == nullptr) {
 
-	        rs = getloginterm(0,termdevbuf1,MAXPATHLEN) ;
+	        rs = getlogterm(0,termdevbuf1,MAXPATHLEN,-1) ;
 
 	        if (rs < 0)
 	            goto badnoterm ;
@@ -566,7 +568,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_on = sb.st_mode & S_IWGRP ;
 
 
-	    if ((newstateval < 0) && (newstate != NULL))
+	    if ((newstateval < 0) && (newstate != nullptr))
 		newstateval = (tolower(newstate[0]) == 'y') ? 1 : 0 ;
 
 
