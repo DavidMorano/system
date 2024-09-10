@@ -103,30 +103,24 @@ int bfliner_readpending(bfliner *op) noex {
 }
 /* end subroutine (bfliner_readpending) */
 
-int bfliner_readln(bfliner *op,int llen,cchar **lpp) noex {
+int bfliner_getln(bfliner *op,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) {
-	    rs = SR_OK ;
-	    if (op->ll < 0) {
-	        bfile	*ifp = op->ifp ;
-	        op->poff = op->foff ;
-	        rs = breadlnto(ifp,op->lbuf,llen,op->to) ;
+	    bfile	*ifp = op->ifp ;
+	    op->poff = op->foff ;
+	    if ((rs = breadlnto(ifp,op->lbuf,op->llen,op->to)) >= 0) {
 	        len = rs ;
 	        op->ll = len ;
-	        if (rs > 0) {
-	            op->foff += len ;
-	        }
-	    } else {
-	        len = op->ll ;
-	    } /* end if (needed a new line) */
+	        op->foff += len ;
+	    } /* end if (breadlnto) */
 	    if (lpp) {
 	        *lpp = (rs >= 0) ? op->lbuf : nullptr ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (bfliner_readln) */
+/* end subroutine (bfliner_getln) */
 
 int bfliner_readover(bfliner *op) noex {
 	int		rs = SR_FAULT ;
@@ -175,5 +169,47 @@ static int bfliner_adv(bfliner *op,int inc) noex {
 }
 /* end subroutine (bfliner_adv) */
 #endif /* CF_BFLINERADV */
+
+int bfliner::start(bfile *fp,off_t so,int to) noex {
+	return bfliner_start(this,fp,so,to) ;
+}
+
+int bfliner::getln(cchar **lpp) noex {
+	return bfliner_getln(this,lpp) ;
+}
+
+int bfliner::getlns(cchar **lpp) noex {
+	return bfliner_getlns(this,lpp) ;
+}
+
+int bfliner::getpoff(off_t *offp) noex {
+	return bfliner_getpoff(this,offp) ;
+}
+
+void bfliner::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("bfliner",rs,"fini-finish") ;
+	}
+} /* end method (bfliner::dtor) */
+
+bfliner_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case bflinermem_readpending:
+	        rs = bfliner_readpending(op) ;
+	        break ;
+	    case bflinermem_readover:
+	        rs = bfliner_readover(op) ;
+	        break ;
+	    case bflinermem_finish:
+	        rs = bfliner_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (bfliner_co::operator) */
 
 

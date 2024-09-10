@@ -35,10 +35,12 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<bfile.h>
+#include	<bfliner.h>
+#include	<sfx.h>
 #include	<strwcpy.h>
-#include	<char.h>
 #include	<field.h>
 #include	<matostr.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"configvarsobj.hh"
@@ -116,8 +118,60 @@ enum vartypes {
 namespace configvars_obj {
 
     int configvars_parse(CV *cvp,int fi,vecobj *eep) noex {
-	USTAT		sb ;
-	CV_FILE	*fep ;
+	int		rs ;
+	int		rv = 0 ;
+	CV_FILE		*fep ;
+	if ((rs = vecobj_get(cvp->fesp,fi,&fep)) >= 0) {
+	    if (fep) {
+	        bfile	cfile, *fp = &cfile ;
+	        cchar	*fn = fep->filename ;
+	        if ((rs = bopen(fp,fn,"r",0664)) >= 0)
+		    USTAT	sb ;
+		    if ((rs = bcontrol(fp,BC_STAT,&sb)) >= 0) {
+			if (sb.st_mtime >= fep->mtime) {
+			    fep->mtime = sb.st_mtime ;
+			    rs = configvars_parser(cvp,eep,fp) ;
+			    rv = rs ;
+			}
+		    } /* end if (bcontrol) */
+		    rs1 = bclose(fp) ;
+		    if (rs >= 0) rs = rs1 ;
+	 	} /* end if (bfile) */
+	    }
+	} /* end if (vecobj_get) */
+	return (rs >= 0) ? rv : rs ;
+    }
+    int configvars_parser(CV *cvp,vecobj *eep,bfile *fp) noex {
+	bfliner		bl ;
+	int		rs ;
+	int		rs1 ;
+	int		rv = 0 ;
+	if ((rs = bl.start(fp,0z,-1)) >= 0) {
+	    {
+		rs = configvars_parsing(cvp,eep,&bl) ;
+		rv = rs ;
+	    }
+	    rs1 = bl.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? rv : rs ;
+    }
+    int configvars_parsing(CV *cvp,vecobj *eep,bfliner *blp) noex {
+	int		rs ;
+	int		rv = 0 ;
+	int		*lp ;
+	while ((rs = blp->getln(&lp)) > 0) {
+	    rs = configvars_parseln(cvp,lp,rs) ;
+	    rv += rs ;
+	} /* end while */
+	return (rs >= 0) ? rv : rs ;
+    }
+    int configvars_parseln(CV *cvp,cchar *lp,int ll) noex {
+	field		fsb ;
+	int		rs ;
+	return (rs >= 0) ? rv : rs ;
+    }
+    int configvars_parse(CV *cvp,int fi,vecobj *eep) noex {
 	CV_FILE	ve ;
 	FIELD		fsb ;
 	bfile		file, *fp = &file ;
