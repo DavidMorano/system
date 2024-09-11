@@ -23,6 +23,15 @@
 	Description:
 	This subroutine just prints out some blank (or other) characters.
 
+	Synopsis:
+	int bwriteblanks(bfile *op,int n) noex
+	int bwritechars(bfile *op,int ch,int n) noex
+
+	Arguments:
+	op		BFILE object pointer
+	ch		character to write
+	n		number of characters to write
+
 	Returns:
 	>=0		number of characters written
 	<0		error-code (system-return)
@@ -30,7 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -68,9 +77,9 @@ static int	bwritebuf(bfile *,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr static cchar	blanks[] = "        " ;
+constexpr cchar		blanks[] = "        " ;
 
-static int		nblanks = strlen(blanks) ;
+constexpr int		nblanks = strlen(blanks) ;
 
 
 /* exported variables */

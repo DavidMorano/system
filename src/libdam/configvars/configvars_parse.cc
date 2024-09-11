@@ -39,6 +39,7 @@
 #include	<sfx.h>
 #include	<strwcpy.h>
 #include	<field.h>
+#include	<fieldterm.h>		/* |fieldterm_termsize(3uc)| */
 #include	<matostr.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -48,13 +49,7 @@
 
 /* local defines */
 
-#undef	BUFLEN
-#define	BUFLEN		(LINEBUFLEN * 2)
-
 #define	KEYBUFLEN	20
-
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
 
 /* local namespaces */
@@ -68,6 +63,8 @@ using namespace		configvars_obj ;
 
 
 /* local typedefs */
+
+typedef	CV_FILE *	filep ;
 
 
 /* external subroutines */
@@ -109,6 +106,17 @@ enum vartypes {
 	vartype_overlast
 } ; /* end enum (vartypes) */
 
+constexpr cpcchar	fterms[] = {
+	0x00, 0x1B, 0x00, 0x00,
+	0x01, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
+} ;
+
 
 /* exported variables */
 
@@ -116,21 +124,22 @@ enum vartypes {
 /* exported subroutines */
 
 namespace configvars_obj {
-
     int configvars_parse(CV *cvp,int fi,vecobj *eep) noex {
 	int		rs ;
 	int		rv = 0 ;
 	CV_FILE		*fep ;
-	if ((rs = vecobj_get(cvp->fesp,fi,&fep)) >= 0) {
-	    if (fep) {
+	void		*vp{} ;
+	if ((rs = vecobj_get(cvp->fesp,fi,&vp)) >= 0) {
+	    CV_FILE	*fep = filep(vp) ;
+	    if (vp) {
 	        bfile	cfile, *fp = &cfile ;
 	        cchar	*fn = fep->filename ;
-	        if ((rs = bopen(fp,fn,"r",0664)) >= 0)
+	        if ((rs = bopen(fp,fn,"r",0664)) >= 0) {
 		    USTAT	sb ;
 		    if ((rs = bcontrol(fp,BC_STAT,&sb)) >= 0) {
 			if (sb.st_mtime >= fep->mtime) {
 			    fep->mtime = sb.st_mtime ;
-			    rs = configvars_parser(cvp,eep,fp) ;
+			    rs = configvars_parser(cvp,fi,eep,fp) ;
 			    rv = rs ;
 			}
 		    } /* end if (bcontrol) */
@@ -141,14 +150,14 @@ namespace configvars_obj {
 	} /* end if (vecobj_get) */
 	return (rs >= 0) ? rv : rs ;
     }
-    int configvars_parser(CV *cvp,vecobj *eep,bfile *fp) noex {
+    int configvars_parser(CV *cvp,int fi,vecobj *eep,bfile *fp) noex {
 	bfliner		bl ;
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = bl.start(fp,0z,-1)) >= 0) {
 	    {
-		rs = configvars_parsing(cvp,eep,&bl) ;
+		rs = configvars_parsing(cvp,fi,eep,&bl) ;
 		rv = rs ;
 	    }
 	    rs1 = bl.finish ;
@@ -156,19 +165,42 @@ namespace configvars_obj {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
     }
-    int configvars_parsing(CV *cvp,vecobj *eep,bfliner *blp) noex {
+    int configvars_parsing(CV *cvp,int fi,vecobj *eep,bfliner *blp) noex {
 	int		rs ;
 	int		rv = 0 ;
 	int		*lp ;
-	while ((rs = blp->getln(&lp)) > 0) {
-	    rs = configvars_parseln(cvp,lp,rs) ;
-	    rv += rs ;
+	while ((rs = blp->getlns(&lp)) > 0) {
+	    cchar	*cp ;
+	    if (int cl ; (cl = sfcontent(lp,rs,&cp)) > 0) {
+	        rs = configvars_parseln(cvp,fi,eep,cp,cl) ;
+	        rv += rs ;
+	    }
+	    if (rs < 0) break ;
 	} /* end while */
 	return (rs >= 0) ? rv : rs ;
     }
-    int configvars_parseln(CV *cvp,cchar *lp,int ll) noex {
+    int configvars_parseln(CV *cvp,int fi,vecobj *eep,cchar *lp,int ll) noex {
 	field		fsb ;
 	int		rs ;
+	int		rs1 ;
+	int		rv = 0 ;
+	if ((rs = fsb.start(lp,ll)) >= 0) {
+	    int	idx ;
+	    if (cchar *fp ; ((rs = fsb.get(fterms,&fp)) > 0) {
+		cint	fl = rs ;
+	        if ((idx = matocasestr(configkeys,2,fp,fl)) > 0) {
+
+
+		} else {
+		    auto	av = configvars_addvar ;
+		    cint	w = CONFIGVARS_WVARS ;
+	            rs = av(cvp,fi,w,fp,fl,fsb.lp,fsb.ll) ;
+		    rv = 1 ;
+		} /* end if (matocasestr) */
+	    } /* end if (field_get) */
+	    rs1 = fsb.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (field) */
 	return (rs >= 0) ? rv : rs ;
     }
     int configvars_parse(CV *cvp,int fi,vecobj *eep) noex {

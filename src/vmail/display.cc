@@ -109,7 +109,6 @@ extern int	strlinelen(cchar *,int,int) ;
 
 extern char	*strsub(cchar *,cchar *) ;
 extern char	*strwcpyblanks(char *,int) ;	/* NUL-terminaed */
-extern char	*strwset(char *,int,int) ;
 extern char	*strdfill1(char *,int,cchar *) ;
 extern char	*strdfill2(char *,int,cchar *,cchar *) ;
 extern char	*strdfill3(char *,int,cchar *,cchar *,cchar *) ;

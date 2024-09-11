@@ -1,5 +1,5 @@
 /* termtrans SUPPORT */
-/* lang=C++98 */
+/* lang=C++20 */
 
 /* terminal-character-translation management */
 /* version %I% last-modified %G% */
@@ -36,6 +36,8 @@
 #include	<buffer.h>
 #include	<findbit.h>
 #include	<endian.h>
+#include	<sncpyx.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"termtrans.h"
@@ -136,24 +138,6 @@ using namespace		std ;		/* yes, we want punishment! */
 
 
 /* external subroutines */
-
-extern "C" int	snsd(char *,int,cchar *,uint) ;
-extern "C" int	snsdd(char *,int,cchar *,uint) ;
-extern "C" int	sncpy1(char *,int,cchar *) ;
-extern "C" int	sncpy2(char *,int,cchar *,cchar *) ;
-extern "C" int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern "C" int	sncpy1w(char *,int,cchar *,int) ;
-extern "C" int	mkpath2(char *,cchar *,cchar *) ;
-extern "C" int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern "C" int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern "C" int	termconseq(char *,int,int,int,int,int,int) ;
-extern "C" int	isprintlatin(int) ;
-extern "C" int	iceil(int,int) ;
-
-extern "C" char	*strwcpy(char *,cchar *,int) ;
-extern "C" char	*strwset(char *,int,int) ;
-extern "C" char	*strnchr(cchar *,int,int) ;
-extern "C" char	*strwcmp(cchar *,cchar *,int) ;
 
 
 /* external variables */
@@ -286,7 +270,7 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 
 	if (ncols <= 0) return SR_INVALID ;
 
-	memset(op,0,sizeof(TERMTRANS)) ;
+	memclear(op) ;
 	op->ncols = ncols ;
 	op->termattr = gettermattr(tstr,tlen) ;
 
@@ -306,8 +290,9 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 		delete cvp ;
 		op->cvp = nullptr ;
 	    }
-	} else
+	} else {
 	    rs = SR_NOMEM ;
+	}
 
 	return rs ;
 }

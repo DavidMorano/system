@@ -3,13 +3,10 @@
 /* Terminal Control Sequence (make them) */
 
 
-#define	CF_DEBUGS	0		/* compile-time */
-
-
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This object package is finally finished!
+	This object package is fchly finished!
 
 */
 
@@ -17,37 +14,32 @@
 
 /*******************************************************************************
 
-        This subroutine formulates a simple string that constitutes a terminal
-        command sequence (of characters).
+	Name:
+	termescseq
 
+	Description:
+	This subroutine formulates a simple string that constitutes
+	a terminal command sequence (of characters).
 
 *******************************************************************************/
 
-
-#define	TD_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
+
+#include	"termescseq.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	ctdecui(char *,int,uint) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -62,75 +54,60 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int termescseq(char *dp,int dl,int final,int a1,int a2,int a3,int a4)
-{
-	int		rs = SR_OK ;
-	int		ai ;
-	int		a ;
+int termescseq(char *dp,int dl,int fch,int a1,int a2,int a3,int a4) noex {
+	int		rs = SR_FAULT ;
 	int		i = 0 ;
-
-	if (dp == NULL) return SR_FAULT ;
-
 	if (dl < 0) dl = INT_MAX ;
-
-#if	CF_DEBUGS
-	debugprintf("termescseq: f=%c(%02x) a1=%c(%02x)\n",
-		final,final,a1,a1) ;
-#endif
-
-	if (final > 0) {
-
-	if (rs >= 0) {
-	    rs = storebuf_chr(dp,dl,i,'\033') ;
-	    i += rs ;
-	}
-
-	for (ai = 1 ; (rs >= 0) && (ai <= 4) ; ai += 1) {
-	    a = -1 ; /* superfluous! */
-	    switch (ai) {
-	    case 1: 
-	        a = a1 ; 
-	        break ;
-	    case 2: 
-	        a = a2 ; 
-	        break ;
-	    case 3: 
-	        a = a3 ; 
-	        break ;
-	    case 4: 
-	        a = a4 ; 
-	        break ;
-	    } /* end switch */
-	    if (a >= 0) {
-	        if ((a >= 0x20) && (a < 0x2f)) {
-		    rs = storebuf_chr(dp,dl,i,a) ;
-		    i += rs ;
-	        } else
-		    rs = SR_ILSEQ ;
-	    }
-	} /* end for */
-
-	if (rs >= 0) {
-	    if ((final >= 0x30) && (final <= 0x7e)) {
-	        rs = storebuf_chr(dp,dl,i,final) ;
-	        i += rs ;
-	    } else
-		rs = SR_ILSEQ ;
-	} /* end if */
-
-	} else
+	if (dp) {
 	    rs = SR_ILSEQ ;
-
-#if	CF_DEBUGS
-	debugprintf("termescseq: ret rs=%d i=%u\n",rs,i) ;
-#endif
-
+	    if (fch > 0) {
+	        rs = SR_OK ;
+	        if (rs >= 0) {
+	            rs = storebuf_chr(dp,dl,i,'\033') ;
+	            i += rs ;
+	        }
+	        for (int ai = 1 ; (rs >= 0) && (ai <= 4) ; ai += 1) {
+	            int		a = -1 ; /* superfluous! */
+	            switch (ai) {
+	            case 1: 
+	                a = a1 ; 
+	                break ;
+	            case 2: 
+	                a = a2 ; 
+	                break ;
+	            case 3: 
+	                a = a3 ; 
+	                break ;
+	            case 4: 
+	                a = a4 ; 
+	                break ;
+	            } /* end switch */
+	            if (a >= 0) {
+	                if ((a >= 0x20) && (a < 0x2f)) {
+		            rs = storebuf_chr(dp,dl,i,a) ;
+		            i += rs ;
+	                } else {
+		            rs = SR_ILSEQ ;
+			}
+	            }
+	        } /* end for */
+	        if (rs >= 0) {
+	            if ((fch >= 0x30) && (fch <= 0x7e)) {
+	                rs = storebuf_chr(dp,dl,i,fch) ;
+	                i += rs ;
+	            } else {
+		        rs = SR_ILSEQ ;
+	            }
+	        } /* end if */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (termescseq) */
-
 
 

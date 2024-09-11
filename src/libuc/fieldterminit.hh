@@ -42,8 +42,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<mkchar.h>
 #include	<baops.h>
 

@@ -72,6 +72,7 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
+#include	<ucmallreg.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -90,7 +91,7 @@
 #include	<char.h>
 #include	<bfile.h>
 #include	<tmtime.h>
-#include	<ucmallreg.h>
+#include	<strw.h>		/* |strwset(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -197,7 +198,6 @@ extern char	*strnchr(const char *,int,int) ;
 extern char	*strnrchr(const char *,int,int) ;
 extern char	*strnpbrk(const char *,int,const char *) ;
 extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strwset(char *,int,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;

@@ -74,6 +74,7 @@
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<strw.h>		/* |strwset(3uc)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -205,7 +206,6 @@ extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*strdcpyclean(char *,int,int,cchar *,int) ;
 extern char	*strnchr(cchar *,int,int) ;
 extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strwset(char *,int,int) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;

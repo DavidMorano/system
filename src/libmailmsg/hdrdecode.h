@@ -20,10 +20,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<b64decoder.h>
 #include	<qpdecoder.h>
 #include	<chartrans.h>
-#include	<localmisc.h>
 
 
 #define	HDRDECODE_MAGIC		0x13f3c202

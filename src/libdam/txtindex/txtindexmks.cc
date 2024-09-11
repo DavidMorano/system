@@ -175,7 +175,6 @@ extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strwcpylc(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
 extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strwset(char *,int,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;

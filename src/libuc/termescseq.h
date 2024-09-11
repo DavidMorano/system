@@ -1,7 +1,7 @@
-/* matparam HEADER */
+/* termescseq HEADER */
 /* lang=C20 */
 
-/* does the parameter array have a given value? */
+/* Terminal-Control-Sequene */
 /* version %I% last-modified %G% */
 
 
@@ -14,11 +14,12 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MATPARAM_INCLUDE
-#define	MATPARAM_INCLUDE
+#ifndef	TERMESCSEQ_INCLUDE
+#define	TERMESCSEQ_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdarg.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -27,11 +28,11 @@
 
 EXTERNC_begin
 
-extern bool	matparam(cshort *,int,int) noex ;
+extern int termescseq(char *,int,int,int,int,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* MATPARAM_INCLUDE */
+#endif /* TERMESCSEQ_INCLUDE */
 
 
