@@ -12,7 +12,7 @@
 /* revision history:
 
 	= 1989-03-01, David A­D­ Morano
-	This subroutine was originally written. 
+	This code was originally written. 
 
 	= 1998-06-01, David A­D­ Morano
 	I enhanced the program a little.

@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2002-05-16, David A­D­ Morano
-	This subroutine was originally written for use in the PCS facility.
+	This code was originally written for use in the PCS facility.
 
 */
 

@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-15, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -136,6 +136,10 @@ int malloc_ho(char **rpp) noex {
 }
 int malloc_sv(char **rpp) noex {
 	cint	w = getbufsize_sv ;
+	return uc_mallocsys(w,rpp) ;
+}
+int malloc_fs(char **rpp) noex {
+	cint	w = getbufsize_fs ;
 	return uc_mallocsys(w,rpp) ;
 }
 int malloc_zn(char **rpp) noex {

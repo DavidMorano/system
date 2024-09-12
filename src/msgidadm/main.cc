@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2003-03-01, David A­D­ Morano
-	This subroutine was originally written to be the front-end for the new
+	This code was originally written to be the front-end for the new
 	MSGIDADM program.
 
 */

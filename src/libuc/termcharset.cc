@@ -46,10 +46,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -80,46 +80,40 @@ static const int	inter[4][2] = {
 } ; /* intermediate characters */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int termcharset(char *dp,int dl,int setnum,int f96,cchar *fontname)
-{
-	int		rs = SR_OK ;
+int termcharset(char *dp,int dl,int setnum,int f96,cchar *fontname) noex {
+	int		rs = SR_FAULT ;
 	int		i = 0 ;
-
-	if (dp == NULL) return SR_FAULT ;
-	if (fontname == NULL) return SR_FAULT ;
-
 	if (dl < 0) dl = INT_MAX ;
-
-	if ((setnum < 0) || (setnum >= 4)) return SR_INVALID ;
-
-	if (f96 != 0) f96 = 1 ;		/* make safe as an array index */
-
-/* setting a 96-character set to G0 is invalid */
-
-	if ((setnum == 0) && f96) return SR_INVALID ;
-
-/* construct escape sequence */
-
-	if (rs >= 0) {
-	    cchar	*sp = "\033" ;
-	    rs = storebuf_strw(dp,dl,i,sp,1) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    int		ich = inter[setnum][f96] ;
-	    rs = storebuf_chr(dp,dl,i,ich) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(dp,dl,i,fontname,-1) ;
-	    i += rs ;
-	}
-
+	if (dp && fontname) {
+	    rs = SR_INVALID ;
+	    if ((setnum >= 0) && (setnum < 4)) {
+	        if (f96 != 0) f96 = 1 ; /* make safe as an array index */
+		/* setting a 96-character set to G0 is invalid */
+	        if ((setnum != 0) || (! f96)) {
+		    rs = SR_OK ;
+		    /* construct escape sequence */
+	            if (rs >= 0) {
+	                cchar	*sp = "\033" ;
+	                rs = storebuf_strw(dp,dl,i,sp,1) ;
+	                i += rs ;
+	            }
+	            if (rs >= 0) {
+	                int		ich = inter[setnum][f96] ;
+	                rs = storebuf_chr(dp,dl,i,ich) ;
+	                i += rs ;
+	            }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,fontname,-1) ;
+	                i += rs ;
+	            }
+	        } /* end if (valid) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (termcharset) */

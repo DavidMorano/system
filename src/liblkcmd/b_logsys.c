@@ -1,18 +1,14 @@
-/* b_logsys */
+/* b_logsys SUPPORT */
+/* lang=C++20 */
 
 /* utility to log message to the system logger facility */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGMALL	1		/* debug memory allocation */
-
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  
+	This code was originally written.  
 
 */
 
@@ -20,17 +16,15 @@
 
 /*******************************************************************************
 
-        This is a built-in command to the KSH shell. This little program looks
-        up a number in a database and returns the corresponding string.
+	This is a built-in command to the KSH shell. This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ logsys <logsys> [-c[=<b>]] [-n <name>[:<version>]] 
 		[-s <logsize>] [-if <infile>] [-V]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -64,6 +58,7 @@
 #include	<expcook.h>
 #include	<linefold.h>
 #include	<strn.h>
+#include	<getsyslogx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -127,8 +122,6 @@ extern int	optvalue(cchar *,int) ;
 extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	getlogfac(cchar *,int) ;
-extern int	getlogpri(cchar *,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -136,13 +129,6 @@ extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
@@ -323,10 +309,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uint		mo_start = 0 ;
-#endif
-
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs, rs1 ;
@@ -351,19 +333,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	cchar		*facs = NULL ;
 	cchar		*pris = NULL ;
 	cchar		*cp ;
-
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("b_logsys: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uc_mallset(1) ;
-	uc_mallout(&mo_start) ;
-#endif
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -748,11 +717,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto retearly ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_logsys: debuglevel=%u\n",pip->debuglevel) ;
-#endif
-
 	if (f_version) {
 	    shio_printf(pip->efp,"%s: version %s\n",
 	        pip->progname,VERSION) ;
@@ -904,11 +868,6 @@ retearly:
 	        pip->progname,ex,rs) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_logsys: exiting ex=%u (%d)\n",ex,rs) ;
-#endif
-
 	if (pip->efp != NULL) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
@@ -934,20 +893,6 @@ badlocstart:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	{
-	    uint	mo ;
-	    uc_mallout(&mo) ;
-	    debugprintf("b_logsys: final mallout=%u\n",mo-mo_start) ;
-	    uc_mallset(0) ;
-	}
-#endif
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
-
 	return ex ;
 }
 /* end subroutine (mainsub) */
@@ -1062,17 +1007,8 @@ static int proclog(PROGINFO *pip,cchar *ifname)
 
 	fac = lip->fac ;
 	tag = lip->tag ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5)) {
-	debugprintf("proclog: ent\n") ;
-	debugprintf("proclog: fac=%s\n",fac) ;
-	debugprintf("proclog: tag=%s\n",tag) ;
-	}
-#endif
-
 	if ((fac != NULL) && (fac[0] != '\0')) {
-	    rs = getlogfac(fac,-1) ;
+	    rs = getsyslogfac(fac,-1) ;
 	    logfac = rs ;
 	} else
 	    logfac = LOG_USER ;
@@ -1110,11 +1046,6 @@ static int process(PROGINFO *pip,LOGSYS *lsp,cchar ifn[])
 	int		rs1 ;
 	int		tlen = 0 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_logsys/process: ent ifn=%s\n",ifn) ;
-#endif
-
 	if ((rs = expcook_start(&ck)) >= 0) {
 	    if ((rs = loadcooks(pip,&ck)) >= 0) {
 
@@ -1125,11 +1056,6 @@ static int process(PROGINFO *pip,LOGSYS *lsp,cchar ifn[])
 	    rs1 = expcook_finish(&ck) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (expcook) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_logsys/process: ret rs=%d tlen=%u\n",rs,tlen) ;
-#endif
 
 	return (rs >= 0) ? tlen : rs ;
 }
@@ -1258,7 +1184,7 @@ static int procline(PROGINFO *pip,LOGSYS *lsp,cchar obuf[],int olen)
 	    const int	cl = (tp-(op+1)) ;
 	    ol -= ((op+ol)-(tp+1)) ;
 	    op = (tp+1) ;
-	    rs = getlogpri(cp,cl) ;
+	    rs = getsyslogpri(cp,cl) ;
 	    logpri = rs ;
 	} else
 	    logpri = lip->logpri ;
@@ -1303,17 +1229,9 @@ static int procsubs(PROGINFO *pip,EXPCOOK *ckp,char obuf[],int olen,
 	    if (rs >= 0) {
 	        rs1 = expcook_exp(ckp,0,obuf,olen,lbuf,llen) ;
 	        obl = rs1 ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(3)) {
-	            debugprintf("b_logsys/procsubs: ec_ex() rs=%d\n",rs1) ;
-	            debugprintf("b_logsys/procsubs: obuf=>%t<\n",
-	                obuf,strlinelen(obuf,obl,40)) ;
-	        }
-#endif
-
-	        if (rs1 < 0)
+	        if (rs1 < 0) {
 	            obl = sncpy1(obuf,olen,"*truncated*") ;
+		}
 	    } /* end if */
 
 	} /* end if (needed processing) */
@@ -1409,10 +1327,6 @@ static int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("procuserinfo_logid: rm=%08ß\n",rs) ;
-#endif
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
 	            const int	s = rs ;
@@ -1473,30 +1387,11 @@ static int locinfo_logparams(LOCINFO *lip,cchar *facs,cchar *tags,cchar *pris)
 
 	if (pip == NULL) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	debugprintf("locinfo_logparams: ent\n") ;
-	debugprintf("locinfo_logparams: fs=%s\n",facs) ;
-	debugprintf("locinfo_logparams: ts=%s\n",tags) ;
-	debugprintf("locinfo_logparams: ps=%s\n",pris) ;
-	}
-#endif /* CF_DEBUG */
-
 	sepstrs_init(&seps) ;
 
 	if ((tags != NULL) && (tags[0] != '\0')) {
 	    sepstrs_load(&seps,tags,-1) ;
 	} /* end if (tags) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    int		i ;
-	    for (i = 0 ; i < la_overlast ; i += 1) {
-		debugprintf("locinfo_logparams: s[%u]=%t\n",
-		i,seps.s[i].sp,seps.s[i].sl) ;
-	    }
-	}
-#endif /* CF_DEBUG */
 
 	if ((facs != NULL) && (facs[0] != '\0')) {
 	    seps.s[la_fac].sp = facs ;
@@ -1517,22 +1412,11 @@ static int locinfo_logparams(LOCINFO *lip,cchar *facs,cchar *tags,cchar *pris)
 	    }
 	} /* end if (pris) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    int		i ;
-	    for (i = 0 ; i < la_overlast ; i += 1) {
-		debugprintf("locinfo_logparams: s[%u]=%t\n",
-		i,seps.s[i].sp,seps.s[i].sl) ;
-	    }
-	}
-#endif /* CF_DEBUG */
-
 	if ((seps.s[la_tag].sp != NULL) && (seps.s[la_tag].sl != 0)) {
 	    int		size = 0 ;
-	    int		i ;
 	    char	*p ;
 
-	    for (i = 0 ; i < la_overlast ; i += 1) {
+	    for (int i = 0 ; i < la_overlast ; i += 1) {
 	        cchar	*sp = seps.s[i].sp ;
 	        int	sl = seps.s[i].sl ;
 	        size += 1 ;
@@ -1579,7 +1463,7 @@ static int locinfo_logvals(LOCINFO *lip)
 	if (lip->logpri < 0) {
 	    cchar	*pri = lip->pri ;
 	    if ((pri != NULL) && (pri[0] != '\0')) {
-	        rs = getlogpri(pri,-1) ;
+	        rs = getsyslogpri(pri,-1) ;
 	        lip->logpri = rs ;
 	    } else {
 	        lip->logpri = LOG_INFO ;

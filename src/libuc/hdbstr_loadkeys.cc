@@ -27,6 +27,11 @@
 	values) into the container object.
 
 	Synopsis:
+	int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex
+
+	Arguments:
+	op		object pointer
+	fname		file-name to extract keys from
 
 	Returns:
 	>=0		number of keys loaded
@@ -35,8 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
@@ -89,6 +92,9 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 static char		fterms[termsize] ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
@@ -123,7 +129,7 @@ int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
 /* local subroutines */
 
 static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	bfile		loadfile, *lfp = &loadfile ;
 	int		rs ;
 	int		rs1 ;

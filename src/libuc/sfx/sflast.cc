@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-23, David D-A- Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 

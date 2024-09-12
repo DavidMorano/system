@@ -7,7 +7,7 @@
 
 	= 1998-07-22, David A­D­ Morano
 
-	This subroutine was originally written.  Unfortunately, it depends
+	This code was originally written.  Unfortunately, it depends
 	on the controlling terminal still being (or being) available on
 	one of the file descriptors between 0 and 2 inclusive.	This may
 	be a difficult thing to arrange for in certain circumstances!

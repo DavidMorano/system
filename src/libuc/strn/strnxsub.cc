@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1998-03-23, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2023-12-20, David A­D­ Morano
 	Everyone (!) has |strnstr(3c)| now. After all of these

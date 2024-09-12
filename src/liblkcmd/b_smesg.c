@@ -16,7 +16,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-        This subroutine was originally written as a KSH built-in command. This
+        This code was originally written as a KSH built-in command. This
         command (which also can be compiled as an independent program) provides
         some additional capabilities over the standard UNIX® System MESG(1)
         program.

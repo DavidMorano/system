@@ -2,7 +2,7 @@
 
 T= libuc
 
-ALL= $(T).so $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -124,11 +124,11 @@ a:			$(T).a
 libmacuser.a:		$(OBJ)
 	$(AR) -rc $@ $?
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
-
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+
+$(T).so:		$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

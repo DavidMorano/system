@@ -118,7 +118,7 @@ NMFLAGS= -xs
 CPP= cpp
 
 
-INCS= config.h defs.h listenspec.h
+INCS= config.h defs.h
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o proginfo_rootname.o
 OBJ01= proginfo_nameid.o proguserlist.o proglog.o
@@ -137,7 +137,7 @@ OBJ13=
 OBJ14= envs.o envs_procxe.o envs_subs.o
 OBJ15= lfm.o svcfile.o acctab.o
 OBJ16= jobdb.o svckey.o connection.o
-OBJ17= sysvar.o dirseen.o linefold.o poller.o listenspec.o
+OBJ17= sysvar.o dirseen.o linefold.o poller.o
 OBJ18=
 OBJ19= netgroupcheck.o mkplogid.o mksublogid.o
 OBJ20= sfthing.o getfname.o securefile.o nlspeername.o getaflen.o
@@ -292,7 +292,7 @@ proglog.o:		proglog.c proglog.h $(INCS)
 
 progprocess.o:		progprocess.c $(INCS)
 
-progwatch.o:		progwatch.c $(INCS) poller.h listenspec.h
+progwatch.o:		progwatch.c $(INCS) poller.h
 
 progipc.o:		progipc.c $(INCS)
 
@@ -396,8 +396,6 @@ sockaddress.o:		sockaddress.c sockaddress.h
 linefold.o:		linefold.c linefold.h
 
 poller.o:		poller.c poller.h
-
-listenspec.o:		listenspec.c listenspec.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
 

@@ -11,8 +11,8 @@
         This code was originally written.
 
 	= 2017-07-17, David A­D­ Morano
-	I added the code to return overflow if the given string cannot fit into
-	the result buffer.
+	I added the code to return overflow if the given string
+	cannot fit into the result buffer.
 
 */
 
@@ -45,6 +45,7 @@
 #include	<cstring>		/* <- |strlen(3c)| + |memset(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
+#include	<localmisc.h>
 
 #include	"mkx.h"
 
@@ -55,7 +56,16 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

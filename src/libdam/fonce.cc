@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 2011-04-12, David A­D­ Morano
-	This subroutine was originally written.  Only the introduction
+	This code was originally written.  Only the introduction
 	of C++11 has allowed this (finally), due to the addition
 	(in C++11) of |unordered_map(3c++)|.
 
@@ -18,8 +18,12 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
 	fonce
+
+	Description:
+	This object implements a map container of blocks (of a given
+	structure).
 
 	Symopsis:
 	int fonce_start<typename K,typename Block>(int n = 0) noex
@@ -75,7 +79,10 @@ typedef fonce::stype::iterator	setiter ;
 /* local structures */
 
 
-/* lcoal variables */
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

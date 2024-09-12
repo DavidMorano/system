@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2017-11-22, David A­D­ Morano
         I changed this to use the PCSNS (PCS Name-Server) object. This allows

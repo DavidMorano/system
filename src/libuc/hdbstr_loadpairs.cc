@@ -21,9 +21,9 @@
 	of an HDBSTR object.
 
 	Note: 
-	This is NOT the same as 'vecstr_loadfile(3dam)'! This
+	This is NOT the same as |vecstr_loadfile(3dam)|!  This
 	subroutine only reads the first TWO strings on the line and
-	puts them into the hash DB as key-value pairs! If there is
+	puts them into the hash DB as key-value pairs!  If there is
 	only one string on a line, it is a key without a value.
 
 *****************************************************************************/

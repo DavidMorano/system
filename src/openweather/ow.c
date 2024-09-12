@@ -12,7 +12,7 @@
 
 	= 1998-07-10, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */
@@ -69,8 +69,6 @@ extern int	strkeycmp(const char *,const char *) ;
 extern int	vstrkeycmp(const void **,const void **) ;
 extern int	getuid_name(cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getlogfac(const char *,int) ;
-extern int	getlogpri(const char *,int) ;
 extern int	isNotPresent(int) ;
 
 

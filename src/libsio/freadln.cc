@@ -8,28 +8,43 @@
 /* revision history:
 
 	= 1998-08-17, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
+	Name:
+	freadln
+	fgetline
+
+	Description:
 	This routine will only read at most 'len' number of bytes
-	from the file.  Note that the sematics of this call are not
-	the same as |fgets(3c)|.  This call will write a nullptrCHAR
+	from the file.  Note that the semantics of this call are not
+	the same as |fgets(3c)|.  This call will write a NUL character
 	into the user buffer after the supplied length of the buffer
 	is used up.  With |fgets(3c)|, it will never write more
 	than the supplied length of bytes.
 
-	Notes:
-	The IRIX operating system is messed up somehow.  An attempt
-	to correct for this is below.
+	Synopsis:
+	int freadln(FILE *fp,char *rbuf,int rlen) noex
+	int fgetline(FILE *fp,char *rbuf,int rlen) noex
 
-******************************************************************************/
+	Arguments:
+	fp		pointer to FILE object
+	rbuf		result buffer pointer
+	rlen		resuly buffer length
 
-#include	<envstandards.h>
+	Returns:
+	>=0		length of data (in bytes) transferred
+	<0		error (system-return)
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* must be ordered first to configure */
+#include	<cerrno>
 #include	<cstdio>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -41,24 +56,53 @@
 /* local defines */
 
 
+/* external subroutines */
+
+extern "C" {
+    int		freadln(FILE *,char *,int) noex ;
+    int		fgetline(FILE *,char *,int) noex ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int freadln(FILE *fp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		len = 0 ;
 	if (fp && rbuf) {
 	    rs = SR_INVALID ;
+	    errno = 0 ;
 	    if (rlen >= 1) {
 	        char	*bp = fgets(rbuf,(rlen + 1),fp) ;
-		rs = SR_OK ;
-	        i = (bp != nullptr) ? strlen(bp) : 0 ;
-	        if ((i == 0) && ferror(fp)) {
-	           clearerr(fp) ;
-	           rs = SR_IO ;
-	        }
+		if (errno == 0) {
+		    rs = SR_OK ;
+		    if (bp) {
+			len = strlen(bp) ;
+		    } else if (ferror(fp)) {
+	                clearerr(fp) ;
+	                rs = SR_IO ;
+	            }
+		} else {
+		    rs = (- errno) ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (freadln) */
 

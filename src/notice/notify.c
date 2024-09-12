@@ -10,7 +10,7 @@
 
 	= 1999-01-10, David Morano
 
-	This subroutine was originally written.  It was prompted by the
+	This code was originally written.  It was prompted by the
 	failure of other terminal message programs when they stopped
 	working on Solaris® 8!
 

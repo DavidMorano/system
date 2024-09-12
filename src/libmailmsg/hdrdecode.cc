@@ -165,7 +165,7 @@ static int	escinfo_pass(ESCINFO *) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	passes[] = {
+constexpr cpcchar	passes[] = {
 	"iso-8859-1",
 	"iso-Latin-1",
 	"Latin-1",

@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-06-15, David A­D­ Morano
-        This subroutine was originally written. This was also inspired by the
+        This code was originally written. This was also inspired by the
         fact that the Sun Solaris 2.5.1 POSIX version of 'ttyname_r' does not
         appear to work. I got the idea for this subroutine from the GNU standard
         C library implementation. It seems like Slowlaris 5.x certainly had a

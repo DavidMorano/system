@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2008-10-97, David A­D­ Morano
 	Changed somewhat to fit into the new polling structure.

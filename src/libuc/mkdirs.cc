@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-08-10, David A­D­ Morano
-	This subroutine was originally written.  This subroutines
+	This code was originally written.  This subroutines
 	(or something similar to it) is standard on some UNIXes but
 	not on others, so it is now provided.
 

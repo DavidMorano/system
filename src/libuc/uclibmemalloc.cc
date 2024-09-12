@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-85, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2018-09-26, David A-D- Morano
 	I brought |uc_libcalloc(3uc)| in line w/ the standard for

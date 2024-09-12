@@ -1,0 +1,233 @@
+/* offindex SUPPORT */
+/* lang=C++20 */
+
+/* offset-index object */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-01, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	offindex
+
+	Description:
+	This object is used to create a line-index of the TXTINDEX
+	"tag" file.  The line-index consists of file offsets of the
+	beginning of each line in the file.  Each line corresponds
+	with a "tag" record.   The length of each "record" is also
+	stored.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* must be before others */
+#include	<unistd.h>		/* |off_t| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<new>
+#include	<usystem.h>
+#include	<vecobj.h>
+#include	<localmisc.h>
+
+#include	"offindex.h"
+
+
+/* local defines */
+
+#define	OFFINDEX_E	struct offindex_e
+
+#define	NDEF		100
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+struct offindex_e {
+	off_t		lineoff ;
+	int		linelen ;
+	offindex_e() = default ;
+	offindex_e(off_t o,int l) noex : lineoff(o), linelen(l) { } ;
+} ;
+
+
+/* forward references */
+
+template<typename ... Args>
+static int offindex_ctor(offindex *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ; /* dangerous ! */
+	    if ((op->oip = new(nothrow) vecobj) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (offindex_ctor) */
+
+static int offindex_dtor(offindex *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->oip) {
+		delete op->oip ;
+		op->oip = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (offindex_dtor) */
+
+template<typename ... Args>
+static inline int offindex_magic(offindex *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (offindex_magic) */
+
+static int vecmp(cvoid **,cvoid **) noex ;
+static int vecmpe(OFFINDEX_E **,OFFINDEX_E **) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int offindex_start(offindex *op,int vn) noex {
+	int		rs ;
+	if (vn < NDEF) vn = NDEF ;
+	if ((rs = offindex_ctor(op)) >= 0) {
+	    cint	vsz = sizeof(OFFINDEX_E) ;
+	    cint	vo = 0 ;
+	    if ((rs = vecobj_start(op->oip,vsz,vn,vo)) >= 0) {
+	        op->magic = OFFINDEX_MAGIC ;
+	    }
+	    if (rs < 0) {
+		offindex_dtor(op) ;
+	    }
+	} /* end if (offindex_ctor) */
+	return rs ;
+}
+/* end subroutine (offindex_start) */
+
+int offindex_finish(offindex *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = offindex_magic(op)) >= 0) {
+	    {
+	        rs1 = vecobj_finish(op->oip) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = offindex_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (offindex_finish) */
+
+int offindex_add(offindex *op,off_t off,int len) noex {
+	int		rs ;
+	if ((rs = offindex_magic(op)) >= 0) {
+	    OFFINDEX_E	e ;
+	    e.lineoff = off ;
+	    e.linelen = len ;
+	    rs = vecobj_add(op->oip,&e) ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (offindex_add) */
+
+int offindex_lookup(offindex *op,off_t off) noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = offindex_magic(op)) >= 0) {
+	    OFFINDEX_E	key ;
+	    void	*vp{} ;
+	    rs = SR_NOSYS ;
+	    if (! op->f.setsorted) {
+	        op->f.setsorted = TRUE ;
+	        vecobj_setsorted(op->oip) ;
+	    }
+	    key.lineoff = off ;
+	    key.linelen = 0 ;
+	    if ((rs = vecobj_search(op->oip,&key,vecmp,&vp)) >= 0) {
+	        rs = SR_BADFMT ;
+	        if (vp) {
+	            OFFINDEX_E	*oep = (OFFINDEX_E *) vp ;
+	            rs = SR_OK ;
+	            len = oep->linelen ;
+	        }
+	    }
+	} /* end if (magic) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (offindex_lookup) */
+
+
+/* private subroutines */
+
+static int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
+	OFFINDEX_E	**e1pp = (OFFINDEX_E **) v1pp ;
+	OFFINDEX_E	**e2pp = (OFFINDEX_E **) v2pp ;
+	return vecmpe(e1pp,e2pp) ;
+}
+/* end subroutine (vecmp) */
+
+static int vecmpe(OFFINDEX_E **e1pp,OFFINDEX_E **e2pp) noex {
+	OFFINDEX_E	*e1p = *e1pp ;
+	OFFINDEX_E	*e2p = *e2pp ;
+	int		rc = 0 ;
+	if (e1p || e2p) {
+	    if (e1p) {
+	        if (e2p) {
+	            rc = (e1p->lineoff - e2p->lineoff) ;
+	        } else {
+	            rc = -1 ;
+	        }
+	    } else {
+	        rc = 1 ;
+	    }
+	}
+	return rc ;
+}
+/* end subroutine (vecmpe) */
+
+

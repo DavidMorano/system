@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 2017-08-15, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -20,12 +20,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string>
-#include	<utypedefs.h>
+#include	<string>		/* |string(3c++)| */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
-extern int ctwords(std::string *,int) noex ;
+extern int	ctwords(std::string *,int) noex ;
 
 
 #endif /* __cplusplus */

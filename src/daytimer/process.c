@@ -13,7 +13,7 @@
 
 	= 1988-02-01, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 	= 1998-05-01, David A­D­ Morano

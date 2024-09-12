@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1999-02-23, David A­D­ Morano
 	I enhanced the 'process' subroutine to place all words

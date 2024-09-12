@@ -154,7 +154,7 @@ OBJ05=
 OBJ06=
 OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
 OBJ08=
-OBJ09= querystring.o
+OBJ09= querystr.o
 OBJ10= filecounts.o
 OBJ11=
 OBJ12=
@@ -309,7 +309,6 @@ kvsfile.o:		kvsfile.c kvsfile.h
 
 filecounts.o:		filecounts.c filecounts.h
 
-querystring.o:		querystring.cc querystring.h
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) querystring.cc
+querystr.o:		querystr.cc querystr.h
 
 

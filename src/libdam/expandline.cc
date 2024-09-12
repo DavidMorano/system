@@ -9,7 +9,7 @@
 /*******************************************************************************
 
 	= 1987-09-05, David A.D. Morano
-	This subroutine was originally written for the
+	This code was originally written for the
 	TEXTSET program.
 
 *******************************************************************************/

@@ -7,7 +7,7 @@
 
 	= 1986-01-17, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */
@@ -26,23 +26,18 @@
 	int		len ;
 
 	Arguments:
-
 	fp		pointer to a FFILE object
 	buf		user supplied buffer
 	len		size of user supplied buffer
 
 	Returns:
-
-	<0		an error occurred
-	==0		no data was returned
 	>0		size of data returned
-
+	==0		no data was returned
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<stdio.h>
 #include	<errno.h>

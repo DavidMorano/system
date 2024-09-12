@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -19,9 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 
 
 #define	TERMOUT_MAGIC	0x13f3c201

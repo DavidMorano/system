@@ -7,7 +7,7 @@
 /* revision history:
 
 	= David A.D. Morano, November 1991
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */

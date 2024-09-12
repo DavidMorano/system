@@ -19,7 +19,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -66,6 +66,7 @@
 #include	<field.h>
 #include	<filer.h>
 #include	<termout.h>
+#include	<opendial.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -77,7 +78,6 @@
 #include	"systems.h"
 #include	"sysdialer.h"
 #include	"cm.h"
-#include	"opendial.h"
 
 
 /* local defines */
@@ -515,7 +515,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -727,7 +727,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1379,7 +1379,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *sfn,
 	        if (afn[0] == '-') afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1492,24 +1492,24 @@ static int procdial(PROGINFO *pip,void *ofp,cchar *ap)
 	if ((rs = query_parse(&q,ap)) >= 0) {
 	    LINEBUF	b ;
 	    if ((rs = linebuf_start(&b)) >= 0) {
-		const int	f_long = lip->f.longer ;
-		const int	llen = b.llen ;
+		cint	f_long = lip->f.longer ;
+		cint	llen = b.llen ;
 		cchar		**av = lip->av ;
 		cchar		*un = q.upart ;
 		char		*lbuf = b.lbuf ;
 		if ((rs = mkfingerquery(lbuf,llen,f_long,un,av)) >= 0) {
-		    const int	ql = rs ;
-		    const int	di = lip->dialer ;
-		    const int	af = lip->af ;
-		    const int	to = pip->to_open ;
-		    const int	oo = 0 ;
+		    cint	ql = rs ;
+		    cint	di = lip->dialer ;
+		    cint	af = lip->af ;
+		    cint	to = pip->to_open ;
+		    cint	oo = 0 ;
 		    cchar	**ev = pip->envv ;
 		    cchar	*hn = q.hpart ;
 		    cchar	*ps = lip->portspec ;
 		    cchar	*ss = lip->svcspec ;
 		    cchar	*qp = lbuf ;
 		    if ((rs = opendial(di,af,hn,ps,ss,NULL,ev,to,oo)) >= 0) {
-	    		const int	s = rs ;
+	    		cint	s = rs ;
 	    		if ((rs = uc_writen(s,qp,ql)) >= 0) {
 	    		    if (lip->f.shutdown && isasocket(s)) {
 	        		rs = u_shutdown(s,SHUT_WR) ;
@@ -1537,13 +1537,13 @@ static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp)
 {
 	LOCINFO		*lip = pip->lip ;
 	FILER		b ;
-	const int	opts = (FILER_ONET&0) ;
+	cint	opts = (FILER_ONET&0) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = filer_start(&b,s,0L,512,opts)) >= 0) {
-	    const int	to = pip->to_read ;
-	    const int	llen = lbp->llen ;
+	    cint	to = pip->to_read ;
+	    cint	llen = lbp->llen ;
 	    char	*lbuf = lbp->lbuf ;
 	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 		cchar	*lp = lbuf ;
@@ -1560,7 +1560,7 @@ static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp)
 		if (rs >= 0) rs = lib_sigintr() ;
 
 		if (rs >= 0) {
-		    const int	clen = LINEBUFLEN ;
+		    cint	clen = LINEBUFLEN ;
 		    int		cl ;
 		    char	cbuf[LINEBUFLEN+1] ;
 		    if (ll > clen) ll = clen ;
@@ -1693,7 +1693,7 @@ static int procsystem(PROGINFO *pip,void *ofp,CM_ARGS *cap,cchar *ap)
 	if ((rs = query_parse(&q,ap)) >= 0) {
 	    LINEBUF	b ;
 	    if ((rs = linebuf_start(&b)) >= 0) {
-	        const int	ll = rs ;
+	        cint	ll = rs ;
 	        cchar		**av = lip->av ;
 	        char		*lp = b.lbuf ;
 	        if ((rs = mkfingerquery(lp,ll,f_long,q.upart,av)) >= 0) {
@@ -1730,7 +1730,7 @@ static int procsystemcm(PROGINFO *pip,void *ofp,CM_ARGS *cap,cchar *hn,
 #endif
 	if ((rs = cm_open(&con,cap,hn,lip->svcspec,NULL)) >= 0) {
 	    if ((rs = procsysteminfo(pip,&con)) >= 0) {
-		const int	ql = lbp->ll ;
+		cint	ql = lbp->ll ;
 		cchar		*qp = lbp->lbuf ;
 		if ((rs = cm_write(&con,qp,ql)) >= 0) {
 	   	    if (lip->f.shutdown) {
@@ -1793,10 +1793,10 @@ static int procsystemread(PROGINFO *pip,void *ofp,CM *conp,LINEBUF *lbp)
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = openshmtmp(NULL,0,om)) >= 0) {
-	    const int	ropts = 0 ;
-	    const int	llen = lbp->llen ;
-	    const int	fd = rs ;
-	    const int	to = pip->to_read ;
+	    cint	ropts = 0 ;
+	    cint	llen = lbp->llen ;
+	    cint	fd = rs ;
+	    cint	to = pip->to_read ;
 	    char	*lbuf = lbp->lbuf ;
 
 	    while ((rs = cm_reade(conp,lbuf,llen,to,ropts)) > 0) {
@@ -1823,13 +1823,13 @@ static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp)
 {
 	LOCINFO		*lip = pip->lip ;
 	FILER		b ;
-	const int	opts = FILER_ONET ;
+	cint	opts = FILER_ONET ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = filer_start(&b,fd,0L,512,opts)) >= 0) {
-	    const int	llen = lbp->llen ;
-	    const int	to = pip->to_read ;
+	    cint	llen = lbp->llen ;
+	    cint	to = pip->to_read ;
 	    char	*lbuf = lbp->lbuf ;
 	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        cchar	*lp = lbuf ;
@@ -1841,11 +1841,11 @@ static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp)
 	        if (rs >= 0) rs = lib_sigintr() ;
 
 	        if (rs >= 0) {
-		    const int	clen = LINEBUFLEN ;
+		    cint	clen = LINEBUFLEN ;
 	            char	cbuf[LINEBUFLEN+1] ;
 		    if (ll > clen) ll = clen ;
 	            if ((rs = snwcpyclean(cbuf,clen,'¿',lp,ll)) >= 0) {
-	                const int	cl = rs ;
+	                cint	cl = rs ;
 	                if (lip->open.outer && (cl > 0)) {
 	                    rs = locinfo_termoutprint(lip,ofp,cbuf,cl) ;
 	                    wlen += rs ;
@@ -1886,7 +1886,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1922,13 +1922,13 @@ static int procuserinfo_logid(PROGINFO *pip)
 	if ((rs = lib_runmode()) >= 0) {
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -1956,7 +1956,7 @@ static int loadsysfiles(PROGINFO *pip,SYSTEMS *sdbp)
 #endif
 
 	if ((rs = schedvar_start(&sf)) >= 0) {
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 	    int		i, j ;
 	    char	tbuf[MAXPATHLEN + 1] ;
 
@@ -2122,7 +2122,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 
 static int locinfo_deflinelen(LOCINFO *lip)
 {
-	const int	def = (DEFPRECISION + 2) ;
+	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
 	    PROGINFO	*pip = lip->pip ;
@@ -2221,7 +2221,7 @@ static int locinfo_setdialer(LOCINFO *lip,cchar *ds)
 	        if ((rs = getopendial(ds)) >= 0) {
 	            lip->dialer = rs ;
 	            if (pip->debuglevel > 0) {
-		        const int	di = rs ;
+		        cint	di = rs ;
 			fmt = "%s: specified dialer=%s(%u)\n" ;
 	                shio_printf(pip->efp,fmt,pn,ds,di) ;
 	            }
@@ -2251,7 +2251,7 @@ static int locinfo_logdialer(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
-	    const int	di = lip->dialer ;
+	    cint	di = lip->dialer ;
 	    if (di >= 0) {
 		cchar	*ds = lip->dialerspec ;
 		cchar	*fmt = "specified dialer=%s(%u)" ;
@@ -2280,7 +2280,7 @@ static int locinfo_setsvcargs(LOCINFO *lip,cchar *argspec)
 	    VECSTR	al, *alp = &al ;
 	    if ((rs = vecstr_start(alp,0,0)) >= 0) {
 	        if ((rs = locinfo_setsvcarger(lip,alp,argspec)) >= 0) {
-	            const int	ts = vecstr_strsize(alp) ;
+	            cint	ts = vecstr_strsize(alp) ;
 	            int		c = rs ;
 	            int		as ;
 	            cchar	**av = NULL ;
@@ -2315,12 +2315,12 @@ static int locinfo_setsvcargs(LOCINFO *lip,cchar *argspec)
 static int locinfo_setsvcarger(LOCINFO *lip,vecstr *alp,cchar *argspec)
 {
 	FIELD		fsb ;
-	const int	alen = strlen(argspec) ;
+	cint	alen = strlen(argspec) ;
 	int		rs ;
 	int		c = 0 ;
 	if (lip == NULL) return SR_FAULT ;
 	if ((rs = field_start(&fsb,argspec,alen)) >= 0) {
-	    const int	flen = alen ;
+	    cint	flen = alen ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	        int	fl ;
@@ -2437,7 +2437,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 
 static int linebuf_start(LINEBUF *lbp)
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	char		*lbuf ;
 	if (lbp == NULL) return SR_FAULT ;
@@ -2468,8 +2468,8 @@ static int linebuf_finish(LINEBUF *lbp)
 	    
 static int query_parse(struct query *qp,cchar *query)
 {
-	const int	ulen = QUERY_USERPARTLEN ;
-	const int	hlen = QUERY_HOSTPARTLEN ;
+	cint	ulen = QUERY_USERPARTLEN ;
+	cint	hlen = QUERY_HOSTPARTLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		ql = -1 ;

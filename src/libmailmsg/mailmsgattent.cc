@@ -44,7 +44,7 @@
 #include	<sfx.h>
 #include	<six.h>
 #include	<mkpathx.h>
-#include	<matxstr.h>
+#include	<matstr.h>
 #include	<strstdfname.h>
 #include	<mkchar.h>
 #include	<localmisc.h>

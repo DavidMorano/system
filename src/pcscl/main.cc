@@ -11,7 +11,7 @@
 /* revision history:
 
 	= 1994-09-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1997-05-03, David A­D­ Morano
 	This subroutine was enhanced to take multiple input files.

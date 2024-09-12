@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2000-09-10, David A­D­ Morano
-        This subroutine was originally written but it was probably started from
+        This code was originally written but it was probably started from
         any one of the numerous subroutines which perform a similar
         "file-processing" fron end.
 

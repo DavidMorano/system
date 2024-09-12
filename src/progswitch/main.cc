@@ -14,7 +14,7 @@
 /* revision history:
 
 	= 1999-03-01, David A­D­ Morano
-	This subroutine was originally adapted from one of the programs used
+	This code was originally adapted from one of the programs used
 	with the hardware CAD systems.
 
 */

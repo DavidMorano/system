@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1998-09-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code MFSBUILT.

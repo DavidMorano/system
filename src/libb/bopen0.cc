@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1999-01-10, David A­D­ Morano
 	I added the little extra code to allow for memory mapped

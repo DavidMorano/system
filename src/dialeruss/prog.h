@@ -5,7 +5,7 @@
 
 	= 2003-11-04, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */

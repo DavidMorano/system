@@ -10,7 +10,7 @@
 
 	= 1999-03-01, David A­D­ Morano
 
-	This subroutine was originally written (its a fairly
+	This code was originally written (its a fairly
 	straight-forward text processing loop).
 
 

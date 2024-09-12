@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  It was inspired by many
+	This code was originally written.  It was inspired by many
 	programs that performs various subset functions of this program.  This
 	can be either a KSH builtin or a stand-alone program.
 

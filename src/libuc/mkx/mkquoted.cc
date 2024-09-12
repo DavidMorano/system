@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 20238-12-08, David A­D­ Morano
 	I moved the character terminator block ('qterms' below)

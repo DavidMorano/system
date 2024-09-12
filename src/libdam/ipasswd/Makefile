@@ -94,7 +94,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r -o $(LDFLAGS) $@ $(OBJ)
 
 $(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?

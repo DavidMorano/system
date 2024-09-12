@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
-        This subroutine was originally written. It was prompted by the failure
+        This code was originally written. It was prompted by the failure
         of other terminal message programs from finding the proper controlling
         terminal.
 

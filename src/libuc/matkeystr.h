@@ -22,12 +22,12 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int matkeystr(mainv,cchar *,int) noex ;
+extern int	matkeystr(mainv,cchar *,int) noex ;
 
 EXTERNC_end
 

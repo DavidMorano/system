@@ -38,6 +38,8 @@
 #include	<vecitem.h>
 #include	<ascii.h>
 #include	<mallocstuff.h>
+#include	<getpwd.h>
+#include	<matstr.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -67,9 +69,6 @@
 
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	field_srvarg(field *,const uchar *,char *,int) ;
-extern int	getpwd(char *,int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
 
@@ -198,7 +197,7 @@ int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
 	if (rs < 0) goto bad1 ;
 	op->fname = cp ;
 
-	rs = vecitem_start(&op->e,10,VECITEM_PSWAP) ;
+	rs = vecitem_start(&op->e,10,VECITEM_OSWAP) ;
 	if (rs < 0)
 	    goto bad2 ;
 

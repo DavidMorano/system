@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1995-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1996-05-22, David A­D­ Morano
 	This subroutine was enhanced to get the local node-name if

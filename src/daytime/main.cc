@@ -14,7 +14,7 @@
 /* revision history:
 
 	= 1988-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1988-02-01, David A­D­ Morano
         This subroutine was modified to not write out anything to standard

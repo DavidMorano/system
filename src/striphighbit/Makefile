@@ -247,7 +247,7 @@ progacc.o:		progacc.c $(INCS)
 
 proglog.o:		proglog.c $(INCS)
 
-progwatch.o:		progwatch.c $(INCS) poller.h listenspec.h
+progwatch.o:		progwatch.c $(INCS) poller.h
 
 progipc.o:		progipc.c $(INCS)
 
@@ -341,8 +341,6 @@ sockaddress.o:		sockaddress.c sockaddress.h
 linefold.o:		linefold.c linefold.h
 
 poller.o:		poller.c poller.h
-
-listenspec.o:		listenspec.c listenspec.h
 
 serialbuf.o:		serialbuf.c serialbuf.h
 

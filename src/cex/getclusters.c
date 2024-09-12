@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1995-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2004-11-22, David A­D­ Morano
 	This subroutine was hi-jacked and pressed into service to get the name

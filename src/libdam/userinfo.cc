@@ -10,7 +10,7 @@
 /* revision history:
 
 	= 1997-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2005-03-30, David A­D­ Morano
 	I added code to look at the LOCALDOMAIN environment variable

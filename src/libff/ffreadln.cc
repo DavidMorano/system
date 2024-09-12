@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1986-01-17, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2001-09-10, David A­D­ Morano
 	I discovered that on the SGI Irix systems, |getc()| does

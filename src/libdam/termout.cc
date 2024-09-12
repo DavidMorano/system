@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	termout
+
+	Description:
 	This is a module that operates on termials (to be determined)
 	for the purposes of putting out small messages to them.
 	Subroutines in this module are:
@@ -40,7 +44,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<initializer_list>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
