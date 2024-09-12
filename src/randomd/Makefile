@@ -71,7 +71,7 @@ LINTFLAGS= -uxn -Dlint $(DEFINES) $(INCDIRS)
 
 OBJ00= main.o whatinfo.o varsub_extras.o expander.o
 OBJ01= configfile.o
-OBJ02= util.o debug.o varsub_dumpfd.o
+OBJ02= debug.o varsub_dumpfd.o
 OBJ03=
 OBJ04= getfname.o
 OBJ05= procfileenv.o procfilepaths.o strfieldcmp.o

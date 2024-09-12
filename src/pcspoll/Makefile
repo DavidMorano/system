@@ -335,9 +335,6 @@ proglogout.o:		proglogout.c $(INCS)
 
 mkplogid.o:		mkplogid.c $(INCS)
 
-util.o:			util.c $(INCS)
-
-
 progentry.o:		progentry.c progentry.h svckey.h
 
 svcentry.o:		svcentry.c svcentry.h svckey.h

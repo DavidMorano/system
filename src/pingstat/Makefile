@@ -286,9 +286,6 @@ proghost.o:		proghost.c $(INCS) pingstatdb.h
 
 expander.o:		expander.c $(INCS)
 
-util.o:			util.c $(INCS)
-
-
 initnow.o:		initnow.c
 
 pinghost.o:		pinghost.c pinghost.h

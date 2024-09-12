@@ -125,10 +125,10 @@ libmacuser.a:		$(OBJ)
 	$(AR) -rc $@ $?
 
 $(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -G -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
