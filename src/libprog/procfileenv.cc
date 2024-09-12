@@ -1,10 +1,8 @@
-/* procfileenv */
+/* procfileenv SUPPORT */
+/* lang=C++20 */
 
 /* process an environment file */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,24 +16,26 @@
 
 /*******************************************************************************
 
-        This subroutine will read (process) an environment file and put all of
-        the environment variables into the string list (supplied). New
-        environment variables just get added to the list. Old environment
-        variables already on the list are deleted with a new definition is
-        encountered.
+	Name:
+	procfileenv
 
+	Description:
+	This subroutine will read (process) an environment file and
+	put all of the environment variables into the string list
+	(supplied).  New environment variables just get added to the
+	list.  Old environment variables already on the list are
+	deleted with a new definition is encountered.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
@@ -101,36 +101,14 @@ int procfileenv(cchar *programroot,cchar *fname,VECSTR *lp)
 	char		buf[BUFLEN + 1], *bp ;
 	char		*cp ;
 
-#if	CF_DEBUGS
-	char		outname[MAXPATHLEN + 1] ;
-#endif
-
-
-#if	CF_DEBUGS
-	debugprintf("procfileenv: ent=%s\n",fname) ;
-	if ((rs = bopenroot(fp,programroot,fname,outname,"r",0666)) < 0) {
-	    debugprintf("procfileenv: bopen rs=%d\n",rs) ;
-	    return rs ;
-	}
-	debugprintf("procfileenv: outname=%s\n",outname) ;
-#else
 	if ((rs = bopenroot(fp,programroot,fname,NULL,"r",0666)) < 0)
 	    return rs ;
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	debugprintf("procfileenv: opened\n") ;
-#endif
 
 	while ((rs = breadln(fp,lbuf,llen)) > 0) {
 	    len = rs ;
 
 	    if (lbuf[len - 1] == '\n')
 	        len -= 1 ;
-
-#if	CF_DEBUGS
-	    debugprintf("procfileenv: line> %t\n",lbuf,len) ;
-#endif
 
 	    cp = lbuf ;
 	    cl = len ;
@@ -150,16 +128,8 @@ int procfileenv(cchar *programroot,cchar *fname,VECSTR *lp)
 
 	    if (fl > 0) {
 
-#if	CF_DEBUGS
-	        debugprintf("procfileenv: 1 field> %t\n",fp,fl) ;
-#endif
-
 	        if (strncasecmp(fp,"export",fl) == 0)
 	            fl = field_get(&fsb,fterms,&fp) ;
-
-#if	CF_DEBUGS
-	        debugprintf("procfileenv: 2 field> %t\n",fp,fl) ;
-#endif
 
 	        bp = buf ;
 	        bp = strwcpy(bp,fp,MIN(fl,BUFLEN)) ;
@@ -170,9 +140,6 @@ int procfileenv(cchar *programroot,cchar *fname,VECSTR *lp)
 	        fp = bp ;
 	        fl = field_sharg(&fsb,fterms,bp,(buf + BUFLEN - bp)) ;
 
-#if	CF_DEBUGS
-	        debugprintf("procfileenv: 3 field> %t\n",fp,fl) ;
-#endif
 	        if (fl > 0) {
 	            bp += fl ;
 	        } else
@@ -196,10 +163,6 @@ int procfileenv(cchar *programroot,cchar *fname,VECSTR *lp)
 	} /* end while (reading lines) */
 
 	bclose(fp) ;
-
-#if	CF_DEBUGS
-	debugprintf("procfileenv: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
