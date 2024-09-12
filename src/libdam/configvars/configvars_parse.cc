@@ -264,7 +264,7 @@ int confparser::parse_addvar(filep fep,field *fsbp,cc *,int,int kt) noex {
 	if ((rs = fsbp->get(fterms,&kp)) > 0) {
 	    cint	kl = rs ;
 	    int		cl = 0 ;
-	    cchar	*cp ;
+	    cchar	*cp = nullptr ;
 	    if (fsbp->term != '#') {
 		if ((rs = fsbp->get(fterms,&cp)) > 0) {
 		    cl = rs ;
