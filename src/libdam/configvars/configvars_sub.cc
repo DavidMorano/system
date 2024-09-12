@@ -112,7 +112,7 @@ enum vartypes {
 namespace configvars_obj {
 
     int configvars_addvar(CV *cvp,int fi,int w,
-		 char *kp,int kl,char *vp,int vl) noex {
+		 cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		idx = 0 ;
 	if (cvp && kp) {

@@ -83,15 +83,6 @@ using namespace		configvars_obj ;
 
 /* local variables */
 
-enum vartypes {
-	vartype_set,
-	vartype_var,
-	vartype_export,
-	vartype_define,
-	vartype_unset,
-	vartype_overlast
-} ; /* end enum (vartypes) */
-
 
 /* exported variables */
 
@@ -178,15 +169,15 @@ namespace configvars_obj {
     } /* end subroutine (file_finone) */
 
     int file_addvar(CV_FILE *cfp,int type,int fi,
-		char *key,int klen,char *value,int vlen) noex {
+		cc *key,int klen,cc *value,int vlen) noex {
 	CV_VAR		ve{} ;
 	int		rs ;
 	if ((rs = var_start(&ve,fi,key,klen,value,vlen)) >= 0) {
 	    vecobj	*vlp{} ;
 	    switch (type) {
-	    case vartype_define: vlp = &cfp->defines ; break ;
-	    case vartype_export: vlp = &cfp->exports ; break ;
-	    case vartype_unset: vlp = &cfp->unsets ; break ;
+	    case keytype_define: vlp = &cfp->defines ; break ;
+	    case keytype_export: vlp = &cfp->exports ; break ;
+	    case keytype_unset: vlp = &cfp->unsets ; break ;
 	    default: rs = SR_BUGCHECK ; break ;
 	    } /* end switch */
 	    if ((rs >= 0) && vlp) {

@@ -82,7 +82,7 @@ static void	freeit(char **) noex ;
 /* exported subroutines */
 
 namespace configvars_obj {
-    int var_start(CV_VAR *cep,int fi,char *kp,int kl,char *vp,int vl) noex {
+    int var_start(CV_VAR *cep,int fi,cc *kp,int kl,cc *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	if (cep && kp) {
 	    int		len{} ;

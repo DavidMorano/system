@@ -26,6 +26,23 @@
 #include	"configvars.h"
 
 
+enum configvarsws {
+	configvarsw_sets,
+	configvarsw_vars,
+	configvarsw_unsets,
+	configvarsw_unvars,
+	configvarsw_overlast
+} ;
+
+enum keytypes {
+	keytype_define,
+	keytype_export,
+	keytype_set,
+	keytype_unset,
+	keytype_var,
+	keytype_overlast
+} ;
+
 #define	CONFIGVARS_WSETS	0
 #define	CONFIGVARS_WVARS	1
 
@@ -50,18 +67,18 @@ namespace configvars_obj {
     extern int configvars_parse(CV *,int,vecobj *) noex ;
     extern int configvars_finvars(CV *) noex ;
     extern int configvars_finfiles(CV *) noex ;
-    extern int configvars_addvar(CV *,int,int,char *,int,char *,int) noex ;
+    extern int configvars_addvar(CV *,int,int,cc *,int,cc *,int) noex ;
 }
 
 namespace configvars_obj {
     extern int file_start(CV_FILE *,cchar *) noex ;
-    extern int file_addvar(CV_FILE *,int,int,char *,int,char *,int) noex ;
+    extern int file_addvar(CV_FILE *,int,int,cc *,int,cc *,int) noex ;
     extern int file_finish(CV_FILE *) noex ;
     extern int file_finone(CV_FILE *,int) noex ;
 }
 
 namespace configvars_obj {
-    extern int var_start(CV_VAR *,int,char *,int,char *,int) noex ;
+    extern int var_start(CV_VAR *,int,cc *,int,cc *,int) noex ;
     extern int var_finish(CV_VAR *) noex ;
 }
 

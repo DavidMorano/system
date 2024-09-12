@@ -1,6 +1,6 @@
-# MAKEFILES (mailalias)
+# MAKEFILES (configvars)
 
-T= mailalias
+T= configvars
 
 ALL= $(T).o
 
@@ -15,9 +15,10 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
+
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gxx
+CXX		?= gpp
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -33,17 +34,17 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += mailalias.h mailaliashdr.h
+INCS += configvars.h
 
 LIBS +=
 
 
-INCDIRS=
+INCDIRS +=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -rpath $(RUNDIR)
+RUNINFO= -tpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -55,16 +56,19 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_MAILALIAS= mailalias_obj.o
-OBJ1_MAILALIAS= dbmake.o
-OBJ2_MAILALIAS= 
-OBJ3_MAILALIAS= 
-OBJ4_MAILALIAS= 
+OBJ0= configvars_main.o configvars_parse.o configvars_sub.o
+OBJ1= configvars_file.o configvars_var.o
+OBJ2= 
+OBJ3=
+OBJ4=
+OBJ5=
+OBJ6=
+OBJ7=
 
-OBJA_MAILALIAS= obj0.o obj1.o
-OBJB_MAILALIAS= obj2.o obj3.o obj4.o
+OBJA= obj0.o obj1.o 
+#OBJB= obj4.o obj5.o obj6.o obj7.o
 
-OBJ_MAILALIAS= obja.o
+OBJ= $(OBJA) $(OBJB)
 
 
 .SUFFIXES:		.hh .ii
@@ -73,6 +77,7 @@ OBJ_MAILALIAS= obja.o
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -93,10 +98,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 
-$(T).o:			$(OBJ_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILALIAS)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_MAILALIAS)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -108,7 +113,7 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(ALL)
+	$(RM) $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -117,31 +122,35 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILALIAS)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1.o:			$(OBJ1_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILALIAS)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2.o:			$(OBJ2_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILALIAS)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3.o:			$(OBJ3_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILALIAS)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
-obj4.o:			$(OBJ4_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILALIAS)
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+
+obj6.o:			$(OBJ6)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
+
+obj7.o:			$(OBJ7)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
 
 
-obja.o:			$(OBJA_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILALIAS)
-
-objb.o:			$(OBJB_MAILALIAS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MAILALIAS)
-
-
-mailalias_obj.o:	mailalias_obj.cc	$(INCS) dbmake.hh
-
-dbmake.o:		dbmake.cc dbmake.hh	$(INCS)
+configvars_main.o:	configvars_main.cc	$(INCS) configvarsobj.hh
+configvars_parse.o:	configvars_parse.cc	$(INCS) configvarsobj.hh
+configvars_sub.o:	configvars_sub.cc	$(INCS) configvarsobj.hh
+configvars_file.o:	configvars_file.cc	$(INCS) configvarsobj.hh
+configvars_var.o:	configvars_var.cc	$(INCS) configvarsobj.hh
 
 
