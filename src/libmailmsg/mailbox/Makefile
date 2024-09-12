@@ -5,59 +5,60 @@ T= mailbox
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
+INDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
-
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS=
+
+INCS= mailbox.h
+
+LIBS=
+
 
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS=
 
+RUNINFO= -rpath $(RUNDIR)
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= mailbox.h
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_MAILBOX= mailbox_main.o
 OBJ1_MAILBOX= mailbox_fromaddr.o
 OBJ2_MAILBOX= mailbox_getfrom.o
-
 
 OBJA_MAILBOX= obj0_mailbox.o obj1_mailbox.o
 OBJB_MAILBOX= obj2_mailbox.o
@@ -65,24 +66,30 @@ OBJB_MAILBOX= obj2_mailbox.o
 OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
 
 
+.SUFFIXES:		.hh .ii
+
+
 default:		$(T).o
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
-
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
 
 
 $(T).o:			$(OBJ_MAILBOX)

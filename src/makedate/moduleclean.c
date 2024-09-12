@@ -11,7 +11,7 @@
 
 	= 1986-03-01, David A­D­ Morano
 
-	This subroutine was originally written for use for LPPI firmware
+	This code was originally written for use for LPPI firmware
 	development.
 
 

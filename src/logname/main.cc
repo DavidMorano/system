@@ -10,7 +10,7 @@
 /* revision history :
 
 	= 1989-03-01, David A­D­ Morano
-	This subroutine was originally written. This whole program,
+	This code was originally written. This whole program,
 	LOGDIR, is needed for use on the Sun CAD machines because
 	Sun doesn't support LOGDIR or LOGNAME at this time. There
 	was a previous program but it is lost and not as good as
@@ -45,9 +45,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -58,6 +59,7 @@
 #include	<realname.h>
 #include	<mallocstuff.h>
 #include	<pwfile.h>
+#include	<getlogx.h>		/* |getloghost(3dam)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1065,18 +1067,13 @@ int main(int argc,mainv argv,mainv envv) {
 	            case qopt_loghost:
 	                {
 	                    char	loghostbuf[MAXHOSTNAMELEN + 1] ;
-
-
-	                    rs = getloghost(loghostbuf,MAXHOSTNAMELEN) ;
-
-	                    if (rs > 0)
+	                    rs = getloghost(loghostbuf,MAXHOSTNAMELEN,-1) ;
+	                    if (rs > 0) {
 	                        bprintf(ofp,"%s\n",loghostbuf) ;
-
-	                    else
+	                    } else {
 	                        bputc(ofp,'\n') ;
-
+			    }
 	                } /* end block */
-
 	                break ;
 
 	            default:

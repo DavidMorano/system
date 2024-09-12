@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-04-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -31,7 +31,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<localmisc.h>

@@ -80,7 +80,7 @@ OBJ15= tcx.o
 OBJ16 += wsix.o wsnx.o wsx.o
 OBJ17 += six.o snx.o sfx.o rmx.o
 OBJ18 +=
-OBJ19 +=
+OBJ19 += hdb.o hdbstr_loadkeys.o hdbstr_loadpairs.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -412,6 +412,9 @@ dstr.o:			dstr.cc dstr.h
 varray.o:		varray.cc varray.h
 
 hdb.o:			hdb.cc hdb.h
+hdbstr.o:		hdbstr.cc hdbstr.h hdb.h
+hdbstr_loadkeys.o:	hdbstr_loadkeys.cc hdbstr.h
+hdbstr_loadpairs.o:	hdbstr_loadpairs.cc hdbstr.h
 lookaside.o:		lookaside.cc lookaside.h
 linefold.o:		linefold.cc linefold.h
 
@@ -436,7 +439,6 @@ dirseen_not.o:		dirseen_not.cc dirseen.h
 
 randomvar.o:		randomvar.cc randomvar.h
 
-strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
 strstore.o:		strstore.cc strstore.h
 strmgr.o:		strmgr.cc strmgr.h
@@ -502,6 +504,7 @@ opensysfs.o:		opensysfs.cc opensysfs.h
 quoteshellarg.o:	quoteshellarg.cc
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
+termescseq.o:		termescseq.cc termescseq.h
 
 tmtime.o:		tmtime.cc tmtime.h
 
@@ -743,11 +746,6 @@ envs.o:			envs.dir
 envs.dir:
 	makesubdir $@
 
-# LOGFILE
-logfile.o:		logfile.dir
-logfile.dir:
-	makesubdir $@
-
 # FILER
 filer.o:		filer.dir
 filer.dir:
@@ -756,6 +754,11 @@ filer.dir:
 # LINER
 liner.o:		liner.dir
 liner.dir:
+	makesubdir $@
+
+# STRPACK
+strpack.o:		strpack.dir
+strpack.dir:
 	makesubdir $@
 
 # TMPX
@@ -771,6 +774,11 @@ timestr.dir:
 # POW
 pow.o:			pow.dir
 pow.dir:
+	makesubdir $@
+
+# GETUTMP
+getutmp.o:		getutmp.dir
+getutmp.dir:
 	makesubdir $@
 
 # UCINET
@@ -813,7 +821,6 @@ unameo.o:		unameo.cc	unameo.h
 hostaddr.o:		hostaddr.cc	hostaddr.h
 b64decoder.o:		b64decoder.cc	b64decoder.h
 lookaside.o:		lookaside.cc	lookaside.h
-strpack.o:		strpack.cc	strpack.h
 strtab.o:		strtab.cc	strtab.h
 strstore.o:		strstore.cc	strstore.h
 expcook.o:		expcook.cc	expcook.h
@@ -897,6 +904,7 @@ utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
 filelines.o:		filelines.cc filelines.h
+getsyslogx.o:		getsyslogx.cc getsyslogx.h
 #
 isproc.o:		isproc.cc isproc.h
 #

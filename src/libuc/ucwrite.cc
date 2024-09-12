@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1986-03-26, David A­D­ Morano
-	This subroutine was originally written to get around some
+	This code was originally written to get around some
 	stupid UNIX® sematics of their stupid system calls!
 
 	= 1993-02-21, David A­D­ Morano

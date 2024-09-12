@@ -7,8 +7,8 @@
 
 /* revision history:
 
-	= 1998-11-01, David AÂ­DÂ­ Morano
-	This subroutine was originally written.
+	= 1998-11-01, David A­D­ Morano
+	This code was originally written.
 
 */
 
@@ -53,6 +53,17 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+template<typename T> T remx(T v,int m) noex {
+	const T	q = (v/m) ;
+	return (v-(q*m)) ;
+}
+
+
 /* local variables */
 
 
@@ -62,38 +73,32 @@
 /* exported subroutines */
 
 int irem(int v,int m) noex {
-	const int	q = (v/m) ;
-	return (v-(q*m)) ;
+	return remx(v,m) ;
 }
 /* end subroutine (irem) */
 
-long lrem(long v,long m) noex {
-	const long	q = (v/m) ;
-	return (v-(q*m)) ;
+long lrem(long v,int m) noex {
+	return remx(v,m) ;
 }
 /* end subroutine (lrem) */
 
 longlong llrem(longlong v,int m) noex {
-	const longlong	q = (v/m) ;
-	return (v-(q*m)) ;
+	return remx(v,m) ;
 }
 /* end subroutine (llrem) */
 
 uint uirem(uint v,int m) noex {
-	const uint	q = (v/m) ;
-	return (v-(q*m)) ;
+	return remx(v,m) ;
 }
 /* end subroutine (uirem) */
 
 ulong ulrem(ulong v,int m) noex {
-	const ulong	q = (v/m) ;
-	return (v-(q*m)) ;
+	return remx(v,m) ;
 }
 /* end subroutine (ulrem) */
 
 ulonglong ullrem(ulonglong v,int m) noex {
-	const ulonglong	q = (v/m) ;
-	return (v-(q*m)) ;
+	return remx(v,m) ;
 }
 /* end subroutine (ullrem) */
 

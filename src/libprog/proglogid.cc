@@ -52,7 +52,10 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<ugetpid.h>
+#include	<ucgetpid.h>
+#include	<getserial.h>
+#include	<mkpathx.h>
+#include	<mklogid.h>
 #include	<localmisc.h>		/* |LOGIDLEN| */
 
 #include	"proginfo.h"
@@ -72,20 +75,6 @@
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsdd(char *,int,cchar *,uint) ;
-extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	getserial(cchar *) ;
-extern int	isprintlatin(int) ;
 
 
 /* externals variables */

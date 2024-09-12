@@ -4,7 +4,6 @@
 /* manage reading or writing a LASTLOG file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -18,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	lastlogfile
+
+	Description:
 	This code is used to manage one LASTLOG type file.  This
 	sort of file is usually used to track the last time that a
 	person has logged in.  This function was implemented as
@@ -35,9 +38,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<sysval.hh>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -49,6 +54,9 @@
 #define	LASTLOGFILE_ENTSIZE	sizeof(LASTLOGFILE_ENT)
 #define	LASTLOGFILE_OPENTIME	30	/* seconds */
 
+#define	LLF			LASTLOGFILE
+#define	LLF_ENT			LASTLOGFILE_ENT
+
 
 /* imported namespaces */
 
@@ -59,20 +67,56 @@
 /* external subroutines */
 
 extern "C" {
-    int		lastlogfile_close(LASTLOGFILE *) noex ;
+    int		lastlogfile_close(LLF *) noex ;
 }
 
 
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
-static int	lastlogfile_checkopen(LASTLOGFILE *) noex ;
-static int	lastlogfile_fileclose(LASTLOGFILE *) noex ;
+template<typename ... Args>
+static int lastlogfile_ctor(lastlogfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_OK ;
+
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (lastlogfile_ctor) */
+
+static int lastlogfile_dtor(lastlogfile *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (lastlogfile_dtor) */
+
+template<typename ... Args>
+static inline int lastlogfile_magic(lastlogfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LASTLOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (lastlogfile_magic) */
+
+static int	lastlogfile_checkopen(LLF *) noex ;
+static int	lastlogfile_fileclose(LLF *) noex ;
 
 
 /* local variables */
+
+static sysval		pagesize(sysval_ps) ;
 
 
 /* exported variables */
@@ -80,111 +124,95 @@ static int	lastlogfile_fileclose(LASTLOGFILE *) noex ;
 
 /* exported subroutines */
 
-int lastlogfile_open(LASTLOGFILE *llp,cchar *fname,int oflags) noex {
+int lastlogfile_open(LLF *op,cchar *fname,int oflags) noex {
 	int		rs ;
-	cchar		*cp ;
-
-#if	CF_DEBUGS
-	debugprintf("lastlogfile_open: ent filename=%s\n",fname) ;
-	debugprintf("lastlogfile_open: entry size=%d\n",
-	    sizeof(LASTLOGFILE_ENT)) ;
-#endif
-
-	if (llp == NULL) return SR_FAULT ;
-
-	if (fname == NULL) fname = LASTLOGFILE_FILEPATH ;
+	if (fname == nullptr) fname = LASTLOGFILE_FILEPATH ;
 	if (fname[0] == '\0') fname = LASTLOGFILE_FILEPATH ;
-
-	memset(llp,0,sizeof(LASTLOGFILE)) ;
-	llp->oflags = oflags ;
-	llp->fd = -1 ;
-	llp->pagesize = getpagesize() ;
-
-/* try to store the file name */
-
-	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	    llp->fname = cp ;
-	    if ((rs = lastlogfile_checkopen(llp)) >= 0) {
-		USTAT	sb ;
-	        if ((rs = u_fstat(llp->fd,&sb)) >= 0) {
-	            llp->fsize = size_t(sb.st_size) ;
-	            llp->mtime = sb.st_mtime ;
-	            llp->magic = LASTLOGFILE_MAGIC ;
-		}
-		if (rs < 0)
-		    lastlogfile_fileclose(llp) ;
-	    } /* end if (file-open) */
+	if ((rs = lastlogfile_ctor(op)) >= 0) {
+	    memclear(op) ;
+	    op->oflags = oflags ;
+	    op->fd = -1 ;
+	    if ((rs = pagesize) >= 0) {
+	        cchar		*cp ;
+	        op->pagesize = rs ;
+	        if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	            op->fname = cp ;
+	            if ((rs = lastlogfile_checkopen(op)) >= 0) {
+		        USTAT	sb ;
+	                if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	                    op->fsize = size_t(sb.st_size) ;
+	                    op->mtime = sb.st_mtime ;
+	                    op->magic = LASTLOGFILE_MAGIC ;
+		        }
+		        if (rs < 0) {
+		            lastlogfile_fileclose(op) ;
+		        }
+	            } /* end if (file-open) */
+	            if (rs < 0) {
+	                uc_free(op->fname) ;
+	                op->fname = nullptr ;
+	            }
+	        } /* end if (memory-allocation) */
+	    } /* end if (pagesize) */
 	    if (rs < 0) {
-	        uc_free(llp->fname) ;
-	        llp->fname = NULL ;
+		lastlogfile_dtor(op) ;
 	    }
-	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("lastlogfile_open: ret rs=%d\n",rs) ;
-#endif
-
+	} /* end if (lastlogfile_ctor) */
 	return rs ;
 }
 /* end subroutine (lastlogfile_open) */
 
-
-/* close this lastlogfile data structure */
-int lastlogfile_close(LASTLOGFILE *llp)
-{
-	int		rs = SR_OK ;
+int lastlogfile_close(LLF *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (llp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (llp->fd >= 0) {
-	    rs1 = u_close(llp->fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (llp->fname != NULL) {
-	    rs1 = uc_free(llp->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    llp->fname = NULL ;
-	}
-
-	llp->magic = 0 ;
+	if ((rs = lastlogfile_magic(op)) >= 0) {
+	    if (op->fd >= 0) {
+	        rs1 = u_close(op->fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    {
+	        rs1 = lastlogfile_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lastlogfile_close) */
 
-
-/* read an entry */
-int lastlogfile_readentry(LASTLOGFILE *llp,uid_t uid,LASTLOGFILE_ENT *ep)
-{
+int lastlogfile_readentry(LLF *op,uid_t uid,LLF_ENT *ep) noex {
 	LASTLOGFILE_ENT	e ;
 	off_t	loc ;
 	int		rs = SR_OK ;
 
-	if (llp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
 
 /* check if operation is allowed */
 
-	if (((llp->oflags & O_RDONLY) != O_RDONLY) &&
-	    ((llp->oflags & O_RDWR) != O_RDWR))
+	if (((op->oflags & O_RDONLY) != O_RDONLY) &&
+	    ((op->oflags & O_RDWR) != O_RDWR))
 	    return SR_ACCESS ;
 
 	loc = uid * LASTLOGFILE_ENTSIZE ;
-	if (loc >= llp->fsize)
+	if (loc >= op->fsize)
 	    return SR_EOF ;
 
 /* proceed with operation */
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    ep = &e ;
 
-	if (llp->fd < 0)
-	    rs = lastlogfile_checkopen(llp) ;
+	if (op->fd < 0)
+	    rs = lastlogfile_checkopen(op) ;
 
 	if (rs >= 0)
-	    rs = u_pread(llp->fd,ep,LASTLOGFILE_ENTSIZE,loc) ;
+	    rs = u_pread(op->fd,ep,LASTLOGFILE_ENTSIZE,loc) ;
 
 	if ((rs >= 0) && (ep->ll_time == 0))
 	    rs = SR_BADSLT ;
@@ -193,51 +221,45 @@ int lastlogfile_readentry(LASTLOGFILE *llp,uid_t uid,LASTLOGFILE_ENT *ep)
 }
 /* end subroutine (lastlogfile_readentry) */
 
-
-/* write an entry */
-int lastlogfile_writeentry(LASTLOGFILE *llp,uid_t uid,LASTLOGFILE_ENT *ep)
-{
-	off_t	loc ;
+int lastlogfile_writeentry(LLF *op,uid_t uid,LLF_ENT *ep) noex {
+	off_t		loc ;
 	int		rs = SR_OK ;
 
-	if (llp == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if (op->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
 
 /* check if operation is allowed */
 
-	if (((llp->oflags & O_WRONLY) != O_WRONLY) &&
-	    ((llp->oflags & O_RDWR) != O_RDWR))
+	if (((op->oflags & O_WRONLY) != O_WRONLY) &&
+	    ((op->oflags & O_RDWR) != O_RDWR))
 	    return SR_ACCESS ;
 
 /* proceed with operation */
 
-	if (llp->fd < 0) {
-	    rs = lastlogfile_checkopen(llp) ;
+	if (op->fd < 0) {
+	    rs = lastlogfile_checkopen(op) ;
 	}
 
 	if (rs >= 0) {
 	    loc = uid * LASTLOGFILE_ENTSIZE ;
-	    rs = u_pwrite(llp->fd,ep,LASTLOGFILE_ENTSIZE,loc) ;
+	    rs = u_pwrite(op->fd,ep,LASTLOGFILE_ENTSIZE,loc) ;
 	}
 
 	return rs ;
 }
 /* end subroutine (lastlogfile_writeentry) */
 
-
-/* read the information from an entry */
-int lastlogfile_readinfo(LASTLOGFILE *llp,uid_t uid,time_t *tp,char *line,
-		char *hostname)
-{
+int lastlogfile_readinfo(LLF *op,uid_t uid,time_t *tp,char *line,
+		char *hostname) noex {
 	LASTLOGFILE_ENT	e ;
 	off_t	loc ;
-	const int	of = llp->oflags ;
+	const int	of = op->oflags ;
 	const int	esize = LASTLOGFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 
-	if (llp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
 	if (uid < 0) return SR_INVALID ;
 
 /* check if operation is allowed */
@@ -246,37 +268,37 @@ int lastlogfile_readinfo(LASTLOGFILE *llp,uid_t uid,time_t *tp,char *line,
 	    return SR_ACCESS ;
 
 	loc = (uid * esize) ;
-	if (loc >= llp->fsize)
+	if (loc >= op->fsize)
 	    return SR_EOF ;
 
 /* proceed with operation */
 
-	if (llp->fd < 0)
-	    rs = lastlogfile_checkopen(llp) ;
+	if (op->fd < 0)
+	    rs = lastlogfile_checkopen(op) ;
 
 	if (rs >= 0) {
-	    if ((rs = u_pread(llp->fd,&e,esize,loc)) >= 0) {
+	    if ((rs = u_pread(op->fd,&e,esize,loc)) >= 0) {
 		if ((rs > 0) && (e.ll_time != 0)) {
 
-	    	    if (tp != NULL)
+	    	    if (tp != nullptr)
 	                *tp = e.ll_time ;
 
-	            if (hostname != NULL)
+	            if (hostname != nullptr)
 	                strwcpy(hostname,e.ll_host,LASTLOGFILE_LHOST) ;
 
-	            if (line != NULL)
+	            if (line != nullptr)
 	                strwcpy(line,e.ll_line,LASTLOGFILE_LLINE) ;
 
 	        } else {
 	            rs = 0 ;
 
-	            if (tp != NULL)
+	            if (tp != nullptr)
 	                *tp = 0 ;
 
-	            if (hostname != NULL)
+	            if (hostname != nullptr)
 	                hostname[0] = '\0' ;
 
-	            if (line != NULL)
+	            if (line != nullptr)
 	                line[0] = '\0' ;
 
 	        } /* end if */
@@ -287,28 +309,26 @@ int lastlogfile_readinfo(LASTLOGFILE *llp,uid_t uid,time_t *tp,char *line,
 }
 /* end subroutine (lastlogfile_readinfo) */
 
-
-/* write information to an entry */
-int lastlogfile_writeinfo(LASTLOGFILE *llp,uid_t uid,time_t t,cchar *line,
+int lastlogfile_writeinfo(LLF *op,uid_t uid,time_t t,cchar *line,
 		cchar *hostname)
 {
 	LASTLOGFILE_ENT	e ;
 	off_t	loc ;
 	int		rs = SR_OK ;
 
-	if (llp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
 
 /* check if operation is allowed */
 
-	if (((llp->oflags & O_WRONLY) != O_WRONLY) &&
-	    ((llp->oflags & O_RDWR) != O_RDWR))
+	if (((op->oflags & O_WRONLY) != O_WRONLY) &&
+	    ((op->oflags & O_RDWR) != O_RDWR))
 	    return SR_ACCESS ;
 
 /* proceed with operation */
 
-	if (llp->fd < 0) {
-	    rs = lastlogfile_checkopen(llp) ;
+	if (op->fd < 0) {
+	    rs = lastlogfile_checkopen(op) ;
 	}
 
 	if (rs >= 0) {
@@ -316,20 +336,20 @@ int lastlogfile_writeinfo(LASTLOGFILE *llp,uid_t uid,time_t t,cchar *line,
 	    (void) memset(&e,0,sizeof(LASTLOGFILE_ENT)) ;
 
 	    if (t < 0)
-	        t = time(NULL) ;
+	        t = time(nullptr) ;
 
 	    e.ll_time = t ;
 
-	    if (hostname != NULL) {
+	    if (hostname != nullptr) {
 	        strncpy(e.ll_host,hostname,LASTLOGFILE_LHOST) ;
 	    }
 
-	    if (line != NULL) {
+	    if (line != nullptr) {
 	        strncpy(e.ll_line,line,LASTLOGFILE_LLINE) ;
 	    }
 
 	    loc = uid * LASTLOGFILE_ENTSIZE ;
-	    rs = u_pwrite(llp->fd,&e,LASTLOGFILE_ENTSIZE,loc) ;
+	    rs = u_pwrite(op->fd,&e,LASTLOGFILE_ENTSIZE,loc) ;
 
 	} /* end if (ok) */
 
@@ -337,123 +357,88 @@ int lastlogfile_writeinfo(LASTLOGFILE *llp,uid_t uid,time_t t,cchar *line,
 }
 /* end subroutine (lastlogfile_writeinfo) */
 
-/* check up on the object */
-int lastlogfile_check(LASTLOGFILE *llp,time_t daytime) noex {
-	USTAT		sb ;
-	int		rs = SR_OK ;
-	int		f_close = FALSE ;
-
-	if (llp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (llp->fd < 0)
-	    return SR_OK ;
-
-	if ((u_fstat(llp->fd,&sb) < 0) || (sb.st_mtime > llp->mtime))
-	    f_close = TRUE ;
-
-	if (! f_close) {
-	    if (daytime <= 0) daytime = time(NULL) ;
-	    if (daytime > (llp->otime + LASTLOGFILE_OPENTIME))
-	        f_close = TRUE ;
-	}
-
-	if (f_close) {
-	    rs = u_close(llp->fd) ;
-	    llp->fd = -1 ;
-	}
-
+int lastlogfile_check(LLF *op,time_t daytime) noex {
+	int		rs ;
+	if ((rs = lastlogfile_magic(op)) >= 0) {
+	    if (op->fd >= 0) {
+	        USTAT		sb ;
+	        int		f_close = FALSE ;
+	        if ((u_fstat(op->fd,&sb) < 0) || (sb.st_mtime > op->mtime)) {
+	            f_close = TRUE ;
+	        }
+	        if (! f_close) {
+	            if (daytime <= 0) daytime = time(nullptr) ;
+	            if (daytime > (op->otime + LASTLOGFILE_OPENTIME)) {
+	                f_close = TRUE ;
+	            }
+	        }
+	        if (f_close) {
+	            rs = u_close(op->fd) ;
+	            op->fd = -1 ;
+	        }
+	    /* end if (needed) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lastlogfile_check) */
 
-
-/* initialize a cursor for enumeration */
-int lastlogfile_curbegin(LASTLOGFILE *llp,LASTLOGFILE_CUR *curp)
-{
-
-	if (llp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	return SR_OK ;
+int lastlogfile_curbegin(LLF *op,LASTLOGFILE_CUR *curp) noex {
+	int		rs ;
+	if ((rs = lastlogfile_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (lastlogfile_curbegin) */
 
-
-/* free up a cursor */
-int lastlogfile_curend(LASTLOGFILE *llp,LASTLOGFILE_CUR *curp)
-{
-
-	if (llp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	return SR_OK ;
+int lastlogfile_curend(LLF *op,LASTLOGFILE_CUR *curp) noex {
+	int		rs ;
+	if ((rs = lastlogfile_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (lastlogfile_curend) */
 
-
-/* enumerate entries */
-int lastlogfile_enuminfo(LASTLOGFILE *llp,LASTLOGFILE_CUR *curp,uid_t *up,
-		time_t *tp,char *line,char *hostname)
-{
-	int		rs = SR_OK ;
-	int		i ;
-
-	if (llp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (llp->magic != LASTLOGFILE_MAGIC) return SR_NOTOPEN ;
-
-	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
-
-#if	CF_DEBUGS
-	debugprintf("lastlogfile_enuminfo: i=%d\n",i) ;
-#endif
-
-	while (rs >= 0) {
-	    if ((rs = lastlogfile_readinfo(llp,i,tp,line,hostname)) > 0) break ;
-	    i += 1 ;
-	} /* end while */
-
-	if (rs >= 0) {
-	    if (up != NULL) *up = i ;
-	    curp->i = i ;
-	}
-
+int lastlogfile_curenum(LLF *op,LASTLOGFILE_CUR *curp,uid_t *up,
+		time_t *tp,char *ln,char *hn) noex {
+	int		rs ;
+	if ((rs = lastlogfile_magic(op,curp)) >= 0) {
+	    int		i = (curp->i < 0) ? 0 : (curp->i + 1) ;
+	    while (rs >= 0) {
+	        if ((rs = lastlogfile_readinfo(op,i,tp,ln,hn)) > 0) break ;
+	        i += 1 ;
+	    } /* end while */
+	    if (rs >= 0) {
+	        if (up != nullptr) *up = i ;
+	        curp->i = i ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (lastlogfile_enuminfo) */
+/* end subroutine (lastlogfile_curenum) */
 
 
 /* private subroutines */
 
-
-static int lastlogfile_checkopen(LASTLOGFILE *llp)
-{
+static int lastlogfile_checkopen(LLF *op) noex {
 	int		rs = SR_OK ;
-
-	if (llp->fd < 0) {
-	    rs = u_open(llp->fname,llp->oflags,0660) ;
-	    llp->fd = rs ;
-	    llp->otime = time(NULL) ;
+	if (op->fd < 0) {
+	    rs = u_open(op->fname,op->oflags,0660) ;
+	    op->fd = rs ;
+	    op->otime = time(nullptr) ;
 	}
-
-	return (rs >= 0) ? llp->fd : rs ;
+	return (rs >= 0) ? op->fd : rs ;
 }
 /* end subroutine (lastlogfile_checkopen) */
 
-
-static int lastlogfile_fileclose(LASTLOGFILE *llp)
-{
+static int lastlogfile_fileclose(LLF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (llp->fd >= 0) {
-	    rs1 = u_close(llp->fd) ;
+	if (op->fd >= 0) {
+	    rs1 = u_close(op->fd) ;
 	    if (rs >= 0) rs = rs1 ;
-	    llp->fd = -1 ;
+	    op->fd = -1 ;
 	}
 	return rs ;
 }

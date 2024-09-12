@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1999-12-03, David A­D­ Morano
 	This was updated to use |strlcpy(3c)| when it was rumored

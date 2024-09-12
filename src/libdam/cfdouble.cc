@@ -6,7 +6,7 @@
 /* revision history:
 
 	= 2007-01-88, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 

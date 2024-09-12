@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int ts_ctor(ts *op,Args ... args) noex {
+static int strfilter_ctor(strfilter *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int ts_ctor(ts *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ts_ctor) */
+/* end subroutine (strfilter_ctor) */
 
-static int ts_dtor(ts *op) noex {
+static int strfilter_dtor(strfilter *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ts_dtor) */
+/* end subroutine (strfilter_dtor) */
 
 template<typename ... Args>
-static inline int ts_magic(ts *op,Args ... args) noex {
+static inline int strfilter_magic(strfilter *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (ts_magic) */
+/* end subroutine (strfilter_magic) */

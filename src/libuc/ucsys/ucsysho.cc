@@ -54,10 +54,11 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<clanguage.h>
+#include	<usupport.h>
 
 #include	"ucsysho.h"
 #include	"ucsys.h"
@@ -141,7 +142,7 @@ int gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	int		ec = EFAULT ;
 	if (hop && hobuf) {
 	    ec = EINVAL ;
-	    memset(hop,0,sizeof(HOSTENT)) ;
+	    memclear(hop) ;
 	    if (holen > 0) {
 	        ec = ENOENT ;
 	    }
@@ -200,7 +201,7 @@ int getwtnam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (hop && hobuf &&n) {
 	    ec = EINVAL ;
-	    memset(hop,0,sizeof(HOSTENT)) ;
+	    memclear(hop) ;
 	    if ((holen > 0) && n[0]) {
 	        ec = ENOENT ;
 	    }
@@ -258,7 +259,7 @@ int gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	int		ec = EFAULT ;
 	if (hop && hobuf && ap) {
 	    ec = EINVAL ;
-	    memset(hop,0,sizeof(HOSTENT)) ;
+	    memclear(hop) ;
 	    if ((holen > 0) && (al > 0) && (af >= 0)) {
 	        ec = ENOENT ;
 	    }

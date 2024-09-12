@@ -49,21 +49,21 @@ struct progconfig_flags {
 
 struct progconfig_head {
 	unsigned long	magic ;
-	const char	*configfname ;
-	const char	*pidfname ;
-	const char	*lockfname ;		/* lock file */
-	const char	*svcfname ;		/* SVCTAB file */
-	const char	*accfname ;		/* ACCTAB file */
-	const char	*passfname ;		/* pass (FD) file */
-	const char	*reqfname ;		/* request file */
-	const char	*shmfname ;		/* SHM file */
-	const char	*msfname ;		/* MS file */
-	const char	*logfname ;
-	const char	*prog_rmail ;
-	const char	*prog_sendmail ;
-	const char	*orgcode ;		/* organization code */
-	const char	*speedname ;		/* CPUSPEED module name */
-	const char	*portspec ;
+	cchar	*configfname ;
+	cchar	*pidfname ;
+	cchar	*lockfname ;		/* lock file */
+	cchar	*svcfname ;		/* SVCTAB file */
+	cchar	*accfname ;		/* ACCTAB file */
+	cchar	*passfname ;		/* pass (FD) file */
+	cchar	*reqfname ;		/* request file */
+	cchar	*shmfname ;		/* SHM file */
+	cchar	*msfname ;		/* MS file */
+	cchar	*logfname ;
+	cchar	*prog_rmail ;
+	cchar	*prog_sendmail ;
+	cchar	*orgcode ;		/* organization code */
+	cchar	*speedname ;		/* CPUSPEED module name */
+	cchar	*portspec ;
 	struct proginfo	*pip ;
 	struct progconfig_flags	f ;
 	struct progconfig_flags	have ;
@@ -75,25 +75,16 @@ struct progconfig_head {
 	vecstr		stores ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(PROGCONFIG_MASTER)) || (PROGCONFIG_MASTER == 0)
+extern int progconfigstart(PROGCONFIG *,proginfo *,cchar *) noex ;
+extern int progconfigcheck(PROGCONFIG *) noex ;
+extern int progconfigread(PROGCONFIG *) noex ;
+extern int progconfigfinish(PROGCONFIG *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int progconfigstart(PROGCONFIG *,struct proginfo *,const char *) ;
-extern int progconfigcheck(PROGCONFIG *) ;
-extern int progconfigread(PROGCONFIG *) ;
-extern int progconfigfinish(PROGCONFIG *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PROGCONFIG_MASTER */
 
 #endif /* PROGCONFIG */
-
 
 

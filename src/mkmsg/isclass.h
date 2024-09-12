@@ -1,6 +1,8 @@
-/* isclass */
+/* isclass HEADER */
+/* lang=C20 */
 
 /* character classes for mail content purposes */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,53 +17,32 @@
 
 /******************************************************************************
 
-        These subroutines check a character to see if it is part of a special
-        character class. See the code for details!
+	Name:
+	isclass
 
+	Description:
+        These subroutines check a character to see if it is part of a special
+        character class.  See the code for details!
 
 ******************************************************************************/
 
-
 #ifndef	ISCLASS_INCLUDE
-#define	ISCLASS_INCLUDE		1
+#define	ISCLASS_INCLUDE	
 
 
 #include	<envstandards.h>
-
-#include	<sys/types.h>
-
-#include	<localmisc.h>
-
-
-/* local defines */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
-/* external subroutines */
+EXTERNC_begin
 
+extern int is7bit(int) noex ;
+extern int is8bit(int) noex ;
+extern int isbinary(int) noex ;
 
-/* external variables */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* exported subroutines */
-
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int is7bit(int) ;
-extern int is8bit(int) ;
-extern int isbinary(int) ;
-
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ISCLASS_INCLUDE */

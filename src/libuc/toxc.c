@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-04-10, David A­D­ Morano
-        This subroutine was originally written.
+        This code was originally written.
 
 	= 2014-01-13, David A­D­ Morano
 	I removed the option of compilling a so-called computed

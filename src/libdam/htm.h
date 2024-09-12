@@ -1,4 +1,8 @@
-/* htm */
+/* htm HEADER */
+/* lang=C20 */
+
+/* hack to output HTML */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -8,11 +12,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<stdarg.h>
 #include	<shio.h>
-#include	<localmisc.h>
 
 
 #define	HTM_MAGIC	0x43628193
@@ -30,47 +34,48 @@ struct htm_flags {
 } ;
 
 struct htm_head {
-	uint		magic ;
+	shio		*ofp ;
+	char		*lbuf ;
 	HTM_FL		f ;
-	SHIO		*ofp ;
+	uint		magic ;
+	int		llen ;
 	int		wlen ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	HTM		htm ;
+typedef	HTM_FL		htm_fl ;
 
-extern int	htm_start(HTM *,SHIO *,const char *) ;
-extern int	htm_finish(HTM *) ;
-extern int	htm_headbegin(HTM *,const char *) ;
-extern int	htm_headend(HTM *) ;
-extern int	htm_bodybegin(HTM *,const char *) ;
-extern int	htm_bodyend(HTM *) ;
-extern int	htm_tagbegin(HTM *,cchar *,cchar *,cchar *,cchar *(*)[2]) ;
-extern int	htm_tagend(HTM *,const char *) ;
-extern int	htm_abegin(HTM *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	htm_aend(HTM *) ;
+EXTERNC_begin
 
-extern int	htm_textbegin(HTM *,cchar *,cchar *,cchar *,
-			int,int,cchar *(*)[2]) ;
-extern int	htm_textend(HTM *) ;
+extern int htm_start(htm *,shio *,cchar *) noex ;
+extern int htm_finish(htm *) noex ;
+extern int htm_headbegin(htm *,cchar *) noex ;
+extern int htm_headend(htm *) noex ;
+extern int htm_bodybegin(htm *,cchar *) noex ;
+extern int htm_bodyend(htm *) noex ;
+extern int htm_tagbegin(htm *,cchar *,cchar *,cchar *,cchar *(*)[2]) noex ;
+extern int htm_tagend(htm *,cchar *) noex ;
+extern int htm_abegin(htm *,cchar *,cchar *,cchar *,cchar *) noex ;
+extern int htm_aend(htm *) noex ;
 
-extern int	htm_hr(HTM *,const char *,const char *) ;
-extern int	htm_br(HTM *,const char *,const char *) ;
-extern int	htm_img(HTM *,cchar *,cchar *,cchar *,cchar *,cchar *,int,int) ;
+extern int htm_textbegin(htm *,cchar *,cchar *,cchar *,
+			int,int,cchar *(*)[2]) noex ;
+extern int htm_textend(htm *) noex ;
 
-extern int	htm_write(HTM *,const void *,int) ;
-extern int	htm_printline(HTM *,const char *,int) ;
-extern int	htm_vprintf(HTM *,const char *,va_list) ;
-extern int	htm_printf(HTM *,const char *,...) ;
-extern int	htm_putc(HTM *,int) ;
-extern int	htm_seek(HTM *,off_t,int) ;
-extern int	htm_flush(HTM *) ;
-extern int	htm_reserve(HTM *,int) ;
+extern int htm_hr(htm *,cchar *,cchar *) noex ;
+extern int htm_br(htm *,cchar *,cchar *) noex ;
+extern int htm_img(htm *,cchar *,cchar *,cchar *,cchar *,cchar *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+extern int htm_write(htm *,cvoid *,int) noex ;
+extern int htm_printline(htm *,cchar *,int) noex ;
+extern int htm_vprintf(htm *,cchar *,va_list) noex ;
+extern int htm_printf(htm *,cchar *,...) noex ;
+extern int htm_putc(htm *,int) noex ;
+extern int htm_seek(htm *,off_t,int) noex ;
+extern int htm_flush(htm *) noex ;
+extern int htm_reserve(htm *,int) noex ;
+
+EXTERNC_end
 
 
 #endif /* HTM_INCLUDE */

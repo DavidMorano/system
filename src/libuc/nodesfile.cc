@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-04-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -36,7 +36,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<ctime>			/* |time(2)| */
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<hdb.h>

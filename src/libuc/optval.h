@@ -19,13 +19,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
 extern int	optval(cchar *,int) noex ;
+
+static inline int optbool(cchar *sp,int sl) noex {
+	return optval(sp,sl) ;
+}
 
 EXTERNC_end
 

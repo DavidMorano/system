@@ -1,7 +1,7 @@
 RSLOW
 
 
-Example client usage :
+Example client usage:
 
 $ rslow coe rmailer < o.rm
 
@@ -12,6 +12,5 @@ $ rslow coe bbpost < test.msg
 $ rslow uri -if inputfile copy
 
 $ rslow uri -af argfile copy
-
 
 

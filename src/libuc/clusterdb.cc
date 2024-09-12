@@ -32,7 +32,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>

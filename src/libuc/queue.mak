@@ -153,7 +153,7 @@ piq.o:			piq.cc piq.h pq.h
 charq.o:		charq.cc charq.h
 chariq.o:		chariq.cc chariq.h charq.h
 
-# variable element
+# variable element size
 fifoitem.o:		fifoitem.cc fifoitem.h
 
 # container

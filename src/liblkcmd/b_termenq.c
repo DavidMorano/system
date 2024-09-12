@@ -14,7 +14,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  
+	This code was originally written.  
 
 	= 2017-12-16, David A­D­ Morano
 	Update puts terminal-type 'screen' ahead of 'vt100'. This

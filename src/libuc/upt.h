@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<pthread.h>
 #include	<usystem.h>
 #include	<pta.h>

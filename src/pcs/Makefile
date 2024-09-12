@@ -403,8 +403,6 @@ serialbuf.o:		serialbuf.c serialbuf.h
 
 spawner.o:		spawner.c spawner.h
 
-listenspec.o:		listenspec.c listenspec.h
-
 pcsmsg.o:		pcsmsg.c pcsmsg.h
 
 pcsnsc.o:		pcsnsc.c pcsnsc.h

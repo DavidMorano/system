@@ -11,7 +11,6 @@
 #define	CF_DIRS		1		/* dirs */
 #define	CF_NEWPRUNE	1		/* try new-prune */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
@@ -32,13 +31,15 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<unistd.h>
 #include	<climits>
 #include	<csignal>
-#include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<sighand.h>
 #include	<bits.h>
@@ -48,6 +49,7 @@
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<fsdirtree.h>
+#include	<removes.h>
 #include	<sigblocker.h>
 #include	<bwops.h>
 #include	<cfdec.h>
@@ -55,11 +57,14 @@
 #include	<nulstr.h>
 #include	<ucmallreg.h>
 #include	<vstrxcmp.h>
+#include	<getourenv.h>
+#include	<nleadstr.h>
+#include	<matxstr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
-#include	"defs.h"
+#include	"proginfo.h"
 
 
 /* local defines */
@@ -68,9 +73,7 @@
 #define	LINEBUFLEN	MAX((MAXPATHLEN + 20),2048)
 #endif
 
-#ifndef	USTAT
-#define	USTAT		USTAT
-#endif
+#define	LI		linkinfo
 
 #define	DIRID		struct dirid
 #define	FILEID		struct fileid
@@ -99,12 +102,6 @@ extern "C" {
 
 /* external subroutines */
 
-extern "C" int	matstr(cchar **,cchar *,int) ;
-extern "C" int	matostr(cchar **,int,cchar *,int) ;
-extern "C" int	matpstr(cchar **,int,cchar *,int) ;
-extern "C" int	nleadstr(cchar *,cchar *,int) ;
-extern "C" int	optbool(cchar *,int) ;
-extern "C" int	optvalue(cchar *,int) ;
 extern "C" int	removes(cchar *) ;
 extern "C" int	mkdirs(cchar *,mode_t) ;
 extern "C" int	mkuserpath(char *,cchar *,cchar *,int) ;
@@ -123,13 +120,13 @@ extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern "C" int	debugopen(cchar *) ;
 extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern "C" int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern "C" int	debugclose() ;
 extern "C" int	strlinelen(cchar *,int,int) ;
 extern "C" int	nprintf(cchar *,cchar *,...) ;
 #endif
 
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
+extern "C" cchar	*getourenv(cchar **,cchar *) noex ;
 
 extern "C" char	*strnrchr(cchar *,int,int) ;
 extern "C" char	*strnchr(cchar *,int,int) ;
@@ -158,14 +155,14 @@ struct fileid {
 } ;
 
 struct tardir { /* placed for best packing */
-	ino_t		ino ;
 	cchar		*dname ;
+	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
 struct linkinfo { /* placed for best packing */
-	ino_t		ino ;
 	cchar		*fname ;
+	ino_t		ino ;
 	dev_t		dev ;
 	mode_t		mode ;
 } ;
@@ -173,9 +170,9 @@ struct linkinfo { /* placed for best packing */
 
 /* forward references */
 
-static uint	linkhash(const void *,int) ;
-static uint	diridhash(const void *,int) ;
-static uint	fileidhash(const void *,int) ;
+static uint	linkhash(cvoid *,int) ;
+static uint	diridhash(cvoid *,int) ;
+static uint	fileidhash(cvoid *,int) ;
 
 static int	usage(PROGINFO *) ;
 
@@ -236,7 +233,7 @@ static int	procprune_size(PROGINFO *,int *) ;
 
 static int	proclink_begin(PROGINFO *) ;
 static int	proclink_add(PROGINFO *,dev_t,ino_t,mode_t,cchar *) ;
-static int	proclink_have(PROGINFO *,dev_t,ino_t,LINKINFO **) ;
+static int	proclink_have(PROGINFO *,dev_t,ino_t,LI **) ;
 static int	proclink_end(PROGINFO *) ;
 static int	proclink_fins(PROGINFO *) ;
 
@@ -246,7 +243,7 @@ static int	procsync(PROGINFO *,cchar *, USTAT *,FILEINFO *) ;
 static int	procrm(PROGINFO *,cchar *, USTAT *,FILEINFO *) ;
 static int	proclines(PROGINFO *,cchar *, USTAT *,FILEINFO *) ;
 
-static int	procsynclink(PROGINFO *,cchar *, USTAT *,LINKINFO *) ;
+static int	procsynclink(PROGINFO *,cchar *, USTAT *,LI *) ;
 static int	procsyncer(PROGINFO *,cchar *, USTAT *) ;
 
 static int	procsyncer_reg(PROGINFO *,cchar *, USTAT *) ;
@@ -261,8 +258,8 @@ static int	tardir_match(TARDIR *,USTAT *) ;
 
 static int	fileinfo_loadfts(FILEINFO *,USTAT *) ;
 
-static int	linkinfo_start(LINKINFO *,dev_t,ino_t,mode_t,cchar *) ;
-static int	linkinfo_finish(LINKINFO *) ;
+static int	linkinfo_start(LI *,dev_t,ino_t,mode_t,cchar *) ;
+static int	linkinfo_finish(LI *) ;
 
 static int	dirid_start(DIRID *,dev_t,ino_t) ;
 static int	dirid_finish(DIRID *) ;
@@ -276,7 +273,7 @@ static int	linkcmp(struct linkinfo *,struct linkinfo *,int) ;
 static int	diridcmp(struct dirid *,struct dirid *,int) ;
 static int	fileidcmp(struct fileid *,struct fileid *,int) ;
 
-static int	isNotStat(int) ;
+static bool	isNotStat(int) noex ;
 
 #if	CF_DEBUG
 static cchar	*strfiletype(USTAT *) ;
@@ -310,14 +307,14 @@ enum fts {
 static volatile int	if_exit ;
 static volatile int	if_intr ;
 
-static cint	sigblocks[] = {
+static constexpr int	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGCHLD,
 	0
 } ;
 
-static cint	sigignores[] = {
+static constexpr int	sigignores[] = {
 	SIGHUP,
 	SIGPIPE,
 	SIGPOLL,
@@ -327,45 +324,11 @@ static cint	sigignores[] = {
 	0
 } ;
 
-static cint	sigints[] = {
+static constexpr int	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	SIGQUIT,
 	0
-} ;
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"pm",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"pf",
-	"yf",
-	"sa",
-	"sr",
-	"yi",
-	"option",
-	"set",
-	"follow",
-	"cores",
-	"iacc",
-	"ignacc",
-	"im",
-	"nice",
-	"ff",
-	"readable",
-	"older",
-	"accessed",
-	"prune",
-	"summary",
-	"noprog",
-	NULL
 } ;
 
 enum argopts {
@@ -402,7 +365,41 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+static const char	*argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"pm",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"pf",
+	"yf",
+	"sa",
+	"sr",
+	"yi",
+	"option",
+	"set",
+	"follow",
+	"cores",
+	"iacc",
+	"ignacc",
+	"im",
+	"nice",
+	"ff",
+	"readable",
+	"older",
+	"accessed",
+	"prune",
+	"summary",
+	"noprog",
+	nullptr
+} ;
+
+static constexpr pivars		initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -410,7 +407,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const struct mapex	mapexs[] = {
+static constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -424,16 +421,6 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progmodes[] = {
-	"filesize",
-	"filefind",
-	"filelinker",
-	"filesyncer",
-	"filerm",
-	"filelines",
-	NULL
-} ;
-
 enum progmodes {
 	progmode_filesize,
 	progmode_filefind,
@@ -444,42 +431,14 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*progopts[] = {
-	"uniq",
-	"name",
-	"cores",
-	"prog",
-	"noprog",
-	"nosock",
-	"nopipe",
-	"nofifo",
-	"nodev",
-	"noname",
-	"nolink",
-	"noextra",
-	"nodotdir",
-	"nosuf",
-	"sr",
-	"sa",
-	"s",
-	"follow",
-	"younger",
-	"yi",
-	"iacc",
-	"ignacc",
-	"im",
-	"quiet",
-	"nice",
-	"ff",
-	"readable",
-	"rmfile",
-	"older",
-	"accessed",
-	"prune",
-	"summary",
-	"ignasscomm",
-	"igncomm",
-	NULL
+static constexpr cpcchar	progmodes[] = {
+	"filesize",
+	"filefind",
+	"filelinker",
+	"filesyncer",
+	"filerm",
+	"filelines",
+	nullptr
 } ;
 
 enum progopts {
@@ -520,20 +479,42 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	*ftstrs[] = {
-	"file",
-	"directory",
-	"block",
-	"character",
-	"pipe",
-	"fifo",
+static constexpr cpcchar	progopts[] = {
+	"uniq",
 	"name",
-	"socket",
-	"link",
-	"door",
-	"exists",
-	"regular",
-	NULL
+	"cores",
+	"prog",
+	"noprog",
+	"nosock",
+	"nopipe",
+	"nofifo",
+	"nodev",
+	"noname",
+	"nolink",
+	"noextra",
+	"nodotdir",
+	"nosuf",
+	"sr",
+	"sa",
+	"s",
+	"follow",
+	"younger",
+	"yi",
+	"iacc",
+	"ignacc",
+	"im",
+	"quiet",
+	"nice",
+	"ff",
+	"readable",
+	"rmfile",
+	"older",
+	"accessed",
+	"prune",
+	"summary",
+	"ignasscomm",
+	"igncomm",
+	nullptr
 } ;
 
 enum ftstrs {
@@ -552,17 +533,20 @@ enum ftstrs {
 	ftstr_overlast
 } ;
 
-#ifdef	COMMENT
-
-static const char	*whiches[] = {
-	"uniq",
+static constexpr cpcchar	ftstrs[] = {
+	"file",
+	"directory",
+	"block",
+	"character",
+	"pipe",
+	"fifo",
 	"name",
-	"noprog",
-	"nosock",
-	"nopipe",
-	"nodev",
-	"nolink",
-	NULL
+	"socket",
+	"link",
+	"door",
+	"exists",
+	"regular",
+	nullptr
 } ;
 
 enum whiches {
@@ -576,20 +560,26 @@ enum whiches {
 	which_overlast
 } ;
 
+#ifdef	COMMENT
+
+static constexpr cpcchar	whiches[] = {
+	"uniq",
+	"name",
+	"noprog",
+	"nosock",
+	"nopipe",
+	"nodev",
+	"nolink",
+	nullptr
+} ;
+
 #endif /* COMMENT */
 
-static const char	*po_fts = PO_FTS ;
-static const char	*po_sufreq = PO_SUFREQ ;
-static const char	*po_sufacc = PO_SUFACC ;
-static const char	*po_sufrej = PO_SUFREJ ;
-static const char	*po_prune = PO_PRUNE ;
-
-static const char	*sufs[] = {
-	PO_SUFREQ,
-	PO_SUFACC,
-	PO_SUFREJ,
-	NULL
-} ;
+static constexpr cchar	po_ftsp[] = PO_FTS ;
+static constexpr cchar	po_sufreq[] = PO_SUFREQ ;
+static constexpr cchar	po_sufacc[] = PO_SUFACC ;
+static constexpr cchar	po_sufrej[] = PO_SUFREJ ;
+static constexpr cchar	po_prune[] = PO_PRUNE ;
 
 enum sufs {
 	suf_req,
@@ -598,13 +588,20 @@ enum sufs {
 	suf_overlast
 } ;
 
-static cint	rsnostat[] = {
+static constexpr cpcchar	sufs[] = {
+	PO_SUFREQ,
+	PO_SUFACC,
+	PO_SUFREJ,
+	nullptr
+} ;
+
+static constexpr int	rsnostat[] = {
 	SR_NOTDIR,
 	SR_NOENT,
 	0
 } ;
 
-static const uchar	aterms[] = {
+static constexpr char	aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -616,11 +613,12 @@ static const uchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	SIGHAND		sm ;
@@ -646,15 +644,15 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_help = false ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*pmspec = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*yfname = NULL ;
-	cchar		*pfname = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*pmspec = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*yfname = nullptr ;
+	cchar		*pfname = nullptr ;
 	cchar		*cp ;
 
 	if_exit = false ;
@@ -664,7 +662,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	if (rs < 0) goto badsighand ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs2 = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs2) ;
 	}
@@ -681,7 +679,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* early things to initialize */
@@ -691,7 +689,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	pip->progmode = -1 ;
 
 	if (rs >= 0) {
-	    if ((cp = getourenv(envv,VARDEBUGLEVEL)) != NULL) {
+	    if ((cp = getourenv(envv,VARDEBUGLEVEL)) != nullptr) {
 	        rs = optvalue(cp,-1) ;
 	        pip->debuglevel = rs ;
 	    }
@@ -713,7 +711,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -741,14 +739,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = false ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -1012,7 +1010,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* nice value */
 	                case argopt_nice:
-	                    cp = NULL ;
+	                    cp = nullptr ;
 	                    cl = -1 ;
 	                    pip->final.nice = true ;
 	                    pip->have.nice = true ;
@@ -1034,7 +1032,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        } else
 	                            rs = SR_INVALID ;
 	                    }
-	                    if ((rs >= 0) && (cp != NULL)) {
+	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        rs = optvalue(cp,cl) ;
 	                        pip->nice = rs ;
 	                    }
@@ -1277,7 +1275,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* file name length restriction */
 	                    case 'l':
-	                        cp = NULL ;
+	                        cp = nullptr ;
 	                        cl = -1 ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
@@ -1297,7 +1295,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            } else
 	                                rs = SR_INVALID ;
 	                        }
-	                        if ((rs >= 0) && (cp != NULL)) {
+	                        if ((rs >= 0) && (cp != nullptr)) {
 	                            rs = optvalue(cp,cl) ;
 	                            pip->namelen = rs ;
 	                        }
@@ -1352,7 +1350,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* require a suffix for file names */
 	                    case 's':
-	                        cp = NULL ;
+	                        cp = nullptr ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
@@ -1371,7 +1369,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            } else
 	                                rs = SR_INVALID ;
 	                        }
-	                        if ((rs >= 0) && (cp != NULL)) {
+	                        if ((rs >= 0) && (cp != nullptr)) {
 	                            pip->final.sufreq = true ;
 	                            rs = procsuf_load(pip,suf_req,cp,cl) ;
 	                        }
@@ -1476,8 +1474,8 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = true ;
@@ -1493,7 +1491,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (pip->debuglevel > 0) {
 	    bfile	*efp = (bfile *) pip->efp ;
-	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	        cchar	*pn = pip->progname ;
 	        bprintf(efp,"%s: extended debugging=%s\n",pn,cp) ;
 	    }
@@ -1544,7 +1542,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* get our program mode */
 
-	if (pmspec == NULL) pmspec = pip->progname ;
+	if (pmspec == nullptr) pmspec = pip->progname ;
 
 	pip->progmode = matstr(progmodes,pmspec,-1) ;
 
@@ -1574,7 +1572,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* help file */
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -1584,16 +1582,16 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* initialization */
 
-	if (afname == NULL) afname = getenv(VARAFNAME) ;
+	if (afname == nullptr) afname = getenv(VARAFNAME) ;
 
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 	pip->euid = geteuid() ;
 	pip->uid = getuid() ;
 
 /* younger interval? */
 
 	if ((rs >= 0) && (pip->younger == 0)) {
-	    if (argval != NULL) {
+	    if (argval != nullptr) {
 	        pip->have.younger = true ;
 	        rs = cfdecti(argval,-1,&v) ;
 	        pip->younger = v ;
@@ -1601,7 +1599,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	}
 
 	if ((rs >= 0) && (pip->younger == 0)) {
-	    if ((yfname != NULL) && (yfname[0] != '\0')) {
+	    if ((yfname != nullptr) && (yfname[0] != '\0')) {
 	        USTAT	sb ;
 	        if ((rs = uc_stat(yfname,&sb)) >= 0) {
 	            pip->have.younger = true ;
@@ -1639,7 +1637,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (rs >= 0) {
 	    cchar	*vp = getourenv(envv,VARPRUNE) ;
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        PARAMOPT	*pop = &pip->aparams ;
 	        cchar		*po = po_prune ;
 	        rs = paramopt_loads(pop,po,vp,-1) ;
@@ -1679,8 +1677,8 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* check a few more things */
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 #ifdef	COMMENT
 	if (pip->debuglevel > 0)
@@ -1794,11 +1792,11 @@ retearly:
 	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    bfile	*efp = (bfile *) pip->efp ;
 	    pip->open.errfile = true ;
 	    bclose(efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.aparams) {
@@ -1924,7 +1922,7 @@ static int usage(PROGINFO *pip)
 static int procsig(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if (if_exit) {
 	    rs = SR_EXIT ;
 	} else if (if_intr) {
@@ -1959,7 +1957,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getenv(VAROPTS)) != NULL) {
+	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -1974,7 +1972,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(progopts,1,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case progopt_uniq:
@@ -2305,7 +2303,7 @@ static int procfts(PROGINFO *pip)
 	cchar		*varftypes = getenv(VARFTYPES) ;
 	cchar		*vp ;
 
-	if (varftypes != NULL) {
+	if (varftypes != nullptr) {
 	    rs = paramopt_loads(pop,po_fts,varftypes,-1) ;
 	}
 
@@ -2379,7 +2377,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-')) {
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-')) {
 	    ofn = BFILE_STDOUT ;
 	}
 
@@ -2434,7 +2432,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    }
 #endif /* CF_DIRS */
 
-	    pip->ofp = NULL ;
+	    pip->ofp = nullptr ;
 	    rs1 = bclose(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
@@ -2466,7 +2464,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = aip->argv[ai] ;
 	            if (cp[0] != '\0') {
@@ -2487,7 +2485,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 
 /* process any files in the argument filename list file */
 
-	if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	    bfile	afile, *afp = &afile ;
 
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
@@ -2567,7 +2565,7 @@ static int procnames(PROGINFO *pip,cchar *lbuf,int llen)
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
 	    int		fl ;
 	    cchar	*fp ;
@@ -2601,7 +2599,7 @@ int procname(PROGINFO *pip,cchar *name)
 	int		f_isdir = false ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
-	if (name == NULL) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 
 	if (name[0] == '\0') return SR_INVALID ;
 
@@ -2611,7 +2609,7 @@ int procname(PROGINFO *pip,cchar *name)
 #endif
 
 	if ((name[0] == '/') && (name[1] == 'u')) {
-	    rs = mkuserpath(tmpfname,NULL,name,-1) ;
+	    rs = mkuserpath(tmpfname,nullptr,name,-1) ;
 	    if (rs > 0) name = tmpfname ;
 	}
 
@@ -3020,7 +3018,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	    vecpstr	*slp ;
 	    int		sl ;
 	    cchar	*tp, *sp ;
-	    if ((tp = strnrchr(bnp,bnl,'.')) != NULL) {
+	    if ((tp = strnrchr(bnp,bnl,'.')) != nullptr) {
 	        sp = (tp+1) ;
 	        sl = ((bnp+bnl)-(tp+1)) ;
 
@@ -3223,7 +3221,7 @@ static int procothers(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 	}
 #endif
 	for (i = 0 ; vechand_get(tlp,i,&tdp) >= 0 ; i += 1) {
-	    if (tdp != NULL) {
+	    if (tdp != nullptr) {
 	        pip->tardname = tdp->dname ;
 	        pip->tardev = tdp->dev ;
 #if	CF_DEBUG
@@ -3259,7 +3257,7 @@ static int procprune(PROGINFO *pip,cchar *name)
 	    debugprintf("main/procprune: ent name=%s\n",name) ;
 #endif
 
-	if (pip->prune != NULL) {
+	if (pip->prune != nullptr) {
 	    int		cl ;
 	    cchar	*cp ;
 	    if ((cl = sfbasename(name,-1,&cp)) > 0) {
@@ -3391,7 +3389,7 @@ static int procrm(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 {
 	int		rs = SR_OK ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -3424,7 +3422,7 @@ static int procrm(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 static int proclines(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("fileop/proclines: ent n=%s\n",name) ;
@@ -3473,7 +3471,7 @@ static int proctars_begin(PROGINFO *pip)
 	    if ((rs = vechand_start(tlp,1,0)) >= 0) {
 	        cchar	*cp ;
 	        pip->open.tardirs = true ;
-	        if ((cp = getenv(VARTARDNAME)) != NULL) {
+	        if ((cp = getenv(VARTARDNAME)) != nullptr) {
 	            PARAMOPT	*pop = &pip->aparams ;
 	            cchar	*po = PO_TARDIRS ;
 	            rs = paramopt_loads(pop,po,cp,-1) ;
@@ -3532,7 +3530,7 @@ static int proctars_check(PROGINFO *pip)
 	int		c = 0 ;
 	cchar		*pn = pip->progname ;
 	cchar		*po = PO_TARDIRS ;
-	cchar		*fmt = NULL ;
+	cchar		*fmt = nullptr ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main/proctars_check: ent\n") ;
@@ -3546,7 +3544,7 @@ static int proctars_check(PROGINFO *pip)
 	        char		td[MAXPATHLEN+1] ;
 	        while ((rs1 = paramopt_enumvalues(pop,po,&cur,&vp)) >= 0) {
 	            vl = rs1 ;
-	            if ((rs1 > 0) && (vp != NULL)) {
+	            if ((rs1 > 0) && (vp != nullptr)) {
 	                if (pip->debuglevel > 0) {
 	                    bprintf(efp,"%s: target=%t\n",pn,vp,vl) ;
 	                }
@@ -3599,7 +3597,7 @@ static int proctars_checkerr(PROGINFO *pip,cchar *td,int rs)
 {
 	bfile		*efp = (bfile *) pip->efp ;
 	cchar		*pn = pip->progname ;
-	cchar		*fmt = NULL ;
+	cchar		*fmt = nullptr ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("main/proctars_checker: gen-error rs=%d\n",rs) ;
@@ -3616,7 +3614,7 @@ static int proctars_checkerr(PROGINFO *pip,cchar *td,int rs)
 	        fmt = "%s: all targets must be directories (%d)\n" ;
 	        break ;
 	    } /* end switch */
-	    if (fmt != NULL) {
+	    if (fmt != nullptr) {
 	        bprintf(efp,fmt,pn,rs) ;
 	        bprintf(efp,"%s: tar=%s\n",pn,td) ;
 	    }
@@ -3684,7 +3682,7 @@ static int proctars_notalready(PROGINFO *pip,USTAT *sbp)
 	    vechand	*tlp = &pip->tardirs ;
 	    int		i ;
 	    for (i = 0 ; vechand_get(tlp,i,&tdp) >= 0 ; i += 1) {
-	        if (tdp != NULL) {
+	        if (tdp != nullptr) {
 	            rs = tardir_match(tdp,sbp) ;
 	            f = rs ;
 	        }
@@ -3706,7 +3704,7 @@ static int proctars_fins(PROGINFO *pip)
 	    vechand	*tlp = &pip->tardirs ;
 	    int		i ;
 	    for (i = 0 ; vechand_get(tlp,i,&tdp) >= 0 ; i += 1) {
-	        if (tdp != NULL) {
+	        if (tdp != nullptr) {
 	            rs1 = tardir_finish(tdp) ;
 	            if (rs >= 0) rs = rs1 ;
 #if	CF_DEBUG
@@ -3776,7 +3774,7 @@ static int procsuf_begin(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		si ;
 	int		c = 0 ;
-	cchar		*po = NULL ;
+	cchar		*po = nullptr ;
 
 	for (si = 0 ; si < suf_overlast ; si += 1) {
 	    int	f = false ;
@@ -3937,7 +3935,7 @@ static int procsuf_load(PROGINFO *pip,int si,cchar *ap,int al)
 	    debugprintf("main/procsuf_load: suf=%s(%u)\n",sufs[si],si) ;
 #endif
 
-	if (ap != NULL) {
+	if (ap != nullptr) {
 
 	    switch (si) {
 	    case suf_req:
@@ -3963,7 +3961,7 @@ static int procsuf_load(PROGINFO *pip,int si,cchar *ap,int al)
 	                ap = getenv(var) ;
 	                al = -1 ;
 	            }
-	            if (ap != NULL) {
+	            if (ap != nullptr) {
 	                rs = paramopt_loads(pop,po,ap,al) ;
 	                c = rs ;
 #if	CF_DEBUGS
@@ -4054,7 +4052,7 @@ static int procrm_end(PROGINFO *pip) {
 
 static int proclines_begin(PROGINFO *pip)
 {
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("fileop/proclines_begin: progopt_ignasscomm=%u\n",
@@ -4068,7 +4066,7 @@ static int proclines_begin(PROGINFO *pip)
 static int proclines_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if (pip->f.summary) {
 	    bfile	*ofp = (bfile *) pip->ofp ;
 	    rs = bprintf(ofp,"%10u\n",pip->c_lines) ;
@@ -4080,7 +4078,7 @@ static int proclines_end(PROGINFO *pip)
 
 static int procdir_begin(PROGINFO *pip)
 {
-	HDB		*dbp = &pip->dirs ;
+	hdb		*dbp = &pip->dirs ;
 	hdbhashfunc_t	hf = (hdbhashfunc_t) diridhash ;
 	hdbcmpfunc_t	cf = (hdbcmpfunc_t) diridcmp ;
 	cint	n = 50 ;
@@ -4088,7 +4086,7 @@ static int procdir_begin(PROGINFO *pip)
 	int		rs ;
 
 	if ((rs = hdb_start(dbp,n,at,hf,cf)) >= 0) {
-	    HDBSTR	*ndp = &pip->dirnames ;
+	    hdbSTR	*ndp = &pip->dirnames ;
 	    if ((rs = hdbstr_start(ndp,0)) >= 0) {
 	        pip->open.dirs = true ;
 	    }
@@ -4103,9 +4101,9 @@ static int procdir_begin(PROGINFO *pip)
 
 static int procdir_end(PROGINFO *pip)
 {
-	HDB		*dbp = &pip->dirs ;
-	HDB_CUR		cur ;
-	HDB_DATUM	key, val ;
+	hdb		*dbp = &pip->dirs ;
+	hdb_cur		cur ;
+	hdb_dat	key, val ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -4118,7 +4116,7 @@ static int procdir_end(PROGINFO *pip)
 	        while (hdb_enum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (DIRID *) val.buf ;
 
-	            if (dip != NULL) {
+	            if (dip != nullptr) {
 	                dirid_finish(dip) ;
 	                rs1 = uc_free(dip) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -4150,8 +4148,8 @@ static int procdir_end(PROGINFO *pip)
 
 static int procdir_have(PROGINFO *pip,dev_t dev,ino_t ino,cchar *np,int nl)
 {
-	HDB		*dbp = &pip->dirs ;
-	HDB_DATUM	key, val ;
+	hdb		*dbp = &pip->dirs ;
+	hdb_dat	key, val ;
 	DIRID		did ;
 	int		rs ;
 
@@ -4160,8 +4158,8 @@ static int procdir_have(PROGINFO *pip,dev_t dev,ino_t ino,cchar *np,int nl)
 
 	key.buf = &did ;
 	key.len = sizeof(ino_t) + sizeof(dev_t) ;
-	if ((rs = hdb_fetch(dbp,key,NULL,&val)) >= 0) {
-	    if ((rs = hdbstr_add(&pip->dirnames,np,nl,NULL,0)) >= 0) {
+	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
+	    if ((rs = hdbstr_add(&pip->dirnames,np,nl,nullptr,0)) >= 0) {
 	        rs = 1 ;
 	    }
 	} else if (rs == SR_NOTFOUND) {
@@ -4183,8 +4181,8 @@ static int procdir_addid(PROGINFO *pip,dev_t dev,ino_t ino)
 
 	if ((rs = uc_malloc(size,&dip)) >= 0) {
 	    if ((rs = dirid_start(dip,dev,ino)) >= 0) {
-	        HDB		*dbp = &pip->dirs ;
-	        HDB_DATUM	key, val ;
+	        hdb		*dbp = &pip->dirs ;
+	        hdb_dat	key, val ;
 	        key.buf = dip ;
 	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	        val.buf = dip ;
@@ -4204,13 +4202,13 @@ static int procdir_addid(PROGINFO *pip,dev_t dev,ino_t ino)
 
 static int procdir_haveprefix(PROGINFO *pip,cchar *fp,int fl)
 {
-	HDBSTR		*plp = &pip->dirnames ;
+	hdbSTR		*plp = &pip->dirnames ;
 	int		rs = SR_OK ;
 	int		pl ;
 	cchar		*pp ;
 
 	if ((pl = sfdirname(fp,fl,&pp)) > 0) {
-	    if ((rs = hdbstr_fetch(plp,pp,pl,NULL,NULL)) >= 0) {
+	    if ((rs = hdbstr_fetch(plp,pp,pl,nullptr,nullptr)) >= 0) {
 	        rs = 1 ;
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = 0 ;
@@ -4224,13 +4222,13 @@ static int procdir_haveprefix(PROGINFO *pip,cchar *fp,int fl)
 
 static int procdir_addprefix(PROGINFO *pip,cchar *np,int nl)
 {
-	HDBSTR		*plp = &pip->dirnames ;
+	hdbSTR		*plp = &pip->dirnames ;
 	int		rs ;
 
-	if ((rs = hdbstr_fetch(plp,np,nl,NULL,NULL)) >= 0) {
+	if ((rs = hdbstr_fetch(plp,np,nl,nullptr,nullptr)) >= 0) {
 	    rs = 1 ;
 	} else if (rs == SR_NOTFOUND) {
-	    if ((rs = hdbstr_add(plp,np,nl,NULL,0)) >= 0) {
+	    if ((rs = hdbstr_add(plp,np,nl,nullptr,0)) >= 0) {
 	        rs = 0 ;
 	    }
 	}
@@ -4242,7 +4240,7 @@ static int procdir_addprefix(PROGINFO *pip,cchar *np,int nl)
 
 static int procuniq_begin(PROGINFO *pip)
 {
-	HDB		*dbp = &pip->files ;
+	hdb		*dbp = &pip->files ;
 	cint	n = 50 ;
 	cint	at = 1 ;	/* use 'lookaside(3dam)' */
 	int		rs = SR_OK ;
@@ -4271,9 +4269,9 @@ static int procuniq_end(PROGINFO *pip)
 	int		rs1 ;
 
 	if (pip->f.f_uniq && pip->open.files) {
-	    HDB		*dbp = &pip->files ;
-	    HDB_CUR	cur ;
-	    HDB_DATUM	key, val ;
+	    hdb		*dbp = &pip->files ;
+	    hdb_cur	cur ;
+	    hdb_dat	key, val ;
 	    FILEID	*dip ;
 	    pip->open.files = false ;
 
@@ -4282,7 +4280,7 @@ static int procuniq_end(PROGINFO *pip)
 	        while (hdb_enum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (FILEID *) val.buf ;
 
-	            if (dip != NULL) {
+	            if (dip != nullptr) {
 	                fileid_finish(dip) ;
 	                rs1 = uc_free(dip) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -4311,8 +4309,8 @@ static int procuniq_end(PROGINFO *pip)
 
 static int procuniq_have(PROGINFO *pip,dev_t dev,ino_t ino)
 {
-	HDB		*dbp = &pip->files ;
-	HDB_DATUM	key, val ;
+	hdb		*dbp = &pip->files ;
+	hdb_dat	key, val ;
 	FILEID		fid ;
 	int		rs ;
 
@@ -4321,7 +4319,7 @@ static int procuniq_have(PROGINFO *pip,dev_t dev,ino_t ino)
 
 	key.buf = &fid ;
 	key.len = sizeof(ino_t) + sizeof(dev_t) ;
-	if ((rs = hdb_fetch(dbp,key,NULL,&val)) >= 0) {
+	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
 	    rs = 1 ;
 	} else if (rs == SR_NOTFOUND) {
 	    if ((rs = procuniq_addid(pip,dev,ino)) >= 0) {
@@ -4342,8 +4340,8 @@ static int procuniq_addid(PROGINFO *pip,dev_t dev,ino_t ino)
 
 	if ((rs = uc_malloc(size,&dip)) >= 0) {
 	    if ((rs = fileid_start(dip,dev,ino)) >= 0) {
-	        HDB		*dbp = &pip->files ;
-	        HDB_DATUM	key, val ;
+	        hdb		*dbp = &pip->files ;
+	        hdb_dat	key, val ;
 	        key.buf = dip ;
 	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	        val.buf = dip ;
@@ -4391,13 +4389,13 @@ static int procprune_begin(PROGINFO *pip,cchar *pfname)
 	                            bp = (strwcpy(bp,vp,vl)+1) ;
 	                        }
 	                    } /* end while */
-	                    pa[c] = NULL ;
+	                    pa[c] = nullptr ;
 	                    rs1 = paramopt_curend(pop,&cur) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (paramopt-cur) */
 	                if (rs < 0) {
 	                    uc_free(pip->prune) ;
-	                    pip->prune = NULL ;
+	                    pip->prune = nullptr ;
 	                }
 	            } /* end if (m-a) */
 	        } /* end if (procprune_size) */
@@ -4412,10 +4410,10 @@ static int procprune_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->prune != NULL) {
+	if (pip->prune != nullptr) {
 	    rs1 = uc_free(pip->prune) ;
 	    if (rs >= 0) rs = rs1 ;
-	    pip->prune = NULL ;
+	    pip->prune = nullptr ;
 	}
 	return rs ;
 }
@@ -4427,7 +4425,7 @@ static int procprune_loadfile(PROGINFO *pip,cchar *pfname)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((pfname != NULL) && (pfname[0] != '\0')) {
+	if ((pfname != nullptr) && (pfname[0] != '\0')) {
 	    bfile	pfile, *pfp = &pfile ;
 	    if ((rs = bopen(pfp,pfname,"r",0666)) >= 0) {
 	        PARAMOPT	*pop = &pip->aparams ;
@@ -4441,7 +4439,7 @@ static int procprune_loadfile(PROGINFO *pip,cchar *pfname)
 	            len = rs ;
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
 	            lbuf[len] = '\0' ;
-	            if ((cp = strnchr(lbuf,len,'#')) != NULL) {
+	            if ((cp = strnchr(lbuf,len,'#')) != nullptr) {
 	                len = (cp-lbuf) ;
 	            }
 	            if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
@@ -4489,7 +4487,7 @@ static int procprune_size(PROGINFO *pip,int *sizep)
 	    rs1 = paramopt_curend(pop,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramopt-cur) */
-	if (sizep != NULL) *sizep = size ;
+	if (sizep != nullptr) *sizep = size ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procuniq_size) */
@@ -4497,7 +4495,7 @@ static int procprune_size(PROGINFO *pip,int *sizep)
 
 static int proclink_begin(PROGINFO *pip)
 {
-	HDB		*dbp = &pip->links ;
+	hdb		*dbp = &pip->links ;
 	hdbhashfunc_t	hf = (hdbhashfunc_t) linkhash ;
 	hdbcmpfunc_t	cf = (hdbcmpfunc_t) linkcmp ;
 	cint	n = 50 ;
@@ -4532,17 +4530,18 @@ static int proclink_end(PROGINFO *pip)
 
 static int proclink_fins(PROGINFO *pip)
 {
-	HDB		*dbp = &pip->links ;
-	HDB_CUR		cur ;
-	HDB_DATUM	key, val ;
+	hdb		*dbp = &pip->links ;
+	hdb_cur		cur ;
+	hdb_dat		key ;
+	hdb_dat		val ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 	    LINKINFO	*lip ;
 	    while ((rs1 = hdb_enum(dbp,&cur,&key,&val)) >= 0) {
-	        lip = (LINKINFO *) val.buf ;
-	        if (lip != NULL) {
+	        lip = (LI *) val.buf ;
+	        if (lip != nullptr) {
 	            rs1 = linkinfo_finish(lip) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rs1 = uc_free(lip) ;
@@ -4563,13 +4562,13 @@ static int proclink_add(PROGINFO *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp)
 {
 	int		rs ;
 	int		f = false ;
-	if ((rs = proclink_have(pip,dev,ino,NULL)) == 0) {
+	if ((rs = proclink_have(pip,dev,ino,nullptr)) == 0) {
 	    LINKINFO	*lip ;
 	    cint	lsize = sizeof(LINKINFO) ;
 	    if ((rs = uc_malloc(lsize,&lip)) >= 0) {
 	        if ((rs = linkinfo_start(lip,dev,ino,m,fp)) >= 0) {
-	            HDB		*dbp = &pip->links ;
-	            HDB_DATUM	key, val ;
+	            hdb		*dbp = &pip->links ;
+	            hdb_dat	key, val ;
 	            f = true ;
 	            key.buf = lip ;
 	            key.len = lsize ;
@@ -4591,13 +4590,12 @@ static int proclink_add(PROGINFO *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp)
 }
 /* end subroutine (proclink_add) */
 
-
-static int proclink_have(PROGINFO *pip,dev_t dev,ino_t ino,LINKINFO **rpp)
-{
+static int proclink_have(PROGINFO *pip,dev_t dev,ino_t ino,LI **rpp) noex {
 	LINKINFO	li ;
-	HDB		*dbp = &pip->links ;
-	HDB_DATUM	key, val ;
-	cint	lsize = sizeof(LINKINFO) ;
+	hdb		*dbp = &pip->links ;
+	hdb_dat		key ;
+	hdb_dat		val ;
+	cint		lsize = sizeof(LINKINFO) ;
 	int		rs ;
 
 	li.dev = dev ;
@@ -4605,9 +4603,9 @@ static int proclink_have(PROGINFO *pip,dev_t dev,ino_t ino,LINKINFO **rpp)
 
 	key.buf = &li ;
 	key.len = lsize ;
-	if ((rs = hdb_fetch(dbp,key,NULL,&val)) >= 0) {
+	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
 	    rs = 1 ;
-	    if (rpp != NULL) *rpp = (LINKINFO *) val.buf ;
+	    if (rpp != nullptr) *rpp = (LI *) val.buf ;
 	} else if (rs == SR_NOTFOUND) {
 	    rs = 0 ;
 	}
@@ -4621,34 +4619,28 @@ static int proclink_have(PROGINFO *pip,dev_t dev,ino_t ino,LINKINFO **rpp)
 }
 /* end subroutine (proclink_have) */
 
-
 /* ARGSUSED */
-static int procsize(PROGINFO *pip,cchar *name,USTAT *sbp, FILEINFO *ckp)
-{
-	ULONG		bytes ;
-	ULONG		size ;
+static int procsize(PROGINFO *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
+	size_t		bytes ;
+	size_t		sz = sbp->st_size ;
 	int		rs ;
 
-	if (name == NULL) return SR_FAULT ;
-
-	size = sbp->st_size ;
+	if (name == nullptr) return SR_FAULT ;
 
 	bytes = pip->bytes ;
-	bytes += (size % MEGABYTE) ;
+	bytes += (sz % MEGABYTE) ;
 
 	pip->bytes = (bytes % MEGABYTE) ;
 	pip->megabytes += (bytes / MEGABYTE) ;
-	pip->megabytes += (size / MEGABYTE) ;
+	pip->megabytes += (sz / MEGABYTE) ;
 
-	rs = (int) (size & INT_MAX) ;
+	rs = int(sz & INT_MAX) ;
 	return rs ;
 }
 /* end subroutine (procsize) */
 
-
 /* ARGSUSED */
-static int proclink(PROGINFO *pip,cchar *name,USTAT *sbp, FILEINFO *ckp)
-{
+static int proclink(PROGINFO *pip,cchar *name,USTAT *sbp, FILEINFO *ckp) noex {
 	int		rs = SR_OK ;
 	int		f_linked = false ;
 
@@ -4755,10 +4747,8 @@ static int proclink(PROGINFO *pip,cchar *name,USTAT *sbp, FILEINFO *ckp)
 }
 /* end subroutine (proclink) */
 
-
 /* ARGSUSED */
-static int procsync(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
-{
+static int procsync(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp) noex {
 	LINKINFO	*lip ;
 	dev_t		dev = sbp->st_dev ;
 	ino_t		ino = sbp->st_ino ;
@@ -4806,10 +4796,8 @@ static int procsync(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 }
 /* end subroutine (procsync) */
 
-
 /* ARGSUSED */
-static int procsynclink(PROGINFO *pip,cchar *name,USTAT *sbp,LINKINFO *lip)
-{
+static int procsynclink(PROGINFO *pip,cchar *name,USTAT *sbp,LI *lip) noex {
 	bfile		*efp = (bfile *) pip->efp ;
 	int		rs ;
 	int		f_linked = false ;
@@ -4830,10 +4818,10 @@ static int procsynclink(PROGINFO *pip,cchar *name,USTAT *sbp,LINKINFO *lip)
 	        if (dev == pip->tardev) {
 	            char	dstfname[MAXPATHLEN + 1] ;
 	            if ((rs = mkpath2(dstfname,pip->tardname,name)) >= 0) {
-	                USTAT		dsb ;
-	                const mode_t	dm = DMODE ;
-	                const mode_t	m = lip->mode ;
-	                int		f_dolink = true ;
+	                USTAT	dsb ;
+	                cmode	dm = DMODE ;
+	                cmode	m = lip->mode ;
+	                bool	f_dolink = true ;
 
 	                if ((rs = uc_lstat(dstfname,&dsb)) >= 0) {
 	                    if (! S_ISDIR(m)) {
@@ -4903,9 +4891,7 @@ static int procsynclink(PROGINFO *pip,cchar *name,USTAT *sbp,LINKINFO *lip)
 }
 /* end subroutine (procsynclink) */
 
-
-static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
-{
+static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG
@@ -4928,7 +4914,7 @@ static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
 	}
 	if (rs >= 0) {
 	    SIGBLOCK	blocker ;
-	    if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&blocker,nullptr)) >= 0) {
 	        if (S_ISREG(sbp->st_mode)) {
 	            rs = procsyncer_reg(pip,name,sbp) ;
 	        } else if (S_ISDIR(sbp->st_mode)) {
@@ -4953,13 +4939,11 @@ static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
 }
 /* end subroutine (procsyncer) */
 
-
-static int procsyncer_reg(PROGINFO *pip,cchar *name,USTAT *sbp)
-{
+static int procsyncer_reg(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
 	USTAT		dsb ;
-	off_t	dfsize = 0 ;
-	const mode_t	dm = DMODE ;
-	const mode_t	nm = (sbp->st_mode & (~ S_IFMT)) | 0600 ;
+	off_t		dfsize = 0 ;
+	cmode		dm = DMODE ;
+	cmode		nm = (sbp->st_mode & (~ S_IFMT)) | 0600 ;
 	uid_t		duid = -1 ;
 	int		rs = SR_OK ;
 	int		of = 0 ;
@@ -5246,11 +5230,9 @@ ret0:
 }
 /* end subroutine (procsyncer_reg) */
 
-
-static int procsyncer_dir(PROGINFO *pip,cchar *name,USTAT *sbp)
-{
+static int procsyncer_dir(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
 	USTAT		dsb ;
-	const mode_t	nm = (sbp->st_mode & (~ S_IFMT)) | DMODE ;
+	cmode		nm = (sbp->st_mode & (~ S_IFMT)) | DMODE ;
 	uid_t		duid = -1 ;
 	int		rs = SR_OK ;
 	int		f_create = false ;
@@ -5382,11 +5364,9 @@ ret0:
 }
 /* end subroutine (procsyncer_dir) */
 
-
-static int procsyncer_lnk(PROGINFO *pip,cchar *name,USTAT *sbp)
-{
+static int procsyncer_lnk(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
 	USTAT		dsb ;
-	const mode_t	dm = DMODE ;
+	cmode		dm = DMODE ;
 	int		rs = SR_OK ;
 	int		f_create = false ;
 	int		f_update = false ;
@@ -5526,35 +5506,25 @@ ret0:
 }
 /* end subroutine (procsyncer_lnk) */
 
-
-static int procsyncer_fifo(PROGINFO *pip,cchar name[],USTAT *sbp)
-{
-	int		rs = SR_OK ;
-
-	if (pip == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-	if (sbp == NULL) return SR_FAULT ;
-
+static int procsyncer_fifo(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
+	int		rs = SR_FAULT ;
+	if (pip && name && sbp) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (procsyncer_fifo) */
 
-
-static int procsyncer_sock(PROGINFO *pip,cchar *name,USTAT *sbp)
-{
-	int		rs = SR_OK ;
-
-	if (pip == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-	if (sbp == NULL) return SR_FAULT ;
-
+static int procsyncer_sock(PROGINFO *pip,cchar *name,USTAT *sbp) noex {
+	int		rs = SR_FAULT ;
+	if (pip && name && sbp) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (procsyncer_sock) */
 
-
-static int tardir_start(TARDIR *tdp,cchar *n,USTAT *sbp)
-{
+static int tardir_start(TARDIR *tdp,cchar *n,USTAT *sbp) noex {
 	int		rs ;
 	cchar		*cp ;
 	if ((rs = uc_mallocstrw(n,-1,&cp)) >= 0) {
@@ -5566,23 +5536,19 @@ static int tardir_start(TARDIR *tdp,cchar *n,USTAT *sbp)
 }
 /* end subroutine (tardir_start) */
 
-
-static int tardir_finish(TARDIR *tdp)
-{
+static int tardir_finish(TARDIR *tdp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (tdp->dname != NULL) {
+	if (tdp->dname != nullptr) {
 	    rs1 = uc_free(tdp->dname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    tdp->dname = NULL ;
+	    tdp->dname = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (tardir_finish) */
 
-
-static int tardir_match(TARDIR *tdp,USTAT *sbp)
-{
+static int tardir_match(TARDIR *tdp,USTAT *sbp) noex {
 	int		f = true ;
 	f = f && (tdp->dev == sbp->st_dev) ;
 	f = f && (tdp->ino == sbp->st_ino) ;
@@ -5590,46 +5556,48 @@ static int tardir_match(TARDIR *tdp,USTAT *sbp)
 }
 /* end subroutine (tardir_match) */
 
-
-static int dirid_start(DIRID *dip,dev_t dev,ino_t ino)
-{
-	int		rs = SR_OK ;
-	dip->dev = dev ;
-	dip->ino = ino ;
+static int dirid_start(DIRID *dip,dev_t dev,ino_t ino) noex {
+	int		rs = SR_FAULT ;
+	if (dip) {
+	    rs = SR_OK ;
+	    dip->dev = dev ;
+	    dip->ino = ino ;
+	}
 	return rs ;
 }
 /* end subroutine (dirid_start) */
 
-
-static int dirid_finish(DIRID *dip)
-{
-	if (dip == NULL) return SR_FAULT ;
-	return SR_OK ;
+static int dirid_finish(DIRID *dip) noex {
+	int		rs = SR_FAULT ;
+	if (dip) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
 /* end subroutine (dirid_finish) */
 
-
-static int fileid_start(FILEID *dip,dev_t dev,ino_t ino)
-{
-	int		rs = SR_OK ;
-	dip->dev = dev ;
-	dip->ino = ino ;
+static int fileid_start(FILEID *dip,dev_t dev,ino_t ino) noex {
+	int		rs = SR_FAULT ;
+	if (dip) {
+	    rs = SR_OK ;
+	    dip->dev = dev ;
+	    dip->ino = ino ;
+	}
 	return rs ;
 }
 /* end subroutine (fileid_start) */
 
-
-static int fileid_finish(FILEID *dip)
-{
-	if (dip == NULL) return SR_FAULT ;
-	return SR_OK ;
+static int fileid_finish(FILEID *dip) noex {
+	int		rs = SR_FAULT ;
+	if (dip) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
 /* end subroutine (fileid_finish) */
 
-
-static int fileinfo_loadfts(FILEINFO *ckp,USTAT *sbp)
-{
-	cint	ftype = (sbp->st_mode & S_IFMT) ;
+static int fileinfo_loadfts(FILEINFO *ckp,USTAT *sbp) noex {
+	cint		ftype = (sbp->st_mode & S_IFMT) ;
 	int		rs = SR_OK ;
 	int		fts = 0 ;
 	switch (ftype) {
@@ -5666,68 +5634,59 @@ static int fileinfo_loadfts(FILEINFO *ckp,USTAT *sbp)
 }
 /* end subroutine (fileinfo_loadfts) */
 
-
-static int linkinfo_start(LINKINFO *lip,dev_t dev,ino_t ino,mode_t m,cchar *fp)
-{
+static int linkinfo_start(LI *lip,dev_t dev,ino_t ino,mode_t m,cc *fp) noex {
 	int		rs ;
 	cchar		*cp ;
-
-	lip->fname = NULL ;
+	lip->fname = nullptr ;
 	if ((rs = uc_mallocstrw(fp,-1,&cp)) >= 0) {
 	    lip->dev = dev ;
 	    lip->ino = ino ;
 	    lip->mode = m ;
 	    lip->fname = cp ;
 	}
-
 	return rs ;
 }
 /* end subroutine (linkinfo_start) */
 
-
-static int linkinfo_finish(LINKINFO *lip)
-{
+static int linkinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (lip->fname != NULL) {
+	if (lip->fname != nullptr) {
 	    rs1 = uc_free(lip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    lip->fname = NULL ;
+	    lip->fname = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (linkinfo_finish) */
 
-
 /* make *parent* directories as needed */
-static int mkpdirs(cchar *tarfname,mode_t dm)
-{
+static int mkpdirs(cchar *tarfname,mode_t dm) noex {
 	int		rs = SR_OK ;
 	int		dl ;
 	cchar		*dp ;
-
 	if ((dl = sfdirname(tarfname,-1,&dp)) > 0) {
 	    char	dname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath1w(dname,dp,dl)) >= 0) {
-	        uc_unlink(dname) ; /* just a little added help */
+	        if ((rs = uc_unlink(dname)) >= 0) {
+		    rs = SR_OK ;
+		} else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
+		}
 	        rs = mkdirs(dname,dm) ;
 	    }
-	} else
+	} else {
 	    rs = SR_NOENT ;
-
+	}
 	return rs ;
 }
 /* end subroutine (mkpdirs) */
 
-
-/* ARGSUSED */
-static uint linkhash(const void *vp,int vl)
-{
-	LINKINFO	*lip = (LINKINFO *) vp ;
+static uint linkhash(cvoid *vp,int vl) noex {
+	LINKINFO	*lip = (LI *) vp ;
 	uint		h = 0 ;
 	ushort		*sa ;
+	(void) vl ;
 	{
 	    sa = (ushort *) &lip->dev ;
 	    h = h ^ ((sa[1] << 16) | sa[0]) ;
@@ -5747,11 +5706,9 @@ static uint linkhash(const void *vp,int vl)
 }
 /* end subroutine (linkhash) */
 
-
-/* ARGSUSED */
-static int linkcmp(LINKINFO *e1p,LINKINFO *e2p,int len)
-{
+static int linkcmp(LI *e1p,LINKINFO *e2p,int len) noex {
 	int		rc ;
+	(void) len ;
 	if ((rc = (e1p->dev - e2p->dev)) == 0) { /* reverse sort! */
 	    int64_t	d ;
 	    if ((d = (e1p->ino - e2p->ino)) > 0) {
@@ -5764,19 +5721,16 @@ static int linkcmp(LINKINFO *e1p,LINKINFO *e2p,int len)
 }
 /* end subroutine (linkcmp) */
 
-
-static uint diridhash(const void *vp,int vl)
-{
+static uint diridhash(cvoid *vp,int vl) noex {
 	const uint	uvl = (uint) vl ;
 	uint		h = 0 ;
 	ushort		*sa = (ushort *) vp ;
-
 	h = h ^ ((sa[1] << 16) | sa[0]) ;
 	h = h ^ ((sa[0] << 16) | sa[1]) ;
 	if (uvl > sizeof(uint)) {
 	    h = h ^ ((sa[3] << 16) | sa[2]) ;
 	    h = h ^ ((sa[2] << 16) | sa[3]) ;
-	    if (uvl > sizeof(ULONG)) {
+	    if (uvl > sizeof(ulong)) {
 	        h = h ^ ((sa[5] << 16) | sa[4]) ;
 	        h = h ^ ((sa[4] << 16) | sa[5]) ;
 	        if (uvl > (4*3)) {
@@ -5785,24 +5739,20 @@ static uint diridhash(const void *vp,int vl)
 	        }
 	    }
 	}
-
 	return h ;
 }
 /* end subroutine (diridhash) */
 
-
-static uint fileidhash(const void *vp,int vl)
-{
+static uint fileidhash(cvoid *vp,int vl) noex {
 	const uint	uvl = (uint) vl ;
 	uint		h = 0 ;
 	ushort		*sa = (ushort *) vp ;
-
 	h = h ^ ((sa[1] << 16) | sa[0]) ;
 	h = h ^ ((sa[0] << 16) | sa[1]) ;
 	if (uvl > sizeof(uint)) {
 	    h = h ^ ((sa[3] << 16) | sa[2]) ;
 	    h = h ^ ((sa[2] << 16) | sa[3]) ;
-	    if (uvl > sizeof(ULONG)) {
+	    if (uvl > sizeof(ulong)) {
 	        h = h ^ ((sa[5] << 16) | sa[4]) ;
 	        h = h ^ ((sa[4] << 16) | sa[5]) ;
 	        if (uvl > (4*3)) {
@@ -5811,16 +5761,13 @@ static uint fileidhash(const void *vp,int vl)
 	        }
 	    }
 	}
-
 	return h ;
 }
 /* end subroutine (fileidhash) */
 
-
-/* ARGSUSED */
-static int diridcmp(struct dirid *e1p,struct dirid *e2p,int len)
-{
+static int diridcmp(struct dirid *e1p,struct dirid *e2p,int len) noex {
 	int		rc ;
+	(void) len ;
 	if ((rc = (e1p->dev - e2p->dev)) == 0) { /* reverse sort! */
 	    int64_t	d ;
 	    if ((d = (e1p->ino - e2p->ino)) > 0) {
@@ -5833,11 +5780,9 @@ static int diridcmp(struct dirid *e1p,struct dirid *e2p,int len)
 }
 /* end subroutine (diridcmp) */
 
-
-/* ARGSUSED */
-static int fileidcmp(struct fileid *e1p,struct fileid *e2p,int len)
-{
+static int fileidcmp(struct fileid *e1p,struct fileid *e2p,int len) noex {
 	int		rc ;
+	(void) len ;
 	if ((rc = (e1p->dev - e2p->dev)) == 0) { /* reverse sort! */
 	    int64_t	d ;
 	    if ((d = (e1p->ino - e2p->ino)) > 0) {
@@ -5850,24 +5795,24 @@ static int fileidcmp(struct fileid *e1p,struct fileid *e2p,int len)
 }
 /* end subroutine (fileidcmp) */
 
-
 static int vcmprstr(cchar **e1pp,cchar **e2pp) noex {
-{
 	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
+	if (*e1pp || *e2pp) {
+	    if (*e1pp) {
+	        if (*e2pp) {
 	            rc = (- strcmp(*e1pp,*e2pp)) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else 
+		}
+	    } else  {
 	        rc = 1 ;
+	    }
 	}
 	return rc ;
 }
 /* end subroutine (vcmprstr) */
 
-static int isNotStat(int rs) {
+static bool isNotStat(int rs) noex {
 	return isOneOf(rsnostat,rs) ;
 }
 /* end subroutine (vcmprstr) */
@@ -5895,7 +5840,7 @@ static cchar *ftypes[] = {
 	"SOCK",
 	"LNK",
 	"OTHER",
-	NULL
+	nullptr
 } ;
 #endif /* COMMENT */
 static cchar *strfiletype(USTAT *sbp) {

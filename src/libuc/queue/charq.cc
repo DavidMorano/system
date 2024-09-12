@@ -39,15 +39,15 @@
 
 /* exported subroutines */
 
-int charq_start(charq *op,int size) noex {
+int charq_start(charq *op,int sz) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_INVALID ;
-	    if (size > 1) {
+	    if (sz > 1) {
 		void	*vp{} ;
-	        if ((rs = uc_libmalloc(size,&vp)) >= 0) {
-		    op->buf = (char *) vp ;
-	            op->size = size ;
+	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+		    op->buf = charp(vp) ;
+	            op->sz = sz ;
 	            op->count = 0 ;
 	            op->ri = 0 ;
 	            op->wi = 0 ;
@@ -68,7 +68,7 @@ int charq_finish(charq *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->buf = nullptr ;
 	    }
-	    op->size = 0 ;
+	    op->sz = 0 ;
 	    op->count = 0 ;
 	} /* end if (non-null) */
 	return rs ;
@@ -79,9 +79,9 @@ int charq_ins(charq *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OVERFLOW ;
-	    if (op->count < op->size) {
+	    if (op->count < op->sz) {
 	        op->buf[op->wi] = ch ;
-	        op->wi = ((op->wi + 1) % op->size) ;
+	        op->wi = ((op->wi + 1) % op->sz) ;
 	        op->count += 1 ;
 	        rs = op->count ;
 	    }
@@ -96,7 +96,7 @@ int charq_rem(charq *op,char *cp) noex {
 	    rs = SR_EMPTY ;
 	    if (op->count > 0) {
 	        if (cp) *cp = op->buf[op->ri] ;
-	        op->ri = ((op->ri + 1) % op->size) ;
+	        op->ri = ((op->ri + 1) % op->sz) ;
 	        op->count -= 1 ;
 	        rs = op->count ;
 	    }
@@ -120,7 +120,7 @@ int charq_remall(charq *op) noex {
 int charq_size(charq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = op->size ;
+	    rs = op->sz ;
 	}
 	return rs ;
 }

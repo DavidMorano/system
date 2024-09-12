@@ -17,6 +17,7 @@
 /*******************************************************************************
 
 	Name:
+	sfcontent
 	sfkeyval
 
 	Description:
@@ -25,7 +26,8 @@
 	specified in the call.
 
 	Synopsis:
-	int sfkeyval(cchar *spint sl,cchar *key,cchar **rpp) noex
+	int sfcontent(cchar *sp,int sl,cchar **rpp) noex
+	int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex
 
 	Arguments:
 	sp		base string pointer
@@ -84,11 +86,13 @@ int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	    if (int si ; (si = sichr(sp,sl,'#')) > 0) {
 		rl = sfshrink(sp,si,&rp) ;
 	    } else {
-		while (sl && iseol(sp[sl-1])) sl -= 1 ;
+		while (sl && iseol(sp[sl-1])) {
+		    sl -= 1 ;
+		}
 		rl = sfshrink(sp,sl,&rp) ;
 	    }
 	} /* end if (non-zero positive) */
-	*rpp = rp ;
+	if (rpp) *rpp = rp ;
 	return rl ;
 }
 /* end subroutine (sfcontent) */
@@ -107,7 +111,7 @@ int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 			vl = sfnext(xp,xl,&vp) ;
 		    } /* end if (strwcmp) */
 		} /* end if (sfnext) */
-	    } /* end if (sfcontext) */
+	    } /* end if (sfcontent) */
 	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (vl >= 0) ? vp : nullptr ;

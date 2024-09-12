@@ -32,9 +32,7 @@
 #include	<signal.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usystem.h>
 
 
 EXTERNC_begin
@@ -43,8 +41,6 @@ EXTERNC_begin
 #define	TYPEDEF_VOIDF
 typedef void (*void_f)() noex ;
 #endif
-
-extern int	u_sigmask(int,sigset_t *,sigset_t *) noex ;
 
 EXTERNC_end
 

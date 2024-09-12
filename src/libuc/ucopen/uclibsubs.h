@@ -179,6 +179,7 @@ extern int	uc_linger(int,int) noex ;
 
 extern int	uc_copy(int,int,int) noex ;
 
+extern int	uc_read(int,void *,int) noex ;
 extern int	uc_readn(int,void *,int) noex ;
 extern int	uc_readline(int,char *,int) noex ;
 extern int	uc_readlinetimed(int,char *,int,int) noex ;

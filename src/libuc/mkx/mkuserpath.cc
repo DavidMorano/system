@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-07-10, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -46,7 +46,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<clanguage.h>
 #include	<getbufsize.h>

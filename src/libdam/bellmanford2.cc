@@ -35,7 +35,7 @@
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -88,7 +88,7 @@ int bellmanford2(res_t *resp,edger_t *edges,int vertices,int vstart) {
 	resp[vstart].dist = 0 ;
 
 	for (int i = 0 ; i < (vertices-1) ; i += 1) {
-	    int		f_nochange = true ;
+	    bool	f_nochange = true ;
 	    for (int j = 0 ; j < vertices ; j += 1) { /* edges(u,v) */
 		cint	u = edges[j].src ;
 	        if (resp[u].dist != INT_MAX) {

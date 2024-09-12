@@ -61,122 +61,131 @@ constexpr bool		f_reltimedwait = F_RELTIMEDWAIT ;
 /* exported subroutines */
 
 int ptc_create(ptc *op,ptca *ap) noex {
-	pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_again = utimeout[uto_again] ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	bool		f_exit = false ;
-	repeat {
-	    if ((rs = pthread_cond_init(pop,ap)) > 0) {
-		rs = (- rs) ;
-	    }
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-		        msleep(1000) ;
-		    } else {
-	                f_exit = true ;
-		    }
-	            break ;
-	        case SR_AGAIN:
-	            if (to_again-- > 0) {
-		        msleep(1000) ;
-		    } else {
-	                f_exit = true ;
-		    }
-	            break ;
-		default:
-		    f_exit = true ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	if (op) {
+	    repeat {
+	        if ((rs = pthread_cond_init(op,ap)) > 0) {
+		    rs = (- rs) ;
+	        }
+	        if (rs < 0) {
+	            switch (rs) {
+	            case SR_NOMEM:
+	                if (to_nomem-- > 0) {
+		            msleep(1000) ;
+		        } else {
+	                    f_exit = true ;
+		        }
+	                break ;
+	            case SR_AGAIN:
+	                if (to_again-- > 0) {
+		            msleep(1000) ;
+		        } else {
+	                    f_exit = true ;
+		        }
+	                break ;
+		    default:
+		        f_exit = true ;
+		        break ;
+	            } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || f_exit) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_create) */
 
 int ptc_destroy(ptc *op) noex {
-	pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
-	int		rs ;
-	if ((rs = pthread_cond_destroy(pop)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_cond_destroy(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_destroy) */
 
 int ptc_broadcast(ptc *op) noex {
-	pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
-	int		rs ;
-	if ((rs = pthread_cond_broadcast(pop)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_cond_broadcast(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_broadcast) */
 
 int ptc_signal(ptc *op) noex {
-	pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
-	int		rs ;
-	if ((rs = pthread_cond_signal(pop)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_cond_signal(op)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_signal) */
 
 int ptc_wait(ptc *op,ptm *mp) noex {
-	pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
-	int		rs ;
-	if ((rs = pthread_cond_wait(pop,mp)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op && mp) {
+	    if ((rs = pthread_cond_wait(op,mp)) > 0) {
+	        rs = (- rs) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_wait) */
 
 int ptc_waiter(ptc *op,ptm *mp,int to) noex {
-	int		rs ;
-	if (to >= 0) {
-	    TIMESPEC		ts ;
-	    const clockid_t	cid = CLOCK_REALTIME ;
-	    clock_gettime(cid,&ts) ;
-	    ts.tv_sec += to ;
-	    rs = ptc_timedwait(op,mp,&ts) ;
-	} else {
-	    rs = ptc_wait(op,mp) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op && mp) {
+	    if (to >= 0) {
+	        TIMESPEC	ts ;
+	        const clockid_t	cid = CLOCK_REALTIME ;
+	        clock_gettime(cid,&ts) ;
+	        ts.tv_sec += to ;
+	        rs = ptc_timedwait(op,mp,&ts) ;
+	    } else {
+	        rs = ptc_wait(op,mp) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_waiter) */
 
 int ptc_timedwait(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
-	int		rs ;
-	if (tp) {
-	    pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
-	    if ((rs = pthread_cond_timedwait(pop,mp,tp)) > 0) {
-	        rs = (- rs) ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if (tp) {
+	        if ((rs = pthread_cond_timedwait(op,mp,tp)) > 0) {
+	            rs = (- rs) ;
+	        }
+	    } else {
+	        rs = ptc_wait(op,mp) ;
 	    }
-	} else {
-	    rs = ptc_wait(op,mp) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_timedwait) */
 
 int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_NOSYS ;
-	if (tp) {
-	    if_constexpr (f_reltimedwait) {
-		pthread_cond_t	*pop = static_cast<pthread_cond_t *>(op) ;
-	        if ((rs = pthread_cond_reltimedwait_np(pop,mp,tp)) > 0) {
-	            rs = (- rs) ;
+	if (op) {
+	    if (tp) {
+	        if_constexpr (f_reltimedwait) {
+	            if ((rs = pthread_cond_reltimedwait_np(op,mp,tp)) > 0) {
+	                rs = (- rs) ;
+	            }
 	        }
+	    } else {
+	        rs = ptc_wait(op,mp) ;
 	    }
-	} else {
-	    rs = ptc_wait(op,mp) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptc_reltimedwaitnp) */
@@ -215,17 +224,19 @@ int ptc_creater::operator () (ptca *ap) noex {
 
 int ptc_co::operator () (int) noex {
 	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case ptcmem_destroy:
-	    rs = ptc_destroy(op) ;
-	    break ;
-	case ptcmem_broadcast:
-	    rs = ptc_broadcast(op) ;
-	    break ;
-	case ptcmem_signal:
-	    rs = ptc_signal(op) ;
-	    break ;
-	} /* end switch */
+	if (op) {
+	    switch (w) {
+	    case ptcmem_destroy:
+	        rs = ptc_destroy(op) ;
+	        break ;
+	    case ptcmem_broadcast:
+	        rs = ptc_broadcast(op) ;
+	        break ;
+	    case ptcmem_signal:
+	        rs = ptc_signal(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (ptc_co::operator) */

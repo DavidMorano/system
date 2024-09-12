@@ -57,17 +57,22 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_DATABASE= 
-OBJ1_DATABASE= 
-OBJ2_DATABASE= 
-OBJ3_DATABASE= 
-OBJ4_DATABASE= 
+OBJ0= babiesfu.o babycalc.o babycalcs.o
+OBJ1= bpihdr.o bvihdr.o bvshdr.o
+OBJ2= cmi.o cmihdr.o 
+OBJ3= commandment.o commandments.o
+OBJ4= msfile.o msfile_best.o msfilee.o
+OBJ5= cyihdr.o pwi.o pwihdr.o
+OBJ6= uuname.o uunames.o
+OBJ7= var.o varhdr.o varmk.o varmks.o vars.o
+OBJ8= votdchdr.o votdshdr.o
 
 
-OBJA_DATABASE= obj0_database.o obj1_database.o
-OBJB_DATABASE= obj2_database.o obj3_database.o obj4_database.o
+OBJA= obj0.o obj1.o obj2.o obj3.o 
+OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJC= obj8.o
 
-OBJ_DATABASE= $(OBJA_DATABASE) $(OBJB_DATABASE)
+OBJ= $(OBJA) $(OBJB) $(OBJC)
 
 
 default:		$(T).o
@@ -90,10 +95,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DATABASE)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_DATABASE)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -114,26 +119,69 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_database.o:	$(OBJ0_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DATABASE)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1_database.o:	$(OBJ1_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DATABASE)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2_database.o:	$(OBJ2_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DATABASE)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3_database.o:	$(OBJ3_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_DATABASE)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
-obj4_database.o:	$(OBJ4_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_DATABASE)
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+
+obj6.o:			$(OBJ6)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
+
+obj7.o:			$(OBJ7)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
+
+obj8.o:			$(OBJ8)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8)
 
 
-obja.o:		$(OBJA_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_DATABASE)
+obja.o:		$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
 
-objb.o:		$(OBJB_DATABASE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_DATABASE)
+objb.o:		$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+objc.o:		$(OBJC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+
+babiesfu.o:		babiesfu.cc babiesfu.h		$(INCS)
+babycalc.o:		babycalc.cc babycalc.h		$(INCS)
+babycalcs.o:		babycalcs.cc babycalcs.h	$(INCS)
+bvcitekey.o:		bvcitekey.cc bvcitekey.h	$(INCS)
+bpihdr.o:		bpihdr.cc bpihdr.h		$(INCS)
+bvihdr.o:		bvihdr.cc bvihdr.h		$(INCS)
+bvshdr.o:		bvshdr.cc bvshdr.h		$(INCS)
+cmi.o:			cmi.cc cmi.h			$(INCS)
+cmihdr.o:		cmihdr.cc cmihdr.h		$(INCS)
+commandment.o:		commandment.cc commandment.h	$(INCS)
+commandments.o:		commandments.cc commandments.h	$(INCS)
+cyihdr.o:		cyihdr.cc cyihdr.h		$(INCS)
+msfile.o:		msfile.cc msfile.h		$(INCS)
+msfile_best.o:		msfile_best.cc msfile.h		$(INCS)
+msfilee.o:		msfilee.cc msfilee.h		$(INCS)
+pwi.o:			pwi.cc pwi.h			$(INCS)
+pwihdr.o:		pwihdr.cc pwihdr.h		$(INCS)
+uuname.o:		uuname.cc uuname.h		$(INCS)
+uunames.o:		uunames.cc uunames.h		$(INCS)
+var.o:			var.cc var.h			$(INCS)
+varhdr.o:		varhdr.cc varhdr.h		$(INCS)
+varmk.o:		varmk.cc varmk.h		$(INCS)
+varmks.o:		varmks.cc varmks.h		$(INCS)
+vars.o:			vars.cc vars.h			$(INCS)
+votdchdr.o:		votdchdr.cc votdchdr.h		$(INCS)
+votdshdr.o:		votdshdr.cc votdshdr.h		$(INCS)
 
 

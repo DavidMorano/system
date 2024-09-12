@@ -18,6 +18,7 @@
 #define	CHARQ_INCLUDE
 
 
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 
 
@@ -28,7 +29,7 @@ struct charq_head {
 	char		*buf ;
 	int		ri ;
 	int		wi ;
-	int		size ;
+	int		sz ;
 	int		count ;
 } ;
 

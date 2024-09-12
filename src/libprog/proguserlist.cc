@@ -51,8 +51,6 @@
 #define	USERFSUF	"users"
 #endif
 
-#define	USERLIST	struct userlist
-
 
 /* imported namespaces */
 
@@ -63,7 +61,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	proglog_printf(PROGINFO *,cchar *,...) noex ;
+    extern int	proglog_printf(proginfo *,cchar *,...) noex ;
 }
 
 
@@ -83,7 +81,7 @@ struct userlist {
 
 /* forward references */
 
-static int	proguserlist_worker(PROGINFO *) noex ;
+static int	proguserlist_worker(proginfo *) noex ;
 
 
 /* local variables */
@@ -97,9 +95,9 @@ static int	proguserlist_worker(PROGINFO *) noex ;
 
 /* exported subroutines */
 
-int proguserlist_begin(PROGINFO *pip) noex {
-	USERLIST	*ulp ;
-	cint		sz = sizeof(USERLIST) ;
+int proguserlist_begin(proginfo *pip) noex {
+	userlist	*ulp ;
+	cint		sz = sizeof(userlist) ;
 	int		rs ;
 	if ((rs = uc_malloc(sz,&ulp)) >= 0) {
 	    workthr	w = (workthr) proguserlist_worker ;
@@ -118,8 +116,8 @@ int proguserlist_begin(PROGINFO *pip) noex {
 }
 /* end subroutine (proguserlist_begin) */
 
-int proguserlist_end(PROGINFO *pip) noex {
-	USERLIST	*ulp = (USERLIST *) pip->userlist ;
+int proguserlist_end(proginfo *pip) noex {
+	userlist	*ulp = (userlist *) pip->userlist ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip->userlist != nullptr) {
@@ -151,7 +149,7 @@ int proguserlist_end(PROGINFO *pip) noex {
 
 /* local subroutines */
 
-static int proguserlist_worker(PROGINFO *pip) noex {
+static int proguserlist_worker(proginfo *pip) noex {
 	cint		blen = REALNAMELEN ;
 	int		rs ;
 	int		rs1 ;

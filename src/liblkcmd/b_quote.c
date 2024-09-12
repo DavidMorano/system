@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2004-06-02, David A­D­ Morano
-	This subroutine was originally written and is the QUOTE built-in
+	This code was originally written and is the QUOTE built-in
 	command for KSH.
 
 */

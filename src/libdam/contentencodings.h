@@ -1,6 +1,9 @@
 /* contentencodings HEADER */
 /* lang=C20 */
 
+/* content-encodings for mail message headers */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -19,16 +22,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
-
-
-#define	CF_NONE		0
-#define	CE_7BIT		1
-#define	CE_8BIT		2
-#define	CE_BINARY	3
-#define	CE_BASE64	4
-#define	CE_QUOTED	5
-#define	CE_OVERLAST	6
 
 
 enum contentencodings {
@@ -42,6 +35,15 @@ enum contentencodings {
 } ;
 
 extern cchar	*contentencodings[] ;
+
+
+#define	CF_NONE		contentencoding_none,
+#define	CE_7BIT		contentencoding_7bit
+#define	CE_8BIT		contentencoding_8bit
+#define	CE_BINARY	contentencoding_binary
+#define	CE_BASE64	contentencoding_base64
+#define	CE_QUOTED	contentencoding_quoted
+#define	CE_OVERLAST	contentencoding_overlast
 
 
 #endif /* CONTENTENCODINGS */

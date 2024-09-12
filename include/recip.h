@@ -21,11 +21,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<limits.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 #include	<vecitem.h>
-#include	<localmisc.h>
 
 
 #define	RECIP_MAGIC	0x73169284

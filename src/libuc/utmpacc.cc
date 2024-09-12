@@ -235,8 +235,6 @@ static int	utmpx_eterm(CUTMPX *) noex ;
 
 static int	utmpaccent_loada(ARG *,CUTMPX *) noex ;
 
-static bool	isNotTerm(int) noex ;
-
 
 /* local variables */
 
@@ -246,14 +244,6 @@ static bool	isNotTerm(int) noex ;
 [[maybe_unused]] constexpr int 		lhost = UTMPACCENT_LHOST ;
 
 static utmpacc		utmpacc_data ;
-
-constexpr int		rsnoterm[] = {
-	SR_BADF,
-	SR_BADFD,
-	SR_NOTTY,
-	SR_ACCESS,
-	0
-} ;
 
 
 /* exported variables */
@@ -1028,9 +1018,5 @@ static int utmpx_eterm(CUTMPX *) noex {
 }
 
 #endif /* defined(SYSHASUTMP_EXIT) && (SYSHASUTMP_EXIT > 0) */
-
-static bool isNotTerm(int rs) noex {
-	return isOneOf(rsnoterm,rs) ;
-}
 
 

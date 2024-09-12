@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-10-20, David A­D­ Morano
-	This subroutine was originally written so that dangerous
+	This code was originally written so that dangerous
 	daemon programs do not have to be run as 'root' in order
 	to bind to a priveledge port (for those transport providers
 	that have priveledged ports).  A good example of a dangerous

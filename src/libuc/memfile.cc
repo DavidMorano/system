@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-4-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -34,7 +34,7 @@
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstring>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<intsat.h>

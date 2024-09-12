@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 1999-12-03, David A­D­ Morano
 	This was updated to use |strlcpy(3c)| when it was rumored
@@ -108,7 +108,7 @@ char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	        cc	*sp = (cc *) va_arg(ap,char *) ;
+	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 	        if (i == (n-1)) {
 	            int	sl = (int) va_arg(ap,int) ;
 	            while ((dl > 0) && sl && (sp[0] != '\0')) {

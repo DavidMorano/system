@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -39,7 +39,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
 #include	<utmpaccent.h>		/* <- the money shot */
 
 

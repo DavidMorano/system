@@ -25,7 +25,7 @@
 	certain PCS programs.
 
 	Synopsis:
-	int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial)
+	int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex
 
 	Arguments:
 	pip		pointer to program information
@@ -40,9 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |gethostid(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -52,7 +50,7 @@
 #include	<mkpathx.h>
 #include	<localmisc.h>
 
-#include	"proginfo.h"
+#include	"progmsgid.h"
 
 
 /* local defines */
@@ -77,10 +75,12 @@ struct vars {
 
 /* forward references */
 
-static int	mkvars() ;
+static int	mkvars() noex ;
 
 
 /* local variables */
+
+static vars		var ;
 
 constexpr bool		f_hostid = CF_HOSTID ;
 
@@ -90,7 +90,7 @@ constexpr bool		f_hostid = CF_HOSTID ;
 
 /* exported subroutines */
 
-int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial) noex {
+int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (pip && mbuf) {
@@ -107,18 +107,18 @@ int progmsgid(PROGINFO *pip,char *mbuf,int mlen,int serial) noex {
 	                if_constexpr (f_hostid) {
 		            cint	nl = strlen(nn) ;
 	                    if (nl > var.usernamelen) {
-		                uv = (uint) gethostid() ;
+		                uv = pip->hwserial ;
 	                        ub.hex(uv) ;
 	                        ub.chr('-') ;
 	                    } else {
 	                        ub.strw(nn,nl) ;
 		            }
 	                } else {
-	                    ub.strw(nn,-1) ;
+	                    ub.str(nn) ;
 	                }
 		        {
 	                    uv = uint(pid) ;
-	                    ub.decui(uv) ;
+	                    ub.dec(uv) ;
     		        }
 	                ub.chr('.') ;
     	                {

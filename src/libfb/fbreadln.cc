@@ -10,7 +10,7 @@
 
 	= 1998-08-17, David A­D­ Morano
 
-	This subroutine was originally written.
+	This code was originally written.
 
 
 */
@@ -36,12 +36,10 @@
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>
-
-#include	<stdio.h>
-
+#include	<cstdio>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -53,15 +51,13 @@
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int fbreadln(fp,lbuf,llen)
-FILE	*fp ;
-char	lbuf[] ;
-int	llen ;
-{
-	int	i = 0 ;
+int fbreadln(FILE *fp,char *lbuf,int llen) noex {
+	int		i = 0 ;
 
 
 	if (fp == NULL)
@@ -108,6 +104,5 @@ int	llen ;
 	return i ;
 }
 /* end subroutine (fbreadln) */
-
 
 

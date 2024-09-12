@@ -72,6 +72,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int termconseqa(char *dp,int dl,int name,cchar *is,int na,...) noex {

@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -47,8 +47,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strncpy(3c)| + |memset(3c)| */
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

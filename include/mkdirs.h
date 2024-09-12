@@ -12,15 +12,17 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MKDIRS_INCLUDE
 #define	MKDIRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

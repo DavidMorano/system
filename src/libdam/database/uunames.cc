@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -26,7 +26,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -552,20 +552,20 @@ static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	op->indfname = nullptr ;
 	if ((rs = malloc_mp(&indfname)) >= 0) {
 	    cchar	*suf = INDSUF ;
-	    cchar	*end = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(indfname,indname,suf,end)) >= 0) {
+	    cchar	*ends = ENDIANSTR ;
+	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
 		cint	fl = rs ;
 	        cchar	*cp{} ;
 	        if ((rs = uc_mallocstrw(indfname,fl,&cp)) >= 0) {
 		    op->indfname = cp ;
 		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) {
-			    rs = uunames_indlist(op) ;
-			    rv = rs ;
+			rs = uunames_indlist(op) ;
+			rv = rs ;
 		    } /* end if */
 	            if (rs < 0) {
-	                 rs1 = uc_free(op->indfname) ;
-	                 if (rs >= 0) rs = rs1 ;
-	                 op->dbname = nullptr ;
+	                rs1 = uc_free(op->indfname) ;
+	                if (rs >= 0) rs = rs1 ;
+	                op->dbname = nullptr ;
 	            }
 		} /* end if (memory-allocation) */
 	    } /* end if (mkfnamesuf) */
@@ -596,9 +596,9 @@ static int uunames_indmapdestroy(UU *op) noex {
 
 static int uunames_filemapcreate(UU *op,time_t dt) noex {
 	cint		of = O_RDONLY ;
-	cmode		om = 0666 ;
 	int		rs ;
 	int		rs1 ;
+	cmode		om = 0666 ;
 	if (dt == 0) dt = time(nullptr) ;
 	if ((rs = uc_open(op->indfname,of,om)) >= 0) {
 	    USTAT	sb ;
@@ -698,19 +698,13 @@ static int uunames_indopentmp(UU *op,time_t dt) noex {
 
 static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	int		rs ;
-	int		f_ok = false ;
+	int		rs1 ;
+	char		*indname{} ;
+	if ((rs = malloc_mp(&indname)) >= 0) {
 	int		f_mk = false ;
-	char		indname[MAXPATHLEN + 1] ;
-
-	rs = mkpath2(indname,dname,op->dbname) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs = uunames_indtest(op,indname,dt) ;
-	f_ok = (rs > 0) ;
-
-	if (rs < 0)
-	    goto ret0 ;
+	if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
+	    if ((rs = uunames_indtest(op,indname,dt)) >= 0) {
+	        bool	f_ok = (rs > 0) ;
 
 	if (((rs < 0) && (rs != SR_NOMEM)) || (! f_ok)) {
 	    if ((rs = uunames_mkuunamesi(op,dname)) >= 0) {
@@ -737,7 +731,11 @@ static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	    }
 	}
 
-ret0:
+		} /* end if (indtest) */
+	    } /* end if (mkpath) */
+	    rs1 = uc_free(indname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_indopendname) */
@@ -749,8 +747,8 @@ static int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
 	char		*indfname{} ;
 	if ((rs = malloc_mp(&indfname)) >= 0) {
 	    cchar	*suf = INDSUF ;
-	    cchar	*end = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(indfname,indname,suf,end)) >= 0) {
+	    cchar	*ends = ENDIANSTR ;
+	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
 	         USTAT		sb ;
 	         time_t		ti_ind ;
 	         rs1 = u_stat(indfname,&sb) ;
@@ -894,11 +892,9 @@ static int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	vecstr_getvec(&envs,&ev) ;
 	ps.opts |= SPAWNPROC_OIGNINTR ;
 	ps.opts |= SPAWNPROC_OSETPGRP ;
-
 	for (i = 0 ; i < 3 ; i += 1) {
 	    ps.disp[i] = (i != 2) ? SPAWNPROC_DCLOSE : SPAWNPROC_DINHERIT ;
 	}
-
 	rs = spawnproc(&ps,progfname,av,ev) ;
 	cpid = rs ;
 
@@ -908,19 +904,15 @@ ret2:
 	    goto ret0 ;
 
 	cstat = 0 ;
-	rs = u_waitpid(cpid,&cstat,0) ;
-
-	if (rs >= 0) {
-
+	if ((rs = u_waitpid(cpid,&cstat,0)) >= 0) {
 	    cex = 0 ;
-	    if (WIFSIGNALED(cstat))
+	    if (WIFSIGNALED(cstat)) {
 	        rs = SR_UNATCH ;	/* protocol not attached */
-
+	    }
 	    if ((rs >= 0) && WIFEXITED(cstat)) {
 	        cex = WEXITSTATUS(cstat) ;
 	        if (cex != 0) rs = SR_LIBBAD ;
 	    }
-
 	} /* end if (process finished) */
 
 ret0:

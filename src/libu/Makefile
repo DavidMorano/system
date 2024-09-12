@@ -2,7 +2,7 @@
 
 T= libu
 
-ALL= $(T).o $(T).a $(T).so
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -97,7 +97,7 @@ OBJ= obja.o objb.o objc.o objd.o obje.o
 .SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -248,7 +248,6 @@ obje.o:			$(OBJE)
 timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
-endian.o:		endian.cc endian.h		$(INCS)
 intsat.o:		intsat.cc intsat.h
 mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
@@ -288,6 +287,11 @@ usysauxinfo.o:		usysauxinfo.dir
 usysauxinfo.dir:
 	makesubdir $@
 
+# USYNC
+ulock.o:		ulock.dir
+ulock.dir:
+	makesubdir $@
+
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 um.o:			um.cc um.h			$(INCS)
@@ -303,6 +307,7 @@ syswords.o:		syswords.cc syswords.hh
 varnames.o:		varnames.cc varnames.hh
 valuelims.o:		valuelims.cc valuelims.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
+endian.o::		endian.cc endian.h
 
 timeval.o:		timeval.cc timeval.h
 itimerval.o:		itimerval.cc itimerval.h

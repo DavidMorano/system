@@ -127,6 +127,8 @@ EXTERNC_begin
 
 extern int ipasswd_open(ipasswd *,cchar *) noex ;
 extern int ipasswd_getinfo(ipasswd *,ipasswd_info *) noex ;
+extern int ipasswd_count(ipasswd *) noex ;
+extern int ipasswd_countindex(ipasswd *) noex ;
 extern int ipasswd_curbegin(ipasswd *,ipasswd_cur *) noex ;
 extern int ipasswd_curend(ipasswd *,ipasswd_cur *) noex ;
 extern int ipasswd_curenum(ipasswd *,ipasswd_cur *,char *,cc **,

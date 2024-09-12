@@ -1,26 +1,40 @@
 /* config */
 
 
+/* revision history:
+
+	= 2000-05-14, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+
 #define	VERSION		"0"
-#define	WHATINFO	"@(#)opensvcnotices "
-#define	BANNER		"Open-Service Notices"
-#define	SEARCHNAME	"opensvcnotices"
+#define	WHATINFO	"@(#)opensvcmailmsgs "
+#define	BANNER		"Open-Service Mail Messages"
+#define	SEARCHNAME	"opensvcmailmsgs"
 #define	VARPRNAME	"PCS"
 
-#define	VARPROGRAMROOT1	"OPENSVCNOTICES_PROGRAMROOT"
+#ifndef	PROGRAMROOT
+#define	PROGRAMROOT	"/usr/add-on/pcs"
+#endif
+
+#define	VARPROGRAMROOT1	"OPENSVCMAILMSGS_PROGRAMROOT"
 #define	VARPROGRAMROOT2	VARPRNAME
 #define	VARPROGRAMROOT3	"PROGRAMROOT"
 
-#define	VARBANNER	"OPENSVCNOTICES_BANNER"
-#define	VARSEARCHNAME	"OPENSVCNOTICES_NAME"
-#define	VARFILEROOT	"OPENSVCNOTICES_FILEROOT"
-#define	VARLOGTAB	"OPENSVCNOTICES_LOGTAB"
-#define	VARMSFNAME	"OPENSVCNOTICES_MSFILE"
-#define	VARUTFNAME	"OPENSVCNOTICES_UTFILE"
-#define	VARERRORFNAME	"OPENSVCNOTICES_ERRORFILE"
+#define	VARBANNER	"OPENSVCMAILMSGS_BANNER"
+#define	VARSEARCHNAME	"OPENSVCMAILMSGS_NAME"
+#define	VARFILEROOT	"OPENSVCMAILMSGS_FILEROOT"
+#define	VARLOGTAB	"OPENSVCMAILMSGS_LOGTAB"
+#define	VARMSFNAME	"OPENSVCMAILMSGS_MSFILE"
+#define	VARUTFNAME	"OPENSVCMAILMSGS_UTFILE"
+#define	VARERRORFNAME	"OPENSVCMAILMSGS_ERRORFILE"
 
-#define	VARDEBUGFNAME	"OPENSVCNOTICES_DEBUGFILE"
-#define	VARDEBUGFD1	"OPENSVCNOTICES_DEBUGFD"
+#define	VARDEBUGFNAME	"OPENSVCMAILMSGS_DEBUGFILE"
+#define	VARDEBUGFD1	"OPENSVCMAILMSGS_DEBUGFD"
 #define	VARDEBUGFD2	"DEBUGFD"
 
 #define	VARNODE		"NODE"
@@ -40,10 +54,6 @@
 #define	VARPRLOCAL	"LOCAL"
 #define	VARPRPCS	"PCS"
 
-#ifndef	PROGRAMROOT
-#define	PROGRAMROOT	"/usr/add-on/pcs"
-#endif
-
 #define	TMPDNAME	"/tmp"
 #define	WORKDNAME	"/tmp"
 
@@ -56,9 +66,9 @@
 #define	PATHSFNAME	"paths"
 #define	HELPFNAME	"help"
 
-#define	PIDFNAME	"run/opensvcnotices"
-#define	LOGFNAME	"var/log/opensvcnotices"
-#define	LOCKFNAME	"spool/locks/opensvcnotices"
+#define	PIDFNAME	"run/opensvcmailmsgs"
+#define	LOGFNAME	"var/log/opensvcmailmsgs"
+#define	LOCKFNAME	"spool/locks/opensvcmailmsgs"
 #define	BBNEWSDNAME	"spool/boards"
 
 #define	LOGSIZE		(80*1024)
@@ -67,7 +77,6 @@
 #define	DEFRUNINT	60
 #define	DEFPOLLINT	8
 #define	DEFNODES	50
-#define	DEFPERIOD	(24*3600)
 
 #define	TO_CACHE	2
 

@@ -2,9 +2,7 @@
 /* lang=C++11 */
 
 /* Depth-First-Search (visit all nodes through un-weighted graph) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,25 +16,23 @@
 
 /*******************************************************************************
 
+	Name:
+	dfs2
+
+	Description:
         This is the (famous) Depth-First-Search algorithm to find the
         connectivity route through an un-weighted graph.
 
 	Features:
-
 	non-recursive (iterative)
 
-
 	Complexity:
-
 	O ( |v| + |e| )
 
-
 	Synopsis:
-
 	int dfs1(res_t *resp,edges_t &edges,int vertices)
 
 	Arguments:
-
 	resp		array of result structures:
 				dist	level or distance from starting node
 				prev	previous node (ancestor)
@@ -45,19 +41,15 @@
 	vstart		starting vertex
 
 	Returns:
-
 	-		result structs are filled in 
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cinttypes>
 #include	<new>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<functional>
 #include	<list>
 #include	<stack>
@@ -76,12 +68,13 @@
 using namespace	std ;
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
+
+/* external variables */
 
 
 /* local structures */
@@ -97,50 +90,42 @@ typedef list<edge_t>::iterator	edgeit_t ;
 int dfs2_visit(res_t *,edges_t &,int) ;
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int dfs2(res_t *resp,edges_t &edges,int vertices)
-{
+int dfs2(res_t *resp,edges_t &edges,int vertices) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	for (i = 0 ; i < vertices ; i += 1) {
+	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = -1 ; /* "level" */
 	    resp[i].prev = -1 ;
 	}
-
-	for (i = 0 ; i < vertices ; i += 1) {
+	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = 0 ; /* level */
 	    rs = dfs2_visit(resp,edges,i) ;
 	    if (rs < 0) break ;
 	}
-
 	return rs ;
 }
 /* end subroutine (dfs2) */
 
-
-int dfs2_one(res_t *resp,edges_t &edges,int vertices,int u)
-{
+int dfs2_one(res_t *resp,edges_t &edges,int vertices,int u) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	for (i = 0 ; i < vertices ; i += 1) {
+	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = -1 ; /* "level" */
 	    resp[i].prev = -1 ;
 	}
-
 	resp[u].dist = 0 ; /* level */
 	rs = dfs2_visit(resp,edges,u) ;
-
 	return rs ;
 }
 /* end subroutine (dfs2_one) */
 
-
-int dfs2_visit(res_t *resp,edges_t &edges,int u)
-{
+int dfs2_visit(res_t *resp,edges_t &edges,int u) noex {
 	stack<int>	vs ;
 	edgeit_t	elit ; /* edge-list-iterator */
 	edgeit_t	end ; /* edge-list-iterator */

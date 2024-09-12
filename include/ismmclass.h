@@ -27,17 +27,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
-
-EXTERNC_begin
-
-extern bool	 ismmclass_7bit(int) noex ;
-extern bool	 ismmclass_8bit(int) noex ;
-extern bool	 ismmclass_binary(int) noex ;
-
-EXTERNC_end
+#include	<ischarx.h>
 
 
 #endif /* ISMMCLASS_INCLUDE */

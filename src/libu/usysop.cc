@@ -14,6 +14,27 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	Names:
+	u_adjtime
+	u_stime
+	u_time
+
+	Description:
+	System functions.
+
+	Synopses:
+	int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
+	int u_stime(time_t *tp) noex ;
+	int u_time(time_t *rp) noex ;
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
+*******************************************************************************/
+
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/time.h>

@@ -19,15 +19,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int rmdirs(cchar *) noex ;
 extern int removes(cchar *) noex ;
 extern int rmdirfiles(cchar *,cchar *,int) noex ;
+
+static inline int rmdirs(cchar *dn) noex {
+	return removes(dn) ;
+}
 
 EXTERNC_end
 

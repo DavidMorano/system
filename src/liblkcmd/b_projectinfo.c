@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  It was inspired by many
+	This code was originally written.  It was inspired by many
 	programs that performs various subset functions of this program.  This
 	can be either a KSH builtin or a stand-alone program.
 
@@ -661,12 +661,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'l':
 	                        pip->final.list = TRUE ;
 	                        pip->have.list = TRUE ;
-	                        pip->f.list = TRUE ;
+	                        pip->pf.lister = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.list = (rs > 0) ;
+	                                pip->pf.lister = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -800,7 +800,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (ofname == NULL) ofname = getourenv(envv,VAROFNAME) ;
 
-	if (pip->f.all) pip->f.list = TRUE ;
+	if (pip->f.all) pip->pf.lister = TRUE ;
 
 	ai_continue = 1 ;
 	for (ai = ai_continue ; ai < argc ; ai += 1) {
@@ -986,7 +986,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if (pip->f.list) {
+	    if (pip->pf.lister) {
 	        if (pip->debuglevel > 0) {
 	    	    cchar	*ms = (pip->f.all) ? "all" : "list" ;
 	            shio_printf(pip->efp,"%s: mode=%s\n",pn,ms) ;

@@ -24,7 +24,7 @@
 	a socket address.
 
 	Synopsis:
-	int progpeername(PROGINFO *pip,clientinfo *cip,char *peername) noex
+	int progpeername(proginfo *pip,clientinfo *cip,char *peername) noex
 
 	Arguments:
 	pip		program information pointer
@@ -53,16 +53,20 @@
 #include	<sockaddress.h>
 #include	<connection.h>
 #include	<clientinfo.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
-#include	"defs.h"
-#include	"config.h"
+#include	"progpeername.h"
 
 
 /* local defines */
 
 #ifndef	LOCALHOST
 #define	LOCALHOST	"localhost"
+#endif
+
+#ifndef	VARNLSADDR
+#define	VARNLSADDR	"NLSADDR"
 #endif
 
 
@@ -77,7 +81,7 @@
 
 /* forward references */
 
-static int	procsocket(PROGINFO *,clientinfo *,char *,int) noex ;
+static int	procsocket(proginfo *,clientinfo *,char *,int) noex ;
 
 
 /* local variables */
@@ -88,7 +92,7 @@ static int	procsocket(PROGINFO *,clientinfo *,char *,int) noex ;
 
 /* exported subroutines */
 
-int progpeername(PROGINFO *pip,clientinfo *cip,char *dp,int dl) noex {
+int progpeername(proginfo *pip,clientinfo *cip,char *dp,int dl) noex {
 	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		rs1 = 0 ;
@@ -142,8 +146,8 @@ int progpeername(PROGINFO *pip,clientinfo *cip,char *dp,int dl) noex {
 
 /* local subroutines */
 
-static int procsocket(PROGINFO *pip,clientinfo *cip,char *dp,int dl) noex {
-	CONNECTION	conn, *cnp = &conn ;
+static int procsocket(proginfo *pip,clientinfo *cip,char *dp,int dl) noex {
+	connection	conn, *cnp = &conn ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;

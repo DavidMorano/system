@@ -1,33 +1,27 @@
-/* strfilter */
+/* strfilter HEADER */
+/* lang=C20 */
 
 
 /* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRFILTER_INCLUDE
-#define	STRFILTER_INCLUDE	1
+#define	STRFILTER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<limits.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 
 
 /* object defines */
 #define	STRFILTER		struct strfilter_head
 #define	STRFILTER_FL		struct strfilter_flags
 
-
 /* options */
 #define	STRFILTER_MCARRIAGE	0x0001
 
-
 /* constants */
-
 #ifdef	LINE_MAX
 #define	STRFILTER_BUFLEN	MAX(LINE_MAX,4096)
 #else
@@ -41,27 +35,22 @@ struct strfilter_flags {
 } ;
 
 struct strfilter_head {
-	vecstr		sslist ;	/* select */
-	vecstr		sxlist ;	/* exclude */
+	vecstr		*sslp ;	/* select list pointer */
+	vecstr		*sxlp ;	/* exclude list pointer */
 	STRFILTER_FL	f ;
 } ;
 
+typedef	STRFILTER	strfilter ;
+typedef	STRFILTER_FL	strfilter_fl ;
 
-#if	(! defined(STRFILTER_MASTER)) || (STRFILTER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int strfilter_start(strfilter *,cchar *,cchar *) noex ;
+extern int strfilter_check(strfilter *,cchar *,int) noex ;
+extern int strfilter_finish(strfilter *) noex ;
 
-extern int strfilter_start(STRFILTER *,const char *,const char *) ;
-extern int strfilter_check(STRFILTER *,const char *,int) ;
-extern int strfilter_finish(STRFILTER *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* STRFILTER_MASTER */
 
 #endif /* STRFILTER_INCLUDE */
 

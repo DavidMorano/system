@@ -1,1 +1,57 @@
-../todo.txt
+TODO
+
+= Current
+
+file		what
+--------------------------------------------------------------------------------
+uctim
+libuc		fix to completely compile!
+srventry
+procse
+lookword
+svcentry
+memfile		can we just trash this?
+libpcs		a lot of junk in there
+convertx	part of the |ctx| group
+msfilee
+msfile
+openqotd
+maintqotd
+fsdirtree	needs pointer implementation and a lot of cleanup
+utmpaccenum
+mailmsg		needs a lot of pointer implementation
+mailmsgstage
+calmgr		pointer implementation
+spawnproc	block structure; actually this is a huge mess
+spawner		pointer implementation
+lineindex	mess
+linehist	pointer-implementation, block-structure
+termnote	could use some break-down of large subs into smaller ones
+logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)
+pwi
+ipasswd
+keysymer
+veclong
+progsig
+statmsg
+motd
+var
+vars
+varmk
+varmks
+ts
+strlistx
+spellchecks	incredible mess!
+termtrans
+uunames
+
+= Future
+
+file		description
+--------------------------------------------------------------------------------
+progsig		total mess
+termtrans	not coded up properly
+sysvar
+sysvars
+uunames		block structure
+dialcprog	incredible mess (maybe not worth refactoring)

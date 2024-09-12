@@ -60,11 +60,11 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -78,6 +78,7 @@
 #include	<pcspoll.h>
 #include	<pcsns.h>
 #include	<prgetclustername.h>
+#include	<getlogx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -136,7 +137,6 @@ extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	getlogname(char *,int) ;
 extern int	mkuibang(char *,int,USERINFO *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	nisdomainname(char *,int) ;
@@ -1675,7 +1675,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
 	            }
 	            break ;
 	        case qopt_logname:
-	            if ((rs = getlogname(vbuf,vlen)) >= 0) {
+	            if ((rs = getlogname(vbuf,vlen,-1)) >= 0) {
 	                vp = vbuf ;
 			vl = rs ;
 	            } else if (isNotPresent(rs)) {

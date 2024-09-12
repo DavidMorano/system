@@ -11,7 +11,7 @@
 /* revision history:
 
 	= 1998-07-10, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 

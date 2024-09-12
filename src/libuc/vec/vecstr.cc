@@ -930,27 +930,29 @@ void vecstr::dtor() noex {
 }
 
 vecstr_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case vecstrmem_count:
-	    rs = vecstr_count(op) ;
-	    break ;
-	case vecstrmem_delall:
-	    rs = vecstr_delall(op) ;
-	    break ;
-	case vecstrmem_strsize:
-	    rs = vecstr_strsize(op) ;
-	    break ;
-	case vecstrmem_recsize:
-	    rs = vecstr_recsize(op) ;
-	    break ;
-	case vecstrmem_audit:
-	    rs = vecstr_audit(op) ;
-	    break ;
-	case vecstrmem_finish:
-	    rs = vecstr_finish(op) ;
-	    break ;
-	} /* end switch */
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vecstrmem_count:
+	        rs = vecstr_count(op) ;
+	        break ;
+	    case vecstrmem_delall:
+	        rs = vecstr_delall(op) ;
+	        break ;
+	    case vecstrmem_strsize:
+	        rs = vecstr_strsize(op) ;
+	        break ;
+	    case vecstrmem_recsize:
+	        rs = vecstr_recsize(op) ;
+	        break ;
+	    case vecstrmem_audit:
+	        rs = vecstr_audit(op) ;
+	        break ;
+	    case vecstrmem_finish:
+	        rs = vecstr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (vecstr_co::operator) */

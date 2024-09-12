@@ -42,7 +42,7 @@ I04= egs.h randmwc.o random.h
 I05= dater.h zdb.h zos.h tmz.h zoffparts.h
 I06= termstr.h
 I07= kinfo.h loadave.h fsdir.h fsdirtree.h
-I08= logfile.h lfm.h lastlogfile.h tmpx.h
+I08= logfile.h lfm.h tmpx.h
 I09= storeitem.h 
 I10= mallocstuff.h userinfo.h openport.h
 I11= char.h ansigr.h baops.h bwops.h
@@ -168,7 +168,7 @@ OBJ61= hasalllc.o hasalluc.o hasallalnum.o hasallalpha.o hasnonwhite.o
 OBJ62= hasalldig.o hasallbase.o hasprintbad.o hasallminus.o hasallplusminus.o
 OBJ63= hasdoublewhite.o hasallwhite.o hasfext.o hasallof.o
 
-OBJ64= optbool.o optvalue.o
+OBJ64= optval.o
 OBJ65= freadln.o hasMeAlone.o hasEOH.o
 OBJ66= fbreadline.o fbread.o fbwrite.o fbprint.o fbprintf.o
 OBJ67= nextpowtwo.o hashelf.o hashagain.o urotate.o
@@ -184,7 +184,7 @@ OBJ75= snfsflags.o snopenflags.o snpollflags.o snfilemode.o snshellunder.o
 OBJ76= snsigabbr.o snerrabbr.o snloadavg.o sninetaddr.o sntmtime.o snmkuuid.o
 OBJ77= sntid.o sncat1.o sncat2.o
 OBJ78= strdcpy.o strdcpyw.o strdcpycompact.o strdcpyopaque.o strdcpyclean.o
-OBJ79= strnwcpy.o strnncpy.o strnset.o strdfill.o
+OBJ79= strnwcpy.o strnncpy.o strnset.o
 
 OBJ80=  nathai.o
 OBJ81= 
@@ -216,8 +216,8 @@ OBJ103= dw.o fmq.o useraccdb.o csem.o
 OBJ104= sesmsg.o msgdata.o
 OBJ105= dater.o dater_getdate.o date.o cachetime.o
 OBJ106= field.o field_word.o field_wordphrase.o field_srvarg.o field_svcargs.o
-OBJ107= lfm.o lastlogfile.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
-OBJ108= logfile.o logfile_userinfo.o logfile_printfold.o
+OBJ107= lfm.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
+OBJ108= logfile.o
 OBJ109= vecstr_adds.o vecstr_foilcmp.o vecstr_svcargs.o vecstr_srvargs.o
 OBJ110= vecstr_avmkstr.o
 OBJ111= vecpstr_loadgrusers.o vecpstr_loadpjusers.o vecpstr_addsubdirs.o
@@ -655,12 +655,6 @@ keyvals.o:		keyvals.c keyvals.h
 
 paramopt.o:		paramopt.c paramopt.h
 
-logfile.o:		logfile.c logfile.h
-logfile_userinfo.o:	logfile_userinfo.c logfile.h userinfo.h
-logfile_printfold.o:	logfile_printfold.c logfile.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
 loadave.o:		loadave.c loadave.h
 
 egs.o:			egs.c egs.h
@@ -791,18 +785,14 @@ msgenv.o:		msgenv.c msgenv.h
 rijndael.o:		rijndael.c rijndael.h
 
 ema.o:			ema.c ema.h
-
 mimetypes.o:		mimetypes.c mimetypes.h
-
 randomvar.o:		randomvar.c randomvar.h
-
 fsdir.o:		fsdir.c fsdir.h
-
 fsdirtree.o:		fsdirtree.c fsdirtree.h
 
 density.o:		density.c density.h
-
 dialtab.o:		dialtab.c dialtab.h
+optval.o:		optval.cc optval.h
 
 clusterdb.o:		clusterdb.c clusterdb.h
 hostinfo.o:		hostinfo.cc hostinfo.h
@@ -821,8 +811,14 @@ strstore.o:		strstore.cc strstore.h
 userattr.o:		userattr.c userattr.h
 pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
+envlist.o:		envlist.cc envlist.h
 
 dir:
+	makesubdir $@
+
+# DATABASE
+database.o:		database.dir
+database.dir:
 	makesubdir $@
 
 # IPAASWD
@@ -830,138 +826,27 @@ ipasswd.o:		ipasswd.dir
 ipasswd.dir:
 	makesubdir $@
 
-
-# testing
-
-X01= testgrcache
-
-X01OBJ= $(X01).o grcache.o groupent.o cq.o
-
-$(X01).o:		$(X01).c grcache.h groupent.h cq.h
-
-$(X01).x:		$(X01OBJ)
-	$(CC) -o $@ $(X01OBJ) $(XLIBINFO)
-
-
-X02= testgetuserhome
-
-X02OBJ= $(X02).o getuserhome.o
-
-$(X02).o:		$(X02).c getxusername.h getax.h ugetpw.h
-
-$(X02).x:		$(X02OBJ)
-	$(CC) -o $@ $(X02OBJ) $(XLIBINFO)
-
-
-X03= testgetrunlevel
-
-X03OBJ= $(X03).o getrunlevel.o
-
-$(X03).o:		$(X03).c tmpx.h
-
-$(X03).x:		$(X03OBJ)
-	$(CC) -o $@ $(X03OBJ) $(XLIBINFO)
-
-
-X04= testcomparse
-
-X04OBJ= $(X04).o comparse.o
-
-$(X04).o:		$(X04).c comparse.h
-
-$(X04).x:		$(X04OBJ)
-	$(CC) -o $@ $(X04OBJ) $(XLIBINFO)
-
-
-X05= testmkuserpath
-
-X05OBJ= $(X05).o mkuserpath.o
-
-$(X05).o:		$(X05).c getxusername.h getax.h ugetpw.h
-
-$(X05).x:		$(X05OBJ)
-	$(CC) -o $@ $(X05OBJ) $(XLIBINFO)
-
-
-X06= testmkuuid
-
-X06OBJ= $(X06).o mkuuid.o snmkuuid.o debug.o
-
-$(X06).o:		$(X06).c mkuuid.h snmkuuid.h
-
-$(X06).x:		$(X06OBJ)
-	$(CC) -o $@ $(X06OBJ) $(XLIBINFO)
-
-
-X07= testhasallof
-
-X07OBJ= $(X07).o hasallof.o
-
-$(X07).o:		$(X07).c
-
-$(X07).x:		$(X07OBJ)
-	$(CC) -o $@ $(X07OBJ) $(XLIBINFO)
-
-
-X08= testnifinfo
-
-X08OBJ= $(X08).o nifinfo.o
-
-$(X08).o:	$(X08).c $(X08).h
-
-$(X08).x:	$(X08OBJ)
-	$(CC) -o $@ $(X08OBJ) $(XLIBINFO)
-
-
-X09= testjunker
-
-X09OBJ= $(X09).o 
-
-$(X09).o:	$(X09).c
-
-$(X09).x:	$(X09OBJ)
-	$(CC) -o $@ $(X09OBJ) $(XLIBINFO)
-
-
-X10= testishex
-
-X10OBJ= $(X10).o ishexlatin.o
-
-$(X10).o:	$(X10).c 
-
-$(X10).x:	$(X10OBJ)
-	$(CC) -o $@ $(X10OBJ) $(XLIBINFO)
-
-
-X11= testminmax
-
-X11OBJ= $(X11).o minmax.o
-
-$(X11).o:	$(X11).c 
-
-$(X11).x:	$(X11OBJ)
-	$(CC) -o $@ $(X11OBJ) $(XLIBINFO)
-
-
-X12= testigcd
-
-X12OBJ= $(X12).o igcd.o
-
-$(X12).o:	$(X12).c 
-	$(CC) -c -g -Wall $(XCFLAGS) $(CPPFLAGS) $(X12).c
-
-$(X12).x:	$(X12OBJ)
-	$(CC) -o $@ $(X12OBJ) $(XLIBINFO)
-
-
-X13= testpartitionai
-
-X13OBJ= $(X13).o partitionai.o arrswap.o
-
-$(X13).o:	$(X13).c 
-	$(CC) -c -g -Wall $(XCFLAGS) $(CPPFLAGS) $(X13).c
-
-$(X13).x:	$(X13OBJ)
-	$(CC) -o $@ $(X13OBJ) $(XLIBINFO)
+# LOGFILE
+logfile.o:		logfile.dir
+logfile.dir:
+	makesubdir $@
+
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
+
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
+
+printhelp.o:		printhelp.cc printhelp.hh
+
+fhm.o:			fhm.cc fhm.h
+intrem.o:		intrem.cc intrem.h
+addsat.o:		addsat.cc addsat.h
+removename.o:		removename.cc removename.h
+wdt.o:			wdt.cc wdt.h
 
 

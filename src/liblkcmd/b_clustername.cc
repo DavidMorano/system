@@ -11,7 +11,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  
+	This code was originally written.  
 
 */
 
@@ -532,7 +532,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* list all clusters for a mode */
 	                    case 'l':
-	                        pip->f.list = TRUE ;
+	                        pip->pf.lister = TRUE ;
 	                        break ;
 
 /* options */
@@ -963,7 +963,7 @@ static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 
 	if (rs >= 0) {
 
-	    if (pip->f.list) {
+	    if (pip->pf.lister) {
 	        VECSTR		clusters, *clp = &clusters ;
 
 	        if ((rs = vecstr_start(&clusters,10,0)) >= 0) {

@@ -1,6 +1,9 @@
 /* lastlogfile HEADER */
 /* lang=C++20 */
 
+/* manage reading or writing a LASTLOG file */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -14,19 +17,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utmpx.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
-
-
-#if		LOCAL_DARWIN
-#include	<utmp.h>
-#else
-#include	<lastlog.h>
-#endif
-
-#include	<localmisc.h>
 
 
 /* object defines */
@@ -73,7 +67,7 @@ extern int lastlogfile_check(lastlogfile *,time_t) noex ;
 extern int lastlogfile_close(lastlogfile *) noex ;
 extern int lastlogfile_curbegin(lastlogfile *,lastlogfile_cur *) noex ;
 extern int lastlogfile_curend(lastlogfile *,lastlogfile_cur *) noex ;
-extern int lastlogfile_enuminfo(lastlogfile *,lastlogfile_cur *,
+extern int lastlogfile_curenum(lastlogfile *,lastlogfile_cur *,
 		uid_t *,time_t *,char *,char *) noex ;
 
 EXTERNC_end

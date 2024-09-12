@@ -57,6 +57,17 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+extern "C" {
+    typedef int (*open_f)(void *,cchar *,cchar *) noex ;
+    typedef int (*count_f)(void *) noex ;
+    typedef int (*exists_f)(void *,cchar *,int) noex ;
+    typedef int (*curbegin_f)(void *,void *) noex ;
+    typedef int (*enumerate_f)(void *,void *,char *,int) noex ;
+    typedef int (*curend_f)(void *,void *) noex ;
+    typedef int (*audit_f)(void *) noex ;
+    typedef int (*close_f)(void *) noex ;
+}
+
 
 /* external subroutines */
 
@@ -385,33 +396,28 @@ static int uuname_loadcalls(uuname *op,cchar *objname) noex {
 	        c += 1 ;
 		switch (i) {
 		case sub_open:
-		    op->call.open = 
-			(int (*)(void *,cchar *,cchar *)) snp ;
+		    op->call.open = open_f(snp) ;
 		    break ;
 		case sub_count:
-		    op->call.count = (int (*)(void *)) snp ;
+		    op->call.count = count_f(snp) ;
 		    break ;
 		case sub_exists:
-		    op->call.exists = 
-			(int (*)(void *,cchar *,int)) snp ;
+		    op->call.exists = exists_f(snp) ;
 		    break ;
 		case sub_curbegin:
-		    op->call.curbegin = 
-			(int (*)(void *,void *)) snp ;
+		    op->call.curbegin = curbegin_f(snp) ;
 		    break ;
 		case sub_enum:
-		    op->call.enumerate = 
-			(int (*)(void *,void *,char *,int)) snp ;
+		    op->call.enumerate = enumerate_f(snp) ;
 		    break ;
 		case sub_curend:
-		    op->call.curend = 
-			(int (*)(void *,void *)) snp ;
+		    op->call.curend = curend_f(snp) ;
 		    break ;
 		case sub_audit:
-		    op->call.audit = (int (*)(void *)) snp ;
+		    op->call.audit = audit_f(snp) ;
 		    break ;
 		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
+		    op->call.close = close_f(snp) ;
 		    break ;
 		} /* end switch */
 	    } /* end if (it had the call) */

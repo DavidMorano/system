@@ -12,7 +12,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -59,7 +59,7 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>

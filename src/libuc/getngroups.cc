@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2023-12-11,
 	I switched to using C++11 |atomic|.

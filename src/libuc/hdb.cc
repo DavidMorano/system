@@ -123,7 +123,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<lookaside.h>
 #include	<strn.h>
@@ -162,6 +162,10 @@ using std::nothrow ;			/* constant */
 
 typedef uint		hdbhv ;		/* HDB hash-value */
 
+extern "C" {
+    typedef uint (*fc_f)(cvoid *,int) noex ;
+}
+
 
 /* external subroutines */
 
@@ -170,6 +174,9 @@ extern "C" {
     int		hdb_fetchrec(hdb *,DAT,CUR *,DAT *,DAT *) noex ;
     int		hdb_enum(hdb *,CUR *,DAT *,DAT *) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */
@@ -189,8 +196,6 @@ struct hdb_ve {
 } ;
 
 #endif /* COMMENT */
-
-typedef uint (*fc_f)(cvoid *,int) noex ;
 
 struct fetchcur {
 	fc_f		hfp ;

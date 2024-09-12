@@ -43,6 +43,7 @@ struct pcsns_cursor {
 	uint	magic ;
 } ;
 
+EXTERNC_begin
 struct pcsns_callsubs {
 	int	(*open)(void *,cchar *) noex ;
 	int	(*setopts)(void *,int) noex ;
@@ -53,6 +54,7 @@ struct pcsns_callsubs {
 	int	(*audit)(void *) noex ;
 	int	(*close)(void *) noex ;
 } ;
+EXTERNC_end
 
 struct pcsns_head {
 	modload		loader ;
@@ -69,14 +71,14 @@ typedef	PCSNS_CALLS	pcsns_calls ;
 
 EXTERNC_begin
 
-extern int pcsns_open(PCSNS *,cchar *) noex ;
-extern int pcsns_setopts(PCSNS *,int) noex ;
-extern int pcsns_get(PCSNS *,char *,int,cchar *,int) noex ;
-extern int pcsns_curbegin(PCSNS *,PCSNS_CUR *) noex ;
-extern int pcsns_enum(PCSNS *,PCSNS_CUR *,char *,int,int) noex ;
-extern int pcsns_curend(PCSNS *,PCSNS_CUR *) noex ;
-extern int pcsns_audit(PCSNS *) noex ;
-extern int pcsns_close(PCSNS *) noex ;
+extern int pcsns_open(pcsns *,cchar *) noex ;
+extern int pcsns_setopts(pcsns *,int) noex ;
+extern int pcsns_get(pcsns *,char *,int,cchar *,int) noex ;
+extern int pcsns_curbegin(pcsns *,pcsns_cur *) noex ;
+extern int pcsns_enum(pcsns *,pcsns_cur *,char *,int,int) noex ;
+extern int pcsns_curend(pcsns *,pcsns_cur *) noex ;
+extern int pcsns_audit(pcsns *) noex ;
+extern int pcsns_close(pcsns *) noex ;
 
 EXTERNC_end
 

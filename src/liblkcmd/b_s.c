@@ -79,6 +79,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
+#include	<ucmallreg.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -87,7 +88,7 @@
 #include	<sbuf.h>
 #include	<termstr.h>
 #include	<getusername.h>
-#include	<ucmallreg.h>
+#include	<strw.h>		/* |strwset(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -203,7 +204,6 @@ extern int	strlinelen(cchar *,int,int) ;
 extern cchar	*getourenv(cchar **,cchar *) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwset(char *,int,int) ;
 extern char	*timestr_std(time_t,char *) ;
 extern char	*timestr_log(time_t,char *) ;
 

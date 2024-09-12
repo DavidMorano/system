@@ -20,11 +20,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>		/* |va_list| */
-#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
+#include	<userinfo.h>
 
 
 /* object defines */
@@ -75,6 +75,8 @@ extern int logfile_check(logfile *,time_t) noex ;
 extern int logfile_flush(logfile *) noex ;
 extern int logfile_chmod(logfile *,mode_t) noex ;
 extern int logfile_control(logfile *,int,void *) noex ;
+extern int logfile_printfold(logfile *,cchar *,cchar *,int) noex ;
+extern int logfile_userinfo(logfile *,userinfo *,time_t,cc *,cc *) noex ;
 extern int logfile_close(logfile *) noex ;
 
 EXTERNC_end

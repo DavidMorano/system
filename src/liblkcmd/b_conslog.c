@@ -1,18 +1,14 @@
-/* b_conslog */
+/* b_conslog SUPPORT */
+/* lang=C++20 */
 
 /* utility to log message to the system logger facility */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGMALL	1		/* debug memory allocation */
-
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  
+	This code was originally written.  
 
 */
 
@@ -20,17 +16,16 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
 
 	$ conslog <conslog> [-c[=<b>]] [-n <name>[:<version>]] 
 		[-s <logsize>] [-if <infile>] [-V]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -65,6 +60,7 @@
 #include	<expcook.h>
 #include	<linefold.h>
 #include	<strn.h>
+#include	<getsyslogx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -124,8 +120,6 @@ extern int	cfdecmfi(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	getlogfac(cchar *,int) ;
-extern int	getlogpri(cchar *,int) ;
 extern int	hasalluc(cchar *,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;
@@ -1096,7 +1090,7 @@ static int proclog(PROGINFO *pip,cchar *ifname)
 	fac = lip->fac ;
 
 	if ((fac != NULL) && (fac[0] != '\0')) {
-	    rs = getlogfac(fac,-1) ;
+	    rs = getsyslogfac(fac,-1) ;
 	    logfac = rs ;
 	} else {
 	    logfac = LOG_USER ;
@@ -1285,7 +1279,7 @@ static int procline(PROGINFO *pip,CONSLOG *lsp,cchar obuf[],int olen)
 	    const int	cl = (tp-(op+1)) ;
 	    ol -= ((op+ol)-(tp+1)) ;
 	    op = (tp+1) ;
-	    rs = getlogpri(cp,cl) ;
+	    rs = getsyslogpri(cp,cl) ;
 	    logpri = rs ;
 	} else {
 	    logpri = lip->logpri ;
@@ -1573,7 +1567,7 @@ static int locinfo_logvals(LOCINFO *lip)
 	cchar		*pri = lip->pri ;
 
 	if ((pri != NULL) && (pri[0] != '\0')) {
-	    rs = getlogpri(pri,-1) ;
+	    rs = getsyslogpri(pri,-1) ;
 	    lip->logpri = rs ;
 	} else {
 	    lip->logpri = LOG_INFO ;

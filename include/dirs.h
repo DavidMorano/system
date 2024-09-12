@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIRS_INCLUDE
 #define	DIRS_INCLUDE
@@ -24,13 +24,7 @@
 
 #include	<mkdirs.h>
 #include	<rmdirs.h>
-
-
-EXTERNC_begin
-
-extern int dirempty(cchar *) noex ;
-
-EXTERNC_end
+#include	<dirempty.h>
 
 
 #endif /* DIRS_INCLUDE */

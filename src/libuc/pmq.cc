@@ -19,13 +19,15 @@
 
 /*******************************************************************************
 
+	Name:
+	pmq
+
+	Description:
 	This module provides a sanitized version of the standard
 	POSIX® Message-Queue facility provided with some newer
 	UNIX®i.  Some operating system problems are managed within
 	these routines for the common stuff that happens when a
-	poorly configured OS gets overloaded!
-
-	Enjoy!
+	poorly configured OS gets overloaded!  Enjoy!
 
 *******************************************************************************/
 
@@ -40,6 +42,7 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<getbufsize.h>
+#include        <errtimer.hh>
 #include	<getax.h>
 #include	<libmallocxx.h>
 #include	<mkpathx.h>
@@ -90,6 +93,9 @@ extern "C" {
     extern int	getgid_group(cchar *,int) noex ;
     extern int	isNotValid(int) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */
@@ -370,23 +376,23 @@ int uc_unlinkpmq(cchar *name) noex {
 /* local subroutines */
 
 static int pmq_nameload(pmq *op,cchar *name) noex {
-	int		nl = strlen(name) ;
+	int		cl = strlen(name) ;
 	int		rs = SR_OK ;
 	cchar		*prefix = "" ;
 	if (name[0] != '/') {
 	    prefix = "/" ;
-	    nl += 1 ;
-	} else if (nl == 1) {
+	    cl += 1 ;
+	} else if (cl == 1) {
 	    rs = SR_INVALID ;
 	} /* end if (needed rooted name) */
 	if (rs >= 0) {
-	    char	*np{} ;
-	    if ((rs = uc_libmalloc((nl+1),&np)) >= 0) {
-	        if ((rs = sncpy(np,nl,prefix,name)) >= 0) {
-		    op->name = np ;
+	    char	*cp{} ;
+	    if ((rs = uc_libmalloc((cl + 1),&cp)) >= 0) {
+	        if ((rs = sncpy(cp,cl,prefix,name)) >= 0) {
+		    op->name = cp ;
 	        }
 	        if (rs < 0) {
-		    uc_libfree(np) ;
+		    uc_libfree(cp) ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (ok) */
@@ -405,51 +411,35 @@ static int pmq_nameclean(pmq *op) noex {
 /* end subroutine (pmq_nameclean) */
 
 int posixhelp::operator () (pmq *op) noex {
-	int		to_mfile = utimeout[uto_mfile] ;
-	int		to_nfile = utimeout[uto_nfile] ;
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		to_nospc = utimeout[uto_nospc] ;
+	errtimer	to_mfile = utimeout[uto_mfile] ;
+	errtimer	to_nfile = utimeout[uto_nfile] ;
+	errtimer	to_nomem = utimeout[uto_nomem] ;
+	errtimer	to_nospc = utimeout[uto_nospc] ;
+        reterr          r ;
 	int		rs ;
-	bool		f_exit = false ;
 	repeat {
 	    if ((rs = (this->*m)(op)) < 0) {
+                r(rs) ;                 /* <- default causes exit */
 	        switch (rs) {
 	        case SR_MFILE:
-	            if (to_mfile-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
+                    r = to_mfile(rs) ;
 		    break ;
 	        case SR_NFILE:
-	            if (to_nfile-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
+                    r = to_nfile(rs) ;
 		    break ;
 		case SR_NOMEM:
-		    if (to_nomem -- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
+                    r = to_nomem(rs) ;
 		    break ;
 	        case SR_NOSPC:
-	            if (to_nospc-- > 0) {
-	                msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
+                    r = to_nospc(rs) ;
 		    break ;
 	        case SR_INTR:
+		    r(false) ;
 	            break ;
-		default:
-		    f_exit = true ;
-		    break ;
 	        } /* end switch */
+		rs = r ;
 	    } /* end if (ok) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end method (posixhelp::operator) */

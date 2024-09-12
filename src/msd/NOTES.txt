@@ -1,6 +1,5 @@
 MSD
 
-
 Connections that are passed on the pass-pipe can be preceeded with some
 data that provides additional information about the subsequently passed
 connection.  This data is passed by passing the name of a file that
@@ -21,6 +20,4 @@ ident		identification of originating user (if known)
 The UID owner of the file must match the subsequent UID of the passed
 file descriptor in order for the association between the two to be
 made.
-
-
 

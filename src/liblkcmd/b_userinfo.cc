@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  It was inspired
+	This code was originally written.  It was inspired
 	by many programs that performs various subset functions of
 	this program.  This can be either a KSH builtin or a
 	stand-alone program.
@@ -167,15 +167,13 @@ extern int	udomain(cchar *,char *,int,cchar *) ;
 extern int	getinetdomain(char *,int,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	getlogname(char *,int) ;
-extern int	getloghost(char *,int,pid_t) ;
 extern int	gethomeorg(char *,int,cchar *) ;
 extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	localgetorgcode(cchar *,char *,int,cchar *) ;
 extern int	localgetorgloc(cchar *,char *,int,cchar *) ;
 extern int	lastlogin(char *,uid_t,time_t *,char *,char *) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	statvfsdir(cchar *,struct statvfs *) ;
+extern int	statvfsdir(cchar *,STATVFS *) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	mkrealname(char *,int,cchar *,int) ;
 extern int	mkmailname(char *,int,cchar *,int) ;

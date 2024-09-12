@@ -47,8 +47,9 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>

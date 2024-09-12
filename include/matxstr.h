@@ -22,9 +22,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
 
-#include	<matstr.h>
 #include	<matostr.h>
 #include	<matpstr.h>
 #include	<matkeystr.h>

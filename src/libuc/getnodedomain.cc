@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -73,7 +73,7 @@
 #include	<climits>		/* for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* for |getenv(3c)| */
-#include	<algorithm>		/* for |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<varnames.hh>

@@ -28,7 +28,7 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<sncpyx.h>

@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-08-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 	= 2013-11-24, David A­D­ Morano
 	I changed this (after all of these years) to use |sntmtime(3dam)|
