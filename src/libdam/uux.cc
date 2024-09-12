@@ -4,7 +4,6 @@
 /* SYSDIALER "uux" dialer */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SOCKET	0		/* use socket or pipe */
 
 /* revision history:
@@ -223,11 +222,6 @@ cchar	*av[] ;
 
 	if ((rs = subinfo_start(sip,op,ap,hostname,svcname,av)) >= 0) {
 
-#if	CF_DEBUGS
-	debugprintf("uux_open: hostname=%s svcname=%s\n",
-	    hostname,svcname) ;
-#endif
-
 	if (ap != nullptr)
 	    rs = subinfo_procargs(sip) ;
 
@@ -246,21 +240,9 @@ cchar	*av[] ;
 		cchar	*un = sip->username ;
 		cchar	*grade = sip->grade ;
 
-#if	CF_DEBUGS
-	    debugprintf("uux_open: pr=%s\n",sip->pr) ;
-	    debugprintf("uux_open: hostname=%s\n",hostname) ;
-	    debugprintf("uux_open: node=%s\n",sip->node) ;
-	    debugprintf("uux_open: svc=%s\n",sip->svcname) ;
-	    debugprintf("uux_open: username=%s\n",sip->username) ;
-	    debugprintf("uux_open: grade=%s\n",sip->grade) ;
-#endif
-
 	    rs = dialuux(pr,nn,svc,dav,un,grade,opts) ;
 	    op->fd = rs ;
 
-#if	CF_DEBUGS
-	    debugprintf("uux_open: dialuux() rs=%d\n",rs) ;
-#endif
 	if (rs >= 0)
 	    op->magic = UUX_MAGIC ;
 
@@ -275,10 +257,6 @@ cchar	*av[] ;
 
 	subinfo_finish(sip) ;
 	} /* end if (subinfo) */
-
-#if	CF_DEBUGS
-	debugprintf("uux_open: ret rs=%d fd=%d\n",rs,op->fd) ;
-#endif
 
 	return (rs >= 0) ? op->fd : rs ;
 }
@@ -636,23 +614,9 @@ struct subinfo	*sip ;
 
 
 	ap = sip->ap ;
-
-#if	CF_DEBUGS
-	debugprintf("uux_open: arguments\n") ;
-#endif
-
 	argv = (char **) ap->argv ;
 
 	for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
-
-#if	CF_DEBUGS
-	{
-	    debugprintf("uux_open: argr=%u\n",argr) ;
-	    for (ai = 0 ; argv[ai] != nullptr ; ai += 1)
-	        debugprintf("uux_open: argv[%u]=%s\n",ai,argv[ai]) ;
-	    debugprintf("uux_open: ai=%u\n",ai) ;
-	}
-#endif
 
 	rs = keyopt_start(&akopts) ;
 	if (rs < 0)
@@ -668,11 +632,6 @@ struct subinfo	*sip ;
 	ai_pos = 0 ;
 	argr = argc - 1 ;
 	while ((rs >= 0) && (argr > 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("uux_open: AL argr=%u\n",argr) ;
-	    debugprintf("uux_open: AL argv[%u]=%s\n",ai,argv[ai]) ;
-#endif
 
 	    argp = argv[++ai] ;
 	    argr -= 1 ;

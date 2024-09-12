@@ -1,5 +1,5 @@
 /* uux HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* SYSDIALER "uux" module */
 /* version %I% last-modified %G% */
@@ -8,9 +8,7 @@
 /* revision history:
 
 	- 1996-02-01, David A­D­ Morano
-
 	This code was originally written.
-
 
 */
 
