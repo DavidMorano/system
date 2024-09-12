@@ -1,9 +1,8 @@
-/* sesnotes */
+/* sesnotes SUPPORT */
+/* lang=C++20 */
 
 /* send notes to sessions */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -51,29 +50,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	mkpath1(char *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	opentmpusd(cchar *,int,mode_t,char *) ;
-extern int	isproc(pid_t) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-
-#if	CF_DEBUGS
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* local structures */
 
@@ -96,10 +72,6 @@ static int haveproc(cchar *,int) ;
 int sesnotes_open(SESNOTES *op,cchar *un)
 {
 	cint	ulen = USERNAMELEN ;
-
-#if	CF_DEBUGS
-	debugprintf("sesnotes_open: ent un=%s\n",un) ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (un == NULL) return SR_FAULT ;
@@ -136,9 +108,6 @@ int sesnotes_close(SESNOTES *op)
 	    if (rs >= 0) rs = rs1 ;
 	    op->sfname = NULL ;
 	}
-#if	CF_DEBUGS
-	debugprintf("sesnotes_close: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (sesnotes_close) */
@@ -170,9 +139,6 @@ int sesnotes_send(SESNOTES *op,int mt,cchar *mp,int ml,pid_t sid)
 	int		c = 0 ;
 	cchar	*sesdname = SESNOTES_SESDNAME ;
 	char		cbuf[MAXNAMELEN+1] ;
-#if	CF_DEBUGS
-	debugprintf("sesnotes_send: ent mt=%u sid=%u\n",mt,sid) ;
-#endif
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != SESNOTES_MAGIC) return SR_NOTOPEN ;
 	if ((rs = snsd(cbuf,clen,"s",uv)) >= 0) {
@@ -183,9 +149,6 @@ int sesnotes_send(SESNOTES *op,int mt,cchar *mp,int ml,pid_t sid)
 	        c += rs ;
 	    } /* end if (mkpath) */
 	} /* end if (snsd) */
-#if	CF_DEBUGS
-	debugprintf("sesnotes_send: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (sesnotes_send) */
@@ -221,15 +184,9 @@ static int sesnotes_ready(SESNOTES *op)
 	                    uc_unlink(sbuf) ;
 	                }
 	            } /* end if (opentmpusd) */
-#if	CF_DEBUGS
-	            debugprintf("sesnotes_open: opentmpusd-out rs=%d\n",rs) ;
-#endif
 	        } /* end if (mkpath) */
 	    } /* end if (mktmpuserdir) */
 	} /* end if (initializaion needed) */
-#if	CF_DEBUGS
-	debugprintf("sesnotes_ready: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (sesnotes_ready) */
@@ -294,11 +251,6 @@ int		sl ;
 	int		rs ;
 	int		rs1 ;
 	int		f = FALSE ;
-#if	CF_DEBUGS
-	debugprintf("sesnotes_sender: ent mt=%u\n",mt) ;
-	debugprintf("sesnotes_sender: al=%d a=>%t<\n",al,ap,al) ;
-	debugprintf("sesnotes_sender: msg=>%t<\n",sp,strlinelen(sp,sl,40)) ;
-#endif
 	if ((rs = sesnotes_ready(op)) >= 0) {
 	    SOCKADDRESS	sa ;
 	    uint	tag = op->pid ;
@@ -308,16 +260,6 @@ int		sl ;
 	        cint	mlen = MSGBUFLEN ;
 	        int		ml = -1 ;
 	        char		mbuf[MSGBUFLEN+1] ;
-#if	CF_DEBUGS
-	        {
-	            cint	cols = 80 ;
-		    char	tbuf[TIMEBUFLEN+1] ;
-	            debugprintf("sesnotes_sender: sal=%u\n",sal) ;
-	            debugprinthexblock("sesnotes_sender: sa=",cols,&sa,sal) ;
-		    timestr_logz(st,tbuf) ;
-	            debugprintf("sesnotes_sender: t=%s\n",tbuf) ;
-	        }
-#endif
 	        switch (mt) {
 	        case sesmsgtype_gen:
 	            {
@@ -353,16 +295,8 @@ int		sl ;
 	            SOCKADDR	*sap = (SOCKADDR *) &sa ;
 	            cint	s = op->fd ;
 	            if ((rs = u_sendto(s,mbuf,ml,0,sap,sal)) >= 0) {
-#if	CF_DEBUGS
-	                debugprintf("sesnotes_sender: u_sendto() PASS rs=%d\n",
-	                    rs) ;
-#endif
 	                f = TRUE ;
 	            } else {
-#if	CF_DEBUGS
-	                debugprintf("sesnotes_sender: u_sendto() FAIL rs=%d\n",
-	                    rs) ;
-#endif
 			if (rs == SR_DESTADDRREQ) {
 			    NULSTR	n ;
 			    cchar	*name ;
@@ -381,9 +315,6 @@ int		sl ;
 	        sockaddress_finish(&sa) ;
 	    } /* end if (sockaddress) */
 	} /* end if (sesnotes_ready) */
-#if	CF_DEBUGS
-	debugprintf("sesnotes_sender: ret rs=%d f=%u\n",rs,f) ;
-#endif
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (sesnotes_sender) */

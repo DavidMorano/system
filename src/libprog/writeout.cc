@@ -1,9 +1,8 @@
-/* progdebugout */
+/* progdebugout SUPPORT */
+/* lang=C++20 */
 
 /* write out the output files from the executed program */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,14 +14,11 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<linefold.h>
 #include	<bfile.h>
@@ -45,12 +41,13 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
+
+/* external variables */
 
 
 /* forward references */
 
-static int	procline(PROGINFO *,int,const char *,int) ;
+static int	procline(PROGINFO *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -58,8 +55,10 @@ static int	procline(PROGINFO *,int,const char *,int) ;
 static cchar	blanks[] = "        " ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progdebugout(PROGINFO *pip,cchar *s,cchar *fname)
 {
