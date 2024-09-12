@@ -2,7 +2,7 @@
 
 T= libdam
 
-ALL= $(T).so $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -36,7 +36,7 @@ DEFS +=
 
 I00= vsystem.h exitcodes.h localmisc.h
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
-I02= hdb.h lookaside.h pq.h plainq.h
+I02=
 I03= field.h 
 I04= egs.h randmwc.o random.h
 I05= dater.h zdb.h zos.h tmz.h zoffparts.h
@@ -191,7 +191,7 @@ OBJ81=
 OBJ82= density.o densitystati.o densitystatll.o denpercents.o
 OBJ83= tmstrs.o shellunder.o udomain.o
 OBJ84= mktmpuserdir.o mkcaselower.o mkfmtphone.o
-OBJ85= mklogid.o mkplogid.o mksublogid.o mkquoted.o mkutmpid.o mkmagic.o 
+OBJ85=
 OBJ86= mktmpfile.o mktmplock.o mkjobfile.o mkdatefile.o mkuuid.o mkchar.o
 OBJ87= nchr.o mnwcpy.o
 
@@ -246,7 +246,7 @@ OBJ130= sbuf_termconseq.o sbuf_blanks.o
 OBJ131= paramopt.o paramopt_loadone.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
 OBJ133= bufstr.o stackaddr.o outstore.o
-OBJ134= hdbstr.o mapstrint.o keyopt.o keyvals.o
+OBJ134= mapstrint.o keyopt.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
 OBJ136= isSpecialObject.o isDotDir.o isValidMagic.o isStrEmpty.o
@@ -291,7 +291,7 @@ OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
 OBJ172= getnodename.o getclustername.o getnodeinfo.o getdomainname.o getseed.o
 OBJ173= getnprocessors.o getarchitecture.o getnfile.o getpwd.o getrunlevel.o
-OBJ174= getlogname.o getloghost.o getutmpterm.o getsocktype.o
+OBJ174= getsocktype.o
 OBJ175= getpwentry.o getpwlogname.o getgroupname.o getarchitecture.o
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
@@ -363,7 +363,7 @@ OBJFILE= $(OBJFILE0) $(OBJFILE1) $(OBJFILE2)
 .SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -390,8 +390,11 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 
-$(T).so:		$(OBJ) Makefile $(T).a
-	$(LD) -G -o $@ $(SLDFLAGS) $(OBJ) $(SLIBINFO)
+$(T).o:			$(OBJ) Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+
+$(T).so:		$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -647,10 +650,6 @@ veclong.o:		veclong.c veclong.h
 
 vecelem.o:		vecelem.c vecelem.h
 
-hdb.o:			hdb.c hdb.h
-
-hdbstr.o:		hdbstr.c hdbstr.h
-
 keyvals.o:		keyvals.c keyvals.h
 
 paramopt.o:		paramopt.c paramopt.h
@@ -754,8 +753,6 @@ openport.o:		openport.c openport.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
 
-pmq.o:			pmq.cc pmq.h
-
 fmq.o:			fmq.cc fmq.h
 
 sigblock.o:		sigblock.c sigblock.h
@@ -812,6 +809,7 @@ userattr.o:		userattr.c userattr.h
 pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
+querystr.o:		querystr.cc querystr.h
 
 dir:
 	makesubdir $@
@@ -841,12 +839,24 @@ strx.o:			strx.dir
 strx.dir:
 	makesubdir $@
 
-printhelp.o:		printhelp.cc printhelp.hh
+# CONFIGVARS
+configvars.o:		configvars.dir
+configvars.dir:
+	makesubdir $@
+
+# MAILALIAS
+mailalias.o:		mailalias.dir
+mailalias.dir:
+	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h
+ba.o:			ba.cc ba.h
+
+printhelp.o:		printhelp.cc printhelp.hh
 intrem.o:		intrem.cc intrem.h
 addsat.o:		addsat.cc addsat.h
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
+getlogx.o:		getlogx.cc getlogx.h
 
 
