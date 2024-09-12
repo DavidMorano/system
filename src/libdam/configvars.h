@@ -32,12 +32,6 @@
 #define	CONFIGVARS_VFL		struct configvars_vflags
 #define	CONFIGVARS_NFILES	(sizeof(int) * 8)
 
-#define	CV		configvars
-#define	CV_VAR		configvars_var
-#define	CV_FILE		configvars_file
-#define	CV_CUR		configvars_cur
-#define	CV_ERR		configvars_err
-
 
 struct paramfile_cursor {
 	int		i ;
@@ -45,11 +39,11 @@ struct paramfile_cursor {
 
 struct configvars_head {
 	vecobj		*fesp ;		/* file entries */
-	vecobj		*defp ;		/* collapsed defined variables */
-	vecobj		*unvp ;		/* unset ENV variables */
-	vecobj		*expp ;		/* collapsed environment variables */
-	vecobj		*setp ;		/* "set" variables */
 	vecobj		*varp ;		/* the user variables */
+	vecobj		*defp ;		/* "define" variables */
+	vecobj		*setp ;		/* "set" variables */
+	vecobj		*expp ;		/* "export" environment variables */
+	vecobj		*unvp ;		/* "unset" environment variables */
 	time_t		checktime ;
 	uint		magic ;		/* magic number */
 } ;
@@ -57,8 +51,8 @@ struct configvars_head {
 struct configvars_filer {
 	cchar		*filename ;
 	vecobj		defines ;	/* defined variables */
-	vecobj		unsets ;	/* unset ENV variables */
 	vecobj		exports ;	/* environment variables */
+	vecobj		unsets ;	/* unset ENV variables */
 	time_t		mtime ;
 	int		fi ;
 } ;
@@ -91,6 +85,7 @@ typedef CONFIGVARS_VAR	configvars_var ;
 typedef CONFIGVARS_FILE	configvars_file ;
 typedef CONFIGVARS_CUR	configvars_cur ;
 typedef CONFIGVARS_ERR	configvars_err ;
+typedef CONFIGVARS_VFL	configvars_vfl ;
 
 EXTERNC_begin
 
@@ -103,44 +98,6 @@ int configvars_fetch(configvars *,cchar *,configvars_cur *,cchar **) noex ;
 int configvars_close(configvars *) noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-template<typename ... Args>
-static inline int configvars_magic(configvars *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == CONFIGVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (configvars_magic) */
-
-namespace configvars_obj {
-    extern int configvars_parse(CV *,int,vecobj *) noex ;
-    extern int configvars_finvars(CV *) noex ;
-    extern int configvars_finfiles(CV *) noex ;
-    extern int configvars_addvar(CV *,int,int,char *,int,char *,int) noex ;
-}
-
-namespace configvars_obj {
-    extern int file_start(CV_FILE *,cchar *) noex ;
-    extern int file_addvar(CV_FILE *,int,int,char *,int,char *,int) noex ;
-    extern int file_finish(CV_FILE *) noex ;
-    extern int file_finone(CV_FILE *,int) noex ;
-}
-
-namespace configvars_obj {
-    extern int var_start(CV_VAR *,int,char *,int,char *,int) noex ;
-    extern int var_finish(CV_VAR *) noex ;
-}
-
-namespace configvars_obj {
-    extern void	badline(vecobj *,char *,int) noex ;
-    extern void	freeit(char **) noex ;
-}
-
-#endif /* __cplusplus */
 
 
 #endif /* CONFIGVARS_INCLUDE */

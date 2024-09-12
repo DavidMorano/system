@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	configvars
+
+	Description:
 	This is an object that reads configuration files and organizes
 	the content into the object for structured access.
 
