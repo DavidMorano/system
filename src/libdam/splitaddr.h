@@ -1,6 +1,8 @@
-/* splitaddr */
+/* splitaddr HEADER */
+/* lang=C20 */
 
-/* splitaddr mail management */
+/* Split-Address mail management */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,14 +15,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SPLITADDR_INCLUDE
-#define	SPLITADDR_INCLUDE	1
+#define	SPLITADDR_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<vechand.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 
 
 #define	SPLITADDR	struct splitaddr_head
@@ -32,27 +34,21 @@
 
 struct splitaddr_head {
 	vechand		coms ;
-	const char	*local ;
+	cchar		*local ;
 	cchar		*mailaddr ;
 	int		nd ;
 } ;
 
+typedef	SPLITADDR	splitaddr ;
 
-#if	(! defined(SPLITADDR_MASTER)) || (SPLITADDR_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int splitaddr_start(splitaddr *,cchar *) noex ;
+extern int splitaddr_prematch(splitaddr *,splitaddr *) noex ;
+extern int splitaddr_finish(splitaddr *) noex ;
 
-extern int splitaddr_start(SPLITADDR *,const char *) ;
-extern int splitaddr_prematch(SPLITADDR *,SPLITADDR *) ;
-extern int splitaddr_finish(SPLITADDR *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SPLITADDR_MASTER */
 
 #endif /* SPLITADDR_INCLUDE */
 
