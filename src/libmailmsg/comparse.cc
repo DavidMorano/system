@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	comparse
+
+	Description:
 	This subroutine separates comment characters from the value
 	characters in a mail message header field value.  This is
 	not meant for use with mail addresses (although they certainly
