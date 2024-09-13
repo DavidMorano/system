@@ -138,14 +138,12 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	int		rs ;
 	if ((rs = uiconv_magic(op,ilp,olp)) >= 0) {
 	    size_t	isize ;
+	    size_t	ileft = (size_t) *ilp ;
+	    size_t	oleft = (size_t) *olp ;
 	    {
 	        iconv_t	*cdp = (iconv_t *) op->cdp ;
-	        size_t	ileft, *ileftp = &ileft ;
-	        size_t	oleft, *oleftp = &oleft ;
-	        {
-		    ileft = (size_t) *ilp ;
-		    oleft = (size_t) *olp ;
-	        }
+	        size_t	*ileftp = &ileft ;
+	        size_t	*oleftp = &oleft ;
 	        {
 		    char	**ibp = const_cast<char **>(ib) ;
 	            isize = iconv(*cdp,ibp,ileftp,ob,oleftp) ;
@@ -170,7 +168,7 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op->cdp) {
-	    iconv_t		cd ;
+	    iconv_t	cd ;
 	    int		to_mem = UICONV_TOMEM ;
 	    bool	f_exit = false ;
 	    repeat {

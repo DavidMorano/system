@@ -47,14 +47,6 @@
 
 /* local defines */
 
-#undef	BUFLEN
-#define	BUFLEN		(LINEBUFLEN * 2)
-
-#define	KEYBUFLEN	20
-
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
-
 
 /* local namespaces */
 

@@ -22,16 +22,17 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	SPLITFNAME	struct splitfname_head
 
 
 struct splitfname_head {
-	cchar		*dp ;
-	cchar		*bp ;
-	int		dl ;
-	int		bl ;
+	cchar		*dp ;	/* directory part (pointer) */
+	cchar		*bp ;	/* directory part (length) */
+	int		dl ;	/* base-name part (pointer) */
+	int		bl ;	/* base-name part (length) */
 } ;
 
 #ifdef	__cplusplus
@@ -42,7 +43,7 @@ struct splitfname : splitfname_head {
 	int operator () (cchar *,int = -1) noex ;
 } ; /* end struct (splitfname) */
 #else /* __cplusplus */
-typedef SPLITFNAME		splitfname ;
+typedef SPLITFNAME	splitfname ;
 #endif /* __cplusplus */
 
 EXTERNC_begin

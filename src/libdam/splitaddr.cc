@@ -22,14 +22,6 @@
 	Description:
 	These object manages a mail splitaddr.
 
-	Note: Strategy with memory allocation:
-	We just have a static storage area (in the object) that is
-	large enough to hold any valid mail address.  We copy the
-	address we are splitting into this storage and then split
-	it in place from there.  There is already too much (and
-	superfluous) memory allocation going on in the world today!
-	:-)
-
 	Matching:
 	We do "prefix" matching.
 
@@ -50,13 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<usystem.h>
 #include	<vechand.h>
+#include	<strn.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"address.h"
@@ -67,13 +60,16 @@
 
 #define	SPLITADDR_DEFENTS	4
 
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	MAX(MAILADDRLEN,2048)
-#endif
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -84,6 +80,45 @@
 
 /* forward references */
 
+template<typename ... Args>
+static int splitaddr_ctor(splitaddr *op,Args ... args) noex {
+	SPLITADDR	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->comp = new(nothrow) vechand) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vechand) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (splitaddr_ctor) */
+
+static int splitaddr_dtor(splitaddr *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->comp) {
+		delete op->comp ;
+		op->comp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (splitaddr_dtor) */
+
+template<typename ... Args>
+static inline int splitaddr_magic(splitaddr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SPLITADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (splitaddr_magic) */
+
 
 /* local variables */
 
@@ -93,161 +128,149 @@
 
 /* exported subroutines */
 
-int splitaddr_start(SPLITADDR *op,cchar *ap) noex {
+int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	cint		nents = SPLITADDR_DEFENTS ;
 	int		rs ;
 	int		n = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (ap == NULL) return SR_FAULT ;
-
-	memset(op,0,sizeof(SPLITADDR)) ;
-
-	if ((rs = vechand_start(&op->coms,nents,0)) >= 0) {
-	    int		al = strlen(ap) ;
-	    cchar	*tp ;
-	    char	*bp ;
-	    while (al && (ap[al-1] == '.')) {
-		al -= 1 ;
-	    }
-	    if ((rs = uc_malloc((al+1),&bp)) >= 0) {
-	        int	bl = al ;
-	        int	f = FALSE ;
-
-	        op->mailaddr = (cchar *) bp ;
-		strwcpy(bp,ap,al) ;
-
-	        while ((tp = strnrpbrk(bp,bl,".@")) != NULL) {
-
-	            f = (*tp == '@') ;
-	            n += 1 ;
-	            rs = vechand_add(&op->coms,(tp+1)) ;
-	            bl = (tp - bp) ;
-	            bp[bl] = '\0' ;
-
-	            if (f) break ;
-	            if (rs < 0) break ;
-	        } /* end while */
-
-	        if ((rs >= 0) && (bp[0] != '\0')) {
-
-	            if (! f) {
+	if ((rs = splitaddr_ctor(op,ap)) >= 0) {
+	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) {
+	        int	al = strlen(ap) ;
+	        cchar	*tp ;
+	        char	*bp ;
+	        while (al && (ap[al-1] == '.')) {
+		    al -= 1 ;
+	        }
+	        if ((rs = uc_malloc((al+1),&bp)) >= 0) {
+	            int		bl = al ;
+	            bool	f = false ;
+	            op->mailaddr = charp(bp) ;
+		    strwcpy(bp,ap,al) ;
+	            while ((tp = strnrpbrk(bp,bl,".@")) != nullptr) {
+	                f = (*tp == '@') ;
 	                n += 1 ;
-	                rs = vechand_add(&op->coms,bp) ;
-	            } else
-	                op->local = bp ;
-
-	        } /* end if */
-
-	        if (rs >= 0) op->nd = n ;
-
-	    } /* end if */
+	                rs = vechand_add(op->comp,(tp+1)) ;
+	                bl = (tp - bp) ;
+	                bp[bl] = '\0' ;
+	                if (f) break ;
+	                if (rs < 0) break ;
+	            } /* end while */
+	            if ((rs >= 0) && (bp[0] != '\0')) {
+	                if (! f) {
+	                    n += 1 ;
+	                    rs = vechand_add(op->comp,bp) ;
+	                } else {
+	                    op->local = bp ;
+		        }
+	            } /* end if */
+	            if (rs >= 0) {
+		        op->nd = n ;
+			op->magic = SPLITADDR_MAGIC ;
+		    }
+		    if (rs < 0) {
+			uc_free(bp) ;
+			op->mailaddr = nullptr ;
+		    }
+	        } /* end if (memory-allocation) */
+	        if (rs < 0) {
+	            vechand_finish(op->comp) ;
+	        }
+	    } /* end if (vechand_start) */
 	    if (rs < 0) {
-	        vechand_finish(&op->coms) ;
+		splitaddr_dtor(op) ;
 	    }
-	} /* end if */
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (splitaddr_start) */
 
-int splitaddr_finish(SPLITADDR *op) noex {
+int splitaddr_finish(splitaddr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->mailaddr != NULL) {
-	    rs1 = uc_free(op->mailaddr) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->mailaddr = NULL ;
-	}
-
-	rs1 = vechand_finish(&op->coms) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if ((rs = splitaddr_magic(op)) >= 0) {
+	    if (op->mailaddr) {
+	        rs1 = uc_free(op->mailaddr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->mailaddr = nullptr ;
+	    }
+	    if (op->comp) {
+	        rs1 = vechand_finish(op->comp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = splitaddr_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (splitaddr_finish) */
 
-int splitaddr_count(SPLITADDR *op) noex {
+int splitaddr_count(splitaddr *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	rs = vechand_count(&op->coms) ;
-
+	if ((rs = splitaddr_magic(op)) >= 0) {
+	    rs = vechand_count(op->comp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (splitaddr_count) */
 
-int splitaddr_prematch(SPLITADDR *op,SPLITADDR *tp) noex {
-	int		rs = SR_OK ;
-	int		rs1, rs2 ;
+int splitaddr_prematch(splitaddr *op,splitaddr *tp) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = splitaddr_magic(op,tp)) >= 0) {
+	int		rs1 ;
+	int		rs2 ;
 	int		i = 0 ;
-	int		f_so = FALSE ;
-	int		f = FALSE ;
-	cchar		*cp1, *cp2 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (tp == NULL) return SR_INVALID ;
-
-/* CONSTCOND */
-	while (TRUE) {
-
-	    rs1 = vechand_get(&op->coms,i,&cp1) ;
-
+	int		f_so = false ;
+	/* CONSTCOND */
+	forever {
+	    void	*v1p{} ;
+	    void	*v2p{} ;
+	    rs1 = vechand_get(op->comp,i,&v1p) ;
 	    if (rs1 < 0) break ;
 
-	    f_so = FALSE ;
-	    rs2 = vechand_get(&tp->coms,i,&cp2) ;
-
+	    f_so = false ;
+	    rs2 = vechand_get(tp->comp,i,&v2p) ;
 	    if (rs2 < 0) break ;
 
-	    f_so = TRUE ;
-	    f = (strcasecmp(cp1,cp2) == 0) ;
-
-	    if (! f)
-	        break ;
+	    f_so = true ;
+	    cchar	*c1p = charp(v1p) ;
+	    cchar	*c2p = charp(v2p) ;
+	    f = (strcasecmp(c1p,c2p) == 0) ;
+	    if (! f) break ;
 
 	    i += 1 ;
-	} /* end while */
-
+	} /* end forever */
 /* handle non-matching related errors first */
 
-	if ((rs1 < 0) && (rs1 != SR_NOTFOUND))
+	if ((rs1 < 0) && (rs1 != SR_NOTFOUND)) {
 	    rs = rs1 ;
-
-	if ((rs >= 0) && (rs2 < 0) && (rs2 != SR_NOTFOUND))
+	}
+	if ((rs >= 0) && (rs2 < 0) && (rs2 != SR_NOTFOUND)) {
 	    rs = rs2 ;
-
+	}
 /* candidate entry must be as long or longer than the list entry */
-
-	if ((rs >= 0) && f)
+	if ((rs >= 0) && f) {
 	    f = f_so ;
-
+	}
 /* candidate entry must have local-name match if list entry has local */
-
-	if ((rs >= 0) && f && (op->local != NULL)) {
-
-	    f = FALSE ;
-	    if (tp->local != NULL)
+	if ((rs >= 0) && f && (op->local != nullptr)) {
+	    f = false ;
+	    if (tp->local != nullptr) {
 	        f = (strcmp(op->local,tp->local) == 0) ;
-
+	    }
 	} /* end if */
-
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (splitaddr_prematch) */
 
-int splitaddr_audit(SPLITADDR *op) noex {
+int splitaddr_audit(splitaddr *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	rs = vechand_audit(&op->coms) ;
-
+	if ((rs = splitaddr_magic(op)) >= 0) {
+	    rs = vechand_audit(op->comp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (splitaddr_audit) */

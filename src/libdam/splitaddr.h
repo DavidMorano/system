@@ -19,23 +19,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<vechand.h>
-#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 
 
 #define	SPLITADDR	struct splitaddr_head
-
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
+#define	SPLITADDR_MAGIC	0x97543178
 
 
 struct splitaddr_head {
-	vechand		coms ;
+	vechand		*comp ;		/* pointer to VECHAND object */
 	cchar		*local ;
 	cchar		*mailaddr ;
+	uint		magic ;
 	int		nd ;
 } ;
 

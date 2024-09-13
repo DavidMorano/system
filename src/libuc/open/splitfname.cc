@@ -26,6 +26,11 @@
 	Synopsis:
 	int splitfname_split(splitfname *op,cchar *fp,int fl) noex
 
+	Arguments:
+	op		object pointer
+	fp		file-name pointer
+	dl		file-name length
+
 	Returns:
 	>=0		OK
 	<0		error-code (system-return)
@@ -45,6 +50,12 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

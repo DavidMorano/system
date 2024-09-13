@@ -60,7 +60,7 @@ OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
 OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
 OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o mailmsgheadkey.o
 OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o 
-OBJ4_LIBMAILMSG= emainfo.o hdrdecode.o
+OBJ4_LIBMAILMSG= emainfo.o hdrdecode.o comparse.o
 OBJ5_LIBMAILMSG= mbcache.o contypevals.o contentencodings.o
 
 
@@ -171,5 +171,7 @@ hdrdecode.o:		hdrdecode.cc hdrdecode.h		$(INCS)
 hdrextnum.o:		hdrextnum.cc hdrextnum.h		$(INCS)
 mailmsgheadkey.o:	mailmsgheadkey.cc 			$(INCS)
 outema.o:		outema.cc outema.h			$(INCS)
+comparse.o:		comparse.cc comparse.h			$(INCS)
+whitelist.o:		whitelist.cc whitelist.h		$(INCS)
 
 

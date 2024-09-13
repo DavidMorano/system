@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int strfilter_ctor(strfilter *op,Args ... args) noex {
+static int whitelist_ctor(whitelist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int strfilter_ctor(strfilter *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (strfilter_ctor) */
+/* end subroutine (whitelist_ctor) */
 
-static int strfilter_dtor(strfilter *op) noex {
+static int whitelist_dtor(whitelist *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (strfilter_dtor) */
+/* end subroutine (whitelist_dtor) */
 
 template<typename ... Args>
-static inline int strfilter_magic(strfilter *op,Args ... args) noex {
+static inline int whitelist_magic(whitelist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == WHITELIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (strfilter_magic) */
+/* end subroutine (whitelist_magic) */

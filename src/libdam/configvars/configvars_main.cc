@@ -27,11 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -51,14 +46,6 @@
 
 
 /* local defines */
-
-#undef	BUFLEN
-#define	BUFLEN		(LINEBUFLEN * 2)
-
-#define	KEYBUFLEN	20
-
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
 
 /* local namespaces */
@@ -92,7 +79,7 @@ static inline int configvars_ctor(configvars *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    op->checktime = time(nullptr) ;
+	    op->checktime = getustime ;
 	    if ((op->fesp = new(nothrow) vecobj) != np) {
 		if ((op->varp = new(nothrow) vecobj) != np) {
 	            if ((op->defp = new(nothrow) vecobj) != np) {

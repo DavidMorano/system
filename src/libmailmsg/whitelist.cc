@@ -1,14 +1,15 @@
-/* whitelist */
+/* whitelist SUPPORT */
+/* lang=C++20 */
 
 /* whitelist mail address management */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_PARTIAL	0		/* partial-domain match */
 #define	CF_SNWCPYOPAQUE	1		/* |snwcpyopaque(3dam)| */
 
 /* revision history:
 
-	= 1998-12-01, David A­D­ Morano
+	= 1998-02-01, David A­D­ Morano
 	Module was originally written.
 
 */
@@ -17,33 +18,32 @@
 
 /*******************************************************************************
 
+	Name:
+	whitelist
+
+	Description:
 	This object manages a mail whitelist (or blacklist).
 
 	Notes:
-
 	= Compile-time switch CF_SNWCPYOPAQUE
-
 	I hope that turning this ON improves performance just a tad.
-
 
 *******************************************************************************/
 
-
-#define	WHITELIST_MASTER	0
-
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<stdlib.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<field.h>
 #include	<sbuf.h>
 #include	<bfile.h>
+#include	<strn.h>
+#include	<sncpyx.h>
+#include	<snwcpyx.h>
 #include	<localmisc.h>
 
 #include	"splitaddr.h"
@@ -61,26 +61,68 @@
 #endif
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	snwcpyopaque(char *,int,cchar *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+/* exported variables */
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
+
+/* local structures */
 
 
 /* forward references */
 
-int		whitelist_fileadd(WHITELIST *,cchar *) ;
+template<typename ... Args>
+static int whitelist_ctor(whitelist *op,Args ... args) noex {
+	WHITELIST	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->wlp = new(nothrow) vecstr) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vecstr) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (whitelist_ctor) */
 
-static int	mkaddr(char *,int,cchar *,int) ;
+static int whitelist_dtor(whitelist *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->wlp) {
+		delete op->wlp ;
+		op->wlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (whitelist_dtor) */
+
+template<typename ... Args>
+static inline int whitelist_magic(whitelist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == WHITELIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (whitelist_magic) */
+
+static int	mkaddr(char *,int,cchar *,int) noex ;
 
 #if	CF_PARTIAL
 static int	cmpaddr() ;
@@ -104,34 +146,53 @@ static const uchar	fterms[32] = {
 #endif /* CF_SNWCPYOPAQUE */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int whitelist_open(WHITELIST *op,cchar *fname)
-{
-	const int	n = WHITELIST_DEFENTS ;
+int whitelist_open(whitelist *op,cchar *fname) noex {
+	cint		vn = WHITELIST_DEFENTS ;
+	cint		vo = 0 ;
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	op->magic = 0 ;
-	if ((rs = vecstr_start(&op->list,n,0)) >= 0) {
-	    op->magic = WHITELIST_MAGIC ;
-	    if (fname != NULL) {
-	        rs = whitelist_fileadd(op,fname) ;
-	    } /* end if */
-	    if (rs < 0) {
-	        vecstr_finish(&op->list) ;
-	        op->magic = 0 ;
+	if ((rs = whitelist_ctor(op)) >= 0) {
+	    if ((rs = vecstr_start(op->wlp,vn,vo)) >= 0) {
+	        op->magic = WHITELIST_MAGIC ;
+	        if (fname) {
+	            rs = whitelist_fileadd(op,fname) ;
+	        } /* end if */
+	        if (rs < 0) {
+	            vecstr_finish(op->wlp) ;
+	            op->magic = 0 ;
+	        }
 	    }
-	}
-
+	    if (rs < 0) {
+		whitelist_dtor(op) ;
+	    }
+	} /* end if (whitelist_ctor) */
 	return rs ;
 }
 /* end subroutine (whitelist_open) */
 
+int whitelist_close(whitelist *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = whitelist_magic(op)) >= 0) {
+	    {
+	        rs1 = vecstr_finish(op->wlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = whitelist_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (whitelist_close) */
 
-int whitelist_fileadd(WHITELIST *op,cchar *fname)
-{
+int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	bfile		loadfile, *lfp = &loadfile ;
 	int		rs ;
 	int		rs1 ;
@@ -142,16 +203,12 @@ int whitelist_fileadd(WHITELIST *op,cchar *fname)
 
 	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("whitelist_fileadd: fname=%s\n",fname) ;
-#endif
-
 	if (fname[0] == '\0') return SR_INVALID ;
 
 /* try to open it */
 
 	if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
@@ -161,11 +218,11 @@ int whitelist_fileadd(WHITELIST *op,cchar *fname)
 	        if (lbuf[len - 1] == '\n') len -= 1 ;
 
 	        if ((len > 0) && (lbuf[0] != '#')) {
-	            const int	mlen = MAILADDRLEN ;
+	            cint	mlen = MAILADDRLEN ;
 	            char	mbuf[MAILADDRLEN + 1] ;
 	            if ((rs = mkaddr(mbuf,mlen,lbuf,len)) > 0) {
 	                n += 1 ;
-	                rs = vecstr_add(&op->list,mbuf,rs) ;
+	                rs = vecstr_add(op->wlp,mbuf,rs) ;
 		    } else if (rs == SR_OVERFLOW) {
 			rs = SR_OK ;
 	            } /* end if */
@@ -178,35 +235,11 @@ int whitelist_fileadd(WHITELIST *op,cchar *fname)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
 
-#if	CF_DEBUGS
-	debugprintf("whitelist_fileadd: ret rs=%d n=%d\n",rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (whitelist_fileadd) */
 
-
-int whitelist_close(WHITELIST *op)
-{
-	int		rs = SR_OK ;
-	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = vecstr_finish(&op->list) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
-	return rs ;
-}
-/* end subroutine (whitelist_close) */
-
-
-int whitelist_get(WHITELIST *op,int i,cchar **rpp)
-{
+int whitelist_get(whitelist *op,int i,cchar **rpp) noex {
 	int		rs ;
 	cchar		*cp ;
 
@@ -214,7 +247,7 @@ int whitelist_get(WHITELIST *op,int i,cchar **rpp)
 
 	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
 
-	rs = vecstr_get(&op->list,i,&cp) ;
+	rs = vecstr_get(op->wlp,i,&cp) ;
 
 	if (rpp != NULL)
 	    *rpp = (rs >= 0) ? cp : NULL ;
@@ -226,8 +259,7 @@ int whitelist_get(WHITELIST *op,int i,cchar **rpp)
 
 #ifdef	COMMENT
 
-int whitelist_read(WHITELIST *op,int i,char *buf,int buflen)
-{
+int whitelist_read(whitelist *op,int i,char *buf,int buflen) noex {
 	int		rs ;
 	cchar		*cp ;
 
@@ -235,7 +267,7 @@ int whitelist_read(WHITELIST *op,int i,char *buf,int buflen)
 
 	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
 
-	rs = vecstr_get(&op->list,i,&cp) ;
+	rs = vecstr_get(op->wlp,i,&cp) ;
 
 	if (rs >= 0)
 	    rs = sncpy1(buf,buflen,cp) ;
@@ -246,26 +278,21 @@ int whitelist_read(WHITELIST *op,int i,char *buf,int buflen)
 
 #endif /* COMMENT */
 
-
-/* return the count of the number of items in this list */
-int whitelist_count(WHITELIST *op)
-{
+int whitelist_count(whitelist *op) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
 
-	rs = vecstr_count(&op->list) ;
+	rs = vecstr_count(op->wlp) ;
 
 	return rs ;
 }
 /* end subroutine (whitelist_count) */
 
-
-int whitelist_prematch(WHITELIST *op,cchar *ta)
-{
-	VECSTR		*lp = &op->list ;
+int whitelist_prematch(whitelist *op,cchar *ta) noex {
+	vecstr		*lp = op->wlp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -274,10 +301,6 @@ int whitelist_prematch(WHITELIST *op,cchar *ta)
 	if (ta == NULL) return SR_FAULT ;
 
 	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("whitelist_prematch: test-addr=%s\n",ta) ;
-#endif
 
 	if (ta[0] == '\0') return SR_INVALID ;
 
@@ -298,21 +321,12 @@ int whitelist_prematch(WHITELIST *op,cchar *ta)
 	        int	i ;
 	        cchar	*cp ;
 
-#if	CF_DEBUGS
-	        debugprintf("whitelist_prematch: search for-before\n") ;
-#endif
-
 	        for (i = 0 ; vecstr_get(lp,i,&cp) >= 0 ; i += 1) {
 	            if (cp != NULL) {
 	                if ((rs = splitaddr_start(&aw,cp)) >= 0) {
 
 	                    rs = splitaddr_prematch(&aw,&ac) ;
 	                    f = (rs > 0) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("whitelist_prematch: "
-	                        "splitaddr_prematch() rs=%d\n",rs) ;
-#endif
 
 	                    rs1 = splitaddr_finish(&aw) ;
 	                    if (rs >= 0) rs = rs1 ;
@@ -321,21 +335,12 @@ int whitelist_prematch(WHITELIST *op,cchar *ta)
 	            if ((rs < 0) || f) break ;
 	        } /* end for */
 
-#if	CF_DEBUGS
-	        debugprintf("whitelist_prematch: search for-after rs=%d\n",
-	            rs) ;
-#endif
-
 	        rs1 = splitaddr_finish(&ac) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (splitaddr) */
 
 	} /* end block */
 #endif /* CF_PARTIAL */
-
-#if	CF_DEBUGS
-	debugprintf("whitelist_prematch: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -344,9 +349,7 @@ int whitelist_prematch(WHITELIST *op,cchar *ta)
 
 #ifdef	COMMENT
 
-int whitelist_curbegin(WHITELIST *op,WHITELIST_CUR *cp)
-{
-
+int whitelist_curbegin(whitelist *op,whitelist_cur *cp) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (cp == NULL) return SR_FAULT ;
 
@@ -355,10 +358,7 @@ int whitelist_curbegin(WHITELIST *op,WHITELIST_CUR *cp)
 }
 /* end subroutine (whitelist_curbegin) */
 
-
-int whitelist_curend(WHITELIST *op)
-{
-
+int whitelist_curend(whitelist *op) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (cp == NULL) return SR_FAULT ;
 
@@ -369,16 +369,14 @@ int whitelist_curend(WHITELIST *op)
 
 #endif /* COMMENT */
 
-
-int whitelist_audit(WHITELIST *op)
-{
+int whitelist_audit(whitelist *op) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != WHITELIST_MAGIC) return SR_NOTOPEN ;
 
-	rs = vecstr_audit(&op->list) ;
+	rs = vecstr_audit(op->wlp) ;
 
 	return rs ;
 }
@@ -389,8 +387,7 @@ int whitelist_audit(WHITELIST *op)
 
 
 #if	CF_SNWCPYOPAQUE
-static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll)
-{
+static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
 	int		rs ;
 	char		*tp ;
 	if ((tp = strnchr(lp,ll,'#')) != NULL) {
@@ -401,13 +398,12 @@ static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll)
 }
 /* end subroutine (mkaddr) */
 #else /* CF_SNWCPYOPAQUE */
-static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll)
-{
-	SBUF		b ;
+static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
+	sbuf		b ;
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = sbuf_start(&b,mbuf,mlen)) >= 0) {
-	    FIELD	fsb ;
+	    field	fsb ;
 	    if ((rs = field_start(&fsb,lp,ll)) >= 0) {
 	        int	fl ;
 	        cchar	*fp ;

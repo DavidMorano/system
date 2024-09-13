@@ -47,9 +47,6 @@
 
 /* local defines */
 
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
-
 
 /* local namespaces */
 
