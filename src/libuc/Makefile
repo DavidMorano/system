@@ -65,7 +65,7 @@ OBJ03= stdfnames.o
 OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 OBJ05= nleadstr.o nleadkeystr.o
 OBJ06= mapex.o getourenv.o strnul.o
-OBJ07= sncpyx.o sncpyxw.o snaddw.o
+OBJ07=
 
 OBJ08= strkeycmp.o ccfile.o strnul.o
 OBJ09= readln.o ccfile.o
@@ -478,20 +478,6 @@ spwdent.o:		spwdent.cc spwdent.h
 groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
-
-matstr.o:		matstr.cc matstr.h
-matostr.o:		matostr.cc matostr.h
-
-sncpyarray.o:		sncpyarray.c sncpy.h
-sncpyxc.o:		sncpyxc.cc sncpyxc.h
-sncpyx.o:		sncpyx.cc sncpyx.h
-sncpyxw.o:		sncpyxw.cc sncpyxw.h
-
-mkpathx.o:		mkpathx.c mkpathx.h
-mkpathxw.o:		mkpathxw.cc mkpathxw.h
-
-mknpathx.o:		mknpathx.cc mknpathx.h
-mknpathxw.o:		mknpathxw.cc mknpathxw.h
 
 mkvarpath.o:		mkvarpath.cc
 mkuserpath.o:		mkuserpath.cc

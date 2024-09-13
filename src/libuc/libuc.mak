@@ -65,7 +65,7 @@ OBJ03= stdfnames.o
 OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 OBJ05= nleadstr.o nleadkeystr.o
 OBJ06= mapex.o getourenv.o strnul.o
-OBJ07= sncpyx.o sncpyxw.o snaddw.o
+OBJ07=
 
 OBJ08= strkeycmp.o ccfile.o strnul.o
 OBJ09= readln.o ccfile.o
@@ -80,7 +80,7 @@ OBJ15= tcx.o
 OBJ16 += wsix.o wsnx.o wsx.o
 OBJ17 += six.o snx.o sfx.o rmx.o
 OBJ18 +=
-OBJ19 +=
+OBJ19 += hdb.o hdbstr_loadkeys.o hdbstr_loadpairs.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -412,6 +412,9 @@ dstr.o:			dstr.cc dstr.h
 varray.o:		varray.cc varray.h
 
 hdb.o:			hdb.cc hdb.h
+hdbstr.o:		hdbstr.cc hdbstr.h hdb.h
+hdbstr_loadkeys.o:	hdbstr_loadkeys.cc hdbstr.h
+hdbstr_loadpairs.o:	hdbstr_loadpairs.cc hdbstr.h
 lookaside.o:		lookaside.cc lookaside.h
 linefold.o:		linefold.cc linefold.h
 
@@ -476,20 +479,6 @@ groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
 
-matstr.o:		matstr.cc matstr.h
-matostr.o:		matostr.cc matostr.h
-
-sncpyarray.o:		sncpyarray.c sncpy.h
-sncpyxc.o:		sncpyxc.cc sncpyxc.h
-sncpyx.o:		sncpyx.cc sncpyx.h
-sncpyxw.o:		sncpyxw.cc sncpyxw.h
-
-mkpathx.o:		mkpathx.c mkpathx.h
-mkpathxw.o:		mkpathxw.cc mkpathxw.h
-
-mknpathx.o:		mknpathx.cc mknpathx.h
-mknpathxw.o:		mknpathxw.cc mknpathxw.h
-
 mkvarpath.o:		mkvarpath.cc
 mkuserpath.o:		mkuserpath.cc
 mkcdpath.o:		mkcdpath.cc
@@ -501,6 +490,7 @@ opensysfs.o:		opensysfs.cc opensysfs.h
 quoteshellarg.o:	quoteshellarg.cc
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
+termescseq.o:		termescseq.cc termescseq.h
 
 tmtime.o:		tmtime.cc tmtime.h
 
@@ -772,6 +762,11 @@ pow.o:			pow.dir
 pow.dir:
 	makesubdir $@
 
+# GETUTMP
+getutmp.o:		getutmp.dir
+getutmp.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -895,6 +890,7 @@ utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
 filelines.o:		filelines.cc filelines.h
+getsyslogx.o:		getsyslogx.cc getsyslogx.h
 #
 isproc.o:		isproc.cc isproc.h
 #

@@ -2,43 +2,39 @@
 
 T= libmailmsg
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
+INDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
-
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= .ov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS=
 
-
 INCS= libmailmsg.h
-
 
 LIBS=
 
@@ -47,12 +43,17 @@ LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
 
+
+RUNINFO= -rpath $(RUNDIR)
+
+LIBINFO= $(LIBDIRS) $(LIBS)
+
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
@@ -67,37 +68,44 @@ OBJA_LIBMAILMSG= obj0.o obj1.o
 OBJB_LIBMAILMSG= obj2.o obj3.o
 OBJC_LIBMAILMSG= obj4.o obj5.o
 
-OBJ_LIBMAILMSG= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG) $(OBJC_LIBMAILMSG)
+OBJ= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG) $(OBJC_LIBMAILMSG)
 
 
-default:		$(T).a
+.SUFFIXES:		.hh .ii
+
+
+default:		$(T).o
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
 
 
-$(T).o:			$(OBJ_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBMAILMSG)
+$(T).o:			$(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
-$(T).a:			$(OBJ_LIBMAILMSG)
-	$(AR) $(ARFLAGS) -rc $@ $?
+$(T).so:		$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).a:			$(OBJ)
+	$(AR) -rc $@ $?
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order

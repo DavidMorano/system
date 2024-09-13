@@ -87,7 +87,8 @@ namespace {
 constexpr void charinfo::mkiswhite() noex {
 	constexpr char	w[] = " \t\f\v\r" ;
 	for (int i = 0 ; w[i] ; i += 1) {
-	    iswhite.set(i,true) ;
+	    cint	ch = w[i] ;
+	    iswhite.set(ch,true) ;
 	}
 }
 /* end method (charinfo::mkiswhite) */

@@ -20,16 +20,13 @@
 	sfnext
 	sfnextchr
 	sfnextbrk
+	sfnextterm
 
 	Philosophy:
 	An explicit terminator (given) is *optional* in order for
 	a non-empty result string to be returned.  A new-line (NL)
 	character and white-space are always implied terminators
 	(this is historic).
-
-
-	Name:
-	sfnext
 
 	Description:
 	This subroutine will extract the next white-space-separated
@@ -49,10 +46,16 @@
 
 	Synopsis:
 	int sfnext(cchar *sp,int sl,cchar **spp) noex
+	int sfnextchr(cchar *sp,int sl,int sch,cchar **spp) noex
+	int sfnextbrk(cchar *sp,int sl,cchar *str,cchar **spp) noex
+	int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **spp) noex
 
 	Arguments:
 	sp		pointer to start of user supplied buffer
 	sl		length of user supplied buffer
+	sch		search character
+	str		search string
+	terms		terminator characters
 	spp		pointer to pointer of the found field
 
 	Returns:
@@ -92,7 +95,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<char.h>
-#include	<mkchar.h>
 
 #include	"sfx.h"
 
@@ -124,7 +126,7 @@ namespace {
 	virtual bool termx(int ch) noex {
 	    return (ch == 0) ;
 	} ;
-	bool term(int ch) noex {
+	bool isterm(int ch) noex {
 	    bool	f = false ;
 	    ch &= UCHAR_MAX ;
 	    f = f || (ch == '\n') ;
@@ -164,18 +166,18 @@ int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	return sf ;
 }
 
-int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
+int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	int		rl = -1 ;
 	struct esfx : sfnextx {
-	    cchar	*terms ;
+	    cchar	*bstr ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
 	    bool termx (int ch) noex override {
-		return (strchr(terms,ch) != nullptr) ;
+		return (strchr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
-	if (terms) {
+	if (bstr) {
 	    esfx	sf(sp,sl,rpp) ;
-	    sf.terms = terms ;
+	    sf.bstr = bstr ;
 	    rl = sf ;
 	} /* end if (non-null) */
 	return rl ;
@@ -193,7 +195,7 @@ sfnextx::operator int () noex {
 	        sl -= 1 ;
 	    } /* end while */
 	    rp = sp ;
-	    while (sl && *sp && (! term(*sp))) {
+	    while (sl && *sp && (! isterm(*sp))) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */

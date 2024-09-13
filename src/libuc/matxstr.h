@@ -22,7 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<localmisc.h>
 
 #include	<matostr.h>
 #include	<matpstr.h>
