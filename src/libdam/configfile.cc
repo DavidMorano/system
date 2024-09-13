@@ -17,16 +17,19 @@
 
 /*******************************************************************************
 
+	Name:
+	configfile
+
+	Description:
 	This is the old configuration file reader object.  It is
 	cheap, it is ill-conceived, it is a mess, it works well
 	enough to be used for cheap code.  I did not want to use
 	this junk for the Levo machine simulator but time pressure
-	decided for us!
-
-	Although this whole configuration scheme is messy, it gives
-	us enough of what we need to get some configuration information
-	into the Levo machine simulator and to get a parameter file
-	name.  This is good enough for now.
+	decided for us!  Although this whole configuration scheme
+	is messy, it gives us enough of what we need to get some
+	configuration information into the Levo machine simulator
+	and to get a parameter file name.  This is good enough for
+	now.
 
 *******************************************************************************/
 
@@ -67,15 +70,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-
-extern char	*strncpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -208,7 +202,7 @@ constexpr cpcchar	configkeys[] = {
 	"polltime",
 	"filetime",
 	"passfile",
-	NULL
+	nullptr
 } ;
 
 
@@ -217,17 +211,11 @@ constexpr cpcchar	configkeys[] = {
 
 /* exported subroutines */
 
-int configfile_start(csp,configfname)
-CONFIGFILE	*csp ;
-cchar	configfname[] ;
-{
-	BUFFER	options ;
-
-	FIELD	fsb ;
-
-	bfile	cfile, *cfp = &cfile ;
-
-	vecstr	*vsp ;
+int configfile_start(configfile *csp,configfname) noex {
+	buffer		options ;
+	field		fsb ;
+	bfile		cfile, *cfp = &cfile ;
+	vecstr		*vsp ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -245,12 +233,12 @@ cchar	configfname[] ;
 	char	buf2[BUFLEN + 1] ;
 	char	*bp, *cp ;
 
-	if (csp == NULL)
+	if (csp == nullptr)
 	    return SR_FAULT ;
 
 	memset(csp,0,sizeof(CONFIGFILE)) ;
 
-	if ((configfname == NULL) || (configfname[0] == '\0'))
+	if ((configfname == nullptr) || (configfname[0] == '\0'))
 	    return SR_NOEXIST ;
 
 /* initialize */
@@ -366,84 +354,84 @@ cchar	configfname[] ;
 	            switch (i) {
 
 	            case configkey_root:
-	                if (csp->root != NULL)
+	                if (csp->root != nullptr)
 	                    uc_free(csp->root) ;
 
 	                csp->root = bp ;
 	                break ;
 
 	            case configkey_log:
-	                if (csp->logfname != NULL)
+	                if (csp->logfname != nullptr)
 	                    uc_free(csp->logfname) ;
 
 	                csp->logfname = bp ;
 	                break ;
 
 	            case configkey_tmpdir:
-	                if (csp->tmpdir != NULL)
+	                if (csp->tmpdir != nullptr)
 	                    uc_free(csp->tmpdir) ;
 
 	                csp->tmpdir = bp ;
 	                break ;
 
 	            case configkey_workdir:
-	                if (csp->workdir != NULL)
+	                if (csp->workdir != nullptr)
 	                    uc_free(csp->workdir) ;
 
 	                csp->workdir = bp ;
 	                break ;
 
 	            case configkey_user:
-	                if (csp->user != NULL)
+	                if (csp->user != nullptr)
 	                    uc_free(csp->user) ;
 
 	                csp->user = bp ;
 	                break ;
 
 	            case configkey_group:
-	                if (csp->group != NULL)
+	                if (csp->group != nullptr)
 	                    uc_free(csp->group) ;
 
 	                csp->group = bp ;
 	                break ;
 
 	            case configkey_pidfile:
-	                if (csp->pidfname != NULL)
+	                if (csp->pidfname != nullptr)
 	                    uc_free(csp->pidfname) ;
 
 	                csp->pidfname = bp ;
 	                break ;
 
 	            case configkey_lockfile:
-	                if (csp->lockfname != NULL)
+	                if (csp->lockfname != nullptr)
 	                    uc_free(csp->lockfname) ;
 
 	                csp->lockfname = bp ;
 	                break ;
 
 	            case configkey_port:
-	                if (csp->port != NULL)
+	                if (csp->port != nullptr)
 	                    uc_free(csp->port) ;
 
 	                csp->port = bp ;
 	                break ;
 
 	            case configkey_userpass:
-	                if (csp->userpass != NULL)
+	                if (csp->userpass != nullptr)
 	                    uc_free(csp->userpass) ;
 
 	                csp->userpass = bp ;
 	                break ;
 
 	            case configkey_machpass:
-	                if (csp->machpass != NULL)
+	                if (csp->machpass != nullptr)
 	                    uc_free(csp->machpass) ;
 
 	                csp->machpass = bp ;
 	                break ;
 
 	            case configkey_srvtab:
-	                if (csp->srvtab != NULL)
+	                if (csp->srvtab != nullptr)
 	                    uc_free(csp->srvtab) ;
 
 	                csp->srvtab = bp ;
@@ -451,77 +439,77 @@ cchar	configfname[] ;
 
 	            case configkey_sendmail:
 	            case configkey_mintexec:
-	                if (csp->sendmail != NULL)
+	                if (csp->sendmail != nullptr)
 	                    uc_free(csp->sendmail) ;
 
 	                csp->sendmail = bp ;
 	                break ;
 
 	            case configkey_envfile:
-	                if (csp->envfname != NULL)
+	                if (csp->envfname != nullptr)
 	                    uc_free(csp->envfname) ;
 
 	                csp->envfname = bp ;
 	                break ;
 
 	            case configkey_pathfile:
-	                if (csp->pathfname != NULL)
+	                if (csp->pathfname != nullptr)
 	                    uc_free(csp->pathfname) ;
 
 	                csp->pathfname = bp ;
 	                break ;
 
 	            case configkey_devicefile:
-	                if (csp->devicefname != NULL)
+	                if (csp->devicefname != nullptr)
 	                    uc_free(csp->devicefname) ;
 
 	                csp->devicefname = bp ;
 	                break ;
 
 	            case configkey_seedfile:
-	                if (csp->seedfname != NULL)
+	                if (csp->seedfname != nullptr)
 	                    uc_free(csp->seedfname) ;
 
 	                csp->seedfname = bp ;
 	                break ;
 
 	            case configkey_logsize:
-	                if (csp->logsize != NULL)
+	                if (csp->logsize != nullptr)
 	                    uc_free(csp->logsize) ;
 
 	                csp->logsize = bp ;
 	                break ;
 
 	            case configkey_organization:
-	                if (csp->organization != NULL)
+	                if (csp->organization != nullptr)
 	                    uc_free(csp->organization) ;
 
 	                csp->organization = bp ;
 	                break ;
 
 	            case configkey_timeout:
-	                if (csp->timeout != NULL)
+	                if (csp->timeout != nullptr)
 	                    uc_free(csp->timeout) ;
 
 	                csp->timeout = bp ;
 	                break ;
 
 	            case configkey_interval:
-	                if (csp->interval != NULL)
+	                if (csp->interval != nullptr)
 	                    uc_free(csp->interval) ;
 
 	                csp->interval = bp ;
 	                break ;
 
 	            case configkey_removemul:
-	                if (csp->removemul != NULL)
+	                if (csp->removemul != nullptr)
 	                    uc_free(csp->removemul) ;
 
 	                csp->removemul = bp ;
 	                break ;
 
 	            case configkey_acctab:
-	                if (csp->acctab != NULL)
+	                if (csp->acctab != nullptr)
 	                    uc_free(csp->acctab) ;
 
 	                csp->acctab = bp ;
@@ -530,84 +518,84 @@ cchar	configfname[] ;
 	            case configkey_paramfile:
 	            case configkey_paramtab:
 	            case configkey_pingtab:
-	                if (csp->paramfname != NULL)
+	                if (csp->paramfname != nullptr)
 	                    uc_free(csp->paramfname) ;
 
 	                csp->paramfname = bp ;
 	                break ;
 
 	            case configkey_nrecips:
-	                if (csp->nrecips != NULL)
+	                if (csp->nrecips != nullptr)
 	                    uc_free(csp->nrecips) ;
 
 	                csp->nrecips = bp ;
 	                break ;
 
 	            case configkey_helpfile:
-	                if (csp->helpfname != NULL)
+	                if (csp->helpfname != nullptr)
 	                    uc_free(csp->helpfname) ;
 
 	                csp->helpfname = bp ;
 	                break ;
 
 	            case configkey_pingstat:
-	                if (csp->statfname != NULL)
+	                if (csp->statfname != nullptr)
 	                    uc_free(csp->statfname) ;
 
 	                csp->statfname = bp ;
 	                break ;
 
 	            case configkey_stampdir:
-	                if (csp->stampdir != NULL)
+	                if (csp->stampdir != nullptr)
 	                    uc_free(csp->stampdir) ;
 
 	                csp->stampdir = bp ;
 	                break ;
 
 	            case configkey_maxjobs:
-	                if (csp->maxjobs != NULL)
+	                if (csp->maxjobs != nullptr)
 	                    uc_free(csp->maxjobs) ;
 
 	                csp->maxjobs = bp ;
 	                break ;
 
 	            case configkey_directory:
-	                if (csp->directory != NULL)
+	                if (csp->directory != nullptr)
 	                    uc_free(csp->directory) ;
 
 	                csp->directory = bp ;
 	                break ;
 
 	            case configkey_interrupt:
-	                if (csp->interrupt != NULL)
+	                if (csp->interrupt != nullptr)
 	                    uc_free(csp->interrupt) ;
 
 	                csp->interrupt = bp ;
 	                break ;
 
 	            case configkey_polltime:
-	                if (csp->polltime != NULL)
+	                if (csp->polltime != nullptr)
 	                    uc_free(csp->polltime) ;
 
 	                csp->polltime = bp ;
 	                break ;
 
 	            case configkey_filetime:
-	                if (csp->filetime != NULL)
+	                if (csp->filetime != nullptr)
 	                    uc_free(csp->filetime) ;
 
 	                csp->filetime = bp ;
 	                break ;
 
 	            case configkey_passfile:
-	                if (csp->passfname != NULL)
+	                if (csp->passfname != nullptr)
 	                    uc_free(csp->passfname) ;
 
 	                csp->passfname = bp ;
 	                break ;
 
 	            case configkey_eigenfile:
-	                if (csp->eigenfname != NULL)
+	                if (csp->eigenfname != nullptr)
 	                    uc_free(csp->eigenfname) ;
 
 	                csp->eigenfname = bp ;
@@ -718,7 +706,7 @@ cchar	configfname[] ;
 			f = (rs1 > 0) ;
 
 #if	CF_EXPORTEQUAL
-			f = f && (strchr(buf2,'=') != NULL) ;
+			f = f && (strchr(buf2,'=') != nullptr) ;
 #endif
 
 			if (f) {
@@ -737,7 +725,7 @@ cchar	configfname[] ;
 
 	                        if (strncmp(buf2,"TMPDIR",len1) == 0) {
 
-	                            if (csp->tmpdir != NULL)
+	                            if (csp->tmpdir != nullptr)
 	                                uc_free(csp->tmpdir) ;
 
 	                            csp->tmpdir = 
@@ -864,103 +852,56 @@ bad0:
 }
 /* end subroutine (configfile_start) */
 
-
-/* free up this object */
-int configfile_finish(csp)
-CONFIGFILE	*csp ;
-{
-
-
-	if (csp == NULL)
-	    return SR_FAULT ;
-
-	if (csp->magic != CONFIGFILE_MAGIC)
-	    return SR_NOTOPEN ;
-
-/* free up the complex data types */
-
+int configfile_finish(configfile *csp) noex {
+	int		rs = SR_FAULT ;
+	if (csp ) {
+	    rs = SR_NOTOPEN ;
+	    if (csp->magic == CONFIGFILE_MAGIC) {
+	        /* free up the complex data types */
 	vecstr_finish(&csp->defines) ;
-
 	vecstr_finish(&csp->unsets) ;
-
 	vecstr_finish(&csp->exports) ;
-
-/* free up the simple ones */
-
+	/* free up the simple ones */
 	checkfree(&csp->root) ;
-
 	checkfree(&csp->tmpdir) ;
-
 	checkfree(&csp->pidfname) ;
-
 	checkfree(&csp->lockfname) ;
-
 	checkfree(&csp->logfname) ;
-
 	checkfree(&csp->workdir) ;
-
 	checkfree(&csp->port) ;
-
 	checkfree(&csp->user) ;
-
 	checkfree(&csp->group) ;
-
 	checkfree(&csp->userpass) ;
-
 	checkfree(&csp->machpass) ;
-
 	checkfree(&csp->srvtab) ;
-
 	checkfree(&csp->sendmail) ;
-
 	checkfree(&csp->envfname) ;
-
 	checkfree(&csp->pathfname) ;
-
 	checkfree(&csp->devicefname) ;
-
 	checkfree(&csp->seedfname) ;
-
 	checkfree(&csp->logsize) ;
-
 	checkfree(&csp->organization) ;
-
 	checkfree(&csp->timeout) ;
-
 	checkfree(&csp->removemul) ;
-
 	checkfree(&csp->acctab) ;
-
 	checkfree(&csp->paramfname) ;
-
 	checkfree(&csp->nrecips) ;
-
 	checkfree(&csp->helpfname) ;
-
 	checkfree(&csp->statfname) ;
-
 	checkfree(&csp->options) ;
-
 	checkfree(&csp->interval) ;
-
 	checkfree(&csp->stampdir) ;
-
 	checkfree(&csp->maxjobs) ;
-
 	checkfree(&csp->directory) ;
-
 	checkfree(&csp->interrupt) ;
-
 	checkfree(&csp->polltime) ;
-
 	checkfree(&csp->filetime) ;
-
 	checkfree(&csp->passfname) ;
-
 	checkfree(&csp->eigenfname) ;
-
 	csp->magic = 0 ;
-	return SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (configfile_finish) */
 
@@ -968,9 +909,9 @@ CONFIGFILE	*csp ;
 /* local subroutines */
 
 static void checkfree(char **vp) noex {
-	if (*vp != NULL) {
+	if (*vp != nullptr) {
 	    uc_free(*vp) ;
-	    *vp = NULL ;
+	    *vp = nullptr ;
 	}
 }
 /* end subroutine (checkfree) */

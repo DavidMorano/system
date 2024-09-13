@@ -1,8 +1,9 @@
-/* xwords */
+/* xwords SUPPORT */
+/* lang=C++20 */
 
 /* extract extra words from a single given word */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS 	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -15,24 +16,27 @@
 
 /*******************************************************************************
 
-	This object extracts extra possible words from a single given word.
-	The given word is always returned (as one extraction) but additional
-	subwords may also be returned.
+	Name:
+	xwords
 
+	Description:
+	This object extracts extra possible words from a single
+	given word.  The given word is always returned (as one
+	extraction) but additional subwords may also be returned.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
+#include	<six.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"xwords.h"
@@ -43,14 +47,15 @@
 #define	XWORDS_WI	struct xwords_wi
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+typedef xwords_word *	wordp ;
+
+
 /* external subroutines */
-
-extern int	sichr(const char *,int,int) ;
-extern int	isprintlatin(int) ;
-extern int	isalnumlatin(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -59,30 +64,33 @@ extern char	*strnchr(const char *,int,int) ;
 /* local structures */
 
 struct xwords_wi {
-	const char	*wp ;
+	cchar		*wp ;
 	int		wl ;
 } ;
+
+typedef xwords_wi *	wip ;
 
 
 /* forward references */
 
-static int	xwords_more(XWORDS *,const char *,int,int) ;
+static int	xwords_more(xwords *,cchar *,int,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int xwords_start(XWORDS *op,cchar *wbuf,int wlen)
-{
-	int		rs = SR_OK ;
+int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (op && wbuf) {
 	int		si ;
 	int		el ;
-	int		i = 0 ;
-
-	memset(op,0,sizeof(XWORDS)) ;
-
+	memclear(op) ; /* dangerous ! */
 /* always enter the whole word */
 
 	op->words[i].wp = wbuf ;
@@ -92,24 +100,20 @@ int xwords_start(XWORDS *op,cchar *wbuf,int wlen)
 /* try for possessives */
 
 	if (wlen > 2) {
-	    int		f = FALSE ;
-
+	    bool	f = false ;
 	    el = wlen - 2 ;
 	    if (strncmp((wbuf + el),"'s",2) == 0) {
-	        f = TRUE ;
+	        f = true ;
 	    } else if (strncmp((wbuf + el),"s'",2) == 0) {
-	        f = TRUE ;
+	        f = true ;
 	        el += 1 ;
 	    }
-
 	    if (f) {
 	        op->words[i].wp = wbuf ;
 	        op->words[i].wl = el ;
 	        i += 1 ;
 	    }
-
 	} /* end if (long enough for extra words) */
-
 	op->nwords = i ;
 	if ((si = sichr(wbuf,wlen,'-')) >= 0) {
 	    rs = xwords_more(op,wbuf,wlen,si) ;
@@ -117,54 +121,43 @@ int xwords_start(XWORDS *op,cchar *wbuf,int wlen)
 	    op->nwords = rs ;
 	}
 
-/* done */
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (xwords_start) */
 
-
-int xwords_get(XWORDS *op,int i,cchar **rpp)
-{
-	XWORDS_WORD	*w = op->words ;
+int xwords_get(xwords *op,int i,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
 	int		wl = 0 ;
-
-	if (i < 0) return SR_INVALID ;
-
-	if (op->xa != NULL) w = op->xa ;
-
-#if	CF_DEBUGS && 0
-	{
-		int	j ;
-		debugprintf("xwords_get: i=%d\n",i) ;
-		for (j = 0 ; j < op->nwords ; j += 1)
-		debugprintf("xwords_get: w=%t\n",w[j].wp,w[j].wl) ;
-	}
-#endif /* CF_DEBUGS */
-
-	if ((i < op->nwords) && (w[i].wp != NULL))
-	    wl = w[i].wl ;
-
-	if (rpp != NULL)
-	    *rpp = (wl > 0) ? w[i].wp : NULL ;
-
-	return wl ;
+	if (op) {
+	    rs = SR_INVALID ;
+	    if (i >= 0) {
+	        xwords_word	*w = op->words ;
+	        if (op->xa != nullptr) w = op->xa ;
+	        if ((i < op->nwords) && (w[i].wp != nullptr)) {
+	            wl = w[i].wl ;
+	        }
+	        if (rpp) {
+	            *rpp = (wl > 0) ? w[i].wp : nullptr ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wl : rs ;
 }
 /* end subroutine (xwords_get) */
 
-
-int xwords_finish(XWORDS *op)
-{
-	int		rs = SR_OK ;
+int xwords_finish(xwords *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (op->xa != NULL) {
-	    rs1 = uc_free(op->xa) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->xa = NULL ;
-	}
-
-	op->nwords = 0 ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->xa) {
+	        rs1 = uc_free(op->xa) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->xa = nullptr ;
+	    }
+	    op->nwords = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (xwords_finish) */
@@ -172,11 +165,9 @@ int xwords_finish(XWORDS *op)
 
 /* private subroutines */
 
-
-static int xwords_more(XWORDS *op,cchar wbuf[],int wlen,int si)
-{
+static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	vecobj		wil ;
-	const int	esize = sizeof(XWORDS_WI) ;
+	cint		esize = sizeof(XWORDS_WI) ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -204,19 +195,19 @@ static int xwords_more(XWORDS *op,cchar wbuf[],int wlen,int si)
 	    	    rs = vecobj_add(&wil,&wi) ;
 		}
 		if (rs >= 0) {
-		    XWORDS_WI	*ep ;
 		    int		i, j ;
+		    void	*vp ;
 		    n = op->nwords + vecobj_count(&wil) ;
 		    if (n > XWORDS_MAX) {
-		        const int	size = (n * esize) ;
-		        void		*p ;
-		        if ((rs = uc_malloc(size,&p)) >= 0) {
-			    op->xa = p ;
+		        cint	sz = (n * esize) ;
+		        if ((rs = uc_malloc(sz,&vp)) >= 0) {
+			    op->xa = wordp(vp) ;
 			    for (j = 0 ; j < op->nwords ; j += 1) {
 			        op->xa[j].wp = op->words[j].wp ;
 			        op->xa[j].wl = op->words[j].wl ;
 			    }
-			    for (i = 0 ; vecobj_get(&wil,i,&ep) >= 0 ; i += 1) {
+			    for (i = 0 ; vecobj_get(&wil,i,&vp) >= 0 ; i += 1) {
+		    		XWORDS_WI	*ep = wip(vp) ;
 			        op->xa[j].wp = ep->wp ;
 			        op->xa[j].wl = ep->wl ;
 			        j += 1 ;
@@ -224,7 +215,8 @@ static int xwords_more(XWORDS *op,cchar wbuf[],int wlen,int si)
 		        } /* end if (memory-allocation) */
 		    } else {
 			j = op->nwords ;
-			for (i = 0 ; vecobj_get(&wil,i,&ep) >= 0 ; i += 1) {
+			for (i = 0 ; vecobj_get(&wil,i,&vp) >= 0 ; i += 1) {
+		   	    XWORDS_WI	*ep = wip(vp) ;
 			    op->words[j].wp = ep->wp ;
 			    op->words[j].wl = ep->wl ;
 			    j += 1 ;
