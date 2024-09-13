@@ -5,34 +5,31 @@ T= field
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-CPP=	cpp
-CC=	gcc
-CXX=	gpp
-LD=	gld
-RANLIB=	granlib
-AR=	gar
-NM=	gnm
-COV=	gcov
-
-LORDER=	lorder
-TSORT=	tsort
-LINT=	lint
-RM=	rm -f
-TOUCH=	touch
-LINT=	lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS=
@@ -47,14 +44,16 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
+RUNINFO= -rpath $(RUNDIR)
+
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_FIELD= field_main.o field_obj.o
@@ -62,31 +61,36 @@ OBJ1_FIELD= field_srvarg.o field_svcargs.o
 OBJ2_FIELD= field_word.o field_wordphrase.o
 OBJ3_FIELD= fieldterms.o
 
-
 OBJA_FIELD= obj0_field.o obj1_field.o
 OBJB_FIELD= obj2_field.o obj3_field.o
 
 OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
 
 
+.SUFFIXES:		.hh .ii
+
+
 default:		$(T).o
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
-
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
 
 
 $(T).o:			$(OBJ_FIELD)
@@ -111,6 +115,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_field.o:	$(OBJ0_FIELD)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_FIELD)

@@ -45,15 +45,14 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
 #include	<mkchar.h>
 #include	<baops.h>
 
 
-constexpr int		fieldtermsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr int	fieldterminit_size = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
 struct fieldterminit {
-	char		terms[fieldtermsize] = {} ;
+	char		terms[fieldterminit_size] = {} ;
 	constexpr fieldterminit(cchar *s) noex {
 	    while (*s) {
 		cint	ch = mkchar(*s++) ;

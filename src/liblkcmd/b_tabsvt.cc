@@ -1,8 +1,8 @@
-/* b_tabsvt */
+/* b_tabsvt SUPPORT */
+/* lang=C++20 */
 
 /* KSH built-in version of 's(1d)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -23,14 +23,14 @@
 #define	CF_VCSR		1		/* VT cursor save-restore */
 #define	CF_ACSR		1		/* ANSI cursor save-restore */
 
-
 /* revision history:
 
 	= 2003-10-01, David A­D­ Morano
-	This code is now a built-in command for the KSH shell.  This code (like
-	almost all KSH built-in commands) can also compile as a stand-alone
-	program (independent process under the UNIX® System).  The independent
-	program created using this code replaces the old S program.
+	This code is now a built-in command for the KSH shell.  This
+	code (like almost all KSH built-in commands) can also compile
+	as a stand-alone program (independent process under the
+	UNIX® System).  The independent program created using this
+	code replaces the old S program.
 
 */
 
@@ -39,12 +39,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ tabsvt
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 
@@ -138,21 +135,21 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,char **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 extern int	tcgetlines(int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pcsmailcheck(const char *,char *,int,const char *) ;
-extern int	nusers(const char *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
+extern int	pcsmailcheck(cchar *,char *,int,cchar *) ;
+extern int	nusers(cchar *) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
@@ -161,15 +158,15 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_std(time_t,char *) ;
 extern char	*timestr_log(time_t,char *) ;
 
@@ -200,7 +197,7 @@ struct locinfo {
 } ;
 
 struct termtype {
-	const char	*name ;
+	cchar	*name ;
 	uint		flags ;
 } ;
 
@@ -212,19 +209,19 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,SHIO *,int,const char *) ;
-static int	gettermflags(PROGINFO *,const char *,int *) ;
-static int	terminit(PROGINFO *,const char *,int,int,char *,int) ;
-static int	termclear(PROGINFO *,const char *,int,int,char *,int) ;
-static int	termdate(PROGINFO *,const char *,int,int,char *,int,time_t) ;
-static int	bufsd(PROGINFO *,int,SBUF *,int,const char *,int) ;
-static int	bufdiv(PROGINFO *,int,SBUF *,int,int,const char *,int) ;
-static int	loadstrs(SBUF *,const char **) ;
+static int	process(PROGINFO *,SHIO *,int,cchar *) ;
+static int	gettermflags(PROGINFO *,cchar *,int *) ;
+static int	terminit(PROGINFO *,cchar *,int,int,char *,int) ;
+static int	termclear(PROGINFO *,cchar *,int,int,char *,int) ;
+static int	termdate(PROGINFO *,cchar *,int,int,char *,int,time_t) ;
+static int	bufsd(PROGINFO *,int,SBUF *,int,cchar *,int) ;
+static int	bufdiv(PROGINFO *,int,SBUF *,int,int,cchar *,int) ;
+static int	loadstrs(SBUF *,cchar **) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -274,7 +271,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"init",
 	"all",
 	"sd",
@@ -321,45 +318,45 @@ static const struct termtype	terms[] = {
 	{ NULL, 0 }
 } ;
 
-static const char	*s_basic[] = {
+static cchar	*s_basic[] = {
 	"\017",				/* shift-in */
 	"\033>",			/* numeric keypad mode */
 	"\033[?1l",			/* regular cursor keys */
 	NULL
 } ;
 
-static const char	*s_scroll[] = {
+static cchar	*s_scroll[] = {
 	"\033[1;24r",
 	NULL
 } ;
 
-static const char	*s_ec[] = {
+static cchar	*s_ec[] = {
 	"\033[m",			/* all character attributes off */
 	"\033[4l",			/* insert-mode off */
 	NULL
 } ;
 
-static const char	*s_vcv[] = {
+static cchar	*s_vcv[] = {
 	TERMSTR_S_VCUR,			/* VT set cursor ON */
 	NULL
 } ;
 
-static const char	*s_acv[] = {
+static cchar	*s_acv[] = {
 	TERMSTR_S_ACUR,			/* ANSI set cursor ON */
 	NULL
 } ;
 
-static const char	*s_scv[] = {
+static cchar	*s_scv[] = {
 	TERMSTR_S_SCUR,			/* SCREEN set cursor ON */
 	NULL
 } ;
 
-static const char	*s_psf[] = {
+static cchar	*s_psf[] = {
 	"\033P1!uA\033\\",	/* designate ISO Latin-1 as supplimental */
 	NULL
 } ;
 
-static const char	*s_scs94[] = {
+static cchar	*s_scs94[] = {
 	"\033(B",		/* map ASCII (94) to G0 */
 	"\033)0",		/* DEC Special Graphic (94) as G1 */
 	"\033+>",		/* map DEC Technical (94) to G3 */
@@ -368,24 +365,24 @@ static const char	*s_scs94[] = {
 } ;
 
 /* this is the holding place for the failings of the SCREEN program! */
-static const char	*s_scs94a[] = {
+static cchar	*s_scs94a[] = {
 	"\033*A",		/* map ISO Latin-1 (96) as G2 */
 	"\033\175",		/* lock shift G2 into GR */
 	NULL
 } ;
 
-static const char	*s_scs96[] = {
+static cchar	*s_scs96[] = {
 	"\033.A",		/* map ISO Latin-1 (96) as G2 */
 	"\033\175",		/* lock shift G2 into GR */
 	NULL
 } ;
 
-static const char	*s_clear[] = {
+static cchar	*s_clear[] = {
 	"\033[H\033[J",			/* clear screen */
 	NULL
 } ;
 
-static const char	blanks[] = "        " ;
+static cchar	blanks[] = "        " ;
 
 
 /* exported subroutines */
@@ -398,7 +395,7 @@ int b_tabsvt(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -450,17 +447,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*prpcs = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*utfname = NULL ;
-	const char	*termspec = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*prpcs = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*utfname = NULL ;
+	cchar	*termspec = NULL ;
+	cchar	*cp ;
 	char		buf[BUFLEN + 1] ;
 	char		pcsroot[MAXPATHLEN + 1] ;
 
@@ -1073,8 +1070,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-i] [-T <termtype>] [-d] [-a]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1095,7 +1092,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1246,7 +1243,7 @@ static int process(pip,ofp,fd,termspec)
 PROGINFO	*pip ;
 SHIO		*ofp ;
 int		fd ;
-const char	termspec[] ;
+cchar	termspec[] ;
 {
 	LOCINFO	*lip = pip->lip ;
 	int		rs, rs1 ;
@@ -1378,7 +1375,7 @@ ret0:
 
 static int gettermflags(pip,termspec,rp)
 PROGINFO	*pip ;
-const char	termspec[] ;
+cchar	termspec[] ;
 int		*rp ;
 {
 	int		rs = SR_OK ;
@@ -1413,7 +1410,7 @@ int		*rp ;
 /* create the data to set (reset-fix) the terminal state */
 static int terminit(pip,termspec,termflags,lines,buf,buflen)
 PROGINFO	*pip ;
-const char	termspec[] ;
+cchar	termspec[] ;
 int		termflags ;
 int		lines ;
 char		buf[] ;
@@ -1586,7 +1583,7 @@ ret0:
 /* clear the terminal */
 static int termclear(pip,termspec,termflags,lines,buf,buflen)
 PROGINFO	*pip ;
-const char	termspec[] ;
+cchar	termspec[] ;
 int		termflags ;
 int		lines ;
 char		buf[] ;
@@ -1717,7 +1714,7 @@ ret0:
 
 static int termdate(pip,termspec,termflags,lines,buf,buflen,daytime)
 PROGINFO	*pip ;
-const char	termspec[] ;
+cchar	termspec[] ;
 int		termflags ;
 int		lines ;
 char		buf[] ;
@@ -1971,7 +1968,7 @@ PROGINFO	*pip ;
 int		termflags ;
 SBUF		*bufp ;
 int		x ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int		rs ;
@@ -2060,7 +2057,7 @@ PROGINFO	*pip ;
 int		termflags ;
 SBUF		*bufp ;
 int		y, x ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int		rs ;
@@ -2140,7 +2137,7 @@ ret0:
 /* load a set of strings into the buffer */
 static int loadstrs(sbp,spp)
 SBUF		*sbp ;
-const char	**spp ;
+cchar	**spp ;
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;

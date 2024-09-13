@@ -38,7 +38,7 @@
 #include	<sfx.h>
 #include	<strwcpy.h>
 #include	<field.h>
-#include	<fieldterm.h>		/* |fieldterm_termsize(3uc)| */
+#include	<fieldterminit.hh>
 #include	<matostr.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -112,16 +112,7 @@ namespace {
 
 /* local variables */
 
-constexpr cchar		fterms[] = {
-	0x00, 0x1B, 0x00, 0x00,
-	0x01, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+constexpr fieldterminit	pt("\b\t\v\f ") ;	/* parsing terminators */
 
 static const keytyper	key ;
 
@@ -194,7 +185,7 @@ int confparser::parseln(filep fep,cchar *lp,int ll) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = fsb.start(lp,ll)) >= 0) {
-	    if (cchar *fp ; (rs = fsb.get(fterms,&fp)) > 0) {
+	    if (cchar *fp ; (rs = fsb.get(pt.terms,&fp)) > 0) {
 		char	keybuf[keylen + 1] ;
 	        cint	kl = min(rs,keylen) ;
 	        strwcpylc(keybuf,fp,kl) ;
@@ -251,7 +242,7 @@ int confparser::parse_set(filep fep,field *fsbp,cc *,int) noex {
 int confparser::parse_unset(filep fep,field *fsbp,cc *,int) noex {
 	int		rs ;
 	cchar		*cp{} ;
-	if ((rs = fsbp->get(fterms,&cp)) > 0) {
+	if ((rs = fsbp->get(pt.terms,&cp)) > 0) {
 	    cint	type = keytype_unset ;
 	    rs = file_addvar(fep,type,fi,cp,rs,nullptr,0) ;
 	}
@@ -261,12 +252,12 @@ int confparser::parse_unset(filep fep,field *fsbp,cc *,int) noex {
 int confparser::parse_addvar(filep fep,field *fsbp,cc *,int,int kt) noex {
 	int		rs ;
 	cchar		*kp{} ;
-	if ((rs = fsbp->get(fterms,&kp)) > 0) {
+	if ((rs = fsbp->get(pt.terms,&kp)) > 0) {
 	    cint	kl = rs ;
 	    int		cl = 0 ;
 	    cchar	*cp = nullptr ;
 	    if (fsbp->term != '#') {
-		if ((rs = fsbp->get(fterms,&cp)) > 0) {
+		if ((rs = fsbp->get(pt.terms,&cp)) > 0) {
 		    cl = rs ;
 		}
 	    }

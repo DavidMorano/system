@@ -42,7 +42,6 @@
 #include	<sigign.h>
 #include	<strn.h>
 #include	<mkchar.h>
-#include	<fieldterm.h>
 #include	<localmisc.h>
 
 #include	"uterm.h"
