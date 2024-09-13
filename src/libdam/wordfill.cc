@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	wordfill
+
+	Description:
 	This object mediates filling out text lines for a specified
 	line length.
 

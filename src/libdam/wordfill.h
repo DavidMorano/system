@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* text fill */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,7 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* base types */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<fifostr.h>
 #include	<localmisc.h>		/* extra types */
 
@@ -28,32 +31,25 @@
 
 
 struct wordfill_head {
+	fifostr		*sqp ;		/* string-queue-pointer */
 	uint		magic ;
-	fifostr		sq ;
 	int		wc ;		/* word-count */
-	int		cc ;		/* character count (w/ blanks) */
+	int		chrc ;		/* character count (w/ blanks) */
 } ;
 
+typedef	WORDFILL	wordfill ;
 
-#if	(! defined(WORDFILL_MASTER)) || (WORDFILL_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	wordfill_start(wordfill *,cchar *,int) noex ;
+extern int	wordfill_addword(wordfill *,cchar *,int) noex ;
+extern int	wordfill_addline(wordfill *,cchar *,int) noex ;
+extern int	wordfill_addlines(wordfill *,cchar *,int) noex ;
+extern int	wordfill_mklinefull(wordfill *,char *,int) noex ;
+extern int	wordfill_mklinepart(wordfill *,char *,int) noex ;
+extern int	wordfill_finish(wordfill *) noex ;
 
-extern int	wordfill_start(WORDFILL *,const char *,int) noex ;
-extern int	wordfill_addword(WORDFILL *,const char *,int) noex ;
-extern int	wordfill_addline(WORDFILL *,const char *,int) noex ;
-extern int	wordfill_addlines(WORDFILL *,const char *,int) noex ;
-extern int	wordfill_mklinefull(WORDFILL *,char *,int) noex ;
-extern int	wordfill_mklinepart(WORDFILL *,char *,int) noex ;
-extern int	wordfill_finish(WORDFILL *) noex ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* WORDFILL_MASTER */
+EXTERNC_end
 
 
 #endif /* WORDFILL_INCLUDE */

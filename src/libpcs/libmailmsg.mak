@@ -36,7 +36,7 @@ DEFS=
 
 INCS= libmailmsg.h
 
-LIBS=
+LIBS= -luc -lu
 
 
 LDRPATH= $(EXTRA)/lib
@@ -56,19 +56,21 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
-OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
-OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o mailmsgheadkey.o
-OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o 
-OBJ4_LIBMAILMSG= emainfo.o hdrdecode.o comparse.o
-OBJ5_LIBMAILMSG= mbcache.o contypevals.o contentencodings.o
+OBJ0= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
+OBJ1= mailmsgmatenv.o mailmsgmathdr.o
+OBJ2= mailmsghdrfold.o mailmsghdrval.o mailmsgheadkey.o
+OBJ3= mhcom.o mcmsg.o mimetypes.o hdrextnum.o 
+OBJ4= emainfo.o hdrdecode.o comparse.o
+OBJ5= mbcache.o contypevals.o contentencodings.o
+OBJ6= whitelist.o splitaddr.o
+OBJ7=
 
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o
+OBJC= obj4.o obj5.o
+OBJD= obj6.o
 
-OBJA_LIBMAILMSG= obj0.o obj1.o
-OBJB_LIBMAILMSG= obj2.o obj3.o
-OBJC_LIBMAILMSG= obj4.o obj5.o
-
-OBJ= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG) $(OBJC_LIBMAILMSG)
+OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD)
 
 
 .SUFFIXES:		.hh .ii
@@ -77,6 +79,8 @@ OBJ= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG) $(OBJC_LIBMAILMSG)
 default:		$(T).o
 
 all:			$(ALL)
+
+so:			$(T).so
 
 
 .c.i:
@@ -121,23 +125,29 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0.o:		$(OBJ0_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBMAILMSG)
+obj0.o:			$(OBJ0)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
 
-obj1.o:		$(OBJ1_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBMAILMSG)
+obj1.o:			$(OBJ1)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
 
-obj2.o:		$(OBJ2_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBMAILMSG)
+obj2.o:			$(OBJ2)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
 
-obj3.o:		$(OBJ3_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBMAILMSG)
+obj3.o:			$(OBJ3)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
-obj4.o:		$(OBJ4_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_LIBMAILMSG)
+obj4.o:			$(OBJ4)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
 
-obj5.o:		$(OBJ5_LIBMAILMSG)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_LIBMAILMSG)
+obj5.o:			$(OBJ5)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+
+obj6.o:			$(OBJ6)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
+
+obj7.o:			$(OBJ7)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
 
 
 # MAILBOX
@@ -173,5 +183,6 @@ mailmsgheadkey.o:	mailmsgheadkey.cc 			$(INCS)
 outema.o:		outema.cc outema.h			$(INCS)
 comparse.o:		comparse.cc comparse.h			$(INCS)
 whitelist.o:		whitelist.cc whitelist.h		$(INCS)
+splitaddr.o:		splitaddr.cc splitaddr.h		$(INCS)
 
 

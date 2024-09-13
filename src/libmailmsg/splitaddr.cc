@@ -1,7 +1,7 @@
 /* splitaddr HEADER */
 /* lang=C++20 */
 
-/* splitaddr mail address management */
+/* mail address management */
 /* version %I% last-modified %G% */
 
 
@@ -135,7 +135,6 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	if ((rs = splitaddr_ctor(op,ap)) >= 0) {
 	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) {
 	        int	al = strlen(ap) ;
-	        cchar	*tp ;
 	        char	*bp ;
 	        while (al && (ap[al-1] == '.')) {
 		    al -= 1 ;
@@ -143,6 +142,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	        if ((rs = uc_malloc((al+1),&bp)) >= 0) {
 	            int		bl = al ;
 	            bool	f = false ;
+	            cchar	*tp ;
 	            op->mailaddr = charp(bp) ;
 		    strwcpy(bp,ap,al) ;
 	            while ((tp = strnrpbrk(bp,bl,".@")) != nullptr) {

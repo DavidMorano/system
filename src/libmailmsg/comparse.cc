@@ -247,13 +247,15 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	            } /* end switch */
 	        } /* end while (scanning characters) */
 	        if (rs >= 0) {
-	            cchar	*cp ;
 	            cchar	*bp ;
 	            int		bl ;
 	            int		w = COMPARSE_SCOMMENT ;
 	            if ((rs = buffer_get((as+w),&bp)) >= 0) {
+	                cchar	*cp ;
 	                bl = rs ;
-	                while (bl && CHAR_ISWHITE(bp[bl-1])) bl -= 1 ;
+	                while (bl && CHAR_ISWHITE(bp[bl-1])) {
+			    bl -= 1 ;
+			}
 	                if ((rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
 	                    cpp->com.sp = cp ;
 	                    cpp->com.sl = bl ;

@@ -48,7 +48,7 @@ extern int whitelist_open(whitelist *,cchar *) noex ;
 extern int whitelist_fileadd(whitelist *,cchar *) noex ;
 extern int whitelist_count(whitelist *) noex ;
 extern int whitelist_get(whitelist *,int,cchar **) noex ;
-extern int whitelist_read(whitelist *,int,char *,int) noex ;
+extern int whitelist_read(whitelist *,char *,int,int) noex ;
 extern int whitelist_prematch(whitelist *,cchar *) noex ;
 extern int whitelist_audit(whitelist *) noex ;
 extern int whitelist_close(whitelist *) noex ;
