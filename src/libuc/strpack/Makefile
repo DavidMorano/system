@@ -44,7 +44,7 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -tpath $(RUNDIR)
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 

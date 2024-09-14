@@ -304,8 +304,8 @@ all:			$(ALL)
 $(TT).a:		$(TOBJ)
 	$(AR) -rc $@ $?
 
-$(T).so:		$(OBJS) Makefile $(T).map
-	$(LD) -G -o $@ $(LDFLAGS) -M $(T).map $(OBJS) $(SLIBINFO)
+$(T).so:		$(OBJS) Makefile
+	$(GXX) -shared -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

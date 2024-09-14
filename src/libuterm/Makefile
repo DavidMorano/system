@@ -176,8 +176,8 @@ so:			$(T).so
 $(T).a:			$(LOBJ)
 	$(AR) -rc $(T).a $?
 
-$(T).so:		$(LOBJS) Makefile localmisc.h $(T).a
-	$(LD) -o $@ -G $(LDFLAGS) $(LOBJS)
+$(T).so:		$(LOBJS) Makefile
+	$(GXX) -shared -o $@ $(LDFLAGS) $(LOBJS)
 
 safe:
 	makesafe -v=3 -I $(INCDIR) $(LOBJ) $(TOBJ)

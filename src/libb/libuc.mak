@@ -37,7 +37,7 @@ DEFS +=
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
 
-LIBS=
+LIBS= -lu
 
 
 INCDIRS=
@@ -64,10 +64,10 @@ OBJ03= stdfnames.o
 
 OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 OBJ05= nleadstr.o nleadkeystr.o
-OBJ06= mapex.o getourenv.o strnul.o
+OBJ06= mapex.o getourenv.o
 OBJ07=
 
-OBJ08= strkeycmp.o ccfile.o strnul.o
+OBJ08= strkeycmp.o strnul.o
 OBJ09= readln.o ccfile.o
 OBJ10= cfx.o memtrack.o addrset.o mapblock.o
 OBJ11= strmgr.o strop.o field.o
@@ -80,7 +80,7 @@ OBJ15= tcx.o
 OBJ16 += wsix.o wsnx.o wsx.o
 OBJ17 += six.o snx.o sfx.o rmx.o
 OBJ18 +=
-OBJ19 += hdb.o hdbstr_loadkeys.o hdbstr_loadpairs.o
+OBJ19 += hdb.o hdbstr.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -93,7 +93,7 @@ OBJ += $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19)
 .SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -121,11 +121,8 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 
-libmacuser.a:		$(OBJ)
-	$(AR) -rc $@ $?
-
 $(T).so:		$(OBJ) Makefile
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
@@ -412,9 +409,6 @@ dstr.o:			dstr.cc dstr.h
 varray.o:		varray.cc varray.h
 
 hdb.o:			hdb.cc hdb.h
-hdbstr.o:		hdbstr.cc hdbstr.h hdb.h
-hdbstr_loadkeys.o:	hdbstr_loadkeys.cc hdbstr.h
-hdbstr_loadpairs.o:	hdbstr_loadpairs.cc hdbstr.h
 lookaside.o:		lookaside.cc lookaside.h
 linefold.o:		linefold.cc linefold.h
 
@@ -745,6 +739,11 @@ liner.dir:
 # STRPACK
 strpack.o:		strpack.dir
 strpack.dir:
+	makesubdir $@
+
+# HDBSTR
+hdbstr.o:		hdbstr.dir
+hdbstr.dir:
 	makesubdir $@
 
 # TMPX

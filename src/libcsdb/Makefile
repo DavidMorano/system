@@ -334,7 +334,7 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJS) Makefile $(T).a
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO)
+	$(GXX) -shared -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (libut)
 
 T= libut
 
@@ -159,7 +159,7 @@ $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
 $(T).so:		$(OBJS) Makefile localmisc.h $(T).a
-	$(LD) -o $@ -G $(LDFLAGS) $(OBJS) $(SLIBINFO)
+	$(GXX) -shared -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO)
 
 install:		$(ALL) Makefile
 	ranlib $(T).a

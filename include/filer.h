@@ -33,7 +33,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
@@ -63,7 +62,78 @@ struct filer_head {
 	int		len ;		/* length of valid-data in buffer */
 } ;
 
+#ifdef	__cplusplus
+enum filermems {
+	filermem_reserve,
+	filermem_invalidate,
+	filermem_flush,
+	filermem_adv,
+	filermem_poll,
+	filermem_finish,
+	filermem_writeblanks,
+	filermem_writealign,
+	filermem_writezero,
+	filermem_overlast
+} ;
+struct filer ;
+struct filer_co {
+	filer		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (filer *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+} ; /* end struct (filer_co) */
+struct filer : filer_head {
+	filer_co	reserve ;
+	filer_co	invalidate ;
+	filer_co	flush ;
+	filer_co	adv ;
+	filer_co	poll ;
+	filer_co	finish ;
+	filer_co	writeblanks ;
+	filer_co	writealign ;
+	filer_co	writezero ;
+	filer() noex {
+	    reserve(this,filermem_reserve) ;
+	    invalidate(this,filermem_invalidate) ;
+	    flush(this,filermem_flush) ;
+	    adv(this,filermem_adv) ;
+	    poll(this,filermem_poll) ;
+	    finish(this,filermem_finish) ;
+	    writeblanks(this,filermem_writeblanks) ;
+	    writealign(this,filermem_writealign) ;
+	    writezero(this,filermem_writezero) ;
+	} ;
+	filer(const filer &) = delete ;
+	filer &operator = (const filer &) = delete ;
+	int start(int = 0,off_t = 0z,int = 0,int = 0) noex ;
+	int read(void *,int,int = -1) noex ;
+	int readp(void *,int,off_t,int = -1) noex ;
+	int readln(char *,int,int = -1) noex ;
+	int readlns(char *,int,int = -1,int * = nullptr) noex ;
+	int write(cvoid *,int) noex ;
+	int writeto(cvoid *,int,int) noex ;
+	int println(cchar *,int) noex ;
+	int printf(cchar *,...) noex ;
+	int vprintf(cchar *,va_list) noex ;
+	int seek(off_t,int) noex ;
+	int tell(off_t *) noex ;
+	int writefill(cchar *,int) noex ;
+	int writefd(char *,int,int,int) noex ;
+	void dtor() noex ;
+	~filer() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (filer) */
+#else	/* __cplusplus */
 typedef FILER		filer ;
+#endif /* __cplusplus */
+
 typedef FILER_FL	filer_fl ;
 
 EXTERNC_begin
@@ -76,8 +146,8 @@ extern int	filer_readlns(filer *,char *,int,int,int *) noex ;
 extern int	filer_write(filer *,cvoid *,int) noex ;
 extern int	filer_writeto(filer *,cvoid *,int,int) noex ;
 extern int	filer_println(filer *,cchar *,int) noex ;
-extern int	filer_vprintf(filer *,cchar *,va_list) noex ;
 extern int	filer_printf(filer *,cchar *,...) noex ;
+extern int	filer_vprintf(filer *,cchar *,va_list) noex ;
 extern int	filer_reserve(filer *,int) noex ;
 extern int	filer_update(filer *,off_t,cchar *,int) noex ;
 extern int	filer_invalidate(filer *) noex ;
@@ -93,9 +163,6 @@ extern int	filer_writefill(filer *,cchar *,int) noex ;
 extern int	filer_writealign(filer *,int) noex ;
 extern int	filer_writezero(filer *,int) noex ;
 extern int	filer_writefd(filer *,char *,int,int,int) noex ;
-extern int	filer_writehdr(filer *,cchar *,int) noex ;
-extern int	filer_writehdrkey(filer *,cchar *) noex ;
-extern int	filer_printlncont(filer *,int,cchar *,int) noex ;
 
 EXTERNC_end
 

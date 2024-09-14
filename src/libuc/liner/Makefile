@@ -44,7 +44,7 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -tpath $(RUNDIR)
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -56,7 +56,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= bfliner.o fbliner.o fdliner.o
+OBJ0= fbliner.o fdliner.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -140,7 +140,6 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-bfliner.o:		bfliner.cc	$(INCS)
 fbliner.o:		fbliner.cc	$(INCS)
 fdliner.o:		fdliner.cc	$(INCS)
 

@@ -519,8 +519,8 @@ a:			$(T).a
 $(T).a:			$(OBJ)
 	$(AR) -cr $(T).a $?
 
-$(T).so:		$(OBJS) Makefile $(T).map
-	$(LD) -G -o $@ -M $(T).map $(LDFLAGS_SO) $(OBJS) $(SLIBINFO)
+$(T).so:		$(OBJS) Makefile
+	$(GXX) -shared -o $@ $(LDFLAGS_SO) $(OBJS) $(SLIBINFO)
 
 $(T).x:			$(XOBJ) Makefile $(T).so
 	makedate -m $(T) > makedate.c

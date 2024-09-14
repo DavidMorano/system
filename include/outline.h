@@ -29,16 +29,13 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<bfile.h>
-#include	<localmisc.h>
 
 
 #define	OUTLINE		struct outline_head

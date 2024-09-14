@@ -161,7 +161,7 @@ OBJ08=
 OBJ09= ema_haveaddr.o emaentry_getbestaddr.o
 OBJ10= outbuf.o outline.o buffer_stropaque.o
 OBJ11= logzones.o received.o
-OBJ12= ng.o retpath.o stackaddr.o
+OBJ12= ng.o rerpath.o stackaddr.o
 OBJ13= article.o
 OBJ14= bfliner.o
 OBJ15=
@@ -289,7 +289,7 @@ progprinthdr.o:		progprinthdr.c $(INCS)
 
 progout.o:		progout.c $(INCS)
 
-progarts.o:		progarts.c $(INCS) ng.h retpath.h article.h
+progarts.o:		progarts.c $(INCS) ng.h rerpath.h article.h
 
 progartmaint.o:		progartmaint.c $(INCS)
 
@@ -299,9 +299,9 @@ progmsgfromaddr.o:	progmsgfromaddr.c $(INCS)
 
 progmsgid.o:		progmsgid.c $(INCS)
 
-broadcast.o:		broadcast.c $(INCS) ng.h retpath.h
+broadcast.o:		broadcast.c $(INCS) ng.h rerpath.h
 
-forward.o:		forward.c $(INCS) ng.h retpath.h
+forward.o:		forward.c $(INCS) ng.h rerpath.h
 
 
 opendial.o:		opendial.c opendial.h
@@ -317,7 +317,7 @@ ng.o:			ng.c ng.h
 
 bbhosts.o:		bbhosts.c bbhosts.h
 
-retpath.o:		retpath.c retpath.h
+rerpath.o:		rerpath.c rerpath.h
 
 outline.o:		outline.c outline.h
 

@@ -63,12 +63,12 @@ OBJ3= mhcom.o mcmsg.o mimetypes.o hdrextnum.o
 OBJ4= emainfo.o hdrdecode.o comparse.o
 OBJ5= mbcache.o contypevals.o contentencodings.o
 OBJ6= whitelist.o splitaddr.o
-OBJ7=
+OBJ7= filer_mailsup.o
 
 OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
 OBJC= obj4.o obj5.o
-OBJD= obj6.o
+OBJD= obj6.o obj7.o
 
 OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD)
 
@@ -184,5 +184,8 @@ outema.o:		outema.cc outema.h			$(INCS)
 comparse.o:		comparse.cc comparse.h			$(INCS)
 whitelist.o:		whitelist.cc whitelist.h		$(INCS)
 splitaddr.o:		splitaddr.cc splitaddr.h		$(INCS)
+stackaddr.o:		stackaddr.cc stackaddr.h		$(INCS)
+
+filer_mailsup.o:	filer_mailsup.cc			$(INCS)
 
 

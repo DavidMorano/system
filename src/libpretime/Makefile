@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (libpretime)
 
 T= libpretime
 
@@ -299,8 +299,8 @@ all:			$(ALL)
 $(TT).a:		$(TOBJ)
 	$(AR) -rc $@ $?
 
-$(T).so:		$(OBJS) Makefile $(T).map
-	$(LD) -G -o $@ $(SLDFLAGS) -M $(T).map $(OBJS) $(SLIBDIRS) $(SLIBS)
+$(T).so:		$(OBJS) Makefile
+	$(GXX) -shared -o $@ $(SLDFLAGS) $(OBJS) $(SLIBDIRS) $(SLIBS)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?

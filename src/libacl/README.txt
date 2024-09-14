@@ -1,4 +1,4 @@
-LIBACL
+LIBACL (Access-Control-List)
 
 These are subroutines that need to be generalized for Access-Control-List
 (ACL) operations.  These are very old functions (now), about 40

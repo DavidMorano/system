@@ -148,7 +148,7 @@ $(T).a:			$(OBJ)
 	ranlib $@
 
 $(T).so:		$(OBJS) Makefile $(T).a
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJS) $(LIBDIRS) $(SLIBS)
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJS) $(LIBDIRS) $(SLIBS)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

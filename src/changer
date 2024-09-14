@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} originally "
+NAMES="${NAMES} tpath "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/This subroutine was originally/s//This code was originally/g
+g/tpath/s//rpath/g
 	w
 	q
 EOF
