@@ -3626,18 +3626,15 @@ static int datauser_groupsfind(DATAUSER *dup)
 }
 /* end subroutine (datauser_groupsfind) */
 
-
-static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen)
-{
-	SYSGROUP	sgr ;
+static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen) noex {
+	sysgroup	sgr ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
 	if ((rs = sysgroup_open(&sgr,nullptr)) >= 0) {
-	    struct group	gr ;
-	    vecstr		*glp = &dup->groups ;
-	    cchar		**users ;
+	    cugrent	gr ;
+	    vecstr	*glp = &dup->groups ;
+	    cchar	**users ;
 	    while ((rs = sysgroup_readent(&sgr,&gr,grbuf,grlen)) > 0) {
 	            if (gr.gr_mem != nullptr) {
 	                cchar	*un = dup->un ;
@@ -3653,15 +3650,12 @@ static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen)
 	    rs1 = sysgroup_close(&sgr) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sysgroup) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (datauser_groupsfinder) */
 
-
 /* find supplemental project names for a given username */
-static int datauser_projects(DATAUSER *dup)
-{
+static int datauser_projects(DATAUSER *dup) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;

@@ -45,7 +45,7 @@
 	int sysdbfnameget(sysdbfiles n,cc *fn,cc **rpp) noex
 
 	Arguments:
-	n		name to retrieve
+	n		name to retrieve (the type is |sysdbfnames|)
 	fn		given file-name (or NULL if want the default)
 	rpp		pointer to the result c-string
 

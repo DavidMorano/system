@@ -30,6 +30,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<ucsysgr.h>		/* <- the money shot! */
 
 

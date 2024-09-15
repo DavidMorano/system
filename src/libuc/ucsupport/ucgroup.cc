@@ -1,4 +1,4 @@
-/* ucgroup */
+/* ucgroup SUPPORT */
 /* lang=C++20 */
 
 /* additional operaring-system support for GROUP-DB access */

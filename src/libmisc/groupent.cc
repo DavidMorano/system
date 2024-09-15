@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	groupent
+
+	Description:
 	These subroutines manage some simple tasks for the GROUP
 	object, referenced as 'struct group'. This object is defined
 	by UNIX® standards.
@@ -82,7 +86,7 @@ int groupent_parse(GROUP *grp,char *grbuf,int grlen,cchar *sp,int sl) noex {
 	if (grp && grbuf && sp) {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memset(grp,0,sizeof(GROUP)) ;
+	    memclear(grp) ;
 	    if ((rs = storeitem_start(ibp,grbuf,grlen)) >= 0) {
 	        int	fi = 0 ;
 	        cchar	*tp ;
@@ -91,10 +95,10 @@ int groupent_parse(GROUP *grp,char *grbuf,int grlen,cchar *sp,int sl) noex {
 	            cchar	**vpp = nullptr ;
 	            switch (fi++) {
 	            case 0:
-	                vpp = (const char **) &grp->gr_name ;
+	                vpp = (cchar **) &grp->gr_name ;
 	                break ;
 	            case 1:
-	                vpp = (const char **) &grp->gr_passwd ;
+	                vpp = (cchar **) &grp->gr_passwd ;
 	                break ;
 	            case 2:
 	                rs = cfdeci(sp,(tp-sp),&v) ;

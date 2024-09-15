@@ -22,8 +22,10 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
 #include	<spwd.h>
+#include	<ucpasswd.h>
 #include	<ucproject.h>
 
 

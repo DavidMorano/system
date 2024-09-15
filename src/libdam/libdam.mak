@@ -206,7 +206,7 @@ OBJ95= mkaddrname.o mkbestaddr.o mkbestfrom.o mkdisphdr.o mkaltext.o
 
 OBJ96= memfile.o linehist.o langstate.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
-OBJ98= openportmsg.o varsub.o mailalias.o userattr.o 
+OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= mknoise.o rijndael.o expcook.o schedvar.o
 OBJ101= termnote.o egs.o random.o bits.o 
@@ -821,11 +821,6 @@ strx.dir:
 # CONFIGVARS
 configvars.o:		configvars.dir
 configvars.dir:
-	makesubdir $@
-
-# MAILALIAS
-mailalias.o:		mailalias.dir
-mailalias.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

@@ -51,11 +51,11 @@
 #include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<usysflag.h>
 #include	<timewatch.hh>
 #include	<sncpyx.h>
 #include	<ptm.h>
+#include	<localmisc.h>
 
 #include	"ucgetus.h"
 

@@ -59,8 +59,8 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<usysflag.h>
+#include	<localmisc.h>
 
 #include	"ucsyssv.h"
 #include	"ucgetsv.h"

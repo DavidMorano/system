@@ -15,7 +15,6 @@
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<filemap.h>
-#include	<localmisc.h>
 
 
 #define	SYSUSERS		struct sysusers_head

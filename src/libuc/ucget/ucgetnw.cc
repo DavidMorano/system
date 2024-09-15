@@ -75,8 +75,8 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<usysflag.h>
+#include	<localmisc.h>
 
 #include	"ucsysnw.h"
 #include	"ucgetnw.h"

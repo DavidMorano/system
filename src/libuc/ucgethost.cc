@@ -110,7 +110,7 @@ extern int	h_errno ;
 #if	CF_DEBUGS
 struct herrno {
 	int		herrno ;
-	cchar	*name ;
+	cchar		*name ;
 } ;
 #endif /* CF_DEBUGS */
 
@@ -154,9 +154,7 @@ int uc_sethostent(int stayopen) noex {
 }
 /* end subrouttine (uc_sethostent) */
 
-
-int uc_endhostent()
-{
+int uc_endhostent() noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = endhostent()) != 0) {

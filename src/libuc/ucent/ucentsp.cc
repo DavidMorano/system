@@ -26,6 +26,7 @@
 #include	<usystem.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>

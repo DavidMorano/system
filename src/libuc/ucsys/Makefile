@@ -69,6 +69,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -90,9 +91,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSYS)
-
-$(T).a:			$(OBJ_UCSYS)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

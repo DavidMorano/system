@@ -29,8 +29,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getax.h>
-#include	<localmisc.h>
 #include	<snwcpy.h>
+#include	<localmisc.h>
 
 #include	"sysusernames.h"
 

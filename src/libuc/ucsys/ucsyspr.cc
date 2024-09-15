@@ -58,10 +58,10 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<clanguage.h>
 
 #include	"ucsyspr.h"
 

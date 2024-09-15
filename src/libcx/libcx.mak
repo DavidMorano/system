@@ -2,122 +2,57 @@
 
 T= libcx
 
-ALL= $(T).a
-
-SRCROOT= $(EXTRA)
+ALL= $(T).so $(T).a
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-
-LDCRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-
-
-CC= $(CGS_CC)
-GPP= $(CGS_GPP)
-
-GPPFLAGS= $(CGS_CXXFLAGS)
-CCOPTS= $(CCOPTS_GCCOPT) $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= -g -Wstrict-aliasing $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB) 
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
 
-DEF0=
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
-
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
-
-
-INCDIRS= -I$(INCDIR)
-
-CPPFLAGS= $(DEFS) $(INCDIRS)
-
-CFLAGS= $(CCOPTS) $(LF_CFLAGS)
-
-#LD= $(CC)
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-LDRPATH= /usr/lib/lwp
+DEFS=
 
-LDFLAGS= $(LF_LDFLAGS) -R$(CGS_RPATH):$(LDRPATH)
+INCS= libcx.h
 
-
-SLIBDIRS= -L$(CGS_LIBDIR)
-
-SLIB0=
-SLIB1= -ldam
-SLIB2=
-SLIB3= -luc -lu
-SLIB4= $(CGS_LIBS)
-SLIB5= $(LF_LIBS) 
-SLIB6=
-SLIB7=
-
-SLIBS= $(SLIB0) $(SLIB1) $(SLIB2) $(SLIB3) $(SLIB4) $(SLIB5) $(SLIB6) $(SLIB7)
-
-SLIBINFO= $(SLIBDIRS) $(SLIBS)
+LIBS=
 
 
-XLIBDIRS= -L$(CGS_LIBDIR)
+INCDIRS=
 
-XLIB0=
-XLIB1= -ldam -lb
-XLIB2= -ldebug
-XLIB3= -luc -lu
-XLIB4= $(CGS_LIBS)
-XLIB5= 
-XLIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
-XLIB7= -ldl
-
-XLIBS= $(XLIB0) $(XLIB1) $(XLIB2) $(XLIB3) $(XLIB4) $(XLIB5) $(XLIB6) $(XLIB7)
+LIBDIRS= -L$(LIBDIR)
 
 
-VALUES= $(VALDIR)/$(CGS_VALUES)
+RUNINFO= -rpath $(RUNDIR)
 
-CRT1= $(LDCRTDIR)/crt1.o
-CRTI= $(LDCRTDIR)/crti.o
-CRTBEGIN= $(LDCRTDIR)/crtbegin.o
-MCRT1= $(LDCRTDIR)/mcrt1.o
-GCRT1= $(LDCRTDIR)/gcrt1.o
-CRTEND= $(LDCRTDIR)/crtend.o
-CRTN= $(LDCRTDIR)/crtn.o
+LIBINFO= $(LIBDIRS) $(LIBS)
 
-CRTFRONT= $(CRT1) $(CRTI) $(VALUES) $(CRTBEGIN)
-CRTBACK= $(CRTEND) $(CRTN)
-
-# for regular (no profiling)
-CRT0= $(CRT1) $(CRTI) $(VALUES)
-# for 'prof(1)'
-MCRT0= $(CRTI) $(MCRT1) $(VALUES)
-# for 'gprof(1)'
-GCRT0= $(CRTI) $(GCRT1) $(VALUES)
-
-LINT= lint
-LINTFLAGS= $(LF_LINTFLAGS) -uxn -Dlint
-
-NM= nm
-NMFLAGS= -sx -v
-
-CPP= cpp
-
-LORDER= lorder
-TSORT= tsort
-
-RM= rm -f
-TOUCH= /usr/bin/touch
-
-
-INSTALLINCS= vsystem.h localmisc.h syshas.h
-
-INCS= localmisc.h syshas.h vsystem.h
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ00= strtoimax.o strtoumax.o
@@ -186,63 +121,44 @@ OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
 OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
 OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
 
-#OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
-OBJ= $(OBJA)
-
-#OBJS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
-OBJS= obja.o
+OBJ= obja.o
 
 
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.cc.o:
-	$(GPP) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
-objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
-objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
+.c.o:
+	$(COMPILE.c) $<
 
-objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
+.cc.o:
+	$(COMPILE.cc) $<
 
-obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
 
-objf.o:			$(OBJF)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
+$(T).o:			$(OBJ)
+	$(LD) -r -o $@ $(LDLAGS) $(OBJ)
 
-objg.o:			$(OBJG)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
-
+$(T).so:		$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
-
-$(T).so:		$(OBJS) Makefile localmisc.h
-	$(LD) -G -m -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -273,6 +189,31 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
+
+obja.o:			$(OBJA)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+
+objc.o:			$(OBJC)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
+
+objd.o:			$(OBJD)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
+
+obje.o:			$(OBJE)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
+
+objf.o:			$(OBJF)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
+
+objg.o:			$(OBJG)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
+
+objh.o:			$(OBJH)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJH)
 
 
 strtoimax.o:		strtoimax.cc
