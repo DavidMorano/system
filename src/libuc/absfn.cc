@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	absfn
+	
+	Description:
 	This object module (absfn) creates an absolute file-name
 	when needed.  It does this by prepending the present 
 	working directory (PWD) to those file names that a relative.

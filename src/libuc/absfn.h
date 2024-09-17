@@ -22,7 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
 
 
 #define	ABSFN		struct absfn_head
@@ -30,8 +30,8 @@
 
 
 struct absfn_head {
-	cchar	*as ;	/* allocated string */
-	char	buf[ABSFN_SHORTLEN+1] ;
+	cchar		*as ;	/* allocated string */
+	char		buf[ABSFN_SHORTLEN+1] ;
 } ;
 
 #ifdef	__cplusplus

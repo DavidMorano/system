@@ -20,13 +20,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<strpack.h>
 #include	<mailbox.h>
-#include	<localmisc.h>
 
 
 #define	MAILMSG		struct mailmsg_head

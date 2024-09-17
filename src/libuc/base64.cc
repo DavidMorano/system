@@ -40,9 +40,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysrets.h>		/* we have one SR below */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>		/* we have one SR below */
 #include	<mkchar.h>
 
 #include	"base64.h"
@@ -123,6 +124,9 @@ const uchar	base64_dt[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int base64_e(cchar *inbuf,int len,char *outbuf) noex {
@@ -181,7 +185,7 @@ int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 /* encode a group */
 static void base64_eg(cchar *inbuf,char *outbuf) noex {
 	ulong		hold = 0 ;
-	int		i{} ;
+	int		i{} ; /* used-afterwards */
 	for (i = 0 ; i < 3 ; i += 1) {
 	    hold = (hold << 8) ;
 	    hold |= mkchar(inbuf[i]) ;

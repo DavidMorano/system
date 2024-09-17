@@ -28,7 +28,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |off_t| */
 #include	<usystem.h>		/* for |USTAT| */
-#include	<localmisc.h>
 
 
 #define	FILEMAP		struct filemap_head

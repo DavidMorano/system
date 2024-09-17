@@ -32,8 +32,9 @@
 
 #include	<envstandards.h>
 #include	<algorithm>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 
 
 class int_fastdiv {

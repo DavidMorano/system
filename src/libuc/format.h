@@ -20,8 +20,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	FORMAT_OCLEAN	(1<<0)		/* clean data */
