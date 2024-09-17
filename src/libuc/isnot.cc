@@ -104,7 +104,7 @@ constexpr int	nlib[] = {
 	0	
 } ;
 
-constexpr int	rsnoterm[] = {
+constexpr int	rnoterm[] = {
 	SR_BADF,
 	SR_BADFD,
 	SR_NOTTY,
@@ -112,7 +112,7 @@ constexpr int	rsnoterm[] = {
 	0
 } ;
 
-constexpr int	rsnosupport[] = {
+constexpr int	rnosupport[] = {
 	SR_NOSYS,
 	SR_NOTSUP,
 	SR_PROTONOSUPPORT,
@@ -153,11 +153,11 @@ bool isNotLib(int rs) noex {
 /* end subroutine (isNotLib) */
 
 bool isNotTerm(int rs) noex {
-	return isOneOf(rsnoterm,rs) ;
+	return isOneOf(rnoterm,rs) ;
 }
 
 bool isNotSupport(int rs) noex {
-	return isOneOf(rsnosupport,rs) ;
+	return isOneOf(rnosupport,rs) ;
 }
 
 

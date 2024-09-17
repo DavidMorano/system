@@ -1,10 +1,8 @@
-/* pcsngdir */
+/* pcsngdir SUPPORT */
+/* lang=C++20 */
 
 /* return a directory name when given a newsgroup name */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,22 +16,18 @@
 
 /*******************************************************************************
 
-        This subroutine will take its argument to be a newsgroup name. The
-        subroutine will return the corresponding directory name in the spool
-        area.
+	Name:
+	pcsngdir
 
-	The 'PCS' variable must be set.
+	Description:
+	This subroutine will take its argument to be a newsgroup
+	name. The subroutine will return the corresponding directory
+	name in the spool area.  The 'PCS' variable must be set.
 
 	Synopsis:
-
-	int pcsngdir(pcs,rbuf,bbnewsdir,newsgroup)
-	const char	pcs[] ;
-	char		rbuf[] ;
-	const char	bbnewsdir[] ;
-	const char	newsgroup[] ;
+	int pcsngdir(cchar *pcs,char *rbuf,cc *bbnewsdir,cc *newsgroup) noex
 
 	Arguments:
-
 	pcs		PCS program root
 	rbuf		the directory path to the newsgroup relative
 			to the BBNEWS spool directory
@@ -41,40 +35,34 @@
 	ngname		a name of a newsgroup
 
 	Returns:
-
 	>0		length of returned directory name
 	SR_FAULT	NULL argument(s) was given
 	SR_INVALID	an invalid argument was given
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mkpathx.h>
+#include	<pathadd.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
+
+#include	"pcsngdir.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	pathadd(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
-
-/* external variables */
 
 
 /* external variables */
@@ -83,16 +71,19 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsngdir(pcs,ngdir,bbnewsdir,newsgroup)
-const char	pcs[] ;
-char		ngdir[] ;
-const char	bbnewsdir[] ;
-const char	newsgroup[] ;
-{
-	struct ustat	sb ;
+int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	int		f_first ;
@@ -100,12 +91,6 @@ const char	newsgroup[] ;
 	char		*bp ;
 	char		*cp2 ;
 	char		*ndp ;
-
-#if	CF_DEBUGS
-	debugprintf("pcsngdir: pcs=%s\n",pcs) ;
-	debugprintf("pcsngdir: bbnewsdir=%s\n",bbnewsdir) ;
-	debugprintf("pcsngdir: entered newsgroup=%s\n",newsgroup) ;
-#endif
 
 	if (pcs == NULL) return SR_FAULT ;
 	if (newsgroup == NULL) return SR_FAULT ;
@@ -123,10 +108,6 @@ const char	newsgroup[] ;
 
 	ndp = strwcpy(ndp,"/",1) ;
 
-#if	CF_DEBUGS
-	debugprintf("pcsngdir: modified bbnewsdir=%s\n",bbnewsdir2) ;
-#endif
-
 	if ((rs = u_stat(bbnewsdir2,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        if ((rs = mkpath1(ngdir,newsgroup)) >= 0) {
@@ -138,10 +119,6 @@ const char	newsgroup[] ;
 	            } /* end while */
 
 /* OK, start looking for the closest directory that matches */
-
-#if	CF_DEBUGS
-	            debugprintf("pcsngdir: about to loop\n") ;
-#endif
 
 	            f_first = TRUE ;
 	            rs = SR_ACCESS ;
@@ -184,11 +161,6 @@ const char	newsgroup[] ;
 	        rs = SR_NOTDIR ;
 	    }
 	} /* end if (u_stat) */
-
-#if	CF_DEBUGS
-	debugprintf("pcsngdir: ret rs=%d len=%u\n",rs,len) ;
-	debugprintf("pcsngdir: ngdir=%s\n",ngdir) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
