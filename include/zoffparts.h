@@ -26,20 +26,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
 #include	<usysrets.h>
 #include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<clanguage.h>
 
 
 #define	ZOFFPARTS	struct zoffparts_head
 
 
 struct zoffparts_head {
-	uint		hours ;
-	uint		mins ;
-	int		zoff ;		/* value */
+	uint	hours ;
+	uint	mins ;
+	int	zoff ;		/* value */
 } ;
 
 typedef ZOFFPARTS	zoffparts ;

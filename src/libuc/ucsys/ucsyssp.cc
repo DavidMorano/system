@@ -1,8 +1,8 @@
-/* spwd SUPPORT */
+/* ucsyssp SUPPORT */
 /* lang=C++20 */
 
-/* define various sytem (global) variables */
-/* last modified %G% vercion %I% */
+/* additional operaring-system support for PEOJECT-DB access */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,9 +19,24 @@
 
 /*******************************************************************************
 
-	I define some subroutines that are missing from some systems, who will
-	remain nameless for now (Apple Darwin).
+	Names:
+	getspent_rp
+	getspnam_rp
+	getspuid_rp
 
+	Description:
+	I define some subroutines that are missing from some systems,
+	which will remain nameless for now (Apple Darwin).
+
+	Synopsis:
+	int	getspent_rp(SPWD *,char *,int) noex
+	int	getspnam_rp(SPWD *,char *,int,cchar *) noex
+	int	getspuid_rp(SPWD *,char *,int,uid_t) noex
+
+	Returns:
+	0	success
+	>0	errno
+	<0	*should not happen*
 
 *******************************************************************************/
 
@@ -33,11 +48,15 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 
-#include	"spwd.h"
+#include	"ucsyssp.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -129,20 +148,6 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 #endif /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
 
 #else /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
-
-void setspent() noex { }
-
-void endspent() noex { }
-
-SPWD *getspent() noex {
-	errno = ENOENT ;
-	return nullptr ;
-}
-
-SPWD *getspnam(cchar *) noex {
-	errno = ENOENT ;
-	return nullptr ;
-}
 
 int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	int	ec = EFAULT ;

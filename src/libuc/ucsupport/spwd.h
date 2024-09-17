@@ -76,13 +76,6 @@ EXTERNC_end
 
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 
-EXTERNC_begin
-
-extern int	getspent_rp(SPWD *,char *,int) noex ;
-extern int	getspnam_rp(SPWD *,char *,int,cchar *) noex ;
-
-EXTERNC_end
-
 
 #endif /* SPWD_INCLUDE */
 

@@ -1,4 +1,4 @@
-/* uterm */
+/* uterm HEADER */
 /* lang=C20 */
 
 /* object to handle UNIX terminal stuff */
@@ -26,13 +26,12 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<charq.h>
-#include	<localmisc.h>		/* extra types */
 
 
 #define	UTERM		struct uterm_head
-#define	UTERM_PROMPT	struct uterm_prompt
-#define	UTERM_LOAD	struct uterm_load
 #define	UTERM_FL	struct uterm_flags
+#define	UTERM_LD	struct uterm_loader
+#define	UTERM_PR	struct uterm_prompter
 
 
 enum utermcmds {
@@ -57,12 +56,12 @@ enum utermcmds {
 } ;
 
 struct uterm_flags {
-	uint		co:1 ;		/* control-O */
-	uint		cc:1 ;		/* control-C */
-	uint		cy:1 ;		/* control-Y */
-	uint		cz:1 ;		/* control-Z */
+	uint		cntl_o:1 ;	/* control-O */
+	uint		cntl_c:1 ;	/* control-C */
+	uint		cntl_y:1 ;	/* control-Y */
+	uint		cntl_z:1 ;	/* control-Z */
 	uint		dle:1 ;		/* data-link-escape */
-	uint		rw:1 ;
+	uint		rw:1 ;		/* ?? */
 	uint		suspend:1 ;	/* output suspended */
 	uint		read:1 ;	/* read in progress */
 	uint		nosig:1 ;	/* no-signal-generation mode */
@@ -72,26 +71,26 @@ struct uterm_flags {
 } ;
 
 /* prompt-output before input */
-struct uterm_prompt {
+struct uterm_prompter {
 	cchar		*pbuf ;
 	int		plen ;
 } ;
 
 /* pre-loading the input buffer */
-struct uterm_load {
+struct uterm_loader {
 	cchar		*lbuf ;
 	int		llen ;
 } ;
 
 struct uterm_head {
-	uint		magic ;
-	UTERM_FL	f ;
 	TERMIOS		ts_old ;
 	TERMIOS		ts_new ;
 	charq		taq ;
 	charq		ecq ;
 	time_t		ti_start ;
 	uid_t		uid ;
+	UTERM_FL	f ;
+	uint		magic ;
 	int		fd ;
 	int		loopcount ;
 	int		timeout ;	/* timeout timer counter */
@@ -102,6 +101,8 @@ struct uterm_head {
 } ;
 
 typedef UTERM		uterm ;
+typedef	UTERM_LD	uterm_ld ;
+typedef	UTERM_PR	uterm_pr ;
 
 EXTERNC_begin
 
@@ -109,8 +110,7 @@ extern int uterm_start(uterm *,int) noex ;
 extern int uterm_control(uterm *,int,...) noex ;
 extern int uterm_status(uterm *,int,...) noex ;
 extern int uterm_read(uterm *,char *,int) noex ;
-extern int uterm_reade(uterm *,char *,int,int,int,
-		UTERM_PROMPT *,UTERM_LOAD *) noex ;
+extern int uterm_reade(uterm *,char *,int,int,int,uterm_pr *,uterm_ld *) noex ;
 extern int uterm_write(uterm *,cchar *,int) noex ;
 extern int uterm_suspend(uterm *) noex ;
 extern int uterm_resume(uterm *) noex ;

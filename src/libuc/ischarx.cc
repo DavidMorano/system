@@ -176,7 +176,7 @@
 
 /* imported namespaces */
 
-using std::bitset ;
+using std::bitset ;			/* type */
 
 
 /* local typedefs */
@@ -207,9 +207,9 @@ namespace {
 	constexpr void mkisalnum() noex ;
 	constexpr void mkishex() noex ;
 	constexpr ischarinfo() noex {
-	     mkisalpha() ;
-	     mkisalnum() ;
-	     mkishex() ;
+	    mkisalpha() ;
+	    mkisalnum() ;
+	    mkishex() ;
 	} ;
     } ; /* end struct (ischarinfo) */
 }
@@ -434,18 +434,22 @@ bool ishdrkey(int ch) noex {
 /* for records-keeping reasons, here is the old computed version */
 
 /****
+
 For the record, this version below (computed) was (substantially)
-faster than my older look-up table version (as shown with benchmarks).
-But the newer (C++11) |bitset| version is probably the slowest of
-them all.  But whatever. I am not so much into performing speed
-benchmarks now-a-days.
+faster than my older look-up table version (as determined by
+benchmarks).  But the newer (C++11) |bitset| version is probably
+the slowest of them all.  But whatever.  I am not so much into
+performing speed benchmarks now-a-days.
+
 ****/
 
 /****
+
 The -- even older (and original) -- look-up table version is
-not recorded here, but may be in some old archives. For the record,
+not recorded here, but may be in some old archives.  For the record,
 my old (very old now) look-up table version was probably faster
 than the C++11 |bitset| object look-up, but who is counting?
+
 ****/
 
 #ifdef	COMMENT

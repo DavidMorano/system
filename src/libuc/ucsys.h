@@ -28,6 +28,7 @@
 #include	<userattr.h>		/* <- special */
 
 #include	<ucsyspw.h>
+#include	<ucsyssp.h>
 #include	<ucsysgr.h>
 #include	<ucsyspj.h>
 

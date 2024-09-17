@@ -747,8 +747,6 @@ acctab.o:		acctab.cc acctab.h
 
 schedvar.o:		schedvar.cc schedvar.h
 
-varsub.o:		varsub.cc varsub.h
-
 memfile.o:		memfile.cc memfile.h
 
 baops.o:		baops.cc baops.h
@@ -821,6 +819,11 @@ strx.dir:
 # CONFIGVARS
 configvars.o:		configvars.dir
 configvars.dir:
+	makesubdir $@
+
+# VARSUB
+varsub.o:		varsub.dir
+varsub.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

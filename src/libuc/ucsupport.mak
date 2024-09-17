@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -56,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= spwd.o ucproject.o
+OBJ00= spwd.o
 OBJ01= 
 OBJ02= 
 OBJ03= 
@@ -132,6 +131,5 @@ obja.o:			$(OBJA)
 
 
 spwd.o:			spwd.cc		$(INCS)
-ucproject.o:		ucproject.cc	$(INCS)
 
 

@@ -20,8 +20,16 @@
 #include	<fcntl.h>
 #include	<cerrno>
 #include	<climits>		/* <- for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<intsat.h>
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

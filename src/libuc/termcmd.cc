@@ -35,6 +35,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
@@ -48,6 +50,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -71,7 +76,7 @@ int termcmd_clear(termcmd *ckp) noex {
 	    ckp->name = 0 ;
 	    ckp->istr[0] = '\0' ;
 	    ckp->dstr[0] = '\0' ;
-	    ckp->f.priv = false ;
+	    ckp->f.fpriv = false ;
 	    ckp->f.iover = false ;
 	    ckp->f.dover = false ;
 	    for (int i = 0 ; i < TERMCMD_NP ; i += 1) {

@@ -50,6 +50,9 @@ using std::nothrow ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 

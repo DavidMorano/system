@@ -26,25 +26,25 @@
 
 EXTERNC_begin
 
-extern bool iswhite(int) noex ;
-extern bool isalnumlatin(int) noex ;
-extern bool isalphalatin(int) noex ;
-extern bool isdict(int) noex ;
-extern bool isfnamespecial(int) noex ;
-extern bool ishexlatin(int) noex ;
-extern bool islowerlatin(int) noex ;
-extern bool isupperlatin(int) noex ;
-extern bool isnumsign(int) noex ;
-extern bool isprintbad(int) noex ;
-extern bool isprintlatin(int) noex ;
-extern bool isprintterm(int) noex ;
-extern bool iscmdstart(int) noex ;
-extern bool ishdrkey(int) noex ;
-extern bool	 ismmclass_7bit(int) noex ;
-extern bool	 ismmclass_8bit(int) noex ;
-extern bool	 ismmclass_binary(int) noex ;
+extern bool	iswhite(int) noex ;
+extern bool	isalnumlatin(int) noex ;
+extern bool	isalphalatin(int) noex ;
+extern bool	isdict(int) noex ;
+extern bool	isfnamespecial(int) noex ;
+extern bool	ishexlatin(int) noex ;
+extern bool	islowerlatin(int) noex ;
+extern bool	isupperlatin(int) noex ;
+extern bool	isnumsign(int) noex ;
+extern bool	isprintbad(int) noex ;
+extern bool	isprintlatin(int) noex ;
+extern bool	isprintterm(int) noex ;
+extern bool	iscmdstart(int) noex ;
+extern bool	ishdrkey(int) noex ;
+extern bool	ismmclass_7bit(int) noex ;
+extern bool	ismmclass_8bit(int) noex ;
+extern bool	ismmclass_binary(int) noex ;
 
-static inline bool isspacetab(int ch) noex {
+static inline bool	isspacetab(int ch) noex {
 	return ((ch == ' ') || (ch == '\t')) ;
 }
 
@@ -52,31 +52,31 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline bool isdigitlatin(int ch) noex {
+inline bool	isdigitlatin(int ch) noex {
 	return (ch >= '0') && (ch <= '9') ;
 }
-inline bool iseol(int ch) noex {
+inline bool	iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
-inline bool iszero(int ch) noex {
+inline bool	iszero(int ch) noex {
 	return (ch == '0') ;
 }
-inline bool isplusminus(int ch) noex {
+inline bool	isplusminus(int ch) noex {
 	return ((ch == '+') || (ch == '-')) ;
 }
 
 #else /* __cplusplus */
 
-static inline bool isdigitlatin(int ch) noex {
+static inline bool	isdigitlatin(int ch) noex {
 	return (ch >= '0') && (ch <= '9') ;
 }
-static inline bool iseol(int ch) noex {
+static inline bool	iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
-static inline bool iszero(int ch) noex {
+static inline bool	iszero(int ch) noex {
 	return (ch == '0') ;
 }
-static inline bool isplusminus(int ch) noex {
+static inline bool	isplusminus(int ch) noex {
 	return ((ch == '+') || (ch == '-')) ;
 }
 

@@ -20,10 +20,16 @@
 
 /*******************************************************************************
 
+	Name:
+	char
+
+	Description:
 	This module provides some character conversion tables for
 	use in the 'C' locale (using the ISO-Latin-1 character set).
 	These tables are provided for fast conversions when the
-	locale is not necessary to be changable.
+	locale is not necessary to be changable.  Only 8-bit
+	characters are supported (ISO-Latin-1 character set).  For
+	other character sets, use the system-supplied facilities.
 
 	Extra-note: Note that non-breaking-white-space (NBSP)
 	characters are *not* considered to be white-space!
@@ -50,7 +56,7 @@
 
 /* imported namespaces */
 
-using std::bitset ;
+using std::bitset ;			/* type */
 
 
 /* local typedefs */
@@ -76,10 +82,10 @@ namespace {
 	constexpr void mkisuc() noex ;
 	constexpr void mktoval() noex ;
 	constexpr charinfo() noex {
-	     mkiswhite() ;
-	     mkislc() ;
-	     mkisuc() ;
-	     mktoval() ;
+	    mkiswhite() ;
+	    mkislc() ;
+	    mkisuc() ;
+	    mktoval() ;
 	} ;
     } ; /* end struct (charinfo) */
 }

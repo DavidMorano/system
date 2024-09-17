@@ -54,9 +54,9 @@
 
 EXTERNC_begin
 
-extern int	getspent_rp(PASSWD *,char *,int) noex ;
-extern int	getspnam_rp(PASSWD *,char *,int,cchar *) noex ;
-extern int	getspuid_rp(PASSWD *,char *,int,uid_t) noex ;
+extern int	getspent_rp(SPWD *,char *,int) noex ;
+extern int	getspnam_rp(SPWD *,char *,int,cchar *) noex ;
+extern int	getspuid_rp(SPWD *,char *,int,uid_t) noex ;
 
 EXTERNC_end
 

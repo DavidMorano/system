@@ -716,11 +716,6 @@ field.o:		field.dir
 field.dir:
 	makesubdir $@
 
-# VARSUB
-varsub.o:		varsub.dir
-varsub.dir:
-	makesubdir $@
-
 # ENVS
 envs.o:			envs.dir
 envs.dir:
