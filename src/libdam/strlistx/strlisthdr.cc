@@ -20,7 +20,8 @@
 	This subroutine writes out a STRLIST file.
 
 	Synopsis:
-	int strlisthdr(strlisthdr *ep,int f,char *hbuf,int hlen) noex
+	int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex
+	int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex
 
 	Arguments:
 	- ep		object pointer

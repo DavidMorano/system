@@ -1,10 +1,8 @@
-/* msghdr */
+/* msghdr SUPPORT */
+/* lang=C++20 */
 
 /* messsage-header methods */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,16 +16,19 @@
 
 /*******************************************************************************
 
-	Message-Header support.
+	name:
+	msghdr
 
+	Description:
+	Message-Header support.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/uio.h>
 #include	<usystem.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 
@@ -35,13 +36,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -53,19 +47,19 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int msghdr_size(MSGHDR *mhp)
-{
-	struct iovec	*vlp = mhp->msg_iov ;
+int msghdr_size(MSGHDR *mhp) noex {
+	IOVEC		*vlp = mhp->msg_iov ;
 	int		vll = mhp->msg_iovlen ;
-	int		i ;
-	int		size = 0 ;
-	for (i = 0 ; i < vll ; i += 1) {
-	   size += vlp->iov_len ;
+	int		sz = 0 ;
+	for (int i = 0 ; i < vll ; i += 1) {
+	   sz += vlp->iov_len ;
 	}
-	return size ;
+	return sz ;
 }
 /* end subroutine (msghdr_size) */
 

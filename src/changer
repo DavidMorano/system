@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} tpath "
+NAMES="${NAMES} cmsghdr_passed "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/tpath/s//rpath/g
+g/cmsghdr_passed/s//conmsghdr_passed/g
 	w
 	q
 EOF
@@ -19,5 +19,4 @@ EOF
     done
   fi
 done
-
 

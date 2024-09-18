@@ -4,8 +4,6 @@
 /* PCS adjunct subroutines */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable at invocation */
 
 /* revision history:
 
@@ -44,8 +42,9 @@
 #include	<usystem.h>
 #include	<msfile.h>
 #include	<sockaddress.h>
+#include	<conmsghdr.h>
 #include	<pcsns.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"shio.h"
 #include	"msgdata.h"
@@ -82,47 +81,8 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
-#define	DEBUGFNAME	"/tmp/pcs.deb"
-
 
 /* external subroutines */
-
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	listenusd(const char *,mode_t,int) ;
-extern int	msghdr_size(MSGHDR *) ;
-extern int	cmsghdr_passed(CONMSGHDR *) ;
-extern int	isBadSend(int) ;
-extern int	isBadMsg(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -142,41 +102,36 @@ struct pcsadj {
 
 /* forward references */
 
-static int	pcsadj_allocbegin(PROGINFO *) ;
-static int	pcsadj_allocend(PROGINFO *) ;
+static int	pcsadj_allocbegin(PROGINFO *) noex ;
+static int	pcsadj_allocend(PROGINFO *) noex ;
 
-static int	pcsadj_objbegin(PROGINFO *) ;
-static int	pcsadj_objend(PROGINFO *) ;
+static int	pcsadj_objbegin(PROGINFO *) noex ;
+static int	pcsadj_objend(PROGINFO *) noex ;
 
-static int	pcsadj_reqother(PROGINFO *,int) ;
-static int	pcsadj_reqmsg(PROGINFO *,int) ;
+static int	pcsadj_reqother(PROGINFO *,int) noex ;
+static int	pcsadj_reqmsg(PROGINFO *,int) noex ;
 
-static int	pcsadj_getstatus(PROGINFO *,MSGDATA *) ;
-static int	pcsadj_gethelp(PROGINFO *,MSGDATA *) ;
-static int	pcsadj_getval(PROGINFO *,MSGDATA *) ;
-static int	pcsadj_mark(PROGINFO *,MSGDATA *) ;
-static int	pcsadj_exit(PROGINFO *,MSGDATA *) ;
+static int	pcsadj_getstatus(PROGINFO *,MSGDATA *) noex ;
+static int	pcsadj_gethelp(PROGINFO *,MSGDATA *) noex ;
+static int	pcsadj_getval(PROGINFO *,MSGDATA *) noex ;
+static int	pcsadj_mark(PROGINFO *,MSGDATA *) noex ;
+static int	pcsadj_exit(PROGINFO *,MSGDATA *) noex ;
 
-static int	pcsadj_send(PROGINFO *,MSGDATA *,int,uint) ;
-static int	pcsadj_invalid(PROGINFO *,MSGDATA *,int,int) ;
+static int	pcsadj_send(PROGINFO *,MSGDATA *,int,uint) noex ;
+static int	pcsadj_invalid(PROGINFO *,MSGDATA *,int,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsadj_begin(PROGINFO *pip)
-{
+int pcsadj_begin(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("pcsadj_begin: ent f_reuseaddr=%u\n",
-	        lip->f.reuseaddr) ;
-#endif
 
 	lip->rfd = -1 ;
 	if (lip->f.adj) {
@@ -195,11 +150,11 @@ int pcsadj_begin(PROGINFO *pip)
 	    }
 
 	    if (rs >= 0) {
-	        const mode_t	om = 0666 ;
-	        int		opts = 0 ;
+	        cmode	om = 0666 ;
+	        int	opts = 0 ;
 	        if (lip->f.reuseaddr) opts |= 1 ; /* reuse-address */
 	        if ((rs = listenusd(lip->reqfname,om,opts)) >= 0) {
-	            const int	fd = rs ;
+	            cint	fd = rs ;
 	            if ((rs = uc_closeonexec(fd,TRUE)) >= 0) {
 	                if ((rs = pcsadj_allocbegin(pip)) >= 0) {
 	                    lip->rfd = fd ;
@@ -213,48 +168,36 @@ int pcsadj_begin(PROGINFO *pip)
 
 	} /* end if (adj) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("pcsadj_begin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pcsadj_begin) */
 
-
-int pcsadj_end(PROGINFO *pip)
-{
+int pcsadj_end(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = pcsadj_allocend(pip) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = pcsadj_allocend(pip) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	if (lip->rfd >= 0) {
 	    rs1 = u_close(lip->rfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->rfd = -1 ;
 	}
-
-	if (lip->reqfname != NULL) {
+	if (lip->reqfname) {
 	    if (lip->reqfname[0] != '\0') {
 	        u_unlink(lip->reqfname) ;
 	    }
 	}
-
 	lip->open.adj = FALSE ;
 	return rs ;
 }
 /* end subroutine (pcsadj_end) */
 
-
-int pcsadj_req(PROGINFO *pip,int re)
-{
+int pcsadj_req(PROGINFO *pip,int re) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-
 	if (re != 0) {
 	    if ((re & POLLIN) || (re & POLLPRI)) {
 	        c += 1 ;
@@ -266,7 +209,6 @@ int pcsadj_req(PROGINFO *pip,int re)
 	        logflush(pip) ;
 	    }
 	} /* end if (events) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (pcsadj_req) */
@@ -274,11 +216,9 @@ int pcsadj_req(PROGINFO *pip,int re)
 
 /* local subroutines */
 
-
-static int pcsadj_allocbegin(PROGINFO *pip)
-{
+static int pcsadj_allocbegin(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
-	const int	asize = sizeof(PCSADJ) ;
+	cint		asize = sizeof(PCSADJ) ;
 	int		rs ;
 	void		*p ;
 	if ((rs = uc_malloc(asize,&p)) >= 0) {
@@ -291,9 +231,7 @@ static int pcsadj_allocbegin(PROGINFO *pip)
 }
 /* end subroutine (pcsadj_allocbegin) */
 
-
-static int pcsadj_allocend(PROGINFO *pip)
-{
+static int pcsadj_allocend(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -308,9 +246,7 @@ static int pcsadj_allocend(PROGINFO *pip)
 }
 /* end subroutine (pcsadj_allocend) */
 
-
-static int pcsadj_objbegin(PROGINFO *pip)
-{
+static int pcsadj_objbegin(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	if (lip->adj != NULL) {
@@ -323,9 +259,7 @@ static int pcsadj_objbegin(PROGINFO *pip)
 }
 /* end subroutine (pcsadj_objbegin) */
 
-
-static int pcsadj_objend(PROGINFO *pip)
-{
+static int pcsadj_objend(PROGINFO *pip) noex {
 	PCSADJ		*pap ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -344,12 +278,10 @@ static int pcsadj_objend(PROGINFO *pip)
 }
 /* end subroutine (pcsadj_objend) */
 
-
-static int pcsadj_reqother(PROGINFO *pip,int re)
-{
+static int pcsadj_reqother(PROGINFO *pip,int re) noex {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
-	const char	*ccp = NULL ;
+	cchar		*ccp = NULL ;
 
 	if (re & POLLHUP) {
 	    ccp = "hangup" ;
@@ -372,30 +304,23 @@ static int pcsadj_reqother(PROGINFO *pip,int re)
 }
 /* end subroutine (pcsadj_reqother) */
 
-
-/* ARGSUSED */
-static int pcsadj_reqmsg(PROGINFO *pip,int re)
-{
+static int pcsadj_reqmsg(PROGINFO *pip,int re) noex {
 	LOCINFO		*lip = pip->lip ;
 	PCSADJ		*pap ;
 	MSGDATA		*mdp ;
 	int		rs ;
 	int		f_logged = FALSE ;
 	char		*mbuf ;
-
+	(void) re ;
 	pap = (PCSADJ *) lip->adj ;
 	mdp = &pap->m ;
 	if ((rs = msgdata_getbuf(mdp,&mbuf)) >= 0) {
 	    if ((rs = msgdata_recv(mdp,lip->rfd)) > 0) {
 	        if ((rs = msgdata_conpass(mdp,FALSE)) >= 0) {
 		    if ((rs = locinfo_newreq(lip,1)) >= 0) {
-			const int	nreqs = rs ;
-	                int		mtype = MKCHAR(mbuf[0]) ;
+			cint	nreqs = rs ;
+	                int	mtype = MKCHAR(mbuf[0]) ;
 	                lip->ti_lastreq = pip->daytime ;
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("pcsadj_reqmsg: mtype=%u\n",mtype) ;
-#endif
 	                switch (mtype) {
 	                case pcsmsgtype_getstatus:
 	                    rs = pcsadj_getstatus(pip,mdp) ;
@@ -431,22 +356,15 @@ static int pcsadj_reqmsg(PROGINFO *pip,int re)
 }
 /* end subroutine (pcsadj_reqmsg) */
 
-
-static int pcsadj_getstatus(PROGINFO *pip,MSGDATA *mdp)
-{
+static int pcsadj_getstatus(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_status	m0 ;
 	struct pcsmsg_getstatus	m1 ;
 	int		rs ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_getstatus: ent\n") ;
-#endif
-
 	if ((rs = pcsmsg_getstatus(&m1,1,mdp->mbuf,mdp->ml)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
 	    if ((rs = locinfo_getreqs(lip)) >= 0) {
-		const int	nreqs = rs ;
+		cint	nreqs = rs ;
 #ifdef	OPTIONAL
 	        memset(&m0,0,sizeof(struct pcsmsg_status)) ;
 #endif
@@ -462,30 +380,18 @@ static int pcsadj_getstatus(PROGINFO *pip,MSGDATA *mdp)
 	    rs = pcsadj_invalid(pip,mdp,rs,TRUE) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_getstatus: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pcsadj_getstatus) */
 
-
-static int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp)
-{
+static int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_gethelp	mreq ;
 	struct pcsmsg_help	mres ;
 	int		rs ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_gethelp: ent\n") ;
-#endif
-
 	if ((rs = pcsmsg_gethelp(&mreq,1,mdp->mbuf,mdp->ml)) >= 0) {
-	    const int	rsn = SR_NOTFOUND ;
-	    const int	idx = mreq.idx ;
+	    cint	rsn = SR_NOTFOUND ;
+	    cint	idx = mreq.idx ;
 	    cchar	*np ;
 	    memset(&mres,0,sizeof(struct pcsmsg_help)) ;
 	    mres.tag = mreq.tag ;
@@ -498,8 +404,8 @@ static int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp)
 		rs = SR_OK ;
 	    }
 	    if (rs >= 0) {
-	        const int	mlen = mdp->mlen ;
-	        char		*mbuf = mdp->mbuf ;
+	        cint	mlen = mdp->mlen ;
+	        char	*mbuf = mdp->mbuf ;
 	        if ((rs = pcsmsg_help(&mres,0,mbuf,mlen)) >= 0) {
 	            rs = pcsadj_send(pip,mdp,rs,mreq.tag) ;
 	        } /* end if */
@@ -508,32 +414,20 @@ static int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp)
 	    rs = pcsadj_invalid(pip,mdp,rs,TRUE) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_gethelp: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pcsadj_gethelp) */
 
-
-static int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp)
-{
+static int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_getval	mreq ;
 	struct pcsmsg_val	mres ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_getval: ent\n") ;
-#endif
-
 	if ((rs = pcsmsg_getval(&mreq,1,mdp->mbuf,mdp->ml)) >= 0) {
-	    const int	rsn = SR_NOTFOUND ;
-	    const int	w = MKCHAR(mreq.w) ;
-	    const int	rlen = REALNAMELEN ;
+	    cint	rsn = SR_NOTFOUND ;
+	    cint	w = MKCHAR(mreq.w) ;
+	    cint	rlen = REALNAMELEN ;
 	    int		vl = 0 ;
 	    cchar	*key = mreq.key ;
 	    char	*rbuf = mres.val ;
@@ -546,60 +440,32 @@ static int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp)
 	        mres.rc = pcsmsgrc_ok ;
 	        mres.vl = (uchar) rs ;
 	    } else if (rs == rsn) {
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("pcsadj_getval: locinfo_nslook() NOTFOUND\n") ;
-#endif
 	        rs = SR_OK ;
 	        mres.rc = pcsmsgrc_notfound ;
 	    }
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("pcsadj_getval: mid rs=%d\n",rs) ;
-#endif
 	    if (rs >= 0) {
-	        const int	mlen = mdp->mlen ;
-	        char		*mbuf = mdp->mbuf ;
+	        cint	mlen = mdp->mlen ;
+	        char	*mbuf = mdp->mbuf ;
 	        if ((rs = pcsmsg_val(&mres,0,mbuf,mlen)) >= 0) {
 	            char	tbuf[TIMEBUFLEN+1] ;
 	            rs = pcsadj_send(pip,mdp,rs,mreq.tag) ;
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("pcsadj_getval: pcsadj_send() rs=%d\n",rs) ;
-#endif
 	            timestr_logz(pip->daytime,tbuf) ;
 	            if ((rs == 0) || (mres.rc != pcsmsgrc_ok)) vl = 0 ;
 	            logprintf(pip,"%s req k=%s w=%u vl=%u",tbuf,key,w,vl) ;
 	        } /* end if (pcsmsg_val) */
 	    } /* end if (ok) */
 	} else if (isBadMsg(rs)) {
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("pcsadj_getval: ISBAD rs=%d\n",rs) ;
-#endif
 	    rs = pcsadj_invalid(pip,mdp,rs,TRUE) ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_getval: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (pcsadj_getval) */
 
-
-static int pcsadj_mark(PROGINFO *pip,MSGDATA *mdp)
-{
+static int pcsadj_mark(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_mark	mreq ;
 	struct pcsmsg_ack	mres ;
 	int		rs ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_mark: ent\n") ;
-#endif
 
 	if ((rs = pcsmsg_mark(&mreq,1,mdp->mbuf,mdp->ml)) >= 0) {
 	    mres.tag = mreq.tag ;
@@ -619,18 +485,11 @@ static int pcsadj_mark(PROGINFO *pip,MSGDATA *mdp)
 	    rs = pcsadj_invalid(pip,mdp,rs,TRUE) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("pcsadj_mark: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pcsadj_mark) */
 
-
-static int pcsadj_exit(PROGINFO *pip,MSGDATA *mdp)
-{
+static int pcsadj_exit(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_exit	mreq ;
 	struct pcsmsg_ack	mres ;
 	int		rs ;
@@ -652,9 +511,7 @@ static int pcsadj_exit(PROGINFO *pip,MSGDATA *mdp)
 }
 /* end subroutine (pcsadj_exit) */
 
-
-static int pcsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f)
-{
+static int pcsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f) noex {
 	struct pcsmsg_status	mres ;
 	int		rs ;
 	cchar		*s = ((f) ? "invalid" : "bad-fmt") ;
@@ -674,9 +531,7 @@ static int pcsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f)
 }
 /* end subroutine (pcsadj_invalid) */
 
-
-static int pcsadj_send(PROGINFO *pip,MSGDATA *mdp,int dl,uint tag)
-{
+static int pcsadj_send(PROGINFO *pip,MSGDATA *mdp,int dl,uint tag) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		len = 0 ;

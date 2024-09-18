@@ -37,11 +37,14 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<msfile.h>
 #include	<poller.h>
+#include	<conmsghdr.h>
+#include	<msghdr.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -106,8 +109,6 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	cfdecmfi(const char *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	listenusd(const char *,mode_t,int) ;
-extern int	msghdr_size(MSGHDR *) ;
-extern int	cmsghdr_passed(CONMSGHDR *) ;
 extern int	isBadSend(int) ;
 extern int	isBadMsg(int) ;
 extern int	isNotPresent(int) ;

@@ -19,12 +19,16 @@
 
 /*******************************************************************************
 
+	Name:
+	stdorder
+
+	Description:
 	These routines provide for serialization of various variables
 	(of essentially the standard scalar-integer types) for use
-	in various messaging applications.
+	in various messaging applications.  Subroutines are provided
+	to read and write (from and to a byte-serial buffer) host
+	native variables of the following types:
 
-	Subroutines are provided to read and write (from and to a
-	byte-serial buffer) host native variables of the following types:
 	+ char
 	+ short
 	+ int
@@ -40,6 +44,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdint>
 #include	<stdintx.h>
 #include	<clanguage.h>

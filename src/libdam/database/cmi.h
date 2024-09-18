@@ -38,7 +38,7 @@
 #define	CMI_FMI		struct cmi_fmidx
 
 
-struct cmi_obj {
+struct cmi_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;

@@ -4,7 +4,7 @@
 /* read or audit a ComMandment Index (CMI) database */
 /* version %I% last-modified %G% */
 
-#define	CF_SEARCH	1		/* use 'bsearch(3c)' */
+#define	CF_SEARCH	1		/* use |bsearch(3c)| */
 
 /* revision history:
 
@@ -65,6 +65,10 @@
 
 #define	TO_CHECK	4
 
+#ifndef	CF_SEARCH
+#define	CF_SEARCH	1		/* use |bsearch(3c)| */
+#endif
+
 
 /* external subroutines */
 
@@ -86,6 +90,36 @@ cmi_obj cmi_modinfo = {
 
 /* forward references */
 
+template<typename ... Args>
+static int cmi_ctor(cmi *op,Args ... args) noex {
+	CMI		*hup = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (cmi_ctor) */
+
+static int cmi_dtor(cmi *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (cmi_dtor) */
+
+template<typename ... Args>
+static inline int cmi_magic(cmi *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == CMI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (cmi_magic) */
+
 static int	cmi_loadbegin(cmi *,time_t) noex ;
 static int	cmi_loadend(cmi *) noex ;
 static int	cmi_mapcreate(cmi *,time_t) noex ;
@@ -97,12 +131,12 @@ static int	cmi_checkupdate(cmi *,time_t) noex ;
 static int	cmi_search(cmi *,uint) noex ;
 static int	cmi_loadcmd(cmi *,cmi_ent *,char *,int,int) noex ;
 
-#if	CF_SEARCH
 static int	vtecmp(cvoid *,cvoid *) noex ;
-#endif
 
 
 /* local variables */
+
+constexpr bool		f_search = CF_SEARCH ;
 
 
 /* exported variables */
@@ -111,18 +145,13 @@ static int	vtecmp(cvoid *,cvoid *) noex ;
 /* exported subroutines */
 
 int cmi_open(cmi *op,cchar *dbname) noex {
-	const time_t	dt = time(NULL) ;
+	custime		dt = getustime ;
 	int		rs ;
 	int		nents = 0 ;
+	if ((rs = ci_ctor(op,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbname[0]) {
 	cchar	*cp ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(CMI)) ;
-
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 	    cchar	*es = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
@@ -137,160 +166,136 @@ int cmi_open(cmi *op,cchar *dbname) noex {
 	                op->magic = CMI_MAGIC ;
 	            } /* end if (loadbegin) */
 	            if (rs < 0) {
-	                if (op->fname != NULL) {
+	                if (op->fname != nullptr) {
 	                    uc_free(op->fname) ;
-	                    op->fname = NULL ;
+	                    op->fname = nullptr ;
 	                }
 	            }
 	        } /* end if (memory-allocation) */
 	    } /* end if (mkfnamesuf2) */
 	    if (rs < 0) {
-	        if (op->dbname != NULL) {
+	        if (op->dbname != nullptr) {
 	            uc_free(op->dbname) ;
-	            op->dbname = NULL ;
+	            op->dbname = nullptr ;
 	        }
 	    }
 	} /* end if (memory-allocation) */
 
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		cmi_dtor(op) ;
+	    }
+	} /* end if (cmi_ctor) */
 	return (rs >= 0) ? nents : rs ;
 }
 /* end subroutine (cmi_open) */
 
 int cmi_close(cmi *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-	{
-	rs1 = cmi_loadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	if (op->fname != NULL) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
-	}
-
-	if (op->dbname != NULL) {
-	    rs1 = uc_free(op->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = cmi_magic(op)) >= 0) {
+	    {
+	        rs1 = cmi_loadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    if (op->dbname) {
+	        rs1 = uc_free(op->dbname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbname = nullptr ;
+	    }
+	    {
+		rs1 = cmi_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (cmi_close) */
 
 int cmi_audit(cmi *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-/* verify that all list pointers and list entries are valid */
-
-	if (rs >= 0) {
+	int		rs ;
+	if ((rs = cmi_magic(op)) >= 0) {
 	    rs = cmi_auditvt(op) ;
-	}
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (cmi_audit) */
 
 int cmi_count(cmi *op) noex {
-	CMIHDR		*hip ;
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-	hip = &op->fhi ;
-	return (rs >= 0) ? hip->nents : rs ;
+	int		rs ;
+	int		ne = 0 ;
+	if ((rs = cmi_magic(op)) >= 0) {
+	    CMIHDR	*hip = &op->fhi ;
+	    ne = hip->nents ;
+	} /* end if (magic) */
+	return (rs >= 0) ? ne : rs ;
 }
 /* end subroutine (cmi_count) */
 
-int cmi_getinfo(cmi *op,CMI_INFO *ip) noex {
-	CMIHDR		*hip ;
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-	hip = &op->fhi ;
-
-	if (ip != NULL) {
-	    memset(ip,0,sizeof(CMI_INFO)) ;
-	    ip->idxmtime = op->fmi.ti_mod ;
-	    ip->idxctime = (time_t) hip->idxtime ;
-	    ip->dbtime = (time_t) hip->dbtime ;
-	    ip->dbsize = (size_t) hip->dbsize ;
-	    ip->idxsize = (size_t) hip->idxsize ;
-	    ip->nents = hip->nents ;
-	    ip->maxent = hip->maxent ;
-	}
-
-	return (rs >= 0) ? hip->nents : rs ;
+int cmi_getinfo(cmi *op,cmi_info *ip) noex {
+	int		rs ;
+	int		ne = 0 ;
+	if ((rs = cmi_magic(op)) >= 0) {
+	    if (ip) {
+	        CMIHDR	*hip = &op->fhi ;
+	        rs = memclear(ip) ;
+	        ip->idxmtime = op->fmi.ti_mod ;
+	        ip->idxctime = (time_t) hip->idxtime ;
+	        ip->dbtime = (time_t) hip->dbtime ;
+	        ip->dbsize = (size_t) hip->dbsize ;
+	        ip->idxsize = (size_t) hip->idxsize ;
+	        ip->nents = hip->nents ;
+	        ip->maxent = hip->maxent ;
+		ne = hip->nents ;
+	    } /* end if (non-null) */
+	} /* end if (magic) */
+	return (rs >= 0) ? ne : rs ;
 }
 /* end subroutine (cmi_getinfo) */
 
 int cmi_read(cmi *op,cmi_ent *bvep,char *vbuf,int vlen,uint cn) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		vi = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (bvep == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-/* check for update */
-
-	if ((rs >= 0) && (op->ncursors == 0)) {
-	    rs = cmi_checkupdate(op,0) ;
-	}
-	if (rs >= 0) {
-	    if ((rs = cmi_search(op,cn)) >= 0) {
-	        vi = rs ;
-	        rs = cmi_loadcmd(op,bvep,vbuf,vlen,vi) ;
+	if ((rs = cmi_magic(op,bvep,vnif)) >= 0) {
+	    if ((rs >= 0) && (op->ncursors == 0)) {
+	        rs = cmi_checkupdate(op,0) ;
 	    }
-	} /* end if (ok) */
-
+	    if (rs >= 0) {
+	        if ((rs = cmi_search(op,cn)) >= 0) {
+	            vi = rs ;
+	            rs = cmi_loadcmd(op,bvep,vbuf,vlen,vi) ;
+	        }
+	    } /* end if (ok) */
+	} /* end if (magic) */
 	return (rs >= 0) ? vi : rs ;
 }
 /* end subroutine (cmi_read) */
 
 int cmi_curbegin(cmi *op,cmi_cur *curp) noex {
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = 0 ;
-	op->ncursors += 1 ;
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = cmi_magic(op,curp)) >= 0) {
+	    curp->i = 0 ;
+	    op->ncursors += 1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (cmi_curbegin) */
 
 int cmi_curend(cmi *op,cmi_cur *curp) noex {
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = 0 ;
-	if (op->ncursors > 0) {
-	    op->ncursors -= 1 ;
-	}
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = cmi_magic(op,curp)) >= 0) {
+	    curp->i = 0 ;
+	    if (op->ncursors > 0) {
+	        op->ncursors -= 1 ;
+	    }
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (cmi_curend) */
 
@@ -300,10 +305,10 @@ int cmi_enum(cmi *op,cmi_cur *curp,cmi_ent *bvep,char *vbuf,int vlen) noex {
 	int		vi ;
 	int		nlines = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (bvep == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
 
@@ -331,14 +336,13 @@ int cmi_enum(cmi *op,cmi_cur *curp,cmi_ent *bvep,char *vbuf,int vlen) noex {
 static int cmi_loadbegin(cmi *op,time_t dt) noex {
 	int		rs ;
 	int		nents = 0 ;
-
 	if ((rs = cmi_mapcreate(op,dt)) >= 0) {
 	    rs = cmi_proc(op,dt) ;
 	    nents = rs ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        cmi_mapdestroy(op) ;
+	    }
 	} /* end if */
-
 	return (rs >= 0) ? nents : rs ;
 }
 /* end subroutine (cmi_loadbegin) */
@@ -347,13 +351,13 @@ static int cmi_loadend(cmi *op) noex {
 	cmi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
+	{
 	rs1 = cmi_mapdestroy(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	mip = &op->fmi ;
-	mip->vt = NULL ;
-	mip->lt = NULL ;
+	mip->vt = nullptr ;
+	mip->lt = nullptr ;
 	return rs ;
 }
 /* end subroutine (cmi_loadend) */
@@ -362,7 +366,7 @@ static int cmi_mapcreate(cmi *op,time_t dt) noex {
 	cmi_fmi		*mip = &op->fmi ;
 	int		rs ;
 
-	if (op->fname == NULL) return SR_BUGCHECK ;
+	if (op->fname == nullptr) return SR_BUGCHECK ;
 
 	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
 	    struct ustat	sb ;
@@ -374,7 +378,7 @@ static int cmi_mapcreate(cmi *op,time_t dt) noex {
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            void	*md ;
-	            if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                mip->mapdata = md ;
 	                mip->mapsize = ms ;
 	                mip->ti_mod = sb.st_mtime ;
@@ -397,10 +401,10 @@ static int cmi_mapdestroy(cmi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (mip->mapdata != NULL) {
+	if (mip->mapdata != nullptr) {
 	    rs1 = u_munmap(mip->mapdata,mip->mapsize) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mip->mapdata = NULL ;
+	    mip->mapdata = nullptr ;
 	    mip->mapsize = 0 ;
 	    mip->ti_map = 0 ;
 	}
@@ -414,7 +418,7 @@ static int cmi_checkupdate(cmi *op,time_t dt) noex {
 	int		f = FALSE ;
 
 	if (op->ncursors == 0) {
-	    if (dt <= 0) dt = time(NULL) ;
+	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	        struct ustat	sb ;
 	        cmi_fmi		*mip = &op->fmi ;
@@ -552,32 +556,23 @@ static int cmi_search(cmi *op,uint cn) noex {
 	int		rs = SR_OK ;
 	int		vtlen ;
 	int		vi = 0 ;
-
 	vt = mip->vt ;
 	vtlen = hip->vilen ;
-
 /* search for entry */
-
 	vte[3] = citekey ;
-
-#if	CF_SEARCH
-	{
+	if_constexpr (f_search) {
 	    uint	*vtep ;
 	    int		vtesize = (4 * sizeof(uint)) ;
 	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
-	    rs = (vtep != NULL) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
+	    rs = (vtep != nullptr) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
 	    vi = rs ;
-	}
-#else /* CF_SEARCH */
-	{
+	} else {
 	    for (vi = 0 ; vi < vtlen ; vi += 1) {
 	        const ushort	vkey = ((vt[vi][3] >> 16) & USHORT_MAX) ;
 	        if (vkey == citekey) break ;
 	    }
 	    rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
-	}
-#endif /* CF_SEARCH */
-
+	} /* end if_constexpr (f_search) */
 	return (rs >= 0) ? vi : rs ;
 }
 /* end subroutine (cmi_search) */
@@ -595,8 +590,8 @@ static int cmi_loadcmd(cmi *op,cmi_ent *bvep,char *ebuf,int elen,int vi) noex {
 	int		linesize ;
 	int		nlines ;
 
-	if (bvep == NULL) return SR_FAULT ;
-	if (ebuf == NULL) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
+	if (ebuf == nullptr) return SR_FAULT ;
 
 	if (elen <= 0) return SR_OVERFLOW ;
 

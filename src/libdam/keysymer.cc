@@ -280,7 +280,7 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 		bfliner		bl ;
 		if ((rs = bl.start(dfp)) >= 0) {
 		    cchar	*lp ;
-	            while ((rs = bl.getln(&lp)) > 0) {
+	            while ((rs = bl.getlns(&lp)) > 0) {
 	                cint	len = rmeol(lp,rs) ;
 	                cchar	*sp ;
 		        if (int sl ; (sl = sfshrink(lp,len,&sp)) > 0) {

@@ -1,4 +1,4 @@
-/* cmsghdr SUPPORT */
+/* conmsghdr SUPPORT */
 /* lang=C++20 */
 
 /* Conrol-Message-Header methods */
@@ -26,7 +26,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"cmsghdr.h"
+#include	"conmsghdr.h"
 
 
 /* local defines */
@@ -58,7 +58,7 @@
 
 /* exported subroutines */
 
-int cmsghdr_passed(CONMSGHDR *cmp) noex {
+int conmsghdr_passed(CONMSGHDR *cmp) noex {
 	cint		fdlen = sizeof(int) ;
 	int		fd = -1 ;
 	int		*ip = (int *) CMSG_DATA(cmp) ;
@@ -71,6 +71,6 @@ int cmsghdr_passed(CONMSGHDR *cmp) noex {
 	}
 	return fd ;
 }
-/* end subroutine (cmsghdr_passed) */
+/* end subroutine (conmsghdr_passed) */
 
 

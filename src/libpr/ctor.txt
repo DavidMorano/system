@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int keysymer_ctor(keysymer *op,Args ... args) noex {
+static int commandment_ctor(commandment *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int keysymer_ctor(keysymer *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (keysymer_ctor) */
+/* end subroutine (commandment_ctor) */
 
-static int keysymer_dtor(keysymer *op) noex {
+static int commandment_dtor(commandment *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (keysymer_dtor) */
+/* end subroutine (commandment_dtor) */
 
 template<typename ... Args>
-static inline int keysymer_magic(keysymer *op,Args ... args) noex {
+static inline int commandment_magic(commandment *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == KEYSYMER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == COMMANDMENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (keysymer_magic) */
+/* end subroutine (commandment_magic) */

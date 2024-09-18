@@ -27,6 +27,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sockaddress.h>
+#include	<conmsghdr.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -43,6 +44,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -219,7 +221,7 @@ int msgdata_conpass(msgdata *mip,int f_passfd) noex {
 	    CONMSGHDR	*cmp = CMSG_FIRSTHDR(mp) ;
 	    int		fd ;
 	    while (cmp != nullptr) {
-		if ((fd = cmsghdr_passed(cmp)) >= 0) {
+		if ((fd = conmsghdr_passed(cmp)) >= 0) {
 	            if ((mip->ns < 0) && f_passfd) {
 	                mip->ns = fd ;
 			f = true ;
