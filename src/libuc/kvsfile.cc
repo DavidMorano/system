@@ -20,14 +20,18 @@
 
 /*******************************************************************************
 
+	Name:
+	kvsfile
+
+	Description:
 	This object processes an access table for use by daemon
 	multiplexing server programs that want to control access
 	to their sub-servers.
 
 	Implementation note:
-	We let stale keys stay around. They are not lost, just not
-	freed when no longer needed. There is no memory leak as
-	they are all freed when the object is deconstructed. Stale
+	We let stale keys stay around.  They are not lost, just not
+	freed when no longer needed.  There is no memory leak as
+	they are all freed when the object is deconstructed.  Stale
 	keys do sort of serve as a ready key cache for those cases
 	when they may be need later on with future entries!
 
@@ -50,6 +54,7 @@
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<fieldterminit.hh>
 #include	<absfn.h>		/* absolute-file-name */
 #include	<hash.h>
 #include	<sncpyx.h>
@@ -241,16 +246,7 @@ static uint	hashkeyval(kf_ent *,int) noex ;
 /* local variables */
 
 /* all white space, pound ('#'), colon (':'), and comma (',') */
-static constexpr cchar	fterms[] = {
-	0x00, 0x1F, 0x00, 0x00,
-	0x09, 0x10, 0x00, 0x04,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+constexpr fieldterminit		ta("\b\t\r\v\f #,:") ; /* term-array */
 
 
 /* exported variables */
@@ -271,11 +267,11 @@ int kvsfile_open(kvsfile *op,int ndef,cchar *atfname) noex {
 		    hdbcmp_f	cf = hdbcmp_f(cmpkeyval) ;
 		    hdbhash_f	hf = hdbhash_f(hashkeyval) ;
 	            if ((rs = hdb_start(op->kvlp,ndef,0,hf,cf)) >= 0) {
-		        const nullptr_t	np{} ;
+		        cnullptr	np{} ;
 		        hdb		*elp = op->elp ;
 	                if ((rs = hdb_start(elp,ndef,0,np,np)) >= 0) {
 	                    op->magic = KVSFILE_MAGIC ;
-	                    op->ti_check = time(nullptr) ;
+	                    op->ti_check = getustime ;
 	                    if (atfname && (atfname[0] != '\0')) {
 	                        rs = kvsfile_fileadd(op,atfname) ;
 	                        if (rs < 0) {
@@ -666,7 +662,7 @@ static int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
 	    int		c = 0 ;
 	    cchar	*fp{} ;
 	    char	keybuf[KEYBUFLEN + 1] = {} ;
-	    while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
+	    while ((fl = field_get(&fsb,ta.terms,&fp)) >= 0) {
                 if ((c_field++ == 0) && (fsb.term == ':')) {
                     c = 0 ;
                     strwcpy(keybuf,fp,min(fl,KEYBUFLEN)) ;

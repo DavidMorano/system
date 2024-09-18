@@ -56,7 +56,7 @@
 
 /* local defines */
 
-#define	CMI_KA		sizeof(CMI_LINE)
+#define	CMI_KA		sizeof(cmi_line)
 #define	CMI_BO(v)	((CMI_KA - ((v) % CMI_KA)) % CMI_KA)
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
@@ -68,33 +68,16 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-
 
 /* external variables */
 
 
 /* exported variables */
 
-CMI_OBJ	cmi_modinfo = {
+cmi_obj cmi_modinfo = {
 	"cmi",
-	sizeof(CMI),
-	sizeof(CMI_CUR)
+	sizeof(cmi),
+	sizeof(cmi_cur)
 } ;
 
 
@@ -103,16 +86,16 @@ CMI_OBJ	cmi_modinfo = {
 
 /* forward references */
 
-static int	cmi_loadbegin(CMI *,time_t) noex ;
-static int	cmi_loadend(CMI *) noex ;
-static int	cmi_mapcreate(CMI *,time_t) noex ;
-static int	cmi_mapdestroy(CMI *) noex ;
-static int	cmi_proc(CMI *,time_t) noex ;
-static int	cmi_verify(CMI *,time_t) noex ;
-static int	cmi_auditvt(CMI *) noex ;
-static int	cmi_checkupdate(CMI *,time_t) noex ;
-static int	cmi_search(CMI *,uint) noex ;
-static int	cmi_loadcmd(CMI *,CMI_ENT *,char *,int,int) noex ;
+static int	cmi_loadbegin(cmi *,time_t) noex ;
+static int	cmi_loadend(cmi *) noex ;
+static int	cmi_mapcreate(cmi *,time_t) noex ;
+static int	cmi_mapdestroy(cmi *) noex ;
+static int	cmi_proc(cmi *,time_t) noex ;
+static int	cmi_verify(cmi *,time_t) noex ;
+static int	cmi_auditvt(cmi *) noex ;
+static int	cmi_checkupdate(cmi *,time_t) noex ;
+static int	cmi_search(cmi *,uint) noex ;
+static int	cmi_loadcmd(cmi *,cmi_ent *,char *,int,int) noex ;
 
 #if	CF_SEARCH
 static int	vtecmp(cvoid *,cvoid *) noex ;
@@ -127,7 +110,7 @@ static int	vtecmp(cvoid *,cvoid *) noex ;
 
 /* exported subroutines */
 
-int cmi_open(CMI *op,cchar *dbname) noex {
+int cmi_open(cmi *op,cchar *dbname) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	int		nents = 0 ;
@@ -173,9 +156,7 @@ int cmi_open(CMI *op,cchar *dbname) noex {
 }
 /* end subroutine (cmi_open) */
 
-
-int cmi_close(CMI *op)
-{
+int cmi_close(cmi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -183,9 +164,10 @@ int cmi_close(CMI *op)
 
 	if (op->magic != CMI_MAGIC) return SR_NOTOPEN ;
 
+	{
 	rs1 = cmi_loadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	if (op->fname != NULL) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -203,9 +185,7 @@ int cmi_close(CMI *op)
 }
 /* end subroutine (cmi_close) */
 
-
-int cmi_audit(CMI *op)
-{
+int cmi_audit(cmi *op) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -222,9 +202,7 @@ int cmi_audit(CMI *op)
 }
 /* end subroutine (cmi_audit) */
 
-
-int cmi_count(CMI *op)
-{
+int cmi_count(cmi *op) noex {
 	CMIHDR		*hip ;
 	int		rs = SR_OK ;
 
@@ -237,10 +215,7 @@ int cmi_count(CMI *op)
 }
 /* end subroutine (cmi_count) */
 
-
-/* this is so vital to normal operation! (no joke) */
-int cmi_getinfo(CMI *op,CMI_INFO *ip)
-{
+int cmi_getinfo(cmi *op,CMI_INFO *ip) noex {
 	CMIHDR		*hip ;
 	int		rs = SR_OK ;
 
@@ -265,9 +240,7 @@ int cmi_getinfo(CMI *op,CMI_INFO *ip)
 }
 /* end subroutine (cmi_getinfo) */
 
-
-int cmi_read(CMI *op,CMI_ENT *bvep,char *vbuf,int vlen,uint cn)
-{
+int cmi_read(cmi *op,cmi_ent *bvep,char *vbuf,int vlen,uint cn) noex {
 	int		rs = SR_OK ;
 	int		vi = 0 ;
 
@@ -293,10 +266,7 @@ int cmi_read(CMI *op,CMI_ENT *bvep,char *vbuf,int vlen,uint cn)
 }
 /* end subroutine (cmi_read) */
 
-
-int cmi_curbegin(CMI *op,CMI_CUR *curp)
-{
-
+int cmi_curbegin(cmi *op,cmi_cur *curp) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
@@ -309,10 +279,7 @@ int cmi_curbegin(CMI *op,CMI_CUR *curp)
 }
 /* end subroutine (cmi_curbegin) */
 
-
-int cmi_curend(CMI *op,CMI_CUR *curp)
-{
-
+int cmi_curend(cmi *op,cmi_cur *curp) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
@@ -327,9 +294,7 @@ int cmi_curend(CMI *op,CMI_CUR *curp)
 }
 /* end subroutine (cmi_curend) */
 
-
-int cmi_enum(CMI *op,CMI_CUR *curp,CMI_ENT *bvep,char *vbuf,int vlen)
-{
+int cmi_enum(cmi *op,cmi_cur *curp,cmi_ent *bvep,char *vbuf,int vlen) noex {
 	CMIHDR		*hip ;
 	int		rs = SR_OK ;
 	int		vi ;
@@ -363,7 +328,7 @@ int cmi_enum(CMI *op,CMI_CUR *curp,CMI_ENT *bvep,char *vbuf,int vlen)
 
 /* private subroutines */
 
-static int cmi_loadbegin(CMI *op,time_t dt) noex {
+static int cmi_loadbegin(cmi *op,time_t dt) noex {
 	int		rs ;
 	int		nents = 0 ;
 
@@ -378,8 +343,8 @@ static int cmi_loadbegin(CMI *op,time_t dt) noex {
 }
 /* end subroutine (cmi_loadbegin) */
 
-static int cmi_loadend(CMI *op) noex {
-	CMI_FMI		*mip ;
+static int cmi_loadend(cmi *op) noex {
+	cmi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -393,8 +358,8 @@ static int cmi_loadend(CMI *op) noex {
 }
 /* end subroutine (cmi_loadend) */
 
-static int cmi_mapcreate(CMI *op,time_t dt) noex {
-	CMI_FMI		*mip = &op->fmi ;
+static int cmi_mapcreate(cmi *op,time_t dt) noex {
+	cmi_fmi		*mip = &op->fmi ;
 	int		rs ;
 
 	if (op->fname == NULL) return SR_BUGCHECK ;
@@ -427,8 +392,8 @@ static int cmi_mapcreate(CMI *op,time_t dt) noex {
 }
 /* end subroutine (cmi_mapcreate) */
 
-static int cmi_mapdestroy(CMI *op) noex {
-	CMI_FMI		*mip = &op->fmi ;
+static int cmi_mapdestroy(cmi *op) noex {
+	cmi_fmi		*mip = &op->fmi ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -444,7 +409,7 @@ static int cmi_mapdestroy(CMI *op) noex {
 }
 /* end subroutine (cmi_mapdestroy) */
 
-static int cmi_checkupdate(CMI *op,time_t dt) noex {
+static int cmi_checkupdate(cmi *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
@@ -452,7 +417,7 @@ static int cmi_checkupdate(CMI *op,time_t dt) noex {
 	    if (dt <= 0) dt = time(NULL) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	        struct ustat	sb ;
-	        CMI_FMI		*mip = &op->fmi ;
+	        cmi_fmi		*mip = &op->fmi ;
 	        op->ti_lastcheck = dt ;
 	        if ((rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
@@ -471,8 +436,8 @@ static int cmi_checkupdate(CMI *op,time_t dt) noex {
 }
 /* end subroutine (cmi_checkupdate) */
 
-static int cmi_proc(CMI *op,time_t dt) noex {
-	CMI_FMI		*mip = &op->fmi ;
+static int cmi_proc(cmi *op,time_t dt) noex {
+	cmi_fmi		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	int		rs ;
 	int		nents = 0 ;
@@ -488,8 +453,8 @@ static int cmi_proc(CMI *op,time_t dt) noex {
 }
 /* end subroutine (cmi_proc) */
 
-static int cmi_verify(CMI *op,time_t dt) noex {
-	CMI_FMI		*mip = &op->fmi ;
+static int cmi_verify(cmi *op,time_t dt) noex {
+	cmi_fmi		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	int		rs = SR_OK ;
 	int		size ;
@@ -541,8 +506,8 @@ static int cmi_verify(CMI *op,time_t dt) noex {
 }
 /* end subroutine (cmi_verify) */
 
-static int cmi_auditvt(CMI *op) noex {
-	CMI_FMI		*mip = &op->fmi ;
+static int cmi_auditvt(cmi *op) noex {
+	cmi_fmi		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	uint		(*vt)[4] ;
 	uint		pcitcmpval = 0 ;
@@ -578,8 +543,8 @@ static int cmi_auditvt(CMI *op) noex {
 }
 /* end subroutine (cmi_auditvt) */
 
-static int cmi_search(CMI *op,uint cn) noex {
-	CMI_FMI		*mip = &op->fmi ;
+static int cmi_search(cmi *op,uint cn) noex {
+	cmi_fmi		*mip = &op->fmi ;
 	CMIHDR		*hip = &op->fhi ;
 	uint		(*vt)[4] ;
 	uint		vte[4] ;
@@ -617,9 +582,9 @@ static int cmi_search(CMI *op,uint cn) noex {
 }
 /* end subroutine (cmi_search) */
 
-static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi) noex {
-	CMI_LINE	*lines ;
-	CMI_FMI		*mip ;
+static int cmi_loadcmd(cmi *op,cmi_ent *bvep,char *ebuf,int elen,int vi) noex {
+	cmi_line	*lines ;
+	cmi_fmi		*mip ;
 	CMIHDR		*hip ;
 	ulong		uebuf = (ulong) ebuf ;
 	uint		*vte ;
@@ -642,7 +607,7 @@ static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi) noex {
 
 /* load the basic stuff */
 
-	memset(bvep,0,sizeof(CMI_ENT)) ;
+	memclear(bvep) ;
 	bvep->eoff = vte[0] ;
 	bvep->elen = vte[1] ;
 	bvep->nlines = ((vte[3] >> 16) & USHORT_MAX) ;
@@ -657,11 +622,11 @@ static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi) noex {
 
 	    bo = CMI_BO(uebuf) ;
 
-	    linesize = ((nlines + 1) * sizeof(CMI_LINE)) ;
+	    linesize = ((nlines + 1) * sizeof(cmi_line)) ;
 	    if (linesize <= (elen - (bo-uebuf))) {
 
 	        lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
-	        lines = (CMI_LINE *) (uebuf + bo) ;
+	        lines = (cmi_line *) (uebuf + bo) ;
 	        bvep->lines = lines ;
 
 	        for (i = 0 ; i < nlines ; i += 1) {

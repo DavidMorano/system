@@ -44,7 +44,7 @@ struct cmi_obj {
 	uint		cursize ;
 } ;
 
-struct cmi_i {
+struct cmi_information {
 	time_t		idxctime ;	/* IDX creation-time */
 	time_t		idxmtime ;	/* IDX modification-time */
 	time_t		dbtime ;	/* DB-file time */
@@ -100,15 +100,15 @@ typedef	CMI_FMI		cmi_fmi ;
 
 EXTERNC_begin
 
-extern int	cmi_open(CMI *,cchar *) noex ;
-extern int	cmi_count(CMI *) noex ;
-extern int	cmi_getinfo(CMI *,CMI_INFO *) noex ;
-extern int	cmi_read(CMI *,CMI_ENT *,char *,int,uint) noex ;
-extern int	cmi_curbegin(CMI *,CMI_CUR *) noex ;
-extern int	cmi_enum(CMI *,CMI_CUR *,CMI_ENT *,char *,int) noex ;
-extern int	cmi_curend(CMI *,CMI_CUR *) noex ;
-extern int	cmi_audit(CMI *) noex ;
-extern int	cmi_close(CMI *) noex ;
+extern int	cmi_open(cmi *,cchar *) noex ;
+extern int	cmi_count(cmi *) noex ;
+extern int	cmi_getinfo(cmi *,cmi_info *) noex ;
+extern int	cmi_read(cmi *,cmi_ent *,char *,int,uint) noex ;
+extern int	cmi_curbegin(cmi *,cmi_cur *) noex ;
+extern int	cmi_enum(cmi *,cmi_cur *,cmi_ent *,char *,int) noex ;
+extern int	cmi_curend(cmi *,cmi_cur *) noex ;
+extern int	cmi_audit(cmi *) noex ;
+extern int	cmi_close(cmi *) noex ;
 
 EXTERNC_end
 

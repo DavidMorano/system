@@ -70,8 +70,6 @@
 
 /* local structures */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
 
 /* forward references */
 
@@ -89,7 +87,7 @@ int fieldterms(char *terms,int f_retain,cchar *s) noex {
 	int		c = 0 ;
 	if (terms && s) {
 	    if (! f_retain) {
-		memclear(terms,termsize) ;
+		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
 	    while (*s) {
 		cint	ch = mkchar(*s++) ;
@@ -107,7 +105,7 @@ int fieldtermsx(char *terms,int f,int na,...) noex {
 	if (terms) {
 	    rs = SR_OK ;
 	    if (! f) {
-		memclear(terms,termsize) ;
+		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
 	    if (na > 0) {
 	        va_list	ap ;

@@ -67,7 +67,7 @@ OBJ03= strtox.o
 
 OBJ04= usupport.o usyscallbase.o
 OBJ05= utimeout.o ugetloadavg.o
-OBJ06= utimeouts.o 
+OBJ06= utimeouts.o uiconv.o
 OBJ07= ulogerror.o uinet.o
 
 OBJ08= usys.o 
@@ -301,7 +301,8 @@ usysop.o:		usysop.cc usysop.h		$(INCS)
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
-uvariables.o:		uvariables.cc uvariables.hh
+uvariables.o:		uvariables.cc uvariables.hh	$(INCS)
+uiconv.o:		uiconv.cc uiconv.h		$(INCS)
 
 syswords.o:		syswords.cc syswords.hh
 varnames.o:		varnames.cc varnames.hh

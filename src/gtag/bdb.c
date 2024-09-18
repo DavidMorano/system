@@ -1020,14 +1020,12 @@ struct bdb_key	*bkp ;
 }
 /* end subroutine (bdb_readentry) */
 
-
 /* operate on the BDBFILE object */
-static int bdbfile_start(struct bdb_file *fp,cchar *fname)
-{
+static int bdbfile_start(struct bdb_file *fp,cchar *fname) noex {
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
-	memset(fp,0,sizeof(struct bdb_file)) ;
+	memclear(fp) ;
 
 	fp->f_indexed = 0 ;
 	rs = uc_mallocstrw(fname,-1,&cp) ;
@@ -1035,7 +1033,7 @@ static int bdbfile_start(struct bdb_file *fp,cchar *fname)
 
 	return rs ;
 }
-/* end subroutine bdbfile_start) */
+/* end subroutine (bdbfile_start) */
 
 
 static int bdbfile_finish(struct bdb_file *fp)

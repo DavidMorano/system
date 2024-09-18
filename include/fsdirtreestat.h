@@ -1,7 +1,7 @@
-/* detdupai HEADER */
+/* fsdirtreestat HEADER */
 /* lang=C20 */
 
-/* does the given array of integers have duplicate entries */
+/* get status (??) on a file */
 /* version %I% last-modified %G% */
 
 
@@ -14,24 +14,31 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DETDUPAI_INCLUDE
-#define	DETDUPAI_INCLUDE
+#ifndef	FSDIRTREESTAT_INCLUDE
+#define	FSDIRTREESTAT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/stat.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
 
 
+#ifndef	FSDIRTREE_STAT
+#define	FSDIRTREE_STAT		USTAT
+#endif
+
+
 EXTERNC_begin
 
-extern int detdupai(cint *,int) noex ;
+extern int	fsdirtreestat(cchar *,int,FSDIRTREE_STAT *) noex ;
 
 EXTERNC_end
 
 
-#endif /* DETDUPAI_INCLUDE */
+#endif /* FSDIRTREESTAT_INCLUDE */
 
 

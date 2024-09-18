@@ -24,9 +24,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<mapstrint.h>
 #include	<bfile.h>
@@ -47,6 +50,17 @@
 #define	KEYSYMER_KSFNAME	"keysym.h"
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -57,6 +71,45 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static int keysymer_ctor(keysymer *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    KEYSYMER	*hop = op ;
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nothrow) mapstrint) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (keysymer_ctor) */
+
+static int keysymer_dtor(keysymer *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (keysymer_dtor) */
+
+template<typename ... Args>
+static inline int keysymer_magic(keysymer *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == KEYSYMER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (keysymer_magic) */
 
 static int keysymer_parse(keysymer *,cchar *) noex ;
 static int keysymer_parseline(keysymer *,cchar *,int) noex ;
@@ -76,53 +129,62 @@ static int cfliteral(cchar *,int,int *) noex ;
 /* exported subroutines */
 
 int keysymer_open(keysymer *op,cchar *pr) noex {
-	int		rs = SR_OK ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(KEYSYMER)) ;
-
-	if ((rs = mapstrint_start(&op->map,20)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_stat(pr,&sb)) >= 0) {
-		if (S_ISDIR(sb.st_mode)) {
-		    cchar	*idn = KEYSYMER_INCDNAME ;
-		    cchar	*kfn = KEYSYMER_KSFNAME ;
-		    if ((rs = mkpath3(tmpfname,pr,idn,kfn)) >= 0) {
-			if ((rs = keysymer_parse(op,tmpfname)) >= 0) {
-			    op->magic = KEYSYMER_MAGIC ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = keysymer_ctor(op,pr)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	        if ((rs = mapstrint_start(op->mlp,20)) >= 0) {
+	            USTAT	sb ;
+	            if ((rs = u_stat(pr,&sb)) >= 0) {
+		        if (S_ISDIR(sb.st_mode)) {
+	        	    char	*tbuf{} ;
+			    if ((rs = malloc_mp(&tbuf)) >= 0) {
+		                cchar	*idn = KEYSYMER_INCDNAME ;
+		                cchar	*kfn = KEYSYMER_KSFNAME ;
+		                if ((rs = mkpath(tbuf,pr,idn,kfn)) >= 0) {
+			            if ((rs = keysymer_parse(op,tbuf)) >= 0) {
+			                op->magic = KEYSYMER_MAGIC ;
+			            }
+		                } /* end if (mkpath) */
+				rs1 = uc_free(tbuf) ;
+				if (rs >= 0) rs = rs1 ;
+			    } /* end if (m-a-f) */
+		        } else {
+	    	            rs = SR_NOTDIR ;
 			}
-		    }
-		} else
-	    	    rs = SR_NOTDIR ;
-	    } /* end if (stat) */
-	    if (rs < 0)
-	        mapstrint_finish(&op->map) ;
-	} /* end if (mapstrint_start) */
-
+	            } /* end if (stat) */
+	            if (rs < 0) {
+	                mapstrint_finish(op->mlp) ;
+	            }
+	        } /* end if (mapstrint_start) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		keysymer_dtor(op) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (keysymer_open) */
 
 int keysymer_close(keysymer *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = keysymer_finishthem(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = mapstrint_finish(&op->map) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = keysymer_magic(op)) >= 0) {
+	    {
+	        rs1 = keysymer_finishthem(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = mapstrint_finish(op->mlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = keysymer_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (keysymer_close) */
@@ -130,11 +192,11 @@ int keysymer_close(keysymer *op) noex {
 int keysymer_count(keysymer *op) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
 
-	rs = mapstrint_count(&op->map) ;
+	rs = mapstrint_count(op->mlp) ;
 
 	return rs ;
 }
@@ -145,8 +207,8 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	int		v = 0 ;
 	char		knbuf[KEYSYMER_NAMELEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
 
@@ -159,7 +221,7 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	    kp = knbuf ;
 	}
 
-	rs = mapstrint_fetch(&op->map,kp,kl,NULL,&v) ;
+	rs = mapstrint_fetch(op->mlp,kp,kl,nullptr,&v) ;
 
 	return (rs >= 0) ? v : rs ;
 }
@@ -168,12 +230,12 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 int keysymer_curbegin(keysymer *op,KEYSYMER_CUR *curp) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
 
-	rs = mapstrint_curbegin(&op->map,&curp->c) ;
+	rs = mapstrint_curbegin(op->mlp,&curp->c) ;
 
 	return rs ;
 }
@@ -182,12 +244,12 @@ int keysymer_curbegin(keysymer *op,KEYSYMER_CUR *curp) noex {
 int keysymer_curend(keysymer *op,KEYSYMER_CUR *curp) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
 
-	rs = mapstrint_curend(&op->map,&curp->c) ;
+	rs = mapstrint_curend(op->mlp,&curp->c) ;
 
 	return rs ;
 }
@@ -197,19 +259,19 @@ int keysymer_enum(keysymer *op,KEYSYMER_CUR *curp,KEYSYMER_KE *rp) noex {
 	int		rs ;
 	int		nl = 0 ;
 	int		v ;
-	cchar	*np = NULL ;
+	cchar	*np = nullptr ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (rp == nullptr) return SR_FAULT ;
 
 	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
 
 	rp->keynum = 0 ;
 	rp->keyname[0] = '\0' ;
-	if ((rs = mapstrint_enum(&op->map,&curp->c,&np,&v)) >= 0) {
+	if ((rs = mapstrint_enum(op->mlp,&curp->c,&np,&v)) >= 0) {
 	    nl = rs ;
-	    if (np != NULL) {
+	    if (np != nullptr) {
 	        strwcpy(rp->keyname,np,MIN(nl,KEYSYMER_NAMELEN)) ;
 	        rp->keynum = v ;
 	    }
@@ -228,7 +290,7 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if ((rs = bopen(dfp,fname,"r",0666)) >= 0) {
 	    cint	llen = LINEBUFLEN ;
@@ -279,7 +341,7 @@ static int keysymer_parseline(keysymer *op,cchar *lp,int ll) noex {
 		    sp = (cp+cl) ;
 		    if ((cl = nextfield(sp,sl,&cp)) > 0) {
 			cchar	*tp ;
-		        if ((tp = strnchr(cp,cl,'_')) != NULL) {
+		        if ((tp = strnchr(cp,cl,'_')) != nullptr) {
 		            if (strncmp("KEYSYM",cp,(tp-cp)) == 0) {
 				cint	kl = ((cp+cl) - (tp+1)) ;
 			        int		nl ;
@@ -330,14 +392,14 @@ static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 	}
 
 	c = 1 ;
-	rs = mapstrint_add(&op->map,kp,kl,kn) ;
+	rs = mapstrint_add(op->mlp,kp,kl,kn) ;
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (keysymer_process) */
 
 static int keysymer_finishthem(keysymer *op) noex {
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	return SR_OK ; /* nothing to do */
 }
 /* end subroutine (keysymer_finishthem) */
@@ -349,7 +411,7 @@ static int keysymer_seen(keysymer *op,cchar *np,int nl,int *rp) noex {
 
 	if (nl < 0) nl = strlen(np) ;
 
-	if ((tp = strnchr(np,nl,'_')) != NULL) {
+	if ((tp = strnchr(np,nl,'_')) != nullptr) {
 	    int		kl = ((np + nl) - (tp + 1)) ;
 	    cchar	*kp = (tp + 1) ;
 	    char	knbuf[KEYSYMER_NAMELEN + 1] ;
@@ -358,7 +420,7 @@ static int keysymer_seen(keysymer *op,cchar *np,int nl,int *rp) noex {
 	        kl = strwcpylc(knbuf,kp,ml) - knbuf ;
 	        kp = knbuf ;
 	    }
-	    rs = mapstrint_fetch(&op->map,kp,kl,NULL,&v) ;
+	    rs = mapstrint_fetch(op->mlp,kp,kl,nullptr,&v) ;
 	}
 
 	if (rp) {
@@ -379,9 +441,9 @@ static int cfliteral(cchar *np,int nl,int *rp) noex {
 	    cchar	*tp ;
 	    np += 1 ;
 	    nl -= 1 ;
-	    if ((tp = strnchr(np,nl,CH_SQUOTE)) != NULL) {
+	    if ((tp = strnchr(np,nl,CH_SQUOTE)) != nullptr) {
 	        if ((tp - np) > 0) {
-	            if (rp != NULL) v = (np[1] & 0xff) ;
+	            if (rp != nullptr) v = (np[1] & 0xff) ;
 	            rs = SR_OK ;
 	        }
 	    }

@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	terment
+
+	Description:[
 	This code provides the methods for the TERMENT object. The
 	TERMENT object, while residing in a file, forms a single
 	record in a file-database of records. This is similar to a
@@ -55,8 +59,7 @@
 int terment_start(terment *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    memclear(op) ;		/* dangerous */
-	    rs = SR_OK ;
+	    rs = memclear(op) ;		/* dangerous */
 	}
 	return rs ;
 }

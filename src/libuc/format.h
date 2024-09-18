@@ -29,6 +29,7 @@
 #define	FORMAT_OCLEAN	(1<<0)		/* clean data */
 #define	FORMAT_ONOOVERR	(1<<1)		/* do *not* return error on overflow */
 
+
 EXTERNC_begin
 
 extern int	format(char *,int,int,cchar *,va_list) noex ;

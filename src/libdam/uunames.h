@@ -1,4 +1,8 @@
-/* uunames */
+/* uunames HEADER */
+/* lang=C20 */
+
+/* uunames-query database manager */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,31 +15,32 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UUNAMES_INCLUDE
-#define	UUNAMES_INCLUDE	1
+#define	UUNAMES_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<time.h>		/* |time_t| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	UUNAMES_MAGIC	0x99889298
 #define	UUNAMES		struct uunames_head
-#define	UUNAMES_OBJ	struct uunames_obj
-#define	UUNAMES_CUR	struct uunames_c
 #define	UUNAMES_FL	struct uunames_flags
+#define	UUNAMES_OBJ	struct uunames_object
+#define	UUNAMES_CUR	struct uunames_cursor
 
 
-struct uunames_obj {
-	const char	*name ;
+struct uunames_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct uunames_c {
+struct uunames_cursor {
 	int		i ;
 } ;
 
@@ -44,41 +49,38 @@ struct uunames_flags {
 } ;
 
 struct uunames_head {
-	uint		magic ;
-	const char	*pr ;
-	const char	*dbname ;
-	const char	*indfname ;		/* index file-name */
-	caddr_t		indfmap ;		/* index file-map */
-	UUNAMES_FL	f ;
-	vecobj		list ;
+	cchar		*pr ;
+	cchar		*dbname ;
+	cchar		*indfname ;		/* index file-name */
+	vecobj		*nlp ;			/* name-list-pointer */
+	caddr_t		mapdata ;		/* index map-data */
+	size_t		mapsize ;		/* index map-size */
 	time_t		ti_mod ;		/* DB file modification */
 	time_t		ti_map ;		/* map */
 	time_t		ti_lastcheck ;
-	int		indfsize ;		/* index file-size */
+	UUNAMES_FL	f ;
+	uint		magic ;
 	int		ncursors ;
 } ;
 
+typedef	UUNAMES		uunames ;
+typedef	UUNAMES_FL	uunames_fl ;
+typedef	UUNAMES_OBJ	uunames_obj ;
+typedef	UUNAMES_CUR	uunames_cur ;
 
-#if	(! defined(UUNAMES_MASTER)) || (UUNAMES_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int uunames_open(uunames *,cchar *,cchar *) noex ;
+extern int uunames_count(uunames *) noex ;
+extern int uunames_exists(uunames *,cchar *,int) noex ;
+extern int uunames_curbegin(uunames *,uunames_cur *) noex ;
+extern int uunames_enum(uunames *,uunames_cur *,char *,int) noex ;
+extern int uunames_curend(uunames *,uunames_cur *) noex ;
+extern int uunames_audit(uunames *) noex ;
+extern int uunames_close(uunames *) noex ;
 
-extern int uunames_open(UUNAMES *,const char *,const char *) ;
-extern int uunames_count(UUNAMES *) ;
-extern int uunames_exists(UUNAMES *,const char *,int) ;
-extern int uunames_curbegin(UUNAMES *,UUNAMES_CUR *) ;
-extern int uunames_enum(UUNAMES *,UUNAMES_CUR *,char *,int) ;
-extern int uunames_curend(UUNAMES *,UUNAMES_CUR *) ;
-extern int uunames_audit(UUNAMES *) ;
-extern int uunames_close(UUNAMES *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-#endif /* UUNAMES_MASTER */
 
 #endif /* UUNAMES_INCLUDE */
 

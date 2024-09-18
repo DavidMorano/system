@@ -1,7 +1,8 @@
-/* hexdecoder */
+/* hexdecoder HEADER */
 /* lang=C99 */
 
 /* HEX decoder */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,12 +15,14 @@
 /* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	HEXDECODER_INCLUDE
-#define	HEXDECODER_INCLUDE	1
+#define	HEXDECODER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
 
 
 #define	HEXDECODER_MAGIC	0x13f3c202
@@ -27,29 +30,23 @@
 
 
 struct hexdecoder_head {
+	void		*outbuf ;	/* output-buffer */
 	uint		magic ;
 	int		rl ;		/* residue length ('0' or '1') */
-	void		*outbuf ;	/* output-buffer */
 	char		rb[2] ;		/* residue buffer */
 } ;
 
+typedef HEXDECODER	hexdecoder ;
 
-#if	(! defined(HEXDECODER_MASTER)) || (HEXDECODER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int hexdecoder_start(HEXDECODER *) noex ;
+extern int hexdecoder_load(HEXDECODER *,cchar *,int) noex ;
+extern int hexdecoder_read(HEXDECODER *,char *,int) noex ;
+extern int hexdecoder_finish(HEXDECODER *) noex ;
 
-extern int hexdecoder_start(HEXDECODER *) ;
-extern int hexdecoder_load(HEXDECODER *,cchar *,int) ;
-extern int hexdecoder_read(HEXDECODER *,char *,int) ;
-extern int hexdecoder_finish(HEXDECODER *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* HEXDECODER_MASTER */
 
 #endif /* HEXDECODER_INCLUDE */
 
