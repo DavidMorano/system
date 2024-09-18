@@ -75,6 +75,7 @@ struct bfliner : bfliner_head {
 	int getln(cchar ** = nullptr) noex ;
 	int getlns(cchar ** = nullptr) noex ;
 	int getpoff(off_t *) noex ;
+	int adv(int = 0) noex ;
 	void dtor() noex ;
 	~bfliner() noex {
 	    dtor() ;
@@ -92,6 +93,7 @@ extern int bfliner_getln(bfliner *,cchar **) noex ;
 extern int bfliner_getlns(bfliner *,cchar **) noex ;
 extern int bfliner_readover(bfliner *) noex ;
 extern int bfliner_getpoff(bfliner *,off_t *) noex ;
+static int bfliner_adv(bfliner *,int) noex ;
 extern int bfliner_finish(bfliner *) noex ;
 
 EXTERNC_end

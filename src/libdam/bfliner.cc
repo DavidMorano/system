@@ -4,7 +4,6 @@
 /* BFILE-liner */
 /* version %I% last-modified %G% */
 
-#define	CF_BFLINERADV	0		/* |bfliner_adv()| ? */
 
 /* revision history:
 
@@ -41,6 +40,11 @@
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -163,24 +167,21 @@ int bfliner_getpoff(bfliner *op,off_t *rp) noex {
 }
 /* end subroutine (bfliner_getpoff) */
 
-#if	CF_BFLINERADV
 static int bfliner_adv(bfliner *op,int inc) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	    op->poff = op->foff ;
 	    if (inc > 0) {
-	        if (! op->f_reg) {
-	            int		rlen = inc ;
-	            while ((rs >= 0) && (rlen > 0)) {
-	                cint	mlen = min(rlen,op->llen) ;
-	                rs = filer_read(&op->mfb,op->lbuf,mlen,op->to) ;
-	                rlen -= rs ;
-	            } /* end while */
-	        } else {
-	            rs = filer_adv(&op->mfb,inc) ;
-		}
-	        op->foff += inc ;
+	        bfile	*ifp = op->ifp ;
+		int	rlen = inc ;
+		while ((rs >= 0) && (rlen > 0)) {
+		    cint	ml = min(op->llen,rlen) ;
+	            if ((rs = bread(ifp,op->lbuf,ml)) >= 0) {
+	                op->foff += rs ;
+			rlen -= rs ;
+		    }
+		} /* end while */
 	    } /* end if */
 	    op->ll = -1 ;
 	    op->lbuf[0] = '\0' ;
@@ -188,7 +189,6 @@ static int bfliner_adv(bfliner *op,int inc) noex {
 	return rs ;
 }
 /* end subroutine (bfliner_adv) */
-#endif /* CF_BFLINERADV */
 
 int bfliner::start(bfile *fp,off_t so,int to) noex {
 	return bfliner_start(this,fp,so,to) ;
@@ -204,6 +204,10 @@ int bfliner::getlns(cchar **lpp) noex {
 
 int bfliner::getpoff(off_t *offp) noex {
 	return bfliner_getpoff(this,offp) ;
+}
+
+int bfliner::adv(int inc) noex {
+	return bfliner_adv(this,inc) ;
 }
 
 void bfliner::dtor() noex {

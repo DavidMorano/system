@@ -16,10 +16,14 @@
 
 /*******************************************************************************
 
+	Name:
+	lookaside
+
+	Description:
 	This object provides a fix-sized pool of memory blocks for
-	fast allocation and deallocation. However, memory is never
+	fast allocation and deallocation.  However, memory is never
 	released back to |malloc(3c)| (the origin from which all
-	memory comes) once it is allocated. Freed blocks are,
+	memory comes) once it is allocated.  Freed blocks are,
 	however, available for new allocation requests.
 
 *******************************************************************************/
@@ -48,8 +52,8 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;
-using std::nothrow ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
