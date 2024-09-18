@@ -40,9 +40,9 @@
 #include	<bfliner.h>
 #include	<cfnum.h>
 #include	<ascii.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<strwcpy.h>
-#include	<char.h>
+#include	<rmx.h>
 #include	<mkchar.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -54,6 +54,8 @@
 
 #define	KEYSYMER_INCDNAME	"include"
 #define	KEYSYMER_KSFNAME	"keysym.h"
+
+#define	KS		keysymer
 
 
 /* local namespaces */
@@ -119,6 +121,7 @@ static inline int keysymer_magic(keysymer *op,Args ... args) noex {
 
 static int keysymer_parse(keysymer *,cchar *) noex ;
 static int keysymer_parseln(keysymer *,cchar *,int) noex ;
+static int keysymer_ks(KS *,cc *,int,cc *,int) noex ;
 static int keysymer_process(keysymer *,cchar *,int,int) noex ;
 static int keysymer_finishthem(keysymer *) noex ;
 static int keysymer_seen(keysymer *,cchar *,int,int *) noex ;
@@ -278,9 +281,8 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 		if ((rs = bl.start(dfp)) >= 0) {
 		    cchar	*lp ;
 	            while ((rs = bl.getln(&lp)) > 0) {
-	                int	len = rs ;
+	                cint	len = rmeol(lp,rs) ;
 	                cchar	*sp ;
-		        if (lp[len-1] == '\n') len -= 1 ;
 		        if (int sl ; (sl = sfshrink(lp,len,&sp)) > 0) {
 	                     if (sp[0] == '#') { /* look for '#define' */
 	        	         if ((rs = keysymer_parseln(op,sp,sl)) >= 0) {
@@ -303,7 +305,6 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 
 static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
 	int		c = 0 ;
 	if (ll < 0) ll = strlen(lp) ;
 	if ((ll > 1) && (lp[0] == '#')) {
@@ -319,30 +320,12 @@ static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 		        if (cchar *tp ; (tp = strnchr(cp,cl,'_')) != np) {
 		            if (strncmp("KEYSYM",cp,(tp-cp)) == 0) {
 				cint	kl = ((cp+cl) - (tp+1)) ;
-			        int		il ;
 				cchar		*kp = (tp+1) ;
-				cchar		*ip ;
 				if (strncasecmp("include",cp,cl) != 0) {
-
-	sl -= ((cp + cl) - sp) ;
-	sp = (cp + cl) ;
-	if ((il = nextfield(sp,sl,&ip)) > 0) {
-		int		kn ;
-
-	if (ip[0] == CH_SQUOTE) {
-	    rs1 = cfliteral(ip,il,&kn) ;
-	} else if (ip[0] == 'K') {
-	    rs1 = keysymer_seen(op,ip,il,&kn) ;
-	} else {
-	    rs1 = cfnumi(ip,il,&kn) ;
-	}
-
-	if (rs1 >= 0) {
-	    rs = keysymer_process(op,kp,kl,kn) ;
-	    c = rs ;
-	}
-
-	} /* end if (postive) */
+				    sl -= ((cp + cl) - sp) ;
+				    sp = (cp + cl) ;
+				    rs = keysymer_ks(op,kp,kl,sp,sl) ;
+				    c = rs ;
 
 			 	} /* end if (not "INCLUDE") */
 	                    } /* end if (KEYSYM) */
@@ -355,6 +338,29 @@ static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (keysymer_parseln) */
+
+static int keysymer_ks(KS *op,cc *kp,int kl,cc *sp,int sl) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	cchar		*ip ;
+	if (int il ; (il = sfnext(sp,sl,&ip)) > 0) {
+	    int		kn ;
+	    if (ip[0] == CH_SQUOTE) {
+	        rs1 = cfliteral(ip,il,&kn) ;
+	    } else if (ip[0] == 'K') {
+	        rs1 = keysymer_seen(op,ip,il,&kn) ;
+	    } else {
+	        rs1 = cfnumi(ip,il,&kn) ;
+	    }
+	    if (rs1 >= 0) {
+	        rs = keysymer_process(op,kp,kl,kn) ;
+	        c = rs ;
+	    }
+	} /* end if (postive) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (keysymer_ks) */
 
 static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 	int		rs = SR_OK ;
