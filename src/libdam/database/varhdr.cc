@@ -40,7 +40,7 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkx.h>
@@ -84,7 +84,6 @@ enum his {
 /* local variables */
 
 constexpr int		headsize = hi_overlast * sizeof(uint) ;
-
 constexpr int		magicsize = VARHDR_MAGICSIZE ;
 constexpr char		magicstr[] = VARHDR_MAGICSTR ;
 
@@ -125,6 +124,8 @@ int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex {
 	        	bp += headsize ;
 	        	bl -= headsize ;
 			len = (bp - hbuf) ;
+		    } else {
+			rs = SR_OVERFLOW ;
 		    } /* end if */
 		} /* end if (mkmagic) */
 	    } else {
@@ -180,7 +181,9 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }
-	        } /* end if (item) */
+	        } /* end if (ok) */
+	    } else {
+		rs = SR_ILSEQ ;
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

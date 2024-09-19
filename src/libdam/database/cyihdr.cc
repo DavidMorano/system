@@ -18,20 +18,16 @@
 /*******************************************************************************
 
 	Name:
+	cyihdr
 
 	Description:
 	This subroutine writes out the hash file.
 
 	Synopsis:
-	int cyihdr(ep,f,hbuf,hlen)
-	CYIHDR		*ep ;
-	int		f ;
-	char		hbuf[] ;
-	int		hlen ;
+	int cyihdr_rd(cyihdr *ep,char *hbuf,int hlen) noex
 
 	Arguments:
 	- ep		object pointer
-	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
@@ -42,11 +38,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<unistd.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkx.h>
@@ -88,6 +82,10 @@ enum his {
 
 /* local variables */
 
+constexpr int		headsize = hi_overlast * sizeof(uint) ;
+constexpr int		magicsize = CYIHDR_MAGICSIZE ;
+constexpr char		magicstr[] = CYIHDR_MAGICSTR ;
+
 
 /* exported variables */
 
@@ -96,11 +94,8 @@ enum his {
 
 int cyihdr(CYIHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	cint	headsize = hi_overlast * sizeof(uint) ;
-	cint	magicsize = CYIHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	cchar	*magicstr = CYIHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;

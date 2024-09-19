@@ -45,11 +45,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<unistd.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkx.h>

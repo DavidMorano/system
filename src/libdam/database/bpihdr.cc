@@ -20,20 +20,17 @@
 /*******************************************************************************
 
 	Name:
+	bpihdr
 
 	Description:
 	This subroutine reads and write a bible-verse-index file.
 
 	Synopsis:
-	int bpihdr(ep,f,hbuf,hlen)
-	BPIHDR		*ep ;
-	int		f ;
-	char		hbuf[] ;
-	int		hlen ;
+	int bpihdr_rd(bpihdr *op,char *hbuf,int hlen) noex
+	int bpihdr_wr(bpihdr *op,cchar *hbuf,int hlen) noex
 
 	Arguments:
-	- ep		object pointer
-	- f		read=1, write=0
+	- op		object pointer
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
@@ -44,8 +41,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkx.h>
@@ -84,93 +82,44 @@ enum his {
 
 /* local variables */
 
+constexpr int		headsize = hi_overlast * sizeof(uint) ;
+constexpr int		magicsize = BPIHDR_MAGICSIZE ;
+constexpr char		magicstr[] = BPIHDR_MAGICSTR ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-int bpihdr(BPIHDR *ep,int f,char *hbuf,int hlen) noex {
-{
-	uint		*header ;
-	cint	headsize = hi_overlast * sizeof(uint) ;
-	cint	magicsize = BPIHDR_MAGICSIZE ;
-	int		rs = SR_OK ;
-	int		bl = hlen ;
-	cchar	*magicstr = BPIHDR_MAGICSTR ;
-	char		*bp = hbuf ;
-
-	if (ep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-	if (f) { /* read */
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
-	        bp += magicsize ;
-	        bl -= magicsize ;
-
-/* read out the VETU information */
-
-	        if (bl >= 4) {
-
-	            memcpy(ep->vetu,bp,4) ;
-
-	            if (ep->vetu[0] != BPIHDR_VERSION) {
-	                rs = SR_PROTONOSUPPORT ;
-	            }
-
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
-	                rs = SR_PROTOTYPE ;
-	            }
-
-	            bp += 4 ;
-	            bl -= 4 ;
-
-	        } else {
-	            rs = SR_ILSEQ ;
-	        }
-
-	        if (rs >= 0) {
-	            if (bl >= headsize) {
-
-	                header = (uint *) bp ;
-
-	                ep->fsize = header[hi_fsize] ;
-	                ep->wtime = header[hi_wtime] ;
-	                ep->vioff = header[hi_vioff] ;
-	                ep->vilen = header[hi_vilen] ;
-	                ep->nverses = header[hi_nverses] ;
-	                ep->nzverses = header[hi_nzverses] ;
-	                ep->maxbook = header[hi_maxbook] ;
-	                ep->maxchapter = header[hi_maxchapter] ;
-
-	                bp += headsize ;
-	                bl -= headsize ;
-
-	            } else {
-	                rs = SR_ILSEQ ;
-	            }
-	        } /* end if (item) */
-
-	    } /* end if (hasValidMagic) */
-	} else { /* write */
+int bpihdr_rd(bpihdr *op,char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && hbuf) {
+	    int		bl = hlen ;
+	    char	*bp = hbuf ;
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	            memcpy(bp,ep->vetu,4) ;
+	            memcpy(bp,op->vetu,4) ;
 	            bp[0] = BPIHDR_VERSION ;
 	            bp[1] = ENDIAN ;
 	            bp += 4 ;
 	            bl -= 4 ;
 	            if (bl >= headsize) {
-	                header = (uint *) bp ;
-	                header[hi_fsize] = ep->fsize ;
-	                header[hi_wtime] = ep->wtime ;
-	                header[hi_vioff] = ep->vioff ;
-	                header[hi_vilen] = ep->vilen ;
-	                header[hi_nverses] = ep->nverses ;
-	                header[hi_nzverses] = ep->nzverses ;
-	                header[hi_maxbook] = ep->maxbook ;
-	                header[hi_maxchapter] = ep->maxchapter ;
+	                uint	*header = (uint *) bp ;
+	                header[hi_fsize] = op->fsize ;
+	                header[hi_wtime] = op->wtime ;
+	                header[hi_vioff] = op->vioff ;
+	                header[hi_vilen] = op->vilen ;
+	                header[hi_nverses] = op->nverses ;
+	                header[hi_nzverses] = op->nzverses ;
+	                header[hi_maxbook] = op->maxbook ;
+	                header[hi_maxchapter] = op->maxchapter ;
 	                bp += headsize ;
 	                bl -= headsize ;
+			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -178,11 +127,60 @@ int bpihdr(BPIHDR *ep,int f,char *hbuf,int hlen) noex {
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
-	} /* end if (read-write) */
-
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bpihdr) */
 
+int bpihdr_wr(bpihdr *op,cchar *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && hbuf) {
+	    int		bl = hlen ;
+	    cchar	*bp = hbuf ;
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+		rs = SR_OK ;
+	        bp += magicsize ;
+	        bl -= magicsize ;
+		/* read out the VETU information */
+	        if (bl >= 4) {
+	            memcpy(op->vetu,bp,4) ;
+	            if (op->vetu[0] != BPIHDR_VERSION) {
+	                rs = SR_PROTONOSUPPORT ;
+	            }
+	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
+	                rs = SR_PROTOTYPE ;
+	            }
+	            bp += 4 ;
+	            bl -= 4 ;
+	        } else {
+	            rs = SR_ILSEQ ;
+	        }
+
+	        if (rs >= 0) {
+	            if (bl >= headsize) {
+	                uint	*header = (uint *) bp ;
+	                op->fsize = header[hi_fsize] ;
+	                op->wtime = header[hi_wtime] ;
+	                op->vioff = header[hi_vioff] ;
+	                op->vilen = header[hi_vilen] ;
+	                op->nverses = header[hi_nverses] ;
+	                op->nzverses = header[hi_nzverses] ;
+	                op->maxbook = header[hi_maxbook] ;
+	                op->maxchapter = header[hi_maxchapter] ;
+	                bp += headsize ;
+	                bl -= headsize ;
+			len = (bp - hbuf) ;
+	            } else {
+	                rs = SR_ILSEQ ;
+	            }
+	        } /* end if (ok) */
+	    } else {
+		rs = SR_ILSEQ ;
+	    } /* end if (hasValidMagic) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (bpihdr_wr) */
+	
 

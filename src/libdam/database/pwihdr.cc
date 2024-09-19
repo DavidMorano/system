@@ -4,6 +4,7 @@
 /* PassWord Index file */
 /* version %I% last-modified %G% */
 
+
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
@@ -23,13 +24,14 @@
 
 	Description:
 	This subroutine reads from and write to a buffer which
-	represents a PWI file header when written out to a file.
+	ropresents a PWI file header when written out to a file.
 
 	Synopsis:
-	int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex
+	int pwihdr_rd(pwdhdr *op,char *hbuf,int hlen) noex
+	int pwihdr_wr(pwdhdr *op,cchar *hbuf,int hlen) noex
 
 	Arguments:
-	- ep		object pointer
+	- op		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
@@ -41,10 +43,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkx.h>
@@ -71,109 +72,49 @@
 
 /* local variables */
 
+constexpr int		headsize = pwihdr_overlast * sizeof(uint) ;
+constexpr int		magicsize = PWIHDR_MAGICSIZE ;
+constexpr char		magicstr[] = PWIHDR_MAGICSTR ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex {
-	uint		*header ;
-	cint		headsize = pwihdr_overlast * sizeof(uint) ;
-	cint		magicsize = PWIHDR_MAGICSIZE ;
-	int		rs = SR_OK ;
-	int		bl = hlen ;
-	cchar		*magicstr = PWIHDR_MAGICSTR ;
-	char		*bp = hbuf ;
-
-	if (ep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-	if (f) { /* read */
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
-	        bp += magicsize ;
-	        bl -= magicsize ;
-
-/* read out the VETU information */
-
-	        if (bl >= 4) {
-
-	            memcpy(ep->vetu,bp,4) ;
-
-	            if (ep->vetu[0] != PWIHDR_VERSION) {
-	                rs = SR_PROTONOSUPPORT ;
-		    }
-
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
-	                rs = SR_PROTOTYPE ;
-		    }
-
-	            bp += 4 ;
-	            bl -= 4 ;
-
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-
-	    if ((rs >= 0) && (bl > 0)) {
-
-	        if (bl >= headsize) {
-
-	            header = (uint *) bp ;
-
-	            ep->fsize = header[pwihdr_fsize] ;
-	            ep->wrtime = header[pwihdr_wrtime] ;
-	            ep->wrcount = header[pwihdr_wrcount] ;
-	            ep->rectab = header[pwihdr_rectab] ;
-	            ep->reclen = header[pwihdr_reclen] ;
-	            ep->recsize = header[pwihdr_recsize] ;
-	            ep->strtab = header[pwihdr_strtab] ;
-	            ep->strlen = header[pwihdr_strlen] ;
-	            ep->strsize = header[pwihdr_strsize] ;
-	            ep->idxlen = header[pwihdr_idxlen] ;
-	            ep->idxsize = header[pwihdr_idxsize] ;
-	            ep->idxl1 = header[pwihdr_idxl1] ;
-	            ep->idxl3 = header[pwihdr_idxl3] ;
-	            ep->idxf = header[pwihdr_idxf] ;
-	            ep->idxfl3 = header[pwihdr_idxfl3] ;
-	            ep->idxun = header[pwihdr_idxun] ;
-
-	            bp += headsize ;
-	            bl -= headsize ;
-
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-
-	    } /* end if (item) */
-
-	    } /* end if (hasValidMagic) */
-	} else { /* write */
-
+int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && hbuf) {
+	    int		bl = hlen ;
+	    char	*bp = hbuf ;
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,ep->vetu,4) ;
+	    	    memcpy(bp,op->vetu,4) ;
 	    	    bp[0] = PWIHDR_VERSION ;
 	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
-	        	header = (uint *) bp ;
-			header[pwihdr_fsize] = ep->fsize ;
-			header[pwihdr_wrtime] = ep->wrtime ;
-			header[pwihdr_wrcount] = ep->wrcount ;
-			header[pwihdr_rectab] = ep->rectab ;
-			header[pwihdr_reclen] = ep->reclen ;
-			header[pwihdr_recsize] = ep->recsize ;
-			header[pwihdr_strtab] = ep->strtab ;
-			header[pwihdr_strlen] = ep->strlen ;
-			header[pwihdr_strsize] = ep->strsize ;
-			header[pwihdr_idxlen] = ep->idxlen ;
-			header[pwihdr_idxsize] = ep->idxsize ;
-			header[pwihdr_idxl1] = ep->idxl1 ;
-			header[pwihdr_idxl3] = ep->idxl3 ;
-			header[pwihdr_idxf] = ep->idxf ;
-			header[pwihdr_idxfl3] = ep->idxfl3 ;
-			header[pwihdr_idxun] = ep->idxun ;
+	        	uint	*header = (uint *) bp ;
+			header[pwihdr_fsize] = op->fsize ;
+			header[pwihdr_wrtime] = op->wrtime ;
+			header[pwihdr_wrcount] = op->wrcount ;
+			header[pwihdr_rectab] = op->rectab ;
+			header[pwihdr_reclen] = op->reclen ;
+			header[pwihdr_recsize] = op->recsize ;
+			header[pwihdr_strtab] = op->strtab ;
+			header[pwihdr_strlen] = op->strlen ;
+			header[pwihdr_strsize] = op->strsize ;
+			header[pwihdr_idxlen] = op->idxlen ;
+			header[pwihdr_idxsize] = op->idxsize ;
+			header[pwihdr_idxl1] = op->idxl1 ;
+			header[pwihdr_idxl3] = op->idxl3 ;
+			header[pwihdr_idxf] = op->idxf ;
+			header[pwihdr_idxfl3] = op->idxfl3 ;
+			header[pwihdr_idxun] = op->idxun ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 	            } else {
@@ -183,11 +124,67 @@ int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex {
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
-	} /* end if (read-write) */
-
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (pwihdr) */
+/* end subroutine (pwihdr_rd) */
+
+int pwihdr_wr(pwihdr *op,char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && hbuf) {
+	    int		bl = hlen ;
+	    char	*bp = hbuf ;
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+		rs = SR_OK ;
+	        bp += magicsize ;
+	        bl -= magicsize ;
+	        /* read out the VETU information */
+	        if (bl >= 4) {
+	            memcpy(op->vetu,bp,4) ;
+	            if (op->vetu[0] != PWIHDR_VERSION) {
+	                rs = SR_PROTONOSUPPORT ;
+		    }
+	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
+	                rs = SR_PROTOTYPE ;
+		    }
+	            bp += 4 ;
+	            bl -= 4 ;
+	        } else {
+	            rs = SR_ILSEQ ;
+		}
+	        if ((rs >= 0) && (bl > 0)) {
+	            if (bl >= headsize) {
+			uint	*header = (uint *) bp ;
+	                op->fsize = header[pwihdr_fsize] ;
+	                op->wrtime = header[pwihdr_wrtime] ;
+	                op->wrcount = header[pwihdr_wrcount] ;
+	                op->rectab = header[pwihdr_rectab] ;
+	                op->reclen = header[pwihdr_reclen] ;
+	                op->recsize = header[pwihdr_recsize] ;
+	                op->strtab = header[pwihdr_strtab] ;
+	                op->strlen = header[pwihdr_strlen] ;
+	                op->strsize = header[pwihdr_strsize] ;
+	                op->idxlen = header[pwihdr_idxlen] ;
+	                op->idxsize = header[pwihdr_idxsize] ;
+	                op->idxl1 = header[pwihdr_idxl1] ;
+	                op->idxl3 = header[pwihdr_idxl3] ;
+	                op->idxf = header[pwihdr_idxf] ;
+	                op->idxfl3 = header[pwihdr_idxfl3] ;
+	                op->idxun = header[pwihdr_idxun] ;
+	                bp += headsize ;
+	                bl -= headsize ;
+			len = (bp - hbuf) ;
+	            } else {
+	                rs = SR_ILSEQ ;
+		    }
+	        } /* end if (ok) */
+	    } else {
+		rs = SR_ILSEQ ;
+	    } /* end if (hasValidMagic) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (pwihdr_wr) */
 
 

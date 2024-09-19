@@ -11,22 +11,25 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BABYCALC_INCLUDE
-#define	BABYCALC_INCLUDE	1
+#define	BABYCALC_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<time.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
-
-#include	"babycalcs.h"
+#include	<babycalcs.h>
 
 
 #define	BABYCALC_MAGIC		0x97147229
 #define	BABYCALC		struct babycalc_head
-#define	BABYCALC_INFO		struct babycalc_i
-#define	BABYCALC_CALLS		struct babycalc_calls
+#define	BABYCALC_CA		struct babycalc_calls
+#define	BABYCALC_INFO		struct babycalc_information
 
 
 struct babycalc_i {
@@ -35,39 +38,37 @@ struct babycalc_i {
 	uint		acount ;
 } ;
 
+EXTERNC_begin
 struct babycalc_calls {
-	int		(*open)(void *,cchar *,cchar *) ;
-	int		(*check)(void *,time_t) ;
-	int		(*lookup)(void *,time_t,uint *) ;
-	int		(*info)(void *,BABYCALCS_INFO *) ;
-	int		(*close)(void *) ;
+	int		(*open)(void *,cchar *,cchar *) noex ;
+	int		(*check)(void *,time_t) noex ;
+	int		(*lookup)(void *,time_t,uint *) noex ;
+	int		(*info)(void *,babycalcs_info *) noex ;
+	int		(*close)(void *) noex ;
 } ;
+EXTERNC_end
 
 struct babycalc_head {
-	uint		magic ;
-	MODLOAD		loader ;
-	BABYCALC_CALLS	call ;
+	modload		*lop ;
 	void		*obj ;		/* object pointer */
+	BABYCALC_CA	call ;
+	uint		magic ;
 } ;
 
+typedef	BABYCALC		babycalc ;
+typedef	BABYCALC_CA		babycalc_ca ;
+typedef	BABYCALC_INFO		babycalc_info ;
 
-#if	(! defined(BABYCALC_MASTER)) || (BABYCALC_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	babycalc_open(babycalc *,cchar *,cchar *) noex ;
+extern int	babycalc_check(babycalc *,time_t) noex ;
+extern int	babycalc_lookup(babycalc *,time_t,uint *) noex ;
+extern int	babycalc_info(babycalc *,babycalc_info *) noex ;
+extern int	babycalc_close(babycalc *) noex ;
 
-extern int	babycalc_open(BABYCALC *,cchar *,cchar *) ;
-extern int	babycalc_check(BABYCALC *,time_t) ;
-extern int	babycalc_lookup(BABYCALC *,time_t,uint *) ;
-extern int	babycalc_info(BABYCALC *,BABYCALC_INFO *) ;
-extern int	babycalc_close(BABYCALC *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BABYCALC_MASTER */
 
 #endif /* BABYCALC_INCLUDE */
 

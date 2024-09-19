@@ -44,7 +44,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkx.h>
@@ -86,7 +86,6 @@ enum his {
 /* local variables */
 
 constexpr int		headsize = hi_overlast * sizeof(uint) ;
-
 constexpr int		magicsize = CMIHDR_MAGICSIZE ;
 constexpr char		magicstr[] = CMIHDR_MAGICSTR ;
 
@@ -128,7 +127,7 @@ int cmihdr_rd(cmihdr *ep,char *hbuf,int hlen) noex {
 			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
-	            }
+	            } /* end if */
 	        } /* end if (mkmagic) */
 	    } else {
 	        rs = SR_OVERFLOW ;
@@ -181,7 +180,7 @@ int cmihdr_wr(cmihdr *ep,cchar *hbuf,int hlen) noex {
 	            } else {
 	                rs = SR_ILSEQ ;
 	            }
-	        } /* end if (item) */
+	        } /* end if (ok) */
 	    } else {
 	        rs = SR_ILSEQ ;
 	    } /* end if (hasValidMagic) */
