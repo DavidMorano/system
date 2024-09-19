@@ -22,8 +22,11 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
+
+typedef CONMSGHDR	conmsghdr ;
 
 EXTERNC_begin
 

@@ -111,11 +111,12 @@ typedef txtindex_calls *	txtindex_callsp ;
 
 template<typename ... Args>
 static int txtindex_ctor(txtindex *op,Args ... args) noex {
+	TXTINDEX	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous! */
+	    memclear(hop) ; /* dangerous! */
 	    if ((op->loaderp = new(nothrow) modload) != np) {
 		txtindex_calls	*callp ;
 	        if ((callp = new(nothrow) txtindex_calls) != np) {

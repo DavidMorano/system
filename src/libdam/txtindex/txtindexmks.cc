@@ -1,5 +1,5 @@
-/* txtindexmks */
-/* lang=C20 */
+/* txtindexmks SUPPORT */
+/* lang=C++20 */
 
 /* make a TXTINDEX database */
 /* version %I% last-modified %G% */

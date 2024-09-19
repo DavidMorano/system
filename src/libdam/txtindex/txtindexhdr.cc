@@ -11,7 +11,7 @@
 	This code was originally written.
 
 	= 2017-08-17, David A­D­ Morano
-	I enhanced to use |isValidMagic()|.
+	I enhanced to use |hasValidMagic()|.
 
 */
 
@@ -26,11 +26,11 @@
 	This subroutine writes out the hash file.
 
 	Synopsis:
-	int txtindexhdr(txtindexhdr *ep,int f,char *hbuf,int hlen) noex
+	int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex
+	int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex
 
 	Arguments:
 	- ep		object pointer
-	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
@@ -43,9 +43,11 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
+#include	<mkx.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"txtindexhdr.h"
@@ -55,11 +57,6 @@
 
 
 /* external subroutines */
-
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -98,84 +95,22 @@ enum his {
 
 /* local variables */
 
+constexpr int		headsize = hi_overlast * sizeof(uint) ;
+constexpr int		magicsize = TXTINDEXHDR_MAGICSIZE ;
+constexpr char		magicstr[] = TXTINDEXHDR_MAGICSTR ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int txtindexhdr(TXTINDEXHDR *ep,int f,char *hbuf,int hlen) noex {
-	uint		*header ;
-	cint		headsize = hi_overlast * sizeof(uint) ;
-	cint		magicsize = TXTINDEXHDR_MAGICSIZE ;
-	int		rs = SR_OK ;
-	int		bl = hlen ;
-	cchar		*magicstr = TXTINDEXHDR_MAGICSTR ;
-	char		*bp = hbuf ;
-
-	if (ep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-	if (f) { /* read */
-	    if ((bl > magicsize) && isValidMagic(bp,magicsize,magicstr)) {
-	        bp += magicsize ;
-	        bl -= magicsize ;
-
-/* read out the VETU information */
-
-	        if (bl >= 4) {
-
-	        memcpy(ep->vetu,bp,4) ;
-
-	        if (ep->vetu[0] != TXTINDEXHDR_VERSION) {
-	            rs = SR_PROTONOSUPPORT ;
-		}
-
-	        if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
-	            rs = SR_PROTOTYPE ;
-		}
-
-	        bp += 4 ;
-	        bl -= 4 ;
-
-		} else {
-		    rs = SR_ILSEQ ;
-		}
-
-	        if (rs >= 0) {
-	            if (bl >= headsize) {
-	        	header = (uint *) bp ;
-	        	ep->hfsize = header[hi_hfsize] ;
-	        	ep->tfsize = header[hi_tfsize] ;
-	        	ep->ersize = header[hi_ersize] ;
-	        	ep->eisize = header[hi_eisize] ;
-	        	ep->wtime = header[hi_wtime] ;
-	        	ep->sdnoff = header[hi_sdnoff] ;
-	        	ep->sfnoff = header[hi_sfnoff] ;
-	        	ep->listoff = header[hi_listoff] ;
-	        	ep->esoff = header[hi_esoff] ;
-	        	ep->essize = header[hi_essize] ;
-	        	ep->eroff = header[hi_eroff] ;
-	        	ep->erlen = header[hi_erlen] ;
-	        	ep->eioff = header[hi_eioff] ;
-	        	ep->eilen = header[hi_eilen] ;
-	        	ep->eiskip = header[hi_eiskip] ;
-	        	ep->taboff = header[hi_taboff] ;
-	        	ep->tablen = header[hi_tablen] ;
-	        	ep->taglen = header[hi_taglen] ;
-	        	ep->maxtags = header[hi_maxtags] ;
-	        	ep->minwlen = header[hi_minwlen] ;
-	        	ep->maxwlen = header[hi_maxwlen] ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
-		    } else {
-		        rs = SR_ILSEQ ;
-		    }
-	        } /* end if (item) */
-
-	    } /* end if (mkmagic) */
-	} else { /* write */
-
+int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (ep && hbuf) {
+	    int		bl = hlen ;
+	    char	*bp = hbuf ;
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
@@ -186,7 +121,7 @@ int txtindexhdr(TXTINDEXHDR *ep,int f,char *hbuf,int hlen) noex {
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
-	        	header = (uint *) bp ;
+	        	uint	*header = uintp(bp) ;
 	        	header[hi_hfsize] = ep->hfsize ;
 	        	header[hi_tfsize] = ep->tfsize ;
 	        	header[hi_ersize] = ep->ersize ;
@@ -210,6 +145,7 @@ int txtindexhdr(TXTINDEXHDR *ep,int f,char *hbuf,int hlen) noex {
 	        	header[hi_maxwlen] = ep->maxwlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
+			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -217,11 +153,72 @@ int txtindexhdr(TXTINDEXHDR *ep,int f,char *hbuf,int hlen) noex {
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
-	} /* end if (read-write) */
-
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (txtindexhdr) */
+/* end subroutine (txtindexhdr_rd) */
+
+int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (ep && hbuf) {
+	    int		bl = hlen ;
+	    cchar	*bp = hbuf ;
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+		rs = SR_OK ;
+	        bp += magicsize ;
+	        bl -= magicsize ;
+		/* read out the VETU information */
+	        if (bl >= 4) {
+	            memcpy(ep->vetu,bp,4) ;
+	            if (ep->vetu[0] != TXTINDEXHDR_VERSION) {
+	                rs = SR_PROTONOSUPPORT ;
+		    }
+	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
+	                rs = SR_PROTOTYPE ;
+		    }
+	            bp += 4 ;
+	            bl -= 4 ;
+		} else {
+		    rs = SR_ILSEQ ;
+		}
+	        if (rs >= 0) {
+	            if (bl >= headsize) {
+	        	uint	*header = uintp(bp) ;
+	        	ep->hfsize = header[hi_hfsize] ;
+	        	ep->tfsize = header[hi_tfsize] ;
+	        	ep->ersize = header[hi_ersize] ;
+	        	ep->eisize = header[hi_eisize] ;
+	        	ep->wtime = header[hi_wtime] ;
+	        	ep->sdnoff = header[hi_sdnoff] ;
+	        	ep->sfnoff = header[hi_sfnoff] ;
+	        	ep->listoff = header[hi_listoff] ;
+	        	ep->esoff = header[hi_esoff] ;
+	        	ep->essize = header[hi_essize] ;
+	        	ep->eroff = header[hi_eroff] ;
+	        	ep->erlen = header[hi_erlen] ;
+	        	ep->eioff = header[hi_eioff] ;
+	        	ep->eilen = header[hi_eilen] ;
+	        	ep->eiskip = header[hi_eiskip] ;
+	        	ep->taboff = header[hi_taboff] ;
+	        	ep->tablen = header[hi_tablen] ;
+	        	ep->taglen = header[hi_taglen] ;
+	        	ep->maxtags = header[hi_maxtags] ;
+	        	ep->minwlen = header[hi_minwlen] ;
+	        	ep->maxwlen = header[hi_maxwlen] ;
+	        	bp += headsize ;
+	        	bl -= headsize ;
+			len = (bp - hbuf) ;
+		    } else {
+		        rs = SR_ILSEQ ;
+		    }
+	        } /* end if (ok) */
+	    } else {
+		rs = SR_ILSEQ ;
+	    } /* end if (hasValidMagic) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (txtindexhdr_wr) */
 
 

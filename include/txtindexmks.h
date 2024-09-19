@@ -1,6 +1,9 @@
 /* txtindexmks HEADER */
 /* lang=C20 */
 
+/* make a TXTINDEX database */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
@@ -8,11 +11,14 @@
 #define	TXTINDEXMKS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<strtab.h>
 #include	<bfile.h>
-#include	<localmisc.h>
 
 #include	"txtindexhdr.h"		/* this is the hash-file-header */
 
@@ -20,45 +26,44 @@
 #define	TXTINDEXMKS_MAGIC	0x88773422
 #define	TXTINDEXMKS		struct txtindexmks_head
 #define	TXTINDEXMKS_FL		struct txtindexmks_flags
-#define	TXTINDEXMKS_OBJ		struct txtindexmks_obj
-#define	TXTINDEXMKS_PA		struct txtindexmks_pa
-#define	TXTINDEXMKS_TAG		struct txtindexmks_tag
-#define	TXTINDEXMKS_KEY		struct txtindexmks_k
-#define	TXTINDEXMKS_TI		struct txtindexmks_ti
+#define	TXTINDEXMKS_OBJ		struct txtindexmks_object
+#define	TXTINDEXMKS_PA		struct txtindexmks_patient
+#define	TXTINDEXMKS_TAG		struct txtindexmks_tagitems
+#define	TXTINDEXMKS_KEY		struct txtindexmks_keyer
+#define	TXTINDEXMKS_TI		struct txtindexmks_titan
 #define	TXTINDEXMKS_INTOPEN	(10*60)
 #define	TXTINDEXMKS_INTSTALE	(5*60)
-
 #define	TXTINDEXMKS_MINWLEN	3
 #define	TXTINDEXMKS_MAXWLEN	10
 
 
-struct txtindexmks_obj {
-	const char	*name ;
+struct txtindexmks_objext {
+	cchar		*name ;
 	uint		objsize ;
 } ;
 
-struct txtindexmks_pa {
-	const char	*sdn ;
-	const char	*sfn ;
+struct txtindexmks_patient {
+	cchar		*sdn ;
+	cchar		*sfn ;
 	uint		tablen ;	/* hash-table length */
 	uint		minwlen ;	/* minimum key-word length */
 	uint		maxwlen ;	/* maximum key-word length */
 } ;
 
-struct txtindexmks_k {
-	const char	*kp ;
+struct txtindexmks_keyer {
+	cchar		*kp ;
 	int		kl ;
 } ;
 
-struct txtindexmks_tag {
+struct txtindexmks_tagitems {
 	TXTINDEXMKS_KEY	*keys ;
-	const char	*fname ;
+	cchar		*fname ;
 	uint		recoff ;
 	uint		reclen ;
 	uint		nkeys ;
 } ;
 
-struct txtindexmks_ti {
+struct txtindexmks_titan {
 	uint		nkeys ;		/* total number of keys */
 	uint		ntags ;		/* total number of tags */
 	uint		maxtags ;	/* maximum tags per list */
@@ -74,9 +79,8 @@ struct txtindexmks_flags {
 } ;
 
 struct txtindexmks_head {
-	uint		magic ;
-	const char 	*dbname ;
-	const char	*idname ;
+	cchar 		*dbname ;
+	cchar		*idname ;
 	char		*nfname ;
 	char		*nidxfname ;	/* hash index */
 	char		*ntagfname ;	/* tags */
@@ -86,27 +90,33 @@ struct txtindexmks_head {
 	TXTINDEXMKS_FL	f ;
 	STRTAB		eigens ;
 	bfile		tagfile ;
-	mode_t		om ;
 	uint		tagoff ;	/* tag-file running offset */
 	uint		tagsize ;	/* tag-file size (after completed) */
+	uint		magic ;
 	int		nfd ;
 	int		clists ;
+	mode_t		om ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	TXTINDEXMKS		txtindexmks ;
+typedef	TXTINDEXMKS_FL		txtindexmks_fl ;
+typedef	TXTINDEXMKS_OBJ		txtindexmks_obj ;
+typedef	TXTINDEXMKS_PA		txtindexmks_pa ;
+typedef	TXTINDEXMKS_TAG		txtindexmks_tag ;
+typedef	TXTINDEXMKS_KEY		txtindexmks_key ;
+typedef	TXTINDEXMKS_TI		txtindexmks_ti ;
 
-extern int txtindexmks_open(TXTINDEXMKS *,TXTINDEXMKS_PA *,cchar *,int,mode_t) ;
-extern int txtindexmks_addeigens(TXTINDEXMKS *,TXTINDEXMKS_KEY *,int) ;
-extern int txtindexmks_addtags(TXTINDEXMKS *,TXTINDEXMKS_TAG *,int) ;
-extern int txtindexmks_noop(TXTINDEXMKS *) ;
-extern int txtindexmks_abort(TXTINDEXMKS *) ;
-extern int txtindexmks_close(TXTINDEXMKS *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int txtindexmks_open(TXTINDEXMKS *,TXTINDEXMKS_PA *,cchar *,int,
+		mode_t) noex ;
+extern int txtindexmks_addeigens(TXTINDEXMKS *,TXTINDEXMKS_KEY *,int) noex ;
+extern int txtindexmks_addtags(TXTINDEXMKS *,TXTINDEXMKS_TAG *,int) noex ;
+extern int txtindexmks_noop(TXTINDEXMKS *) noex ;
+extern int txtindexmks_abort(TXTINDEXMKS *) noex ;
+extern int txtindexmks_close(TXTINDEXMKS *) noex ;
+
+EXTERNC_end
 
 
 #endif /* TXTINDEXMKS_INCLUDE */

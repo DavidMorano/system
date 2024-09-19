@@ -134,11 +134,11 @@ objb.o:			$(OBJB_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_STRLIST)
 
 
-strlist.o:		strlist.cc			$(INCS)
-strlisthdr.o:		strlisthdr.cc			$(INCS)
-strlistmk.o:		strlistmk.cc strlistmk.h 	$(INCS)
-strlistmks.o:		strlistmks.cc strlistmks.h	$(INCS) rectab.h
+strlist.o:		strlist.cc				$(INCS)
+strlisthdr.o:		strlisthdr.cc				$(INCS)
+strlistmk.o:		strlistmk.cc strlistmk.h 		$(INCS)
+strlistmks.o:		strlistmks.cc strlistmks.h rectab.h	$(INCS)
 
-rectab.o:		rectab.cc rectab.h		$(INCS)
+rectab.o:		rectab.cc rectab.h			$(INCS)
 
 

@@ -1,27 +1,31 @@
-/* txtindexhdr */
+/* txtindexhdr HEADER */
+/* lang=C20 */
+
+/* text-index hash file */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TXTINDEXHDR_INCLUDE
-#define	TXTINDEXHDR_INCLUDE	1
+#define	TXTINDEXHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-#include	<sys/types.h>
 
-#include	<localmisc.h>
-
-
-#define	TXTINDEXHDR		struct txtindexhdr
+#define	TXTINDEXHDR		struct txtindexhdr_head
 #define	TXTINDEXHDR_MAGICSIZE	16
 #define	TXTINDEXHDR_MAGICSTR	"MKINVHASH"
-#define	TXTINDEXHDR_MAGICLEN	sizeof(TXTINDEXHDR_MAGICSTR)
 #define	TXTINDEXHDR_VERSION	0
 
 
-struct txtindexhdr {
+struct txtindexhdr_head {
 	uint		hfsize ;	/* hash-file size */
 	uint		tfsize ;	/* tag-file size */
 	uint		ersize ;	/* eigen-record table size */
@@ -46,16 +50,15 @@ struct txtindexhdr {
 	uchar		vetu[4] ;
 } ;
 
+typedef	TXTINDEXHDR	txtindexhdr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int txtindexhdr(TXTINDEXHDR *,int,char *,int) ;
+extern int	txtindexhdr_rd(txtindexhdr *,char *,int) noex ;
+extern int	txtindexhdr_wr(txtindexhdr *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* TXTINDEXHDR_INCLUDE */
 

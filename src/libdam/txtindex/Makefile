@@ -99,9 +99,6 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
@@ -143,3 +140,5 @@ txtindex_main.o:	txtindex_main.cc			$(INCS)
 txtindexes.o:		txtindexes.cc txtindexes.h		$(INCS)
 txtindexmk.o:		txtindexmk.cc txtindexmk.h		$(INCS)
 txtindexmks.o:		txtindexmks.cc txtindexmks.h		$(INCS)
+
+
