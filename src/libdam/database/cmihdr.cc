@@ -15,7 +15,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -111,7 +111,7 @@ int cmihdr_rd(cmihdr *ep,char *hbuf,int hlen) noex {
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
-	        	uint	*header = (uint *) bp ;
+	        	uint	*header = uintp(bp) ;
 	        	header[hi_dbsize] = ep->dbsize ;
 	        	header[hi_dbtime] = ep->dbtime ;
 	        	header[hi_idxsize] = ep->idxsize ;

@@ -15,14 +15,15 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	STRLISTHDR		struct strlisthdr_head
-#define	STRLISTHDR_FSUF		"si"	/* String-Index */
-#define	STRLISTHDR_MAGICSTR	"STRLIST"
 #define	STRLISTHDR_MAGICSIZE	16	/* the standard (pretty much) */
+#define	STRLISTHDR_MAGICSTR	"STRLIST"
 #define	STRLISTHDR_VERSION	0	/* file (string-list) version */
+#define	STRLISTHDR_FSUF		"si"	/* String-Index */
 
 
 struct strlisthdr_head {
