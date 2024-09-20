@@ -61,7 +61,7 @@
 
 /* forward references */
 
-static uint	satcount(uint,uint,int) ;
+static uint	satcount(uint,uint,int) noex ;
 
 static int	calu(struct yags_cache *,uint,uint,uint *) ;
 static int	caup(struct yags_cache *,uint,uint,int,int) ;
@@ -74,19 +74,18 @@ static int	caup(struct yags_cache *,uint,uint,int,int) ;
 
 struct bpload	yags_mod = {
 	"yags",
-	sizeof(YAGS),
+	sizeof(YAGS)
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int yags_init(op,chlen,calen)
-YAGS		*op ;
-int		chlen ;
-int		calen ;
-{
-	int	rs ;
-	int	size ;
+int yags_init(YAGS *op,int chlen,int calen) noex {
+	int		rs ;
+	int		size ;
 
 	if (op == NULL) return SR_FAULT ;
 

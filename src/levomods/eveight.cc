@@ -72,11 +72,11 @@
 
 /* forward references */
 
-static uint	satcount(uint,uint,int) ;
-static uint	fi_bim(uint,uint) ;
-static uint	fi_g0(uint,uint) ;
-static uint	fi_g1(uint,uint) ;
-static uint	fi_meta(uint,uint) ;
+static uint	satcount(uint,uint,int) noex ;
+static uint	fi_bim(uint,uint) noex ;
+static uint	fi_g0(uint,uint) noex ;
+static uint	fi_g1(uint,uint) noex ;
+static uint	fi_meta(uint,uint) noex ;
 
 
 /* local variables */
@@ -86,19 +86,19 @@ static uint	fi_meta(uint,uint) ;
 
 struct bpload	eveight_mod = {
 	"eveight",
-	sizeof(EVEIGHT),
+	sizeof(EVEIGHT)
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int eveight_init(op,p1,p2,p3,p4)
-EVEIGHT	*op ;
-int	p1, p2, p3, p4 ;
-{
-	int	rs ;
-	int	size ;
-	int	max ;
+int eveight_init(EVEIGHT *op,int p1,int p2,int p3,int p4) noex {
+	int		rs ;
+	int		size ;
+	int		max ;
 
 	if (op == NULL) return SR_FAULT ;
 

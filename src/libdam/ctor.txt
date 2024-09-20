@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int commandment_ctor(commandment *op,Args ... args) noex {
+static int txtindexes_ctor(txtindexes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int commandment_ctor(commandment *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (commandment_ctor) */
+/* end subroutine (txtindexes_ctor) */
 
-static int commandment_dtor(commandment *op) noex {
+static int txtindexes_dtor(txtindexes *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (commandment_dtor) */
+/* end subroutine (txtindexes_dtor) */
 
 template<typename ... Args>
-static inline int commandment_magic(commandment *op,Args ... args) noex {
+static inline int txtindexes_magic(txtindexes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == COMMANDMENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TXTINDEXES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (commandment_magic) */
+/* end subroutine (txtindexes_magic) */

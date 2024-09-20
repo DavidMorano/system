@@ -1,7 +1,8 @@
-/* bfs-1 */
+/* bfs-1 HEADER (Breath-First-Search-1) */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,29 +16,27 @@
 
 /*******************************************************************************
 
-	Dijkstra-1 (shorted path through graph)
+	Name:
+	bfs1
 
+	Description:
+	This is the (famous) Breath-First-Search algorithm to find
+	the shorted (least number of hops) route through an un-weighted
+	graph.
 
 *******************************************************************************/
 
 #ifndef	BFS1_INCLUDE
-#define	BFS1_INCLUDE	1
+#define	BFS1_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<vector>
 #include	<list>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
 
 
 /* local structures */

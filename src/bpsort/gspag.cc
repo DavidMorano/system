@@ -63,7 +63,7 @@
 
 /* forward references */
 
-static uint	satcount(uint,uint,int) ;
+static uint	satcount(uint,uint,int) noex ;
 
 
 /* local variables */
@@ -73,17 +73,16 @@ static uint	satcount(uint,uint,int) ;
 
 struct bpload	gspag_mod = {
 	"gspag",
-	sizeof(GSPAG),
+	sizeof(GSPAG)
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int gspag_init(op,bhlen,phlen)
-GSPAG	*op ;
-int	bhlen ;
-int	phlen ;
-{
+int gspag_init(GSPAG *op,int bhlen,int phlen) noex {
 	int		rs ;
 	int		size ;
 

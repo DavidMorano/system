@@ -29,7 +29,7 @@
 	files).
 
 	Synopsis:
-	int txtindexes_open(txtindexes *op,cchar *cchardbname) noex
+	int txtindexes_open(txtindexes *op,cchar *dbname) noex
 
 	Arguments:
 	- op		object pointer
@@ -73,6 +73,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<vecstr.h>
@@ -117,10 +118,23 @@
 #define	TI_TAG		txtindexes_tag
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
+typedef int (*strtab_t)[3] ;
+
 extern "C" {
-    extern int	strtabfind(cchar *,int (*)[3],int,int,cchar *,int) noex ;
+    extern int	strtabfind(cchar *,strtab_r,int,int,cchar *,int) noex ;
 }
 
 
@@ -146,6 +160,46 @@ struct listdesc {
 
 /* forward references */
 
+template<typename ... Args>
+static int txtindexes_ctor(txtindexes *op,Args ... args) noex {
+	TXTINDEXES	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mxp = new(nothrow) ptm) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-ptm) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindexes_ctor) */
+
+static int txtindexes_dtor(txtindexes *op) noex {
+	TXTINDEXES	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->mxp) {
+		delete op->mxp ;
+		op->mxp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindexes_dtor) */
+
+template<typename ... Args>
+static inline int txtindexes_magic(txtindexes *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TXTINDEXES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (txtindexes_magic) */
+
 static int	txtindexes_dbloadcreate(txtindexes *,time_t) noex ;
 static int	txtindexes_dbloaddestroy(txtindexes *) noex ;
 static int	txtindexes_fimapcreate(txtindexes *,int,cchar *,time_t) noex ;
@@ -157,10 +211,10 @@ static int	txtindexes_mkhashkeys(txtindexes *,vecstr *,cchar **) noex ;
 static int	txtindexes_mktaglist(txtindexes *,uint **,vecstr *) noex ;
 static int	txtindexes_oureigen(txtindexes *,cchar *,int) noex ;
 static int	txtindexes_hdrverify(txtindexes *,time_t) noex ;
-static int	txtindexes_audithash(txtindexes *,OFFINDEX *) noex ;
+static int	txtindexes_audithash(txtindexes *,offindex *) noex ;
 static int	txtindexes_auditeigen(txtindexes *) noex ;
 
-static int	offindex_tags(OFFINDEX *,cchar *,int) noex ;
+static int	offindex_tags(offindex *,cchar *,int) noex ;
 
 static int	tag_parse(TI_TAG *,cchar *,int) noex ;
 
@@ -189,126 +243,109 @@ static int	vcmpkey(cchar **,cchar **) noex ;
 /* exported subroutines */
 
 int txtindexes_open(txtindexes *op,cchar *dbname) noex {
-	custime		dt = time(NULL) ;
-	int		rs = SR_OK ;
-	cchar		*cp ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(TI_TAG)) ;
-
-	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
-	    op->dbname = cp ;
-	    if ((rs = ptm_create(&op->mx,NULL)) >= 0) {
-	        if ((rs = txtindexes_dbloadcreate(op,dt)) >= 0) {
-	            op->ti_lastcheck = dt ;
-	            op->magic = TI_TAG_MAGIC ;
-	        }
-	        if (rs < 0)
-	            ptm_destroy(&op->mx) ;
-	    }
+	custime		dt = getustime ;
+	int		rs ;
+	if ((rs = txtindexes_ctor(op,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbname[0]) {
+	        cchar	*cp ;
+	        if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
+	            op->dbname = cp ;
+	            if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
+	                if ((rs = txtindexes_dbloadcreate(op,dt)) >= 0) {
+	                    op->ti_lastcheck = dt ;
+	                    op->magic = TXTINDEXES_MAGIC ;
+	                }
+	                if (rs < 0) {
+	                    ptm_destroy(op->mxp) ;
+			}
+	             } /* end if (ptm_create) */
+	             if (rs < 0) {
+	                 uc_free(op->dbname) ;
+	                 op->dbname = nullptr ;
+	             }
+	         } /* end if (m-a) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        uc_free(op->dbname) ;
-	        op->dbname = NULL ;
+		txtindexes_dtor(op) ;
 	    }
-	} /* end if (m-a) */
-
+	} /* end if (txtindexes_ctor) */
 	return rs ;
 }
 /* end subroutine (txtindexes_open) */
 
-
-int txtindexes_close(txtindexes *op)
-{
-	int		rs = SR_OK ;
+int txtindexes_close(txtindexes *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = txtindexes_dbloaddestroy(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = ptm_destroy(&op->mx) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->dbname != NULL) {
-	    rs1 = uc_free(op->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = txtindexes_magic(op)) >= 0) {
+	    {
+	        rs1 = txtindexes_dbloaddestroy(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->mxp) {
+	        rs1 = ptm_destroy(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->dbname) {
+	        rs1 = uc_free(op->dbname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbname = nullptr ;
+	    }
+	    {
+		rs1 = txtindexes_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexes_close) */
 
-
-int txtindexes_audit(txtindexes *op)
-{
-	OFFINDEX	oi ;
-	int		rs = SR_OK ;
+int txtindexes_audit(txtindexes *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		n ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
-
-/* line-index the TAG file */
-
-	n = op->ifi.taglen ;
-	if ((rs = offindex_start(&oi,n)) >= 0) {
-	    cint	sl = op->tf.mapsize ;
-	    cchar	*sp = op->tf.mapdata ;
-	    if ((rs = offindex_tags(&oi,sp,sl)) >= 0) {
-	        cint	taglen = rs ;
-	        if (taglen == op->ifi.taglen) {
-	            rs = txtindexes_audithash(op,&oi) ;
-	        } else {
-	            rs = SR_BADFMT ;
+	if ((rs = txtindexes_magic(op)) >= 0) {
+	    offindex	oi ;
+	    int		n = op->ifi.taglen ;
+	    if ((rs = offindex_start(&oi,n)) >= 0) {
+	        cint	sl = int(op->tf.mapsize) ;
+	        cchar	*sp = op->tf.mapdata ;
+	        if ((rs = offindex_tags(&oi,sp,sl)) >= 0) {
+	            cint	taglen = rs ;
+	            if (taglen == op->ifi.taglen) {
+	                rs = txtindexes_audithash(op,&oi) ;
+	            } else {
+	                rs = SR_BADFMT ;
+	            }
 	        }
+	        rs1 = offindex_finish(&oi) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (offindex) */
+	    if (rs >= 0) {
+	        rs = txtindexes_auditeigen(op) ;
 	    }
-	    rs1 = offindex_finish(&oi) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (offindex) */
-	if (rs >= 0) {
-	    rs = txtindexes_auditeigen(op) ;
-	}
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexes_audit) */
 
-
-int txtindexes_count(txtindexes *op)
-{
-	int		rs = SR_OK ;
+int txtindexes_count(txtindexes *op) noex {
+	int		rs ;
 	int		n = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
-
-	n = op->ifi.taglen ;
-
+	if ((rs = txtindexes_magic(op)) >= 0) {
+	    n = op->ifi.taglen ;
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (txtindexes_count) */
 
-
-int txtindexes_neigen(txtindexes *op)
-{
+int txtindexes_neigen(txtindexes *op) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
 	n = (op->ifi.erlen - 1) ;
 
@@ -321,12 +358,12 @@ int txtindexes_getinfo(txtindexes *op,TI_TAG_INFO *ip) noex {
 	int		n = 0 ;
 	cchar	*sp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
 	n = op->ifi.taglen ;
-	if (ip != NULL) {
+	if (ip != nullptr) {
 	    TI_TAG_FI	*fip = &op->hf ;
 	    cint		plen = MAXPATHLEN ;
 	    memset(ip,0,sizeof(TI_TAG_INFO)) ;
@@ -357,10 +394,10 @@ int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl)
 	int		klen = KEYBUFLEN ;
 	char		keybuf[KEYBUFLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
 	if (kl < 0) kl = strlen(kp) ;
 	if (kl > klen) kl = klen ;
@@ -382,16 +419,16 @@ int txtindexes_curbegin(txtindexes *op,TI_TAG_CUR *curp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
 	memset(curp,0,sizeof(TI_TAG_CUR)) ;
 
-	if ((rs = ptm_lock(&op->mx)) >= 0) {
+	if ((rs = ptm_lock(op->mxp)) >= 0) {
 	    op->ncursors += 1 ;
-	    ptm_unlock(&op->mx) ;
+	    ptm_unlock(op->mxp) ;
 	} /* end if */
 
 	return rs ;
@@ -404,24 +441,24 @@ int txtindexes_curend(txtindexes *op,TI_TAG_CUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->taglist != NULL) {
+	if (curp->taglist != nullptr) {
 	    rs1 = uc_free(curp->taglist) ;
 	    if (rs >= 0) rs = rs1 ;
-	    curp->taglist = NULL ;
+	    curp->taglist = nullptr ;
 	}
 
 	curp->taglen = 0 ;
 
-	if ((rs1 = ptm_lock(&op->mx)) >= 0) {
+	if ((rs1 = ptm_lock(op->mxp)) >= 0) {
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
 	    }
-	    ptm_unlock(&op->mx) ;
+	    ptm_unlock(op->mxp) ;
 	} /* end if */
 	if (rs >= 0) rs = rs1 ;
 
@@ -433,21 +470,21 @@ int txtindexes_curend(txtindexes *op,TI_TAG_CUR *curp)
 int txtindexes_lookup(txtindexes *op,TI_TAG_CUR *curp,cchar **klp)
 {
 	vecstr		hkeys ;
-	uint		*taglist = NULL ;
+	uint		*taglist = nullptr ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		taglen = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (klp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (klp == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
 	curp->taglen = 0 ;
-	if (curp->taglist != NULL) {
+	if (curp->taglist != nullptr) {
 	    uc_free(curp->taglist) ;
-	    curp->taglist = NULL ;
+	    curp->taglist = nullptr ;
 	}
 
 /* condition the keys for the lookup */
@@ -457,7 +494,7 @@ int txtindexes_lookup(txtindexes *op,TI_TAG_CUR *curp,cchar **klp)
 	    if ((rs = txtindexes_mkhashkeys(op,&hkeys,klp)) >= 0) {
 	        if ((rs = txtindexes_mktaglist(op,&taglist,&hkeys)) >= 0) {
 	            taglen = rs ;
-	            if (taglist != NULL) {
+	            if (taglist != nullptr) {
 	                curp->taglist = taglist ;
 	                curp->taglen = taglen ;
 	                curp->i = 0 ;
@@ -483,14 +520,14 @@ int txtindexes_read(txtindexes *op,TI_TAG_CUR *curp,TI_TAG *tagp)
 	int		len = 0 ;
 	cchar	*tagbuf ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (tagp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (tagp == nullptr) return SR_FAULT ;
 
-	if (op->magic != TI_TAG_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
 	fip = &op->tf ;
-	if ((curp->taglist == NULL) || (curp->taglen == 0)) {
+	if ((curp->taglist == nullptr) || (curp->taglen == 0)) {
 	    rs = SR_NOTFOUND ;
 	}
 
@@ -563,10 +600,10 @@ static int txtindexes_dbloaddestroy(txtindexes *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	mip = &op->mi ;
-	mip->table = NULL ;
-	mip->estab = NULL ;
-	mip->ertab = NULL ;
-	mip->eitab = NULL ;
+	mip->table = nullptr ;
+	mip->estab = nullptr ;
+	mip->ertab = nullptr ;
+	mip->eitab = nullptr ;
 	return rs ;
 }
 /* end subroutine (txtindexes_dbloaddestroy) */
@@ -609,21 +646,22 @@ static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
 	int		rs ;
 
 	{
-	    fip->mapdata = NULL ;
+	    fip->mapdata = nullptr ;
 	    fip->mapsize = 0 ;
 	    fip->ti_mod = 0 ;
 	    fip->ti_map = 0 ;
 	}
 
 	if ((rs = u_open(fn,O_RDONLY,0666)) >= 0) {
+	    cnullptr	np{} ;
 	    USTAT	sb ;
-	    int		fd = rs ;
+	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        size_t	ms = (sb.st_size & UINT_MAX) ;
 	        int	mp = PROT_READ ;
 	        int	mf = MAP_SHARED ;
 	        void	*md ;
-	        if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	            fip->mapdata = md ;
 	            fip->mapsize = ms ;
 	            fip->ti_mod = sb.st_mtime ;
@@ -643,9 +681,9 @@ static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
 
 	fip = (w) ? &op->tf : &op->hf ;
 
-	if (fip->mapdata != NULL) {
-	    rs = u_munmap(fip->mapdata,fip->mapsize) ;
-	    fip->mapdata = NULL ;
+	if (fip->mapdata != nullptr) {
+	    rs = u_mmapend(fip->mapdata,fip->mapsize) ;
+	    fip->mapdata = nullptr ;
 	    fip->mapsize = 0 ;
 	    fip->ti_map = 0 ;
 	}
@@ -694,8 +732,8 @@ static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,cchar **klp) noex {
 	minwlen = op->ifi.minwlen ;
 	maxwlen = op->ifi.maxwlen ;
 
-	for (i = 0 ; (kp = klp[i]) != NULL ; i += 1) {
-	    if (kp != NULL) {
+	for (i = 0 ; (kp = klp[i]) != nullptr ; i += 1) {
+	    if (kp != nullptr) {
 
 	        kl = strnlen(kp,klen) ;	/* also prevents overflow */
 	        if (kl >= minwlen) {
@@ -736,14 +774,14 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 /* allocate an array to hold tag-list results */
 
 	if ((rs = vecstr_count(hlp)) > 0) {
-	    LISTDESC	*lists = NULL ;
+	    LISTDESC	*lists = nullptr ;
 	    int		n = rs ;
 	    int		size ;
 
 	    size = n * sizeof(LISTDESC) ;
 	    if ((rs = uc_malloc(size,&lists)) >= 0) {
 	        uint	*table = op->mi.table ;
-	        uint	*taglist = NULL ;
+	        uint	*taglist = nullptr ;
 	        uint	maxtags = hip->maxtags ;
 	        uint	hv ;
 	        uint	listoff ;
@@ -760,7 +798,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 /* fill in the tag-list array with results */
 
 	        for (i = 0 ; vecstr_get(hlp,i,&kp) >= 0 ; i += 1) {
-	            if (kp != NULL) {
+	            if (kp != nullptr) {
 
 	                hv = hash_elf(kp,-1) ;
 
@@ -894,7 +932,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 
 /* finishing */
 
-	        if ((rs >= 0) && (taglist != NULL)) {
+	        if ((rs >= 0) && (taglist != nullptr)) {
 
 #if	CF_DYNACOMPACT
 #else
@@ -917,18 +955,18 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 
 /* done */
 
-	        if ((rs < 0) || (tlpp == NULL)) {
-	            if (taglist != NULL) {
+	        if ((rs < 0) || (tlpp == nullptr)) {
+	            if (taglist != nullptr) {
 	                uc_free(taglist) ;
-	                taglist = NULL ;
+	                taglist = nullptr ;
 	            }
 	        } else {
 	            *tlpp = taglist ;
 	        }
 
-	        if (lists != NULL) {
+	        if (lists != nullptr) {
 	            uc_free(lists) ;
-	            lists = NULL ;
+	            lists = nullptr ;
 	        }
 
 	    } /* end if (m-a) */
@@ -1021,7 +1059,7 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 }
 /* end subroutine (txtindexes_hdrverify) */
 
-static int txtindexes_audithash(txtindexes *op,OFFINDEX *oip) noex {
+static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	TI_TAG_FI	*fip = &op->hf ;
 	TI_TAG_MI	*mip = &op->mi ;
 	TXTINDEXHDR	*hip ;
@@ -1224,15 +1262,15 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 /* end subroutine (txtindexes_auditeigen) */
 
 /* index the beginning-of-line offsets in the TAG file */
-static int offindex_tags(OFFINDEX *oip,cchar *fp,int fl) noex {
-	off_t	lineoff = 0 ;
+static int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
+	off_t		lineoff = 0 ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		ll ;
 	int		n = 0 ;
 	cchar	*tp ;
 
-	while ((tp = strnchr(fp,fl,'\n')) != NULL) {
+	while ((tp = strnchr(fp,fl,'\n')) != nullptr) {
 
 	    len = ((tp + 1) - fp) ;
 	    ll = (len - 1) ;
@@ -1272,7 +1310,7 @@ static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 	    tagp->reclen = 0 ;
 	    tagp->fname[0] = '\0' ;
 
-	    if ((tp = strnchr(sp,sl,':')) != NULL) {
+	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
 
 	        rs = snwcpy(tagp->fname,MAXPATHLEN,sp,(tp - sp)) ;
 	        len = rs ;
@@ -1284,7 +1322,7 @@ static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 
 	    if (rs >= 0) {
 
-	        if ((tp = strnchr(sp,sl,',')) != NULL) {
+	        if ((tp = strnchr(sp,sl,',')) != nullptr) {
 
 	            rs = cfdecui(sp,(tp - sp),&tagp->recoff) ;
 
@@ -1292,7 +1330,7 @@ static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 	            sp = (tp + 1) ;
 	            if (rs >= 0) {
 
-	                if ((tp = strnpbrk(sp,sl,"\t ")) != NULL) {
+	                if ((tp = strnpbrk(sp,sl,"\t ")) != nullptr) {
 	                    sl = (tp - sp) ;
 	                }
 
@@ -1341,8 +1379,8 @@ static int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 	const uint	*i1p = (const uint *) v1p ;
 	const uint	*i2p = (const uint *) v2p ;
 	int		rc = 0 ;
-	if (i1p != NULL) {
-	    if (i2p != NULL) {
+	if (i1p != nullptr) {
+	    if (i2p != nullptr) {
 	        rc = (*i1p - *i2p) ;
 	    } else
 	        rc = -1 ;
@@ -1357,9 +1395,9 @@ static int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 /* reverse sort strings by 1. string length and 2. string value */
 static int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	if ((s1pp != NULL) || (s2pp != NULL)) {
-	    if (s1pp != NULL) {
-	        if (s2pp != NULL) {
+	if ((s1pp != nullptr) || (s2pp != nullptr)) {
+	    if (s1pp != nullptr) {
+	        if (s2pp != nullptr) {
 	            cchar	*s1 = *s1pp ;
 	            cchar	*s2 = *s2pp ;
 	            int		l1, l2 ;

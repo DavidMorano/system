@@ -1,10 +1,8 @@
-/* dijkstra-2 */
+/* dijkstra-2 SUPPORT */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,30 +16,27 @@
 
 /*******************************************************************************
 
-        This executes the Dijjstra algorithm to find the sorted path through a
-        weighted graph.
+	Name:
+	dijkstra-2
 
+	Description:
+	This executes the Dijjstra algorithm to find the sorted
+	path through a weighted graph.
 
 	Fatures:
-
 	+ close to optimal speed because we used queue for future work
 
-
 	Complexity:
-
 	O ( |v| + |v|log|e| )
 
 	Implementation:
-
 	We assume we have an object known as |minheap|, with methods:
 	+ push()
 	+ pop()
 	+ descrease()
 	+ top()
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -69,11 +64,6 @@ using namespace	std ;
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
 
 
 /* local structures */
@@ -127,11 +117,15 @@ typedef priority_queue<nodeval,vector<nodeval>,nodevalcmp>	ourmin ;
 /* forward refereces */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart)
-{
+int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	int		rs = SR_OK ;
 	bool		*visited ;
 	if ((visited = new(nothrow) bool [vertices+1]) != NULL) {

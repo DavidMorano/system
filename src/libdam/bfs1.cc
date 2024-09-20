@@ -1,10 +1,8 @@
-/* bfs-1 */
+/* bfs-1 SUPPORT (Breath-First-Search-1) */
 /* lang=C++11 */
 
 /* Breath-First-Search (shortest route through un-weighted graph) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,19 +16,22 @@
 
 /*******************************************************************************
 
-        This is the (famous) Breath-First-Search algorithm to find the shorted
-        (least number of hops) route through an un-weighted graph.
+	Name:
+	bfs1
+
+	Description:
+	This is the (famous) Breath-First-Search algorithm to find
+	the shorted (least number of hops) route through an un-weighted
+	graph.
 
 	Complexity:
 
 	O ( |v| + |e| )
 
 	Synopsis:
-
 	int bfs1(res_t *resp,edges_t &edges,int vertices,int vstart)
 
 	Arguments:
-
 	resp		array of result structures:
 				dist	level or distance from starting node
 				prev	previous node (ancestor)
@@ -39,12 +40,9 @@
 	vstart		starting vertex
 
 	Returns:
-
 	-		result structs are filled in 
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>

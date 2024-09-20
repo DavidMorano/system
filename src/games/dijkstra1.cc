@@ -1,10 +1,8 @@
-/* dijkstra-1 */
+/* dijkstra-1 SUPPORT */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,22 +16,20 @@
 
 /*******************************************************************************
 
-        This executes the Dijjstra algorithm to find the sorted path through a
-        weighted graph.
+	Name:
+	dijkstra-1
 
+	Description:
+	This executes the Dijjstra algorithm to find the sorted
+	path through a weighted graph.
 
 	Fatures:
-
 	+ pretty close to optimal speed (no queue, just linear search)
 
-
 	Complexity:
-
 	O ( |v| + |v|log|e| )
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -63,11 +59,6 @@ using namespace	std ;
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
 
 /* local structures */
 
@@ -83,11 +74,15 @@ typedef list<edge_t>::iterator	edgeit_t ;
 static int minvertex(bool *,res_t *,int) ;
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart)
-{
+int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	int		rs = SR_OK ;
 	bool		*visited ;
 	if ((visited = new(nothrow) bool [vertices+1]) != NULL) {

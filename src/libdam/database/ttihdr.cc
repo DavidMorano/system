@@ -83,16 +83,6 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* local structures */
 
-#ifdef	COMMENT
-	uint		fsize ;		/* file-size */
-	uint		ctime ;		/* create-time */
-	uint		rectab ;	/* record-table */
-	uint		reclen ;	/* recotd-table-length */
-	uint		ostrtab ;	/* overflow-string-table */
-	uint		ostrlen ;	/* overflow-string-table length */
-	uchar		vetu[4] ;	/* VETU */
-#endif /* COMMENT */
-
 enum his {
 	hi_fsize,			/* file-size */
 	hi_ctime,			/* creation-time */
@@ -109,32 +99,25 @@ enum his {
 
 /* local variables */
 
+constexpr int		headsize = hi_overlast * sizeof(uint) ;
+constexpr int		magicsize = TTIHDR_MAGICSIZE ;
+constexpr char		magicstr[] = TTIHDR_MAGICSTR ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int ttihdr(ep,f,hbuf,hlen)
-TTIHDR		*ep ;
-int		f ;
-char		hbuf[] ;
-int		hlen ;
-{
-	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = TTIHDR_MAGICSIZE ;
+int ttihdr_rd(ttihdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_OK ;
-	int		bl = hlen ;
 	int		cl ;
-	const char	*magicstr = TTIHDR_MAGICSTR ;
 	const char	*tp, *cp ;
+
+	if (ep && hbuf) {
+	int		bl = hlen ;
 	char		*bp = hbuf ;
 
-	if (ep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-	if (f) { /* read */
-
-/* the magic string is within the first 15 bytes */
 
 	    if ((rs >= 0) && (bl > 0)) {
 

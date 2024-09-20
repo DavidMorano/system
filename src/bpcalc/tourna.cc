@@ -68,7 +68,7 @@
 
 /* forward references */
 
-static uint	satcount(uint,uint,int) ;
+static uint	satcount(uint,uint,int) noex ;
 
 
 /* local variables */
@@ -78,20 +78,18 @@ static uint	satcount(uint,uint,int) ;
 
 struct bpload	tourna_mod = {
 	"tourna",
-	sizeof(TOURNA),
+	sizeof(TOURNA)
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int tourna_init(op,lhlen,lplen,glen)
-TOURNA	*op ;
-int	lhlen ;
-int	lplen ;
-int	glen ;
-{
-	int	rs ;
-	int	size ;
+int tourna_init(YOURNA *op,int lhlen,int lplen,int glen) noex {
+	int		rs ;
+	int		size ;
 
 	if (op == NULL) return SR_FAULT ;
 

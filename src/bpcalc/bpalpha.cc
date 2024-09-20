@@ -65,7 +65,7 @@
 
 /* forward references */
 
-static uint	satcount(uint,uint,int) ;
+static uint	satcount(uint,uint,int) noex ;
 
 
 /* local variables */
@@ -75,18 +75,16 @@ static uint	satcount(uint,uint,int) ;
 
 struct bpload	bpalpha_mod = {
 	"bpalpha",
-	sizeof(BPALPHA),
+	sizeof(BPALPHA)
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int bpalpha_init(op,lhlen,lplen,glen)
-BPALPHA	*op ;
-int	lhlen ;
-int	lplen ;
-int	glen ;
-{
+int bpalpha_init(BPALPHA *op,int lhlen,int lplen,int glen) noex {
 	int		rs ;
 	int		size ;
 

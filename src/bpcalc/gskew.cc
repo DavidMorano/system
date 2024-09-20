@@ -104,16 +104,16 @@ static uint	fi_meta(int,uint,uint) ;
 
 struct bpload	gskew_mod = {
 	"gskew",
-	sizeof(GSKEW),
+	sizeof(GSKEW)
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int gskew_init(op,p1,p2,p3,p4)
-GSKEW	*op ;
-int	p1, p2, p3, p4 ;
-{
+int gskew_init(GSKEW *op,int p1,int p2,int p3,int p4) noex {
 	int		rs ;
 	int		i ;
 	int		size ;

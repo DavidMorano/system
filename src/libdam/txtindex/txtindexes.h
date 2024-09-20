@@ -88,11 +88,11 @@ struct txtindexes_information {
 
 struct txtindexes_head {
 	cchar 		*dbname ;
+	ptm		*mxp ;
 	TXTINDEXES_FI	hf ;
 	TXTINDEXES_FI	tf ;
 	TXTINDEXES_MI	mi ;
 	TXTINDEXHDR	ifi ;		/* index-file (header) information */
-	ptm		mx ;
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;
