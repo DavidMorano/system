@@ -75,6 +75,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
@@ -160,8 +161,8 @@ extern "C" {
 
 TI_OBJ	txtindexes_mod = {
 	"txtindexes",
-	sizeof(txtindexes),
-	sizeof(txtindexes_cur)
+	int(sizeof(txtindexes)),
+	int(sizeof(txtindexes_cur))
 } ;
 
 
@@ -531,14 +532,13 @@ int txtindexes_lookup(txtindexes *op,TI_CUR *curp,cchar **klp)
 /* end subroutine (txtindexes_lookup) */
 
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp)
-{
-	TI_FI	*fip ;
+int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp) noex {
+	TI_FI		*fip ;
 	uint		tagoff ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		len = 0 ;
-	cchar	*tagbuf ;
+	cchar		*tagbuf ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
@@ -600,26 +600,24 @@ int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp)
 
 static int txtindexes_dbloadcreate(txtindexes *op,time_t dt) noex {
 	int		rs ;
-
 	if ((rs = txtindexes_dbmapcreate(op,dt)) >= 0) {
 	    rs = txtindexes_dbproc(op,dt) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        txtindexes_dbmapdestroy(op) ;
+	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (txtindexes_dbloadcreate) */
 
 static int txtindexes_dbloaddestroy(txtindexes *op) noex {
-	TI_MI		*mip ;
+	TI_MI		*mip = &op->mi ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
 	    rs1 = txtindexes_dbmapdestroy(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	mip = &op->mi ;
 	mip->table = nullptr ;
 	mip->estab = nullptr ;
 	mip->ertab = nullptr ;
@@ -630,18 +628,22 @@ static int txtindexes_dbloaddestroy(txtindexes *op) noex {
 
 static int txtindexes_dbmapcreate(txtindexes *op,time_t dt) noex {
 	int		rs ;
-	char		tbuf[MAXPATHLEN + 1] ;
-
-	if ((rs = mkfnamesuf2(tbuf,op->dbname,FE_HASH,ENDIANSTR)) >= 0) {
-	    if ((rs = txtindexes_fimapcreate(op,0,tbuf,dt)) >= 0) {
-	        if ((rs = mkfnamesuf1(tbuf,op->dbname,FE_TAG)) >= 0) {
-	            rs = txtindexes_fimapcreate(op,1,tbuf,dt) ;
-	        }
-	        if (rs < 0)
-	            txtindexes_fimapdestroy(op,0) ;
-	    } /* end if (txtindexes_fimapcreate) */
-	}
-
+	int		rs1 ;
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,op->dbname,FE_HASH,ENDIANSTR)) >= 0) {
+	        if ((rs = txtindexes_fimapcreate(op,0,tbuf,dt)) >= 0) {
+	            if ((rs = mkfnamesuf1(tbuf,op->dbname,FE_TAG)) >= 0) {
+	                rs = txtindexes_fimapcreate(op,1,tbuf,dt) ;
+	            }
+	            if (rs < 0) {
+	                txtindexes_fimapdestroy(op,0) ;
+		    }
+	        } /* end if (txtindexes_fimapcreate) */
+	    } /* end if (mkfnamesuf) */
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (txtindexes_dbmapcreate) */
@@ -662,16 +664,15 @@ static int txtindexes_dbmapdestroy(txtindexes *op) noex {
 /* end subroutine (txtindexes_dbmapdestroy) */
 
 static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
-	TI_FI	*fip = (w) ? &op->tf : &op->hf ;
+	TI_FI		*fip = (w) ? &op->tf : &op->hf ;
 	int		rs ;
-
+	int		rs1 ;
 	{
 	    fip->mapdata = nullptr ;
 	    fip->mapsize = 0 ;
 	    fip->ti_mod = 0 ;
 	    fip->ti_map = 0 ;
 	}
-
 	if ((rs = u_open(fn,O_RDONLY,0666)) >= 0) {
 	    cnullptr	np{} ;
 	    USTAT	sb ;
@@ -688,40 +689,34 @@ static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
 	            fip->ti_map = dt ;
 	        }
 	    } /* end if (fstat) */
-	    u_close(fd) ;
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open-file) */
-
 	return rs ;
 }
 /* end subroutine (txtindexes_fimapcreate) */
 
 static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
-	TI_FI	*fip ;
+	TI_FI		*fip = (w) ? &op->tf : &op->hf ;
 	int		rs = SR_OK ;
-
-	fip = (w) ? &op->tf : &op->hf ;
-
 	if (fip->mapdata != nullptr) {
 	    rs = u_mmapend(fip->mapdata,fip->mapsize) ;
 	    fip->mapdata = nullptr ;
 	    fip->mapsize = 0 ;
 	    fip->ti_map = 0 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (txtindexes_fimapdestroy) */
 
 static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
 	TI_FI		*fip = &op->hf ;
-	TI_MI		*mip = &op->mi ;
-	txtindexhdr	*hip ;
+	txtindexhdr	*hip = &op->ifi ;
 	int		rs ;
 	int		c = 0 ;
-
-	hip = &op->ifi ;
 	if ((rs = txtindexhdr(hip,1,fip->mapdata,fip->mapsize)) >= 0) {
 	    if ((rs = txtindexes_hdrverify(op,dt)) >= 0) {
+		TI_MI		*mip = &op->mi ;
 	        mip->sdn = (char *) (fip->mapdata + hip->sdnoff) ;
 	        mip->sfn = (char *) (fip->mapdata + hip->sfnoff) ;
 	        mip->lists = (uint *) (fip->mapdata + hip->listoff) ;
@@ -732,7 +727,6 @@ static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
 	        c = hip->taglen ;
 	    }
 	}
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexes_dbproc) */
@@ -790,16 +784,14 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 	txtindexhdr	*hip = &op->ifi ;
 	int		rs ;
 	int		tagcount = 0 ;
-
-/* allocate an array to hold tag-list results */
-
+	/* allocate an array to hold tag-list results */
 	if ((rs = vecstr_count(hlp)) > 0) {
 	    listdesc	*lists = nullptr ;
 	    int		n = rs ;
-	    int		size ;
+	    int		sz ;
 
-	    size = n * sizeof(listdesc) ;
-	    if ((rs = uc_malloc(size,&lists)) >= 0) {
+	    sz = n * sizeof(listdesc) ;
+	    if ((rs = uc_malloc(sz,&lists)) >= 0) {
 	        uint	*table = op->mi.table ;
 	        uint	*taglist = nullptr ;
 	        uint	maxtags = hip->maxtags ;
@@ -812,12 +804,11 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 	        int	ntags ;
 	        cchar	*kp ;
 	        int	k ;
-		int	i ;
 		int	c = 0 ;
 
 /* fill in the tag-list array with results */
 
-	        for (i = 0 ; vecstr_get(hlp,i,&kp) >= 0 ; i += 1) {
+	        for (int i = 0 ; vecstr_get(hlp,i,&kp) >= 0 ; i += 1) {
 	            if (kp != nullptr) {
 
 	                hv = hash_elf(kp,-1) ;
@@ -886,7 +877,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 /* perform the join operation on the tag lists (not the easiest thing to do) */
 
 	        taglen = 0 ;
-	        for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 
 	            uip = lists[i].listp ;
 	            ntags = lists[i].ntags ;
@@ -895,9 +886,9 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 
 	                tagcount = ntags ;
 	                taglen = ntags ;
-	                size = (taglen + 1) * sizeof(uint) ;
-	                if ((rs = uc_malloc(size,&taglist)) >= 0) {
-	                    memcpy(taglist,uip,size) ;
+	                sz = (taglen + 1) * sizeof(uint) ;
+	                if ((rs = uc_malloc(sz,&taglist)) >= 0) {
+	                    memcpy(taglist,uip,sz) ;
 	                }
 
 	            } else {
@@ -997,13 +988,13 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 /* end subroutine (txtindexes_mktaglist) */
 
 int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
-	TI_MI	*mip = &op->mi ;
+	TI_MI		*mip = &op->mi ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		(*eitab)[3] ;
 	int		eilen ;
 	int		nskip ;
-	int		f = TRUE ;
+	int		f = true ;
 	cchar	*estab ;
 
 	estab = mip->estab ;
@@ -1011,7 +1002,7 @@ int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
 	eilen = op->ifi.eilen ;
 	nskip = op->ifi.eiskip ;
 	if ((rs = strtabfind(estab,eitab,eilen,nskip,kp,kl)) == rsn) {
-	    f = FALSE ;
+	    f = false ;
 	    rs = SR_OK ;
 	}
 
@@ -1020,13 +1011,13 @@ int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
 /* end subroutine (txtindexes_oureigen) */
 
 static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
-	TI_FI	*fip = &op->hf ;
+	TI_FI		*fip = &op->hf ;
 	txtindexhdr	*hip = &op->ifi ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
 	int		hfsize, tfsize ;
 	int		tabsize ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	hfsize = hip->hfsize ;
 	tfsize = hip->tfsize ;
@@ -1072,8 +1063,9 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 
 	} /* end if */
 
-	if (! f)
+	if (! f) {
 	    rs = SR_BADFMT ;
+	}
 
 	return rs ;
 }
@@ -1090,7 +1082,6 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	uint		listsize ;
 	uint		*uip ;
 	int		rs = SR_OK ;
-	int		i, j ;
 	int		ntags ;
 
 	hip = &op->ifi ;
@@ -1100,7 +1091,7 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	hfsize = fip->mapsize ;
 	tfsize = op->tf.mapsize ;
 
-	for (i = 0 ; i < hip->tablen ; i += 1) {
+	for (int i = 0 ; i < hip->tablen ; i += 1) {
 
 	    listoff = mip->table[i] ;
 	    if (listoff == 0) continue ;
@@ -1112,7 +1103,6 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	    } /* end if (error) */
 
 	    if ((listoff & 3) != 0) {
-
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
@@ -1124,28 +1114,22 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	    if (ntags > 0) {
 
 	        if (ntags > hip->taglen) {
-
 	            rs = SR_BADFMT ;
 	            break ;
-
 	        } /* end if (error) */
 
 	        listsize = (ntags + 1) * sizeof(uint) ;
 	        if ((listsize + listoff) >= hfsize) {
-
 	            rs = SR_BADFMT ;
 	            break ;
-
 	        } /* end if (error) */
 
-	        for (j = 0 ; j < ntags ; j += 1) {
-
+	        for (int j = 0 ; j < ntags ; j += 1) {
 	            tagoff = *uip++ ;
 	            if (tagoff >= tfsize) {
 	                rs = SR_BADFMT ;
 	                break ;
 	            } /* end if (error) */
-
 	            rs = offindex_lookup(oip,tagoff) ;
 	            if (rs < 0) break ;
 	        } /* end for (tag-list entries) */
@@ -1399,8 +1383,8 @@ static int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 	const uint	*i1p = (const uint *) v1p ;
 	const uint	*i2p = (const uint *) v2p ;
 	int		rc = 0 ;
-	if (i1p != nullptr) {
-	    if (i2p != nullptr) {
+	if (i1p) {
+	    if (i2p) {
 	        rc = (*i1p - *i2p) ;
 	    } else {
 	        rc = -1 ;
