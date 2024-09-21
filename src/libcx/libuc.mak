@@ -761,6 +761,11 @@ getutmp.o:		getutmp.dir
 getutmp.dir:
 	makesubdir $@
 
+# GETXNAME
+getxname.o:		getxname.dir
+getxname.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 

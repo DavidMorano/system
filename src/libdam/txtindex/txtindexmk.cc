@@ -1,9 +1,8 @@
-/* txtindexmk */
+/* txtindexmk SUPPORT */
+/* lang=C++20 */
 
-/* interface to the TXTINDEXMKS loadable object */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* interface to the TIMS loadable object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,27 +16,28 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the TXTINDEXMK object (which is dynamically loaded).
+	Name:
+	txtindexmk
 
+	Description:
+	This module implements an interface (a trivial one) that
+	provides access to the TIM object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	TXTINDEXMK_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getnodename.h>
+#include	<mkpr.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -48,38 +48,33 @@
 
 /* local defines */
 
-#define	TXTINDEXMK_DEFENTS	(44 * 1000)
+#define	TIM_DEFENTS	(44 * 1000)
+#define	TIM_MODBNAME	"txtindexmks"
+#define	TIM_OBJNAME	"txtindexmks"
+#define	TIM		txtindexmk
+#define	TIM_PA		txtindexmk_pa
+#define	TIM_TAG		txtindexmk_tag
+#define	TIM_KEY		txtindexmk_key
+#define	TIM_ENTS	txtindexmk_ents
 
-#define	TXTINDEXMK_MODBNAME	"txtindexmks"
-#define	TXTINDEXMK_OBJNAME	"txtindexmks"
-
-#define	VARPRNAME		"LOCAL"
+#define	VARPRNAME	"LOCAL"
 
 #ifndef	SYMNAMELEN
-#define	SYMNAMELEN		60
+#define	SYMNAMELEN	60
 #endif
 
+
 #undef	TIS_TAG
-#define	TIS_TAG			TXTINDEXMKS_TAG
+#define	TIS_TAG		txtindexmks_tag
 
 #undef	TIS_KEY
-#define	TIS_KEY			TXTINDEXMKS_KEY
+#define	TIS_KEY		txtindexmks_key
 
 
 /* external subroutines */
 
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	getdomainname(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -87,27 +82,17 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	txtindexmk_objloadbegin(TXTINDEXMK *,cchar *,cchar *) ;
-static int	txtindexmk_objloadend(TXTINDEXMK *) ;
-static int	txtindexmk_loadcalls(TXTINDEXMK *,const char *) ;
+static int	txtindexmk_objloadbegin(TIM *,cchar *,cchar *) noex ;
+static int	txtindexmk_objloadend(TIM *) noex ;
+static int	txtindexmk_loadcalls(TIM *,cchar *) noex ;
 
-static int	isrequired(int) ;
+static bool	isrequired(int) noex ;
 
 
 /* global variables */
 
 
 /* local variables */
-
-static const char	*subs[] = {
-	"open",
-	"addeigens",
-	"addtags",
-	"close",
-	"noop",
-	"abort",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -119,36 +104,44 @@ enum subs {
 	sub_overlast
 } ;
 
+constexpr cpcchar	subs[] = {
+	"open",
+	"addeigens",
+	"addtags",
+	"close",
+	"noop",
+	"abort",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int txtindexmk_open(TXTINDEXMK *op,TXTINDEXMK_PA *pp,cchar *db,int of,mode_t om)
+int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om)
 {
 	int		rs ;
-	const char	*objname = TXTINDEXMK_OBJNAME ;
+	cchar	*objname = TIM_OBJNAME ;
 	char		dbuf[MAXHOSTNAMELEN+1] ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexmk_open: db=%s\n",db) ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
-	if (db == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (db == nullptr) return SR_FAULT ;
 
 	if (db[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(TXTINDEXMK)) ;
+	memset(op,0,sizeof(TIM)) ;
 
-	if ((rs = getnodedomain(NULL,dbuf)) >= 0) {
+	if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
 	    const int	plen = MAXPATHLEN ;
-	    const char	*pn = VARPRNAME ;
+	    cchar	*pn = VARPRNAME ;
 	    char	pbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) {
-		const char	*pr = pbuf ;
+		cchar	*pr = pbuf ;
 		if ((rs = txtindexmk_objloadbegin(op,pr,objname)) >= 0) {
 	    	    if ((rs = (*op->call.open)(op->obj,pp,db,of,om)) >= 0) {
-			op->magic = TXTINDEXMK_MAGIC ;
+			op->magic = TIM_MAGIC ;
 	    	    }
 	    	    if (rs < 0)
 			txtindexmk_objloadend(op) ;
@@ -156,24 +149,20 @@ int txtindexmk_open(TXTINDEXMK *op,TXTINDEXMK_PA *pp,cchar *db,int of,mode_t om)
 	    } /* end if (mkpr) */
 	} /* end if (getnodedomain) */
 
-#if	CF_DEBUGS
-	debugprintf("txtindexmk_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (txtindexmk_open) */
 
 
 /* free up the entire vector string data structure object */
-int txtindexmk_close(TXTINDEXMK *op)
+int txtindexmk_close(TIM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -187,13 +176,13 @@ int txtindexmk_close(TXTINDEXMK *op)
 /* end subroutine (txtindexmk_close) */
 
 
-int txtindexmk_addeigens(TXTINDEXMK *op,TXTINDEXMK_KEY keys[],int nkeys)
+int txtindexmk_addeigens(TIM *op,TIM_KEY keys[],int nkeys)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
 
 	rs = (*op->call.addeigens)(op->obj,keys,nkeys) ;
 
@@ -202,13 +191,13 @@ int txtindexmk_addeigens(TXTINDEXMK *op,TXTINDEXMK_KEY keys[],int nkeys)
 /* end subroutine (txtindexmk_addeigens) */
 
 
-int txtindexmk_addtags(TXTINDEXMK *op,TXTINDEXMK_TAG tags[],int ntags)
+int txtindexmk_addtags(TIM *op,TIM_TAG tags[],int ntags)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
 
 	rs = (*op->call.addtags)(op->obj,tags,ntags) ;
 
@@ -217,15 +206,15 @@ int txtindexmk_addtags(TXTINDEXMK *op,TXTINDEXMK_TAG tags[],int ntags)
 /* end subroutine (txtindexmk_addtags) */
 
 
-int txtindexmk_noop(TXTINDEXMK *op)
+int txtindexmk_noop(TIM *op)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TXTINDEXMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.noop != NULL) {
+	if (op->call.noop != nullptr) {
 	    rs = (*op->call.noop)(op->obj) ;
 	}
 
@@ -238,7 +227,7 @@ int txtindexmk_noop(TXTINDEXMK *op)
 
 
 /* find and load the DB-access object */
-static int txtindexmk_objloadbegin(TXTINDEXMK *op,cchar *pr,cchar *objname)
+static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
@@ -247,18 +236,13 @@ static int txtindexmk_objloadbegin(TXTINDEXMK *op,cchar *pr,cchar *objname)
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("txtindexmk_objloadbegin: pr=%s\n",pr) ;
-	debugprintf("txtindexmk_objloadbegin: objname=%s\n",objname) ;
-#endif
-
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
 	    const int	nlen = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -268,13 +252,13 @@ static int txtindexmk_objloadbegin(TXTINDEXMK *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*mn = TXTINDEXMK_MODBNAME ;
+	            cchar	*mn = TIM_MODBNAME ;
 	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 	            if ((rs = modload_open(lp,pr,mn,objname,mo,sv)) >= 0) {
 	    		int	mv[2] ;
-			f_modload = TRUE ;
+			f_modload = true ;
 	    		if ((rs = modload_getmva(lp,mv,2)) >= 0) {
 			    void	*p ;
 			    op->objsize = mv[0] ;
@@ -284,12 +268,12 @@ static int txtindexmk_objloadbegin(TXTINDEXMK *op,cchar *pr,cchar *objname)
 		                rs = txtindexmk_loadcalls(op,objname) ;
 		                if (rs < 0) {
 			            uc_free(op->obj) ;
-			            op->obj = NULL ;
+			            op->obj = nullptr ;
 		                }
 		            } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
-			    f_modload = FALSE ;
+			    f_modload = false ;
 		            modload_close(lp) ;
 			}
 	            } /* end if (modload_open) */
@@ -303,24 +287,20 @@ static int txtindexmk_objloadbegin(TXTINDEXMK *op,cchar *pr,cchar *objname)
 	    }
 	} /* end if (vecstr-syms) */
 
-#if	CF_DEBUGS
-	debugprintf("txtindexmk_objloadbegin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (txtindexmk_objloadbegin) */
 
 
-static int txtindexmk_objloadend(TXTINDEXMK *op)
+static int txtindexmk_objloadend(TIM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -331,7 +311,7 @@ static int txtindexmk_objloadend(TXTINDEXMK *op)
 /* end subroutine (txtindexmk_objloadend) */
 
 
-static int txtindexmk_loadcalls(TXTINDEXMK *op,cchar objname[])
+static int txtindexmk_loadcalls(TIM *op,cchar objname[])
 {
 	MODLOAD		*lp = &op->loader ;
 	const int	nlen = SYMNAMELEN ;
@@ -341,31 +321,25 @@ static int txtindexmk_loadcalls(TXTINDEXMK *op,cchar objname[])
 	char		nbuf[SYMNAMELEN + 1] ;
 	const void	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
-	    debugprintf("txtindexmk_loadcalls: call=%s %c\n",
-		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
-#endif
-
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
 
 		case sub_open:
-		    op->call.open = (int (*)(void *,TXTINDEXMKS_PA *,
-			const char *,int,int)) snp ;
+		    op->call.open = (int (*)(void *,TIMS_PA *,
+			cchar *,int,int)) snp ;
 		    break ;
 
 		case sub_addeigens:
@@ -400,20 +374,16 @@ static int txtindexmk_loadcalls(TXTINDEXMK *op,cchar objname[])
 }
 /* end subroutine (txtindexmk_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
-
+static bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_addeigens:
 	case sub_addtags:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
-
 	return f ;
 }
 /* end subroutine (isrequired) */

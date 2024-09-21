@@ -48,10 +48,11 @@
 
 #include	<vsystem.h>
 #include	<getbufsize.h>
-#include	<vecstr.h>
+#include	<getnodename.h>
+#include	<getusername.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<vecstr.h>
 #include	<modload.h>
 #include	<nulstr.h>
 #include	<uinfo.h>
@@ -113,7 +114,6 @@ extern int	sfcookkey(cchar *,int,cchar **) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
-extern int	getusername(char *,int,uid_t) ;
 extern int	getnodedomain(char *,char *) ;
 
 #if	CF_DEBUGS
@@ -852,7 +852,7 @@ static int pcsconf_getpcspw(PCSCONF *op)
 		        un = NULL ;
 		        if ((rs = getpwusername(&pw,pwbuf,pwlen,u)) >= 0) {
 			    un = pw.pw_name ;
-		        } /* end if (getxusername) */
+		        } /* end if (getusername) */
 		    } /* end if */
 		    if ((rs >= 0) && (un != NULL)) {
 		        cchar	*cp ;

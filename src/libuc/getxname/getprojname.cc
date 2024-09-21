@@ -94,7 +94,7 @@ int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	            if (rs >= 0) {
 	                char	*pjbuf{} ;
 	                if ((rs = malloc_pj(&pjbuf)) >= 0) {
-			    auto	getpj = uc_getdefaultproj ;
+			    auto	getpj = uc_getpjdef ;
 	                    ucentpj	pj ;
 	                    cint	pjlen = rs ;
 	                    if ((rs = getpj(&pj,pjbuf,pjlen,un)) >= 0) {

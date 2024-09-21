@@ -1,4 +1,8 @@
-/* txtindexmk */
+/* txtindexmk HEADER */
+/* lang=C20 */
+
+/* interface to the TXTINDEXMKS loadable object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,63 +15,66 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TXTINDEXMK_INCLUDE
-#define	TXTINDEXMK_INCLUDE	1
+#define	TXTINDEXMK_INCLUDE
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
 #include	"txtindexmks.h"
 
 
 #define	TXTINDEXMK_MAGIC	0x99447246
 #define	TXTINDEXMK		struct txtindexmk_head
-#define	TXTINDEXMK_ENTS		struct txtindexmk_ents
+#define	TXTINDEXMK_ENTS		struct txtindexmk_calls
 #define	TXTINDEXMK_PA		TXTINDEXMKS_PA
 #define	TXTINDEXMK_TAG		TXTINDEXMKS_TAG
 #define	TXTINDEXMK_KEY		TXTINDEXMKS_KEY
 
 
-struct txtindexmk_ents {
-	int	(*open)(void *,TXTINDEXMKS_PA *,const char *,int,int) ;
-	int	(*addeigens)(void *,TXTINDEXMKS_KEY *,int) ;
-	int	(*addtags)(void *,TXTINDEXMKS_TAG *,int) ;
-	int	(*noop)(void *) ;
-	int	(*abort)(void *) ;
-	int	(*close)(void *) ;
+EXTERNC_begin
+struct txtindexmk_calls {
+	int	(*open)(void *,TXTINDEXMKS_PA *,cchar *,int,int) noex ;
+	int	(*addeigens)(void *,TXTINDEXMKS_KEY *,int) noex ;
+	int	(*addtags)(void *,TXTINDEXMKS_TAG *,int) noex ;
+	int	(*noop)(void *) noex ;
+	int	(*abort)(void *) noex ;
+	int	(*close)(void *) noex ;
 } ;
+EXTERNC_end
 
 struct txtindexmk_head {
-	uint		magic ;
-	MODLOAD		loader ;
-	TXTINDEXMK_ENTS	call ;
+	modload		*lop ;		/* load-object-pointer */
 	void		*obj ;		/* object pointer */
+	TXTINDEXMK_ENTS	call ;
+	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size (not used here) */
 	int		nfd ;
 } ;
 
+typedef	TXTINDEXMK	txtindexmk ;
+typedef	TXTINDEXMK_ENTS	txtindexmk_ents ;
+typedef	TXTINDEXMK_PA	txtindexmk_pa ;
+typedef	TXTINDEXMK_TAG	txtindexmk_tag ;
+typedef	TXTINDEXMK_KEY	txtindexmk_key ;
 
-#if	(! defined(TXTINDEXMK_MASTER)) || (TXTINDEXMK_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int txtindexmk_open(txtindexmk *,txtindexmk_pa *,cc *,int,mode_t) noex ;
+extern int txtindexmk_addeigens(txtindexmk *,txtindexmk_key *,int) ;
+extern int txtindexmk_addtags(txtindexmk *,txtindexmk_tag *,int) ;
+extern int txtindexmk_noop(txtindexmk *) ;
+extern int txtindexmk_abort(txtindexmk *) ;
+extern int txtindexmk_close(txtindexmk *) ;
 
-extern int txtindexmk_open(TXTINDEXMK *,TXTINDEXMK_PA *,cchar *,int,mode_t) ;
-extern int txtindexmk_addeigens(TXTINDEXMK *,TXTINDEXMK_KEY *,int) ;
-extern int txtindexmk_addtags(TXTINDEXMK *,TXTINDEXMK_TAG *,int) ;
-extern int txtindexmk_noop(TXTINDEXMK *) ;
-extern int txtindexmk_abort(TXTINDEXMK *) ;
-extern int txtindexmk_close(TXTINDEXMK *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TXTINDEXMK_MASTER */
 
 #endif /* TXTINDEXMK_INCLUDE */
 

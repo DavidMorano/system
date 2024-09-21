@@ -82,8 +82,9 @@
 #include	<snwcpy.h>
 #include	<strwcpy.h>
 #include	<strn.h>
-#include	<hash.h>
+#include	<mkpathxw.h>
 #include	<mkfname.h>
+#include	<hash.h>
 #include	<cfdec.h>
 #include	<offindex.h>
 #include	<char.h>
@@ -674,7 +675,7 @@ static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,cchar **klp) noex {
 	int		i ;
 	int		kl ;
 	int		c = 0 ;
-	cchar	*kp ;
+	cchar		*kp ;
 	char		keybuf[KEYBUFLEN + 1] ;
 
 	minwlen = op->ifi.minwlen ;
@@ -947,55 +948,40 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 	uint		tfsize ;
 	uint		tabsize ;
 	bool		f = true ;
-
 	hfsize = hip->hfsize ;
 	tfsize = hip->tfsize ;
 	tabsize = (hip->tablen * sizeof(uint)) ;
-
 	f = f && (hfsize == fip->mapsize) ;
 	f = f && (tfsize == op->tf.mapsize) ;
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
 	f = f && (hip->sdnoff <= fip->mapsize) ;
 	f = f && (hip->sfnoff <= fip->mapsize) ;
-
 /* alignment restriction */
 	f = f && ((hip->listoff & (sizeof(int)-1)) == 0) ;
 /* size restrictions */
 	f = f && (hip->listoff <= fip->mapsize) ;
-
 /* alignment restriction */
 	f = f && ((hip->taboff & (sizeof(int)-1)) == 0) ;
 /* size restrictions */
 	f = f && (hip->taboff <= fip->mapsize) ;
-
 	f = f && (tabsize <= fip->mapsize) ;
-
 	f = f && ((hip->taboff + tabsize) <= fip->mapsize) ;
-
 	if (f) {
-
-	    int	essize = hip->essize ;
-	    int	erlen = hip->erlen ;
-	    int	eilen = hip->eilen ;
-
+	    uint	essize = hip->essize ;
+	    uint	erlen = hip->erlen ;
+	    uint	eilen = hip->eilen ;
 /* alignment restrictions */
-
 	    f = f && ((hip->esoff & (sizeof(int)-1)) == 0) ;
 	    f = f && ((hip->eroff & (sizeof(int)-1)) == 0) ;
 	    f = f && ((hip->eioff & (sizeof(int)-1)) == 0) ;
-
 /* size restrictions */
-
 	    f = f && ((hip->esoff + essize) <= hfsize) ;
 	    f = f && ((hip->eroff + (erlen * sizeof(int))) <= hfsize) ;
 	    f = f && ((hip->eioff + (eilen * 3 * sizeof(int))) <= hfsize) ;
-
 	} /* end if */
-
 	if (! f) {
 	    rs = SR_BADFMT ;
 	}
-
 	return rs ;
 }
 /* end subroutine (txtindexes_hdrverify) */
@@ -1003,40 +989,32 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	TI_FI		*fip = &op->hf ;
 	TI_MI		*mip = &op->mi ;
-	txtindexhdr	*hip ;
 	uint		listoff ;
 	uint		tagoff ;
 	uint		hfsize ;
 	uint		tfsize ;
 	uint		listsize ;
-	uint		*uip ;
+	txtindexhdr	*hip ;
 	int		rs = SR_OK ;
-
 	hip = &op->ifi ;
-
-/* loop over table entries */
-
+	/* loop over table entries */
 	hfsize = fip->mapsize ;
 	tfsize = op->tf.mapsize ;
-
-	int	n = int(hip->tablen) ;
+	cint	n = int(hip->tablen) ;
 	for (int i = 0 ; i < n ; i += 1) {
+	    uint	*uip ;
 	    uint	ntags ;
-
 	    listoff = mip->table[i] ;
 	    if (listoff == 0) continue ;
-
 	    if (listoff >= hfsize) {
 	        rs = SR_BADFMT ;
 	        break ;
 
 	    } /* end if (error) */
-
 	    if ((listoff & 3) != 0) {
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
-
 	    uip = (uint *) (fip->mapdata + listoff) ;
 	    ntags = *uip++ ;
 	    if (ntags > 0) {
@@ -1061,7 +1039,6 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 	    } /* end if (had some tags) */
 	    if (rs < 0) break ;
 	} /* end for (hash-table entries) */
-
 	return rs ;
 }
 /* end subroutine (txtindexes_audithash) */
@@ -1078,27 +1055,25 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	int		eilen ;
 	uint		*ertab ;
 	uint		(*eitab)[3] ;
-	cchar	*estab ;
-	cchar	*cp ;
-
-	essize = hip->essize ;
-	erlen = int(hip->erlen) ;
-	eilen = int(hip->eilen) ;
-
-	estab = mip->estab ;
-	eitab = mip->eitab ;
-	ertab = mip->ertab ;
-
+	cchar		*estab ;
+	cchar		*cp ;
+	{
+	    essize = hip->essize ;
+	    erlen = int(hip->erlen) ;
+	    eilen = int(hip->eilen) ;
+	}
+	{
+	    estab = mip->estab ;
+	    eitab = mip->eitab ;
+	    ertab = mip->ertab ;
+	}
 /* some record-table checkes */
-
 	if ((rs >= 0) && (ertab[0] != 0)) {
 	    rs = SR_BADFMT ;
 	}
-
 	if ((rs >= 0) && (estab[0] != '\0')) {
 	    rs = SR_BADFMT ;
 	}
-
 	if (rs >= 0) {
 	    nskip = hip->eiskip ;
 	    for (int i = 1 ; i < erlen ; i += 1) {
@@ -1121,13 +1096,10 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (ok) */
-
 /* some index-table checks */
-
 	if ((rs >= 0) && (eitab[0][0] != 0)) {
 	    rs = SR_BADFMT ;
 	}
-
 	if (rs >= 0) {
 	    for (int i = 1 ; i < eilen ; i += 1) {
 	        uint	si = eitab[i][0] ;
@@ -1142,9 +1114,7 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	        }
 	    } /* end for */
 	} /* end if (ok) */
-
 /* while we are here, we may as well go all out! (inverted str-tab check) */
-
 	if (rs >= 0) {
 	    cchar	*ecp ;
 	    cp = (estab + 1) ;
@@ -1175,29 +1145,21 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 static int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 	off_t		lineoff = 0 ;
 	int		rs = SR_OK ;
-	int		len ;
 	int		ll ;
 	int		n = 0 ;
-	cchar	*tp ;
-
+	cchar		*tp ;
 	while ((tp = strnchr(fp,fl,'\n')) != nullptr) {
-
-	    len = ((tp + 1) - fp) ;
+	    cint	len = ((tp + 1) - fp) ;
 	    ll = (len - 1) ;
 	    if (ll > 0) {
-
 	        n += 1 ;
 	        rs = offindex_add(oip,lineoff,ll) ;
 	        if (rs < 0) break ;
-
 	    } /* end if */
-
 	    lineoff += len ;
 	    fp += len ;
 	    fl -= len ;
-
 	} /* end while */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (offindex_tags) */
@@ -1205,8 +1167,7 @@ static int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	cchar	*tp ;
-
+	cchar		*tp ;
 	if (sl < 0) {
 	    if ((tp = strchr(sp,'\n')) != 0) {
 	        sl = (tp - sp) ;
@@ -1214,48 +1175,37 @@ static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 	        rs = SR_BADFMT ;
 	    }
 	}
-
 	if (rs >= 0) {
 	    tagp->recoff = 0 ;
 	    tagp->reclen = 0 ;
 	    tagp->fname[0] = '\0' ;
-
 	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
-
-	        rs = snwcpy(tagp->fname,MAXPATHLEN,sp,(tp - sp)) ;
-	        len = rs ;
-
+		{
+	            rs = mkpathw(tagp->fname,sp,(tp - sp)) ;
+	            len = rs ;
+		}
 	        sl -= ((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
-
 	    } /* end if */
-
 	    if (rs >= 0) {
-
 	        if ((tp = strnchr(sp,sl,',')) != nullptr) {
-
-	            rs = cfdecui(sp,(tp - sp),&tagp->recoff) ;
-
-	            sl -= ((tp + 1) - sp) ;
-	            sp = (tp + 1) ;
-	            if (rs >= 0) {
-
+		    uint	uv ;
+	            if ((rs = cfdecui(sp,(tp - sp),&uv)) >= 0) {
+			tagp->recoff = uv ;
+	                sl -= ((tp + 1) - sp) ;
+	                sp = (tp + 1) ;
 	                if ((tp = strnpbrk(sp,sl,"\t ")) != nullptr) {
 	                    sl = (tp - sp) ;
 	                }
-
 	                tagp->reclen = INT_MAX ;
 	                if (sl >= 0) {
 	                    rs = cfdecui(sp,sl,&tagp->reclen) ;
 	                }
-
 	            } /* end if (ok) */
-
 	        } else {
 	            rs = SR_BADFMT ;
 	 	}
 	    } /* end if (ok) */
-
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
 }
