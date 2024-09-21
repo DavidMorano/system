@@ -26,11 +26,11 @@
 	This subroutine reads and write a commandment-entry index file.
 
 	Synopsis:
-	int cmihdr_rd(cmihdr *ep,char *hbuf,int hlen) noex
-	int cmihdr_wr(cmihdr *ep,cchar *hbuf,int hlen) noex
+	int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex
+	int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex
 
 	Arguments:
-	- ep		object pointer
+	- op		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
@@ -47,7 +47,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<mkx.h>
+#include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -95,33 +95,33 @@ constexpr char		magicstr[] = CMIHDR_MAGICSTR ;
 
 /* exported subroutines */
 
-int cmihdr_rd(cmihdr *ep,char *hbuf,int hlen) noex {
+int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,ep->vetu,4) ;
+	    	    memcpy(bp,op->vetu,4) ;
 	    	    bp[0] = CMIHDR_VERSION ;
 	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
 	        	uint	*header = uintp(bp) ;
-	        	header[hi_dbsize] = ep->dbsize ;
-	        	header[hi_dbtime] = ep->dbtime ;
-	        	header[hi_idxsize] = ep->idxsize ;
-	        	header[hi_idxtime] = ep->idxtime ;
-	        	header[hi_vioff] = ep->vioff ;
-	        	header[hi_vilen] = ep->vilen ;
-	        	header[hi_vloff] = ep->vloff ;
-	        	header[hi_vllen] = ep->vllen ;
-	        	header[hi_nents] = ep->nents ;
-	        	header[hi_maxent] = ep->maxent ;
+	        	header[hi_dbsize] = op->dbsize ;
+	        	header[hi_dbtime] = op->dbtime ;
+	        	header[hi_idxsize] = op->idxsize ;
+	        	header[hi_idxtime] = op->idxtime ;
+	        	header[hi_vioff] = op->vioff ;
+	        	header[hi_vilen] = op->vilen ;
+	        	header[hi_vloff] = op->vloff ;
+	        	header[hi_vllen] = op->vllen ;
+	        	header[hi_nents] = op->nents ;
+	        	header[hi_maxent] = op->maxent ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 			len = (bp - hbuf) ;
@@ -137,10 +137,10 @@ int cmihdr_rd(cmihdr *ep,char *hbuf,int hlen) noex {
 }
 /* end subroutine (cmihdr_rd) */
 
-int cmihdr_wr(cmihdr *ep,cchar *hbuf,int hlen) noex {
+int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (op && hbuf) {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
 	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
@@ -149,11 +149,11 @@ int cmihdr_wr(cmihdr *ep,cchar *hbuf,int hlen) noex {
 	        bl -= magicsize ;
 		/* read out the VETU information */
 	        if (bl >= 4) {
-	            memcpy(ep->vetu,bp,4) ;
-	            if (ep->vetu[0] != CMIHDR_VERSION) {
+	            memcpy(op->vetu,bp,4) ;
+	            if (op->vetu[0] != CMIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
+	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
 		    }
 	            bp += 4 ;
@@ -164,16 +164,16 @@ int cmihdr_wr(cmihdr *ep,cchar *hbuf,int hlen) noex {
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
 	                uint	*header = (uint *) bp ;
-	                ep->dbsize = header[hi_dbsize] ;
-	                ep->dbtime = header[hi_dbtime] ;
-	                ep->idxsize = header[hi_idxsize] ;
-	                ep->idxtime = header[hi_idxtime] ;
-	                ep->vioff = header[hi_vioff] ;
-	                ep->vilen = header[hi_vilen] ;
-	                ep->vloff = header[hi_vloff] ;
-	                ep->vllen = header[hi_vllen] ;
-	                ep->nents = header[hi_nents] ;
-	                ep->maxent = header[hi_maxent] ;
+	                op->dbsize = header[hi_dbsize] ;
+	                op->dbtime = header[hi_dbtime] ;
+	                op->idxsize = header[hi_idxsize] ;
+	                op->idxtime = header[hi_idxtime] ;
+	                op->vioff = header[hi_vioff] ;
+	                op->vilen = header[hi_vilen] ;
+	                op->vloff = header[hi_vloff] ;
+	                op->vllen = header[hi_vllen] ;
+	                op->nents = header[hi_nents] ;
+	                op->maxent = header[hi_maxent] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = (bp - hbuf) ;

@@ -46,7 +46,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<mkx.h>
+#include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -156,7 +156,6 @@ int bpihdr_wr(bpihdr *op,cchar *hbuf,int hlen) noex {
 	        } else {
 	            rs = SR_ILSEQ ;
 	        }
-
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
 	                uint	*header = (uint *) bp ;

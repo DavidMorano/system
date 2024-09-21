@@ -50,7 +50,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<mkx.h>
+#include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 

@@ -50,7 +50,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<mkx.h>
+#include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -184,6 +184,7 @@ int votdchdr(VOTDCHDR *ep,int f,char *hbuf,int hlen) noex {
 	        	header[votdchdrh_vstrlen] = ep->vstrlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
+			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -191,10 +192,8 @@ int votdchdr(VOTDCHDR *ep,int f,char *hbuf,int hlen) noex {
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
 	} /* end if (read-write) */
-
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (votdchdr) */
 

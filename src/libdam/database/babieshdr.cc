@@ -1,7 +1,7 @@
-/* varhdr SUPPORT */
+/* babieshdr SUPPORT */
 /* lang=C++20 */
 
-/* text-index header for VAR-INDEX file */
+/* header management for BABIES shared-memory segment */
 /* version %I% last-modified %G% */
 
 
@@ -17,14 +17,15 @@
 /*******************************************************************************
 
 	Name:
-	varhdr
+	babieshdr
 
 	Description:
-	This subroutine writes out the hash file.
+	This subroutine reads and writes the BABIES shared-memory
+	segment header.
 
 	Synopsis:
-	int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex
-	int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex
+	int babieshdr_rd(babieshdr *op,char *hbuf,int hlen) noex
+	int babieshdr_wr(babieshdr *op,cchar *hbuf,int hlen) noex
 
 	Arguments:
 	- ep		object pointer
@@ -38,16 +39,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
+#include	<unistd.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
-#include	"varhdr.h"
+#include	"babieshdr.h"
 
 
 /* local defines */
@@ -61,31 +64,15 @@
 
 /* local structures */
 
-enum his {
-	hi_fsize,			/* file size */
-	hi_wtime,			/* creation time */
-	hi_ksoff,			/* key-string table */
-	hi_kslen,
-	hi_vsoff,			/* value-string table */
-	hi_vslen,
-	hi_rtoff,			/* record table */
-	hi_rtlen,			
-	hi_itoff,			/* index (hash) table */
-	hi_itlen,			
-	hi_nvars,			/* number of variables */
-	hi_nskip,
-	hi_overlast
-} ;
-
 
 /* forward references */
 
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * sizeof(uint) ;
-constexpr int		magicsize = VARHDR_MAGICSIZE ;
-constexpr char		magicstr[] = VARHDR_MAGICSTR ;
+constexpr int		headsize = babieshdrh_overlast * sizeof(uint) ;
+constexpr int		magicsize = BABIESHDR_MAGICSIZE ;
+constexpr char		magicstr[] = BABIESHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -93,7 +80,7 @@ constexpr char		magicstr[] = VARHDR_MAGICSTR ;
 
 /* exported subroutines */
 
-int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex {
+int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (ep && hbuf) {
@@ -104,39 +91,38 @@ int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex {
 	            bp += magicsize ;
 	            bl -= magicsize ;
 	    	    memcpy(bp,ep->vetu,4) ;
-	    	    *bp = VARHDR_VERSION ;
+	    	    bp[0] = BABIESHDR_VERSION ;
+	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
-	            if (bl >= headsize) {
-	        	uint	*header = (uint *) bp ;
-	        	header[hi_fsize] = ep->fsize ;
-	        	header[hi_wtime] = ep->wtime ;
-	        	header[hi_ksoff] = ep->ksoff ;
-	        	header[hi_kslen] = ep->kslen ;
-	        	header[hi_vsoff] = ep->vsoff ;
-	        	header[hi_vslen] = ep->vslen ;
-	        	header[hi_rtoff] = ep->rtoff ;
-	        	header[hi_rtlen] = ep->rtlen ;
-	        	header[hi_itoff] = ep->itoff ;
-	        	header[hi_itlen] = ep->itlen ;
-	        	header[hi_nvars] = ep->nvars ;
-	        	header[hi_nskip] = ep->nskip ;
+	    	    if (bl >= headsize) {
+	        	uint	*header = uintp(bp) ;
+	        	header[babieshdrh_shmsize] = ep->shmsize ;
+	        	header[babieshdrh_dbsize] = ep->dbsize ;
+	        	header[babieshdrh_dbtime] = ep->dbtime ;
+	        	header[babieshdrh_wtime] = ep->wtime ;
+	        	header[babieshdrh_atime] = ep->atime ;
+	        	header[babieshdrh_acount] = ep->acount ;
+	        	header[babieshdrh_muoff] = ep->muoff ;
+	        	header[babieshdrh_musize] = ep->musize ;
+	        	header[babieshdrh_btoff] = ep->btoff ;
+	        	header[babieshdrh_btlen] = ep->btlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 			len = (bp - hbuf) ;
-		    } else {
-			rs = SR_OVERFLOW ;
-		    } /* end if */
-		} /* end if (mkmagic) */
+	            } else {
+	                rs = SR_OVERFLOW ;
+	            }
+	        } /* end if (mkmagic) */
 	    } else {
 	        rs = SR_OVERFLOW ;
-	    } /* end if */
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (varhdr_rd) */
+/* end subroutine (babieshdr_rd) */
 
-int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
+int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (ep && hbuf) {
@@ -149,7 +135,7 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 		/* read out the VETU information */
 	        if (bl >= 4) {
 	            memcpy(ep->vetu,bp,4) ;
-	            if (ep->vetu[0] != VARHDR_VERSION) {
+	            if (ep->vetu[0] != BABIESHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
 	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
@@ -162,19 +148,17 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 		}
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = (uint *) bp ;
-	                ep->fsize = header[hi_fsize] ;
-	                ep->wtime = header[hi_wtime] ;
-	                ep->ksoff = header[hi_ksoff] ;
-	                ep->kslen = header[hi_kslen] ;
-	                ep->vsoff = header[hi_vsoff] ;
-	                ep->vslen = header[hi_vslen] ;
-	                ep->rtoff = header[hi_rtoff] ;
-	                ep->rtlen = header[hi_rtlen] ;
-	                ep->itoff = header[hi_itoff] ;
-	                ep->itlen = header[hi_itlen] ;
-	                ep->nvars = header[hi_nvars] ;
-	                ep->nskip = header[hi_nskip] ;
+	                uint	*header = uintp(bp) ;
+	                ep->shmsize = header[babieshdrh_shmsize] ;
+	                ep->dbsize = header[babieshdrh_dbsize] ;
+	                ep->dbtime = header[babieshdrh_dbtime] ;
+	                ep->wtime = header[babieshdrh_wtime] ;
+	                ep->atime = header[babieshdrh_atime] ;
+	                ep->acount = header[babieshdrh_acount] ;
+	                ep->muoff = header[babieshdrh_muoff] ;
+	                ep->musize = header[babieshdrh_musize] ;
+	                ep->btoff = header[babieshdrh_btoff] ;
+	                ep->btlen = header[babieshdrh_btlen] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = (bp - hbuf) ;
@@ -188,6 +172,6 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (varhdr_wr) */
+/* end subroutine (babieshdr_wr) */
 
 

@@ -48,7 +48,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<mkx.h>
+#include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -117,6 +117,7 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 			header[pwihdr_idxun] = op->idxun ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
+			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }

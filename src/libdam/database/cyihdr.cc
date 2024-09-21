@@ -24,10 +24,11 @@
 	This subroutine writes out the hash file.
 
 	Synopsis:
-	int cyihdr_rd(cyihdr *ep,char *hbuf,int hlen) noex
+	int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex
+	int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex
 
 	Arguments:
-	- ep		object pointer
+	- op		object pointer
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
@@ -43,7 +44,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<mkx.h>
+#include	<mkmagic.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -92,89 +93,37 @@ constexpr char		magicstr[] = CYIHDR_MAGICSTR ;
 
 /* exported subroutines */
 
-int cyihdr(CYIHDR *ep,int f,char *hbuf,int hlen) noex {
-	uint		*header ;
-	int		rs = SR_OK ;
-	int		bl = hlen ;
-	char		*bp = hbuf ;
-
-	if (ep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-	if (f) { /* read */
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
-	        bp += magicsize ;
-	        bl -= magicsize ;
-
-/* read out the VETU information */
-
-		if (bl >= 4) {
-
-	        memcpy(ep->vetu,bp,4) ;
-
-	        if (ep->vetu[0] != CYIHDR_VERSION)
-	            rs = SR_PROTONOSUPPORT ;
-
-	        if ((rs >= 0) && (ep->vetu[1] != ENDIAN))
-	            rs = SR_PROTOTYPE ;
-
-	        bp += 4 ;
-	        bl -= 4 ;
-
-		} else {
-		    rs = SR_ILSEQ ;
-		}
-
-	        if (rs >= 0) {
-		    if (bl >= headsize) {
-	                header = (uint *) bp ;
-	                ep->fsize = header[hi_fsize] ;
-	                ep->wtime = header[hi_wtime] ;
-	                ep->diroff = header[hi_diroff] ;
-	                ep->caloff = header[hi_caloff] ;
-	                ep->vioff = header[hi_vioff] ;
-	                ep->vilen = header[hi_vilen] ;
-	                ep->vloff = header[hi_vloff] ;
-	                ep->vllen = header[hi_vllen] ;
-	                ep->nentries = header[hi_nentries] ;
-	                ep->nskip = header[hi_nskip] ;
-	                ep->year = header[hi_year] ;
-	                bp += headsize ;
-	        	bl -= headsize ;
-	            } else {
-	                rs = SR_OVERFLOW ;
-	            }
-	        } /* end if (mkmagic) */
-
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} else { /* write */
-
+int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && hbuf) {
+	    int		bl = hlen ;
+	    char	*bp = hbuf ;
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,ep->vetu,4) ;
+	    	    memcpy(bp,op->vetu,4) ;
 	    	    bp[0] = CYIHDR_VERSION ;
 	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
-	        	header = (uint *) bp ;
-	        	header[hi_fsize] = ep->fsize ;
-	        	header[hi_wtime] = ep->wtime ;
-	        	header[hi_diroff] = ep->diroff ;
-	        	header[hi_caloff] = ep->caloff ;
-	        	header[hi_vioff] = ep->vioff ;
-	        	header[hi_vilen] = ep->vilen ;
-	        	header[hi_vloff] = ep->vloff ;
-	        	header[hi_vllen] = ep->vllen ;
-	        	header[hi_nentries] = ep->nentries ;
-	        	header[hi_nskip] = ep->nskip ;
-	        	header[hi_year] = ep->year ;
+	        	uint	*header = uintp(bp) ;
+	        	header[hi_fsize] = op->fsize ;
+	        	header[hi_wtime] = op->wtime ;
+	        	header[hi_diroff] = op->diroff ;
+	        	header[hi_caloff] = op->caloff ;
+	        	header[hi_vioff] = op->vioff ;
+	        	header[hi_vilen] = op->vilen ;
+	        	header[hi_vloff] = op->vloff ;
+	        	header[hi_vllen] = op->vllen ;
+	        	header[hi_nentries] = op->nentries ;
+	        	header[hi_nskip] = op->nskip ;
+	        	header[hi_year] = op->year ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
+			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -182,11 +131,62 @@ int cyihdr(CYIHDR *ep,int f,char *hbuf,int hlen) noex {
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
-	} /* end if (read-write) */
-
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (cyihdr) */
+/* end subroutine (cyihdr_rd) */
+
+int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && hbuf) {
+	    int		bl = hlen ;
+	    cchar	*bp = hbuf ;
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+		rs = SR_OK ;
+	        bp += magicsize ;
+	        bl -= magicsize ;
+		/* read out the VETU information */
+		if (bl >= 4) {
+	            memcpy(op->vetu,bp,4) ;
+	            if (op->vetu[0] != CYIHDR_VERSION) {
+	                rs = SR_PROTONOSUPPORT ;
+		    }
+	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
+	                rs = SR_PROTOTYPE ;
+		    }
+	            bp += 4 ;
+	            bl -= 4 ;
+		} else {
+		    rs = SR_ILSEQ ;
+		}
+	        if (rs >= 0) {
+		    if (bl >= headsize) {
+	                uint	*header = uintp(bp) ;
+	                op->fsize = header[hi_fsize] ;
+	                op->wtime = header[hi_wtime] ;
+	                op->diroff = header[hi_diroff] ;
+	                op->caloff = header[hi_caloff] ;
+	                op->vioff = header[hi_vioff] ;
+	                op->vilen = header[hi_vilen] ;
+	                op->vloff = header[hi_vloff] ;
+	                op->vllen = header[hi_vllen] ;
+	                op->nentries = header[hi_nentries] ;
+	                op->nskip = header[hi_nskip] ;
+	                op->year = header[hi_year] ;
+	                bp += headsize ;
+	        	bl -= headsize ;
+			len = (bp - hbuf) ;
+	            } else {
+	                rs = SR_ILSEQ ;
+	            }
+	        } /* end if (ok) */
+	    } else {
+	        rs = SR_ILSEQ ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (cyihdr_wr) */
 
 

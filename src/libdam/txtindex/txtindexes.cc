@@ -112,10 +112,25 @@
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
-#define	LISTDESC	struct listdesc
-
 #define	TI_CUR		txtindexes_cur
 #define	TI_TAG		txtindexes_tag
+#define	TI_OBJ		txtindexes_obj
+#define	TI_INFO		txtindexes_info
+#define	TI_FI		txtindexes_fi
+#define	TI_MI		txtindexes_mi
+
+#ifndef	CF_SORT
+#define	CF_SORT		1		/* sort primary tags */
+#endif
+#ifndef	CF_DYNACOMPACT
+#define	CF_DYNACOMPACT	1		/* try dynamic compacting */
+#endif
+#ifndef	CF_SORTKEYS
+#define	CF_SORTKEYS	0		/* sort hash keys (not needed!) */
+#endif
+#ifndef	CF_SORTLISTS
+#define	CF_SORTLISTS	1		/* sort tag lists */
+#endif
 
 
 /* local namespaces */
@@ -143,7 +158,7 @@ extern "C" {
 
 /* exported variables */
 
-TI_TAG_OBJ	txtindexes_mod = {
+TI_OBJ	txtindexes_mod = {
 	"txtindexes",
 	sizeof(txtindexes),
 	sizeof(txtindexes_cur)
@@ -226,7 +241,7 @@ static int	taglist_compact(uint *,int) noex ;
 static int	vcmpuint(cvoid *,cvoid *) noex ;
 
 #if	CF_SORTLISTS
-static int	cmplistdesc(const LISTDESC *,const LISTDESC *) noex ;
+static int	cmplistdesc(const listdesc *,const listdesc *) noex ;
 #endif /* CF_SORTLISTS */
 
 #if	CF_SORTKEYS
@@ -235,6 +250,11 @@ static int	vcmpkey(cchar **,cchar **) noex ;
 
 
 /* local variables */
+
+constexpr bool		f_sort		= CF_SORT ;
+constexpr bool		f_dynacompact	= CF_DYNACOMPACT ;
+constexpr bool		f_sortkeys	= CF_SORTKEYS ;
+constexpr bool		f_sortlists	= CF_SORTLISTS ;
 
 
 /* exported variables */
@@ -353,7 +373,7 @@ int txtindexes_neigen(txtindexes *op) noex {
 }
 /* end subroutine (txtindexes_neigen) */
 
-int txtindexes_getinfo(txtindexes *op,TI_TAG_INFO *ip) noex {
+int txtindexes_getinfo(txtindexes *op,TI_INFO *ip) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	cchar	*sp ;
@@ -364,9 +384,9 @@ int txtindexes_getinfo(txtindexes *op,TI_TAG_INFO *ip) noex {
 
 	n = op->ifi.taglen ;
 	if (ip != nullptr) {
-	    TI_TAG_FI	*fip = &op->hf ;
-	    cint		plen = MAXPATHLEN ;
-	    memset(ip,0,sizeof(TI_TAG_INFO)) ;
+	    TI_FI	*fip = &op->hf ;
+	    cint	plen = MAXPATHLEN ;
+	    memclear(ip) ;
 	    ip->ctime = (time_t) op->ifi.wtime ;
 	    ip->mtime = fip->ti_mod ;
 	    ip->count = n ;
@@ -415,7 +435,7 @@ int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl)
 
 
 /* amazingly the only thread-shared data is the 'ncursors' variable here! */
-int txtindexes_curbegin(txtindexes *op,TI_TAG_CUR *curp)
+int txtindexes_curbegin(txtindexes *op,TI_CUR *curp)
 {
 	int		rs ;
 
@@ -424,7 +444,7 @@ int txtindexes_curbegin(txtindexes *op,TI_TAG_CUR *curp)
 
 	if (op->magic != TXTINDEXES_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(TI_TAG_CUR)) ;
+	memset(curp,0,sizeof(TI_CUR)) ;
 
 	if ((rs = ptm_lock(op->mxp)) >= 0) {
 	    op->ncursors += 1 ;
@@ -436,7 +456,7 @@ int txtindexes_curbegin(txtindexes *op,TI_TAG_CUR *curp)
 /* end subroutine (txtindexes_curbegin) */
 
 
-int txtindexes_curend(txtindexes *op,TI_TAG_CUR *curp)
+int txtindexes_curend(txtindexes *op,TI_CUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -467,7 +487,7 @@ int txtindexes_curend(txtindexes *op,TI_TAG_CUR *curp)
 /* end subroutine (txtindexes_curend) */
 
 
-int txtindexes_lookup(txtindexes *op,TI_TAG_CUR *curp,cchar **klp)
+int txtindexes_lookup(txtindexes *op,TI_CUR *curp,cchar **klp)
 {
 	vecstr		hkeys ;
 	uint		*taglist = nullptr ;
@@ -511,9 +531,9 @@ int txtindexes_lookup(txtindexes *op,TI_TAG_CUR *curp,cchar **klp)
 /* end subroutine (txtindexes_lookup) */
 
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_read(txtindexes *op,TI_TAG_CUR *curp,TI_TAG *tagp)
+int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp)
 {
-	TI_TAG_FI	*fip ;
+	TI_FI	*fip ;
 	uint		tagoff ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -592,7 +612,7 @@ static int txtindexes_dbloadcreate(txtindexes *op,time_t dt) noex {
 /* end subroutine (txtindexes_dbloadcreate) */
 
 static int txtindexes_dbloaddestroy(txtindexes *op) noex {
-	TI_TAG_MI	*mip ;
+	TI_MI		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -642,7 +662,7 @@ static int txtindexes_dbmapdestroy(txtindexes *op) noex {
 /* end subroutine (txtindexes_dbmapdestroy) */
 
 static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
-	TI_TAG_FI	*fip = (w) ? &op->tf : &op->hf ;
+	TI_FI	*fip = (w) ? &op->tf : &op->hf ;
 	int		rs ;
 
 	{
@@ -657,11 +677,11 @@ static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
 	    USTAT	sb ;
 	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
-	        size_t	ms = (sb.st_size & UINT_MAX) ;
+	        size_t	ms = int(sb.st_size & UINT_MAX) ;
 	        int	mp = PROT_READ ;
 	        int	mf = MAP_SHARED ;
 	        void	*md ;
-	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	            fip->mapdata = md ;
 	            fip->mapsize = ms ;
 	            fip->ti_mod = sb.st_mtime ;
@@ -676,7 +696,7 @@ static int txtindexes_fimapcreate(txtindexes *op,int w,cc *fn,time_t dt) noex {
 /* end subroutine (txtindexes_fimapcreate) */
 
 static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
-	TI_TAG_FI	*fip ;
+	TI_FI	*fip ;
 	int		rs = SR_OK ;
 
 	fip = (w) ? &op->tf : &op->hf ;
@@ -693,9 +713,9 @@ static int txtindexes_fimapdestroy(txtindexes *op,int w) noex {
 /* end subroutine (txtindexes_fimapdestroy) */
 
 static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
-	TI_TAG_FI	*fip = &op->hf ;
-	TI_TAG_MI	*mip = &op->mi ;
-	TXTINDEXHDR	*hip ;
+	TI_FI		*fip = &op->hf ;
+	TI_MI		*mip = &op->mi ;
+	txtindexhdr	*hip ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -767,18 +787,18 @@ static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,cchar **klp) noex {
 /* end subroutine (txtindexes_mkhashkeys) */
 
 static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
-	TXTINDEXHDR	*hip = &op->ifi ;
+	txtindexhdr	*hip = &op->ifi ;
 	int		rs ;
 	int		tagcount = 0 ;
 
 /* allocate an array to hold tag-list results */
 
 	if ((rs = vecstr_count(hlp)) > 0) {
-	    LISTDESC	*lists = nullptr ;
+	    listdesc	*lists = nullptr ;
 	    int		n = rs ;
 	    int		size ;
 
-	    size = n * sizeof(LISTDESC) ;
+	    size = n * sizeof(listdesc) ;
 	    if ((rs = uc_malloc(size,&lists)) >= 0) {
 	        uint	*table = op->mi.table ;
 	        uint	*taglist = nullptr ;
@@ -859,7 +879,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 	        if ((rs >= 0) && (n > 1)) {
 	            int	(*cfn)(cvoid *,cvoid *) ;
 	            cfn = (int (*)(cvoid *,cvoid *)) cmplistdesc ;
-	            qsort(lists,n,sizeof(LISTDESC),cfn) ;
+	            qsort(lists,n,sizeof(listdesc),cfn) ;
 	        }
 #endif /* CF_SORTLISTS */
 
@@ -977,7 +997,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 /* end subroutine (txtindexes_mktaglist) */
 
 int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
-	TI_TAG_MI	*mip = &op->mi ;
+	TI_MI	*mip = &op->mi ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		(*eitab)[3] ;
@@ -1000,8 +1020,8 @@ int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
 /* end subroutine (txtindexes_oureigen) */
 
 static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
-	TI_TAG_FI	*fip = &op->hf ;
-	TXTINDEXHDR	*hip = &op->ifi ;
+	TI_FI	*fip = &op->hf ;
+	txtindexhdr	*hip = &op->ifi ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
 	int		hfsize, tfsize ;
@@ -1060,9 +1080,9 @@ static int txtindexes_hdrverify(txtindexes *op,time_t dt) noex {
 /* end subroutine (txtindexes_hdrverify) */
 
 static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
-	TI_TAG_FI	*fip = &op->hf ;
-	TI_TAG_MI	*mip = &op->mi ;
-	TXTINDEXHDR	*hip ;
+	TI_FI		*fip = &op->hf ;
+	TI_MI	*mip = &op->mi ;
+	txtindexhdr	*hip ;
 	uint		listoff ;
 	uint		tagoff ;
 	uint		hfsize ;
@@ -1140,8 +1160,8 @@ static int txtindexes_audithash(txtindexes *op,offindex *oip) noex {
 /* end subroutine (txtindexes_audithash) */
 
 static int txtindexes_auditeigen(txtindexes *op) noex {
-	TXTINDEXHDR	*hip ;
-	TI_TAG_MI	*mip ;
+	txtindexhdr	*hip ;
+	TI_MI		*mip ;
 	int		rs = SR_OK ;
 	int		i, si, nhi ;
 	int		cl ;
@@ -1382,10 +1402,12 @@ static int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 	if (i1p != nullptr) {
 	    if (i2p != nullptr) {
 	        rc = (*i1p - *i2p) ;
-	    } else
+	    } else {
 	        rc = -1 ;
-	} else
+	    }
+	} else {
 	    rc = +1 ;
+	}
 	return rc ;
 }
 /* end subroutine (vcmpuint) */
@@ -1394,17 +1416,15 @@ static int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 
 /* reverse sort strings by 1. string length and 2. string value */
 static int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
+	cchar		*s1 = *s1pp ;
+	cchar		*s2 = *s2pp ;
 	int		rc = 0 ;
-	if ((s1pp != nullptr) || (s2pp != nullptr)) {
-	    if (s1pp != nullptr) {
-	        if (s2pp != nullptr) {
-	            cchar	*s1 = *s1pp ;
-	            cchar	*s2 = *s2pp ;
-	            int		l1, l2 ;
-	            l1 = strlen(s1) ;
-	            l2 = strlen(s2) ;
-	            rc = (l2 - l1) ;
-	            if (rc == 0) {
+	if (s1 || s2) {
+	    if (s1) {
+	        if (s2) {
+	            cint	l1 = strlen(s1) ;
+	            cint 	l2 = strlen(s2) ;
+	            if ((rc = (l2 - l1)) == 0) {
 	                rc = strcmp(s2,s1) ;
 		    }
 	        } else {
@@ -1421,7 +1441,7 @@ static int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
 #endif /* CF_SORTKEYS */
 
 #if	CF_SORTLISTS
-static int cmplistdesc(const LISTDESC *l1p,const LISTDESC *l2p) noex {
+static int cmplistdesc(const listdesc *l1p,const listdesc *l2p) noex {
 	return (l1p->ntags - l2p->ntags) ;
 }
 /* end subroutine (cmplistdesc) */

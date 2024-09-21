@@ -1,6 +1,9 @@
 /* naturalwords HEADER */
 /* lang=C20 */
 
+/* natural-word management */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

@@ -1,31 +1,38 @@
-/* ttihdr */
+/* ttihdr HEADER */
+/* lang=C20 */
 
-/* Termianl-Translate-Index file management */
+/* Termial-Translate-Index (TTI) file management */
+/* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-03-01, David A­D­ Morano
+	This code was originally written.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	TTIHDR_INCLUDE
-#define	TTIHDR_INCLUDE	1
+#define	TTIHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-#include	<sys/types.h>
 
-#include	<localmisc.h>
-
-
-#define	TTIHDR			struct ttihdr
-
-#define	TTIHDR_MAGICSTR		"TERMTRANSINDEX"
-#define	TTIHDR_MAGICLEN		sizeof(TTIHDR_MAGICSTR)
+#define	TTIHDR			struct ttihdr_head
 #define	TTIHDR_MAGICSIZE	16
+#define	TTIHDR_MAGICSTR		"TERMTRANSINDEX"
 #define	TTIHDR_VERSION		0
 
 
-struct ttihdr {
+struct ttihdr_head {
 	uint		fsize ;		/* file-size */
 	uint		ctime ;		/* create-time */
 	uint		rectab ;	/* record-table */
@@ -35,16 +42,15 @@ struct ttihdr {
 	uchar		vetu[4] ;	/* VETU */
 } ;
 
+typedef	TTIHDR		ttihdr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int ttihdr(TTIHDR *,int,char *,int) ;
+extern int	ttihdr_rd(ttihdr *,char *,int) noex ;
+extern int	ttihdr_wd(ttihdr *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* TTIHDR_INCLUDE */
 
