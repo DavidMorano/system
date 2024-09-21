@@ -48,7 +48,7 @@ struct txtindexes_object {
 struct txtindexes_cursor {
 	uint		*taglist ;
 	uint		taglen ;
-	int		i ;
+	uint		i ;
 } ;
 
 struct txtindexes_tagitem {
@@ -70,8 +70,8 @@ struct txtindexes_mile {
 	cchar		*estab ;	/* eigen-string table */
 	uint		*table ;	/* mapped hash table */
 	uint		*lists ;	/* mapped lists */
-	int		*ertab ;	/* eigen-record table */
-	int		(*eitab)[3] ;	/* eigen-index table */
+	uint		*ertab ;	/* eigen-record table */
+	uint		(*eitab)[3] ;	/* eigen-index table */
 } ;
 
 /* returned information */
@@ -92,7 +92,7 @@ struct txtindexes_head {
 	TXTINDEXES_FI	hf ;
 	TXTINDEXES_FI	tf ;
 	TXTINDEXES_MI	mi ;
-	TXTINDEXHDR	ifi ;		/* index-file (header) information */
+	txtindexhdr	ifi ;		/* index-file (header) information */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;
