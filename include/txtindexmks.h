@@ -20,7 +20,7 @@
 #include	<strtab.h>
 #include	<bfile.h>
 
-#include	"txtindexhdr.h"		/* this is the hash-file-header */
+#include	<txtindexhdr.h>		/* this is the hash-file-header */
 
 
 #define	TXTINDEXMKS_MAGIC	0x88773422
@@ -37,7 +37,7 @@
 #define	TXTINDEXMKS_MAXWLEN	10
 
 
-struct txtindexmks_objext {
+struct txtindexmks_object {
 	cchar		*name ;
 	uint		objsize ;
 } ;
@@ -85,11 +85,11 @@ struct txtindexmks_head {
 	char		*nidxfname ;	/* hash index */
 	char		*ntagfname ;	/* tags */
 	void		*lists ;	/* the lists */
+	strtab		eigens ;
+	bfile		tagfile ;
 	TXTINDEXMKS_PA	pi ;
 	TXTINDEXMKS_TI	ti ;
 	TXTINDEXMKS_FL	f ;
-	STRTAB		eigens ;
-	bfile		tagfile ;
 	uint		tagoff ;	/* tag-file running offset */
 	uint		tagsize ;	/* tag-file size (after completed) */
 	uint		magic ;

@@ -16,13 +16,15 @@
 
 /*******************************************************************************
 
+	Names:
+	utf8decoder_start
+	utf8decoder_load
+	utf8decoder_read
+	utf8decoder_finish
+
+	Description:
         We facilitate the decoding of UTF-8 byte streams into UNICODE®
         characters.
-
-		utf8decoder_start
-		utf8decoder_load
-		utf8decoder_read
-		utf8decoder_finish
 
 *******************************************************************************/
 

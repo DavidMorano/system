@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	dirseen
+
+	Description:
 	This object manages directory lists by:
 	+ ensuring unique entries by name
 	+ ensuring unique entries by dev-inode pair
@@ -25,7 +29,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
-#include	<cstddef>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */

@@ -57,13 +57,11 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getnodename.h>		/* |getnodename(3uc)| */
 #include	<mallocxx.h>
-#include	<getnodename.h>		/* |getnodedomain(3uc)| */
 #include	<getxx.h>
 #include	<hostent.h>
-#include	<snx.h>
 #include	<sncpyx.h>
-#include	<snwcpy.h>
 #include	<isinetaddr.h>
 #include	<localmisc.h>
 

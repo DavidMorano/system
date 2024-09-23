@@ -19,8 +19,10 @@
 
 	Names:
 	digval
-	hexval
-	decval
+	digvalbin
+	digvaloct
+	digvaldec
+	digvalhex
 
 	Description:
 	We examine a single character, supposedly a hexadecimal
@@ -28,28 +30,36 @@
 	symbolic hexadecimal digit.
 
 	Synopsis:
-	int hexval(int ch) noex
+	int digval(int ch) noex
+	int digvalbin(int ch) noex
+	int digvaloct(int ch) noex
+	int digvaldec(int ch) noex
+	int digvalhex(int ch) noex
 
 	Arguments:
 	ch		character to evaluate
 
 	Outputs:
-	>=0		value of symbolic hexadecimal digit
+	>=0		value of symbolic digit
 	<0		error (system-return)
 
 	Notes:
 	subroutine	domain
 	----------------------------------
 	digval		base-64 (original + checked)
-	hexval		base-16 (checked)
-	decval		base-10 (checked)
+	digvalbin	base-2 (checked)
+	digvaloct	base-8 (checked)
+	digvaldec	base-10 (checked)
+	digvalhex	base-16 (checked)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<char.h>
 
@@ -68,7 +78,19 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -80,7 +102,34 @@ int digval(int ch) noex {
 }
 /* end subroutine (digval) */
 
-int hexval(int ch) noex {
+int digvalbin(int ch) noex {
+	int		v = SR_DOM ;
+	if ((ch >= '0') && (ch <= '1')) {
+	    v = (ch - '0') ;
+	}
+	return v ;
+}
+/* end subroutine (digvalbin) */
+
+int digvaloct(int ch) noex {
+	int		v = SR_DOM ;
+	if ((ch >= '0') && (ch <= '7')) {
+	    v = (ch - '0') ;
+	}
+	return v ;
+}
+/* end subroutine (digvaloct) */
+
+int digvaldec(int ch) noex {
+	int		v = SR_DOM ;
+	if ((ch >= '0') && (ch <= '9')) {
+	    v = (ch - '0') ;
+	}
+	return v ;
+}
+/* end subroutine (digvaldec) */
+
+int digvalhex(int ch) noex {
 	int		v = SR_DOM ;
 	if ((ch >= '0') && (ch <= '9')) {
 	    v = (ch - '0') ;
@@ -92,15 +141,6 @@ int hexval(int ch) noex {
 	}
 	return v ;
 }
-/* end subroutine (hexval) */
-
-int decval(int ch) noex {
-	int		v = SR_DOM ;
-	if ((ch >= '0') && (ch <= '9')) {
-	    v = (ch - '0') ;
-	}
-	return v ;
-}
-/* end subroutine (decval) */
+/* end subroutine (digvalhex) */
 
 

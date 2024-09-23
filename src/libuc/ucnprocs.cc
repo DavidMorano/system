@@ -66,11 +66,11 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<libmallocxx.h>
-#include	<mkchar.h>
 #include	<fsdir.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
 #include	<cfdec.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -223,8 +223,8 @@ int procer::selection() noex {
 		while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
 		    cint        ch = mkchar(de.name[0]) ;
 		    if (isdigitlatin(ch)) {
-		        cchar   *np = de.name ;
-                        if ((rs = pathadd(pbuf,pl,np)) >= 0) {
+		        cchar   *dp = de.name ;
+                        if ((rs = pathadd(pbuf,pl,dp)) >= 0) {
                             USTAT       sb ;
                             if ((rs = u_stat(pbuf,&sb)) >= 0) {
 				switch (w) {

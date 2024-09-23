@@ -83,6 +83,33 @@
 #include	<usystem.h>
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_nprocessors(int w) noex {
@@ -171,5 +198,11 @@ int uc_syspages(int w) noex {
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (uc_syspages) */
+
+int uc_pagesize() noex {
+	cint	cmd = _SC_PAGESIZE ;
+	return uc_sysconfval(cmd,nullptr) ;
+}
+/* end subroutine (uc_pagesize) */
 
 

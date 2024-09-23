@@ -4,10 +4,6 @@
 /* make a TXTINDEX database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUGEIGEN	0		/* debug the EIGEN stuff */
-#define	CF_DEBUGCECK	0		/* debug "checkXXX" */
-#define	CF_LATE		0		/* make new index file late */
 #define	CF_SETINT	1		/* use |osetint(3dam)| */
 
 /* revision history:
@@ -21,16 +17,16 @@
 
 /*******************************************************************************
 
+	Name:
+	txtindexmks
+
+	Description:
 	This subroutine creates a TXTINDEX database (currently
 	consisting of two files).
 
 	Synopsis:
-	int txtindexmks_open(op,pp,dbname,of,om)
-	TXTINDEXMKS	*op ;
-	TXTINDEXMKS_PA	*pp ;
-	const char	dbname[] ;
-	int		of ;
-	mode_t		om ;
+	int txtindexmks_open(txtindexmks *op,txtindexmks_pa *pp,
+		cchar *dbname,int of,mode_t om) noex
 
 	Arguments:
 	- op		object pointer
@@ -75,13 +71,18 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<getpwd.h>
+#include	<sysval.hh>
+#include	<mallocxx.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecint.h>
@@ -90,8 +91,17 @@
 #include	<bfile.h>
 #include	<filer.h>
 #include	<opentmp.h>
+#include	<mktmp.h>
+#include	<mkfname.h>
+#include	<sfx.h>
+#include	<strw.h>
+#include	<strn.h>
 #include	<hash.h>
+#include	<xperm.h>
 #include	<char.h>
+#include	<hasx.h>
+#include	<ischarx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"txtindexmks.h"
@@ -114,8 +124,8 @@
 #endif
 #endif
 
-#define	HDRBUFLEN	(sizeof(TXTINDEXHDR) + 128)
-#define	BUFLEN		(sizeof(TXTINDEXHDR) + 128)
+#define	HDRBUFLEN	(sizeof(HDR) + 128)
+#define	BUFLEN		(sizeof(HDR) + 128)
 #define	SUFBUFLEN	32
 #define	TMPFNAMELEN	14
 
@@ -152,38 +162,23 @@
 #define	LISTOBJ_CUREND(op,cp)		vecint_curend((op),(cp))
 #endif /* CF_SETINT */
 
+#define	TIM			txtindexmks
+#define	TIM_PA			txtindexmks_pa
+#define	TIM_TAG			txtindexmks_tag
+#define	TIM_KEY			txtindexmks_key
+#define	HDR			txtindexhdr
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef int (*idxtab_t)[3] ;
+typedef int *	rectab_t ;
+
 
 /* external subroutines */
-
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	msleep(int) ;
-extern int	filer_writefill(FILER *,const char *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-#if	CF_DEBUGS && CF_DEBUGEIGEN
-extern int	strtabfind(const char *,int (*)[3],int,int,const char *,int) ;
-#endif
 
 
 /* external variables */
@@ -191,284 +186,255 @@ extern int	strtabfind(const char *,int (*)[3],int,int,const char *,int) ;
 
 /* exported variables */
 
-TXTINDEXMKS_OBJ	txtindexmks = {
+txtindexmks_obj	txtindexmks_modinfo = {
 	"txtindexmks",
-	sizeof(TXTINDEXMKS)
+	sizeof(txtindexmks)
 } ;
 
 
 /* local structures */
 
+struct vars {
+	int		pagesize ;
+	int		maxpathlen ;
+} ;
+
 
 /* forward references */
 
-static int	txtindexmks_checkparams(TXTINDEXMKS *) ;
-static int	txtindexmks_idxdirbegin(TXTINDEXMKS *) ;
-static int	txtindexmks_idxdirend(TXTINDEXMKS *) ;
-static int	txtindexmks_filesbegin(TXTINDEXMKS *) ;
-static int	txtindexmks_filesbeginc(TXTINDEXMKS *) ;
-static int	txtindexmks_filesbeginwait(TXTINDEXMKS *) ;
-static int	txtindexmks_filesbeginopen(TXTINDEXMKS *,cchar *) ;
-static int	txtindexmks_filesend(TXTINDEXMKS *) ;
-static int	txtindexmks_listbegin(TXTINDEXMKS *) ;
-static int	txtindexmks_listend(TXTINDEXMKS *) ;
-static int	txtindexmks_addtag(TXTINDEXMKS *,TXTINDEXMKS_TAG *) ;
-static int	txtindexmks_mkhash(TXTINDEXMKS *) ;
-static int	txtindexmks_mkhashwrmain(TXTINDEXMKS *,TXTINDEXHDR *) ;
-static int	txtindexmks_mkhashwrhdr(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILER *,int) ;
-static int	txtindexmks_mkhashwrtab(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILER *,int) ;
-static int	txtindexmks_mkhashwreigen(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILER *,int) ;
-static int	txtindexmks_mkhashwrtabone(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILER *,int,int *,int) ;
-static int	txtindexmks_nhashopen(TXTINDEXMKS *) ;
-static int	txtindexmks_nhashclose(TXTINDEXMKS *) ;
-static int	txtindexmks_ntagclose(TXTINDEXMKS *) ;
-static int	txtindexmks_renamefiles(TXTINDEXMKS *) ;
+template<typename ... Args>
+static int txtindexmks_ctor(txtindexmks *op,Args ... args) noex {
+	TXTINDEXMKS	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	    memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindexmks_ctor) */
 
-#if	CF_DEBUGS && CF_DEBUGEIGEN
-struct printeigen {
-	int		*ertab ;
-	char		*estab ;
-	int		ersize ;
-	int		erlen ;
-} ;
-static int	txtindexmks_printeigen(TXTINDEXMKS *) ;
-static int	txtindexmks_printeigener(TXTINDEXMKS *,struct printeigen *) ;
-#endif
+static int txtindexmks_dtor(txtindexmks *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindexmks_dtor) */
 
-static int	mknewfname(char *,int,cchar *,cchar *) ;
-static int	unlinkstale(cchar *,int) ;
+template<typename ... Args>
+static inline int txtindexmks_magic(txtindexmks *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TXTINDEXMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (txtindexmks_magic) */
 
-#if	CF_DEBUGS && CF_DEBUGCHECK
-static int	checksize(const char *,int,int) ;
-static int	checkalign(const char *,uint) ;
-#endif
+static int	txtindexmks_checkparams(TIM *) noex ;
+static int	txtindexmks_idxdirbegin(TIM *) noex ;
+static int	txtindexmks_idxdirend(TIM *) noex ;
+static int	txtindexmks_filesbegin(TIM *) noex ;
+static int	txtindexmks_filesbeginc(TIM *) noex ;
+static int	txtindexmks_filesbeginwait(TIM *) noex ;
+static int	txtindexmks_filesbeginopen(TIM *,cchar *) noex ;
+static int	txtindexmks_filesend(TIM *) noex ;
+static int	txtindexmks_listbegin(TIM *) noex ;
+static int	txtindexmks_listend(TIM *) noex ;
+static int	txtindexmks_addtag(TIM *,TIM_TAG *) noex ;
+static int	txtindexmks_mkhash(TIM *) noex ;
+static int	txtindexmks_mkhashwrmain(TIM *,HDR *) noex ;
+static int	txtindexmks_mkhashwrhdr(TIM *,HDR *,
+			filer *,int) noex ;
+static int	txtindexmks_mkhashwrtab(TIM *,HDR *,
+			filer *,int) noex ;
+static int	txtindexmks_mkhashwreigen(TIM *,HDR *,
+			filer *,int) noex ;
+static int	txtindexmks_mkhashwrtabone(TIM *,HDR *,
+			filer *,int,int *,int) noex ;
+static int	txtindexmks_nhashopen(TIM *) noex ;
+static int	txtindexmks_nhashclose(TIM *) noex ;
+static int	txtindexmks_ntagclose(TIM *) noex ;
+static int	txtindexmks_renamefiles(TIM *) noex ;
+
+static int	mknewfname(char *,int,cchar *,cchar *) noex ;
+static int	unlinkstale(cchar *,int) noex ;
+static int	mkvars() noex ;
 
 
 /* local variables */
 
-static const char	zerobuf[4] = {
+static vars	var ;
+
+constexpr char	zerobuf[4] = {
 	0, 0, 0, 0 
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int txtindexmks_open(TXTINDEXMKS *op,TXTINDEXMKS_PA *pp,cchar db[],
-		int of,mode_t om)
-{
+int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	int		rs ;
-	int		f = FALSE ;
-	const char	*cp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	{
-		char	obuf[100+1] ;
-	debugprintf("txtindexmks_open: ent db=%s\n",db) ;
-		snopenflags(obuf,-1,of) ;
-	debugprintf("txtindexmks_open: of=%s\n",obuf) ;
-	}
-#endif /* CF_DEBUGS */
-
-	if (pp == NULL) return SR_FAULT ;
-	if (db == NULL) return SR_FAULT ;
-
-	if (db[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(TXTINDEXMKS)) ;
-	op->om = (om|0600) ;
-	op->nfd = -1 ;
-	op->pi = *pp ;			/* copy the given parameters */
-
-	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
-
-	if ((rs = uc_mallocstrw(db,-1,&cp)) >= 0) {
-	    op->dbname = cp ;
-	    if ((rs = txtindexmks_checkparams(op)) >= 0) {
-	        if ((rs = txtindexmks_idxdirbegin(op)) >= 0) {
-	            if ((rs = txtindexmks_filesbegin(op)) >= 0) {
-	                f = rs ;
-	                if ((rs = txtindexmks_listbegin(op)) >= 0) {
-	                    op->ti.maxtags = 0 ;
-	                    op->magic = TXTINDEXMKS_MAGIC ;
+	int		f = false ;
+	if ((rs = txtindexmks_ctor(op,pp,db)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (db[0]) {
+		static cint	rsv = mkvars() ;
+		if ((rs = rsv) >= 0) {
+	            op->om = (om | 0600) ;
+	            op->nfd = -1 ;
+	            op->pi = *pp ; /* copy the given parameters */
+	            op->f.ofcreat = MKBOOL(of & O_CREAT) ;
+	            op->f.ofexcl = MKBOOL(of & O_EXCL) ;
+	            if (cchar *cp ; (rs = uc_mallocstrw(db,-1,&cp)) >= 0) {
+	                op->dbname = cp ;
+	                if ((rs = txtindexmks_checkparams(op)) >= 0) {
+	                    if ((rs = txtindexmks_idxdirbegin(op)) >= 0) {
+	                        if ((rs = txtindexmks_filesbegin(op)) >= 0) {
+	                            f = rs ;
+	                            if ((rs = txtindexmks_listbegin(op)) >= 0) {
+	                                op->ti.maxtags = 0 ;
+	                                op->magic = TXTINDEXMKS_MAGIC ;
+	                            }
+	                            if (rs < 0) {
+	                                txtindexmks_filesend(op) ;
+			            }
+	                        } /* end if (files-begin) */
+	                        if (rs < 0) {
+	                            txtindexmks_idxdirend(op) ;
+		                }
+	                    } /* end if (txtindexmks_idxdirbegin) */
+	                } /* end if (check-params) */
+	                if (rs < 0) {
+	                    if (op->dbname != nullptr) {
+	                        uc_free(op->dbname) ;
+	                        op->dbname = nullptr ;
+	                    }
 	                }
-	                if (rs < 0)
-	                    txtindexmks_filesend(op) ;
-	            } /* end if (files-begin) */
-	            if (rs < 0)
-	                txtindexmks_idxdirend(op) ;
-	        } /* end if (txtindexmks_idxdirbegin) */
-	    } /* end if (check-params) */
+	            } /* end if (memory-allocation) */
+		} /* end if (mkvars) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        if (op->dbname != NULL) {
-	            uc_free(op->dbname) ;
-	            op->dbname = NULL ;
-	        }
+		txtindexmks_dtor(op) ;
 	    }
-	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_open: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
+	} /* end if (txtindexmks_ctor) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (txtindexmks_open) */
 
-
-int txtindexmks_close(TXTINDEXMKS *op)
-{
-	int		rs = SR_OK ;
+int txtindexmks_close(TIM *op) noex {
+	int		rs ;
 	int		rs1 ;
 	int		clists = 0 ;
-	int		f_go  ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEXMKS_MAGIC) return SR_NOTOPEN ;
-
-	f_go = (! op->f.abort) ;
-	rs1 = txtindexmks_ntagclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-	if (f_go) f_go = (rs1 >= 0) ;
-
-	if ((op->ti.nkeys > 0) && f_go) {
-	    rs1 = txtindexmks_mkhash(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	    f_go = (rs1 >= 0) ;
-	    clists = op->clists ;
-	}
-
-	rs1 = txtindexmks_listend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	if (f_go) f_go = (rs1 >= 0) ;
-
-	if ((rs >= 0) && (op->ti.nkeys > 0) && f_go) {
-	    rs1 = txtindexmks_renamefiles(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = txtindexmks_filesend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = txtindexmks_idxdirend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->dbname != NULL) {
-	    rs1 = uc_free(op->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = txtindexmks_magic(op)) >= 0) {
+	    bool	f_go  = (! op->f.abort) ;
+	    {
+	        rs1 = txtindexmks_ntagclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	        if (f_go) f_go = (rs1 >= 0) ;
+	    }
+	    if ((op->ti.nkeys > 0) && f_go) {
+	        rs1 = txtindexmks_mkhash(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	        f_go = (rs1 >= 0) ;
+	        clists = op->clists ;
+	    }
+	    {
+	        rs1 = txtindexmks_listend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	        if (f_go) f_go = (rs1 >= 0) ;
+	    }
+	    if ((rs >= 0) && (op->ti.nkeys > 0) && f_go) {
+	        rs1 = txtindexmks_renamefiles(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = txtindexmks_filesend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = txtindexmks_idxdirend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->dbname) {
+	        rs1 = uc_free(op->dbname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbname = nullptr ;
+	    }
+	    {
+		rs1 = txtindexmks_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return (rs >= 0) ? clists : rs ;
 }
 /* end subroutine (txtindexmks_close) */
 
-
-int txtindexmks_noop(TXTINDEXMKS *op)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != TXTINDEXMKS_MAGIC) return SR_NOTOPEN ;
-	return SR_OK ;
+int txtindexmks_noop(TIM *op) noex {
+	int		rs ;
+	if ((rs = txtindexmks_magic(op)) >= 0) {
+	    rs = SR_OK ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (txtindexmks_noop) */
 
-
-int txtindexmks_abort(TXTINDEXMKS *op)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != TXTINDEXMKS_MAGIC) return SR_NOTOPEN ;
-	op->f.abort = TRUE ;
-	return SR_OK ;
+int txtindexmks_abort(TIM *op) noex {
+	int		rs ;
+	if ((rs = txtindexmks_magic(op)) >= 0) {
+	    op->f.abort = true ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (txtindexmks_abort) */
 
-
-int txtindexmks_addeigens(TXTINDEXMKS *op,TXTINDEXMKS_KEY eigens[],int n)
-{
-	int		rs = SR_OK ;
-	int		i ;
-	int		kbl = KEYBUFLEN ;
-	int		kl ;
-	const char	*kp ;
-	char		keybuf[KEYBUFLEN + 1] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (eigens == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEXMKS_MAGIC) return SR_NOTOPEN ;
-
-	if (n < 0) return SR_INVALID ;
-
-	for (i = 0 ; i < n ; i += 1) {
-
-	    kp = (const char *) eigens[i].kp ;
-	    kl = eigens[i].kl ;
-	    if (kl < 0) kl = strlen(kp) ;
-
-	    if (hasuc(kp,kl)) {
-	        if (kl > kbl) kl = kbl ;
-	        strwcpylc(keybuf,kp,kl) ;
-	        kp = keybuf ;
-	    }
-
-	    rs = strtab_add(&op->eigens,kp,kl) ;
-
-	    if (rs < 0) break ;
-	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_addeigens: ret rs=%d neigens=%u\n",rs,n) ;
-#endif
-
+int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
+	int		rs ;
+	if ((rs = txtindexmks_magic(op,eigens)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (n >= 0) {
+	        int	keylen = KEYBUFLEN ;
+	        char	keybuf[KEYBUFLEN + 1] ;
+		rs = SR_OK ;
+	        for (int i = 0 ; i < n ; i += 1) {
+	            cchar	*kp = charp(eigens[i].kp) ;
+	            int		kl = eigens[i].kl ;
+	            if (kl < 0) kl = strlen(kp) ;
+	            if (hasuc(kp,kl)) {
+	                if (kl > keylen) kl = keylen ;
+	                strwcpylc(keybuf,kp,kl) ;
+	                kp = keybuf ;
+	            }
+	            {
+	                rs = strtab_add(&op->eigens,kp,kl) ;
+	            }
+	            if (rs < 0) break ;
+	        } /* end for */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexmks_addeigens) */
 
-
-int txtindexmks_addtags(TXTINDEXMKS *op,TXTINDEXMKS_TAG tags[],int ntags)
-{
-	int		rs = SR_OK ;
-	int		i ;
+int txtindexmks_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
+	int		rs ;
 	int		c = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (tags == NULL) return SR_FAULT ;
-
-	if (op->magic != TXTINDEXMKS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_addtags: tags(%p) ntags=%u\n",tags,ntags) ;
-#endif
-
-	for (i = 0 ; i < ntags ; i += 1) {
-
-	    rs = txtindexmks_addtag(op,(tags + i)) ;
-	    c += rs ;
-
-#if	CF_DEBUGS
-	    debugprintf("txtindexmks_addtags: _addtag() rs=%d\n",rs) ;
-#endif
-
-	    if (rs < 0) break ;
-	} /* end for */
-
-	if (rs >= 0)
-	    op->ti.ntags += ntags ;
-
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_addtags: ret rs=%d c=%u total_ntags=%u\n",
-	    rs,c,op->ti.ntags) ;
-#endif
-
+	if ((rs = txtindexmks_magic(op,tags)) >= 0) {
+	    for (int i = 0 ; i < ntags ; i += 1) {
+	        rs = txtindexmks_addtag(op,(tags + i)) ;
+	        c += rs ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	    if (rs >= 0) {
+	        op->ti.ntags += ntags ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexmks_addtags) */
@@ -476,31 +442,26 @@ int txtindexmks_addtags(TXTINDEXMKS *op,TXTINDEXMKS_TAG tags[],int ntags)
 
 /* private subroutines */
 
-
-static int txtindexmks_checkparams(TXTINDEXMKS *op)
-{
-	TXTINDEXMKS_PA	*pp = &op->pi ;
+static int txtindexmks_checkparams(TIM *op) noex {
+	TIM_PA		*pp = &op->pi ;
 	int		rs = SR_OK ;
-
-	if (pp->tablen == 0)
+	if (pp->tablen == 0) {
 	    pp->tablen = TXTINDEXMKS_TABLEN ;
-
-	if (pp->minwlen == 0)
+	}
+	if (pp->minwlen == 0) {
 	    pp->minwlen = TXTINDEXMKS_MINWLEN ;
-
-	if (pp->maxwlen == 0)
+	}
+	if (pp->maxwlen == 0) {
 	    pp->maxwlen = TXTINDEXMKS_MAXWLEN ;
-
-	if (pp->maxwlen > KEYBUFLEN)
+	}
+	if (pp->maxwlen > KEYBUFLEN) {
 	    pp->maxwlen = KEYBUFLEN ;
-
+	}
 	return rs ;
 }
 /* end subroutine (txtindexmks_checkparams) */
 
-
-static int txtindexmks_filesbegin(TXTINDEXMKS *op)
-{
+static int txtindexmks_filesbegin(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op->f.ofcreat) {
@@ -509,65 +470,67 @@ static int txtindexmks_filesbegin(TXTINDEXMKS *op)
 	    rs = txtindexmks_filesbeginwait(op) ;
 	    c = rs ;
 	}
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_filesbegin: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexmks_filesbegin) */
 
-
-static int txtindexmks_filesbeginc(TXTINDEXMKS *op)
-{
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+static int txtindexmks_filesbeginc(TIM *op) noex {
+	cint		type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint		szinc = (var.maxpathlen + 1) ;
 	int		rs ;
+	int		rs1 ;
+	int		ai = 0 ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_TAG	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    cchar		*tfn = tbuf ;
-	    char		rbuf[MAXPATHLEN+1] ;
-	    if (type) {
-	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	    	    op->f.created = TRUE ;
-	            tfn = rbuf ;
-		}
-	    }
-	    if (rs >= 0) {
-	        bfile	*tfp = &op->tagfile ;
-	        char	ostr[8] = "wc" ;
-	        if (op->f.ofexcl) strcat(ostr,"e") ;
-	        if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
-	            cchar	*cp ;
-	    	    op->f.created = TRUE ;
-	            if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
-	                op->ntagfname = (char *) cp ;
-	            }
-	            if (rs < 0)
-	                bclose(tfp) ;
-	        } /* end if (bopen) */
-		if ((rs < 0) && type) {
-		    uc_unlink(rbuf) ;
-		}
-	    } /* end if (ok) */
-	} /* end if (mknewfname) */
+	char		*ap ;
+	if ((rs = uc_malloc((szinc * 2),&ap)) >= 0) {
+	    char	*tbuf = (ap + (szinc * ai++)) ;
+	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
+	        cmode	om = op->om ;
+	        cchar	*tfn = tbuf ;
+	        char	*rbuf = (ap + (szinc * ai++)) ;
+	        if (type) {
+	            if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) {
+	    	        op->f.created = true ;
+	                tfn = rbuf ;
+		    }
+	        }
+	        if (rs >= 0) {
+	            bfile	*tfp = &op->tagfile ;
+	            char	ostr[8] = "wc" ;
+	            if (op->f.ofexcl) strcat(ostr,"e") ;
+	            if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
+	                cchar	*cp ;
+	    	        op->f.created = true ;
+	                if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	                    op->ntagfname = charp(cp) ;
+	                }
+	                if (rs < 0) {
+	                    bclose(tfp) ;
+		        }
+	            } /* end if (bopen) */
+		    if ((rs < 0) && type) {
+		        uc_unlink(rbuf) ;
+		    }
+	        } /* end if (ok) */
+	    } /* end if (mknewfname) */
+	    rs1 = uc_free(ap) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (txtindexmks_filesbeginc) */
 
-
-static int txtindexmks_filesbeginwait(TXTINDEXMKS *op)
-{
+static int txtindexmks_filesbeginwait(TIM *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_TAG	 ;
 	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
-		const int	to_stale = TXTINDEXMKS_INTSTALE ;
-		const int	nrs = SR_EXISTS ;
-		int		to = TXTINDEXMKS_INTOPEN ;
+	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
+		cint	to_stale = TXTINDEXMKS_INTSTALE ;
+		cint	nrs = SR_EXISTS ;
+		int	to = TXTINDEXMKS_INTOPEN ;
 		while ((rs = txtindexmks_filesbeginopen(op,tbuf)) == nrs) {
 		    c = 1 ;
 		    sleep(1) ;
@@ -575,7 +538,7 @@ static int txtindexmks_filesbeginwait(TXTINDEXMKS *op)
 		    if (to-- == 0) break ;
 		} /* end while (db exists) */
 		if (rs == nrs) {
-		    op->f.ofcreat = FALSE ;
+		    op->f.ofcreat = false ;
 		    c = 0 ;
 		    rs = txtindexmks_filesbeginc(op) ;
 		}
@@ -584,74 +547,59 @@ static int txtindexmks_filesbeginwait(TXTINDEXMKS *op)
 }
 /* end subroutine (txtindexmks_filesbeginwait) */
 
-
-static int txtindexmks_filesbeginopen(TXTINDEXMKS *op,cchar *tfn)
-{
+static int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 	bfile		*tfp = &op->tagfile ;
-	const mode_t	om = op->om ;
+	cmode		om = op->om ;
 	int		rs ;
 	char		ostr[8] = "wce" ;
 	if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
 	    cchar	*cp ;
-	    op->f.created = TRUE ;
+	    op->f.created = true ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 		op->ntagfname = (char *) cp ;
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 		bclose(tfp) ;
+	    }
 	} /* end if (bopen) */
 	return rs ;
 }
 /* end subroutine (txtindexmks_filesbeginopen) */
 
-
-static int txtindexmks_filesend(TXTINDEXMKS *op)
-{
+static int txtindexmks_filesend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->f.tagopen) {
-	    op->f.tagopen = FALSE ;
+	    op->f.tagopen = false ;
 	    rs1 = bclose(&op->tagfile) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	if (op->ntagfname != NULL) {
+	if (op->ntagfname != nullptr) {
 	    if (op->f.created && (op->ntagfname[0] != '\0')) {
 	        u_unlink(op->ntagfname) ;
 	    }
 	    rs1 = uc_free(op->ntagfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->ntagfname = NULL ;
+	    op->ntagfname = nullptr ;
 	}
-
-	if (op->nidxfname != NULL) {
+	if (op->nidxfname != nullptr) {
 	    if (op->f.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
 	    rs1 = uc_free(op->nidxfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->nidxfname = NULL ;
+	    op->nidxfname = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (txtindexmks_filesend) */
 
-
-static int txtindexmks_idxdirbegin(TXTINDEXMKS *op)
-{
+static int txtindexmks_idxdirbegin(TIM *op) noex {
 	int		rs = SR_INVALID ;
 	int		dnl ;
-	const char	*dnp ;
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_idxdirbegin: ent db=%s\n",op->dbname) ;
-#endif
+	cchar		*dnp ;
 	if ((dnl = sfdirname(op->dbname,-1,&dnp)) >= 0) {
 	    char	tbuf[MAXPATHLEN + 1] ;
-#if	CF_DEBUGS
-	    debugprintf("txtindexmks_idxdirbegin: dnl=%d\n",dnl) ;
-#endif
 	    if (dnl == 0) {
 	        rs = getpwd(tbuf,MAXPATHLEN) ;
 	        dnl = rs ;
@@ -660,165 +608,134 @@ static int txtindexmks_idxdirbegin(TXTINDEXMKS *op)
 	    }
 	    if (rs >= 0) {
 	        int	am = (X_OK | W_OK) ;
-	        if ((rs = perm(tbuf,-1,-1,NULL,am)) >= 0) {
-	            const char	*cp ;
+	        if ((rs = perm(tbuf,-1,-1,nullptr,am)) >= 0) {
+	            cchar	*cp ;
 	            if ((rs = uc_mallocstrw(tbuf,dnl,&cp)) >= 0) {
 	                op->idname = cp ;
 	            }
 	        }
-#if	CF_DEBUGS
-		debugprintf("txtindexmks_idxdirbegin: perm() rs=%d\n",rs) ;
-#endif
 	    }
 	}
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_idxdirbegin: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (txtindexmks_idxdirbegin) */
 
-
-static int txtindexmks_idxdirend(TXTINDEXMKS *op)
-{
+static int txtindexmks_idxdirend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->idname != NULL) {
+	if (op->idname != nullptr) {
 	    rs1 = uc_free(op->idname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->idname = NULL ;
+	    op->idname = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (txtindexmks_idxdirend) */
 
-
-static int txtindexmks_listbegin(TXTINDEXMKS *op)
-{
+static int txtindexmks_listbegin(TIM *op) noex {
+	int		sz = int(op->pi.tablen * sizeof(LISTOBJ)) ;
 	int		rs ;
-	int		size = (op->pi.tablen * sizeof(LISTOBJ)) ;
-	void		*p ;
-
-	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    LISTOBJ	*lop = (LISTOBJ *) p ;
-	    const int	lo = LISTOBJ_OORDERED ;
+	void		*vp ;
+	if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    LISTOBJ	*lop = (LISTOBJ *) vp ;
+	    cint	lo = LISTOBJ_OORDERED ;
 	    int		n = 0 ;
-	    int		i ;
-	    op->lists = p ;
-
-#if	CF_DEBUGS 
-	    debugprintf("txtindexmks_listbegin: tablen=%d\n", op->pi.tablen) ;
-#endif
-
+	    int		idx = 0 ;
+	    op->lists = vp ;
 	    if ((lo >= 0) && (n >= 0)) {
-	        for (i = 0 ; (rs >= 0) && (i < op->pi.tablen) ; i += 1) {
-	            rs = LISTOBJ_START((lop+i),n,lo) ;
-	        }
-	    } else
+		cint	tablen = int(op->pi.tablen) ;
+	        for (int i = 0 ; (rs >= 0) && (i < tablen) ; i += 1) {
+	            if ((rs = LISTOBJ_START((lop+i),n,lo)) >= 0) {
+			idx += 1 ;
+		    }
+	        } /* end for */
+	    } else {
 	        rs = SR_BUGCHECK ;
-
-	    if (rs >= 0) {
-	        size = TXTINDEXMKS_EIGENSIZE ;
-	        rs = strtab_start(&op->eigens,size) ;
 	    }
-
+	    if (rs >= 0) {
+	        sz = TXTINDEXMKS_EIGENSIZE ;
+	        rs = strtab_start(&op->eigens,sz) ;
+	    }
 	    if (rs < 0) {
-	        int	j ;
-	        for (j = 0 ; j < i ; j += 1) {
+	        for (int j = 0 ; j <= idx ; j += 1) {
 	            LISTOBJ_FINISH(lop+j) ;
 	        }
 	    }
-
 	    if (rs < 0) {
 	        uc_free(op->lists) ;
-	        op->lists = NULL ;
+	        op->lists = nullptr ;
 	    }
 	} /* end if (m-a) */
-
 	return rs ;
 }
 /* end subroutine (txtindexmks_listbegin) */
 
-
-static int txtindexmks_listend(TXTINDEXMKS *op)
-{
-	LISTOBJ		*lop ;
+static int txtindexmks_listend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	rs1 = strtab_finish(&op->eigens) ;
-	if (rs >= 0) rs = rs1 ;
-
-	lop = (LISTOBJ *) op->lists ;
-	for (i = 0 ; i < op->pi.tablen ; i += 1) {
-	    rs1 = LISTOBJ_FINISH(lop+i) ;
+	{
+	    rs1 = strtab_finish(&op->eigens) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	if (op->lists != NULL) {
+	{
+	    LISTOBJ	*lop = (LISTOBJ *) op->lists ;
+	    cint	tablen = int(op->pi.tablen) ;
+	    for (int i = 0 ; i < tablen ; i += 1) {
+	        rs1 = LISTOBJ_FINISH(lop+i) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	}
+	if (op->lists != nullptr) {
 	    rs1 = uc_free(op->lists) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->lists = NULL ;
+	    op->lists = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (txtindexmks_listend) */
 
-
-static int txtindexmks_addtag(TXTINDEXMKS *op,TXTINDEXMKS_TAG *tagp)
-{
-	LISTOBJ		*lop = op->lists ;
+static int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
+	LISTOBJ		*lop = (LISTOBJ *) op->lists ;
 	bfile		*tfp = &op->tagfile ;
 	uint		tagoff ;
 	int		rs = SR_OK ;
 	int		roff = tagp->recoff ;
 	int		rlen = tagp->reclen ;
 	int		c = 0 ;
-	const char	*fmt = "%s:%u,%u\n" ;
-	const char	*fp ;
-
-#if	CF_DEBUGS 
-	debugprintf("txtindexmks_addtag: tag=%u,%u\n",
-	    tagp->recoff,tagp->reclen) ;
-	debugprintf("txtindexmks_addtag: fname=%s\n",tagp->fname) ;
-#endif
+	cchar		*fmt = "%s:%u,%u\n" ;
+	cchar		*fp ;
 
 /* write out the tag to the tag-file */
 
 	tagoff = op->tagoff ;
-	fp = (tagp->fname != NULL) ? tagp->fname : zerobuf ;
+	fp = (tagp->fname != nullptr) ? tagp->fname : zerobuf ;
 	if ((rs = bprintf(tfp,fmt,fp,roff,rlen)) >= 0) {
 	    uint	hv ;
-	    const int	maxkl = MIN(op->pi.maxwlen,KEYBUFLEN) ;
-	    int		i ;
+	    cint	maxkl = MIN(op->pi.maxwlen,KEYBUFLEN) ;
 	    int		kl ;
 	    int		hi ;
-	    const char	*kp ;
+	    cchar	*kp ;
 	    char	keybuf[KEYBUFLEN + 1] ;
 	    op->tagoff += rs ;
 
 /* process the keys associated with this tag */
 
-	    for (i = 0 ; i < tagp->nkeys ; i += 1) {
-
+	    cint	nkeys = int(tagp->nkeys) ;
+	    for (int i = 0 ; i < nkeys ; i += 1) {
+		cint	minwlen = int(op->pi.minwlen) ;
 	        kp = tagp->keys[i].kp ;
 	        kl = tagp->keys[i].kl ;
-
-#if	CF_DEBUGS 
-	        debugprintf("txtindexmks_addtag: key=>%t<\n",kp,kl) ;
-#endif
 
 /* overflow and maximum word length management */
 
 	        if (kl >= 0) {
-	            if (kl > maxkl)
+	            if (kl > maxkl) {
 	                kl = maxkl ;
-	        } else
+		    }
+	        } else {
 	            kl = strnlen(kp,maxkl) ;
-
-	        if (kl < op->pi.minwlen) continue ;
+		}
+	        if (kl < minwlen) continue ;
 
 /* convert to lower-case as necessary */
 
@@ -833,11 +750,6 @@ static int txtindexmks_addtag(TXTINDEXMKS *op,TXTINDEXMKS_TAG *tagp)
 
 	        hi = (hv % op->pi.tablen) ;
 
-#if	CF_DEBUGS 
-	        debugprintf("txtindexmks_addtag: tablen=%d hi=%d\n",
-	            op->pi.tablen,hi) ;
-#endif
-
 	        if ((rs = LISTOBJ_ADD((lop+hi),tagoff)) >= 0) {
 	            if (rs != INT_MAX) {
 	                c += 1 ;
@@ -848,91 +760,51 @@ static int txtindexmks_addtag(TXTINDEXMKS *op,TXTINDEXMKS_TAG *tagp)
 	        if (rs < 0) break ;
 	    } /* end for (processing keys) */
 
-#if	CF_DEBUGS 
-	    debugprintf("txtindexmks_addtag: for-out rs=%d\n",rs) ;
-#endif
-
 	} /* end if (bprintf) */
-
-#if	CF_DEBUGS 
-	debugprintf("txtindexmks_addtag: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexmks_addtag) */
 
-
-static int txtindexmks_mkhash(TXTINDEXMKS *op)
-{
+static int txtindexmks_mkhash(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		clists = 0 ;
-
 	if ((rs = txtindexmks_nhashopen(op)) >= 0) {
-	    TXTINDEXHDR	hdr ;
-
-	    memset(&hdr,0,sizeof(TXTINDEXHDR)) ;
+	    HDR		hdr{} ;
 	    hdr.vetu[0] = TXTINDEXHDR_VERSION ;
 	    hdr.vetu[1] = ENDIAN ;
 	    hdr.vetu[2] = 0 ;
 	    hdr.vetu[3] = 0 ;
-	    hdr.wtime = (uint) time(NULL) ;
+	    hdr.wtime = (uint) time(nullptr) ;
 	    hdr.tfsize = op->tagsize ;
 	    hdr.taglen = op->ti.ntags ;
 	    hdr.minwlen = op->pi.minwlen ;
 	    hdr.maxwlen = op->pi.maxwlen ;
 	    hdr.tablen = op->pi.tablen ;
-
 	    if ((rs = txtindexmks_mkhashwrmain(op,&hdr)) >= 0) {
-	        const int	hlen = HDRBUFLEN ;
-	        char		hbuf[HDRBUFLEN+1] ;
+	        cint	hlen = HDRBUFLEN ;
+	        char	hbuf[HDRBUFLEN+1] ;
 	        hdr.hfsize = rs ;
-
-#if	CF_DEBUGS
-	        debugprintf("txtindexmks_mkhash: hfsize=%u\n",hdr.hfsize) ;
-	        debugprintf("txtindexmks_mkhash: tfsize=%u\n",hdr.tfsize) ;
-	        debugprintf("txtindexmks_mkhash: wtime=%u\n",hdr.wtime) ;
-	        debugprintf("txtindexmks_mkhash: sdnoff=%u\n",hdr.sdnoff) ;
-	        debugprintf("txtindexmks_mkhash: sfnoff=%u\n",hdr.sfnoff) ;
-	        debugprintf("txtindexmks_mkhash: listoff=%u\n",hdr.listoff) ;
-	        debugprintf("txtindexmks_mkhash: taboff=%u\n",hdr.taboff) ;
-	        debugprintf("txtindexmks_mkhash: tablen=%u\n",hdr.tablen) ;
-	        debugprintf("txtindexmks_mkhash: taglen=%u\n",hdr.taglen) ;
-	        debugprintf("txtindexmks_mkhash: maxtags=%u\n",hdr.maxtags) ;
-	        debugprintf("txtindexmks_mkhash: minwlen=%u\n",hdr.minwlen) ;
-	        debugprintf("txtindexmks_mkhash: maxwlen=%u\n",hdr.maxwlen) ;
-#endif /* CF_DEBUGS */
-
-	        if ((rs = txtindexhdr(&hdr,0,hbuf,hlen)) >= 0) {
-	            const int	bl = rs ;
+	        if ((rs = txtindexhdr_rd(&hdr,hbuf,hlen)) >= 0) {
+	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
-	                const mode_t	om = op->om ;
+	                cmode	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
 	            }
 	        }
-
 	    } /* end if (txtindexmks_mkhashwrmain) */
-
 	    rs1 = txtindexmks_nhashclose(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (txtindexmks_nhash) */
-
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_mkhash: ret rs=%d clists=%u\n",
-	    rs,clists) ;
-#endif
-
 	return (rs >= 0) ? clists : rs ;
 }
 /* end subroutine (txtindexmks_mkhash) */
 
-
-static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
-{
-	FILER		hf, *hfp = &hf ;
-	const int	nfd = op->nfd ;
-	const int	ps = getpagesize() ;
+static int txtindexmks_mkhashwrmain(TIM *op,HDR *hdrp) noex {
+	filer		hf, *hfp = &hf ;
+	cint		nfd = op->nfd ;
+	cint		ps = var.pagesize ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
@@ -942,13 +814,13 @@ static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
 	    if ((rs = txtindexmks_mkhashwrhdr(op,hdrp,hfp,off)) >= 0) {
 	        off += rs ;
 /* write SDN string */
-	        if ((rs >= 0) && (op->pi.sdn != NULL)) {
+	        if ((rs >= 0) && (op->pi.sdn != nullptr)) {
 	            hdrp->sdnoff = off ;
 	            rs = filer_writefill(hfp,op->pi.sdn,-1) ;
 	            off += rs ;
 	        }
 /* write SFN string */
-	        if ((rs >= 0) && (op->pi.sfn != NULL)) {
+	        if ((rs >= 0) && (op->pi.sfn != nullptr)) {
 	            hdrp->sfnoff = off ;
 	            rs = filer_writefill(hfp,op->pi.sfn,-1) ;
 	            off += rs ;
@@ -971,37 +843,32 @@ static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
 }
 /* end subroutine (txtindexmks_mkhashwrmain) */
 
-
-/* ARGSUSED */
-static int txtindexmks_mkhashwrhdr(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILER *hfp,int off)
-{
-	const int	hlen = HDRBUFLEN ;
-	int		rs ;
+static int txtindexmks_mkhashwrhdr(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	char		hbuf[HDRBUFLEN+1] ;
-	if (op == NULL) return SR_FAULT ; /* LINT */
-	if ((rs = txtindexhdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    const int	bl = rs ;
-	    rs = filer_writefill(hfp,hbuf,bl) ;
-	    wlen += rs ;
-	}
+	(void) off ;
+	if (op) {
+	    cint	hlen = HDRBUFLEN ;
+	    char	hbuf[HDRBUFLEN+1] ;
+	    if ((rs = txtindexhdr_rd(hdrp,hbuf,hlen)) >= 0) {
+	        cint	bl = rs ;
+	        rs = filer_writefill(hfp,hbuf,bl) ;
+	        wlen += rs ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (txtindexmks_mkhashwrhdr) */
 
-
-static int txtindexmks_mkhashwrtab(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILER *hfp,int off)
-{
-	int		*table = NULL ;
-	const int	tsize = op->pi.tablen * sizeof(uint) ;
+static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
+	int		*table = nullptr ;
+	cint		tsize = op->pi.tablen * sizeof(uint) ;
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = uc_malloc(tsize,&table)) >= 0) {
-	    int		i ;
+	    cint	tablen = int(op->pi.tablen) ;
 	    hdrp->listoff = off ;
-	    for (i = 0 ; (rs >= 0) && (i < op->pi.tablen) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (i < tablen) ; i += 1) {
 	        rs = txtindexmks_mkhashwrtabone(op,hdrp,hfp,off,table,i) ;
 	        off += rs ;
 	        wlen += rs ;
@@ -1009,7 +876,7 @@ static int txtindexmks_mkhashwrtab(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 	    hdrp->maxtags = op->ti.maxtags ;
 	    hdrp->taboff = off ;
 	    if (rs >= 0) {
-	        const int	tsize = op->pi.tablen * sizeof(uint) ;
+	        cint	tsize = op->pi.tablen * sizeof(uint) ;
 	        rs = filer_write(hfp,table,tsize) ;
 	        off += rs ;
 	        wlen += rs ;
@@ -1020,31 +887,32 @@ static int txtindexmks_mkhashwrtab(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 }
 /* end subroutine (txtindexmks_mkhashwrtab) */
 
-
-/* ARGSUSED */
-static int txtindexmks_mkhashwrtabone(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILER *hfp,int off,int *tab,int i)
-{
+static int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
+		filer *hfp,int off,int *tab,int i) noex {
 	LISTOBJ		*lop = (LISTOBJ *) op->lists ;
 	int		rs ;
 	int		wlen = 0 ;
+	(void) hdrp ;
 	lop += i ;
 	if ((rs = LISTOBJ_COUNT(lop)) > 0) {
-	    const int	c = rs ;
-	    const int	asize = ((c+1)*sizeof(int)) ;
+	    cint	c = rs ;
+	    cint	asize = ((c+1)*sizeof(int)) ;
 	    int		*va ;
 	    if ((rs = uc_malloc(asize,&va)) >= 0) {
 	        if ((rs = LISTOBJ_MKVEC(lop,va)) >= 0) {
-	            if (c > op->ti.maxtags) op->ti.maxtags = c ;
+		    cint	maxtags = int(op->ti.maxtags) ;
+	            if (c > maxtags) {
+			op->ti.maxtags = c ;
+		    }
 	            if (c > 0) {
-	                const int	csize = sizeof(int) ;
+	                cint	csize = sizeof(int) ;
 	                op->clists += 1 ;
 	                tab[i] = off ;
 	                if ((rs = filer_write(hfp,&c,csize)) >= 0) {
 	                    off += rs ;
 	                    wlen += rs ;
 	                    if (c > 0) {
-	                        const int	vsize = (c*sizeof(uint)) ;
+	                        cint	vsize = (c*sizeof(uint)) ;
 	                        rs = filer_write(hfp,va,vsize) ;
 	                        off += rs ;
 	                        wlen += rs ;
@@ -1061,117 +929,73 @@ static int txtindexmks_mkhashwrtabone(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 }
 /* end subroutine (txtindexmks_mkhashwrtabone) */
 
-
-static int txtindexmks_mkhashwreigen(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILER *hfp,int off)
-{
+static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
+		filer *hfp,int off) noex {
+	strtab		*elp = &op->eigens ;
 	int		rs ;
 	int		wlen = 0 ;
-
-	if ((rs = strtab_strsize(&op->eigens)) >= 0) {
-	    const int	nskip = TXTINDEXMKS_NSKIP ;
+	if ((rs = strtab_strsize(elp)) >= 0) {
+	    cint	nskip = TXTINDEXMKS_NSKIP ;
 	    int		essize = rs ;
-	    char	*estab = NULL ;
-
+	    char	*estab = nullptr ;
 	    hdrp->eiskip = nskip ;
 	    if (essize > 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("txtindexmks_wreigen: "
-	            "strtab_strsize() rs=%d\n",rs) ;
-#endif
-
 	        if ((rs = uc_malloc(essize,&estab)) >= 0) {
-
 	            hdrp->esoff = off ;
 	            hdrp->essize = essize ;
-	            rs = strtab_strmk(&op->eigens,estab,essize) ;
-
-#if	CF_DEBUGS
-	            debugprintf("txtindexmks_wreigen: "
-	                "strtab_strmk() rs=%d\n",rs) ;
-#endif
-
-	            if (rs >= 0) {
+	            if ((rs = strtab_strmk(elp,estab,essize)) >= 0) {
 	                rs = filer_write(hfp,estab,essize) ;
 	                off += rs ;
 	                wlen += rs ;
 	            }
-
 	            uc_free(estab) ;
 	        } /* end if (eigen-string table) */
 
-#if	CF_DEBUGS
-	        debugprintf("txtindexmks_wreigen: st rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0) {
 	            int		ersize = 0 ;
-	            int		n, erlen ;
-	            int		*ertab = NULL ;
+	            int		n ;
+	            int		erlen ;
+	            int		*ertab = nullptr ;
 
 	            n = strtab_count(&op->eigens) ;
 	            erlen = (n+1) ;
 
-#if	CF_DEBUGS
-	            debugprintf("txtindexmks_wreigen: n=%u erlen=%u\n",
-	                n,erlen) ;
-#endif
-
 	            if ((rs = strtab_recsize(&op->eigens)) >= 0) {
-	                void	*p ;
+	                void	*vp ;
 	                ersize = rs ;
-	                if ((rs = uc_malloc(ersize,&p)) >= 0) {
-	                    ertab = p ;
-
+	                if ((rs = uc_malloc(ersize,&vp)) >= 0) {
+	                    ertab = rectab_t(vp) ;
 	                    hdrp->ersize = ersize ;
 	                    hdrp->eroff = off ;
 	                    hdrp->erlen = erlen ;
-	                    rs = strtab_recmk(&op->eigens,ertab,ersize) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("txtindexmks_wreigen: "
-	                        "strtab_recmk() rs=%d\n",rs) ;
-#endif
-
-	                    if (rs >= 0) {
+	                    if ((rs = strtab_recmk(elp,ertab,ersize)) >= 0) {
 	                        rs = filer_write(hfp,ertab,ersize) ;
 	                        off += rs ;
 	                        wlen += rs ;
 	                    }
-
 	                    uc_free(ertab) ;
 	                } /* end if (memory-allocation) */
 	            } /* end if (recsize) */
 
 	        } /* end if (eigen-record table) */
 
-#if	CF_DEBUGS
-	        debugprintf("txtindexmks_wreigen: rt rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0) {
 	            int		eisize = 0 ;
 	            int		eilen ;
-	            int		(*eitab)[3] = NULL ;
+	            int		(*eitab)[3] = nullptr ;
 
-	            eilen = strtab_indlen(&op->eigens) ;
+	            eilen = strtab_indlen(elp) ;
 
-	            if ((rs = strtab_indsize(&op->eigens)) >= 0) {
-	                void	*p ;
+	            if ((rs = strtab_indsize(elp)) >= 0) {
+	                void	*vp ;
 	                eisize = rs ;
-	                if ((rs = uc_malloc(eisize,&p)) >= 0) {
-	                    eitab = p ;
+	                if ((rs = uc_malloc(eisize,&vp)) >= 0) {
+	                    eitab = idxtab_t(vp) ;
 
 	                    hdrp->eisize = eisize ;
 	                    hdrp->eioff = off ;
 	                    hdrp->eilen = eilen ;
-	                    rs = strtab_indmk(&op->eigens,eitab,eisize,nskip) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("txtindexmks_wreigen: "
-	                        "strtab_indmk() rs=%d\n",rs) ;
-#endif
+	                    rs = strtab_indmk(elp,eitab,eisize,nskip) ;
 
 	                    if (rs >= 0) {
 	                        rs = filer_write(hfp,eitab,eisize) ;
@@ -1188,32 +1012,21 @@ static int txtindexmks_mkhashwreigen(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 	    } /* end if (positive) */
 	} /* end if (strtab_strsize) */
 
-#if	CF_DEBUGS && CF_DEBUGEIGEN
-	if (rs >= 0)
-	    rs = txtindexmks_printeigen(op) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("txtindexmks_wreigen: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (txtindexmks_mkhashwreigen) */
 
-
-static int txtindexmks_nhashopen(TXTINDEXMKS *op)
-{
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+static int txtindexmks_nhashopen(TIM *op) noex {
+	cint		type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IND ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    int			of = (O_CREAT|O_WRONLY) ;
-	    cchar		*tfn = tbuf ;
-	    char		rbuf[MAXPATHLEN+1] ;
+	    cmode	om = op->om ;
+	    int		of = (O_CREAT|O_WRONLY) ; /* <- writable */
+	    cchar	*tfn = tbuf ;
+	    char	rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        rs = opentmpfile(tbuf,of,om,rbuf) ;
 	        op->nfd = rs ;
@@ -1234,9 +1047,7 @@ static int txtindexmks_nhashopen(TXTINDEXMKS *op)
 }
 /* end subroutine (txtindexmks_nhashopen) */
 
-
-static int txtindexmks_nhashclose(TXTINDEXMKS *op)
-{
+static int txtindexmks_nhashclose(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfd >= 0) {
@@ -1248,14 +1059,12 @@ static int txtindexmks_nhashclose(TXTINDEXMKS *op)
 }
 /* end subroutine (txtindexmks_nhashclose) */
 
-
-static int txtindexmks_renamefiles(TXTINDEXMKS *op)
-{
+static int txtindexmks_renamefiles(TIM *op) noex {
 	int		rs ;
-	const char	*end = ENDIANSTR ;
+	cchar		*ends = ENDIANSTR ;
 	char		hashfname[MAXPATHLEN + 1] ;
 
-	if ((rs = mkfnamesuf2(hashfname,op->dbname,FSUF_IND,end)) >= 0) {
+	if ((rs = mkfnamesuf2(hashfname,op->dbname,FSUF_IND,ends)) >= 0) {
 	    char	tagfname[MAXPATHLEN + 1] ;
 	    if ((rs = mkfnamesuf1(tagfname,op->dbname,FSUF_TAG)) >= 0) {
 
@@ -1283,9 +1092,7 @@ static int txtindexmks_renamefiles(TXTINDEXMKS *op)
 }
 /* end subroutine (txtindexmks_renamefiles) */
 
-
-int txtindexmks_ntagclose(TXTINDEXMKS *op)
-{
+int txtindexmks_ntagclose(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tagsize = 0 ;
@@ -1297,19 +1104,16 @@ int txtindexmks_ntagclose(TXTINDEXMKS *op)
 	}
 	rs1 = bclose(&op->tagfile) ;
 	if (rs >= 0) rs = rs1 ;
-	op->f.tagopen = FALSE ;
+	op->f.tagopen = false ;
 	return (rs >= 0) ? tagsize : rs ;
 }
 /* end if (txtindexmks_ntagclose) */
 
+#ifdef	COMMENT
 
-#if	CF_DEBUGS && CF_DEBUGEIGEN
-
-static int txtindexmks_printeigen(TXTINDEXMKS *op)
-{
-	STRTAB		*edp = &op->eigens ;
+static int txtindexmks_printeigen(TIM *op) noex {
+	strtab		*edp = &op->eigens ;
 	int		rs ;
-
 	if ((rs = strtab_count(edp)) >= 0) {
 	    int		erlen = (rs+1) ;
 	    if ((rs = strtab_strsize(edp)) >= 0) {
@@ -1335,15 +1139,12 @@ static int txtindexmks_printeigen(TXTINDEXMKS *op)
 		} /* end if (m-a) */
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (txtindexmks_printeigen) */
 
-
-static int txtindexmks_printeigener(TXTINDEXMKS *op,struct printeigen *ap)
-{
-	STRTAB		*edp = &op->eigens ;
+static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
+	strtab		*edp = &op->eigens ;
 	int		rs ;
 	int		rs1 ;
 	int		*ertab = ap->ertab ;
@@ -1384,22 +1185,18 @@ static int txtindexmks_printeigener(TXTINDEXMKS *op,struct printeigen *ap)
 }
 /* end subroutine (txtindexmks_printeigener) */
 
-#endif /* CF_DEBUGS */
+#endif /* COMMENT */
 
-
-static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
-{
+static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
 	return mkfnamesuf3(tbuf,dbn,suf,end,fin) ;
 }
 /* end subroutine (mknewfname) */
 
-
-static int unlinkstale(cchar *fn,int to)
-{
-	struct ustat	sb ;
-	const time_t	dt = time(NULL) ;
+static int unlinkstale(cchar *fn,int to) noex {
+	USTAT		sb ;
+	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = uc_stat(fn,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= to) {
@@ -1415,21 +1212,30 @@ static int unlinkstale(cchar *fn,int to)
 }
 /* end subroutine (unlinkstale) */
 
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = uc_pagesize()) >= 0) {
+	    var.pagesize = rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        var.maxpathlen = rs ;
+	    } /* end if (getbufsize) */
+	} /* end if (uc_pagesize) */
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
-#if	CF_DEBUGS && CF_DEBUGCECK
+#ifdef	COMMENT
 
-static int checksize(cchar *s,int rs,int size)
-{
-	if (rs != size) {
+static int checksize(cchar *s,int rs,int sz) noex {
+	if (rs != sz) {
 	    debugprintf("txtindexmks/checksize: %s mismatch rs=%d size=%d\n",
-	        s,rs,size) ;
+	        s,rs,sz) ;
 	}
 	return 0 ;
 }
 /* end subroutine (checksize) */
 
-static int checkalign(cchar *s,uint off)
-{
+static int checkalign(cchar *s,uint off) noex {
 	if ((off & 3) != 0) {
 	    debugprintf("txtindexmks/checkalign: %s misalign off=%08lx\n",
 	        s,off) ;
@@ -1438,6 +1244,6 @@ static int checkalign(cchar *s,uint off)
 }
 /* end subroutine (checkalign) */
 
-#endif /* CF_DEBUGS */
+#endif /* COMMENT */
 
 

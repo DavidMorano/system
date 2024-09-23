@@ -26,7 +26,7 @@
 #include	<usysrets.h>
 #include	<ptm.h>
 
-#include	"txtindexhdr.h"		/* this is the hash-file-header */
+#include	<txtindexhdr.h>		/* this is the hash-file-header */
 
 
 #define	TXTINDEXES_MAGIC	0x88773421

@@ -24,6 +24,8 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>

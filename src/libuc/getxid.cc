@@ -122,6 +122,10 @@
 
 /* external subroutines */
 
+extern "C" {
+    extern projid_t	getprojid() noex ;
+}
+
 
 /* external variables */
 
@@ -135,6 +139,7 @@
 /* local variables */
 
 constexpr gid_t		gidend = -1 ;
+constexpr projid_t	pjidend = -1 ;
 
 
 /* exported variables */
@@ -301,5 +306,21 @@ int getpjid_proj(cchar *sp,int sl) noex {
 	return rs ;
 }
 /* end subroutine (getpjid_proj) */
+
+int getpjid_def(cchar *name,projid_t pjid) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_FAULT ;
+	if (name) {
+	    if ((rs = getpjid_proj(name,-1)) == rsn) {
+	        if (pjid == pjidend) {
+	            rs = getprojid() ;
+	        } else {
+	            rs = pjid ;
+	        }
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (getpjid_def) */
 
 

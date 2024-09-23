@@ -1,6 +1,8 @@
-/* qpdecoder */
+/* qpdecoder HEADER */
+/* lang=C20 */
 
 /* Quoted-Printable (QP) decoder */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,12 +15,15 @@
 /* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	QPDECODER_INCLUDE
-#define	QPDECODER_INCLUDE	1
+#define	QPDECODER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	QPDECODER_MAGIC		0x13f3c205
@@ -32,30 +37,25 @@ struct qpdecoder_flags {
 } ;
 
 struct qpdecoder_head {
+	void		*outbuf ;	/* output-buffer */
+	QPDECODER_FL	f ;
 	uint		magic ;
 	int		rl ;		/* stage length */
-	QPDECODER_FL	f ;
-	void		*outbuf ;	/* output-buffer */
 	char		rb[4+1] ;	/* stage buffer */
 } ;
 
+typedef	QPDECODER	qpdecoder ;
+typedef	QPDECODER_FL	qpdecoder_fl ;
 
-#if	(! defined(QPDECODER_MASTER)) || (QPDECODER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int qpdecoder_start(qpdecoder *,int) noex ;
+extern int qpdecoder_load(qpdecoder *,cchar *,int) noex ;
+extern int qpdecoder_read(qpdecoder *,char *,int) noex ;
+extern int qpdecoder_finish(qpdecoder *) noex ;
 
-extern int qpdecoder_start(QPDECODER *,int) ;
-extern int qpdecoder_load(QPDECODER *,cchar *,int) ;
-extern int qpdecoder_read(QPDECODER *,char *,int) ;
-extern int qpdecoder_finish(QPDECODER *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* QPDECODER_MASTER */
 
 #endif /* QPDECODER_INCLUDE */
 

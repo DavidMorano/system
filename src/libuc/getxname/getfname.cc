@@ -26,7 +26,7 @@
 	be rooted at one place or another in the file system.
 	If a type of GETFNAME_TYPELOCAL is given as an argument,
 	the file is searched locally before being searched in the
-	program root area. If the type is given as GETFNAME_TYPEROOT,
+	program root area.  If the type is given as GETFNAME_TYPEROOT,
 	the file is searched for in the program root area first and
 	then locally.
 
@@ -58,8 +58,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<mkpathx.h>
 #include	<xperm.h>
@@ -73,7 +73,7 @@
 
 #ifndef	GETFNAME_TYPELOCAL
 #define	GETFNAME_TYPELOCAL	0	/* search locally first */
-#define	GETFNAME_TYPEROOT	1	/* search pr area first */
+#define	GETFNAME_TYPEROOT	1	/* search PR area first */
 #endif
 
 
@@ -216,6 +216,6 @@ int subinfo::rem() noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end method (subinfo::loc) */
+/* end method (subinfo::rem) */
 
 

@@ -406,15 +406,15 @@ int txtindex_curenum(txtindex *op,txtindex_cur *curp,txtindex_tag *tagp) noex {
 static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objname) noex {
 	modload		*lp = op->loaderp ;
 	vecstr		syms ;
-	cint		n = nelem(subs) ;
+	cint		vn = nelem(subs) ;
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
+	if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
 	    cint	nlen = SYMNAMELEN ;
 	    bool	f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
-	    for (int i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
+	    for (int i = 0 ; subs[i] ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;

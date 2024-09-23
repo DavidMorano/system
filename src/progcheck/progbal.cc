@@ -61,7 +61,7 @@ using namespace		std ;		/* yes, we want punishment! */
 
 extern "C" int	sichar(cchar *,int,int) ;
 
-extern "C" int	hexval(int) ;
+extern "C" int	digvalhex(int) ;
 extern "C" int	isprintlatin(int) ;
 extern "C" int	ishexlatin(int) ;
 

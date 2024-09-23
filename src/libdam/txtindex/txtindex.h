@@ -26,7 +26,7 @@
 #include	<usysrets.h>
 #include	<modload.h>
 
-#include	"txtindexes.h"
+#include	<txtindexes.h>
 
 
 #define	TXTINDEX_MAGIC		0x99447246

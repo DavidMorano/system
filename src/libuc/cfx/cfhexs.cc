@@ -56,7 +56,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	hexval(int) noex ;
+    extern int	digvalhex(int) noex ;
 }
 
 
@@ -83,8 +83,8 @@ int cfhexs(cchar *sp,int sl,uchar *rp) noex {
 	            cint	ch1 = mkchar(cp[1]) ;
 	            if (ishexlatin(ch0) && ishexlatin(ch1)) {
 		        int	v = 0 ;
-	                v |= (hexval(ch0)<<4) ;
-	                v |= (hexval(ch1)<<0) ;
+	                v |= (digvalhex(ch0)<<4) ;
+	                v |= (digvalhex(ch1)<<0) ;
 	                *rp++ = uchar(v) ;
 	            } else {
 		        rs = SR_INVALID ;

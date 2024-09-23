@@ -78,13 +78,12 @@ int inetaddrparse_load(inetaddrparse *ap,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (ap && sp) {
-	    int		cl ;
-	    cchar	*tp ;
-	    cchar	*cp ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    memclear(ap) ;
 	    n += 1 ;
-	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
+	        int	cl ;
+	        cchar	*cp ;
 	        n += 1 ;
 	        ap->af.sp = sp ;
 	        ap->af.sl = (tp - sp) ;

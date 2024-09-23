@@ -46,18 +46,10 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<getxx.h>
-#include	<ucgetpid.h>
-#include	<bfile.h>
-#include	<snx.h>
 #include	<localmisc.h>
 
 #include	"gethename.h"

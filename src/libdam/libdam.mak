@@ -826,6 +826,11 @@ varsub.o:		varsub.dir
 varsub.dir:
 	makesubdir $@
 
+# TXTINDEX
+txtindex.o:		txtindex.dir
+txtindex.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 

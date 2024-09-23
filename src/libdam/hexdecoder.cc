@@ -16,12 +16,14 @@
 
 /*******************************************************************************
 
-	We facilitate HEX (coded input) decoding.
+	Names:
+	hexdecoder_start
+	hexdecoder_load
+	hexdecoder_read
+	hexdecoder_finish
 
-		hexdecoder_start
-		hexdecoder_load
-		hexdecoder_read
-		hexdecoder_finish
+	Description:
+	We facilitate HEX (coded input) decoding.
 
 *******************************************************************************/
 
@@ -170,8 +172,8 @@ static int hexdecoder_cvt(hexdecoder *op) noex {
 	    int	ch0 = mkchar(rb[0]) ;
 	    int	ch1 = mkchar(rb[1]) ;
 	    int	v = 0 ;
-	    v |= (hexval(ch0)<<4) ;
-	    v |= (hexval(ch1)<<0) ;
+	    v |= (digvalhex(ch0)<<4) ;
+	    v |= (digvalhex(ch1)<<0) ;
 	    obp->add(v) ;
 	} else {
 	    rs = SR_BUGCHECK ;

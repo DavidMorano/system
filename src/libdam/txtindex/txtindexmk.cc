@@ -34,8 +34,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<getnodename.h>
 #include	<mkpr.h>
 #include	<estrings.h>
@@ -64,11 +67,24 @@
 #endif
 
 
-#undef	TIS_TAG
-#define	TIS_TAG		txtindexmks_tag
+/* imported namespaces */
 
-#undef	TIS_KEY
-#define	TIS_KEY		txtindexmks_key
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+extern "C" {            
+    typedef int	(*soopen_f)(void *,TIM_PA *,cchar *,int,int) noex ;
+    typedef int	(*soaddeigens_f)(void *,TIM_KEY *,int) noex ;
+    typedef int	(*soaddtags_f)(void *,TIM_TAG *,int) noex ;
+    typedef int	(*sonoop_f)(void *) noex ;
+    typedef int	(*soabort_f)(void *) noex ;
+    typedef int	(*soclose_f)(void *) noex ;
+}
 
 
 /* external subroutines */
@@ -79,17 +95,90 @@
 
 /* local structures */
 
+struct vars {
+	int		maxhostlen ;
+	int		maxpathlen ;
+} ;
+
+struct txtindexmk_calls {
+    soopen_f		open ;
+    soaddeigens_f	addeigens ;
+    soaddtags_f		addtags ;
+    sonoop_f		noop ;
+    soabort_f		abort ;
+    soclose_f		close ;
+} ;
+
+typedef txtindexmk_calls *	txtindexmk_callsp ;
+
+namespace {
+    struct opener {
+	TIM		*op ;
+	TIM_PA		*pp ;
+	cchar		*db ;
+	int		of ;
+	mode_t		om ;
+	opener(TIM *aop,TIM_PA *app,cchar *adb,int aof,mode_t aom) noex { 
+		op = aop ;
+		pp = app ;
+		db = adb ;
+		of = aof ;
+		om = aom ;
+	} ;
+	int operator () (char *ap) noex ;
+    } ; /* end struct (opener) */
+}
+
 
 /* forward references */
+
+template<typename ... Args>
+static int txtindexmk_ctor(txtindexmk *op,Args ... args) noex {
+	TXTINDEXMK	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->callp = new(nothrow) txtindexmk_calls) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-txtindexmks_calls) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindexmk_ctor) */
+
+static int txtindexmk_dtor(txtindexmk *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->callp) {
+	        txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+		delete callp ;
+		op->callp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (txtindexmk_dtor) */
+
+template<typename ... Args>
+static inline int txtindexmk_magic(txtindexmk *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TXTINDEXMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (txtindexmk_magic) */
 
 static int	txtindexmk_objloadbegin(TIM *,cchar *,cchar *) noex ;
 static int	txtindexmk_objloadend(TIM *) noex ;
 static int	txtindexmk_loadcalls(TIM *,cchar *) noex ;
 
+static int	mkvars() noex ;
+
 static bool	isrequired(int) noex ;
-
-
-/* global variables */
 
 
 /* local variables */
@@ -114,110 +203,119 @@ constexpr cpcchar	subs[] = {
 	nullptr
 } ;
 
+static vars		var ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om)
-{
+int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	int		rs ;
-	cchar	*objname = TIM_OBJNAME ;
-	char		dbuf[MAXHOSTNAMELEN+1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (db == nullptr) return SR_FAULT ;
-
-	if (db[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(TIM)) ;
-
-	if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
-	    const int	plen = MAXPATHLEN ;
-	    cchar	*pn = VARPRNAME ;
-	    char	pbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) {
-		cchar	*pr = pbuf ;
-		if ((rs = txtindexmk_objloadbegin(op,pr,objname)) >= 0) {
-	    	    if ((rs = (*op->call.open)(op->obj,pp,db,of,om)) >= 0) {
-			op->magic = TIM_MAGIC ;
-	    	    }
-	    	    if (rs < 0)
-			txtindexmk_objloadend(op) ;
-		} /* end if (txtindexmk_objloadbegin) */
-	    } /* end if (mkpr) */
-	} /* end if (getnodedomain) */
-
-	return rs ;
+	int		rs1 ;
+	int		rv = 0 ;
+	if ((rs = txtindexmk_ctor(op,pp,db)) >= 0) {
+	    static cint	rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+		cint	sz = (var.maxhostlen + 1 + var.maxpathlen + 1) ;
+		char	*ap{} ;
+		if ((rs = uc_malloc(sz,&ap)) >= 0) {
+		    opener	oo(op,pp,db,of,om) ;
+		    {
+		        rs = oo(ap) ;
+			rv = rs ;
+		    }
+		    rs1 = uc_free(ap) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (mkvars) */
+	    if (rs < 0) {
+		txtindexmk_dtor(op) ;
+	    }
+	} /* end if (txtindexmk_ctor) */
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (txtindexmk_open) */
 
+int opener::operator () (char *ap) noex {
+	int		rs ;
+	int		rv = 0 ;
+	char		*dbuf = ap ;
+	if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
+	    cint	plen = var.maxpathlen ;
+	    cchar	*pn = VARPRNAME ;
+	    char	*pbuf = (ap + (var.maxhostlen + 1)) ;
+	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) {
+	        cchar	*objname = TIM_OBJNAME ;
+		cchar	*pr = pbuf ;
+		if ((rs = txtindexmk_objloadbegin(op,pr,objname)) >= 0) {
+	    	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    	    if ((rs = (*callp->open)(op->obj,pp,db,of,om)) >= 0) {
+			rv = rs ;
+			op->magic = TXTINDEXMK_MAGIC ;
+	    	    }
+	    	    if (rs < 0) {
+			txtindexmk_objloadend(op) ;
+		    }
+		} /* end if (txtindexmk_objloadbegin) */
+	    } /* end if (mkpr) */
+	} /* end if (getnodedomain) */
+	return (rs >= 0) ? rv : rs ;
+}
+/* end method (opener::operator) */
 
-/* free up the entire vector string data structure object */
-int txtindexmk_close(TIM *op)
-{
-	int		rs = SR_OK ;
+int txtindexmk_close(TIM *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = txtindexmk_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = txtindexmk_magic(op)) >= 0) {
+	    if (op->obj) {
+	        txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	        rs1 = (*callp->close)(op->obj) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = txtindexmk_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = txtindexmk_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexmk_close) */
 
-
-int txtindexmk_addeigens(TIM *op,TIM_KEY keys[],int nkeys)
-{
+int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
-
-	rs = (*op->call.addeigens)(op->obj,keys,nkeys) ;
-
+	if ((rs = txtindexmk_magic(op,keys)) >= 0) {
+	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    rs = (*callp->addeigens)(op->obj,keys,nkeys) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexmk_addeigens) */
 
-
-int txtindexmk_addtags(TIM *op,TIM_TAG tags[],int ntags)
-{
+int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
-
-	rs = (*op->call.addtags)(op->obj,tags,ntags) ;
-
+	if ((rs = txtindexmk_magic(op,tags)) >= 0) {
+	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    rs = (*callp->addtags)(op->obj,tags,ntags) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexmk_addtags) */
 
-
-int txtindexmk_noop(TIM *op)
-{
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TIM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.noop != nullptr) {
-	    rs = (*op->call.noop)(op->obj) ;
-	}
-
+int txtindexmk_noop(TIM *op) noex {
+	int		rs ;
+	if ((rs = txtindexmk_magic(op)) >= 0) {
+	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    if (callp->noop) {
+	        rs = (*callp->noop)(op->obj) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (txtindexmk_noop) */
@@ -225,24 +323,18 @@ int txtindexmk_noop(TIM *op)
 
 /* private subroutines */
 
-
-/* find and load the DB-access object */
-static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname) noex {
+	modload		*lp = op->lop ;
+	vecstr		syms ;
+	cint		vn = nelem(subs) ;
+	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
-	    int		i ;
-	    int		f_modload = false ;
+	if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
+	    cint	nlen = SYMNAMELEN ;
 	    char	nbuf[SYMNAMELEN + 1] ;
-
-	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
+	    bool	f_modload = false ;
+	    for (int i = 0 ; subs[i] ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -250,21 +342,20 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname)
 		}
 		if (rs < 0) break ;
 	    } /* end for */
-
 	    if (rs >= 0) {
-		cchar	**sv ;
+		mainv	sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*mn = TIM_MODBNAME ;
-	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
+	            cint	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 	            if ((rs = modload_open(lp,pr,mn,objname,mo,sv)) >= 0) {
 	    		int	mv[2] ;
 			f_modload = true ;
 	    		if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-			    void	*p ;
+			    void	*vp ;
 			    op->objsize = mv[0] ;
 		            op->cursize = mv[1] ;
-		            if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
-		                op->obj = p ;
+		            if ((rs = uc_malloc(op->objsize,&vp)) >= 0) {
+		                op->obj = vp ;
 		                rs = txtindexmk_loadcalls(op,objname) ;
 		                if (rs < 0) {
 			            uc_free(op->obj) ;
@@ -279,100 +370,86 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname)
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (ok) */
-
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_modload) {
 	        modload_close(lp) ;
 	    }
 	} /* end if (vecstr-syms) */
-
 	return rs ;
 }
 /* end subroutine (txtindexmk_objloadbegin) */
 
-
-static int txtindexmk_objloadend(TIM *op)
-{
+static int txtindexmk_objloadend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->obj != nullptr) {
+	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-
-	rs1 = modload_close(&op->loader) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op->lop) {
+	    rs1 = modload_close(op->lop) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (txtindexmk_objloadend) */
 
-
-static int txtindexmk_loadcalls(TIM *op,cchar objname[])
-{
-	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+static int txtindexmk_loadcalls(TIM *op,cchar *objname) noex {
+	modload		*lp = op->lop ;
+	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp ;
-
-	for (i = 0 ; subs[i] != nullptr ; i += 1) {
-
+	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
+	    cvoid	*snp{} ;
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
 		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
-
-	    if (rs < 0) break ;
-
-	    if (snp != nullptr) {
-
+	    if ((rs >= 0) && snp) {
+	        txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
 	        c += 1 ;
 		switch (i) {
-
 		case sub_open:
-		    op->call.open = (int (*)(void *,TIMS_PA *,
-			cchar *,int,int)) snp ;
+		    callp->open = soopen_f(snp) ;
 		    break ;
-
 		case sub_addeigens:
-		    op->call.addeigens = 
-			(int (*)(void *,TIS_KEY *,int)) snp ;
+		    callp->addeigens = soaddeigens_f(snp) ;
 		    break ;
-
 		case sub_addtags:
-		    op->call.addtags = 
-			(int (*)(void *,TIS_TAG *,int)) snp ;
+		    callp->addtags = soaddtags_f(snp) ;
 		    break ;
-
 		case sub_noop:
-		    op->call.noop = (int (*)(void *)) snp ;
+		    callp->noop = sonoop_f(snp) ;
 		    break ;
-
 		case sub_abort:
-		    op->call.abort = (int (*)(void *)) snp ;
+		    callp->abort = soabort_f(snp) ;
 		    break ;
-
 		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
+		    callp->close = soclose_f(snp) ;
 		    break ;
-
 		} /* end switch */
-
 	    } /* end if (it had the call) */
-
 	} /* end for (subs) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexmk_loadcalls) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    var.maxhostlen = rs ;
+	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+		var.maxpathlen = rs ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 static bool isrequired(int i) noex {
 	bool		f = false ;

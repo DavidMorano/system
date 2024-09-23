@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} cmsghdr_passed "
+NAMES="${NAMES} hexval"
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/cmsghdr_passed/s//conmsghdr_passed/g
+g/hexval/s//digvalhex/g
 	w
 	q
 EOF

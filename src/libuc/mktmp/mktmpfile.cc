@@ -42,9 +42,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -63,10 +63,16 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward reference */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -75,8 +81,9 @@ int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	cint		of = (O_WRONLY|O_CLOEXEC) ;
 	int		rs ;
 	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
-	    uc_close(rs) ;
-	    rs = strlen(rbuf) ;
+	    if ((rs = uc_close(rs)) >= 0) {
+	        rs = strlen(rbuf) ;
+	    }
 	} /* end if (opentmpfile) */
 	return rs ;
 }
