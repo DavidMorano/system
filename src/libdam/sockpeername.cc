@@ -84,6 +84,9 @@ namespace {
 	int proc_in4(sockaddress *) noex ;
 	int proc_in6(sockaddress *) noex ;
 	int proc_in4name(hostent *) noex ;
+	int proc_in4namex(hostent *) noex ;
+	int proc_in4namedom(bool,hostent *) noex ;
+	int proc_in4namecan(hostent *) noex ;
 	int proc_in4addr(INADDR *) noex ;
     } ; /* end struct (suber) */
 }
@@ -179,8 +182,12 @@ int suber::proc_in4(sockaddress *sap) noex {
 	        cint		helen = rs ;
 		cchar		*na = charp(&naddr) ;
 	    	if ((rs = getho_addr(&he,hebuf,helen,af,na,nalen)) >= 0) {
-		    rs = proc_in4name(&he) ;
-		    rl = rs ;
+		    if ((rs = proc_in4name(&he)) > 0) {
+		        rl = rs ;
+		    } else if (rs == 0) {
+		        rs = proc_in4addr(&naddr) ;
+		        rl = rs ;
+		    }
 	        } else if (isNotPresent(rs)) {
 		    rs = proc_in4addr(&naddr) ;
 		    rl = rs ;
@@ -194,12 +201,79 @@ int suber::proc_in4(sockaddress *sap) noex {
 /* end method (suber::proc_in4) */
 
 int suber::proc_in4name(hostent *hep) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rl = 0 ;
-	(void) hep ;
+	if ((rs = proc_in4namex(hep)) > 0) {
+	    if (cchar *tp ; (tp = strchr(rbuf,'.')) != nullptr) {
+		rbuf[tp - rbuf] = '\0' ;
+	    }
+	}
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (suber::proc_in4name) */
+
+int suber::proc_in4namex(hostent *hep) noex {
+	int		rs = SR_OK ;
+	int		rl = 0 ;
+	if (dn) {
+	    if (dn[0]) {
+		if ((rs = proc_in4namedom(false,hep)) == 0) {
+		    rs = proc_in4namecan(hep) ;
+		}
+		rl = rs ;
+	    } else {
+		rs = proc_in4namecan(hep) ;
+		rl = rs ;
+	    }
+	} else {
+		rs = proc_in4namecan(hep) ;
+		rl = rs ;
+	}
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (suber::proc_in4namex) */
+
+int suber::proc_in4namedom(bool fany,hostent *hep) noex {
+	hostent_cur	hc ;
+	int		rs ;
+	int		rs1 ;
+	int		rl = 0 ;
+	if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
+	    cchar	*sp ;
+	    while ((rs = hostent_curenumname(hep,&hc,&sp)) > 0) {
+		if (fany || isindomain(sp,dn)) {
+		    rs = sncpy(rbuf,rlen,sp) ;
+		    rl = rs ;
+	        }
+		if (rl > 0) break ;
+	    } /* end while */
+	    rs1 = hostent_curend(hep,&hc) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (hostent) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (suber::proc_in4namedom) */
+
+#ifdef	COMMENT
+int suber::proc_in4nameany(hostent *hep) noex {
+	return proc_in4namedom(true,hep) ;
+}
+/* end method (suber::proc_in4nameany) */
+#endif /* COMMENT */
+
+int suber::proc_in4namecan(hostent *hep) noex {
+	int		rs ;
+	int		rl = 0 ;
+	cchar		*sp ;
+	if ((rs = hostent_getcanonical(hep,&sp)) > 0) {
+	    rs = sncpy(rbuf,rlen,sp) ;
+	    rl = rs ;
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
+	}
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (suber::proc_in4namecan) */
 
 int suber::proc_in4addr(INADDR *naddrp) noex {
 	inetaddr	ia ;
@@ -218,37 +292,8 @@ int suber::proc_in4addr(INADDR *naddrp) noex {
 }
 /* end method (suber::proc_in4addr) */
 
-#ifdef	COMMENT
-
-	        if (domainname != NULL) {
-		    hostent_cur		hc ;
-	            if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-			cchar	*sp ;
-	                while ((rs = hostent_curenumname(&he,&hc,&sp)) > 0) {
-	                    if (isindomain(sp,domainname)) break ;
-	                } /* end while */
-	                hostent_curend(&he,&hc) ;
-		    } /* end if (hostent) */
-	        } else {
-	            rs = SR_HOSTUNREACH ;
-		}
-	        if (rs >= 0) {
-		    cchar	*tp ;
-	            strwcpy(peername,np,nlen) ;
-	            if ((tp = strchr(peername,'.')) != NULL) {
-			peername[tp-peername] = '\0' ;
-		    }
-	        } else {
-	            hostent_getcanonical(&he,&np) ;
-	            strwcpy(peername,np,nlen) ;
-	        } /* end if */
-
-#else
-
 int suber::proc_in6(sockaddress *) noex {
 	return SR_OK ;
 }
-
-#endif /* COMMENT */
 
 

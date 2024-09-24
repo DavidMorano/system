@@ -893,6 +893,7 @@ isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
+isindomain.o:		isindomain.cc isindomain.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
