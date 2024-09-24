@@ -198,7 +198,7 @@ OBJ87= nchr.o mnwcpy.o
 OBJ88= tcgetlines.o tcsetlines.o tcpeek.o tcsetmesg.o tcsetbiff.o tcsetown.o
 OBJ89= tcgetws.o tcsetws.o
 OBJ90=
-OBJ91= getus.o getua.o getpe.o getse.o getne.o gethe.o getus.o getua.o
+OBJ91=
 OBJ92= unlinkd.o mapshmtmp.o
 OBJ93= mkfnamesuf.o mkfname.o mksofname.o mkfdfname.o
 OBJ94= mkgecosname.o mkmailname.o mkrealname.o mkuiname.o mkuibang.o 
@@ -828,6 +828,11 @@ varsub.dir:
 # TXTINDEX
 txtindex.o:		txtindex.dir
 txtindex.dir:
+	makesubdir $@
+
+# GETHE
+gethe.o:		gethe.dir
+gethe.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h
