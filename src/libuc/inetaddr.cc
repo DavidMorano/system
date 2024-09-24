@@ -25,12 +25,32 @@
 
 /*******************************************************************************
 
+	Name:
+	inetaddr
+
+	Description:
 	This little object allows for some common manipulations on
 	INET4 addresses.  I only handle INET4 addresses with this
 	object, so it is now a little bit out-of-date with the
 	spread of INET6 addresses (now-a-days).  This code is based
 	on code I wrote back in the 1990s when INET6 had not yet
 	come fully into its own).
+
+	Synopsis:
+	int inetaddr_start(inetaddr *ip,cvoid *addr) noex
+	int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex
+	int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex
+
+	Arguments:
+	ip		object pointer
+	addr		INADDR pointer
+	addrp		c-string address pointer
+	addrl		c-string address (raw-bytes) length
+	addrl		c-string address (dot-decimal) length
+
+	Return:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -39,7 +59,7 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* |memcpy(3c)| + |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ctdec.h>
@@ -81,9 +101,10 @@
 
 /* local variables */
 
-static constexpr int		inet4addrlen = INET4ADDRLEN ;
+constexpr int		inet4addrlen = INET4ADDRLEN ;
+constexpr int		alen = (inet4addrlen * 4) ;
 
-static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
+constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 
 /* exported variables */
@@ -94,7 +115,8 @@ static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 int inetaddr_start(inetaddr *ip,cvoid *addr) noex {
 	int		rs = SR_FAULT ;
 	if (ip && addr) {
-	    rs = memclear(ip) ;
+	    cint	al = INET4ADDRLEN ;
+	    rs = memcpy(ip,addr,al) ;
 	}
 	return rs ;
 }
@@ -104,7 +126,7 @@ int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	int		rs = SR_FAULT ;
 	if (ip && addrp) {
 	    cchar	*ap = addrp ;
-	    char	abuf[(inet4addrlen* 4) + 1] ;
+	    char	abuf[alen + 1] ;
 	    rs = SR_OK ;
 	    if (addrl < 0) addrl = strlen(addrp) ;
 	    while (CHAR_ISWHITE(*ap)) {

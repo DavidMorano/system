@@ -83,6 +83,8 @@ namespace {
 	int proc_unix(sockaddress *) noex ;
 	int proc_in4(sockaddress *) noex ;
 	int proc_in6(sockaddress *) noex ;
+	int proc_in4name(hostent *) noex ;
+	int proc_in4addr(INADDR *) noex ;
     } ; /* end struct (suber) */
 }
 
@@ -162,35 +164,68 @@ int suber::proc_unix(sockaddress *sap) noex {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
 }
+/* end method (suber::proc_unix) */
+
+int suber::proc_in4(sockaddress *sap) noex {
+	INADDR		naddr{} ;
+	cint		nalen = INET4ADDRLEN ;
+	int		rs ;
+	int		rs1 ;
+	int		rl = 0 ;
+	if ((rs = sockaddress_getaddr(sap,&naddr,nalen)) >= 0) {
+	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
+		ucentho		he ;
+		cint		af = AF_INET4 ;
+	        cint		helen = rs ;
+		cchar		*na = charp(&naddr) ;
+	    	if ((rs = getho_addr(&he,hebuf,helen,af,na,nalen)) >= 0) {
+		    rs = proc_in4name(&he) ;
+		    rl = rs ;
+	        } else if (isNotPresent(rs)) {
+		    rs = proc_in4addr(&naddr) ;
+		    rl = rs ;
+		}
+		rs1 = uc_free(hebuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (sockaddress_getaddr) */
+	return (rs >= 0) ? rl : rs ;
+}
 /* end method (suber::proc_in4) */
+
+int suber::proc_in4name(hostent *hep) noex {
+	int		rs = SR_OK ;
+	int		rl = 0 ;
+	(void) hep ;
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (suber::proc_in4name) */
+
+int suber::proc_in4addr(INADDR *naddrp) noex {
+	inetaddr	ia ;
+	int		rs ;
+	int		rs1 ;
+	int		rl = 0 ;
+	if ((rs = inetaddr_start(&ia,naddrp)) >= 0) {
+	    {
+		rs = inetaddr_getdotaddr(&ia,rbuf,rlen) ;
+		rl = rs ;
+	    }
+	    rs1 = inetaddr_finish(&ia) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (suber::proc_in4addr) */
 
 #ifdef	COMMENT
 
-int suber::proc_in4(sockaddress *sap) noex {
-	INADDR		naddr ;
-	cint		helen = getbufsize(getbufsize_ho) ;
-	int		rs ;
-	int		rl = 0 ;
-		    cint	ialen = INETXADDRLEN ;
-		    char	*hebuf ;
-	    	    sockaddress_getaddr(&sa,&naddr,ialen) ;
-		    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-			ucentho	he ;
-			cchar	*na = charp(&naddr) ;
-			cint	nlen = MAXHOSTNAMELEN ;
-
-/* lookup this IP (INET4) address */
-
-	    	        rs = getho_addr(&he,hebuf,helen,af,na,ialen) ;
-	    		if (rs >= 0) {
-			    /* hostent	*hep = ((hostent *) &he) ; */
-	        	    hostent_cur	hc ;
-	        	    cchar	*np ;
-
 	        if (domainname != NULL) {
+		    hostent_cur		hc ;
 	            if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	                while ((rs = hostent_curenumname(&he,&hc,&np)) > 0) {
-	                    if (isindomain(np,domainname)) break ;
+			cchar	*sp ;
+	                while ((rs = hostent_curenumname(&he,&hc,&sp)) > 0) {
+	                    if (isindomain(sp,domainname)) break ;
 	                } /* end while */
 	                hostent_curend(&he,&hc) ;
 		    } /* end if (hostent) */
@@ -208,28 +243,7 @@ int suber::proc_in4(sockaddress *sap) noex {
 	            strwcpy(peername,np,nlen) ;
 	        } /* end if */
 
-	    } else if (isNotPresent(rs)) {
-	        inetaddr	ia ;
-	        if ((rs = inetaddr_start(&ia,&na)) >= 0) {
-	            rs = inetaddr_getdotaddr(&ia,peername,nlen) ;
-	            inetaddr_finish(&ia) ;
-		} /* end if */
-	    } /* end if */
-
-			uc_free(hebuf) ;
-		    } /* end if (m-a) */
-		} /* end if (INET) */
-	    } /* end if (sockaddress_getaf) */
-	} /* end if (got an INET host entry) */
-	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4) */
-
 #else
-
-int suber::proc_in4(sockaddress *) noex {
-	return SR_OK ;
-}
 
 int suber::proc_in6(sockaddress *) noex {
 	return SR_OK ;
