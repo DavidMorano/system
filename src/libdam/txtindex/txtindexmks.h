@@ -85,8 +85,8 @@ struct txtindexmks_head {
 	char		*nidxfname ;	/* hash index */
 	char		*ntagfname ;	/* tags */
 	void		*lists ;	/* the lists */
-	strtab		eigens ;
-	bfile		tagfile ;
+	strtab		*eigenp ;
+	bfile		*tagfilep ;
 	TXTINDEXMKS_PA	pi ;
 	TXTINDEXMKS_TI	ti ;
 	TXTINDEXMKS_FL	f ;
@@ -108,13 +108,13 @@ typedef	TXTINDEXMKS_TI		txtindexmks_ti ;
 
 EXTERNC_begin
 
-extern int txtindexmks_open(TXTINDEXMKS *,TXTINDEXMKS_PA *,cchar *,int,
+extern int txtindexmks_open(txtindexmks *,txtindexmks_pa *,cchar *,int,
 		mode_t) noex ;
-extern int txtindexmks_addeigens(TXTINDEXMKS *,TXTINDEXMKS_KEY *,int) noex ;
-extern int txtindexmks_addtags(TXTINDEXMKS *,TXTINDEXMKS_TAG *,int) noex ;
-extern int txtindexmks_noop(TXTINDEXMKS *) noex ;
-extern int txtindexmks_abort(TXTINDEXMKS *) noex ;
-extern int txtindexmks_close(TXTINDEXMKS *) noex ;
+extern int txtindexmks_addeigens(txtindexmks *,txtindexmks_key *,int) noex ;
+extern int txtindexmks_addtags(txtindexmks *,txtindexmks_tag *,int) noex ;
+extern int txtindexmks_noop(txtindexmks *) noex ;
+extern int txtindexmks_abort(txtindexmks *) noex ;
+extern int txtindexmks_close(txtindexmks *) noex ;
 
 EXTERNC_end
 

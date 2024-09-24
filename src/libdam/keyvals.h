@@ -1,7 +1,7 @@
 /* keyvals HEADER */
 /* lang=C20 */
 
-/* key-values file operations */
+/* key-values (in-memory only) operations */
 /* version %I% last-modified %G% */
 
 
@@ -15,11 +15,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<localmisc.h>
 
 
 #define	KEYVALS			struct keyvals_head
@@ -29,14 +31,14 @@
 
 
 struct keyvals_cursor {
-	HDB_CUR		ec ;
+	hdb_cur		ec ;
 	int		i ;
 } ;
 
 struct keyvals_head {
-	VECOBJ		keys ;
-	HDB		bykey ;		/* indexed by key only */
-	HDB		bykeyval ;	/* indexed by key-val together */
+	vecobj		keys ;
+	hdb		bykey ;		/* indexed by key only */
+	hdb		bykeyval ;	/* indexed by key-val together */
 	uint		magic ;
 } ;
 
@@ -45,18 +47,18 @@ typedef KEYVALS_CUR	keyvals_cur ;
 
 EXTERNC_begin
 
-extern int keyvals_start(keyvals *,int) ;
-extern int keyvals_add(keyvals *,int,cchar *,cchar *,int) ;
-extern int keyvals_count(keyvals *) ;
-extern int keyvals_curbegin(keyvals *,keyvals_cur *) ;
-extern int keyvals_curend(keyvals *,keyvals_cur *) ;
-extern int keyvals_enumkey(keyvals *,keyvals_cur *,cchar **) ;
-extern int keyvals_enum(keyvals *,keyvals_cur *,cchar **,cchar **) ;
-extern int keyvals_fetch(keyvals *,cchar *,keyvals_cur *,cchar **) ;
-extern int keyvals_delset(keyvals *,int) ;
-extern int keyvals_delkey(keyvals *,cchar *,int) ;
-extern int keyvals_check(keyvals *,time_t) ;
-extern int keyvals_finish(keyvals *) ;
+extern int keyvals_start(keyvals *,int) noex ;
+extern int keyvals_add(keyvals *,int,cchar *,cchar *,int) noex ;
+extern int keyvals_count(keyvals *) noex ;
+extern int keyvals_curbegin(keyvals *,keyvals_cur *) noex ;
+extern int keyvals_curend(keyvals *,keyvals_cur *) noex ;
+extern int keyvals_curenumkey(keyvals *,keyvals_cur *,cchar **) noex ;
+extern int keyvals_curenum(keyvals *,keyvals_cur *,cchar **,cchar **) noex ;
+extern int keyvals_fetch(keyvals *,cchar *,keyvals_cur *,cchar **) noex ;
+extern int keyvals_delset(keyvals *,int) noex ;
+extern int keyvals_delkey(keyvals *,cchar *,int) noex ;
+extern int keyvals_check(keyvals *,time_t) noex ;
+extern int keyvals_finish(keyvals *) noex ;
 
 EXTERNC_end
 

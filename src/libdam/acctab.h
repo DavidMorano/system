@@ -1,6 +1,9 @@
 /* acctab HEADER */
 /* lang=C20 */
 
+/* perform access-table file related functions */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

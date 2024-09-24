@@ -71,7 +71,7 @@ extern "C" {
     typedef int	(*soopen_f)(void *,cchar *) noex ;
     typedef int	(*socount_f)(void *) noex ;
     typedef int	(*soneigen_f)(void *) noex ;
-    typedef int	(*sogetinfo_f)(void *,txtindexes_info *) noex ;
+    typedef int	(*sogetinfo_f)(void *,txtindexes_info *,char *,int) noex ;
     typedef int	(*soiseigen_f)(void *,cchar *,int) noex ;
     typedef int	(*socurbegin_f)(void *,void *) noex ;
     typedef int	(*socurlookup_f)(void *,void *,cchar **) noex ;
@@ -296,14 +296,14 @@ int txtindex_neigen(txtindex *op) noex {
 }
 /* end subroutine (txtindex_neigen) */
 
-int txtindex_getinfo(txtindex *op,TXTINDEX_INFO *ip) noex {
+int txtindex_getinfo(txtindex *op,TXTINDEX_INFO *ip,char *rb,int rl) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,ip)) >= 0) {
 	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->getinfo) {
 		auto	co = callp->getinfo ;
-	        rs = co(op->obj,ip) ;
+	        rs = co(op->obj,ip,rb,rl) ;
 	    }
 	} /* end if (magic) */
 	return rs ;

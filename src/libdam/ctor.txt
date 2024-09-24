@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int linehist_ctor(linehist *op,Args ... args) noex {
+static int keyvals_ctor(keyvals *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int linehist_ctor(linehist *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (linehist_ctor) */
+/* end subroutine (keyvals_ctor) */
 
-static int linehist_dtor(linehist *op) noex {
+static int keyvals_dtor(keyvals *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (linehist_dtor) */
+/* end subroutine (keyvals_dtor) */
 
 template<typename ... Args>
-static inline int linehist_magic(linehist *op,Args ... args) noex {
+static inline int keyvals_magic(keyvals *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == PROGBAL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == KEYVALS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (linehist_magic) */
+/* end subroutine (keyvals_magic) */

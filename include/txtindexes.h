@@ -54,7 +54,6 @@ struct txtindexes_cursor {
 struct txtindexes_tagitem {
 	uint		recoff ;
 	uint		reclen ;
-	char		fname[MAXPATHLEN + 1] ;
 } ;
 
 struct txtindexes_file {
@@ -82,8 +81,6 @@ struct txtindexes_information {
 	uint		neigen ;
 	uint		minwlen ;	/* minimum word length */
 	uint		maxwlen ;	/* maximum word length */
-	char		sdn[MAXPATHLEN + 1] ;
-	char		sfn[MAXPATHLEN + 1] ;
 } ;
 
 struct txtindexes_head {
@@ -116,7 +113,7 @@ extern int	txtindexes_iseigen(txtindexes *,cchar *,int) noex ;
 extern int	txtindexes_curbegin(txtindexes *,txtindexes_cur *) noex ;
 extern int	txtindexes_lookup(txtindexes *,txtindexes_cur *,cchar **) noex ;
 extern int	txtindexes_read(txtindexes *,txtindexes_cur *,
-			txtindexes_tag *) noex ;
+			txtindexes_tag *,char *,int) noex ;
 extern int	txtindexes_curend(txtindexes *,txtindexes_cur *) noex ;
 extern int	txtindexes_audit(txtindexes *) noex ;
 extern int	txtindexes_close(txtindexes *) noex ;

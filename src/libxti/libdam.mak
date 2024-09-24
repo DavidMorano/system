@@ -610,47 +610,7 @@ fifoitem.o:		fifoitem.c fifoitem.h
 
 fifoelem.o:		fifoelem.c fifoelem.h
 
-vechand.o:		vechand.c vechand.h
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecstr_adduniq.o:	vecstr_adduniq.c vecstr.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c vecstr.h
-
-vecstr_foilcmp.o:	vecstr_foilcmp.c vecstr.h
-
-vecstr_env.o:		vecstr_env.c vecstr.h
-
-vecstr_envfile.o:	vecstr_envfile.c vecstr.h
-
-vecstr_svcargs.o:	vecstr_svcargs.c vecstr.h
-
-vecstr_srvargs.o:	vecstr_srvargs.c vecstr.h
-
-vecpstr.o:		vecpstr.c vecpstr.h
-
-vecpstr_loadfile.o:	vecpstr_loadfile.c vecpstr.h
-
-vecpstr_loadgrusers.o:	vecpstr_loadgrusers.c vecpstr.h
-
-vecpstr_loadpjusers.o:	vecpstr_loadpjusers.c vecpstr.h
-
-vecpstr_envadd.o:	vecpstr_envadd.c vecpstr.h
-
-vecpstr_envfile.o:	vecpstr_envfile.c vecpstr.h
-
-vecitem.o:		vecitem.c vecitem.h
-
-vecobj.o:		vecobj.c vecobj.h
-
-vecint.o:		vecint.c vecint.h
-
-veclong.o:		veclong.c veclong.h
-
-vecelem.o:		vecelem.c vecelem.h
-
-keyvals.o:		keyvals.c keyvals.h
+keyvals.o:		keyvals.cc keyvals.h
 
 paramopt.o:		paramopt.c paramopt.h
 
