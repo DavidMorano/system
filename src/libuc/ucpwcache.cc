@@ -35,10 +35,10 @@
 
 	Q. Why cannot we just use a POSIX® mutex-lock around the
 	guts of the public subroutines?
-	A. Because those "guts" might do some complex operating-system-like
-	things that would lead to a deadlock (because perhaps there
-	is a |uc_fork(3uc)| in there, for example)!  It is *much*
-	better to be safe than sorry.
+	A. Because those "guts" might do some complex 
+	operating-system-like things that would lead to a deadlock
+	(because perhaps there is a |uc_fork(3uc)| in there, for
+	example)!  It is *much* better to be safe than sorry.
 
 	Q. Your (our) little "capture" mutex-lock implementation:
 	why did you not just use a |lockrw(3dam)| object lock in
@@ -56,7 +56,10 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t(3c++)| */
+#include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<atomic>		/* |atomic_int(3c++)| */
 #include	<usystem.h>
 #include	<timewatch.hh>
@@ -73,7 +76,9 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::atomic_int ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -146,8 +151,8 @@ namespace {
 	int	iopcheck() noex ;
 	int	iopbegin() noex ;
 	int	iopend() noex ;
-	int	name(PASSWD *,char *,int,cchar *) noex ;
-	int	uid(PASSWD *,char *,int,uid_t) noex ;
+	int	name(ucentpw *,char *,int,cchar *) noex ;
+	int	uid(ucentpw *,char *,int,uid_t) noex ;
 	int	stats(ucpwcache_st *) noex ;
 	~ucpwcache() noex {
 	    cint	rs = fini() ;
@@ -186,11 +191,11 @@ int ucpwcache_fini() noex {
 	return ucpwcache_data.fini() ;
 }
 
-int ucpwcache_name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
+int ucpwcache_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	return ucpwcache_data.name(pwp,pwbuf,pwlen,un) ;
 }
 
-int ucpwcache_uid(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
+int ucpwcache_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	return ucpwcache_data.uid(pwp,pwbuf,pwlen,uid) ;
 }
 
@@ -279,7 +284,7 @@ int ucpwcache::ifini() noex {
 }
 /* end method (ucpwcache::ifini) */
 
-int ucpwcache::name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
+int ucpwcache::name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -301,7 +306,7 @@ int ucpwcache::name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 }
 /* end subroutine (ucpwcache_name) */
 
-int ucpwcache::uid(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
+int ucpwcache::uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;

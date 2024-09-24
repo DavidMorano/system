@@ -36,6 +36,7 @@
 #include	<getgroupname.h>
 #include	<vechand.h>
 #include	<cq.h>
+#include	<sncpy.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>		/* |GROUPNAMELEN| + |TIME_MAX| */
 
@@ -57,13 +58,11 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef gncache_ent	ent ;
-typedef gncache_ent *	entp ;
-
 
 /* external subroutines */
 
-extern int	getgroupname(char *,int,gid_t) noex ;
+
+/* external variables */
 
 
 /* local structures */
@@ -158,8 +157,6 @@ static int record_update(rec *,time_t,cchar *) noex ;
 static int record_access(rec *,time_t) noex ;
 static int record_finish(rec *) noex ;
 
-static int	entry_load(ent *,rec *) noex ;
-
 static int mkvars() noex ;
 
 
@@ -221,7 +218,7 @@ int gncache_finish(GN *op) noex {
 	                    rs1 = uc_free(rp) ;
 	                    if (rs >= 0) rs = rs1 ;
 		        }
-	            }
+	            } /* end if (non-null) */
 	        } /* end for */
 	    }
 	    if (rlp) {
@@ -269,14 +266,14 @@ int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
 }
 /* end subroutine (gncache_add) */
 
-int gncache_lookgid(GN *op,ent *ep,gid_t gid) noex {
+int gncache_lookgid(GN *op,char *rbuf,int rlen,gid_t gid) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	int		rs1 ;
 	int		gl = 0 ;
-	if ((rs = gncache_magic(op)) >= 0) {
+	if ((rs = gncache_magic(op,rbuf)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (gid != gidend) {
+	    if ((gid != gidend) && (rlen > 0)) {
 	        int	ct{} ;
 	        rec	*rp{} ;
 	        if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
@@ -301,8 +298,9 @@ int gncache_lookgid(GN *op,ent *ep,gid_t gid) noex {
 	            if (rs == 0) rs = SR_NOTFOUND ;
 	        }
 	        if (rs >= 0) {
-	            if (ep) rs = entry_load(ep,rp) ;
-	            gncache_maintenance(op,dt) ;
+		    if ((rs = sncpy(rbuf,rlen,rp->gn)) >= 0) {
+	                rs = gncache_maintenance(op,dt) ;
+		    }
 	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -407,7 +405,7 @@ static int gncache_maintenance(GN *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		iold = -1 ; /* the oldest one */
-/* delete expired entries */
+	/* delete expired entries */
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
@@ -424,7 +422,7 @@ static int gncache_maintenance(GN *op,time_t dt) noex {
 	        } /* end if */
 	    } /* end if (non-null) */
 	} /* end for */
-/* delete entries (at least one) if we are too big */
+	/* delete entries (at least one) if we are too big */
 	if ((rs >= 0) && (iold >= 0)) {
 	    if ((rs = vechand_count(rlp)) > op->nmax) {
 	        rs1 = vechand_get(op->rlp,iold,&vp) ;
@@ -591,15 +589,6 @@ static int record_access(rec *rp,time_t dt) noex {
 	return gl ;
 }
 /* end subroutine (record_access) */
-
-static int entry_load(ent *ep,rec *rp) noex {
-	cint		gnl = var.groupnamelen ;
-	int		gl ;
-	ep->gid = rp->gid ;
-	gl = strwcpy(ep->groupname,rp->gn,gnl) - ep->groupname ;
-	return gl ;
-}
-/* end subroutine (entry_load) */
 
 static int mkvars() noex {
 	int		rs ;

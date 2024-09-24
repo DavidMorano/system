@@ -180,13 +180,14 @@ static int	getpw_name(ucentpw *,char *,int,cchar *) noex ;
 int pwcache_start(pwcache *op,int nmax,int ttl) noex {
         int             rs  ;
 	if ((rs = pwcache_ctor(op)) >= 0) {
+	    cnullptr	np{} ;
             if (nmax < PWCACHE_DEFMAX) nmax = PWCACHE_DEFMAX ;
             if (ttl < PWCACHE_DEFTTL) ttl = PWCACHE_DEFTTL ;
-            if ((rs = hdb_start(op->dbp,nmax,1,nullptr,nullptr)) >= 0) {
+            if ((rs = hdb_start(op->dbp,nmax,1,np,np)) >= 0) {
                 if ((rs = pq_start(op->lrup)) >= 0) {
                     op->nmax = nmax ;
                     op->ttl = ttl ;
-                    op->ti_check = time(nullptr) ;
+                    op->ti_check = getustime ;
                     op->magic = PWCACHE_MAGIC ;
                 }
                 if (rs < 0) {
@@ -228,7 +229,7 @@ int pwcache_finish(pwcache *op) noex {
 /* end subroutine (pwcache_finish) */
 
 int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
-        const time_t    dt = time(nullptr) ;
+        custime    	dt = getustime ;
         int             rs ;
 	if ((rs = pwcache_magic(op,pwp,pwbuf,un)) >= 0) {
             rs = SR_INVALID ;
@@ -267,7 +268,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 /* end subroutine (pwcache_lookup) */
 
 int pwcache_uid(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
-        const time_t    dt = time(nullptr) ;
+        custime		dt = getustime ;
         int             rs ;
 	if ((rs = pwcache_magic(op,pwp,pwbuf)) >= 0) {
             rec         *ep = nullptr ;
@@ -346,7 +347,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
             if ((rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
                 hdb_dat       key{} ;
                 hdb_dat       val{} ;
-                if (dt == 0) dt = time(nullptr) ;
+                if (dt == 0) dt = getustime ;
                 while (rs >= 0) {
                     rs1 = hdb_enum(op->dbp,&cur,&key,&val) ;
                     if (rs1 == SR_NOTFOUND) break ;
