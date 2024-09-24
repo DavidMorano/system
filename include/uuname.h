@@ -22,11 +22,11 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
-#include	"uunames.h"
+#include	<uunames.h>
 
 
 #define	UUNAME_MAGIC	0x99447243

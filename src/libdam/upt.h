@@ -1,4 +1,4 @@
-/* upt */
+/* upt HEADER */
 /* UNIX® POSIX Thread manipulation */
 
 
@@ -13,25 +13,19 @@
 
 
 #ifndef	UPT_INCLUDE
-#define	UPT_INCLUDE	1
+#define	UPT_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
-
 #include	<usystem.h>
 #include	<pta.h>
-#include	<localmisc.h>
 
+
+EXTERNC_begin
 
 typedef int (*uptsub_t)(void *) ;
-
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
 extern int uptcreate(pthread_t *,pthread_attr_t *,int (*)(void *),void *) ;
 extern int uptexit(int) ;
@@ -52,9 +46,8 @@ extern int uptself(pthread_t *) ;
 extern int uptatfork(void (*)(),void (*)(),void (*)()) ;
 extern int uptncpus(int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* UPT_INCLUDE */
 

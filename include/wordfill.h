@@ -19,11 +19,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<fifostr.h>
-#include	<localmisc.h>		/* extra types */
 
 
 #define	WORDFILL_MAGIC	0x88442239

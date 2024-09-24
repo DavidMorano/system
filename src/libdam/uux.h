@@ -23,12 +23,11 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<logfile.h>
-#include	<localmisc.h>
 
-#include	"sysdialer.h"
+#include	<sysdialer.h>
 
 
 #define	UUX_MAGIC	0x31455926

@@ -15,8 +15,9 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bufstr.h>
-#include	<localmisc.h>
 
 
 #define	MAILADDRQUOTE		struct mailaddrquote_head

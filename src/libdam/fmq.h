@@ -26,12 +26,9 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
-
-#ifndef	UINT
-#define	UINT		unsigned int
-#endif
 
 #define	FMQ_MAGIC	0x21419876
 #define	FMQ		struct fmq_head
