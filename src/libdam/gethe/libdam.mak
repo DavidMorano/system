@@ -830,6 +830,11 @@ txtindex.o:		txtindex.dir
 txtindex.dir:
 	makesubdir $@
 
+# GETHE
+gethe.o:		gethe.dir
+gethe.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
