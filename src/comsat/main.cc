@@ -1960,7 +1960,7 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	    bool	f = false ;
 	    const uchar	*ap ;
 
-	    while ((rs = hostinfo_enumaddr(hip,&cur,&ap)) > 0) {
+	    while ((rs = hostinfo_curenumaddr(hip,&cur,&ap)) > 0) {
 	        al = rs ;
 
 	        switch (al) {

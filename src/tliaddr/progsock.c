@@ -308,7 +308,7 @@ int		*pp ;
 	    if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
 		cint		aflen = getaflen(af) ;
 		const uchar	*ap ;
-	        while ((rs = hostinfo_enumaddr(&hi,&hc,&ap)) > 0) {
+	        while ((rs = hostinfo_curenumaddr(&hi,&hc,&ap)) > 0) {
 		    al = rs ;
 	            if (al == aflen) {
 			memcpy(naddr,ap,aflen) ;

@@ -2234,10 +2234,8 @@ cchar	node[] ;
 	cchar	*np ;
 
 	if ((rs = hostinfo_start(&hi,af,node)) >= 0) {
-
 	    if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
-
-	        while ((rs = hostinfo_enumname(&hi,&hc,&np)) > 0) {
+	        while ((rs = hostinfo_curenumname(&hi,&hc,&np)) > 0) {
 		    int		nl = rs ;
 
 /* don't remove domain part since the node could be in another domain */

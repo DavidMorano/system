@@ -1451,7 +1451,7 @@ static int listenspec_openportao(LS *op,char *addr,int af,cc *hn) noex {
 	            if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
 	                hostinfo_cur	hicur ;
 	                if ((rs = hostinfo_curbegin(&hi,&hicur)) >= 0) {
-	                    auto hi_ea = hostinfo_enumaddr ;
+	                    auto hi_ea = hostinfo_curenumaddr ;
 	                    const uchar	*ap ;
 	                    while ((rs = hi_ea(&hi,&hicur,&ap)) > 0) {
 	                        if (rs == addrlen) {
