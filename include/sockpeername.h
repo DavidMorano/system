@@ -1,4 +1,4 @@
-/* peerhostname HEADER */
+/* sockpeername HEADER */
 /* lang=C20 */
 
 /* get a peer host name if there is one */
@@ -7,8 +7,8 @@
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PEERHOSTNAME_INCLUDE
-#define	PEERHOSTNAME_INCLUDE
+#ifndef	SOCKPEERNAME_INCLUDE
+#define	SOCKPEERNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -21,11 +21,11 @@
 
 EXTERNC_begin
 
-extern int	peerhostname(int,cchar *,char *) noex ;
+extern int	sockpeername(int,cchar *,char *) noex ;
 
 EXTERNC_end
 
 
-#endif /* PEERHOSTNAME_INCLUDE */
+#endif /* SOCKPEERNAME_INCLUDE */
 
 
