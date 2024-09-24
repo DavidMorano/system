@@ -47,6 +47,8 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"peerhostname.h"
+
 
 /* local defines */
 
@@ -55,6 +57,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

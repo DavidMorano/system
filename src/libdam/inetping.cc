@@ -62,6 +62,8 @@
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
+#include	"inetping.h"
+
 
 /* local defines */
 
@@ -157,10 +159,13 @@ static cchar	*pings[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int inetping(cchar *rhost,int timeout) noex {
-	HOSTENT	he, *hep ;
+	HOSTENT		he, *hep ;
 	const int	helen = getbufsize(getbufsize_he) ;
 	int		rs ;
 	char		*hebuf ;
