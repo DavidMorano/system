@@ -14,10 +14,14 @@
 
 */
 
-/* Copyright © 2004 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+	Name:
+	grcache
+
+	Description:
 	This object provides a crude cache for GROUP-DB entries.
 
 *******************************************************************************/

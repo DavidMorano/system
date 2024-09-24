@@ -174,7 +174,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	                    if (dn) {
 	    			hostent_cur	hc ;
 	                        if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-				    auto	henum = hostent_enumname ;
+				    auto	henum = hostent_curenumname ;
 	                            cchar	*hp ;
 	                            while ((rs = henum(&he,&hc,&hp)) > 0) {
 	                                if (isindomain(hp,dn)) {

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int txtindexmks_ctor(txtindexmks *op,Args ... args) noex {
+static int linehist_ctor(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int txtindexmks_ctor(txtindexmks *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (txtindexmks_ctor) */
+/* end subroutine (linehist_ctor) */
 
-static int txtindexmks_dtor(txtindexmks *op) noex {
+static int linehist_dtor(linehist *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (txtindexmks_dtor) */
+/* end subroutine (linehist_dtor) */
 
 template<typename ... Args>
-static inline int txtindexmks_magic(txtindexmks *op,Args ... args) noex {
+static inline int linehist_magic(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TXTINDEXMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == PROGBAL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (txtindexmks_magic) */
+/* end subroutine (linehist_magic) */

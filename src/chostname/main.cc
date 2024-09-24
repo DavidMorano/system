@@ -734,7 +734,7 @@ char		cname[] ;
 
 	    hostent_curbegin(&he,&hc) ;
 
-	    while ((rs = hostent_enumaddr(&he,&hc,&ap)) > 0) {
+	    while ((rs = hostent_curenumaddr(&he,&hc,&ap)) > 0) {
 	        inetaddr	ia ;
 		in_addr_t	iwa, *iwap ;
 	        char		iabuf[IABUFLEN + 1] ;
@@ -761,7 +761,7 @@ char		cname[] ;
 /* alias names */
 
 	    if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	        while ((rs = hostent_enumname(&he,&hc,&np)) > 0) {
+	        while ((rs = hostent_curenumname(&he,&hc,&np)) > 0) {
 	            rs = bprintf(ofp,"\talias=%s\n",np) ;
 		    if (rs < 0) break ;
 	        } /* end while */

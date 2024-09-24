@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	gncache
+
+	Description:
 	This object provides a crude cache for GROUP-DB entries.
 
 *******************************************************************************/
@@ -71,10 +75,10 @@ enum cts {
 } ;
 
 struct gncache_rec {
+	char		*gn ;			/* memory-allocated */
 	time_t		ti_create ;		/* creation time */
 	time_t		ti_access ;		/* last access time */
 	gid_t		gid ;
-	char		gn[GROUPNAMELEN + 1] ;
 } ;
 
 typedef	gncache_rec	rec ;
@@ -266,25 +270,31 @@ int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
 /* end subroutine (gncache_add) */
 
 int gncache_lookgid(GN *op,ent *ep,gid_t gid) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs ;
+	int		rs1 ;
 	int		gl = 0 ;
 	if ((rs = gncache_magic(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (gid != gidend) {
-	        int	ct ;
+	        int	ct{} ;
 	        rec	*rp{} ;
 	        if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
 	            ct = ct_hit ;
 	            rs = gncache_recaccess(op,rp,dt) ;
 	            gl = rs ;
 	        } else if (rs == SR_NOTFOUND) {
-	            char	gn[GROUPNAMELEN + 1] ;
-	            ct = ct_miss ;
-	            if ((rs = getgroupname(gn,GROUPNAMELEN,gid)) >= 0) {
-	                rs = gncache_newrec(op,dt,&rp,gid,gn) ;
-	                gl = rs ;
-	            }
+	            char	*gbuf{} ;
+		    if ((rs = malloc_gn(&gbuf)) >= 0) {
+			cint	glen = rs ;
+	                ct = ct_miss ;
+	                if ((rs = getgroupname(gbuf,glen,gid)) >= 0) {
+	                    rs = gncache_newrec(op,dt,&rp,gid,gbuf) ;
+	                    gl = rs ;
+	                }
+		        rs1 = uc_free(gbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 	        } /* end if (search-gid) */
 	        {
 	            gncache_record(op,ct,rs) ;
@@ -331,7 +341,7 @@ int gncache_check(GN *op,time_t dt) noex {
 /* private subroutines */
 
 static int gncache_newrec(GN *op,time_t dt,rec **rpp,gid_t gid,cc *gn) noex {
-	rec	*rp{} ;
+	rec		*rp{} ;
 	int		rs ;
 	int		gl = 0 ;
 	if ((rs = gncache_allocrec(op,&rp)) >= 0) {
@@ -369,7 +379,7 @@ static int gncache_recaccess(GN *op,rec *rp,time_t dt) noex {
 
 static int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
 	vechand		*rlp = op->rlp ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		gl = 0 ;
 	rec		*rp = nullptr ;
 	void		*vp{} ;
@@ -438,7 +448,7 @@ static int gncache_allocrec(GN *op,rec **rpp) noex {
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	        *rpp = recp(vp) ;
 	    }
-	}
+	} /* end if (cq_rem) */
 	return rs ;
 }
 /* end subroutine (gncache_allocrec) */
@@ -497,12 +507,16 @@ static int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 	if (rp && gn) {
 	    rs = SR_INVALID ;
 	    if (gn[0]) {
-	     if (dt == 0) dt = time(nullptr) ;
-	     memclear(rp) ;
-	     rp->gid = gid ;
-	     rp->ti_create = dt ;
-	     rp->ti_access = dt ;
-	     gl = strwcpy(rp->gn,gn,GROUPNAMELEN) - rp->gn ;
+	        cint	gnl = var.groupnamelen ;
+	        if (dt == 0) dt = time(nullptr) ;
+	        memclear(rp) ;
+	        rp->gid = gid ;
+	        rp->ti_create = dt ;
+	        rp->ti_access = dt ;
+		if (char *cp ; (rs = malloc_gn(&cp)) >= 0) {
+		    rp->gn = cp ;
+	            gl = strwcpy(rp->gn,gn,gnl) - rp->gn ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? gl : rs ;
@@ -511,10 +525,16 @@ static int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 
 static int record_finish(rec *rp) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (rp) {
 	    rs = SR_OK ;
 	    rp->gid = -1 ;
-	    rp->gn[0] = '\0' ;
+	    if (rp->gn) {
+	        rp->gn[0] = '\0' ;
+		rs1 = uc_free(rp->gn) ;
+		if (rs >= 0) rs = rs1 ;
+		rp->gn = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -533,12 +553,18 @@ static int record_old(rec *rp,time_t dt,int ttl) noex {
 
 static int record_refresh(rec *rp,time_t dt) noex {
 	int		rs ;
+	int		rs1 ;
 	int		gl = 0 ;
-	char		gn[GROUPNAMELEN + 1] ;
-	if ((rs = getgroupname(gn,GROUPNAMELEN,rp->gid)) >= 0) {
-	    gl = rs ;
-	    rs = record_update(rp,dt,gn) ;
-	}
+	char		*gbuf{} ;
+	if ((rs = malloc_gn(&gbuf)) >= 0) {
+	    cint	glen = rs ;
+	    if ((rs = getgroupname(gbuf,glen,rp->gid)) >= 0) {
+	        gl = rs ;
+	        rs = record_update(rp,dt,gbuf) ;
+	    }
+	    rs1 = uc_free(gbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (record_refresh) */
@@ -551,7 +577,8 @@ static int record_update(rec *rp,time_t dt,cchar *gn) noex {
 	    rp->ti_access = dt ;
 	    f_changed = (strcmp(rp->gn,gn) != 0) ;
 	    if (f_changed) {
-	        strwcpy(rp->gn,gn,GROUPNAMELEN) ;
+		cint	gnl = var.groupnamelen ;
+	        strwcpy(rp->gn,gn,gnl) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_changed : rs ;
@@ -566,7 +593,7 @@ static int record_access(rec *rp,time_t dt) noex {
 /* end subroutine (record_access) */
 
 static int entry_load(ent *ep,rec *rp) noex {
-	cint		gnl = GROUPNAMELEN ;
+	cint		gnl = var.groupnamelen ;
 	int		gl ;
 	ep->gid = rp->gid ;
 	gl = strwcpy(ep->groupname,rp->gn,gnl) - ep->groupname ;

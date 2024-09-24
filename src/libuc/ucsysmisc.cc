@@ -163,7 +163,7 @@ int uc_gethz(int w) noex {
 	    rs = uc_sysconfval(_SC_CLK_TCK,&hz) ;
 	}
 #endif
-	if (rs >= 0) rs = (hz & INT_MAX) ;
+	if (rs >= 0) rs = int(hz & INT_MAX) ;
 	return rs ;
 }
 /* end subroutine (uc_gethz) */
@@ -192,7 +192,7 @@ int uc_syspages(int w) noex {
         } /* end switch */
 	if (rs >= 0) {
 	    rs = uc_sysconfval(cmd,&rn) ;
-	    n = (rn & INT_MAX) ;
+	    n = int(rn & INT_MAX) ;
 	    if (rs == SR_INVALID) rs = SR_NOTSUP ;
 	}
 	return (rs >= 0) ? n : rs ;
@@ -200,7 +200,7 @@ int uc_syspages(int w) noex {
 /* end subroutine (uc_syspages) */
 
 int uc_pagesize() noex {
-	cint	cmd = _SC_PAGESIZE ;
+	cint		cmd = _SC_PAGESIZE ;
 	return uc_sysconfval(cmd,nullptr) ;
 }
 /* end subroutine (uc_pagesize) */

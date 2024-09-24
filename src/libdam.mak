@@ -777,7 +777,7 @@ lfm.o:			lfm.cc lfm.h
 bfliner.o:		bfliner.cc bfliner.h
 
 keyopt.o:		keyopt.cc keyopt.h
-
+codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
 strstore.o:		strstore.cc strstore.h
@@ -787,9 +787,8 @@ pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
-
-dir:
-	makesubdir $@
+linehist.o:		linehist.cc linehist.h
+langstate.o:		langstate.cc langstate.h
 
 # DATABASE
 database.o:		database.dir

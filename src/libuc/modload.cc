@@ -478,8 +478,9 @@ static int subinfo_sofindpr(SI *sip,dirseen *dsp,int dlm,cchar *pr) noex {
 			        if ((rs < 0) && isNotPresent(rs)) {
 	        		    char *pbuf = (a + ((maxpath + 1) * ai++)) ;
 	    		            int pl = pathclean(pbuf,libdname,-1) ;
-	    		            if (pl >= 0)
+	    		            if (pl >= 0) {
 	        		        dirseen_add(dsp,pbuf,pl,&sb) ;
+				    }
 			        }
 			    } else if (rs >= 0) {
 	        	        rs = SR_NOENT ;

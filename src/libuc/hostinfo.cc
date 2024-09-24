@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	hostinfo
+
+	Description:
 	This object provides the functionality that was previosuly
 	supplied by the subroutine 'gethostbyname(3snl)'.  That
 	subroutine only worked for INET4 class addresses.  This
@@ -822,13 +826,13 @@ static int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	    HOSTINFO_A	a{} ;
 	    cint	nrs = SR_NOTFOUND ;
 	    cint	alen = rs ;
-	    const uchar	*ap ;
 	    a.af = af ;
 	    a.addrlen = alen ;
 	    if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
 	        vecobj		*alp = op->alp ;
+	        const uchar	*ap ;
 		cnullptr	np{} ;
-	        while ((rs = hostent_enumaddr(hep,&hc,&ap)) > 0) {
+	        while ((rs = hostent_curenumaddr(hep,&hc,&ap)) > 0) {
 	            a.addrlen = rs ;
 	            memcpy(&a.addr,ap,rs) ;
 	            if ((rs = vecobj_search(alp,&a,vmataddr,np)) == nrs) {
@@ -871,13 +875,14 @@ static int hostinfo_loadnames(hostinfo *op,int af,HOSTENT *hep) noex {
 	} /* end if */
 /* get all of the "alias" name(s) */
 	if (rs >= 0) {
-	    if ((hostent_curbegin(hep,&hc)) >= 0) {
-	        while ((rs = hostent_enumname(hep,&hc,&sp)) > 0) {
+	    if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
+	        while ((rs = hostent_curenumname(hep,&hc,&sp)) > 0) {
 	            rs = hostinfo_addname(op,sp,rs,af) ;
 	            c += rs ;
 	            if (rs < 0) break ;
 	        } /* end while */
-	        hostent_curend(hep,&hc) ;
+	        rs1 = hostent_curend(hep,&hc) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (hostent) */
 	} /* end if (ok) */
 	return (rs >= 0) ? c : rs ;

@@ -491,7 +491,8 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	            cchar		*sp = nullptr ;
 	            if (cnp->inetdomain != nullptr) {
 	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	                    while ((rs = hostent_enumname(&he,&hc,&sp)) > 0) {
+			    auto	enumname = hostent_curenumname ;
+	                    while ((rs = enumname(&he,&hc,&sp)) > 0) {
 	                        if (isindomain(sp,cnp->inetdomain)) break ;
 	                    } /* end while */
 	                    rs1 = hostent_curend(&he,&hc) ;

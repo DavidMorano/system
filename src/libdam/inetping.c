@@ -203,8 +203,9 @@ int inetping(cchar *rhost,int timeout) noex {
 	            } else {
 	                hostent_cur	hc ;
 	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
+			    auto	enumaddr = hostent_curenumaddr ;
 	            	    cuchar	*ap ;
-	                    while ((rs = hostent_enumaddr(&he,&hc,&ap)) > 0) {
+	                    while ((rs = enumaddr(&he,&hc,&ap)) > 0) {
 	                        iap = (in_addr_t *) ap ;
 	                        rs = pingone(pingprog,iap,timeout) ;
 	                        if (rs >= 0) break ;

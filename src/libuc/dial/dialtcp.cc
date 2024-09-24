@@ -384,7 +384,7 @@ static int try_inet6(SUBINFO *sip) noex {
 	    	    SOCKADDR	*sap ;
 	            int		c = 0 ;
 	    	    cuchar	*ap ;
-	            while ((rs = hostent_enumaddr(hep,&hc,&ap)) > 0) {
+	            while ((rs = hostent_curenumaddr(hep,&hc,&ap)) > 0) {
 	                sockaddress_putaddr(&server,ap) ;
 	                c += 1 ;
 	                sip->count += 1 ;

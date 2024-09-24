@@ -2154,7 +2154,7 @@ static int getlocalnames(PROGINFO *pip) noex {
 	            HOSTENT_CUR	cur ;
 	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
 		        cchar	*hp ;
-	                while ((rs = hostent_enumname(&he,&cur,&hp) > 0) {
+	                while ((rs = hostent_curenumname(&he,&cur,&hp) > 0) {
 		            cint	rsn = SR_NOTFOUND ;
 	                    if ((rs = vecstr_find(lnp,hp)) == rsn) {
 	                        vecstr_add(lnp,hp,-1) ;

@@ -37,8 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<usystem.h>
 #include	<ids.h>
@@ -69,15 +67,20 @@
 /* exported subroutines */
 
 int xfile(ids *idp,cchar *fname) noex {
-	USTAT		sb ;
-	int		rs ;
-	if ((rs = uc_stat(fname,&sb)) >= 0) {
-	    if (S_ISREG(sb.st_mode)) {
-		rs = sperm(idp,&sb,X_OK) ;
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    }
-	} /* end if (uc_stat) */
+	int		rs = SR_FAULT ;
+	if (idp && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        USTAT	sb ;
+	        if ((rs = uc_stat(fname,&sb)) >= 0) {
+	            if (S_ISREG(sb.st_mode)) {
+		        rs = sperm(idp,&sb,X_OK) ;
+	            } else {
+	                rs = SR_NOTFOUND ;
+	            }
+	        } /* end if (uc_stat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (xfile) */

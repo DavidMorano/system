@@ -1719,7 +1719,6 @@ static int proclocnames_load(PROGINFO *pip) noex {
 	    ucentho	he ;
 	    vecstr	*lnp = &pip->localnames ;
 	    cint	helen = rs ;
-	    cchar	*np ;
 	    cchar	*hnp ;
 	    for (int i = 0 ; i < 2 ; i += 1) {
 	        hnp = (i == 0) ? pip->nodename : hbuf ;
@@ -1727,9 +1726,10 @@ static int proclocnames_load(PROGINFO *pip) noex {
 	            hostent_cur		cur ;
 	            if ((rs = hostent_curbegin(&he,&cur)) >= 0) {
 	                cint	rsn = SR_NOTFOUND ;
-	                while ((rs = hostent_enumname(&he,&cur,&np)) > 0) {
-	                    if ((rs = vecstr_find(lnp,np)) == rsn) {
-	                        rs = vecstr_add(lnp,np,-1) ;
+	    		cchar	*sp ;
+	                while ((rs = hostent_curenumname(&he,&cur,&sp)) > 0) {
+	                    if ((rs = vecstr_find(lnp,sp)) == rsn) {
+	                        rs = vecstr_add(lnp,sp,-1) ;
 	                    }
 	                    if (rs < 0) break ;
 	                } /* end while */

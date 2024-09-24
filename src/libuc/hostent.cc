@@ -155,7 +155,7 @@ int hostent_curend(HOSTENT *hep,hostent_cur *curp) noex {
 /* end subroutine (hostent_curend) */
 
 /* enumerate the next hostname */
-int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
+int hostent_curenumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
 	if (hep && curp) {
@@ -192,10 +192,10 @@ int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
 }
-/* end subroutine (hostent_enumname) */
+/* end subroutine (hostent_curenumname) */
 
 /* enumerate the next host address */
-int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
+int hostent_curenumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		alen = 0 ;
 	if (hep && curp) {
@@ -226,7 +226,7 @@ int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? alen : rs ;
 }
-/* end subroutine (hostent_enumaddr) */
+/* end subroutine (hostent_curenumaddr) */
 
 int hostent_getcanonical(HOSTENT *hep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;

@@ -100,7 +100,7 @@ int peerhostname(int s,cchar *domainname,char *peername) noex {
 
 	        if (domainname != NULL) {
 	            if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-	                while ((rs = hostent_enumname(&he,&hc,&np)) > 0) {
+	                while ((rs = hostent_curenumname(&he,&hc,&np)) > 0) {
 	                    if (isindomain(np,domainname)) break ;
 	                } /* end while */
 	                hostent_curend(&he,&hc) ;
