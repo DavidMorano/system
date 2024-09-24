@@ -236,11 +236,15 @@ static int	key_finish(kf_key *) noex ;
 static int entry_start(kf_ent *,int,int,kf_key *,cchar *,int) noex ;
 static int entry_finish(kf_ent *) noex ;
 
-static int	vcmpfname(kf_file **,kf_file **) noex ;
-static int	vcmpkey(kf_key **,kf_key **) noex ;
-static int	cmpkeyval(kf_ent *,kf_ent *,int) noex ;
+extern "C" {
+    static int	vcmpfname(kf_file **,kf_file **) noex ;
+    static int	vcmpkey(kf_key **,kf_key **) noex ;
+    static int	cmpkeyval(kf_ent *,kf_ent *,int) noex ;
+}
 
-static uint	hashkeyval(kf_ent *,int) noex ;
+extern "C" {
+    static uint	hashkeyval(kf_ent *,int) noex ;
+}
 
 
 /* local variables */

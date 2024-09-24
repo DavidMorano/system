@@ -32,6 +32,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -92,10 +93,14 @@ static int	entry_start(KEYVALS_ENT *,int,int,KEY *,cchar *,int) noex ;
 static int	entry_matkey(KEYVALS_ENT *,cchar *,int) noex ;
 static int	entry_finish(KEYVALS_ENT *) noex ;
 
-static uint	hashkeyval(KEYVALS_ENT *,int) noex ;
+extern "C" {
+    static uint	hashkeyval(KEYVALS_ENT *,int) noex ;
+}
 
-static int	vcmpkey() noex ;
-static int	vcmpentry(KEYVALS_ENT *,KEYVALS_ENT *,int) noex ;
+extern "C" {
+    static int	vcmpkey() noex ;
+    static int	vcmpentry(KEYVALS_ENT *,KEYVALS_ENT *,int) noex ;
+}
 
 
 /* local variables */

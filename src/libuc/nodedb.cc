@@ -252,7 +252,9 @@ static int	svcentry_finish(SVCENTRY *) noex ;
 
 static int	entry_load(NODEDB_ENT *,char *,int,NODEDB_IE *) noex ;
 
-static int	vcmpfname(nodedb_f **,nodedb_f **) noex ;
+extern "C" {
+    static int	vcmpfname(nodedb_f **,nodedb_f **) noex ;
+}
 
 static int	freeit(cchar **) noex ;
 

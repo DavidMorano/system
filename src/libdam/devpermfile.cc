@@ -1,4 +1,4 @@
-/* devpermfile */
+/* devpermfile SUPPORT */
 /* lang=C++20 */
 
 /* read in a file of parameters */
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+	Name:
+	devpermfile
+
+	Description:
 	This object reads in the parameter file and makes the
 	parameter pairs available thought a key search.
 
@@ -31,7 +35,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<regexpr.h>
@@ -64,20 +69,20 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	getpwd(char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	cfnumi(const char *,int,int *) ;
-extern int	sfbasename(const char *,int,const char **) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	cfnumi(cchar *,int,int *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -86,13 +91,13 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct devpermfile_k {
-	const char	*console ;
+	cchar	*console ;
 	int		conlen ;
 	int		count ;
 } ;
 
 struct devpermfile_ie {
-	const char	*dev ;		/* device string */
+	cchar	*dev ;		/* device string */
 	mode_t		dmode ;
 	int		ci ;		/* console index */
 	int		devlen ;	/* device length */
@@ -103,46 +108,48 @@ struct devpermfile_ie {
 
 static int	devpermfile_finishkeys(DEVPERMFILE *) ;
 static int	devpermfile_finishentries(DEVPERMFILE *) ;
-static int	devpermfile_fileparse(DEVPERMFILE *,const char *) ;
-static int	devpermfile_fileparseline(DEVPERMFILE *,const char *,int) ;
-static int	devpermfile_keyadd(DEVPERMFILE *,const char *,int) ;
+static int	devpermfile_fileparse(DEVPERMFILE *,cchar *) ;
+static int	devpermfile_fileparseline(DEVPERMFILE *,cchar *,int) ;
+static int	devpermfile_keyadd(DEVPERMFILE *,cchar *,int) ;
 static int	devpermfile_keydel(DEVPERMFILE *,int) ;
 static int	devpermfile_keyincr(DEVPERMFILE *,int) ;
 static int	devpermfile_keydecr(DEVPERMFILE *,int) ;
 static int	devpermfile_entexpand(DEVPERMFILE *,int,mode_t,
-			const char *,int) ;
+			cchar *,int) ;
 static int	devpermfile_ententer(DEVPERMFILE *,int,mode_t,
-			const char *,int) ;
+			cchar *,int) ;
 static int	devpermfile_entdir(DEVPERMFILE *,int,mode_t,
-			const char *,int) ;
+			cchar *,int) ;
 static int	devpermfile_entadd(DEVPERMFILE *,DEVPERMFILE_IE *) ;
 static int	devpermfile_keymat(DEVPERMFILE *,DEVPERMFILE_IE *,
-			const char *) ;
+			cchar *) ;
 
-static int	key_start(DEVPERMFILE_KEY *,const char *,int) ;
+static int	key_start(DEVPERMFILE_KEY *,cchar *,int) ;
 static int	key_incr(DEVPERMFILE_KEY *) ;
 static int	key_decr(DEVPERMFILE_KEY *) ;
 static int	key_count(DEVPERMFILE_KEY *) ;
-static int	key_mat(DEVPERMFILE_KEY *,const char *,int) ;
+static int	key_mat(DEVPERMFILE_KEY *,cchar *,int) ;
 static int	key_finish(DEVPERMFILE_KEY *) ;
-static int	key_fake(DEVPERMFILE_KEY *,const char *,int) ;
+static int	key_fake(DEVPERMFILE_KEY *,cchar *,int) ;
 
-static int	ientry_start(DEVPERMFILE_IE *,int,mode_t,const char *,int) ;
+static int	ientry_start(DEVPERMFILE_IE *,int,mode_t,cchar *,int) ;
 static int	ientry_ci(DEVPERMFILE_IE *) ;
 static int	ientry_finish(DEVPERMFILE_IE *) ;
 
 static int	entry_load(DEVPERMFILE_ENT *,char *,int,DEVPERMFILE_IE *) ;
 
-static int	mkcatfile(char *,int,const char *) ;
-static int	mkdirfile(char *,const char *,int,const char *,int) ;
+static int	mkcatfile(char *,int,cchar *) ;
+static int	mkdirfile(char *,cchar *,int,cchar *,int) ;
 
 static int	vkeymat() ;
 
 #ifdef	COMMENT
-static int	vcmpentry() ;
+extern "C" {
+    static int	vcmpentry() noex ;
+}
 #endif
 
-static mode_t	modeparse(const char *,int) ;
+static mode_t	modeparse(cchar *,int) ;
 
 
 /* local variables */
@@ -177,13 +184,13 @@ static const unsigned char 	aterms[32] = {
 
 int devpermfile_open(op,fname)
 DEVPERMFILE	*op ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	int	rs = SR_OK ;
 	int	size ;
 	int	opts ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (op == NULL)
@@ -363,7 +370,7 @@ DEVPERMFILE_CUR	*cp ;
 /* search the parameters for a match */
 int devpermfile_fetch(op,key,curp,ep,ebuf,elen)
 DEVPERMFILE	*op ;
-const char	key[] ;
+cchar	key[] ;
 DEVPERMFILE_CUR	*curp ;
 DEVPERMFILE_ENT	*ep ;
 char		ebuf[] ;
@@ -577,7 +584,7 @@ ret0:
 /* parse a parameter file */
 static int devpermfile_fileparse(op,fname)
 DEVPERMFILE	*op ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	struct ustat	sb ;
 
@@ -590,7 +597,7 @@ const char	fname[] ;
 	int	cl ;
 	int	c = 0 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	lbuf[LINEBUFLEN + 1] ;
 
@@ -674,7 +681,7 @@ ret0:
 
 static int devpermfile_fileparseline(op,lp,ll)
 DEVPERMFILE	*op ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	FIELD	fsb ;
@@ -689,8 +696,8 @@ int		ll ;
 	int	f_key = FALSE ;
 	int	f_mode = FALSE ;
 
-	const char	*fp ;
-	const char	*kp, *mp ;
+	cchar	*fp ;
+	cchar	*kp, *mp ;
 
 
 	rs = field_start(&fsb,lp,ll) ;
@@ -841,7 +848,7 @@ DEVPERMFILE	*op ;
 
 static int devpermfile_keyadd(op,kp,kl)
 DEVPERMFILE	*op ;
-const char	*kp ;
+cchar	*kp ;
 int		kl ;
 {
 	DEVPERMFILE_KEY	k ;
@@ -954,14 +961,14 @@ static int devpermfile_entexpand(op,ci,dmode,dp,dl)
 DEVPERMFILE	*op ;
 int		ci ;
 mode_t		dmode ;
-const char	*dp ;
+cchar	*dp ;
 int		dl ;
 {
 	int	rs = SR_OK ;
 	int	bl ;
 	int	c = 0 ;
 
-	const char	*bp ;
+	cchar	*bp ;
 
 
 	if (dl < 0) dl = strlen(dp) ;
@@ -987,7 +994,7 @@ static int devpermfile_ententer(op,ci,dmode,dp,dl)
 DEVPERMFILE	*op ;
 int		ci ;
 mode_t		dmode ;
-const char	*dp ;
+cchar	*dp ;
 int		dl ;
 {
 	DEVPERMFILE_IE	ie ;
@@ -1018,7 +1025,7 @@ static int devpermfile_entdir(op,ci,dmode,dp,dl)
 DEVPERMFILE	*op ;
 int		ci ;
 mode_t		dmode ;
-const char	*dp ;
+cchar	*dp ;
 int		dl ;
 {
 	NULSTR		ns ;
@@ -1031,7 +1038,7 @@ int		dl ;
 	int	rs1 ;
 	int	c = 0 ;
 
-	const char	*dname ;
+	cchar	*dname ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 
@@ -1042,7 +1049,7 @@ int		dl ;
 	        int	dnl ;
 
 	        while ((dnl = fsdir_read(&d,&ds)) > 0) {
-		    const char *dnp = ds.name ;
+		    cchar *dnp = ds.name ;
 
 		    if (dnp[0] == '.') continue ;
 		    rs1 = mkdirfile(tmpfname,dp,dl,dnp,dnl) ;
@@ -1067,7 +1074,7 @@ int		dl ;
 static int devpermfile_keymat(op,iep,key)
 DEVPERMFILE	*op ;
 DEVPERMFILE_IE	*iep ;
-const char	key[] ;
+cchar	key[] ;
 {
 	DEVPERMFILE_KEY	*kep ;
 
@@ -1090,12 +1097,12 @@ const char	key[] ;
 
 static int key_start(kep,console,conlen)
 DEVPERMFILE_KEY	*kep ;
-const char	*console ;
+cchar	*console ;
 int		conlen ;
 {
 	int	rs ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (kep == NULL)
@@ -1165,13 +1172,13 @@ DEVPERMFILE_KEY	*kep ;
 
 static int key_mat(kep,key,keylen)
 DEVPERMFILE_KEY	*kep ;
-const char	key[] ;
+cchar	key[] ;
 int		keylen ;
 {
 	int	cl = kep->conlen ;
 	int	f ;
 
-	const char	*cp = kep->console ;
+	cchar	*cp = kep->console ;
 
 
 	if (keylen < 0) keylen = strlen(key) ;
@@ -1204,7 +1211,7 @@ DEVPERMFILE_KEY	*kep ;
 
 static int key_fake(kep,key,keylen)
 DEVPERMFILE_KEY	*kep ;
-const char	key[] ;
+cchar	key[] ;
 int		keylen ;
 {
 
@@ -1222,12 +1229,12 @@ static int ientry_start(iep,ci,m,dp,dl)
 DEVPERMFILE_IE	*iep ;
 int		ci ;
 mode_t		m ;
-const char	dp[] ;
+cchar	dp[] ;
 int		dl ;
 {
 	int	rs ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (iep == NULL)
@@ -1354,7 +1361,7 @@ DEVPERMFILE_IE		*iep ;
 /* end subroutine (entry_load) */
 
 
-static int mkcatfile(char *buf,int i,const char *fname)
+static int mkcatfile(char *buf,int i,cchar *fname)
 {
 	const int	blen = MAXPATHLEN ;
 
@@ -1378,9 +1385,9 @@ static int mkcatfile(char *buf,int i,const char *fname)
 
 static int mkdirfile(buf,dp,dl,dnp,dnl)
 char		buf[] ;
-const char	*dp ;
+cchar	*dp ;
 int		dl ;
-const char	*dnp ;
+cchar	*dnp ;
 int		dnl ;
 {
 	const int	blen = MAXPATHLEN ;
@@ -1438,15 +1445,10 @@ DEVPERMFILE_KEY	**e1pp, **e2pp ;
 
 #ifdef	COMMENT
 
-static int vcmpentry(e1pp,e2pp)
-DEVPERMFILE_ENT	**e1pp, **e2pp ;
-{
+static int vcmpentry(DEVPERMFILE_ENT **e1pp,DEVPERMFILE_ENT **e2pp) noex {
 	DEVPERMFILE_ENT	*e1p = *e1pp ;
 	DEVPERMFILE_ENT	*e2p = *e2pp ;
-
-	int	rc ;
-
-
+	int	rc = 0 ;
 	if ((*e1pp == NULL) && (*e2pp == NULL))
 	    return 0 ;
 
@@ -1466,14 +1468,9 @@ DEVPERMFILE_ENT	**e1pp, **e2pp ;
 
 #endif /* COMMENT */
 
-
-static mode_t modeparse(const char *mp,int ml)
-{
+static mode_t modeparse(cchar *mp,int ml) noex {
 	mode_t	m = 0600 ;
-
-
 	if (ml < 0) ml = strlen(mp) ;
-
 	if (ml > 0) {
 		int	rs1 ;
 		int	v ;
@@ -1483,10 +1480,8 @@ static mode_t modeparse(const char *mp,int ml)
 			m = v ;
 		}
 	}
-
 	return m ;
 }
 /* end subroutine (modeparse) */
-
 
 

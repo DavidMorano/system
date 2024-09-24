@@ -126,8 +126,10 @@ static inline int csro_magic(csro *op,Args ... args) noex {
 static int	value_start(VALUE *,cchar *,cchar *,off_t) noex ;
 static int	value_finish(VALUE *) noex ;
 
-static int	vcmpname(cvoid **,cvoid **) noex ;
-static int	vcmpentry(cvoid **,cvoid **) noex ;
+extern "C" {
+    static int	vcmpname(cvoid **,cvoid **) noex ;
+    static int	vcmpentry(cvoid **,cvoid **) noex ;
+}
 
 
 /* local variables */

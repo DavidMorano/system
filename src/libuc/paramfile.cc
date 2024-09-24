@@ -217,7 +217,9 @@ static int	entry_start(PF_E *,int,cchar *,int,vecstr *,int) noex ;
 static int	entry_release(PF_E *) noex ;
 static int	entry_finish(PF_E *) noex ;
 
-static int	vcmpentry(PF_E **,PF_E **) noex ;
+extern "C" {
+    static int	vcmpentry(PF_E **,PF_E **) noex ;
+}
 
 
 /* local variables */

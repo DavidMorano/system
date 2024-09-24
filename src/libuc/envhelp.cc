@@ -306,7 +306,7 @@ static int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 
 static int vechand_addover(vechand *elp,cchar *ep) noex {
 	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = vechand_search(elp,ep,vcf,np)) >= 0) {

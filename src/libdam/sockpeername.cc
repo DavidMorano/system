@@ -140,7 +140,7 @@ int suber::operator () (int s) noex {
 		    rl = rs ;
 		    break ;
 		default:
-		    rs = SR_NOSYS ;
+		    rs = SR_AFNOSUPPORT ;
 		    break ;
 		} /* end switch */
 	    } /* end if (sockaddress_getsf) */
@@ -292,8 +292,13 @@ int suber::proc_in4addr(INADDR *naddrp) noex {
 }
 /* end method (suber::proc_in4addr) */
 
-int suber::proc_in6(sockaddress *) noex {
-	return SR_OK ;
+int suber::proc_in6(sockaddress *sap) noex {
+	int		rs = SR_OK ;
+	int		rl = 0 ;
+	(void) sap ;
+
+	return (rs >= 0) ? rl : rs ;
 }
+/* end method (suber::proc_in6) */
 
 

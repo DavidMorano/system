@@ -343,7 +343,7 @@ int mkdirlist_sort(mkdirlist *op) noex {
 }
 /* end subroutine (mkdirlist_sort) */
 
-int mkdirlist_audit(MKDIRLIST *op) noex {
+int mkdirlist_audit(mkdirlist *op) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
 	    vechand	*dlp = op->dlp ;

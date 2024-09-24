@@ -435,7 +435,7 @@ int hostinfo_curend(hostinfo *op,hostinfo_cur *curp) noex {
 /* end subroutine (hostinfo_curend) */
 
 /* enumerate the next hostname */
-int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
+int hostinfo_curenumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		nlen = 0 ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
@@ -493,10 +493,10 @@ int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
 }
-/* end subroutine (hostinfo_enumname) */
+/* end subroutine (hostinfo_curenumname) */
 
 /* enumerate the next host address */
-int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
+int hostinfo_curenumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	int		rs ;
 	int		alen = 0 ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
@@ -554,7 +554,7 @@ int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? alen : rs ;
 }
-/* end subroutine (hostinfo_enumaddr) */
+/* end subroutine (hostinfo_curenumaddr) */
 
 
 /* private subroutines */
