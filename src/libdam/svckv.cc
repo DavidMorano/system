@@ -28,7 +28,7 @@
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<nleadstr.h>
-#include	<matxstr.h>
+#include	<matstr.h>
 #include	<localmisc.h>
 
 #include	"svckv.h"
@@ -59,7 +59,7 @@ static bool	ourmat(cchar *,cchar *,int) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	isexecs[] = {
+constexpr cpcchar	isexecs[] = {
 	"program",
 	"args",
 	nullptr
@@ -70,7 +70,7 @@ enum svcopts {
 	svcopt_overlast
 } ;
 
-static constexpr cpcchar	svcopts[] = {
+constexpr cpcchar	svcopts[] = {
 	"termout",
 	nullptr
 } ;

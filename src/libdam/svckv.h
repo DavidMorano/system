@@ -29,13 +29,15 @@
 
 EXTERNC_begin
 
-extern int	svckv_val(cchar *(*)[2],int,cchar *,cchar **) noex ;
-extern int	svckv_dequote(cchar *(*)[2],int,cchar *,cchar **) noex ;
-extern int	svckv_isfile(cchar *(*)[2],int,cchar **) noex ;
-extern int	svckv_ispass(cchar *(*)[2],int,cchar **) noex ;
-extern int	svckv_islib(cchar *(*)[2],int,cchar **) noex ;
-extern int	svckv_isprog(cchar *(*)[2],int,cchar **) noex ;
-extern int	svckv_svcopts(cchar *(*)[2],int) noex ;
+typedef cchar *(*svckv_t)[2] ;
+
+extern int	svckv_val(	svckv_t,int,cchar *,cchar **) noex ;
+extern int	svckv_dequote(	svckv_t,int,cchar *,cchar **) noex ;
+extern int	svckv_isfile(	svckv_t,int,cchar **) noex ;
+extern int	svckv_ispass(	svckv_t,int,cchar **) noex ;
+extern int	svckv_islib(	svckv_t,int,cchar **) noex ;
+extern int	svckv_isprog(	svckv_t,int,cchar **) noex ;
+extern int	svckv_svcopts(	svckv_t,int) noex ;
 
 EXTERNC_end
 

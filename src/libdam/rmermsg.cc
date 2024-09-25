@@ -1,9 +1,8 @@
-/* rmermsg */
+/* rmermsg SUPPORT */
+/* lang=C++20 */
 
 /* create and parse the internal messages */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,21 +16,16 @@
 
 /******************************************************************************
 
-        This module contains the code to make and parse the internal messages
-        that are used in this whole server facility.
+	Name:
+	rmermsg
 
+	Description:
+	This module contains the code to make and parse the internal
+	messages that are used in this whole server facility.
 
 ******************************************************************************/
 
-
-#define	RMERMSG_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
 #include	<usystem.h>
 #include	<serialbuf.h>
 #include	<stdorder.h>
@@ -46,23 +40,30 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-/* general response message */
 int rmermsg_fname(sp,f,mbuf,mlen)
 struct rmermsg_fname	*sp ;
 int			f ;
 char			mbuf[] ;
 int			mlen ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
@@ -115,15 +116,13 @@ int			mlen ;
 }
 /* end subroutine (rmermsg_response) */
 
-
-/* unknown message */
 int rmermsg_unknown(sp,f,mbuf,mlen)
 struct rmermsg_unknown	*sp ;
 int			f ;
 char			mbuf[] ;
 int			mlen ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 

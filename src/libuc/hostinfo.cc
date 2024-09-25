@@ -1251,9 +1251,9 @@ static int matknown(cchar *name,int nl) noex {
 }
 /* end subroutine (matknown) */
 
-static int vmatname(cvoid **e1pp,cvoid **e2pp) noex {
-	HOSTINFO_N	*ne1p = (HOSTINFO_N *) *e1pp ;
-	HOSTINFO_N	*ne2p = (HOSTINFO_N *) *e2pp ;
+static int vmatname(cvoid **v1pp,cvoid **v2pp) noex {
+	HOSTINFO_N	*ne1p = (HOSTINFO_N *) *v1pp ;
+	HOSTINFO_N	*ne2p = (HOSTINFO_N *) *v2pp ;
 	bool		f = true ;
 	f = f && (ne1p->name[0] == ne2p->name[0]) ;
 	f = f && (ne1p->namelen == ne2p->namelen) ;
@@ -1262,9 +1262,9 @@ static int vmatname(cvoid **e1pp,cvoid **e2pp) noex {
 }
 /* end subroutine (vmatname) */
 
-static int vmataddr(cvoid **e1pp,cvoid **e2pp) noex {
-	HOSTINFO_A	*ae1p = (HOSTINFO_A *) *e1pp ;
-	HOSTINFO_A	*ae2p = (HOSTINFO_A *) *e2pp ;
+static int vmataddr(cvoid **v1pp,cvoid **v2pp) noex {
+	HOSTINFO_A	*ae1p = (HOSTINFO_A *) *v1pp ;
+	HOSTINFO_A	*ae2p = (HOSTINFO_A *) *v2pp ;
 	bool		f = true ;
 	f = f && (ae1p->addrlen == ae2p->addrlen) ;
 	if (f) {

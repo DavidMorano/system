@@ -21,16 +21,19 @@
 
 /*******************************************************************************
 
+	Name:
+	mkdirlist
+
+	Description:
 	Create a list of pathnames for each newsgroup in the spool
 	area.  This routine is called with the path to the spool
 	area directory.  The routine returns two open file pointers
 	(Basic I-O).  These file pointers must be eventually closed
-	by the calling routine or somebody!
-
-	One returned file pointer is to a file of the path names.
-	The other file pointer is a file of an array of 'stat(2)'
-	structures corresponding to the directory specified by the
-	path in the other file.
+	by the calling routine or somebody!  One returned file
+	pointer is to a file of the path names.  The other file
+	pointer is a file of an array of 'stat(2)' structures
+	corresponding to the directory specified by the path in the
+	other file.
 
 	Synopsis:
 	int mkdirlist(char *basedir,bfile *sfp,bfile *nfp,int (*uf)()) noex
@@ -54,6 +57,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<filer.h>
@@ -84,6 +88,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -105,6 +110,10 @@ extern "C" {
 
 
 /* local structures */
+
+struct vars {
+	int		maxpathlen ;
+} ;
 
 
 /* forward references */
@@ -146,8 +155,8 @@ static int mkdirlist_magic(mkdirlist *op,Args ... args) noex {
 }
 /* end subroutine (mkdirlist_magic) */
 
-static int mkdirlist_procdircache(mkdirlist *,cchar *,int) noex ;
-static int mkdirlist_procnewsdir(mkdirlist *,cchar *) noex ;
+static int mkdirlist_pdc(mkdirlist *,cchar *,int) noex ; /* proc-dir-cache */
+static int mkdirlist_pdn(mkdirlist *,cchar *) noex ;	/* proc-dir-news */
 static int mkdirlist_newent(mkdirlist *,USTAT *,cchar *,int) noex ;
 static int mkdirlist_entfins(mkdirlist *) noex ;
 
@@ -157,10 +166,16 @@ static int entry_showdef(ENT *) noex ;
 static int entry_show(ENT *,cchar *,int) noex ;
 static int entry_matung(ENT *,cchar *,time_t,int,int) noex ;
 
-static int ordercmp(ENT **,ENT **) noex ;
+extern "C" {
+    static int vcmporder(ENT **,ENT **) noex ;
+}
+
+static int mkvars() noex ;
 
 
 /* local variables */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -168,33 +183,38 @@ static int ordercmp(ENT **,ENT **) noex ;
 
 /* exported subroutines */
 
-int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndname) noex {
+int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mkdirlist_ctor(op,pr,ndname)) >= 0) {
+	if ((rs = mkdirlist_ctor(op,pr,ndn)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (pr[0] && ndname[0]) {
-	        if ((rs = vechand_start(op->dlp,20,0)) >= 0) {
-	            cint	of = O_RDONLY ;
-	            cmode	om = 0666 ;
-	            if ((rs = pcsopendircache(pr,ndname,of,om,-1)) >= 0) {
-	                cint	fd = rs ;
-	                if ((rs = mkdirlist_procdircache(op,ndname,fd)) >= 0) {
+	    if (pr[0] && ndn[0]) {
+		static cint	rsv = mkvars() ;
+		if ((rs = rsv) >= 0) {
+	            if ((rs = vechand_start(op->dlp,20,0)) >= 0) {
+	                cint	of = O_RDONLY ;
+	                cmode	om = 0666 ;
+	                if ((rs = pcsopendircache(pr,ndn,of,om,-1)) >= 0) {
+	                    cint	fd = rs ;
+	                    if ((rs = mkdirlist_pdc(op,ndn,fd)) >= 0) {
+	                        c = rs ;
+		            }
+	                    rs1 = uc_close(fd) ;
+			    if (rs >= 0) rs = rs1 ;
+	                } else if (isNotPresent(rs)) {
+	                    rs = mkdirlist_pdn(op,ndn) ;
 	                    c = rs ;
+	                }
+	                if (rs >= 0) {
+			    op->magic = MKDIRLIST_MAGIC ;
 		        }
-	                uc_close(fd) ;
-	            } else if (isNotPresent(rs)) {
-	                rs = mkdirlist_procnewsdir(op,ndname) ;
-	                c = rs ;
-	            }
-	            if (rs >= 0) {
-			op->magic = MKDIRLIST_MAGIC ;
-		    }
-	            if (rs < 0) {
-	                mkdirlist_entfins(op) ;
-	                vechand_finish(op->dlp) ;
-	            }
-	        } /* end if (vechand) */
+	                if (rs < 0) {
+	                    mkdirlist_entfins(op) ;
+	                    vechand_finish(op->dlp) ;
+	                }
+	            } /* end if (vechand) */
+		} /* end if (mkvars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mkdirlist_dtor(op) ;
@@ -336,7 +356,7 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 int mkdirlist_sort(mkdirlist *op) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
-	    vechand_vcmp	vcf = vechand_vcmp(ordercmp) ;
+	    vechand_vcmp	vcf = vechand_vcmp(vcmporder) ;
 	    rs = vechand_sort(op->dlp,vcf) ;
 	} /* end if (magic) */
 	return rs ;
@@ -356,56 +376,60 @@ int mkdirlist_audit(mkdirlist *op) noex {
 
 /* private subroutines */
 
-static int mkdirlist_procdircache(mkdirlist *op,cchar *ndname,int fd) noex {
+static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
+	cint		plen = var.maxpathlen ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
+	int		sz = ((var.maxpathlen + 1) * 2) ;
+	int		ai = 0 ;
 	cchar		*dcm = MKDIRLIST_DCMAGIC ;
-	char		dbuf[MAXPATHLEN+1] ;
-
-	if ((rs = mkpath1(dbuf,ndname)) >= 0) {
-	    filer	b ;
-	    cint	dlen = rs ;
-
-	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
-	        USTAT	sb ;
-	        cint	nlen = MAXPATHLEN ;
-	        int	line = 0 ;
-	        int	f_bol = true ;
-	        int	f_eol ;
-	        char	nbuf[MAXPATHLEN+1] ;
-	        while ((rs = filer_readln(&b,nbuf,nlen,-1)) > 0) {
-	            int		len = rs ;
-	            f_eol = (len && (nbuf[len-1] == '\n')) ;
-	            if (f_eol) nbuf[--len] = '\0' ;
-	            if (f_bol) {
-	                if (line++ == 0) {
-	                    if (strwcmp(dcm,nbuf,len) != 0) {
-	                        rs = SR_BADFMT ;
-	                    }
-	                } else {
-	                    if ((rs = pathadd(dbuf,dlen,nbuf)) >= 0) {
-	                        if (u_stat(dbuf,&sb) >= 0) {
-	                            rs = mkdirlist_newent(op,&sb,nbuf,len) ;
-	                            c += rs ;
+	char		*ap{} ;
+	if ((uc_malloc(sz,&ap)) >= 0) {
+	    char	*dbuf = (ap + (plen + ai++)) ;
+	    if ((rs = mkpath1(dbuf,ndn)) >= 0) {
+	        filer	b ;
+	        cint	dlen = rs ;
+	        if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
+	            USTAT	sb ;
+	            cint	nlen = plen ;
+	            int		line = 0 ;
+	            bool	f_bol = true ;
+	            bool	f_eol ;
+	            char	*nbuf = (ap + (plen & ai++)) ;
+	            while ((rs = filer_readln(&b,nbuf,nlen,-1)) > 0) {
+	                int	len = rs ;
+	                f_eol = (len && (nbuf[len-1] == '\n')) ;
+	                if (f_eol) nbuf[--len] = '\0' ;
+	                if (f_bol) {
+	                    if (line++ == 0) {
+	                        if (strwcmp(dcm,nbuf,len) != 0) {
+	                            rs = SR_BADFMT ;
+	                        }
+	                    } else {
+	                        if ((rs = pathadd(dbuf,dlen,nbuf)) >= 0) {
+	                            if (u_stat(dbuf,&sb) >= 0) {
+	                                rs = mkdirlist_newent(op,&sb,nbuf,len) ;
+	                                c += rs ;
+	                            }
 	                        }
 	                    }
-	                }
-	            } /* end if (BOL) */
-	            f_bol = f_eol ;
-	            if (rs < 0) break ;
-	        } /* end while */
-	        rs1 = filer_finish(&b) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if */
-
-	} /* end if (mkpath) */
-
+	                } /* end if (BOL) */
+	                f_bol = f_eol ;
+	                if (rs < 0) break ;
+	            } /* end while */
+	            rs1 = filer_finish(&b) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if */
+	    } /* end if (mkpath) */
+	    rs1 = uc_free(ap) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (mkdirlist_procdircache) */
+/* end subroutine (mkdirlist_pdc) */
 
-static int mkdirlist_procnewsdir(MKDIRLIST *op,cchar *ndname) noex {
+static int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 	cint		dot = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
 	int		rs ;
 	int		rs1 ;
@@ -414,7 +438,7 @@ static int mkdirlist_procnewsdir(MKDIRLIST *op,cchar *ndname) noex {
 	if ((rs = malloc_mp(&nbuf)) >= 0) {
 	    fsdirtree	dir ;
 	    cint	nlen = rs ;
-	    if ((rs = fsdirtree_open(&dir,ndname,dot)) >= 0) {
+	    if ((rs = fsdirtree_open(&dir,ndn,dot)) >= 0) {
 	        USTAT	sb ;
 	        while ((rs = fsdirtree_read(&dir,&sb,nbuf,nlen)) > 0) {
 	            cint	ngl = rs ;
@@ -432,7 +456,7 @@ static int mkdirlist_procnewsdir(MKDIRLIST *op,cchar *ndname) noex {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (mkdirlist_procnewsdir) */
+/* end subroutine (mkdirlist_pdn) */
 
 static int mkdirlist_newent(mkdirlist *op,USTAT *sbp,cc *nbuf,int nlen) noex {
 	cint		esize = sizeof(mkdirlist_ent) ;
@@ -493,7 +517,6 @@ static int entry_start(ENT *ep,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	    ep->ino = sbp->st_ino ;
 	    ep->dev = sbp->st_dev ;
 	} /* end if (memory-allocation) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (entry_start) */
@@ -548,12 +571,12 @@ static int entry_show(ENT *ep,cchar *ng,int order) noex {
 }
 /* end subroutine (entry_show) */
 
-static int ordercmp(ENT **e1pp,ENT **e2pp) noex {
+static int vcmporder(ENT **e1pp,ENT **e2pp) noex {
 	mkdirlist_ent	*e1p = *e1pp ;
 	mkdirlist_ent	*e2p = *e2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
@@ -563,6 +586,15 @@ static int ordercmp(ENT **e1pp,ENT **e2pp) noex {
 	}
 	return rc ;
 }
-/* end subroutine (ordercmp) */
+/* end subroutine (vcmporder) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    var.maxpathlen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
