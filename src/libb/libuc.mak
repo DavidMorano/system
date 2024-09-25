@@ -2,7 +2,7 @@
 
 T= libuc
 
-ALL= $(T).so $(T).a
+ALL= $(T).o $(T).so $(T).a
 
 
 BINDIR		?= $(REPOROOT)/bin

@@ -763,8 +763,7 @@ static int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 }
 
 static int getpw_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
-	ucentpw		*ep = pwentp(pwp) ;
-	return uc_getpwnam(ep,pwbuf,pwlen,un) ;
+	return uc_getpwnam(pwp,pwbuf,pwlen,un) ;
 }
 
 

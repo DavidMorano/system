@@ -1,7 +1,7 @@
 /* kvsfile SUPPORT */
 /* lang=C++20 */
 
-/* perform access table kf_file related functions */
+/* perform kf_file related functions */
 /* version %I% last-modified %G% */
 
 

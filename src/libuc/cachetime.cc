@@ -71,9 +71,10 @@ typedef cachetime_st *	stp ;
 
 template<typename ... Args>
 static int cachetime_ctor(cachetime *op,Args ... args) noex {
+	CACHETIME	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->dbp = new(nothrow) hdb) != nullptr) {
 	        if ((op->mxp = new(nothrow) ptm) != nullptr) {

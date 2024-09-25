@@ -4,6 +4,8 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+grmems
+sesnotes
 uctim
 libuc		fix to completely compile!
 srventry

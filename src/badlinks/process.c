@@ -22,12 +22,9 @@
 	- pip		program information pointer
 	- basedir	directory at top of tree
 
-
 ***********************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -39,7 +36,7 @@
 #include	<limits.h>
 
 #include	<usystem.h>
-#include	<sfstr.h>
+#include	<sfx.h>
 #include	<bfile.h>
 #include	<fsdir.h>
 #include	<localmisc.h>

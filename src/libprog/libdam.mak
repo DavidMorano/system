@@ -749,6 +749,7 @@ envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
 linehist.o:		linehist.cc linehist.h
 langstate.o:		langstate.cc langstate.h
+mkdirlist.o:		mkdirlist.cc mkdirlist.h
 
 # DATABASE
 database.o:		database.dir
