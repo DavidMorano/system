@@ -84,8 +84,8 @@ enum cts {
 } ;
 
 struct grcache_rec {
+	cchar		*gn ;
 	char		*grbuf ;
-	char		*gn ;
 	ucentgr		gr ;
 	time_t		ti_create ;		/* creation time */
 	time_t		ti_access ;		/* access time (last) */
@@ -619,17 +619,17 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	            cint	grlen = rs ;
 	            if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
 	                cint	sz = (rs+1) ;
-	                void	*p{} ;
+	                void	*vp{} ;
 	                grl = rs ; /* indicates entry found */
-	                if ((rs = uc_malloc(sz,&p)) >= 0) {
+	                if ((rs = uc_malloc(sz,&vp)) >= 0) {
 			    ucentgr	*grp = &rp->gr ;
-		            char	*grbuf = charp(p) ;
+		            char	*grbuf = charp(vp) ;
 		            if ((rs = grp->load(grbuf,grl,&gr)) >= 0) {
 	                        rp->grbuf = grbuf ;
 	    	                rp->grl = grl ;
 		            }
 		            if (rs < 0) {
-				uc_free(p) ;
+				uc_free(grbuf) ;
 			    }
 	                } /* end if (memory-allocation) */
 	            } else if (rs == rsn) {
@@ -637,16 +637,14 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	                grl = 0 ; /* indicates an empty (not-found) entry */
 		    }
 	            if (rs >= 0) {
-			char	*gnbuf{} ;
-			if ((rs = malloc_gn(&gnbuf)) >= 0) {
-			    cint	gnlen = rs ;
-			    rp->gn = gnbuf ;
-	                    strwcpy(rp->gn,gn,gnlen) ;
+			cchar	*cp{} ;
+			if ((rs = uc_mallocstrw(gn,-1,&cp)) >= 0) {
+			    rp->gn = cp ;
 	                    rp->ti_create = dt ;
 	                    rp->ti_access = dt ;
 	                    rp->wcount = wc ;
 	                    rp->magic = RECORD_MAGIC ;
-			}
+			} /* end if (memory-allocation) */
 	            } /* end if (ok) */
 	            rs1 = uc_free(grbuf) ; /* free first one up at top */
 		    if (rs >= 0) rs = rs1 ;
@@ -665,7 +663,6 @@ static int record_finish(rec *rp) noex {
 	    if (rp->magic == RECORD_MAGIC) {
 		rs = SR_OK ;
 		if (rp->gn) {
-	            rp->gn[0] = '\0' ;
 	            rs1 = uc_free(rp->gn) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rp->gn = nullptr ;
@@ -701,20 +698,20 @@ static int record_access(rec *ep,time_t dt) noex {
 
 static int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
 	int		rs = SR_OK ;
-        void    	*p{} ;
+        void    	*vp{} ;
         if (ep->grbuf) {
-            rs = uc_realloc(ep->grbuf,(grl+1),&p) ;
+            rs = uc_realloc(ep->grbuf,(grl+1),&vp) ;
         } else {
-            rs = uc_malloc((grl+1),&p) ;
+            rs = uc_malloc((grl+1),&vp) ;
         }
         if (rs >= 0) {
-            char        *grbuf = charp(p) ; /* new variable */
+            char        *grbuf = charp(vp) ; /* new variable */
 	    ucentgr	*grp = &ep->gr ;
-            ep->grbuf = charp(p) ;
+            ep->grbuf = charp(vp) ;
             ep->grl = grl ;
             rs = grp->load(grbuf,grl,ngrp) ;
             if (rs < 0) {
-                uc_free(p) ;
+                uc_free(vp) ;
             }
         } /* end if (ok) */
 	return rs ;

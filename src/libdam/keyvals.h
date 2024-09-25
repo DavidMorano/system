@@ -27,18 +27,18 @@
 #define	KEYVALS			struct keyvals_head
 #define	KEYVALS_CUR		struct keyvals_cursor
 #define	KEYVALS_MAGIC		0x31415993
-#define	KEYVALS_DEFENTS	100
+#define	KEYVALS_DEFENTS		100
 
 
 struct keyvals_cursor {
-	hdb_cur		ec ;
+	hdb_cur		*ecp ;
 	int		i ;
 } ;
 
 struct keyvals_head {
-	vecobj		keys ;
-	hdb		bykey ;		/* indexed by key only */
-	hdb		bykeyval ;	/* indexed by key-val together */
+	vecobj		*keyp ;
+	hdb		*bykeyp ;	/* indexed by key only */
+	hdb		*bykeyvalp ;	/* indexed by key-val together */
 	uint		magic ;
 } ;
 

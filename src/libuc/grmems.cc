@@ -196,6 +196,7 @@ static int	grmems_upstats(grmems *,int,int) noex ;
 static int	grmems_mkug(grmems *,time_t) noex ;
 static int	grmems_mkugload(grmems *,time_t,vecobj *) noex ;
 static int	grmems_mkugstore(grmems *,time_t,vecobj *) noex ;
+static int	grmems_mkugdeplete(grmems *) noex ;
 
 static int	grmems_recusers(grmems *,time_t,vecobj *,gid_t) noex ;
 
@@ -228,7 +229,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static vars		var ;
+static vars	var ;
 
 
 /* exported variables */
@@ -264,10 +265,16 @@ int grmems_finish(grmems *op) noex {
 	int		rs1 ;
 	if ((rs = grmems_magic(op)) >= 0) {
 	    if (op->usergids) {
-	        rs1 = uc_free(op->usergids) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->usergids = nullptr ;
-	    }
+		{
+		    rs1 = grmems_mkugdeplete(op) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(op->usergids) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->usergids = nullptr ;
+		}
+	    } /* end if (usergids) */
 	    {
 	        rs1 = grmems_recfins(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -340,7 +347,7 @@ int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	            }
 	            if (rs >= 0) {
 	                grmems_rec	*ep = nullptr ;
-	                time_t		dt = time(nullptr) ;
+	                time_t		dt = getustime ;
 	                int		ct{} ;
 	                op->s.total += 1 ;
 	                if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
@@ -452,7 +459,7 @@ int grmems_check(grmems *op,time_t dt) noex {
 	        grmems_rec	*ep{} ;
 	        for (int i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
 	            if (ep) {
-	                if (dt == 0) dt = time(nullptr) ;
+	                if (dt == 0) dt = getustime ;
 	                if ((rs = record_isold(ep,dt,op->ttl)) > 0) {
 	                    f = true ;
 	                    if ((rs = grmems_recdel(op,ep)) >= 0) {
@@ -501,7 +508,7 @@ static int grmems_starter(grmems *op) noex {
 	        ro |= RECARR_OCONSERVE ;
 	        op->recs = (recarr *) vp ;
 	        if ((rs = recarr_start(op->recs,op->nmax,ro)) >= 0) {
-		    op->ti_check = time(nullptr) ;
+		    op->ti_check = getustime ;
 	        } /* end if (recarr_start) */
 	        if (rs < 0) {
 	            uc_free(op->recs) ;
@@ -642,9 +649,13 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	            vecobj	u ;
 	            const gid_t	gid = gr.gr_gid ;
 	            cint	esize = sizeof(grmems_u) ;
-	            if ((rs = vecobj_start(&u,esize,10,0)) >= 0) {
+		    cint	vn = 10 ;
+		    cint	vo = 0 ;
+	            if ((rs = vecobj_start(&u,esize,vn,vo)) >= 0) {
 	                if ((rs = grmems_recusers(op,dt,&u,gid)) >= 0) {
-	                    rs = record_refresh(ep,dt,wc,&u,&gr) ;
+	                    if ((rs = record_refresh(ep,dt,wc,&u,&gr)) >= 0) {
+	        		op->s.refreshes += 1 ;
+			    }
 	                } /* end if (grmems-recusers) */
 	                rs1 = vecobj_finish(&u) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -759,14 +770,12 @@ static int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 /* end subroutine (grmems_mkugload) */
 
 static int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
+	cint		esize = sizeof(grmems_ug) ;
 	int		rs ;
-	int		sz ;
 	int		c = 0 ;
 	if ((rs = vecobj_count(ulp)) >= 0) {
-	    cint	esize = sizeof(grmems_ug) ;
-	    cint	n = rs ;
+	    cint	sz = ((rs + 1) * esize) ;
 	    void	*vp{} ;
-	    sz = ((n+1) * esize) ;
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	        grmems_ug	*ugs = (grmems_ug *) vp ;
 	        for (int i = 0 ; vecobj_get(ulp,i,&vp) >= 0 ; i += 1) {
@@ -775,7 +784,7 @@ static int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 	                ugs[c++] = *ugp ;
 		    }
 	        } /* end for */
-	        ugs[c].un[0] = '\0' ;
+	        ugs[c] = {} ;
 	        op->usergids = ugs ;
 	        op->nusergids = c ;
 	        op->ti_usergids = dt ;
@@ -785,11 +794,25 @@ static int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 }
 /* end subroutine (grmems_mkugstore) */
 
+static int grmems_mkugdeplete(grmems *op) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->usergids) {
+	    cint	n = op->nusergids ;
+	    grmems_ug	*ugs = (grmems_ug *) op->usergids ;
+	    for (int i = 0 ; i < n ; i += 1) {
+		rs1 = usergid_finish((ugs + i)) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end for */
+	} /* end if (needed) */
+	return rs ;
+}
+/* end subroutine (grmems_mkugdeplete) */
+
 static int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 	int		rs ;
 	if ((rs = grmems_recrear(op,ep)) >= 0) {
 	    if ((rs = record_isold(ep,dt,op->ttl)) > 0) {
-	        op->s.refreshes += 1 ;
 	        rs = grmems_recrefresh(op,dt,ep) ;
 	    } else {
 	        rs = record_access(ep,dt) ;
@@ -800,10 +823,10 @@ static int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 /* end subroutine (grmems_recaccess) */
 
 static int grmems_recrear(grmems *op,grmems_rec *ep) noex {
-	pq_ent		*pcp = (pq_ent *) ep ;
 	pq_ent		*pep ;
 	int		rs ;
 	if ((rs = pq_gettail(op->lrup,&pep)) >= 0) {
+	    pq_ent	*pcp = (pq_ent *) ep ;
 	    if (pcp != pep) {
 	        pep = (pq_ent *) ep ;
 	        if ((rs = pq_unlink(op->lrup,pep)) >= 0) {
@@ -812,7 +835,7 @@ static int grmems_recrear(grmems *op,grmems_rec *ep) noex {
 	                grmems_rec	*ep = (grmems_rec *) pep ;
 	                record_finish(ep) ;
 	                uc_free(pep) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (pq_unlink) */
 	    }
 	} /* end if (pq_gettail) */
@@ -1092,11 +1115,14 @@ static int record_isold(grmems_rec *ep,time_t dt,int ttl) noex {
 static int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (ep && rpp) {
-	    rs = SR_NOTOPEN ;
-	    if (ep->gn[0]) {
-		rs = SR_OK ;
-	        *rpp = (rs >= 0) ? ep->gn : nullptr ;
-	    } /* end if (valid) */
+	    rs = SR_BUGCHECK ;
+	    if (ep->gn) {
+	        rs = SR_NOTOPEN ;
+	        if (ep->gn[0]) {
+		    rs = SR_OK ;
+	            *rpp = (rs >= 0) ? ep->gn : nullptr ;
+	        } /* end if (valid) */
+	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return rs ;
 }
