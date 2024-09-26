@@ -164,8 +164,6 @@ static void	freeit(cchar **) noex ;
 
 /* local variables */
 
-constexpr cchar		xes[] = "XXXXXXXXXXXXXX" ;
-
 constexpr fieldterminit	pt(" \t") ;
 
 
@@ -839,7 +837,7 @@ static int mkfile(char *outbuf,cc *tmpdname,int type) noex {
 		        int	nu = 0 ;
 	                nu += b.strw("pcspoll",-1) ;
 	                nu += b.chr(type) ;
-	                b.strw(xes,(14 - nu)) ;
+	                b.chrs('X',nu) ;
 	            }
 	            rs1 = b.finish ;
 	    	    if (rs >= 0) rs = rs1 ;

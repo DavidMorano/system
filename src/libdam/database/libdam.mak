@@ -766,16 +766,6 @@ logfile.o:		logfile.dir
 logfile.dir:
 	makesubdir $@
 
-# STRXCMP
-strxcmp.o:		strxcmp.dir
-strxcmp.dir:
-	makesubdir $@
-
-# STRX
-strx.o:			strx.dir
-strx.dir:
-	makesubdir $@
-
 # CONFIGVARS
 configvars.o:		configvars.dir
 configvars.dir:

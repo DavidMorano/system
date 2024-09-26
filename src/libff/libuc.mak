@@ -626,6 +626,21 @@ strnxcmp.o:		strnxcmp.dir
 strnxcmp.dir:
 	makesubdir $@
 
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
+
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
+
+# STRKEYX
+strkeyx.o:		strkeyx.dir
+strkeyx.dir:
+	makesubdir $@
+
 # VEC
 vec.o:			vec.dir
 vec.dir:
@@ -764,11 +779,6 @@ getutmp.dir:
 # GETXNAME
 getxname.o:		getxname.dir
 getxname.dir:
-	makesubdir $@
-
-# STRKEYX
-strkeyx.o:		strkeyx.dir
-strkeyx.dir:
 	makesubdir $@
 
 # UCINET
