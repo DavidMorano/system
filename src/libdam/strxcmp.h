@@ -16,7 +16,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+
 #include	<strnxcmp.h>
+#include	<strkeycmp.h>
 
 
 EXTERNC_begin

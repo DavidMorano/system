@@ -48,7 +48,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"srtkeycmp.h"
+#include	"strkeycmp.h"
 
 
 /* local defines */

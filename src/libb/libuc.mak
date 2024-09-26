@@ -766,6 +766,11 @@ getxname.o:		getxname.dir
 getxname.dir:
 	makesubdir $@
 
+# STRKEYX
+strkeyx.o:		strkeyx.dir
+strkeyx.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 

@@ -17,21 +17,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<strnxcmp.h>
 #include	<strkeycmp.h>
-
-
-EXTERNC_begin
-
-extern int	stremacmp(cchar *,cchar *) noex ;
-extern int	strpcmp(cchar *,cchar *) noex ;
-extern int	strleadcmp(cchar *,cchar *) noex ;
-
-static inline int strdictcmp(cchar *s1,cchar *s2) noex {
-	return strnndictcmp(s1,-1,s2,-1) ;
-}
-
-EXTERNC_end
 
 
 #endif /* STRXCMP_INCLUDE */
