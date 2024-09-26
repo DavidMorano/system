@@ -5,6 +5,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-09-01, David A­D­ Morano
+	This code was written.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SVCENTRY_INCLUDE
@@ -12,8 +19,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<time.h>
+#include	<sys/types.h>		/* |pid_t| */
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -24,16 +31,15 @@
 #include	<svcfile.h>
 
 
-/* local object defines */
 #define	SVCENTRY		struct svcentry_head
-#define	SVCENTRY_ARGS		struct svcentry_a
 #define	SVCENTRY_FL		struct svcentry_flags
+#define	SVCENTRY_ARGS		struct svcentry_arguments
 #define	SVCENTRY_MAGIC		0x76452376
 #define	SVCENTRY_TMPDIR		"/tmp"
 #define	SVCENTRY_IDLEN		15
 
 
-struct svcentry_a {
+struct svcentry_arguments {
 	cchar		*version ;	/* %V */
 	cchar		*programroot ;	/* %R */
 	cchar		*nodename ;	/* %N */

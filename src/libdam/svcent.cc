@@ -4,7 +4,6 @@
 /* service file entry (SVCENT) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -18,11 +17,16 @@
 
 /*******************************************************************************
 
+	Name:
+	svcent
+
+	Description:
 	We perform some slight management on SVCENT objects.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -36,41 +40,13 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfdequote(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	nchr(cchar *,int,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	cfdecmful(cchar *,int,ulong *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	msleep(int) ;
-extern int	tolc(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strnrpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -85,30 +61,27 @@ extern char	*strnrpbrk(cchar *,int,cchar *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int svcent_getval(SVCENT *sep,cchar *k,cchar **rpp)
-{
-	const int	n = sep->nkeys ;
+int svcent_getval(svcent *sep,cchar *k,cchar **rpp) noex {
+	cint		n = sep->nkeys ;
 	cchar		*(*kv)[2] = sep->keyvals ;
 	return svckv_val(kv,n,k,rpp) ;
 }
 /* end subroutine (svcent_getval) */
 
-
-int svcent_getdeval(SVCENT *sep,cchar *k,cchar **rpp)
-{
-	const int	n = sep->nkeys ;
+int svcent_getdeval(svcent *sep,cchar *k,cchar **rpp) noex {
+	cint		n = sep->nkeys ;
 	cchar		*(*kv)[2] = sep->keyvals ;
 	return svckv_dequote(kv,n,k,rpp) ;
 }
 /* end subroutine (svcent_getdeval) */
 
-
-int svcent_islib(SVCENT *sep,cchar **rpp)
-{
-	const int	n = sep->nkeys ;
+int svcent_islib(svcent *sep,cchar **rpp) noex {
+	cint		n = sep->nkeys ;
 	int		vl ;
 	cchar		*(*kv)[2] = sep->keyvals ;
 	cchar		*k1 = "so" ;

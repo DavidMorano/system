@@ -8,15 +8,11 @@
 /* revision history:
 
 	= 1998-09-01, David A­D­ Morano
-	This code was written.
-
-	= 2024-09-26, David A­D­ Morano
-	I am reviewing this code and making some minor refactoring
-	(to C++20 standard).
+	This code was originally written.
 
 */
 
-/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -24,25 +20,11 @@
 	svcentry
 
 	Description:
-	This little object is used to create a "program entry"
-	(whatever that means) and to populate aspects of it with
-	various operations on the object.  This object is used in
-	"server" types of programs.  This object is usually populated
-	from elements taken from the parsing of a sevice-table
-	(SVCTAB) file (which is used by various servers).
-
-	Notes:
-	= David A-D- Morano (2024-09-26)
-	This code is quite (very) old.  It is not (I think) more
-	than thirty (30) years old, but it is very likely more than
-	twenty-five (25) years old.  The copyright year (above)
-	says 1998.  That means that the code was originally written,
-	or adapted from prior code, in or before 1998.  That seems
-	about correct.  I say that this code is old because of the
-	style and use of the in-file expansion code (subroutine
-	below |args_expand()|).  I would not have written that
-	custom in-file c-string expansion subroutine if the code
-	was younger than at least twenty-five (25) years ago.
+	This little object is used to create a program entry and
+	to populate aspects of it with different operations on the
+	object.  This object is used in "server" types of programs.
+	This object is usually created from elements taken from the
+	parsing of a server file.
 
 *******************************************************************************/
 
@@ -65,9 +47,7 @@
 #include	<fieldterminit.hh>
 #include	<sbuf.h>
 #include	<svcfile.h>
-#include	<strn.h>
 #include	<snx.h>
-#include	<snwcpy.h>
 #include	<sfx.h>
 #include	<mktmp.h>
 #include	<strwcpy.h>
@@ -662,7 +642,7 @@ static int svcentry_mkfile(SVCENTRY *op,cchar *tmpdname,int type) noex {
 
 /* expand out a program argument with the substitution parameters */
 
-/****
+/*
 #	The following substitutions are made on command strings:
 
 #		%V	Directory-Watcher version string
@@ -672,114 +652,123 @@ static int svcentry_mkfile(SVCENTRY *op,cchar *tmpdname,int type) noex {
 #		%H	machine hostname
 #		%U	invoking username
 #		%G	invoking groupname
+
 #		%s	service
 #		%i	interval (decimal seconds)
 #
-****/
+*/
 
 static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		rl = 0 ;
-	if (esap && rbuf && sp) {
-	    cnullptr	np{} ;
-	    rbuf[0] = '\0' ;
-	    if ((sl == 0) || sp[0]) {
-	        char	*hbuf{} ;
-	        if (sl < 0) sl = strlen(sp) ;
-	        if ((rs = malloc_hn(&hbuf)) >= 0) {
-		    cint	sch = '%' ;
-		    cint	hlen = rs ;
-		    int		bl = rlen ;
-		    cchar	*tp ;
-		    char	*bp = rbuf ;
-		    while ((tp = strnchr(sp,sl,sch)) != np) {
-			if ((rs = snwcpy(bp,bl,sp,(tp-sp))) >= 0) {
-	    		    cint	ch = mkchar(*tp) ;
-		    	    int		cl ;
-		    	    cchar	*cp ;
-			    bp += (rs + 1) ;
-			    bl -= (rs + 1) ;
-	                    switch (ch) {
-	                    case 'V':
-	                        cp = esap->version ;
-	                        cl = strlen(cp) ;
-	                        break ;
-	                    case 'R':
-	                        cp = esap->programroot ;
-	                        cl = strlen(cp) ;
-	                        break ;
-	                    case 'N':
-	                        cp = esap->nodename ;
-	                        cl = strlen(cp) ;
-	                        break ;
-	                    case 'D':
-	                        cp = esap->domainname ;
-	                        cl = strlen(cp) ;
-	                        break ;
-	                    case 'H':
-	                        cl = -1 ;
-	                        if (esap->hostname == nullptr) {
-			            cchar	*nn = esap->nodename ;
-			            cchar	*dn = esap->domainname ;
-	                            cp = hbuf ;
-	                            cl = snsds(hbuf,hlen,nn,dn) ;
-	                        } else {
-	                            cp = esap->hostname ;
-		                }
-	                        if (cl < 0) sl = strlen(cp) ;
-	                        break ;
-	                    case 'U':
-	                        cp = esap->username ;
-	                        cl = strlen(cp) ;
-	                        break ;
-	                    case 'G':
-	                        cp = esap->groupname ;
-	                        cl = strlen(cp) ;
-	                        break ;
-	                    case 's':
-	                        cp = esap->service ;
-	                        if (cp) cl = strlen(cp) ;
-	                        break ;
-	                    case 'i':
-	                        if (esap->interval != nullptr) {
-	                            cp = esap->interval ;
-	                            if (cp) cl = strlen(cp) ;
-	                        } else {
-	                            cp = "1" ;
-	                            cl = 1 ;
-	                        }
-	                        break ;
-	                    default:
-	                        cp = "¿" ;
-	                        cl = 1 ;
-		                break ;
-	                    } /* end switch */
-		            if ((rs >= 0) && (cl > 0)) {
-		                if ((rs = snwcpy(bp,bl,cp,cl)) > 0) {
-			            bp += rs ;
-			            bl -= rs ;
-		                }
-		            }
-		        } /* end if */
-		 	sl -= ((tp + 1) - sp) ;
-			sp = (tp + 1) ;
-		        if (rs < 0) break ;
-		    } /* end while */
-		    if ((rs >= 0) && (sl > 0)) {
-			if ((rs = snwcpy(bp,bl,sp,sl)) > 0) {
-			    bp += rs ;
-			    bl -= rs ;
-			}
-		    } /* end if (remainder) */
-	            *bp = '\0' ;
-		    rl = (bp - rbuf) ;
-		    rs1 = uc_free(hbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (non-empty source c-string) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+	int		elen ;
+	int		ch ;
+	int		cl ;
+	cchar		*bp = sp ;
+	cchar		*cp ;
+	char		hostbuf[MAXHOSTNAMELEN + 1] ;
+	char		*rbp = rbuf ;
+
+	rbuf[0] = '\0' ;
+	if (sl == 0)
+	    return 0 ;
+
+	if (sl < 0)
+	    sl = strlen(sp) ;
+
+	elen = 0 ;
+	rlen -= 1 ;			/* reserve for zero terminator */
+	while ((sl > 0) && (elen < rlen)) {
+
+	    ch = MKCHAR(*bp) ;
+	    switch (ch) {
+
+	    case '%':
+	        bp += 1 ;
+	        sl -= 1 ;
+	        if (sl == 0)
+	            return elen ;
+
+	        cl = 0 ;
+		ch = (*bp & 0xff) ;
+	        switch (ch) {
+	        case 'V':
+	            cp = esap->version ;
+	            cl = strlen(cp) ;
+	            break ;
+	        case 'R':
+	            cp = esap->programroot ;
+	            cl = strlen(cp) ;
+	            break ;
+	        case 'N':
+	            cp = esap->nodename ;
+	            cl = strlen(cp) ;
+	            break ;
+	        case 'D':
+	            cp = esap->domainname ;
+	            cl = strlen(cp) ;
+	            break ;
+	        case 'H':
+	            cl = -1 ;
+	            if (esap->hostname == nullptr) {
+			cint	hlen = MAXHOSTNAMELEN ;
+			cchar		*nn = esap->nodename ;
+			cchar		*dn = esap->domainname ;
+	                cp = hostbuf ;
+	                cl = snsds(hostbuf,hlen,nn,dn) ;
+	            } else {
+	                cp = esap->hostname ;
+		    }
+	            if (cl < 0) sl = strlen(cp) ;
+	            break ;
+	        case 'U':
+	            cp = esap->username ;
+	            cl = strlen(cp) ;
+	            break ;
+	        case 'G':
+	            cp = esap->groupname ;
+	            cl = strlen(cp) ;
+	            break ;
+	        case 's':
+	            cp = esap->service ;
+	            if (cp != nullptr)
+	                cl = strlen(cp) ;
+	            break ;
+	        case 'i':
+	            if (esap->interval != nullptr) {
+	                cp = esap->interval ;
+	                if (cp != nullptr)
+	                    cl = strlen(cp) ;
+	            } else {
+	                cp = "1" ;
+	                cl = 1 ;
+	            }
+	            break ;
+	        default:
+	            cp = bp ;
+	            cl = 1 ;
+		    break ;
+	        } /* end switch */
+	        bp += 1 ;
+	        sl -= 1 ;
+	        if ((elen + sl) > rlen)
+	            return BAD ;
+
+	        strncpy(rbp,cp,cl) ;
+	        rbp += cl ;
+	        elen += cl ;
+	        break ;
+
+	    default:
+	        *rbp++ = *bp++ ;
+	        elen += 1 ;
+	        sl -= 1 ;
+		break ;
+
+	    } /* end switch */
+
+	} /* end while */
+
+	rbuf[elen] = '\0' ;
+	return elen ;
 }
 /* end subroutine (args_expand) */
 

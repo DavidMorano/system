@@ -4,6 +4,8 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+svcentry
+svcfile
 sesnotes
 uctim
 libuc		fix to completely compile!

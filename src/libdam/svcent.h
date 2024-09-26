@@ -25,11 +25,14 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<svcfile.h>
+
+#include	<svcfile.h>		/* <- the money shot */
 
 
 #define	SVCENT	SVCFILE_ENT
 
+
+typedef	SVCENT		svcent ;
 
 EXTERNC_begin
 

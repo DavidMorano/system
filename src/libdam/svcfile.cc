@@ -21,6 +21,10 @@
 
 /******************************************************************************
 
+	Name:
+	svcfile
+
+	Description:
 	This object processes an access table for use by daemon
 	multiplexing server programs that want to control access
 	to their sub-servers.
