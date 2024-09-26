@@ -890,6 +890,7 @@ shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
 filelines.o:		filelines.cc filelines.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
+dictdiff.o:		dictdiff.cc dictdiff.h
 #
 isproc.o:		isproc.cc isproc.h
 #

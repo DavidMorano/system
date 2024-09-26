@@ -41,9 +41,16 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<toxc.h>
 #include	<char.h>
 #include	<localmisc.h>
+
+
+/* local defines */
 
 
 /* external subroutines */
