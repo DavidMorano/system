@@ -23,6 +23,10 @@
 EXTERNC_begin
 
 extern int	strwildsub(cchar *,cchar *) noex ;
+extern int	strwildsub(cchar *,cchar *) noex ;
+
+extern char	*strrpbrk(cchar *,cchar *) noex ;
+extern char	*strwhite(cchar *) noex ;
 
 EXTERNC_end
 

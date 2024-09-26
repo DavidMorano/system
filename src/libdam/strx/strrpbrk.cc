@@ -36,13 +36,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| + |strrchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -50,6 +50,27 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

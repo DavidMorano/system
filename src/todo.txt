@@ -8,7 +8,6 @@ sesnotes
 uctim
 libuc		fix to completely compile!
 srventry
-procse
 lookword
 svcentry
 memfile		can we just trash this?

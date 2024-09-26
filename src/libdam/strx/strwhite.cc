@@ -42,10 +42,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -59,6 +60,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
