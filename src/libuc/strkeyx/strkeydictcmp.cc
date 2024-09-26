@@ -82,7 +82,7 @@ extern "C" {
 int strkeydictcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
 	if (s1 || s2) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
 		if (s2) {
@@ -104,7 +104,7 @@ int strkeydictcmp(cchar *s1,cchar *s2) noex {
                     } /* end while */
                     if (rc == *s2) rc = 0 ;
                     if (*s1 == '=') rc = (*s2 == '\0') ? 0 : -1 ;
-                    if (*s2 == '=') rc = (*s1 == '\0') ? 0 : 1 ;
+                    if (*s2 == '=') rc = (*s1 == '\0') ? 0 : +1 ;
 		}
 	    }
 	}

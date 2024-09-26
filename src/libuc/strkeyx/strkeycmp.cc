@@ -77,7 +77,7 @@
 int strkeycmp(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
 	if (e1p || e2p) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
@@ -93,7 +93,7 @@ int strkeycmp(cchar *e1p,cchar *e2p) noex {
 	                    if (*e2p != '=') {
 	                        rc = (*e1p - *e2p) ;
 	                    } else {
-	                        rc = (*e1p == '\0') ? 0 : 1 ;
+	                        rc = (*e1p == '\0') ? 0 : +1 ;
 			    }
 	                } else {
 	                    rc = (*e2p == '\0') ? 0 : -1 ;

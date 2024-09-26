@@ -21,6 +21,10 @@
 
 /*******************************************************************************
 
+	Name:
+	varsub
+
+	Description:
 	This module performs substitutions on strings that have
 	variable substitution escapes of some sort in them. The
 	variable substitution escapes look like environment variable
@@ -141,7 +145,7 @@ static int	entry_tmp(ent *,cchar *,int,cchar *,int) noex ;
 static int	entry_valcmp(ent *,ent *) noex ;
 
 static int	getkey(cchar *,int,int [][2]) noex ;
-static int	ventcmp(cvoid **,cvoid **) noex ;
+static int	vcmpent(cvoid **,cvoid **) noex ;
 
 
 /* local subroutines */
@@ -296,7 +300,7 @@ int varsub_del(varsub *op,cchar *k,int klen) noex {
 	        void	*vp{} ;
 	        te.kp = k ;
 	        te.kl = klen ;
-	        if ((rs = vechand_search(elp,&te,ventcmp,&vp)) >= 0) {
+	        if ((rs = vechand_search(elp,&te,vcmpent,&vp)) >= 0) {
 	            ent	*ep = entp(vp) ;
 	            {
 	                rs1 = vechand_del(elp,rs) ;
@@ -362,7 +366,7 @@ int varsub_curend(varsub *op,varsub_cur *curp) noex {
 }
 /* end subroutine (varsub_curend) */
 
-int varsub_enum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
+int varsub_curenum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = varsub_magic(op,curp)) >= 0) {
@@ -388,7 +392,7 @@ int varsub_enum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
-/* end subroutine (varsub_enum) */
+/* end subroutine (varsub_curenum) */
 
 int varsub_expfile(varsub *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
@@ -581,7 +585,7 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	    vechand	*elp = op->slp ;
 	    int		rs1 ;
 	    void	*vp{} ;
-	    if ((rs1 = vechand_search(elp,&tmp,ventcmp,&vp)) >= 0) {
+	    if ((rs1 = vechand_search(elp,&tmp,vcmpent,&vp)) >= 0) {
 	        ent	*dep = entp(vp) ;
 	        if (entry_valcmp(dep,&tmp) != 0) {
 	            vechand_del(elp,rs1) ;
@@ -646,7 +650,7 @@ static int varsub_sort(varsub *op) noex {
 	if (! op->f.sorted) {
 	    f = true ;
 	    op->f.sorted = true ;
-	    rs = vechand_sort(op->slp,ventcmp) ;
+	    rs = vechand_sort(op->slp,vcmpent) ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
@@ -663,7 +667,7 @@ static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
 	    void	*vp{} ;
 	    te.kp = kp ;
 	    te.kl = kl ;
-	    if ((rs = vechand_search(slp,&te,ventcmp,&vp)) >= 0) {
+	    if ((rs = vechand_search(slp,&te,vcmpent,&vp)) >= 0) {
 		ep = entp(vp) ;
 	        vl = ep->vl ;
 	    }
@@ -759,7 +763,7 @@ static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	if (vl < 0) {
 	    vl = (vp) ? strlen(vp) : 0 ;
 	}
-/* allocate buffers for the key and its value respectively */
+	/* allocate buffers for the key and its value respectively */
 	if (kl > 0) {
 	    cint	sz = (kl + 1) + (vl + 1) ;
 	    char	*bp{} ;
@@ -856,27 +860,27 @@ static int getkey(cchar *sp,int sl,int sses[][2]) noex {
 }
 /* end subroutine (getkey) */
 
-static int ventcmp(cvoid **ve1pp,cvoid **ve2pp) noex {
+static int vcmpent(cvoid **ve1pp,cvoid **ve2pp) noex {
 	ent		**e1pp = (ent **) ve1pp ;
 	ent		**e2pp = (ent **) ve2pp ;
-	ent		*e1p ;
-	ent		*e2p ;
 	int		rc = 0 ;
-	e1p = *e1pp ;
-	e2p = *e2pp ;
-	if (e1p || e2p) {
-	    if (e1p) {
-	        if (e2p) {
-		    rc = entry_keycmp(e1p,e2p) ;
-	        } else {
+	{
+	    ent		*e1p = *e1pp ;
+	    ent		*e2p = *e2pp ;
+	    if (e1p || e2p) {
+	        if (e1p) {
+	            if (e2p) {
+		        rc = entry_keycmp(e1p,e2p) ;
+	            } else {
 	            rc = -1 ;
-		}
-	    } else {
-	        rc = 1 ;
+		    }
+	        } else {
+	            rc = +1 ;
+	        }
 	    }
-	}
+	} /* end block */
 	return rc ;
 }
-/* end subroutine (ventcmp) */
+/* end subroutine (vcmpent) */
 
 

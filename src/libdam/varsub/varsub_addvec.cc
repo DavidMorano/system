@@ -49,11 +49,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
-#include	<estrings.h>
 #include	<vecstr.h>
-#include	<strwcpy.h>
-#include	<strn.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -92,9 +90,9 @@ int varsub_addvec(varsub *op,vecstr *vsp) noex {
 	    if (sp) {
 		cchar	*vp ;
 	        cchar	*kp = sp ;
+		bool	f ;
 	        if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 		    int		ch = mkchar(kp[0]) ;
-		    bool	f ;
 		    f = isprintlatin(ch) ;
 	            vp = (tp + 1) ;
 	            if (f) {

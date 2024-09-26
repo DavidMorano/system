@@ -1,8 +1,8 @@
-/* progwatch */
+/* progwatch SUPPORT */
+/* lang=C++20 */
 
 /* process the service names given us */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -28,15 +28,11 @@
 /* revision history:
 
 	= 1999-09-01, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
 
-
 	= 2009-03-05, David A­D­ Morano
-
 	The SRVTAB object has been replaced with the SVCFILE object.
 	Some changed were needed to this module to accomplish this.
-
 
 */
 
@@ -428,7 +424,7 @@ vecstr		*snp ;
 	    cchar	*kp, *vp ;
 	    debugprintf("progwatch: varsubs¬\n") ;
 	    varsub_curbegin(slp,&c) ;
-	    while (varsub_enum(slp,&c,&kp,&vp) >= 0) {
+	    while (varsub_curenum(slp,&c,&kp,&vp) >= 0) {
 		n += 1 ;
 	        debugprintf("progwatch: k=%s v=%t\n",kp,
 		    vp,strlinelen(vp,-1,40)) ;

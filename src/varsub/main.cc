@@ -1,25 +1,26 @@
-/* main (varsub) */
+/* main SUPPORT (varsub) */
+/* lang=C++20 */
 
 /* variable-substituting */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_AUDIT	1		/* ¿some kind of audit */
 
-
 /* revision history:
 
 	- 1991-11-01, David A­D­ Morano
-	This was a total rewrite from scratch of the old SATSIM filter
-	program.  This should be quite a bit faster for such a simple function
-	(although Rick Meis was a cleavor guy when we wrote his version).
+	This was a total rewrite from scratch of the old SATSIM
+	filter program.  This should be quite a bit faster for such
+	a simple function (although Rick Meis was a cleavor guy
+	when we wrote his version).
 
 	- 1995-10-01, David A­D­ Morano
-	This was adapted for use as a general macro variable expansion filter.
-	No real program changes have been made (including the comments below).
+	This was adapted for use as a general macro variable expansion
+	filter.  No real program changes have been made (including
+	the comments below).
 
 */
 
@@ -27,29 +28,26 @@
 
 /*******************************************************************************
 
-	This program converts extension and circuit pack locations in SATSIM
-	scripts (.ap files) to model specific locations at script run time.  It
-	reads the model file (dr06_CP.s for instance) to determine what
-	extension perfix and carrier-slot location to replace in the file.
+	This program converts extension and circuit pack locations
+	in SATSIM scripts (.ap files) to model specific locations
+	at script run time.  It reads the model file (dr06_CP.s for
+	instance) to determine what extension perfix and carrier-slot
+	location to replace in the file.
 
 	Synopsis:
-
 	$ varsub [-s <var>=<value>] [-f <filter_file>] [<input_file>]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -2147,7 +2145,7 @@ static int debugsubs(PROGINFO *pip,VARSUB *vsp)
 	    const char	*kp, *vp ;
 	    debugprintf("main: list-start\n") ;
 	    varsub_curbegin(&subs,&scur) ;
-	    while ((vl = varsub_enum(&subs,&scur,&kp,&vp)) >= 0) {
+	    while ((vl = varsub_curenum(&subs,&scur,&kp,&vp)) >= 0) {
 	        debugprintf("main: VS k=%s\n",kp) ;
 	        if (vp != NULL)
 	            debugprintf("main: VS v=>%t<\n",vp,vl) ;
