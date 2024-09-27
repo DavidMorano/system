@@ -22,12 +22,13 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int getrandom(void *,size_t,uint) noex ;
+extern int	getrandom(void *,size_t,uint) noex ;
 
 EXTERNC_end
 

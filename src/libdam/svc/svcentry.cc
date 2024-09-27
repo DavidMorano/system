@@ -42,7 +42,11 @@
 	style and use of the in-file expansion code (subroutine
 	below |args_expand()|).  I would not have written that
 	custom in-file c-string expansion subroutine if the code
-	was younger than at least twenty-five (25) years ago.
+	was younger than at least twenty-five (25) years ago.  Also,
+	I think I was a little bit fast-and-loose with my error
+	handling in some places.  This (questionable error handling)
+	is not necessarily a sign of age, but rather poor (or
+	haphazard) thinking at the time of the coding.
 
 *******************************************************************************/
 
@@ -62,7 +66,6 @@
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<field.h>
-#include	<fieldterms.h>
 #include	<fieldterminit.hh>
 #include	<sbuf.h>
 #include	<svcfile.h>
@@ -82,7 +85,8 @@
 
 /* local defines */
 
-#define	BUFMULT		10
+#define	TMPLEN		14		/* old SysV file-len */
+#define	BUFMULT		10		/* expansion buffer path multiplier */
 
 #undef	OUTBUFLEN
 #define	OUTBUFLEN	(10 * MAXPATHLEN)
@@ -164,6 +168,7 @@ static int	svcentry_mkfile(SE *,cchar *,int) noex ;
 static int	args_expand(ARGS *,char *,int,cchar *,int) noex ;
 static int	vecstr_procargs(vecstr *,char *) noex ;
 static int	mkfile(char *,cchar *,int) noex ;
+static int	mkpat(char *,int,cchar *,int) noex ;
 static int	mkvars() noex ;
 
 static void	freeit(cchar **) noex ;
@@ -175,6 +180,8 @@ static void	freeit(cchar **) noex ;
 /* local variables */
 
 constexpr fieldterminit		pt(" \t") ;
+
+constexpr int			tmplen = TMPLEN ;
 
 static vars			var ;
 
@@ -189,8 +196,7 @@ int svcentry_start(SE *op,varsub *ssp,ENT *sep,ARGS * esap) noex {
 	if ((rs = svcentry_ctor(op,sep)) >= 0) {
 	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
-	        char	*bp ;
-	        if ((rs = malloc_mn(&bp)) >= 0) {
+	        if (char *bp ; (rs = malloc_mn(&bp)) >= 0) {
 	            svckey	sk ;
 		    cint	namelen = rs ;
 		    op->name = bp ;
@@ -314,6 +320,7 @@ int svcentry_getargs(SE *op,mainv avp) noex {
 }
 /* end subroutine (svcentry_getargs) */
 
+#ifdef	COMMENT
 int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	svckey		sk ;
 	int		rs = SR_OK ;
@@ -367,8 +374,8 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	        goto bad2 ;
 
 	    if ((cl = sfshrink(obuf,sl,&cp)) > 0) {
-	        if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
-		    op->program = ccp ;
+	        if (cchar *ap{} ; (rs = uc_mallocstrw(cp,cl,&ap)) >= 0) {
+		    op->program = ap ;
 		}
 	    } else {
 		rs = SR_INVALID ;
@@ -536,6 +543,230 @@ retok:
 	return rs ;
 }
 /* end subroutine (svcentry_expand) */
+#else /* COMMENT */
+int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
+	svckey		sk ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		sl, cl ;
+	int		opts ;
+	cchar		*oldservice ;
+	cchar		*oldinterval ;
+	cchar		*argz ;
+	cchar		*tmpdname ;
+	cchar		*ccp ;
+	cchar		*cp ;
+	char		obuf[OUTBUFLEN + 1] ;
+
+	if (op == nullptr) return SR_FAULT ;
+
+	if (op->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
+
+	oldservice = esap->service ;
+	oldinterval = esap->interval ;
+
+	svckey_load(&sk,sep) ;
+
+	esap->service = sk.svc ;
+	esap->interval = sk.interval ;
+
+/* load the job ID if one was supplied */
+
+	if (esap->jobid != nullptr)
+	    strwcpy(op->jobid,esap->jobid,SVCENTRY_IDLEN) ;
+
+/* did they supply a TMPDIR? */
+
+	tmpdname = (esap->tmpdname) ? esap->tmpdname : SVCENTRY_TMPDIR ;
+
+/* make some temporary files for program file input and output */
+
+	rs = svcentry_mkfile(op,tmpdname,'o') ;
+	if (rs < 0) goto bad0 ;
+
+	rs = svcentry_mkfile(op,tmpdname,'e') ;
+	if (rs < 0) goto bad1 ;
+
+/* process them */
+
+	if (sk.p != nullptr) {
+
+	    rs = svcentry_proc(op,sk.p,esap,obuf,OUTBUFLEN) ;
+	    sl = rs ;
+	    if (rs < 0)
+	        goto bad2 ;
+
+	    if ((cl = sfshrink(obuf,sl,&cp)) > 0) {
+	        if (cchar *ap{} ; (rs = uc_mallocstrw(cp,cl,&ap)) >= 0) {
+		    op->program = ap ;
+		}
+	    } else {
+		rs = SR_INVALID ;
+	    }
+	    if (rs < 0) goto bad2 ;
+
+	} /* end if (program path) */
+
+	argz = nullptr ;
+	if (sk.a != nullptr) {
+
+	    rs = svcentry_proc(op,sk.a,esap,obuf,OUTBUFLEN) ;
+	    sl = rs ;
+	    if (rs < 0)
+	        goto bad3 ;
+
+	    opts = VECSTR_OCOMPACT ;
+	    rs = vecstr_start(op->sap,6,opts) ;
+	    if (rs < 0)
+	        goto bad3 ;
+
+	    op->f.srvargs = true ;
+	    if ((rs = vecstr_procargs(op->sap,obuf)) > 0) {
+
+	        rs1 = vecstr_get(op->sap,0,&argz) ;
+	        if (rs1 < 0)
+	            argz = nullptr ;
+
+	    } /* end if */
+
+	} /* end if (program arguments) */
+
+	if (rs < 0) goto bad4 ;
+
+	if (sk.u != nullptr) {
+
+	    rs = svcentry_proc(op,sk.u,esap,obuf,OUTBUFLEN) ;
+	    sl = rs ;
+	    if (rs < 0)
+	        goto bad4 ;
+
+	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
+		op->username = ccp ;
+	    }
+	    if (rs < 0)
+	        goto bad4 ;
+
+	} /* end if (username field) */
+
+	if (sk.g != nullptr) {
+
+	    rs = svcentry_proc(op,sk.g,esap,obuf,OUTBUFLEN) ;
+	    sl = rs ;
+	    if (rs < 0)
+	        goto bad5 ;
+
+	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
+		op->groupname = ccp ;
+	    }
+	    if (rs < 0)
+	        goto bad5 ;
+
+	}
+
+	if (sk.opts != nullptr) {
+
+	    rs = svcentry_proc(op,sk.opts,esap,obuf,OUTBUFLEN) ;
+	    sl = rs ;
+	    if (rs < 0)
+	        goto bad6 ;
+
+	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
+		op->options = ccp ;
+	    }
+	    if (rs < 0)
+	        goto bad6 ;
+
+	}
+
+/* OK, perform some fixups */
+
+	if ((op->program == nullptr) && (argz != nullptr)) {
+
+	    cl = sfshrink(argz,-1,&cp) ;
+
+	    if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
+		op->program = ccp ;
+	    }
+	    if (rs < 0)
+	        goto bad7 ;
+
+	}
+
+/* are we OK for a go? */
+
+	if (op->program == nullptr)
+	    goto bad7 ;
+
+/* set at least one program argument if we have none so far */
+
+	rs = SR_OK ;
+	if (op->f.srvargs) {
+	    rs = vecstr_count(op->sap) ;
+	}
+
+	if ((rs == 0) && (op->program != nullptr)) {
+
+	    if (sfbasename(op->program,-1,&cp) > 0) {
+
+	        if (! op->f.srvargs) {
+
+	            rs = vecstr_start(op->sap,2,0) ;
+	            if (rs >= 0)
+	                op->f.srvargs = true ;
+
+	        }
+
+	        if (op->f.srvargs)
+	            rs = vecstr_add(op->sap,cp,-1) ;
+
+	    }
+
+	} /* end if (setting 'argv[0]') */
+
+/* we're out of here */
+
+	if (rs >= 0)
+	    goto retok ;
+
+/* bad things */
+bad7:
+	freeit(&op->options) ;
+
+bad6:
+	freeit(&op->groupname) ;
+
+bad5:
+	freeit(&op->username) ;
+
+bad4:
+	if (op->f.srvargs) {
+	    op->f.srvargs = false ;
+	    vecstr_finish(op->sap) ;
+	}
+
+bad3:
+	if (op->program != nullptr)
+	    freeit(&op->program) ;
+
+bad2:
+	if ((op->efname != nullptr) && (op->efname[0] != '\0')) {
+	    uc_unlink(op->efname) ;
+	}
+
+bad1:
+	if ((op->ofname != nullptr) && (op->ofname[0] != '\0')) {
+	    uc_unlink(op->ofname) ;
+	}
+
+bad0:
+retok:
+	esap->interval = oldinterval ;
+	esap->service = oldservice ;
+
+	return rs ;
+}
+/* end subroutine (svcentry_expand) */
+#endif /* COMMENT */
 
 int svcentry_arrival(SE *op,time_t *tp) noex {
 	int		rs ;
@@ -563,12 +794,11 @@ static int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
 	int		rs1 ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    cint	olen = (rs * BUFMULT) ;
-	    char	*obuf{} ;
-	    if ((rs = uc_malloc((olen + 1),&obuf)) >= 0) {
+	    if (char *obuf{} ; (rs = uc_malloc((olen + 1),&obuf)) >= 0) {
 	        if (skp->acc) {
 	            cchar	*sp = skp->acc ;
 	            if ((rs = svcentry_proc(op,sp,esap,obuf,olen)) >= 0) {
-		        cchar	*cp{} ;
+			cchar	*cp{} ;
 	                if ((rs = uc_mallocstrw(obuf,rs,&cp)) >= 0) {
 		            op->access = cp ;
 		        }
@@ -611,8 +841,7 @@ static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
 	int		elen = 0 ;
 	if (inbuf) {
 	    int		vlen = var.olen ;
-	    char	*vbuf{} ;
-	    if ((uc_malloc((vlen + 1),&vbuf)) >= 0) {
+	    if (char *vbuf{} ; (rs = uc_malloc((vlen + 1),&vbuf)) >= 0) {
 		int	ibl = 0 ;
 	        cchar	*ibp = inbuf ;
 		if (op->ssp) {
@@ -626,8 +855,6 @@ static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
 		if (rs >= 0) {
 	            if ((rs = args_expand(esap,obuf,olen,ibp,ibl)) >= 0) {
 	                elen = rs ;
-	            } else {
-	                rs = SR_TOOBIG ;
 	            }
 	        } /* end if (ok) */
 		rs1 = uc_free(vbuf) ;
@@ -641,12 +868,10 @@ static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
 static int svcentry_mkfile(SE *op,cchar *tmpdname,int type) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkfile(tbuf,tmpdname,type)) >= 0) {
-	        cint	fl = rs ;
-	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(tbuf,fl,&cp)) >= 0) {
+	        cint	tlen = rs ;
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(tbuf,tlen,&cp)) >= 0) {
 		    switch (type) {
 		    case 'o':
 		        op->ofname = cp ;
@@ -668,7 +893,7 @@ static int svcentry_mkfile(SE *op,cchar *tmpdname,int type) noex {
 
 /****
 #	The following substitutions are made on command strings:
-
+#
 #		%V	Directory-Watcher version string
 #		%R	program root
 #		%N	machine nodename
@@ -688,10 +913,9 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 	if (esap && rbuf && sp) {
 	    cnullptr	np{} ;
 	    rbuf[0] = '\0' ;
-	    if ((sl == 0) || sp[0]) {
-	        char	*hbuf{} ;
+	    if ((sl != 0) && sp[0]) {
 	        if (sl < 0) sl = strlen(sp) ;
-	        if ((rs = malloc_hn(&hbuf)) >= 0) {
+	        if (char *hbuf{} ; (rs = malloc_hn(&hbuf)) >= 0) {
 		    cint	sch = '%' ;
 		    cint	hlen = rs ;
 		    int		bl = rlen ;
@@ -700,8 +924,8 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 		    while ((tp = strnchr(sp,sl,sch)) != np) {
 			if ((rs = snwcpy(bp,bl,sp,(tp-sp))) >= 0) {
 	    		    cint	ch = mkchar(*tp) ;
-		    	    int		cl ;
-		    	    cchar	*cp ;
+		    	    int		cl = -1 ;
+		    	    cchar	*cp = nullptr ;
 			    bp += (rs + 1) ;
 			    bl -= (rs + 1) ;
 	                    switch (ch) {
@@ -731,7 +955,8 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 			            cchar	*nn = esap->nodename ;
 			            cchar	*dn = esap->domainname ;
 	                            cp = hbuf ;
-	                            cl = snsds(hbuf,hlen,nn,dn) ;
+	                            rs = snsds(hbuf,hlen,nn,dn) ;
+				    cl = rs ;
 	                        } else {
 	                            cp = esap->hostname ;
 		                }
@@ -769,7 +994,7 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 			            bl -= rs ;
 		                }
 		            }
-		        } /* end if */
+		        } /* end if (snwcpy) */
 		 	sl -= ((tp + 1) - sp) ;
 			sp = (tp + 1) ;
 		        if (rs < 0) break ;
@@ -800,11 +1025,10 @@ static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	    cint	alen = strlen(abuf) ;
 	    if (abuf[0]) {
 	        cint	flen = alen ;
-	        char	*fbuf ;
-		if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
+		if (char *fbuf{} ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	            field	fsb ;
 	            if ((rs = fsb.start(abuf,alen)) >= 0) {
-	                int	fl ;
+			int	fl ;
 	                while ((fl = fsb.sharg(pt.terms,fbuf,flen)) > 0) {
 	                    i += 1 ;
 	                    rs = vecstr_add(alp,fbuf,fl) ;
@@ -828,32 +1052,37 @@ static int mkfile(char *obuf,cc *tmpdname,int type) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (obuf && tmpdname) {
-	    char	*pbuf{} ;
-	    if ((rs = malloc_mp(&pbuf)) >= 0) {
-		sbuf	b ;
-		cint	plen = rs ;
-		if ((rs = b.start(pbuf,plen)) >= 0) {
-	            b.strw(tmpdname,-1) ;
-	    	    b.chr('/') ;
-	            {
-		        int	nu = 0 ;
-	                nu += b.strw("pcspoll",-1) ;
-	                nu += b.chr(type) ;
-	                b.chrs('X',nu) ;
-	            }
-	            rs1 = b.finish ;
-	    	    if (rs >= 0) rs = rs1 ;
-		} /* end if (sbuf) */
-	        if (rs >= 0) {
+	    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+		if ((rs = mkpat(pbuf,rs,tmpdname,type)) >= 0) {
 		    rs = mktmpfile(obuf,pbuf,0600) ;
 		}
 		rs1 = uc_free(pbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    }  /* end if (m-a-f) */
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mkfile) */
+
+static int mkpat(char *pbuf,int plen,cc *tmpdname,int type) noex {
+	sbuf		b ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = b.start(pbuf,plen)) >= 0) {
+	    b.strw(tmpdname,-1) ;
+	    b.chr('/') ;
+	    {
+		int	nu = 0 ;
+		nu += b.strw("pcspoll",-1) ;
+		nu += b.chr(type) ;
+		b.chrs('X',(tmplen - nu)) ;
+	    }
+	    rs1 = b.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (sbuf) */
+	return rs ;
+}
+/* end subroutine (mkpat) */
 
 static int mkvars() noex {
 	int		rs ;
@@ -863,7 +1092,6 @@ static int mkvars() noex {
 	return rs ;
 }
 /* end subroutine (mkvars) */
-
 
 static void freeit(cchar **pp) noex {
 	if (*pp != nullptr) {

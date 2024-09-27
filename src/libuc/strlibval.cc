@@ -18,15 +18,22 @@
 
 /*******************************************************************************
 
-	Type:
+	Name:
 	strlibval
+
+	Description
+	Recommended usage within source code:
+		#include	<strlibval.hh>
+		strlibval	strpath(strlibval_path) ;
+		if (strpath != nullptr) {
+			* do something w/ string-value pointer 'strpath' *
+		}
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>		/* for |getenv(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -43,8 +50,10 @@
 
 /* local defines */
 
+#define	PLMULT		2		/* path-length multiplier */
 
-/* local namespaces */
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -59,24 +68,40 @@
 /* local strutures */
 
 namespace {
-    struct strenv {
+    struct strvarenv {
 	cchar		*name[strlibval_overlast] ;
-	constexpr strenv() noex ;
-    } ; /* end struct (strenv) */
+	constexpr strvarenv() noex ;
+    } ; /* end struct (strvarenv) */
 }
 
-constexpr strenv::strenv() noex {
-	name[strlibval_path] = varname.path ;
-	name[strlibval_fpath] = varname.fpath ;
-	name[strlibval_incpath] = varname.incpath ;
-	name[strlibval_libpath] = varname.libpath ;
-	name[strlibval_manpath] = varname.manpath ;
-	name[strlibval_infopath] = varname.infopath ;
-	name[strlibval_cdpath] = varname.cdpath ;
-	name[strlibval_tmpdir] = varname.tmpdir ;
-	name[strlibval_maildir] = varname.maildir ;
+constexpr strvarenv::strvarenv() noex {
+	name[strlibval_logid]		= varname.logid ;
+	name[strlibval_logname]		= varname.logname ;
+	name[strlibval_logline]		= varname.logline ;
+	name[strlibval_utmpid]		= varname.utmpid ;
+	name[strlibval_utmpname]	= varname.utmpname ;
+	name[strlibval_utmpline]	= varname.utmpline ;
+	name[strlibval_path]		= varname.path ;
+	name[strlibval_fpath]		= varname.fpath ;
+	name[strlibval_incpath]		= varname.incpath ;
+	name[strlibval_libpath]		= varname.libpath ;
+	name[strlibval_manpath]		= varname.manpath ;
+	name[strlibval_infopath]	= varname.infopath ;
+	name[strlibval_cdpath]		= varname.cdpath ;
+	name[strlibval_tmpdir]		= varname.tmpdir ;
+	name[strlibval_maildir]		= varname.maildir ;
+	name[strlibval_node]		= varname.node ;
+	name[strlibval_domain]		= varname.domain ;
+	name[strlibval_localdomain]	= varname.localdomain ;
+	name[strlibval_username]	= varname.username ;
+	name[strlibval_user]		= varname.user ;
+	name[strlibval_home]		= varname.home ;
+	name[strlibval_mail]		= varname.mail ;
+	name[strlibval_organization]	= varname.organization ;
+	name[strlibval_orgloc]		= varname.orgloc ;
+	name[strlibval_orgcode]		= varname.orgcode ;
 }
-/* end method (strenv::ctor) */
+/* end method (strvarenv::ctor) */
 
 
 /* forward references */
@@ -84,7 +109,7 @@ constexpr strenv::strenv() noex {
 
 /* local variables */
 
-constexpr strenv	enver ;
+constexpr strvarenv	enver ;
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
@@ -149,7 +174,7 @@ void strlibval::dtor() noex {
 	    cint	rs = uc_free(a) ;
 	    a = nullptr ;
 	    if (rs < 0) {
-		 ulogerror("strlibpath::dtor",rs,"uc_free") ;
+		 ulogerror("strlibpath::dtor",rs,"dtor-uc_free") ;
 	    }
 	}
 }
@@ -189,29 +214,29 @@ ccharp strlibval::strmaildir() noex {
 }
 /* end method (strlibval::strmaildir) */
 
-cchar *strlibval::strpath() noex {
+ccharp strlibval::strpath() noex {
 	cchar	*rp = nullptr ;
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    if ((rp = getenv(vn)) == nullptr) {
 		int	rs ;
 		int	rs1 ;
 		if ((rs = maxpathlen) >= 0) {
-		    cint	tlen = (rs * 2) ;
+		    cint	tlen = (rs * PLMULT) ;
 		    char	*tbuf{} ;
 		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
-			    int	tl = rs ;
+			    int		tl = rs ;
 			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
 		                cint	cmd = _CS_PATH ;
 			        cint	clen = (tlen - (tl+rs)) ;
 			        char	*cbuf = (tbuf + (tl+rs)) ;
 			        tl += rs ;
-		                if ((rs = uc_confstr(cbuf,clen,cmd)) >= 0) {
+		                if ((rs = uc_sysconfstr(cbuf,clen,cmd)) >= 0) {
 			            tl += rs ;
 			            a = mallocstrw(tbuf,tl) ;
 			            rp = a ;
-		                } /* end if (uc_confstr) */
+		                } /* end if (uc_sysconfstr) */
 			    } /* end if (sncpy) */
 		        } /* end if (mkpath) */
 		        rs1 = uc_free(tbuf) ;
