@@ -155,7 +155,7 @@ constexpr int		in6addrlen = INET6ADDRLEN ;
 int connection_start(CON *cnp,cchar *inetdomain) noex {
 	int		rs = SR_FAULT ;
 	if (cnp && inetdomain) {
-	    static cint	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    connection_head	*hop = static_cast<connection *>(cnp) ;
 	    cint		ssz = sizeof(sockaddress) ;
 	    memclear(hop) ;

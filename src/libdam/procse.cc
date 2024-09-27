@@ -82,7 +82,7 @@ int procse_start(procse *op,cchar **envv,varsub *vsp,procse_args *esap) noex {
 	PROCSE		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && esap) {
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    memclear(hop) ;
 	    if ((rs = rsv) >= 0) {
 	        op->envv = envv ;

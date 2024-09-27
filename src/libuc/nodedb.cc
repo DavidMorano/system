@@ -4,7 +4,6 @@
 /* magement for the NODE-DB file */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFECHECK	0		/* extra safety */
 
 /* revision history:
 
@@ -253,7 +252,7 @@ static int	svcentry_finish(SVCENTRY *) noex ;
 static int	entry_load(NODEDB_ENT *,char *,int,NODEDB_IE *) noex ;
 
 extern "C" {
-    static int	vcmpfname(nodedb_f **,nodedb_f **) noex ;
+    static int	vcmpfn(cvoid **,cvoid **) noex ;
 }
 
 static int	freeit(cchar **) noex ;
@@ -474,7 +473,7 @@ static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = file_start(&fe,fname)) >= 0) {
 	    vecobj	*flp = op->filep ;
-	    vecobj_vcf	vcf = vecobj_vcf(vcmpfname) ;
+	    vecobj_vcf	vcf = vecobj_vcf(vcmpfn) ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = vecobj_search(flp,&fe,vcf,nullptr)) == rsn) {
 	        if ((rs = vecobj_add(flp,&fe)) >= 0) {
@@ -1110,29 +1109,36 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-static int vcmpfname(nodedb_f **e1pp,nodedb_f **e2pp) noex {
-	ND_F		*e1p = *e1pp ;
-	ND_F		*e2p = *e2pp ;
+static int cmpfne(nodedb_f *e1p,nodedb_f *e2p) noex {
 	int		rc = 0 ;
-	if (e1p || e2p) {
-	    if (e1p) {
-	        if (e2p) {
-		    cchar	*s1 = e1p->fname ;
-		    cchar	*s2 = e2p->fname ;
-		    {
-		        cint	ch1 = mkchar(*s1) ;
-		        cint	ch2 = mkchar(*s2) ;
-			if ((rc = (ch1 - ch2)) == 0) {
-	                    rc = strcmp(s1,s2) ;
-			}
-		    }
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
+	cchar		*s1 = e1p->fname ;
+	cchar		*s2 = e2p->fname ;
+	{
+	    cint	ch1 = mkchar(*s1) ;
+	    cint	ch2 = mkchar(*s2) ;
+	    if ((rc = (ch1 - ch2)) == 0) {
+		rc = strcmp(s1,s2) ;
+	    }
 	}
 	return rc ;
 }
-/* end subroutine (vcmpfname) */
+/* end subroutine (cmpfne) */
+
+static int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
+	ND_F		*e1p = (ND_F *) *v1pp ;
+	ND_F		*e2p = (ND_F *) *v2pp ;
+	int		rc = 0 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+		    rc = cmpfne(e1p,e2p) ;
+	        }
+	    }
+	}
+	return rc ;
+}
+/* end subroutine (vcmpfn) */
 
 

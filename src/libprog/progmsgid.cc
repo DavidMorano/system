@@ -94,7 +94,7 @@ int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (pip && mbuf) {
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        sbuf	ub ;
 	        if ((rs = ub.start(mbuf,mlen)) >= 0) {

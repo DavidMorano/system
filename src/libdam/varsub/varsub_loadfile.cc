@@ -111,13 +111,11 @@ int varsub_loadfile(varsub *op,cchar *fn) noex {
 	    fn = STDFNIN ; /* standard-input */
 	}
 	if (op) {
-	     static cint	srs = mkterms() ;
-	     if ((rs = srs) >= 0) {
-	        char	*lbuf{} ;
-	        if ((rs = malloc_mp(&lbuf)) >= 0) {
+	     static cint	rst = mkterms() ;
+	     if ((rs = rst) >= 0) {
+	        if (char *lbuf{} ; (rs = malloc_mp(&lbuf)) >= 0) {
 	            cint	llen = rs ;
-	            char	*abuf{} ;
-	            if ((rs = malloc_mp(&abuf)) >= 0) {
+	            if (char *abuf{} ; (rs = malloc_mp(&abuf)) >= 0) {
 		        sub_loadfile	lo(op,lbuf,llen,abuf,rs) ;
 		        {
 		            rs = lo(fn) ;

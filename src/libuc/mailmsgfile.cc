@@ -200,7 +200,7 @@ int mailmsgfile_start(MMF *op,cc *tmpdname,int cols,int ind) noex {
 	int		rs ;
 	int		rv = 0 ;
 	if ((rs = mailmsgfile_magic(op,tmpdname)) >= 0) {
-	    static int	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 	        if ((rs = pagesize) >= 0) {
 		    op->pagesize = rs ;
