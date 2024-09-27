@@ -61,7 +61,7 @@ struct svcentry_flags {
 struct svcentry_head {
 	vecstr		*sap ;		/* server program arguments */
 	varsub		*ssp ;		/* string substitutions */
-	char		*name ;		/* service name */
+	char		*name ;		/* service name (allocated) */
 	cchar		*program ;	/* server program path */
 	cchar		*username ;
 	cchar		*groupname ;

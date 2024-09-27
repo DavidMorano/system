@@ -111,10 +111,6 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct vars {
-	int		olen ;
-} ;
-
 
 /* forward references */
 
@@ -164,7 +160,6 @@ static int	svcentry_mkfile(SE *,cchar *,int) noex ;
 static int	args_expand(ARGS *,char *,int,cchar *,int) noex ;
 static int	vecstr_procargs(vecstr *,char *) noex ;
 static int	mkfile(char *,cchar *,int) noex ;
-static int	mkvars() noex ;
 
 static void	freeit(cchar **) noex ;
 
@@ -176,8 +171,6 @@ static void	freeit(cchar **) noex ;
 
 constexpr fieldterminit		pt(" \t") ;
 
-static vars			var ;
-
 
 /* exported variables */
 
@@ -187,24 +180,21 @@ static vars			var ;
 int svcentry_start(SE *op,varsub *ssp,ENT *sep,ARGS * esap) noex {
 	int		rs ;
 	if ((rs = svcentry_ctor(op,sep)) >= 0) {
-	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) {
-	        char	*bp ;
-	        if ((rs = malloc_mn(&bp)) >= 0) {
-	            svckey	sk ;
-		    cint	namelen = rs ;
-		    op->name = bp ;
-	            op->ssp = ssp ;
-	            op->atime = esap->daytime ;	/* job arrival time */
-		    op->jobid[0] = '\0' ;
-		    if ((rs = svckey_load(&sk,sep)) >= 0) {
-		        strwcpy(op->name,sk.svc,namelen) ;
-		        {
-			    rs = svcentry_starter(op,&sk,esap) ;
-		        }
-		    } /* end if (svckey_load) */
-	        } /* end if (memory-allocation) */
-	    } /* end if (mkvars) */
+	    char	*bp ;
+	    if ((rs = malloc_mn(&bp)) >= 0) {
+	        svckey	sk ;
+		cint	namelen = rs ;
+		op->name = bp ;
+	        op->ssp = ssp ;
+	        op->atime = esap->daytime ;	/* job arrival time */
+		op->jobid[0] = '\0' ;
+		if ((rs = svckey_load(&sk,sep)) >= 0) {
+		    strwcpy(op->name,sk.svc,namelen) ;
+		    {
+			rs = svcentry_starter(op,&sk,esap) ;
+		    }
+		} /* end if (svckey_load) */
+	    } /* end if (memory-allocation) */
 	    if (rs < 0) {
 		svcentry_dtor(op) ;
 	    }
@@ -605,34 +595,32 @@ static int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
 }
 /* end subroutie (svcentry_starter) */
 
-static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
+static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,
+		char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		elen = 0 ;
 	if (inbuf) {
-	    int		vlen = var.olen ;
-	    char	*vbuf{} ;
-	    if ((uc_malloc((vlen + 1),&vbuf)) >= 0) {
-		int	ibl = 0 ;
-	        cchar	*ibp = inbuf ;
-		if (op->ssp) {
-	    	    if ((rs = varsub_exp(op->ssp,vbuf,vlen,inbuf,-1)) >= 0) {
-	                ibl = rs ;
-	                ibp = vbuf ;
-	    	    }
-		} else {
-	    	    ibl = strlen(ibp) ;
-		}
-		if (rs >= 0) {
-	            if ((rs = args_expand(esap,obuf,olen,ibp,ibl)) >= 0) {
-	                elen = rs ;
-	            } else {
-	                rs = SR_TOOBIG ;
-	            }
-	        } /* end if (ok) */
-		rs1 = uc_free(vbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	int		vlen ;
+	cchar		*ibp = inbuf ;
+	char		vbuf[OUTBUFLEN + 1] ;
+
+
+	if (op->ssp != nullptr) {
+	    if ((rs = varsub_exp(op->ssp,vbuf,OUTBUFLEN,inbuf,-1)) >= 0) {
+	        vlen = rs ;
+	        ibp = vbuf ;
+	    }
+	} else {
+	    vlen = strlen(ibp) ;
+	}
+	if (rs >= 0) {
+	    if ((rs = args_expand(esap,obuf,olen,ibp,vlen)) >= 0) {
+	        elen = rs ;
+	    } else {
+	        rs = SR_TOOBIG ;
+	    }
+	} /* end if (ok) */
+
 	} /* end if (non-null) */
 	return (rs >= 0) ? elen : rs ;
 }
@@ -791,6 +779,14 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 }
 /* end subroutine (args_expand) */
 
+static void freeit(cchar **pp) noex {
+	if (*pp != nullptr) {
+	    uc_free(*pp) ;
+	    *pp = nullptr ;
+	}
+}
+/* end subroutine (freeit) */
+
 /* process an argument list */
 static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	int		rs = SR_FAULT ;
@@ -854,23 +850,5 @@ static int mkfile(char *obuf,cc *tmpdname,int type) noex {
 	return rs ;
 }
 /* end subroutine (mkfile) */
-
-static int mkvars() noex {
-	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.olen = (rs * BUFMULT) ;
-	}
-	return rs ;
-}
-/* end subroutine (mkvars) */
-
-
-static void freeit(cchar **pp) noex {
-	if (*pp != nullptr) {
-	    uc_free(*pp) ;
-	    *pp = nullptr ;
-	}
-}
-/* end subroutine (freeit) */
 
 

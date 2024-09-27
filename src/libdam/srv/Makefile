@@ -1,6 +1,6 @@
-# MAKEFILES (svc)
+# MAKEFILES (srv)
 
-T= svc
+T= srv
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += svc.h
+INCS += srv.h
 
 LIBS +=
 
@@ -55,13 +55,10 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= svcent.o svcentry.o
-OBJ1= svckey.o svckv.o
-OBJ2= svcfile.o
-OBJ3= 
+OBJ0= srvreg.o srvrege.o
+OBJ1= srventry.o srvtab.o
 
-OBJA= obj0.o obj1.o 
-#OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o
 
 OBJ= $(OBJA)
 
@@ -136,10 +133,9 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-svcent.o:		svcent.cc	svcent.h	$(INCS)
-svcentry.o:		svcentry.cc	svcentry.h	$(INCS)
-svcfile.o:		svcfile.cc	svcfile.h	$(INCS)
-svckey.o:		svckey.cc	svckey.h	$(INCS)
-svckv.o:		svckv.cc	svckv.h		$(INCS)
+srventry.o:		srventry.cc	srventry.h	$(ICNS)
+srvreg.o:		srvreg.cc	srvreg.h	$(ICNS)
+srvrege.o:		srvrege.cc	srvrege.h	$(ICNS)
+srvtab.o:		srvtab.cc	srvtab.h	$(ICNS)
 
 

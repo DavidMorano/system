@@ -785,6 +785,11 @@ svc.o:			svc.dir
 svc.dir:
 	makesubdir $@
 
+# SRV
+srv.o:			srv.dir
+srv.dir:
+	makesubdir $@
+
 # GETHE
 gethe.o:		gethe.dir
 gethe.dir:

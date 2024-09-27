@@ -1,8 +1,7 @@
-/* srvrege */
-
+/* srvrege SUPPORT */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -20,22 +19,23 @@
 
 /******************************************************************************
 
+	Name:
+	srvrege
+
+	Description:
 	These subroutines provide for marshalling (and unmarshalling)
 	of a SRVREGE file entry.
 
-
 ******************************************************************************/
 
-
-#define	SRVREGE_MASTER	0
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<inttypes.h>
 #include	<time.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<serialbuf.h>
 #include	<stdorder.h>
@@ -55,8 +55,10 @@
 /* external subroutines */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int srvrege_all(buf,buflen,f_read,ep)
 char		buf[] ;

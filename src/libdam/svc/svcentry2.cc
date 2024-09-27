@@ -111,10 +111,6 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct vars {
-	int		olen ;
-} ;
-
 
 /* forward references */
 
@@ -157,14 +153,12 @@ static inline int svcentry_magic(svcentry *op,Args ... args) noex {
 }
 /* end subroutine (svcentry_magic) */
 
-static int	svcentry_starter(SE *,svckey *,ARGS *) noex ;
-static int	svcentry_proc(SE *,cchar *,ARGS *,char *,int) noex ;
+static int	svcentry_process(SE *,cchar *,ARGS *,char *,int) noex ;
 static int	svcentry_mkfile(SE *,cchar *,int) noex ;
 
 static int	args_expand(ARGS *,char *,int,cchar *,int) noex ;
 static int	vecstr_procargs(vecstr *,char *) noex ;
 static int	mkfile(char *,cchar *,int) noex ;
-static int	mkvars() noex ;
 
 static void	freeit(cchar **) noex ;
 
@@ -176,8 +170,6 @@ static void	freeit(cchar **) noex ;
 
 constexpr fieldterminit		pt(" \t") ;
 
-static vars			var ;
-
 
 /* exported variables */
 
@@ -185,31 +177,79 @@ static vars			var ;
 /* exported subroutines */
 
 int svcentry_start(SE *op,varsub *ssp,ENT *sep,ARGS * esap) noex {
-	int		rs ;
-	if ((rs = svcentry_ctor(op,sep)) >= 0) {
-	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) {
-	        char	*bp ;
-	        if ((rs = malloc_mn(&bp)) >= 0) {
-	            svckey	sk ;
-		    cint	namelen = rs ;
-		    op->name = bp ;
-	            op->ssp = ssp ;
-	            op->atime = esap->daytime ;	/* job arrival time */
-		    op->jobid[0] = '\0' ;
-		    if ((rs = svckey_load(&sk,sep)) >= 0) {
-		        strwcpy(op->name,sk.svc,namelen) ;
-		        {
-			    rs = svcentry_starter(op,&sk,esap) ;
-		        }
-		    } /* end if (svckey_load) */
-	        } /* end if (memory-allocation) */
-	    } /* end if (mkvars) */
-	    if (rs < 0) {
-		svcentry_dtor(op) ;
-	    }
-	} /* end if (svcentry_ctor) */
+	svckey		sk ;
+	cint		olen = OUTBUFLEN ;
+	int		rs = SR_OK ;
+	int		sl ;
+	char		obuf[OUTBUFLEN + 1] ;
+
+	if (op == nullptr) return SR_FAULT ;
+	if (sep == nullptr) return SR_FAULT ;
+	op->name[0] = '\0' ;
+	op->jobid[0] = '\0' ;
+
+/* store what we will need later! */
+
+	op->ssp = ssp ;
+	op->atime = esap->daytime ;	/* job arrival time */
+
+/* process the service-entry in a way that makes it how we want it */
+
+	svckey_load(&sk,sep) ;
+
+/* load the service name */
+
+	strwcpy(op->name,sk.svc,MAXNAMELEN) ;
+
+/* process the access field */
+
+	if ((rs >= 0) && (sk.acc != nullptr)) {
+
+	    rs = svcentry_process(op,sk.acc,esap,obuf,olen) ;
+	    sl = rs ;
+	    if (rs < 0)
+	        goto bad0 ;
+
+	    rs = uc_mallocstrw(obuf,sl,&op->access) ;
+	    if (rs < 0)
+	        goto bad0 ;
+
+	} /* end if (access field) */
+
+/* process the interval field */
+
+	if ((rs >= 0) && (sk.interval != nullptr)) {
+
+	    rs = svcentry_process(op,sk.interval,esap,obuf,olen) ;
+	    if (rs < 0)
+	        goto bad1 ;
+
+/* convert the interval string to an integer */
+
+	    rs = cfdecti(obuf,rs,&op->interval) ;
+
+	    op->interval = (rs >= 0) ? op->interval : -1 ;
+	    rs = SR_OK ;
+
+	} else {
+	    op->interval = -1 ;
+	}
+
+	if (rs >= 0)
+	    op->magic = SVCENTRY_MAGIC ;
+
+ret0:
 	return rs ;
+
+/* bad stuff happened */
+bad1:
+	if (op->access != nullptr) {
+	    uc_free(op->access) ;
+	    op->access = nullptr ;
+	}
+
+bad0:
+	goto ret0 ;
 }
 /* end subroutine (svcentry_start) */
 
@@ -266,11 +306,6 @@ int svcentry_finish(SE *op) noex {
 	        rs1 = uc_free(op->access) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->access = nullptr ;
-	    }
-	    if (op->name) {
-	        rs1 = uc_free(op->name) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->name = nullptr ;
 	    }
 	    {
 		rs1 = svcentry_dtor(op) ;
@@ -361,7 +396,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 
 	if (sk.p != nullptr) {
 
-	    rs = svcentry_proc(op,sk.p,esap,obuf,OUTBUFLEN) ;
+	    rs = svcentry_process(op,sk.p,esap,obuf,OUTBUFLEN) ;
 	    sl = rs ;
 	    if (rs < 0)
 	        goto bad2 ;
@@ -380,7 +415,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	argz = nullptr ;
 	if (sk.a != nullptr) {
 
-	    rs = svcentry_proc(op,sk.a,esap,obuf,OUTBUFLEN) ;
+	    rs = svcentry_process(op,sk.a,esap,obuf,OUTBUFLEN) ;
 	    sl = rs ;
 	    if (rs < 0)
 	        goto bad3 ;
@@ -405,7 +440,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 
 	if (sk.u != nullptr) {
 
-	    rs = svcentry_proc(op,sk.u,esap,obuf,OUTBUFLEN) ;
+	    rs = svcentry_process(op,sk.u,esap,obuf,OUTBUFLEN) ;
 	    sl = rs ;
 	    if (rs < 0)
 	        goto bad4 ;
@@ -420,7 +455,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 
 	if (sk.g != nullptr) {
 
-	    rs = svcentry_proc(op,sk.g,esap,obuf,OUTBUFLEN) ;
+	    rs = svcentry_process(op,sk.g,esap,obuf,OUTBUFLEN) ;
 	    sl = rs ;
 	    if (rs < 0)
 	        goto bad5 ;
@@ -435,7 +470,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 
 	if (sk.opts != nullptr) {
 
-	    rs = svcentry_proc(op,sk.opts,esap,obuf,OUTBUFLEN) ;
+	    rs = svcentry_process(op,sk.opts,esap,obuf,OUTBUFLEN) ;
 	    sl = rs ;
 	    if (rs < 0)
 	        goto bad6 ;
@@ -558,85 +593,36 @@ int svcentry_stime(SE *op,time_t daytime) noex {
 
 /* private subroutines */
 
-static int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
-	int		rs ;
-	int		rs1 ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    cint	olen = (rs * BUFMULT) ;
-	    char	*obuf{} ;
-	    if ((rs = uc_malloc((olen + 1),&obuf)) >= 0) {
-	        if (skp->acc) {
-	            cchar	*sp = skp->acc ;
-	            if ((rs = svcentry_proc(op,sp,esap,obuf,olen)) >= 0) {
-		        cchar	*cp{} ;
-	                if ((rs = uc_mallocstrw(obuf,rs,&cp)) >= 0) {
-		            op->access = cp ;
-		        }
-	            }
-		} /* end if (field-access) */
-	        /* process the interval field */
-	        if ((rs >= 0) && skp->interval) {
-	            cchar	*sp = skp->interval ;
-	            if ((rs = svcentry_proc(op,sp,esap,obuf,olen)) >= 0) {
-		        int	v{} ;
-	                if ((rs = cfdecti(obuf,rs,&v)) >= 0) {
-	    	            op->interval = v ;
-		        } else {
-		            op->interval = -1 ;
-	    	            rs = SR_OK ;
-		        }
-	            } else {
-	                op->interval = -1 ;
-	            }
-	            if (rs >= 0) {
-	                op->magic = SVCENTRY_MAGIC ;
-	            } else {
-	                if (op->access) {
-	                    uc_free(op->access) ;
-	                    op->access = nullptr ;
-	                }
-	            } /* end if */
-		} /* end if (field-interval) */
-	        rs1 = uc_free(obuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
-	return rs ;
-}
-/* end subroutie (svcentry_starter) */
-
-static int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
+static int svcentry_process(SE *op,cc *inbuf,ARGS *esap,
+		char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		elen = 0 ;
 	if (inbuf) {
-	    int		vlen = var.olen ;
-	    char	*vbuf{} ;
-	    if ((uc_malloc((vlen + 1),&vbuf)) >= 0) {
-		int	ibl = 0 ;
-	        cchar	*ibp = inbuf ;
-		if (op->ssp) {
-	    	    if ((rs = varsub_exp(op->ssp,vbuf,vlen,inbuf,-1)) >= 0) {
-	                ibl = rs ;
-	                ibp = vbuf ;
-	    	    }
-		} else {
-	    	    ibl = strlen(ibp) ;
-		}
-		if (rs >= 0) {
-	            if ((rs = args_expand(esap,obuf,olen,ibp,ibl)) >= 0) {
-	                elen = rs ;
-	            } else {
-	                rs = SR_TOOBIG ;
-	            }
-	        } /* end if (ok) */
-		rs1 = uc_free(vbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	int		vlen ;
+	cchar		*ibp = inbuf ;
+	char		vbuf[OUTBUFLEN + 1] ;
+
+
+	if (op->ssp != nullptr) {
+	    if ((rs = varsub_exp(op->ssp,vbuf,OUTBUFLEN,inbuf,-1)) >= 0) {
+	        vlen = rs ;
+	        ibp = vbuf ;
+	    }
+	} else {
+	    vlen = strlen(ibp) ;
+	}
+	if (rs >= 0) {
+	    if ((rs = args_expand(esap,obuf,olen,ibp,vlen)) >= 0) {
+	        elen = rs ;
+	    } else {
+	        rs = SR_TOOBIG ;
+	    }
+	} /* end if (ok) */
+
 	} /* end if (non-null) */
 	return (rs >= 0) ? elen : rs ;
 }
-/* end subroutine (svcentry_proc) */
+/* end subroutine (svcentry_process) */
 
 static int svcentry_mkfile(SE *op,cchar *tmpdname,int type) noex {
 	int		rs ;
@@ -791,6 +777,14 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 }
 /* end subroutine (args_expand) */
 
+static void freeit(cchar **pp) noex {
+	if (*pp != nullptr) {
+	    uc_free(*pp) ;
+	    *pp = nullptr ;
+	}
+}
+/* end subroutine (freeit) */
+
 /* process an argument list */
 static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	int		rs = SR_FAULT ;
@@ -854,23 +848,5 @@ static int mkfile(char *obuf,cc *tmpdname,int type) noex {
 	return rs ;
 }
 /* end subroutine (mkfile) */
-
-static int mkvars() noex {
-	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.olen = (rs * BUFMULT) ;
-	}
-	return rs ;
-}
-/* end subroutine (mkvars) */
-
-
-static void freeit(cchar **pp) noex {
-	if (*pp != nullptr) {
-	    uc_free(*pp) ;
-	    *pp = nullptr ;
-	}
-}
-/* end subroutine (freeit) */
 
 

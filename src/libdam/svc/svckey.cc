@@ -71,10 +71,11 @@ constexpr cpcchar	svckeys[] = {
 /* exported subroutines */
 
 int svckey_load(svckey *skp,svcfile_ent *sep) noex {
+	SVCKEY		*hop = skp ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (skp && sep) {
-	    rs = memclear(skp) ;
+	    rs = memclear(hop) ;
 	    skp->svc = sep->svc ;
 	    for (int i = 0 ; sep->keyvals[i][0] != nullptr ; i += 1) {
 	        cchar	*kp = sep->keyvals[i][0] ;

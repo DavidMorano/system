@@ -1,18 +1,18 @@
-/* srvreg */
+/* srvreg SUPPORT */
+/* lang=C++20 */
 
 /* manage reading or writing of a server registry file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1
 #define	CF_CREAT	0		/* always create the file? */
 
-
 /* revision history:
 
 	= 1998-08-22, David A­D­ Morano
-        This subroutine module was adopted for use from some previous code that
-        performed the similar sorts of functions.
+	This subroutine module was adopted for use from some previous
+	code that performed the similar sorts of functions.
 
 */
 
@@ -20,19 +20,18 @@
 
 /*******************************************************************************
 
-        This module manages the reading and writing of entries to or from a
-        server registry file. A server registry file is where (system?) servers
-        register themselves so that clients know how to communicate with them.
+	Name:
+	srvreg
+
+	This module manages the reading and writing of entries to
+	or from a server registry file. A server registry file is
+	where (system?) servers register themselves so that clients
+	know how to communicate with them.
 
 
 *******************************************************************************/
 
-
-#define	SRVREG_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -40,16 +39,21 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<inttypes.h>
-#include	<limits.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<netdb.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<serialbuf.h>
+#include	<strwcpy.h>
+#include	<lockfile.h>
+#include	<intceil.h>
+#include	<timestr.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"srvreg.h"
@@ -89,15 +93,6 @@
 
 
 /* external subroutines */
-
-extern uint	uceil(uint,int) ;
-
-extern int	matstr(const char **,const char *,int) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	isfsremote(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -149,8 +144,10 @@ static const char	*aitypes[] = {
 #endif /* COMMENT */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int srvreg_open(op,fname,oflags,operm)
 SRVREG		*op ;
@@ -158,7 +155,7 @@ const char	fname[] ;
 int		oflags ;
 int		operm ;
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 
 	time_t	daytime = time(NULL) ;
 
@@ -1176,7 +1173,7 @@ ret0:
 static int srvreg_filechanged(op)
 SRVREG		*op ;
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 
 	int	rs ;
 	int	f_changed = FALSE ;
