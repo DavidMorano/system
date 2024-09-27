@@ -1,4 +1,5 @@
-/* termcharsets */
+/* termcharsets HEADER */
+/* lang=C20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */

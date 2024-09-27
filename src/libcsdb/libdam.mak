@@ -215,23 +215,23 @@ OBJ103= dw.o fmq.o useraccdb.o csem.o
 
 OBJ104= sesmsg.o msgdata.o
 OBJ105= dater.o dater_getdate.o date.o cachetime.o
-OBJ106= field.o field_word.o field_wordphrase.o field_srvarg.o field_svcargs.o
+OBJ106= 
 OBJ107= lfm.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
 OBJ108= logfile.o
-OBJ109= vecstr_adds.o vecstr_foilcmp.o vecstr_svcargs.o vecstr_srvargs.o
-OBJ110= vecstr_avmkstr.o
-OBJ111= vecpstr_loadgrusers.o vecpstr_loadpjusers.o vecpstr_addsubdirs.o
+OBJ109= 
+OBJ110= 
+OBJ111= 
 
 OBJ112= strmgr.o dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o obuf.o
 OBJ113= hdrdecode.o qpdecoder.o b64decoder.o hexdecoder.o utf8decoder.o
-OBJ114= vecitem.o vecint.o veclong.o vecelem.o vecobj.o 
+OBJ114= 
 OBJ115=
 OBJ116= setint.o osetint.o setstr.o osetstr.o mapstrs.o
 OBJ117= msfile.o msfilee.o ebuf.o nodedb.o clusterdb.o kinfo.o
 OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o ema.o fsi.o
 OBJ119= q.o plainq.o cq.o fifostr.o fifoitem.o charq.o intiq.o
 
-OBJ120= kvsfile.o paramfile.o strtab.o strstore.o svcfile.o querystr.o
+OBJ120= kvsfile.o paramfile.o strtab.o strstore.o querystr.o
 OBJ121= mailmsgmatenv.o mailmsgmathdr.o mailmsgfrom.o mailmsgstage.o
 OBJ122= mailbox.o mailbox_getfrom.o
 OBJ123= mailmsg.o mailmsg_loadmb.o mailmsg_loadfile.o mailmsg_loadfd.o
@@ -701,7 +701,6 @@ paramfile.o:		paramfile.cc paramfile.h
 
 kvsfile.o:		kvsfile.cc kvsfile.h
 
-svcfile.o:		svcfile.cc svcfile.h
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
 
@@ -779,6 +778,11 @@ varsub.dir:
 # TXTINDEX
 txtindex.o:		txtindex.dir
 txtindex.dir:
+	makesubdir $@
+
+# SVC
+svc.o:			svc.dir
+svc.dir:
 	makesubdir $@
 
 # GETHE

@@ -19,21 +19,19 @@
 
 /*******************************************************************************
 
+	Name:
+	strfilemks
+
 	Description:
 	This subroutine creates a STRFILE database file.
 
 	Synopsis:
-	int strfilemks_open(op,dbname,oflags,om,n)
-	STRFILEMKS	*op ;
-	cchar	dbname[] ;
-	int		oflags ;
-	mode_t		om ;
-	int		n ;
+	int strfilemks_open(strfilemks *op,cc *dbn,int of,mode_t om,int n) noex
 
 	Arguments:
 	op		object pointer
-	dbname		name of (path-to) DB
-	oflags		open-flags
+	dbn		name of (path-to) DB
+	of		open-flags
 	om		open-mode
 	n		starting estimate of numbers of variables
 
