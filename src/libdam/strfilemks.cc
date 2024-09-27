@@ -4,7 +4,6 @@
 /* make a STRFILE database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_FIRSTHASH	0		/* arrange for first-attempt hashing */
 #define	CF_MINMOD	1		/* ensure minimum file mode */
 #define	CF_LATE		0		/* late open */
@@ -145,10 +144,6 @@ extern int	isNotPresent(int) ;
 extern char	*strnchr(cchar *,int,int) ;
 extern char	*strnpbrk(cchar *,int,cchar *) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
 
 /* external variables */
 
@@ -171,10 +166,10 @@ struct idx_flags {
 }
 
 struct idx {
-	cchar	*idname ;	/* idx dir-name */
-	cchar	*ibname ;	/* idx base-name */
-	cchar	*nfname ;	/* new idx file-name */
-	cchar	*ai ;
+	cchar		*idname ;	/* idx dir-name */
+	cchar		*ibname ;	/* idx base-name */
+	cchar		*nfname ;	/* new idx file-name */
+	cchar		*ai ;
 	STRLISTHDR	hdr ;
 	IDX_FL		f ;
 	filer		fb ;
@@ -234,13 +229,11 @@ static int	rectab_finish(RECTAB *) ;
 static int	rectab_count(RECTAB *) ;
 #endif
 
-static int	mapfile_start(MAPFILE *,int,cchar *,int) ;
-static int	mapfile_end(MAPFILE *) ;
+static int	mapfile_start(MAPFILE *,int,cchar *,int) noex ;
+static int	mapfile_end(MAPFILE *) noex ;
 
-static int	filer_writefill(filer *,cchar *,int) ;
-
-static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct strentry *) ;
-static int	hashindex(uint,int) ;
+static int	indinsert(uint (*rt)[2],uint (*it)[3],int,strentry *) noex ;
+static int	hashindex(uint,int) noex ;
 
 
 /* local variables */
@@ -270,20 +263,8 @@ int		n ;
 	int	rs ;
 	cchar	*cp ;
 
-
-#if	CF_DEBUGS && defined(DEBFNAME)
-	{
-	    int	dfd = debuggetfd() ;
-	    nprintf(DEBFNAME,"strfilemks_open: ent dfd=%d\n",dfd) ;
-	}
-#endif /* DEBFNAME */
-
 	if (op == NULL)
 	    return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("strfilemks_open: ent dbname=%s\n",dbname) ;
-#endif /* CF_DEBUGS */
 
 	if (dbname == NULL) return SR_FAULT ;
 
@@ -321,10 +302,6 @@ int		n ;
 	        strfilemks_recend(op) ;
 	} /* end if (recmgr) */
 
-#if	CF_DEBUGS
-	debugprintf("strfilemks_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (strfilemks_open) */
@@ -345,20 +322,12 @@ STRFILEMKS	*op ;
 	if (op->magic != STRFILEMKS_MAGIC)
 	    return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("strfilemks_close: nvars=%u\n",op->nvars) ;
-#endif
-
 	nvars = op->nvars ;
 	if (! op->f.abort) {
 	    rs1 = strfilemks_mkvarfile(op) ;
 	    f_remove = (rs1 < 0) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("strfilemks_close: strfilemks_mkvarfile() rs=%d\n",rs) ;
-#endif
 
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
@@ -375,10 +344,6 @@ STRFILEMKS	*op ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("strfilemks_close: strfilemks_renamefiles() rs=%d\n",rs) ;
-#endif
-
 	rs1 = strfilemks_filesend(op,f_remove) ;
 	if (rs >= 0) rs = rs1 ;
 
@@ -387,10 +352,6 @@ STRFILEMKS	*op ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbname = NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("strfilemks_close: ret=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 
 	op->magic = 0 ;
 	return (rs >= 0) ? nvars : rs ;
@@ -418,9 +379,6 @@ int		sl ;
 
 	    mapfile_finish(&fm) ;
 	} /* end if (mapfile) */
-#if	CF_DEBUGS
-	debugprintf("strfilemks_addfile: ret=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -986,10 +944,6 @@ static int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (sfdirname) */
 
-#if	CF_DEBUGS
-	debugprintf("strfilemks_filesbegin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (strfilemks_filesbegin) */
@@ -1097,13 +1051,6 @@ cchar	fpre[] ;
 cchar	fsuf[] ;
 {
 	int	rs = SR_OK ;
-
-
-#if	CF_DEBUGS
-	debugprintf("strfilemks_nfcreatecheck: nfd=%d\n",op->nfd) ;
-	debugprintf("strfilemks_nfcreatecheck: f_inprogress=%u\n",
-		op->f.inprogress) ;
-#endif
 
 	if ((op->nfd < 0) || op->f.inprogress) {
 	    int	oflags = O_WRONLY | O_CREAT ;
@@ -1404,10 +1351,6 @@ STRFILEMKS	*op ;
 
 			memset(indtab,0,size) ;
 
-#if	CF_DEBUGS
-	debugprintf("strfilemks_wrvarfile: _mkind() \n") ;
-#endif
-
 	                rs = strfilemks_mkind(op,kstab,indtab,itl) ;
 
 	                if (rs >= 0) {
@@ -1444,9 +1387,6 @@ ret2:
 #endif /* CF_MINMOD */
 
 	    if ((rs >= 0) && (op->gid >= 0)) {
-#if	CF_DEBUGS
-		debugprintf("strfilemks_wrvarfile: gid=%d\n",op->gid) ;
-#endif
 		rs = u_fchown(op->nfd,-1,op->gid) ;
 	    }
 
@@ -1491,10 +1431,6 @@ int		il ;
 
 
 	rtl = rectab_getvec(&op->rectab,&rt) ;
-
-#if	CF_DEBUGS
-	debugprintf("strfilemks_mkind: rtl=%u\n",rtl) ;
-#endif
 
 #if	CF_FIRSTHASH
 	{
@@ -1548,11 +1484,6 @@ int		il ;
 	    ki = rt[ri][0] ;
 	    kp = kst + ki ;
 
-#if	CF_DEBUGS
-	debugprintf("strfilemks_mkind: ri=%u k=%s\n",ri,
-		kp,strnlen(kp,20)) ;
-#endif
-
 	    khash = hash_elf(kp,-1) ;
 
 	    hi = hashindex(khash,il) ;
@@ -1573,10 +1504,6 @@ int		il ;
 
 	if (sc < 0)
 	    sc = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("strfilemks_mkind: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? sc : rs ;
 }
@@ -1836,22 +1763,9 @@ struct strentry	*vep ;
 	nhash = vep->khash ;
 	chash = (nhash & INT_MAX) ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: ve ri=%u ki=%u khash=%08X hi=%u\n",
-		vep->ri,vep->ki,vep->khash,vep->hi) ;
-	debugprintf("indinsert: il=%u loop 1\n",il) ;
-#endif
-
 /* CONSTCOND */
 	while (TRUE) {
-
-#if	CF_DEBUGS
-	debugprintf("indinsert: it%u ri=%u nhi=%u\n",
-		hi,it[hi][0],it[hi][2]) ;
-#endif
-
-	    if (it[hi][0] == 0)
-		break ;
+	    if (it[hi][0] == 0) break ;
 
 	    ri = it[hi][0] ;
 	    ki = rt[ri][0] ;
@@ -1863,37 +1777,20 @@ struct strentry	*vep ;
 
 	    hi = hashindex(nhash,il) ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: nhash=%08X nhi=%u\n",nhash,hi) ;
-#endif
-
 	} /* end while */
 
 	if (it[hi][0] > 0) {
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: loop 2\n") ;
-#endif
-
 	    lhi = hi ;
-	    while ((nhi = it[lhi][2]) > 0)
+	    while ((nhi = it[lhi][2]) > 0) {
 	        lhi = nhi ;
-
+	    }
 	    hi = hashindex((lhi + 1),il) ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: loop 3 lhi=%u\n",lhi) ;
-#endif
-
-	    while (it[hi][0] > 0)
+	    while (it[hi][0] > 0) {
 	        hi = hashindex((hi + 1),il) ;
-
+	    }
 	    it[lhi][2] = hi ;
-
-#if	CF_DEBUGS
-	debugprintf("indinsert: loop 3 it%u ki=%u nhi=%u\n",lhi,
-		it[lhi][0],hi) ;
-#endif
 
 	} /* end if (same-key continuation) */
 
@@ -1901,18 +1798,12 @@ struct strentry	*vep ;
 	it[hi][1] = chash ;
 	it[hi][2] = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: ret hi=%u c=%u\n",hi,c) ;
-#endif
-
 	return c ;
 }
 /* end subroutine (indinsert) */
 
-
-static int hashindex(uint i,int n)
-{
-	int	hi = MODP2(i,n) ;
+static int hashindex(uint i,int n) noex {
+	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
 }

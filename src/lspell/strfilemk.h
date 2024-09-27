@@ -11,9 +11,14 @@
 #define	STRFILEMK_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* system types */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 #include	"strfilemks.h"
 
@@ -24,9 +29,9 @@
 
 
 struct strfilemk_calls {
-	int	(*open)(void *,const char *,int,mode_t,int) ;
+	int	(*open)(void *,cchar *,int,mode_t,int) ;
 	int	(*chgrp)(void *,gid_t) ;
-	int	(*addfile)(void *,const char *,int) ;
+	int	(*addfile)(void *,cchar *,int) ;
 	int	(*abort)(void *) ;
 	int	(*close)(void *) ;
 } ;
@@ -40,19 +45,18 @@ struct strfilemk_head {
 	int		objsize ;	/* object size */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	STRFILEMK	strfilemk ;
+typedef	STRFILEMK_CALLS	strfilemk_ca ;
 
-extern int	strfilemk_open(STRFILEMK *,const char *,int,mode_t,int) ;
-extern int	strfilemk_chgrp(STRFILEMK *,gid_t) ;
-extern int	strfilemk_addfile(STRFILEMK *,const char *,int) ;
-extern int	strfilemk_abort(STRFILEMK *) ;
-extern int	strfilemk_close(STRFILEMK *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int	strfilemk_open(STRFILEMK *,cchar *,int,mode_t,int) noex ;
+extern int	strfilemk_chgrp(STRFILEMK *,gid_t) noex ;
+extern int	strfilemk_addfile(STRFILEMK *,cchar *,int) noex ;
+extern int	strfilemk_abort(STRFILEMK *) noex ;
+extern int	strfilemk_close(STRFILEMK *) noex ;
+
+EXTERNC_end
 
 
 #endif /* STRFILEMK_INCLUDE */
