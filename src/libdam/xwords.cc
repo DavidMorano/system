@@ -85,39 +85,33 @@ int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && wbuf) {
-	int		si ;
-	int		el ;
-	memclear(op) ; /* dangerous ! */
-/* always enter the whole word */
-
-	op->words[i].wp = wbuf ;
-	op->words[i].wl = wlen ;
-	i += 1 ;
-
-/* try for possessives */
-
-	if (wlen > 2) {
-	    bool	f = false ;
-	    el = wlen - 2 ;
-	    if (strncmp((wbuf + el),"'s",2) == 0) {
-	        f = true ;
-	    } else if (strncmp((wbuf + el),"s'",2) == 0) {
-	        f = true ;
-	        el += 1 ;
+	    rs = memclear(op) ; /* dangerous ! */
+            /* always enter the whole word */
+	    op->words[i].wp = wbuf ;
+	    op->words[i].wl = wlen ;
+	    i += 1 ;
+            /* try for possessives */
+	    if (wlen > 2) {
+	        int	el = (wlen - 2) ;
+	        bool	f = false ;
+	        if (strncmp((wbuf + el),"'s",2) == 0) {
+	            f = true ;
+	        } else if (strncmp((wbuf + el),"s'",2) == 0) {
+	            f = true ;
+	            el += 1 ;
+	        }
+	        if (f) {
+	            op->words[i].wp = wbuf ;
+	            op->words[i].wl = el ;
+	            i += 1 ;
+	        }
+	    } /* end if (long enough for extra words) */
+	    op->nwords = i ;
+	    if (int si ; (si = sichr(wbuf,wlen,'-')) >= 0) {
+	        rs = xwords_more(op,wbuf,wlen,si) ;
+	        i = rs ;
+	        op->nwords = rs ;
 	    }
-	    if (f) {
-	        op->words[i].wp = wbuf ;
-	        op->words[i].wl = el ;
-	        i += 1 ;
-	    }
-	} /* end if (long enough for extra words) */
-	op->nwords = i ;
-	if ((si = sichr(wbuf,wlen,'-')) >= 0) {
-	    rs = xwords_more(op,wbuf,wlen,si) ;
-	    i = rs ;
-	    op->nwords = rs ;
-	}
-
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -168,7 +162,6 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
 	if ((rs = vecobj_start(&wil,esize,2,0)) >= 0) {
 	    XWORDS_WI	wi ;
 	    wi.wp = wbuf ;
@@ -192,7 +185,8 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	    	    rs = vecobj_add(&wil,&wi) ;
 		}
 		if (rs >= 0) {
-		    int		i, j ;
+		    int		i ;
+		    int		j ;
 		    void	*vp ;
 		    n = op->nwords + vecobj_count(&wil) ;
 		    if (n > XWORDS_MAX) {
@@ -218,13 +212,12 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 			    op->words[j].wl = ep->wl ;
 			    j += 1 ;
 			} /* end for */
-		    }
+		    } /* end if */
 		} /* end if (ok) */
 	    } /* end if (add first word) */
 	    rs1 = vecobj_finish(&wil) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (xwords_more) */
