@@ -357,7 +357,7 @@ int keyvals_curenumkey(keyvals *op,CUR *curp,cchar **kpp) noex {
 	    cchar	*kp = nullptr ;
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->keyp,oi,&vp)) >= 0) {
-	        KEY	*kep = (KEY *) vp ;
+	        KEY	*kep = keyp(vp) ;
 	        if (kep) break ;
 	        oi += 1 ;
 	    } /* end while */
@@ -422,7 +422,7 @@ int keyvals_fetch(keyvals *op,cchar *kp,CUR *curp,cchar **vpp) noex {
 	        key.buf = kp ;
 	        key.len = kl ;
 	        if ((rs = hdb_fetch(op->bykeyp,key,curp->ecp,&val)) >= 0) {
-	            ENT		*ep = (ENT *) val.buf ;
+	            ENT		*ep = entp(val.buf) ;
 	            valp = ep->vname ;
 	            vl = ep->vlen ;
 	        } /* end if (had an entry) */
@@ -499,9 +499,9 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	    if (rs >= 0) {
 	        hdb	*bykeyvalp = op->bykeyvalp ;
 	        if ((rs = hdb_curbegin(bykeyvalp,&cur)) >= 0) {
-	            KEYVALS_ENT	*ep ;
+	            KEYVALS_ENT		*ep ;
 	            while ((rs1 = hdb_enum(bykeyvalp,&cur,&key,&val)) >= 0) {
-	                ep = (ENT *) val.buf ;
+	                ep = entp(val.buf) ;
 	                if ((rs = entry_matkey(ep,kp,kl)) >= 0) {
 	                    hdb_delcur(bykeyvalp,&cur,0) ;
 		            entry_finish(ep) ;
@@ -533,7 +533,7 @@ static int keyvals_keyadd(keyvals *op,KEY *kep,KEY **rpp) noex {
 	    void	*vp{} ;
 	    ki = rs ;
 	    if ((rs = vecobj_get(op->keyp,ki,&vp)) >= 0) {
-		*rpp = (KEY *) vp ;
+		*rpp = keyp(vp) ;
 	    }
 	}
 	return (rs >= 0) ? ki : rs ;
@@ -546,7 +546,7 @@ static int keyvals_keyfins(keyvals *op) noex {
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(op->keyp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
-		KEY	*kep = (KEY *) vp ;
+		KEY	*kep = keyp(vp) ;
 	        rs1 = key_finish(kep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -601,6 +601,7 @@ static int keyvals_already(keyvals *op,ENT *nep) noex {
 static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	KEYVALS_ENT	*ep ;
 	int		rs ;
+	int		rs1 ;
 	int		sz = sizeof(KEYVALS_ENT) ;
 	if ((rs = uc_malloc(sz,&ep)) >= 0) {
 	    KEYVALS_KEY	*kep ;
@@ -622,12 +623,11 @@ static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	        rs = hdb_store(op->bykeyvalp,key,val) ;
 		if (rs < 0) {
 	    	    hdb_cur	cur ;
-	    	    int		rs1 ;
 	    	    hdb_curbegin(op->bykeyp,&cur) ;
 	    	    {
-	        	    rs1 = hdb_fetch(op->bykeyp,key,&cur,&val) ;
-	        	    if (rs1 >= 0)
+	        	if ((rs1 = hdb_fetch(op->bykeyp,key,&cur,&val)) >= 0) {
 	            	    hdb_delcur(op->bykeyp,&cur,0) ;
+			}
 	    	    }
 	    	    hdb_curend(op->bykeyp,&cur) ;
 		} /* end if (error) */
@@ -651,7 +651,7 @@ static int keyvals_entfins(keyvals *op) noex {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    while ((rs2 = hdb_enum(elp,&cur,&key,&val)) >= 0) {
-	        ENT	*ep = (ENT *) val.buf ;
+	        ENT	*ep = entp(val.buf) ;
 		{
 	            rs1 = entry_finish(ep) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -839,7 +839,7 @@ static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 		    }
 		}
 	    }
-	}
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (vcmpkey) */
@@ -847,7 +847,9 @@ static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 static int cmpente(const ENT *e1p,const ENT *e2p,int) noex {
 	int		rc = (e1p->fi - e2p->fi) ;
 	if (rc == 0) {
-	    if ((rc = strcmp(e1p->kep->kp,e2p->kep->kp)) == 0) {
+	    const KEY	*k1p = e1p->kep ;
+	    const KEY	*k2p = e2p->kep ;
+	    if ((rc = strcmp(k1p->kp,k2p->kp)) == 0) {
 	        rc = strcmp(e1p->vname,e2p->vname) ;
 	    }
 	}

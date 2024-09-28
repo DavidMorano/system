@@ -48,6 +48,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -67,6 +68,7 @@
 #include	<keysym.h>
 #include	<toxc.h>
 #include	<ansigr.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -152,8 +154,7 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
+extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	msleep(int) ;
@@ -2301,14 +2302,14 @@ static int inter_checksusp(INTER *iap)
 	        char	tbuf[19+1] ;
 	        termconseq(tbuf,19,'m',ANSIGR_BOLD,ANSIGR_BLINK,-1,-1) ;
 	        sbuf_strw(&b,tbuf,-1) ;
-	        sbuf_char(&b,CH_SS3) ;
-	        sbuf_char(&b,0x40) ;
+	        sbuf_chr(&b,CH_SS3) ;
+	        sbuf_chr(&b,0x40) ;
 	        termconseq(tbuf,19,'m',ANSIGR_OFFALL,-1,-1,-1) ;
 	        sbuf_strw(&b,tbuf,-1) ;
-	        sbuf_char(&b,' ') ;
+	        sbuf_chr(&b,' ') ;
 	    } /* end if (graphics terminal) */
 	    sbuf_strw(&b,msg,-1) ;
-	    sbuf_char(&b,'\v') ;
+	    sbuf_chr(&b,'\v') ;
 	    rs1 = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dl = rs1 ;
@@ -2813,7 +2814,7 @@ int inter_charin(INTER *iap,const char *fmt,...)
 	{
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
-	    rs = vbufprintf(lbuf,LINEBUFLEN,fmt,ap) ;
+	    rs = bufvprintf(lbuf,LINEBUFLEN,fmt,ap) ;
 	    len += rs ;
 	    va_end(ap) ;
 	}
@@ -5464,7 +5465,7 @@ static int inter_suspend(INTER *iap)
 
 	uc_sigsetempty(&nsm) ;
 	if ((rs = uc_sigsetadd(&nsm,sig)) >= 0) {
-	    if ((rs = pt_sigmask(SIG_UNBLOCK,&nsm,&osm)) >= 0) {
+	    if ((rs = u_sigmask(SIG_UNBLOCK,&nsm,&osm)) >= 0) {
 	        struct sigaction	sao, san ;
 
 	        uc_sigsetfill(&nsm) ;
@@ -5489,7 +5490,7 @@ static int inter_suspend(INTER *iap)
 	            u_sigaction(sig,&sao,NULL) ;
 	        } /* end if (sigaction) */
 
-	        pt_sigmask(SIG_SETMASK,&osm,NULL) ;
+	        u_sigmask(SIG_SETMASK,&osm,NULL) ;
 	    } /* end if (sigmask) */
 	} /* end if */
 

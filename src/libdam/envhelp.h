@@ -1,4 +1,5 @@
-/* envhelp */
+/* envhelp HEADER */
+/* lang=C20 */
 
 /* help w/ handling environment */
 /* version %I% last-modified %G% */
@@ -14,13 +15,10 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ENVHELP_INCLUDE
-#define	ENVHELP_INCLUDE	1
+#define	ENVHELP_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<strpack.h>
@@ -30,30 +28,23 @@
 
 
 struct envhelp_head {
-	vechand		env ;
-	strpack		stores ;
+	vechand		*elp ;		/* Environment-List-Pointer */
+	strpack		*spp ;		/* String-Pack-Pointer */
 } ;
 
+typedef ENVHELP		envhelp ;
 
-#if	(! defined(ENVHELP_MASTER)) || (ENVHELP_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int envhelp_start(envhelp *,mainv,mainv) noex ;
+extern int envhelp_present(envhelp *,cchar *,int,cchar **) noex ;
+extern int envhelp_envset(envhelp *,cchar *,cchar *,int) noex ;
+extern int envhelp_sort(envhelp *) noex ;
+extern int envhelp_getvec(envhelp *,mainv *) noex ;
+extern int envhelp_finish(envhelp *) noex ;
 
-extern int envhelp_start(ENVHELP *,cchar **,cchar **) ;
-extern int envhelp_present(ENVHELP *,cchar *,int,cchar **) ;
-extern int envhelp_envset(ENVHELP *,cchar *,cchar *,int) ;
-extern int envhelp_setexecs(ENVHELP *,cchar *,cchar *) ;
-extern int envhelp_sort(ENVHELP *) ;
-extern int envhelp_getvec(ENVHELP *,cchar ***) ;
-extern int envhelp_finish(ENVHELP *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* (! defined(ENVHELP_MASTER)) || (ENVHELP_MASTER == 0) */
 
 #endif /* ENVHELP_INCLUDE */
 

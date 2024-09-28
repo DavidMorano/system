@@ -226,8 +226,8 @@ OBJ112= strmgr.o dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o obuf.o
 OBJ113= hdrdecode.o qpdecoder.o b64decoder.o hexdecoder.o utf8decoder.o
 OBJ114= 
 OBJ115=
-OBJ116= setint.o osetint.o setstr.o osetstr.o mapstrs.o
-OBJ117= msfile.o msfilee.o ebuf.o nodedb.o clusterdb.o kinfo.o
+OBJ116=
+OBJ117= msfile.o msfilee.o ebuf.o nodedb.o clusterdb.o
 OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o ema.o fsi.o
 OBJ119= q.o plainq.o cq.o fifostr.o fifoitem.o charq.o intiq.o
 

@@ -147,7 +147,7 @@
 #define	LISTOBJ_COUNT(op)		osetint_count((op))
 #define	LISTOBJ_MKVEC(op,va)		osetint_mkvec((op),(va))
 #define	LISTOBJ_CURBEGIN(op,cp)		osetint_curbegin((op),(cp))
-#define	LISTOBJ_ENUM(op,cp,rp)		osetint_enum((op),(cp),(rp))
+#define	LISTOBJ_ENUM(op,cp,rp)		osetint_curenum((op),(cp),(rp))
 #define	LISTOBJ_CUREND(op,cp)		osetint_curend((op),(cp))
 #else /* CF_SETINT */
 #define	LISTOBJ				vecint

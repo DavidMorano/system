@@ -197,8 +197,8 @@ static int	ientry_morekeys(SVCFILE_IENT *,int,int) noex ;
 
 static int	entry_load(svcfile_ent *,char *,int,SVCFILE_IENT *) noex ;
 
-static int	cmpfname() noex ;
-static int	cmpsvcname() noex ;
+static int	vcmpfname(cvoid **,cvoid **) noex ;
+static int	vcmpsvcname(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
@@ -354,8 +354,8 @@ int svcfile_fileadd(svcfile *op,cchar *fname) noex {
 	    vecobj		*flp = &op->files ;
 	    if ((rs = file_start(&fe,np)) >= 0) {
 	        cint	nrs = SR_NOTFOUND ;
-	        int		f_fin = false ;
-	        if ((rs = vecobj_search(flp,&fe,cmpfname,nullptr)) == nrs) {
+	        bool	f_fin = false ;
+	        if ((rs = vecobj_search(flp,&fe,vcmpfname,nullptr)) == nrs) {
 	            if ((rs = vecobj_add(flp,&fe)) >= 0) {
 	                fi = rs ;
 	                rs = svcfile_fileparse(op,fi) ;
@@ -951,7 +951,7 @@ static int svcfile_svcadd(svcfile *op,cchar *svc) noex {
 
 	sn.svcname = svc ;
 	sn.count = 1 ;
-	if ((rs = vecobj_search(lp,&sn,cmpsvcname,&snp)) >= 0) {
+	if ((rs = vecobj_search(lp,&sn,vcmpsvcname,&snp)) >= 0) {
 	    rs = svcname_incr(snp) ;
 	} else if (rs == SR_NOTFOUND) {
 	    f_added = true ;
@@ -977,7 +977,7 @@ static int svcfile_svcdel(svcfile *op,cchar *svc) noex {
 
 	sn.svcname = svc ;
 	sn.count = 0 ;
-	if ((rs = vecobj_search(lp,&sn,cmpsvcname,&snp)) >= 0) {
+	if ((rs = vecobj_search(lp,&sn,vcmpsvcname,&snp)) >= 0) {
 	    si = rs ;
 	    rs1 = svcname_decr(snp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1308,55 +1308,47 @@ static int entry_load(svcfile_ent *ep,char *ebuf,int elen,
 }
 /* end subroutine (entry_load) */
 
-static int cmpfname(SVCFILE_FILE **e1pp,SVCFILE_FILE **e2pp) noex {
+static int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
+	SVCFILE_FILE	*e1p = (SVCFILE_FILE *) *v1pp ;
+	SVCFILE_FILE	*e2p = (SVCFILE_FILE *) *v2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp != nullptr) {
-	        if (*e2pp != nullptr) {
-	            rc = strcmp((*e1pp)->fname,(*e2pp)->fname) ;
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
-	}
-	return rc ;
-}
-/* end subroutine (cmpfname) */
-
-static int cmpsvcname(cvoid *v1p, cvoid *v2p) noex {
-	SVCFILE_SVCNAME	**e1pp = (SVCFILE_SVCNAME **) v1p ;
-	SVCFILE_SVCNAME	**e2pp = (SVCFILE_SVCNAME **) v2p ;
-	int		rc = 0 ;
-
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp != nullptr) {
-	        if (*e2pp != nullptr) {
-		    SVCFILE_SVCNAME	*e1p = (SVCFILE_SVCNAME *) *e1pp ;
-		    SVCFILE_SVCNAME	*e2p = (SVCFILE_SVCNAME *) *e2pp ;
-		    int		n1, n2 ;
-
-		    n1 = (e1p->svcname == nullptr) ;
-		    n2 = (e2p->svcname == nullptr) ;
-		    if (n1 || n2) {
-	    	        if (! (n1 && n2)) {
-	        	    rc = (n1) ? 1 : -1 ;
-	    	        }
-		    }
-
-		    if ((rc == 0) && (! n1) && (! n2)) {
-	    	        rc = strcmp(e1p->svcname,e2p->svcname) ;
-	            }
-
-	        } else {
-	            rc = -1 ;
-		}
-	    } else {
-	        rc = 1 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+	            rc = strcmp(e1p->fname,e2p->fname) ;
+	        }
 	    }
 	}
-
 	return rc ;
 }
-/* end subroutine (cmpsvcname) */
+/* end subroutine (vcmpfname) */
+
+static int vcmpsvcname(cvoid **v1pp, cvoid **v2pp) noex {
+	SVCFILE_SVCNAME	*e1pp = (SVCFILE_SVCNAME *) *v1pp ;
+	SVCFILE_SVCNAME	*e2pp = (SVCFILE_SVCNAME *) *v2pp ;
+	int		rc = 0 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+		    bool	f1 = (e1p->svcname == nullptr) ;
+		    bool	f2 = (e2p->svcname == nullptr) ;
+		    if (f1 || f2) {
+	    	        if (! (f1 && f2)) {
+	        	    rc = (f1) ? 1 : -1 ;
+	    	        }
+		    }
+		    if ((rc == 0) && (! f1) && (! f2)) {
+	    	        rc = strcmp(e1p->svcname,e2p->svcname) ;
+	            }
+	        }
+	    }
+	}
+	return rc ;
+}
+/* end subroutine (vcmpsvcname) */
 
 

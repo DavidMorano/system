@@ -268,19 +268,18 @@ static int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
 	                rs1 = fifostr_headlen(op->sqp) ;
 	                wl = rs1 ;
 	                if (rs1 == SR_NOTFOUND) break ;
-/* ignore zero-length words */
+			/* ignore zero-length words */
 	                if (wl == 0) continue ;
-/* calculate needed-length ('nl') for this word */
+			/* calculate needed-length ('nl') for this word */
 	                nl = (c > 0) ? (wl + 1) : wl ;
-/* can this word fit in the current line? */
+			/* can this word fit in the current line? */
 	                if (nl > ll) break ;
-/* yes: so remove the word from the FIFO to the line */
+			/* yes: so remove the word from the FIFO to the line */
 	                if (c++ > 0) {
 	                    *lp++ = ' ' ;
 	                    ll -= 1 ;
 	                }
-	                rs = fifostr_remove(op->sqp,lp,ll) ;
-		        if (rs >= 0) {
+	                if ((rs = fifostr_remove(op->sqp,lp,ll)) >= 0) {
 		            op->wc -= 1 ;
 		            op->chrc -= wl ;
 		        }

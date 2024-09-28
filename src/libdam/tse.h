@@ -19,8 +19,8 @@
 #include	<usysrets.h>
 
 
-#define	TSE_ALL		struct tse_all
-#define	TSE_UPDATE	struct tse_update
+#define	TSE_ALL		struct tse_aller
+#define	TSE_UPDATE	struct tse_updater
 /* entry field lengths */
 #define	TSE_LCOUNT		4
 #define	TSE_LUTIME		4	/* entry update */
@@ -39,7 +39,7 @@
 #define	TSE_SIZE		(TSE_OKEYNAME + TSE_LKEYNAME)
 
 
-struct tse_all {
+struct tse_aller {
 	uint		count ;		/* count */
 	uint		utime ;		/* update time-stamp */
 	uint		ctime ;		/* creation time-stamp */
@@ -47,15 +47,18 @@ struct tse_all {
 	char		keyname[TSE_LKEYNAME+ 1] ;
 } ;
 
-struct tse_update {
+struct tse_updater {
 	uint		count ;
 	uint		utime ;
 } ;
 
+typedef	TSE_ALL		tse_all ;
+typedef	TSE_UPDATE	tse_update ;
+
 EXTERNC_begin
 
-extern int tse_all(struct tse_all *,int,char *,int) ;
-extern int tse_update(struct tse_update *,int,char *,int) ;
+extern int tse_all(tse_all *,int,char *,int) noex ;
+extern int tse_update(tse_update *,int,char *,int) noex ;
 
 EXTERNC_end
 
