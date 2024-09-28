@@ -269,13 +269,16 @@ static int lookword_record(LW *op,LW_CUR *curp,
 	if ((rs = vecobj_start(&ans,esize,1,0)) >= 0) {
 	    LOOKWORD_WORD	w ;
 	    int			m ;
-	    int			f_mat = true ;
+	    bool		f_mat = true ;
 	    cchar		*tp ;
-	    while ((rs >= 0) && (front < back) && 
-	        (compare(op,front,back,wstr,np) == 0)) {
-
+	    auto cmp = [&] () noex -> bool {
+		bool	f = true ;
+		f = f && (front < back) ;
+		f = f && (compare(op,front,back,wstr,np) == 0) ;
+		return f ;
+	    } ;
+	    while ((rs >= 0) && cmp()) {
 	        if ((tp = strchr(front,'\n')) != np) {
-
 	            if (op->f.word) {
 	                f_mat = (compare(op,front,tp,wstr,&m) == 0) ;
 	                f_mat = f_mat && 
