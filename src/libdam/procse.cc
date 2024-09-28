@@ -46,7 +46,7 @@
 
 /* local defines */
 
-#define	BUF_MULT	10		/* multiplier for buffer length */
+#define	BUFMULT	10		/* multiplier for buffer length */
 
 
 /* external subroutines */
@@ -283,7 +283,7 @@ static int mkvars() noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
-	    var.ebuflen = (rs * BUF_MULT) ;
+	    var.ebuflen = (rs * BUFMULT) ;
 	}
 	return rs ;
 }

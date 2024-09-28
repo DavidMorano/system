@@ -814,28 +814,30 @@ static unsigned int hashent(cvoid *vp,int len) noex {
 }
 /* end subroutine (hashent) */
 
-static int cmpkeye(const KEY *e1p,const KEY *e2p) noex {
-	int		rc = 0 ;
-	if ((rc = (e1p->kp[0] - e2p->kp[0])) == 0) {
-	    rc = strcmp(e1p->kp,e2p->kp) ;
+static int cmpkeye(const KEY *k1p,const KEY *k2p) noex {
+	int		rc ;
+	cchar		*c1p = k1p->kp ;
+	cchar		*c2p = k2p->kp ;
+	if ((rc = (c1p[0] - c2p[0])) == 0) {
+	    rc = strcmp(c1p,c2p) ;
 	}
 	return rc ;
 }
 /* end subroutine (cmpkeye) */
 
 static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
-	const KEY	**e1pp = (const KEY **) v1pp ;
-	const KEY	**e2pp = (const KEY **) v2pp ;
+	const KEY	**k1pp = (const KEY **) v1pp ;
+	const KEY	**k2pp = (const KEY **) v2pp ;
 	int		rc = 0 ;
 	{
-	    const KEY	*e1p = *e1pp ;
-	    const KEY	*e2p = *e2pp ;
-	    if (e1p || e2p) {
+	    const KEY	*k1p = *k1pp ;
+	    const KEY	*k2p = *k2pp ;
+	    if (k1p || k2p) {
 		rc = +1 ;
-		if (e1p) {
+		if (k1p) {
 		    rc = -1 ;
-		    if (e2p) {
-	    	        rc = cmpkeye(e1p,e2p) ;
+		    if (k2p) {
+	    	        rc = cmpkeye(k1p,k2p) ;
 		    }
 		}
 	    }
