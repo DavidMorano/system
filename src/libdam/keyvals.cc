@@ -176,7 +176,7 @@ typedef int		(*hdbcmp_f)(cvoid *,cvoid *,int) noex ;
 
 extern "C" {
     static uint	hashent(cvoid *,int) noex ;
-    static int	vcmpent(cvoid *,cvoid *,int) noex ;
+    static int	cmpent(cvoid *,cvoid *,int) noex ;
 }
 
 static uint	hashente(const ENT *,int) noex ;
@@ -185,7 +185,7 @@ extern "C" {
     static int	vcmpkey(cvoid **,cvoid **) noex ;
 }
 
-static int	vcmpente(const ENT *,const ENT *,int) noex ;
+static int	cmpente(const ENT *,const ENT *,int) noex ;
 
 
 /* local variables */
@@ -207,7 +207,7 @@ int keyvals_start(keyvals *op,int ndef) noex {
 	    if ((rs = vecobj_start(op->keyp,sz,vn,vo)) >= 0) {
 	        if ((rs = hdb_start(op->bykeyp,ndef,0,np,np)) >= 0) {
 	            auto	hk = hashent ;
-	            auto	vcmp = vcmpent ;
+	            auto	vcmp = cmpent ;
 	            if ((rs = hdb_start(op->bykeyvalp,ndef,0,hk,vcmp)) >= 0) {
 	                op->magic = KEYVALS_MAGIC ;
 	            }
@@ -342,7 +342,7 @@ int keyvals_curend(keyvals *op,keyvals_cur *curp) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		curp->ecp = nullptr ;
-	    } /* end if (non-null) */
+	    } /* end if (cursor-valid) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -401,7 +401,7 @@ int keyvals_curenum(keyvals *op,CUR *curp,cchar **kpp,cchar **vpp) noex {
 	        if (vpp) {
 	            *vpp = valp ;
 	        }
-	        } /* end if (valid) */
+	    } /* end if (cursor-valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
 }
@@ -475,51 +475,50 @@ int keyvals_delset(keyvals *op,int fi) noex {
 /* end subroutine (keyvals_delset) */
 
 int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
-	hdb_cur		cur ;
-	hdb_dat		key ;
-	hdb_dat		val ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	int		ki = 0 ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-
-	if (op->magic != KEYVALS_MAGIC) return SR_NOTOPEN ;
-
-/* delete all keyvals w/ this key */
-
-	if ((rs = hdb_curbegin(op->bykeyp,&cur)) >= 0) {
-	    key.buf = kp ;
-	    key.len = strlen(kp) ;
-	    while (hdb_fetch(op->bykeyp,key,&cur,&val) >= 0) {
-		c += 1 ;
-	        hdb_delcur(op->bykeyp,&cur,0) ;
-	    } /* end while */
-	    hdb_curend(op->bykeyp,&cur) ;
-	} /* end if (cursor) */
-
-	if (rs >= 0) {
-	    if ((rs = hdb_curbegin(op->bykeyvalp,&cur)) >= 0) {
-	        KEYVALS_ENT	*ep ;
-	        while (hdb_enum(op->bykeyvalp,&cur,&key,&val) >= 0) {
-	            ep = (ENT *) val.buf ;
-	            if (entry_matkey(ep,kp,kl) >= 0) {
-	                hdb_delcur(op->bykeyvalp,&cur,0) ;
-		        entry_finish(ep) ;
-		        uc_free(ep) ;
-	            } /* end if (key-match) */
-	        } /* end while (looping through entries) */
-	        hdb_curend(op->bykeyvalp,&cur) ;
+	if ((rs = keyvals_magic(op,kp)) >= 0) {
+	    hdb		*bykeyp = op->bykeyp ;
+	    hdb_cur	cur ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
+	    int		ki = 0 ;
+	    /* delete all keyvals w/ this key */
+	    if ((rs = hdb_curbegin(bykeyp,&cur)) >= 0) {
+	        key.buf = kp ;
+	        key.len = strlen(kp) ;
+	        while ((rs1 = hdb_fetch(bykeyp,key,&cur,&val)) >= 0) {
+		    c += 1 ;
+	            hdb_delcur(bykeyp,&cur,0) ;
+	        } /* end while */
+		if (rs1 != rsn) rs = rs1 ;
+	        hdb_curend(bykeyp,&cur) ;
 	    } /* end if (cursor) */
-	} /* end if */
-
-/* delete the key from the key-store */
-
-	if ((rs >= 0) && (ki >= 0)) {
-	    rs = vecobj_del(op->keyp,ki) ;
-	}
-
+	    if (rs >= 0) {
+	        hdb	*bykeyvalp = op->bykeyvalp ;
+	        if ((rs = hdb_curbegin(bykeyvalp,&cur)) >= 0) {
+	            KEYVALS_ENT	*ep ;
+	            while ((rs1 = hdb_enum(bykeyvalp,&cur,&key,&val)) >= 0) {
+	                ep = (ENT *) val.buf ;
+	                if ((rs = entry_matkey(ep,kp,kl)) >= 0) {
+	                    hdb_delcur(bykeyvalp,&cur,0) ;
+		            entry_finish(ep) ;
+		            uc_free(ep) ;
+			} else if (rs == rsn) {
+			    rs = SR_OK ;
+	                } /* end if (key-match) */
+	            } /* end while (looping through entries) */
+		    if (rs1 != rsn) rs = rs1 ;
+	            hdb_curend(bykeyvalp,&cur) ;
+	        } /* end if (cursor) */
+	    } /* end if (ok) */
+	    /* delete the key from the key-store */
+	    if ((rs >= 0) && (ki >= 0)) {
+	        rs = vecobj_del(op->keyp,ki) ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (keyvals_delkey) */
@@ -583,9 +582,7 @@ static int keyvals_keyget(keyvals *op,cchar *keybuf,KEY **kpp) noex {
 /* end subroutine (keyvals_keyget) */
 
 static int keyvals_keydel(keyvals *op,int ki) noex {
-	int		rs ;
-	rs = vecobj_del(op->keyp,ki) ;
-	return rs ;
+	return vecobj_del(op->keyp,ki) ;
 }
 /* end subroutine (keyvals_keydel) */
 
@@ -607,13 +604,18 @@ static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	int		sz = sizeof(KEYVALS_ENT) ;
 	if ((rs = uc_malloc(sz,&ep)) >= 0) {
 	    KEYVALS_KEY	*kep ;
-	    hdb_dat	key, val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    *ep = *nep ; /* copy */
 	    kep = ep->kep ;
-		key.buf = kep->kp ;
-		key.len = kep->kl ;
-	    val.buf = ep ;
-	    val.len = sizeof(KEYVALS_ENT) ;
+	    {
+	        key.buf = kep->kp ;
+	        key.len = kep->kl ;
+	    }
+	    {
+	        val.buf = ep ;
+	        val.len = sizeof(KEYVALS_ENT) ;
+	    }
 	    if ((rs = hdb_store(op->bykeyp,key,val)) >= 0) {
 		key.buf = ep ;
 		key.len = sizeof(KEYVALS_ENT) ;
@@ -628,8 +630,8 @@ static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	            	    hdb_delcur(op->bykeyp,&cur,0) ;
 	    	    }
 	    	    hdb_curend(op->bykeyp,&cur) ;
-		}
-	    }
+		} /* end if (error) */
+	    } /* end if (hdb_store) */
 	    if (rs < 0) {
 		uc_free(ep) ;
 	    }
@@ -641,12 +643,14 @@ static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 static int keyvals_entfins(keyvals *op) noex {
 	hdb		*elp = op->bykeyvalp ;
 	hdb_cur		cur ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
+	int		rs2 ;
 	if ((rs = hdb_curbegin(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    while (hdb_enum(elp,&cur,&key,&val) >= 0) {
+	    while ((rs2 = hdb_enum(elp,&cur,&key,&val)) >= 0) {
 	        ENT	*ep = (ENT *) val.buf ;
 		{
 	            rs1 = entry_finish(ep) ;
@@ -657,6 +661,7 @@ static int keyvals_entfins(keyvals *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end while */
+	    if (rs2 != rsn) rs = rs2 ;
 	    rs1 = hdb_curend(elp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
@@ -665,44 +670,50 @@ static int keyvals_entfins(keyvals *op) noex {
 /* end subroutine (keyvals_entfins) */
 
 static int key_start(KEY *kep,cchar *kname) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		kl = 0 ;
-	memclear(kep) ;
-	if (kname) {
-	    cchar	*kp ;
-	    kl = strlen(kname) ;
-	    if ((rs = uc_mallocstrw(kname,kl,&kp)) >= 0) {
-		kep->kp = kp ;
-	        kep->kl = kl ;
+	if (kep && kname) {
+	    rs = memclear(kep) ;
+	    if (kname) {
+	        kl = strlen(kname) ;
+	        if (cchar *kp{} ; (rs = uc_mallocstrw(kname,kl,&kp)) >= 0) {
+		    kep->kp = kp ;
+	            kep->kl = kl ;
+	        }
 	    }
-	}
+	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (key_start) */
 
 static int key_increment(KEY *kep) noex {
-	if (kep == nullptr) return SR_FAULT ;
-
-	kep->count += 1 ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (kep) {
+	    rs = SR_OK ;
+	    kep->count += 1 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (key_increment) */
 
 static int key_decrement(KEY *kep) noex {
-	if (kep == nullptr) return SR_FAULT ;
-
-	if (kep->count > 0)
-	    kep->count -= 1 ;
-
+	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (kep) {
+	    rs = SR_OK ;
+	    if (kep->count > 0) {
+	        kep->count -= 1 ;
+	    }
 #ifdef	COMMENT
-	if ((kep->count == 0) && (kep->kp != nullptr)) {
-	    uc_free(kep->kp) ;
-	    kep->kp = nullptr ;
-	    kep->kl = 0 ;
-	}
+	    if ((kep->count == 0) && (kep->kp != nullptr)) {
+	        uc_free(kep->kp) ;
+	        kep->kp = nullptr ;
+	        kep->kl = 0 ;
+	    }
 #endif /* COMMENT */
-
-	return kep->count ;
+	    c = kep->count ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (key_decrement) */
 
@@ -735,53 +746,53 @@ static int key_mat(KEY *kep,cchar *kp,int kl) noex {
 /* end subroutine (key_mat) */
 
 static int entry_start(ENT *ep,int fi,int ki,KEY *kep,cc *vp,int vl) noex {
-	cint		kl = kep->kl ;
-	int		rs ;
-	cchar		*cp ;
-
-	memclear(ep) ;
-	ep->fi = fi ;
-	ep->ki = ki ;
-	ep->kep = kep ;
-	ep->vlen = vl ;
-
-	if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
-	    ep->vname = cp ;
-	    key_increment(kep) ;
-	}
-
+	int		rs = SR_FAULT ;
+	int		kl = 0 ;
+	if (ep && kep && vp) {
+	    memclear(ep) ;
+	    kl = kep->kl ;
+	    ep->fi = fi ;
+	    ep->ki = ki ;
+	    ep->kep = kep ;
+	    ep->vlen = vl ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
+	        ep->vname = cp ;
+	        key_increment(kep) ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (entry_start) */
 
 static int entry_finish(ENT *ep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		nkeys ;
 	int		rc = 0 ;
-
-	if (ep->vname == nullptr) return SR_OK ;
-
-	if (ep->kep == nullptr) return SR_NOANODE ;
-
-	nkeys = key_decrement(ep->kep) ;
-
-	if (ep->vname != nullptr) {
-	    rs1 = uc_free(ep->vname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    ep->vname = nullptr ;
-	}
-
-	rc = (nkeys == 0) ? ep->ki : INT_MAX ;
+	if (ep) {
+	    rs = SR_BUGCHECK ;
+	    if (ep->vname && ep->kep) {
+		cint	nkeys = key_decrement(ep->kep) ;
+		rs = SR_OK ;
+	        if (ep->vname) {
+	            rs1 = uc_free(ep->vname) ;
+	            if (rs >= 0) rs = rs1 ;
+	            ep->vname = nullptr ;
+	        }
+		rc = (nkeys == 0) ? ep->ki : INT_MAX ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (entry_finish) */
 
 static int entry_matkey(ENT *ep,cchar *kp,int kl) noex {
 	int		rs ;
-	int		ki ;
-	rs = key_mat(ep->kep,kp,kl) ;
-	ki = (rs > 0) ? ep->ki : SR_NOTFOUND ;
+	int		ki = 0 ;
+	if ((rs = key_mat(ep->kep,kp,kl)) > 0) {
+	    ki = ep->ki ;
+	} else {
+	    rs = SR_NOTFOUND ;
+	}
 	return (rs >= 0) ? ki : rs ;
 }
 /* end subroutine (entry_matkey) */
@@ -803,14 +814,14 @@ static unsigned int hashent(cvoid *vp,int len) noex {
 }
 /* end subroutine (hashent) */
 
-static int vcmpkeye(const KEY *e1p,const KEY *e2p) noex {
+static int cmpkeye(const KEY *e1p,const KEY *e2p) noex {
 	int		rc = 0 ;
 	if ((rc = (e1p->kp[0] - e2p->kp[0])) == 0) {
 	    rc = strcmp(e1p->kp,e2p->kp) ;
 	}
 	return rc ;
 }
-/* end subroutine (vcmpkeye) */
+/* end subroutine (cmpkeye) */
 
 static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 	const KEY	**e1pp = (const KEY **) v1pp ;
@@ -824,7 +835,7 @@ static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 		if (e1p) {
 		    rc = -1 ;
 		    if (e2p) {
-	    	        rc = vcmpkeye(e1p,e2p) ;
+	    	        rc = cmpkeye(e1p,e2p) ;
 		    }
 		}
 	    }
@@ -833,7 +844,7 @@ static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmpkey) */
 
-static int vcmpente(const ENT *e1p,const ENT *e2p,int) noex {
+static int cmpente(const ENT *e1p,const ENT *e2p,int) noex {
 	int		rc = (e1p->fi - e2p->fi) ;
 	if (rc == 0) {
 	    if ((rc = strcmp(e1p->kep->kp,e2p->kep->kp)) == 0) {
@@ -842,13 +853,13 @@ static int vcmpente(const ENT *e1p,const ENT *e2p,int) noex {
 	}
 	return rc ;
 }
-/* end subroutine (vcmpente) */
+/* end subroutine (cmpente) */
 
-static int vcmpent(cvoid *v1p,cvoid *v2p,int len) noex {
+static int cmpent(cvoid *v1p,cvoid *v2p,int len) noex {
 	const ENT	*e1p = entp(v1p) ;
 	const ENT	*e2p = entp(v2p) ;
-	return vcmpente(e1p,e2p,len) ;
+	return cmpente(e1p,e2p,len) ;
 }
-/* end subroutine (vcmpent) */
+/* end subroutine (cmpent) */
 
 

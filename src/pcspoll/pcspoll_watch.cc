@@ -24,7 +24,6 @@
 #define	CF_JOBDNAME	1		/* use "jobdname" */
 #define	CF_PROCFINDPROG	0		/* use |procfindprog()| */
 
-
 /* revision history:
 
 	= 1999-09-01, David A­D­ Morano
@@ -56,14 +55,14 @@
 #include	<sys/wait.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<limits.h>
-#include	<utime.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cerrno>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-#include	<time.h>
-#include	<errno.h>
 #include	<usystem.h>
 #include	<mktmp.h>
 #include	<bfile.h>
@@ -1520,12 +1519,6 @@ SVCENTRY_ARGS	*pap ;
 /* initialize this SVCENTRY object */
 
 	rs = svcentry_start(pep,pcp->ssp,sep,pap) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("procservice: svcentry_start() rs=%d\n",rs) ;
-#endif
-
 	if (rs < 0)
 	    goto bad1 ;
 
@@ -1687,11 +1680,6 @@ SVCENTRY_ARGS	*pap ;
 	            timestr_logz(pip->daytime,timebuf),
 	            pep->name) ;
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(2))
-	        debugprintf("procservice: svcentry_expand()\n") ;
-#endif
-
 	    if (rs >= 0)
 	        rs = svcentry_expand(pep,sep,pap) ;
 
@@ -1777,15 +1765,10 @@ bad0:
 }
 /* end subroutine (procservice) */
 
-
 /* is a named job active in the system already? */
-static int procjobactive(pip,name,pepp)
-struct proginfo	*pip ;
-cchar	name[] ;
-SVCENTRY	**pepp ;
-{
+static int procjobactive(proginfo *pip,cchar *name,svcentry **pepp) noex {
 	struct subinfo	*pcp = pip->sip ;
-	CQ_CUR		cur ;
+	cq_cur		cur ;
 	SVCENTRY	*pep ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -2196,13 +2179,10 @@ struct proginfo	*pip ;
 }
 /* end subroutine (procfreeall) */
 
-
-static int proclogjobs(pip)
-struct proginfo	*pip ;
-{
+static int proclogjobs(progifo *pip) noex {
 	struct subinfo	*sip = pip->sip ;
 	SVCENTRY	*pep ;
-	CQ_CUR		cur ;
+	cq_cur		cur ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		to ;

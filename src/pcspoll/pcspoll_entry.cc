@@ -1,11 +1,11 @@
-/* progentry */
+/* progentry SUPPORT */
+/* lang=C++20 */
 
 /* build up a program entry piece-meal as it were */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGS2	0		/* more */
-
 
 /* revision history:
 
@@ -29,10 +29,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<varsub.h>
