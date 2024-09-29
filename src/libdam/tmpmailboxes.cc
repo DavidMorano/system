@@ -177,8 +177,7 @@ static int chownpcs(cchar *dname) noex {
 	if ((rs = malloc_hn(&dbuf)) >= 0) {
 	    cint	dlen = rs ;
 	    if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
-	        char	*prbuf{} ;
-		if ((rs = malloc_mp(&prbuf)) >= 0) {
+		if (char *prbuf{} ; (rs = malloc_mp(&prbuf)) >= 0) {
 	             cint	prlen = rs ;
 	    	     cchar	*prname = PRNAME ;
 	             if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
