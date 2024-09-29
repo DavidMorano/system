@@ -37,7 +37,7 @@ typedef	READCMDKEY	readcmdkey ;
 
 EXTERNC_begin
 
-extern int	readcmdkey(readcmdkey *,UTERM *,int,int) noex ;
+extern int	readcmdkey(readcmdkey *,utern *,int,int) noex ;
 
 EXTERNC_end
 

@@ -73,11 +73,11 @@ namespace {
 	int	llen ;
 	int	alen ;
 	sub_loadfile(varsub *p,char *lb,int ll,char *ab,int al) noex {
-		op = p ;
-		lbuf = lb ;
-		abuf = ab ;
-		llen = ll ;
-		alen = al ;
+	    op = p ;
+	    lbuf = lb ;
+	    abuf = ab ;
+	    llen = ll ;
+	    alen = al ;
 	} ;
 	int operator () (cchar *) noex ;
     } ; /* end struct (sub_loadfile) */
@@ -93,9 +93,7 @@ static bool	hasexport(cchar *,int) noex ;
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
-static char		fterms[termsize] ;
+static char		fterms[fieldterms_termsize] ;
 
 
 /* exported variables */
@@ -150,9 +148,8 @@ int sub_loadfile::operator () (cchar *fn) noex {
 	            cchar	*cp = lbuf ;
 	            int		cl = len ;
 	            if ((rs = fsb.start(cp,cl)) >= 0) {
-	    		int	kl ;
-	    		cchar	*kp ;
-	                if ((kl = fsb.get(fterms,&kp)) > 0) {
+	    		cchar	*kp{} ;
+	                if (int kl ; (kl = fsb.get(fterms,&kp)) > 0) {
 		            int		al = alen ;
 	                    char	*bp = abuf ;
 	                    if ((kl == 6) && hasexport(kp,kl)) {

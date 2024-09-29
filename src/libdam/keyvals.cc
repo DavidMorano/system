@@ -311,9 +311,8 @@ int keyvals_curbegin(keyvals *op,keyvals_cur *curp) noex {
 	int		rs ;
 	if ((rs = keyvals_magic(op,curp)) >= 0) {
 	    cint	osz = sizeof(hdb_cur) ;
-	    void	*vp{} ;
 	    curp->i = -1 ;
-	    if ((rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
 		curp->ecp = (hdb_cur *) vp ;
 	        rs = hdb_curbegin(op->bykeyp,curp->ecp) ;
 		if (rs < 0) {
@@ -446,7 +445,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	    ENT		*ep ;
 	    if ((rs = hdb_curbegin(op->bykeyp,&cur)) >= 0) {
 	        while (hdb_enum(op->bykeyp,&cur,&key,&val) >= 0) {
-	            ep = (ENT *) val.buf ;
+	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
 		        c += 1 ;
 	                hdb_delcur(op->bykeyp,&cur,0) ;
@@ -458,7 +457,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	    if (rs >= 0) {
 	        if ((rs = hdb_curbegin(op->bykeyvalp,&cur)) >= 0) {
 	            while (hdb_enum(op->bykeyvalp,&cur,&key,&val) >= 0) {
-	                ep = (ENT *) val.buf ;
+	                ep = entp(val.buf) ;
 	                if ((ep->fi == fi) || (fi < 0)) {
 	                    hdb_delcur(op->bykeyvalp,&cur,0) ;
 		            entry_finish(ep) ;
@@ -530,9 +529,8 @@ static int keyvals_keyadd(keyvals *op,KEY *kep,KEY **rpp) noex {
 	int		rs ;
 	int		ki = INT_MAX ;
 	if ((rs = vecobj_add(op->keyp,kep)) >= 0) {
-	    void	*vp{} ;
 	    ki = rs ;
-	    if ((rs = vecobj_get(op->keyp,ki,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = vecobj_get(op->keyp,ki,&vp)) >= 0) {
 		*rpp = keyp(vp) ;
 	    }
 	}
@@ -599,12 +597,12 @@ static int keyvals_already(keyvals *op,ENT *nep) noex {
 
 /* add an entry to entry list */
 static int keyvals_addentry(keyvals *op,ENT *nep) noex {
-	KEYVALS_ENT	*ep ;
 	int		rs ;
 	int		rs1 ;
 	int		sz = sizeof(KEYVALS_ENT) ;
-	if ((rs = uc_malloc(sz,&ep)) >= 0) {
-	    KEYVALS_KEY	*kep ;
+	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    ENT		*ep = entp(vp) ;
+	    KEY		*kep ;
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    *ep = *nep ; /* copy */

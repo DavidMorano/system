@@ -64,12 +64,18 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward subroutines */
 
-static int isinter(int) ;
-static int isfinalesc(int) ;
-static int isfinalcsi(int) ;
-static int isparam(int) ;
+static int isinter(int) noex ;
+static int isfinalesc(int) noex ;
+static int isfinalcsi(int) noex ;
+static int isparam(int) noex ;
 
 
 /* local variables */
@@ -113,11 +119,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 	    lp = (lbuf + i) ;
 	    rs = uterm_reade(utp,lp,1,to,ropts,NULL,NULL) ;
 
-#if	CF_DEBUGS
-	    debugprintf("readcmdkey: uterm_reade() rs=%d\n",rs) ;
-	    debugprintf("readcmdkey: ch=%02X\n",(*lp & 0xff)) ;
-#endif
-
 	    if (rs < 0)
 	        break ;
 
@@ -128,10 +129,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 
 	        f = isfinalcsi(ch) ;
 
-#if	CF_DEBUGS
-	        debugprintf("readcmdkey: CSI isfinalcsi()=%u\n",f) ;
-#endif
-
 	        if (f) {
 	            ktype = (ch == '~') ? KBDINFO_TFKEY : KBDINFO_TCSI ;
 	            break ;
@@ -139,22 +136,12 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 
 	        f = isinter(ch) ;
 
-#if	CF_DEBUGS
-	        debugprintf("readcmdkey: CSI isinter()=%u\n",f) ;
-#endif
-
 	        if (f) {
 	            if (pl < 0) pl = (i - pi) ;
 	        }
 
 	        f = f || isparam(ch) ;
-
-#if	CF_DEBUGS
-	        debugprintf("readcmdkey: CSI isparam()=%u\n",f) ;
-#endif
-
-	        if (! f)
-	            break ;
+	        if (! f) break ;
 
 	    } else if ((n == 1) && (ch == CH_LBRACK)) {
 
@@ -175,10 +162,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 
 	        f = isfinalesc(ch) ;
 
-#if	CF_DEBUGS
-	        debugprintf("readcmdkey: ESC isfinalesc()=%u\n",f) ;
-#endif
-
 	        if (f) {
 	            ktype = KBDINFO_TESC ;
 	            kinter = ch ;
@@ -186,10 +169,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 	        }
 
 	        f = isinter(ch) ;
-
-#if	CF_DEBUGS
-	        debugprintf("readcmdkey: ESC isinter()=%u\n",f) ;
-#endif
 
 	        if (! f)
 	            break ;
@@ -199,10 +178,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 	} /* end for (reading characters) */
 
 /* parse any parameter */
-
-#if	CF_DEBUGS
-	debugprintf("readcmdkey: f_csi=%u ktype=%d\n",f_csi,ktype) ;
-#endif
 
 	if (f_csi && (ktype >= 0)) {
 	    int	cl ;
@@ -214,9 +189,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 	    cp = (lbuf + pi) ;
 	    cl = pl ;
 
-#if	CF_DEBUGS
-	    debugprintf("readcmdkey: cl=%d cp=>%t<\n",cl,cp,cl) ;
-#endif
 	    if (cl > 0) {
 
 	        if ((tp = strnchr(cp,cl,';')) != NULL)
@@ -234,11 +206,6 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 	ckp->type = ktype ;
 	ckp->inter = kinter ;
 
-#if	CF_DEBUGS
-	debugprintf("readcmdkey: ret rs=%d ktype=%d kinter=%d\n",
-	    rs,ckp->type,ckp->inter) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (readcmdkey) */
@@ -246,45 +213,24 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 
 /* local subroutines */
 
-
-static int isinter(ch)
-int	ch ;
-{
-
-
+static int isinter(int ch) noex {
 	return ((ch >= 0x20) && (ch <= 0x2F)) ;
 }
 /* end subroutines (isinter) */
 
-
-static int isfinalesc(ch)
-int	ch ;
-{
-
-
+static int isfinalesc(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x7E)) ;
 }
 /* end subroutines (isfinalesc) */
 
-
-static int isfinalcsi(ch)
-int	ch ;
-{
-
-
+static int isfinalcsi(int ch) noex {
 	return ((ch >= 0x40) && (ch <= 0x7E)) ;
 }
 /* end subroutines (isfinalcsi) */
 
-
-static int isparam(ch)
-int	ch ;
-{
-
-
+static int isparam(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x3F)) ;
 }
 /* end subroutines (isparam) */
-
 
 
