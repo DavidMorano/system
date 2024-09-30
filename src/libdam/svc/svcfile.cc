@@ -365,252 +365,195 @@ int svcfile_close(svcfile *op) noex {
 /* end subroutine (svcfile_close) */
 
 int svcfile_fileadd(svcfile *op,cchar *fname) noex {
-	int		rs = SR_OK ;
-	int		fi = 0 ;
-	cchar	*np ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-	np = (cchar *) fname ;
-	if (fname[0] != '/') {
-	    char	pwdbuf[MAXPATHLEN+1] ;
-	    np = tmpfname ;
-	    if ((rs = getpwd(pwdbuf,MAXPATHLEN)) >= 0) {
-	        rs = mkpath2(tmpfname,pwdbuf,fname) ;
-	    }
-	} /* end if (added PWD) */
-
-	if (rs >= 0) {
-	    SVCFILE_FILE	fe ;
-	    vecobj		*flp = &op->files ;
-	    if ((rs = file_start(&fe,np)) >= 0) {
-	        cint	nrs = SR_NOTFOUND ;
-	        bool	f_fin = false ;
-	        if ((rs = vecobj_search(flp,&fe,vcmpfname,nullptr)) == nrs) {
-	            if ((rs = vecobj_add(flp,&fe)) >= 0) {
-	                fi = rs ;
-	                rs = svcfile_fileparse(op,fi) ;
-	                if (rs < 0) {
-	                    f_fin = true ;
-	                    vecobj_del(flp,fi) ;
-	                }
-	            } /* end if (vecobj_add) */
-	        } else {
-	            f_fin = true ;
+	int		rs ;
+	if ((rs = svcfile_magic(op,fname)) >= 0) {
+	    int		fi = 0 ;
+	    cchar	*sp = fname ;
+	    char	tmpfname[MAXPATHLEN + 1] ;
+	    if (fname[0] != '/') {
+	        char	pwdbuf[MAXPATHLEN+1] ;
+	        sp = tmpfname ;
+	        if ((rs = getpwd(pwdbuf,MAXPATHLEN)) >= 0) {
+	            rs = mkpath2(tmpfname,pwdbuf,fname) ;
 	        }
-	        if ((rs < 0) || f_fin) {
-	            file_finish(&fe) ;
-	        }
-	    } /* end if (file_start) */
-	} /* end if (ok) */
-
+	    } /* end if (added PWD) */
+	    if (rs >= 0) {
+	        SVCFILE_FILE	fe ;
+	        vecobj		*flp = &op->files ;
+		cnullptr	np{} ;
+	        if ((rs = file_start(&fe,sp)) >= 0) {
+	            cint	rsn = SR_NOTFOUND ;
+	            bool	f_fin = false ;
+	            if ((rs = vecobj_search(flp,&fe,vcmpfname,np)) == rsn) {
+	                if ((rs = vecobj_add(flp,&fe)) >= 0) {
+	                    fi = rs ;
+	                    rs = svcfile_fileparse(op,fi) ;
+	                    if (rs < 0) {
+	                        f_fin = true ;
+	                        vecobj_del(flp,fi) ;
+	                    }
+	                } /* end if (vecobj_add) */
+	            } else {
+	                f_fin = true ;
+	            }
+	            if ((rs < 0) || f_fin) {
+	                file_finish(&fe) ;
+	            }
+	        } /* end if (file_start) */
+	    } /* end if (ok) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcfile_fileadd) */
 
 int svcfile_curbegin(svcfile *op,svcfile_cur *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->ncursors == 0) {
-	    rs = svcfile_check(op,0L) ;
-	}
-
-	if (rs >= 0) {
-	    curp->i = -1 ;
-	    if ((rs = hdb_curbegin(&op->entries,&curp->ec)) >= 0) {
-	        op->ncursors += 1 ;
-	        op->magic = SVCFILE_MAGIC ;
+	int		rs ;
+	if ((rs = svcfile_magic(op,curp)) >= 0) {
+	    if (op->ncursors == 0) {
+	        rs = svcfile_check(op,0L) ;
 	    }
-	}
-
+	    if (rs >= 0) {
+	        curp->i = -1 ;
+	        if ((rs = hdb_curbegin(&op->entries,&curp->ec)) >= 0) {
+	            op->ncursors += 1 ;
+	            op->magic = SVCFILE_MAGIC ;
+	        }
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcfile_curbegin) */
 
 int svcfile_curend(svcfile *op,svcfile_cur *curp) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	if ((rs = hdb_curend(&op->entries,&curp->ec)) >= 0) {
-	    if (op->ncursors > 0) op->ncursors -= 1 ;
-	}
-
+	if ((rs = svcfile_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	    if ((rs = hdb_curend(&op->entries,&curp->ec)) >= 0) {
+	        if (op->ncursors > 0) op->ncursors -= 1 ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcfile_curend) */
 
 int svcfile_enumsvc(svcfile *op,svcfile_cur *curp,char *ebuf,int elen) noex {
-	SVCFILE_SVCNAME	*snp = nullptr ;
-	int		rs = SR_OK ;
-	int		i ;
+	int		rs ;
 	int		kl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (ebuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-
-	void	*vp{} ;
-	while ((rs = vecobj_get(&op->svcnames,i,&vp)) >= 0) {
-	    snp = (SVCFILE_SVCNAME *) vp ;
-	    if (snp) break ;
-	    i += 1 ;
-	} /* end while */
-
-	if (rs >= 0) {
-	    if ((rs = sncpy1(ebuf,elen,snp->svcname)) >= 0) {
-	        kl = rs ;
-	        curp->i = i ;
-	    }
-	} /* end if */
-
+	if ((rs = svcfile_magic(op,curp,ebuf)) >= 0) {
+	    SVCFILE_SVCNAME	*snp = nullptr ;
+	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    void	*vp{} ;
+	    while ((rs = vecobj_get(&op->svcnames,i,&vp)) >= 0) {
+	        snp = (SVCFILE_SVCNAME *) vp ;
+	        if (snp) break ;
+	        i += 1 ;
+	    } /* end while */
+	    if (rs >= 0) {
+	        if ((rs = sncpy1(ebuf,elen,snp->svcname)) >= 0) {
+	            kl = rs ;
+	            curp->i = i ;
+	        }
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (svcfile_enumsvc) */
 
-int svcfile_enum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
+int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 		char *ebuf,int elen) noex {
-	hdb_dat		key ;
-	hdb_dat		val ;
-	hdb_cur		cur ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		svclen = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if ((ep == nullptr) || (ebuf == nullptr)) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (elen <= 0) return SR_OVERFLOW ;
-
-	cur = curp->ec ;
-	if ((rs = hdb_enum(&op->entries,&cur,&key,&val)) >= 0) {
-	    IENT	*iep = (struct svcfile_ie *) val.buf ;
-
-	    if ((ep != nullptr) && (ebuf != nullptr)) {
-	        rs = entry_load(ep,ebuf,elen,iep) ;
-	        svclen = rs ;
-	    } else {
-	        svclen = strlen(iep->svc) ;
-	    }
-
-	    if (rs >= 0) {
-	        curp->ec = cur ;
-	    }
-
-	} /* end if (had an entry) */
-
+	if ((rs = svcfile_magic(op,curp,ep,ebuf)) >= 0) {
+	    rs = SR_OVERFLOW ;
+	    if (elen > 0) {
+	        hdb_dat		key ;
+	        hdb_dat		val ;
+	        hdb_cur		cur ;
+	        cur = curp->ec ;
+	        if ((rs = hdb_enum(&op->entries,&cur,&key,&val)) >= 0) {
+	            IENT	*iep = (struct svcfile_ie *) val.buf ;
+	            if ((ep != nullptr) && (ebuf != nullptr)) {
+	                rs = entry_load(ep,ebuf,elen,iep) ;
+	                svclen = rs ;
+	            } else {
+	                svclen = strlen(iep->svc) ;
+	            }
+	            if (rs >= 0) {
+	                curp->ec = cur ;
+	            }
+	        } /* end if (had an entry) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
 }
 /* end subroutine (svcfile_enum) */
 
-int svcfile_fetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
+int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 		char *ebuf,int elen) noex {
-	hdb_dat		key ;
-	hdb_dat		val ;
-	hdb_cur		cur ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		svclen = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (svcname == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-/* check for update */
-
-	if (op->ncursors == 0) {
-	    rs = svcfile_check(op,0L) ;
-	}
-
-	if (rs >= 0) {
-
-/* continue */
-
-	    if (curp == nullptr) {
-	        rs = hdb_curbegin(&op->entries,&cur) ;
-	    } else {
-	        cur = curp->ec ;
+	if ((rs = svcfile_magic(op,svcname)) >= 0) {
+	    /* check for update */
+	    hdb_dat		key ;
+	    hdb_dat		val ;
+	    hdb_cur		cur ;
+	    if (op->ncursors == 0) {
+	        rs = svcfile_check(op,0L) ;
 	    }
-
 	    if (rs >= 0) {
-	        key.buf = (void *) svcname ;
-	        key.len = strlen(svcname) ;
-	        if ((rs = hdb_fetch(&op->entries,key,&cur,&val)) >= 0) {
-	            IENT	*iep = (struct svcfile_ie *) val.buf ;
-
-	            if ((ep != nullptr) && (ebuf != nullptr)) {
-
-	                rs = entry_load(ep,ebuf,elen,iep) ;
-	                svclen = rs ;
-
-	            } else {
-	                svclen = strlen(iep->svc) ;
-	            }
-
-	            if ((rs >= 0) && (curp != nullptr)) {
-	                curp->ec = cur ;
-	            }
-
-	        } /* end if (had an entry) */
+                /* continue */
 	        if (curp == nullptr) {
-	            hdb_curend(&op->entries,&cur) ;
-		}
+	            rs = hdb_curbegin(&op->entries,&cur) ;
+	    } else {
+	            cur = curp->ec ;
+	        }
+	        if (rs >= 0) {
+	            key.buf = (void *) svcname ;
+	            key.len = strlen(svcname) ;
+	            if ((rs = hdb_fetch(&op->entries,key,&cur,&val)) >= 0) {
+	                IENT	*iep = (struct svcfile_ie *) val.buf ;
+	                if ((ep != nullptr) && (ebuf != nullptr)) {
+	                    rs = entry_load(ep,ebuf,elen,iep) ;
+	                    svclen = rs ;
+	                } else {
+	                    svclen = strlen(iep->svc) ;
+	                }
+	                if ((rs >= 0) && (curp != nullptr)) {
+	                    curp->ec = cur ;
+	                }
+	            } /* end if (had an entry) */
+	            if (curp == nullptr) {
+	                hdb_curend(&op->entries,&cur) ;
+		    }
+	        } /* end if (ok) */
 	    } /* end if (ok) */
-
-	} /* end if (ok) */
-
+	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
 }
 /* end subroutine (svcfile_fetch) */
 
-int svcfile_check(svcfile *op,time_t daytime) noex {
-	cint		to = SVCFILE_INTCHECK ;
-	int		rs = SR_OK ;
+int svcfile_check(svcfile *op,time_t dt) noex {
+	int		rs ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (daytime == 0)
-	    daytime = time(nullptr) ;
-
-/* should we even check? */
-
-	if ((op->ncursors == 0) && ((daytime - op->checktime) >= to)) {
-	    op->checktime = daytime ;
-	    rs = svcfile_checkfiles(op,daytime) ;
-	    c = rs ;
-	} /* end if */
-
+	if ((rs = svcfile_magic(op)) >= 0) {
+	    cint	to = SVCFILE_INTCHECK ;
+	    if (dt == 0) dt = getustime ;
+            /* should we even check? */
+	    if ((op->ncursors == 0) && ((dt - op->checktime) >= to)) {
+	        op->checktime = dt ;
+	        rs = svcfile_checkfiles(op,dt) ;
+	        c = rs ;
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (svcfile_check) */
 
-int svcfile_match(svcfile *sfp,cchar *name) noex {
+int svcfile_match(svcfile *op,cchar *name) noex {
 	int		rs ;
-
-	rs = svcfile_fetch(sfp,name,nullptr,nullptr,nullptr,0) ;
-
+	if ((rs = svcfile_magic(op)) >= 0) {
+	    rs = svcfile_fetch(op,name,nullptr,nullptr,nullptr,0) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (svcfile_match) */
@@ -631,7 +574,6 @@ static int svcfile_filefins(svcfile *op) noex {
 		}
 	    }
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (svcfile_filefins) */
