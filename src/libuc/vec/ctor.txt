@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int keyvals_ctor(keyvals *op,Args ... args) noex {
+static int svcfile_ctor(svcfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int keyvals_ctor(keyvals *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (keyvals_ctor) */
+/* end subroutine (svcfile_ctor) */
 
-static int keyvals_dtor(keyvals *op) noex {
+static int svcfile_dtor(svcfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (keyvals_dtor) */
+/* end subroutine (svcfile_dtor) */
 
 template<typename ... Args>
-static inline int keyvals_magic(keyvals *op,Args ... args) noex {
+static inline int svcfile_magic(svcfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == KEYVALS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SVCFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (keyvals_magic) */
+/* end subroutine (svcfile_magic) */
