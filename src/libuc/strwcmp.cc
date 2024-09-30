@@ -46,7 +46,6 @@
 #include	<nleadstr.h>
 #include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
 #include	<toxc.h>
-#include	<mkchar.h>
 
 #include	"strwcmp.h"
 
@@ -122,19 +121,19 @@ namespace {
 
 /* exported subroutines */
 
-int strwbasecmpx(cchar *s1,cchar *s2,int s2len) noex {
+int strwbasecmp(cchar *s1,cchar *s2,int s2len) noex {
 	basecmpx	co ;
 	return co.x(s1,s2,s2len) ;
 }
 /* end subroutine (strwbasecmpx) */
 
-int strwcasecmpx(cchar *s1,cchar *s2,int s2len) noex {
+int strwcasecmp(cchar *s1,cchar *s2,int s2len) noex {
 	casecmpx	co ;
 	return co.x(s1,s2,s2len) ;
 }
 /* end subroutine (strwcasecmpx) */
 
-int strwfoldcmpx(cchar *s1,cchar *s2,int s2len) noex {
+int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 	foldcmpx	co ;
 	return co.x(s1,s2,s2len) ;
 }

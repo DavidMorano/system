@@ -447,7 +447,7 @@ int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		rs = SR_INVALID ;
 		if (len >= 0) {
-		    int		bl = (SBUF_RLEN-SBUF_INDEX) ;
+		    int		bl = (SBUF_RLEN - SBUF_INDEX) ;
 		    char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 		    rs = SR_OVERFLOW ;
 	            if (bl >= len) {

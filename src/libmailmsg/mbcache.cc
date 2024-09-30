@@ -196,19 +196,21 @@ static int	headappend(char **,char *,int) noex ;
 static bool	isNoMsg(int) noex ;
 static bool	isBadDate(int) noex ;
 
-static int	vcmpmsgentry(cvoid *,cvoid *) noex ;
+extern "C" {
+    static int	vcmpmsgentry(cvoid *,cvoid *) noex ;
+}
 
 
 /* local variables */
 
-static constexpr int	rsdatebad[] = {
+constexpr int	rsdatebad[] = {
 	SR_INVALID,
 	SR_DOM,
 	SR_NOMSG,
 	0
 } ;
 
-static constexpr int	rsnomsg[] = {
+constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
@@ -216,7 +218,7 @@ static constexpr int	rsnomsg[] = {
 
 
 #ifdef	COMMENT
-static constexpr struct scantitle	scantitles[] = {
+constexpr struct scantitle	scantitles[] = {
 	{ "FROM",	COL_SCANFROM },
 	{ "SUBJECT",	COL_SCANSUBJECT },
 	{ "DATE",	COL_SCANDATE },

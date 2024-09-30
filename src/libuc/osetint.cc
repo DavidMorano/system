@@ -78,9 +78,13 @@ int osetint_start(osetint *op) noex {
 	if (op) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    if (setint *setp ; (setp = new(nothrow) setint) != np) {
-	        op->setp = setp ;
-		rs = SR_OK ;
+	    try {
+	        if (setint *setp ; (setp = new(nothrow) setint) != np) {
+	            op->setp = setp ;
+		    rs = SR_OK ;
+	        } /* end if (new-setint) */
+	    } catch (...) {
+		rs = SR_NOMEM ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -108,11 +112,15 @@ int osetint_addval(osetint *op,int v) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-	        setint		*setp  = setintp(op->setp) ;
-	        pair<setint::iterator,bool>	ret ;
-	        ret = setp->insert(v) ;
-	        if (ret.second == true) f = 0 ;
-		rs = SR_OK ;
+		try {
+	            setint	*setp  = setintp(op->setp) ;
+	            pair<setint::iterator,bool>	ret ;
+	            ret = setp->insert(v) ;
+	            if (ret.second == true) f = 0 ;
+		    rs = SR_OK ;
+		} catch (...) {
+		    rs = SR_NOMEM ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
@@ -224,7 +232,7 @@ int osetint_curend(osetint *op,osetint_cur *curp) noex {
 }
 /* end subroutine (osetint_curend) */
 
-int osetint_enum(osetint *op,osetint_cur *curp,int *rp) noex {
+int osetint_curenum(osetint *op,osetint_cur *curp,int *rp) noex {
 	int		rs = SR_FAULT ;
 	if (op && curp && rp) {
 	    rs = SR_NOTOPEN ;
@@ -245,6 +253,6 @@ int osetint_enum(osetint *op,osetint_cur *curp,int *rp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (osetint_enum) */
+/* end subroutine (osetint_curenum) */
 
 

@@ -12,7 +12,7 @@
 
 	= 1999-07-12, David A­D­ Morano
 	Believe it or not I did not like the treatment that zero
-	length values were getting! I modified the |varsub_add|
+	length values were getting!  I modified the |varsub_add|
 	subroutine to allow zero-length values in the default case.
 
 */
@@ -21,6 +21,10 @@
 
 /*******************************************************************************
 
+	Name:
+	varsub
+
+	Description:
 	This module performs substitutions on strings that have
 	variable substitution escapes of some sort in them. The
 	variable substitution escapes look like environment variable
@@ -48,6 +52,7 @@
 #include	<strwcpy.h>
 #include	<strnxchr.h>
 #include	<strnxcmp.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"varsub.h"
@@ -141,7 +146,7 @@ static int	entry_tmp(ent *,cchar *,int,cchar *,int) noex ;
 static int	entry_valcmp(ent *,ent *) noex ;
 
 static int	getkey(cchar *,int,int [][2]) noex ;
-static int	ventcmp(cvoid **,cvoid **) noex ;
+static int	vcmpent(cvoid **,cvoid **) noex ;
 
 
 /* local subroutines */
@@ -229,8 +234,7 @@ int varsub_addva(varsub *op,mainv envv) noex {
 	if ((rs = varsub_magic(op,envv)) >= 0) {
 	    for (int i = 0 ; envv[i] ; i += 1) {
 	        cchar	*esp = envv[i] ;
-	        cchar	*tp ;
-	        if ((tp = strchr(esp,'=')) != nullptr) {
+	        if (cchar *tp ; (tp = strchr(esp,'=')) != nullptr) {
 	            cint	kch = mkchar(esp[0]) ;
 	            cchar	*vp = (tp + 1) ;
 	            if (isprintlatin(kch)) {
@@ -266,8 +270,7 @@ int varsub_addvaquick(varsub *op,cchar **envv) noex {
 	if ((rs = varsub_magic(op,envv)) >= 0) {
 	    for (int i = 0 ; envv[i] != nullptr ; i += 1) {
 	        cchar	*esp = envv[i] ;
-	        cchar	*tp ;
-	        if ((tp = strchr(esp,'=')) != nullptr) {
+	        if (cchar *tp ; (tp = strchr(esp,'=')) != nullptr) {
 	            cint	kch = mkchar(esp[0]) ;
 	            cchar	*vp = (tp + 1) ;
 	            if (isprintlatin(kch)) {
@@ -296,7 +299,7 @@ int varsub_del(varsub *op,cchar *k,int klen) noex {
 	        void	*vp{} ;
 	        te.kp = k ;
 	        te.kl = klen ;
-	        if ((rs = vechand_search(elp,&te,ventcmp,&vp)) >= 0) {
+	        if ((rs = vechand_search(elp,&te,vcmpent,&vp)) >= 0) {
 	            ent	*ep = entp(vp) ;
 	            {
 	                rs1 = vechand_del(elp,rs) ;
@@ -362,7 +365,7 @@ int varsub_curend(varsub *op,varsub_cur *curp) noex {
 }
 /* end subroutine (varsub_curend) */
 
-int varsub_enum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
+int varsub_curenum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = varsub_magic(op,curp)) >= 0) {
@@ -388,7 +391,7 @@ int varsub_enum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
-/* end subroutine (varsub_enum) */
+/* end subroutine (varsub_curenum) */
 
 int varsub_expfile(varsub *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
@@ -418,15 +421,14 @@ int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	            if ((rs = varsub_sort(op)) >= 0) {
 		        auto	vsp = varsub_procvalue ;
 	                buffer	b ;
-	                if ((rs = buffer_start(&b,mll)) >= 0) {
-	                    cchar	*bp{} ;
+	                if ((rs = b.start(mll)) >= 0) {
 	                    if ((rs = vsp(op,&b,sbuf,slen)) >= 0) {
-	                        if ((rs = buffer_get(&b,&bp)) >= 0) {
+	                        if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
 	                            bl = rs ;
 	                            rs = snwcpy(dbuf,dlen,bp,bl) ;
 	                        }
 	                    }
-	                    rs1 = buffer_finish(&b) ;
+	                    rs1 = b.finish ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (buffer) */
 	            } /* end if (varsub_sort) */
@@ -476,13 +478,11 @@ static int varsub_setopts(varsub *op,int vo) noex {
 static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		sses[3][2] ;
-	int		kl, cl ;
+	int		kl ;
 	int		i = 0 ;
 	int		len = 0 ;
 	cchar		ssb[] = { CH_LBRACE, CH_RBRACE, 0 } ;
 	cchar		ssp[] = { CH_LPAREN, CH_RPAREN, 0 } ;
-	cchar		*tp ;
-	cchar		*cp ;
 	cchar		*kp ;
 	if (op->f.brace) {
 	    sses[i][0] = ssb[0] ;
@@ -496,17 +496,17 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	}
 	sses[i][0] = 0 ;
 	sses[i][1] = 0 ;
+	cchar		*tp ;
 	while ((tp = strnchr(sp,sl,'$')) != nullptr) {
-	    cp = sp ;
-	    cl = (tp - sp) ;
+	    cchar	*cp = sp ;
+	    int		cl = (tp - sp) ;
 	    if (cl > 0) {
-	        rs = buffer_strw(bufp,cp,cl) ;
+	        rs = bufp->strw(cp,cl) ;
 	        len += rs ;
 	    }
 	    if (rs >= 0) {
 	        kp = (tp + 2) ;
-	        kl = getkey(tp,((sp + sl) - tp),sses) ;
-	        if (kl > 0) {
+	        if ((kl = getkey(tp,((sp + sl) - tp),sses)) > 0) {
 	            rs = varsub_procsub(op,bufp,kp,kl) ;
 	            len += rs ;
 	        }
@@ -517,7 +517,7 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	            } else {
 	                sl -= ((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
-	                rs = buffer_chr(bufp,'$') ;
+	                rs = bufp->chr('$') ;
 	                len += rs ;
 	            }
 	        } /* end if (ok) */
@@ -525,7 +525,7 @@ static int varsub_procvalue(varsub *op,buffer *bufp,cchar *sp,int sl) noex {
 	    if (rs < 0) break ;
 	} /* end while */
 	if ((rs >= 0) && (sl > 0)) {
-	    rs = buffer_strw(bufp,sp,sl) ;
+	    rs = bufp->strw(sp,sl) ;
 	    len += rs ;
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
@@ -537,27 +537,26 @@ static int varsub_procsub(varsub *op,buffer *bufp,cchar *kp,int kl) noex {
 	int		len = 0 ;
 	if (kl > 0) {
 	    int		al = 0 ;
-	    cchar	*cp{} ;
 	    cchar	*ap = nullptr ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
 	        al = (kp + kl) - (tp + 1) ;
 	        kl = (tp - kp) ;
 	    }
-/* lookup the environment key-name that we have */
-	    if ((rs = varsub_getval(op,kp,kl,&cp)) >= 0) {
-	        rs = buffer_strw(bufp,cp,rs) ;
+	    /* lookup the environment key-name that we have */
+	    if (cchar *cp{} ; (rs = varsub_getval(op,kp,kl,&cp)) >= 0) {
+	        rs = bufp->strw(cp,rs) ;
 	        len += rs ;
 	    } else if (rs == SR_NOTFOUND) {
 	        if (al > 0) {
-	            rs = buffer_strw(bufp,ap,al) ;
+	            rs = bufp->strw(ap,al) ;
 	            len += rs ;
 		} else if (op->f.noblank) {
-		    if ((rs = buffer_chr(bufp,'*')) >= 0) {
+		    if ((rs = bufp->chr('*')) >= 0) {
 	            	len += rs ;
-	                if ((rs = buffer_strw(bufp,kp,kl)) >= 0) {
+	                if ((rs = bufp->strw(kp,kl)) >= 0) {
 	            	    len += rs ;
-		    	    rs = buffer_chr(bufp,'*') ;
+		    	    rs = bufp->chr('*') ;
 	            	    len += rs ;
 			}
 		    }
@@ -581,7 +580,7 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	    vechand	*elp = op->slp ;
 	    int		rs1 ;
 	    void	*vp{} ;
-	    if ((rs1 = vechand_search(elp,&tmp,ventcmp,&vp)) >= 0) {
+	    if ((rs1 = vechand_search(elp,&tmp,vcmpent,&vp)) >= 0) {
 	        ent	*dep = entp(vp) ;
 	        if (entry_valcmp(dep,&tmp) != 0) {
 	            vechand_del(elp,rs1) ;
@@ -594,8 +593,9 @@ static int varsub_iadd(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	    } /* end if (entry search-by-key) */
 	    if (rs1 == SR_NOTFOUND) {
 	        cint	msize = sizeof(ent) ;
-	        ent	*ep{} ;
-	        if ((rs = uc_malloc(msize,&ep)) >= 0) {
+		void	*vp{} ;
+	        if ((rs = uc_malloc(msize,&vp)) >= 0) {
+	            ent		*ep = entp(vp) ;
 	            if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
 	                op->f.sorted = false ;
 	                rs = vechand_add(elp,ep) ;
@@ -622,8 +622,9 @@ static int varsub_iaddq(varsub *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	if (klen > 0) {
 	    vechand	*elp = op->slp ;
 	    cint	msize = sizeof(ent) ;
-	    ent		*ep{} ;
-	    if ((rs = uc_malloc(msize,&ep)) >= 0) {
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(msize,&vp)) >= 0) {
+	        ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,k,klen,v,vlen)) >= 0) {
 	            op->f.sorted = false ;
 	            rs = vechand_add(elp,ep) ;
@@ -646,7 +647,7 @@ static int varsub_sort(varsub *op) noex {
 	if (! op->f.sorted) {
 	    f = true ;
 	    op->f.sorted = true ;
-	    rs = vechand_sort(op->slp,ventcmp) ;
+	    rs = vechand_sort(op->slp,vcmpent) ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
@@ -663,13 +664,13 @@ static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
 	    void	*vp{} ;
 	    te.kp = kp ;
 	    te.kl = kl ;
-	    if ((rs = vechand_search(slp,&te,ventcmp,&vp)) >= 0) {
+	    if ((rs = vechand_search(slp,&te,vcmpent,&vp)) >= 0) {
 		ep = entp(vp) ;
 	        vl = ep->vl ;
 	    }
 	} /* end if (non-zero positive) */
 	if (vpp) {
-	    *vpp = (rs >= 0) ? ep->vp : nullptr ;
+	    *vpp = ((rs >= 0) && ep) ? ep->vp : nullptr ;
 	}
 	return (rs >= 0) ? vl : rs ;
 }
@@ -686,7 +687,7 @@ static int varsub_expfiler(varsub *op,bfile *ifp,bfile *ofp) noex {
 	        buffer	b ;
 	        cint	stlen = (VARSUB_NLINES * rs) ;
 	        op->badline = -1 ;
-	        if ((rs = buffer_start(&b,stlen)) >= 0) {
+	        if ((rs = b.start(stlen)) >= 0) {
 		    int		nlines = 0 ;
 	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	                int	len = rs ;
@@ -704,7 +705,7 @@ static int varsub_expfiler(varsub *op,bfile *ifp,bfile *ofp) noex {
 	                rs = varsub_writebuf(op,ofp,&b) ;
 		        wlen += rs ;
 	            }
-	            rs1 = buffer_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (buffer) */
 	    } /* end if (maxlinelen) */
@@ -719,11 +720,10 @@ static int varsub_writebuf(varsub *op,bfile *ofp,buffer *bufp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op) {
-	    cchar	*bp{} ;
-	    if ((rs = buffer_get(bufp,&bp)) > 0) {
+	    if (cchar *bp{} ; (rs = bufp->get(&bp)) > 0) {
 	        if ((rs = bwrite(ofp,bp,rs)) >= 0) {
 	            wlen += rs ;
-	            buffer_reset(bufp) ;
+	            bufp->reset() ;
 	        }
 	    } /* end if (buffer_get) */
 	} /* end if (non-null) */
@@ -759,11 +759,10 @@ static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	if (vl < 0) {
 	    vl = (vp) ? strlen(vp) : 0 ;
 	}
-/* allocate buffers for the key and its value respectively */
+	/* allocate buffers for the key and its value respectively */
 	if (kl > 0) {
 	    cint	sz = (kl + 1) + (vl + 1) ;
-	    char	*bp{} ;
-	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	        ep->kp = bp ;
 	        ep->kl = kl ;
 	        bp = (strwcpy(bp,kp,kl) + 1) ;
@@ -841,13 +840,12 @@ static int getkey(cchar *sp,int sl,int sses[][2]) noex {
 	    sp += 1 ;
 	    sl -= 1 ;
 	    for (i = 0 ; sses[i][0] != 0 ; i += 1) {
-	        int	ch = (*sp & 0xff) ;
+	        cint	ch = mkchar(*sp) ;
 	        f = (ch == sses[i][0]) ;
 	        if (f) break ;
 	    } /* end for */
 	    if (f) {
-	        cchar	*tp ;
-	        if ((tp = strnchr(sp,sl,sses[i][1])) != nullptr) {
+	        if (cchar *tp ; (tp = strnchr(sp,sl,sses[i][1])) != nullptr) {
 	            kl = (tp - (sp+1)) ;
 	        }
 	    }
@@ -856,27 +854,25 @@ static int getkey(cchar *sp,int sl,int sses[][2]) noex {
 }
 /* end subroutine (getkey) */
 
-static int ventcmp(cvoid **ve1pp,cvoid **ve2pp) noex {
+static int vcmpent(cvoid **ve1pp,cvoid **ve2pp) noex {
 	ent		**e1pp = (ent **) ve1pp ;
 	ent		**e2pp = (ent **) ve2pp ;
-	ent		*e1p ;
-	ent		*e2p ;
 	int		rc = 0 ;
-	e1p = *e1pp ;
-	e2p = *e2pp ;
-	if (e1p || e2p) {
-	    if (e1p) {
-	        if (e2p) {
-		    rc = entry_keycmp(e1p,e2p) ;
-	        } else {
-	            rc = -1 ;
-		}
-	    } else {
-	        rc = 1 ;
+	{
+	    ent		*e1p = *e1pp ;
+	    ent		*e2p = *e2pp ;
+	    if (e1p || e2p) {
+		rc = +1 ;
+	        if (e1p) {
+		    rc = -1 ;
+	            if (e2p) {
+		        rc = entry_keycmp(e1p,e2p) ;
+	            }
+	        }
 	    }
-	}
+	} /* end block */
 	return rc ;
 }
-/* end subroutine (ventcmp) */
+/* end subroutine (vcmpent) */
 
 

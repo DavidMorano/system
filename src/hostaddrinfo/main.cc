@@ -1117,7 +1117,7 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 #if	CF_ALIASES
 	        if (f_all) {
 	            if ((rs = hostinfo_curbegin(&hi,&cur)) >= 0) {
-	                while ((rs = hostinfo_enumname(&hi,&cur,&np)) > 0) {
+	                while ((rs = hostinfo_curenumname(&hi,&cur,&np)) > 0) {
 	                        rs = bprintf(ofp,"%salias=%s\n",indent,np) ;
 	                    if (rs < 0) break ;
 	                } /* end while */
@@ -1135,7 +1135,7 @@ static int procinfo(PROGINFO *pip,bfile *ofp,char *cname,cchar *np,int nl)
 
 	        if (rs >= 0) {
 	            if ((rs = hostinfo_curbegin(&hi,&cur)) >= 0) {
-	                while ((rs = hostinfo_enumaddr(&hi,&cur,&ap)) > 0) {
+	                while ((rs = hostinfo_curenumaddr(&hi,&cur,&ap)) > 0) {
 			    al = rs ;
 	                    if (pip->verboselevel >= 2) {
 	                        bprintf(ofp,"%saddrlen=%u\n",indent,al) ;

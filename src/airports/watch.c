@@ -74,7 +74,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<sfstr.h>
+#include	<sfx.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<lfm.h>

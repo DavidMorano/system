@@ -15,6 +15,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	OSETINT		struct osetint_head
@@ -42,7 +44,7 @@ extern int osetint_count(osetint *) noex ;
 extern int osetint_mkvec(osetint *,int *) noex ;
 extern int osetint_extent(osetint *) noex ;
 extern int osetint_curbegin(osetint *,osetint_cur *) noex ;
-extern int osetint_enum(osetint *,osetint_cur *,int *) noex ;
+extern int osetint_curenum(osetint *,osetint_cur *,int *) noex ;
 extern int osetint_curend(osetint *,osetint_cur *) noex ;
 extern int osetint_find(osetint *,int) noex ;
 

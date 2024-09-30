@@ -24,7 +24,7 @@
 	has some purpose someplace.
 
 	Synopsis:
-	int getsrcname(char *rbuf,int rlen) noex
+	int tmpmailboxes(char *rbuf,int rlen) noex
 
 	Arguments:
 	rbuf		result buffer pointer
@@ -44,6 +44,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

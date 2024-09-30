@@ -100,6 +100,7 @@ int fieldterms(char *terms,int f_retain,cchar *s) noex {
 /* end subroutine (fieldterms) */
 
 int fieldtermsx(char *terms,int f,int na,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (terms) {
@@ -108,7 +109,6 @@ int fieldtermsx(char *terms,int f,int na,...) noex {
 		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
 	    if (na > 0) {
-	        va_list	ap ;
 		va_begin(ap,na) ;
 	        for (int i = 0 ; i < na ; i += 1) {
 		    int	ch = (int) va_arg(ap,int) ;

@@ -17,11 +17,19 @@
 /*******************************************************************************
 
 	Names:
+	percache
 
 	Synopsis:
 	int percache_xxx(PERCACHE *op,...) noex
 
-	where:
+	Descrption:
+	This was originally written to store permanent (or
+	semi-permanent) data items for use in KornShell (KSH) built-in
+	commands.  In the original use case (KornShell built-ins)
+	there was no need for thread-safety because all built-ins
+	are run serially.
+
+	Arguments:
 	op		pointer to particular data instance (many are possible)
 
 	Returns:

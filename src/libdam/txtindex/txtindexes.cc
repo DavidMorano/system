@@ -75,10 +75,12 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
+#include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
 #include	<strn.h>
@@ -87,6 +89,7 @@
 #include	<hash.h>
 #include	<cfdec.h>
 #include	<offindex.h>
+#include	<strtabfind.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -114,6 +117,7 @@
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
+#define	TI		txtindexes
 #define	TI_CUR		txtindexes_cur
 #define	TI_TAG		txtindexes_tag
 #define	TI_OBJ		txtindexes_obj
@@ -148,11 +152,7 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-typedef uint (*strtab_t)[3] ;
-
-extern "C" {
-    extern int	strtabfind(cchar *,strtab_t,int,int,cchar *,int) noex ;
-}
+typedef int (*strtab_t)[3] ;		/* for |strtabfind(3uc)| */
 
 
 /* external variables */
@@ -160,7 +160,7 @@ extern "C" {
 
 /* exported variables */
 
-TI_OBJ	txtindexes_mod = {
+TI_OBJ	txtindexes_modinfo = {
 	"txtindexes",
 	int(sizeof(txtindexes)),
 	int(sizeof(txtindexes_cur))
@@ -232,7 +232,7 @@ static int	txtindexes_auditeigen(txtindexes *) noex ;
 
 static int	offindex_tags(offindex *,cchar *,int) noex ;
 
-static int	tag_parse(TI_TAG *,cchar *,int) noex ;
+static int	tag_parse(TI_TAG *,char *,int,cchar *,int) noex ;
 
 #if	CF_DYNACOMPACT
 #else
@@ -377,8 +377,6 @@ int txtindexes_getinfo(txtindexes *op,TI_INFO *ip) noex {
 	    n = op->ifi.taglen ;
 	    if (ip != nullptr) {
 	        TI_FI	*fip = &op->hf ;
-	        cint	plen = MAXPATHLEN ;
-	        cchar	*sp ;
 	        memclear(ip) ;
 	        ip->ctime = (time_t) op->ifi.wtime ;
 	        ip->mtime = fip->ti_mod ;
@@ -386,14 +384,19 @@ int txtindexes_getinfo(txtindexes *op,TI_INFO *ip) noex {
 	        ip->neigen = (op->ifi.erlen - 1) ;
 	        ip->minwlen = op->ifi.minwlen ;
 	        ip->maxwlen = op->ifi.maxwlen ;
-	        sp = (fip->mapdata + op->ifi.sdnoff) ;
-	        if (sp[0] != '\0') {
-	            strwcpy(ip->sdn,sp,plen) ;
-	        }
-	        sp = (fip->mapdata + op->ifi.sfnoff) ;
-	        if (sp[0] != '\0') {
-	            strwcpy(ip->sfn,sp,plen) ;
-	        }
+#ifdef	COMMENT
+		if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	            cint	plen = rs ;
+	            cchar	*sp = (fip->mapdata + op->ifi.sdnoff) ;
+	            if (sp[0] != '\0') {
+	                strwcpy(ip->sdn,sp,plen) ;
+	            }
+	            sp = (fip->mapdata + op->ifi.sfnoff) ;
+	            if (sp[0] != '\0') {
+	                strwcpy(ip->sfn,sp,plen) ;
+	            }
+		} /* end if (getbufsize) */
+#endif /* COMMENT */
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
@@ -485,10 +488,11 @@ int txtindexes_lookup(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
 /* end subroutine (txtindexes_lookup) */
 
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp) noex {
+int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
+		char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = txtindexes_magic(op,curp,tagp)) >= 0) {
+	if ((rs = txtindexes_magic(op,curp,tagp,rbuf)) >= 0) {
 	    uint		tagoff ;
 	    TI_FI		*fip = &op->tf ;
 	    cchar		*tagbuf ;
@@ -512,7 +516,7 @@ int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp) noex {
 	                tagoff = curp->taglist[idx] ;
 	                if (tagoff < fip->mapsize) {
 	                    tagbuf = (fip->mapdata + tagoff) ;
-	                    rs = tag_parse(tagp,tagbuf,-1) ;
+	                    rs = tag_parse(tagp,rbuf,rlen,tagbuf,-1) ;
 	                    len = rs ;
 	                } else {
 	                    rs = SR_BADFMT ;
@@ -924,7 +928,7 @@ static int txtindexes_mktaglist(txtindexes *op,uint **tlpp,vecstr *hlp) noex {
 
 int txtindexes_oureigen(txtindexes *op,cchar *kp,int kl) noex {
 	TI_MI		*mip = &op->mi ;
-	strtab_t	eitab = strtab_t( mip->eitab) ;
+	strtab_t	eitab = strtab_t(mip->eitab) ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	uint		eilen = op->ifi.eilen ;
@@ -1089,7 +1093,8 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	            break ;
 	        }
 	        if (cp[-1] == '\0') {
-	            rs = strtabfind(estab,eitab,eilen,nskip,cp,cl) ;
+		    strtab_t	stab = strtab_t(eitab) ;
+	            rs = strtabfind(estab,stab,eilen,nskip,cp,cl) ;
 	        } else {
 	            rs = SR_BADFMT ;
 		}
@@ -1131,7 +1136,8 @@ static int txtindexes_auditeigen(txtindexes *op) noex {
 	            rs = SR_BADFMT ;
 	        }
 	        if (rs >= 0) {
-	            rs = strtabfind(estab,eitab,eilen,nskip,cp,cl) ;
+		    strtab_t	stab = strtab_t(eitab) ;
+	            rs = strtabfind(estab,stab,eilen,nskip,cp,cl) ;
 	        }
 	        cp = (cp + cl + 1) ;
 	        if (rs < 0) break ;
@@ -1164,10 +1170,11 @@ static int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 }
 /* end subroutine (offindex_tags) */
 
-static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
+static int tag_parse(TI_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*tp ;
+	rbuf[0] = '\0' ;
 	if (sl < 0) {
 	    if ((tp = strchr(sp,'\n')) != 0) {
 	        sl = (tp - sp) ;
@@ -1178,10 +1185,9 @@ static int tag_parse(TI_TAG *tagp,cchar *sp,int sl) noex {
 	if (rs >= 0) {
 	    tagp->recoff = 0 ;
 	    tagp->reclen = 0 ;
-	    tagp->fname[0] = '\0' ;
 	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
 		{
-	            rs = mkpathw(tagp->fname,sp,(tp - sp)) ;
+	            rs = snwcpy(rbuf,rlen,sp,(tp - sp)) ;
 	            len = rs ;
 		}
 	        sl -= ((tp + 1) - sp) ;

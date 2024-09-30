@@ -32,12 +32,15 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
+#include	<strnxcmp.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -60,8 +63,6 @@
 
 /* external subroutines */
 
-extern int	vstrkeycmp(char **,char **) ;
-extern int	strnvaluecmp(char *,char *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 
 
@@ -191,12 +192,7 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 	    fp[fl] = '\0' ;
 	    if (pbi > 0) {
 
-	        if (strnvaluecmp(pathbuf,fp,fl) != 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("procfilepaths: adding %t\n",
-	                fp,fl) ;
-#endif
+	        if (strnvalcmp(pathbuf,fp,fl) != 0) {
 
 	            c += 1 ;
 	            rs = storebuf_chr(pathbuf,PATHBUFLEN,pbi,':') ;
@@ -207,11 +203,6 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 	                fp,fl) ;
 
 			pbi += rs ;
-
-#if	CF_DEBUGS
-	debugprintf("procfilepaths: incremental rs=%d\n",rs) ;
-	pathdump(pathbuf,pbi) ;
-#endif /* CF_DEBUGS */
 
 	        } /* end if (adding) */
 
@@ -243,7 +234,7 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 /* do we have the standard path component? */
 
 	cp = "/usr/bin" ;
-	if ((rs >= 0) && (strnvaluecmp(pathbuf,cp,-1) != 0)) {
+	if ((rs >= 0) && (strnvalcmp(pathbuf,cp,-1) != 0)) {
 
 	    c += 1 ;
 	    rs = storebuf_chr(pathbuf,PATHBUFLEN,pbi,':') ;

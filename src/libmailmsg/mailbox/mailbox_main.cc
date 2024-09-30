@@ -43,6 +43,7 @@
 #include	<sigblocker.h>
 #include	<mallocxx.h>
 #include	<filer.h>
+#include	<filer_mailsup.h>
 #include	<fbliner.h>
 #include	<ascii.h>
 #include	<vecobj.h>

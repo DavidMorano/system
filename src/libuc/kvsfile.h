@@ -1,7 +1,7 @@
 /* kvsfile HEADER */
 /* lang=C20 */
 
-/* perform access table file related functions */
+/* perform kf_file related functions */
 /* version %I% last-modified %G% */
 
 
@@ -23,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<vecobj.h>
 #include	<hdb.h>

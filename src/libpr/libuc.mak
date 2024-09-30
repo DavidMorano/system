@@ -2,7 +2,7 @@
 
 T= libuc
 
-ALL= $(T).so $(T).a
+ALL= $(T).o $(T).so $(T).a
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -626,6 +626,21 @@ strnxcmp.o:		strnxcmp.dir
 strnxcmp.dir:
 	makesubdir $@
 
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
+
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
+
+# STRKEYX
+strkeyx.o:		strkeyx.dir
+strkeyx.dir:
+	makesubdir $@
+
 # VEC
 vec.o:			vec.dir
 vec.dir:
@@ -885,6 +900,7 @@ shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
 filelines.o:		filelines.cc filelines.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
+dictdiff.o:		dictdiff.cc dictdiff.h
 #
 isproc.o:		isproc.cc isproc.h
 #
@@ -893,6 +909,7 @@ isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
+isindomain.o:		isindomain.cc isindomain.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

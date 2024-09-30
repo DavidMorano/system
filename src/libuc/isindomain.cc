@@ -59,6 +59,12 @@
 /* forward references */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 bool isindomain(cchar *name,cchar *domainname) noex {

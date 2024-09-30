@@ -1,7 +1,7 @@
 /* kvsfile SUPPORT */
 /* lang=C++20 */
 
-/* perform access table kf_file related functions */
+/* perform kf_file related functions */
 /* version %I% last-modified %G% */
 
 
@@ -33,7 +33,7 @@
 	freed when no longer needed.  There is no memory leak as
 	they are all freed when the object is deconstructed.  Stale
 	keys do sort of serve as a ready key cache for those cases
-	when they may be need later on with future entries!
+	when they may be needed later on with future entries!
 
 *******************************************************************************/
 
@@ -236,11 +236,16 @@ static int	key_finish(kf_key *) noex ;
 static int entry_start(kf_ent *,int,int,kf_key *,cchar *,int) noex ;
 static int entry_finish(kf_ent *) noex ;
 
-static int	vcmpfname(kf_file **,kf_file **) noex ;
-static int	vcmpkey(kf_key **,kf_key **) noex ;
+extern "C" {
+    static int	vcmpfname(kf_file **,kf_file **) noex ;
+    static int	vcmpkey(kf_key **,kf_key **) noex ;
+}
+
 static int	cmpkeyval(kf_ent *,kf_ent *,int) noex ;
 
-static uint	hashkeyval(kf_ent *,int) noex ;
+extern "C" {
+    static uint	hashkeyval(kf_ent *,int) noex ;
+}
 
 
 /* local variables */
@@ -988,7 +993,7 @@ static int vcmpfname(kf_file **e1pp,kf_file **e2pp) noex {
 	            rc = -1 ;
 		}
 	    } else {
-	       rc = 1 ;
+	       rc = +1 ;
 	    }
 	}
 	return rc ;
@@ -1007,7 +1012,7 @@ static int vcmpkey(kf_key **e1pp,kf_key **e2pp) noex {
 	            rc = -1 ;
 		}
 	    } else {
-	        rc = 1 ;
+	        rc = +1 ;
 	    }
 	}
 	return rc ;

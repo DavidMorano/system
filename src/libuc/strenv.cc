@@ -18,9 +18,10 @@
 
 /*******************************************************************************
 
-	Type:
+	Name:
 	strenv
 
+	Description:
 	Recommended usage within source code:
 		#include	<strenv.hh>
 		strenv	strpath(strenv_path) ;
@@ -49,7 +50,7 @@
 
 /* local defines */
 
-#define	PLMULT		2		/* path-length multiplier */
+#define	PLMULT		4		/* path-length multiplier */
 
 
 /* imported namespaces */
@@ -206,8 +207,7 @@ int valstore_fini() noex {
 strenv::operator ccharp () noex {
 	cchar		*rp = strp ;
 	if (! facc) {
-	    int		rs ;
-	    if ((rs = data.valget(w,&rp)) >= 0) {
+	    if (int rs ; (rs = data.valget(w,&rp)) >= 0) {
 		strp = rp ;
 		facc = true ;
 	    } else {
@@ -354,12 +354,11 @@ int valstore::valpath(int aw) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
-	    cchar *rp ; 
+	    cchar	*rp ; /* used-afterwards */
 	    if ((rp = getenv(vn)) == nullptr) {
 		if ((rs = maxpathlen) >= 0) {
 		    cint	tlen = (rs * PLMULT) ;
-		    char	*tbuf{} ;
-		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		    if (char *tbuf{} ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
 			    int		tl = rs ;
@@ -378,7 +377,7 @@ int valstore::valpath(int aw) noex {
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
-	    } /* end if (env-variable access) */
+	    } /* end if (getenv) */
 	    strp[aw] = rp ;
 	} /* end if (env-variabiel name) */
 	facc[aw] = true ;

@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	These routines provide means to peruse the elements of a
-	'hostent' structure as returned by the system subroutines:
+	HOSTENT structure as returned by the system subroutines:
 
 		gethostbyname
 		gethostbyaddr
@@ -77,6 +77,12 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

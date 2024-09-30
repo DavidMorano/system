@@ -33,6 +33,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<string>		/* |string(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -82,6 +84,7 @@ enum cts {
 } ;
 
 struct grcache_rec {
+	cchar		*gn ;
 	char		*grbuf ;
 	ucentgr		gr ;
 	time_t		ti_create ;		/* creation time */
@@ -90,7 +93,6 @@ struct grcache_rec {
 	uint		magic ;
 	int		wcount ;
 	int		grl ;
-	char		gn[GROUPNAMELEN+1] ;
 } ;
 
 typedef grcache_rec	rec ;
@@ -228,7 +230,7 @@ int grcache_finish(grcache *op) noex {
 			    if (rs >= 0) rs = rs1 ;
 			}
 	            }
-	        } /* end while */
+	        } /* end for */
 	    }
 	    if (rlp) {
 	        rs1 = vechand_finish(rlp) ;
@@ -617,33 +619,36 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	            cint	grlen = rs ;
 	            if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
 	                cint	sz = (rs+1) ;
-	                void	*p{} ;
+	                void	*vp{} ;
 	                grl = rs ; /* indicates entry found */
-	                if ((rs = uc_malloc(sz,&p)) >= 0) {
+	                if ((rs = uc_malloc(sz,&vp)) >= 0) {
 			    ucentgr	*grp = &rp->gr ;
-		            char	*grbuf = charp(p) ;
+		            char	*grbuf = charp(vp) ;
 		            if ((rs = grp->load(grbuf,grl,&gr)) >= 0) {
 	                        rp->grbuf = grbuf ;
 	    	                rp->grl = grl ;
 		            }
 		            if (rs < 0) {
-				uc_free(p) ;
+				uc_free(grbuf) ;
 			    }
 	                } /* end if (memory-allocation) */
 	            } else if (rs == rsn) {
 	                rp->grl = 0 ; /* optional */
 	                grl = 0 ; /* indicates an empty (not-found) entry */
 		    }
+	            if (rs >= 0) {
+			cchar	*cp{} ;
+			if ((rs = uc_mallocstrw(gn,-1,&cp)) >= 0) {
+			    rp->gn = cp ;
+	                    rp->ti_create = dt ;
+	                    rp->ti_access = dt ;
+	                    rp->wcount = wc ;
+	                    rp->magic = RECORD_MAGIC ;
+			} /* end if (memory-allocation) */
+	            } /* end if (ok) */
 	            rs1 = uc_free(grbuf) ; /* free first one up at top */
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
-	        if (rs >= 0) {
-	            strwcpy(rp->gn,gn,GROUPNAMELEN) ;
-	            rp->ti_create = dt ;
-	            rp->ti_access = dt ;
-	            rp->wcount = wc ;
-	            rp->magic = RECORD_MAGIC ;
-	        }
+	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? grl : rs ;
@@ -657,6 +662,11 @@ static int record_finish(rec *rp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (rp->magic == RECORD_MAGIC) {
 		rs = SR_OK ;
+		if (rp->gn) {
+	            rs1 = uc_free(rp->gn) ;
+	            if (rs >= 0) rs = rs1 ;
+	            rp->gn = nullptr ;
+		}
 	        if (rp->grbuf) {
 	            rs1 = uc_free(rp->grbuf) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -664,7 +674,6 @@ static int record_finish(rec *rp) noex {
 	        }
 	        rp->grl = 0 ;
 	        rp->gid = -1 ;
-	        rp->gn[0] = '\0' ;
 	        rp->magic = 0 ;
 	    } /* end if (was open) */
 	} /* end if (non-null) */
@@ -689,20 +698,20 @@ static int record_access(rec *ep,time_t dt) noex {
 
 static int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
 	int		rs = SR_OK ;
-        void    	*p{} ;
+        void    	*vp{} ;
         if (ep->grbuf) {
-            rs = uc_realloc(ep->grbuf,(grl+1),&p) ;
+            rs = uc_realloc(ep->grbuf,(grl+1),&vp) ;
         } else {
-            rs = uc_malloc((grl+1),&p) ;
+            rs = uc_malloc((grl+1),&vp) ;
         }
         if (rs >= 0) {
-            char        *grbuf = charp(p) ; /* new variable */
+            char        *grbuf = charp(vp) ; /* new variable */
 	    ucentgr	*grp = &ep->gr ;
-            ep->grbuf = charp(p) ;
+            ep->grbuf = charp(vp) ;
             ep->grl = grl ;
             rs = grp->load(grbuf,grl,ngrp) ;
             if (rs < 0) {
-                uc_free(p) ;
+                uc_free(vp) ;
             }
         } /* end if (ok) */
 	return rs ;
@@ -732,14 +741,14 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
 	                ep->grl = 0 ; /* signal whatever? */
 	                grl = 0 ; /* indicates an empty (not-found) entry */
 		    } /* end if */
+	            if (rs >= 0) {
+	                ep->ti_create = dt ;
+	                ep->ti_access = dt ;
+	                ep->wcount = wc ;
+	            } /* end if (ok) */
 	            rs1 = uc_free(grbuf) ; /* free first one up top */
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
-	        if (rs >= 0) {
-	            ep->ti_create = dt ;
-	            ep->ti_access = dt ;
-	            ep->wcount = wc ;
-	        }
+	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? grl : rs ;

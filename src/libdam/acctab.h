@@ -1,6 +1,9 @@
 /* acctab HEADER */
 /* lang=C20 */
 
+/* perform access-table file related functions */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -15,7 +18,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usyscalls.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<vecitem.h>
 #include	<vecstr.h>

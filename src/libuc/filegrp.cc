@@ -24,9 +24,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strken(3c)| */
 #include	<usystem.h>
+#include	<getgroupname.h>
 #include	<bufsizevar.hh>
 #include	<vechand.h>
 #include	<cq.h>
@@ -48,6 +50,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -55,10 +58,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getgroupname(char *,int,gid_t) noex ;
-}
 
 
 /* local structures */

@@ -47,6 +47,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"strnxcmp.h"
 

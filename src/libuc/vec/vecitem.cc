@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	vecitem
+
+	Description:
 	These routines are used when the caller wants to store a
 	COPY of the passed element data into a vector.  These
 	routines will copy and store the copied data in the list.
@@ -51,6 +55,12 @@ extern "C" {
 }
 
 typedef vecitem_cur	cur ;
+
+
+/* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -111,14 +121,15 @@ constexpr cur		curdef = mkcurdef() ;
 /* exported subroutines */
 
 int vecitem_start(vecitem *op,int n,int opts) noex {
+	VECITEM		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (n < 0) n = VECITEM_DEFENTS ;
 	if (op) {
-	    memclear(op) ;	/* <- potentially dangerous if type changes */
+	    memclear(hop) ;	/* <- potentially dangerous if type changes */
 	    if ((rs = vecitem_setopts(op,opts)) >= 0) {
-	        cint	size = (n + 1) * sizeof(char **) ;
+	        cint	sz = (n + 1) * sizeof(char **) ;
 		void	*vp{} ;
-	        if ((rs = uc_malloc(size,&vp)) >= 0) {
+	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
 	            op->va[0] = nullptr ;
 	            op->n = n ;

@@ -1,6 +1,9 @@
 /* strcpyxc HEADER */
 /* lang=C20 */
 
+/* copy a c-string to destination buffer a/ a case conversion */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -15,19 +18,23 @@
 #define	STRCPYXC_INCLUDE
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern char	*strcpylc(char *,const char *) ;
-extern char	*strcpyuc(char *,const char *) ;
-extern char	*strcpyfc(char *,const char *) ;
-
-#ifdef	__cplusplus
-}
-#endif
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
-#endif /* STRCPYXC_INCLUDE	*/
+EXTERNC_begin
+
+extern char	* strcpybc (char *,cchar *) noex ;
+extern char	* strcpylc (char *,cchar *) noex ;
+extern char	* strcpyuc (char *,cchar *) noex ;
+extern char	* strcpyfc (char *,cchar *) noex ;
+
+EXTERNC_end
+
+
+#endif /* STRCPYXC_INCLUDE */
 
 

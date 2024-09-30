@@ -4,107 +4,53 @@ T= unlinkd
 
 ALL= $(T).o
 
-HELPFILE= $(T).help
 
-SRCROOT= $(LOCAL)
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
-
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
-
-
-CC= $(CGS_CC)
-GPP= $(CGS_GPP)
-
-GPPFLAGS= $(CGS_CXXFLAGS)
-
-CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
-CCOPTS= $(CCOPTS_GCCOPT) $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB) -Wall
-CCOPTS= $(CCOPTS_GCCOPT) $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= -g -Wstrict-aliasing -Wall $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB) 
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-# HyperSPARC
-#CCOPTS= -xO5 -xtarget=ss20/hs22 -dalign -xdepend
+DEFS= 
 
-# UltraSPARC
-#CCOPTS= -xO5 -xtarget=ultra -xsafe=mem -dalign -xdepend
+INCS= unlinkd.h
 
-
-DEF0= -DOSNAME_$(SYSNAME)=$(OSNUM) -DOSTYPE_$(OSTYPE)=1
-DEF1= 
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7=
-
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
-
-INCDIRS= -I$(INCDIR)
-
-CPPFLAGS= $(DEFS) $(INCDIRS)
-
-CFLAGS= $(CCOPTS)
-
-#LD= $(CC)
-#LD= cc
-LD= ld
+LIBS= -ldam
 
 
-LDFLAGS= -m # -Bdirect
+INCDIRS=
 
-LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-LIB0=
-LIB1= -ldam -lb 
-LIB2= -luc -lu
-LIB3=
-LIB4= $(CGS_LIBS)
-LIB5=
-LIB6= -lsecdb -lproject -lrt -lpthread -lxnet -lsocket -lnsl
-LIB7= -ldl -lc
-
-LIBS= $(LIB0) $(LIB1) $(LIB2) $(LIB3) $(LIB4) $(LIB5) $(LIB6) $(LIB7)
+LIBDIRS= -L$(LIBDIR)
 
 
-VALUES= $(VALDIR)/$(CGS_VALDIR)
+RUNINFO= -rpath $(RUNDIR)
 
-CRTI= $(LDCRTDIR)/crti.o
-CRT1= $(LDCRTDIR)/crt1.o
-CRTN= $(LDCRTDIR)/crtn.o
-
-CRT0= $(CRTI) $(CRT1) $(VALUES)
-CRTC= makedate.o
-
-LINT= lint
-LINTFLAGS= -uxn
-
-NM= nm
-NMFLAGS= -xs
-
-CPP= cpp
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 
-UPINCS=
-
-INCS= rmermsg.h
-
-
-OBJ00= unlinkdmain.o 
+OBJ00= unlinkd_main.o 
 OBJ01= rmermsg.o
-OBJ02= pcsgetprogpath.o
+OBJ02=
 OBJ03=
 OBJ04=
 OBJ05=
@@ -124,36 +70,32 @@ OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 
 OBJ= $(OBJA) $(OBJB)
 
-OBJS= $(CRT0) $(OBJ) $(CRTC)
 
-
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii
 
 
 default:		$(T).o
 
 all:			$(ALL)
 
-.cc.o:
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
-.c.cx:
-	$(CXREF) -C $(CXREFFLAGS) $(CPPFLAGS) $<
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-.c.cs:
-	$(CXREF) $(CXREFFLAGS) $(CPPFLAGS) -o $(*).cs $<
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
 
 
 $(T).o:			$(OBJ) Makefile $(T).map
@@ -164,9 +106,6 @@ $(T).nm nm:		$(T).o
 
 safe:
 	makesafe -v=3 -I $(INCDIR) $(OBJ)
-
-# there are no include files as part of this interface
-upincs:			$(UPINCS)
 
 up:			upincs $(ALL)
 	makenewer $(ALL) .. -t $(@)
@@ -182,13 +121,7 @@ control:
 	date >> Control
 
 
-unlinkdmain.o:		unlinkdmain.c $(INCS)
-
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-rmermsg.o:		rmermsg.c rmermsg.h
+unlinkd_main.o:		unlinkd_main.cc rmermsg.h	$(INCS)
+rmermsg.o:		rmermsg.cc rmermsg.h		$(INCS)
 
 

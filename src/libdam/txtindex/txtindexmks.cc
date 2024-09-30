@@ -78,6 +78,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<getpwd.h>
@@ -146,7 +147,7 @@
 #define	LISTOBJ_COUNT(op)		osetint_count((op))
 #define	LISTOBJ_MKVEC(op,va)		osetint_mkvec((op),(va))
 #define	LISTOBJ_CURBEGIN(op,cp)		osetint_curbegin((op),(cp))
-#define	LISTOBJ_ENUM(op,cp,rp)		osetint_enum((op),(cp),(rp))
+#define	LISTOBJ_ENUM(op,cp,rp)		osetint_curenum((op),(cp),(rp))
 #define	LISTOBJ_CUREND(op,cp)		osetint_curend((op),(cp))
 #else /* CF_SETINT */
 #define	LISTOBJ				vecint
@@ -170,6 +171,11 @@
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -207,8 +213,18 @@ static int txtindexmks_ctor(txtindexmks *op,Args ... args) noex {
 	TXTINDEXMKS	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    cnullptr	np{} ;
 	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->eigenp = new(nothrow) strtab) != np) {
+	        if ((op->tagfilep = new(nothrow) bfile) != np) {
+		    rs = SR_OK ;
+		} /* end if (new-bfile) */
+		if (rs < 0) {
+		    delete op->eigenp ;
+		    op->eigenp = nullptr ;
+		}
+	    } /* end if (new-strtab) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -218,6 +234,14 @@ static int txtindexmks_dtor(txtindexmks *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->tagfilep) {
+		delete op->tagfilep ;
+		op->tagfilep = nullptr ;
+	    }
+	    if (op->eigenp) {
+		delete op->eigenp ;
+		op->eigenp = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -412,7 +436,7 @@ int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
 	                kp = keybuf ;
 	            }
 	            {
-	                rs = strtab_add(&op->eigens,kp,kl) ;
+	                rs = strtab_add(op->eigenp,kp,kl) ;
 	            }
 	            if (rs < 0) break ;
 	        } /* end for */
@@ -496,7 +520,7 @@ static int txtindexmks_filesbeginc(TIM *op) noex {
 		    }
 	        }
 	        if (rs >= 0) {
-	            bfile	*tfp = &op->tagfile ;
+	            bfile	*tfp = op->tagfilep ;
 	            char	ostr[8] = "wc" ;
 	            if (op->f.ofexcl) strcat(ostr,"e") ;
 	            if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
@@ -548,7 +572,7 @@ static int txtindexmks_filesbeginwait(TIM *op) noex {
 /* end subroutine (txtindexmks_filesbeginwait) */
 
 static int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
-	bfile		*tfp = &op->tagfile ;
+	bfile		*tfp = op->tagfilep ;
 	cmode		om = op->om ;
 	int		rs ;
 	char		ostr[8] = "wce" ;
@@ -571,7 +595,7 @@ static int txtindexmks_filesend(TIM *op) noex {
 	int		rs1 ;
 	if (op->f.tagopen) {
 	    op->f.tagopen = false ;
-	    rs1 = bclose(&op->tagfile) ;
+	    rs1 = bclose(op->tagfilep) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->ntagfname != nullptr) {
@@ -654,7 +678,7 @@ static int txtindexmks_listbegin(TIM *op) noex {
 	    }
 	    if (rs >= 0) {
 	        sz = TXTINDEXMKS_EIGENSIZE ;
-	        rs = strtab_start(&op->eigens,sz) ;
+	        rs = strtab_start(op->eigenp,sz) ;
 	    }
 	    if (rs < 0) {
 	        for (int j = 0 ; j <= idx ; j += 1) {
@@ -674,7 +698,7 @@ static int txtindexmks_listend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	    rs1 = strtab_finish(&op->eigens) ;
+	    rs1 = strtab_finish(op->eigenp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	{
@@ -696,7 +720,7 @@ static int txtindexmks_listend(TIM *op) noex {
 
 static int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	LISTOBJ		*lop = (LISTOBJ *) op->lists ;
-	bfile		*tfp = &op->tagfile ;
+	bfile		*tfp = op->tagfilep ;
 	uint		tagoff ;
 	int		rs = SR_OK ;
 	int		roff = tagp->recoff ;
@@ -931,7 +955,7 @@ static int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 
 static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 		filer *hfp,int off) noex {
-	strtab		*elp = &op->eigens ;
+	strtab		*elp = op->eigenp ;
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = strtab_strsize(elp)) >= 0) {
@@ -957,10 +981,10 @@ static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	            int		erlen ;
 	            int		*ertab = nullptr ;
 
-	            n = strtab_count(&op->eigens) ;
+	            n = strtab_count(op->eigenp) ;
 	            erlen = (n+1) ;
 
-	            if ((rs = strtab_recsize(&op->eigens)) >= 0) {
+	            if ((rs = strtab_recsize(op->eigenp)) >= 0) {
 	                void	*vp ;
 	                ersize = rs ;
 	                if ((rs = uc_malloc(ersize,&vp)) >= 0) {
@@ -1096,15 +1120,17 @@ int txtindexmks_ntagclose(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tagsize = 0 ;
-	if ((rs = bsize(&op->tagfile)) >= 0) {
+	if ((rs = bsize(op->tagfilep)) >= 0) {
 	    mode_t	om = op->om ;
 	    op->tagsize = rs ;
 	    tagsize = rs ;
-	    rs = bcontrol(&op->tagfile,BC_MINMOD,om) ;
+	    rs = bcontrol(op->tagfilep,BC_MINMOD,om) ;
+	} /* end if (bsize) */
+	{
+	    rs1 = bclose(op->tagfilep) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->f.tagopen = false ;
 	}
-	rs1 = bclose(&op->tagfile) ;
-	if (rs >= 0) rs = rs1 ;
-	op->f.tagopen = false ;
 	return (rs >= 0) ? tagsize : rs ;
 }
 /* end if (txtindexmks_ntagclose) */
@@ -1112,7 +1138,7 @@ int txtindexmks_ntagclose(TIM *op) noex {
 #ifdef	COMMENT
 
 static int txtindexmks_printeigen(TIM *op) noex {
-	strtab		*edp = &op->eigens ;
+	strtab		*edp = op->eigenp ;
 	int		rs ;
 	if ((rs = strtab_count(edp)) >= 0) {
 	    int		erlen = (rs+1) ;
@@ -1144,7 +1170,7 @@ static int txtindexmks_printeigen(TIM *op) noex {
 /* end subroutine (txtindexmks_printeigen) */
 
 static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
-	strtab		*edp = &op->eigens ;
+	strtab		*edp = op->eigenp ;
 	int		rs ;
 	int		rs1 ;
 	int		*ertab = ap->ertab ;

@@ -16,7 +16,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	FILECOUNTS_MAGIC	0x22436893

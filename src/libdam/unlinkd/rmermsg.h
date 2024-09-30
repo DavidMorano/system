@@ -1,20 +1,21 @@
-/* rmermsg */
+/* rmermsg HEADER */
+/* lang=C20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	RMERMSG_INCLUDE
-#define	RMERMSG_INCLUDE	1
+#define	RMERMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-#include	<sys/types.h>
 
-#include	<localmisc.h>
-
-
-/* general acknowledgement response */
 struct rmermsg_fname {
 	uint	msglen ;
 	uint	tag ;
@@ -38,21 +39,13 @@ enum rmermsgtypes {
 	rmermsgtype_overlast
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(RMERMSG_MASTER)) || (RMERMSG_MASTER == 0)
+extern int	rmermsg_fname(struct rmermsg_fname *,int,char *,int) noex ;
+extern int	rmermsg_unknown(struct rmermsg_unknown *,int,char *,int) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	rmermsg_fname(struct rmermsg_fname *,int,char *,int) ;
-extern int	rmermsg_unknown(struct rmermsg_unknown *,int,char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* RMERMSG_MASTER */
 
 #endif /* RMERMSG_INCLUDE */
 

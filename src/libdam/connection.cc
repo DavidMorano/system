@@ -155,7 +155,7 @@ constexpr int		in6addrlen = INET6ADDRLEN ;
 int connection_start(CON *cnp,cchar *inetdomain) noex {
 	int		rs = SR_FAULT ;
 	if (cnp && inetdomain) {
-	    static cint	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    connection_head	*hop = static_cast<connection *>(cnp) ;
 	    cint		ssz = sizeof(sockaddress) ;
 	    memclear(hop) ;
@@ -370,7 +370,7 @@ int sub_mknames::addnames(hostinfo *hip) noex {
 	            rs = connection_addname(cnp,nlp,hp) ;
 	            n += rs ;
 	            if ((rs = hostinfo_curbegin(hip,&hc)) >= 0) {
-	                while ((rs = hostinfo_enumname(hip,&hc,&hp)) > 0) {
+	                while ((rs = hostinfo_curenumname(hip,&hc,&hp)) > 0) {
 	                    rs = connection_addname(cnp,nlp,hp) ;
 	              	    n += rs ;
 	              	    if (rs < 0) break ;
@@ -395,7 +395,7 @@ int sub_mknames::addresses(hostinfo *hip) noex {
 	    cint		nlen = rs ;
 	    const uchar		*ap ;
 	    if ((rs = hostinfo_curbegin(hip,&hc)) >= 0) {
-	        while ((rs = hostinfo_enumaddr(hip,&hc,&ap)) > 0) {
+	        while ((rs = hostinfo_curenumaddr(hip,&hc,&ap)) > 0) {
 		    inetaddr	ia ;
 		    cint	al = rs ;
 	            if (al != INET4ADDRLEN) continue ;

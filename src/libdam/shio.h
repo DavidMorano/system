@@ -22,9 +22,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>		/* |USTAT| */
 #include	<stdarg.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<bfile.h>
 
 

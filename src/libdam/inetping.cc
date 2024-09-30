@@ -58,7 +58,10 @@
 #include	<hostent.h>
 #include	<inetaddr.h>
 #include	<spawnproc.h>
+#include	<strn.h>
 #include	<sfx.h>
+#include	<ctdec.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -102,10 +105,7 @@
 /* external subroutines */
 
 extern "C" {
-   extern int	ctdeci(char *,int,int) noex ;
    extern int	getheour(cchar *,char *,HOSTENT *,char *,int) noex ;
-   extern int	isNotPresent(int) noex ;
-   extern int	isNotAccess(int) noex ;
 }
 
 #if	CF_DEBUGS
@@ -113,10 +113,6 @@ extern "C" {
     extern int	debugprintf(cchar *,...) noex ;
 }
 #endif
-
-extern "C" {
-    extern char	*strnchr(char *,int,int) noex ;
-}
 
 
 /* external variables */
@@ -166,7 +162,7 @@ static cchar	*pings[] = {
 
 int inetping(cchar *rhost,int timeout) noex {
 	HOSTENT		he, *hep ;
-	const int	helen = getbufsize(getbufsize_he) ;
+	cint		helen = getbufsize(getbufsize_he) ;
 	int		rs ;
 	char		*hebuf ;
 
@@ -244,7 +240,7 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 
 #if	CF_DEBUGS
 	{
-	    const int	af = AF_INET4 ;
+	    cint	af = AF_INET4 ;
 	    cchar	*as = (cchar *) ap ;
 	    char	abuf[INETX_ADDRSTRLEN+1] ;
 	    debugprintf("inetping/pingone: ent to=%d\n",to) ;
@@ -259,11 +255,11 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 #endif /* CF_BROKEN */
 
 	if ((rs = inetaddr_start(&ia,ap)) >= 0) {
-	    const int	dotlen = DOTBUFLEN ;
+	    cint	dotlen = DOTBUFLEN ;
 	    char	dotbuf[DOTBUFLEN + 1] ;
 	    if ((rs = inetaddr_getdotaddr(&ia,dotbuf,dotlen)) >= 0) {
 		SPAWNPROC	ps ;
-		const int	tolen = TOBUFLEN ;
+		cint		tolen = TOBUFLEN ;
 		int		ai = 0 ;
 		cchar		*args[4] ;
 		char		tobuf[TOBUFLEN+1] ;
@@ -286,7 +282,7 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 		ps.disp[2] = SPAWNPROC_DNULL ;
 		if ((rs = spawnproc(&ps,pingprog,args,NULL)) >= 0) {
 		    const pid_t	pid = rs ;
-		    const int	fd = ps.fd[1] ;
+		    cint	fd = ps.fd[1] ;
 		    int		cs = 0 ;
 #if	CF_DEBUGS
 	debugprintf("inetping/pingone: mid3 rs=%d\n",rs) ;
@@ -320,7 +316,7 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 /* end subroutine (pingone) */
 
 static int pingoneresp(int fd,int to) noex {
-	const int	rlen = RBUFLEN ;
+	cint		rlen = RBUFLEN ;
 	int		rs = SR_OK ;
 	int		tl = 0 ;
 	int		t = 0 ;

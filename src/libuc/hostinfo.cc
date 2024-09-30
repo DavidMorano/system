@@ -435,7 +435,7 @@ int hostinfo_curend(hostinfo *op,hostinfo_cur *curp) noex {
 /* end subroutine (hostinfo_curend) */
 
 /* enumerate the next hostname */
-int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
+int hostinfo_curenumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		nlen = 0 ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
@@ -493,10 +493,10 @@ int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
 }
-/* end subroutine (hostinfo_enumname) */
+/* end subroutine (hostinfo_curenumname) */
 
 /* enumerate the next host address */
-int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
+int hostinfo_curenumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	int		rs ;
 	int		alen = 0 ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
@@ -554,7 +554,7 @@ int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? alen : rs ;
 }
-/* end subroutine (hostinfo_enumaddr) */
+/* end subroutine (hostinfo_curenumaddr) */
 
 
 /* private subroutines */
@@ -1251,9 +1251,9 @@ static int matknown(cchar *name,int nl) noex {
 }
 /* end subroutine (matknown) */
 
-static int vmatname(cvoid **e1pp,cvoid **e2pp) noex {
-	HOSTINFO_N	*ne1p = (HOSTINFO_N *) *e1pp ;
-	HOSTINFO_N	*ne2p = (HOSTINFO_N *) *e2pp ;
+static int vmatname(cvoid **v1pp,cvoid **v2pp) noex {
+	HOSTINFO_N	*ne1p = (HOSTINFO_N *) *v1pp ;
+	HOSTINFO_N	*ne2p = (HOSTINFO_N *) *v2pp ;
 	bool		f = true ;
 	f = f && (ne1p->name[0] == ne2p->name[0]) ;
 	f = f && (ne1p->namelen == ne2p->namelen) ;
@@ -1262,9 +1262,9 @@ static int vmatname(cvoid **e1pp,cvoid **e2pp) noex {
 }
 /* end subroutine (vmatname) */
 
-static int vmataddr(cvoid **e1pp,cvoid **e2pp) noex {
-	HOSTINFO_A	*ae1p = (HOSTINFO_A *) *e1pp ;
-	HOSTINFO_A	*ae2p = (HOSTINFO_A *) *e2pp ;
+static int vmataddr(cvoid **v1pp,cvoid **v2pp) noex {
+	HOSTINFO_A	*ae1p = (HOSTINFO_A *) *v1pp ;
+	HOSTINFO_A	*ae2p = (HOSTINFO_A *) *v2pp ;
 	bool		f = true ;
 	f = f && (ae1p->addrlen == ae2p->addrlen) ;
 	if (f) {

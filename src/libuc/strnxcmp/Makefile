@@ -5,35 +5,30 @@ T= strnxcmp
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-RUNDIR= $(USRLOCAL)/lib
-
-
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS=
@@ -48,19 +43,21 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
+RUNINFO= -rpath $(RUNDIR)
+
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= strnfoldcmp.o
-OBJ1= strnkeycmp.o strnleadcmp.o 
-OBJ2= strnncmp.o 
+OBJ1= strnkeycmp.o strnvalcmp.o
+OBJ2= strnleadcmp.o strnncmp.o 
 OBJ3= strnndictcmp.o
 
 OBJA= obj0.o obj1.o
@@ -69,31 +66,35 @@ OBJB= obj2.o obj3.o
 OBJ_STRNXCMP= obja.o objb.o
 
 
+.SUFFIXES:		.hh .ii
+
+
 default:		$(T).o
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) .cc $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) -c $(CFLAGS) $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX) $(CPPFLAGS) -c $(CXXFLAGS) $<
+	$(COMPILE.cc) $<
 
 
 $(T).o:			$(OBJ_STRNXCMP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRNXCMP)
-
-$(T).a:			$(OBJ_STRNXCMP)
-	$(AR) $(ARFLAGS) -cr $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -134,6 +135,7 @@ objb.o:			$(OBJB)
 
 
 strnkeycmp.o:		strnkeycmp.cc	$(INCS)
+strnvalcmp.o:		strnvalcmp.cc	$(INCS)
 strnleadcmp.o:		strnleadcmp.cc	$(INCS)
 strnncmp.o:		strnncmp.cc	$(INCS)
 strnndictcmp.o:		strnndictcmp.cc $(INCS)

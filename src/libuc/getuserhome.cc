@@ -66,6 +66,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
@@ -210,7 +211,7 @@ int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 
 static int subinfo_start(SUBINFO *sip,cchar *un) noex {
 	int		rs ;
-	memclear(sip) ;			/* <- noted */
+	memclear(sip) ;			/* <- noted (dangerous?) */
 	sip->un = un ;
 	sip->uid = -1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {

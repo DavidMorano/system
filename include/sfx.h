@@ -19,6 +19,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin
@@ -55,6 +56,9 @@ extern int sfcenter(cchar *,int,cchar *,cchar **) noex ;
 extern int sfochr(cchar *,int,int,cchar **) noex ;
 extern int sfrchr(cchar *,int,int,cchar **) noex ;
 
+static inline int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+	return sfochr(sp,sl,sch,rpp) ;
+}
 static inline int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	return sfnextbrk(sp,sl,ss,rpp) ;
 }

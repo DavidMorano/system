@@ -19,11 +19,25 @@
 
 /*******************************************************************************
 
+	Names:
+	uc_getpwbegin
+	uc_getpwent
+	uc_getpwnam
+	uc_getpwuid
+	uc_getpwend
+
 	Description:
 	These subroutines were written so that we could use a single
 	interface to access the 'passwd' database on all UNIX®
 	platforms.  This code module provides a platform independent
 	implementation of UNIX® 'passwd' database access subroutines.
+
+	Synopsis:
+	int uc_getpwbegin() noex
+	int uc_getpwent(ucentpw *,char *,int) noex
+	int uc_getpwnam(ucentpw *,char *,int,cchar *) noex
+	int uc_getpwuid(ucentpw *,char *,int,uid_t) noex
+	int uc_getpwend() noex
 
 	Note:
 	1. Coding note: On some platforms, the non-reentrant versions

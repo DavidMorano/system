@@ -9,10 +9,10 @@
 
 	= 1998-05-01, David A­D­ Morano
 	This code module was originally written in VAX assembly
-	(back around 1980 or so).  It was then written into C-language
-	perhaps around 1983 (at AT&T Bell Laboratories).  This
-	(below) is a new incarnation based on that older C-language
-	code.
+	(back around 1980 or so).  It was then rewritten into
+	C-language perhaps around 1983 (at AT&T Bell Laboratories).
+	This (below) is a new incarnation based on that older
+	C-language code.
 
 */
 
@@ -37,6 +37,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<vecstr.h>
 

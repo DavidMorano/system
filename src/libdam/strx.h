@@ -15,6 +15,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	<strxcmp.h>
 
@@ -22,6 +23,10 @@
 EXTERNC_begin
 
 extern int	strwildsub(cchar *,cchar *) noex ;
+extern int	strwildsub(cchar *,cchar *) noex ;
+
+extern char	*strrpbrk(cchar *,cchar *) noex ;
+extern char	*strwhite(cchar *) noex ;
 
 EXTERNC_end
 

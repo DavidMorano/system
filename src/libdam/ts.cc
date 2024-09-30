@@ -42,14 +42,16 @@
 
 /******************************************************************************
 
-	This subroutine maintains a Time-Stamp (TS) file.  
+	Name:
+	ts
 
+	Description:
+	This subroutine maintains a Time-Stamp (TS) file.  
 	Format of file records:
 
 	- (see the 'entry' structure in the header)
 
 	Design note: 
-
 	In summary, Solaris sucks cock meat!  Solaris does not allow
 	a file to be memory-mapped from an NFS remote server *and*
 	also be file-locked at the same time.  A lot of stupid Solaris
@@ -83,7 +85,6 @@
 	file-locked.
 
 	Implementation note:
-
 	The code was actually running when files were being locked
 	in their entirety and beyond their ends.  There was some
 	sort of loop-hole in the stupid Solaris code that allowed
@@ -104,7 +105,6 @@
 	let me finish with the comment that Solaris sucks cock meat.
 
 	Final note:
-
 	Solaris sucks cock meat! Give me back simultaneous memory
 	mapping and file locking.  And while you're at it, give me
 	back RFS also! And to you stupid Solaris VM developers, get
@@ -113,7 +113,6 @@
 	all be happier with one (or more) of those alternatives.
 
 	Anecdotal note:
-
 	Hey, you stupid Solaris developers: give me back the ability
 	to push SOCKMOD on a TPI endpoint also! Since you're so
 	stupid, I know that you forgot that this was possible at

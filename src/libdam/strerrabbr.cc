@@ -70,7 +70,7 @@ struct sysret {
 
 /* local variables */
 
-static constexpr struct sysret	cvts[] = {
+static constexpr sysret		cvts[] = {
 	{ SR_PERM, "PERM" },
 	{ SR_NOENT, "NOENT" },
 	{ SR_SRCH, "SRCH" },
