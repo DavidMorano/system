@@ -126,13 +126,9 @@ struct wordstat {
 } ;
 
 
-int word(wsbp)
-struct wordstat	*wsbp ;
-{
+int word(struct wordstat	*wsbp) {
 	int	pos = wsbp->lenr, lenr ;
-
 	char	*cp ;
-
 
 	while (! isword(*cp)) {
 		lenr -= 1 ;
@@ -151,16 +147,14 @@ struct wordstat	*wsbp ;
 	return (pos - wsbp->lenr) ;
 }
 
-
-int isword(c)
-char	c ;
-{
+int isword(int c) {
 	int	sc = c | 0x20 ;
-
 	if ((sc >= 'a' && sc <= 'z') || (c >= '0' && c <= '9') ||
-		(c == '-') || (c == '_') || (c == "'")) return YES ;
-
-	else return NO ;
+		(c == '-') || (c == '_') || (c == "'")) {
+	    return YES ;
+	} else {
+	    return NO ;
+	}
 }
 
 

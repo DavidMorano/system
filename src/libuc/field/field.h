@@ -85,6 +85,7 @@ struct field : field_head {
 	int get(cchar *,cchar **) noex ;
 	int getterm(cchar *,cchar **) noex ;
 	int sharg(cchar *,char *,int) noex ;
+	int srvarg(cchar *,char *,int) noex ;
 	int remaining(cchar ** = nullptr) noex ;
 	void dtor() noex ;
 	~field() noex {

@@ -85,6 +85,10 @@ int field::sharg(cchar *tp,char *rbuf,int rlen) noex {
 	return field_sharg(this,tp,rbuf,rlen) ;
 }
 
+int field::srvarg(cchar *tp,char *rbuf,int rlen) noex {
+	return field_srvarg(this,tp,rbuf,rlen) ;
+}
+
 int field::remaining(cchar **rpp) noex {
 	return field_remaining(this,rpp) ;
 }

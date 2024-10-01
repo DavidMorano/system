@@ -1,22 +1,23 @@
-/* dial */
+/* dial SUPPORT */
+/* lang=C++20 */
 
 /* dial out and create a login session */
+/* version %I% last-modified %G% */
 
-/*
-	= 87/09/01, David A­D­ Morano
 
-*/
+/****
+	= 1987-09-01, David A­D­ Morano
 
-/******************************************************************
+****/
+
+/*******************************************************************************
 
 	This program will dial out on a phone line and
 	will then start up a shell on that line.
 
+*******************************************************************************/
 
-*********************************************************************/
-
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdio.h>
@@ -50,10 +51,7 @@
 
 
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+int main(int argc,const char **argv) {
 	CALL	da ;
 
 	int	pid ;
@@ -118,5 +116,6 @@ char	*argv[] ;
 
 	return (OK) ;
 }
+/* end subroutine (main) */
 
 

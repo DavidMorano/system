@@ -235,5 +235,6 @@ not_enough:
 
 	goto bad_ret ;
 }
+/* end subroutine (main) */
 
 

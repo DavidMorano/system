@@ -1,12 +1,10 @@
-/* squareroot */
+/* main SUPPORT (squareroot) */
 
 #include	<math.h>
 #include	<stdio.h>
 
-int main()
-{
+int main() {
 	double		x = 0.0 ;
-
 
 	for (x = 0.0 ; x < 100.0 ; x += 0.01) {
             double a ;

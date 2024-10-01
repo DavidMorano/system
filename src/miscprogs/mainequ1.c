@@ -1,13 +1,15 @@
 /* mainequ1 */
+
 #include	<stdlib.h>
 #include	<math.h>
 #include	<stdio.h>
+
 static int	equ(double,double) ;
 
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,const char **argv,const char **envv) {
 	double		n = 100 ;
-	double		x, y ;
+	double		x ;
+	double		y ;
 	int		f = 0 ;
 
 	for (x = -n ; x < n ; x += 0.02) {
@@ -34,9 +36,7 @@ int main(int argc,const char **argv,const char **envv)
 
 /* local subroutines */
 
-
-static int equ(double a,double b)
-{
+static int equ(double a,double b) {
 	double		small = 0.1 ;
 	return (fabs(a-b) < small) ;
 }

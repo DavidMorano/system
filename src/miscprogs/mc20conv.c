@@ -1,3 +1,6 @@
+/* main SUPPORT */
+
+
 /* program to swap the bytes in an MC20 SGS to normal M32 compatible mode */
 
 #include	"rel.h"
@@ -54,28 +57,16 @@
 
 
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+int main(int argc,const char **argv) {
 	struct fh	st_fh ;
-
 	struct uh	st_uh ;
-
 	struct sh	st_sh[20] ;
-
 	register int	i, len ;
-
 	int		c, n, load_start, load_off ;
-
 	int		j, sn, lenr, try, count, nsh ;
-
 	int		ifd, ofd ;
-
 	short		*swp, buf[BUFL] ;
-
 	char		*bp, obuf[82] ;
-
 
 /* interpret arguments */
 
@@ -197,7 +188,6 @@ default:
 
 	lenr = st_sh[sn].size ;
 	while (lenr) {
-
 		try = (BUFL < lenr) ? BUFL : lenr ;
 
 		len = read(ifd,buf,try) ;
@@ -214,18 +204,11 @@ default:
 		write(ofd,buf,len) ;
 
 		lenr -= len ;
-	} ;
+	} /* end while */
 
-
-
-	} ; /* end for loop */
-
-
-
+	} /* end for */
 
 /* continue to copy over the rest of the file */
-
-
 loop:
 	len = read(ifd,buf,BUFL) ;
 	if (len <= 0) goto eof ;
@@ -238,17 +221,11 @@ loop:
 eof:
 	return (0) ;
 }
+/* end subroutine (main) */
 
-
-int debugprint(s)
-char	*s ;
-{
-	int	len ;
-
-
-	len = 0 ;
+int debugprint(cchar *s) {
+	int	len = 0 ;
 	while (s[len]) len++ ;
-
 	return (write(2,s,len)) ;
 }
 

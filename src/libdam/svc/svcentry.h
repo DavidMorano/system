@@ -35,7 +35,6 @@
 #define	SVCENTRY_FL		struct svcentry_flags
 #define	SVCENTRY_ARGS		struct svcentry_arguments
 #define	SVCENTRY_MAGIC		0x76452376
-#define	SVCENTRY_TMPDIR		"/tmp"
 #define	SVCENTRY_IDLEN		15
 
 

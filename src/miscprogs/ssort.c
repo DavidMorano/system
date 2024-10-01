@@ -25,10 +25,7 @@
 
 
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+int main(int argc,const char **argv) {
 	bfile	in, out, err ;
 
 	int	i, rs, len ;
@@ -120,5 +117,6 @@ error:
 
 	goto exit ;
 }
+/* end subroutine (main) */
 
 

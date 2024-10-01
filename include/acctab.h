@@ -1,6 +1,9 @@
 /* acctab HEADER */
 /* lang=C20 */
 
+/* perform access-table file related functions */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -10,16 +13,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usyscalls.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<vecitem.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 
 
 #define	ACCTAB_MAGIC		0x31415926
@@ -71,10 +72,10 @@ EXTERNC_begin
 
 extern int acctab_open(acctab *,cchar *) noex ;
 extern int acctab_fileadd(acctab *,cchar *) noex ;
-extern int acctab_enum(acctab *,acctab_cur *,acctab_ent **) noex ;
-extern int acctab_check(acctab *) noex ;
 extern int acctab_curbegin(acctab *,acctab_cur *) noex ;
 extern int acctab_curend(acctab *,acctab_cur *) noex ;
+extern int acctab_curenum(acctab *,acctab_cur *,acctab_ent **) noex ;
+extern int acctab_check(acctab *) noex ;
 extern int acctab_allowed(acctab *,cchar *,cchar *,cchar *,cchar *) noex ;
 extern int acctab_anyallowed(acctab *,vecstr *,vecstr *,cchar *,cchar *) noex ;
 extern int acctab_close(acctab *) noex ;

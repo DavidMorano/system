@@ -5,7 +5,7 @@
 
 /* revision history:
 
-	= February 88, David A­D­ Morano
+	= 1988-02-01, David A­D­ Morano
 
 
 */

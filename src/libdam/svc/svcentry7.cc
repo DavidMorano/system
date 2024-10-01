@@ -63,7 +63,6 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<strlibval.hh>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<field.h>
@@ -185,8 +184,6 @@ constexpr fieldterminit		pt(" \t") ;
 constexpr int			tmplen = TMPLEN ;
 
 static vars			var ;
-
-static strlibval		deftmpdname(strlibval_tmpdir) ;
 
 
 /* exported variables */
@@ -328,27 +325,28 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = svcentry_magic(op,sep,esap)) >= 0) {
-	    svckey	sk ;
-	    if ((rs = svckey_load(&sk,sep)) >= 0) {
-		cint		olen = var.olen ;
-		cchar		*oldservice = esap->service ;
-		cchar		*oldinterval = esap->interval ;
-		esap->service = sk.svc ;
-		esap->interval = sk.interval ;
-		char		*obuf{} ;
-		if ((rs = uc_malloc((olen + 1),&obuf)) >= 0) {
+	svckey		sk ;
+	if ((rs = svckey_load(&sk,sep)) >= 0) {
+	esap->service = sk.svc ;
+	esap->interval = sk.interval ;
 	int		sl, cl ;
 	int		opts ;
+	cchar		*oldservice = esap->service ;
+	cchar		*oldinterval = esap->interval ;
 	cchar		*argz ;
 	cchar		*tmpdname ;
 	cchar		*ccp ;
 	cchar		*cp ;
+	char		obuf[OUTBUFLEN + 1] ;
+
+
+
 	/* load the job ID if one was supplied */
-	if (esap->jobid) {
+	if (esap->jobid != nullptr) {
 	    strwcpy(op->jobid,esap->jobid,SVCENTRY_IDLEN) ;
 	}
 	/* did they supply a TMPDIR? */
-	tmpdname = (esap->tmpdname) ? esap->tmpdname : deftmpdname ;
+	tmpdname = (esap->tmpdname) ? esap->tmpdname : SVCENTRY_TMPDIR ;
 	/* make some temporary files for program file input and output */
 	rs = svcentry_mkfile(op,tmpdname,'o') ;
 	if (rs < 0) goto bad0 ;
@@ -514,9 +512,8 @@ bad4:
 	}
 
 bad3:
-	if (op->program) {
+	if (op->program != nullptr)
 	    freeit(&op->program) ;
-	}
 
 bad2:
 	if ((op->efname != nullptr) && (op->efname[0] != '\0')) {
@@ -533,9 +530,6 @@ retok:
 	esap->interval = oldinterval ;
 	esap->service = oldservice ;
 
-		    rs1 = uc_free(obuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
 	    } /* end if (svckey_load) */
 	} /* end if (magic) */
 	return rs ;
