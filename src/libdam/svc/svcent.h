@@ -29,7 +29,7 @@
 #include	<svcfile.h>		/* <- the money shot */
 
 
-#define	SVCENT	SVCFILE_ENT
+#define	SVCENT	svcfile_ent
 
 
 #ifdef	__cplusplus

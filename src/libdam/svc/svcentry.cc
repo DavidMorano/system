@@ -575,7 +575,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 
 /* did they supply a TMPDIR? */
 
-	tmpdname = (esap->tmpdname) ? esap->tmpdname : SVCENTRY_TMPDIR ;
+	tmpdname = (esap->tmpdname) ? esap->tmpdname : deftmpdname ;
 
 /* make some temporary files for program file input and output */
 
