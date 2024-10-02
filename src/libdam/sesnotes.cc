@@ -36,11 +36,20 @@
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<ucgetpid.h>
+#include	<opentmp.h>
 #include	<mktmp.h>
+#include	<mkpathx.h>
+#include	<pathadd.h>
+#include	<snx.h>
 #include	<sockaddress.h>
 #include	<fsdir.h>
 #include	<nulstr.h>
-#include	<localmisc.h>
+#include	<strdcpyx.h>
+#include	<strwcpy.h>
+#include	<cfdec.h>
+#include	<isproc.h>
+#include	<isnot.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"sesnotes.h"
 #include	"sesmsg.h"
@@ -50,20 +59,20 @@
 
 #define	SESNOTES_PROGDNAME	"sesnotes"
 
-#define	NDF			"sesnotes.deb"
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
 
 /* local structures */
 
+struct vars {
+	int		usernamelen ;
+} ;
+
 
 /* forward references */
+
+static int	mkvars(int) noex ;
 
 template<typename ... Args>
 static int sesnotes_ctor(sesnotes *op,Args ... args) noex {
@@ -72,8 +81,15 @@ static int sesnotes_ctor(sesnotes *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    memclear(hop) ;
 	    if (char *bp{} ; (rs = malloc_un(&bp)) >= 0) {
-		op->unbuf = bp ;
-	    }
+		static cint	rsv = mkvars(rs) ;
+		if ((rs = rsv) >= 0) {
+		    op->unbuf = bp ;
+		}
+		if (rs < 0) {
+		    uc_free(op->unbuf) ;
+		    op->unbuf = nullptr ;
+		}
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -81,6 +97,7 @@ static int sesnotes_ctor(sesnotes *op,Args ... args) noex {
 
 static int sesnotes_dtor(sesnotes *op) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->unbuf) {
@@ -112,6 +129,8 @@ static int haveproc(cchar *,int) noex ;
 
 /* local variables */
 
+static vars		var ;
+
 
 /* exported variables */
 
@@ -123,7 +142,8 @@ int sesnotes_open(sesnotes *op,cchar *un) noex {
 	if ((rs = sesnotes_ctor(op,un)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-		if ((rs = ucgetpid()) >= 0) {
+		if ((rs = uc_getpid()) >= 0) {
+		    cint	ulen = var.usernamelen ;
 		    op->pid = rs ;
 		    op->fd = -1 ;
 		    strdcpy1(op->unbuf,ulen,un) ;
@@ -179,23 +199,33 @@ int sesnotes_sendgen(sesnotes *op,cchar *sp,int sl,pid_t sid) noex {
 /* end subroutine (sesnotes_sendgen) */
 
 int sesnotes_send(sesnotes *op,int mt,cchar *mp,int ml,pid_t sid) noex {
-	const time_t	st = time(nullptr) ;
-	uint		uv = sid ;
-	cint	clen = MAXNAMELEN ;
+	constexpr char	sesdname[] = SESNOTES_SESDNAME ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	cchar	*sesdname = SESNOTES_SESDNAME ;
-	char		cbuf[MAXNAMELEN+1] ;
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != SESNOTES_MAGIC) return SR_NOTOPEN ;
-	if ((rs = snsd(cbuf,clen,"s",uv)) >= 0) {
-	    char	dbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpath2(dbuf,sesdname,cbuf)) >= 0) {
-	        cint	dl = rs ;
-	        rs = sesnotes_sends(op,dbuf,dl,mt,st,mp,ml) ;
-	        c += rs ;
-	    } /* end if (mkpath) */
-	} /* end if (snsd) */
+	if ((rs = sesnotes_magic(op,mp)) >= 0) {
+	    custime	st = getustime ;
+	    uint	uv = sid ;
+	    int		sz = 0 ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		cint	maxpath = rs ;
+		int	ai = 0 ;
+		char	*ap{} ;
+		sz += ((maxpath + 1) * 2) ;
+		if ((rs = uc_malloc(sz,&ap)) >= 0) {
+		     char	*cbuf = (ap + ((maxpath + 1) * ai++)) ;
+		     if ((rs = snsd(cbuf,maxpath,"s",uv)) >= 0) {
+	    	         char	*dbuf{} ;
+	    	         if ((rs = mkpath(dbuf,sesdname,cbuf)) >= 0) {
+	        	     rs = sesnotes_sends(op,dbuf,rs,mt,st,mp,ml) ;
+	        	     c += rs ;
+	    	        } /* end if (mkpath) */
+		    } /* end if (snsd) */
+		    rs1 = uc_free(ap) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (getbufsize) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (sesnotes_send) */
@@ -206,14 +236,14 @@ int sesnotes_send(sesnotes *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 static int sesnotes_ready(sesnotes *op) noex {
 	int		rs = SR_OK ;
 	if (op->sfname == nullptr) {
-	    const mode_t	dm = 0775 ;
-	    cchar		*dname = SESNOTES_PROGDNAME ;
-	    char		dbuf[MAXPATHLEN+1] ;
+	    cmode	dm = 0775 ;
+	    cchar	*dname = SESNOTES_PROGDNAME ;
+	    char	dbuf[MAXPATHLEN+1] ;
 	    if ((rs = mktmpuserdir(dbuf,op->unbuf,dname,dm)) >= 0) {
-	        cchar	*template = "sesnotesXXXXXX" ;
+	        cchar	*tpat = "sesnotesXXXXXX" ;
 	        char		rbuf[MAXNAMELEN+1] ;
-	        if ((rs = mkpath2(rbuf,dbuf,template)) >= 0) {
-	            const mode_t	om = 0666 ;
+	        if ((rs = mkpath2(rbuf,dbuf,tpat)) >= 0) {
+	            cmode	om = 0666 ;
 	            cint		of = (O_CREAT|O_RDWR) ;
 	            char		sbuf[MAXPATHLEN+1] ;
 	            if ((rs = opentmpusd(rbuf,of,om,sbuf)) >= 0) {
@@ -238,44 +268,51 @@ static int sesnotes_ready(sesnotes *op) noex {
 
 static int sesnotes_sends(sesnotes *op,char *dbuf,int dlen,
 		int mt,int st,cchar *mp,int ml) noex {
-	fsdir		d ;
-	fsdir_ent	de ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = fsdir_open(&d,dbuf)) >= 0) {
-	    while ((rs = fsdir_read(&d,&de)) > 0) {
-	        if (de.name[0] == 'p') {
-		    if ((rs = haveproc((de.name+1),(rs-1))) > 0) {
-	                if ((rs = pathadd(dbuf,dlen,de.name)) >= 0) {
-	                    USTAT	sb ;
-			    cint	dl = rs ;
-			    if ((rs = u_lstat(dbuf,&sb)) >= 0) {
-	                        if (S_ISSOCK(sb.st_mode)) {
-				    cchar	*dp = dbuf ;
-	                            rs = sesnotes_sender(op,dp,dl,mt,st,mp,ml) ;
-	                            c += rs ;
-	                        } /* end if (is-socket) */
-	                    } /* end if (stat) */
-	                } /* end if (pathadd) */
-		    } else if ((rs == 0) || isNotValid(rs)) {
-			u_unlink(de.name) ;
-			rs = SR_OK ;
-		    } /* end if (haveproc) */
-	        } /* end if (is-not-leading-dot) */
-	        if (rs < 0) break ;
-	    } /* end while (reading) */
-	    dbuf[dlen] = '\0' ;
-	    rs1 = fsdir_close(&d) ;
+	char		*nbuf{} ;
+	if ((rs = malloc_mn(&nbuf)) >= 0) {
+	    fsdir	d ;
+	    cint	nlen = rs ;
+	    if ((rs = fsdir_open(&d,dbuf)) >= 0) {
+	        fsdir_ent	de ;
+	        while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+	            if (de.name[0] == 'p') {
+		        if ((rs = haveproc((de.name+1),(rs-1))) > 0) {
+	                    if ((rs = pathadd(dbuf,dlen,de.name)) >= 0) {
+	                        USTAT	sb ;
+			        cint	dl = rs ;
+			        if ((rs = u_lstat(dbuf,&sb)) >= 0) {
+	                            if (S_ISSOCK(sb.st_mode)) {
+				        cchar	*dp = dbuf ;
+				        auto	ss = sesnotes_sender ;
+	                                rs = ss(op,dp,dl,mt,st,mp,ml) ;
+	                                c += rs ;
+	                            } /* end if (is-socket) */
+	                        } /* end if (stat) */
+	                    } /* end if (pathadd) */
+		        } else if ((rs == 0) || isNotValid(rs)) {
+			    u_unlink(de.name) ;
+			    rs = SR_OK ;
+		        } /* end if (haveproc) */
+	            } /* end if (is-not-leading-dot) */
+	            if (rs < 0) break ;
+	        } /* end while (reading) */
+	        dbuf[dlen] = '\0' ;
+	        rs1 = fsdir_close(&d) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } else if (isNotPresent(rs)) {
+	        rs = SR_OK ;
+	    }
+	    rs1 = uc_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} else if (isNotPresent(rs)) {
-	    rs = SR_OK ;
-	}
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (sesnotes_sends) */
 
-static int sesnotes_sender(sesnotes *op,cc *ap,int al,int mt,int st,
+static int sesnotes_sender(sesnotes *op,cc *ap,int al,int mt,time_t st,
 		cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
@@ -362,5 +399,15 @@ static int haveproc(cchar *pp,int pl) noex {
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (haveproc) */
+
+static int mkvars(int v) noex {
+	int		rs = SR_BUGCHECK ;
+	if (v > 0) {
+	    rs = SR_OK ;
+	    var.usernamelen = v ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 

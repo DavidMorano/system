@@ -44,6 +44,8 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<timewatch.hh>
 #include	<ptm.h>

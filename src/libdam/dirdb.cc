@@ -135,7 +135,7 @@ static int	entry_start(dirdb_ent *,cchar *,int,USTAT *,int) noex ;
 static int	entry_finish(dirdb_ent *) noex ;
 
 #if	CF_STATCMP
-static uint	cmpstat(USTAT **,USTAT **) noex ;
+static int	vcmpstat(cvoid **,cvoid **) noex ;
 #endif
 
 
@@ -342,7 +342,7 @@ static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
 		    hdb_dat	val ;
 	            int		dbi = rs ;
 	            key.buf = &ep->fid ;
-	            key.len = sizeof(DIRDB_FID) ;
+	            key.len = sizeof(dirdb_fid) ;
 	            val.buf = ep ;
 	            val.len = sz ;
 	            if ((rs = hdb_store(op->dbp,key,val)) >= 0) {
@@ -394,13 +394,13 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
 	        USTAT	sb ;
 	        if ((rs = u_stat(tbuf,&sb)) >= 0) {
-	            DIRDB_FID	fid{} ;
+	            dirdb_fid	fid{} ;
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            fid.ino = sb.st_ino ;
 	            fid.dev = sb.st_dev ;
 	            key.buf = &fid ;
-	            key.len = sizeof(DIRDB_FID) ;
+	            key.len = sizeof(dirdb_fid) ;
 	            if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
 		        f = true ;
 	            } else if (rs == SR_NOTFOUND) {
@@ -417,15 +417,15 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 }
 /* end subroutine (dirdb_alreadyname) */
 
-static int entry_start(dirdb_ent *ep,cc *sp,int nl,USTAT *sbp,int count) noex {
+static int entry_start(dirdb_ent *ep,cc *sp,int sl,USTAT *sbp,int count) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    if (nl < 0) nl = strlen(sp) ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    memclear(ep) ;
 	    ep->fid.ino = sbp->st_ino ;
 	    ep->fid.dev = sbp->st_dev ;
 	    ep->count = count ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(sp,nl,&cp)) >= 0) {
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	        ep->name = cp ;
 	    }
 	} /* end if (non-null) */
@@ -450,7 +450,7 @@ static int entry_finish(dirdb_ent *ep) noex {
 
 #if	CF_STATCMP
 
-static uint cmpstat(const USTAT *e1p,const USTAT *e2p) noex {
+static int cmpstat(const USTAT *e1p,const USTAT *e2p) noex {
 	int		rc = (e1p->st_ino - e2p->st_ino) ;
 	if (rc == 0) {
 	    rc = (e1p->st_dev - e2p->st_dev)
@@ -459,7 +459,7 @@ static uint cmpstat(const USTAT *e1p,const USTAT *e2p) noex {
 }
 /* end subroutine (cmpstat) */
 
-static uint vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
+static int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
 	const USTAT	*e1p = (USTAT *) *v1pp ;
 	const USTAT	*e2p = (USTAT *) *v2pp ;
 	int		rc = 0 ;

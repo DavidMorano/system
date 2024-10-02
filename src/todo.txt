@@ -5,7 +5,6 @@ TODO
 file		what
 --------------------------------------------------------------------------------
 sesnotes
-dirdb
 uctim
 libuc		fix to completely compile!
 srventry
