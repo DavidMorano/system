@@ -345,7 +345,6 @@ int svcfile_close(svcfile *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = svcfile_magic(op)) >= 0) {
-	    /* secondary items */
 	    {
 	        rs1 = svcfile_filedump(op,-1) ;
 	        if (rs >= 0) rs = rs1 ;

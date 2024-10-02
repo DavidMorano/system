@@ -1,72 +1,72 @@
-/* dirdb */
+/* dirdb HEADER */
+/* lang=C20 */
+
+/* handle directory list operations */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIRDB_INCLUDE
-#define	DIRDB_INCLUDE		1
+#define	DIRDB_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<sys/types.h>		/* system types */
+#include	<sys/stat.h>
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<hdb.h>
-#include	<localmisc.h>
 
 
 #define	DIRDB_MAGIC	0x33119572
 #define	DIRDB_NDEF	30
 #define	DIRDB		struct dirdb_head
-#define	DIRDB_ENT	struct dirdb_e
-#define	DIRDB_FID	struct dirdb_fid
-#define	DIRDB_CUR	struct dirdb_c
+#define	DIRDB_ENT	struct dirdb_entry
+#define	DIRDB_FID	struct dirdb_fider
+#define	DIRDB_CUR	struct dirdb_cursor
 
 
-struct dirdb_fid {
+struct dirdb_fider {
 	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
-struct dirdb_e {
-	const char	*name ;
+struct dirdb_entry {
+	cchar		*name ;
 	DIRDB_FID	fid ;
 	int		count ;
 } ;
 
 struct dirdb_head {
+	vechand		*dlp ;		/* directory-list-pointer */
+	hdb		*dbp ;		/* data-base-pointer */
 	uint		magic ;
-	VECHAND		dlist ;
-	HDB		db ;
 	int		count ;
 } ;
 
-struct dirdb_c {
+struct dirdb_cursor {
 	int		i ;
 } ;
 
 
-#if	(! defined(DIRDB_MASTER)) || (DIRDB_MASTER == 0)
+typedef	DIRDB		dirdb ;
+typedef	DIRDB_ENT	dirdb_ent ;
+typedef	DIRDB_FID	dirdb_fid ;
+typedef	DIRDB_CUR	dirdb_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int dirdb_start(DIRDB *,int) ;
-extern int dirdb_add(DIRDB *,const char *,int) ;
-extern int dirdb_clean(DIRDB *) ;
-extern int dirdb_curbegin(DIRDB *,DIRDB_CUR *) ;
-extern int dirdb_enum(DIRDB *,DIRDB_CUR *,DIRDB_ENT **) ;
-extern int dirdb_curend(DIRDB *,DIRDB_CUR *) ;
-extern int dirdb_finish(DIRDB *) ;
+extern int dirdb_start(dirdb *,int) noex ;
+extern int dirdb_add(dirdb *,cchar *,int) noex ;
+extern int dirdb_clean(dirdb *) noex ;
+extern int dirdb_curbegin(dirdb *,dirdb_cur *) noex ;
+extern int dirdb_curenum(dirdb *,dirdb_cur *,dirdb_ent **) noex ;
+extern int dirdb_curend(dirdb *,dirdb_cur *) noex ;
+extern int dirdb_finish(dirdb *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* (! defined(DIRDB_MASTER)) || (DIRDB_MASTER == 0) */
 
 #endif /* DIRDB_INCLUDE */
 

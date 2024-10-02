@@ -21,7 +21,7 @@
 
 	Description:
 	This subroutine checks to see if the specific process
-	identified by its PID, is still on the system. Note that
+	identified by its PID, is still on the system.  Note that
 	even zombie processes can satisfy the search requirement
 	on some systems!
 
@@ -51,6 +51,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -58,6 +61,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -816,7 +816,7 @@ static int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		i = 0 ;
+	int		c = 0 ;
 	if (alp && abuf) {
 	    cint	alen = strlen(abuf) ;
 	    if (abuf[0]) {
@@ -826,7 +826,7 @@ static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	            if ((rs = fsb.start(abuf,alen)) >= 0) {
 			int	fl ;
 	                while ((fl = fsb.sharg(pt.terms,fbuf,flen)) > 0) {
-	                    i += 1 ;
+	                    c += 1 ;
 	                    rs = vecstr_add(alp,fbuf,fl) ;
 		            if (fsb.term == '#') break ;
 	                    if (rs < 0) break ;
@@ -839,7 +839,7 @@ static int vecstr_procargs(vecstr *alp,char *abuf) noex {
 		} /* end if (m-a-f) */
 	    } /* end if (non-empty arguments) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? c: rs ;
 }
 /* end subroutine (processargs) */
 
