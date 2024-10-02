@@ -172,6 +172,7 @@ static int	mkfile(char *,cchar *,int) noex ;
 static int	mkpat(char *,int,cchar *,int) noex ;
 static int	mkvars() noex ;
 
+static void	delfreeit(cchar *&) noex ;
 static void	freeit(cchar **) noex ;
 
 
@@ -323,131 +324,190 @@ int svcentry_getargs(SE *op,mainv avp) noex {
 }
 /* end subroutine (svcentry_getargs) */
 
-#ifdef	COMMENT
+namespace {
+    struct expander {
+	SE		*op ;
+	ENT		*sep ;
+	ARGS		*esap ;
+	cchar		*argz{} ;
+	char		*obuf{} ;
+	svckey		sk ;
+	cint		olen = var.olen ;
+	expander(SE *o,ENT *s,ARGS *e) noex : op(o), sep(s), esap(e) { } ;
+	expander() = delete ;
+	operator int () noex ;
+	int mkfiles() noex ;
+	int mkcomps() noex ;
+	int comp_p() noex ;
+	int comp_a() noex ;
+	int comp_u() noex ;
+	int comp_g() noex ;
+	int comp_o() noex ;
+    } ; /* end struct (expander) */
+    typedef int (expander::*expander_m)() noex ;
+}
+
+constexpr expander_m	compmems[] = {
+	&expander::comp_p,
+	&expander::comp_a,
+	&expander::comp_u,
+	&expander::comp_g,
+	&expander::comp_o
+} ;
+
 int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	int		rs ;
-	int		rs1 ;
 	if ((rs = svcentry_magic(op,sep,esap)) >= 0) {
-	    svckey	sk ;
-	    if ((rs = svckey_load(&sk,sep)) >= 0) {
-		cint		olen = var.olen ;
-		cchar		*oldservice = esap->service ;
-		cchar		*oldinterval = esap->interval ;
-		esap->service = sk.svc ;
-		esap->interval = sk.interval ;
-		char		*obuf{} ;
-		if ((rs = uc_malloc((olen + 1),&obuf)) >= 0) {
-	int		sl, cl ;
-	int		opts ;
-	cchar		*argz ;
+	    expander	eo(op,sep,esap) ;
+	    rs = eo ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (svcentry_expand) */
+
+expander::operator int () noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = svckey_load(&sk,sep)) >= 0) {
+	    cchar	*oldservice = esap->service ;
+	    cchar	*oldinterval = esap->interval ;
+	    esap->service = sk.svc ;
+	    esap->interval = sk.interval ;
+	    if ((rs = uc_malloc((olen + 1),&obuf)) >= 0) {
+		{
+		    rs = mkfiles() ;
+		}
+		rs1 = uc_free(obuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	    esap->interval = oldinterval ;
+	    esap->service = oldservice ;
+	} /* end if (svckey_load) */
+	return rs ;
+}
+/* end subroutine (svcentry_expand) */
+
+int expander::mkfiles() noex {
+	int		rs = SR_OK ;
 	cchar		*tmpdname ;
-	cchar		*ccp ;
-	cchar		*cp ;
-	/* load the job ID if one was supplied */
 	if (esap->jobid) {
 	    strwcpy(op->jobid,esap->jobid,SVCENTRY_IDLEN) ;
 	}
 	/* did they supply a TMPDIR? */
 	tmpdname = (esap->tmpdname) ? esap->tmpdname : deftmpdname ;
 	/* make some temporary files for program file input and output */
-	rs = svcentry_mkfile(op,tmpdname,'o') ;
-	if (rs < 0) goto bad0 ;
-
-	rs = svcentry_mkfile(op,tmpdname,'e') ;
-	if (rs < 0) goto bad1 ;
-
-/* process them */
-
-	if (sk.p != nullptr) {
-
-	    rs = svcentry_proc(op,sk.p,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad2 ;
-
-	    if ((cl = sfshrink(obuf,sl,&cp)) > 0) {
-	        if (cchar *ap{} ; (rs = uc_mallocstrw(cp,cl,&ap)) >= 0) {
-		    op->program = ap ;
+	if ((rs = svcentry_mkfile(op,tmpdname,'o')) >= 0) {
+	    if ((rs = svcentry_mkfile(op,tmpdname,'e')) >= 0) {
+		{
+		    rs = mkcomps() ;
 		}
-	    } else {
-		rs = SR_INVALID ;
-	    }
-	    if (rs < 0) goto bad2 ;
+		if (rs < 0) {
+		    delfreeit(op->efname) ;
+		} /* end if (error) */
+	    } /* end if (svcentry_mkfile) */
+	    if (rs < 0) {
+		delfreeit(op->ofname) ;
+	    } /* end if (error) */
+	} /* end if (svcentry_mkfile) */
+	return rs ;
+}
+/* end method (expander::mkfiles) */
 
-	} /* end if (program path) */
+int expander::mkcomps() noex {
+	int		rs = SR_OK ;
+	for (auto m : compmems) {
+	    rs = (this->*m)() ;
+	    if (rs < 0) break ;
+	} /* end for */
+	return rs ;
+}
+/* end method (expander::mkcomps) */
 
-	argz = nullptr ;
-	if (sk.a != nullptr) {
-
-	    rs = svcentry_proc(op,sk.a,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad3 ;
-
-	    opts = VECSTR_OCOMPACT ;
-	    rs = vecstr_start(op->sap,6,opts) ;
-	    if (rs < 0)
-	        goto bad3 ;
-
-	    op->f.srvargs = true ;
-	    if ((rs = vecstr_procargs(op->sap,obuf)) > 0) {
-
-	        rs1 = vecstr_get(op->sap,0,&argz) ;
-	        if (rs1 < 0)
-	            argz = nullptr ;
-
+int expander::comp_p() noex {
+	int		rs = SR_OK ;
+	if (sk.p) {
+	    if ((rs = svcentry_proc(op,sk.p,esap,obuf,olen)) >= 0) {
+		cchar	*cp{} ;
+	        if (int cl ; (cl = sfshrink(obuf,rs,&cp)) > 0) {
+	            if (cchar *ap{} ; (rs = uc_mallocstrw(cp,cl,&ap)) >= 0) {
+		        op->program = ap ;
+		    }
+	        } else {
+		    rs = SR_INVALID ;
+	        }
 	    } /* end if */
+	} /* end if (program path) */
+	return rs ;
+}
+/* end method (expander::comp_p) */
 
+int expander::comp_a() noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	argz = nullptr ;
+	if (sk.a) {
+	    if ((rs = svcentry_proc(op,sk.a,esap,obuf,olen)) >= 0) {
+		cint	vn = 6 ;
+	        cint	vo = VECSTR_OCOMPACT ;
+	        if ((rs = vecstr_start(op->sap,vn,vo)) >= 0) {
+	            op->f.srvargs = true ;
+	            if ((rs = vecstr_procargs(op->sap,obuf)) > 0) {
+			if ((rs = vecstr_get(op->sap,0,&argz)) >= 0) {
+			    rs = SR_OK ;
+			} else if (rs == rsn) {
+			    rs = SR_OK ;
+			    argz = nullptr ;
+			}
+		    } /* end if (vecstr_procargs) */
+		} /* end if (vecstr_start) */
+	    } /* end if (svcentry_proc) */
 	} /* end if (program arguments) */
+	return rs ;
+}
+/* end method (expander::comp_a) */
 
-	if (rs < 0) goto bad4 ;
-
-	if (sk.u != nullptr) {
-
-	    rs = svcentry_proc(op,sk.u,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad4 ;
-
-	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
-		op->username = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad4 ;
-
+int expander::comp_u() noex {
+	int		rs = SR_OK ;
+	if (sk.u) {
+	    if ((rs = svcentry_proc(op,sk.u,esap,obuf,olen)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(obuf,rs,&cp)) >= 0) {
+		    op->username = cp ;
+	        }
+	    } /* end if (svcentry_proc) */
 	} /* end if (username field) */
+	return rs ;
+}
+/* end method (expander::comp_u) */
 
-	if (sk.g != nullptr) {
-
-	    rs = svcentry_proc(op,sk.g,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad5 ;
-
-	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
-		op->groupname = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad5 ;
-
+int expander::comp_g() noex {
+	int		rs = SR_OK ;
+	if (sk.g) {
+	    if ((rs = svcentry_proc(op,sk.g,esap,obuf,olen)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(obuf,rs,&cp)) >= 0) {
+		    op->groupname = cp ;
+	        }
+	    } /* end if (svcentry_proc) */
 	}
+	return rs ;
+}
+/* end method (expander::comp_g) */
 
-	if (sk.opts != nullptr) {
-
-	    rs = svcentry_proc(op,sk.opts,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad6 ;
-
-	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
-		op->options = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad6 ;
-
+int expander::comp_o() noex {
+	int		rs = SR_OK ;
+	if (sk.opts) {
+	    if ((rs = svcentry_proc(op,sk.opts,esap,obuf,olen)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(obuf,rs,&cp)) >= 0) {
+		    op->options = cp ;
+	        }
+	    } /* end if (svcentry_proc) */
 	}
+	return rs ;
+}
+/* end method (expander::comp_o) */
 
-/* OK, perform some fixups */
+
+#ifdef	COMMENT
+
 
 	if ((op->program == nullptr) && (argz != nullptr)) {
 
@@ -541,7 +601,8 @@ retok:
 	return rs ;
 }
 /* end subroutine (svcentry_expand) */
-#else /* COMMENT */
+
+#ifdef	COMMENT2
 int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	svckey		sk ;
 	int		rs = SR_OK ;
@@ -764,6 +825,7 @@ retok:
 	return rs ;
 }
 /* end subroutine (svcentry_expand) */
+#endif /* COMMENT2 */
 #endif /* COMMENT */
 
 int svcentry_arrival(SE *op,time_t *tp) noex {
@@ -1090,6 +1152,14 @@ static int mkvars() noex {
 	return rs ;
 }
 /* end subroutine (mkvars) */
+
+static void delfreeit(cchar *&fn) noex {
+	if (fn) {
+	    if (fn[0]) uc_unlink(fn) ;
+	    freeit(&fn) ;
+	}
+}
+/* end subroutine (delfreeit) */
 
 static void freeit(cchar **pp) noex {
 	if (*pp != nullptr) {
