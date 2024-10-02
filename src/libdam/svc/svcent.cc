@@ -97,4 +97,16 @@ int svcent_islib(svcent *sep,cchar **rpp) noex {
 }
 /* end subroutine (svcent_islib) */
 
+int svcent::geval(cchar *sp,cchar **rpp) noex {
+	return svcent_getval(this,sp,rpp) ;
+}
+
+int svcent::getdeval(cchar *sp,cchar **rpp) noex {
+	return svcent_getdeval(this,sp,rpp) ;
+}
+
+int svcent::islib(cchar **rpp) noex {
+	return svcent_islib(this,rpp) ;
+}
+
 

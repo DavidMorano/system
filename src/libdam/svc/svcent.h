@@ -32,13 +32,21 @@
 #define	SVCENT	SVCFILE_ENT
 
 
+#ifdef	__cplusplus
+struct svcent : svcfile_ent {
+	int islib(cchar **) noex ;
+	int geval(cchar *,cchar **) noex ;
+	int getdeval(cchar *,cchar **) noex ;
+} ; /* end struct (svcent) */
+#else /* __cplusplus */
 typedef	SVCENT		svcent ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	svcent_islib(SVCENT *,cchar **) noex ;
-extern int	svcent_getval(SVCENT *,cchar *,cchar **) noex ;
-extern int	svcent_getdeval(SVCENT *,cchar *,cchar **) noex ;
+extern int	svcent_islib(svcent *,cchar **) noex ;
+extern int	svcent_getval(svcent *,cchar *,cchar **) noex ;
+extern int	svcent_getdeval(svcent *,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
