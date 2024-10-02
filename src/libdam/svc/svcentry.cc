@@ -343,6 +343,9 @@ namespace {
 	int comp_u() noex ;
 	int comp_g() noex ;
 	int comp_o() noex ;
+	int comp_prog() noex ;
+	int comp_def() noex  ;
+	void compfrees() noex ;
     } ; /* end struct (expander) */
     typedef int (expander::*expander_m)() noex ;
 }
@@ -352,7 +355,9 @@ constexpr expander_m	compmems[] = {
 	&expander::comp_a,
 	&expander::comp_u,
 	&expander::comp_g,
-	&expander::comp_o
+	&expander::comp_o,
+	&expander::comp_prog,
+	&expander::comp_def
 } ;
 
 int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
@@ -400,6 +405,9 @@ int expander::mkfiles() noex {
 	    if ((rs = svcentry_mkfile(op,tmpdname,'e')) >= 0) {
 		{
 		    rs = mkcomps() ;
+		    if (rs < 0) {
+			compfrees() ;
+		    }
 		}
 		if (rs < 0) {
 		    delfreeit(op->efname) ;
@@ -505,328 +513,56 @@ int expander::comp_o() noex {
 }
 /* end method (expander::comp_o) */
 
-
-#ifdef	COMMENT
-
-
-	if ((op->program == nullptr) && (argz != nullptr)) {
-
-	    cl = sfshrink(argz,-1,&cp) ;
-
-	    if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
-		op->program = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad7 ;
-
-	}
-
-/* are we OK for a go? */
-
-	if (op->program == nullptr)
-	    goto bad7 ;
-
-/* set at least one program argument if we have none so far */
-
-	rs = SR_OK ;
-	if (op->f.srvargs) {
-	    rs = vecstr_count(op->sap) ;
-	}
-
-	if ((rs == 0) && (op->program != nullptr)) {
-
-	    if (sfbasename(op->program,-1,&cp) > 0) {
-
-	        if (! op->f.srvargs) {
-
-	            rs = vecstr_start(op->sap,2,0) ;
-	            if (rs >= 0)
-	                op->f.srvargs = true ;
-
-	        }
-
-	        if (op->f.srvargs)
-	            rs = vecstr_add(op->sap,cp,-1) ;
-
-	    }
-
-	} /* end if (setting 'argv[0]') */
-
-/* we're out of here */
-
-	if (rs >= 0)
-	    goto retok ;
-
-/* bad things */
-bad7:
-	freeit(&op->options) ;
-
-bad6:
-	freeit(&op->groupname) ;
-
-bad5:
-	freeit(&op->username) ;
-
-bad4:
-	if (op->f.srvargs) {
-	    op->f.srvargs = false ;
-	    vecstr_finish(op->sap) ;
-	}
-
-bad3:
-	if (op->program) {
-	    freeit(&op->program) ;
-	}
-
-bad2:
-	if ((op->efname != nullptr) && (op->efname[0] != '\0')) {
-	    uc_unlink(op->efname) ;
-	}
-
-bad1:
-	if ((op->ofname != nullptr) && (op->ofname[0] != '\0')) {
-	    uc_unlink(op->ofname) ;
-	}
-
-bad0:
-retok:
-	esap->interval = oldinterval ;
-	esap->service = oldservice ;
-
-		    rs1 = uc_free(obuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
-	    } /* end if (svckey_load) */
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (svcentry_expand) */
-
-#ifdef	COMMENT2
-int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
-	svckey		sk ;
+int expander::comp_prog() noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
-	int		sl, cl ;
-	int		opts ;
-	cchar		*oldservice ;
-	cchar		*oldinterval ;
-	cchar		*argz ;
-	cchar		*tmpdname ;
-	cchar		*ccp ;
-	cchar		*cp ;
-	char		obuf[OUTBUFLEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SVCENTRY_MAGIC) return SR_NOTOPEN ;
-
-	oldservice = esap->service ;
-	oldinterval = esap->interval ;
-
-	svckey_load(&sk,sep) ;
-
-	esap->service = sk.svc ;
-	esap->interval = sk.interval ;
-
-/* load the job ID if one was supplied */
-
-	if (esap->jobid != nullptr)
-	    strwcpy(op->jobid,esap->jobid,SVCENTRY_IDLEN) ;
-
-/* did they supply a TMPDIR? */
-
-	tmpdname = (esap->tmpdname) ? esap->tmpdname : deftmpdname ;
-
-/* make some temporary files for program file input and output */
-
-	rs = svcentry_mkfile(op,tmpdname,'o') ;
-	if (rs < 0) goto bad0 ;
-
-	rs = svcentry_mkfile(op,tmpdname,'e') ;
-	if (rs < 0) goto bad1 ;
-
-/* process them */
-
-	if (sk.p != nullptr) {
-
-	    rs = svcentry_proc(op,sk.p,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad2 ;
-
-	    if ((cl = sfshrink(obuf,sl,&cp)) > 0) {
-	        if (cchar *ap{} ; (rs = uc_mallocstrw(cp,cl,&ap)) >= 0) {
-		    op->program = ap ;
-		}
-	    } else {
-		rs = SR_INVALID ;
-	    }
-	    if (rs < 0) goto bad2 ;
-
-	} /* end if (program path) */
-
-	argz = nullptr ;
-	if (sk.a != nullptr) {
-
-	    rs = svcentry_proc(op,sk.a,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad3 ;
-
-	    opts = VECSTR_OCOMPACT ;
-	    rs = vecstr_start(op->sap,6,opts) ;
-	    if (rs < 0)
-	        goto bad3 ;
-
-	    op->f.srvargs = true ;
-	    if ((rs = vecstr_procargs(op->sap,obuf)) > 0) {
-
-	        rs1 = vecstr_get(op->sap,0,&argz) ;
-	        if (rs1 < 0)
-	            argz = nullptr ;
-
-	    } /* end if */
-
-	} /* end if (program arguments) */
-
-	if (rs < 0) goto bad4 ;
-
-	if (sk.u != nullptr) {
-
-	    rs = svcentry_proc(op,sk.u,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad4 ;
-
-	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
-		op->username = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad4 ;
-
-	} /* end if (username field) */
-
-	if (sk.g != nullptr) {
-
-	    rs = svcentry_proc(op,sk.g,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad5 ;
-
-	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
-		op->groupname = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad5 ;
-
-	}
-
-	if (sk.opts != nullptr) {
-
-	    rs = svcentry_proc(op,sk.opts,esap,obuf,OUTBUFLEN) ;
-	    sl = rs ;
-	    if (rs < 0)
-	        goto bad6 ;
-
-	    if ((rs = uc_mallocstrw(obuf,sl,&ccp)) >= 0) {
-		op->options = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad6 ;
-
-	}
-
-/* OK, perform some fixups */
-
 	if ((op->program == nullptr) && (argz != nullptr)) {
-
-	    cl = sfshrink(argz,-1,&cp) ;
-
-	    if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
-		op->program = ccp ;
-	    }
-	    if (rs < 0)
-	        goto bad7 ;
-
+	    cchar	*cp{} ;
+	    if (int cl ; (cl = sfshrink(argz,-1,&cp)) > 0) {
+	        if (cchar *pp{} ; (rs = uc_mallocstrw(cp,cl,&pp)) >= 0) {
+		    op->program = pp ;
+	        }
+	    } /* end if (non-zero) */
 	}
+	return rs ;
+}
+/* end method (expander::comp_prog) */
 
-/* are we OK for a go? */
-
-	if (op->program == nullptr)
-	    goto bad7 ;
-
-/* set at least one program argument if we have none so far */
-
-	rs = SR_OK ;
+int expander::comp_def() noex {
+	int		rs = SR_OK ;
+	int		c = 0 ;
 	if (op->f.srvargs) {
 	    rs = vecstr_count(op->sap) ;
+	    c = rs ;
 	}
-
 	if ((rs == 0) && (op->program != nullptr)) {
-
-	    if (sfbasename(op->program,-1,&cp) > 0) {
-
+	    cchar	*cp{} ;
+	    if (int cl ; (cl = sfbasename(op->program,-1,&cp)) > 0) {
 	        if (! op->f.srvargs) {
-
-	            rs = vecstr_start(op->sap,2,0) ;
-	            if (rs >= 0)
+	            if ((rs = vecstr_start(op->sap,2,0)) >= 0) {
 	                op->f.srvargs = true ;
-
+		    }
 	        }
-
-	        if (op->f.srvargs)
-	            rs = vecstr_add(op->sap,cp,-1) ;
-
-	    }
-
+	        if (op->f.srvargs) {
+	            rs = vecstr_add(op->sap,cp,cl) ;
+		    c = rs ;
+		}
+	    } /* end if (non-zero) */
 	} /* end if (setting 'argv[0]') */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (expander::comp_def) */
 
-/* we're out of here */
-
-	if (rs >= 0)
-	    goto retok ;
-
-/* bad things */
-bad7:
+void expander::compfrees() noex {
 	freeit(&op->options) ;
-
-bad6:
 	freeit(&op->groupname) ;
-
-bad5:
 	freeit(&op->username) ;
-
-bad4:
 	if (op->f.srvargs) {
 	    op->f.srvargs = false ;
 	    vecstr_finish(op->sap) ;
 	}
-
-bad3:
-	if (op->program != nullptr)
-	    freeit(&op->program) ;
-
-bad2:
-	if ((op->efname != nullptr) && (op->efname[0] != '\0')) {
-	    uc_unlink(op->efname) ;
-	}
-
-bad1:
-	if ((op->ofname != nullptr) && (op->ofname[0] != '\0')) {
-	    uc_unlink(op->ofname) ;
-	}
-
-bad0:
-retok:
-	esap->interval = oldinterval ;
-	esap->service = oldservice ;
-
-	return rs ;
+	freeit(&op->program) ;
 }
-/* end subroutine (svcentry_expand) */
-#endif /* COMMENT2 */
-#endif /* COMMENT */
+/* end method (expander::compfrees) */
 
 int svcentry_arrival(SE *op,time_t *tp) noex {
 	int		rs ;
