@@ -4,14 +4,8 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-svcentry
-svcfile
-sesnotes
 uctim
 libuc		fix to completely compile!
-srventry
-lookword
-svcentry
 memfile		can we just trash this?
 libpcs		a lot of junk in there
 convertx	part of the |ctx| group

@@ -45,6 +45,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
 #include	<char.h>
 #include	<toxc.h>
@@ -56,6 +57,18 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -85,7 +98,7 @@ int sfcasesub(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	        } /* end if (possible) */
 	    } /* end if (non-zero string) */
 	    if (rpp) {
-	        *rpp = ((f) ? (sp+i) : nullptr) ;
+	        *rpp = (f) ? (sp + i) : nullptr ;
 	    }
 	} /* end if (non-null) */
 	return (f) ? s2len : -1 ;

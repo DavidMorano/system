@@ -125,7 +125,7 @@ static int	debugargs(cchar **) ;
 
 /* local variables */
 
-static constexpr struct pivars	initvars = {
+constexpr struct pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -133,7 +133,7 @@ static constexpr struct pivars	initvars = {
 	VARPRNAME
 } ;
 
-static constexpr struct mapex	mapexs[] = {
+constexpr struct mapex	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -145,7 +145,7 @@ static constexpr struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static constexpr cpcchar	sysdirs[] = {
+constexpr cpcchar	sysdirs[] = {
 	"/usr/xpg4/bin",
 	"/usr/ccs/bin",
 	"/usr/bin",
@@ -160,24 +160,24 @@ static constexpr cpcchar	sysdirs[] = {
 	nullptr
 } ;
 
-static constexpr cpcchar	envbads[] = {
+constexpr cpcchar	envbads[] = {
 	"LD_PRELOAD",
 	"RANDOM",
 	"A__z",
 	nullptr
 } ;
 
-static constexpr cpcchar	argdels[] = {
+constexpr cpcchar	argdels[] = {
 	"-v",
 	nullptr
 } ;
 
-static constexpr cpcchar	argchecks[] = {
+constexpr cpcchar	argchecks[] = {
 	"-I",
 	nullptr
 } ;
 
-static constexpr cpcchar	assexts[] = {
+constexpr cpcchar	assexts[] = {
 	"s",
 	nullptr
 } ;
@@ -327,10 +327,8 @@ badprogstart:
 
 /* local subroutines */
 
-
-static int proc_devino(PROGINFO *pip)
-{
-	cint	tlen = MAXPATHLEN ;
+static int proc_devino(PROGINFO *pip) noex {
+	cint		tlen = MAXPATHLEN ;
 	int		rs ;
 	char		tbuf[MAXPATHLEN+1] ;
 
@@ -357,24 +355,18 @@ static int proc_devino(PROGINFO *pip)
 }
 /* end subroutine (proc_devino) */
 
-
-static int proc_idsbegin(PROGINFO *pip)
-{
+static int proc_idsbegin(PROGINFO *pip) noex {
 	return ids_load(&pip->id) ;
 }
 /* end subroutine (proc_idsbegin) */
 
-
-static int proc_idsend(PROGINFO *pip)
-{
+static int proc_idsend(PROGINFO *pip) noex {
 	return ids_release(&pip->id) ;
 }
 /* end subroutine (proc_idsend) */
 
-
-static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar **argv)
-{
-	cint	clen = MAXNAMELEN ;
+static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar **argv) noex {
+	cint		clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		f_found = false ;
@@ -401,9 +393,7 @@ static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar **argv)
 }
 /* end subroutine (proc_find) */
 
-
-static int proc_progok(PROGINFO *pip,cchar *progfname)
-{
+static int proc_progok(PROGINFO *pip,cchar *progfname) noex {
 	USTAT		sb ;
 	int		rs ;
 	int		f = false ;
@@ -446,9 +436,7 @@ static int proc_progok(PROGINFO *pip,cchar *progfname)
 }
 /* end subroutine (proc_progok) */
 
-
-static int proc_exec(PROGINFO *pip,cchar *rbuf,cchar **argv,cchar **penvv)
-{
+static int proc_exec(PROGINFO *pip,cc *rbuf,cc **argv,cc **penvv) noex {
 	VECPSTR		a ;
 	int		rs ;
 	int		rs1 ;
@@ -484,14 +472,11 @@ static int proc_exec(PROGINFO *pip,cchar *rbuf,cchar **argv,cchar **penvv)
 }
 /* end subroutine (proc_exec) */
 
-
-static int proc_args(PROGINFO *pip,VECPSTR *alp,cchar **argv)
-{
+static int proc_args(PROGINFO *pip,VECPSTR *alp,cchar **argv) noex {
 	int		rs ;
 	if ((rs = vecpstr_add(alp,argv[0],-1)) >= 0) {
-	    int		f_del = false ;
-	    int		i ;
-	    for (i = 1 ; argv[i] != nullptr ; i += 1) {
+	    bool	f_del = false ;
+	    for (int i = 1 ; argv[i] != nullptr ; i += 1) {
 	        cchar	*a = argv[i] ;
 	        if (matstr(argdels,a,-1) < 0) {
 		    if (matstr(argchecks,a,-1) >= 0) {

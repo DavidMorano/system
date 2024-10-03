@@ -81,7 +81,6 @@ extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	isproc(pid_t) ;
 
 
 /* local structures */

@@ -1,8 +1,8 @@
-/* uc_procpid */
+/* uc_procpid SUPPORT */
 /* lang=C20 */
 
-/* interface component for UNIX® library-3c */
 /* get a process ID by searching for its command string */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -33,7 +33,7 @@
 	Returns:
 	>=0		proces s foudnd with this PID
 	==0		no such process
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -41,6 +41,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<sfx.h>
 #include	<cfdec.h>
 #include	<ctdec.h>
@@ -49,10 +50,23 @@
 
 /* local defines */
 
-#define	READBUFLEN	(MAXPATHLEN+DIGBUFLEN+2)
-
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -62,12 +76,13 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	int		rs1 ;
 	int		pid = 0 ;
 	if (name) {
-	    cint	v = uid ;
+	    int		v = uid ;
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        cint		dlen = DIGBUFLEN ;
-	        char		dbuf[DIGBUFLEN+1] ;
+	        cint	dlen = DIGBUFLEN ;
+	        char	dbuf[DIGBUFLEN+1] ;
 	        if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
+		    cnullptr	np{} ;
 	            cint	of = O_RDONLY ;
 	            int		i = 0 ;
 	            cchar	*pfname = "sys:pgrep" ;
@@ -78,21 +93,27 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	                argv[i++] = dbuf ;
 	            }
 	            argv[i++] = name ;
-	            argv[i] = NULL ;
-	            if ((rs = uc_openprog(pfname,of,argv,NULL)) >= 0) {
+	            argv[i] = nullptr ;
+	            if ((rs = uc_openprog(pfname,of,argv,np)) >= 0) {
 	                cint	fd = rs ;
-	                cint	llen = READBUFLEN ;
-	                char	lbuf[READBUFLEN+1] ;
-	                if ((rs = u_read(fd,lbuf,llen)) > 0) {
-	                    cint	sl = rs ;
-	                    int		cl ;
-	                    cchar	*sp = lbuf ;
-	                    cchar	*cp ;
-	                    if ((cl = sfnext(sp,sl,&cp)) > 0) {
-	                        rs = cfdeci(cp,cl,&v) ;
-	                        pid = v ;
-	                    }
-	                } /* end if (u_read) */
+			if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+			    cint	llen = (rs + DIGBUFLEN + 2) ;
+			    char	*lbuf{} ;
+			    if ((rs = uc_malloc((llen + 1),&lbuf)) >= 0) {
+	                        if ((rs = u_read(fd,lbuf,llen)) > 0) {
+	                            cint	sl = rs ;
+	                            int		cl ;
+	                            cchar	*sp = lbuf ;
+	                            cchar	*cp{} ;
+	                            if ((cl = sfnext(sp,sl,&cp)) > 0) {
+	                                rs = cfdeci(cp,cl,&v) ;
+	                                pid = v ;
+	                            }
+	                        } /* end if (u_read) */
+			        rs1 = uc_free(lbuf) ;
+			        if (rs >= 0) rs = rs1 ;
+			    } /* end if (m-a-f) */
+			} /* end if (getbufsize) */
 	                rs1 = uc_close(fd) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (open) */
@@ -102,4 +123,5 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	return (rs >= 0) ? pid : rs ;
 }
 /* end subroutine (uc_procpid) */
+
 

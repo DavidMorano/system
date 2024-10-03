@@ -81,18 +81,32 @@ int svcent_getdeval(svcent *sep,cchar *k,cchar **rpp) noex {
 /* end subroutine (svcent_getdeval) */
 
 int svcent_islib(svcent *sep,cchar **rpp) noex {
+	constexpr char	ko[] = "so" ;
 	cint		n = sep->nkeys ;
-	int		vl ;
+	int		rs ;
+	int		vl = 0 ;
 	cchar		*(*kv)[2] = sep->keyvals ;
-	cchar		*k1 = "so" ;
-	if ((vl = svcent_getval(sep,k1,rpp)) > 0) {
+	if ((rs = svcent_getval(sep,ko,rpp)) > 0) {
 	    cchar	*dummy ;
-	    if (svckv_isprog(kv,n,&dummy) == 0) {
+	    vl = rs ;
+	    if ((rs = svckv_isprog(kv,n,&dummy)) == 0) {
 		vl = 0 ;
 	    }
 	}
-	return vl ;
+	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (svcent_islib) */
+
+int svcent::geval(cchar *sp,cchar **rpp) noex {
+	return svcent_getval(this,sp,rpp) ;
+}
+
+int svcent::getdeval(cchar *sp,cchar **rpp) noex {
+	return svcent_getdeval(this,sp,rpp) ;
+}
+
+int svcent::islib(cchar **rpp) noex {
+	return svcent_islib(this,rpp) ;
+}
 
 

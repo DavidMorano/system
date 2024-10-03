@@ -260,17 +260,18 @@ enum qopts {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_isproc(int argc,cchar *argv[],void *contextp)
-{
+int b_isproc(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;

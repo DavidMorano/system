@@ -17,6 +17,10 @@
 
 /******************************************************************************
 
+	Name:
+	srvtab
+
+	Description:
 	This object reads in a service table file and stores the
 	information parsed from that file.
 
@@ -39,6 +43,9 @@
 #include	<ascii.h>
 #include	<mallocstuff.h>
 #include	<getpwd.h>
+#include	<mkpathx.h>
+#include	<sfx.h>
+#include	<strwcpy.h>
 #include	<matstr.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -67,18 +74,13 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-
 
 /* external variables */
 
 
 /* forward references */
 
-static int	srvtab_fileparse(SRVTAB *,time_t,VECITEM *) noex ;
+static int	srvtab_fileparse(SRVTAB *,time_t,vecitem *) noex ;
 static int	srvtab_filedump(SRVTAB *) noex ;
 
 static int	entry_start(SRVTAB_ENT *) noex ;
@@ -249,19 +251,11 @@ int srvtab_close(srvtab *op) noex {
 }
 /* end subroutine (srvtab_close) */
 
-
-/* search the service table for a service match (input is a RE) */
-int srvtab_match(op,service,sepp)
-SRVTAB		*op ;
-cchar	service[] ;
-SRVTAB_ENT	**sepp ;
-{
-	VECITEM	*slp ;
-
+int srvtab_match(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
+	vecitem	*slp ;
 	int	rs = SR_NOTFOUND ;
 	int	sl, l1, l2 ;
 	int	i ;
-
 	cchar	*sp, *cp ;
 
 
@@ -297,31 +291,20 @@ SRVTAB_ENT	**sepp ;
 
 	        } /* end if */
 
-	    } else if (strcmp(service,sp) == 0)
+	    } else if (strcmp(service,sp) == 0) {
 	        rs = SR_OK ;
-
-	    if (rs >= 0)
-		break ;
-
+	    }
+	    if (rs >= 0) break ;
 	} /* end for (looping through entries) */
 
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (srvtab_match) */
 
-
-/* search the service table for a service match (input is a straight name) */
-int srvtab_find(op,service,sepp)
-SRVTAB		*op ;
-cchar	service[] ;
-SRVTAB_ENT	**sepp ;
-{
-	VECITEM	*slp ;
-
+int srvtab_find(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
+	vecitem		*slp ;
 	SRVTAB_ENT	*ep ;
-
 	int	i ;
-
 	cchar	*sp ;
 
 
@@ -354,15 +337,9 @@ SRVTAB_ENT	**sepp ;
 
 
 /* enumerate the service entries */
-int srvtab_get(op,i,sepp)
-SRVTAB		*op ;
-int		i ;
-SRVTAB_ENT	**sepp ;
-{
-	VECITEM	*slp ;
-
-	int	rs ;
-
+int srvtab_get(srvtab *op,int i,srvtab_ent **sepp) noex {
+	vecitem		*slp ;
+	int		rs ;
 
 	if (op == NULL)
 	    return SR_FAULT ;
@@ -377,17 +354,9 @@ SRVTAB_ENT	**sepp ;
 }
 /* end subroutine (srvtab_get) */
 
-
-/* check if the server file has changed */
-int srvtab_check(op,daytime,eep)
-SRVTAB		*op ;
-time_t		daytime ;
-VECITEM		*eep ;
-{
-	struct ustat	sb ;
-
-	int	rs = SR_OK ;
-
+int srvtab_check(srvtab *op,time_t daytime,vecitem *eep) noex {
+	USTAT		sb ;
+	int		rs = SR_OK ;
 
 	if (op == NULL)
 	    return SR_FAULT ;
@@ -447,21 +416,11 @@ ret0:
 
 /* private subroutines */
 
-
-/* parse a server file */
-static int srvtab_fileparse(op,daytime,eep)
-SRVTAB		*op ;
-time_t		daytime ;
-VECITEM		*eep ;
-{
-	struct ustat	sb ;
-
-	VECITEM		*slp ;
-
+static int srvtab_fileparse(srvtab *op,time_t daytime,vecitem *eep) noex {
+	USTAT		sb ;
+	vecitem		*slp ;
 	SRVTAB_ENT	se ;
-
 	field		fsb ;
-
 	bfile	sfile, *sfp = &sfile ;
 
 	int	rs = SR_OK ;
@@ -954,17 +913,14 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 	    sl = strlen(sp) ;
 
 	    len += (sl + 1) ;
-	    rs = uc_realloc(osp,len,&cp) ;
-
-	    if (rs >= 0) {
-
+	    if ((rs = uc_realloc(osp,len,&cp)) >= 0) {
 		*spp = cp ;
 		cp += sl ;
 		*cp++ = CH_US ;
 	        strwcpy(cp,s,slen) ;
-
-	    } else
+	    } else {
 	        *spp = NULL ;
+	    }
 
 	} else {
 	    rs = uc_mallocstrw(s,slen,&sp) ;
@@ -977,16 +933,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 /* end subroutine (stradd) */
 
 static void freeit(cchar **pp) noex {
-	if (*pp != NULL) {
-
-#ifdef	MALLOCLOG
-	    {
-	        char	pbuf[100 + 1] ;
-	        bufprintf(pbuf,100,"srvtab/freeit >%t<",*pp,strnlen(*pp,40)) ;
-	        malloclog_free(*pp,pbuf) ;
-	    }
-#endif
-
+	if (*pp) {
 	    uc_free(*pp) ;
 	    *pp = NULL ;
 	}

@@ -60,8 +60,8 @@ OBJ1= svckey.o svckv.o
 OBJ2= svcfile.o
 OBJ3= 
 
-OBJA= obj0.o obj1.o 
-#OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o
+#OBJA= obj0.o obj1.o obj2.o obj3.o
 
 OBJ= $(OBJA)
 

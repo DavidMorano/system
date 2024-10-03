@@ -209,7 +209,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	mkutmpid(char *,int,const char *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	isproc(pid_t) ;
 extern int	audit_settid(int);	/* set terminal ID */
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
@@ -1618,13 +1617,7 @@ int			master ;
 #endif
 
 			if (rs1 == 0)
-			    f_isproc = isproc(pid) ; /* this is double check! */
-
-#if	CF_DEBUG
-		if (DEBUGLEVEL(5))
-		debugprintf("proghandle/telnet: isproc() f=%u\n",
-		f_isproc) ;
-#endif
+			    f_isproc = uc_prochave(pid) ; /* double check! */
 
 			if (! f_isproc)
 			    cnoprog += 1 ;

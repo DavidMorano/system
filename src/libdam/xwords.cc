@@ -41,8 +41,6 @@
 
 /* local defines */
 
-#define	XWORDS_WI	struct xwords_wi
-
 
 /* local namespaces */
 
@@ -158,12 +156,12 @@ int xwords_finish(xwords *op) noex {
 
 static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	vecobj		wil ;
-	cint		esize = sizeof(XWORDS_WI) ;
+	cint		esize = sizeof(xwords_wi) ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
 	if ((rs = vecobj_start(&wil,esize,2,0)) >= 0) {
-	    XWORDS_WI	wi ;
+	    xwords_wi	wi ;
 	    wi.wp = wbuf ;
 	    wi.wl = si ;
 	    if ((rs = vecobj_add(&wil,&wi)) >= 0) {
@@ -186,7 +184,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 		}
 		if (rs >= 0) {
 		    int		i ;
-		    int		j ;
+		    int		j ; /* used-afterwards */
 		    void	*vp ;
 		    n = op->nwords + vecobj_count(&wil) ;
 		    if (n > XWORDS_MAX) {
@@ -198,7 +196,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 			        op->xa[j].wl = op->words[j].wl ;
 			    }
 			    for (i = 0 ; vecobj_get(&wil,i,&vp) >= 0 ; i += 1) {
-		    		XWORDS_WI	*ep = wip(vp) ;
+		    		xwords_wi	*ep = wip(vp) ;
 			        op->xa[j].wp = ep->wp ;
 			        op->xa[j].wl = ep->wl ;
 			        j += 1 ;
@@ -207,7 +205,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 		    } else {
 			j = op->nwords ;
 			for (i = 0 ; vecobj_get(&wil,i,&vp) >= 0 ; i += 1) {
-		   	    XWORDS_WI	*ep = wip(vp) ;
+		   	    xwords_wi	*ep = wip(vp) ;
 			    op->words[j].wp = ep->wp ;
 			    op->words[j].wl = ep->wl ;
 			    j += 1 ;

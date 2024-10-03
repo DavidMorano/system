@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} hexval"
+NAMES="${NAMES} hdb_curdel "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/hexval/s//digvalhex/g
+g/hdb_curdel/s//hdb_delcur/g
 	w
 	q
 EOF
@@ -19,4 +19,5 @@ EOF
     done
   fi
 done
+
 

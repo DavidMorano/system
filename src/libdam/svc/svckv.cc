@@ -88,7 +88,7 @@ int svckv_val(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	    cint	kl = strlen(kv[i][0]) ;
 	    cchar	*kp = kv[i][0] ;
 	    if (ourmat(sp,kp,kl)) {
-	        if (vpp != nullptr) *vpp = kv[i][1] ;
+	        if (vpp) *vpp = kv[i][1] ;
 	        vl = strlen(kv[i][1]) ;
 	        break ;
 	    }
@@ -99,13 +99,12 @@ int svckv_val(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 
 int svckv_dequote(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	int		cl = 0 ;
-	int		vl ;
-	cchar		*vp ;
+	cchar		*vp{} ;
 	cchar		*cp = nullptr ;
-	if ((vl = svckv_val(kv,n,sp,&vp)) > 0) {
+	if (int vl ; (vl = svckv_val(kv,n,sp,&vp)) > 0) {
 	    cl = sfdequote(vp,vl,&cp) ;
 	}
-	if (vpp != nullptr) *vpp = cp ;
+	if (vpp) *vpp = cp ;
 	return cl ;
 }
 /* end subroutine (svckv_dequote) */
