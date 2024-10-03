@@ -6,29 +6,23 @@
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_POLL		1
-#define	CF_ISPROC	0		/* use 'isproc()' ? */
+#define	CF_ISPROC	0		/* use |uc_prochave(3uc)| */
 
 
 /* revision history:
 
 	= 1988-02-01, David A­D­ Morano
-
 	This code was originally written.
 
-
 	= 1998-05-01, David A­D­ Morano
-
 	This subroutine was modified to not write out anything
 	to standard output if the access time of the associated
 	terminal has not been changed in 10 minutes.
 
-
 	= 1998-12-01, David A­D­ Morano
-
 	This subroutine has been updated to use the new Lock File
 	Manager (lfm) and also the new display manager object for
 	management of the display.
-
 
 */
 
@@ -39,28 +33,24 @@
 	This is the subroutine which performs the active work for
 	the 'daytime' program.
 
-
 	Implementtion note:
-
-	I do not exactly know why orphan-detection is so important but
-	it is when things start to go badly !  Anyway, there is choice
-	of using 'isproc()' or 'u_kill(2)' for detecting if our session
-	leader is gone or not.  The 'isproc()' call tells us if any
-	process whose PID is specified in that call is alive on the
-	system or not.  The 'u_kill(2)' call allows us to only
-	determine whether a process that we have the right to kill (!)
-	is alive on the system.  Since this program will not generally
-	be run by one user where it session leader-process is owned by
-	another person, it is probably (?) safe to assume that our
-	session leader is owned by the same owner as we are.  Is this a
-	valid assumption ?
-
+	I do not exactly know why orphan-detection is so important
+	but it is when things start to go badly!  Anyway, there is
+	choice of using |uc_prochave(3uc)| or |u_kill(2)| for
+	detecting if our session leader is gone or not.  The
+	|uc_prochave(3uc)| call tells us if any process whose PID
+	is specified in that call is alive on the system or not.
+	The |u_kill(2)| call allows us to only determine whether a
+	process that we have the right to kill (!) is alive on the
+	system.  Since this program will not generally be run by
+	one user where it session leader-process is owned by another
+	person, it is probably (?) safe to assume that our session
+	leader is owned by the same owner as we are.  Is this a
+	valid assumption?
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -70,8 +60,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<userinfo.h>
 #include	<bfile.h>
@@ -88,8 +76,6 @@
 
 
 /* external subroutines */
-
-extern int	isproc(pid_t) ;
 
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
@@ -466,7 +452,7 @@ MAILFILES	*mfp ;
 
 #if	CF_ISPROC
 
-	        if (! isproc(pip->sid))
+	        if (! uc_prochave(pip->sid))
 	            f_orphaned = TRUE ;
 
 #else /* CF_ISPROC */

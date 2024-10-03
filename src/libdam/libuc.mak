@@ -902,8 +902,6 @@ filelines.o:		filelines.cc filelines.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 #
-isproc.o:		isproc.cc isproc.h
-#
 isinetaddr.o:		isinetaddr.cc isinetaddr.h
 isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
@@ -918,5 +916,6 @@ unameo.o:		unameo.cc unameo.h
 utmpacc.o:		utmpacc.cc utmpacc.h
 utmpaccent.o:		utmpaccent.cc utmpaccent.h
 ucrand.o:		ucrand.cc ucrand.h
+usprochave.o:		ucprochave.cc ucprochave.h
 
 

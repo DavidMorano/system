@@ -83,6 +83,7 @@
 #include	<uctimer.h>
 #include	<ucinetconv.h>
 #include	<ucsysconf.h>
+#include	<ucprochave.h>
 
 #include	<getexecname.h>
 #include	<termios_cf.h>

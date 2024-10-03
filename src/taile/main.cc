@@ -6,14 +6,14 @@
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_SESSION	1		/* track our process session */
-#define	CF_ISPROC	1		/* use 'isproc(3dam)' */
+#define	CF_ISPROC	1		/* use |uc_prochave(3uc)| */
 
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -21,26 +21,24 @@
 
 /*******************************************************************************
 
-	This program is like 'tail(1)' but has several enhancements over that
-	program.  This program can track multiple files simultaneously and can
-	also be put into the backgroun more safely than 'tail(1)' can be.
-
+	This program is like |tail(1)| but has several enhancements
+	over that program.  This program can track multiple files
+	simultaneously and can also be put into the backgroun more
+	safely than |tail(1)| can be.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<csignal>
 #include	<time.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -77,7 +75,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	isproc(pid_t) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 
@@ -1114,8 +1111,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* is our session leader still around? */
 
 #if	CF_SESSION
-	            if ((pip->pid_session > 0) && (! isproc(pip->pid_session)))
-	                break ;
+		{
+	            if (pip->pid_session > 0) {
+			const pid_t	pid = pip->pid_session ;
+		        if ((rs = uc_prochave(pid)) == 0) break ;
+		}
 #endif /* CF_SESSION */
 
 	            if (! istrack(pip))
@@ -1465,7 +1465,7 @@ static int istrack(PROGINFO *pip)
 	if (pip->pid_track > 0) {
 
 #if	CF_ISPROC
-	    f_track = isproc(pip->pid_track) ;
+	    f_track = uc_prochave(pip->pid_track) ;
 #else /* CF_ISPROC */
 	    {
 	        int	rs1 = u_kill(pip->pid_track,0) ;

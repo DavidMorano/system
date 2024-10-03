@@ -47,7 +47,6 @@
 #include	<strdcpyx.h>
 #include	<strwcpy.h>
 #include	<cfdec.h>
-#include	<isproc.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
@@ -66,6 +65,7 @@
 /* local structures */
 
 struct vars {
+	int		maxpathlen ;
 	int		usernamelen ;
 } ;
 
@@ -172,9 +172,11 @@ int sesnotes_close(sesnotes *op) noex {
 	            uc_unlink(op->sfname) ;
 	            op->sfname[0] = '\0' ;
 	        }
-	        rs1 = uc_free(op->sfname) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->sfname = nullptr ;
+		{
+	            rs1 = uc_free(op->sfname) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->sfname = nullptr ;
+		}
 	    }
 	    {
 		rs1 = sesnotes_dtor(op) ;
@@ -234,33 +236,40 @@ int sesnotes_send(sesnotes *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 /* private subroutines */
 
 static int sesnotes_ready(sesnotes *op) noex {
+	constexpr char	dname[] = SESNOTES_PROGDNAME ;
+	constexpr char	tpat[] = "sesnotesXXXXXX" ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (op->sfname == nullptr) {
+	    cint	sz = ((var.maxpathlen + 1) * 3) ;
+	    int		ai = 0 ;
 	    cmode	dm = 0775 ;
-	    cchar	*dname = SESNOTES_PROGDNAME ;
-	    char	dbuf[MAXPATHLEN+1] ;
-	    if ((rs = mktmpuserdir(dbuf,op->unbuf,dname,dm)) >= 0) {
-	        cchar	*tpat = "sesnotesXXXXXX" ;
-	        char		rbuf[MAXNAMELEN+1] ;
-	        if ((rs = mkpath2(rbuf,dbuf,tpat)) >= 0) {
-	            cmode	om = 0666 ;
-	            cint		of = (O_CREAT|O_RDWR) ;
-	            char		sbuf[MAXPATHLEN+1] ;
-	            if ((rs = opentmpusd(rbuf,of,om,sbuf)) >= 0) {
-	                cchar	*cp ;
-	                op->fd = rs ;
-	                if ((rs = uc_mallocstrw(sbuf,-1,&cp)) >= 0) {
-	                    op->sfname = (char *) cp ;
-	                    rs = 1 ;
-	                }
-	                if (rs < 0) {
-	                    u_close(op->fd) ;
-	                    op->fd = -1 ;
-	                    uc_unlink(sbuf) ;
-	                }
-	            } /* end if (opentmpusd) */
-	        } /* end if (mkpath) */
-	    } /* end if (mktmpuserdir) */
+	    if (char *ap{} ; (rs = uc_malloc(sz,&ap)) >= 0) {
+	        char	*dbuf = ap + ((var.maxpathlen + 1) * ai++) ;
+	        if ((rs = mktmpuserdir(dbuf,op->unbuf,dname,dm)) >= 0) {
+	            char	*rbuf = ap + ((var.maxpathlen + 1) * ai++) ;
+	            if ((rs = mkpath2(rbuf,dbuf,tpat)) >= 0) {
+	                cint	of = (O_CREAT|O_RDWR) ;
+	                cmode	om = 0666 ;
+	                char	*sbuf = ap + ((var.maxpathlen + 1) * ai++) ;
+	                if ((rs = opentmpusd(rbuf,of,om,sbuf)) >= 0) {
+	                    cchar	*cp ;
+	                    op->fd = rs ;
+	                    if ((rs = uc_mallocstrw(sbuf,-1,&cp)) >= 0) {
+	                        op->sfname = (char *) cp ;
+	                        rs = 1 ;
+	                    }
+	                    if (rs < 0) {
+	                        u_close(op->fd) ;
+	                        op->fd = -1 ;
+	                        uc_unlink(sbuf) ;
+	                    }
+	                } /* end if (opentmpusd) */
+	            } /* end if (mkpath) */
+	        } /* end if (mktmpuserdir) */
+		rs1 = uc_free(ap) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (initializaion needed) */
 	return rs ;
 }
@@ -299,7 +308,7 @@ static int sesnotes_sends(sesnotes *op,char *dbuf,int dlen,
 	            } /* end if (is-not-leading-dot) */
 	            if (rs < 0) break ;
 	        } /* end while (reading) */
-	        dbuf[dlen] = '\0' ;
+		dbuf[dlen] = '\0' ;	/* <- reset buffer for repeat */
 	        rs1 = fsdir_close(&d) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else if (isNotPresent(rs)) {
@@ -329,9 +338,8 @@ static int sesnotes_sender(sesnotes *op,cc *ap,int al,int mt,time_t st,
 	        switch (mt) {
 	        case sesmsgtype_gen:
 	            {
-	                SESMSG_GEN	m2 ;
+	                SESMSG_GEN	m2{} ;
 	                cint	nlen = SESMSG_NBUFLEN ;
-	                memset(&m2,0,sizeof(SESMSG_GEN)) ;
 	                m2.tag = tag ;
 	                m2.stime = st ;
 	                strwcpy(m2.user,op->unbuf,SESMSG_USERLEN) ;
@@ -342,9 +350,8 @@ static int sesnotes_sender(sesnotes *op,cc *ap,int al,int mt,time_t st,
 	            break ;
 	        case sesmsgtype_biff:
 	            {
-	                SESMSG_BIFF	m3 ;
+	                SESMSG_BIFF	m3{} ;
 	                cint	nlen = SESMSG_NBUFLEN ;
-	                memset(&m3,0,sizeof(SESMSG_BIFF)) ;
 	                m3.tag = tag ;
 	                m3.stime = st ;
 	                strwcpy(m3.user,op->unbuf,SESMSG_USERLEN) ;
@@ -366,11 +373,11 @@ static int sesnotes_sender(sesnotes *op,cc *ap,int al,int mt,time_t st,
 			if (rs == SR_DESTADDRREQ) {
 			    nulstr	n ;
 			    cchar	*name ;
-			    if ((rs = nulstr_start(&n,ap,al,&name)) >= 0) {
+			    if ((rs = n.start(ap,al,&name)) >= 0) {
 				{
 			            u_unlink(name) ;
 				}
-				rs1 = nulstr_finish(&n) ;
+				rs1 = n.finish ;
 				if (rs >= 0) rs = rs1 ;
 			    } /* end if (nulstr) */
 			} else {
@@ -392,7 +399,7 @@ static int haveproc(cchar *pp,int pl) noex {
 	if (pl > 0) {
 	    if (uint uv{} ; (rs = cfdecui(pp,pl,&uv)) >= 0) {
 		const pid_t	pid = uv ;
-		rs = isproc(pid) ;
+		rs = uc_prochave(pid) ;
 		f = (rs > 0) ;
 	    }
 	}
@@ -403,8 +410,10 @@ static int haveproc(cchar *pp,int pl) noex {
 static int mkvars(int v) noex {
 	int		rs = SR_BUGCHECK ;
 	if (v > 0) {
-	    rs = SR_OK ;
 	    var.usernamelen = v ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		var.maxpathlen = rs ;
+	    }
 	}
 	return rs ;
 }

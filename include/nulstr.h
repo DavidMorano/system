@@ -19,10 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	NULSTR		struct nulstr_head
@@ -30,8 +31,8 @@
 
 
 struct nulstr_head {
-	cchar	*as ;	/* allocated string */
-	char	buf[NULSTR_SHORTLEN+1] ;
+	cchar		*as ;	/* allocated string */
+	char		buf[NULSTR_SHORTLEN+1] ;
 } ;
 
 #ifdef	__cplusplus
@@ -59,7 +60,7 @@ struct nulstr : nulstr_head {
 	} ;
 	nulstr(const nulstr &) = delete ;
 	nulstr &operator = (const nulstr &) = delete ;
-	int start(cchar *sp,int sl,cchar **) noex ;
+	int start(cchar *,int,cchar **) noex ;
 	~nulstr() noex {
 	    (void) int(finish) ;
 	} ;

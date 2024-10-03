@@ -241,11 +241,11 @@ static int lookword_proc(LW *op,LW_CUR *curp,
 static int lookword_mksword(LW *op,char *rbuf,int rlen,cchar *s) noex {
 	int		rs = SR_OK ;
 	int		i ; /* used-afterwards */
-	int		ch, dch, fch ;
+	int		dch, fch ;
 	cchar		*readp = s ;
 	char		*writep = rbuf ;
 	for (i = 0 ; (i < rlen) && (s[i] != '\0') ; i += 1) {
-	    ch = mkchar(*readp++) ;
+	    cint	ch = mkchar(*readp++) ;
 	    if (ch == 0) break ;
 	    dch = (op->f.dict) ? DICT(ch) : ch ;
 	    if (dch != NO_COMPARE) {
@@ -395,7 +395,7 @@ static cchar *binary_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 	        back = p ;
 	    }
 	    p = front + ((back - front) / 2) ;
-	    SKNL(p, back) ;
+	    SKNL(p,back) ;
 	} /* end while */
 	return (front) ;
 }
@@ -416,7 +416,7 @@ static cchar *linear_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 	while (front < back) {
 	    rc = compare(op,front,back,wstr,nullptr) ;
 	    if (rc <= 0) break ;
-	    SKNL(front, back) ;
+	    SKNL(front,back) ;
 	} /* end while */
 	return ((rc == 0) ? front : nullptr) ;
 }

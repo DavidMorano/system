@@ -85,7 +85,6 @@ extern int	pathadd(char *,int,cchar *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	removes(cchar *) ;
-extern int	isproc(pid_t) ;
 extern int	hasNotDots(cchar *,int) ;
 extern int	isNotValid(int) ;
 extern int	isNotPresent(int) ;
@@ -454,7 +453,7 @@ static int isNotRunning(cchar *np,int nl)
 	    nl -= 1 ;
 	    if ((rs = cfdecui(np,nl,&uv)) >= 0) {
 	        const pid_t	pid = uv ;
-	        if ((rs = isproc(pid)) == 0) {
+	        if ((rs = uc_prochave(pid)) == 0) {
 	            f = TRUE ;
 	        }
 	    } else if (isNotValid(rs)) {

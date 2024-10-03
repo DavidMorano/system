@@ -1,4 +1,4 @@
-/* isproc SUPPORT */
+/* ucprochave SUPPORT */
 /* lang=C++20 */
 
 /* is a process (specified by PID) currently in the system? */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	isproc
+	ucprochave
 
 	Description:
 	This subroutine checks to see if the specific process
@@ -26,7 +26,7 @@
 	on some systems!
 
 	Synopsis:
-	int isproc(pid_t pid) noex
+	int ucprochave(pid_t pid) noex
 
 	Arguments:
 	pid			PID of process to search for
@@ -41,8 +41,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
-
-#include	"isproc.h"
 
 
 /* local defines */
@@ -68,7 +66,7 @@
 
 /* exported subroutines */
 
-int isproc(pid_t pid) noex {
+int ucprochave(pid_t pid) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = u_kill(pid,0)) >= 0) {
@@ -81,6 +79,6 @@ int isproc(pid_t pid) noex {
 	}
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (isproc) */
+/* end subroutine (ucprochave) */
 
 
