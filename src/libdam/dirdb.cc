@@ -213,12 +213,11 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	if ((rs = dirdb_magic(op,dp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dp[0]) {
-	        char	*tbuf{} ;
 	        if (dl < 0) dl = strlen(dp) ;
-	        if ((rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	             if ((rs = mkpath1w(tbuf,dp,dl)) >= 0) {
 	                 USTAT	sb ;
-	                 if ((rs = u_stat(tbuf,&sb)) >= 0) {
+	                 if ((rs = uc_stat(tbuf,&sb)) >= 0) {
 		             if (S_ISDIR(sb.st_mode)) {
 		                 bool	f_add = true ;
 		                 while ((dl > 0) && (dp[dl-1] == '/')) {
@@ -332,10 +331,10 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 /* private subroutines */
 
 static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
-	dirdb_ent	*ep ;
 	cint		sz = sizeof(dirdb_ent) ;
 	int		rs ;
-	if ((rs = uc_malloc(sz,&ep)) >= 0) {
+	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    dirdb_ent	*ep = entp(vp) ;
 	    if ((rs = entry_start(ep,sp,sl,sbp,op->count)) >= 0) {
 	        if ((rs = vechand_add(op->dlp,ep)) >= 0) {
 		    hdb_dat	key ;
@@ -388,12 +387,11 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if (nlen < 0) nlen = strlen(name) ;
 	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
 	        USTAT	sb ;
-	        if ((rs = u_stat(tbuf,&sb)) >= 0) {
+	        if ((rs = uc_stat(tbuf,&sb)) >= 0) {
 	            dirdb_fid	fid{} ;
 	            hdb_dat	key ;
 	            hdb_dat	val ;

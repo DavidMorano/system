@@ -4,6 +4,7 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+sockpeername
 uctim
 libuc		fix to completely compile!
 memfile		can we just trash this?
