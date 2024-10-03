@@ -1,6 +1,9 @@
 /* xwords HEADER */
 /* lang=C20 */
 
+/* extract extra words from a single given word */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
