@@ -30,8 +30,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"getbufsizenames.h"
-#include	"usysdefs.h"
+#include	"bufsizenames.h"
 #include	"bufsizedata.hh"
 
 

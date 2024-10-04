@@ -82,27 +82,29 @@ extern char	*strnrpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-static int cmdmap_defmap(CMDMAP *,const CMDMAP_E *) ;
+static int cmdmap_defmap(CMDMAP *,const CMDMAP_E *) noex ;
 
-static int vcmpfind(const void *,const void *) ;
+extern "C" {
+    static int	vcmpfind(cvoid **,cvoid **) noex ;
+}
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int cmdmap_start(CMDMAP *op,const CMDMAP_E *defmap)
-{
+int cmdmap_start(CMDMAP *op,const CMDMAP_E *defmap) noex {
 	int		rs = SR_OK ;
-	int		size ;
+	int		sz = sizeof(CMDMAP_E) ;
 	int		opts ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(CMDMAP)) ;
+	memclear(op) ;
 
 	opts = VECOBJ_OREUSE ;
-	size = sizeof(CMDMAP_E) ;
-	if ((rs = vecobj_start(&op->map,size,10,opts)) >= 0) {
+	if ((rs = vecobj_start(&op->map,sz,10,opts)) >= 0) {
 	    if (defmap != NULL) rs = cmdmap_defmap(op,defmap) ;
 	    if (rs >= 0) {
 	        op->magic = CMDMAP_MAGIC ;
@@ -226,20 +228,18 @@ static int cmdmap_defmap(CMDMAP *op,const CMDMAP_E *defmap)
 }
 /* end subroutine (cmdmap_defmap) */
 
-
-static int vcmpfind(const void *v1pp,const void *v2pp)
-{
-	CMDMAP_E	**e1pp = (CMDMAP_E **) v1pp ;
-	CMDMAP_E	**e2pp = (CMDMAP_E **) v2pp ;
+static int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
+	CMDMAP_E	*e1p = (CMDMAP_E *) *v1pp ;
+	CMDMAP_E	*e2p = (CMDMAP_E *) *v2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
-	            rc = (*e1pp)->key - (*e2pp)->key ;
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+	            rc = e1p->key - e2p->key ;
+	        }
+	    }
 	}
 	return rc ;
 }

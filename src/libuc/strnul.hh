@@ -23,10 +23,10 @@
 #include	<string>
 #include	<string_view>
 #include	<iostream>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
 
 
 #define	STRNUL_SHORTLEN	128		/* "short-string optimization" */
@@ -38,7 +38,7 @@ struct strnul {
 	cchar		*sp = nullptr ;
 	char		*as = nullptr ;	/* allocated memory */
 	int		sl = 0 ;
-	char		buf[STRNUL_SHORTLEN+1] ;
+	char		buf[STRNUL_SHORTLEN + 1] ;
 	strnul(cchar *ap,int al = -1) noex : sp(ap), sl(al) { 
 	    buf[0] = '\0' ;
 	} ; /* end ctor */

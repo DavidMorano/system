@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	strnul
+
+	Descriptor:
 	This object module (strnul) provides support for creating
 	NUL-terminated strings when only a counted string is
 	available.
@@ -38,6 +42,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -69,7 +74,7 @@ strnul::operator ccharp () noex {
 	    rp = sp ;
 	    if ((sl >= 0) && (sp[sl] != '\0')) {
 	        if (sl > STRNUL_SHORTLEN) {
-		    if ((as = new(nothrow) char[(sl+1)]) != nullptr) {
+		    if ((as = new(nothrow) char[sl + 1]) != nullptr) {
 			strwcpy(as,sp,sl) ;
 			rp = as ;
 		    } else {

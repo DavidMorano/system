@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	geaddrinfo
+
+	Description:
 	This subroutine is used to get a canonical INET hostname
 	for a supplied name.  Note carefully that the returned
 	hostname, if any, may NOT be a name that can be translated
@@ -38,9 +42,9 @@
 	Arguments:
 	hn		name of host to lookup
 	svc		name of service to lookup
-	hintp		pointer to 'addrinfo' structure
-	ehbuf		caller-supplied buffer to received "effective" name
-	rpp		pointer to pointer to 'addrinfo' result
+	hintp		pointer to 'addrinfo' structure (hint)
+	ehbuf		caller-supplied buffer to receive "effective" name
+	rpp		pointer to pointer to 'addrinfo' result data
 
 	Returns:
 	>=0		<name> had a valid INET address
@@ -98,6 +102,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -323,15 +328,14 @@ static int try_rem(SUBINFO *mip) noex {
 	int		c = 0 ;
 	if (aip->hostname != nullptr) {
 	    if (! isinetaddr(aip->hostname)) {
-		const nullptr_t		np{} ;
+		cnullptr	np{} ;
 	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != np) {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
 	                rs = SR_NOTFOUND ;
 	                if (isindomain(aip->hostname,mip->domainname)) {
 	                    int		hl = (tp - aip->hostname) ;
 			    cchar	*hn = aip->hostname ;
-	                    char	*hbuf{} ;
-			    if ((rs = malloc_hn(&hbuf)) >= 0) {
+			    if (char *hbuf{} ; (rs = malloc_hn(&hbuf)) >= 0) {
 				cint	hlen = rs ;
 	    		        char	*bp = hbuf ;
 			        if (mip->ehostname != nullptr) {
@@ -406,6 +410,7 @@ static int try_remlocal(SUBINFO *mip) noex {
 static int arginfo_load(ARGINFO *aip,cc *hn,cc *svc,AI *hintp,AI **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (aip) {
+	    rs = SR_OK ;
 	    aip->hostname = hn ;
 	    aip->svcname = svc ;
 	    aip->hintp = hintp ;

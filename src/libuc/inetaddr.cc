@@ -115,8 +115,8 @@ constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 int inetaddr_start(inetaddr *ip,cvoid *addr) noex {
 	int		rs = SR_FAULT ;
 	if (ip && addr) {
-	    cint	al = INET4ADDRLEN ;
-	    rs = memcpy(ip,addr,al) ;
+	    char	*rp = charp(memcpy(ip->straddr,addr,inet4addrlen)) ;
+	    rs = (rp - ip->straddr) ;
 	}
 	return rs ;
 }
@@ -252,5 +252,38 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (inetaddr_getdotaddr) */
+
+inetaddr_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case inetaddrmem_finish:
+	        rs = inetaddr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (inetaddr_co::operator) */
+
+int inetaddr::start(cvoid *addr) noex {
+	return inetaddr_start(this,addr) ;
+}
+
+int inetaddr::startstr(cchar *sp,int sl) noex {
+	return inetaddr_startstr(this,sp,sl) ;
+}
+
+int inetaddr::startdot(cchar *sp,int sl) noex {
+	return inetaddr_startdot(this,sp,sl) ;
+}
+
+int inetaddr::gethexaddr(char *bp,int bl) noex {
+	return inetaddr_gethexaddr(this,bp,bl) ;
+}
+
+int inetaddr::getdotaddr(char *bp,int bl) noex {
+	return inetaddr_getdotaddr(this,bp,bl) ;
+}
 
 

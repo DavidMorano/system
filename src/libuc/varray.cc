@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	varray
+
+	Description:
 	This object attempts to implement a sort of variable-length
 	array of elements.
 

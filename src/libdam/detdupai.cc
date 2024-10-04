@@ -54,7 +54,9 @@
 
 /* forwards references */
 
-static int	vcmp(cvoid *,cvoid *) noex ;
+extern "C" {
+    static int	cmpint(cvoid *,cvoid *) noex ;
+}
 
 
 /* local variables */
@@ -73,11 +75,11 @@ int detdupai(cint *ap,int al) noex {
 	    rs = SR_OK ;
 	    if (al > 1) {
 		cint	esize = sizeof(int) ;
-		cint	size = ((al+1)*sizeof(int)) ;
+		cint	sz = ((al+1)*sizeof(int)) ;
 	        int	*aa ;
-	        if ((rs = uc_libmalloc(size,&aa)) >= 0) {
-	            memcpy(aa,ap,size) ;
-	            qsort(aa,al,esize,vcmp) ;
+	        if ((rs = uc_libmalloc(sz,&aa)) >= 0) {
+	            memcpy(aa,ap,sz) ;
+	            qsort(aa,al,esize,cmpint) ;
 	            for (int i = 1 ; (!f) && (i < al) ; i += 1) {
 		        f = (aa[i] == aa[i-1]) ;
 		    } /* end for */
@@ -93,11 +95,11 @@ int detdupai(cint *ap,int al) noex {
 
 /* local subroutines */
 
-int vcmp(cvoid *v1p,cvoid *v2p) noex {
-	cint	*i1p = (cint *) v1p ;
-	cint	*i2p = (cint *) v2p ;
+int cmpint(cvoid *v1p,cvoid *v2p) noex {
+	cint	*i1p = intp(v1p) ;
+	cint	*i2p = intp(v2p) ;
 	return (*i1p - *i2p) ;
 }
-/* end subroutine (vcmp) */
+/* end subroutine (cmpint) */
 
 

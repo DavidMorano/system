@@ -35,7 +35,7 @@
 	addrset::ifinish
 
 	Description:
-	Reack memory blocks.
+	Track memory blocks.
 
 	Symopsis:
 	int addrset::start(int n) noex

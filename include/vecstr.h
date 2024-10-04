@@ -29,13 +29,14 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* object defines */
 #define	VECSTR			struct vecstr_head
 #define	VECSTR_FL		struct vecstr_flags
 #define	VECSTR_DEFENTS		5
-
 /* options */
 #define	VECSTR_ODEFAULT		0
 #define	VECSTR_OREUSE		(1 << 0)	/* reuse empty slots */

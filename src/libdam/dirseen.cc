@@ -99,8 +99,10 @@ static inline int dirseen_magic(dirseen *op,Args ... args) noex {
 static int entry_start(dirseen_ent *,cchar *,int,dev_t,ino_t) noex ;
 static int entry_finish(dirseen_ent *) noex ;
 
-static int vcmpname(cvoid **,cvoid **) noex ;
-static int vcmpdevino(cvoid **,cvoid **) noex ;
+extern "C" {
+    static int vcmpname(cvoid **,cvoid **) noex ;
+    static int vcmpdevino(cvoid **,cvoid **) noex ;
+}
 
 
 /* local variables */

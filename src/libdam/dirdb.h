@@ -23,7 +23,7 @@
 #define	DIRDB_NDEF	30
 #define	DIRDB		struct dirdb_head
 #define	DIRDB_ENT	struct dirdb_entry
-#define	DIRDB_FID	struct dirdb_fider
+#define	DIRDB_FID	struct dirdb_fider	/* file-ID */
 #define	DIRDB_CUR	struct dirdb_cursor
 
 

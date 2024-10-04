@@ -125,7 +125,10 @@ static int	part_match(ACCTAB_PA *,cchar *) noex ;
 static int	part_finish(ACCTAB_PA *) noex ;
 
 static int	parttype(cchar *) noex ;
-static int	vcmpent(ACCTAB_ENT **,ACCTAB_ENT **) noex ;
+
+extern "C" {
+    static int	vcmpent(cvoid **,cvoid **) noex ;
+}
 
 static int	freeit(cchar **) noex ;
 
@@ -1090,17 +1093,17 @@ static int freeit(cchar **pp) noex {
 /* end subroutine (freeit) */
 
 /* compare just the 'netgroup' part of entries (used for sorting) */
-static int vcmpent(ACCTAB_ENT **e1pp,ACCTAB_ENT **e2pp) noex {
+static int vcmpent(cvoid **e1pp,cvoid **e2pp) noex {
+	ACCTAB_ENT	*e1p = (ACCTAB_ENT *) *v1pp ;
+	ACCTAB_ENT	*e2p = (ACCTAB_ENT *) *v2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp != nullptr) {
-	        if (*e2pp != nullptr) {
-	    	    rc = strcmp((*e1pp)->netgroup.std,(*e2pp)->netgroup.std) ;
-		} else {
-	    	    rc = -1 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+	    	    rc = strcmp(e1p->netgroup.std,e2p->netgroup.std) ;
 		}
-	    } else {
-	        rc = +1 ;
 	    }
 	}
 	return rc ;

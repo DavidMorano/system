@@ -218,19 +218,17 @@ static int	entry_release(PF_E *) noex ;
 static int	entry_finish(PF_E *) noex ;
 
 extern "C" {
-    static int	vcmpentry(PF_E **,PF_E **) noex ;
+    static int	vcmpentry(cvoid **,cvoid **) noex ;
 }
 
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
 /* key field terminators (pound, equal, and all white-space) */
-static char 		kterms[termsize] ;
+static char 		kterms[fieldterms_termsize] ;
 
 /* argument field terminators (pound and all white-space) */
-static char 		aterms[termsize] ;
+static char 		aterms[fieldterms_termsize] ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
@@ -1038,22 +1036,22 @@ static int entry_release(PF_E *pep) noex {
 }
 /* end subroutine (entry_release) */
 
-static int vcmpentry(PF_E **e1pp,PF_E **e2pp) noex {
-	PF_E		*e1p = *e1pp ;
-	PF_E		*e2p = *e2pp ;
+static int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
+	PF_E		*e1p = (PF_E *) *v1pp ;
+	PF_E		*e2p = (PF_E *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
+	    rc = +1 ;
 	    if (e1p) {
+		rc = -1 ;
 	        if (e2p) {
 		    cint	ch1 = mkchar(e1p->key[0]) ;
 		    cint	ch2 = mkchar(e2p->key[0]) ;
 	            if ((rc = (ch1 - ch2)) == 0) {
 	                rc = strcmp(e1p->key,e2p->key) ;
 	            }
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
+	        }
+	    }
 	}
 	return rc ;
 }

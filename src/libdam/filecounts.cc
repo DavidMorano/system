@@ -169,20 +169,23 @@ static int	worker_finish(WORKER *) ;
 static int	mkentry(char *,int,uint,int,cchar *,int,cchar *) ;
 static int	actioncmd(int) ;
 
-static int	vcmpoff(vcoid *,vcoid *) ;
+extern "C" {
+    static int	vcmpoff(cvoid **,cvoid **) noex ;
+}
 
 
 /* local variables */
 
-static cchar	*total = "TOTAL" ;
-static cchar	blanks[] = "                    " ;
+constexpr char	total[] = "TOTAL" ;
+constexpr char	blanks[] = "                    " ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int filecounts_open(FILECOUNTS *op,cchar *fname,int oflags,mode_t om)
-{
+int filecounts_open(FILECOUNTS *op,cchar *fname,int oflags,mode_t om) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -1090,9 +1093,7 @@ cchar	name[] ;
 }
 /* end subroutine (mkentry) */
 
-
-static int actioncmd(int nv)
-{
+static int actioncmd(int nv) noex {
 	int		na = 0 ;
 	switch (nv) {
 	case 1:
@@ -1106,32 +1107,26 @@ static int actioncmd(int nv)
 }
 /* end subroutine (actioncmd) */
 
-static int vcmpoff(vcoid *v1p,vcoid *v2p) noex {
-	WORKER_ENT	**e1pp = (WORKER_ENT **) v1p ;
-	WORKER_ENT	**e2pp = (WORKER_ENT **) v2p ;
-	WORKER_ENT	*e1p ;
-	WORKER_ENT	*e2p ;
+static int vcmpoff(cvoid **v1pp,cvoid **v2pp) noex {
+	WORKER_ENT	*e1pp = (WORKER_ENT *) *v1pp ;
+	WORKER_ENT	*e2pp = (WORKER_ENT *) *v2pp ;
 	int		rc = 0 ;
-
-	e1p = *e1pp ;
-	e2p = *e2pp ;
-	if ((e1p != NULL) || (e2p != NULL)) {
-	    if (e1p != NULL) {
-	        if (e2p != NULL) {
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+		    rc = 0 ;
 	            if ((e2p->eoff >= 0) || (e1p->eoff >= 0)) {
 	                if ((rc = (e1p->eoff < 0) ? 1 : 0) == 0) {
 	    	            if ((rc = (e2p->eoff < 0) ? -1 : 0) == 0) {
 	    	                rc = (e1p->eoff - e2p->eoff) ;
 		            }
 	                }
-	            } else
-	                rc = 0 ;
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
+	            }
+	        }
+	    }
 	}
-
 	return rc ;
 }
 /* end subroutine (vcmpoff) */

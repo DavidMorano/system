@@ -18,6 +18,7 @@
 
 	Name:
 	uc_addrinfoget
+	uc_addrinfofree
 
 	Description:
 	This is a nicer version of the standard |getaddrinfo(3socket)|
@@ -25,6 +26,7 @@
 
 	Synopsis:
 	int uc_addrinfoget(cc *hn,cc *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex
+	int uc_addrinfofree(ADDRINFO *aip) noex
 
 	Arguments:
 	hn		host-name
@@ -94,8 +96,7 @@ int uc_addrinfoget(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	repeat {
 	    rs = SR_OK ;
 	    errno = 0 ;
-	    rc = getaddrinfo(hn,svc,hintp,rpp) ;
-	    if (rc != 0) {
+	    if ((rc = getaddrinfo(hn,svc,hintp,rpp)) != 0) {
 	        switch (rc) {
 	        case EAI_ADDRFAMILY:
 	            rs = SR_AFNOSUPPORT ;
@@ -103,7 +104,7 @@ int uc_addrinfoget(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	            break ;
 	        case EAI_AGAIN:
 	            if (to_again-- > 0) {
-		        msleep(100) ;
+		        msleep(1000) ;
 		    } else {
 	                rs = SR_AGAIN ;
 			f_exit = true ;
@@ -146,7 +147,7 @@ int uc_addrinfoget(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	            switch (rs) {
 	            case SR_AGAIN:
 	                if (to_again-- > 0) {
-			    msleep(100) ;
+			    msleep(1000) ;
 			} else {
 			    f_exit = true ;
 			}

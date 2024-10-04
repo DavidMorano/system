@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	getaddrfamily
+	getaddr{x}
 
 	Description:
 	This subroutines gets (retrieves) an address family index
@@ -89,7 +89,7 @@ struct addrfamily {
 
 /* local variables */
 
-static constexpr struct addrfamily	addrfamilies[] = {
+constexpr addrfamily	addrfamilies[] = {
 	{ "unspecified", AF_UNSPEC },
 	{ "unix", AF_UNIX },
 	{ "inet", AF_INET },
@@ -107,8 +107,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 int getaddrfamily(cchar *name) noex {
-	const struct addrfamily	*afs = addrfamilies ;
-	int		m ;
+	const addrfamily	*afs = addrfamilies ;
 	int		m_max = 0 ;
 	int		si = -1 ;
 	int		cnamelen ;
@@ -116,7 +115,7 @@ int getaddrfamily(cchar *name) noex {
 	cnamelen = strwcpylc(cname,name,AFNAMELEN) - cname ;
 	for (int i = 0 ; afs[i].name ; i += 1) {
 	    cchar	*anp = afs[i].name ;
-	    if ((m = nleadstr(anp,cname,cnamelen)) >= 2) {
+	    if (int m ; (m = nleadstr(anp,cname,cnamelen)) >= 2) {
 	        if (m > m_max) {
 	            m_max = m ;
 	            si = i ;
