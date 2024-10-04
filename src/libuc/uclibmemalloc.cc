@@ -28,8 +28,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */

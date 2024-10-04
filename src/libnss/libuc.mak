@@ -281,7 +281,7 @@ objz.o:			$(OBJZ)
 # base
 OBJ0_BASE= uctimeout.o
 OBJ1_BASE= ucsysconf.o 
-OBJ2_BASE= bufsizedata.o getbufsizenames.o
+OBJ2_BASE= bufsizedata.o bufsizenames.o
 OBJ3_BASE= getbufsize.o bufsizevar.o 
 
 OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
@@ -326,6 +326,8 @@ ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc
 ucatexit.o:		ucatexit.cc
 ucfork.o:		ucfork.cc
+ucgetipnodeby.o:	ucgetipnodeby.cc
+ucgetnameinfo.o:	ucgetnameinfo.cc
 ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
 ucgetpid.o:		ucgetpid.cc ucgetpid.h
@@ -440,10 +442,10 @@ strmgr.o:		strmgr.cc strmgr.h
 serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
-getbufsize.o:		getbufsize.cc getbufsize.h getbufsizenames.h usysdefs.h
-getbufsize.o:		getbufsizenames.h usysdefs.h bufsizedata.hh
+getbufsize.o:		getbufsize.cc getbufsize.h bufsizenames.h usysdefs.h
+getbufsize.o:		bufsizenames.h usysdefs.h bufsizedata.hh
 
-getbufsizenames.o:	getbufsizenames.c getbufsizenames.h
+bufsizenames.o:		bufsizenames.c bufsizenames.h
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
@@ -901,6 +903,7 @@ callback.o:		callback.cc callback.h
 filelines.o:		filelines.cc filelines.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
+rsfree.o:		rsfree.cc rsfree.h
 #
 isinetaddr.o:		isinetaddr.cc isinetaddr.h
 isindomain.o:		isindomain.cc isindomain.h
@@ -916,6 +919,6 @@ unameo.o:		unameo.cc unameo.h
 utmpacc.o:		utmpacc.cc utmpacc.h
 utmpaccent.o:		utmpaccent.cc utmpaccent.h
 ucrand.o:		ucrand.cc ucrand.h
-usprochave.o:		ucprochave.cc ucprochave.h
+ucprochave.o:		ucprochave.cc ucprochave.h
 
 

@@ -401,7 +401,7 @@ static int try_inet6(SUBINFO *sip) noex {
 	        rs1 = sockaddress_finish(&server) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
-	    rs1 = uc_freehostent(hep) ;
+	    rs1 = uc_hostentfree(hep) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (uc_getipnodebyname) */
 	if ((rs < 0) && (fd >= 0)) {

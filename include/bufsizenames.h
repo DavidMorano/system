@@ -1,4 +1,4 @@
-/* getbufsizenames HEADER */
+/* bufsizenames HEADER */
 /* lang=C20 */
 
 /* list the various system buffer-size names (as strings) */
@@ -15,16 +15,18 @@
 
 /*******************************************************************************
 
+	Name:
+	bufsizenames
+
+	Description:
 	This file contains the string names (enumeration names) for
 	the various system buffer-sizes, and the array interface
 	to access them.
 
-
 *******************************************************************************/
 
-
-#ifndef	GETBUFSIZENAMES_INCLUDE
-#define	GETBUFSIZENAMES_INCLUDE
+#ifndef	BUFSIZENAMES_INCLUDE
+#define	BUFSIZENAMES_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -59,9 +61,9 @@ enum getbufsizes {
 } ; /* end enum (getbufsizes) */
 
 
-extern cchar	*getbufsizenames[] ;
+extern cchar	*bufsizenames[] ;
 
 
-#endif /* GETBUFSIZENAMES_INCLUDE */
+#endif /* BUFSIZENAMES_INCLUDE */
 
 

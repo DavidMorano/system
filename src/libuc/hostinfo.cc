@@ -23,7 +23,7 @@
 
 	Description:
 	This object provides the functionality that was previosuly
-	supplied by the subroutine 'gethostbyname(3snl)'.  That
+	supplied by the subroutine |gethostbyname(3snl)|.  That
 	subroutine only worked for INET4 class addresses.  This
 	object returns host-entry information for both INET4 and
 	INET6 class addresses.
@@ -754,7 +754,7 @@ static int hostinfo_getname(hostinfo *op,int af,cchar *name) noex {
                     }
                 }
                 if ((! f_inet4) && hep) {
-                    uc_freehostent(hep) ;
+                    uc_hostentfree(hep) ;
                 }
             } else if (isNotPresent(rs)) {
                 rs = SR_OK ;
@@ -806,7 +806,7 @@ static int hostinfo_getaddr(hostinfo *op,int af) noex {
 	                }
 	            }
 	            if ((! f_inet4) && hep) {
-	                uc_freehostent(hep) ;
+	                uc_hostentfree(hep) ;
 	            }
 	        } /* end if (got host-entry) */
 	        rs1 = uc_free(hebuf) ;

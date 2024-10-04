@@ -81,7 +81,7 @@ extern int acctab_anyallowed(acctab *,vecstr *,vecstr *,cchar *,cchar *) noex ;
 extern int acctab_close(acctab *) noex ;
 
 #ifdef	COMMENT
-extern int acctab_find(acctab *,cchar *,ACCTAB_ENT **) noex ;
+extern int acctab_find(acctab *,cchar *,acctab_ent **) noex ;
 #endif
 
 EXTERNC_end

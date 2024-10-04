@@ -1,4 +1,4 @@
-/* getbufsizenames SUPPORT */
+/* bufsizenames SUPPORT */
 /* lang=C23 (MUST-BE C-language) */
 
 /* enumerate the various system buffer-size names */
@@ -16,12 +16,14 @@
 
 /*******************************************************************************
 
-	This file contains the enumerations for the various system
-	buffer-size names.
+	Name:
+	bufsizenames
 
-	This code module MUST-BE written in the C-language.
-	The reason is because C++ does NOT support the language feature 
-	used below.
+	Description:
+	This file contains the enumerations for the various system
+	buffer-size names.  This code module MUST-BE written in the
+	C-language.  The reason is because C++ does NOT support the
+	language feature used below.
 
 *******************************************************************************/
 
@@ -30,10 +32,10 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 
-#include	"getbufsizenames.h"
+#include	"bufsizenames.h"
 
 
-cchar *getbufsizenames[] = {
+cchar *bufsizenames[] = {
 	[getbufsize_ma] = "MA",		/* max-args */
 	[getbufsize_mn] = "MN",		/* max-name */
 	[getbufsize_mp] = "MP",		/* max-path */
@@ -55,6 +57,6 @@ cchar *getbufsizenames[] = {
 	[getbufsize_fs] = "FS",		/* filesystem-type */
 	[getbufsize_zn] = "ZN",		/* zone-name (from Zone-Info) */
 	nullptr
-} ; /* end array (getbufsizenames) */
+} ; /* end array (bufsizenames) */
 
 

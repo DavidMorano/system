@@ -354,6 +354,7 @@ enum errnomssings {
 #define	SR_LOOK		SR_BADRQC	/* look-alert */
 #define	SR_DOWN		SR_L2HLT	/* service down */
 #define	SR_TXTBUSY	SR_TXTBSY	/* Text file busy */
+#define	SR_FAIL		SR_IO		/* operation failed */
 
 /* missing codes -- backwards */
 

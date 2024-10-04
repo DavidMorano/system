@@ -7,6 +7,8 @@ file		what
 sockpeername
 uctim
 libuc		fix to completely compile!
+acctab
+srv{x}
 memfile		can we just trash this?
 libpcs		a lot of junk in there
 convertx	part of the |ctx| group

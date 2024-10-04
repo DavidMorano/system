@@ -15,7 +15,7 @@
 #define	STRCPY_INCLUDE
 
 
-#include	<strcpyxc.h>
+#include	<strcpyx.h>
 
 
 #endif /* STRCPY_INCLUDE	*/

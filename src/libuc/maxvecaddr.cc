@@ -27,14 +27,36 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 
 #include	"maxvecaddr.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -60,8 +82,8 @@ cchar *maxvecaddr(mainv va) noex {
 		    lp += (strlen(sp) + 1) ;
 		    if (lp > maxp) maxp = lp ;
 		}
-	    }
-	} /* end if */
+	    } /* end block */
+	} /* end if (non-null) */
 	return maxp ;
 }
 /* end subroutine (maxvecaddr) */

@@ -218,7 +218,7 @@ int ubufsize::load() noex {
 	                    }
 	                    if (vp) {
 	                        int		w ;
-				cchar		**vars = getbufsizenames ;
+				cchar		**vars = bufsizenames ;
 	                        if ((w = matocasestr(vars,4,kp,kl)) >= 0) {
 	                            int		v ;
 	                            if ((rs = cfdecmfi(vp,vl,&v)) >= 0) {
