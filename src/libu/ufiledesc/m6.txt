@@ -5,5 +5,5 @@ $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
+	$(AR) -rc $@ $?
 

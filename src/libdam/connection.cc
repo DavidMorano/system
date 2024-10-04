@@ -211,7 +211,7 @@ int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex {
 	                sockaddress	*sap = cnp->sap ;
 	                int		sal = sizeof(sockaddress) ;
 	                cnp->s = s ;
-	                if ((rs = u_getsockname(s,sap,&sal)) >= 0) {
+	                if ((rs = u_sockaddrloc(s,sap,&sal)) >= 0) {
 	                    cnp->f.sa = true ;
 	                    rs = connection_peername(cnp,sap,sal,dp,dl) ;
 	                    len = rs ;
@@ -240,7 +240,7 @@ int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex {
 	                sockaddress	*sap = cnp->sap ;
 	                int		sal = sizeof(sockaddress) ;
 	                cnp->s = s ;
-	                if ((rs = u_getpeername(s,sap,&sal)) >= 0) {
+	                if ((rs = u_sockaddrrem(s,sap,&sal)) >= 0) {
 	                    cnp->f.sa = true ;
 	                    rs = connection_peername(cnp,sap,sal,dp,dl) ;
 	                    len = rs ;
@@ -261,32 +261,31 @@ int connection_peername(CON *cnp,SA *sap,int sal,char *dp,int dl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (cnp && sap && dp) {
-	    cint	af = sockaddress_getaf(sap) ;
-	    rs = SR_OK ;
 	    dp[0] = '\0' ;
-	    cnp->f.addr = false ;
-	    cnp->f.sa = true ;
-	    memcpy(cnp->sap,sap) ;
-	    cnp->sal = sal ;
-	    switch (af) {
-	    case AF_UNIX:
-	        rs = sockaddress_getaddr(sap,dp,dl) ;
-	        len = rs ;
-	        break ;
-	    case AF_INET4:
-	        cnp->f.inet = true ;
-	        cnp->f.addr = true ;
-	        rs = connection_ip4lookup(cnp,dp,dl) ;
-	        len = rs ;
-	        break ;
-	    case AF_INET6:
-	        cnp->f.inet = true ;
-	        rs = connection_ip6lookup(cnp,dp,dl) ;
-	        len = rs ;
-	        break ;
-	    default:
-	        break ;
-	    } /* end switch (got an INET host entry) */
+	    if ((rs = sockaddress_getaf(sap)) >= 0) {
+	        cint	af = rs ;
+	        cnp->f.addr = false ;
+	        cnp->f.sa = true ;
+	        memcpy(cnp->sap,sap) ;
+	        cnp->sal = sal ;
+	        switch (af) {
+	        case AF_UNIX:
+	            rs = sockaddress_getaddr(sap,dp,dl) ;
+	            len = rs ;
+	            break ;
+	        case AF_INET4:
+	            cnp->f.inet = true ;
+	            cnp->f.addr = true ;
+	            rs = connection_ip4lookup(cnp,dp,dl) ;
+	            len = rs ;
+	            break ;
+	        case AF_INET6:
+	            cnp->f.inet = true ;
+	            rs = connection_ip6lookup(cnp,dp,dl) ;
+	            len = rs ;
+	            break ;
+	        } /* end switch (got an INET host entry) */
+	    } /* end if (sockaddress_getaf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -349,7 +348,7 @@ int sub_mknames::addstuff(int af) noex {
 		n += rs ;
 		rs = addresses(&hi) ;
 		n += rs ;
-	    }
+	    } /* end if (addnames) */
 	    rs1 = hostinfo_finish(&hi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostinfo) */
