@@ -25,7 +25,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-extern int	sockpeernamex(int s,char *rb,int rl,cchar *dn = nullptr) noex {
+extern int sockpeernamex(int s,char *rb,int rl,cchar *dn = nullptr) noex {
 	return sockpeername(s,rb,rl,dn) ;
 }
 

@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	hostent
+
+	Description:
 	These routines provide means to peruse the elements of a
 	HOSTENT structure as returned by the system subroutines:
 

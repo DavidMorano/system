@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	nodesfile
+
+	Description:
 	This little object supports reading the cluster 'nodes'
 	file by mapping it into memory.  No data is copied out of
 	the file map!  This is assumed to provide some performance

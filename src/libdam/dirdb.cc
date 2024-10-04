@@ -75,9 +75,6 @@ typedef dirdb_ent *	entp ;
 
 /* forward references */
 
-	vechand		*dlp ;		/* directory-list-pointer */
-	hdb		*dbp ;		/* data-base-pointer */
-
 template<typename ... Args>
 static int dirdb_ctor(dirdb *op,Args ... args) noex {
 	DIRDB		*hop = op ;
@@ -135,7 +132,9 @@ static int	entry_start(dirdb_ent *,cchar *,int,USTAT *,int) noex ;
 static int	entry_finish(dirdb_ent *) noex ;
 
 #if	CF_STATCMP
-static int	vcmpstat(cvoid **,cvoid **) noex ;
+extern "C" {
+    static int	vcmpstat(cvoid **,cvoid **) noex ;
+}
 #endif
 
 

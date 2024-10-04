@@ -116,7 +116,7 @@ int getehostname(char *hbuf,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (name) {
+	if (hbuf && name) {
 	    char	*hebuf{} ;
 	    if ((rs = malloc_ho(&hebuf)) >= 0) {
 		cint	helen = rs ;

@@ -120,10 +120,11 @@ struct vars {
 
 template<typename ... Args>
 static int mkdirlist_ctor(mkdirlist *op,Args ... args) noex {
+	MKDIRLIST	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ;
 	    if ((op->dlp = new(nothrow) vechand) != nullptr) {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
@@ -167,7 +168,7 @@ static int entry_show(ENT *,cchar *,int) noex ;
 static int entry_matung(ENT *,cchar *,time_t,int,int) noex ;
 
 extern "C" {
-    static int vcmporder(ENT **,ENT **) noex ;
+    static int vcmporder(cvoid **,cvoid **) noex ;
 }
 
 static int mkvars() noex ;
@@ -505,9 +506,8 @@ static int mkdirlist_entfins(mkdirlist *op) noex {
 static int entry_start(ENT *ep,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
 	int		c = 0 ;
-	cchar		*cp ;
 	memclear(ep) ; /* dangerous */
-	if ((rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
+	if (cchar *cp{} ; (rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
 	    cint	nlen = rs ;
 	    ep->name = cp ;
 	    c += 1 ;
@@ -571,9 +571,9 @@ static int entry_show(ENT *ep,cchar *ng,int order) noex {
 }
 /* end subroutine (entry_show) */
 
-static int vcmporder(ENT **e1pp,ENT **e2pp) noex {
-	mkdirlist_ent	*e1p = *e1pp ;
-	mkdirlist_ent	*e2p = *e2pp ;
+static int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
+	mkdirlist_ent	*e1p = entp(*v1pp) ;
+	mkdirlist_ent	*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;

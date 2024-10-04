@@ -132,7 +132,7 @@ constexpr in_addr_t	anyaddr = 0 ;
 
 int getheour(ucentho *hep,char *hebuf,int helen,char *hbuf,cc *hn) noex {
 	int		rs = SR_FAULT ;
-	if (hep && hebuf) {
+	if (hep && hebuf && hn) {
 	    gether	go(hep,hebuf,helen,hbuf,hn) ;
 	    rs = go ;
 	}

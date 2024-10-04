@@ -137,8 +137,8 @@ static int dirlist_magic(dirlist *op,Args ... args) noex {
 /* end subroutine (dirlist_magic) */
 
 extern "C" {
-    static int	vcmpname(ent **,ent **) noex ;
-    static int	vcmpdevino(ent **,ent **) noex ;
+    static int	vcmpname(cvoid **,cvoid **) noex ;
+    static int	vcmpdevino(cvoid **,cvoid **) noex ;
 }
 
 static int	entry_start(ent *,cchar *,int,dev_t,ino_t) noex ;
@@ -471,12 +471,12 @@ static int entry_finish(ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int vcmpname(ent **e1pp,ent **e2pp) noex {
-	ent		*e1p = *e1pp ;
-	ent		*e2p = *e2pp ;
+static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
+	ent		*e1p = entp(*v1pp) ;
+	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
@@ -497,9 +497,9 @@ static int vcmpname(ent **e1pp,ent **e2pp) noex {
 }
 /* end subroutine (vcmpname) */
 
-static int vcmpdevino(ent **e1pp,ent **e2pp) noex {
-	ent		*e1p = *e1pp ;
-	ent		*e2p = *e2pp ;
+static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
+	ent		*e1p = entp(*v1pp) ;
+	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = 1 ;

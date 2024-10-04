@@ -26,26 +26,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<uinet.h>		/* |INETXADDRLEN| */
 #include	<mallocxx.h>
 #include	<getbufsize.h>
 #include	<getxx.h>
-#include	<hostent.h>
 #include	<sockaddress.h>
+#include	<hostent.h>
 #include	<inetaddr.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
@@ -59,6 +52,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef sockaddr *		sockaddrp ;
+
+
 /* external subroutines */
 
 
@@ -67,8 +68,15 @@
 
 /* local structures */
 
+struct vars {
+	int		maxhostlen ;
+	int		svcnamelen ;
+} ;
+
 
 /* forward references */
+
+static int	mkvars() noex ;
 
 
 /* local variables */
@@ -87,9 +95,11 @@ namespace {
 	int proc_in4namex(hostent *) noex ;
 	int proc_in4namedom(bool,hostent *) noex ;
 	int proc_in4namecan(hostent *) noex ;
-	int proc_in4addr(INADDR *) noex ;
+	int proc_in4addr(INADDR4 *) noex ;
     } ; /* end struct (suber) */
 }
+
+static vars		var ;
 
 
 /* exported variables */
@@ -121,9 +131,9 @@ int suber::operator () (int s) noex {
 	sockaddress	sa ;
 	int		rs ;
 	int		rs1 ;
-	int		alen = sizeof(sockaddress) ;
+	int		sal = sizeof(sockaddress) ;
 	int		rl = 0 ;
-	if ((rs = u_getpeername(s,&sa,&alen)) >= 0) {
+	if ((rs = u_getpeername(s,&sa,&sal)) >= 0) {
 	    if ((rs = sockaddress_getaf(&sa)) >= 0) {
 		cint	af = rs ;
 		switch (af) {
@@ -170,7 +180,7 @@ int suber::proc_unix(sockaddress *sap) noex {
 /* end method (suber::proc_unix) */
 
 int suber::proc_in4(sockaddress *sap) noex {
-	INADDR		naddr{} ;
+	INADDR4		naddr{} ;
 	cint		nalen = INET4ADDRLEN ;
 	int		rs ;
 	int		rs1 ;
@@ -275,30 +285,79 @@ int suber::proc_in4namecan(hostent *hep) noex {
 }
 /* end method (suber::proc_in4namecan) */
 
-int suber::proc_in4addr(INADDR *naddrp) noex {
+int suber::proc_in4addr(INADDR4 *naddrp) noex {
 	inetaddr	ia ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = inetaddr_start(&ia,naddrp)) >= 0) {
+	if ((rs = ia.start(naddrp)) >= 0) {
 	    {
-		rs = inetaddr_getdotaddr(&ia,rbuf,rlen) ;
+		rs = ia.getdotaddr(rbuf,rlen) ;
 		rl = rs ;
 	    }
-	    rs1 = inetaddr_finish(&ia) ;
+	    rs1 = ia.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (suber::proc_in4addr) */
 
-int suber::proc_in6(sockaddress *sap) noex {
-	int		rs = SR_OK ;
-	int		rl = 0 ;
-	(void) sap ;
+namespace {
+    struct in6er {
+	cchar		*dn ;
+	char		*rbuf ;
+	int		rlen ;
+	in6er(char *bp,int bl,cc *d) noex {
+	    dn = d ;
+	    rbuf = bp ;
+	    rlen = bl ;
+	} ;
+	int operator () (sockaddress *) noex ;
+    } ; /* end struct (in6er) */
+}
 
+int suber::proc_in6(sockaddress *sap) noex {
+	static cint	rsv = mkvars() ;
+	int		rs ;
+	int		rl = 0 ;
+	if ((rs = rsv) >= 0) {
+	    in6er	io(rbuf,rlen,dn) ;
+	    rs = io(sap) ;
+	    rl = rs ;
+	} /* end if (mkvars) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (suber::proc_in6) */
+
+int in6er::operator () (sockaddress *sap) noex {
+	int		rs ;
+	int		rl = 0 ;
+	if ((rs = sockaddress_getlen(sap)) >= 0) {
+	    sockaddr	*sp = sockaddrp(sap) ;
+	    cint	sl = rs ;
+	    if (char *sbuf{} ; (rs = malloc_nn(&sbuf)) >= 0) {
+		cint	slen = rs ;
+		cint	fl = 0 ;
+	        if ((rs = uc_getnameinfo(sp,sl,rbuf,rlen,sbuf,slen,fl)) >= 0) {
+		    rl = rs ;
+		} /* end if (uc_getnameinfo) */
+	        rs = rsfree(rs,sbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (sockaddress_getlen) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (in6er::operator) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    var.maxhostlen = rs ;
+	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+		var.svcnamelen = rs ;
+	    }
+	}
+	return rs ;
+}
+/* end method (mkvars) */
 
 

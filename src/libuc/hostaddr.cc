@@ -16,15 +16,19 @@
 
 /*******************************************************************************
 
+	Name:
+	hostaddr
+
+	Description:
 	This object provides the capability to peruse the information
 	returned by the subroutines:
 		geteaddrinfo(3dam)
-	which itself is an enhanved version of the system-provided:
+	which itself is an enhanced version of the system-provided:
 		getaddrinfo(3socket)
 
 	Additional information:
 
- * addrinfo introduced with IPv6 for Protocol-Independent Hostname
+ * ADDRINFO was introduced with IPv6 for Protocol-Independent Hostname
  * and Service Name Translation.
 
 ADDRINFO {
@@ -82,8 +86,9 @@ ADDRINFO {
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -153,7 +158,7 @@ static int	hostaddr_resultbegin(hostaddr *) noex ;
 static int	hostaddr_resultend(hostaddr *) noex ;
 
 extern "C" {
-    static int	vcmp(cvoid *,cvoid *) noex ;
+    static int	vcmpaddr(cvoid *,cvoid *) noex ;	/* for |qsort(3c)| */
 }
 
 
@@ -239,16 +244,16 @@ int hostaddr_getcanonical(hostaddr *op,cchar **rpp) noex {
 }
 /* end subroutine (hostaddr_cannonical) */
 
-int hostaddr_curbegin(hostaddr *op,HOSTADDR_CUR *curp) noex {
+int hostaddr_curbegin(hostaddr *op,hostaddr_cur *curp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
-	        curp->i = -1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (hostaddr_curbegin) */
 
-int hostaddr_curend(hostaddr *op,HOSTADDR_CUR *curp) noex {
+int hostaddr_curend(hostaddr *op,hostaddr_cur *curp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
@@ -257,7 +262,7 @@ int hostaddr_curend(hostaddr *op,HOSTADDR_CUR *curp) noex {
 }
 /* end subroutine (hostaddr_curend) */
 
-int hostaddr_enum(hostaddr *op,HOSTADDR_CUR *curp,ADDRINFO **rpp) noex {
+int hostaddr_curenum(hostaddr *op,hostaddr_cur *curp,ADDRINFO **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
@@ -272,7 +277,7 @@ int hostaddr_enum(hostaddr *op,HOSTADDR_CUR *curp,ADDRINFO **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (hostaddr_enum) */
+/* end subroutine (hostaddr_curenum) */
 
 
 /* private subroutines */
@@ -289,9 +294,9 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    aip = aip->ai_next ;
 	    n += 1 ;
 	} /* end while */
-	sz = ((n+1) * esize) ;
+	sz = ((n + 1) * esize) ;
 	if ((rs = uc_malloc(sz,&resarr)) >= 0) {
-	    int		i = 0 ;
+	    int		i = 0 ; /* used-afterwards */
 	    op->resarr = resarr ;
 	    op->n = n ;
 	    aip = op->aip ;
@@ -303,7 +308,7 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    resarr[i] = nullptr ;
 	    if (n > 1) {
 		cint	ssize = sizeof(void *) ;
-	        qsort(resarr,n,ssize,vcmp) ;
+	        qsort(resarr,n,ssize,vcmpaddr) ;
 	    }
 	} /* end if (m-a) */
 	return (rs >= 0) ? n : rs ;
@@ -323,23 +328,26 @@ static int hostaddr_resultend(hostaddr *op) noex {
 }
 /* end subroutine (hostaddr_resultend) */
 
-static int vcmp(cvoid *v1pp,cvoid *v2pp) noex {
-	ADDRINFO	**a1pp = (ADDRINFO **) v1pp ;
-	ADDRINFO	**a2pp = (ADDRINFO **) v2pp ;
+/* this is for |qsort(3c)| */
+static int vcmpaddr(cvoid *v1p,cvoid *v2p) noex {
+	ADDRINFO	**a1pp = (ADDRINFO **) v1p ;
+	ADDRINFO	**a2pp = (ADDRINFO **) v2p ;
 	int		rc = 0 ;
-	if (v1pp || v2pp) {
-	    rc = 1 ;
-	    if (v1pp) {
-		rc = -1 ;
-	        if (v2pp) {
-		    ADDRINFO	*a1p = (ADDRINFO *) *a1pp ;
-		    ADDRINFO	*a2p = (ADDRINFO *) *a2pp ;
-	            rc = (a1p->ai_family - a2p->ai_family) ;
+	{
+	    ADDRINFO	*a1p = (ADDRINFO *) *a1pp ;
+	    ADDRINFO	*a2p = (ADDRINFO *) *a2pp ;
+	    if (a1p || a2p) {
+	        rc = +1 ;
+	        if (a1p) {
+		    rc = -1 ;
+	            if (a2p) {
+	                rc = (a1p->ai_family - a2p->ai_family) ;
+	            }
 	        }
 	    }
-	}
+	} /* end block */
 	return rc ;
 }
-/* end subroutine (vcmp) */
+/* end subroutine (vcmpaddr) */
 
 

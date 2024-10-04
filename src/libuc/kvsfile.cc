@@ -237,14 +237,13 @@ static int entry_start(kf_ent *,int,int,kf_key *,cchar *,int) noex ;
 static int entry_finish(kf_ent *) noex ;
 
 extern "C" {
-    static int	vcmpfname(kf_file **,kf_file **) noex ;
-    static int	vcmpkey(kf_key **,kf_key **) noex ;
+    static int	vcmpfname(cvoid **,cvoid **) noex ;
+    static int	vcmpkey(cvoid **,cvoid **) noex ;
+    static int	cmpkeyval(cvoid *,cvoid *,int) noex ;
 }
 
-static int	cmpkeyval(kf_ent *,kf_ent *,int) noex ;
-
 extern "C" {
-    static uint	hashkeyval(kf_ent *,int) noex ;
+    static uint	hashkeyval(cvoid *,int) noex ;
 }
 
 
@@ -981,9 +980,9 @@ static int entry_finish(kf_ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int vcmpfname(kf_file **e1pp,kf_file **e2pp) noex {
-	kf_file		*e1p = *e1pp ;
-	kf_file		*e2p = *e2pp ;
+static int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
+	kf_file		*e1p = (kf_file *) *v1pp ;
+	kf_file		*e2p = (kf_file *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    if (e1p) {
@@ -1000,9 +999,9 @@ static int vcmpfname(kf_file **e1pp,kf_file **e2pp) noex {
 }
 /* end subroutine (vcmpfname) */
 
-static int vcmpkey(kf_key **e1pp,kf_key **e2pp) noex {
-	kf_key		*e1p = *e1pp ;
-	kf_key		*e2p = *e2pp ;
+static int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
+	kf_key		*e1p = (kf_key *) *v1pp ;
+	kf_key		*e2p = (kf_key *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    if (e1p) {
@@ -1019,7 +1018,9 @@ static int vcmpkey(kf_key **e1pp,kf_key **e2pp) noex {
 }
 /* end subroutine (vcmpkey) */
 
-static int cmpkeyval(kf_ent *e1p,kf_ent *e2p,int) noex {
+static int cmpkeyval(cvoid *v1p,cvoid *v2p,int) noex {
+	kf_ent		*e1p = (kf_ent *) v1p ;
+	kf_ent		*e2p = (kf_ent *) v2p ;
 	int		rc ;
 	if ((rc = strcmp(e1p->kep->kname,e2p->kep->kname)) == 0) {
 	    rc = strcmp(e1p->vname,e2p->vname) ;
@@ -1028,11 +1029,14 @@ static int cmpkeyval(kf_ent *e1p,kf_ent *e2p,int) noex {
 }
 /* end subroutine (cmpkeyval) */
 
-static uint hashkeyval(kf_ent *ep,int) noex {
-	kf_key		*kep = ep->kep ;
+static uint hashkeyval(cvoid *vp,int) noex {
+	kf_ent		*ep = entp(vp) ;
 	uint		hv = 0 ;
-	hv += hash_elf(kep->kname,-1) ;
-	hv += hash_elf(ep->vname,-1) ;
+	{
+	    kf_key	*kep = ep->kep ;
+	    hv += hash_elf(kep->kname,-1) ;
+	    hv += hash_elf(ep->vname,-1) ;
+	}
 	return hv ;
 }
 /* end subroutine (hashkeyval) */
