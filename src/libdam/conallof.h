@@ -21,7 +21,7 @@
 
 EXTERNC_begin
 
-extern int	conallof(int,char *,int,cchar *) noex ;
+extern int	conallof(cchar *,int,cchar *) noex ;
 
 EXTERNC_end
 
