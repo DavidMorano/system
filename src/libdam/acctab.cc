@@ -324,15 +324,15 @@ int acctab_close(acctab *op) noex {
 	        rs1 = acctab_filefins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->stdalp) {
 	        rs1 = vecitem_finish(op->stdalp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->rgxalp) {
 	        rs1 = vecitem_finish(op->rgxalp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->flp) {
 	        rs1 = vecobj_finish(op->flp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -349,13 +349,14 @@ int acctab_close(acctab *op) noex {
 int acctab_fileadd(acctab *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
+	int		fi = 0 ;
 	if ((rs = acctab_magic(op,fname)) >= 0) {
 	    absfn	afo ;
 	    if (cchar *fn{} ; (rs = afo.start(fname,-1,&fn)) >= 0) {
 		ACCTAB_FI	fe ;
 	        if ((rs = file_start(&fe,fn)) >= 0) {
 		    if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
-		        cint	fi = rs ;
+		        fi = rs ;
 		        rs = acctab_fileparse(op,fi) ;
 		        if (rs < 0) {
 			    acctab_filedel(op,fi) ;
@@ -369,7 +370,7 @@ int acctab_fileadd(acctab *op,cchar *fname) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (absfn) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? fi : rs ;
 }
 /* end subroutine (acctab_fileadd) */
 

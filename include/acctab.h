@@ -45,7 +45,6 @@ struct acctab_head {
 	vecobj		*flp ;			/* file-list-pointer */
 	vecitem		*stdalp ;		/* access-list-entries */
 	vecitem		*rgxalp ;		/* access-list-entries */
-
 	time_t		checktime ;
 	uint		magic ;
 } ;
