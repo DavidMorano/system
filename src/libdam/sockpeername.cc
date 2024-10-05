@@ -163,17 +163,14 @@ int suber::operator () (int s) noex {
 		
 int suber::proc_unix(sockaddress *sap) noex {
 	int		rs ;
-	int		rs1 ;
 	int		rl = 0 ;
-	char		*pbuf{} ;
-	if ((rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
 	    cint	plen = rs ;
 	    if ((rs = sockaddress_getaddr(sap,pbuf,plen)) >= 0) {
 		rs = sncpyw(rbuf,rlen,pbuf,rs) ;
 	        rl = rs ;
 	    } /* end if (sockaddress_getaddr) */
-	    rs1 = uc_free(pbuf) ;
-	    if (rs >= 0) rs = rs1 ;
+	    rs = rsfree(rs,pbuf) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -183,7 +180,6 @@ int suber::proc_in4(sockaddress *sap) noex {
 	INADDR4		naddr{} ;
 	cint		nalen = INET4ADDRLEN ;
 	int		rs ;
-	int		rs1 ;
 	int		rl = 0 ;
 	if ((rs = sockaddress_getaddr(sap,&naddr,nalen)) >= 0) {
 	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
@@ -202,8 +198,7 @@ int suber::proc_in4(sockaddress *sap) noex {
 		    rs = proc_in4addr(&naddr) ;
 		    rl = rs ;
 		}
-		rs1 = uc_free(hebuf) ;
-		if (rs >= 0) rs = rs1 ;
+		rs = rsfree(rs,hebuf) ;
 	    } /* end if (m-a-f) */
 	} /* end if (sockaddress_getaddr) */
 	return (rs >= 0) ? rl : rs ;

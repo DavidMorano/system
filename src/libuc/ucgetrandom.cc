@@ -1,6 +1,7 @@
 /* ucgetrandom SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get system configuration information */
 /* version %I% last-modified %G% */
 

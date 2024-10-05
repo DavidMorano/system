@@ -1,6 +1,7 @@
 /* ucread SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* read a line from a file descriptor but time it */
 /* version %I% last-modified %G% */
 

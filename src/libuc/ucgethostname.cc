@@ -1,8 +1,9 @@
 /* ucgethostname SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
+/* interface components for UNIX® library-3c */
 /* get the "hostname" (really the "nodename") of the current machine */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

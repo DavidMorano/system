@@ -41,6 +41,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<limits.h>		/* |{xxx}_MAX| */
+#include	<netdb.h>		/* |NI_MAX{x}| */
 
 
 /* extra "open" flags */
@@ -389,6 +390,15 @@ enum signalmissings {
 #define	PID_MAX		99999		/* historic value (in decimal) */
 #endif
 
+/* Network-Interface (NI) */
+#ifndef	NI_MAXHOST
+#define	NI_MAXHOST	MAXHOSTNAMELEN
+#endif
+#ifndef	NI_MAXSERV
+#define	NI_MAXSERV	SVCNAMELEN
+#endif
+
+/* for |poll(2)| */
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-interval-multiplier (to secs) */
 #endif

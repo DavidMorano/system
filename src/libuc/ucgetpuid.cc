@@ -1,6 +1,7 @@
 /* ucgetpuid SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get the UID of a given process by its PID */
 /* version %I% last-modified %G% */
 

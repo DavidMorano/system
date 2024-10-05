@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
+/* various "open" fuctions */
 /* version %I% last-modified %G% */
 
 

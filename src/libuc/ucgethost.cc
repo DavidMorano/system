@@ -1,6 +1,7 @@
 /* ucgethost SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* subroutine to get a single "host" entry (raw) */
 /* version %I% last-modified %G% */
 

@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* set the CLOSE-ON-EXEC file descriptor flag */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

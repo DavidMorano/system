@@ -1,6 +1,7 @@
 /* ucclustername SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* set or get a cluster name given a nodename */
 /* version %I% last-modified %G% */
 

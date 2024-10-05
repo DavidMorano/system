@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* Solaris® threads */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

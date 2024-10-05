@@ -263,10 +263,6 @@ extern int	uc_openshm(cchar *,int,mode_t) noex ;
 extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
-/* miscellaneous */
-extern int	uc_strtod(cchar *,char **,double *) noex ;
-extern int	uc_getnetname(char *) noex ;
-
 /* NETWORK IPNODE database */
 extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
 extern int	uc_getipnodebyaddr(HOSTENT **,cvoid *,int,int) noex ;
@@ -286,6 +282,8 @@ extern int	uc_getlogin(char *,int) noex ;
 /* miscellaneous */
 extern int	uc_ztime(TM *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
+extern int	uc_strtod(cchar *,char **,double *) noex ;
+extern int	uc_getnetname(char *) noex ;
 
 EXTERNC_end
 

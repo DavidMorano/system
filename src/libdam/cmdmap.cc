@@ -1,11 +1,10 @@
-/* cmdmap */
+/* cmdmap SUPPORT */
+/* lang=C++20 */
 
 /* command mapping management */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_FASTDEF	1		/* use fast-default */
-
 
 /* revision history:
 
@@ -18,28 +17,24 @@
 
 /*******************************************************************************
 
+	Name:
+	cmdmap
+
+	Description:
 	This object manages the mapping between keys and commands.
-
-        Using the "lookup" function, one can provide a key (in the form of a
-        KEYSYM value) and this object will return the index of a 'command'.
-
+	Using the "lookup" function, one can provide a key (in the
+	form of a KEYSYM value) and this object will return the
+	index of a 'command'.
 
 *******************************************************************************/
 
-
-#define	CMDMAP_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"cmdmap.h"
@@ -47,31 +42,26 @@
 
 /* local defines */
 
-
-/* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+#ifndef	CF_FASTDEF
+#define	CF_FASTDEF	1		/* use fast-default */
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpyblanks(char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strncpylc(char *,const char *,int) ;
-extern char	*strncpyuc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnrpbrk(const char *,int,const char *) ;
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef cmdmap_ent	ent ;
+typedef cmdmap_ent *	entp ;
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -82,11 +72,55 @@ extern char	*strnrpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-static int cmdmap_defmap(CMDMAP *,const CMDMAP_E *) noex ;
+template<typename ... Args>
+static int cmdmap_ctor(cmdmap *op,Args ... args) noex {
+	CMDMAP		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nothrow) vecobj) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (cmdmap_ctor) */
+
+static int cmdmap_dtor(cmdmap *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (cmdmap_dtor) */
+
+template<typename ... Args>
+static inline int cmdmap_magic(cmdmap *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == CMDMAP_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (cmdmap_magic) */
+
+static int cmdmap_defmap(cmdmap *,const cmdmap_ent *) noex ;
 
 extern "C" {
     static int	vcmpfind(cvoid **,cvoid **) noex ;
 }
+
+
+/* local variables */
+
+constexpr bool		f_fastdef = CF_FASTDEF ;
 
 
 /* exported variables */
@@ -94,109 +128,107 @@ extern "C" {
 
 /* exported subroutines */
 
-int cmdmap_start(CMDMAP *op,const CMDMAP_E *defmap) noex {
-	int		rs = SR_OK ;
-	int		sz = sizeof(CMDMAP_E) ;
-	int		opts ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	memclear(op) ;
-
-	opts = VECOBJ_OREUSE ;
-	if ((rs = vecobj_start(&op->map,sz,10,opts)) >= 0) {
-	    if (defmap != NULL) rs = cmdmap_defmap(op,defmap) ;
-	    if (rs >= 0) {
-	        op->magic = CMDMAP_MAGIC ;
+int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
+	int		rs ;
+	if ((rs = cmdmap_ctor(op)) >= 0) {
+	    cint	sz = sizeof(cmdmap_ent) ;
+	    cint	vn = 10 ;
+	    cint	vo = VECOBJ_OREUSE ;
+	    if ((rs = vecobj_start(op->mlp,sz,vn,vo)) >= 0) {
+	        if (defmap) {
+		    rs = cmdmap_defmap(op,defmap) ;
+		}
+	        if (rs >= 0) {
+	            op->magic = CMDMAP_MAGIC ;
+	        }
+	        if (rs < 0) {
+		    vecobj_finish(op->mlp) ;
+	        }
+	    } /* end if (vecobj-started) */
+	    if (rs < 0) {
+		cmdmap_dtor(op) ;
 	    }
-	    if (rs < 0)
-		vecobj_finish(&op->map) ;
-	} /* end if (vecobj-started) */
-
+	} /* end if (cmdmap_ctor) */
 	return rs ;
 }
 /* end subroutine (cmdmap_start) */
 
-
-int cmdmap_finish(CMDMAP *op)
-{
-	int		rs = SR_OK ;
+int cmdmap_finish(cmdmap *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMDMAP_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = vecobj_finish(&op->map) ;
-	if (rs < 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = cmdmap_magic(op)) >= 0) {
+	    {
+		rs1 = vecobj_finish(op->mlp) ;
+		if (rs < 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = cmdmap_dtor(op) ;
+		if (rs < 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (cmdmap_finish) */
 
-
-int cmdmap_load(CMDMAP *op,int key,int cmd)
-{
-	CMDMAP_E	e, *ep ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		f_add = TRUE ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMDMAP_MAGIC) return SR_NOTOPEN ;
-
-	if (key < 0) return SR_INVALID ;
-
-	memset(&e,0,sizeof(CMDMAP_E)) ;
-	e.key = key ;
-	e.cmd = cmd ;
-
-	if ((rs1 = vecobj_search(&op->map,&e,vcmpfind,&ep)) >= 0) {
-	    if (ep->cmd != e.cmd) {
-	        rs = vecobj_del(&op->map,rs1) ;
-	    } else {
-		f_add = FALSE ;
-	    }
-	} /* end if */
-
-	if ((rs >= 0) && f_add) {
-	    op->f.sorted = FALSE ;
-	    rs = vecobj_add(&op->map,&e) ;
-	}
-
+int cmdmap_load(cmdmap *op,int key,int cmd) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
+	if ((rs = cmdmap_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (key >= 0) {
+	        cmdmap_ent	e{} ;
+	        bool		f_add = true ;
+	        e.key = key ;
+	        e.cmd = cmd ;
+		auto vos = vecobj_search ;
+	        auto vcf = vcmpfind ;
+	        if (void *vp{} ; (rs = vos(op->mlp,&e,vcf,&vp)) >= 0) {
+	            cmdmap_ent	*ep = entp(vp) ;
+		    cint	idx = rs ;
+	            if (ep->cmd != e.cmd) {
+	                rs = vecobj_del(op->mlp,idx) ;
+	            } else {
+		        f_add = false ;
+	            }
+	        } else if (rs == rsn) {
+	            rs = SR_OK ;
+	        } /* end if */
+	        if ((rs >= 0) && f_add) {
+	            op->f.sorted = false ;
+	            rs = vecobj_add(op->mlp,&e) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (cmdmap_load) */
 
-
-int cmdmap_lookup(CMDMAP *op,int key)
-{
-	int		rs = SR_OK ;
+int cmdmap_lookup(cmdmap *op,int key) noex {
+	int		rs ;
 	int		cmd = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != CMDMAP_MAGIC) return SR_NOTOPEN ;
-
-	if (key < 0) return SR_INVALID ;
-
-	if (! op->f.sorted) {
-	    op->f.sorted = TRUE ;
-	    rs = vecobj_sort(&op->map,vcmpfind) ;
-	}
-
-	if (rs >= 0) {
-	    CMDMAP_E	te, *ep ;
-	    te.key = key ;
-	    if ((rs = vecobj_search(&op->map,&te,vcmpfind,&ep)) >= 0) {
-	        if (ep != NULL) {
-	            cmd = ep->cmd ;
+	if ((rs = cmdmap_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (key >= 0) {
+		rs = SR_OK ;
+	        if (! op->f.sorted) {
+	            op->f.sorted = true ;
+	            rs = vecobj_sort(op->mlp,vcmpfind) ;
 	        }
-	    }
-	}
-
+	        if (rs >= 0) {
+	            cmdmap_ent	te{} ;
+	            te.key = key ;
+		    auto	vos = vecobj_search ;
+	            auto	vcf = vcmpfind ;
+	            if (void *vp{} ; (rs = vos(op->mlp,&te,vcf,&vp)) >= 0) {
+	                if (vp) {
+			    cmdmap_ent	*ep = entp(vp) ;
+	                    cmd = ep->cmd ;
+	                }
+	            } /* end if (vecobj_search) */
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? cmd : rs ;
 }
 /* end subroutine (cmdmap_lookup) */
@@ -204,33 +236,27 @@ int cmdmap_lookup(CMDMAP *op,int key)
 
 /* private subroutines */
 
-
-static int cmdmap_defmap(CMDMAP *op,const CMDMAP_E *defmap)
-{
+static int cmdmap_defmap(cmdmap *op,const cmdmap_ent *defmap) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-#if	CF_FASTDEF
-	{
-	CMDMAP_E	*ep ;
-	for (i = 0 ; (rs >= 0) && (defmap[i].key >= 0) ; i += 1) {
-	    ep = (CMDMAP_E *) (defmap + i) ;
-	    rs = vecobj_add(&op->map,ep) ;
-	}
-	}
-#else /* CF_FASTDEF */
-	for (i = 0 ; (rs >= 0) && (defmap[i].key >= 0) ; i += 1) {
-	    rs = cmdmap_load(op,defmap[i].key,defmap[i].cmd) ;
-	} /* end for */
-#endif /* COMMENT */
-
+	int		i = 0 ;
+	if_constexpr (f_fastdef) {
+	    cmdmap_ent	*ep ;
+	    for (i = 0 ; (rs >= 0) && (defmap[i].key >= 0) ; i += 1) {
+	        ep = entp(defmap + i) ;
+	        rs = vecobj_add(op->mlp,ep) ;
+	    } /* end for */
+	} else {
+	    for (i = 0 ; (rs >= 0) && (defmap[i].key >= 0) ; i += 1) {
+	        rs = cmdmap_load(op,defmap[i].key,defmap[i].cmd) ;
+	    } /* end for */
+	} /* end if_constexpr (f_fastdef) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (cmdmap_defmap) */
 
 static int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
-	CMDMAP_E	*e1p = (CMDMAP_E *) *v1pp ;
-	CMDMAP_E	*e2p = (CMDMAP_E *) *v2pp ;
+	cmdmap_ent	*e1p = (cmdmap_ent *) *v1pp ;
+	cmdmap_ent	*e2p = (cmdmap_ent *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;

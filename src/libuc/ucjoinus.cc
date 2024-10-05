@@ -1,6 +1,7 @@
 /* ucjoinus SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* join a UNIX®-Socket-Datagram */
 /* version %I% last-modified %G% */
 

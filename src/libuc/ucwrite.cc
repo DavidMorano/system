@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* UNIX® write system call subroutine */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

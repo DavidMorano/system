@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* zone-time functions */
 /* version %I% last-modified %G% */
 
 
@@ -19,6 +20,27 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

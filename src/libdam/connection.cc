@@ -160,11 +160,10 @@ int connection_start(CON *cnp,cchar *inetdomain) noex {
 	    cint		ssz = sizeof(sockaddress) ;
 	    memclear(hop) ;
 	    if ((rs = rsv) >= 0) {
-	        void	*vp{} ;
 	        cnp->inetdomain = inetdomain ;
 	        cnp->f.inet = false ;
 	        cnp->s = -1 ;
-	        if ((rs = uc_libmalloc(ssz,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = uc_libmalloc(ssz,&vp)) >= 0) {
 		    cnp->sap = sockaddressp(vp) ;
 	        }
 	    } /* end if (mkvars) */
@@ -388,8 +387,7 @@ int sub_mknames::addresses(hostinfo *hip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	char		*nbuf{} ;
-	if ((rs = malloc_hn(&nbuf)) >= 0) {
+	if (char *nbuf{} ; (rs = malloc_hn(&nbuf)) >= 0) {
 	    hostinfo_cur	hc ;
 	    cint		nlen = rs ;
 	    const uchar		*ap ;
@@ -412,8 +410,7 @@ int sub_mknames::addresses(hostinfo *hip) noex {
 	        rs1 = hostinfo_curend(hip,&hc) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (hostinfo-cur) */
-	    rs1 = uc_free(&nbuf) ;
-	    if (rs >= 0) rs = rs1 ;
+	    rs = rsfree(rs,&nbuf) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -426,8 +423,7 @@ int sub_mknames::adddots(int af) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if ((af == AF_INET4) && cnp->f.inet && cnp->f.addr) {
-	    char	*nbuf{} ;
-	    if ((rs = malloc_hn(&nbuf)) >= 0) {
+	    if (char *nbuf{} ; (rs = malloc_hn(&nbuf)) >= 0) {
 	        cint		nlen = rs ;
 	        inetaddr	ia ;
 	        if ((rs = inetaddr_start(&ia,&cnp->netipaddr)) >= 0) {
@@ -438,8 +434,7 @@ int sub_mknames::adddots(int af) noex {
 	            rs1 = inetaddr_finish(&ia) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (inetaddr) */
-	        rs1 = uc_free(&nbuf) ;
-	        if (rs >= 0) rs = rs1 ;
+	        rs = rsfree(rs,&nbuf) ;
 	    } /* end if (m-a-f) */
 	} /* end if (go) */
 	return (rs >= 0) ? n : rs ;
@@ -478,8 +473,7 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = sockaddress_getaddr(sap,&cnp->netipaddr,alen)) >= 0) {
-	    char	*hebuf ;
-	    if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
 	        ucentho		he ;
 	        cint		helen = rs ;
 	        cint		af = AF_INET4 ;
@@ -528,8 +522,7 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (inetadd) */
 	        } /* end if */
-	        rs1 = uc_free(hebuf) ;
-	        if (rs >= 0) rs = rs1 ;
+	        rs = rsfree(rs,hebuf) ;
 	    } /* end if (m-a-f) */
 	} /* end if (sockaddress_getaddr) */
 	return (rs >= 0) ? len : rs ;
@@ -538,10 +531,8 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 
 static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 	int		rs ;
-	int		rs1 ;
 	int		len = 0 ;
-	char		*hnbuf{} ;
-	if ((rs = malloc_hn(&hnbuf)) >= 0) {
+	if (char *hnbuf{} ; (rs = malloc_hn(&hnbuf)) >= 0) {
 	    CSOCKADDR	*ssap = sockaddrp(cnp->sap) ;
 	    cint	sal = cnp->sal ;
 	    cint	slen = NI_MAXSERV ;
@@ -549,7 +540,8 @@ static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 	    cint	fl = NI_NOFQDN ;
 	    ushort	in6addr[in6addrlen/2] ;
 	    char	sbuf[NI_MAXSERV + 1] ;
-	    if ((rs = uc_getnameinfo(ssap,sal,hnbuf,hnlen,sbuf,slen,fl)) >= 0) {
+	    auto gni = uc_getnameinfo ;
+	    if ((rs = gni(ssap,sal,hnbuf,hnlen,sbuf,slen,fl)) >= 0) {
 	        rs = sncpy1(dp,dl,hnbuf) ;
 	        len = rs ;
 	    } else if (isNotPresent(rs)) {
@@ -568,8 +560,7 @@ static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 	            } /* end if */
 		} /* end if (sockaddress_getaddr) */
 	    } /* end if (getnameinfo) */
-	    rs1 = uc_free(hnbuf) ;
-	    if (rs >= 0) rs = rs1 ;
+	    rs = rsfree(rs,hnbuf) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }

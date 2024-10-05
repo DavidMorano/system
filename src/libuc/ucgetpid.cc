@@ -1,6 +1,7 @@
 /* ucgetpid SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get the current process PID (quickly and fork-safely) */
 /* version %I% last-modified %G% */
 

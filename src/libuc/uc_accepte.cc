@@ -2,7 +2,8 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
-/* extended read */
+/* extended read operation */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

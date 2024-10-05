@@ -1,6 +1,7 @@
 /* ucproguser SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get or set a cached username given a UID */
 /* version %I% last-modified %G% */
 

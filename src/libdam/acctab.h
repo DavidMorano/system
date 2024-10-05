@@ -5,8 +5,14 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* revision history:
 
+	= 1998-06-01, David A­D­ Morano
+	This code was originally written (and largely forgotten).
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ACCTAB_INCLUDE
 #define	ACCTAB_INCLUDE
@@ -36,7 +42,7 @@ struct acctab_cursor {
 } ;
 
 struct acctab_head {
-	vecobj		files ;			/* files */
+	vecobj		*flp ;			/* file-list-pointer */
 	vecitem		aes_std ;		/* access entries */
 	vecitem		aes_rgx ;		/* access entries */
 	time_t		checktime ;
@@ -64,6 +70,7 @@ struct acctab_errline {
 } ;
 
 typedef ACCTAB		acctab ;
+typedef	ACCTAB_PA	acctab_pa ;
 typedef ACCTAB_ENT	acctab_ent ;
 typedef ACCTAB_CUR	acctab_cur ;
 typedef ACCTAB_ERR	acctab_err ;

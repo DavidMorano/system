@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* get the filename (path) of a terminal device */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

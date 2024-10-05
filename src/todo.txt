@@ -7,7 +7,6 @@ file		what
 uctim
 libuc		fix to completely compile!
 acctab
-cmdmap
 srv{x}
 memfile		can we just trash this?
 libpcs		a lot of junk in there

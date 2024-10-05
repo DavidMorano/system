@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int dirdb_ctor(dirdb *op,Args ... args) noex {
+static int acctab_ctor(acctab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int dirdb_ctor(dirdb *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dirdb_ctor) */
+/* end subroutine (acctab_ctor) */
 
-static int dirdb_dtor(dirdb *op) noex {
+static int acctab_dtor(acctab *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dirdb_dtor) */
+/* end subroutine (acctab_dtor) */
 
 template<typename ... Args>
-static inline int dirdb_magic(dirdb *op,Args ... args) noex {
+static inline int acctab_magic(acctab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DIRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == ACCTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (dirdb_magic) */
+/* end subroutine (acctab_magic) */

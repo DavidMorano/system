@@ -266,12 +266,13 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 		if ((rs = hostinfo_bufbegin(op)) >= 0) {
 	            if ((rs = hostinfo_argsbegin(op,af,hn)) >= 0) {
 		        vecobj	*nlp = op->nlp ;
+			cint	vn = 10 ;
 	                cint	vo = VECOBJ_OCOMPACT ;
 	                int	osz = sizeof(HOSTINFO_N) ;
-	                if ((rs = vecobj_start(nlp,osz,10,vo)) >= 0) {
+	                if ((rs = vecobj_start(nlp,osz,vn,vo)) >= 0) {
 			    vecobj	*alp = op->alp ;
 	                    osz = sizeof(HOSTINFO_A) ;
-	                    if ((rs = vecobj_start(alp,osz,10,vo)) >= 0) {
+	                    if ((rs = vecobj_start(alp,osz,vn,vo)) >= 0) {
 	                        rs = 0 ;
 	                        if (isaf4(af)) {
 	                            rs = getinet(op,af4) ;

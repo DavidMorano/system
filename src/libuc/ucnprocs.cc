@@ -1,6 +1,7 @@
 /* ucnprocs SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get the number of processes on the system */
 /* version %I% last-modified %G% */
 

@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* asynchronous read */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

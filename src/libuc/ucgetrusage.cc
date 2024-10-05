@@ -1,7 +1,8 @@
 /* uc_getrusage SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
+/* interface components for UNIX® library-3c */
+/* retrieve process usage information */
 /* version %I% last-modified %G% */
 
 

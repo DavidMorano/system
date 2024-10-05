@@ -1,6 +1,7 @@
 /* uctimeout SUPPORT */
 /* lang=C++11 */
 
+/* interface components for UNIX® library-3c */
 /* UNIX® time-out management */
 /* version %I% last-modified %G% */
 

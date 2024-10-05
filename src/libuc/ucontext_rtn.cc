@@ -1,6 +1,7 @@
 /* ucontext_rtn SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* retrieve return address from UCONTEXT */
 /* version %I% last-modified %G% */
 

@@ -2,6 +2,7 @@
 
 /* interface component for UNIX® library-3c */
 /* POSIX file-unlink */
+/* version %I% last-modified %G% */
 
 
 #define	CF_DEBUGS	0

@@ -1,6 +1,7 @@
 /* ucgetnameinfo SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* manipulate host-address entry structures */
 /* version %I% last-modified %G% */
 
