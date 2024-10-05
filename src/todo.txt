@@ -41,7 +41,7 @@ ts
 strlistx
 spellchecks	incredible mess!
 termtrans
-uunames
+dialtab
 
 = Future
 
@@ -53,3 +53,4 @@ sysvar
 sysvars
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)
+

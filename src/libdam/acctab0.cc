@@ -38,7 +38,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<regex>
 #include	<usystem.h>
 #include	<getpwd.h>
 #include	<bfile.h>
