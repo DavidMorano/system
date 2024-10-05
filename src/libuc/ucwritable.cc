@@ -1,6 +1,7 @@
 /* uc_waitwritable SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* wait for an FD to become writable */
 /* version %I% last-modified %G% */
 

@@ -1,6 +1,7 @@
 /* ucpts SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get the filename (path) of a slave-pseudo terminal device */
 /* version %I% last-modified %G% */
 

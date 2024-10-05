@@ -175,8 +175,7 @@ static int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	int		c = 0 ;
 	if ((rs = mkpath(pbuf,dname)) >= 0) {
 	    cint	pl = rs ;
-	    char	*nbuf{} ;
-	    if ((rs = malloc_mn(&nbuf)) >= 0) {
+	    if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
 	        sigblocker	s ;
 		cint		nlen = rs ;
 	        if ((rs = s.start) >= 0) {

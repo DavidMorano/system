@@ -1,6 +1,7 @@
 /* ucsem SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* UNIX® Counting Semaphore (UCSEM) */
 /* version %I% last-modified %G% */
 

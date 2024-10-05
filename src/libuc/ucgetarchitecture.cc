@@ -1,6 +1,7 @@
 /* ucgetarchitecture SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get the "architecture" of the present machine */
 /* version %I% last-modified %G% */
 

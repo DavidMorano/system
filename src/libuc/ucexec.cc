@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* process exchange execution */
 /* version %I% last-modified %G% */
 
 #define	CF_ISAEXEC	1		/* try ISA-EXEC */

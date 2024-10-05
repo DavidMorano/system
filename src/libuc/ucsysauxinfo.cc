@@ -1,6 +1,7 @@
 /* ucsysauxinfo SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* UNIX® system-auxillary-information */
 /* version %I% last-modified %G% */
 

@@ -1,7 +1,8 @@
 /* ucatexit SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
+/* interface components for UNIX® library-3c */
+/* process exit handling */
 /* version %I% last-modified %G% */
 
 

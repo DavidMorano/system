@@ -1,6 +1,7 @@
 /* ucpeek SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* "peek" at any waiting input */
 /* version %I% last-modified %G% */
 

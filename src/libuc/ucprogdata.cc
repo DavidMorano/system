@@ -1,6 +1,7 @@
 /* ucprogdata SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* set or get some program (process) data */
 /* version %I% last-modified %G% */
 

@@ -1,6 +1,7 @@
 /* ucaddrinfo SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* manipulate host-address entry structures */
 /* version %I% last-modified %G% */
 
@@ -115,7 +116,7 @@ int uc_addrinfoget(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 		    f_exit = true ;
 	            break ;
 	        case EAI_FAIL:
-	            rs = SR_NOANODE ;
+	            rs = SR_FAIL;
 		    f_exit = true ;
 	            break ;
 	        case EAI_FAMILY:

@@ -36,7 +36,8 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getpwd.h>
 #include	<bfile.h>
@@ -80,6 +81,20 @@
 #define	ACCTAB_REGEX	CF_REGEX
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef acctab_ent	ent ;
+typedef acctab_ent *	entp ;
+
+
 /* external subroutines */
 
 
@@ -96,33 +111,73 @@ struct acctab_file {
 	int		len ;
 } ;
 
+typedef acctab_file *	filep ;
+
 
 /* forward references */
 
-static int	acctab_filefins(ACCTAB *) noex ;
-static int	acctab_freeentries(ACCTAB *) noex ;
-static int	acctab_fileparse(ACCTAB *,int) noex ;
-static int	acctab_filedump(ACCTAB *,int) noex ;
-static int	acctab_filedel(ACCTAB *,int) noex ;
-static int	acctab_addentry() noex ;
-static int	acctab_addentry(ACCTAB *,ACCTAB_ENT *) noex ;
-static int	acctab_checkfiles(ACCTAB *,time_t) noex ;
+template<typename ... Args>
+static int acctab_ctor(acctab *op,Args ... args) noex {
+	ACCTAB		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->flp = new(nothrow) vecobj) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (acctab_ctor) */
 
-static int	entry_start(ACCTAB_ENT *) noex ;
-static int	entry_load(ACCTAB_ENT *,cchar *,cchar *,cchar *,cchar *) noex ;
-static int	entry_mat2(ACCTAB_ENT *,ACCTAB_ENT *) noex ;
-static int	entry_mat3(ACCTAB_ENT *,ACCTAB_ENT *) noex ;
-static int	entry_finish(ACCTAB_ENT *) noex ;
+static int acctab_dtor(acctab *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->flp) {
+		delete op->flp ;
+		op->flp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (acctab_dtor) */
+
+template<typename ... Args>
+static inline int acctab_magic(acctab *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == ACCTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (acctab_magic) */
+
+static int	acctab_filefins(acctab *) noex ;
+static int	acctab_freeentries(acctab *) noex ;
+static int	acctab_fileparse(acctab *,int) noex ;
+static int	acctab_filedump(acctab *,int) noex ;
+static int	acctab_filedel(acctab *,int) noex ;
+static int	acctab_addentry(acctab *,acctab_ent *) noex ;
+static int	acctab_checkfiles(acctab *,time_t) noex ;
+
+static int	entry_start(acctab_ent *) noex ;
+static int	entry_load(acctab_ent *,cchar *,cchar *,cchar *,cchar *) noex ;
+static int	entry_mat2(acctab_ent *,acctab_ent *) noex ;
+static int	entry_mat3(acctab_ent *,acctab_ent *) noex ;
+static int	entry_finish(acctab_ent *) noex ;
 
 static int	file_start(ACCTAB_FI *,cchar *) noex ;
 static int	file_release(ACCTAB_FI *) noex ;
 static int	file_finish(ACCTAB_FI *) noex ;
 
-static int	part_start(ACCTAB_PA *) noex ;
-static int	part_copy(ACCTAB_PA *,ACCTAB_PA *) noex ;
-static int	part_compile(ACCTAB_PA *,cchar *,int) noex ;
-static int	part_match(ACCTAB_PA *,cchar *) noex ;
-static int	part_finish(ACCTAB_PA *) noex ;
+static int	part_start(acctab_pa *) noex ;
+static int	part_copy(acctab_pa *,acctab_pa *) noex ;
+static int	part_compile(acctab_pa *,cchar *,int) noex ;
+static int	part_match(acctab_pa *,cchar *) noex ;
+static int	part_finish(acctab_pa *) noex ;
 
 static int	parttype(cchar *) noex ;
 
@@ -133,9 +188,9 @@ extern "C" {
 static int	freeit(cchar **) noex ;
 
 
-/* local static data */
+/* local varaibles */
 
-constexpr cchar		group_terms[32] = {
+constexpr cchar		gterms[] = {
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x04,
 	0x00, 0x00, 0x00, 0x00,
@@ -146,7 +201,7 @@ constexpr cchar		group_terms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-constexpr cchar		arg_terms[32] = {
+constexpr cchar		aterms[] = {
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -157,60 +212,55 @@ constexpr cchar		arg_terms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
+constexpr int		intcheck = ACCTAB_CHECKTIME ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int acctab_open(ACCTAB *op,cchar *fname) noex {
+int acctab_open(acctab *op,cchar *fname) noex {
 	int		rs ;
-	int		sz ;
-	int		vo ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	memclear(op) ;
-	op->checktime = time(nullptr) ;
-
-/* the vector of files should use a fixed position policy */
-
-	sz = sizeof(struct acctab_file) ;
-	vo = VECOBJ_OREUSE ;
-	if ((rs = vecobj_start(&op->files,sz,10,vo)) >= 0) {
-	    vo = VECITEM_PSORTED ;
-	    if ((rs = vecitem_start(&op->aes_std,10,vo)) >= 0) {
-	        vo = VECITEM_PNOHOLES ;
-	        if ((rs = vecitem_start(&op->aes_rgx,10,vo)) >= 0) {
-	            op->magic = ACCTAB_MAGIC ;
-	            if (fname != nullptr) {
-	                rs = acctab_fileadd(op,fname) ;
-	            }
+	if ((rs = acctab_ctor(op)) >= 0) {
+	    cint	sz = sizeof(struct acctab_file) ;
+	    cint	vn = 10 ;
+	    int		vo = VECOBJ_OREUSE ;
+	    op->checktime = getustime ;
+	    if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
+	        vo = VECITEM_OSORTED ;
+	        if ((rs = vecitem_start(&op->aes_std,vn,vo)) >= 0) {
+	            vo = VECITEM_OCOMPACT ;
+	            if ((rs = vecitem_start(&op->aes_rgx,vn,vo)) >= 0) {
+	                op->magic = ACCTAB_MAGIC ;
+	                if (fname) {
+	                    rs = acctab_fileadd(op,fname) ;
+	                }
+	                if (rs < 0) {
+	                    op->magic = 0 ;
+	                    vecitem_finish(&op->aes_rgx) ;
+	                }
+	            } /* end if (rgx) */
 	            if (rs < 0) {
-	                op->magic = 0 ;
-	                vecitem_finish(&op->aes_rgx) ;
-	            }
-	        } /* end if (rgx) */
+	                vecitem_finish(&op->aes_std) ;
+		    }
+	        } /* end if (std) */
 	        if (rs < 0) {
-	            vecitem_finish(&op->aes_std) ;
-		}
-	    } /* end if (std) */
+	            vecobj_finish(op->flp) ;
+	        }
+	    } /* end if (vecobj-files) */
 	    if (rs < 0) {
-	        vecobj_finish(&op->files) ;
+		acctab_dtor(op) ;
 	    }
-	} /* end if (files) */
-
+	} /* end if (acctab_ctor) */
 	return rs ;
 }
 /* end subroutine (acctab_open) */
 
-int acctab_close(ACCTAB *op) noex {
-	int		rs = SR_OK ;
+int acctab_close(acctab *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
+	if ((rs = acctab_magic(op)) >= 0) {
 	    {
 	        rs1 = acctab_freeentries(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -228,283 +278,245 @@ int acctab_close(ACCTAB *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecobj_finish(&op->files) ;
+	        rs1 = vecobj_finish(op->flp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = acctab_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (acctab_close) */
 
-int acctab_fileadd(ACCTAB *op,cchar *fname) noex {
+int acctab_fileadd(acctab *op,cchar *fname) noex {
+	int		rs ;
+	if ((rs = acctab_magic(op,fname)) >= 0) {
 	ACCTAB_FI	fe ;
-	int		rs = SR_OK ;
 	int		fi ;
-	cchar		*np ;
+	cchar		*sp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	np = fname ;
+	sp = fname ;
 	if (fname[0] != '/') {
 	    char	pwdbuf[MAXPATHLEN+1] ;
 	    if ((rs = getpwd(pwdbuf,MAXPATHLEN)) >= 0) {
-	        np = tmpfname ;
+	        sp = tmpfname ;
 	        rs = mkpath2(tmpfname,pwdbuf,fname) ;
 	    }
 	} /* end if (rooting file) */
 
 	if (rs >= 0) {
-	    if ((rs = file_start(&fe,np)) >= 0) {
-		if ((rs = vecobj_add(&op->files,&fe)) >= 0) {
+	    if ((rs = file_start(&fe,sp)) >= 0) {
+		if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
 		    fi = rs ;
 		    file_release(&fe) ;
 		    rs = acctab_fileparse(op,fi) ;
-		    if (rs < 0)
+		    if (rs < 0) {
 			acctab_filedel(op,fi) ;
-		}
-		if (rs < 0)
+		    }
+		} /* end if (vecobj_add) */
+		if (rs < 0) {
 		    file_finish(&fe) ;
-	    } /* end if (vecobj_add) */
+		}
+	    } /* end if (file_start) */
 	} /* end if (ok) */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (acctab_fileadd) */
 
-int acctab_allowed(ACCTAB *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
-	time_t		dt = time(nullptr) ;
+int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
+	custime		dt = getustime ;
 	cint		rsn = SR_NOTFOUND ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	if (ma == nullptr) return SR_INVALID ;
-
-/* should we check for changes to underlying file? */
-
-	if ((dt - op->checktime) > ACCTAB_MINCHECKTIME) {
-	    rs = acctab_checkfiles(op,dt) ;
-	} /* end if (we needed to check) */
-
-	if (rs >= 0) {
-	    ACCTAB_ENT	ae, *aep ;
-	    VECITEM	*slp ;
-	    VECITEM_CUR	cur ;
-	    int		i ;
-
-/* load up a fake entry for comparison purposes */
-
-	    if ((rs = entry_start(&ae)) >= 0) {
-	        if ((rs = entry_load(&ae,ng,ma,un,pw)) >= 0) {
-
-/* search the STD entries first */
-
-	    slp = &op->aes_std ;
-	    if ((rs = vecitem_curbegin(slp,&cur)) >= 0) {
-
-	        while ((rs1 = vecitem_fetch(slp,&ae,&cur,vcmpent,&aep)) >= 0) {
-	            if (aep != nullptr) {
-	                f = entry_mat2(aep,&ae) ;
-	                if (f) break ;
-	            }
-	        } /* end while */
-	        if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-
-	        vecitem_curend(slp,&cur) ;
-	    } /* end if (vecitem-cur) */
-
-/* search the RGX entries (if necessary) */
-
-	    if ((rs == rsn) || (! f)) {
-	        slp = &op->aes_rgx ;
-	        for (i = 0 ; (rs1 = vecitem_get(slp,i,&aep)) >= 0 ; i += 1) {
-	            if (aep != nullptr) {
-	                f = entry_mat3(aep,&ae) ;
-	                if (f) break ;
-	            }
-	        } /* end for (looping through entries) */
-	        if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	    } /* end if (comparing RGX entries) */
-
-	        } /* end if (entry_load) */
-		entry_finish(&ae) ;
-	    } /* end if () */
-
-	} /* end if (ok) */
-
+	int		f = false ;
+	if ((rs = acctab_magic(op,ng,ma,un,pw)) >= 0) {
+	    /* should we check for changes to underlying file? */
+	    if ((dt - op->checktime) > ACCTAB_MINCHECKTIME) {
+	        rs = acctab_checkfiles(op,dt) ;
+	    } /* end if (we needed to check) */
+	    if (rs >= 0) {
+	        acctab_ent	ae ;
+	        acctab_ent	*aep ;
+	        vecitem		*slp ;
+	        vecitem_cur	cur ;
+	        void		*vp{} ;
+	        /* load up a fake entry for comparison purposes */
+	        if ((rs = entry_start(&ae)) >= 0) {
+	            if ((rs = entry_load(&ae,ng,ma,un,pw)) >= 0) {
+		    /* search the STD entries first */
+	                slp = &op->aes_std ;
+	                if ((rs = vecitem_curbegin(slp,&cur)) >= 0) {
+		            auto	vif = vecitem_fetch ;
+	                    while ((rs1 = vif(slp,&ae,&cur,vcmpent,&vp)) >= 0) {
+		                aep = entp(vp) ;
+	                        if (vp) {
+	                            f = entry_mat2(aep,&ae) ;
+	                            if (f) break ;
+	                        }
+	                    } /* end while */
+	                    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	                    vecitem_curend(slp,&cur) ;
+	                } /* end if (vecitem-cur) */
+		        /* search the RGX entries (if necessary) */
+	                if ((rs == rsn) || (! f)) {
+	                    slp = &op->aes_rgx ;
+		            auto	vig = vecitem_get ;
+	                for (int i = 0 ; (rs1 = vig(slp,i,&vp)) >= 0 ; i += 1) {
+		    		aep = entp(vp) ;
+	            		if (vp) {
+				    f = entry_mat3(aep,&ae) ;
+	                            if (f) break ;
+	                        }
+	                    } /* end for (looping through entries) */
+	                    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	                } /* end if (comparing RGX entries) */
+		    } /* end if (entry_load) */
+		    entry_finish(&ae) ;
+	        } /* end if (entry) */
+	    } /* end if (ok) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (acctab_allowed) */
 
-int acctab_anyallowed(ACCTAB *op,vecstr *ngp,vecstr *mnp,cc*un,cc *pw) noex {
+int acctab_anyallowed(acctab *op,vecstr *nlp,vecstr *mlp,cc *un,cc *pw) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rs2 ;
-	int		i, j ;
-	int		f = FALSE ;
-	cchar		*np ; /* netgroup pointer */
-	cchar		*mp ; /* machine pointer */
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	for (i = 0 ; (rs1 = vecstr_get(ngp,i,&np)) >= 0 ; i += 1) {
-	    if (np != nullptr) {
-	        for (j = 0 ; (rs2 = vecstr_get(mnp,j,&mp)) >= 0 ; j += 1) {
-	            if (mp != nullptr) {
-	                if ((rs = acctab_allowed(op,np,mp,un,pw)) >= 0) {
-	                    f = TRUE ;
-	                } else if (rs == rsn) {
-	                    rs = SR_OK ;
+	int		f = false ;
+	if ((rs = acctab_magic(op,nlp,mlp,un,pw)) >= 0) {
+	    cchar	*ngp ; /* netgroup pointer */
+	    cchar	*mp ; /* machine pointer */
+	    auto	vsg = vecstr_get ;
+	    for (int i = 0 ; (rs1 = vsg(nlp,i,&ngp)) >= 0 ; i += 1) {
+	        if (ngp) {
+	            for (int j = 0 ; (rs2 = vsg(mlp,j,&mp)) >= 0 ; j += 1) {
+	                if (mp) {
+	                    if ((rs = acctab_allowed(op,ngp,mp,un,pw)) >= 0) {
+	                        f = true ;
+	                    } else if (rs == rsn) {
+	                        rs = SR_OK ;
+	                    }
 	                }
-	            }
-	            if (f) break ;
-	            if (rs < 0) break ;
-	        } /* end for */
-	        if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
-	    }
-	    if (f) break ;
-	    if (rs < 0) break ;
-	} /* end for (looping over netgroups) */
-	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-
+	                if (f) break ;
+	                if (rs < 0) break ;
+	            } /* end for */
+	            if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
+	        }
+	        if (f) break ;
+	        if (rs < 0) break ;
+	    } /* end for (looping over netgroups) */
+	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (acctab_anyallowed) */
 
-
 #ifdef	COMMENT
 
 /* search the netgroup table for a netgroup match */
-int acctab_find(op,netgroup,sepp)
-ACCTAB		*op ;
-cchar	netgroup[] ;
-ACCTAB_ENT	**sepp ;
-{
-	VECITEM		*slp ;
-	int		i ;
-	cchar	*sp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	slp = &op->e ;
-	for (i = 0 ; vecitem_get(slp,i,sepp) >= 0 ; i += 1) {
-	    if (*sepp == nullptr) continue ;
-
-	    sp = (*sepp)->netgroup ;
-
-	    if (strcmp(netgroup,sp) == 0)
-	        return i ;
-
-	} /* end for (looping through entries) */
-
-	return -1 ;
+int acctab_find(acctab *op,cc *netgroup,acctab_ent **sepp) noex {
+	int		rs ;
+	int		idx = 0 ;
+	if ((rs = acctab_magic(op,netgroup,sepp)) >= 0) {
+	    int		i ; /* used-afterwards */
+	    vecitem	*slp = &op->e ;
+	    cchar	*sp ;
+	    bool	f = false ;
+	    void	*vp{} ;
+	    for (i = 0 ; vecitem_get(slp,i,&vp) >= 0 ; i += 1) {
+		*sepp = entp(vp) ;
+	        if (*sepp == nullptr) continue ;
+	        sp = (*sepp)->netgroup ;
+	        f = (strcmp(netgroup,sp) == 0) ;
+	        if (f) break ;
+	    } /* end for (looping through entries) */
+	    if (f) idx = i ;
+	} /* end if (magic) */
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (acctab_find) */
 
 #endif /* COMMENT */
 
-int acctab_curbegin(ACCTAB *op,ACCTAB_CUR *cp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	cp->i = cp->j = -1 ;
-	return SR_OK ;
+int acctab_curbegin(acctab *op,acctab_cur *curp) noex {
+	int		rs ;
+	if ((rs = acctab_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	    curp->j = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (acctab_curbegin) */
 
-int acctab_curend(ACCTAB *op,ACCTAB_CUR *cp) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	cp->i = cp->j = -1 ;
-	return SR_OK ;
+int acctab_curend(acctab *op,acctab_cur *curp) noex {
+	int		rs ;
+	if ((rs = acctab_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	    curp->j = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (acctab_curend) */
 
-int acctab_curenum(ACCTAB *op,ACCTAB_CUR *cp,ACCTAB_ENT **sepp) noex {
-	vecitem		*slp ;
-	ACCTAB_ENT	*aep ;
-	int		rs = SR_OK ;
-	int		j ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (cp == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-	if (sepp == nullptr)
-	    sepp = &aep ;
-
-	rs = SR_NOTFOUND ;
-	if (cp->i <= 0) {
-
-	    slp = &op->aes_std ;
-	    cp->j = (cp->j < 0) ? 0 : (cp->j + 1) ;
-	    for (j = cp->j ; (rs = vecitem_get(slp,j,sepp)) >= 0 ; j += 1) {
-	        if (*sepp != nullptr) break ;
-	    } /* end for */
-
-	    if (rs < 0) {
-	        cp->j = -1 ;
-	        cp->i = 1 ;
-	    } else {
-	        cp->i = 0 ;
-	        cp->j = j ;
-	    } /* end if */
-
-	} /* end if (cursor needed initialization) */
-
-	if (cp->i == 1) {
-
-	    slp = &op->aes_rgx ;
-	    cp->j = (cp->j < 0) ? 0 : cp->j + 1 ;
-	    for (j = cp->j ; (rs = vecitem_get(slp,j,sepp)) >= 0 ; j += 1) {
-	        if (*sepp != nullptr) break ;
-	    } /* end for */
-
-	    if (rs < 0) {
-	        cp->j = -1 ;
-	        cp->i += 1 ;
-	    } else {
-	        cp->j = j ;
-	    } /* end if */
-
-	} /* end if (RGX entries) */
-
+int acctab_curenum(acctab *op,acctab_cur *curp,acctab_ent **sepp) noex {
+	int		rs ;
+	if ((rs = acctab_magic(op,curp)) >= 0) {
+	    vecitem	*slp ;
+	    acctab_ent	*aep ;
+	    int		j ;
+	    auto	vig = vecitem_get ;
+	    void	*vp{} ;
+	    if (sepp == nullptr) sepp = &aep ;
+	    rs = SR_NOTFOUND ;
+	    if (curp->i <= 0) {
+	        slp = &op->aes_std ;
+	        curp->j = (curp->j < 0) ? 0 : (curp->j + 1) ;
+	        for (j = curp->j ; (rs = vig(slp,j,&vp)) >= 0 ; j += 1) {
+		    *sepp = entp(vp) ;
+	            if (*sepp != nullptr) break ;
+	        } /* end for */
+	        if (rs < 0) {
+	            curp->j = -1 ;
+	            curp->i = 1 ;
+	        } else {
+	            curp->i = 0 ;
+	            curp->j = j ;
+	        } /* end if */
+	    } /* end if (cursor needed initialization) */
+	    if (curp->i == 1) {
+	        slp = &op->aes_rgx ;
+	        curp->j = (curp->j < 0) ? 0 : curp->j + 1 ;
+	        for (j = curp->j ; (rs = vig(slp,j,&vp)) >= 0 ; j += 1) {
+		    *sepp = entp(vp) ;
+	            if (*sepp != nullptr) break ;
+	        } /* end for */
+	        if (rs < 0) {
+	            curp->j = -1 ;
+	            curp->i += 1 ;
+	        } else {
+	            curp->j = j ;
+	        } /* end if */
+	    } /* end if (RGX entries) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (acctab_curenum) */
 
 /* check if the access tables files have changed */
-int acctab_check(ACCTAB *op) noex {
+int acctab_check(acctab *op) noex {
 	custime		dt = time(nullptr) ;
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != ACCTAB_MAGIC) return SR_NOTOPEN ;
-
-/* should we even check? */
-
-	if ((dt - op->checktime) > ACCTAB_CHECKTIME) {
-	    rs = acctab_checkfiles(op,dt) ;
-	}
-
+	int		rs ;
+	if ((rs = acctab_magic(op)) >= 0) {
+	    if ((dt - op->checktime) > intcheck) {
+	        rs = acctab_checkfiles(op,dt) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (acctab_check) */
@@ -512,11 +524,12 @@ int acctab_check(ACCTAB *op) noex {
 
 /* private subroutines */
 
-static int acctab_filefins(ACCTAB *op) noex {
-	ACCTAB_FI	*fep ;
+static int acctab_filefins(acctab *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (int i = 0 ; vecobj_get(&op->files,i,&fep) >= 0 ; i += 1) {
+	void		*vp{} ;
+	for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	    ACCTAB_FI	*fep = (ACCTAB_FI *) vp ;
 	    if (fep != nullptr) {
 	        rs1 = file_finish(fep) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -526,29 +539,26 @@ static int acctab_filefins(ACCTAB *op) noex {
 }
 /* end subroutine (acctab_filefins) */
 
-static int acctab_checkfiles(ACCTAB *op,time_t dt) noex {
-	USTAT		sb ;
-	ACCTAB_FI	*fep ;
+static int acctab_checkfiles(acctab *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		c_changed = FALSE ;
-	for (int i = 0 ; vecobj_get(&op->files,i,&fep) >= 0 ; i += 1) {
-	    if (fep != nullptr) {
+	int		c_changed = false ;
+	void		*vp{} ;
+	for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	    ACCTAB_FI	*fep = (ACCTAB_FI *) vp ;
+	    if (vp) {
+		USTAT	sb ;
 	    if ((u_stat(fep->fname,&sb) >= 0) &&
 	        (sb.st_mtime > fep->mtime) &&
 	        ((dt - sb.st_mtime) >= ACCTAB_CHANGETIME)) {
 
 	        acctab_filedump(op,i) ;
-
-	        rs = acctab_fileparse(op,i) ;
-
-	        if (rs >= 0)
+	        if ((rs = acctab_fileparse(op,i)) >= 0) {
 	            c_changed += 1 ;
-
+		}
 	    } /* end if */
-	    } /end if (non-nullptr) */
+	    } /* end if (non-nullptr) */
 	    if (rs < 0) break ;
 	} /* end for */
-
 	if ((rs >= 0) && c_changed) {
 	    rs = vecitem_sort(&op->aes_std,vcmpent) ;
 	} /* end if (something changed) */
@@ -558,11 +568,11 @@ static int acctab_checkfiles(ACCTAB *op,time_t dt) noex {
 /* end subroutine (acctab_checkfiles) */
 
 /* parse an access server file */
-static int acctab_fileparse(ACCTAB *op,int fi) noex {
+static int acctab_fileparse(acctab *op,int fi) noex {
 	PARTTYPE	netgroup ;
 	bfile		file, *fp = &file ;
 	ACCTAB_FI	*fep ;
-	ACCTAB_ENT	se ;
+	acctab_ent	se ;
 	USTAT		sb ;
 	field		fsb ;
 	int		rs ;
@@ -573,7 +583,9 @@ static int acctab_fileparse(ACCTAB *op,int fi) noex {
 	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	rs = vecobj_get(&op->files,fi,&fep) ;
+	void		*vp{} ;
+	rs = vecobj_get(op->flp,fi,&vp) ;
+	fep = filep(vp) ;
 
 	if (rs < 0)
 	    goto ret0 ;
@@ -629,8 +641,7 @@ static int acctab_fileparse(ACCTAB *op,int fi) noex {
 	    if ((rs = field_start(&fsb,cp,cl)) >= 0) {
 	        int	fl ;
 	        cchar	*fp ;
-
-	        if ((fl = field_get(&fsb,group_terms,&fp)) > 0) {
+	        if ((fl = field_get(&fsb,gterms,&fp)) > 0) {
 
 /* we have something! */
 
@@ -640,7 +651,7 @@ static int acctab_fileparse(ACCTAB *op,int fi) noex {
 	            if (fsb.term == ':') {
 	                part_finish(&netgroup) ;
 	                rs = part_compile(&netgroup,fp,fl) ;
-	                fl = field_get(&fsb,arg_terms,&fp) ;
+	                fl = field_get(&fsb,aterms,&fp) ;
 	            } /* end if */
 
 /* see if there is a machine on this same line */
@@ -656,7 +667,7 @@ static int acctab_fileparse(ACCTAB *op,int fi) noex {
 	                if (rs == SR_NOMEM)
 	                    goto badpart ;
 
-	                if ((fl = field_get(&fsb,arg_terms,&fp)) > 0) {
+	                if ((fl = field_get(&fsb,aterms,&fp)) > 0) {
 
 	                    rs = part_compile(&se.username,fp,fl) ;
 
@@ -665,7 +676,7 @@ static int acctab_fileparse(ACCTAB *op,int fi) noex {
 
 	                }
 
-	                if ((fl = field_get(&fsb,arg_terms,&fp)) > 0) {
+	                if ((fl = field_get(&fsb,aterms,&fp)) > 0) {
 
 	                    rs = part_compile(&se.password,fp,fl) ;
 
@@ -714,215 +725,215 @@ badpart:
 }
 /* end subroutine (acctab_fileparse) */
 
-static int acctab_addentry(ACCTAB *op,ACCTAB_ENT *sep) noex {
+static int acctab_addentry(acctab *op,acctab_ent *sep) noex {
 	int		rs ;
 	if (parttype(sep->netgroup.std) == PARTTYPE_STD) {
-	    rs = vecitem_add(&op->aes_std,sep,sizeof(ACCTAB_ENT)) ;
+	    rs = vecitem_add(&op->aes_std,sep,sizeof(acctab_ent)) ;
 	} else {
-	    rs = vecitem_add(&op->aes_rgx,sep,sizeof(ACCTAB_ENT)) ;
+	    rs = vecitem_add(&op->aes_rgx,sep,sizeof(acctab_ent)) ;
 	}
 	return rs ;
 }
 /* end subroutine (acctab_addentry) */
 
-static int acctab_filedump(ACCTAB *op,int fi) noex {
-	ACCTAB_ENT	*sep ;
-	veitem		*slp ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		i, j ;
-
-	for (j = 0 ; j < 2 ; j += 1) {
-
-	    slp = (j == 0) ? &op->aes_std : &op->aes_rgx ;
-	    for (i = 0 ; (rs = vecitem_get(slp,i,&sep)) >= 0 ; i += 1) {
-	        if (sep != nullptr) {
-
-	            if ((sep->fi == fi) || (fi < 0)) {
-
-	                rs1 = entry_finish(sep) ;
-	                if (rs >= 0) rs = rs1 ;
-
-	                rs1 = vecitem_del(slp,i--) ;
-	                if (rs >= 0) rs = rs1 ;
-
-	            } /* end if (found matching entry) */
-
-	        }
-	    } /* end for (looping through entries) */
-
-	} /* end for (looping on the different types of entries) */
-
-	return rs ;
-}
-/* end subroutine (acctab_filedump) */
-
-static int acctab_filedel(ACCTAB *op,int fi) noex {
-	ACCTAB_FI	*fep ;
-	int		rs ;
-
-	if ((rs = vecobj_get(&op->files,fi,&fep)) >= 0) {
-	    if (fep != nullptr) {
-	        file_finish(fep) ;
-	        rs = vecobj_del(&op->files,fi) ;
-	    }
-	}
-
-	return rs ;
-}
-/* end subroutine (acctab_filedel) */
-
-static int acctab_freeentries(ACCTAB *op) noex {
-	ACCTAB_ENT	*sep ;
+static int acctab_filedump(acctab *op,int fi) noex {
 	vecitem		*slp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int j = 0 ; j < 2 ; j += 1) {
 	    slp = (j == 0) ? &op->aes_std : &op->aes_rgx ;
-	    for (int i = 0 ; vecitem_get(slp,i,&sep) >= 0 ; i += 1) {
-	        if (sep) {
-	            rs1 = entry_finish(sep) ;
-	            if (rs >= 0) rs = rs1 ;
+	    void	*vp{} ;
+	    for (int i = 0 ; (rs = vecitem_get(slp,i,&vp)) >= 0 ; i += 1) {
+	        acctab_ent	*sep = entp(vp) ;
+	        if (vp) {
+	            if ((sep->fi == fi) || (fi < 0)) {
+			{
+	                rs1 = entry_finish(sep) ;
+	                if (rs >= 0) rs = rs1 ;
+			}
+			{
+	                rs1 = vecitem_del(slp,i--) ;
+	                if (rs >= 0) rs = rs1 ;
+			}
+	            } /* end if (found matching entry) */
 	        }
-	    } /* end for */
-	} /* end for */
+	    } /* end for (looping through entries) */
+	} /* end for (looping on the different types of entries) */
+	return rs ;
+}
+/* end subroutine (acctab_filedump) */
 
+static int acctab_filedel(acctab *op,int fi) noex {
+	int		rs = SR_OK ;
+	if (void *vp{} ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
+	    ACCTAB_FI	*fep = (ACCTAB_FI *) vp ;
+	    if (vp) {
+	        file_finish(fep) ;
+	        rs = vecobj_del(op->flp,fi) ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (acctab_filedel) */
+
+static int acctab_freeentries(acctab *op) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (op) {
+	    vecitem	*slp ;
+	    rs = SR_OK ;
+	    for (int j = 0 ; j < 2 ; j += 1) {
+	        slp = (j == 0) ? &op->aes_std : &op->aes_rgx ;
+		void	*vp{} ;
+	        for (int i = 0 ; vecitem_get(slp,i,&vp) >= 0 ; i += 1) {
+	    	    acctab_ent	*sep = entp(vp) ;
+	            if (vp) {
+	                rs1 = entry_finish(sep) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end for */
+	    } /* end for */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (acctab_freeentries) */
 
 static int file_start(ACCTAB_FI *fep,cchar *fname) noex {
-	int		rs = SR_OK ;
-	cchar		*cp ;
-
-	if (fname == nullptr) return SR_FAULT ;
-
-	memclear(fep) ;
-
-	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	    fep->fname = cp ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (fep && fname) {
+	    memclear(fep) ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        fep->fname = cp ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_start) */
 
 static int file_release(ACCTAB_FI *fep) noex {
-	fep->fname = nullptr ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (fep) {
+	    rs = SR_OK ;
+	    fep->fname = nullptr ;
+	}
+	return rs ;
 }
 /* end subroutine (file_release) */
 
 static int file_finish(ACCTAB_FI *fep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (fep == nullptr) return SR_FAULT ;
-
-	if (fep->fname != nullptr) {
-	    rs1 = uc_free(fep->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    fep->fname = nullptr ;
-	}
-
+	if (fep) {
+	    rs = SR_OK ;
+	    if (fep->fname) {
+	        rs1 = uc_free(fep->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        fep->fname = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_finish) */
 
-static int entry_start(ACCTAB_ENT *sep) noex {
-	int		rs = SR_OK ;
-
-	memclear(sep) ;
-	sep->fi = -1 ;
-
-	part_start(&sep->netgroup) ;
-
-	part_start(&sep->machine) ;
-
-	part_start(&sep->username) ;
-
-	part_start(&sep->password) ;
-
+static int entry_start(acctab_ent *sep) noex {
+	int		rs = SR_FAULT ;
+	if (sep) {
+	    rs = memclear(sep) ;
+	    sep->fi = -1 ;
+	    part_start(&sep->netgroup) ;
+	    part_start(&sep->machine) ;
+	    part_start(&sep->username) ;
+	    part_start(&sep->password) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(ACCTAB_ENT *sep) noex {
-	int		rs = SR_OK ;
+static int entry_finish(acctab_ent *sep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (sep->fi >= 0) {
-	    rs1 = part_finish(&sep->netgroup) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = part_finish(&sep->machine) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = part_finish(&sep->username) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = part_finish(&sep->password) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sep->fi = -1 ;
-	} /* end if */
-
+	if (sep) {
+	    rs = SR_OK ;
+	    if (sep->fi >= 0) {
+	        rs1 = part_finish(&sep->netgroup) ;
+	        if (rs >= 0) rs = rs1 ;
+	        rs1 = part_finish(&sep->machine) ;
+	        if (rs >= 0) rs = rs1 ;
+	        rs1 = part_finish(&sep->username) ;
+	        if (rs >= 0) rs = rs1 ;
+	        rs1 = part_finish(&sep->password) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sep->fi = -1 ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_finish) */
 
 static int entry_load(acctab_ent *aep,cc *netgroup,cc *machine,
 		cc *username,cc *password) noex {
-	aep->netgroup.std = (char *) netgroup ;
-	if ((netgroup == nullptr) || (netgroup[0] == '\0')) {
-	    aep->netgroup.std = ACCTAB_DEFNETGROUP ;
-	}
-	aep->machine.std = (char *) machine ;
-	aep->username.std = (char *) username ;
-	aep->password.std = (char *) password ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (aep) {
+	    rs = SR_OK ;
+	    aep->netgroup.std = charp(netgroup) ;
+	    if ((netgroup == nullptr) || (netgroup[0] == '\0')) {
+	        aep->netgroup.std = ACCTAB_DEFNETGROUP ;
+	    }
+	    aep->machine.std = (char *) machine ;
+	    aep->username.std = (char *) username ;
+	    aep->password.std = (char *) password ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_load) */
 
-static int entry_mat2(ACCTAB_ENT *e1p,ACCTAB_ENT *e2p) noex {
+static int entry_mat2(acctab_ent *e1p,acctab_ent *e2p) noex {
 
 #ifdef	OPTIONAL
 	if (! part_match(&e1p->netgroup,e2p->netgroup.std))
-	    return FALSE ;
+	    return false ;
 #endif
 
 	if (! part_match(&e1p->machine,e2p->machine.std))
-	    return FALSE ;
+	    return false ;
 
 	if (! part_match(&e1p->username,e2p->username.std))
-	    return FALSE ;
+	    return false ;
 
 	if (! part_match(&e1p->password,e2p->password.std))
-	    return FALSE ;
+	    return false ;
 
-	return TRUE ;
+	return true ;
 }
 /* end subroutine (entry_mat2) */
 
-static int entry_mat3(ACCTAB_ENT *e1p,ACCTAB_ENT *e2p) noex {
+static int entry_mat3(acctab_ent *e1p,acctab_ent *e2p) noex {
 
 	if (! part_match(&e1p->netgroup,e2p->netgroup.std))
-	    return FALSE ;
+	    return false ;
 
 	if (! part_match(&e1p->machine,e2p->machine.std))
-	    return FALSE ;
+	    return false ;
 
 	if (! part_match(&e1p->username,e2p->username.std))
-	    return FALSE ;
+	    return false ;
 
 	if (! part_match(&e1p->password,e2p->password.std))
-	    return FALSE ;
+	    return false ;
 
-	return TRUE ;
+	return true ;
 }
 /* end subroutine (entry_mat3) */
 
 static int part_start(PARTTYPE *pp) noex {
-	pp->type = 0 ;
-	pp->std = nullptr ;
-	pp->rgx = nullptr ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (pp) {
+	    rs = SR_OK ;
+	    pp->type = 0 ;
+	    pp->std = nullptr ;
+	    pp->rgx = nullptr ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (part_start) */
 
@@ -1007,13 +1018,13 @@ static int part_compile(PARTTYPE *pp,cchar *sp,int sl) noex {
 
 static int part_match(PARTTYPE *pp,cchar *s) noex {
 	int		sl, sl1, sl2 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar	*cp ;
 
-	if (pp->std == nullptr) return TRUE ;
+	if (pp->std == nullptr) return true ;
 
 	if (s == nullptr)
-	    return FALSE ;
+	    return false ;
 
 	if (pp->rgx == nullptr) {
 
@@ -1028,7 +1039,7 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 
 	        if ((cp = strchr(pp->std,'*')) != nullptr) {
 
-	            f = FALSE ;
+	            f = false ;
 	            if (strncmp(s,pp->std,(cp - pp->std)) == 0) {
 
 	                cp += 1 ;
@@ -1051,7 +1062,7 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 #if	ACCTAB_REGEX
 	        f = advance(pp->rgx,s) ;
 #else
-	        f = FALSE ;
+	        f = false ;
 #endif
 
 	        if (! f) {
@@ -1093,16 +1104,18 @@ static int freeit(cchar **pp) noex {
 /* end subroutine (freeit) */
 
 /* compare just the 'netgroup' part of entries (used for sorting) */
-static int vcmpent(cvoid **e1pp,cvoid **e2pp) noex {
-	ACCTAB_ENT	*e1p = (ACCTAB_ENT *) *v1pp ;
-	ACCTAB_ENT	*e2p = (ACCTAB_ENT *) *v2pp ;
+static int vcmpent(cvoid **v1pp,cvoid **v2pp) noex {
+	acctab_ent	*e1p = (acctab_ent *) *v1pp ;
+	acctab_ent	*e2p = (acctab_ent *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	    	    rc = strcmp(e1p->netgroup.std,e2p->netgroup.std) ;
+		    cchar	*s1 = e1p->netgroup.std ;
+		    cchar	*s2 = e2p->netgroup.std ;
+	    	    rc = strcmp(s1,s2) ;
 		}
 	    }
 	}
@@ -1113,7 +1126,7 @@ static int vcmpent(cvoid **e1pp,cvoid **e2pp) noex {
 /* determine the type of this string part */
 static int parttype(cchar *s) noex {
 	int		type = PARTTYPE_STD ;
-	bool		f = FALSE ;
+	bool		f = false ;
 	for ( ; *s ; s += 1) {
 	    cint	ch = MKCHAR(*s) ;
 	    f = f || isalnumlatin(ch) ;
@@ -1121,7 +1134,7 @@ static int parttype(cchar *s) noex {
 	    f = f || (*s == '_') ;
 	    if ((! f) && (*s == '*')) {
 	        type = PARTTYPE_RGX ;
-	        f = TRUE ;
+	        f = true ;
 	    }
 	    if (! f) break ;
 	} /* end for */

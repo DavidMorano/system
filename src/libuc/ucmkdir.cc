@@ -1,6 +1,7 @@
 /* ucmkdir SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* like |mkdir(2)| */
 /* version %I% last-modified %G% */
 

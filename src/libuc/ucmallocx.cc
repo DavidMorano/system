@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* process memory management */
 /* version %I% last-modified %G% */
 
 #define	CF_STRNCPY	1		/* try it out */

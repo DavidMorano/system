@@ -1,6 +1,7 @@
 /* ucsyncer SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* UNIX® file-system synchronization */
 /* version %I% last-modified %G% */
 

@@ -1,6 +1,7 @@
 /* ucfiledesc SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* translation layer interface for UNIX® equivalents */
 /* version %I% last-modified %G% */
 

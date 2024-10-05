@@ -1,6 +1,7 @@
 /* uclockfile(3uc) */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* UNIX® System V file-record locking */
 /* version %I% last-modified %G% */
 

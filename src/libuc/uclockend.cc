@@ -1,6 +1,7 @@
 /* uclocktail SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* put a file-lock on the tail of a file */
 /* version %I% last-modified %G% */
 

@@ -1,6 +1,7 @@
 /* ucmemla SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* Memory-Large-Allocation */
 /* version %I% last-modified %G% */
 

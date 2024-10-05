@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* time-conversion functions */
 /* version %I% last-modified %G% */
 
 

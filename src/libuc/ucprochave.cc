@@ -1,6 +1,7 @@
 /* ucprochave SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* is a process (specified by PID) currently in the system? */
 /* version %I% last-modified %G% */
 

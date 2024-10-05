@@ -1,6 +1,7 @@
 /* ucgetlogin SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get the username of this login session */
 /* version %I% last-modified %G% */
 

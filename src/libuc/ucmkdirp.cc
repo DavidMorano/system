@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* make parent directories in a file path */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

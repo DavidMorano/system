@@ -1,6 +1,7 @@
 /* uvariables SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* define various system (global) variables */
 /* version %I% last-modified %G% */
 

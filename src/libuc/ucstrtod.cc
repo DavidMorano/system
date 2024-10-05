@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* string-to-florating-point functions */
 /* version %I% last-modified %G% */
 
 

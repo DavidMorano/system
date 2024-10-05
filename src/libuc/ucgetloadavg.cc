@@ -1,6 +1,7 @@
 /* ucgetloadavg SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get load averages as floating doubles (relatively now standard!) */
 /* version %I% last-modified %G% */
 

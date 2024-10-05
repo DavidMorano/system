@@ -1,6 +1,7 @@
 /* ucrand SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get random data from the system */
 /* version %I% last-modified %G% */
 

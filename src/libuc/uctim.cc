@@ -1,7 +1,8 @@
 /* uctim SUPPORT */
 /* lang=C++11 */
 
-/* UNIX® time-out management */
+/* interface components for UNIX® library-3c */
+/* virtual per-process timer management */
 /* version %I% last-modified %G% */
 
 #define	CF_CHILDTHRS	0		/* start threads in child process */
@@ -27,7 +28,8 @@
 	uc_timget
 
 	Description:
-	This module creates virtual time-of-day timers for callers.
+	This module creates per-process (virtual) time-of-day timers
+	for callers.
 
 	Synopsis:
 	int uc_timcreate(callback *cbp) noex
@@ -55,6 +57,7 @@
 #include	<csignal>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<queue>
 #include	<usystem.h>

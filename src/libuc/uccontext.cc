@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* version %I% last-modified %G% */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

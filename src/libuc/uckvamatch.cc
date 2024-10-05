@@ -1,7 +1,8 @@
 /* uckvamatch SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
+/* system data-abse key-value handling */
 /* version %I% last-modified %G% */
 
 

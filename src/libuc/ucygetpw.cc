@@ -1,6 +1,7 @@
 /* ucpwcache SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* get UNIX® password entries (w/ cache) */
 /* version %I% last-modified %G% */
 

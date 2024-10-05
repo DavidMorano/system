@@ -3,6 +3,7 @@
 
 /* interface component for UNIX® library-3c */
 /* get system configuration information */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

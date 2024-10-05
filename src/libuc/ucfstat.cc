@@ -3,6 +3,7 @@
 
 /* translation layer interface for UNIX® equivalents */
 /* get the size of an open file */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

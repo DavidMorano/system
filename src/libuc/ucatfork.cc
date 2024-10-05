@@ -1,6 +1,7 @@
 /* ucatfork SUPPORT */
 /* lang=C++20 */
 
+/* interface components for UNIX® library-3c */
 /* an enhanced UNIX®-like |pthread_atfork(3pthread)| subroutine */
 /* version %I% last-modified %G% */
 
