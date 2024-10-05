@@ -36,7 +36,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -63,7 +63,8 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<regex>			/* C++ REGEX; currently unused */
 #include	<usystem.h>
-#include	<getpwd.h>
+#include	<mallocxx.h>
+#include	<absfn.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<fieldterminit.hh>
@@ -143,13 +144,6 @@ typedef acctab_file *	filep ;
 
 /* forward references */
 
-#ifdef	COMMENT
-	vecitem		aes_std ;		/* access entries */
-	vecitem		aes_rgx ;		/* access entries */
-	vecitem		*stdalp ;		/* access-list-entries */
-	vecitem		*rgxalp ;		/* access-list-entries */
-#endif
-
 template<typename ... Args>
 static int acctab_ctor(acctab *op,Args ... args) noex {
 	ACCTAB		*hop = op ;
@@ -224,7 +218,6 @@ static int	entry_mat3(acctab_ent *,acctab_ent *) noex ;
 static int	entry_finish(acctab_ent *) noex ;
 
 static int	file_start(ACCTAB_FI *,cchar *) noex ;
-static int	file_release(ACCTAB_FI *) noex ;
 static int	file_changed(ACCTAB_FI *,custime) noex ;
 static int	file_finish(ACCTAB_FI *) noex ;
 
@@ -355,35 +348,26 @@ int acctab_close(acctab *op) noex {
 
 int acctab_fileadd(acctab *op,cchar *fname) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = acctab_magic(op,fname)) >= 0) {
-	ACCTAB_FI	fe ;
-	int		fi ;
-	cchar		*sp ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-	sp = fname ;
-	if (fname[0] != '/') {
-	    char	pwdbuf[MAXPATHLEN+1] ;
-	    if ((rs = getpwd(pwdbuf,MAXPATHLEN)) >= 0) {
-	        sp = tmpfname ;
-	        rs = mkpath2(tmpfname,pwdbuf,fname) ;
-	    }
-	} /* end if (rooting file) */
-
-	if (rs >= 0) {
-	    if ((rs = file_start(&fe,sp)) >= 0) {
-		if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
-		    fi = rs ;
-		    file_release(&fe) ;
-		    rs = acctab_fileparse(op,fi) ;
+	    absfn	afo ;
+	    if (cchar *fn{} ; (rs = afo.start(fname,-1,&fn)) >= 0) {
+		ACCTAB_FI	fe ;
+	        if ((rs = file_start(&fe,fn)) >= 0) {
+		    if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
+		        cint	fi = rs ;
+		        rs = acctab_fileparse(op,fi) ;
+		        if (rs < 0) {
+			    acctab_filedel(op,fi) ;
+		        }
+		    } /* end if (vecobj_add) */
 		    if (rs < 0) {
-			acctab_filedel(op,fi) ;
+		        file_finish(&fe) ;
 		    }
-		} /* end if (vecobj_add) */
-		if (rs < 0) {
-		    file_finish(&fe) ;
-		}
-	    } /* end if (file_start) */
-	} /* end if (ok) */
+	        } /* end if (file_start) */
+		rs1 = afo.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (absfn) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -887,16 +871,6 @@ static int file_finish(ACCTAB_FI *fep) noex {
 }
 /* end subroutine (file_finish) */
 
-static int file_release(ACCTAB_FI *fep) noex {
-	int		rs = SR_FAULT ;
-	if (fep) {
-	    rs = SR_OK ;
-	    fep->fname = nullptr ;
-	}
-	return rs ;
-}
-/* end subroutine (file_release) */
-
 static int file_changed(ACCTAB_FI *fep,custime dt) noex {
 	USTAT		sb ;
 	int		rs ;
@@ -915,12 +889,27 @@ static int file_changed(ACCTAB_FI *fep,custime dt) noex {
 static int entry_start(acctab_ent *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
-	    rs = memclear(sep) ;
-	    sep->fi = -1 ;
-	    part_start(&sep->netgroup) ;
-	    part_start(&sep->machine) ;
-	    part_start(&sep->username) ;
-	    part_start(&sep->password) ;
+	    if ((rs = memclear(sep)) >= 0) {
+	        sep->fi = -1 ;
+	        if ((rs = part_start(&sep->netgroup)) >= 0) {
+	    	    if ((rs = part_start(&sep->machine)) >= 0) {
+	    	        if ((rs = part_start(&sep->username)) >= 0) {
+			    {
+	    		        rs = part_start(&sep->password) ;
+			    }
+			    if (rs < 0) {
+			        part_finish(&sep->username) ;
+			    }
+			}
+			if (rs < 0) {
+			    part_finish(&sep->machine) ;
+			}
+		    }
+		    if (rs < 0) {
+			part_finish(&sep->netgroup) ;
+		    }
+		}
+	    } /* end if (memclear) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -1137,11 +1126,11 @@ static int part_finish(PARTTYPE *pp) noex {
 	int		rs1 ;
 	if (pp) {
 	    rs = SR_OK ;
-	    {
+	    if (pp->patstd) {
 	        rs1 = freeit(&pp->patstd) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (pp->patrgx) {
 	        rs1 = freeit(&pp->patrgx) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
