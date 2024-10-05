@@ -806,5 +806,6 @@ wdt.o:			wdt.cc wdt.h
 getlogx.o:		getlogx.cc getlogx.h
 sockpeername.o:		sockpeername.cc sockpeername.h
 nlspeername.o:		nlspeername.cc nlspeername.h
+conallof.o:		conallof.cc conallof.h
 
 
