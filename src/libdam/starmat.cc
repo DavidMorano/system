@@ -37,7 +37,7 @@
 
 	Returns:
 	TRUE		match
-	false		no match
+	FALSE		no match
 
 *******************************************************************************/
 
@@ -48,6 +48,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"starmat.h"
@@ -85,12 +86,12 @@
 bool starmat(cchar *se,cchar *s) noex {
 	bool		f ;
 	if (cchar *tp ; (tp = strchr(se,'*')) != nullptr) {
-	    int		sl, sl1, sl2 ;
+	    int		sl ;
 	    f = false ;
 	    if (strncmp(s,se,(tp - se)) == 0) {
+	        cint	sl1 = strlen(s) ;
+	        cint	sl2 = strlen(se) ;
 	        tp += 1 ;
-	        sl1 = strlen(s) ;
-	        sl2 = strlen(se) ;
 	        sl = (se + sl2) - tp ;
 	        f = (strncmp((s + sl1 - sl),tp,sl) == 0) ;
 	    } /* end if */
