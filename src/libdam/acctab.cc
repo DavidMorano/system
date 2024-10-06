@@ -684,6 +684,7 @@ parser::operator int () noex {
 			    } /* end while */
 			    if ((rs >= 0) && fent) {
 				if ((rs = acctab_entadd(op,&se)) >= 0) {
+				    rs = entry_release(&se) ;
 				    fent = false ;
 				}
 			    }
@@ -741,11 +742,12 @@ int parser::parseln(cchar *lp,int ll) noex {
 		        } /* end if (entry_start) */
 		    } /* end if (ok) */
 	        } /* end if (new netgroup) */
-		if (rs >= 0) {
+		if ((rs >= 0) && fent && (fsb.term != '#')) {
 		    for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	                if ((rs = fsb.get(aterms,&fp)) > 0) {
 			    rs = entry_addx(&se,i,fp,rs) ;
 			} /* end if (field_get) */
+			if (fsb.term == '#') break ;
 	            } /* end if */
 		    if (rs == rsn) {
 			rs = SR_OK ;
