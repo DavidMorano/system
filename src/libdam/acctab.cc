@@ -407,7 +407,8 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 	                        }
 	                    } /* end while */
 	                    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	                    vecitem_curend(slp,&cur) ;
+	                    rs1 = vecitem_curend(slp,&cur) ;
+			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (vecitem-cur) */
 		        /* search the RGX entries (if necessary) */
 	                if ((rs == rsn) || (! f)) {
@@ -785,12 +786,14 @@ static int acctab_entadd(acctab *op,acctab_ent *sep) noex {
 
 static int acctab_filedump(acctab *op,int fi) noex {
 	vecitem		*slp ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
+	int		rs2 ;
 	for (int j = 0 ; j < 2 ; j += 1) {
 	    slp = (j == 0) ? op->stdalp : op->rgxalp ;
 	    void	*vp{} ;
-	    for (int i = 0 ; (rs = vecitem_get(slp,i,&vp)) >= 0 ; i += 1) {
+	    for (int i = 0 ; (rs2 = vecitem_get(slp,i,&vp)) >= 0 ; i += 1) {
 	        acctab_ent	*sep = entp(vp) ;
 	        if (vp) {
 	            if ((sep->fi == fi) || (fi < 0)) {
@@ -805,40 +808,52 @@ static int acctab_filedump(acctab *op,int fi) noex {
 	            } /* end if (found matching entry) */
 	        }
 	    } /* end for (looping through entries) */
+	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	} /* end for (looping on the different types of entries) */
 	return rs ;
 }
 /* end subroutine (acctab_filedump) */
 
 static int acctab_filedel(acctab *op,int fi) noex {
-	int		rs = SR_OK ;
+	int		rs ;
+	int		rs1 ;
 	if (void *vp{} ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
 	    ACCTAB_FI	*fep = (ACCTAB_FI *) vp ;
 	    if (vp) {
-	        file_finish(fep) ;
-	        rs = vecobj_del(op->flp,fi) ;
+		{
+	            rs1 = file_finish(fep) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = vecobj_del(op->flp,fi) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
 	    }
-	}
+	} /* end if (vecobj_get) */
 	return rs ;
 }
 /* end subroutine (acctab_filedel) */
 
 static int acctab_entfins(acctab *op) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rs2 ;
 	if (op) {
 	    vecitem	*slp ;
+	    auto	vig = vecitem_get ;
 	    rs = SR_OK ;
 	    for (int j = 0 ; j < 2 ; j += 1) {
 	        slp = (j == 0) ? op->stdalp : op->rgxalp ;
 		void	*vp{} ;
-	        for (int i = 0 ; vecitem_get(slp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; (rs2 = vig(slp,i,&vp)) >= 0 ; i += 1) {
 	    	    acctab_ent	*sep = entp(vp) ;
 	            if (vp) {
 	                rs1 = entry_finish(sep) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
 	        } /* end for */
+		if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
