@@ -100,7 +100,7 @@
 #include	<strop.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<terminit.hh>
+#include	<fieldterminit.hh>
 #include	<localmisc.h>
 
 #include	"field.h"
@@ -129,10 +129,10 @@
 
 /* local variables */
 
-constexpr terminit	quotes("\"\'") ;
-constexpr terminit	doubles("\"$\\`") ;
-constexpr terminit	dterms("\r!#$%&,:;<=>") ;
-constexpr terminit	shterms(" #") ;
+constexpr fieldterminit		quotes("\"\'") ;
+constexpr fieldterminit		doubles("\"$\\`") ;
+constexpr fieldterminit		dterms("\r!#$%&,:;<=>") ;
+constexpr fieldterminit		shterms(" #") ;
 
 
 /* local inline-subroutines */
@@ -194,9 +194,8 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		fl = 0 ;
 	cchar		*fp = nullptr ;
 	if (fsbp && fpp) {
-	    strop	so ;
 	    if (terms == nullptr) terms = dterms.terms ;
-	    if ((rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
+	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
 		int		ch ;
 		int		chterm = '\0' ;
 		so.white() ;
@@ -241,7 +240,7 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 		*fpp = fsbp->fp ;
 		rs1 = so.finish ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (so) */
+	    } /* end if (strop) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
 }

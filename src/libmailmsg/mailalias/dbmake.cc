@@ -67,7 +67,7 @@
 #include	<linebuffer.h>
 #include	<bfile.h>
 #include	<field.h>
-#include	<terminit.hh>
+#include	<fieldterminit.hh>
 #include	<kvsfile.h>
 #include	<strtab.h>
 #include	<strn.h>
@@ -122,14 +122,14 @@ using std::nothrow ;			/* constant */
 
 /* local variables */
 
-static bufsizevar	maxnamelen(getbufsize_mn) ;
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar		maxnamelen(getbufsize_mn) ;
+static bufsizevar		maxpathlen(getbufsize_mp) ;
 
 /* all white space plus colon (':') */
-constexpr terminit	keys("\b\t\n\f\v :") ;
+constexpr fieldterminit		keys("\b\t\n\f\v :") ;
 
 /* all white space plus comma (',') */
-constexpr terminit	vals("\b\t\n\f\v ,") ;
+constexpr fieldterminit		vals("\b\t\n\f\v ,") ;
 
 
 /* exported variables */

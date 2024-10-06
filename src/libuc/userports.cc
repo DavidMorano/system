@@ -52,8 +52,8 @@
 #include	<mallocxx.h>
 #include	<pwcache.h>
 #include	<filemap.h>
-#include	<terminit.hh>
 #include	<field.h>
+#include	<fieldterminit.hh>
 #include	<getax.h>
 #include	<nulstr.h>
 #include	<strn.h>
@@ -202,9 +202,9 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-constexpr terminit		ft("\t #,") ;
+constexpr fieldterminit		ft("\t #,") ;
 
-static constexpr cpcchar	defprotos[] = {
+constexpr cpcchar		defprotos[] = {
 	"tcp",
 	"udp",
 	"ddp",

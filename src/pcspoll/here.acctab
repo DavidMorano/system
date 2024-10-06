@@ -21,6 +21,7 @@
 # 
 #
 
+#
 # Format of entries:
 #
 # netgroup:
@@ -33,5 +34,9 @@ a:
 
 b:
 	rcb
+
+test0:
+test1:	rca	nuucp goodluck
+test2:	rcb	nuucp goodluck
 
 

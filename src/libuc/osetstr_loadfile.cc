@@ -71,8 +71,8 @@
 #include	<mallocxx.h>
 #include	<linebuffer.h>
 #include	<filer.h>
-#include	<terminit.hh>
 #include	<field.h>
+#include	<fieldterminit.hh>
 #include	<sfx.h>
 #include	<localmisc.h>
 
@@ -116,7 +116,7 @@ static int	osetstr_loadline(osetstr *,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr terminit	ft("\n#") ;
+constexpr fieldterminit		ft("\n#") ;
 
 
 /* exported variables */

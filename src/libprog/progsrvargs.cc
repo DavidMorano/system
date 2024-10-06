@@ -16,11 +16,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	progsrvargs
+
+	Description:
 	This subroutine is used to parse the SERVER program arguments
 	from an expanded (substituted) server file entry.  Basically,
 	we just "field-SHELL" out arguments and put them into the
 	supplied vector-string object.
-
 
 *******************************************************************************/
 
@@ -30,9 +33,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<terminit.hh>
 #include	<field.h>
-#include	<fieldterms.h>
+#include	<fieldterminit.hh>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
@@ -53,7 +55,7 @@
 
 /* local structures */
 
-constexpr terminit	sa("\t ") ;
+constexpr fieldterminit	sa("\t ") ;
 
 
 /* exported variables */

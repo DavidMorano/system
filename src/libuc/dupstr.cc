@@ -54,7 +54,28 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -67,8 +88,7 @@ int dupstr_start(dupstr *op,cchar *sp,int sl,char **rpp) noex {
 	    op->as = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (sl > DUPSTR_SHORTLEN) {
-	        cint	ssize = (sl+1) ;
-	        if (char *bp{} ; (rs = uc_malloc(ssize,&bp)) >= 0) {
+	        if (char *bp{} ; (rs = uc_malloc((sl + 1),&bp)) >= 0) {
 	            cl = strwcpy(bp,sp,sl) - bp ;
 	            *rpp = bp ;
 	            op->as = bp ;

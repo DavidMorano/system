@@ -71,7 +71,6 @@
 #include	<bfile.h>
 #include	<opentmp.h>
 #include	<field.h>
-#include	<terminit.hh>
 #include	<kvsfile.h>
 #include	<strtab.h>
 #include	<intceil.h>
