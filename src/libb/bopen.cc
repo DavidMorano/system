@@ -24,6 +24,10 @@
 
 /*******************************************************************************
 
+	Object:
+	bfile
+
+	Description:
 	This code piece provides for the basic "open" and "close"
 	functions for the BFILE I-O library.
 
@@ -32,6 +36,7 @@
 
 	- bopen
 	- bopene
+	- bopenmod
 	- bclose
 
 *******************************************************************************/
@@ -53,6 +58,7 @@
 #include	<getfdfile.h>
 #include	<snx.h>
 #include	<cfdec.h>
+#include	<conallof.h>
 #include	<intsat.h>
 #include	<intceil.h>
 #include	<mkchar.h>
@@ -179,6 +185,25 @@ int bopen(bfile *op,cchar *fn,cchar *os,mode_t om) noex {
 	return bopene(op,fn,os,om,-1) ;
 }
 /* end subroutine (bopen) */
+
+int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
+	int		rs ;
+	int		rv = 0 ;
+	if ((rs = bopen(fp,fname,of,om)) >= 0) {
+	    rv = rs ;
+	    if (strchr(of,'M') == nullptr) { /* not already done! */
+	        if ((rs = conallof(of,-1,"wc")) > 0) {
+	            fp->of |= O_MINMODE ;
+	            rs = uc_fminmod(fp->fd,om) ;
+	        }
+	    }
+	    if (rs < 0) {
+	        bclose(fp) ;
+	    }
+	} /* end if (bopen) */
+	return (rs >= 0) ? rv : rs ;
+}
+/* end routine (bopenmod) */
 
 int bclose(bfile *op) noex {
 	int		rs ;

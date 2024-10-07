@@ -2390,28 +2390,17 @@ char	*argv[], *envv[] ;
 
 #if	CF_DEBUG
 	if ((pip->debuglevel > 1) && pip->f.acctab) {
-
 		ACCTAB_CUR	ac ;
-
 		ACCTAB_ENT	*ep ;
-
-
 		debugprintf("main: netgroup machine user password\n") ;
-
 		acctab_curbegin(&atab,&ac) ;
-
-		while (acctab_enum(&atab,&ac,&ep) >= 0) {
-
+		while (acctab_curenum(&atab,&ac,&ep) >= 0) {
 			if (ep == NULL) continue ;
-
 		debugprintf("main: %-20s %-20s %-8s %-8s\n",
 			ep->netgroup.std,ep->machine.std,
 			ep->username.std,ep->password.std) ;
-
 		}
-
 		acctab_curend(&atab,&ac) ;
-
 	}
 #endif /* CF_DEBUG */
 

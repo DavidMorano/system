@@ -2489,7 +2489,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 		ACCTAB_ENT	*ep ;
 		debugprintf("main: netgroup machine user password\n") ;
 		acctab_curbegin(&pip->atab,&ac) ;
-		while (acctab_enum(&pip->atab,&ac,&ep) >= 0) {
+		while (acctab_curenum(&pip->atab,&ac,&ep) >= 0) {
 			if (ep == NULL) continue ;
 		debugprintf("main: %-20s %-20s %-8s %-8s\n",
 			ep->netgroup.std,ep->machine.std,

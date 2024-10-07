@@ -13,8 +13,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/time.h>
-#include	<time.h>
+#include	<time.h>		/* |time_t| */
 #include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
 #include	<usys.h>		/* <- auxillary OS support */
 #include	<stdint.h>
@@ -23,7 +22,6 @@
 #include	<utypealiases.h>
 #include	<utimeout.h>
 #include	<ulogerror.h>
-#include	<usys.h>
 #include	<usysutility.hh>
 #include	<timecount.hh>
 #include	<filetype.h>

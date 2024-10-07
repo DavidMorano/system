@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	linebuffer
+
+	Description:
 	This object module (linebuffer) provides a dynamically sized
 	line-bufefer of the system-defined line-length.
 

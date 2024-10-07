@@ -1,12 +1,11 @@
-/* progacc */
+/* progacc SUPPORT */
+/* lang=C++20 */
 
 /* handle some service processing */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
-
 
 /* revision history:
 
@@ -22,21 +21,18 @@
 
 	Prepare to do some servicing.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<acctab.h>
@@ -280,7 +276,7 @@ int progaccopen(PROGINFO *pip)
 	    ACCTAB_ENT	*ep ;
 	    debugprintf("progaccopen: netgroup machine user password\n") ;
 	    acctab_curbegin(&pip->atab,&ac) ;
-	    while (acctab_enum(&pip->atab,&ac,&ep) >= 0) {
+	    while (acctab_curenum(&pip->atab,&ac,&ep) >= 0) {
 	        if (ep == NULL) continue ;
 	        debugprintf("progaccopen: %-20s %-20s\n",
 	            ep->netgroup.std,ep->machine.std) ;

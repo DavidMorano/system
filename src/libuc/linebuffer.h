@@ -22,6 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -66,7 +67,7 @@ struct linebuffer : linebuffer_head {
 	} ;
 } ; /* end struct (linebuffer) */
 #else /* __cplusplus */
-typedef LINEBUFFER		linebuffer ;
+typedef LINEBUFFER	linebuffer ;
 #endif /* __cplusplus */
 
 EXTERNC_begin

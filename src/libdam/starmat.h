@@ -1,7 +1,7 @@
 /* starmat HEADER */
 /* lang=C20 */
 
-/* wælk-directory-tree */
+/* see if a string matches a "starmat" ('*') expresssion */
 /* version %I% last-modified %G% */
 
 

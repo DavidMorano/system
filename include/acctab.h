@@ -43,16 +43,16 @@ struct acctab_cursor {
 
 struct acctab_head {
 	vecobj		*flp ;			/* file-list-pointer */
-	vecitem		aes_std ;		/* access entries */
-	vecitem		aes_rgx ;		/* access entries */
+	vecitem		*stdalp ;		/* access-list-entries */
+	vecitem		*rgxalp ;		/* access-list-entries */
 	time_t		checktime ;
 	uint		magic ;
 } ;
 
 struct acctab_part {
-	cchar		*std ;
-	cchar		*rgx ;
-	int		rgxlen ;
+	cchar		*patstd ;
+	cchar		*patrgx ;
+	int		patrgxlen ;
 	int		type ;
 } ;
 

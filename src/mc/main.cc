@@ -2681,28 +2681,17 @@ char	*argv[], *envv[] ;
 
 #if	CF_DEBUG
 	if ((pip->debuglevel > 1) && pip->f.acctab) {
-
 		ACCTAB_CUR	ac ;
-
 		ACCTAB_ENT	*ep ;
-
-
 		debugprintf("main: netgroup machine user password\n") ;
-
 		acctab_curbegin(&pip->atab,&ac) ;
-
-		while (acctab_enum(&pip->atab,&ac,&ep) >= 0) {
-
+		while (acctab_curenum(&pip->atab,&ac,&ep) >= 0) {
 			if (ep == NULL) continue ;
-
 		debugprintf("main: %-20s %-20s %-8s %-8s\n",
 			ep->netgroup.std,ep->machine.std,
 			ep->username.std,ep->password.std) ;
-
 		}
-
 		acctab_curend(&pip->atab,&ac) ;
-
 	}
 #endif /* CF_DEBUG */
 
@@ -2713,30 +2702,21 @@ char	*argv[], *envv[] ;
 
 	rs = SR_NOEXIST ;
 	if (pathfname[0] == '\0') {
-
 	    strcpy(pathfname,PATHFNAME) ;
-
 	    sl = permsched(sched2,&svars,
 	        tmpfname,MAXPATHLEN, pathfname,R_OK) ;
-
 	    if (sl > 0)
 	        strcpy(pathfname,tmpfname) ;
-
 #if	CF_DEBUG
 	    if (pip->debuglevel >= 3)
 	        debugprintf("main: 0 pathfname=%s\n",pathfname) ;
 #endif
-
 	    rs = sl ;
-
 	} else {
-
 	        path_type = GETFNAME_TYPEROOT ;
 	    sl = getfname(pip->pr,pathfname,path_type,tmpfname) ;
-
 	    if (sl > 0)
 	        strwcpy(pathfname,tmpfname,sl) ;
-
 	} /* end if */
 
 #if	CF_DEBUG

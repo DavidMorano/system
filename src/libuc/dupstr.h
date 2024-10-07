@@ -22,19 +22,53 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
-#define	DUPSTR		struct dupstr
+#define	DUPSTR		struct dupstr_head
 #define	DUPSTR_SHORTLEN	32
 
 
-struct dupstr {
+struct dupstr_head {
 	char		*as ;	/* allocated string */
 	char		buf[DUPSTR_SHORTLEN+1] ;
 } ;
 
+#ifdef	__cplusplus
+enum dupstrmems {
+	dupstrmem_finish,
+	dupstrmem_overlast
+} ;
+struct dupstr ;
+struct dupstr_co {
+	dupstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (dupstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (dupstr_co) */
+struct dupstr : dupstr_head {
+	dupstr_co	finish ;
+	dupstr() noex {
+	    finish(this,dupstrmem_finish) ;
+	} ;
+	dupstr(const dupstr &) = delete ;
+	dupstr &operator = (const dupstr &) = delete ;
+	int start(cchar *,int,char **) noex ;
+	void dtor() noex ;
+	~dupstr() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (dupstr) */
+#else	/* __cplusplus */
 typedef DUPSTR		dupstr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

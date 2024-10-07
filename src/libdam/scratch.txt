@@ -5,12 +5,11 @@ TODO
 file		what
 --------------------------------------------------------------------------------
 uctim
-libuc		fix to completely compile!
-acctab
-srv{x}
-memfile		can we just trash this?
-libpcs		a lot of junk in there
-convertx	part of the |ctx| group
+This is the time for all bad people to die.
+And again. What about this? Other.
+Again the word.
+and		a lot of junk in there
+find		part of the |ctx| group
 msfilee
 msfile
 openqotd
