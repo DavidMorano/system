@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -846,6 +845,7 @@ bufstr.o:		bufstr.cc bufstr.h
 setint.o:		setint.cc setint.h
 osetint.o:		osetint.cc osetint.h
 osetstr.o:		osetstr.cc osetstr.h
+osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 
 
 # sring-comparisons

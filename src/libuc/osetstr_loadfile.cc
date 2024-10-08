@@ -70,11 +70,12 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<linebuffer.h>
+#include	<intsat.h>
 #include	<filer.h>
 #include	<field.h>
 #include	<fieldterminit.hh>
 #include	<sfx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |BCEIL(3dam)| */
 
 #include	"osetstr.h"
 
@@ -169,7 +170,7 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 		int		fbsz = 1024 ;
 		int		fbo = 0 ;
 	        if (S_ISREG(sb.st_mode)) {
-	            int	fs = ((sb.st_size == 0) ? 1 : (sb.st_size & INT_MAX)) ;
+	            int	fs = ((sb.st_size == 0) ? 1 : intsat(sb.st_size)) ;
 	            int	cs ;
 	            cs = BCEIL(fs,512) ;
 	            fbsz = min(cs,1024) ;
@@ -205,14 +206,13 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 /* end subroutine (osetstr_loadfd) */
 
 static int osetstr_loadline(osetstr *vsp,int fu,cchar *lbuf,int len) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lbuf,len)) >= 0) {
 	    int		fl ;
 	    cchar	*fp ;
-	    while ((fl = field_get(&fsb,ft.terms,&fp)) >= 0) {
+	    while ((fl = fsb.get(ft.terms,&fp)) >= 0) {
 		if (fl > 0) {
 		    if (fu) {
 			rs = osetstr_del(vsp,fp,fl) ;
@@ -225,7 +225,7 @@ static int osetstr_loadline(osetstr *vsp,int fu,cchar *lbuf,int len) noex {
 		if (fsb.term == '#') break ;
 		if (rs < 0) break ;
 	    } /* end while (fields) */
-	    rs1 = field_finish(&fsb) ;
+	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;

@@ -22,6 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -51,9 +52,11 @@ extern int osetstr_del(osetstr *,cchar *,int) noex ;
 extern int osetstr_delall(osetstr *) noex ;
 extern int osetstr_count(osetstr *) noex ;
 extern int osetstr_curbegin(osetstr *,osetstr_cur *) noex ;
-extern int osetstr_enum(osetstr *,osetstr_cur *,cchar **) noex ;
+extern int osetstr_curenum(osetstr *,osetstr_cur *,cchar **) noex ;
 extern int osetstr_curend(osetstr *,osetstr_cur *) noex ;
 extern int osetstr_finish(osetstr *) noex ;
+
+extern int osetstr_loadfile(osetstr *,int,cchar *) noex ;
 
 EXTERNC_end
 

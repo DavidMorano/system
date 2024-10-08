@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LINEINDEX_INCLUDE
 #define	LINEINDEX_INCLUDE
@@ -90,7 +90,7 @@ extern int lineindex_open(lineindex *,cchar *,int,mode_t,cchar *) noex ;
 extern int lineindex_lookup(lineindex *,uint,off_t *) noex ;
 extern int lineindex_curbegin(lineindex *,lineindex_cur *) noex ;
 extern int lineindex_curend(lineindex *,lineindex_cur *) noex ;
-extern int lineindex_enum(lineindex *,lineindex_cur *,off_t *) noex ;
+extern int lineindex_curenum(lineindex *,lineindex_cur *,off_t *) noex ;
 extern int lineindex_check(lineindex *,time_t) noex ;
 extern int lineindex_count(lineindex *) noex ;
 extern int lineindex_close(lineindex *) noex ;

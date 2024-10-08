@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	logzones
+
+	Description:
 	This subroutine maintains a LOGZONES file.  This file is
 	used to maintain the names and offsets for time-zone names.
 
@@ -132,8 +136,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -194,11 +200,12 @@ constexpr bool		f_creat = CF_CREAT ;
 /* exported subroutines */
 
 int logzones_open(LZ *op,cchar *fname,int of,mode_t om) noex {
+    	LOGZONES	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && fname) {
 	    rs = SR_INVALID ;
+	    memclear(hop) ;
 	    if (fname[0]) {
-		memclear(op) ;
 	        op->fd = -1 ;
 	        if_constexpr (f_creat) {
 	            of |= O_CREAT ;

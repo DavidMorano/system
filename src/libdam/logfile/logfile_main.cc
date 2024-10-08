@@ -19,7 +19,7 @@
 
 /*******************************************************************************
 
-	This is a module to operate on a logfile. The subroutines
+	This is a module to operate on a logfile.  The subroutines
 	in this module are:
 
 		logfile_open
@@ -35,7 +35,7 @@
 	should NOT be necessary (since a terminated process releases
 	all file locks that it may have), it is a good precaution
 	against some stupid implementations of the NFS helper lock
-	manager daemon. We want to guard against a program terminating
+	manager daemon.  We want to guard against a program terminating
 	abruptly while its lock is retained (for a time) back at
 	the server.
 
@@ -154,7 +154,7 @@ static bool	isourbad(int) noex ;
 
 /* local variables */
 
-static constexpr int	sigblockers[] = {
+constexpr int		sigblockers[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -188,12 +188,11 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	        op->operm = (operm & S_IAMB) ;
 	        op->lfd = -1 ;
 	        if ((rs = uc_mallocstrw(lfname,-1,&cp)) >= 0) {
-	            void	*p{} ;
 	            op->fname = cp ;
 	            op->bufsize = LOGFILE_BUFSIZE ;
 	            op->len = 0 ;
-	            if ((rs = uc_malloc(op->bufsize,&p)) >= 0) {
-	                op->buf = charp(p) ;
+	            if (void *vp{} ; (rs = uc_malloc(op->bufsize,&vp)) >= 0) {
+	                op->buf = charp(vp) ;
 	                if ((rs = logfile_fileopen(op)) >= 0) {
 		            if_constexpr (f_chmod) {
 	                        if (op->operm) {

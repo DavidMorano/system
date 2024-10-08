@@ -371,6 +371,7 @@ so:			$(T).so
 
 a:			$(T).a
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -793,6 +794,11 @@ srv.dir:
 # GETHE
 gethe.o:		gethe.dir
 gethe.dir:
+	makesubdir $@
+
+# STRLISTX
+strlistx.o:		strlistx.dir
+strlistx.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

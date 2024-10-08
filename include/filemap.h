@@ -1,7 +1,7 @@
 /* filemap HEADER */
 /* lang=C20 */
 
-/* support low-overhead file bufferring operations */
+/* read-file funtion through file-mapping */
 /* version %I% last-modified %G% */
 
 
@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	filemap
+
+	Description:
         This little object supports some buffered file operations for
         low-overhead buffered I-O operations (read-only).
 
@@ -28,7 +32,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |off_t| */
 #include	<usystem.h>		/* for |USTAT| */
-#include	<localmisc.h>
 
 
 #define	FILEMAP		struct filemap_head
@@ -42,7 +45,61 @@ struct filemap_head {
 	size_t		maxsize ;
 } ;
 
-typedef	FILEMAP		filemap ;
+#ifdef	__cplusplus
+enum filemapmems {
+	filemapmem_rewind,
+	filemapmem_close,
+	filemapmem_overlast
+} ;
+struct filemap ;
+struct filemap_co {
+	filemap		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (filemap *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (filemap_co) */
+struct filemap_teller {
+	filemap		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (filemap *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (off_t * = nullptr) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (filemap_teller) */
+struct filemap : filemap_head {
+	filemap_co	rewind ;
+	filemap_co	close ;
+	filemap_teller	tell ;
+	filemap() noex {
+	    rewind(this,filemapmem_rewind) ;
+	    close(this,filemapmem_close) ;
+	    tell(this,0) ;
+	} ;
+	filemap(const filemap &) = delete ;
+	filemap &operator = (const filemap &) = delete ;
+	int open(cchar *,size_t = 0uz) noex ;
+	int stat(USTAT *) noex ;
+	int read(int,void *) noex ;
+	int getln(cchar **) noex ;
+	int seek(off_t,int = 0) noex ;
+	void dtor() noex ;
+	~filemap() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (filemap) */
+#else	/* __cplusplus */
+typedef FILEMAP		filemap ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
