@@ -1,4 +1,4 @@
-/* fileisprint HEADER (file-is-printable) */
+/* fileprintable HEADER (file-is-printable) */
 /* lang=C20 */
 
 /* is the given file totally printable? */
@@ -7,8 +7,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	FILEISPRINT_INCLUDE
-#define	FILEISPRINT_INCLUDE
+#ifndef	FILEPRINTABLE_INCLUDE
+#define	FILEPRINTABLE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -21,11 +21,11 @@
 
 EXTERNC_begin
 
-extern int	fileisprint(cchar *) noex ;
+extern int	fileprintable(cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* FILEISPRINT_INCLUDE */
+#endif /* FILEPRINTABLE_INCLUDE */
 
 

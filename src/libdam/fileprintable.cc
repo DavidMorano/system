@@ -1,4 +1,4 @@
-/* fileisprint SUPPORT */
+/* fileprintable SUPPORT */
 /* lang=C++20 */
 
 /* is the specified file totally printable? */
@@ -7,7 +7,7 @@
 
 /* revision history:
 
-	= 1998-07-01, David AÂ­DÂ­ Morano
+	= 1998-07-01, David A­D­ Morano
 	This code was originally written.
 
 
@@ -18,13 +18,13 @@
 /*******************************************************************************
 
   	Name:
-	fileisprint
+	fileprintable
 
 	Description:
 	This subroutine checks if the specified file is totally printable.
 
 	Synopsis:
-	int fileisprint(cchar *fname) noex
+	int fileprintable(cchar *fname) noex
 
 	Arguments:
 	fname		file to check
@@ -48,7 +48,7 @@
 #include	<hasx.h>
 #include	<localmisc.h>
 
-#include	"fileisprint.h"
+#include	"fileprintable.h"
 
 
 /* local defines */
@@ -74,7 +74,7 @@
 
 /* exported subroutines */
 
-int fileisprint(cchar *fname) noex {
+int fileprintable(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
@@ -107,6 +107,6 @@ int fileisprint(cchar *fname) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? int(!f) : rs ;
 }
-/* end subroutine (fileisprint) */
+/* end subroutine (fileprintable) */
 
 

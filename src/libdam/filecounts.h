@@ -79,8 +79,8 @@ EXTERNC_begin
 extern int filecounts_open(filecounts *,cchar *,int,mode_t) noex ;
 extern int filecounts_process(filecounts *,filecounts_n *) noex ;
 extern int filecounts_curbegin(filecounts *,filecounts_cur *) noex ;
-extern int filecounts_snap(filecounts *,filecounts_cur *) noex ;
-extern int filecounts_read(filecounts *,filecounts_cur *,
+extern int filecounts_cursnap(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_curread(filecounts *,filecounts_cur *,
 		FILECOUNTS_INFO *,char *,int) noex ;
 extern int filecounts_curend(filecounts *,filecounts_cur *) noex ;
 extern int filecounts_close(filecounts *) noex ;

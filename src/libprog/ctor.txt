@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int lineindex_ctor(lineindex *op,Args ... args) noex {
+static int filecounts_ctor(filecounts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int lineindex_ctor(lineindex *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (lineindex_ctor) */
+/* end subroutine (filecounts_ctor) */
 
-static int lineindex_dtor(lineindex *op) noex {
+static int filecounts_dtor(filecounts *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (lineindex_dtor) */
+/* end subroutine (filecounts_dtor) */
 
 template<typename ... Args>
-static inline int lineindex_magic(lineindex *op,Args ... args) noex {
+static inline int filecounts_magic(filecounts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LINEINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FILECOUNTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (lineindex_magic) */
+/* end subroutine (filecounts_magic) */
