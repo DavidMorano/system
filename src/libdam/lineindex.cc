@@ -42,6 +42,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<sysval.hh>
+#include	<getbufsize.h>
 #include	<mallocstuff.h>
 #include	<bfile.h>
 #include	<filemap.h>
@@ -62,10 +64,6 @@
 #define	TO_CHECK	4
 #define	TO_ACCESS	(1 * 60)
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 #define	NRECS		(2 * 1024)
 
 
@@ -84,9 +82,10 @@ typedef mode_t		om_t ;		/* open-mode */
 
 template<typename ... Args>
 static int lineindex_ctor(lineindex *op,Args ... args) noex {
+    	LINEINDEX	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -111,10 +110,13 @@ static inline int lineindex_magic(lineindex *op,Args ... args) noex {
 }
 /* end subroutine (lineindex_magic) */
 
+static int	lineindex_stbegin(LI *,cc *,cc *) noex ;
+static int	lineindex_stend(LI *) noex ;
+
 static int	lineindex_mkindex(lineindex *) noex ;
 static int	lineindex_fileheader(lineindex *) noex ;
-static int	lineindex_filemap(lineindex *,time_t) noex ;
-static int	lineindex_fileunmap(lineindex *) noex ;
+static int	lineindex_filembegin(lineindex *,time_t) noex ;
+static int	lineindex_filemend(lineindex *) noex ;
 
 static int	lineindex_fileopen(lineindex *,time_t) noex ;
 static int	lineindex_fileclose(lineindex *) noex ;
@@ -129,6 +131,8 @@ enum headers {
 	header_overlast
 } ;
 
+static sysval		pagesize(sysval_ps) ;
+
 
 /* exported variables */
 
@@ -137,63 +141,40 @@ enum headers {
 
 int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 	int		rs ;
-	if ((rs = lineindex_ctor(op,ifn
-	USTAT		sb ;
-
-	time_t	dt = time(nullptr) ;
-
-	int	amode ;
-	int	sz ;
-
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (ifn == nullptr)
-	    return SR_FAULT ;
-
-	if (ifn[0] == '\0')
-	    return SR_INVALID ;
-
-	memclear(op) ;
-
-	op->pagesize = getpagesize() ;
-	op->fd = -1 ;
-	op->of = of ;
-	op->om = om ;
-
-	amode = (of & O_ACCMODE) ;
-	op->f.wantwrite = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
-
-/* store filename away */
-
-	op->ifn = mallocstr(ifn) ;
-
-	if (op->ifn == nullptr) {
-	    rs = SR_NOMEM ;
-	    goto bad0 ;
-	}
-
-	if ((tfn != nullptr) && (tfn[0] != '\0')) {
-	    if ((op->tfn = mallocstr(tfn)) == nullptr) {
-	        rs = SR_NOMEM ;
-	        goto bad1 ;
+	if ((rs = lineindex_ctor(op,ifn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (ifn[0]) {
+	        op->fd = -1 ;
+	        op->of = of ;
+	        op->om = om ;
+		if ((rs = pagesize) >= 0) {
+		    cint	am = (of & O_ACCMODE) ;
+		    op->pagesize = rs ;
+		    op->f.wantwrite = ((am == O_WRONLY) || (am == O_RDWR)) ;
+		    if ((rs = lineindex_stbegin(op,ifn,tfn)) >= 0) {
+		    	{
+		    	    rs = lineindex_opener(op) ;
+			}
+			if (rs < 0) {
+			    lineindex_stend(op) ;
+			}
+		    } /* end if (store-files) */
+		} /* end if (pagesize) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		lineindex_dtor(op) ;
 	    }
+	} /* end if (lineindex_ctor) */
+	return rs ;
+}
+/* end subroutine (lineindex_opne) */
 
-	}
-
-/* try to open the file */
-
-	rs = lineindex_fileopen(op,dt) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-/* wait for the file to come in if it is not yet available */
-
-	sz = 16 + 4 + (header_overlast * sizeof(int)) ;
-
-	rs = u_fstat(op->fd,&sb) ;
-
+static int lineindex_opener(LI *op) noex {
+	custime		dt = getustime ;
+	int		rs ;
+	if ((rs = lineindex_fileopen(op,dt)) >= 0) {
+	    cint	sz = 16 + 4 + (header_overlast * sizeof(int)) ;
+	    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	size_t	fsz = size_t(sb.st_size) ;
 	csize	hsz = size_t(sz) ;
 	int	to = TO_FILECOME ;
@@ -286,6 +267,14 @@ int lineindex_close(LI *op) noex {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	    }
+	    {
+		rs1 = lineindex_stend(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = lineindex_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -338,7 +327,7 @@ int lineindex_curenum(LI *op,lineindex_cur *curp,off_t *rop) noex {
 		ri = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	        if (op->mapbuf) {
 	            custime	dt = getustime ;
-	            if ((rs = lineindex_filemap(op,dt)) >= 0) {
+	            if ((rs = lineindex_filembegin(op,dt)) >= 0) {
 	                rs = lineindex_fileheader(op) ;
         	    }
 	        } /* end if (checking if file is mapped) */
@@ -363,7 +352,7 @@ int lineindex_lookup(LI *op,uint ri,off_t *rop) noex {
 	    if (ri < op->lines) {
 	        if (op->mapbuf) {
 	            csutime	dt = getustime ;
-	            if ((rs = lineindex_filemap(op,dt)) > 0) {
+	            if ((rs = lineindex_filembegin(op,dt)) > 0) {
 	                rs = lineindex_fileheader(op) ;
 	            }
 	        } /* end if (checking if file is mapped) */
@@ -440,7 +429,7 @@ changed:
 
 closeit:
 	op->ti_check = dt ;
-	rs = lineindex_fileunmap(op) ;
+	rs = lineindex_filemend(op) ;
 
 	goto ret0 ;
 }
@@ -448,6 +437,44 @@ closeit:
 
 
 /* private subroutines */
+
+static int lineindex_stbegin(LI *op,cc *ifn,cc *tfn) noex {
+    	int		rs ;
+	if (char *cp ; (rs = uc_mallocstrw(ifn,-1,&cp)) >= 0) {
+	    op->ifn = cp ;
+	    if (tfn) {
+	        rs = SR_INVALID ;
+		if (tfn[0]) {
+		    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	    		op->tfn = cp ;
+		    } /* end if (memory-alloation) */
+		}
+	    } /* end if (non-null) */
+	    if (rs < 0) {
+		uc_free(op->ifn) ;
+		op->ifn = nullptr ;
+	    }
+	} /* end if (memory-allocation) */
+	return rs ;
+}
+/* end subroutine (lineindex_stbegin) */
+
+static int lineindex_stend(LI *op) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->tfn) {
+	    rs1 = uc_free(op->tfn) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->tfn = nullptr ;
+	}
+	if (op->ifn) {
+	    rs1 = uc_free(op->ifn) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->ifn = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (lineindex_stend) */
 
 static int lineindex_fileheader(LI *op) noex {
 	uint		*table ;
@@ -510,7 +537,7 @@ bad3:
 }
 /* end subroutine (lineindex_fileheader) */
 
-static int lineindex_filemap(LI *op,custime dt) noex {
+static int lineindex_filembegin(LI *op,custime dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapbuf) {
@@ -532,9 +559,9 @@ static int lineindex_filemap(LI *op,custime dt) noex {
 	} /* end if (mapping file) */
 	return rs ;
 }
-/* end subroutine (lineindex_filemap) */
+/* end subroutine (lineindex_filembegin) */
 
-static int lineindex_fileunmap(LI *op) noex {
+static int lineindex_filemend(LI *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapbuf) {
@@ -547,7 +574,7 @@ static int lineindex_fileunmap(LI *op) noex {
 	} /* end if (checking existing map) */
 	return rs ;
 }
-/* end subroutine (lineindex_fileunmap) */
+/* end subroutine (lineindex_filemend) */
 
 static int lineindex_fileopen(LI *op,custime dt) noex {
 	USTAT		sb ;

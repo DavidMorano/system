@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	sysval
+
+	Description:
 	Recommended usage within source code:
 		#include	<sysval.hh>
 		sysval	pagesize(sysval_ps) ;

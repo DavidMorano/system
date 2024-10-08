@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} hdb_curdel "
+NAMES="${NAMES} mkpath2"
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/hdb_curdel/s//hdb_delcur/g
+g/mkpath2/s//mkpath/g
 	w
 	q
 EOF

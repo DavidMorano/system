@@ -418,29 +418,31 @@ static int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 	        op->oflags = (of &= (~ O_TRUNC)) ;
 	        op->operms = om ;
 	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
-	            USTAT	sb ;
 	            cint	am = (of & O_ACCMODE) ;
 		    if ((am == O_WRONLY) || (am == O_RDWR)) {
 	                op->f.writable = true ;
 		    }
 	            op->opentime = dt ;
 	            op->accesstime = dt ;
-	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	                cint	ne = LOGZONES_NENTS ;
-	                cint	entlen = LZ_ENTLEN ;
-	                op->mtime = sb.st_mtime ;
-	                op->filesize = sb.st_size ;
-	                if ((rs = isfsremote(op->fd)) >= 0) {
-	                    cint	sz = (ne * entlen) ;
-	                    char	*bp ;
-	                    op->f.remote = (rs > 0) ;
-	                    if ((rs = uc_malloc(sz,&bp)) >= 0) {
-	                        op->bufsize = sz ;
-	                        op->buf = bp ;
-	                        op->magic = LOGZONES_MAGIC ;
-	                    }
-	                } /* end if (isfsremote) */
-	            } /* end if (stat) */
+	            if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+			rs = SR_TOOBIG ;
+			if (sb.st_size <= INT_MAX) {
+	                    cint	ne = LOGZONES_NENTS ;
+	                    cint	entlen = LZ_ENTLEN ;
+	                    op->mtime = sb.st_mtime ;
+	                    op->filesize = sb.st_size ;
+	                    if ((rs = isfsremote(op->fd)) >= 0) {
+	                        cint	sz = (ne * entlen) ;
+	                        char	*bp{} ;
+	                        op->f.remote = (rs > 0) ;
+	                        if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	                            op->bufsize = sz ;
+	                            op->buf = bp ;
+	                            op->magic = LOGZONES_MAGIC ;
+	                        }
+	                    } /* end if (isfsremote) */
+			} /* end if (filesize) */
+	            } /* end if (uc_fstat) */
 	        } /* end if (uc_closeonexec) */
 	        if (rs < 0) {
 	            uc_free(op->fname) ;
