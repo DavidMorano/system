@@ -12,7 +12,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -76,14 +76,14 @@ extern	FILECOUNTS_FL		filecounts_fl ;
 
 EXTERNC_begin
 
-extern int filecounts_open(FILECOUNTS *,cchar *,int,mode_t) noex ;
-extern int filecounts_process(FILECOUNTS *,FILECOUNTS_N *) noex ;
-extern int filecounts_curbegin(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
-extern int filecounts_snap(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
-extern int filecounts_read(FILECOUNTS *,FILECOUNTS_CUR *,
+extern int filecounts_open(filecounts *,cchar *,int,mode_t) noex ;
+extern int filecounts_process(filecounts *,filecounts_n *) noex ;
+extern int filecounts_curbegin(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_snap(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_read(filecounts *,filecounts_cur *,
 		FILECOUNTS_INFO *,char *,int) noex ;
-extern int filecounts_curend(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
-extern int filecounts_close(FILECOUNTS *) noex ;
+extern int filecounts_curend(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_close(filecounts *) noex ;
 
 EXTERNC_end
 

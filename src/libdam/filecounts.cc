@@ -56,8 +56,13 @@
 #include	<vecobj.h>
 #include	<storebuf.h>
 #include	<dater.h>
+#include	<snx.h>
+#include	<cfdec.h>
+#include	<nleadstr.h>
+#include	<timestr.h>
+#include	<satarith.h>
 #include	<char.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| + |TIMEBUFLEN| */
 
 #include	"filecounts.h"
 
@@ -72,10 +77,6 @@
 
 #define	DEFNENTRIES	10
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40
-#endif
-
 #define	TO_LOCK		4		/* seconds */
 
 #ifndef	LINEBUFLEN
@@ -89,36 +90,10 @@
 #define	UPDATEBUFLEN	(FILECOUNTS_NUMDIGITS + 1 + \
 	            FILECOUNTS_LOGZLEN + 1 + MAXNAMELEN + 1)
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
-extern uint	uaddsat(uint,uint) ;
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	iaddsat(int,int) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -246,20 +221,7 @@ int filecounts_process(FILECOUNTS *op,FILECOUNTS_N *nlp)
 
 	if (op->magic != FILECOUNTS_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    debugprintf("filecounts_process: ent\n") ;
-	    for (i = 0 ; nlp[i].name != NULL ; i += 1)
-	        debugprintf("filecounts_process: n=%s\n",nlp[i].name) ;
-	}
-#endif /* CF_DEBUGS */
-
 	rs = filecounts_proclist(op,nlp) ;
-
-#if	CF_DEBUGS
-	debugprintf("filecounts_process: _proclist() rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -332,7 +294,7 @@ int filecounts_snap(FILECOUNTS *op,FILECOUNTS_CUR *curp)
 	cint	to = TO_LOCK ;
 	int		rs ;
 	int		n = DEFNENTRIES ;
-	int		opts = 0 ;
+	int		vo = 0 ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -343,7 +305,7 @@ int filecounts_snap(FILECOUNTS *op,FILECOUNTS_CUR *curp)
 	if (op->ncursors == 0)
 	    return SR_BADSLOT ;
 
-	if ((rs = vecobj_start(&tlist,iisize,n,opts)) >= 0) {
+	if ((rs = vecobj_start(&tlist,iisize,n,vo)) >= 0) {
 
 	    if ((rs = lockfile(op->fd,F_RLOCK,0L,0L,to)) >= 0) {
 
@@ -356,21 +318,7 @@ int filecounts_snap(FILECOUNTS *op,FILECOUNTS_CUR *curp)
 	        int	size ;
 	        char	*p ;
 
-#if	CF_DEBUGS
-	        {
-	            FILECOUNTS_II	*ep ;
-	            int	i ;
-	            for (i = 0 ; vecobj_get(&tlist,i,&ep) >= 0 ; i += 1)
-	                debugprintf("filecounts_snap: i=%u n=%s\n",
-	                    i,ep->name) ;
-	        }
-#endif
-
 	        n = vecobj_count(&tlist) ;
-
-#if	CF_DEBUGS
-	        debugprintf("filecounts_snap: n=%d \n",n) ;
-#endif
 
 	        size = ((n + 1) * iisize) ;
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
@@ -393,10 +341,6 @@ int filecounts_snap(FILECOUNTS *op,FILECOUNTS_CUR *curp)
 
 	    vecobj_finish(&tlist) ;
 	} /* end if (tlist) */
-
-#if	CF_DEBUGS
-	debugprintf("filecounts_snap: ret rs=%d n=%d\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -423,10 +367,6 @@ int filecounts_read(FILECOUNTS *op,FILECOUNTS_CUR *curp,FILECOUNTS_INFO *fcip,
 	ei = (curp->i >= 0) ? curp->i : 0 ;
 	if (ei < curp->nlist) {
 
-#if	CF_DEBUGS
-	    debugprintf("filecounts_read: ei=%u\n",ei) ;
-#endif
-
 	    fcip->utime = curp->list[ei].utime ;
 	    fcip->value = curp->list[ei].value ;
 	    np = curp->list[ei].name ;
@@ -443,10 +383,6 @@ int filecounts_read(FILECOUNTS *op,FILECOUNTS_CUR *curp,FILECOUNTS_INFO *fcip,
 	} else
 	    rs = SR_NOTFOUND ;
 
-#if	CF_DEBUGS
-	debugprintf("filecounts_read: ret rs=%d nl=%u\n",rs,nl) ;
-#endif
-
 	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (filecounts_read) */
@@ -460,12 +396,12 @@ static int filecounts_proclist(FILECOUNTS *op,FILECOUNTS_N *nlp)
 	WORKER		work ;
 	int		rs ;
 	int		rs1 ;
-	int		opts = 0 ;
+	int		vo = 0 ;
 
 	if ((rs = worker_start(&work,nlp)) >= 0) {
 	    if ((rs = filecounts_lockbegin(op)) >= 0) {
 	        FILER	fb ;
-	        if ((rs = filer_start(&fb,op->fd,0L,0,opts)) >= 0) {
+	        if ((rs = filer_start(&fb,op->fd,0L,0,vo)) >= 0) {
 	            if ((rs = filecounts_scan(op,&work,&fb)) >= 0) {
 	                if (! op->f.rdonly) {
 	                    rs = filecounts_update(op,&work) ;
@@ -502,24 +438,14 @@ static int filecounts_scan(FILECOUNTS *op,WORKER *wp,FILER *fbp)
 	while ((rs = filer_readln(fbp,lbuf,llen,to)) > 0) {
 	    len = rs ;
 
-#if	CF_DEBUGS
-	    debugprintf("filecounts_scan: l=>%t<\n",
-	        lbuf,strlinelen(lbuf,len,40)) ;
-#endif
 	    if ((rs = filecounts_procline(op,wp,foff,lbuf,len)) >= 0) {
 	        foff += len ;
 	        rn = worker_remaining(wp) ;
 	    }
-#if	CF_DEBUGS
-	    debugprintf("filecounts_scan: rn=%d\n",rn) ;
-#endif
 	    if (rn <= 0) break ;
 	    if (rs < 0) break ;
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("filecounts_scan: ret rs=%d rn=%d\n",rs,rn) ;
-#endif
 	return rs ;
 }
 /* end subroutine (filecounts_scan) */
@@ -632,7 +558,7 @@ static int filecounts_updateone(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 	switch (na) {
 	case WORKER_CMDINC:
 	    if (ni >= 0) {
-	        nv = uaddsat(wep->ovalue,wep->avalue) ;
+	        nv = uiaddsat(wep->ovalue,wep->avalue) ;
 	    } else {
 	        nv = (wep->ovalue + 1) ;
 	    }
@@ -652,19 +578,10 @@ static int filecounts_updateone(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 	wlen = rs ;
 #endif /* COMMENT */
 
-#if	CF_DEBUGS
-	debugprintf("filecounts_updateone: mkentry() rs=%d\n",rs) ;
-	debugprintf("filecounts_updateone: uoff=%ld\n",wep->eoff) ;
-#endif
-
 	if (rs >= 0) {
 	    off_t	uoff = wep->eoff ;
 	    rs = u_pwrite(op->fd,ubuf,wlen,uoff) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("filecounts_updateone: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -682,14 +599,6 @@ static int filecounts_append(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 	int		rs ;
 	int		wlen = 0 ;
 	char		ubuf[UPDATEBUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    debugprintf("filecounts_append: ent na=%u\n",na) ;
-	    debugprintf("filecounts_append: n=%s\n",wep->name) ;
-	}
-#endif
 
 	nv = 0 ;
 	switch (na) {
@@ -715,10 +624,6 @@ static int filecounts_append(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 	        wep->eoff = eoff ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("filecounts_append: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -756,8 +661,8 @@ static int filecounts_snaper(FILECOUNTS *op,VECOBJ *ilp)
 
 	if ((rs = dater_start(&dm,NULL,NULL,0)) >= 0) {
 	    FILER	fb ;
-	    cint	opts = 0 ;
-	    if ((rs = filer_start(&fb,op->fd,0L,0,opts)) >= 0) {
+	    cint	vo = 0 ;
+	    if ((rs = filer_start(&fb,op->fd,0L,0,vo)) >= 0) {
 	        cint	to = -1 ;
 	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
@@ -820,10 +725,6 @@ int		llen ;
 	cp = sp ;
 	cl = sl ;
 
-#if	CF_DEBUGS
-	debugprintf("filecounts_snaperline: cn=%t\n",cp,cl) ;
-#endif
-
 	            if ((rs = uc_mallocstrw(cp,cl,&np)) >= 0) {
 	                FILECOUNTS_II	ii ;
 	                ii.name = np ;
@@ -838,10 +739,6 @@ int		llen ;
 	} /* end if (cfdecui) */
 
 	} /* end if (zero or positive) */
-
-#if	CF_DEBUGS
-	debugprintf("filecounts_snaperline: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -858,29 +755,22 @@ static int filecounts_lockbegin(FILECOUNTS *op)
 }
 /* end subroutine (filecounts_lockbegin) */
 
-
-static int filecounts_lockend(FILECOUNTS *op)
-{
-	cint	cmd = F_ULOCK ;
-	int		rs ;
-	rs = lockfile(op->fd,cmd,0L,0L,0) ;
-	return rs ;
+static int filecounts_lockend(FILECOUNTS *op) noex {
+	cint		cmd = F_ULOCK ;
+	return lockfile(op->fd,cmd,0L,0L,0) ;
 }
 /* end subroutine (filecounts_lockend) */
 
-
-static int worker_start(WORKER *wp,FILECOUNTS_N *nlp)
-{
-	cint	wesize = sizeof(WORKER_ENT) ;
-	cint	n = DEFNENTRIES ;
+static int worker_start(WORKER *wp,FILECOUNTS_N *nlp) noex 
+	cint		wesize = sizeof(WORKER_ENT) ;
+	cint		n = DEFNENTRIES ;
 	int		rs ;
-	int		opts ;
+	int		vo = VECOBJ_OCOMPACT ;
 
-	memset(wp,0,sizeof(WORKER)) ;
+	memset(wp) ;
 	wp->nlp = nlp ;
 
-	opts = VECOBJ_OCOMPACT ;
-	if ((rs = vecobj_start(&wp->list,wesize,n,opts)) >= 0) {
+	if ((rs = vecobj_start(&wp->list,wesize,n,vo)) >= 0) {
 	    WORKER_ENT	we ;
 	    int		i ;
 	    int		na ;
@@ -906,9 +796,6 @@ static int worker_start(WORKER *wp,FILECOUNTS_N *nlp)
 	        if (rs < 0) break ;
 	    } /* end for */
 	    if (rs >= 0) {
-#if	CF_DEBUGS
-	        debugprintf("worker_start: vadding=%u\n",vadding) ;
-#endif
 	        memset(&we,0,wesize) ;
 	        we.eoff = -1 ;
 	        we.ni = ti ;
@@ -922,72 +809,44 @@ static int worker_start(WORKER *wp,FILECOUNTS_N *nlp)
 	        vecobj_finish(&wp->list) ;
 	} /* end if (vecobj_start) */
 
-#if	CF_DEBUGS
-	{
-	    WORKER_ENT	*wep ;
-	    int	i ;
-	    for (i = 0 ; vecobj_get(&wp->list,i,&wep) >= 0 ; i += 1) {
-	        debugprintf("worker_start: i=%u n=%s a=%d av=%d\n",
-	            i,wep->name,wep->action,wep->avalue) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
 	return rs ;
 }
 /* end subroutine (worker_start) */
 
-
-static int worker_finish(WORKER *wp)
-{
+static int worker_finish(WORKER *wp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = vecobj_finish(&wp->list) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = vecobj_finish(&wp->list) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (worker_finish) */
 
-
-static int worker_match(WORKER *wp,cchar *np,int nl)
-{
+static int worker_match(WORKER *wp,cchar *np,int nl) noex {
 	WORKER_ENT	*wep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		m ;
 
-#if	CF_DEBUGS
-	debugprintf("filecounts/worker_match: n=%t\n",np,nl) ;
-#endif
-
 	for (i = 0 ; (rs = vecobj_get(&wp->list,i,&wep)) >= 0 ; i += 1) {
-	    if (wep != NULL) {
+	    if (wep) {
 	        m = nleadstr(wep->name,np,nl) ;
 	        if ((m > 0) && (wep->name[m] == '\0')) break ;
 	    }
 	} /* end for */
 
-#if	CF_DEBUGS
-	debugprintf("filecounts/worker_match: ret rs=%d i=%d\n",rs,i) ;
-#endif
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (worker_match) */
 
-
-static int worker_remaining(WORKER *wp)
-{
-
+static int worker_remaining(WORKER *wp) noex {
 	return wp->nremain ;
 }
 /* end subroutine (worker_remaining) */
 
-
-static int worker_record(WORKER *wp,int ei,int eoff,uint v)
-{
+static int worker_record(WORKER *wp,int ei,int eoff,uint v) noex {
 	FILECOUNTS_N	*nlp = wp->nlp ;
 	WORKER_ENT	*wep ;
 	int		rs ;
@@ -1004,25 +863,13 @@ static int worker_record(WORKER *wp,int ei,int eoff,uint v)
 }
 /* end subroutine (worker_record) */
 
-
-static int worker_sort(WORKER *wp)
-{
-	int		rs ;
-
-	rs = vecobj_sort(&wp->list,vcmpoff) ;
-
-	return rs ;
+static int worker_sort(WORKER *wp) noex {
+	return vecobj_sort(&wp->list,vcmpoff) ;
 }
 /* end subroutine (worker_sort) */
 
-
-static int worker_get(WORKER *wp,int i,WORKER_ENT **rpp)
-{
-	int		rs ;
-
-	rs = vecobj_get(&wp->list,i,rpp) ;
-
-	return rs ;
+static int worker_get(WORKER *wp,int i,WORKER_ENT **rpp) noex {
+	return vecobj_get(&wp->list,i,rpp) ;
 }
 /* end subroutine (worker_get) */
 

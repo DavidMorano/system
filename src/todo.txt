@@ -4,6 +4,8 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+lineindex
+filecounts
 uctim
 libuc		fix to completely compile!
 srv{x}
@@ -21,7 +23,6 @@ mailmsgstage
 calmgr		pointer implementation
 spawnproc	block structure; actually this is a huge mess
 spawner		pointer implementation
-lineindex	mess
 termnote	could use some break-down of large subs into smaller ones
 pwi
 ipasswd

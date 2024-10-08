@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	satarith
+
+	Description:
 	We provide some saturated add operations.
 
 *******************************************************************************/
@@ -28,6 +32,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<uvariables.hh>		/* <- for variable |valuelimit| */
+#include	<stdinx.h>		/* extended integer types */
 #include	<localmisc.h>
 
 #include	"satarith.h"
