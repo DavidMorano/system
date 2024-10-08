@@ -37,23 +37,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<unistd.h>
+#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| + |memcmp(3c)| */
 #include	<usystem.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
 #include	<localmisc.h>
 
 #include	"fileobject.h"
 
 
 /* local defines */
-
-#define	MAGICLEN	4		/* length of file-magic */
 
 
 /* external subroutines */
@@ -70,7 +66,9 @@
 
 /* local variables */
 
-constexpr int		maglen = MAGICLEN ;
+constexpr char		magstr[] = "\177ELF" ;
+
+constexpr cint		maglen = cstrlen(magstr) ;
 
 
 /* exported variables */
@@ -86,15 +84,14 @@ int fileobject(cchar *fname) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		cint	of = O_RDONLY ;
-		cmode	om = 0666 ;
+		cmode	om = 0 ;
 		if ((rs = uc_open(fname,of,om)) >= 0) {
-	            USTAT	sb ;
 	            cint	fd = rs ;
-	            if ((rs = uc_fstat(fd,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 	                if (S_ISREG(sb.st_mode)) {
-		            char	buf[maglen + 1] ;
-	                    if ((rs = uc_read(fd,buf,maglen)) >= maglen) {
-	                        f = (memcmp(buf,"\177ELF",maglen) == 0) ;
+		            char	magbuf[maglen + 1] ;
+	                    if ((rs = uc_read(fd,magbuf,maglen)) >= maglen) {
+	                        f = (memcmp(magbuf,magstr,maglen) == 0) ;
 		            }
 			} /* end if (regular file) */
 	            } /* end if (stat) */

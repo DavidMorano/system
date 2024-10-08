@@ -67,6 +67,27 @@ inline void *memcpy(T *dp,void *sp) noex {
 #endif /* TEMPLATE_MEMCPY */
 
 
+#ifndef	SUBROUTINE_CSTRLEN
+#define	SUBROUTINE_CSTRLEN
+#ifdef	__cplusplus
+
+consteval int cstrlen(cchar *sp) noex {
+    	cchar		*cp = sp ;
+	while (*cp++) ;
+	return (cp - sp) ;
+}
+
+#endif /* __cplusplus */
+#endif /* SUBROUTINE_CSTRLEN */
+
+
+#ifndef	TYPEDEF_MTIME
+#define	TYPEDEF_MTIME
+typedef int64_t		mtime_t ;
+#endif
+
+
+
 #ifndef	TYPEDEF_MTIME
 #define	TYPEDEF_MTIME
 typedef int64_t		mtime_t ;

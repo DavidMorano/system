@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -36,14 +36,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<linebuffer.h>
 #include	<filer.h>
@@ -91,17 +87,17 @@ int fileisprint(cchar *fname) noex {
 		    cmode	om = 0 ;
 	            if ((rs = uc_open(fname,of,om)) >= 0) {
 	    	        filer	b ;
-	                int	fd = rs ;
+	                cint	fd = rs ;
 	                if ((rs = b.start(fd,0z,512,0)) >= 0) {
 	                    while ((rs = b.readln(lb.lbuf,lb.llen,to)) > 0) {
-	                        int	ll = rmeol(lb.lbuf,rs) ;
+	                        cint	ll = rmeol(lb.lbuf,rs) ;
 		    		f = hasprintbad(lb.lbuf,ll) ;
 		    		if (f) break ;
 	        	    } /* end while (reading lines) */
 	                    rs1 = b.finish ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (filer) */
-	                rs1 = u_close(fd) ;
+	                rs1 = uc_close(fd) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (open) */
 		    rs1 = lb.finish ;
@@ -109,7 +105,7 @@ int fileisprint(cchar *fname) noex {
 		} /* end if (linebuffer) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? (!f) : rs ;
+	return (rs >= 0) ? int(!f) : rs ;
 }
 /* end subroutine (fileisprint) */
 

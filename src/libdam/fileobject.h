@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	fileobject
+
+	Description:
 	Given a file-name we determine if it is an object file (or
 	core file).
 
