@@ -84,7 +84,7 @@
 #include	<climits>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |abs(3c)| */
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>

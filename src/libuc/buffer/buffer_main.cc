@@ -94,6 +94,12 @@ using std::max ;			/* subroutine-template */
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 template<typename ... Args>

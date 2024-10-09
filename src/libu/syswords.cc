@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	syswords
+
+	Description:
 	This object contains various commonly used system-related
 	words.
 
@@ -25,6 +29,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"syswords.hh"
 
@@ -53,5 +58,6 @@ const char syswords::w_usrlocaldir[] =	"/usr/local" ;
 
 const char syswords::w_digtab[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
 		"abcdefghijklmnopqrstuvwxyz" "Øø" ;
+const char syswords::w_blanks[] = "        " ;
 
 

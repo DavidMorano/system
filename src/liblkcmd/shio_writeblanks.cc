@@ -42,6 +42,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<strn.h>		/* |strnset(3uc)| */
 #include	<localmisc.h>		/* |MIN| */
 
@@ -76,15 +77,10 @@ extern "C" {
 /* local structures */
 
 namespace {
-    constexpr int	nblanks = NBLANKS ;
-    struct vars {
-	char		blanks[NBLANKS] ;
-	constexpr vars() noex {
-	    for (int i = 0 ; i < NBLANKS ; i += 1) {
-		blanks[i] = ' ' ;
-	    }
-	} ;
-    } ; /* end struct (vars) */
+    struct blanker {
+	cint	l = strlen(sysword.w_blanks) ;
+	cchar	*p = sysword.w_blanks ;
+    } ; /* end struct (blanker) */
 }
 
 
@@ -93,7 +89,7 @@ namespace {
 
 /* local variables */
 
-constexpr vars		var ;
+static blanker			bo ;	/* "blank" object */
 
 
 /* exported variables */
@@ -109,8 +105,8 @@ int shio_writeblanks(shio *fp,int n) noex {
 	    if (n >= 0) {
 	        rs = SR_OK ;
 	        while ((rs >= 0) && (wlen < n)) {
-	            cint	ml = min((n - wlen),nblanks) ;
-	            rs = shio_write(fp,var.blanks,ml) ;
+	            cint	ml = min((n - wlen),bo.l) ;
+	            rs = shio_write(fp,bo.p,ml) ;
 	            wlen += rs ;
 	        } /* end while */
 	    } /* end if (valid) */

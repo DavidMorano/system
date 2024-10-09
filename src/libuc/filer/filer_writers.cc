@@ -115,9 +115,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<localmisc.h>
 
 #include	"filer.h"
@@ -125,12 +127,10 @@
 
 /* local defines */
 
-#undef	NBLANKS
-#define	NBLANKS		8		/* number blanks to write at a time */
-
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -147,16 +147,14 @@ using std::max ;			/* subroutine-template */
 /* local structures */
 
 namespace {
-    template<int N> struct blanks {
-	cint		l = N ;
-	char		p[N+1] ;
-	constexpr blanks() noex {
-	    for (int i = 0 ; i < N ; i += 1) {
-		p[i] = ' ' ;
-	    }
-	    p[N] = '\0' ;
-	} ;
-    } ;
+    struct blanker {
+	cint	l = strlen(sysword.w_blanks) ;
+	cchar	*p = sysword.w_blanks ;
+    } ; /* end struct (blanker) */
+    struct zeroer {
+	cint	l = sizeof(int) ;
+	cchar	p[sizeof(int)] = {} ;
+    } ; /* end struct (zeroer) */
 }
 
 
@@ -170,11 +168,8 @@ extern "C" {
 
 /* local variables */
 
-constexpr int			zsize = sizeof(int) ;
-
-constexpr blanks<NBLANKS>	bo ;
-
-constexpr cchar			zerobuf[zsize] = { } ;
+static blanker			bo ;
+constexpr zeroer		zo ;
 
 
 /* exported variables */
@@ -187,7 +182,7 @@ int filer_writeblanks(filer *op,int n) noex {
 	int		wlen = 0 ;
 	if ((rs = filer_magic(op)) >= 0) {
 	    while ((rs >= 0) && (wlen < n)) {
-	        cint	ml = min((n-wlen),bo.l) ;
+	        cint	ml = min((n - wlen),bo.l) ;
 	        rs = filer_write(op,bo.p,ml) ;
 	        wlen += rs ;
 	    } /* end while */
@@ -231,14 +226,14 @@ int filer_writealign(filer *op,int asize) noex {
 }
 /* end subroutine (filer_writeallign) */
 
-int filer_writezero(filer *op,int zlen) noex {
+int filer_writezero(filer *op,int n) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = filer_magic(op)) >= 0) {
-	    while ((rs >= 0) && (zlen > 0)) {
-	        cint	ml = min(zlen,zsize) ;
-	        rs = filer_write(op,zerobuf,ml) ;
-	        zlen -= rs ;
+	    while ((rs >= 0) && (n > 0)) {
+	        cint	ml = min(n,zo.l) ;
+	        rs = filer_write(op,zo.p,ml) ;
+	        n -= rs ;
 	        wlen += rs ;
 	    } /* end while */
 	} /* end if (magic) */

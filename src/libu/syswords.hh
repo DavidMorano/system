@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	syswords
+
+	Description:
 	This object contains various commonly used system-related
 	words.
 
@@ -30,6 +34,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 struct syswords {
@@ -53,6 +58,7 @@ struct syswords {
 	static const char w_maildir[] ;
 	static const char w_usrlocaldir[] ;
 	static const char w_digtab[] ;
+	static const char w_blanks[] ;
 } ; /* end struct (syswords) */
 
 
