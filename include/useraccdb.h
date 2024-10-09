@@ -44,7 +44,7 @@ struct useraccdb_flags {
 struct useraccdb_head {
 	dater		*dmp ;		/* dater-manager-pointer */
 	cchar		*fname ;
-	off_t		eo ;
+	off_t		eo ;		/* ?? */
 	time_t		ti_check ;
 	time_t		ti_mod ;
 	ino_t		ino ;

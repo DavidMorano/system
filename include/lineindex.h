@@ -12,8 +12,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<time.h>
+#include	<sys/types.h>		/* |caddr_t| */
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

@@ -11,7 +11,7 @@
 	Originally written for Rightcore Network Services.
 
 	= 2020-03-26, David A­D­ Morano
-	I refactored the |uinfo_getaux| subroutine below.  It
+	I refactored the |uinfo_auxload| subroutine below.  It
 	previously used a proprietary interface to get that auxillary
 	information, but now it uses a generic interface (suitable
 	for most all UNIX®-like systems).
@@ -57,6 +57,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<ucsysauxinfo.h>
+#include	<getbufsize.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<timewatch.hh>
@@ -82,12 +83,15 @@
 /* local structures */
 
 namespace {
+    constexpr int	tmpaux_nfields = 5 ;
     struct uinfo_tmpaux {
-	char		architecture[NODENAMELEN+1] ;
-	char		platform[NODENAMELEN+1] ;
-	char		hwprovider[NODENAMELEN+1] ;
-	char		hwserial[NODENAMELEN+1] ;
-	char		nisdomain[NODENAMELEN+1] ;
+	int		flen ;		/* length of fields (buffers) below */
+	char		*a ;
+	char		*architecture ;
+	char		*platform ;
+	char		*hwprovider ;
+	char		*hwserial ;
+	char		*nisdomain ;
     } ;
     struct setname {
 	uinfo_infoname	tmpname ;
@@ -115,7 +119,7 @@ namespace {
     } ;
     struct uinfo {
 	ptm		mx ;		/* data mutex */
-	uinfo_alloc	a ;		/* memory allocations */
+	uinfo_alloc	ao ;		/* memory allocations */
 	uinfo_infoname	name ;
 	uinfo_infoaux	aux ;
 	aflag		fvoid ;
@@ -155,7 +159,9 @@ extern "C" {
     static void	uinfo_exit() noex ;
 }
 
-static int	uinfo_getaux(uinfo_tmpaux *) noex ;
+static int	uinfo_auxbegin(uinfo_tmpaux *) noex ;
+static int	uinfo_auxend(uinfo_tmpaux *) noex ;
+static int	uinfo_auxload(uinfo_tmpaux *) noex ;
 
 
 /* local variables */
@@ -244,16 +250,14 @@ int uinfo::fini() noex {
 	int		rs1 ;
 	if (finitdone && (!fvoid.testandset)) {
 	    {
-	        uinfo_alloc	*uap = &a ;
+	        uinfo_alloc	*uap = &ao ;
 	        if (uap->name) {
-	            cvoid	*p = (cvoid *) uap->name ;
-	            rs1 = uc_libfree(p) ;
+	            rs1 = uc_libfree(uap->name) ;
 		    if (rs >= 0) rs = rs1 ;
 	            uap->name = nullptr ;
 	        }
 	        if (uap->aux) {
-	            cvoid	*p = (cvoid *) uap->aux ;
-	            rs1 = uc_libfree(p) ;
+	            rs1 = uc_libfree(uap->aux) ;
 		    if (rs >= 0) rs = rs1 ;
 	            uap->aux = nullptr ;
 	        }
@@ -297,7 +301,7 @@ int uinfo::getname(uinfo_infoname *unp) noex {
 
 int uinfo::getname_setup() noex {
 	int		rs = SR_OK ;
-	if (a.name == nullptr) {
+	if (ao.name == nullptr) {
 	    setname	tmp ;
 	    if ((rs = getname_load(&tmp)) >= 0) {
 		rs = getname_install(&tmp) ;
@@ -349,8 +353,8 @@ int uinfo::getname_install(setname *setp) noex {
 	int		rs1 ;
         if ((rs = uc_forklockbegin(-1)) >= 0) {
             if ((rs = mx.lockbegin) >= 0) {
-                if (a.name == nullptr) {
-                    a.name = setp->strp ;
+                if (ao.name == nullptr) {
+                    ao.name = setp->strp ;
                     name = setp->tmpname ;
                     setp->strp = nullptr ;
 		} else {
@@ -389,7 +393,7 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 
 int uinfo::getaux_setup() noex {
 	int		rs = SR_OK ;
-	if (a.name == nullptr) {
+	if (ao.name == nullptr) {
 	    setaux	tmp ;
 	    if ((rs = getaux_load(&tmp)) >= 0) {
 		rs = getaux_install(&tmp) ;
@@ -406,35 +410,48 @@ int uinfo::getaux_load(setaux *setp) noex {
 	int		rs1 ;
 	if ((rs = uc_libmalloc(usz,&vp)) >= 0) {
 	    uinfo_tmpaux	*tap = (uinfo_tmpaux *) vp ;
-            if ((rs = uinfo_getaux(tap)) >= 0) {
-                cint    nlen = int(sizeof(tap->architecture) - 1) ;
-                int     sz = 0 ;
-                char    *bp ;
-                sz += (strnlen(tap->architecture,nlen) + 1) ;
-                sz += (strnlen(tap->platform,nlen) + 1) ;
-                sz += (strnlen(tap->hwprovider,nlen) + 1) ;
-                sz += (strnlen(tap->hwserial,nlen) + 1) ;
-                sz += (strnlen(tap->nisdomain,nlen) + 1) ;
-                if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
-                    cchar   *sp ;
-                    setp->strp = bp ;
-                    setp->tmpaux.architecture = bp ;
-                    sp = tap->architecture ;
-                    bp = (strwcpy(bp,sp,nlen) + 1) ;
-                    setp->tmpaux.platform = bp ;
-                    sp = tap->platform ;
-                    bp = (strwcpy(bp,sp,nlen) + 1) ;
-                    setp->tmpaux.hwprovider = bp ;
-                    sp = tap->hwprovider ;
-                    bp = (strwcpy(bp,sp,nlen) + 1) ;
-                    setp->tmpaux.hwserial = bp ;
-                    sp = tap->hwserial ;
-                    bp = (strwcpy(bp,sp,nlen) + 1) ;
-                    setp->tmpaux.nisdomain = bp ;
-                    sp = tap->nisdomain ;
-                    bp = (strwcpy(bp,sp,nlen) + 1) ;
-                } /* end if (memory-allocation) */
-            } /* end if (uinfo_getaux) */
+	    if ((rs = uinfo_auxbegin(tap)) >= 0) {
+                if ((rs = uinfo_auxload(tap)) >= 0) {
+                    cint    nlen = tap->flen ;
+                    int     sz = 0 ;
+                    sz += (strnlen(tap->architecture,nlen) + 1) ;
+                    sz += (strnlen(tap->platform,nlen) + 1) ;
+                    sz += (strnlen(tap->hwprovider,nlen) + 1) ;
+                    sz += (strnlen(tap->hwserial,nlen) + 1) ;
+                    sz += (strnlen(tap->nisdomain,nlen) + 1) ;
+                    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+                        cchar   *sp ;
+                        setp->strp = bp ;
+		        {
+                            setp->tmpaux.architecture = bp ;
+                            sp = tap->architecture ;
+                            bp = (strwcpy(bp,sp,nlen) + 1) ;
+		        }
+		        {
+                            setp->tmpaux.platform = bp ;
+                            sp = tap->platform ;
+                            bp = (strwcpy(bp,sp,nlen) + 1) ;
+		        }
+		        {
+                            setp->tmpaux.hwprovider = bp ;
+                            sp = tap->hwprovider ;
+                            bp = (strwcpy(bp,sp,nlen) + 1) ;
+		        }
+		        {
+                            setp->tmpaux.hwserial = bp ;
+                            sp = tap->hwserial ;
+                            bp = (strwcpy(bp,sp,nlen) + 1) ;
+		        }
+		        {
+                            setp->tmpaux.nisdomain = bp ;
+                            sp = tap->nisdomain ;
+                            bp = (strwcpy(bp,sp,nlen) + 1) ;
+		        }
+                    } /* end if (memory-allocation) */
+                } /* end if (uinfo_auxload) */
+	    	rs1 = uinfo_auxend(tap) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (tmpaux) */
 	    rs1 = uc_libfree(tap) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -447,8 +464,8 @@ int uinfo::getaux_install(setaux *setp) noex {
 	int		rs1 ;
         if ((rs = uc_forklockbegin(-1)) >= 0) {
             if ((rs = mx.lockbegin) >= 0) {
-                if (a.aux == nullptr) {
-                    a.aux = setp->strp ;
+                if (ao.aux == nullptr) {
+                    ao.aux = setp->strp ;
                     aux = setp->tmpaux ;
                     setp->strp = nullptr ;
 		} else {
@@ -465,8 +482,48 @@ int uinfo::getaux_install(setaux *setp) noex {
 }
 /* end method (uinfo::getaux_install) */
 
-static int uinfo_getaux(uinfo_tmpaux *tap) noex {
-	cint    	nlen = int(sizeof(tap->architecture) - 1) ;
+static int uinfo_auxbegin(uinfo_tmpaux *tap) noex {
+    	int		rs = SR_FAULT ;
+	if (tap) {
+	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+		cint	flen = rs ;
+		cint	sz = (tmpaux_nfields * (rs + 1)) ;
+		if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+		    int		ai = 0 ;
+		    char	*a = charp(vp) ;
+		    tap->flen = flen ;
+		    tap->a = charp(vp) ;
+		    {
+			tap->architecture = (a + ((flen + 1) & ai++)) ;
+			tap->platform = (a + ((flen + 1) & ai++)) ;
+			tap->hwprovider = (a + ((flen + 1) & ai++)) ;
+			tap->hwserial = (a + ((flen + 1) & ai++)) ;
+			tap->nisdomain = (a + ((flen + 1) & ai++)) ;
+		    }
+		} /* end if (memory-allocation) */
+	    } /* end if (getbufsize) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (uinfo_auxbegin) */
+
+static int uinfo_auxend(uinfo_tmpaux *tap) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (tap) {
+	    rs = SR_OK ;
+	    if (tap->a) {
+	        rs1 = uc_libfree(tap->a) ;
+		if (rs >= 0) rs = rs1 ;
+		tap->a = nullptr ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (uinfo_auxend) */
+
+static int uinfo_auxload(uinfo_tmpaux *tap) noex {
+	cint    	nlen = tap->flen ;
 	int		rs = SR_OK ;
 	int		sz = 0 ;
 	tap->architecture[0] = '\0' ;
@@ -508,7 +565,7 @@ static int uinfo_getaux(uinfo_tmpaux *tap) noex {
 	} /* end for */
 	return (rs >= 0) ? sz : rs ;
 }
-/* end subroutine (uinfo_getaux) */
+/* end subroutine (uinfo_auxload) */
 
 static void uinfo_atforkbefore() noex {
 	uinfo_data.atforkbefore() ;
