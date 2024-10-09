@@ -71,9 +71,8 @@ int filelines(cchar *fn) noex {
 	    if (fn[0]) {
 		cint	of = O_RDONLY ;
 		if ((rs = uc_open(fn,of,0)) >= 0) {
-		    USTAT	sb ;
 		    cint	fd = rs ;
-		    if ((rs = uc_fstat(fd,&sb)) >= 0) {
+		    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 			csize	fsz = size_t(sb.st_size) ;
 			rs = SR_NOTSUP ;
 		        if (S_ISREG(sb.st_mode)) {
@@ -104,7 +103,7 @@ static int liner(int fd,size_t ms) noex {
 	int		lines = 0 ;
 	cnullptr	np{} ;
 	void		*md{} ;
-	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    cint	cmd = MADV_SEQUENTIAL ;
 	    if ((rs = u_madvise(md,ms,cmd)) >= 0) {
 		size_t	ll = ms ;

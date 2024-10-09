@@ -447,7 +447,7 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 
 int acctab_anyallowed(acctab *op,vecstr *nlp,vecstr *mlp,cc *un,cc *pw) noex {
 	cint		rsn = SR_NOTFOUND ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
 	int		f = false ;

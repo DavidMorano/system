@@ -3431,12 +3431,12 @@ static char *stridig(char *ip,int il,int n) noex {
 	char		digbuf[DIGBUFLEN + 1] ;
 	nd = ctdecui(digbuf,DIGBUFLEN,n) ;
 	if ((nd > 0) && (nd < il)) {
-	    ip = strnset(ip,' ',1) ;
+	    ip = strnset(ip,1,' ') ;
 	    il -= 1 ;
-	    ip = strnset(ip,' ',(il - nd)) ;
+	    ip = strnset(ip,(il - nd),' ') ;
 	    ip = strncpy(ip,digbuf,nd) ;
 	} else {
-	    ip = strnset(ip,' ',il) ;
+	    ip = strnset(ip,il,' ') ;
 	}
 	return ip ;
 }

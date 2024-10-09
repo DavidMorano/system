@@ -871,9 +871,6 @@ termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
-intsat.o:		intsat.cc intsat.h
-intfloor.o:		intfloor.cc intfloor.h
-intceil.o:		intceil.cc intceil.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
 getxid.o:		getxid.cc getxid.h

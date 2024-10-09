@@ -40,8 +40,8 @@ struct filecounts_iil {
 
 struct filecounts_cursor {
 	uint		magic ;
-	FILECOUNTS_II	*list ;
-	int		nlist ;
+	FILECOUNTS_II	*listp ;	/* list-pointer */
+	int		listn ;		/* list-number */
 	int		i ;
 } ;
 
@@ -81,7 +81,7 @@ extern int filecounts_process(filecounts *,filecounts_n *) noex ;
 extern int filecounts_curbegin(filecounts *,filecounts_cur *) noex ;
 extern int filecounts_cursnap(filecounts *,filecounts_cur *) noex ;
 extern int filecounts_curread(filecounts *,filecounts_cur *,
-		FILECOUNTS_INFO *,char *,int) noex ;
+		filecounts_info *,char *,int) noex ;
 extern int filecounts_curend(filecounts *,filecounts_cur *) noex ;
 extern int filecounts_close(filecounts *) noex ;
 

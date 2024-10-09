@@ -15,12 +15,14 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
-#define	MKUUID			struct mkuuid_head
+#define	MKUUID_DAT		struct mkuuid_data
 
 
-struct mkuuid_head {
+struct mkuuid_data {
 	uint64_t	time ;		/* 60-bits */
 	uint64_t	node ;		/* 48-bits */
 	uint16_t	clk ;		/* 14 (or 13¹) bits */
@@ -29,9 +31,11 @@ struct mkuuid_head {
 
 /* Note ¹: Micro$oft used 13 bits in the past (we always use 14 bits) */
 
+typedef	MKUUID_DAT	mkuuid_dat ;
+
 EXTERNC_begin
 
-extern int mkuuid(MKUUID *,int) noex ;
+extern int mkuuid(MKUUID_DAT *,int) noex ;
 
 EXTERNC_end
 

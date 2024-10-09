@@ -624,8 +624,6 @@ snpollflags.o:		snpollflags.c snflags.h
 
 sntmtime.o:		sntmtime.c tmtime.h
 
-intsat.o:		intsat.c intsat.h
-
 tmtime.o:		tmtime.c tmtime.h
 
 ctdecp.o:		ctdecp.c ctdecp.h

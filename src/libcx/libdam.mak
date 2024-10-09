@@ -256,7 +256,7 @@ OBJ139= isasocket.o isinteractive.o isfsremote.o isproc.o
 OBJ140= fsdirtreestat.o statvfsdir.o
 OBJ141= rmsesfiles.o dircount.o isdirempty.o
 OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
-OBJ143= intceil.o intfloor.o intsat.o
+OBJ143=
 
 OBJ144= cfdouble.o cfdecf.o cfb26.o
 OBJ145= cfdecmf.o cfdect.o cfroman.o
@@ -805,8 +805,6 @@ fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
 printhelp.o:		printhelp.cc printhelp.hh
-intrem.o:		intrem.cc intrem.h
-addsat.o:		addsat.cc addsat.h
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
 getlogx.o:		getlogx.cc getlogx.h

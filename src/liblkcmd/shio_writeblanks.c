@@ -37,6 +37,7 @@
 
 #include	<sys/types.h>
 #include	<usystem.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -55,8 +56,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern char	*strnset(char *,int,int) ;
-
 
 /* local structures */
 
@@ -69,15 +68,13 @@ extern char	*strnset(char *,int,int) ;
 
 /* exported subroutines */
 
-
-int shio_writeblanks(SHIO *fp,int n)
-{
+int shio_writeblanks(SHIO *fp,int n) noex {
 	int		rs = SR_OK ;
 	int		ml ;
 	int		wlen = 0 ;
 	char		blanks[NBLANKS] ;
 
-	strnset(blanks,' ',NBLANKS) ;
+	strnset(blanks,NBLANKS,' ') ;
 	while ((rs >= 0) && (wlen < n)) {
 	    ml = MIN((n-wlen),NBLANKS) ;
 	    rs = shio_write(fp,blanks,ml) ;

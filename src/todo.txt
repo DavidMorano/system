@@ -6,6 +6,7 @@ file		what
 --------------------------------------------------------------------------------
 lineindex
 filecounts
+mkprogenv
 uctim
 libuc		fix to completely compile!
 srv{x}

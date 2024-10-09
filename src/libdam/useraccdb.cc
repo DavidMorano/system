@@ -743,7 +743,7 @@ static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
 	            dbp += dld ;
 	            dbl -= dld ;
 	        }
-	        if (n > 0) rbp = strnset(rbp,' ',n) ;
+	        if (n > 0) rbp = strnset(rbp,n,' ') ;
 	        rbp = strwcpy(rbp,dbp,dbl) ;
 	    }
 	    if (rs >= 0) {
@@ -848,7 +848,7 @@ static int mkts(char *tbuf,int tlen,time_t t) noex {
 	if (tl < tlen) {
 	    char	*bp = (tbuf + tl) ;
 	    int		bl = (tlen - tl) ;
-	    strnset(bp,' ',bl) ;
+	    strnset(bp,bl,' ') ;
 	}
 	return tl ;
 }

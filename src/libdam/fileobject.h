@@ -1,7 +1,7 @@
 /* fileobject HEADER */
 /* lang=C20 */
 
-/* determine if named file is an object file */
+/* determine if a named file is an object file */
 /* version %I% last-modified %G% */
 
 

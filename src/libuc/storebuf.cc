@@ -149,6 +149,27 @@ int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 
 /* exported subroutines */
 
+int storebuf_chrs(char *rbuf,int rlen,int idx,int ch,int n) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    rs = SR_INVALID ;
+	    if ((idx >= 0) && (n >= 0)) {
+	        char	*bp = (rbuf + idx) ;
+		rs = SR_OK ;
+	        if ((rlen < 0) || ((rlen - idx) >= n)) {
+		    for (int i = 0 ; i < n ; i += 1) {
+	                *bp++ = ch ;
+		    }
+	        } else {
+	            rs = SR_OVERFLOW ;
+	        }
+	        *bp = '\0' ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? 1 : rs ;
+}
+/* end subroutine (storebuf_chrs) */
+
 int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {

@@ -25,12 +25,12 @@
 	NUL-terminated.
 
 	Synopsis:
-	char *strnset(cchar *s1,int ch,int n) noex
+	char *strnset(cchar *bp,int bl,int ch) noex
 
 	Arguments:
-	s1	string buffer that receives the copy
+	sp	destination string buffer (pointer)
+	sl	destination string buffer (length)
 	ch	character to set in the destination string
-	n	the maximum length to be copied
 
 	Returns:
 	-	the character pointer to the end of the destination
@@ -51,11 +51,11 @@
 	NUL-terminated.
 
 	Synopsis:
-	char *strnsetblanks(char *dst,int n) noex
+	char *strnsetblanks(char *bp,int bl) noex
 
 	Arguments:
-	dst	string buffer that receives the copy
-	n	the maximum length to be copied
+	sp	destination string buffer (pointer)
+	sl	destination string buffer (length)
 
 	Returns:
 	-	the character pointer to the end of the destination
@@ -67,6 +67,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"strn.h"
 
@@ -74,14 +75,37 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
-char *strnset(char *dp,int ch,int n) noex {
-	while (n-- > 0) *dp++ = ch ;
-	return dp ;
+char *strnset(char *bp,int bl,int ch) noex {
+	while (bl-- > 0) {
+	    *bp++ = ch ;
+	}
+	return bp ;
 }
 /* end subroutine (strnset) */
 

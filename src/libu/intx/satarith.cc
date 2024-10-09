@@ -32,7 +32,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<uvariables.hh>		/* <- for variable |valuelimit| */
-#include	<stdinx.h>		/* extended integer types */
+#include	<stdintx.h>		/* extended integer types */
 #include	<localmisc.h>
 
 #include	"satarith.h"

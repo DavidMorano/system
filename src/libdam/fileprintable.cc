@@ -82,14 +82,12 @@ int fileprintable(cchar *fname) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		if (linebuffer lb ; (rs = lb.start) >= 0) {
-		    cint	to = -1 ;
 		    cint	of = O_RDONLY ;
 		    cmode	om = 0 ;
 	            if ((rs = uc_open(fname,of,om)) >= 0) {
-	    	        filer	b ;
 	                cint	fd = rs ;
-	                if ((rs = b.start(fd,0z,512,0)) >= 0) {
-	                    while ((rs = b.readln(lb.lbuf,lb.llen,to)) > 0) {
+	                if (filer b ; (rs = b.start(fd,0z,512)) >= 0) {
+	                    while ((rs = b.readln(lb.lbuf,lb.llen)) > 0) {
 	                        cint	ll = rmeol(lb.lbuf,rs) ;
 		    		f = hasprintbad(lb.lbuf,ll) ;
 		    		if (f) break ;

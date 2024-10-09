@@ -1,7 +1,7 @@
 /* fileobject SUPPORT */
 /* lang=C++20 */
 
-/* determine if named file is an object file */
+/* determine if a named file is an object file */
 /* version %I% last-modified %G% */
 
 
