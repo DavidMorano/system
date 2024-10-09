@@ -79,16 +79,19 @@
 /* local structures */
 
 namespace {
-    constexpr int	tmpaux_nfields = 5 ;
-    struct uinfo_tmpaux {
+    struct auxinfo {
 	char		*a ;
 	char		*architecture ;
 	char		*platform ;
 	char		*hwprovider ;
 	char		*hwserial ;
 	char		*nisdomain ;
-	int		flen ;		/* length of fields (buffers) below */
-    } ; /* end struct (uinfo_tmpaux) */
+        cint		nfields = 5 ;
+	int		flen ;		/* length of fields (buffers) above */
+	int start() noex ;
+	int finish() noex ;
+	int load() noex ;
+    } ; /* end struct (auxinfo) */
     struct setname {
 	uinfo_infoname	tmpname ;
 	char		*strp = nullptr ;
@@ -154,10 +157,6 @@ extern "C" {
     static void	uinfo_atforkafter() noex ;
     static void	uinfo_exit() noex ;
 }
-
-static int	uinfo_auxbegin(uinfo_tmpaux *) noex ;
-static int	uinfo_auxend(uinfo_tmpaux *) noex ;
-static int	uinfo_auxload(uinfo_tmpaux *) noex ;
 
 
 /* local variables */
@@ -370,9 +369,8 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uxp) {
-	    sigblocker	b ;
 	    memclear(uxp) ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init()) >= 0) {
 		    if ((rs = getaux_setup()) >= 0) {
 			*uxp = aux ;
@@ -389,8 +387,7 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 int uinfo::getaux_setup() noex {
 	int		rs = SR_OK ;
 	if (ao.name == nullptr) {
-	    setaux	tmp ;
-	    if ((rs = getaux_load(&tmp)) >= 0) {
+	    if (setaux tmp ; (rs = getaux_load(&tmp)) >= 0) {
 		rs = getaux_install(&tmp) ;
 	    } /* end if (ok) */
 	} /* end if (setup needed) */
@@ -399,14 +396,13 @@ int uinfo::getaux_setup() noex {
 /* end method (uinfo::getaux_setup) */
 
 int uinfo::getaux_load(setaux *setp) noex {
-	cint		usz = sizeof(uinfo_tmpaux) ;
-	void		*vp{} ;
+	cint		usz = sizeof(auxinfo) ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = uc_libmalloc(usz,&vp)) >= 0) {
-	    uinfo_tmpaux	*tap = (uinfo_tmpaux *) vp ;
-	    if ((rs = uinfo_auxbegin(tap)) >= 0) {
-                if ((rs = uinfo_auxload(tap)) >= 0) {
+	if (void *vp{} ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
+	    auxinfo	*tap = (auxinfo *) vp ;
+	    if ((rs = tap->start()) >= 0) {
+                if ((rs = tap->load()) >= 0) {
                     cint    nlen = tap->flen ;
                     int     sz = 0 ;
                     sz += (strnlen(tap->architecture,nlen) + 1) ;
@@ -444,7 +440,7 @@ int uinfo::getaux_load(setaux *setp) noex {
 		        }
                     } /* end if (memory-allocation) */
                 } /* end if (uinfo_auxload) */
-	    	rs1 = uinfo_auxend(tap) ;
+	    	rs1 = tap->finish() ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (tmpaux) */
 	    rs1 = uc_libfree(tap) ;
@@ -477,72 +473,65 @@ int uinfo::getaux_install(setaux *setp) noex {
 }
 /* end method (uinfo::getaux_install) */
 
-static int uinfo_auxbegin(uinfo_tmpaux *tap) noex {
-    	int		rs = SR_FAULT ;
-	if (tap) {
-	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
-		cint	flen = rs ;
-		cint	sz = (tmpaux_nfields * (rs + 1)) ;
-		if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
-		    int		ai = 0 ;
-		    char	*a = charp(vp) ;
-		    tap->flen = flen ;
-		    tap->a = charp(vp) ;
-		    {
-			tap->architecture = (a + ((flen + 1) & ai++)) ;
-			tap->platform = (a + ((flen + 1) & ai++)) ;
-			tap->hwprovider = (a + ((flen + 1) & ai++)) ;
-			tap->hwserial = (a + ((flen + 1) & ai++)) ;
-			tap->nisdomain = (a + ((flen + 1) & ai++)) ;
-		    }
-		} /* end if (memory-allocation) */
-	    } /* end if (getbufsize) */
-	} /* end if (non-null) */
+int auxinfo::start() noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    cint	sz = (nfields * (rs + 1)) ;
+	    flen = rs ;
+	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
+		int	ai = 0 ;
+		a = charp(vp) ;
+		{
+		    architecture = (a + ((flen + 1) & ai++)) ;
+		    platform = (a + ((flen + 1) & ai++)) ;
+		    hwprovider = (a + ((flen + 1) & ai++)) ;
+		    hwserial = (a + ((flen + 1) & ai++)) ;
+		    nisdomain = (a + ((flen + 1) & ai++)) ;
+		}
+	    } /* end if (memory-allocation) */
+	} /* end if (getbufsize) */
 	return rs ;
 }
-/* end subroutine (uinfo_auxbegin) */
+/* end subroutine (auxinfo::start) */
 
-static int uinfo_auxend(uinfo_tmpaux *tap) noex {
-    	int		rs = SR_FAULT ;
+int auxinfo::finish() noex {
+    	int		rs = SR_OK ;
 	int		rs1 ;
-	if (tap) {
-	    rs = SR_OK ;
-	    if (tap->a) {
-	        rs1 = uc_libfree(tap->a) ;
-		if (rs >= 0) rs = rs1 ;
-		tap->a = nullptr ;
-	    }
+	if (a) {
+	    rs1 = uc_libfree(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	    a = nullptr ;
 	}
 	return rs ;
 }
-/* end subroutine (uinfo_auxend) */
+/* end method (auxinfo::finish) */
 
-static int uinfo_auxload(uinfo_tmpaux *tap) noex {
-	cint    	nlen = tap->flen ;
+int auxinfo::load() noex {
+	cint    	nlen = flen ;
 	int		rs = SR_OK ;
 	int		sz = 0 ;
-	tap->architecture[0] = '\0' ;
-	tap->platform[0] = '\0' ;
-	tap->hwprovider[0] = '\0' ;
-	tap->hwserial[0] = '\0' ;
-	tap->nisdomain[0] = '\0' ;
+	architecture[0] = '\0' ;
+	platform[0] = '\0' ;
+	hwprovider[0] = '\0' ;
+	hwserial[0] = '\0' ;
+	nisdomain[0] = '\0' ;
 	for (cauto &req : sais) {
 	    char	*nbuf = nullptr ;
 	    switch (req) {
 	    case SAI_ARCHITECTURE:
-	        nbuf = tap->architecture ;
+	        nbuf = architecture ;
 		break ;
 	    case SAI_PLATFORM:
-	        nbuf = tap->platform ;
+	        nbuf = platform ;
 		break ;
 	    case SAI_HWPROVIDER:
-	        nbuf = tap->hwprovider ;
+	        nbuf = hwprovider ;
 		break ;
 	    case SAI_HWSERIAL:
-	        nbuf = tap->hwserial ;
+	        nbuf = hwserial ;
 		break ;
 	    case SAI_RPCDOMAIN:
-	        nbuf = tap->nisdomain ;
+	        nbuf = nisdomain ;
 		break ;
 	    } /* end switch */
 	    if ((req >= 0) && nbuf) {
@@ -560,7 +549,7 @@ static int uinfo_auxload(uinfo_tmpaux *tap) noex {
 	} /* end for */
 	return (rs >= 0) ? sz : rs ;
 }
-/* end subroutine (uinfo_auxload) */
+/* end method (auxinfo::load) */
 
 static void uinfo_atforkbefore() noex {
 	uinfo_data.atforkbefore() ;
