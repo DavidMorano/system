@@ -611,18 +611,15 @@ badpargs:
 
 /* local subroutines */
 
-
-static int writeargs(int afd,BITS *blp,int ai_pos,int argc,cchar **argv)
-{
-	FILER		b ;
+static int writeargs(int afd,BITS *blp,int ai_pos,int argc,mainv argv) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
 
-	if ((rs = filer_start(&b,afd,0L,512,0)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,afd,0z,512,0)) >= 0) {
 	    int		ai ;
 	    int		f ;
-	    const char	*ap ;
+	    cchar	*ap ;
 
 	    for (ai = 1 ; ai < argc ; ai += 1) {
 	        f = (bits_test(blp,ai) > 0) ;

@@ -175,9 +175,9 @@ int vecpstr_envfiler(vecpstr *op,cchar *fname) noex {
             cint    to_open = utimeout[uto_open] ;
             if ((rs = uc_opene(fname,of,om,to_open)) >= 0) {
 		cnullptr	np{} ;
-                filer     dfile, *dfp = &dfile ;
-                cint        fd = rs ;
-                if ((rs = filer_start(dfp,fd,0L,0,0)) >= 0) {
+                filer		dfile, *dfp = &dfile ;
+                cint		fd = rs ;
+                if ((rs = filer_start(dfp,fd,0z,0,0)) >= 0) {
                     cint    to = utimeout[uto_read] ;
                     cint    llen = si.llen ;
                     rls_f   rls = filer_readlns ;

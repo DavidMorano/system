@@ -52,6 +52,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3++)| */
@@ -80,7 +81,6 @@
 /* local defines */
 
 #define	USERACCDB_LOGDNAME	"var/log"
-#define	USERACCDB_MAGIC		0x11359299
 #define	USERACCDB_INTCHECK	5
 
 #define	UAFILE_SUF		"users"
@@ -99,7 +99,7 @@
 #define	UAD_ITEM	useraccdb_item
 
 #define	UPINFO		upinfo
-#define	UPINFO_REC		struct upinfo_rec
+#define	UPINFO_REC	struct upinfo_rec
 
 #define	TO_CHECK	5		/* check interval */
 #define	TO_LOCK		4		/* time-out */
@@ -305,8 +305,7 @@ int useraccdb_close(UAD *op) noex {
 }
 /* end subroutine (useraccdb_close) */
 
-int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
-		cchar *user) noex {
+int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,cc *user) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = useraccdb_magic(op,ep,ebuf,user)) >= 0) {
@@ -315,8 +314,8 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
 	        if ((rs = useraccdb_openlock(op)) >= 0) {
 		    linebuffer	lb ;
 		    if ((rs = lb.start) >= 0) {
-	                filer	b ;
-	                if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
+			cint	fd = op->fd ;
+	                if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 	                    UAD_REC	rec ;
 	                    cint	llen = lb.llen ;
 	                    char	*lbuf = lb.lbuf ;
@@ -387,11 +386,10 @@ int useraccdb_updater(UAD *op,UPINFO *uip) noex {
 	int		rs1 ;
 	char		*lbuf{} ;
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    filer	b ;
 	    cint	llen = rs ;
-	    if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
-		UAD_REC	rec ;
-		off_t	ro = 0z ;
+	    if (filer b ; (rs = filer_start(&b,op->fd,0z,0,0)) >= 0) {
+		UAD_REC		rec ;
+		off_t		ro = 0z ;
 		while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 		    cint	ll = rs ;
 	            if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
@@ -502,7 +500,8 @@ namespace {
     } ; /* end struct (sub_enum) */
 }
 
-int useraccdb_enum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,char *ebuf,int elen) noex {
+int useraccdb_curenum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,
+		char *ebuf,int elen) noex {
 	int		rs ;
 	if ((rs = useraccdb_magic(op,curp,ep,ebuf)) >= 0) {
 	    rs = SR_INVALID ;

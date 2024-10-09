@@ -2166,10 +2166,8 @@ static int procdeps_incargs(PROGINFO *pip,vecstr *alp)
 
 
 /* process the lines that contain dependency names */
-static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
-{
-	FILER		buf ;
-	cint	to = pip->to_read ;
+static int proclines(PROGINFO *pip,vecpstr *dp,int fd) noex {
+	cint		to = pip->to_read ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
@@ -2190,7 +2188,7 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 	}
 #endif /* CF_DEBUG */
 
-	if ((rs = filer_start(&buf,fd,0L,FBUFLEN,0)) >= 0) {
+	if (filer buf ; (rs = filer_start(&buf,fd,0z,FBUFLEN,0)) >= 0) {
 	    LSTATE	ls ;
 	    cint	llen = LINEBUFLEN ;
 	    int		len ;
@@ -2304,13 +2302,10 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 }
 /* end subroutine (procline) */
 
-
 /* process the error output */
-static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
-{
-	USTAT	sb ;
-	FILER		buf ;
-	cint	fsize = FBUFLEN ;
+static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err) noex {
+	USTAT		sb ;
+	cint		fsize = FBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		to = pip->to_read ;
@@ -2322,10 +2317,10 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 	}
 
 	if ((rs >= 0) && (sb.st_size > 0)) {
-	    if ((rs = filer_start(&buf,fd_err,0L,fsize,0)) >= 0) {
+	    if (filer buf ; (rs = filer_start(&buf,fd_err,0z,fsize,0)) >= 0) {
 	        cint	llen = LINEBUFLEN ;
-	        int		len ;
-	        char		lbuf[LINEBUFLEN + 1] ;
+	        int	len ;
+	        char	lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))

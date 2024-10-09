@@ -145,20 +145,17 @@ int		to ;
 /* write it out */
 
 	if (rs >= 0) {
-	if ((rs = opentmp(NULL,0,0664)) >= 0) {
-	    FILER	b ;
-	    fd = rs ;
-
-	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
-
-		rs = printhols(pr,&b,year,query) ;
-
-		filer_finish(&b) ;
-	    } /* end if (issue) */
-
-	    if (rs >= 0) u_rewind(fd) ;
-	    if (rs < 0) u_close(fd) ;
-	} /* end if (opentmp) */
+	    if ((rs = opentmp(NULL,0,0664)) >= 0) {
+	        fd = rs ;
+	        if (filer b ; (rs = filer_start(&b,fd,0z,512,0)) >= 0) {
+		    {
+		        rs = printhols(pr,&b,year,query) ;
+		    }
+		    filer_finish(&b) ;
+	        } /* end if (issue) */
+	        if (rs >= 0) u_rewind(fd) ;
+	        if (rs < 0) u_close(fd) ;
+	    } /* end if (opentmp) */
 	} /* end if (ok) */
 
 	return (rs >= 0) ? fd : rs ;

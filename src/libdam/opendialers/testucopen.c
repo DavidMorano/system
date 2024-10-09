@@ -158,18 +158,15 @@ int main(int argc,const char **argv,const char **envv)
 
 /* local subroutines */
 
-
-static int dumpfile(int fd,int of)
-{
-	FILER		b ;
+static int dumpfile(int fd,int of) noex {
 	FILE		*ofp = stdout ;
-	const int	to = 5 ;
-	const int	fo = (of | O_NETWORK) ;
+	cint		to = 5 ;
+	cint		fo = (of | O_NETWORK) ;
 	int		rs ;
 #if	CF_DEBUGS
 	debugprintf("main/dumpfile: ent to=%d\n",to) ;
 #endif
-	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
 	    const int	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;

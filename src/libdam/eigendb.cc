@@ -366,7 +366,6 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 /* end subroutine (eigendb_fileparse) */
 
 static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
-	linebuffer	lb ;
 	cint		to = TO_READ ;
 	int		rs ;
 	int		rs1 ;
@@ -375,9 +374,8 @@ static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
 	if (fsize >= 0) {
 	    bsize = iceil(fsize,1024) ;
 	}
-	if ((rs = lb.start) >= 0) {
-	    filer	fb ;
-	    if ((rs = filer_start(&fb,fd,0L,bsize,0)) >= 0) {
+	if (linebuffer lb ; (rs = lb.start) >= 0) {
+	    if (filer fb ; (rs = filer_start(&fb,fd,0z,bsize,0)) >= 0) {
 	        cint	llen = lb.llen ;
 	        char	*lbuf = lb.lbuf ;
 	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {

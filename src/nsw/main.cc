@@ -1186,15 +1186,13 @@ static int procsearch(PROGINFO *pip,VECSTR *nlp)
 	args[i] = NULL ;
 
 	if ((rs = uc_openprog(pfname,of,args,NULL)) >= 0) {
-	    FILER	b ;
-	    const int	fd = rs ;
-
-	    if ((rs = filer_start(&b,fd,0L,2048,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        int		line = 0 ;
-	        int		f_bol = TRUE ;
-	        int		f_eol ;
-	        char		lbuf[LINEBUFLEN+1] ;
+	    cint	fd = rs ;
+	    if (filer b ; (rs = filer_start(&b,fd,0z,2048,0)) >= 0) {
+	        cint	llen = LINEBUFLEN ;
+	        int	line = 0 ;
+	        int	f_bol = TRUE ;
+	        int	f_eol ;
+	        char	lbuf[LINEBUFLEN+1] ;
 
 	        while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	            int	len = rs ;

@@ -4,11 +4,13 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+useraccdb
 lineindex
 filecounts
 mkprogenv
 uctim
 libuc		fix to completely compile!
+lfm
 srv{x}
 memfile		can we just trash this?
 libpcs		a lot of junk in there

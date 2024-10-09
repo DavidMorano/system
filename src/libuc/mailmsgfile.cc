@@ -443,16 +443,14 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	int		vlines = 0 ;
 	char		*lbuf{} ;
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    filer	in ;
 	    cint	llen = rs ;
 	    cint	ibsize = min(blen,(op->pagesize*8)) ;
 	    int		inlen ;
 	    int		wlen = 0 ;
-	    if ((rs = filer_start(&in,mfd,bo,ibsize,0)) >= 0) {
-	        filer	out ;
+	    if (filer in ; (rs = filer_start(&in,mfd,bo,ibsize,0)) >= 0) {
 	        cint	obsize = rs ;
 	        int	rlen = blen ;
-	        if ((rs = filer_start(&out,tfd,0L,obsize,0)) >= 0) {
+	        if (filer out ; (rs = filer_start(&out,tfd,0z,obsize,0)) >= 0) {
 		    int		ncols ;
 	            int		ll ;
 	            while ((rs >= 0) && (rlen > 0)) {

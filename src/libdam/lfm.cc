@@ -649,10 +649,8 @@ static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
 	    check_init(lcp) ;
 
 	    if ((rs = u_open(op->lfname,of,omode)) >= 0) {
-	        FILER		b ;
-	        const int	lfd = rs ;
-
-	        if ((rs = filer_start(&b,lfd,0L,512,0)) >= 0) {
+	        cint	lfd = rs ;
+	        if (filer b ; (rs = filer_start(&b,lfd,0z,512,0)) >= 0) {
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -799,15 +797,12 @@ static int lfm_lockwrite(LFM *op,LFM_LOCKINFO *lip,int lfd)
 }
 /* end subroutine (lfm_lockwrite) */
 
-
-static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd)
-{
-	FILER		b ;
+static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		woff = 0 ;
 
-	if ((rs = filer_start(&b,lfd,0L,512,0)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,lfd,0z,512,0)) >= 0) {
 
 	    if (rs >= 0) {
 	        rs = filer_printf(&b,"%u\n",op->pid) ;

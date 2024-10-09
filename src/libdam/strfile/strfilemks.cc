@@ -843,38 +843,28 @@ static int idx_nfstore(IDX *op,cchar *nf)
 }
 /* end subroutine (idx_nfstore) */
 
-
-static int idx_bufbegin(IDX *ixp)
-{
+static int idx_bufbegin(IDX *ixp) noex {
 	int	rs ;
-
-	if ((rs = filer_start(&ixp->fb,ixp->fd,0L,0)) >= 0) {
+	if ((rs = filer_start(&ixp->fb,ixp->fd,0z,0,0)) >= 0) {
 	    ixp->f.fb = TRUE ;
 	}
-
 	return rs ;
 }
 /* end subroutine (idx_bufbegin) */
 
-
-static int idx_bufend(IDX *ixp)
-{
+static int idx_bufend(IDX *ixp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
 	if (ixp->f.fb) {
 	    ixp->f.fb = FALSE ;
 	    rs1 = filer_finish(&ixp->fb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (idx_bufend) */
 
-
-static int idx_bufwrite(IDX *ixp,const void *wbuf,int wlen)
-{
+static int idx_bufwrite(IDX *ixp,cvoid *wbuf,int wlen) noex {
 	int	rs = filer_write(&ixp->db,wbuf,wlen) ;
 	ixp->fo += rs ;
 	return rs ;
@@ -1270,7 +1260,7 @@ STRFILEMKS	*op ;
 
 	op->f.viopen = TRUE ;
 	size = (pagesize * 4) ;
-	rs = filer_start(&varfile,op->nfd,0,size,0) ;
+	rs = filer_start(&varfile,op->nfd,0z,size,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 

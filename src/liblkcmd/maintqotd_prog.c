@@ -579,18 +579,16 @@ cchar		*sname ;
 #endif /* COMMENT */
 
 #if	CF_DEBUGS
-static int debugoutput(cchar *ids,int fd)
-{
-	FILER		b ;
+static int debugoutput(cchar *ids,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	debugprintf("%t\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
 	    debugprintf("%t fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
-	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        char		lbuf[LINEBUFLEN+1] ;
+	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
+	        cint	llen = LINEBUFLEN ;
+	        char	lbuf[LINEBUFLEN+1] ;
 	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	            debugprintf("o> %t\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;

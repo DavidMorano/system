@@ -106,24 +106,14 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int readfilestrs(rbuf,rlen,fname)
-char		*rbuf ;
-int		rlen ;
-const char	*fname ;
-{
-	FILER		f ;
-
-	const int	llen = LINEBUFLEN ;
-	const int	to = -1 ;
-
+int readfilestrs(char *rbuf,int rlen,cchar *fname) noex {
+	cint		llen = LINEBUFLEN ;
+	cint		to = -1 ;
 	int	rs ;
 	int	cl ;
 	int	c = 0 ;
 	int	bl = 0 ;
-
-	const char	*tp, *cp ;
-
+	cchar		*tp, *cp ;
 	char	lbuf[LINEBUFLEN+1] ;
 
 
@@ -138,12 +128,10 @@ const char	*fname ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
-	    int	fd = rs ;
-
-	    if ((rs = filer_start(&f,fd,0L,512,0)) >= 0) {
-	        int		ll ;
-		const char	*lp ;
-
+	    cint	fd = rs ;
+	    if (filer f ; (rs = filer_start(&f,fd,0z,512,0)) >= 0) {
+	        int	ll ;
+		cchar	*lp ;
 	        while ((rs = filer_readln(&f,lbuf,llen,to)) > 0) {
 	            ll = rs ;
 

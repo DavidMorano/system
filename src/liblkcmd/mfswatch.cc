@@ -1977,11 +1977,10 @@ static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = sreq_ofd(jep)) >= 0) {
-	    FILER	b ;
 	    cint	ofd = rs ;
 	    cint	bs = MAXNAMELEN ;
 	    cint	fo = 0 ;
-	    if ((rs = filer_start(&b,ofd,0L,bs,fo)) >= 0) {
+	    if (filer b ; (rs = filer_start(&b,ofd,0z,bs,fo)) >= 0) {
 	        SREQ_SNCUR	cur ;
 	        if ((rs = sreq_snbegin(jep,&cur)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;

@@ -215,7 +215,7 @@ static int vecstr_loadfd(vecstr *vsp,int fu,int fd) noex {
 	            char	*lbuf{} ;
 		    if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
 			filer		loadfile, *lfp = &loadfile ;
-	        	if ((rs = filer_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
+	        	if ((rs = filer_start(lfp,fd,0z,fbsize,fbo)) >= 0) {
 			    auto	rl = filer_readln ;
 	                    while ((rs = rl(lfp,lbuf,llen,to)) > 0) {
 	                        int	len = rs ;

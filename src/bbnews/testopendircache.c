@@ -89,13 +89,13 @@ int main(int argc,const char **argv,const char **envv)
 
 	if (argv != NULL) {
 	    const mode_t	om = 0666 ;
-	    const int	to = -1 ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	to = -1 ;
+	    cint	llen = LINEBUFLEN ;
 	    int		ai ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    for (ai = 1 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
 	        const char	*fn = argv[ai] ;
-	        const int	of = O_RDONLY ;
+	        cint	of = O_RDONLY ;
 #if	CF_DEBUGS
 	        debugprintf("main: fn=%s\n",fn) ;
 #endif
@@ -155,14 +155,14 @@ int main(int argc,const char **argv,const char **envv)
 static int dumpfile(int fd,int of)
 {
 	FILER		b ;
-	const int	fo = (of | O_NETWORK) ;
+	cint	fo = (of | O_NETWORK) ;
 	int		rs ;
 #if	CF_DEBUGS
 	debugprintf("main/dumpfile: ent\n") ;
 #endif
-	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	    const int	to = 0 ;
-	    const int	llen = LINEBUFLEN ;
+	if ((rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
+	    cint	to = 0 ;
+	    cint	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
@@ -191,7 +191,7 @@ static int dumpdir(int fd,int of)
 {
 	FSDIR		d ;
 	FSDIR_ENT	de ;
-	const int	dlen = MAXPATHLEN ;
+	cint	dlen = MAXPATHLEN ;
 	int		rs ;
 	char		dbuf[USERNAMELEN+1] ;
 

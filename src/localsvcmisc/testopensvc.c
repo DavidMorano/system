@@ -187,19 +187,13 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* local subroutines */
 
-
-static int dumpfile(FILE *ofp,int fd,int of)
-{
-	FILER		b ;
+static int dumpfile(FILE *ofp,int fd,int of) noex {
 	const int	to = 5 ;
 	const int	fo = (of | O_NETWORK) ;
 	int		rs ;
 	int		rs1 ;
-#if	CF_DEBUGS
-	debugprintf("main/dumpfile: ent to=%d\n",to) ;
-#endif
-	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	if (filer b ; (rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
+	    cint	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {

@@ -1155,13 +1155,11 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 
 static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 		int f_apm) noex {
-	FILER		b ;
-	const int	fd = sip->wfd ;
+	cint		fd = sip->wfd ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
-	if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,fd,0z,512,0)) >= 0) {
 	    sip->ofp = &b ;
 
 	    if (sip->f.allcache) {

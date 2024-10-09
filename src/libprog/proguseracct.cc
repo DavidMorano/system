@@ -1,14 +1,14 @@
-/* proguseracct */
+/* proguseracct SUPPORT */
+/* lang=C++20 */
 
 /* handle some login-based stuff */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_LINEFOLD	0		/* use 'linefold(3dam)' */
 #define	CF_CLEAN	0		/* clean lines */
 #define	CF_CLEANBEFORE	1		/* clean before (else after) */
-
 
 /* revision history:
 
@@ -21,37 +21,38 @@
 
 /*******************************************************************************
 
-        We're going to make this pretty cheap since we do not get a lot of
-        Finger requests! That pretty much says it right there.
+  	Name:
+	proguseracct
 
-        OK, we are at least not going to let (or try not to let) garbage
-        characters get out to the network. Since we are readling files that are
-        maintained by users on the local system, those files can have junk in
-        them. Sending junk out to the network does not present the image (a nice
-        one) that we want to protray. So we try to clean up any junkd that we
-        find in user files (like "project" and "plan" files).
-
-        Also, FINGER responses are generally assumed to occupy no more than 80
-        columns of output (not necessarily on a terminal of any kind either). So
-        we also try to fix-clean this up.
-
+	Description:
+	We are going to make this pretty cheap since we do not get
+	a lot of Finger requests! That pretty much says it right
+	there.  OK, we are at least not going to let (or try not
+	to let) garbage characters get out to the network.  Since
+	we are readling files that are maintained by users on the
+	local system, those files can have junk in them.  Sending
+	junk out to the network does not present the image (a nice
+	one) that we want to protray.  So we try to clean up any
+	junkd that we find in user files (like "project" and "plan"
+	files).  Also, FINGER responses are generally assumed to
+	occupy no more than 80 columns of output (not necessarily
+	on a terminal of any kind either).  So we also try to fix-clean
+	this up.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<filer.h>
@@ -59,7 +60,12 @@
 #include	<linefold.h>
 #include	<getax.h>
 #include	<passwdent.h>
-#include	<localmisc.h>
+#include	<strn.h>
+#include	<snx.h>
+#include	<mkpathx.h>
+#include	<ischarx.h>
+#include	<isnot.h>
+#include	<localmisc.h>		/* |COLUMNS| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -70,18 +76,10 @@
 
 #define	LOGBUFLEN	(LOGNAMELEN + 20)
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
 
 #ifndef	CHAR_ISEND
 #define	CHAR_ISEND(c)	(((c) == '\r') || ((c) == '\n'))
-#endif
-
-#ifndef	COLUMNS
-#define	COLUMNS		80
 #endif
 
 #undef	NINDENT
@@ -97,18 +95,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	isprintlatin(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	proglog_printf(PROGINFO *,cchar *,...) ;
-extern int	proglog_flush(PROGINFO *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern int	proglog_printf(PROGINFO *,cchar *,...) noex ;
+extern int	proglog_flush(PROGINFO *) noex ;
 
 
 /* external variables */
@@ -120,26 +108,26 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* forward references */
 
 static int	proguseracct_usersrv(PROGINFO *,CLIENTINFO *,
-PASSWDENT *) ;
+			PASSWDENT *) ;
 static int	proguseracct_pop(PROGINFO *,int,PASSWDENT *,
-const char *,const char *) ;
+			cchar *,cchar *) ;
 static int	proguseracct_projinfo(PROGINFO *,int,
-PASSWDENT *) ;
+			PASSWDENT *) ;
 static int	proguseracct_copyover(PROGINFO *,int,int) ;
 static int	proguseracct_prints(PROGINFO *,FILER *,
-char *,int, const char *,int) ;
+			char *,int, cchar *,int) ;
 static int	proguseracct_print(PROGINFO *,FILER *,int,int,
-const char *,int) ;
+			cchar *,int) ;
 
 static int	filer_writeblanks(FILER *,int) ;
 
 #if	CF_LINEFOLD
 #else
-static int	getline(int,const char *,int) ;
+static int	getline(int,cchar *,int) ;
 #endif
 
 #if	CF_CLEAN && CF_CLEANBEFORE
-static int	mkclean(char *,const char *,int) ;
+static int	mkclean(char *,cchar *,int) ;
 static int	isourbad(int) ;
 #endif /* CF_CLEANBEFORE */
 
@@ -237,21 +225,21 @@ int proguseracctexec(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 
 static int proguseracct_usersrv(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 {
-	const int	ofd = cip->fd_output ;
+	cint	ofd = cip->fd_output ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd = -1 ;
 	int		to = TO_OPEN ;
 	int		wlen = 0 ;
 	int		f_served = FALSE ;
-	const char	*usersrv = pip->usersrv ;
+	cchar	*usersrv = pip->usersrv ;
 	char		tmpfname[MAXPATHLEN + 1], *ssbuf = tmpfname ;
 
 	if ((usersrv == NULL) || (usersrv[0] == '\0'))
 	    usersrv = USERSRV ;
 
 	if ((rs1 = mkpath2(tmpfname,pep->pw_dir,usersrv)) >= 0) {
-	    const int	of = (O_RDWR | O_NDELAY | O_NOCTTY) ;
+	    cint	of = (O_RDWR | O_NDELAY | O_NOCTTY) ;
 	    rs1 = uc_opene(tmpfname,of,0666,to) ;
 	    fd = rs1 ;
 	}
@@ -305,12 +293,12 @@ static int proguseracct_pop(PROGINFO *pip,int ofd,PASSWDENT *pep,
 	if (fname == NULL) return SR_FAULT ;
 
 	if (fname[0] != '\0') {
-	    const int	to = TO_OPEN ;
+	    cint	to = TO_OPEN ;
 	    int		fd = -1 ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 	    if ((rs1 = mkpath2(tmpfname,pep->pw_dir,fname)) >= 0) {
-	        const int	of = (O_RDONLY | O_NDELAY | O_NOCTTY) ;
+	        cint	of = (O_RDONLY | O_NDELAY | O_NOCTTY) ;
 	        rs1 = uc_opene(tmpfname,of,0666,to) ;
 	        fd = rs1 ;
 	    }
@@ -338,7 +326,7 @@ static int proguseracct_pop(PROGINFO *pip,int ofd,PASSWDENT *pep,
 static int proguseracct_projinfo(PROGINFO *pip,int ofd,PASSWDENT *pep)
 {
 	struct project	pj ;
-	const int	pjlen = getbufsize(getbufsize_pj) ;
+	cint	pjlen = getbufsize(getbufsize_pj) ;
 	int		rs ;
 	int		c = 0 ;
 	char		*pjbuf ;
@@ -346,7 +334,7 @@ static int proguseracct_projinfo(PROGINFO *pip,int ofd,PASSWDENT *pep)
 	if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
 	    cchar	*n = pep->pw_name ;
 	    if ((rs = uc_getdefaultproj(n,&pj,pjbuf,pjlen)) >= 0) {
-	        const int	outlen = (pjlen*2) ;
+	        cint	outlen = (pjlen*2) ;
 	        if (pj.pj_comment != NULL) {
 	            int		ol ;
 	            char	outbuf[outlen+1] ;
@@ -373,8 +361,8 @@ static int proguseracct_projinfo(PROGINFO *pip,int ofd,PASSWDENT *pep)
 static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 {
 	FILER		local, net ;
-	const int	clen = LINEBUFLEN ;
-	const int	to = TO_READ ;
+	cint	clen = LINEBUFLEN ;
+	cint	to = TO_READ ;
 	int		rs = SR_OK ;
 	int		rs1 = 0 ;
 	int		size ;
@@ -392,10 +380,10 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 	size = (clen + 2) ; /* plus two characters: NL and NUL */
 	if ((rs = uc_malloc(size,&cbuf)) >= 0) {
 
-	    if ((rs = filer_start(&net,ofd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&net,ofd,0z,0,0)) >= 0) {
 
-	        if ((rs = filer_start(&local,fd,0L,0,0)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	        if ((rs = filer_start(&local,fd,0z,0,0)) >= 0) {
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 2] ;
 
 	            while ((rs = filer_readln(&local,lbuf,llen,to)) > 0) {
@@ -472,7 +460,7 @@ static int proguseracct_prints(PROGINFO *pip,FILER *fbp,char *cbuf,int cbl,
 	int		ln = 0 ;
 	int		ind = NINDENT ;
 	int		wlen = 0 ;
-	const char	*lp ;
+	cchar		*lp ;
 
 	ncols = MIN(cbl,COLUMNS) ;
 

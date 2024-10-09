@@ -601,12 +601,11 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 /* end subroutine (try_resolvefile) */
 
 static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
-	filer		b ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*dp = nullptr ;
-        if ((rs = filer_start(&b,fd,0L,FILERLEN,0)) >= 0) {
+        if (filer b ; (rs = filer_start(&b,fd,0z,FILERLEN,0)) >= 0) {
 	    cint	to = TO_READ ;
 	    cchar	*key = "domain" ;
             while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {

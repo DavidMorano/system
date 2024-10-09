@@ -18,21 +18,18 @@
 
 /*******************************************************************************
 
-	Process a 
+	Process a system variable. I have no idea what that means!
 
 	Synopsis:
-
 	int sysvarprocget(vlp,fname)
 	HDBSTR		*vlp ;
 	const char	fname[] ;
 
 	Arguments:
-
 	vlp		pointer to hash-string object
 	fname		file to process
 
 	Returns:
-
 	<0		error
 	>=0		OK
 
@@ -41,20 +38,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<strings.h>		/* |strncasecmp(3c)| */
-
 #include	<usystem.h>
 #include	<filer.h>
 #include	<vecstr.h>
 #include	<hdbstr.h>
 #include	<field.h>
 #include	<varmk.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 
@@ -139,7 +135,6 @@ static const char	*pstrs[] = {
 
 
 /* exported subroutines */
-
 
 int sysvarprocget(HDBSTR *vlp,cchar fname[])
 {
@@ -247,16 +242,15 @@ const char	fname[] ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    FILER	dfile, *dfp = &dfile ;
-	    int	fd = rs ;
-
-	    if ((rs = filer_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
-		FIELD		fsb ;
-	        const int	llen = LINEBUFLEN ;
-		const int	vlen = VBUFLEN ;
+	    filer	dfile, *dfp = &dfile ;
+	    cint	fd = rs ;
+	    if ((rs = filer_start(dfp,fd,0z,BUFLEN,0)) >= 0) {
+		field		fsb ;
+	        cint		llen = LINEBUFLEN ;
+		cint		vlen = VBUFLEN ;
 	        int		len ;
 		int		vl ;
-		const char	*vp ;
+		cchar		*vp ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 		char		vbuf[VBUFLEN + 1] ;
 

@@ -131,7 +131,7 @@ static int process(cchar *ds,int f_top) noex {
 	    filer	wfile, *wfp = &wfile ;
 	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
-	    if ((rs = filer_start(wfp,wfd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(wfp,wfd,0z,0,0)) >= 0) {
 		{
 	            rs = procfiler(wfp,ds,f_top) ;
 		}
@@ -201,7 +201,7 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	    if ((rs = uc_open(sysbanner,of,0666)) >= 0) {
 	        filer	sysban, *sfp = &sysban ;
 	        cint	fd = rs ;
-	        if ((rs = filer_start(sfp,fd,0L,0,0)) >= 0) {
+	        if ((rs = filer_start(sfp,fd,0z,0,0)) >= 0) {
 	            int		line = 0 ;
 	            while ((rs = filer_readln(sfp,lbuf,llen,to)) > 0) {
 	                cint	len = rmeol(lbuf,rs) ;

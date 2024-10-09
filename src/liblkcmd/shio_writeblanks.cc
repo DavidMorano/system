@@ -51,8 +51,6 @@
 
 /* local defines */
 
-#define	NBLANKS		8		/* desired number blanks in buffer */
-
 
 /* imported namespaces */
 

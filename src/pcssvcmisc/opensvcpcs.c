@@ -192,21 +192,19 @@ int subpcs_args(SUBPCS *sip,FILER *ofp,ARGINFO *aip,BITS *bop,
 }
 /* end subroutine (subpcs_args) */
 
-
-int subpcs_af(SUBPCS *sip,FILER *ofp,cchar *afn)
-{
+int subpcs_af(SUBPCS *sip,FILER *ofp,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
-	    const mode_t	om = 0666 ;
-	    const int		of = O_RDONLY ;
+	    cmode	om = 0666 ;
+	    cint	of = O_RDONLY ;
 	    if ((rs = uc_open(afn,of,om)) >= 0) {
-		FILER		afile, *afp = &afile ;
-		const int	to = -1 ;
-		const int	afd = rs ;
-		if ((rs = filer_start(afp,afd,0L,0,0)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+		filer	afile, *afp = &afile ;
+		cint	to = -1 ;
+		cint	afd = rs ;
+		if ((rs = filer_start(afp,afd,0z,0,0)) >= 0) {
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 		    int		cl ;
 		    cchar	*cp ;

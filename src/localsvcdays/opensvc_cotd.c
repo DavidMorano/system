@@ -651,19 +651,11 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 }
 /* end subroutine (subinfo_cotd) */
 
-
 static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
-		cchar *cbuf,int clen)
-{
-	FILER		b ;
+		cchar *cbuf,int clen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUGS
-	    debugprintf("b_commandment/procout: n=%u clen=%d\n",n,clen) ;
-#endif
-
-	if ((rs = filer_start(&b,wfd,0L,512,0)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,wfd,0z,512,0)) >= 0) {
 	    WORDFILL	w ;
 
 	    if ((rs = wordfill_start(&w,cbuf,clen)) >= 0) {

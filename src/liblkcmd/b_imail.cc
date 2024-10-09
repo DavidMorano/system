@@ -3267,11 +3267,9 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 	}
 
 	if (rs >= 0) {
-	    filer	fb ;
 	    off_t	fboff = 0 ;
-	    const int	bsize = lip->pagesize ;
-
-	    if ((rs = filer_start(&fb,sfd,fboff,bsize,0)) >= 0) {
+	    cint	bsize = lip->pagesize ;
+	    if (filer fb ; (rs = filer_start(&fb,sfd,fboff,bsize,0)) >= 0) {
 
 	        rs = procmsg(pip,&fb,mi,optp) ;
 	        wlen += rs ;
@@ -4003,11 +4001,8 @@ static int procdisposefile(PROGINFO *pip,char *mbuf,int to,MSGOPTS *mop)
 }
 /* end subroutine (procdisposefile) */
 
-
-static int procextract(PROGINFO *pip,int sfd,MSGOPTS *mop)
-{
+static int procextract(PROGINFO *pip,int sfd,MSGOPTS *mop) noex {
 	LOCINFO		*lip = pip->lip ;
-	filer		fb ;
 	int		rs ;
 	int		rs1 ;
 	int		ps ;
@@ -4017,10 +4012,9 @@ static int procextract(PROGINFO *pip,int sfd,MSGOPTS *mop)
 	    debugprintf("b_imail/procextract: ent\n") ;
 #endif
 	ps = lip->pagesize ;
-	if ((rs = filer_start(&fb,sfd,0,ps,0)) >= 0) {
-	    const int	n = lip->nmsgs ;
-	    int		i ;
-	    for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	if (filer db ; (rs = filer_start(&fb,sfd,0z,ps,0)) >= 0) {
+	    cint	n = lip->nmsgs ;
+	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	        rs = procextracter(pip,&fb,i,mop) ;
 	        wlen += rs ;
 	    } /* end for */
@@ -6257,18 +6251,16 @@ cchar *hp,int hl)
 }
 /* end subroutine (procprinthdr_mailnote) */
 
-
-static int procmsgfilebcc(PROGINFO *pip,int tfd,int sfd,int hlen,cchar *ap)
-{
+static int procmsgfilebcc(PROGINFO *pip,int tfd,int sfd,int hlen,
+		cchar *ap) noex {
 	LOCINFO		*lip = pip->lip ;
-	filer		mfile ;
 	int		rs ;
 	int		rs1 ;
 	int		bsize ;
 	int		wlen = 0 ;
 
 	bsize = lip->pagesize ;
-	if ((rs = filer_start(&mfile,tfd,0L,bsize,0)) >= 0) {
+	if (filer mfile ; (rs = filer_start(&mfile,tfd,0z,bsize,0)) >= 0) {
 	    int		rlen = hlen ;
 	    int		mlen ;
 	    int		len ;

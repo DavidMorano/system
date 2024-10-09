@@ -506,8 +506,7 @@ int		to ;
 		    break ;
 		} /* end switch */
 	        if ((rs = subpcs_start(&si,pr,envv,w)) >= 0) {
-		    FILER	b ;
-		    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
+		    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 		        if (sip->f.all) {
 			    rs = subpcs_all(&si,&b) ;
 		        } else {

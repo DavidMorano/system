@@ -611,8 +611,7 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 
 static int mailbox_parse(mailbox *op) noex {
 	fbliner		ls, *lsp = &ls ;
-	filer		fb ;
-	const off_t	soff = 0L ;
+	const off_t	soff = 0z ;
 	cint		bsize = (32 * op->pagesize) ;
 	int		rs ;
 	int		rs1 ;
@@ -620,7 +619,7 @@ static int mailbox_parse(mailbox *op) noex {
 	if_constexpr (f_readto) {
 	    to = op->to_read ;
 	}
-	if ((rs = filer_start(&fb,op->mfd,soff,bsize,0)) >= 0) {
+	if (filer db ; (rs = filer_start(&fb,op->mfd,soff,bsize,0)) >= 0) {
 	    if ((rs = fbliner_start(lsp,&fb,soff,to)) >= 0) {
 	        int	mi = 0 ;
 	        while ((rs = mailbox_parsemsg(op,lsp,mi)) > 0) {
@@ -1015,7 +1014,7 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	    mc.bp = bp ;
 	    mc.bl = bl ;
 	    mc.moff = 0 ;
-	    if ((rs = filer_start(fbp,tfd,0L,bsize,0)) >= 0) {
+	    if ((rs = filer_start(fbp,tfd,0z,bsize,0)) >= 0) {
 	        for (int mi = 0 ; mi < op->msgs_total ; mi += 1) {
 		    bool	f = false ;
 		    bool	fcopy = false ;

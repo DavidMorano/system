@@ -422,11 +422,8 @@ const char	*ap ;
 	        if (rs >= 0) rs = u_rewind(fd) ;
 
 	        if (rs >= 0) {
-	            FILER	b ;
-	            const int	opts = 0 ;
-
-	            if ((rs = filer_start(&b,fd,0L,512,opts)) >= 0) {
-
+	            cint	opts = 0 ;
+	            if (filer b ; (rs = filer_start(&b,fd,0z,512,opts)) >= 0) {
 	                while (rs >= 0) {
 	                    rs = filer_readlns(&b,lbuf,llen,to,NULL) ;
 	                    ll = rs ;
@@ -880,18 +877,16 @@ const char	*sname ;
 #endif /* COMMENT */
 
 #if	CF_DEBUGS
-static int debugoutput(const char *ids,int fd)
-{
-	FILER		b ;
+static int debugoutput(const char *ids,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	debugprintf("%t\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
 	    debugprintf("%t fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
-	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        char		lbuf[LINEBUFLEN+1] ;
+	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
+	        cint	llen = LINEBUFLEN ;
+	        char	lbuf[LINEBUFLEN+1] ;
 	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	            debugprintf("o> %t\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;

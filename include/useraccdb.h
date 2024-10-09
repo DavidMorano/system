@@ -15,13 +15,13 @@
 #include	<usystem.h>		/* for 'ino_t' */
 #include	<filer.h>
 #include	<dater.h>
-#include	<localmisc.h>
 
 
-#define	USERACCDB	struct useraccdb_head
-#define	USERACCDB_FL	struct useraccdb_flags
-#define	USERACCDB_CUR	struct useraccdb_cursor
-#define	USERACCDB_ENT	struct useraccdb_entry
+#define	USERACCDB_MAGIC		0x11359299
+#define	USERACCDB		struct useraccdb_head
+#define	USERACCDB_FL		struct useraccdb_flags
+#define	USERACCDB_CUR		struct useraccdb_cursor
+#define	USERACCDB_ENT		struct useraccdb_entry
 
 
 struct useraccdb_entry {
@@ -32,7 +32,7 @@ struct useraccdb_entry {
 } ;
 
 struct useraccdb_cursor {
-	filer		b ;
+	filer		*fbp ;		/* file-buffer-pointer */
 	off_t		eo ;		/* enumeration offset */
 } ;
 
@@ -66,7 +66,7 @@ extern int useraccdb_find(useraccdb *,useraccdb_ent *,char *,int,cchar *) noex ;
 extern int useraccdb_update(useraccdb *,cchar *,cchar *) noex ;
 extern int useraccdb_curbegin(useraccdb *,useraccdb_cur *) noex ;
 extern int useraccdb_curend(useraccdb *,useraccdb_cur *) noex ;
-extern int useraccdb_enum(useraccdb *,useraccdb_cur *,
+extern int useraccdb_curenum(useraccdb *,useraccdb_cur *,
 		useraccdb_ent *,char *,int) noex ;
 extern int useraccdb_check(useraccdb *,time_t) noex ;
 extern int useraccdb_close(useraccdb *) noex ;

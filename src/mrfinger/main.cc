@@ -750,7 +750,6 @@ const char	query[] ;
 	char	querybuf[QUERYLEN + 1], *bp = querybuf ;
 	char	linebuf[LINEBUFLEN + 1] ;
 
-
 	rs = dialtcp(dsp->host,dsp->portspec,dsp->af,to,opts) ;
 	s = rs ;
 	if (rs < 0)
@@ -764,21 +763,13 @@ const char	query[] ;
 	*bp++ = '\n' ;
 	*bp = '\0' ;
 
-	rs = u_write(s,querybuf,(bp - querybuf)) ;
-	if (rs >= 0) {
-	    FILER	rd ;
-
+	if ((rs = u_write(s,querybuf,(bp - querybuf))) >= 0) {
 	    u_shutdown(s,SHUT_WR) ;
-
-	    rs = filer_start(&rd,s,0L,BUFLEN,fbo) ;
-	    if (rs >= 0) {
-
+	    if (filer rd ; (rs = filer_start(&rd,s,0z,BUFLEN,fbo)) >= 0) {
 	        while (rs >= 0) {
-
 	            rs = filer_readln(&rd,linebuf,LINEBUFLEN,to) ;
 	            len = rs ;
-	            if (rs <= 0)
-	                break ;
+	            if (rs <= 0) break ;
 
 	            while ((len > 0) && isspace(linebuf[len - 1]))
 	                len -= 1 ;

@@ -389,9 +389,8 @@ static int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	if ((uc_malloc(sz,&ap)) >= 0) {
 	    char	*dbuf = (ap + (plen + ai++)) ;
 	    if ((rs = mkpath1(dbuf,ndn)) >= 0) {
-	        filer	b ;
 	        cint	dlen = rs ;
-	        if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
+	        if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 	            USTAT	sb ;
 	            cint	nlen = plen ;
 	            int		line = 0 ;

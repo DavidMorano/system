@@ -924,16 +924,14 @@ const char	query[] ;
 	    *bp = '\0' ;
 
 	    if ((rs = u_write(s,querybuf,(bp - querybuf))) >= 0) {
-	        FILER		rd ;
-	        const int	fbo = FILER_ONET ;
+	        cint	fbo = FILER_ONET ;
 
 	        u_shutdown(s,SHUT_WR) ;
 
-	        if ((rs = filer_start(&rd,s,0L,BUFLEN,fbo)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	        if (filer rd ; (rs = filer_start(&rd,s,0z,BUFLEN,fbo)) >= 0) {
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
-
 	            while ((rs = filer_readln(&rd,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
