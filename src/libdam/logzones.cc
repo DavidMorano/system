@@ -692,7 +692,7 @@ static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	    ep->znl = strnlen(znb,ml) ;
 	    ep->off = soff ;
 	    strnwcpy(ep->znb,LOGZONES_ZNAMESIZE,znb,znl) ;
-	    cp = (st != nullptr) ? st : blanks ;
+	    cp = (st) ? st : blanks ;
 	    strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
 	} /* end if (non-null) */
 	return rs ;

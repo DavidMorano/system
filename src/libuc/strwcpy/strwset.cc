@@ -16,17 +16,20 @@
 
 /*******************************************************************************
 
+  	Name:
+	strwset
+
+	Description:
 	Copy a specified character to a destination for the number of
 	characters specified.  The resulting string is NUL-terminated.
 
 	Synopsis:
-
-	char *strwset(char *dp,int ch,int w) noex 
+	char *strwset(char *dp,int ch,int n) noex 
 
 	Arguments:
 	dp	c-string buffer pointer
 	ch	character to set in the destination string
-	w	the maximum length to be copied
+	n	number of characters to set
 
 	Returns:
 	-	the character pointer to the end of the destination
@@ -37,6 +40,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"strwset.h"
 
@@ -49,8 +53,10 @@
 
 /* exported subroutines */
 
-char *strwset(char *dp,int ch,int w) noex {
-	while (w-- > 0) *dp++ = ch ;
+char *strwset(char *dp,int ch,int n) noex {
+	while (n-- > 0) {
+	    *dp++ = ch ;
+	}
 	*dp = '\0' ;
 	return dp ;
 }
