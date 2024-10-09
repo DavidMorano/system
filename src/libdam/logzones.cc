@@ -91,7 +91,8 @@
 #include	<sysval.hh>
 #include	<sfx.h>
 #include	<strwcpy.h>
-#include	<strn.h>
+#include	<strw.h>		/* |strwblanks(3uc)| */
+#include	<strn.h>		/* |strnblanks(3uc)| */
 #include	<lockfile.h>
 #include	<cfdec.h>
 #include	<ctdec.h>
@@ -188,8 +189,6 @@ static bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 /* local variables */
 
 static sysval		pagesize(sysval_ps) ;
-
-constexpr cchar		blanks[] = "                       " ;
 
 constexpr bool		f_creat = CF_CREAT ;
 
@@ -684,7 +683,6 @@ static int logzones_enteropen(LZ *op,time_t dt) noex {
 
 static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	int		rs = SR_FAULT ;
-	cchar		*cp ;
 	if (ep && znb) {
 	    cint	ml = min(znl,LOGZONES_ZNAMESIZE) ;
 	    rs = SR_OK ;
@@ -692,8 +690,11 @@ static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	    ep->znl = strnlen(znb,ml) ;
 	    ep->off = soff ;
 	    strnwcpy(ep->znb,LOGZONES_ZNAMESIZE,znb,znl) ;
-	    cp = (st) ? st : blanks ;
-	    strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
+	    if (st) {
+	        strncpy(ep->st,st,LOGZONES_STAMPSIZE) ;
+	    } else {
+	        strnblanks(ep->st,LOGZONES_STAMPSIZE) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -748,10 +749,13 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 static int entry_update(LZ_ENT *ep,cchar *st) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    cchar	*cp = (st) ? st : blanks ;
 	    rs = SR_OK ;
 	    ep->count += 1 ;
-	    strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
+	    if (st) {
+	        strncpy(ep->st,st,LOGZONES_STAMPSIZE) ;
+	    } else {
+	        strnblanks(ep->st,LOGZONES_STAMPSIZE) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -777,7 +781,7 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	        }
 		{
 	            rl = (clen - cl) ;
-	            strncpy(bp,blanks,rl) ;
+	            strnblanks(bp,rl) ;
 	            strncpy((bp + rl),cp,cl) ;
 		}
 	        bp += clen ;
@@ -790,7 +794,7 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	            zl = strnlen(ep->znb,EFL_NAME) ;
 #endif /* COMMENT */
 	            rl = (EFL_NAME - zl) ;
-	            strncpy(bp,blanks,rl) ;
+	            strnblanks(bp,rl) ;
 	            strwcpyuc((bp + rl),ep->znb,zl) ;
 	            bp += EFL_NAME ;
 		}
@@ -808,14 +812,14 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	            *bp++ = ((mins / 10) + '0') ;
 	            *bp++ = ((mins % 10) + '0') ;
 	        } else {
-	            bp = strwcpy(bp,blanks,5) ;
+	            bp = strwblanks(bp,5) ;
 	        }
 	        *bp++ = ' ' ;
 		/* the stamp field */
 	        cp = strwcpy(bp,ep->st,EFL_STAMP) ;
 	        cl = cp - bp ;
 	        if ((rl = EFL_STAMP - cl) > 0) {
-	            strwcpy(cp,blanks,rl) ;
+	            strwblanks(cp,rl) ;
 	        }
 	        bp += EFL_STAMP ;
 		/* end it off */

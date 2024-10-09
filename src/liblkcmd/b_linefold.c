@@ -100,7 +100,6 @@ extern int	optvalue(cchar *,int) ;
 extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	ncolstr(int,int,cchar *,int) ;
-extern int	shio_writeblanks(SHIO *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;

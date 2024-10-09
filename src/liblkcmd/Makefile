@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (liblkcmd)
 
 T= liblkcmd
 
