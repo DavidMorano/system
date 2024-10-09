@@ -62,16 +62,12 @@
 #include	<ptm.h>
 #include	<timewatch.hh>
 #include	<strwcpy.h>
-#include	<localmisc.h>		/* |NODENAMELEN| */
+#include	<localmisc.h>
 
 #include	"uinfo.h"
 
 
 /* local defines */
-
-#ifndef	NODENAMELEN
-#define	NODENAMELEN	256
-#endif
 
 
 /* external subroutines */
@@ -85,14 +81,14 @@
 namespace {
     constexpr int	tmpaux_nfields = 5 ;
     struct uinfo_tmpaux {
-	int		flen ;		/* length of fields (buffers) below */
 	char		*a ;
 	char		*architecture ;
 	char		*platform ;
 	char		*hwprovider ;
 	char		*hwserial ;
 	char		*nisdomain ;
-    } ;
+	int		flen ;		/* length of fields (buffers) below */
+    } ; /* end struct (uinfo_tmpaux) */
     struct setname {
 	uinfo_infoname	tmpname ;
 	char		*strp = nullptr ;
@@ -102,7 +98,7 @@ namespace {
 	        strp = nullptr ;
 	    }
 	}
-    } ;
+    } ; /* end struct (setname) */
     struct setaux {
 	uinfo_infoaux	tmpaux ;
 	char		*strp = nullptr ;
@@ -112,11 +108,11 @@ namespace {
 	        strp = nullptr ;
 	    }
 	}
-    } ;
+    } ; /* end struct (setaux) */
     struct uinfo_alloc {
 	cchar		*name ;	/* string allocation for "name" */
 	cchar		*aux ;	/* string allocation for "aux" */
-    } ;
+    } ; /* end struct (uinfo_alloc) */
     struct uinfo {
 	ptm		mx ;		/* data mutex */
 	uinfo_alloc	ao ;		/* memory allocations */
@@ -302,8 +298,7 @@ int uinfo::getname(uinfo_infoname *unp) noex {
 int uinfo::getname_setup() noex {
 	int		rs = SR_OK ;
 	if (ao.name == nullptr) {
-	    setname	tmp ;
-	    if ((rs = getname_load(&tmp)) >= 0) {
+	    if (setname tmp ; (rs = getname_load(&tmp)) >= 0) {
 		rs = getname_install(&tmp) ;
 	    } /* end if (ok) */
 	} /* end if (setup needed) */
