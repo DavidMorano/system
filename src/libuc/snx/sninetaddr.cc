@@ -48,7 +48,7 @@
 #include	<strdcpyx.h>
 #include	<cthex.h>
 #include	<mkchar.h>
-#include	<localmisc.h>		/* |MIN| */
+#include	<localmisc.h>		/* |MIN| + |DIGBUFLEN| */
 
 #include	"snx.h"
 
@@ -79,10 +79,6 @@
 #define	INETX_ADDRSTRLEN	MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN		10
-#endif
-
 #ifndef	CF_CTHEXUC
 #define	CF_CTHEXUC		0
 #endif
@@ -111,6 +107,8 @@ static int sninet6(char *,int,cchar *) noex ;
 
 
 /* local variables */
+
+constexpr int		diglen = DIGBUFLEN ;
 
 constexpr bool		f_cthexuc = CF_CTHEXUC ;
 
@@ -157,16 +155,15 @@ static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 /* end subroutine (snunix) */
 
 static int sninet4(char *dbuf,int dlen,cchar *addr) noex {
-	INETADDR	ia ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = inetaddr_start(&ia,addr)) >= 0) {
+	if (inetaddr ia ; (rs = ia.start(addr)) >= 0) {
 	    {
-	        rs = inetaddr_getdotaddr(&ia,dbuf,dlen) ;
+	        rs = ia.getdotaddr(dbuf,dlen) ;
 		len = rs ;
 	    }
-	    rs1 = inetaddr_finish(&ia) ;
+	    rs1 = ia.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (inetaddr) */
 	return (rs >= 0) ? len : rs ;
@@ -179,9 +176,8 @@ static int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	int		pl = 0 ;
 	if ((dlen < 0) || (dlen >= astrlen)) {
 	    uint	uch ;
-	    cint	diglen = DIGBUFLEN ;
 	    cint	n = INET6ADDRLEN ;
-	    char	digbuf[DIGBUFLEN+1] ;
+	    char	digbuf[diglen + 1] ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 		uch = mkchar(addr[i]) ;
 		if_constexpr (f_cthexuc) {
