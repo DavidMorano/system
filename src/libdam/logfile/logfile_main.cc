@@ -61,7 +61,7 @@
 #include	<lockfile.h>
 #include	<opentmp.h>
 #include	<strn.h>
-#include	<strw.h>
+#include	<strw.h>		/* |strwset(3uc)| */
 #include	<strwcpy.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<mkx.h>

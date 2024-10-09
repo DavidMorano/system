@@ -29,6 +29,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	progmsgs
+
+	Description:
 	This module processes one or more mail messages (in appropriate
 	mailbox format if more than one) on STDIN.  The output is
 	a single file that is ready to be added to each individual
@@ -45,8 +49,9 @@
 #include	<netdb.h>
 #include	<climits>
 #include	<csignal>
-#include	<cstdlib>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -67,6 +72,7 @@
 #include	<logzones.h>
 #include	<nulstr.h>
 #include	<buffer.h>
+#include	<strw.h>		/* |strwset(3uc)| */
 #include	<ascii.h>
 #include	<char.h>
 #include	<hasx.h>

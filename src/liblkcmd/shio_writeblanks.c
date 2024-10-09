@@ -1,9 +1,8 @@
-/* shio_writeblanks */
+/* shio_writeblanks SUPPORT */
+/* lang=C++20 */
 
 /* write blacks to a SHIO object */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,9 +18,7 @@
 
 	Write a specified number of blanks to a SHIO object.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -37,7 +34,7 @@
 
 #include	<sys/types.h>
 #include	<usystem.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnset(3uc)| */
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -51,11 +48,6 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* local structures */
 
@@ -66,21 +58,25 @@ extern int	strlinelen(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int shio_writeblanks(SHIO *fp,int n) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		ml ;
 	int		wlen = 0 ;
 	char		blanks[NBLANKS] ;
-
-	strnset(blanks,NBLANKS,' ') ;
-	while ((rs >= 0) && (wlen < n)) {
-	    ml = MIN((n-wlen),NBLANKS) ;
-	    rs = shio_write(fp,blanks,ml) ;
-	    wlen += rs ;
-	} /* end while */
-
+	if (fp) {
+	    rs = SR_OK ;
+	    strnblanks(blanks,NBLANKS) ;
+	    while ((rs >= 0) && (wlen < n)) {
+	        ml = MIN((n-wlen),NBLANKS) ;
+	        rs = shio_write(fp,blanks,ml) ;
+	        wlen += rs ;
+	    } /* end while */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (shio_writeblanks) */

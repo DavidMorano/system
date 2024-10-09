@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	storebuf
+
+	Description:
 	This subroutine can be used to construct strings or messages
 	in a buffer WITHOUT using the 'sprintf(3c)' subroutine.
 
@@ -54,11 +58,10 @@
 	    i += rs ;
 	}
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<ctbin.h>
 #include	<ctoct.h>

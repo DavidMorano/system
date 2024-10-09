@@ -27,9 +27,9 @@
 
 
 #define	LOGZONES		struct logzones_head
+#define	LOGZONES_FL		struct logzones_flags
 #define	LOGZONES_ENT		struct logzones_entry
 #define	LOGZONES_CUR		struct logzones_cursor
-#define	LOGZONES_FL		struct logzones_flags
 
 #define	LOGZONES_MAGIC		91824563
 #define	LOGZONES_ENTLEN		48

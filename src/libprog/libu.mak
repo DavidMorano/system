@@ -59,10 +59,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00=
+OBJ00= endian.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= endian.o strtox.o xxtostr.o
+OBJ03= strtox.o xxtostr.o
 
 OBJ04= usupport.o usyscallbase.o
 OBJ05= utimeout.o ugetloadavg.o

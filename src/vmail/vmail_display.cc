@@ -39,12 +39,13 @@
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ascii.h>
-#include	<char.h>
+#include	<strn.h>		/* |strnset(3uc)| */
 #include	<sbuf.h>
 #include	<tmtime.h>
 #include	<sntmtime.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<tabexpand.h>
+#include	<char.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -3431,12 +3432,12 @@ static char *stridig(char *ip,int il,int n) noex {
 	char		digbuf[DIGBUFLEN + 1] ;
 	nd = ctdecui(digbuf,DIGBUFLEN,n) ;
 	if ((nd > 0) && (nd < il)) {
-	    ip = strnset(ip,1,' ') ;
+	    ip = strnlanks(ip,1) ;
 	    il -= 1 ;
-	    ip = strnset(ip,(il - nd),' ') ;
+	    ip = strnblanks(ip,(il - nd)) ;
 	    ip = strncpy(ip,digbuf,nd) ;
 	} else {
-	    ip = strnset(ip,il,' ') ;
+	    ip = strnblanks(ip,il) ;
 	}
 	return ip ;
 }

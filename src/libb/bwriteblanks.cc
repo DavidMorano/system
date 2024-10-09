@@ -43,7 +43,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<strw.h>
+#include	<strw.h>		/* |strwset(3uc)| */
 #include	<localmisc.h>
 
 #include	"bfile.h"

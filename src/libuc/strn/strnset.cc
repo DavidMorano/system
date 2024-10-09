@@ -25,12 +25,12 @@
 	NUL-terminated.
 
 	Synopsis:
-	char *strnset(cchar *bp,int bl,int ch) noex
+	char *strnset(cchar *dp,int ch,int n) noex
 
 	Arguments:
-	sp	destination string buffer (pointer)
-	sl	destination string buffer (length)
+	dp	destination string buffer (pointer)
 	ch	character to set in the destination string
+	n	number of characters
 
 	Returns:
 	-	the character pointer to the end of the destination
@@ -43,7 +43,7 @@
 
 
 	Name:
-	strnsetblanks
+	strnblanks
 
 	Description:
 	Copy blank characters to a destination for the number of
@@ -51,11 +51,11 @@
 	NUL-terminated.
 
 	Synopsis:
-	char *strnsetblanks(char *bp,int bl) noex
+	char *strnblanks(char *dp,int n) noex
 
 	Arguments:
-	sp	destination string buffer (pointer)
-	sl	destination string buffer (length)
+	dp	destination string buffer (pointer)
+	n	number of characters
 
 	Returns:
 	-	the character pointer to the end of the destination
@@ -101,8 +101,8 @@
 
 /* exported subroutines */
 
-char *strnset(char *bp,int bl,int ch) noex {
-	while (bl-- > 0) {
+char *strnset(char *bp,int ch,int n) noex {
+	while (n-- > 0) {
 	    *bp++ = ch ;
 	}
 	return bp ;

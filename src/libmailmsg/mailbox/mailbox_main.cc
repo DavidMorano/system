@@ -48,7 +48,7 @@
 #include	<ascii.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnset(3uc)| */
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<matxstr.h>
@@ -1212,7 +1212,7 @@ static int writeblanks(int mfd,int len) noex {
 	    while ((rs >= 0) && (rlen > 0)) {
 	        cint	maxlen = (rlen > 1) ? (rlen-1) : 0 ;
 	        ll = min(llen,maxlen) ;
-	        strnsetblanks(lbuf,ll) ;
+	        strnblanks(lbuf,ll) ;
 	        lbuf[ll++] = '\n' ;
 	        rs = uc_write(mfd,lbuf,ll) ;
 	        rlen -= rs ;
