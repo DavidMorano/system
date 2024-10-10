@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	eigendb
+
+	Description:
 	This module stores eigen words in a database for later
 	convenient access.
 
@@ -91,6 +95,7 @@ static int eigendb_ctor(eigendb *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
+	    op->dbp = nullptr ;
 	    if ((op->spp = new(nothrow) strpack) != np) {
 	        if ((op->dbp = new(nothrow) hdb) != np) {
 		    rs = SR_OK ;
@@ -340,9 +345,8 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	int		rs1 ;
 	cmode		om = 0666 ;
 	if ((rs = uc_open(fname,of,om)) >= 0) {
-	    USTAT	sb ;
 	    cint	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
 	            csize	mfsize = EIGENDB_MAXFILESIZE ;
 	            csize	fsize = sb.st_size ;
