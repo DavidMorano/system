@@ -1,4 +1,5 @@
 /* fileobject HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* determine if a named file is an object file */

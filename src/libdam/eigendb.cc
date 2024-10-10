@@ -1,4 +1,5 @@
 /* eigendb SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* store eigen words in a database */

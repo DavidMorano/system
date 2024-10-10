@@ -1,11 +1,12 @@
 /* sysvarproc */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* Ssytem-Variable-Process */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_PROCVARFILE	0		/* compile in 'procvarfile' */
-
 
 /* revision history:
 
@@ -18,31 +19,32 @@
 
 /*******************************************************************************
 
+  	Name:
+	sysvarproc
+
+	Description:
 	Process a system variable. I have no idea what that means!
 
 	Synopsis:
-	int sysvarprocget(vlp,fname)
-	HDBSTR		*vlp ;
-	const char	fname[] ;
+	int sysvarprocget(hdbstr *vlp,cchar *fname) noex
 
 	Arguments:
 	vlp		pointer to hash-string object
 	fname		file to process
 
 	Returns:
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<filer.h>

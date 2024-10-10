@@ -1,4 +1,5 @@
 /* filecounts HEADERS */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manage a file-based counter database */

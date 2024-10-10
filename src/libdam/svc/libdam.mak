@@ -270,7 +270,7 @@ OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
 OBJ153= getev.o getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
 OBJ154= msghdr.o cmsghdr.o
-OBJ155= readfileline.o readfilestrs.o mailboxappend.o
+OBJ155= filereadln.o filereadstrs.o mailboxappend.o
 OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
 OBJ157= localgetorg.o localgetorgcode.o localgetorgloc.o 
 OBJ158= localgetnetload.o localsetnetload.o localgetsystat.o localsetsystat.o
@@ -811,5 +811,7 @@ getlogx.o:		getlogx.cc getlogx.h
 sockpeername.o:		sockpeername.cc sockpeername.h
 nlspeername.o:		nlspeername.cc nlspeername.h
 conallof.o:		conallof.cc conallof.h
+filereadstrs.o:		filereadstrs.cc filereadstrs.h
+filereadln.o:		filereadln.cc filereadln.h
 
 

@@ -1,4 +1,5 @@
 /* lineindex SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* line indexing object */
@@ -513,17 +514,20 @@ bad3:
 /* end subroutine (lineindex_fileheader) */
 
 static int lineindex_filemap(LI *op) noex {
-	cnullptr	np{} ;
-	csize		ms = op->filesize ;
-	cint 		mp = PROT_READ ;
-	cint 		mf = MAP_SHARED ;
-	cint		fd = op->fd ;
-	int		rs ;
-	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
-		op->mapdatæ = caddr_t(md) ;
+	int		rs = SR_OK ;
+	if (op->mpadata == nullptr) {
+	    cnullptr	np{} ;
+	    csize	ms = size_t(uceil(op->filesize,op->pagesize)) ;
+	    cint 	mp = PROT_READ ;
+	    cint 	mf = MAP_SHARED ;
+	    cint	fd = op->fd ;
+	    void	*md{} ; 
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+		op->mapdata = caddr_t(md) ;
 		op->mapsize = ms ;
 	        op->ti_map = dt ;
-	} /* end if (u_mmapbegin) */
+	    } /* end if (u_mmapbegin) */
+	} /* end if (mapping needed) */
 	return rs ;
 }
 /* end subroutine (lineindex_filemap) */
@@ -534,16 +538,8 @@ static int lineindex_filembegin(LI *op,custime dt) noex {
 	if (op->mapdata == nullptr) {
 	    xnullptr	np{} ;
 	    if ((rs = lineindex_fileopen(op,dt)) >= 0) {
-		csize	ms ->mapsize = uceil(op->filesize,op->pagesize) ;
-		cint	mp = PROT_READ ;
-		cint	mf = MAP_SHARED ;
-		cint	fd = op->fd ;
-		void	*md{} ;
-		ms = uceil(op->filesize,op->pagesize) ;
-	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
-		    op->mapdata = md ;
-		    op->mapsze = ms ;
-	            op->ti_map = dt ;
+		{
+		    rs = lineindex_filemap(op) ;
 		}
 	        rs1 = lineindex_fileclose(op) ;
 		if (rs >= 0) rs = rs1 ;

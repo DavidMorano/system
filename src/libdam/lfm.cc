@@ -1,4 +1,5 @@
 /* lfm SUPPORT (Lock File Manager) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage file-lock operations */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	lfm
+
+	Description:
 	We want to check that we still own the lock file and also
 	update it by writting a current time into it.
 
