@@ -169,6 +169,9 @@ int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 }
 /* end subroutine (lineindex_opne) */
 
+namespace {
+}
+
 static int lineindex_opener(LI *op) noex {
 	custime		dt = getustime ;
 	int		rs ;

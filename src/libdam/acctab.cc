@@ -1233,6 +1233,7 @@ static int part_release(PARTTYPE *pp) noex {
 	}
 	return rs ;
 }
+/* end subroutine (part_release) */
 
 static int part_finish(PARTTYPE *pp) noex {
 	int		rs = SR_FAULT ;

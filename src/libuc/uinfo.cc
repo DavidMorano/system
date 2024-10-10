@@ -58,7 +58,9 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strnlen(3c)| */
 #include	<usystem.h>
 #include	<ucsysauxinfo.h>
 #include	<getbufsize.h>
@@ -247,7 +249,7 @@ int uinfo::init() noex {
 int uinfo::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (finitdone && (!fvoid.testandset)) {
+	if (finitdone && (! fvoid.testandset)) {
 	    {
 	        uinfo_alloc	*uap = &ao ;
 	        if (uap->name) {
@@ -317,13 +319,12 @@ int uinfo::getname_load(setname *setp) noex {
             if ((rs = u_uname(utsp)) >= 0) {
                 cint    nlen = int(sizeof(utsp->sysname) - 1) ;
                 int     sz = 0 ;
-                char    *bp ;
                 sz += (strnlen(utsp->sysname,nlen) + 1) ;
                 sz += (strnlen(utsp->nodename,nlen) + 1) ;
                 sz += (strnlen(utsp->release,nlen) + 1) ;
                 sz += (strnlen(utsp->version,nlen) + 1) ;
                 sz += (strnlen(utsp->machine,nlen) + 1) ;
-                if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
+                if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
                     setp->strp = bp ;
                     setp->tmpname.sysname = bp ;
                     bp = (strwcpy(bp,utsp->sysname,nlen) + 1) ;
@@ -486,11 +487,11 @@ int auxinfo::start() noex {
 		int	ai = 0 ;
 		a = charp(vp) ;
 		{
-		    architecture =	(a + ((flen + 1) & ai++)) ;
-		    platform =		(a + ((flen + 1) & ai++)) ;
-		    hwprovider =	(a + ((flen + 1) & ai++)) ;
-		    hwserial =		(a + ((flen + 1) & ai++)) ;
-		    nisdomain =		(a + ((flen + 1) & ai++)) ;
+		    architecture =	(a + ((flen + 1) * ai++)) ;
+		    platform =		(a + ((flen + 1) * ai++)) ;
+		    hwprovider =	(a + ((flen + 1) * ai++)) ;
+		    hwserial =		(a + ((flen + 1) * ai++)) ;
+		    nisdomain =		(a + ((flen + 1) * ai++)) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if (getbufsize) */

@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	timewatch
+
+	Description:
 	This simple object provides a facility to watch variables
 	for changes.
 
@@ -51,13 +55,13 @@ public:
 	template<typename L>
 	int operator () (L &lamb) noex {
 	    int		rs = SR_OK ;
-	    int		i ; /* used afterwards */
-	    for (i = 0 ; (rs == 0) && (i < mto) ; i += 1) {
+	    bool	fok = true ;
+	    for (int i = 0 ; (rs == 0) && (fok = (i < mto)) ; i += 1) {
 		if ((rs = msleep(1)) >= 0) {
 		    rs = lamb() ;
 		}
 	    } /* end for */
-	    if ((rs == 0) && (i == mto)) rs = SR_TIMEDOUT ;
+	    if ((rs == 0) && (! fok)) rs = SR_TIMEDOUT ;
 	    return rs ;
 	} ; /* end method (operator) */
 } ; /* end class (timewatch) */
