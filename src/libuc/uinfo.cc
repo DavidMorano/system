@@ -38,6 +38,10 @@
 	employ the basic (and not so basic) means of accomplishing
 	this.  See the code for our various machinations.
 
+	Synopsis:
+	int uinfo_name(uinfo_names *) noex
+	int uinfo_aux(uinfo_auxs *) noex
+
 	Q. Do these subroutines (the public ones) need to be 
 	multi-thread-safe?
 	A. What do you think?
@@ -80,7 +84,7 @@
 
 namespace {
     struct auxinfo {
-	char		*a ;
+	char		*a = nullptr ;
 	char		*architecture ;
 	char		*platform ;
 	char		*hwprovider ;
@@ -278,9 +282,8 @@ int uinfo::getname(uinfo_infoname *unp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (unp) {
-	    sigblocker	b ;
 	    memclear(unp) ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init()) >= 0) {
 		    if ((rs = getname_setup()) >= 0) {
 			*unp = name ;
@@ -307,10 +310,9 @@ int uinfo::getname_setup() noex {
 
 int uinfo::getname_load(setname *setp) noex {
 	cint		usz = sizeof(UTSNAME) ;
-	void		*vp{} ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = uc_libmalloc(usz,&vp)) >= 0) {
+	if (void *vp{} ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
 	    UTSNAME	*utsp = (UTSNAME *) vp ;
             if ((rs = u_uname(utsp)) >= 0) {
                 cint    nlen = int(sizeof(utsp->sysname) - 1) ;
@@ -475,6 +477,8 @@ int uinfo::getaux_install(setaux *setp) noex {
 
 int auxinfo::start() noex {
     	int		rs ;
+	a = nullptr ;
+	flen = 0 ;
 	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
 	    cint	sz = (nfields * (rs + 1)) ;
 	    flen = rs ;
@@ -482,11 +486,11 @@ int auxinfo::start() noex {
 		int	ai = 0 ;
 		a = charp(vp) ;
 		{
-		    architecture = (a + ((flen + 1) & ai++)) ;
-		    platform = (a + ((flen + 1) & ai++)) ;
-		    hwprovider = (a + ((flen + 1) & ai++)) ;
-		    hwserial = (a + ((flen + 1) & ai++)) ;
-		    nisdomain = (a + ((flen + 1) & ai++)) ;
+		    architecture =	(a + ((flen + 1) & ai++)) ;
+		    platform =		(a + ((flen + 1) & ai++)) ;
+		    hwprovider =	(a + ((flen + 1) & ai++)) ;
+		    hwserial =		(a + ((flen + 1) & ai++)) ;
+		    nisdomain =		(a + ((flen + 1) & ai++)) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if (getbufsize) */
@@ -502,51 +506,55 @@ int auxinfo::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	}
+	flen = 0 ;
 	return rs ;
 }
 /* end method (auxinfo::finish) */
 
 int auxinfo::load() noex {
 	cint    	nlen = flen ;
-	int		rs = SR_OK ;
+	int		rs = SR_BUGCHECK ;
 	int		sz = 0 ;
-	architecture[0] = '\0' ;
-	platform[0] = '\0' ;
-	hwprovider[0] = '\0' ;
-	hwserial[0] = '\0' ;
-	nisdomain[0] = '\0' ;
-	for (cauto &req : sais) {
-	    char	*nbuf = nullptr ;
-	    switch (req) {
-	    case SAI_ARCHITECTURE:
-	        nbuf = architecture ;
-		break ;
-	    case SAI_PLATFORM:
-	        nbuf = platform ;
-		break ;
-	    case SAI_HWPROVIDER:
-	        nbuf = hwprovider ;
-		break ;
-	    case SAI_HWSERIAL:
-	        nbuf = hwserial ;
-		break ;
-	    case SAI_RPCDOMAIN:
-	        nbuf = nisdomain ;
-		break ;
-	    } /* end switch */
-	    if ((req >= 0) && nbuf) {
-	        if ((rs = uc_sysauxinfo(nbuf,nlen,req)) >= 0) {
-		    sz += (rs + 1) ;
-		} else if (rs == SR_NOTFOUND) {
-		    rs = SR_OK ;
-		    sz += 1 ;		/* for the NUL character */
-	            nbuf[0] = '\0' ;
-		}
-	    } else {
-		sz += 1 ;
-	    } /* end if */
-	    if (rs < 0) break ;
-	} /* end for */
+	if (a) {
+	    rs = SR_OK ;
+	    architecture[0] = '\0' ;
+	    platform[0] = '\0' ;
+	    hwprovider[0] = '\0' ;
+	    hwserial[0] = '\0' ;
+	    nisdomain[0] = '\0' ;
+	    for (cauto &req : sais) {
+	        char	*nbuf = nullptr ;
+	        switch (req) {
+	        case SAI_ARCHITECTURE:
+	            nbuf = architecture ;
+		    break ;
+	        case SAI_PLATFORM:
+	            nbuf = platform ;
+		    break ;
+	        case SAI_HWPROVIDER:
+	            nbuf = hwprovider ;
+		    break ;
+	        case SAI_HWSERIAL:
+	            nbuf = hwserial ;
+		    break ;
+	        case SAI_RPCDOMAIN:
+	            nbuf = nisdomain ;
+		    break ;
+	        } /* end switch */
+	        if ((req >= 0) && nbuf) {
+	            if ((rs = uc_sysauxinfo(nbuf,nlen,req)) >= 0) {
+		        sz += (rs + 1) ;
+		    } else if (rs == SR_NOTFOUND) {
+		        rs = SR_OK ;
+		        sz += 1 ;		/* for the NUL character */
+	                nbuf[0] = '\0' ;
+		    }
+	        } else {
+		    sz += 1 ;
+	        } /* end if */
+	        if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
 }
 /* end method (auxinfo::load) */

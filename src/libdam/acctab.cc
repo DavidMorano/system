@@ -234,6 +234,7 @@ static int	part_load(acctab_pa *,cchar *,int = -1) noex ;
 [[maybe_unused]] static int	part_copy(acctab_pa *,acctab_pa *) noex ;
 [[maybe_unused]] static int	part_compile(acctab_pa *,cchar *,int) noex ;
 static int	part_match(acctab_pa *,cchar *) noex ;
+static int	part_release(acctab_pa *) noex ;
 static int	part_finish(acctab_pa *) noex ;
 
 static int	parttype(cchar *) noex ;
@@ -951,7 +952,31 @@ static int entry_finish(acctab_ent *sep) noex {
 /* end subroutine (entry_finish) */
 
 static int entry_release(acctab_ent *ep) noex {
-    return memclear(ep) ;
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->fi >= 0) {
+		{
+	            rs1 = part_release(&ep->netgroup) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = part_release(&ep->machine) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = part_release(&ep->username) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = part_release(&ep->password) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+	        ep->fi = -1 ;
+	    } /* end if */
+	} /* end if (non-null) */
+	return rs ;
 }
 
 static int entry_tmpload(acctab_ent *aep,cc *n,cc *m,cc *u,cc *p) noex {
@@ -1200,6 +1225,14 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 	return f ;
 }
 /* end subroutine (part_match) */
+
+static int part_release(PARTTYPE *pp) noex {
+    	int		rs = SR_FAULT ;
+	if (pp) {
+	    rs = memclear(pp) ;
+	}
+	return rs ;
+}
 
 static int part_finish(PARTTYPE *pp) noex {
 	int		rs = SR_FAULT ;
