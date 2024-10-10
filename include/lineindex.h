@@ -59,7 +59,7 @@ struct lineindex_head {
 	cchar		*ifn ;		/* index-file-name */
 	cchar		*tfn ;		/* text-file-name */
 	uint		*rectab ;
-	caddr_t		mapbuf ;
+	caddr_t		mapdata ;
 	time_t		wtime ;
 	time_t		mtime ;
 	time_t		ti_open ;
