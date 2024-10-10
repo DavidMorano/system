@@ -106,11 +106,10 @@ int umask_fini() noex {
 /* end subroutine (umask_fini) */
 
 int umaskget() noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		cmask = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    {
 		rs = umask_data.get() ;
 		cmask = rs ;
@@ -123,11 +122,10 @@ int umaskget() noex {
 /* end subroutine (umaskget) */
 
 int umaskset(mode_t cmask) noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    {
 		rs = umask_data.setmode(cmask) ;
 		omask = rs ;

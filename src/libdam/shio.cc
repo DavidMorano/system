@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	shio
+
+	Desfription:
 	This is a hack to make the SFIO stuff useable in an
 	interchangeable way when not in an SFIO environment.  This
 	generally occurs when a subroutine is used both in a SHELL
@@ -243,16 +247,16 @@ enum stdfnames {
 	stdfname_overlast
 } ;
 
-static constexpr cpcchar	stdfnames[] = {
+constexpr cpcchar	stdfnames[] = {
 	STDFNIN,
 	STDFNOUT,
 	STDFNERR,
-	STDFNnullptr,
+	STDFNNULL,
 	"*nullptr*",
 	nullptr
 } ;
 
-static constexpr int		seekrs[] = {
+constexpr int		seekrs[] = {
 	SR_NOTSEEK,
 	0
 } ;
