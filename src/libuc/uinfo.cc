@@ -147,8 +147,7 @@ namespace {
 	    mx.lockend() ;
 	} ;
 	~uinfo() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 	        ulogerror("uinfo",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (uinfo) */
@@ -569,8 +568,7 @@ static void uinfo_atforkafter() noex {
 }
 
 static void uinfo_exit() noex {
-	int		rs = uinfo_data.fini() ;
-	if (rs < 0) {
+	if (cint rs = uinfo_data.fini() ; rs < 0) {
 	    ulogerror("uinfo",rs,"exit-fini") ;
 	}
 }

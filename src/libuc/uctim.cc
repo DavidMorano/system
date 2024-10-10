@@ -187,8 +187,7 @@ namespace {
 	int disphandle() noex ;
 	int dispjobdel(callback *) noex ;
 	~uctim() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uctim",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (uctim) */

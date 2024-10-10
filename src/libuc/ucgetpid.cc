@@ -97,8 +97,7 @@ namespace {
 	    mx.lockend() ;
         }
 	~ucgetpid() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucgetpid",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor */
