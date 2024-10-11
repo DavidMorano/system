@@ -791,7 +791,7 @@ static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
 static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar	*tp, *cp ;
+	cchar		*cp ;
 	memclear(recp) ;
 #ifdef	COMMENT
 	cl = sfnext(lp,ll,&cp) ;
@@ -819,7 +819,7 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	recp->userstr.sl = min(cl,UAFILE_MAXUSERLEN) ;
 	ll = ((lp+ll)-(cp+cl)) ;
 	lp = (cp+cl) ;
-	if ((tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
+	if (cchar *tp{} ; (tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
 	    ll = ((lp+ll)-(tp+1)) ;
 	    lp = (tp+1) ;
 	    cp = lp ;
@@ -834,22 +834,19 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 /* end subroutine (rec_parse) */
 
 static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
-	storeitem	s ;
 	int		rs ;
 	int		rs1 ;
 	memclear(ep) ;
-	if ((rs = storeitem_start(&s,ebuf,elen)) >= 0) {
-	    UAD_ITEM	*ip ;
-	    cchar	*cp ;
+	if (storeitem s ; (rs = storeitem_start(&s,ebuf,elen)) >= 0) {
+	    UAD_ITEM	*ip = &recp->userstr ;
 	    ep->atime = recp->atime ;
 	    ep->count = recp->count ;
-	    ip = &recp->userstr ;
-	    rs = storeitem_strw(&s,ip->sp,ip->sl,&cp) ;
-	    ep->user = cp ;
-	    if (rs >= 0) {
+	    if (cchar *cp ; (rs = storeitem_strw(&s,ip->sp,ip->sl,&cp)) >= 0) {
+	        ep->user = cp ;
 	        ip = &recp->namestr ;
-	        rs = storeitem_strw(&s,ip->sp,ip->sl,&cp) ;
-	        ep->name = cp ;
+	        if ((rs = storeitem_strw(&s,ip->sp,ip->sl,&cp)) >= 0) {
+	            ep->name = cp ;
+		}
 	    }
 	    rs1 = storeitem_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;

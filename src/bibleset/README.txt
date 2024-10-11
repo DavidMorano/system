@@ -1,6 +1,6 @@
 BIBLESET
 
-This program typesets the Bible (or any text in appropriate database form)..
+This program typesets the Bible (or any text in appropriate database form).
 
 Synopsis:
 $ bibleset <file(s)> [-ff <fontfamily>] [-ps <ps>[:<vs>] [-vs <vs>] 

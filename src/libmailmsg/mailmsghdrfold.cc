@@ -1,4 +1,5 @@
 /* mailmsghdrfold SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage folding of a mail-message header line */
@@ -61,6 +62,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<climits>		/* |UINT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<vecobj.h>

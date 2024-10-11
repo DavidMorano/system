@@ -1,4 +1,5 @@
 /* headkeymat SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match on mail-message header keys */
@@ -46,11 +47,13 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<strwcmp.h>

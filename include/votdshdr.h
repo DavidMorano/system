@@ -69,16 +69,11 @@ struct votdchdr_head {
 	uchar		vetu[4] ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	votdchdr(VOTDCHDR *,int,char *,int) noex ;
 
-extern int votdchdr(VOTDCHDR *,int,char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VOTDCHDR_INCLUDE */

@@ -110,7 +110,7 @@ OBJ13= matstr.o matostr.o matpstr.o matpcasestr.o
 OBJ14= matkeystr.o matnstr.o matsubstr.o matcasesubstr.o
 OBJ15=
 
-OBJ16= mallocstuff.o filread.o
+OBJ16= mallocstuff.o fileread.o
 OBJ17= 
 OBJ18= 
 OBJ19= 

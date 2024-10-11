@@ -1,4 +1,5 @@
 /* mcmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create and parse mail-cluster IPC messages */
@@ -21,7 +22,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |LOGNAMELEN| + ... */
 
 
 #ifndef	LOGNAMELEN

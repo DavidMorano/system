@@ -1,4 +1,5 @@
 /* mailmsgmathdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* match on a message header (returns the key-name) */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

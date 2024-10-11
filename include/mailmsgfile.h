@@ -1,4 +1,5 @@
 /* mailmsgfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create and cache message content files */

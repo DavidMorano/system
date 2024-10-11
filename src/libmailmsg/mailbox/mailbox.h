@@ -1,4 +1,5 @@
 /* mailbox HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* mailbox handling object */
@@ -21,13 +22,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
-#include	<unistd.h>
-#include	<utypedefs.h>
-#include	<usysrets.h>
+#include	<unistd.h>		/* |open(2)| definitions */
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 
 
 /* object defines */

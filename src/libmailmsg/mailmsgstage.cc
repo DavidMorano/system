@@ -1,4 +1,5 @@
 /* mailmsgstage SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the input messages and spool them up */
@@ -52,6 +53,7 @@
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */

@@ -1,4 +1,5 @@
 /* headketmat HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* match on mail-message header keys */
@@ -19,8 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

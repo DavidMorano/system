@@ -1,4 +1,5 @@
 /* mailaddr EADPER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* parse email route addresses into host and local parts */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>		/* |MAILADDRLEN| */
 
 

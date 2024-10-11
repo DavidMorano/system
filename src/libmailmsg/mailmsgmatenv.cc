@@ -1,4 +1,5 @@
 /* mailmsgmatenv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to match on a UNIX® mail-message envelope */
@@ -64,6 +65,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<tmstrs.h>

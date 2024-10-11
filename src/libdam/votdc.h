@@ -1,4 +1,8 @@
-/* votdc */
+/* votdc HEADER (VOTD Shared-memory management) */
+/* lang=C20 */
+
+/* VOTDs system Cache management */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -10,6 +14,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<ptm.h>
 #include	<shmalloc.h>
 #include	<localmisc.h>

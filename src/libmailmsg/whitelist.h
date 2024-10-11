@@ -1,4 +1,5 @@
 /* whitelist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* whitelist mail management */
@@ -19,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<vecstr.h>
 

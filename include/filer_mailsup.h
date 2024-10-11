@@ -1,4 +1,5 @@
 /* filer_mailsup HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* support some buffered file operations for email purposes */

@@ -81,6 +81,14 @@ int field::getterm(cchar *tp,cchar **rpp) noex {
 	return field_getterm(this,tp,rpp) ;
 }
 
+int field::word(cchar *tp,cchar **fpp) noex {
+	return field_word(this,tp,fpp) ;
+}
+
+int field::wordphrase(cchar *tp,char *rbuf,int rlen) noex {
+	return field_wordphrase(this,tp,rbuf,rlen) ;
+}
+
 int field::sharg(cchar *tp,char *rbuf,int rlen) noex {
 	return field_sharg(this,tp,rbuf,rlen) ;
 }

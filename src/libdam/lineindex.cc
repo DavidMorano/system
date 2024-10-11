@@ -555,7 +555,6 @@ static int lineindex_filemend(LI *op) noex {
 /* end subroutine (lineindex_filemend) */
 
 static int lineindex_fileopen(LI *op,custime dt) noex {
-	USTAT		sb ;
 	int	rs = SR_OK ;
 	int	of ;
 	int	f ;
@@ -597,7 +596,7 @@ static int lineindex_fileopen(LI *op,custime dt) noex {
 
 	if (rs >= 0) {
 
-	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 
 	        if (! f_changed)
 	            f_changed = (op->filesize != sb.st_size) ||

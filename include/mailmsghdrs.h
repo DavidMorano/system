@@ -1,4 +1,5 @@
 /* mailmsghdrs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -16,11 +17,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mailmsg.h>
-#include	<localmisc.h>
 
 
 /* object defines */

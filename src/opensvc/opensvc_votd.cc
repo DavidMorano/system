@@ -4,8 +4,6 @@
 /* LOCAL facility open-service (votd) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_TEST1	0		/* test-1 */
 #define	CF_SUBNDAYS	0		/* use |subinfo_ndays()| */
 
@@ -82,6 +80,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
@@ -189,7 +188,7 @@ extern cchar	**environ ;
 /* local structures */
 
 struct vcinfo {
-	BIBLEVERSE_Q	q ;
+	bibleverse_q	q ;
 	cchar		*a ;
 	char		*nbuf ;
 	char		*vbuf ;
@@ -226,7 +225,7 @@ struct subinfo_flags {
 struct subinfo {
 	TMTIME		tm ;		/* holds today's date, when set */
 	BIBLEBOOK	ndb ;		/* bible-book-name DB */
-	BIBLEVERSE	vdb ;
+	bibleverse	vdb ;
 	BVS		sdb ;
 	BVSMK		bsmk ;
 	BIBLEPARA	pdb ;
@@ -278,17 +277,17 @@ static int	subinfo_booksize(SUBINFO *) noex ;
 static int	subinfo_booklookup(SUBINFO *,char *,int,int) noex ;
 static int	subinfo_bookmatch(SUBINFO *,cchar *,int) noex ;
 static int	subinfo_today(SUBINFO *) noex ;
-static int	subinfo_defdayspec(SUBINFO *,DAYSPEC *) noex ;
+static int	subinfo_defdayspec(SUBINFO *,dayspec *) noex ;
 static int	subinfo_year(SUBINFO *) noex ;
 static int	subinfo_tmtime(SUBINFO *) noex ;
 static int	subinfo_finish(SUBINFO *) noex ;
-static int	subinfo_mkmodquery(SUBINFO *,BIBLEVERSE_Q *,int) noex ;
+static int	subinfo_mkmodquery(SUBINFO *,bibleverse_q *,int) noex ;
 static int	subinfo_bvs(SUBINFO *) noex ;
 static int	subinfo_bvsbuild(SUBINFO *) noex ;
 static int	subinfo_bvsbuilder(SUBINFO *) noex ;
-static int	subinfo_ispara(SUBINFO *,BIBLEVERSE_Q *) noex ;
+static int	subinfo_ispara(SUBINFO *,bibleverse_q *) noex ;
 static int	subinfo_text(SUBINFO *) noex ;
-static int	subinfo_textquery(SUBINFO *,char *,int,BIBLEVERSE_Q *) noex ;
+static int	subinfo_textquery(SUBINFO *,char *,int,bibleverse_q *) noex ;
 static int	subinfo_vc(SUBINFO *) noex ;
 static int	subinfo_vcbegin(SUBINFO *) noex ;
 static int	subinfo_vcfetch(SUBINFO *,VCINFO *,int) noex ;
@@ -299,10 +298,10 @@ static int	subinfo_vcend(SUBINFO *) noex ;
 static int	subinfo_titlelang(SUBINFO *) noex ;
 
 #if	CF_SUBNDATS
-static int	subinfo_ndays(SUBINFO *,BIBLEVERSE_Q *,int) noex ;
+static int	subinfo_ndays(SUBINFO *,bibleverse_q *,int) noex ;
 #endif
 
-static int	procopts(SUBINFO *,KEYOPT *) noex ;
+static int	procopts(SUBINFO *,keyopt *) noex ;
 static int	process(SUBINFO *,ARGINFO *,BITS *,cchar *,int) noex ;
 static int	procsome(SUBINFO *,ARGINFO *,BITS *,cchar *,int) noex ;
 static int	procspecs(SUBINFO *,cchar *,int) noex ;
@@ -312,23 +311,23 @@ static int	procallcacheout(SUBINFO *,VOTDC *,VOTDC_CITE *,
 			char *,int) noex ;
 static int	procallcacheoutcite(SUBINFO *,VOTDC *,VOTDC_CITE *) noex ;
 static int	procall(SUBINFO *) noex ;
-static int	procparse(SUBINFO *,BIBLEVERSE_Q *,cchar *,int) noex ;
-static int	procmulti(SUBINFO *,BIBLEVERSE_Q *,int,int) noex ;
-static int	procload(SUBINFO *,VRBUF *,int,BIBLEVERSE_Q *) noex ;
+static int	procparse(SUBINFO *,bibleverse_q *,cchar *,int) noex ;
+static int	procmulti(SUBINFO *,bibleverse_q *,int,int) noex ;
+static int	procload(SUBINFO *,VRBUF *,int,bibleverse_q *) noex ;
 static int	proctoday(SUBINFO *,int,int) noex ;
 static int	procmjds(SUBINFO *,int,int,int) noex ;
 static int	procvcache(SUBINFO *,int,int) noex ;
 static int	procvcacher(SUBINFO *,VCINFO *,int) noex ;
 static int	procvoutcite(SUBINFO *,VCINFO *,int) noex ;
 static int	procvoutverse(SUBINFO *,VCINFO *) noex ;
-static int	procoutcite(SUBINFO *,BIBLEVERSE_Q *,int) noex ;
-static int	procoutverse(SUBINFO *,BIBLEVERSE_Q *,cchar *,int) noex ;
+static int	procoutcite(SUBINFO *,bibleverse_q *,int) noex ;
+static int	procoutverse(SUBINFO *,bibleverse_q *,cchar *,int) noex ;
 static int	procoutline(SUBINFO *,int,cchar *,int) noex ;
 
 static int	vcinfo_start(VCINFO *) noex ;
 static int	vcinfo_finish(VCINFO *) noex ;
 
-static int	votdsq_load(VOTDC_Q *,BIBLEVERSE_Q *) noex ;
+static int	votdsq_load(VOTDC_Q *,bibleverse_q *) noex ;
 
 
 /* local variables */
@@ -358,7 +357,7 @@ static constexpr cchar	*argopts[] = {
 	"sdb",
 	"bookname",
 	"lang",
-	NULL
+	nullptr
 } ;
 
 enum akonames {
@@ -394,7 +393,7 @@ static constexpr cchar	*akonames[] = {
 	"gmt",
 	"lang",
 	"allcache",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	aterms[] = {
@@ -419,19 +418,19 @@ static constexpr cchar	*qtypes[] = {
 	"verses",
 	"days",
 	"mjds",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*langs[] = {
 	"english",
 	"spanish",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	*vers[] = {
 	"av",
 	"rvv",
-	NULL
+	nullptr
 } ;
 
 static constexpr cchar	blanks[NBLANKS+1] = "                    " ;
@@ -455,7 +454,7 @@ int		to ;
 	SUBINFO		si, *sip = &si ;
 	ARGINFO		ainfo ;
 	BITS		pargs ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		argc = 0 ;
@@ -464,25 +463,21 @@ int		to ;
 	int		v ;
 	int		fd = -1 ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_apm = FALSE ;
+	int		f_apm = false ;
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*ndbname = NULL ;
-	cchar		*pdbname = NULL ;
-	cchar		*vdbname = NULL ;
-	cchar		*sdbname = NULL ;
-	cchar		*qtypestr = NULL ;
-	cchar		*lang = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*ndbname = nullptr ;
+	cchar		*pdbname = nullptr ;
+	cchar		*vdbname = nullptr ;
+	cchar		*sdbname = nullptr ;
+	cchar		*qtypestr = nullptr ;
+	cchar		*lang = nullptr ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd: ent\n") ;
-#endif
-
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	}
 
 /* local information */
@@ -498,11 +493,10 @@ int		to ;
 	rs = keyopt_start(&akopts) ;
 	sip->open.akopts = (rs >= 0) ;
 
-	ai = 0 ;
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (int ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -513,11 +507,11 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
-	            if (f_optplus) f_apm = TRUE ;
+	            if (f_optplus) f_apm = true ;
 	            argval = (argp+1) ;
 
 	        } else if (ach == '-') {
@@ -530,15 +524,15 @@ int		to ;
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -550,7 +544,7 @@ int		to ;
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -568,7 +562,7 @@ int		to ;
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -586,7 +580,7 @@ int		to ;
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -604,7 +598,7 @@ int		to ;
 /* BibleBook-name DB name */
 	                case argopt_book:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ndbname = avp ;
 	                    } else {
@@ -622,7 +616,7 @@ int		to ;
 /* paragraph-db name */
 	                case argopt_pdb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pdbname = avp ;
 	                    } else {
@@ -640,7 +634,7 @@ int		to ;
 /* BibleBook-verse DB name */
 	                case argopt_vdb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            vdbname = avp ;
 	                    } else {
@@ -658,7 +652,7 @@ int		to ;
 /* structure-db name */
 	                case argopt_sdb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sdbname = avp ;
 	                    } else {
@@ -674,11 +668,11 @@ int		to ;
 	                    break ;
 
 	                case argopt_bookname:
-	                    sip->have.bookname = TRUE ;
-	                    sip->final.bookname = TRUE ;
-	                    sip->f.bookname = TRUE ;
+	                    sip->have.bookname = true ;
+	                    sip->final.bookname = true ;
+	                    sip->f.bookname = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            sip->f.bookname = (rs > 0) ;
@@ -687,8 +681,8 @@ int		to ;
 	                    break ;
 
 	                case argopt_lang:
-	                    sip->have.lang = TRUE ;
-	                    sip->final.bookname = TRUE ;
+	                    sip->have.lang = true ;
+	                    sip->final.bookname = true ;
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
@@ -710,7 +704,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -727,7 +721,7 @@ int		to ;
 	                        break ;
 
 	                    case 'a':
-	                        sip->f.all = TRUE ;
+	                        sip->f.all = true ;
 	                        break ;
 
 /* type of argument-input */
@@ -750,8 +744,8 @@ int		to ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                sip->have.nitems = TRUE ;
-	                                sip->final.nitems = TRUE ;
+	                                sip->have.nitems = true ;
+	                                sip->final.nitems = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                sip->nitems = rs ;
 	                            }
@@ -766,7 +760,7 @@ int		to ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -780,8 +774,8 @@ int		to ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                sip->have.linelen = TRUE ;
-	                                sip->final.linelen = TRUE ;
+	                                sip->have.linelen = true ;
+	                                sip->final.linelen = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                sip->linelen = rs ;
 	                            }
@@ -805,10 +799,10 @@ int		to ;
 
 /* use GMT */
 	                    case 'z':
-	                        sip->final.gmt = TRUE ;
-	                        sip->f.gmt = TRUE ;
+	                        sip->final.gmt = true ;
+	                        sip->f.gmt = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                sip->f.gmt = (rs > 0) ;
@@ -845,15 +839,11 @@ int		to ;
 	    rs = subinfo_setroot(sip,pr,sn) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd: subinfo_setroot() rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && (sip->nitems <= 0) && (argval != NULL)) {
+	if ((rs >= 0) && (sip->nitems <= 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    sip->nitems = rs ;
-	    sip->have.nitems = TRUE ;
-	    sip->final.nitems = TRUE ;
+	    sip->have.nitems = true ;
+	    sip->final.nitems = true ;
 	}
 
 /* load up the environment options */
@@ -864,14 +854,14 @@ int		to ;
 
 /* argument defaults */
 
-	if (afname == NULL) afname = getourenv(sip->envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(sip->envv,VARAFNAME) ;
 
-	if (lang == NULL) lang = getourenv(sip->envv,VARLANG) ;
-	if (lang == NULL) lang = DEFLANG ;
+	if (lang == nullptr) lang = getourenv(sip->envv,VARLANG) ;
+	if (lang == nullptr) lang = DEFLANG ;
 
 /* check for valid language */
 
-	if ((lang != NULL) && (lang[0] != '\0')) {
+	if ((lang != nullptr) && (lang[0] != '\0')) {
 	    int		li = matostr(langs,1,lang,-1) ;
 	    ndbname = lang ;
 	    if (li < 0) li = 0 ;
@@ -880,23 +870,23 @@ int		to ;
 
 /* name-db name */
 
-	if (ndbname == NULL) ndbname = getourenv(envv,VARNDB) ;
-	if (ndbname == NULL) ndbname = NDBNAME ;
+	if (ndbname == nullptr) ndbname = getourenv(envv,VARNDB) ;
+	if (ndbname == nullptr) ndbname = NDBNAME ;
 
 /* verse-db name */
 
-	if (vdbname == NULL) vdbname = getourenv(envv,VARVDB) ;
-	if (vdbname == NULL) vdbname = VDBNAME ;
+	if (vdbname == nullptr) vdbname = getourenv(envv,VARVDB) ;
+	if (vdbname == nullptr) vdbname = VDBNAME ;
 
 /* structure-db name */
 
-	if (sdbname == NULL) sdbname = getourenv(envv,VARSDB) ;
-	if (sdbname == NULL) sdbname = SDBNAME ;
+	if (sdbname == nullptr) sdbname = getourenv(envv,VARSDB) ;
+	if (sdbname == nullptr) sdbname = SDBNAME ;
 
 /* paragraph-db name */
 
-	if (pdbname == NULL) pdbname = getourenv(envv,VARPDB) ;
-	if (pdbname == NULL) pdbname = PDBNAME ;
+	if (pdbname == nullptr) pdbname = getourenv(envv,VARPDB) ;
+	if (pdbname == nullptr) pdbname = PDBNAME ;
 
 /* defaults */
 
@@ -908,28 +898,23 @@ int		to ;
 
 /* type of argument-input */
 
-	if ((rs >= 0) && (qtypestr != NULL)) {
+	if ((rs >= 0) && (qtypestr != nullptr)) {
 	    v = matostr(qtypes,1,qtypestr,-1) ;
 	    if (v < 0) rs = SR_INVALID ;
 	    sip->qtype = v ;
 	}
-
-#if	CF_DEBUGS
-	if (qtypestr != NULL)
-	    debugprintf("opensvc_votd: qtype=%s(%u)\n",qtypestr,sip->qtype) ;
-#endif
 
 /* debugging */
 
 	rs1 = (DEFPRECISION + 2) ;
 	if ((rs >= 0) && (sip->linelen < rs1)) {
 	    cp = getourenv(envv,VARLINELEN) ;
-	    if (cp == NULL) cp = getourenv(envv,VARCOLUMNS) ;
-	    if (cp != NULL) {
+	    if (cp == nullptr) cp = getourenv(envv,VARCOLUMNS) ;
+	    if (cp != nullptr) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (v >= rs1) {
-	                sip->have.linelen = TRUE ;
-	                sip->final.linelen = TRUE ;
+	                sip->have.linelen = true ;
+	                sip->final.linelen = true ;
 	                sip->linelen = rs ;
 		    }
 	        }
@@ -952,12 +937,6 @@ int		to ;
 	ainfo.ai_max = ai_max ;
 	ainfo.ai_pos = ai_pos ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd: pr=%s\n",sip->pr) ;
-	debugprintf("opensvc_votd: vdbname=%s\n",vdbname) ;
-	debugprintf("opensvc_votd: f_all=%u\n",sip->f.all) ;
-#endif
-
 	if (rs >= 0) {
 	    if ((rs = subinfo_outbegin(sip)) >= 0) {
 	        {
@@ -969,13 +948,9 @@ int		to ;
 	    } /* end if (subinfo_outend) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd: done rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 /* done */
 	if (sip->open.akopts) {
-	    sip->open.akopts = FALSE ;
+	    sip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -995,17 +970,17 @@ badsubstart:
 /* local subroutines */
 
 /* process the program ako-names */
-static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
+static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getourenv(sip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(sip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1015,14 +990,14 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_audit:
 	                    if (! sip->final.audit) {
-	                        sip->have.audit = TRUE ;
-	                        sip->final.audit = TRUE ;
-	                        sip->f.audit = TRUE ;
+	                        sip->have.audit = true ;
+	                        sip->final.audit = true ;
+	                        sip->f.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.audit = (rs > 0) ;
@@ -1031,9 +1006,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_linelen:
 	                    if (! sip->final.linelen) {
-	                        sip->have.linelen = TRUE ;
-	                        sip->final.linelen = TRUE ;
-	                        sip->f.linelen = TRUE ;
+	                        sip->have.linelen = true ;
+	                        sip->final.linelen = true ;
+	                        sip->f.linelen = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            sip->linelen = rs ;
@@ -1042,9 +1017,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_indent:
 	                    if (! sip->final.indent) {
-	                        sip->have.indent = TRUE ;
-	                        sip->final.indent = TRUE ;
-	                        sip->f.indent = TRUE ;
+	                        sip->have.indent = true ;
+	                        sip->final.indent = true ;
+	                        sip->f.indent = true ;
 	                        sip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1054,9 +1029,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_bookname:
 	                    if (! sip->final.bookname) {
-	                        sip->have.bookname = TRUE ;
-	                        sip->final.bookname = TRUE ;
-	                        sip->f.bookname = TRUE ;
+	                        sip->have.bookname = true ;
+	                        sip->final.bookname = true ;
+	                        sip->f.bookname = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.bookname = (rs > 0) ;
@@ -1065,9 +1040,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_interactive:
 	                    if (! sip->final.interactive) {
-	                        sip->have.interactive = TRUE ;
-	                        sip->final.interactive = TRUE ;
-	                        sip->f.interactive = TRUE ;
+	                        sip->have.interactive = true ;
+	                        sip->final.interactive = true ;
+	                        sip->f.interactive = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.interactive = (rs > 0) ;
@@ -1076,9 +1051,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_separate:
 	                    if (! sip->final.separate) {
-	                        sip->have.separate = TRUE ;
-	                        sip->final.separate = TRUE ;
-	                        sip->f.separate = TRUE ;
+	                        sip->have.separate = true ;
+	                        sip->final.separate = true ;
+	                        sip->f.separate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.separate = (rs > 0) ;
@@ -1088,9 +1063,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                case akoname_default:
 	                case akoname_defnull:
 	                    if (! sip->final.defnull) {
-	                        sip->have.defnull = TRUE ;
-	                        sip->final.defnull = TRUE ;
-	                        sip->f.defnull = TRUE ;
+	                        sip->have.defnull = true ;
+	                        sip->final.defnull = true ;
+	                        sip->f.defnull = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.defnull = (rs > 0) ;
@@ -1099,9 +1074,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_para:
 	                    if (! sip->final.para) {
-	                        sip->have.para = TRUE ;
-	                        sip->final.para = TRUE ;
-	                        sip->f.para = TRUE ;
+	                        sip->have.para = true ;
+	                        sip->final.para = true ;
+	                        sip->f.para = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.para = (rs > 0) ;
@@ -1110,9 +1085,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_gmt:
 	                    if (! sip->final.gmt) {
-	                        sip->have.gmt = TRUE ;
-	                        sip->final.gmt = TRUE ;
-	                        sip->f.gmt = TRUE ;
+	                        sip->have.gmt = true ;
+	                        sip->final.gmt = true ;
+	                        sip->f.gmt = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.gmt = (rs > 0) ;
@@ -1121,9 +1096,9 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 	                    break ;
 	                case akoname_allcache:
 	                    if (! sip->final.allcache) {
-	                        sip->have.allcache = TRUE ;
-	                        sip->final.allcache = TRUE ;
-	                        sip->f.allcache = TRUE ;
+	                        sip->have.allcache = true ;
+	                        sip->final.allcache = true ;
+	                        sip->f.allcache = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            sip->f.allcache = (rs > 0) ;
@@ -1173,18 +1148,10 @@ static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 	        wlen += rs ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("opensvc_votd/process: before-close rs=%d\n",rs) ;
-#endif
-
-	    sip->ofp = NULL ;
+	    sip->ofp = nullptr ;
 	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/process: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1199,25 +1166,11 @@ static int procsome(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 	int		wlen = 0 ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procsome: ent\n") ;
-	debugprintf("opensvc_votd/procsome: argc=%u\n",aip->argc) ;
-#endif
-
 	if (rs >= 0) {
-	    int	ai ;
-	    int	f ;
-	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
+	    for (int ai = 1 ; ai < aip->argc ; ai += 1) {
 
-#if	CF_DEBUGS
-	        debugprintf("opensvc_votd/process: pos-arg\n") ;
-#endif
-
-	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
-#if	CF_DEBUGS
-	        debugprintf("opensvc_votd/process: pos-arg ai=%u f=%u\n",ai,f) ;
-#endif
+	        bool	f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
+	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = aip->argv[ai] ;
 	            if (cp[0] != '\0') {
@@ -1233,11 +1186,11 @@ static int procsome(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 	} /* end if (positional arguments) */
 
 	if (rs >= 0) {
-	    if ((afn != NULL) && (afn[0] != '\0')) {
+	    if ((afn != nullptr) && (afn[0] != '\0')) {
 	        bfile	afile, *afp = &afile ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1271,7 +1224,7 @@ static int procsome(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 
 	    pan += 1 ;
 	    if (sip->nitems > 0) ndays = (sip->nitems+1) ;
-	    rs = proctoday(sip,TRUE,ndays) ;
+	    rs = proctoday(sip,true,ndays) ;
 	    wlen += rs ;
 
 	} /* end if */
@@ -1279,19 +1232,11 @@ static int procsome(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 	if ((rs >= 0) && (pan == 0) && sip->f.defnull) {
 	    int		ndays = 1 ;
 
-#if	CF_DEBUGS
-	    debugprintf("opensvc_votd/process: defnull\n") ;
-#endif
-
 	    if (sip->nitems > 1) ndays = sip->nitems ;
-	    rs = proctoday(sip,TRUE,ndays) ;
+	    rs = proctoday(sip,true,ndays) ;
 	    wlen += rs ;
 
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procsome: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1302,14 +1247,14 @@ static int procspecs(SUBINFO *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (sp == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (sip->f.interactive) sip->cout = 0 ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	    const int	flen = sl ;
+	    cint	flen = sl ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	        int	fl ;
@@ -1335,15 +1280,11 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 	int		ndays = sip->nitems ;
 	int		wlen = 0 ;
 
-	if (sp == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
 	if ((sl > 0) && (sp[0] != '\0')) {
-
-#if	CF_DEBUGS
-	    debugprintf("opensvc_votd/procspec: spec>%t<\n",sp,sl) ;
-#endif
 
 	    if ((sp[0] == '+') || (sp[0] == '-')) {
 	        int		v = sip->nitems ;
@@ -1355,15 +1296,15 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 	        }
 
 	        if (rs >= 0) {
-	            rs = proctoday(sip,TRUE,v) ;
+	            rs = proctoday(sip,true,v) ;
 	            wlen += rs ;
 	        }
 
 	    } else if (sip->qtype == qtype_verse) {
-	        BIBLEVERSE_Q	q ;
+	        bibleverse_q	q ;
 
 	        if ((rs = procparse(sip,&q,sp,sl)) >= 0) {
-	            rs = procmulti(sip,&q,TRUE,ndays) ;
+	            rs = procmulti(sip,&q,true,ndays) ;
 	            wlen += rs ;
 	        }
 
@@ -1373,7 +1314,7 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 	            if ((rs = ourmjd(sp,sl)) > 0) {
 	                mjd = rs ;
 	            } else {
-	                DAYSPEC	ds ;
+	                dayspec	ds ;
 	                if ((rs = dayspec_load(&ds,sp,sl)) >= 0) {
 	                    if ((rs = subinfo_defdayspec(sip,&ds)) >= 0) {
 	                        rs = getmjd(ds.y,ds.m,ds.d) ;
@@ -1394,18 +1335,13 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 	        }
 
 	        if ((rs >= 0) && (mjd >= 0)) {
-	            rs = procmjds(sip,mjd,TRUE,ndays) ;
+	            rs = procmjds(sip,mjd,true,ndays) ;
 	            wlen += rs ;
 	        }
 
 	    } /* end if (handling different query types) */
 
 	} /* end if (positive) */
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procspec: ret rs=%d wlen=%u\n",
-	    rs,wlen) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1417,48 +1353,31 @@ static int procallcache(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	cchar		*pr = sip->pr ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procallcache: ent\n") ;
-#endif
 #if	CF_TEST1
 	rs = filer_printf(sip->ofp,"hello world\n") ;
 	wlen += rs ;
 #else /* CF_TEST1 */
-	if ((rs = votdc_open(vcp,pr,NULL,0)) >= 0) {
+	if ((rs = votdc_open(vcp,pr,nullptr,0)) >= 0) {
 	    VOTDC_VCUR	vc ;
-	    sip->open.vcache = TRUE ;
+	    sip->open.vcache = true ;
 	    if ((rs = votdc_vcurbegin(vcp,&vc)) >= 0) {
 	        VOTDC_CITE	vcite ;
-	        const int	vlen = BVBUFLEN ;
+	        cint	vlen = BVBUFLEN ;
 	        int		vl ;
 	        char		vbuf[BVBUFLEN+1] ;
 	        while ((vl = votdc_vcurenum(vcp,&vc,&vcite,vbuf,vlen)) > 0) {
-#if	CF_DEBUGS
-	            debugprintf("opensvc_votd/procallcache: "
-	                "votdc_vcurenum() rs=%d\n", rs) ;
-#endif
 	            rs = procallcacheout(sip,vcp,&vcite,vbuf,vl) ;
 	            wlen += rs ;
 	        } /* end while */
-#if	CF_DEBUGS
-	        debugprintf("opensvc_votd/procallcache: while-out rs=%d\n",rs) ;
-#endif
 	        if ((rs >= 0) && (vl != SR_NOTFOUND)) rs = vl ;
 	        rs1 = votdc_vcurend(&sip->vcache,&vc) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (votdc-cur) */
-#if	CF_DEBUGS
-	    debugprintf("opensvc_votd/procallcache: votdc_vcur-out rs=%d\n",
-	        rs) ;
-#endif
-	    sip->open.vcache = FALSE ;
+	    sip->open.vcache = false ;
 	    rs1 = votdc_close(&sip->vcache) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (votdc) */
 #endif /* CF_TEST1 */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procallcache: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procallcache) */
@@ -1468,13 +1387,8 @@ static int procallcacheout(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep,
 	int		rs ;
 	int		wlen = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procallcacheout: ent\n") ;
-	debugprintf("opensvc_votd/procallcacheout: v=>%t<\n",
-	    vbuf,strlinelen(vbuf,vl,40)) ;
-#endif
 	if ((rs = procallcacheoutcite(sip,vcp,citep)) >= 0) {
-	    BIBLEVERSE_Q	q ;
+	    bibleverse_q	q ;
 	    wlen += rs ;
 	    q.b = citep->b ;
 	    q.c = citep->c ;
@@ -1483,10 +1397,6 @@ static int procallcacheout(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep,
 	    wlen += rs ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procallcacheout: ret rs=%d wlen=%u\n",
-	    rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procallcacheout) */
@@ -1495,22 +1405,19 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*fmt ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procallcacheoutcite: ent\n") ;
-#endif
 	if (sip->f.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
 	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
 	} /* end if (separator) */
 	if (rs >= 0) {
-	    const int	b = citep->b ;
-	    const int	c = citep->c ;
-	    const int	v = citep->v ;
-	    const int	l = citep->l ;
+	    cint	b = citep->b ;
+	    cint	c = citep->c ;
+	    cint	v = citep->v ;
+	    cint	l = citep->l ;
 	    if (sip->f.bookname) {
-	        const int	rsn = SR_NOTFOUND ;
-	        const int	nlen = BNBUFLEN ;
+	        cint	rsn = SR_NOTFOUND ;
+	        cint	nlen = BNBUFLEN ;
 	        char		nbuf[BNBUFLEN+1] ;
 	        if ((rs = votdc_titleget(vcp,nbuf,nlen,l,b)) == rsn) {
 	            rs = subinfo_booklookup(sip,nbuf,nlen,b) ;
@@ -1526,10 +1433,6 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	        wlen += rs ;
 	    }
 	} /* end if (ok) */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procallcacheoutcite: ret rs=%d wlen=%u\n",
-	    rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procallcacheoutcite) */
@@ -1539,33 +1442,20 @@ static int procall(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procall: ent nitems=%u\n",sip->nitems) ;
-#endif
-
 	if ((rs = subinfo_text(sip)) >= 0) {
-	    BIBLEVERSE		*vdbp = &sip->vdb ;
-	    BIBLEVERSE_CUR	cur ;
-	    BIBLEVERSE_Q	q ;	/* result */
+	    bibleverse		*vdbp = &sip->vdb ;
+	    bibleverse_cur	cur ;
+	    bibleverse_q	q ;	/* result */
 	    if ((rs = bibleverse_curbegin(vdbp,&cur)) >= 0) {
-	        const int	bvlen = BVBUFLEN ;
+	        cint	bvlen = BVBUFLEN ;
 	        int		bvl ;
 	        int		c = 0 ;
 	        char		bvbuf[BVBUFLEN + 1] ;
 
 	        while (rs >= 0) {
-	            bvl = bibleverse_enum(vdbp,&cur,&q,bvbuf,bvlen) ;
+	            bvl = bibleverse_curenum(vdbp,&cur,&q,bvbuf,bvlen) ;
 	            if ((bvl == SR_NOTFOUND) || (bvl == 0)) break ;
 	            rs = bvl ;
-
-#if	CF_DEBUGS
-	            {
-	                debugprintf("opensvc_votd/procall: bvl=%d\n",bvl) ;
-	                debugprintf("opensvc_votd/procall: q=%u:%u:%u\n",
-	                    q.b,q.c,q.v) ;
-	            }
-#endif
-
 	            if (rs >= 0) {
 	                rs = procoutverse(sip,&q,bvbuf,bvl) ;
 	                wlen += rs ;
@@ -1579,19 +1469,15 @@ static int procall(SUBINFO *sip) noex {
 	    } /* end if (printing all book titles) */
 	} /* end if (subinfo_text) */
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procall: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procall) */
 
-static int procmulti(SUBINFO *sip,BIBLEVERSE_Q *qp,int f_cite,int ndays) noex {
+static int procmulti(SUBINFO *sip,bibleverse_q *qp,int f_cite,int ndays) noex {
 	VRBUF		*vrp ;
 	int		rs ;
 	int		rs1 ;
-	int		size ;
+	int		sz ;
 	int		wlen = 0 ;
 
 	if (ndays < 1) {
@@ -1600,17 +1486,10 @@ static int procmulti(SUBINFO *sip,BIBLEVERSE_Q *qp,int f_cite,int ndays) noex {
 	    ndays = NDAYS ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_bibleverse/procmulti: q=%u:%u:%u ndays=%d\n",
-	        qp->b,qp->c,qp->v,ndays) ;
-#endif
-
-	size = (ndays * sizeof(VRBUF)) ;
-	if ((rs = uc_malloc(size,&vrp)) >= 0) {
+	sz = (ndays * sizeof(VRBUF)) ;
+	if ((rs = uc_malloc(sz,&vrp)) >= 0) {
 	    if ((rs = procload(sip,vrp,ndays,qp)) > 0) {
-	        const int	nv = rs ;
-	        int		i ;
+	        cint	nv = rs ;
 
 	        sip->ncites += nv ;
 
@@ -1625,8 +1504,8 @@ static int procmulti(SUBINFO *sip,BIBLEVERSE_Q *qp,int f_cite,int ndays) noex {
 	            qp->v += 1 ;
 	        }
 
-	        for (i = 1 ; (rs >= 0) && (i < nv) ; i += 1) {
-	            const int	vl = vrp[i].vl ;
+	        for (int i = 1 ; (rs >= 0) && (i < nv) ; i += 1) {
+	            cint	vl = vrp[i].vl ;
 	            char	*vbuf = vrp[i].vbuf ;
 	            rs = procoutverse(sip,qp,vbuf,vl) ;
 	            wlen += rs ;
@@ -1638,22 +1517,17 @@ static int procmulti(SUBINFO *sip,BIBLEVERSE_Q *qp,int f_cite,int ndays) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_bibleverse/proccite: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procmulti) */
 
-static int procload(SUBINFO *sip,VRBUF *vrp,int nbuf,BIBLEVERSE_Q *qp) noex {
+static int procload(SUBINFO *sip,VRBUF *vrp,int nbuf,bibleverse_q *qp) noex {
 	int		rs ;
 	int		nb = 0 ;
 	if ((rs = subinfo_text(sip)) >= 0) {
-	    BIBLEVERSE		*dbp = &sip->vdb ;
-	    BIBLEVERSE_Q	q = *qp ;
-	    const int		bvlen = BVBUFLEN ;
+	    bibleverse		*dbp = &sip->vdb ;
+	    bibleverse_q	q = *qp ;
+	    cint		bvlen = BVBUFLEN ;
 	    int			vl ;
 	    while ((rs >= 0) && (nb < nbuf)) {
 	        vl = bibleverse_read(dbp,vrp->vbuf,bvlen,&q) ;
@@ -1671,17 +1545,17 @@ static int procload(SUBINFO *sip,VRBUF *vrp,int nbuf,BIBLEVERSE_Q *qp) noex {
 }
 /* end subroutine (procload) */
 
-static int procparse(SUBINFO *sip,BIBLEVERSE_Q *qp,cchar sp[],int sl) noex {
+static int procparse(SUBINFO *sip,bibleverse_q *qp,cchar sp[],int sl) noex {
 	BCSPEC		bb ;
 	int		rs ;
 
 	if ((rs = bcspec_load(&bb,sp,sl)) >= 0) {
 	    cchar	*np = bb.np ;
-	    const int	nl = bb.nl ;
+	    cint	nl = bb.nl ;
 	    qp->b = bb.b ;
 	    qp->c = bb.c ;
 	    qp->v = bb.v ;
-	    if (np != NULL) {
+	    if (np != nullptr) {
 	        rs = subinfo_bookmatch(sip,np,nl) ;
 	        qp->b = (uchar) rs ;
 	    }
@@ -1695,25 +1569,20 @@ static int proctoday(SUBINFO *sip,int f_cite,int ndays) noex {
 	int		rs ;
 	int		wlen = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/proctoday: ent ndays=%d\n",
-	    ndays) ;
-#endif
-
 	if ((rs = subinfo_today(sip)) >= 0) {
-	    const int	f_c = sip->f.trycache ;
+	    cint	f_c = sip->f.trycache ;
 	    int		mjd = rs ;
-	    int		f_got = FALSE ;
+	    int		f_got = false ;
 	    if (f_c) {
 	        if ((rs = procvcache(sip,mjd,ndays)) > 0) {
 	            wlen += rs ;
-	            f_got = TRUE ;
+	            f_got = true ;
 	            if (ndays > 0) ndays -= 1 ;
 	        }
 	    }
 	    if ((rs >= 0) && ((! f_got) || (ndays > 0))) {
 	        if (f_got) {
-	            f_cite = FALSE ;
+	            f_cite = false ;
 	            mjd += 1 ;
 	        }
 	        rs = procmjds(sip,mjd,f_cite,ndays) ;
@@ -1721,22 +1590,14 @@ static int proctoday(SUBINFO *sip,int f_cite,int ndays) noex {
 	    }
 	} /* end if (subinfo_today) */
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/proctoday: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (proctoday) */
 
 static int procmjds(SUBINFO *sip,int mjd,int f_cite,int ndays) noex {
-	BIBLEVERSE_Q	q ;
+	bibleverse_q	q ;
 	int		rs ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procmjds: mjd=%u ndays=%d\n",mjd,ndays) ;
-#endif
 
 	if ((rs = subinfo_mkmodquery(sip,&q,mjd)) >= 0) {
 	    rs = procmulti(sip,&q,f_cite,ndays) ;
@@ -1752,21 +1613,10 @@ static int procvcache(SUBINFO *sip,int mjd,int ndays) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procvcache: ent mjd=%d\n",mjd) ;
-#endif
 	if ((rs = vcinfo_start(&vci)) >= 0) {
 	    if ((rs = procvcacher(sip,&vci,mjd)) >= 0) {
 	        wlen = rs ;
-#if	CF_DEBUGS
-	        debugprintf("opensvc_votd/procvcache: procvcacher() rs=%d\n",
-	            rs) ;
-#endif
 	        if ((rs = procvoutcite(sip,&vci,ndays)) >= 0) {
-#if	CF_DEBUGS
-	            debugprintf("opensvc_votd/procvcache: "
-	                "procoutcite() rs=%d\n",rs) ;
-#endif
 	            rs = procvoutverse(sip,&vci) ;
 	            wlen += rs ;
 	        }
@@ -1774,9 +1624,6 @@ static int procvcache(SUBINFO *sip,int mjd,int ndays) noex {
 	    rs1 = vcinfo_finish(&vci) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vcinfo) */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procvcache: ret rs=%d vl=%u\n",rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procvcache) */
@@ -1784,11 +1631,8 @@ static int procvcache(SUBINFO *sip,int mjd,int ndays) noex {
 static int procvcacher(SUBINFO *sip,VCINFO *vip,int mjd) noex {
 	int		rs ;
 	int		vl = 0 ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procvcacher: ent mjd=%d\n",mjd) ;
-#endif
 	if ((rs = subinfo_vc(sip)) >= 0) {
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = subinfo_vcfetch(sip,vip,mjd)) >= 0) {
 	        vl = rs ;
 	    } else if (rs == rsn) {
@@ -1803,18 +1647,15 @@ static int procvcacher(SUBINFO *sip,VCINFO *vip,int mjd) noex {
 	        rs = subinfo_vcbookname(sip,vip,lang) ;
 	    }
 	} /* end if (subinfo_vc) */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procvcacher: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (procvcacher) */
 
 static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
-	BIBLEVERSE_Q	*qp = &vip->q ;
+	bibleverse_q	*qp = &vip->q ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	cchar		*fmt = NULL ;
+	cchar		*fmt = nullptr ;
 
 	if (sip->f.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
@@ -1823,20 +1664,20 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	} /* end if (separator) */
 
 	if (rs >= 0) {
-	    const int	clen = COLBUFLEN ;
-	    const int	b = qp->b ;
-	    const int	c = qp->c ;
-	    const int	v = qp->v ;
+	    cint	clen = COLBUFLEN ;
+	    cint	b = qp->b ;
+	    cint	c = qp->c ;
+	    cint	v = qp->v ;
 	    int		cl ;
-	    int		f_havebook = FALSE ;
+	    int		f_havebook = false ;
 	    cchar	*fmt ;
 	    char	cbuf[COLBUFLEN + 1] ;
 
-	    if (sip->f.bookname && (vip->nbuf != NULL)) {
+	    if (sip->f.bookname && (vip->nbuf != nullptr)) {
 	        if (vip->nbuf[0] != '\0') {
-	            const int	nlen = vip->nlen ;
+	            cint	nlen = vip->nlen ;
 	            cchar	*nbuf = vip->nbuf ;
-	            f_havebook = TRUE ;
+	            f_havebook = true ;
 	            fmt = (ndays > 1) ? "%t %u:%u (%u)" : "%t %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,nbuf,nlen,c,v,ndays) ;
 	            cl = rs ;
@@ -1864,7 +1705,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 /* end subroutine (procvoutcite) */
 
 static int procvoutverse(SUBINFO *sip,VCINFO *vcip) noex {
-	BIBLEVERSE_Q	*qp = &vcip->q ;
+	bibleverse_q	*qp = &vcip->q ;
 	int		rs = SR_OK ;
 	int		vlen = vcip->vlen ;
 	int		wlen = 0 ;
@@ -1877,17 +1718,13 @@ static int procvoutverse(SUBINFO *sip,VCINFO *vcip) noex {
 }
 /* end subroutine (procvoutverse) */
 
-static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
-	const int	clen = COLBUFLEN ;
+static int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		wlen = 0 ;
 	cchar		*fmt ;
 	char		cbuf[COLBUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procoutcite: ent ndays=%u\n",ndays) ;
-#endif
 
 /* print out any necessary separator */
 
@@ -1903,16 +1740,16 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 	    int		b = qp->b ;
 	    int		c = qp->c ;
 	    int		v = qp->v ;
-	    int		f_havebook = FALSE ;
+	    int		f_havebook = false ;
 
 	    if (sip->f.bookname) {
-	        const int	blen = BNBUFLEN ;
+	        cint	blen = BNBUFLEN ;
 	        int		bbl ;
 	        char		bbuf[BNBUFLEN + 1] ;
 
 	        if ((bbl = subinfo_booklookup(sip,bbuf,blen,b)) > 0) {
 
-	            f_havebook = TRUE ;
+	            f_havebook = true ;
 	            fmt = (ndays > 1) ? "%t %u:%u (%u)" : "%t %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,ndays) ;
 	            cl = rs ;
@@ -1939,17 +1776,13 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procoutcite: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procoutcite) */
 
-static int procoutverse(SUBINFO *sip,BIBLEVERSE_Q *qp,cchar vp[],int vl) noex {
+static int procoutverse(SUBINFO *sip,bibleverse_q *qp,cchar vp[],int vl) noex {
 	WORDFILL	w ;
-	const int	clen = COLBUFLEN ;
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl = vl ;
@@ -1957,7 +1790,7 @@ static int procoutverse(SUBINFO *sip,BIBLEVERSE_Q *qp,cchar vp[],int vl) noex {
 	int		cbl ;
 	int		line = 0 ;
 	int		wlen = 0 ;
-	int		f_p = FALSE ;
+	int		f_p = false ;
 	cchar		*sp = vp ;
 	char		cbuf[COLBUFLEN + 1] ;
 
@@ -1971,7 +1804,7 @@ static int procoutverse(SUBINFO *sip,BIBLEVERSE_Q *qp,cchar vp[],int vl) noex {
 /* print out the text-data itself */
 
 	if ((rs >= 0) && (vl > 0)) {
-	    if (f_p) sp = NULL ;
+	    if (f_p) sp = nullptr ;
 	    if ((rs = wordfill_start(&w,sp,sl)) >= 0) {
 
 	        if (f_p) {
@@ -2008,10 +1841,6 @@ static int procoutverse(SUBINFO *sip,BIBLEVERSE_Q *qp,cchar vp[],int vl) noex {
 	    } /* end if (word-fill) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procout: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procoutverse) */
@@ -2028,11 +1857,6 @@ static int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
 	rs = filer_printf(sip->ofp,fmt,blanks,indent,lp,ll) ;
 	wlen += rs ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/procoutline: ret rs=%d wlen=%u\n",
-	    rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procoutline) */
@@ -2040,18 +1864,18 @@ static int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
 static int subinfo_start(SUBINFO *sip,cchar **envv) noex {
 	int		rs = SR_OK ;
 
-	if (envv == NULL) envv = environ ;
+	if (envv == nullptr) envv = environ ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
 	sip->envv = envv ;
-	sip->dt = time(NULL) ;
+	sip->dt = time(nullptr) ;
 	sip->indent = 1 ;
 	sip->year = -1 ;
 	sip->linelen = 0 ;
 	sip->count = -1 ;
 	sip->max = -1 ;
 
-	sip->f.defnull = OPT_DEFNULL ;
+	sip->f.defnull = OPT_DEFnullptr ;
 	sip->f.separate = OPT_SEPARATE ;
 	sip->f.bookname = OPT_BOOKNAME ;
 	sip->f.trycache = OPT_TRYCACHE ;
@@ -2070,42 +1894,38 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	}
 
 	if (sip->open.pdb) {
-	    sip->open.pdb = FALSE ;
+	    sip->open.pdb = false ;
 	    rs1 = biblepara_close(&sip->pdb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (sip->open.sdb) {
-	    sip->open.sdb = FALSE ;
+	    sip->open.sdb = false ;
 	    rs1 = bvs_close(&sip->sdb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (sip->open.ndb) {
-	    sip->open.ndb = FALSE ;
+	    sip->open.ndb = false ;
 	    rs1 = biblebook_close(&sip->ndb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (sip->open.vdb) {
-	    sip->open.vdb = FALSE ;
+	    sip->open.vdb = false ;
 	    rs1 = bibleverse_close(&sip->vdb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bibleverse) */
-
-#if	CF_DEBUGS
-	debugprintf("subinfo_finish: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
 static int subinfo_setroot(SUBINFO *sip,cchar *pr,cchar *sn) noex {
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 	sip->pr = pr ;
-	if (sn == NULL) sn = getourenv(sip->envv,VARSEARCHNAME) ;
-	if (sn == NULL) sn = SEARCHNAME ;
+	if (sn == nullptr) sn = getourenv(sip->envv,VARSEARCHNAME) ;
+	if (sn == nullptr) sn = SEARCHNAME ;
 	sip->sn = sn ;
 	return SR_OK ;
 }
@@ -2114,7 +1934,7 @@ static int subinfo_setroot(SUBINFO *sip,cchar *pr,cchar *sn) noex {
 static int subinfo_outbegin(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->f.all || sip->f.allcache) {
-	    if ((rs = opentmp(NULL,0,0)) >= 0) {
+	    if ((rs = opentmp(nullptr,0,0)) >= 0) {
 	        sip->fd = rs ;
 	        sip->wfd = rs ;
 	    }
@@ -2125,9 +1945,6 @@ static int subinfo_outbegin(SUBINFO *sip) noex {
 	        sip->wfd = pipes[1] ;
 	    }
 	}
-#if	CF_DEBUGS
-	debugprintf("subinfo_outbegin: ret rs=%d fd=%u\n",rs,sip->fd) ;
-#endif
 	return (rs >= 0) ? sip->wfd : rs ;
 }
 /* end subroutine (subinfo_outbegin) */
@@ -2151,15 +1968,9 @@ static int subinfo_outend(SUBINFO *sip,int ars) noex {
 
 static int subinfo_booksize(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_booksize: ent\n") ;
-#endif
 	if ((rs = subinfo_book(sip)) >= 0) {
 	    rs = biblebook_size(&sip->ndb) ;
 	}
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_booksize: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (subinfo_booksize) */
@@ -2168,23 +1979,12 @@ static int subinfo_booklookup(SUBINFO *sip,char *nbuf,int nlen,int bi) noex {
 	int		rs ;
 	int		len = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_booklookup: ent bi=%u\n",bi) ;
-	debugprintf("opensvc_votd/subinfo_booklookup: open.ndb=%u",
-	    sip->open.ndb) ;
-#endif
-
 	nbuf[0] = '\0' ;
 	if ((rs = subinfo_book(sip)) >= 0) {
 	    BIBLEBOOK	*bbp = &sip->ndb ;
 	    rs = biblebook_lookup(bbp,nbuf,nlen,bi) ;
 	    len = rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_booklookup: ret rs=%d len=%u\n",
-	    rs,len) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
@@ -2217,7 +2017,7 @@ static int subinfo_book(SUBINFO *sip) noex {
 
 /* get (find out) the current MJD (for today) */
 static int subinfo_today(SUBINFO *sip) noex {
-	const int	to = TO_MJD ;
+	cint	to = TO_MJD ;
 	int		rs ;
 	int		mjd = sip->mjd ;
 
@@ -2229,7 +2029,7 @@ static int subinfo_today(SUBINFO *sip) noex {
 	        yr = (tmp->year + TM_YEAR_BASE) ;
 	        rs = getmjd(yr,tmp->mon,tmp->mday) ;
 	        mjd = rs ;
-	        sip->f.mjd = TRUE ;
+	        sip->f.mjd = true ;
 	        sip->mjd = mjd ;
 	    }
 	} /* end if (subinfo-tmtime) */
@@ -2238,7 +2038,7 @@ static int subinfo_today(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_today) */
 
-static int subinfo_defdayspec(SUBINFO *sip,DAYSPEC *dsp) noex {
+static int subinfo_defdayspec(SUBINFO *sip,dayspec *dsp) noex {
 	int		rs = SR_OK ;
 	if ((rs >= 0) && (dsp->y <= 0)) {
 	    rs = subinfo_year(sip) ;
@@ -2265,18 +2065,18 @@ static int subinfo_year(SUBINFO *sip) noex {
 /* end subroutine (subinfo_year) */
 
 static int subinfo_tmtime(SUBINFO *sip) noex {
-	const int	tc = TIMECOUNT ;
-	const int	to = TO_TMTIME ;
+	cint	tc = TIMECOUNT ;
+	cint	to = TO_TMTIME ;
 	int		rs = SR_OK ;
 
 	if ((! sip->f.tmtime) || (sip->timecount++ >= tc)) {
 	    if ((sip->dt == 0) || (sip->timecount == tc)) {
-	        sip->dt = time(NULL) ;
+	        sip->dt = time(nullptr) ;
 	    }
 	    sip->timecount = 0 ;
 	    if ((! sip->f.tmtime) || ((sip->dt - sip->ti_tmtime) >= to)) {
 	        sip->ti_tmtime = sip->dt ;
-	        sip->f.tmtime = TRUE ;
+	        sip->f.tmtime = true ;
 	        if (sip->f.gmt) {
 	            rs = tmtime_gmtime(&sip->tm,sip->dt) ;
 	        } else {
@@ -2289,21 +2089,12 @@ static int subinfo_tmtime(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_tmtime) */
 
-static int subinfo_mkmodquery(SUBINFO *sip,BIBLEVERSE_Q *qp,int mjd) noex {
+static int subinfo_mkmodquery(SUBINFO *sip,bibleverse_q *qp,int mjd) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_mkmodquery: mjd=%u\n",mjd) ;
-#endif
 
 	if (! sip->open.sdb) {
 	    rs = subinfo_bvs(sip) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_mkmodquery: "
-	    "subinfo_bvs() rs=%d\n",rs) ;
-#endif
 
 	if (rs >= 0) {
 	    BVS		*bsp = &sip->sdb ;
@@ -2314,16 +2105,6 @@ static int subinfo_mkmodquery(SUBINFO *sip,BIBLEVERSE_Q *qp,int mjd) noex {
 	    qp->v = bsq.v ;
 	}
 
-#if	CF_DEBUGS
-	{
-	    debugprintf("opensvc_votd/subinfo_mkmodquery: "
-	        "ret rs=%d\n",rs) ;
-	    debugprintf("opensvc_votd/subinfo_mkmodquery: b=%u",qp->b) ;
-	    debugprintf("opensvc_votd/subinfo_mkmodquery: c=%u",qp->c) ;
-	    debugprintf("opensvc_votd/subinfo_mkmodquery: v=%u",qp->v) ;
-	}
-#endif /* CF_DEBUGS */
-
 	return rs ;
 }
 /* end subroutine (subinfo_mkmodquery) */
@@ -2332,11 +2113,11 @@ static int subinfo_bvs(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->open.sdb) {
 	    BVS		*bsp = &sip->sdb ;
-	    const int	rsn = SR_NOENT ;
+	    cint	rsn = SR_NOENT ;
 	    cchar	*pr = sip->pr ;
 	    cchar	*sdbname = sip->sdbname ;
 	    if ((rs = bvs_open(bsp,pr,sdbname)) >= 0) {
-	        sip->open.sdb = TRUE ;
+	        sip->open.sdb = true ;
 	    } else if (rs == rsn) {
 	        if ((rs = subinfo_bvsbuild(sip)) >= 0) {
 	            rs = bvs_open(bsp,sip->pr,sip->sdbname) ;
@@ -2366,48 +2147,32 @@ static int subinfo_bvsbuild(SUBINFO *sip) noex {
 
 static int subinfo_bvsbuilder(SUBINFO *sip) noex {
 	BVSMK		*bmp = &sip->bsmk ;
-	const mode_t	om = 0666 ;
-	const int	of = 0 ;
+	cmode		om = 0666 ;
+	cint		of = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*pr = sip->pr ;
-	const char	*sdbname = sip->sdbname ;
-
-#if	CF_DEBUGS
-	debugprintf("b_bibleverse/subinfo_bvsbuilder: ent\n") ;
-#endif
+	cchar		*pr = sip->pr ;
+	cchar		*sdbname = sip->sdbname ;
 
 	if ((rs = bvsmk_open(bmp,pr,sdbname,of,om)) >= 0) {
-	    sip->open.bvsmk = TRUE ;
+	    sip->open.bvsmk = true ;
 	    if (rs == 0) {
-	        BIBLEVERSE	*vdbp = &sip->vdb ;
-	        BIBLEVERSE_INFO	binfo ;
+	        bibleverse	*vdbp = &sip->vdb ;
+	        bibleverse_info	binfo ;
 	        if ((rs = bibleverse_info(vdbp,&binfo)) >= 0) {
-	            const int	maxbook = binfo.maxbook ;
-	            const int	maxchapter = binfo.maxchapter ;
+	            cint	maxbook = binfo.maxbook ;
+	            cint	maxchapter = binfo.maxchapter ;
 	            int		bal ;
-	            int		size ;
-	            uchar		*bap = NULL ;
+	            int		sz ;
+	            uchar		*bap = nullptr ;
 	            bal = (maxchapter + 1) ;
-	            size = (bal * sizeof(uchar)) ;
-	            if ((rs = uc_malloc(size,&bap)) >= 0) {
-	                int		b ;
+	            sz = (bal * sizeof(uchar)) ;
+	            if ((rs = uc_malloc(sz,&bap)) >= 0) {
 	                int		nc ;
-
-	                for (b = 0 ; (rs >= 0) && (b <= maxbook) ; b += 1) {
-
-#if	CF_DEBUGS
-	                    debugprintf("b_bibleverse/subinfo_bvsbuild: "
-	                        "b=%u\n", b) ;
-#endif
+	                for (int b = 0 ; (rs >= 0) && (b <= maxbook) ; b += 1) {
 
 	                    rs1 = bibleverse_chapters(vdbp,b,bap,bal) ;
 	                    nc = rs1 ;
-
-#if	CF_DEBUGS
-	                    debugprintf("b_bibleverse/subinfo_bvsbuild: "
-	                        "bibleverses_chapters() rs=%d\n",rs1) ;
-#endif
 
 	                    if (rs1 == SR_NOTFOUND) {
 	                        nc = 0 ;
@@ -2419,26 +2184,17 @@ static int subinfo_bvsbuilder(SUBINFO *sip) noex {
 	                        rs = bvsmk_add(bmp,b,bap,nc) ;
 			    }
 
-#if	CF_DEBUGS
-	                    debugprintf("b_bibleverse/subinfo_bvsbuild: "
-	                        "bvsmk_add() rs=%d\n",rs) ;
-#endif
-
 	                } /* end for (looping through the books) */
 
 	                uc_free(bap) ;
-	                bap = NULL ;
+	                bap = nullptr ;
 	            } /* end if (temporary memory allocation) */
 	        } /* end if (bibleverse_info) */
 	    } /* end if (majing) */
-	    sip->open.bvsmk = FALSE ;
+	    sip->open.bvsmk = false ;
 	    rs1 = bvsmk_close(bmp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bvsmk) */
-
-#if	CF_DEBUGS
-	debugprintf("b_bibleverse/subinfo_bvsbuild: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -2446,50 +2202,29 @@ static int subinfo_bvsbuilder(SUBINFO *sip) noex {
 
 /* return maximum days possible for this citation */
 #if	CF_SUBNDATS
-static int subinfo_ndays(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
+static int subinfo_ndays(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_ndays: ndays=%u\n",ndays) ;
-#endif
-
 	if (ndays > 1) {
-	    BIBLEVERSE_Q	q = *qp ;
+	    bibleverse_q	q = *qp ;
 	    uint		v ;
 
 	    rs1 = SR_NOTFOUND ;
 	    while ((rs1 == SR_NOTFOUND) && (ndays > 1)) {
 
-#if	CF_DEBUGS
-	        debugprintf("opensvc_votd/subinfo_ndays: "
-	            "loop ndays=%u\n",ndays) ;
-#endif
-
 	        v = qp->v ;
 	        v += (ndays-1) ;
 	        if (v <= UCHAR_MAX) {
 
-#if	CF_DEBUGS
-	            debugprintf("opensvc_votd/subinfo_ndays: "
-	                "q=(%u:%u:%u)\n", q.b,q.b,(q.v & 0xff)) ;
-#endif
-
 	            q.v = v ;
-	            rs1 = bibleverse_read(&sip->vdb,NULL,0,&q) ;
+	            rs1 = bibleverse_read(&sip->vdb,nullptr,0,&q) ;
 
 	        } /* end if */
 
 	        if (rs1 == SR_NOTFOUND)
 	            ndays -= 1 ;
 
-#if	CF_DEBUGS
-	        {
-	            debugprintf("opensvc_votd/subinfo_ndays: rs1=%d\n",rs1) ;
-	            debugprintf("opensvc_votd/subinfo_ndays: mod ndays=%u\n",
-	                ndays) ;
-	        }
-#endif
 
 	    } /* end while */
 
@@ -2500,19 +2235,15 @@ static int subinfo_ndays(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 /* end subroutine (subinfo_ndays) */
 #endif /* CF_SUBNDATS */
 
-static int subinfo_ispara(SUBINFO *sip,BIBLEVERSE_Q *qp) noex {
+static int subinfo_ispara(SUBINFO *sip,bibleverse_q *qp) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (qp == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_ispara: ent\n") ;
-#endif
+	if (qp == nullptr) return SR_FAULT ;
 
 	if (! sip->open.pdb) {
 	    if ((rs = biblepara_open(&sip->pdb,sip->pr,sip->pdbname)) >= 0) {
-	        sip->open.pdb = TRUE ;
+	        sip->open.pdb = true ;
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
@@ -2525,10 +2256,6 @@ static int subinfo_ispara(SUBINFO *sip,BIBLEVERSE_Q *qp) noex {
 	    pq.v = qp->v ;
 	    rs = biblepara_ispara(&sip->pdb,&pq) ;
 	    f = (rs > 0) ;
-#if	CF_DEBUGS
-	    debugprintf("opensvc_votd/subinfo_ispara: "
-	        "biblepara_ispara() rs=%d\n",rs) ;
-#endif
 	}
 
 	return (rs >= 0) ? f : rs ;
@@ -2547,10 +2274,10 @@ static int subinfo_vc(SUBINFO *sip) noex {
 static int subinfo_vcbegin(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->f.trycache && (! sip->open.vcache)) {
-	    const int	of = O_CREAT ;
+	    cint	of = O_CREAT ;
 	    cchar	*pr = sip->pr ;
-	    if ((rs = votdc_open(&sip->vcache,pr,NULL,of)) >= 0) {
-	        sip->open.vcache = TRUE ;
+	    if ((rs = votdc_open(&sip->vcache,pr,nullptr,of)) >= 0) {
+	        sip->open.vcache = true ;
 	    }
 	}
 	return rs ;
@@ -2571,39 +2298,30 @@ static int subinfo_vcend(SUBINFO *sip) noex {
 static int subinfo_vcfetch(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
 	VOTDC		*vcp = &sip->vcache ;
 	VOTDC_Q		vq ;
-	const int	vlen = vcip->vlen ;
+	cint	vlen = vcip->vlen ;
 	int		rs ;
 	int		vl = 0 ;
 	cchar		*lang = sip->lang ;
 	char		*vbuf = vcip->vbuf ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_vcfetch: ent\n") ;
-#endif
-	if (lang == NULL) lang = DEFLANG ;
+	if (lang == nullptr) lang = DEFLANG ;
 	if ((rs = votdc_versefetch(vcp,&vq,vbuf,vlen,lang,mjd)) >= 0) {
-	    BIBLEVERSE_Q	*qp = &vcip->q ;
+	    bibleverse_q	*qp = &vcip->q ;
 	    vl = rs ;
 	    qp->b = vq.b ;
 	    qp->c = vq.c ;
 	    qp->v = vq.v ;
 	} /* end if (votdc_versefetch) */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_vcfetch: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (subinfo_vcfetch) */
 
 static int subinfo_vcmjd(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
-	BIBLEVERSE_Q	*qp = &vcip->q ;
+	bibleverse_q	*qp = &vcip->q ;
 	int		rs ;
 	int		vl = 0 ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_vcmjd: ent mjd=%d\n",mjd) ;
-#endif
 	if ((rs = subinfo_mkmodquery(sip,qp,mjd)) >= 0) {
 	    if ((rs = subinfo_text(sip)) >= 0) {
-	        const int	vlen = vcip->vlen ;
+	        cint	vlen = vcip->vlen ;
 	        char		*vbuf = vcip->vbuf ;
 	        vcip->q.b = qp->b ;
 	        vcip->q.c = qp->c ;
@@ -2612,9 +2330,6 @@ static int subinfo_vcmjd(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
 	        vl = rs ;
 	    } /* end if (subinfo_text) */
 	} /* end if (subinfo_mkmodquery) */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_vcmjd: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (subinfo_vcmjd) */
@@ -2625,7 +2340,7 @@ static int subinfo_vcload(SUBINFO *sip,VCINFO *vcip,cchar *lang,int mjd,
 	if ((rs = subinfo_titlelang(sip)) >= 0) {
 	    VOTDC		*vcp = &sip->vcache ;
 	    VOTDC_Q		vq ;
-	    BIBLEVERSE_Q	*qp = &vcip->q ;
+	    bibleverse_q	*qp = &vcip->q ;
 	    char		*vbuf = vcip->vbuf ;
 	    votdsq_load(&vq,qp) ;
 	    rs = votdc_verseload(vcp,lang,&vq,mjd,vbuf,vl) ;
@@ -2638,8 +2353,8 @@ static int subinfo_vcbookname(SUBINFO *sip,VCINFO *vip,cchar *lang) noex {
 	int		rs = SR_OK ;
 	if (vip->nbuf[0] == '\0') {
 	    VOTDC	*vcp = &sip->vcache ;
-	    const int	nlen = vip->nlen ;
-	    const int	b = vip->q.b ;
+	    cint	nlen = vip->nlen ;
+	    cint	b = vip->q.b ;
 	    char	*nbuf = vip->nbuf ;
 	    rs = votdc_titlefetch(vcp,nbuf,nlen,lang,b) ;
 	} /* end if (name needed) */
@@ -2653,7 +2368,7 @@ static int subinfo_text(SUBINFO *sip) noex {
 	    cchar	*pr = sip->pr ;
 	    cchar	*vdb = sip->vdbname ;
 	    if ((rs = bibleverse_open(&sip->vdb,pr,vdb)) >= 0) {
-	        sip->open.vdb = TRUE ;
+	        sip->open.vdb = true ;
 	        rs = 1 ;
 	    }
 	}
@@ -2662,7 +2377,7 @@ static int subinfo_text(SUBINFO *sip) noex {
 /* end subroutine (subinfo_text) */
 
 static int subinfo_textquery(SUBINFO *sip,char *vbuf,int vlen,
-		BIBLEVERSE_Q *qp) noex {
+		bibleverse_q *qp) noex {
 	return bibleverse_read(&sip->vdb,vbuf,vlen,qp) ;
 	return rs ;
 }
@@ -2672,78 +2387,46 @@ static int subinfo_titlelang(SUBINFO *sip) noex {
 	VOTDC		*vcp = &sip->vcache ;
 	int		rs ;
 	cchar		*lang = sip->lang ;
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_titlelang: ent\n") ;
-	debugprintf("opensvc_votd/subinfo_titlelang: lang=%s\n",lang) ;
-#endif
 	if ((rs = votdc_titlelang(vcp,lang)) == 0) {
-#if	CF_DEBUGS
-	    debugprintf("opensvc_votd/subinfo_titlelang: "
-	        "votdc_titlelang() rs=%d\n",rs) ;
-#endif
 	    if ((rs = subinfo_booksize(sip)) >= 0) {
-	        const int	size = rs ;
+	        cint	sz = rs ;
 	        cchar		*titles[VOTDC_NTITLES+1] ;
 	        char		*bp ;
-#if	CF_DEBUGS
-	        debugprintf("opensvc_votd/subinfo_titlelang: booksize=%u\n",
-	            size) ;
-#endif
-	        if ((rs = uc_malloc(size,&bp)) >= 0) {
+	        if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	            BIBLEBOOK	*bbp = &sip->ndb ;
-	            const int	n = VOTDC_NTITLES ;
-	            int		i ;
+	            cint	n = VOTDC_NTITLES ;
 	            int		bl = 0 ;
 	            cchar	*bstr = bp ;
-	            for (i = 0 ; i < n ; i += 1) {
-#if	CF_DEBUGS
-	                debugprintf("opensvc_votd/subinfo_titlelang: "
-	                    "read i=%u\n",i) ;
-#endif
-	                rs = biblebook_read(bbp,bp,(size-bl),i) ;
-#if	CF_DEBUGS
-	                debugprintf("opensvc_votd/subinfo_titlelang: "
-	                    "biblebook_read() rs=%d\n",rs) ;
-#endif
+	            for (int i = 0 ; i < n ; i += 1) {
+	                rs = biblebook_read(bbp,bp,(sz-bl),i) ;
 	                titles[i] = bp ;
 	                bp[rs] = '\0' ;
 	                bl += (rs+1) ;
 	                bp += (rs+1) ;
 	                if (rs < 0) break ;
 	            } /* end for */
-	            titles[i] = NULL ;
+	            titles[i] = nullptr ;
 	            if (rs >= 0) {
-#if	CF_DEBUGS
-	                debugprintf("opensvc_votd/subinfo_titlelang: "
-	                    "votdc_titleloads()\n") ;
-#endif
 	                rs = votdc_titleloads(vcp,lang,titles) ;
-#if	CF_DEBUGS
-	                debugprintf("opensvc_votd/subinfo_titlelang: "
-	                    "votdc_titleloads() rs=%d\n",rs) ;
-#endif
 	            }
 	            uc_free(bstr) ;
 	        } /* end if (m-a) */
 	    } /* end if (subinfo_booksize) */
 	} /* end if (votdc_titlelang) */
-#if	CF_DEBUGS
-	debugprintf("opensvc_votd/subinfo_titlelang: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (subinfo_titlelang) */
 
 static int vcinfo_start(VCINFO *op) noex {
-	const int	nlen = BNBUFLEN ;
-	const int	vlen = BVBUFLEN ;
+	cint	nlen = BNBUFLEN ;
+	cint	vlen = BVBUFLEN ;
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp ;
 	memset(op,0,sizeof(VCINFO)) ;
-	size += (nlen+1) ;
-	size += (vlen+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	sz += (nlen+1) ;
+	sz += (vlen+1) ;
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->nbuf = bp + (0) ;
 	    op->nlen = nlen ;
@@ -2761,12 +2444,12 @@ static int vcinfo_start(VCINFO *op) noex {
 static int vcinfo_finish(VCINFO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a != NULL) {
+	if (op->a != nullptr) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
-	    op->vbuf = NULL ;
-	    op->nbuf = NULL ;
+	    op->a = nullptr ;
+	    op->vbuf = nullptr ;
+	    op->nbuf = nullptr ;
 	    op->vlen = 0 ;
 	    op->nlen = 0 ;
 	}
@@ -2774,7 +2457,7 @@ static int vcinfo_finish(VCINFO *op) noex {
 }
 /* end subroutine (vcinfo_finish) */
 
-static int votdsq_load(VOTDC_Q *vqp,BIBLEVERSE_Q *qp) noex {
+static int votdsq_load(VOTDC_Q *vqp,bibleverse_q *qp) noex {
 	vqp->b = qp->b ;
 	vqp->c = qp->c ;
 	vqp->v = qp->v ;

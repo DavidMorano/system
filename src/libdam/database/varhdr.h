@@ -39,7 +39,7 @@ struct varhdr_head {
 	uint		itlen ;
 	uint		nvars ;
 	uint		nskip ;
-	char		vetu[4] ;
+	uchar		vetu[4] ;
 } ;
 
 typedef	VARHDR		varhdr ;

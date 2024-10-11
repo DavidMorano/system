@@ -1,4 +1,5 @@
 /* msgentry SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Message-Entry */
@@ -24,6 +25,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */

@@ -1,4 +1,5 @@
 /* mbcache HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* mailbox cache */
@@ -12,14 +13,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecint.h>
 #include	<strpack.h>
 #include	<dater.h>
 #include	<date.h>
-#include	<localmisc.h>
 
 #include	"mailbox.h"
 

@@ -1,4 +1,5 @@
 /* hdrextid HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* extract an ID from a header value */

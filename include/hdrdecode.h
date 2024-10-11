@@ -1,4 +1,5 @@
 /* hdrdecode HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* mail-header value string decoder */
@@ -19,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |wchar_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

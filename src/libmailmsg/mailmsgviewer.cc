@@ -1,4 +1,5 @@
 /* mailmsgviewer SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* support low-overhead file buffering requirements */
@@ -28,6 +29,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>

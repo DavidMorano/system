@@ -1,4 +1,5 @@
 /* mailmsgatt HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* mail-message attachment object processing */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecitem.h>
 #include	<mimetypes.h>
 #include	<contentencodings.h>

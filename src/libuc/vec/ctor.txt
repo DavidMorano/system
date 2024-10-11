@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int filecounts_ctor(filecounts *op,Args ... args) noex {
+static int biblecur_ctor(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int filecounts_ctor(filecounts *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filecounts_ctor) */
+/* end subroutine (biblecur_ctor) */
 
-static int filecounts_dtor(filecounts *op) noex {
+static int biblecur_dtor(biblecur *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filecounts_dtor) */
+/* end subroutine (biblecur_dtor) */
 
 template<typename ... Args>
-static inline int filecounts_magic(filecounts *op,Args ... args) noex {
+static inline int biblecur_magic(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == FILECOUNTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (filecounts_magic) */
+/* end subroutine (biblecur_magic) */

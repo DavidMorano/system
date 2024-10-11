@@ -1,4 +1,5 @@
 /* mhcom SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* comment-separate (parse) a mail header field value */

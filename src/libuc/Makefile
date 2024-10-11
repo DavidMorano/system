@@ -834,7 +834,6 @@ csem.o:			csem.cc		csem.h
 pwcache.o:		pwcache.cc	pwcache.h
 lockrw.o:		lockrw.cc	lockrw.h
 nodedb.o:		nodedb.cc	nodedb.h
-mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc	ccfile.hh
 thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h

@@ -156,7 +156,7 @@ OBJ01= progopts.o progconfig.o progterm.o progmailget.o proguserlist.o
 OBJ02= proglog.o progvmerr.o
 OBJ03= inter.o inter_trans.o
 OBJ04= display.o ds.o 
-OBJ05= mailmsgfile.o mailmsgviewer.o
+OBJ05= mailmsgviewer.o
 OBJ06= timestr_scandate.o digit3.o
 OBJ07= printhelp.o kshlib.o sesmsg.o msgdata.o
 OBJ08=
@@ -356,7 +356,7 @@ proguserlist.o:		proguserlist.c $(INCS)
 initnow.o:		initnow.c $(INCS)
 
 inter.o:		inter.c inter.h $(INCS) uterm.h ds.h display.h
-inter.o:		mailbox.h mailmsgfile.h mailmsgviewer.h mbcache.h
+inter.o:		mailbox.h mailmsgviewer.h mbcache.h
 inter.o:		kbdinfo.h cmdmap.h subprocs.h
 
 inter_trans.o:		inter_trans.c inter.h ${INCS}
@@ -364,8 +364,6 @@ inter_trans.o:		inter_trans.c inter.h ${INCS}
 display.o:		display.cc display.h $(INCS) ds.h
 
 ds.o:			ds.c ds.h $(INCS) td.h termstr.h
-
-mailmsgfile.o:		mailmsgfile.c mailmsgfile.h
 
 mailmsgviewer.o:	mailmsgviewer.c mailmsgviewer.h
 

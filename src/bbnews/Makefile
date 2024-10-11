@@ -187,7 +187,7 @@ OBJ21=
 OBJ22= openpcsdircache.o
 OBJ23=
 
-OBJ24= mailmsgfile.o mailmsgviewer.o
+OBJ24= mailmsgviewer.o
 OBJ25=
 OBJ26=
 OBJ27=
@@ -394,8 +394,6 @@ vecstr_env.o:		vecstr_env.c
 mailmsg_envtimes.o:	mailmsg_envtimes.c mailmsg.h
 
 dater.o:		dater.c dater.h
-
-mailmsgfile.o:		mailmsgfile.c mailmsgfile.h
 
 mailmsgviewer.o:	mailmsgviewer.c mailmsgviewer.h
 

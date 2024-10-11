@@ -1,4 +1,5 @@
 /* mailmsgfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* maintain translations for MSGID to filenames */
@@ -43,6 +44,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>

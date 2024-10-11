@@ -1,4 +1,5 @@
 /* outema SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
  
 /* manage printing EMAs (E-Mail-Addresses) as lines */
@@ -22,6 +23,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>

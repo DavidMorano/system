@@ -1,4 +1,5 @@
 /* hdrextnum SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* comment separate (parse) a mail header field value */
@@ -42,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

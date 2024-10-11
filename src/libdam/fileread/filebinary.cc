@@ -90,7 +90,7 @@ static bool	isc1(int) noex ;
 
 /* local variables */
 
-static constexpr cchar	allowed[] = "\a\b\f\n\r\t\v" ;
+constexpr cchar	allowed[] = "\a\b\f\n\r\t\v" ;
 
 
 /* exported variables */
@@ -105,12 +105,10 @@ int filebinary(cchar *fname) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        linebuffer	lb ;
-	        if ((rs = lb.start) >= 0) {
+	        if (linebuffer lb ; (rs = lb.start) >= 0) {
 	            bfile	ifile, *ifp = &ifile ;
 	            if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
-	                USTAT	sb ;
-	                if ((rs = bstat(ifp,&sb)) >= 0) {
+	                if (USTAT sb ; (rs = bstat(ifp,&sb)) >= 0) {
 		            if (S_ISREG(sb.st_mode)) {
 				cint	ll = lb.llen ;
 				char	*lp = lb.lbuf ;
