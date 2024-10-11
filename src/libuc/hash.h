@@ -24,6 +24,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#include	<hashindex.h>
+
 
 EXTERNC_begin
 

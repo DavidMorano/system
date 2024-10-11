@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	hasx
+
+	Description:
 	These subroutines check if a specified c-string has any of
 	some characteristic we are looking for.
 

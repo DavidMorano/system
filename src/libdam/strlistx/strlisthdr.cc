@@ -92,7 +92,6 @@ enum his {
 
 /* local variables */
 
-constexpr nullptr_t	np{} ;
 constexpr cint		hdrsz = hi_overlast * sizeof(uint) ;
 constexpr cint		magicsize = STRLISTHDR_MAGICSIZE ;
 constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
