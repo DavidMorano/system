@@ -84,7 +84,7 @@ int filereadln(cchar *fname,char *rbuf,int rlen) noex {
 	if (fname && rbuf) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (fname[0]) {
+	    if (fname[0] && (rlen > 0)) {
 		if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 		    cint	llen = rs ;
 		    cint	of = O_RDONLY ;

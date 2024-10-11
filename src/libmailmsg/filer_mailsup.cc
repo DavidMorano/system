@@ -1,7 +1,7 @@
 /* filer_mailsup SUPPORT */
 /* lang=C++20 */
 
-/* mail supprt from the FILER object */
+/* mail support from the FILER object */
 /* version %I% last-modified %G% */
 
 

@@ -10,6 +10,7 @@ mkprogenv
 uctim
 libuc		fix to completely compile!
 lfm
+mailmsghdrct
 srv{x}
 memfile		can we just trash this?
 libpcs		a lot of junk in there

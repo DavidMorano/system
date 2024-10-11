@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mailmsghdrct
+
+	Description:
 	This object module parses a "content-type" header specification.
 	The parsed results are broken into three types of items:
 	the type, the sub-type, and parameters.
@@ -24,6 +28,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

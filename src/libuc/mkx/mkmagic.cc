@@ -76,19 +76,21 @@
 int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && ms) {
-	    cint	mslen = strlen(ms) ;
-	    rs = SR_OK ;
-	    if ((mslen+1) <= rlen) {
-	        char	*bp = strwcpy(rbuf,ms,-1) ;
-	        *bp++ = '\n' ;
-	        *bp++ = '\0' ;
-	        if (((rbuf+rlen)-bp) > 0) {
-	            memset(bp,0,(rbuf+rlen)-bp) ;
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if ((rlen > 2) && ms[0]) {
+	        if (cint mslen = strlen(ms) ; (mslen+1) <= rlen) {
+	            char	*bp = strwcpy(rbuf,ms,-1) ;
+	            rs = SR_OK ;
+	            *bp++ = '\n' ;
+	            *bp++ = '\0' ;
+	            if (cint zl = ((rbuf+rlen)-bp) ; zl > 0) {
+	                memclear(bp,zl) ;
+	            }
+	        } else {
+	            rs = SR_OVERFLOW ;
 	        }
-	    } else {
-	        if (rlen > 0) rbuf[0] = '\0' ;
-	        rs = SR_OVERFLOW ;
-	    }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rlen : rs ;
 }

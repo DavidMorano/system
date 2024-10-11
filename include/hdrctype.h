@@ -1,6 +1,9 @@
 /* hdrctype HEADER */
 /* lang=C20 */
 
+/* parse a mailmsg content-type into its parts */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -16,10 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	HDRCTYPE	struct hdrctype_head

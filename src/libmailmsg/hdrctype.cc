@@ -1,7 +1,7 @@
 /* hdrctype SUPPORT */
 /* lang=C++20 */
 
-/* process the input messages and spool them up */
+/* parse a mailmsg content-type into its parts */
 /* version %I% last-modified %G% */
 
 
@@ -16,6 +16,10 @@
 
 /****************************************************************************
 
+  	Object:
+	hdrctype
+
+	Description:
 	This object module parses a "content-type" header specification.
 	The parsed results are broken into three types of items:
 	the type, the sub-type, and parameters.
@@ -23,13 +27,13 @@
 ****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"hdrctype.h"

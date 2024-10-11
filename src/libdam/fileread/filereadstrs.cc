@@ -86,7 +86,7 @@ int filereadstrs(cchar *fname,char *rbuf,int rlen) noex {
 	if (fname && rbuf) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (fname[0]) {
+	    if (fname[0] && (rlen > 0)) {
 		rs = reader(fname,rbuf,rlen) ;
 		rl = rs ;
 	    } /* end if (valid) */

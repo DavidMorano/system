@@ -344,27 +344,17 @@ int lineindex_lookup(LI *op,uint ri,off_t *rop) noex {
 }
 /* end subroutine (lineindex_lookup) */
 
+static int lieindex_checkclose(LI *op,time_t dt) noex {
+}
+
 int lineindex_check(LI *op,time_t dt) noex {
-	USTAT		sb ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f_changed = false ;
-	cchar	*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LINEINDEX_MAGIC) return SR_NOTOPEN ;
-
-/* check things */
-
-	if (op->cursors > 0)
-	    goto ret0 ;
-
-	if (op->mapdata == nullptr)
-	    goto ret0 ;
-
-/* check for "unused" */
-
-	cp = (cchar *) (op->mapdata + 16 + 3) ;
+	if ((rs = lineindex_magic(op,rop)) >= 0) {
+	    if ((op->cursors ==  0) && 
+		    
+		    if (op->mapdata) {
+		if (cchar *cp = charp(op->mapdata + 16 + 3) ; *cp == 0) {
 	if (*cp)
 	    goto closeit ;
 
@@ -376,7 +366,7 @@ int lineindex_check(LI *op,time_t dt) noex {
 	if ((dt - op->ti_check) > TO_CHECK) {
 
 	    op->ti_check = dt ;
-	    if ((rs = u_stat(op->ifn,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_stat(op->ifn,&sb)) >= 0) {
 
 	        if ((sb.st_mtime > op->mtime) ||
 	            (sb.st_size > op->filesize))

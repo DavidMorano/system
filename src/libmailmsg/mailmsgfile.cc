@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Object:
+	mailmsgfile
+
+	Description:
 	This object implements a translation mapping from message-ids
 	(MSGIDs) to unique temporary filenames.  Although not our
 	business, these filenames point to files that hold the
