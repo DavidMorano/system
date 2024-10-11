@@ -56,13 +56,13 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= filereadln.o filereadstrs.o
-OBJ1=
-OBJ2=
-OBJ3=
+OBJ1= filebinary.o fileobject.o
+OBJ2= fileliner.o filelines.o
+OBJ3= fileprintable.o
 OBJ4=
 OBJ5=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
 
 OBJ= $(OBJA) $(OBJB)
@@ -135,7 +135,12 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-filreadln.o:		filereadln.cc filereadln.h	$(INCS)
-filreadstrs.o:		filereadstrs.cc filereadstrs.h	$(INCS)
+filreadln.o:		filereadln.cc		filereadln.h		$(INCS)
+filreadstrs.o:		filereadstrs.cc		filereadstrs.h		$(INCS)
+filebinary.o:		filebinary.cc		filebinary.h		$(INCS)
+fileliner.o:		fileliner.cc		fileliner.h		$(INCS)
+filelines.o:		filelines.cc		filelines.h		$(INCS)
+fileobject.o:		fileobject.cc		fileobject.h		$(INCS)
+fileprintable.o:	fileprintable.cc	fileprintable.h		$(INCS)
 
 

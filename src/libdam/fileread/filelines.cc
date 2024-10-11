@@ -14,6 +14,19 @@
 
 /* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Name:
+	filelines
+
+	Description:
+	This is the (now) famous 'filelines' subroutine.  It is the
+	fastest version of this kind of cuntion (counting lines in
+	a text file).  Note that unlike the |fileliner(3dam)|
+	subroutine, no comment character can be specified.
+
+*******************************************************************************/
+
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/stat.h>
 #include	<sys/mman.h>

@@ -7,12 +7,12 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 2023-12-17, David A­D­ Morano
+	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	FILELINES_INCLUDE
 #define	FILELINES_INCLUDE

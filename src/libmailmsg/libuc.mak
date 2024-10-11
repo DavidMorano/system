@@ -897,7 +897,6 @@ ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
-filelines.o:		filelines.cc filelines.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h

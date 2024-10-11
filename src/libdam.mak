@@ -110,7 +110,7 @@ OBJ13= matstr.o matostr.o matpstr.o matpcasestr.o
 OBJ14= matkeystr.o matnstr.o matsubstr.o matcasesubstr.o
 OBJ15=
 
-OBJ16= mallocstuff.o fileobject.o 
+OBJ16= mallocstuff.o filread.o
 OBJ17= 
 OBJ18= 
 OBJ19= 
@@ -269,7 +269,7 @@ OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
 OBJ153= getev.o getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
 OBJ154= msghdr.o cmsghdr.o
-OBJ155= fileread.o mailboxappend.o
+OBJ155= mailboxappend.o
 OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
 OBJ157= localgetorg.o localgetorgcode.o localgetorgloc.o 
 OBJ158= localgetnetload.o localsetnetload.o localgetsystat.o localsetsystat.o
@@ -674,7 +674,6 @@ gecos.o:		gecos.c gecos.h
 kinfo.o:		kinfo.c kinfo.h
 
 msfile.o:		msfile.c msfile.h msfilee.h
-
 msfilee.o:		msfilee.c msfilee.h
 
 ebuf.o:			ebuf.c ebuf.h

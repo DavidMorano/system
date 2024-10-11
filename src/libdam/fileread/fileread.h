@@ -28,6 +28,11 @@
 
 #include	<filereadln.h>
 #include	<filereadstrs.h>
+#include	<filebinary.h>
+#include	<fileliner.h>
+#include	<filelines.h>
+#include	<fileobject.h>
+#include	<fileprintable.h>
 
 
 #endif /* FILEREAD_INCLUDE */

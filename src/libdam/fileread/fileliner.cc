@@ -20,14 +20,20 @@
 	fileliner
 
 	Description:
-	Given a file-name we determine the number of lines the file has.
+	Given a file-name we determine the number of lines the file
+	has.  An optional comment character can be specified.  When
+	a comment character is specified, only lines with some
+	content located before the comment character will count as
+	a line.  Note that a comment characters is indeed just a
+	single characters, so things like specifying C-language
+	comments are not possible.
 
 	Synopsis:
 	int fileliner(cchar *fname,int cc) noex
 
 	Arguments:
 	fname		file-path to check
-	cc		optional comment character
+	cc		optional comment character (when non-zero)
 
 	Returns:
 	<0		error
@@ -80,15 +86,13 @@ int fileliner(cchar *fname,int cn) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        char	*lbuf{} ;
-	        if ((rs = malloc_ml(&lbuf)) >= 0) {
+	        if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    	    bfile	ifile, *ifp = &ifile ;
 		    cint	llen = rs ;
 	            if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
 	                while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 		            if (cn > 0) {
-		                int	ll = rmeol(lbuf,rs) ;
-			        if (ll > 0) {
+		                if (cint ll = rmeol(lbuf,rs) ; ll > 0) {
 				    auto sw = siskipwhite ;
 			            if (int si ; (si = sw(lbuf,ll)) >= 0) {
 				        if (ll > si) {
