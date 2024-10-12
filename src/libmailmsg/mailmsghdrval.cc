@@ -1,4 +1,5 @@
 /* mailmsghdrval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* message header-value handling */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	mailmsghdrval
+
+	Description:
 	This is a (rather) simple message header-value object.  The
 	purpose of this object is to accummulate pieces of an entire
 	header-value, one piece of it at a time.  The reason that

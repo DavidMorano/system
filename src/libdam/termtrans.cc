@@ -101,7 +101,6 @@
 #define	TA_MALL		(TA_MBASE|TA_MOFFIND|TA_MDOUBLE|TA_MREV|TA_MFONTS)
 
 /* source graphic rendition specifier characters */
-
 #define	GRCH_BOLD	'*'		/* bold */
 #define	GRCH_UNDER	'_'		/* underline */
 #define	GRCH_BLINK	':'		/* blinking */
@@ -110,7 +109,6 @@
 #define	GRCH_WIDE	'-'		/* double-wide */
 
 /* our graphic renditions */
-
 #define	GR_VBOLD	0		/* indicate BOLD */
 #define	GR_VUNDER	1		/* indicate UNDER */
 #define	GR_VBLINK	2		/* indicate BLINK */
@@ -576,13 +574,13 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	int		bgr = pgr ;
 	int		cc ;
 	int		n ;
-	int		size ;
+	int		sz ;
 	int		gl = 0 ;
 	int		len = 0 ;
 	char		*grbuf ;
 	n = flbsi(grmask) + 1 ;
-	size = ((2*n)+1+1) ; /* size according to algorithm below */
-	if ((grbuf = new(nothrow) char[size]) != nullptr) {
+	sz = ((2*n)+1+1) ; /* size according to algorithm below */
+	if ((grbuf = new(nothrow) char[sz]) != nullptr) {
 	    bgr &= grmask ;
 	    ogr = (bgr & (~ gr) & grmask) ;
 	    if (ogr != (bgr & grmask)) { /* partial gr-off */

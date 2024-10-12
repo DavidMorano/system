@@ -1,4 +1,5 @@
 /* hdrextid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* header-extract-id */
@@ -17,6 +18,7 @@
 /*******************************************************************************
 
 	Name:
+	hdrextid
 
 	Description:
 	Here we extract an ID from a header value.  The ID is only
@@ -36,18 +38,23 @@
 	>=0		length of result
 	<0		error (system-return)
 
-	Notes: IDs are derived from the "route-address" in an
+	Notes: 
+	IDs are derived from the "route-address" in an
 	email-addresses (EMAs).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<ema.h>
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<localmisc.h>
+
+#include	"hdrextid.h"
 
 
 /* local defines */
@@ -84,11 +91,10 @@ int hdrextid(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf && abuf) {
-	    ema	a ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = ema_start(&a)) >= 0) {
+	    if (ema a ; (rs = ema_start(&a)) >= 0) {
 	        if ((rs = ema_parse(&a,abuf,alen)) >= 0) {
-	            EMA_ENT	*ep{} ;
+	            ema_ent	*ep{} ;
 	            for (int i = 0 ; ema_get(&a,i,&ep) >= 0 ; i += 1) {
 	                if (ep) {
 	                    int		sl = 0 ;

@@ -1,4 +1,5 @@
 /* mailmsgheadkey SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* extract the key from a mail-msg header field (c-string) */
@@ -51,6 +52,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>

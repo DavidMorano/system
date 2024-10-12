@@ -9,7 +9,7 @@
 
 	= 2005-01-20, David A­D­ Morano
 	This was originally written to collect some common PCS code
-	into one subroutines.  Making and refactoring PCS programs
+	into one subroutine.  Making and refactoring PCS programs
 	accounts for a good bit of these subroutine libraries.
 
 */
@@ -22,8 +22,8 @@
 	logfile_userinfo
 
 	Description:
-	This subroutines is generally used to make the first log-file
-	entry at the start of a program involcation. The subroutine
+	This subroutine is generally used to make the first log-file
+	entry at the start of a program involcation.  The subroutine
 	requires that both a LOGFILE object have already been opened
 	and that the caller has retrieved the user information using
 	the userinfo facility (and passed a pointer to that down

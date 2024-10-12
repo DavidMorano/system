@@ -2420,21 +2420,17 @@ static int procregouter(PROGINFO *pip,cchar **av,SHIO *ofp)
 }
 /* end subroutine (procregouter) */
 
-
-static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
-{
+static int procregouterterm(PROGINFO *pip,void *ofp,int fd) noex {
 	LOCINFO		*lip = pip->lip ;
-	FILER		b ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
-	    const int	to = pip->to_read ;
-	    const int	llen = LINEBUFLEN ;
-	    int		len ;
+	if (filer b ; (rs = filer_start(&b,fd,0z,512,0)) >= 0) {
+	    cint	to = pip->to_read ;
+	    cint	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
-	        len = rs ;
+	        cint	len = rs ;
 	        if (rs >= 0) rs = lib_sigterm() ;
 	        if (rs >= 0) rs = lib_sigintr() ;
 	        if (rs >= 0) {

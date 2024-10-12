@@ -76,9 +76,10 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| */
-#include	<ctime>
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
@@ -124,8 +125,8 @@ extern "C" {
 /* local structures */
 
 struct ucprogdata_head {
-	ptm		m ;		/* data mutex */
-	ptc		c ;		/* condition variable */
+	ptm		mx ;		/* data mutex */
+	ptc		cv;		/* condition variable */
 	varray		*ents ;
 	vaflag		waiters ;
 	vaflag		f_void ;
@@ -178,8 +179,8 @@ int ucprogdata_init() noex {
 	if (! uip->f_void) {
 	    if (! uip->f_init) {
 	        uip->f_init = true ;
-	        if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	            if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
+	        if ((rs = ptm_create(&uip->mx,nullptr)) >= 0) {
+	            if ((rs = ptc_create(&uip->cv,nullptr)) >= 0) {
 	                void_f	b = ucprogdata_atforkbefore ;
 	                void_f	a = ucprogdata_atforkafter ;
 	                if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -192,11 +193,11 @@ int ucprogdata_init() noex {
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
-	                    ptc_destroy(&uip->c) ;
+	                    ptc_destroy(&uip->cv) ;
 			}
 	            } /* end if (ptc_create) */
 	            if (rs < 0) {
-	                ptm_destroy(&uip->m) ;
+	                ptm_destroy(&uip->mx) ;
 		    }
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
@@ -231,11 +232,11 @@ int ucprogdata_fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptc_destroy(&uip->c) ;
+	        rs1 = ptc_destroy(&uip->cv) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->m) ;
+	        rs1 = ptm_destroy(&uip->mx) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_init = false ;
@@ -378,16 +379,16 @@ static int ucprogdata_entfins(PD *uip) noex {
 static int ucprogdata_capbegin(PD *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
+	if ((rs = ptm_lockto(&uip->mx,to)) >= 0) {
 	    uip->waiters += 1 ;
 	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
+	        rs = ptc_waiter(&uip->cv,&uip->mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        uip->f_capture = true ;
 	    }
 	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = ptm_unlock(&uip->mx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -397,12 +398,12 @@ static int ucprogdata_capbegin(PD *uip,int to) noex {
 static int ucprogdata_capend(PD *uip) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
+	if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	    uip->f_capture = false ;
 	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->c) ;
+	        rs = ptc_signal(&uip->cv) ;
 	    }
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = ptm_unlock(&uip->mx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -430,7 +431,7 @@ static int ucprogdata_geter(PD *uip,int di,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = varray_acc(vap,di,&ep)) > 0) {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = getustime ;
 	    if ((ep->et > 0) && ((dt-ep->et) < ep->ttl)) {
 		rs = sncpy1w(rbuf,rlen,ep->vp,ep->vl) ;
 		len = rs ;
@@ -453,8 +454,7 @@ static void ucprogdata_atforkafter() noex {
 /* end subroutine (ucprogdata_atforkafter) */
 
 static void ucprogdata_exit() noex {
-	cint	rs = ucprogdata_fini() ;
-	if (rs < 0) {
+	if (cint rs = ucprogdata_fini() ; rs < 0) {
 	    ulogerror("ucprogdata",rs,"exit-fini") ;
 	}
 }
@@ -462,11 +462,10 @@ static void ucprogdata_exit() noex {
 
 
 static int entry_start(UCPROGDATA_ENT *ep,cchar *vp,int vl,int ttl) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs ;
-	char		*bp ;
 	if (vl < 0) vl = strlen(vp) ;
-	if ((rs = uc_libmalloc((vl+1),&bp)) >= 0) {
+	if (char *bp{} ; (rs = uc_libmalloc((vl+1),&bp)) >= 0) {
 	    ep->vp = bp ;
 	    ep->vl = vl ;
 	    strwcpy(bp,vp,vl) ;

@@ -1,4 +1,5 @@
 /* strlistmk HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* STRLISTMK management */
@@ -12,7 +13,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* systems IDs */
+#include	<sys/types.h>		/* systems types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

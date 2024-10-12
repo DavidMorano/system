@@ -109,7 +109,7 @@ struct txtindexmk_calls {
     soclose_f		close ;
 } ;
 
-typedef txtindexmk_calls *	txtindexmk_callsp ;
+typedef txtindexmk_calls *	callsp ;
 
 namespace {
     struct opener {
@@ -153,7 +153,7 @@ static int txtindexmk_dtor(txtindexmk *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->callp) {
-	        txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	        txtindexmk_calls	*callp = callsp(op->callp) ;
 		delete callp ;
 		op->callp = nullptr ;
 	    }
@@ -250,7 +250,7 @@ int opener::operator () (char *ap) noex {
 	        cchar	*objname = TIM_OBJNAME ;
 		cchar	*pr = pbuf ;
 		if ((rs = txtindexmk_objloadbegin(op,pr,objname)) >= 0) {
-	    	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    	    if ((rs = (*callp->open)(op->obj,pp,db,of,om)) >= 0) {
 			rv = rs ;
 			op->magic = TXTINDEXMK_MAGIC ;
@@ -270,7 +270,7 @@ int txtindexmk_close(TIM *op) noex {
 	int		rs1 ;
 	if ((rs = txtindexmk_magic(op)) >= 0) {
 	    if (op->obj) {
-	        txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	        txtindexmk_calls	*callp = callsp(op->callp) ;
 	        rs1 = (*callp->close)(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -291,7 +291,7 @@ int txtindexmk_close(TIM *op) noex {
 int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 	int		rs ;
 	if ((rs = txtindexmk_magic(op,keys)) >= 0) {
-	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    rs = (*callp->addeigens)(op->obj,keys,nkeys) ;
 	} /* end if (magic) */
 	return rs ;
@@ -301,7 +301,7 @@ int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	int		rs ;
 	if ((rs = txtindexmk_magic(op,tags)) >= 0) {
-	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    rs = (*callp->addtags)(op->obj,tags,ntags) ;
 	} /* end if (magic) */
 	return rs ;
@@ -311,7 +311,7 @@ int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 int txtindexmk_noop(TIM *op) noex {
 	int		rs ;
 	if ((rs = txtindexmk_magic(op)) >= 0) {
-	    txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
+	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    if (callp->noop) {
 	        rs = (*callp->noop)(op->obj) ;
 	    }
@@ -396,44 +396,42 @@ static int txtindexmk_objloadend(TIM *op) noex {
 }
 /* end subroutine (txtindexmk_objloadend) */
 
-static int txtindexmk_loadcalls(TIM *op,cchar *objname) noex {
+static int txtindexmk_loadcalls(TIM *op,cchar *soname) noex {
 	modload		*lp = op->lop ;
-	cint		nlen = SYMNAMELEN ;
+	cint		slen = SYMNAMELEN ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	char		nbuf[SYMNAMELEN + 1] ;
+	char		sbuf[SYMNAMELEN + 1] ;
 	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
-	    cvoid	*snp{} ;
-	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
-	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = nullptr ;
+	    if ((rs = sncpy(sbuf,slen,soname,"_",subs[i])) >= 0) {
+	        if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
+	            txtindexmk_calls	*callp = callsp(op->callp) ;
+	            c += 1 ;
+		    switch (i) {
+		    case sub_open:
+		        callp->open = soopen_f(snp) ;
+		        break ;
+		    case sub_addeigens:
+		        callp->addeigens = soaddeigens_f(snp) ;
+		        break ;
+		    case sub_addtags:
+		        callp->addtags = soaddtags_f(snp) ;
+		        break ;
+		    case sub_noop:
+		        callp->noop = sonoop_f(snp) ;
+		        break ;
+		    case sub_abort:
+		        callp->abort = soabort_f(snp) ;
+		        break ;
+		    case sub_close:
+		        callp->close = soclose_f(snp) ;
+		        break ;
+		    } /* end switch */
+		} else if (rs == rsn) {
 		     if (! isrequired(i)) rs = SR_OK ;
-		}
-	    }
-	    if ((rs >= 0) && snp) {
-	        txtindexmk_calls	*callp = txtindexmk_callsp(op->callp) ;
-	        c += 1 ;
-		switch (i) {
-		case sub_open:
-		    callp->open = soopen_f(snp) ;
-		    break ;
-		case sub_addeigens:
-		    callp->addeigens = soaddeigens_f(snp) ;
-		    break ;
-		case sub_addtags:
-		    callp->addtags = soaddtags_f(snp) ;
-		    break ;
-		case sub_noop:
-		    callp->noop = sonoop_f(snp) ;
-		    break ;
-		case sub_abort:
-		    callp->abort = soabort_f(snp) ;
-		    break ;
-		case sub_close:
-		    callp->close = soclose_f(snp) ;
-		    break ;
-		} /* end switch */
-	    } /* end if (it had the call) */
+	        } /* end if (it had the call) */
+	    } /* end if (sncpy) */
 	} /* end for (subs) */
 	return (rs >= 0) ? c : rs ;
 }

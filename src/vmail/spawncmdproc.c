@@ -202,13 +202,11 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 #endif
 
 	    if ((rs = opentmpfile(inname,oflags,omode,cmdfname)) >= 0) {
-		const int	cmdlen = CMDBUFLEN ;
-	        const int	sfd = rs ;
-	        char		*cmdbuf ;
-
+		cint	cmdlen = CMDBUFLEN ;
+	        cint	sfd = rs ;
+	        char	*cmdbuf ;
 		if ((rs = uc_malloc((cmdlen+1),&cmdbuf)) >= 0) {
-	            FILER	b ;
-		    if ((rs = filer_start(&b,sfd,0L,0,0)) >= 0) {
+		    if (filer b ; (rs = filer_start(&b,sfd,0z,0,0)) >= 0) {
 			int	i ;
 			int	cl ;
 

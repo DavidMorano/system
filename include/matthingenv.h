@@ -1,4 +1,5 @@
 /* matthingenv HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -9,9 +10,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysrets.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

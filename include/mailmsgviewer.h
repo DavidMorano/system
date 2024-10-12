@@ -1,4 +1,5 @@
 /* mailmsgviewer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create and cache message content files */
@@ -28,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	MAILMSGVIEWER_MAGIC	0x54837492

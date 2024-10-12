@@ -1,4 +1,5 @@
 /* mailmsgstage HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Message-Entry */
@@ -29,6 +30,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* |off_t| */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */

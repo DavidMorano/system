@@ -128,6 +128,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<sfx.h>
 #include	<strwcpy.h>
 #include	<char.h>
@@ -148,7 +149,9 @@
 /* exported subroutines */
 
 char *strwcpyblanks(char *dp,int w) noex {
-	while (w-- > 0) *dp++ = ' ' ;
+	while (w-- > 0) {
+	    *dp++ = ' ' ;
+	}
 	*dp = '\0' ;
 	return dp ;
 }

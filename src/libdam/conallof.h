@@ -1,4 +1,4 @@
-/* conallof HEADER */
+/* conallof HEADER (contains-all-of) */
 /* lang=C20 */
 
 /* does the given string have all of the given characters? */

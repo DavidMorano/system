@@ -1,4 +1,5 @@
 /* comsatmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create and parse COMSAT messages */
@@ -20,10 +21,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |off_t| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>		/* |USERNAMELEN| */
 
 
 #ifndef	USERNAMELEN

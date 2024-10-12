@@ -578,8 +578,7 @@ PROGINFO	*pip ;
 VECSTR		*dp ;
 int		fd ;
 {
-	FILER		buf ;
-	const int	to = pip->to_read ;
+	cint		to = pip->to_read ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -595,9 +594,9 @@ int		fd ;
 #endif
 
 	if ((rs = u_rewind(fd)) >= 0) {
-	    if ((rs = filer_start(&buf,fd,0L,BUFLEN,0)) >= 0) {
+	    if (filer buf ; (rs = filer_start(&buf,fd,0z,BUFLEN,0)) >= 0) {
 	        struct lstate	ls ;
-	        const int	llen = LINEBUFLEN ;
+	        cint		llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -687,9 +686,8 @@ PROGINFO	*pip ;
 VECOBJ		*errp ;
 int		fd_err ;
 {
-	struct ustat	sb ;
-	FILER		buf ;
-	const int	fsize = BUFLEN ;
+	YSTAT		sb ;
+	cint		fsize = BUFLEN ;
 	int		rs ;
 	int		to = pip->to_read ;
 
@@ -700,10 +698,10 @@ int		fd_err ;
 	}
 
 	if ((rs >= 0) && (sb.st_size > 0)) {
-	    if ((rs = filer_start(&buf,fd_err,0L,fsize,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        int		len ;
-	        char		lbuf[LINEBUFLEN + 1] ;
+	    if (filer buf ; (rs = filer_start(&buf,fd_err,0z,fsize,0)) >= 0) {
+	        cint	llen = LINEBUFLEN ;
+	        int	len ;
+	        char	lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))

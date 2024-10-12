@@ -1,0 +1,892 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_application_query.5,v $ $Revision: 1.1.2.8 $ (DEC) $Date: 1996/02/21 20:24:19 $
+.\"
+.TH atom_application_query 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom_application_query\*O, \*LGetProgInfo\*O, \*LGetObjInfo\*O, \*LGetObjName\*O, \*LGetObjOutName\*O, \*LGetAnalName\*O, \*LGetObjInstArray\*O, \*LGetObjInstCount\*O, \*LGetProcInfo\*O, \*LProcName\*O, \*LProcFileName\*O, \*LProcPC\*O, \*LGetBlockInfo\*O, \*LBlockPC\*O, \*LIsBranchTarget\*O, \*LGetInstClass\*O, \*LIsInstType\*O, \*LGetInstInfo\*O, \*LInstPC\*O, \*LInstLineNo\*O, \*LGetInstBinary\*O, \*LGetInstRegEnum\*O, \*LGetInstRegUsage\*O \- Allows an Atom-tool instrumentation routine to obtain information about the parts of an application program
+.SH SYNOPSIS
+.PP
+.sS
+\*L#include <cmplrs/atom.inst.h>\*O
+.PP
+\*Lconst char *GetAnalName (
+.nL
+        void );\*O
+.PP
+\*Llong GetProgInfo (
+.nL
+        ProgInfoType );\*O
+.PP
+\*Llong GetObjInfo (
+.nL
+        Obj *,
+.nL
+        ObjInfoType );\*O
+.PP
+\*Lconst char *GetObjName (
+.nL
+        Obj * );\*O
+.PP
+\*Lconst char *GetObjOutName (
+.nL
+        Obj * );\*O
+.PP
+\*Lconst unsigned int *GetObjInstArray (
+.nL
+        Obj * );\*O
+.PP
+\*Llong GetObjInstCount (
+.nL
+        Obj * );\*O
+.PP
+\*Llong GetProcInfo (
+.nL
+        Proc *,
+.nL
+        ProcInfoType );\*O
+.PP
+\*Lconst char *ProcName (
+.nL
+        Proc * );\*O
+.PP
+\*Lconst char *ProcFileName (
+.nL
+        Proc * );\*O
+.PP
+\*Llong ProcPC (
+.nL
+        Proc * );\*O
+.PP
+\*Llong GetBlockInfo (
+.nL
+        Block *,
+.nL
+        BlockInfoType );\*O
+.PP
+\*Llong BlockPC (
+.nL
+        Block * );\*O
+.PP
+\*Lunsigned IsBranchTarget (
+.nL
+        Block * );\*O
+.PP
+\*LIClassType GetInstClass (
+.nL
+        Inst * );\*O
+.PP
+\*Lint IsInstType (
+.nL
+        Inst *
+.nL
+        ITypeType );\*O
+.PP
+\*Lint GetInstInfo (
+.nL
+        Inst *
+.nL
+        InstInfoType );\*O
+.PP
+\*Llong InstPC (
+.nL
+        Inst * );\*O
+.PP
+\*Llong InstLineNo (
+.nL
+        Inst * );\*O
+.PP
+\*Lint GetInstBinary (
+.nL
+        long );\*O
+.PP
+\*LRegvType GetInstRegEnum (
+.nL
+        Inst *,
+.nL
+        InstInfoType );\*O
+.PP
+\*Lvoid GetInstRegUsage (
+.nL
+        Inst *,
+.nL
+         InstRegUsageVec *);\*O
+.nL
+.sE
+.SH DESCRIPTION
+.PP
+.iX "Atom application query routines"
+.iX "GetProgInfo Atom routine"
+.iX "GetObjInfo Atom routine"
+.iX "GetObjName Atom routine"
+.iX "GetObjOutName Atom routine"
+.iX "GetAnalName Atom routine"
+.iX "GetObjInstArray Atom routine"
+.iX "GetObjInstCount Atom routine"
+.iX "GetProcInfo Atom routine"
+.iX "ProcName Atom routine"
+.iX "ProcFileName Atom routine"
+.iX "ProcPC Atom routine"
+.iX "GetBlockInfo Atom routine"
+.iX "BlockPC Atom routine"
+.iX "IsBranchTarget Atom routine"
+.iX "GetInstClass Atom routine"
+.iX "IsInstType Atom routine"
+.iX "GetInstInfo Atom routine"
+.iX "InstPC Atom routine"
+.iX "InstLineNo Atom routine"
+.iX "GetInstBinary Atom routine"
+.iX "GetInstRegEnum Atom routine"
+.iX "GetInstRegUsage Atom routine"
+Atom's application query routines allow an instrumentation routine to obtain
+information about the parts of an application program.
+.PP
+You can use these routines only from an Atom tool's instrumentation file.
+See \*Latom\*O(1) for a description of Atom.
+.\" .PP
+.SS "GetAnalName Routine"
+Use the \*LGetAnalName\*O routine to obtain the name of the analysis
+file, as passed to the \*Latom\*O command.  This routine is useful for tools
+that have a single instrumentation file and multiple analysis files.
+.\" .PP
+.SS "GetProgInfo Routine"
+Use the \*LGetProgInfo\*O routine to obtain the number of objects in a program.
+The only accepted \*LProgInfo\*O value is \*LProgNumberObjects\*O.
+.PP
+Each object of a program is a self-contained program with text, unitialized,
+and data sections.  The text section contains instructions.  Initialized data
+includes data that must be initialized to nonzero values; unitialized data is
+filled with zeroes when the corresponding pages are mapped into the user's
+address space.
+.\" .PP
+.SS "GetObjInfo Routine"
+Use the \*LGetObjInfo\*O routine to obtain information about the
+specified \*LObj\*O.  The following \*LObjInfoType\*O values return
+the indicated information:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+\*LObjInfoType\*O@Description
+.sp
+_
+T{
+\*LObjTextStartAddress\*O
+T}@T{
+Returns the starting compile-time address of the object's text segment.
+ When instrumenting a nonshared executable or the main executable of
+call-shared programs, the compile-time address is identical to the
+run-time address.  For shared libraries, the compiler may place an
+object at a different address than its compile-time address.
+T}
+.sp
+T{
+\*LObjTextSize\*O
+T}@T{
+Returns the size in bytes of the object's text segment.
+T}
+.sp
+T{
+\*LObjInitDataStartAddress\*O
+T}@T{
+Returns the starting address of the object's data segment.
+T}
+.sp
+T{
+\*LObjInitDataSize\*O
+T}@T{
+Returns the size in bytes of the object's data segment.
+T}
+.sp
+T{
+\*LObjUninitDataStartAddress\*O
+T}@T{
+Returns the starting address of the object's \*Lbss\*O segment.
+T}
+.sp
+T{
+\*LObjUninitDataSize\*O
+T}@T{
+Returns the size in bytes of the object's \*Lbss\*O segment.
+T}
+.sp
+T{
+\*LObjNumberProcs\*O
+T}@T{
+Returns the number of procedures in the object.
+T}
+.sp
+T{
+\*LObjNumberBlocks\*O
+T}@T{
+Returns the number of basic blocks in the object.
+T}
+.sp
+T{
+\*LObjNumberInsts\*O
+T}@T{
+Returns the number of instructions in the object.  Note that the number
+of instructions returned is not usually equal to the value returned by
+\*LObjTextSize\*O divided by the instruction size (4 bytes).
+The compiler aligns procedures on 16-byte boundaries by padding them
+on both sides with \*LNOP\*O instructions.  Because these instructions
+are never executed, they are not included in the count returned by
+\*LObjNumberInsts\*O.
+T}
+.sp
+T{
+\*LObjID\*O
+T}@T{
+Returns a unique numeric identifier for the object.  This identifier
+is unique to this object within the entire application program.
+T}
+.sp
+T{
+\*LObjModifyHint\*O
+T}@T{
+Returns a Boolean value indicating whether the user requested that the
+object be instrumented or not.  A user indicates which objects are or
+are not to be instrumented by specifying the \*L\-all\*O,
+\*L\-incobj\*O, or \*L\-excobj\*O flags on the \*Latom\*O command line.
+The \*LObjModifyHint\*O type returns the value \*LOBJ_READONLY\*O if
+the user did not ask for the object to be instrumented or
+\*LOBJ_WRITEABLE\*O if the user asked for the object to be
+instrumented.  Certain tools can use this hint to decide whether to
+exclude particular objects from instrumentation.  Although an
+Atom tool can disregard these flag settings and instrument objects
+as it sees fit, it typically honors the user's requests.
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "GetObjName and GetObjOutName Routines"
+Use the \*LGetObjName\*O routine to obtain the original filename of
+the specified object.
+.PP
+Use the \*LGetObjOutName\*O routine to obtain the name of the
+instrumented object.
+.\" .PP
+.SS "GetObjInstArray and GetObjInstCount Routines"
+Use the \*LGetObjInstArray\*O routine to obtain an array consisting
+of the 32-bit instructions included in the specified \*LObj\*O.
+.PP
+Use \*LGetObjInstCount\*O to obtain the number of instructions in
+the array.
+.\" .PP
+.SS "GetProcInfo Routine"
+Use the \*LGetProcInfo\*O routine to obtain information about the
+specified \*LProc\*O.  The following \*LProcInfoType\*O values return
+the indicated information:
+.nL
+.ne 6
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+\*LProcInfoType\*O@Description
+.sp
+_
+T{
+\*LProcFrameSize\*O
+T}@T{
+Returns the size of the fixed portion of the procedure's stack frame.
+T}
+.sp
+T{
+\*LProcIRegMask\*O
+T}@T{
+Returns the procedure's saved integer register mask.
+T}
+.sp
+T{
+\*LProcIRegOffset\*O
+T}@T{
+Returns the offset to the procedure's integer register save area in the stack
+frame.
+T}
+.sp
+T{
+\*LProcFRegMask\*O
+T}@T{
+Returns the procedure's saved floating-point register mask.
+T}
+.sp
+T{
+\*LProcFRegOffset\*O
+T}@T{
+Returns the offset to the procedure's floating-point register save area in the stack
+frame.
+T}
+.sp
+T{
+\*LProcgpPrologue\*O
+T}@T{
+Returns the size in bytes of the global pointer (GP) prologue.
+T}
+.sp
+T{
+\*LProcgpUsed\*O
+T}@T{
+Returns a nonzero value if the procedure uses the GP register (\*L$gp\*O) and
+zero (0) if it does not.
+T}
+.sp
+T{
+\*LProcLocalOffset\*O
+T}@T{
+Returns the offset to the procedure's local variables from the virtual frame
+pointer.
+T}
+.sp
+T{
+\*LProcFrameReg\*O
+T}@T{
+Returns the number of the register that is being used as the procedure's frame
+pointer.
+T}
+.sp
+T{
+\*LProcPcReg\*O
+T}@T{
+Returns the number of the register that contains the procedure's return address.
+T}
+.sp
+T{
+\*LProcNumberBlocks\*O
+T}@T{
+Returns the number of basic blocks in the procedure.
+T}
+.sp
+T{
+\*LProcNumberInsts\*O
+T}@T{
+Returns the number of instructions in the procedure.
+T}
+.sp
+T{
+\*LProcID\*O
+T}@T{
+Returns a unique numeric identifier for the procedure. This identifier
+is unique across all shared libraries and can thus be used to create
+per-procedure data structures.
+T}
+.sp
+T{
+\*LProcLineLow\*O
+T}@T{
+Returns the lowest source line in the procedure, or zero (0) if source
+line information is unavailable.
+T}
+.sp
+T{
+\*LProcLineHigh\*O
+T}@T{
+Returns the highest source line in the procedure, or zero (0) if
+source line information is unavailable.  This value and the value
+returned by \*LProcLineLow\*O are useful for determining when the
+compiler has performed inline operations that have changed the line
+number of an instruction to a value that is not in the range of the
+current procedure.
+T}
+.sp
+T{
+\*LProcAddrTaken\*O
+T}@T{
+Returns a nonzero value if the program has taken the procedure's
+address and zero (0) if it has not.  An Atom tool can use this value
+to determine if the procedure is a potential target of an indirect
+procedure call.
+T}
+.sp
+T{
+\*LProcIsRegFrame\*O
+T}@T{
+Returns a nonzero value if the procedure has a register frame.
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "ProcName and ProcFileName Routines"
+Use the \*LProcName\*O routine to obtain the name of the specified
+\*LProc\*O.
+.PP
+Use the \*LProcFileName\*O routine to obtain the name of
+the source file that contains the specified \*LProc\*O.
+If local symbols are not present, the value \*LNULL\*O is returned.
+Use to \*LProcFileName\*O and \*LInstLineNo\*O routines to identify
+the file name and line number of any instruction in the application
+program.
+.\" .PP
+.SS "ProcPC Routine"
+Use the \*LProcPC\*O routine to obtain the compile-time program
+counter (PC) of the first instruction in the procedure.
+.\" .PP
+.SS "GetBlockInfo Routine"
+Use the \*LGetBlockInfo\*O routine to obtain information about the
+pecified \*LBlock\*O.  The following \*LBlockInfoType\*O values return
+the indicated information:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+\*LBlockInfoType\*O@Description
+.sp
+_
+T{
+\*LBlockNumberInsts\*O
+T}@T{
+Returns the number of instructions in the basic block.
+T}
+.sp
+T{
+\*LBlockID\*O
+T}@T{
+Returns a unique numeric identifier for the basic block.  This identifier is unique
+to this basic block within its containing object.
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "BlockPC Routine"
+Use the \*LBlockPC\*O routine to obtain the compile-time program
+counter (PC) of the first instruction in the basic block.
+.\" .PP
+.SS "IsBranchTarget Routine"
+Use the \*LIsBranchTarget\*O routine to determine if the specified
+\*LBlock\*O is the target of a branch instruction, such as \*Lbr\*O,
+\*Lbsr\*O, a conditional integer branch, or a conditional
+floating-point branch.  \*LIsBranchTarget\*O returns a nonzero value if
+the basic block is the target of a branch and zero (0) if it is not.
+A tool that builds a call flow graph would find this information useful.
+.\" .PP
+.SS "GetInstClass Routine"
+Use the \*LGetInstClass\*O routine to obtain the class of the specified
+\*LInst\*O.  The following \*LIClassType\*O values may be returned:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+\*LIClassType\*O@Description
+.sp
+_
+T{
+\*LClassLoad\*O
+T}@T{
+Integer load instruction
+T}
+.sp
+T{
+\*LClassFload\*O
+T}@T{
+Floating-point load instruction
+T}
+.sp
+T{
+\*LClassStore\*O
+T}@T{
+Integer store data instruction
+T}
+.sp
+T{
+\*LClassFstore\*O
+T}@T{
+Floating-point store data instruction
+T}
+.sp
+T{
+\*LClassIbranch\*O
+T}@T{
+Integer branch instruction
+T}
+.sp
+T{
+\*LClassFbranch\*O
+T}@T{
+Floating-point branch instruction
+T}
+.sp
+T{
+\*LClassSubroutine\*O
+T}@T{
+Integer subroutine call instruction
+T}
+.sp
+T{
+\*LClassIarithmetic\*O
+T}@T{
+Integer arithmetic instruction
+T}
+.sp
+T{
+\*LClassImultiplyl\*O
+T}@T{
+Integer longword multiply instruction
+T}
+.sp
+T{
+\*LClassImultiplyq\*O
+T}@T{
+Integer quadword multiply instruction
+T}
+.sp
+T{
+\*LClassIlogical\*O
+T}@T{
+Logical function instruction
+T}
+.sp
+T{
+\*LClassIshift\*O
+T}@T{
+Shift function instruction
+T}
+.sp
+T{
+\*LClassIcondmove\*O
+T}@T{
+Conditional move instruction
+T}
+.sp
+T{
+\*LClassIcompare\*O
+T}@T{
+Integer compare instruction
+T}
+.sp
+T{
+\*LClassFpop\*O
+T}@T{
+Other floating-point operations
+T}
+.sp
+T{
+\*LClassFdivs\*O
+T}@T{
+Floating-point single precision divide instruction
+T}
+.sp
+T{
+\*LClassFdivd\*O
+T}@T{
+Floating-point double precision divide instruction
+T}
+.sp
+T{
+\*LClassNull\*O
+T}@T{
+\*Lcall pal\*O instruction, \*Lhw_x\*O instruction,  etc
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "IsInstType Routine"
+Use the \*LIsInstType\*O routine to determine if the specified
+\*LInst\*O is an instruction of the specified type.
+You can specify any of the following \*LITypeType\*O values.
+\*LIsInstType\*O returns a nonzero value if the instruction is of
+the specified type and zero (0) if it is not.
+Note that any instruction can be of more than one \*LITypeType\*O.
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+\*LITypeType\*O@Description
+.sp
+_
+T{
+\*LInstTypeLoad\*O
+T}@T{
+Integer or floating-point load instruction
+T}
+.sp
+T{
+\*LInstTypeStore\*O
+T}@T{
+Integer or floating-point store instruction
+T}
+.sp
+T{
+\*LInstTypeJump\*O
+T}@T{
+Jump, jump to subroutine, or return instruction
+T}
+.sp
+T{
+\*LInstTypeFP\*O
+T}@T{
+Any floating-point instruction
+T}
+.sp
+T{
+\*LInstTypeInt\*O
+T}@T{
+Any integer or nonfloating-point instruction
+T}
+.sp
+T{
+\*LInstTypeDiv\*O
+T}@T{
+Single or double precision divide instruction
+T}
+.sp
+T{
+\*LInstTypeMul\*O
+T}@T{
+Integer or floating-point multiply instruction
+T}
+.sp
+T{
+\*LInstTypeAdd\*O
+T}@T{
+Integer or floating-point add instruction
+T}
+.sp
+T{
+\*LInstTypeSub\*O
+T}@T{
+Integer or floating-point subtract instruction
+T}
+.sp
+T{
+\*LInstTypeCondBr\*O
+T}@T{
+Integer or floating-point conditional branch instruction
+T}
+.sp
+T{
+\*LInstTypeUncondBr\*O
+T}@T{
+Integer or floating-point unconditional branch instruction, but not a
+subroutine call
+T}
+.sp
+_
+.TE
+.SS "GetInstInfo Routine"
+Use the \*LGetInstInfo\*O routine to parse an entire 32-bit instruction
+and obtain all or a portion of that instruction.  You can specify any
+of the following \*LInstInfoType\*O values:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+\*LInstInfoType\*O@Description
+.sp
+_
+T{
+\*LInstMemDisp\*O
+T}@T{
+Returns the 16-bit memory-format displacement field, sign-extended to 32 bits
+(even if the instruction does not reference memory).
+T}
+.sp
+T{
+\*LInstBrDisp\*O
+T}@T{
+Returns the sign-extended, branch-format displacement field.
+T}
+.sp
+T{
+\*LInstRA\*O
+T}@T{
+Returns register field A.  Supply \*LInstA\*O to a call to
+\*LGetInstRegEnum\*O to determine whether the instruction is an
+integer or floating-point instruction.
+T}
+.sp
+T{
+\*LInstRB\*O
+T}@T{
+Returns register field B.  Supply \*LInstB\*O to a call to
+\*LGetInstRegEnum\*O to determine whether the instruction is an
+integer or floating-point instruction.
+T}
+.sp
+T{
+\*LInstRC\*O
+T}@T{
+Returns register field C.  Supply \*LInstC\*O to a call to
+\*LGetInstRegEnum\*O to determine whether the instruction is an
+integer or floating-point instruction.
+T}
+.sp
+T{
+\*LInstOpcode\*O
+T}@T{
+Returns the instruction's opcode.
+T}
+T{
+\*LInstBinary\*O
+T}@T{
+Returns a 32-bit binary representation of the assembly language instruction.
+T}
+.sp
+T{
+\*LInstAddrTaken\*O
+T}@T{
+Returns a nonzero value if the instruction's address is taken and
+zero (0) if it is not.
+T}
+.spi
+T{
+\*LInstEntryPoint\*O
+T}@T{
+Returns a nonzero value if the instruction is a procedure entry point
+and zero (0) if it is not.
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "InstPC Routine"
+Use the \*LInstPC\*O routine to obtain the compile-time program counter
+(PC) of the instruction.
+.\" .PP
+.SS "InstLineNo Routine"
+Use the \*LInstLineNo\*O routine to obtain the specified instruction's
+source line number.  Often, an Atom tool's instrumentation routine uses
+this information with the information returned by a call to the
+\*LProcFileName\*O routine to obtain the corresponding line in the
+source file.  A value of 0 (zero) is returned if local symbol table
+information is not present.
+.\" .PP
+.SS "GetInstBinary Routine"
+Use the \*LGetInstBinary\*O routine to obtain a 32-bit binary
+representation of the assembly language instruction.
+.\" .PP
+.SS "GetInstRegEnum Routine"
+Use the \*LGetInstRegEnum\*O routine to obtain the register type from
+an instruction field (\*LIInstInfoType\*O).
+(See the description of \*LAddCallProto\*O in the
+\*Latom_application_instrumentation\*O(5) reference page for a list of
+register types.)  If the specified register is not defined for this
+instruction, \*LGetInstRegEnum\*O returns \*LREG_NOTUSED\*O.
+.PP
+For example, if you supply an argument of \*LInstRA\*O to
+\*LGetInstRegEnum\*O and the RA field of the instruction contains a 5,
+\*LGetInstRegEnum\*O returns \*LREG_5\*O if the instruction is an
+integer instruction and \*LFREG_5\*O if it is a floating-point
+instruction.
+.\" .PP
+.SS "GetInstRegUsage Routine"
+The \*LGetInstRegUsage\*O routine returns a structure containing two
+vectors.  The first vector is a bitmask with bits set for each
+register read by the instruction, and the second vector is a bitmask
+with bits set for each register stored by the instruction.
+Each vector is composed of two 64-bit integers:  the low 32 bits
+correspond to the integer registers, the next 32 bits correspond to
+the floating-point registers, and the next two bits refer to the
+program counter (PC) and the cycle counter, respectively.
+.PP
+The format of the \*LInstRegUsageVec\*O structure is as follows:
+.oS
+typedef struct inst_reg_usage{
+   unsigned long ureg_bitvec[2];
+   unsigned long dreg_bitvec[2];
+} InstRegUsageVec;
+.oE
+.PP
+Consider the following example:
+.oS
+InstRegUsageVec usageVec;
+Inst *inst = GetLastInst(GetFirstBlock(GetFirstProc()));
+GetInstRegUsage(inst,&usageVec);
+.oE
+.PP
+This small code fragment sets \*Linst\*O to point to the last
+instruction in the first basic block in the first procedure.
+Assume the first instruction was
+.oS
+ADDQ r0,r2,r7
+.oE
+.PP
+This instruction adds of the contents of register 0 to the contents
+of register 2 and places the result in register 7.
+The value returned in \*LusageVec.ureg_bitvec[0]\*O is 0x5 because
+register 0 and register 2 are both used.  The value of
+\*LusageVec.dreg_bitvec[0]\*O is set to 0x40, indicating that
+register 7 is set by the add instruction.
+.PP
+One use of this primitive would be to determine if the register
+loaded in one cycle is used in the next cycle.
+In most pipelined processors, this results in a one
+cycle pipeline stall (also known as a load/use conflict).
+The \*LLoadUseConflict\*O procedure in the following example uses the
+\*LGetInstRegUsage\*O routine to detect such conflicts:
+.oS
+   1  int LoadUseConflict(Inst *instA,Inst *instB) {
+   2    int confict;
+   3    InstRegUsageVec vecA,vecB;
+   4    GetInstRegUsage(instA,&vecA);
+   5    GetInstRegUsage(instB,&vecB);
+   6    conflict = (vecA.dreg_bitvec[0] & vecB.ureg_bitvec[0]) ||
+   7                vecA.dreg_bitvec[1] & vecB.ureg_bitvec[1]);
+   8    return(IsInstType(instA,InstTypeLoad) && conflict);
+   9  }
+.oE
+.PP
+The arguments are two instructions, A and B.  Line 3, 4, and 5 define
+and set the bit usage bit vectors for the two instructions.
+Lines 6 and 7 perform a logical-AND operation on the destination
+vector of instruction A with the usage vector of instruction B.
+Line 8 returns \*LTRUE\*O if instruction A is a load instruction and
+a load/use conflict was detected.  In this example,
+\*LLoadUseConflict\*O would return \*LTRUE\*O because register 1 is
+the destination of the \*LLDQ\*O instruction and the source for the
+\*LADDQ\*O instruction.
+.SH RETURN VALUES
+.PP
+These routines return the values described in the preceding section.
+.SH FILES
+.PP
+.VL
+.LI "\*L/usr/include/cmplrs/atom.inst.h\*O"
+Header file containing external definitions of Atom routines
+.LE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_navigation\*O(5), \*Latom_application_resolvers\*O(5),
+\*Latom_description_file\*O(5),
+\*Latom_object_management\*O(5), \*Latom_instrumentation_routines\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

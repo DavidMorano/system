@@ -25,8 +25,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
+#include	<sys/uio.h>		/* |IOVEC| */
+#include	<sys/socket.h>		/* |MSHGDR| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>

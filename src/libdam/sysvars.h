@@ -22,9 +22,9 @@
 
 
 #define	SYSVARS		struct sysvars_head
+#define	SYSVARS_FL	struct sysvars_flags
 #define	SYSVARS_CUR	struct sysvars_cursor
 #define	SYSVARS_OBJ	struct sysvars_object
-#define	SYSVARS_FL	struct sysvars_flags
 #define	SYSVARS_MAGIC	0x99889298
 #define	SYSVARS_OPREFIX	(1<<0)		/* prefix match */
 
@@ -36,7 +36,7 @@ struct sysvars_object {
 } ;
 
 struct sysvars_cursor {
-	VAR_CUR		vcur ;
+	var_cir		vcur ;
 } ;
 
 struct sysvars_flags {
@@ -55,9 +55,9 @@ struct sysvars_head {
 } ;
 
 typedef SYSVARS		sysvars ;
+typedef SYSVARS_FL	sysvars_fl ;
 typedef SYSVARS_CUR	sysvars_cur ;
 typedef SYSVARS_OBJ	sysvars_obj ;
-typedef SYSVARS_FL	sysvars_fl ;
 
 EXTERNC_begin
 

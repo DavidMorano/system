@@ -84,6 +84,8 @@ struct field : field_head {
 	int start(cchar *,int = -1) noex ;
 	int get(cchar *,cchar **) noex ;
 	int getterm(cchar *,cchar **) noex ;
+	int word(cchar *,cchar **) noex ;
+	int wordphrase(cchar *,char *,int) noex ;
 	int sharg(cchar *,char *,int) noex ;
 	int srvarg(cchar *,char *,int) noex ;
 	int remaining(cchar ** = nullptr) noex ;

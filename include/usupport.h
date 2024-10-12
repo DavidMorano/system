@@ -38,7 +38,6 @@ extern int memclear(void *,size_t) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_MEMCLEAR */
 
-
 #ifndef	TEMPLATE_MEMCLEAR
 #define	TEMPLATE_MEMCLEAR
 #ifdef	__cplusplus
@@ -51,7 +50,6 @@ inline int memclear(T *op) noex {
 
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCLEAR */
-
 
 #ifndef	TEMPLATE_MEMCPY
 #define	TEMPLATE_MEMCPY
@@ -66,6 +64,23 @@ inline void *memcpy(T *dp,void *sp) noex {
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCPY */
 
+#ifndef	SUBROUTINE_CSTRLEN
+#define	SUBROUTINE_CSTRLEN
+#ifdef	__cplusplus
+
+consteval int cstrlen(cchar *sp) noex {
+    	cchar		*cp = sp ;
+	while (*cp++) ;
+	return (cp - sp) ;
+}
+
+#endif /* __cplusplus */
+#endif /* SUBROUTINE_CSTRLEN */
+
+#ifndef	TYPEDEF_MTIME
+#define	TYPEDEF_MTIME
+typedef int64_t		mtime_t ;
+#endif
 
 #ifndef	TYPEDEF_MTIME
 #define	TYPEDEF_MTIME
@@ -79,7 +94,6 @@ extern mtime_t	mtime(void) noex ;
 EXTERNC_end
 #endif
 
-
 #ifndef	SUBROUTINE_MSLEEP
 #define	SUBROUTINE_MSLEEP
 EXTERNC_begin
@@ -87,14 +101,12 @@ extern int	msleep(int) noex ;
 EXTERNC_end
 #endif
 
-
 #ifndef	SUBROUTINE_FILETYPE
 #define	SUBROUTINE_FILETYPE
 EXTERNC_begin
 extern int	filetype(mode_t) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
-
 
 #ifndef	OBJECT_GETUSTIME
 #define	OBJECT_GETUSTIME
@@ -113,7 +125,6 @@ extern ugetustime	getustime ;
 
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
-
 
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */

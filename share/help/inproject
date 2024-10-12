@@ -1,0 +1,15 @@
+INPROJECT
+
+This program checks to see if the current (or specified) user
+is in the project given as a positional argument.
+
+Synopsis:
+
+$ inproject <projectname> [-u <username>] [-V]
+
+whwere:
+
+<projectname>	project name to check
+-u <username>	alternative username to check
+-V		print program version to standard-error and then exit
+

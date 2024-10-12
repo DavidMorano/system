@@ -1,0 +1,19 @@
+WN
+
+This is a KSH shell built-in command.  It prints out who is logged
+into the current node with their usernames and their real names.
+
+Synopsis:
+
+$ wn [-h[=n]] [-s|-l] [<logname(s) ...>] [-V]
+
+where:
+
+<logname(s)>	restrict records to these login names
+-l		instead of printing real names, print the login ID and host
+-s		print only login names (takes precendece over "long" option)
+-v[=<n>]	verbosity level
+-h[=n]		print a header n={0|1}
+-nh		force no header if printing it is otherwise the default
+-V		print command version to standard-error and then exit
+

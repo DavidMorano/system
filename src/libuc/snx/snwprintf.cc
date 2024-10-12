@@ -99,11 +99,11 @@ int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 /* end subroutine (snwvprintf) */
 
 int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (rbuf && fmt) {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) {
-		va_list	ap ;
 		va_begin(ap,fmt) ;
 		rs = snwvprintf(rbuf,rlen,fmt,ap) ;
 		va_end(ap) ;

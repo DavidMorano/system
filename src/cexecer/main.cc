@@ -193,7 +193,7 @@ static int	usage(PROGINFO *) ;
 static int	procenvsys(PROGINFO *) ;
 static int	process_input(PROGINFO *,int,int,
 			TARGETINFO *) ;
-static int	process_record(PROGINFO *,FILER *,int,int,char *,
+static int	process_record(PROGINFO *,filer *,int,int,char *,
 			int,TARGETINFO *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -366,7 +366,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1163,7 +1163,7 @@ TARGETINFO	*tip ;
 	struct dialcprogmsg_end		m0 ;
 	struct dialcprogmsg_light	m5 ;
 
-	FILER		rd ;
+	filer		rd ;
 	const int	salen = sizeof(SOCKADDRESS) ;
 	const int	fbo = FILER_ONET ;
 	int		rs ;
@@ -1174,9 +1174,9 @@ TARGETINFO	*tip ;
 	ushort		usw ;
 	char		buf[BUFLEN + 1] ;
 
-	memset(tip,0,sizeof(TARGETINFO)) ;
+	memclear(tip) ;
 
-	if ((rs = filer_start(&rd,fd,0L,BUFLEN,fbo)) >= 0) {
+	if ((rs = filer_start(&rd,fd,0z,BUFLEN,fbo)) >= 0) {
 	    f_exit = FALSE ;
 
 	    while ((! f_exit) && ((rs = filer_read(&rd,buf,1,to)) > 0)) {
@@ -1278,7 +1278,7 @@ TARGETINFO	*tip ;
 
 static int process_record(pip,fbp,to,type,rbuf,rlen,tip)
 PROGINFO	*pip ;
-FILER		*fbp ;
+filer		*fbp ;
 int		to ;
 int		type ;
 char		rbuf[] ;

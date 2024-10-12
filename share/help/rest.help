@@ -1,0 +1,14 @@
+REST
+
+This is a KSH shell built-in command that causes the shell to wait for
+the specified amount of time (given as the argument) before continuing.
+
+Synopsis:
+
+$ rest <timespec> [-V]
+
+where:
+
+<timespec>	a specification of the amount of time to rest
+-V		print command version to standard-error and then exit
+

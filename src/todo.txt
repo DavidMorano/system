@@ -4,9 +4,13 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
+lineindex
+filecounts
+mkprogenv
 uctim
 libuc		fix to completely compile!
-acctab
+lfm
+mailmsghdrct
 srv{x}
 memfile		can we just trash this?
 libpcs		a lot of junk in there
@@ -22,14 +26,9 @@ mailmsgstage
 calmgr		pointer implementation
 spawnproc	block structure; actually this is a huge mess
 spawner		pointer implementation
-lineindex	mess
-linehist	pointer-implementation, block-structure
 termnote	could use some break-down of large subs into smaller ones
-logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)
 pwi
 ipasswd
-keysymer
-veclong
 progsig
 statmsg
 motd
@@ -38,9 +37,7 @@ vars
 varmk
 varmks
 ts
-strlistx
 spellchecks	incredible mess!
-termtrans
 dialtab
 
 = Future
@@ -53,4 +50,5 @@ sysvar
 sysvars
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)
+logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)
 

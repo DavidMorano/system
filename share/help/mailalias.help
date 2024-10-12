@@ -1,0 +1,15 @@
+MAILALIAS
+
+Synopsis:
+
+$ mailalias [-p <profile>] [<aliasname(s)> ...] [-af <afile>] [-V]
+	[-dump <dfile>]
+
+where:
+
+<aliasname(s)>	names to translate
+-p <profile>	mail-alias profile (default is 'default')
+-af <afile>	argument list file
+-dump <dfile>	dump the database in ASCII to file
+-V		print command version to standard-error and then exit
+

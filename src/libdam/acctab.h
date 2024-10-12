@@ -25,7 +25,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<vecobj.h>
-#include	<vecitem.h>
 #include	<vecstr.h>
 
 
@@ -43,8 +42,8 @@ struct acctab_cursor {
 
 struct acctab_head {
 	vecobj		*flp ;			/* file-list-pointer */
-	vecitem		*stdalp ;		/* access-list-entries */
-	vecitem		*rgxalp ;		/* access-list-entries */
+	vecobj		*stdalp ;		/* access-list-entries */
+	vecobj		*rgxalp ;		/* access-list-entries */
 	time_t		checktime ;
 	uint		magic ;
 } ;

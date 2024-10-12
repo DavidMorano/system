@@ -1,3 +1,4 @@
+/* encoding=ISO8859-1 */
 /* emainfo SUPPORT */
 /* lang=C++20 */
 
@@ -47,6 +48,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>

@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	storebuf
+
+	Description:
 	This subroutine can be used to construct strings or messages
 	in a buffer WITHOUT using the 'sprintf(3c)' subroutine.
 
@@ -54,11 +58,10 @@
 	    i += rs ;
 	}
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<ctbin.h>
 #include	<ctoct.h>
@@ -148,6 +151,27 @@ int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 
 
 /* exported subroutines */
+
+int storebuf_chrs(char *rbuf,int rlen,int idx,int ch,int n) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    rs = SR_INVALID ;
+	    if ((idx >= 0) && (n >= 0)) {
+	        char	*bp = (rbuf + idx) ;
+		rs = SR_OK ;
+	        if ((rlen < 0) || ((rlen - idx) >= n)) {
+		    for (int i = 0 ; i < n ; i += 1) {
+	                *bp++ = ch ;
+		    }
+	        } else {
+	            rs = SR_OVERFLOW ;
+	        }
+	        *bp = '\0' ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? 1 : rs ;
+}
+/* end subroutine (storebuf_chrs) */
 
 int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	int		rs = SR_FAULT ;

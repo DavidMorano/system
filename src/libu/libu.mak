@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -60,10 +59,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 SOFL= -shared
 
 
-OBJ00= endian.o intsat.o xxtostr.o
+OBJ00= endian.o
 OBJ01= aflag.o errtimer.o 
 OBJ02= timewatch.o timecount.o
-OBJ03= strtox.o
+OBJ03= strtox.o xxtostr.o
 
 OBJ04= usupport.o usyscallbase.o
 OBJ05= utimeout.o ugetloadavg.o
@@ -248,7 +247,6 @@ obje.o:			$(OBJE)
 timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
-intsat.o:		intsat.cc intsat.h
 mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
 
@@ -290,6 +288,11 @@ usysauxinfo.dir:
 # USYNC
 ulock.o:		ulock.dir
 ulock.dir:
+	makesubdir $@
+
+# INTX
+intx.o:		intx.dir
+intx.dir:
 	makesubdir $@
 
 # OTHER

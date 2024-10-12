@@ -15,6 +15,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
@@ -22,6 +24,7 @@ EXTERNC_begin
 extern int storebuf_buf(char *,int,int,cchar *,int) noex ;
 extern int storebuf_strw(char *,int,int,cchar *,int) noex ;
 extern int storebuf_chr(char *,int,int,int) noex ;
+extern int storebuf_chrs(char *,int,int,int,int) noex ;
 
 extern int storebuf_bini(char *,int,int,int) noex ;
 extern int storebuf_binl(char *,int,int,long) noex ;
@@ -56,6 +59,9 @@ static inline int storebuf_str(char *bp,int bl,int i,cchar *sp) noex {
 }
 static inline int storebuf_char(char *bp,int bl,int i,int ch) noex {
 	return storebuf_chr(bp,bl,i,ch) ;
+}
+static inline int storebuf_blanks(char *bp,int bl,int i,int n) noex {
+	return storebuf_chrs(bp,bl,i,' ',n) ;
 }
 
 EXTERNC_end
@@ -145,31 +151,58 @@ inline int storebuf_hex(char *bp,int bl,int i,ulonglong uv) noex {
 struct storebuf {
 	char		*bufp ;
 	int		bufl ;
+	int		idx ;
 	storebuf() = delete ;
-	storebuf(char *p,int l) noex : bufp(p), bufl(l) { } ;
-	int chr(int i,int ch) noex {
-	    return storebuf_chr(bufp,bufl,i,ch) ;
+	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { } ;
+	int chrs(int ch,int n) noex {
+	    int rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
-	int strw(int i,cchar *sp,int sl = -1) noex {
-	    return storebuf_strw(bufp,bufl,i,sp,sl) ;
+	int chr(int ch) noex {
+	    int rs = storebuf_chr(bufp,bufl,idx,ch) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
-	int str(int i,cchar *sp) noex {
-	    return storebuf_str(bufp,bufl,i,sp) ;
+	int strw(cchar *sp,int sl = -1) noex {
+	    int rs = storebuf_strw(bufp,bufl,idx,sp,sl) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
-	int buf(int i,cchar *sp,int sl = -1) noex {
-	    return storebuf_buf(bufp,bufl,i,sp,sl) ;
+	int str(cchar *sp) noex {
+	    int rs = storebuf_str(bufp,bufl,idx,sp) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
-	int bin(int i,auto v) noex {
-	    return storebuf_bin(bufp,bufl,i,v) ;
+	int buf(cchar *sp,int sl = -1) noex {
+	    int rs = storebuf_buf(bufp,bufl,idx,sp,sl) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
-	int oct(int i,auto v) noex {
-	    return storebuf_oct(bufp,bufl,i,v) ;
+	int blanks(int n = 1) noex {
+	    int rs = storebuf_blanks(bufp,bufl,idx,n) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
-	int dec(int i,auto v) noex {
-	    return storebuf_dec(bufp,bufl,i,v) ;
+	int bin(auto v) noex {
+	    int rs = storebuf_bin(bufp,bufl,idx,v) ;
+	    idx += rs ;
+	    return rs ;
+	} ;
+	int oct(auto v) noex {
+	    int rs = storebuf_oct(bufp,bufl,idx,v) ;
+	    idx += rs ;
+	    return rs ;
+	} ;
+	int dec(auto v) noex {
+	    int rs = storebuf_dec(bufp,bufl,idx,v) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
 	int hexn(int i,auto v) noex {
-	    return storebuf_hex(bufp,bufl,i,v) ;
+	    int rs = storebuf_hex(bufp,bufl,idx,v) ;
+	    idx += rs ;
+	    return rs ;
 	} ;
 } ; /* end struct (storebuf) */
 

@@ -58,6 +58,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include        <timewatch.hh>
@@ -117,8 +119,7 @@ namespace {
 	void		atforkparent() noex ;
 	void		atforkchild() noex ;
 	~ucatfork() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucatfork",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (ucatfork) */
@@ -248,7 +249,7 @@ int ucatfork::record(void_f sb,void_f sp,void_f sc) noex {
 	if ((rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	            if ((rs = m.lockbegin) >= 0) { /* single */
+	            if ((rs = mx.lockbegin) >= 0) { /* single */
 			ucatfork_ent	*ep{} ;
 	                if ((rs = ucatfork_trackbegin()) >= 0) {
 	                    cint	esize = sizeof(UCATFORK_ENT) ;
@@ -258,7 +259,7 @@ int ucatfork::record(void_f sb,void_f sp,void_f sc) noex {
 				list_add(lp,ep) ;
 	                    } /* end if (memory-allocation) */
 	                } /* end if (track-begin) */
-	                rs1 = m.lockend ;
+	                rs1 = mx.lockend ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (mutex) */
 	            rs1 = uc_forklockend() ;
@@ -280,7 +281,7 @@ int ucatfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	if ((rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	            if ((rs = m.lockbegin) >= 0) { /* single */
+	            if ((rs = mx.lockbegin) >= 0) { /* single */
 			ucatfork_list	*lp = &hlist ;
 	                if ((rs = ucatfork_trackbegin()) >= 0) {    
 	                    UCATFORK_ENT	*ep = lp->head ;
@@ -295,7 +296,7 @@ int ucatfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	                        ep = nep ;
 	                    } /* end while (deleting matches) */
 	                } /* end if (track-begin) */
-	                rs1 = m.lockend ;
+	                rs1 = mx.lockend ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (mutex) */
 	            rs1 = uc_forklockend() ;
@@ -339,7 +340,7 @@ int ucatfork::trackend() noex {
 void ucatfork::atforkbefore() noex {
 	int		rs = SR_OK ;
 	if (finitdone) {
-	    if ((rs = m.lockbegin) >= 0) {
+	    if ((rs = mx.lockbegin) >= 0) {
 	        ucatfork_ent	*ep = hlist.tail ;
 	        ucatfork_ent	*pep ;
 	        while (ep) {
@@ -366,7 +367,7 @@ void ucatfork::atforkparent() noex {
 	        ep = nep ;
 	    } /* end while */
 	    {
-	        rs1 = m.lockend() ;
+	        rs1 = mx.lockend() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	}
@@ -387,7 +388,7 @@ void ucatfork::atforkchild() noex {
 	        ep = nep ;
 	    } /* end while */
 	    {
-	        rs1 = m.lockend() ;
+	        rs1 = mx.lockend() ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	}

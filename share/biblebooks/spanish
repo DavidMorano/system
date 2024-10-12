@@ -1,0 +1,158 @@
+# BIBLEBOOKS
+# book names of the bible
+#
+# This file contains a list of the names of the books of the Bible.
+# The list is ordered in the same order that the books appear in the Bible.
+# Book names that have whitespace within their names are further quoted
+# with double quotes.  When quoting is needed, the entire book name is
+# quoted (this allows for both SHELL-style parsing as well as other
+# types).
+#
+# Each book name should appear on a line by itself.
+# Comments and blank lines in this file are ignored.
+#
+#
+
+#
+# LA BIBLIA: VERSIÓN REINA-VALERA DE 1909
+#
+
+# title
+"La Santa Biblia"
+
+# book names
+
+Génesis
+
+Éxodo
+
+Levítico
+
+Números
+
+Deuteronomio
+
+Josué
+
+Jueces
+
+Ruth
+
+"I de Samuel"
+
+"II de Samuel"
+
+"I de Reyes"
+
+"II de Reyes"
+
+"I de Crónicas"
+
+"II de Crónicas"
+
+Esdras
+
+Nehemías
+
+Esther
+
+Job
+
+Salmos
+
+Proverbios
+
+Ecclesiastés
+
+"Cantar de los Cantares"
+
+Isaías
+
+Jeremías
+
+Lamentaciones 
+
+Ezequiel
+
+Daniel
+
+Oseas
+
+Joel
+
+Amós
+
+Abdías
+
+Jonás
+
+Miqueas
+
+Nahum
+
+Habacuc
+
+Sofonías
+
+Haggeo
+
+Zacarías
+
+Malaquías
+
+Mateo
+
+Marcos
+
+Lucas
+
+Juan
+
+Hechos
+
+Romanos
+
+"I Corintios"
+
+"II Corintios"
+
+Gálatas
+
+Efesios
+
+Filipenses
+
+Colosenses
+
+"I Tesalonicenses"
+
+"II Tesalonicenses"
+
+"I Timoteo"
+
+"II Timoteo"
+
+Tito
+
+Filemón
+
+Hebreos
+
+Santiago
+
+"I Pedro"
+
+"II Pedro"
+
+"I Juan"
+
+"II Juan"
+
+"III Juan"
+
+Judas
+
+Apocalipsis
+
+
+

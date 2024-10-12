@@ -1,4 +1,5 @@
 /* mailmsgfrom HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -10,10 +11,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	MAILMSGFROM	struct mailmsgfrom_head
@@ -30,10 +32,10 @@ typedef	MAILMSGFROM	mailmsgfrom ;
 
 EXTERNC_begin
 
-extern int	mailmsgfrom_start(MAILMSGFROM *,char *,int) noex ;
-extern int	mailmsgfrom_test(MAILMSGFROM *,time_t) noex ;
-extern int	mailmsgfrom_loadfrom(MAILMSGFROM *,cchar *,int) noex ;
-extern int	mailmsgfrom_finish(MAILMSGFROM *) noex ;
+extern int	mailmsgfrom_start(mailmsgfrom *,char *,int) noex ;
+extern int	mailmsgfrom_test(mailmsgfrom *,time_t) noex ;
+extern int	mailmsgfrom_loadfrom(mailmsgfrom *,cchar *,int) noex ;
+extern int	mailmsgfrom_finish(mailmsgfrom *) noex ;
 
 EXTERNC_end
 

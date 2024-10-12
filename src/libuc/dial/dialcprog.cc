@@ -996,7 +996,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 /* initialize read buffer */
 
 	fbo = FILER_ONET ;
-	rs = filer_start(&rd,fd,0L,BUFLEN,fbo) ;
+	rs = filer_start(&rd,fd,0z,BUFLEN,fbo) ;
 	if (rs < 0)
 	    goto badinit ;
 
@@ -1098,22 +1098,9 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 /* if we had an error channel, then find synchronization there also */
 
 	if (ip != NULL) {
-	    FILER		rd2 ;
-
-#if	CF_DEBUGS
-	    debugprintf("dialremote: have an error channel FD=%d\n",*fd2p) ;
-#endif
-
-	    if ((rs = filer_start(&rd2,*fd2p,0L,BUFLEN,fbo)) >= 0) {
-
+	    if (filer rd2 ; (rs = filer_start(&rd2,*fd2p,0z,BUFLEN,fbo)) >= 0) {
 	        rs = findsync(&rd2) ;
-
-#if	CF_DEBUGS
-	        debugprintf("dialremote: findsync() rs=%d\n",rs) ;
-#endif
-
 	        if (rs == 0) rs = SR_PROTO ;
-
 	        filer_finish(&rd2) ;
 	    } /* end if (filer) */
 
@@ -1564,7 +1551,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	    goto ret0 ;
 
 	fbo = FILER_ONET ;
-	rs = filer_start(&wr,fd,0L,BUFLEN,fbo) ;
+	rs = filer_start(&wr,fd,0z,BUFLEN,fbo) ;
 	if (rs < 0)
 	    goto ret1 ;
 

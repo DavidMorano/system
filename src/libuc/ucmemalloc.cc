@@ -183,13 +183,14 @@ namespace {
 	    fini(this,ucmemallocmem_fini) ;
 	} ;
 	~ucmemalloc() noex {
-	    int		rs = ifini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini ; rs < 0) {
 		ulogerror("ucmenalloc",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor */
 	void rserr(int rs) noex {
-	    if ((rs < 0) && (st.err_rs == 0)) st.err_rs = rs ;
+	    if ((rs < 0) && (st.err_rs == 0)) {
+		st.err_rs = rs ;
+	    }
 	} ;
 	void numoutmax() noex {
 	    ulong 	out = (st.num_allocs - st.num_frees) ;

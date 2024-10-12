@@ -1,4 +1,5 @@
 /* mailmsgfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create and cache message content files */
@@ -21,7 +22,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<hdb.h>
-#include	<localmisc.h>
 
 
 #define	MAILMSGFILE_MAGIC	0x24182132

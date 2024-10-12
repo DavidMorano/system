@@ -58,6 +58,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<format.h>
 #include	<ctbin.h>
 #include	<ctoct.h>
@@ -78,6 +79,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -92,6 +94,13 @@ using std::max ;			/* subroutine-template */
 
 
 /* local structures */
+
+namespace {
+    struct blanker {
+	cint	l = strlen(sysword.w_blanks) ;
+	cchar	*p = sysword.w_blanks ;
+    } ; /* end struct (blanker) */
+}
 
 
 /* forward references */
@@ -152,7 +161,7 @@ int sbuf_hexx(sbuf *sbp,T v) noex {
 
 /* local variables */
 
-constexpr cchar		blanks[] = "        " ;
+static blanker			bo ;	/* so-valled "blank" object */
 
 
 /* exported variables */
@@ -468,15 +477,14 @@ int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 /* end subroutine (sbuf_chrs) */
 
 int sbuf_blanks(sbuf *sbp,int n) noex {
-	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		if (n >= 0) {
 	            while ((rs >= 0) && (len < n)) {
-	                cint	ml = min(nblanks,(n - len)) ;
-	                rs = sbuf_addstrw(sbp,blanks,ml) ;
+	                cint	ml = min((n - len),bo.l) ;
+	                rs = sbuf_addstrw(sbp,bo.p,ml) ;
 	                len += rs ;
 	            } /* end while */
 		} /* end if (valid) */

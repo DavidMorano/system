@@ -104,7 +104,7 @@ struct txtindex_calls {
 	soclose_f	close ;
 } ; /* end struct (txtindex_calls) */
 
-typedef txtindex_calls *	txtindex_callsp ;
+typedef txtindex_calls *	callsp ;
 
 
 /* forward references */
@@ -138,7 +138,7 @@ static int txtindex_dtor(txtindex *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->callp) {
-		txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+		txtindex_calls	*callp = callsp(op->callp) ;
 		delete callp ;
 		op->callp = nullptr ;
 	    }
@@ -214,7 +214,7 @@ int txtindex_open(txtindex *op,cchar *pr,cchar *dbname) noex {
 	if ((rs = txtindex_ctor(op,pr,dbname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) {
-		txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+		txtindex_calls	*callp = callsp(op->callp) ;
 	        cchar		*objname = TXTINDEX_OBJNAME ;
 	        if ((rs = txtindex_objloadbegin(op,pr,objname)) >= 0) {
 		    auto	co = callp->open ;
@@ -238,7 +238,7 @@ int txtindex_close(txtindex *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = txtindex_magic(op)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    {
 		auto	co = callp->close ;
 	        rs1 = co(op->obj) ;
@@ -257,7 +257,7 @@ int txtindex_close(txtindex *op) noex {
 int txtindex_audit(txtindex *op) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
 		auto	co = callp->audit ;
@@ -271,7 +271,7 @@ int txtindex_audit(txtindex *op) noex {
 int txtindex_count(txtindex *op) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->count) {
 		auto	co = callp->count ;
@@ -285,7 +285,7 @@ int txtindex_count(txtindex *op) noex {
 int txtindex_neigen(txtindex *op) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->neigen) {
 		auto	co = callp->neigen ;
@@ -299,7 +299,7 @@ int txtindex_neigen(txtindex *op) noex {
 int txtindex_getinfo(txtindex *op,TXTINDEX_INFO *ip,char *rb,int rl) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,ip)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->getinfo) {
 		auto	co = callp->getinfo ;
@@ -313,14 +313,13 @@ int txtindex_getinfo(txtindex *op,TXTINDEX_INFO *ip,char *rb,int rl) noex {
 int txtindex_curbegin(txtindex *op,txtindex_cur *curp) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,curp)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
-	        void	*vp ;
-	        if ((rs = uc_malloc(op->cursize,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = uc_malloc(op->cursize,&vp)) >= 0) {
 		    curp->scp = vp ;
 		    rs = SR_BUGCHECK ;
-		    {
+		    if (callp->curbegin) {
 		        auto	co = callp->curbegin ;
 		        if ((rs = co(op->obj,curp->scp)) >= 0) {
 	    	            curp->magic = TXTINDEX_MAGIC ;
@@ -343,7 +342,7 @@ int txtindex_curend(txtindex *op,txtindex_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = txtindex_magic(op,curp)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == TXTINDEX_MAGIC) {
 	        rs = SR_BUGCHECK ;
@@ -369,7 +368,7 @@ int txtindex_curend(txtindex *op,txtindex_cur *curp) noex {
 int txtindex_curlookup(txtindex *op,txtindex_cur *curp,cchar **klp) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,curp,klp)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == TXTINDEX_MAGIC) {
 		rs = SR_BUGCHECK ;
@@ -386,7 +385,7 @@ int txtindex_curlookup(txtindex *op,txtindex_cur *curp,cchar **klp) noex {
 int txtindex_curenum(txtindex *op,txtindex_cur *curp,txtindex_tag *tagp) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,curp,tagp)) >= 0) {
-	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
+	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == TXTINDEX_MAGIC) {
 		rs = SR_NOSYS ;
@@ -478,57 +477,55 @@ static int txtindex_objloadend(txtindex *op) noex {
 
 static int txtindex_loadcalls(txtindex *op,cchar *objname) noex {
 	modload		*lp = op->loaderp ;
-	cint		nlen = SYMNAMELEN ;
+	cint		slen = SYMNAMELEN ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	char		nbuf[SYMNAMELEN + 1] ;
+	char		sbuf[SYMNAMELEN + 1] ;
 	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
-	    cvoid	*snp{} ;
-	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
-	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = nullptr ;
-		     if (! isrequired(i)) rs = SR_OK ;
-		}
-	    }
-	    if ((rs >= 0) && snp) {
-	        txtindex_calls	*callp = txtindex_callsp(op->callp) ;
-	        c += 1 ;
-		switch (i) {
-		case sub_open:
-		    callp->open = soopen_f(snp) ;
-		    break ;
-		case sub_count:
-		    callp->count = socount_f(snp) ;
-		    break ;
-		case sub_neigen:
-		    callp->neigen = soneigen_f(snp) ;
-		    break ;
-		case sub_getinfo:
-		    callp->getinfo = sogetinfo_f(snp) ;
-		    break ;
-		case sub_iseigen:
-		    callp->iseigen = soiseigen_f(snp) ;
-		    break ;
-		case sub_curbegin:
-		    callp->curbegin = socurbegin_f(snp) ;
-		    break ;
-		case sub_curlookup:
-		    callp->curlookup = socurlookup_f(snp) ;
-		    break ;
-		case sub_curenum:
-		    callp->curenum = socurenum_f(snp) ;
-		    break ;
-		case sub_curend:
-		    callp->curend = socurend_f(snp) ;
-		    break ;
-		case sub_audit:
-		    callp->audit = soaudit_f(snp) ;
-		    break ;
-		case sub_close:
-		    callp->close = soclose_f(snp) ;
-		    break ;
-		} /* end switch */
-	    } /* end if (it had the call) */
+	    if ((rs = sncpy(sbuf,slen,objname,"_",subs[i])) >= 0) {
+		if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
+	            txtindex_calls	*callp = callsp(op->callp) ;
+	            c += 1 ;
+		    switch (i) {
+		    case sub_open:
+		        callp->open = soopen_f(snp) ;
+		        break ;
+		    case sub_count:
+		        callp->count = socount_f(snp) ;
+		        break ;
+		    case sub_neigen:
+		        callp->neigen = soneigen_f(snp) ;
+		        break ;
+		    case sub_getinfo:
+		        callp->getinfo = sogetinfo_f(snp) ;
+		        break ;
+		    case sub_iseigen:
+		        callp->iseigen = soiseigen_f(snp) ;
+		        break ;
+		    case sub_curbegin:
+		        callp->curbegin = socurbegin_f(snp) ;
+		        break ;
+		    case sub_curlookup:
+		        callp->curlookup = socurlookup_f(snp) ;
+		        break ;
+		    case sub_curenum:
+		        callp->curenum = socurenum_f(snp) ;
+		        break ;
+		    case sub_curend:
+		        callp->curend = socurend_f(snp) ;
+		        break ;
+		    case sub_audit:
+		        callp->audit = soaudit_f(snp) ;
+		        break ;
+		    case sub_close:
+		        callp->close = soclose_f(snp) ;
+		        break ;
+		    } /* end switch */
+		} else if (rs == rsn) {
+		    if (! isrequired(i)) rs = SR_OK ;
+	        } /* end if (it had the call) */
+	    } /* end if (sncpy) */
 	} /* end for (subs) */
 	return (rs >= 0) ? c : rs ;
 }

@@ -1,0 +1,29 @@
+# BUFSIZE
+#
+#
+# This file provides a means to set values for various system buffer sizes.
+# Some system buffer size values available for change are:
+#
+#	ma		maximum argument (and environment) size
+#	mn 		maximum name
+#	mp 		maximum path
+#	ml		maximum line
+#	nn		node-name length
+#	hn		host-name length
+#	un		user-name length
+#	gn		group-name length
+#	pn		project-name length
+#	pw 		passwd entry
+#	sp 		shadow entry
+#	gr 		group entry
+#	pj		project entry
+#	pr 		network protocol entry
+#	nw 		network network entry
+#	ho 		network host entry
+#	sv		network service entry
+#	fs		file-system type length
+#	zn		zone-name (fro Zone-Info) length
+#
+#
+
+

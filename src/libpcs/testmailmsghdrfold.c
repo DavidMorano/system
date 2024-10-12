@@ -47,16 +47,12 @@ static int	filer_printcont(FILER *,int,const char *,int) ;
 
 /* exported subroutines */
 
-int main(int argc,const char **argv,const char **envv)
-{
-	FILER		ofile, *ofp = &ofile  ;
-
+int main(int argc,mainv argv,mainv envv) {
+	filer		ofile, *ofp = &ofile  ;
 	const int	mcols = MSGCOLS ;
 	const int	hlen = MAXPATHLEN ;
-
 	int	rs ;
 	int	wlen = 0 ;
-
 	const char	*hdr = "references" ;
 	const char	*ifname = BFILE_STDIN ;
 
@@ -71,11 +67,11 @@ int main(int argc,const char **argv,const char **envv)
 	}
 #endif /* CF_DEBUGS */
 
-	if ((rs = filer_start(ofp,1,0L,0,0)) >= 0) {
+	if ((rs = filer_start(ofp,1,0z,0,0)) >= 0) {
 	        bfile	ifile, *ifp = &ifile ;
 
 	        if ((rs = bopen(ifp,ifname,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 		    int		ll ;
 		    int		ln = 0 ;

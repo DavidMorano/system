@@ -1,7 +1,8 @@
 /* filer_mailsup SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* mail supprt from the FILER object */
+/* mail support from the FILER object */
 /* version %I% last-modified %G% */
 
 
@@ -33,6 +34,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<mailmsghdrfold.h>

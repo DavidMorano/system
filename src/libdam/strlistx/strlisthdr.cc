@@ -1,4 +1,5 @@
 /* strlisthdr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-list database-file header */
@@ -91,7 +92,6 @@ enum his {
 
 /* local variables */
 
-constexpr nullptr_t	np{} ;
 constexpr cint		hdrsz = hi_overlast * sizeof(uint) ;
 constexpr cint		magicsize = STRLISTHDR_MAGICSIZE ;
 constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;

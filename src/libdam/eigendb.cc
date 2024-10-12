@@ -1,4 +1,5 @@
 /* eigendb SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* store eigen words in a database */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	eigendb
+
+	Description:
 	This module stores eigen words in a database for later
 	convenient access.
 
@@ -91,6 +96,7 @@ static int eigendb_ctor(eigendb *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
+	    op->dbp = nullptr ;
 	    if ((op->spp = new(nothrow) strpack) != np) {
 	        if ((op->dbp = new(nothrow) hdb) != np) {
 		    rs = SR_OK ;
@@ -340,9 +346,8 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	int		rs1 ;
 	cmode		om = 0666 ;
 	if ((rs = uc_open(fname,of,om)) >= 0) {
-	    USTAT	sb ;
 	    cint	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
 	            csize	mfsize = EIGENDB_MAXFILESIZE ;
 	            csize	fsize = sb.st_size ;
@@ -366,7 +371,6 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 /* end subroutine (eigendb_fileparse) */
 
 static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
-	linebuffer	lb ;
 	cint		to = TO_READ ;
 	int		rs ;
 	int		rs1 ;
@@ -375,9 +379,8 @@ static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
 	if (fsize >= 0) {
 	    bsize = iceil(fsize,1024) ;
 	}
-	if ((rs = lb.start) >= 0) {
-	    filer	fb ;
-	    if ((rs = filer_start(&fb,fd,0L,bsize,0)) >= 0) {
+	if (linebuffer lb ; (rs = lb.start) >= 0) {
+	    if (filer fb ; (rs = filer_start(&fb,fd,0z,bsize,0)) >= 0) {
 	        cint	llen = lb.llen ;
 	        char	*lbuf = lb.lbuf ;
 	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {

@@ -1,4 +1,5 @@
 /* progsig SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* program signal handling */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	progsig
+
+	Description:
 	Manage process signals.
 
 *******************************************************************************/
@@ -64,8 +69,6 @@
 #ifndef	CMSGBUFLEN
 #define	CMSGBUFLEN	256
 #endif
-
-#define	NDF		"progsig.deb"
 
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	60
@@ -128,9 +131,9 @@ struct progsig_flags {
 } ;
 
 struct progsig {
-	ptm		m ;		/* mutex data */
+	ptm		mx ;		/* mutex data */
 	ptm		menv ;		/* mutex environment */
-	ptc		c ;		/* condition variable */
+	ptc		cv ;		/* condition variable */
 	sighand		sm ;
 	sockaddress	servaddr ;	/* server address */
 	raqhand		mq ;		/* message queue */
@@ -226,7 +229,7 @@ static int	mksdname(char *,cchar *,pid_t) noex ;
 
 static PROGSIG		progsig_data ;
 
-static constexpr int	sigblocks[] = {
+constexpr int		sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -234,24 +237,20 @@ static constexpr int	sigblocks[] = {
 	0
 } ;
 
-static constexpr int	sigigns[] = {
+constexpr int		sigigns[] = {
 	SIGPIPE,
 	SIGPOLL,
-#if	defined(SIGXFSZ)
 	SIGXFSZ,
-#endif
 	0
 } ;
 
-static constexpr int	sigints[] = {
+constexpr int		sigints[] = {
 	SIGQUIT,
 	SIGTERM,
 	SIGINT,
 	SIGWINCH,
 	SIGCHLD,
-#if	CF_SIGTSTP /* causes a hang in |sigpending(2)| in Solaris® UNIX® */
 	SIGTSTP,
-#endif
 	0
 } ;
 
@@ -266,8 +265,8 @@ int progsig_init(void) noex {
 	int		rs = SR_OK ;
 	if (! uip->f_init) {
 	    uip->f_init = true ;
-	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	        if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
+	    if ((rs = ptm_create(&uip->mx,nullptr)) >= 0) {
+	        if ((rs = ptc_create(&uip->cv,nullptr)) >= 0) {
 	            void_f	b = progsig_atforkbefore ;
 	            void_f	a = progsig_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -282,7 +281,7 @@ int progsig_init(void) noex {
 			}
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
-	                ptc_destroy(&uip->c) ;
+	                ptc_destroy(&uip->cv) ;
 		    }
 	        } /* end if (ptc_create) */
 	    } /* end if (ptm_create) */
@@ -318,11 +317,11 @@ int progsig_fini(void) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptc_destroy(&uip->c) ;
+	        rs1 = ptc_destroy(&uip->cv) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->m) ;
+	        rs1 = ptm_destroy(&uip->mx) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_init = false ;
@@ -475,7 +474,7 @@ int progsig_noteread(PROGSIG_NOTE *rp,int ni) noex {
 	    if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 	        if ((rs = progsig_mq(uip)) >= 0) {
 		    void	*vp{} ;
-		    if ((rs = raqhand_acc(&uip->mq,ni,&vp)) >= 0) {
+		    if ((rs = raqhand_acc(&uip->mxq,ni,&vp)) >= 0) {
 			if (vp) {
 		    	    SN	*ep = (SN *) vp ;;
 			    rp->stime = ep->stime ;
@@ -504,7 +503,7 @@ int progsig_notedel(int ni) noex {
 	    PROGSIG	*uip = &progsig_data ;
 	    if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 	        if ((rs = progsig_mq(uip)) >= 0) {
-		    rs = raqhand_del(&uip->mq,ni) ;
+		    rs = raqhand_del(&uip->mxq,ni) ;
 		    rc = rs ;
 		} /* end if (progsig_mq) */
 	        rs1 = progsig_capend(uip) ;
@@ -538,7 +537,7 @@ static int progsig_begin(PROGSIG *uip) noex {
 	int		rs = SR_OK ;
 	if (! uip->f_mq) {
 	    cint	n = PROGSIG_NENTS ;
-	    if ((rs = raqhand_start(&uip->mq,n,0)) >= 0) {
+	    if ((rs = raqhand_start(&uip->mxq,n,0)) >= 0) {
 	        uip->f_mq = true ;
 	    }
 	}
@@ -555,7 +554,7 @@ static int progsig_end(PROGSIG *uip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = raqhand_finish(&uip->mq) ;
+	        rs1 = raqhand_finish(&uip->mxq) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_mq = false ;
@@ -565,7 +564,7 @@ static int progsig_end(PROGSIG *uip) noex {
 /* end subroutine (progsig_end) */
 
 static int progsig_entfins(PROGSIG *uip) noex {
-	raqhand		*qlp = &uip->mq ;
+	raqhand		*qlp = &uip->mxq ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
@@ -768,16 +767,16 @@ static int progsig_workbiffer(PROGSIG *uip,SESMSG_BIFF *mp) noex {
 static int progsig_workdef(PROGSIG *uip,MSGDATA *mip) noex {
 	int		rs ;
 	if (mip == nullptr) return SR_FAULT ;
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
-	    uip->cdefs += 1 ;
-	    ptm_unlock(&uip->m) ;
+	if ((rs = ptm_lock(&uip->mx)) >= 0) {
+	    uip->cvdefs += 1 ;
+	    ptm_unlock(&uip->mx) ;
 	} /* end if (mutex) */
 	return rs ;
 }
 /* end subroutine (progsig_workdef) */
 
 static int progsig_msgenter(PROGSIG *uip,SN *ep) noex {
-	raqhand		*qlp = &uip->mq ;
+	raqhand		*qlp = &uip->mxq ;
 	cint		ors = SR_OVERFLOW ;
 	int		rs ;
 	if ((rs = raqhand_ins(qlp,ep)) == ors) {
@@ -958,13 +957,13 @@ static int progsig_cmdsend(PROGSIG *uip,int cmd) noex {
 
 static void progsig_atforkbefore() noex {
 	PROGSIG		*uip = &progsig_data ;
-	ptm_lock(&uip->m) ;
+	ptm_lock(&uip->mx) ;
 }
 /* end subroutine (progsig_atforkbefore) */
 
 static void progsig_atforkafter() noex {
 	PROGSIG		*uip = &progsig_data ;
-	ptm_unlock(&uip->m) ;
+	ptm_unlock(&uip->mx) ;
 }
 /* end subroutine (progsig_atforkafter) */
 
@@ -1021,16 +1020,16 @@ static int progsig_mkreqfname(PROGSIG *uip,char *sbuf,cchar *dname) noex {
 static int progsig_capbegin(PROGSIG *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
+	if ((rs = ptm_lockto(&uip->mx,to)) >= 0) {
 	    uip->waiters += 1 ;
 	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
+	        rs = ptc_waiter(&uip->cv,&uip->mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        uip->f_capture = true ;
 	    }
 	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = ptm_unlock(&uip->mx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -1040,12 +1039,12 @@ static int progsig_capbegin(PROGSIG *uip,int to) noex {
 static int progsig_capend(PROGSIG *uip) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
+	if ((rs = ptm_lock(&uip->mx)) >= 0) {
 	    uip->f_capture = false ;
 	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->c) ;
+	        rs = ptc_signal(&uip->cv) ;
 	    }
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = ptm_unlock(&uip->mx) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;

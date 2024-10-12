@@ -1,4 +1,5 @@
 /* strlisthdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-list database-file header */
@@ -37,7 +38,7 @@ struct strlisthdr_head {
 	uint		itlen ;		/* index-table length (n-entries) */
 	uint		nstrs ;		/* total number of strings */
 	uint		nskip ;		/* a hash-lookup parameter */
-	char		vetu[4] ;	/* relatively standard (V-E-T-U) ID */
+	uchar		vetu[4] ;	/* relatively standard (V-E-T-U) ID */
 } ;
 
 typedef STRLISTHDR	strlisthdr ;

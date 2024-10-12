@@ -19,10 +19,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* <- is this really needed? */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+
+#include	<hashindex.h>
 
 
 EXTERNC_begin

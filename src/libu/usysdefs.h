@@ -61,6 +61,7 @@ enum signalmissings {
 	signalmissing_pwr,
 	signalmissing_cancel,
 	signalmissing_lost,
+	signalmissing_xfsz,
 	signalmissing_overlast
 } ;
 
@@ -82,6 +83,10 @@ enum signalmissings {
 
 #ifndef	SIGLOST
 #define	SIGLOST		signalmissing_lost
+#endif
+
+#ifndef	SIGXFSZ
+#define	SIGXFSZ		signalmissing_xfsz
 #endif
 
 /* missing file open-flags */

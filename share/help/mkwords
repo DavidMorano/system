@@ -1,0 +1,17 @@
+MKWORDS
+
+This program creates a list of words (English words) from the given files.
+Words are parsed out from the input and written to the output one word
+per line.
+
+Synopsis:
+
+$ mkwords [<file(s)> ...] [-af <argfile>] [-u] [-V]
+
+where:
+
+<file(s)>	file to parse for words
+-af <argfile>	file containing a list of files to parse for words
+-u		only print the unique words
+-V		print the program version to standard-error and then exit
+

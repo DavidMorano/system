@@ -1,16 +1,14 @@
-/* mailfiles */
-
+/* mailfiles SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	0
 #define	CF_MAILBOXZERO	1
 
-
 /* revision history:
 
 	= 1988-02-01, David A­D­ Morano
-
 	This module was originally written.
-
 
 */
 
@@ -18,21 +16,21 @@
 
 /******************************************************************************
 
-	This object module is used to manage a set of mail files.
+  	Name:
+	mailfiles
 
+	Description:
+	This object module is used to manage a set of mail files.
 
 ******************************************************************************/
 
-
-#define	MAILFILES_MASTER	1
+#define	MAILFILES_MASTER
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<mallocstuff.h>

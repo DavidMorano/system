@@ -211,19 +211,3 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 /* end subroutine (uc_lockfile) */
 
 
-/* local subroutines */
-
-#ifdef	COMMENT
-static int debugprintstat(cchar *s,int fd) noex {
-	USTAT		sb ;
-	int		rs ;
-	int		sl = 0 ;
-	if ((rs = u_fstat(fd,&sb)) >= 0) {
-	    sl = debugprintf("%s fd=%d rs=%d size=%ld perm=%04o\n",
-	        s,fd,rs,sb.st_size,sb.st_mode) ;
-	}
-	return (rs >= 0) ? sl : rs ;
-}
-#endif /* COMMENT */
-
-

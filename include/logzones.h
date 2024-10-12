@@ -1,4 +1,5 @@
 /* logzones HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* log timezone names */
@@ -22,13 +23,14 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
 #define	LOGZONES		struct logzones_head
+#define	LOGZONES_FL		struct logzones_flags
 #define	LOGZONES_ENT		struct logzones_entry
 #define	LOGZONES_CUR		struct logzones_cursor
-#define	LOGZONES_FL		struct logzones_flags
 
 #define	LOGZONES_MAGIC		91824563
 #define	LOGZONES_ENTLEN		48

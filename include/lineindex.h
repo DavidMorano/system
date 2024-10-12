@@ -1,19 +1,20 @@
 /* lineindex HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* line indexing object */
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LINEINDEX_INCLUDE
 #define	LINEINDEX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<time.h>
+#include	<sys/types.h>		/* |caddr_t| */
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -59,7 +60,7 @@ struct lineindex_head {
 	cchar		*ifn ;		/* index-file-name */
 	cchar		*tfn ;		/* text-file-name */
 	uint		*rectab ;
-	caddr_t		mapbuf ;
+	caddr_t		mapdata ;
 	time_t		wtime ;
 	time_t		mtime ;
 	time_t		ti_open ;
@@ -90,7 +91,7 @@ extern int lineindex_open(lineindex *,cchar *,int,mode_t,cchar *) noex ;
 extern int lineindex_lookup(lineindex *,uint,off_t *) noex ;
 extern int lineindex_curbegin(lineindex *,lineindex_cur *) noex ;
 extern int lineindex_curend(lineindex *,lineindex_cur *) noex ;
-extern int lineindex_enum(lineindex *,lineindex_cur *,off_t *) noex ;
+extern int lineindex_curenum(lineindex *,lineindex_cur *,off_t *) noex ;
 extern int lineindex_check(lineindex *,time_t) noex ;
 extern int lineindex_count(lineindex *) noex ;
 extern int lineindex_close(lineindex *) noex ;

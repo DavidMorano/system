@@ -1,4 +1,5 @@
 /* mailmsgmatenv HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* try to match on a UNIX® mail-message envelope */
@@ -19,10 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* object defines */

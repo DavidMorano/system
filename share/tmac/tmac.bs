@@ -1,0 +1,16 @@
+.\"_
+.\"_ BibleSet macros
+.\"_
+.nr qI 4
+.\"_
+.\"_
+.de QS
+.ll -\\n(qI
+.in +\\n(qI
+..
+.de QE
+.ll +\\n(qI
+.in -\\n(qI
+..
+.\"_
+.\"_

@@ -1,4 +1,5 @@
 /* lfm SUPPORT (Lock File Manager) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage file-lock operations */
@@ -17,16 +18,20 @@
 
 /*******************************************************************************
 
+  	Object:
+	lfm
+
+	Description:
 	We want to check that we still own the lock file and also
 	update it by writting a current time into it.
 
 	Synopsis:
 	int lfm_start(op,fname,type,timeout,lcp,nn,un,banner)
 	LFM		*op ;
-	const char	fname[] ;
+	cchar	fname[] ;
 	int		type, timeout ;
-	LFM_CHECK	*lcp ;
-	const char	nn[], un[], banner[] ;
+	lfm_ch	*lcp ;
+	cchar	nn[], un[], banner[] ;
 
 	Arguments:
 	op		object pointer
@@ -69,7 +74,7 @@
 #include	<storeitem.h>
 #include	<getusername.h>
 #include	<ugetpid.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"lfm.h"
 
@@ -96,32 +101,23 @@
 #define	BUFLEN		(MAXPATHLEN + 40)
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
 
 
 /* external subroutines */
 
 extern int	snopenflags(char *,int,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	sfnamecomp(cchar *,int,cchar **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	format(char *,int,int,const char *,va_list) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	format(char *,int,int,cchar *,va_list) ;
 extern int	isNotPresent(int) ;
 extern int	isFailOpen(int) ;
 
@@ -133,9 +129,9 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 
 extern char	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -145,9 +141,9 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct lfm_lockinfo {
-	const char	*nn ;
-	const char	*un ;
-	const char	*bn ;
+	cchar	*nn ;
+	cchar	*un ;
+	cchar	*bn ;
 	time_t		dt ;
 } ;
 
@@ -157,8 +153,8 @@ struct lfm_lockinfo {
 static int	lfm_startcheck(LFM *,time_t) ;
 static int	lfm_startopen(LFM *,LFM_LOCKINFO *) ;
 
-static int	lfm_lockload(LFM *,LFM_CHECK *) ;
-static int	lfm_locklost(LFM *,LFM_CHECK *,FILER *) ;
+static int	lfm_lockload(LFM *,lfm_ch *) ;
+static int	lfm_locklost(LFM *,lfm_ch *,FILER *) ;
 static int	lfm_lockwrite(LFM *,LFM_LOCKINFO *,int) ;
 static int	lfm_lockwriter(LFM *,LFM_LOCKINFO *,int) ;
 static int	lfm_lockwritedate(LFM *,time_t) ;
@@ -168,13 +164,13 @@ static int	lfm_lockend(LFM *op) ;
 static int	lfm_checklock(LFM *,time_t) ;
 static int	lfm_ourdevino(LFM *,USTAT *) ;
 
-static int	check_init(LFM_CHECK *) ;
+static int	check_init(lfm_ch *) ;
 
 
 /* local variables */
 
 #if	CF_DEBUGS
-static const char	*types[] = {
+static cchar	*types[] = {
 	    "record",
 	    "create",
 	    "exclusive",
@@ -188,15 +184,15 @@ static const char	*types[] = {
 
 int lfm_start(op,fname,type,to,lcp,nn,un,bn)
 LFM		*op ;
-const char	fname[] ;
+cchar	fname[] ;
 int		type ;
 int		to ;
-LFM_CHECK	*lcp ;
-const char	nn[], un[], bn[] ;
+lfm_ch	*lcp ;
+cchar	nn[], un[], bn[] ;
 {
 	const time_t	dt = time(NULL) ;
-	const int	nnlen = NODENAMELEN ;
-	const int	unlen = USERNAMELEN ;
+	cint	nnlen = NODENAMELEN ;
+	cint	unlen = USERNAMELEN ;
 	int		rs = SR_OK ;
 	char		nnbuf[NODENAMELEN + 1] ;
 	char		unbuf[USERNAMELEN + 1] ;
@@ -211,7 +207,7 @@ const char	nn[], un[], bn[] ;
 
 	if (to < 0) to = LFM_TOLOCK ;
 
-	memset(op,0,sizeof(LFM)) ;
+	memclear(op) ;
 
 /* argument check */
 
@@ -249,7 +245,7 @@ const char	nn[], un[], bn[] ;
 	    if ((fnl = sfnamecomp(fname,-1,&fnp)) > 0) {
 	        cchar	*cp ;
 	        if ((rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
-	            const int	fnlen = (rs-1) ;
+	            cint	fnlen = (rs-1) ;
 	            int		dnl ;
 	            cchar	*dnp ;
 	            op->lfname = cp ;
@@ -257,8 +253,8 @@ const char	nn[], un[], bn[] ;
 	                char	dbuf[MAXPATHLEN+1] ;
 	                if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) {
 	                    LFM_LOCKINFO	li ;
-	                    const int		am = (X_OK | W_OK) ;
-	                    const int		rsn = SR_NOENT ;
+	                    cint		am = (X_OK | W_OK) ;
+	                    cint		rsn = SR_NOENT ;
 	                    li.dt = dt ;
 	                    li.nn = nn ;
 	                    li.un = un ;
@@ -351,10 +347,7 @@ int lfm_setpoll(LFM *op,int tocheck)
 }
 /* end subroutine (lfm_setpoll) */
 
-
-int lfm_getinfo(LFM *op,LFM_INFO *ip)
-{
-
+int lfm_getinfo(LFM *op,lfm_in *ip) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (ip == NULL) return SR_FAULT ;
 
@@ -369,16 +362,8 @@ int lfm_getinfo(LFM *op,LFM_INFO *ip)
 }
 /* end subroutine (lfm_getinfo) */
 
-
-/* check that we still own the lock on the file */
-int lfm_check(LFM *op,LFM_CHECK *cip,time_t dt)
-{
+int lfm_check(LFM *op,lfm_ch *cip,time_t dt) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("lfm_check: ent\n") ;
-#endif
-
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
@@ -551,12 +536,12 @@ int lfm_getpid(LFM *op,pid_t *rp)
 static int lfm_startcheck(LFM *op,time_t dt)
 {
 	USTAT		sb ;
-	const int	type = op->type ;
+	cint	type = op->type ;
 	int		rs ;
 	cchar		*lfn = op->lfname ;
 	if ((rs = u_stat(lfn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        const int	to = op->tolock ;
+	        cint	to = op->tolock ;
 	        op->ti_check = dt ;
 	        op->ti_stat = dt ;
 	        if (type >= LFM_TCREATE) {
@@ -582,7 +567,7 @@ static int lfm_startcheck(LFM *op,time_t dt)
 
 static int lfm_startopen(LFM *op,LFM_LOCKINFO *lip)
 {
-	const int	type = op->type ;
+	cint	type = op->type ;
 	int		rs ;
 	int		oflags = (O_RDWR | O_CREAT) ;
 	mode_t		omode = 0664 ;
@@ -595,7 +580,7 @@ static int lfm_startopen(LFM *op,LFM_LOCKINFO *lip)
 	if (type >= LFM_TCREATE) omode = 0444 ;
 	if (type >= LFM_TEXCLUSIVE) oflags |= O_EXCL ;
 	if ((rs = u_open(op->lfname,oflags,omode)) >= 0) {
-	    const int	lfd = rs ;
+	    cint	lfd = rs ;
 
 #if	CF_DEBUGS
 	    debugprintf("lfm_startopen: u_open() rs=%d\n",rs) ;
@@ -635,24 +620,22 @@ static int lfm_startopen(LFM *op,LFM_LOCKINFO *lip)
 
 
 /* try to load up information on the lock (lost) */
-static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
+static int lfm_lockload(LFM *op,lfm_ch *lcp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (lcp != NULL) {
 	    const mode_t	omode = 0666 ;
-	    const int		llen = LINEBUFLEN ;
-	    const int		of = O_RDONLY ;
+	    cint		llen = LINEBUFLEN ;
+	    cint		of = O_RDONLY ;
 	    int			v ;
 
 	    check_init(lcp) ;
 
 	    if ((rs = u_open(op->lfname,of,omode)) >= 0) {
-	        FILER		b ;
-	        const int	lfd = rs ;
-
-	        if ((rs = filer_start(&b,lfd,0L,512,0)) >= 0) {
+	        cint	lfd = rs ;
+	        if (filer b ; (rs = filer_start(&b,lfd,0z,512,0)) >= 0) {
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -695,10 +678,10 @@ static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
 
 
 /* read the lock information on a failure */
-static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILER *fp)
+static int lfm_locklost(LFM *op,lfm_ch *lcp,FILER *fp)
 {
 	STOREITEM	cb ;
-	const int	buflen = LFM_CHECKBUFLEN ;
+	cint	buflen = lfm_chBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 
@@ -711,11 +694,11 @@ static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILER *fp)
 
 	lcp->pid = op->pid_lock ;
 	if ((rs = storeitem_start(&cb,lcp->buf,buflen)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		sl, cl ;
-	    const char	*sp, *cp, *ip ;
-	    const char	*tp ;
+	    cchar	*sp, *cp, *ip ;
+	    cchar	*tp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    if ((rs = filer_readln(fp,lbuf,llen,0)) > 0) {
@@ -799,15 +782,12 @@ static int lfm_lockwrite(LFM *op,LFM_LOCKINFO *lip,int lfd)
 }
 /* end subroutine (lfm_lockwrite) */
 
-
-static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd)
-{
-	FILER		b ;
+static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		woff = 0 ;
 
-	if ((rs = filer_start(&b,lfd,0L,512,0)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,lfd,0z,512,0)) >= 0) {
 
 	    if (rs >= 0) {
 	        rs = filer_printf(&b,"%u\n",op->pid) ;
@@ -820,7 +800,7 @@ static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd)
 	    }
 
 	    if (rs >= 0) {
-	        const char	*bn = (lip->bn != NULL) ? lip->bn : "" ;
+	        cchar	*bn = (lip->bn != NULL) ? lip->bn : "" ;
 	        char		tbuf[TIMEBUFLEN+1] ;
 	        op->odate = woff ;
 	        timestr_logz(lip->dt,tbuf) ;
@@ -839,15 +819,15 @@ static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd)
 
 static int lfm_lockreadpid(LFM *op)
 {
-	const int	lfd = op->lfd ;
+	cint	lfd = op->lfd ;
 	int		rs ;
 	int		v = 0 ;
 
 	if ((rs = u_rewind(lfd)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    if ((rs = u_read(lfd,lbuf,llen)) >= 0) {
-	        const char	*tp ;
+	        cchar	*tp ;
 	        int		len = rs ;
 
 	        if ((tp = strnchr(lbuf,len,'\n')) != NULL) {
@@ -889,7 +869,7 @@ static int lfm_lockbegin(LFM *op)
 
 	if (op->lfd < 0) {
 	    const mode_t	om = 0666 ;
-	    const int		of = O_RDWR ;
+	    cint		of = O_RDWR ;
 	    f_open = TRUE ;
 	    rs = u_open(op->lfname,of,om) ;
 	    op->lfd = rs ;
@@ -944,9 +924,7 @@ static int lfm_checklock(LFM *op,time_t dt)
 }
 /* end subroutine (lfm_checklock) */
 
-
-static int lfm_ourdevino(LFM *op,USTAT *sbp)
-{
+static int lfm_ourdevino(LFM *op,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	if ((sbp->st_dev != op->dev) || (sbp->st_ino != op->ino)) {
 	    rs = SR_LOCKLOST ;
@@ -955,15 +933,10 @@ static int lfm_ourdevino(LFM *op,USTAT *sbp)
 }
 /* end subroutine (lfm_ourdevino) */
 
-
-static int check_init(LFM_CHECK *lcp)
-{
-
+static int check_init(lfm_ch *lcp) noex {
 	if (lcp == NULL) return SR_FAULT ;
 
-#ifdef	OPTIONAL
-	memset(lcp,0,sizeof(LFM_CHECK)) ;
-#endif
+	memclear(lcp) ;
 
 	lcp->nodename = NULL ;
 	lcp->username = NULL ;

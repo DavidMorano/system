@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int acctab_ctor(acctab *op,Args ... args) noex {
+static int biblecur_ctor(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int acctab_ctor(acctab *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (acctab_ctor) */
+/* end subroutine (biblecur_ctor) */
 
-static int acctab_dtor(acctab *op) noex {
+static int biblecur_dtor(biblecur *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (acctab_dtor) */
+/* end subroutine (biblecur_dtor) */
 
 template<typename ... Args>
-static inline int acctab_magic(acctab *op,Args ... args) noex {
+static inline int biblecur_magic(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == ACCTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (acctab_magic) */
+/* end subroutine (biblecur_magic) */

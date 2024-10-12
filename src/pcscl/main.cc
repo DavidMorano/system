@@ -1549,4 +1549,3 @@ char	tmpfname[], dir1[], dir2[], fname[] ;
 /* end subroutine (filereadable) */
 
 
-

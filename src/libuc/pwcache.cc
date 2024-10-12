@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	pwcache
+
+	Description:
         This object provides a crude cache for ucentpw-DB entries.
 
 *******************************************************************************/
@@ -23,10 +27,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include        <sys/types.h>		/* |uid_t| */
 #include        <sys/param.h>
+#include        <ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include        <cstdlib>
 #include        <cstring>		/* <- for |strlen(3c)| */
-#include        <ctime>
 #include        <usystem.h>
 #include        <getbufsize.h>
 #include        <mallocxx.h>

@@ -156,8 +156,7 @@ namespace {
 	int	uid(ucentpw *,char *,int,uid_t) noex ;
 	int	stats(ucpwcache_st *) noex ;
 	~ucpwcache() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini ; rs < 0) {
 		ulogerror("ucpwcache",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor */
@@ -456,8 +455,7 @@ static void ucpwcache_atforkafter() noex {
 /* end subroutine (ucpwcache_atforkafter) */
 
 static void ucpwcache_exit() noex {
-	cint		rs = ucpwcache_data.fini() ;
-	if (rs < 0) {
+	if (cint rs = ucpwcache_data.fini ; rs < 0) {
 	    ulogerror("ucpwcache",rs,"exit-fini") ;
 	}
 }

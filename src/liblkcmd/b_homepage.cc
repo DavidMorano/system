@@ -61,6 +61,8 @@
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
+#include	<ugetpw.h>
+#include	<ucmallreg.h>
 #include	<estrings.h>
 #include	<getbufsize.h>
 #include	<intceil.h>
@@ -71,6 +73,7 @@
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<vecpstr.h>
+#include	<filer.h>
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<svcfile.h>
@@ -83,14 +86,11 @@
 #include	<ptc.h>
 #include	<upt.h>
 #include	<bwops.h>
-#include	<filer.h>
 #include	<termout.h>
-#include	<ugetpw.h>
 #include	<spawner.h>
 #include	<lfm.h>
 #include	<tmtime.h>
 #include	<querystr.h>
-#include	<ucmallreg.h>
 #include	<sfx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -128,8 +128,8 @@
 
 #define	GATHER		struct gather
 
-#define	FILER		struct filer
-#define	FILER_DSIZE	(3*1024) ;
+#define	FILEDAT		struct filedat
+#define	FILEDAT_DSIZE	(3*1024) ;
 
 #define	PO_OPTION	"option"
 
@@ -235,7 +235,7 @@ struct gather {
 	int		cols ;
 } ;
 
-struct filer {
+struct filedat {
 	PROGINFO	*pip ;
 	cchar		*a ;
 	cchar		*fname ;
@@ -471,20 +471,20 @@ static int gather_entfins(GATHER *) ;
 static int gather_getlines(GATHER *,cchar *) ;
 static int gather_getbuf(GATHER *,cchar *,cchar **) ;
 
-static int filer_start(FILER *,PROGINFO *,cchar *,int,cchar *,cchar *,int) ;
-static int filer_worker(FILER *) ;
-static int filer_workread(FILER *,int) ;
-static int filer_workreadreg(FILER *,int) ;
-static int filer_workreadterm(FILER *,int) ;
-static int filer_workreadtermline(FILER *,TERMOUT *,char *,cchar *,int) ;
-static int filer_getlines(FILER *) ;
-static int filer_getbuf(FILER *,cchar **) ;
-static int filer_havesvc(FILER *,cchar *) ;
-static int filer_finish(FILER *) ;
-static int filer_stackbegin(FILER *) ;
-static int filer_stackend(FILER *) ;
-static int filer_stackfill(FILER *) ;
-static int filer_stackused(FILER *) ;
+static int filedat_start(FILEDAT *,PROGINFO *,cchar *,int,cchar *,cchar *,int) ;
+static int filedat_worker(FILEDAT *) ;
+static int filedat_workread(FILEDAT *,int) ;
+static int filedat_workreadreg(FILEDAT *,int) ;
+static int filedat_workreadterm(FILEDAT *,int) ;
+static int filedat_workreadtermline(FILEDAT *,TERMOUT *,char *,cchar *,int) ;
+static int filedat_getlines(FILEDAT *) ;
+static int filedat_getbuf(FILEDAT *,cchar **) ;
+static int filedat_havesvc(FILEDAT *,cchar *) ;
+static int filedat_finish(FILEDAT *) ;
+static int filedat_stackbegin(FILEDAT *) ;
+static int filedat_stackend(FILEDAT *) ;
+static int filedat_stackfill(FILEDAT *) ;
+static int filedat_stackused(FILEDAT *) ;
 
 
 /* local variables */
@@ -3811,15 +3811,13 @@ SVCFILE_ENT *sep)
 }
 /* end subroutine (procdocbodymain_svcerfile) */
 
-
 static int procdocbodymain_svcerfiler(PROGINFO *pip,HTM *hdp,GATHER *glp,
-SVCFILE_ENT *sep,int nl)
-{
-	const int	n = sep->nkeys ;
+		SVCFILE_ENT *sep,int nl) noex {
+	cint		n = sep->nkeys ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		vl ;
-	cchar	*vp ;
+	cchar		*vp ;
 	if (pip == NULL) return SR_FAULT ;
 	if ((vl = svckv_dequote(sep->keyvals,n,"h",&vp)) > 0) {
 	    NULSTR	ts ;
@@ -3832,9 +3830,9 @@ SVCFILE_ENT *sep,int nl)
 	        cchar	*svc = sep->svc ;
 	        cchar	*dp ;
 	        if ((rs = gather_getbuf(glp,svc,&dp)) >= 0) {
-	            const int	dl = rs ;
-	            const int	r = (nl+1) ;
-	            const int	c = COLUMNS ;
+	            cint	dl = rs ;
+	            cint	r = (nl+1) ;
+	            cint	c = COLUMNS ;
 	            int		i = 0 ;
 	            cchar		*class = NULL ;
 	            cchar		*id = NULL ;
@@ -3892,10 +3890,8 @@ SVCFILE_ENT *sep,int nl)
 }
 /* end subroutine (procdocbodymain_svcerfiler) */
 
-
-static int prochdrs(PROGINFO *pip,CGI *hp,int clen)
-{
-	const int	hlen = HBUFLEN ;
+static int prochdrs(PROGINFO *pip,CGI *hp,int clen) noex {
+	cint		hlen = HBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HBUFLEN+1] ;
@@ -4115,7 +4111,7 @@ static int gather_finish(GATHER *glp)
 
 static int gather_file(GATHER *glp,cchar *svc,int f_to,cchar *fp,int fl)
 {
-	const int	fsize = sizeof(FILER) ;
+	const int	fsize = sizeof(FILEDAT) ;
 	int		rs ;
 	void		*p ;
 
@@ -4132,18 +4128,20 @@ static int gather_file(GATHER *glp,cchar *svc,int f_to,cchar *fp,int fl)
 	if (fp[0] == '\0') return SR_INVALID ;
 
 	if ((rs = uc_malloc(fsize,&p)) >= 0) {
-	    FILER	*fep = p ;
-	    const int	c = glp->cols ;
+	    FILEDAT	*fep = p ;
+	    cint	c = glp->cols ;
 	    cchar	*tt = (f_to) ? glp->termtype : NULL ;
-	    if ((rs = filer_start(fep,glp->pip,tt,c,svc,fp,fl)) >= 0) {
+	    if ((rs = filedat_start(fep,glp->pip,tt,c,svc,fp,fl)) >= 0) {
 	        if ((rs = vechand_add(&glp->ents,fep)) >= 0) {
 	            glp->nout += 1 ;
 	        }
-	        if (rs < 0)
-	            filer_finish(fep) ;
-	    } /* end if (filer_start) */
-	    if (rs < 0)
+	        if (rs < 0) {
+	            filedat_finish(fep) ;
+		}
+	    } /* end if (filedat_start) */
+	    if (rs < 0) {
 	        uc_free(p) ;
+	    }
 	} /* end if (m-a) */
 
 #if	CF_DEBUGS
@@ -4157,7 +4155,7 @@ static int gather_file(GATHER *glp,cchar *svc,int f_to,cchar *fp,int fl)
 
 static int gather_entfins(GATHER *glp)
 {
-	FILER		*fep ;
+	FILEDAT		*fep ;
 	vechand		*elp = &glp->ents ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -4168,7 +4166,7 @@ static int gather_entfins(GATHER *glp)
 
 	for (i = 0 ; vechand_get(elp,i,&fep) >= 0 ; i += 1) {
 	    if (fep != NULL) {
-	        rs1 = filer_finish(fep) ;
+	        rs1 = filedat_finish(fep) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if ((rs1 >= 0) && (rs1 > used)) used = rs1 ;
 	        rs1 = uc_free(fep) ;
@@ -4187,7 +4185,7 @@ static int gather_entfins(GATHER *glp)
 
 static int gather_getlines(GATHER *glp,cchar *svc)
 {
-	FILER		*fep = NULL ;
+	FILEDAT		*fep = NULL ;
 	int		rs = SR_OK ;
 	int		lines = 0 ;
 
@@ -4205,14 +4203,14 @@ static int gather_getlines(GATHER *glp,cchar *svc)
 	    int		i ;
 	    for (i = 0 ; (rs = vechand_get(elp,i,&fep)) >= 0 ; i += 1) {
 	        if (fep != NULL) {
-	            if ((rs = filer_havesvc(fep,svc)) > 0) break ;
+	            if ((rs = filedat_havesvc(fep,svc)) > 0) break ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end block */
 
 	if ((rs >= 0) && (fep != NULL)) {
-	    rs = filer_getlines(fep) ;
+	    rs = filedat_getlines(fep) ;
 	    lines = rs ;
 	}
 
@@ -4228,7 +4226,7 @@ static int gather_getlines(GATHER *glp,cchar *svc)
 
 static int gather_getbuf(GATHER *glp,cchar *svc,cchar **rpp)
 {
-	FILER		*fep = NULL ;
+	FILEDAT		*fep = NULL ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -4240,13 +4238,13 @@ static int gather_getbuf(GATHER *glp,cchar *svc,cchar **rpp)
 	    int		i ;
 	    for (i = 0 ; (rs = vechand_get(elp,i,&fep)) >= 0 ; i += 1) {
 	        if (fep != NULL) {
-	            if ((rs = filer_havesvc(fep,svc)) > 0) break ;
+	            if ((rs = filedat_havesvc(fep,svc)) > 0) break ;
 	        }
 	    } /* end for */
 	} /* end block */
 
 	if ((rs >= 0) && (fep != NULL)) {
-	    rs = filer_getbuf(fep,rpp) ;
+	    rs = filedat_getbuf(fep,rpp) ;
 	    rl = rs ;
 	}
 
@@ -4254,22 +4252,20 @@ static int gather_getbuf(GATHER *glp,cchar *svc,cchar **rpp)
 }
 /* end subroutine (gather_getbuf) */
 
-
-static int filer_start(FILER *fep,PROGINFO *pip,cchar *tt,int cols,cchar *svc,
-cchar *fp,int fl)
-{
-	const int	to = 30 ;
+static int filedat_start(FILEDAT *fep,PROGINFO *pip,cchar *tt,int cols,
+		cchar *svc,cchar *fp,int fl) noex {
+	cint		to = 30 ;
 	int		rs ;
 	int		rs1 ;
 	int		size = 0 ;
 	char		*bp ;
 
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_start: ent svc=%s\n",svc) ;
-	debugprintf("b_homepage/filer_start: fn=%t\n",fp,fl) ;
+	debugprintf("b_homepage/filedat_start: ent svc=%s\n",svc) ;
+	debugprintf("b_homepage/filedat_start: fn=%t\n",fp,fl) ;
 #endif
 
-	memset(fep,0,sizeof(FILER)) ;
+	memclear(fep) ;
 	fep->pip = pip ;
 	fep->cols = cols ;
 	fep->to = to ;
@@ -4281,7 +4277,7 @@ cchar *fp,int fl)
 	    size += (strlen(tt)+1) ;
 	}
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
-	    const int	dsize = FILER_DSIZE ;
+	    const int	dsize = FILEDAT_DSIZE ;
 	    fep->a = bp ;
 	    fep->svc = bp ;
 	    bp = (strwcpy(bp,svc,-1)+1) ;
@@ -4295,13 +4291,13 @@ cchar *fp,int fl)
 	        fep->dbuf = bp ;
 	        fep->dsize = dsize ;
 	        bp[0] = '\0' ;
-	        if ((rs = filer_stackbegin(fep)) >= 0) {
+	        if ((rs = filedat_stackbegin(fep)) >= 0) {
 	            PTA		ta ;
 	            if ((rs = pta_create(&ta)) >= 0) {
 	                const caddr_t	saddr = fep->saddr ;
 	                int		ssize = fep->ssize ;
 	                if ((rs = pta_setstack(&ta,saddr,ssize)) >= 0) {
-	                    tworker	tw = (tworker) filer_worker ;
+	                    tworker	tw = (tworker) filedat_worker ;
 	                    pthread_t	tid ;
 	                    if ((rs = uptcreate(&tid,&ta,tw,fep)) >= 0) {
 	                        fep->tid = tid ;
@@ -4312,8 +4308,8 @@ cchar *fp,int fl)
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (pta) */
 	            if (rs < 0)
-	                filer_stackend(fep) ;
-	        } /* end if (filer_stackbegin) */
+	                filedat_stackend(fep) ;
+	        } /* end if (filedat_stackbegin) */
 	        if (rs < 0) {
 	            uc_free(fep->dbuf) ;
 	            fep->dbuf = NULL ;
@@ -4326,15 +4322,15 @@ cchar *fp,int fl)
 	} /* end if (m-a) */
 
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_start: ret rs=%d\n",rs) ;
+	debugprintf("b_homepage/filedat_start: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
 }
-/* end subroutine (filer_start) */
+/* end subroutine (filedat_start) */
 
 
-static int filer_stackbegin(FILER *fep)
+static int filedat_stackbegin(FILEDAT *fep)
 {
 	size_t		ms ;
 	const int	ps = getpagesize() ;
@@ -4356,24 +4352,24 @@ static int filer_stackbegin(FILER *fep)
 	    if ((rs = u_mprotect((maddr-0),ps,PROT_NONE)) >= 0) {
 	        if ((rs = u_mprotect((maddr+ms-ps),ps,PROT_NONE)) >= 0) {
 	            if (fep->f_stackcheck) {
-	                rs = filer_stackfill(fep) ;
+	                rs = filedat_stackfill(fep) ;
 	            }
 	        } /* end if (u_mprotect) */
 	    } /* end if (u_mprotect) */
 	} /* end if (u_mmap) */
 	return rs ;
 }
-/* end subroutine (filer_stackbegin) */
+/* end subroutine (filedat_stackbegin) */
 
 
-static int filer_stackend(FILER *fep)
+static int filedat_stackend(FILEDAT *fep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		used = 0 ;
 	if (fep->saddr != NULL) {
 	    if (fep->f_stackcheck) {
-	        used = filer_stackused(fep) ;
+	        used = filedat_stackused(fep) ;
 	        if (rs >= 0) rs = used ;
 	    }
 	    rs1 = u_munmap(fep->maddr,fep->msize) ;
@@ -4385,10 +4381,10 @@ static int filer_stackend(FILER *fep)
 	}
 	return (rs >= 0) ? used : rs ;
 }
-/* end subroutine (filer_stackend) */
+/* end subroutine (filedat_stackend) */
 
 
-static int filer_stackfill(FILER *fep)
+static int filedat_stackfill(FILEDAT *fep)
 {
 	int		rs = SR_OK ;
 	if ((fep->saddr != NULL) && fep->f_stackcheck) {
@@ -4404,10 +4400,10 @@ static int filer_stackfill(FILER *fep)
 	} /* end if (stackcheck) */
 	return rs ;
 }
-/* end subroutine (filer_stackfill) */
+/* end subroutine (filedat_stackfill) */
 
 
-static int filer_stackused(FILER *fep)
+static int filedat_stackused(FILEDAT *fep)
 {
 	int		rs = SR_OK ;
 	int		used = 0 ;
@@ -4425,28 +4421,28 @@ static int filer_stackused(FILER *fep)
 	}
 	return (rs >= 0) ? used : rs ;
 }
-/* end subroutine (filer_stackused) */
+/* end subroutine (filedat_stackused) */
 
 
-static int filer_finish(FILER *fep)
+static int filedat_finish(FILEDAT *fep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		used = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_finish: ent svc=%s\n",fep->svc) ;
+	debugprintf("b_homepage/filedat_finish: ent svc=%s\n",fep->svc) ;
 #endif
 
-	rs1 = filer_getlines(fep) ;
+	rs1 = filedat_getlines(fep) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = filer_stackend(fep) ;
+	rs1 = filedat_stackend(fep) ;
 	if (rs >= 0) rs = rs1 ;
 	if (rs >= 0) used = rs ;
 
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_finish: svc=%s stack used=%u\n",
+	debugprintf("b_homepage/filedat_finish: svc=%s stack used=%u\n",
 	    fep->svc,used) ;
 #endif
 
@@ -4466,32 +4462,32 @@ static int filer_finish(FILER *fep)
 	fep->svc = NULL ;
 
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_finish: ret rs=%d\n",rs) ;
+	debugprintf("b_homepage/filedat_finish: ret rs=%d\n",rs) ;
 #endif
 
 	return (rs >= 0) ? used : rs ;
 }
-/* end subroutine (filer_finish) */
+/* end subroutine (filedat_finish) */
 
 
 /* this is an independent thread */
-static int filer_worker(FILER *fep)
+static int filedat_worker(FILEDAT *fep)
 {
 	int		rs ;
 	int		rl = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("filer_worker: ent svc=%s\n",fep->svc) ;
-	debugprintf("filer_worker: fn=%s\n",fep->fname) ;
-	debugprintf("filer_worker: uc_open() svc=%s\n",fep->svc) ;
+	debugprintf("filedat_worker: ent svc=%s\n",fep->svc) ;
+	debugprintf("filedat_worker: fn=%s\n",fep->fname) ;
+	debugprintf("filedat_worker: uc_open() svc=%s\n",fep->svc) ;
 #endif
 
 	if ((rs = uc_open(fep->fname,O_RDONLY,0666)) >= 0) {
 	    const int	fd = rs ;
 #if	CF_DEBUGS
-	    debugprintf("filer_worker: uc_open() svc=%s fd=%d\n",fep->svc,fd) ;
+	    debugprintf("filedat_worker: uc_open() svc=%s fd=%d\n",fep->svc,fd) ;
 #endif
-	    if ((rs = filer_workread(fep,fd)) > 0) {
+	    if ((rs = filedat_workread(fep,fd)) > 0) {
 	        int	lines = 0 ;
 	        int	sl = rs ;
 	        cchar	*sp = fep->dbuf ;
@@ -4503,41 +4499,41 @@ static int filer_worker(FILER *fep)
 	            sp = (tp+1) ;
 	        } /* end while */
 	        fep->lines = lines ;
-	    } /* end if (filer_workread) */
+	    } /* end if (filedat_workread) */
 	    u_close(fd) ;
 	} /* end if (file) */
 
 #if	CF_DEBUGS
-	debugprintf("filer_worker: ret rs=%d svc=%s rl=%u lines=%u\n",
+	debugprintf("filedat_worker: ret rs=%d svc=%s rl=%u lines=%u\n",
 	    rs,fep->svc,rl,fep->lines) ;
 #endif
 
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (filer_worker) */
+/* end subroutine (filedat_worker) */
 
 
-static int filer_workread(FILER *fep,int fd)
+static int filedat_workread(FILEDAT *fep,int fd)
 {
 	int		rs ;
 #if	CF_DEBUGS
-	debugprintf("filer_workread: ent svc=%s tt=%s\n",
+	debugprintf("filedat_workread: ent svc=%s tt=%s\n",
 	    fep->svc,fep->termtype) ;
 #endif
 	if (fep->termtype != NULL) {
-	    rs = filer_workreadterm(fep,fd) ;
+	    rs = filedat_workreadterm(fep,fd) ;
 	} else {
-	    rs = filer_workreadreg(fep,fd) ;
+	    rs = filedat_workreadreg(fep,fd) ;
 	}
 #if	CF_DEBUGS
-	debugprintf("filer_workread: ret rs=%d svc=%s\n",rs,fep->svc) ;
+	debugprintf("filedat_workread: ret rs=%d svc=%s\n",rs,fep->svc) ;
 #endif
 	return rs ;
 }
-/* end subroutine (filer_workread) */
+/* end subroutine (filedat_workread) */
 
 
-static int filer_workreadreg(FILER *fep,int fd)
+static int filedat_workreadreg(FILEDAT *fep,int fd)
 {
 	const int	rlen = (fep->dsize-1) ;
 	const int	to = fep->to ;
@@ -4547,12 +4543,12 @@ static int filer_workreadreg(FILER *fep,int fd)
 	int		rl = 0 ;
 	char		*rp = fep->dbuf ;
 #if	CF_DEBUGS
-	debugprintf("filer_workreadreg: ent svc=%s\n",fep->svc) ;
+	debugprintf("filedat_workreadreg: ent svc=%s\n",fep->svc) ;
 #endif
 	while ((rs >= 0) && (rl < rlen)) {
 	    ml = (rlen-rl) ;
 #if	CF_DEBUGS
-	    debugprintf("filer_workreadreg: svc=%s uc_reade() ml=%d\n",
+	    debugprintf("filedat_workreadreg: svc=%s uc_reade() ml=%d\n",
 	        fep->svc,ml) ;
 #endif
 #if	CF_UCREADE
@@ -4561,7 +4557,7 @@ static int filer_workreadreg(FILER *fep,int fd)
 	    rs = u_read(fd,rp,ml) ;
 #endif
 #if	CF_DEBUGS
-	    debugprintf("filer_workreadreg: svc=%s uc_reade() rs=%d\n",
+	    debugprintf("filedat_workreadreg: svc=%s uc_reade() rs=%d\n",
 	        fep->svc,rs) ;
 #endif
 	    if (rs <= 0) break ;
@@ -4570,44 +4566,31 @@ static int filer_workreadreg(FILER *fep,int fd)
 	    rl += len ;
 	} /* end while */
 #if	CF_DEBUGS
-	debugprintf("filer_workreadreg: ret rs=%d svc=%s rl=%u\n",
+	debugprintf("filedat_workreadreg: ret rs=%d svc=%s rl=%u\n",
 	    rs,fep->svc,rl) ;
 #endif
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (filer_workreadreg) */
+/* end subroutine (filedat_workreadreg) */
 
-
-static int filer_workreadterm(FILER *fep,int fd)
-{
+static int filedat_workreadterm(FILEDAT *fep,int fd) noex {
 	TERMOUT		out ;
-	const int	cols = fep->cols ;
+	cint		cols = fep->cols ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
 	cchar		*tt = fep->termtype ;
 	if ((rs = termout_start(&out,tt,-1,cols)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    char	*lbuf ;
 	    if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-	        FILER		b ;
-	        if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
-	            const int	to = fep->to ;
-	            int		len ;
+	        if (filer b ; (rs = filer_start(&b,fd,0z,512,0)) >= 0) {
+	            cint	to = fep->to ;
 	            void	*n = NULL ;
 	            char	*dp = fep->dbuf ;
 	            while ((rs = filer_readlns(&b,lbuf,llen,to,n)) > 0) {
-	                len = rs ;
-#if	CF_DEBUGS
-	                debugprintf("filer_workreadterm: len=%u\n",len) ;
-	                debugprintf("filer_workreadterm: termline dp{%p}\n",
-	                    dp) ;
-#endif
-	                rs = filer_workreadtermline(fep,&out,dp,lbuf,len) ;
-#if	CF_DEBUGS
-	                debugprintf("filer_workreadterm: termline() rs=%d\n",
-	                    rs) ;
-#endif
+	                cint	len = rs ;
+	                rs = filedat_workreadtermline(fep,&out,dp,lbuf,len) ;
 	                if (rs > 0) {
 	                    rl += rs ;
 	                    dp += rs ;
@@ -4616,29 +4599,24 @@ static int filer_workreadterm(FILER *fep,int fd)
 	            } /* end while (reading lines) */
 	            rs1 = filer_finish(&b) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (filer) */
-	        uc_free(lbuf) ;
+	        } /* end if (filedat) */
+	        rs1 = uc_free(lbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    rs1 = termout_finish(&out) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (termout) */
-#if	CF_DEBUGS
-	debugprintf("filer_workreadterm: ret rs=%d svc=%s rl=%u\n",
-	    rs,fep->svc,rl) ;
-#endif
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (filer_workreadterm) */
+/* end subroutine (filedat_workreadterm) */
 
-
-static int filer_workreadtermline(FILER *fep,TERMOUT *top,char *rp,
-cchar *lbuf,int len)
-{
+static int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
+		cchar *lbuf,int len) noex {
 	int		rlen = (fep->dsize-1) ;
 	int		rs ;
 	int		rl = 0 ;
 #if	CF_DEBUGS
-	debugprintf("filer_workreadtermline: ent l=>%t<\n",
+	debugprintf("filedat_workreadtermline: ent l=>%t<\n",
 	    lbuf,strlinelen(lbuf,len,40)) ;
 #endif
 	if ((rs = termout_load(top,lbuf,len)) >= 0) {
@@ -4652,13 +4630,13 @@ cchar *lbuf,int len)
 	        ll = termout_getline(top,i,&lp) ;
 	        if (ll < 0) break ;
 #if	CF_DEBUGS
-	        debugprintf("filer_workreadtermline: l=>%t<\n",
+	        debugprintf("filedat_workreadtermline: l=>%t<\n",
 	            lp,strlinelen(lp,ll,30)) ;
 #endif
 	        if (lenrem > 0) {
 	            ml = MIN(ll,(lenrem-1)) ;
 #if	CF_DEBUGS
-	            debugprintf("filer_workreadtermline: ml=%u\n",ml) ;
+	            debugprintf("filedat_workreadtermline: ml=%u\n",ml) ;
 #endif
 	            rp = strwcpy(rp,lp,ml) ;
 	            *rp++ = CH_NL ;
@@ -4669,19 +4647,19 @@ cchar *lbuf,int len)
 	    } /* end for */
 	} /* end if (termout_load) */
 #if	CF_DEBUGS
-	debugprintf("filer_workreadtermline: ret rs=%d rl=%u\n",rs,rl) ;
+	debugprintf("filedat_workreadtermline: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (filer_workreadtermline) */
+/* end subroutine (filedat_workreadtermline) */
 
 
-static int filer_getlines(FILER *fep)
+static int filedat_getlines(FILEDAT *fep)
 {
 	PROGINFO	*pip = fep->pip ;
 	int		rs ;
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_getlines: ent svc=%s f_run=%u\n",
+	debugprintf("b_homepage/filedat_getlines: ent svc=%s f_run=%u\n",
 	    fep->svc,fep->f_running) ;
 #endif
 	if (fep->f_running) {
@@ -4691,7 +4669,7 @@ static int filer_getlines(FILER *fep)
 	    fep->f_running = FALSE ;
 	    if ((rs = uptjoin(fep->tid,&trs)) >= 0) {
 #if	CF_DEBUGS
-	        debugprintf("b_homepage/filer_getlines: uptjoin() trs=%d\n",
+	        debugprintf("b_homepage/filedat_getlines: uptjoin() trs=%d\n",
 	            trs) ;
 #endif
 	        if (trs >= 0) {
@@ -4707,36 +4685,32 @@ static int filer_getlines(FILER *fep)
 	        shio_printf(pip->efp,fmt,pn,fep->svc,rs) ;
 	    } /* end if (pthead-join) */
 #if	CF_DEBUGS
-	    debugprintf("b_homepage/filer_getlines: uptjoin-out rs=%d\n",rs) ;
+	    debugprintf("b_homepage/filedat_getlines: uptjoin-out rs=%d\n",rs) ;
 #endif
 	} else {
 	    rs = fep->lines ;
 	}
 #if	CF_DEBUGS
-	debugprintf("b_homepage/filer_getlines: ret rs=%d svc=%s lns=%u\n",
+	debugprintf("b_homepage/filedat_getlines: ret rs=%d svc=%s lns=%u\n",
 	    rs,fep->svc,fep->lines) ;
 #endif
 	return rs ;
 }
-/* end subroutine (filer_getlines) */
+/* end subroutine (filedat_getlines) */
 
-
-static int filer_getbuf(FILER *fep,cchar **rpp)
-{
+static int filedat_getbuf(FILEDAT *fep,cchar **rpp) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if (rpp != NULL) *rpp = NULL ;
-	if ((rs = filer_getlines(fep)) >= 0) {
+	if ((rs = filedat_getlines(fep)) >= 0) {
 	    if (rpp != NULL) *rpp = fep->dbuf ;
 	    rl = fep->dl ;
 	}
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (filer_getbuf) */
+/* end subroutine (filedat_getbuf) */
 
-
-static int filer_havesvc(FILER *fep,cchar *svc)
-{
+static int filedat_havesvc(FILEDAT *fep,cchar *svc) noex {
 	int		f = TRUE ;
 	if (fep == NULL) return SR_FAULT ;
 	if (svc == NULL) return SR_FAULT ;
@@ -4744,30 +4718,22 @@ static int filer_havesvc(FILER *fep,cchar *svc)
 	f = f && (strcmp(svc,fep->svc) == 0) ;
 	return f ;
 }
-/* end subroutine (filer_havesvc) */
+/* end subroutine (filedat_havesvc) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
-
 	if (lip == NULL) return SR_FAULT ;
-
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->to_cache = -1 ;
 	lip->to_lock = -1 ;
-
 	return rs ;
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (lip == NULL) return SR_FAULT ;
 
 	rs1 = locinfo_svclistend(lip) ;

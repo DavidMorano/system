@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	osetint
+	osetstr
 
 	Description:
 	This object provides am ordered set of strings.  No two
@@ -26,11 +26,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<utility>		/* |pair(3c++)| */
+#include	<string>		/* |string(3c++)| */
 #include	<set>
-#include	<string>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -51,8 +53,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef set<string>	setstr ;
-typedef set<string> *	setstrp ;
+typedef set<string>		setstr ;
+typedef set<string> *		setstrp ;
 
 typedef	set<string>::iterator	iter ;
 typedef	set<string>::iterator *	iterp ;
@@ -222,7 +224,7 @@ int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
 }
 /* end subroutine (osetstr_curend) */
 
-int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
+int osetstr_curenum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = osetstr_magic(op,curp,rpp)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
@@ -242,6 +244,6 @@ int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (osetstr_enum) */
+/* end subroutine (osetstr_curenum) */
 
 

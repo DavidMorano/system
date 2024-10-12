@@ -24,6 +24,8 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<new>
 #include	<initializer_list>
@@ -43,14 +45,11 @@
 #include	<iomanip>
 #include	<usystem.h>
 #include	<ctdec.h>
-#include	<localmisc.h>
+#include	<getourenv.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 
 /* local defines */
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	45
-#endif
 
 
 /* name spaces */
@@ -63,7 +62,8 @@ using namespace	std ;
 
 /* external subroutines */
 
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
+
+/* external variables */
 
 
 /* local structures */
@@ -90,6 +90,9 @@ static vector<int>	cases[] = {
 	{ 2, 1, 0, 10, 11, 12, 13 },
 	{ 2, 3, 6, 2, -1, 1, 1 }
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -19,6 +19,9 @@
 	Type:
 	sysval
 
+	Description:
+	Means to retrive system related parameters (values).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

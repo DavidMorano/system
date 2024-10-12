@@ -1,4 +1,5 @@
 /* hdrdecode SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* mail-header weirdo-string decoding */
@@ -26,7 +27,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
-#include	<cstddef>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<string>

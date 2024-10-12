@@ -1,4 +1,5 @@
 /* contypevals HRADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* email content-type values */
@@ -19,8 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 enum contypevals {

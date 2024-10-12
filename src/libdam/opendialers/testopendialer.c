@@ -66,46 +66,30 @@ int main(int argc,const char **argv,const char **envv)
 #endif
 
 	if (argv != NULL) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		ai ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    for (ai = 1 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
-	        const char	*fn = argv[ai] ;
-	        const int	of = O_RDONLY ;
-#if	CF_DEBUGS
-	        debugprintf("main: fn=%s\n",fn) ;
-#endif
+	        cchar	*fn = argv[ai] ;
+	        cint	of = O_RDONLY ;
 	        if ((rs = uc_open(fn,of,0666)) >= 0) {
-	            FILER	b ;
-	            const int	fo = (of | O_NETWORK) ;
+	            cint	fo = (of | O_NETWORK) ;
 	            int		fd = rs ;
-#if	CF_DEBUGS
-	            debugprintf("main: uc_open() rs=%d\n",rs1) ;
-#endif
-	            if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	                const int	to = 5 ;
+	            if (filer b ; (rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
+	                cint	to = 5 ;
 	                while ((rs = filer_read(&b,lbuf,llen,to)) > 0) {
 	                    int	len = rs ;
-#if	CF_DEBUGS
-	                    debugprintf("main: readline() len=%d\n",len) ;
-#endif
 	                    fbwrite(stdout,lbuf,len) ;
 	                    if (rs < 0) break ;
 	                } /* end while */
 	                rs1 = filer_finish(&b) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (filer) */
-#if	CF_DEBUGS
-	            debugprintf("main: readline-out rs=%d\n",rs) ;
-#endif
 	            rs1 = u_close(fd) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
 	            fbprintf(stdout,"not_found fn=%s (%d)\n",fn,rs) ;
 	        }
-#if	CF_DEBUGS
-	        debugprintf("main: uc_open-out rs=%d\n",rs1) ;
-#endif
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (arguments) */

@@ -149,18 +149,12 @@ int main(int argc,const char **argv,const char **envv)
 
 /* local subroutines */
 
-
-static int procweather(int fd,int of)
-{
-	FILER	b ;
-	const int	fo = (of | O_NETWORK) ;
-	int	rs ;
-#if	CF_DEBUGS
-	debugprintf("main/dumpfile: entered\n") ;
-#endif
-	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	    const int	to = 0 ;
-	    const int	llen = LINEBUFLEN ;
+static int procweather(int fd,int of) noex {
+	cint		fo = (of | O_NETWORK) ;
+	int		rs ;
+	if (filer b ; (rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
+	    cint	to = 0 ;
+	    cint	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {

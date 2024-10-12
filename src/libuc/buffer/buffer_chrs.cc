@@ -71,13 +71,20 @@ using std::max ;			/* subroutine-template */
 
 /* local structures */
 
+namespace {
+    struct blanker {
+	cint	l = strlen(sysword.w_blanks) ;
+	cchar	*p = sysword.w_blanks ;
+    } ; /* end struct (blanker) */
+}
+
 
 /* forward references */
 
 
 /* local variables */
 
-constexpr cchar		blanks[] = "        " ;
+static blanker		bo ;		/* "blank" object */
 
 
 /* exported variables */
@@ -97,12 +104,11 @@ int buffer_chrs(buffer *op,int ch,int n) noex {
 /* end subroutine (buffer_chrs) */
 
 int buffer_blanks(buffer *op,int n) noex {
-	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	while ((rs >= 0) && (n > 0)) {
-	    cint	m = min(n,nblanks) ;
-	    rs = buffer_strw(op,blanks,m) ;
+	    cint	m = min(n,bo.l) ;
+	    rs = buffer_strw(op,bo.p,m) ;
 	    n -= m ;
 	    len += rs ;
 	} /* end while */

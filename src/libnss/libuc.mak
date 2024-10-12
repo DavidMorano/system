@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -835,7 +834,6 @@ csem.o:			csem.cc		csem.h
 pwcache.o:		pwcache.cc	pwcache.h
 lockrw.o:		lockrw.cc	lockrw.h
 nodedb.o:		nodedb.cc	nodedb.h
-mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc	ccfile.hh
 thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
@@ -846,6 +844,7 @@ bufstr.o:		bufstr.cc bufstr.h
 setint.o:		setint.cc setint.h
 osetint.o:		osetint.cc osetint.h
 osetstr.o:		osetstr.cc osetstr.h
+osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 
 
 # sring-comparisons
@@ -871,9 +870,6 @@ termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
-intsat.o:		intsat.cc intsat.h
-intfloor.o:		intfloor.cc intfloor.h
-intceil.o:		intceil.cc intceil.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
 getxid.o:		getxid.cc getxid.h
@@ -900,7 +896,6 @@ ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
-filelines.o:		filelines.cc filelines.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h

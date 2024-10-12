@@ -677,11 +677,11 @@ mode_t		operms ;
 /* write file-header */
 
 	if (rs >= 0) {
-	    if ((rs = filer_start(&babyfile,fd,0L,size,0)) >= 0) {
-
-	        rs = filer_writefill(&babyfile,hdrbuf,bl) ;
-	        fileoff += rs ;
-
+	    if ((rs = filer_start(&babyfile,fd,0z,size,0)) >= 0) {
+		{
+	            rs = filer_writefill(&babyfile,hdrbuf,bl) ;
+	            fileoff += rs ;
+		}
 	        rs1 = filer_finish(&babyfile) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (file) */

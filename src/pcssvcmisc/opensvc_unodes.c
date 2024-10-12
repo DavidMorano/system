@@ -157,13 +157,10 @@ static int process(int wfd,cchar *pr)
 }
 /* end subroutie (process) */
 
-
-static int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen)
-{
-	FILER		fb ;
+static int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = filer_start(&fb,wfd,0L,0,0)) >= 0) {
+	if (filer fb ; (rs = filer_start(&fb,wfd,0z,0,0)) >= 0) {
 	    PCSUNODES_CUR	cur ;
 	    if ((rs = pcsunodes_curbegin(unp,&cur)) >= 0) {
 		while ((rs = pcsunodes_enum(unp,&cur,nbuf,nlen)) >= 0) {

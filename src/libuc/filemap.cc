@@ -1,7 +1,7 @@
 /* filemap SUPPORT */
 /* lang=C++20 */
 
-/* support low-overhead file bufferring operations (read-only) */
+/* read-file funtion through file-mapping */
 /* version %I% last-modified %G% */
 
 
@@ -27,7 +27,7 @@
 #include	<sys/mman.h>
 #include	<unistd.h>		/* |off_t| */
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |ULONG_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -47,6 +47,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -220,7 +221,7 @@ int filemap_tell(filemap *op,off_t *offp) noex {
 	    if (op->mapdata) {
 	        cchar	*bdata = (cchar *) op->mapdata ;
 	        if (offp) *offp = (op->bp - bdata) ;
-	        rs = int((op->bp - bdata) & INT_MAX) ;
+	        rs = intsat(op->bp - bdata) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -294,5 +295,61 @@ static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	return rs ;
 }
 /* end subroutine (filemap_openmap) */
+
+filemap_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case filemapmem_rewind:
+	        rs = filemap_rewind(op) ;
+	        break ;
+	    case filemapmem_close:
+	        rs = filemap_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (filemap_co::operator) */
+
+int filemap_teller::operator () (off_t *fop) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case 0:
+	        rs = filemap_tell(op,fop) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (filemap_teller::operator) */
+
+int filemap::open(cchar *fn,size_t fsz) noex {
+    	return filemap_open(this,fn,fsz) ;
+}
+
+int filemap::stat(USTAT *sbp) noex {
+    	return filemap_stat(this,sbp) ;
+}
+
+int filemap::read(int rlen,void *rbuf) noex {
+    	return filemap_read(this,rlen,rbuf) ;
+}
+
+int filemap::getln(cchar **cpp) noex {
+    	return filemap_getln(this,cpp) ;
+}
+
+int filemap::seek(off_t fo,int w) noex {
+    	return filemap_seek(this,fo,w) ;
+}
+
+void filemap::dtor() noex {
+	cint	rs = int(close) ;
+	if (rs < 0) {
+	    ulogerror("filemap",rs,"fini-close") ;
+	}
+}
 
 

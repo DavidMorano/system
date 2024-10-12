@@ -382,8 +382,7 @@ static void ucclustername_atforkafter() noex {
 /* end subroutine (ucclustername_atforkafter) */
 
 static void ucclustername_exit() noex {
-	int	rs = ucclustername_fini() ;
-	if (rs < 0) {
+	if (cint rs = ucclustername_fini() ; rs < 0) {
 	    ulogerror("ucclustername",rs,"exit-fini") ;
 	}
 }
@@ -438,14 +437,12 @@ static int subinfo_cacheset(SUBINFO *sip,UCLUSTERNAME *uip,int ttl) noex {
 	char		*aprev = nullptr ;
 	if (ttl < 0) ttl = sip->to ;
 	if ((rs = ucclustername_allocbegin(uip,sip->dt,ttl)) > 0) {
-	    UCLUSTERNAME_A	uca ;
-	    int			size = 0 ;
-	    char		*bp ;
+	    UCLUSTERNAME_A	uca{} ;
+	    int			sz = 0 ;
 	    f = true ;
-	    memset(&uca,0,sizeof(UCLUSTERNAME_A)) ;
-	    size += (strlen(sip->nn) + 1) ;
-	    size += (strnlen(sip->rbuf,sip->rlen) + 1) ;
-	    if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	    sz += (strlen(sip->nn) + 1) ;
+	    sz += (strnlen(sip->rbuf,sip->rlen) + 1) ;
+	    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 	        uca.a = bp ;
 	        aprev = uip->a ;
 	        uca.nn = bp ;

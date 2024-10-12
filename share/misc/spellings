@@ -1,0 +1,29 @@
+# SPELLINGS
+#
+
+#
+# This is the "spellings" database.  It is a table that consists of two
+# columns.  The first column contains the American (or otherwise the
+# most conventional) spelling for an English word and the second column
+# contains the British spelling for the same word.
+# 
+# 
+
+#
+# colloquial	alternate
+#
+
+honor		honour
+color		colour
+neighbor	neighbour
+ceiling		cieling
+scepter		sceptre
+evening		even
+fulfill		fulfil
+while		whiles
+
+builds		buildeth
+
+
+
+

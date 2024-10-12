@@ -1,12 +1,12 @@
-/* lkmail */
+/* lkmail SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* object to manipulate a mail lock */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SGIDGROUPS	0		/* SGID to a supplemetal group? */
-
 
 /* revision history:
 
@@ -19,22 +19,24 @@
 
 /*******************************************************************************
 
-	This object is used to manipulate a mail lock file.
+  	Name:
+	lkmail
 
+	Description:
+	This object is used to manipulate a mail lock file.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<string.h>
-
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<localmisc.h>

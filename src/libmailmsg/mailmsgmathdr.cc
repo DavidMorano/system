@@ -1,4 +1,5 @@
 /* mailmsgmathdr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match on a message header (returns the key-name) */
@@ -53,6 +54,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>

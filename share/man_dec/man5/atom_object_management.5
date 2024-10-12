@@ -1,0 +1,145 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_object_management.5,v $ $Revision: 1.1.2.8 $ (DEC) $Date: 1996/02/21 19:30:26 $
+.\"
+.TH atom_object_management 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom_object_management\*O, \*LBuildObj\*O, \*LIsObjBuilt\*O, \*LWriteObj\*O, \*LReleaseObj\*O \- Allows an Atom tool's \*LInstrumentAll\*O routine to build, release, and write objects
+.SH SYNOPSIS
+.PP
+.sS
+\*L#include <cmplrs/atom.inst.h>\*O
+.PP
+\*Lunsigned BuildObj (
+.nL
+        Obj * );\*O
+.PP
+\*Lunsigned IsObjBuilt (
+.nL
+        Obj * );\*O
+.PP
+\*Lvoid WriteObj (
+.nL
+        Obj * );\*O
+.PP
+\*Lvoid ReleaseObj (
+.nL
+        Obj * );\*O
+.sE
+.SH DESCRIPTION
+.PP
+.iX "Atom object management routines"
+.iX "BuildObj Atom routine"
+.iX "IsObjBuilt Atom routine"
+.iX "WriteObj Atom routine"
+.iX "ReleaseObj Atom routine"
+Atom's object management routines allow an Atom tool's
+\*LInstrumentAll\*O routine to build, write, and release objects.
+.PP
+You can use these routines only from an Atom tool's instrumentation
+file.  See \*Latom\*O(1) for a description of Atom.
+.PP
+An \*LInstrumentAll\*O routine must call the \*LBuildObj\*O routine
+before calling \*LAddCallObj\*O to add analysis routine calls to the
+object and before traversing the procedures in the object.
+\*LBuildObj\*O builds the internal data structures Atom uses to
+manipulate the object.  After the Atom tool traverses and instruments
+the object, the \*LInstrumentAll\*O routine must call the
+\*LWriteObj\*O routine to write out the instrumented version
+of the object. For example:
+.oS
+unsigned InstrumentAll(int iargc, char **iargv)
+{
+    Obj *  obj;
+.sp
+    AddCallProto("Startup()");
+    AddCallProto("Finish()");
+    AddCallProto("foo(int, REGV)");
+.sp
+    AddCallProgram(ProgramBefore, "Startup");
+    AddCallProgram(ProgramAfter, "Finish");
+.sp
+    for (obj = GetFirstObj();  obj;  obj = GetNextObj(obj))
+    {
+        if (BuildObj(obj))
+            return(1);
+.sp
+            /* instrument obj */
+.sp
+        WriteObj(obj);
+     }
+    return(0);
+}
+.oE
+.PP
+The \*LWriteObj\*O routine writes the instrumented version of the
+specified object, deallocating the internal data structures
+\*LBuildObj\*O previously created.
+.PP
+Note that \*LBuildObj\*O may return an error code.
+It returns a nonzero value (and issues an appropriate error message)
+if it encounters an error in the executable file for the \*LObj\*\O.
+You should propagate this error value back to Atom by returning 1
+from \*LInstrumentAll\*O.
+.PP
+The \*LReleaseObj\*O routine deallocates the internal data structures
+for the given object, but does not write out the instrumented version
+the object.  You should not call \*LReleaseObj\*O if you have added
+any analysis routine calls to the object.
+.PP
+The \*LIsObjBuilt\*O routine returns a nonzero value if the specified
+object has been built with \*LBuildObj\*O, but not yet written with
+\*LWriteObj\*O or unbuilt with \*LReleaseObj\*O.
+.PP
+Whenever possible, tools should build and write out each object only
+once.  Some tools, however, may build and release an object several
+times, ultimately writing out its instrumented version.
+This can be very time-consuming for a tool with very large objects.
+.PP
+Similarly, tools should normally build only one object at a time.
+Certain tools may simultaneously build several objects, instrument
+each one, and then write each out.
+This has advantages for tools that call \*LResolveNamedProc\*O or
+\*LResolveTargetProc\*O.  However, having more than one large object
+built at a single time will cause Atom to run slowly and to consume
+a large amount of memory.
+.SH RETURN VALUES
+.PP
+These routines return values as described above.
+.SH FILES
+.PP
+.VL
+.LI "\*L/usr/include/cmplrs/atom.inst.h\*O"
+Header file containing external definitions of Atom routines
+.LE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_navigation\*O(5),
+\*Latom_description_file\*O(5),
+\*Latom_application_resolvers\*O(5), \*Latom_instrumentation_routines\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

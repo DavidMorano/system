@@ -1,0 +1,20 @@
+MAINTOWN
+
+This program (actually a SHELL built-in) is a maintenance utility that
+ensures that specified directory trees (or files) are owned by the
+specified user.
+
+Synopsis:
+
+$ maintown [-r] [-n] <username> [<file(s) ...>] [-af <argfile>] [-f] [-V]
+
+where:
+
+-r		recurse into subdirectories
+-c		no stopping on stupid errors!
+<username>	username to own directories
+<file(s)>	the files or directories
+-af <argfile>	more file (or directory) arguments in this file
+-f		follow symbolic links
+-V		print version to STDERR and exit
+

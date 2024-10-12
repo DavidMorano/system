@@ -1532,16 +1532,13 @@ static int procdial(PROGINFO *pip,void *ofp,cchar *ap)
 }
 /* end subroutine (procdial) */
 
-
-static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp)
-{
+static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp) noex {
 	LOCINFO		*lip = pip->lip ;
-	FILER		b ;
-	cint	opts = (FILER_ONET&0) ;
+	cint		opts = (FILER_ONET&0) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filer_start(&b,s,0L,512,opts)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,s,0z,512,opts)) >= 0) {
 	    cint	to = pip->to_read ;
 	    cint	llen = lbp->llen ;
 	    char	*lbuf = lbp->lbuf ;
@@ -1818,16 +1815,13 @@ static int procsystemread(PROGINFO *pip,void *ofp,CM *conp,LINEBUF *lbp)
 }
 /* end subroutine (procsystemread) */
 
-
-static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp)
-{
+static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp) noex {
 	LOCINFO		*lip = pip->lip ;
-	FILER		b ;
-	cint	opts = FILER_ONET ;
+	cint		opts = FILER_ONET ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filer_start(&b,fd,0L,512,opts)) >= 0) {
+	if (filer b ; (rs = filer_start(&b,fd,0z,512,opts)) >= 0) {
 	    cint	llen = lbp->llen ;
 	    cint	to = pip->to_read ;
 	    char	*lbuf = lbp->lbuf ;

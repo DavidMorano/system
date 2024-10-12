@@ -1150,10 +1150,7 @@ static int procexec(PROGINFO *pip,struct calarger *cap,int ofd)
 }
 /* end subroutine (procexec) */
 
-
-static int procerrout(PROGINFO *pip,int cols,cchar s[],int ofd)
-{
-	FILER		b ;
+static int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	int		wlen = 0 ;
@@ -1161,16 +1158,13 @@ static int procerrout(PROGINFO *pip,int cols,cchar s[],int ofd)
 	cchar		*pn = pip->progname ;
 
 	if (pip->efp != NULL) {
-	    if ((rs = filer_start(&b,ofd,0L,0,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        char		lbuf[LINEBUFLEN + 1] ;
-
+	    if (filer b ; (rs = filer_start(&b,ofd,0z,0,0)) >= 0) {
+	        cint	llen = LINEBUFLEN ;
+	        char	lbuf[LINEBUFLEN + 1] ;
 	        rs1 = SR_OK ;
 	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
-	            int	len = rs ;
-
+	            int		len = rs ;
 	            if (lbuf[len - 1] == '\n') lbuf[--len] = '\0' ;
-
 	            if ((! f_title) && (len > 0)) {
 	                if ((s != NULL) && (s[0] != '\0')) {
 	                    f_title = TRUE ;

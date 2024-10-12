@@ -68,8 +68,7 @@ namespace {
 	    mx.lockend() ;
 	} ;
 	~umasker() {
-            cint        rs = fini() ;
-            if (rs < 0) {
+            if (cint rs = fini() ; rs < 0) {
                 ulogerror("umask",rs,"dtor-fini") ;
             }
 	} ;
@@ -107,11 +106,10 @@ int umask_fini() noex {
 /* end subroutine (umask_fini) */
 
 int umaskget() noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		cmask = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    {
 		rs = umask_data.get() ;
 		cmask = rs ;
@@ -124,11 +122,10 @@ int umaskget() noex {
 /* end subroutine (umaskget) */
 
 int umaskset(mode_t cmask) noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    {
 		rs = umask_data.setmode(cmask) ;
 		omask = rs ;
@@ -213,20 +210,20 @@ int umasker::get() noex {
 	int		rs ;
 	int		rs1 ;
 	int		cmask = 0 ;
-	    if ((rs = init()) >= 0) {
-	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	            if ((rs = mx.lockbegin) >= 0) { /* single */
-			{
-			    cmask = umask(0) ; /* in case of race! */
-			    umask(cmask) ;
-			}
-	                rs1 = mx.lockend ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (mutex) */
-	            rs1 = uc_forklockend() ;
+	if ((rs = init()) >= 0) {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
+	        if ((rs = mx.lockbegin) >= 0) { /* single */
+		    {
+			cmask = umask(0) ; /* in case of race! */
+			umask(cmask) ;
+		    }
+	            rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (forklock) */
-	    } /* end if (init) */
+	        } /* end if (mutex) */
+	        rs1 = uc_forklockend() ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (forklock) */
+	} /* end if (init) */
 	cmask &= INT_MAX ;
 	return (rs >= 0) ? cmask : rs ;
 }
@@ -236,19 +233,19 @@ int umasker::setmode(mode_t cmask) noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	    if ((rs = init()) >= 0) {
-	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	            if ((rs = mx.lockbegin) >= 0) { /* single */
-			{
-			    omask = umask(cmask) ;
-			}
-	                rs1 = mx.lockend ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (mutex) */
-	            rs1 = uc_forklockend() ;
+	if ((rs = init()) >= 0) {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
+	        if ((rs = mx.lockbegin) >= 0) { /* single */
+		    {
+			omask = umask(cmask) ;
+		    }
+	            rs1 = mx.lockend ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (forklock) */
-	    } /* end if (init) */
+	        } /* end if (mutex) */
+	        rs1 = uc_forklockend() ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (forklock) */
+	} /* end if (init) */
 	omask &= INT_MAX ;
 	return (rs >= 0) ? omask : rs ;
 }

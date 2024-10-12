@@ -58,12 +58,11 @@
 
 /* local structures */
 
-struct uctimer ;
-
-typedef int (uctimer::*mem_f)(timer_t) noex ;
-
-struct uctimer {
-	mem_f		m ;
+namespace {
+    struct uctimer ;
+    typedef int (uctimer::*mem_m)(timer_t) noex ;
+    struct uctimer {
+	mem_m		m ;
 	sigevent	*sep ;
 	timer_t		*tmp ;
 	ITS		*otvp ;
@@ -86,7 +85,8 @@ struct uctimer {
 	int set(timer_t) noex ;
 	int get(timer_t) noex ;
 	int over(timer_t) noex ;
-} ; /* end struct (uctimer) */
+    } ; /* end struct (uctimer) */
+}
 
 
 /* forward references */

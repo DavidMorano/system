@@ -126,38 +126,50 @@ int snsd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
 	return sxo(dbuf,dlen) ;
 }
 
+int snchrs(char *dp,int dl,int ch,int n) noex {
+    	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	if (dp) {
+	    rs = SR_INVALID ;
+	    if (n >= 0) {
+		if (storebuf sb(dp,dl) ; (rs = sb.chrs(ch,n)) >= 0) {
+		    rl = sb.idx ;
+		} /* end if (storebuf) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end subroutine (snchrs) */
+
 
 /* local subroutines */
 
 int snxxx::operator () (char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		rl = 0 ;
 	if (dbuf) {
+	    storebuf	sb(dbuf,dlen) ;
 	    rs = SR_OK ;
 	    if (rs >= 0) {
 	        if (s1) {
-	            rs = storebuf_strw(dbuf,dlen,i,s1,-1) ;
-	            i += rs ;
+	            rs = sb.str(s1) ;
 	        } else {
-	            rs = storebuf_decui(dbuf,dlen,i,d1) ;
-	            i += rs ;
+	            rs = sb.dec(d1) ;
 	        }
 	    }
 	    if ((rs >= 0) && mch) {
-	        rs = storebuf_chr(dbuf,dlen,i,mch) ;
-	        i += rs ;
+	        rs = sb.chr(mch) ;
 	    }
 	    if (rs >= 0) {
 	        if (s2) {
-	            rs = storebuf_strw(dbuf,dlen,i,s2,-1) ;
-	            i += rs ;
+	            rs = sb.str(s2) ;
 	        } else {
-	            rs = storebuf_decui(dbuf,dlen,i,d2) ;
-	            i += rs ;
+	            rs = sb.dec(d2) ;
 	        }
 	    }
+	    rl = sb.idx ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end method (snxxx::operator) */
 

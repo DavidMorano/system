@@ -1,0 +1,20 @@
+COMMANDMENT
+
+This is a KSH shell built-in command.  It queries the COMMANDMENT
+database for matching entries.
+
+Synopsis:
+
+$ commandment [<number>|<word(s)> ...] [-af <argfile>] [-db <dbname>] [-a] 
+	[-w <width>] [-V]
+
+where:
+
+<number>	a number indicating the commandment desired
+<word(s)>	one or more words to query
+-af <argfile>	take queries from this file
+-w <cols>	output column width (default is 80)
+-db <dbname>	specifies a database
+-a		print all entries
+-V		print command version to standard-error and then exit
+

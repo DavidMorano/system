@@ -1,4 +1,4 @@
-/* getehostname SUPPORT (Get Entry Hostname) */
+/* getehostname SUPPORT (Get-Entry-Hostname) */
 /* lang=C++20 */
 
 /* get a host name that has an INET address */
@@ -33,13 +33,15 @@
 	int getehostname(char *hostname,cchar *name) noex
 
 	Arguments:
-	- hostname	a buffer to receive a substitute name (optional) ;
-			this can be NULL and no substitute name is returned
+	- hostname	a buffer to receive a substitute name 
+			(optional) ; this can be NULL and no
+			substitute name is returned
 	- name		given name to find a substitute for
 
 	Retruns:
 	>=0		a valid substitute can be found
-	<0		error (system-return); no valid substitute can be found
+	<0              error (system-return); no valid substitute
+			can be found
 
 	Important note:
 
@@ -69,14 +71,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/utsname.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -117,8 +111,7 @@ int getehostname(char *hbuf,cchar *name) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (hbuf && name) {
-	    char	*hebuf{} ;
-	    if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
 		cint	helen = rs ;
 		{
 		    ucentho	he ;

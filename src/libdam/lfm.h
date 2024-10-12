@@ -1,4 +1,5 @@
 /* lfm HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manage file-lock operations */
@@ -19,18 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system types */
 #include	<unistd.h>
-#include	<usystem.h>		/* for 'ino_t' */
-#include	<localmisc.h>		/* for types */
+#include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* object defines */
 #define	LFM_MAGIC	0x8a7b7c6d
 #define	LFM		struct lfm_head
-#define	LFM_INFO	struct lfm_i
-#define	LFM_CHECK	struct lfm_c
+#define	LFM_IN		struct lfm_information
+#define	LFM_CH		struct lfm_check
 
 /*  lock-file types */
 #define	LFM_TRECORD		0		/* record lock */
@@ -45,13 +45,13 @@
 #define	LFM_CHECKBUFLEN		400
 
 
-struct lfm_i {
+struct lfm_information {
 	dev_t		dev ;
 	ino_t		ino ;
 	int		tocheck ;	/* check interval */
 } ;
 
-struct lfm_c {
+struct lfm_check {
 	cchar		*nodename ;	/* lock node name */
 	cchar		*username ;	/* lock user name */
 	cchar		*banner ;	/* banner */
@@ -79,18 +79,19 @@ struct lfm_head {
 } ;
 
 typedef LFM		lfm ;
+typedef	LFM_IN		lfm_in ;
+typedef	LFM_CH		lfm_ch ;
 
 EXTERNC_begin
 
-extern int	lfm_start(LFM *,cchar *,int,int,LFM_CHECK *,
-			cchar *,cchar *,cchar *) noex ;
-extern int	lfm_setpoll(LFM *,int) noex ;
-extern int	lfm_check(LFM *,LFM_CHECK *,time_t) noex ;
-extern int	lfm_printf(LFM *,cchar *,...) noex ;
-extern int	lfm_flush(LFM *) noex ;
-extern int	lfm_getinfo(LFM *,LFM_INFO *) noex ;
-extern int	lfm_getpid(LFM *,pid_t *) noex ;
-extern int	lfm_finish(LFM *) noex ;
+extern int	lfm_start(lfm *,cc *,int,int,lfm_ch *,cc *,cc *,cc *) noex ;
+extern int	lfm_setpoll(lfm *,int) noex ;
+extern int	lfm_check(lfm *,lfm_ch *,time_t) noex ;
+extern int	lfm_printf(lfm *,cchar *,...) noex ;
+extern int	lfm_flush(lfm *) noex ;
+extern int	lfm_getinfo(lfm *,lfm_in *) noex ;
+extern int	lfm_getpid(lfm *,pid_t *) noex ;
+extern int	lfm_finish(lfm *) noex ;
 
 EXTERNC_end
 

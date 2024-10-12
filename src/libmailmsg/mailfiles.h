@@ -1,47 +1,47 @@
-/* mailfiles */
-
+/* mailfiles HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 */
 
 
 #ifndef	MAILFILES_INCLUDE
-#define	MAILFILES_INCLUDE	1
+#define	MAILFILES_INCLUDE
 
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecitem.h>
 
 
-
-/* object defines */
-
 #define	MAILFILES		VECITEM
-#define	MAILFILES_ENT		struct mailfiles_ent
+#define	MAILFILES_ENT		struct mailfiles_entry
 
 
-
-
-struct mailfiles_ent {
+struct mailfiles_entry {
 	char	*mailfname ;
 	time_t	lasttime ;
 	off_t	lastsize ;
 	int	f_changed ;
 } ;
 
+typedef	MAILFILES		mailfiles ;
+typedef	MAILFILES_ENT		mailfiles_ent ;
 
+EXTERNC_begin
 
+extern int mailfiles_init(mailfiles *) noex ;
+extern int mailfiles_free(mailfiles *) noex ;
+extern int mailfiles_add(mailfiles *,cchar *,int) noex ;
+extern int mailfiles_addpath(mailfiles *,cchar *,int) noex ;
+extern int mailfiles_get(mailfiles *,int,mailfiles_ent **) noex ;
+extern int mailfiles_check(mailfiles *) noex ;
+extern int mailfiles_count(mailfiles *) noex ;
 
-#if	(! defined(MAILFILES_MASTER)) || (MAILFILES_MASTER == 0)
-
-extern int mailfiles_init(MAILFILES *) ;
-extern int mailfiles_free(MAILFILES *) ;
-extern int mailfiles_add(MAILFILES *,const char *,int) ;
-extern int mailfiles_addpath(MAILFILES *,const char *,int) ;
-extern int mailfiles_get(MAILFILES *,int,MAILFILES_ENT **) ;
-extern int mailfiles_check(MAILFILES *) ;
-extern int mailfiles_count(MAILFILES *) ;
-
-#endif /* MAILFILES_MASTER */
+EXTERNC_end
 
 
 #endif /* MAILFILES_INCLUDE */

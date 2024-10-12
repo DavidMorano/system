@@ -1,0 +1,14 @@
+SYNC
+
+This is a Korn Shell (KSH) built-in command that synchronizes the
+file-system.
+
+Synopsis:
+
+$ sync [-b] [-V]
+
+where:
+
+-b		perform the synchronization in the background
+-V		print command version to standard-error and then exit
+

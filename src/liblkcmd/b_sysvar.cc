@@ -1905,15 +1905,12 @@ static int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
 }
 /* end subroutine (procseter) */
 
-
-static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl)
-{
+static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
 	LOCINFO		*lip = pip->lip ;
-	HDBSTR		*varp ;
-	FIELD		fsb ;
-	FILER		dfile, *dfp = &dfile ;
-	const int	llen = LINEBUFLEN ;
-	const int	vlen = VBUFLEN ;
+	dhbstr		*varp ;
+	field		fsb ;
+	cint		llen = LINEBUFLEN ;
+	cint		vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	int		len, cl ;
@@ -1943,9 +1940,9 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl)
 #endif
 
 	if ((rs = u_open(fnp,O_RDONLY,0666)) >= 0) {
-	    int	fd = rs ;
-
-	    if ((rs = filer_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
+	    filer	dfile, *dfp = &dfile ;
+	    cint	fd = rs ;
+	    if ((rs = filer_start(dfp,fd,0z,BUFLEN,0)) >= 0) {
 
 	        while ((rs = filer_readln(dfp,lbuf,llen,to)) > 0) {
 	            len = rs ;

@@ -1,4 +1,5 @@
 /* mailmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* message parsing object */
@@ -19,14 +20,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 #include	<strpack.h>
 #include	<mailbox.h>
-#include	<localmisc.h>
 
 
 #define	MAILMSG		struct mailmsg_head

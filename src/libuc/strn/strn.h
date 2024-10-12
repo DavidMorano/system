@@ -1,7 +1,7 @@
 /* strn HEADER */
 /* lang=C20 */
 
-/* find a character in a counted c-string */
+/* perform variable counted -cstring operations */
 /* version %I% last-modified %G% */
 
 
@@ -22,6 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	<strnxcmp.h>
 #include	<strnxchr.h>
@@ -40,11 +41,10 @@ extern char *strncasesub(cchar *,int,cchar *) noex ;
 extern char *strnncpy(char *,cchar *,int,int) noex ;
 extern char *strnwcpy(char *,int,cchar *,int) noex ;
 /* set */
-extern char *strnset(char *,int,int) noex ;
-extern char *strnset(char *,int,int) noex ;
+extern char *strnset(char *dp,int ch,int n) noex ;
 
-static inline char *strnsetblanks(char *dp,int dl) noex {
-	return strnset(dp,dl,' ') ;
+static inline char *strnblanks(char *dp,int n) noex {
+	return strnset(dp,' ',n) ;
 }
 
 EXTERNC_end

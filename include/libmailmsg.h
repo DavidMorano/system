@@ -1,4 +1,5 @@
 /* libmailmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -22,11 +23,13 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 #include	<mailmsghdrs.h>
 #include	<mailmsghdrfold.h>
 #include	<mailmsghdrval.h>
+#include	<mailmsghdrct.h>
 #include	<mailmsgmatenv.h>
 #include	<mailmsgmathdr.h>
 #include	<mailmsgstage.h>
@@ -44,6 +47,9 @@
 #include	<mcmsg.h>
 
 #include	<hdrextnum.h>
+#include	<hdrextid.h>
+#include	<hdrctype.h>
+#include	<hdrdecode.h>
 #include	<contypevals.h>
 #include	<headkeymat.h>
 #include	<comparse.h>

@@ -19,8 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
@@ -31,6 +34,14 @@ extern int snses(char *,int,cchar *,cchar *) noex ;
 extern int snsdd(char *,int,cchar *,uint) noex ;
 extern int snddd(char *,int,uint,uint) noex ;
 extern int snsd(char *,int,cchar *,uint) noex ;
+extern int snchrs(char *,int,int,int) noex ;
+
+static inline int snchr(char *dp,int dl,int ch) noex {
+    return snchrs(dp,dl,ch,1) ;
+}
+static inline int snblanks(char *dp,int dl,int n) noex {
+    return snchrs(dp,dl,' ',n) ;
+}
 
 EXTERNC_end
 

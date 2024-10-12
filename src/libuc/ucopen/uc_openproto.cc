@@ -1023,10 +1023,9 @@ static int fingerworker(FINGERARGS *fap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filer_start(ofp,cfd,0L,0,0)) >= 0) {
-	    filer	fb ;
+	if ((rs = filer_start(ofp,cfd,0z,0,0)) >= 0) {
 	    cint	fbo = FILER_ONET ;
-	    if ((rs = filer_start(&fb,nfd,0L,0,fbo)) >= 0) {
+	    if (filer fb ; (rs = filer_start(&fb,nfd,0z,0,fbo)) >= 0) {
 	        {
 	            rs = fingerworker_loop(fap,ofp,&fb,cols,ind,to) ;
 	            wlen = rs ;
@@ -1178,12 +1177,11 @@ static int fingerclean(cint fd) noex {
 	int		nfd = -1 ;
 	if ((rs = openshmtmp(nullptr,0,om)) >= 0) {
 	    cint	fo = FILER_ONET ;
-	    FILER	b ;
 	    nfd = rs ;
-	    if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	        cint	to = (1*60) ;
-	        cint	llen = LINEBUFLEN ;
-	        cint	clen = LINEBUFLEN ;
+	    if (filer b ; (rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
+	        cint		to = (1*60) ;
+	        cint		llen = LINEBUFLEN ;
+	        cint		clen = LINEBUFLEN ;
 	        int		sz = 0 ;
 	        char		*bp ;
 	        char		*lbuf ;

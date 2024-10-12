@@ -35,6 +35,8 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<timewatch.hh>
@@ -78,8 +80,7 @@ namespace {
 	int lockbegin(int) noex ;
 	int lockend() noex ;
 	~ucfork() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucfork",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (ucfork) */
@@ -210,11 +211,10 @@ int ucfork::stdfork() noex {
 /* end mrthod (ucfork::stdfork) */
 
 int ucfork::lockbegin(int to) noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
 	        rs = lock.rdlock(to) ;
 		rc = rs ;
@@ -227,11 +227,10 @@ int ucfork::lockbegin(int to) noex {
 /* end subroutine (ucfork::lockbegin) */
 
 int ucfork::lockend() noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if (finit) {
 	        rs = lock.unlock ;
 		rc = rs ;

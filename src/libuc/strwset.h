@@ -22,11 +22,16 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin
 
-extern char	*strwset(char *,int,int) noex ;
+extern char	*strwset(char *dp,int ch,int n) noex ;
+
+static inline char *strwblanks(char *dp,int n) noex {
+    return strwset(dp,' ',n) ;
+}
 
 EXTERNC_end
 

@@ -1,0 +1,550 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_application_instrumentation.5,v $ $Revision: 1.1.2.8 $ (DEC) $Date: 1996/02/21 19:30:07 $
+.\"
+.TH atom_application_instrumentation 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom_application_instrumentation\*O, \*LAddCallProto\*O, \*LAddCallProgram\*O, \*LAddCallObj\*O, \*LAddCallProc\*O, \*LAddCallBlock\*O, \*LAddCallInst\*O, \*LReplaceProcedure\*O \- Allows an Atom tool's instrumentation routine to add, within an application program, calls to analysis routines
+.SH SYNOPSIS
+.PP
+.sS
+\*L#include <cmplrs/atom.inst.h>\*O
+.PP
+\*Lvoid AddCallProto (
+.nL
+        const char * );\*O
+.PP
+\*Lvoid AddCallProgram (
+.nL
+        PlaceType,
+.nL
+        const char *, ... );\*O
+.PP
+\*Lvoid AddCallObj (
+.nL
+        Obj *,
+.nL
+        PlaceType,
+.nL
+        const char *, ... );\*O
+.PP
+\*Lvoid AddCallProc (
+.nL
+        Proc *,
+.nL
+        PlaceType,
+.nL
+        const char *, ... );\*O
+.PP
+\*Lvoid AddCallBlock (
+.nL
+        Block *,
+.nL
+        PlaceType,
+.nL
+        const char *, ... );\*O
+.PP
+\*Lvoid AddCallInst (
+.nL
+        Inst *,
+.nL
+        PlaceType,
+.nL
+        const char *, ... );\*O
+.PP
+\*Lvoid ReplaceProcedure (
+.nL
+        Proc *,
+.nL
+        const char * );\*O
+.nL
+.sE
+.SH DESCRIPTION
+.PP
+.iX "Atom application instrumentation routines"
+.iX "AddCallProto Atom routine"
+.iX "AddCallProgram Atom routine"
+.iX "AddCallObj Atom routine"
+.iX "AddCallProc Atom routine"
+.iX "AddCallBlock Atom routine"
+.iX "AddCallInst Atom routine"
+.iX "ReplaceProcedure Atom routine"
+The Atom application instrumentation routines allow you to add
+arbitrary procedure calls before and after objects, procedures,
+basic blocks, and instructions.  You can also add procedure calls
+before and after the application program executes.
+.PP
+You can use these routines only from an Atom tool's instrumentation
+file.  See \*Latom\*O(1) for a description of Atom.
+.\" .PP
+.SS "AddCallProto Routine"
+You must use the \*LAddCallProto\*O routine to specify the prototype
+of each procedure call to be added to the program.
+In other words, an \*LAddCallProto\*O call must define the procedural
+interface for each call to an analysis procedure to be added to the
+program by subsequent calls to \*LAddCallProgram\*O, \*LAddCallObj\*O,
+\*LAddCallProc\*O, \*LAddCallBlock\*O, and \*LAddCallInst\*O.
+.PP
+The format of the prototype is similar to a C language function
+definition.  The name of the analysis procedure is followed by a
+parenthesized list of arguments.
+.PP
+There are four basic argument types:
+.ML
+.LI
+Constants
+.LI
+Computed values (\*LVALUE\*O)
+.LI
+Register values (\*LREGV\*O)
+.LI
+Address translation structure (\*L*XLATE\*O)
+.LE
+.PP
+Constant types include \*Lchar\*O, \*Lint\*O, \*Llong\*O, \*Lchar *\*O,
+\*Lchar[]\*O, \*Lint[]\*O, and \*Llong[]\*O . Often, arrays are used
+to communicate static information, especially large data structures,
+to analysis procedures.  Three special keywords exist to facilitate
+the passing of array and string arguments:
+.VL
+.LI "\*Lconst\*O"
+Indicates that the analysis routine cannot modify or write to the
+passed array or string. Atom allocates the memory for such a string
+or array in the instrumented program's read-only memory.  Using
+\*Lconst\*O can thus greatly reduce the memory usage of instrumented
+programs that have multiple images active simultaneously.
+.LI "\*Lstable\*O"
+Indicates that Atom does not need to make a copy of the data for the
+string or array during instrumentation. If your instrumentation code
+passes a \*Lstable\*O buffer to \*LAddCallObj\*O, \*LAddCallProc\*O,
+\*LAddCallBlock\*O, or \*LAddCallInst\*O, it must not modify or free
+the buffer until after \*LWriteObj\*O is called for the object
+containing the given \*LObj\*O, \*LProc\*O, \*LBlock\*O, or \*LInst\*O.
+If you pass a \*Lstable\*O buffer to \*LAddCallProgram\*O, you must
+never modify or free the buffer.
+.sp
+Strings returned by the following routines can be considered stable
+for the duration of the instrumentation process: \*LGetObjName\*O,
+\*LGetObjOutName\*O, \*LGetAnalName\*O, \*LGetObjInstArray\*O,
+\*LProcName\*O, \*LProcFileName\*O, and \*LGetInstProcCalled\*O.
+.LI "\*Lfree\*O"
+Indicates that Atom does not need to make a copy of the data for the
+string or array during instrumentation and that it will deallocate the
+buffer (by calling \*Lfree\*O) when it is done with it.
+Instrumentation code should never modify or free such a buffer
+after it has been passed to \*LAddCallObj\*O, \*LAddCallProc\*O,
+\*LAddCallBlock\*O, \*LAddCallInst\*O, or \*LAddCallProgram\*O.
+.LE
+.PP
+You can use the \*Lconst\*O keyword with either \*Lstable\*O or
+\*Lfree\*O. The \*Lstable\*O and \*Lfree\*O keywords are mutually
+exclusive.
+.PP
+The \*LVALUE\*O argument type defines an argument with a 64-bit value
+that Atom must compute before passing it to the analysis procedure.
+There are two arguments of the \*LVALUE\*O argument type, as listed
+in the following table.  For such arguments, specify \*LVALUE\*O in
+the \*LAddCallProto\*O call and the argument's symbolic name in the
+call to \*LAddCallObj\*O, \*LAddCallProc\*O, \*LAddCallBlock\*O,
+\*LAddCallInst\*O, or \*LAddCallProgram\*O.
+.\" ***PAGE BREAK FOR POSTSCRIPT OUTPUT
+.nL
+.ne 8
+.TS
+tab(@);
+lfHB lfHB lfHB
+lw(.6i) lw(1.0i) lw(2.85i) .
+_
+.sp
+Type@Argument@Description
+.sp
+_
+T{
+\*LVALUE\*O
+T}@T{
+\*LEffAddrValue\*O
+T}@T{
+Effective load-time address of a load or store instruction. This is the
+sum of the 64-bit address contained in the base register and the
+signed 16-bit displacement.  (Note that, for a shared library, the
+run-time PC differs from the compile-time PC.)  This argument is
+valid only on load or store instructions instrumented by an
+\*LAddCallInst\*O call with \*LInstBefore\*O specified.  Otherwise,
+Atom reports an error.
+T}
+.sp
+T{
+\*LVALUE\*O
+T}@T{
+\*LBrCondValue\*O
+T}@T{
+Outcome of a conditional branch instruction.  Returns a zero (0) if the
+branch condition will evaluate to false or a 64-bit nonzero value if it
+will evaluate to true.  This argument is valid only on conditional
+branch instructions instrumented by an \*LAddCallInst\*O call with
+\*LInstBefore\*O specified.  Otherwise, Atom reports an error.
+T}
+.sp
+.TE
+.PP
+The \*LREGV\*O argument type defines an argument representing the
+contents of a register.  There are several arguments
+of the \*LREGV\*O argument type, as listed in the following table.
+For such arguments, specify \*LREGV\*O in the \*LAddCallProto\*O call
+and the argument's symbolic name in the call to \*LAddCallObj\*O,
+\*LAddCallProc\*O, \*LAddCallBlock\*O, \*LAddCallInst\*O, or
+\*LAddCallProgram\*O.
+.nL
+.ne 8
+.TS
+tab(@);
+lfHB lfHB lfHB
+lw(.6i) lw(1.0i) lw(2.85i) .
+_
+.sp
+Type@Argument@Description
+.sp
+_
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_\*Vn\*O
+T}@T{
+Integer register \*Vn\*O, where \*Vn\*O is a value from 0 to 31.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LFREG_\*Vn\*O
+T}@T{
+Floating-point register \*Vn\*O, where \*Vn\*O is a value from 0 to 31.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_RA\*O
+T}@T{
+Return address register.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_GP\*O
+T}@T{
+Global pointer.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_SP\*O
+T}@T{
+Stack pointer.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_ZERO\*O
+T}@T{
+Integer register 31.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_CC\*O
+T}@T{
+Processor cycle counter.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_PC\*O
+T}@T{
+Pure compile-time (that is, noninstrumented) program counter at the
+instrumentation point. (Note that, for a shared library, the run-time
+PC differs from the compile-time PC.)
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_IPC\*O
+T}@T{
+Instrumented program counter at run-time  If the call is from a shared
+library, the run-time PC is passed.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_ARG_\*Vn\*O
+T}@T{
+Integer argument register \*Vn\*O, where \*Vn\*O is a value from 1 to 6.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LREG_RETVAL\*O
+T}@T{
+Integer function return value.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LFREG_ZERO\*O
+T}@T{
+Floating-point register 31.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LFREG_ARG_\*Vn\*O
+T}@T{
+Floating-point argument register \*Vn\*O, where \*Vn\*O is a value from 1 to 6.
+T}
+.sp
+T{
+\*LREGV\*O
+T}@T{
+\*LFREG_RETVAL\*O
+T}@T{
+Floating-point function return value.
+T}
+.sp
+_
+.TE
+.PP
+Note that the special \*LREGV\*O-type value \*LREG_NOTUSED\*O is also defined
+as a return value from \*LGetInstRegEnum\*O.  You cannot pass it as an
+argument to \*LAddCallObj\*O, \*LAddCallProc\*O, \*LAddCallBlock\*O,
+\*LAddCallInst\*O, or \*LAddCallProgram\*O.
+.PP
+.nL
+.ne 6
+.ce 1
+\f(HBNote\fP
+.sp 6p
+.rS 5
+When you use \*LAddCallObj\*O, you will sometimes find that the analysis
+routine for each added call requires a slightly different prototype.
+This usually occurs when you pass an array argument and the number of
+elements in the array depends on the contents of the object.  Normally,
+it is illegal to reprototype an analysis routine, but Atom makes an
+exception for array parameters.  If the only difference between the new
+prototype and the old prototype is the length of an array parameter,
+Atom allows you to use \*LAddCallProto\*O to reprototype the analysis
+routine.  Subsequent calls to that analysis routine will use the new
+array length.
+.sp 6p
+.rE
+.\" .PP
+.SS "AddCallProgram Routine"
+Use the \*LAddCallProgram\*O routine in an \*LInstrumentInit\*O or
+\*LInstrumentAll\*O routine
+to add a call to an analysis procedure before
+a program starts execution or after it completes execution.  Typically
+such an analysis procedure does something that applies to the whole
+program, such as opening an output file or parsing command line
+options.  Supply a \*LPlaceType\*O value of \*LProgramBefore\*O or
+\*LProgramAfter\*O as the instrumentation point, followed by the name
+of the analysis procedure and a list of its arguments.
+.PP
+Because the \*LInstrument\*O routine is called for each object in a
+program, avoid calling \*LAddCallProgram\*O from the \*LInstrument\*O
+routine.
+.PP
+If the program forks and \*LProgramBefore\*O is specified, Atom calls
+the analysis procedure only once: before the parent process starts
+execution.  If \*LProgramAfter\*O is specified, Atom calls the
+analysis procedure after each child process, and the parent process,
+completes execution.
+.\" .PP
+.SS "AddCallObj Routine"
+Use the \*LAddCallObj\*O routine in an instrumentation routine to add
+a call to an analysis procedure before an object starts execution or
+after it completes execution.  Typically such an analysis procedure
+does something that applies to the single object, such as initializing
+some data for its procedures.  Supply a \*LPlaceType\*O value of
+\*LObjBefore\*O or \*LObjAfter\*O as the instrumentation point,
+followed by the name of the analysis procedure and a list of its
+arguments.
+.PP
+Instrumentation code added at the beginning of an object is executed
+immediately after the object is loaded into memory (before any
+procedures in that object are executed).  Instrumentation code added
+at the end of an object is executed immediately before that object is
+unloaded from memory (after all procedures from that object have
+finished execution).
+.PP
+.ce 1
+\f(HBNote\fP
+.sp 6p
+.rS 5
+An \*LInstrumentAll\*O routine must call the \*LBuildObj\*O routine
+before calling \*LAddCallObj\*O, \*LAddCallBlock\*O, \*LAddCallProc\*O,
+or \*LAddCallInst\*O to add analysis routine calls, and before
+traversing the procedures in the object.
+\*LBuildObj\*O builds the internal data structures Atom uses to
+manipulate the object.  After the Atom tool traverses and instruments
+the object, the \*LInstrumentAll\*O routine must call the
+\*LWriteObj\*O routine to write out the instrumented version of the
+object. See the \*Latom_object_management\*O(5) reference page for
+additional information.
+.sp 6p
+.rE
+.\" .PP
+.SS "AddCallProc Routine"
+Use the \*LAddCallProc\*O routine in an instrumentation routine to add
+a call to an analysis procedure before a procedure starts execution or
+after it completes execution. Supply a \*LPlaceType\*O value of
+\*LProcBefore\*O or \*LProcAfter\*O as the instrumentation point,
+followed by the name of the analysis procedure and a list of its
+arguments.
+.ML
+The following factors determine when the analysis procedures are
+called:
+.LI
+If the procedure has multiple entry points and \*LProcBefore\*O is
+specified, Atom calls the analysis procedure at each entry point.
+.LI
+If the procedure has multiple exit points and \*LProcAfter\*O is
+specified, Atom calls the analysis procedure each time it issues a
+return.
+.LI
+If the procedure does not issue a return (for example, it calls
+\*Lexit\*O or \*Llongjmp\*O), Atom does not call the analysis procedure.
+.LE
+.\" .PP
+.SS "AddCallBlock Routine"
+Use the \*LAddCallBlock\*O routine in an instrumentation routine to
+add a call to an analysis procedure before a basic block starts
+execution or after it completes execution.
+Supply a \*LPlaceType\*O value of \*LBlockBefore\*O or
+\*LBlockAfter\*O as the instrumentation point, followed by the name
+of the analysis procedure and a list of its arguments.
+.PP
+If the basic block ends with an unconditional branch or jump and
+\*LBlockAfter\*O is specified, Atom calls the analysis procedure after
+the basic block completes execution.  However, if the basic block
+ends with a jump to a subroutine that does not return (for instance,
+the subroutine calls \*Lexit\*O or \*Llongjmp\*O),
+Atom does not call the analysis procedure.
+.\" .PP
+.SS "AddCallInst Routine"
+Use the \*LAddCallInst\*O routine in an instrumentation routine to
+add a call to an analysis procedure before a given instruction
+executes or after it executes.
+Supply a \*LPlaceType\*O value of \*LInstBefore\*O or \*LInstAfter\*O
+as the instrumentation point, followed by the name of the analysis
+procedure and a list of its arguments.
+.PP
+If the instruction is an unconditional branch or jump and
+\*LInstAfter\*O is specified, Atom calls the analysis procedure after
+the instruction executes.  However, if the instruction is a jump
+to a subroutine that does not return (for example, the subroutine
+calls \*Lexit\*O or \*Llongjmp\*O), Atom does not call the analysis
+procedure.
+.PP
+An implied scope hierarchy exists in the ordering of calls to
+analysis procedures before and after the execution of programs,
+objects, procedures, basic blocks, and instructions.
+By enforcing a scope hierarchy, Atom guarantees, for instance, that
+a procedure added at \*LProgramBefore\*O executes before procedures
+added in lower scopes.  Procedures added at \*LProgramAfter\*O
+execute after all application instructions have executed.
+.\" .PP
+.SS "ReplaceProcedure Routine"
+Use the \*LReplaceProcedure\*O routine to replace a procedure call in
+the instrumented program.  For instance, Atom's Third Degree tool uses
+\*LReplaceProcedure\*O to replace all calls to dynamic memory
+allocation routines with special-purpose procedures.
+It defines the special procedure \*L3rd_malloc\*O as having the same
+arguments and return value as the original \*Lmalloc\*O.
+.SH EXAMPLES
+.PP
+The following example accumulates wall-clock and per-process time for
+a procedure.  The instrumentation routine defines the prototypes for
+calls to analysis procedures and identifies the intrumentation points
+at which those calls take place:
+.oS
+   AddCallProto("Start(REGV)");
+   AddCallProto("Stop(REGV)");
+   .
+   .
+   .
+   AddCallProc(p,ProcBefore,"Start",REG_CC);
+   AddCallProc(p,ProcAfter,"Stop",REG_CC);
+   .
+   .
+   .
+.oE
+The analysis routine is complicated by the format of the cycle counter.
+The low-order 32 bits contain a free running cycle count.
+The high-order 32 bits of the counter are an offset that, when added
+to the low-order 32 bits, produces a cycle count for this process.
+The low-order 32 bits can be used directly to determine wall clock
+times:
+.oS
+   long total;
+   long process;
+   int ccStart;
+   int ccStartProcess;
+.sp
+   void Start(unsigned long cc) {
+     ccStart = cc;
+     ccStartProcess = ((cc << 32) + cc) >> 32;
+   }
+   void Stop(unsigned long cc) {
+     int ccEnd = cc;
+     int ccEndProcess = ((cc << 32) + cc) >> 32;
+     total += (unsigned) (ccEnd - ccStart);
+     process += (unsigned) (ccEndProcess - ccStartProcess);
+   }
+.oE
+.SH RETURN VALUES
+.PP
+These routines have no return values.
+.SH FILES
+.PP
+.VL
+.LI "\*L/usr/include/cmplrs/atom.inst.h\*O"
+Header file containing external definitions of Atom routines
+.LE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_navigation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_resolvers\*O(5),
+\*Latom_description_file\*O(5), \*Latom_object_management\*O(5), \*Latom_instrumentation_routines\*O(5), \*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

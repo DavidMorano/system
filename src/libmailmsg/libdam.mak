@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -111,7 +110,7 @@ OBJ13= matstr.o matostr.o matpstr.o matpcasestr.o
 OBJ14= matkeystr.o matnstr.o matsubstr.o matcasesubstr.o
 OBJ15=
 
-OBJ16= mallocstuff.o fileobject.o 
+OBJ16= mallocstuff.o fileread.o
 OBJ17= 
 OBJ18= 
 OBJ19= 
@@ -256,7 +255,7 @@ OBJ139= isasocket.o isinteractive.o isfsremote.o isproc.o
 OBJ140= fsdirtreestat.o statvfsdir.o
 OBJ141= rmsesfiles.o dircount.o isdirempty.o
 OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
-OBJ143= intceil.o intfloor.o intsat.o
+OBJ143=
 
 OBJ144= cfdouble.o cfdecf.o cfb26.o
 OBJ145= cfdecmf.o cfdect.o cfroman.o
@@ -270,7 +269,7 @@ OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
 OBJ153= getev.o getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
 OBJ154= msghdr.o cmsghdr.o
-OBJ155= readfileline.o readfilestrs.o mailboxappend.o
+OBJ155= mailboxappend.o
 OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
 OBJ157= localgetorg.o localgetorgcode.o localgetorgloc.o 
 OBJ158= localgetnetload.o localsetnetload.o localgetsystat.o localsetsystat.o
@@ -370,6 +369,7 @@ all:			$(ALL)
 so:			$(T).so
 
 a:			$(T).a
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -674,7 +674,6 @@ gecos.o:		gecos.c gecos.h
 kinfo.o:		kinfo.c kinfo.h
 
 msfile.o:		msfile.c msfile.h msfilee.h
-
 msfilee.o:		msfilee.c msfilee.h
 
 ebuf.o:			ebuf.c ebuf.h
@@ -795,12 +794,20 @@ gethe.o:		gethe.dir
 gethe.dir:
 	makesubdir $@
 
+# STRLISTX
+strlistx.o:		strlistx.dir
+strlistx.dir:
+	makesubdir $@
+
+# FILEREAD
+fileread.o:		fileread.dir
+fileread.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
 printhelp.o:		printhelp.cc printhelp.hh
-intrem.o:		intrem.cc intrem.h
-addsat.o:		addsat.cc addsat.h
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
 getlogx.o:		getlogx.cc getlogx.h

@@ -1814,18 +1814,14 @@ static int procqueryouter(PROGINFO *pip,void *ofp,int qfd)
 }
 /* end subroutine (procqueryouter) */
 
-
-static int procquerytermout(PROGINFO *pip,void *ofp,int qfd)
-{
+static int procquerytermout(PROGINFO *pip,void *ofp,int qfd) noex {
 	LOCINFO		*lip = pip->lip ;
-	FILER		b ;
-	const int	to = pip->to_read ;
+	cint		to = pip->to_read ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
-	if ((rs = filer_start(&b,qfd,0L,0,0)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	if (filer b ; (rs = filer_start(&b,qfd,0z,0,0)) >= 0) {
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 

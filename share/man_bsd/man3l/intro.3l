@@ -1,0 +1,374 @@
+.\" @(#)Intro.3l 1.44 90/02/15 SMI;
+.\" Copyright (C) 1987, Sun Microsystems, Inc.
+.TH INTRO 3L "21 January 1990" "BSD UNIX [SunOS 4.1.3]"
+.SH NAME
+intro \- introduction to the lightweight process library (LWP)
+.SH DESCRIPTION
+.IX "lightweight processes library" "" "" "" PAGE MAJOR
+.LP
+The lightweight process library
+(\s-1LWP\s0)
+provides a mechanism to support
+multiple threads of control that share a single address space.
+Under SunOS, the address space is derived from a single
+.I forked
+(\*(lqheavyweight\*(rq) process.
+Each thread has its own stack segment (specified when the thread is created)
+so that it can access local variables
+and make procedure calls independently of other threads.
+The collection of threads sharing an address space is called a
+.IR pod .
+Under SunOS,
+threads share all of the resources of the
+heavyweight process that contains the pod, including descriptors and signal
+handlers.
+.LP
+The 
+.SM LWP
+provides a means for creating and destroying
+threads, message exchange between threads, manipulating
+condition variables and
+monitors, handling synchronous exceptions, mapping asynchronous
+events into messages, mapping synchronous events into
+exceptions, arranging for special per-thread context,
+multiplexing the clock for timeouts,
+and scheduling threads both preemptively and non\-preemptively.
+.LP
+The
+.SM LWP
+system exists as a library of routines
+.RB ( /usr/lib/liblwp.a )
+linked in
+.RB ( \-llwp )
+with a client program which should
+.B #include
+the file
+.BR <lwp/lwp.h> .
+.B main
+is transparently converted into a lightweight process as soon as
+it attempts to use any
+.SM LWP
+primitives.
+.LP
+When an object created by a
+.SM LWP
+primitive is destroyed,
+every attempt is made to clean up after it.
+For example, if a thread dies, all threads blocked on sends to
+or receives from that thread are unblocked, and all monitor locks
+held by the dead thread are released.
+.LP
+Because there is no kernel support for threads at present,
+system calls effectively block the entire pod.
+By linking in the non-blocking I/O library
+.RB ( \-lnbio )
+ahead of the
+.SM LWP
+library,
+you can alleviate this problem for those system calls that can issue
+a signal when a system call would be profitable to try.
+This library (which redefines some system calls)
+uses asynchronous I/O and events (for example,
+.SB SIGCHLD
+and
+.SM
+.BR SIGIO \s0)
+to make blocking less painful.
+The system calls remapped by the nbio library are:
+.BR open (2V),
+.BR socket (2),
+.BR pipe (2V),
+.BR close (2V),
+.BR read (2V),
+.BR write (2V) ,
+.BR send (2),
+.BR recv (2),
+.BR accept (2),
+.BR connect (2),
+.B select (2)
+and
+.BR wait (2V).
+.SH RETURN VALUES
+.LP
+.SM LWP
+primitives
+return
+non-negative integers
+on success.
+On errors,
+they return
+\-1.
+See
+.BR lwp_perror (3L)
+for details on error handling.
+.LP
+.SH FILES
+.PD 0
+.TP 20
+.B /usr/lib/liblwp.a
+.TP
+.B /usr/lib/libnbio.a
+.\".TP
+.\".B <lwp/check.h>
+.\".TP
+.\".B <lwp/lwp.h>
+.\".TP
+.\".B <lwp/lwperror.h>
+.\".TP
+.\".B <lwp/lwpmachdep.h>
+.\".TP
+.\".B <lwp/stackdep.h>
+.SH SEE ALSO
+.BR accept (2),
+.BR close (2V),
+.BR connect (2),
+.BR open (2V),
+.BR pipe (2V),
+.BR read (2V),
+.BR recv (2),
+.BR select (2),
+.BR send (2),
+.BR socket (2),
+.BR wait (2V)
+.BR write (2V) ,
+.LP
+.I Lightweight Processes
+in the
+.TX SSO
+.SH INDEX
+The following are the primitives currently supported, grouped roughly
+by function.
+.SS "Thread Creation"
+.nf
+.ft B
+lwp_self(tid)
+lwp_getstate(tid, statvec)
+lwp_setregs(tid, machstate)
+lwp_getregs(tid, machstate)
+lwp_ping(tid)
+lwp_create(tid, pc, prio, flags, stack, nargs, arg1, .\|.\|.\|, argn)
+lwp_destroy(tid)
+lwp_enumerate(vec, maxsize)
+pod_setexit(status)
+pod_getexit(\|)
+pod_exit(status)
+\s-1SAMETHREAD\s0(t1, t2)
+.ft R
+.fi
+.SS "Thread Scheduling"
+.nf
+.ft B
+pod_setmaxpri(maxprio)
+pod_getmaxpri(\|)
+pod_getmaxsize(\|)
+lwp_resched(prio)
+lwp_setpri(tid, prio)
+lwp_sleep(timeout)
+lwp_suspend(tid)
+lwp_resume(tid)
+lwp_yield(tid)
+lwp_join(tid)
+.ft R
+.fi
+.SS "Error Handling"
+.nf
+.ft B
+lwp_geterr(\|)
+lwp_perror(s)
+lwp_errstr(\|)
+.ft R
+.fi
+.SS Messages
+.nf
+.ft B
+msg_send(tid, argbuf, argsize, resbuf, ressize)
+msg_recv(tid, argbuf, argsize, resbuf, ressize, timeout)
+\s-1MSG_RECVALL\s0(tid, argbuf, argsize, resbuf, ressize, timeout)
+msg_reply(tid)
+msg_enumsend(vec, maxsize)
+msg_enumrecv(vec, maxsize)
+.ft R
+.fi
+.SS "Event Mapping (Agents)"
+.nf
+.ft B
+agt_create(agt, event, memory)
+agt_enumerate(vec, maxsize)
+agt_trap(event)
+.ft R
+.fi
+.SS "Thread Synchronization: Monitors"
+.nf
+.ft B
+mon_create(mid)
+mon_destroy(mid)
+mon_enter(mid)
+mon_exit(mid)
+mon_enumerate(vec, maxsize)
+mon_waiters (mid, owner, vec, maxsize)
+mon_cond_enter(mid)
+mon_break(mid)
+\s-1MONITOR\s0(mid)
+\s-1SAMEMON\s0(m1, m2)
+.ft R
+.fi
+.SS "Thread Synchronization: Condition Variables"
+.nf
+.ft B
+cv_create(cv, mid)
+cv_destroy(cv)
+cv_wait(cv)
+cv_notify(cv)
+cv_send(cv, tid)
+cv_broadcast(cv)
+cv_enumerate(vec, maxsize)
+cv_waiters(cv, vec, maxsize)
+\s-1SAMECV\s0(c1, c2)
+.ft R
+.fi
+.SS "Exception Handling"
+.nf
+.ft B
+exc_handle(pattern, func, arg)
+exc_unhandle(\|)
+(*exc_bound(pattern, arg))(\|)
+exc_notify(pattern)
+exc_raise(pattern)
+exc_on_exit(func, arg)
+exc_uniqpatt(\|)
+.ft R
+.fi
+.SS "Special Context Handling"
+.nf
+.ft B
+lwp_ctxinit(tid, cookie)
+lwp_ctxremove(tid, cookie)
+lwp_ctxset(save, restore, ctxsize, optimise)
+lwp_ctxmemget(mem, tid, ctx)
+lwp_ctxmemset(mem, tid, ctx)
+lwp_fpset(tid)
+lwp_libcset(tid)
+.ft R
+.fi
+.SS "Stack Management"
+.nf
+.ft B
+\s-1CHECK\s0(location, result)
+lwp_setstkcache(minsize, numstks)
+lwp_newstk(\|)
+lwp_datastk(data, size, addr)
+lwp_stkcswset(tid, limit)
+lwp_checkstkset(tid, limit)
+\s-1STKTOP\s0(s)
+.ft R
+.fi
+.SH BUGS
+.LP
+There is no language support available from C.
+.LP
+There is no kernel support yet.
+Thus system calls in different threads cannot execute in parallel.
+.LP
+Killing a process that uses the non-blocking I/O library may leave
+objects (such as its standard input) in a non-blocking state.
+This could cause confusion to the shell.
+.br
+.ne 10 
+.SH "LIST OF LWP LIBRARY FUNCTIONS"
+.sp
+.if t .ta 25n; +20n
+.if n .ta 20n; +20n
+.nf
+\fBName	Appears on Page	Description\fR
+.sp
+.nr zZ 1
+.\" @(#)List.3l 1.13 90/02/15 SMI;
+.if \n(zZ=1 .ig zZ
+.TH LIST 3L "18 January 1988"
+.SH LIST OF LWP LIBRARY FUNCTIONS
+.nf
+.sp
+.ta 20n; +20n
+\fBName	Appears on Page	Description\fR
+.sp
+.zZ
+\fBagt_create\fP	\fBagt_create\fP(3L)	 map LWP events into messages
+\fBagt_enumerate\fP	\fBagt_create\fP(3L)	 map LWP events into messages
+\fBagt_trap\fP	\fBagt_create\fP(3L)	 map LWP events into messages
+\fB\s-1CHECK\s0\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBcv_broadcast\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_create\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_destroy\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_enumerate\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_notify\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_send\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_wait\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBcv_waiters\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fBexc_bound\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBexc_handle\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBexc_notify\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBexc_on_exit\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBexc_raise\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBexc_unhandle\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBexc_uniqpatt\fP	\fBexc_handle\fP(3L)	 LWP exception handling
+\fBlwp_checkstkset\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBlwp_create\fP	\fBlwp_create\fP(3L)	 LWP thread creation and destruction primitives
+\fBlwp_ctxinit\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_ctxmemget\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_ctxmemset\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_ctxremove\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_ctxset\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_datastk\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBlwp_destroy\fP	\fBlwp_create\fP(3L)	 LWP thread creation and destruction primitives
+\fBlwp_enumerate\fP	\fBlwp_status\fP(3L)	 LWP status information
+\fBlwp_errstr\fP	\fBlwp_perror\fP(3L)	 LWP error handling
+\fBlwp_fpset\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_geterr\fP	\fBlwp_perror\fP(3L)	 LWP error handling
+\fBlwp_getregs\fP	\fBlwp_status\fP(3L)	 LWP status information
+\fBlwp_getstate\fP	\fBlwp_status\fP(3L)	 LWP status information
+\fBlwp_join\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fBlwp_libcset\fP	\fBlwp_ctxinit\fP(3L)	 special LWP context operations
+\fBlwp_newstk\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBlwp_perror\fP	\fBlwp_perror\fP(3L)	 LWP error handling
+\fBlwp_ping\fP	\fBlwp_status\fP(3L)	 LWP status information
+\fBlwp_resched\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fBlwp_resume\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fBlwp_self\fP	\fBlwp_status\fP(3L)	 LWP status information
+\fBlwp_setpri\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fBlwp_setregs\fP	\fBlwp_status\fP(3L)	 LWP status information
+\fBlwp_setstkcache\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBlwp_sleep\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fBlwp_stkcswset\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBlwp_suspend\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fBlwp_yield\fP	\fBlwp_yield\fP(3L)	 control LWP scheduling
+\fB\s-1MINSTACKSZ\s0\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+\fBmon_break\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_cond_enter\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_create\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_destroy\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_enter\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_enumerate\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_exit\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmon_waiters\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fB\s-1MONITOR\s0\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fBmsg_enumrecv\fP	\fBmsg_send\fP(3L)	 LWP send and receive messages
+\fBmsg_enumsend\fP	\fBmsg_send\fP(3L)	 LWP send and receive messages
+\fBmsg_recv\fP	\fBmsg_send\fP(3L)	 LWP send and receive messages
+\fB\s-1MSG_RECVALL\s0\fP	\fBmsg_send\fP(3L)	 LWP send and receive messages
+\fBmsg_reply\fP	\fBmsg_send\fP(3L)	 LWP send and receive messages
+\fBmsg_send\fP	\fBmsg_send\fP(3L)	 LWP send and receive messages
+\fBpod_exit\fP	\fBlwp_create\fP(3L)	 LWP thread creation and destruction primitives
+\fBpod_getexit\fP	\fBlwp_create\fP(3L)	 LWP thread creation and destruction primitives
+\fBpod_getmaxpri\fP	\fBpod_getmaxpri\fP(3L)	 control LWP scheduling priority
+\fBpod_getmaxsize\fP	\fBpod_getmaxpri\fP(3L)	 control LWP scheduling priority
+\fBpod_setexit\fP	\fBlwp_create\fP(3L)	 LWP thread creation and destruction primitives
+\fBpod_setmaxpri\fP	\fBpod_getmaxpri\fP(3L)	 control LWP scheduling priority
+.br
+.ne 5
+\fB\s-1SAMECV\s0\fP	\fBcv_create\fP(3L)	 manage LWP condition variables
+\fB\s-1SAMEMON\s0\fP	\fBmon_create\fP(3L)	 LWP routines to manage critical sections
+\fB\s-1SAMETHREAD\s0\fP	\fBlwp_create\fP(3L)	 LWP thread creation and destruction primitives
+\fB\s-1STKTOP\s0\fP	\fBlwp_newstk\fP(3L)	 LWP stack management
+.fi
+.nr zZ 0
+.fi

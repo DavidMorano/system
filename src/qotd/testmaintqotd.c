@@ -161,29 +161,16 @@ done:
 
 /* local subroutines */
 
-
-static int dumpfile(int fd,int of)
-{
-	FILER	b ;
-	const int	fo = (of | O_NETWORK) ;
-	int	rs ;
-#if	CF_DEBUGS
-	debugprintf("main/dumpfile: entered\n") ;
-#endif
-	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
-	    const int	to = 0 ;
-	    const int	llen = LINEBUFLEN ;
+static int dumpfile(int fd,int of) noex {
+	cint		fo = (of | O_NETWORK) ;
+	int		rs ;
+	if (filer b ; (rs = filer_start(&b,fd,0z,0,fo)) >= 0) {
+	    cint	to = 0 ;
+	    cint	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
-#if	CF_DEBUGS
-	        debugprintf("main/dumpfile: readline() len=%d\n",len) ;
-#endif
 	        fbwrite(stdout,lbuf,len) ;
-#if	CF_DEBUGS
-	        debugprintf("main/dumpfile: l=>%t<\n",lbuf,
-			strlinelen(lbuf,len,70)) ;
-#endif
 	        if (rs < 0) break ;
 	    } /* end while */
 	    filer_finish(&b) ;

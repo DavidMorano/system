@@ -1,0 +1,14 @@
+BABIES
+
+This little program prints out some information.
+
+Synopsis:
+
+$ babies <date(s)> [-db <bdb>] [-V]
+
+where:
+
+<date(s)>	date(s) ('[CC]YYMMDD') to use instead of current date
+-db <bdb>	alternative database
+-V		print program version to standard-error and then exit
+

@@ -23,11 +23,13 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-int mkutmpid(char *,int,cchar *,int) noex ;
+extern int	mkutmpid(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 

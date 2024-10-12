@@ -86,9 +86,8 @@
 bool starmat(cchar *se,cchar *s) noex {
 	bool		f ;
 	if (cchar *tp ; (tp = strchr(se,'*')) != nullptr) {
-	    int		sl ;
 	    f = false ;
-	    if (strncmp(s,se,(tp - se)) == 0) {
+	    if (int sl ; strncmp(s,se,(tp - se)) == 0) {
 	        cint	sl1 = strlen(s) ;
 	        cint	sl2 = strlen(se) ;
 	        tp += 1 ;

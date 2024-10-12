@@ -1,4 +1,5 @@
 /* comparse HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* comment-parse (for RFC822) small strings (like for stupid RFC822 date) */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>		/* |LINEBUFLEN| */
 
 

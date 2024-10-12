@@ -1,4 +1,4 @@
-/* conallof SUPPORT */
+/* conallof SUPPORT (contains-all-of) */
 /* lang=C++20 */
 
 /* does the given string have all of the given characters? */
@@ -103,7 +103,7 @@ int conallof(cchar *sp,int sl,cchar *tstr) noex {
 			bs.reset(ch) ;
 			f = (bs.count() == 0) ;
 	                if (f) break ;
-		    } /* end if (sichr) */
+		    } /* end if */
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */

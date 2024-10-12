@@ -6,3 +6,6 @@ The following are supported:
 	hash_elf
 	hash_hsieh
 
+Also, the support function is available:
+	hashindex
+

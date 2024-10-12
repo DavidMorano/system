@@ -48,7 +48,7 @@
 #include	<ascii.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnset(3uc)| */
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<matxstr.h>
@@ -611,8 +611,7 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 
 static int mailbox_parse(mailbox *op) noex {
 	fbliner		ls, *lsp = &ls ;
-	filer		fb ;
-	const off_t	soff = 0L ;
+	const off_t	soff = 0z ;
 	cint		bsize = (32 * op->pagesize) ;
 	int		rs ;
 	int		rs1 ;
@@ -620,7 +619,7 @@ static int mailbox_parse(mailbox *op) noex {
 	if_constexpr (f_readto) {
 	    to = op->to_read ;
 	}
-	if ((rs = filer_start(&fb,op->mfd,soff,bsize,0)) >= 0) {
+	if (filer fb ; (rs = fb.start(op->mfd,soff,bsize,0)) >= 0) {
 	    if ((rs = fbliner_start(lsp,&fb,soff,to)) >= 0) {
 	        int	mi = 0 ;
 	        while ((rs = mailbox_parsemsg(op,lsp,mi)) > 0) {
@@ -631,7 +630,7 @@ static int mailbox_parse(mailbox *op) noex {
 	        rs1 = fbliner_finish(lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (liner) */
-	    rs1 = filer_finish(&fb) ;
+	    rs1 = fb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? op->msgs_total : rs ;
@@ -1015,7 +1014,7 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	    mc.bp = bp ;
 	    mc.bl = bl ;
 	    mc.moff = 0 ;
-	    if ((rs = filer_start(fbp,tfd,0L,bsize,0)) >= 0) {
+	    if ((rs = fbp->start(tfd,0z,bsize,0)) >= 0) {
 	        for (int mi = 0 ; mi < op->msgs_total ; mi += 1) {
 		    bool	f = false ;
 		    bool	fcopy = false ;
@@ -1045,11 +1044,11 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	                u_seek(mfd,op->mblen,SEEK_SET) ;
 	                mc.moff = op->mblen ;
 	            }
-	            rs = filer_writefd(fbp,bp,bl,mfd,-1) ;
+	            rs = fbp->writefd(bp,bl,mfd,-1) ;
 	            elen = rs ;
 	            wlen += rs ;
 	        } /* end if (finishing off) */
-	        rs1 = filer_finish(fbp) ;
+	        rs1 = fbp->finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
 	    if (rs >= 0) {
@@ -1089,7 +1088,8 @@ static int mailbox_msgcopy(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	        rs = mailbox_msgcopyadd(op,mcp,mip) ;
 	        wlen += rs ;
 	    } else {
-	        rs = filer_writefd(mcp->fbp,mcp->bp,mcp->bl,mfd,mip->mlen) ;
+		filer	*fbp = mcp->fbp ;
+	        rs = fbp->writefd(mcp->bp,mcp->bl,mfd,mip->mlen) ;
 	        wlen += rs ;
 	    }
 	    mcp->moff += wlen ;
@@ -1105,14 +1105,14 @@ static int mailbox_msgcopyadd(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	int		wlen = 0 ;
 	int		wl = mcp->bl ;
 	char		*wp = mcp->bp ;
-	if ((rs = filer_writefd(mcp->fbp,wp,wl,mfd,ehlen)) >= 0) {
+	if (filer *fbp = mcp->fbp ; (rs = fbp->writefd(wp,wl,mfd,ehlen)) >= 0) {
 	    wlen += rs ;
 	    if (mip->f.addany && mip->f.hdradds) {
 		vecstr	*hlp = &mip->hdradds ;
 	        cchar	*sp{} ;
 	        for (int i = 0 ; vecstr_get(hlp,i,&sp) >= 0 ; i += 1) {
 	            if (sp) {
-	                rs = filer_writehdr(mcp->fbp,sp,-1) ;
+	                rs = filer_writehdr(fbp,sp,-1) ;
 	                wlen += rs ;
 		    }
 	            if (rs < 0) break ;
@@ -1121,7 +1121,7 @@ static int mailbox_msgcopyadd(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	    if (rs >= 0) {
 		wl = mcp->bl ;
 		wp = mcp->bp ;
-	        rs = filer_writefd(mcp->fbp,wp,wl,mfd,(mip->blen+1)) ;
+	        rs = fbp->writefd(wp,wl,mfd,(mip->blen+1)) ;
 	        wlen += rs ;
 	    }
 	} /* end if (filer_writefd) */
@@ -1212,7 +1212,7 @@ static int writeblanks(int mfd,int len) noex {
 	    while ((rs >= 0) && (rlen > 0)) {
 	        cint	maxlen = (rlen > 1) ? (rlen-1) : 0 ;
 	        ll = min(llen,maxlen) ;
-	        strnsetblanks(lbuf,ll) ;
+	        strnblanks(lbuf,ll) ;
 	        lbuf[ll++] = '\n' ;
 	        rs = uc_write(mfd,lbuf,ll) ;
 	        rlen -= rs ;

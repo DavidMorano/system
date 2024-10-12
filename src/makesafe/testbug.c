@@ -1665,10 +1665,8 @@ static int proctouchfile(PROGINFO *pip,cchar touchfname[])
 
 
 /* process the lines that contain dependency names */
-static int proclines(PROGINFO *pip,int fd)
-{
-	FILER		buf ;
-	const int	to = pip->to_read ;
+static int proclines(PROGINFO *pip,int fd) noex {
+	cint		to = pip->to_read ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1689,9 +1687,9 @@ static int proclines(PROGINFO *pip,int fd)
 	}
 #endif /* CF_DEBUG */
 
-	    if ((rs = filer_start(&buf,fd,0L,FBUFLEN,0)) >= 0) {
+	    if (filer buf ; (rs = filer_start(&buf,fd,0z,FBUFLEN,0)) >= 0) {
 	        struct lstate	ls ;
-	        const int	llen = LINEBUFLEN ;
+	        cint		llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1774,13 +1772,10 @@ static int procline(PROGINFO *pip,LSTATE *lsp,cchar *lbuf,int len)
 }
 /* end subroutine (procline) */
 
-
 /* process the error output */
-static int procerr(PROGINFO *pip,int fd_err)
-{
-	struct ustat	sb ;
-	FILER		buf ;
-	const int	fsize = FBUFLEN ;
+static int procerr(PROGINFO *pip,int fd_err) noex {
+	USTAT		sb ;
+	cint		fsize = FBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		to = pip->to_read ;
@@ -1792,10 +1787,10 @@ static int procerr(PROGINFO *pip,int fd_err)
 	}
 
 	if ((rs >= 0) && (sb.st_size > 0)) {
-	    if ((rs = filer_start(&buf,fd_err,0L,fsize,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        int		len ;
-	        char		lbuf[LINEBUFLEN + 1] ;
+	    if (filer buf ; (rs = filer_start(&buf,fd_err,0z,fsize,0)) >= 0) {
+	        cint	llen = LINEBUFLEN ;
+	        int	len ;
+	        char	lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))

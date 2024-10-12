@@ -1,4 +1,5 @@
 /* filecounts HEADERS */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manage a file-based counter database */
@@ -12,7 +13,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -40,8 +41,8 @@ struct filecounts_iil {
 
 struct filecounts_cursor {
 	uint		magic ;
-	FILECOUNTS_II	*list ;
-	int		nlist ;
+	FILECOUNTS_II	*listp ;	/* list-pointer */
+	int		listn ;		/* list-number */
 	int		i ;
 } ;
 
@@ -76,14 +77,14 @@ extern	FILECOUNTS_FL		filecounts_fl ;
 
 EXTERNC_begin
 
-extern int filecounts_open(FILECOUNTS *,cchar *,int,mode_t) noex ;
-extern int filecounts_process(FILECOUNTS *,FILECOUNTS_N *) noex ;
-extern int filecounts_curbegin(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
-extern int filecounts_snap(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
-extern int filecounts_read(FILECOUNTS *,FILECOUNTS_CUR *,
-		FILECOUNTS_INFO *,char *,int) noex ;
-extern int filecounts_curend(FILECOUNTS *,FILECOUNTS_CUR *) noex ;
-extern int filecounts_close(FILECOUNTS *) noex ;
+extern int filecounts_open(filecounts *,cchar *,int,mode_t) noex ;
+extern int filecounts_process(filecounts *,filecounts_n *) noex ;
+extern int filecounts_curbegin(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_cursnap(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_curread(filecounts *,filecounts_cur *,
+		filecounts_info *,char *,int) noex ;
+extern int filecounts_curend(filecounts *,filecounts_cur *) noex ;
+extern int filecounts_close(filecounts *) noex ;
 
 EXTERNC_end
 

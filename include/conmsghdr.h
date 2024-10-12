@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/socket.h>		/* |CONMSGHDR| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -26,7 +27,12 @@
 #include	<usysrets.h>
 
 
+#ifndef	CONMSGHDR_TYPEDEF
+#define	CONMSGHDR_TYPEDEF
+
 typedef CONMSGHDR	conmsghdr ;
+
+#endif /* CONMSGHDR_TYPEDEF */
 
 EXTERNC_begin
 

@@ -2,7 +2,7 @@
 
 T= libuc
 
-ALL= $(T).so $(T).a
+ALL= $(T).o $(T).so $(T).a
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -37,7 +36,7 @@ DEFS +=
 INCS += usystem.h localmisc.h
 INCS += uclibsubs.h
 
-LIBS=
+LIBS= -lu
 
 
 INCDIRS=
@@ -64,10 +63,10 @@ OBJ03= stdfnames.o
 
 OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 OBJ05= nleadstr.o nleadkeystr.o
-OBJ06= mapex.o getourenv.o strnul.o
-OBJ07= sncpyx.o sncpyxw.o snaddw.o
+OBJ06= mapex.o getourenv.o
+OBJ07=
 
-OBJ08= strkeycmp.o ccfile.o strnul.o
+OBJ08= strkeycmp.o strnul.o
 OBJ09= readln.o ccfile.o
 OBJ10= cfx.o memtrack.o addrset.o mapblock.o
 OBJ11= strmgr.o strop.o field.o
@@ -80,7 +79,7 @@ OBJ15= tcx.o
 OBJ16 += wsix.o wsnx.o wsx.o
 OBJ17 += six.o snx.o sfx.o rmx.o
 OBJ18 +=
-OBJ19 +=
+OBJ19 += hdb.o hdbstr.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -93,7 +92,7 @@ OBJ += $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19)
 .SUFFIXES:		.hh .ii
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -121,11 +120,8 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 
-libmacuser.a:		$(OBJ)
-	$(AR) -rc $@ $?
-
 $(T).so:		$(OBJ) Makefile
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
 
 $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
@@ -284,7 +280,7 @@ objz.o:			$(OBJZ)
 # base
 OBJ0_BASE= uctimeout.o
 OBJ1_BASE= ucsysconf.o 
-OBJ2_BASE= bufsizedata.o getbufsizenames.o
+OBJ2_BASE= bufsizedata.o bufsizenames.o
 OBJ3_BASE= getbufsize.o bufsizevar.o 
 
 OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
@@ -329,6 +325,8 @@ ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc
 ucatexit.o:		ucatexit.cc
 ucfork.o:		ucfork.cc
+ucgetipnodeby.o:	ucgetipnodeby.cc
+ucgetnameinfo.o:	ucgetnameinfo.cc
 ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
 ucgetpid.o:		ucgetpid.cc ucgetpid.h
@@ -443,10 +441,10 @@ strmgr.o:		strmgr.cc strmgr.h
 serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
-getbufsize.o:		getbufsize.cc getbufsize.h getbufsizenames.h usysdefs.h
-getbufsize.o:		getbufsizenames.h usysdefs.h bufsizedata.hh
+getbufsize.o:		getbufsize.cc getbufsize.h bufsizenames.h usysdefs.h
+getbufsize.o:		bufsizenames.h usysdefs.h bufsizedata.hh
 
-getbufsizenames.o:	getbufsizenames.c getbufsizenames.h
+bufsizenames.o:		bufsizenames.c bufsizenames.h
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
@@ -476,20 +474,6 @@ groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
 
-matstr.o:		matstr.cc matstr.h
-matostr.o:		matostr.cc matostr.h
-
-sncpyarray.o:		sncpyarray.c sncpy.h
-sncpyxc.o:		sncpyxc.cc sncpyxc.h
-sncpyx.o:		sncpyx.cc sncpyx.h
-sncpyxw.o:		sncpyxw.cc sncpyxw.h
-
-mkpathx.o:		mkpathx.c mkpathx.h
-mkpathxw.o:		mkpathxw.cc mkpathxw.h
-
-mknpathx.o:		mknpathx.cc mknpathx.h
-mknpathxw.o:		mknpathxw.cc mknpathxw.h
-
 mkvarpath.o:		mkvarpath.cc
 mkuserpath.o:		mkuserpath.cc
 mkcdpath.o:		mkcdpath.cc
@@ -501,6 +485,7 @@ opensysfs.o:		opensysfs.cc opensysfs.h
 quoteshellarg.o:	quoteshellarg.cc
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
+termescseq.o:		termescseq.cc termescseq.h
 
 tmtime.o:		tmtime.cc tmtime.h
 
@@ -642,6 +627,21 @@ strnxcmp.o:		strnxcmp.dir
 strnxcmp.dir:
 	makesubdir $@
 
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
+
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
+
+# STRKEYX
+strkeyx.o:		strkeyx.dir
+strkeyx.dir:
+	makesubdir $@
+
 # VEC
 vec.o:			vec.dir
 vec.dir:
@@ -732,11 +732,6 @@ field.o:		field.dir
 field.dir:
 	makesubdir $@
 
-# VARSUB
-varsub.o:		varsub.dir
-varsub.dir:
-	makesubdir $@
-
 # ENVS
 envs.o:			envs.dir
 envs.dir:
@@ -757,6 +752,11 @@ strpack.o:		strpack.dir
 strpack.dir:
 	makesubdir $@
 
+# HDBSTR
+hdbstr.o:		hdbstr.dir
+hdbstr.dir:
+	makesubdir $@
+
 # TMPX
 tmpx.o:			tmpx.dir
 tmpx.dir:
@@ -770,6 +770,16 @@ timestr.dir:
 # POW
 pow.o:			pow.dir
 pow.dir:
+	makesubdir $@
+
+# GETUTMP
+getutmp.o:		getutmp.dir
+getutmp.dir:
+	makesubdir $@
+
+# GETXNAME
+getxname.o:		getxname.dir
+getxname.dir:
 	makesubdir $@
 
 # UCINET
@@ -824,7 +834,6 @@ csem.o:			csem.cc		csem.h
 pwcache.o:		pwcache.cc	pwcache.h
 lockrw.o:		lockrw.cc	lockrw.h
 nodedb.o:		nodedb.cc	nodedb.h
-mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc	ccfile.hh
 thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
@@ -835,6 +844,7 @@ bufstr.o:		bufstr.cc bufstr.h
 setint.o:		setint.cc setint.h
 osetint.o:		osetint.cc osetint.h
 osetstr.o:		osetstr.cc osetstr.h
+osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 
 
 # sring-comparisons
@@ -860,18 +870,10 @@ termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
-intsat.o:		intsat.cc intsat.h
-intfloor.o:		intfloor.cc intfloor.h
-intceil.o:		intceil.cc intceil.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
 getxid.o:		getxid.cc getxid.h
 getngroups.o:		getngroups.cc getngroups.h
-getsysname.o:		getsysname.cc getsysname.h
-getnodename.o:		getnodename.cc getnodename.h
-getnodedomain.o:	getnodedomain.cc getnodename.h
-getuserorg.o:		getuserorg.cc getuserorg.h
-getrealname.o:		getrealname.cc getrealname.h
 getourenv.o:		getourenv.cc getourenv.h
 getaddr.o:		getaddr.cc getaddr.h
 getmjd.o:		getmjd.cc getmjd.h
@@ -894,15 +896,16 @@ ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
-filelines.o:		filelines.cc filelines.h
-#
-isproc.o:		isproc.cc isproc.h
+getsyslogx.o:		getsyslogx.cc getsyslogx.h
+dictdiff.o:		dictdiff.cc dictdiff.h
+rsfree.o:		rsfree.cc rsfree.h
 #
 isinetaddr.o:		isinetaddr.cc isinetaddr.h
 isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
+isindomain.o:		isindomain.cc isindomain.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
@@ -911,5 +914,6 @@ unameo.o:		unameo.cc unameo.h
 utmpacc.o:		utmpacc.cc utmpacc.h
 utmpaccent.o:		utmpaccent.cc utmpaccent.h
 ucrand.o:		ucrand.cc ucrand.h
+ucprochave.o:		ucprochave.cc ucprochave.h
 
 
