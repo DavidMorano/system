@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	strlistmk
+
+	Description:
 	This module implements an interface (a trivial one) that
 	provides access to the STRLISTMK object (which is dynamically
 	loaded).
@@ -137,7 +141,7 @@ enum subs {
 	sub_overlast
 } ;
 
-static constexpr cpcchar	subs[] = {
+constexpr cpcchar	subs[] = {
 	"open",
 	"add",
 	"abort",

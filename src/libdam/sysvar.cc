@@ -488,61 +488,47 @@ static int sysvar_objloadend(SV *op) noex {
 
 static int sysvar_loadcalls(SV *op,cchar *soname) noex {
 	modeload	*lp = op->loaderp ;
-	cint		symlen = SYMNAMELEN ;
+	cint		slen = SYMNAMELEN ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	char		symbuf[SYMNAMELEN + 1] ;
-	cvoid		*snp ;
-
-	for (int i = 0 ; subs[i] != nullptr ; i += 1) {
-
-	    if ((rs = sncpy3(symbuf,symlen,soname,"_",subs[i])) >= 0) {
-	        if ((rs = modload_getsym(lp,symbuf,&snp)) == SR_NOTFOUND) {
-	            snp = nullptr ;
+	char		sbuf[SYMNAMELEN + 1] ;
+	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
+	    if ((rs = sncpy(sbuf,slen,soname,"_",subs[i])) >= 0) {
+	        if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
+		    sysvar_calls	*callp = callsp(op->callp) ;
+	            c += 1 ;
+		    switch (i) {
+		    case sub_open:
+		        callp->open = soopen_f(snp) ;
+		        break ;
+		    case sub_count:
+		        callp->count = socount_f(snp) ;
+		        break ;
+		    case sub_curbegin:
+		        callp->curbegin = socurbegin_f(snp) ;
+		        break ;
+		    case sub_curenum:
+		        callp->curenum = socurenum_f(snp) ;
+		        break ;
+		    case sub_fetch:
+		        callp->fetch = sofetch_f(snp) ;
+		        break ;
+		    case sub_curend:
+		        callp->curend = socurend_f(snp) ;
+		        break ;
+		    case sub_audit:
+		        callp->audit = soaudit_f(snp) ;
+		        break ;
+		    case sub_close:
+		        callp->close = soclose_f(snp) ;
+		        break ;
+		    } /* end switch */
+		} else if (rs == rsn) {
 	            if (! isrequired(i)) rs = SR_OK ;
-	        }
-	    }
-
-	    if (rs < 0) break ;
-
-	    if (snp != nullptr) {
-	        c += 1 ;
-		switch (i) {
-		case sub_open:
-		    op->call.open = 
-			(int (*)(void *,cchar *,cchar *)) snp ;
-		    break ;
-		case sub_count:
-		    op->call.count = (int (*)(void *)) snp ;
-		    break ;
-		case sub_curbegin:
-		    op->call.curbegin = 
-			(int (*)(void *,void *)) snp ;
-		    break ;
-		case sub_fetch:
-		    op->call.fetch = 
-			(int (*)(void *,cchar *,int,void *,char *,int)) 
-				snp ;
-		    break ;
-		case sub_curenum:
-		    op->call.curenum = 
-			(int (*)(void *,void *,char *,int,char *,int)) snp ;
-		    break ;
-		case sub_curend:
-		    op->call.curend = 
-			(int (*)(void *,void *)) snp ;
-		    break ;
-		case sub_audit:
-		    op->call.audit = (int (*)(void *)) snp ;
-		    break ;
-		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
-		    break ;
-		} /* end switch */
-	    } /* end if (it had the call) */
-
+	        } /* end if (it had the call) */
+	    } /* end if (sncpy) */
 	} /* end for (subs) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (sysvar_loadcalls) */

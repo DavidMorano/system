@@ -13,7 +13,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* systems IDs */
+#include	<sys/types.h>		/* systems types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
