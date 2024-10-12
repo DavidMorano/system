@@ -1,0 +1,56 @@
+Age of Consent in the United States
+
+Alabama--------16
+Alaska---------16
+Arizona--------18
+Arkansas-------16
+California-----18
+Colorado-------16
+Connecticut----16
+D.C.-----------16
+Delaware-------12
+Florida--------18
+Georgia--------14
+Hawaii---------16
+Idaho----------18
+Illinois-------16
+Indiana--------16
+Iowa-----------14
+Kansas---------16
+Kentucky-------14
+Louisiana------17
+Maine----------14
+Maryland-------16
+Massachusetts--18
+Michigan-------16
+Minnesota------16
+Mississippi----18
+Missouri-------16
+Montana--------16
+Nebraska-------16
+Nevada---------16
+New Hampshire--16
+New Jersey-----16
+New Mexico-----13
+New York-------17
+North Carolina-16
+North Dakota---18
+Ohio-----------16
+Oklahoma-------18
+Oregon---------18
+Pennsylvania---14
+Rhode Island---16
+South Carolina-16
+South Dakota---16
+Tennessee------18
+Texas----------17
+Utah-----------14
+Vermont--------15
+Virginia-------16
+Washington-----18
+West Virginia--16
+Wisconsin------18
+Wyoming--------18
+
+
+

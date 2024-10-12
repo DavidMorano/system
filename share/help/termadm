@@ -1,0 +1,17 @@
+TERMADM
+
+This is a KSH shell built-in command.  It prints out file-system
+information on a file.
+
+Synopsis:
+
+$ termadm [-s] <line> <spec(s)> ... [-af <argfile>] [-V]
+
+where:
+
+<line>		terminal line (or device) for operations
+<spec(s)>	one of: term label
+-s		specify a "set" operation (otherwise "get")
+-af <argfile>	take spec(s) from file
+-V		print command version to standard-error and then exit
+

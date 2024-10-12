@@ -1,0 +1,38 @@
+BIBLEVERSE
+
+This program takes a query (invocation argument or on standard input)
+and prints the corresponding Bible verse.  A verse query takes the form:
+
+	book:chapter:verse
+
+The <book> part of the specification should be numeric.
+
+Synopsis:
+
+$ bibleverse [<query(s)> ...] [-af <argfile>] [-a] [-n <nverses>] [-w <cols>] 
+		[-ndb <ndbname>] [-vdb <vdbname>] [-V]
+
+where:
+
+<query(s)>	a verse specification indicating a verse to print out
+-a		print out the whole Bible (text filled)
+-ndb <ndbname>	the bible-name DB-name
+-vdb <vdbname>	the bible-verse DB-name
+-n <nverses>	number of verses to print (default is one)
+-w <cols>	output column width
+-V		print the program version on standard-error and then exit
+
+Notes:
+
+Queries are of the form (whitespace allowed between tokens):
+	<string(s)>[:]<c>:<v>
+or
+	<b>:<c>:<v>
+
+where:
+
+<string(s)>	are one or more alpha-strings
+<b>		numeric book
+<c>		numeric chapter
+<v>		numeric verse
+

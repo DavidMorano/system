@@ -1,0 +1,25 @@
+abbreviation	latin		description
+----------------------------------------------------------------------------
+
+e.i.		ex infra	from below (from below in this writing)
+e.g.		exempli	gratia	for sake of example
+e.s.		ex supra	from above (from above in this writing)
+etc.		et cetera	and the rest (and so on)
+errata		errors
+erratum		error
+et al.		et alii		and others
+et ux.		et uxor		and wife
+
+i.a.		inter alia	among other things
+ibib.		ibidem		in the same place (same as previous reference)
+i.c.		in casu		in the event (in this case)
+i.e.		id est		that is
+i.f.		in the end
+idem.		idem		the same (as has been already said)
+		in situ		in the place (in the original place)
+i.o.		in that order	respectively
+i.q.		idem quod	the same as
+
+s.h.		in this sense
+
+

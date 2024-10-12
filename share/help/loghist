@@ -1,0 +1,19 @@
+LOGHIST
+
+This program accesses the UTMPX DB and prints out the information on the
+names requested (if any) given by arguments.  If no names are specified,
+then all of the names that exist in the WTMPX DB are processed.
+
+Synopsis:
+
+$ loghist [<name(s)> ...] [-af <argfile>] [-utf <wtmp>] [-h] [-nh] [-V]
+
+where:
+
+<name(s)>	name(s) to extract records for
+-af <argfile>	take name(s) file file
+-h		print header (not implemented)
+-nh		do not print header
+-db <wtmpx>	optional WTMPX database (file)
+-V		print command version to standard-error and then exit
+

@@ -1,0 +1,395 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: hiprof.5,v $ $Revision: 1.1.4.2 $ (DEC) $Date: 1996/08/13 17:19:23 $
+.\"
+.TH hiprof 5 96/08/13 "Digital OSF1 UNIX V4.0"
+.SH NAME
+\*Lhiprof\*O - Hierarchical instruction profiler
+.SH SYNOPSIS
+.PP
+.sS
+\*Latom\*O \*Vappl_prog\*O \*L\-tool\*O \*Lhiprof\*O [\*L\-env \*Venviron\*O] [\*L\-toolargs\*O="\*Varg1\*O \*Varg2\*O ..."] [\*Vatom_flags\*O...]
+.sE
+.SH PARAMETERS
+.PP
+.VL
+.LI "\*Vappl_prog\*O"
+File name of a fully linked shared or nonshared executable to be
+profiled.  This program should be compiled with the \*L\-g1\*O,
+\*L\-g2\*O, or \*L\-g3\*O flag to obtain more complete profiling
+information.  If the default symbol table level (\*L\-g0\*O) has
+been used, line number information, static procedure names, and
+file names are unavailable to the profiler.
+.LE
+.SH FLAGS
+.VL 4m
+.LI "\*L\-tool \*Lhiprof\*O"
+Identifies the \*Lhiprof\*O tool to \*Latom\*O.
+.LI "\*L\-env \*Venviron\*O"
+Identifies any special environment.  You can invoke the \*Lhiprof\*O
+tool for a threaded application program by specifying the
+\*Lthreads\*O environment.  You can invoke \*Lhiprof\*O for a
+general-purpose environment by omitting the \*L\-env\*O flag.
+.LI "\*L\-toolargs\*O=""""\*Varg1\*O \*Varg2\*O ..."""""
+Passes arguments to the \*Lhiprof\*O tool's instrumentation routines.
+Use whitespace characters to separate arguments from their parameters
+(if any) and from other arguments.
+.LI "\*Latom_flags\*O"
+Specifies flags to the \*Latom\*O command.  See the \*Latom\*O(1)
+reference page for descriptions of other flags accepted by the
+\*Latom\*O command.
+.LE
+.PP
+The \*Lhiprof\*O tool allows the following flags to be passed in the
+\*L\-toolargs\*O flag for use by the \*Lhiprof\*O tool's
+instrumentation routine when instrumenting \*Vappl_prog\*O.
+Except where noted, these flags can also be passed to the
+instrumented program at execution time by being defined as part of
+the \*LHIPROF_ARGS\*O environment variable.
+.VL 4m
+.LI "\*L\-calltime\*O"
+Causes \*Lhiprof\*O to apply more precise, pthread-dependent profiling
+process-wide. This style of profiling measures the cost of calls during
+each call. By default, \*Lhiprof\*O uses threadsafe,
+pthread-independent profiling, which shows the cost of calls
+proportional to the number of calls.  This flag cannot be defined as
+part of the \*LHIPROF_ARGS\*O environment variable.
+.LI "\*L\-cputime\*O"
+Causes \*Lhiprof\*O to use CPU time obtained from the hardware cycle
+counter rather than from instruction counts.  This flag cannot be
+defined as part of the \*LHIPROF_ARGS\*O environment variable.
+.LI "\*L\-dirname \*Vdirectory\*O"
+Specifies the directory path in which \*Lhiprof\*O creates its
+\*L.hiout\*O data files.
+.LI "\*L\-exc \*Vprocname\*O"
+Excludes time spent in \*Vprocname\*O from the profile.  This switch
+can be used multiple times to exclude multiple procedures.
+.LI "\*L\-fastrecur\*O"
+Invokes a simpler heuristic for mapping recursion into a hierarchical
+report when used with the \*L\-calltime\*O, \*L\-cputime\*O, or
+\*L\-pagefaults\*O flag.
+.\" ***REMOVE -hiout PER JPW
+.\" .LI "\*L\-hiout\*O \*Vprofilename\*O"
+.\" Specify the filename portion of the profile file output by the
+.\" instrumented application.
+.LI "\*L\-nolog\*O"
+Disables use of a trace buffer for \*L\-cputime\*O.  This is useful for
+studying the performance of \*Lhiprof\*O.  This flag cannot be
+defined as part of the \*LHIPROF_ARGS\*O environment variable.
+.LI "\*L\-nousr\*O"
+Excludes user execution time from the profile.  This flag cannot be
+defined as part of the \*LHIPROF_ARGS\*O environment variable.
+.LI "\*L\-[no]pids\*O"
+Include (or not include) the process ID of the process running the
+program in the name of the \*Lhiprof\*O profile file produced by the
+instrumented application.
+.LI "\*L\-pagefaults\*O"
+Measures pagefaults instead of program execution time.  Only works
+for nonthreaded programs.  This flag cannot be
+defined as part of the \*LHIPROF_ARGS\*O environment variable.
+.LI "\*L\-sigdump \*Vsig\*O"
+Causes the process running the instrumented application to catch the
+signal indicated by \*Vsig\*O (see \*Lsignal\*O(4)).  When it receives
+that signal, the process writes the current profiling data
+to the output file, reinitializes the profile by setting the execution
+time to zero, and resumes execution.
+.LI "\*L\-systime\*O"
+Incorporates cycle counter estimates of system time into instruction
+count estimates of user time when used with the \*L\-calltime\*O flag.
+.LI "\*L\-threads\*O"
+When used with the \*L\-calltime\*O or \*L\-cputime\*O flags (and
+\*L\-env threads\*O is specified on the \*Latom\*O command line),
+causes \*Lhiprof\*O to apply more localized, pthread-dependent
+profiling to each individual thread in the process.  Otherwise,
+\*Lhiprof\*O provides process-wide profiling for the modes enabled by
+these flags.
+.LI "\*L\-textout\*O"
+When used with the \*L\-calltime\*O, \*L\-cputime\*O, or
+\*L\-pagefaults\*O flags, produces a text-format profile file instead
+of a binary profiling data file. This file is similar to the output
+from \*Lgprof\*O, although it cannot be combined or filtered.
+It also contains additional statistics on the instrumentation that
+has been used on \*Vappl_prog\*O.  By default, the profile file
+contains binary data that the \*Lgprof\*O utility can combine with
+other profiles and filter, prior to generating a report.
+.sp
+When \*L\-testout\*O is specified with \*L\-env threads\*O, each
+thread is individually profiled, as if \*L\-threads\*O had also
+been specified.
+.LE
+.PP
+While the instrumented \*Vappl_prog\*O is being executed, flags
+specified in the definition of the \*LHIPROF_ARGS\*O environment
+variable override any corresponding settings in the \*L\-toolargs\*O
+flags.  For example:
+.oS
+% setenv HIPROF_ARGS "-dirname /tmp/profiles -pids"
+.oE
+.SH DESCRIPTION
+.PP
+.iX "hiprof Atom tool"
+The \*Lhiprof\*O tool is an Atom-based program profiling tool that
+produces both flat and hierarchical profiles.  The flat profile shows
+the execution time spent in any given procedure.  The hierarchical
+profile shows the time spent in a given procedure and all its
+descendents.  The hierarchical profile enables the user to answer
+questions of the form "How much time is spent in printf() and all
+procedures called by \*Lprintf\*O()?".
+.PP
+The \*Lhiprof\*O tool's output is similar to that generated by the
+\*L\-pg\*O flag of the \*Lcc\*O command.
+However, \*Lhiprof\*O uses code instrumentation rather than PC-sampling
+to gather statistics.  The \*Lgprof\*O command is usually used to
+filter and merge output files and to format profile reports.
+.PP
+The \*Lhiprof\*O tool generates an instrumented version of
+\*Vappl_prog\*O.  The instrumented program behaves
+identically to the original except that it writes out an execution
+profile after it is done.
+.PP
+Multiple profile files can be created by a single program run because
+a separate profile can optionally be generated for each thread of each
+process.  Nonthreaded programs are treated as programs with just
+one thread.
+.SS "Specifying the Name of Profile Files"
+The name of the profile file has the following form:
+.PP
+\*Vappl_prog\*O.\*Vpid\*O.\*Vtid\*O.\*Lhiout\*O
+.PP
+The \*Vpid\*O (process ID) portion of the filename appears only if you
+specify the \*L\-pids\*O flag in either the \*Latom\*O command's
+\*L\-toolargs\*O flag or the \*LHIPROF_ARGS\*O environment variable.
+The \*Vtid\*O (thread ID) portion appears only if you specify both
+\*L\-env threads\*O on the \*Latom\*O command line and \*L\-threads\*O
+in either the \*Latom\*O command's \*L\-toolargs\*O flag or the
+\*LHIPROF_ARGS\*O environment variable.
+.PP
+.\" ***OMIT PER JPW
+.\" You can specify a different name for the \*Vappl_prog\*O portion of
+.\" the filename either by specifying the \*L\-hiout\*O flag in the
+.\" \*Latom\*O command line or by defining the \*L\-hiout\*O flag in the
+.\" \*LHIPROF_ARGS\*O environment variable.  For example, if you include
+.\" \*L\-hiout /test/file1\*O in the \*L\-toolargs\*O flag
+.\" \*LHIPROF_ARGS\*O environment variable definition, the profile
+.\" filenames will have the form:
+.\" .PP
+.\" \*L/test/file1.<\*Vpid\*L>.<\*Vtid>\*L.hiout\*O.
+The directory in which the profile file is created can be specified
+with the \*L\-dirname\*O flag.
+.SS "Resetting the Profile"
+It is sometimes useful to start profiling part way into the execution
+of a program.  For example, a user may wish to omit program
+initialization from the profile.  Also, it is sometimes useful to
+force the program to print its profile even before it has finished
+executing.  For example, a user might wish to extract the profile of a
+running file server.  The \*Lhiprof\*O tool provides a mechanism to do
+these things.
+.PP
+If you specify the \*L\-sigdump\*O flag in the \*Latom\*O command
+line or define the \*L\-sigdump\*O flag in the \*LHIPROF_ARGS\*O
+environment variable, the specified signal will be caught by the
+process.  When it receives that signal, the process writes the current
+profiling data to the output file, reinitializes the profile by
+setting the execution time to zero, and resumes execution.
+.PP
+The process can be signaled any number of times during its execution.
+.PP
+If you do not specify the \*L\-textout\*O flag in the \*Latom\*O
+command line or define it in the \*LHIPROF_ARGS\*O environment
+variable (that is, when you are producing binary profile files for
+\*Lgprof\*O), each signal causes the process to overwrite any
+existing file.
+.PP
+If you do specify the \*L\-textout\*O flag (that is, when you are
+producing text-format profile files), the output file will contain
+two sets of profile data when the process completes execution:
+.ML
+.LI
+From the beginning of the program to the point at which the signal
+was received
+.LI
+From the point each signal was received to the end of the program
+.LE
+.PP
+For example:
+.oS
+	setenv HIPROF_ARGS "-sigdump USR1"
+.br
+	application_program.hiprof &
+.br
+	<wait until the desired time>
+.br
+	kill -USR1 \*Lpid\*O
+.oE
+.SS "User Time Estimates"
+The \*Lhiprof\*O tool provides two different ways of estimating user
+execution time: instruction counts and the cycle counter.  By default,
+the \*Lhiprof\*O tool estimates execution time by counting the number
+of user-level instructions executed.  However, if the \*L\-cputime\*O
+flag is specified during instrumentation (that is, to the
+\*L\-toolargs\*O flag in the \*Latom\*O command line), CPU time is
+estimated using the hardware cycle counter.  This involves looking
+at the value of the hardware cycle counter before and after a
+procedure call to determine the time spent in the procedure.
+.PP
+The advantage of instruction counts is that they are repeatable and
+are unaffected by the presence of the instrumentation code.  If a
+program is run twice with identical inputs, the instruction counts for
+both runs will be identical.  The disadvantage of instruction counts
+is that they do not account for various second-order effects (cache
+misses, TLB misses, and pipeline stalls) which degrade the execution
+time of a real program.
+.PP
+The advantage of using the cycle counter is that the effects of
+cache misses, TLB misses, and pipeline stalls are accounted for.
+The disadvantage is that the presence of the instrumentation code can
+degrade the performance of the cache and TLB seen by the application.
+If an application procedure is short (a 100 or so
+instructions), then times reported for both the short procedure and
+the procedure calling the short procedure can be unrealistically
+pessimistic.  If a significant fraction of an application's time is
+spent in a short procedure, it may be better not to instrument that
+procedure at all.  To exclude procedure \*Vprocname\*O from
+instrumentation, you can specify the \*L\-exc \*Vprocname\*O flag
+in the \*Latom\*O command line or define it in the \*LHIPROF_ARGS\*O
+environment variable.  If a procedure is not instrumented, its run
+time is charged to its parent and all calls made by the procedure
+appear to be made by the parent.
+.SS "System Time Estimates"
+By default, the \*Lhiprof\*O tool uses instruction counts and omits
+system time from its estimates of execution time.  However, passing the
+\*L\-cputime\*O flag in the \*L\-toolargs\*O flag to \*Lhiprof\*O's
+instrumentation routine causes the instrumentation routine to use the
+hardware cycle counter to measure both user and system CPU time.
+If you specify the \*L\-calltime\*O flag to the \*L\-toolargs\*O flag
+on the \*Latom\*O command line, you can specify the \*L\-systime\*O
+flag (either in \*L\-toolargs\*O or in the \*LHIPROF_ARGS\*O
+environment variable) to incorporate cycle counter estimates of system
+time into instruction count estimates of user time.
+You can exclude user execution time from the profile by using the
+\*L\-nouser\*O flag in the \*L\-toolargs\*O flag at instrumentation
+time.
+.SS "Multiple Processes and Threads"
+When a program calls \*Lfork\*O, an additional output file is created
+for the new child process.  The child's output file reports only
+the execution time used by the child process following the fork.
+The parent's output file reports the execution time of the parent
+process both before and after the fork.  Similarly, when a threaded
+application creates a new thread, a separate profile is created for
+that thread.
+.PP
+If a process calls \*Lexec\*O and the \*Lexec\*O succeeds, then all
+execution time statistics from the creation of the process up to the
+\*Lexec\*O are lost.  This occurs because the profile statistics are
+lost when the \*Lexec\*O overwrites the address space.
+For the most part, this is not a problem because calls to \*Lexec\*O
+are usually immediately preceded by a \*Lfork\*O.
+If the program being invoked by the \*Lexec\*O call is instrumented,
+then the execution time of the process following the \*Lexec\*O is
+reported in that new program's output file.
+.SS Recursion
+Recursion causes complications for hierarchical profilers because
+.\" OMIT THIS CLAUSE -- JUST CONFUSES THE ISSUE
+.\" although the report is in the form of a tree
+the call graph is not a tree. The \*Lhiprof\*O tool uses a heuristic
+to map the times from a cyclic graph to a hierarchical report.
+While the application runs, \*Lhiprof\*O
+dynamically detects edges that close cycles in the call graph.
+Then, \*Lhiprof\*O "breaks" the cycle by stopping the clock for all
+edges in the cycle.  Edges that close cycles in the call graph are
+marked in the text-format report (generated when the \*L\-textout\*O
+flag is specified in the \*L-toolargs\*O flag or in the
+\*LHIPROF_ARGS\*O environment variable) with a '+' character and
+will have zero time assigned to them.
+.PP
+Although the above heuristic produces the most intuitive reports, it
+can be inefficient for some programs that are highly recursive.
+A simpler algorithm can be invoked by including \*L\-fastrecur\*O in
+the \*L\-toolargs\*O flag to the \*Latom\*O command line or in the
+definition of the \*LHIPROF_ARGS\*O environment variable.  In the
+simpler algorithm, the
+clock is stopped only for the edge closing the cycle.  All of the other
+edges in the cycle continue to accumulate time \- with the result
+that the sum of the times of the edges leaving a node can sum to more
+than the execution time of the program.
+.SS Algorithm
+Although \*Lhiprof\*O's output format was modeled after \*Lgprof\*O's
+PC-sampling format, its algorithms (except in the default mode) are
+different.  A couple of improvements result.
+For example, the amount of time spent by a child procedure on
+behalf of its parent is measured rather than estimated, as it is in
+PC-sampling. Unlike profilers based on \*Lpixie\*O, both the source
+and destination of indirect calls can be reported.
+.PP
+The \*Lhiprof\*O tool dynamically constructs the procedure call graph
+during the execution of the program.  This allows the profiler to
+handle indirect calls that would otherwise be ambiguous from a static
+analysis of the program.  Nodes in the graph represent procedures, and
+arcs between nodes represent procedure calls.  During the execution of
+the program, the profiler maintains a model of the procedure call
+stack.  When a procedure is called, the profiler pushes the identity of
+the called procedure and the time of the call onto its stack.  When a
+procedure returns, the profiler pops the top entry off its simulated
+stack.  The difference in the times of the call and return gives the
+time spent in the called procedure and all of its descendents.
+.PP
+A test is performed by the algorithm to avoid double counting times
+when a recursion occurs.  If multiple calls to the same procedure are
+outstanding simultaneously, the profiler only times the first call.
+.SH FILES
+.PP
+.VL
+.LI "\*Vappl_prog.\*Lhiprof\*O"
+Default name for instrumented version of \*Vappl_prog\*O
+.LI "\*Vappl_prog.\*Lhiout\*O"
+Default name of profile output file
+.LE
+.SH BUGS
+.PP
+If the cycle counter is used to measure the execution time of a
+procedure and the procedure call executes more than 2^32 cycles
+without making another procedure call, the reported execution time for
+that procedure will be too small because the wraparound of the 32-bit
+cycle counter is not detected.  Wraparound may also occur if not all
+procedures or shared libraries are profiled.  Consequently, when you
+specify the \*L\-cputime\*O flag, you should also specify the
+\*L\-all\*O flag.  However, if you use the \*L\-cputime\*O flag on
+multithreaded programs, the \*L\-all\*O flag may not prevent wraparound.
+.PP
+If a deadlock occurs in a multithreaded application that has signal
+handlers in instrumented objects, you can use any one of the following
+flags on the \*Latom\*O command line to avoid the problem:
+.ML
+.LI
+Specify the \*L\-excobj\*O flag to avoid instrumenting the object
+.LI
+Specify the \*L\-toolargs="\-exc procname"\*O flag to avoid
+instrumenting the signal-handling procedure
+.LI
+Specify the \*L\-toolargs="\-calltime"\*O flag to enable deadlock
+detection (and thereby ignore the signal-handling procedures)
+.LE
+.PP
+A maximum of 1024 threads are allowed.
+.SH RELATED INFORMATION
+.PP
+\*Latom\*O(1), \*Lgprof\*O(1), \*Lcc\*O(1)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

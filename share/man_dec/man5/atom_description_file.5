@@ -1,0 +1,201 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_description_file.5,v $ $Revision: 1.1.2.8 $ (DEC) $Date: 1996/02/21 19:30:18 $
+.\"
+.TH atom_description_file 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+\*Latom_description_file\*O \- Defines a specific environment in which an Atom tool runs
+.SH "DESCRIPTION"
+.PP
+.iX "Atom description file"
+An Atom tool's description file, as described in the
+.MS atom_description_file 5
+reference page, identifies and describes the tool's instrumentation
+and analysis files.  It can also specify the flags to be used by the
+\*Lcc\*O, \*Lld\*O, and \*Latom\*O commands when it is compiled,
+linked, and invoked.  Each Atom tool must supply at least one
+description file.  See \*Latom\*O(1) for additional information on Atom.
+.PP
+You must place a tool's description files, along with its
+instrumentation and analysis files, in the tool's directory.
+By default, Atom searches for tools in the
+\*L/usr/lib/cmplrs/atom/tools\*O and
+\*L/usr/lib/cmplrs/atom/examples\*O directories.  You can add
+directories to the search path by supplying a colon-separated list of
+additional directories to the \*LATOMTOOLPATH\*O environment variable.
+.PP
+Atom has two types of description files:
+.ML
+.LI
+A description file providing an environment for generalized use of the
+tool.  A tool can provide only one general-purpose environment.
+The name of this type of description file has the format:
+\*Vtool\*O.\*Ldesc\*O.
+.LI
+A description file providing an environment for use of the tool in
+specific contexts, such as in a multithreaded application or in kernel
+mode.  A tool can provide several special-purpose environments,
+each of which has its own description file.
+The name of this type of description file has the format:
+\*Vtool\*O.\*Venvironment\*O.\*Ldesc\*O.
+.LE
+.PP
+The names supplied for the \*Vtool\*O and \*Venvironment\*O portions
+of these names correspond to values the user specifies with the
+\*L\-tool\*O and \*L\-env\*O flags on an \*Latom\*O command when
+invoking the tool.
+.PP
+An Atom description file is a text file containing a series of
+\*Ltag\*O, \*Lvalue\*O pairs.  The \*Ltag\*O and \*Lvalue\*O are
+separated by white space and occupy a single line.
+The order of the lines in a description file are unimportant.
+Lines starting with a pound sign (#) are comments, blank lines are
+ignored.  A line can be continued by ending with a backslash (\\)
+newline character.
+.PP
+The following \*Ltag\*O values are defined. If a tool's description
+file contains an unknown tag, Atom issues a warning and ignores that
+tag's line.  Duplicate tags in a description file cause a fatal error.
+.TS
+tab(@);
+lfHB lfHB
+l lw(3.5i).
+.sp
+_
+Tag@Meaning
+_
+.sp
+INST_FILE@T{
+The tool's instrumentation file.  This tag is required in all
+description files.  The file can be either a C source file (with a
+\*L.c\*O suffix) or an object module (with an \*L.o\*O suffix).
+No other file types are allowed.
+T}
+.sp
+ANAL_FILE@T{
+The tool's analysis file.  If this is not specified, a null analysis
+file is used.  The file can be either a C source file (with a ".c"
+suffix) or an object module (with a ".o" suffix).
+No other file types are allowed.
+T}
+.sp
+INST_CFLAGS@T{
+Flags to be passed to the C compiler when compiling the instrumentation
+file.  This tag is ignored if the instrumentation file is not a C
+source file.
+T}
+.sp
+ANAL_CFLAGS@T{
+Flags to be passed to the C compiler when compiling the analysis file.
+This tag is ignored if the analysis file is not specified, or is not
+a C source file.
+T}
+.sp
+INST_LDFLAGS@T{
+Flags to be passed to the linker when linking the instrumentation file
+with the Atom run-time system.
+T}
+.sp
+ANAL_LDFLAGS@T{
+Flags to be passed to the linker when linking the analysis file to
+resolve all undefined symbols.
+T}
+.sp
+ATOM_REQ@T{
+Required \*Latom\*O command line flags for the tool described by
+this description file.  These flags
+are implicitly passed to Atom when the tool is invoked.
+If the user specifies a conflicting flag, the \*Latom\*O command
+displays a warning and ignores the user-specified switch.
+T}
+.sp
+ATOM_DEF@T{
+Default \*Latom\*O command line flags for the tool described by this
+description file.  These flags are implicitly passed to Atom when the
+tool is invoked.  If the user specifies a conflicting flag, the
+\*Latom\*O command overrides the corresponding flag listed in this list.
+T}
+.sp
+_
+.TE
+.PP
+The following description file is for a tool named \*Lpixie\*O that
+has an instrumentation file called \*Lpixie.inst.c\*O and an
+analysis file called \*Lpixie.anal.c\*O.
+The instrumentation file links in the \*Llibmld\*O library (using
+the \*L\-lmld\*O flag) and the analysis file links in the \*Lpdf\*O
+library (using the \*L\-lpdf\*O flag).
+.oS
+#
+# pixie.desc
+#
+INST_FILE	pixie.inst.c
+ANAL_FILE	pixie.anal.c
+INST_LDFLAGS	-lmld
+ANAL_LDFLAGS	-lpdf
+.oE
+.PP
+The following environment-specific description file supports a version
+of the \*Lpixie\*O tool for the threads environment.  The threaded version of
+\*Lpixie\*O uses the same instrumentation and analysis source files as the
+general-purpose version.  However, the source files are compiled with the
+\*L\-DTHREADS\*O compiler flag.
+.oS
+#
+# pixie.threads.desc
+#
+INST_FILE	pixie.inst.c
+ANAL_FILE	pixie.anal.c
+INST_CFLAGS	-DTHREADS
+ANAL_CFLAGS	-DTHREADS
+INST_LDFLAGS	-lmld
+ANAL_LDFLAGS	-lpdf
+.oE
+.PP
+The following general-purpose description file for the \*Lthird\*O Atom tool
+specifies default and required
+\*Latom\*O command line flags.  It forces the \*L\-heapbase progend\*O
+flag to be passed to \*Latom\*O whenever the \*Lthird\*O tool
+is invoked.  It also passes the \*L-A1\*O flag to the \*Latom\*O
+command line unless the user overrides this option by explicitly
+specifying \*L\-A0\*O when issuing the command.
+.oS
+#
+# third.desc
+#
+INST_FILE	third.inst.o
+ANAL_FILE	third.anal.o
+ATOM_REQ	-heapbase progend
+ATOM_DEF	-A1
+------------------------------------------------------------------
+.oE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_navigation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_resolvers\*O(5),
+\*Latom_object_management\*O(5), \*Latom_instrumentation_routines\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

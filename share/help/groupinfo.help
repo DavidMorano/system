@@ -1,0 +1,21 @@
+GROUPINFO
+
+This program retrieves information from the UNIX GROUP database.
+
+Synopsis:
+
+$ groupinfo {groupname|gid} [query(s)] [-q] [-V]
+
+where:
+
+<groupname>	a groupname to query on
+<gid>		a group ID to query
+-q		do not print anything out (just return exit-code)
+-V		print program version to standard-error and then exit
+
+queries:
+
+groupname	return the group name
+gid		return the group ID
+users		return the users within the group
+

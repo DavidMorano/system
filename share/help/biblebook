@@ -1,0 +1,18 @@
+BIBLEBOOK
+
+This is a KSH shell built-in command.  It queries the BIBLEBOOK database
+for matching entries.
+
+Synopsis:
+
+$ biblebook [<number>|<word(s)> ...] [-af <argfile>] [-ndb <ndbname>] [-a] [-V]
+
+where:
+
+<number>	a number indicating the biblebook desired
+<word(s)>	one or more words to query
+-af <argfile>	take queries from this file
+-ndb <ndbname>	bible-book name database
+-a		print all book titles of the Bible
+-V		print command version to standard-error and then exit
+

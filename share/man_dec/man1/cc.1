@@ -1,0 +1,1961 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: cc.1,v $ $Revision: 3.2.17.3 $ (DEC) $Date: 1996/10/29 21:41:23 $
+.\"
+.\" ---------------------------------------------------
+.\" | Copyright (c) 1986, MIPS Computer Systems, Inc. |
+.\" | All Rights Reserved.                            |
+.\" ---------------------------------------------------
+.\" $Header: /usr/doc/osf1doc/refpages/rcs/src/BASE/DEC/man1/cc.1,v 3.2.17.3 1996/10/29 21:41:23 Ken_Hall Exp $
+.TH cc 1 96/10/29 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Lcc\*O \- C compiler
+.SH SYNOPSIS
+.PP
+.sS
+.in +.5i
+.ti -.5i
+\*Lcc\*O \*O[\*L\-newc\*O] \*O[\*Vflag\*O] ... \*Vfile\*O ...
+.nL
+.ti -.5i
+\*Lcc\*O \*L\-oldc\*O \*O[\*Vflag\*O] ... \*Vfile\*O ...
+.nL
+.ti -.5i
+\*Lcc\*O \*L\-migrate\*O \*O[\*Vflag\*O] ... \*Vfile\*O ...
+.SS Default Flags:
+\*Lcc \-newc \-assume aligned_objects \-cpp \-call_shared \-double
+\-fprm n \-fptm n
+\-g0 \-I/usr/include \-inline manual \-member_alignment
+\-no_fp_reorder \-no_misalign \-object \-O1 \-oldcomment \-p0 \-no_pg
+\-preempt_symbol \-signed \-arch generic \-std0 \-tune generic
+\-writeable_strings\*O
+.sE
+.SH DESCRIPTION
+.PP
+.iX "cc command"
+The \*Lcc\*O command invokes the C compiler.  The \*L\-newc\*O
+and \*L\-oldc\*O flags invoke different compiler implementations
+(where the implementation invoked by \*L\-newc\*O is upwardly
+compatible with that invoked by \*L\-oldc\*O).
+The \*(lqnewc\*(rq compiler offers improved optimization, additional
+features, and greater compatibility with Digital compilers provided
+on other platforms.
+The \*(lqnewc\*(rq compiler implementation is the default.
+.PP
+You can access the \*(lqnewc\*(rq compiler with either the
+\*L\-newc\*O flag or the
+\*L\-migrate\*O
+flag; however, the default flags associated with these two flags are
+different:
+.\" ***DON'T USE THE ".ML" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.VL 2m
+.LI "\-"
+The default flags associated with the \*L\-newc\*O flag are
+similar to the defaults associated with the \*L\-oldc\*O flag.
+.LI "\-"
+The default flags associated with the \*L\-migrate\*O flag are
+the same as those previously associated with the \*L\-migrate\*O
+flag in the compilation environment for versions of the
+DEC OSF/1 operating system preceding
+.\"  ***Preceding reference to DEC OSF/1 is correct.
+.\"     Do not change to Digital UNIX"
+Digital UNIX Version 4.0.
+.LE
+.PP
+The ability to access the \*(lqnewc\*(rq compiler with the
+\*L\-migrate\*O flag was retained in the Digital UNIX system's
+compilation environment so that prior users of \*L\-migrate\*O
+can continue to use the compiler in the same way that they did
+previously (that is, the same command line accesses the same
+compiler with the same defaults).
+.PP
+The \*Lcc\*O command can accept any of the following \*Vfile\*O
+arguments:
+.\" ***DON'T USE THE ".ML" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.VL 2m
+.LI "\-"
+Arguments whose names end with \*L\.c\*O are assumed to be C source
+programs. They are compiled, and each object program is left in a
+file whose name consists of the last component of the source with
+\*L\.o\*O substituted for \*L\.c\*O.  The \*L\.o\*O file is deleted
+only when a single source program is compiled and loaded all at once.
+.LI "\-"
+Arguments whose names end with \*L\.s\*O are assumed to be symbolic
+assembly language source programs.  They are assembled, producing a
+\*L\.o\*O file.
+.LI "\-"
+Arguments whose names end with \*L\.i\*O are assumed to be C source
+files after being processed by the C preprocessor.
+.LI "\-"
+Arguments whose names do not end with \*L\.c\*O, \*L\.s\*O, or
+\*L\.i\*O are assumed to be either C-compatible object files,
+typically produced by an earlier \*Lcc\*O run, or libraries of
+C-compatible routines.
+.LE
+.PP
+When you use the \*L\-oldc\*O flag, the compiler accepts the following
+additional \*Vfile\*O arguments:
+.\" ***DON'T USE THE ".ML" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.VL 2m
+.LI "\-"
+Arguments whose names end with \*L\.c\*O are compiled into ucode
+object files when \*L\-oldc\*O's highest level of optimization is
+specified (\*L\-O3\*O flag) or when only ucode object files are to be
+produced (\*L\-j\*O flag).  The ucode object file is left in a file
+whose name consists of the last component of the source with \*L\.u\*O
+substituted for \*L.c\*O.
+.LI "\-"
+Arguments whose names end with \*L\.B\*O, \*L\.O\*O, \*L\.S\*O, and
+\*L\.M\*O are assumed to be binary ucode, produced by the front end,
+optimizer, ucode object file splitter, and ucode merger, respectively.
+Arguments whose names end with \*L\.U\*O are assumed to be symbolic
+ucode.  Arguments whose names end with \*L\.G\*O are assumed to be
+binary assembly language, which is produced by the code generator and
+the symbolic to binary assembler.  These files primarily aid in
+compiler development and are not generally used.
+.LI "\-"
+Files that are assumed to be binary ucode, symbolic ucode, or binary
+assembly language by the suffix conventions are also assumed to have
+their corresponding symbol table in a file with a \*L\.T\*O suffix.
+.LE
+.PP
+The \*Lcc\*O command can accept \*Vflags\*O specific to either the
+\*Lcc\*O command or the \*Lld\*O command (linker).  When the compiler
+recognizes position-sensitive linker flags (\*L\-L\*O, \*L\-all\*O,
+\*L\-exclude\*O, \*L\-exported_symbol\*O, \*L\-hidden\*O,
+\*L\-hidden_symbol\*O, \*L\-kl\*O, \*L\-l\*O, \*L\-none\*O,
+\*L\-non_hidden\*O, and \*L\-no_archive\*O), it maintains their
+relative order for the linker.  This reference page describes the
+flags specific to the \*Lcc\*O command.  See \*Lld\*O(1) for a
+description of the linker flags.
+.PP
+All of the input files, plus the results of the compilations, are
+loaded in the order given to produce an executable program with the
+default name \*La\.out.\*O  The compiler can produce object files in
+extended COFF format (the normal result).  It can also produce
+object files in symbolic assembly language format when invoked with the
+\*L\-S\*O flag.
+When invoked with the \*L\-oldc\*O flag, it can also produce binary
+assembly language code, binary ucode, or symbolic ucode.
+.PP
+When the compiler is invoked, it defines C preprocessor macros that
+identify the language of the input files and the environments in which
+the code can run.  You can reference these macros in \*L#ifdef\*O
+statements to isolate code that applies to a particular language or
+environment.  The preprocessor macros are listed in the following
+table.  Note that the type of source file and the type of standards
+you apply determine the macros that are defined.
+.TS
+tab(@);
+lfHB lfHB lfHB
+lll.
+_
+.sp 4p
+Macro@Source File Type@\-std Flag
+.sp 4p
+_
+.sp 6p
+\*L_\|_DECC\*O (\*L\-newc\*O and \*L\-migrate\*O only)@\*L.c\*O@@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*LLANGUAGE_C\*O@\*L.c\*O@\*L\-std0\*O
+.sp 4p
+\*L_\|_LANGUAGE_C_\|_\*O@\*L.c\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*Lunix\*O@\*L.c\*O, \*L.s\*O@\*L\-std0\*O
+.sp 4p
+\*L_\|_unix_\|_\*O@\*L.c\*O, \*L.s\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*L_\|_osf_\|_\*O@\*L.c\*O, \*L.s\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*L_\|_alpha\*O@\*L.c\*O, \*L.s\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*LSYSTYPE_BSD\*O@\*L.c\*O, \*L.s\*O@\*L\-std0\*O
+.sp 4p
+\*L_SYSTYPE_BSD\*O@\*L.c\*O, \*L.s\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*LLANGUAGE_ASSEMBLY\*O@\*L.s\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 4p
+\*L_\|_LANGUAGE_ASSEMBLY_\|_\*O@\*L.s\*O@\*L\-std0\*O, \*L\-std\*O, \*L\-std1\*O
+.sp 6p
+_
+.TE
+.PP
+You can explicitly define macros with the \*L\-D\*O flag
+to control which functions are declared in header files and to obtain
+standards conformance checking.
+.\" ***HANDLE THIS WITH A REF TO STANDARD(5) -- PER TPETERSON AND DLONG
+.\" .TS
+.\" tab(@);
+.\" lfHB lfHB
+.\" ll.
+.\" _
+.\" .sp 4p
+.\" Macro@Standard
+.\" .sp 4p
+.\" _
+.\" .sp
+.\" \*L_XOPEN_SOURCE_EXTENDED\*O@XPG4-UNIX
+.\" \*L_XOPEN_SOURCE\*O@XPG4
+.\" \*L_POSIX_SOURCE\*O@POSIX
+.\" \*L_ANSI_C_SOURCE\*O@ISO C and ANSI C
+.\" .sp 6p
+.\" _
+.\" .TE
+.\" .PP
+.\" .\" ***REPLACE FOLLOWING TEXT (kch)
+.\" .\" These macros are hierarchical,
+.\" .\" so that \*L_ANSI_C_SOURCE\*O is included
+.\" .\" in \*L_POSIX_SOURCE\*O, \*L_POSIX_SOURCE\*O is included in
+.\" .\" \*L_XOPEN_SOURCE\*O, and \*L_XOPEN_SOURCE\*O is included in
+.\" .\" \*L_XOPEN_SOURCE_EXTENDED\*O.
+.\" These macros are hierarchical,
+.\" with \*L_XOPEN_SOURCE_EXTENDED\*O being
+.\" the highest in the order and \*L_ANSI_C_SOURCE\*O being the lowest.
+.\" Each macro includes any macros that are lower in the hierarchy; for
+.\" example, the \*L_XOPEN_SOURCE\*O macro includes the \*L_POSIX_SOURCE\*O
+.\" and \*L_ANSI_C_SOURCE\*O macros.
+.\" ***REPLACEMENT TEXT:
+See
+.MS standards 5
+for a list of the macro names and details on the function declarations
+and standards conformance checking associated with the various macros.
+.PP
+While the \*L\-D\*O flag controls which functions are declared in
+header files, the \*L\-std\*Vn\*O flags control how strictly the
+declarations conform to the ANSI C standard.  For strict ISO C and
+ANSI C conformance, the compiler command line must include the
+\*L\-std1\*O flag.
+.PP
+The following environment variables can affect compiler operation:
+.VL 4m
+.LI "\*LLANG\*O"
+Provides a default value for locale variables that are not set.
+If any of these variables contains an invalid setting, the compiler
+behaves as if none were set.
+.LI "\*LLC_ALL\*O"
+If set to a non-empty string, this variable overrides values in all
+locale variables, including \*LLANG\*O.
+.LI "\*LLC_CTYPE\*O"
+Determines the locale for the interpretation of sequences of bytes of
+text data as characters (for example, single- as opposed to multi-byte
+characters in arguments and input files).
+.LI "\*LLC_MESSAGES\*O"
+Determines the locale used for diagnostic messages.
+.LI "\*LNLSPATH\*O"
+Determines the locale of message catalogs for the processing of
+\*LLC_MESSAGES\*O.
+.LI "\*LTMPDIR\*O"
+Provides a pathname that overrides the default directory for temporary
+files, if any.
+.LE
+.PP
+For more information on these environment variables, see
+\*Li18n_intro\*O(5) and \*Ll10n_intro\*O(5).
+.PP
+To facilitate setting default compiler flags, you can create an optional
+configuration file named \*Lcomp.config\*O. This file should be stored
+in the compiler target directory, \*L/usr/lib/cmplrs/cc\*O, and should
+contain a single line of compiler flags.  The flags are processed
+before the user-specified flags in the command line. The line can be
+up to 8191 (\*LBUFSIZ\*O-1) bytes long, with up to 64 tokens
+(separated by blanks and tabs).  Flags specified in the command line
+override those specified in the configuration file.
+.SH FLAGS
+.PP
+Flags described in this section are divided into the following
+categories:
+.\" ***DON'T USE THE ".ML" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.VL 2m
+.LI "\-"
+Flags that select a particular compiler implementation
+.LI "\-"
+Flags that affect the compiler's overall behavior
+.LI "\-"
+Flags that affect the C preprocessor
+.LI "\-"
+Flags that affect the behavior of the linker or loader
+.LI "\-"
+Flags that perform optimizations
+.LI "\-"
+Flags that facilitate the use of feedback-directed optimizations
+.LI "\-"
+Flags for debugging source code
+.LI "\-"
+Flags that work in conjunction with the \*Lpixie\*O, \*Lprof\*O, and
+\*Lgprof\*O programs for program profiling
+.LI "\-"
+Flags that check the portability of code
+.LI "\-"
+Flags that affect the alignment of data
+.LI "\-"
+Flags that affect the volatility of data
+.LI "\-"
+Flags specific to the C programming language
+.LI "\-"
+Flags that determine the rounding mode applied to IEEE floating-point
+instructions generated by the compiler
+.LI "\-"
+Flags that handle stacks and pointers
+.LI "\-"
+Flags that provide IEEE floating-point support
+.LI "\-"
+Flags enabled by the \*L\-oldc\*O flag for the generation of ucode
+.LI "\-"
+Flags that aid compiler development (not generally used)
+.LE
+.sp 2
+.\" COMPILER SELECTION FLAGS ***************************************
+\*BFlags that select a particular compiler implementation:\*O
+.VL 4m
+.LI "\*L\-newc\*O"
+Invokes the new implementation of the C compiler, with defaults that
+make it compatible with the \*L\-oldc\*O compiler.  (This is
+the default.)
+.LI "\*L\-migrate\*O"
+Invokes the new implementation of the C compiler, but with a slightly
+different set of compiler flags and default optimizations.
+These flags and optimizations provide backward compatibility for
+applications relying on the \*L\-migrate\*O flag provided in previous
+implementations of the \*Lcc\*O command.
+.LI "\*L\-oldc\*O"
+Invokes the older, ucode-based implementation of the C compiler.
+.LE
+.sp 2
+.\" GENERAL FLAGS **************************************************
+\*BFlags that affect the compiler's overall behavior:\*O
+.VL 4m
+.LI "\*L\-arch \*Voption\*O"
+Specifies which version of the Alpha architecture to generate
+instructions for.   All Alpha processors implement a core set of
+instructions and, in some cases, the following extensions:
+BWX (byte- and word-manipulation instructions) and MAX (multimedia
+instructions).  (The
+\*EAlpha Architecture Reference Manual\*O
+.\" Alpha Architecture Reference Manual
+describes the extensions in detail.)
+.IP
+The option specified by the \*L-arch\*O flag determines which
+instructions the compiler can generate:
+.VL 4m
+.LI "\*Lgeneric\*O"
+Generate instructions that are appropriate for all Alpha processors.
+This option is the default.
+.LI "\*Lhost\*O"
+Generate instructions for the processor that the compiler is running
+on (for example, EV56 instructions on an EV56 processor, and EV4
+instructions on an EV4 processor).
+.LI "\*Lev4,ev5\*O"
+Generate instructions for the EV4 processor (21064, 20164A, 21066, and
+21068 chips) and EV5 processor (some 21164 chips).  (Note that the EV5
+and EV56 processors both have the same chip number \- 21164.)
+.IP
+Applications compiled with this option will not incur any emulation
+overhead on any Alpha processor.
+.LI "\*Lev56\*O"
+Generate instructions for EV56 processors (some 21164 chips).
+.IP
+This option permits the compiler to generate any EV4 instruction,
+plus any instructions contained in the BWX extension.
+.IP
+Applications compiled with this option may incur emulation overhead on
+EV4 and EV5 processors.
+.LI "\*L pca56\*O"
+Generate instructions for PCA56 processors (21164PC chips).
+.IP
+This option permits the compiler to generate any EV4 instruction,
+plus any instructions contained in the BWX or MAX extensions.
+.IP
+Applications compiled with this option may incur emulation overhead
+on EV4, EV5, and EV56 processors.
+.LE
+A program compiled with any of the options will run on any Alpha
+processor.  Beginning with Digital UNIX V4.0 and continuing with
+subsequent versions, the operating system kernel includes an
+instruction emulator. This capability allows any Alpha chip to
+execute and produce correct results from Alpha instructions \- even
+if the some of the instructions are not implemented on the chip.
+Applications using emulated instructions will run correctly, but may
+incur significant emulation overhead at run time.
+.IP
+The \*Lpsrinfo \-v\*O command can be used to determine which type of
+processor is installed on any given Alpha system.
+.LI "\*L\-c\*O"
+Suppresses the loading phase of the compilation and forces the
+creation of an object file.
+.LI "\*L\-edit\*O[\*V0-9\*O]"
+When syntactic or semantic errors are detected by the compiler's front
+end, invokes the editor defined by the environment variable
+\*LEDITOR\*O (or \*Lvi\*O if \*LEDITOR\*O is undefined).  Two files
+are opened for editing: the error message file, which indicates the
+location of the error, and the source file.  When you exit from the
+editor, the compilation is restarted.
+.IP
+The \*Vn\*O argument specifies the number of times a compilation can
+be interrupted in this way.  If no number is specified, the
+compile-edit-compile cycle repeats indefinitely until all errors are
+corrected. The \*L\-edit0\*O flag turns off this feature.  To abort the
+cycle, you must press Ctrl-C while the process is in the compilation
+phase (that is, while it is not in the editor).
+.IP
+When compiling on a character-based terminal, the compile job has to
+be in the foreground for this flag to take effect.  When compiling on
+a workstation, this flag takes effect whether it is in the foreground
+or background.
+.LI "\*L\-machine_code\*O"
+Includes the generated machine code in the listing file.  By default,
+machine code is not listed.  To produce the listing file, you must
+also specify \*L\-source_listing\*O.  This flag is not available when
+you use the \*L\-oldc\*O flag.
+.LI "\*L\-noobject\*O"
+Suppresses creation of an object file. By default, an object
+module file is created with the same name as that of the first source
+file of a compilation unit and with the \*L.o\*O file extension.
+.IP
+Use the \*L\-noobject\*O flag when you need only a listing of a
+program or when you want the compiler to check a source
+file for errors.
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-o \*Voutput\*O"
+Names the final output file \*Voutput\*O.
+.LI "\*L\-S\*O"
+Compiles the specified source files and generates symbolic
+assembly language output in corresponding files suffixed with
+\*L\.s\*O.
+.LI "\*L\-show \*Vkeyword[,keyword,...]\*O"
+Specifies one or more items to be included in the listing file.
+When specifying multiple keywords, separate them by commas and no
+intervening blanks. To use any of the \*L\-show\*O keywords, you
+must also specify the \*L\-source_listing\*O option.
+.IP
+The \*L\-show\*O keywords are as follows:
+.VL 4m
+.LI "\*Lnone\*O"
+Turns off all show options.
+.LI "\*Lall\*O"
+Turns on all show options.
+.LI "\*L[no]expansion\*O"
+Places final macro expansions in the program listing. When you specify
+expansion, the number printed in the margin indicates the maximum
+depth of macro substitutions that occur on each line.
+.LI "\*L[no]header\*O"
+Produces header lines at the top of each page of listing.
+.LI "\*L[no]include\*O"
+Places contents of \*L#include\*O files in program listing.
+.LI "\*L[no]source\*O"
+Places source program statements in program listing.
+.LI "\*L[no]statistics\*O"
+Places compile-time performance statistics in the program listing.
+.LE
+.IP
+If you specify \*L\-source_listing\*O but do not specify
+\*L\-show\*O \*Vkeywords\*O, the compiler includes header lines and
+source statements in the program listing (\*L\-show header,source\*O).
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-source_listing\*O"
+Produces a source program listing file with the same name as the source
+file and with a \*L\.lis\*O file extension. You must specify this
+qualifier to get a listing. The default is to not produce a listing
+file. This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-v\*O"
+Prints the compiler passes as they execute with their arguments and
+their input and output files.  Also print resource usage in the
+C-shell \*Ltime\*O format. If specified more than once, the passes are
+printed but not executed.
+.LI "\*L\-V\*O"
+Prints the version of the compiler driver and, when the \*L\-oldc\*O
+flag is specified, the versions of all
+passes in the same format as the \*Lwhat\*O command.
+.LI "\*L\-verbose\*O"
+Produces longer error and warning messages. Messages in this form may
+give the user more hints about why the compilation failed.
+.LI "\*L\-w\*O[\*Vn\*O]"
+Controls the display of messages as well as the actions that occur
+as a result of the messages.
+The value of \*Vn\*O can be one of the following:
+.VL 4m
+.LI "\*L0\*O"
+Displays all levels of compiler messages (warnings, errors, fatals, and,
+when \*L\-newc\*O or \*L\-migrate\*O is specified, informational messages).
+.LI "\*L\1\*O"
+Suppresses warning messages.  The \*L\-w1\*O flag displays error and fatal messages
+and, when \*L\-newc\*O or \*L\-migrate\*O is specified, informational messages.
+Specifying \*L\-w\*O is the equivalent of specifying \*L\-w1\*O.
+.LI "\*L\2\*O"
+.\" ***REVISE FOLLOWING TEXT:
+.\" Abort on warnings after printing them as if an error occurred.
+Prints warning messages and then aborts.
+.LI "\*L\3\*O"
+Does not print warning messages. However, when warnings occur,
+exits with nonzero status.
+.LE
+.IP
+If no \*L\-w\*O\ flag is specified (the default), only warning, error, and
+fatal messages are displayed.
+.LI "\*L\-warnprotos\*O"
+Causes the compiler to produce warning messages when a function is
+called that is not declared with a full prototype.  This
+checking is more strict than required by ANSI C.
+.LE
+.sp 2
+.ne 4
+.\" PREPROCESSOR FLAGS **********************************************
+\*BFlags that affect the C preprocessor:\*O
+.VL 4m
+.LI "\*L\-C\*O"
+Passes all comments directly to the preprocessor, except comments on
+preprocessor directive lines.
+.LI "\*L\-\*O[\*Lno_\*O]\*Lcpp\*O"
+Determines whether to call the C macro preprocessor on C and assembly
+source files before compiling.
+.IP
+\*L\-cpp\*O is the default.
+.LI "\*L\-D\*Vname\*O[=\*Vdef\*O]"
+Defines the \*Vname\*O as if with a \*L#define\*O statement. If no
+definition is given, the name is defined as \*L1\*O.
+.LI "\*L\-E\*O"
+Runs only the C macro preprocessor on the files and sends the result
+to the standard output device.
+.LI "\*L\-I\*O[\*Vdir\*O]"
+Specifies a search path for \*L#include\*O files whose names do not
+indicate a specific directory path (that is, whose names do not
+begin with a /).  The actual search path depends upon the form of the
+\*L#include\*O directive used for the file:
+.\" ***DON'T USE THE ".ML" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.VL 2m
+.LI "\-"
+If the \*L#include "\*Vfilename\*L"\*O form of the directive is used,
+the C macro preprocessor searches for the file first in the directory
+in which it found the file that contains the directive, then in the
+search path indicated by the \*L\-I\*O flag, and finally in the
+standard directory, \*L/usr/include\*O.
+.LI "\-"
+If the \*Linclude <\*Vfilename\*L>\*O form of the directive is used,
+the preprocessor searches for the file first in the search path
+indicated by the \*L\-I\*O flag, and then in the standard directory,
+\*L/usr/include\*O.
+.LE
+.IP
+You can specify multiple iterations of the \*L\-I\*O[\*Vdir\*O] flag
+in the \*Lcc\*O command line; each instance of the \*L\-\*O[\*Vdir\*O]
+flag appends locations to the previously established \*L\-I\*O[\*Vdir\*O]
+search path.  If no \*Vdir\*O is specified in any
+instance of the \*L\-I\*O[\*Vdir\*O] flag, the C macro preprocessor
+never searches the standard directory, \*L/usr/include\*O,
+for \*L#include\*O files.
+.IP
+The \*L\-nocurrent_include\*O flag can also modify the search path.
+.LI "\*L\-M\*O"
+Requests a dependency list.
+This flag is passed directly to the preprocessor.
+See \*Lcpp\*O(1) for details.
+.LI "\*L\-MD\*O"
+Requests a dependency file.
+This flag is passed directly to the preprocessor and linker.
+For more information, see \*Lcpp\*O(1) and
+\*Lld\*O(1).
+.LI "\*L\-nocurrent_include\*O"
+Controls the search order for header files.
+This flag is passed directly to the preprocessor.
+For more information, see \*Lcpp\*O(1).
+.LI "\*L\-oldcomment\*O"
+Directs the preprocessor to delete comments (replacing them with nothing at all).
+This allows traditional token concatenation.
+.IP
+This is the default in \*L\-std0\*O mode.  In \*L\-std\*O and \*L\-std1\*O mode, the
+default is to replace comments with a single space.
+.LI "\*L\-P\*O"
+Runs only the C preprocessor and puts the result for each
+\*L.c\*O or \*L\.s\*O source file in a
+corresponding \*L\.i\*O file. The \*L\.i\*O file has no
+\*L#\*Vline_number\*O preprocessor macro lines in it.
+.LI "\*L\-proto\*O[\*Lis\*O]"
+Extracts prototype declarations for function definitions and
+puts them in a \*L.H\*O suffixed file.
+The suboption \*Li\*O includes identifiers in
+the prototype, and the suboption \*Ls\*O generates prototypes for
+static functions as well.
+.LI "\*L\-Q\*O"
+Directs the preprocessor to use
+single quotes in \*L_\|_FILE_\|_\*O expansions instead of double
+quotes. See \*Lcpp\*O(1) for details.
+.LI "\*L\-U\*Vname\*O"
+Removes any definition of \*Vname\*O previously defined with the
+\*L\-D\*O flag.
+.LE
+.sp 2
+.\" LINKER FLAGS **************************************************
+\*BFlags that affect the behavior of the linker or loader:\*O
+.VL 4m
+.LI "\*L\-call_shared\*O"
+Produces a dynamic executable file that uses shareable objects during
+run time. This is the default. The loader uses shareable objects to
+resolve undefined symbols. The run-time loader (\*L/sbin/loader\*O) is
+invoked to bring in all required shareable objects and to resolve any
+symbols that remained undefined during static link time.
+.LI "\*L\-compress\*O"
+Passes the \*L\-compress\*O flag to the assembler (\*Las\*O)
+(if the \*L\-c\*O flag is present) or
+passes the \*L\-compress_r\*O flag to \*Lld\*O
+(if the \*L\-r\*O flag is present).
+Use of this flag causes the output object file to be produced in
+compressed object file format, resulting in a substantially smaller
+object file.
+.LI "\*L\-cord\*O"
+Runs the procedure rearranger, \*Lcord\*O, on the resulting
+file after linking. The rearrangement is done to reduce the cache
+conflicts associated with accessing the program's text.
+The output of \*Lcord\*O is left in the file specified by the
+\*L\-o \*Voutput\*O flag or \*La.out\*O by default.
+At least one \*L\-feedback \*Vfile\*O must be specified.  See
+\*Lprof\*O(1) for information on creating feedback files.
+.LI "\*L\-exact_version\*O"
+Used in conjunction with \*L\-call_shared\*O to request strict
+dependency testing for the executable file produced. Executable files
+built in this manner can be executed only  if the shared libraries
+that they use were not modified after the executable was built.
+.LI "\*L\-no_archive\*O"
+Prevents the linker from using archive libraries to
+resolve symbols. This flag is used in conjunction with
+\*L\-call_shared\*O. The \*L\-no_archive\*O
+flag is position sensitive; it affects only those flags and
+variables that follow it on the command line. This flag can also be
+used more than once on the command line.
+.LI "\*L\-non_shared\*O"
+.\" ***THE FOLLOWING SHOULD REFER TO THE 'LINKER', NOT THE 'LOADER'
+.\" (kch/mjr)
+Directs the linker to produce a static executable.  The output object created by
+the linker will not use any shared objects during execution.
+.\" the next option commented out for alpha
+.\" .LI "\*L\-shared\*O"
+.\" Produce dynamic shareable objects. The loader will produce a
+.\" shareable object that other dynamic executables can use at run time.
+.LI "\*L\-pthread\*O"
+Directs the linker to use the threadsafe version of any library
+specified with the \*L\-l\*O flag when linking programs.
+This flag also tells the linker to include the POSIX 1003.1c-conformant
+DECthreads interfaces in \*Llibpthread\*O when linking the program.
+.LI "\*L\-taso\*O"
+Directs the linker to load the executable file in the lower
+31-bit addressable virtual address range. The \*L\-T\*O and \*L\-D\*O
+flags to the \*Lld\*O command can also be used, respectively, to
+ensure that the text and data segments addresses are loaded into
+low memory.
+.IP
+The \*L\-taso\*O flag, however, in addition to setting default
+addresses for text and data segments, also causes shared libraries
+linked outside the 31-bit address space to be appropriately relocated
+by the loader. If you specify \*L\-taso\*O and also specify text and
+data segment addresses with \*L\-T\*O and \*L\-D\*O, those addresses
+override the \*L\-taso\*O default addresses. The \*L\-taso\*O flag is
+useful for porting 32-bit programs to Digital UNIX.
+.LI "\*L\-threads\*O"
+Directs the linker to use the threadsafe version of any library
+specified with the \*L\-l\*O flag when linking programs.
+This flag also tells the linker to include both the POSIX
+1003.4a Draft 4 conformant DECthreads interfaces.
+It is supported only for compatibility with earlier releases of Digital
+UNIX.  New designs should use the \*L\-pthread\*O flag.
+.LE
+.sp 2
+.\" OPTIMIZATION FLAGS *********************************************
+\*BFlags that perform optimizations:\*O
+.VL 4m
+.LI "\*L\-[no]ansi_alias\*O"
+Directs the compiler to assume the ANSI C aliasing rules, and thus
+allows the optimizer to be more aggressive. The \*L\-noansi_alias\*O flag turns off
+ANSI C aliasing rules.
+.IP
+The aliasing rules
+are explained in Section 3.3, paragraphs 20 and 25 of the ANSI C
+Standard, reprinted as follows:
+.rS
+.IP
+"An object shall have its stored value accessed only by an lvalue that
+has one of the following types:
+.VL 2m
+.LI "\-"
+The declared type of the object,
+.LI "\-"
+A qualified version of the declared type of the object,
+.LI "\-"
+A type that is the signed or unsigned type corresponding to the
+declared type of the object,
+.LI "\-"
+A type that is the signed or unsigned type corresponding to a
+qualified version of the declared type of the object,
+.LI "\-"
+An aggregate or union type that includes one of the aforementioned
+types among its members (including, recursively, a member of a
+subaggregate or contained union), or
+.LI "\-"
+A character type."
+.rE
+.LE
+.IP
+If your program does not access the same data through pointers of a
+different type (and for this purpose, signed and qualified versions of
+an otherwise same type are considered to be the same type), then
+assuming ANSI C aliasing rules allows the compiler to generate better
+optimized code.
+.IP
+If your program does access the same data through pointers of a
+different type (for example, by a "pointer to int" and a "pointer to
+float"), you must not allow the compiler to assume ANSI C
+aliasing rules because these rules can result in the generation
+of incorrect code.
+.IP
+The default is to assume no ANSI C aliasing rules when compiling with
+the \*L\-vaxc\*O or \*L\-std0\*O flag. The default is
+\*L\-ansi_alias\*O for the other compiler modes (\*L\-std\*O,
+\*L\-std1\*O).
+.IP
+The \*L\-noansi_alias\*O flag turns off ANSI C aliasing rules.
+.IP
+The \*L\-[no]ansi_alias\*O flag is not available when you use the
+\*L\-oldc\*O flag.
+.LI "\*L\-[no_]ansi_args\*O"
+Tells the compiler whether the source code follows all ANSI rules
+about arguments; that is, whether the type of an argument matches the
+type of the parameter in the called function, or whether a function
+prototype is present so the compiler can automatically perform the
+expected type conversion.
+.IP
+Specifying \*L\-no_ansi_args\*O means that the argument type may not
+match the expected parameter type.  For example, this flag is
+important when the caller passes a parameter of type \*Llong\*O and
+the called routine expects an \*Lint\*O.  The \*L\-no_ansi_args\*O
+flag forces the compiler to generate argument cleaning code to convert
+the argument to the appropriate type.  Except when the \*L\-std1\*O
+flag is specified, \*L\-no_ansi_args\*O is the default. Note that
+it is safe to specify \*L\-ansi_args\*O if you use ANSI-style
+function prototypes at all call sites.
+.IP
+Specifying \*L\-ansi_args\*O means that your code meets the ANSI C
+requirements, so no special argument cleaning code is generated.  This
+is a performance gain.  When \*L\-std1\*O is specified,
+\*L\-ansi_args\*O is the default.
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-fast\*O"
+Provides a single method for turning on a collection of optimizations
+for increased performance.
+.IP
+Note that the \*L\-fast\*O flag can produce different results for
+floating-point arithmetic and math functions, although most programs are
+not sensitive to these differences.  If your code contains
+constructs that make some of these optimizations undesirable, you may
+turn off individual options set by the \*L\-fast\*O flag by specifying
+their negation after \*L\-fast\*O.
+.IP
+The \*L\-fast\*O flag defines the following compiler flags and
+symbols to improve run-time performance.  You can adjust the optimizations
+provided by \*L\-fast\*O by specifying the negation of any given flag.
+.VL 4m
+.LI "\*L\-ansi_args\*O"
+Tells the compiler that the source code follows all ANSI rules
+about arguments; that is, whether the type of an argument matches the
+type of the parameter in the called function, or whether a function
+prototype is present so the compiler can automatically perform the
+expected type conversion.
+.IP
+See the description of this flag elsewhere in this reference
+page for more detailed information about this operation.
+.LI "\*L\-assume trusted_short_alignment\*O"
+Specifies that any \*Lshort\*O accessed through a pointer is
+naturally aligned.  This generates the fastest code, but can silently
+generate the wrong results when the \*Lshort\*O object crosses a
+quadword boundary.
+.IP
+See the description of this flag elsewhere in this reference
+page for more detailed information about this operation.
+.LI "\*L\-D_INTRINSICS\*O"
+Declares certain functions to be \*Lintrinsic\*O.  When a function is
+\*Lintrinsic\*O, the compiler is free to generate faster code that
+provides the same function behavior (but may not actually call the
+function).
+.LI "\*L\-D_INLINE_INTRINSICS\*O"
+Directs the compiler to inline some of the
+intrinsic functions, avoiding the overhead of a function call.
+.LI "\*L\-D_FASTMATH\*O"
+Causes the \*L/usr/include/math.h\*O file to redefine the names of
+certain common math routines, including \*Lsqrt\*O and \*Lexp\*O, so
+that faster but slightly less accurate functions are used. The
+fast math routines do not support IEEE exceptional behavior.
+.LI "\*L\-float\*O"
+Tells the compiler that it is not necessary to promote expressions of type
+\*Lfloat\*O to type \*Ldouble\*O.
+.IP
+See the description of this flag elsewhere in this reference
+page for more detailed information about this operation.
+.LI "\*L\-fp_reorder\*O"
+Allows floating-point operations to be reordered during optimization.
+.IP
+See the description of this flag elsewhere in this reference
+page for more detailed information about this operation.
+.LI "\*L\-ifo\*O"
+Performs inter-file optimizations.
+.IP
+See the description of this flag elsewhere in this reference
+page for more detailed information about this operation.
+.LI "\*L\-O3\*O or \*L\-O4\*O"
+\*L\-newc\*O and \*L\-oldc\*O set the optimization level to \*L\-O3\*O.
+.IP
+\*L\-migrate\*O sets the optimization level to \*L\-O4\*O.
+.IP
+See the description of these flags elsewhere in this reference
+page for more detailed information about this operation.
+.LI "\*L\-readonly_strings\*O"
+Makes string literals read-only for improved performance.
+.IP
+See the description of this flag elsewhere in this reference
+page for more detailed information about this operation.
+.LE
+.LI "\*L\-feedback \*Vfile\*O"
+Specifies the name of a feedback file (produced by \*Lprof\*O after
+running a \*Lpixie\*O version of the program).  The feedback file
+contains information that the compiler can use when performing
+optimizations.
+.IP
+You can also use a feedback file as input to the \*Lcord\*O utility,
+using \*L\-feedback\*O and the \*L\-cord\*O flags to link the program.
+.LI "\*L\-\*O[\*Lno_\*O]\*Lfp_reorder\*O"
+Specifies whether certain code transformations that affect
+floating-point operations are allowed. These changes can affect the
+accuracy of the program's results.
+.IP
+The \*L\-no_fp_reorder\*O flag, the default, directs the compiler to
+use only certain scalar rules for calculations. This setting can
+prevent some optimizations.  The \*L\-fp_reorder\*O flag frees the
+compiler to reorder floating-point operations based on algebraic
+identities (inverses, associativity, and distribution). For instance,
+this allows the compiler to move divide operations outside of loops, thus
+improving performance.
+.IP
+If you specify \*L\-fp_reorder\*O and the compiler reorders code to
+improve performance, the results can differ from the default, for example,
+due to the way intermediate results are rounded. However, the
+\*L\-fp_reorder\*O results are not categorically less accurate than
+those gained by the default.
+.LI "\*L\-G \*Vnum\"
+Specifies the maximum size, in bytes, of a data item that is to be put
+in one of the small data sections. Data items in the small data
+sections are more likely to be candidates for global pointer
+optimizations by link-time optimizations. The \*Vnum\*O argument is
+interpreted as a decimal number. The default value for \*Vnum\*O is 8
+bytes.  This value cannot be changed when using the \*L\-newc\*O or
+\*L\-migrate\*O flag.
+.LI "\*L\-\*O[\*Lno_\*O]\*Linline \*Vkeyword\*O"
+Specifies whether to provide inline expansion of functions.
+The \*L\-no_inline\*O flag disables the inlining
+optimization that would otherwise be performed by default under the
+following compiler optimization \*L-O[\*Vn\*L]\*O flags:
+.\" ***DON'T USE THE ".ML" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.VL 2m
+.LI "\-"
+When \*L\-O2\*O, \*L\-O3\*O, or \*L\-O4\*O is specified under
+\*L\-newc\*O
+.LI "\-"
+When \*L\-O4\*O or \*L\-O5\*O is specified under \*L\-migrate\*O
+.LI "\-"
+When \*L\-O3\*O is specified under \*L\-oldc\*O
+.LE
+.IP
+When choosing calls to expand inline, the
+compiler also considers the function size, how often the call is
+executed, how many registers the inline expansion will require, and
+other factors.
+.IP
+You can specify one of the following as the \*Vkeyword\*O to control
+inlining:
+.VL 4m
+.LI "\*Lnone\*O"
+No inlining is done, even if requested by a \*L#pragma inline\*O
+preprocessor directive. This is the default when compiling with the
+\*L\-O0\*O optimization level.
+.LI "\*L\manual\*O"
+Inlines only those function calls explicitly requested for inlining by
+a \*L#pragma inline\*O directive. This is the default when compiling
+with the \*L\-O1\*O flag under \*L\-newc\*O, or with the \*L\-O2\*O and
+\*L\-O3\*O flags under \*L\-oldc\*O.
+.LI "\*Lsize\*O"
+Inlines all of the function calls in the manual category, plus any
+additional calls that the compiler determines would improve run-time
+performance without significantly increasing the size of the program.
+This is the default when compiling with the \*L\-O2\*O or \*L\-O3\*O
+flag under \*L\-newc\*O; the \*L\-O\*O or \*L\-O4\*O flag under \*L\-oldc\*O
+or \*L\-migrate\*O; the \*L\-O5\*O flag under \*L\-migrate\*O.
+.LI "\*Lspeed\*O"
+Inlines all of the function calls in the manual category, plus any
+additional calls that the compiler determines would improve run-time
+performance, even where it may significantly increase the size of the
+program.
+.LI "\*Lall\*O"
+Inlines every call that can be inlined while still generating correct
+code. Recursive routines, however, will not cause an infinite loop at
+compile time.
+.LE
+.IP
+For optimization level 0 (\*L\-O0\*O), the \*L\-inline\*O flag is
+ignored and no inlining is done.  The \*L#pragma noinline\*O
+preprocessor directive can also prevent inlining of any function.
+.IP
+The \*L\-inline\*O flag is not available when you use the \*L\-oldc\*O
+flag.
+.LI "\*L\-ifo\*O"
+Provide improved optimization (inter-file optimization) and code
+generation across file boundaries that would not be possible if the
+files were compiled separately.
+.IP
+When you specify \*L\-ifo\*O on the command line in conjunction with a
+series of file specifications, the compiler does not concatenate each
+of the specified source files.  Instead, each file is treated
+separately for purposes of parsing, except that the compiler will
+issue diagnostics about conflicting external declarations and function
+definitions that occur in different files. For purposes of code
+generation, the compiler treats the files as one application. The
+default is to not provide inter-file optimization.
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-O\*O[\*Vn\*O]"
+Determine the level of optimization. The following table lists the
+types of optimizations that can be performed.  The default
+optimization level is \*L\-O1\*O.  Note, however, that different
+optimizations are performed at each level, depending on whether you
+invoke the compiler with the \*L\-newc\*O, \*L\-oldc\*O, or
+\*L\-migrate\*O flag.
+.nL
+.ne 8
+.TS
+tab(@);
+lfHB lfHB lfHB lfHB
+l l lw(.6i) lw(2.2i) .
+_
+.sp 4p
+\-newc@\-oldc@\-migrate@Optimization
+.sp 4p
+_
+.sp
+\*L\-O0\*O@\*L\-O0\*O@\*L\-O0\*O@None
+.\" ***CHANGE THE FOLLOWING IN THIS TABLE TO JUST .SP'S:
+.\" .sp 4
+.sp 4p
+\*L\-O1\*O@\*L\-O1\*O@\*L\-O1\*O@T{
+Local optimizations and recognition of common subexpressions.
+T}
+.sp 4p
+\*L\-O1\*O@\*L\-O2\*O, \*L\-O\*O@\*L\-O2\*O, \*L\-O\*O@T{
+Global optimization, including code motion, strength reduction and
+test replacement, split lifetime analysis, and code
+scheduling.
+T}
+.sp 4p
+\*L\-O2\*O, \*L\-O\*O@\*L\-O2\*O, \*L\-O\*O@\*L\-O3\*O@T{
+Additional global optimizations that improve speed (at the cost of
+extra code size), such as integer multiplication and division
+expansion (using shifts), loop unrolling, and code replication to
+eliminate branches.
+T}
+.sp 4p
+\*L\-O2\*O, \*L\-O\*O@\*L\-O3\*O@\*L\-O4\*O@T{
+Inline expansion of static procedures.
+T}
+.sp 4p
+\*L\-O3\*O@\*L\-O3\*O@\*L\-O4\*O@T{
+Inline expansion of global procedures.
+T}
+.sp 4p
+\*L\-O4\*O@N/A@\*L\-O5\*O@T{
+Software pipelining using dependency analysis, vectorization of some
+loops on 8-bit and 16-bit data (\*Lchar\*O and \*Lshort\*O), and
+insertion of NOP instructions to improve scheduling.
+T}
+.sp 6p
+_
+.TE
+.IP
+To determine whether using \*L\-O4\*O with \*L\-newc\*O benefits your program, you
+should compare program execution times for the same program compiled
+at levels \*L\-O3\*O and \*L\-O4\*O.
+.LI "\*L\-Olimit \*Vnum\*O"
+Specifies the maximum size, in basic blocks, of a routine that will be
+optimized by the global optimizer. If a routine has more than this
+number of basic blocks, it will not be optimized and a message will be
+printed. A flag specifying that the global optimizer is to be run
+(\*L\-O2\*O or \*L\-O3\*O) must also be specified. The
+\*Vnum\*O is assumed to be a decimal number. The default value for
+\*Vnum\*O is 500 basic blocks.
+.IP
+This flag is not available with the \*L\-newc\*O or \*L\-migrate\*O
+flags.
+.LI "\*L\-om\*O"
+Perform code optimization after linking, including \*Lnop\*O (no
+operation) removal, \*L\.lita\*O removal, and reallocation of common
+symbols. This flag also positions the \*L$gp\*O register so that the
+maximum number of addresses fall in the \*L$gp\*O-accessible window.
+The \*L\-om\*O flag is supported only for programs compiled with the
+\*L\-non_shared\*O flag. The following options can be passed directly
+to \*L\-om\*O by using the \*L\-WL\*O compiler flag:
+.VL 4m
+.LI "\*L\-WL,\-om_compress_lita\*O"
+Removes unused \*L\.lita\*O entries after optimization, and then
+compresses the \*L\.lita\*O section.
+.LI "\*L\-WL,\-om_dead_code\*O"
+Removes dead code (unreachable instructions) generated after applying
+optimizations. The \*L\.lita\*O section is not compressed by this flag.
+.\" NOTE - the following two flags carry these wierd names only for
+.\"        goldminor eft, the names will be changed after eft
+.\"        9/21 the following flag left undoc'd as per mjr 
+.\" .LI "\*L\-WL,\-om_alt_sched\*O"
+.\" Invoke the EV5 instruction scheduler instead of the EV4 scheduler.
+.LI "\*L\-WL,\-om_ireorg_feedback\*O,\*Vfile\*O"
+Uses the pixie-produced information in \*Vfile\*L\.Counts\*O and
+\*Vfile\*L\.Addrs\*O to reorganize the instructions to reduce cache
+thrashing.
+.LI "\*L\-WL,\-om_no_inst_sched\*O"
+Turns off instruction scheduling.
+.LI "\*L\-WL,\-om_no_align_labels\*O"
+Turns off alignment of labels. Normally, the \*L\-om\*O flag will
+quadword align the targets of all branches to improve loop performance.
+.LI "\*L\-WL,\-om_Gcommon,\*Vnum\*O"
+Sets the size threshold of \*(lqcommon\*(rq symbols.
+Every \*(lqcommon\*(rq symbol whose size is less than or equal
+to \*Vnum\*O will be allocated close to each other.
+This flag can be used to improve the probability that the symbol can
+be accessed directly from the \*L$gp\*O register.
+(Normally, \*Lom\*O tries to collect all \*(lqcommon\*(rq symbols
+together, not just symbols that conform to certain size constraints.)
+.LE
+.IP
+For additional information on \*Lom\*O, send email to
+\*Lwrl-techreports@decwrl.dec.com\*O, specifying \*Lhelp\*O on the subject
+line.  Then, follow the instructions in the reply you receive to obtain
+report number \*L94/1\*O.
+.LI "\*L\-preempt_module\*O"
+Supports symbol preemption on a module\-by\-module basis. During
+optimization, inlining is performed only on functions within a single
+compilation unit. This is the default at optimization levels
+\*L\-O3\*O and \*L\-O4\*O when \*L\-newc\*O is used, and at
+optimization levels \*L\-O4\*O and \*L\-O5\*O when \*L\-migrate\*O
+is used.
+.LI "\*L\-preempt_symbol\*O"
+Preserves full symbol preemption; that is, supports symbol preemption on
+a symbol\-by\-symbol basis within a module as well as between modules.
+During optimization, if inlining is requested, only static functions
+are eligible.
+.IP
+This is the default at optimization levels \*L\-O0\*O through
+\*L\-O2\*O when \*L\-newc\*O is used, and at optimization levels
+\*L\-O0\*O through \*L\-O3\*O when \*L\-migrate\*O is used.
+This is the default behavior when \*L\-oldc\*O is used.
+.LI "\*L\-speculate all\*O"
+Specifies that speculation may occur anywhere in the executable image.
+.IP
+A conditionally-executed operation is speculated by beginning the
+operation's execution prior to testing the condition that guards the
+use of the value of that operation.  If execution reaches the
+conditionally-executed use of the operation's value, then that value
+will be available for immediate use.  If execution does not reach the
+conditionally executed use of the operation's value, then the
+speculatively computed value is ignored.
+.IP
+If any module in a program is compiled with \*L\-speculate all\*O, all
+exceptions throughout the entire program are dismissed on the assumption
+that the execution is caused by an unsuccessful speculative instruction.
+(Note, though, that floating-pointing instructions specifying software
+completion [\*L/S\*O] are still given normal exception handling.) Code
+compiled with the \*L\-speculate all\*O flag cannot use any form of local
+exception handling nor be linked with any routines that do.  As a result,
+you should use the \*L\-speculate all\*O flag only in programs that are
+known to be error-free and that do not depend on fault and trap handling.
+If code compiled speculatively incurs a lot of exceptions, it may result
+in an overall performance loss.
+If this is so, you should discontinue use of this feature.
+.LI "\*L\-speculate by_routine\*O"
+Specifies that speculation is allowed only in the code in the source
+module that is being compiled.
+.IP
+A module compiled with \*L\-speculate by_routine\*O cannot use any form
+of local exception handling, but can be linked with other modules that
+do. The run-time system checks each exception to see if it occurred in
+a speculative routine.  It dismisses exceptions from routines that are
+speculatively executed, but signals exceptions from other routines.
+(Note, though, that floating-pointing instructions specifying software
+completion [\*L/S\*O] are still given normal exception handling.)
+As a result, you should use the \*L\-speculate by_routine \*O flag only
+for modules that are known to be error-free and that do not depend on
+fault and trap handling.  If code compiled speculatively incurs a lot
+of exceptions, it may result in an overall performance loss.
+If this is so, you should discontinue use of this feature.
+.IP
+The \*L\-speculate by_routine\*O flag yields somewhat slower execution
+than the \*L\-speculate all\*O flag, but does not restrict trap and
+fault handling in other modules with which it is linked.
+.LI "\*L\-tune \*Voption\*O"
+Selects processor-specific instruction tuning for a specific
+implementation of the Alpha architecture.
+Tuning for a specific implementation can provide improvements in
+run-time performance.
+.IP
+Regardless of the setting of the \*L\-tune\*O flag, the generated code
+will run correctly on all Alpha processors.
+Note that code tuned for a specific target may run more slowly on
+another target than generically-tuned code.
+.IP
+The \*Voption\*O keyword can be one of the following:
+.VL 4m
+.LI "\*Lgeneric\*O"
+Selects instruction tuning that is appropriate for all
+Alpha processors. This option is the default.
+.LI "\*Lhost\*O"
+Selects instruction tuning that is appropriate for the
+processor on which the code is being compiled.
+.LI "\*Lev4\*O"
+Selects instruction tuning for the 21064, 21064A, 21066,
+and 21068 chips.
+.LI "\*Lev5,ev56\*O"
+Selects instruction tuning for the 21164 chip.
+(EV5 and EV56 processors both have the same chip number \- 21164.)
+.LE
+.LI "\*L\-unroll\*V n\*O"
+Controls loop unrolling done by the optimizer at levels \*L\-O2\*O and
+above for \*L\-newc\*O. Specifying \*L\-unroll\*V n\*O unrolls loop
+bodies \*Vn\*O times. Specifying \*L\-unroll 0\*O means the optimizer
+uses its own default unroll amount. Specifying \*L\-unroll 1\*O means
+no unrolling.  The default is \*L\-unroll 0\*O.
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LE
+.sp 2
+.\" SPEC95 FLAGS
+\*BFlags that facilitate the use of feedback-directed optimizations:\*O
+.VL 4m
+.LI "\*L\-prof_gen\*O"
+Generates an executable image that has profiling code added to it.
+Using this flag is equivalent to running the \*Lpixie\*O(1) command on
+an existing image.  See also the descriptions of the
+\*L\-prof_use_om_feedback\*O, \*L\-prof_dir\*O, and \*L\-pids\*O flags.
+.LI "\*L\-prof_use_feedback\*O"
+Uses profiling feedback to improve runtime performance.  Using this flag
+is equivalent to using the \*Lprof\*O(1) command to produce a feedback
+file, and then using the \*Lcc \-feedback\*O command to recompile the
+program.
+.IP
+To use the \*L\-prof_use_feedback\*O flag, first compile your program
+with the \*L\-prof_gen\*O and \*L\-gen_feedback\*O flags, and then run
+the resulting \*Vprogname\*L.pixie\*O file to generate the needed
+profiling data.
+.LI "\*L\-prof_use_om_feedback\*O"
+Uses profiling feedback to rearrange the resulting image to reduce
+cache conflicts of the program text.  This flag uses the \*L\-om\*O
+postlink optimizer, and is equivalent to using the
+\*L-om -WL,-om_ireorg_feedback\*O flags.  If the \*L\-pids\*O flag is
+also specified, this flag merges the \*L.Counts\*O performance data
+files  using the \*Lprof \-pixie \-merge\*O command.
+.IP
+To use the \*L\-prof_use_om_feedback\*O flag, first compile your
+program with the \*L\-prof_gen\*O flag and then run the resulting
+\*Vprogname\*L.pixie\*O program to generate the profiling data.
+.LI "\*L\-prof_dir\*O"
+Specifies a location to which the profiling data files (\*L.Counts\*O
+and \*L.Addrs\*O) are written.  Use this flag in conjunction with the
+\*L\-prof_gen\*O flag and the \*L\-prof_use_feedback\*O or
+\*L\-prof_use_om_feedback\*O flag to specify a location for the
+profiling data files.   If you do not specify this flag, the profiling
+files are written to the current directory.
+.IP
+Specifying the \*L\-prof_dir\*O flag also enables the \*L\-pids\*O flag.
+.LI "\*L-[no_]pids\*O"
+[Disables] or enables the addition of the process-id to the filename of
+the basic block counts file (\*L.Counts\*O). This facilitates collecting
+information from multiple invocations of the \*Lpixie\*O output file.
+Unless the \*L\-prof_dir\*O flag is specified, the default is
+\*L\no_pids\*O.
+.LE
+.sp 2
+.\" DEBUGGING FLAGS **********************************************
+\*BFlags for debugging source code:\*O
+.VL 4m
+.LI "\*L\-g\*O[\*Vn\*O]"
+Determines the production of symbol table information. When no value is
+specified for \*Vn\*O, the compiler produces symbol table information
+for full symbolic debugging and suppresses optimizations that
+limit full symbolic debugging (same as \*L\-g2\*O).
+.IP
+The value of \*Vn\*O can be one of the following:
+.VL 4m
+.LI "\*L0\*O"
+Produces only enough symbol table information for linking. Names and
+addresses of external symbols, and the addresses and basic layout of
+the stack-frame are available. Profiling tools work, but the names of
+local procedures, source lines, and source file names are not
+available. The debugger allows procedure traceback and all
+instruction-level commands.
+However, line-oriented commands do not work.
+No symbol types are available, and the names of stack-frame and static
+variables are not available.  All optimizations are supported.
+.LI "\*L\1\*O"
+Produces limited symbol table information. Profiling and debugging
+tools provide line numbers, source file names, and the names of local
+procedures, when appropriate. Line-oriented debugging commands work,
+but symbol types and the names of stack-frame variables are not
+available. Most profiling tools work to their fullest ability, but
+some advanced Atom tools may provide more information at higher debug
+levels.  All optimizations are supported.
+.LI "\*L\2\*O"
+Produces symbol table information for full symbolic debugging and
+suppress some optimizations.  Symbol types and stack-frame variables
+names are available.  Optimization is supressed (\*L\-g2\*O implies
+\*L\-O0\*O).
+.LI "\*L\3\*O"
+Produces symbol table information for fully optimized code.  This level
+of debugging supplies the same information as \*L\-g2\*O, but it also
+allows all compiler optimizations.  As a result, some of the
+correlation is lost between the source code and the executable
+program.
+.LE
+.LE
+.sp 2
+.ne 4
+.\" PROFILING FLAGS ***********************************************
+\*BFlags that work in conjunction with the pixie, prof, and gprof programs for program profiling:\*O
+.VL 4m
+.LI "\*L\-gen_feedback\*O"
+Generates accurate profile information to be used with
+\*L\-feedback\*O optimizations, as follows:
+.\" ***DON'T USE THE ".AL" -- DOESN'T FORMAT PROPERLY IN ONLINE OUTPUT
+.\" ***ALSO, NOTE SPECIAL CHARACTERS ADDED TO ".LI" COMMANDS
+.\" .AL
+.VL 2m
+.LI "1."
+Compile the source code with the \*L\-gen_feedback\*O flag.
+.LI "2."
+Run \*Lpixie\*O on the executable file.
+.LI "3."
+Execute the \*Lpixie\*O version of the program to generate execution
+statistics on the program.
+.LI "4."
+Use \*Lprof\*O to create a feedback file from the execution
+statistics.
+.LI "5."
+Recompile the program with the \*L\-feedback\*O flag and either the
+\*L\-O2\*O or \*L\-O3\*O flag (for \*L\-newc\*O) or the \*L\-O2\*O,
+\*L\-O3\*O, \*L\-O4\*O, or \*L\-O5\*O flag (for \*L\-migrate\*O).
+This provides the compiler with execution information that the compiler
+can use to improve certain optimizations.
+.LE
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-p\*O[\*Vn\*O]"
+Determines the level of profiling. The \*L\-p\*O flag prepares for
+profiling by periodically sampling the value of the program counter.
+This flag affects linking only, so that when linking occurs, the
+standard run-time startup routine is replaced by the profiling
+run-time startup routine (\*Lmcrt0\.o\*O) and the level 1 profiling
+library (\*Llibprof1\.a\*O) is searched. When you use the \*L\-p\*O
+flag together with either the \*L\-pthread\*O flag or the
+\*L\-threads\*O flag, the profiling library \*Llibprof1_r.a\*O is used.
+.IP
+When profiling begins, the startup routine calls \*Lmonstartup\*O
+(see \*Lmonitor\*O(3)) and produces, in file
+\*Lmon\.out\*O, execution-profiling data for use with
+the postprocessor \*Lprof\*O(1).
+.IP
+The value \*Vn\*O can be one of the following:
+.VL 4m
+.LI "\*L0\*O"
+Do not permit any profiling.  This is the default.
+If linking occurs, the standard run-time startup routine
+(\*Lcrt0\.o\*O)
+is used, and no profiling library is searched.
+.LI "\*L1\*O"
+Same as \*L\-p\*O.
+.LE
+.LI "\*L\-\*O[\*Lno_\*O]\*Lpg\*O"
+Turns \*Lgprof\*O profiling on or off when compiling and linking the
+file immediately following this flag.  The \*Lgprof\*O profiler
+produces a call graph showing the execution of a C program.
+.IP
+When this flag is turned on, the standard run-time startup routine is
+replaced by the \*Lgcrt0.o\*O routine.  Programs that are linked with
+the \*L\-pg\*O flag and then run will produce, in file \*Lgmon.out\*O,
+a dynamic call graph and profile.  You then run \*Lgprof\*O
+on the \*Lgmon.out\*O file to display the output.  When you use the
+\*L\-pg\*O flag together with either the \*L\-pthread\*O flag or the
+\*L\-threads\*O flag, the profiling library \*Llibprof1_r.a\*O is used.
+.\" ***DROP THE FOLLOWING PER REM. QAR 39893 HAS BEEN ROLLED OUT OF v4.0
+.\" .IP
+.\" Specifying the \*L\-pg\*O flag generates limited symbol table
+.\" information at a minimum.  When \*L\-pg\*O is specified, \*L\-g1\*O
+.\" becomes the default debugging level and the compiler overrides
+.\" a \*L\-g0\*O specification with \*L\-g1\*O.
+.IP
+For more information, see the \*Lgprof\*O(1) reference page.
+.LE
+.sp 2
+.\" PORTABILITY FLAGS ***********************************************
+\*BFlags that check the portability of code:\*O
+.VL 4m
+.LI "\*L\-check\*O"
+Performs compile-time code checking. With this flag, the compiler
+checks for code that exhibits nonportable behavior, represents a
+possible unintended code sequence, or possibly affects operation of
+the program because of a quiet change in the ANSI C Standard. Some of
+these checks have traditionally been associated with the \*Llint\*O
+utility.  This flag is available for \*L\-newc\*O and \*L\-migrate\*O
+only.
+.LI "\*L\-isoc94\*O"
+Causes the macro \*L_\|_STDC_VERSION_\|_\*O to be passed to the
+preprocessor and enables recognition of the digraph forms of
+various operators.
+Note that the \*L\-isoc94\*O flag has no influence on \*L\-std\*Vn\*O
+flags and vice versa.
+.LI "\*L\-portable\*O"
+Enables the issuance of diagnostics that warn about any nonportable
+usages encountered. This flag is not available when you use the
+\*L\-oldc\*O flag.
+.LI "\*L\-std\*O[\*Vn\*O]"
+Directs the compiler to produce warnings for language constructs that
+are not standard in the language. The default is \*L\-std0\*O.
+.IP
+The following values are accepted:
+.VL 4m
+.LI "\*L\-std\*O"
+Enforces the ANSI C standard, but allows some common programming
+practices disallowed by the standard. The \*L\-std\*O flag
+causes the macro \*L_\|_STDC_\|_=0\*O to be passed to the preprocessor.
+.LI "\*L\-std0\*O"
+Enforces the K & R programming style, with certain ANSI extensions
+in areas where the K & R behavior is undefined or ambiguous.
+In general, \*L\-std0\*O compiles most pre-ANSI C programs
+and produces expected results. The \*L\-std0\*O flag causes the
+\*L_\|_STDC_\|_\*O macro to be undefined.
+.LI "\*L\-std1\*O"
+Strictly enforces the ANSI C standard and all its prohibitions (such
+as those that apply to the handling of \*Lvoid\*O types, the
+definition of lvalues in expressions, the mixing of integrals and
+pointers, and the modification of rvalues).
+This flag does not, however, restrict the name space defined by
+the Digital UNIX implementation to only reserved names as
+specified by ANSI C.
+.IP
+The \*L\-std1\*O flag causes the macro
+\*L_\|_STDC_\|_=1\*O to be passed to the preprocessor.
+Note that the \*L\-std1\*O flag also affects linker defined symbols.
+See \*Lld\*O(1) for more information.
+.LE
+.IP
+None of the \*L-std*\*O flags restrict or expand the name space
+defined by the Digital UNIX implementation (for example, items
+declared in system header files).  To restrict the name space so
+that only ANSI C reserved names are made visible from the system
+header files listed in the ANSI C standard, use the
+\*L_ANSI_C_SOURCE\*O macro.
+For details on \*L_ANSI_C_SOURCE\*O and other standard macros, see
+\*Lstandards\*O(5).
+.LI "\*L\-traditional\*O"
+Same as the \*L\-std0\*O flag.
+.LI "\*L\-vaxc\*O"
+Places the compiler in VAX C compatibility mode.
+In addition to supporting the ANSI C language, this mode of compilation
+also supports VAX C extensions that are incompatible with the ANSI C
+standard and that change the language semantics. This mode provides
+compatibility for programs that depend on old VAX C behavior. This
+flag is not available when you use the \*L\-oldc\*O flag.
+.LE
+.sp 2
+.\" DATA ALIGNMENT FLAGS *******************************************
+\*BFlags that affect the alignment of data:\*O
+.VL 4m
+.LI "\*L\-assume [no]aligned_objects\*O"
+Controls the alignment assumptions for code generated for indirect load
+and store instructions.
+.IP
+The \*L\-assume aligned_objects\*O flag causes the compiler to assume
+that a dereferenced object's alignment matches or exceeds the alignment
+indicated by the pointer to the object.  On Alpha systems,
+dereferencing a pointer to a longword- or quadword-aligned object is
+more efficient than dereferencing a pointer to a byte- or word-aligned
+object. Therefore, when the compiler assumes that a pointer object of
+an aligned pointer type does point to an aligned object, it can
+generate better code for pointer dereferences of aligned pointer types.
+.IP
+The \*L\-assume noaligned_objects\*O flag causes the compiler to
+generate longer code sequences to perform indirect load and store
+operations in order to avoid hardware alignment faults for arbitrarily
+aligned addresses.  Although the \*L\-assume noaligned_objects\*O flag
+may generate less efficient code than \*L\-assume aligned_objects\*O,
+by avoiding hardware alignment faults, it speeds the execution of
+programs that reference unaligned data.
+.IP
+The \*L\-assume aligned_objects\*O flag is the default. The compiler
+assumes that the alignment of pointers meets or exceeds that of the
+objects to which they point.  The following rules apply:
+.VL 2m
+.LI "\-"
+A pointer of type \*Lshort\*O points to objects that are at least
+\*Lshort\*O-aligned.
+.LI "\-"
+A pointer of type \*Lint\*O points to objects that are at least
+\*Lint\*O-aligned.
+.LI "\-"
+A pointer of type \*Lstruct\*O points to objects that have an
+alignment of \*Lstruct\*O (that is, the alignment of the
+strictest member alignment, or byte alignment if you have specified
+\*L#pragma nomember_alignment\*O for \*Lstruct\*O).
+.LE
+.IP
+If your module breaks one of these rules, you must use the \*L\-assume
+noaligned_objects\*O flag to compile the module; otherwise, your
+program may get alignment faults during execution, which will degrade
+performance.
+.IP
+The \*L\-assume aligned_objects\*O and \*L\-assume noaligned_objects\*O
+flags can be used in the same \*Lcc\*O command, allowing you to turn
+this flag on and off as needed by individual source files.
+.IP
+The \*L\-assume aligned_objects\*O and \*L\-assume noaligned_objects\*O
+are not available when you use the \*L\-oldc\*O flag.  However, the
+\*L\-misalign\*O flag is a synonym for \*L\-assume noaligned_objects\*O
+and the \*L\-no_misalign\*O flag is a synonym for
+\*L\-assume aligned_objects.
+.LI "\*L\-assume [no]trusted_short_alignment\*O"
+Allows the compiler additional assumptions about the alignment of
+\*Lshort\*O types that, although naturally aligned, may cross a
+quadword boundary.
+.IP
+Specifying \*L\-assume trusted_short_alignment\*O indicates that the
+compiler should assume any \*Lshort\*O accessed through a pointer is
+naturally aligned.  This generates the fastest code, but can silently
+generate the wrong results when an unaligned \*Lshort\*O object
+crosses a quadword boundary.  This is the behavior when
+\*L\-oldc\*O is specified.
+.IP
+Specifying \*L\-assume notrusted_short_alignment\*O tells the compiler
+that \*Lshort\*O objects may not be naturally aligned.
+The compiler generates slightly larger (and slower) code that will give
+the correct result, regardless of the actual alignment of the data.
+This is the default when \*L\-newc\*O or \*L\-migrate\*O is specified.
+.IP
+Note that \*L\-assume notrusted_short_alignment\*O does not override
+the \*L\_\_unaligned\*O type qualifier, the \*L\-misalign\*O flag, or
+the \*L\-assume noaligned_objects\*O flag.
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.IP
+To ensure that this change has no impact on standards conformance,
+the \*L\-float_const\*O flag is disabled when \*L\-std1\*O (strict ANSI
+mode) is also specified on the compile command line.  When this
+situation occurs, the compiler issues a warning message indicating
+that the \*L\-float_const\*O flag is being ignored.
+.LI "\*L\-[no_]misalign\*O"
+Controls the alignment assumptions for code generated for indirect load
+and store instructions.
+.IP
+The \*L\-misalign\*O flag is a synonym for
+\*L\-assume noaligned_objects\*O and the \*L\-no_misalign flag is a
+synonym for \*L\-assume aligned_objects\*O.
+The \*L\-assume [no]aligned_objects\*O flag is discussed earlier in
+this reference page.
+.LI "\*L\-[no]member_alignment\*O"
+Directs the compiler to byte-align data structure members (with the
+exception of bit-field members).
+.IP
+By default, data structure members are aligned on natural boundaries
+(that is, on the next boundary appropriate to the type of the member)
+instead of the next byte. For example, an \*Lint\*O variable member
+is aligned on the next longword boundary, and a \*Lshort\*O variable
+member is aligned on the next word boundary.
+.IP
+Any use of the \*L#pragma member_alignment\*O, \*L#pragma
+nomember_alignment\*O, or \*L#pragma pack\*O directives within the
+source code overrides the setting established by this flag.
+.IP
+This flag is not available when you use the \*L\-oldc\*O flag.
+.LI "\*L\-Zp\*Vn\*O"
+Aligns structure members based on the integer \*Vn\*O, where \*Vn\*O
+can be 1, 2, or 4. This flag specifies packing so
+that each structure member after the first is stored on \*Vn\*O-byte
+boundaries. When you specify
+the \*L\-Zp\*O flag without an \*Vn\*O value, structure members
+are packed on 1-byte boundaries.
+.LE
+.sp 2
+.\" VOLATILITY FLAGS *******************************************
+\*BFlags that affect the volatility of data:\*O
+.VL 4m
+.LI "\*L\-weak_volatile\*O"
+Affects the generation of code for assignments to objects that are
+less than or equal to 16 bits in size (for instance \*Lchar\*O,
+\*Lshort\*O) that have been declared as volatile.  The generated code
+includes a read of the enclosing longword or quadword, an insertion
+of the new value of the object, and a store of the enclosing longword
+or quadword.
+.IP
+The \*L\-weak_volatile\*O flag does not generate locked instructions
+for this sequence.  This allows byte or word access to
+memory-like I/O devices for which larger accesses will not cause
+read or write side effects.
+Because the sequence does not access byte or word data independently
+directly in memory (that is, ensure byte granularity), adjacent
+volatile data can be corrupted when such byte or word accesses are
+performed in a multithreaded environment (for example, two volatile
+\*Lshort\*Os stored in a longword and accessed asynchronously).
+.IP
+This flag is not supported under \*L\-oldc\*O.
+.LI "\*L\-strong_volatile\*O"
+Affects the generation of code for assignments to objects that are less
+than or equal to 16 bits in size (for instance \*Lchar\*O,
+\*Lshort\*O) that have been declared as volatile.
+The generated code includes a load-locked instruction for the enclosing
+longword or quadword, an insertion of the new value of the object, and
+a store-conditional instruction for the enclosing longword or quadword.
+By using this locked instruction sequence for byte and word stores, the
+\*L\-strong_volatile\*O flag allows byte and word access of data at
+byte granularity.  This means that assignments to adjacent volatile
+small objects by different threads in a multithreaded program will not
+cause one of the objects to receive an incorrect value.
+.IP
+This flag is not supported under \*L\-oldc\*O.
+.LE
+.sp 2
+.\" C LANGUAGE FLAGS *************************************************
+\*BFlags specific to the C programming language:\*O
+.VL 4m
+.LI "\*L\-double\*O"
+Promotes expressions of type \*Lfloat\*O to \*Ldouble\*O.  This is the
+default when \*L\-std0\*O is used.
+.LI "\*L\-float\*O"
+Prevents the compiler from promoting expressions of type \*Lfloat\*O
+to type \*Ldouble\*O.  This is the default for all \*L\-std\*O levels
+other than 0.
+.LI "\*L\-float_const\*O"
+Causes the C front end to inspect the floating-point value and treat
+the value as a float if it can be represented as a single precision
+value.  By default, all floating-point constants are treated as double
+precision.
+.LI "\*L\-readonly_strings\*O"
+Causes all string literals to be read-only. If you attempt to write
+to a string literal when \*L\-readonly_strings\*O is specified, you
+might experience unpredictable results, such as a segmentation fault.
+.LI "\*L\-signed\*O"
+Causes all \*Lchar\*O declarations to be \*Lsigned char\*O
+declarations.  This is usually used to override a previous
+\*L\-unsigned\*O flag.  This is the default.
+.LI "\*L\-unsigned\*O"
+Causes all \*Lchar\*O declarations to be \*Lunsigned char\*O
+declarations.
+.LI "\*L\-varargs\*O"
+Prints warnings for all lines that may require the \*Lvarargs\.h\*O
+macros.
+.LI "\*L\-volatile\*O"
+Causes all variables to be treated as \*Lvolatile\*O.
+.LI "\*L\-writable_strings\*O"
+Causes all string literals to be writable. This is the default.
+.LE
+.sp 2
+.\" FLOATING-POINT FLAGS *********************************************
+\*BFlags that determine the rounding mode applied to IEEE floating-point instructions generated by the compiler:\*O
+.VL 4m
+.LI "\*L\-fprm c\*O"
+Specifies chopped rounding mode (round toward zero).
+.LI "\*L\-fprm d\*O"
+Set rounding mode for IEEE floating-point instructions dynamically.
+The dynamic rounding mode is determined from the contents of the
+floating-point control register and can be changed or read at
+execution time by a call to \*Lwrite_rnd\*O(3) or \*Lread_rnd\*O(3).
+If you specify \*L\-fprm d\*O, the IEEE floating-point rounding mode
+defaults to round to nearest.
+.LI "\*L\-fprm n\*O"
+Specifies normal rounding mode (unbiased round to nearest).
+This is the default.
+.LI "\*L\-fprm m\*O"
+Specifies round toward minus infinity mode.
+.LE
+.sp 2
+.\" STACKS AND POINTERS FLAGS *************************************
+\*BFlags that handle stacks and pointers:\*O
+.VL 4m
+.LI "\*L\-trapuv\*O"
+Forces all uninitialized stack variables to be initialized with
+0xfff58005fff58005. When this value is used as a floating-point
+variable, it is treated as a floating-point NaN and causes a
+floating-point trap.  When it is used as a pointer, an address or
+segmentation violation usually occurs.
+.IP
+For programs compiled without the \*L\-trapuv\*O switch, the debugger
+stops only on executable statements in which the value of a specified
+variable changes.  With the \*L\-trapuv\*O switch, the debugger stops
+on these statements and also stops on all local variable declarations.
+(The debugger treats the local variable declarations as assignment
+statements because the variables are initialized by the compiler.)
+.LI "\*L\-xtaso\*O"
+Controls pointer size allocation by directing the compiler to respond
+to the \*L#pragma pointer_size\*O preprocessor directives. This
+flag allows you to specify 32-bit pointers when used in conjunction
+with the \*Lpragma pointer_size\*O directive. To use 32-bit pointers,
+you must place pragmas where appropriate in your program. Images built
+with this flag must be linked with the \*L\-xtaso\*O or \*L\-taso\*O
+flag in order to run correctly. See the \*EProgrammer's Guide\*O for
+information on \*L#pragma pointer_size\*O.
+.LI "\*L\-xtaso_short\*O"
+Directs the compiler to allocate 32-bit pointers by default.
+You can still use 64-bit pointers, but only by the use of pragmas.
+.\" commented out as per craig neth
+.\" Must be used in conjunction with the \*L\-xtaso\*O flag.
+.\" commented out 12/23 as per chris g.
+.\" .LI "\*L\-FASTMATH\*O"
+.\" Cause the \*L/usr/include/math.h\*O file to redefine
+.\" the names of certain common math routines, including \*Lsqrt\*O
+.\" and \*Lexp\*O, so that faster but slightly less accurate functions
+.\" are used.
+.LI "\*L\-framepointer\*O"
+.\" ***REPLACE THE FOLLOWING TEXT (kch -- per mjr and gl)
+.\" Asserts the requirement of frame pointer for all procedures
+.\" defined in the source file.
+Makes all procedures in the source file use \*L$fp\*O (register
+15) as the frame pointer.
+.\" ***NO ONE KNOWS _WHY_ YOU WOULD WANT USE -FRAMEPOINTER
+.LE
+.sp 2
+.\" EXCEPTION HANDLING FLAGS **************************************
+\*BFlags that provide IEEE floating-point support:\*O
+.VL 4m
+.LI "\*L\-fptm n\*O"
+.\" ***REWORD THE FOLLOWING (kch -- per jon reeves)
+.\" No floating-point trapping modes.
+Generates instructions that do not trigger floating-point underflow or
+inexact trapping modes.  Any floating point overflow, divide-by-zero, or
+invalid operation will unconditionally generate a trap.  \*L\-fptm n\*O is
+the default.
+.LI "\*L\-fptm u\*O"
+Generates traps on floating-point underflow as well as overflow,
+divide-by-zero, and invalid operation.
+.LI "\*L\-ieee\*O"
+Ensure support of all portable features of the \*EIEEE Standard for
+Binary Floating-Point Arithmetic\*O (ANSI/IEEE Std 754-1985), including
+the treatment of denormalized numbers, NaNs, and infinities and the
+handling of error cases.  This flag also sets the \*L_IEEE_FP\*O C
+preprocessor macro.
+.IP
+If your program must use IEEE signaling features that are not portable
+across different IEEE implementations, see the \*Lieee\*O(3) reference
+page for a discussion of how to access them under the
+Digital UNIX operating system.
+.LI "\*L\-scope_safe\*O"
+Ensures that any trap (such as floating-point overflow) is reported to
+have occurred in the procedure or guarded scope that caused the trap.
+Any trap occurring outside that scope is not reported to have occurred
+in the procedure or guarded scope, with the exception of well-defined
+\*Ltrapb\*Os following \*Ljsr\*Os.
+.LE
+.sp 2
+.\" UCODE FLAGS (-OLDC ONLY) ****************************************
+\*BFlags enabled by the \-oldc flag for the generation of ucode:\*O
+.VL 4m
+.LI "\*L\-j\*O"
+Compiles the specified source programs and leaves the ucode object file
+output in corresponding files suffixed with \*L\.u\*O.  This flag is
+not available with the \*L\-newc\*O and \*L\-migrate\*O flags.
+.LI "\*L\-k\*O"
+Passes flags that start with a \*L\-k\*O to the ucode loader. This flag
+is used to specify ucode libraries (with \*L\-kl \*Vfilename\*O) and
+other ucode loader flags.
+.\" ***DELETE FOLLOWING STATEMENT PER QAR 34904 (kch -- confirmed by
+.\" mario, neth, and ianelli)
+.\" This flag is not available with the \*L\-newc\*O and \*L\-migrate\*O
+.\" flags.
+.LI "\*L\-ko \*Voutput\*O"
+Names the output file created by the ucode loader as \*Voutput\*O.
+This file is not removed. If this file is compiled, the object file is
+left in a file whose name consists of \*Voutput\*O with the suffix
+changed to \*L\.o\*O. If \*Voutput\*O has no suffix, a \*L\.o\*O
+suffix is appended to \*Voutput\*O.  This flag is not available with
+the \*L\-newc\*O and \*L\-migrate\*O flags.
+.LE
+.sp 2
+.\" INTERNAL FLAGS *************************************************
+\*BFlags that aid compiler development (not generally used):\*O
+.VL 4m
+.LI "\*L\-H\*Vc\*O"
+Halts compiling after the pass specified by the character \*Vc\*O,
+producing an intermediate file for the next pass.  The \*Vc\*O
+character can be one of the following: [ \*Lfjusmoca\*O ].
+It selects the compiler pass in the same way as the \*L\-t\*O flag.
+If this flag is used, the symbol table file produced and used by the
+passes is given the name of the last component of the source file
+with the suffix changed to \*L\.T\*O, and the file is always
+retained after the compilation is halted.
+.LI "\*L\-K\*O"
+Directs the compiler to
+give recognizable names to intermediate files and retain them
+for debugging purposes. Each file is given the name of
+the last component of the source file, replacing its suffix with
+the conventional suffix for the type of file (for example, \*L\.B\*O
+file for binary ucode produced by the front end).
+These intermediate files are never removed, even when a pass
+encounters a fatal error. When ucode linking is performed and the
+\*L\-K\*O flag is specified, the base name of the files created after
+the ucode link is \*Lu\.out\*O by default.  If \*L\-ko \*Voutput\*O
+is specified, the base name of the object file, if it exists, is
+\*Voutput\*O.  If \*Voutput\*O includes a suffix, the suffix is
+not included as part of the base name.
+.\" 
+.\" the -# flag commented out 29-nov-93 as per qar 11354 - greg lueck
+.\" .LI "\*L\-#\*O"
+.\" Converts binary ucode files (\*L\.B\*O) or optimized binary
+.\" ucode files  (\*L\.O\*O) to symbolic ucode (a \*L\.U \*O file)
+.\" using \*Lbtou\*O(1).
+.\" If a symbolic ucode file is to be produced by converting the binary
+.\" ucode from the C compiler front end then the front end option
+.\" \*L\-Xu\*O is used instead of \*Lbtou\*O(1).
+.LI "\*L\-W\*Vc\*O[\*Vc...\*O],\*Varg1\*O,[\*Varg2...\*O]"
+Passes the argument, or arguments (\*Vargi\*O), to the compiler pass,
+or passes (\*Vc\*O[\*Vc...\*O]). Each \*Vc\*O character can be
+one of the following: \*L[ pfjusdqmocablyz ]\*O. The \*Vc\*O selects
+the compiler pass in the same way as the \*L\-t\*O flag.
+.LE
+.PP
+The flags from the set \*L\-t[hpfjusmocablyzrntLCD]\*O,
+\*L\-h\*Vpath\*O, and \*L\-B\*Vstring\*O select a name to use for a
+particular pass, startup routine, or standard library. These arguments
+are processed from left to right, so their order is significant. When
+the \*L\-B\*O flag is encountered, the selection of names takes place
+using the last \*L\-h\*O and \*L\-t\*O flags.  Therefore, the
+\*L\-B\*O flag is always required when using \*L\-h\*O or \*L\-t\*O.
+Sets of these flags can be used to select any combination of names.
+.PP
+All \*L\-B\*O flags must be preceded by \*L\-p\*O flags.
+The \*L\-p\*O flag provides the location of startup routines and
+the profiling library.
+.PP
+Use the \*L\-t [hpfjusmocablyzrntLCD]\*O suboptions to select the names.
+The names selected are those designated by the characters following
+the \*L\-t\*O flag, according to the following table.  Note that the
+\*L\-newc\*O and \*L\-migrate\*O flags accept the same set of
+suboptions.
+.sp
+.TS
+tab(@);
+lfHB lfHB lfHB
+lll.
+_
+.sp 4p
+\-oldc Name@\-newc Name@Character
+.sp 4p
+_
+.sp
+include@@h (see note following table)
+.sp 4p
+cfe@gemc_cc@p, f
+.sp 4p
+ujoin@@j
+.sp 4p
+uld@@u
+.sp 4p
+usplit@@s
+.sp 4p
+umerge@@m
+.sp 4p
+uopt@@o
+.sp 4p
+ugen@@c
+.sp 4p
+as0@as0@a
+.sp 4p
+as1@as1@b
+.sp 4p
+ld@ld@l
+.sp 4p
+ftoc@@y
+.sp 4p
+cord@cord@z
+.sp 4p
+[m]crt0.o@[m]crt0.o@r
+.sp 4p
+libprof1.a@libprof1.a@n
+.sp 4p
+btou, utob@@t
+.sp 4p
+om@om@L
+.sp 4p
+pixie@pixie@C
+.sp 4p
+prof@prof@D
+.sp 6p
+_
+.TE
+.PP
+If the character \*Lh\*O is in the \*L\-t\*O argument, a directory is
+added to the list of directories to be used in searching for
+\*L#include\*O files.  This directory name has the form
+\*L$COMP_TARGET_ROOT/usr/include/\*Vstring\*O. This directory is to
+contain the include files for the \*Vstring\*O release of the
+compiler.  The standard directory is still searched.
+.VL 4m
+.LI "\*L\-h\*Vpath\*O"
+Use \*Vpath\*O instead of the directory where the name is normally
+found.
+.LI "\*L\-B\*Vstring\*O"
+Append \*Vstring\*O to all names specified by the \*L\-t\*O flag.
+If no \*L\-t\*O flag has been processed before the \*L\-B\*O, the
+\*L\-t\*O flag is assumed to be \*LhpfjusmocablyzrntL\*O.
+This list designates all names.
+.IP
+If no \*L\-t\*O argument has been processed before the \*L\-B\*O,
+then a \*L\-B\*Vstring\*O is passed to the loader to use with its
+\*L\-l\*Vx\*O arguments.
+.LE
+.PP
+Invoking the compiler with a name of the form \*Lcc\*Vstring\*O has
+the same effect as using a \*L\-B\*Vstring\*O flag on the command
+line.
+.SH EXAMPLES
+.AL
+.LI
+\*Lcc helloworld.c\*O
+.IP
+Compiles the file \*Lhelloworld.c\*O using the compiler's defaults.
+Because no output file is named in the command line, the result of the
+compilation is written to the executable file named \*La.out\*O.
+.LI
+\*Lcc -newc -v helloworld.c\*O
+.nL
+\*L/usr/lib/cmplrs/cc/gemc_cc -D__LANGUAGE_C__ -D__unix__ -D__osf__
+-D__alpha -D_SYSTYPE_BSD -D_LONGLONG -DLANGUAGE_C -Dunix -DSYSTYPE_BSD
+-I/usr/include3.11 -preempt_symbol -g0 -O2 -common -o helloworld.o
+helloworld.c
+.br
+0.0u 0.0s 0:00 66% 0+10k 0+5io 0pf+0w
+.br
+/usr/lib/cmplrs/cc/ld -g0 -O1 -std0 -call_shared
+.br
+/usr/lib/cmplrs/cc/crt0.o helloworld.o -lc
+.br
+0.0u 0.0s 0:00 14% 0+4k 0+12io 0pf+0w\*O
+.IP
+This example invokes the C compiler with the \*L\-newc\*O flag. The
+\*L\-v\*O option displays the name of each compilation pass, and its
+arguments, as it executes.
+.LE
+.SH ERRORS
+.PP
+The diagnostics produced by \*Lcc\*O are intended to be
+self-explanatory.  Occasional messages may be produced by the
+assembler or loader.
+.SH FILES
+.PP
+.VL
+.LI "\*Vfile\*L\.c\*O"
+Input file
+.LI "\*Vfile\*L\.o\*O"
+Object file
+.LI "\*La\.out\*O"
+Loaded output
+.LI "\*Lerr.english.cc\*O"
+Compiler error messages in English
+.LI "\*L/tmp/ctm?\*O"
+Temporary
+.LI "\*L/usr/lib/cmplrs/cc/comp.config\*O"
+Compiler configuration file (optional)
+.LI "\*L/usr/lib/cmplrs/cc/cfe\*O"
+C front end
+.LI "\*L/usr/lib/cmplrs/cc/cpp\*O"
+C macro preprocessor
+.LI "\*L/usr/lib/cmplrs/cc/gemc_cc\*O"
+DEC C compiler
+.LI "\*L/usr/lib/cmplrs/cc/ujoin\*O"
+Binary ucode and symbol table joiner
+.LI "\*L/usr/bin/uld\*O"
+Ucode loader
+.LI "\*L/usr/lib/cmplrs/cc/usplit\*O"
+Binary ucode and symbol table splitter
+.LI "\*L/usr/lib/cmplrs/cc/umerge\*O"
+Procedure integrator
+.LI "\*L/usr/lib/cmplrs/cc/uopt\*O"
+Optional global ucode optimizer
+.LI "\*L/usr/lib/cmplrs/cc/om\*O"
+Post-link optimizer
+.LI "\*L/usr/lib/cmplrs/cc/ugen\*O"
+Code generator
+.LI "\*L/usr/lib/cmplrs/cc/as0\*O"
+Symbolic to binary assembly language translator
+.LI "\*L/usr/lib/cmplrs/cc/as1\*O"
+Binary assembly language assembler and reorganizer
+.LI "\*L/usr/lib/cmplrs/cc/crt0.o\*O"
+Run-time startup
+.LI "\*L/usr/lib/cmplrs/cc/mcrt0.o\*O"
+Startup for \*Lprof\*O profiling
+.LI "\*L/usr/lib/cmplrs/cc/gcrt0.o\*O"
+Startup for \*Lgprof\*O profiling
+.LI "\*L/usr/ccs/lib/libc.a\*O"
+Standard library, see
+\*Lintro\*O(3)
+.LI "\*L/usr/lib/cmplrs/cc/libprof1.a\*O"
+Level 1 profiling library
+.LI "\*L/usr/lib/cmplrs/cc/libprof1_r.a\*O"
+Reentrant level 1 profiling library for code compiled with
+\*L\-pthread\*O or \*L\-threads\*O
+.LI "\*L/usr/include\*O"
+Standard directory for \*L#include\*O files
+.\" this is a place holder for the file for rld which is now loader
+.LI "\*L/usr/lib/cmplrs/cc/ftoc\*O"
+Interface between \*Lprof\*O and \*Lcord\*O
+.LI "\*L/usr/lib/cmplrs/cc/cord\*O"
+Procedure-rearranger
+.LI "\*L/usr/bin/btou\*O"
+Binary to symbolic ucode translator
+.LI "\*L/usr/bin/utob\*O"
+Symbolic to binary ucode translator
+.LI "\*Lmon.out\*O"
+File produced for analysis by \*Lprof\*O
+.LI "\*Lgmon.out\*O"
+File produced for analysis by \*Lgprof\*O
+.LE
+.SH RELATED INFORMATION
+.PP
+\*VANSI X3.159-1989\*)
+.PP
+B. W. Kernighan and D. M. Ritchie,
+\*EThe C Programming Language\*O
+.PP
+B. W. Kernighan,
+\*EProgramming in C \(em a tutorial\*O
+.PP
+D. M. Ritchie,
+\*EC Reference Manual\*O
+.PP
+\*EProgrammer's Guide\*O
+.PP
+\*EAssembly Language Programmer's Guide\*O
+.PP
+\*EDEC C Language Reference Manual\*O
+.PP
+\*Las\*O(1), \*Latom\*O(1), \*Lc89\*O(1), \*Lcord\*O(1), \*Ldbx\*O(1),
+\*Lftoc\*O(1), \*Lgprof\*O(1), \*Lhiprof\*O(5), \*Lieee\*O(3),
+\*Lladebug\*O(1), \*Lld\*O(1), \*Lmonitor\*O(3), \*Lpixie\*O(5),
+\*Lprof\*O(1), \*Lstandards\*O(5), \*Lthird\*O(5), \*Lwhat\*O(1)
+.EQ
+delim off
+.EN

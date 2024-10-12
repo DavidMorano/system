@@ -1,0 +1,2772 @@
+
+
+
+CC(1)									 CC(1)
+
+
+
+NAME
+     cc, c89 - MIPS and	MIPSpro	C compiler
+
+SYNOPSIS
+     cc	[ -o32 | -n32 |	-64 ] [	option ] ... file ...
+
+DESCRIPTION
+     The SGI compilers support three different Application Binary Interfaces
+     controlled	by the options -o32 , -n32 , and -64   (see abi(5) ) and
+     produce files in the following formats:  SGI object code in elf format
+     (the normal result), binary intermediate files, symbolic assembly
+     language, and binary ucode	files (-o32 only).
+
+     cc	accepts	several	types of arguments:
+
+     Arguments whose names end with `.c' are assumed to	be C source programs.
+     They are compiled,	and each object	program	is left	in the file whose name
+     consists of the last component of the source with `.o' substituted	for
+     `.c'.  The	`.o' file is deleted only when a single	source program is
+     compiled and loaded all at	once.
+
+     Arguments whose names end with `.s' are assumed to	be symbolic assembly
+     language source programs.	They are assembled, producing a	`.o' file.
+
+     Arguments whose names end with `.i' are assumed to	be C source after
+     being processed by	the C preprocessor.  They are compiled without
+     predefining any symbols.  The -nocpp option is ignored when compiling
+     `.i' files.
+
+     Arguments whose names end up with suffixes	of other languages, e.g.
+     `.cxx' or `.f', are compiled by the compiler for that language, and then
+     linked by the C compiler.
+
+     By	default, cc behaves as if the option -xansi were on the	command	line.
+     This is an	extended ANSI/ISO C mode with __STDC__,	__EXTENSIONS__,	and
+     __INLINE_INTRINSICS defined (see -xansi below).  The environment variable
+     SGI_CC may	be set to any one of -cckr, -ansi, or -xansi to	change the
+     default definition.  The compiler inspects	options	-cckr, -ansi, -xansi
+     in	the following order:   1) the default	 2) the	value of the SGI_CC
+     environment variable     3) the command line.  The	last of	these options
+     seen is used. It is impossible to compile with both Traditional C and
+     ANSI/ISO C	in one command.
+
+     cc	will define the	C preprocessor symbols LANGUAGE_ASSEMBLY and
+     _LANGUAGE_ASSEMBLY	when an	`.s' file is being compiled. The predefined
+     symbols used by cc	for `.c' files are defined below.  One can see (and
+     check) these definitions with the -show option to cc . The	C preprocessor
+     adds other	standard definitions of	its own	if -cckr applies.
+
+     Many options to cc	are grouped into option	groups of related options
+     (e.g. to specify optimization choices, or target machine attributes).
+     The command line format used for group options is
+
+
+
+									Page 1
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  -groupname:option[=value][:opt2[=val2]]...
+
+     Thus, the group name is followed by a colon-separated list	of options,
+     each of which is an option	name possibly followed by an equal sign	and a
+     value.  The option	names may generally be abbreviated by truncating them
+     to	a unique prefix	(which may change when new options are added to	the
+     group).  These options groups are available only when compiling -n32 or
+     -64
+
+     The following options are interpreted by cc.  See ld(1) for load-time
+     options.
+
+COMMAND	LINE OPTIONS
+     This first	set of options controls	the choice of ABI and ISA (Instruction
+     Set Architecture).
+
+     -o32 or -32
+	  Generate a 32-bit object.  This defaults to -mips2 if	-mips1 has not
+	  been specified.  This	is the default when compiling on any non-R8000
+	  based	machine, if no default specification file is present (see
+	  Defaults Specification Files below).
+
+     -64  Generate a 64-bit object.  This defaults to -mips4 if	-mips3 has not
+	  been specified.  This	is the default when compiling on any R8000
+	  based	machine, if no default specification file is present (see
+	  Defaults Specification Files below).
+
+     -n32 Generate an n32 object.  This	defaults to -mips3 if -mips4 has not
+	  been specified.
+
+
+
+     -mips1
+	  Generate code	using the instruction set of the R2000/R3000 RISC
+	  architecture,	and search for mips1 libraries/objects at link-time.
+	  This defaults	to -o32.
+
+     -mips2
+	  Generate code	using the MIPS II instruction set (MIPS	I + R4000
+	  specific extensions),	and search for mips2 libraries/objects at
+	  link-time.  This defaults to -o32.
+
+     -mips3
+	  Generate code	using the full MIPS III	(e.g. R4000) instruction set,
+	  and search for mips3 libraries/objects at link-time.	This defaults
+	  to -n32 if -64 has not been specified	(except	on R8000-based systems
+	  it defaults to -64).
+
+     -mips4
+	  Generate code	using the full MIPS IV instruction set which is
+	  supported on R10000, R5000 and R8000 systems,	and search for mips4
+	  libraries/objects at link-time.  This	is the default on R8000
+
+
+
+									Page 2
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  systems.  This defaults to -n32 if -64 has not been specified
+	  (except on R8000-based systems it defaults to	-64).
+
+
+
+
+COMMAND	LINE OPTIONS (all three	ABIs).
+     These options are specific	to cc and valid	in all three ABIs.
+
+     -ansi
+	  (ANSI/ISO C only) Pure ANSI/ISO C.  The symbols _MIPS_FPSET,
+	  _MIPS_ISA, _MIPS_SIM,	_MIPS_SZINT, _MIPS_SZLONG, _MIPS_SZPTR,
+	  _LANGUAGE_C, __sgi, __unix, __host_mips, _MODERN_C, __DSO__,
+	  _SYSTYPE_SVR4, __mips, _MIPSEB, __STDC__, and	_CFE are defined to
+	  the preprocessor.  The symbol	__ANSI_CPP__ is	defined, and ANSI/ISO
+	  trigraphs are	processed, by default.	NOTE: when compiling in	pure
+	  ANSI/ISO mode	( -ansi) several standard UNIX symbols (e.g.  environ,
+	  end) may only	be referenced by their ANSI/ISO-compliant counterparts
+	  (e.g., _environ, _end).  The type 'long long'	is allowed, but
+	  results in a warning,	in -ansi mode.	To take	advantage of this type
+	  in libraries that refer to __int64_t and __uint64_t the user must
+	  define the macro __LONGLONG on the command line; otherwise,
+	  __int64_t and	__uint64_t will	be defined as structs. See the ANSI C
+	  Transition Guide for more information.
+
+     -ansiposix
+	  (ANSI/ISO C only) Same compilation environment as -ansi with the
+	  additional preprocessor definition of	_POSIX_SOURCE.	This is	a pure
+	  ANSI/ISO environment,	and __STDC__ is	defined	with this option as
+	  well as with the -ansi option.  WARNING:  This option	is obsolete
+	  and will be removed in future	releases.  See the below section on
+	  API's	for information	on getting a POSIX-compliant compile.
+
+     -cckr
+	  The traditional K&R/Version7 C with SGI (and	some ANSI/ISO-C-like)
+	  extensions, including	function prototypes, void, void*.  The symbols
+	  _MIPS_FPSET, _MIPS_ISA, _MIPS_SIM, _MIPS_SZINT, _MIPS_SZLONG,
+	  _MIPS_SZPTR, __EXTENSIONS__, LANGUAGE_C, _LANGUAGE_C,
+	  __INLINE_INTRINSICS, sgi, __sgi, unix, mips, host_mips, __unix,
+	  __host_mips, _SVR4_SOURCE, _MODERN_C,	_SGI_SOURCE, __DSO__,
+	  SYSTYPE_SVR4,	_SYSTYPE_SVR4, _LONGLONG, __mips, _MIPSEB, MIPSEB, and
+	  _CFE are defined to the preprocessor.
+
+     -xansi
+	  (ANSI/ISO C only) ANSI/ISO C with all	the same definitions as	-cckr.
+	  Note that __STDC__ is	defined, __EXTENSIONS__	is defined and adds
+	  many symbols into the	namespace, and __INLINE_INTRINSICS is defined
+	  and may cause	some intrinsic <math.h>, <stdio.h>, <string.h>,	and
+	  <curses.h> library routines to be inlined.  Such inlined routines
+	  may not set errno in accordance with the strict ANSI/ISO C standard
+	  requirements.	 -xansi	is the default used by the compiler unless the
+	  environment variable SGI_CC is set (see the introductory remarks of
+
+
+
+									Page 3
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  this man page).
+
+     -common
+	  The ANSI/ISO C Strict-Ref/Def-initialization model can be relaxed to
+	  the traditional IRIX Relaxed Ref/Def model with this option.
+	  (defined in the ANSI/ISO C Standard, section 3.1 and elaborated on
+	  in the Rationale, page 23).  With -common the	declaration ``int i;''
+	  in multiple files at file level is merged.  Without it, ANSI/ISO C
+	  generates a warning (from ld(1)) about duplicate definitions.	 When
+	  C and	Fortran	compiled objects are linked together and an ANSI C
+	  defined variable should be located at	the same address as a Fortran
+	  common block,	then it	necessary to compile the C source with the
+	  -common flag.	When using traditional K&R/Version7 C (i.e., -cckr),
+	  specifying -common is	redundant and ignored.
+
+     -dollar
+	  Allows the dollar sign ($) as	a character in C identifiers,
+	  including allowing it	as the leading character of an identifier.
+	  The option is	provided solely	for compatibility purposes.  The
+	  dollar sign is not a standard	C identifier character and its use is
+	  not recommended.
+
+     -float
+	  Causes the compiler to use single-precision floating-point whenever
+	  the programmer specified float (except in function arguments).  For
+	  example, in
+
+	       float a;	int b; float c;
+	       c = a * b;
+
+	  a and	b are promoted to double and a double-precision	multiply is
+	  done,	followed by a conversion back to single-precision for the
+	  assignment to	c.
+
+	  If the -float	option is specified, b will be promoted	to single-
+	  precision and	a single-precision multiply will be done.  This	option
+	  does not affect float	and double argument passing; float function
+	  arguments are	always promoted	to double unless function prototypes
+	  are used.  Unsuffixed	floating-point constants will be cast to
+	  single precision values in subexpressions with no double (or long
+	  double) operands.  The -float	option is ignored in all ANSI/ISO C
+	  conformance modes and	only has effect	in -cckr mode.	ANSI/ISO C
+	  uses single precision	floating-point operations where	allowed	by the
+	  Standard.
+
+     -keep
+	  Build	intermediate compilation files named after the corresponding
+	  source files,	with the suffix	replaced by one	appropriate for	the
+	  type of intermediate file (e.g. the front end	generates a binary
+	  intermediate `.B' file).  These intermediate files are never removed
+	  even when a compilation pass encounters a fatal error.
+
+
+
+
+									Page 4
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     -KPIC
+	  Generate position-independent	code (PIC).  This is the default and
+	  is needed for	programs linking with dynamic shared libraries.	 If
+	  the user doesn't want	to generate PIC	code, then she/he will need to
+	  specify -non_shared on the command line.
+
+     -L	directory
+	  In XPG4 mode,	change the algorithm of	searching for libraries	named
+	  in -L	operands to look in the	directory named	by directory path-name
+	  before looking in the	default	location.  Directories names in	-L
+	  options shall	be searched in the specified order.  Multiple
+	  instances of -L options can be specified.
+
+     -l	library
+	  In XPG4 mode,	search the library named lib.IRlibrary.a.  A library
+	  is searched when its name is encountered, so the placement of	a -l
+	  operand is significant.
+
+     --	  In XPG4 mode standard	utilities that do not accept options, but that
+	  do accept operands, will recognize --	as the first argument to be
+	  discarded.  This is required because portable	applications need a
+	  way to shield	their operands from any	arbitrary options that the
+	  implementation may provide as	an extension.
+
+	  For example, if the standard utility foo is listed as	taking no
+	  options, and the application needed to give it a pathname with a
+	  leading hypen, it could safely do it as:
+		  foo -- -myfile
+	  and avoid any	problems with -m used as an extension.
+
+     -non_shared
+	  Specifies that the compiler should build a non-shared	object.	 This
+	  is the opposite of -KPIC.  Using the -non_shared option causes the
+	  linker to search the nonshared subdirectory of each default library
+	  search directory, see	ld(1).	The linker will	default	the archive
+	  extensions to	.a instead of .so.  The	user must have installed the
+	  appropriate non-shared library images.  Programs built with the
+	  -non_shared option are not portable across platforms.
+
+     -mp  Enable the multiprocessing directives.  (Requires Power C under -o32
+	  )
+
+     -pca Under	-n32 or	-64 invoke the MIPSpro automatic parallelization
+	  option of the	back-end.
+
+     Under -o32	run the	pca(1) preprocessor to automatically discover
+     parallelism in the	source code.  This also	enables	the multiprocessing
+     (-mp) directive.  There are two optional arguments:  -pca list, which
+     will run pca and produce a	listing	file with suffix .L, explaining	which
+     loops were	parallelized and which were not	(and if	not, why not); and -
+     pca keep, which will run pca, produce the listing file, and keep the
+     transformed multiprocessed	C intermediate file in a file with a .M
+
+
+
+									Page 5
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     suffix.  (Power C only)
+
+     -signed
+	  Cause	all char declarations to be signed char	declarations.  The
+	  default is to	treat them as unsigned char declarations.
+
+     -sopt[,option][,option]...
+	  Invoke the C source-to-source	optimizer, copt(1), on the indicated
+	  source file(s).  This	is distinct from the standard global optimizer
+	  which	is invoked with	one of -O, -O2,	or -O3.	 Additional options
+	  can be passed	to -sopt by using a comma-separated list, but the
+	  options passed by default can	not be changed (use cc -sopt -show to
+	  see what is passed by	default).  See copt(1) for more	details.
+
+     -use_readwrite_const
+	  All const qualified variables	and string literals are	put in a
+	  readable and writable	data section.
+
+     -use_readonly_const
+	  String literals and file-level (static, common, or external) const
+	  qualified initialized	variables may be put into a .rodata section to
+	  separate these objects from data likely to be	modified.  This	is the
+	  default. However, if you really want constants to not	be writable,
+	  then in addition to -use_readonly_const you must also	specify	-G0
+	  -rdata_shared	because	by default the linker will make	.rodata	and
+	  gp-relative sections be on writable pages.
+
+     -Xcpluscomm
+	  Process C++ style comment (//	). By default, // is not treated as a
+	  comment introduction.	 With this option C++ comment rules are
+	  applied (so // is treated as beginning a comment).
+
+     -c	  Suppress the loading phase of	the compilation	and force an object
+	  file to be produced even if only one program is compiled.
+
+     -g0  Have the compiler produce no debugging information for symbolic
+	  debugging.  This is the default.
+
+     -g	or -g2
+	  Have the compiler produce additional debugging information for full
+	  symbolic debugging and not do	optimizations that limit full symbolic
+	  debugging.  These options override the optimization options (-O,
+	  -O1, -O2, -O3).
+
+     -g3  Have the compiler produce additional debugging information for
+	  symbolic debugging of	fully optimized	code.  This option makes the
+	  debugger inaccurate.	This option can	be used	with the optimization
+	  options (-O, -O1, -O2, -O3).
+
+     -pedantic
+	  In ANSI/ISO preprocessing mode, warn that the	#ident preprocessor
+	  directive is non-standard.  This directive is	a System V extension,
+
+
+
+									Page 6
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  which	by default is silently ignored.	 The -pedantic option causes
+	  the #ident preprocessor directive to be ignored with a warning,
+	  except in -cckr mode when the	directive is always silently ignored.
+
+     -fullwarn
+	  Does various extra checks and	produces additional warnings that are
+	  normally suppressed by default. This option is recommended for all
+	  compiles during software development.
+
+     -w	  Suppress warning messages.
+
+     -w2  Warnings count as errors.
+
+     -ansiE
+	  In ANSI/ISO C, use of	non-standard features will issue diagnostic
+	  messages.  Issue error messages for those diagnostics.
+
+     -ansiW
+	  Issue	warning	messages for use of non-standard features in ANSI/ISO
+	  C.  This is the default with the -ansi flag.
+
+     -woff all
+	  Suppress warning messages.
+
+     -woff numberlist
+	  In ANSI/ISO C, warnings can be suppressed.  All warnings have	been
+	  given	a number: the number appears immediately after the word
+	  ``Warning'' in the warning text, and is larger than 1000 (to make
+	  warning numbers disjoint from	those in an earlier version of the
+	  compiler).  The numberlist is	a comma-separated set of 1 or more
+	  numbersets. A	numberset is either a simple integer or	a pair of
+	  integers separated by	a hyphen.  Examples:  -woff 1527 suppresses
+	  warning 1527.	 -woff 1527-1570 suppresses warnings 1527 through
+	  1570.	 -woff 1600-1700,1705-1790 suppresses numbers 1600 through
+	  1700 and 1705	through	1790.
+
+     -o	output
+	  Name the final output	file output.  If this option is	used, the file
+	  `a.out' is undisturbed.
+
+     -On  The main optimization	level, specifying the basic level of
+	  optimization desired.	 The level n should be in the range 0..3, with
+	  the implications described below.
+
+     -O0  Turn off all optimizations.  This is the default.
+
+     -O1  Turn on local	optimizations that can be done quickly.
+
+     -O	or -O2
+	  Turn on extensive optimization.  The optimizations at	this level are
+	  generally conservative, in the sense that they (1) are virtually
+	  always beneficial, (2) provide improvements commensurate to the
+
+
+
+									Page 7
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  compile time spent to	achieve	them, and (3) avoid changes which
+	  affect such things as	floating point accuracy.
+
+     -O3  Turn on aggressive optimization.  The	optimizations at this level
+	  are distinguished from -O2 by	their aggressiveness, generally
+	  seeking highest-quality generated code even if it requires extensive
+	  compile time.	 They may include optimizations	which are generally
+	  beneficial but occasionally hurt performance.	-O3 has	different
+	  behavior in the three	ABIs.  See the ABI specific sections (below)
+	  for the details.
+
+     -S	  Compile the specified	source programs	and leave the symbolic
+	  assembly language output in corresponding files suffixed with	`.s'.
+
+     -MDupdate filename
+	  While	compiling, update filename to contain header, library, and
+	  runtime make(1) dependencies for cc's	output file.  cc -MDupdate
+	  updates only lines that end with a distinctive make comment and
+	  begin	with the name of the output file followed by a colon.  The
+	  standard option used with make(1) is
+
+	   -MDupdate Makedepend
+
+     -M	  Run only the macro preprocessor on the named C programs, requesting
+	  it to	generate make dependencies and send the	result to the standard
+	  output.
+
+     -P	  Run only the C macro preprocessor and	put the	result for each	source
+	  file (by suffix convention, i.e., '.c' and '.s') in a	corresponding
+	  `.i' file.  The `.i' file has	no `#' lines in	it.
+
+     -E	  Run only the C macro preprocessor files (without considering
+	  suffixes), and send the result to the	standard output.  The
+	  resultant output will	contain	line directives.  This overrides the
+	  -nocpp option.
+
+     -Dname=def
+     -Dname
+	  Define the name to the C macro preprocessor, as if by	`#define'.  If
+	  no definition	is given, the name is defined as "1".
+
+     -Uname
+	  Remove any initial definition	of name.
+
+     -Idir
+	  `#include' files whose names do not begin with `/' are always	sought
+	  first	in the directory of the	file argument, then in directories
+	  specified in -I options, and finally in the standard directory
+	  (/usr/include).
+
+
+
+
+
+
+									Page 8
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     -nostdinc
+	  This option will cause `#include' files never	to be searched for in
+	  the standard directory (/usr/include).
+
+     -I	  This option will cause `#include' files never	to be searched for in
+	  the standard directory (/usr/include).  This option will be phased
+	  out in a future release; -nostdinc should be used in its place.
+
+     -G	num
+	  Specify the maximum size, in bytes, of a data	item that is to	be
+	  accessed from	the global pointer.  Num is assumed to be a decimal
+	  number.  If num is zero, no data is accessed from the	global
+	  pointer.  The	default	value for num is 8 bytes.  Data	stored
+	  relative to the global pointer can be	accessed by the	program
+	  quickly, but this space is limited.  Large programs may overflow the
+	  space	accessed by the	global pointer at load time.  If the loader
+	  gives	the error message ``Bad	-G num value'',	recompile with -G 0.
+	  One must normally use	the same value of this switch for compiling
+	  all files that comprise a program executable or DSO.	Please note
+	  that this switch is non-standard and may not be supported across
+	  product lines.
+
+     -show
+	  Print	the passes as they execute with	their arguments	and their
+	  input	and output files.
+
+     -trapuv
+	  See -DEBUG:trap_uninitialized	in DEBUG_group(5).
+
+     -version
+	  Display the version number of	the compiler. Note: The	compiler will
+	  not be run if	this flag is used.
+
+     -xgot
+	  Compile using	a 32-bit offset	in the Global Symbol Table (GOT).  By
+	  default, addresses are loaded	out of the GOT using a 16-bit offset
+	  from a context pointer.  The default size of the GOT thus is limited
+	  to 64K bytes,	or about 8K worth of symbols, 16K for -o32 compiled
+	  objects.  This can sometimes result in a "GOT	overflow" message.
+	  Use of the -xgot option allows the GOT to contain up to 1G of
+	  entries; however, the	resulting executable will be somewhat larger
+	  and slower.  -xgot is	a synonym for -TENV:large_GOT (see below).
+
+	  A better solution for	"GOT overflow" problems	is to compile the
+	  objects without the -xgot option and to link using the -multigot
+	  option, described in ld(1).
+
+	  For more information about the GOT, the -xgot	option and some
+	  important notes about	its use, see the dso(5)	man page (the FAQ
+	  section, "What should	I do about a GOT overflow?").
+
+
+
+
+
+									Page 9
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     -avoid_gp_overflow
+	  Asserts assorted flags which are intended to avoid GOT overflow.
+
+     -v	  Same as -fullwarn (verbose warnings).	 The old meaning of -v (to
+	  show the compiler passes), is	invoked	with -show.
+
+     -nocpp
+	  Do not run any C macro preprocessor on C and assembly	source files
+	  before compiling.  This option is ignored when compiling a '.i'
+	  file.
+
+COMMAND	LINE OPTIONS (-o32 only)
+     -O3  With this option, a ucode object file	is created for each C source
+	  file and left	in a `.u' file.	 The newly created ucode object	files,
+	  the ucode object files specified on the command line,	the runtime
+	  startup routine, and all of the runtime libraries are	linked.
+	  Optimization is done on the resulting	ucode linked file and then it
+	  is linked as normal producing	an ``a.out'' file.  No resulting `.o'
+	  file is left from the	ucode linked result as in previous releases.
+	  Use of -c is not compatible with -O3.	 Instead, use -j described
+	  below.
+
+     -j	  Compile the specified	source programs, and leave the ucode object
+	  file output in corresponding files suffixed with `.u'.  Please note
+	  that this switch is non-standard and may not be supported across
+	  product lines.
+
+     -ko output
+	  Name the output file created by the ucode loader as output. This
+	  file is not removed.	If this	file is	compiled, the object file is
+	  left in a file whose name consists of	output with the	suffix changed
+	  to a `.o'.  If output	has no suffix, a `.o' suffix is	appended to
+	  output. Please note that this	switch is non-standard and may not be
+	  supported across product lines.
+
+     -Olimit num
+	  Specify the maximum size, in basic blocks, of	a routine that will be
+	  optimized by the global optimizer.  If a routine has more that this
+	  number of basic blocks it will not be	optimized and a	message	will
+	  be printed.  An option specifying that the global optimizer is to be
+	  run (-O -O2, -O3) must also be specified.  Num is assumed to be a
+	  decimal number.  The default value for num is	1000 basic blocks.
+
+     -nokpicopt
+	  Asks uopt not	to perform the special treatment for global variables
+	  to optimize their program accesses under shared compilation.
+
+     -kpicopt
+	  Asks uopt to perform the special treatment for global	variables to
+	  optimize their program accesses regardless of	the shared/non-shared
+	  compilation mode.
+
+
+
+
+								       Page 10
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     -Wx,[-G [num],-v, -A, -K]
+	  Treat	any argument following `-Wx,' as if it were an svr3 cc option.
+
+     The following options primarily aid compiler development and are not
+     generally used:
+
+     -Wc,arg1[,arg2...]
+	  Pass the argument[s] argi to the compiler pass c. The	c is one of
+	  [pKMfjusmocablyz].  The c selects the	compiler pass in the same way
+	  as the -t option.  Note that the arg1	etc must not contain spaces.
+	  For example, to pass
+	      -init bob
+	      to ld, use
+	      -Wl,-init,bob
+
+     The options -t[hpKfjusmocablrnyz],	-hpath,	and -Bstring select a name to
+     use for a particular pass,	startup	routine, or standard library.  These
+     arguments are processed from left to right	so their order is significant.
+     When the -B option	is encountered,	the selection of names takes place
+     using the last -h and -t options.	You must use all three options
+     together.	For example, -tc -h. -B	says to	use the	ugen executable	in the
+     current directory.
+
+     Any of the	-p[01] options and any of the -g[0123] options must precede
+     all -B options because they can affect the	location of runtimes and what
+     runtimes are used.
+
+     -t[hpKfjusmocablrnyz]
+	  Select the names.  The names selected	are those designated by	the
+	  characters following the -t option.
+
+     Characters	used in	the -H,	-W, and	-t options are interpreted according
+     to	the following table:
+
+
+	  Name		    Character
+	  include	h
+	  preprocessor	p
+	  pca		K (Power C only)
+	  mpc		M (Power C only)
+	  cfe		f (See below)
+	  ujoin		j
+	  uld		u
+	  usplit	s
+	  umerge	m
+	  uopt		o
+	  ugen		c
+	  as0		a
+	  as1		b
+	  ld		l
+	  [m]crt[1n].o	r
+
+
+
+
+								       Page 11
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     Although cc may be	used to	compile	source files in	such languages as
+     FORTRAN and pascal, only the name used for	the front-end of the C
+     compiler is selected by the -tf option.
+
+     -hpath
+	  Use path rather than the directory where the name is normally	found.
+	  Please note that this	switch is non-standard and may not be
+	  supported across product lines.
+
+     -Bstring
+	  Append string	to all names specified by the -t option.  If no	-t
+	  option has been processed before the -B, the -t option is assumed to
+	  be ``hpKfjusmocablrnyz''.  This list designates all names.  If no -t
+	  argument has been processed before the -B then a -Bstring is passed
+	  to the loader	to use with its	-lx arguments.	Sometimes a more
+	  convenient way to get	a string appended to all archive library names
+	  is the ld(1)	-Bstring option, which may be passed via the
+	  -Wl,-Bstring option to cc.  Invoking the compiler with a name	of the
+	  form ccstring	has the	same effect as using a -Bstring	option on the
+	  command line.
+
+     -cord
+	  Run the procedure rearranger,	cord(1), on the	resulting file after
+	  linking.  The	rearrangement is done to improve the paging and
+	  caching performance of the program's text.  The output of cord(1) is
+	  left in the file specified by	the -o output option or	a.out by
+	  default.  If no -feedback file is specified, then <outfile>.fb is
+	  used as the default.
+
+     -feedback <file>
+	  Used with the	-cord option to	specify	feedback file(s) to be used.
+	  This file can	be produced by prof(1) with its	-feedback option from
+	  an execution of the instrumented program produced by pixie(1).
+	  Multiple feedback files can be specified with	multiple -feedback
+	  options.
+
+COMMAND-LINE OPTIONS (-n32 or -64 only)
+     -O3  This level also enables the -OPT:roundoff=2 option described below,
+	  which	does aggressive	rearrangement of floating point	calculations
+	  with potential effects on accuracy.  In addition, refer to the
+	  -OPT:...  (general optimization), -INLINE:...	 (standalone inliner),
+	  -IPA:...  (interprocedural analysis),	and -LNO:...  (loop nest
+	  optimizer) option groups described below.
+
+     -Ofast[=ipxx]
+	  Use optimizations selected to	maximize performance for the given SGI
+	  target platform IPxx.	 The selected optimizations may	differ between
+	  releases of the compiler, and	among the supported platforms.	They
+	  will always enable the full instruction set of the target platform
+	  (e.g.	 -mips4	for an R10000).	 Although the optimizations are
+	  generally safe, they may affect floating point accuracy due to
+	  rearrangement	of computations.  Typical optimizations	selected
+
+
+
+								       Page 12
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  include -O3, -IPA, -TARG:platform=ipxx, -n32,	and
+	  -OPT:Olimit=0:roundoff=3:div_split=ON:alias=typed.  See the
+	  description of -TARG:platform=ipxx for information about the
+	  optional argument.  To determine precisely what options are set by
+	  -Ofast, use -LIST:options.  The default is an	R10000 Power
+	  Challenge, IP25.
+
+     -diag_suppress numberlist
+	  Equivalent to	-woff numberlist
+
+     -diag_remark numberlist
+	  The messages with the	specified numbers are treated as remarks
+	  unless they are non-discretionary errors.  In	particular they	will
+	  be reported only if -fullwarn	is specified.
+
+     -diag_warning numberlist
+	  The messages with the	specified numbers are treated as warnings
+	  unless they are non-discretionary errors.  In	particular, they will
+	  be reported unless -w	is specified.
+
+     -diag_error numberlist
+	  The messages with the	specified numbers are treated as errors.  In
+	  particular, if any such message is reported, no object file will be
+	  generated.
+
+     -float_const
+	  Causes the compiler to interpret floating point constants without
+	  precision suffixes as	single-precision whenever doing	so will	not
+	  lose precision and the context is otherwise single-precision.	 This
+	  may prevent unnecessary conversions between single- and double-
+	  precision in ANSI modes when the variables involved have all been
+	  declared as float but	the constants have not been suffixed with 'f'.
+
+     -help
+	  This will not	run the	compiler, but will list	all the	available
+	  options.
+
+     -ignore_suffix
+	  By default the compiler uses file suffixes to	determine which
+	  language to compile for.  For	example, "cc file.cxx" will invoke the
+	  C++ compiler.	 With the -ignore_suffix option, the language will be
+	  determined solely by how the compiler	is invoked, so in the above
+	  example of "cc file.cxx", we will invoke the C compiler.
+
+     -pch This option allows the user to avoid	recompiling a set of header
+	  files.  This is particularly useful when your	header files introduce
+	  many lines of	code, and the primary source files that	included them
+	  are relatively small.	 The use of -pch can improve compile time
+	  performance at the expense of	taking up a lot	of disk	space.	See
+	  the section on Using precompiled headers in C	and C++	in  chapter 2
+	  of the MIPSpro Compiling and Performance Tuning Guide	for more
+	  information on using precompiled headers.
+
+
+
+								       Page 13
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     -r5000
+	  Schedule code	for the	R5000 and add
+	  -L/usr/lib{32,64}/mips{3,4}/r5000 to the head	of the library search
+	  path depending on which ABI and ISA is specified or implied. (See
+	  math(3) for details of math library usage)
+
+     -r8000
+	  Schedule code	for the	R8000 and add
+	  -L/usr/lib{32,64}/mips{3,4}/r8000 to the head	of the library search
+	  path depending on which ABI and ISA is specified or implied. (See
+	  math(3) for details of math library usage)
+
+     -r10000
+	  Schedule code	for the	R10000 and add
+	  -L/usr/lib{32,64}/mips{3,4}/r10000 to	the head of the	library	search
+	  path depending on which ABI and ISA is specified or implied. (See
+	  math(3) for details of math library usage)
+
+
+     -CLIST:...
+	     C listing control group:  control emission	of the compiler's
+	     internal program representation, after IPA	inlining and loop-nest
+	     transformations, back into	C code.	 This is intended primarily as
+	     a diagnostic tool,	and the	generated C code may not always	be
+	     compilable. This compiler option may be discontinued in future
+	     compiler releases.	 The generated C code will be written to two
+	     files, a header file containing file-scope	declarations, and a
+	     file containing function definitions.  The	individual controls in
+	     this group	are:
+
+	     =(ON|OFF)
+		 Enable	the C listing.	This option is implied by any of the
+		 others, but may be used to enable the listing when no other
+		 options are required, e.g.  -CLIST:=ON.  (-clist is
+		 equivalent.)
+
+	     dotc_file=filename
+		 Specify the file into which program units will	be emitted.
+		 Defaults to the source	file name with extension .w2c.c.
+
+	     doth_file=filename
+		 Specify the file into which file-scope	declarations will be
+		 emitted.  Defaults to the source file name with extension
+		 .w2c.h.
+
+	     emit_pfetch[=(ON|OFF)]
+		 Emit prefetch information as comments in the transformed
+		 source. The upper case	PREFETCH denotes a prefetch and
+		 includes the variable reference, along	with an	offset in
+		 bytes,	indication of read/write, a stride for each dimension,
+		 and a number in the range from	1 (low)	to 3 (high) reflecting
+		 the confidence	in the prefetch	analysis. The lower case
+
+
+
+								       Page 14
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 prefetch comments identify the	reference(s) being prefetched
+		 by the	PREFETCH descriptor above. They	occur after a
+		 read/write to a variable, and give the	identifier of the
+		 PREFETCH-spec for each	level of the cache. (default OFF).
+
+	     linelength=n
+		 Set the maximum linelength to n characters (the default is
+		 unlimited).
+
+	     show[=(ON|OFF)]
+		 Print the input and output filenames to stderr	(default ON).
+
+
+     -DEBUG:...
+	     Debugging features	control	group:	control	compiler features
+	     related to	debugging, e.g.	checking for possible errors (at
+	     compile time or execution time), or controlling the treatment of
+	     warning messages.	See the	DEBUG_group(5) man page	for more
+	     information, including the	individual options in this group.  See
+	     also the -g option	for controlling	emission of information	for
+	     the debugger.
+
+
+     -INLINE:...
+	     Standalone	inliner	option group:  control application of intra-
+	     file subprogram inlining when interprocedural analysis is not
+	     enabled (see -IPA below).	See the	ipa(5) man page	for more
+	     information, including the	individual options in this group.
+
+     -IPA:...
+	     Inter-Procedural Analyzer option group:  control application of
+	     inter-procedural analysis and optimization, including inlining,
+	     constant propagation, common block	array padding, dead function
+	     elimination, alias	analysis, and others.  Use -IPA	by itself to
+	     invoke the	interprocedural	analysis phase with default options.
+	     If	you compile and	link in	distinct steps,	you must use at	least
+	     -IPA for the compile step,	and specify -IPA and the individual
+	     options in	the group for the link step. If	you specify -IPA for
+	     the compile step, and do not specify -IPA for the link step then
+	     you'll get	an error.  See the ipa(5) man page for more
+	     information, including the	individual options in this group.
+
+     -r	     When used with -IPA and -c	during compilation, the	resulted
+	     object will be an ELF relocatable object, not an intermediate
+	     object.  When used	with -IPA:relopt=on, the resulted object will
+	     have non-PIC optimizations	performed on it.
+
+     -LNO:...
+	     Loop nest optimizer (LNO) option control group: control
+	     optimizations and transformations performed by LNO.  The
+	     individual	controls in this group are:
+
+
+
+
+								       Page 15
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	     opt[=(0|1)]
+		 General control over the LNO optimization level.
+		 opt=0 computes	the dependence graph to	be used	by later
+		 passes.  It also removes unexecutable loops and if
+		 statements.
+		 opt=1 peforms full LNO	transformations.
+
+	     -LNO:auto_dist [ =	( TRUE|FALSE)]
+		 On Origin systems, use	a heuristic to distribute local	and
+		 global	arrays that are	accessed in parallel.  The heuristic
+		 is based on access patterns of	the named arrays; access
+		 patterns of arrays used as dummy arguments are	ignored.  This
+		 optimization works with either	automatic parallelism or
+		 parallelism expressed through directives.  This optimization
+		 is always safe, does not affect the layout of arrays in
+		 virtual space and does	not incur addressing overhead. The
+		 default value is FALSE.  ignore_pragmas By default, pragmas
+		 within	a file override	the command-line options. This
+		 command-line options allows the user to have the command-line
+		 options override the pragmas in the file.
+
+	     fission[=(0|1|2)]
+		 Control loop fission. The default value is 1.
+		 -LNO:fission=0	implies	that no	fission	will be	performed.
+		 -LNO:fission=1	performs normal	fission	as necessary in
+		 fiz_fuse phase.
+		 -LNO:fission=2	specifies that fission be tried	before fusion
+		 in fiz_fuse phase.  -LNO:fission=2 attempts to	fission	inner
+		 loops as much as possible in inner_fission phase.
+		 If -LNO:fission and -LNO:fusion (see below) are both set to 1
+		 or to 2, fusion is preferred.
+
+	     fusion[=(0|1|2)]
+		 Control loop fusion. The default value	is 1.
+		 -LNO:fusion=0 implies that no fusion will be performed.
+		 -LNO:fusion=1 specifies that normal outer loop	fusion be
+		 performed along with fiz_fuse phase fusion.
+		 -LNO:fusion=2 specifies the following:	 Fuse outer loops even
+		 if it means partial fusion.  Try fusion before	fission	in
+		 fiz_fuse phase.  Allow	partial	fusion in fiz_fuse phase if
+		 not all levels	can be fused in	the multiple level fusion.
+		 If -LNO:fission and -LNO:fusion are both set to 1 or to 2,
+		 fusion	is preferred. Note that	fiz_fuse phase of LNO is run
+		 regardless of these flag values. These	flags will, however,
+		 affect	the SNLs produced by fiz_fuse phase.
+
+	     fusion_peeling_limit[=n]
+		 Set the limit (n>=0) for number of iterations allowed to be
+		 peeled	in fusion. By default, n=5.
+
+
+
+
+
+
+								       Page 16
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	     oinvar[=(ON|OFF)]
+		 Turn on and off outer loop invariant hoisting algorithm.  The
+		 compiler looks	for expressions	that vary in the inner loop
+		 but are invariant in an outer loop.  The compiler precomputes
+		 all the expressions and stores	them in	a temporary vector.
+		 All references	to the expression in the inner loop are
+		 replaced by loads from	the vector.  By	default, .B oinvar=ON.
+
+	     outer[=(ON|OFF)]
+		 Turn on and off the outer loop	fusion.	LNO fuses two outer
+		 most loops for	reuse and reduced loop overhead. By default,
+		 outer=ON.
+
+	     vintr[=(ON|OFF)]
+		 Replace mathematical intrinsic	calls in loops with vectorized
+		 versions of the intrinsics. The transformation	is done	by
+		 fissioning intrinsic calls out	of the loops and convert the
+		 fissioned loops with vector intrinsic calls. See also man
+		 page for 'math'. By default, vintr=ON.
+
+	The following options may also be specified to model the cache memory
+	system.	The numbering starts with the cache level closest to the
+	processor and works outward.
+
+	     (cache_size1|cs1)=n
+	     (cache_size2|cs2)=n
+	     (cache_size3|cs3)=n
+	     (cache_size4|cs4)=n
+		 The size of the cache.	 The value n may either	be 0, or it
+		 must be a positive integer followed by	exactly	one of the
+		 letters k, K, m or M. This specifies the cache	size in
+		 kilobytes or megabytes. Setting a value to zero indicates
+		 that there is no cache	at that	level.
+
+	     (line_size1|ls1)=n
+	     (line_size2|ls2)=n
+	     (line_size3|ls3)=n
+	     (line_size4|ls4)=n
+		 The line size in bytes. This is the number of bytes that are
+		 moved from the	memory hierarchy level further out to this
+		 level on a miss. Setting a value to zero indicates that there
+		 is no cache at	that level.
+
+	     (associativity1|assoc1)=n
+	     (associativity2|assoc2)=n
+	     (associativity3|assoc3)=n
+	     (associativity4|assoc4)=n
+		 The cache set associativity.  Large values are	equivalent.
+		 e.g. when blocking for	main memory, it's adequate to set
+		 assoc3=128. Setting a value to	zero indicates that there is
+		 no cache at that level.
+
+
+
+
+								       Page 17
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	     (clean_miss_penalty1|cmp1)=n
+	     (clean_miss_penalty2|cmp2)=n
+	     (clean_miss_penalty3|cmp3)=n
+	     (clean_miss_penalty4|cmp4)=n
+	     (dirty_miss_penalty1|dmp1)=n
+	     (dirty_miss_penalty2|dmp2)=n
+	     (dirty_miss_penalty3|dmp3)=n
+	     (dirty_miss_penalty4|dmp4)=n
+		 In processor cycles, the time for a clean or dirty miss to
+		 the next outer	level of the memory hierarchy.	This number is
+		 obviously approximate,	since it depends upon a	clean or dirty
+		 line, read or write miss, etc.	 Setting a value to zero
+		 indicates that	there is no cache at that level.
+
+	     (is_memory_level1|is_mem1)=ON|OFF
+	     (is_memory_level2|is_mem2)=ON|OFF
+	     (is_memory_level3|is_mem3)=ON|OFF
+	     (is_memory_level4|is_mem4)=ON|OFF
+		 Does not need to be specified.	 Default is OFF. If specified,
+		 the corresponding associativity is ignored and	needn't	be
+		 specified.  Model this	memory hierarchy level as a memory,
+		 not a cache.  This means that blocking	may be attempted for
+		 this memory hierarchy level, and that blocking	appropriate
+		 for a memory rather than cache	would be applied. This implies
+		 no prefetching, no need to worry about	conflict misses.
+
+	The following options may also be specified to model the TLB.  The TLB
+	is assumed to be fully associative.
+
+	     (tlb_entries1|tlb1)=n
+	     (tlb_entries2|tlb2)=n
+	     (tlb_entries3|tlb3)=n
+	     (tlb_entries4|tlb4)=n
+		 The size of the tlb for this cache level.
+
+	     (page_size1|ps1)=n
+	     (page_size2|ps2)=n
+	     (page_size3|ps3)=n
+	     (page_size4|ps4)=n
+		 The number of bytes in	a page.
+
+	     (tlb_clean_miss_penalty1|tlbcmp1)=n
+	     (tlb_clean_miss_penalty2|tlbcmp2)=n
+	     (tlb_clean_miss_penalty3|tlbcmp3)=n
+	     (tlb_clean_miss_penalty4|tlbcmp4)=n
+	     (tlb_dirty_miss_penalty1|tlbdmp1)=n
+	     (tlb_dirty_miss_penalty2|tlbdmp2)=n
+	     (tlb_dirty_miss_penalty3|tlbdmp3)=n
+	     (tlb_dirty_miss_penalty4|tlbdmp4)=n
+		 The number of processor cycles	it takes to service a clean or
+		 dirty tlb miss.
+
+
+
+
+								       Page 18
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	The following option controls aids in modeling,	but is not required.
+	The default depends upon the target processor.
+
+	     non_blocking_loads[=(ON|OFF)]
+		 Specify FALSE if the processor	blocks on loads.  If not set,
+		 takes the default of the current processor.  This is not
+		 associated with a cache level,	and does not have to be
+		 defined when defining a cache level.
+
+	The following options control which transformations to apply.
+
+	     interchange[=(ON|OFF)]
+		 Specify OFF to	disable	the interchange	transformation.	 By
+		 default, interchange= ON.
+
+	     blocking[=(ON|OFF)]
+		 Specify OFF to	disable	the cache blocking transformation.
+		 Note that loop	interchange to improve cache performance could
+		 still be applied.  By default,	blocking= ON.
+
+	     blocking_size=[n1][,n2]
+		 Specify a blocksize that the compiler must use	when
+		 performing any	blocking.
+
+	     (outer_unroll,ou)=n
+	     (outer_unroll_max,ou_max)=n
+	     (outer_unroll_prod_max,ou_prod_max)=n
+		 If outer_unroll (abbreviation ou ) is specified, neither
+		 outer_unroll_max nor outer_unroll_prod_max may	be.
+		 outer_unroll indicates	that every outer loop for which
+		 unrolling is legal should be unrolled by exactly n. The
+		 compiler will either unroll by	this amount or not at all.
+		 outer_unroll_max indicates that the compiler may unroll as
+		 many as n per loop, but no more. outer_unroll_prod_max
+		 indicates that	the product of unrolling of the	various	outer
+		 loops in a given loop nest is not to exceed
+		 outer_unroll_prod_max.	The default is 16.
+
+	     (outer_unroll_further,ou_further)=n
+		 When generating wind-down code	from outer loop	unrolling, the
+		 compiler sometimes will attempt to generate additional
+		 register tiling of unrolling factor two.  For example,	rather
+		 than transforming
+
+				 for (i=0; i<n;	i++) {
+				   for (j=0; j<n; j++) {
+				     S[i][j];
+				   }
+				 }
+
+			 into
+
+
+
+
+								       Page 19
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+				 for (i=0; i<n-5; i+=6)	 {
+				   for (j=0; j<n; j++) {
+				     S[i][j]; S[i+1][j];
+				     S[i+2][j];	S[i+3][j];
+				     S[i+4][j];	S[i+5][j];
+				   }
+				 }
+				 for (i=i; i<n;	i++) {
+				   for (j=0; j<n; j++) {
+				     S[i][j];
+				   }
+				 }
+
+			 the compiler may choose to generate
+
+				 for (i=0; i<n-5; i+=6)	 {
+				   for (j=0; j<n; j++) {
+				     S[i][j]; S[i+1][j];
+				     S[i+2][j];	S[i+3][j];
+				     S[i+4][j];	S[i+5][j];
+				   }
+				 }
+				 for (i=i; i<n-1; i+=2)	{
+				   for (j=0; j<n; j++) {
+				     S[i][j]; S[i+1][j];
+				   }
+				 }
+				 for (i=i; i<n;	i++) {
+				   for (j=0; j<n; j++) {
+				     S[i][j];
+				   }
+				 }
+
+
+		 The compiler will not always do this. It is guaranteed	not to
+		 do this when the unrolling factor (six	in the above example)
+		 is less than the number supplied in this parameter. Thus,
+		 this additional unrolling is disabled by specifying -
+		 LNO:ou_further=999999 , and is	enabled	as much	as is sensible
+		 by specifying -LNO:ou_further=3.
+
+	     (outer_unroll_deep,ou_deep)=n
+		 When ON , for 3-deep or deeper	nests, we outer	unroll the
+		 wind-down loops that result from outer	unrolling loops
+		 further out. This results on larger code, but generates much
+		 better	code whenever wind down	loop execution costs are at
+		 all important.	The default is ON.
+
+	     pwr2[=(ON|OFF)]
+		 When the leading dimension of an array	is a power of two, the
+		 compiler makes	an extra effort	to make	the inner loop stride
+		 one, and is less likely to block since	it'll be harder	to
+
+
+
+								       Page 20
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 take advantage	of reuse.  Set to OFF to disable this, so that
+		 the leading dimension is ignored.
+
+	The following controls the gather-scatter optimization.
+
+	     gather_scatter=n
+		 Perform the gather-scatter optimization.
+		     0 = Do not	perform	gather-scatter
+		     1 = Gather-scatter	non-nested IF statements.
+		     2 = Multi-level gather-scatter.
+
+	The following options control use of the prefetch operation.
+
+	     prefetch[=(0|1|2)]
+		 Specify level of prefetching.
+		     0 = Prefetch disabled.
+		     1 = Prefetch enabled but conservative
+		     2 = Prefetch enabled and aggressive.
+		     The default is (1)	enabled	and conservative for R10000,
+		     and (0) disabled for all previous processors.
+
+	     prefetch_leveln[=(OFF|ON)]
+	     pfn[=(OFF|ON)]
+		 Selectively disable/enable prefetching	for cache level	n
+		 where n ranges	from 1 to 4.
+
+	     prefetch_manual[=(ON|OFF)]
+		 Specify whether manual	prefetches (through pragmas) should be
+		 respected or ignored.
+		     OFF - ignore manual prefetches
+		     (default for R8000	 and earlier)
+		     ON	- respect manual prefetches
+		     (default for R10000 and beyond)
+
+	     prefetch_ahead=[n]
+		 Prefetch the specified	number of cache	lines ahead of the
+		 reference. The	default	is 2.
+
+     PRAGMAS FOR LNO
+
+     Directives	within a program unit apply only to that particular program
+     unit, reverting to	the default values upon	the end	of the program unit.
+     Directives	that occur outside of a	program	unit alter the default value,
+     and therefore apply to the	rest of	the file from that point on, until
+     overridden	by a subsequent	pragma.
+
+     Pragmas within a file override the	command-line options by	default. To
+     have the command-line options override pragmas, use the command line
+     option:  -LNO:ignore_pragmas
+
+
+
+
+
+
+								       Page 21
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     Fission and Fusion	Pragmas
+
+     #pragma aggressive	inner loop fission
+	  Fission this loop in inner_fission phase to as many loops as
+	  possible.  It	can only be followed by	a inner	loop and has no	effect
+	  if that loop is not inner any	more after SNL phase.
+
+     #pragma fission [ (n) ]
+     #pragma fissionable
+	  Fission the enclosing	n level	of loops after this directive. Perform
+	  legality test	unless a fissionable directive is also specified. Will
+	  not re-order statements.
+
+     #pragma fuse [(n [,level] )]
+     #pragma fusable
+	  Fuse the following n loops. They have	to be immediately adjacent.
+	  Fusion is attempted on each pair of adjacent loops and the level by
+	  default is the determined by the maximal SNL levels of the fused
+	  loops	although partial fusion	is allowed.  Iterations	may be peeled
+	  as needed during fusion and the limit	of this	peeling	is 5 or	the
+	  number specified by the -LNO:fusion_peeling_limit flag. Fiz_fuse
+	  phase	will only try fusion on	these loops. For outer loops, if they
+	  are not adjacent any more after fiz_fuse phase, no fusion will be
+	  done for the non-adjacent outer loops. When the fusable pragma is
+	  present, no legality test is done and	the fusion is done up to the
+	  maximal SNL levels where the iteration numbers matched for each pair
+	  of loops to be matched.  The default value for n is  2.
+
+     #pragma no	fission
+	  The loop following this directive should not be fissioned in either
+	  fiz_fuse phase or inner_fission phase. Its inner loops, however, are
+	  allowed to be	fissioned.
+
+     #pragma no	fusion
+	  The loop following this directive should not be fused	with other
+	  loop.
+
+     SNL Transformation	Pragmas
+
+     Note: The parallelizing preprocessor may decide to	do some	transformation
+     for parallelism that violate some of these	directives.
+
+     #pragma interchange (i, j [,k ...])
+	  Loops	I, J and K (in any order) must directly	follow this directive
+	  and be perfectly nested one inside the other.	If they	are not
+	  perfectly nested, the	compiler may choose to perform loop
+	  distribution to make them so,	or may choose to ignore	the
+	  annotation, or even apply imperfect interchange.  This case is not
+	  likely. Attempts to reorder loops so that I is outermost, then J,
+	  then K. The compiler may choose to ignore this directive.  There
+	  must be a minimum of 2 indexes in the	directive.
+
+
+
+
+								       Page 22
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     #pragma no	interchange
+	  Prevent the compiler from involving the loop directly	following this
+	  directive in a permutation, or any loop nested within	this loop.
+
+     #pragma blocking size (n1,n2)
+     #pragma blocking size (n1)
+     #pragma blocking size (,n2)
+	  The loop specified, if it is involved	in a blocking for the primary
+	  {secondary} cache, will have a blocksize of n1 {n2}. The compiler
+	  will make an effort to include this loop within such a block.	 It
+	  cannot guarantee this. If a blocking size is specified to be 0, then
+	  the loop is not actually stripped, but the entire loop is inside the
+	  block.
+
+		  Examples:
+
+		  amat(x,y,z,n,m,mm)
+		  double x[100,100], y[100,100], z[100,100];
+		  int n, m, mm;
+		  {
+		    for	(k = 0;	k<n; k++) {
+		#pragma	blocking size (20)
+		      for (j = 0; j<m; j++){
+		#pragma	blocking size (20)
+			for (i = 0; j<mm; i++){
+			  z[i,k] = z[i,k] + x[i,j]*y[j,k];
+			}
+		      }
+		    }
+		  }
+
+	     In	this example, the compiler will	make
+	     20x20 blocks when blocking. However, the
+	     compiler would be well within its rights to block
+	     the loop nest such	that loop k is not included
+	     in	the tile. If it	didn't,	one could put a
+	     directive:
+
+	     #pragma blocking size (0)
+
+	     just before the k loop. That would	suggest	the
+	     compiler to generate a nest like
+
+		  amat(x,y,z,n,m,mm)
+		  double x[100,100], y[100,100], z[100,100];
+		  int n, m, mm;
+		  {
+		    for	(jj = 0; jj<m; jj+=20){
+		      for (ii =	0; ii<mm; ii+=20){
+			for (k = 0; k<n; k++){
+			  for (j = jj; j<min(m,	jj+19);	j++){
+			    for	(i = ii; j<min(mm, ii+19); i++){
+
+
+
+								       Page 23
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+			      z[i,k] = z[i,k] +	x[i,j]*y[j,k];
+			    }
+			  }
+			}
+		      }
+		    }
+		  }
+
+	     Finally note that a #pragma permutation
+	     may be applied to the same	nest as	a
+	     #pragma blocking size. The	blocking size
+	     applies to	the loop it directly
+	     preceeds only, and	moves with that
+	     loop when a permutation is	applied.
+
+     #pragma no	blocking
+	  Prevent the compiler from involving this loop	in a cache blocking.
+
+     #pragma unroll (n)
+	  This directive suggests to the compiler that n-1 copies of the loop
+	  body be added	to the inner loop. If the loop that this directive
+	  directly preceeds is an inner	loop, then it indicates	standard
+	  unrolling. If	the loop that this directive directly preceeds is not
+	  innermost, then "outer loop unrolling" (a.k.a.  unroll and jam) is
+	  performed.  The value	of n must be at	least one. If n	==1 then no
+	  unrolling is to be performed.	If n ==0, then the default unrolling
+	  should be applied. n2	(KAP's weight parameter) is ignored.
+
+     #pragma blockable (i,j [,k	...])
+	  The loops I, J and K must be adjacent	and nested within each other,
+	  although not necessarily perfectly nested.  This directive informs
+	  the compiler that these loops	may legally be involved	in a blocking
+	  with each other, even	if the compiler	would consider such a
+	  transformation illegal.  The loops are also interchangeable and
+	  unrollable.  This directive does not instruct	the compiler on	which
+	  of these transformations to apply.  You must specify at least	2 loop
+	  indexes in the directive.
+
+
+     Prefetch Pragmas
+
+     #pragma prefetch (n1 [ ,n2	])
+	  Specify prefetching for each level of	the cache.
+	  0 - prefetching off
+	      (default for all processors except R10000)
+	  1 - prefetching on, but conservative
+	  2 - prefetching on, and aggressive
+	      (default when prefetch is	on)
+	  Scope: Entire	function containing the	pragma.
+
+
+
+
+
+
+								       Page 24
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     #pragma prefetch_manual (n)
+	  Specify whether manual prefetches (through pragmas) should be
+	  respected or ignored.
+	  0 - ignore manual prefetches
+	      (default for mips3 and earlier)
+	  1 - respect manual prefetches
+	      (default for mips4)
+	  Scope: Entire	function containing the	pragma.
+
+     #pragma prefetch_ref_disable=A [, size=num]
+	  size = size (in Kbytes) of this array
+		 referenced in this loop. This argument	is optional and	must
+		 be a constant.
+
+	  This pragma explicitly disables prefetching all references to	array
+	  A in the current function. The auto-prefetcher runs (if enabled)
+	  ignoring array A. The	size is	used for volume	analysis.  Scope:
+	  Entire function containing the pragma.
+
+     #pragma prefetch_ref=array-ref,
+	     [stride=[str][,str]], [level=[lev][,lev]],	[kind=[rd/wr]],
+	     [size=[sz]]
+	  array-ref = reference	itself,	e.g. A(i, j)  (necessary)
+	  stride = prefetch every <str>	iterations of this loop	(optional; The
+	  default is 1)
+	  level	= level	in memory hierarchy to prefetch	(optional; The default
+	  is 2)
+	     lev=1: prefetch from L2 to	L1 cache
+	     lev=2: prefetch from memory to L1 cache
+	  kind = read/write  (optional;	The default is read/write)
+	  size = size (in Kbytes) of this array	referenced in this loop.
+	  (optional; Must be a constant)
+
+	  This pragma generates	a single prefetch instruction to the specified
+	  memory location. In addition:
+	    It searches	for array references that match	the supplied reference
+	    in the current loop-nest. If such a	reference is found, then that
+	    reference is connected to this prefetch node with the specified
+	    latency. If	no such	reference is found, then this prefetch node
+	    stays free-floating	and is scheduled "loosely".
+	    All	references to this array in this loop-nest are ignored by the
+	    automatic prefetcher (if enabled).
+	    If the size	is supplied, then the auto-prefetcher (if enabled)
+	    reduces the	effective cache	size by	that amount in its
+	    calculations.
+	    The	compiler tries to issue	one prefetch per stride	iterations,
+	    but	cannot guarantee it. Redundant prefetches are preferred	to
+	    transformations (such as inserting conditionals) which incur other
+	    overhead.
+	  Scope: No scope. Just	generate a prefetch instruction.
+
+
+
+
+
+								       Page 25
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     Dependence	Analysis Pragmas
+
+     #pragma ivdep
+	  This applies only to inner loops. It liberalizes dependence
+	  analysis.  Given two memory references, where	at least one is	loop
+	  variant, ignore any loop-carried dependences between the two
+	  references.  Some examples:
+
+		   for (i=0; i<n; i++)
+		     b[k] = b[k] + a[i];
+
+		  #pragma ivdep	does not break the
+		  dependence since b(k)	is not loop variant
+
+		  for (i=0; i<n; i++)
+		    a[i] = a[i-1] + 3;
+
+
+		  ivdep	does break the dependence but the
+		  compiler warns the user that it's breaking
+		  an obvious dependence.
+
+		  for (i=0; i<n; i++)
+		    a[b[i]] = a[b[i]] +	3;
+
+		  ivdep	does break the dependence.
+
+		  for (i=0; i<n; i++){
+		    a[i] = b[i];
+		    c[i] = a[i]	+ 3;
+		  }
+
+		  ivdep	does not break the dependence on
+		  a[i] since it	is within an iteration.
+
+
+	  If -OPT:cray_ivdep=TRUE, use Cray semantics.	Break all lexically
+	  backwards dependences.  Some examples:
+
+		  for (i=1; i<=n; i++)
+		    a[i] = a[i-1] + 3;
+
+		  ivdep	does break the dependence but the
+		  compiler warns the user that it's breaking
+		  an obvious dependence.
+
+		  for (i=0; i<=n; i++)
+		    a[i] = a[i+1] + 3;
+
+		  ivdep	does not break the dependence
+		  since	the dependence is from the load	to
+		  the store, and the load comes	lexically
+
+
+
+								       Page 26
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		  before the store.
+
+	  If -OPT:liberal_ivdep=TRUE, break all	dependences.
+
+
+     -LIST:...
+	  Listing option flag:	control	information which gets written to a
+	  listing (.l) file.  The individual controls in this group are:
+
+	     =(ON|OFF)
+		  Enable or disable writing the	listing	file.  The default is
+		  ON if	any -LIST: group options are enabled.  By default, the
+		  listing file will contain a list of options enabled.
+
+	     all_options[=(ON|OFF)]
+		  Enable or disable listing of most supported options.	The
+		  default is OFF.
+
+	     notes[=(ON|OFF)]
+		  If an	assembly listing is generated (i.e. on -S), various
+		  parts	of the compiler	(e.g. software pipelining) will	emit
+		  notes	into it	as comments describing what they have done.
+		  Turning this option OFF will suppress	these notes.  The
+		  default is ON.
+
+	     options[=(ON|OFF)]
+		  Enable or disable listing of the options modified (directly
+		  in the command line, or indirectly as	a side effect of other
+		  options).  The default is OFF.
+
+	     symbols[=(ON|OFF)]
+		  Enable or disable listing of information about the symbols
+		  (variables) managed by the compiler.
+
+
+     -OPT:...
+	     Optimization option group:	control	application of miscellaneous
+	     optimizations.  These options override defaults based on the main
+	     optimization level.  See also the -INLINE:...  (standalone
+	     inliner), -LNO:...	 (Loop Nest Optimization), and -IPA:...
+	     (Inter-Procedural Optimization), groups for additional
+	     optimization options.  The	individual controls in this group are:
+
+	     alias=name
+		 Specify the pointer aliasing model to be used.	 If name is
+		 any, then the compiler	will assume that any two memory
+		 references may	be aliased unless it can determine otherwise
+		 (the default).	 If name is typed, the ANSI rules for object
+		 reference types (Section 3.3) are assumed - essentially,
+		 pointers of distinct base types are assumed to	point to
+		 distinct, non-overlapping objects.  If	name is	no_typed,
+		 pointers to different base types may point to the same
+
+
+
+								       Page 27
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 object.  If name is common_scalar, scalar variables that are
+		 defined in a common block along with array variables are not
+		 referenced or modified	by any accesses	of the array
+		 variables.  If	name is	unnamed, pointers are also assumed
+		 never to point	to named objects. If name is no_unnamed,
+		 pointer may point to named object.  If	name is	no_restrict,
+		 distinct pointers may point to	overlapping storage.  Finally,
+		 if name is restrict, distinct pointers	are assumed to point
+		 to distinct, non-overlapping objects.	If name	is disjoint,
+		 distinct pointer expressions are assumed to point to
+		 distinct, non-overlapping objects.  The restrict and disjoint
+		 options also implies unnamed.	These options are unsafe, and
+		 may cause existing C programs to fail in obscure ways,	so it
+		 should	be used	with extreme care.
+
+	     cis[=(OFF|ON)]
+		 Convert sin/cos pairs with the	same argument to single	calls
+		 which calculate both values at	once (default ON).
+
+	     const_copy_limit=n
+		 Don't do const/copy propagation if there are more than	n
+		 expressions (approximately) in	a subprogram (default 10,000).
+
+	     cray_ivdep[=(OFF|ON)]
+		 Use Cray semantics when encountering #pragma ivdep
+		 statements. This means	that the compiler will break all
+		 lexically backward dependencies.  See also -
+		 OPT:liberal_ivdep.  Default OFF.
+
+	     div_split[=(OFF|ON)]
+		 Enable/disable	the calculation	of x/y as x*(1.0/y), normally
+		 enabled by
+		 -OPT:IEEE_arithmetic=3. Should	be used	with caution, as it
+		 produces less accurate	results.  Has no effect	for some
+		 targets, where	it produces slower code.  See also -OPT:recip.
+		 Default OFF.
+
+	     fast_bit_intrinsics[=(OFF|ON)]
+		 If ON,	turns off the check for	the bit	count being within
+		 range for Fortran bit intrinsics (e.g., BTEST,	ISHFT).
+		 Default OFF.
+
+	     fast_complex[=(OFF|ON)]
+		 Enable	calculation of complex absolute	value (norm) and
+		 division using	fast algorithms	which overflow for an operand
+		 (divisor in the case of division) which has a norm larger
+		 than the square root of the largest representable floating-
+		 point number (or underflow for	a value	which is smaller than
+		 the square root of the	smallest representable floating	point
+		 number).  Default ON if -OPT:roundoff=3 is used; otherwise
+		 OFF.
+
+
+
+
+								       Page 28
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	     fast_exp[=(OFF|ON)]
+		 Enable	optimization of	exponentiation by replacement of the
+		 runtime call by multiplication	and/or square root for certain
+		 compile-time constant exponents (integers and halves).	 This
+		 may produce differently-rounded results than the runtime
+		 routine.  The default is ON for Fortran, and for C when
+		 function exp()	in <math.h> is intrinsic (the default in
+		 -xansi	and -cckr modes), if -OPT:roundoff=1 or	above is used.
+
+	     fast_io[=(OFF|ON)]
+		 Enable	inlining of printf(), fprintf(), sprintf(), scanf(),
+		 fscanf(), sscanf() and	printw() in terms of more specialized
+		 lower-level subroutines.  This	option only has	effect when
+		 the candidates	for inlining are marked	as intrinsic in
+		 <stdio.h> and <curses.h>, as will be the case when the
+		 preprocessing symbol __INLINE_INTRINSICS is defined,
+		 otherwise they	are not	inlined.  Programs which make frequent
+		 calls to functions such as printf() or	scanf()	will generally
+		 get improved I/O performance when -OPT:fast_io=ON.  However,
+		 this option may cause substantial code-expansion, and is
+		 therefore OFF by default.
+
+	     fast_nint[=(OFF|ON)]
+		 Enables use of	the round instruction to implement NINT	and
+		 ANINT (both single- and double-precision versions).  This
+		 violates the Fortran 77 standard for certain argument values,
+		 since it does rounding	as specified by	the IEEE standard,
+		 rather	than as	specified by the ANSI Fortran 77 standard (for
+		 example, Fortran 77 says that NINT(1.5) is 2, and NINT(2.5)
+		 is 3, while IEEE rounds both of these to 2).  If fast_trunc
+		 is also enabled, NINT and ANINT are implemented with round
+		 instructions (i.e., fast_nint takes precedence	for these
+		 intrinsics).  Default ON if -OPT:roundoff=3 is	used;
+		 otherwise OFF.
+
+	     fast_sqrt[=(OFF|ON)]
+		 Enable	calculation of square roots using the identity
+		 sqrt(x) = x*rsqrt(x), where rsqrt is the reciprocal square
+		 root operation	(-mips4	compilations only).  WARNING: this
+		 option	results	in sqrt(0.0) producing a NaN result.  Use it
+		 only where zero sqrt operands are not valid.  Default OFF.
+
+	     fast_trunc[=(OFF|ON)]
+		 The Fortran intrinsics	NINT, ANINT, AINT, and AMOD (both
+		 single- and double-precision versions)	are inlined in a fast
+		 way which, although fully compliant with the Fortran 77
+		 standard, reduces the valid argument range somewhat.  If
+		 fast_nint is also enabled, NINT and ANINT are implemented
+		 with round instructions (i.e.,	fast_nint takes	precedence for
+		 these intrinsics).  Default ON	if -OPT:roundoff=1 (or
+		 greater) is used; otherwise OFF.
+
+
+
+
+								       Page 29
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	     fold_reassociate[=(OFF|ON)]
+		 Allow optimizations involving reassociation of	floating point
+		 quantities.  Default ON at optimization level -O3 or if
+		 -OPT:roundoff=2 or above is used.
+
+	     fold_unsafe_relops[=(OFF|ON)]
+		 Allow folding of relational operators in the presence of
+		 possible integer overflow.  Default ON.
+
+	     fold_unsigned_relops[=(OFF|ON)]
+		 Allow folding of unsigned relational operators	in the
+		 presence of possible integer overflow.	 Default OFF.
+
+	     got_call_conversion[=(OFF|ON)]
+		 Allow loads of	function addresses to be moved out of loops.
+		 The load is also set up with the proper relocation so that
+		 the address is	resolved at program start-up time.  Default
+		 OFF except at -O3.  Note: This	option should be disabled when
+		 compiling shared objects that contain function	addresses that
+		 may be	preempted by rld(1).  For more information, see
+		 dso(5).
+
+	     IEEE_arithmetic=n
+		 Specify the level of conformance to IEEE 754 floating-point
+		 arithmetic roundoff and overflow behavior.  At	level 1	(the
+		 default), do no optimizations which produce less accurate
+		 results than required by IEEE 754.  At	level 2, allow the use
+		 of operations which may produce less accurate inexact results
+		 (but accurate exact results) on the target hardware.
+		 Examples are the recip	and rsqrt operators for	a MIPS IV
+		 target.  At level 3, allow arbitrary mathematically valid
+		 transformations, even if they may produce inaccurate results
+		 for IEEE 754 specified	operations, or may overflow or
+		 underflow for a valid operand range.  An example is the
+		 conversion of x/y to x*recip(y) for MIPS IV targets.  See
+		 also -OPT:roundoff below.
+
+	     IEEE_comparisons[=(OFF|ON)]
+		 Force all comparisons to yield	results	conforming to the IEEE
+		 754 standard for NaN and Inf operands.	 If this option	is OFF
+		 (the default case), certain optimizations will	produce	non-
+		 IEEE results for comparisons involving	NaN and	Inf values,
+		 e.g. 'x==x' will be treated as	TRUE without executing a test.
+		 If your purpose is to detect NaN or Inf values, using the
+		 routines described in isnan(3C) will have less	impact on
+		 general optimization.	Default	OFF.
+
+	     inline_intrinsics[=(OFF|ON)]
+		 All Fortran intrinsics	which have a library function will be
+		 turned	into a call to that function if	this flag is set to
+		 OFF.  Default ON.
+
+
+
+
+								       Page 30
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	     liberal_ivdep[=(OFF|ON)]
+		 Instruct the compiler to break	all dependencies when
+		 encountering #pragma ivdep statements.	 Default OFF.
+
+	     Olimit=n
+		 Any routine above the Olimit size will	not be optimized.  If
+		 the compile is	-O2 or above, and a routine is so big that the
+		 compile speed may be slow, then the compiler will print a
+		 message about what Olimit value is needed to optimize.	 To
+		 force optimization, recompile with that value or use
+		 -OPT:Olimit=0 to avoid	having any Olimit cutoff.
+
+	     pad_common[=(OFF|ON)]
+		 Reorganize common blocks to improve the cache behavior	of
+		 accesses to members of	the common block.  This	may involve
+		 adding	padding	between	members	and/or breaking	a common block
+		 into a	collection of common blocks.  This option should not
+		 be used unless	the common block definitions (including
+		 EQUIVALENCE) are consistent among all sources comprising a
+		 program, nor if common	blocks are initialized with DATA
+		 statements, and if used it must be used for all of the	source
+		 files in the program.	It is supported	for Fortran only, and
+		 should	not be used if a common	block is referenced from C
+		 code.	Default	OFF.
+
+	     recip[=(OFF|ON)]
+		 Allow code that uses the MIPS IV recip	instruction.  Default
+		 ON at optimization level -O3 or if -OPT:IEEE_arithmetic=2 or
+		 above;	otherwise OFF.
+
+	     reorg_common[=(OFF|ON)]
+		 Reorganize common blocks to improve the cache behavior	of
+		 accesses to members of	the common block.  This	option is
+		 guaranteed to produce consistent results as long as array
+		 references are	made within the	bounds of the array.  This
+		 option	should not be used unless the common block definitions
+		 (including EQUIVALENCE) are consistent	among all sources
+		 comprising a program, nor if common blocks are	initialized
+		 with DATA statements, and if used it must be used for all of
+		 the source files in the program.  Default ON at -O3),
+		 otherwise OFF.
+
+	     roundoff=n
+		 Specify the level of acceptable departure from	source
+		 language floating-point round-off and overflow	semantics.  At
+		 level 0 (the default at optimization levels -O0 through -O2),
+		 do no optimizations which might affect	the floating-point
+		 behavior.  At level 1,	allow simple transformations which
+		 might cause limited round-off or overflow differences
+		 (compounding such transformations could have more extensive
+		 effects).  At level 2 (the default at optimization level -
+		 O3), allow more extensive transformations, such as the
+
+
+
+								       Page 31
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 execution of reduction	loop iterations	in a different order.
+		 At level 3, any mathematically	valid transformation is
+		 enabled.  Best	performance in conjunction with	software
+		 pipelining normally requires level 2 or above,	since
+		 reassociation is required for many transformations to break
+		 recurrences in	loops.	See also IEEE_arithmetic,
+		 fast_complex, fast_trunc, fast_nint, and fold_intrinsics
+		 above.
+
+	     rsqrt[=(OFF|ON)]
+		 Allow code that uses the MIPS IV rsqrt	instruction.  Default
+		 ON at optimization level -O3 or if -OPT:IEEE_arithmetic=2 or
+		 above.
+
+	     space[=(OFF|ON)]
+		 Specify that code space is to be given	priority in tradeoffs
+		 with execution	time in	optimization choices (default OFF).
+		 For instance, this forces all exits from a function to	go
+		 through a single exit block.
+
+	     swp[=(OFF|ON)]
+		 Disable/enable	software pipelining of loops.  The default is
+		 to do software	pipelining at -O3.
+
+	     unroll_analysis[=(OFF|ON)]
+		 Perform analysis of resource usage and	recurrences in bodies
+		 of innermost loops that don't qualify for being fully
+		 unrolled, unrolling only to the point that there's a
+		 potential benefit in doing so (i.e., so the shortest possible
+		 schedule length per iteration decreases). In general it
+		 shouldn't be necessary	to disable this.  Note that this often
+		 results in unrolling less than	the upper limit	dictated by
+		 -OPT:unroll_times_max and -OPT:unroll_size. Default ON.
+
+	     unroll_size=n
+		 Specify the maximum size (instructions) of an unrolled	loop
+		 (default 320).	 This indirectly controls which	loops can be
+		 fully unrolled.  See also -OPT:unroll_times_max.
+
+	     unroll_times_max=n
+		 Specify the maximum number of times a loop will be unrolled
+		 if it is not going to be fully	unrolled (default 2 for	MIPS
+		 IV ISA, 4 for MIPS I-III ISA).	 See also -OPT:unroll_size.
+
+	     wrap_around_unsafe_opt[=(OFF|ON)]
+		 If set	to OFF ,this option will disable both the induction
+		 variable replacement and linear function test replacement
+		 optimizations.	 These optimizations are normally enabled at
+		 general optimization level -O2	and above.  The	optimizations
+		 are unsafe in that they may potentially generate incorrect
+		 code for situations that may arise, for example, when there
+		 are multiple induction	variables in loops and their combined
+
+
+
+								       Page 32
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 initial values	can overflow or	wrap around.  General use of
+		 this flag is discouraged because it can degrade performance.
+		 It is provided, however, as a diagnostic tool to identify the
+		 situation described above.
+
+
+     -TARG:...
+	     Target option group: control the target architecture and machine
+	     for which code is generated.  The individual controls in this
+	     group are:
+
+	     dismiss_mem_faults[=(ON|OFF)]
+		 Force the kernel to dismiss any memory	faults (i.e. SIGSEGV
+		 or SIGBUS) which occur	during execution of the	program	(not
+		 just the code being compiled).	 This option allows
+		 optimizations which might cause extra faults, and can slow
+		 down execution	if many	extra faults actually occur.  It will
+		 also prevent recognition of legitimate	faults,	and should
+		 therefore be used with	care.  Default OFF.
+
+	     exc_max=[I][U][O][Z][V]
+		 Specify the maximum set of IEEE-754 floating point exceptions
+		 for which traps may be	enabled	at runtime for the program
+		 (not just the code being compiled).  Zero or more of the five
+		 letters specify inexact (I), underflow	(U), overflow (O),
+		 divide-by-zero	(Z), and invalid operation (V) exceptions.
+		 This option allows optimizations which	might cause extra
+		 exceptions, and it may	prevent	recognition of legitimate
+		 faults.  It does not affect explicit setting of exception
+		 enable	flags by the program, and should be avoided if the
+		 program does this.  See also -TARG:exc_min below.  Default
+		 IUOZV,	affected by -TENV:X option.
+
+	     exc_min=[I][U][O][Z][V]
+		 Specify the minimum set of IEEE-754 floating point exceptions
+		 for which traps must be enabled at runtime for	the program
+		 (not just the code being compiled).  Zero or more of the five
+		 letters specify inexact (I), underflow	(U), overflow (O),
+		 divide-by-zero	(Z), and invalid operation (V) exceptions.
+		 This option does not affect explicit setting of exception
+		 enable	flags by the program, and should be avoided if the
+		 program does this.  See also -TARG:exc_max below.  The
+		 -TARG:exc_max and -TARG:exc_min options specified for the
+		 various modules comprising a program must be consistent, i.e.
+		 none of the -TARG:exc_min values may require exceptions
+		 disabled by -TARG:exc_max values.  Default none.
+
+	     fp_precise[=(ON|OFF)]
+		 Force the target processor into precise floating point	mode
+		 at execution time.  Using this	option to compile any of the
+		 component source files	of a program will invoke this feature
+		 in the	resulting program.  This option	is only	meaningful for
+
+
+
+								       Page 33
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 R8000 target processors, and can cause	significant
+		 performance degradation for programs with heavy floating
+		 point usage.  See also	the fpmode(1) command.
+
+	     isa=(mips3|mips4)
+		 Identify the target instruction set architecture for
+		 compilation, i.e. the set of instructions which will be
+		 generated.  Code which	must run on R4000 processors should
+		 use -TARG:isa=mips3.  This option is equivalent to -mips3 or
+		 -mips4	- see those options for	defaults.
+
+	     madd[=(ON|OFF)]
+		 Enable/disable	transformations	to use multiply/add
+		 instructions.	These instructions perform a multiply and an
+		 add with a single roundoff.  They are therefore more accurate
+		 than the usual	discrete operations, and may cause results not
+		 to match baselines from other targets.	Use this option	to
+		 determine whether observed differences	are due	to madds.
+		 Default ON for	MIPS IV	target,	ignored	for others.
+
+	     platform[=ipxx]
+		 Identify the target SGI platform for compilation, choosing
+		 various internal parameters (such as cache sizes)
+		 appropriately.	 The current supported values are ip19,	ip20,
+		 ip21, ip22_4k,	ip22_5k, ip24, ip25, ip26, ip27, ip28, ip30,
+		 ip32_5k, and ip32_10k.	 The appropriate selection for your
+		 platform can be determined by running 'hinv -c	processor':
+		 The first line	will identify the proper IP number, and	for
+		 those where a processor suffix	(e.g.  '_4k') is required, the
+		 next line will	identify the processor (e.g. R4000).
+
+	     processor=(r4000|r5000|r8000|r10000)
+		 Select	the processor for which	to schedule code.  The chosen
+		 processor must	support	the ISA	specified (or implied by the
+		 ABI).
+
+	     sync[=(ON|OFF)]
+		 Enable/disable	use of SYNC instructions.  Default ON.
+
+
+     -TENV:...
+	     Target environment	option group: control the target environment
+	     assumed and/or produced by	the compiler.  The individual controls
+	     in	this group are:
+
+	     align_aggregate[=bytes]
+		 Control alignment of allocated	aggregates, i.e. structs and
+		 arrays.  The given value bytes	specifies that any aggregate
+		 object	at least that large is to be have at least that
+		 alignment.  By	default	(or if no value	bytes is provided),
+		 aggregates are	aligned	to the integer register	size, i.e.  8
+		 bytes for 64-bit programs and 4 bytes for 32-bit programs.
+
+
+
+								       Page 34
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+		 The value 0 specifies that the	minimum	alignment consistent
+		 with the ABI is to be used.  Otherwise, the value given must
+		 be a power of two no greater than 16.
+
+	     check_div[=N]
+		 See -DEBUG:div_check in DEBUG_group(5).
+
+	     kernel
+		 Generate code suitable	for an OS kernel to run	on the
+		 selected target.
+
+	     large_GOT[=ON]
+		 Assume	that the Global	Offset Table (for shared code) is more
+		 than 64K bytes, i.e. generate large offsets for references to
+		 it (default OFF -- see	small_GOT below).
+
+	     small_GOT[=ON]
+		 Assume	that the Global	Offset Table (for shared code) is less
+		 than 64K bytes, i.e. assume small offsets for references to
+		 it (default --	see large_GOT above).
+
+	     varargs_prototypes[=(OFF|ON)]
+		 See -DEBUG:varargs_prototypes in DEBUG_group(5).
+
+	     X=0..5
+		 Specify the level of enabled exceptions that will be assumed
+		 for purposes of performing speculative	code motion (default
+		 level 1 at -O0..-O2, 2	at -O3).  In general, an instruction
+		 will not be speculated	(i.e. moved above a branch by the
+		 optimizer) unless any exceptions it might cause are disabled
+		 by this option.  At level 0, no speculative code motion may
+		 be performed.	At level 1, safe speculative code motion may
+		 be performed, with IEEE-754 underflow and inexact exceptions
+		 disabled.  At level 2,	all IEEE-754 exceptions	are disabled
+		 except	divide by zero.	 At level 3, all IEEE-754 exceptions
+		 are disabled including	divide by zero.	 At level 4, memory
+		 exceptions may	be disabled or ignored.
+
+		 NOTE: At levels above the default level 1, various hardware
+		 exceptions which are normally useful for debugging, or	which
+		 are trapped and repaired by the hardware, may be disabled or
+		 ignored, with the potential of	hiding obscure bugs.  The
+		 program should	not explicitly manipulate the IEEE floating
+		 point trap-enable flags in the	hardware if this option	is
+		 used.
+
+	     zeroinit_in_bss[=(OFF|ON)]
+		 Enables data which is initialized to zero to be loaded	into
+		 the .bss section instead of the .data section.
+
+
+
+
+
+
+								       Page 35
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     -fbgen
+	  Used to specify that an instrumented executable program is to	be
+	  generated. Such an executable	is suitable for	producing one or more
+	  .Counts files	for feedback compilation. In those instances where the
+	  -c option is used to produce an object file that will	eventually be
+	  linked to form an instrumented executable, the -fbgen	option should
+	  be given as well. If the -c option is	not specified, pixie(1)	will
+	  be run automatically to instrument the generated executable.
+
+     -fbuse <file>
+	  Used to specify a .Counts file that should be	used to	guide feedback
+	  compilation. The specified file will be used along with the
+	  instrumented binary that produced the	.Counts	file to	generate a
+	  compiler feedback file, which	will then be used to direct
+	  optimization of the program.
+
+     -fb <file>
+	  Used to specify the feedback file to be used.	 This file with	suffix
+	  .cfb can be produced by prof(1) with its -feedback option from one
+	  or more .Counts files	generated by the execution of the instrumented
+	  program produced by pixie(1).Inordertomaintain to generated code,
+	  the program that is instrumented by pixie, must have been compiled
+	  at optimization level	-O0.
+
+The options described below primarily aid compiler development and are not
+generally used:
+
+     -Wc,arg1[,arg2...]
+	  Pass the argument[s] argi to the compiler pass c where c is one of
+	  [pKMfbal].  The c selects the	compiler pass according	to the
+	  following table:
+
+	  Name (-n32 or	-64)  Character
+	  preprocessor	p
+	  pca		K (Automatic Parallelization Option Only)
+	  fec		f (See below)
+	  be		b
+	  asm		a
+	  ld		l
+
+     Sets of these phase names can be used to select any combination of
+     phases.  For example, "-Wba,-o,foo" passes	the option "-o foo" to the "b"
+     and "a" phases.
+
+     -Yc,path
+	  Sets the path	in which to find the associated	phase, using the same
+	  phase	names as given in the -W option.  Also,	the letter I can be
+	  used to specify where	to search for include files; the letter	S can
+	  be used to specify where to search for startup files (crt*.o); and
+	  the letter L can be used to specify where to search for libraries.
+
+
+
+
+
+								       Page 36
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+LOADER OPTIONS
+     Other arguments are assumed to be either loader options or	C-compatible
+     object files, typically produced by an earlier cc run, or perhaps
+     libraries of C-compatible routines.  These	files, together	with the
+     results of	any compilations specified, are	loaded in the order given,
+     producing an executable program with the default name a.out.
+
+ENVIRONMENT VARIABLES
+     _XPG If the environment variable _XPG is defined, cc or c89 as it is
+	  known	under XPG4, operates in	conformance with the X/Open XPG4
+	  specifications.  The options and the command line behavior may
+	  differ in accordance to the XPG4 standards.
+
+     TMPDIR
+	  If the environment variable TMPDIR is	set, the value is used as the
+	  directory to place any temporary files rather	than the default /tmp.
+
+     SGI_ABI
+	  The environment variable SGI_ABI can be used to change the default
+	  abi behavior to be -o32, -n32, or -64; see getabi(3c).
+
+     SGI_CC
+	  The environment variable SGI_CC may be set to	any one	of -cckr,
+	  -ansi, or -xansi and is interpreted as an option before any other
+	  options on the command line.	This enables you to conveniently set
+	  the default C	compile	mode.
+
+     The environment variables COMP_TARGET_ROOT, TOOLROOT, RLS_ID_OBJECT are
+     used by cc	while compiling	the compiler itself.  Their meaning is left
+     undefined intentionally.  They should not be set in your environment.
+
+PREDEFINED VARIABLES
+     _MIPS_ISA
+	  The compiler defines _MIPS_ISA as _MIPS_ISA_MIPSx where x is 1, 2,
+	  3, or	4 based	on the -mips option.  Similarly, it defines _MIPS_SIM
+	  as _MIPS_SIM_ABI32 or	_MIPS_SIM_NABI32 or _MIPS_SIM_ABI64 based on
+	  the -o32, -n32 and -64 options respectively.	The _MIPS_ISA_MIPS,
+	  _MIPS_SIM_ABI, and _MIPS_SIM_NABI symbols are	defined	in <sgidefs.h>
+	  and should never be referenced unless	this file has first been
+	  included.  Note that only some combinations of ISA (Instruction Set
+	  Architecture)	and SIM	(Subprogram Interface Model) definitions are
+	  valid; e.g.  (_MIPS_ISA==_MIPS_ISA_MIPS4 &&
+	  _MIPS_SIM==_MIPS_SIM_ABI32) should always be false.
+
+STANDARD APIs
+     IRIX supports a number of C standards including POSIX1003.[abc], XPG4,
+     ANSI, etc.	 Each of these standards define	an allowed name	space that the
+     various header files and C	compiler may make visible.  Except for ANSI,
+     feature test macros are used to request a particular name space.  In
+     general, each standard specifies symbol rules only	for specific headers,
+     headers outside the scope of the standard have no restrictions on them.
+     To	create these various name spaces, many feature test macros are used
+
+
+
+								       Page 37
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     internally	in the various headers.	 Random	definitions given to these
+     internal macros will likely result	in the inability to compile anything.
+
+     POSIX
+       Enabling	a POSIX	name space requires that any SGI extensions be hidden.
+       Headers outside of the POSIX standard are not affected.
+       To request a POSIX 1003.1 1990 name space:
+	  cc -xansi -D_POSIX_SOURCE
+       To request a POSIX 1003.1b 1993 (realtime) name space:
+	  cc -xansi -D_POSIX_C_SOURCE=199309L
+       To request a POSIX 1003.1c(pthreads) name space:
+	  cc -xansi -D_POSIX_C_SOURCE=199506L
+
+
+     XPG4
+       The XPG4	name space is a	superset of POSIX 1003.1 1990 but does not
+       include most of POSIX 1003.1b or	later.	XPG4 has an extended symbol
+       space for Unix derived systems (which of	course IRIX is).
+       To request a XPG4 name space:
+	  cc -xansi -D_XOPEN_SOURCE
+       To request a XPG4 extended name space:
+	  cc -xansi -D_XOPEN_SOURCE -D_XOPEN_SOURCE_EXTENDED=1
+
+     SGI
+       The SGI name space is, for the most part, a superset of all other
+       standards.  The -xansi option alone enables the SGI name	space.
+
+     ANSI
+       ANSI mode is enabled directly from cc.  In ANSI mode, all POSIX,	XPG4,
+       and SGI symbols are hidden within the ANSI specific header files.  In
+       addition	SGI symbols in any POSIX or XPG4 header	are hidden.
+       To request a conforming ANSI name space:
+	  cc -ansi
+
+EXAMPLES
+	  cc -64 -mips4	...
+
+     Compile 64-bit MIPS IV (R8000, R10000, R5000) code, which will not	run on
+     R4000/R4400 processors.
+
+	  cc -64 -TARG:proc=r8000 ...
+
+     Compile 64-bit ABI	(MIPS 3) code, scheduled for best performance on the
+     R8000 processor but not using R8000-specific (MIPS	IV) instructions so
+     that it will be executable	on R4000/R4400 processors.
+
+	  cc ... -O2 -OPT:roundoff=2:alias=typed ...
+
+     Compile with extensive optimization enabled, allowing transformations
+     which affect floating point roundoff and overflow,	assuming strict	ANSI C
+     aliasing rules.
+
+
+
+
+								       Page 38
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+	  cc ... -O3 -OPT:roundoff=3 ...
+
+     Compile with aggressive optimization (including SWP) enabled, allowing
+     transformations with arbitrary effects on floating	point roundoff and
+     overflow.
+
+Defaults Specification Files
+     The compiler provides a method by which the user can customize the
+     Application Binary	Interface (ABI), instruction set architecture (ISA)
+     and processor type	used in	compilations where they	are not	explicitly
+     specified.	 Under this method, the	COMPILER_DEFAULTS_PATH environment
+     variable can be set to a colon separated list of paths where the compiler
+     will look for a compiler.defaults file. If	no compiler.defaults file is
+     found or if the environment variable is not set, the compiler looks for
+     /etc/compiler.defaults. If	that file is not found either, the compiler
+     resorts to	the built-in defaults described	earlier	in this	man page.
+
+     The compiler.defaults file	contains a -DEFAULT: option group specifier
+     that can be used to specify the default ABI, ISA, processor, and
+     optimization level. A warning will	be issued if anything other than a -
+     DEFAULT: option is	given in the compiler.defaults file.
+
+     The format	of the -DEFAULT: option	group specifier	is as follows:
+
+     -DEFAULT:[abi={o32|n32|64}]:[isa={mips1|mips2|mips3|mips4}]
+     :[proc={r4k|r5k|r8k|r10k}]:[opt={0,1,2,3}]
+
+     Where the ABI selections are from o32 (32-bit), n32 (high performance,
+     n32), or 64 (64-bit).  Likewise, the ISA selections are from mips1	(R3000
+     and above), mips2 (R4000 and above), mips3	(R4000 and above), mips4
+     (R5000, R8000 and R10000).	 The proc selections indicate for which
+     processor the compiler will schedule instructions by default and which
+     paths will	be added to the	head of	the library search path	(see -r5000,
+     -r8000, and -r10000 above).  The opt selections indicate which
+     optimization level	to use as the default.	If this	is not specified, the
+     compiler defaults to -O0.
+
+     The -show_defaults	option can be used to print out	what if	any
+     compiler.defaults is being	used and what its values are. This option is
+     for diagnostic purposes only and will not compile your program.
+
+     The SGI_ABI environment variable will override the	abi default from the
+     compiler.defaults file, while explicit command line options override all
+     the defaults.  Thus,
+
+     %cc -64 foo.c
+
+     will override a compiler.defaults file containing:
+
+     -DEFAULT:abi=n32:isa=mips4:proc=r10k
+
+     and do a -64 -mips4 -r10000 compilation.
+
+
+
+								       Page 39
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     Also note that a
+     %cc -o32 foo.c
+     in	the example above, will	not only override the ABI to -o32, but it
+     would also	override the ISA to -mips2, because -o32 supports only -mips2
+     and -mips1	compilations. The processor type is ignored by -o32
+     compilations.
+
+FILES
+     file.c		 input file
+     file.o		 object	file
+     a.out		 loaded	output
+     mon.out		 file produced for analysis by prof(1)
+     /usr/include	 standard directory for	`#include' files
+     /usr/bin/ld	 loader
+     /usr/bin/cord	 procedure rearranger
+
+FILES (-o32 only)
+     /tmp/ctm*		 temporaries
+     /usr/lib/driver	 compiler driver
+     /usr/lib/cpp	 C macro preprocessor
+     /usr/lib/acpp	 ANSI/ISO C macro preprocessor
+     /usr/lib/pca	 multiprocessing analyzer (Power C only)
+     /usr/lib/mpc	 multiprocessing C translator (Power C only)
+     /usr/lib/copt	 C source-to-source optimizer
+     /usr/lib/cfe	 C front end
+     /usr/lib/ujoin	 binary	ucode and symbol table joiner
+     /usr/bin/uld	 ucode loader
+     /usr/lib/usplit	 binary	ucode and symbol table splitter
+     /usr/lib/umerge	 procedure intergrator
+     /usr/lib/uopt	 optional global ucode optimizer
+     /usr/lib/ugen	 code generator
+     /usr/lib/as0	 symbolic to binary assembly language translator
+     /usr/lib/as1	 binary	assembly language assembler and	reorganizer
+     /usr/lib/mcrt1.o	 startup for profiling
+     /usr/lib/crt1.o	 runtime startup
+     /usr/lib/crtn.o	 runtime startup
+     /usr/lib/libc_mp.a	 multiprocessing library (Power	C only)
+     /usr/lib/libc.so.1	 shared	standard library
+     /usr/lib/libfpe.so	 floating point	exception handler library, see
+			 sigfpe(3c)
+     /usr/lib/libm.so	 shared	math library
+
+FILES (-n32 and	-64)
+     file.c		    input file
+     file.o		    object file
+     file.L		    listing file
+     /tmp/cmplr*	    temporary files
+     /etc/compiler.defaults Default ABI, ISA and processor options
+			    configuration file.
+     /usr/lib32/cmplrs/fec  C front end
+
+
+
+
+
+								       Page 40
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     /usr/lib32/cmplrs/be   code generator
+     /usr/lib32/cmplrs/asm  assembler
+     /usr/lib{32,64}/mcrt1.o
+			    startup for	profiling
+     /usr/lib{32,64}/crt1.o runtime startup
+     /usr/lib{32,64}/crtn.o runtime startup
+     /usr/lib{32,64}/libc.so.1
+			    shared standard library
+     /usr/lib{32,64}/libfpe.so
+			    floating point exception handler library, see
+			    sigfpe(3c)
+     /usr/lib{32,64}/libm.so
+			    shared math	library
+     /usr/lib{32,64}/libprof.a
+			    profiling library
+
+SEE ALSO
+     B.	W. Kernighan and D. M. Ritchie,	The C Programming Language, Prentice-
+     Hall, 1978
+     B.	W. Kernighan, ANSI X3.159-1989,	the ANSI C Standard.  Programming in
+     C-a tutorial
+     D.	M. Ritchie, C Reference	Manual
+     Power C User's Guide
+     ANSI C Transition Guide
+     MIPSpro Compiling,	Debugging and Performance Tuning
+     MIPSpro 64-bit Porting and	Transition Guide
+     MIPSpro N32 ABI Guide
+     as(1), collide(1),	cpp(1),	copt(1), pca(1), mpc(1), dis(1), nm(1),
+     dbx(1), elfdump(1), f77(1), ftoc(1), ld(1), pixie(1), prof(1), what(1),
+     getabi(3c), sigfpe(3c), speedshop(1).
+
+DIAGNOSTICS
+     The diagnostics produced by cc are	intended to be self-explanatory.
+     Occasional	messages may be	produced by the	assembler or loader.
+
+BUGS
+     The compiler attempts to continue after finding semantic errors.  These
+     errors may	result in compiler internal errors.
+
+NOTES
+     If	more than one of the options -cckr, -ansi, or -xansi is	chosen,	the
+     last one chosen is	effective and the others are ignored.
+
+     The compiler uses the same	set of warning numbers when compiling -n32 or
+     -64 , but it uses a different set of warning numbers when compiling -o32.
+     Keep this in mind when writing multi-ABI Makefiles.
+
+     All SGI platforms support the development and execution of	-o32
+     applications.
+
+
+
+
+
+
+								       Page 41
+
+
+
+
+
+
+CC(1)									 CC(1)
+
+
+
+     All SGI platforms support the development and execution of	-n32
+     applications, but the subsystems containing the appropriate libraries are
+     not always	installed by default.  During installation, you	may have to
+     select subsystems with names like product.sw32 for	-n32 libraries.
+
+     All SGI platforms support the development of -64 applications, but	the
+     subsystems	containing the appropriate libraries are not always installed
+     by	default.  During installation, you may have to select subsystems with
+     names like	product.sw64 for -64 libraries.
+
+     Most SGI platforms	do not support the execution of	-64 applications.
+
+     libc The standard library,	/usr/lib/libc.so.1, is loaded by using the -lc
+	  loader option	and not	a full path name.   If libc.so.1 is specified
+	  explicitly, the wrong	one could be loaded if there are files with
+	  the name libc.so.1 in	the directories	specified with the -L loader
+	  option or in the default directories searched	by the loader.
+
+     Generally,	linker control options and libraries must follow source	file
+     names on the command line.	 A simple example:
+	 cc t.c	-lm
+     For example, an example for source	files is:
+	 cc -I/local a.c b.c /local/foo.a -lm -o out
+     For a command line	with object files an example is:
+	 cc a.o	b.o /local/foo.a -lm -o	out
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								       Page 42
+
+
+

@@ -1,0 +1,17 @@
+IMAIL
+
+This is a KSH shell built-in command.  It injects a mail message (in
+mail-message format) on STDIN into the mail network.  By default mail
+recipients are taken from the given mail message itself.
+
+Synopsis:
+
+$ imail [<recip(s)>] [-t[=<b>]] [-f <fromaddr>] [-V]
+
+where:
+
+<recip(s)>	optional recipients (in addition to ones inside the message)
+-t[=<b>]	take option (ON by default)
+-f <fromaddr>	optional FROM address
+-V		print command version to standard-error and then exit
+

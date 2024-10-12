@@ -1,0 +1,17 @@
+KSHBI
+
+This little program checks to see if a KSH builtin function is available
+in a shared library file.
+
+Synopsis:
+
+$ kshbi -f <lib> <name(s)> [-af <argfile>] [-of <outfile>] [-V]
+
+where:
+
+<name(s)>	loadable command names to search for
+-f <lib>	shared object containing builin KSH commands
+-af <argfile>	take arguments from this file
+-of <outfile>	use this file for standard output
+-V		print command version to standard-error and then exit
+

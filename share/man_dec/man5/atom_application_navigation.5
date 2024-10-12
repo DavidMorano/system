@@ -1,0 +1,281 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_application_navigation.5,v $ $Revision: 1.1.2.8 $ (DEC) $Date: 1996/02/21 19:30:12 $
+.\"
+.TH atom_application_navigation 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom_application_navigation\*O, \*LGetFirstObj\*O, \*LGetLastObj\*O, \*LGetNextObj\*O, \*LGetPrevObj\*O, \*LGetFirstObjProc\*O, \*LGetLastObjProc\*O, \*LGetNextProc\*O, \*LGetPrevProc\*O, \*LGetFirstBlock\*O, \*LGetLastBlock\*O, \*LGetNextBlock\*O, \*LGetPrevBlock\*O, \*LGetFirstInst\*O, \*LGetLastInst\*O, \*LGetNextInst\*O, \*LGetPrevInst\*O, \*LGetProcObj\*O, \*LGetBlockProc\*O, \*LGetInstBlock\*O, \*LGetInstBranchTarget\*O \- Allows an Atom tool's instrumentation routine to find locations in an application program
+.SH SYNOPSIS
+.PP
+.sS
+\*L#include <cmplrs/atom.inst.h>\*O
+.PP
+\*LObj *GetFirstObj (
+.nL
+        void );\*O
+.nL
+\*LObj *GetLastObj (
+.nL
+        void );\*O
+.nL
+\*LObj *GetNextObj (
+.nL
+        Obj * );\*O
+.nL
+\*LObj *GetPrevObj (
+.nL
+        Obj * );\*O
+.PP
+\*LProc *GetFirstObjProc (
+.nL
+        Obj * );\*O
+.nL
+\*LProc *GetLastObjProc (
+.nL
+        Obj * );\*O
+.nL
+\*LProc *GetNextProc (
+.nL
+        Proc * );\*O
+.nL
+\*LProc *GetPrevProc (
+.nL
+        Proc * );\*O
+.PP
+\*LBlock *GetFirstBlock (
+.nL
+        Proc * );\*O
+.nL
+\*LBlock *GetLastBlock (
+.nL
+        Proc * );\*O
+.nL
+\*LBlock *GetNextBlock (
+.nL
+        Block * );\*O
+.nL
+\*LBlock *GetPrevBlock (
+.nL
+        Block * );\*O
+.PP
+\*LInst *GetFirstInst (
+.nL
+        Block * );\*O
+.nL
+\*LInst *GetLastInst (
+.nL
+        Block * );\*O
+.nL
+\*LInst *GetNextInst (
+.nL
+        Inst * );\*O
+.nL
+\*LInst *GetPrevInst (
+.nL
+        Inst * );\*O
+.PP
+\*LInst *GetInstBranchTarget (
+.nL
+        Inst * );\*O
+.nL
+\*LObj   *GetProcObj (
+.nL
+        Proc * );\*O
+.nL
+\*LProc  *GetBlockProc (
+.nL
+        Block * );\*O
+.nL
+\*LBlock *GetInstBlock (
+.nL
+        Inst * );\*O
+.nL
+.sE
+.SH DESCRIPTION
+.PP
+.iX "Atom application navigation routines"
+.iX "GetFirstObj Atom routine"
+.iX "GetLastObj Atom routine"
+.iX "GetNextObj Atom routine"
+.iX "GetPrevObj Atom routine"
+.iX "GetFirstObjProc Atom routine"
+.iX "GetLastObjProc Atom routine"
+.iX "GetNextProc Atom routine"
+.iX "GetPrevProc Atom routine"
+.iX "GetFirstBlock Atom routine"
+.iX "GetLastBlock Atom routine"
+.iX "GetNextBlock Atom routine"
+.iX "GetPrevBlock Atom routine"
+.iX "GetFirstInst Atom routine"
+.iX "GetLastInst Atom routine"
+.iX "GetNextInst Atom routine"
+.iX "GetPrevInst Atom routine"
+.iX "GetProcObj Atom routine"
+.iX "GetBlockProc Atom routine"
+.iX "GetInstBlock Atom routine"
+.iX "GetInstBranchTarget Atom routine"
+Atom's application navigation routines allow an instrumentation
+routine to locate areas of an application that are interesting to
+monitor or analyze.
+.PP
+You can use these routines only from an Atom tool's instrumentation
+file.  See \*Latom\*O(1) for a description of Atom.
+.PP
+Atom allows you view an application with the following granularity:
+.VL
+.LI "Program"
+The entire application, including all shared libraries.
+.LI "\*LObj\*O"
+Either the main executable or a shared library.  An object comprises
+a list of procedures and has it own set of attributes (for example,
+each object has its own name).
+.LI "\*LProc\*O"
+A procedure.
+.LI "\*LBlock\*O"
+A basic block.
+.LI "\*LInst\*O"
+An instruction.
+.LE
+.PP
+.ce 1
+\f(HBNote\fP
+.sp 6p
+.rS 5
+Do not confuse the term object with an object module
+produced by a compiler.  The two terms are completely different.
+.sp 6p
+.rE
+.PP
+To traverse the list of objects in an application program, use the
+following routines:
+.ML
+.LI
+Use the \*LGetFirstObj\*O or \*LGetLastObj\*O routine to obtain a
+pointer to the first or last object in the program.
+Nonshared programs, have only one object.  For call-shared programs,
+the first object corresponds to the main program and the remaining
+objects are its shared libraries.
+.LI
+Use the \*LGetNextObj\*O routine to obtain a pointer to the object that
+follows the specified \*LObj\*O.  If the specified \*LObj\*O is the
+last object in the program, \*LGetNextObj\*O returns a NULL pointer.
+.LI
+Use the \*LGetPrevObj\*O routine to obtain a pointer to the object
+that precedes the specified \*LObj\*O.
+If the specified \*LObj\*O is the first object in the
+program, \*LGetPrevObj\*O returns a NULL pointer.
+.LE
+.PP
+.ce 1
+\f(HBNote\fP
+.sp 6p
+.rS 5
+Because the \*LInstrument\*O routine is called for each object in the
+program, the object traversal routines in the \*LInstrument\*O
+do not need to be used routine.
+.sp 6p
+.rE
+.PP
+To traverse the list of procedures in an object, use the following routines:
+.ML
+.LI
+Use the \*LGetFirstObjProc\*O or \*LGetLastObjProc\*O routine to obtain a pointer
+to the first or last procedure in the specified \*LObj\*O.
+.LI
+Use the \*LGetNextProc\*O routine to obtain a pointer to the procedure that follows
+the specified \*LProc\*O.  If the specified \*LProc\*O is the last procedure in
+the object, \*LGetNextProc\*O returns a NULL pointer.
+.LI
+Use the \*LGetPrevProc\*O routine to obtain a pointer to the procedure that precedes
+the specified \*LProc\*O.  If the specified \*LProc\*O is the first procedure in
+the object, \*LGetPrevProc\*O returns a NULL pointer.
+.LE
+.PP
+To traverse the list of basic blocks in a procedure, use the following routines:
+.ML
+.LI
+Use the \*LGetFirstBlock\*O or \*LGetLastBlock\*O routine to obtain a pointer
+to the first or last basic block in the specified \*LProc\*O.
+.LI
+Use the \*LGetNextBlock\*O routine to obtain a pointer to the basic block that
+follows the specified \*LBlock\*O.  If the specified \*LBlock\*O is the last
+basic block in the procedure, \*LGetNextBlock\*O returns a NULL pointer.
+.LI
+Use the \*LGetPrevBlock\*O routine to obtain a pointer to the basic block that
+precedes the specified \*LBlock\*O.  If the specified \*LBlock\*O is the first
+basic block in the procedure, \*LGetPrevBlock\*O returns a NULL pointer.
+.LE
+.PP
+To traverse the instructions in a basic block, use the following routines:
+.ML
+.LI
+Use the \*LGetFirstInst\*O or \*LGetLastInst\*O routine to obtain a pointer
+to the first or last instruction in the specified \*LBlock\*O.
+.LI
+Use the \*LGetNextInst\*O routine to obtain a pointer to the instruction that
+follows the specified \*LInst\*O.  If the specified \*LInst\*O is the last
+instruction in the basic block, \*LGetNextInst\*O returns a NULL pointer.
+.LI
+Use the \*LGetPrevInst\*O routine to obtain a pointer to the instruction that
+precedes the specified \*LInst\*O.  If the specified \*LInst\*O is the first
+instruction in the basic block, \*LGetPrevInst\*O returns a NULL pointer.
+.LI
+Use the \*LGetInstBranchTarget\*O routine to obtain a pointer to the instruction
+that is the target of \*LInst\*O.  An error is raised if \*LInst\*O is not a
+branch instruction.
+.LE
+.PP
+To navigate between the parts of an application, use the following routines:
+.ML
+.LI
+Use the \*LGetProcObj\*O routine to obtain a pointer to the object that contains
+the specified \*LProc\*O.
+.LI
+Use the \*LGetBlockProc\*O routine to obtain a pointer to the procedure that contains
+the specified \*LBlock\*O.
+.LI
+Use the \*LGetInstBlock\*O routine to obtain a pointer to the basic
+block that contains the specified \*LInst\*O.
+.LE
+.SH RETURN VALUES
+.PP
+These routines return pointers to \*LObj\*O, \*LProc\*O, \*LBlock\*O,
+and \*LInst\*O structures, or NULL pointers, as described in the
+preceding section.
+.SH FILES
+.PP
+.VL
+.LI "\*L/usr/include/cmplrs/atom.inst.h\*O"
+Header file containing external definitions of Atom routines
+.LE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_resolvers\*O(5),
+\*Latom_description_file\*O(5),
+\*Latom_object_management\*O(5), \*Latom_instrumentation_routines\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

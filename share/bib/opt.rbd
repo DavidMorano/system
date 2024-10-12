@@ -1,0 +1,442 @@
+
+%T Combinatorial Optimization: Algorithms and Complexity
+%A C. Papadimitriou
+%A K. Steiglitz
+%I Prentice-Hall
+%C Englewood Cliffs, New Jersey
+%D 1982
+%K optimization
+%X This book describes various issues in the area of optimization algorithms.
+
+%T The Traveling Salesman Problem:
+A Guided Tour of Combinatorial Optimization
+%A E. Lawler
+%A J. Lenstra
+%A A. Rinnooy Kan
+%A D. Shmoys
+%I Wiley
+%D 1997
+%K optimization
+%X This book discusses the TSP in great detail.
+
+%T Computers and Intractability: A Guide to the Theory of NP Completeness
+%A M. Garey
+%A D. Johnson
+%I Freeman
+%D 1997
+%K problem intractability optimization combinatorial
+%X This book discusses the intractability of combinatorial
+optimization problems
+
+%T Introduction to Algorithms
+%A T. Cormen
+%A C. Leiserson
+%A R. Rivest
+%I McGraw Hill
+%D 1991
+%K problem algorithms optimization combinatorial
+%X this book introduces optimization algorithms
+
+%T Complete Register Allocation Problem
+%A R. Sethi
+%J SIAM Journal on Computing
+%V 4
+%N 3
+%D September 1975
+%P 226-248
+%K optimization register allocation dag NP-complete
+%X This article book discusses the register allocation problem.
+
+%T Compiler Design in C
+%A Allen I. Holub
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+%D 1990
+%K compiler optimization register allocation dag
+
+%T Compiler Technology: Tools, Translators and Language Implementation
+%A Derek Beng Kee Kong
+%D 1997
+%I Kluwer Academic
+%C Norwell, MA
+%P 162-165
+%K optimization register coloring
+
+%T Design of Compilers Techniques of Programming Language Translation
+%A Karen A. Lemone
+%I CRC Press
+%C Boca Tatan, FL
+%D 1992
+%K optimization register allocation trees DAGs
+
+%T An Axiomatic Approach to Code Optimization for Expressions
+%A James W. Beatty
+%V 19
+%D 1972
+%J Journal of the Association for Computing Machinery
+%I Association for Computing Machinery (ACM)
+%C New York, NJ
+%P 615-640
+%K register optimization expressions
+%X
+Beatty shows that the code generating algorithm
+for expressions can be run in linear time.
+
+%T On Compiling Algorithms for Arithmetic Expressions
+%A Ikuo Nakata
+%V 10
+%N 8
+%D 1967
+%J Communications of the Association for Computing Machinery
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 492-494
+%K register optimization expressions
+%X
+Nakata was one of the discoverers of the DAG tree labeling
+algorithm used by Aho and Ullman in the Dragon book.
+
+%T Adapting Optimal Code Generation for Arithmetic Expressions to the
+Instruction Sets Available on Present-day Computers
+%A Peter F. Stockhausen
+%V 16
+%N 6
+%D June 1973
+%J Communications of the Association for Computing Machinery
+%I Association for Computing Machinery
+%C New York, NY
+%P 353-354
+%K optimal code generation expressions
+
+%T Characterization of Flowchartable Recursions
+%A S. A. Walker
+%A H. R. Strong
+%D May 1972
+%J Fourth Annual ACM Symposium on Theory of Computing (Denver, CO)
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 18-34
+%K flowchartable recursions
+
+%T Some Graph Games Related to the Efficient Calculation of Expressions
+%A S. A. Walker
+%D November 1971
+%J IBM Res. Rep. RC 3628
+%C Yorktown Heights, NY
+%K graph games efficient calculation expressions
+
+%T The Complexity of Theorem-proving Procedures
+%A S. A. Cook
+%D May 1971
+%J Third Annual ACM Symposium on Theory of Computing (Shaker Heights, OH)
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 151-158
+%K provable theorems
+
+%T Reducibility Among Combinatorial Problems
+%A R. E. Miller
+%A J. W. Thatcher
+%D 1972
+%J Complexity of Computer Computations
+%I Plenum Press
+%C New York, NY
+%P 85-104
+%K combinatorial complexity reducibility
+
+%T The FORTRAN Automatic Coding System
+%A J. W. Backus
+%A et al
+%D 1957
+%V 11
+%J Procedings of the Western Joint Computer Conference
+%C New York, NY
+%P 188-198
+%K automatic coding system FORTRAN
+
+%T The Study of Replacement Algorithms for a Virtual Storage Computer
+%A L. A. Belady
+%D 1966
+%V 5
+%N 2
+%J IBM System Journal
+%I International Business Machines
+%C New York, NY
+%P 78-101
+%K replacement algorithms
+%X
+Creating a free register by throwing out that register whose value
+will be unused for the longest time is shown to be optimal.
+
+%T Computational Chains and the Simplification of Computer Programs
+%A T. Marrill
+%D 1962
+%V EC-11
+%N 2
+%J IRE Transactions on Electronic Computers
+%P 173-180
+%K computational sinmplification computer programs
+
+%T Code Generation for a One Register Machine
+%A J. L. Bruno
+%A R. Sethi
+%D 1976
+%V 23
+%N 3
+%J Journal of the Association for Computing Machinery
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 502-510
+%K register allocation code generation
+%X
+Register allocation for a one register machine is NP-complete.
+On multiple register machines, determinining the minimum number of
+registers without store operations is NP-complete.  This is also
+due to Sethi in his famous 1975 paper also.
+
+%T Code Generation for Expressions with Common Subexpressions
+%A A. V. Aho
+%A S. C. Johnson
+%A J. D. Ullman
+%D 1977
+%V 24
+%N 1
+%J Journal of the Association for Computing Machinery
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 146-160
+%K register allocation common subexpressions code generation
+
+%T Register Assignment Algorithm for Generation
+of Highly Optimized Object Code
+%A J. C. Beatty
+%V 5
+%N 2
+%D 1974
+%J IBM Journal on Reseach and Development
+%I International Business Machines
+%C New York, NY
+%P 20-39
+%K register assignment optimized object code generation
+%X (MAYBE 1976)
+
+%T Compiler Assignment of Data Items to Registers
+%A W. H. E. Day
+%V 9
+%N 4
+%D 1970
+%J IBM System Journal
+%I International Business Machines
+%C New York, NY
+%P 281-317
+%K register assignment compiler
+
+%T On Programming of Arithmetic Operations
+%A M. Ershov
+%V 1
+%N 8
+%D 1958
+%J Communications of the Association for Computing Machinery
+%I Association for Computing Machinery
+%C New York, NY
+%P 3-9
+%K register assignment optimized object code generation
+
+%T An Algorithm for Coding Efficient Arithmetic Expressions
+%A R. W. Floyd
+%V 4
+%N 1
+%D 1961
+%J Communications of the Association for Computing Machinery
+%I Association for Computing Machinery
+%C New York, NY
+%P 42-51
+%K algorithm efficient arithmentic expressions
+%X
+This algorithm handles common subexpression
+elimination in arithmetic expressions.
+
+%T Compiler Construction: An Advanced Course
+%A F. L. Bauer
+%A J. Eickel
+%D 1974
+%I Springer-Verlag
+%C New York, NY
+%P 549-602
+%K register assignment optimized object code generation
+%X
+W. M. Waite (in "Optimization") gives and algorithm which separates
+DAGs into individual trees and operates on the trees separately.
+
+%T The Generation of Optimal Code for Stack Machines
+%A J. L. Bruno
+%A T. Lassagne
+%D July 1975
+%V 22
+%N 3
+%J Journal of the Association for Computing Machinery (ACM)
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 382-396
+%K generation optimal code stack machines
+
+%T On Arithmetic Expressions and Trees
+%A R. R. Redziejowski
+%D February 1969
+%V 12
+%N 2
+%J Journal of the Association for Computing Machinery (ACM)
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 81-84
+%K arithmetic expressions trees
+
+%T A Note on Some Compiling Algorithms
+%A J. P. Anderson
+%V 7
+%N 3
+%D 1964
+%J Communications of the Association for Computing Machinery (ACM)
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 149-150
+%K compiling algorithms
+
+%T Introduction to Mathematical Programming
+%A F. S. Hillier
+%A G. J. Lieberman
+%I McGraw-Hill
+%C New York, NY
+%K mathematical programming
+
+%T Graph Coloring Problems
+%A Tommy R. Jensen
+%A Bjarne Toft
+%D 1995
+%I John Wiley & Sons
+%C New York, NY
+%K graph coloring
+%X
+ISBN 0-471-02865-7
+QA 612.18.J46
+
+%T Efficient Register Allocation via Coloring Using Clique Separators
+%A Rajiv Gupta
+%A Mary Lou Soffa
+%A Denise Ombres
+%V 16
+%N 3
+%D May 1994
+%J ACM Transactions on Programming Languages and Systems
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 370-386
+%K register allocation clique graph coloring
+
+%T Register Allocation over the Program Dependence Graph
+%A Cindy Norris
+%A Lori L. Pollock
+%D June 1994
+%V 24
+%N 7
+%J ACM SIGPLAN
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 266-277
+%K register allocation dependence graph
+
+%T Coloring Heuristics for Register Allocation
+%A Preston Briggs
+%A Keith D. Cooper
+%A Ken Kennedy
+%A Linda Torczon
+%D July 1989
+%J ACM SIGPLAN Notices
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 275-284
+%K coloring heuristics register allocation
+
+%T Improvements to Graph Coloring Register Allocation
+%A Preston Briggs
+%A Keith D. Cooper
+%A Linda Torczon
+%D May 1994
+%V 16
+%N 3
+%J ACM Transactions on Programming Languages and Systems
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 428-455
+%K register allocation graph coloring
+
+%T The Priority-based Coloring Approach to Register Allocation
+%A Fred C. Chow
+%A John L. Hennessy
+%D October 1990
+%V 24
+%N 4
+%J ACM Transactions on Programming Languages and Systems
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 501-536
+%K register allocation coloring
+
+%T Demand-driven Register Allocation
+%A Todd A. Proebsting
+%A Charles N. Fischer
+%D November 1996
+%V 18
+%N 6
+%J ACM Transactions on Programming Languages and Systems
+%I Association for Computing Machinery (ACM)
+%C New York, NY
+%P 683-710
+%K register allocation coloring
+
+%T Compilers: Principles, Techniques, and Tools
+%A A. V. Aho
+%A Ravi Sethi
+%A J. D. Ullman
+%D 1986
+%I Addison-Wesley
+%C New York, NY
+%K register allocation common subexpressions code generation compiler
+%X
+The new "Dragon" book.
+ISBN 0-201-10088-6
+
+%T Local Search in Combinatorial Optimization
+%A Emile H. L. Aarts
+%A Jan Karel Lenstra
+%D 1997
+%I John Wiley & Sons Ltd.
+%C Baffins Lane, Chichester
+%K combinatorial optimization local search
+%X
+ISBN 0-471-94822-5
+call no: T 57.88L6 1997
+
+%T Register Allocation via Hierarchical Graph Coloring
+%A David Callahan
+%A Brian Koblenz
+%D 1991
+%I ACM Press
+%J ACM SIGPLAN Notices,
+Proceedings of the ACM, SIGPLAN Conferences on Program Language Design
+and Implementation
+%D June 1991
+%V 26
+%N 6
+%C New York, NY
+%K register allocation hierachical graph coloring
+
+%T Approximation Algorithms for NP-hard Problems
+%A D. Hochbaum
+%D 1997
+%I PWS Publishing
+%K NP-hard problems approximations algorithms
+%X
+ISBN 0-534-94968-1
+
+

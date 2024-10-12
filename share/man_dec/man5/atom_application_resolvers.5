@@ -1,0 +1,235 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_application_resolvers.5,v $ $Revision: 1.1.2.8 $ (DEC) $Date: 1996/02/21 19:30:15 $
+.\"
+.TH atom_application_resolvers 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom_application_resolvers\*O, \*LResolveTargetProc\*O, \*LResolveNamedProc\*O, \*LReResolveProc\*O \- Allows an Atom tool's instrumentation routine to resolve procedure names and call targets
+.SH SYNOPSIS
+.PP
+.sS
+\*L#include <cmplrs/atom.inst.h>\*O
+.PP
+\*Lvoid ResolveTargetProc (
+.nL
+        Inst *,
+.nL
+        ProcRes * );\*O
+.PP
+\*Lvoid ResolveNamedProc (
+.nL
+        const char *,
+.nL
+        ProcRes * );\*O
+.PP
+\*Lvoid ReResolveProc
+.nL
+        ProcRes * );\*O
+.sE
+.SH DESCRIPTION
+.PP
+.iX "Atom application resolver routines"
+.iX "ResolveTargetProc Atom routine"
+.iX "ResolveNamedProc Atom routine"
+.iX "ReResolveProc Atom routine"
+Atom's application resolver routines allow an Atom tool's
+instrumentation routine to find a procedure by name and to find a
+target procedure for a call site.
+.PP
+You can use these routines only from an Atom tool's instrumentation
+file.  See \*Latom\*O(1) for a description of Atom.
+.PP
+These routines return a \*LProcRes\*O structure, the format of which
+is as follows:
+.oS
+typedef struct {
+    Obj *               obj;    /* Object containing the called procedure */
+    Proc *              proc;   /* Called procedure */
+    const char *        name;   /* Name of the called procedure */
+} ProcRes;
+.oE
+.PP
+If any of the three pieces of information contained in the
+\*LProcRes\*O structure is unavailable, the routine sets the
+corresponding field to \*LNULL\*O.
+.PP
+Certain tools can simultaneously build several objects, instrument
+each one, and then write each out.  This has advantages for tools
+that call \*LResolveNamedProc\*O or \*LResolveTargetProc\*O.
+The \*LResolveNamedProc\*O routine searches for the named procedure
+in all of the built objects.  If the procedure exists in a built
+object, it returns that procedure's \*LProc\*O.
+If the procedures exists in an unbuilt object, it returns \*LNULL\*O.
+The \*LResolveTargetProc\*O routine returns the \*LProc\*O called
+by a \*Ljsr\*O or \*Lbsr\*O instruction.  It also returns
+\*LNULL\*O if the called procedure is in an unbuilt object.
+.\" .PP
+.SS "ResolveTargetProc Routine"
+Use the \*LResolveTargetProc\*O routine to resolve the target of a
+procedure call.  Atom raises an error if the instruction identified
+by \*LInst\*O is not in the instruction class (\*LIClass\*O)
+\*LClassSubroutine\*O.
+.PP
+Depending upon the circumstances under which it has been called,
+\*LResolveTargetProc\*O returns the following combinations of
+information:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+T{
+Return Values
+T}@T{
+When Returned
+.sp
+-
+T}
+.sp
+T{
+\*Lobj\*O, \*Lproc\*O, \*Lname\*O
+T}@T{
+Returned when the called procedure resides in a built object and the
+procedure has a name.
+T}
+.sp
+T{
+\*Lobj\*O, \*Lproc\*O
+T}@T{
+Returned when the called procedure resides in a built object and the
+procedure does not have a name.
+T}
+.sp
+T{
+\*Lobj\*O, \*Lname\*O
+T}@T{
+Returned when the called procedure resides in an unbuilt object.  (Such a procedure
+always has a name.)  When this pair of values is returned, you can subsequently
+resolve the target procedure by building the target object with \*LBuildObj\*O and
+then calling \*LReResolveProc\*O.
+T}
+.sp
+T{
+\*Lname\*O
+T}@T{
+Returned when the called procedure is not visible, but its name is known.
+T}
+.sp
+T{
+--
+T}@T{
+The called procedure cannot be determined.
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "ResolveNamedProc Routine"
+Use the \*LResolveNamedProc\*O routine to return the procedure
+identified by the specified name string.  In the event that more
+than one procedure has the specified name, \*LResolveNamedProc\*O
+uses the following  criteria to determine which procedure to return:
+.AL
+.LI
+If an external procedure has the specified name and that
+procedure is exported to other objects, return it.
+.LI
+If an external procedure has the specified name, return it.
+If more than one external procedure has the name, return one at random.
+.LI
+If a static procedure has the specified name, return it.
+If more than one static procedure has the name, return one at random.
+.\" ***NOT USEFUL INFORMATION PER GREG_L
+.\" .LI
+.\" Otherwise, no procedure has the specified name.
+.LE
+.PP
+Depending upon the circumstances under which it has been called,
+\*LResolveNamedProc\*O returns the following combinations of
+information:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i) .
+_
+.sp
+T{
+Return Values
+T}@T{
+When Returned
+.sp
+-
+T}
+.sp
+T{
+\*Lobj\*O, \*Lproc\*O, \*Lname\*O
+T}@T{
+Returned when the named procedure resides in a built object.
+T}
+.sp
+T{
+\*Lobj\*O, \*Lname\*O
+T}@T{
+Returned when the named procedure resides in an unbuilt object. When this pair of
+values is returned, you can subsequently resolve the named procedure by building
+the target object with \*LBuildObj\*O and then calling \*LReResolveProc\*O.
+T}
+.sp
+T{
+\*Lname\*O
+T}@T{
+Returned when the named procedure does not exist.
+T}
+.sp
+_
+.TE
+.\" .PP
+.SS "ReResolveProc Routine"
+Use the \*LReResolveProc\*O routine to complete a procedure resolution
+if the procedure initially resided in an unbuilt object.
+If the name in the specified \*LProcRes\*O structure exists in the
+object in the specified \*LProcRes\*O structure, \*LReResolveProc\*O
+returns the procedure in the \*LProcRes\*O.
+If either the object or the name are \*LNULL\*O, \*LReResolveProc\*O
+does nothing.
+.SH RETURN VALUES
+.PP
+These routines return values as described preceding section.
+.SH FILES
+.PP
+.VL
+.LI "\*L/usr/include/cmplrs/atom.inst.h\*O"
+Header file containing external definitions of Atom routines
+.LE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_navigation\*O(5),
+\*Latom_description_file\*O(5),
+\*Latom_object_management\*O(5), \*Latom_instrumentation_routines\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

@@ -1,0 +1,13 @@
+# PLURALS
+
+#
+# This is the "plurals" database.  It is a table of two columns that
+# stores pairs of words.  The first column contains the singular form of
+# the word while the second column contains the plural form.
+# 
+
+goose	geese
+pants	pants
+
+
+

@@ -1,0 +1,403 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom.1,v $ $Revision: 1.1.6.2 $ (DEC) $Date: 1996/05/16 17:29:36 $
+.\"
+.TH atom 1 96/05/16 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom\*O \- Builds an instrumented version of an application program
+.SH SYNOPSIS
+.PP
+.sS
+\*Latom\*O \*Vappl_prog\*O  \*L\-tool\*O \*Vtoolname\*O [\*L\-env \*Venviron\*O] [\*Vflags\*O...]
+.PP
+\*Latom\*O \*Vappl_prog\*O \*Vinstrum_file\*O [\*Vanal_file\*O] [\*Vflags\*O...]
+.nL
+.sE
+.SH PARAMETERS
+.PP
+.VL
+.LI "\*Vappl_prog\*O"
+File name of a fully linked shared or nonshared executable.
+.LI "\*Vinstrum_file\*O"
+Name of a C source file (with a \*L.c\*O suffix) or an object module
+(with a \*L.o\*O suffix) that contains the Atom tool's instrumentation
+procedures.  If the instrumentation procedures are in more than one
+file, the \*L.o\*O of each file may be linked together into one file
+using the \*Lld\*O command with a \*L\-r\*O flag.  By convention, most
+instrumentation files have the suffix \*L\.inst.c\*O or \*L\.inst.o\*O.
+.LI "\*Vanal_file\*O"
+Name of a C source file (with a \*L.c\*O suffix) or an object module
+(with a \*L.o\*O suffix) that contains the Atom tool's analysis
+procedures.  If the analysis routines are in more than one file,
+the \*L.o\*O of each file may be linked together into one file using
+the \*Lld\*O command with a \*L\-r\*O flag. By convention, most
+analysis files have the suffix \*L\.anal.c\*O or \*L\.anal.o\*O.
+.LE
+.SH FLAGS
+.PP
+The first format of the \*Latom\*O command uses a prepackaged tool
+to build an instrumented version of an application program.
+This format requires the \*L\-tool\*O flag and accepts the \*L\-env\*O
+flag.  It allows neither the \*Linstrum_file\*O nor the
+\*Lanal_file\*O parameter.
+.PP
+The following list describes those flags used to invoke Atom with a
+prepackaged tool:
+.VL
+.LI "\*L\-tool \*Vtoolname\*O"
+Identifies the prepackaged Atom tool to be used.  By default,
+\*Latom\*O searches for prepackaged tools in the
+\*L/usr/lib/cmplrs/atom/tools\*O and
+\*L/usr/lib/cmplrs/atom/examples\*O directories.
+You can add directories to the search path by supplying a
+colon-separated list of additional directories to the
+\*LATOMTOOLPATH\*O environment variable.
+.LI "\*L\-env \*Venviron\*O"
+Identifies any special environment (for example, \*Lthreads\*O) in
+which the tool is to operate.  The set of environments supported by
+a given tool is defined by the tool's creator and listed in the
+tool's documentation.  Atom displays an error if you specify an
+environment that is undefined for the tool. Some tools allow you to
+omit the \*L\-env\*O flag to obtain a general-purpose environment.
+.LE
+.PP
+The second format of the \*Latom\*O command is used to create a tool
+that instruments an application program.  This format requires the
+\*Vinstrum_file\*O parameter and accepts the \*Vanal_file\*O
+parameter.
+.PP
+Both formats of the \*Latom\*O command accepts the following flags.
+Note that the listed default values apply only to the second format.
+When the \*L\-tool\*O flag is specified, required \*Latom\*O flags,
+as well as the default values of \*Latom\*O, compiler, and linker
+flags may be defined by the specified Atom tool.
+.VL
+.LI "\*L\-A0\*O"
+Indicates that calls to analysis routines are not to be optimized.
+This is the default.
+.LI "\*L\-A1\*O"
+Optimizes the calls to analysis routines by reducing the number of
+registers that need to be restored. Specifying this switch causes Atom to
+generate slightly larger, but faster code.
+.LI "\*L\-all\*O"
+Instruments all statically loaded shared libraries in the shared executable.
+.LI "\*L\-debug\*O"
+Allows debugging of instrumentation routines.
+Atom puts the control in \*Ldbx\*O with a stop at the instrumentation
+routine. See the
+\*EProgrammer's Guide\*O
+for a discussion on how to use \*Ldbx\*O with Atom.
+.LI "\*L\-dynobj\*O  \*Vobjname\*O"
+Specifies that \*Vobjname\*O is a dynamic shared library (that is, one
+loaded by a call to \*Ldlopen\*O(3)).
+You must specify all of an application's dynamic shared libraries, even if
+you do not want them instrumented.  Specifying \*L\-dynobj\*O
+does not cause the library to be instrumented.  You must also specify
+the library in an \*L\-incobj\*O flag to instrument it.
+Specifying \*L\-incobj\*O for a dynamic library causes the library to be
+both recognized and instrumented, so \*L\-dynobj\*O is not needed if you
+specify \*L\-incobj\*O.
+.LI "\*L\-excobj\*O \*Vobjname\*O"
+Excludes the named shared library from instrumentation. You can use the
+\*L\-excobj\*O flag more than once to specify several shared libraries. Note that
+the Third Degree Atom tool instruments the memory allocation functions in
+\*Llibc.so\*O and \*Llibcxx.so\*O. Similarly,
+when \*L\-env threads\*O is specified, Atom automatically instruments parts of
+\*Llibpthreads.so\*O even if it's specified in the \*L\-excobj\*O flag.
+.LI "\*L\-g\*O"
+Produces the instrumented program with debugging information.
+This enables debugging of analysis routines.
+.LI "\*L\-heapbase\*O [\*Vhex_address\*O | \*Ltaso\*O | \*Lprogend\*O]"
+Changes the base of the analysis heap.  This option has three forms:
+.VL
+.LI "\*L\-heapbase\*O \*Vhex_address\*O"
+Sets the base to the given hex address.
+.LI "\*L\-heapbase taso\*O"
+Sets the base to a default 31-bit address that is safe for applications
+that expect analysis addresses to fit in 31 bits.
+.LI "\*L\-heapbase progend\*O"
+Sets the base to the first page after the end of the application's
+\*Lbss\*O segment. This puts the heap base in about the same place as
+the application's heap. You should only specify this for tools that
+intercept every heap allocation in the application program.
+.LE
+.sp
+Normally, Atom's default location for the analysis heap is sufficient,
+so you don't need to use the \*L\-heapbase\*O option.  However, if the
+default location conflicts with an address range used by the application
+program, you may have to choose a new location for the analysis heap.
+.LI "\*L\-incobj\*V objname\*O"
+Instruments the named shared library.  You can use the \*L\-incobj\*O
+flag more than once to specify several shared libraries.
+.LI "\*L\-L\*Vdir\*O"
+Changes the library directory search order for shared object libraries
+so that \*Latom\*O searches for them in \*Vdir\*O before
+searching the default library directories.  You can specify multiple
+\*L\-L\*Vdir\*O switches to specify several directory names.
+.LI "\*L\-L"
+Changes the library directory search order for shared object libraries
+so that \*Latom\*O \*Enever\*O looks for them in the default library
+directories.  Use this option when the default library directories
+should not be searched and only the directories specified by
+\*L\-L\*Vdir\*O are to be searched.
+.LI "\*L\-o \*Vfilename\*O"
+Names the executable output file \*Vfilename\*O.  By default, when the
+first format of the \*Latom\*O command is used, the file is called
+\*Lprogname.\*Vtoolname\*O; when the second format is used,
+the file is called \*Lprogname.atom\*O.
+.LI "\*L\-shlibdir \*Vdirname\*O"
+Specifies an existing  directory to which \*Latom\*O writes the
+instrumented shared libraries.  Using this flag allows you to keep all
+of an application's instrumented shared libraries in a single place.
+.LI "\*L-suffix\*O  \*Vsuffix\*O"
+Specifies a filename suffix that is appended to the name of each object
+when Atom writes the instrumented version.  For instance, specifying
+\*L\-suffix third\*O would cause a shared library such as \*Llibc.so\*O
+to be written as \*Llibc.so.third\*O and a main executable file such as
+\*Ltest1\*O to be written as \*Ltest1.third\*O.  If you do not specify
+the \*L\-tool\*O flag, the  suffix defaults to the name of the tool.
+.LI "\*L\-toolargs\*O=""""\*Varg1\*O \*Varg2\*O ..."""""
+Passes arguments to the Atom tool's instrumentation routines.
+Use whitespace characters to separate arguments from their parameters
+(if any) and from other arguments.
+.LI "\*L\-v\*O"
+Displays each step Atom takes to create the instrumented program.
+.LI "\*L\-version\*O"
+Displays Atom's version number.
+.LI "\*L\-w\*Vn"
+Controls display of warning messages.  The value of \*Vn\*O can
+be one of the following values:
+.VL
+.LI "0"
+Display all warning messages, including those that are normally
+suppressed.
+.LI "1"
+Suppress warning messages that can be safely ignored.  This is
+the default.
+.LE
+.LI "\*L\-Wla,\*Vflag1\*L[,\*Vflag2\*L][,\*Vflag3\*L]..."
+Passes the specified flags to the analysis file's link phase.
+.LI "\*L\-Wli,\*Vflag1\*L[,\*Vflag2\*L][,\*Vflag3\*L]..."
+Passes the specified flags to the instrumentation file's link phase.
+.LI "\*L\-Wca,\*Vflag1\*L[,\*Vflag2\*L][,\*Vflag3\*L]..."
+Passes the specified flags to the analysis file's compilation phase.
+.LI "\*L\-Wci,\*Vflag1\*L[,\*Vflag2\*L][,\*Vflag3\*L]..."
+Passes the specified flags to the instrumentation file's compilation
+phase.
+.\" ***THIS IS DEFUNCT PER GREG L.
+.\" .LI "\*L\-Xprogcall\*O"
+.\" Allows a tool to add calls to the beginning or end of the
+.\" program it is instrumenting, regardless of whether it is currently
+.\" processing the object in which the beginning or end is located.
+.LE
+.SH DESCRIPTION
+.PP
+.iX "atom command"
+When invoked with the \*L\-tool\*O flag, the \*Latom\*O command uses a
+prepackaged tool to build an instrumented version of an application
+program.  This format requires the \*L\-tool\*O flag and accepts the
+\*L\-env\*O flag.  It allows neither the \*Vinstrum_file\*O nor the
+\*Vanal_file\*O parameter.
+.PP
+The following are the names of supported prepackaged tools that are accepted
+by the \*L\-tool\*O flag:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i).
+_
+.sp
+Tool@Description
+_
+.sp
+\*Lthird\*O@T{
+Performs memory access checks and detects memory leaks in an application.
+T}
+.sp
+\*Lhiprof\*O@T{
+Produces a flat profile of an application that shows the execution time
+spent in a given procedure, and a hierarchical profile that shows the
+execution time spent in a given procedure and all its descendents.
+T}
+.sp
+\*Lpixie\*O@T{
+Produces a profile of an application \- by procedure, source line, or
+instruction \- by partitioning it into basic blocks and counting the
+number of times each basic block is executed.
+T}
+.sp
+_
+.TE
+.PP
+The following are the names of unsupported example tools that are
+accepted by the \*L\-tool\*O flag:
+.TS
+tab(@);
+lfHB lfHB
+lw(1.5i) lw(3.0i).
+_
+.sp
+Tool@Description
+_
+.sp
+\*Lbranch\*O@T{
+Instruments all conditional branches to determine how many are
+predicted correctly.
+T}
+.sp
+\*Lcache\*O@T{
+Determines cache miss rate. Simulates execution of the
+application in 8KB direct-mapped cache.
+T}
+.sp
+\*Ldtb\*O@T{
+Determines the number of dtb (data translation buffer) misses.
+Simulates execution of the application 
+in 8KB pages and with a fully associative translation buffer.
+T}
+.sp
+\*Ldyninst\*O@T{
+Provides fundamental dynamic counts of instructions, loads, stores,
+blocks, and procedures.
+T}
+.sp
+\*Linline\*O@T{
+Identifies potential candidates for inlining.
+T}
+.sp
+\*Liprof\*O@T{
+Prints the number of times each procedure is called as well as the
+number (dynamic count) of instructions executed by each procedure.
+T}
+.sp
+\*Lmalloc\*O@T{
+Records each call to the \*Lmalloc\*O function and prints a summary
+of the application's allocated memory.
+T}
+.sp
+\*Lprof\*O@T{
+Prints the number (dynamic count) of instructions executed by each
+procedure.
+T}
+.sp
+\*Lptrace\*O@T{
+Prints the name of each procedure as it is called.
+T}
+.sp
+\*Ltrace\*O@T{
+Generates an address trace, logs the effective address of every load
+and store operation, and logs the address of the start of every basic
+block as it is executed.
+T}
+.sp
+_
+.TE
+.PP
+The second format of the \*Latom\*O command takes an application
+program, instrumentation file, and analysis file as input, and
+produces an instrumented application program executable.
+You cannot use the \*L\-tool\*O and \*L\-env\*O flags with this format.
+This format requires the \*Vinstrum_file\*O parameter and accepts the
+\*Vanal_file\*O parameter.
+.PP
+If you specify either the \*L\-all\*O or \*L\-incobj\*O switch,
+Atom instruments an application and the application's shared libraries.
+The instrumented shared libraries are written to the current directory
+with the \*L.atom\*O suffix.
+For example, \*Llibc.so\*O is written as \*Llibc.so.atom\*O.
+.PP
+By default, Atom searches for shared libraries in the same locations as
+the linker:
+.ML
+.LI
+\*L/usr/shlib\*O
+.LI
+\*L/usr/ccs/lib\*O
+.LI
+\*L/usr/lib/cmplrs/cc\*O
+.LI
+\*L/usr/lib\*O
+.LI
+\*L/usr/local/lib\*O
+.LI
+\*L/var/shlib\*O
+.LE
+.PP
+If you specify the \*L\-L\*Vdir\*O flag, Atom searches the given directory
+before searching the default locations. You can specify multiple
+\*L\-L\*Vdir\*O flags.  You can also specify the \*L\-L\*O flag without
+a directory name. This causes Atom to avoid searching the default
+directories.  Only those directories specified by \*L\-L\*Vdir\*O
+flags are searched.
+.PP
+After you have instrumented an application that uses shared libraries,
+set the \*LLD_LIBRARY_PATH\*O environment variable to point to
+the directory containing the instrumented shared libraries.  Typically,
+this would be the current directory or the directory specified by the
+\*L\-shlibdir\*O flag.
+You may leave \*LLD_LIBRARY_PATH\*O pointing to this directory while
+running other, uninstrumented applications.
+.PP
+The loader uses only the
+instrumented shared libraries for those applications that have been
+instrumented.  As long you choose a unique suffix name (using the
+\*L\-suffix\*O flag) for the instrumented files, you can even run an
+application instrumented with two different Atom tools.  The loader
+picks up the correctly instrumented shared library for each version of
+the instrumented application.
+.SH EXAMPLES
+.AL
+.LI
+\*Latom -tool third program\*O
+.IP
+Invokes Atom's Third Degree tool to instrument \*Lprogram\*O, producing
+the executable output file \*Lprogram.third\*O.
+.LI
+\*Latom program myinst.c myanal.c\*O
+.IP
+Instruments \*Lprogram\*O using the instrumentation file \*Lmyinst.c\*O
+and analysis file \*Lmyanal.c\*O, producing the executable output file
+\*Lprogram.atom\*O.
+.LE
+.SH RESTRICTIONS
+.PP
+Instrumented code can be substantially larger than the original code.
+In rare cases, conditional branches that fit in the 21-bit branch
+displacement field may not do so in the instrumented version of the
+code, thus generating an error.
+.PP
+Atom does not work on programs built with the \*L\-om\*O compiler flags.
+.SH ERRORS
+.PP
+The diagnostic messages produced by Atom are sent to the standard
+error file.
+.SH RELATED INFORMATION
+.PP
+Atom Tools: \*Lthird\*O(5), \*Lhiprof\*O(5), \*Lpixie\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_navigation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_resolvers\*O(5),
+\*Latom_description_file\*O(5),
+\*Latom_object_management\*O(5), \*Latom_instrumentation_routines\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

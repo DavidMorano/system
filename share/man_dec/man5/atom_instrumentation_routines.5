@@ -1,0 +1,269 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: atom_instrumentation_routines.5,v $ $Revision: 1.1.2.9 $ (DEC) $Date: 1996/02/21 19:30:22 $
+.\"
+.TH atom_instrumentation_routines 5 96/02/21 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Latom_instrumentation_routines\*O, \*LInstrument\*O, \*LInstrumentAll\*O, \*LInstrumentInit\*O, \*LInstrumentFini\*O - Atom tool instrumentation routines
+.SH SYNOPSIS
+.PP
+.sS
+\*L#include <cmplrs/atom.inst.h>\*O
+.PP
+\*Lvoid Instrument(
+.nL
+        int \*Viargc\*L,
+.nL
+        char \*V**iargv\*L,
+.nL
+        Obj \*V*obj\*L);\*O
+.PP
+\*Lvoid InstrumentInit(
+.nL
+        int \*Viargc\*L,
+.nL
+        char \*V**iargv\*L);\*L
+.PP
+\*Lvoid InstrumentFini (
+.nL
+        void );\*O
+.PP
+\*Lunsigned InstrumentAll (
+.nL
+        int \*Viargc\*L,
+.nL
+        char \*V**iargv\*L);\*O
+.nL
+.sE
+.SH DESCRIPTION
+.PP
+.iX "Atom instrumentation routines"
+.iX "Instrument Atom routine"
+.iX "InstrumentAll Atom routine"
+.iX "InstrumentInit Atom routine"
+.iX "InstrumentFini Atom routine"
+Atom invokes a tool's instrumentation routine on a given application
+program when that program is specified as the \*Vapplication_program\*O
+parameter to the \*Latom\*O command, and either of the following is
+true:
+.ML
+.LI
+The tool is a prepackaged tool specified as an argument to the
+\*L\-tool\*O flag of an \*Latom\*O command.
+By default, Atom looks for prepackaged tools in the
+\*L/usr/lib/cmplrs/atom/tools\*O and
+\*L/usr/lib/cmplrs/atom/examples\*O directories.
+.LI
+The file containing the instrumentation routine is specified as the
+\*Vinstrum_file\*O parameter of an \*Latom\*O command.
+.LE
+.PP
+The instrumentation routine contains the code that traverses the
+objects, procedures, basic blocks, and instructions to locate
+instrumentation points; adds calls to analysis procedures; and builds
+the instrumented version of an application.
+.PP
+An instrumentation routine can employ one of the following interfaces
+based on the needs of the tool:
+.VL
+.LI "\*Lvoid Instrument(int \*Viargc\*O, \*Lchar \*V**iargv\*O, \*LObj \*V*obj\*L);\*O"
+.sp
+Atom calls the \*LInstrument\*O routine for each eligible object in
+the application program.  As a result, an \*LInstrument\*O routine
+should not call \*LAddCallProgram\*O and does not need to use the
+object navigation routines (\*LGetFirstObj\*O, \*LGetLastObj\*O,
+\*LGetNextObj\*O, and \*LGetPrevObj\*O).
+Because Atom automatically writes each object before passing
+the next to the \*LInstrument\*O routine, the \*LInstrument\*O routine
+should never call the \*LBuildObj\*O, \*LWriteObj\*O, or
+\*LReleaseObj\*O routines.
+.sp
+If an \*LInstrument\*O routine calls the \*LResolveTargetProc\*O or
+\*LResolveNamedProc\*O routine for a procedure name that exists in
+another object, the routine sets the \*Lproc\*O field in the
+\*LProcRes\*O structure to \*LNULL\*O.  You can work around this
+restriction in a variety of ways.  If the tool uses
+\*LResolveNamedProc\*O to add special instrumentation code to a
+specific procedure, it can use a construct like the following:
+.oS
+Instrument(int iargc, char **iargv, Obj *obj)
+{
+    Proc*       proc;
+    ProcRes     pres;
+.sp
+    ResolveNamedProc("malloc", &pres);
+    if (pres = proc) {
+         AddCallProc(pres, proc);
+.sp
+         <Add special instrumentation code>
+    }
+}
+.oE
+.sp
+Because \*Lmalloc\*O exists in only one of the objects, this construct
+adds the special instrumentation code to \*Lmalloc\*O exactly
+once \- when its object is instrumented.
+.sp
+When using the \*LInstrument\*O interface, you can define an
+\*LInstrumentInit\*O routine to perform tasks required before Atom
+calls \*LInstrument\*O for the first object (such as defining
+analysis routine prototypes, adding program
+level instrumentation calls, and performing global initializations).
+Atom passes the arguments specified in the \*L\-toolargs\*O flag to
+the \*Latom\*O command to the \*LInstrumentInit\*O routine.
+You can also define an \*LInstrumentFini\*O routine to perform tasks
+required after Atom calls \*LInstrument\*O for the last object (such
+as global cleanup).  Atom passes no parameters to the
+\*LInstrumentFini\*O routine.
+.sp
+Atom restricts an \*LInstrumentInit\*O or \*LInstrumentFini\*O routine
+to using only a subset of the Atom routines. In general terms, either
+routine is allowed to add prototypes, add program level analysis
+calls, traverse objects, and perform some queries about objects.
+Neither can traverse the procedures in any object.
+.sp
+Specifically, \*LInstrumentInit\*O and \*LInstrumentFini\*O can call
+only the following routines:
+.ML
+.LI
+\*LAddCallProto\*O
+.LI
+\*LGetFirstObj\*O
+.LI
+\*LGetLastObj\*O
+.LI
+\*LGetNextObj\*O
+.LI
+\*LGetPrevObj\*O
+.LI
+Calls to \*LGetObjInfo\*O that do not specify an \*LObjInfoType\*O of
+\*LObjNumberProcs\*O, \*LObjNumberBlocks\*O, or \*LObjNumberInsts\*O
+.LI
+\*LGetObjName\*O
+.LI
+\*LGetObjOutName\*O
+.LI
+\*LGetAnalName\*O
+.LI
+\*LGetObjInstArray\*O
+.LI
+\*LGetObjInstCount\*O
+.LI
+\*LGetProgInfo\*O
+.LE
+.sp
+Additionally, an \*LInstrumentInit\*O routine can call
+\*LAddCallProgram\*O.  Normally a tool does not use any Atom routines
+in an \*LInstrumentFini\*O routine.
+.LI "\*Lunsigned InstrumentAll(\*Lint \*Viargc\*O, \*Lchar \*V**iargv\*L);\*O"
+.sp
+Atom calls the \*LInstrumentAll\*O routine once for the entire
+application program, thus allowing a tool's instrumentation code
+itself to determine how to traverse the application's objects.
+With this method, you do not specify \*LInstrumentInit\*O or
+\*LInstrumentFini\*O routines. The \*LInstrumentAll\*O routine does
+everything.  Because of this, an \*LInstrumentAll\*O routine must
+call the Atom object navigation routines itself and use the
+\*LBuildObj\*O, \*LWriteObj\*O, or \*LReleaseObj\*O routine to manage
+the application's objects.
+.sp
+A typical
+\*LInstrumentAll\*O routine might contain the following code:
+.oS
+unsigned InstrumentAll(int iargc, char **iargv)
+{
+    Obj *       obj;
+.sp
+    AddCallProto("Startup()");
+    AddCallProto("Finish()");
+    AddCallProto("foo(int, REGV)");
+.sp
+    AddCallProgram(ProgramBefore, "Startup");
+    AddCallProgram(ProgramAfter, "Finish");
+.sp
+    for (obj = GetFirstObj();  obj;  obj = GetNextObj(obj))
+    {
+        if (BuildObj(obj))
+            return(1);
+.sp
+        /* instrument obj */
+.sp
+        WriteObj(obj);
+    }
+}
+.oE
+.sp
+The \*LInstrumentAll\*O routine first adds the prototypes for the
+analysis routine and then adds the program-level analysis calls.
+Next, it traverses the objects in the program, calling \*LBuildObj\*O
+to build the internal Atom data structures for each object before
+traversing that object's procedures or adding analysis calls to
+the object.  Afterwards, it calls \*LWriteObj\*O to write out the
+instrumented version of the given object and deallocate the internal
+data structures that \*LBuildObj\*O created.
+Note that, because \*LBuildObj\*O may return an error code,
+the \*LInstrumentAll\*O routine propagates this error return back to
+Atom by returning 1.  An \*LInstrumentAll\*O routine must return zero
+(0) to Atom if the tool completes successfully, or 1 if it encounters
+an error.  Atom terminates with an error code if the routine returns 1.
+.LE
+.PP
+Regardless of the instrumentation routine interface, Atom passes the
+arguments specified in the \*L\-toolargs\*O flag to the routine.
+In the case of the \*LInstrument\*O interface, Atom also passes a
+pointer to the current object.
+.PP
+An Atom tool should use one of the following methods of specifying
+analysis routines to instrument an entire object or application program:
+.ML
+.LI
+If an analysis routine applies to something contained within a single
+object, use \*LAddCallObj\*O.  An example of this is an analysis
+routine that initializes some data for a procedure.
+.LI
+If an analysis routine applies to the entire program, call
+\*LAddCallProgram\*O from an \*LInstrumentInit\*O routine (when using
+the \*LInstrument\*O interface) or from the \*LInstrumentAll\*O
+routine.  An example of this is an analysis routine that opens an
+output file or parses command line options.
+.LE
+.SH RETURN VALUES
+.PP
+These routines return values as described in the preceding section.
+.SH FILES
+.PP
+.VL
+.LI "\*L/usr/include/cmplrs/atom.inst.h\*O"
+Header file containing external definitions of Atom routines
+.LE
+.SH RELATED INFORMATION
+.PP
+Commands: \*Latom\*O(1)
+.PP
+Atom Tools: \*Lhiprof\*O(5), \*Lpixie\*O(5), \*Lthird\*O(5)
+.PP
+Functions: \*Latom_application_instrumentation\*O(5),
+\*Latom_application_query\*O(5), \*Latom_application_navigation\*O(5),
+\*Latom_description_file\*O(5),
+\*Latom_application_resolvers\*O(5), \*Latom_object_management\*O(5),
+\*LAnalHeapBase\*O(5), \*LXlate\*O(5)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

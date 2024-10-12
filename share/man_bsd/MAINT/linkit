@@ -1,0 +1,25 @@
+
+# run this from within the directory where the MAN pages are 
+
+for F in $* ; do
+
+  fgrep '.so' $F | fgrep man | read J FP J2
+  if [ -n "${FP}" ] ; then
+
+  O=`basename $FP `
+  if [ -r $O ] ; then
+
+    ln $O $F
+
+  else
+
+    echo "${0}: file \"${O}\" not found" >&2
+
+  fi
+
+  fi
+
+done
+
+
+

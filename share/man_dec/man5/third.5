@@ -1,0 +1,621 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: third.5,v $ $Revision: 1.1.4.5 $ (DEC) $Date: 1996/10/09 13:24:46 $
+.\"
+.TH third 5 96/10/09 "Digital OSF1 UNIX V4.0"
+.SH NAME
+.PP
+\*Lthird\*O \- Performs memory access checks and detects memory leaks
+.SH SYNOPSIS
+.PP
+.sS
+\*Latom\*O \*Vappl_prog\*O  \*L\-tool\*O \*Lthird\*O [\*L\-env \*Venviron\*O] [\*L\-toolargs\*O="\*Varg1\*O \*Varg2\*O ..."]  [\*Vatom_flags\*O...]
+.sE
+.SH PARAMETERS
+.PP
+.VL
+.LI "\*Vappl_prog\*O"
+File name of a fully linked shared or nonshared executable to be
+examined.  This program should be compiled with the \*L\-g2\*O or
+\*L\-g3\*O flag to obtain more complete debugging information.
+If the default symbol table level (\*L\-g0\*O) is used, line number
+information, static procedure names, and file names are unavailable.
+If \*L\-g1\*O is used, the variable name symbolic information is
+not available.
+.LE
+.SH FLAGS
+.VL 4m
+.LI "\*L\-tool \*Lthird\*O"
+Identifies the Third Degree tool to the \*Latom\*O command.
+.LI "\*L\-env \*Venviron\*O"
+Identifies any special environment for Third Degree.  You can invoke
+Third Degree for a threaded application program by specifying the
+\*Lthreads\*O environment.  You can invoke Third Degree for a
+general-purpose environment by omitting the \*L\-env\*O flag.
+.LI "\*L\-toolargs\*O=""""\*Varg1\*O \*Varg2\*O ..."""""
+Passes arguments to Third Degree's instrumentation routines.
+Use whitespace characters to separate arguments from their parameters
+(if any) and from other arguments.
+.LI "\*Latom_flags\*O"
+Specifies flags to the \*Latom\*O command.  See the \*Latom\*O(1)
+reference page for descriptions of other flags accepted by the
+\*Latom\*O command.
+.sp
+Note that the \*L\-excobj\*O Atom flag behaves as described except
+that those libraries (such as \*Llibc.so\*O and \*Llibcxx.so\*O) that
+contain memory allocation functions (such as \*Lmalloc\*O,
+\*L\_sbrk\*O, and \*Lnew\*O) are partially instrumented, as
+appropriate, even if they are specified in the \*L\-excobj\*O flag.
+This allows Third Degree to use instrumented versions of the standard
+memory allocation functions.
+.sp
+Consequently, after you have instrumented an application that uses
+\*Llibc.so\*O, \*Llibcxx.so\*O, or other shared libraries, you must
+set the \*LLD_LIBRARY_PATH\*O environment variable to point to
+the directory containing the instrumented shared libraries.  Typically,
+this would be the current directory or the directory specified by the
+\*L\-shlibdir\*O flag. (You may leave \*LLD_LIBRARY_PATH\*O pointing to this
+directory while running other, uninstrumented applications.)
+.LE
+.PP
+The Third Degree tool allows the following flags to be passed in the
+\*L\-toolargs\*O flag for Third Degree's instrumentation routine to use
+when instrumenting \*Vappl_prog\*O.  Except where noted, these flags
+can also be passed to the instrumented program at execution time by
+being defined as part of the \*LTHIRD_ARGS\*O environment variable.
+.VL 4m
+.LI "\*L\-dirname\*O \*Vdirectory\*O"
+Specifies the directory path in which Third Degree creates its log file.
+.LI "\*L\-[no]pids\*O"
+Specifies the name of the log file as
+\*Vapplication_program\*L.\*Vpid\*O.\*L3log\*O.  The \*L\-nopids\*O
+flag overrides any previous specification of \*L\-pids\*O.
+.LE
+.PP
+While the instrumented \*Vappl_prog\*O is being executed, flags
+specified in the definition of the \*LTHIRD_ARGS\*O environment
+variable override any corresponding settings in the \*L\-toolargs\*O
+flags.  For example:
+.oS
+% setenv THIRD_ARGS "-dirname /mydir -pids"
+.oE
+.SH DESCRIPTION
+.PP
+.iX "Third Degree tool"
+The Third Degree Atom tool performs memory access checks and memory
+leak detection of C and C++ programs at run-time.
+It accomplishes this by using Atom to add code to executable and
+shared objects.  Third Degree instruments the entire program,
+including the libraries it references.
+The additional code performs run-time checks of memory accesses,
+calls to memory allocators, procedure calls and returns, and program
+start and exit.  The instrumented program locates most occurrences
+of the worst types of bugs in C and C++ programs: array overflows,
+memory smashing, and errors in the use of the \*Lmalloc\*O and
+\*Lfree\*O functions.  It also helps you determine the allocation
+habits of your application by listing the heap and finding memory leaks.
+.PP
+The instrumented program behaves in the same way as the original
+program except for the following:
+.ML
+.LI
+The code is larger and runs more slowly because of the additional
+instrumentation code that is inserted.
+.LI
+Each allocated heap memory object is larger because Third Degree pads
+it to allow boundary checking.  You can adjust the amount of padding by
+specifying the \*Lobject_padding\*O option in the \*L\.third\*O file.
+.LI
+To detect errant use of uninitialized data, Third Degree initializes all
+otherwise uninitialized data to a special pattern.  This can cause the
+instrumented program to behave differently, behave incorrectly, or crash
+(particularly if this special pattern, an invalid pointer, appears in a
+pointer).  All of these behaviors indicate a bug in the program.
+.LE
+.PP
+You can use the Third Degree for the following types of applications:
+.ML
+.LI
+For C or C++ applications that allocate memory by using the
+\*Lmalloc\*O, \*Lcalloc\*O, \*Lrealloc\*O, \*Lvalloc\*O, \*Lalloca\*O,
+\*Lsbrk\*O, and \*Lnew\*O (C++ only) functions.
+You can use Third Degree to instrument programs using other memory
+allocators, such as the \*Lmmap\*O function, but it does not check
+accesses to the memory thus obtained.
+.sp
+Third Degree detects and forbids calls to the \*Lbrk\*O function.
+Furthermore, if your program allocates memory by partitioning large
+blocks it obtained by using the \*Lsbrk\*O function, Third Degree may
+not be able to precisely identify memory blocks in which errors occur.
+.LI
+Applications using POSIX threads (\*Lpthread\*O)
+interfaces and applications using a supported coroutine package.  Most
+coroutine packages are supported.  If your application uses a custom
+threads or coroutine package, you may not be able to use Third Degree.
+.LE
+.SS "Third Degree Customization File"
+Third Degree takes as input a user-specified customization file named
+\*L.third\*O.  This customization file allows you to enable and
+disable error detection and reporting.
+.PP
+The following general syntax rules apply to the \*L.third\*O file:
+.ML
+.LI
+Third Degree treats lines beginning with a pound-sign character (#) as
+comments.
+.LI
+Specify procedure names and file names within single-quotes or
+double-quotes.
+.LI
+Procedure names should match those printed by the \*Lnm\*O command.
+In particular, C++ names must include the list of argument types,
+for example, \*Lhandler(int)\*O.
+Third Degree ignores inlined procedures unless they are compiled with
+the \*Lcxx \-noinline\*O command or similar mechanism.
+.LI
+You can omit the keyword \*Lyes\*O when defining Boolean options.
+For example, Third Degree treats \*Lheap_history\*O and
+\*Lheap_history yes\*O as identical.
+.LE
+.PP
+Third Degree looks for the \*L.third\*O file in the current directory.
+If the file is not in the current directory, Third Degree looks for it
+in your home directory.  If Third Degree cannot find the \*L.third\*O
+file, it uses the defaults indicated in the following list of
+\*L.third\*O file options.
+.PP
+Use the following options in the \*L.third\*O file:
+.VL 4m
+.LI "\*Lall leaks at_exit\*O"
+When the program exits, reports leaks introduced since the program
+started running.
+.LI "\*Lall leaks \*Lbefore\*O|\*Lafter\*O \*Vproc_name\*O \*Levery\*O \*VN\*O"
+Before or after every \*VN\*O calls to \*Vproc_name\*O, reports leaks
+introduced since the program started running.
+.LI "\*Lall objects at_exit\*O"
+When the program exits, reports that allocated memory blocks created
+since the program started running are still reachable by means of
+pointers in static and heap memory.
+.LI "\*Lall objects \*Lbefore\*O|\*Lafter\*O \*Vproc_name\*O \*Levery\*O \*VN\*O"
+Before or after every \*VN\*O calls to \*Vproc_name\*O, reports which
+allocated memory blocks created since the program started running are
+still reachable by means of pointers in stack, static, and heap memory.
+.LI "\*Lnew leaks at_exit\*O"
+When the program exits, reports leaks introduced since the previous
+leak report.
+.LI "\*Lnew leaks \*Lbefore\*O|\*Lafter\*O \*Vproc_name\*O \*Levery\*O \*VN\*O"
+Before or after every \*VN\*O calls to \*Vproc_name\*O, reports leaks
+introduced since the previous leak report.
+.LI "\*Lnew objects at_exit\*O"
+When the program exits, reports that allocated memory blocks created
+since the previous object report are still reachable by means of
+pointers in static and heap memory.
+.LI "\*Lnew objects \*Lbefore\*O|\*Lafter\*O \*Vproc_name\*O \*Levery\*O \*VN\*O"
+Before or after every \*VN\*O calls to \*Vproc_name\*O, reports which
+allocated memory blocks created since the previous object report are
+still reachable by means of pointers in stack, static, and heap memory.
+.LI "\*Lno leaks at_exit\*O"
+Disables the default report of \*Lnew leaks at_exit\*O.
+.LI "\*Lfree_queue_bytes\*O \*Vqueue-size\*O"
+Specifies the size in bytes of the queue in which freed blocks reside
+before they are actually deallocated.  The default size of this queue
+is 1000000 bytes.  Increasing the size of the queue uses more memory,
+but helps troubleshoot problems in accessing freed objects.
+.LI "\*Lheap_history\*O \*Lyes\*O|\*Lno\*O"
+Generates a heap history for the program.  A heap history allows you
+to see how the program used dynamic memory during its execution.
+You can use a heap history to identify unused fields in data
+structures or pack active fields to use memory more efficiently.
+The heap history also shows memory blocks that are allocated but
+never used by the application.
+.sp
+Every 32 bits of the first kilobyte of each dynamically-allocated
+memory object (unless you specify otherwise with the \*Lhistory_size\*O
+option) is represented by one character in the contents map for
+all objects allocated at the same place.  (See the description of the
+Third Degree log file in a later section of this reference page.)
+.LI "\*Lhistory_size\*O \*Vsize\*O"
+Specifies the portion (in number of bytes) of each very large
+dynamically-allocated memory object that is summarized in the contents
+map when the \*Lheap_history\*O option is enabled.  The default
+history size is 1024 bytes.
+.\" ***FOLLOWING SYNTAX IS OBSOLETE
+.\" .LI "\*Lignore_proc\*O \*Verror-pattern\*O [\*Vname-pattern\*O] [\*Lline \*Vline-number\*O"
+.\" .LI "\*Lignore_file\*O \*Verror-pattern\*O [\*Vname-pattern\*O] [\*Lline \*Vline-number\*O"
+.\" ***NEW SYNTAX FOLLOWS:
+.\" .LI "\*Lignore\*O [\*Vobj-pattern\*O^] [\*Vfile-pattern\*O^] \*Vproc-pattern\*O [\*Verror-pattern\*O [\*Lline\*V line-number\*O]]"
+.LI "\*Lignore\*V proc_id \*L[\*Verror_pattern \*L[line \*Vline_no\*L]]\*O"
+Partially or completely disables error reporting for all routines
+represented by \*Vproc_id\*O, where \*Vproc_id\*O equals
+\*L[\*Vobj_pattern\*L^][\*Vfile_pattern\*L^]\*Vproc_pattern\*O.
+The degree to which error reporting is disabled depends on whether
+\*Verror_pattern\*O is specified on the \*Lignore\*O command line:
+.ML
+.LI
+If \*Verror_pattern\*O is not supplied, the specified
+routines will not be instrumented.
+.LI
+If \*Verror_pattern\*O is specified,
+those particular errors will be filtered at analysis time.
+.LE
+.sp
+The \*Vproc_id\*O components \*Vfile_pattern\*O and \*Vobj_pattern\*O
+are optional and can be specified as pathnames.
+.sp
+Third Degree recognizes the three-letter error abbreviations listed in
+the description of the Third Degree log file in a later section of this
+reference page.  Wildcard characters (*) can be used only in pattern
+names.
+.sp
+For example, the following command disables instrumentation of all
+routines named \*Lfoobar\*O in the application:
+.sp
+.sS
+\*Lignore foobar\*O
+.sE
+.sp
+The following commands each disable instrumentation of all routines
+named \*Lfoo\*O in the library \*Llibx.so.\*O  (If multiple static
+routines have the same name, these commands ensure that neither are
+instrumented.)
+.sp
+.sS
+\*Lignore libx.so^^foo
+.nL
+ignore libx.so^*^foo\*O
+.sE
+.sp
+The following command filters "read uninitialized stack errors"
+at analysis time in routine foo at line 20:
+.sp
+.sS
+\*Lignore foo rus line 20\*O
+.sE
+.\" ***OLD DESCRIPITON:
+.\" Disables the error represented by the specified \*Verror-pattern\*O
+.\" within the procedure or file represented by the name indicated by
+.\" \*Vname-pattern\*O.  This is often useful when the errors occur
+.\" within library functions for which you do not have the source.
+.\" If no \*Vname-pattern\*O is specified, the error is disabled
+.\" everywhere.
+.\" .sp
+.\" Third Degree recognizes the three-letter error abbreviations listed
+.\" in the discussion of the Third Degree log file in a later section
+.\" of this reference page.
+.\" Both the \*Verror-pattern\*O and \*Vname-pattern\*O can contain a
+.\" wildcard character (*).
+.LI "\*Linclude\*L \*Vfile-path\*O"
+Reads additional Third Degree options from \*Vfile-path\*O.
+A full pathname to the included file is required.
+.LI "\*Lleak_stack_depth\*O \*Vdepth\*O"
+.LI "\*Lobject_stack_depth\*O \*Vdepth\*O"
+Specifies an integer representing the maximum number of procedure
+invocations on the call stack that Third Degree uses to distinguish
+objects from other objects (or leaks from other leaks).
+Third Degree lists memory objects and leaks in the report by
+decreasing importance, based on the number of bytes involved.
+It groups together objects allocated with identical call stacks.
+For example, if the same call sequence allocates a million one-byte
+objects, Third Degree reports them as a one-megabyte group containing
+a million allocations.
+.sp
+For example, if you specify a depth of 1 for objects, Third Degree
+groups valid objects in the heap by the function and line number
+that allocated them, no matter what function was the caller.
+Conversely, if you specify a very large depth for leaks, Third Degree
+groups only leaks allocated at points with identical call stacks
+from \*Lmain\*O upwards.
+.sp
+The default stack depth is 10000.
+.LI "\*Lleak_min_percent\*O \*Vpercentage\*O"
+.LI "\*Lobject_min_percent\*O \*Vpercentage\*O"
+Limits the length of a Third Degree heap report by specifying a
+percentage of the total memory leaked or in use by an object as a
+threshold.  When all smaller remaining leaks or objects amount to
+less than this threshold, Third Degree groups them together under
+a single final entry.
+.sp
+The default percentage is 1.0.
+.LI "\*Lmemory_errors \*Lyes\*O|\*Lno\*O"
+Enables or disables the listing of all memory access errors.
+By default, all memory errors are listed.  Regardless of the setting
+of this option, fatal memory access errors are always listed.
+.LI "\*Lobject_padding\*O \*Vpad\*O"
+Specifies an integer representing the number of bytes of padding that
+Third Degree adds after each heap-allocated object.
+.sp
+Third Degree cannot detect a chance access of the wrong object in the
+heap; for example, it cannot detect that \*La[last+100]\*O is the
+same address as \*Lb[0]\*O.  Specifying a padding for allocated
+objects helps reduce the chances of these types of accesses.
+Note that a larger value for \*Vpad\*O may catch more errors but will
+use more memory.
+.sp
+The default padding is 16 bytes.
+.LI "\*Lpointer_mask\*O \*Vmask\*O"
+Activates a mask that Third Degree applies (using a logical-AND
+operation) to potential pointers when searching for memory leaks.
+.sp
+Third Degree discovers leaks (that is, allocated objects the address of
+which is not stored anywhere in memory) by searching memory for words
+that contain the addresses of memory objects.  If an application hides
+true pointers by storing them in the address space of some other
+process or by encoding them, Third Degree may report spurious leaks.
+Supplying a pointer mask may reduce the reporting of such spurious
+leaks.
+.sp
+The \*Vmask\*O is a 64-bit hexadecimal number; the value
+0xffffffffffffffff is the default mask value.
+.LI "\*Lsignals\*O \*Lyes\*O|\*Lno\*O"
+Enables or disables Third Degree's use of the default signal handler for
+fatal errors.
+.sp
+Third Degree defines signal handlers only for those signals that
+normally cause program crashes (including \*LSIGILL\*O, \*LSIGTRAP\*O,
+\*LSIGABRT\*O, \*LSIGEMT\*O, \*LSIGFPE\*O, \*LSIGBUS\*O, \*LSIGSEGV\*O,
+\*LSIGSYS\*O, \*LSIGXCPU\*O, and \*LSIGXFSZ\*O).  If your program
+establishes signal handlers, there is a small chance that Third
+Degree's changing of the default signal handler may interfere with it.
+You can disable Third Degree's signal handling by specifying
+\*Lsignals no\*O.
+.sp
+By default, signal handling is enabled; however, any application-defined
+signal handlers will replace those defined by Third Degree, except
+while Third Degree is reporting on heap objects, leaks, and history.
+In the exception case, Third Degree temporarily overrides any
+application-defined signal handlers.
+.sp
+.\" ***REPLACE THIS TEXT PER JPW (V4.0)
+.\" If you disable Third Degree's handler for a multithreaded program,
+.\" specify the \*L\-all\*O or \*L\-incobj\*O flag to instrument every
+.\" thread's routines (including \*Llibpthread.so\*O) and avoid
+.\" truncation of the \*L.3log\*O file.
+.\" ***REPLACEMENT TEXT:
+If you disable signal handling for a multithreaded program, the
+\*Lall leaks before|after proc-Name every N\*O option and the
+\*Lall objects before|after proc_name every N\*O option are not
+supported.
+.LI "\*Luninit_heap\*O \*Lyes\*O|\*Lno\*O"
+.LI "\*Luninit_stack\*O \*Lyes\*O|\*Lno\*O"
+Enables or disables Third Degree's filling of newly allocated heap or
+stack memory to the value Third Degree uses to detect uninitialized
+memory.
+.sp
+If the uninstrumented version of the application worked, but fails
+after being instrumented by Third Degree, you can use \*Luninit_stack
+no\*O and \*Luninit_heap no\*O to pinpoint the source of the error.
+By using one or both options, you can alter the behavior of the
+instrumented program and may likely get it to complete successfully.
+This will help you determine which type of error is causing the
+instrumented program to crash and, as a result, help you focus on
+specific messages in the log file.
+.sp
+By default, Third Degree initializes newly-allocated stack and heap
+memory.  Do not use the \*Luninit_heap no\*O and \*Luninit_stack no\*O
+options under normal operation.  They hamper Third Degree's ability
+to detect a program's use of uninitialized data.
+.LI "\*Luse\*O \*Vdirectory-spec\*O"
+Adds a directory to the search path Third Degree uses to find source
+files.  There is no default setting.  To clear the search path,
+specify the \*Luse\*O option without a \*Vdirectory-spec\*O.
+.LE
+.SS "Third Degree Log File"
+Third Degree places its output in a log file that includes the
+\*L.3log\*O suffix in its name.  The log file contains the heap
+history, memory-access errors, heap-object lists, and memory-leak
+lists that were selected by commands in the \*L.third\*O file.
+.PP
+When heap history is enabled, Third Degree collects information
+about each dynamically allocated object at the time it is freed by the
+application.  When program execution completes, Third Degree assembles
+this information for every object still alive (including memory leaks).
+For each object, Third Degree looks at the contents of the object,
+and categorizes each word as follows:
+.ML
+.LI
+Never written by the application
+.LI
+Zero
+.LI
+A valid pointer value in the stack, heap, or static data area
+.LI
+Some other value
+.LE
+.PP
+Third Degree then merges the information for each object with the
+information that it has gathered for all other objects allocated at
+the same call stack in the program. This provides you with a
+cumulative picture of the use of all objects of a given type.
+.PP
+Third Degree provides a summary of all of the objects allocated
+during the life of the program and the purposes for which their
+contents were used.  The report shows one entry per allocation point
+(for example, a call stack where an allocator function such as
+\*Lmalloc\*O or \*Lnew\*O was called).  Entries are sorted by
+decreasing volume of allocation.
+.PP
+Each entry provides the following:
+.ML
+.LI
+Information about all objects that have been allocated at any point
+up to this point in the program's execution
+.LI
+Total number of bytes allocated at the specified point in the
+program's execution
+.LI
+Total number of objects that have been allocated up to the
+specified point in the program's execution
+.LI
+Percentage of bytes of the allocated objects that have been written
+.LI
+The call stack and a cumulative map of the contents of all objects
+allocated by that call stack
+.LE
+.PP
+The contents part of each entry describes how the objects allocated at
+the specified point were used.  If all allocated objects are not
+the same size, Third Degree considers only the minimum size common to
+all objects.  For very large allocations, it summarizes the contents
+of only the beginning of the objects (by default, the first kilobyte).
+You can adjust the maximum size value by specifying the
+\*Lhistory_size\*O option in the \*L.third\*O configuration file.
+.PP
+In the contents portion of an entry, Third Degree uses one of the
+following characters to represent each 32-bit longword it has examined:
+.TS
+tab(@);
+lfHB lfHB
+lw(.75i) lw(3.75i).
+_
+.sp
+Character@Description
+.sp
+_
+T{
+Dot (.)
+T}@T{
+Indicates a longword that was never written in any of the objects,
+a definite sign of wasted memory.  Further analysis is generally
+required to see if it is simply a deficiency of a test that never
+used this field, if it is a padding problem solved by swapping fields
+or choosing better types, or if this field is obsolete.
+T}
+.sp
+z@T{
+Indicates a field whose value was always 0 (zero) in every object.
+T}
+.sp
+pp@T{
+Indicates a pointer; that is, a 64-bit quantity that was zero in
+every object or was a valid pointer into the stack, the static data
+area, or the heap.
+T}
+.sp
+ss@T{
+Indicates a sometime pointer.  This longword looked like a pointer in
+at least one of the objects, but not in all objects.  It could be a
+pointer that is not initialized in some instances, or a union.
+However, it could also be the sign of a serious programming error.
+T}
+.sp
+i@T{
+Indicates a longword that was written with some nonzero value in at
+least one object and that never contained a pointer value in any object.
+T}
+.sp
+_
+.TE
+.PP
+When memory-access checks and heap listings are enabled in the
+\*L.third\*O
+file, a common format indicates the nature, characteristics, and location
+of each listed error or object.  The log file uses a three-letter
+name to identify each error.  The names are as follows:
+.TS
+tab(@);
+lfHB lfHB
+lw(.75i) lw(3.75i).
+_
+.sp
+Name@Error
+.sp
+_
+\*Lror\*O@T{
+Reading out of range: neither in heap, stack, nor static area
+T}
+.sp
+\*Lris\*O@T{
+Reading invalid data in stack: probably an array bound error
+T}
+.sp
+\*Lrus\*O@T{
+Reading an uninitialized (but valid) location in stack
+T}
+.sp
+\*Lrih\*O@T{
+Reading invalid data in heap: probably an array bound error
+T}
+.sp
+\*Lruh\*O@T{
+Reading an uninitialized (but valid) location in heap
+T}
+.sp
+\*Lwor\*O@T{
+Writing out of range: neither in heap, stack, nor static area
+T}
+.sp
+\*Lwis\*O@T{
+Writing invalid data in stack: probably an array bound error
+T}
+.sp
+\*Lwih\*O@T{
+Writing invalid data in heap: probably an array bound error
+T}
+.sp
+\*Lfor\*O@T{
+Freeing out of range: neither in heap nor stack
+T}
+.sp
+\*Lfis\*O@T{
+Freeing an address in the stack
+T}
+.sp
+\*Lfih\*O@T{
+Freeing an invalid address in the heap: no valid object there
+T}
+.sp
+\*Lfof\*O@T{
+Freeing an already freed object
+T}
+.sp
+\*Lfon\*O@T{
+Freeing a null pointer (really just a warning)
+T}
+.sp
+\*Lmrn\*O@T{
+\*Lmalloc\*O returned null
+T}
+.sp
+_
+.TE
+.SH EXAMPLES
+.VL
+.LI "\*Latom -tool third program -toolargs= """"-dirname /tmp -nopids"""""
+Invokes Third Degree to instrument \*Lprogram\*O, creating
+the log file \*L/tmp/program.\*Vpid\*L.3log\*O and producing
+the output executable \*Lprogram.third\*O.
+.LE
+.SH FILES
+.PP
+.VL
+.LI "\*Vappl_prog.\*Lthird\*O"
+Instrumented version of \*Vappl_prog\*O.
+.LI "\*Vappl_prog.\*L3log\*O"
+Log of memory errors, leaks, and other reports.  The name of this log
+file can be overriden by the settings of the \*L\-toolargs\*O flag
+or the \*LTHIRD_ARGS\*O environment variable.
+.LI "\*L.third\*O"
+Customization file for Third Degree.
+.LE
+.SH RELATED INFORMATION
+.PP
+\*Latom\*O(1)
+.PP
+\*EProgrammer's Guide\*O
+.EQ
+delim off
+.EN

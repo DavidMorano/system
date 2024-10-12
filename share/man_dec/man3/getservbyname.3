@@ -1,0 +1,193 @@
+.\" This manpage source uses rsml coding. 
+.so /usr/share/lib/tmac/sml
+.so /usr/share/lib/tmac/rsml
+.\"
+.\"
+.\" *********************************************************************
+.\" *                                                                   *
+.\" *      Copyright (c) Digital Equipment Corporation, 1991, 1996      *
+.\" *                                                                   *
+.\" *                       All Rights Reserved.                        *
+.\" *                                                                   *
+.\" *********************************************************************
+.\"
+.\" HISTORY
+.\"
+.\" @(#)$RCSfile: getservbyname.3,v $ $Revision: 3.2.7.6 $ (DEC) $Date: 1995/10/17 13:53:33 $
+.\"
+.\" (c) Copyright 1991, OPEN SOFTWARE FOUNDATION, INC.
+.\" ALL RIGHTS RESERVED
+.\" 
+.\" (c) Copyright 1990, 1991, 1992, 1993 OPEN SOFTWARE FOUNDATION, INC. 
+.\" ALL RIGHTS RESERVED 
+.\" OSF/1 1.2
+.\"
+.TH getservbyname 3
+.SH NAME
+.PP
+\*Lgetservbyname\*O, \*Lgetservbyname_r\*O \- Get a service entry by name
+.SH LIBRARY
+.PP
+\*OStandard C Library \*L(libc.so, libc.a)\*O
+.SH SYNOPSIS
+.PP
+.sS
+.PP
+\*L#include <netdb.h>
+.PP
+\*Lstruct servent *getservbyname\*L(
+.nL
+	\*Lconst char *\*Vname\*L,
+.nL
+	\*Lconst char *\*Vproto\*L);\*O
+.PP
+.sE
+.sp 0.4v
+.PP
+[Digital]\ \ The following obsolete function is supported in order to maintain
+backward compatibility with previous versions of the operating system.  You should
+not use it in new designs.
+.sS
+\*Lint getservbyname_r\*L(
+.nL
+	\*Lconst char *\*Vname\*L,
+.nL
+	\*Lconst char *\*Vproto\*L,
+.nL
+	\*Lstruct servent *\*Vserv\*L,
+.nL
+	\*Lstruct servent_data *\*Vserv_data\*L);\*O
+.sE
+.SH STANDARDS
+.PP
+Interfaces documented on this reference page conform to industry
+standards as follows:
+.PP
+\*Lgetservbyname(\|)\*O:  XPG4\-UNIX
+.PP
+Refer to the \*Lstandards\*O(5) reference page for more information
+about industry standards and associated tags.
+.SH PARAMETERS
+.PP
+.VL
+.LI "\*Vname\*O"
+Specifies the official name or alias name of the service.
+.LI "\*Vproto\*O"
+Specifies the name of the protocol to use when contacting the
+service.
+.LI "\*Vserv\*O"
+[Digital]\ \ For \*Lgetservbyname_r(\|)\*O only, this points to the
+\*Lservent\*O structure.  The \*Lnetdb.h\*O header file defines the
+\*Lservent\*O structure.
+.LI "\*Vserv_data\*O"
+[Digital]\ \ For \*Lgetservbyname_r(\|)\*O only, this is data for the services
+database.  The \*Lnetdb.h\*O header file defines the
+\*Lservent_data\*O structure.
+.LE
+.SH DESCRIPTION
+.PP
+.iX "getservbyname function"
+.iX "getservbyname_r function"
+.iX "service entry" "returning by name"
+.iX "services file" "searching by name"
+The \*Lgetservbyname(\|)\*O function returns a pointer to a structure of type
+\*Lservent\*O. Its members specify data in fields from a record line in either
+the local \*L/etc/services\*O file or the NIS distributed network services
+database file. To determine which file or files to search, and
+in which order, the system uses the switches in the \*L/etc/svc.conf\*O file.
+The \*Lnetdb.h\*O header file defines the \*Lservent\*O structure.
+.PP
+The \*Lgetservbyname(\|)\*O function searches the network services database
+file sequentially until a match with the \*Vname\*O
+parameter and with the \*Vproto\*O parameter occurs. The
+\*Vname\*O parameter can specify either the official name or its
+alias. When EOF (End-of-File) is reached without the match, a null pointer
+is returned by this subroutine. When the protocol
+name is not specified (\*Vproto\*O parameter is NULL),
+the \*Vproto\*O parameter need not be matched during the
+network services database file record search.
+.\"	Removed by bac - redundant with previous paragraph
+.\".PP
+.\"The \*Lgetservbyname(\|)\*O function searches the \*L/etc/services\*O
+.\"file sequentially until one of the following occurs:
+.\".ML
+.\".LI
+.\"A service name and protocol name match.
+.\".LI
+.\"A service name matches while the \*Vproto\*O parameter is set to NULL.
+.\".LI
+.\"The end of the \*L/etc/services\*O file is reached.
+.\".LE
+.PP
+Use the \*Lendservent(\|)\*O function to close the network services database
+file.
+.SH NOTES
+.PP
+The \*Lgetservbyname(\|)\*O function returns a pointer to thread-specific data.
+Subsequent calls to this or a related function from the same thread overwrite this
+data.
+.PP
+[Digital]\ \ The \*Lgetservbyname_r(\|)\*O function is an obsolete reentrant
+version of the \*Lgetservbyname(\|)\*O function.  It is supported in order to
+maintain backward compatibility with previous versions of the operating system and
+should not be used in new designs.  Note that you must zero-fill the
+\*Lservent_data\*O structure before its first access by either the
+\*Lsetservent_r(\|)\*O or \*Lgetservbyname_r(\|)\*O function.
+.\"
+.\" Deleted at request of David Long
+.\" set to NULL the
+.\"\*Lserv_fp\*O field of the \*Lservent_data\*O structure.  In
+.\"addition, the \*L_serv_stayopen\*O flag of the \*Lservent_data\*O
+.\"structure must
+.\"be initialized if the \*Lsetservent(\|)\*O function is \*Vnot\*O used.
+.SH RETURN VALUES
+.PP
+Upon successful completion, the \*Lgetservbyname(\|)\*O function returns a pointer
+to a \*Lservent\*O structure.  If it fails or reaches the end of the
+network services database file, it returns a null pointer.
+.PP
+[Digital]\ \ Upon successful completion, the \*Lgetservbyname_r(\|)\*O function
+stores the \*Lservent\*O structure in the location pointed to by \*Vserv\*O, and returns a value
+of 0 (zero).  Upon failure, it returns a value of -1.
+.SH ERRORS
+.PP
+[Digital]\ \ If any of the following conditions occurs, the \*Lgetservbyname_r(\|)\*O
+function sets \*Lerrno\*O to the corresponding value:
+.VL
+.LI "[EINVAL]"
+The \*Vserv\*O or \*Vserv_data\*O parameter is invalid.
+.LI "[ESRCH]"
+The search failed.
+.LE
+.PP
+In addition, if the function fails to open the file, it sets \*Lerrno\*O to
+indicate the cause of the failure.
+.SH FILES
+.PP
+.VL 1i
+.LI "\*L/etc/services\*O"
+The DARPA Internet network service-name database. Each record
+in the file occupies a single line and has four fields: the
+official service name, the port reference, protocol name, and aliases.
+.LI "\*L/etc/svc.conf\*O"
+The database service selection configuration file.
+.LE
+.SH RELATED INFORMATION
+.PP
+Functions:
+\*Lgetservbyport\*O(3),
+\*Lgetservent\*O(3),
+\*Lsetservent\*O(3),
+\*Lendservent\*O(3).
+.PP
+Files: \*Lservices\*O(4), \*Lsvc.conf\*O(4).
+.PP
+Networks: \*Lnis_intro\*O(7).
+.PP
+Standards: \*Lstandards\*O(5).
+.iX "getservbyname function"
+.iX "getservbyname_r function"
+.\" End Digital-specific information
+.EQ
+delim off
+.EN
