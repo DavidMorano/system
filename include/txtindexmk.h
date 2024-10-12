@@ -37,9 +37,9 @@
 
 
 struct txtindexmk_head {
-	modload		*lop ;		/* load-object-pointer */
 	void		*obj ;		/* object pointer */
 	void		*callp ;
+	modload		*lop ;		/* load-object-pointer */
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size (not used here) */

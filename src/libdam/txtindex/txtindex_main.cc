@@ -316,11 +316,10 @@ int txtindex_curbegin(txtindex *op,txtindex_cur *curp) noex {
 	    txtindex_calls	*callp = txtindex_callsp(op->callp) ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
-	        void	*vp ;
-	        if ((rs = uc_malloc(op->cursize,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = uc_malloc(op->cursize,&vp)) >= 0) {
 		    curp->scp = vp ;
 		    rs = SR_BUGCHECK ;
-		    {
+		    if (callp->curbegin) {
 		        auto	co = callp->curbegin ;
 		        if ((rs = co(op->obj,curp->scp)) >= 0) {
 	    	            curp->magic = TXTINDEX_MAGIC ;

@@ -1,7 +1,7 @@
 /* biblecur HEADER */
 /* lang=C++20 */
 
-/* perform some output processsing activities */
+/* bible-cursor -- perform some output processsing activities */
 /* version %I% last-modified %G% */
 
 

@@ -42,9 +42,9 @@ struct txtindex_cursor {
 } ;
 
 struct txtindex_head {
-	modload		*loaderp ;
 	void		*obj ;		/* object pointer */
 	void		*callp ;
+	modload		*loaderp ;
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */

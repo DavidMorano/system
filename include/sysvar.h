@@ -25,30 +25,17 @@
 
 #define	SYSVAR_MAGIC	0x99447243
 #define	SYSVAR		struct sysvar_head
+#define	SYSVAR_FL	struct sysvar_flags
 #define	SYSVAR_CUR	struct sysvar_cursor
 #define	SYSVAR_CALLS	struct sysvar_callsubs
-#define	SYSVAR_FL	struct sysvar_flags
 
 #define	SYSVAR_OPREFIX	SYSVARS_OPREFIX		/* prefix match */
 
 
 struct sysvar_cursor {
-	void	*scp ;		/* SO-cursor pointer */
-	uint	magic ;
+	void		*scp ;		/* SO-cursor pointer */
+	uint		magic ;
 } ;
-
-EXTERNC_begin
-    struct sysvar_callsubs {
-	int	(*open)(void *,cchar *,cchar *) ;
-	int	(*count)(void *) ;
-	int	(*curbegin)(void *,void *) ;
-	int	(*fetch)(void *,cchar *,int,void *,char *,int) ;
-	int	(*enumerate)(void *,void *,char *,int,char *,int) ;
-	int	(*curend)(void *,void *) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
-    } ;
-EXTERNC_end
 
 struct sysvar_flags {
 	uint		defaults:1 ;
@@ -56,9 +43,9 @@ struct sysvar_flags {
 
 struct sysvar_head {
 	void		*obj ;			/* object pointer */
-	MODLOAD		loader ;
-	vecstr		defaults ;
-	SYSVAR_CALLS	call ;
+	void		*callp ;		/* call-struct pointer */
+	modload		*loaderp ;		/* loader-pointer */
+	vecstr		*dlp ;			/* default-list-pointer */
 	SYSVAR_FL	f ;
 	uint		magic ;
 	int		objsize ;		/* object size */
@@ -66,20 +53,19 @@ struct sysvar_head {
 } ;
 
 typedef SYSVAR		sysvar ;
-typedef SYSVAR_CUR	sysvar_cur ;
-typedef SYSVAR_CALLS	sysvar_calls ;
 typedef SYSVAR_FL	sysvar_fl ;
+typedef SYSVAR_CUR	sysvar_cur ;
 
 EXTERNC_begin
 
-extern int sysvar_open(sysvar *,cchar *,cchar *) ;
-extern int sysvar_count(sysvar *) ;
-extern int sysvar_curbegin(sysvar *,sysvar_cur *) ;
-extern int sysvar_fetch(sysvar *,cchar *,int,sysvar_cur *,char *,int) ;
-extern int sysvar_enum(sysvar *,sysvar_cur *,char *,int,char *,int) ;
-extern int sysvar_curend(sysvar *,sysvar_cur *) ;
-extern int sysvar_audit(sysvar *) ;
-extern int sysvar_close(sysvar *) ;
+extern int sysvar_open(sysvar *,cchar *,cchar *) noex ;
+extern int sysvar_count(sysvar *) noex ;
+extern int sysvar_curbegin(sysvar *,sysvar_cur *) noex ;
+extern int sysvar_curend(sysvar *,sysvar_cur *) noex ;
+extern int sysvar_curenum(sysvar *,sysvar_cur *,char *,int,char *,int) noex ;
+extern int sysvar_fetch(sysvar *,cchar *,int,sysvar_cur *,char *,int) noex ;
+extern int sysvar_audit(sysvar *) noex ;
+extern int sysvar_close(sysvar *) noex ;
 
 EXTERNC_end
 

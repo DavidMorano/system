@@ -1,7 +1,7 @@
 /* biblecur SUPPORT */
 /* lang=C++20 */
 
-/* bible-cursor */
+/* bible-cursor -- perform some output processsing activities */
 /* version %I% last-modified %G% */
 
 
@@ -26,7 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
