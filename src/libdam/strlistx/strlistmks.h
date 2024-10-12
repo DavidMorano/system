@@ -20,8 +20,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<strtab.h>
-
-#include	"rectab.h"
+#include	<srectab.h>
 
 
 #define	STRLISTMKS		struct strlistmks_head
@@ -52,7 +51,7 @@ struct strlistmks_head {
 	cchar		*idname ;	/* index-directory-name */
 	char		*nfname ;	/* new-file-name */
 	strtab		*stp ;		/* string-tab-pointer */
-	rectab		*rtp ;		/* record-table-pointer */
+	srectab		*rtp ;		/* string-record-table-pointer */
 	STRLISTMKS_FL	f ;
 	gid_t		gid ;
 	uint		magic ;

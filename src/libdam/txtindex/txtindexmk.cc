@@ -140,9 +140,15 @@ static int txtindexmk_ctor(txtindexmk *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->callp = new(nothrow) txtindexmk_calls) != np) {
-		rs = SR_OK ;
-	    } /* end if (new-txtindexmks_calls) */
+	    if ((op->mlp = new(nothrow) modload) != np) {
+	        if ((op->callp = new(nothrow) txtindexmk_calls) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-txtindexmks_calls) */
+		if (rs < 0) {
+		    delete op->mlp ;
+		    op->mlp = nullptr ;
+		}
+	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -156,6 +162,10 @@ static int txtindexmk_dtor(txtindexmk *op) noex {
 	        txtindexmk_calls	*callp = callsp(op->callp) ;
 		delete callp ;
 		op->callp = nullptr ;
+	    }
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -216,11 +226,10 @@ int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = txtindexmk_ctor(op,pp,db)) >= 0) {
-	    static cint	rsv = mkvars() ;
+	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
 		cint	sz = (var.maxhostlen + 1 + var.maxpathlen + 1) ;
-		char	*ap{} ;
-		if ((rs = uc_malloc(sz,&ap)) >= 0) {
+		if (char *ap{} ; (rs = uc_malloc(sz,&ap)) >= 0) {
 		    opener	oo(op,pp,db,of,om) ;
 		    {
 		        rs = oo(ap) ;
@@ -324,7 +333,7 @@ int txtindexmk_noop(TIM *op) noex {
 /* private subroutines */
 
 static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname) noex {
-	modload		*lp = op->lop ;
+	modload		*lp = op->mlp ;
 	vecstr		syms ;
 	cint		vn = nelem(subs) ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -388,8 +397,8 @@ static int txtindexmk_objloadend(TIM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	if (op->lop) {
-	    rs1 = modload_close(op->lop) ;
+	if (op->mlp) {
+	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -397,7 +406,8 @@ static int txtindexmk_objloadend(TIM *op) noex {
 /* end subroutine (txtindexmk_objloadend) */
 
 static int txtindexmk_loadcalls(TIM *op,cchar *soname) noex {
-	modload		*lp = op->lop ;
+	modload		*lp = op->mlp ;
+	callsp		callp = callsp(op->callp) ;
 	cint		slen = SYMNAMELEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -406,7 +416,6 @@ static int txtindexmk_loadcalls(TIM *op,cchar *soname) noex {
 	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
 	    if ((rs = sncpy(sbuf,slen,soname,"_",subs[i])) >= 0) {
 	        if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
-	            txtindexmk_calls	*callp = callsp(op->callp) ;
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:

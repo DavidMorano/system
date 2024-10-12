@@ -117,15 +117,15 @@ static int txtindex_ctor(txtindex *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous! */
-	    if ((op->loaderp = new(nothrow) modload) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) {
 		txtindex_calls	*callp ;
 	        if ((callp = new(nothrow) txtindex_calls) != np) {
 		    op->callp = callp ;
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
-		    delete op->loaderp ;
-		    op->loaderp = nullptr ;
+		    delete op->mlp ;
+		    op->mlp = nullptr ;
 		}
 	    } /* end new (new-modload) */
 	} /* end if (non-null) */
@@ -142,9 +142,9 @@ static int txtindex_dtor(txtindex *op) noex {
 		delete callp ;
 		op->callp = nullptr ;
 	    }
-	    if (op->loaderp) {
-		delete op->loaderp ;
-		op->loaderp = nullptr ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -403,7 +403,7 @@ int txtindex_curenum(txtindex *op,txtindex_cur *curp,txtindex_tag *tagp) noex {
 /* private subroutines */
 
 static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objname) noex {
-	modload		*lp = op->loaderp ;
+	modload		*lp = op->mlp ;
 	vecstr		syms ;
 	cint		vn = nelem(subs) ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -468,7 +468,7 @@ static int txtindex_objloadend(txtindex *op) noex {
 	    op->obj = nullptr ;
 	}
 	{
-	    rs1 = modload_close(op->loaderp) ;
+	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -476,7 +476,8 @@ static int txtindex_objloadend(txtindex *op) noex {
 /* end subroutine (txtindex_objloadend) */
 
 static int txtindex_loadcalls(txtindex *op,cchar *objname) noex {
-	modload		*lp = op->loaderp ;
+	modload		*lp = op->mlp ;
+	txtindex_calls	*callp = callsp(op->callp) ;
 	cint		slen = SYMNAMELEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -485,7 +486,6 @@ static int txtindex_loadcalls(txtindex *op,cchar *objname) noex {
 	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
 	    if ((rs = sncpy(sbuf,slen,objname,"_",subs[i])) >= 0) {
 		if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
-	            txtindex_calls	*callp = callsp(op->callp) ;
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:

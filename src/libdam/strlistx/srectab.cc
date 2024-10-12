@@ -1,4 +1,4 @@
-/* rectab SUPPORT */
+/* srectab SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	rectab
+	srectab
 
 	Description:
 	Record-Table.
@@ -56,7 +56,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>		/* |MODP2(3dam)| */
 
-#include	"rectab.h"
+#include	"srectab.h"
 
 
 /* local defines */
@@ -94,7 +94,7 @@ using std::nothrow ;			/* constant */
 
 /* exported subroutines */
 
-int rectab_start(rectab *rtp,int n) noex {
+int srectab_start(srectab *rtp,int n) noex {
 	int		rs = SR_OK ;
 	int		sz ;
 	void		*vp ;
@@ -109,9 +109,9 @@ int rectab_start(rectab *rtp,int n) noex {
 	}
 	return rs ;
 }
-/* end subroutine (rectab_start) */
+/* end subroutine (srectab_start) */
 
-int rectab_finish(rectab *rtp) noex {
+int srectab_finish(srectab *rtp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (rtp->rt) {
@@ -121,13 +121,13 @@ int rectab_finish(rectab *rtp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (rectab_finish) */
+/* end subroutine (srectab_finish) */
 
-int rectab_add(rectab *rtp,uint ki) noex {
+int srectab_add(srectab *rtp,uint ki) noex {
 	int		rs = SR_OK ;
 	int		i = rtp->i ;
 	if ((i + 1) > rtp->n) {
-	    rs = rectab_extend(rtp) ;
+	    rs = srectab_extend(rtp) ;
 	}
 	if (rs >= 0) {
 	    rtp->rt[i] = ki ;
@@ -135,9 +135,9 @@ int rectab_add(rectab *rtp,uint ki) noex {
 	}
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (rectab_add) */
+/* end subroutine (srectab_add) */
 
-int rectab_extend(rectab *rtp) noex {
+int srectab_extend(srectab *rtp) noex {
 	int		nn = (rtp->n * 2) ;
 	int		rs = SR_OK ;
 	if ((rtp->i + 1) > rtp->n) {
@@ -150,24 +150,24 @@ int rectab_extend(rectab *rtp) noex {
 	} /* end if */
 	return rs ;
 }
-/* end subroutine (rectab_extend) */
+/* end subroutine (srectab_extend) */
 
-int rectab_done(rectab *rtp) noex {
+int srectab_done(srectab *rtp) noex {
 	int		i = rtp->i ;
 	rtp->rt[i] = UINT_MAX ;
 	return i ;
 }
-/* end subroutine (rectab_done) */
+/* end subroutine (srectab_done) */
 
-int rectab_count(rectab *rtp) noex {
+int srectab_count(srectab *rtp) noex {
 	return rtp->i ;
 }
-/* end subroutine (rectab_count) */
+/* end subroutine (srectab_count) */
 
-int rectab_getvec(rectab *rtp,uint **rpp) noex {
+int srectab_getvec(srectab *rtp,uint **rpp) noex {
 	*rpp = rtp->rt ;
 	return rtp->i ;
 }
-/* end subroutine (rectab_getvec) */
+/* end subroutine (srectab_getvec) */
 
 

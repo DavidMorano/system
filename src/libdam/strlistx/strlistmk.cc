@@ -47,6 +47,7 @@
 /* local defines */
 
 #define	SLM		strlistmk
+#define	SLM_CA		strlistmk_calls
 
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	60
@@ -62,11 +63,11 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*open_f)(void *,cchar *,cchar *,int,mode_t,int) noex ;
-    typedef int (*add_f)(void *,cchar *,int) noex ;
-    typedef int (*abort_f)(void *) noex ;
-    typedef int (*chgrp_f)(void *,gid_t) noex ;
-    typedef int (*close_f)(void *) noex ;
+    typedef int (*soopen_f)(void *,cchar *,cchar *,int,mode_t,int) noex ;
+    typedef int (*soadd_f)(void *,cchar *,int) noex ;
+    typedef int (*soabort_f)(void *) noex ;
+    typedef int (*sochgrp_f)(void *,gid_t) noex ;
+    typedef int (*soclose_f)(void *) noex ;
 }
 
 typedef mode_t		om_t ;
@@ -79,6 +80,16 @@ typedef mode_t		om_t ;
 
 
 /* local structures */
+
+struct strlistmk_calls {
+	soopen_f	open ;
+	sochgrp_f	chgrp ;
+	soadd_f		add ;
+	soabort_f	abort ;
+	soclose_f	close ;
+} ;
+
+typedef strlistmk_calls *	callsp ;
 
 
 /* forward references */
@@ -162,9 +173,10 @@ int strlistmk_open(SLM *op,cc *pr,cc *dbn,cc *lfn,int of,om_t om,int n) noex {
 	if ((rs = strlistmk_ctor(op,pr,dbn,lfn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dbn[0] && lfn[0]) {
+		strlistmk_calls		*callp = callsp(op->callp) ;
 	        if ((rs = strlistmk_objloadbegin(op,pr,objn)) >= 0) {
-		    auto	ofun = op->call.open ;
-	            if ((rs = ofun(op->obj,dbn,lfn,of,om,n)) >= 0) {
+		    auto	co = callp->open ;
+	            if ((rs = co(op->obj,dbn,lfn,of,om,n)) >= 0) {
 		        op->magic = STRLISTMK_MAGIC ;
 	            }
 	            if (rs < 0) {
@@ -184,8 +196,10 @@ int strlistmk_close(SLM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = strlistmk_magic(op)) >= 0) {
-	    {
-	        rs1 = (*op->call.close)(op->obj) ;
+	    strlistmk_calls		*callp = callsp(op->callp) ;
+	    if (callp->close) {
+		auto co = callp->close ;
+	        rs1 = co(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -205,7 +219,11 @@ int strlistmk_close(SLM *op) noex {
 int strlistmk_add(SLM *op,cc *sp,int sl) noex {
 	int		rs ;
 	if ((rs = strlistmk_magic(op,sp)) >= 0) {
-	    rs = (*op->call.add)(op->obj,sp,sl) ;
+	    strlistmk_calls		*callp = callsp(op->callp) ;
+	    if (callp->add) {
+		auto co = callp->add ;
+	        rs = co(op->obj,sp,sl) ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -214,8 +232,10 @@ int strlistmk_add(SLM *op,cc *sp,int sl) noex {
 int strlistmk_abort(SLM *op) noex {
 	int		rs ;
 	if ((rs = strlistmk_magic(op)) >= 0) {
-	    if (op->call.abort) {
-	        rs = (*op->call.abort)(op->obj) ;
+	    strlistmk_calls		*callp = callsp(op->callp) ;
+	    if (callp->abort) {
+		auto co = callp->abort ;
+	        rs = co(op->obj) ;
 	    } else {
 		rs = SR_NOSYS ;
 	    }
@@ -227,8 +247,10 @@ int strlistmk_abort(SLM *op) noex {
 int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 	int		rs ;
 	if ((rs = strlistmk_magic(op)) >= 0) {
-	    if (op->call.chgrp) {
-	        rs = (*op->call.chgrp)(op->obj,gid) ;
+	    strlistmk_calls		*callp = callsp(op->callp) ;
+	    if (callp->chgrp) {
+		auto co = callp->chgrp ;
+	        rs = co(op->obj,gid) ;
 	    } else {
 		rs = SR_NOSYS ;
 	    }
@@ -241,16 +263,14 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 /* private subroutines */
 
 static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
-	vecstr		syms ;
 	modload		*lp = op->mlp ;
 	int		rs ;
 	int		rs1 ;
 	cint		ne = sub_overlast ;
 	int		vo = VECSTR_OCOMPACT ;
-	if ((rs = vecstr_start(&syms,ne,vo)) >= 0) {
+	if (vecstr syms ; (rs = vecstr_start(&syms,ne,vo)) >= 0) {
 	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
-                mainv       sv ;
-                if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
+                if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
                     cchar	*modbn = STRLISTMK_MODBNAME ;
                     int		mo = 0 ;
                     mo |= MODLOAD_OLIBVAR ;
@@ -301,32 +321,32 @@ static int strlistmk_objloadend(SLM *op) noex {
 
 static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 	modload		*lp = op->mlp ;
+	strlistmk_calls	*callp = callsp(op->callp) ;
+	cint		slen = SYMNAMELEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
+	char		sbuf[SYMNAMELEN + 1] ;
 	for (int i = 0 ; (rs >= SR_OK) && subs[i] ; i += 1) {
-	    cint	slen = SYMNAMELEN ;
-	    char	sbuf[SYMNAMELEN + 1] ;
 	    cchar	*sn = subs[i] ;
 	    if ((rs = sncpy(sbuf,slen,soname,"_",sn)) >= 0) {
-		cvoid	*snp ;
-	        if ((rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
+		if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:
-		        op->call.open = open_f(snp) ;
+		        callp->open = soopen_f(snp) ;
 		        break ;
 		    case sub_add:
-		        op->call.add = add_f(snp) ;
+		        callp->add = soadd_f(snp) ;
 		        break ;
 		    case sub_abort:
-		        op->call.abort = abort_f(snp) ;
+		        callp->abort = soabort_f(snp) ;
 		        break ;
 		    case sub_chgrp:
-		        op->call.chgrp = chgrp_f(snp) ;
+		        callp->chgrp = sochgrp_f(snp) ;
 		        break ;
 		    case sub_close:
-		        op->call.close = close_f(snp) ;
+		        callp->close = soclose_f(snp) ;
 		        break ;
 		    } /* end switch */
 	        } else if ((rs == rsn) && (! isrequired(i))) {
