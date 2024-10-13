@@ -42,9 +42,9 @@ struct sysvar_flags {
 } ;
 
 struct sysvar_head {
-	void		*obj ;			/* object pointer */
+	modload		*mlp ;			/* mod-load-pointer */
 	void		*callp ;		/* call-struct pointer */
-	modload		*loaderp ;		/* loader-pointer */
+	void		*obj ;			/* object pointer */
 	vecstr		*dlp ;			/* default-list-pointer */
 	SYSVAR_FL	f ;
 	uint		magic ;
