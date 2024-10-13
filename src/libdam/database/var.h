@@ -91,7 +91,7 @@ extern int	var_curbegin(var *,var_cur *) noex ;
 extern int	var_fetch(var *,cchar *,int,var_cur *,char *,int) noex ;
 extern int	var_enum(var *,var_cur *,char *,int,char *,int) noex ;
 extern int	var_curend(var *,var_cur *) noex ;
-extern int	var_info(var *,var_info *) noex ;
+extern int	var_getinfo(var *,var_info *) noex ;
 extern int	var_audit(var *) noex ;
 extern int	var_close(var *) noex ;
 

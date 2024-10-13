@@ -36,7 +36,7 @@ struct sysvars_object {
 } ;
 
 struct sysvars_cursor {
-	var_cir		vcur ;
+	var_cur		vcur ;
 } ;
 
 struct sysvars_flags {
