@@ -1,4 +1,6 @@
-/* babycalc */
+/* babycalc HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -15,8 +17,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<time.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

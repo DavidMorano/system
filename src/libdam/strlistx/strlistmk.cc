@@ -47,11 +47,6 @@
 /* local defines */
 
 #define	SLM		strlistmk
-#define	SLM_CA		strlistmk_calls
-
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
 
 
 /* imported namespaces */
@@ -279,9 +274,9 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    if ((rs = vecstr_addsyms(&syms,objn,subs)) >= 0) {
-                if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+                if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
                     cchar	*modbn = STRLISTMK_MODBNAME ;
                     int		mo = 0 ;
                     mo |= MODLOAD_OLIBVAR ;
@@ -308,7 +303,7 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                     } /* end if (modload-open) */
 		} /* end if (vecstr_getvec) */
             } /* end if (vecstr_addsyms) */
-	    rs1 = vecstr_finish(&syms) ;
+	    rs1 = syms.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
@@ -327,7 +322,8 @@ static int strlistmk_objloadend(SLM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	if (op->mlp) {
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}

@@ -1,4 +1,5 @@
 /* txtindexmk HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface to the TXTINDEXMKS loadable object */

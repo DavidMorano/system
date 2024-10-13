@@ -1,4 +1,5 @@
 /* bvshdr HEADER (Bible Verse Structure) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* index for Bible-Verse-Structure (BVS) file */

@@ -1,4 +1,5 @@
 /* vars HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* read or audit a VAR database */
@@ -19,11 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<varhdr.h>		/* <- the money shot */
-#include	<localmisc.h>
 
 
 #define	VARS_MAGIC	0x88773421

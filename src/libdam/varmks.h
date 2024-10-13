@@ -1,4 +1,5 @@
 /* varmks HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -8,10 +9,13 @@
 #define	VARMKS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<strtab.h>
-#include	<localmisc.h>
 
 
 #define	VARMKS		struct varmks_head

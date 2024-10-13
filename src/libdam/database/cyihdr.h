@@ -1,4 +1,5 @@
 /* cyihdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* text-index for CYI-INDEX file */

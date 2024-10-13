@@ -1,4 +1,5 @@
 /* cmihdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* index for Commandment-entry file */

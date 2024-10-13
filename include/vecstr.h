@@ -150,8 +150,10 @@ struct vecstr : vecstr_head {
 	int start(int = 0,int = 0) noex ;
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
+	int addsyms(cchar *,mainv) noex ;
 	int insert(int,cchar *,int = -1) noex ;
 	int get(int,cchar **) noex ;
+	int getvec(mainv *) noex ;
 	int del(int = -1) noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;

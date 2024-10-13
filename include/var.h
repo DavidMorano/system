@@ -1,4 +1,5 @@
 /* var HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* VAR management */
@@ -19,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
 #include	"vars.h"
 

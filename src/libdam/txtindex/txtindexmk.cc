@@ -1,4 +1,5 @@
 /* txtindexmk SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface to the TIMS loadable object */
@@ -61,10 +62,6 @@
 #define	TIM_ENTS	txtindexmk_ents
 
 #define	VARPRNAME	"LOCAL"
-
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
 
 
 /* imported namespaces */
@@ -338,9 +335,9 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    if ((rs = vecstr_addsyms(&syms,objn,subs)) >= 0) {
-		if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = TIM_MODBNAME ;
 		    int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
@@ -367,7 +364,7 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
-	    rs1 = vecstr_finish(&syms) ;
+	    rs1 = syms.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
@@ -386,7 +383,8 @@ static int txtindexmk_objloadend(TIM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	if (op->mlp) {
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}

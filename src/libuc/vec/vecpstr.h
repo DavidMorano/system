@@ -78,7 +78,106 @@ struct vecpstr_head {
 	int		stsize ;	/* string table size */
 } ; /* end struct (vecpstr_head) */
 
-typedef VECPSTR		vecpstr ;
+#ifdef	__cplusplus
+enum vecpstrmems {
+	vecpstrmem_count,
+	vecpstrmem_delall,
+	vecpstrmem_strsize,
+	vecpstrmem_recsize,
+	vecpstrmem_audit,
+	vecpstrmem_finish,
+	vecpstrmem_overlast
+} ;
+struct vecpstr_iter {
+	cchar		**va = nullptr ;
+	int		i = -1 ;
+	int		ii = -1 ;
+	vecpstr_iter() = default ;
+	vecpstr_iter(cchar **ov,int oi,int oii) noex : va(ov), i(oi) {
+	    ii = oii ;
+	} ;
+	vecpstr_iter(const vecpstr_iter &oit) noex {
+	    if (this != &oit) {
+		va = oit.va ;
+		i = oit.i ;
+		ii = oit.ii ;
+	    }
+	} ;
+	vecpstr_iter &operator = (const vecpstr_iter &oit) noex {
+	    if (this != &oit) {
+		va = oit.va ;
+		i = oit.i ;
+		ii = oit.ii ;
+	    }
+	    return *this ;
+	} ;
+	bool operator != (const vecpstr_iter &) noex ;
+	bool operator == (const vecpstr_iter &) noex ;
+	cchar *operator * () noex {
+	    cchar	*rp = nullptr ;
+	    if (i < ii) rp = va[i] ;
+	    return rp ;
+	} ;
+	vecpstr_iter operator + (int) const noex ;
+	vecpstr_iter operator += (int) noex ;
+	vecpstr_iter operator ++ () noex ; /* pre */
+	vecpstr_iter operator ++ (int) noex ; /* post */
+	void increment(int = 1) noex ;
+} ; /* end struct vecpstr_iter) */
+struct vecpstr ;
+struct vecpstr_co {
+	vecpstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecpstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (vecpstr_co) */
+struct vecpstr : vecpstr_head {
+	vecpstr_co	count ;
+	vecpstr_co	delall ;
+	vecpstr_co	strsize ;
+	vecpstr_co	recsize ;
+	vecpstr_co	audit ;
+	vecpstr_co	finish ;
+	vecpstr() noex {
+	    count(this,vecpstrmem_count) ;
+	    delall(this,vecpstrmem_delall) ;
+	    strsize(this,vecpstrmem_strsize) ;
+	    recsize(this,vecpstrmem_recsize) ;
+	    audit(this,vecpstrmem_audit) ;
+	    finish(this,vecpstrmem_finish) ;
+	} ;
+	vecpstr(const vecpstr &) = delete ;
+	vecpstr &operator = (const vecpstr &) = delete ;
+	int start(int = 0,int = 0,int = 0) noex ;
+	int add(cchar *,int = -1) noex ;
+	int adduniq(cchar *,int = -1) noex ;
+	int addsyms(cchar *,mainv) noex ;
+	int get(int,cchar **) noex ;
+	int getvec(mainv *) noex ;
+	int del(int = -1) noex ;
+	vecpstr_iter begin() noex {
+	    vecpstr_iter		it(va,0,i) ;
+	    return it ;
+	} ;
+	vecpstr_iter end() noex {
+	    vecpstr_iter		it(va,i,i) ;
+	    return it ;
+	} ;
+	void dtor() noex ;
+	~vecpstr() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (vecpstr) */
+#else	/* __cplusplus */
+typedef VECSTR		vecpstr ;
+#endif /* __cplusplus */
+
 typedef VECPSTR_CH	vecpstr_ch ;
 
 EXTERNC_begin

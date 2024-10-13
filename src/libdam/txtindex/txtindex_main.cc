@@ -1,4 +1,5 @@
 /* txtindex_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface to the TXTINDEXES loadable object */
@@ -46,10 +47,6 @@
 
 #define	TXTINDEX_MODBNAME	"txtindexes"
 #define	TXTINDEX_OBJNAME	"txtindexes"
-
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
 
 #undef	TIS_CUR
 #define	TIS_CUR			TXTINDEXES_CUR
@@ -408,9 +405,9 @@ static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    if ((rs = vecstr_addsyms(&syms,objn,subs)) >= 0) {
-		if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*modbname = TXTINDEX_MODBNAME ;
 	            int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
@@ -438,7 +435,7 @@ static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	            } /* end if (modload_open) */
 		} /* end it (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
-	    rs1 = vecstr_finish(&syms) ;
+	    rs1 = syms.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
@@ -457,7 +454,8 @@ static int txtindex_objloadend(txtindex *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	if (op->mlp) {
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
