@@ -19,8 +19,7 @@
 #include	<usysrets.h>
 #include	<vecstr.h>
 #include	<modload.h>
-
-#include	"sysvars.h"
+#include	<sysvars.h>
 
 
 #define	SYSVAR_MAGIC	0x99447243

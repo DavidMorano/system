@@ -17,8 +17,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-
-#include	"var.h"
+#include	<var.h>
 
 
 #define	SYSVARS		struct sysvars_head
