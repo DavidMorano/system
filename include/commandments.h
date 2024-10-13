@@ -22,9 +22,10 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	"cmi.h"
+#include	<cmi.h>
 
 
 #define	COMMANDMENTS_MAGIC	0x99447248
@@ -67,8 +68,6 @@ struct commandments_flags {
 } ;
 
 struct commandments_head {
-	uint		magic ;
-	COMMANDMENTS_FL	f ;
 	CMI		idx ;
 	void		*a ;
 	cchar		*pr ;
@@ -84,16 +83,18 @@ struct commandments_head {
 	uid_t		uid ;
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
+	COMMANDMENTS_FL	f ;
+	uint		magic ;
 	int		ncursors ;
 	int		nents ;
 	int		maxent ;
 } ;
 
 typedef	COMMANDMENTS		commandments ;
+typedef	COMMANDMENTS_FL		commandments_fl ;
 typedef	COMMANDMENTS_INFO	commandments_info ;
 typedef	COMMANDMENTS_CUR	commandments_cur ;
 typedef	COMMANDMENTS_ENT	commandments_ent ;
-typedef	COMMANDMENTS_FL		commandments_fl ;
 typedef	COMMANDMENTS_OBJ	commandments_obj ;
 
 EXTERNC_begin

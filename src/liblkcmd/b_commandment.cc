@@ -1,14 +1,14 @@
-/* b_commandment */
+/* b_commandment SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* translate a commandment number to its corresponding entry (string) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_COOKIE	0		/* use cookie as separator */
-
 
 /* revision history:
 
@@ -21,16 +21,18 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Name:
+	b_commandment
+
+	Description:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ commandment <num(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -409,7 +411,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -573,7 +575,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1165,7 +1167,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,int f_apm)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1294,8 +1296,8 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 #endif
 
 	    if (rs >= 0) {
-	        const int	ni = lip->nitems ;
-	        const int	clen = COMBUFLEN ;
+	        cint	ni = lip->nitems ;
+	        cint	clen = COMBUFLEN ;
 	        int		j ;
 	        char		cbuf[COMBUFLEN + 1] ;
 	        for (j = 0 ; (rs >= 0) && (j < ni) ; j += 1) {
@@ -1366,14 +1368,14 @@ static int procstrings(PROGINFO *pip,cchar *sp,int sl)
 
 		if ((rs = commandment_curbegin(cmdp,&cur)) >= 0) {
 	            uint	cn ;
-	            const int	clen = COMBUFLEN ;
-		    const int	n = (lip->max > 0) ? (lip->max+1) : NDBENTS ;
+	            cint	clen = COMBUFLEN ;
+		    cint	n = (lip->max > 0) ? (lip->max+1) : NDBENTS ;
 		    int		c = 0 ;
 	            int		cbl ;
 	            char	cbuf[COMBUFLEN + 1] ;
 		    while (rs >= 0) {
 
-	                cbl = commandment_enum(cmdp,&cur,&cn,cbuf,clen) ;
+	                cbl = commandment_curenum(cmdp,&cur,&cn,cbuf,clen) ;
 	                if (cbl == SR_NOTFOUND) break ;
 	                rs = cbl ;
 	                if (rs < 0) break ;
@@ -1417,34 +1419,22 @@ static int procall(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	COMMANDMENT	*cmdp = &lip->cdb ;
 	COMMANDMENT_CUR	cur ;
-	const int	clen = COMBUFLEN ;
+	cint	clen = COMBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cbl ;
 	int		wlen = 0 ;
 	char		cbuf[COMBUFLEN + 1] ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("b_commandment/procall: ent\n") ;
-	    debugprintf("b_commandment/procall: max=%d\n",lip->max) ;
-	}
-#endif
-
 	if ((rs = commandment_curbegin(cmdp,&cur)) >= 0) {
 	    uint	cn ;
-	    const int	n = (lip->max > 0) ? (lip->max+1) : NDBENTS ;
+	    cint	n = (lip->max > 0) ? (lip->max+1) : NDBENTS ;
 	    int		c = 0 ;
 	    while (rs >= 0) {
 
-	        cbl = commandment_enum(&lip->cdb,&cur,&cn,cbuf,clen) ;
+	        cbl = commandment_curenum(&lip->cdb,&cur,&cn,cbuf,clen) ;
 	        if (cbl == SR_NOTFOUND) break ;
 	        rs = cbl ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("b_commandment/procall: cn=%u\n",cn) ;
-#endif
 
 	        if ((rs >= 0) && (cn != 0)) {
 	            rs = procout(pip,cn,cbuf,cbl) ;
@@ -1459,20 +1449,15 @@ static int procall(PROGINFO *pip)
 	    rs1 = commandment_curend(cmdp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (commandment-cur) */
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_commandment/procall: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end if (procall) */
 
-
 static int procout(PROGINFO *pip,uint n,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	clen = COLBUFLEN ;
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cbl ;
@@ -1580,7 +1565,7 @@ static int loadprecision(PROGINFO *pip)
 #endif
 
 	if (lip->max < 0) {
-	    const int	nrs = SR_NOSYS ;
+	    cint	nrs = SR_NOSYS ;
 	    lip->max = 0 ;
 	    if ((rs = commandment_max(&lip->cdb)) == nrs) {
 	        if ((rs = commandment_count(&lip->cdb)) >= 0) {
@@ -1639,10 +1624,8 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_deflinelen(LOCINFO *lip)
-{
-	const int	def = (DEFPRECISION + 2) ;
+static int locinfo_deflinelen(LOCINFO *lip) noex {
+	cint		def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
 	    PROGINFO	*pip = lip->pip ;

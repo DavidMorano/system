@@ -65,7 +65,7 @@ using std::nothrow ;			/* constant */
 	int	(*open)(void *,cchar *,cchar *) noex ;
 	int	(*audit)(void *) noex ;
 	int	(*count)(void *) noex ;
-	int	(*nmax)(void *) noex ;
+	int	(*nummax)(void *) noex ;
 	int	(*read)(void *,char *,int,uint) noex ;
 	int	(*get)(void *,int,char *,int) noex ;
 	int	(*curbegin)(void *,void *) noex ;
@@ -85,7 +85,7 @@ using std::nothrow ;			/* constant */
 	int	(*open)(void *,cchar *,cchar *) noex ;
 	int	(*audit)(void *) noex ;
 	int	(*count)(void *) noex ;
-	int	(*nmax)(void *) noex ;
+	int	(*nummax)(void *) noex ;
 	int	(*read)(void *,char *,int,uint) noex ;
 	int	(*get)(void *,int,char *,int) noex ;
 	int	(*curbegin)(void *,void *) noex ;
@@ -137,7 +137,7 @@ static inline int commandment_magic(commandment *op,Args ... args) noex {
 
 static int	commandment_objloadbegin(commandment *,cchar *,cchar *) noex ;
 static int	commandment_objloadend(commandment *) noex ;
-static int	commandment_loadcalls(commandment *,cchar *) noex ;
+static int	commandment_loadcalls(commandment *,vecstr *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -151,7 +151,7 @@ enum subs {
 	sub_open,
 	sub_audit,
 	sub_count,
-	sub_max,
+	sub_nummax,
 	sub_read,
 	sub_get,
 	sub_curbegin,
@@ -246,17 +246,17 @@ int commandment_count(commandment *op) noex {
 }
 /* end subroutine (commandment_count) */
 
-int commandment_max(commandment *op) noex {
+int commandment_nummax(commandment *op) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op)) >= 0) {
 	    rs = SR_NOSYS ;
-	    if (op->call.nmax) {
-	        rs = (*op->call.nmax)(op->obj) ;
+	    if (op->call.nummax) {
+	        rs = (*op->call.nummax)(op->obj) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (commandment_max) */
+/* end subroutine (commandment_nummax) */
 
 int commandment_read(commandment *op,char *rbuf,int rlen,uint cn) noex {
 	int		rs ;
@@ -427,9 +427,10 @@ static int commandment_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	            mo |= MODLOAD_OAVAIL ;
 	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
-	                if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
+	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
 			    cint	sz = op->objsize ;
 	                    op->objsize = mv[0] ;
+	                    op->cursize = mv[1] ;
 			    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = commandment_loadcalls(op,&syms) ;
@@ -473,66 +474,55 @@ static int commandment_objloadend(commandment *op) noex {
 }
 /* end subroutine (commandment_objloadend) */
 
-static int commandment_loadcalls(commandment *op,cchar *objn) noex {
+static int commandment_loadcalls(SV *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
-	cint		nlen = SYMNAMELEN ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
-	int		i ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		nbuf[SYMNAMELEN + 1] ;
-	cvoid		*snp = nullptr ;
-
-	for (i = 0 ; subs[i] != nullptr ; i += 1) {
-
-	    if ((rs = sncpy3(nbuf,nlen,objn,"_",subs[i])) >= 0) {
-	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = nullptr ;
-		     if (! isrequired(i)) rs = SR_OK ;
-		}
-	    }
-
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
+		    commandment_calls	*callp = callsp(op->callp) ;
+	            c += 1 ;
+		    switch (i) {
+		    case sub_open:
+		        callp->open = soopen_f(snp) ;
+		        break ;
+		    case sub_count:
+		        callp->count = socount_f(snp) ;
+		        break ;
+		    case sub_get:
+		        callp->get = soget_f(snp) ;
+		        break ;
+		    case sub_read:
+		        callp->read = soreadt_f(snp) ;
+		        break ;
+		    case sub_nummax:
+		        callp->nummax = sonummax_f(snp) ;
+		        break ;
+		    case sub_curbegin:
+		        callp->curbegin = socurbegin_f(snp) ;
+		        break ;
+		    case sub_curenum:
+		        callp->curenum = socurenum_f(snp) ;
+		        break ;
+		    case sub_curend:
+		        callp->curend = socurend_f(snp) ;
+		        break ;
+		    case sub_audit:
+		        callp->audit = soaudit_f(snp) ;
+		        break ;
+		    case sub_close:
+		        callp->close = soclose_f(snp) ;
+		        break ;
+		    } /* end switch */
+		} else if (rs == rsn) {
+	            if (! isrequired(i)) rs = SR_OK ;
+	        } /* end if (it had the call) */
 	    if (rs < 0) break ;
-
-	    if (snp != nullptr) {
-	        c += 1 ;
-		switch (i) {
-		case sub_open:
-		    op->call.open = 
-			(int (*)(void *,cchar *,cchar *)) snp ;
-		    break ;
-		case sub_audit:
-		    op->call.audit = (int (*)(void *)) snp ;
-		    break ;
-		case sub_count:
-		    op->call.count = (int (*)(void *)) snp ;
-		    break ;
-		case sub_max:
-		    op->call.nmax = (int (*)(void *)) snp ;
-		    break ;
-		case sub_read:
-		    op->call.read = (int (*)(void *,char *,int,uint)) snp ;
-		    break ;
-		case sub_get:
-		    op->call.get = (int (*)(void *,int,char *,int)) snp ;
-		    break ;
-		case sub_curbegin:
-		    op->call.curbegin = (int (*)(void *,void *)) snp ;
-		    break ;
-		case sub_curend:
-		    op->call.curend = (int (*)(void *,void *)) snp ;
-		    break ;
-		case sub_curenum:
-		    op->call.enumerate = 
-			(int (*)(void *,void *,void *,char *,int)) snp ;
-		    break ;
-		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
-		    break ;
-		} /* end switch */
-	    } /* end if (it had the call) */
-
-	} /* end for (subs) */
-
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (commandment_loadcalls) */
