@@ -184,9 +184,7 @@ static inline int txtindexmk_magic(txtindexmk *op,Args ... args) noex {
 
 static int	txtindexmk_objloadbegin(TIM *,cchar *,cchar *) noex ;
 static int	txtindexmk_objloadend(TIM *) noex ;
-static int	txtindexmk_loadcalls(TIM *,cchar *) noex ;
-
-static int	vecstr_loadsubs(vecstr *,cc *) noex ;
+static int	txtindexmk_loadcalls(TIM *,vecstr *) noex ;
 
 static int	mkvars() noex ;
 
@@ -341,22 +339,21 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    bool	f_modload = false ;
-	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
+	    if ((rs = vecstr_addsyms(&syms,objn,subs)) >= 0) {
 		if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*mn = TIM_MODBNAME ;
 		    int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
 	            mo |= MODLOAD_OSDIRS ;
 	            if ((rs = modload_open(lp,pr,mn,objn,mo,sv)) >= 0) {
-			f_modload = true ;
+			op->fl.modload = true ;
 	    		if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
 			    cint	sz = op->objsize ;
 			    op->objsize = mv[0] ;
 		            op->cursize = mv[1] ;
 			    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		                op->obj = vp ;
-		                rs = txtindexmk_loadcalls(op,objn) ;
+		                rs = txtindexmk_loadcalls(op,&syms) ;
 		                if (rs < 0) {
 			            uc_free(op->obj) ;
 			            op->obj = nullptr ;
@@ -364,15 +361,16 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 		            } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
-			    f_modload = false ;
+			    op->fl.modload = false ;
 		            modload_close(lp) ;
 			}
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
-	    } /* end if (ok) */
+	    } /* end if (vecstr_addsyms) */
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_modload) {
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
 	        modload_close(lp) ;
 	    }
 	} /* end if (vecstr-syms) */
@@ -396,17 +394,16 @@ static int txtindexmk_objloadend(TIM *op) noex {
 }
 /* end subroutine (txtindexmk_objloadend) */
 
-static int txtindexmk_loadcalls(TIM *op,cchar *sobjn) noex {
+static int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
 	callsp		callp = callsp(op->callp) ;
-	cint		slen = SYMNAMELEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		sbuf[SYMNAMELEN + 1] ;
-	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
-	    if ((rs = sncpy(sbuf,slen,sobjn,"_",subs[i])) >= 0) {
-	        if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:
@@ -431,29 +428,12 @@ static int txtindexmk_loadcalls(TIM *op,cchar *sobjn) noex {
 		} else if (rs == rsn) {
 		     if (! isrequired(i)) rs = SR_OK ;
 	        } /* end if (it had the call) */
-	    } /* end if (sncpy) */
-	} /* end for (subs) */
+	    if (rs < 0) break ;
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexmk_loadcalls) */
-
-static int vecstr_loadsubs(vecstr *vlp,cc *objn) noex {
-	cint		slen = SYMNAMELEN ;
-	cint		ne = sub_overlast ;
-	int		rs = SR_OK ;
-	int		c = 0 ;
-	char		sbuf[SYMNAMELEN + 1] ;
-	for (int i = 0 ; (rs >= 0) && (i < ne) && subs[i] ; i += 1) {
-	    cchar	*sn = subs[i] ;
-            if ((rs = sncpy3(sbuf,slen,objn,"_",sn)) >= 0) {
-		c += 1 ;
-                rs = vecstr_add(vlp,sbuf,rs) ;
-            }
-            if (rs < 0) break ;
-        } /* end for */
-	return rs ;
-}
-/* end subroutine (vecstr_loadsubs) */
 
 static int mkvars() noex {
 	int		rs ;

@@ -1,7 +1,7 @@
-/* vecstr_adds SUPPORT */
+/* vecpstr_addsyms SUPPORT */
 /* lang=C20 */
 
-/* add white-space separated substrings */
+/* add constucted symbols to the object */
 /* version %I% last-modified %G% */
 
 
@@ -17,19 +17,18 @@
 /*******************************************************************************
 
 	Name:
-	vecstr_adds
+	vecpstr_addsyms
 
 	Description:
-	This subroutine adds white-space separated substrings of a
-	given string to the object.
+	Add constucted symbols to the object.
 
 	Synopsis:
-	int vecstr_adds(vecstr *op,cchar *sp,int sl) noex
+	int vecpstr_addsyms(vecpstr *vlp,cc *objn,mainv syms) noe
 
 	Arguments:
 	op		pointer to VECSTR object
-	sp		string to parse for substrings
-	sl		length of string to parse for substrings
+	objn		base-name for constructed symbol
+	syms		array of pointees to particular parts of symbols
 
 	Returns:
 	>=0		number of elements loaded
@@ -43,15 +42,21 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
-#include	"vecstr.h"
+#include	"vecpstr.h"
 
 
 /* local defines */
 
+#define	SYMNAMELEN		REALNAMELEN
+
 
 /* external subroutines */
+
+extern "C" {
+    extern int	vecpstr_addsyms(vecpstr *,cc *,mainv) noex ;
+}
 
 
 /* external variables */
@@ -71,24 +76,20 @@
 
 /* exported subroutines */
 
-int vecstr_adds(vecstr *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+int vecpstr_addsyms(vecpstr *vlp,cc *objn,mainv syms) noex {
+	cint		slen = SYMNAMELEN ;
+	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (op && sp) {
-	    int		wl ;
-	    cchar	*wp ;
-	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    while ((sl > 0) && ((wl = sfnext(sp,sl,&wp)) > 0)) {
-	        c += 1 ;
-	        rs = op->add(wp,wl) ;
-	        sl -= ((wp + wl) - sp) ;
-	        sp = (wp + wl) ;
-	        if (rs < 0) break ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return (rs >= 0) ? c : rs ;
+	char		sbuf[SYMNAMELEN + 1] ;
+	for (int i = 0 ; (rs >= 0) && syms[i] ; i += 1) {
+	    cchar	*sn = syms[i] ;
+            if ((rs = sncpy(sbuf,slen,objn,"_",sn)) >= 0) {
+		c += 1 ;
+                rs = vecpstr_add(vlp,sbuf,rs) ;
+            }
+        } /* end for */
+	return rs ;
 }
-/* end subroutine (vecstr_adds) */
+/* end subroutine (vecpstr_addsymss) */
 
 

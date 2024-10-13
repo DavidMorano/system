@@ -2,7 +2,7 @@
 
 T= vec
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -60,7 +59,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJA_VECSTR= vecstr.o vecstr_env.o vecstr_envfile.o 
 OBJB_VECSTR= vecstr_adduniqs.o vecstr_addpath.o
 OBJC_VECSTR= vecstr_avmkstr.o vecstr_loadfile.o
-OBJD_VECSTR= vecstr_adds.o vecstr_foilcmp.o
+OBJD_VECSTR= vecstr_adds.o vecstr_addsyms.o vecstr_foilcmp.o
 OBJE_VECSTR= vecstr_srvargs.o vecstr_svcargs.o
 OBJF_VECSTR= vecstr_loadgrusers.o vecstr_addsubdirs.o
 
@@ -71,7 +70,7 @@ OBJ_VECSTR+= objd_vecstr.o obje_vecstr.o objf_vecstr.o
 OBJA_VECPSTR= vecpstr.o vecpstr_env.o vecpstr_envfile.o 
 OBJB_VECPSTR= vecpstr_adduniqs.o vecpstr_addpath.o
 OBJC_VECPSTR= vecpstr_avmkstr.o vecpstr_loadfile.o
-OBJD_VECPSTR= vecpstr_adds.o vecpstr_foilcmp.o
+OBJD_VECPSTR= vecpstr_adds.o vecpstr_addsyms.o vecpstr_foilcmp.o
 OBJE_VECPSTR= vecpstr_srvargs.o vecpstr_svcargs.o
 OBJF_VECPSTR= vecpstr_loadgrusers.o vecpstr_addsubdirs.o
 
@@ -124,9 +123,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_VEC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_VEC)
-
-$(T).a:			$(OBJ_VEC)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -209,6 +205,7 @@ vecstr_loadfile.o:	vecstr_loadfile.cc	vecstr.h
 vecstr_loadgrusers.o:	vecstr_loadgrusers.cc	vecstr.h
 vecstr_srvargs.o:	vecstr_srvargs.cc	vecstr.h
 vecstr_svcargs.o:	vecstr_svcargs.cc	vecstr.h
+vecstr_addsyms.o:	vecstr_addsyms.cc	vecstr.h
 
 vecpstr.o:		vecpstr.cc		vecpstr.h
 vecpstr_addpath.o:	vecpstr_addpath.cc	vecpstr.h
@@ -223,6 +220,7 @@ vecpstr_loadfile.o:	vecpstr_loadfile.cc	vecpstr.h
 vecpstr_loadgrusers.o:	vecpstr_loadgrusers.cc	vecpstr.h
 vecpstr_srvargs.o:	vecpstr_srvargs.cc	vecpstr.h
 vecpstr_svcargs.o:	vecpstr_svcargs.cc	vecpstr.h
+vecpstr_addsyms.o:	vecpstr_addsyms.cc	vecpstr.h
 
 vecobj.o:		vecobj.cc		vecobj.h
 vecobj_hsort.o:		vecobj_hsort.cc		vecobj.h

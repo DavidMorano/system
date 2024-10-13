@@ -4,18 +4,21 @@
 lineindex \- create a line index for a text file
 .SH SYNOPSIS
 .\"_
+.so tmac.att
+.\"_
 .B lineindex
-.OP "-af argfile" "" ] [
+.OP -af " argfile" ] [
 .OP -V "" ] [
 .OP -? "" ] [
 .OP -HELP "" ] [
 .OP -D "" ] [
-.OP "-v\fI[=level]\fP" "" ] [
+.OP "\fB-v\fP[=\fIlevel\fP]" "" ] [
 .MW [
 .I file=indexfile ...
 .MW ]
 .\"_
 .\"_ macro to put some text into a Constant Width font
+..
 .de CW		\" puts first arg in CW font.
 \%\&\\$3\f(CW\\$1\fP\&\\$2
 ..
@@ -28,8 +31,8 @@ creates a line-index file for each input file.
 The index file created for each source file contains a list
 of all coded lines in the original file and the file offset
 assciciated with each code line.
-Source line-coded files and the index file that should be created
-for each one are specified as argument operand pairs to the program at
+Source line-coded files and the index file that is to be created
+for each one are specified as operand-pair arguments to the program at
 invocation.  Operand pairs can also be specified with the 
 .MW "-af argfile"
 option specified below.
@@ -151,12 +154,11 @@ Be careful to put at one space between all option key
 letters and the associated
 key letter parameter.
 .\"_
-.SH IMPLEMENTAION
-.\"_
-Dave Morano
-.\"_
 .SH ACKNOWLEDGEMENTS
 .\"_
 .sp
+.\"_
+.SH AUTHOR
+David A.D. Morano
 .\"_
 .\"_

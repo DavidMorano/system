@@ -147,9 +147,7 @@ static inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
 
 static int	strlistmk_objloadbegin(SLM *,cchar *,cchar *) noex ;
 static int	strlistmk_objloadend(SLM *) noex ;
-static int	strlistmk_loadcalls(SLM *,cchar *) noex ;
-
-static int	vecstr_loadsubs(vecstr *,cc *) noex ;
+static int	strlistmk_loadcalls(SLM *,vecstr *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -282,8 +280,7 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    bool	f_modload = false ;
-	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
+	    if ((rs = vecstr_addsyms(&syms,objn,subs)) >= 0) {
                 if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
                     cchar	*modbn = STRLISTMK_MODBNAME ;
                     int		mo = 0 ;
@@ -291,13 +288,13 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                     mo |= MODLOAD_OPRS ;
                     mo |= MODLOAD_OSDIRS ;
                     if ((rs = modload_open(lp,pr,modbn,objn,mo,sv)) >= 0) {
-			f_modload = true ;
+			op->fl.modload = true ;
                         if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
 			    cint	sz = op->objsize ;
                             op->objsize = mv[0] ;
                             if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
                                 op->obj = vp ;
-                                rs = strlistmk_loadcalls(op,objn) ;
+                                rs = strlistmk_loadcalls(op,&syms) ;
                                 if (rs < 0) {
                                     uc_free(op->obj) ;
                                     op->obj = nullptr ;
@@ -305,15 +302,16 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                             } /* end if (memory-allocation) */
                         } /* end if (modload_getmva) */
                         if (rs < 0) {
-			    f_modload = false ;
+			    op->fl.modload = false ;
                             modload_close(lp) ;
                         }
                     } /* end if (modload-open) */
 		} /* end if (vecstr_getvec) */
-            } /* end if (vecstr_loadsubs) */
+            } /* end if (vecstr_addsyms) */
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_modload) {
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
 		modload_close(lp) ;
 	    }
 	} /* end if (vecstr) */
@@ -337,18 +335,16 @@ static int strlistmk_objloadend(SLM *op) noex {
 }
 /* end subroutine (strlistmk_objloadend) */
 
-static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
+static int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
 	strlistmk_calls	*callp = callsp(op->callp) ;
-	cint		slen = SYMNAMELEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		sbuf[SYMNAMELEN + 1] ;
-	for (int i = 0 ; (rs >= SR_OK) && subs[i] ; i += 1) {
-	    cchar	*sn = subs[i] ;
-	    if ((rs = sncpy(sbuf,slen,soname,"_",sn)) >= 0) {
-		if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:
@@ -370,29 +366,12 @@ static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 	        } else if ((rs == rsn) && (! isrequired(i))) {
 	            rs = SR_OK ;
 	        }
-	    } /* end if (sncpy) */
-	} /* end for (subs) */
+	    if (rs < 0) break ;
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (strlistmk_loadcalls) */
-
-static int vecstr_loadsubs(vecstr *vlp,cc *objn) noex {
-	cint		slen = SYMNAMELEN ;
-	cint		ne = sub_overlast ;
-	int		rs = SR_OK ;
-	int		c = 0 ;
-	char		sbuf[SYMNAMELEN + 1] ;
-	for (int i = 0 ; (rs >= 0) && (i < ne) && subs[i] ; i += 1) {
-	    cchar	*sn = subs[i] ;
-            if ((rs = sncpy3(sbuf,slen,objn,"_",sn)) >= 0) {
-		c += 1 ;
-                rs = vecstr_add(vlp,sbuf,rs) ;
-            }
-            if (rs < 0) break ;
-        } /* end for */
-	return rs ;
-}
-/* end subroutine (vecstr_loadsubs) */
 
 static bool isrequired(int i) noex {
 	bool		f = false ;

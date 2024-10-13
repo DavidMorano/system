@@ -19,53 +19,42 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 #include	<commandments.h>
 
 
 #define	COMMANDMENT_MAGIC	0x99447242
 #define	COMMANDMENT		struct commandment_head
-#define	COMMANDMENT_CA		struct commandment_calls
+#define	COMMANDMENT_FL		struct commandment_flags
 #define	COMMANDMENT_CUR		struct commandment_cursor
 
+
+struct commandment_flags {
+        uint		modload:1 ;
+} ;
 
 struct commandment_cursor {
 	void		*scp ;
 	uint		magic ;
 } ;
 
-EXTERNC_begin
-
-struct commandment_calls {
-	int	(*open)(void *,cchar *,cchar *) noex ;
-	int	(*audit)(void *) noex ;
-	int	(*count)(void *) noex ;
-	int	(*nmax)(void *) noex ;
-	int	(*read)(void *,char *,int,uint) noex ;
-	int	(*get)(void *,int,char *,int) noex ;
-	int	(*curbegin)(void *,void *) noex ;
-	int	(*curend)(void *,void *) noex ;
-	int	(*enumerate)(void *,void *,void *,char *,int) noex ;
-	int	(*close)(void *) noex ;
-} ;
-
-EXTERNC_end
-
 struct commandment_head {
-	modload		*lop ;		/* loader-object-pointer */
+	modload		*mlp ;		/* module-load-pointer */
+	void		*callp ;
 	void		*obj ;		/* object pointer */
-	COMMANDMENT_CA	call ;
+	COMMANDMENT_FL	fl ;
 	uint		magic ;
 	int		objsize ;
 	int		cursize ;
 } ;
 
 typedef	COMMANDMENT		commandment ;
-typedef	COMMANDMENT_CA		commandment_ca ;
+typedef	COMMANDMENT_FL		commandment_fl ;
 typedef	COMMANDMENT_CUR		commandment_cur ;
 
 EXTERNC_begin

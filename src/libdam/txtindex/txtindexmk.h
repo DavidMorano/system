@@ -18,7 +18,7 @@
 #define	TXTINDEXMK_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -31,15 +31,21 @@
 
 #define	TXTINDEXMK_MAGIC	0x99447246
 #define	TXTINDEXMK		struct txtindexmk_head
+#define	TXTINDEXMK_FL		struct txtindexmk_flags
 #define	TXTINDEXMK_PA		TXTINDEXMKS_PA
 #define	TXTINDEXMK_TAG		TXTINDEXMKS_TAG
 #define	TXTINDEXMK_KEY		TXTINDEXMKS_KEY
 
 
+struct txtindexmk_flags {
+    	uint		modload:1 ;
+} ;
+
 struct txtindexmk_head {
 	modload		*mlp ;		/* load-object-pointer */
 	void		*callp ;
 	void		*obj ;		/* object pointer */
+	TXTINDEXMK_FL	fl ;
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size (not used here) */
@@ -47,6 +53,7 @@ struct txtindexmk_head {
 } ;
 
 typedef	TXTINDEXMK	txtindexmk ;
+typedef	TXTINDEXMK_FL	txtindexmk_fl ;
 typedef	TXTINDEXMK_PA	txtindexmk_pa ;
 typedef	TXTINDEXMK_TAG	txtindexmk_tag ;
 typedef	TXTINDEXMK_KEY	txtindexmk_key ;

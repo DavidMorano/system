@@ -122,9 +122,8 @@ extern int vecpstr_addpathclean(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_addpath(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_addcspath(vecpstr *) noex ;
 extern int vecpstr_adds(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addsyms(vecpstr *,cchar *,mainv) noex ;
 extern int vecpstr_addsubdirs(vecpstr *,cchar *) noex ;
-extern int vecpstr_loaddirs(vecpstr *,cchar *) noex ;
-extern int vecpstr_adduniqs(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_adduniqs(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_envadd(vecpstr *,cchar *,cchar *,int) noex ;
 extern int vecpstr_envadds(vecpstr *,cchar *,int) noex ;
@@ -136,6 +135,10 @@ extern int vecpstr_loadfile(vecpstr *,int,cchar *) noex ;
 extern int vecpstr_loadgrusers(vecpstr *,gid_t) noex ;
 extern int vecpstr_srvargs(vecpstr *,cchar *) noex ;
 extern int vecpstr_svcargs(vecpstr *,int *,cchar *) noex ;
+
+static inline int vecpstr_loaddirs(vecpstr *op,cchar *newsdname) noex {
+	return vecpstr_addsubdirs(op,newsdname) ;
+}
 
 EXTERNC_end
 
