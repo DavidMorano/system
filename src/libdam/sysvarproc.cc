@@ -5,7 +5,6 @@
 /* Ssytem-Variable-Process */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
 #define	CF_PROCVARFILE	0		/* compile in 'procvarfile' */
 
 /* revision history:
@@ -86,24 +85,24 @@
 /* external subroutines */
 
 #if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(const char *,const char *,int) ;
+extern int	strncasecmp(cchar *,cchar *,int) ;
 #endif
 
-extern int	vecstr_envfile(VECSTR *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
+extern int	vecstr_envfile(VECSTR *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
 extern int	isalnumlatin(int) ;
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* forward references */
 
-static int	procaddvar(HDBSTR *,const char *,int) ;
+static int	procaddvar(HDBSTR *,cchar *,int) ;
 
 #if	CF_PROCVARFILE
-static int	procvarfile(HDBSTR *,const char *) ;
-static int	hasweird(const char *,int) ;
+static int	procvarfile(HDBSTR *,cchar *) ;
+static bool	hasweird(cchar *,int) ;
 #endif
 
 
@@ -122,17 +121,17 @@ static const uchar	fterms[32] = {
 } ;
 #endif /* CF_PROCVARFILE */
 
-static const char	*wstrs[] = {
+static cchar	*wstrs[] = {
 	"TZ",
 	"LANG",
 	"UMASK",
 	"PATH",
-	NULL
+	nullptr
 } ;
 
-static const char	*pstrs[] = {
+static cchar	*pstrs[] = {
 	"LC_",
-	NULL
+	nullptr
 } ;
 
 
@@ -144,8 +143,8 @@ int sysvarprocget(HDBSTR *vlp,cchar fname[])
 	int		rs ;
 	int		rs1 ;
 
-	if (vlp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
+	if (vlp == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if ((rs = vecstr_start(&lvars,10,0)) >= 0) {
 	    int		i ;
@@ -155,9 +154,9 @@ int sysvarprocget(HDBSTR *vlp,cchar fname[])
 	    if ((rs = vecstr_envfile(&lvars,fname)) >= 0) {
 
 	        for (i = 0 ; vecstr_get(&lvars,i,&cp) >= 0 ; i += 1) {
-	            if (cp == NULL) continue ;
+	            if (cp == nullptr) continue ;
 
-	            if ((tp = strchr(cp,'=')) == NULL) continue ;
+	            if ((tp = strchr(cp,'=')) == nullptr) continue ;
 
 	            f = (matstr(wstrs,cp,(tp - cp)) >= 0) ;
 	            f = f || (matpstr(pstrs,10,cp,(tp - cp)) >= 0) ;
@@ -183,14 +182,14 @@ int sysvarprocset(HDBSTR *vlp,cchar dbname[],mode_t om)
 {
 	HDBSTR_CUR	cur ;
 	VARMK		svars ;
-	const int	of = O_CREAT ;
-	const int	n = DEFNVARS ;
+	cint	of = O_CREAT ;
+	cint	n = DEFNVARS ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (vlp == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (vlp == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if ((rs = varmk_open(&svars,dbname,of,om,n)) >= 0) {
 	    int		vl ;
@@ -229,17 +228,17 @@ int sysvarprocset(HDBSTR *vlp,cchar dbname[],mode_t om)
 
 static int procvarfile(vlp,fname)
 HDBSTR		*vlp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
-	const int	to = TO_READ ;
+	cint	to = TO_READ ;
 	int		rs ;
 	int		cl ;
 	int		kl ;
 	int		c = 0 ;
-	const char	*tp, *kp ;
-	const char	*cp ;
+	cchar	*tp, *kp ;
+	cchar	*cp ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -283,8 +282,8 @@ const char	fname[] ;
 	                } /* end if (elimination of 'export') */
 
 	                if ((kl > 0) && (! hasweird(kp,kl))) {
-	                    const int	nrs = SR_NOTFOUND ;
-	                    const void	*n = NULL ;
+	                    cint	nrs = SR_NOTFOUND ;
+	                    const void	*n = nullptr ;
 
 	                    if ((rs = hdbstr_fetch(vlp,kp,kl,n,n)) == nrs) {
 
@@ -318,18 +317,13 @@ const char	fname[] ;
 }
 /* end subroutine (procvarfile) */
 
-
-static int hasweird(cchar *sp,int sl)
-{
-	int		i ;
-	int		f = FALSE ;
-
-	for (i = 0 ; (i != sl) && (sp[i] != '\0') ; i += 1) {
-	    const int	ch = MKCHAR(sp[i]) ;
+static bool hasweird(cchar *sp,int sl) noex {
+	bool		f = false ;
+	for (int i = 0 ; (i != sl) && (sp[i] != '\0') ; i += 1) {
+	    cint	ch = mkchar(sp[i]) ;
 	    f = ((! isalnumlatin(ch)) && (ch != '_')) ;
 	    if (f) break ;
 	} /* end if */
-
 	return f ;
 }
 /* end subroutine (hasweird) */
@@ -342,20 +336,20 @@ static int procaddvar(HDBSTR *vlp,cchar *cp,int cl)
 	int		rs = SR_OK ;
 	int		kl, vl ;
 	int		c = 0 ;
-	const char	*tp ;
-	const char	*kp, *vp ;
+	cchar	*tp ;
+	cchar	*kp, *vp ;
 
 	kp = cp ;
 	kl = cl ;
-	vp = NULL ;
+	vp = nullptr ;
 	vl = 0 ;
-	if ((tp = strnchr(cp,cl,'=')) != NULL) {
+	if ((tp = strnchr(cp,cl,'=')) != nullptr) {
 	    vp = (tp + 1) ;
 	    vl = -1 ;
 	    kl = (tp - cp) ;
 	}
 
-	if ((rs = hdbstr_fetch(vlp,kp,kl,NULL,NULL)) == SR_NOTFOUND) {
+	if ((rs = hdbstr_fetch(vlp,kp,kl,nullptr,nullptr)) == SR_NOTFOUND) {
 	    c += 1 ;
 	    rs = hdbstr_add(vlp,kp,kl,vp,vl) ;
 	}

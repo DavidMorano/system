@@ -51,6 +51,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
@@ -116,6 +117,8 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -157,7 +160,7 @@ static int strlistmks_ctor(strlistmks *op,Args ... args) noex {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
 	    if ((op->stp = new(nothrow) strtab) != np) {
-		if ((op->rtp = new(nothrow) rectab) != np) {
+		if ((op->rtp = new(nothrow) srectab) != np) {
 		    rs = SR_OK ;
 		} /* end if (new-rectab) */
 		if (rs < 0) {
@@ -333,7 +336,7 @@ int strlistmks_addvar(SLM *op,cchar *sp,int sl) noex {
 	if ((rs = strlistmks_magic(op,sp)) >= 0) {
 	    if ((rs = strtab_add(op->stp,sp,sl)) >= 0) {
 	        uint	ki = rs ;
-	        if ((rs = rectab_add(op->rtp,ki)) >= 0) {
+	        if ((rs = srectab_add(op->rtp,ki)) >= 0) {
 	            op->nstrs += 1 ;
 	        }
 	    }
@@ -570,7 +573,7 @@ static int strlistmks_listbegin(SLM *op,int n) noex {
 	cint		sz = (n * STRLISTMKS_SIZEMULT) ;
 	int		rs ;
 	if ((rs = strtab_start(op->stp,sz)) >= 0) {
-	    rs = rectab_start(op->rtp,n) ;
+	    rs = srectab_start(op->rtp,n) ;
 	    if (rs < 0) {
 		strtab_finish(op->stp) ;
 	    }
@@ -583,7 +586,7 @@ static int strlistmks_listend(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->rtp) {
-	    rs1 = rectab_finish(op->rtp) ;
+	    rs1 = srectab_finish(op->rtp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->stp) {
@@ -595,7 +598,7 @@ static int strlistmks_listend(SLM *op) noex {
 /* end subroutine (strlistmks_listend) */
 
 static int strlistmks_mksfile(SLM *op) noex {
-	cint		rtl = rectab_done(op->rtp) ;
+	cint		rtl = srectab_done(op->rtp) ;
 	int		rs = SR_BUGCHECK ;
 	int		nstrs = 0 ;
 	if (rtl == (op->nstrs + 1)) {
@@ -634,7 +637,7 @@ sub_wrsfile::operator int () noex {
 	if ((rs = pagesize) >= 0) {
 	    rectab_t	rt ;
 	    ps = rs ;
-	    if ((rs = rectab_getvec(op->rtp,&rt)) >= 0) {
+	    if ((rs = srectab_getvec(op->rtp,&rt)) >= 0) {
 	        cint	rtl = rs ;
 		if ((rs = mkfile(rt,rtl)) >= 0) {
 	    	    hf.fsize = foff ;
@@ -651,7 +654,7 @@ sub_wrsfile::operator int () noex {
 	    		}
 		    } /* end if (strlisthdr_rd) */
 		} /* end if (mkfile) */
-	    } /* end if (rectab_getvec) */
+	    } /* end if (srectab_getvec) */
 	} /* end if (pagesize) */
 	return rs ;
 }
@@ -744,7 +747,7 @@ int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 	rectab_t	rt ;
 	int		rs ;
 	int		sc = 0 ;
-	if ((rs = rectab_getvec(op->rtp,&rt)) >= 0) {
+	if ((rs = srectab_getvec(op->rtp,&rt)) >= 0) {
 	    VE		ve ;
 	    cint	rtl = rs ;
 	    uint	hi ;
@@ -768,7 +771,7 @@ int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 	    if (sc < 0) {
 	        sc = 0 ;
 	    }
-	} /* end if (rectab_getvec) */
+	} /* end if (srectab_getvec) */
 	return (rs >= 0) ? sc : rs ;
 }
 /* end subroutine (strlistmks_mkind) */

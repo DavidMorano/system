@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Object:
+	strlist
+
 	Description:
 	This subroutine opens and allows for reading or auditing
 	of a STRLIST database (which currently consists of two

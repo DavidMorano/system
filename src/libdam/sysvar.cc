@@ -36,6 +36,10 @@
 #include	<vecstr.h>
 #include	<nulstr.h>
 #include	<sncpyx.h>
+#include	<snwcpy.h>
+#include	<strxcmp.h>
+#include	<matstr.h>
+#include	<vstrkeycmpx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -47,6 +51,7 @@
 #define	SYSVAR_OBJNAME	"varmks"
 #define	SYSVAR_MODBNAME	"varmks"
 
+#define	SV		sysvar
 #define	SV_DC		sysvar_defcur
 #define	SV_CUR		sysvar_cur
 #define	SV_CA		sysvar_calls
@@ -116,7 +121,7 @@ struct sysvar_calls {
     soclose_f		close ;
 } ; /* end struct (sysvar_calls) */
 
-typedef syscar_calls *		callsp ;
+typedef sysvar_calls *		callsp ;
 
 
 /* forward references */
@@ -129,15 +134,15 @@ static int sysvar_ctor(SV *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous! */
-	    if ((op->loaderp = new(nothrow) modload) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) {
 		sysvar_calls	*callp ;
 	        if ((callp = new(nothrow) sysvar_calls) != np) {
 		    op->callp = callp ;
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
-		    delete op->loaderp ;
-		    op->loaderp = nullptr ;
+		    delete op->mlp ;
+		    op->mlp = nullptr ;
 		}
 	    } /* end new (new-modload) */
 	} /* end if (non-null) */
@@ -150,13 +155,13 @@ static int sysvar_dtor(SV *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->callp) {
-		sysvar_calls	*callp = sysvar_callsp(op->callp) ;
+		sysvar_calls	*callp = callsp(op->callp) ;
 		delete callp ;
 		op->callp = nullptr ;
 	    }
-	    if (op->loaderp) {
-		delete op->loaderp ;
-		op->loaderp = nullptr ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -186,6 +191,8 @@ static int	sysvar_deffetch(SV *,cchar *,int,
 			SV_DC *,char *,int) noex ;
 static int	sysvar_defenum(SV *,SV_DC *,
 			char *,int,char *,int) noex ;
+
+static int	vecstr_loadsubs(vecstr *,cc *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -250,11 +257,21 @@ int sysvar_open(SV *op,cchar *pr,cchar *dbname) noex {
 	if ((rs = sysvar_ctor(op,pr)) >= 0) {
 	    int		rs = SR_INVALID ;
 	    if (pr[0]) {
-	        cchar	*objname = SYSVAR_OBJNAME ;
-	        if ((rs = sysvar_objloadbegin(op,pr,objname)) >= 0) {
-	            if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
-	    	        op->magic = SYSVAR_MAGIC ;
-	            }
+	        cchar	*objn = SYSVAR_OBJNAME ;
+	        if ((rs = sysvar_objloadbegin(op,pr,objn)) >= 0) {
+	            sysvar_calls	*callp = callsp(op->callp) ;
+		    if (op->callp) {
+			if (callp->open) {
+			    auto co = callp->open ;
+	                    if ((rs = co(op->obj,pr,dbname)) >= 0) {
+	    	                op->magic = SYSVAR_MAGIC ;
+	            	    }
+		        } else {
+			    rs = SR_NOTOPEN ;
+			}
+		    } else {
+			rs = SR_NOTSOCK ;
+		    }
 	            if (rs < 0) {
 		        sysvar_objloadend(op) ;
 	            }
@@ -280,10 +297,16 @@ int sysvar_close(SV *op) noex {
 	    if (op->f.defaults) {
 	        rs1 = vecstr_finish(op->dlp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } else {
-	        rs = (*op->call.close)(op->obj) ;
-	        rs1 = sysvar_objloadend(op) ;
-	        if (rs >= 0) rs = rs1 ;
+	    } else if (op->callp) {
+	        sysvar_calls	*callp = callsp(op->callp) ;
+		if (callp->close) {
+		    auto co = callp->close ;
+	            rs = co(op->obj) ;
+		}
+		{
+	            rs1 = sysvar_objloadend(op) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
 	    } /* end if */
 	    {
 		rs1 = sysvar_dtor(op) ;
@@ -346,7 +369,7 @@ int sysvar_curbegin(SV *op,sysvar_cur *curp) noex {
 
 int sysvar_curend(SV *op,sysvar_cur *curp) noex {
 	int		rs ;
-	if ((rs = sysvar_magic(op,cur)) >= 0) {
+	if ((rs = sysvar_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == SYSVAR_MAGIC) {
 	        if (op->f.defaults) {
@@ -370,7 +393,8 @@ int sysvar_fetch(SV *op,cchar *kp,int kl,SV_CUR *curp,
 		sysvar_calls	*callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 	        if (op->f.defaults) {
-	            rs = sysvar_deffetch(op,kp,kl,curp->scp,vbuf,vlen) ;
+		    SV_DC	*dcurp = (SV_DC *) curp->scp ;
+	            rs = sysvar_deffetch(op,kp,kl,dcurp,vbuf,vlen) ;
 	        } else if (callp->fetch) {
 		    auto co = callp->fetch ;
 	    	    rs = co(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
@@ -390,7 +414,8 @@ int sysvar_curenum(SV *op,SV_CUR *curp,char *kbuf,int klen,
 		sysvar_calls	*callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 	        if (op->f.defaults) {
-	            rs = sysvar_defenum(op,curp->scp,kbuf,klen,vbuf,vlen) ;
+		    SV_DC	*dcurp = (SV_DC *) curp->scp ;
+	            rs = sysvar_defenum(op,dcurp,kbuf,klen,vbuf,vlen) ;
 	        } else if (callp->curenum) {
 		    auto co = callp->curenum ;
 	            rs = co(op->obj,curp->scp,kbuf,klen,vbuf,vlen) ;
@@ -405,67 +430,50 @@ int sysvar_curenum(SV *op,SV_CUR *curp,char *kbuf,int klen,
 
 /* private subroutines */
 
-static int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objname) noex {
-	modeload	*lp = op->loaderp ;
-	cint		vn = nelem(subs) ;
+static int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
+	modload	*lp = op->mlp ;
+	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    cint	snl = SYMNAMELEN ;
 	    int		f_modload = false ;
-	    cchar	**sv ;
-	    cchar	*on = objname ;
-	    char	snb[SYMNAMELEN + 1] ;
-	    for (int i = 0 ; (subs[i] ; i += 1) {
-	        if (isrequired(i)) {
-	            if ((rs = sncpy3(snb,snl,on,"_",subs[i])) >= 0) {
-	                rs = vecstr_add(&syms,snb,rs) ;
-		    }
-	        }
-	        if (rs < 0) break ;
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
+	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
+	        if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*mn = SYSVAR_MODBNAME ;
-	            cchar	*on = objname ;
+	            cchar	*on = objn ;
 	            int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
 	            mo |= MODLOAD_OPRS ;
 	            mo |= MODLOAD_OSDIRS ;
 	            mo |= MODLOAD_OAVAIL ;
-	            rs = modload_open(lp,pr,mn,on,mo,sv) ;
-		    f_modload = (rs >= 0) ;
-	        } /* end if (getvec) */
-	    } /* end if (ok) */
-
+	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
+		        f_modload = true ;
+	                if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
+			    cint	sz = op->objsize ;
+	                    op->objsize = mv[0] ;
+			    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	                        op->obj = vp ;
+	                        rs = sysvar_loadcalls(op,objn) ;
+	                        if (rs < 0) {
+	                            uc_free(op->obj) ;
+	                            op->obj = nullptr ;
+	                        }
+	                    } /* end if (memory-allocation) */
+	                } /* end if (modload_getmva) */
+	                if (rs < 0) {
+		            f_modload = false ;
+	                    modload_close(lp) ;
+	                }
+	            } /* end if (modload_open) */
+		} /* end if (vecstr_getvec) */
+	    } /* end if (vecstr_loadubs) */
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_modload) {
 		modload_close(lp) ;
 	    }
 	} /* end if (vecstr_start) */
-
-	if (rs >= 0) {
-	    int		mv[2] ;
-	    if ((rs = modload_getmva(lp,mv,1)) >= 0) {
-	        void	*p ;
-	        op->objsize = mv[0] ;
-	        if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
-	            op->obj = p ;
-	            rs = sysvar_loadcalls(op,objname) ;
-	            if (rs < 0) {
-	                uc_free(op->obj) ;
-	                op->obj = nullptr ;
-	            }
-	        } /* end if (memory-allocation) */
-	    } /* end if (modload_getmva) */
-	    if (rs < 0) {
-	        modload_close(lp) ;
-	    }
-	} /* end if (modload_open) */
-
 	return rs ;
 }
 /* end subroutine (sysvar_objloadbegin) */
@@ -478,8 +486,8 @@ static int sysvar_objloadend(SV *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	if (op->loaderp) {{
-	    rs1 = modload_close(op->loaderp) ;
+	if (op->mlp) {
+	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -487,7 +495,7 @@ static int sysvar_objloadend(SV *op) noex {
 /* end subroutine (sysvar_objloadend) */
 
 static int sysvar_loadcalls(SV *op,cchar *soname) noex {
-	modeload	*lp = op->loaderp ;
+	modload		*lp = op->mlp ;
 	cint		slen = SYMNAMELEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -559,13 +567,13 @@ static int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	if (curp->scp) {
-	    if (op->call.curend != nullptr) {
-		sysvar_calls	*callp = callsp(cur->callp) ;
-		{
-		    auto	co = callp->curent ;
+	    if (op->callp) {
+		sysvar_calls	*callp = callsp(op->callp) ;
+		if (callp->curend) {
+		    auto	co = callp->curend ;
 	            rs1 = co(op->obj,curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
-		{
+		}
 		{
 	            rs1 = uc_free(curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -645,7 +653,7 @@ static int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 static int sysvar_defcurend(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (op && curp)
+	if (op && curp) {
 	    if (curp->scp) {
 	    	rs = SR_OK ;
 		{
@@ -664,7 +672,7 @@ static int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	cchar		*key{} 
+	cchar		*key{} ;
 	if (vbuf) vbuf[0] = '\0' ;
 	if (nulstr ns ; (rs = ns.start(kp,kl,&key)) >= 0) {
 	    int		i = (dcp->i >= 0) ? (dcp->i + 1) : 0 ;
@@ -691,7 +699,7 @@ static int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 		}
 	    } /* end if */
 	    rs1 = ns.finish ;
-	   f (rs >= 0) rs = rs1 ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nul-string) */
 	return (rs >= 0) ? vl : rs ;
 }
@@ -735,6 +743,24 @@ static int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (sysvar_defenum) */
+
+static int vecstr_loadsubs(vecstr *vlp,cc *objn) noex {
+	cint		slen = SYMNAMELEN ;
+	cint		ne = sub_overlast ;
+	int		rs = SR_OK ;
+	int		c = 0 ;
+	char		sbuf[SYMNAMELEN + 1] ;
+	for (int i = 0 ; (rs >= 0) && (i < ne) && subs[i] ; i += 1) {
+	    cchar	*sn = subs[i] ;
+            if ((rs = sncpy3(sbuf,slen,objn,"_",sn)) >= 0) {
+		c += 1 ;
+                rs = vecstr_add(vlp,sbuf,rs) ;
+            }
+            if (rs < 0) break ;
+        } /* end for */
+	return rs ;
+}
+/* end subroutine (vecstr_loadsubs) */
 
 static bool isrequired(int i) noex {
 	bool		f = false ;

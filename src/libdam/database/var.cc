@@ -4,8 +4,6 @@
 /* VAR management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
 /* revision history:
 
@@ -19,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	var
+
+	Description:
 	This module implements an interface (a trivial one) that
 	provides access to the VAR object (which is dynamically
 	loaded).
@@ -31,12 +33,19 @@
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getnodename.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
 #include	<endian.h>
+#include	<sncpyx.h>
+#include	<mkpr.h>
+#include	<mkpathx.h>
+#include	<mkfname.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"var.h"
@@ -67,28 +76,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,
-			cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getinetdomain(char *,int,cchar *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -96,13 +85,11 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* forward references */
 
-int		var_opena(VAR *,cchar **) ;
+static int	var_objloadbegin(VAR *,cchar *) noex ;
+static int	var_objloadend(VAR *) noex ;
+static int	var_loadcalls(VAR *,cchar *) noex ;
 
-static int	var_objloadbegin(VAR *,cchar *) ;
-static int	var_objloadend(VAR *) ;
-static int	var_loadcalls(VAR *,cchar *) ;
-
-static int	isrequired(int) ;
+static bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -110,7 +97,7 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static cchar	*subs[] = {
+constexpr cpcchar		subs[] = {
 	"open",
 	"count",
 	"curbegin",
@@ -120,7 +107,7 @@ static cchar	*subs[] = {
 	"info",
 	"audit",
 	"close",
-	NULL
+	nullptr
 } ;
 
 enum subs {
@@ -128,7 +115,7 @@ enum subs {
 	sub_count,
 	sub_curbegin,
 	sub_fetch,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
 	sub_info,
 	sub_audit,
@@ -137,24 +124,21 @@ enum subs {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int var_open(VAR *op,cchar *dbname)
-{
+int var_open(VAR *op,cchar *dbname) noex {
 	int		rs ;
-	cchar	*objname = VAR_OBJNAME ;
+	cchar		*objname = VAR_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("var_open: ent dbname=%s\n",dbname) ;
-#endif
-
-	memset(op,0,sizeof(VAR)) ;
+	memclear(op) ;
 
 	if ((rs = var_objloadbegin(op,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
@@ -164,39 +148,25 @@ int var_open(VAR *op,cchar *dbname)
 		var_objloadend(op) ;
 	} /* end if (objloadbegin) */
 
-#if	CF_DEBUGS
-	debugprintf("var_open: call->open() rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("var_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (var_open) */
 
-
-int var_opena(VAR *op,cchar *narr[])
-{
+int var_opena(VAR *op,cchar **narr) noex {
 	int		rs ;
 	cchar	*objname = VAR_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (narr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (narr == nullptr) return SR_FAULT ;
 
-	if (narr[0] == NULL) return SR_INVALID ;
+	if (narr[0] == nullptr) return SR_INVALID ;
 	if (narr[0][0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("var_opena: ent\n") ;
-#endif
-
-	memset(op,0,sizeof(VAR)) ;
+	memclear(op) ;
 
 	if ((rs = var_objloadbegin(op,objname)) >= 0) {
 	    int	i ;
-	    for (i = 0 ; narr[i] != NULL ; i += 1) {
+	    for (i = 0 ; narr[i] != nullptr ; i += 1) {
 	        rs = (*op->call.open)(op->obj,narr[i]) ;
 	        if ((rs >= 0) || (! isNotPresent(rs))) break ;
 	    } /* end for */
@@ -207,28 +177,17 @@ int var_opena(VAR *op,cchar *narr[])
 		var_objloadend(op) ;
 	} /* end if (objloadbegin) */
 
-#if	CF_DEBUGS
-	debugprintf("var_opena: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (var_opena) */
 
-
-/* free up the entire vector string data structure object */
-int var_close(VAR *op)
-{
+int var_close(VAR *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("var_close: ent\n") ;
-#endif
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -241,20 +200,18 @@ int var_close(VAR *op)
 }
 /* end subroutine (var_close) */
 
-
-int var_info(VAR *op,VAR_INFO *vip)
-{
+int var_getinfo(VAR *op,VAR_INFO *vip) noex {
 	VARS_INFO	vsi ;
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (vip == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (vip == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-	memset(vip,0,sizeof(VAR_INFO)) ;
+	memclear(vip) ;
 
-	if (op->call.info != NULL) {
+	if (op->call.info != nullptr) {
 	    if ((rs = (*op->call.info)(op->obj,&vsi)) >= 0) {
 		vip->wtime = vsi.wtime ;
 		vip->mtime = vsi.mtime ;
@@ -267,16 +224,14 @@ int var_info(VAR *op,VAR_INFO *vip)
 }
 /* end subroutine (var_info) */
 
-
-int var_audit(VAR *op)
-{
+int var_audit(VAR *op) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL) {
+	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
 	}
 
@@ -284,16 +239,14 @@ int var_audit(VAR *op)
 }
 /* end subroutine (var_audit) */
 
-
-int var_count(VAR *op)
-{
+int var_count(VAR *op) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.count != NULL) {
+	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
 	}
 
@@ -301,89 +254,76 @@ int var_count(VAR *op)
 }
 /* end subroutine (var_count) */
 
-
-int var_curbegin(VAR *op,VAR_CUR *curp)
-{
+int var_curbegin(VAR *op,VAR_CUR *curp) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("var_curbegin: ent\n") ;
-#endif
+	memclear(curp) ;
 
-	memset(curp,0,sizeof(VAR_CUR)) ;
-
-	if (op->call.curbegin != NULL) {
-	    void	*p ;
-	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
-		curp->scp = p ;
+	if (op->call.curbegin != nullptr) {
+	    if (void *vp{} ; (rs = uc_malloc(op->cursize,&vp)) >= 0) {
+		curp->scp = vp ;
 	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
 	            curp->magic = VAR_MAGIC ;
 		}
 	        if (rs < 0) {
 	            uc_free(curp->scp) ;
-	            curp->scp = NULL ;
+	            curp->scp = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
-	} else
+	} else {
 	    rs = SR_NOSYS ;
-
-#if	CF_DEBUGS
-	debugprintf("var_curbegin: ret rs=%d\n",rs) ;
-#endif
-
+	}
 	return rs ;
 }
 /* end subroutine (var_curbegin) */
 
-
-int var_curend(VAR *op,VAR_CUR *curp)
-{
+int var_curend(VAR *op,VAR_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->scp != NULL) {
-	    if (op->call.curend != NULL) {
+	if (curp->scp != nullptr) {
+	    if (op->call.curend != nullptr) {
 	        rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
 	        rs = SR_NOSYS ;
 	    }
-	    rs1 = uc_free(curp->scp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    curp->scp = NULL ;
-	} else
+	    {
+	        rs1 = uc_free(curp->scp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        curp->scp = nullptr ;
+	    }
+	} else {
 	    rs = SR_NOANODE ;
+	}
 
 	curp->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (var_curend) */
 
-
-/* fetch a variable by name */
-int var_fetch(VAR *op,cchar *kp,int kl,VAR_CUR *curp,char vbuf[],int vlen)
-{
+int var_fetch(VAR *op,cc *kp,int kl,VAR_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.fetch != NULL) {
+	if (op->call.fetch != nullptr) {
 	    rs = (*op->call.fetch)(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
 	}
 
@@ -391,56 +331,51 @@ int var_fetch(VAR *op,cchar *kp,int kl,VAR_CUR *curp,char vbuf[],int vlen)
 }
 /* end subroutine (var_fetch) */
 
-
-/* enumerate entries */
-int var_enum(VAR *op,VAR_CUR *curp,char kbuf[],int klen,char vbuf[],int vlen)
-{
+int var_curenum(VAR *op,VAR_CUR *curp,char *kbuf,int klen,
+		char *vbuf,int vlen) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (kbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != VAR_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.enumerate != NULL) {
+	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,
 		kbuf,klen,vbuf,vlen) ;
 	}
 
 	return rs ;
 }
-/* end subroutine (var_enum) */
+/* end subroutine (var_curenum) */
 
-
-int varinfo(VARINFO *vip,cchar dbnp[],int dbnl)
-{
-	NULSTR		ns ;
+int varinfo(VARINFO *vip,cchar dbnp[],int dbnl) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar	*np ;
 
-	if (vip == NULL) return SR_FAULT ;
-	if (dbnp == NULL) return SR_FAULT ;
+	if (vip == nullptr) return SR_FAULT ;
+	if (dbnp == nullptr) return SR_FAULT ;
 
 	if (dbnp[0] == '\0') return SR_INVALID ;
 
-	if ((rs = nulstr_start(&ns,dbnp,dbnl,&np)) >= 0) {
+	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&np)) >= 0) {
 	    cchar	*end = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
-	    memset(vip,0,sizeof(VARINFO)) ;
+	    memclear(vip) ;
 
 	    if ((rs = mkfnamesuf2(tmpfname,np,INDSUF,end)) >= 0) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 		if ((rs = u_stat(tmpfname,&sb)) >= 0) {
 		    vip->size = sb.st_size ;
 		    vip->mtime = sb.st_mtime ;
 		}
 	    }
 
-	    rs1 = nulstr_finish(&ns) ;
+	    rs1 = ns.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 
@@ -448,17 +383,15 @@ int varinfo(VARINFO *vip,cchar dbnp[],int dbnl)
 }
 /* end subroutine (varinfo) */
 
-
-int varunlink(cchar dbnp[],int dbnl)
-{
-	NULSTR		ns ;
-	int		rs ;
+int varunlink(cchar *dbnp,int dbnl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	cchar	*np ;
 
-	if (dbnp == NULL) return SR_FAULT ;
+	if (dbnp == nullptr) return SR_FAULT ;
 	if (dbnp[0] == '\0') return SR_INVALID ;
 
-	if ((rs = nulstr_start(&ns,dbnp,dbnl,&np)) >= 0) {
+	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&np)) >= 0) {
 	    cchar	*end = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
@@ -466,7 +399,8 @@ int varunlink(cchar dbnp[],int dbnl)
 		rs = uc_unlink(tmpfname) ;
 	    }
 
-	    nulstr_finish(&ns) ;
+	    rs1 = ns.finish ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 
 	return rs ;
@@ -476,30 +410,24 @@ int varunlink(cchar dbnp[],int dbnl)
 
 /* private subroutines */
 
-
-/* find and load the DB-access object */
-static int var_objloadbegin(VAR *op,cchar *objname)
-{
+static int var_objloadbegin(VAR *op,cchar *objname) noex {
 	MODLOAD		*lp = &op->loader ;
 	int		rs ;
 	char		dn[MAXHOSTNAMELEN+1] ;
-
-	if ((rs = getnodedomain(NULL,dn)) >= 0) {
+	if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	    cchar	*prname = VARPRLOCAL ;
 	    char	pr[MAXPATHLEN+1] ;
 	    if ((rs = mkpr(pr,MAXPATHLEN,prname,dn)) >= 0) {
 		vecstr	syms ;
-	        cint	n = nelem(subs) ;
-		cint	vo = vecstr_OCOMPACT ;
+	        cint	vn = nelem(subs) ;
+		cint	vo = VECSTR_OCOMPACT ;
 
-	        if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
+	        if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
 		    cint	snl = SYMNAMELEN ;
-	            int		i ;
-		    cchar	**sv ;
 		    cchar	*on = objname ;
 		    char	snb[SYMNAMELEN + 1] ;
 
-	            for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	            for (int i = 0 ; (i < vn) && subs[i] ; i += 1) {
 	                if (isrequired(i)) {
 	                    if ((rs = sncpy3(snb,snl,on,"_",subs[i])) >= 0) {
 			        rs = vecstr_add(&syms,snb,rs) ;
@@ -509,7 +437,7 @@ static int var_objloadbegin(VAR *op,cchar *objname)
 	            } /* end for */
         
 	            if (rs >= 0) {
-	                if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
+		        if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	                    cchar	*modbname = VAR_MODBNAME ;
 			    int		mo = 0 ;
 	                    mo |= MODLOAD_OLIBVAR ;
@@ -533,7 +461,7 @@ static int var_objloadbegin(VAR *op,cchar *objname)
 			    rs = var_loadcalls(op,objname) ;
 			    if (rs < 0) {
 	    			uc_free(op->obj) ;
-	    			op->obj = NULL ;
+	    			op->obj = nullptr ;
 			    }
 			} /* end if (memory-allocation) */
 		    } /* end if (modload_getmva) */
@@ -548,16 +476,14 @@ static int var_objloadbegin(VAR *op,cchar *objname)
 }
 /* end subroutine (var_objloadbegin) */
 
-
-static int var_objloadend(VAR *op)
-{
+static int var_objloadend(VAR *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -574,28 +500,20 @@ static int var_loadcalls(VAR *op,cchar *objname) noex {
 	char		symname[SYMNAMELEN + 1] ;
 	cvoid	*snp ;
 
-	for (int i = 0 ; subs[i] != NULL ; i += 1) {
+	for (int i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,symname,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
-	    debugprintf("var_loadcalls: call=%s %c\n",
-		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
-#endif
-
-	    if (snp != NULL) {
-
+	    if (snp != nullptr) {
 	        c += 1 ;
 		switch (i) {
-
 		case sub_open:
 		    op->call.open = 
 			(int (*)(void *,cchar *)) snp ;
@@ -616,7 +534,7 @@ static int var_loadcalls(VAR *op,cchar *objname) noex {
 				snp ;
 		    break ;
 
-		case sub_enum:
+		case sub_curenum:
 		    op->call.enumerate = 
 			(int (*)(void *,void *,char *,int,char *,int)) snp ;
 		    break ;
@@ -643,25 +561,19 @@ static int var_loadcalls(VAR *op,cchar *objname) noex {
 
 	} /* end for (subs) */
 
-#if	CF_DEBUGS
-	debugprintf("var_loadcalls: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (var_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+static bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_curbegin:
-	case sub_enum:
+	case sub_curenum:
 	case sub_curend:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	case sub_fetch:
 	    break ;
