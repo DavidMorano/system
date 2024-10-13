@@ -186,6 +186,8 @@ static int	txtindexmk_objloadbegin(TIM *,cchar *,cchar *) noex ;
 static int	txtindexmk_objloadend(TIM *) noex ;
 static int	txtindexmk_loadcalls(TIM *,cchar *) noex ;
 
+static int	vecstr_loadsubs(vecstr *,cc *) noex ;
+
 static int	mkvars() noex ;
 
 static bool	isrequired(int) noex ;
@@ -256,9 +258,9 @@ int opener::operator () (char *ap) noex {
 	    cchar	*pn = VARPRNAME ;
 	    char	*pbuf = (ap + (var.maxhostlen + 1)) ;
 	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) {
-	        cchar	*objname = TIM_OBJNAME ;
+	        cchar	*objn = TIM_OBJNAME ;
 		cchar	*pr = pbuf ;
-		if ((rs = txtindexmk_objloadbegin(op,pr,objname)) >= 0) {
+		if ((rs = txtindexmk_objloadbegin(op,pr,objn)) >= 0) {
 	    	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    	    if ((rs = (*callp->open)(op->obj,pp,db,of,om)) >= 0) {
 			rv = rs ;
@@ -332,40 +334,29 @@ int txtindexmk_noop(TIM *op) noex {
 
 /* private subroutines */
 
-static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objname) noex {
+static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
-	vecstr		syms ;
-	cint		vn = nelem(subs) ;
+	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    cint	nlen = SYMNAMELEN ;
-	    char	nbuf[SYMNAMELEN + 1] ;
+	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
 	    bool	f_modload = false ;
-	    for (int i = 0 ; subs[i] ; i += 1) {
-	        if (isrequired(i)) {
-	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
-			rs = vecstr_add(&syms,nbuf,rs) ;
-		    }
-		}
-		if (rs < 0) break ;
-	    } /* end for */
-	    if (rs >= 0) {
-		mainv	sv ;
-	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
+	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
+		if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*mn = TIM_MODBNAME ;
-	            cint	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
-	            if ((rs = modload_open(lp,pr,mn,objname,mo,sv)) >= 0) {
-	    		int	mv[2] ;
+		    int		mo = 0 ;
+	            mo |= MODLOAD_OLIBVAR ;
+	            mo |= MODLOAD_OSDIRS ;
+	            if ((rs = modload_open(lp,pr,mn,objn,mo,sv)) >= 0) {
 			f_modload = true ;
-	    		if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-			    void	*vp ;
+	    		if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
+			    cint	sz = op->objsize ;
 			    op->objsize = mv[0] ;
 		            op->cursize = mv[1] ;
-		            if ((rs = uc_malloc(op->objsize,&vp)) >= 0) {
+			    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		                op->obj = vp ;
-		                rs = txtindexmk_loadcalls(op,objname) ;
+		                rs = txtindexmk_loadcalls(op,objn) ;
 		                if (rs < 0) {
 			            uc_free(op->obj) ;
 			            op->obj = nullptr ;
@@ -405,7 +396,7 @@ static int txtindexmk_objloadend(TIM *op) noex {
 }
 /* end subroutine (txtindexmk_objloadend) */
 
-static int txtindexmk_loadcalls(TIM *op,cchar *soname) noex {
+static int txtindexmk_loadcalls(TIM *op,cchar *sobjn) noex {
 	modload		*lp = op->mlp ;
 	callsp		callp = callsp(op->callp) ;
 	cint		slen = SYMNAMELEN ;
@@ -414,7 +405,7 @@ static int txtindexmk_loadcalls(TIM *op,cchar *soname) noex {
 	int		c = 0 ;
 	char		sbuf[SYMNAMELEN + 1] ;
 	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
-	    if ((rs = sncpy(sbuf,slen,soname,"_",subs[i])) >= 0) {
+	    if ((rs = sncpy(sbuf,slen,sobjn,"_",subs[i])) >= 0) {
 	        if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
 	            c += 1 ;
 		    switch (i) {
@@ -445,6 +436,24 @@ static int txtindexmk_loadcalls(TIM *op,cchar *soname) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindexmk_loadcalls) */
+
+static int vecstr_loadsubs(vecstr *vlp,cc *objn) noex {
+	cint		slen = SYMNAMELEN ;
+	cint		ne = sub_overlast ;
+	int		rs = SR_OK ;
+	int		c = 0 ;
+	char		sbuf[SYMNAMELEN + 1] ;
+	for (int i = 0 ; (rs >= 0) && (i < ne) && subs[i] ; i += 1) {
+	    cchar	*sn = subs[i] ;
+            if ((rs = sncpy3(sbuf,slen,objn,"_",sn)) >= 0) {
+		c += 1 ;
+                rs = vecstr_add(vlp,sbuf,rs) ;
+            }
+            if (rs < 0) break ;
+        } /* end for */
+	return rs ;
+}
+/* end subroutine (vecstr_loadsubs) */
 
 static int mkvars() noex {
 	int		rs ;

@@ -102,7 +102,15 @@ static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
 	    if ((op->mlp = new(nothrow) modload) != np) {
-		rs = SR_OK ;
+		strlistmk_calls	*callp ;
+	        if ((callp = new(nothrow) strlistmk_calls) != np) {
+		    op->callp = callp ;
+		    rs = SR_OK ;
+		} /* end if (new-strlistmk_calls) */
+		if (rs < 0) {
+		    delete op->mlp ;
+		    op->mlp = nullptr ;
+		} 
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -113,6 +121,11 @@ static int strlistmk_dtor(strlistmk *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->callp) {
+		strlistmk_calls	*callp = callsp(op->callp) ;
+		delete callp ;
+		op->callp = nullptr ;
+	    }
 	    if (op->mlp) {
 		delete op->mlp ;
 		op->mlp = nullptr ;
@@ -264,11 +277,12 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 
 static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	modload		*lp = op->mlp ;
+	cint		vn = sub_overlast ;
+	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	cint		ne = sub_overlast ;
-	int		vo = VECSTR_OCOMPACT ;
-	if (vecstr syms ; (rs = vecstr_start(&syms,ne,vo)) >= 0) {
+	if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
+	    bool	f_modload = false ;
 	    if ((rs = vecstr_loadsubs(&syms,objn)) >= 0) {
                 if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
                     cchar	*modbn = STRLISTMK_MODBNAME ;
@@ -277,12 +291,12 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                     mo |= MODLOAD_OPRS ;
                     mo |= MODLOAD_OSDIRS ;
                     if ((rs = modload_open(lp,pr,modbn,objn,mo,sv)) >= 0) {
-                        int         mv[2] ;
-                        if ((rs = modload_getmva(lp,mv,1)) >= 0) {
-                            void    *p ;
+			f_modload = true ;
+                        if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
+			    cint	sz = op->objsize ;
                             op->objsize = mv[0] ;
-                            if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
-                                op->obj = p ;
+                            if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+                                op->obj = vp ;
                                 rs = strlistmk_loadcalls(op,objn) ;
                                 if (rs < 0) {
                                     uc_free(op->obj) ;
@@ -291,6 +305,7 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                             } /* end if (memory-allocation) */
                         } /* end if (modload_getmva) */
                         if (rs < 0) {
+			    f_modload = false ;
                             modload_close(lp) ;
                         }
                     } /* end if (modload-open) */
@@ -298,6 +313,9 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
             } /* end if (vecstr_loadsubs) */
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
+	    if ((rs < 0) && f_modload) {
+		modload_close(lp) ;
+	    }
 	} /* end if (vecstr) */
 	return rs ;
 }
@@ -311,7 +329,7 @@ static int strlistmk_objloadend(SLM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	{
+	if (op->mlp) {
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
