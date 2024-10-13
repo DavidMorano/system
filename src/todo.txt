@@ -46,7 +46,6 @@ file		description
 --------------------------------------------------------------------------------
 progsig		total mess
 termtrans	not coded up properly
-sysvar
 sysvars
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)

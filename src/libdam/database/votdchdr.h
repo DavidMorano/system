@@ -1,4 +1,6 @@
 /* votdchdr */
+/* encoding=ISO8859-1 */
+/* lang=C20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */

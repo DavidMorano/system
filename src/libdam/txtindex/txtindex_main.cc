@@ -1,4 +1,5 @@
 /* txtindex_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface to the TXTINDEXES loadable object */
@@ -46,10 +47,6 @@
 
 #define	TXTINDEX_MODBNAME	"txtindexes"
 #define	TXTINDEX_OBJNAME	"txtindexes"
-
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
 
 #undef	TIS_CUR
 #define	TIS_CUR			TXTINDEXES_CUR
@@ -117,15 +114,15 @@ static int txtindex_ctor(txtindex *op,Args ... args) noex {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous! */
-	    if ((op->loaderp = new(nothrow) modload) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) {
 		txtindex_calls	*callp ;
 	        if ((callp = new(nothrow) txtindex_calls) != np) {
 		    op->callp = callp ;
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
-		    delete op->loaderp ;
-		    op->loaderp = nullptr ;
+		    delete op->mlp ;
+		    op->mlp = nullptr ;
 		}
 	    } /* end new (new-modload) */
 	} /* end if (non-null) */
@@ -142,9 +139,9 @@ static int txtindex_dtor(txtindex *op) noex {
 		delete callp ;
 		op->callp = nullptr ;
 	    }
-	    if (op->loaderp) {
-		delete op->loaderp ;
-		op->loaderp = nullptr ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -163,7 +160,7 @@ static inline int txtindex_magic(txtindex *op,Args ... args) noex {
 
 static int	txtindex_objloadbegin(txtindex *,cchar *,cchar *) noex ;
 static int	txtindex_objloadend(txtindex *) noex ;
-static int	txtindex_loadcalls(txtindex *,cchar *) noex ;
+static int	txtindex_loadcalls(txtindex *,vecstr *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -215,8 +212,8 @@ int txtindex_open(txtindex *op,cchar *pr,cchar *dbname) noex {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) {
 		txtindex_calls	*callp = callsp(op->callp) ;
-	        cchar		*objname = TXTINDEX_OBJNAME ;
-	        if ((rs = txtindex_objloadbegin(op,pr,objname)) >= 0) {
+	        cchar		*objn = TXTINDEX_OBJNAME ;
+	        if ((rs = txtindex_objloadbegin(op,pr,objn)) >= 0) {
 		    auto	co = callp->open ;
 	            if ((rs = co(op->obj,dbname)) >= 0) {
 		        op->magic = TXTINDEX_MAGIC ;
@@ -402,59 +399,49 @@ int txtindex_curenum(txtindex *op,txtindex_cur *curp,txtindex_tag *tagp) noex {
 
 /* private subroutines */
 
-static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objname) noex {
-	modload		*lp = op->loaderp ;
-	vecstr		syms ;
-	cint		vn = nelem(subs) ;
+static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
+	modload		*lp = op->mlp ;
+	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
-	    cint	nlen = SYMNAMELEN ;
-	    bool	f_modload = false ;
-	    char	nbuf[SYMNAMELEN + 1] ;
-	    for (int i = 0 ; subs[i] ; i += 1) {
-	        if (isrequired(i)) {
-	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
-			rs = vecstr_add(&syms,nbuf,rs) ;
-		    }
-		}
-		if (rs < 0) break ;
-	    } /* end for */
-	    if (rs >= 0) {
-		mainv	sv ;
-	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*modbname = TXTINDEX_MODBNAME ;
-	            int	mo = (MODLOAD_OLIBVAR | MODLOAD_OPRS | MODLOAD_OSDIRS) ;
-	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
-		    f_modload = (rs >= 0) ;
-		}
-	    } /* end if (ok) */
-	    rs1 = vecstr_finish(&syms) ;
+	            int		mo = 0 ;
+	            mo |= MODLOAD_OLIBVAR ;
+	            mo |= MODLOAD_OPRS ;
+	            mo |= MODLOAD_OSDIRS ;
+	            if ((rs = modload_open(lp,pr,modbname,objn,mo,sv)) >= 0) {
+		        op->fl.modload = true ;
+	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
+		            cint	sz = op->objsize ;
+		            op->objsize = mv[0] ;
+		            op->cursize = mv[1] ;
+		            if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		                op->obj = vp ;
+		                rs = txtindex_loadcalls(op,&syms) ;
+		                if (rs < 0) {
+			            op->obj = nullptr ;
+			            uc_free(op->obj) ;
+		                }
+		            } /* end if (memory-allocation) */
+	                } /* end if (modload_getmva) */
+	                if (rs < 0) {
+		            op->fl.modload = false ;
+		            modload_close(lp) ;
+	                }
+	            } /* end if (modload_open) */
+		} /* end it (vecstr_getvec) */
+	    } /* end if (vecstr_addsyms) */
+	    rs1 = syms.finish ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_modload) {
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
 		modload_close(lp) ;
 	    }
 	} /* end if (vecstr) */
-	if (rs >= 0) {
-	    int		mv[2] ;
-	    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-		void	*vp ;
-		op->objsize = mv[0] ;
-		op->cursize = mv[1] ;
-		if ((rs = uc_malloc(op->objsize,&vp)) >= 0) {
-		    op->obj = vp ;
-		    rs = txtindex_loadcalls(op,objname) ;
-		    if (rs < 0) {
-			uc_free(op->obj) ;
-			op->obj = nullptr ;
-		    }
-		} /* end if (memory-allocation) */
-	    } /* end if (modload_getmva) */
-	    if (rs < 0) {
-		modload_close(lp) ;
-	    }
-	} /* end if (ok) */
 	return rs ;
 }
 /* end subroutine (txtindex_objloadbegin) */
@@ -467,25 +454,25 @@ static int txtindex_objloadend(txtindex *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-	{
-	    rs1 = modload_close(op->loaderp) ;
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
+	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
 }
 /* end subroutine (txtindex_objloadend) */
 
-static int txtindex_loadcalls(txtindex *op,cchar *objname) noex {
-	modload		*lp = op->loaderp ;
-	cint		slen = SYMNAMELEN ;
+static int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
+	modload		*lp = op->mlp ;
+	txtindex_calls	*callp = callsp(op->callp) ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		sbuf[SYMNAMELEN + 1] ;
-	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
-	    if ((rs = sncpy(sbuf,slen,objname,"_",subs[i])) >= 0) {
-		if (cvoid *snp{} ; (rs = modload_getsym(lp,sbuf,&snp)) >= 0) {
-	            txtindex_calls	*callp = callsp(op->callp) ;
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
 	            c += 1 ;
 		    switch (i) {
 		    case sub_open:
@@ -525,8 +512,9 @@ static int txtindex_loadcalls(txtindex *op,cchar *objname) noex {
 		} else if (rs == rsn) {
 		    if (! isrequired(i)) rs = SR_OK ;
 	        } /* end if (it had the call) */
-	    } /* end if (sncpy) */
-	} /* end for (subs) */
+	    if (rs < 0) break ;
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (txtindex_loadcalls) */

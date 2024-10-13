@@ -1,4 +1,5 @@
 /* sysvar HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* SYSVAR management */
@@ -19,8 +20,7 @@
 #include	<usysrets.h>
 #include	<vecstr.h>
 #include	<modload.h>
-
-#include	"sysvars.h"
+#include	<sysvars.h>
 
 
 #define	SYSVAR_MAGIC	0x99447243
@@ -38,15 +38,16 @@ struct sysvar_cursor {
 } ;
 
 struct sysvar_flags {
+    	uint		modload:1 ;
 	uint		defaults:1 ;
 } ;
 
 struct sysvar_head {
-	void		*obj ;			/* object pointer */
+	modload		*mlp ;			/* mod-load-pointer */
 	void		*callp ;		/* call-struct pointer */
-	modload		*loaderp ;		/* loader-pointer */
+	void		*obj ;			/* object pointer */
 	vecstr		*dlp ;			/* default-list-pointer */
-	SYSVAR_FL	f ;
+	SYSVAR_FL	fl ;
 	uint		magic ;
 	int		objsize ;		/* object size */
 	int		cursize ;		/* cursor size */

@@ -1,4 +1,5 @@
 /* varmk HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* VARMK management */
@@ -12,13 +13,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-
-#include	"varmks.h"
+#include	<varmks.h>
 
 
 #define	VARMK		struct varmk_head

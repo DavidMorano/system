@@ -1,4 +1,5 @@
 /* var HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* VAR management */
@@ -19,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
 #include	"vars.h"
 
@@ -91,7 +92,7 @@ extern int	var_curbegin(var *,var_cur *) noex ;
 extern int	var_fetch(var *,cchar *,int,var_cur *,char *,int) noex ;
 extern int	var_enum(var *,var_cur *,char *,int,char *,int) noex ;
 extern int	var_curend(var *,var_cur *) noex ;
-extern int	var_info(var *,var_info *) noex ;
+extern int	var_getinfo(var *,var_info *) noex ;
 extern int	var_audit(var *) noex ;
 extern int	var_close(var *) noex ;
 

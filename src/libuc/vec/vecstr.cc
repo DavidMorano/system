@@ -909,12 +909,20 @@ int vecstr::adduniq(cchar *sp,int sl) noex {
 	return vecstr_adduniq(this,sp,sl) ;
 }
 
+int vecstr::addsyms(cchar *on,mainv sv) noex {
+	return vecstr_addsyms(this,on,sv) ;
+}
+
 int vecstr::insert(int ai,cchar *sp,int sl) noex {
 	return vecstr_insert(this,ai,sp,sl) ;
 }
 
 int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
+}
+
+int vecstr::getvec(mainv *rppp) noex {
+	return vecstr_getvec(this,rppp) ;
 }
 
 int vecstr::del(int ai) noex {

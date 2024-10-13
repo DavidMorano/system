@@ -17,8 +17,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-
-#include	"var.h"
+#include	<var.h>
 
 
 #define	SYSVARS		struct sysvars_head
@@ -36,7 +35,7 @@ struct sysvars_object {
 } ;
 
 struct sysvars_cursor {
-	var_cir		vcur ;
+	var_cur		vcur ;
 } ;
 
 struct sysvars_flags {

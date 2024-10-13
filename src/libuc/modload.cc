@@ -1,4 +1,5 @@
 /* modload SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* module-load management */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -129,9 +131,10 @@ struct vars {
 
 template<typename ... Args>
 static int modload_ctor(modload *op,Args ... args) noex {
+    	MODLOAD		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = memclear(op) ;
+	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -438,8 +441,7 @@ static int subinfo_sofindprs(SI *sip,dirseen *dsp,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ai = 0 ;
-	char		*a{} ;
-	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
 	    char	*dn = (a + ((maxpath + 1) * ai++)) ;
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	        cint	prlen = maxpath ;
@@ -464,14 +466,12 @@ static int subinfo_sofindpr(SI *sip,dirseen *dsp,int dlm,cchar *pr) noex {
 	int		rs1 ;
 	int		ai = 0 ;
 	cint		sz = ((var.maxpathlen + 1) * 2) ;
-	char		*a{} ;
-	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
 	    char	*libdname = (a + ((maxpath + 1) * ai++)) ;
 	    if ((rs = mkpath2(libdname,pr,LIBCNAME)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        if ((rs = dirseen_havename(dsp,libdname,-1)) == rsn) {
-	            USTAT	sb ;
-		    if ((rs = u_stat(libdname,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_stat(libdname,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
 	    	            if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 	    		        rs = subinfo_sochecklib(sip,dsp,libdname,dlm) ;
@@ -523,7 +523,7 @@ static int subinfo_sofindvar(SI *sip,dirseen *dsp,int dlm) noex {
 	    static cchar	*sp = getenv(vn) ;
 	    if (sp) {
 	        cchar	*tp ;
-	        int	sl ;
+	        int	sl{} ;
 	        rs = SR_OK ;
 	        while ((tp = strpbrk(sp,":;")) != nullptr) {
 	            sl = (tp-sp) ;
@@ -548,15 +548,13 @@ static int subinfo_socheckvarc(SI *sip,dirseen *dsp,
 		cchar *ldnp,int ldnl,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    cchar	*pp = const_cast<cchar *>(tbuf) ;
 	    if ((rs = pathclean(tbuf,ldnp,ldnl)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	pl = rs ;
 	        if ((rs = dirseen_havename(dsp,pp,pl)) == rsn) {
-	            USTAT	sb ;
-	            if ((rs = u_stat(pp,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_stat(pp,&sb)) >= 0) {
 	                if (S_ISDIR(sb.st_mode)) {
 	                    if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 	                        rs = subinfo_sochecklib(sip,dsp,pp,dlm) ;
@@ -585,8 +583,7 @@ static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dsp) {
-	    char	*tbuf{} ;
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	        USTAT		sb ;
 	        modload		*op = (ML *) sip->op ;
 	        cint		am = (R_OK | X_OK) ;
@@ -632,8 +629,7 @@ static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
 static int subinfo_sockliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    modload	*op = (ML *) sip->op ;
 	    ids		*idp = &sip->id ;
 	    cint	tlen = rs ;
@@ -642,8 +638,7 @@ static int subinfo_sockliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 	    (void) dsp ;
 	    for (int j = 0 ; exts[j] != nullptr ; j += 1) {
 	        if ((rs = mksofname(tbuf,ldnp,mfn,exts[j])) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_stat(tbuf,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
 		        if (S_ISREG(sb.st_mode)) {
 			    if ((rs = sperm(idp,&sb,am)) >= 0) {
 			        cnullptr	np{} ;

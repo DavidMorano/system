@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	commandments
+
+	Description:
 	This module implements an interface (a trivial one) that
 	allows access to the COMMANDMENTS datbase.
 
@@ -28,16 +32,20 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<sbuf.h>
 #include	<storebuf.h>
 #include	<opentmp.h>
 #include	<char.h>
+#include	<isoneof.h>
+#include	<isnot.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"commandments.h"
@@ -69,28 +77,25 @@
 /* external subroutines */
 
 extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
 extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfprogroot(cchar *,int,cchar **) ;
 extern int	sfrootname(cchar *,int,cchar **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	mkdirs(char *,mode_t) ;
 extern int	removes(cchar *) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
 extern int	getusername(char *,int,uid_t) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	isdigitlatin(int) ;
-extern int	isOneOf(const int *,int) ;
-extern int	isNotPresent(int) ;
+extern int	getuserhome(char *,int,cchar *) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -99,8 +104,8 @@ extern int	strlinelen(cchar *,int,int) ;
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -119,7 +124,7 @@ struct mkent {
 	ushort		cn ;
 } ;
 
-static const int	rsold[] = {
+static cint	rsold[] = {
 	SR_STALE,
 	0
 } ;
@@ -164,35 +169,30 @@ static int	mkent_finish(MKENT *) ;
 static int	cmimkent_start(CMIMK_ENT *,MKENT *) ;
 static int	cmimkent_finish(CMIMK_ENT *) ;
 
-static int	isempty(const char *,int) ;
-static int	isstart(const char *,int,int *,int *) ;
-static int	hasourdig(const char *,int) ;
+static bool	hasourdig(cchar *,int) noex ;
 
-#if	CF_DEBUGS && CF_DEBUGLINE
-static int	linenlen(cchar *,int,int) ;
-#endif
+static bool	isempty(cchar *,int) noex ;
+static bool	isstart(cchar *,int,int *,int *) noex ;
 
-static int	isNotOurAccess(int) ;
-static int	isStale(int) ;
+static int	isNotOurAccess(int) noex ;
+static int	isStale(int) noex ;
+
+
+/* local variables */
 
 
 /* exported variables */
 
-COMMANDMENTS_OBJ	commandments = {
+COMMANDMENTS_OBJ	commandments_modinfo = {
 	"commandments",
 	sizeof(COMMANDMENTS),
 	sizeof(COMMANDMENTS_CUR)
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
 
-
-int commandments_open(COMMANDMENTS *op,cchar *pr,cchar *dbname)
-{
+int commandments_open(COMMANDMENTS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		c = 0 ;
 
@@ -329,7 +329,7 @@ int commandments_read(COMMANDMENTS *op,char *vbuf,int vlen,uint cn)
 	CMI_ENT		viv ;
 	CMI_LINE	lines[COMMANDMENTS_NLINES+1] ;
 	time_t		dt = 0 ;
-	const int	nlines = COMMANDMENTS_NLINES ;
+	cint	nlines = COMMANDMENTS_NLINES ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -354,7 +354,7 @@ int commandments_read(COMMANDMENTS *op,char *vbuf,int vlen,uint cn)
 #endif
 
 	if (rs >= 0) {
-	    const int	lsize = ((nlines+1) * sizeof(CMI_LINE)) ;
+	    cint	lsize = ((nlines+1) * sizeof(CMI_LINE)) ;
 	    char	*lb = (char *) lines ;
 	    if ((rs = cmi_read(&op->idx,&viv,lb,lsize,cn)) >= 0) {
 	        if (vbuf != NULL) {
@@ -454,7 +454,7 @@ int		vlen ;
 	    CMI_CUR	*bcurp = &curp->vicur ;
 	    CMI_ENT	viv ;
 	    CMI_LINE	lines[COMMANDMENTS_NLINES + 1] ;
-	    const int	ls = ((COMMANDMENTS_NLINES + 1) * sizeof(CMI_LINE)) ;
+	    cint	ls = ((COMMANDMENTS_NLINES + 1) * sizeof(CMI_LINE)) ;
 	    if ((rs = cmi_enum(&op->idx,bcurp,&viv,(char *) lines,ls)) >= 0) {
 	        if (vbuf != NULL) {
 	            rs = commandments_loadbuf(op,&viv,vbuf,vlen) ;
@@ -589,7 +589,7 @@ static int commandments_tmpcheck(COMMANDMENTS *op,char *tbuf,USTAT *sbp,
 		cchar *dbname)
 {
 	const mode_t	dm = 0777 ;
-	const int	plen = MAXPATHLEN ;
+	cint	plen = MAXPATHLEN ;
 	int		rs ;
 	int		size = 0 ;
 	cchar		*vtmp = "/var/tmp" ;
@@ -605,7 +605,7 @@ static int commandments_tmpcheck(COMMANDMENTS *op,char *tbuf,USTAT *sbp,
 		    USTAT	tsb ;
 		    if ((rs = uc_stat(abuf,&tsb)) >= 0) {
 			if (S_ISREG(tsb.st_mode)) {
-			    int	f = FALSE ;
+			    int	f = false ;
 			    f = f || (sbp->st_mtime > tsb.st_mtime) ;
 			    f = f || (sbp->st_size != tsb.st_size) ;
 			    if (f) {
@@ -631,17 +631,17 @@ static int commandments_tmpcheck(COMMANDMENTS *op,char *tbuf,USTAT *sbp,
 static int commandments_tmpcopy(COMMANDMENTS *op,char *tbuf,
 		cchar *abuf, char *dbuf)
 {
-	const int	xlen = MAXPATHLEN ;
+	cint	xlen = MAXPATHLEN ;
 	int		rs ;
 	char		*xbuf ;
 	if ((rs = uc_malloc((xlen+1),&xbuf)) >= 0) {
-	    const int	dlen = strlen(dbuf) ;
+	    cint	dlen = strlen(dbuf) ;
 	    cchar	*ft = "cmdXXXXXXXXXXX" ;
 	    if ((rs = pathadd(dbuf,dlen,ft)) >= 0) {
 		const mode_t	om = 0664 ;
-		const int	of = O_RDWR ;
+		cint	of = O_RDWR ;
 	        if ((rs = opentmpfile(dbuf,of,om,xbuf)) >= 0) {
-		    const int	fd = rs ;
+		    cint	fd = rs ;
 		    rs = uc_writefile(fd,tbuf) ;
 		    if ((rs < 0) && (xbuf[0] != '\0')) {
 			u_unlink(xbuf) ;
@@ -838,7 +838,7 @@ static int commandments_idxmk(COMMANDMENTS *op,cchar *tbuf)
 {
 	CMIMK		mk ;
 	const mode_t	om = 0664 ;
-	const int	of = 0 ;
+	cint	of = 0 ;
 	int		rs ;
 	int		rs1 ;
 #if	CF_DEBUGS
@@ -889,7 +889,7 @@ static int commandments_idxmapend(COMMANDMENTS *op)
 	    CMI		*cip = &op->idx ;
 	    rs1 = cmi_close(cip) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->f.idx = FALSE ;
+	    op->f.idx = false ;
 	}
 	return rs ;
 }
@@ -905,13 +905,13 @@ static int commandments_usridname(COMMANDMENTS *op,char *tbuf)
 	    cchar	*sn = COMMANDMENTS_SN ;
 	    if ((rs = mkpath3(tbuf,op->uhome,vd,sn)) >= 0) {
 		USTAT		sb ;
-		const int	rsn = SR_NOTFOUND ;
+		cint	rsn = SR_NOTFOUND ;
 	        rl = rs ;
 		if ((rs = uc_stat(tbuf,&sb)) == rsn) {
 	            const mode_t	dm = 0775 ;
 	            if ((rs = mkdirs(tbuf,dm)) >= 0) {
 			if ((rs = uc_minmod(tbuf,dm)) >= 0) {
-	    	                const int	n = _PC_CHOWN_RESTRICTED ;
+	    	                cint	n = _PC_CHOWN_RESTRICTED ;
 	    	                if ((rs = u_pathconf(tbuf,n,NULL)) == 0) {
 		                    rs = commandments_chownpr(op,tbuf) ;
 		                }
@@ -947,13 +947,13 @@ static int commandments_sysidname(COMMANDMENTS *op,char *tbuf)
 	            cchar	*sn = COMMANDMENTS_SN ;
 	            if ((rs = mkpath3(tbuf,tmpdname,prn,sn)) >= 0) {
 		        USTAT		sb ;
-		        const int	rsn = SR_NOTFOUND ;
+		        cint	rsn = SR_NOTFOUND ;
 	                rl = rs ;
 		        if ((rs = uc_stat(tbuf,&sb)) == rsn) {
 	                    const mode_t	dm = 0777 ;
 	                    if ((rs = mkdirs(tbuf,dm)) >= 0) {
 				if ((rs = uc_chmod(tbuf,dm)) >= 0) {
-	    	                    const int	n = _PC_CHOWN_RESTRICTED ;
+	    	                    cint	n = _PC_CHOWN_RESTRICTED ;
 	    	                    if ((rs = u_pathconf(tbuf,n,NULL)) == 0) {
 		                        rs = commandments_chownpr(op,tbuf) ;
 				    }
@@ -988,7 +988,7 @@ static int commandments_dbmapbegin(COMMANDMENTS *op,time_t dt)
 
 	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
 	    USTAT	sb ;
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 	            size_t	ms = (size_t) sb.st_size ;
@@ -1042,9 +1042,9 @@ static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
 	int		len ;
 	int		n = 0 ;
 	int		c = 0 ;
-	int		f_ent = FALSE ;
-	const char	*tp, *lp ;
-	const char	*mp = op->data_db ;
+	int		f_ent = false ;
+	cchar	*tp, *lp ;
+	cchar	*mp = op->data_db ;
 
 #if	CF_DEBUGS
 	debugprintf("commandments_dbproc: ent ml=%d\n",ml) ;
@@ -1071,13 +1071,13 @@ static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
 	                    rs = cmimk_add(cmp,&ce) ;
 			    cmimkent_finish(&ce) ;
 			}
-			f_ent = FALSE ;
+			f_ent = false ;
 	                mkent_finish(&e) ;
 	            } /* end if (entry) */
 
 	            if (rs >= 0) {
 			const uint	soff = (foff+si) ;
-			const int	slen = (ll-si) ;
+			cint	slen = (ll-si) ;
 	                if ((rs = mkent_start(&e,n,soff,slen)) >= 0) {
 	                    f_ent = TRUE ;
 			}
@@ -1101,7 +1101,7 @@ static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
 			rs = cmimk_add(cmp,&ce) ;
 			cmimkent_finish(&ce) ;
 	    	    }
-	    	    f_ent = FALSE ;
+	    	    f_ent = false ;
 	    	    mkent_finish(&e) ;
 	        }
 #else
@@ -1124,7 +1124,7 @@ static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
 	        rs = cmimk_add(cmp,&ce) ;
 	        cmimkent_finish(&ce) ;
 	    }
-	    f_ent = FALSE ;
+	    f_ent = false ;
 	    mkent_finish(&e) ;
 	} /* end if (entry) */
 
@@ -1144,7 +1144,7 @@ static int commandments_dbproc(COMMANDMENTS *op,CMIMK *cmp)
 static int commandments_checkupdate(COMMANDMENTS *op,time_t dt)
 {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (op->ncursors == 0) {
 	    struct ustat	sb ;
@@ -1184,10 +1184,10 @@ static int commandments_loadbuf(COMMANDMENTS *op,CMI_ENT *vivp,
 
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	    CMI_LINE	*lines = vivp->lines ;
-	    const int	nlines = vivp->nlines ;
+	    cint	nlines = vivp->nlines ;
 	    int		i ;
 	    int		ll ;
-	    const char	*lp ;
+	    cchar	*lp ;
 
 	    for (i = 0 ; i < nlines ; i += 1) {
 
@@ -1214,7 +1214,7 @@ static int commandments_userhome(COMMANDMENTS *op)
 {
 	int		rs ;
 	if (op->uhome == NULL) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	*hbuf ;
 	    if ((rs = uc_malloc((hlen+1),&hbuf)) >= 0) {
 	        if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
@@ -1262,10 +1262,8 @@ static int commandments_ids(COMMANDMENTS *op)
 }
 /* end subroutine (commandments_ids) */
 
-
-static int mkent_start(MKENT *ep,int cn,uint eoff,uint elen)
-{
-	const int	ne = CMIMK_NE ; /* use their value for starters */
+static int mkent_start(MKENT *ep,int cn,uint eoff,uint elen) noex {
+	cint		ne = CMIMK_NE ; /* use their value for starters */
 	int		rs = SR_OK ;
 	int		size ;
 	void		*p ;
@@ -1427,13 +1425,10 @@ static int cmimkent_finish(CMIMK_ENT *bvep)
 }
 /* end subroutine (cmimkent_finish) */
 
-
-static int isempty(cchar *lp,int ll)
-{
+static bool isempty(cchar *lp,int ll) noex {
 	int		cl ;
-	int		f = FALSE ;
-	const char	*cp ;
-
+	bool		f = false ;
+	cchar	*cp ;
 	f = f || (ll == 0) ;
 	f = f || (lp[0] == '#') ;
 	if ((! f) && CHAR_ISWHITE(*lp)) {
@@ -1441,43 +1436,32 @@ static int isempty(cchar *lp,int ll)
 	    f = f || (cl == 0) ;
 	    f = f || (cp[0] == '#') ;
 	}
-
 	return f ;
 }
 /* end subroutine (isempty) */
 
-
-static int isstart(cchar *lp,int ll,int *np,int *sip)
-{
+static int isstart(cchar *lp,int ll,int *np,int *sip) noex {
 	int		cl ;
-	int		f = FALSE ;
-	const char	*tp, *cp ;
-
+	bool		f = false ;
+	cchar	*tp, *cp ;
 	*np = -1 ;
 	*sip = 0 ;
 	if ((tp = strnchr(lp,ll,'.')) != NULL) {
-
 	    cp = lp ;
 	    cl = (tp - lp) ;
 	    f = hasourdig(cp,cl) && (cfdeci(cp,cl,np) >= 0) ;
-
 	    if (f) {
 	        *sip = ((tp + 1) - lp) ;
 	    }
-
 	} /* end if */
-
 	return f ;
 }
 /* end subroutine (isstart) */
 
-
-static int hasourdig(cchar *sp,int sl)
-{
+static bool hasourdig(cchar *sp,int sl) noex {
 	int		cl ;
-	int		f = FALSE ;
-	const char	*cp ;
-
+	bool		f = false ;
+	cchar	*cp ;
 	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 	    f = TRUE ;
 	    while (cl && *cp) {
@@ -1487,21 +1471,17 @@ static int hasourdig(cchar *sp,int sl)
 	        cl -= 1 ;
 	    } /* end while */
 	} /* end if */
-
 	return f ;
 }
 /* end subroutine (hasourdig) */
 
-
 #if	CF_DEBUGS && CF_DEBUGLINE
-static int linenlen(cchar *lp,int ll,int ml)
-{
+static int linenlen(cchar *lp,int ll,int ml) noex {
 	int		len = INT_MAX ;
-	const char	*tp ;
 	if (lp == NULL) return 0 ;
 	if (ll > 0) len = MIN(len,ll) ;
 	if (ml > 0) len = MIN(len,ml) ;
-	if ((tp = strnchr(lp,len,'\n')) != NULL) {
+	if (cchar *tp{} ; (tp = strnchr(lp,len,'\n')) != NULL) {
 	    len = (tp - lp) ;
 	}
 	return len ;
@@ -1509,10 +1489,8 @@ static int linenlen(cchar *lp,int ll,int ml)
 /* end subroutine (linenlen) */
 #endif /* CF_DEBUGS */
 
-
-int isNotOurAccess(int rs)
-{
-	int		f = FALSE ;
+static bool isNotOurAccess(int rs) noex {
+	bool		f = false ;
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
 	    f = f || (rs == SR_ISDIR) ;
@@ -1521,10 +1499,8 @@ int isNotOurAccess(int rs)
 }
 /* end subroutine (isNotOurAccess) */
 
-
-static int isStale(int rs)
-{
-	int		f = FALSE ;
+static bool isStale(int rs) noex {
+	bool		f = false ;
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
 	    f = f || isOneOf(rsold,rs) ;

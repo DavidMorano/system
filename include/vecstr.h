@@ -150,8 +150,10 @@ struct vecstr : vecstr_head {
 	int start(int = 0,int = 0) noex ;
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
+	int addsyms(cchar *,mainv) noex ;
 	int insert(int,cchar *,int = -1) noex ;
 	int get(int,cchar **) noex ;
+	int getvec(mainv *) noex ;
 	int del(int = -1) noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;
@@ -210,9 +212,8 @@ extern int vecstr_addpathclean(vecstr *,cchar *,int) noex ;
 extern int vecstr_addpath(vecstr *,cchar *,int) noex ;
 extern int vecstr_addcspath(vecstr *) noex ;
 extern int vecstr_adds(vecstr *,cchar *,int) noex ;
+extern int vecstr_addsyms(vecstr *,cchar *,mainv) noex ;
 extern int vecstr_addsubdirs(vecstr *,cchar *) noex ;
-extern int vecstr_loaddirs(vecstr *,cchar *) noex ;
-extern int vecstr_adduniqs(vecstr *,cchar *,int) noex ;
 extern int vecstr_adduniqs(vecstr *,cchar *,int) noex ;
 extern int vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
 extern int vecstr_envadds(vecstr *,cchar *,int) noex ;
@@ -224,6 +225,10 @@ extern int vecstr_loadfile(vecstr *,int,cchar *) noex ;
 extern int vecstr_loadgrusers(vecstr *,gid_t) noex ;
 extern int vecstr_srvargs(vecstr *,cchar *) noex ;
 extern int vecstr_svcargs(vecstr *,int *,cchar *) noex ;
+
+static inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
+	return vecstr_addsubdirs(op,newsdname) ;
+}
 
 EXTERNC_end
 

@@ -1,4 +1,5 @@
 /* pwi HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* PassWord Index manager */
@@ -12,11 +13,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ipasswd.h>
-#include	<localmisc.h>
 
 
 #define	PWI_MAGIC	0x99889998

@@ -1,4 +1,5 @@
 /* txtindex HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface to TXTINDEX database management */
@@ -31,10 +32,15 @@
 
 #define	TXTINDEX_MAGIC		0x99447246
 #define	TXTINDEX		struct txtindex_head
+#define	TXTINDEX_FL		struct txtindex_flags
 #define	TXTINDEX_CUR		struct txtindex_cursor
 #define	TXTINDEX_TAG		TXTINDEXES_TAG
 #define	TXTINDEX_INFO		TXTINDEXES_INFO
 
+
+struct txtindex_flags {
+        uint		modload:1 ;
+} ;
 
 struct txtindex_cursor {
 	void		*scp ;		/* SO-cursor pointer */
@@ -42,15 +48,17 @@ struct txtindex_cursor {
 } ;
 
 struct txtindex_head {
-	void		*obj ;		/* object pointer */
+	modload		*mlp ;
 	void		*callp ;
-	modload		*loaderp ;
+	void		*obj ;		/* object pointer */
+	TXTINDEX_FL	fl ;
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ;
 
 typedef	TXTINDEX	txtindex ;
+typedef	TXTINDEX_FL	txtindex_fl ;
 typedef	TXTINDEX_CUR	txtindex_cur ;
 typedef	TXTINDEX_TAG	txtindex_tag ;
 typedef	TXTINDEX_INFO	txtindex_info ;

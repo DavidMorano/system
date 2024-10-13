@@ -1,4 +1,5 @@
 /* txtindexhdr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* text-index hash file */

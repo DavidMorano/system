@@ -38,8 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -82,7 +81,7 @@ int vecstr_adds(vecstr *op,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((sl > 0) && ((wl = sfnext(sp,sl,&wp)) > 0)) {
 	        c += 1 ;
-	        rs = vecstr_add(op,wp,wl) ;
+	        rs = op->add(wp,wl) ;
 	        sl -= ((wp + wl) - sp) ;
 	        sp = (wp + wl) ;
 	        if (rs < 0) break ;

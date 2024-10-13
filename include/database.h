@@ -1,4 +1,5 @@
 /* database HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* provide a variæty of database files */
@@ -8,7 +9,7 @@
 /* revision history:
 
 	= 2017-11-24, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	database
+
+	Description:
 	Manage interlocked FIFO-integer operations.
 
 *******************************************************************************/
@@ -28,6 +33,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ptm.h>
 #include	<fifoitem.h>

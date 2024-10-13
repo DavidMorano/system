@@ -23,10 +23,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -62,19 +59,16 @@ int vecstr_addsubdirs(vecstr *op,cchar *newsdname) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (op && newsdname) {
-	    char	*fbuf{} ;
-	    if ((rs = libmalloc_mp(&fbuf)) >= 0) {
+	    if (char *fbuf{} ; (rs = libmalloc_mp(&fbuf)) >= 0) {
 	        fsdirtree	dir ;
 		cint		flen = rs ;
 	        cint		fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
 	        if ((rs = fsdirtree_open(&dir,newsdname,fo)) >= 0) {
 	            USTAT	sb ;
-	            int		fl ;
 	            while ((rs = fsdirtree_read(&dir,&sb,fbuf,flen)) > 0) {
-	                fl = rs ;
 	                if (fbuf[0] != '.') {
 	                    c += 1 ;
-	                    rs = vecstr_add(op,fbuf,fl) ;
+	                    rs = vecstr_add(op,fbuf,rs) ;
 	                }
 	                if (rs < 0) break ;
 	            } /* end while */
@@ -91,10 +85,5 @@ int vecstr_addsubdirs(vecstr *op,cchar *newsdname) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_addsubdirs) */
-
-int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
-	return vecstr_addsubdirs(op,newsdname) ;
-}
-/* end subroutine (vecstr_loaddirs) */
 
 

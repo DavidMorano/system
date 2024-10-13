@@ -185,15 +185,15 @@ constexpr int		resz = sizeof(int) ;
 
 /* exported subroutines */
 
-int vecpstr_start(vecpstr *op,int n,int chsize,int opts) noex {
+int vecpstr_start(vecpstr *op,int vn,int vsz,int vo) noex {
 	int		rs ;
 	if ((rs = vecpstr_ctor(op)) >= 0) {
-	    if (chsize < VECPSTR_CHSIZEIZE) chsize = VECPSTR_CHSIZEIZE ;
-	    if (n < 0) n = 0 ;
-	    op->chsize = chsize ;
-	    op->an = n ;
-	    if ((rs = vecpstr_setopts(op,opts)) >= 0) {
-	        cint	nc = min(((n * 6) / chsize),1) ;
+	    if (vsz < VECPSTR_CHSIZEIZE) vsz = VECPSTR_CHSIZEIZE ;
+	    if (vn < 0) vn = 0 ;
+	    op->chsize = vsz ;
+	    op->an = vn ;
+	    if ((rs = vecpstr_setopts(op,vo)) >= 0) {
+	        cint	nc = min(((vn * 6) / vsz),1) ;
 	        if ((rs = vechand_start(op->clp,nc,0)) >= 0) {
 	            op->magic = VECPSTR_MAGIC ;
 	        }
@@ -1017,5 +1017,119 @@ static int indexsize(int il) noex {
 	return isize ;
 }
 /* end subroutine (indexsize) */
+
+int vecpstr::start(int vn,int vsz,int vo) noex {
+	return vecpstr_start(this,vn,vsz,vo) ;
+}
+
+int vecpstr::add(cchar *sp,int sl) noex {
+	return vecpstr_add(this,sp,sl) ;
+}
+
+int vecpstr::adduniq(cchar *sp,int sl) noex {
+	return vecpstr_adduniq(this,sp,sl) ;
+}
+
+int vecpstr::addsyms(cchar *on,mainv sv) noex {
+	return vecpstr_addsyms(this,on,sv) ;
+}
+
+int vecpstr::get(int ai,cchar **rpp) noex {
+	return vecpstr_get(this,ai,rpp) ;
+}
+
+int vecpstr::getvec(mainv *rppp) noex {
+	return vecpstr_getvec(this,rppp) ;
+}
+
+int vecpstr::del(int ai) noex {
+	if (ai < 0) ai = 0 ;
+	return vecpstr_del(this,ai) ;
+}
+
+void vecpstr::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("vecpstr",rs,"fini-finish") ;
+	}
+}
+
+vecpstr_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vecpstrmem_count:
+	        rs = vecpstr_count(op) ;
+	        break ;
+	    case vecpstrmem_delall:
+	        rs = vecpstr_delall(op) ;
+	        break ;
+	    case vecpstrmem_strsize:
+	        rs = vecpstr_strsize(op) ;
+	        break ;
+	    case vecpstrmem_recsize:
+	        rs = vecpstr_recsize(op) ;
+	        break ;
+	    case vecpstrmem_audit:
+	        rs = vecpstr_audit(op) ;
+	        break ;
+	    case vecpstrmem_finish:
+	        rs = vecpstr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (vecpstr_co::operator) */
+
+bool vecpstr_iter::operator == (const vecpstr_iter &oit) noex {
+	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
+}
+
+bool vecpstr_iter::operator != (const vecpstr_iter &oit) noex {
+	bool		f = false ;
+	f = f || (va != oit.va) ;
+	f = f || (ii != oit.ii) ;
+	if (!f) {
+	    f = (i < oit.i) ;
+	}
+	return f ;
+}
+/* end method (vecpstr_iter::operator) */
+
+vecpstr_iter vecpstr_iter::operator + (int n) const noex {
+	vecpstr_iter	rit(va,i,i) ;
+	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
+	return rit ;
+}
+
+vecpstr_iter vecpstr_iter::operator += (int n) noex {
+	vecpstr_iter	rit(va,i,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
+}
+
+vecpstr_iter vecpstr_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
+}
+
+vecpstr_iter vecpstr_iter::operator ++ (int) noex { /* post */
+	vecpstr_iter	pre(*this) ;
+	increment() ;
+	return pre ;
+}
+
+void vecpstr_iter::increment(int n) noex {
+	if ((i + n) < 0) n = -i ;
+	if (n != 0) {
+	    i += n ;
+	    while ((i < ii) && (va[i] == nullptr)) {
+	        i += 1 ;
+	    }
+	}
+}
+/* end method (vecpstr_iter::increment) */
 
 

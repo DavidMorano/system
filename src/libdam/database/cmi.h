@@ -1,4 +1,5 @@
 /* cmi HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* ComMand Index object */
