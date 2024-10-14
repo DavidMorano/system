@@ -30,7 +30,7 @@
 
 
 struct sysvars_object {
-	char		*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -65,7 +65,7 @@ extern int sysvars_open(sysvars *,char *,char *) noex ;
 extern int sysvars_count(sysvars *) noex ;
 extern int sysvars_curbegin(sysvars *,sysvars_cur *) noex ;
 extern int sysvars_fetch(sysvars *, char *,int,sysvars_cur *,char *,int) noex ;
-extern int sysvars_enum(sysvars *,sysvars_cur *,char *,int,char *,int) noex ;
+extern int sysvars_curenum(sysvars *,sysvars_cur *,char *,int,char *,int) noex ;
 extern int sysvars_curend(sysvars *,sysvars_cur *) noex ;
 extern int sysvars_audit(sysvars *) noex ;
 extern int sysvars_close(sysvars *) noex ;

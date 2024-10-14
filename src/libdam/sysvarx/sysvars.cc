@@ -42,9 +42,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<new>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
+#include	<strlibval.hh>
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
@@ -53,9 +56,12 @@
 #include	<hdbstr.h>
 #include	<expcook.h>
 #include	<dirseen.h>
+#include	<pathclean.h>
 #include	<sfx.h>
-#include	<strlibval.hh>
+#include	<mkpathx.h>
+#include	<mkdirs.h>
 #include	<xperm.h>
+#include	<strwcpy.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<isnot.h>
@@ -181,6 +187,17 @@
 #define	SUBINFO_FL	struct subinfo_flags
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -215,6 +232,7 @@ static int sysvars_ctor(sysvars *op,Args ... args) noex {
     	SYSVARS		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
+	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->vindp = new(nothrow) var) != np) {
@@ -324,7 +342,7 @@ constexpr cpcchar	dbdirs[] = {
 	nullptr
 } ;
 
-static strlbvar		tmpdname(strlibval_tmpdir) ;
+static strlibval		tmpdname(strlibval_tmpdir) ;
 
 
 /* exported variables */
@@ -353,7 +371,7 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	                if (rs < 0) {
 	                    sysvars_infoloadend(op) ;
 			}
-	            }
+	            } /* end if (infoload) */
 	            rs1 = subinfo_finish(&si) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
@@ -389,90 +407,83 @@ int sysvars_close(SVS *op) noex {
 /* end subroutine (sysvars_close) */
 
 int sysvars_audit(SVS *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == SYSVARS_MAGIC) {
-		rs = var_audit(&op->vind) ;
-	    } /* end if (open) */
+	int		rs ;
+	if ((rs = sysvars_magic(op)) >= 0) {
+	    rs = var_audit(op->vindp) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sysvars_audit) */
 
-int sysvars_curbegin(SVS *op,SVS_CUR *curp) noex {
+int sysvars_curbegin(SVS *op,SVS_C *curp) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(SVS_CUR)) ;
-	if ((rs = var_curbegin(&op->vind,&curp->vcur)) >= 0) {
-	    op->ncursors += 1 ;
-	}
-
+	if ((rs = sysvars_magic(op,curp)) >= 0) {
+	    cint	osz = sizeof(var) ;
+	    memclear(curp) ;
+	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+		var_cur		*vcp = (var_cur *) vp ;
+	        if ((rs = var_curbegin(op->vindp,vcp)) >= 0) {
+		    curp->vcurp = vcp ;
+	            op->ncursors += 1 ;
+	        } /* end if (var_curbegin) */
+	    } /* end if (memory-allocation) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysvars_curbegin) */
 
-int sysvars_curend(SVS *op,SVS_CUR *curp) noex {
+int sysvars_curend(SVS *op,SVS_C *curp) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = var_curend(&op->vind,&curp->vcur)) >= 0) {
-	    op->ncursors -= 1 ;
-	}
-
+	if ((rs = sysvars_magic(op,curp)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (curp->vcurp) {
+	        var_cur		*vcp = (var_cur *) curp->vcurp ;
+	        if ((rs = var_curend(op->vindp,vcp)) >= 0) {
+	            op->ncursors -= 1 ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysvars_curend) */
 
 int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
-
-	rs = var_fetch(&op->vind,kp,kl,&curp->vcur,vbuf,vlen) ;
-
-	if ((rs < 0) && (vbuf != nullptr)) {
+	if ((rs = sysvars_magic(op,kp,curp)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (curp->vcurp) {
+	        var_cur		*vcp = (var_cur *) curp->vcurp ;
+		rs = var_fetch(op->vindp,kp,kl,vcp,vbuf,vlen) ;
+	    }
+	} /* end if (magic) */
+	if ((rs < 0) && vbuf) {
 	    vbuf[0] = '\0' ;
 	}
-
 	return rs ;
 }
 /* end subroutine (sysvars_fetch) */
 
-int sysvars_enum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
+int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp && kp) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == SYSVARS_MAGIC) {
-		rs = var_enum(&op->vind,&curp->vcur,kp,kl,vp,vl) ;
-	        if ((rs < 0) && vp) vp[0] = '\0' ;
+	if ((rs = sysvars_magic(op,curp,kp)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (curp->vcurp) {
+	        var_cur		*vcp = (var_cur *) curp->vcurp ;
+		rs = var_enum(op->vindp,vcp,kp,kl,vp,vl) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
+	if ((rs < 0) && vp) {
+	    vp[0] = '\0' ;
+	}
 	return rs ;
 }
-/* end subroutine (sysvars_enum) */
+/* end subroutine (sysvars_curenum) */
 
 int sysvars_count(SVS *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == SYSVARS_MAGIC) {
-		rs = var_count(&op->vind) ;
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	if ((rs = sysvars_magic(op)) >= 0) {
+	    rs = var_count(op->vindp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysvars_count) */
@@ -482,19 +493,16 @@ int sysvars_count(SVS *op) noex {
 
 static int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	int		size = 0 ;
-	char		*bp ;
-
-	size += (strlen(pr)+1) ;
-	size += (strlen(dbname)+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	int		sz = 0 ;
+	sz += (strlen(pr)+1) ;
+	sz += (strlen(dbname)+1) ;
+	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;
 	    bp = (strwcpy(bp,pr,-1)+1) ;
 	    op->dbname = bp ;
 	    bp = (strwcpy(bp,dbname,-1)+1) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (sysvars_infoloadbegin) */
@@ -502,13 +510,11 @@ static int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 static int sysvars_infoloadend(SVS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->a != nullptr) {
+	if (op->a) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
 	}
-
 	op->pr = nullptr ;
 	op->dbname = nullptr ;
 	return rs ;
@@ -521,15 +527,13 @@ static int sysvars_indopen(SVS *op,SUBINFO *sip) noex {
 /* end subroutine (sysvars_indopen) */
 
 static int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
-	expcook		cooks ;
-	dirseen		ds ;
-	vecstr		sdirs ;
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = dirseen_start(&ds)) >= 0) {
+	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) {
+	    expcook	cooks ;
+	    cint	vn = 6 ;
 	    cint	vo = VECSTR_OCOMPACT ;
-	    if ((rs = vecstr_start(&sdirs,6,vo)) >= 0) {
+	    if (vecstr sdirs ; (rs = vecstr_start(&sdirs,vn,vo)) >= 0) {
 	        if ((rs = expcook_start(&cooks)) >= 0) {
 		    if ((rs = sysvars_loadcooks(op,&cooks)) >= 0) {
 			rs = sysvars_indopenseqer(op,sip,&ds,&sdirs,&cooks) ;
@@ -543,7 +547,6 @@ static int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
 	    rs1 = dirseen_finish(&ds) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirseen) */
-
 	return rs ;
 }
 /* end subroutines (sysvars_indopenseq) */
@@ -582,7 +585,7 @@ static int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 	    if ((rs = dirseen_curbegin(dsp,&cur)) >= 0) {
 
 	        while (rs >= 0) {
-	            el = dirseen_enum(dsp,&cur,ebuf,elen) ;
+	            el = dirseen_curenum(dsp,&cur,ebuf,elen) ;
 	            if (el == SR_NOTFOUND) break ;
 	            rs = el ;
 	            if (rs >= 0) {
@@ -607,7 +610,7 @@ static int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 
 	if (rs >= 0) {
 	    if (mainv dv ; (rs = vecstr_getvec(sdp,&dv)) >= 0) {
-	        if ((rs = var_opena(&op->vind,dv)) >= 0) {
+	        if ((rs = var_opena(op->vindp,dv)) >= 0) {
 	            op->f.var = true ;
 		}
 	        if ((rs < 0) && isNotPresent(rs)) {
@@ -622,14 +625,12 @@ static int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 
 static int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	int		rs = SR_OK ;
-	int		vl ;
 	cchar		*ks = "RST" ;
-	cchar		*vp ;
 	char		kbuf[2] = {} ;
 	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-	    cint	kch = MKCHAR(ks[i]) ;
-	    vp = nullptr ;
-	    vl = -1 ;
+	    cint	kch = mkchar(ks[i]) ;
+	    int		vl = -1 ;
+	    cchar	*vp = nullptr ;
 	    switch (kch) {
 	    case 'R':
 		vp = op->pr ;
@@ -646,16 +647,14 @@ static int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 		rs = expcook_add(ecp,kbuf,vp,vl) ;
 	    }
 	} /* end for */
-
 	if (rs >= 0) {
-	    if cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
+	    if (cchar *prname{} ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
 	        rs = SR_NOENT ;
-	        if (prname != nullptr) {
+	        if (prname) {
 	            rs = expcook_add(ecp,"PRN",prname,-1) ;
 		}
 	    }
-	}
-
+	} /* end if (ok) */
 	return rs ;
 }
 /* end subroutines (sysvars_loadcooks) */
@@ -671,7 +670,7 @@ static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 
 	    while (rs >= 0) {
 
-	        el = dirseen_enum(dsp,&cur,ebuf,elen) ;
+	        el = dirseen_curenum(dsp,&cur,ebuf,elen) ;
 	        if (el == SR_NOTFOUND) break ;
 	        rs = el ;
 
@@ -689,7 +688,7 @@ static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 
 	            if (rs >= 0) {
 	                if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
-	                    rs = var_open(&op->vind,indname) ;
+	                    rs = var_open(op->vindp,indname) ;
 	                    op->f.var = (rs >= 0) ;
 	                }
 	            }
@@ -763,7 +762,7 @@ static int sysvars_indclose(SVS *op) noex {
 	int		rs1 ;
 	if (op->f.var) {
 	    op->f.var = false ;
-	    rs1 = var_close(&op->vind) ;
+	    rs1 = var_close(op->vindp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
@@ -843,15 +842,13 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 /* go */
 
 	                if (rs >= 0) {
-	                    mainv	ev ;
-	                    if ((rs = vecstr_getvec(&envs,&ev)) >= 0) {
-	                        SPAWNPROC	ps ;
+	                    if (mainv ev ; (rs = envs.getvec(&ev)) >= 0) {
+	                        SPAWNPROC_CON	ps{} ;
 	                        int		i = 0 ;
 	                        cchar		*av[10] ;
 	                        av[i++] = prog ;
 	                        av[i++] = "-s" ;
 	                        av[i++] = nullptr ;
-	                        memset(&ps,0,sizeof(SPAWNPROC)) ;
 	                        ps.opts |= SPAWNPROC_OIGNINTR ;
 	                        ps.opts |= SPAWNPROC_OSETPGRP ;
 	                        for (int j = 0 ; j < 3 ; j += 1) {
