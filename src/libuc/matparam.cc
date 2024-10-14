@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	matparam
+
+	Description:
 	We search to see if our given value is in the given parameter
 	array.
 
@@ -26,8 +30,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |SHORT_MIN| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"matparam.h"
