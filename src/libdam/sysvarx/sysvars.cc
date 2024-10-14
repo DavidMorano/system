@@ -58,6 +58,7 @@
 #include	<xperm.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"sysvars.h"
@@ -188,6 +189,9 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
 /* local structures */
 
 struct subinfo_flags {
@@ -201,7 +205,48 @@ struct subinfo {
 } ;
 
 
+/* local structures */
+
+
 /* forward references */
+
+template<typename ... Args>
+static int sysvars_ctor(sysvars *op,Args ... args) noex {
+    	SYSVARS		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->vindp = new(nothrow) var) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-var) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sysvars_ctor) */
+
+static int sysvars_dtor(sysvars *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->vindp) {
+		delete op->vindp ;
+		op->vindp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sysvars_dtor) */
+
+template<typename ... Args>
+static inline int sysvars_magic(sysvars *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == SYSVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (sysvars_magic) */
 
 static int	sysvars_infoloadbegin(SVS *,cchar *,cchar *) noex ;
 static int	sysvars_infoloadend(SVS *) noex ;
@@ -251,7 +296,7 @@ constexpr cpcchar	envdefs[] = {
 	VARWSTATION,
 	nullptr
 } ;
-#endif /* CF_MKSVS */
+#endif /* CF_MKSYSVARS */
 
 /* use fixed locations for security reasons (like we care!) */
 #if	CF_MKSYSVARS
@@ -260,7 +305,7 @@ constexpr cpcchar	prbins[] = {
 	"sbin",
 	nullptr
 } ;
-#endif /* CF_MKSVS */
+#endif /* CF_MKSYSVARS */
 
 constexpr cpcchar	sysfnames[] = {
 	DEFINITFNAME,	
@@ -297,9 +342,8 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if ((dbname == nullptr) || (dbname[0] == '\0')) dbname = INDNAME ;
-	if (op && pr) {
+	if ((rs = sysvars_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
-	    memclear(op) ;			/* dangerous */
 	    if (pr[0]) {
 	        if (SUBINFO si ; (rs = subinfo_start(&si)) >= 0) {
 	            if ((rs = sysvars_infoloadbegin(op,pr,dbname)) >= 0) {
@@ -314,7 +358,10 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		sysvars_dtor(op) ;
+	    }
+	} /* end if (sysvars_ctor) */
 	return rs ;
 }
 /* end subroutine (sysvars_open) */
@@ -329,6 +376,10 @@ int sysvars_close(SVS *op) noex {
 	    }
 	    {
 	        rs1 = sysvars_infoloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = sysvars_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -349,7 +400,7 @@ int sysvars_audit(SVS *op) noex {
 }
 /* end subroutine (sysvars_audit) */
 
-int sysvars_curbegin(SVS *op,SYSVARS_CUR *curp) noex {
+int sysvars_curbegin(SVS *op,SVS_CUR *curp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -357,7 +408,7 @@ int sysvars_curbegin(SVS *op,SYSVARS_CUR *curp) noex {
 
 	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(SYSVARS_CUR)) ;
+	memset(curp,0,sizeof(SVS_CUR)) ;
 	if ((rs = var_curbegin(&op->vind,&curp->vcur)) >= 0) {
 	    op->ncursors += 1 ;
 	}
@@ -366,7 +417,7 @@ int sysvars_curbegin(SVS *op,SYSVARS_CUR *curp) noex {
 }
 /* end subroutine (sysvars_curbegin) */
 
-int sysvars_curend(SVS *op,SYSVARS_CUR *curp) noex {
+int sysvars_curend(SVS *op,SVS_CUR *curp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -382,7 +433,7 @@ int sysvars_curend(SVS *op,SYSVARS_CUR *curp) noex {
 }
 /* end subroutine (sysvars_curend) */
 
-int sysvars_fetch(SVS *op,cchar *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
+int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -610,11 +661,9 @@ static int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 /* end subroutines (sysvars_loadcooks) */
 
 static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
-	dirseen_cur	cur ;
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = dirseen_curbegin(dsp,&cur)) >= 0) {
+	if (dirseen_cur cur ; (rs = dirseen_curbegin(dsp,&cur)) >= 0) {
 	    cint	elen = MAXPATHLEN ;
 	    int		el ;
 	    char	ebuf[MAXPATHLEN + 1] ;
@@ -630,9 +679,9 @@ static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 
 #if	CF_MKSYSVARS
 	            rs = sysvars_mksysvarsi(op,sip,ebuf) ;
-#else /* CF_MKSVS */
+#else /* CF_MKSYSVARS */
 		    rs = SR_NOENT ;
-#endif /* CF_MKSVS */
+#endif /* CF_MKSYSVARS */
 
 	            if ((rs < 0) && isNotPresent(rs)) {
 	                rs = sysvars_indmk(op,ebuf) ;
@@ -712,13 +761,11 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t operms) noex {
 static int sysvars_indclose(SVS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->f.var) {
 	    op->f.var = false ;
 	    rs1 = var_close(&op->vind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (sysvars_indclose) */
@@ -726,6 +773,7 @@ static int sysvars_indclose(SVS *op) noex {
 /* make the index */
 #if	CF_MKSYSVARS
 static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*prog = PROG_MKSYSVARSI ;
@@ -739,12 +787,11 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 	    if ((rs = subinfo_ids(sip)) >= 0) {
 	        USTAT	sb ;
 	        int		rs_last = SR_NOTFOUND ;
-	        int		i ;
 	        int		pl = 0 ;
 		cchar		*pr = op->pr ;
 	        char		pbuf[MAXPATHLEN + 1] ;
 
-	        for (i = 0 ; prbins[i] != nullptr ; i += 1) {
+	        for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
 	            if ((rs = mkpath3(pbuf,pr,prbins[i],prog)) >= 0) {
 	                pl = rs ;
 	                if ((rs = u_stat(pbuf,&sb)) >= 0) {
@@ -764,12 +811,15 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 	            if (pl > 0) break ;
 	            if (rs >= 0) break ;
 	        } /* end for */
-	        if ((rs >= 0) && (pl == 0)) rs = rs_last ;
+	        if ((rs >= 0) && (pl == 0)) {
+		    rs = rs_last ;
+		}
 
 	        if (rs >= 0) {
 	            vecstr	envs ;
+		    cint	vn = 20 ;
 	            cint	vo = VECSTR_OCOMPACT ;
-	            if ((rs = vecstr_start(&envs,20,vo)) >= 0) {
+	            if ((rs = vecstr_start(&envs,vn,vo)) >= 0) {
 	                cchar	*cp ;
 
 /* setup environment */
@@ -781,9 +831,10 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 	                    rs = vecstr_envadd(&envs,VARSVDBNAME,dbname,-1) ;
 	                }
 			if (rs >= 0) {
-	                    for (i = 0 ; envdefs[i] != nullptr ; i += 1) {
-	                        if ((cp = getenv(envdefs[i])) != nullptr) {
-	                            rs = vecstr_envadd(&envs,envdefs[i],cp,-1) ;
+	                    for (int i = 0 ; envdefs[i] ; i += 1) {
+				cchar	*evn = envdefs[i] ;
+	                        if ((cp = getenv(evn)) != np) {
+	                            rs = vecstr_envadd(&envs,evn,cp,-1) ;
 	                        }
 	                        if (rs < 0) break ;
 	                    } /* end for */
@@ -792,22 +843,22 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 /* go */
 
 	                if (rs >= 0) {
-	                    cchar	**ev ;
+	                    mainv	ev ;
 	                    if ((rs = vecstr_getvec(&envs,&ev)) >= 0) {
 	                        SPAWNPROC	ps ;
+	                        int		i = 0 ;
 	                        cchar		*av[10] ;
-	                        i = 0 ;
 	                        av[i++] = prog ;
 	                        av[i++] = "-s" ;
 	                        av[i++] = nullptr ;
 	                        memset(&ps,0,sizeof(SPAWNPROC)) ;
 	                        ps.opts |= SPAWNPROC_OIGNINTR ;
 	                        ps.opts |= SPAWNPROC_OSETPGRP ;
-	                        for (i = 0 ; i < 3 ; i += 1) {
-	                            if (i != 2) {
-	                                ps.disp[i] = SPAWNPROC_DCLOSE ;
+	                        for (int j = 0 ; j < 3 ; j += 1) {
+	                            if (j != 2) {
+	                                ps.disp[j] = SPAWNPROC_DCLOSE ;
 	                            } else {
-	                                ps.disp[i] = SPAWNPROC_DINHERIT ;
+	                                ps.disp[j] = SPAWNPROC_DINHERIT ;
 	                            }
 	                        } /* end for */
 	                        if ((rs = spawnproc(&ps,pbuf,av,ev)) >= 0) {
@@ -838,7 +889,7 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 	return rs ;
 }
 /* end subroutine (sysvars_mksysvarsi) */
-#endif /* CF_MKSVS */
+#endif /* CF_MKSYSVARS */
 
 static int subinfo_start(SUBINFO *sip) noex {
 	int		rs = SR_FAULT ;

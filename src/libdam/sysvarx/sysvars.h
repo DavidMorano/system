@@ -36,7 +36,7 @@ struct sysvars_object {
 } ;
 
 struct sysvars_cursor {
-	var_cur		vcur ;
+	var_cur		*vcurp ;
 } ;
 
 struct sysvars_flags {
@@ -44,10 +44,10 @@ struct sysvars_flags {
 } ;
 
 struct sysvars_head {
-	cvoid		*a ;		/* allocation */
+	cvoid		*a ;		/* memory-allocation */
 	char		*pr ;
 	char		*dbname ;	/* DB name (allocated) */
-	VAR		vind ;		/* variable index */
+	var		*vindp ;	/* variable-index-pointer */
 	time_t		ti_db ;		/* DB mtime */
 	SYSVARS_FL	f ;
 	uint		magic ;
