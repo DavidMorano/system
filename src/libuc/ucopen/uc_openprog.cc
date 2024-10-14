@@ -92,7 +92,6 @@ extern int	snshellunder(char *,int,pid_t,cchar *) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	matkeystr(cchar **,cchar *,int) ;
 extern int	vstrkeycmp(const void **,const void **) ;
 extern int	strkeycmp(cchar *,cchar *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;

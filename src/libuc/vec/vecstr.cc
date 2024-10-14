@@ -921,6 +921,10 @@ int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
 }
 
+int vecstr::envfile(cchar *fn) noex {
+	return vecstr_envfile(this,fn) ;
+}
+
 int vecstr::getvec(mainv *rppp) noex {
 	return vecstr_getvec(this,rppp) ;
 }

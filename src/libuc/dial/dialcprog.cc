@@ -75,13 +75,13 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<csignal>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<estrings.h>
@@ -97,6 +97,7 @@
 #include	<getusername.h>
 #include	<filer.h>
 #include	<findfilepath.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"streamsync.h"
@@ -190,7 +191,6 @@
 /* external subroutines */
 
 extern int	matstr(cchar **,cchar *,int) ;
-extern int	matkeystr(cchar **,cchar *,int) ;
 extern int	strkeycmp(cchar *,cchar *) ;
 extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;

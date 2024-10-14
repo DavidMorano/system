@@ -1,12 +1,12 @@
-/* uc_openfs */
+/* uc_openfs SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a file-system (?) */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -19,10 +19,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_openfs
+
+	Description:
 	This subroutine opens a file-system (what does this mean?).
 
 	Synopsis:
-
 	int uc_openfs(passfname,oflags,timeout,opts)
 	const char	passfname[] ;
 	int		oflags ;
@@ -39,23 +42,20 @@
 	Returns:
 
 	>=0		file descriptor to program STDIN and STDOUT
-	<0		error
-
+	<0		error (system-error)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -93,7 +93,6 @@ extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(const char **,const char *,int) ;
 extern int	vstrkeycmp(const void **,const void **) ;
 extern int	strkeycmp(const char *,const char *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;

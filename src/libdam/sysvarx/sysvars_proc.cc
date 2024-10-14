@@ -1,4 +1,4 @@
-/* sysvarproc */
+/* sysvars_proc SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -19,13 +19,13 @@
 /*******************************************************************************
 
   	Name:
-	sysvarproc
+	sysvars_proc
 
 	Description:
 	Process a system variable. I have no idea what that means!
 
 	Synopsis:
-	int sysvarprocget(hdbstr *vlp,cchar *fname) noex
+	int sysvars_procget(hdbstr *vlp,cchar *fname) noex
 
 	Arguments:
 	vlp		pointer to hash-string object
@@ -46,13 +46,19 @@
 #include	<cstdlib>
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
+#include	<linebuffer.h>
 #include	<filer.h>
 #include	<vecstr.h>
 #include	<hdbstr.h>
 #include	<field.h>
 #include	<varmk.h>
+#include	<strn.h>
+#include	<matstr.h>
 #include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
+
+#include	"sysvars.h"
 
 
 /* local defines */
@@ -85,31 +91,24 @@
 /* external subroutines */
 
 #if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(cchar *,cchar *,int) ;
+extern int	strncasecmp(cchar *,cchar *,int) noex ;
 #endif
-
-extern int	vecstr_envfile(VECSTR *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	isalnumlatin(int) ;
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* forward references */
 
-static int	procaddvar(HDBSTR *,cchar *,int) ;
+static int	procaddvar(hdbstr *,cchar *,int) noex ;
 
 #if	CF_PROCVARFILE
-static int	procvarfile(HDBSTR *,cchar *) ;
-static bool	hasweird(cchar *,int) ;
+static int	procvarfile(hdbstr *,cchar *) noex ;
+static bool	hasweird(cchar *,int) noex ;
 #endif
 
 
 /* local variables */
 
 #if	CF_PROCVARFILE
-static const uchar	fterms[32] = {
+constexpr char		fterms[] = {
 	0x00, 0x3A, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x20,
 	0x00, 0x00, 0x00, 0x00,
@@ -121,7 +120,7 @@ static const uchar	fterms[32] = {
 } ;
 #endif /* CF_PROCVARFILE */
 
-static cchar	*wstrs[] = {
+constexpr cpcchar	wstrs[] = {
 	"TZ",
 	"LANG",
 	"UMASK",
@@ -129,108 +128,96 @@ static cchar	*wstrs[] = {
 	nullptr
 } ;
 
-static cchar	*pstrs[] = {
+constexpr cpcchar	pstrs[] = {
 	"LC_",
 	nullptr
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sysvarprocget(HDBSTR *vlp,cchar fname[])
-{
-	vecstr		lvars ;
-	int		rs ;
+int sysvars_procget(hdbstr *vlp,cchar *fn) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (vlp == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-
-	if ((rs = vecstr_start(&lvars,10,0)) >= 0) {
-	    int		i ;
-	    int		f ;
-	    cchar	*tp, *cp ;
-
-	    if ((rs = vecstr_envfile(&lvars,fname)) >= 0) {
-
-	        for (i = 0 ; vecstr_get(&lvars,i,&cp) >= 0 ; i += 1) {
-	            if (cp == nullptr) continue ;
-
-	            if ((tp = strchr(cp,'=')) == nullptr) continue ;
-
-	            f = (matstr(wstrs,cp,(tp - cp)) >= 0) ;
-	            f = f || (matpstr(pstrs,10,cp,(tp - cp)) >= 0) ;
-	            if (f) {
-	                rs = procaddvar(vlp,cp,-1) ;
-	            } /* end if */
-
-	            if (rs < 0) break ;
-	        } /* end for */
-
-	    } /* end if (vecstr_envfile) */
-
-	    rs1 = vecstr_finish(&lvars) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (lvars) */
-
+	if (vlp && fn) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+	        cint	vn = 10 ;
+	        cint	vo = 0 ;
+	        if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) {
+	            if ((rs = lvars.envfile(fn)) >= 0) {
+	                bool	f ;
+	                cchar	*tp ;
+			cchar	*cp{} ;
+	                for (int i = 0 ; lvars.get(i,&cp) >= 0 ; i += 1) {
+	                    if (cp == nullptr) continue ;
+	                    if ((tp = strchr(cp,'=')) == nullptr) continue ;
+	                    f = (matstr(wstrs,cp,(tp - cp)) >= 0) ;
+	                    f = f || (matpstr(pstrs,10,cp,(tp - cp)) >= 0) ;
+	                    if (f) {
+	                        rs = procaddvar(vlp,cp,-1) ;
+	                    } /* end if */
+	                    if (rs < 0) break ;
+	                } /* end for */
+	            } /* end if (vecstr_envfile) */
+	            rs1 = lvars.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (lvars) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sysvarprocget) */
+/* end subroutine (sysvars_procget) */
 
-
-int sysvarprocset(HDBSTR *vlp,cchar dbname[],mode_t om)
-{
-	HDBSTR_CUR	cur ;
-	VARMK		svars ;
-	cint	of = O_CREAT ;
-	cint	n = DEFNVARS ;
-	int		rs ;
+int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rs2 ;
 	int		c = 0 ;
-
-	if (vlp == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if ((rs = varmk_open(&svars,dbname,of,om,n)) >= 0) {
-	    int		vl ;
-	    cchar	*kp, *vp ;
-
-	    if ((rs = hdbstr_curbegin(vlp,&cur)) >= 0) {
-
-	        while (rs >= 0) {
-	            rs1 = hdbstr_enum(vlp,&cur,&kp,&vp,&vl) ;
-	            if (rs1 == SR_NOTFOUND) break ;
-	            rs = rs1 ;
-
-	            if (rs >= 0) {
-	                c += 1 ;
-	                rs = varmk_addvar(&svars,kp,vp,vl) ;
-	            }
-
-	        } /* end while */
-
-	        hdbstr_curend(vlp,&cur) ;
-	    } /* end if (cursor) */
-
-	    rs1 = varmk_close(&svars) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (varmk) */
-
+	if (vlp && dbn) {
+	    rs = SR_INVALID ;
+	    if (dbn[0]) {
+	        cint		of = O_CREAT ;
+	        cint		vn = DEFNVARS ;
+	        if (varmk svars ; (rs = varmk_open(&svars,dbn,of,om,vn)) >= 0) {
+	            int		vl ;
+	            cchar	*kp ;
+	            cchar	*vp ;
+		    auto hcb = hdbstr_curbegin ;
+	            if (hdbstr_cur cur ; (rs2 = hcb(vlp,&cur)) >= 0) {
+	                while (rs >= 0) {
+	                    rs1 = hdbstr_enum(vlp,&cur,&kp,&vp,&vl) ;
+	                    if (rs1 == SR_NOTFOUND) break ;
+	                    rs = rs1 ;
+	                    if (rs >= 0) {
+	                        c += 1 ;
+	                        rs = varmk_addvar(&svars,kp,vp,vl) ;
+	                    }
+	                } /* end while */
+	                rs1 = hdbstr_curend(vlp,&cur) ;
+	                if (rs >= 0) rs = rs1 ;
+		        if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
+	            } /* end if (hdbstr_cursor) */
+	            rs1 = varmk_close(&svars) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (varmk) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (sysvarprocset) */
+/* end subroutine (sysvars_procset) */
 
 
 /* local subroutines */
 
-
 #if	CF_PROCVARFILE
 
-static int procvarfile(vlp,fname)
-HDBSTR		*vlp ;
-cchar	fname[] ;
-{
-	cint	to = TO_READ ;
+static int procvarfile(hdbstr *vlp,cchar *fname) noex {
+	cint		to = TO_READ ;
 	int		rs ;
 	int		cl ;
 	int		kl ;
@@ -300,17 +287,16 @@ cchar	fname[] ;
 	                    } /* end if (didn't have it already) */
 
 	                } /* end if (have a variable keyname) */
-
-	                field_finish(&fsb) ;
+	                rs1 = field_finish(&fsb) ;
+	    		if (rs >= 0) rs = rs1 ;
 	            } /* end if (fields) */
-
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
-
-	        filer_finish(dfp) ;
+	        rs1 = filer_finish(dfp) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
-
-	    u_close(fd) ;
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
 
 	return (rs >= 0) ? c : rs ;
@@ -330,30 +316,24 @@ static bool hasweird(cchar *sp,int sl) noex {
 
 #endif /* CF_PROCVARFILE */
 
-
-static int procaddvar(HDBSTR *vlp,cchar *cp,int cl)
-{
-	int		rs = SR_OK ;
-	int		kl, vl ;
+static int procaddvar(hdbstr *vlp,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
+    	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
+	int		kl = sl ;
+	int		vl = 0 ;
 	int		c = 0 ;
-	cchar	*tp ;
-	cchar	*kp, *vp ;
-
-	kp = cp ;
-	kl = cl ;
-	vp = nullptr ;
-	vl = 0 ;
-	if ((tp = strnchr(cp,cl,'=')) != nullptr) {
+	cchar		*kp = sp ;
+	cchar		*vp = nullptr ;
+	if (cchar *tp{} ; (tp = strnchr(sp,sl,'=')) != np) {
 	    vp = (tp + 1) ;
 	    vl = -1 ;
-	    kl = (tp - cp) ;
+	    kl = (tp - sp) ;
 	}
-
-	if ((rs = hdbstr_fetch(vlp,kp,kl,nullptr,nullptr)) == SR_NOTFOUND) {
+	if ((rs = hdbstr_fetch(vlp,kp,kl,np,np)) == rsn) {
 	    c += 1 ;
 	    rs = hdbstr_add(vlp,kp,kl,vp,vl) ;
 	}
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procaddvar) */

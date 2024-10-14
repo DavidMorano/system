@@ -1,4 +1,5 @@
 /* sysvars HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface to query the system-variable database */
