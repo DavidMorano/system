@@ -391,10 +391,10 @@ int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
 
 int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 	int		rs ;
+	int		i = 0 ;
 	if (cmpfunc == nullptr) cmpfunc = defaultcmp ;
 	if ((rs = commandment_magic(op,s,rpp)) >= 0) {
-	    int		i ;
-	    char		**rpp2 ;
+	    char	**rpp2 ;
 	    if (op->f.osorted && (! op->f.issorted)) {
 	        op->f.issorted = true ;
 	        if (op->c > 1) {
@@ -476,7 +476,7 @@ static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 		op->fl.modload = false ;
 		modload_close(lp) ;
 	    }
-	} /* end if (vecstr_start) */
+	} /* end if (vecstr-syms) */
 	return rs ;
 }
 /* end subroutine (commandment_objloadbegin) */
@@ -507,43 +507,43 @@ static int commandment_loadcalls(CMD *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-		    commandment_calls	*callp = callsp(op->callp) ;
-	            c += 1 ;
-		    switch (i) {
-		    case sub_open:
-		        callp->open = soopen_f(snp) ;
-		        break ;
-		    case sub_count:
-		        callp->count = socount_f(snp) ;
-		        break ;
-		    case sub_get:
-		        callp->get = soget_f(snp) ;
-		        break ;
-		    case sub_read:
-		        callp->read = soread_f(snp) ;
-		        break ;
-		    case sub_nummax:
-		        callp->nummax = sonummax_f(snp) ;
-		        break ;
-		    case sub_curbegin:
-		        callp->curbegin = socurbegin_f(snp) ;
-		        break ;
-		    case sub_curenum:
-		        callp->curenum = socurenum_f(snp) ;
-		        break ;
-		    case sub_curend:
-		        callp->curend = socurend_f(snp) ;
-		        break ;
-		    case sub_audit:
-		        callp->audit = soaudit_f(snp) ;
-		        break ;
-		    case sub_close:
-		        callp->close = soclose_f(snp) ;
-		        break ;
-		    } /* end switch */
-		} else if (rs == rsn) {
-	            if (! isrequired(i)) rs = SR_OK ;
-	        } /* end if (it had the call) */
+                commandment_calls   *callp = callsp(op->callp) ;
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open = soopen_f(snp) ;
+                    break ;
+                case sub_count:
+                    callp->count = socount_f(snp) ;
+                    break ;
+                case sub_get:
+                    callp->get = soget_f(snp) ;
+                    break ;
+                case sub_read:
+                    callp->read = soread_f(snp) ;
+                    break ;
+                case sub_nummax:
+                    callp->nummax = sonummax_f(snp) ;
+                    break ;
+                case sub_curbegin:
+                    callp->curbegin = socurbegin_f(snp) ;
+                    break ;
+                case sub_curenum:
+                    callp->curenum = socurenum_f(snp) ;
+                    break ;
+                case sub_curend:
+                    callp->curend = socurend_f(snp) ;
+                    break ;
+                case sub_audit:
+                    callp->audit = soaudit_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close = soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
 	    if (rs < 0) break ;
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;

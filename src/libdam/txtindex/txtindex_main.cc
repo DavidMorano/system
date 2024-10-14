@@ -441,7 +441,7 @@ static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 		op->fl.modload = false ;
 		modload_close(lp) ;
 	    }
-	} /* end if (vecstr) */
+	} /* end if (vecstr-syms) */
 	return rs ;
 }
 /* end subroutine (txtindex_objloadbegin) */
@@ -473,45 +473,45 @@ static int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-	            c += 1 ;
-		    switch (i) {
-		    case sub_open:
-		        callp->open = soopen_f(snp) ;
-		        break ;
-		    case sub_count:
-		        callp->count = socount_f(snp) ;
-		        break ;
-		    case sub_neigen:
-		        callp->neigen = soneigen_f(snp) ;
-		        break ;
-		    case sub_getinfo:
-		        callp->getinfo = sogetinfo_f(snp) ;
-		        break ;
-		    case sub_iseigen:
-		        callp->iseigen = soiseigen_f(snp) ;
-		        break ;
-		    case sub_curbegin:
-		        callp->curbegin = socurbegin_f(snp) ;
-		        break ;
-		    case sub_curlookup:
-		        callp->curlookup = socurlookup_f(snp) ;
-		        break ;
-		    case sub_curenum:
-		        callp->curenum = socurenum_f(snp) ;
-		        break ;
-		    case sub_curend:
-		        callp->curend = socurend_f(snp) ;
-		        break ;
-		    case sub_audit:
-		        callp->audit = soaudit_f(snp) ;
-		        break ;
-		    case sub_close:
-		        callp->close = soclose_f(snp) ;
-		        break ;
-		    } /* end switch */
-		} else if (rs == rsn) {
-		    if (! isrequired(i)) rs = SR_OK ;
-	        } /* end if (it had the call) */
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open = soopen_f(snp) ;
+                    break ;
+                case sub_count:
+                    callp->count = socount_f(snp) ;
+                    break ;
+                case sub_neigen:
+                    callp->neigen = soneigen_f(snp) ;
+                    break ;
+                case sub_getinfo:
+                    callp->getinfo = sogetinfo_f(snp) ;
+                    break ;
+                case sub_iseigen:
+                    callp->iseigen = soiseigen_f(snp) ;
+                    break ;
+                case sub_curbegin:
+                    callp->curbegin = socurbegin_f(snp) ;
+                    break ;
+                case sub_curlookup:
+                    callp->curlookup = socurlookup_f(snp) ;
+                    break ;
+                case sub_curenum:
+                    callp->curenum = socurenum_f(snp) ;
+                    break ;
+                case sub_curend:
+                    callp->curend = socurend_f(snp) ;
+                    break ;
+                case sub_audit:
+                    callp->audit = soaudit_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close = soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
 	    if (rs < 0) break ;
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;

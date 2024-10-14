@@ -402,30 +402,30 @@ static int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-	            c += 1 ;
-		    switch (i) {
-		    case sub_open:
-		        callp->open = soopen_f(snp) ;
-		        break ;
-		    case sub_addeigens:
-		        callp->addeigens = soaddeigens_f(snp) ;
-		        break ;
-		    case sub_addtags:
-		        callp->addtags = soaddtags_f(snp) ;
-		        break ;
-		    case sub_noop:
-		        callp->noop = sonoop_f(snp) ;
-		        break ;
-		    case sub_abort:
-		        callp->abort = soabort_f(snp) ;
-		        break ;
-		    case sub_close:
-		        callp->close = soclose_f(snp) ;
-		        break ;
-		    } /* end switch */
-		} else if (rs == rsn) {
-		     if (! isrequired(i)) rs = SR_OK ;
-	        } /* end if (it had the call) */
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open = soopen_f(snp) ;
+                    break ;
+                case sub_addeigens:
+                    callp->addeigens = soaddeigens_f(snp) ;
+                    break ;
+                case sub_addtags:
+                    callp->addtags = soaddtags_f(snp) ;
+                    break ;
+                case sub_noop:
+                    callp->noop = sonoop_f(snp) ;
+                    break ;
+                case sub_abort:
+                    callp->abort = soabort_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close = soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                 if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
 	    if (rs < 0) break ;
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;

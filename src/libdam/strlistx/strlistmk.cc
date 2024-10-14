@@ -341,27 +341,27 @@ static int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-	            c += 1 ;
-		    switch (i) {
-		    case sub_open:
-		        callp->open = soopen_f(snp) ;
-		        break ;
-		    case sub_add:
-		        callp->add = soadd_f(snp) ;
-		        break ;
-		    case sub_abort:
-		        callp->abort = soabort_f(snp) ;
-		        break ;
-		    case sub_chgrp:
-		        callp->chgrp = sochgrp_f(snp) ;
-		        break ;
-		    case sub_close:
-		        callp->close = soclose_f(snp) ;
-		        break ;
-		    } /* end switch */
-	        } else if ((rs == rsn) && (! isrequired(i))) {
-	            rs = SR_OK ;
-	        }
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open = soopen_f(snp) ;
+                    break ;
+                case sub_add:
+                    callp->add = soadd_f(snp) ;
+                    break ;
+                case sub_abort:
+                    callp->abort = soabort_f(snp) ;
+                    break ;
+                case sub_chgrp:
+                    callp->chgrp = sochgrp_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close = soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if ((rs == rsn) && (! isrequired(i))) {
+                rs = SR_OK ;
+            }
 	    if (rs < 0) break ;
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;

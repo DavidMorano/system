@@ -53,18 +53,20 @@ struct var_cursor {
 	uint		magic ;
 } ;
 
-struct var_callsubs {
-	int	(*open)(void *,cchar *) ;
-	int	(*opena)(void *,cchar **) ;
-	int	(*count)(void *) ;
-	int	(*curbegin)(void *,void *) ;
-	int	(*fetch)(void *,cchar *,int,void *,char *,int) ;
-	int	(*enumerate)(void *,void *,char *,int,char *,int) ;
-	int	(*curend)(void *,void *) ;
-	int	(*info)(void *,VARS_INFO *) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
-} ;
+EXTERNC_begin
+    struct var_callsubs {
+	int	(*open)(void *,cchar *) noex ;
+	int	(*opena)(void *,cchar **) noex ;
+	int	(*count)(void *) noex ;
+	int	(*curbegin)(void *,void *) noex ;
+	int	(*fetch)(void *,cchar *,int,void *,char *,int) noex ;
+	int	(*enumerate)(void *,void *,char *,int,char *,int) noex ;
+	int	(*curend)(void *,void *) noex ;
+	int	(*info)(void *,VARS_INFO *) noex ;
+	int	(*audit)(void *) noex ;
+	int	(*close)(void *) noex ;
+    } ; /* end struct (var_callsubs) */
+EXTERNC_end
 
 struct var_head {
 	modload		loader ;

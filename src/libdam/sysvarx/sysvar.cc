@@ -183,10 +183,8 @@ static int	sysvar_defaults(SV *) noex ;
 static int	sysvar_procsysdef(SV *,cchar *) noex ;
 static int	sysvar_defcurbegin(SV *,SV_CUR *) noex ;
 static int	sysvar_defcurend(SV *,SV_CUR *) noex ;
-static int	sysvar_deffetch(SV *,cchar *,int,
-			SV_DC *,char *,int) noex ;
-static int	sysvar_defenum(SV *,SV_DC *,
-			char *,int,char *,int) noex ;
+static int	sysvar_deffetch(SV *,cchar *,int,SV_DC *,char *,int) noex ;
+static int	sysvar_defenum(SV *,SV_DC *,char *,int,char *,int) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -443,9 +441,9 @@ static int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
-			    cint	sz = op->objsize ;
+			    cint	osz = op->objsize ;
 	                    op->objsize = mv[0] ;
-			    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+			    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = sysvar_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
@@ -467,7 +465,7 @@ static int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 		op->fl.modload = false ;
 		modload_close(lp) ;
 	    }
-	} /* end if (vecstr_start) */
+	} /* end if (vecstr-syms) */
 	return rs ;
 }
 /* end subroutine (sysvar_objloadbegin) */
@@ -498,37 +496,37 @@ static int sysvar_loadcalls(SV *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-		    sysvar_calls	*callp = callsp(op->callp) ;
-	            c += 1 ;
-		    switch (i) {
-		    case sub_open:
-		        callp->open = soopen_f(snp) ;
-		        break ;
-		    case sub_count:
-		        callp->count = socount_f(snp) ;
-		        break ;
-		    case sub_curbegin:
-		        callp->curbegin = socurbegin_f(snp) ;
-		        break ;
-		    case sub_curenum:
-		        callp->curenum = socurenum_f(snp) ;
-		        break ;
-		    case sub_fetch:
-		        callp->fetch = sofetch_f(snp) ;
-		        break ;
-		    case sub_curend:
-		        callp->curend = socurend_f(snp) ;
-		        break ;
-		    case sub_audit:
-		        callp->audit = soaudit_f(snp) ;
-		        break ;
-		    case sub_close:
-		        callp->close = soclose_f(snp) ;
-		        break ;
-		    } /* end switch */
-		} else if (rs == rsn) {
-	            if (! isrequired(i)) rs = SR_OK ;
-	        } /* end if (it had the call) */
+                sysvar_calls        *callp = callsp(op->callp) ;
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open = soopen_f(snp) ;
+                    break ;
+                case sub_count:
+                    callp->count = socount_f(snp) ;
+                    break ;
+                case sub_curbegin:
+                    callp->curbegin = socurbegin_f(snp) ;
+                    break ;
+                case sub_curenum:
+                    callp->curenum = socurenum_f(snp) ;
+                    break ;
+                case sub_fetch:
+                    callp->fetch = sofetch_f(snp) ;
+                    break ;
+                case sub_curend:
+                    callp->curend = socurend_f(snp) ;
+                    break ;
+                case sub_audit:
+                    callp->audit = soaudit_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close = soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
 	    if (rs < 0) break ;
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
@@ -585,7 +583,7 @@ static int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 static int sysvar_defaults(SV *op) noex {
 	int		rs ;
 	if ((rs = vecstr_start(op->dlp,NDEFAULTS,0)) >= 0) {
-	    op->fl.defaults = (rs >= 0) ;
+	    op->fl.defaults = true ;
 	    for (int i = 0 ; sysfnames[i] != nullptr ; i += 1) {
 	        bool	f = false ;
 	        rs = sysvar_procsysdef(op,sysfnames[i]) ;
@@ -606,14 +604,19 @@ static int sysvar_defaults(SV *op) noex {
 /* end subroutine (sysvar_defaults) */
 
 static int sysvar_procsysdef(SV *op,cchar *fname) noex {
+    	cnullptr	np{} ;
+    	cint		vn = 10 ;
+	cint		vo = 0 ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr lvars ; (rs = vecstr_start(&lvars,10,0)) >= 0) {
-	    if ((rs = vecstr_envfile(&lvars,fname)) >= 0) {
+	int		rs2 ;
+	if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) {
+	    if ((rs = lvars.envfile(fname)) >= 0) {
 		cchar	*cp{} ;
-	        for (int i = 0 ; vecstr_get(&lvars,i,&cp) >= 0 ; i += 1) {
+	        for (int i = 0 ; (rs2 = lvars.get(i,&cp)) >= 0 ; i += 1) {
 	            if (cp) {
-	                if (cchar *tp{} ; (tp = strchr(cp,'=')) != nullptr) {
+	                if (cchar *tp{} ; (tp = strchr(cp,'=')) != np) {
 	                    bool	f = (matstr(wstrs,cp,(tp - cp)) >= 0) ;
 	                    f = f || (matpstr(pstrs,10,cp,(tp - cp)) >= 0) ;
 	                    if (f) {
@@ -623,8 +626,9 @@ static int sysvar_procsysdef(SV *op,cchar *fname) noex {
 		    } /* end if (non-null) */
 		    if (rs < 0) break ;
 	        } /* end for */
+		if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	    } /* end if (vecstr_envfile) */
-	    rs1 = vecstr_finish(&lvars) ;
+	    rs1 = lvars.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (lvars) */
 	return rs ;
@@ -639,7 +643,7 @@ static int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 	        SV_DC	*dcp = (SV_DC *) vp ;
 	        curp->scp = vp ;
 	        dcp->i = -1 ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
