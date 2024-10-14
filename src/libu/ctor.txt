@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int biblecur_ctor(biblecur *op,Args ... args) noex {
+static int sysvars_ctor(sysvars *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int biblecur_ctor(biblecur *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (biblecur_ctor) */
+/* end subroutine (sysvars_ctor) */
 
-static int biblecur_dtor(biblecur *op) noex {
+static int sysvars_dtor(sysvars *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (biblecur_dtor) */
+/* end subroutine (sysvars_dtor) */
 
 template<typename ... Args>
-static inline int biblecur_magic(biblecur *op,Args ... args) noex {
+static inline int sysvars_magic(sysvars *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SYSVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (biblecur_magic) */
+/* end subroutine (sysvars_magic) */

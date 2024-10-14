@@ -20,6 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* system types */
+#include	<stddef.h>		/* language types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -36,7 +38,7 @@
 #define	VAR_INFO	struct var_information
 #define	VAR_CALLS	struct var_callsubs
 
-#define	VARINFO		struct varinfo
+#define	VARINFO_DAT	struct varinfo_data
 
 
 struct var_information {
@@ -73,8 +75,8 @@ struct var_head {
 	int		cursize ;	/* cursor size */
 } ;
 
-struct varinfo {
-	long		size ;
+struct varinfo_data {
+	size_t		sz ;
 	time_t		mtime ;
 } ;
 
@@ -83,10 +85,12 @@ typedef VAR_CUR		var_cur ;
 typedef VAR_INFO	var_info ;
 typedef VAR_CALLS	var_calls ;
 
+typedef VARINFO_DAT		varinfo_dat ;
+
 EXTERNC_begin
 
 extern int	var_open(var *,cchar *) noex ;
-extern int	var_opena(var *,cchar **) noex ;
+extern int	var_opena(var *,mainv) noex ;
 extern int	var_count(var *) noex ;
 extern int	var_curbegin(var *,var_cur *) noex ;
 extern int	var_fetch(var *,cchar *,int,var_cur *,char *,int) noex ;
@@ -96,7 +100,7 @@ extern int	var_getinfo(var *,var_info *) noex ;
 extern int	var_audit(var *) noex ;
 extern int	var_close(var *) noex ;
 
-extern int	varinfo(VARINFO *,cchar *,int) noex ;
+extern int	varinfo_get(varinfo_dat *,cchar *,int) noex ;
 extern int	varunlink(cchar *,int) noex ;
 
 EXTERNC_end

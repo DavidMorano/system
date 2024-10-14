@@ -154,6 +154,7 @@ struct vecstr : vecstr_head {
 	int insert(int,cchar *,int = -1) noex ;
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
+	int envfile(cchar *) noex ;
 	int del(int = -1) noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;

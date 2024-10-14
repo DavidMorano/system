@@ -1,4 +1,5 @@
 /* sysvars HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface to query the system-variable database */
@@ -29,13 +30,13 @@
 
 
 struct sysvars_object {
-	char		*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
 struct sysvars_cursor {
-	var_cur		vcur ;
+	var_cur		*vcurp ;
 } ;
 
 struct sysvars_flags {
@@ -43,10 +44,10 @@ struct sysvars_flags {
 } ;
 
 struct sysvars_head {
-	cvoid		*a ;		/* allocation */
+	cvoid		*a ;		/* memory-allocation */
 	char		*pr ;
 	char		*dbname ;	/* DB name (allocated) */
-	VAR		vind ;		/* variable index */
+	var		*vindp ;	/* variable-index-pointer */
 	time_t		ti_db ;		/* DB mtime */
 	SYSVARS_FL	f ;
 	uint		magic ;
@@ -64,7 +65,7 @@ extern int sysvars_open(sysvars *,char *,char *) noex ;
 extern int sysvars_count(sysvars *) noex ;
 extern int sysvars_curbegin(sysvars *,sysvars_cur *) noex ;
 extern int sysvars_fetch(sysvars *, char *,int,sysvars_cur *,char *,int) noex ;
-extern int sysvars_enum(sysvars *,sysvars_cur *,char *,int,char *,int) noex ;
+extern int sysvars_curenum(sysvars *,sysvars_cur *,char *,int,char *,int) noex ;
 extern int sysvars_curend(sysvars *,sysvars_cur *) noex ;
 extern int sysvars_audit(sysvars *) noex ;
 extern int sysvars_close(sysvars *) noex ;

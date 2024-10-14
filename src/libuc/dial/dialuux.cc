@@ -53,11 +53,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"dialuux.h"
@@ -140,7 +142,6 @@ extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matkeystr(const char **,const char *,int) ;
 extern int	strkeycmp(const char *,const char *) ;
 extern int	vstrkeycmp(const void **,const void **) ;
 extern int	pathclean(char *,const char *,int) ;

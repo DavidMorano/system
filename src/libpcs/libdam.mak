@@ -804,6 +804,11 @@ fileread.o:		fileread.dir
 fileread.dir:
 	makesubdir $@
 
+# SYSVARX
+sysvarx.o:		sysvarx.dir
+sysvarx.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
