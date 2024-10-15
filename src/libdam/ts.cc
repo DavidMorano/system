@@ -1,4 +1,5 @@
 /* ts SUPPORT (Time-Stamp) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* time-stamp file manager */

@@ -1,4 +1,5 @@
 /* pwi SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* PassWord Index manager */
@@ -17,11 +18,14 @@
 
 /*******************************************************************************
 
-	This is a small hack for use by the USERINFO built-in command
-	that is part of the Korn Shell (KSH).
+  	Object:
+	pwi
 
-	This object provides some front-end glue for using the
-	Iucentpw object on an Iucentpw database.
+	Description:
+	This is a small hack for use by the USERINFO built-in command
+	that is part of the Korn Shell (KSH).  This object provides
+	some front-end glue for using the Iucentpw object on an
+	Iucentpw database.
 
 	Notes:
 
@@ -46,6 +50,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
@@ -139,6 +144,11 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
@@ -171,6 +181,45 @@ struct pwdesc {
 
 /* forward references */
 
+template<typename ... Args>
+static int pwi_ctor(pwi *op,Args ... args) noex {
+    	PWI		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->dbp = new(nothrow) ipasswd) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-ipasswd) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (pwi_ctor) */
+
+static int pwi_dtor(pwi *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->dbp) {
+		delete op->dbp ;
+		op->dbp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (pwi_dtor) */
+
+template<typename ... Args>
+static inline int pwi_magic(pwi *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == PWI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (pwi_magic) */
+
 static int	subinfo_start(SUBINFO *,cchar *,cchar *) noex ;
 static int	subinfo_finish(SUBINFO *) noex ;
 static int	subinfo_midname(SUBINFO *) noex ;
@@ -181,7 +230,7 @@ static int	realname_isextra(realname *,PWDESC *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	exports[] = {
+constexpr cpcchar	exports[] = {
 	VARHZ,
 	VARNODE,
 	VARHOMEDNAME,
@@ -193,13 +242,13 @@ static constexpr cpcchar	exports[] = {
 } ;
 
 /* use fixed locations for security reasons (like we care!) */
-static constexpr cpcchar	prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	nullptr
 } ;
 
-static constexpr cchar		extras[] = "¹²³" ;
+constexpr cchar		extras[] = "¹²³" ;
 
 
 /* exported variables */
@@ -208,15 +257,12 @@ static constexpr cchar		extras[] = "¹²³" ;
 /* exported subroutines */
 
 int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
-	SUBINFO		si, *sip = &si ;
-	YSTAT		sb, *sbp = &sb ;
-	const time_t	daytime = time(nullptr) ;
 	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
+	if ((rs = pwi_ctor(op,pr)) >= 0) {
+	SUBINFO		si, *sip = &si ;
+	USTAT		sb, *sbp = &sb ;
+	ctime		daytime = getustime ;
 	if ((rs = subinfo_start(sip,pr,dbname)) >= 0) {
 	    if ((rs = subinfo_midname(sip)) >= 0) {
 	        time_t	ti_pwi ;
@@ -266,28 +312,34 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
 
+	    if (rs < 0) {
+		pwi_dtor(op) ;
+	    }
+	} /* end if (pwi_ctor) */
 	return rs ;
 }
 /* end subroutine (pwi_open) */
 
 int pwi_close(PWI *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != PWI_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = ipasswd_close(&op->db) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = pwi_magic(op)) >= 0) {
+	    {
+	        rs1 = ipasswd_close(&op->db) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = pwi_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwi_close) */
 
 int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
-	Iucentpw_CUR	cur ;
+	ipasswd_cur	cur ;
 	realname	rn ;
 	cint		nlen = realnameLEN ;
 	int		rs = SR_OK ;
@@ -382,27 +434,33 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
 /* private subroutines */
 
 static int subinfo_start(SUBINFO *sip,cchar *pr,cchar *dbname) noex {
-	memclear(sip) ;
-	sip->pr = pr ;
-	sip->dbname = dbname ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (sip && pr && dbname) {
+	    rs = memclear(sip) ;
+	    sip->pr = pr ;
+	    sip->dbname = dbname ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
 static int subinfo_finish(SUBINFO *sip) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip->midname != nullptr) {
-	    rs1 = uc_free(sip->midname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->midname = nullptr ;
-	}
-	if (sip->alloc.dbname && (sip->dbname != nullptr)) {
-	    rs1 = uc_free(sip->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->dbname = nullptr ;
-	}
-	sip->pr = nullptr ;
+	if (sip) {
+	    rs = SR_OK :
+	    if (sip->midname) {
+	        rs1 = uc_free(sip->midname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->midname = nullptr ;
+	    }
+	    if (sip->alloc.dbname && (sip->dbname != nullptr)) {
+	        rs1 = uc_free(sip->dbname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->dbname = nullptr ;
+	    }
+	    sip->pr = nullptr ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
