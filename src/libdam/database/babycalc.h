@@ -29,7 +29,6 @@
 
 #define	BABYCALC_MAGIC		0x97147229
 #define	BABYCALC		struct babycalc_head
-#define	BABYCALC_CA		struct babycalc_calls
 #define	BABYCALC_INFO		struct babycalc_information
 
 
@@ -39,25 +38,14 @@ struct babycalc_i {
 	uint		acount ;
 } ;
 
-EXTERNC_begin
-struct babycalc_calls {
-	int		(*open)(void *,cchar *,cchar *) noex ;
-	int		(*check)(void *,time_t) noex ;
-	int		(*lookup)(void *,time_t,uint *) noex ;
-	int		(*info)(void *,babycalcs_info *) noex ;
-	int		(*close)(void *) noex ;
-} ;
-EXTERNC_end
-
 struct babycalc_head {
-	modload		*lop ;
+	modload		*mlp ;		/* module-load-pointer */
+	void		*callp ;	/* calls-structure pointer */
 	void		*obj ;		/* object pointer */
-	BABYCALC_CA	call ;
 	uint		magic ;
 } ;
 
 typedef	BABYCALC		babycalc ;
-typedef	BABYCALC_CA		babycalc_ca ;
 typedef	BABYCALC_INFO		babycalc_info ;
 
 EXTERNC_begin

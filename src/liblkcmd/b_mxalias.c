@@ -1005,20 +1005,18 @@ static int locinfo_outadd(LOCINFO *lip,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_outadd) */
 
-
-static int locinfo_outprint(LOCINFO *lip,SHIO *ofp)
-{
+static int locinfo_outprint(LOCINFO *lip,SHIO *ofp) noex {
 	PROGINFO	*pip = lip->pip ;
 	HDBSTR_CUR	cur ;
 	int		rs ;
 	int		wlen = 0 ;
 
 	if (pip == NULL) return SR_FAULT ;
+	cnullptr	np{} ;
 	if ((rs = hdbstr_curbegin(&lip->addrs,&cur)) >= 0) {
 	    int		kl ;
 	    cchar	*kp ;
-
-	    while ((kl = hdbstr_enum(&lip->addrs,&cur,&kp,NULL,NULL)) >= 0) {
+	    while ((kl = hdbstr_curenum(&lip->addrs,&cur,&kp,np,np)) >= 0) {
 
 	        if (kl > 0) {
 	            rs = shio_printf(ofp,"%t\n",kp,kl) ;

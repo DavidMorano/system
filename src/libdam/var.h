@@ -29,7 +29,7 @@
 #include	<usysrets.h>
 #include	<modload.h>
 
-#include	"vars.h"
+#include	<vars.h>
 
 
 #define	VAR_MAGIC	0x99447246

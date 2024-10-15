@@ -27,12 +27,11 @@
 #include	<usysrets.h>
 #include	<mapstrint.h>
 
-#include	"msfilee.h"
-#include	"ebuf.h"
+#include	<msfilee.h>
+#include	<ebuf.h>
 
 
 /* object defines */
-
 #define	MSFILE			struct msfile_head
 #define	MSFILE_CUR		struct msfile_cursor
 #define	MSFILE_ENT		MSFILEE_ALL
@@ -44,7 +43,6 @@
 #define	MSFILE_FILEMAGICSIZE	16
 #define	MSFILE_FILEMAGICLEN	sizeof(MSFILE_FILEMAGIC)
 #define	MSFILE_FILEVERSION	0
-#define	MSFILE_ENDIAN		0
 #define	MSFILE_NODENAMELEN	MSFILEE_LNODENAME
 #define	MSFILE_IDLEN		(16 + sizeof(uint))
 #define	MSFILE_HEADTABLEN	(3 * sizeof(uint))
@@ -75,7 +73,7 @@ struct msfile_flags {
 } ;
 
 struct msfile_head {
-	EBUF		ebm ;		/* entry-buffer-manager */
+	ebuf		ebm ;		/* entry-buffer-manager */
 	mapstrint	ni ;		/* nodename index */
 	cchar		*fname ;
 	uint		magic ;

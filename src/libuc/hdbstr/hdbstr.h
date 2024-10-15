@@ -40,14 +40,14 @@ EXTERNC_begin
 extern int hdbstr_start(hdbstr *,int) noex ;
 extern int hdbstr_add(hdbstr *,cchar *,int,cchar *,int) noex ;
 extern int hdbstr_curbegin(hdbstr *,hdbstr_cur *) noex ;
-extern int hdbstr_curend(hdbstr *,hdbstr_cur *) noex ;
+extern int hdbstr_getrec(hdbstr *,hdbstr_cur *,cchar **,cchar **,int *) noex ;
+extern int hdbstr_curenum(hdbstr *,hdbstr_cur *,cchar **,cchar **,int *) noex ;
+extern int hdbstr_delcur(hdbstr *,hdbstr_cur *,int) noex ;
 extern int hdbstr_fetch(hdbstr *,cchar *,int,hdbstr_cur *,cchar **) noex ;
 extern int hdbstr_fetchrec(hdbstr *,cchar *,int,hdbstr_cur *,
 				cchar **,cchar **,int *) noex ;
-extern int hdbstr_getrec(hdbstr *,hdbstr_cur *,cchar **,cchar **,int *) noex ;
-extern int hdbstr_enum(hdbstr *,hdbstr_cur *,cchar **,cchar **,int *) noex ;
+extern int hdbstr_curend(hdbstr *,hdbstr_cur *) noex ;
 extern int hdbstr_delkey(hdbstr *,cchar *,int) noex ;
-extern int hdbstr_delcur(hdbstr *,hdbstr_cur *,int) noex ;
 extern int hdbstr_next(hdbstr *,hdbstr_cur *) noex ;
 extern int hdbstr_nextkey(hdbstr *,cchar *,int,hdbstr_cur *) noex ;
 extern int hdbstr_count(hdbstr *) noex ;

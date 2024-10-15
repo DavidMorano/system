@@ -31,14 +31,12 @@
 
 
 /* object defines */
-
 #define	MSFILEE_ALL		struct msfilee_all
 #define	MSFILEE_LA		struct msfilee_la
 #define	MSFILEE_ATIME		struct msfilee_atime
 #define	MSFILEE_UTIME		struct msfilee_utime
 #define	MSFILEE_DTIME		struct msfilee_dtime
 #define	MSFILEE_STIME		struct msfilee_stime
-
 
 /* entry field lengths */
 #define	MSFILEE_LBOOTTIME	4

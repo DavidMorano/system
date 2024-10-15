@@ -23,8 +23,8 @@
 
 #define	PWI_MAGIC	0x99889998
 #define	PWI		struct pwi_head
-#define	PWI_CUR		struct pwi_cursor
 #define	PWI_FL		struct pwi_flags
+#define	PWI_CUR		struct pwi_cursor
 
 
 struct pwi_cursor {
@@ -36,7 +36,7 @@ struct pwi_flags {
 } ;
 
 struct pwi_head {
-	ipasswd		db ;
+	ipasswd		*dbp ;
 	PWI_FL		f ;
 	uint		magic ;
 	int		i ;
