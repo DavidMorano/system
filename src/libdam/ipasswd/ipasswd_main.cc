@@ -18,24 +18,24 @@
 
 /*******************************************************************************
 
+  	Object:
+	ipasswd
+
+	Description:
 	This object module provides an interface to a data base of
 	information about the GECOS name in the system PASSWD
-	database.
-
-	The system PASSWD database (whether a file or whatever) was
-	enumerated (separately) and an index file was made with
-	several indices to lookup usernames based on a real name.
-	For starters only indices consisting of using the first
-	character of the last name, the first 3 characters of the
-	last name, and the first character of the first name have
-	been used.  But future index files might provide more
+	database.  The system PASSWD database (whether a file or
+	whatever) was enumerated (separately) and an index file was
+	made with several indices to lookup usernames based on a
+	real name.  For starters only indices consisting of using
+	the first character of the last name, the first 3 characters
+	of the last name, and the first character of the first name
+	have been used.  But future index files might provide more
 	combinations, like using the first 3 characters of the last
 	name combined with the first character of the first name!
-
 	The various data and indices were written into a file. We
-	are accessing that file within this object.
-
-	Extra note: this code needs another rewrite!
+	are accessing that file within this object.  Extra note:
+	this code needs another rewrite!
 
 	Name:
 	ipasswd_fetch
@@ -203,7 +203,7 @@ constexpr bool		f_usefl3 = CF_USEFL3 ;
 /* exported variables */
 
 #ifdef	COMMENT
-IPASSWD_OBJ	ipasswd_mod = {
+IPASSWD_OBJ	ipasswd_modinfo = {
 	"ipasswd",
 	sizeof(ipasswd),
 	sizeof(ipasswd_cur)
@@ -214,7 +214,7 @@ IPASSWD_OBJ	ipasswd_mod = {
 /* exported subroutines */
 
 int ipasswd_open(ipasswd *op,cchar *dbname) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && dbname) {
@@ -484,7 +484,7 @@ int ipasswd_curbegin(ipasswd *op,ipasswd_cur *curp) noex {
 /* end subroutine (ipasswd_curbegin) */
 
 int ipasswd_curend(ipasswd *op,ipasswd_cur *curp) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = ipasswd_magic(op,curp)) >= 0) {
 	    if (curp->magic == IPASSWD_CURMAGIC) {
@@ -922,7 +922,7 @@ static int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 	if (op->fd < 0) {
 	    if ((rs = uc_open(op->fname,op->oflags,op->operm)) >= 0) {
 	        op->fd = rs ;
-	        if (dt == 0) dt = time(nullptr) ;
+	        if (dt == 0) dt = getustime ;
 	        op->ti_open = dt ;
 	        if ((uc_closeonexec(op->fd,true)) >= 0) {
 	            USTAT	sb ;

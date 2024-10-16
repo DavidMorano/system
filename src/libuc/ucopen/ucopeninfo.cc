@@ -1,8 +1,10 @@
 /* ucopeninfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* higher-level "open" /w timeout */
+/* version %I% last-modified %G% */
 
 #define	CF_ISMORE	0		/* compile in |isMorePossible()| */
 
@@ -87,6 +89,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
@@ -97,6 +100,7 @@
 #include	<getax.h>
 #include	<typenonpath.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
+#include	<matstr.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -132,7 +136,6 @@ extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath1w(char *,cchar *,int) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
 extern int	haslc(cchar *,int) ;
 extern int	hascdpath(cchar *,int) ;
 extern int	hasvarpathprefix(cchar *,int) ;

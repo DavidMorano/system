@@ -1,4 +1,5 @@
-/* sysrealname */
+/* sysrealname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */
@@ -19,16 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<modload.h>
-#include	<localmisc.h>
 #include	<ipasswd.h>		/* <- money shot */
 
 
 #define	SYSREALNAME		struct sysrealname_head
-#define	SYSREALNAME_CUR		struct sysrealname_c
-#define	SYSREALNAME_INFO	struct sysrealname_i
+#define	SYSREALNAME_FL		struct sysrealname_flags
+#define	SYSREALNAME_CUR		struct sysrealname_cursor
+#define	SYSREALNAME_INFO	struct sysrealname_information
 #define	SYSREALNAME_CA		struct sysrealname_calls
 #define	SYSREALNAME_MAGIC	0x88776216
 #define	SYSREALNAME_CURMAGIC	0x88776217
@@ -36,15 +36,19 @@
 #define	SYSREALNAME_DBNAME	"/sysdb/realname"
 
 
-struct sysrealname_c {
-	uint		magic ;
+struct sysrealname_flags {
+    	uint		modload:1 ;
+} ;
+
+struct sysrealname_cursor {
 	void		*scp ;
-	const char	**sa ;
+	cchar		**sa ;
+	uint		magic ;
 	int		sn ;
 	int		fo ;		/* options */
 } ;
 
-struct sysrealname_i {
+struct sysrealname_information {
 	time_t		writetime ;	/* time DB written */
 	uint		writecount ;	/* write counter */
 	uint		entries ;	/* total number of entries */
@@ -54,48 +58,34 @@ struct sysrealname_i {
 	uint		collisions ;
 } ;
 
-struct sysrealname_calls {
-	int (*open)(void *,const char *) noex ;
-	int (*info)(void *,IPASSWD_INFO *) noex ;
-	int (*curbegin)(void *,IPASSWD_CUR *) noex ;
-	int (*curend)(void *,IPASSWD_CUR *) noex ;
-	int (*enumerate)(void *,IPASSWD_CUR *,char *,cchar **,char *,int) noex ;
-	int (*fetcher)(void *,IPASSWD_CUR *,int,char *,cchar **,int) noex ;
-	int (*audit)(void *) noex ;
-	int (*close)(void *) noex ;
-} ;
-
 struct sysrealname_head {
-	uint		magic ;
-	MODLOAD		loader ;
-	SYSREALNAME_CA	call ;
+	modload		*mlp ;
+	void		*callp ;
 	void		*obj ;		/* object pointer */
+	SYSREALNAME_FL	fl ;
+	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ;
 
-typedef struct sysrealname_head	sysrealname ;
+typedef SYSREALNAME	sysrealname ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int sysrealname_open(SYSREALNAME *,const char *) noex ;
-extern int sysrealname_curbegin(SYSREALNAME *,SYSREALNAME_CUR *) noex ;
-extern int sysrealname_curend(SYSREALNAME *,SYSREALNAME_CUR *) noex ;
-extern int sysrealname_look(SYSREALNAME *,SYSREALNAME_CUR *,int,
+extern int sysrealname_open(sysrealname *,const char *) noex ;
+extern int sysrealname_curbegin(sysrealname *,sysrealname_cur *) noex ;
+extern int sysrealname_curend(sysrealname *,sysrealname_cur *) noex ;
+extern int sysrealname_look(sysrealname *,sysrealname_cur *,int,
 		cchar *,int) noex ;
-extern int sysrealname_lookparts(SYSREALNAME *,SYSREALNAME_CUR *,int,
+extern int sysrealname_lookparts(sysrealname *,sysrealname_cur *,int,
 		cchar **,int) noex ;
-extern int sysrealname_lookread(SYSREALNAME *,SYSREALNAME_CUR *,char *) noex ;
-extern int sysrealname_enum(SYSREALNAME *,SYSREALNAME_CUR *,char *,
+extern int sysrealname_lookread(sysrealname *,sysrealname_cur *,char *) noex ;
+extern int sysrealname_enum(sysrealname *,sysrealname_cur *,char *,
 		cchar **,char *,int) noex ;
-extern int sysrealname_audit(SYSREALNAME *) noex ;
-extern int sysrealname_close(SYSREALNAME *) noex ;
+extern int sysrealname_audit(sysrealname *) noex ;
+extern int sysrealname_close(sysrealname *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSREALNAME_INCLUDE */

@@ -19,11 +19,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_openfsvc
+
+	Description:
 	This subroutine opens what is referred to as a "facility-service."
-	Facility services are services provided by "facilities." Facilities are
-	normally or usually really a software distribution that has its own
-	source-root or program-root.  Examples of software distributions within
-	AT&T are:
+	Facility services are services provided by "facilities."
+	Facilities are normally or usually really a software
+	distribution that has its own source-root or program-root.
+	Examples of software distributions within AT&T are:
 
 	NCMP
 	PCS (Personal Communication Services)
@@ -35,21 +39,21 @@
 	AST (Advanced Software Technologies)
 	GNU
 
-	Facilities are stored in the filesystem hierarchy rooted at a certain
-	place.  Facilities are usually rooted at one of the following locations
-	in the system filesystem hierarchy:
+	Facilities are stored in the filesystem hierarchy rooted
+	at a certain place.  Facilities are usually rooted at one
+	of the following locations in the system filesystem hierarchy:
 
 	/usr
 	/usr/add-on
 	/opt
 
-	Facility services are represented in the filesystem as files with names
-	of the form:
+	Facility services are represented in the filesystem as files
+	with names of the form:
 
 	<facility>§<svc>[­<arg(s)>
 
-	These sorts of file names are often actually stored in the filesystem
-	as symbolic links.
+	These sorts of file names are often actually stored in the
+	filesystem as symbolic links.
 
 	Synopsis:
 
@@ -64,7 +68,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	svc		service name
@@ -75,15 +78,15 @@
 	to		time-out
 
 	Returns:
-
 	<0		error
 	>=0		file-descriptor
 
-	Facility services are implemented with loadable shared-object files.
-	Each service has a file of the same name as the service name itself.
-	The file is a shared-object with a global symbol of a callable
-	subroutine with the name 'opensvc_<svc>' where <svc> is the service
-	name.  The subroutine looks like:
+	Facility services are implemented with loadable shared-object
+	files.  Each service has a file of the same name as the
+	service name itself.  The file is a shared-object with a
+	global symbol of a callable subroutine with the name
+	'opensvc_<svc>' where <svc> is the service name.  The
+	subroutine looks like:
 
 	int opensvc_<svc>(pr,prn,of,om,argv,envv,to)
 	const char	*pr ;
@@ -94,25 +97,23 @@
 	const char	*envv[] ;
 
 	Multiple services can be actually implemented in the same
-	shared-object.  But the actual file of that object should be linked to
-	other files, each with the filename of a service to be implemented.
-	These links are required because this code only searches for services
-	by searching for files with the names of the services.
-
+	shared-object.  But the actual file of that object should
+	be linked to other files, each with the filename of a service
+	to be implemented.  These links are required because this
+	code only searches for services by searching for files with
+	the names of the services.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<localmisc.h>
@@ -143,8 +144,6 @@ extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	mkpath1w(char *,const char *,int) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mksofname(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isOneOf(const int *,int) ;

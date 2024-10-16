@@ -1,10 +1,10 @@
-/* uc_openfint (open-facility-intercept) */
+/* uc_openfint SUPPORT (open-facility-intercept) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a facility-intercept */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,12 +18,17 @@
 
 /*******************************************************************************
 
-        This subroutine opens what is referred to as a "facility-intercept."
-        Facility intercepts provide a way for opens on files to be intercepted
-        by a facility manager specified by the intercept name. Facilities are
-        normally or usually really a software distribution that has its own
-        source-root or program-root. Examples of software distributions within
-        AT&T are:
+  	Name:
+	uc_openfint
+
+	Description:
+	This subroutine opens what is referred to as a
+	"facility-intercept." Facility intercepts provide a way for
+	opens on files to be intercepted by a facility manager
+	specified by the intercept name.  Facilities are normally
+	or usually really a software distribution that has its own
+	source-root or program-root.  Examples of software distributions
+	within AT&T are:
 
 	NCMP
 	PCS (Personal Communication Services)
@@ -35,38 +40,36 @@
 	AST (Advanced Software Technologies)
 	GNU
 
-        Facilities are stored in the filesystem hierarchy rooted at a certain
-        place. Facilities are usually rooted at one of the following locations
-        in the system filesystem hierarchy:
+	Facilities are stored in the filesystem hierarchy rooted
+	at a certain place.  Facilities are usually rooted at one
+	of the following locations in the system filesystem hierarchy:
 
 	/usr
 	/usr/add-on
 	/opt
 
-        Facility services are represented in the filesystem as files with names
-        of the form:
+	Facility services are represented in the filesystem as files
+	with names of the form:
 
 	<facility>º<int>[­<arg(s)>
 
-        These sorts of file names are often actually stored in the filesystem as
-        symbolic links.
+	These sorts of file names are often actually stored in the
+	filesystem as symbolic links.
 
 	Synopsis:
-
 	int uc_openfint(pr,dn,bn,prn,svc,of,om,argv,envv,to)
-	const char	pr[] ;
-	const char	dn[] ;
-	const char	bn[] ;
-	const char	prn[] ;
-	const char	svc[] ;
+	cchar	pr[] ;
+	cchar	dn[] ;
+	cchar	bn[] ;
+	cchar	prn[] ;
+	cchar	svc[] ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv[] ;
-	const char	**envv[] ;
+	cchar	**argv[] ;
+	cchar	**envv[] ;
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	dn		directory name (containing the file)
 	dn		base name of the file
@@ -79,46 +82,46 @@
 	to		time-out
 
 	Returns:
-
 	<0		error
 	>=0		file-descriptor
 
-        Facility intercepts are implemented with loadable shared-object files.
-        Each service has a file of the same name as the intercept name itself.
-        The file is a shared-object with a global symbol of a callable
-        subroutine with the name 'openint_<int>' where <int> is the intercept
-        name. The subroutine looks like:
+
+	Facility intercepts are implemented with loadable shared-object
+	files.  Each service has a file of the same name as the
+	intercept name itself.  The file is a shared-object with a
+	global symbol of a callable subroutine with the name
+	'openint_<int>' where <int> is the intercept name.  The
+	subroutine looks like:
 
 	int openint_<int>(pr,dn,bn,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*dn ;
-	const char	*bn ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*dn ;
+	cchar	*bn ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	*argv[] ;
-	const char	*envv[] ;
+	cchar	*argv[] ;
+	cchar	*envv[] ;
 
-        Multiple intercepts can be actually implemented in the same
-        shared-object. But the actual file of that object should be linked to
-        other files, each with the filename of an intercept to be implemented.
-        These links are required because this code only searches for intercepts
-        by searching for files with the names of the intercepts.
-
+	Notes:
+	Multiple intercepts can be actually implemented in the same
+	shared-object.  But the actual file of that object should
+	be linked to other files, each with the filename of an
+	intercept to be implemented.  These links are required
+	because this code only searches for intercepts by searching
+	for files with the names of the intercepts.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<localmisc.h>
@@ -142,26 +145,19 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mksofname(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mksofname(char *,cchar *,cchar *,cchar *) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strdcpy2w(char *,int,const char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strdcpy2w(char *,int,cchar *,cchar *,int) ;
 
 
 /* external variables */
@@ -176,15 +172,15 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	const char	*pr ;
-	const char	*dn ;
-	const char	*bn ;
-	const char	*prn ;
-	const char	*svc ;
-	const char	*svcdname ;	/* memory-allocated */
-	const char	*svcsym ;	/* memory-allocated */
-	const char	**argv ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*dn ;
+	cchar	*bn ;
+	cchar	*prn ;
+	cchar	*svc ;
+	cchar	*svcdname ;	/* memory-allocated */
+	cchar	*svcsym ;	/* memory-allocated */
+	cchar	**argv ;
+	cchar	**envv ;
 	SUBINFO_FL	f ;
 	mode_t		om ;
 	int		of ;
@@ -194,16 +190,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,const char *,const char *,const char *,
-			const char *,const char *,
-			int,mode_t,const char **,const char **,int) ;
+static int	subinfo_start(SUBINFO *,cchar *,cchar *,cchar *,
+			cchar *,cchar *,
+			int,mode_t,cchar **,cchar **,int) ;
 static int	subinfo_finish(SUBINFO *) ;
 static int	subinfo_search(SUBINFO *) ;
 
 
 /* local variables */
 
-static const char	*soexts[] = {
+static cchar	*soexts[] = {
 	"so",
 	"o",
 	"",
@@ -215,28 +211,21 @@ static const char	*soexts[] = {
 
 
 int uc_openfint(pr,dn,bn,prn,svc,of,om,av,ev,to)
-const char	pr[] ;
-const char	dn[] ;
-const char	bn[] ;
-const char	prn[] ;
-const char	svc[] ;
+cchar	pr[] ;
+cchar	dn[] ;
+cchar	bn[] ;
+cchar	prn[] ;
+cchar	svc[] ;
 int		of ;
 mode_t		om ;
-const char	*av[] ;
-const char	*ev[] ;
+cchar	*av[] ;
+cchar	*ev[] ;
 int		to ;
 {
 	SUBINFO		si ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd = -1 ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_openfint: pr=%s\n",pr) ;
-	debugprintf("uc_openfint: dn=%s\n",dn) ;
-	debugprintf("uc_openfint: prn=%s\n",prn) ;
-	debugprintf("uc_openfint: svc=%s\n",svc) ;
-#endif
 
 	if ((pr == NULL) || (prn == NULL) || (svc == NULL))
 	    return SR_FAULT ;
@@ -254,10 +243,6 @@ int		to ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (subinfo) */
 
-#if	CF_DEBUGS
-	debugprintf("uc_openfint: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (uc_openfint) */
@@ -268,21 +253,21 @@ int		to ;
 
 static int subinfo_start(sip,pr,dn,bn,prn,svc,of,om,argv,envv,to)
 SUBINFO		*sip ;
-const char	*pr ;
-const char	*dn ;
-const char	*bn ;
-const char	*prn ;
-const char	*svc ;
+cchar	*pr ;
+cchar	*dn ;
+cchar	*bn ;
+cchar	*prn ;
+cchar	*svc ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	struct ustat	sb ;
 	int		rs = SR_OK ;
 	int		pl ;
-	const char	*ccp ;
+	cchar	*ccp ;
 	char		svcdname[MAXPATHLEN+1] ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
@@ -292,7 +277,7 @@ int		to ;
 	sip->prn = prn ;
 	sip->svc = svc ;
 	sip->argv = argv ;
-	sip->envv = (envv != NULL) ? envv : ((const char **) environ) ;
+	sip->envv = (envv != NULL) ? envv : ((cchar **) environ) ;
 	sip->of = of ;
 	sip->om = om ;
 	sip->to = to ;
@@ -378,18 +363,12 @@ SUBINFO		*sip ;
 	int		rs1 ;
 	int		j ;
 	int		fd = -1 ;
-	int		(*symp)(const char *,const char *,const char *,
-			const char *,
+	int		(*symp)(cchar *,cchar *,cchar *,
+			cchar *,
 			int,mode_t,
-			const char **,const char **,int) ;
+			cchar **,cchar **,int) ;
 	void		*sop = NULL ;
 	char		sofname[MAXPATHLEN + 1] ;
-
-#if	CF_DEBUGS
-	    debugprintf("uc_openfint/subinfo_search: pr=%s\n",sip->pr) ;
-	    debugprintf("uc_openfint/subinfo_search: svcsym=%s\n",
-	                sip->svcsym) ;
-#endif
 
 	symp = NULL ;
 	rs = ids_load(&id) ;
@@ -398,17 +377,7 @@ SUBINFO		*sip ;
 	rs1 = SR_NOENT ;
 	for (j = 0 ; (soexts[j] != NULL) ; j += 1) {
 
-#if	CF_DEBUGS
-	    debugprintf("uc_openfint/subinfo_search: ext=%s\n",
-	        soexts[j]) ;
-#endif
-
 	    rs1 = mksofname(sofname,sip->svcdname,sip->svc,soexts[j]) ;
-
-#if	CF_DEBUGS
-	    debugprintf("uc_openfint/subinfo_search: mksofname() rs=%d\n",rs1) ;
-	    debugprintf("uc_openfint/subinfo_search: sofname=%s\n",sofname) ;
-#endif
 
 	    if (rs1 >= 0) {
 
@@ -418,11 +387,6 @@ SUBINFO		*sip ;
 
 	        if (rs1 >= 0)
 	            rs1 = sperm(&id,&sb,soperm) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_openfint/subinfo_search: sperm() rs=%d\n",
-	            rs1) ;
-#endif
 
 	        if (rs1 >= 0) {
 
@@ -439,12 +403,12 @@ SUBINFO		*sip ;
 	                symp = dlsym(sop,sip->svcsym) ;
 
 	                if (symp != NULL) {
-	                    const char	*pr = sip->pr ;
-	                    const char	*dn = sip->dn ;
-	                    const char	*bn = sip->bn ;
-			    const char	*prn = sip->prn ;
-	                    const char	**argv = sip->argv ;
-	                    const char	**envv = sip->envv ;
+	                    cchar	*pr = sip->pr ;
+	                    cchar	*dn = sip->dn ;
+	                    cchar	*bn = sip->bn ;
+			    cchar	*prn = sip->prn ;
+	                    cchar	**argv = sip->argv ;
+	                    cchar	**envv = sip->envv ;
 			    mode_t	om = sip->om ;
 	                    int		of = sip->of ;
 	                    int		to = sip->to ;

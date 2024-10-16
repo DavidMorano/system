@@ -1,11 +1,11 @@
 /* uc_opendev */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open special overlay mount under the '/dev' directory*/
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -18,23 +18,26 @@
 
 /*******************************************************************************
 
-	This subroutine attempts to open a special overlay mounted resource of
-	some kind under the '/dev' directory.
+  	Name:
+	uc_opendev
 
+	Description:
+	This subroutine attempts to open a special overlay mounted
+	resource of some kind under the '/dev' directory.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<opensysfs.h>
+#include	<matstr.h>
 #include	<localmisc.h>
 
 
@@ -48,7 +51,6 @@
 /* external subroutines */
 
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
 extern int	getaf(const char *) ;
 extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;

@@ -19,9 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin
@@ -64,6 +66,10 @@ inline bool	iszero(int ch) noex {
 inline bool	isplusminus(int ch) noex {
 	return ((ch == '+') || (ch == '-')) ;
 }
+inline bool	isabbr(int ch) noex {
+	ch &= UCHAR_MAX ;
+	return ((ch == '.') || (ch == ('­' & UCHAR_MAX))) ;
+}
 
 #else /* __cplusplus */
 
@@ -79,8 +85,20 @@ static inline bool	iszero(int ch) noex {
 static inline bool	isplusminus(int ch) noex {
 	return ((ch == '+') || (ch == '-')) ;
 }
+static inline bool	isabbr(int ch) noex {
+	ch &= UCHAR_MAX ;
+	return ((ch == '.') || (ch == ('­' & UCHAR_MAX))) ;
+}
 
 #endif /* __cplusplus */
+
+EXTERNC_begin
+
+static inline bool	isAbbr(int ch) noex {
+    	return isabbr(ch) ;
+}
+
+EXTERNC_end
 
 
 #endif /* ISCHARX_INCLUDE */

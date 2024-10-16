@@ -43,7 +43,6 @@
 
 /* local defines */
 
-#define	CMD_DEFENTS	67
 #define	CMD_MODBNAME	"commandments"
 #define	CMD_OBJNAME	"commandments"
 #define	CMD		commandment

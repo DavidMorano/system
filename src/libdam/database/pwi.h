@@ -27,12 +27,12 @@
 #define	PWI_CUR		struct pwi_cursor
 
 
-struct pwi_cursor {
-	int		i ;
-} ;
-
 struct pwi_flags {
 	uint		f:1 ;
+} ;
+
+struct pwi_cursor {
+	int		i ;
 } ;
 
 struct pwi_head {

@@ -667,8 +667,6 @@ dayspec.o:		dayspec.c dayspec.h
 
 cvtdater.o:		cvtdater.c cvtdater.h
 
-realname.o:		realname.c realname.h
-
 gecos.o:		gecos.c gecos.h
 
 kinfo.o:		kinfo.c kinfo.h
@@ -807,6 +805,11 @@ fileread.dir:
 # SYSVARX
 sysvarx.o:		sysvarx.dir
 sysvarx.dir:
+	makesubdir $@
+
+# REALNAME
+realname.o:		realname.dir
+realname.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h
