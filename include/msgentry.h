@@ -17,9 +17,12 @@
 
 /*******************************************************************************
 
-	This object represents a Message-Entry.
-	It is used within the MAILMSGSTAGE object (unless used elsewhere
-	also).
+  	Object:
+	megentry
+
+	Description:
+	This object represents a Message-Entry.  It is used within
+	the MAILMSGSTAGE object (unless used elsewhere also).
 
 *******************************************************************************/
 
@@ -37,7 +40,6 @@
 #include	<usystem.h>
 #include	<mailmsg.h>
 #include	<fdliner.h>
-#include	<localmisc.h>
 
 
 #define	MSGENTRY	struct msgentry_head
@@ -56,9 +58,9 @@ struct msgentry_flags {
 } ;
 
 struct msgentry_head {
-	MSGENTRY_FL	f, hdr ;
 	mailmsg		m ;
 	off_t		boff ;		/* w/ tmpfile */
+	MSGENTRY_FL	f, hdr ;
 	int		blen ;		/* w/ tmpfile */
 	int		clen ;		/* supplied or calculated */
 	int		clines ;	/* supplied or calculated */

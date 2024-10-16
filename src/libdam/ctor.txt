@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int realname_ctor(realname *op,Args ... args) noex {
+static int msgid_ctor(msgid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int realname_ctor(realname *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (realname_ctor) */
+/* end subroutine (msgid_ctor) */
 
-static int realname_dtor(realname *op) noex {
+static int msgid_dtor(msgid *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (realname_dtor) */
+/* end subroutine (msgid_dtor) */
 
 template<typename ... Args>
-static inline int realname_magic(realname *op,Args ... args) noex {
+static inline int msgid_magic(msgid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == REALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MSGID_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (realname_magic) */
+/* end subroutine (msgid_magic) */

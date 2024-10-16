@@ -17,9 +17,12 @@
 
 /*******************************************************************************
 
-	This object represents a Message-Entry.
-	It is used within the MAILMSGSTAGE object (unless used elsewhere
-	also).
+  	Object:
+	msgentry
+
+	Description:
+	This object represents a Message-Entry.  It is used within
+	the MAILMSGSTAGE object (unless used elsewhere also).
 
 *******************************************************************************/
 
@@ -52,8 +55,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -80,9 +85,10 @@ using std::max ;			/* subroutine-template */
 /* exported subroutines */
 
 int msgentry_start(msgentry *mep) noex {
+    	MSGENTRY	*hop = mep ;
 	int		rs = SR_FAULT ;
 	if (mep) {
-	    memclear(mep) ;
+	    memclear(hop) ;
 	    mep->clines = -1 ;
 	    mep->clen = -1 ;
 	    mep->blen = -1 ;

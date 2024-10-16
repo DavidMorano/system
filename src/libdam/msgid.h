@@ -31,25 +31,23 @@
 
 #define	MSGID_MAGIC		1092847456
 #define	MSGID			struct msgid_head
+#define	MSGID_FL		struct msgid_flags
+#define	MSGID_FM		struct msgid_filemagic
+#define	MSGID_FH		struct msgid_filehead
 #define	MSGID_KEY		struct msgid_keyer
 #define	MSGID_CUR		struct msgid_cursor
 #define	MSGID_BUF		struct msgid_buffer
-#define	MSGID_FM		struct msgid_filemagic
-#define	MSGID_FH		struct msgid_filehead
-#define	MSGID_FL		struct msgid_flags
 #define	MSGID_ENT		MSGIDE_ALL
 
 /* other defines */
-
 #define	MSGID_FILEPATH		"/tmp/msgid"
-
 #define	MSGID_FILEVERSION	0
 #define	MSGID_ENDIAN		1	/* big endian */
 
 
 struct msgid_buffer {
-	char		*buf ;		/* fixed buffer */
-	uint		size ;		/* fixed buffer size */
+	char		*mbuf ;		/* fixed buffer pointer */
+	uint		mlen ;		/* fixed buffer length */
 	uint		off ;		/* file offset of valid area */
 	uint		len ;		/* length of valid area */
 } ;
@@ -110,9 +108,13 @@ struct msgid_keyer {
 } ;
 
 typedef MSGID		msgid ;
+typedef	MSGID_FL	msgid_fl ;
+typedef	MSGID_FM	msgid_fm ;
+typedef	MSGID_FH	msgid_fh ;
 typedef MSGID_CUR	msgid_cur ;
 typedef MSGID_ENT	msgid_ent ;
 typedef MSGID_KEY	msgid_key ;
+typedef	MSGID_BUF	msgid_buf ;
 
 EXTERNC_begin
 
@@ -121,7 +123,7 @@ extern int msgid_check(msgid *,time_t) noex ;
 extern int msgid_close(msgid *) noex ;
 extern int msgid_curbegin(msgid *,msgid_cur *) noex ;
 extern int msgid_curend(msgid *,msgid_cur *) noex ;
-extern int msgid_enum(msgid *,msgid_cur *,msgid_ent *) noex ;
+extern int msgid_curenum(msgid *,msgid_cur *,msgid_ent *) noex ;
 extern int msgid_match(msgid *,time_t,msgid_key *,msgid_ent *) noex ;
 extern int msgid_update(msgid *,time_t,msgid_key *,msgid_ent *) noex ;
 extern int msgid_matchid(msgid *,time_t,cchar *,int,msgid_ent *) noex ;
