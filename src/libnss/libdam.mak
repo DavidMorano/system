@@ -37,7 +37,7 @@ I00= vsystem.h exitcodes.h localmisc.h
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
 I02=
 I03= field.h 
-I04= egs.h randmwc.o random.h
+I04= egs.h randmwc.h librandom.h
 I05= dater.h zdb.h zos.h tmz.h zoffparts.h
 I06= termstr.h
 I07= kinfo.h loadave.h fsdir.h fsdirtree.h
@@ -208,7 +208,7 @@ OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= mknoise.o rijndael.o expcook.o schedvar.o
-OBJ101= termnote.o egs.o random.o bits.o 
+OBJ101= termnote.o egs.o librandom.o bits.o 
 OBJ102= loadave.o modload.o userinfo.o pwentry.o 
 OBJ103= dw.o fmq.o useraccdb.o csem.o
 
@@ -697,7 +697,6 @@ sighand.o:		sighand.c sighand.h
 paramfile.o:		paramfile.cc paramfile.h
 
 kvsfile.o:		kvsfile.cc kvsfile.h
-
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
 
@@ -715,9 +714,7 @@ rijndael.o:		rijndael.c rijndael.h
 
 ema.o:			ema.c ema.h
 mimetypes.o:		mimetypes.c mimetypes.h
-randomvar.o:		randomvar.c randomvar.h
-fsdir.o:		fsdir.c fsdir.h
-fsdirtree.o:		fsdirtree.c fsdirtree.h
+librandom.o:		librandom.c librandom.h
 
 density.o:		density.c density.h
 dialtab.o:		dialtab.c dialtab.h

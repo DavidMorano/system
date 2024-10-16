@@ -1,4 +1,5 @@
 /* librandom SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* librandom object */
@@ -32,6 +33,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<randlc.h>
 #include	<localmisc.h>

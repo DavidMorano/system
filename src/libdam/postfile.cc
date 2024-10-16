@@ -67,6 +67,8 @@
 #include	<endian.h>
 #include	<hash.h>
 #include	<hashindex.h>
+#include	<intceil.h>
+#include	<randlc.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"postfile.h"
@@ -74,7 +76,10 @@
 
 /* local defines */
 
-#define	POSTFILE_MAGIC	0x23456787
+#define	PF		postfile
+#define	PF_INFO		postfile_info
+#define	PF_CUR		postfile_cur
+#define	PF_ENT		postfile_ent
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
@@ -90,7 +95,6 @@
 
 /* external subroutines */
 
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	randlc(int) ;
 extern int	isfsremote(int) ;
 

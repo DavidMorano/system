@@ -22,6 +22,7 @@
 
 
 /* object defines */
+#define	POSTFILE_MAGIC		0x23456787
 #define	POSTFILE		struct postfile_head
 #define	POSTFILE_INFO		struct postfile_information
 #define	POSTFILE_CUR		struct postfile_cursor
@@ -37,10 +38,10 @@
 #define	POSTFILE_USERNAMELEN	32
 #define	POSTFILE_NINDICES	3
 
-#define	POSTFILE_OSEC		0x01		/* use secondard hash */
-#define	POSTFILE_ORANDLC	0x02		/* use 'randlc()' */
+#define	POSTFILE_OSEC		(1 << 0)	/* use secondard hash */
+#define	POSTFILE_ORANDLC	(1 << 1)	/* use |randlc(3c)| */
 
-#define	POSTFILE_FLASTFULL	0x01		/* full last name */
+#define	POSTFILE_FLASTFULL	(1 << 0)	/* full last name */
 
 
 struct postfile_cursor {
