@@ -136,7 +136,7 @@ OBJ05=
 OBJ06=
 OBJ07= printhelp.o 
 OBJ08=
-OBJ09= openportmsg.o msgbuf.o
+OBJ09= openportmsg.o
 OBJ10=
 OBJ11=
 OBJ12=
@@ -254,13 +254,5 @@ vecstr_env.o:		vecstr_env.c
 userports.o:		userports.c userports.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
-
-msgbuf.o:		msgbuf.c msgbuf.h
-
-pwcache.o:		pwcache.c pwcache.h
-
-thrbase.o:		thrbase.c thrbase.h
-
-thrcomm.o:		thrcomm.c thrcomm.h
 
 

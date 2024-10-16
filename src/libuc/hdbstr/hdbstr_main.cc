@@ -77,24 +77,25 @@ int hdbstr_start(hdbstr *op,int n) noex {
 /* end subroutine (hdbstr_start) */
 
 int hdbstr_finish(hdbstr *op) noex {
+    	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ;
 	if (op) {
-	    hdb_cur	cur{} ;
-	    if ((rs1 = hdb_curbegin(op,&cur)) >= 0) {
+	    if (hdb_cur cur{} ; (rs = hdb_curbegin(op,&cur)) >= 0) {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
-	        while (hdb_enum(op,&cur,&key,&val) >= 0) {
+	        while ((rs1 = hdb_enum(op,&cur,&key,&val)) >= 0) {
 	            if (key.buf != nullptr) {
 	                rs1 = uc_free(key.buf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
 	            n += 1 ;
 	        } /* end while (enum) */
-	        hdb_curend(op,&cur) ;
+		if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	        rs1 = hdb_curend(op,&cur) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
-	    if (rs >= 0) rs = rs1 ;
 	    rs1 = hdb_finish(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (non-null) */
@@ -137,7 +138,7 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 /* end subroutine (hdbstr_add) */
 
 /* enumerate all of the entries */
-int hdbstr_enum(hdbstr *op,cur *curp,cc **kpp,
+int hdbstr_curenum(hdbstr *op,cur *curp,cc **kpp,
 		cc **vpp,int *vlenp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
@@ -160,7 +161,7 @@ int hdbstr_enum(hdbstr *op,cur *curp,cc **kpp,
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
 }
-/* end subroutine (hdbstr_enum) */
+/* end subroutine (hdbstr_curenum) */
 
 /* fetch the next entry value matching the given key */
 int hdbstr_fetch(hdbstr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {

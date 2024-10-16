@@ -1,4 +1,5 @@
 /* prmktmpdir SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a TMP-PR directory */
@@ -50,6 +51,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

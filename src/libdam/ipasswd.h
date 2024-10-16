@@ -23,7 +23,6 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<realname.h>
 
@@ -43,11 +42,11 @@
 #define	IPASSWD_NINDICES	5	/* number of indices */
 
 /* database ("read") options */
-#define	IPASSWD_ROSEC		0x01	/* use second hash */
-#define	IPASSWD_RORANDLC	0x02	/* use |randlc(3uc)| */
+#define	IPASSWD_ROSEC		(1 << 0)	/* use second hash */
+#define	IPASSWD_RORANDLC	(1 << 1)	/* use |randlc(3uc)| */
 
 /* fetch options */
-#define	IPASSWD_FOLASTFULL	0x01	/* require full last name for match */
+#define	IPASSWD_FOLASTFULL	(1 << 0)	/* require full last name */
 
 
 struct ipasswd_object {

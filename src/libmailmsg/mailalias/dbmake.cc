@@ -362,8 +362,7 @@ int dbmake::wrfilekeytab() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	int		*keytab ;
-	if ((rs = uc_malloc(ktsize,&keytab)) >= 0) {
+	if (int *keytab ; (rs = uc_malloc(ktsize,&keytab)) >= 0) {
 	    if ((rs = strtab_recmk(klp,keytab,ktsize)) >= 0) {
 		rs = u_write(fd,keytab,ktsize) ;
 		wlen += rs ;
@@ -413,8 +412,7 @@ int dbmake::wrfilekeys() noex {
 	int		wlen = 0 ;
 	int		(*indtab)[2] ;
 	if ((rs = uc_malloc(risize,&indtab)) >= 0) {
-	    char	*kstab ;
-	    if ((rs = uc_malloc(sksize,&kstab)) >= 0) {
+	    if (char *kstab ; (rs = uc_malloc(sksize,&kstab)) >= 0) {
 	        if ((rs = strtab_strmk(klp,kstab,sksize)) >= 0) {
 	            int		(*it)[2] = indtab ;
 	            cint	ris = risize ;
@@ -441,8 +439,7 @@ int dbmake::wrfilevals() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*vstab ;
-	if ((rs = uc_malloc(svsize,&vstab)) >= 0) {
+	if (char *vstab ; (rs = uc_malloc(svsize,&vstab)) >= 0) {
 	    if ((rs = strtab_strmk(vlp,vstab,svsize)) >= 0) {
 	        rs = u_write(fd,vstab,svsize) ;
 		wlen += rs ;

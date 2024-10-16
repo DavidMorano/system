@@ -1,4 +1,5 @@
 /* dialcprog SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* dial to a program on the local cluster */
@@ -97,7 +98,6 @@
 #include	<getusername.h>
 #include	<filer.h>
 #include	<findfilepath.h>
-#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"streamsync.h"
@@ -190,7 +190,6 @@
 
 /* external subroutines */
 
-extern int	matstr(cchar **,cchar *,int) ;
 extern int	strkeycmp(cchar *,cchar *) ;
 extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;

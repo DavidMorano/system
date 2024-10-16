@@ -49,32 +49,29 @@ struct varmks_rectab {
 } ;
 
 struct varmks_head {
-	uint		magic ;
-	const char 	*dbname ;
-	const char	*idname ;
+	cchar 		*dbname ;
+	cchar		*idname ;
 	char		*nidxfname ;
-	STRTAB		keys, vals ;
+	strtab		keys ;
+	strtab		vals ;
 	VARMKS_RECTAB	rectab ;
 	VARMKS_FL	f ;
-	mode_t		om ;
 	gid_t		gid ;
+	uint		magic ;
 	int		nvars ;
 	int		nfd ;
+	mode_t		om ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	varmks_open(VARMKS *,const char *,int,mode_t,int) ;
-extern int	varmks_addvar(VARMKS *,const char *,const char *,int) ;
+extern int	varmks_open(VARMKS *,cchar *,int,mode_t,int) ;
+extern int	varmks_addvar(VARMKS *,cchar *,cchar *,int) ;
 extern int	varmks_abort(VARMKS *) ;
 extern int	varmks_chgrp(VARMKS *,gid_t) ;
 extern int	varmks_close(VARMKS *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VARMKS_INCLUDE */

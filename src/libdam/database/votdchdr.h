@@ -1,4 +1,4 @@
-/* votdchdr */
+/* votdchdr HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -75,7 +75,8 @@ typedef	VOTDCHDR	votdchdr ;
 
 EXTERNC_begin
 
-extern int votdchdr(VOTDCHDR *,int,char *,int) ;
+extern int votdchdr_rd(votdchdr *,char *,int) noex ;
+extern int votdchdr_wr(ctodvhdr *,cchar *,int) noex ;
 
 EXTERNC_end
 

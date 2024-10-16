@@ -294,7 +294,7 @@ int nodesearch_enum(NODESEARCH *nsp,NODESEARCH_CUR *curp,char *np,int nl) noex {
 	    rs = nodesfile_enum(&nsp->a,&curp->c1,np,nl) ;
 	    break ;
 	case 1:
-	    if ((rs = hdbstr_enum(&nsp->b,&curp->c2,&kp,&vp,&vl)) >= 0) {
+	    if ((rs = hdbstr_curenum(&nsp->b,&curp->c2,&kp,&vp,&vl)) >= 0) {
 	        kl = (nl >= 0) ? MIN(rs,nl) : rs ;
 	        rs = snwcpy(np,nl,kp,kl) ;
 	    }
@@ -356,7 +356,7 @@ static int hdbstr_release(HDBSTR *hsp) noex {
 	if (hsp == NULL) return SR_FAULT ;
 
 	hdbstr_curbegin(hsp,&cur) ;
-	while (hdbstr_enum(hsp,&cur,NULL,NULL,NULL) >= 0) {
+	while (hdbstr_curenum(hsp,&cur,NULL,NULL,NULL) >= 0) {
 		hdbstr_delcur(hsp,&cur,0) ;
 	}
 	hdbstr_curend(hsp,&cur) ;

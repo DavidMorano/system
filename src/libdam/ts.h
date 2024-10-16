@@ -1,4 +1,5 @@
-/* ts INCLUDE (Time-Stamp) */
+/* ts HEADER (Time-Stamp) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* time-stamp file manager */
@@ -20,8 +21,8 @@
 #include	<usysrets.h>
 #include	<mapstrint.h>
 
-#include	"tse.h"
-#include	"ebuf.h"
+#include	<tse.h>
+#include	<ebuf.h>
 
 
 #define	TS_MAGIC		918245636

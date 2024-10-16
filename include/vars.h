@@ -74,7 +74,7 @@ struct vars_head {
 	cchar 		*dbname ;
 	VARS_FM		vf ;
 	VARS_MI		mi ;
-	VARHDR		ifi ;		/* index-file (header) information */
+	varhdr		ifi ;		/* index-file (header) information */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;

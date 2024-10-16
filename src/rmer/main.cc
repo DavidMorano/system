@@ -1,20 +1,19 @@
-/* main */
+/* main SUPPORT (rmer) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* front-end subroutine for the RMER program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* switchable */
 #define	CF_SORTENTRIES	0		/* sort entries */
 #define	CF_MSGDISCARD	0		/* use message-discard mode */
 
-
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -22,25 +21,24 @@
 
 /*******************************************************************************
 
+  	Name:
+	main
+
 	Synopsis:
-
 	$ rmer [-af <afile>] [<file(s)>]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -103,7 +101,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct entry {
-	const char	*fname ;
+	cchar		*fname ;
 	time_t		ti_expire ;
 } ;
 
@@ -137,21 +135,6 @@ static int	filedel(PROGINFO *,const char *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"sn",
-	"ef",
-	"if",
-	"of",
-	"af",
-	"md",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -167,7 +150,22 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"sn",
+	"ef",
+	"if",
+	"of",
+	"af",
+	"md",
+	NULL
+} ;
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -175,7 +173,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -190,11 +188,12 @@ static const struct mapex	mapexs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	BITS		pargs ;
@@ -778,9 +777,7 @@ badarg:
 
 /* local subroutines */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -798,9 +795,7 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
-{
+static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
@@ -835,9 +830,9 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	    if (afn[0] == '-') afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
-		int		len ; 
-	        char		lbuf[LINEBUFLEN + 1] ;
+		cint	llen = LINEBUFLEN ;
+		int	len ; 
+	        char	lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(afp,lbuf,llen)) > 0) {
 	            len = rs ;
@@ -868,13 +863,11 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 }
 /* end subroutine (procargs) */
 
-
-static int process(PROGINFO *pip,int fd)
-{
-	vecobj		flist ;
+static int process(PROGINFO *pip,int fd) noex {
+    	cint		vn = 10 ;
 	int		rs ;
-	int		size ;
-	int		opts ;
+	int		sz = sizeof(struct entry) ;
+	int		vo ;
 	int		c = 0 ;
 
 #if	CF_DEBUG
@@ -883,13 +876,12 @@ static int process(PROGINFO *pip,int fd)
 #endif
 
 #ifdef	COMMENT		/* not necessary */
-	opts = VECOBJ_OCOMPACT ;
+	vo = VECOBJ_OCOMPACT ;
 #else
-	opts = 0 ;
+	vo = 0 ;
 #endif
 
-	size = sizeof(struct entry) ;
-	if ((rs = vecobj_start(&flist,size,10,opts)) >= 0) {
+	if (vecobj flist ; (rs = vecobj_start(&flist,sz,vn,opts)) >= 0) {
 
 	    rs = procafiles(pip,&flist) ;
 	    c += rs ;
@@ -923,19 +915,13 @@ static int process(PROGINFO *pip,int fd)
 }
 /* end subroutine (process) */
 
-
-static int procafiles(pip,flp)
-PROGINFO	*pip ;
-vecobj		*flp ;
-{
+static int procafiles(proginfo *pip,vecobj *flp) noex {
 	struct entry	e ;
-
 	time_t		ti_e ;
-
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	for (i = 0 ; vecstr_get(&pip->afiles,i,&cp) >= 0 ; i += 1) {
 	    if (cp != NULL) {
@@ -954,30 +940,24 @@ vecobj		*flp ;
 }
 /* end subroutine (procafiles) */
 
-
-static int procin(PROGINFO *pip,vecobj *flp,int fd)
-{
+static int procin(proginfo *pip,vecobj *flp,int fd) noex {
 	struct rmermsg_fname	m0 ;
 	struct rmermsg_unknown	mu ;
-	MSGBUF		mb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		msgtype ;
 	int		m0_size = sizeof(struct rmermsg_fname) ;
-	int		size ;
+	int		sz ;
 	int		mlen ;
 	int		to = TO_READ ;
 	int		c = 0 ;
 
-	size = MAX(m0_size,pip->pagesize) ;
-	if ((rs = msgbuf_start(&mb,fd,size,to)) >= 0) {
+	sz = MAX(m0_size,pip->pagesize) ;
+	if (msgbuf mb ; (rs = msgbuf_start(&mb,fd,sz,to)) >= 0) {
 	    int		ml ;
 	    cchar	*mp ;
-
 	    while ((rs = msgbuf_read(&mb,&mp)) > 0) {
+	        cint	msgtype = MKCHAR(mp[0]) ;
 	        ml = rs ;
-
-	    msgtype = MKCHAR(mp[0]) ;
 	    switch (msgtype) {
 
 	    case rmermsgtype_fname:
@@ -1011,12 +991,7 @@ static int procin(PROGINFO *pip,vecobj *flp,int fd)
 }
 /* end subroutine (procin) */
 
-
-static int procin_file(pip,flp,mp)
-PROGINFO	*pip ;
-vecobj		*flp ;
-struct rmermsg_fname	*mp ;
-{
+static int procin_file(proginfo *pip,vecobj *flp,rmermsg_fname *mp) noex {
 	struct entry	e ;
 	time_t		ti_e ;
 	int		rs = SR_OK ;

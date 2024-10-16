@@ -1,4 +1,5 @@
 /* msgdata HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* miscellaneous message handling */
@@ -19,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
+#include	<sys/types.h>		/* system types */
+#include	<sys/socket.h>		/* socket types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -45,12 +46,12 @@
 
 
 struct msgdata_head {
-	MSGHDR		msg ;
-	SOCKADDRESS	from ;
-	IOVEC		vecs[1] ;
 	CONMSGHDR	*cmsgp ;	/* Control-Message-Header */
 	void		*a ;		/* allocation */
 	char		*mbuf ;		/* buffer */
+	MSGHDR		msg ;
+	SOCKADDRESS	from ;
+	IOVEC		vecs[1] ;
 	int		clen ;		/* Control-Message length */
 	int		mlen ;		/* fixed at buffer size */
 	int		ml ;		/* variable as used */

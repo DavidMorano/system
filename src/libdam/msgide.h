@@ -1,6 +1,9 @@
-/* msgide */
+/* msgide HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
-/* machine status entry */
+/* message identification (MSG-ID) entry */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,23 +16,23 @@
 /* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MSGIDE_INCLUDE
-#define	MSGIDE_INCLUDE	1
+#define	MSGIDE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netdb.h>
-
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* object defines */
-
 #define	MSGIDE_ALL		struct msgide_all
 #define	MSGIDE_UPDATE		struct msgide_update
-
 
 /* entry field lengths */
 #define	MSGIDE_LCOUNT		4
@@ -45,7 +48,6 @@
 /* do this carefully! */
 /* there is no good automatic way to do this in C language (sigh) */
 /* the C language does not have all of the advantages of assembly language */
-
 #define	MSGIDE_OCOUNT		0
 #define	MSGIDE_OUTIME		(MSGIDE_OCOUNT + MSGIDE_LCOUNT)
 #define	MSGIDE_OCTIME		(MSGIDE_OUTIME + MSGIDE_LUTIME)
@@ -74,21 +76,13 @@ struct msgide_update {
 	uint		utime ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(MSGIDE_MASTER)) || (MSGIDE_MASTER == 0)
+extern int msgide_all(struct msgide_all *,int,char *,int) noex ;
+extern int msgide_update(struct msgide_update *,int,char *,int) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int msgide_all(struct msgide_all *,int,char *,int) ;
-extern int msgide_update(struct msgide_update *,int,char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MSGIDE_MASTER */
 
 #endif /* MSGIDE_INCLUDE */
 

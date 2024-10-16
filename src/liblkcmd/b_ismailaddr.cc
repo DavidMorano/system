@@ -1,4 +1,5 @@
 /* b_ismailaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to test for local mail-addresses */
@@ -23,6 +24,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_ismailaddr
+
+	Description:
 	This is (or can be) a built-in KSH command for testing
 	whether specified mail-addresses are local (local native
 	to the current node) or not.  Take a look at this.  Would
@@ -48,15 +53,15 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -172,47 +177,31 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+static int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+static int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procnames(PROGINFO *,void *,cchar *,int) ;
-static int	procname(PROGINFO *,void *,cchar *,int) ;
+static int	procopts(PROGINFO *,KEYOPT *) noex ;
+static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) noex ;
+static int	procnames(PROGINFO *,void *,cchar *,int) noex ;
+static int	procname(PROGINFO *,void *,cchar *,int) noex ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+static int	procuserinfo_begin(PROGINFO *,USERINFO *) noex ;
+static int	procuserinfo_end(PROGINFO *) noex ;
+static int	procuserinfo_logid(PROGINFO *) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_pwi(LOCINFO *,cchar *) ;
-static int	locinfo_loadnames(LOCINFO *,cchar *) ;
-static int	locinfo_loadone(LOCINFO *,cchar *,int) ;
-static int	locinfo_pwilookup(LOCINFO *,cchar *) ;
-static int	locinfo_finish(LOCINFO *) ;
+static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+static int	locinfo_pwi(LOCINFO *,cchar *) noex ;
+static int	locinfo_loadnames(LOCINFO *,cchar *) noex ;
+static int	locinfo_loadone(LOCINFO *,cchar *,int) noex ;
+static int	locinfo_pwilookup(LOCINFO *,cchar *) noex ;
+static int	locinfo_finish(LOCINFO *) noex ;
 
-static int	initdomain(PROGINFO *) ;
-static int	addrcompact(char *,int,cchar *,int) ;
+static int	initdomain(PROGINFO *) noex ;
+static int	addrcompact(char *,int,cchar *,int) noex ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"lf",
-	"ln",
-	"lnf",
-	"rndb",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -230,7 +219,23 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const PIVARS	initvars = {
+constexpr cpchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"lf",
+	"ln",
+	"lnf",
+	"rndb",
+	NULL
+} ;
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -238,7 +243,7 @@ static const PIVARS	initvars = {
 	VARPRNAME
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_INVALID, EX_USAGE },
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
@@ -253,17 +258,17 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
-	"logging",
-	NULL
-} ;
-
 enum akonames {
 	akoname_logging,
 	akoname_overlast
 } ;
 
-static const uchar	aterms[] = {
+constexpr cpchar	akonames[] = {
+	"logging",
+	NULL
+} ;
+
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -275,11 +280,12 @@ static const uchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_ismailaddr(int argc,cchar *argv[],void *contextp)
-{
+int b_ismailaddr(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -297,9 +303,7 @@ int b_ismailaddr(int argc,cchar *argv[],void *contextp)
 }
 /* end subroutine (b_ismailaddr) */
 
-
-int p_ismailaddr(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_ismailaddr(int argc,mainv argv[],mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_ismailaddr) */
@@ -307,10 +311,7 @@ int p_ismailaddr(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -327,9 +328,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		rs, rs1 ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 
 	cchar		*argp, *aop, *akp, *avp ;
 	cchar		*argval = NULL ;
@@ -400,7 +401,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -416,7 +417,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
@@ -457,7 +458,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -472,7 +473,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -490,7 +491,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -508,7 +509,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -526,7 +527,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -544,7 +545,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* log file name */
 	                case argopt_lf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->lfname = avp ;
 	                    } else {
@@ -563,7 +564,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_ln:
 	                case argopt_lnf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            lnfname = avp ;
 	                    } else {
@@ -581,7 +582,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* real-name DB */
 	                case argopt_rndb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            rndbfname = avp ;
 	                    } else {
@@ -606,7 +607,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -614,7 +615,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -666,7 +667,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -886,13 +887,13 @@ retearly:
 	}
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -932,9 +933,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -956,13 +955,11 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs ;
 	int		opts ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->init.db = TRUE ;
 
@@ -974,45 +971,36 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (lip->f.rndb) {
-	    lip->f.rndb = FALSE ;
+	    lip->f.rndb = false ;
 	    rs1 = pwi_close(&lip->rndb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	if (lip->rndbfname != NULL) {
+	if (lip->rndbfname) {
 	    rs1 = uc_free(lip->rndbfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->rndbfname = NULL ;
 	}
-
 	if (lip->f.db) {
-	    lip->f.db = FALSE ;
+	    lip->f.db = false ;
 	    rs1 = vecstr_finish(&lip->names) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_pwi(LOCINFO *lip,cchar *rndbfname)
-{
+static int locinfo_pwi(LOCINFO *lip,cchar *rndbfname) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
 
-	if (rndbfname != NULL) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(rndbfname,-1,&cp)) >= 0) {
+	if (rndbfname) {
+	    if (cchar	*cp ; (rs = uc_mallocstrw(rndbfname,-1,&cp)) >= 0) {
 	        lip->rndbfname = cp ;
 	    }
 	}
@@ -1021,9 +1009,7 @@ static int locinfo_pwi(LOCINFO *lip,cchar *rndbfname)
 }
 /* end subroutine (locinfo_pwi) */
 
-
-static int locinfo_pwilookup(LOCINFO *lip,cchar *name)
-{
+static int locinfo_pwilookup(LOCINFO *lip,cchar *name) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1051,7 +1037,7 @@ static int locinfo_pwilookup(LOCINFO *lip,cchar *name)
 #endif
 
 	if (lip->f.rndb && (name[0] != '\0')) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    rs = pwi_lookup(&lip->rndb,ubuf,ulen,name) ;
 	}
@@ -1065,10 +1051,7 @@ static int locinfo_pwilookup(LOCINFO *lip,cchar *name)
 }
 /* end subroutine (locinfo_pwilookup) */
 
-
-/* load the various names for this host (order doesn't matter; sorted later) */
-static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname)
-{
+static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname) noex {
 	PROGINFO	*pip = lip->pip ;
 	KVSFILE		kv ;
 	KVSFILE_CUR	cur ;
@@ -1193,9 +1176,7 @@ static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname)
 }
 /* end subroutine (locinfo_loadnames) */
 
-
-static int locinfo_loadone(LOCINFO *lip,cchar *namep,int namel)
-{
+static int locinfo_loadone(LOCINFO *lip,cchar *namep,int namel) noex {
 	PROGINFO	*pip = lip->pip ;
 	NULSTR		s ;
 	int		rs ;
@@ -1203,8 +1184,8 @@ static int locinfo_loadone(LOCINFO *lip,cchar *namep,int namel)
 	cchar		*np ;
 
 	if ((rs = nulstr_start(&s,namep,namel,&np)) >= 0) {
-	    const int	nl = rs ;
-	    const int	namelen = MAXHOSTNAMELEN ;
+	    cint	nl = rs ;
+	    cint	namelen = MAXHOSTNAMELEN ;
 	    int		nbl ;
 	    cchar	*ldn = LOCALDOMAINNAME ;
 	    char	namebuf[MAXHOSTNAMELEN + 1] ;
@@ -1315,7 +1296,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1355,13 +1336,13 @@ static int procuserinfo_logid(PROGINFO *pip)
 #endif
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -1418,7 +1399,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1496,16 +1477,13 @@ static int procnames(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 }
 /* end subroutine (procnames) */
 
-
-/* process a mail-address */
-static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel)
-{
+static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		type = 0 ;
 	int		ans ;
 	int		wlen = 0 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 	char		mailaddr[MAILADDRLEN + 1] ;
@@ -1560,10 +1538,10 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel)
 	        cchar	*localhost = ADDRESS_LOCALHOST ;
 	        if (strcmp(parthost,localhost) != 0) {
 		    vecstr	*nlp = &lip->names ;
-		    const int	nrs = SR_NOTFOUND ;
+		    cint	rsn = SR_NOTFOUND ;
 	            if ((rs = vecstr_search(nlp,parthost,NULL,NULL)) >= 0) {
 			f = TRUE ;
-		    } else if (rs == nrs) {
+		    } else if (rs == rsn) {
 			rs = SR_OK ;
 		    }
 	        }

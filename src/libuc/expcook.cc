@@ -221,7 +221,7 @@ int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	    int		vl ;
 	    cchar	*kp{} ;
 	    cchar	*vp{} ;
-	    if ((rs = hdbstr_enum(slp,curp->clp,&kp,&vp,&vl)) >= 0) {
+	    if ((rs = hdbstr_curenum(slp,curp->clp,&kp,&vp,&vl)) >= 0) {
 	        cint	kl = rs ;
 	        rs = mkcomp(rbuf,rlen,kp,kl,vp,vl) ;
 	        bl = rs ;

@@ -1,11 +1,11 @@
 /* uc_opendialer (open-dialer-service) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
 /* open a dialer */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_GETEXECNAME	1		/* use 'getexecname(3c)' */
 
 /* revision history:
@@ -109,8 +109,6 @@ extern int	mkpath1w(char *,const char *,int) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mksofname(char *,const char *,const char *,const char *) ;
 extern int	pathadd(char *,int,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfprogroot(const char *,int,const char **) ;
@@ -120,11 +118,6 @@ extern int	getuserhome(char *,int,const char *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
@@ -208,23 +201,9 @@ int		to ;
 	int		rs1 ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_opendialer: ent svc=%s to=%d\n",svc,to) ;
-#endif
-
 	if ((prn == NULL) && (svc == NULL)) return SR_FAULT ;
 
 	if ((prn[0] == '\0') && (svc[0] == '\0')) return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_opendialer: svc=%s\n",svc) ;
-	if (argv != NULL) {
-	    int	i ;
-	    for (i = 0 ; argv[i] != NULL ; i += 1) {
-	        debugprintf("uc_opendialer: a[%u]=%s\n",i,argv[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	if ((rs = subinfo_start(&si,prn,svc,of,om,argv,envv,to)) >= 0) {
 	    if ((rs = subinfo_search(&si)) > 0) { /* >0 means found */
@@ -236,11 +215,6 @@ int		to ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (subinfo) */
-
-#if	CF_DEBUGS
-	debugprintf("uc_opendialer: ret rs=%d fd=%u\n",rs,fd) ;
-	debugprintf("uc_opendialer: ret svc=%s\n",svc) ;
-#endif
 
 	return (rs >= 0) ? fd : rs ;
 }
@@ -335,10 +309,6 @@ static int subinfo_search(SUBINFO *sip) noex {
 			if (rs < 0) break ;
 	            } /* end for (prns) */
 
-#if	CF_DEBUGS
-		    debugprintf("uc_opendialer/_search: for-out rs=%d f=%u\n",
-		        rs,f) ;
-#endif
 	        } /* end if */
 	        rs1 = uc_libfree(abuf) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -352,9 +322,6 @@ static int subinfo_search(SUBINFO *sip) noex {
 	    sip->fd = -1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("uc_opendialer/_search: ret rs=%d f=%u\n",rs,f) ;
-#endif
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (subinfo_search) */
@@ -416,28 +383,10 @@ static int subinfo_searchcall(SUBINFO *sip,cchar *pr,subdialer_t symp) noex {
 	const char	**argv = sip->argv ;
 	const char	**envv = sip->envv ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_opendialer/_searchcall: ent\n") ;
-	debugprintf("uc_opendialer/_searchcall: pr=%s\n",pr) ;
-	debugprintf("uc_opendialer/_searchcall: prn=%s\n",prn) ;
-	debugprintf("uc_opendialer/_searchcall: svc=%s\n",svc) ;
-	{
-	    int	i ;
-	    for (i = 0 ; argv[i] != NULL ; i += 1) {
-		debugprintf("uc_opendialer/_searchcall: a[%d]=%s\n",
-			i,argv[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
 	if ((rs = (*symp)(pr,prn,svc,of,om,argv,envv,to)) >= 0) {
 	    sip->fd = rs ;
 	    f = TRUE ;
 	} /* end if (call) */
-
-#if	CF_DEBUGS
-	debugprintf("uc_opendialer/_searchcall: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }

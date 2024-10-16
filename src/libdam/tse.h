@@ -1,4 +1,5 @@
-/* tse HEADER */
+/* tse HEADER (Time-Stamp Entry) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* machine status entry */

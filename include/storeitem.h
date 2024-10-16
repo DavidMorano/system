@@ -1,4 +1,5 @@
 /* storeitem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* storage object */
@@ -24,6 +25,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -37,7 +39,50 @@ struct storeitem_head {
 	int		f_overflow ;
 } ;
 
+#ifdef	__cplusplus
+enum storeitemmems {
+	storeitemmem_getlen,
+	storeitemmem_finish,
+	storeitemmem_overlast
+} ;
+struct storeitem ;
+struct storeitem_co {
+	storeitem	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (storeitem *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (storeitem_co) */
+struct storeitem : storeitem_head {
+	storeitem_co	getlen ;
+	storeitem_co	finish ;
+	storeitem() noex {
+	    getlen(this,storeitemmem_getlen) ;
+	    finish(this,storeitemmem_finish) ;
+	} ;
+	storeitem(const storeitem &) = delete ;
+	storeitem &operator = (const storeitem &) = delete ;
+	int start(char *,int) noex ;
+	int strw(cchar *,int,cchar **) noex ;
+	int buf(cvoid *,int,cchar **) noex ;
+	int dec(int,cchar **) noex ;
+	int chr(int,cchar **) noex ;
+	int nul(cchar **) noex ;
+	int ptab(int,void ***) noex ;
+	int block(int,int,void **) noex ;
+	void dtor() noex ;
+	~storeitem() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (storeitem) */
+#else	/* __cplusplus */
 typedef STOREITEM	storeitem ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -51,10 +96,6 @@ extern int storeitem_ptab(storeitem *,int,void ***) noex ;
 extern int storeitem_block(storeitem *,int,int,void **) noex ;
 extern int storeitem_getlen(storeitem *) noex ;
 extern int storeitem_finish(storeitem *) noex ;
-
-static inline int storeitem_char(storeitem *op,int ch,cchar **rpp) noex {
-	return storeitem_chr(op,ch,rpp) ;
-}
 
 EXTERNC_end
 

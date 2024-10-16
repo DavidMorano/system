@@ -1,4 +1,5 @@
 /* storeitem SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++23 */
 
 /* storage object */
@@ -337,5 +338,60 @@ int storeitem_getlen(storeitem *op) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (storeitem_getlen) */
+
+int storeitem::start(char *rbuf,int rlen) noex {
+	return storeitem_start(this,rbuf,rlen) ;
+}
+
+int storeitem::strw(cchar *sp,int sl,cchar **rpp) noex {
+	return storeitem_strw(this,sp,sl,rpp) ;
+}
+
+int storeitem::buf(cvoid *sp,int sl,cchar **rpp) noex {
+	return storeitem_buf(this,sp,sl,rpp) ;
+}
+
+int storeitem::dec(int v,cchar **rpp) noex {
+	return storeitem_dec(this,v,rpp) ;
+}
+
+int storeitem::chr(int ch,cchar **rpp) noex {
+	return storeitem_chr(this,ch,rpp) ;
+}
+
+int storeitem::nul(cchar **rpp) noex {
+	return storeitem_nul(this,rpp) ;
+}
+
+int storeitem::ptab(int n,void ***vppp) noex {
+	return storeitem_ptab(this,n,vppp) ;
+}
+
+int storeitem::block(int bsz,int bal,void **vpp) noex {
+	return storeitem_block(this,bsz,bal,vpp) ;
+}
+
+void storeitem::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("storeitem",rs,"fini-finish") ;
+	}
+}
+
+storeitem_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case storeitemmem_getlen:
+	        rs = storeitem_getlen(op) ;
+		break ;
+	    case storeitemmem_finish:
+	        rs = storeitem_finish(op) ;
+		break ;
+	    } /* end switch */
+	} /* end if */
+	return rs ;
+}
+/* end method (storeitem::operator) */
 
 

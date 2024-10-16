@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* |time_t| */
+#include	<time.h>			/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -28,7 +28,7 @@
 
 
 #define	PROGSIG_NENTS	30
-#define	PROGSIG_NOTE	struct progsig_note
+#define	PROGSIG_NOTE	struct progsig_noter
 
 #define	PROGSIG_RMKSH	(1<<0)
 #define	PROGSIG_RMMAIN	(1<<1)
@@ -37,13 +37,15 @@
 #define	PROGSIG_USERLEN	100
 
 
-struct progsig_note {
+struct progsig_noter {
 	time_t		stime ;
 	int		type ;
 	int		dlen ;
 	char		dbuf[PROGSIG_NBUFLEN+1] ;
 	char		user[PROGSIG_USERLEN+1] ;
 } ;
+
+typedef	PROGSIG_NOTE	progsig_note ;
 
 EXTERNC_begin
 
@@ -63,7 +65,7 @@ extern int	progsig_sigterm(void) noex ;
 extern int	progsig_sigintr(void) noex ;
 extern int	progsig_issig(int) noex ;
 
-extern int	progsig_noteread(PROGSIG_NOTE *,int) noex ;
+extern int	progsig_noteread(progsig_note *,int) noex ;
 extern int	progsig_notedel(int) noex ;
 
 EXTERNC_end

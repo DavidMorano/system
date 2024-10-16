@@ -190,7 +190,7 @@ int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
 		    auto hcb = hdbstr_curbegin ;
 	            if (hdbstr_cur cur ; (rs2 = hcb(vlp,&cur)) >= 0) {
 	                while (rs >= 0) {
-	                    rs1 = hdbstr_enum(vlp,&cur,&kp,&vp,&vl) ;
+	                    rs1 = hdbstr_curenum(vlp,&cur,&kp,&vp,&vl) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
 	                    rs = rs1 ;
 	                    if (rs >= 0) {

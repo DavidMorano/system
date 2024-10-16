@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int sysvars_ctor(sysvars *op,Args ... args) noex {
+static int realname_ctor(realname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int sysvars_ctor(sysvars *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sysvars_ctor) */
+/* end subroutine (realname_ctor) */
 
-static int sysvars_dtor(sysvars *op) noex {
+static int realname_dtor(realname *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sysvars_dtor) */
+/* end subroutine (realname_dtor) */
 
 template<typename ... Args>
-static inline int sysvars_magic(sysvars *op,Args ... args) noex {
+static inline int realname_magic(realname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SYSVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == REALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (sysvars_magic) */
+/* end subroutine (realname_magic) */

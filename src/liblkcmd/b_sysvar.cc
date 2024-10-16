@@ -1859,7 +1859,7 @@ static int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
 	        if ((rs = hdbstr_curbegin(&lip->vars,&cur)) >= 0) {
 
 	            while (rs >= 0) {
-	                kl = hdbstr_enum(&lip->vars,&cur,&kp,&vp,&vl) ;
+	                kl = hdbstr_curenum(&lip->vars,&cur,&kp,&vp,&vl) ;
 	                if (kl == SR_NOTFOUND) break ;
 	                rs = kl ;
 

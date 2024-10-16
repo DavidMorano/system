@@ -729,7 +729,7 @@ static int sysvars_indmk(SVS *op,cchar *dname) noex {
 }
 /* end subroutine (sysvars_indmk) */
 
-static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t operms) noex {
+static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -747,7 +747,7 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t operms) noex {
 	            if (rs < 0) break ;
 	        } /* end for */
 	        if (rs >= 0) {
-	            rs = sysvars_procset(vlp,indname,operms) ;
+	            rs = sysvars_procset(vlp,indname,om) ;
 	        }
 	        rs1 = hdbstr_finish(vlp) ;
 	        if (rs >= 0) rs = rs1 ;

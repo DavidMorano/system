@@ -1,4 +1,5 @@
 /* prgetclustername SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -219,7 +220,7 @@ static int subinfo_cacheget(SI *sip) noex {
 /* end subroutine (getsubinfo_cacheget) */
 
 static int subinfo_cacheset(SI *sip) noex {
-	cint	ttl = TO_TTL ;
+	cint		ttl = TO_TTL ;
 	return uclustername_set(sip->rbuf,sip->rlen,sip->nn,ttl) ;
 }
 /* end subroutine (subinfo_cacheset) */
@@ -281,12 +282,11 @@ static int subinfo_cdb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
-	        CLUSTERDB	cdb ;
-		const nullptr_t	np{} ;
+	        clusterdb	cdb ;
+		cnullptr	np{} ;
 	        if ((rs = clusterdb_open(&cdb,tbuf)) >= 0) {
 	            auto	cf = clusterdb_curfetchrev ;
 	            cint	rsn = SR_NOTFOUND ;

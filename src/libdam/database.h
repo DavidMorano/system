@@ -49,7 +49,6 @@
 #include	<commandment.h>
 #include	<commandments.h>
 #include	<cyihdr.h>
-#include	<database.h>
 #include	<msfile.h>
 #include	<msfilee.h>
 #include	<pwi.h>
@@ -62,7 +61,6 @@
 #include	<varmks.h>
 #include	<vars.h>
 #include	<votdchdr.h>
-#include	<votdshdr.h>
 
 
 #endif /* DATABASE_INCLUDE */

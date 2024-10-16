@@ -25,6 +25,10 @@
 
 /*******************************************************************************
 
+	Object:
+	vecstr
+
+	Description:
 	This object is used when the caller wants to store a COPY
 	of the passed string data into a vector-like container (how
 	this object is implemented).  A copy of the caller-supplied

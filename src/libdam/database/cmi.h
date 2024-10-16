@@ -26,7 +26,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	"cmihdr.h"		/* this is the hash-file-header */
+#include	<cmihdr.h>		/* this is the hash-file-header */
 
 
 #define	CMI_MAGIC	0x88773427
