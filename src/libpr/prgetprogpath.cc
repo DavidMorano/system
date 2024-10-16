@@ -1,4 +1,5 @@
 /* prgetprogpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the path to a program that is used within the PCS system */
@@ -54,6 +55,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
