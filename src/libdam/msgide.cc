@@ -1,7 +1,9 @@
-/* msgide */
+/* msgide SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* message identification (MSG-ID) entry */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,24 +17,23 @@
 
 /*******************************************************************************
 
-        These module implements the messages (reads and writes) to the MSGID
-        database file. It actually does the subroutine marshalling for the file
-        reads and writes.
+  	Name:
+	msgide
 
+	Description:
+	These module implements the messages (reads and writes) to
+	the MSGID database file.  It actually does the subroutine
+	marshalling for the file reads and writes.
 
 *******************************************************************************/
 
-
-#define	MSGIDE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<inttypes.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<serialbuf.h>
 #include	<localmisc.h>
@@ -42,13 +43,11 @@
 
 /* local defines */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int msgide_all(ep,f_read,mbuf,mlen)
 char		mbuf[] ;
@@ -59,10 +58,6 @@ MSGIDE_ALL	*ep ;
 	SERIALBUF	msgbuf ;
 	int		rs ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("msgide_all: buf=%p buflen=%d\n",buf,buflen) ;
-#endif
 
 	if (ep == NULL) return SR_FAULT ;
 	if (mbuf == NULL) return SR_FAULT ;

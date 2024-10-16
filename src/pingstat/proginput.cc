@@ -1,17 +1,19 @@
-/* proginput */
+/* proginput SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* process messages on the input stream */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGN	0		/* special */
 
-
 /* revision history:
 
 	= 2001-03-01, David A­D­ Morano
-	The subroutine was adapted from other programs that do similar things.
+	The subroutine was adapted from other programs that do
+	similar things.
 
 */
 
@@ -19,27 +21,29 @@
 
 /*******************************************************************************
 
-        This subroutine processes messages that are present on the input stream.
+	Name:
+	proginput
 
+	Description:
+        This subroutine processes messages that are present on the input stream.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-#include	<time.h>
-
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<logfile.h>
 #include	<dater.h>
+#include	<timestr.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -67,9 +71,6 @@
 
 /* external subroutines */
 
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t, char *) ;
-
 
 /* external variables */
 
@@ -79,21 +80,22 @@ extern char	*timestr_logz(time_t, char *) ;
 
 /* forward references */
 
-static int	procstream(PROGINFO *,int) ;
-static int	procdatagram(PROGINFO *,int) ;
-static int	procupdate(PROGINFO *,struct pingstatmsg_update *) ;
-static int	procuptime(PROGINFO *,struct pingstatmsg_uptime *) ;
-static int	procentry(PROGINFO *,const char *,PINGSTATDB_UP *) ;
+static int	procstream(PROGINFO *,int) noex ;
+static int	procdatagram(PROGINFO *,int) noex ;
+static int	procupdate(PROGINFO *,struct pingstatmsg_update *) noex ;
+static int	procuptime(PROGINFO *,struct pingstatmsg_uptime *) noex ;
+static int	procentry(PROGINFO *,const char *,PINGSTATDB_UP *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int proginput(PROGINFO *pip,int fd)
-{
+int proginput(PROGINFO *pip,int fd) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG
@@ -123,19 +125,16 @@ int proginput(PROGINFO *pip,int fd)
 
 /* local subroutines */
 
-
-int procstream(PROGINFO *pip,int fd)
-{
+int procstream(PROGINFO *pip,int fd) noex {
 	struct pingstatmsg_update	m0 ;
 	struct pingstatmsg_uptime	m1 ;
 	struct pingstatmsg_unknown	mu ;
-	MSGBUF		mb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		to = TO_READ ;
 	int		ti_start = pip->daytime ;
 	int		msgtype ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	int		s ;
 	int		n = 0 ;
 	int		mlen ;
@@ -149,22 +148,17 @@ int procstream(PROGINFO *pip,int fd)
 /* find maximum message size (or machine pagesize) */
 
 	s = pip->pagesize ;
-	if (s > size) size = s ;
+	if (s > sz) sz = s ;
 	s = sizeof(struct pingstatmsg_uptime) ;
-	if (s > size) size = s ;
+	if (s > sz) sz = s ;
 	s = sizeof(struct pingstatmsg_update) ;
-	if (s > size) size = s ;
+	if (s > sz) sz = s ;
 
 /* initialize */
 
-	if ((rs = msgbuf_start(&mb,fd,size,to)) >= 0) {
+	if (msgbuf mb ; (rs = msgbuf_start(&mb,fd,sz,to)) >= 0) {
 	    int		ml = 0 ;
 	    cchar	*mp ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("proginput/procstream: while-before\n") ;
-#endif
 
 	    while (rs >= 0) {
 		char	*bp ;
@@ -181,15 +175,7 @@ int procstream(PROGINFO *pip,int fd)
 	        msgtype = MKCHAR(mp[0]) ;
 	        pip->daytime = time(NULL) ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4)) {
-	            debugprintf("proginput/procstream: "
-	                "msgbuf_read() ml=%u mt=%u\n",ml,msgtype) ;
-	        }
-#endif
-
 	        switch (msgtype) {
-
 	        case pingstatmsgtype_update:
 	            mlen = pingstatmsg_update(&m0,1,bp,ml) ;
 	            if (mlen > 0) {
@@ -197,7 +183,6 @@ int procstream(PROGINFO *pip,int fd)
 	                rs = procupdate(pip,&m0) ;
 	            }
 	            break ;
-
 	        case pingstatmsgtype_uptime:
 	            mlen = pingstatmsg_uptime(&m1,1,bp,ml) ;
 	            if (mlen > 0) {
@@ -281,17 +266,15 @@ int procstream(PROGINFO *pip,int fd)
 }
 /* end subroutine (procstream) */
 
-
-int procdatagram(PROGINFO *pip,int fd)
-{
+int procdatagram(PROGINFO *pip,int fd) noex {
 	struct pingstatmsg_update	m0 ;
 	struct pingstatmsg_uptime	m1 ;
 	struct pingstatmsg_unknown	mu ;
 	int		ti_start = pip->daytime ;
 	int		ti_read = pip->daytime ;
-	const int	to = TO_READ ;
+	cint		to = TO_READ ;
 	int		rs = SR_OK ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	int		msgtype ;
 	int		bl = 0 ;
 	int		mflags = 0 ;
@@ -314,11 +297,11 @@ int procdatagram(PROGINFO *pip,int fd)
 /* find maximum message size (or machine pagesize) */
 
 	s = pip->pagesize ;
-	if (s > size) size = s ;
+	if (s > sz) sz = s ;
 	s = sizeof(struct pingstatmsg_uptime) ;
-	if (s > size) size = s ;
+	if (s > sz) sz = s ;
 	s = sizeof(struct pingstatmsg_update) ;
-	if (s > size) size = s ;
+	if (s > sz) sz = s ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -405,8 +388,9 @@ int procdatagram(PROGINFO *pip,int fd)
 
 	        if ((rs >= 0) && (pip->intrun >= 0)) {
 	            if ((pip->daytime - ti_start) >= pip->intrun) {
-	                if (pip->open.logprog && pip->f.logextra)
+	                if (pip->open.logprog && pip->f.logextra) {
 	                    logfile_printf(&pip->lh,"runint to") ;
+			}
 	                break ;
 	            }
 	        }
@@ -467,14 +451,11 @@ int procdatagram(PROGINFO *pip,int fd)
 }
 /* end subroutine (procdatagram) */
 
-
-static int procupdate(PROGINFO *pip,struct pingstatmsg_update *mp)
-{
+static int procupdate(PROGINFO *pip,struct pingstatmsg_update *mp) noex {
 	int		rs = SR_OK ;
 
 	if (mp->hostname[0] != '\0') {
-	    PINGSTATDB_UP	u ;
-	    memset(&u,0,sizeof(PINGSTATDB_UP)) ;
+	    PINGSTATDB_UP	u{} ;
 	    u.count = UINT_MAX ;
 	    u.timestamp = mp->timestamp ;
 	    u.timechange = pip->daytime ;
@@ -487,14 +468,11 @@ static int procupdate(PROGINFO *pip,struct pingstatmsg_update *mp)
 }
 /* end subroutine (procupdate) */
 
-
-static int procuptime(PROGINFO *pip,struct pingstatmsg_uptime *mp)
-{
+static int procuptime(PROGINFO *pip,struct pingstatmsg_uptime *mp) noex {
 	int		rs = SR_OK ;
 
 	if (mp->hostname[0] != '\0') {
-	    PINGSTATDB_UP	u ;
-	    memset(&u,0,sizeof(PINGSTATDB_UP)) ;
+	    PINGSTATDB_UP	u{} ;
 	    u.count = mp->count ;
 	    u.timestamp = mp->timestamp ;
 	    u.timechange = mp->timechange ;

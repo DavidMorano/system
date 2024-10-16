@@ -48,11 +48,10 @@
 #include	<mkdirs.h>
 #include	<xperm.h>
 #include	<ctdec.h>
-#include	<exitcodes.h>
+#include	<sesmsg.h>
+#include	<msgdata.h>
 #include	<localmisc.h>
 
-#include	"sesmsg.h"
-#include	"msgdata.h"
 #include	"progsig.h"
 
 
@@ -197,17 +196,17 @@ static int	progsig_entfins(PROGSIG *) noex ;
 static int	progsig_mq(PROGSIG *) noex ;
 static int	progsig_mkreqfname(PROGSIG *,char *,cchar *) noex ;
 static int	progsig_worker(PROGSIG *) noex ;
-static int	progsig_workecho(PROGSIG *,MSGDATA *) noex ;
-static int	progsig_workbiff(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_workecho(PROGSIG *,msgdata *) noex ;
+static int	progsig_workbiff(PROGSIG *,msgdata *) noex ;
 static int	progsig_workbiffer(PROGSIG *,SESMSG_BIFF *) noex ;
-static int	progsig_workgen(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_workgen(PROGSIG *,msgdata *) noex ;
 static int	progsig_workgener(PROGSIG *,SESMSG_GEN *) noex ;
-static int	progsig_workdef(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_workdef(PROGSIG *,msgdata *) noex ;
 static int	progsig_msgenter(PROGSIG *,SN *) noex ;
 static int	progsig_reqopen(PROGSIG *) noex ;
 static int	progsig_reqopener(PROGSIG *,cchar *) noex ;
-static int	progsig_reqsend(PROGSIG *,MSGDATA *,int) noex ;
-static int	progsig_reqrecv(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_reqsend(PROGSIG *,msgdata *,int) noex ;
+static int	progsig_reqrecv(PROGSIG *,msgdata *) noex ;
 static int	progsig_reqclose(PROGSIG *) noex ;
 static int	progsig_poll(PROGSIG *) noex ;
 static int	progsig_cmdsend(PROGSIG *,int) noex ;
@@ -462,7 +461,7 @@ int progsig_issig(int sn) noex {
 }
 /* end subroutine (progsig_issig) */
 
-int progsig_noteread(PROGSIG_NOTE *rp,int ni) noex {
+int progsig_noteread(progsig_note *rp,int ni) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
@@ -474,9 +473,9 @@ int progsig_noteread(PROGSIG_NOTE *rp,int ni) noex {
 	    if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 	        if ((rs = progsig_mq(uip)) >= 0) {
 		    void	*vp{} ;
-		    if ((rs = raqhand_acc(&uip->mxq,ni,&vp)) >= 0) {
+		    if ((rs = raqhand_acc(&uip->mq,ni,&vp)) >= 0) {
 			if (vp) {
-		    	    SN	*ep = (SN *) vp ;;
+		    	    SN	*ep = (SN *) vp ;
 			    rp->stime = ep->stime ;
 			    rp->type = ep->type ;
 			    rp->dlen = ep->dlen ;
@@ -503,7 +502,7 @@ int progsig_notedel(int ni) noex {
 	    PROGSIG	*uip = &progsig_data ;
 	    if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 	        if ((rs = progsig_mq(uip)) >= 0) {
-		    rs = raqhand_del(&uip->mxq,ni) ;
+		    rs = raqhand_del(&uip->mq,ni) ;
 		    rc = rs ;
 		} /* end if (progsig_mq) */
 	        rs1 = progsig_capend(uip) ;
@@ -537,7 +536,7 @@ static int progsig_begin(PROGSIG *uip) noex {
 	int		rs = SR_OK ;
 	if (! uip->f_mq) {
 	    cint	n = PROGSIG_NENTS ;
-	    if ((rs = raqhand_start(&uip->mxq,n,0)) >= 0) {
+	    if ((rs = raqhand_start(&uip->mq,n,0)) >= 0) {
 	        uip->f_mq = true ;
 	    }
 	}
@@ -554,7 +553,7 @@ static int progsig_end(PROGSIG *uip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = raqhand_finish(&uip->mxq) ;
+	        rs1 = raqhand_finish(&uip->mq) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_mq = false ;
@@ -564,7 +563,7 @@ static int progsig_end(PROGSIG *uip) noex {
 /* end subroutine (progsig_end) */
 
 static int progsig_entfins(PROGSIG *uip) noex {
-	raqhand		*qlp = &uip->mxq ;
+	raqhand		*qlp = &uip->mq ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
@@ -651,7 +650,7 @@ static int progsig_runend(PROGSIG *uip) noex {
 
 /* it always takes a good bit of code to make this part look easy! */
 static int progsig_worker(PROGSIG *uip) noex {
-	MSGDATA		m ;
+	msgdata		m ;
 	int		rs = SR_OK ;
 	    while ((rs = progsig_reqrecv(uip,&m)) > 0) {
 	        switch (rs) {
@@ -675,7 +674,7 @@ static int progsig_worker(PROGSIG *uip) noex {
 }
 /* end subroutine (progsig_worker) */
 
-static int progsig_workecho(PROGSIG *uip,MSGDATA *mip) noex {
+static int progsig_workecho(PROGSIG *uip,msgdata *mip) noex {
 	int		rs ;
 	if ((rs = msgdata_conpass(mip,false)) >= 0) {
 	    rs = progsig_reqsend(uip,mip,0) ;
@@ -684,7 +683,7 @@ static int progsig_workecho(PROGSIG *uip,MSGDATA *mip) noex {
 }
 /* end subroutine (progsig_workecho) */
 
-static int progsig_workgen(PROGSIG *uip,MSGDATA *mip) noex {
+static int progsig_workgen(PROGSIG *uip,msgdata *mip) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = progsig_capbegin(uip,-1)) >= 0) {
@@ -725,7 +724,7 @@ static int progsig_workgener(PROGSIG *uip,SESMSG_GEN *mp) noex {
 }
 /* end subroutine (progsig_workgener) */
 
-static int progsig_workbiff(PROGSIG *uip,MSGDATA *mip) noex {
+static int progsig_workbiff(PROGSIG *uip,msgdata *mip) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = progsig_capbegin(uip,-1)) >= 0) {
@@ -764,11 +763,11 @@ static int progsig_workbiffer(PROGSIG *uip,SESMSG_BIFF *mp) noex {
 }
 /* end subroutine (progsig_workbiffer) */
 
-static int progsig_workdef(PROGSIG *uip,MSGDATA *mip) noex {
+static int progsig_workdef(PROGSIG *uip,msgdata *mip) noex {
 	int		rs ;
 	if (mip == nullptr) return SR_FAULT ;
 	if ((rs = ptm_lock(&uip->mx)) >= 0) {
-	    uip->cvdefs += 1 ;
+	    uip->cdefs += 1 ;
 	    ptm_unlock(&uip->mx) ;
 	} /* end if (mutex) */
 	return rs ;
@@ -776,7 +775,7 @@ static int progsig_workdef(PROGSIG *uip,MSGDATA *mip) noex {
 /* end subroutine (progsig_workdef) */
 
 static int progsig_msgenter(PROGSIG *uip,SN *ep) noex {
-	raqhand		*qlp = &uip->mxq ;
+	raqhand		*qlp = &uip->mq ;
 	cint		ors = SR_OVERFLOW ;
 	int		rs ;
 	if ((rs = raqhand_ins(qlp,ep)) == ors) {
@@ -869,13 +868,13 @@ static int progsig_reqclose(PROGSIG *uip) noex {
 }
 /* end subroutine (progsig_reqclose) */
 
-static int progsig_reqsend(PROGSIG *uip,MSGDATA *mip,int clen) noex {
+static int progsig_reqsend(PROGSIG *uip,msgdata *mip,int dlen) noex {
 	cint		fd = uip->sfd ;
-	return msgdata_send(mip,fd,clen) ;
+	return msgdata_send(mip,fd,dlen,0) ;
 }
 /* end subroutine (progsig_reqsend) */
 
-static int progsig_reqrecv(PROGSIG *uip,MSGDATA *mip) noex {
+static int progsig_reqrecv(PROGSIG *uip,msgdata *mip) noex {
 	POLLFD		fds[1] = {} ;
 	cint		fd = uip->sfd ;
 	cint		mto = (5*POLL_INTMULT) ;
@@ -925,25 +924,26 @@ static int progsig_poll(PROGSIG *uip) noex {
 
 static int progsig_cmdsend(PROGSIG *uip,int cmd) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		f = false ;
-	if (uip->f_running && (uip->reqfname != nullptr)) {
+	if (uip->f_running && uip->reqfname) {
 	    f = true ;
 	    switch (cmd) {
 	    case sesmsgtype_exit:
 		{
-	    	    MSGDATA	m ;
-		    if ((rs = msgdata_init(&m,0)) >= 0) {
+	    	    if (msgdata m ; (rs = msgdata_init(&m,0)) >= 0) {
 		        SESMSG_EXIT	m0{} ;
 			cint	mlen = MSGBUFLEN ;
 			cint	sal = uip->servlen ;
 			cvoid	*sap = &uip->servaddr ;
 			msgdata_setaddr(&m,sap,sal) ;
-			memset(&m0,0,sizeof(SESMSG_EXIT)) ;
 		        if ((rs = sesmsg_exit(&m0,0,m.mbuf,mlen)) >= 0) {
 			    m.mlen = rs ;
 	    	            rs = progsig_reqsend(uip,&m,0) ;
 			} /* end if (sesmsg_exit) */
-		    } /* end if (init) */
+			rs1 = msgdata_fini(&m) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (msgdata) */
 		} /* end block */
 		break ;
 	    default:
@@ -972,9 +972,10 @@ static void progsig_exit() noex {
 }
 /* end subroutine (progsig_atforkafter) */
 
-/* ARGSUSED */
 static void kshlib_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	PROGSIG		*kip = &progsig_data ;
+	(void) sip ;
+	(void) vcp ;
 	switch (sn) {
 	case SIGQUIT:
 	    kip->f_sigquit = true ;

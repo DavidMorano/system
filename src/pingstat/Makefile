@@ -153,7 +153,7 @@ OBJ05= pingtab.o pingstatdb.o pingstatmsg.o pinghost.o
 OBJ06=
 OBJ07= printhelp.o
 OBJ08=
-OBJ09= msgbuf.o dater.o zdb.o
+OBJ09=
 OBJ10= 
 OBJ11= 
 OBJ12= initnow.o inetping.o
@@ -293,34 +293,5 @@ pinghost.o:		pinghost.c pinghost.h
 pingstatdb.o:		pingstatdb.c pingstatdb.h
 
 pingstatmsg.o:		pingstatmsg.c pingstatmsg.h
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-dater.o:		dater.c dater.h
-
-zdb.o:			zdb.c zdb.h
-
-msgbuf.o:		msgbuf.c msgbuf.h
 
 

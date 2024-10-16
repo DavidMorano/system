@@ -1,5 +1,4 @@
 /* msgdata SUPPORT */
-
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,6 +17,10 @@
 
 /*******************************************************************************
 
+  	ObjectL
+	msgdata
+
+	Description:
 	This module provides miscellaneous message support.
 
 *******************************************************************************/
@@ -49,6 +52,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -79,47 +83,39 @@ constexpr int		conmsghdr_len = int(sizeof(CONMSGHDR)) ;
 /* exported subroutines */
 
 int msgdata_init(msgdata *mip,int mlen) noex {
-	cint		clen = MAX(CMSGBUFLEN,conmsghdr_len) ;
-	int		rs ;
-	int		sz = 0 ;
+	int		rs = SR_FAULT ;
 	int		ml = 0 ;
-	char		*bp ;
-
-	memclear(mip) ;
-	mip->ns = -1 ;
-
-	if (mlen < MSGBUFLEN) mlen = MSGBUFLEN ;
-
-	sz += (clen+1) ;
-	sz += (mlen+1) ;
-	if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
-	    MSGHDR	*mp = &mip->msg ;
-	    mip->a = bp ;
-	    ml = mlen ;
-
-	    mip->mbuf = bp ;
-	    mip->mlen = mlen ;
-	    bp += (mlen+1) ;
-	    mip->cmsgp = (CONMSGHDR *) bp ;
-	    mip->clen = clen ;
-	    bp += (clen+1) ;
-
-	    mip->mbuf[0] = '\0' ;
-	    mip->vecs[0].iov_base = mip->mbuf ;
-	    mip->vecs[0].iov_len = mip->mlen ;
-
-	    memset(mip->cmsgp,0,clen) ; /* clear control-message */
-
-	    memclear(mp) ;
-	    mp->msg_name = &mip->from ;
-	    mp->msg_namelen = sizeof(SOCKADDRESS) ;
-	    mp->msg_control = mip->cmsgp ;
-	    mp->msg_controllen = 0 ;
-	    mp->msg_iov = mip->vecs ;
-	    mp->msg_iovlen = 1 ;
-
-	} /* end if (m-a) */
-
+	if (mip) {
+	    cint		clen = MAX(CMSGBUFLEN,conmsghdr_len) ;
+	    int		sz = 0 ;
+	    memclear(mip) ;
+	    mip->ns = -1 ;
+	    if (mlen < MSGBUFLEN) mlen = MSGBUFLEN ;
+	    sz += (clen+1) ;
+	    sz += (mlen+1) ;
+	    if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	        MSGHDR	*mp = &mip->msg ;
+	        mip->a = bp ;
+	        ml = mlen ;
+	        mip->mbuf = bp ;
+	        mip->mlen = mlen ;
+	        bp += (mlen+1) ;
+	        mip->cmsgp = (CONMSGHDR *) bp ;
+	        mip->clen = clen ;
+	        bp += (clen+1) ;
+	        mip->mbuf[0] = '\0' ;
+	        mip->vecs[0].iov_base = mip->mbuf ;
+	        mip->vecs[0].iov_len = mip->mlen ;
+	        memset(mip->cmsgp,0,clen) ; /* clear control-message */
+	        memclear(mp) ;
+	        mp->msg_name = &mip->from ;
+	        mp->msg_namelen = sizeof(SOCKADDRESS) ;
+	        mp->msg_control = mip->cmsgp ;
+	        mp->msg_controllen = 0 ;
+	        mp->msg_iov = mip->vecs ;
+	        mp->msg_iovlen = 1 ;
+	    } /* end if (m-a) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? ml : rs ;
 }
 /* end subroutine (msgdata_init) */
@@ -221,9 +217,8 @@ int msgdata_conpass(msgdata *mip,int f_passfd) noex {
 	mip->ns = -1 ;
 	if (mp->msg_controllen > 0) {
 	    CONMSGHDR	*cmp = CMSG_FIRSTHDR(mp) ;
-	    int		fd ;
 	    while (cmp != nullptr) {
-		if ((fd = conmsghdr_passed(cmp)) >= 0) {
+		if (int fd ; (fd = conmsghdr_passed(cmp)) >= 0) {
 	            if ((mip->ns < 0) && f_passfd) {
 	                mip->ns = fd ;
 			f = true ;

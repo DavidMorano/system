@@ -38,7 +38,7 @@ I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
 I02=
 I03= field.h 
 I04= egs.h randmwc.h librandom.h
-I05= dater.h zdb.h zos.h tmz.h zoffparts.h
+I05= zdb.h zos.h tmz.h zoffparts.h
 I06= termstr.h
 I07= kinfo.h loadave.h fsdir.h fsdirtree.h
 I08= logfile.h lfm.h tmpx.h
@@ -212,8 +212,8 @@ OBJ101= termnote.o egs.o librandom.o bits.o
 OBJ102= loadave.o modload.o userinfo.o pwentry.o 
 OBJ103= dw.o fmq.o useraccdb.o csem.o
 
-OBJ104= sesmsg.o msgdata.o
-OBJ105= dater.o dater_getdate.o date.o cachetime.o
+OBJ104= sesmsg.o msgdata.o msgbuf.o
+OBJ105= date.o cachetime.o
 OBJ106= 
 OBJ107= lfm.o pwi.o raqhand.o spawner.o thrbase.o thrcomm.o
 OBJ108= logfile.o
@@ -231,11 +231,11 @@ OBJ118= cksum.o sha1.o gecos.o pwfile.o ipasswd.o ema.o fsi.o
 OBJ119= q.o plainq.o cq.o fifostr.o fifoitem.o charq.o intiq.o
 
 OBJ120= kvsfile.o paramfile.o strtab.o strstore.o querystr.o
-OBJ121= mailmsgmatenv.o mailmsgmathdr.o mailmsgfrom.o mailmsgstage.o
-OBJ122= mailbox.o mailbox_getfrom.o
-OBJ123= mailmsg.o mailmsg_loadmb.o mailmsg_loadfile.o mailmsg_loadfd.o
-OBJ124= mailmsg_enver.o mailmsg_envtimes.o
-OBJ125= mailmsgenv.o mailmsghdrval.o mailmsghdrfold.o mailmsghdrs.o 
+OBJ121=
+OBJ122=
+OBJ123=
+OBJ124=
+OBJ125=
 OBJ126= fsdirtree.o netfile.o realname.o termstr.o filecounts.o
 OBJ127= pwcache.o grcache.o gncache.o namecache.o grmems.o
 
@@ -649,10 +649,6 @@ comparse.o:		comparse.c comparse.h
 
 mhcom.o:		mhcom.c mhcom.h
 
-dater.o:		dater.c dater.h
-
-dater_getdate.o:	dater_getdate.c dater.h date.h
-
 date.o:			date.c date.h
 
 zdb.o:			zdb.c zdb.h
@@ -743,6 +739,9 @@ querystr.o:		querystr.cc querystr.h
 linehist.o:		linehist.cc linehist.h
 langstate.o:		langstate.cc langstate.h
 mkdirlist.o:		mkdirlist.cc mkdirlist.h
+sesmsg.o:		sesmsg.cc sesmsg.h
+msgdata.o:		msgdata.cc msgdata.h
+msgbuf.o:		msgbuf.cc msgbuf.h
 
 # DATABASE
 database.o:		database.dir

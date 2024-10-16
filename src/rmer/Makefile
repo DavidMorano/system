@@ -122,7 +122,7 @@ OBJ05=
 OBJ06=
 OBJ07= printhelp.o 
 OBJ08=
-OBJ09= msgbuf.o
+OBJ09=
 OBJ10=
 OBJ11=
 OBJ12=
@@ -212,7 +212,7 @@ control:
 	date >> Control
 
 
-main.o:			main.c $(INCS) rmermsg.h msgbuf.h
+main.o:			main.c $(INCS) rmermsg.h
 
 whatinfo.o:		whatinfo.c config.h
 
@@ -221,12 +221,6 @@ proginfo.o:		proginfo.c defs.h
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
 
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
 rmermsg.o:		rmermsg.c rmermsg.h
-
-msgbuf.o:		msgbuf.c msgbuf.h
 
 
