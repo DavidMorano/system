@@ -154,21 +154,36 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct subinfo_fl {
+struct opener_fl {
 	uint		dbname:1 ;
 } ;
 
-struct subinfo {
+struct opener {
 	cchar		*pr ;
 	cchar		*dbname ;
-	cchar		*midname ;
-	subinfo_fl	fl ;
-} ;
+	cchar		*idxdname ;
+	opener_fl	fl{} ;
+	opener(cchar *apr,cchar *adbn) noex : pr(apr), dbname(adbn) { 
+	    idxdname = nullptr ;
+	} ;
+	int start() noex ;
+	int finish() noex ;
+	int mkidxdname() noex ;
+	int mkpwi() noex ;
+} ; /* end struct(opener) */
 
 struct pwdesc {
 	ucentpw		*pwp ;
 	char		*pwbuf ;
 	int		pwlen ;
+} ;
+
+struct vars {
+    	int		maxpathlen ;
+	int		maxnamelen ;
+	int		nodenamelen ;
+	int		usernamelen ;
+	int		realnamelen ;
 } ;
 
 
@@ -213,12 +228,9 @@ static inline int pwi_magic(pwi *op,Args ... args) noex {
 }
 /* end subroutine (pwi_magic) */
 
-static int	subinfo_start(subinfo *,cchar *,cchar *) noex ;
-static int	subinfo_finish(subinfo *) noex ;
-static int	subinfo_midname(subinfo *) noex ;
-static int	subinfo_mkpwi(subinfo *) noex ;
-
 static int	realname_isextra(realname *,PWDESC *,cchar *) noex ;
+
+static int	mkvars() noex ;
 
 
 /* local variables */
@@ -234,7 +246,6 @@ constexpr cpcchar	exports[] = {
 	nullptr
 } ;
 
-/* use fixed locations for security reasons (like we care!) */
 constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
@@ -242,6 +253,9 @@ constexpr cpcchar	prbins[] = {
 } ;
 
 constexpr cchar		extras[] = "¹²³" ;
+constexpr cchar		progmkpwi[] = PROG_MKPWI ;
+
+static vars		var ;
 
 
 /* exported variables */
@@ -253,16 +267,18 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pwi_ctor(op,pr)) >= 0) {
-	subinfo		si, *sip = &si ;
+	    static cint		rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	opener		si(pr,dbname) ;
 	USTAT		sb, *sbp = &sb ;
 	custime		dt = getustime ;
-	if ((rs = subinfo_start(sip,pr,dbname)) >= 0) {
-	    if ((rs = subinfo_midname(sip)) >= 0) {
+	if ((rs = si.start()) >= 0) {
+	    if ((rs = si.mkidxdname()) >= 0) {
 	        time_t	ti_pwi ;
 	        cint	to = TO_FILEMOD ;
 	        cchar	*suf = IPASSWD_SUF ;
 	        cchar	*endstr = ENDIANSTR ;
-	        cchar	*midname = sip->midname ;
+	        cchar	*midname = si.idxdname ;
 	        char	fname[MAXPATHLEN+1] ;
 
 	        if ((rs = mkfnamesuf2(fname,midname,suf,endstr)) >= 0) {
@@ -288,7 +304,7 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	            } /* end if (checking against system ucentpw file) */
 
 	            if ((rs1 == SR_NOTFOUND) || (rs1 == SR_ACCESS)) {
-	                rs = subinfo_mkpwi(sip) ;
+	                rs = si.mkpwi() ;
 	            } else {
 	                rs = rs1 ;
 		    }
@@ -300,11 +316,11 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	                op->magic = PWI_MAGIC ;
 	            }
 	        }
-	    } /* end if (subinfo_midname) */
-	    rs1 = subinfo_finish(sip) ;
+	    } /* end if (opener_midname) */
+	    rs1 = si.finish() ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
+	} /* end if (opener) */
+	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		pwi_dtor(op) ;
 	    }
@@ -378,15 +394,12 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
 		pd.pwbuf = pwbuf ;
 		pd.pwlen = pwlen ;
 	        if ((rs = realname_start(&rn,sp,sl)) >= 0) {
-
 	            if ((rs = ipasswd_curbegin(op->dbp,&cur)) >= 0) {
 		        char	un[USERNAMELEN + 1] ;
-
 	                while (rs >= 0) {
 	                    rs1 = ipasswd_fetch(op->dbp,&rn,&cur,fopts,un) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
 			    rs = rs1 ;
-
 			    if (rs >= 0) {
 			        if ((rs = realname_isextra(&rn,&pd,un)) == 0) {
 	                            ul = rs1 ; /* this must be HERE! */
@@ -394,13 +407,10 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
 	                            rs = sncpy1(rbuf,rlen,un) ;
 			        }
 			    }
-
 	                } /* end while */
-
 	                rs1 = ipasswd_curend(op->dbp,&cur) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (cursor) */
-
 	            rs1 = realname_finish(&rn) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (realname) */
@@ -426,44 +436,36 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
 
 /* private subroutines */
 
-static int subinfo_start(subinfo *sip,cchar *pr,cchar *dbname) noex {
+int opener::start() noex {
     	int		rs = SR_FAULT ;
-	if (sip && pr && dbname) {
-	    rs = memclear(sip) ;
-	    sip->pr = pr ;
-	    sip->dbname = dbname ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (subinfo_start) */
-
-static int subinfo_finish(subinfo *sip) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (sip) {
+	if (pr && dbname) {
 	    rs = SR_OK ;
-	    if (sip->midname) {
-	        rs1 = uc_free(sip->midname) ;
-	        if (rs >= 0) rs = rs1 ;
-	        sip->midname = nullptr ;
-	    }
-	    if (sip->fl.dbname && sip->dbname) {
-	        rs1 = uc_free(sip->dbname) ;
-	        if (rs >= 0) rs = rs1 ;
-	        sip->dbname = nullptr ;
-		sip->fl.dbname = false ;
-	    }
-	    sip->pr = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (subinfo_finish) */
+/* end method (opener::start) */
 
-/* find the inverse-passwd database file */
-static int subinfo_midname(subinfo *sip) noex {
+int opener::finish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	    if (idxdname) {
+	        rs1 = uc_free(idxdname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        idxdname = nullptr ;
+	    }
+	    if (fl.dbname && dbname) {
+	        rs1 = uc_free(dbname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        dbname = nullptr ;
+		fl.dbname = false ;
+	    }
+	return rs ;
+}
+/* end method (opener::finish) */
+
+int opener::mkidxdname() noex {
 	int		rs = SR_OK ;
 	int		dblen = -1 ;
-	cchar		*dbname = sip->dbname ;
 	char		namebuf[MAXNAMELEN + 1] ;
 
 	if ((dbname == nullptr) || (dbname[0] == '\0')) {
@@ -473,14 +475,14 @@ static int subinfo_midname(subinfo *sip) noex {
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cchar	*nn ;
-	        if ((rs = prgetclustername(sip->pr,cbuf,nlen,nbuf)) >= 0) {
+	        if ((rs = prgetclustername(pr,cbuf,nlen,nbuf)) >= 0) {
 	            nn = cbuf ;
 		} else if (rs == rsn) {
 		    rs = SR_OK ;
 		    nn = nbuf ;
 		}
 		if (rs >= 0) {
-	            rs = mkpath3(namebuf,sip->pr,DBDNAME,nn) ;
+	            rs = mkpath3(namebuf,pr,DBDNAME,nn) ;
 	            dbname = namebuf ;
 	            dblen = rs ;
 		}
@@ -489,20 +491,18 @@ static int subinfo_midname(subinfo *sip) noex {
 
 	if (rs >= 0) {
 	    if (cchar *cp{} ; (rs = uc_mallocstrw(dbname,dblen,&cp)) >= 0) {
-	        sip->midname = cp ;
+	        idxdname = cp ;
 	    }
 	} /* end if */
 
 	return rs ;
 }
-/* end subroutine (subinfo_midname) */
+/* end method (opener::mkidxdname) */
 
-static int subinfo_mkpwi(subinfo *sip) noex {
+int opener::mkpwi() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	cchar		*pr = sip->pr ;
-	cchar		*dbname = sip->midname ;
-	cchar		*progmkpwi = PROG_MKPWI ;
+	cchar		*dbname = idxdname ;
 	char		progfname[MAXPATHLEN + 1] ;
 
 	if (dbname == nullptr)
@@ -545,10 +545,10 @@ static int subinfo_mkpwi(subinfo *sip) noex {
 
 /* setup environment */
 
-	        vecstr_envadd(&envs,VARPRPWI,sip->pr,-1) ;
+	        vecstr_envadd(&envs,VARPRPWI,pr,-1) ;
 
-		if (sip->dbname != nullptr) {
-	            vecstr_envadd(&envs,VARDBNAME,sip->dbname,-1) ;
+		if (dbname != nullptr) {
+	            vecstr_envadd(&envs,VARDBNAME,dbname,-1) ;
 		}
 	        for (int i = 0 ; exports[i] != nullptr ; i += 1) {
 	            if ((cp = getenv(exports[i])) != nullptr) {
@@ -610,7 +610,7 @@ static int subinfo_mkpwi(subinfo *sip) noex {
 
 	return rs ;
 }
-/* end subroutine (subinfo_mkpwi) */
+/* end method (opener::mkpwi) */
 
 static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
 	int		rs ;
@@ -632,6 +632,25 @@ static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
 	    } /* end if (query does not have special extras) */
 	} /* end if (realname_getlast) */
 	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (realname_isextra) */
+
+static int mkvars() noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    var.maxpathlen = rs ;
+	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	        var.maxnamelen = rs ;
+	        if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+		    var.nodenamelen = rs ;
+	            if ((rs = getbufsize(getbufsize_un)) >= 0) {
+			var.usernamelen = rs ;
+			var.realnamelen = REALNAMELEN ;
+		    }
+		}
+	    }
+	}
+	return rs ;
 }
 /* end subroutine (realname_isextra) */
 

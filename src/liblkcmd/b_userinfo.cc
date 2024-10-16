@@ -2501,10 +2501,10 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 }
 /* end subroutine (procquery) */
 
-
-static int procquery_name(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
-{
+static int procquery_name(PROGINFO *pip,PROGDATA *pdp,
+		char *cbuf,int clen) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		sl = -1 ;
 	cchar		*sp = nullptr ;
 	if ((sp == nullptr) && pdp->f.self) {
@@ -2608,13 +2608,13 @@ static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 	} /* end if */
 	if ((rs >= 0) && (sp == nullptr) && pdp->f.self) {
 	    if ((cp = getourenv(pip->envv,VARNAME)) != nullptr) {
-	        REALNAME	rn ;
-	        if ((rs = realname_startparse(&rn,cp,-1)) >= 0) {
-	            if ((rs = realname_fullname(&rn,cbuf,clen)) > 0) {
+	        if (realname rn ; (rs = rn.start(cp)) >= 0) {
+	            if ((rs = rn.fullname(cbuf,clen)) > 0) {
 	                sp = cbuf ;
 	                sl = rs ;
 	            }
-	            realname_finish(&rn) ;
+	            rs1 = rn.finish ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (realname) */
 	    } /* end if (non-null) */
 	} /* end if */

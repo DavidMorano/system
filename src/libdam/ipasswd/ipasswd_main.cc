@@ -611,7 +611,6 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 /* do we have a hold on the file? */
 
 	if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
-	    realname	rn, *rp = &rn ;
 	    cint	ns = NSHIFT ;
 	    int		hv, hi, ri, ui ;
 	    int		wi ;
@@ -625,10 +624,8 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	    op->f.cursoracc = true ;	/* does not hurt if no cursor! */
 
 	    if (rs >= 0) {
-	        if ((rs = realname_startpieces(rp,sa,sn)) >= 0) {
-
-/* which index do we want to use? */
-
+	        realname	rn, *rp = &rn ;
+	        if ((rs = rp->start(sa,sn)) >= 0) {
 	            wi = -1 ;
 	            if ((rp->len.first >= 1) && (rp->len.last >= 3)) {
 			if_constexpr (f_usefl3) {
@@ -797,8 +794,7 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	                }
 
 	            } /* end if (got one) */
-
-	            rs1 = realname_finish(rp) ;
+	            rs1 = rp->finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (realname) */
 	    } /* end if (ok) */

@@ -5,7 +5,6 @@
 /* indexed POST file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1		/* safe mode */
 #define	CF_LOCKING	0		/* use file locking */
 #define	CF_HOLDING	1		/* use file-map holding */
@@ -91,11 +90,11 @@
 
 /* external subroutines */
 
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	randlc(int) ;
 extern int	isfsremote(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -115,7 +114,7 @@ static int	postfile_lockrelease(POSTFILE *) ;
 static int	postfile_fileopen(POSTFILE *,time_t) ;
 static int	postfile_fileclose(POSTFILE *) ;
 static int	postfile_keymatchlast(POSTFILE *,int,int,char *,int) ;
-static int	postfile_keymatchall(POSTFILE *,int,int,REALNAME *) ;
+static int	postfile_keymatchall(POSTFILE *,int,int,realname *) ;
 
 
 /* local variables */
@@ -134,7 +133,7 @@ enum headers {
 	header_overlast
 } ;
 
-static const char	*localfs[] = {
+static cchar	*localfs[] = {
 	    "ufs",
 	    "tmpfs",
 	    "lofs",
@@ -147,7 +146,7 @@ static const char	*localfs[] = {
 
 int postfile_open(op,fname)
 POSTFILE	*op ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	struct ustat	sb ;
 
@@ -161,7 +160,7 @@ const char	fname[] ;
 	int	magiclen ;
 	int	size ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (op == NULL)
@@ -177,10 +176,6 @@ const char	fname[] ;
 	op->operm = 0666 ;
 
 	rs = u_open(fname,op->oflags,op->operm) ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_open: u_open() rs=%d\n",rs) ;
-#endif
 
 	if (rs < 0)
 	    goto bad0 ;
@@ -207,11 +202,6 @@ const char	fname[] ;
 	}
 
 	size = 16 + 4 + (header_overlast * sizeof(int)) ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_open: filesize=%d headersize=%d\n",
-	    sb.st_size,size) ;
-#endif
 
 /* wait for the file to come in if it is not yet available */
 
@@ -244,18 +234,10 @@ const char	fname[] ;
 
 /* map it */
 
-#if	CF_DEBUGS
-	    debugprintf("postfile_open: mapping file\n") ;
-#endif
-
 	    prot = PROT_READ ;
 	    flags = MAP_SHARED ;
 	    rs = u_mmap(NULL,(size_t) op->filesize,prot,flags,
 	        op->fd,0L,&op->mapbuf) ;
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_open: u_mmap() rs=%d\n",rs) ;
-#endif
 
 	    if (rs < 0)
 	        goto bad2 ;
@@ -270,16 +252,9 @@ const char	fname[] ;
 /* ok, we're good (?) */
 
 	    u_time(&daytime) ;
-
 	    op->opentime = daytime ;
 	    op->accesstime = daytime ;
-
 	    op->f.fileinit = TRUE ;
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_open: header processing completed \n") ;
-#endif
-
 	} /* end if (file had some data) */
 
 /* we should be good */
@@ -305,11 +280,6 @@ bad1:
 	op->fd = -1 ;
 
 bad0:
-
-#if	CF_DEBUGS
-	debugprintf("postfile_open: bad ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (postfile_open) */
@@ -429,7 +399,7 @@ POSTFILE_CUR	*cp ;
 int postfile_enum(op,cup,np,up)
 POSTFILE	*op ;
 POSTFILE_CUR	*cup ;
-REALNAME	*np ;
+realname	*np ;
 char		*up ;
 {
 	time_t	daytime ;
@@ -456,10 +426,6 @@ char		*up ;
 	    return SR_INVALID ;
 
 	ri = (cup->i[0] < 1) ? 1 : (cup->i[0] + 1) ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_enum: ri=%d\n",ri) ;
-#endif
 
 /* capture a hold on the file */
 
@@ -507,30 +473,19 @@ char		*up ;
 	    ss[4].s = (char *) (op->stab + si) ;
 	    ss[4].slen = -1 ;
 		/* done */
-	    rs = realname_startparts(np,ss) ;
+	    rs = np->start(ss) ;
 	} /* end if */
 
 	if (rs >= 0) {
 
 	    ui = op->rectab[ri].username ;
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_enum: ui=%d\n",ui) ;
-#endif
-
 	    if (up != NULL) {
-
 	        cp = strwcpy(up,(op->stab + ui),POSTFILE_USERNAMELEN) ;
-
 	        rs = cp - up ;
-
-	    } else
+	    } else {
 	        rs = strlen(op->stab + ui) ;
-
-/* update the cursor */
-
+	   }
 	    cup->i[0] = ri ;
-
 	} /* end if */
 
 	return rs ;
@@ -541,7 +496,7 @@ char		*up ;
 /* fetch an entry by key lookup */
 int postfile_fetch(op,np,cup,opts,up)
 POSTFILE	*op ;
-REALNAME	*np ;
+realname	*np ;
 POSTFILE_CUR	*cup ;
 int		opts ;
 char		*up ;
@@ -602,13 +557,7 @@ char		*up ;
 	    rs = postfile_holdget(op,daytime) ;
 
 	    if (rs > 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("postfile_fetch: file changed\n") ;
-#endif
-
 	        rs = postfile_fileheader(op) ;
-
 	    }
 
 	    if (rs < 0)
@@ -626,17 +575,9 @@ char		*up ;
 
 	wi = (np->len.last < 3) ? 0 : 1 ;
 
-#if	CF_DEBUGS
-	debugprintf("postfile_fetch: wi=%d\n",wi) ;
-#endif
-
 /* OK, we go from here */
 
 	if (cup->i[wi] < 0) {
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_fetch: new cursor\n") ;
-#endif
 
 	    sp = np->last ;
 	    hl = MIN(np->len.last,((wi == 0) ? 1 : 3)) ;
@@ -644,58 +585,29 @@ char		*up ;
 	    rhash = hash_elf(sp,hl) ;
 
 	    hi = hashindex(rhash,op->rilen) ;
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_fetch: rhash=%08x hi=%d\n",rhash,hi) ;
-#endif
-
-/* start searching ! */
-
+/* start searching! */
 	    if (op->ropts & POSTFILE_OSEC) {
-
-#if	CF_DEBUGS
-	        debugprintf("postfile_fetch: secondary initial ri=%d\n",
-	            (op->recind[wi])[hi][0]) ;
-#endif
-
 	        c = 0 ;
 	        while ((ri = (op->recind[wi])[hi][0]) != 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("postfile_fetch: keymatchlast ri=%d\n",ri) ;
-#endif
 
 	            if (postfile_keymatchlast(op,opts,ri,sp,hl))
 	                break ;
 
 	            op->collisions += 1 ;
-	            if (op->ropts & POSTFILE_ORANDLC)
+	            if (op->ropts & POSTFILE_ORANDLC) {
 	                rhash = randlc(rhash + c) ;
-
-	            else
+		    } else {
 	                rhash = ((rhash << (32 - ns)) | (rhash >> ns)) + c ;
-
+		    }
 	            hi = hashindex(rhash,n) ;
-
 	            c += 1 ;
-
 	        } /* end while */
-
-#if	CF_DEBUGS
-	        debugprintf("postfile_fetch: index-key-match ri=%d\n",ri) ;
-#endif
-
-	        if (ri == 0)
+	        if (ri == 0) {
 	            rs = SR_NOTFOUND ;
-
+		}
 	    } /* end if (secondard hasing) */
 
 	} else {
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_fetch: old cursor\n") ;
-#endif
-
 	    hi = cup->i[wi] ;
 	    if (hi != 0) {
 
@@ -715,11 +627,6 @@ char		*up ;
 	        rs = SR_NOTFOUND ;
 
 	} /* end if (preparation) */
-
-#if	CF_DEBUGS
-	debugprintf("postfile_fetch: match search hi=%d\n",hi) ;
-#endif
-
 	if (rs >= 0) {
 
 	    while ((ri = (op->recind[wi])[hi][0]) != 0) {
@@ -735,32 +642,24 @@ char		*up ;
 
 	    } /* end while */
 
-	    if ((ri == 0) || (hi == 0))
+	    if ((ri == 0) || (hi == 0)) {
 	        rs = SR_NOTFOUND ;
-
+	    }
 	} /* end if (following the existing chain) */
 
 	if (rs >= 0) {
 
 	    ui = op->rectab[ri].username ;
 	    if (up != NULL) {
-
 	        cp = strwcpy(up,(op->stab + ui),POSTFILE_USERNAMELEN) ;
-
-#if	CF_DEBUGS
-	        debugprintf("postfile_fetch: username=%s\n",up) ;
-#endif
-
 	        ul = (cp - up) ;
-
-	    } else
+	    } else {
 	        ul = strlen(op->stab + ui) ;
-
+	    }
 /* update cursor */
-
-	    if (f_cur)
+	    if (f_cur) {
 	        cup->i[wi] = hi ;
-
+	    }
 	} /* end if (got one) */
 
 #if	CF_HOLDING
@@ -774,10 +673,6 @@ char		*up ;
 
 	}
 #endif /* CF_HOLDING */
-
-#if	CF_DEBUGS
-	debugprintf("postfile_fetch: ret rs=%d ul=%d\n",rs,ul) ;
-#endif
 
 	return (rs >= 0) ? ul : rs ;
 }
@@ -793,11 +688,6 @@ int		ri ;
 POSTFILE_ENT	**rpp ;
 {
 
-
-#if	CF_DEBUGS
-	debugprintf("postfile_get: entered 0\n") ;
-#endif
-
 #if	CF_SAFE
 	if (op == NULL)
 	    return SR_FAULT ;
@@ -806,28 +696,16 @@ POSTFILE_ENT	**rpp ;
 	    return SR_NOTOPEN ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("postfile_get: entered 2\n") ;
-#endif
-
 	if (rpp == NULL)
 	    return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_get: entered ri=%d\n",ri) ;
-#endif
 
 	if ((ri < 0) || (ri >= op->rtlen))
 	    return SR_NOTFOUND ;
 
 	*rpp = NULL ;
-	if (ri > 0)
+	if (ri > 0) {
 	    *rpp = op->rectab + ri ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_get: OK\n") ;
-#endif
-
+	}
 	return ri ;
 }
 /* end subroutine (postfile_get) */
@@ -870,11 +748,6 @@ time_t		daytime ;
 {
 	int	rs = SR_OK ;
 
-#if	CF_DEBUGS
-	char	timebuf[TIMEBUFLEN + 1] ;
-#endif
-
-
 	if (op == NULL)
 	    return SR_FAULT ;
 
@@ -883,11 +756,6 @@ time_t		daytime ;
 
 	if (op->fd < 0)
 	    return SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_check: %s\n",
-	    timestr_log(daytime,timebuf)) ;
-#endif
 
 	if ((daytime - op->accesstime) > TO_ACCESS)
 	    goto closeit ;
@@ -949,25 +817,17 @@ POSTFILE	*op ;
 	f = f && (*(cp + POSTFILE_FILEMAGICLEN) == '\n') ;
 
 	if (! f) {
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_fileheader: bad magic=>%t<\n",
-	        cp,strnlen(cp,14)) ;
-#endif
-
 	    rs = SR_BADFMT ;
 	    goto bad3 ;
 	}
 
 	cp += 16 ;
 	if (cp[0] > POSTFILE_FILEVERSION) {
-
 	    rs = SR_NOTSUP ;
 	    goto bad3 ;
 	}
 
 	if (cp[1] != ENDIAN) {
-
 	    rs = SR_NOTSUP ;
 	    goto bad3 ;
 	}
@@ -976,30 +836,13 @@ POSTFILE	*op ;
 
 	op->ropts = cp[2] ;
 
-#if	CF_DEBUGS
-	debugprintf("postfile_fileheader: ropts=%02x\n",op->ropts) ;
-#endif
-
 /* if looks good, read the header stuff */
 
 	table = (uint *) (op->mapbuf + 16 + 4) ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-
-
-	    for (i = 0 ; i < header_overlast ; i += 1)
-	        debugprintf("postfile_fileheader: header[%d]=%08x\n",
-	            i,table[i]) ;
-
-	}
-#endif /* CF_DEBUGS */
-
 	op->rectab = (POSTFILE_ENT *) (op->mapbuf + table[header_rectab]) ;
 	op->rtlen = table[header_rectablen] ;
 
-	op->stab = (const char *) (op->mapbuf + table[header_strtab]) ;
+	op->stab = (cchar *) (op->mapbuf + table[header_strtab]) ;
 	op->stlen = table[header_strtabsize] ;
 
 	op->recind[0] = (uint (*)[2]) (op->mapbuf + table[header_indexl1]) ;
@@ -1007,45 +850,6 @@ POSTFILE	*op ;
 	op->recind[3] = (uint (*)[2]) (op->mapbuf + table[header_indexf]) ;
 
 	op->rilen = table[header_indexlen] ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_fileheader: rtlen=%d rilen=%d\n",op->rtlen,op->rilen) ;
-	debugprintf("postfile_fileheader: stlen=%d \n",op->stlen) ;
-#endif
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-
-
-	    for (i = 1 ; i < op->rtlen ; i += 1) {
-
-	        debugprintf("postfile_fileheader: rec[%d] username=%d last=%d\n",
-	            i,op->rectab[i].username,op->rectab[i].last) ;
-
-	    }
-
-	}
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-
-	    const char	*ol = op->stab + op->stlen ;
-
-
-	    cp = (char *) (op->stab + 1) ;
-	    for (i = 0 ; cp < ol ; i += 1) {
-
-	        debugprintf("postfile_fileheader: s[%d]=%s\n",
-	            i,cp) ;
-
-	        cp += (strlen(cp) + 1) ;
-	    }
-
-	}
-#endif /* CF_DEBUGS */
 
 ret0:
 	return rs ;
@@ -1062,18 +866,12 @@ static int postfile_holdget(op,daytime)
 POSTFILE	*op ;
 time_t		daytime ;
 {
-	struct ustat	sb ;
-
+	USTAT		sb ;
 	int	rs = SR_OK ;
 	int	mpages, fpages ;
 	int	prot, flags ;
 	int	f_changed = FALSE ;
 	int	f_opened = FALSE ;
-
-
-#if	CF_DEBUGS
-	debugprintf("postfile_holdget: entered\n") ;
-#endif
 
 	if ((daytime - op->accesstime) < TO_ACCESS)
 	    return SR_OK ;
@@ -1142,10 +940,6 @@ time_t		daytime ;
 	        rs = u_mmap(((caddr_t) 0),(size_t) op->mapsize,prot,flags,
 	            op->fd,0L,&op->mapbuf) ;
 
-#if	CF_DEBUGS
-	        debugprintf("postfile_holdget: u_mmap() rs=%d\n",rs) ;
-#endif
-
 	        postfile_fileclose(op) ;
 
 	    } /* end if (opened the file) */
@@ -1161,11 +955,6 @@ time_t		daytime ;
 	    op->mtime = sb.st_mtime ;
 
 	}
-
-#if	CF_DEBUGS
-	debugprintf("postfile_holdget: ret rs=%d f_changed=%d\n",
-	    rs,f_changed) ;
-#endif
 
 	if (rs >= 0)
 	    op->f.held = TRUE ;
@@ -1219,44 +1008,19 @@ int		f_read ;
 	int	f_changed = FALSE ;
 
 
-#if	CF_DEBUGS
-	debugprintf("postfile_lockget: entered\n") ;
-#endif
-
 	if (op->fd < 0)
 	    rs = postfile_fileopen(op,daytime) ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_lockget: postfile_fileopen() rs=%d fd=%d\n",
-	    rs,op->fd) ;
-#endif
 
 	if (rs < 0)
 	    goto bad0 ;
 
 	if (f_read) {
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_lockget: need READ lock\n") ;
-#endif
-
 	    op->f.lockedread = TRUE ;
 	    rs = lockfile(op->fd,F_RLOCK,0L,op->filesize,TO_LOCK) ;
-
 	} else {
-
-#if	CF_DEBUGS
-	    debugprintf("postfile_lockget: need WRITE lock\n") ;
-#endif
-
 	    op->f.lockedwrite = TRUE ;
 	    rs = lockfile(op->fd,F_WLOCK,0L,op->filesize,TO_LOCK) ;
-
 	}
-
-#if	CF_DEBUGS
-	debugprintf("postfile_lockget: lockfile() rs=%d\n",rs) ;
-#endif
 
 	if (rs < 0)
 	    goto bad1 ;
@@ -1311,20 +1075,12 @@ int		f_read ;
 	    rs = u_mmap(((caddr_t) 0),(size_t) op->mapsize,prot,flags,
 	        op->fd,0L,&op->mapbuf) ;
 
-#if	CF_DEBUGS
-	    debugprintf("postfile_lockget: u_mmap() rs=%d\n",rs) ;
-#endif
-
 	    if (rs < 0)
 	        goto bad2 ;
 
 	    op->mtime = sb.st_mtime ;
 
 	} /* end if (mapping file) */
-
-#if	CF_DEBUGS
-	debugprintf("postfile_lockget: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? f_changed : rs ;
 
@@ -1369,24 +1125,10 @@ POSTFILE	*op ;
 time_t		daytime ;
 {
 	int	rs ;
-
-
-#if	CF_DEBUGS
-	debugprintf("postfile_fileopen: fname=%s\n",op->fname) ;
-#endif
-
 	if (op->fd >= 0)
 	    return op->fd ;
 
-#if	CF_DEBUGS
-	debugprintf("postfile_fileopen: need open\n") ;
-#endif
-
 	rs = u_open(op->fname,op->oflags,op->operm) ;
-
-#if	CF_DEBUGS
-	debugprintf("postfile_fileopen: u_open() rs=%d\n",rs) ;
-#endif
 
 	if (rs < 0)
 	    goto bad0 ;
@@ -1429,52 +1171,28 @@ int		ri ;
 char		*sp ;
 int		hl ;
 {
-	int	si ;
+	int		si = op->rectab[ri].last ;
 	int	f ;
-
-
-	si = op->rectab[ri].last ;
-
-#if	CF_DEBUGS
-	debugprintf("keymatchlast: hl=%d sp=%t stab=%t\n",
-	    hl,
-	    sp,hl,
-	    (op->stab + si),hl) ;
-#endif
-
-	if (opts & POSTFILE_FLASTFULL)
+	if (opts & POSTFILE_FLASTFULL) {
 	    f = (strncmp((op->stab + si),sp,3) == 0) ;
-
-	else
+	} else {
 	    f = (strncmp((op->stab + si),sp,hl) == 0) ;
-
+	}
 	return f ;
 }
 /* end subroutine (postfile_keymatchlast) */
-
 
 static int postfile_keymatchall(op,opts,ri,np)
 POSTFILE	*op ;
 int		opts ;
 int		ri ;
-REALNAME	*np ;
+realname	*np ;
 {
 	int	si ;
 
-	const char	*s = op->stab ;
-	const char	*sp ;
-
-
-#if	CF_DEBUGS
-	debugprintf("keymatchall: keyname last=%s first=%s\n",
-	    np->last,np->first) ;
-	debugprintf("keymatchall: ri=%d last=%s first=%s\n",ri,
-	    (s + op->rectab[ri].last),
-	    (s + op->rectab[ri].first)) ;
-#endif
-
+	cchar	*s = op->stab ;
+	cchar	*sp ;
 /* last */
-
 	if (opts & POSTFILE_FLASTFULL) {
 
 	    si = op->rectab[ri].last ;

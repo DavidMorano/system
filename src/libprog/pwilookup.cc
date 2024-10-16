@@ -1,4 +1,5 @@
 /* pwilookup SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* wrapper functon dealing with the PWI object */
@@ -16,13 +17,16 @@
 
 /*******************************************************************************
 
+  	Name:
+	pwilookup
+
+	Description:
 	This little subroutine provides a bridge between those
 	applications that want to lookup a single name (real-name)
 	in the IPASSWD DB but do not want to use either the PWI or
-	the IPASSWD objects directly (for whatever reason).
-
-	Note that we use a PWI object method that does not allow
-	for multiple DB responses. This is the desired behavior for
+	the IPASSWD objects directly (for whatever reason).  Note
+	that we use a PWI object method that does not allow for
+	multiple DB responses.  This is the desired behavior for
 	some applications and is actually the most popular behavior
 	desired so far.
 
@@ -51,27 +55,23 @@
 /* exported subroutines */
 
 int pwilookup(cchar *pr,cchar *dbname,char *rbuf,int rlen,cchar *name) noex {
-	pwi		index ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-
-	if (name[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = pwi_open(&index,pr,dbname)) >= 0) {
-	    {
-	        rs = pwi_lookup(&index,rbuf,rlen,name) ;
-	        rl = rs ;
-	    }
-	    rs1 = pwi_close(&index) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (open) */
-
+	if (pr && rbuf && name) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (name[0]) {
+	        if (pwi index ; (rs = pwi_open(&index,pr,dbname)) >= 0) {
+	            {
+	                rs = pwi_lookup(&index,rbuf,rlen,name) ;
+	                rl = rs ;
+	            }
+	            rs1 = pwi_close(&index) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (open) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (pwilookup) */
