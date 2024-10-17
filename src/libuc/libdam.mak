@@ -808,6 +808,11 @@ realname.o:		realname.dir
 realname.dir:
 	makesubdir $@
 
+# MSGIDX
+msgidx.o:		msgidx.dir
+msgidx.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 

@@ -97,13 +97,13 @@ static bool	isrequired(int) noex ;
 
 /* local variables */
 
-constexpr cpcchar		subs[] = {
+constexpr cpcchar	subs[] = {
 	"open",
 	"count",
 	"curbegin",
-	"fetch",
-	"enum",
+	"curenum",
 	"curend",
+	"fetch",
 	"info",
 	"audit",
 	"close",
@@ -114,9 +114,9 @@ enum subs {
 	sub_open,
 	sub_count,
 	sub_curbegin,
-	sub_fetch,
 	sub_curenum,
 	sub_curend,
+	sub_fetch,
 	sub_info,
 	sub_audit,
 	sub_close,

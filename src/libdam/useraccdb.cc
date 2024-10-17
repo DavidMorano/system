@@ -134,7 +134,8 @@ struct upinfo_rec {
 } ;
 
 struct upinfo {
-	UPINFO_REC	user, total ;
+	UPINFO_REC	user ;
+	UPINFO_REC	total ;
 	useraccdb	*op ;
 	cchar		*arguser ;
 	cchar		*argname ;
@@ -426,13 +427,13 @@ int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
 /* end subroutine (useraccdb_curend) */
 
 namespace {
-    struct sub_enum {
+    struct enumerator {
 	UAD		*op ;
 	UAD_CUR		*curp ;
 	UAD_ENT		*ep ;
 	char		*ebuf ;
 	int		elen ;
-	sub_enum(UAD *o,UAD_CUR *c,UAD_ENT *e,char *b,int l) noex {
+	enumerator(UAD *o,UAD_CUR *c,UAD_ENT *e,char *b,int l) noex {
 	    op = o ;
 	    curp = c ;
 	    ep = e ;
@@ -449,7 +450,7 @@ namespace {
 	int prelude() noex {
 	    int		rs = SR_OK ;
 	    if (op->fd >= 0) {
-		sub_enum	so(op,curp,ep,ebuf,elen) ;
+		enumerator	so(op,curp,ep,ebuf,elen) ;
 		rs = so ;
 	    }
 	    return rs ;
@@ -482,7 +483,7 @@ namespace {
 	    } /* end if (m-a-f) */
 	    return rs ;
 	} ;
-    } ; /* end struct (sub_enum) */
+    } ; /* end struct (enumerator) */
 }
 
 int useraccdb_curenum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,
@@ -491,7 +492,7 @@ int useraccdb_curenum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,
 	if ((rs = useraccdb_magic(op,curp,ep,ebuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (op->fd >= 0) {
-		sub_enum	so(op,curp,ep,ebuf,elen) ;
+		enumerator	so(op,curp,ep,ebuf,elen) ;
 		rs = so ;
 	    }
 	} /* end if (magic) */

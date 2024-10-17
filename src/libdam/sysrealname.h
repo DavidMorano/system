@@ -29,7 +29,6 @@
 #define	SYSREALNAME_FL		struct sysrealname_flags
 #define	SYSREALNAME_CUR		struct sysrealname_cursor
 #define	SYSREALNAME_INFO	struct sysrealname_information
-#define	SYSREALNAME_CA		struct sysrealname_calls
 #define	SYSREALNAME_MAGIC	0x88776216
 #define	SYSREALNAME_CURMAGIC	0x88776217
 #define	SYSREALNAME_PR		"/usr/extra"
@@ -68,19 +67,24 @@ struct sysrealname_head {
 	int		cursize ;	/* cursor size */
 } ;
 
-typedef SYSREALNAME	sysrealname ;
+typedef SYSREALNAME		sysrealname ;
+typedef	SYSREALNAME_FL		sysrealname_fl ;
+typedef	SYSREALNAME_CUR		sysrealname_cur ;
+typedef	SYSREALNAME_INFO	sysrealname_info ;
 
 EXTERNC_begin
 
 extern int sysrealname_open(sysrealname *,const char *) noex ;
+extern int sysrealname_getinfo(sysrealname *,sysrealname_info *) noex ;
 extern int sysrealname_curbegin(sysrealname *,sysrealname_cur *) noex ;
 extern int sysrealname_curend(sysrealname *,sysrealname_cur *) noex ;
-extern int sysrealname_look(sysrealname *,sysrealname_cur *,int,
+extern int sysrealname_curlook(sysrealname *,sysrealname_cur *,int,
 		cchar *,int) noex ;
-extern int sysrealname_lookparts(sysrealname *,sysrealname_cur *,int,
+extern int sysrealname_curlookparts(sysrealname *,sysrealname_cur *,int,
 		cchar **,int) noex ;
-extern int sysrealname_lookread(sysrealname *,sysrealname_cur *,char *) noex ;
-extern int sysrealname_enum(sysrealname *,sysrealname_cur *,char *,
+extern int sysrealname_curlookread(sysrealname *,sysrealname_cur *,
+		char *) noex ;
+extern int sysrealname_curenum(sysrealname *,sysrealname_cur *,char *,
 		cchar **,char *,int) noex ;
 extern int sysrealname_audit(sysrealname *) noex ;
 extern int sysrealname_close(sysrealname *) noex ;

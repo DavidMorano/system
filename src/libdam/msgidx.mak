@@ -1,6 +1,6 @@
-# MAKEFILES (ipasswd)
+# MAKEFILES (msgidx)
 
-T= ipasswd
+T= msgidx
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ipasswd.h
+INCS += msgidx.h
 
 LIBS +=
 
@@ -55,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= ipasswd_main.o
+OBJ0= msgid.o msgide.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -135,6 +135,7 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-ipasswd.o:		ipasswd_main.cc		$(INCS)
+msgid.o:		msgid.cc	msgid.h		$(INCS)
+msgide.o:		msgide.cc	msgide.h	$(INCS)
 
 

@@ -55,7 +55,7 @@ int		mlen ;
 int		f_read ;
 MSGIDE_ALL	*ep ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
@@ -101,7 +101,7 @@ int		mlen ;
 int		f_read ;
 MSGIDE_UPDATE	*ep ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 

@@ -41,6 +41,7 @@
 #include	<vecstr.h>
 #include	<realname.h>
 #include	<modload.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"sysrealname.h"
@@ -54,6 +55,10 @@
 #define	SRN_INFO	sysrealname_info
 #define	SRN_MODBNAME	"ipasswd"
 #define	SRN_OBJNAME	"ipasswd"
+#define	SRN_CURMAGIC	SYSREALNAME_CURMAGIC
+
+#define	IPW_CUR		ipasswd_cur
+#define	IPW_INFO	ipasswd_info
 
 #undef	SMM_INFO
 #define	SMM_INFO	IPASSWD_INFO
@@ -64,26 +69,27 @@
 #define	VARLIBPATH	"LD_LIBRARY_PATH"
 #endif
 
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
-
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
-struct sysrealname_calls {
-	int (*open)(void *,const char *) noex ;
-	int (*info)(void *,IPASSWD_INFO *) noex ;
-	int (*curbegin)(void *,IPASSWD_CUR *) noex ;
-	int (*curend)(void *,IPASSWD_CUR *) noex ;
-	int (*enumerate)(void *,IPASSWD_CUR *,char *,cchar **,char *,int) noex ;
-	int (*fetch)(void *,IPASSWD_CUR *,int,char *,cchar **,int) noex ;
-	int (*audit)(void *) noex ;
-	int (*close)(void *) noex ;
-} ; /* end if (sysrealaname_calls) */
+extern "C" {
+    typedef int (*soopen_f)(void *,cchar *) noex ;
+    typedef int (*sogetinfo_f)(void *,IPW_INFO *) noex ;
+    typedef int (*socurbegin_f)(void *,IPW_CUR *) noex ;
+    typedef int (*socurend_f)(void *,IPW_CUR *) noex ;
+    typedef int (*socurenum_f)(void *,IPW_CUR *,char *,cc **,char *,int) noex ;
+    typedef int (*socurfetch_f)(void *,IPW_CUR *,int,char *,cc **,int) noex ;
+    typedef int (*soaudit_f)(void *) noex ;
+    typedef int (*soclose_f)(void *) noex ;
+}
 
 
 /* external subroutines */
@@ -93,6 +99,19 @@ struct sysrealname_calls {
 
 
 /* local structures */
+
+struct sysrealname_calls {
+	soopen_f	open ;
+	sogetinfo_f	getinfo ;
+	socurbegin_f	curbegin ;
+	socurend_f	curend ;
+	socurenum_f	curenum ;
+	socurfetch_f	curfetch ;
+	soaudit_f	audit ;
+	soclose_f	close ;
+} ; /* end struct (sysrealaname_calls) */
+
+typedef sysrealname_calls *		callsp ;
 
 
 /* forward references */
@@ -149,11 +168,11 @@ static inline int sysrealname_magic(sysrealname *op,Args ... args) noex {
 }
 /* end subroutine (sysrealname_magic) */
 
-static int	sysrealname_objloadbegin(SRM *,cchar *) noex ;
-static int	sysrealname_objloadend(SRM *) noex ;
-static int	sysrealname_loadcalls(SRM *,cchar *) noex ;
+static int	sysrealname_objloadbegin(SRN *,cchar *,cchar *) noex ;
+static int	sysrealname_objloadend(SRN *) noex ;
+static int	sysrealname_loadcalls(SRN *,vecstr *) noex ;
 
-static int	sysrealname_curload(SRM *,SRN_CUR *,
+static int	sysrealname_curload(SRN *,SRN_CUR *,
 			int,cchar **,int) noex ;
 
 static bool	isrequired(int) noex ;
@@ -166,27 +185,29 @@ static bool	isrequired(int) noex ;
 
 enum subs {
 	sub_open,
-	sub_info,
+	sub_getinfo,
 	sub_curbegin,
 	sub_curend,
-	sub_fetch,
-	sub_enum,
+	sub_curenum,
+	sub_curfetch,
 	sub_audit,
 	sub_close,
 	sub_overlast
 } ;
 
-constexpt cpcchar		subs[] = {
+constexpr cpcchar		subs[] = {
 	"open",
-	"info",
+	"getinfo",
 	"curbegin",
 	"curend",
-	"fetch",
-	"enum",
+	"curenum",
+	"curfetch",
 	"audit",
 	"close",
 	nullptr
 } ;
+
+constexpr char		pr[] = "/usr/extra" ;
 
 
 /* exported variables */
@@ -194,235 +215,226 @@ constexpt cpcchar		subs[] = {
 
 /* exported subroutines */
 
-int sysrealname_open(SRM *op,cchar *dbname) noex {
+int sysrealname_open(SRN *op,cchar *dbname) noex {
 	int		rs ;
-	cchar		*objname = SRN_OBJNAME ;
-
-	if (op == nullptr) return SR_FAULT ;
-
 	if (dbname == nullptr) dbname = SYSREALNAME_DBNAME ;
-
-	memclear(op) ;
-
-	if ((rs = sysrealname_objloadbegin(op,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
-	        op->magic = SYSREALNAME_MAGIC ;
+	if ((rs = sysrealname_ctor(op)) >= 0) {
+	    cchar	*objname = SRN_OBJNAME ;
+	    if ((rs = sysrealname_objloadbegin(op,pr,objname)) >= 0) {
+                sysrealname_calls    *callp = callsp(op->callp) ;
+		rs = SR_NOSYS ;
+		if (op->callp) {
+		    auto co = callp->open ;
+	            if ((rs = co(op->obj,dbname)) >= 0) {
+	                op->magic = SYSREALNAME_MAGIC ;
+	            }
+		}
+	    } /* end if (sysrealname_objloadbegin) */
+	    if (rs < 0) {
+		sysrealname_dtor(op) ;
 	    }
-	}
-
+	} /* end if (sysrealname_ctor) */
 	return rs ;
 }
 /* end subroutine (sysrealname_open) */
 
-int sysrealname_close(SRM *op) noex {
-	int		rs = SR_OK ;
+int sysrealname_close(SRN *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = sysrealname_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = sysrealname_magic(op)) >= 0) {
+            sysrealname_calls    *callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+	    if (callp->close) {
+		auto co = callp->close ;
+	        rs1 = co(op->obj) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = sysrealname_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysrealname_close) */
 
-int sysrealname_info(SRM *op,SYSREALNAME_INFO *ip) noex {
-	IPASSWD_INFO	iinfo ;
+int sysrealname_getinfo(SRN *op,SRN_INFO *ip) noex {
 	int		rs = SR_NOSYS ;
 	int		n = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.info != nullptr) {
-	    rs = (*op->call.info)(op->obj,&iinfo) ;
-	    n = rs ;
-	}
-
-	if (ip != nullptr) {
-	    memset(ip,0,sizeof(SYSREALNAME_INFO)) ;
-	    if (rs >= 0) {
-		ip->writetime = iinfo.writetime ;
-		ip->writecount = iinfo.writecount ;
-		ip->entries = iinfo.entries ;
-		ip->version = iinfo.version ;
-		ip->encoding = iinfo.encoding ;
-		ip->type = iinfo.type ;
-		ip->collisions = iinfo.collisions ;
+	if ((rs = sysrealname_magic(op)) >= 0) {
+            sysrealname_calls    *callp = callsp(op->callp) ;
+	    IPW_INFO		iinfo{} ;
+	    rs = SR_NOSYS ;
+	    if (callp->getinfo) {
+		auto co = callp->getinfo ;
+	        rs = co(op->obj,&iinfo) ;
+	        n = rs ;
 	    }
-	}
-
+	    if (ip) {
+	        memclear(ip) ;
+	        if (rs >= 0) {
+		    ip->writetime = iinfo.writetime ;
+		    ip->writecount = iinfo.writecount ;
+		    ip->entries = iinfo.entries ;
+		    ip->version = iinfo.version ;
+		    ip->encoding = iinfo.encoding ;
+		    ip->type = iinfo.type ;
+		    ip->collisions = iinfo.collisions ;
+	        }
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (sysrealname_info) */
+/* end subroutine (sysrealname_getinfo) */
 
-int sysrealname_curbegin(SRM *op,SRN_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	memset(curp,0,sizeof(SRN_CUR)) ;
-
-	if (op->call.curbegin != nullptr) {
-	    char	*p ;
-	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
-		curp->scp = p ;
-	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-		    curp->magic = SRN_CURMAGIC ;
-		}
-
-		if (rs < 0) {
-		    uc_free(curp->scp) ;
-		    curp->scp = nullptr ;
-		}
-	    } /* end if (memory-allocation) */
-	} else {
+int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
+	int		rs ;
+	if ((rs = sysrealname_magic(op,curp)) >= 0) {
+            sysrealname_calls	*callp = callsp(op->callp) ;
+	    cint		csz = op->cursize ;
 	    rs = SR_NOSYS ;
-	}
-
+	    memclear(curp) ;
+	    if (callp->curbegin) {
+	        if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
+		    auto co = callp->curbegin ;
+		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
+		    curp->scp = vp ;
+	            if ((rs = co(op->obj,icurp)) >= 0) {
+		        curp->magic = SRN_CURMAGIC ;
+		    }
+		    if (rs < 0) {
+		        uc_free(curp->scp) ;
+		        curp->scp = nullptr ;
+		    }
+	        } /* end if (memory-allocation) */
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysrealname_curbegin) */
 
-int sysrealname_curend(SRM *op,SRN_CUR *curp) noex {
-	int		rs = SR_OK ;
+int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != SRN_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->call.curend != nullptr) {
-	    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = uc_free(curp->scp) ;
-	if (rs >= 0) rs = rs1 ;
-	curp->scp = nullptr ;
-
-	if (curp->sa != nullptr) {
-	    rs1 = uc_free(curp->sa) ;
-	    if (rs >= 0) rs = rs1 ;
-	    curp->sa = nullptr ;
-	}
-
-	curp->magic = 0 ;
+	if ((rs = sysrealname_magic(op,curp)) >= 0) {
+            sysrealname_calls	*callp = callsp(op->callp) ;
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == SRN_CURMAGIC) {
+		rs = SR_OK ;
+	        if (callp->curend) {
+		    auto 	co = callp->curend ;
+		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
+		    {
+	                rs1 = co(op->obj,icurp) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+	        } else {
+		    rs = SR_NOSYS ;
+		}
+	        {
+	            rs1 = uc_free(curp->scp) ;
+	            if (rs >= 0) rs = rs1 ;
+	            curp->scp = nullptr ;
+	        }
+	        if (curp->sa) {
+	            rs1 = uc_free(curp->sa) ;
+	            if (rs >= 0) rs = rs1 ;
+	            curp->sa = nullptr ;
+	        }
+		curp->magic = 0 ;
+	    } /* end if (valid-magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysrealname_curend) */
 
-int sysrealname_look(SRM *op,SRN_CUR *curp,int fo,
+int sysrealname_curlook(SRN *op,SRN_CUR *curp,int fo,
 		cchar *sbuf,int slen) noex {
-	realname	rn ;
 	int		rs ;
-
-	if (sbuf == nullptr) return SR_FAULT ;
-
-	if ((rs = realname_start(&rn,sbuf,slen)) >= 0) {
-	    cchar	*sa[6] ;
-	    if ((rs = realname_getpieces(&rn,sa)) > 0) {
-		rs = sysrealname_lookparts(op,curp,fo,sa,rs) ;
-	    }
-	    realname_finish(&rn) ;
-	} /* end if (realname) */
-
-	return rs ;
+	int		rs1 ;
+	int		rv = 0 ;
+	if ((rs = sysrealname_magic(op,curp,sbuf)) >= 0) {
+	    if (realname rn ; (rs = rn.start(sbuf,slen)) >= 0) {
+	        cchar	*sa[6] ;
+	        if ((rs = rn.getpieces(sa)) > 0) {
+		    rs = sysrealname_curlookparts(op,curp,fo,sa,rs) ;
+		    rv = rs ;
+	        }
+	        rs1 = rn.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (realname) */
+	} /* end if (magic) */
+	return (rs >= 0) ? rv : rs ;
 }
-/* end subroutine (sysrealname_look) */
+/* end subroutine (sysrealname_curlook) */
 
-int sysrealname_lookparts(SRM *op,SRN_CUR *curp,int fo,
+int sysrealname_curlookparts(SRN *op,SRN_CUR *curp,int fo,
 		cchar **sa,int sn) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (sa == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != SRN_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->call.fetch != nullptr) {
-	    rs = sysrealname_curload(op,curp,fo,sa,sn) ;
-	} else {
-	    rs = SR_NOSYS ;
-	}
-
+	int		rs ;
+	if ((rs = sysrealname_magic(op,curp,sa)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == SRN_CURMAGIC) {
+	        rs = sysrealname_curload(op,curp,fo,sa,sn) ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (sysrealname_lookparts) */
+/* end subroutine (sysrealname_curlookparts) */
 
-int sysrealname_lookread(SRM *op,SRN_CUR *curp,char *rbuf) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != SRN_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->call.fetch != nullptr) {
-	    IPASSWD_CUR	*icp = curp->scp ;
-	    cint	rsn = SR_NOTFOUND ;
-	    int		sn = curp->sn ;
-	    int		fo = curp->fo;
-	    cchar	**sa = curp->sa ;
-	    if ((rs = (*op->call.fetch)(op->obj,icp,fo,rbuf,sa,sn)) == rsn) {
-		rs = SR_OK ;
-	    }
-	} else {
-	    rs = SR_NOSYS ;
-	}
-
+int sysrealname_curlookread(SRN *op,SRN_CUR *curp,char *rbuf) noex {
+	int		rs ;
+	if ((rs = sysrealname_magic(op,curp,rbuf)) >= 0) {
+            sysrealname_calls	*callp = callsp(op->callp) ;
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == SRN_CURMAGIC) {
+		rs = SR_NOSYS ;
+	        if (callp->curfetch) {
+		    auto	co = callp->curfetch ;
+	            IPW_CUR	*icp = (IPW_CUR *) curp->scp ;
+	            cint	rsn = SR_NOTFOUND ;
+	            cint	sn = curp->sn ;
+	            cint	fo = curp->fo ;
+	            cchar	**sa = curp->sa ;
+	            if ((rs = co(op->obj,icp,fo,rbuf,sa,sn)) == rsn) {
+		        rs = SR_OK ;
+	            }
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (sysrealname_lookread) */
+/* end subroutine (sysrealname_curlookread) */
 
-int sysrealname_enum(SRM *op,SRN_CUR *curp,char *ubuf,
+int sysrealname_curenum(SRN *op,SRN_CUR *curp,char *ubuf,
 		cchar **sa,char *rbuf,int rlen) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (sa == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != SRN_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->call.enumerate != nullptr) {
-	    IPASSWD_CUR	*icp = curp->scp ;
-	    rs = (*op->call.enumerate)(op->obj,icp,ubuf,sa,rbuf,rlen) ;
-	} else {
-	    rs = SR_NOTAVAIL ;
-	}
-
+	int		rs ;
+	if ((rs = sysrealname_magic(op,curp,ubuf,sa,rbuf)) >= 0) {
+            sysrealname_calls	*callp = callsp(op->callp) ;
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == SRN_CURMAGIC) {
+		rs = SR_NOSYS ;
+	        if (callp->curenum) {
+		    auto 	co = callp->curenum ;
+	            IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
+	            rs = co(op->obj,icurp,ubuf,sa,rbuf,rlen) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (sysrealname_enum) */
+/* end subroutine (sysrealname_curenum) */
 
-int sysrealname_audit(SRM *op) noex {
-	int		rs = SR_NOTAVAIL ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SYSREALNAME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.audit != nullptr) {
-	    rs = (*op->call.audit)(op->obj) ;
-	}
-
+int sysrealname_audit(SRN *op) noex {
+	int		rs ;
+	if ((rs = sysrealname_magic(op)) >= 0) {
+            sysrealname_calls	*callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+	    if (callp->audit) {
+		auto co = callp->audit ;
+	        rs = co(op->obj) ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sysrealname_audit) */
@@ -430,7 +442,7 @@ int sysrealname_audit(SRM *op) noex {
 
 /* private subroutines */
 
-static int sysrealname_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
+static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -439,7 +451,7 @@ static int sysrealname_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
 	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
 	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
-	            cchar	*mn = CMD_MODBNAME ;
+	            cchar	*mn = SRN_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
@@ -479,7 +491,7 @@ static int sysrealname_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (sysrealname_objloadbegin) */
 
-static int sysrealname_objloadend(CMD *op) noex {
+static int sysrealname_objloadend(SRN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
@@ -496,7 +508,7 @@ static int sysrealname_objloadend(CMD *op) noex {
 }
 /* end subroutine (sysrealname_objloadend) */
 
-static int sysrealname_loadcalls(CMD *op,vecstr *slp) noex {
+static int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -511,8 +523,8 @@ static int sysrealname_loadcalls(CMD *op,vecstr *slp) noex {
                 case sub_open:
                     callp->open = soopen_f(snp) ;
                     break ;
-                case sub_info:
-                    callp->info = soinfo_f(snp) ;
+                case sub_getinfo:
+                    callp->getinfo = sogetinfo_f(snp) ;
                     break ;
                 case sub_curbegin:
                     callp->curbegin = socurbegin_f(snp) ;
@@ -523,8 +535,8 @@ static int sysrealname_loadcalls(CMD *op,vecstr *slp) noex {
                 case sub_curend:
                     callp->curend = socurend_f(snp) ;
                     break ;
-                case sub_fetch:
-                    callp->fetch = sofetch_f(snp) ;
+                case sub_curfetch:
+                    callp->curfetch = socurfetch_f(snp) ;
                     break ;
                 case sub_audit:
                     callp->audit = soaudit_f(snp) ;
@@ -543,53 +555,47 @@ static int sysrealname_loadcalls(CMD *op,vecstr *slp) noex {
 }
 /* end subroutine (sysrealname_loadcalls) */
 
-static int sysrealname_curload(SRM *op,SRN_CUR *curp,
+static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 		int fo,cc **sa,int sn) noex {
-	int		rs ;
-	int		i ;
-	int		sasize ;
-	int		ssize = 0 ;
-	char		*bp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sa == nullptr) return SR_FAULT ;
-
-	if (sn < 0) {
-	    for (sn = 0 ; sa[sn] != nullptr ; sn += 1) ;
-	}
-
-	sasize = ((sn+1) * sizeof(cchar *)) ;
-	ssize += sasize ;
-	for (i = 0 ; i < sn ; i += 1) {
-	    ssize += (strlen(sa[i]) + 1) ;
-	}
-
-	if ((rs = uc_malloc(ssize,&bp)) >= 0) {
-	    cchar	**sap = (cchar **) bp ;
-	    char	*sbp = (bp + sasize) ;
-	    curp->fo = fo ;
-	    curp->sa = (cchar **) bp ;
-	    curp->sn = sn ;
-	    for (i = 0 ; i < sn ; i += 1) {
-		sap[i] = sbp ;
-		sbp = (strwcpy(sbp,sa[i],-1) + 1) ;
+	int		rs = SR_FAULT ;
+	if (op && sa) {
+	    int		sasize ;
+	    int		ssize = 0 ;
+	    if (sn < 0) {
+	        for (sn = 0 ; sa[sn] != nullptr ; sn += 1) ;
 	    }
-	    sap[i] = nullptr ;
-	} /* end if (memory-allocation) */
-
+	    sasize = ((sn+1) * sizeof(cchar *)) ;
+	    ssize += sasize ;
+	    for (int i = 0 ; i < sn ; i += 1) {
+	        ssize += (strlen(sa[i]) + 1) ;
+	    }
+	    if (char *bp{} ; (rs = uc_malloc(ssize,&bp)) >= 0) {
+	        int	i{} ; /* used-afterwards */
+	        cchar	**sap = (cchar **) bp ;
+	        char	*sbp = (bp + sasize) ;
+	        curp->fo = fo ;
+	        curp->sa = (cchar **) bp ;
+	        curp->sn = sn ;
+	        for (i = 0 ; i < sn ; i += 1) {
+		    sap[i] = sbp ;
+		    sbp = (strwcpy(sbp,sa[i],-1) + 1) ;
+	        }
+	        sap[i] = nullptr ;
+	    } /* end if (memory-allocation) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sysrealname_curload) */
 
 static bool isrequired(int i) noex {
-	bool		f = FALSE ;
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_curbegin:
 	case sub_curend:
-	case sub_fetch:
+	case sub_curfetch:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
