@@ -41,6 +41,7 @@
 #include	<vecstr.h>
 #include	<realname.h>
 #include	<modload.h>
+#include	<ipasswd.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 

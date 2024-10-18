@@ -22,7 +22,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<modload.h>
-#include	<ipasswd.h>		/* <- money shot */
 
 
 #define	SYSREALNAME		struct sysrealname_head
