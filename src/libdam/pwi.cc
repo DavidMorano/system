@@ -158,7 +158,8 @@ struct opener_fl {
 	uint		dbname:1 ;
 } ;
 
-struct opener {
+namespace {
+    struct opener {
 	cchar		*pr ;
 	cchar		*dbname ;
 	cchar		*idxdname ;
@@ -170,7 +171,8 @@ struct opener {
 	int finish() noex ;
 	int mkidxdname() noex ;
 	int mkpwi() noex ;
-} ; /* end struct(opener) */
+    } ; /* end struct (opener) */
+}
 
 struct pwdesc {
 	ucentpw		*pwp ;
@@ -178,13 +180,15 @@ struct pwdesc {
 	int		pwlen ;
 } ;
 
-struct vars {
+namespace {
+    struct vars {
     	int		maxpathlen ;
 	int		maxnamelen ;
 	int		nodenamelen ;
 	int		usernamelen ;
 	int		realnamelen ;
-} ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -252,7 +256,7 @@ constexpr cpcchar	prbins[] = {
 	nullptr
 } ;
 
-constexpr cchar		extras[] = "¹²³" ;
+constexpr cchar		extras[] = "°¹²³" ;
 constexpr cchar		progmkpwi[] = PROG_MKPWI ;
 
 static vars		var ;
@@ -269,19 +273,19 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	if ((rs = pwi_ctor(op,pr)) >= 0) {
 	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
-	opener		si(pr,dbname) ;
-	USTAT		sb, *sbp = &sb ;
-	custime		dt = getustime ;
-	if ((rs = si.start()) >= 0) {
-	    if ((rs = si.mkidxdname()) >= 0) {
-	        time_t	ti_pwi ;
-	        cint	to = TO_FILEMOD ;
-	        cchar	*suf = IPASSWD_SUF ;
-	        cchar	*endstr = ENDIANSTR ;
-	        cchar	*midname = si.idxdname ;
-	        char	fname[MAXPATHLEN+1] ;
+		opener		si(pr,dbname) ;
+		custime		dt = getustime ;
+		if ((rs = si.start()) >= 0) {
+	    	    if ((rs = si.mkidxdname()) >= 0) {
+	        	time_t	ti_pwi ;
+	        	cint	to = TO_FILEMOD ;
+	        	cchar	*suf = IPASSWD_SUF ;
+	        	cchar	*endstr = ENDIANSTR ;
+	        	cchar	*midname = si.idxdname ;
+	        	char	fname[MAXPATHLEN+1] ;
 
 	        if ((rs = mkfnamesuf2(fname,midname,suf,endstr)) >= 0) {
+			USTAT		sb, *sbp = &sb ;
 	            rs1 = u_stat(fname,sbp) ;
 
 	            ti_pwi = sbp->st_mtime ;

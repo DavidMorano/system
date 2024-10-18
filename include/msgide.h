@@ -40,8 +40,8 @@
 #define	MSGIDE_LCTIME		4	/* entry creation */
 #define	MSGIDE_LMTIME		4	/* message */
 #define	MSGIDE_LHASH		4
-#define	MSGIDE_LRECIPIENT	32
-#define	MSGIDE_LMESSAGEID	(2 * MAXHOSTNAMELEN)
+#define	MSGIDE_LRECIP		32
+#define	MSGIDE_LMSGID		(2 * MAXHOSTNAMELEN)
 #define	MSGIDE_LFROM		(2 * MAXHOSTNAMELEN)
 
 /* entry field offsets */
@@ -53,9 +53,9 @@
 #define	MSGIDE_OCTIME		(MSGIDE_OUTIME + MSGIDE_LUTIME)
 #define	MSGIDE_OMTIME		(MSGIDE_OCTIME + MSGIDE_LCTIME)
 #define	MSGIDE_OHASH		(MSGIDE_OMTIME + MSGIDE_LMTIME)
-#define	MSGIDE_ORECIPIENT	(MSGIDE_OHASH + MSGIDE_LHASH)
-#define	MSGIDE_OMESSAGEID	(MSGIDE_ORECIPIENT + MSGIDE_LRECIPIENT)
-#define	MSGIDE_OFROM		(MSGIDE_OMESSAGEID + MSGIDE_LMESSAGEID)
+#define	MSGIDE_ORECIP		(MSGIDE_OHASH + MSGIDE_LHASH)
+#define	MSGIDE_OMSGID		(MSGIDE_ORECIP + MSGIDE_LRECIP)
+#define	MSGIDE_OFROM		(MSGIDE_OMSGID + MSGIDE_LMSGID)
 
 #define	MSGIDE_SIZE		(MSGIDE_OFROM + MSGIDE_LFROM)
 
@@ -66,8 +66,8 @@ struct msgide_all {
 	uint		ctime ;		/* creation time-stamp */
 	uint		mtime ;		/* message time-stamp */
 	uint		hash ;
-	char		recipient[MSGIDE_LRECIPIENT + 1] ;
-	char		messageid[MSGIDE_LMESSAGEID + 1] ;
+	char		recipient[MSGIDE_LRECIP + 1] ;
+	char		messageid[MSGIDE_LMSGID + 1] ;
 	char		from[MSGIDE_LFROM + 1] ;
 } ;
 

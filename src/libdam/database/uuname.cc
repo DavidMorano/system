@@ -58,21 +58,35 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*open_f)(void *,cchar *,cchar *) noex ;
-    typedef int (*count_f)(void *) noex ;
-    typedef int (*exists_f)(void *,cchar *,int) noex ;
-    typedef int (*curbegin_f)(void *,void *) noex ;
-    typedef int (*enumerate_f)(void *,void *,char *,int) noex ;
-    typedef int (*curend_f)(void *,void *) noex ;
-    typedef int (*audit_f)(void *) noex ;
-    typedef int (*close_f)(void *) noex ;
+    typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
+    typedef int (*socount_f)(void *) noex ;
+    typedef int (*soexists_f)(void *,cchar *,int) noex ;
+    typedef int (*socurbegin_f)(void *,void *) noex ;
+    typedef int (*socurenum_f)(void *,void *,char *,int) noex ;
+    typedef int (*socurend_f)(void *,void *) noex ;
+    typedef int (*soaudit_f)(void *) noex ;
+    typedef int (*soclose_f)(void *) noex ;
 }
 
 
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
+
+struct uuname_calls {
+    soopen_f		open ;
+    socount_f		count ;
+    soexists_f		exists ;
+    socurbegin_f	curbegin ;
+    socurenum_f		curenum ;
+    socurend_f		curend ;
+    soaudit_f		audit ;
+    soclose_f		close ;
+} ; /* end struct (uuname_calls) */
 
 
 /* forward references */
@@ -133,7 +147,7 @@ enum subs {
 	sub_count,
 	sub_exists,
 	sub_curbegin,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
 	sub_audit,
 	sub_close,
@@ -145,7 +159,7 @@ constexpr cpcchar	subs[] = {
 	"count",
 	"exists",
 	"curbegin",
-	"enum",
+	"curenum",
 	"curend",
 	"audit",
 	"close",
@@ -288,8 +302,8 @@ int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic) {
 		rs = SR_NOSYS ;
-	        if (op->call.enumerate != nullptr) {
-	            rs = (*op->call.enumerate)(op->obj,curp->scp,rbuf,rlen) ;
+	        if (op->call.curenum != nullptr) {
+	            rs = (*op->call.curenum)(op->obj,curp->scp,rbuf,rlen) ;
 	        }
 	    } /* end if (cursor-magic) */
 	} /* end if (magic) */
@@ -407,8 +421,8 @@ static int uuname_loadcalls(uuname *op,cchar *objname) noex {
 		case sub_curbegin:
 		    op->call.curbegin = curbegin_f(snp) ;
 		    break ;
-		case sub_enum:
-		    op->call.enumerate = enumerate_f(snp) ;
+		case sub_curenum:
+		    op->call.curenum = curenum_f(snp) ;
 		    break ;
 		case sub_curend:
 		    op->call.curend = curend_f(snp) ;
@@ -432,7 +446,7 @@ static bool isrequired(int i) noex {
 	case sub_open:
 	case sub_exists:
 	case sub_curbegin:
-	case sub_enum:
+	case sub_curenum:
 	case sub_curend:
 	case sub_close:
 	    f = true ;

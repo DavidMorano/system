@@ -742,6 +742,7 @@ mkdirlist.o:		mkdirlist.cc mkdirlist.h
 sesmsg.o:		sesmsg.cc sesmsg.h
 msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
+sysrealname.o:		sysrealname.cc sysrealname.h
 
 # DATABASE
 database.o:		database.dir
@@ -806,6 +807,11 @@ sysvarx.dir:
 # REALNAME
 realname.o:		realname.dir
 realname.dir:
+	makesubdir $@
+
+# MSGIDX
+msgidx.o:		msgidx.dir
+msgidx.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

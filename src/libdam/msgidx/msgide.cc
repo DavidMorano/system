@@ -55,7 +55,7 @@ int		mlen ;
 int		f_read ;
 MSGIDE_ALL	*ep ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
@@ -67,41 +67,23 @@ MSGIDE_ALL	*ep ;
 	if ((rs = serialbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
 
 	if (f_read) {
-
 	    serialbuf_rui(&msgbuf,&ep->count) ;
-
 	    serialbuf_rui(&msgbuf,&ep->utime) ;
-
 	    serialbuf_rui(&msgbuf,&ep->ctime) ;
-
 	    serialbuf_rui(&msgbuf,&ep->mtime) ;
-
 	    serialbuf_rui(&msgbuf,&ep->hash) ;
-
-	    serialbuf_rstrn(&msgbuf,ep->recipient,MSGIDE_LRECIPIENT) ;
-
-	    serialbuf_rstrn(&msgbuf,ep->messageid,MSGIDE_LMESSAGEID) ;
-
+	    serialbuf_rstrn(&msgbuf,ep->recipient,MSGIDE_LRECIP) ;
+	    serialbuf_rstrn(&msgbuf,ep->messageid,MSGIDE_LMSGID) ;
 	    serialbuf_rstrn(&msgbuf,ep->from,MSGIDE_LFROM) ;
-
 	} else {
-
 	    serialbuf_wui(&msgbuf,ep->count) ;
-
 	    serialbuf_wui(&msgbuf,ep->utime) ;
-
 	    serialbuf_wui(&msgbuf,ep->ctime) ;
-
 	    serialbuf_wui(&msgbuf,ep->mtime) ;
-
 	    serialbuf_wui(&msgbuf,ep->hash) ;
-
-	    serialbuf_wstrn(&msgbuf,ep->recipient,MSGIDE_LRECIPIENT) ;
-
-	    serialbuf_wstrn(&msgbuf,ep->messageid,MSGIDE_LMESSAGEID) ;
-
+	    serialbuf_wstrn(&msgbuf,ep->recipient,MSGIDE_LRECIP) ;
+	    serialbuf_wstrn(&msgbuf,ep->messageid,MSGIDE_LMSGID) ;
 	    serialbuf_wstrn(&msgbuf,ep->from,MSGIDE_LFROM) ;
-
 	} /* end if */
 
 	    rs1 = serialbuf_finish(&msgbuf) ;
@@ -119,7 +101,7 @@ int		mlen ;
 int		f_read ;
 MSGIDE_UPDATE	*ep ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 

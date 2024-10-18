@@ -198,9 +198,9 @@ enum subs {
 	sub_open,
 	sub_count,
 	sub_curbegin,
-	sub_fetch,
 	sub_curenum,
 	sub_curend,
+	sub_fetch,
 	sub_audit,
 	sub_close,
 	sub_overlast
@@ -210,9 +210,9 @@ constexpr cpcchar	subs[] = {
 	"open",
 	"count",
 	"curbegin",
-	"fetch",
-	"enum",
+	"curenum",
 	"curend",
+	"fetch",
 	"audit",
 	"close",
 	nullptr
