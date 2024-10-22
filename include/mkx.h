@@ -1,4 +1,5 @@
 /* mkx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* provided are various general c-string creation subroutines */

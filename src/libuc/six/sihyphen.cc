@@ -38,13 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| + |strnchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<strn.h>
-#include	<toxc.h>
 #include	<toxc.h>
 #include	<localmisc.h>
 
@@ -84,7 +86,7 @@ int sihyphen(cchar *sp,int sl) noex {
 /* end subroutine (sihyphen) */
 #else /* CF_STRNCHR */
 int sihyphen(cchar *sp,int sl) noex {
-	int		i ;
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	if (sl < 0) sl = strlen(sp) ;
 	for (i = 0 ; (i < (sl-1)) && sp[i] ; i += 1) {

@@ -1,4 +1,5 @@
 /* mksofname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a shared-object filename from components */

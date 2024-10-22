@@ -1,4 +1,5 @@
 /* systems SUPPORT */
+/* version %I% last-modified %G% */
 /* lang=C20 */
 
 /* get machine dialing information from UUCP "Systems" DB */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	systems
+
+	Description:
 	This object is a container for "systems" listed in "systems"
 	files.  These are files that are keyed by the name of a
 	"system" (whatever that is) and has a composite value that

@@ -510,6 +510,7 @@ static int sysrealname_objloadend(SRN *op) noex {
 /* end subroutine (sysrealname_objloadend) */
 
 static int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
+        sysrealname_calls   *callp = callsp(op->callp) ;
 	modload		*lp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -518,7 +519,6 @@ static int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
-                sysrealname_calls   *callp = callsp(op->callp) ;
                 c += 1 ;
                 switch (i) {
                 case sub_open:
@@ -565,7 +565,7 @@ static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 	    if (sn < 0) {
 	        for (sn = 0 ; sa[sn] != nullptr ; sn += 1) ;
 	    }
-	    sasize = ((sn+1) * sizeof(cchar *)) ;
+	    sasize = ((sn + 1) * sizeof(cchar *)) ;
 	    ssize += sasize ;
 	    for (int i = 0 ; i < sn ; i += 1) {
 	        ssize += (strlen(sa[i]) + 1) ;

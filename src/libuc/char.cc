@@ -39,10 +39,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bitset>		/* <- the money shot! */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"char.h"
 
@@ -71,7 +73,7 @@ using std::bitset ;			/* type */
 /* local structures */
 
 namespace {
-    constexpr int   chtablen = (UCHAR_MAX+1) ;
+    constexpr int   chtablen = (UCHAR_MAX + 1) ;
     struct charinfo {
 	bitset<chtablen>	iswhite{} ;
 	bitset<chtablen>	islc{} ;

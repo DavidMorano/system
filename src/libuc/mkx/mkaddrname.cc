@@ -1,4 +1,5 @@
 /* mkaddrname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the best address-name, if one exists */

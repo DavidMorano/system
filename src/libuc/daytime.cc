@@ -76,7 +76,10 @@
 
 /* local typedefs */
 
-typedef int	(*thrsub_f)(void *) noex ;
+extern "C" {
+    typedef int	(*thrsub_f)(void *) noex ;
+}
+
 typedef mainv	mv ;
 
 

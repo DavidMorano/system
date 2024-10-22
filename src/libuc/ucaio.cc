@@ -82,9 +82,9 @@
 
 namespace {
     struct ucaio ;
-    typedef int (ucaio::*mem_f)(AIOCB *) noex ;
+    typedef int (ucaio::*mem_m)(AIOCB *) noex ;
     struct ucaio {
-	mem_f		m ;
+	mem_m		m ;
 	CTIMESPEC	*tsp ;
 	int		fd ;
 	int		ne ;

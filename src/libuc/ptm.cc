@@ -45,9 +45,9 @@
 
 namespace {
     struct ucptm ;
-    typedef int (ucptm::*mem_f)(ptm *) ;
+    typedef int (ucptm::*mem_m)(ptm *) ;
     struct ucptm {
-	mem_f		m ;
+	mem_m		m ;
 	ptma		*ap ;
 	int		mto = 0 ;
 	ucptm() = default ;

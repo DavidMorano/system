@@ -1,4 +1,4 @@
-/* matxstr SUPPORT */
+/* matstr SUPPORT */
 /* lang=C++20 */
 
 /* Match a String */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	matbasestr
+	mat{x}str
 
 	Description:
 	Check that the given string matches EXACTLY some string in
@@ -26,7 +26,7 @@
 	match, we return "less-than-zero".
 
 	Synopsis:
-	int matbasestr(mainv a,cchar *sp,int sl) noex
+	int mat(x)str(mainv a,cchar *sp,int sl) noex
 
 	Arguments:
 	a		array of string to match against
@@ -36,29 +36,6 @@
 	Returns:
 	>=0		index of match in array
 	<0		no match found (not further distinguished)
-
-
-	Name:
-	matcasestr
-
-	Description:
-	Check that the given string matches EXACTLY (case insensitively)
-	some string in the given array of strings.  If we get a
-	match, we return the array index.  If we do not match, we
-	return "less-than-zero".
-
-	Synopsis:
-	int matcasestr(mainv a,cchar *sp,int sl) noex
-
-	Arguments:
-	a		array of string to match against
-	sp		string to test against array
-	sl		length of test string
-
-	Returns:
-	>=0		index of match in array
-	<0		no match found (not further distinguished)
-
 
 	Notes:
 	1. Rationale for using templates rather than passing a 
@@ -66,8 +43,8 @@
 	The thinking is that I want the template instantiation to
 	"see" any inlined subroutine and optimize it all out rather
 	than being forced to actually call a subroutine (if only a
-	pointer was supplied). Anywat, that was the thinking, even
-	if misguided. Also note that this goes against one of the
+	pointer was supplied).  Anyway, that was the thinking, even
+	if misguided.  Also note that this goes against one of the
 	major coding standard rules which is: to optimize for space
 	rather than time (without the compiler doing that operation
 	itself).
@@ -75,10 +52,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<nleadstr.h>
 #include	<toxc.h>
 #include	<localmisc.h>
@@ -94,14 +73,19 @@
 
 /* local typedefs */
 
-typedef int (*toxc_f)(int) noex ;
-typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+    typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+}
 
 
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -115,7 +99,7 @@ typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
 template<toxc_f toxc,nleadxstr_f nleadxstr>
 int matxstr(mainv a,cchar *sp,int sl) noex {
 	cint		lch = toxc(sp[0]) ;
-	int		i ; /* used afterwards */
+	int		i{} ; /* used-afterwards */
 	int		m ;
 	if (sl >= 0) {
 	    for (i = 0 ; a[i] ; i += 1) {

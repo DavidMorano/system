@@ -1,4 +1,5 @@
 /* mkfdfname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a FD file-name (for BFILE and others) */

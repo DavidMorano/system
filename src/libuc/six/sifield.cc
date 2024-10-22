@@ -39,10 +39,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
 
 #include	"six.h"
 

@@ -74,7 +74,7 @@ extern int	getngroups() noex ;
 
 namespace {
     struct tryer ;
-    typedef int (tryer::*tryer_f)(USTAT *,int) noex ;
+    typedef int (tryer::*tryer_m)(USTAT *,int) noex ;
     struct tryer {
 	gid_t		*gids ;
 	uid_t		euid ;
@@ -98,7 +98,7 @@ static int permer(USTAT *,uid_t,gid_t,gid_t *,int) noex ;
 
 /* local variables */
 
-static tryer_f tries[] = {
+static tryer_m tries[] = {
 	&tryer::root,
 	&tryer::user,
 	&tryer::grp,
@@ -164,7 +164,7 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 	        am &= 007 ;
 	        if ((rs = t.start()) >= 0) {
 	            for (int i = 0 ; tries[i] ; i += 1) {
-			tryer_f	m = tries[i] ;
+			tryer_m		m = tries[i] ;
 	                rs = (t.*m)(sbp,am) ;
 	                if (rs != 0) break ;
 	            } /* end for */

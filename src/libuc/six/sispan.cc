@@ -39,10 +39,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<toxc.h>
 #include	<cstring>		/* for |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strnxchr.h>
 #include	<ascii.h>
 #include	<toxc.h>

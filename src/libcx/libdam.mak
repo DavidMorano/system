@@ -105,7 +105,7 @@ OBJ08= strcasestr.o strwcmp.o strwcasecmp.o strpcmp.o strnncmp.o
 OBJ09= strsub.o strcasesub.o strnsub.o strncasesub.o
 OBJ10= 
 OBJ11= strnlen.o strnnlen.o strlinelen.o
-OBJ12= starmat.o 
+OBJ12= isstarmat.o 
 OBJ13= matstr.o matostr.o matpstr.o matpcasestr.o
 OBJ14= matkeystr.o matnstr.o matsubstr.o matcasesubstr.o
 OBJ15=
@@ -704,13 +704,8 @@ baops.o:		baops.cc baops.h
 
 bits.o:			bits.cc bits.h baops.h
 
-msgenv.o:		msgenv.c msgenv.h
-
 rijndael.o:		rijndael.c rijndael.h
-
-ema.o:			ema.c ema.h
-mimetypes.o:		mimetypes.c mimetypes.h
-librandom.o:		librandom.c librandom.h
+librandom.o:		librandom.cc librandom.h
 
 density.o:		density.c density.h
 dialtab.o:		dialtab.c dialtab.h
@@ -824,5 +819,6 @@ getlogx.o:		getlogx.cc getlogx.h
 sockpeername.o:		sockpeername.cc sockpeername.h
 nlspeername.o:		nlspeername.cc nlspeername.h
 conallof.o:		conallof.cc conallof.h
+ismatstar.o:		ismatstar.cc ismatstar.h
 
 

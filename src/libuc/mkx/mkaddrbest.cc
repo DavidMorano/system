@@ -1,4 +1,5 @@
 /* mkaddrbest SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the "best" address out of an EMA type address specification */

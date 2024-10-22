@@ -39,10 +39,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<toxc.h>
 #include	<mkchar.h>
@@ -61,7 +63,7 @@
 /* exported subroutines */
 
 int sialnum(cchar *sp,int sl) noex {
-	int		i ;
+	int		i{} ; /* used-afterwards */
 	bool		f = false ;
 	for (i = 0 ; sl && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;

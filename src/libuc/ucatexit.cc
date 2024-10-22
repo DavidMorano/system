@@ -54,9 +54,9 @@ extern "C" {
 
 namespace {
     struct ucatexit ;
-    typedef int (ucatexit::*mem_f)() noex ;
+    typedef int (ucatexit::*mem_m)() noex ;
     struct ucatexit {
-	mem_f		m ;
+	mem_m		m ;
 	atexit_f	func ;
 	ucatexit(atexit_f f) noex : func(f) { } ;
 	int stdatexit() noex ;

@@ -1,4 +1,5 @@
 /* mkonefrom SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to divine the best "from" address from a raw source string */

@@ -1,4 +1,5 @@
 /* mkcaselower SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* change the character case in a c-string to lower-case inplace */

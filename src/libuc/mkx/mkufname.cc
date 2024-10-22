@@ -1,4 +1,5 @@
 /* mkufname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a "user" file-name (whatever that is) */
@@ -37,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<usystem.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>

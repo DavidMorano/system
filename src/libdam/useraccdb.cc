@@ -74,6 +74,7 @@
 #include	<strn.h>		/* |strnblanks(3uc)| */
 #include	<sfx.h>
 #include	<strwcmp.h>
+#include	<isnot.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"useraccdb.h"
@@ -99,8 +100,8 @@
 #define	UAD_REC		useraccdb_rec
 #define	UAD_ITEM	useraccdb_item
 
-#define	UPINFO		upinfo
-#define	UPINFO_REC	struct upinfo_rec
+#define	UPI		upinfo
+#define	UPI_REC		upinfo_rec
 
 #define	TO_CHECK	5		/* check interval */
 #define	TO_LOCK		4		/* time-out */
@@ -134,8 +135,8 @@ struct upinfo_rec {
 } ;
 
 struct upinfo {
-	UPINFO_REC	user ;
-	UPINFO_REC	total ;
+	UPI_REC		user ;
+	UPI_REC		total ;
 	useraccdb	*op ;
 	cchar		*arguser ;
 	cchar		*argname ;
@@ -206,14 +207,14 @@ static int	useraccdb_fileclose(UAD *) noex ;
 static int	useraccdb_lock(UAD *,int) noex ;
 static int	useraccdb_recproc(UAD *,UAD_REC *) noex ;
 static int	useraccdb_doit(UAD *,time_t *,cchar *,int) noex ;
-static int	useraccdb_updater(UAD *,UPINFO *) noex ;
+static int	useraccdb_updater(UAD *,UPI *) noex ;
 
-static int	upinfo_start(UPINFO *,UAD *,cchar *,cchar *) noex ;
-static int	upinfo_match(UPINFO *,off_t,UAD_REC *) noex ;
-static int	upinfo_update(UPINFO *) noex ;
-static int	upinfo_finish(UPINFO *) noex ;
-static int	upinfo_upone(UPINFO *,UPINFO_REC *,int) noex ;
-static int	upinfo_mkrec(UPINFO *,UPINFO_REC *,char *,int,int) noex ;
+static int	upinfo_start(UPI *,UAD *,cchar *,cchar *) noex ;
+static int	upinfo_match(UPI *,off_t,UAD_REC *) noex ;
+static int	upinfo_update(UPI *) noex ;
+static int	upinfo_finish(UPI *) noex ;
+static int	upinfo_upone(UPI *,UPI_REC *,int) noex ;
+static int	upinfo_mkrec(UPI *,UPI_REC *,char *,int,int) noex ;
 
 static int	rec_parse(UAD_REC *,cc *,int) noex ;
 
@@ -317,11 +318,11 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,cc *user) noex {
 	        if ((rs = useraccdb_openlock(op)) >= 0) {
 		    if (linebuffer lb ; (rs = lb.start) >= 0) {
 			cint	fd = op->fd ;
-	                if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
+	                if (filer b ; (rs = b.start(fd,0z,0,0)) >= 0) {
 	                    UAD_REC	rec ;
 	                    cint	llen = lb.llen ;
 	                    char	*lbuf = lb.lbuf ;
-	                    while ((rs1 = filer_readln(&b,lbuf,llen,-1)) > 0) {
+	                    while ((rs1 = b.readln(lbuf,llen,-1)) > 0) {
 	                        cint	ll = rs ;
 	                        if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
 	                            cchar	*sp = rec.userstr.sp ;
@@ -339,7 +340,7 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,cc *user) noex {
 	                    if ((rs >= 0) && (rs1 <= 0)) {
 	                        rs = (rs1 < 0) ? rs1 : SR_NOTFOUND ;
 	                    }
-	                    rs1 = filer_finish(&b) ;
+	                    rs1 = b.finish ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (filer) */
 		        rs1 = lb.finish ;
@@ -361,7 +362,7 @@ int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 	if ((rs = useraccdb_magic(op,user)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (op->eo < 0) {
-		if (UPINFO ui ; (rs = upinfo_start(&ui,op,user,name)) >= 0) {
+		if (UPI ui ; (rs = upinfo_start(&ui,op,user,name)) >= 0) {
 	    	    if ((rs = useraccdb_openlock(op)) >= 0) {
 			if ((rs = useraccdb_updater(op,&ui)) >= 0) {
 			    rv = rs ;
@@ -459,18 +460,16 @@ namespace {
 	    off_t	eo = curp->eo ;
 	    int		rs ;
 	    int		rs1 ;
-	    char	*lbuf{} ;
-	    if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
 	        if ((rs = filer_readln(curp->fbp,lbuf,llen,-1)) >= 0) {
 		    cint	ll = rs ;
 	            if (ll > 0) {
-	                UAD_REC		rec ;
-	                if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
+	                if (UAD_REC rec ; (rs = rec_parse(&rec,lbuf,ll)) >= 0) {
 	                    if ((rs = useraccdb_recproc(op,&rec)) >= 0) {
 	                        rs = entry_load(ep,ebuf,elen,&rec) ;
 			    }
-		        }
+		        } /* end if (rec_parse) */
 	            } else {
 	                rs = SR_NOTFOUND ;
 		    }
@@ -596,7 +595,9 @@ static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 	    sl = recp->countstr.sl ;
 	    sp = recp->countstr.sp ;
 	    if (sp != nullptr) {
-	        rs = cfdecui(sp,sl,&recp->count) ;
+	        if (uint uc{} ; (rs = cfdecui(sp,sl,&uc)) >= 0) {
+		    recp->count = uc ;
+		}
 	    } else {
 	        rs = SR_INVALID ;
 	    }
@@ -608,13 +609,12 @@ static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	int		rs = SR_OK ;
 	if (! op->f.dater) {
-	    TIMEB	now ;
 	    cint	zlen = DATER_ZNAMELEN ;
 	    char	zbuf[DATER_ZNAMELEN+1] ;
-	    if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
+	    if (TIMEB now ; (rs = initnow(&now,zbuf,zlen)) >= 0) {
 	        rs = dater_start(op->dmp,&now,zbuf,zlen) ;
 	        op->f.dater = (rs >= 0) ;
-	    }
+	    } /* end if (initnow) */
 	}
 	if (rs >= 0) {
 	    rs = dater_setlogz(op->dmp,tsp,tsl) ;
@@ -626,25 +626,23 @@ static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 }
 /* end subroutine (useraccdb_doit) */
 
-static int useraccdb_updater(UAD *op,UPINFO *uip) noex {
+static int useraccdb_updater(UAD *op,UPI *uip) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
-	    if (filer b ; (rs = filer_start(&b,op->fd,0z,0,0)) >= 0) {
-		UAD_REC		rec ;
+	    if (filer b ; (rs = b.start(op->fd,0z,0,0)) >= 0) {
 		off_t		ro = 0z ;
-		while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
+		while ((rs = b.readln(lbuf,llen,-1)) > 0) {
 		    cint	ll = rs ;
-	            if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
+		    if (UAD_REC rec ; (rs = rec_parse(&rec,lbuf,ll)) >= 0) {
 			rs = upinfo_match(uip,ro,&rec) ;
 			if (rs > 0) break ;
-		    }
+		    } /* end if (rec_parse) */
 		    if (rs < 0) break ;
 		    ro += ll ;
 		} /* end while (reading lines) */
-		rs1 = filer_finish(&b) ;
+		rs1 = b.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
 	    rs1 = uc_free(lbuf) ;
@@ -654,7 +652,7 @@ static int useraccdb_updater(UAD *op,UPINFO *uip) noex {
 }
 /* end subroutine (useraccdb_updater) */
 
-static int upinfo_start(UPINFO *uip,UAD *op,cc *au,cc *an) noex {
+static int upinfo_start(UPI *uip,UAD *op,cc *au,cc *an) noex {
     	int		rs = SR_BUGCHECK ;
 	if (uip && op) {
 	    custime	dt = getustime ;
@@ -670,7 +668,7 @@ static int upinfo_start(UPINFO *uip,UAD *op,cc *au,cc *an) noex {
 }
 /* end subroutine (upinfo_start) */
 
-static int upinfo_finish(UPINFO *uip) noex {
+static int upinfo_finish(UPI *uip) noex {
 	int		rs = SR_FAULT ;
 	if (uip) {
 	    rs = SR_OK ;
@@ -679,10 +677,9 @@ static int upinfo_finish(UPINFO *uip) noex {
 }
 /* end subroutine (upinfo_finish) */
 
-static int upinfo_match(UPINFO *uip,off_t ro,UAD_REC *recp) noex {
-	UPINFO_REC	*urp = nullptr ;
+static int upinfo_match(UPI *uip,off_t ro,UAD_REC *recp) noex {
+	UPI_REC	*urp = nullptr ;
 	int		rs = SR_OK ;
-	int		rs1 ;
 	int		sl = recp->userstr.sl ;
 	int		rc = 0 ;
 	cchar		*sp = recp->userstr.sp ;
@@ -698,10 +695,12 @@ static int upinfo_match(UPINFO *uip,off_t ro,UAD_REC *recp) noex {
 	        urp->count = 0 ;
 	        sl = recp->countstr.sl ;
 	        sp = recp->countstr.sp ;
-	        if (sp != nullptr) {
-	            uint	c ;
-	            rs1 = cfdecui(sp,sl,&c) ;
-	            if (rs1 >= 0) urp->count = c ;
+	        if (sp) {
+	            if (uint uc{} ; (rs = cfdecui(sp,sl,&uc)) >= 0) {
+	                urp->count = uc ;
+		    } else if (isNotValid(rs)) {
+			rs = SR_OK ;
+		    }
 	        }
 	    }
 	    rc = (uip->user.found && uip->total.found) ;
@@ -710,8 +709,8 @@ static int upinfo_match(UPINFO *uip,off_t ro,UAD_REC *recp) noex {
 }
 /* end subroutine (upinfo_match) */
 
-static int upinfo_update(UPINFO	 *uip) noex {
-	UPINFO_REC	*urp ;
+static int upinfo_update(UPI	 *uip) noex {
+	UPI_REC	*urp ;
 	int		rs = SR_OK ;
 	if (rs >= 0) {
 	    urp = &uip->total ;
@@ -725,7 +724,7 @@ static int upinfo_update(UPINFO	 *uip) noex {
 }
 /* end subroutine (upinfo_update) */
 
-static int upinfo_upone(UPINFO *uip,UPINFO_REC *urp,int type) noex {
+static int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
 	cint		rlen = UAFILE_RECLEN ;
 	int		rs ;
 	char		rbuf[UAFILE_RECLEN+1] ;
@@ -744,7 +743,7 @@ static int upinfo_upone(UPINFO *uip,UPINFO_REC *urp,int type) noex {
 }
 /* end subroutine (upinfo_upone) */
 
-static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
+static int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 		int type) noex {
 	int		rs = SR_OVERFLOW ;
 	int		rl = 0 ;
@@ -838,18 +837,18 @@ static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 	int		rs ;
 	int		rs1 ;
 	memclear(ep) ;
-	if (storeitem s ; (rs = storeitem_start(&s,ebuf,elen)) >= 0) {
+	if (storeitem s ; (rs = s.start(ebuf,elen)) >= 0) {
 	    UAD_ITEM	*ip = &recp->userstr ;
 	    ep->atime = recp->atime ;
 	    ep->count = recp->count ;
-	    if (cchar *cp ; (rs = storeitem_strw(&s,ip->sp,ip->sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = s.strw(ip->sp,ip->sl,&cp)) >= 0) {
 	        ep->user = cp ;
 	        ip = &recp->namestr ;
-	        if ((rs = storeitem_strw(&s,ip->sp,ip->sl,&cp)) >= 0) {
+	        if ((rs = s.strw(ip->sp,ip->sl,&cp)) >= 0) {
 	            ep->name = cp ;
 		}
 	    }
-	    rs1 = storeitem_finish(&s) ;
+	    rs1 = s.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (storeitem) */
 	return rs ;
@@ -862,7 +861,7 @@ static int mkts(char *tbuf,int tlen,time_t t) noex {
 	tl = strlen(tbuf) ;
 	if (tl < tlen) {
 	    char	*bp = (tbuf + tl) ;
-	    int		bl = (tlen - tl) ;
+	    cint	bl = (tlen - tl) ;
 	    strnblanks(bp,bl) ;
 	}
 	return tl ;

@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -56,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= stremacmp.o strfieldcmp.o strpcmp.o
+OBJ0= stremacmp.o strpcmp.o
 OBJ1= strleadcmp.o
 OBJ2= 
 OBJ3= 
@@ -141,7 +140,6 @@ obj5.o:			$(OBJ5)
 
 
 stremacmp.o:		stremacmp.cc 	$(INCS)
-strfieldcmp.o:		strfieldcmp.cc	$(INCS)
 strpcmp.o:		strpcmp.cc	$(INCS)
 strleadcmp.o:		strleadcmp.cc	$(INCS)
 

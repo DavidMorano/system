@@ -124,6 +124,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -133,6 +134,7 @@
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"strwcpyxx.h"
 
@@ -143,7 +145,19 @@
 /* imported namespaces */
 
 
-/* external subroutines */
+/* local typedefs */
+
+
+/* local structues */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

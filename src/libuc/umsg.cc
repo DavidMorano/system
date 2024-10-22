@@ -55,9 +55,9 @@ using std::nullptr_t ;			/* type */
 
 namespace {
     struct umsg ;
-    typedef int (umsg::*mem_f)(int,void *,int,int) noex ;
+    typedef int (umsg::*mem_m)(int,void *,int,int) noex ;
     struct umsg {
-	mem_f		m ;
+	mem_m		m ;
 	MSQIDDS		*buf ;
 	key_t		key ;
 	sysvmsgtype	msgtype ;

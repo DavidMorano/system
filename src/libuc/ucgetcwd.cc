@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This subroutine returns the Current Working Directory (CWD).
 	If you wanted the Present Working Directory (PWD), you
 	should be calling |getpwd(3uc)|.
@@ -48,9 +51,9 @@
 
 namespace {
     struct ucgetcwd ;
-    typedef int (ucgetcwd::*mem_f)() noex ;
+    typedef int (ucgetcwd::*mem_m)() noex ;
     struct ucgetcwd {
-	mem_f		m ;
+	mem_m		m ;
 	char		*cwbuf ;
 	int		cwlen ;
 	ucgetcwd(char *b,int l) noex : cwbuf(b), cwlen(l) { } ;

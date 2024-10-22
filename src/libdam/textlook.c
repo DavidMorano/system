@@ -1,4 +1,5 @@
-/* textlook */
+/* textlook SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* text look-up manager (we use the index and verify speculative results) */
@@ -132,12 +133,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy4(char *,int, const char *,const char *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	snwcpylc(char *,int,const char *,int) ;
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;

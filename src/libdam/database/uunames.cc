@@ -1,4 +1,5 @@
 /* uunames SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* uunames-query database manager */

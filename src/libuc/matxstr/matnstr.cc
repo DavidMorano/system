@@ -41,10 +41,12 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<nleadstr.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -61,6 +63,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -74,7 +79,7 @@
 
 int matnstr(mainv a,cchar *sp,int sl) noex {
 	cint		lc = sp[0] ; /* ok: everything promotes the same */
-	int		i = 0 ; /* used afterwards */
+	int		i{} ; /* used-afterwards */
 	if (sl < 0) sl = strlen(sp) ;
 	for (i = 0 ; a[i] ; i += 1) {
 	    if ((lc == a[i][0]) && (strncmp(a[i],sp,sl) == 0)) break ;

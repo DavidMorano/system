@@ -1,7 +1,9 @@
-/* main (daytime) */
+/* main SUPPORT (daytime) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* main subroutine for the 'daytime' INET server program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -10,16 +12,15 @@
 #define	CF_LOGID	0		/* |procuserinfo_logid()| */
 #define	CF_SIGHAND	0		/* use |sighand(3dam)| */
 
-
 /* revision history:
 
 	= 1988-02-01, David A­D­ Morano
 	This code was originally written.
 
 	= 1988-02-01, David A­D­ Morano
-        This subroutine was modified to not write out anything to standard
-        output if the access time of the associated terminal has not been
-        changed in 10 minutes.
+	This subroutine was modified to not write out anything to
+	standard output if the access time of the associated terminal
+	has not been changed in 10 minutes.
 
 */
 
@@ -27,33 +28,29 @@
 
 /*******************************************************************************
 
-	We are both a server and client.  The normal action is to be a server.
-	Invoked with no positional arguments, we perform the server function
-	and print out the current time.  With positional arguments, we go into
-	client mode and contact a remove host for a date using the 'daytime'
-	service.
+	We are both a server and client.  The normal action is to
+	be a server.  Invoked with no positional arguments, we
+	perform the server function and print out the current time.
+	With positional arguments, we go into client mode and contact
+	a remove host for a date using the 'daytime' service.
 
 	Synopsis:
-
 	$ daytime [<hostname(s)>]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<sighand.h>
 #include	<bits.h>
@@ -105,9 +102,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	sncpylc(char *,int,const char *) ;
 extern int	sncpyuc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	snwcpylc(char *,int,cchar *,int) ;
-extern int	snwcpyuc(char *,int,cchar *,int) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfskipwhite(const char *,int,const char **) ;
 extern int	matstr(const char **,const char *,int) ;

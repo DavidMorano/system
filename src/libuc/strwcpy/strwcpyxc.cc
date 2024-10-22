@@ -42,7 +42,9 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"strwcpyxc.h"
 
@@ -64,6 +66,12 @@ extern "C" {
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local subroutine-templates */
@@ -93,7 +101,7 @@ char *strwcpybc(char *dp,cchar *sp,int sl) noex {
 	return strwcpyxc<tobc>(dp,sp,sl) ;
 }
 
-char *strwcpyl(char *dp,cchar *sp,int sl) noex {
+char *strwcpylc(char *dp,cchar *sp,int sl) noex {
 	return strwcpyxc<tolc>(dp,sp,sl) ;
 }
 

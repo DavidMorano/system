@@ -1,4 +1,5 @@
 /* mkdisplayable SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* clean up some text string for printing to terminal */

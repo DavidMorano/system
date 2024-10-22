@@ -19,16 +19,16 @@
 
 
 #define	VARMKS		struct varmks_head
-#define	VARMKS_OBJ	struct varmks_obj
-#define	VARMKS_RECTAB	struct varmks_rectab
 #define	VARMKS_FL	struct varmks_flags
+#define	VARMKS_OBJ	struct varmks_object
+#define	VARMKS_REC	struct varmks_rectab
 #define	VARMKS_MAGIC	0x88773422
 #define	VARMKS_NENTRIES	(2 * 1024)
 #define	VARMKS_INTOPEN	(10*60)
 #define	VARMKS_INTSTALE	(5*60)
 
 
-struct varmks_obj {
+struct varmks_object {
 	char		*name ;
 	uint		objsize ;
 } ;
@@ -63,13 +63,18 @@ struct varmks_head {
 	mode_t		om ;
 } ;
 
+typedef	VARMKS		varmks ;
+typedef	VARMKS_FL	varmks_fl ;
+typedef	VARMKS_OBJ	varmks_obj ;
+typedef	VARMKS_REC	varmks_rec ;
+
 EXTERNC_begin
 
-extern int	varmks_open(VARMKS *,cchar *,int,mode_t,int) ;
-extern int	varmks_addvar(VARMKS *,cchar *,cchar *,int) ;
-extern int	varmks_abort(VARMKS *) ;
-extern int	varmks_chgrp(VARMKS *,gid_t) ;
-extern int	varmks_close(VARMKS *) ;
+extern int	varmks_open(varmks *,cchar *,int,mode_t,int) noex ;
+extern int	varmks_addvar(varmks *,cchar *,cchar *,int) noex ;
+extern int	varmks_abort(varmks *) noex ;
+extern int	varmks_chgrp(varmks *,gid_t) noex ;
+extern int	varmks_close(varmks *) noex ;
 
 EXTERNC_end
 

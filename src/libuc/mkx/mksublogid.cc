@@ -1,4 +1,5 @@
 /* mksublogid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a sub (or serial) log-ID */

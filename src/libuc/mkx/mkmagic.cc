@@ -1,4 +1,5 @@
 /* mkmagic SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create a c-string that constitutes a "magic" string for file-ID purposes */

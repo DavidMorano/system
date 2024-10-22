@@ -1,4 +1,5 @@
 /* mkfnamesuf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a file name from parts (one base and some suffixes) */

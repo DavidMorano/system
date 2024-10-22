@@ -104,7 +104,6 @@
 #endif
 #endif /* __cplusplus */
 
-
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
 #define	EXTERNC_begin	extern "C" {

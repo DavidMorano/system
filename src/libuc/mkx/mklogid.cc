@@ -1,4 +1,5 @@
 /* mklogid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a log-ID c-string, suitable for logging purposes */

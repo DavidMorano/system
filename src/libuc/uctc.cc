@@ -45,9 +45,9 @@
 
 namespace {
     struct uctc ;
-    typedef int (uctc::*mem_f)(int) noex ;
+    typedef int (uctc::*mem_m)(int) noex ;
     struct uctc {
-	mem_f		m ;
+	mem_m		m ;
 	WINSIZE		*wsp ;
 	TERMIOS		*tip ;
 	int		cmd ;

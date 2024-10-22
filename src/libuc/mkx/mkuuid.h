@@ -1,4 +1,5 @@
 /* mkuuid HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make UUID (also a specialized object) */

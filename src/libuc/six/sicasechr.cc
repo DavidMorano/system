@@ -40,13 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
-#include	<nleadstr.h>
 #include	<toxc.h>
+#include	<nleadstr.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
