@@ -22,9 +22,7 @@
 
 ***********************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -33,12 +31,10 @@
 #include	<unistd.h>
 #include	<string.h>
 #include	<dirent.h>
-
 #include	<bfile.h>
 #include	<fsdir.h>
+#include	<wdt.h">
 #include	<localmisc.h>
-
-#include	"wdt.h"
 
 
 /* local defines */

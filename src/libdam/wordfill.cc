@@ -279,7 +279,7 @@ static int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
 	                    *lp++ = ' ' ;
 	                    ll -= 1 ;
 	                }
-	                if ((rs = fifostr_remove(op->sqp,lp,ll)) >= 0) {
+	                if ((rs = fifostr_rem(op->sqp,lp,ll)) >= 0) {
 		            op->wc -= 1 ;
 		            op->chrc -= wl ;
 		        }

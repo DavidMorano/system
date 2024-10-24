@@ -1,4 +1,5 @@
 /* fifostr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* FIFO string operations */
@@ -25,6 +26,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -52,9 +54,60 @@ struct fifostr_cursor {
 	FIFOSTR_ENT	*current ;
 } ;
 
-typedef FIFOSTR		fifostr ;
 typedef FIFOSTR_CUR	fifostr_cur ;
 typedef FIFOSTR_ENT	fifostr_ent ;
+
+#ifdef	__cplusplus
+enum fifostrmems {
+	fifostrmem_start,
+	fifostrmem_headlen,
+	fifostrmem_count,
+	fifostrmem_finish,
+	fifostrmem_overlast
+} ;
+struct fifostr ;
+struct fifostr_co {
+	fifostr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (fifostr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (fifostr_co) */
+struct fifostr : fifostr_head {
+	fifostr_co	start ;
+	fifostr_co	headlen ;
+	fifostr_co	count ;
+	fifostr_co	finish ;
+	fifostr() noex {
+	    start(this,fifostrmem_start) ;
+	    headlen(this,fifostrmem_headlen) ;
+	    count(this,fifostrmem_count) ;
+	    finish(this,fifostrmem_finish) ;
+	} ;
+	fifostr(const fifostr &) = delete ;
+	fifostr &operator = (const fifostr &) = delete ;
+	int add(cchar *,int = -1) noex ;
+	int headread(char *,int) noex ;
+	int entread(char *,int,int) noex ;
+	int entlen(int) noex ;
+	int rem(char *,int) noex ;
+	int curbegin(fifostr_cur *) noex ;
+	int curend(fifostr_cur *) noex ;
+	int curenum(fifostr_cur *,char *,int) noex ;
+	int curdel(fifostr_cur *) noex ;
+	void dtor() noex ;
+	~fifostr() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (fifostr) */
+#else	/* __cplusplus */
+typedef FIFOSTR		fifostr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -66,7 +119,7 @@ extern int fifostr_headread(fifostr *,char *,int) noex ;
 extern int fifostr_headlen(fifostr *) noex ;
 extern int fifostr_entread(fifostr *,char *,int,int) noex ;
 extern int fifostr_entlen(fifostr *,int) noex ;
-extern int fifostr_remove(fifostr *,char *,int) noex ;
+extern int fifostr_rem(fifostr *,char *,int) noex ;
 extern int fifostr_count(fifostr *) noex ;
 extern int fifostr_curbegin(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_curend(fifostr *,fifostr_cur *) noex ;

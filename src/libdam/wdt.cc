@@ -1,4 +1,5 @@
 /* wdt SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* walk directory tree */
@@ -25,20 +26,25 @@
 	|ftw(3c)| this subroutine is NOT recursive!
 
 	Synopsis:
-	int wdt(cchar *basedir,int wopts,int (*uf)(),void *uarg) noex
+	typedef	int	(*wdt_f)(cchar *,USTAT *,void *) noex
+	int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex
 
 	Arguments:
 	basedir		directory at top of tree
 	wopts		options for usage (FOLLOW links or not)
-	uf		user function to call
+	auf		user function to call
 	uarg		user argument (usually a pointer)
 
 	Returns:
 	>=0		OK
 	<0		error (system-return)
 
+	Name:
+	checkname
+
 	Description:
-	The user-defined subroutie that we call.
+	This is the user-defined function that is called for each
+	name encountered.
 
 	Synopsis:
 	int checkname(cchar *name,struct ustat *sbp,void *uarg)
@@ -55,7 +61,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -78,18 +84,6 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	MAX((MAXPATHLEN + 10),2048)
-#endif
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
 #define	SUBINFO		struct subinfo
 
 
@@ -97,10 +91,6 @@
 
 
 /* local typedefs */
-
-extern "C" {
-    typedef int (*ufun_f)(cchar *,USTAT *,void *) noex ;
-}
 
 
 /* external subroutines */
@@ -112,7 +102,7 @@ extern "C" {
 /* local structures */
 
 struct subinfo {
-	ufun_f		uf ;
+	wdt_f		uf ;
 	void		*uarg ;
 	fifostr		fs ;
 	int		wopts ;
@@ -122,7 +112,7 @@ struct subinfo {
 
 /* forward references */
 
-static int subinfo_start(SUBINFO *,int,ufun_f,void *) noex ;
+static int subinfo_start(SUBINFO *,int,wdt_f,void *) noex ;
 static int subinfo_finish(SUBINFO *) noex ;
 static int subinfo_procdir(SUBINFO *,char *,int) noex ;
 static int subinfo_procdirents(SUBINFO *,char *,int) noex ;
@@ -138,42 +128,41 @@ static int subinfo_procout(SUBINFO *,cchar *,USTAT *) noex ;
 
 /* exported subroutines */
 
-int wdt(cchar *basedir,int wopts,int (*auf)(),void *uarg) noex {
-	void_f		vuf = void_f(auf) ;
-	SUBINFO		si, *sip = &si ;
+int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
+    	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-	if (basedir == NULL) return SR_FAULT ;
-	if (vuf == NULL) return SR_FAULT ;
-
-	if (basedir[0] == '\0') return SR_INVALID ;
-
-/* go */
-
-	ufun_f	suf = ufun_f(vuf) ;
-	if ((rs = subinfo_start(sip,wopts,suf,uarg)) >= 0) {
-	    char	dbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpath1(dbuf,basedir)) >= 0) {
-	        if ((rs = subinfo_procdir(sip,dbuf,rs)) >= 0) {
-	            cint	dlen = MAXPATHLEN ;
-	            c += rs ;
-	            while ((rs >= 0) && (! sip->f_exit)) {
-	                rs1 = fifostr_remove(&sip->fs,dbuf,dlen) ;
-	                if (rs1 == SR_NOTFOUND) break ;
-	                rs = rs1 ;
-	                if (rs >= 0) {
-	                    rs = subinfo_procdir(sip,dbuf,rs1) ;
-	                    c += rs ;
-	                }
-	            } /* end while */
-	        } /* end if (subinfo_procdir) */
-	    } /* end if (mkpath) */
-	    rs1 = subinfo_finish(sip) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
+	if (basedir && auf) {
+	    rs = SR_INVALID ;
+	    if (basedir[0]) {
+	        SUBINFO		si, *sip = &si ;
+	        if ((rs = subinfo_start(sip,wopts,auf,uarg)) >= 0) {
+		    fifostr	*fsp = &sip->fs ;
+	            if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
+			cint	dlen = rs ;
+	                if ((rs = mkpath1(dbuf,basedir)) >= 0) {
+	                    if ((rs = subinfo_procdir(sip,dbuf,rs)) >= 0) {
+	                        c += rs ;
+	                        while ((rs >= 0) && (! sip->f_exit)) {
+				    auto fsr = fifostr_rem ;
+	                            if ((rs = fsr(fsp,dbuf,dlen)) >= 0) {
+	                                rs = subinfo_procdir(sip,dbuf,rs) ;
+	                                c += rs ;
+				    } else if (rs == rsn) {
+					rs = SR_OK ;
+					break ;
+	                            }
+	                        } /* end while */
+	                    } /* end if (subinfo_procdir) */
+	                } /* end if (mkpath) */
+		    	rs = rsfree(rs,dbuf) ;
+		    } /* end if (m-a-f) */
+	            rs1 = subinfo_finish(sip) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (wdt) */
@@ -181,7 +170,7 @@ int wdt(cchar *basedir,int wopts,int (*auf)(),void *uarg) noex {
 
 /* private subroutines */
 
-static int subinfo_start(SUBINFO *sip,int wopts,ufun_f uf,void *uarg) noex {
+static int subinfo_start(SUBINFO *sip,int wopts,wdt_f uf,void *uarg) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    memclear(sip) ;
@@ -227,8 +216,7 @@ static int subinfo_procdirents(SUBINFO *sip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*nbuf{} ;
-	if ((rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
 	    fsdir	d ;
 	    fsdir_ent	de ;
 	    cint	nlen = rs ;
@@ -290,11 +278,11 @@ static int subinfo_procname(SUBINFO *sip,cchar *dbuf,int dlen) noex {
 static int subinfo_procout(SUBINFO *sip,cchar *dbuf,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (sip->uf != NULL) {
-	    ufun_f	uf = ufun_f(sip->uf) ;
+	if (sip->uf) {
+	    wdt_f	uf = wdt_f(sip->uf) ;
 	    if ((rs = uf(dbuf,sbp,sip->uarg)) >= 0) {
 		c = 1 ;
-	        if (rs > 0) sip->f_exit = TRUE ;
+	        if (rs > 0) sip->f_exit = true ;
 	    }
 	}
 	return (rs >= 0) ? c : rs ;

@@ -31,9 +31,7 @@
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -43,12 +41,10 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<field.h>
-#include	<wdt.h>
 
 #include	"localmisc.h"
 #include	"config.h"
