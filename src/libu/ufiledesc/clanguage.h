@@ -104,6 +104,12 @@
 #endif
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+#ifndef	szof
+#define	szof(T)		int(sizeof(T))
+#endif
+#endif /* __cplusplus */
+
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
 #define	EXTERNC_begin	extern "C" {

@@ -31,17 +31,6 @@
 #include	<strtox.h>
 
 
-#ifndef	TEMPLATE_SZOF
-#define	TEMPLATE_SZOF
-#ifdef	__cplusplus
-template<typename T>
-inline int szof(T *op) noex {
-	csize	osz = sizeof(T) ;
-	return int(osz) ;
-}
-#endif /* __cplusplus */
-#endif /* TEMPLATE_SZOF */
-
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
 EXTERNC_begin

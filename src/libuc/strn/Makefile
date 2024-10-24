@@ -58,10 +58,10 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_STRN= strnxsub.o
+OBJ0_STRN= strnwcpy.o strncpyxc.o strnncpy.o 
 OBJ1_STRN= strnnlen.o
-OBJ2_STRN= strnxchr.o strnxpbrk.o 
-OBJ3_STRN= strnset.o strnwcpy.o strnncpy.o strncpyxc.o 
+OBJ2_STRN= strnxchr.o strnxpbrk.o strnxsub.o
+OBJ3_STRN= strnset.o 
 
 OBJA_STRN= obj0_strn.o obj1_strn.o
 OBJB_STRN= obj2_strn.o obj3_strn.o
@@ -126,13 +126,14 @@ obj3_strn.o:	$(OBJ3_STRN)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRN)
 
 
-strnxsub.o:		strnxsub.cc	$(INCS)
-strnnlen.o:		strnnlen.cc	$(INCS)
-strnxchr.o:		strnxchr.cc	$(INCS)
-strnxpbrk.o:		strnxpbrk.cc	$(INCS)
-strnwcpy.o:		strnwcpy.cc	$(INCS)
-strnncpy.o:		strnncpy.cc	$(INCS)
-strncpyxc.o:		strncpyxc.cc	$(INCS)
-strnset.o:		strnset.cc	$(INCS)
+strnxsub.o:		strnxsub.cc	strnxsub.h	$(INCS)
+strnxchr.o:		strnxchr.cc	strnxchr.h	$(INCS)
+strnxpbrk.o:		strnxpbrk.cc	strnxpbrk.h	$(INCS)
+
+strnnlen.o:		strnnlen.cc			$(INCS)
+strnwcpy.o:		strnwcpy.cc			$(INCS)
+strnncpy.o:		strnncpy.cc			$(INCS)
+strncpyxc.o:		strncpyxc.cc	strncpyxc.h	$(INCS)
+strnset.o:		strnset.cc			$(INCS)
 
 

@@ -1,4 +1,5 @@
 /* strwhite SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the next white space character in a string */

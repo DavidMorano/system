@@ -1,4 +1,5 @@
 /* strstore HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-store */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vechand.h>
 #include	<lookaside.h>
 #include	<hdb.h>

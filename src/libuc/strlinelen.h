@@ -1,4 +1,5 @@
 /* strlinelen HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the number of characters in a c-string up to a given maximum */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

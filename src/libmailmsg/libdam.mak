@@ -93,7 +93,7 @@ INSTALLINCS= $(INSTALLINCa) $(INSTALLINCb)
 
 
 OBJ00= substring.o strdomain.o 
-OBJ01= strbasename.o strdirname.o strshrink.o 
+OBJ01=
 OBJ02= strdictcmp.o strnndictcmp.o
 OBJ03= strkeycmp.o strkeydictcmp.o
 OBJ04= stremacmp.o

@@ -1,4 +1,5 @@
 /* uiconv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® international conversion */
@@ -44,6 +45,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -151,7 +155,7 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	        {
 		    char	**ibp = const_cast<char **>(ib) ;
 	            isize = iconv(*cdp,ibp,ileftp,ob,oleftp) ;
-	            if (isize == ((size_t)-1)) rs = (-errno) ;
+	            if (isize == ((size_t)-1)) rs = (- errno) ;
 	        }
 	        {
 		    *olp = (int) oleft ;
@@ -178,7 +182,7 @@ static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	    repeat {
 	        rs = SR_OK ;
 	        cd = iconv_open(tsp,fsp) ;
-	        if (cd == ((iconv_t)-1)) rs = (-errno) ;
+	        if (cd == ((iconv_t)-1)) rs = (- errno) ;
 	        if (rs < 0) {
 	            switch (rs) {
 		    case SR_INTR:
@@ -209,7 +213,7 @@ static int uiconv_libclose(uiconv *op) noex {
 	int		rs ;
 	repeat {
 	    rs = iconv_close(*cdp) ;
-	    if (rs == -1) rs = (-errno) ;
+	    if (rs == -1) rs = (- errno) ;
 	} until (rs != SR_INTR) ;
 	return rs ;
 }

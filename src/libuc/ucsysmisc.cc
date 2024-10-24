@@ -1,4 +1,5 @@
 /* ucsysmisc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -83,6 +84,8 @@
 #include	<climits>
 #include	<usystem.h>
 
+#include	"ucsysmisc.h"
+
 
 /* local defines */
 
@@ -109,6 +112,8 @@
 
 
 /* exported variables */
+
+ucpagesizer		ucpagesize ;
 
 
 /* exported subroutines */
@@ -205,5 +210,20 @@ int uc_pagesize() noex {
 	return uc_sysconfval(cmd,nullptr) ;
 }
 /* end subroutine (uc_pagesize) */
+
+
+/* local subrouties */
+
+ucpagesizer::operator int () noex {
+    	int		rs ;
+	if ((rs = pagesize) == 0) {
+	    cint	cmd = _SC_PAGESIZE ;
+	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
+		pagesize = rs ;
+	    }
+	}
+    	return rs ;
+}
+/* end method (ucpagesizer::operator) */
 
 

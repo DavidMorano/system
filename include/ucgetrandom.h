@@ -1,4 +1,5 @@
 /* ucgetrnadom HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* LIBUC get some pseudo-randomo data from the operaring system */

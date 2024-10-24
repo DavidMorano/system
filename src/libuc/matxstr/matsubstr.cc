@@ -1,4 +1,5 @@
 /* matsubstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a string w/ various case handling */
@@ -27,6 +28,7 @@
 	int mat{x}substr(mainv a,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		base, case, fold
 	a		array of string to match against
 	sp		string to test against array
 	sl		length of test string

@@ -85,7 +85,7 @@ int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
 	            *bp++ = '\0' ;
-	            if (cint zl = ((rbuf+rlen)-bp) ; zl > 0) {
+	            if (cint zl = ((rbuf + rlen) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
 	            }
 	        } else {

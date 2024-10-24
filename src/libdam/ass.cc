@@ -1,4 +1,5 @@
 /* ass SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* experimenal string manipulation object */
@@ -6,7 +7,6 @@
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
@@ -18,6 +18,24 @@
 /* local defines */
 
 #define	ASS_ADDLEN	100
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -34,6 +52,7 @@ int ass_start(ass *asp) noex {
 	    asp->len = 0 ;
 	    asp->e = 0 ;
 	    asp->s = nullptr ;
+	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }

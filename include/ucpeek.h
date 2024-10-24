@@ -1,4 +1,5 @@
 /* ucpeek HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* "peek" at any waiting input */

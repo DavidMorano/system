@@ -29,6 +29,7 @@
 	char *str{x}npbrk(cchar *sp,int sl,cchar *ss) noex
 
 	Arguments:
+	{x}		base, case, fold
 	sp		string to test
 	sl		length of string to test
 	ss		string of characters to compare against
@@ -39,11 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| + |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"strnxpbrk.h"
 
@@ -51,7 +56,28 @@
 /* local defines */
 
 
-/* exported subroutines */
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -61,14 +87,14 @@ char *strnopbrk(cchar *sp,int sl,cchar *ss) noex {
 	if (sp && ss) {
 	    if (sl >= 0) {	
 	        bool	f = false ;
-	        cchar	*lsp = (sp+sl) ;
+	        cchar	*lsp = (sp + sl) ;
 	        while ((sp < lsp) && *sp) {
 		    cint	ch = mkchar(*sp) ;
 	            f = (strchr(ss,ch) != nullptr) ;
 		    if (f) break ;
 	            sp += 1 ;
 	        } /* end while */
-	        rsp = (f) ? ((char *) sp) : nullptr ;
+	        rsp = (f) ? charp(sp) : nullptr ;
 	    } else if (sl < 0) {
 	        rsp = strpbrk(sp,ss) ;
 	    } /* end if */
@@ -82,7 +108,7 @@ char *strnrpbrk(cchar *sp,int sl,cchar *ss) noex {
 	char		*rsp = nullptr ;
 	if (sp && ss) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    rsp = (char *) (sp + sl) ;
+	    rsp = charp(sp + sl) ;
 	    while (--rsp >= sp) {
 	        cint	ch = mkchar(*rsp) ;
 	        f = (strchr(ss,ch) != nullptr) ;

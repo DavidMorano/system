@@ -1,4 +1,5 @@
 /* ucproguser HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® username and possibly user-home-directory */

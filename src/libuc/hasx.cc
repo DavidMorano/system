@@ -317,6 +317,7 @@
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
+#include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasx.h"
 
@@ -643,7 +644,7 @@ bool hasallchr(cchar *sp,int sl,int sch) noex {
 	while (sl && *sp) {
 	    cint	ch = mkchar(*sp) ;
 	    f = (ch == sch) ;
-	    if (!f) break ;
+	    if (! f) break ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	} /* end while */
@@ -689,7 +690,7 @@ bool hasvarpathprefix(cchar *sp,int sl) noex {
 	if (sp) {
 	    cint	ec = '%' ;
 	    f = f || (sl && (sp[0] == ec)) ;
-	    if (!f) {
+	    if (! f) {
 		f = true ;
 	        f = f && ((sl < 0) || (sl > 1)) ;
 		f = f && (sp[0] == '/') && (sp[1] == ec) ;
@@ -702,7 +703,7 @@ bool hasvarpathprefix(cchar *sp,int sl) noex {
 bool hascdpath(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sl && sp) {
-	    cint	ec = UC('¬') ;
+	    cint	ec = mkchar('¬') ;
 	    int		ch = mkchar(sp[0]) ;
 	    f = (ch == ec) ;
 	}

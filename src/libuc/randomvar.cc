@@ -1,7 +1,9 @@
 /* randomvar SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* random number generation object */
+/* UNIX® standard-library support functions */
 /* version %I% last-modified %G% */
 
 
@@ -20,6 +22,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	randomvar
+
+	Description:
 	This object provides a random number generator.  This is
 	similar to the UNIX® System |random(3)| subroutine except
 	that no global variables are used.  Rather this is an onject
@@ -64,6 +70,10 @@
 	comes from dynamic system resources, and has to occur every
 	time a new object is instantiated.
 
+	Note:
+	This code is part of the UNIX® standard-library interface layer
+	library ("libuc").
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -78,6 +88,7 @@
 #include	<uvariables.hh>
 #include	<cfdec.h>
 #include	<randlc.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"randomvar.h"
@@ -166,7 +177,7 @@ static int	mkprocrand() noex ;
 
 /* local variables */
 
-constexpr int	digsize = sizeof(RANDOMVAR_DIGIT) ;
+constexpr int	digsize = szof(RANDOMVAR_DIGIT) ;
 constexpr int	slen = RANDOMVAR_STATELEN ;
 
 constexpr ulong	randtbl[] = {
@@ -193,7 +204,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	if (seed == 0) seed = 31415926 ;
 	if (op) {
 	    void	*vp{} ;
-	    csize	sz = (slen * sizeof(ulong)) ;
+	    csize	sz = (slen * szof(ulong)) ;
 	    memclear(op) ;
 	    if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 		op->state = ulongp(vp) ;
@@ -206,7 +217,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	        } else {
 		    rs = randomvar_initreal(op,seed) ;
 	        } /* end if (initializing state) */
-    /* our polynomial --  x**128 + x**67 + x**23 + 1  */
+    		/* our polynomial --  x**128 + x**67 + x**23 + 1  */
 		if (rs >= 0) {
 		    cint	n = (slen * 10) ;
 	            op->a = COF(67) ;
@@ -385,7 +396,7 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-	        cint	wl = sizeof(ulong) ;
+	        cint	wl = szof(ulong) ;
 	        char	*rp = charp(rbuf) ;
 		rs = SR_OK ;
 	        while ((rs >= 0) && (rlen > 0)) {
@@ -543,12 +554,98 @@ static int mkprocrand() noex {
 	initrv.v[c++] = (v = getpgrp(),randlc(v)) ;
 	initrv.v[c++] = (v = getsid(0),randlc(v)) ;
 	if (var) {
-	    if (cfdecui(var,-1,&v) >= 0) {
+	    if ((rs = cfdecui(var,-1,&v)) >= 0) {
 		initrv.v[c++] = v ;
+	    } else if (isNotValid(rs)) {
+		rs = SR_OK ;
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mkprocrand) */
+
+int randomvar_st::operator () (int fpseudo,uint seed) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case 0:
+	        rs = randomvar_start(op,fpseudo,seed) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (randomvar_st::operator) */
+
+randomvar_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case randomvarmem_finish:
+	        rs = randomvar_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (randomvar_co::operator) */
+
+int randomvar::stateload(cchar *ms,int ml) noex {
+    	return randomvar_stateload(this,ms,ml) ;
+}
+
+int randomvar::statesave(char *msp,int msl) noex {
+    	return randomvar_statesave(this,msp,msl) ;
+}
+
+int randomvar::setpoly(int a,int b) noex {
+    	return randomvar_setpoly(this,a,b) ;
+}
+
+int randomvar::addnoise(cvoid *nbuf,int nlen) noex {
+    	return randomvar_addnoise(this,nbuf,nlen) ;
+}
+
+int randomvar::getlong(long *slp) noex {
+    	return randomvar_getlong(this,slp) ;
+}
+
+int randomvar::getulong(ulong *ulp) noex {
+    	return randomvar_getulong(this,ulp) ;
+}
+
+int randomvar::getint(int *sip) noex {
+    	return randomvar_getint(this,sip) ;
+}
+
+int randomvar::getuint(uint *uip) noex {
+    	return randomvar_getuint(this,uip) ;
+}
+
+int randomvar::get(void *rbuf,int rlen) noex {
+    	return randomvar_get(this,rbuf,rlen) ;
+}
+
+int randomvar::get(long *slp) noex {
+    	return randomvar_getlong(this,slp) ;
+}
+
+int randomvar::get(ulong *ulp) noex {
+    	return randomvar_getulong(this,ulp) ;
+}
+
+int randomvar::get(int *sip) noex {
+    	return randomvar_getint(this,sip) ;
+}
+
+int randomvar::get(uint *uip) noex {
+    	return randomvar_getuint(this,uip) ;
+}
+
+void randomvar::dtor() noex {
+	if (cint rs = int(finish) ; rs < 0) {
+	    ulogerror("randomvar",rs,"fini-finish") ;
+	}
+}
 
 

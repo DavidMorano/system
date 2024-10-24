@@ -42,12 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"strcpyxc.h"
 #include	"strncpyxc.h"
@@ -56,7 +59,7 @@
 /* local defines */
 
 
-/* namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -70,6 +73,12 @@ extern "C" {
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* subroutine-templates */

@@ -61,7 +61,7 @@ OBJ01= strn.o strnxcmp.o sif.o
 OBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
 OBJ03= stdfnames.o
 
-OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
+OBJ04= isx.o
 OBJ05= nleadstr.o nleadkeystr.o
 OBJ06= mapex.o getourenv.o
 OBJ07=
@@ -303,7 +303,7 @@ base.o:		$(OBJ_BASE)
 
 # CHARACTER
 OBJA_CHAR= toxc.o char.o rmeol.o
-OBJB_CHAR= ischarx.o hasx.o
+OBJB_CHAR= hasx.o
 
 OBJ_CHAR= obja_char.o objb_char.o
 
@@ -525,7 +525,6 @@ uctimer.o:		uctimer.cc uctimer.h
 # misc-character
 toxc.o:			toxc.c toxc.h
 char.o:			char.cc char.h
-ischarx.o:		ischarx.cc ischarx.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
 # RMX
@@ -782,6 +781,11 @@ getxname.o:		getxname.dir
 getxname.dir:
 	makesubdir $@
 
+# ISZ
+isx.o:			isx.dir
+isx.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -899,13 +903,6 @@ callback.o:		callback.cc callback.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
-#
-isinetaddr.o:		isinetaddr.cc isinetaddr.h
-isindomain.o:		isindomain.cc isindomain.h
-isoneof.o:		isoneof.cc isoneof.h
-isnot.o:		isnot.cc isnot.h isoneof.h
-iserror.o:		iserror.cc iserror.h isoneof.h
-isindomain.o:		isindomain.cc isindomain.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

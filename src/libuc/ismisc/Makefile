@@ -2,7 +2,7 @@
 
 T= ismisc
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -91,7 +91,6 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
-
 
 
 $(T).o:			$(OBJ_ISMISC)

@@ -1,4 +1,5 @@
 /* matstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Match a String */
@@ -29,6 +30,7 @@
 	int mat(x)str(mainv a,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		base, case, fold
 	a		array of string to match against
 	sp		string to test against array
 	sl		length of test string

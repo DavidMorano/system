@@ -1,4 +1,5 @@
 /* issamehostname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* rough equivalency hostname check */
@@ -40,8 +41,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<strings.h>		/* |strncasecmp(3c)| + |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>		/* |LEQUIV(3dam)| */
 
 #include	"ismisc.h"

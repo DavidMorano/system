@@ -1,4 +1,5 @@
 /* ismisc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* is something something? */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin
@@ -31,11 +33,11 @@ extern bool	isleapyear(int) noex ;
 extern bool	isdotdir(cchar *) noex ;
 extern bool	isobjspecial(void *) noex ;
 extern bool	issamehostname(cchar *,cchar *,cchar *) noex ;
+extern bool	isfnamespecial(cchar *,int) noex ;
 
 static inline bool isDotDir(cchar *dp) noex {
 	return isdotdir(dp) ;
 }
-
 static inline bool isSpecialObject(void *op) noex {
 	return isobjspecial(op) ;
 }

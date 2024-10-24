@@ -50,6 +50,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<strdcpyx.h>
 #include	<ctdec.h>

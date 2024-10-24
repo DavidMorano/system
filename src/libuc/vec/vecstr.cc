@@ -939,8 +939,7 @@ int vecstr::del(int ai) noex {
 }
 
 void vecstr::dtor() noex {
-	cint	rs = int(finish) ;
-	if (rs < 0) {
+	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("vecstr",rs,"fini-finish") ;
 	}
 }

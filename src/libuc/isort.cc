@@ -1,4 +1,5 @@
 /* isort SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* looks like an Insertion-Sort implementation */
@@ -80,22 +81,29 @@ extern "C" int	isort(void *,int,int,sortcmp_f) noex ;
 
 /* exported subroutines */
 
-int isort(void *base,int nelem,int esize,sortcmp_f cmp) noex {
-	int		rs = SR_NOMEM ;
-	char		*arr = (char *) base ;
-	if (char *key ; (key = new(nothrow) char[esize]) != nullptr) {
-	    rs = SR_OK ;
-   	    for (int i = 1 ; i < nelem ; i += 1) {
-		int	j = (i-1) ;
-                memcpy(key,arr+(i*esize),esize) ;
-                while ((j >= 0) && (cmp(arr+(j*esize),key) > 0)) {
-		    memcpy(arr+((j+1)*esize),arr+(j*esize),esize) ;
-                    j = (j - 1) ;
-                }
-                memcpy(arr+((j+1)*esize),key,esize) ;
-            } /* end for */
-	    delete [] key ;
-	} /* end if (m-a-f) */
+int isort(void *base,int ne,int esz,sortcmp_f cmp) noex {
+    	csize		esize = size_t(esz) ;
+	int		rs = SR_FAULT ;
+	if (base && cmp) {
+	    rs = SR_INVALID ;
+	    if ((esz > 0) && (ne > 0)) {
+	        char	*arr = charp(base) ;
+	        rs = SR_NOMEM ;
+	        if (char *key ; (key = new(nothrow) char[esz]) != nullptr) {
+	            rs = SR_OK ;
+   	            for (int i = 1 ; i < ne ; i += 1) {
+		        int	j = (i-1) ;
+                        memcpy(key,arr+(i*esz),esz) ;
+                        while ((j >= 0) && (cmp(arr+(j*esz),key) > 0)) {
+		            memcpy(arr+((j+1)*esz),arr+(j*esz),esize) ;
+                            j = (j - 1) ;
+                        }
+                        memcpy(arr+((j+1)*esize),key,esize) ;
+                    } /* end for */
+	            delete [] key ;
+	        } /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (isort) */

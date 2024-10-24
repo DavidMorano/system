@@ -1,4 +1,5 @@
 /* strlocktype HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* provide c-string for a given UNIX® file-lock type */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

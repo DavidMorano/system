@@ -1,4 +1,5 @@
 /* isasocket SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* test if a given file descriptor is a socket */
@@ -35,6 +36,8 @@
 #include	<sys/socket.h>
 #include	<sys/conf.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<isoneof.h>
 #include	<localmisc.h>

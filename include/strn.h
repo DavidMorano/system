@@ -1,7 +1,8 @@
 /* strn HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* perform variable counted -cstring operations */
+/* perform variable counted c-string operations */
 /* version %I% last-modified %G% */
 
 
@@ -24,19 +25,17 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<strnxcmp.h>
-#include	<strnxchr.h>
-#include	<strnxpbrk.h>
-#include	<strncpyxc.h>
+#include	<strnxcmp.h>		/* compare */
+#include	<strnxchr.h>		/* find */
+#include	<strnxpbrk.h>		/* find */
+#include	<strnxsub.h>		/* find */
+#include	<strncpyxc.h>		/* copy */
 
 
 EXTERNC_begin
 
 /* calculate string length */
 extern int strnnlen(cchar *,int,int) noex ;
-/* find */
-extern char *strnsub(cchar *,int,cchar *) noex ;
-extern char *strncasesub(cchar *,int,cchar *) noex ;
 /* copy */
 extern char *strnncpy(char *,cchar *,int,int) noex ;
 extern char *strnwcpy(char *,int,cchar *,int) noex ;

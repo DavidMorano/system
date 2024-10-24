@@ -1,4 +1,5 @@
 /* matpstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a partial string */
@@ -31,6 +32,7 @@
 	int matp{x}str(mainv a,int n,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		base, case, fold
 	a		array of string to match against
 	n		minimum number of characters that must match
 	sp		string to test against array

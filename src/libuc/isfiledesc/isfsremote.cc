@@ -1,4 +1,5 @@
 /* isfsremote SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* is the file on a local or remote filesystem? */
@@ -37,6 +38,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<matxstr.h>		/* |matlocalfs(3uc)| */

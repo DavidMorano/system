@@ -1,4 +1,5 @@
 /* uclibsubs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -84,6 +85,7 @@
 #include	<ucinetconv.h>
 #include	<ucsysconf.h>
 #include	<ucprochave.h>
+#include	<ucsysmisc.h>
 
 #include	<getexecname.h>
 #include	<termios_cf.h>
@@ -98,10 +100,7 @@ extern int	uc_gethostname(char *,int) noex ;
 extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_getnisdomain(char *,int) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
-extern int	uc_nprocessors(int) noex ;
-extern int	uc_syspages(int) noex ;
 extern int	uc_nprocs(int) noex ;
-extern int	uc_pagesize() noex ;
 
 /* time group */
 extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
@@ -110,6 +109,7 @@ extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
 extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
 extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 
+/* process group */
 extern int	uc_fork() noex ;
 extern int	uc_forklockbegin(int) noex ;
 extern int	uc_forklockend() noex ;

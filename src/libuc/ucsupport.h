@@ -1,4 +1,5 @@
 /* ucsupport HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* support utilities for the LIBUC library */

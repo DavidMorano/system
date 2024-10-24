@@ -1,4 +1,4 @@
-/* si{x}sub SUPPORT */
+/* sisub SUPPORT */
 /* lang=C++20 */
 
 /* find the string-index of a sub-stringin the given c-string */
@@ -113,7 +113,7 @@ int sixsub(cchar *sp,int sl,cchar *ss) noex {
 	} /* end if (possible) */
 	return (f) ? i : -1 ;
 }
-/* end subroutine (sixsub) */
+/* end subroutine-template (sixsub) */
 
 
 /* local variables */

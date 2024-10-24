@@ -1,4 +1,5 @@
 /* matkeystr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match the key part of a string */
@@ -73,7 +74,7 @@
 
 /* forward references */
 
-static inline bool keyend(cint ch) noex {
+static constexpr bool keyend(cint ch) noex {
 	return (((ch) == '\0') || ((ch) == '=')) ;
 }
 

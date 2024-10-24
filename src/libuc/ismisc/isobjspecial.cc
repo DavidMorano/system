@@ -1,4 +1,5 @@
 /* isobjspecial SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine if a shared-object handle is special or not */
@@ -44,8 +45,14 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdfnames.h>
+#include	<matstr.h>
 #include	<localmisc.h>
 
 #include	"ismisc.h"
@@ -81,6 +88,9 @@ static const void	*objs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 bool isobjspecial(void *sop) noex {
@@ -92,5 +102,10 @@ bool isobjspecial(void *sop) noex {
 	return f ;
 }
 /* end subroutine (isobjspecial) */
+
+bool isfnamespecial(cchar *fp,int fl) noex {
+	return (matstr(stdfnames,fp,fl) >= 0) ;
+}
+/* end subroutine (isfnamespecial) */
 
 

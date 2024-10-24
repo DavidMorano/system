@@ -1,4 +1,5 @@
 /* isprime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine if a number is prime or not */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	isprime
+
+	Description:
 	This little subroutine detemines if the given number is
 	prime or not.
 
@@ -23,13 +28,38 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<math.h>		/* math functions */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
+
+#include	"ismisc.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

@@ -1,4 +1,5 @@
 /* matkeystr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* match the key part of a string */

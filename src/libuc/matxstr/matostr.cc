@@ -1,4 +1,5 @@
 /* matostr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Match-Option-String */
@@ -29,6 +30,7 @@
 	int mato{x}str(cchar *const *a,int n,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		base, case, fold
 	a		array of string to match against
 	n		minimum number of characters that must match
 	sp		string to test against array
