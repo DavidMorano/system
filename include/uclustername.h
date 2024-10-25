@@ -1,4 +1,5 @@
 /* uclustername HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® cluster name */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

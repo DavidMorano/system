@@ -1,4 +1,5 @@
 /* getprogroot HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get program root directory */
@@ -22,11 +23,13 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int getprogroot(cc *,mainv,int *,char *,cc *) noex ;
+extern int	getprogroot(cc *,mainv,int *,char *,cc *) noex ;
 
 EXTERNC_end
 

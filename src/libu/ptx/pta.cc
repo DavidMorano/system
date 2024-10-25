@@ -1,4 +1,5 @@
 /* pta SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* POSIX® Thread Attribute manipulation */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	pta
+
+	Description:
 	This object provides the initialization add-on for a PTM
 	object.  Enjoy!
 
@@ -24,7 +29,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"pta.h"

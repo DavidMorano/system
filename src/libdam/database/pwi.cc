@@ -267,7 +267,7 @@ static vars		var ;
 
 /* exported subroutines */
 
-int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
+int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pwi_ctor(op,pr)) >= 0) {
@@ -323,7 +323,7 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	    } /* end if (opener_midname) */
 	    rs1 = si.finish() ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (opener) */
+	} /* end if (subinfo) */
 	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		pwi_dtor(op) ;
@@ -333,7 +333,7 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 }
 /* end subroutine (pwi_open) */
 
-int pwi_close(PWI *op) noex {
+int pwi_close(pwi *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pwi_magic(op)) >= 0) {
@@ -351,7 +351,7 @@ int pwi_close(PWI *op) noex {
 }
 /* end subroutine (pwi_close) */
 
-int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
+int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
 	ipasswd_cur	cur ;
 	realname	rn ;
 	cint		nlen = REALNAMELEN ;
@@ -619,9 +619,9 @@ int opener::mkpwi() noex {
 static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
 	int		rs ;
 	int		f = false ;
-	if (cchar *ln{} ; (rs = realname_getlast(op,&ln)) >= 0) {
+	if (cchar *lp{} ; (rs = realname_getlast(op,&lp)) >= 0) {
 	    cint	ll = rs ;
-	    if (strnpbrk(ln,ll,extras) == nullptr) {
+	    if (strnpbrk(lp,ll,extras) == nullptr) {
 		ucentpw		*pwp = pdp->pwp ;
 		cint		pwlen = pdp->pwlen ;
 		char		*pwbuf = pdp->pwbuf ;

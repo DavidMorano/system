@@ -1,4 +1,5 @@
 /* getidname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the certain system IDs based on a specified name */

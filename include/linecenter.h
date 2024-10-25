@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* base types */
+#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

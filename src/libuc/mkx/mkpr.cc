@@ -57,9 +57,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
-#include	<cstdlib>
-#include	<cstring>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<varnames.hh>
@@ -149,6 +150,8 @@ struct subinfo {
 	SI_FL		init, open ;
 } ;
 
+typedef int		(*subinfo_f)(SI *,char *,int) ;
+
 struct prmap {
 	cchar		*prname ;
 	cchar		*dname ;
@@ -183,7 +186,7 @@ static int	dirsearch(const char *,const char *) noex ;
 
 /* local variables */
 
-static constexpr int	(*gettries[])(SI *,char *,int) = {
+constexpr subinfo_f		gettries[] = {
 	subinfo_domain,
 	subinfo_user,
 	subinfo_prmap,
@@ -191,7 +194,7 @@ static constexpr int	(*gettries[])(SI *,char *,int) = {
 	nullptr
 } ;
 
-static constexpr int	(*mktries[])(SI *,char *,int) = {
+constexpr subinfo_f		mktries[] = {
 	subinfo_env,
 	subinfo_domain,
 	subinfo_user,
@@ -201,8 +204,10 @@ static constexpr int	(*mktries[])(SI *,char *,int) = {
 	nullptr
 } ;
 
-static constexpr struct prmap	prmaps[] = {
+constexpr prmap			prmaps[] = {
 	{ "root", "/" },
+	{ "extra", "/usr/extra" },
+	{ "usrlocal", "/usr/local" },
 	{ "usr", "/usr" },
 	{ "xpg4", "/usr/xpg4" },
 	{ "xpg6", "/usr/xpg6" },
@@ -210,14 +215,13 @@ static constexpr struct prmap	prmaps[] = {
 	{ "ccs", "/usr/ccs" },
 	{ "openwin", "/usr/openwin" },
 	{ "java", "/usr/java" },
-	{ "extra", "/usr/extra" },
 	{ "preroot", "/usr/preroot" },
 	{ "apache", "/usr/apache" },
 	{ "postfix", "/usr/postfix" },
 	{ nullptr, nullptr }
 } ;
 
-static constexpr struct domainbase	domains[] = {
+constexpr domainbase		domains[] = {
 	{ "rightcore.com", "/usr/add-on" },
 	{ "rightcore.org", "/usr/add-on" },
 	{ "ece.neu.edu", "/home/student/dmorano/add-on" },
@@ -229,7 +233,7 @@ static constexpr struct domainbase	domains[] = {
 	{ nullptr, nullptr }
 } ;
 
-static constexpr cpcchar	basednames[] = {
+constexpr cpcchar		basednames[] = {
 	"/usr/add-on",
 	"/usr",
 	"/opt",

@@ -53,6 +53,7 @@
 #include	<mkpath.h>
 #include	<mkchar.h>
 #include	<mkaddr.h>
+#include	<mkpr.h>
 
 
 EXTERNC_begin

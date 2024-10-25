@@ -361,33 +361,6 @@ fsdir.o:		fsdir.cc fsdir.h
 sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h posixdirent.hh
 darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h posixdirent.hh
 
-# POSIX Thread Attribute
-pta.o:			pta.cc pta.h
-
-# POSIX Thread Mutex Attribute
-ptma.o:			ptma.cc ptma.h
-
-# POSIX Thread Condition Attribute
-ptca.o:			ptca.cc ptca.h
-
-# POSIX Thread Mutex
-ptm.o:			ptm.cc ptm.h
-
-# POSIX Thread Condition Variable
-ptc.o:			ptc.cc ptc.h
-
-# POSIX Semaphore
-psem.o:			psem.cc psem.h
-
-# POSIX Read-Write Lock (broken in dynamically loadable modeules)
-ptrwlock.o:		ptrwlock.cc ptrwlock.h
-
-# POSIX Thread Read-Write Lock Attribute
-ptrwa.o:		ptrwa.cc ptrwa.h
-
-# POSIX Message Queue
-pmq.o:			pmq.cc pmq.h
-
 sighand.o:		sighand.cc sighand.h
 sigblock.o:		sigblock.cc sigblock.h
 sigign.o:		sigign.cc sigign.h
@@ -416,14 +389,12 @@ linefold.o:		linefold.cc linefold.h
 envlist.o:		envlist.cc envlist.h
 envhelp.o:		envhelp.cc envhelp.h
 
-mkpr.o:			mkpr.cc
 mkprogenv.o:		mkprogenv.cc mkprogenv.h
 
 spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
 
-lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 

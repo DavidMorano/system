@@ -1,4 +1,5 @@
 /* pmq SUPPORT (LIBUC) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Posix Message Queue (PMQ) */

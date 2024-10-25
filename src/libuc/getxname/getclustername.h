@@ -1,4 +1,5 @@
 /* getclustername HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the cluster-name of the current machine cluster */
@@ -28,9 +29,17 @@
 
 EXTERNC_begin
 
-extern int	getclustername(char *,int) noex ;
+extern int	getclustername(char *,int,cchar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+namespace libuc {
+    extern int	prgetclustername(cchar *,char *,int,cchar *) noex ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* GETCLUSTERNAME_INCLUDE */

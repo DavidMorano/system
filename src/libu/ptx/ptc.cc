@@ -1,4 +1,5 @@
 /* ptc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* POSIX® Thread Condition manipulation */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	ptc
+
+	Description:
 	This is a cleaned up version of the p-threads condition-variable
 	locking facility.
 
@@ -25,7 +30,14 @@
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<ctime>			/* for |TIMESPEC| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ptca.h"

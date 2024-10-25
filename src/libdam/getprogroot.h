@@ -1,4 +1,5 @@
 /* getprogroot HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get program root directory */

@@ -1,4 +1,5 @@
 /* ptc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* POSIX Thread Condition manipulation */
@@ -26,6 +27,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 #include	"ptm.h"			/* needed for interface */

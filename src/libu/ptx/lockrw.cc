@@ -1,4 +1,5 @@
 /* lockrw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Reader-Writer Lock (LOCKRW) */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	lockrw
+
+	Description:
 	The Solaris® implmentation of the POSIX® read-write lock
 	is BROKEN!  We can all thank the "smart" Solaris® developers
 	for that.  How did Solaris® manage to create a borken
@@ -26,10 +31,8 @@
 	created a read-write lock that was especially "optimized,"
 	whatever that means. They forgot that it was more important
 	to create a *working* version of a piece of code, than a
-	fast *broken* version of that code.
-
-	This module provides a working (and minimally smart)
-	read-write lock.
+	fast *broken* version of that code.  This module provides
+	a working (and minimally smart) read-write lock.
 
 	Notes:
 
@@ -49,7 +52,13 @@
 #include	<cstdlib>
 #include	<ctime>
 #include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"lockrw.h"

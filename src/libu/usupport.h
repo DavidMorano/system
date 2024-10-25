@@ -20,6 +20,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<utimeout.h>
 #include	<ulogerror.h>
 #include	<usysutility.hh>

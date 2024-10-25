@@ -1,4 +1,5 @@
 /* ptrwlock SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 /* ** broken on SOLARIS®! ** */
 
@@ -17,7 +18,11 @@
 
 /*******************************************************************************
 
+  	Object:
+	ptrwlock
+	
 	** broken on SOLARIS®! **
+	Description:
 	The supplied reader-writer lock implemetation (used within
 	this source file) on Solaris (used within this source file)
 	is broken.  See alternative implementionals.
@@ -38,7 +43,6 @@
 	David A­D­ Morano.
 
 	Updated note:
-
 	This object (or rather the underlying RW-LOCK facility
 	itself) is **broken** on Solaris®.  It is rather complicated
 	but when this object is used within a shared object that
@@ -59,7 +63,14 @@
 #include	<unistd.h>
 #include	<pthread.h>
 #include	<climits>		/* |INT_MAX| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ptrwlock.h"

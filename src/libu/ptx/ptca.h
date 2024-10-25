@@ -1,4 +1,5 @@
 /* ptca HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* POSIX® Thread (Pthread) Condition-Vvariable Attributes */
@@ -15,7 +16,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<pthread.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	PTCA		pthread_condattr_t
@@ -29,7 +34,7 @@ enum ptcamems {
 } ;
 struct ptca ;
 struct ptca_co {
-        ptca             *op = nullptr ;
+        ptca		*op = nullptr ;
         int             w = -1 ;
         constexpr void operator () (ptca *p,int m) noex {
             op = p ;

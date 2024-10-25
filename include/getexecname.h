@@ -1,4 +1,5 @@
 /* getexecname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a the file-name that this program was 'exec'ed from */

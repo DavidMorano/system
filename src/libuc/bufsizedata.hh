@@ -26,9 +26,9 @@
 	when a particular buffer size is required.  This data base
 	takes the most simplest of forms: an array of structures
 	(|bufsuzeitem|).  Oh, I almost forgot.  I am using the new
-	|constexpr| features of C++14.  I waited for this C++14
+	|constexpr| features of C++14.  I waited for these C++14
 	enhancements to |constexpr| for these many years.  I knew
-	that the embicilic implemention of |constexpr| in C+14
+	that the imbecilic implemention of |constexpr| in C+11
 	needed to be enhanced (and eventually so it was).  Merry
 	programming!
 

@@ -295,6 +295,14 @@ intx.o:		intx.dir
 intx.dir:
 	makesubdir $@
 
+# POSIX Message Queue
+pmq.o:			pmq.cc pmq.h			$(INCS)
+
+# POSIX® synchronization mechanisms
+ptx.o:			ptx.dir
+ptx.dir:
+	makesubdir $@
+
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
 um.o:			um.cc um.h			$(INCS)

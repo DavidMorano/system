@@ -87,6 +87,7 @@
 #include	<ucprochave.h>
 #include	<ucsysmisc.h>
 
+#include	<getxname.h>
 #include	<getexecname.h>
 #include	<termios_cf.h>
 #include	<rsfree.h>

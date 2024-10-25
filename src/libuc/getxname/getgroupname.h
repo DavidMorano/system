@@ -1,4 +1,5 @@
 /* getgroupname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a group name (from the system account database) for current process */

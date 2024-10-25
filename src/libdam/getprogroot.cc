@@ -1,4 +1,5 @@
 /* getprogroot SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the program root directory */
@@ -49,8 +50,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getnodename.h>
 #include	<bufsizevar.hh>
@@ -145,17 +147,17 @@ int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *name) noex {
 	        if ((rs = subinfo_start(sip)) >= 0) {
 	            rs = SR_NOENT ;
 	            if (strnchr(name,namelen,'/') == nullptr) {
-/* check if the PCS root directory exists */
+			/* check if the PCS root directory exists */
 	                if ((rs < 0) && (rs != SR_NOMEM) && pr) {
 	                    rs = subinfo_pr(sip,pr,obuf,name,namelen) ;
 	                    outlen = rs ;
 	                }
-/* check other program roots */
+			/* check other program roots */
 	                if ((rs < 0) && (rs != SR_NOMEM) && prnames) {
 	                    rs = subinfo_prs(sip,prnames,obuf,name,namelen) ;
 	                    outlen = rs ;
 	                }
-/* search the rest of the execution path */
+			/* search the rest of the execution path */
 	                if ((rs < 0) && (rs != SR_NOMEM)) {
 	                    rs = subinfo_other(sip,obuf,name,namelen) ;
 	                    outlen = rs ;
@@ -164,7 +166,7 @@ int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *name) noex {
 	                rs = subinfo_local(sip,obuf,name,namelen) ;
 	                outlen = (f_changed) ? namelen : 0 ;
 	            }
-	            if (prlenp != nullptr) {
+	            if (prlenp) {
 	                *prlenp = sip->prlen ;
 	            }
 	            rs1 = subinfo_finish(sip) ;
@@ -246,14 +248,13 @@ static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *sp,int sl) noex {
 	        if ((rs1 = dirseen_havedevino(&sip->dirs,&sb)) >= 0) {
 	            rs = SR_NOENT ;
 		} else if (rs == rsn) {
-	            rs = SR_OK ;
-		}
-		if ((rs = mkdfname(obuf,d,dlen,sp,sl)) >= 0) {
-		    outlen = rs ;
-		    if ((rs = subinfo_xfile(sip,obuf)),isNotAccess(rs)) {
-	    		rs = subinfo_record(sip,&sb,d,dlen) ;
-		    }
-		} /* end if (mkdfname) */
+		    if ((rs = mkdfname(obuf,d,dlen,sp,sl)) >= 0) {
+		        outlen = rs ;
+		        if ((rs = subinfo_xfile(sip,obuf)),isNotAccess(rs)) {
+	    		    rs = subinfo_record(sip,&sb,d,dlen) ;
+		        }
+		    } /* end if (mkdfname) */
+	        }
 	    }
 	} /* end if (ok) */
 	return (rs >= 0) ? outlen : rs ;
@@ -274,11 +275,9 @@ static int subinfo_local(SI *sip,char *obuf,cc *sp,int sl) noex {
 static int subinfo_prs(SI *sip,mainv prnames,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*dn{} ;
-	if ((rs = malloc_hn(&dn)) >= 0) {
+	if (char *dn{} ; (rs = malloc_hn(&dn)) >= 0) {
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	        char	*pr{} ;
-	        if ((rs = malloc_mp(&pr)) >= 0) {
+	        if (char *pr{} ; (rs = malloc_mp(&pr)) >= 0) {
 		    cint	maxlen = rs ;
 	            rs = SR_NOENT ;
 	            for (int i = 0 ; prnames[i] ; i += 1) {
@@ -302,8 +301,7 @@ static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		outlen = 0 ;
-	char		*dbuf{} ;
-	if ((rs = malloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
 	    if ((rs = mkpath2(dbuf,pr,"bin")) >= 0) {
 	        rs = subinfo_check(sip,dbuf,-1,obuf,sp,sl) ;
 	        outlen = rs ;
@@ -325,17 +323,16 @@ static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 /* end subroutine (subinfo_pr) */
 
 static int subinfo_dirstat(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
-	nulstr		ns ;
 	int		rs ;
 	int		rs1 ;
-	cchar		*dnp ;
-	if ((rs = nulstr_start(&ns,d,dlen,&dnp)) >= 0) {
+	cchar		*dnp{} ;
+	if (nulstr ns ; (rs = ns.start(d,dlen,&dnp)) >= 0) {
 	    if ((rs = u_stat(dnp,sbp)) >= 0) {
 	        rs = SR_NOTFOUND ;
 	        if (S_ISDIR(sbp->st_mode))
 	            rs = sperm(&sip->id,sbp,X_OK) ;
 	    }
-	    rs1 = nulstr_finish(&ns) ;
+	    rs1 = ns.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (numstr) */
 	return rs ;
@@ -356,9 +353,8 @@ static int subinfo_record(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
 /* end subroutine (subinfo_record) */
 
 static int subinfo_xfile(SI *sip,cc *name) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_stat(name,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(name,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
 	        rs = sperm(&sip->id,&sb,X_OK) ;

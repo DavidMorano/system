@@ -1,4 +1,5 @@
 /* prgetclustername SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -88,17 +89,20 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<uclustername.h>
+#include	<nodedb.h>
+#include	<clusterdb.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
+#include	<ids.h>
+#include	<xperm.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"nodedb.h"
-#include	"clusterdb.h"
-#include	"prgetclustername.h"
+#include	"getclustername.h"
 
 
 /* local defines */
@@ -119,12 +123,20 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using libuc::prgetclustername ;		/* subroutine */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
+
+namespace libuc {
+    int prgetclustername(cchar *,char *,int,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -139,6 +151,21 @@ struct subinfo {
 	int		rlen ;
 } ;
 
+namespace {
+    struct searcher {
+    	char		*rbuf ;
+	cchar		*nn ;
+	char		*a{} ;
+	int		rlen ;
+	searcher(char *rb,int rl,cchar *n) noex : rbuf(rb), rlen(rl) {
+	    nn = n ;
+	    rbuf[0] = '\0' ;
+	} ;
+	int start(cchar **) noex ;
+	int finish() noex ;
+    } ; /* end struct (search) */
+}
+
 
 /* forward references */
 
@@ -152,13 +179,58 @@ static int	subinfo_cdb(SI *) noex ;
 
 /* local variables */
 
+constexpr cpcchar	prs[] = {
+    "/",
+    "/usr/extra",
+    "/usr/local"
+} ;
+
+constexpr cchar		nodefname[] = NODEFNAME ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
+int getclustername(char *rbuf,int rlen,cchar *nname) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (rbuf) {
+	    searcher	so(rbuf,rlen,nname) ;
+	    rs = SR_OK ;
+	    rbuf[0] = '\0' ;
+	    if (cchar *nn{} ; (rs = so.start(&nn)) >= 0) {
+	        if (ids id ; (rs = id.load) >= 0) {
+		    cint	am = R_OK ;
+	            if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+		        rs = SR_OK ;
+		        for (const auto pr : prs) {
+		            if ((rs = mkpath(pbuf,nodefname)) >= 0) {
+			        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+			            if ((rs = sperm(&id,&sb,am)) >= 0) {
+    				        rs = prgetclustername(pr,rbuf,rlen,nn) ;
+    				        len = rs ;
+				    } /* end if (sperm) */
+			        } /* end if (stat) */
+		            } /* end if (mkpath) */
+		            if (rs != 0) break ;
+		        } /* end for */
+		        rs = rsfree(rs,pbuf) ;
+	            } /* end if (m-a-f) */
+	            rs1 = id.release ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (ids) */
+	        rs1 = so.finish() ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (searcher) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+
+namespace libuc {
+    int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -185,8 +257,8 @@ int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (prgetclustername) */
 }
-/* end subroutine (prgetclustername) */
 
 
 /* local subroutines */
@@ -219,7 +291,7 @@ static int subinfo_cacheget(SI *sip) noex {
 /* end subroutine (getsubinfo_cacheget) */
 
 static int subinfo_cacheset(SI *sip) noex {
-	cint	ttl = TO_TTL ;
+	cint		ttl = TO_TTL ;
 	return uclustername_set(sip->rbuf,sip->rlen,sip->nn,ttl) ;
 }
 /* end subroutine (subinfo_cacheset) */
@@ -232,8 +304,7 @@ static int subinfo_ndb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
 	        nodedb		st ;
@@ -281,17 +352,14 @@ static int subinfo_cdb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
-	        CLUSTERDB	cdb ;
-		const nullptr_t	np{} ;
-	        if ((rs = clusterdb_open(&cdb,tbuf)) >= 0) {
+		cnullptr	np{} ;
+	        if (clusterdb cdb ; (rs = clusterdb_open(&cdb,tbuf)) >= 0) {
 	            auto	cf = clusterdb_curfetchrev ;
 	            cint	rsn = SR_NOTFOUND ;
-	            char	*cbuf ;
-    		    if ((rs = malloc_nn(&cbuf)) >= 0) {
+	            if (char *cbuf ; (rs = malloc_nn(&cbuf)) >= 0) {
 			cint	clen = rs ;
 	                if ((rs = cf(&cdb,nn,np,cbuf,clen)) >= 0) {
 	                    rs = sncpy1(rbuf,rlen,cbuf) ;
@@ -314,5 +382,30 @@ static int subinfo_cdb(SI *sip) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_cdb) */
+
+int searcher::start(cchar **npp) noex {
+    	int		rs = SR_OK ;
+	if (nn == nullptr) {
+	    if ((rs = malloc_nn(&a)) >= 0) {
+		*npp = a ;
+	    } /* end if (memory-allocation) */
+	} else {
+	    *npp = nn ;
+	}
+	return rs ;
+}
+/* end method (search::start) */
+
+int searcher::finish() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (a) {
+	    rs1 = uc_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	    a = nullptr ;
+	}
+	return rs ;
+}
+/* end method (search::finish) */
 
 

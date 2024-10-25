@@ -1,4 +1,5 @@
 /* ptca SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* POSIX® Thread Condition Attribute manipulation */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	ptca
+
+	Description:
 	This is a cleaned up version of the p-threads condition-variable
 	attribute set of subroutines (object).
 
@@ -24,7 +29,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ptca.h"

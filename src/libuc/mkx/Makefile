@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gxx
@@ -75,12 +74,13 @@ OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o
+OBJ19_MKX= mkpr.o
 
 OBJA_MKX= obj00_mkx.o obj01_mkx.o obj02_mkx.o obj03_mkx.o
 OBJB_MKX= obj04_mkx.o obj05_mkx.o obj06_mkx.o obj07_mkx.o
 OBJC_MKX= obj08_mkx.o obj09_mkx.o obj10_mkx.o obj11_mkx.o
 OBJD_MKX= obj12_mkx.o obj13_mkx.o obj14_mkx.o obj15_mkx.o
-OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o 
+OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o obj19_mkx.o
 
 OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o objd_mkx.o obje_mkx.o
 
@@ -192,6 +192,9 @@ obj17_mkx.o:	$(OBJ17_MKX)
 obj18_mkx.o:	$(OBJ18_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ18_MKX)
 
+obj19_mkx.o:	$(OBJ19_MKX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ19_MKX)
+
 
 obja_mkx.o:	$(OBJA_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MKX)
@@ -235,5 +238,7 @@ mkstrunique.o:		mkstrunique.cc $(INCS)
 mkcleanline.o:		mkcleanline.cc $(INCS)
 mkfmtphone.o:		mkfmtphone.cc $(INCS)
 mkfingerquery.o:	mkfingerquery.cc $(INCS)
+
+mkpr.o:			mkpr.cc mkpr.h		$(INCS)
 
 

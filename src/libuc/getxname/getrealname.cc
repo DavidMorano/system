@@ -1,4 +1,5 @@
 /* getrealname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to find the real-name of a user (given a username) */

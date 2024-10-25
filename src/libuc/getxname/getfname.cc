@@ -1,5 +1,6 @@
 /* getfname SUPPORT */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C++21 */
 
 /* get a file name according to rules */
 /* version %I% last-modified %G% */
