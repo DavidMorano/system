@@ -1,4 +1,5 @@
 /* mkcexsync HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make the synchronization string used for CEX */

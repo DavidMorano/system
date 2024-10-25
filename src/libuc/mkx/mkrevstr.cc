@@ -1,4 +1,5 @@
 /* mkrevstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* reverse the characters in a string in place */

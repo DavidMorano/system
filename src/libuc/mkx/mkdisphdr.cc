@@ -1,4 +1,5 @@
 /* mkdisphdr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create (in a buffer) a sort of nice mail address for display purposes */

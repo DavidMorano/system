@@ -75,11 +75,11 @@
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<mkpathx.h>
-#include	<starmat.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
+#include	<ismatstar.h>
 #include	<localmisc.h>
 
 #include	"acctab.h"
@@ -1192,7 +1192,7 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 	        if (pp->patrgx == nullptr) {
 	            f = (strcmp(pp->patstd,s) == 0) ;
 	            if (! f) {
-	                f = starmat(pp->patstd,s) ;
+	                f = ismatstar(pp->patstd,s) ;
 	            }
 	        } else {
 	            if (pp->type == 1) {
@@ -1217,7 +1217,7 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 	                    f = false ;
 		        } /* end if_constexpr (f_regex) */
 	                if (! f) {
-	                    f = starmat(pp->patstd,s) ;
+	                    f = ismatstar(pp->patstd,s) ;
 	                }
 	            } /* end if */
 	        } /* end if (STD or RGX) */

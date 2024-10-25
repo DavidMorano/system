@@ -1,16 +1,15 @@
-/* uc_writedesc */
+/* uc_writedesc SUPPORT */
+/* encoding=ISO8859-1 */
+/* version %I% last-modified %G% */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
 /* copy from one file descriptor to another */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_VALLOC	0		/* only use 'valloc(3c)' */
-
 
 /* revision history:
 
-	= 1998-01-10, David AÂ­DÂ­ Morano
+	= 1998-01-10, David A­D­ Morano
 	The subroutine was originally written.
 
 */
@@ -19,43 +18,41 @@
 
 /*******************************************************************************
 
-        This subroutine copies data from one file descriptor to another (source
-        to destination) for the length specified as an argument.
+  	Name:
+	uc_writedesc
 
-        The idea of having a separate subroutine for this sort of (usually)
-        trivial function, is that we can perform optimizations that a typical
-        user would find tiresome for such a "simple" function.
+	Description:
+	This subroutine copies data from one file descriptor to
+	another (source to destination) for the length specified
+	as an argument.  The idea of having a separate subroutine
+	for this sort of (usually) trivial function, is that we can
+	perform optimizations that a typical user would find tiresome
+	for such a "simple" function.
 
 	Synopsis:
-
-	int uc_writedesc(int dfd,int sfd,int len)
+	int uc_writedesc(int dfd,int sfd,int len) noex
 
 	Arguments:
-
 	sfd		source file descriptor
 	dfd		destination file descriptor
 	len		length to copy
 
 	Returns:
-
-	<0		error
 	>=0		length copied
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -77,30 +74,19 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-static int	deubgprintstat(cchar *,int) ;
-#endif
-
 
 /* exported subroutines */
 
-
-int uc_writedesc(int dfd,int sfd,int ulen)
-{
+int uc_writedesc(int dfd,int sfd,int ulen) noex {
 	int		rs = SR_OK ;
 	int		tlen = 0 ;
 
 	if (sfd == dfd) return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_copy: ent sfd=%u dfd=%u ulen=%d\n",sfd,dfd,ulen) ;
-#endif
-
 	if (ulen != 0) {
+	    if ((rs = uc_pagesize()) >= 0) {
 	    size_t	fsize = SIZE_MAX ;
-	    const int	ps = getpagesize() ;
+	    const int	ps = rs ;
 	    int		readlen ;
 
 /* calculate the size of a buffer to allocate */
@@ -112,7 +98,7 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 	            USTAT	sb ;
 	            int		bsize ;
 	            if ((rs = u_fstat(sfd,&sb)) >= 0) {
-	                const mode_t	m = sb.st_mode ;
+	                cmode	m = sb.st_mode ;
 	                if (S_ISREG(m) || S_ISBLK(m)) {
 	                    fsize = (size_t) (sb.st_size & SIZE_MAX) ;
 	                    bsize = (MAX(sb.st_size,1) & INT_MAX) ;
@@ -129,11 +115,6 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 	        readlen = ps ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("uc_copy: mid1 rs=%d fsize=%lu readlen=%u\n",rs,
-	        fsize,readlen) ;
-#endif
-
 	    if ((rs >= 0) && (fsize > 0)) {
 	        char		*mdata = NULL ;
 
@@ -141,10 +122,6 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 #else
 	        size_t		msize = 0 ;
 #endif /* CF_VALLOC */
-
-#if	CF_DEBUGS
-	        debugprintf("uc_copy: readlen=%u\n",readlen) ;
-#endif
 
 /* allocate the buffer */
 
@@ -161,10 +138,6 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 	        }
 #endif /* CF_VALLOC */
 
-#if	CF_DEBUGS
-	        debugprintf("uc_copy: before rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0) {
 	            int	wlen ;
 
@@ -177,9 +150,6 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 
 	                rs = u_read(sfd,mdata,rlen) ;
 	                wlen = rs ;
-#if	CF_DEBUGS
-	                debugprintf("uc_copy: u_read() rs=%d\n",rs) ;
-#endif
 	                if (rs <= 0) break ;
 
 	                rs = uc_writen(dfd,mdata,wlen) ;
@@ -187,10 +157,6 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 
 	                if (rs < 0) break ;
 	            } /* end while */
-
-#if	CF_DEBUGS
-	            debugprintf("uc_copy: while-end rs=%d tlen=%u\n",rs,tlen) ;
-#endif
 
 #if	CF_VALLOC
 	            uc_libfree(mdata) ;
@@ -207,41 +173,16 @@ int uc_writedesc(int dfd,int sfd,int ulen)
 
 	    } /* end if (positive) */
 
+	    } /* ed if (uc_pagesize) */
 	} /* end if (non-zero) */
-
-#if	CF_DEBUGS
-	debugprintf("uc_copy: ret rs=%d tlen=%u\n",rs,tlen) ;
-#endif
 
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (uc_writedesc) */
 
-
-int uc_copy(int ifd,int ofd,int wlen)
-{
-#if	CF_DEBUGS
-	debugprintf("uc_copy: ent ulen=%d\n",wlen) ;
-	deubgprintstat("ifd",ifd) ;
-	deubgprintstat("ofd",ofd) ;
-#endif
+int uc_copy(int ifd,int ofd,int wlen) noex {
 	return uc_writedesc(ofd,ifd,wlen) ;
 }
 /* end subroutine (uc_writedesc) */
-
-
-#if	CF_DEBUGS
-static int deubgprintstat(cchar *id,int fd)
-{
-	USTAT		sb ;
-	int		rs ;
-	if ((rs = u_fstat(fd,&sb)) >= +0) {
-	    ulong	fs = sb.st_size ;
-	    debugprintf("uc_writedesc: %s size=%lu\n",id,fs) ;
-	}
-	return rs ;
-}
-/* end subroutine (debugprintstat) */
-#endif /* CF_DEBUGS */
 
 

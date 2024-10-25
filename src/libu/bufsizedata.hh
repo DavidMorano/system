@@ -16,18 +16,21 @@
 
 /*******************************************************************************
 
-	This module provides the database from which decisions are made
-	for determing buffer sizes.  A decision about how to determine
-	any particular buffer size is make at the point when a particular
-	buffer size is required.  This data base takes the most simplest
-	of forms: an array of structures (|bufsuzeitem|).
+	Name:
+	bufsizedata
 
-	Oh, I almost forgot. I am using the new |constexpr| features
-	of C++14. I waited for this C++14 enhancements to |constexpr|
-	for these many years. I knew that the embicilic implemention
-	of |constexpr| in C+14 needed to be enhanced (and eventually
-	so it was).  Merry programming!
-
+	Description:
+	This module provides the database from which decisions are
+	made for determing buffer sizes.  A decision about how to
+	determine any particular buffer size is make at the point
+	when a particular buffer size is required.  This data base
+	takes the most simplest of forms: an array of structures
+	(|bufsuzeitem|).  Oh, I almost forgot.  I am using the new
+	|constexpr| features of C++14.  I waited for these C++14
+	enhancements to |constexpr| for these many years.  I knew
+	that the imbecilic implemention of |constexpr| in C+11
+	needed to be enhanced (and eventually so it was).  Merry
+	programming!
 
 *******************************************************************************/
 
@@ -40,10 +43,7 @@
 #include	<unistd.h>		/* |_SC_xx| */
 #include	<climits>
 #include	<usystem.h>
-#include	<localmisc.h>
-
-#include	"getbufsizenames.h"
-#include	"usysdefs.h"
+#include	<bufsizenames.h>
 
 
 #ifndef	_SC_ARG_MAX

@@ -45,7 +45,6 @@
 #include	<bfile.h>
 #include	<baops.h>
 #include	<field.h>
-#include	<wdt.h>
 
 #include	"localmisc.h"
 #include	"config.h"

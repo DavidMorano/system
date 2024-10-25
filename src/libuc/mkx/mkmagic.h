@@ -1,4 +1,5 @@
 /* mkmagic HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* create a c-string that constitutes a "magic" string for file-ID purposes */

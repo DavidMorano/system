@@ -20,10 +20,10 @@
 	nleadkeystr
 
 	Description:
-        Check that the given string matches (case independently) the LEADING
-        part of some string in the given array of strings. If we get a match, we
-        return the number of characters matched. If we do not match, we return a
-        negative number.
+	Check that the given string matches (case independently)
+	the LEADING part of some string in the given array of
+	strings.  If we get a match, we return the number of characters
+	matched.  If we do not match, we return a negative number.
 
 	Synopsis:
 	int nleadkeystr(cchar *bs,cchar *sp,int sl) noex
@@ -41,10 +41,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |INT_MAX| */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
 
 #include	"nleadkeystr.h"
 
@@ -58,16 +61,22 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int nleadkeystr(cchar *bs,cchar *sp,int sl) noex {
-	int		i{} ;
+	int		i{} ; /* used-afterwards */
 	if (sl < 0) sl = INT_MAX ;
 	for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
 	    if (bs[i] != sp[i]) break ;

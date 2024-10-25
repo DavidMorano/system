@@ -1,4 +1,5 @@
 /* strwcpyx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	<strwcpyxc.h>
 #include	<strwcpyxx.h>

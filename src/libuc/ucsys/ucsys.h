@@ -1,4 +1,5 @@
 /* ucsys HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UCSYS object management */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 #include	<spwd.h>		/* <- special */

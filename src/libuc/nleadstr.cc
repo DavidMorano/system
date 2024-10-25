@@ -62,17 +62,23 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |INT_MAX| */
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 #include	<char.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"nleadstr.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -88,6 +94,9 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -98,7 +107,7 @@ extern "C" {
 
 template <toxc_f toxc>
 int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
-	int		i ;
+	int		i{} ; /* used-afterwards */
 	if (sl < 0) sl = INT_MAX ;
 	for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
 	    if (toxc(bs[i]) != toxc(sp[i])) break ;

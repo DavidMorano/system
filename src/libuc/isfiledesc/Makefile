@@ -57,7 +57,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_ISFILEDESC= isasocket.o
+OBJ0_ISFILEDESC= isasocket.o isterminal.o
 OBJ1_ISFILEDESC= isfsremote.o
 OBJ2_ISFILEDESC= isinteractive.o
 
@@ -122,6 +122,7 @@ obj2_isfiledesc.o:	$(OBJ2_ISFILEDESC)
 
 
 isasocket.o:		isasocket.cc		$(INCS)
+isterminal.o:		isterminal.cc		$(INCS)
 isfsremote.o:		isfsremote.cc		$(INCS)
 isinteractive.o:	isinteractive.cc	$(INCS)
 

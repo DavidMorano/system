@@ -1,4 +1,5 @@
 /* systems SUPPORT */
+/* version %I% last-modified %G% */
 /* lang=C20 */
 
 /* get machine dialing information from UUCP "Systems" DB */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	systems
+
+	Description:
 	This object is a container for "systems" listed in "systems"
 	files.  These are files that are keyed by the name of a
 	"system" (whatever that is) and has a composite value that
@@ -48,11 +53,11 @@
 
 /* local defines */
 
-#define	FILE		systems_file
+#define	SYS_FILE	systems_file
 #define	CUR		systems_cur
 #define	ENT		systems_ent
 
-#define	TI_FILECHECK	3
+#define	TI_SYS_FILECHECK	3
 #define	SYSLINELEN	((4 * 1024) + 1)
 #define	ARGSBUFLEN	((6 * MAXPATHLEN) + 35)
 
@@ -78,13 +83,13 @@ typedef systems_file *	filep ;
 
 /* forward references */
 
-static int systems_fileparse(systems *,int,FILE *) noex ;
+static int systems_fileparse(systems *,int,SYS_FILE *) noex ;
 static int systems_filealready(systems *,dev_t,ino_t) noex ;
 static int systems_procline(systems *,int,field *) noex ;
 static int systems_delfes(systems *,int) noex ;
 
-static int file_start(FILE *,cchar *) noex ;
-static int file_finish(FILE *) noex ;
+static int file_start(SYS_FILE *,cchar *) noex ;
+static int file_finish(SYS_FILE *) noex ;
 
 static int entry_start(ENT *,int,cchar *,int) noex ;
 static int entry_dialer(ENT *,cchar *,int) noex ;
@@ -133,7 +138,7 @@ int systems_open(systems *op,cchar *sysfname) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	sz = sizeof(FILE) ;
+	sz = sizeof(SYS_FILE) ;
 	opts = VECOBJ_OREUSE ;
 	if ((rs = vecobj_start(&op->files,sz,10,opts)) >= 0) {
 	    sz = sizeof(ENT) ;
@@ -158,8 +163,8 @@ int systems_open(systems *op,cchar *sysfname) noex {
 /* end subroutine (systems_open) */
 
 int systems_close(systems *op) noex {
-	ENT	*dep ;
-	FILE	*fep ;
+	ENT		*dep ;
+	SYS_FILE	*fep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -220,7 +225,7 @@ int systems_fileadd(systems *op,cchar *sysfname) noex {
 	} /* end if */
 
 	if (rs >= 0) {
-	    FILE	fe, *fep ;
+	    SYS_FILE	fe, *fep ;
 	    if ((rs = file_start(&fe,sp)) >= 0) {
 	        if ((rs = vecobj_add(&op->files,&fe)) >= 0) {
 	            int		fi = rs ;
@@ -317,7 +322,7 @@ int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
 
 int systems_check(systems *op,time_t dt) noex {
 	USTAT		sb ;
-	FILE		*fep ;
+	SYS_FILE	*fep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
@@ -332,7 +337,7 @@ int systems_check(systems *op,time_t dt) noex {
 
 /* should we even check? */
 
-	if ((dt - op->checktime) <= TI_FILECHECK)
+	if ((dt - op->checktime) <= TI_SYS_FILECHECK)
 	    return SR_OK ;
 
 	op->checktime = dt ;
@@ -366,15 +371,13 @@ int systems_check(systems *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int systems_fileparse(systems *op,int fi,FILE *fep) noex {
+static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
 	bfile		dialfile, *sfp = &dialfile ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
 	if ((rs = bopen(sfp,fep->fname,"r",0664)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) {
 		const dev_t	dev = sb.st_dev ;
 		const ino_t	ino = sb.st_ino ;
 		if ((rs = systems_filealready(op,dev,ino)) == 0) {
@@ -384,7 +387,7 @@ static int systems_fileparse(systems *op,int fi,FILE *fep) noex {
 		        field	fsb ;
 		        int	len ;
 		        fep->mtime = sb.st_mtime ;
-		        fep->fsize = (size_t) (sb.st_size & UINT_MAX) ;
+		        fep->fsize = size_t(sb.st_size & UINT_MAX) ;
 		        fep->dev = sb.st_dev ;
 		        fep->ino = sb.st_ino ;
 		        while ((rs = breadlns(sfp,lbuf,llen,nullptr)) > 0) {
@@ -416,33 +419,30 @@ static int systems_fileparse(systems *op,int fi,FILE *fep) noex {
 
 	                if (rs < 0) break ;
 	            } /* end while (reading lines) */
-			uc_free(lbuf) ;
+			rs1 = uc_free(lbuf) ;
+			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a) */
 	        } /* end if (not-already) */
 	    } /* end if (bcontrol) */
 	    rs1 = bclose(sfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (systems_fileparse) */
 
 static int systems_filealready(systems *op,dev_t dev,ino_t ino) noex {
-	FILE	*fep ;
+	SYS_FILE	*fep ;
 	vecobj		*flp = &op->files ;
 	int		rs ;
-	int		i ;
 	int		f = false ;
-
-	for (i = 0 ; (rs = vecobj_get(flp,i,&fep)) >= 0 ; i += 1) {
-	    if (fep != nullptr) {
+	for (int i = 0 ; (rs = vecobj_get(flp,i,&fep)) >= 0 ; i += 1) {
+	    if (fep) {
 		f = ((fep->dev == dev) && (fep->ino == ino)) ;
 		if (f) break ;
 	    }
 	} /* end for */
 	if (rs == SR_NOTFOUND) rs = SR_OK ;
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (systems_filealready) */
@@ -450,13 +450,11 @@ static int systems_filealready(systems *op,dev_t dev,ino_t ino) noex {
 static int systems_procline(systems *op,int fi,field *fsp) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
-
 	if ((fsp->fl > 0) && (fsp->term != '#')) {
-	    ENT	e ;
 	    int		fl = fsp->fl ;
-	    cchar	*fp = (cchar *) fsp->fp ;
-	    if ((rs = entry_start(&e,fi,fp,fl)) >= 0) {
-		int	f_fin = true ;
+	    cchar	*fp = fsp->fp ;
+	    if (ENT e ; (rs = entry_start(&e,fi,fp,fl)) >= 0) {
+		bool	f_fin = true ;
 	        if ((fl = field_get(fsp,fterms,&fp)) > 0) {
 	            if ((rs = entry_dialer(&e,fp,fl)) >= 0) {
 	                if (fsp->term != '#') {
@@ -480,84 +478,77 @@ static int systems_procline(systems *op,int fi,field *fsp) noex {
 		    entry_finish(&e) ;
 	    } /* end if (entry_start) */
 	} /* end if (possible) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (systems_procline) */
 
 static int systems_delfes(systems *op,int fi) noex {
-	ENT	*ep ;
+	ENT		*ep ;
 	vecobj		*elp = &op->entries ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vecobj_get(elp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != nullptr) {
+	for (int i = 0 ; vecobj_get(elp,i,&ep) >= 0 ; i += 1) {
+	    if (ep) {
 	        if (ep->fi == fi) {
-	            rs1 = entry_finish(ep) ;
-		    if (rs >= 0) rs = rs1 ;
-	            rs1 = vecobj_del(&op->entries,i--) ;
-		    if (rs >= 0) rs = rs1 ;
+		    {
+	                rs1 = entry_finish(ep) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+	                rs1 = vecobj_del(&op->entries,i--) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
 	        }
 	    }
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (systems_delfes) */
 
-static int file_start(FILE *fep,cchar *fname) noex {
-	int		rs ;
-	cchar		*cp ;
-
-	if (fname == nullptr) return SR_FAULT ;
-
-	memclear(fep) ;
-
-	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	    fep->fname = cp ;
-	}
-
+static int file_start(SYS_FILE *fep,cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	if (fep && fname) {
+	    memclear(fep) ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        fep->fname = cp ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_start) */
 
-static int file_finish(FILE *fep) noex {
-	int		rs = SR_OK ;
+static int file_finish(SYS_FILE *fep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (fep == nullptr) return SR_FAULT ;
-
-	if (fep->fname != nullptr) {
-	    rs1 = uc_free(fep->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    fep->fname = nullptr ;
-	}
-
+	if (fep) {
+	    rs = SR_OK ;
+	    if (fep->fname) {
+	        rs1 = uc_free(fep->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        fep->fname = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_finish) */
 
 static int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
-	int		rs ;
-	cchar	*cp ;
-
-	memclear(ep) ;
-	ep->fi = fi ;
-	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	    ep->sysnamelen = sl ;
-	    ep->sysname = cp ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    memclear(ep) ;
+	    ep->fi = fi ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        ep->sysnamelen = sl ;
+	        ep->sysname = cp ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
 
 static int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 	int		rs ;
-	cchar		*cp ;
-	if ((rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
 	    ep->dialernamelen = dl ;
 	    ep->dialername = cp ;
 	}
@@ -568,9 +559,8 @@ static int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 static int entry_args(ENT *ep,cchar *args,int argslen) noex {
 	int		rs = SR_OK ;
 	if (argslen > 0) {
-	    cchar	*cp ;
 	    ep->dialerargslen = argslen ;
-	    if ((rs = uc_mallocstrw(args,argslen,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(args,argslen,&cp)) >= 0) {
 		ep->dialerargs = cp ;
 	    }
 	} /* end if */
@@ -580,29 +570,30 @@ static int entry_args(ENT *ep,cchar *args,int argslen) noex {
 /* end subroutine (entry_args) */
 
 static int entry_finish(ENT *ep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (ep->sysnamelen <= 0)
-	    return SR_OK ;
-
-	if (ep->dialerargs != nullptr) {
-	    rs1 = uc_free(ep->dialerargs) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (ep->dialername != nullptr) {
-	    rs1 = uc_free(ep->dialername) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (ep->sysname != nullptr) {
-	    rs1 = uc_free(ep->sysname) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	ep->sysnamelen = 0 ;
-	return SR_OK ;
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->sysnamelen > 0) {
+	        if (ep->dialerargs) {
+	            rs1 = uc_free(ep->dialerargs) ;
+	            if (rs >= 0) rs = rs1 ;
+		    ep->dialerargs = nullptr ;
+	        }
+	        if (ep->dialername) {
+	            rs1 = uc_free(ep->dialername) ;
+	            if (rs >= 0) rs = rs1 ;
+	            ep->dialername = nullptr ;
+	        }
+	        if (ep->sysname) {
+	            rs1 = uc_free(ep->sysname) ;
+	            if (rs >= 0) rs = rs1 ;
+	            ep->sysname = nullptr ;
+	        }
+	        ep->sysnamelen = 0 ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_finish) */
 

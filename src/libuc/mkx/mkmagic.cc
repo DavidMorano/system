@@ -1,4 +1,5 @@
 /* mkmagic SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create a c-string that constitutes a "magic" string for file-ID purposes */
@@ -84,7 +85,7 @@ int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
 	            *bp++ = '\0' ;
-	            if (cint zl = ((rbuf+rlen)-bp) ; zl > 0) {
+	            if (cint zl = ((rbuf + rlen) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
 	            }
 	        } else {

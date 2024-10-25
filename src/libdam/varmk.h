@@ -27,16 +27,18 @@
 #define	VARMK_MAGIC	0x99447246
 
 
-struct varmk_callsubs {
+EXTERNC_begin
+    struct varmk_callsubs {
 	int	(*open)(void *,cchar *,int,mode_t,int) ;
 	int	(*chgrp)(void *,gid_t) ;
 	int	(*addvar)(void *,cchar *,cchar *,int) ;
 	int	(*abort)(void *) ;
 	int	(*close)(void *) ;
-} ;
+    } ; /* end struct (varmk_callsubs) */
+EXTERNC_end
 
 struct varmk_head {
-	MODLOAD		loader ;
+	modload		loader ;
 	VARMK_CALLS	call ;
 	void		*sop ;		/* shared-object (SO) pointer */
 	void		*obj ;		/* object pointer */
@@ -49,11 +51,11 @@ typedef VARMK_CALLS	varmk_calls ;
 
 EXTERNC_begin
 
-extern int	varmk_open(VARMK *,cchar *,int,mode_t,int) noex ;
-extern int	varmk_chgrp(VARMK *,gid_t) noex ;
-extern int	varmk_addvar(VARMK *,cchar *,cchar *,int) noex ;
-extern int	varmk_abort(VARMK *) noex ;
-extern int	varmk_close(VARMK *) noex ;
+extern int	varmk_open(varmk *,cchar *,int,mode_t,int) noex ;
+extern int	varmk_chgrp(varmk *,gid_t) noex ;
+extern int	varmk_addvar(varmk *,cchar *,cchar *,int) noex ;
+extern int	varmk_abort(varmk *) noex ;
+extern int	varmk_close(varmk *) noex ;
 
 EXTERNC_end
 

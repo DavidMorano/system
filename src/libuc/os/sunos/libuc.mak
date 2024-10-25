@@ -61,7 +61,7 @@ OBJ01= strn.o strnxcmp.o sif.o
 OBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
 OBJ03= stdfnames.o
 
-OBJ04= isnot.o isoneof.o hasx.o ischarx.o 
+OBJ04= isx.o
 OBJ05= nleadstr.o nleadkeystr.o
 OBJ06= mapex.o getourenv.o
 OBJ07=
@@ -303,7 +303,7 @@ base.o:		$(OBJ_BASE)
 
 # CHARACTER
 OBJA_CHAR= toxc.o char.o rmeol.o
-OBJB_CHAR= ischarx.o hasx.o
+OBJB_CHAR= hasx.o
 
 OBJ_CHAR= obja_char.o objb_char.o
 
@@ -361,33 +361,6 @@ fsdir.o:		fsdir.cc fsdir.h
 sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h posixdirent.hh
 darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h posixdirent.hh
 
-# POSIX Thread Attribute
-pta.o:			pta.cc pta.h
-
-# POSIX Thread Mutex Attribute
-ptma.o:			ptma.cc ptma.h
-
-# POSIX Thread Condition Attribute
-ptca.o:			ptca.cc ptca.h
-
-# POSIX Thread Mutex
-ptm.o:			ptm.cc ptm.h
-
-# POSIX Thread Condition Variable
-ptc.o:			ptc.cc ptc.h
-
-# POSIX Semaphore
-psem.o:			psem.cc psem.h
-
-# POSIX Read-Write Lock (broken in dynamically loadable modeules)
-ptrwlock.o:		ptrwlock.cc ptrwlock.h
-
-# POSIX Thread Read-Write Lock Attribute
-ptrwa.o:		ptrwa.cc ptrwa.h
-
-# POSIX Message Queue
-pmq.o:			pmq.cc pmq.h
-
 sighand.o:		sighand.cc sighand.h
 sigblock.o:		sigblock.cc sigblock.h
 sigign.o:		sigign.cc sigign.h
@@ -416,14 +389,12 @@ linefold.o:		linefold.cc linefold.h
 envlist.o:		envlist.cc envlist.h
 envhelp.o:		envhelp.cc envhelp.h
 
-mkpr.o:			mkpr.cc
 mkprogenv.o:		mkprogenv.cc mkprogenv.h
 
 spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
 
-lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
@@ -525,7 +496,6 @@ uctimer.o:		uctimer.cc uctimer.h
 # misc-character
 toxc.o:			toxc.c toxc.h
 char.o:			char.cc char.h
-ischarx.o:		ischarx.cc ischarx.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
 # RMX
@@ -782,6 +752,11 @@ getxname.o:		getxname.dir
 getxname.dir:
 	makesubdir $@
 
+# ISZ
+isx.o:			isx.dir
+isx.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -899,13 +874,6 @@ callback.o:		callback.cc callback.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
-#
-isinetaddr.o:		isinetaddr.cc isinetaddr.h
-isindomain.o:		isindomain.cc isindomain.h
-isoneof.o:		isoneof.cc isoneof.h
-isnot.o:		isnot.cc isnot.h isoneof.h
-iserror.o:		iserror.cc iserror.h isoneof.h
-isindomain.o:		isindomain.cc isindomain.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

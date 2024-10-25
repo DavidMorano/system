@@ -36,10 +36,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<toxc.h>
 #include	<mkchar.h>
@@ -58,7 +61,7 @@
 /* exported subroutines */
 
 int sibasename(cchar *sp,int sl) noex {
-	int		si ;
+	int		si{} ; /* used-afterwards */
 	if (sl < 0) sl = strlen(sp) ;
 	while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	    sl -= 1 ;

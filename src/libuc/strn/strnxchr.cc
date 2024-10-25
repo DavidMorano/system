@@ -31,6 +31,7 @@
 	char *strn{x}chr(cchar *sp,int sl,int ch) noex
 
 	Arguments:
+	{x}		base, case, fold
 	sp		string to search through
 	sl		maximum number of character to search
 	ch		the character to search for
@@ -42,11 +43,15 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| + |strchr(3c)| + ... */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"strnxchr.h"
 
@@ -71,13 +76,14 @@
 
 /* local typedefs */
 
-typedef char	*charp ;
-
 
 /* external subroutines */
 
 
 /* external subroutines */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -147,13 +153,13 @@ char *strnrchr(cchar *sp,int sl,int sch) noex {
 	    } /* end if (no length given) */
 	    if ((!fdone) && (sl >= 0)) {
 	        bool	f = false ;
-	        cchar	*csp = (sp+sl) ;
+	        cchar	*csp = (sp + sl) ;
 	        while (--csp >= sp) {
 	            cint	ch = mkchar(*csp) ;
 	            f = (ch == sch) ;
 	            if (f) break ;
 	        } /* end while */
-		if (f) rsp = ((char *) csp) ;
+		if (f) rsp = charp(csp) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;

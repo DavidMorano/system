@@ -1,4 +1,5 @@
 /* isdotdir SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* is a directory entry a dot-directory? */
@@ -17,14 +18,21 @@
 
 /*******************************************************************************
 
+  	Name:
+	isfotdir
+
+	Description:
 	This subroutine determines if a directory entry is a
 	dot-directory.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
 
 #include	"ismisc.h"
 

@@ -1,4 +1,5 @@
 /* uctc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* LIBUC Teermina-Control functions */
@@ -23,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>	/* |TERMIOS| */
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

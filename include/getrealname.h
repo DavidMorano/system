@@ -1,4 +1,5 @@
 /* getrealname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutines to access the 'passwd' and 'group' databases */

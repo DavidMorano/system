@@ -1,4 +1,5 @@
 /* isfiledesc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* is a file-descriptor associated with a someting? */
@@ -28,15 +29,24 @@
 
 EXTERNC_begin
 
-extern int	isinteractive(int) noex ;
+extern int	isterminal(int) noex ;
 extern int	isasocket(int) noex ;
 extern int	isfsremote(int) noex ;
 
-static inline int isterminal(int fd) noex {
-	return isinteractive(fd) ;
-}
-
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+struct isinterobj {
+    operator int () noex ;
+    int operator () () noex {
+	return operator int () ;
+    } ;
+} ; /* end class (isinteractive) */
+
+extern isinterobj	isinteractive ;
+
+#endif /* __cplusplus */
 
 
 #endif /* ISFILEDESC_INCLUDE */

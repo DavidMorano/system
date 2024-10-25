@@ -1,18 +1,17 @@
-/* main */
+/* main SUPPORT (pcspasswd) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* main module for the 'passwdv' program */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time */
-#define	CF_DEBUG	0		/* run-time */
 #define	CF_GETEXECNAME	1		/* use 'getexecname(3c)' */
-
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -20,24 +19,25 @@
 
 /******************************************************************************
 
+  	Name:
+	main
+
+	Description:
 	This is the front-end subroutine for the PASSWDV (password
 	verification) program.
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -45,6 +45,8 @@
 #include	<paramopt.h>
 #include	<getusername.h>
 #include	<pwfile.h>
+#include	<isfiledesc.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -60,15 +62,8 @@
 
 /* external subroutines */
 
-extern int	isinteractive() ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isdigitlatin(int) ;
-
 extern int	process(struct proginfo *,PARAMOPT *,PWFILE *,bfile *,
 			const char *) ;
-
-extern char	*strshrink(char *) ;
 
 
 /* external variables */
@@ -79,20 +74,10 @@ extern char	*strshrink(char *) ;
 
 /* forward references */
 
-static int	usage(struct proginfo *) ;
+static int	usage(proginfo *) noex ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"option",
-	"af",
-	NULL
-} ;
 
 enum argopts {
 	argopt_version,
@@ -104,8 +89,13 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*procopts[] = {
-	"seven",
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"option",
+	"af",
 	NULL
 } ;
 
@@ -114,13 +104,19 @@ enum procopts {
 	procopt_overlast
 } ;
 
+constexpr cpcchar	procopts[] = {
+	"seven",
+	NULL
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
-	struct proginfo	pi, *pip = &pi ;
+int main(int argc,mainv argv,mainv envv) {
+	proginfo	pi, *pip = &pi ;
 	PARAMOPT	aparams ;
 	PWFILE		pf, *pfp ;
 	bfile		errfile ;
@@ -450,10 +446,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 
 	if (f_version) {
-
-	    bprintf(pip->efp,"%s: version %s\n",
-	        pip->progname,VERSION) ;
-
+	    bprintf(pip->efp,"%s: version %s\n",pip->progname,VERSION) ;
 	}
 
 	if (f_usage) 
@@ -463,7 +456,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 		goto done ;
 
 	ex = EX_DATAERR ;
-	if (isinteractive() < 0)
+	if ((rs = isinteractive) < 0)
 	    goto notinteractive ;
 
 /* get the program root */

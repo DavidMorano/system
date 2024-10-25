@@ -1,4 +1,5 @@
 /* mkquoted SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* quote arguments for safe passage through a SHELL */

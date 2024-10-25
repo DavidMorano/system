@@ -41,14 +41,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
-#include	<char.h>
 #include	<toxc.h>
+#include	<char.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 

@@ -1,4 +1,5 @@
 /* ucprochave HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* is a proceess (given by a PID) in the system? */

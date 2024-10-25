@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	clusterdb
+
+	Description:
 	This object processes an access table for use by daemon
 	multiplexing server programs that want to control access
 	to their sub-servers.
@@ -28,7 +32,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
@@ -55,17 +59,11 @@
 #define	CLUSTERDB_DEFNETGROUP	"DEFAULT"
 
 #define	CLUSTERDB_FILE		struct clusterdb_file
-#define	CLUSTERDB_KEYNAME		struct clusterdb_keyname
+#define	CLUSTERDB_KEYNAME	struct clusterdb_keyname
 
 #define	CLUSTERDB_KA		sizeof(char *(*)[2])
 #define	CLUSTERDB_BO(v)		\
 	((CLUSTERDB_KA - ((v) % CLUSTERDB_KA)) % CLUSTERDB_KA)
-
-#undef	ARGSBUFLEN
-#define	ARGSBUFLEN		(3 * MAXHOSTNAMELEN)
-
-#undef	DEFCHUNKSIZE
-#define	DEFCHUNKSIZE		512
 
 #define	KEYALIGNMENT		sizeof(char *(*)[2])
 
@@ -121,7 +119,8 @@ struct svcentry {
 struct svcentry_key {
 	cchar		*kname ;
 	cchar		*args ;
-	int		kl, al ;
+	int		kl ;
+	int		al ;
 } ;
 
 
@@ -131,7 +130,7 @@ template<typename ... Args>
 static int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->ctp = new(nothrow) kvsfile) != np) {
@@ -179,13 +178,11 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	if ((rs = clusterdb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(fname,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
 		    csize	fsz = size_t(sb.st_size) ;
-		    int		isz ;
 		    int		ne ;
 		    {
-			isz = intsat(fsz / 4) ;
+		        cint	isz = intsat(fsz / 4) ;
 	                ne = max(isz,10) ;
 	                if ((rs = kvsfile_open(op->ctp,ne,fname)) >= 0) {
 	                    op->magic = CLUSTERDB_MAGIC ;
@@ -205,7 +202,7 @@ int clusterdb_close(clusterdb *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = clusterdb_magic(op)) >= 0) {
-	    {
+	    if (op->ctp) {
 		rs1 = kvsfile_close(op->ctp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }

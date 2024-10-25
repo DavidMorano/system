@@ -1,4 +1,5 @@
 /* matlocalfs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine is the given counted c-string is a local-filesystem name */
@@ -39,6 +40,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<matstr.h>
@@ -70,7 +73,7 @@
 
 /* local variables */
 
-static constexpr cpcchar	localfs[] = {
+constexpr cpcchar	localfs[] = {
 	"sysv",
 	"ufs",
 	"ext1",

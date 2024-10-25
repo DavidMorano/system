@@ -1,4 +1,5 @@
 /* matpstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match a partial string */
@@ -17,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	matpxstr
+	matp{x}str
 
 	Description:
 	Check that the given string matches the LEADING part of
@@ -28,9 +29,10 @@
 	array index.  If we do not match, we return "less-than-zero".
 
 	Synopsis:
-	int matpxstr(mainv a,int n,cchar *sp,int sl) noex
+	int matp{x}str(mainv a,int n,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		base, case, fold
 	a		array of string to match against
 	n		minimum number of characters that must match
 	sp		string to test against array
@@ -42,22 +44,24 @@
 
 	Implementation-note:
 	I used to use virtual inheritance to implement subroutine
-	groups just like this one in the past. I kind of moved to
+	groups just like this one in the past.  I kind of moved to
 	templates more recently (I used to use templates more
 	extensively a good white ago for subroutine groups like this).
 	But I gave up on templates in the past in preference to
 	using virtual inheritance, before moving back to templates
-	more recently. But the approach below is a hybrid between
+	more recently.  But the approach below is a hybrid between
 	virtual inheritance and passing subroutine pointers.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
 #include	<localmisc.h>
@@ -74,9 +78,11 @@
 
 /* local typedefs */
 
-typedef int (*toxc_f)(int) noex ;
-typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
-typedef int (*matxstr_f)(mainv,cchar *,int) noex ;
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+    typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+    typedef int (*matxstr_f)(mainv,cchar *,int) noex ;
+}
 
 
 /* external subroutines */
@@ -137,9 +143,8 @@ int mater::matpxstr(mainv a,int n,cchar *sp,int sl) noex {
 	if (n >= 0) {
 	    cint	lch = toxc(sp[0]) ;
 	    int		m_max = 0 ;
-	    int		m ;
-	    si = -1 ;
 	    for (int i = 0 ; a[i] ; i += 1) {
+		int	m ;
 		if ((m = (lch == toxc(a[i][0]))) > 0) {
 		    m = nleadx(a[i],sp,sl) ;
 		}

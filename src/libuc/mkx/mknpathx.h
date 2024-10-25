@@ -1,4 +1,5 @@
 /* mknpathx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a file-path from multiple component c-strings */

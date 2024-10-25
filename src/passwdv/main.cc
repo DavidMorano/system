@@ -1,19 +1,16 @@
-/* main (passwdv) */
+/* main SUPPORT (passwdv) */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* main module for the 'passwdv' program */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time debugging */
-#define	CF_DEBUGMALL	1		/* debug memory-allocations */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -21,28 +18,32 @@
 
 /*******************************************************************************
 
-        This is the front-end subroutine for the PASSWDV (password verification)
-        program.
+  	Name:
+	main
 
+	Description:
+	This is the front-end subroutine for the PASSWDV (password
+	verification) program.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<termios.h>
 #include	<unistd.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<paramopt.h>
 #include	<bits.h>
 #include	<bfile.h>
 #include	<ids.h>
 #include	<field.h>
+#include	<isfiledesc.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -67,7 +68,6 @@ extern "C" int	optbool(cchar *,int) ;
 extern "C" int	optvalue(cchar *,int) ;
 extern "C" int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern "C" int	sperm(IDS *,struct ustat *,int) ;
-extern "C" int	isinteractive() ;
 extern "C" int	isdigitlatin(int) ;
 extern "C" int	isNotPresent(int) ;
 extern "C" int	isFailOpen(int) ;
@@ -195,10 +195,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	PARAMOPT	aparams ;
 	bfile		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uint		mo_start = 0 ;
-#endif
-
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		pan = 0 ;
@@ -224,18 +220,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	const char	*pwfname = NULL ;
 	const char	*cp ;
 
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("main: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	uc_mallset(1) ;
-	uc_mallout(&mo_start) ;
-#endif
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -594,11 +578,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (rs < 0)
 	    goto badarg ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: debuglevel=%u\n",pip->debuglevel) ;
-#endif
-
 	if (f_version) {
 	    bfile	*efp = (bfile *) pip->efp ;
 	    bprintf(efp,"%s: version %s\n",pip->progname,VERSION) ;
@@ -616,11 +595,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    ex = EX_OSERR ;
 	    goto retearly ;
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main: pr=%s\n",pip->pr) ;
-#endif
 
 	if (pip->debuglevel > 0) {
 	    bfile	*efp = (bfile *) pip->efp ;
@@ -651,11 +625,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* options? */
 
-#if	CF_DEBUG
-	if (pip->debuglevel > 1)
-	    debugprintf("main: sevenbit=%d\n",pip->f.sevenbit) ;
-#endif
-
 	pfp = NULL ;
 	if (pwfname != NULL) {
 
@@ -674,30 +643,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    pfp = &pf ;
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(2)) {
-	            PWFILE_CUR	cur ;
-	            PWFILE_ENT	pe ;
-	    const int	pwlen = PWFILE_RECLEN ;
-	            char	pwbuf[PWFILE_RECLEN + 1] ;
-		cchar	*fmt = "main: opened PWFILE >%s< rs=%d\n" ;
-	        debugprintf(fmt,pwfname,rs) ;
-	            pwfile_curbegin(pfp,&cur) ;
-	            debugprintf("main: &pe %08lX pwbuf %08lX\n",&pe,pwbuf) ;
-	            while (pwfile_curenum(pfp,&cur,
-	                &pe,pwbuf,pwlen) >= 0) {
-	                debugprintf("username=%s\n",pe.username) ;
-	                debugprintf("password=%s\n",pe.password) ;
-	                debugprintf("gecos=>%s<\n",pe.gecos) ;
-	                debugprintf("realname=>%s<\n",pe.realname) ;
-	                debugprintf("account=%s\n",pe.account) ;
-	                debugprintf("office=>%s<\n",pe.office) ;
-	                debugprintf("hphone=>%s<\n",pe.hphone) ;
-	            } /* end while */
-	            pwfile_curend(pfp,&cur) ;
-	    } /* end if */
-#endif /* CF_DEBUG */
-
 	} /* end if (specified password file) */
 
 /* get ready */
@@ -712,7 +657,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (rs >= 0) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
-	    if ((rs = isinteractive()) > 0) {
+	    if ((rs = isinteractive) > 0) {
 	        if ((rs = procgather(pip,&aparams)) >= 0) {
 		    bfile	ofile ;
 		    cchar	*ofn = ofname ;
@@ -736,6 +681,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            ex = EX_DATAERR ;
 	            bprintf(pip->efp,fmt,pn,rs) ;
 	        }
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
 	    } /* end if (procgather) */
 	} else if (ex == EX_OK) {
 	    bfile	*efp = (bfile *) pip->efp ;
@@ -782,20 +729,6 @@ badlocstart:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
-	{
-	    uint	mo ;
-	    uc_mallout(&mo) ;
-	    debugprintf("main: final mallout=%u\n",(mo-mo_start)) ;
-	    uc_mallset(0) ;
-	}
-#endif
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
-
 	return ex ;
 
 /* bad stuff comes here */
@@ -812,9 +745,7 @@ badarg:
 
 /* local subroutines */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	const char	*pn = pip->progname ;
@@ -832,9 +763,7 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int procgather(PROGINFO *pip,PARAMOPT *pop)
-{
+static int procgather(PROGINFO *pip,PARAMOPT *pop) noex {
 	PARAMOPT_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
@@ -861,9 +790,7 @@ static int procgather(PROGINFO *pip,PARAMOPT *pop)
 } 
 /* end subroutine (procgather) */
 
-
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
-{
+static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cl ;
@@ -952,9 +879,7 @@ static int procone(PROGINFO *pip,cchar *un)
 }
 /* end subroutine (procone) */
 
-
-static int procout_begin(PROGINFO *pip,cchar *ofn)
-{
+static int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	if (! pip->f.nooutput) {
@@ -975,9 +900,7 @@ static int procout_begin(PROGINFO *pip,cchar *ofn)
 }
 /* end subroutine (procout_begin) */
 
-
-static int procout_end(PROGINFO *pip)
-{
+static int procout_end(PROGINFO *pip) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -992,9 +915,7 @@ static int procout_end(PROGINFO *pip)
 }
 /* end subroutine (procout_end) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == NULL) return SR_FAULT ;
@@ -1006,9 +927,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1040,10 +959,8 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -1076,20 +993,14 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_setentry) */
 
-
-static int locinfo_pwbegin(LOCINFO *lip,cchar *pfn)
-{
+static int locinfo_pwbegin(LOCINFO *lip,cchar *pfn) noex {
 	int		rs = SR_OK ;
-
 	return rs ;
 }
 /* end subroutine (locinfo_pwbegin) */
 
-
-static int locinfo_pwend(LOCINFO *lip)
-{
+static int locinfo_pwend(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
-
 	return rs ;
 }
 /* end subroutine (locinfo_pwend) */

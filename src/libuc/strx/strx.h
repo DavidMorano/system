@@ -1,4 +1,5 @@
 /* strx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* c-string comparisons */
@@ -17,17 +18,22 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#include	<strsub.h>
 #include	<strxcmp.h>
 
 
 EXTERNC_begin
 
 extern int	strwildsub(cchar *,cchar *) noex ;
-extern int	strwildsub(cchar *,cchar *) noex ;
 
 extern char	*strrpbrk(cchar *,cchar *) noex ;
 extern char	*strwhite(cchar *) noex ;
 
+/* deprecated (can give erroneous result) */
+extern char	*strbasename(cchar *) noex ;
+
+/* deprecated (writes to source string) */
+[[deprecated("writes to source string")]] extern char *strdirname(char *) noex ; 
 EXTERNC_end
 
 

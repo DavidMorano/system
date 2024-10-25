@@ -1,4 +1,5 @@
 /* mkchar HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a character (8-bit) out of an integer */

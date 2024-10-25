@@ -1,4 +1,5 @@
 /* ucmemla HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* object to provide large0allocation memory */

@@ -1,17 +1,16 @@
-/* checkname */
+/* checkname SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* check a directory entry for a match */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG 	0		/* run-time debugging */
-
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	This code was originally written.
-
 
 */
 
@@ -19,49 +18,44 @@
 
 /***********************************************************************
 
-	This subroutine is called by the 'process()' subroutine in order
-	to check if a filename is marked for some disposition.
+  	Name:
+	checkname
+
+	Description:
+	This subroutine is called by the |process()| subroutine in
+	order to check if a filename is marked for some disposition.
 
 	Synopsis:
-
-	int checkname(name,sbp,pip)
-	char		name[] ;
-	struct ustat	*sbp ;
-	struct proginfo	*pip ;
+	int checkname(proginfo *pip,cchar *name,USTAT *sbp) noex
 
 	Arguments:
-
+	pip		user specified argument
 	name		directory entry
 	sbp		'stat' block pointer
-	pip		user specified argument
 
 	Returns:
-
 	>0		skip this directory entry in directory walk
 	0		continue with directory walk as usual
-	<0		exit directory walk altogether
-
+	<0		error (system-return)
 
 ***********************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<fsdir.h>
 #include	<storebuf.h>
 #include	<vecstr.h>
+#include	<burn.h>
 #include	<localmisc.h>
 
 #include	"removename.h"
@@ -81,8 +75,6 @@
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	checklink(char *,struct ustat *,struct proginfo *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
-
-extern int	burn(randomvar *,int,const char *) ;
 
 
 /* external variables */
@@ -376,13 +368,13 @@ int		pdirlen ;
 	            rs1 = SR_OK ;
 	            if (! pip->f.no) {
 
-	                if (pip->f.burn)
-	                    burn(pip->rvp,pip->bcount,fname) ;
+	                if (pip->f.burn) {
+	                    rs = burn(fname,pip->bcount,pip->rvp) ;
+			}
 
-	                rs1 = u_unlink(fname) ;
-	                if (rs1 >= 0)
-	                pip->c_removed += 1 ;
-
+	                if ((rs1 = u_unlink(fname)) >= 0) {
+	                    pip->c_removed += 1 ;
+			}
 	            } /* end if */
 
 		    } /* end if (have good path) */

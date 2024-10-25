@@ -1,4 +1,5 @@
 /* getprojname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a project name from the system account database */

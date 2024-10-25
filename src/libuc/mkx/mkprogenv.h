@@ -1,4 +1,5 @@
 /* mkprogenv HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make new environment for a program */

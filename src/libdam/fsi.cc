@@ -160,7 +160,7 @@ int fsi_remove(fsi *op,char *sbuf,int slen) noex {
 	int		rl = 0 ;
 	if ((rs = ptm_lock(op->mxp)) >= 0) {
 	    {
-	        rs = fifostr_remove(op->qsp,sbuf,slen) ;
+	        rs = fifostr_rem(op->qsp,sbuf,slen) ;
 	        rl = rs ;
 	    }
 	    rs1 = ptm_unlock(op->mxp) ;

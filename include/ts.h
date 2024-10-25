@@ -31,7 +31,6 @@
 #define	TS_CUR			struct ts_cursor
 #define	TS_HDR			struct ts_header
 #define	TS_ENT			TSE_ALL
-
 #define	TS_FILEMAGIC		"TIMESTAMP"
 #define	TS_FILEMAGICSIZE	16
 #define	TS_FILEVERSION		0
@@ -40,11 +39,10 @@
 #define	TS_IDLEN		(TS_FILEMAGICSIZE + sizeof(uint))
 #define	TS_HEADTABLEN		(3 * sizeof(uint))
 #define	TS_TOPLEN		(TS_IDLEN + TS_HEADTABLEN)
-
 /* entry flags */
-#define	TS_FLA			0x01	/* flag-loadaverage */
-#define	TS_FUSERS		0x02	/* flag-users */
-#define	TS_FPMAVAIL		0x04	/* flag-percent_memory_available */
+#define	TS_FLA			(1 << 0)	/* loadaverage */
+#define	TS_FUSERS		(1 << 1)	/* users */
+#define	TS_FPMAVAIL		(1 << 2)	/* percent_memory_available */
 
 
 struct ts_header {
@@ -81,7 +79,9 @@ struct ts_head {
 	int		topsize ;
 	int		fd ;
 	int		ncursors ;
-	int		fileversion, fileencoding, filetype ;
+	int		fileversion (V) ;
+	int		fileencoding (E) ;
+	int		filetype (T) ;
 	mode_t		operm ;
 	char		topbuf[TS_TOPLEN + 1] ;	/* top-buffer */
 } ;

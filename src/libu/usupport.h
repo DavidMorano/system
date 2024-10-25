@@ -20,6 +20,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<utimeout.h>
 #include	<ulogerror.h>
 #include	<usysutility.hh>
@@ -41,39 +42,33 @@ EXTERNC_end
 #ifndef	TEMPLATE_MEMCLEAR
 #define	TEMPLATE_MEMCLEAR
 #ifdef	__cplusplus
-
 template<typename T>
 inline int memclear(T *op) noex {
 	csize	osz = sizeof(T) ;
 	return memclear(op,osz) ;
 }
-
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCLEAR */
 
 #ifndef	TEMPLATE_MEMCPY
 #define	TEMPLATE_MEMCPY
 #ifdef	__cplusplus
-
 template<typename T>
 inline void *memcpy(T *dp,void *sp) noex {
 	csize	dsz = sizeof(T) ;
 	return memcpy(dp,sp,dsz) ;
 }
-
 #endif /* __cplusplus */
 #endif /* TEMPLATE_MEMCPY */
 
 #ifndef	SUBROUTINE_CSTRLEN
 #define	SUBROUTINE_CSTRLEN
 #ifdef	__cplusplus
-
 consteval int cstrlen(cchar *sp) noex {
     	cchar		*cp = sp ;
 	while (*cp++) ;
 	return (cp - sp) ;
 }
-
 #endif /* __cplusplus */
 #endif /* SUBROUTINE_CSTRLEN */
 
@@ -111,7 +106,6 @@ EXTERNC_end
 #ifndef	OBJECT_GETUSTIME
 #define	OBJECT_GETUSTIME
 #ifdef	__cplusplus
-
 struct ugetustime {
 	operator time_t () noex {
 	    return time(nullptr) ;
@@ -120,9 +114,7 @@ struct ugetustime {
 	    return time(nullptr) ;
 	} ;
 } ; /* end struct (getustime) */
-
 extern ugetustime	getustime ;
-
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
 

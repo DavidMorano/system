@@ -1,4 +1,5 @@
 /* isort HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* looks like an Insertion-Sort */
@@ -22,13 +23,12 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin
 
-extern "C" {
-    typedef int	(*sortcmp_f)(cvoid *,cvoid *) noex ;
-}
+typedef int	(*sortcmp_f)(cvoid *,cvoid *) noex ;
 
 extern int isort(void *,int,int,sortcmp_f) noex ;
 

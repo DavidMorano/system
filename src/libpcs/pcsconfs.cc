@@ -30,7 +30,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-include	<mktmp.h>
+#include	<mktmp.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<ids.h>
@@ -178,9 +178,6 @@ extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	sncpy4(char *,int, cchar *,cchar *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	snwcpylc(char *,int,cchar *,int) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;

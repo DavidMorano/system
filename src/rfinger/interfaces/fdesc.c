@@ -1,41 +1,32 @@
-/* fdesc */
+/* fdesc SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface */
-
-
-#define	F_DEBUG		0
-#define	F_DEBUGFIELD	0
+/* version %I% last-modified %G% */
 
 
 /* revision history :
 
 	- 96/02/01, Dave Morano
-
 	This subroutine was adopted for use from the DWD program.
 
-
 	- 03/11/04, Dave Morano
-
 	I don't know where all this has been (apparently "around") but
 	I grabbed it from the FDESC object !
 
-
-
 */
 
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /******************************************************************************
 
 	This is an interface module.
 
-
-
 ******************************************************************************/
 
-
-#define	FDESC_MASTER	0
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
@@ -44,14 +35,11 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 
 #include	"misc.h"
 #include	"fdesc.h"
 #include	"dialer.h"
-
 
 
 /* local defines */
@@ -65,13 +53,7 @@
 #define	ARGBUFLEN	(MAXPATHLEN + 35)
 
 
-
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	starmat(const char *,const char *) ;
-extern int	getpwd(char *,int) ;
 
 
 /* external variables */
@@ -90,7 +72,7 @@ struct sinterface	fdesc = {
 
 /* local variables */
 
-static const unsigned char 	fterms[32] = {
+constexpr cpcchar		fterms[] = {
 	    0x00, 0x00, 0x00, 0x00,
 	    0x08, 0x10, 0x00, 0x24,
 	    0x00, 0x00, 0x00, 0x00,
@@ -102,32 +84,22 @@ static const unsigned char 	fterms[32] = {
 } ;
 
 
+/* exported variables */
 
 
+/* external subroutines */
 
-int fdesc_init(op,ap)
-FDESC		*op ;
-FDESC_ARGS	*ap ;
-{
-	int	rs = SR_OK ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	memset(op,0,sizeof(FDESC)) ;
-
-	if (ap != NULL) {
-
+int fdesc_init(FDESC *op,FDESC_ARGS *ap) noex {
+	int		rs = SR_OK ;
+	if (op == NULL) return SR_FAULT ;
+	memclear(op) ;
+	if (ap) {
 		op->fd = ap->fd ;
 		op->pid = ap->pid ;
 		op->flags = ap->flags ;
-
 	}
-
 	return rs ;
 }
-
 
 int fdesc_read(op,buf,buflen,to)
 FDESC		*op ;
@@ -243,47 +215,26 @@ time_t		daytime ;
 
 	} /* end for */
 
-#if	F_DEBUGS
-	eprintf("fdesc_check: ret rs=%d\n",rs) ;
-#endif
-
 	return c ;
 }
 /* end subroutine (fdesc_check) */
 
 #endif /* COMMENT */
 
-
-/* close the connection */
-int fdesc_close(op)
-FDESC		*op ;
-{
-	int	rs ;
-	int	cs ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != FDESC_MAGIC)
-	    return SR_NOTOPEN ;
+int fdesc_close(FDESC *op) noex {
+	int		rs ;
+	int		cs ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != FDESC_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_close(op->fd) ;
-
 	if (op->pid > 0) {
-
 		u_waitpid(op->pid,&cs,0) ;
-
 	} /* end if (waiting for program) */
 
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (fdesc_close) */
-
-
-
-/* INTERNAL SUBROUTINES */
-
 
 

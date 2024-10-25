@@ -1,4 +1,5 @@
 /* mkgecosname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make (or get) a GECOS name out of the raw PASSWD c-string */

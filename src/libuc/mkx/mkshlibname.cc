@@ -1,4 +1,5 @@
 /* mkshlibname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the filename for a shared library (shared object) */

@@ -171,7 +171,7 @@ int sfill_wline(sfill *op,int olinelen) noex {
 	            wlen += rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = fifostr_remove(op->fsp,nullptr,0) ;
+	            rs = fifostr_rem(op->fsp,nullptr,0) ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end while (getting words) */

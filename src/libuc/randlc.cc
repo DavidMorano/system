@@ -45,11 +45,18 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"randlc.h"
 
 
 /* local defines */
+
+
+/* exported subroutines */
+
+
+/* exported variables */
 
 
 /* local structures */

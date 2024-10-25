@@ -1,4 +1,5 @@
 /* ucmem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* provide some memory UNIX® operations*/

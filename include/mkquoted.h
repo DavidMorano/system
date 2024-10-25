@@ -1,4 +1,5 @@
 /* mkquoted HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Make-a-Quoted c-string (from a source c-string) */

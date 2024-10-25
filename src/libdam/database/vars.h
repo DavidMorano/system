@@ -30,12 +30,17 @@
 
 #define	VARS_MAGIC	0x88773421
 #define	VARS		struct vars_head
+#define	VARS_FL		struct vars_flags
 #define	VARS_INFO	struct vars_information
 #define	VARS_OBJ	struct vars_object
 #define	VARS_CUR	struct vars_cursor
 #define	VARS_FM		struct vars_fmap
 #define	VARS_MI		struct vars_mindex
 
+
+struct vars_flags {
+    	uint		modload::1 ;
+} ; /* end struct (vars_flags) */
 
 struct vars_information {
 	time_t		wtime ;
@@ -72,15 +77,17 @@ struct vars_mindex {
 
 struct vars_head {
 	cchar 		*dbname ;
-	VARS_FM		vf ;
-	VARS_MI		mi ;
 	varhdr		ifi ;		/* index-file (header) information */
 	time_t		ti_lastcheck ;	/* time last check of file */
+	VARS_FM		vf ;
+	VARS_MI		mi ;
+	VARS_FL		fl ;
 	uint		magic ;
 	int		ncursors ;
 } ;
 
 typedef	VARS		vars ;
+typedef	VARS_FL		vars_fl ;
 typedef	VARS_INFO	vars_info ;
 typedef	VARS_OBJ	vars_obj ;
 typedef	VARS_CUR	vars_cur ;

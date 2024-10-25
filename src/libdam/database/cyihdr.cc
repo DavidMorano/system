@@ -1,6 +1,9 @@
 /* cyihdr SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* text-index for CYI-INDEX file */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

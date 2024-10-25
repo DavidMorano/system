@@ -1,4 +1,5 @@
 /* removename SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* remove a named file-system object (and its descendants) */
@@ -52,6 +53,7 @@
 #include	<wdt.h>
 #include	<vecpstr.h>
 #include	<randomvar.h>
+#include	<burn.h>
 #include	<localmisc.h>
 
 #include	"removename.h"
@@ -74,8 +76,6 @@ extern "C" {
 
 
 /* external subroutines */
-
-extern int	burn(randomvar *,int,cchar *) noex ;
 
 
 /* external variables */
@@ -102,8 +102,8 @@ struct removeinfo {
 
 /* forward references */
 
-static int	removeit(cchar *,USTAT *,REMOVEINFO *) noex ;
-static int	rmdirs(REMOVEINFO *) noex ;
+static int	removeit(cchar *,USTAT *,removeinfo *) noex ;
+static int	rmdirs(removeinfo *) noex ;
 
 
 /* local variables */
@@ -124,7 +124,7 @@ int removename(randomvar *rvp,int bcount,int opts,cchar *name) noex {
 	int		wopts = 0 ;
 	bool		f_rv = false ;
 
-	if (name == NULL)
+	if (name == nullptr)
 	    return SR_FAULT ;
 
 	rs = u_lstat(name,&sb) ;
@@ -137,7 +137,7 @@ int removename(randomvar *rvp,int bcount,int opts,cchar *name) noex {
 	ri.bcount = bcount ;
 	ri.c_removed = 0 ;
 
-	if (ri.f.burn && (rvp == NULL)) {
+	if (ri.f.burn && (rvp == nullptr)) {
 
 	    rs = randomvar_start(&x,false,opts) ;
 	    if (rs < 0)
@@ -223,7 +223,7 @@ static int removeit(cchar *name,USTAT *sbp,removeinfo *rip) noex {
 	    rs = vecpstr_add(&rip->dirs,name,-1) ;
 	} else {
 	    if (rip->f.burn && S_ISREG(sbp->st_mode)) {
-	        rs = burn(rip->rvp,rip->bcount,name) ;
+	        rs = burn(name,rip->bcount,rip->rvp) ;
 	    }
 	    if (rs >= 0) {
 	        if ((rs = u_unlink(name)) >= 0) {
@@ -235,22 +235,26 @@ static int removeit(cchar *name,USTAT *sbp,removeinfo *rip) noex {
 }
 /* end subroutine (removeit) */
 
-static int rmdirs(REMOVEINFO *rip) noex {
+static int rmdirs(removeinfo *rip) noex {
 	vecpstr		*dlp = &rip->dirs ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = vecpstr_count(dlp)) > 0) {
 	    n = rs ;
-	    if ((rs = vecpstr_sort(dlp,NULL)) >= 0) {
-		cchar	*cp ;
+	    if ((rs = vecpstr_sort(dlp,nullptr)) >= 0) {
+		bool	fe = false ;
 	        for (int i = (n - 1) ; i >= 0 ; i -= 1) {
-	            if (vecpstr_get(dlp,i,&cp) >= 0) {
+		    if (cchar *cp{} ; (rs = vecpstr_get(dlp,i,&cp)) >= 0) {
 	                if (cp) {
 	                    if ((rs = u_rmdir(cp)) >= 0) {
 	                        rip->c_removed += 1 ;
 			    }
 	                }
+		    } else if (rs == rsn) {
+			fe = true ;
 	            }
+		    if (fe) break ;
 		    if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if */

@@ -1,4 +1,5 @@
 /* matkeystr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* match the key part of a string */
@@ -41,9 +42,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<nleadkeystr.h>
 #include	<strkeycmp.h>
 #include	<localmisc.h>
@@ -69,11 +72,14 @@
 /* local variables */
 
 
-/* local subroutines */
+/* forward references */
 
-static inline bool keyend(cint ch) noex {
+static constexpr bool keyend(cint ch) noex {
 	return (((ch) == '\0') || ((ch) == '=')) ;
 }
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -83,7 +89,7 @@ static inline bool keyend(cint ch) noex {
 
 int matkeystr(mainv a,cchar *sp,int sl) noex {
 	cint		sch = sp[0] ; /* ok: everything promotes the same */
-	int		i ; /* used afterwards */
+	int		i{} ; /* used-afterwards */
 	int		f = false ;
 	if (sl >= 0) {
 	    for (i = 0 ; a[i] != nullptr ; i += 1) {

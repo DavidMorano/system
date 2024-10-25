@@ -22,6 +22,7 @@
 #include	<usysrets.h>
 
 #include	<libmallocxx.h>
+#include	<getxname.h>
 
 
 #endif /* LIBUC_INCLUDE */

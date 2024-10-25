@@ -1,4 +1,5 @@
 /* getnodename SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the node-name of this node */

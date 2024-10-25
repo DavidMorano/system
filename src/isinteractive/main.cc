@@ -1,6 +1,9 @@
 /* main (isinteractive) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* whole program for ISINTERACTIVE */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,15 +15,13 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<pwd.h>
 #include	<cstdio>
-
+#include	<pwd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -30,14 +31,9 @@
 
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
-{
-	int	ex = 0 ;
-	int	f = TRUE ;
+int main(int argc,mainv argv,mainv envv) {
+	int		ex = 0 ;
+	int		f = TRUE ;
 
 
 	f = f && (isatty(0) > 0) ;

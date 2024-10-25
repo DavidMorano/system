@@ -1,4 +1,5 @@
 /* fifostr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* FIFO string operations */
@@ -19,11 +20,16 @@
 
 /*******************************************************************************
 
+  	Object:
+	fifostr
+
+	Description:
 	This object manages a FIFO of strings.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -216,7 +222,7 @@ int fifostr_entlen(fifostr *op,int n) noex {
 }
 /* end subroutine (fifostr_entlen) */
 
-int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
+int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op)) >= 0) {
@@ -245,7 +251,7 @@ int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
-/* end subroutine (fifostr_remove) */
+/* end subroutine (fifostr_rem) */
 
 int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
@@ -389,5 +395,69 @@ static int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
 	return rs ;
 }
 /* end subroutine (fifostr_mat) */
+
+int fifostr::add(cchar *sp,int sl) noex {
+	return fifostr_add(this,sp,sl) ;
+}
+
+int fifostr::headread(char *rbuf,int rlen) noex {
+	return fifostr_headread(this,rbuf,rlen) ;
+}
+
+int fifostr::entread(char *rbuf,int rlen,int n) noex {
+	return fifostr_entread(this,rbuf,rlen,n) ;
+}
+
+int fifostr::entlen(int n) noex {
+	return fifostr_entlen(this,n) ;
+}
+
+int fifostr::rem(char *rbuf,int rlen) noex {
+	return fifostr_rem(this,rbuf,rlen) ;
+}
+
+int fifostr::curbegin(fifostr_cur *curp) noex {
+	return fifostr_curbegin(this,curp) ;
+}
+
+int fifostr::curend(fifostr_cur *curp) noex {
+	return fifostr_curend(this,curp) ;
+}
+
+int fifostr::curenum(fifostr_cur *curp,char *rbuf,int rlen) noex {
+	return fifostr_curenum(this,curp,rbuf,rlen) ;
+}
+
+int fifostr::curdel(fifostr_cur *curp) noex {
+	return fifostr_curdel(this,curp) ;
+}
+
+void fifostr::dtor() noex {
+	if (cint rs = int(finish) ; rs < 0) {
+	    ulogerror("fifostr",rs,"fini-finish") ;
+	}
+}
+
+fifostr_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fifostrmem_start:
+	        rs = fifostr_start(op) ;
+	        break ;
+	    case fifostrmem_headlen:
+	        rs = fifostr_headlen(op) ;
+	        break ;
+	    case fifostrmem_count:
+	        rs = fifostr_count(op) ;
+	        break ;
+	    case fifostrmem_finish:
+	        rs = fifostr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (fifostr_co::operator) */
 
 

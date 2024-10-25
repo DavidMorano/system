@@ -21,12 +21,9 @@
         This subroutine processes one name at a time. The name can be either a
         file or a directory.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -36,12 +33,10 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<field.h>
-#include	<wdt.h>
 #include	<localmisc.h>
 
 #include	"config.h"

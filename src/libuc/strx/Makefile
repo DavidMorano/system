@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -58,10 +57,10 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ0= strwildsub.o strrpbrk.o
 OBJ1= strwhite.o
-OBJ2=
-OBJ3=
+OBJ2= strsub.o
+OBJ3= strbasename.o strdirname.o
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 #OBJB= obj3.o obj4.o obj5.o
 
 OBJ= $(OBJA)
@@ -96,9 +95,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
-
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -137,8 +133,12 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-strwildsub.o:		strwildsub.cc	$(INCS)
-strrpbrk.o:		strrpbrk.cc	$(INCS)
-strwhite.o:		strwhite.cc	$(INCS)
+strwildsub.o:		strwildsub.cc		$(INCS)
+strrpbrk.o:		strrpbrk.cc		$(INCS)
+strwhite.o:		strwhite.cc		$(INCS)
+strsub.o:		strsub.cc strsub.h	$(INCS)
+
+strbasename.o:		strbasename.cc		$(INCS)
+strdirname.o:		strdirname.cc		$(INCS)
 
 

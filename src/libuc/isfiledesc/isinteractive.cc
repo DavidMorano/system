@@ -1,4 +1,5 @@
 /* isinteractive SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* test if we have a controlling terminal or not */
@@ -29,6 +30,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -43,21 +46,40 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
+
+isinterobj	isiteractive ;
 
 
 /* exported subroutines */
 
-int isinteractive() noex {
+isinterobj::operator int () noex {
+    	cint		of = O_RDONLY ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = u_open(TTYFNAME,O_RDONLY,0666)) >= 0) {
+	cmode		om = 0 ;
+	if ((rs = u_open(TTYFNAME,of,om)) >= 0) {
 	    f = true ;
 	    u_close(rs) ;
 	} else if (isNotPresent(rs)) {
@@ -65,6 +87,6 @@ int isinteractive() noex {
 	}
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (isinteractive) */
+/* end method (isinterobj::operator) */
 
 

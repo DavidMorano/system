@@ -48,6 +48,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strncpy(3c)| + |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
@@ -55,6 +56,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strwcpy.h>
+#include	<localmisc.h>
 
 #include	"strn.h"
 

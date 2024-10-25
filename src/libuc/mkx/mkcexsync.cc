@@ -1,4 +1,5 @@
 /* mkcexsync SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the synchronization string used for CEX */
@@ -63,6 +64,9 @@
 
 /* local variables */
 
+constexpr int		reqlen = MKCEXSYNC_REQLEN ;
+constexpr int		finlen = MKCEXSYNC_FINLEN ;
+
 
 /* exported variables */
 
@@ -70,20 +74,23 @@
 /* exported subroutines */
 
 int mkcexsync(char *rbuf,int rlen) noex {
-	cint		leaderlen = (rlen - MKCEXSYNC_FINLEN) ;
-	int		rs = SR_OVERFLOW ;
+    	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (rlen >= MKCEXSYNC_REQLEN) {
-	    int		j{} ;
-	    for (j = (leaderlen-1) ; j >= 0 ; j -= 1) {
-	        rbuf[i] = (i & 1) ;
-	        i += 1 ;
-	    }
-	    for (j = 0 ; j < MKCEXSYNC_FINLEN ; j += 1) {
-	        rbuf[i++] = CH_SYNC ;
-	    }
-	    rs = SR_OK ;
-	} /* end if (valid) */
+	if (rbuf) {
+	    cint	leaderlen = (rlen - finlen) ;
+	    rs = SR_OVERFLOW ;
+	    if (rlen >= reqlen) {
+	        int	j{} ;
+	        for (j = (leaderlen-1) ; j >= 0 ; j -= 1) {
+	            rbuf[i] = (i & 1) ;
+	            i += 1 ;
+	        }
+	        for (j = 0 ; j < finlen ; j += 1) {
+	            rbuf[i++] = CH_SYNC ;
+	        }
+	        rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkcexsync) */

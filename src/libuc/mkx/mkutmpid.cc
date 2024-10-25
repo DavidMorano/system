@@ -1,4 +1,5 @@
 /* mkutmpid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a UTMPX entry ID (c_string) */

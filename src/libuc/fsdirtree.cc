@@ -324,7 +324,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	        while (rs >= 0) {
 	            cdnp = op->bnbuf + op->bndlen ;
 	            mlen = MAXPATHLEN - op->bndlen ;
-	            rs = fifostr_remove(&op->dirq,cdnp,mlen) ;
+	            rs = fifostr_rem(&op->dirq,cdnp,mlen) ;
 	            len = rs ;
 	            if ((rs < 0) && (rs != SR_NOTFOUND)) break ;
 	            if (rs == SR_NOTFOUND) {

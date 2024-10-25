@@ -372,8 +372,7 @@ int storeitem::block(int bsz,int bal,void **vpp) noex {
 }
 
 void storeitem::dtor() noex {
-	cint	rs = int(finish) ;
-	if (rs < 0) {
+	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("storeitem",rs,"fini-finish") ;
 	}
 }

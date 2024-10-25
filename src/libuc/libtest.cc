@@ -33,6 +33,13 @@
 using namespace std ;
 
 
+/* local namesapces */
+
+extern "C" {
+    typedef void (*voidint_f)(int) noex ;
+}
+
+
 /* external subroutines */
 
 extern "C" {
@@ -74,8 +81,7 @@ void exit(int ex) {
 	    write(1,sp,sl) ;
 	{
 	    void	*dlp = dlsym(RTLD_NEXT,"exit") ;
-	    typedef void (*void_f)(int) ;
-	    void_f	ef = (void_f) dlp ;
+	    voidint_f	ef = (voidint_f) dlp ;
 	    (*ef)(ex) ;
 	}
 	std::unreachable() ;

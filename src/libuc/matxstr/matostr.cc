@@ -1,4 +1,5 @@
 /* matostr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Match-Option-String */
@@ -17,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	matobasestr
+	mato{x}str
 
 	Description:
 	Check that the given string matches a MINIMUM number of
@@ -26,9 +27,10 @@
 	we do not match, we return "less-than-zero".
 
 	Synopsis:
-	int matobasestr(cchar *const *a,int n,cchar *sp,int sl) noex
+	int mato{x}str(cchar *const *a,int n,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		base, case, fold
 	a		array of string to match against
 	n		minimum number of characters that must match
 	sp		string to test against array
@@ -37,55 +39,22 @@
 	Returns:
 	>=0		index of match in array
 	<0		no match found (not further distinguished)
-
-
-	Name:
-	matocasestr
-
-	Description:
-	Check that the given string case-insensitively matches a
-	MINIMUM number of leading characters for some string in the
-	given array of strings.  If we get a match, we return the
-	array index.  If we do not match, we return "less-than-zero".
-
-	Synopsis:
-	int matocasestr(cchar **a,int n,cchar *sp,int sl) noex
-
-	Arguments:
-	a		array of string to match against
-	n		minimum number of characters that must match
-	sp		string to test against array
-	sl		length of test string
-
-	Returns:
-	>=0		index of match in array
-	<0		no match found (not further distinguished)
-
-
-	Notes:
-	1. Rationale for using templates rather than passing a 
-	function-pointer:
-	The thinking is that I want the template instantiation to
-	"see" any inlined subroutine and optimize it all out rather
-	than being forced to actually call a subroutine (if only a
-	pointer was supplied). Anywat, that was the thinking, even
-	if misguided. Also note that this goes against one of the
-	major coding standard rules which is: to optimize for space
-	rather than time (without the compiler doing that operation
-	itself).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
 #include	<localmisc.h>
 
+#include	"matstr.h"		/* <- needed for one case */
 #include	"matostr.h"
 
 
@@ -97,8 +66,11 @@
 
 /* local typedefs */
 
-typedef int (*toxc_f)(int) noex ;
-typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+    typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+    typedef int (*matxstr_f)(mainv,cchar *,int) noex ;
+}
 
 
 /* external subroutines */
@@ -107,52 +79,73 @@ typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
 /* external variables */
 
 
+/* local structures */
+
+namespace {
+    struct mater {
+	toxc_f		toxc ;
+	nleadxstr_f	nleadx ;
+	matxstr_f	matxstr ;
+	int matoxstr(mainv,int,cchar *,int) noex ;
+	mater(toxc_f t,nleadxstr_f n,matxstr_f m) noex { 
+	    toxc = t ;
+	    nleadx = n ;
+	    matxstr = m ;
+	} ; /* end ctor */
+    } ; /* end struct (mater) */
+}
+
+
 /* forward references */
 
 
 /* local variables */
 
 
-/* subroutine-templates */
-
-template<toxc_f toxc,nleadxstr_f nleadxstr>
-int matoxstr(mainv a,int n,cchar *sp,int sl) noex {
-	cint		lch = toxc(sp[0]) ;
-	int		i ;
-	int		m ;
-	if (sl < 0) sl = strlen(sp) ;
-	for (i = 0 ; a[i] ; i += 1) {
-	    cchar	*ap = a[i] ;
-	    if ((m = (lch == toxc(ap[0]))) > 0) {
-	        m = nleadxstr(ap,sp,sl) ;
-	    }
-	    if ((m == sl) && ((m >= n) || (ap[m] == '\0'))) {
-		break ; 
-	    }
-	} /* end for */
-	return (a[i]) ? i : -1 ;
-}
-/* end subroutine-template (matoxstr) */
-
-
-/* exported variables */
-
-
 /* exported subroutines */
 
 int matobasestr(mainv a,int n,cchar *sp,int sl) noex {
-	return matoxstr<tobc,nleadbasestr>(a,n,sp,sl) ;
+	mater	mo(tobc,nleadbasestr,matbasestr) ;
+	return mo.matoxstr(a,n,sp,sl) ;
 }
 /* end subroutine (matobasestr) */
 
 int matocasestr(mainv a,int n,cchar *sp,int sl) noex {
-	return matoxstr<tolc,nleadcasestr>(a,n,sp,sl) ;
+	mater	mo(tolc,nleadcasestr,matcasestr) ;
+	return mo.matoxstr(a,n,sp,sl) ;
 }
 /* end subroutine (matocasestr) */
 
 int matofoldstr(mainv a,int n,cchar *sp,int sl) noex {
-	return matoxstr<tofc,nleadfoldstr>(a,n,sp,sl) ;
+	mater	mo(tofc,nleadfoldstr,matfoldstr) ;
+	return mo.matoxstr(a,n,sp,sl) ;
 }
 /* end subroutine (matofoldstr) */
+
+
+/* local subroutines */
+
+int mater::matoxstr(mainv a,int n,cchar *sp,int sl) noex {
+	int		si = -1 ;
+	if (sl < 0) sl = strlen(sp) ;
+	if (n >= 0) {
+	    cint	lch = toxc(sp[0]) ;
+	    for (int i = 0 ; a[i] ; i += 1) {
+	        int	m ;
+	        cchar	*ap = a[i] ;
+	        if ((m = (lch == toxc(ap[0]))) > 0) {
+	            m = nleadx(ap,sp,sl) ;
+	        }
+	        if ((m == sl) && ((m >= n) || (ap[m] == '\0'))) {
+		    si = i ;
+		    break ; 
+	        }
+	    } /* end for */
+	} else {
+	    si = matxstr(a,sp,sl) ;
+	}
+	return si ;
+}
+/* end method (mater::matoxstr) */
 
 

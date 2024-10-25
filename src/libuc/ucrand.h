@@ -1,4 +1,5 @@
 /* ucrand HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get random data from the system */

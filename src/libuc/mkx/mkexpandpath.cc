@@ -1,4 +1,5 @@
 /* mkexpandpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make an expanded path */

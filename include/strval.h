@@ -1,4 +1,5 @@
 /* strval HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* return (calculate) the numeric value of a given string */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

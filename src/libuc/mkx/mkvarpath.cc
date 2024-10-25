@@ -1,4 +1,5 @@
 /* mkvarpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to make a prefix-variable path */

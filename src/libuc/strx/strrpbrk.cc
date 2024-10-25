@@ -1,4 +1,5 @@
 /* strrpbrk SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a character in a counted string */
@@ -42,7 +43,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 

@@ -1,9 +1,28 @@
 /* randomvar HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* random-variable object */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-08-11, David A­D­ Morano
+	This object module was originally written.
+
+*/
+
+/*******************************************************************************
+
+  	Object:
+	randomvar
+
+	Description:
+	This code is part of the UNIX® standard-library interface layer
+	library ("libuc").
+
+*******************************************************************************/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -12,6 +31,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* system types */
+#include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 #include	<stdintx.h>
 
@@ -21,7 +42,6 @@
 #define	RANDOMVAR_DIGIT		ulong
 #define	RANDOMVAR_STATELEN	(RANDOMVAR_DEGREE+1)
 #define	RANDOMVAR_STIRINT	(5 * 60)
-
 #define	RANDOMVAR		struct randomvar_head
 #define	RANDOMVAR_FL		struct randomvar_flags
 
@@ -40,7 +60,67 @@ struct randomvar_head {
 	int		a, b, c ;
 } ;
 
+#ifdef	__cplusplus
+enum randomvarmems {
+	randomvarmem_finish,
+	randomvarmem_overlast
+} ;
+struct randomvar ;
+struct randomvar_st {
+	randomvar	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (randomvar *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0,uint = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (randomvar_st) */
+struct randomvar_co {
+	randomvar	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (randomvar *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (randomvar_co) */
+struct randomvar : randomvar_head {
+	randomvar_st	start ;
+	randomvar_co	finish ;
+	randomvar() noex {
+	    start(this,0) ;
+	    finish(this,randomvarmem_finish) ;
+	} ;
+	randomvar(const randomvar &) = delete ;
+	randomvar &operator = (const randomvar &) = delete ;
+	int stateload(cchar *,int) noex ;
+	int statesave(char *,int) noex ;
+	int setpoly(int,int) noex ;
+	int addnoise(cvoid *,int) noex ;
+	int getlong(long *) noex ;
+	int getulong(ulong *) noex ;
+	int getint(int *) noex ;
+	int getuint(uint *) noex ;
+	int get(void *,int) noex ;
+	int get(long *) noex ;
+	int get(ulong *) noex ;
+	int get(int *) noex ;
+	int get(uint *) noex ;
+	void dtor() noex ;
+	~randomvar() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (randomvar) */
+#else	/* __cplusplus */
 typedef RANDOMVAR	randomvar ;
+#endif /* __cplusplus */
+
 typedef RANDOMVAR_FL	randomvar_fl ;
 
 EXTERNC_begin

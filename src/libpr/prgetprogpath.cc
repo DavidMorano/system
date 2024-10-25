@@ -25,10 +25,10 @@
 	to verify that it is executable.
 
 	Important:
-	This subroutine is different from 'pcsgetprog(3pcs)' in
+	This subroutine is different from |pcsgetprog(3pcs)| in
 	that this will return a full path of the found program
 	whenever it is different than what was supplied.  In contrast,
-	the 'pcsgetprog(3pcs)' subroutine only returns the full
+	the |pcsgetprog(3pcs)| subroutine only returns the full
 	path of the found program when it is not absolute and it
 	is found in the PCS distribution.
 
@@ -80,8 +80,6 @@
 #ifndef	VARPATH
 #define	VARPATH		"PATH"
 #endif
-
-#define	NDF		"prgetprogpath.deb"
 
 
 /* imported namespaces */

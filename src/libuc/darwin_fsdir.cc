@@ -25,14 +25,14 @@
 	This code module provides a platform independent implementation
 	of UNIX® file system directory access.  This module uses
 	the system call |getdent(2)| to read the directories and
-	to format them into entries. This is on Solaris® and perhaps
+	to format them into entries.  This is on Solaris® and perhaps
 	some others (even some more but in slightly different forms),
 	but it is not generally portable.  A portable version of
 	this object is located in |fsdirport(3dam)|.  It would have
 	been colocated in this file (with appropriate compile-time
 	define switches) but it is just way too ugly to look at.
 	Besides, depending on platform, it itself is not always
-	multi-thread-safe or reentrant. If you want it you know
+	multi-thread-safe or reentrant.  If you want it you know
 	where to find it.
 
 *******************************************************************************/

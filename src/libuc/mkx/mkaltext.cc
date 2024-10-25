@@ -1,4 +1,5 @@
 /* mkaltext SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a file-name w/ an alternate extension */

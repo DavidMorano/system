@@ -1,4 +1,5 @@
 /* matxstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Match a String */
@@ -23,17 +24,15 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 
 #include	<matostr.h>
 #include	<matpstr.h>
 #include	<matkeystr.h>
+#include	<matsubstr.h>
 
 
 EXTERNC_begin
 
-extern int	matsubstr(mainv,cchar *,int) noex ;
-extern int	matcasesubstr(mainv,cchar *,int) noex ;
 extern int	matnstr(mainv,cchar *,int) noex ;
 extern int	matlocalfs(cchar *,int) noex ;
 

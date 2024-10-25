@@ -1,4 +1,5 @@
 /* ucbmemalloc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* memory allocation facility */

@@ -1,4 +1,5 @@
 /* mkfmtphone SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* similar to |snwcpy(3dam)| but formatting a phone number */

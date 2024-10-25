@@ -16,6 +16,9 @@
 
 /******************************************************************************
 
+  	Names:
+
+	Description:
 	We check for specified permissions on a file given an IDS
 	object (for the user to check permissions for) and the
 	|stat(2)| of the file in question.

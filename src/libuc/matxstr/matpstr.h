@@ -1,4 +1,5 @@
 /* matpstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Match a String */
@@ -23,7 +24,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 
 
 EXTERNC_begin

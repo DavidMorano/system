@@ -109,7 +109,8 @@ static int nodesfile_dtor(nodesfile *op) noex {
 }
 /* end subroutine (nodesfile_dtor) */
 
-static int	nodesfile_opener(nodesfile *) noex ;
+static int	nodesfile_opens(NF *,cchar *,int) noex ;
+static int	nodesfile_opener(NF *) noex ;
 static int	nodesfile_parse(NF *) noex ;
 static int	nodesfile_filechanged(NF *,time_t) noex ;
 static int	nodesfile_filemapbegin(NF *) noex ;
@@ -128,40 +129,14 @@ static int	hdb_release(hdb *) noex ;
 
 int nodesfile_open(NF *op,cchar *fname,int maxsize,int of) noex {
 	int		rs ;
-	int		rs1 ;
 	if ((rs = nodesfile_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0] && (maxsize > 0)) {
-		if ((rs = uc_open(fname,of,0666)) >= 0) {
-		    USTAT	sb ;
-		    cint	fd = rs ;
-		    if ((rs = uc_fstat(fd,&sb)) >= 0) {
-			rs = SR_PROTO ;
-			if (S_ISREG(sb.st_mode)) {
-	    		    rs = SR_TOOBIG ;
-			    if (sb.st_size < maxsize) {
-				cchar	*cp{} ;
-				op->maxsize = maxsize ;
-				op->pagesize = getpagesize() ;
-				op->fi.oflags = of ;
-				if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-				    op->fi.fname = cp ;
-				    op->fi.mtime = sb.st_mtime ;
-				    op->fi.ino = sb.st_ino ;
-				    op->fi.dev = sb.st_dev ;
-				    op->filesize = sb.st_size ;
-				    rs = nodesfile_opener(op) ;
-				    if (rs < 0) {
-	    				uc_free(op->fi.fname) ;
-	    				op->fi.fname = nullptr ;
-				    }
-				} /* end if (m-a) */
-			    } /* end if (size OK) */
-			} /* end if (type-of-file) */
-		    } /* end if (stat-file) */
-		    rs1 = uc_close(fd) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (open-file) */
+		if ((rs = uc_pagesize()) >= 0) {
+		    op->pagesize = rs ;
+		    op->maxsize = maxsize ;
+		    rs = nodesfile_opens(op,fname,of) ;
+		} /* end if (uc_pagesize) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		nodesfile_dtor(op) ;
@@ -294,8 +269,41 @@ int nodesfile_enum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 
 /* private subroutines */
 
+static int nodesfile_opens(NF *op,cc *fn,int of) noex {
+    	int		rs ;
+	int		rs1 ;
+	if ((rs = uc_open(fn,of,0)) >= 0) {
+	    cint	fd = rs ;
+	    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+		rs = SR_PROTO ;
+		if (S_ISREG(sb.st_mode)) {
+		    rs = SR_TOOBIG ;
+		    if (sb.st_size < op->maxsize) {
+			op->fi.oflags = of ;
+			if (cc *cp{} ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
+			    op->fi.fname = cp ;
+			    op->fi.mtime = sb.st_mtime ;
+			    op->fi.ino = sb.st_ino ;
+			    op->fi.dev = sb.st_dev ;
+			    op->filesize = sb.st_size ;
+			    rs = nodesfile_opener(op) ;
+			    if (rs < 0) {
+			        uc_free(op->fi.fname) ;
+			        op->fi.fname = nullptr ;
+			    }
+			} /* end if (m-a) */
+		    } /* end if (size OK) */
+		} /* end if (type-of-file) */
+	    } /* end if (stat-file) */
+	    rs1 = uc_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (open-file) */
+	return rs ;
+}
+/* end subroutine (nodesfile_opens) */
+
 static int nodesfile_opener(nodesfile *op) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = nodesfile_filemapbegin(op)) >= 0) {
 	    cint	ne = NODESFILE_DEFNODES ;

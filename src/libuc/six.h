@@ -22,6 +22,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	<sifext.h>
 
@@ -41,13 +42,18 @@ extern int siskipwhite(cchar *,int) noex ;
 extern int silbrace(cchar *,int) noex ;
 extern int sileader(cchar *,int) noex ;
 extern int sibreak(cchar *,int,cchar *) noex ;
-extern int sicasesub(cchar *,int,cchar *) noex ;
 extern int sihyphen(cchar *,int) noex ;
 extern int sispan(cchar *,int,cchar *) noex ;
-extern int sisub(cchar *,int,cchar *) noex ;
 extern int sicite(cchar *,int,cchar *,int) noex ;
 extern int siterm(cchar *,int,cchar *) noex ;
 
+extern int sibasesub(cchar *,int,cchar *) noex ;
+extern int sicasesub(cchar *,int,cchar *) noex ;
+extern int sifoldsub(cchar *,int,cchar *) noex ;
+
+static inline int sisub(cchar *sp,int sl,cchar *ss) noex {
+	return sibasesub(sp,sl,ss) ;
+}
 static inline int sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
 }
