@@ -138,7 +138,6 @@ obj5.o:			$(OBJ5)
 
 getchostname.o:		getchostname.cc	getchostname.h		$(INCS)
 getclustername.o:	getclustername.cc getclustername.h	$(INCS)
-getcname.o:		getcname.cc	getexecname.h		$(INCS)
 getfname.o:		getfname.cc	getfname.h		$(INCS)
 getgroupname.o:		getgroupname.cc	getgroupname.h		$(INCS)
 getnodename.o:		getnodename.cc	getnodename.h		$(INCS)

@@ -1,4 +1,5 @@
 /* strtox SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* conversion of a decimal c-sting to the type |longlong| */
@@ -71,9 +72,10 @@
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cctype>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 #include	"strtox.h"

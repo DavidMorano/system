@@ -49,7 +49,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<getidname.h>		/* |getuid_name(3uc)| */
+#include	<getxid.h>		/* |getuid_name(3uc)| */
 #include	<nisdomainname.h>	/* |nisdomainname(3uc)| */
 #include	<sncpyx.h>
 #include	<ctdec.h>

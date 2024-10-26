@@ -65,6 +65,7 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -250,7 +251,7 @@ int nodesfile_curend(NF *op,nodesfile_cur *curp) noex {
 }
 /* end subroutine (nodesfile_curend) */
 
-int nodesfile_enum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
+int nodesfile_curenum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
 	if (op && curp) {
@@ -264,7 +265,7 @@ int nodesfile_enum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
 }
-/* end subroutine (nodesfile_enum) */
+/* end subroutine (nodesfile_curenum) */
 
 
 /* private subroutines */
@@ -344,15 +345,15 @@ static int nodesfile_parse(NF *op) noex {
 	        } else {
 	            sl -= ((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
-/* remove trailing comments */
+		    /* remove trailing comments */
 		    for (int i = 0 ; i < cl ; i += 1) {
 			if (cp[i] == '#') {
-				cl = i ;
-				break ;
+			    cl = i ;
+			    break ;
 			}
 		    } /* end for */
-/* store it */
-	            key.buf = (void *) cp ;
+		    /* store it */
+	            key.buf = cp ;
 	            key.len = cl ;
 	            rs = hdb_store(op->nlp,key,value) ;
 	            n += 1 ;

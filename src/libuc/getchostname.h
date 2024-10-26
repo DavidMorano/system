@@ -1,7 +1,8 @@
-/* strtox HEADER */
+/* getchostname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* numeric-character conversion */
+/* get a cannical host-name */
 /* version %I% last-modified %G% */
 
 
@@ -14,31 +15,29 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRTOX_INCLUDE
-#define	STRTOX_INCLUDE
+#ifndef	GETCHOSTNAME_INCLUDE
+#define	GETCHOSTNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<stdintx.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern longlong		strtoxll(cchar *,char **,int) noex ;
-extern ulonglong	strtoxull(cchar *,char **,int) noex ;
+extern int getchostname(char *,cchar *) noex ;
 
-#ifdef	COMMENT
-extern intmax		strtoxim(cchar *,char **,int) noex ;
-extern uintmax		strtoxuim(cchar *,char **,int) noex ;
-#endif /* COMMENT */
+static inline int getcname(char *cbuf,cchar *name) noex {
+	return getchostname(cbuf,name) ;
+}
 
 EXTERNC_end
 
 
-#endif /* STRTOX_INCLUDE */
+#endif /* GETCHOSTNAME_INCLUDE */
 
 

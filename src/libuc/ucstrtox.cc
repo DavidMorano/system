@@ -1,4 +1,5 @@
 /* ucstrtox SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucstrtox
+
+	Description:
 	I make an interface to the standard-C library for most
 	types.  But I have to roll my own for the |xlonglong| type
 	(|xint64_t|).  I have six exported subroutines from this
@@ -33,6 +38,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<stdintx.h>

@@ -2,44 +2,40 @@
 
 T= src
 
-ALL= $(T).so $(T).a
+ALL= $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
-LDRPATH= $(REPOROOT)/lib
-
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-
-
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
 DEFS +=
 
 INCS +=
 
-LIBS=
+LIBS +=
 
 
 INCDIRS=
@@ -47,21 +43,22 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
-LDRAPTH=
+RUNINFO= -rpath $(RUNDIR)
+
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_SRC= 
-OBJ1_SRC= 
-OBJ2_SRC= 
-OBJ3_SRC= 
-
+OBJ0_SRC= libu.o libuc.o
+OBJ1_SRC= libdam.o libpcs.o
+OBJ2_SRC= libmailmsg.o
+OBJ3_SRC= libpr.o
 
 OBJA_SRC= obj0_src.o obj1_src.o
 OBJB_SRC= obj2_src.o obj3_src.o
@@ -69,28 +66,32 @@ OBJB_SRC= obj2_src.o obj3_src.o
 OBJ_SRC= $(OBJA_SRC) $(OBJB_SRC)
 
 
-default:		$(T).o
+.SUFFIXES:		.hh .ii
+
+
+default:		$(T).a
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
 
-
-$(T).o:			$(OBJ_SRC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SRC)
 
 $(T).a:			$(OBJ_SRC)
 	$(AR) $(ARFLAGS) -rc $@ $?
@@ -112,16 +113,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_src.o:	$(OBJ0_SRC)
+
+obj0_src.o:		$(OBJ0_SRC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SRC)
 
-obj1_src.o:	$(OBJ1_SRC)
+obj1_src.o:		$(OBJ1_SRC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SRC)
 
-obj2_src.o:	$(OBJ2_SRC)
+obj2_src.o:		$(OBJ2_SRC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SRC)
 
-obj3_src.o:	$(OBJ3_SRC)
+obj3_src.o:		$(OBJ3_SRC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SRC)
 
 

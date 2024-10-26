@@ -16,8 +16,11 @@
 
 /*******************************************************************************
 
-	This little object supports "nodes" file management.
+  	Object:
+	nodesfile
 
+	Description:
+	This little object supports "nodes" file management.
 
 *******************************************************************************/
 
@@ -70,7 +73,7 @@ extern int	nodesfile_open(nodesfile *,cchar *,int,int) noex ;
 extern int	nodesfile_search(nodesfile *,cchar *,int) noex ;
 extern int	nodesfile_curbegin(nodesfile *,nodesfile_cur *) noex ;
 extern int	nodesfile_curend(nodesfile *,nodesfile_cur *) noex ;
-extern int	nodesfile_enum(nodesfile *,nodesfile_cur *,char *,int) noex ;
+extern int	nodesfile_curenum(nodesfile *,nodesfile_cur *,char *,int) noex ;
 extern int	nodesfile_check(nodesfile *,time_t) noex ;
 extern int	nodesfile_close(nodesfile *) noex ;
 

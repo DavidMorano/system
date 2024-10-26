@@ -1,4 +1,5 @@
 /* uclibsubs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -58,10 +59,10 @@
 #include	<xti.h>
 #endif
 
-#include	<usys.h>	/* <- auxilllary OS support */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usys.h>	/* <- auxilllary OS support */
 
 #include	<ucsys.h>
 #include	<ucent.h>
@@ -83,9 +84,13 @@
 #include	<uctimer.h>
 #include	<ucinetconv.h>
 #include	<ucsysconf.h>
+#include	<ucprochave.h>
+#include	<ucsysmisc.h>
 
+#include	<getxname.h>
 #include	<getexecname.h>
 #include	<termios_cf.h>
+#include	<rsfree.h>
 
 
 EXTERNC_begin
@@ -96,8 +101,6 @@ extern int	uc_gethostname(char *,int) noex ;
 extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_getnisdomain(char *,int) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
-extern int	uc_nprocessors(int) noex ;
-extern int	uc_syspages(int) noex ;
 extern int	uc_nprocs(int) noex ;
 
 /* time group */
@@ -107,6 +110,7 @@ extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
 extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
 extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 
+/* process group */
 extern int	uc_fork() noex ;
 extern int	uc_forklockbegin(int) noex ;
 extern int	uc_forklockend() noex ;
@@ -252,23 +256,6 @@ extern int	uc_localtime(const time_t *,TM *) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
 extern int	uc_mkfifo(cchar *,mode_t) noex ;
 
-/* memory allocation (user-space) */
-
-#ifdef	COMMENT
-extern int	uc_malloc(int,void *) noex ;
-extern int	uc_calloc(int,int,void *) noex ;
-extern int	uc_valloc(int,void *) noex ;
-extern int	uc_realloc(cvoid *,int,void *) noex ;
-extern int	uc_free(cvoid *) noex ;
-extern int	uc_mallset(int) noex ;
-extern int	uc_mallout(ulong *) noex ;
-extern int	uc_mallinfo(unsigned int *,int) noex ;
-extern int	uc_mallpresent(cvoid *) noex ;
-extern int	uc_mallocstrw(cchar *,int,cchar **) noex ;
-extern int	uc_mallocsys(int,char **) noex ;
-extern int	uc_mallocbuf(cvoid *,int,cvoid **) noex ;
-#endif /* COMMENT */
-
 /* project related */
 extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 
@@ -277,13 +264,10 @@ extern int	uc_openshm(cchar *,int,mode_t) noex ;
 extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
-/* miscellaneous */
-extern int	uc_strtod(cchar *,char **,double *) noex ;
-extern int	uc_getnetname(char *) noex ;
-
 /* NETWORK IPNODE database */
 extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
-extern int	uc_freehostent(HOSTENT *) noex ;
+extern int	uc_getipnodebyaddr(HOSTENT **,cvoid *,int,int) noex ;
+extern int	uc_hostentfree(HOSTENT *) noex ;
 
 /* NETWORK ADDRINFO database */
 extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
@@ -299,6 +283,8 @@ extern int	uc_getlogin(char *,int) noex ;
 /* miscellaneous */
 extern int	uc_ztime(TM *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
+extern int	uc_strtod(cchar *,char **,double *) noex ;
+extern int	uc_getnetname(char *) noex ;
 
 EXTERNC_end
 
