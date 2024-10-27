@@ -2,7 +2,7 @@
 
 T= ema
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -68,6 +68,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -89,9 +90,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_EMA)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_EMA)
-
-$(T).a:			$(OBJ_EMA)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -124,10 +122,10 @@ obj3.o:			$(OBJ3)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
 
 
-ema_main.o:		ema_main.cc ema.h parts.hh asstr.hh entry.hh
-ema_haveaddr.o:		ema_haveaddr.cc ema.h
-parts.o:		parts.cc parts.hh asstr.hh
-asstr.o:		asstr.cc asstr.hh
-entry.o:		entry.cc entry.hh ema.h
+ema_main.o:		ema_main.cc ema.h parts.hh asstr.hh entry.hh	$(INCS)
+ema_haveaddr.o:		ema_haveaddr.cc ema.h				$(INCS)
+parts.o:		parts.cc parts.hh asstr.hh			$(INCS)
+asstr.o:		asstr.cc asstr.hh				$(INCS)
+entry.o:		entry.cc entry.hh ema.h				$(INCS)
 
 

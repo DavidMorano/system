@@ -632,11 +632,6 @@ mkfile.o:		mkfile.dir
 mkfile.dir:
 	makesubdir $@
 
-# EMA
-ema.o:		ema.dir
-ema.dir:
-	makesubdir $@
-
 # QUEUE
 queue.o:		queue.dir
 queue.dir:

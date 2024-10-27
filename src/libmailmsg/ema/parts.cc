@@ -1,4 +1,5 @@
 /* parts SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* E-Mail Address (parts) */
@@ -24,6 +25,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -77,7 +79,7 @@ namespace emaobj {
 	if (asp) {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < si_overlast ; i += 1) {
-	        ass_start(asp + i) ;
+	        asstr_start(asp + i) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -90,8 +92,8 @@ namespace emaobj {
 	if (asp) {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < si_overlast ; i += 1) {
-	        ass_backwhite(asp+i) ;
-	        rs1 = ass_len(asp+i) ;
+	        asstr_backwhite(asp+i) ;
+	        rs1 = asstr_len(asp+i) ;
 	        if (rs1 >= 0) len += rs1 ;
 	    } /* end for */
 	} /* end if (non-null) */
@@ -104,7 +106,7 @@ namespace emaobj {
 	if (asp) {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < si_overlast ; i += 1) {
-	        rs1 = ass_finish(asp + i) ;
+	        rs1 = asstr_finish(asp + i) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */

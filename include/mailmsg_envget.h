@@ -1,4 +1,5 @@
 /* mailmsg_envget HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* MAILMSG get-envelope */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mailmsg.h>
 
 

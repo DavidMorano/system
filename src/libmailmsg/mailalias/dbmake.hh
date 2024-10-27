@@ -1,4 +1,5 @@
 /* dbmake HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* database-make */
@@ -18,22 +19,23 @@
 
 /*******************************************************************************
 
-	This module is used to manage a MAILALIAS object.
+  	Object:
+	dbmake
 
-	We always check if your alias key is the string "Postmater"
-	(in a case-insensitive way) and if it is, we convert it to
-	LOWER case before doing the |mailalias_fetch()|.  Also,
-	unlike other fetching (with other DBs), there is no concept
-	of "prefix" match fetching!
-
-	We use TWO string tables in this DB (unlike some other
-	similar DBs). We use one string table for keys and another
-	for values. I sort of did this for fun (so far). This is
-	actually potentially less space-efficient than using just
-	one string table since strings that are both a key and a
-	value are not combined in one table but rather appear
-	separately in each of the two tables. However, the up side
-	is that:
+	Description:
+	This module is used to manage a MAILALIAS object.  We always
+	check if your alias key is the string "Postmater" (in a
+	case-insensitive way) and if it is, we convert it to LOWER
+	case before doing the |mailalias_fetch()|.  Also, unlike
+	other fetching (with other DBs), there is no concept of
+	"prefix" match fetching!  We use TWO string tables in this
+	DB (unlike some other similar DBs). We use one string table
+	for keys and another for values. I sort of did this for fun
+	(so far). This is actually potentially less space-efficient
+	than using just one string table since strings that are
+	both a key and a value are not combined in one table but
+	rather appear separately in each of the two tables. However,
+	the up side is that:
 
 	a. making a record table of only keys is done by just taking
 	advantage of the strtab method for that

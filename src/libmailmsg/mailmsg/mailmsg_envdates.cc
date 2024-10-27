@@ -1,4 +1,5 @@
 /* mailmsg_envdates SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* extract the environment date (if any) from a message */
@@ -16,14 +17,19 @@
 
 /******************************************************************************
 
+  	Object:
+	mailmsg
+
+	Description:
 	This subroutine searches through the various envelope dates
-	and returns the earliest one found. Message header dates
+	and returns the earliest one found.  Message header dates
 	are ignored.
 
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

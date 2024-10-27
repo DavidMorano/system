@@ -2,7 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-#define	CF_DEBUGS	0
+/* manage mail files (mailboxes) */
+/* version %I% last-modified %G% */
+
 #define	CF_MAILBOXZERO	1
 
 /* revision history:
@@ -24,16 +26,18 @@
 
 ******************************************************************************/
 
-#define	MAILFILES_MASTER
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* memset(3c)| */
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<mallocstuff.h>
+#include	<strwcpy.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"mailfiles.h"
@@ -41,9 +45,8 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
+
+/* external variables */
 
 
 /* forward references */
@@ -152,15 +155,7 @@ int		pathlen ;
 	    cl = cp - sp ;
 	    cp = sp ;
 
-#if	CF_DEBUGS
-	debugprintf("mailfiles_addpath: mf=%t\n",cp,cl) ;
-#endif
-
 	    rs = mailfiles_add(lp,cp,cl) ;
-
-#if	CF_DEBUGS
-	debugprintf("mailfiles_addpath: mailfiles_add() rs=%d\n",rs) ;
-#endif
 
 	    if (rs < 0)
 	        break ;
@@ -174,24 +169,12 @@ int		pathlen ;
 
 	if ((rs >= 0) && (sl > 0)) {
 
-#if	CF_DEBUGS
-	debugprintf("mailfiles_addpath: mf=%t\n",sp,sl) ;
-#endif
-
 	    rs = mailfiles_add(lp,sp,sl) ;
-
-#if	CF_DEBUGS
-	debugprintf("mailfiles_addpath: mailfiles_add() rs=%d\n",rs) ;
-#endif
 
 	    if (rs >= 0)
 	        n += 1 ;
 
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailfiles_addpath: ret rs=%d n=%d\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -313,17 +296,15 @@ const char	path[] ;
 int		pathlen ;
 {
 	int	rs ;
-
 	char	*cp ;
 
-
-	memset(ep,0,sizeof(struct mailfiles_ent)) ;
-
+	memclear(ep) ;
 	ep->f_changed = FALSE ;
 	rs = uc_malloc((pathlen + 1),&ep->mailfname) ;
 
-	if (rs >= 0)
+	if (rs >= 0) {
 	    rs = strwcpy(ep->mailfname,path,pathlen) - path ;
+	}
 
 	return rs ;
 }

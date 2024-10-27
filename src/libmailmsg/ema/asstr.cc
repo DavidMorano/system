@@ -1,4 +1,5 @@
 /* asstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* AS-String (asstr) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	asstr
+
+	Descriptor:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 
@@ -24,14 +29,15 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<mallocstuff.h>
 #include	<strn.h>
+#include	<ascii.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"asstr.hh"
@@ -104,7 +110,7 @@ namespace emaobj {
 	return rs ;
     } /* end subroutine (asstr_finish) */
 
-    int asstr_add(asstr *asp,int ch) noex {
+    int asstr_addchr(asstr *asp,int ch) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (asp) {
@@ -132,7 +138,7 @@ namespace emaobj {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-    } /* end subroutine (asstr_add) */
+    } /* end subroutine (asstr_addchr) */
 
     int asstr_get(asstr *asp) noex {
 	int		rs = SR_FAULT ;
@@ -217,6 +223,6 @@ namespace emaobj {
 	return (rs >= 0) ? f : rs ;
     } /* end subroutine (asstr_backwhite) */
 
-}
+} /* end namespace (emaobj) */
 
 

@@ -14,29 +14,27 @@
 
 /*******************************************************************************
 
-	This routine returns a pointer within the given string to the start of
-	the next tokenized substring.  This routine is similar to the standard
-	UNIX 'strtok' routine except that this one takes additional arguments
-	so that the subroutine can be reentrant.
+  	Name:
+	strtoken
+
+	Description:
+	This routine returns a pointer within the given string to
+	the start of the next tokenized substring.  This routine
+	is similar to the standard UNIX 'strtok' routine except
+	that this one takes additional arguments so that the
+	subroutine can be reentrant.
 
 	Synopsis:
-
-	char *strtoken(s,ts,lp)
-	char		*s ;
-	const char	*ts ;
-	int		*lp ;
+	char *strtoken(char *s,cchar *ts,int *lp) noex
 
 	Arguments:
-
 	s	input string to break into tokens (same as UNIX version
 		except that this can never be NULL)
 	ts	string containing token characters (same as UNIX version)
 	lp	pointer to an integer for the subroutine to maintain state
 
 	Returns:
-
 	-	pointer to the token string just tokenized!
-
 
 *******************************************************************************/
 
@@ -48,16 +46,14 @@
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-char *strtoken(s,ts,lp)
-char		*s ;
-const char	*ts ;
-int		*lp ;
-{
+char *strtoken(char *s,cchar *ts,int *lp) noex {
 	int		si = *lp ;
-	const char	*tp = ts ;
+	cchar		*tp = ts ;
 
 	if (s == NULL) return NULL ;
 

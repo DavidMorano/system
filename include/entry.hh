@@ -1,4 +1,5 @@
 /* entry HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* AS-String (entry) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	entry
+
+	Description:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 
@@ -23,6 +28,7 @@
 
 #ifndef	ENTRY_INCLUDE
 #define	ENTRY_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -40,6 +46,7 @@ namespace emaobj {
 }
 
 
+#endif /* __cplusplus */
 #endif /* ENTRY_INCLUDE */
 
 

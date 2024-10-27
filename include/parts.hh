@@ -1,4 +1,5 @@
 /* parts HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* AS-String (parts) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	parts
+
+	Description:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 
@@ -23,11 +28,13 @@
 
 #ifndef	PARTS_INCLUDE
 #define	PARTS_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -47,6 +54,7 @@ namespace emaobj {
 }
 
 
+#endif /* __cplusplus */
 #endif /* PARTS_INCLUDE */
 
 

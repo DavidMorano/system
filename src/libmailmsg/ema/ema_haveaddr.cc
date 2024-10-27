@@ -1,4 +1,5 @@
 /* ema_haveaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* EMA have a given address */
@@ -25,7 +26,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>

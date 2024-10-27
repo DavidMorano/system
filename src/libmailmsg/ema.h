@@ -1,4 +1,5 @@
 /* ema HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* E-Mail Address */

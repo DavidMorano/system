@@ -59,10 +59,10 @@ OBJ0= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
 OBJ1= mailmsgmatenv.o mailmsgmathdr.o
 OBJ2= mailmsghdrfold.o mailmsghdrval.o mailmsgheadkey.o
 OBJ3= mhcom.o mcmsg.o mimetypes.o 
-OBJ4= emainfo.o comparse.o
+OBJ4= ema.o emainfo.o comparse.o
 OBJ5= mbcache.o contypevals.o contentencodings.o
 OBJ6= whitelist.o splitaddr.o
-OBJ7= filer_mailsup.o mailalias.o
+OBJ7= filer_mailsup.o mailalias.o 
 
 OBJ8= hdrextnum.o hdrextid.o
 OBJ9= hdrctype.o hdrdecode.o 
@@ -188,6 +188,11 @@ mailmsg.dir:
 # MAILALIAS
 mailalias.o:		mailalias.dir
 mailalias.dir:
+	makesubdir $@
+
+# EMA
+ema.o:		ema.dir
+ema.dir:
 	makesubdir $@
 
 contypevals.o:		contypevals.cc contypevals.h		$(INCS)

@@ -1,7 +1,8 @@
-/* asstr HEADER */
+/* parts HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* AS-String (asstr) */
+/* AS-String (parts) */
 /* version %I% last-modified %G% */
 
 
@@ -16,18 +17,24 @@
 
 /*******************************************************************************
 
+  	Object:
+	parts
+
+	Description:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 
 *******************************************************************************/
 
-#ifndef	ASSTR_INCLUDE
-#define	ASSTR_INCLUDE
+#ifndef	PARTS_INCLUDE
+#define	PARTS_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -37,42 +44,17 @@
 #include	<ascii.h>
 #include	<localmisc.h>
 
-
-#define	ASSTR		struct asstr_head
-
-
-namespace emaobj {
-    enum sis {
-	si_address,
-	si_route,
-	si_comment,
-	si_overlast
-    } ;
-    struct asstr_head {
-	char		*sp ;
-	int		sl ;
-	int		e ;
-    } ; /* end struct (asstr_head) */
-}
-
-namespace emaobj {
-    typedef ASSTR	asstr ;
-}
+#include	"asstr.hh"
 
 
 namespace emaobj {
-    extern int	ass_start(asstr *) noex ;
-    extern int	ass_add(asstr *,int) noex ;
-    extern int	ass_get(asstr *) noex ;
-    extern int	ass_getprev(asstr *) noex ;
-    extern int	ass_adv(asstr *) noex ;
-    extern int	ass_skipwhite(asstr *) noex ;
-    extern int	ass_backwhite(asstr *) noex ;
-    extern int	ass_len(asstr *) noex ;
-    extern int	ass_finish(asstr *) noex ;
+    extern int	partsbegin(asstr *) noex ;
+    extern int	partslen(asstr *) noex ;
+    extern int	partsend(asstr *) noex ;
 }
 
 
-#endif /* ASSTR_INCLUDE */
+#endif /* __cplusplus */
+#endif /* PARTS_INCLUDE */
 
 

@@ -1,4 +1,5 @@
 /* mailmsg_loadfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* load the header-lines from a MAILMSG file into the object */
@@ -41,6 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

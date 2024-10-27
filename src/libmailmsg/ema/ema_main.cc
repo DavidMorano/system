@@ -1,4 +1,5 @@
 /* ema SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* E-Mail Address */
@@ -28,6 +29,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -310,61 +312,55 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	int		f_quote = FALSE ;
 	int		f_exit = FALSE ;
 	cchar		*orig ;
-
-/* skip over any leading white space */
-
-	ass_skipwhite(bp) ;
-
-/* initialize for this entry */
-
+	/* skip over any leading white space */
+	asstr_skipwhite(bp) ;
+	/* initialize for this entry */
 	orig = bp->sp ;
 	partsbegin(as) ;
-
-/* start scanning */
-
+	/* start scanning */
 	state = si_address ;
-	while ((! f_exit) && ((ch = ass_get(bp)) >= 0)) {
+	while ((! f_exit) && ((ch = asstr_get(bp)) >= 0)) {
 	    switch (ch) {
 	    case '\\':
 	        if (f_quote) {
-	            ch = ass_adv(bp) ;
+	            ch = asstr_adv(bp) ;
 	            if (ch >= 0) {
-	                ass_add((as + state),ch) ;
-	                ass_adv(bp) ;
+	                asstr_addchr((as + state),ch) ;
+	                asstr_adv(bp) ;
 	            }
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case CH_DQUOTE:
-	        ass_adv(bp) ;
+	        asstr_adv(bp) ;
 	        f_quote = (! f_quote) ;
 	        break ;
 	    case CH_LPAREN:
 	        if (! f_quote) {
 	            if (c_comment == 0) {
 #ifdef	COMMENT
-	                size = ass_len(as + state) ;
-	                if ((size > 0) && (ass_getprev(as + state) != ' ')) {
-	                    ass_add((as + state),' ') ;
+	                size = asstr_len(as + state) ;
+	                if ((size > 0) && (asstr_getprev(as + state) != ' ')) {
+	                    asstr_addchr((as + state),' ') ;
 			}
 #endif /* COMMENT */
 	                pstate = state ;
 	                state = si_comment ;
-	                size = ass_len(as + state) ;
-	                if ((size > 0) && (ass_getprev(as + state) != ' ')) {
-	                    ass_add((as + state),' ') ;
+	                size = asstr_len(as + state) ;
+	                if ((size > 0) && (asstr_getprev(as + state) != ' ')) {
+	                    asstr_addchr((as + state),' ') ;
 	                }
-	                ass_adv(bp) ;
+	                asstr_adv(bp) ;
 	            } else {
-	                ass_add((as + state),ch) ;
-	                ass_adv(bp) ;
+	                asstr_addchr((as + state),ch) ;
+	                asstr_adv(bp) ;
 	            }
 	            c_comment += 1 ;
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case CH_RPAREN:
@@ -372,14 +368,14 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            c_comment -= 1 ;
 	            if (c_comment == 0) {
 	                state = pstate ;
-	                ass_adv(bp) ;
+	                asstr_adv(bp) ;
 	            } else {
-	                ass_add((as + state),ch) ;
-	                ass_adv(bp) ;
+	                asstr_addchr((as + state),ch) ;
+	                asstr_adv(bp) ;
 	            }
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case '<':
@@ -387,20 +383,20 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            (! f_quote) && (c_comment == 0)) {
 	            pstate = state ;
 	            state = si_route ;
-	            ass_adv(bp) ;
+	            asstr_adv(bp) ;
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case '>':
 	        if ((state == si_route) && 
 	            (! f_quote) && (c_comment == 0)) {
 	            state = pstate ;
-	            ass_adv(bp) ;
+	            asstr_adv(bp) ;
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case ':':
@@ -409,7 +405,7 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            size = sizeof(ema) ;
 	            if ((rs = uc_malloc(size,&nlp)) >= 0) {
 	                if ((rs = ema_start(nlp)) >= 0) {
-	                    ass_adv(bp) ;
+	                    asstr_adv(bp) ;
 	                    rs = ema_parseit(nlp,bp) ;
 	                    if (rs < 0)
 	                        ema_finish(nlp) ;
@@ -420,8 +416,8 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	                }
 	            } /* end if (allocation) */
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case ';':
@@ -429,10 +425,10 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            (! f_quote) && (c_comment == 0)) {
 	            f_exit = TRUE ;
 	            olen = (bp->sp - orig) ;
-	            ass_adv(bp) ;
+	            asstr_adv(bp) ;
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 	    case ',':
@@ -447,14 +443,14 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            if (rs >= 0) {
 	                nlp = nullptr ;
 	                partsbegin(as) ;
-	                ass_adv(bp) ;
-	                ass_skipwhite(bp) ;
+	                asstr_adv(bp) ;
+	                asstr_skipwhite(bp) ;
 	                orig = bp->sp ;
 	                state = si_address ;
 	            } /* end if */
 	        } else {
-	            ass_add((as + state),ch) ;
-	            ass_adv(bp) ;
+	            asstr_addchr((as + state),ch) ;
+	            asstr_adv(bp) ;
 	        }
 	        break ;
 /* I think that these cases are just some optimizations (not required) */
@@ -469,20 +465,20 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            if (c_comment == 0) {
 	                int	ai = state ;
 	                if ((state == si_route) || (state == si_address)) {
-	                    ass_adv(bp) ;
+	                    asstr_adv(bp) ;
 	                    break ;
 	                } else if ((as[ai].sl == 0) ||
 	                    (as[ai].sp[as[ai].sl-1] == ' ')) {
 	                    ch = 0 ;
-	                    ass_adv(bp) ;
+	                    asstr_adv(bp) ;
 	                    break ;
 	                } /* end if */
 	            } else {
-	                sl = ass_len(as+si_comment) ;
+	                sl = asstr_len(as+si_comment) ;
 	                if ((sl == 0) || 
-	                    (CHAR_ISWHITE(ass_getprev(as+si_comment)))) {
+	                    (CHAR_ISWHITE(asstr_getprev(as+si_comment)))) {
 	                    ch = 0 ;
-	                    ass_adv(bp) ;
+	                    asstr_adv(bp) ;
 	                    break ;
 	                } /* end if */
 	            } /* end if */
@@ -492,12 +488,12 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	    default:
 	        if (ch > 0) {
 	            if (c_comment) {
-	                ass_add((as + si_comment),ch) ;
+	                asstr_addchr((as + si_comment),ch) ;
 	            } else {
-	                ass_add((as + state),ch) ;
+	                asstr_addchr((as + state),ch) ;
 	            }
 	        }
-	        ass_adv(bp) ;
+	        asstr_adv(bp) ;
 	        break ;
 	    } /* end switch */
 	    if (rs < 0) break ;
@@ -506,9 +502,9 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 #ifdef	COMMENT /* not needed here */
 	if (rs >= 0) {
 	    asstr	*asp = (as+si_comment) ;
-	    if (ass_len(asp) > 0) {
-	        int	pch = ass_getprev(asp) ;
-	        if (CHAR_ISWHITE(pch)) ass_backwhite(asp) ;
+	    if (asstr_len(asp) > 0) {
+	        int	pch = asstr_getprev(asp) ;
+	        if (CHAR_ISWHITE(pch)) asstr_backwhite(asp) ;
 	    }
 	}
 #endif /* COMMENT */
@@ -708,7 +704,7 @@ static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 	int		ch ;
 	int		len ;
 	int		f_quote = FALSE ;
-	ass_start(&s) ;
+	asstr_start(&s) ;
 	if (sl < 0) sl = strlen(sp) ;
 	while ((rs >= 0) && (sl > 0)) {
 	    cint	ch = mkchar(*sp) ;
@@ -719,7 +715,7 @@ static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 		/* FALLTHROUGH */
 	    default:
 	        if (f_quote || (! CHAR_ISWHITE(ch))) {
-	            rs = ass_add(&s,ch) ;
+	            rs = asstr_addchr(&s,ch) ;
 	        }
 	        break ;
 	    } /* end switch */
@@ -730,7 +726,7 @@ static int malloccompactstr(cchar *sp,int sl,char **rpp) noex {
 	if (rpp) {
 	    *rpp = (rs >= 0) ? mallocstrw(s.sp,s.sl) : nullptr ;
 	}
-	ass_finish(&s) ;
+	asstr_finish(&s) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (malloccompactstr) */

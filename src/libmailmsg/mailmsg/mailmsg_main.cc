@@ -1,4 +1,5 @@
 /* mailmsg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* message parsing object */
@@ -23,6 +24,10 @@
 
 /*******************************************************************************
 
+	Object:
+	mailmsg
+
+	Description:
 	This module operates on mail messages. It is expected that
 	a file be opened and fed to this object one line at a time.
 	The order of processing should proceed roughly as follows
