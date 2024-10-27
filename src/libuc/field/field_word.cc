@@ -1,4 +1,5 @@
 /* field_word SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* routine to parse a line into words (word field) */
@@ -8,7 +9,7 @@
 /* revision history:
 
 	= 2002-05-01, David A­D­ Morano
-	This was created (from 'field_get()') to deal with parsing
+	This was created (from |field_get(3uc)|) to deal with parsing
 	keys that are supposed to be English words in prose.
 
 */
@@ -21,8 +22,8 @@
 	field_word
 
 	Description:
-	This subroutine finds the next "word" in the buffer. This
-	is different than 'field_get()' since no default quoting
+	This subroutine finds the next "word" in the buffer.  This
+	is different than |field_get()| since no default quoting
 	is assumed.
 
 	Synopsis:
@@ -48,6 +49,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<char.h>

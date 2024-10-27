@@ -21,6 +21,7 @@
 	mkufname
 
 	Description:
+	Make a "user" file-name (whatever that is -- see the code below).
 
 	Synopsis:
 	int mkufname(char *rbuf,int rlen,cchar *hn,cchar *un) noex
@@ -38,6 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>

@@ -12,12 +12,12 @@
 	This subroutine was written for Rightcore Network Services.
 
 	= 2004-11-22, David A-D- Morano
-	I make the |prgetclustername()| subroutine availåble elsewhere
+	I make the |prgetclustername()| subroutine available elsewhere
 	(everywhere) within the namespace |libuc|.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

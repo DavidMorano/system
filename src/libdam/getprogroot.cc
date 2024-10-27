@@ -29,7 +29,7 @@
 	supplied program root directories.
 
 	Synopsis:
-	int getprogroot(char *pr,mv prnames,int prlenp,char *obuf,cc *name)
+	int getprogroot(char *pr,mv prnames,int prlenp,char *obuf,cc *name) noex
 
 	Arguments:
 	pr		program root path
@@ -75,8 +75,7 @@
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
-#define	SI		SUBINFO
+#define	SI		subinfo
 
 
 /* imported namespaces */
@@ -197,6 +196,7 @@ static int subinfo_finish(subinfo *sip) noex {
 	if (sip->f_dirs) {
 	    rs1 = dirseen_finish(&sip->dirs) ;
 	    if (rs >= 0) rs = rs1 ;
+	    sip->f_dirs = false ;
 	}
 	{
 	    rs1 = ids_release(&sip->id) ;

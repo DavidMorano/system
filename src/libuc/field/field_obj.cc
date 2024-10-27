@@ -1,4 +1,5 @@
 /* field_obj SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to parse a line into fields */
@@ -7,12 +8,14 @@
 
 /* revision history:
 
-	= 1998-05-01, David A­ D­ Morano
-	This code module was originally written in VAX assembly
-	(back around 1980 or so). It was then written into C-language
-	perhaps around 1983 (at AT&T Bell Laboratories).  This
-	(below) is a new incarnation based on that older C-language
-	code.
+	= 1998-05-01, David A­D­ Morano
+	This code module was originally written in C language modeled
+	(roughly) from a prior VAX assembly language version (written
+	circa 1980 perhaps).  This is why this looks so "ugly"!
+	This code comes from stuff dated back to almost the pre-dawn
+	era of modern computer languages!  I wrote the original VAX
+	assembly stuff also.  This code below was then written into
+	C-language perhaps around 1983 (at AT&T Bell Laboratories).
 
 */
 
@@ -20,6 +23,10 @@
 
 /*******************************************************************************
 
+  	Object (continued):
+	field_obj
+
+	Description:
 	Object support routines for the FIELD object.
 
 *******************************************************************************/
@@ -28,8 +35,6 @@
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>

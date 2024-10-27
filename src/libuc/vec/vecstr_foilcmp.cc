@@ -1,4 +1,5 @@
 /* vecstr_foilcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform a foil comparison of two VECSTR lists */
@@ -16,13 +17,17 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecstr_foilcmp
+
+	Description:
 	Perform a foil comparison between two VECSTR lists.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 

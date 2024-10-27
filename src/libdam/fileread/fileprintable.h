@@ -1,4 +1,5 @@
 /* fileprintable HEADER (file-is-printable) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* is the given file totally printable? */

@@ -14,7 +14,7 @@
 	all of it).
 
 	= 2011-12-09, David A­D­ Morano
-	I got rid of the 'strlcpy(3c)' usage.  That subroutine just
+	I got rid of the |strlcpy(3c)| usage.  That subroutine just
 	does not represent my moral values!  I now do not know what
 	prompted me to do this (probably its extra complexity to
 	use).
@@ -25,14 +25,20 @@
 
 /*******************************************************************************
 
+  	Family:
+	mknpathxw
+
+	Description:
         This subroutine constructs a file path out of one or more path
         componets.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
+#include	<cstring>		/* |strlcpy(3c)| */
 #include	<usystem.h>
 #include	<snwcpy.h>
 #include	<bufsizevar.hh>

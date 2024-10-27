@@ -39,6 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -87,14 +89,13 @@ int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	    if (rlen > 0) {
 	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	            cint	ulen = rs ;
-		    char	ubuf[rs+1] ;
+		    char	ubuf[rs + 1] ;
 	            if ((un[0] == '-') || (un[0] == '\0')) {
 	                un = ubuf ;
 	                rs = getusername(ubuf,ulen,-1) ;
 	            }
 	            if (rs >= 0) {
-	                char	*pjbuf{} ;
-	                if ((rs = malloc_pj(&pjbuf)) >= 0) {
+	                if (char *pjbuf{} ; (rs = malloc_pj(&pjbuf)) >= 0) {
 			    auto	getpj = uc_getpjdef ;
 	                    ucentpj	pj ;
 	                    cint	pjlen = rs ;

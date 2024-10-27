@@ -1,4 +1,5 @@
 /* vecint SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector integer operations */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	name:
+	vecint
+
+	Description:
 	These routines are used when the caller wants to store a
 	COPY of the passed element data into a vector.  These
 	routines will copy and store the copied data in the list.

@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	mkutmpid
+
+	Description:
 	This subroutine is used to create UTMP ID values.  These
 	values are (generally) four-character strings (without
 	terminating NULs) that are used in the ID field of the UTMP
@@ -108,6 +112,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>
@@ -143,7 +148,7 @@ namespace {
 	cchar		*prefix ;
     } ;
     struct tmper ;
-    typedef int (tmper::*tmp_f)(cchar *,int) noex ;
+    typedef int (tmper::*tmp_m)(cchar *,int) noex ;
     struct tmper {
 	cchar	*sbuf ;
 	char	*rbuf ;
@@ -187,7 +192,7 @@ static constexpr struct prefix	specials[] = {
 	{ nullptr, nullptr }
 } ;
 
-static tmp_f	tmpcalls[] {
+static tmp_m	tmpcalls[] {
 	&tmper::subdirs,
 	&tmper::basename,
 	&tmper::special,
@@ -224,7 +229,7 @@ tmper::operator int () noex {
 		        cchar	*lp{} ;
 		        rs = 0 ;
 		        for (int i = 0 ; (rs == 0) && tmpcalls[i] ; i += 1) {
-		            tmp_f	m = tmpcalls[i] ;
+		            tmp_m	m = tmpcalls[i] ;
 		            rs = (this->*m)(lp,ll) ;
 		        } /* end for */
 		    } /* end if (extdev) */

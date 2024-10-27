@@ -1,4 +1,5 @@
 /* vecstr_addpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* add a "path" compnent to the string-list */
@@ -65,6 +66,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>

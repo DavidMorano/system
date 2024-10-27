@@ -1,4 +1,5 @@
 /* vecstr_svcargs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* load service arguments */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-09-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 
@@ -16,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecpstr_svcargs
+
+	Description:
 	This subroutine loads service arguments (arguments which
 	accompany a service string) into a VECSTR object.
 
@@ -23,6 +29,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>

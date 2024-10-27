@@ -1,4 +1,5 @@
 /* vecobj SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector object list operations */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecobj
+
+	Description:
 	These routines are used when the caller wants to store a
 	COPY of the passed object data into a vector.  These routines
 	will copy and store the copied data in the list.  The
@@ -28,6 +33,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |memcmp(3c)| */
 #include	<new>

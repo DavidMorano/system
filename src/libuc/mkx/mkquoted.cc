@@ -59,6 +59,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>

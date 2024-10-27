@@ -1,4 +1,5 @@
 /* vecstr_envfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* process an environment file */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-09-10, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 

@@ -1,4 +1,5 @@
 /* uc_getnetname */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -30,7 +31,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -40,20 +43,44 @@
 #define	PROCNAME	"keyserv"	/* required process */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	getnetname(cchar *) ;	/* UNIX® ONC interface */
+extern "C" {
+    extern int	getnetname(cchar *) ;	/* UNIX® ONC interface */
+}
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int uc_getnetname(char *nbuf) noex {
 	int		rs = SR_FAULT ;
+	int		len = 0 ;
 	if (nbuf) {
-	    const uid_t	uid = 0 ; /* root user */
+	    const uid_t		uid = 0 ; /* root user */
 	    if ((rs = uc_procpid(PROCNAME,uid)) > 0) {
 	        if (getnetname(nbuf) > 0) {
-	            rs = strlen(nbuf) ;
+	            len = strlen(nbuf) ;
 	        } else {
 	            rs = SR_NOTFOUND ;
 	        }
@@ -61,7 +88,7 @@ int uc_getnetname(char *nbuf) noex {
 	        rs = SR_BUSY ;		/* was previously SR_UNAVAIL */
 	    }
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uc_getnetname) */
 

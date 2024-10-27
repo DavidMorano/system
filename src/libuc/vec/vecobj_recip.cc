@@ -1,4 +1,5 @@
 /* vecobj_recip SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* extend the VECOBJ object w/ some recipient handling */
@@ -25,6 +26,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecobj_recip
+
+	Description:
 	This set of subroutines extends the VECOBJ object (yes we
 	are using that to hold "recipients") for some "recipient"
 	handling.
@@ -32,8 +37,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecobj.h>

@@ -18,7 +18,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 
 
 #define	ASS		struct ass_head

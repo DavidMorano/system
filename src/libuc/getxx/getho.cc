@@ -1,4 +1,5 @@
 /* getho SUPPORT (Get Host Entry) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a host entry from the system database */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 

@@ -1,4 +1,5 @@
 /* field_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to parse a line into fields */
@@ -7,14 +8,16 @@
 
 /* revision history:
 
-	= 1998-05-01, David A­ D­ Morano
-	This code module was originally written in VAX assembly
-	(back around 1980 or so).  It was then rewritten into
+	= 1998-05-01, David A­D­ Morano
+	This code module was originally written in C language modeled
+	(roughly) from a prior VAX assembly language version (written
+	circa 1980 perhaps).  This is why this looks so "ugly"!
+	This code comes from stuff dated back to almost the pre-dawn
+	era of modern computer languages!  I wrote the original VAX
+	assembly stuff also.  This code below was then written into
 	C-language perhaps around 1983 (at AT&T Bell Laboratories).
-	This (below) is a new incarnation based on that older
-	C-language code.
 
-	= 2023-11-04, David A­ D­ Morano
+	= 2023-11-04, David A­D­ Morano
 	I (finally) changed the code to initialize the default
 	character terminator blocks using the C++14 'constexpr'
 	keyword.  Previously, the character terminator blocks were
@@ -252,9 +255,8 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		fl = 0 ;
 	cchar		*fp = nullptr ;
 	if (fsbp && fpp) {
-	    strop	so ;
 	    if (terms == nullptr) terms = dterms.terms ;
-	    if ((rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
+	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
 		int		ch ;
 		int		chterm = '\0' ;
 		so.white() ;
@@ -294,10 +296,9 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	int		rs1 ;
 	int		fl = 0 ;
 	if (fsbp && fbuf) {
-	    strop	so ;
 	    if (terms == nullptr) terms = dterms.terms ;
-	    if ((rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
-		int		chterm = '\0' ;
+	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
+		int	chterm = '\0' ;
 		so.white() ;
 	        if (so.sl > 0) {
 		    int		ch ;

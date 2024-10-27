@@ -1,4 +1,5 @@
 /* vecpstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector-packed-string object */
@@ -68,8 +69,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>

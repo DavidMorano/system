@@ -46,6 +46,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
 #include	<varnames.hh>
@@ -75,7 +76,7 @@
 
 namespace {
     struct nodeinfo ;
-    typedef int (nodeinfo::*nodeinfo_f)() noex ;
+    typedef int (nodeinfo::*nodeinfo_m)() noex ;
     struct nodeinfo {
 	char		*nbuf ;		/* user argument */
 	int		nlen ;		/* user argument */
@@ -92,7 +93,7 @@ namespace {
 
 /* local variables */
 
-static constexpr nodeinfo_f	nodes[] = {
+static constexpr nodeinfo_m	nodes[] = {
 	&nodeinfo::env,
 	&nodeinfo::uinfo,
 	nullptr
@@ -120,7 +121,7 @@ int getnodename(char *nbuf,int nlen) noex {
 nodeinfo::operator int () noex {
 	int		rs = SR_OK ;
 	for (int i = 0 ; (rs == SR_OK) && nodes[i] ; i += 1) {
-	    nodeinfo_f	m = nodes[i] ;
+	    nodeinfo_m	m = nodes[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
@@ -145,9 +146,8 @@ int nodeinfo::env() noex {
 /* end method (nodeinfo::env) */
 
 int nodeinfo::uinfo() noex {
-	uinfo_names	uin ;
 	int		rs ;
-	if ((rs = uinfo_name(&uin)) >= 0) {
+	if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) {
 	    cint	nl = rmchr(uin.nodename,-1,'.') ;
 	    rs = snwcpy(nbuf,nlen,uin.nodename,nl) ;
 	} /* end if (uinfo_name) */

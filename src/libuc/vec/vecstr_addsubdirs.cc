@@ -1,4 +1,5 @@
 /* vecstr_addsubdirs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find and load UNIX® directories under a given root */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecstr_addsubdirs
+
+	Description:
 	This subroutine load all directories and sub-directories
 	of a given root in the file-system into a vecstr (container)
 	object.

@@ -1,4 +1,5 @@
 /* vecpstr_addsyms SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* add constucted symbols to the object */

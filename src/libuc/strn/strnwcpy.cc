@@ -1,4 +1,5 @@
 /* strnwcpy SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a counted c-string to a sized destination buffer */

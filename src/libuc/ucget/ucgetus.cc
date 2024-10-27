@@ -79,7 +79,7 @@
 
 namespace {
     struct ucgetus {
-	ptm		m ;		/* data mutex */
+	ptm		mx ;		/* data mutex */
 	aflag		factive ;	/* "set" or "get" was done */
 	aflag		finit ;
 	aflag		finitdone ;
@@ -90,10 +90,10 @@ namespace {
 	int getusend() noex ;
 	int getusent(char *,int) noex ;
         void atforkbefore() noex {
-	    ptm_lock(&m) ;
+	    mx.lockbegin() ;
         }
         void atforkafter() noex {
-	    ptm_unlock(&m) ;
+	    mx.lockend() ;
         }
 	~ucgetus() noex {
 	    int		rs = fini() ;
@@ -108,9 +108,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void	ucgetus_atforkbefore() noex ;
-    static void	ucgetus_atforkafter() noex ;
-    static void	ucgetus_exit() noex ;
+    static void		ucgetus_atforkbefore() noex ;
+    static void		ucgetus_atforkafter() noex ;
+    static void		ucgetus_exit() noex ;
 }
 
 
@@ -145,7 +145,7 @@ int ucgetus::init() noex {
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    if (!finit.testandset) {
-	        if ((rs = m.create) >= 0) {
+	        if ((rs = mx.create) >= 0) {
 	            void_f	b = ucgetus_atforkbefore ;
 	            void_f	a = ucgetus_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -153,11 +153,13 @@ int ucgetus::init() noex {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	 	    if (rs < 0)
-		        m.destroy() ;
+	 	    if (rs < 0) {
+		        mx.destroy() ;
+		    }
 	        } /* end if (ptm-create) */
 	        if (rs < 0) finit = false ;
 	    } else if (! finitdone) {
@@ -193,7 +195,7 @@ int ucgetus::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = m.destroy ;
+	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    finit = false ;
@@ -208,14 +210,14 @@ int ucgetus::getusbegin() noex {
 	int		rs1 ;
 	if ((rs = init()) >= 0) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	 	if ((rs = m.lockbegin) >= 0) { /* single */
+	 	if ((rs = mx.lockbegin) >= 0) { /* single */
 		    {
 			errno = 0 ;
 		        factive = true ;
 		        setusershell() ;
 			rs = (- errno) ;
 		    }
-		    rs1 = m.lockend ;
+		    rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (mutex) */
 	        rs1 = uc_forklockend() ;
@@ -231,14 +233,14 @@ int ucgetus::getusend() noex {
 	int		rs1 ;
 	if ((rs = init()) >= 0) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	 	if ((rs = m.lockbegin) >= 0) { /* single */
+	 	if ((rs = mx.lockbegin) >= 0) { /* single */
 		    {
 			errno = 0 ;
 		        factive = false ;
 		        endusershell() ;
 			rs = (- errno) ;
 		    }
-		    rs1 = m.lockend ;
+		    rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (mutex) */
 	        rs1 = uc_forklockend() ;
@@ -258,7 +260,7 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 	    if (rlen > 0) {
 	        if ((rs = init()) >= 0) {
 	            if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	 	        if ((rs = m.lockbegin) >= 0) { /* single */
+	 	        if ((rs = mx.lockbegin) >= 0) { /* single */
 		            cchar	*rp ;
 		            factive = true ;
 		            errno = 0 ;
@@ -268,7 +270,7 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 		            } else { /* this is really extra safety */
 			        if (errno != 0) rs = (- errno) ;
 		            }
-		            rs1 = m.lockend ;
+		            rs1 = mx.lockend ;
 		            if (rs >= 0) rs = rs1 ;
 		        } /* end if (mutex) */
 	                rs1 = uc_forklockend() ;

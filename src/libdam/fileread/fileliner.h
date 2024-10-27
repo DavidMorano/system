@@ -1,4 +1,5 @@
 /* fileliner HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the number of lines in a file */

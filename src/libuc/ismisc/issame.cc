@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 1998-11-21, David A­D­ Morano
-	This program was started by copying from the RSLOW program.
+	This subroutine was started by copying from the RSLOW
+	program.
 
 */
 

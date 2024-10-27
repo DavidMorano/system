@@ -1,4 +1,5 @@
 /* xfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* eXecutable File? */
@@ -71,8 +72,7 @@ int xfile(ids *idp,cchar *fname) noex {
 	if (idp && fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(fname,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
 		        rs = sperm(idp,&sb,X_OK) ;
 	            } else {

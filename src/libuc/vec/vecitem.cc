@@ -1,4 +1,5 @@
 /* vecitem SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector-item operations */
@@ -31,8 +32,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 

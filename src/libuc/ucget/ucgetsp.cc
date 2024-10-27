@@ -85,10 +85,10 @@
 
 namespace {
     struct ucgetsp ;
-    typedef int (ucgetsp::*mem_f)(ucentsp *,char *,int) noex ;
+    typedef int (ucgetsp::*mem_m)(ucentsp *,char *,int) noex ;
     struct ucgetsp {
-	mem_f	m ;
-	cchar	*name ;
+	mem_m		m ;
+	cchar		*name ;
 	ucgetsp(cchar *n = nullptr) noex : name(n) { } ;
 	int getsp_ent(ucentsp *,char *,int) noex ;
 	int getsp_nam(ucentsp *,char *,int) noex ;
@@ -102,11 +102,11 @@ namespace {
 
 /* local variables */
 
-constexpr bool f_sunos = F_SUNOS ;
-constexpr bool f_darwin = F_DARWIN ;
-constexpr bool f_linux = F_LINUX ;
-constexpr bool f_getspentr = F_GETSPENTR ;
-constexpr bool f_getspnamr = F_GETSPNAMR ;
+constexpr bool		f_sunos 	= F_SUNOS ;
+constexpr bool		f_darwin 	= F_DARWIN ;
+constexpr bool		f_linux 	= F_LINUX ;
+constexpr bool		f_getspentr 	= F_GETSPENTR ;
+constexpr bool		f_getspnamr 	= F_GETSPNAMR ;
 
 
 /* exported variables */

@@ -1,4 +1,5 @@
 /* vecelem SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector element-list operations */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	vecelem
+
+	Description:
 	These routines are used when the caller wants to store a
 	COPY of the passed element data into a vector.  These
 	routines will copy and store the copied data in the list.
@@ -30,7 +35,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memcpy(2c)| */
 #include	<algorithm>
 #include	<usystem.h>
 #include	<localmisc.h>

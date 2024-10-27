@@ -1,4 +1,5 @@
 /* mktmpuserdir SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a directory in the TMP-USER area */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 

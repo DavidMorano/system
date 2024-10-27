@@ -1,4 +1,5 @@
 /* field HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* structure definition for field extraction calls */
@@ -20,7 +21,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	field
 
 	Description:

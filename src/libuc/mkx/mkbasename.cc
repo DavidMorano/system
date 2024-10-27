@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 2008-07-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 
@@ -23,6 +24,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mkpathxw.h>
 #include	<sfx.h>

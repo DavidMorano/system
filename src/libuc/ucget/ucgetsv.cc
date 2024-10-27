@@ -91,9 +91,9 @@
 
 namespace {
     struct ucgetsv ;
-    typedef int (ucgetsv::*mem_f)(ucentsv *,char *,int) noex ;
+    typedef int (ucgetsv::*mem_m)(ucentsv *,char *,int) noex ;
     struct ucgetsv {
-	mem_f		m ;
+	mem_m		m ;
 	cchar		*proto ;
 	cchar		*name ;
 	int		num ;

@@ -1,4 +1,5 @@
 /* filebinary SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* determine if the named file is a binary file */
@@ -16,6 +17,14 @@
 
 #ifndef	FILEBINARY_INCLUDE
 #define	FILEBINARY_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

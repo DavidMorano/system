@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 
@@ -65,6 +66,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<sncpyx.h>
@@ -108,10 +111,9 @@ int getchostname(char *hbuf,cchar *name) noex {
 	int		len = 0 ;
 	if (name && hbuf) {
 	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
-	        hostinfo	hi ;
 	        cint		af = AF_UNSPEC ;
 	        cint		hlen = rs ;
-	        if ((rs = hostinfo_start(&hi,af,name)) >= 0) {
+	        if (hostinfo hi ; (rs = hostinfo_start(&hi,af,name)) >= 0) {
 	            cchar	*cnp{} ;
 	            if ((rs = hostinfo_getcanonical(&hi,&cnp)) >= 0) {
 		        rs = sncpy1(hbuf,hlen,cnp) ;

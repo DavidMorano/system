@@ -38,6 +38,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* <- for |UINT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear| */
 #include	<mkuuid.h>

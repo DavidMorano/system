@@ -1,4 +1,5 @@
 /* vechand SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector list operations */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	vechand
+
+	Description:
 	This object is used when the caller just wants to store
 	their own pointer in a vector.  These routines will not
 	copy the structure pointed to by the passed pointer.  The
@@ -25,8 +30,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -39,6 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
 #include	<uvariables.hh>
@@ -83,10 +84,11 @@ cchar *gettmpdnamex(mainv envv) noex {
 	if (envv) {
 	    vp = getourenv(envv,vn) ;
 	}
-	if ((vp == nullptr) || (vn[0] == '\0')) {
-	    vp = getenv(vn) ;
+	if ((vp == nullptr) || (vp[0] == '\0')) {
+	    static cchar	*tmpval = getenv(vn) ;
+	    vp = tmpval ;
 	}
-	if ((vp == nullptr) || (vn[0] == '\0')) {
+	if ((vp == nullptr) || (vp[0] == '\0')) {
 	    vp = sysword.w_tmpdir ;
 	}
 	return vp ;

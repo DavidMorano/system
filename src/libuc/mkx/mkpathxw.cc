@@ -25,12 +25,18 @@
 
 /*******************************************************************************
 
+  	Family:
+	mkpathxw
+
+	Description:
         This subroutine constructs a file path out of one or more path
         componets.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"mkpathxw.h"

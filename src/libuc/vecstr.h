@@ -1,4 +1,5 @@
 /* vecstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-string container (Vector-String) */

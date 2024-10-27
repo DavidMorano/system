@@ -17,11 +17,17 @@
 
 /*******************************************************************************
 
+  	Name:
+	mkrevstr
+
+	Description:
 	Reverse the characters of a string in place.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 

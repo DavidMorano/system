@@ -28,7 +28,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/mman.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |dup2(2)| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -59,15 +59,15 @@ using std::nullptr_t ;			/* type */
 
 namespace {
     struct udup ;
-    typedef int (udup::*mem_f)(int) noex ;
+    typedef int (udup::*mem_m)(int) noex ;
     struct udup {
-	mem_f		m ;
+	mem_m		m ;
 	int		fd2 ;
 	udup() noex { } ;
 	udup(int f) noex : fd2(f) { } ;
 	int operator () (int) noex ;
-	int dup1(int) noex ;
-	int dup2(int) noex ;
+	int udup1(int) noex ;
+	int udup2(int) noex ;
     } ; /* end struct (udup) */
 }
 
@@ -82,14 +82,14 @@ namespace {
 
 int u_dup(int fd) noex {
 	udup		udupo ;
-	udupo.m = &udup::dup1 ;
+	udupo.m = &udup::udup1 ;
 	return udupo(fd) ;
 }
 /* end subroutine (u_dup) */
 
 int u_dup2(int fd,int fd2) noex {
 	udup		udupo(fd2) ;
-	udupo.m = &udup::dup2 ;
+	udupo.m = &udup::udup2 ;
 	return udupo(fd) ;
 }
 /* end subroutine (u_dup2) */
@@ -154,24 +154,24 @@ int udup::operator () (int fd) noex {
 }
 /* end subroutine (udup::operator) */
 
-int udup::dup1(int fd) noex {
+int udup::udup1(int fd) noex {
 	int		rs ;
 	if ((rs = dup(fd)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end method (udup::dup1) */
+/* end method (udup::udup1) */
 
-int udup::dup2(int fd) noex {
+int udup::udup2(int fd) noex {
 	int		rs = SR_INVALID ;
 	if (fd2 >= 0) {
-	    if ((rs = dup2(fd2)) < 0) {
+	    if ((rs = dup2(fd,fd2)) < 0) {
 	        rs = (- errno) ;
 	    }
 	}
 	return rs ;
 }
-/* end method (udup::dup2) */
+/* end method (udup::udup2) */
 
 

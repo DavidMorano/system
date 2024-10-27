@@ -1,4 +1,5 @@
 /* vecsorthand SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector of sorted handles */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	vecsorthand
+
+	Description:
 	This object is used when the caller just wants to store an
 	item in a sorted (flat) list.  This object is a vector-type
 	object that stores pointers to the caller data objects to

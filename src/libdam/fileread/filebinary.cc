@@ -1,4 +1,5 @@
 /* filebinary SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine if the named file is a binary file */
