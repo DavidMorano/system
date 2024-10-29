@@ -84,7 +84,7 @@
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
+#define	SI	subinfo
 
 
 /* imported namespaces */
@@ -112,12 +112,12 @@ struct subinfo {
 
 /* forward references */
 
-static int subinfo_start(SUBINFO *,int,wdt_f,void *) noex ;
-static int subinfo_finish(SUBINFO *) noex ;
-static int subinfo_procdir(SUBINFO *,char *,int) noex ;
-static int subinfo_procdirents(SUBINFO *,char *,int) noex ;
-static int subinfo_procname(SUBINFO *,cchar *,int) noex ;
-static int subinfo_procout(SUBINFO *,cchar *,USTAT *) noex ;
+static int subinfo_start(SI *,int,wdt_f,void *) noex ;
+static int subinfo_finish(SI *) noex ;
+static int subinfo_procdir(SI *,char *,int) noex ;
+static int subinfo_procdirents(SI *,char *,int) noex ;
+static int subinfo_procname(SI *,cchar *,int) noex ;
+static int subinfo_procout(SI *,cchar *,USTAT *) noex ;
 
 
 /* local variables */
@@ -136,7 +136,7 @@ int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
 	if (basedir && auf) {
 	    rs = SR_INVALID ;
 	    if (basedir[0]) {
-	        SUBINFO		si, *sip = &si ;
+	        SI	si, *sip = &si ;
 	        if ((rs = subinfo_start(sip,wopts,auf,uarg)) >= 0) {
 		    fifostr	*fsp = &sip->fs ;
 	            if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
@@ -170,7 +170,7 @@ int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
 
 /* private subroutines */
 
-static int subinfo_start(SUBINFO *sip,int wopts,wdt_f uf,void *uarg) noex {
+static int subinfo_start(SI *sip,int wopts,wdt_f uf,void *uarg) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    memclear(sip) ;
@@ -183,7 +183,7 @@ static int subinfo_start(SUBINFO *sip,int wopts,wdt_f uf,void *uarg) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+static int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sip) {
@@ -197,7 +197,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_procdir(SUBINFO *sip,char *dbuf,int dlen) noex {
+static int subinfo_procdir(SI *sip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = subinfo_procdirents(sip,dbuf,dlen)) >= 0) {
@@ -212,7 +212,7 @@ static int subinfo_procdir(SUBINFO *sip,char *dbuf,int dlen) noex {
 }
 /* end subroutine (subinfo_procdir) */
 
-static int subinfo_procdirents(SUBINFO *sip,char *dbuf,int dlen) noex {
+static int subinfo_procdirents(SI *sip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -242,7 +242,7 @@ static int subinfo_procdirents(SUBINFO *sip,char *dbuf,int dlen) noex {
 }
 /* end subroutine (subinfo_procdirents) */
 
-static int subinfo_procname(SUBINFO *sip,cchar *dbuf,int dlen) noex {
+static int subinfo_procname(SI *sip,cchar *dbuf,int dlen) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = lstat(dbuf,&sb)) >= 0) {
@@ -275,7 +275,7 @@ static int subinfo_procname(SUBINFO *sip,cchar *dbuf,int dlen) noex {
 }
 /* end subroutine (subinfo_procname) */
 
-static int subinfo_procout(SUBINFO *sip,cchar *dbuf,USTAT *sbp) noex {
+static int subinfo_procout(SI *sip,cchar *dbuf,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (sip->uf) {

@@ -869,6 +869,7 @@ callback.o:		callback.cc callback.h
 getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
+xfile.o:		xfile.cc xfile.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

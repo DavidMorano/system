@@ -22,7 +22,7 @@
 	removename
 
 	Description:
-	This function removes a named UNIX file-system object along
+	This function removes a named UNIX® file-system object along
 	with all of its descendents (if any).
 
 	Synopsis:
@@ -40,7 +40,7 @@
 
 ******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -61,15 +61,11 @@
 
 /* local defines */
 
-#define	REMOVEINFO	struct removeinfo
-#define	REMOVEINFO_FL	struct removeinfo_flags
+#define	REMOVEINFO	struct remover
+#define	REMOVEINFO_FL	struct remover_flags
 
 
 /* imported namespaces */
-
-extern "C" {
-    typedef int (*wdt_f)() noex ;
-}
 
 
 /* local typedefs */
@@ -86,24 +82,38 @@ extern "C" {
 
 /* local structures */
 
-struct removeinfo_flags {
+struct remover_flags {
+    	uint		randomvar:1 ;
 	uint		burn:1 ;
 	uint		follow:1 ;
 } ;
 
-struct removeinfo {
+namespace {
+    struct remover {
+	cchar		*name ;
 	randomvar	*rvp ;
-	REMOVEINFO_FL	f ;
 	vecpstr		dirs ;
-	uint		c_removed ;
-	int		bcount ;
-} ;
+	randomvar	x ;
+	REMOVEINFO_FL	fl{} ;
+	int		crem ;
+	int		bcount = 0 ;
+	remover(cc *n,randomvar *p,int bc) noex : name(n), rvp(p) {
+	    if (bc > 0) bcount = bc ;
+	} ;
+	int start(int) noex ;
+	int finish() noex ;
+	int decider(USTAT *) noex ;
+	int rmdirs() noex ;
+	int removeit(cchar *,USTAT *) noex ;
+    } ; /* end struct (remover) */
+}
 
 
 /* forward references */
 
-static int	removeit(cchar *,USTAT *,removeinfo *) noex ;
-static int	rmdirs(removeinfo *) noex ;
+extern "C" {
+    static int	remover_co(cchar *,USTAT *,void *) noex ;
+}
 
 
 /* local variables */
@@ -114,141 +124,146 @@ static int	rmdirs(removeinfo *) noex ;
 
 /* exported subroutines */
 
-int removename(randomvar *rvp,int bcount,int opts,cchar *name) noex {
-	void_f		vuf = void_f(removeit) ;
-	USTAT		sb, sb2 ;
-	REMOVEINFO	ri{} ;
-	randomvar	x ;
-	int		rs = SR_OK ;
+int removename(cchar *name,int rno,randomvar *rvp,int bcount) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		wopts = 0 ;
-	bool		f_rv = false ;
-
-	if (name == nullptr)
-	    return SR_FAULT ;
-
-	rs = u_lstat(name,&sb) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	ri.f.burn = (opts & REMOVENAME_MBURN) ? 1 : 0 ;
-	ri.f.follow = (opts & REMOVENAME_MFOLLOW) ? 1 : 0 ;
-	ri.rvp = rvp ;
-	ri.bcount = bcount ;
-	ri.c_removed = 0 ;
-
-	if (ri.f.burn && (rvp == nullptr)) {
-
-	    rs = randomvar_start(&x,false,opts) ;
-	    if (rs < 0)
-	        goto ret0 ;
-
-	    f_rv = true ;
-	    ri.rvp = &x ;
-
-	} /* end if (we need our own random variable) */
-
-	if ((rs = vecpstr_start(&ri.dirs,10,0,0)) >= 0) {
-	    wdt_f		wuf = wdt_f(vuf) ;
-
-/* continue with our processing */
-
-	    if (S_ISLNK(sb.st_mode)) {
-
-	        if (ri.f.follow &&
-	            (u_stat(name,&sb2) >= 0) && S_ISDIR(sb2.st_mode)) {
-
-	            wopts |= ((ri.f.follow) ? WDT_MFOLLOW : 0) ;
-	            if ((rs = wdt(name,wopts,wuf,&ri)) >= 0) {
-	                rs = vecpstr_add(&ri.dirs,name,-1) ;
-		    }
-	        } else {
-	            rs = removeit(name,&sb,&ri) ;
-	        } /* end if */
-
-	    } else if (S_ISDIR(sb.st_mode)) {
-
-	        wopts |= ((ri.f.follow) ? WDT_MFOLLOW : 0) ;
-	        rs = wdt(name,wopts,wuf,&ri) ;
-
-	        if (rs >= 0)
-	            rs = vecpstr_add(&ri.dirs,name,-1) ;
-
-	    } else {
-
-	        rs = removeit(name,&sb,&ri) ;
-
-	    } /* end if */
-
-/* remove the directories */
-
-	    if (rs >= 0) {
-	        rs = rmdirs(&ri) ;
-	    }
-	    rs1 = vecpstr_finish(&ri.dirs) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (vecpstr) */
-
-	if (f_rv) {
-	    rs1 = randomvar_finish(&x) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-ret0:
-
-	return (rs >= 0) ? ri.c_removed : rs ;
+	int		c = 0 ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		if (USTAT sb ; (rs = u_lstat(name,&sb)) >= 0) {
+		    remover	ro(name,rvp,bcount) ;
+		    if ((rs = ro.start(rno)) >= 0) {
+			{
+			    rs = ro.decider(&sb) ;
+			    c = rs ;
+			}
+			rs1 = ro.finish() ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (remover) */
+		} /* end if (lstat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (removename) */
+/* end subroutinte (removename) */
 
 
 /* local subroutines */
 
-static int removeit(cchar *name,USTAT *sbp,removeinfo *rip) noex {
+int remover::start(int rno) noex {
+    	int		rs = SR_OK ;
+	fl.burn = bool(rno & REMOVENAME_MBURN) ;
+	fl.follow = bool(rno & REMOVENAME_MFOLLOW) ;
+	if (fl.burn && (rvp == nullptr)) {
+	    if ((rs = x.start) >= 0) {
+	        fl.randomvar = true ;
+	        rvp = &x ;
+	    }
+	} /* end if (we need our own random variable) */
+	return rs ;
+}
+/* end method (remover::start) */
+
+int remover::finish() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (fl.randomvar && rvp) {
+	    rs1 = x.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	    rvp = nullptr ;
+	    fl.randomvar = false ;
+	}
+	return (rs >= 0) ? crem : rs ;
+}
+/* end method (remover::finish) */
+
+int remover::decider(USTAT *sbp) noex {
+    	cint		vn = 10 ;
+	cint		vo = 0 ;
+    	int		rs ;
+	int		rs1 ;
+	if ((rs = dirs.start(vn,0,vo)) >= 0) {
+	    wdt_f	wuf = remover_co ;
+	    int		wopts = 0 ;
+	    if (S_ISLNK(sbp->st_mode)) {
+	        if (fl.follow) {
+	            if (USTAT sbf ; (rs = u_stat(name,&sbf)) >= 0) {
+			if (S_ISDIR(sbf.st_mode)) {
+	            	    wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
+	            	    if ((rs = wdt(name,wopts,wuf,this)) >= 0) {
+	                	rs = dirs.add(name) ;
+		    	    }
+			} else {
+	                    rs = removeit(name,sbp) ;
+			}
+		    } /* end if (stat) */
+	        } else {
+	            rs = removeit(name,sbp) ;
+	        } /* end if */
+	    } else if (S_ISDIR(sbp->st_mode)) {
+	        wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
+	        if ((rs = wdt(name,wopts,wuf,this)) >= 0) {
+	            rs = dirs.add(name) ;
+		}
+	    } else {
+	        rs = removeit(name,sbp) ;
+	    } /* end if */
+	    /* remove the directories */
+	    if (rs >= 0) {
+	        rs = rmdirs() ;
+	    }
+	    rs1 = dirs.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (vecpstr) */
+	return (rs >= 0) ? crem : rs ;
+}
+/* end subroutine (remover::decider) */
+
+int remover::removeit(cchar *name,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	if (S_ISLNK(sbp->st_mode)) {
 	    USTAT	sb2 ;
 	    bool	f = true ;
-	    rs = (rip->f.follow) ? 0 : 1 ;
-	    f = f && rip->f.follow ;
+	    f = f && fl.follow ;
 	    f = f && (u_stat(name,&sb2) >= 0) ;
 	    f = f && S_ISDIR(sb2.st_mode) ;
 	    if (f) {
-	        rs = vecpstr_add(&rip->dirs,name,-1) ;
+	        rs = dirs.add(name,-1) ;
 	    } else {
 	        if ((rs = u_unlink(name)) >= 0) {
-	            rip->c_removed += 1 ;
+	            crem += 1 ;
 		}
 	    } /* end if */
 	} else if (S_ISDIR(sbp->st_mode)) {
-	    rs = vecpstr_add(&rip->dirs,name,-1) ;
+	    rs = dirs.add(name,-1) ;
 	} else {
-	    if (rip->f.burn && S_ISREG(sbp->st_mode)) {
-	        rs = burn(name,rip->bcount,rip->rvp) ;
+	    if (fl.burn && S_ISREG(sbp->st_mode)) {
+	        rs = burn(name,bcount,rvp) ;
 	    }
 	    if (rs >= 0) {
 	        if ((rs = u_unlink(name)) >= 0) {
-	            rip->c_removed += 1 ;
+	            crem += 1 ;
 		}
 	    } /* end if */
 	} /* end if */
 	return rs ;
 }
-/* end subroutine (removeit) */
+/* end method (remover::removeit) */
 
-static int rmdirs(removeinfo *rip) noex {
-	vecpstr		*dlp = &rip->dirs ;
+int remover::rmdirs() noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = vecpstr_count(dlp)) > 0) {
+	if ((rs = dirs.count) > 0) {
 	    n = rs ;
-	    if ((rs = vecpstr_sort(dlp,nullptr)) >= 0) {
+	    if ((rs = dirs.sort(nullptr)) >= 0) {
 		bool	fe = false ;
 	        for (int i = (n - 1) ; i >= 0 ; i -= 1) {
-		    if (cchar *cp{} ; (rs = vecpstr_get(dlp,i,&cp)) >= 0) {
+		    if (cchar *cp{} ; (rs = dirs.get(i,&cp)) >= 0) {
 	                if (cp) {
 	                    if ((rs = u_rmdir(cp)) >= 0) {
-	                        rip->c_removed += 1 ;
+	                        crem += 1 ;
 			    }
 	                }
 		    } else if (rs == rsn) {
@@ -258,9 +273,15 @@ static int rmdirs(removeinfo *rip) noex {
 		    if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if */
-	} /* end if */
+	} /* end if (vecpstr_count) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (rmdirs) */
+/* end method (remover::rmdirs) */
+
+static int remover_co(cchar *name,USTAT *sbp,void *vop) noex {
+    	remover		*op = (remover *) vop ;
+	return op->removeit(name,sbp) ;
+}
+/* end subroutine (remover_co) */
 
 

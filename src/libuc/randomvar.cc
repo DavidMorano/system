@@ -40,7 +40,7 @@
 	but we do it with a 127 degree polynomial.  Our polynomial
 	is currently:
 
-		x**127 + x**67 + x**23 + 1
+		x**127 + x**67 + x**23 + x**0
 
 	If you have a better one (which is likely) or even a good
 	one, let me know!  Some known good polynomials for lower
@@ -203,10 +203,9 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	int		rs = SR_FAULT ;
 	if (seed == 0) seed = 31415926 ;
 	if (op) {
-	    void	*vp{} ;
 	    csize	sz = (slen * szof(ulong)) ;
 	    memclear(op) ;
-	    if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 		op->state = ulongp(vp) ;
 	        op->f.flipper = false ;
 	        op->f.pseudo = f_pseudo ;

@@ -1,10 +1,8 @@
-# MAKEFILE
+# MAKEFILE (days)
 
 T= days
 
 ALL= $(T).so
-
-SRCROOT= $(LOCAL)
 
 
 BINDIR= $(SRCROOT)/bin
@@ -467,9 +465,7 @@ biblepara.o:		biblepara.c biblepara.h
 bibleverse.o:		bibleverse.c bibleverse.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 
-requests.o:		requests.c requests.h
-
-vecobj.o:		vecobj.c vecobj.h
+requests.o:		requests.cc requests.h
 
 oc.o:			oc.c oc.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
@@ -478,13 +474,13 @@ oc.o:			oc.c oc.h
 X01= testopensvc
 
 X01OBJ00= $(X01).o 
-#X01OBJ01= votdc.o votdchdr.o
-#X01OBJ02= shmalloc.o
+X01OBJ01=
+X01OBJ02=
 X01OBJ03=
 X01OBJ04=
 X01OBJ05=
 X01OBJ06=
-X01OBJ07= uc_openshmto.o uc_openshm.o
+X01OBJ07=
 
 X01OBJa= $(X01OBJ00) $(X01OBJ01) $(X01OBJ02) $(X01OBJ03) 
 X01OBJb= $(X01OBJ04) $(X01OBJ05) $(X01OBJ06) $(X01OBJ07)

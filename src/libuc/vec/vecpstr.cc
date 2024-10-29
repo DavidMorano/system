@@ -179,7 +179,7 @@ constexpr bool		f_qsort = CF_QSORT ;
 
 constexpr int		optmask = mkoptmask() ;
 
-constexpr int		resz = sizeof(int) ;
+constexpr int		resz = szof(int) ;
 
 
 /* exported variables */

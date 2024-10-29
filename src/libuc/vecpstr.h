@@ -81,6 +81,13 @@ struct vecpstr_head {
 	int		stsize ;	/* string table size */
 } ; /* end struct (vecpstr_head) */
 
+EXTERNC_begin
+
+typedef int (*vecpstr_vcmp)(cchar **,cchar **) noex ;
+typedef int (*vecpstr_f)(cchar **,cchar **) noex ;
+
+EXTERNC_end
+
 #ifdef	__cplusplus
 enum vecpstrmems {
 	vecpstrmem_count,
@@ -164,6 +171,7 @@ struct vecpstr : vecpstr_head {
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
 	int del(int = -1) noex ;
+	int sort(vecpstr_f = nullptr) noex ;
 	vecpstr_iter begin() noex {
 	    vecpstr_iter		it(va,0,i) ;
 	    return it ;

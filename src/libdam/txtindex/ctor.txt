@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int linecenter_ctor(linecenter *op,Args ... args) noex {
+static int lfm_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int linecenter_ctor(linecenter *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (linecenter_ctor) */
+/* end subroutine (lfm_ctor) */
 
-static int linecenter_dtor(linecenter *op) noex {
+static int lfm_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (linecenter_dtor) */
+/* end subroutine (lfm_dtor) */
 
 template<typename ... Args>
-static inline int linecenter_magic(linecenter *op,Args ... args) noex {
+static inline int lfm_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LINECENTER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == LFM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (linecenter_magic) */
+/* end subroutine (lfm_magic) */

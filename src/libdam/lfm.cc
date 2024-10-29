@@ -5,7 +5,6 @@
 /* manage file-lock operations */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -26,12 +25,8 @@
 	update it by writting a current time into it.
 
 	Synopsis:
-	int lfm_start(op,fname,type,timeout,lcp,nn,un,banner)
-	LFM		*op ;
-	cchar	fname[] ;
-	int		type, timeout ;
-	lfm_ch	*lcp ;
-	cchar	nn[], un[], banner[] ;
+	int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
+		cc *nn,cc *un,cc *banner) noex
 
 	Arguments:
 	op		object pointer
@@ -44,9 +39,8 @@
 	banner		program banner
 
 	Returns:
-	>=0	OK
-	<0	error (system-return)
-
+	>=0		OK
+	<0		error (system-return)
 
 	= Notes:
 
@@ -61,19 +55,33 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<cstdarg>
 #include	<usystem.h>
+#include	<ucgetpid.h>
 #include	<estrings.h>
+#include	<mallocxx.h>
+#include	<getnodename.h>
+#include	<getusername.h>
+#include	<linebuffer.h>
 #include	<filer.h>
 #include	<storeitem.h>
-#include	<getusername.h>
-#include	<ugetpid.h>
+#include	<mkdirs.h>
+#include	<mkpathx.h>
+#include	<sfx.h>
+#include	<rmx.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<cfdec.h>
+#include	<timestr.h>
+#include	<isnot.h>
+#include	<iserror.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"lfm.h"
@@ -81,7 +89,8 @@
 
 /* local defines */
 
-#define	LFM_LOCKINFO	struct lfm_lockinfo
+#define	SB		storebuffer
+#define	SI		storeitem
 
 #ifndef	USERNAMELEN
 #ifndef	LOGNAME_MAX
@@ -91,48 +100,19 @@
 #endif
 #endif
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	MAX((NODENAMELEN + 1 + LOGNAMELEN + 1),2048)
-#endif
 
-#if	CF_DEBUGS
-#define	BUFLEN		80
-#else
-#define	BUFLEN		(MAXPATHLEN + 40)
-#endif
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern int	snopenflags(char *,int,int) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfnamecomp(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	getnodename(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	format(char *,int,int,cchar *,va_list) ;
-extern int	isNotPresent(int) ;
-extern int	isFailOpen(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-#endif
-
-extern char	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -141,73 +121,83 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct lfm_lockinfo {
-	cchar	*nn ;
-	cchar	*un ;
-	cchar	*bn ;
+	cchar		*nn ;
+	cchar		*un ;
+	cchar		*bn ;
 	time_t		dt ;
 } ;
 
 
 /* forward references */
 
-static int	lfm_startcheck(LFM *,time_t) ;
-static int	lfm_startopen(LFM *,LFM_LOCKINFO *) ;
+template<typename ... Args>
+static int lfm_ctor(lfm *op,Args ... args) noex {
+    	LFM		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (lfm_ctor) */
 
-static int	lfm_lockload(LFM *,lfm_ch *) ;
-static int	lfm_locklost(LFM *,lfm_ch *,FILER *) ;
-static int	lfm_lockwrite(LFM *,LFM_LOCKINFO *,int) ;
-static int	lfm_lockwriter(LFM *,LFM_LOCKINFO *,int) ;
-static int	lfm_lockwritedate(LFM *,time_t) ;
-static int	lfm_lockreadpid(LFM *) ;
-static int	lfm_lockbegin(LFM *op) ;
-static int	lfm_lockend(LFM *op) ;
-static int	lfm_checklock(LFM *,time_t) ;
-static int	lfm_ourdevino(LFM *,USTAT *) ;
+static int lfm_dtor(lfm *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (lfm_dtor) */
 
-static int	check_init(lfm_ch *) ;
+template<typename ... Args>
+static inline int lfm_magic(lfm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LFM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (lfm_magic) */
+
+static int	lfm_startcheck(lfm *,time_t) noex ;
+static int	lfm_startopen(lfm *,lfm_in *) noex ;
+
+static int	lfm_lockload(lfm *,lfm_ch *) noex ;
+static int	lfm_locklost(lfm *,lfm_ch *,filer *) noex ;
+static int	lfm_lockwrite(lfm *,lfm_in *,int) noex ;
+static int	lfm_lockwriter(lfm *,lfm_in *,int) noex ;
+static int	lfm_lockwritedate(lfm *,time_t) noex ;
+static int	lfm_lockreadpid(lfm *) noex ;
+static int	lfm_lockbegin(lfm *op) noex ;
+static int	lfm_lockend(lfm *op) noex ;
+static int	lfm_checklock(lfm *,time_t) noex ;
+static int	lfm_ourdevino(lfm *,USTAT *) noex ;
+
+static int	check_init(lfm_ch *) noex ;
 
 
 /* local variables */
 
-#if	CF_DEBUGS
-static cchar	*types[] = {
-	    "record",
-	    "create",
-	    "exclusive",
-	    NULL
-} ;
-#endif /* CF_DEBUGS */
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int lfm_start(op,fname,type,to,lcp,nn,un,bn)
-LFM		*op ;
-cchar	fname[] ;
-int		type ;
-int		to ;
-lfm_ch	*lcp ;
-cchar	nn[], un[], bn[] ;
-{
-	const time_t	dt = time(NULL) ;
-	cint	nnlen = NODENAMELEN ;
-	cint	unlen = USERNAMELEN ;
+int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
+		cc *nn,cc *un,cc *bn) noex {
+	custime		dt = getustime ;
+	cint		nnlen = NODENAMELEN ;
+	cint		unlen = USERNAMELEN ;
 	int		rs = SR_OK ;
 	char		nnbuf[NODENAMELEN + 1] ;
 	char		unbuf[USERNAMELEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("lfm_start: ent fname=%s\n",fname) ;
-	debugprintf("lfm_start: type=%u\n",type) ;
-#endif
+	if (op == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (to < 0) to = LFM_TOLOCK ;
-
-	memclear(op) ;
 
 /* argument check */
 
@@ -223,18 +213,18 @@ cchar	nn[], un[], bn[] ;
 	op->pid_lock = -1 ;
 	op->tocheck = LFM_TOMINCHECK ;
 	op->tolock = to ;
-	op->pid = ugetpid() ;
+	op->pid = ucgetpid() ;
 
-	if (lcp != NULL) check_init(lcp) ;
+	if (lcp != nullptr) check_init(lcp) ;
 
 /* continue itialization */
 
-	if ((rs >= 0) && (nn == NULL)) {
+	if ((rs >= 0) && (nn == nullptr)) {
 	    nn = nnbuf ;
 	    rs = getnodename(nnbuf,nnlen) ;
 	}
 
-	if ((rs >= 0) && (un == NULL)) {
+	if ((rs >= 0) && (un == nullptr)) {
 	    un = unbuf ;
 	    rs = getusername(unbuf,unlen,-1) ;
 	}
@@ -252,9 +242,9 @@ cchar	nn[], un[], bn[] ;
 	            if ((dnl = sfdirname(op->lfname,fnlen,&dnp)) > 0) {
 	                char	dbuf[MAXPATHLEN+1] ;
 	                if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) {
-	                    LFM_LOCKINFO	li ;
-	                    cint		am = (X_OK | W_OK) ;
-	                    cint		rsn = SR_NOENT ;
+	                    lfm_in	li{} ;
+	                    cint	rsn = SR_NOENT ;
+	                    cint	am = (X_OK | W_OK) ;
 	                    li.dt = dt ;
 	                    li.nn = nn ;
 	                    li.un = un ;
@@ -264,20 +254,17 @@ cchar	nn[], un[], bn[] ;
 	                            rs = lfm_startopen(op,&li) ;
 	                        }
 	                    } else if (rs == rsn) {
-	                        const mode_t	dm = 0777 ;
+	                        cmode	dm = 0777 ;
 	                        if ((rs = mkdirs(dbuf,dm)) >= 0) {
 	                            rs = lfm_startopen(op,&li) ;
 	                        }
 	                    }
-#if	CF_DEBUGS
-			    debugprintf("lfm_start: u_access() rs=%d\n",rs) ;
-#endif
 	                } /* end if (mkpath) */
 	            }
 	            if (rs < 0) {
-	                if (op->lfname != NULL) {
+	                if (op->lfname != nullptr) {
 	                    uc_free(op->lfname) ;
-	                    op->lfname = NULL ;
+	                    op->lfname = nullptr ;
 	                }
 	            }
 	        } /* end if (m-a) */
@@ -285,246 +272,173 @@ cchar	nn[], un[], bn[] ;
 	} /* end if (ok) */
 
 	if (rs < 0) {
-	    if (lcp != NULL) lfm_lockload(op,lcp) ;
+	    if (lcp) lfm_lockload(op,lcp) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("lfm_start: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (lfm_start) */
 
-
-int lfm_finish(LFM *op)
-{
-	int		rs = SR_OK ;
+int lfm_finish(lfm *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("lfm_finish: ent\n") ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfd >= 0) {
-	    rs1 = u_close(op->lfd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->lfd = -1 ;
-	}
-
-	if (op->lfname != NULL) {
-	    if ((op->type >= LFM_TCREATE) && (op->lfname[0] != '\0')) {
-	        u_unlink(op->lfname) ;
+	if ((rs = lfm_magic(op)) >= 0) {
+	    if (op->lfd >= 0) {
+	        rs1 = u_close(op->lfd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->lfd = -1 ;
 	    }
-	    rs1 = uc_free(op->lfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->lfname = NULL ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("lfm_finish: ret rs=%d\n",rs) ;
-#endif
-
-	op->magic = 0 ;
+	    if (op->lfname) {
+	        if ((op->type >= LFM_TCREATE) && (op->lfname[0] != '\0')) {
+	            u_unlink(op->lfname) ;
+	        }
+	        rs1 = uc_free(op->lfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->lfname = nullptr ;
+	    }
+	    {
+		rs1 = lfm_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lfm_finish) */
 
-
-int lfm_setpoll(LFM *op,int tocheck)
-{
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	op->tocheck = tocheck ;
-	return SR_OK ;
+int lfm_setpoll(lfm *op,int tocheck) noex {
+    	int		rs ;
+	if ((rs = lfm_magic(op)) >= 0) {
+	    op->tocheck = tocheck ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (lfm_setpoll) */
 
-int lfm_getinfo(LFM *op,lfm_in *ip) noex {
-	if (op == NULL) return SR_FAULT ;
-	if (ip == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfname == NULL) return SR_NOANODE ;
-
-	ip->dev = op->dev ;
-	ip->ino = op->ino ;
-	ip->tocheck = op->tocheck ;
-	return SR_OK ;
+int lfm_getinfo(lfm *op,lfm_in *ip) noex {
+    	int		rs ;
+	if ((rs = lfm_magic(op,ip)) >= 0) {
+	    rs = SR_NOANODE ;
+	    if (op->lfname) {
+		rs = SR_OK ;
+	        ip->dev = op->dev ;
+	        ip->ino = op->ino ;
+	        ip->tocheck = op->tocheck ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (lfm_getinfo) */
 
-int lfm_check(LFM *op,lfm_ch *cip,time_t dt) noex {
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfname == NULL) return SR_NOANODE ;
-
-#if	CF_DEBUGS
-	debugprintf("lfm_check: continuing\n") ;
-#endif
-
-	if (cip != NULL) check_init(cip) ;
-
-	if (op->tocheck >= 0) {
-	    if (dt == 0) dt = time(NULL) ;
-	    if ((dt - op->ti_check) >= op->tocheck) {
-	        op->ti_check = dt ;
-	        op->pid_lock = -1 ;
-
-/* do a check on the INODE (if it is the same) */
-	        if (((dt - op->ti_stat) >= LFM_TOMINSTAT) ||
-	            (op->type == LFM_TCREATE)) {
-	            USTAT	sb ;
-
-	            if ((rs = u_stat(op->lfname,&sb)) >= 0) {
-	                op->ti_stat = dt ;
-	                rs = lfm_ourdevino(op,&sb) ;
-	            }
-	        } /* end if (stat check) */
-
-#if	CF_DEBUGS
-	        debugprintf("lfm_check: past INODE check\n") ;
-#endif
-
-	        if (rs >= 0) {
-	            rs = lfm_checklock(op,dt) ;
-	        } /* end if (ok) */
-
-
-	        if ((rs < 0) && (cip != NULL)) {
-	            lfm_lockload(op,cip) ;
-	            cip->stat = rs ;
-	        }
-
-	    } /* end if */
-	} /* end if (time-out enabled) */
-
-#if	CF_DEBUGS
-	debugprintf("lfm_check: ret rs=%d\n",rs) ;
-#endif
-
+int lfm_check(lfm *op,lfm_ch *cip,time_t dt) noex {
+	int		rs ;
+	if ((rs = lfm_magic(op)) >= 0) {
+	    rs = SR_NOANODE ;
+	    if (op->lfname) {
+		rs = SR_OK ;
+		if (cip) rs = check_init(cip) ;
+	        if ((rs >= 0)  && (op->tocheck >= 0)) {
+	            if (dt == 0) dt = getustime ;
+	            if ((dt - op->ti_check) >= op->tocheck) {
+			bool	f = false ;
+	                op->ti_check = dt ;
+	                op->pid_lock = -1 ;
+		        /* do a check on the INODE (if it is the same) */
+			f = f || ((dt - op->ti_stat) >= LFM_TOMINSTAT) ;
+			f = f || (op->type == LFM_TCREATE) ;
+			if (f) {
+			    cchar	*fn = op->lfname ;
+	                    if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	                        op->ti_stat = dt ;
+	                        rs = lfm_ourdevino(op,&sb) ;
+	                    }
+	                } /* end if (stat check) */
+	                if (rs >= 0) {
+	                    rs = lfm_checklock(op,dt) ;
+	                } /* end if (ok) */
+	                if ((rs < 0) && cip) {
+	                    lfm_lockload(op,cip) ;
+	                    cip->status = rs ;
+	                }
+	            } /* end if */
+	        } /* end if (time-out enabled) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lfm_check) */
 
-
-/* 'printf'-like routine */
-int lfm_printf(LFM *op,cchar *fmt,...)
-{
-	int		rs = SR_OK ;
+int lfm_printf(lfm *op,cchar *fmt,...) noex {
+	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	char		buf[BUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("lfm_printf: ent\n") ;
-#endif /* CF_DEBUGS */
-
-	if (op == NULL) rs = SR_FAULT ;
-
-	if (op->lfname == NULL) return SR_NOANODE ;
-
-	if (op->lfd < 0) {
-	    rs = u_open(op->lfname,O_RDWR,0666) ;
-	    if (rs >= 0) op->lfd = rs ;
-	}
-
-	if (rs >= 0) {
-
-/* seek up to the proper place to start writing (for the user stuff) */
-
-	    u_seek(op->lfd,op->owrite,SEEK_SET) ;
-
-#if	CF_DEBUGS
-	    debugprintf("lfm_printf: we seeked to %lld\n",op->owrite) ;
-#endif /* CF_DEBUGS */
-
-/* format the user's data (possibly write some out) */
-
-	    {
-	        va_list	ap ;
-	        va_begin(ap,fmt) ;
-	        rs = format(buf,BUFLEN,0,fmt,ap) ;
-	        len = rs ;
-	        va_end(ap) ;
-	    }
-
-	    if (rs >= 0) {
-	        if ((rs = u_write(op->lfd,buf,len)) >= 0) {
-	            op->owrite += len ;
+	if ((rs = lfm_magic(op,fmt)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (op->lfname) {
+		rs = SR_OK ;
+	        if (op->lfd < 0) {
+	            rs = u_open(op->lfname,O_RDWR,0666) ;
+	            if (rs >= 0) op->lfd = rs ;
 	        }
-	    }
-
-	} /* end if (ok) */
-
-#if	CF_DEBUGS
-	debugprintf("lfm_printf: ret rs=%d len=%u\n",rs,len) ;
-#endif /* CF_DEBUGS */
-
+	        if (rs >= 0) {
+	            /* seek up to the proper place to start writing */
+	            if ((rs = u_seek(op->lfd,op->owrite,SEEK_SET)) >= 0) {
+	                va_list	ap ;
+		        if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	                    va_begin(ap,fmt) ;
+		            cint	llen = rs ;
+	                    if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) >= 0) {
+	                        if ((rs = u_write(op->lfd,buf,len)) >= 0) {
+	                            op->owrite += len ;
+	                        }
+	                    } /* end if (fmtstr) */
+			    rs = rsfree(rs,lbuf) ;
+		        } /* end if (m-a-f) */
+	                va_end(ap) ;
+	            } /* end if (u_seek) */
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (lfm_printf) */
 
-
-int lfm_rewind(LFM *op)
-{
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfname == NULL) return SR_NOANODE ;
-
-	op->owrite = op->orewind ;
-	return SR_OK ;
+int lfm_rewind(lfm *op) noex {
+    	int		rs ;
+	if ((rs = lfm_rewind(op)) >= 0) {
+	    rs = SR_NOANODE ;
+	    if (op->lfname) {
+		op->owrite = op->orewind ;
+	    }
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (lfm_rewind) */
 
-
-int lfm_flush(LFM *op)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfname == NULL) return SR_NOANODE ;
-
-/* nothing to do now! */
-
+int lfm_flush(lfm *op) noex {
+	int		rs ;
+	if ((rs = lfm_magic(op)) >= 0) {
+	    rs = SR_NOANODE ;
+	    if (op->lfname) {
+		rs = SR_OK ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lfm_flush) */
 
-
-/* get the PID of the guy who stole our lock! */
-int lfm_getpid(LFM *op,pid_t *rp)
-{
+int lfm_getpid(lfm *op,pid_t *rp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
-
-	if (op->magic != LFM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfname == NULL) return SR_NOANODE ;
-
-	if (rp != NULL) {
-	    *rp = op->pid ;
-	}
-
-	rs = (op->pid & INT_MAX) ;
+	if ((rs = lfm_magic(op)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (op->lfname) {
+		rs = SR_OK ;
+	        if (rp) {
+	            *rp = op->pid ;
+	        }
+		rs = (op->pid & INT_MAX) ;
+	    } /* end if (not bugcheck) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lfm_getpid) */
@@ -532,14 +446,11 @@ int lfm_getpid(LFM *op,pid_t *rp)
 
 /* private subroutines */
 
-
-static int lfm_startcheck(LFM *op,time_t dt)
-{
-	USTAT		sb ;
-	cint	type = op->type ;
+static int lfm_startcheck(lfm *op,time_t dt) noex {
+	cint		type = op->type ;
 	int		rs ;
 	cchar		*lfn = op->lfname ;
-	if ((rs = u_stat(lfn,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(lfn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        cint	to = op->tolock ;
 	        op->ti_check = dt ;
@@ -557,39 +468,23 @@ static int lfm_startcheck(LFM *op,time_t dt)
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	} /* end if (u_stat) */
-#if	CF_DEBUGS
-	debugprintf("lfm_startcheck: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (lfm_startcheck) */
 
-
-static int lfm_startopen(LFM *op,LFM_LOCKINFO *lip)
-{
-	cint	type = op->type ;
+static int lfm_startopen(lfm *op,lfm_in *lip) noex {
+	cint		type = op->type ;
 	int		rs ;
-	int		oflags = (O_RDWR | O_CREAT) ;
-	mode_t		omode = 0664 ;
-
-#if	CF_DEBUGS
-	debugprintf("lfm_startopen: ent lfn=%s\n",op->lfname) ;
-	debugprintf("lfm_startopen: ent type=%u\n",type) ;
-#endif
-
-	if (type >= LFM_TCREATE) omode = 0444 ;
-	if (type >= LFM_TEXCLUSIVE) oflags |= O_EXCL ;
-	if ((rs = u_open(op->lfname,oflags,omode)) >= 0) {
+	int		of = (O_RDWR | O_CREAT) ;
+	mode_t		om = 0664 ;
+	if (type >= LFM_TEXCLUSIVE) of |= O_EXCL ;
+	if (type >= LFM_TCREATE) om = 0444 ;
+	if ((rs = u_open(op->lfname,of,om)) >= 0) {
 	    cint	lfd = rs ;
-
-#if	CF_DEBUGS
-	    debugprintf("lfm_startopen: u_open() rs=%d\n",rs) ;
-#endif
-
-	    if ((rs = uc_lockf(lfd,F_TLOCK,0L)) >= 0) {
+	    cint	cmd = F_TLOCK ;
+	    if ((rs = uc_lockf(lfd,cmd,0z)) >= 0) {
 	        if ((rs = lfm_lockwrite(op,lip,lfd)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_fstat(lfd,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_fstat(lfd,&sb)) >= 0) {
 	                op->lfd = lfd ;
 	                op->magic = LFM_MAGIC ;
 	                op->dev = sb.st_dev ;
@@ -599,7 +494,6 @@ static int lfm_startopen(LFM *op,LFM_LOCKINFO *lip)
 	    } else if (rs == SR_ACCESS) {
 	        rs = SR_LOCKED ;
 	    } /* end if (uc_lockf) */
-
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_EXIST:
@@ -609,246 +503,208 @@ static int lfm_startopen(LFM *op,LFM_LOCKINFO *lip)
 	        } /* end switch */
 	    } /* end if */
 	} /* end if (u_open) */
-
-#if	CF_DEBUGS
-	debugprintf("lfm_startopen: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutie (lfm_startopen) */
 
-
-/* try to load up information on the lock (lost) */
-static int lfm_lockload(LFM *op,lfm_ch *lcp)
-{
+static int lfm_lockload(lfm *op,lfm_ch *lcp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (lcp != NULL) {
-	    const mode_t	omode = 0666 ;
-	    cint		llen = LINEBUFLEN ;
-	    cint		of = O_RDONLY ;
-	    int			v ;
-
-	    check_init(lcp) ;
-
-	    if ((rs = u_open(op->lfname,of,omode)) >= 0) {
-	        cint	lfd = rs ;
-	        if (filer b ; (rs = filer_start(&b,lfd,0z,512,0)) >= 0) {
-	            int		len ;
-	            char	lbuf[LINEBUFLEN + 1] ;
-
-	            if ((rs = filer_readln(&b,lbuf,llen,0)) > 0) {
-	                len = rs ;
-
-	                if ((len > 0) && (lbuf[len - 1] == '\n'))
-	                    len -= 1 ;
-
-	                op->pid_lock = (pid_t) -1 ;
-	                if (cfdeci(lbuf,len,&v) >= 0)
-	                    op->pid_lock = (pid_t) v ;
-
-#if	CF_DEBUGS
-	                debugprintf("lfm_check: pid=%d lockpid=%d\n",
-	                    op->pid,op->pid_lock) ;
-#endif
-
-/* resume with the rest of the data gathering */
-
-	                rs = lfm_locklost(op,lcp,&b) ;
-
-	            } else {
-	                rs = SR_LOCKLOST ;
-	            }
-
-	            rs1 = filer_finish(&b) ;
+	if (lcp != nullptr) {
+	    if (cchar *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	        cint	llen = rs ;
+	        cint	of = O_RDONLY ;
+	        cmode	omode = 0666 ;
+	        check_init(lcp) ;
+	        if ((rs = u_open(op->lfname,of,omode)) >= 0) {
+	            cint	lfd = rs ;
+	            if (filer b ; (rs = b.start(lfd,0z,512,0)) >= 0) {
+	                if ((rs = b.readln(lbuf,llen,0)) > 0) {
+	                    int		len = rs ;
+	                    if ((len > 0) && (lbuf[len - 1] == '\n')) {
+	                        len -= 1 ;
+			    }
+	                    if (int v{} ; (rs = cfdeci(lbuf,len,&v)) >= 0) {
+	                        op->pid_lock = pid_t(v) ;
+			    } else if (isNotValid(rs)) {
+	                        op->pid_lock = pid_t(-1) ;
+			    }
+			    /* resume with the rest of the data gathering */
+			    if (rs >= 0) {
+	                        rs = lfm_locklost(op,lcp,&b) ;
+			    }
+	                } else {
+	                    rs = SR_LOCKLOST ;
+	                }
+	                rs1 = b.finish ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (filer) */
+	            rs1 = u_close(lfd) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (filer) */
-
-	        rs1 = u_close(lfd) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (opened file) */
-
+	        } /* end if (opened file) */
+		rs = rsfree(rs,lbuf) ;
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
-
 	return rs ;
 }
 /* end subroutine (lfm_lockload) */
 
+namespace {
+    lfm		*op ;
+    lfm_ch	*lcp ;
+    linebuffer	*lbp ;
+    storeitem	*sip ;
+    struct parser {
+	parser(lfm *aop,lfm *alcp,linebuffer *albp,storeitem *asip) noex {
+	    op = aop ;
+	    lcp = alcp ;
+	    lbp = albp ;
+	    sip = asip ;
+	} ;
+	int pnodeuser(int) noex ;
+	int ptimebuffer(int) noex ;
+    } ; /* end struct (parser) */
+}
+
+int parser::pnodeuser(int len) noex {
+	int		rs = SR_OK ;
+	int		sl = len ;
+	cchar		*sp = lbp->lbuf ;
+	if (cc *tp{} ; (tp = strnchr(sp,sl,'!')) != np) {
+	    sl = (tp - lbp->lbuf) ;
+	    if ((cl = sfshrink(sp,sl,&cp)) > 0) {
+		if (cc *ip{} ; (rs = cb.strw(cp,cl,&ip)) >= 0) {
+		    lcp->nodename = ip ;
+		}
+		sl = len - ((tp + 1) - sp) ;
+		sp = (tp + 1) ;
+	    } /* end if (sfshrink) */
+	} /* end if */
+	cl = sfshrink(sp,sl,&cp) ;
+	if (rs >= 0) {
+	    if (cc *ip{} ; (rs = cb.strw(cp,cl,&ip)) >= 0) {
+	        lcp->username = ip ;
+	    }
+	} /* end if */
+	return rs ;
+}
+/* end subroutine (lfm_parsenodeuser) */
+
+int parser::ptimebanner(int len) noex {
+    	int		rs = SR_OK ;
+	if (cc *tp{} ; (tp = strnpbrk(lbp->lbuf,len," \t")) != np) {
+	    cchar	*sp = (tp + 1) ;
+	    cint	sl = len - ((tp + 1) - lbp->lbuf) ;
+	    if ((cl = sfshrink(sp,sl,&cp)) >= 0) {
+		if (cc *ip{} ; (rs = cb.strw(cp,cl,&ip)) >= 0) {
+		    lcp->banner = ip ;
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (lfm_ptimebanner) */
 
 /* read the lock information on a failure */
-static int lfm_locklost(LFM *op,lfm_ch *lcp,FILER *fp)
-{
-	STOREITEM	cb ;
-	cint	buflen = lfm_chBUFLEN ;
-	int		rs ;
+static int lfm_locklost(lfm *op,lfm_ch *lcp,filer *fp) noex {
+    	cnullptr	np{} ;
+	cint		buflen = LFM_CHBUFLEN ;
+	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-
-/* sanity */
-
-	if (lcp == NULL) return SR_NOANODE ;
-	if (fp == NULL) return SR_NOANODE ;
-
-/* ok */
-
-	lcp->pid = op->pid_lock ;
-	if ((rs = storeitem_start(&cb,lcp->buf,buflen)) >= 0) {
-	    cint	llen = LINEBUFLEN ;
-	    int		len ;
-	    int		sl, cl ;
-	    cchar	*sp, *cp, *ip ;
-	    cchar	*tp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-	    if ((rs = filer_readln(fp,lbuf,llen,0)) > 0) {
-	        len = rs ;
-
-	        if (lbuf[len - 1] == '\n') len -= 1 ;
-	        lbuf[len] = '\0' ;
-
-/* is there a nodename? */
-
-	        sp = lbuf ;
-	        sl = len ;
-	        if ((tp = strnchr(sp,sl,'!')) != NULL) {
-
-	            cl = sfshrink(lbuf,(tp - sp),&cp) ;
-
-	            rs1 = storeitem_strw(&cb,cp,cl,&ip) ;
-
-	            if (rs1 >= 0)
-	                lcp->nodename = ip ;
-
-	            sl = len - ((tp + 1) - sp) ;
-	            sp = (tp + 1) ;
-
-	        } /* end if (had a nodename) */
-
-	        cl = sfshrink(sp,sl,&cp) ;
-
-	        rs1 = storeitem_strw(&cb,cp,cl,&ip) ;
-
-	        if (rs1 >= 0)
-	            lcp->username = ip ;
-
-	    } /* end if (reading node!user) */
-
-	    if ((rs >= 0) && (len > 0)) {
-
-	        if ((rs = filer_readln(fp,lbuf,llen,0)) > 0) {
-	            len = rs ;
-
-	            if (lbuf[len - 1] == '\n') len -= 1 ;
-	            lbuf[len] = '\0' ;
-
-	            if ((tp = strnpbrk(lbuf,len," \t")) != NULL) {
-	                sp = (tp + 1) ;
-	                sl = len - ((tp + 1) - lbuf) ;
-	                if ((cl = sfshrink(sp,sl,&cp)) >= 0) {
-	                    if ((rs = storeitem_strw(&cb,cp,cl,&ip)) >= 0) {
-	                        lcp->banner = ip ;
-	                    }
-	                }
-	            }
-
-	        } /* end if (reading time-banner) */
-
-	    } /* end if (reading continued) */
-
-	    rs1 = storeitem_finish(&cb) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (STOREITEM) */
-
+	if (lcp && fp) {
+	    lcp->pid = op->pid_lock ;
+	    if (linebuffer lb ; (rs = lb.start) >= 0) {
+		cint	llen = rs ;
+	        if (storeitem cb ; (rs = cb.start(lcp->buf,buflen)) >= 0) {
+		    parser	po(op,lcp,&lb,&sb) ;
+	            if ((rs = fp->readln(lb.lbuf,lb.llen,0)) > 0) {
+	                int	len = rmeol(lb,lbuf,rs) ;
+			if ((rs = po.pnodeuser(len)) >= 0) {
+	                    if ((rs = fp->readln(lb.lbuf,lb.llen,0)) > 0) {
+	                        len = rmeol(lbuf,rs) ;
+				rs = po.ptimebanner(len) ;
+			    }
+	                } /* end if (reading time-banner) */
+	            } /* end if (reading continued) */
+	            rs1 = cb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (storeitem) */
+		rs = lb.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (lfm_locklost) */
 
-
-static int lfm_lockwrite(LFM *op,LFM_LOCKINFO *lip,int lfd)
-{
+static int lfm_lockwrite(lfm *op,lfm_in *lip,int lfd) noex {
 	int		rs ;
-
 	if ((rs = lfm_lockwriter(op,lip,lfd)) >= 0) {
-	    off_t	woff = rs ;
+	    coff	woff = rs ;
 	    if ((rs = uc_ftruncate(lfd,woff)) >= 0) {
 	        op->owrite = woff ;
 	        op->orewind = woff ;
-	        rs = (woff & INT_MAX) ;
+	        rs = int(woff) ;
 	    }
-	}
-
+	} /* end if (lfm_lockwriter) */
 	return rs ;
 }
 /* end subroutine (lfm_lockwrite) */
 
-static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd) noex {
+static int lfm_lockwriter(lfm *op,lfm_in *lip,int lfd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		woff = 0 ;
-
-	if (filer b ; (rs = filer_start(&b,lfd,0z,512,0)) >= 0) {
-
+	if (filer b ; (rs = b.start(lfd,0z,512,0)) >= 0) {
 	    if (rs >= 0) {
-	        rs = filer_printf(&b,"%u\n",op->pid) ;
+	        rs = b.printf("%u\n",op->pid) ;
 	        woff += rs ;
 	    }
-
 	    if (rs >= 0) {
-	        rs = filer_printf(&b,"%s!%s\n",lip->nn,lip->un) ;
+	        rs = b.printf("%s!%s\n",lip->nn,lip->un) ;
 	        woff += rs ;
 	    }
-
 	    if (rs >= 0) {
-	        cchar	*bn = (lip->bn != NULL) ? lip->bn : "" ;
-	        char		tbuf[TIMEBUFLEN+1] ;
+	        cchar	*bn = (lip->bn) ? lip->bn : "" ;
+	        char	tbuf[TIMEBUFLEN+1] ;
 	        op->odate = woff ;
 	        timestr_logz(lip->dt,tbuf) ;
-	        rs = filer_printf(&b,"%s %s\n",tbuf,bn) ;
+	        rs = b.printf("%s %s\n",tbuf,bn) ;
 	        woff += rs ;
 	    }
-
-	    rs1 = filer_finish(&b) ;
+	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-
 	return (rs >= 0) ? woff : rs ;
 }
 /* end subroutine (lfm_lockwriter) */
 
-
-static int lfm_lockreadpid(LFM *op)
-{
-	cint	lfd = op->lfd ;
+static int lfm_lockreadpid(lfm *op) noex {
+    	cnullptr	np{} ;
+	cint		lfd = op->lfd ;
 	int		rs ;
+	int		rs1 ;
 	int		v = 0 ;
-
 	if ((rs = u_rewind(lfd)) >= 0) {
-	    cint	llen = LINEBUFLEN ;
-	    char	lbuf[LINEBUFLEN+1] ;
-	    if ((rs = u_read(lfd,lbuf,llen)) >= 0) {
-	        cchar	*tp ;
-	        int		len = rs ;
-
-	        if ((tp = strnchr(lbuf,len,'\n')) != NULL) {
-	            lbuf[tp-lbuf] = '\0' ;
-	        }
-
-	        rs = cfdeci(lbuf,len,&v) ;
-	        v &= INT_MAX ;
-
-	    } /* end if */
+	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	        cint	llen = rs ;
+	        if ((rs = u_read(lfd,lbuf,llen)) >= 0) {
+	            cint	len = rs ;
+	            if (cchar *tp{} ; (tp = strnchr(lbuf,len,'\n')) != np) {
+	                lbuf[tp - lbuf] = '\0' ;
+	            }
+	            rs = cfdeci(lbuf,len,&v) ;
+	            v &= INT_MAX ;
+	        } /* end if (u_read) */
+		rs = rsfree(rs,lbuf) ;
+	    } /* end if (m-a-f) */
 	} /* end if (u_rewind) */
-
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (lfm_lockreadpid) */
 
-
-static int lfm_lockwritedate(LFM *op,time_t dt)
-{
+static int lfm_lockwritedate(lfm *op,time_t dt) noex {
 	int		rs ;
-
 	if ((rs = u_seek(op->lfd,op->odate,SEEK_SET)) >= 0) {
 	    int		tl ;
 	    char	tbuf[TIMEBUFLEN+2] ;
@@ -856,75 +712,63 @@ static int lfm_lockwritedate(LFM *op,time_t dt)
 	    tl = strlen(tbuf) ;
 	    rs = u_write(op->lfd,tbuf,tl) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (lfm_lockwritedate) */
 
-
-static int lfm_lockbegin(LFM *op)
-{
+static int lfm_lockbegin(lfm *op) noex {
 	int		rs = SR_OK ;
-	int		f_open = FALSE ;
-
+	int		f_open = false ;
 	if (op->lfd < 0) {
-	    const mode_t	om = 0666 ;
-	    cint		of = O_RDWR ;
-	    f_open = TRUE ;
+	    cint	of = O_RDWR ;
+	    cmode	om = 0666 ;
+	    f_open = true ;
 	    rs = u_open(op->lfname,of,om) ;
 	    op->lfd = rs ;
 	}
-
 	return (rs >= 0) ? f_open : rs ;
 }
 /* end subroutine (lfm_lockbegin) */
 
-
-static int lfm_lockend(LFM *op)
-{
+static int lfm_lockend(lfm *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_open = FALSE ;
-
+	int		f_open = false ;
 	if (op->lfd >= 0) {
-	    f_open = TRUE ; /* was *previosuly* open */
+	    f_open = true ; /* was *previosuly* open */
 	    rs1 = u_close(op->lfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->lfd = -1 ;
 	}
-
 	return (rs >= 0) ? f_open : rs ;
 }
 /* end subroutine (lfm_lockend) */
 
-
-static int lfm_checklock(LFM *op,time_t dt)
-{
+static int lfm_checklock(lfm *op,time_t dt) noex {
 	int		rs ;
 	int		v = 0 ;
 	if ((rs = lfm_lockbegin(op)) >= 0) {
-	    int	f_open = (rs > 0) ;
-
+	    bool	f_open = (rs > 0) ;
 	    if ((rs = lfm_lockreadpid(op)) >= 0) {
-	        pid_t pid_lock = rs ;
-
+	        const pid_t	pid_lock = rs ;
 	        if (pid_lock != op->pid)  {
 	            rs = SR_LOCKLOST ;
 	        }
-
 	        if (rs >= 0) {
 	            v = pid_lock ;
 	            rs = lfm_lockwritedate(op,dt) ;
 	        }
-
 	    } /* end if (lfm_lockreadpid) */
-	    if (f_open) lfm_lockend(op) ;
+	    if (f_open) {
+		rs1 = lfm_lockend(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
 	} /* end if (lfm_lock) */
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (lfm_checklock) */
 
-static int lfm_ourdevino(LFM *op,USTAT *sbp) noex {
+static int lfm_ourdevino(lfm *op,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	if ((sbp->st_dev != op->dev) || (sbp->st_ino != op->ino)) {
 	    rs = SR_LOCKLOST ;
@@ -934,17 +778,17 @@ static int lfm_ourdevino(LFM *op,USTAT *sbp) noex {
 /* end subroutine (lfm_ourdevino) */
 
 static int check_init(lfm_ch *lcp) noex {
-	if (lcp == NULL) return SR_FAULT ;
-
-	memclear(lcp) ;
-
-	lcp->nodename = NULL ;
-	lcp->username = NULL ;
-	lcp->banner = NULL ;
-	lcp->pid = -1 ;
-	lcp->stat = 0 ;
-	lcp->buf[0] = '\0' ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (lcp && lcp) {
+	    rs = memclear(lcp) ;
+	    lcp->nodename = nullptr ;
+	    lcp->username = nullptr ;
+	    lcp->banner = nullptr ;
+	    lcp->pid = -1 ;
+	    lcp->status = 0 ;
+	    lcp->buf[0] = '\0' ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (check_init) */
 

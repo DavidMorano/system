@@ -16,14 +16,13 @@
 #include	<hdb.h>
 
 
-/* object defines */
 #define	ENVLIST			struct envlist_head
 #define	ENVLIST_CHUNKSIZE	256
 
 
 struct envlist_head {
 	hdb		*elp ;
-	void		*store ;
+	void		*store ;	/* <- this is a STRPACK object */
 } ;
 
 typedef ENVLIST		envlist ;

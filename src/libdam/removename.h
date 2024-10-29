@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern int	removename(randomvar *,int,int,cchar *) noex ;
+extern int	removename(cchar *,int,randomvar *,int) noex ;
 
 EXTERNC_end
 
