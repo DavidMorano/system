@@ -1,4 +1,5 @@
 /* nlspeername SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to find the peername for an NLS (XTI) connection */
@@ -161,8 +162,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	(void) al ;
 	if ((rs = cfhexui((ap + adv),8,&uv)) >= 0) {
 	    cint	family = int(uv) ;
-	    char	*hebuf{} ;
-	    if ((rs = malloc_ho(&hebuf)) >= 0) {
+	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
 	        ucentho		he ;
 		cint		helen = rs ;
 	        if ((rs = getheaddr(&he,hebuf,helen,ap)) >= 0) {

@@ -815,6 +815,7 @@ setint.o:		setint.cc setint.h
 osetint.o:		osetint.cc osetint.h
 osetstr.o:		osetstr.cc osetstr.h
 osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
+syspasswd.o:		syspasswd.cc syspasswd.h
 
 
 # sring-comparisons

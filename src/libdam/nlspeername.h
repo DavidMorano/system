@@ -1,4 +1,5 @@
 /* nlspeername HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* try to find the peername for an NLS (XTI) connection */

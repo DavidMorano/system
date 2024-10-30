@@ -1,4 +1,5 @@
 /* spawnproc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* spawn a local program */
@@ -71,8 +72,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<getbufsize.h>
 #include	<ucgetpid.h>
+#include	<getbufsize.h>
+#include	<getpwd.h>
 #include	<envhelp.h>
 #include	<vecstr.h>
 #include	<ids.h>
@@ -81,6 +83,7 @@
 #include	<snx.h>
 #include	<sfx.h>
 #include	<xperm.h>
+#include	<matxstr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -125,14 +128,10 @@ typedef spawnproc_con	scon ;
 /* external subroutines */
 
 extern "C" {
-    extern int	matkeystr(cchar **,cchar *,int) noex ;
     extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
-    extern int	getpwd(char *,int) noex ;
     extern int	dupup(int,int) noex ;
     extern int	sigdefaults(cint *) noex ;
     extern int	sigignores(cint *) noex ;
-    extern int	vecstr_addpath(vecstr *,cchar *,int) noex ;
-    extern int	vecstr_addcspath(vecstr *) noex ;
 }
 
 
@@ -166,7 +165,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr cpcchar	envbads[] = {
+constexpr cpcchar	envbads[] = {
 	"_",
 	"_A0",
 	"_EF",
@@ -176,7 +175,7 @@ static constexpr cpcchar	envbads[] = {
 	nullptr
 } ;
 
-static constexpr cint	sigigns[] = {
+constexpr cint	sigigns[] = {
 	SIGTERM,
 	SIGINT,
 	SIGHUP,
@@ -190,7 +189,7 @@ static constexpr cint	sigigns[] = {
 	0
 } ;
 
-static constexpr cint	sigdefs[] = {
+constexpr cint	sigdefs[] = {
 	SIGQUIT,
 	SIGTERM,
 	SIGINT,
@@ -200,14 +199,14 @@ static constexpr cint	sigdefs[] = {
 	0
 } ;
 
-static constexpr cint	sigouts[] = {
+constexpr cint	sigouts[] = {
 	SIGTTOU,
 	0
 } ;
 
 static vars		var ;
 
-static constexpr cchar	nullfname[] = NULLFNAME ;
+constexpr cchar		nullfname[] = NULLFNAME ;
 
 
 /* exported variables */
@@ -567,23 +566,22 @@ static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 /* end subroutine (findprog) */
 
 static int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
-	vecstr		plist ;
+    	static cchar	*path = getenv(VARPATH) ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
 	rbuf[0] = '\0' ;
-	if ((rs = vecstr_start(&plist,40,0)) >= 0) {
-	    cchar	*path = getenv(VARPATH) ;
+	if (vecstr plist ; (rs = plist.start(40,0)) >= 0) {
 	    if ((path != nullptr) && (path[0] != '\0')) {
-	        rs = vecstr_addpath(&plist,path,-1) ;
+	        rs = plist.addpath(path,-1) ;
 	    } else {
-	        rs = vecstr_addcspath(&plist) ;
+	        rs = plist.addcspath ;
 	    }
 	    if (rs >= 0) {
 	        rs = getprogpath(idp,&plist,rbuf,pn,-1) ;
 	        pl = rs ;
 	    }
-	    rs1 = vecstr_finish(&plist) ;
+	    rs1 = plist.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return (rs >= 0) ? pl : rs ;
@@ -596,10 +594,9 @@ static int ourfork() noex {
 /* end subroutine (ourfork) */
 
 static int opendevnull(int *opens,int i) noex {
-	USTAT		sb ;
 	cint		rsbad = SR_BADF ;
 	int		rs ;
-	if ((rs = u_fstat(i,&sb)) == rsbad) {
+	if (USTAT sb ; (rs = u_fstat(i,&sb)) == rsbad) {
 	    cint	of = (i == 0) ? O_RDONLY : O_WRONLY ;
 	    cmode	om = 0666 ;
 	    if ((rs = u_open(nullfname,of,om)) >= 0) {

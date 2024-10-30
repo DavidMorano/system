@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int nodesearch_ctor(lfm *op,Args ... args) noex {
+static int syspasswd_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int nodesearch_ctor(lfm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (nodesearch_ctor) */
+/* end subroutine (syspasswd_ctor) */
 
-static int nodesearch_dtor(lfm *op) noex {
+static int syspasswd_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (nodesearch_dtor) */
+/* end subroutine (syspasswd_dtor) */
 
 template<typename ... Args>
-static inline int nodesearch_magic(lfm *op,Args ... args) noex {
+static inline int syspasswd_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == NODESEARCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SYSPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (nodesearch_magic) */
+/* end subroutine (syspasswd_magic) */

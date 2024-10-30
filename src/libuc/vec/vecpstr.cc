@@ -1036,6 +1036,10 @@ int vecpstr::addsyms(cchar *on,mainv sv) noex {
 	return vecpstr_addsyms(this,on,sv) ;
 }
 
+int vecpstr::addpath(cchar *sp,int sl) noex {
+	return vecpstr_addpath(this,sp,sl) ;
+}
+
 int vecpstr::get(int ai,cchar **rpp) noex {
 	return vecpstr_get(this,ai,rpp) ;
 }
@@ -1060,6 +1064,9 @@ vecpstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
+	    case vecpstrmem_addcspath:
+	        rs = vecpstr_addcspath(op) ;
+	        break ;
 	    case vecpstrmem_count:
 	        rs = vecpstr_count(op) ;
 	        break ;

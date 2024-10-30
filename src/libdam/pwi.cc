@@ -54,6 +54,7 @@
 #include	<usystem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<endian.h>
 #include	<mkpathx.h>
 #include	<mkfname.h>
@@ -155,7 +156,7 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 struct opener_fl {
-	uint		dbname:1 ;
+	uint		dbname:1 ;	/* allocated */
 } ;
 
 namespace {
@@ -170,6 +171,8 @@ namespace {
 	int start() noex ;
 	int finish() noex ;
 	int mkidxdname() noex ;
+	int dbnameload(cc *) noex ;
+	int idxload(cc *,int = -1) noex ;
 	int mkpwi() noex ;
     } ; /* end struct (opener) */
 }
@@ -452,56 +455,66 @@ int opener::start() noex {
 int opener::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	    if (idxdname) {
-	        rs1 = uc_free(idxdname) ;
-	        if (rs >= 0) rs = rs1 ;
-	        idxdname = nullptr ;
-	    }
-	    if (fl.dbname && dbname) {
-	        rs1 = uc_free(dbname) ;
-	        if (rs >= 0) rs = rs1 ;
-	        dbname = nullptr ;
-		fl.dbname = false ;
-	    }
+	if (idxdname) {
+	    rs1 = uc_free(idxdname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    idxdname = nullptr ;
+	}
+	if (fl.dbname && dbname) {
+	    rs1 = uc_free(dbname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    dbname = nullptr ;
+	    fl.dbname = false ;
+	}
 	return rs ;
 }
 /* end method (opener::finish) */
 
 int opener::mkidxdname() noex {
-	int		rs = SR_OK ;
-	int		dblen = -1 ;
-	char		namebuf[MAXNAMELEN + 1] ;
-
+	int		rs ;
 	if ((dbname == nullptr) || (dbname[0] == '\0')) {
-	    cint	nlen = NODENAMELEN ;
-	    char	nbuf[NODENAMELEN + 1] ;
-	    char	cbuf[NODENAMELEN + 1] ;
-	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	        cint	rsn = SR_NOTFOUND ;
-	        cchar	*nn ;
-	        if ((rs = prgetclustername(pr,cbuf,nlen,nbuf)) >= 0) {
-	            nn = cbuf ;
-		} else if (rs == rsn) {
-		    rs = SR_OK ;
-		    nn = nbuf ;
-		}
-		if (rs >= 0) {
-	            rs = mkpath3(namebuf,pr,DBDNAME,nn) ;
-	            dbname = namebuf ;
-	            dblen = rs ;
-		}
-	    }
+	    int		ai = 0 ;
+	    cint	sz = ((var.nodenamelen + 1) * 2) ;
+	    if ((char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	        cint	nlen = var.nodenamelen ;
+	        cint	clen = var.nodenamelen ;
+	        char	*nbuf = (a + (ai++ * (var.nodenamelen + 1))) ;
+	        char	*cbuf = (a + (ai++ * (var.nodenamelen + 1))) ;
+	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
+	            cint	rsn = SR_NOTFOUND ;
+	            cchar	*nn ;
+	            if ((rs = prgetclustername(pr,cbuf,clen,nbuf)) >= 0) {
+	                nn = cbuf ;
+		    } else if (rs == rsn) {
+		        rs = SR_OK ;
+		        nn = nbuf ;
+		    }
+		    if (rs >= 0) {
+		        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	                    if ((rs = mkpath(tbuf,pr,DBDNAME,nn)) >= 0) {
+	    		        rs = idxload(tbuf,rs) ;
+		            }
+		    	    rs = rsfree(rs,tbuf) ;
+		        } /* end if (m-a-f) */
+		    } /* end if (ok) */
+	        } /* end if (getnodename) */
+	    	rs = rsfree(rs,a) ;
+	    } /* end if (m-a-f) */
+	} else {
+	    rs = idxload(dbname) ;
 	} /* end if (empty specification) */
-
-	if (rs >= 0) {
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(dbname,dblen,&cp)) >= 0) {
-	        idxdname = cp ;
-	    }
-	} /* end if */
-
 	return rs ;
 }
 /* end method (opener::mkidxdname) */
+
+int opener::idxload(cc *dp,int dl) noex {
+	int		rs ;
+	if (cchar *cp{} ; (rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
+	    idxdname = cp ;
+	}
+	return rs ;
+}
+/* end method (opener::idxload) */
 
 int opener::mkpwi() noex {
 	int		rs = SR_OK ;

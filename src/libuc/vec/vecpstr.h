@@ -34,7 +34,6 @@
 #define	VECPSTR_CH		struct vecpstr_chunk
 #define	VECPSTR_FL		struct vecpstr_flags
 #define	VECPSTR_DEFENTS		10
-
 /* options */
 #define	VECPSTR_ODEFAULT	0
 #define	VECPSTR_OREUSE		(1 << 0)	/* reuse empty slots */
@@ -90,6 +89,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 enum vecpstrmems {
+	vecpstrmem_addcspath,
 	vecpstrmem_count,
 	vecpstrmem_delall,
 	vecpstrmem_strsize,
@@ -148,6 +148,7 @@ struct vecpstr_co {
 	} ;
 } ; /* end struct (vecpstr_co) */
 struct vecpstr : vecpstr_head {
+	vecpstr_co	addcspath ;
 	vecpstr_co	count ;
 	vecpstr_co	delall ;
 	vecpstr_co	strsize ;
@@ -155,6 +156,7 @@ struct vecpstr : vecpstr_head {
 	vecpstr_co	audit ;
 	vecpstr_co	finish ;
 	vecpstr() noex {
+	    addcspath(this,vecpstrmem_addcspath) ;
 	    count(this,vecpstrmem_count) ;
 	    delall(this,vecpstrmem_delall) ;
 	    strsize(this,vecpstrmem_strsize) ;
@@ -168,6 +170,7 @@ struct vecpstr : vecpstr_head {
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int addsyms(cchar *,mainv) noex ;
+	int addpath(cchar *,int = -1) noex ;
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
 	int del(int = -1) noex ;

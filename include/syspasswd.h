@@ -1,4 +1,5 @@
 /* syspasswd HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */
@@ -14,7 +15,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<filemap.h>
-#include	<localmisc.h>
 
 
 #define	SYSPASSWD		struct syspasswd_head
@@ -23,18 +23,18 @@
 
 
 struct syspasswd_head {
+	filemap		*fmp ;
 	uint		magic ;
-	filemap		b ;
 } ;
 
 typedef SYSPASSWD	syspasswd ;
 
 EXTERNC_begin
 
-extern int syspasswd_open(SYSPASSWD *,cchar *) noex ;
-extern int syspasswd_close(SYSPASSWD *) noex ;
-extern int syspasswd_readent(SYSPASSWD *,ucentpw *,char *,int) noex ;
-extern int syspasswd_reset(SYSPASSWD *) noex ;
+extern int syspasswd_open(syspasswd *,cchar *) noex ;
+extern int syspasswd_close(syspasswd *) noex ;
+extern int syspasswd_readent(syspasswd *,ucentpw *,char *,int) noex ;
+extern int syspasswd_reset(syspasswd *) noex ;
 
 EXTERNC_end
 
