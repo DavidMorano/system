@@ -1,4 +1,5 @@
 /* uopen HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® support for opening files or devices */
@@ -48,6 +49,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* extra system flags for 'openXXX(2)' and friends */

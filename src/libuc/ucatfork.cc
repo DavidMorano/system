@@ -1,4 +1,5 @@
 /* ucatfork SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -85,6 +86,7 @@
 
 extern "C" {
     extern int uc_atforkrecord(void_f,void_f,void_f) noex ;
+    extern int uc_atforkexpunge(void_f,void_f,void_f) noex ;
 }
 
 
@@ -345,7 +347,9 @@ void ucatfork::atforkbefore() noex {
 	        ucatfork_ent	*pep ;
 	        while (ep) {
 	            pep = ep->prev ;
-	            if (ep->sub_before) (*ep->sub_before)() ;
+	            if (ep->sub_before) {
+			(*ep->sub_before)() ;
+		    }
 	            ep = pep ;
 	        } /* end if while */
 	    } /* end if (locked) */
@@ -363,7 +367,9 @@ void ucatfork::atforkparent() noex {
 	    ucatfork_ent	*nep ;
 	    while (ep) {
 	        nep = ep->next ;
-	        if (ep->sub_parent) (*ep->sub_parent)() ;
+	        if (ep->sub_parent) {
+		    (*ep->sub_parent)() ;
+		}
 	        ep = nep ;
 	    } /* end while */
 	    {
@@ -384,7 +390,9 @@ void ucatfork::atforkchild() noex {
 	    ucatfork_ent	*nep ;
 	    while (ep) {
 	        nep = ep->next ;
-	        if (ep->sub_child) (*ep->sub_child)() ;
+	        if (ep->sub_child) {
+		    (*ep->sub_child)() ;
+		}
 	        ep = nep ;
 	    } /* end while */
 	    {

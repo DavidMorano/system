@@ -1,4 +1,5 @@
 /* syswords HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a database of commonly used system words */

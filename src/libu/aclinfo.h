@@ -1,4 +1,5 @@
 /* aclinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* ACL information */
@@ -13,12 +14,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usyscalls.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"acltypes.h"
 

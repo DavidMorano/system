@@ -1,4 +1,5 @@
 /* usupport HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® kernel support subroutines */

@@ -1,4 +1,5 @@
 /* uxti HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* additional UNIX® limits support */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	uxti
+
+	Description:
 	Additional (or supplemental) support for UNIX® limits.
 
 *******************************************************************************/
@@ -31,9 +36,11 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
 #include	<xti.h>

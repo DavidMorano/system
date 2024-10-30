@@ -1,4 +1,5 @@
 /* uinet HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® Internet-Address support */
@@ -33,6 +34,7 @@
 #include	<clanguage.h>		/* |MAX| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	PF_INET4

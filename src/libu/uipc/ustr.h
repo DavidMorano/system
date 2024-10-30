@@ -1,4 +1,5 @@
 /* ustr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® system STREAMS message interface */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ustr
+
+	Desfription:
 	This file contains the subroutine declarations for the
 	UNIX® system STREAMS® message interface.
 
@@ -32,6 +37,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<usys.h>
 

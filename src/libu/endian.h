@@ -1,4 +1,5 @@
 /* endian HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* machine endian management */
@@ -28,6 +29,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	ENDIAN

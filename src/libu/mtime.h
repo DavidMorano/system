@@ -1,4 +1,5 @@
 /* mtime HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Millisecond Time */
@@ -15,6 +16,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdint.h>
 
 

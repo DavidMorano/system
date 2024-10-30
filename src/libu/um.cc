@@ -16,10 +16,13 @@
 
 /*******************************************************************************
 
+  	General:
 	This file contains the subroutine declarations for various
 	UNIX® system Memory-Management subroutines.
 
 	Names:
+	u_brk
+	u_sbrk
 	u_mmapbegin
 	u_mmapend
 	u_mlockbegin
@@ -74,6 +77,10 @@
 
 
 /* local defines */
+
+#ifndef	CAST_R
+#define	CAST_R		cast_reinterpret
+#endif
 
 
 /* imported namespaces */
@@ -144,13 +151,103 @@ namespace {
 
 /* local variables */
 
-static cvoid	*mapfailed = static_cast<voidp>(MAP_FAILED) ;
+[[maybe_unused]] static cvoid	*mapfailed = CAST_R<voidp>(MAP_FAILED) ;
+[[maybe_unused]] static cvoid	*brkfailed = CAST_R<voidp>(-1) ;
 
 
 /* exported variables */
 
 
 /* exported subroutines */
+
+#ifdef	DEPRECATED
+int u_brk(cvoid *endp,void **rapp) noex {
+	int		rs = SR_FAULT ;
+	if (endp && rapp) {
+	    int		to_nomem = utimeout[uto_nomem] ;
+	    int		to_again = utimeout[uto_again] ;
+	    int		f_exit = false ;
+	    repeat {
+	        if (void *rap{} ; (rap = brk(endp)) == brkfailed) {
+		    rs = (- errno) ;
+	        } else {
+		    *rapp = rap ;
+	        }
+	        if (rs < 0) {
+	            switch (rs) {
+	            case SR_NOMEM:
+	                if (to_nomem-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+			    f_exit = true ;
+		        }
+	                break ;
+	            case SR_AGAIN:
+	                if (to_again-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+			    f_exit = true ;
+		        }
+	            case SR_INTR:
+	                break ;
+		    default:
+		        f_exit = true ;
+		        break ;
+	            } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || f_exit) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_brk) */
+#endif /* DEPRECATED */
+
+#ifdef	DEPRECATED
+int u_sbrk(int incr,void **rpp) noex {
+    	int		rs = SR_FAULT ;
+	if (rpp) {
+	    rs = SR_INVALID ;
+	    if (incr >= 0) {
+	        int	to_nomem = utimeout[uto_nomem] ;
+	        int	to_again = utimeout[uto_again] ;
+	        bool	f_exit = false ;
+	        repeat {
+	            rs = SR_OK ;
+	            if (void *rap ; (rp = (incr)) == brkfailed) {
+		        rs = (- errno) ;
+	            } else {
+		        *rpp = rap ;
+	            }
+	            if (rs < 0) {
+	                switch (rs) {
+	                case SR_NOMEM:
+	                    if (to_nomem-- > 0) {
+	                        msleep(1000) ;
+		            } else {
+			        f_exit = true ;
+		            }
+	                    break ;
+	                case SR_AGAIN:
+	                    if (to_again-- > 0) {
+	                        msleep(1000) ;
+		            } else {
+			        f_exit = true ;
+		            }
+		            break ;
+	                case SR_INTR:
+	                    break ;
+		        default:
+		            f_exit = true ;
+		            break ;
+	                } /* end switch */
+	            } /* end if (error) */
+	        } until ((rs >= 0) || f_exit) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_sbrk) */
+#endif /* DEPRECATED */
 
 int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd,
 		off_t off,void *vp) noex {
@@ -326,8 +423,9 @@ int um::mapbegin(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        rs = SR_OK ;
-	        ra = mmap(ma,ms,pr,fl,fd,off) ;
-	        if (ra == mapfailed) rs = (- errno) ;
+	        if ((ra = mmap(ma,ms,pr,fl,fd,off)) == mapfailed) {
+		    rs = (- errno) ;
+		}
 	    }
 	    *rpp = (rs >= 0) ? ra : nullptr ;
 	}

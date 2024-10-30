@@ -1,4 +1,5 @@
 /* itimerval HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* interval-timer object methods */
@@ -29,6 +30,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<timespec.h>
 
 

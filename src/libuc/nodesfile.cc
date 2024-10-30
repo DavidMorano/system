@@ -54,12 +54,11 @@
 
 /* local defines */
 
-#define	NODESFILE_DEFNODES	200
-
-#define	TO_CHECK		4
-#define	TO_HOLD			2
-
 #define	NF		nodesfile
+#define	NF_DEFNODES	200
+
+#define	TO_CHECK	4
+#define	TO_HOLD		2
 
 
 /* imported namespaces */
@@ -308,7 +307,7 @@ static int nodesfile_opener(nodesfile *op) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = nodesfile_filemapbegin(op)) >= 0) {
-	    cint	ne = NODESFILE_DEFNODES ;
+	    cint	ne = NF_DEFNODES ;
 	    if ((rs = hdb_start(op->nlp,ne,0,np,np)) >= 0) {
 		rs = nodesfile_parse(op) ;
 		if (rs < 0) {

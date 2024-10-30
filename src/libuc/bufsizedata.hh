@@ -1,4 +1,5 @@
 /* bufsizedata HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* buffer-size-data (default value database) */

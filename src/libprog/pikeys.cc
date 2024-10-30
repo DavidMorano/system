@@ -1,10 +1,9 @@
-/* keys */
+/* keys SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* handle the keys while processing a file */
-
-
-#define	CF_DEBUGS 	0		/* non-switchable debug print-outs */
-#define	CF_DEBUG	0		/* switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,22 +17,23 @@
 
 /*******************************************************************************
 
-        This is a set of subroutines for managing keys while processing an input
-        file (of them).
+  	Name:
+	keys
 
+	Description:
+	This is a set of subroutines for managing keys while
+	processing an input file (of them).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<limits.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<hdb.h>
@@ -46,16 +46,10 @@
 
 /* local defines */
 
+#define	PI	proginfo
+
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 
 
 /* external variables */
@@ -63,150 +57,101 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 
 /* forward references */
 
-int	keys_ender(PROGINFO *,HDB *,bfile *,PTM *,cchar *,off_t,int) ;
+extern "C" {
+    int	keys_ender(PI *,hdb *,bfile *,ptm *,cchar *,off_t,int) noex ;
+}
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int keys_begin(PROGINFO *pip,HDB *dbp,int hashsize)
-{
-	const int	f = FALSE ;
-	int		rs ;
-
-	if (pip == NULL) return SR_FAULT ;
-
-	rs = hdb_start(dbp,hashsize,f,NULL,NULL) ;
-
+int keys_begin(PI *pip,hdb *dbp,int hashsize) noex {
+	int		rs = SR_FAULT ;
+	if (pip && dbp) {
+	    cint	f = false ;
+	    rs = hdb_start(dbp,hashsize,f,nullptr,nullptr) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (keys_begin) */
 
-
-int keys_add(PROGINFO *pip,HDB *dbp,cchar *sp,int sl)
-{
-	HDB_DATUM	key, value, dumbvalue ;
-	const int	nrs = SR_NOTFOUND ;
+int keys_add(PI *pip,hdb *dbp,cchar *sp,int sl) noex {
+	hdb_dat		key ;
+	hdb_dat		value ;
+	hdb_dat		dumbvalue ;
+	cint		nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_add: klen=%d\n",sl) ;
-#endif
-
-	if (sl < 0)
-	    sl = strlen(sp) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_add: key=%t klen=%d\n",sp,sl,sl) ;
-#endif
+	if (sl < 0) sl = strlen(sp) ;
 
 	key.len = sl ;
-	key.buf = (void *) sp ;			/* prepare for check */
-
+	key.buf = sp ;			/* prepare for check */
 	value.len = 0 ;
-	value.buf = NULL ;
-
-/* if it is already present, we're done, return */
-
-	if ((rs = hdb_fetch(dbp,key,NULL,&dumbvalue)) == nrs) {
-	    const char	*cp ;
+	value.buf = nullptr ;
+	/* if it is already present, we're done, return */
+	if ((rs = hdb_fetch(dbp,key,nullptr,&dumbvalue)) == nrs) {
+	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	        f = TRUE ;
+	        f = true ;
 	        key.buf = (void *) cp ;
 	        rs = hdb_store(dbp,key,value) ;
 	    }
 	} /* end if */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_add: add rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (keys_add) */
 
-
-int keys_end(pip,dbp,ofp,omp,fname,recoff,reclen)
-PROGINFO	*pip ;
-HDB		*dbp ;
-bfile		*ofp ;
-PTM		*omp ;
-const char	fname[] ;
-off_t	recoff ;
-int		reclen ;
-{
+int keys_end(PI *pip,hdb *dbp,bfile *ofp,ptm *omp,cc *fn,
+		off_t roff,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_end: ent\n") ;
-#endif
-
+	int		rv = 0 ;
 	if ((rs = ptm_lock(omp)) >= 0) {
-
-	    rs = keys_ender(pip,dbp,ofp,omp,fname,recoff,reclen) ;
-
+	    {
+	        rs = keys_ender(pip,dbp,ofp,omp,fn,roff,rlen) ;
+		rv = rs ;
+	    }
 	    rs1 = ptm_unlock(omp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_end: ret rs=%d\n",rs) ;
-#endif
-
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (keys_end) */
 
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-int keys_ender(pip,dbp,ofp,omp,fname,recoff,reclen)
-PROGINFO	*pip ;
-HDB		*dbp ;
-bfile		*ofp ;
-PTM		*omp ;
-const char	fname[] ;
-off_t	recoff ;
-int		reclen ;
-{
+int keys_ender(PI *pip,hdb *dbp,bfile *ofp,ptm omp,cc *fn,
+		off_t roff,int rlen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		n = 0 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_ender: ent\n") ;
-#endif
-
-	if (recoff <= INT_MAX) {
-	    HDB_CUR	keycursor ;
-	    HDB_DATUM	key, value ;
-	    uint	tagoff = recoff ;
-	    uint	taglen = reclen ;
+	if (roff <= INT_MAX) {
+	    dhB_cur	keycursor ;
+	    hdb_dat	key ;
+	    hdb_dat	value ;
+	    uint	tagoff = roff ;
+	    uint	taglen = rlen ;
 
 	    if ((rs = hdb_curbegin(dbp,&keycursor)) >= 0) {
 
 	        if (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
 
 	            if (! pip->f.removelabel) {
-	                bprintf(ofp,"%s:%u,%u\t",fname,tagoff,taglen) ;
+	                bprintf(ofp,"%s:%u,%u\t",fn,tagoff,taglen) ;
 		    }
 
-	            rs = bwrite(ofp, (void *) key.buf,key.len) ;
+	            rs = bwrite(ofp,key.buf,key.len) ;
 
 	            n = 1 ;
 	            while ((rs >= 0) && 
@@ -232,7 +177,7 @@ int		reclen ;
 
 	    if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
 	        while (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
-	            if (key.buf != NULL) {
+	            if (key.buf) {
 	                rs1 = uc_free((void *) key.buf) ;
 			if (rs >= 0) rs = rs1 ;
 	            }
@@ -245,11 +190,6 @@ int		reclen ;
 	    rs1 = hdb_finish(dbp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (within range) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("keys_ender: ret rs=%d n=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }

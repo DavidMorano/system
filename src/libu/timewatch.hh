@@ -1,4 +1,5 @@
 /* timewatch HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* watch time and variables simultaneously */
