@@ -70,7 +70,7 @@ typedef NODESFILE_CUR	nodesfile_cur ;
 
 EXTERNC_begin
 
-extern int	nodesfile_open(nodesfile *,cchar *,int,int) noex ;
+extern int	nodesfile_open(nodesfile *,cchar *,int) noex ;
 extern int	nodesfile_search(nodesfile *,cchar *,int) noex ;
 extern int	nodesfile_curbegin(nodesfile *,nodesfile_cur *) noex ;
 extern int	nodesfile_curend(nodesfile *,nodesfile_cur *) noex ;
