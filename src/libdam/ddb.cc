@@ -86,7 +86,7 @@ int ddb_close(DDB *op) noex {
 
 	hdb_curbegin(&op->db,&cur) ;
 
-	while (hdb_enum(&op->db,&cur,&key,&value) >= 0) {
+	while (hdb_curenum(&op->db,&cur,&key,&value) >= 0) {
 
 		if (value.buf != NULL)
 			uc_free(value.buf) ;

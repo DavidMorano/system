@@ -1,4 +1,5 @@
 /* nodesearch HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* search for a node name */
@@ -8,7 +9,7 @@
 /* revision history:
 
 	= 1998-04-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	nodesearch
+
+	Description:
 	This little object supports searching for a node name in
 	the cluster node list file.
 
@@ -25,23 +30,20 @@
 #define	NODESEARCH_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/mman.h>
-#include	<limits.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<hdbstr.h>
-#include	<localmisc.h>
+#include	<nodesfile.h>
 
-#include	"nodesfile.h"
-
-
-/* local defines */
 
 #define	NODESEARCH		struct nodesearch_head
 #define	NODESEARCH_CUR		struct nodesearch_cursor
 #define	NODESEARCH_FL		struct nodesearch_flags
-#define	NODESEARCH_FILE		struct nodesearch_file
+#define	NODESEARCH_FI		struct nodesearch_file
 
 
 struct nodesearch_flags {
@@ -50,8 +52,8 @@ struct nodesearch_flags {
 } ;
 
 struct nodesearch_cursor {
-	NODESFILE_CUR	c1 ;
-	HDBSTR_CUR	c2 ;
+	nodesfile_cur	c1 ;
+	hdbstr_cur	c2 ;
 } ;
 
 struct nodesearch_file {
@@ -62,15 +64,17 @@ struct nodesearch_file {
 } ;
 
 struct nodesearch_head {
-	NODESFILE	a ;		/* first choice */
-	HDBSTR		b ;		/* second choice */
-	NODESEARCH_FL	f ;
-	NODESEARCH_FILE	fi ;
+	nodesfile	a ;		/* first choice */
+	hddstr		b ;		/* second choice */
+	NODESEARCH_FL	fl ;
+	NODESEARCH_FI	fi ;
 	time_t		ti_check ;	/* last check time */
 	time_t		ti_load ;	/* last load time */
 } ;
 
 typedef NODESEARCH	nodesearch ;
+typedef	NODESEARCH_FL	nodesearch_fl ;
+typedef	NODESEARCH_FI	nodesearch_fi ;
 typedef NODESEARCH_CUR	nodesearch_cur ;
 
 EXTERNC_begin

@@ -100,7 +100,7 @@ int mapstrint_finish(MSI *dbp) noex {
 	        if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
 	            hdb_dat	key{} ;
 	            hdb_dat	val{} ;
-	            while (hdb_enum(dbp,&keycursor,&key,&val) >= 0) {
+	            while (hdb_curenum(dbp,&keycursor,&key,&val) >= 0) {
 	                cchar	*ep = charp(val.buf) ;
 	                if (ep) {
 	                    rs1 = uc_free(ep) ;
@@ -171,7 +171,7 @@ int mapstrint_enum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if (kpp) *kpp = nullptr ;
-	    if ((rs = hdb_enum(dbp,curp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(dbp,curp,&key,&val)) >= 0) {
 	        klen = key.len ;
 	        if (kpp) {
 	            *kpp = charp(key.buf) ;
@@ -180,7 +180,7 @@ int mapstrint_enum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	            int		*ip = (int *) val.buf ;
 	            *vp = *ip ;
 	        }
-	    } /* end if (hdb_enum) */
+	    } /* end if (hdb_curenum) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? klen : rs ;
 }

@@ -459,7 +459,7 @@ int strtab_recmk(strtab *op,int *rec,int recsize) noex {
 	            if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
 	                hdb_dat	key{} ;
 	                hdb_dat	val{} ;
-	                while (hdb_enum(op->hlp,&cur,&key,&val) >= 0) {
+	                while (hdb_curenum(op->hlp,&cur,&key,&val) >= 0) {
 	                    ip = (int *) val.buf ;
 	                    rec[c++] = *ip ;
 	                } /* end while (looping through strings) */
@@ -520,7 +520,7 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 		            int		*ip ;
 		            int		sl ;
 		            cchar	*sp ;
-	                    while ((sl = hdb_enum(hp,&cur,&key,&val)) >= 0) {
+	                    while ((sl = hdb_curenum(hp,&cur,&key,&val)) >= 0) {
 	                        sp = charp(key.buf) ;
 	                        sl = key.len ;
 	                        ip = (int *) val.buf ;

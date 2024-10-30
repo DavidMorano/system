@@ -264,7 +264,7 @@ int dirdb_clean(dirdb *op) noex {
 	    if ((rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
 	        hdb_dat	key ;
 	        hdb_dat	val ;
-	        while ((rs1 = hdb_enum(op->dbp,&cur,&key,&val)) >= 0) {
+	        while ((rs1 = hdb_curenum(op->dbp,&cur,&key,&val)) >= 0) {
 	            dirdb_ent	*ep = (dirdb_ent *) val.buf ;
 	            if ((rs = dirdb_alreadyentry(op,ep)) >= 0) {
 		        {

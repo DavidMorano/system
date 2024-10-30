@@ -472,7 +472,7 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 	            hdb_dat	key, val ;
 	            rdata[c++] = 0 ;	/* ZERO-entry is NUL-string */
 	            if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
-	                while (hdb_enum(hp,&cur,&key,&val) >= 0) {
+	                while (hdb_curenum(hp,&cur,&key,&val) >= 0) {
 	                    int	*ip = (int *) val.buf ;
 	                    rdata[c++] = *ip ;
 	                } /* end while (looping through strings) */
@@ -529,7 +529,7 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	                uint		khash, chash, nhash ;
 	                int		lhi, nhi, hi, si ;
 	                if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
-	        	    while ((rs1 = hdb_enum(hp,&cur,&key,&val)) >= 0) {
+	        	    while ((rs1 = hdb_curenum(hp,&cur,&key,&val)) >= 0) {
 	            		cint	sl = key.len ;
 	            		int	*ip = (int *) val.buf ;
 	            		cchar	*sp = (cchar *) key.buf ;

@@ -1,4 +1,5 @@
 /* nodesfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* read (process) a standard UNIX® "nodes" file */
@@ -257,7 +258,7 @@ int nodesfile_curenum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 	if (op && curp) {
 	    hdb_datum	key{} ;
 	    hdb_datum	val{} ;
-	    if ((rs = hdb_enum(op->nlp,curp->hcp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op->nlp,curp->hcp,&key,&val)) >= 0) {
 	        cchar	*cp = charp(key.buf) ;
 	        cl = (nlen >= 0) ? min(key.len,nlen) : key.len ;
 	        strwcpy(nbuf,cp,cl) ;
@@ -449,7 +450,7 @@ static int hdb_release(hdb *hsp) noex {
 	    hdb_cur	cur ;
 	    rs = SR_OK ;
 	    hdb_curbegin(hsp,&cur) ;
-	    while (hdb_enum(hsp,&cur,nullptr,nullptr) >= 0) {
+	    while (hdb_curenum(hsp,&cur,nullptr,nullptr) >= 0) {
 	        hdb_delcur(hsp,&cur,0) ;
 	    }
 	    hdb_curend(hsp,&cur) ;

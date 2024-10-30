@@ -985,7 +985,7 @@ LOCINFO	*lip ;
 	    HDB_CUR	cur ;
 	    HDB_DATUM	k, v ;
 	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
-	        while (hdb_enum(dbp,&cur,&k,&v) >= 0) {
+	        while (hdb_curenum(dbp,&cur,&k,&v) >= 0) {
 	            struct wordent	*ep = (struct wordent *) v.buf ;
 	            rs1 = uc_free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -1459,7 +1459,7 @@ static int procoutcounts(PROGINFO *pip,void *ofp)
 	    const char	*wp ;
 	    int		wl ;
 	    int		count ;
-	    while ((rs = hdb_enum(dbp,&cur,&k,&v)) >= 0) {
+	    while ((rs = hdb_curenum(dbp,&cur,&k,&v)) >= 0) {
 	        ep = (struct wordent *) v.buf ;
 	        wp = (const char *) k.buf ;
 	        wl = k.len ;

@@ -1,4 +1,5 @@
 /* envstandards (Darwin) */
+/* encoding=ISO8859-1 */
 
 
 /* revision history:
@@ -17,6 +18,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This file is included in pretty much all other user-created
 	header files.  The reason is so that the name, type, and
 	version of the operating system (made available through

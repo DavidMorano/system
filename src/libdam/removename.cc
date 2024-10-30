@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* remove a named file-system object (and its descendants) */
+/* remove a named file-system object (and its descendants if any) */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,7 @@
 
 /* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
 	Name:
 	removename
@@ -26,34 +26,33 @@
 	with all of its descendents (if any).
 
 	Synopsis:
-	int removename(cchar *name,randomvar *rvp,int opts,int bcount) noex
+	int removename(cchar *name,int rno,randomvar *rvp,int bc) noex
 
 	Arguments:
 	name		name of FS object to remove
-	rvp		pointer to RADNDOMVAR object
-	opts		options
-	bcount		burn-count (number of times to burn files)
+	rno		remove-name options
+	rvp		pointer to RANDOMVAR object
+	bc		burn-count (number of times to burn files)
 
 	Returns:
 	>=0		count of objects (files or directories) removed
 	<0		error (system-return)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<wdt.h>
 #include	<vecpstr.h>
 #include	<randomvar.h>
 #include	<burn.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"removename.h"
@@ -95,7 +94,7 @@ namespace {
 	vecpstr		dirs ;
 	randomvar	x ;
 	REMOVEINFO_FL	fl{} ;
-	int		crem ;
+	int		crem = 0 ;
 	int		bcount = 0 ;
 	remover(cc *n,randomvar *p,int bc) noex : name(n), rvp(p) {
 	    if (bc > 0) bcount = bc ;
@@ -186,28 +185,27 @@ int remover::decider(USTAT *sbp) noex {
 	if ((rs = dirs.start(vn,0,vo)) >= 0) {
 	    wdt_f	wuf = remover_co ;
 	    int		wopts = 0 ;
+	    wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
 	    if (S_ISLNK(sbp->st_mode)) {
 	        if (fl.follow) {
 	            if (USTAT sbf ; (rs = u_stat(name,&sbf)) >= 0) {
 			if (S_ISDIR(sbf.st_mode)) {
-	            	    wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
-	            	    if ((rs = wdt(name,wopts,wuf,this)) >= 0) {
-	                	rs = dirs.add(name) ;
-		    	    }
+	            	    rs = wdt(name,wopts,wuf,this) ;
 			} else {
 	                    rs = removeit(name,sbp) ;
 			}
+		    } else if (isNotPresent(rs)) {
+	                rs = u_unlink(name) ;
 		    } /* end if (stat) */
 	        } else {
-	            rs = removeit(name,sbp) ;
+	            rs = u_unlink(name) ;
 	        } /* end if */
 	    } else if (S_ISDIR(sbp->st_mode)) {
-	        wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
-	        if ((rs = wdt(name,wopts,wuf,this)) >= 0) {
-	            rs = dirs.add(name) ;
-		}
-	    } else {
+	        rs = wdt(name,wopts,wuf,this) ;
+	    } else if (S_ISREG(sbp->st_mode)) {
 	        rs = removeit(name,sbp) ;
+	    } else {
+		rs = u_unlink(name) ;
 	    } /* end if */
 	    /* remove the directories */
 	    if (rs >= 0) {
@@ -229,14 +227,14 @@ int remover::removeit(cchar *name,USTAT *sbp) noex {
 	    f = f && (u_stat(name,&sb2) >= 0) ;
 	    f = f && S_ISDIR(sb2.st_mode) ;
 	    if (f) {
-	        rs = dirs.add(name,-1) ;
+	        rs = dirs.add(name) ;
 	    } else {
 	        if ((rs = u_unlink(name)) >= 0) {
 	            crem += 1 ;
 		}
 	    } /* end if */
 	} else if (S_ISDIR(sbp->st_mode)) {
-	    rs = dirs.add(name,-1) ;
+	    rs = dirs.add(name) ;
 	} else {
 	    if (fl.burn && S_ISREG(sbp->st_mode)) {
 	        rs = burn(name,bcount,rvp) ;
@@ -267,6 +265,7 @@ int remover::rmdirs() noex {
 			    }
 	                }
 		    } else if (rs == rsn) {
+			rs = SR_OK ;
 			fe = true ;
 	            }
 		    if (fe) break ;

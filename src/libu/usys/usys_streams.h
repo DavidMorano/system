@@ -1,4 +1,5 @@
 /* usys_streams HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -16,13 +17,16 @@
 
 /*******************************************************************************
 
+  	System:
+	usys_linux
+
 	General:
 	This file contains the UNIX® system types that the brain-damaged
-	MacOS operating system does NOT have.  We are trying in a very
-	small way to make up for some of the immense brain-damage within
-	the Apple Darwin operating system.  This particular file provides
-	link-time symbols for emulating a broken UNIZ® STREAMS®
-	interface.
+	MacOS operating system does NOT have.  We are trying in a
+	very small way to make up for some of the immense brain-damage
+	within the Apple Darwin operating system.  This particular
+	file provides link-time symbols for emulating a broken UNIZ®
+	STREAMS® interface.
 
 	Name:
 	strmsgget
@@ -70,6 +74,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	STRBUF

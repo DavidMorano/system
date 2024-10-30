@@ -353,7 +353,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
                 hdb_dat       val{} ;
                 if (dt == 0) dt = getustime ;
                 while (rs >= 0) {
-                    rs1 = hdb_enum(op->dbp,&cur,&key,&val) ;
+                    rs1 = hdb_curenum(op->dbp,&cur,&key,&val) ;
                     if (rs1 == SR_NOTFOUND) break ;
                     rs = rs1 ;
                     if (rs >= 0) {
@@ -544,7 +544,7 @@ static int pwcache_recfins(pwcache *op) noex {
         if ((rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) {
             hdb_dat	key{} ;
             hdb_dat	val{} ;
-            while (hdb_enum(op->dbp,&cur,&key,&val) >= 0) {
+            while (hdb_curenum(op->dbp,&cur,&key,&val) >= 0) {
         	rec	*ep = recp(val.buf) ;
 		rs1 = pwcache_oldrec(op,ep) ;
                 if (rs >= 0) rs = rs1 ;
@@ -585,7 +585,7 @@ static int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
 	    hdb_dat   key{} ;
 	    hdb_dat   val{} ;
-            while ((rs = hdb_enum(dbp,&cur,&key,&val)) >= 0) {
+            while ((rs = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
                 ep = (rec *) val.buf ;
 		{
 		    ucentpw	*pwp = pwentp(&ep->pw) ;

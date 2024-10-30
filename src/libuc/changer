@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} fifostr_remove"
+NAMES="${NAMES} hdb_enum "
 
 DN=/dev/null
 
@@ -11,7 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/fifostr_remove/s//fifostr_rem/g
+g/hdb_enum/s//hdb_curenum/g
 	w
 	q
 EOF

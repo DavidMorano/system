@@ -22,8 +22,8 @@
 
 /* object defines (options) */
 #define	REMOVENAME_MDEFAULT	0
-#define	REMOVENAME_MBURN	1
-#define	REMOVENAME_MFOLLOW	2
+#define	REMOVENAME_MBURN	(1 << 0)	/* "burn" the file */
+#define	REMOVENAME_MFOLLOW	(1 << 1)	/* follow symbolic links */
 
 
 EXTERNC_begin
@@ -31,6 +31,15 @@ EXTERNC_begin
 extern int	removename(cchar *,int,randomvar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int removename(cchar *n,int o = 0,randomvar *p = nullptr) noex {
+	cint		bc = (o & REMOVENAME_MBURN) ? 1 : 0 ;
+	return removename(n,o,p,bc) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* REMOVENAME_INCLUDE */

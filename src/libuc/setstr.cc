@@ -70,7 +70,7 @@ int setstr_finish(setstr *op) noex {
 	        cint		rsn = SR_NOTFOUND ;
 	        if ((rs1 = hdb_curbegin(op,&cur)) >= 0) {
 	            int		rs2 ;
-	            while ((rs2 = hdb_enum(op,&cur,&key,&val)) >= 0) {
+	            while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
 	                if (key.buf != nullptr) {
 		            c += 1 ;
 	                    rs1 = uc_free(key.buf) ;
@@ -192,7 +192,7 @@ int setstr_enum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
 	if (op && curp && rpp) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if ((rs = hdb_enum(op,curp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op,curp,&key,&val)) >= 0) {
 	        rl = val.len ;
 	        if (rpp) {
 	            *rpp = charp(val.buf) ;

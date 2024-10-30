@@ -707,7 +707,7 @@ int objfile_enumsym(OBJFILE *op,OBJFILE_SNCUR *cp,cchar **namepp,
 	if (! op->f.symbols)
 	    return SR_NOTAVAIL ;
 
-	rs = hdb_enum(&op->symbols,cp,&key,&value) ;
+	rs = hdb_curenum(&op->symbols,cp,&key,&value) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -1215,7 +1215,7 @@ static int objfile_symbolsfree(OBJFILE *op)
 
 	hdb_curbegin(&op->symbols,&cur) ;
 
-	while (hdb_enum(&op->symbols,&cur,&key,&value) >= 0) {
+	while (hdb_curenum(&op->symbols,&cur,&key,&value) >= 0) {
 	    sep = (OBJFILE_SYMBOL *) value.buf ;
 	    if (sep != NULL) {
 		uc_free(sep) ;

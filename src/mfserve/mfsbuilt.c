@@ -393,7 +393,7 @@ int mfsbuilt_enum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen)
 	if (curp->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	hcp = &curp->hcur ;
-	if ((rs = hdb_enum(dbp,hcp,&k,&v)) >= 0) {
+	if ((rs = hdb_curenum(dbp,hcp,&k,&v)) >= 0) {
 	    const int	sl = k.len ;
 	    cchar	*sp = (cchar *) k.buf ;
 	    rs = snwcpy(rbuf,rlen,sp,sl) ;
@@ -420,7 +420,7 @@ int mfsbuilt_strsize(MFSBUILT *op)
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	if ((rs = hdb_curbegin(dbp,&hcur)) >= 0) {
-	    while ((rs1 = hdb_enum(dbp,&hcur,&k,&v)) >= 0) {
+	    while ((rs1 = hdb_curenum(dbp,&hcur,&k,&v)) >= 0) {
 	        cchar	*sp = (cchar *) k.buf ;
 		size += (strlen(sp)+1) ;
 	    } /* end while */
@@ -449,7 +449,7 @@ int mfsbuilt_strvec(MFSBUILT *op,cchar **va,char *rbuf,int rlen)
 	dbp = &op->db ;
 	if ((rs = hdb_curbegin(dbp,&hcur)) >= 0) {
 	    char	*bp = rbuf ;
-	    while ((rs1 = hdb_enum(dbp,&hcur,&k,&v)) >= 0) {
+	    while ((rs1 = hdb_curenum(dbp,&hcur,&k,&v)) >= 0) {
 	        cchar	*sp = (cchar *) k.buf ;
 		va[c++] = bp ;
 		rs = sncpy1(bp,(rlen-rl),sp) ;
@@ -506,7 +506,7 @@ static int mfsbuilt_entprune(MFSBUILT *op)
 	    ENT		*ep ;
 	    const int	rsn = SR_NOTFOUND ;
 	    int		i ;
-	    for (i = 0 ; (rs2 = hdb_enum(dbp,&c,&k,&v)) >= 0 ; i += 1) {
+	    for (i = 0 ; (rs2 = hdb_curenum(dbp,&c,&k,&v)) >= 0 ; i += 1) {
 		ep = (ENT *) v.buf ;
 		if (ep != NULL) {
 		    if ((rs = ent_isnotloaded(ep)) > 0) {
@@ -638,7 +638,7 @@ static int mfsbuilt_fins(MFSBUILT *op)
 	    ENT		*ep ;
 	    const int	rsn = SR_NOTFOUND ;
 	    int		i ;
-	    for (i = 0 ; (rs2 = hdb_enum(dbp,&c,&k,&v)) >= 0 ; i += 1) {
+	    for (i = 0 ; (rs2 = hdb_curenum(dbp,&c,&k,&v)) >= 0 ; i += 1) {
 		ep = (ENT *) v.buf ;
 		if (ep != NULL) {
 #ifdef	OPTIONAL

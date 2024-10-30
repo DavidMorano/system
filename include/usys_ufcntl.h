@@ -1,4 +1,5 @@
 /* usys_ufcntl HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® system emulated support */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	System:
+	usys_ufcntl
+
+	Description:
 	This is a utility function for use by other emulators.
 
 *******************************************************************************/
@@ -29,6 +34,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

@@ -1,7 +1,10 @@
-/* uc_resolvepath */
+/* uc_resolvepath SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface component for UNIX®Â® library-3c */
 /* resolve a path without symbolic components */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,54 +18,62 @@
 
 /*******************************************************************************
 
-        This subroutine takes an existing path and creates a new path that does
-        not contain any symbolic components.
+  	Name:
+	uc_resolvepath
 
+	Description:
+	This subroutine takes an existing path and creates a new
+	path that does not contain any symbolic components.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
-
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_resolvepath(const char *input,char *rbuf,int rlen)
-{
-	int		rs ;
-
-	if ((input == NULL) || (rbuf == NULL))
-		return SR_FAULT ;
-
-	id (rlen > 0) {
-	    if ((rs = resolvepath(input,rbuf,rlen)) >= 0) {
-		if (rs <= rlen) {
-			rbuf[rs] = '\0' ;
-		} else {
-			rbuf[rlen] = '\0' ;
-			rs = SR_OVERFLOW ;
-		}
-	    } else {
-		rbuf[0] = '\0' ;
-		rs = (- errno) ;
-	    }
-	} else {
-	    rbuf[0] = '\0' ;
+int uc_resolvepath(cchar *input,char *rbuf,int rlen) noex {
+    	int		rs = SR_FAULT ;
+	if (input && rbuf) {
 	    rs = SR_INVALID ;
-	}
-	
+	    rbuf[0] = '\0' ;
+	    if (input[0] && (rlen > 0)) {
+		rs = u_resolvepath(input,rbuf,rlen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_resolvepath) */

@@ -1,10 +1,11 @@
 /* uc_realpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* resolve a path without symbolic or relative components */
 /* version %I% last-modified %G% */
 
-#define	CF_MKPATH	0		/* use |mkpath(3u)| */
+#define	CF_MKPATH	0		/* use |mkpath(3uc)| */
 
 /* revision history:
 
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_realpath
+
+	Description:
 	This subroutine takes an existing path and creates a new path
 	that does not contain either symbolic or relative components.
 
@@ -37,7 +42,7 @@
 /* local defines */
 
 #ifndef	CF_MKPATH
-#define	CF_MKPATH	0		/* use |mkpath(3u)| */
+#define	CF_MKPATH	0		/* use |mkpath(3uc)| */
 #endif
 
 

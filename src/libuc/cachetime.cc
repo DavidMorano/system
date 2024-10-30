@@ -157,7 +157,7 @@ int cachetime_finish(CT *op) noex {
 	        if ((rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
-	            while (hdb_enum(op->dbp,&cur,&key,&val) >= 0) {
+	            while (hdb_curenum(op->dbp,&cur,&key,&val) >= 0) {
 		        ent	*ep = entp(val.buf) ;
 		        if (ep) {
 		            {
@@ -256,7 +256,7 @@ int cachetime_enum(CT *op,cur *curp,char *pbuf,int plen,time_t *timep) noex {
 	if ((rs = cachetime_magic(op,curp,pbuf)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if ((rs = hdb_enum(op->dbp,curp->hcp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op->dbp,curp->hcp,&key,&val)) >= 0) {
 	        ent	*ep = entp(val.buf) ;
 	        if ((rs = sncpy1(pbuf,plen,ep->name)) >= 0) {
 	            if (timep) {

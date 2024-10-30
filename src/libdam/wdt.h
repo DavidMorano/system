@@ -29,7 +29,8 @@
 
 
 /* mode values for call */
-#define	WDT_MFOLLOW	1
+#define	WDT_MDEFAULT	0
+#define	WDT_MFOLLOW	(1 << 0)
 /* return values */
 #define	WDT_ROK		0
 #define	WDT_RBADTMP	SR_ACCESS

@@ -1,4 +1,5 @@
 /* hdbstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Key-Value Hash DataBase for Strings */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<hdb.h>
 

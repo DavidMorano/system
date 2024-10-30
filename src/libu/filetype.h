@@ -1,4 +1,5 @@
 /* filetype HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* define file types according to the S_IFMT field of |mode_t| */
@@ -18,6 +19,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	S_IFMT

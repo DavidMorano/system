@@ -413,7 +413,7 @@ int nodedb_enum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    hdb_cur	*ecp = curp->ecp ;
-	    if ((rs = hdb_enum(op->entsp,ecp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op->entsp,ecp,&key,&val)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	        if (ep && ebuf) {
 	            rs = entry_load(ep,ebuf,elen,iep) ;
@@ -713,7 +713,7 @@ static int nodedb_filedump(nodedb *op,int fi) noex {
 	if ((rs = hdb_curbegin(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    while (hdb_enum(elp,&cur,&key,&val) >= 0) {
+	    while (hdb_curenum(elp,&cur,&key,&val) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	        if ((iep->fi == fi) || (fi < 0)) {
 	            c += 1 ;

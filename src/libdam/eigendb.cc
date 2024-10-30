@@ -326,7 +326,7 @@ int eigendb_enum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
 	        hdb_dat 	key ;
 	        hdb_dat		val ;
 	        if (rpp) *rpp = nullptr ;
-	        if ((rs = hdb_enum(op->dbp,hcp,&key,&val)) >= 0) {
+	        if ((rs = hdb_curenum(op->dbp,hcp,&key,&val)) >= 0) {
 	            len = key.len ;
 		    rp = charp(key.buf) ;
 	        }

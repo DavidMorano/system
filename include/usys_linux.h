@@ -1,4 +1,5 @@
 /* usys_linux HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Apple Darwin operating system support */
@@ -19,8 +20,12 @@
 
 /*******************************************************************************
 
-	This file contains the UNIX® system types and preprocessor symbols
-	that may not be provided.
+  	System:
+	usys_linux
+
+	Description:
+	This file contains the UNIX® system types and preprocessor
+	symbols that may not be provided.
 
 *******************************************************************************/
 
@@ -38,6 +43,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 /* USYSLINUX start */

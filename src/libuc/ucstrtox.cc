@@ -129,8 +129,8 @@ int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	    char	*endp = nullptr ;
 	    errno = 0 ;
 	    strtox(sp,&endp,b,rp) ;
-	    if (epp) *epp = (cchar *) endp ;
-	    rs = (errno != 0) ? (- errno) : (endp-sp) ;
+	    if (epp) *epp = endp ;
+	    rs = (errno != 0) ? (- errno) : (endp - sp) ;
 	}
 	return rs ;
 }

@@ -427,7 +427,7 @@ int citedb_finish(CITEDB *op)
 /* clean out the "store" DB */
 
 	if (hdb_curbegin(&op->store,&keycursor) >= 0) {
-	    while (hdb_enum(&op->store,&keycursor,&key,&value) >= 0) {
+	    while (hdb_curenum(&op->store,&keycursor,&key,&value) >= 0) {
 	        sp = (CITEDB_STORE *) value.buf ;
 	        rs1 = store_finish(sp) ;
 	        if (rs >= 0) rs = rs1 ;

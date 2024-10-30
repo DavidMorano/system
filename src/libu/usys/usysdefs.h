@@ -1,4 +1,5 @@
 /* usysdefs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* define the various system buffer sizes */

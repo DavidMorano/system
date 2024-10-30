@@ -1481,7 +1481,7 @@ static int procuniq_end(PROGINFO *pip)
 	    pip->f.f_uniq = FALSE ;
 	    if ((rs = hdb_curbegin(&pip->udb,&cur)) >= 0) {
 	        struct fileuniq	*up ;
-	        while (hdb_enum(&pip->udb,&cur,&key,&val) >= 0) {
+	        while (hdb_curenum(&pip->udb,&cur,&key,&val) >= 0) {
 	            up = (struct fileuniq *) key.buf ;
 	            if (up != NULL) {
 	                uc_free(up) ;

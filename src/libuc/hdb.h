@@ -1,4 +1,5 @@
 /* hdb HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* general-purpose in-core hashing, DBM-like interface */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<lookaside.h>
 
@@ -87,7 +89,7 @@ extern int hdb_fetchrec(hdb *,hdb_dat,hdb_cur *,
 extern int hdb_getkeyrec(hdb *,hdb_dat,hdb_cur *,
 			hdb_dat *,hdb_dat *) noex ;
 extern int hdb_nextrec(hdb *,hdb_dat,hdb_cur *) noex ;
-extern int hdb_enum(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+extern int hdb_curenum(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
 extern int hdb_getrec(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
 extern int hdb_next(hdb *,hdb_cur *) noex ;
 extern int hdb_delkey(hdb *,hdb_dat) noex ;

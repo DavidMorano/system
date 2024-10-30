@@ -388,7 +388,7 @@ static int fsdirtree_dirend(fsdirtree *pip) noex {
 	    pip->f.dirids = false ;
 	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 	        DIRID	*dip ;
-	        while (hdb_enum(dbp,&cur,&key,&val) >= 0) {
+	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (DIRID *) val.buf ;
 	            if (dip != nullptr) {
 	                rs1 = dirid_finish(dip) ;

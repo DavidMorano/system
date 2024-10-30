@@ -1,4 +1,5 @@
 /* syshas HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* specify what features each operating system has */
@@ -227,7 +228,7 @@
 #define	SYSHAS_STIME		1
 
 /* Solaris®: |resolvepath(2)| */
-#define	SYSHAS_RESOLVEPATH	1
+#define	SYSHAS_RESOLVEPATH	1	/* thank-you Solaris® */
 
 /* Solaris®: |waitid(2)| */
 #define	SYSHAS_WAITID		1
@@ -463,7 +464,7 @@
 #define	SYSHAS_STIME		0
 
 /* Darwin: |resolvepath(2)| */
-#define	SYSHAS_RESOLVEPATH	0
+#define	SYSHAS_RESOLVEPATH	0	/* expected to not have it! */
 
 /* Darwin: |waitid(2)| */
 #define	SYSHAS_WAITID		1	/* <- welcome to club! (confirmed) */
@@ -675,7 +676,7 @@
 #define	SYSHAS_STIME		0
 
 /* Linux: |resolvepath(2)| */
-#define	SYSHAS_RESOLVEPATH	0
+#define	SYSHAS_RESOLVEPATH	0	/* some sources falsely claim YES! */
 
 /* Linux: |waitid(2)| */
 #define	SYSHAS_WAITID		1
