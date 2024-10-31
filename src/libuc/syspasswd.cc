@@ -117,7 +117,7 @@ constexpr cchar		defufname[] = SYSPASSWD_FNAME ;
 int syspasswd_open(syspasswd *op,cchar *sufname) noex {
 	csize		nmax = INT_MAX ;
 	int		rs ;
-	if (sufname == NULL) sufname = defufname ; /* default */
+	if (sufname == nullptr) sufname = defufname ; /* default */
 	if ((rs = syspasswd_ctor(op)) >= 0) {
 	    filemap	*fmp = op->fmp ;
 	    if ((rs = fmp->open(sufname,nmax)) >= 0) {

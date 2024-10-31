@@ -1,25 +1,25 @@
-/* objfile */
+/* objfile SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* map an ELF object file into memory for examination */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_SAFE		1		/* extra safe mode */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2000-07-26, David A­D­ Morano
-	I am writing this from stratch after trying to make the best use of the
-	related code in the MINT simulator and becoming disgusted with the
-	failure of the attempt!  MINT is changing the code that it reads in and
-	also does not read every type of object file either!  Worse, MINT
-	inserts into the code some stuff for its own purposes that currently
+	I am writing this from stratch after trying to make the
+	best use of the related code in the MINT simulator and
+	becoming disgusted with the failure of the attempt!  MINT
+	is changing the code that it reads in and also does not
+	read every type of object file either!  Worse, MINT inserts
+	into the code some stuff for its own purposes that currently
 	escapes understanding.
 
 	= 2005-03-28, David A­D­ Morano
-        This code has been hacked up to just provide examination of the object
-        file.
+	This code has been hacked up to just provide examination
+	of the object file.
 
 */
 
@@ -27,30 +27,31 @@
 
 /*******************************************************************************
 
-        This module is used to map an object file into memory for purposes of
-        examining it for symbol content.
+  	Object:
+	objfile
 
-	
+	Description:
+	This module is used to map an object file into memory for
+	purposes of examining it for symbol content.
+
 *******************************************************************************/
 
-
-#define	OBJFILE_MASTER		1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<elf.h>
-#include	<string.h>
-
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<hdb.h>
+#include	<hash.h>		/*|hash_elf(3uc) */
+#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"objfile.h"		/* ourselves */
@@ -58,13 +59,12 @@
 
 /* local defines */
 
+#define	OF		objfile
+
 #define	NSYMBOLS	200
 
 
 /* external subroutines */
-
-extern uint	hash_elf(void *,int) ;
-extern uint	uceil(uint,int) ;
 
 
 /* external variables */
@@ -75,41 +75,42 @@ extern uint	uceil(uint,int) ;
 
 /* forward references */
 
-static int	objfile_hash(OBJFILE *,Elf32_Ehdr *) ;
-static int	objfile_dynsym(OBJFILE *,Elf32_Ehdr *) ;
+static int	objfile_hash(OF *,Elf32_Ehdr *) noex ;
+static int	objfile_dynsym(OF *,Elf32_Ehdr *) noex ;
 
-static int	objfile_symtabsinit(OBJFILE *,Elf32_Ehdr *) ;
-static int	objfile_symtabsfree(OBJFILE *) ;
+static int	objfile_symtabsinit(OF *,Elf32_Ehdr *) noex ;
+static int	objfile_symtabsfree(OF *) noex ;
 
-static int	objfile_symtabmap(OBJFILE *,int) ;
-static int	objfile_symtabunmap(OBJFILE *,int) ;
+static int	objfile_symtabmap(OF *,int) noex ;
+static int	objfile_symtabunmap(OF *,int) noex ;
 
-static int	objfile_symbolsinit(OBJFILE *) ;
-static int	objfile_symbolsfree(OBJFILE *) ;
+static int	objfile_symbolsinit(OF *) noex ;
+static int	objfile_symbolsfree(OF *) noex ;
 
-static int	checkelf(Elf32_Ehdr *) ;
-static int	findsection(Elf32_Shdr *,int,char *,char *,int) ;
-static int	findhighsection(Elf32_Shdr *,int,char *,char *,int) ;
+static int	checkelf(Elf32_Ehdr *) noex ;
+static int	finds(Elf32_Shdr *,int,cc *,cc *,int) noex ;
+static int	findhs(Elf32_Shdr *,int,cc *,cc *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int objfile_open(OBJFILE *op,cchar fname[])
-{
+int objfile_open(OF *op,cchar *fname) noex {
 	Elf32_Ehdr	ehead ;
-	off_t	uoff ;
+	off_t		uoff ;
 	uint		size ;
 	uint		mapalign ;
-	const int	pagesize = getpagesize() ;
+	cint		pagesize = getpagesize() ;
 	int		rs, rs1 ;
 	int		i ;
 	int		len ;
-	const char	*cp ;
-	char		*shstrings = NULL ; 	/* section header strings */
+	cchar		*cp ;
+	char		*shstrs = NULL ; 	/* section header strings */
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -117,13 +118,7 @@ int objfile_open(OBJFILE *op,cchar fname[])
 
 	op->f.symtab = FALSE ;
 	op->f.symbols = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_open: progfile=%s\n",fname) ;
-#endif
-
 /* try to open the ELF file */
-
 	rs = u_open(fname,O_RDONLY,0666) ;
 	op->ofd = rs ;
 	if (rs < 0)
@@ -153,11 +148,6 @@ int objfile_open(OBJFILE *op,cchar fname[])
 /* read some stuff that we want out of the ELF header */
 
 	op->progentry = ehead.e_ent ;	/* program entry address */
-
-#if	CF_DEBUGS
-	debugprintf("objfile_open: OS pagesize=%08lx\n",pagesize) ;
-#endif
-
 	mapalign = pagesize ;
 	op->mapalign = mapalign ;
 
@@ -183,19 +173,13 @@ int objfile_open(OBJFILE *op,cchar fname[])
 /* do we even have a section string table? */
 
 	if (ehead.e_shstrndx != SHN_UNDEF) {
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_open: section string table\n") ;
-#endif
-
-/* verify we have a section string table here! */
-
+	    /* verify we have a section string table here! */
 	    i = ehead.e_shstrndx ;
 	    if (op->sheads[i].sh_type != SHT_STRTAB)
 	        goto bad2 ;
 
 	    size = op->sheads[i].sh_size ;
-	    rs = uc_malloc(size,&shstrings) ;
+	    rs = uc_malloc(size,&shstrs) ;
 	    if (rs < 0)
 	        goto bad2 ;
 
@@ -204,7 +188,7 @@ int objfile_open(OBJFILE *op,cchar fname[])
 	    uoff = op->sheads[i].sh_offset ;
 	    u_seek(op->ofd,uoff,SEEK_SET) ;
 
-	    rs = u_read(op->ofd,shstrings,size) ;
+	    rs = u_read(op->ofd,shstrs,size) ;
 	    len = rs ;
 	    if ((rs >= 0) && (len < size)) {
 		rs = SR_EOF ;
@@ -252,20 +236,15 @@ int objfile_open(OBJFILE *op,cchar fname[])
 
 /* free up section strings */
 
-	if (shstrings != NULL) {
-	    uc_free(shstrings) ;
-	    shstrings = NULL ;
+	if (shstrs != NULL) {
+	    uc_free(shstrs) ;
+	    shstrs = NULL ;
 	}
 
 	u_close(op->ofd) ;
 	op->ofd = -1 ;			/* mark as closed */
 
 /* let's index the symbols if we have any (by name) */
-
-#if	CF_DEBUGS
-	debugprintf("objfile_open: index symbols? rs=%d f_symtab=%d\n",
-	    rs,op->f.symtab) ;
-#endif
 
 	if ((rs >= 0) && op->f.symtab) {
 	    HDB_DATUM		key, value ;
@@ -275,10 +254,6 @@ int objfile_open(OBJFILE *op,cchar fname[])
 #endif
 	    Elf32_Sym	*eep ;
 	    int		j ;
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_open: indexing symbols\n") ;
-#endif
 
 	    rs = hdb_start(&op->symbols,0,NSYMBOLS,NULL,NULL) ;
 	    if (rs < 0)
@@ -291,11 +266,6 @@ int objfile_open(OBJFILE *op,cchar fname[])
 
 	            eep = stp->symtab + j ;
 	            if (eep->st_name == 0) continue ;
-
-#if	CF_DEBUGS && 0
-	            debugprintf("objfile_open: s> %s\n",
-	                (stp->strings + eep->st_name)) ;
-#endif
 
 	            key.buf = (stp->strings + eep->st_name) ;
 	            key.len = -1 ;
@@ -338,14 +308,8 @@ int objfile_open(OBJFILE *op,cchar fname[])
 	    op->f.symbols = TRUE ;
 
 	} /* end if (indexing symbols by name) */
-
 /* clean up some stuff before exiting */
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("objfile_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 
 /* bad things come here */
@@ -383,8 +347,8 @@ bad3a:
 	}
 
 bad3:
-	if (shstrings != NULL)
-	    uc_free(shstrings) ;
+	if (shstrs != NULL)
+	    uc_free(shstrs) ;
 
 bad2:
 	if (op->sheads != NULL)
@@ -400,7 +364,7 @@ bad0:
 
 
 /* return the program entry point address */
-int objfile_getentry(OBJFILE *op,uint *ap)
+int objfile_getentry(OF *op,uint *ap)
 {
 
 	if (op == NULL) return SR_FAULT ;
@@ -411,10 +375,6 @@ int objfile_getentry(OBJFILE *op,uint *ap)
 
 	if (op->magic != OBJFILE_MAGIC)
 	    return SR_NOTOPEN ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("objfile_getentry: ent\n") ;
 #endif
 
 	*ap = op->progentry ;
@@ -425,7 +385,7 @@ int objfile_getentry(OBJFILE *op,uint *ap)
 
 
 /* get the target program page size */
-int objfile_getpagesize(OBJFILE *op,uint *ap)
+int objfile_getpagesize(OF *op,uint *ap)
 {
 
 	if (op == NULL) return SR_FAULT ;
@@ -436,10 +396,6 @@ int objfile_getpagesize(OBJFILE *op,uint *ap)
 
 	if (op->magic != OBJFILE_MAGIC)
 	    return SR_NOTOPEN ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("objfile_getpagesize: ent\n") ;
 #endif
 
 	*ap = op->pagealign ;
@@ -459,7 +415,7 @@ int objfile_getpagesize(OBJFILE *op,uint *ap)
 
 ***/
 
-int objfile_getsym(OBJFILE *op,cchar name[],Elf32_Sym **sepp)
+int objfile_getsym(OF *op,cchar name[],Elf32_Sym **sepp)
 {
 	HDB_CUR		cur ;
 	HDB_DATUM	key, value ;
@@ -486,10 +442,6 @@ int objfile_getsym(OBJFILE *op,cchar name[],Elf32_Sym **sepp)
 	if (! op->f.symbols)
 	    return SR_NOTFOUND ;
 
-#if	CF_DEBUGS
-	debugprintf("objfile_getsym: symbol=%s\n",name) ;
-#endif
-
 	if (name[0] == '\0')
 	    return SR_INVALID ;
 
@@ -503,10 +455,6 @@ int objfile_getsym(OBJFILE *op,cchar name[],Elf32_Sym **sepp)
 	while (rs >= 0) {
 
 	    rs = hdb_fetch(&op->symbols,key,&cur,&value) ;
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_getsym: hdb_fetch() rs=%d\n",rs) ;
-#endif
 
 	    if (rs >= 0) {
 	        sep = (Elf32_Sym *) value.buf ;
@@ -532,10 +480,6 @@ int objfile_getsym(OBJFILE *op,cchar name[],Elf32_Sym **sepp)
 
 	        rs = hdb_fetch(&op->symbols,key,&cur,&value) ;
 
-#if	CF_DEBUGS
-	        debugprintf("objfile_getsym: hdb_fetch() rs=%d\n",rs) ;
-#endif
-
 		if (rs >= 0) {
 	            sep = (Elf32_Sym *) value.buf ;
 	            f = (ELF32_ST_BIND(sep->st_info) == STB_WEAK) ;
@@ -553,20 +497,10 @@ int objfile_getsym(OBJFILE *op,cchar name[],Elf32_Sym **sepp)
 	} /* end if (second chance) */
 
 	if (rs >= 0) {
-
-	    if (sepp != NULL)
+	    if (sepp) {
 	        *sepp = sep ;
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_getsym: value=%08lx\n",
-	        (uint) sep->st_value) ;
-#endif
-
+	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("objfile_getsym: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -574,7 +508,7 @@ int objfile_getsym(OBJFILE *op,cchar name[],Elf32_Sym **sepp)
 
 
 /* initialize a cursor for fetching symbols by name */
-int objfile_sncurbegin(OBJFILE *op,OBJFILE_SNCUR *cp)
+int objfile_sncurbegin(OF *op,OBJFILE_SNCUR *cp)
 {
 	int		rs ;
 
@@ -583,11 +517,6 @@ int objfile_sncurbegin(OBJFILE *op,OBJFILE_SNCUR *cp)
 
 #if	CF_SAFE
 	if ((op->magic != OBJFILE_MAGIC) && (op->magic != 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_sncurbegin: bad format\n") ;
-#endif
-
 	    return SR_BADFMT ;
 	}
 
@@ -605,7 +534,7 @@ int objfile_sncurbegin(OBJFILE *op,OBJFILE_SNCUR *cp)
 /* end subroutine (objfile_sncurbegin) */
 
 
-int objfile_sncurend(OBJFILE *op,OBJFILE_SNCUR *cp)
+int objfile_sncurend(OF *op,OBJFILE_SNCUR *cp)
 {
 	int		rs ;
 
@@ -614,10 +543,6 @@ int objfile_sncurend(OBJFILE *op,OBJFILE_SNCUR *cp)
 
 #if	CF_SAFE
 	if ((op->magic != OBJFILE_MAGIC) && (op->magic != 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_sncurend: bad format\n") ;
-#endif
 
 	    return SR_BADFMT ;
 	}
@@ -634,7 +559,7 @@ int objfile_sncurend(OBJFILE *op,OBJFILE_SNCUR *cp)
 
 
 /* fetch a symbol table entry */
-int objfile_fetchsym(OBJFILE *op,cchar name[],OBJFILE_SNCUR *cp,
+int objfile_fetchsym(OF *op,cchar name[],OBJFILE_SNCUR *cp,
 		Elf32_Sym **sepp)
 {
 	HDB_DATUM	key, value ;
@@ -658,10 +583,6 @@ int objfile_fetchsym(OBJFILE *op,cchar name[],OBJFILE_SNCUR *cp,
 
 	if (! op->f.symbols) return SR_NOTAVAIL ;
 
-#if	CF_DEBUGS
-	debugprintf("objfile_fetchsym: symbol=%s\n",name) ;
-#endif
-
 	if (name[0] == '\0') return SR_INVALID ;
 
 	key.buf = (char *) name ;
@@ -672,18 +593,13 @@ int objfile_fetchsym(OBJFILE *op,cchar name[],OBJFILE_SNCUR *cp,
 	    if (sepp != NULL) *sepp = sep ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("objfile_fetchsym: ret rs=%d value=%08x\n",
-	    rs,(uint) sep->st_value) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (objfile_fetchsym) */
 
 
 /* enumerate the symbols */
-int objfile_enumsym(OBJFILE *op,OBJFILE_SNCUR *cp,cchar **namepp,
+int objfile_enumsym(OF *op,OBJFILE_SNCUR *cp,cchar **namepp,
 		Elf32_Sym **sepp)
 {
 	HDB_DATUM	key, value ;
@@ -715,38 +631,22 @@ int objfile_enumsym(OBJFILE *op,OBJFILE_SNCUR *cp,cchar **namepp,
 	    *namepp = key.buf ;
 
 	sep = (Elf32_Sym *) value.buf ;
-	if (sepp != NULL)
+	if (sepp) {
 	    *sepp = sep ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_enumsym: value=%08x\n",
-	    (uint) sep->st_value) ;
-#endif
+	}
 
 ret0:
 	return rs ;
 }
 /* end subroutine (objfile_enumsym) */
 
-
-/* get pointers to section headers */
-int objfile_getsec(OBJFILE *op,int i,Elf32_Shdr **shpp)
-{
+int objfile_getsec(OF *op,int i,Elf32_Shdr **shpp) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_getsec: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 
 #if	CF_SAFE
 	if ((op->magic != OBJFILE_MAGIC) && (op->magic != 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("objfile_getsec: bad format\n") ;
-#endif
-
 	    return SR_BADFMT ;
 	}
 
@@ -768,7 +668,7 @@ int objfile_getsec(OBJFILE *op,int i,Elf32_Shdr **shpp)
 
 
 /* free up this whole program mapping! */
-int objfile_close(OBJFILE *op)
+int objfile_close(OF *op)
 {
 	int		i ;
 
@@ -781,10 +681,6 @@ int objfile_close(OBJFILE *op)
 
 	if (op->magic != OBJFILE_MAGIC)
 	    return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_close: ent\n") ;
-#endif
 
 /* free up the indexed symbols (if any) */
 
@@ -811,29 +707,18 @@ int objfile_close(OBJFILE *op)
 	    op->f.symtab = FALSE ;
 
 	} /* end if (freeing up the symbol tables) */
-
-/* close any open files */
-
-#if	CF_DEBUGS
-	debugprintf("objfile_close: closing files\n") ;
-#endif
-
-	if (op->ofd >= 0)
+	/* close any open files */
+	if (op->ofd >= 0) {
 	    u_close(op->ofd) ;
-
-/* free up the data structures that were allocated */
-
-#if	CF_DEBUGS
-	debugprintf("objfile_close: freeing other memory\n") ;
-#endif
-
-	if (op->fname != NULL)
+	}
+	/* free up the data structures that were allocated */
+	if (op->fname != NULL) {
 	    uc_free(op->fname) ;
-
-/* free up sections headers */
-
-	if (op->sheads != NULL)
+	}
+	/* free up sections headers */
+	if (op->sheads != NULL) {
 	    uc_free(op->sheads) ;
+	}
 
 	op->magic = 0 ;
 	return SR_OK ;
@@ -843,86 +728,55 @@ int objfile_close(OBJFILE *op)
 
 /* private subroutines */
 
-
-static int objfile_hash(OBJFILE *op,Elf32_Ehdr *ehp)
-{
+static int objfile_hash(OF *op,Elf32_Ehdr *ehp) noex {
 	int		rs = SR_NOENT ;
-	int		i ;
-
+	int		i ; /* used-afterwards */
 	for (i = 0 ; i < ehp->e_shnum ; i += 1) {
 	    if (op->sheads[i].sh_type == SHT_HASH) break ;
 	} /* end for */
-
 	if (i < ehp->e_shnum) {
-
-/* we have a hash section */
-
-
-
+	    /* we have a hash section */
 	    op->f.hash = (rs >= 0) ;
 	} /* end if (dynamic symbols) */
-
 	return (rs >= 0) ? op->f.hash : rs ;
 }
 /* end subroutine (objfile_hash) */
 
-
-static int objfile_dynsym(OBJFILE *op,Elf32_Ehdr *ehp)
-{
+static int objfile_dynsym(OF *op,Elf32_Ehdr *ehp) noex {
 	int		rs = SR_NOENT ;
-	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_dynsym: ent\n") ;
-#endif
-
+	int		i ; /* used-afterwards */
 	for (i = 0 ; i < ehp->e_shnum ; i += 1) {
 	    if (op->sheads[i].sh_type == SHT_DYNSYM) break ;
 	} /* end for */
-
 	if (i < ehp->e_shnum) {
 	    rs = objfile_symtabmap(op,i) ;
 	    op->f.dynsym = (rs >= 0) ;
 	}
-
 	return (rs >= 0) ? op->f.dynsym : rs ;
 }
 /* end subroutine (objfile_dynsym) */
 
-
 /* map the symbol tables along with their string tables */
-static int objfile_symtabsinit(OBJFILE *op,Elf32_Ehdr *ehp)
-{
+static int objfile_symtabsinit(OF *op,Elf32_Ehdr *ehp) noex {
 	OBJFILE_SYMTAB	st ;
 	Elf32_Shdr	*sheads = op->sheads ;
 	int		rs = SR_NOENT ;
-	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_symtabsinit: ent\n") ;
-#endif
-
-/* loop searching for symbol tables and mapping them! */
-
-	for (i = 0 ; i < ehp->e_shnum ; i += 1) {
+	/* loop searching for symbol tables and mapping them! */
+	for (int i = 0 ; i < ehp->e_shnum ; i += 1) {
 
 	    if (sheads[i].sh_type == SHT_SYMTAB) {
 
 	        rs = objfile_symtabmap(op,i) ;
 	        if (rs < 0) break ;
-
-/* save this symbol table */
-
+		/* save this symbol table */
 	        rs = vecobj_add(&op->symtabs,&st) ;
-
 	        if (rs < 0) {
-
-	            if (st.pa_symtab != NULL)
+	            if (st.pa_symtab != NULL) {
 	                u_munmap(st.pa_symtab,st.maplen_symtab) ;
-
-	            if (st.pa_strings != NULL)
+		    }
+	            if (st.pa_strings != NULL) {
 	                u_munmap(st.pa_strings,st.maplen_strings) ;
-
+		    }
 	            break ;
 	        }
 
@@ -968,7 +822,7 @@ bad3:
 
 
 /* free up the symbol tables */
-static int objfile_symtabsfree(OBJFILE *op)
+static int objfile_symtabsfree(OF *op)
 {
 	OBJFILE_SYMTAB	*stp ;
 	int		rs = SR_OK ;
@@ -1005,17 +859,9 @@ int		n ;
 	int		j ;
 	int		flags, prot ;
 
-#if	CF_DEBUGS
-	debugprintf("objfile_symtabmap: ent n=%u\n",n) ;
-#endif
-
 	if ((sheads[n].sh_type != SHT_SYMTAB) &&
 	    (sheads[n].sh_type != SHT_DYNSYM))
 	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile_symtabmap: continuing\n") ;
-#endif
 
 	st.type = sheads[n].sh_type ;
 
@@ -1068,58 +914,42 @@ int		n ;
 	} /* end if (had strings) */
 
 	if (rs >= 0) {
-
-/* save this symbol table */
-
+	    /* save this symbol table */
 	    rs = vecobj_add(&op->symtabs,&st) ;
 	    if (rs < 0) {
-
-	        if (st.pa_symtab != NULL)
+	        if (st.pa_symtab != NULL) {
 	            u_munmap(st.pa_symtab,st.maplen_symtab) ;
-
-	        if (st.pa_strings != NULL)
+		}
+	        if (st.pa_strings != NULL) {
 	            u_munmap(st.pa_strings,st.maplen_strings) ;
-
+		}
 	    }
-
 	}
-
-#if	CF_DEBUGS
-	debugprintf("objfile_symtabmap: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (objfile_symtabmap) */
 
-
-static int objfile_symtabunmap(OBJFILE *op,int n)
-{
+static int objfile_symtabunmap(OF *op,int n) noex {
 	OBJFILE_SYMTAB	*stp ;
 	int		rs ;
 
 	rs = vecobj_get(&op->symtabs,n,&stp) ;
 
 	if ((rs >= 0) && (stp != NULL)) {
-
-	    if (stp->pa_symtab != NULL)
+	    if (stp->pa_symtab != NULL) {
 	        u_munmap(stp->pa_symtab,stp->maplen_symtab) ;
-
-	    if (stp->pa_strings != NULL)
+	    }
+	    if (stp->pa_strings != NULL) {
 	        u_munmap(stp->pa_strings,stp->maplen_strings) ;
-
+	    }
 	    vecobj_del(&op->symtabs,n) ;
-
 	} /* end if (got one) */
 
 	return rs ;
 }
 /* end subroutine (objfile_symtabunmap) */
 
-
-/* initialize the symbols */
-static int objfile_symbolsinit(OBJFILE *op)
-{
+static int objfile_symbolsinit(OF *op) noex {
 	HDB_DATUM	key, value ;
 	OBJFILE_SYMTAB	*stp ;
 #ifdef	COMMENT
@@ -1144,11 +974,6 @@ static int objfile_symbolsinit(OBJFILE *op)
 
 	        eep = stp->symtab + j ;
 	        if (eep->st_name == 0) continue ;
-
-#if	CF_DEBUGS && 0
-	        debugprintf("objfile_symbolsinit: s> %s\n",
-	            (stp->strings + eep->st_name)) ;
-#endif
 
 	        key.buf = (stp->strings + eep->st_name) ;
 	        key.len = -1 ;
@@ -1198,10 +1023,7 @@ bad9:
 }
 /* end subroutine (objfile_symbolsinit) */
 
-
-/* free up the indexed symbols, if any */
-static int objfile_symbolsfree(OBJFILE *op)
-{
+static int objfile_symbolsfree(OF *op) noex {
 	int		rs = SR_OK ;
 
 	if (! op->f.symbols)
@@ -1235,15 +1057,8 @@ ret0:
 }
 /* end subroutine (objfile_symbolsfree) */
 
-
-/* check if we have an ELF file and if we can handle it */
-static int checkelf(Elf32_Ehdr *ehp)
-{
+static int checkelf(Elf32_Ehdr *ehp) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("objfile/checkelf: magic\n") ;
-#endif
 
 	if ((ehp->e_ident[0] != 0x7f) ||
 	    (strncmp((char *) (ehp->e_ident + 1),"ELF",3) != 0)) {
@@ -1251,47 +1066,24 @@ static int checkelf(Elf32_Ehdr *ehp)
 	    rs = SR_BADFMT ;
 	    goto bad2 ;
 	}
-
-/* check the file class (we can only handle 32 bit) */
-
-#if	CF_DEBUGS
-	debugprintf("objfile/checkelf: file class\n") ;
-#endif
-
+	/* check the file class (we can only handle 32 bit) */
 	if (ehp->e_ident[EI_CLASS] != ELFCLASS32) {
 	    rs = SR_NOTSUP ;
 	    goto bad2 ;
 	}
-
-/* check for a version of the ELF file that we understand */
-
-#if	CF_DEBUGS
-	debugprintf("objfile/checkelf: ident version\n") ;
-#endif
-
+	/* check for a version of the ELF file that we understand */
 	if ((ehp->e_ident[EI_VERSION] == 0) ||
 	    (ehp->e_ident[EI_VERSION] > EV_CURRENT)) {
 
 	    rs = SR_NOTSUP ;
 	    goto bad2 ;
 	}
-
-/* check the data encoding (we can only handle 32 bit Big-Endian) */
-
-#if	CF_DEBUGS
-	debugprintf("objfile/checkelf: byte ordering\n") ;
-#endif
-
+	/* check the data encoding (we can only handle 32 bit Big-Endian) */
 	if (ehp->e_ident[EI_DATA] != ELFDATA2MSB) {
 	    rs = SR_NOTSUP ;
 	    goto bad2 ;
 	}
-
-/* check version in the header entry */
-
-#if	CF_DEBUGS
-	debugprintf("objfile/checkelf: header version\n") ;
-#endif
+	/* check version in the header entry */
 
 	if ((ehp->e_version == 0) || (ehp->e_version > EV_CURRENT)) {
 	    rs = SR_NOTSUP ;
@@ -1299,57 +1091,32 @@ static int checkelf(Elf32_Ehdr *ehp)
 	}
 
 bad2:
-
-#if	CF_DEBUGS
-	debugprintf("objfile/checkelf: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (checkelf) */
 
-
-/* find a section by its name (and type if specified) */
-static int findsection(sheads,n,shstrings,name,type)
-Elf32_Shdr	*sheads ;
-int		n ;
-char		shstrings[], name[] ;
-int		type ;
-{
-	int		i ;
-	int		namei ;
-
-	for (i = 0 ; i < n ; i += 1) {
-	    namei = sheads[i].sh_name ;
-	    if (strcmp(shstrings + namei,name) == 0) {
+static int finds(Elf32_shdr *sheads,int n,cc *shstrs,cc *name,int type) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    cint	namei = sheads[i].sh_name ;
+	    if (strcmp(shstrs + namei,name) == 0) {
 	        if (type < 0) break ;
 	        if (sheads[i].sh_type == type) break ;
 	    }
 	} /* end for */
-
 	return ((i < n) ? i : -1) ;
 }
-/* end subroutine (findsection) */
-
+/* end subroutine (finds) */
 
 /* find a section by its name (and type if specified) */
-static int findhighsection(sheads,n,shstrings,name,type)
-Elf32_Shdr	*sheads ;
-int		n ;
-char		shstrings[], name[] ;
-int		type ;
-{
-	uint		maxaddr ;
-	int		si, i ;
+static int findhs(Elf32_Shdr *sheads,int n,cc *shstrs,cc *name,int type) noex {
+	uint		maxaddr = 0 ;
+	int		si = -1 ;
 	int		namei ;
+	for (int i = 0 ; i < n ; i += 1) {
 
-	si = -1 ;
-	maxaddr = 0 ;
-	for (i = 0 ; i < n ; i += 1) {
-
-	    if ((name != NULL) && (shstrings != NULL)) {
+	    if ((name != NULL) && (shstrs != NULL)) {
 	        namei = sheads[i].sh_name ;
-	        if (strcmp(shstrings + namei,name) != 0) continue ;
+	        if (strcmp(shstrs + namei,name) != 0) continue ;
 	    }
 
 	    if (type < 0)
@@ -1364,6 +1131,6 @@ int		type ;
 
 	return si ;
 }
-/* end subroutine (findhighsection) */
+/* end subroutine (findhs) */
 
 

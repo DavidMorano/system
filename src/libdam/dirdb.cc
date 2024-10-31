@@ -1,4 +1,5 @@
 /* dirdb SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle directory list operations */
@@ -215,8 +216,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	        if (dl < 0) dl = strlen(dp) ;
 	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	             if ((rs = mkpath1w(tbuf,dp,dl)) >= 0) {
-	                 USTAT	sb ;
-	                 if ((rs = uc_stat(tbuf,&sb)) >= 0) {
+	                 if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 		             if (S_ISDIR(sb.st_mode)) {
 		                 bool	f_add = true ;
 		                 while ((dl > 0) && (dp[dl-1] == '/')) {
@@ -260,10 +260,9 @@ int dirdb_clean(dirdb *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirdb_magic(op)) >= 0) {
-	    hdb_cur	cur ;
-	    if ((rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
-	        hdb_dat	key ;
-	        hdb_dat	val ;
+	    if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
+	        hdb_dat		key ;
+	        hdb_dat		val ;
 	        while ((rs1 = hdb_curenum(op->dbp,&cur,&key,&val)) >= 0) {
 	            dirdb_ent	*ep = (dirdb_ent *) val.buf ;
 	            if ((rs = dirdb_alreadyentry(op,ep)) >= 0) {
