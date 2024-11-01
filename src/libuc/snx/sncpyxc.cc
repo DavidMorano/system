@@ -24,9 +24,12 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<toxc.h>
 

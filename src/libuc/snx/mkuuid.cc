@@ -24,10 +24,10 @@
 	We create a UUID.
 
 	Synpsis:
-	int mkuuid(MKUUID *up,int ver) noex
+	int mkuuid(UUID_DAT *up,int ver) noex
 
 	Arguments:
-	up		pointer to MKUUID object
+	up		pointer to UUID_DAT object
 	ver		version desired
 
 	Returns:
@@ -38,8 +38,10 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* <- for |UINT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>		/* <- for |memclear| */
+#include	<usystem.h>		/* |memclear| + |getrand(3uc)| */
 #include	<mkuuid.h>
 #include	<localmisc.h>
 
@@ -48,7 +50,7 @@
 
 /* local defines */
 
-#define	NWORDS	4
+#define	NWORDS		4
 
 
 /* external subroutines */
@@ -60,24 +62,26 @@ extern "C" {
 
 /* forward references */
 
-static int mkuutime(MKUUID *,uint *) noex ;
-static int mkuuclk(MKUUID *,uint *) noex ;
-static int mkuunode(MKUUID *,uint *) noex ;
+static int mkuutime(uuid_dat *,uint *) noex ;
+static int mkuuclk(uuid_dat *,uint *) noex ;
+static int mkuunode(uuid_dat *,uint *) noex ;
 
 
 /* exported subroutines */
 
-int mkuuid(MKUUID *up,int) noex {
-	cint		rsize = (NWORDS * sizeof(uint)) ;
-	uint		rwords[NWORDS+1] ;
-	int		rs ;
-	memclear(up) ;
-	if ((rs = getrand(rwords,rsize)) >= 0) {
-	    up->version = 4 ;
-	    mkuutime(up,rwords) ;
-	    mkuuclk(up,rwords) ;
-	    mkuunode(up,rwords) ;
-	} /* end if (reading random) */
+int mkuuid(uuid_dat *up,int) noex {
+	int		rs = SR_FAULT ;
+	if (up) {
+	    cint	rsize = (NWORDS * szof(uint)) ;
+	    uint	rwords[NWORDS+1] ;
+	    memclear(up) ;
+	    if ((rs = getrand(rwords,rsize)) >= 0) {
+	        up->version = 4 ;
+	        mkuutime(up,rwords) ;
+	        mkuuclk(up,rwords) ;
+	        mkuunode(up,rwords) ;
+	    } /* end if (reading random) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mkuuid) */
@@ -85,7 +89,7 @@ int mkuuid(MKUUID *up,int) noex {
 
 /* local subroutines */
 
-static int mkuutime(MKUUID *up,uint *rwords) noex {
+static int mkuutime(uuid_dat *up,uint *rwords) noex {
 	uint64_t	tv = 0 ;
 	uint64_t	v ;
 	{
@@ -101,7 +105,7 @@ static int mkuutime(MKUUID *up,uint *rwords) noex {
 }
 /* end subroutine (mkuutime) */
 
-static int mkuuclk(MKUUID *up,uint *rwords) noex {
+static int mkuuclk(uuid_dat *up,uint *rwords) noex {
 	uint64_t	v ;
 	{
 	    v = (rwords[2] & UINT_MAX) ;
@@ -112,7 +116,7 @@ static int mkuuclk(MKUUID *up,uint *rwords) noex {
 }
 /* end subroutine (mkuuclk) */
 
-static int mkuunode(MKUUID *up,uint *rwords) noex {
+static int mkuunode(uuid_dat *up,uint *rwords) noex {
 	uint64_t	nv = 0 ;
 	uint64_t	v ;
 	{

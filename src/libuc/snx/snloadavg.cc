@@ -45,6 +45,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>		/* |FSCALE| + |FSHIFT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>

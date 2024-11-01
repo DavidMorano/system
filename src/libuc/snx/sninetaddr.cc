@@ -42,6 +42,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<netinet/in.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<inetaddr.h>

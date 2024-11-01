@@ -46,6 +46,7 @@
 #include	<cstdio>
 #include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

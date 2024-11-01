@@ -23,7 +23,7 @@
 
 EXTERNC_begin
 
-extern int snuuid(char *,int,MKUUID *) noex ;
+extern int snuuid(char *,int,uuid_dat *) noex ;
 
 EXTERNC_end
 

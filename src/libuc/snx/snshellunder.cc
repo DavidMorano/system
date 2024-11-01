@@ -49,6 +49,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

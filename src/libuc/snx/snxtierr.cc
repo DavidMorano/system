@@ -44,6 +44,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 
 /* local defines */

@@ -43,6 +43,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"snflags.h"
 #include	"snx.h"

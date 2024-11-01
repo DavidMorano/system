@@ -51,10 +51,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

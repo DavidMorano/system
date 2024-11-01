@@ -25,12 +25,12 @@
 	from a UUID.
 
 	Synopsis:
-	int snuuid(char *rbuf,int rlen,MKUUID *up) noex
+	int snuuid(char *rbuf,int rlen,uuid_dat *up) noex
 
 	Arguments:
 	rbuf		result buffer
 	rlen		size of supplied result buffer
-	up		pointer to MKUUID object holding a UUID
+	up		pointer to UUID_DAT object holding a UUID
 
 	Returns:
 	>=0		resulting length
@@ -79,7 +79,7 @@ static int sbuf_hexp(sbuf *,uint64_t,int) noex ;
 
 /* exported subroutines */
 
-int snuuid(char *dbuf,int dlen,MKUUID *up) noex {
+int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && up) {

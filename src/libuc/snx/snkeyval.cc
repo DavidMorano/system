@@ -44,9 +44,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

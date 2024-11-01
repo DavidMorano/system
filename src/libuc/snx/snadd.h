@@ -17,6 +17,10 @@
 
 /******************************************************************************
 
+  	Name:
+	snadd
+
+	Description:
 	Ths object is used to concatenate a new c-string to
 	an existing counted c-string.
 
@@ -30,7 +34,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<snaddw.h>
 
 
