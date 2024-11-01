@@ -1,4 +1,5 @@
 /* snerrabbr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the string repreentation of a system-error return number */

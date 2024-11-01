@@ -1,4 +1,5 @@
 /* sninetaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of INET addresses */

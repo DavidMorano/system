@@ -1,4 +1,5 @@
 /* snclean SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* clean up a c-string of text */

@@ -1,4 +1,5 @@
 /* snsigabbr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the string repreentation of a signal number */
@@ -37,9 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

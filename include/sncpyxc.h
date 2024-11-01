@@ -1,4 +1,5 @@
 /* sncpyxc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* copy a c-string to a given case */

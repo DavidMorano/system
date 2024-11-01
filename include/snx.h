@@ -1,4 +1,5 @@
 /* snx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* counted c-string operations */
@@ -24,6 +25,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<sncpy.h>
 #include	<sncpyx.h>		/* repeat? */

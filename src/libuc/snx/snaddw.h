@@ -1,4 +1,5 @@
 /* snaddw HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* append a counted c-string to existing counted c-string */

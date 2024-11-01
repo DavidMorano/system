@@ -1,4 +1,5 @@
 /* sntmtime HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* counted c-string operations */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<tmtime.h>		/* <- the money shot! */
 
 

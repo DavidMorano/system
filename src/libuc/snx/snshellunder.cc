@@ -1,4 +1,5 @@
 /* snshellunder SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the shell-under information string */
@@ -44,6 +45,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |pid_t| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
 
@@ -54,6 +57,15 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forwards references */
 
 
 /* local variables */

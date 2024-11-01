@@ -1,4 +1,5 @@
 /* snclean HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* clean up a c-string of text */

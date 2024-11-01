@@ -1,4 +1,5 @@
 /* snfilemode SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the file-mode flags */
@@ -41,6 +42,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<ctoct.h>
@@ -111,7 +114,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    if (snflags ss ; (rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
+	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
 	        cint	ft = (fm & S_IFMT) ;
 	        cchar	*ms = nullptr ;
 	        switch (ft) {
@@ -147,11 +150,11 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 		    break ;
 	        } /* end switch */
 	        if (ms) {
-		    rs = snflags_addstr(&ss,ms) ;
+		    rs = ss.addstr(ms) ;
 	        }
 	        for (int i = 0 ; (rs >= 0) && fileperms[i].f ; i += 1) {
 	            if (fm & fileperms[i].f) {
-	                rs = snflags_addstr(&ss,fileperms[i].s) ;
+	                rs = ss.addstr(fileperms[i].s) ;
 		    }
 	        } /* end for */
 	        if (rs >= 0) {
@@ -160,10 +163,10 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 		    char	pbuf[OCTBUFLEN+1] ;
 		    if ((rs = ctocti(pbuf,plen,(fm & S_IAMB))) >= 0) {
 		        cchar	*cp = ((rs > n) ? (pbuf+(rs-n)) : pbuf) ;
-	                rs = snflags_addstr(&ss,cp) ;
+	                rs = ss.addstr(cp) ;
 		    }
 	        } /* end if (ok) */
-	        rs1 = snflags_finish(&ss) ;
+	        rs1 = ss.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (snflags) */
 	} /* end if (non-null) */

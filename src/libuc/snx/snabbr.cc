@@ -1,4 +1,5 @@
 /* snabbr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy an abbreviation of a groups of words */

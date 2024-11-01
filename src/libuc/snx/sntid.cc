@@ -1,4 +1,5 @@
 /* sntid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create a string representation of a Pthread Thread-ID */
@@ -44,6 +45,7 @@
 #include	<cstdint>		/* <- for |uintptr_t| */
 #include	<usystem.h>
 #include	<ctdec.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

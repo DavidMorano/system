@@ -1,4 +1,5 @@
 /* snopenflags SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the open-call flags */
@@ -39,7 +40,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<fcntl.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"snflags.h"

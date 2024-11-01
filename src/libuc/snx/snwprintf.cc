@@ -1,4 +1,5 @@
 /* snwprintf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform a c-string creation function similar to |snprintf(3c)| */
