@@ -94,7 +94,7 @@ struct flagstrs {
 
 /* local variables */
 
-static constexpr struct flagstrs	fileperms[] = {
+constexpr flagstrs	fileperms[] = {
 	{ S_ISUID, "SUID" },
 	{ S_ISGID, "SGID" },
 	{ S_ISVTX, "SAVETXT" },
@@ -111,8 +111,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    SNFLAGS	ss ;
-	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
+	    if (snflags ss ; (rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
 	        cint	ft = (fm & S_IFMT) ;
 	        cchar	*ms = nullptr ;
 	        switch (ft) {

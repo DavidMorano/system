@@ -27,7 +27,7 @@
 	Description:
 	This subroutine adds a "path" componment to the vector-string
 	list.  It cleans up the path-component first by passing it
-	through 'pathclean(3dam)'.
+	through |pathclean(3uc)|.
 
 	Synopsis:
 	int vecstr_addpathclean(vecstr *lp,cchar *pp,int pl) noex
@@ -71,6 +71,7 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
+#include	<libmallocxx.h>		/* <- currently unused */
 #include	<strn.h>
 #include	<pathclean.h>
 #include	<localmisc.h>
