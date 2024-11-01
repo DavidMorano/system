@@ -930,6 +930,10 @@ int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
 }
 
+int vecstr::envset(cchar *kp,cchar *valp,int vall) noex {
+	return vecstr_envset(this,kp,valp,vall) ;
+}
+
 int vecstr::envfile(cchar *fn) noex {
 	return vecstr_envfile(this,fn) ;
 }

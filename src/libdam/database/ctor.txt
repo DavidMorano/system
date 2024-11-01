@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int syspasswd_ctor(lfm *op,Args ... args) noex {
+static int pdb_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int syspasswd_ctor(lfm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (syspasswd_ctor) */
+/* end subroutine (pdb_ctor) */
 
-static int syspasswd_dtor(lfm *op) noex {
+static int pdb_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (syspasswd_dtor) */
+/* end subroutine (pdb_dtor) */
 
 template<typename ... Args>
-static inline int syspasswd_magic(lfm *op,Args ... args) noex {
+static inline int pdb_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SYSPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == PDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (syspasswd_magic) */
+/* end subroutine (pdb_magic) */

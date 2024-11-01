@@ -173,6 +173,8 @@ struct vecpstr : vecpstr_head {
 	int addpath(cchar *,int = -1) noex ;
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
+	int envset(cchar *,cchar *,int = -1) noex ;
+	int envfile(cchar *) noex ;
 	int del(int = -1) noex ;
 	int sort(vecpstr_f = nullptr) noex ;
 	vecpstr_iter begin() noex {

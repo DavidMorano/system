@@ -277,7 +277,7 @@ OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
 OBJ161= nusers.o mesg.o sysmemutil.o initnow.o 
-OBJ162= getfiledirs.o findfilepath.o findfile.o findxfile.o
+OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o dictdiff.o bufprintf.o xfile.o
 OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o straltwchar.o
 OBJ165= emainfo.o getdig.o

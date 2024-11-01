@@ -429,11 +429,6 @@ upt.o:			upt.cc upt.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
-getusername.o:		getusername.cc getusername.h
-getuserhome.o:		getuserhome.cc getuserhome.h
-getgroupname.o:		getgroupname.cc getgroupname.h
-getprojname.o:		getprojname.cc getprojname.h
-
 memfile.o:		memfile.cc memfile.h
 filemap.o:		filemap.cc filemap.h
 
@@ -840,9 +835,11 @@ termtypemat.o:		termtypemat.cc termtypemat.h
 termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
-getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
+
+getuserhome.o:		getuserhome.cc getuserhome.h
+getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 getxid.o:		getxid.cc getxid.h
 getngroups.o:		getngroups.cc getngroups.h
 getourenv.o:		getourenv.cc getourenv.h
@@ -851,6 +848,9 @@ getmjd.o:		getmjd.cc getmjd.h
 gethz.o:		gethz.cc gethz.h
 getpassword.o:		getpassword.cc getpassword.h
 getrand.o:		getrand.cc getrand.h
+getsyslogx.o:		getsyslogx.cc getsyslogx.h
+getprogpath.o:		getprogpath.cc getprogpath.h
+
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
@@ -860,6 +860,7 @@ isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
+findxfile.o:		findxfile.cc findxfile.h
 calstrs.o:		calstrs.cc calstrs.h
 ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
@@ -867,7 +868,6 @@ ffbs.o:			ffbs.cc ffbs.h
 utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
-getsyslogx.o:		getsyslogx.cc getsyslogx.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h

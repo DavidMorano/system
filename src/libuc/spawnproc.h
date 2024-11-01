@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* }pid_t| */
+#include	<sys/types.h>		/* |pid_t| */
 #include	<usystem.h>
 
 

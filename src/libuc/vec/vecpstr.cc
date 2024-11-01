@@ -1048,6 +1048,14 @@ int vecpstr::getvec(mainv *rppp) noex {
 	return vecpstr_getvec(this,rppp) ;
 }
 
+int vecpstr::envset(cchar *kp,cchar *valp,int vall) noex {
+	return vecpstr_envset(this,kp,valp,vall) ;
+}
+
+int vecpstr::envfile(cchar *fn) noex {
+	return vecpstr_envfile(this,fn) ;
+}
+
 int vecpstr::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
 	return vecpstr_del(this,ai) ;

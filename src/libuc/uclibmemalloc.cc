@@ -1,4 +1,5 @@
 /* uclibmemalloc SUPPORT (3uc) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -22,6 +23,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	uclbmemalloc
+
+	Description:
 	This is the low-level component of the MEMALLOC facility.
 	These subroutines need to be able to be interposed upon,
 	so they have to be in their own compilation (object) image.
