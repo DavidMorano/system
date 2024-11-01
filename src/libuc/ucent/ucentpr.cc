@@ -1,4 +1,5 @@
 /* ucentpr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTPR object management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumpr
+
+	Description:
 	I provide the normal (usual) subroutines for managing the
 	UCENTPR (UNIX® |PROTOENT| database entries) object.
 
@@ -24,8 +29,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<cerrno>
 #include	<unistd.h>
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

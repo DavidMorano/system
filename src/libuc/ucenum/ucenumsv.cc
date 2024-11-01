@@ -1,4 +1,5 @@
 /* ucenumsv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* enumerate system SYSDB-XX entries */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumsv
+
+	Description:
 	We enumerate (reentrantly and thread safely) SYSDB entries
 	from the system SYSDB-XX database.
 
@@ -26,6 +31,7 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

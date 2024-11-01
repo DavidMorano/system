@@ -1,4 +1,5 @@
 /* ucuserattr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* deal with user-attributes (appears in coming version of Solaris®) */
@@ -44,6 +45,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

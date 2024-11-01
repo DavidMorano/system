@@ -1,4 +1,5 @@
 /* ucentpj HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTPJ object management */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ucsyspj.h>		/* <- the money shot! */
 
 

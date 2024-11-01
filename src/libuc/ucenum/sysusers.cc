@@ -1,4 +1,5 @@
 /* sysusers SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* system user-entry enumeration */
@@ -26,6 +27,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

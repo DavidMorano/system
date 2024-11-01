@@ -1,4 +1,5 @@
 /* sysusers HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* system user-entry enumeration */
@@ -15,7 +16,6 @@
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<filemap.h>
-#include	<localmisc.h>
 
 
 #define	SYSUSERS		struct sysusers_head
@@ -31,18 +31,14 @@ struct sysusers_head {
 typedef SYSUSERS	sysusers ;
 typedef PASSWD		sysusers_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sysusers_open(sysusers *,cchar *) noex ;
 extern int sysusers_close(sysusers *) noex ;
 extern int sysusers_readent(sysusers *,sysusers_ent *,char *,int) noex ;
 extern int sysusers_reset(sysusers *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSUSERS_INCLUDE */

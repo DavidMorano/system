@@ -1,4 +1,5 @@
 /* ucentgr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTGR object management */
@@ -12,14 +13,6 @@
 
 */
 
-
-/* revision history:
-
-	= 1998-02-12, David A­D­ Morano
-	Originally written for Rightcore Network Services.
-
-*/
-
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UCENTGR_INCLUDE
@@ -30,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<ucsysgr.h>		/* <- the money shot! */
 
 
