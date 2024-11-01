@@ -1,4 +1,5 @@
 /* ucentnw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTNW object management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumnw
+
+	Description:
 	I provide the normal (usual) subroutines for managing the
 	UCENTNW (UNIX® |NETWENT| database entries) object.
 
@@ -27,6 +32,7 @@
 #include	<arpa/inet.h>		/* <- |htonl(3c)| */
 #include	<cerrno>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |memcpy(3c)| */
 #include	<algorithm>

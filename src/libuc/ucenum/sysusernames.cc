@@ -1,4 +1,5 @@
 /* sysusernames SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* system user-name enumeration */
@@ -25,6 +26,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -40,6 +42,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 

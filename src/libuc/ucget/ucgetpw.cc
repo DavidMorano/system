@@ -1,4 +1,5 @@
 /* ucgetpw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® C-language system database access (UCGET) */
@@ -60,6 +61,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usysflag.h>

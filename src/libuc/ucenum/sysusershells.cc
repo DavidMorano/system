@@ -1,4 +1,5 @@
 /* sysusershells SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* system user-shell enumeration */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	sysusershells
+
+	Description:
 	We enumerate (reentrantly and thread safely) user-shell
 	entries from the system user-shell database.
 
@@ -25,6 +30,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

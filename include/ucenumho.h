@@ -1,4 +1,5 @@
 /* ucenumho HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* enumerate system SYSDB-XX entries */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumho
+
+	Descrption:
 	We enumerate (reentrantly and thread safely) system SYSDB-XX
 	entries from the system SYSDB-XX database.
 

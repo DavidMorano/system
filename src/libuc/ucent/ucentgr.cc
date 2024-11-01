@@ -1,4 +1,5 @@
 /* ucentgr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTGR object management */
@@ -16,15 +17,19 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumgr
+
+	Description:
 	These subroutines manage some simple tasks for the GROUP
 	object, referenced as 'struct group'. This object is defined
 	by UNIX® standards.
-
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
