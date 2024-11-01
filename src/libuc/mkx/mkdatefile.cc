@@ -46,9 +46,9 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdio>
-#include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
 #include	<bufsizevar.hh>

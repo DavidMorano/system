@@ -2919,7 +2919,7 @@ static int proclinkend(struct proginfo *pip)
 
 	if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 
-	    while (hdb_enum(dbp,&cur,&key,&val) >= 0) {
+	    while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	        lip = (LINKINFO *) val.buf ;
 
 	        if (lip != NULL) {

@@ -1,4 +1,5 @@
 /* strtox HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* numeric-character conversion */
@@ -22,8 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
-#include	<usysrets.h>
 
 
 EXTERNC_begin

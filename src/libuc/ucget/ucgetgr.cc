@@ -90,9 +90,9 @@
 
 namespace {
     struct ucgetgr ;
-    typedef int (ucgetgr::*mem_f)(ucentgr *,char *,int) noex ;
+    typedef int (ucgetgr::*mem_m)(ucentgr *,char *,int) noex ;
     struct ucgetgr {
-	mem_f	m ;
+	mem_m	m ;
 	cchar	*name ;
 	gid_t	gid ;
 	ucgetgr(cchar *n,gid_t u = 0) noex : name(n), gid(u) { } ;

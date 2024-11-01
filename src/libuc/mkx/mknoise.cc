@@ -52,7 +52,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>

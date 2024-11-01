@@ -501,7 +501,7 @@ int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            hdb_cur	*ecp = curp->ecp ;
-	            if ((rs = hdb_enum(op->elp,ecp,&key,&val)) >= 0) {
+	            if ((rs = hdb_curenum(op->elp,ecp,&key,&val)) >= 0) {
 	                IENT	*iep = (IENT *) val.buf ;
 	                if ((ep != nullptr) && (ebuf != nullptr)) {
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
@@ -944,7 +944,7 @@ static int svcfile_filedump(svcfile *op,int fi) noex {
 	int		c = 0 ;
 	if ((rs = hdb_curbegin(op->elp,&cur)) >= 0) {
 	    IENT	*ep ;
-	    while ((rs2 = hdb_enum(op->elp,&cur,&key,&val)) >= 0) {
+	    while ((rs2 = hdb_curenum(op->elp,&cur,&key,&val)) >= 0) {
 	        ep = (IENT *) val.buf ;
 	        if ((ep->fi == fi) || (fi < 0)) {
 	            c += 1 ;

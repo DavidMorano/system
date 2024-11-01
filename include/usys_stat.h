@@ -1,4 +1,5 @@
 /* usys_stat HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® USYSSTAT support */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	System:
+	usys_stat
+
+	Description:
 	This file contains some support for the UNIX® USYSSTAT related
 	operations.
 
@@ -34,6 +39,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	S_IFNAM

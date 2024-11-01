@@ -1,4 +1,5 @@
 /* errtimer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* error-timer */
@@ -35,6 +36,7 @@
 #include	<clanguage.h>		
 #include	<utypedefs.h>		/* |POLL_INTMULT| */
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

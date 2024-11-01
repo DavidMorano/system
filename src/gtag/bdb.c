@@ -269,7 +269,7 @@ int bdb_finish(BDB *op)
 /* free up all key entries */
 
 	if (hdb_curbegin(&op->keys,&cur) >= 0) {
-	    while (hdb_enum(&op->keys,&cur,&key,&value) >= 0) {
+	    while (hdb_curenum(&op->keys,&cur,&key,&value) >= 0) {
 	        bkp = (struct bdb_key *) value.buf ;
 	        rs1 = bdbkey_finish(bkp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -487,7 +487,7 @@ int		belen ;
 	    HDB_DATUM		value ;
 	    debugprintf("bdb_query: search loop rs=%d\n",rs) ;
 	    hdb_curbegin(&op->keys,&cur) ;
-	    while (hdb_enum(&op->keys,&cur,&key,&value) >= 0) {
+	    while (hdb_curenum(&op->keys,&cur,&key,&value) >= 0) {
 	        bkp = (struct bdb_key *) value.buf ;
 	        debugprintf("bdb_query: citekey=%t fi=%u\n",
 	            key.buf,key.len,bkp->fi) ;

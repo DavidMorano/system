@@ -1,4 +1,5 @@
 /* ucgetpr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® C-language system database access (UCGET) */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 
@@ -105,9 +107,9 @@
 
 namespace {
     struct ucgetpr ;
-    typedef int (ucgetpr::*mem_f)(ucentpr *,char *,int) noex ;
+    typedef int (ucgetpr::*mem_m)(ucentpr *,char *,int) noex ;
     struct ucgetpr {
-	mem_f		m ;
+	mem_m		m ;
 	cchar		*name ;
 	int		num ;
 	ucgetpr(cchar *n,int u = 0) noex : name(n), num(u) { } ;

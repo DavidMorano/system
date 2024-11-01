@@ -134,10 +134,9 @@ int namer::tryenv() noex {
 /* end method (namer::tryenv) */
 
 int namer::trysys() noex {
-	uinfo_names	names ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = uinfo_name(&names)) >= 0) {
+	if (uinfo_names names ; (rs = uinfo_name(&names)) >= 0) {
 	    rs = sncpy(rbuf,rlen,names.sysname) ;
 	    len = rs ;
 	} /* end if (uinfo) */

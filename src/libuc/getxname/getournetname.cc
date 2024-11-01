@@ -47,9 +47,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<getidname.h>		/* |getuid_name(3uc)| */
+#include	<getxid.h>		/* |getuid_name(3uc)| */
 #include	<nisdomainname.h>	/* |nisdomainname(3uc)| */
 #include	<sncpyx.h>
 #include	<ctdec.h>
@@ -94,7 +96,7 @@ int getournetname(char *nbuf,int nlen,cchar *un) noex {
 	int		len = 0 ;
 	if (nlen < 0) nlen = MAXNETNAMELEN ;
 	if (nbuf) {
-	    if ((un == NULL) || (un[0] == '\0') || (un[0] == '-')) {
+	    if ((un == nullptr) || (un[0] == '\0') || (un[0] == '-')) {
 	        if (nlen >= MAXNETNAMELEN) {
 	            rs = uc_getnetname(nbuf) ;
 	            len = rs ;
@@ -123,8 +125,7 @@ static int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	int		len = 0 ;
 	cchar		*procname = PROCNAME ;
 	if ((rs = uc_procpid(procname,0)) > 0) {
-	    char	*dbuf{} ;
-	    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	    if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
 		cint	dlen = rs ;
 	        if ((rs = nisdomainname(dbuf,dlen)) >= 0) {
 	            cint	dl = rs ;

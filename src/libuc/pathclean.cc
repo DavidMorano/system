@@ -1,4 +1,5 @@
 /* pathclean SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* cleanup a path */
@@ -38,6 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -48,8 +51,6 @@
 
 
 /* local defines */
-
-#define	PATHBUF		struct pathbuf
 
 #define	PATHBUF_BUFP	pbuf
 #define	PATHBUF_BUFPL	plen
@@ -102,39 +103,38 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		len = 0 ;
 	if (rbuf && spathbuf) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
 		cint	rlen = rs ;
 	        int	nc = 0 ;
-	        int	pl ;
 	        bool	f_prev = false ;
 	        cchar	*pp = spathbuf ;
-	        if ((pl = strnlen(spathbuf,spathlen)) > 0) {
-	            pathbuf	pb ;
-	            int		cl ;
-	            cchar	*cp ;
-	            if ((rs = pb.start(rbuf,rlen)) >= 0) {
+	        if (int pl ; (pl = strnlen(spathbuf,spathlen)) > 0) {
+	            if (pathbuf pb ; (rs = pb.start(rbuf,rlen)) >= 0) {
 	                if (*pp == '/') {
 	                    pp += 1 ;
 	                    pl -= 1 ;
 	                    f_prev = true ;
 	                    if (*pp == '/') {
-	                        pb.chr('/') ;
+	                        rs = pb.chr('/') ;
 		            }
 	                } /* end if */
 			if (rs >= 0) {
+	                    int		cl ;
+	                    cchar	*cp{} ;
 	                    while ((cl = nextname(pp,pl,&cp)) > 0) {
 	                        if (cp[0] == '.') {
 	                            if ((cp[1] == '.') && (cl == 2)) {
 	                                if (nc > 0) {
-	                                    pb.remslash() ;
+	                                    rs = pb.remslash() ;
 	                                    nc -= 1 ;
 	                                } else {
 	                                    if (f_prev) {
 	                                        pb.chr('/') ;
 					    }
-	                                    pb.strw(cp,2) ;
+	                                    rs = pb.strw(cp,2) ;
 	                                    f_prev = true ;
 	                                    nc = 0 ;
 	                                } /* end if */
@@ -142,7 +142,7 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	                                if (f_prev) {
 	                                    pb.chr('/') ;
 				        }
-	                                pb.strw(cp,cl) ;
+	                                rs = pb.strw(cp,cl) ;
 	                                f_prev = true ;
 	                                nc += 1 ;
 	                            } /* end if */
@@ -150,22 +150,23 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	                            if (f_prev) {
 	                                pb.chr('/') ;
 			            }
-	                            pb.strw(cp,cl) ;
+	                            rs = pb.strw(cp,cl) ;
 	                            f_prev = true ;
 	                            nc += 1 ;
 	                        } /* end if */
 	                        pl -= ((cp + cl) - pp) ;
 	                        pp = (cp + cl) ;
+				if (rs < 0) break ;
 	                    } /* end while */
 			} /* end if (ok) */
 	                rs1 = pb.finish() ;
 	                if (rs >= 0) rs = rs1 ;
-	                if (rs1 >= 0) rbuf[rs1] = '\0' ;
+			len = rs1 ;
 	            } /* end if (pathbuf) */
 	        } /* end if (positive) */
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (pathclean) */
 
@@ -188,7 +189,9 @@ int pathbuf::finish() noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = PATHBUF_IDX) >= 0) {
+	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
 	    len = PATHBUF_IDX ;
+	    *bp = '0' ;			/* NUL-terminate */
 	    PATHBUF_BUFP = nullptr ;
 	    PATHBUF_BUFPL = 0 ;
 	    PATHBUF_IDX = SR_NOTOPEN ;

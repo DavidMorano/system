@@ -1,4 +1,5 @@
 /* xfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* eXecutable File? */
@@ -20,8 +21,10 @@
 	xfile
 
 	Description:
-	We test if a given file is executable (has its 'x' access
-	permission mode bit set).
+	This subroutine tests tests if a given file is executable
+	(has its 'x' access permission mode bit set).  For the
+	present purposes, an "executable" file is also a "regular"
+	file, as opposed to a socket or pipe, et cetera.
 
 	Synopsis:
 	int xfile(ids *idp,cchar *fname) noex
@@ -38,6 +41,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<xperm.h>
@@ -71,8 +76,7 @@ int xfile(ids *idp,cchar *fname) noex {
 	if (idp && fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(fname,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
 		        rs = sperm(idp,&sb,X_OK) ;
 	            } else {

@@ -1,4 +1,5 @@
 /* utypealiases HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* virtual-system definitions */

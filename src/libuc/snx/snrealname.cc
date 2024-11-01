@@ -1,4 +1,5 @@
 /* snrealname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-copy a real-name (consisting of parts) */
@@ -40,8 +41,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 
@@ -49,13 +53,28 @@
 /* local defines */
 
 
-/* imported namespaces */
+/* local namespaces */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

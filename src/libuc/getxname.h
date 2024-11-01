@@ -31,7 +31,6 @@
 #include	<getexecname.h>
 #include	<getfname.h>
 #include	<getgroupname.h>
-#include	<getidname.h>
 #include	<getnodename.h>
 #include	<getournetname.h>
 #include	<getprojname.h>

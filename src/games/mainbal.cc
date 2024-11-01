@@ -291,10 +291,8 @@ struct bal3_item {
 	int	c = 0 ; /* count */
 	int	i = 0 ; /* index */
 	int	w = 0 ; /* which-type */
-	bal3_item() { 
-	} ;
-	bal3_item(int _c,int _i,int _w) : c(_c), i(_i), w(_w) { 
-	} ;
+	bal3_item() { } ;
+	bal3_item(int _c,int _i,int _w) : c(_c), i(_i), w(_w) { } ;
 	bal3_item &operator = (const bal3_item &wi) = default ;
 	/* do not need 'move' constructor or assignment (too simple) */
 } ;

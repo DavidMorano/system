@@ -1,4 +1,5 @@
 /* pathclean HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* add a c-string to the end of an existing path c-string */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

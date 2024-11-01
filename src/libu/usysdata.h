@@ -1,4 +1,5 @@
 /* usysdata HEADER (UNIX® system operations) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -34,6 +35,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 #include	<usysauxinfo.h>		/* the request codes */

@@ -1,4 +1,5 @@
 /* b64decoder SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* Base-64 (B64) decoding */
@@ -28,6 +29,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<vector>
 #include	<new>

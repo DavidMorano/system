@@ -2,6 +2,18 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* manage mail files (mailboxes) */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1988-02-01, David A­D­ Morano
+	This module was originally written.
+
+*/
+
+/* Copyright © 1988 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MAILFILES_INCLUDE
 #define	MAILFILES_INCLUDE
@@ -22,10 +34,10 @@
 
 
 struct mailfiles_entry {
-	char	*mailfname ;
-	time_t	lasttime ;
-	off_t	lastsize ;
-	int	f_changed ;
+	char		*mailfname ;
+	time_t		lasttime ;
+	off_t		lastsize ;
+	int		f_changed ;
 } ;
 
 typedef	MAILFILES		mailfiles ;

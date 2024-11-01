@@ -1,4 +1,5 @@
 /* vecstr_loadgrusers SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find and load UNIX® users who have the given group as their default */
@@ -38,8 +39,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<strn.h>
 #include	<cfdec.h>

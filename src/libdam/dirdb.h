@@ -1,4 +1,5 @@
 /* dirdb HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* handle directory list operations */
@@ -48,7 +49,6 @@ struct dirdb_head {
 struct dirdb_cursor {
 	int		i ;
 } ;
-
 
 typedef	DIRDB		dirdb ;
 typedef	DIRDB_ENT	dirdb_ent ;

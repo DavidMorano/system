@@ -19,12 +19,18 @@
 
 /*******************************************************************************
 
+  	Name:
+	mksofname
+
+	Description:
 	This subroutine constructs a filename from various specified
 	components.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>

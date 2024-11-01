@@ -1,4 +1,5 @@
 /* aflag HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* atomic-flag */
@@ -24,6 +25,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 enum aflagmems {

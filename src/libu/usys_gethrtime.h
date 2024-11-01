@@ -1,4 +1,5 @@
 /* usys_gethrtime HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -33,6 +34,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 /* GETHRTIME begin */

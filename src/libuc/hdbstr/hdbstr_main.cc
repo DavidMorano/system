@@ -1,4 +1,5 @@
 /* hdbstr_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Key-Value Hash DataBase for Strings */
@@ -40,6 +41,7 @@
 #endif
 
 #define	HS		hdbstr
+#define	HS_CUR		hdbstr_cur
 
 
 /* imported namespaces */
@@ -85,7 +87,7 @@ int hdbstr_finish(hdbstr *op) noex {
 	    if (hdb_cur cur{} ; (rs = hdb_curbegin(op,&cur)) >= 0) {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
-	        while ((rs1 = hdb_enum(op,&cur,&key,&val)) >= 0) {
+	        while ((rs1 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
 	            if (key.buf != nullptr) {
 	                rs1 = uc_free(key.buf) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -108,7 +110,6 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && kstr) {
 	    int		sz ;
-	    char	*bp{} ;
 	    if (klen < 0) klen = strlen(kstr) ;
 	    if (vstr) {
 	        if (vlen < 0) {
@@ -118,7 +119,7 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	        vlen = 0 ;
 	    }
 	    sz = (klen + vlen + 2) ;
-	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
 	        key.buf = bp ;
@@ -146,7 +147,7 @@ int hdbstr_curenum(hdbstr *op,cur *curp,cc **kpp,
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    if (kpp) *kpp = nullptr ;
-	    if ((rs = hdb_enum(op,curp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op,curp,&key,&val)) >= 0) {
 	        kl = key.len ;
 	        if (kpp) {
 	            *kpp = charp(key.buf) ;

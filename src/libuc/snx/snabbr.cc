@@ -1,4 +1,5 @@
 /* snabbr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy an abbreviation of a groups of words */
@@ -50,10 +51,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

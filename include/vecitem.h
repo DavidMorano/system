@@ -1,4 +1,5 @@
 /* vecitem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector¯item operations */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* object defines */

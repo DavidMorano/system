@@ -1,4 +1,5 @@
 /* sncpyx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* concatenate c-strings */
@@ -41,12 +42,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<cstdarg>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<localmisc.h>
 
 #include	"sncpyx.h"
 

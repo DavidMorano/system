@@ -307,7 +307,7 @@ namespace {
 	CD		*op ;
 	CD_CUR		*curp ;
 	cchar		*nn ;
-	char		*nbuf ;
+	char		*nbuf{} ;
 	char		*kbuf ;
 	int		nlen ;
 	int		klen ;
@@ -361,15 +361,14 @@ int clusterdb_curfetchrev(CD *op,cc *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 /* end subroutine (clusterdb_curfetchrev) */
 
 fetcher::operator int () noex {
-	kvsfile		*kop ;
+	kvsfile		*kop = op->ctp ;
 	kvsfile_cur	vcur ;
 	cint		nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_match = false ;
-	kop = op->ctp ;
 	if (curp != nullptr) {
-	    kvsfile_cur	*kcp = curp->kcurp ;
+	    kvsfile_cur		*kcp = curp->kcurp ;
 	    while ((rs = kvsfile_curenumkey(kop,kcp,kbuf,klen)) >= 0) {
 	        if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	            while (rs >= 0) {

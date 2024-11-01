@@ -1,4 +1,5 @@
 /* snpollflags SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the poll-event flags */
@@ -40,9 +41,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"snflags.h"
 #include	"snx.h"
@@ -107,8 +111,7 @@ int snpollflags(char *dbuf,int dlen,int flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    snflags	ss ;
-	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
+	    if (snflags ss ; (rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
 	        for (int i = 0 ; (rs >= 0) && fs_poll[i].f ; i += 1) {
 	            if (flags & fs_poll[i].f) {
 	                rs = snflags_addstr(&ss,fs_poll[i].s) ;

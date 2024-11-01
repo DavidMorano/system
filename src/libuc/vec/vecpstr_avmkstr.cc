@@ -1,4 +1,5 @@
 /* vecpstr_avmkstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the Array-Vector and the String-table */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecpstr_avmkstr
+
+	Description:
 	These routines are used when the caller wants to store a
 	COPY of the passed string data into a vector.  These routines
 	will copy and store the copied data in the list.  The
@@ -27,8 +32,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<strwcpy.h>

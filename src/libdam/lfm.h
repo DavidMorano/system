@@ -56,7 +56,7 @@ struct lfm_check {
 	cchar		*username ;	/* lock user name */
 	cchar		*banner ;	/* banner */
 	pid_t		pid ;		/* lock PID */
-	int		stat ;		/* status */
+	int		status ;	/* status */
 	char		buf[LFM_CHECKBUFLEN + 1] ;
 } ;
 

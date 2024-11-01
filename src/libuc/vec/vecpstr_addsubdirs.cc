@@ -1,4 +1,5 @@
 /* vecpstr_addsubdirs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find and load UNIX® directories under a given root */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecpstr_addsubdirs
+
+	Description:
 	This subroutine load all directories and sub-directories
 	of a given root in the file-system into a vecpstr (container)
 	object.
@@ -25,7 +30,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<libmallocxx.h>
 #include	<fsdirtree.h>

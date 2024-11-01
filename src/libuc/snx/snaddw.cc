@@ -1,4 +1,5 @@
 /* snaddw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* append a counted c-string to a given counted c-string */
@@ -41,7 +42,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"snaddw.h"
 

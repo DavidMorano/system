@@ -1,4 +1,5 @@
 /* mkpathrooted HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a file rooted from the present-working-directory (PWD) */
@@ -22,11 +23,17 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
 extern int mkpathrooted(char *,cchar *) noex ;
+
+static inline int mkpathabs(char *rbuf,cchar *sp) noex {
+    	return mkpathrooted(rbuf,sp) ;
+}
 
 EXTERNC_end
 

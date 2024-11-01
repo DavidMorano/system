@@ -408,7 +408,7 @@ pcspoll.o:		pcspoll.c pcspoll.h pcsconf.h
 
 X01= testspawner
 
-X01OBJ01= $(X01).o spawner.o envhelp.o
+X01OBJ01= $(X01).o spawner.o
 X01OBJ02= debugprintf.o strlinelen.o
 
 X01OBJ= $(X01OBJ01) $(X01OBJ02)

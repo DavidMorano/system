@@ -1,4 +1,5 @@
 /* mkuix SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to divine the best real name from a USERINFO object */
@@ -61,6 +62,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<userinfo.h>
 #include	<sncpyx.h>
@@ -124,7 +127,7 @@ int mkuiname(char *rbuf,int rlen,userinfo *uip) noex {
 	            ns = uip->username ;
 	        }
 	        if (ns) {
-	            rs = sncpy1(rbuf,rlen,ns) ;
+	            rs = sncpy(rbuf,rlen,ns) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -168,11 +171,11 @@ int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	            cchar	*un = uip->username ;
 	            rs = SR_NOTFOUND ;
 	            if (ns) {
-	               rs = sncpy6(rbuf,rlen,nn,"!",un," (",ns,")") ;
-	            }
-	            if ((rs == SR_OVERFLOW) || ns) {
-	               rs = sncpy3(rbuf,rlen,nn,"!",un) ;
-	            }
+	                rs = sncpy(rbuf,rlen,nn,"!",un," (",ns,")") ;
+	                if (rs == SR_OVERFLOW) {
+	                   rs = sncpy(rbuf,rlen,nn,"!",un) ;
+	                }
+		    }
 	        } /* end block */
 	    } /* end if (valid) */
 	} /* end if (non-null) */

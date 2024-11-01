@@ -371,7 +371,7 @@ ta.x:			$(TAOBJ)
 
 TSR= testspawner
 
-TWOBJ01= testspawner.o spawner.o envhelp.o
+TWOBJ01= testspawner.o spawner.o
 TWOBJ02= debugprintf.o strlinelen.o
 
 TWOBJ= $(TWOBJ01) $(TWOBJ02)
@@ -482,10 +482,6 @@ varhdr.o:		varhdr.c varhdr.h
 
 spawner.o:		spawner.c spawner.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-envhelp.o:		envhelp.c envhelp.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
 
 fileobject.o:		fileobject.c
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<

@@ -200,7 +200,7 @@ int		reclen ;
 
 	    if ((rs = hdb_curbegin(dbp,&keycursor)) >= 0) {
 
-	        if (hdb_enum(dbp,&keycursor,&key,&value) >= 0) {
+	        if (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
 
 	            if (! pip->f.removelabel) {
 	                bprintf(ofp,"%s:%u,%u\t",fname,tagoff,taglen) ;
@@ -211,7 +211,7 @@ int		reclen ;
 	            n = 1 ;
 	            while ((rs >= 0) && 
 	                ((pip->maxkeys < 0) || (n < pip->maxkeys)) && 
-	                (hdb_enum(dbp,&keycursor,&key,&value) >= 0)) {
+	                (hdb_curenum(dbp,&keycursor,&key,&value) >= 0)) {
 
 	                if ((rs = bputc(ofp,' ')) >= 0) {
 	                    rs = bwrite(ofp, (void *) key.buf,key.len) ;
@@ -231,7 +231,7 @@ int		reclen ;
 /* delete this whole DB */
 
 	    if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
-	        while (hdb_enum(dbp,&keycursor,&key,&value) >= 0) {
+	        while (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
 	            if (key.buf != NULL) {
 	                rs1 = uc_free((void *) key.buf) ;
 			if (rs >= 0) rs = rs1 ;

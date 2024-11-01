@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ucatæxit
+
+	Description:
 	Happily, unlike some (several) other middleware calls to
 	the UNIX® system, this one is quite straight-forward.
 
@@ -27,6 +31,7 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |atexit(3c)| */
 #include	<usystem.h>
 

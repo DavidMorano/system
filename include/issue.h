@@ -1,4 +1,5 @@
 /* issue HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to help and manage "issue" messages */
@@ -14,11 +15,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<usystem.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
 #include	<vechand.h>
-#include	<localmisc.h>
 
 
 #define	ISSUE_MAGIC	0x75648941
@@ -34,7 +35,7 @@ struct issue_mapper {
 	LOCKRW		rwm ;
 	PARAMFILE	dirsfile ;
 	vechand		mapdirs ;
-	const char	*fname ;
+	cchar		*fname ;
 	time_t		ti_mtime ;
 	time_t		ti_check ;
 } ;

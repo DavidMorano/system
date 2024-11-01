@@ -39,6 +39,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<char.h>
 

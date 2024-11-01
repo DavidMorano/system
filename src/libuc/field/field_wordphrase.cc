@@ -1,4 +1,5 @@
 /* field_wordphrase SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to parse a line into word-fields */
@@ -8,9 +9,13 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This code module was originally written in C language but
-	modeled (roughly) from a prior VAX assembly language version
-	of mine (circa 1980 perhaps). This is why is looks so "ugly"!
+	This code module was originally written in C language modeled
+	(roughly) from a prior VAX assembly language version (written
+	circa 1980 perhaps).  This is why this looks so "ugly"!
+	This code comes from stuff dated back to almost the pre-dawn
+	era of modern computer languages!  I wrote the original VAX
+	assembly stuff also.  This code below was then written into
+	C-language perhaps around 1983 (at AT&T Bell Laboratories).
 
 */
 
@@ -47,7 +52,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<char.h>
@@ -120,7 +125,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	int		fl = -1 ;
 	if (op && fbuf) {
 	    if (op->lp) {
-	        int	term = '\0' ;
+	        int	chterm = '\0' ;
 	        int	ll = op->ll ;
 	        cchar	*lp = op->lp ;
 	        if (terms == nullptr) terms = shterms ;
@@ -218,10 +223,10 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                ll -= 1 ;
 	            } /* end while */
             	    /* we are at the end */
-	            term = ' ' ;
+	            chterm = ' ' ;
 	            ch = mkchar(*lp) ;
 	            if (BATST(terms,ch) && (! BATST(dquote,ch))) {
-	                term = ch ;		/* save terminator */
+	                chterm = ch ;		/* save terminator */
 	                lp += 1 ;
 	                ll -= 1 ;		/* skip over the terminator */
 	            } /* end if */
@@ -231,7 +236,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	        op->lp = lp ;
 	        op->fl = fl ;
 	        op->fp = fbuf ;
-	        op->term = term ;
+	        op->term = chterm ;
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;

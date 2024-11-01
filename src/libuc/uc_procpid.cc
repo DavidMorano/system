@@ -1,4 +1,5 @@
 /* uc_procpid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a process ID by searching for its command string */
@@ -40,6 +41,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<sfx.h>
@@ -78,7 +81,7 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	if (name) {
 	    int		v = uid ;
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0] && (v >= 0)) {
 	        cint	dlen = DIGBUFLEN ;
 	        char	dbuf[DIGBUFLEN+1] ;
 	        if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
@@ -100,7 +103,7 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 			    cint	llen = (rs + DIGBUFLEN + 2) ;
 			    char	*lbuf{} ;
 			    if ((rs = uc_malloc((llen + 1),&lbuf)) >= 0) {
-	                        if ((rs = u_read(fd,lbuf,llen)) > 0) {
+	                        if ((rs = uc_read(fd,lbuf,llen)) > 0) {
 	                            cint	sl = rs ;
 	                            int		cl ;
 	                            cchar	*sp = lbuf ;

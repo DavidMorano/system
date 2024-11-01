@@ -384,7 +384,7 @@ int keyvals_curenum(keyvals *op,CUR *curp,cchar **kpp,cchar **vpp) noex {
 	        hdb_dat		val ;
 	        cchar		*kp = nullptr ;
 	        cchar		*valp = nullptr ;
-	        if ((rs = hdb_enum(op->bykeyp,curp->ecp,&key,&val)) >= 0) {
+	        if ((rs = hdb_curenum(op->bykeyp,curp->ecp,&key,&val)) >= 0) {
 	            {
 	                kp = charp(key.buf) ;
 	                kl = key.len ;
@@ -444,7 +444,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	    hdb_dat	val ;
 	    ENT		*ep ;
 	    if ((rs = hdb_curbegin(op->bykeyp,&cur)) >= 0) {
-	        while (hdb_enum(op->bykeyp,&cur,&key,&val) >= 0) {
+	        while (hdb_curenum(op->bykeyp,&cur,&key,&val) >= 0) {
 	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
 		        c += 1 ;
@@ -456,7 +456,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	    } /* end if (cursor) */
 	    if (rs >= 0) {
 	        if ((rs = hdb_curbegin(op->bykeyvalp,&cur)) >= 0) {
-	            while (hdb_enum(op->bykeyvalp,&cur,&key,&val) >= 0) {
+	            while (hdb_curenum(op->bykeyvalp,&cur,&key,&val) >= 0) {
 	                ep = entp(val.buf) ;
 	                if ((ep->fi == fi) || (fi < 0)) {
 	                    hdb_delcur(op->bykeyvalp,&cur,0) ;
@@ -499,7 +499,7 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	        hdb	*bykeyvalp = op->bykeyvalp ;
 	        if ((rs = hdb_curbegin(bykeyvalp,&cur)) >= 0) {
 	            KEYVALS_ENT		*ep ;
-	            while ((rs1 = hdb_enum(bykeyvalp,&cur,&key,&val)) >= 0) {
+	            while ((rs1 = hdb_curenum(bykeyvalp,&cur,&key,&val)) >= 0) {
 	                ep = entp(val.buf) ;
 	                if ((rs = entry_matkey(ep,kp,kl)) >= 0) {
 	                    hdb_delcur(bykeyvalp,&cur,0) ;
@@ -648,7 +648,7 @@ static int keyvals_entfins(keyvals *op) noex {
 	if ((rs = hdb_curbegin(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    while ((rs2 = hdb_enum(elp,&cur,&key,&val)) >= 0) {
+	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
 	        ENT	*ep = entp(val.buf) ;
 		{
 	            rs1 = entry_finish(ep) ;

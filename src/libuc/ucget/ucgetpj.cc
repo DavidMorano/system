@@ -95,9 +95,9 @@
 
 namespace {
     struct ucgetpj ;
-    typedef int (ucgetpj::*mem_f)(ucentpj *,char *,int) noex ;
+    typedef int (ucgetpj::*mem_m)(ucentpj *,char *,int) noex ;
     struct ucgetpj {
-	mem_f		m ;
+	mem_m		m ;
 	cchar		*name ;
 	projid_t	pjid ;
 	ucgetpj(cchar *n,projid_t u = 0) noex : name(n), pjid(u) { } ;

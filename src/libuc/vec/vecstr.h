@@ -1,4 +1,5 @@
 /* vecstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-string container (Vector-String) */
@@ -73,6 +74,7 @@ struct vecstr_head {
 
 #ifdef	__cplusplus
 enum vecstrmems {
+    	vecstrmem_addcspath,
 	vecstrmem_count,
 	vecstrmem_delall,
 	vecstrmem_strsize,
@@ -131,6 +133,7 @@ struct vecstr_co {
 	} ;
 } ; /* end struct (vecstr_co) */
 struct vecstr : vecstr_head {
+	vecstr_co	addcspath ;
 	vecstr_co	count ;
 	vecstr_co	delall ;
 	vecstr_co	strsize ;
@@ -138,6 +141,7 @@ struct vecstr : vecstr_head {
 	vecstr_co	audit ;
 	vecstr_co	finish ;
 	vecstr() noex {
+	    addcspath(this,vecstrmem_addcspath) ;
 	    count(this,vecstrmem_count) ;
 	    delall(this,vecstrmem_delall) ;
 	    strsize(this,vecstrmem_strsize) ;
@@ -151,9 +155,11 @@ struct vecstr : vecstr_head {
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int addsyms(cchar *,mainv) noex ;
+	int addpath(cchar *,int = -1) noex ;
 	int insert(int,cchar *,int = -1) noex ;
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
+	int envset(cchar *,cchar *,int = -1) noex ;
 	int envfile(cchar *) noex ;
 	int del(int = -1) noex ;
 	vecstr_iter begin() noex {

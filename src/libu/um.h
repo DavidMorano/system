@@ -1,4 +1,5 @@
 /* um HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® Memory-Management interface */
@@ -23,6 +24,8 @@
 	UNIX® system Memory-Management subroutines.
 
 	Names:
+	u_brk
+	u_sbrk
 	u_mmapbegin
 	u_mmapend
 	u_mlockbegin
@@ -54,6 +57,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<usys.h>
 
@@ -77,6 +82,8 @@
 
 EXTERNC_begin
 
+extern int u_brk(cvoid *,void **) noex ;
+extern int u_sbrk(int,void **) noex ;
 extern int u_mmapbegin(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_mmapend(void *,size_t) noex ;
 extern int u_mlockbegin(void *,size_t) noex ;

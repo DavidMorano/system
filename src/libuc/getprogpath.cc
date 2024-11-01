@@ -1,4 +1,5 @@
 /* getprogpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the path to a program */
@@ -40,19 +41,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<getpwd.h>
 #include	<mkpathxw.h>
 #include	<ids.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<vecstr.h>
+#include	<xfile.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -71,10 +70,6 @@ typedef vecstr		vs ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	xfile(ids *,cchar *) noex ;
-}
 
 
 /* external variables */
@@ -100,7 +95,6 @@ static bufsizevar		maxpathlen(getbufsize_mp) ;
 
 int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		rl = 0 ;
 	if (idp && plp && rbuf && pnp) {
 	     rs = SR_INVALID ;
@@ -111,15 +105,8 @@ int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 	             pnl -= 1 ;
 	         }
 	         if (strnchr(pnp,pnl,'/') == nullptr) {
-		     ids	id ;
-		     if ((rs = id.load) >= 0) {
-			{
-	                     rs = getprogpathrel(&id,plp,rbuf,pnp,pnl) ;
-	                     rl = rs ;
-			}
-			rs1 = id.release ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (ids) */
+	             rs = getprogpathrel(idp,plp,rbuf,pnp,pnl) ;
+	             rl = rs ;
 	         } else {
 	             if ((rs = mkpath1w(rbuf,pnp,pnl)) >= 0) {
 	                 rl = rs ;
@@ -142,15 +129,16 @@ static int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	int		rl = 0 ;
 	if ((rs = maxpathlen) >= 0) {
 	    cint	pwdl = rs ;
-	    char	*pwdp ;
-	    if ((rs = uc_libmalloc((pwdl+1),&pwdp)) >= 0) {
+	    if (char *pwdp{} ; (rs = uc_libmalloc((pwdl+1),&pwdp)) >= 0) {
 	        bool	f = false ;
 	        cchar	*pp{} ;
 		pwdp[0] = '\0' ;
-	        for (int i = 0 ; vecstr_get(plp,i,&pp) >= 0 ; i += 1) {
+	        for (int i = 0 ; plp->get(i,&pp) >= 0 ; i += 1) {
 	            if (pp) {
 	                if (pp[0] == '\0') {
-	                    if (pwdp[0] == '\0') rs = getpwd(pwdp,pwdl) ;
+	                    if (pwdp[0] == '\0') {
+				rs = getpwd(pwdp,pwdl) ;
+			    }
 	                    if (rs >= 0) {
 	                        rs1 = mkpath2w(rbuf,pwdp,pnp,pnl) ;
 	                        rl = rs1 ;

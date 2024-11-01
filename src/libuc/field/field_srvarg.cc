@@ -1,4 +1,5 @@
 /* field_srvarg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to field out (parse) the next "server" argument */
@@ -10,11 +11,12 @@
 
 	= 1998-07-01, David A­D­ Morano
 	This code module was originally written in C language modeled
-	(roughly) from a prior VAX assembly language version (circa
-	1980 perhaps).  This is why is looks so "ugly"!  This stuff
-	comes from stuff dated back to almost the pre-dawm era of
-	computer languages!  I wrote the original VAX assembly stuff
-	also.
+	(roughly) from a prior VAX assembly language version (written
+	circa 1980 perhaps).  This is why this looks so "ugly"!
+	This code comes from stuff dated back to almost the pre-dawn
+	era of modern computer languages!  I wrote the original VAX
+	assembly stuff also.  This code below was then written into
+	C-language perhaps around 1983 (at AT&T Bell Laboratories).
 
 */
 
@@ -59,13 +61,14 @@
 
 	Note:
 	This subroutine will do quote interpretation like the SHELL
-	when inside double or single quotes!
+	when inside double or single quotes.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
@@ -98,23 +101,16 @@
 
 /* forward references */
 
-static void fieldinit_terms() noex ;
+static int	fieldinit_terms() noex ;
+static int	field_srvarger(field *,cchar *,char *,int) noex ;
 
 
 /* local structures */
 
-namespace {
-    struct fieldinit {
-	fieldinit() noex {
-	   fieldinit_terms() ;
-	} ;
-    } ; /* end struct (fieldinit) */
-}
-
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr int		termsize = fieldterms_termsize ;
 
 /* 'double quote', 'back-slash', 'pound', 'back-accent', et cetera */
 static char		doubles[termsize] ;
@@ -131,17 +127,34 @@ constexpr bool		f_trailwhite = CF_TRAILWHITE ;
 /* exported subroutines */
 
 int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
-	int		rs = SR_FAULT ;
+    	int		rs = SR_FAULT ;
 	int		fl = 0 ;
-	if (terms == nullptr) terms = dterms ;
 	if (fsbp && abuf) {
-	    int		ch, nch ;
+    	    static cint		rsf = fieldinit_terms() ;
+	    abuf[0] = '\0' ;
+	    if ((rs = rsf) >= 0) {
+		if (terms == nullptr) terms = dterms ;
+	        rs = field_srvarger(fsbp,terms,abuf,alen) ;
+	        fl = rs ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? fl : rs ; 
+}
+/* end subroutine (field_srvarg) */
+
+
+/* local subroutines */
+
+static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
+	int		rs = SR_OK ;
+	int		fl = 0 ;
+	    int		ch ;
+	    int		nch ;
 	    int		qe ;
 	    int		chterm = '\0' ;
 	    int		ll = fsbp->ll ;
 	    cchar	*lp = fsbp->lp ;
 	    char	*bp = abuf ;
-	    abuf[0] = '\0' ;
 	    while ((ll > 0) && char_iswhite(*lp)) {
 	        lp += 1 ;
 	        ll -= 1 ;
@@ -299,18 +312,17 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	    fsbp->fp = (fl >= 0) ? abuf : nullptr ;
 	    fsbp->fl = fl ;
 	    fsbp->term = chterm ;
-	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
 }
-/* end subroutine (field_srvarg) */
+/* end subroutine (field_srvarger) */
 
-
-/* local subroutines */
-
-static void fieldinit_terms() noex {
-	cbool	f_retain = true ;
-	fieldterms(dterms,f_retain,",") ;
-	fieldterms(doubles,f_retain,"\"$\\`") ;
+static int fieldinit_terms() noex {
+    	int		rs ;
+	cbool		f_retain = true ;
+	if ((rs = fieldterms(dterms,f_retain,",")) >= 0) {
+	    rs = fieldterms(doubles,f_retain,"\"$\\`") ;
+	}
+	return rs ;
 }
 /* end subroutine (fieldinit_terms) */
 

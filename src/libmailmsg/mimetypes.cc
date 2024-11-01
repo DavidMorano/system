@@ -111,7 +111,7 @@ int mimetypes_finish(mt *dbp) noex {
 	    mt_dat	key ;
 	    mt_dat	data ;
 	    if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
-	        while (hdb_enum(dbp,&cur,&key,&data) >= 0) {
+	        while (hdb_curenum(dbp,&cur,&key,&data) >= 0) {
 	            if (key.buf != nullptr) {
 		        void	*vp = voidp(key.buf) ;
 	                rs1 = uc_free(vp) ;
@@ -256,7 +256,7 @@ int mimetypes_enum(mt *dbp,mt_cur *curp,char *ext,char *ts) noex {
 	    mt_dat	val ;
 	    ext[0] = '\0' ;
 	    if (ts) ts[0] = '\0' ;
-	    if ((rs = hdb_enum(dbp,curp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(dbp,curp,&key,&val)) >= 0) {
 	        cint	ml = min(key.len,MIMETYPES_TYPELEN) ;
 	        cchar	*kp = charp(key.buf) ;
 	        strwcpy(ext,kp,ml) ;

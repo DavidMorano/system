@@ -3994,7 +3994,7 @@ static int procdir_end(PI *pip) noex {
 	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 	        DIRID	*dip ;
 
-	        while (hdb_enum(dbp,&cur,&key,&val) >= 0) {
+	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (DIRID *) val.buf ;
 
 	            if (dip != nullptr) {
@@ -4136,7 +4136,7 @@ static int procuniq_end(PI *pip) noex {
 
 	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 
-	        while (hdb_enum(dbp,&cur,&key,&val) >= 0) {
+	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (FILEID *) val.buf ;
 
 	            if (dip != nullptr) {
@@ -4374,7 +4374,7 @@ static int proclink_fins(PI *pip) noex {
 	if (pip == nullptr) return SR_FAULT ;
 	if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
 	    LINKINFO	*lip ;
-	    while ((rs1 = hdb_enum(dbp,&cur,&key,&val)) >= 0) {
+	    while ((rs1 = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
 	        lip = (LI *) val.buf ;
 	        if (lip != nullptr) {
 	            rs1 = linkinfo_finish(lip) ;

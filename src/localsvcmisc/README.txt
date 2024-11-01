@@ -3,7 +3,7 @@ LOCALSVCMISC
 This directory contains some loadable facility-open-services.  
 
 service		description
---------------------------------------------------
+--------------------------------------------------------------------------------
 
 hello		Hello-World
 daytime		DayTime

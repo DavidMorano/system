@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 2008-07-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	mkshlibname
+
+	Description:
 	This subroutine formulates (makes) the file-name for a
 	shared library (shared object).
 
@@ -25,6 +30,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>

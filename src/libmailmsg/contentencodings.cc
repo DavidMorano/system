@@ -28,6 +28,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -60,11 +62,6 @@
 
 
 /* local variables */
-
-
-/* exported variables */
-
-
 
 
 /* exported variables */

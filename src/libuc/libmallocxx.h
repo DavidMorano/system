@@ -1,4 +1,5 @@
 /* libmallocxx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -16,10 +17,13 @@
 
 /*******************************************************************************
 
+  	Group:
+	uclibmallocxx
+
+	Description:
 	This module provides some subroutines to serve as short-cuts to
 	allocating system buffers (that is: buffers that are used by
 	the UNIX® system with their particular buffer-sizes).
-
 
 *******************************************************************************/
 
@@ -31,6 +35,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

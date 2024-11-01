@@ -1,4 +1,5 @@
 /* utimeouts HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* some helper management for UNIX® kernal-call timeouts */
@@ -16,6 +17,7 @@
 
 /*******************************************************************************
 
+  	Desfription:
 	See the souce code in 'utimeouts.cc' for what is going on.
 	Some documentation and notes on this whole "timeout" facility
 	is located in the source language file 'utimeoutdefs.h'.

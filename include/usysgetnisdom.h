@@ -1,4 +1,5 @@
 /* usys_ugetnisdom HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* operating support for retrieving the NIS domain-name */
@@ -45,6 +46,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

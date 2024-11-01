@@ -1,4 +1,5 @@
 /* vecsorthand HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* vector of sorted handles */
@@ -23,6 +24,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	VECSORTHAND		struct vecsorthand_head

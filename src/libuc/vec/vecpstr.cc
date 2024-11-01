@@ -1,4 +1,5 @@
 /* vecpstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector-packed-string object */
@@ -68,8 +69,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>
@@ -177,7 +179,7 @@ constexpr bool		f_qsort = CF_QSORT ;
 
 constexpr int		optmask = mkoptmask() ;
 
-constexpr int		resz = sizeof(int) ;
+constexpr int		resz = szof(int) ;
 
 
 /* exported variables */
@@ -1034,12 +1036,24 @@ int vecpstr::addsyms(cchar *on,mainv sv) noex {
 	return vecpstr_addsyms(this,on,sv) ;
 }
 
+int vecpstr::addpath(cchar *sp,int sl) noex {
+	return vecpstr_addpath(this,sp,sl) ;
+}
+
 int vecpstr::get(int ai,cchar **rpp) noex {
 	return vecpstr_get(this,ai,rpp) ;
 }
 
 int vecpstr::getvec(mainv *rppp) noex {
 	return vecpstr_getvec(this,rppp) ;
+}
+
+int vecpstr::envset(cchar *kp,cchar *valp,int vall) noex {
+	return vecpstr_envset(this,kp,valp,vall) ;
+}
+
+int vecpstr::envfile(cchar *fn) noex {
+	return vecpstr_envfile(this,fn) ;
 }
 
 int vecpstr::del(int ai) noex {
@@ -1058,6 +1072,9 @@ vecpstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
+	    case vecpstrmem_addcspath:
+	        rs = vecpstr_addcspath(op) ;
+	        break ;
 	    case vecpstrmem_count:
 	        rs = vecpstr_count(op) ;
 	        break ;

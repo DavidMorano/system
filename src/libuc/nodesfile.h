@@ -1,4 +1,5 @@
 /* nodesfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX "nodes" file support */
@@ -16,8 +17,11 @@
 
 /*******************************************************************************
 
-	This little object supports "nodes" file management.
+  	Object:
+	nodesfile
 
+	Description:
+	This little object supports "nodes" file management.
 
 *******************************************************************************/
 
@@ -66,11 +70,11 @@ typedef NODESFILE_CUR	nodesfile_cur ;
 
 EXTERNC_begin
 
-extern int	nodesfile_open(nodesfile *,cchar *,int,int) noex ;
+extern int	nodesfile_open(nodesfile *,cchar *,int) noex ;
 extern int	nodesfile_search(nodesfile *,cchar *,int) noex ;
 extern int	nodesfile_curbegin(nodesfile *,nodesfile_cur *) noex ;
 extern int	nodesfile_curend(nodesfile *,nodesfile_cur *) noex ;
-extern int	nodesfile_enum(nodesfile *,nodesfile_cur *,char *,int) noex ;
+extern int	nodesfile_curenum(nodesfile *,nodesfile_cur *,char *,int) noex ;
 extern int	nodesfile_check(nodesfile *,time_t) noex ;
 extern int	nodesfile_close(nodesfile *) noex ;
 

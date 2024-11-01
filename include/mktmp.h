@@ -1,4 +1,5 @@
 /* mktmp HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a temporary file of a certain type */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

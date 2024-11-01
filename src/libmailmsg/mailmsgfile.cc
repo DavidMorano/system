@@ -419,7 +419,7 @@ static int mailmsgfile_filefins(MMF *op) noex {
 	int		rs1{} ;
 	if ((rs1 = hdb_curbegin(mp,&cur)) >= 0) {
 	    MMF_MI	*mip ;
-	    while (hdb_enum(mp,&cur,&key,&val) >= 0) {
+	    while (hdb_curenum(mp,&cur,&key,&val) >= 0) {
 	        mip = (MMF_MI *) val.buf ;
 	        if (mip) {
 		    {

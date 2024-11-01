@@ -1,4 +1,5 @@
-/* snuuid */
+/* snuuid HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-UUID (String-UUID) */
@@ -12,16 +13,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mkuuid.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin
 
-extern int snuuid(char *,int,MKUUID *) noex ;
+extern int snuuid(char *,int,uuid_dat *) noex ;
 
 EXTERNC_end
 

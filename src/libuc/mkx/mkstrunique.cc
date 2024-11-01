@@ -39,6 +39,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bitset>		/* |bitset(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>

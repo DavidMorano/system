@@ -452,7 +452,7 @@ int kvsfile_curenum(kvsfile *op,kf_cur *curp,
 	    hdb_datum	key ;
 	    hdb_datum	val ;
 	    hdb_cur	*ecp = curp->ecp ;
-	    if ((rs = hdb_enum(op->elp,ecp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op->elp,ecp,&key,&val)) >= 0) {
 	        cchar	*kp = charp(key.buf) ;
 	        cchar	*vp ;
 		int	vl ;
@@ -809,7 +809,7 @@ static int kvsfile_filedump(kvsfile *op,int fi) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hdb_curbegin(op->kvlp,&cur)) >= 0) {
-	    while (hdb_enum(op->kvlp,&cur,&key,&val) >= 0) {
+	    while (hdb_curenum(op->kvlp,&cur,&key,&val) >= 0) {
 	        ep = entp(val.buf) ;
 	        if ((ep->fi == fi) || (fi < 0)) {
 	            hdb_delcur(op->kvlp,&cur,0) ;
@@ -821,7 +821,7 @@ static int kvsfile_filedump(kvsfile *op,int fi) noex {
 /* delete all entries w/ this kf_file */
 	if (rs >= 0) {
 	    if ((rs = hdb_curbegin(op->elp,&cur)) >= 0) {
-	        while (hdb_enum(op->elp,&cur,&key,&val) >= 0) {
+	        while (hdb_curenum(op->elp,&cur,&key,&val) >= 0) {
 	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
 			{

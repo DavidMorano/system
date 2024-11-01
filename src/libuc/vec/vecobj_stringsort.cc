@@ -1,4 +1,5 @@
 /* vecobj_strsort SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector object list operations (vstrsort) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecobj_strsort
+
+	Description:
 	This subroutine extends the VECOBJ object to add the
 	capability to get the vector-list heap-sorted rather than
 	quick-sorted as would be done normally.  There are rare
@@ -27,6 +32,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

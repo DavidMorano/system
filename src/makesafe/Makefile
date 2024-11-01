@@ -336,8 +336,6 @@ sysrealname.o:		sysrealname.c sysrealname.h
 
 cachetime.o:		cachetime.c cachetime.h
 
-envhelp.o:		envhelp.c envhelp.h
-
 fsi.o:			fsi.c fsi.h
 
 setstr.o:		setstr.c setstr.h
@@ -377,7 +375,7 @@ T02OBJ07= printhelp.o shio.o kshlib.o maininfo.o sesmsg.o msgdata.o
 T02OBJ08=
 T02OBJ09=
 T02OBJ10= cachetime.o
-T02OBJ11= envhelp.o
+T02OBJ11=
 T02OBJ12=
 T02OBJ13=
 T02OBJ14= spawnproc.o

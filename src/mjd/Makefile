@@ -389,8 +389,6 @@ pwcache.o:		pwcache.c pwcache.h
 termout.o:		termout.cc termout.h ansigr.h
 	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) termout.cc
 
-envhelp.o:		envhelp.c envhelp.h
-
 spawner.o:		spawner.c spawner.h
 
 systems.o:		systems.c systems.h
@@ -424,7 +422,7 @@ $(X01).x:		$(X01OBJ)
 X02= testspawner
 
 X02OBJ00= $(X02).o
-X02OBJ01= spawner.o envhelp.o
+X02OBJ01= spawner.o
 X02OBJ02=
 X02OBJ03=
 

@@ -1,4 +1,5 @@
 /* vecstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector string operations */
@@ -917,12 +918,20 @@ int vecstr::addsyms(cchar *on,mainv sv) noex {
 	return vecstr_addsyms(this,on,sv) ;
 }
 
+int vecstr::addpath(cchar *sp,int sl) noex {
+	return vecstr_addpath(this,sp,sl) ;
+}
+
 int vecstr::insert(int ai,cchar *sp,int sl) noex {
 	return vecstr_insert(this,ai,sp,sl) ;
 }
 
 int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
+}
+
+int vecstr::envset(cchar *kp,cchar *valp,int vall) noex {
+	return vecstr_envset(this,kp,valp,vall) ;
 }
 
 int vecstr::envfile(cchar *fn) noex {
@@ -948,6 +957,9 @@ vecstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    switch (w) {
+	    case vecstrmem_addcspath:
+	        rs = vecstr_addcspath(op) ;
+	        break ;
 	    case vecstrmem_count:
 	        rs = vecstr_count(op) ;
 	        break ;

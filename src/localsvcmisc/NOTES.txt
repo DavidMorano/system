@@ -9,11 +9,9 @@ NOTES (local-svc-misc)
 + Subroutine to get information:
 
 Synopsis:
-
-int localnoticecheck(cchar *pr,char *rbuf,int rlen,cchar *un,int period)
+int localnoticecheck(cchar *pr,char *rbuf,int rlen,cchar *un,int period) noex
 
 Arhuments:
-
 pr		program-root
 rbuf		result buffer
 rlen		size of result buffer
@@ -21,7 +19,5 @@ un		username
 period		period of time to include
 
 Return:
-
 -		length of result string
-
 

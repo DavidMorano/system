@@ -1,4 +1,5 @@
 /* vecelem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* vector-element */
@@ -20,9 +21,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |caddr_t| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* object defines */

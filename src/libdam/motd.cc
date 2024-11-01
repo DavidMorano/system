@@ -1,4 +1,5 @@
 /* motd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to help (manage) MOTD messages */

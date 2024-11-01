@@ -1,4 +1,5 @@
 /* vecpstr_srvargs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* process server file program arguments */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 1998-09-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 	= 2017-11-30, David A­D­ Morano
 	This code has been borrowed from the above.
@@ -19,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	vecpstr_srvargs
+
+	Description:
 	This subroutine is used to parse the server program arguments
 	from an expanded (substituted) service file entry. Basically,
 	we just "field-SHELL" out arguments and put them into the
@@ -28,6 +34,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>

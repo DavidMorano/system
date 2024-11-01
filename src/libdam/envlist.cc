@@ -1,4 +1,5 @@
 /* envlist SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* environment variable management */
@@ -16,10 +17,6 @@
 
 /*******************************************************************************
 
-	Name:
-	envlist
-
-	Description:
 	This object just provides a hash list of environment-like
 	(with a key and an associated value) variables.
 
@@ -28,9 +25,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<hdb.h>
 #include	<strpack.h>
 #include	<strn.h>
 #include	<strwcpy.h>
@@ -55,11 +51,13 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
-typedef hdb *		hdbp ;
-typedef strpack *	strpackp ;
+typedef strpack	*	strpackp ;
 
 
 /* external subroutines */
@@ -73,6 +71,34 @@ typedef strpack *	strpackp ;
 
 /* forward references */
 
+template<typename ... Args>
+static int envlist_ctor(envlist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    const nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->store = nullptr ;
+	    if ((op->elp = new(nothrow) hdb) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envlist_ctor) */
+
+static int envlist_dtor(envlist *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clusterdb_dtor) */
+
 static int	envlist_store(envlist *,cchar *,int) noex ;
 static int	envlist_storer(envlist *) noex ;
 
@@ -85,19 +111,12 @@ static int	envlist_storer(envlist *) noex ;
 
 /* exported subroutines */
 
-int envlist_start(envlist *op,int n) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    cint	osz = sizeof(hdb) ;
-	    void	*vp{} ;
-	    memclear(op) ;
-	    if ((rs = uc_malloc(osz,&vp)) >= 0) {
-		op->elp = (hdb *)(vp) ;
-	        rs = ENVLIST_DBINIT(op->elp,n,0,nullptr,nullptr) ;
-		if (rs < 0) {
-		    uc_free(op->elp) ;
-		    op->elp = nullptr ;
-		}
+int envlist_start(envlist *op,int ne) noex {
+	int		rs ;
+	if ((rs = envlist_ctor(op)) >= 0) {
+	    rs = ENVLIST_DBINIT(op->elp,ne,0,nullptr,nullptr) ;
+	    if (rs < 0) {
+		envlist_dtor(op) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -110,26 +129,24 @@ int envlist_finish(envlist *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->store) {
-	        strpack	*spp = strpackp(op->store) ;
 		{
+	            strpack	*spp = static_cast<strpackp>(op->store) ;
 	            rs1 = strpack_finish(spp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
 	            rs1 = uc_free(op->store) ;
 	            if (rs >= 0) rs = rs1 ;
-	            op->store = nullptr ;
 		}
+	        op->store = nullptr ;
+	    } /* end if (store) */
+	    {
+	        rs1 = ENVLIST_DBFREE(op->elp) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->elp) {
-		{
-	            rs1 = ENVLIST_DBFREE(op->elp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = uc_free(op->elp) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
+	    {
+		rs1 = envlist_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -138,58 +155,56 @@ int envlist_finish(envlist *op) noex {
 
 int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	int		kl ;
-	int		size = 1 ;
-	char		*ep ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-
-	kl = strlen(kp) ;
-
-	size += (kl+1) ;
-	if (vp != nullptr) {
-	    if (vl < 0) vl = strlen(vp) ;
-	    size += vl ;
-	}
-
-	if ((rs = uc_malloc(size,&ep)) >= 0) {
-	    int		el ;
-	    char	*bp = ep ;
-	    bp = strwcpy(bp,kp,kl) ;
-	    *bp++ = '=' ;
-	    bp = strwcpy(bp,vp,vl) ;
-	    el = (bp-ep) ;
-	    rs = envlist_store(op,ep,el) ;
-	    uc_free(ep) ;
-	} /* end if (m-a-f) */
-
-	return rs ;
+	int		rs1 ;
+	int		ridx = 0 ;
+	if (op && kp) {
+	    int		kl = strlen(kp) ;
+	    int		sz = 1 ;
+	    char	*ep{} ;
+	    sz += (kl+1) ;
+	    if (vp != nullptr) {
+	        if (vl < 0) vl = strlen(vp) ;
+	        sz += vl ;
+	    }
+	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
+		{
+	            int		el ;
+	            char	*bp = ep ;
+	            bp = strwcpy(bp,kp,kl) ;
+	            *bp++ = '=' ;
+	            bp = strwcpy(bp,vp,vl) ;
+	            el = (bp-ep) ;
+	            rs = envlist_store(op,ep,el) ;
+		    ridx = rs ;
+		} /* end block */
+	        rs1 = uc_free(ep) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? ridx : rs ;
 }
 /* end subroutine (envlist_addkeyval) */
 
 int envlist_add(envlist *op,cchar *sp,int sl) noex {
-	ENVLIST_DBDATA	key, val ;
-	int		rs ;
-	int		kl ;
-	cchar	*tp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	kl = sl ;
-	if ((tp = strnchr(sp,sl,'=')) != nullptr) kl = (tp-sp) ;
-
-	key.buf = sp ;
-	key.len = kl ;
-	val.buf = sp ;
-	val.len = sl ;
-
-	rs = ENVLIST_DBSTORE(op->elp,key,val) ;
-
-	return rs ;
+	int		rs = SR_FAULT ;
+	int		ridx = 0 ;
+	if (op && sp) {
+	    ENVLIST_DBDATA	key ;
+	    ENVLIST_DBDATA	val ;
+	    int			kl ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    kl = sl ;
+	    if (cchar *tp ; tp = strnchr(sp,sl,'=')) != nullptr) {
+		kl = (tp-sp) ;
+	    }
+	    key.buf = sp ;
+	    key.len = kl ;
+	    val.buf = sp ;
+	    val.len = sl ;
+	    rs = ENVLIST_DBSTORE(op->elp,key,val) ;
+	    ridx = rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? ridx : rs ;
 }
 /* end subroutine (envlist_add) */
 
@@ -207,20 +222,21 @@ int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		vl = 0 ;
 	if (op && sp) {
 	    ENVLIST_DBDATA	key ;
-	    ENVLIST_DBDATA	val ;
+	    ENVLIST_DBDATA	val{} ;
 	    int		kl ;
 	    cchar	*tp ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    kl = sl ;
 	    if ((tp = strnchr(sp,sl,'=')) != nullptr) {
-	        kl = (tp-sp) ;
+		kl = (tp-sp) ;
 	    }
 	    key.buf = sp ;
 	    key.len = kl ;
-	    rs = ENVLIST_DBFETCH(op->elp,key,nullptr,&val) ;
-	    if (rs >= 0) vl = val.len ;
+	    if ((rs = ENVLIST_DBFETCH(op->elp,key,nullptr,&val)) >= 0) {
+		vl = val.len ;
+	    }
 	    if (rpp) {
-	        *rpp = (rs >= 0) ? charp(val.buf) : nullptr ;
+	        *rpp = (rs >= 0) ? (cchar *) val.buf : nullptr ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
@@ -232,15 +248,13 @@ int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 
 static int envlist_store(envlist *op,cchar *sp,int sl) noex {
 	int		rs ;
-
 	if ((rs = envlist_storer(op)) >= 0) {
-	    strpack	*spp = strpackp(op->store) ;
+	    strpack	*spp = static_cast<strpackp>(op->store) ;
 	    cchar	*ep ;
 	    if ((rs = strpack_store(spp,sp,sl,&ep)) >= 0) {
 		rs = envlist_add(op,ep,rs) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (envlist_store) */
@@ -249,9 +263,9 @@ static int envlist_storer(envlist *op) noex {
 	int		rs = SR_OK ;
 	if (op->store == nullptr) {
 	    cint	osize = sizeof(strpack) ;
-	    void	*vp ;
+	    void	*vp{} ;
 	    if ((rs = uc_malloc(osize,&vp)) >= 0) {
-		strpack		*spp = strpackp(vp) ;
+	        strpack		*spp = static_cast<strpackp>(vp) ;
 	        cint		csz = ENVLIST_CHUNKSIZE ;
 		op->store = vp ;
 	        rs = strpack_start(spp,csz) ;
@@ -260,7 +274,7 @@ static int envlist_storer(envlist *op) noex {
 		    op->store = nullptr ;
 		}
 	    } /* end if (m-a) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (envlist_storer) */

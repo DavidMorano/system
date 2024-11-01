@@ -1,4 +1,5 @@
 /* issue SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to help and manage "issue" messages */

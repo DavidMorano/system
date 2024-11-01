@@ -104,9 +104,9 @@
 
 namespace {
     struct ucgetpw ;
-    typedef int (ucgetpw::*mem_f)(ucentpw *,char *,int) noex ;
+    typedef int (ucgetpw::*mem_m)(ucentpw *,char *,int) noex ;
     struct ucgetpw {
-	mem_f	m ;
+	mem_m	m ;
 	cchar	*name ;
 	uid_t	uid ;
 	ucgetpw(cchar *n,uid_t u = 0) noex : name(n), uid(u) { } ;

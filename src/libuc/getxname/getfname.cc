@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 1998-09-01, David A­D­ Morano
-	This program was originally written.
+	This subroutine was originally written for Rightcore Network
+	Services (RNS).
 
 */
 

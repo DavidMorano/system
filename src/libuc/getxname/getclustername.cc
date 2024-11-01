@@ -1,4 +1,4 @@
-/* prgetclustername SUPPORT */
+/* getclustername SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -8,22 +8,28 @@
 
 /* revision history:
 
-	= 2004-11-22, David A­D­ Morano
-	This code was originally written.
+	= 1998-04-10, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+	= 2004-11-22, David A-D- Morano
+	I make the |prgetclustername()| subroutine available elsewhere
+	(everywhere) within the namespace |libuc|.
 
 */
 
-/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Name:
+	getclustername
 	prgetclustername
 
 	Description:
 	Get a cluster name given a nodename.
 
 	Synopsis:
+	int getclustername(char *rbuf,int rlen,cc *nn) noex
 	int prgetclustername(cc *pr,char *rbuf,int rlen,cc *nn) noex
 
 	Arguments:
@@ -34,19 +40,18 @@
 
 	Returns:
 	>=0		string length of cluster name
-	SR_OK		if OK
 	SR_NOTFOUND	if could not get something needed for correct operation
 	SR_ISDIR	database file was a directory (admin error)
-	<0		some other error
+	<0		some other error (system-return)
 
 	Design note:
 	If there is no entry in the NODE DB file for the given
 	nodename, then we proceed on to lookup the nodename in the
-	CLUSTER DB. We use the CLUSTERDB object to interface with
-	the CLUSTER DB itself. Generally, results (key-value pairs)
-	are returned in a random order. If the idea was to return
+	CLUSTER DB.  We use the CLUSTERDB object to interface with
+	the CLUSTER DB itself.  Generally, results (key-value pairs)
+	are returned in a random order.  If the idea was to return
 	the => first <= cluster with the given node as a member,
-	this will not always give predictable results. This is just
+	this will not always give predictable results.  This is just
 	something to keep in mind, and another reason to have an
 	entry for the given node in the NODE DB if deterministic
 	results need to be returned for a cluster name lookup by
@@ -61,34 +66,15 @@
 	Q. Was the amount of complication supported by the need?
 	A. Looking at it now ... maybe not.
 
-	Q. Were there any alternatives?
-	A. Yes; the predicessor to this present implementation was an 
-	   implementation that was quite simple, but it had a lot
-	   of static memory storage.  It was the desire to eliminate
-	   the static memory storage that led to this present
-	   implementation.
-
 	Q. Are there ways to clean this up further?
 	A. Probably, but it looks like I have already done more to this 
 	   simple function than may have been ever warranted to begin with!
-
-	Q. Did this subroutine have to be Asyc-Signal-Safe?
-	A. Not really.
-
-	Q. Then why did you do it?
-	A. The system-call |uname(2)| is Async-Signal-Safe.  Since this
-	   subroutine (|prgetclustername(3dam)|) sort of looks like
-	   |uname(2)| (of a sort), I thought it was a good idea.
-
-	Q. Was it really a good idea?
-	A. I guess not.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -163,7 +149,7 @@ namespace {
 	} ;
 	int start(cchar **) noex ;
 	int finish() noex ;
-    } ; /* end struct (search) */
+    } ; /* end struct (searcher) */
 }
 
 
@@ -174,6 +160,7 @@ static int	subinfo_finish(SI *) noex ;
 static int	subinfo_cacheget(SI *) noex ;
 static int	subinfo_cacheset(SI *) noex ;
 static int	subinfo_ndb(SI *) noex ;
+static int	subinfo_ndber(SI *,cchar *) noex ;
 static int	subinfo_cdb(SI *) noex ;
 
 
@@ -186,6 +173,7 @@ constexpr cpcchar	prs[] = {
 } ;
 
 constexpr cchar		nodefname[] = NODEFNAME ;
+constexpr cchar		clusterfname[] = CLUSTERFNAME ;
 
 
 /* exported variables */
@@ -203,8 +191,8 @@ int getclustername(char *rbuf,int rlen,cchar *nname) noex {
 	    rbuf[0] = '\0' ;
 	    if (cchar *nn{} ; (rs = so.start(&nn)) >= 0) {
 	        if (ids id ; (rs = id.load) >= 0) {
-		    cint	am = R_OK ;
 	            if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+		        cint	am = R_OK ;
 		        rs = SR_OK ;
 		        for (const auto pr : prs) {
 		            if ((rs = mkpath(pbuf,nodefname)) >= 0) {
@@ -228,6 +216,7 @@ int getclustername(char *rbuf,int rlen,cchar *nname) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
+/* end subroutine (getclustername) */
 
 namespace libuc {
     int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
@@ -300,42 +289,11 @@ static int subinfo_ndb(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	cint		rlen = sip->rlen ;
 	cchar		*pr = sip->pr ;
-	cchar		*nn = sip->nn ;
-	char		*rbuf = sip->rbuf ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	    rbuf[0] = '\0' ;
-	    if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
-	        nodedb		st ;
-	        nodedb_ent	ste ;
-	        nodedb_cur	cur ;
-	        if ((rs = nodedb_open(&st,tbuf)) >= 0) {
-	            if ((rs = nodedb_curbegin(&st,&cur)) >= 0) {
-	                cint	rsn = SR_NOTFOUND ;
-	                cint	elen = NODEDB_ENTLEN ;
-	                char	ebuf[NODEDB_ENTLEN+1] ;
-	                while (rs >= 0) {
-	                    rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
-	                    if (rs1 == rsn) break ;
-	                    rs = rs1 ;
-	                    if (rs >= 0) {
-	                        if (ste.clu && (ste.clu[0] != '\0')) {
-	                            rs = sncpy1(rbuf,rlen,ste.clu) ;
-	                            len = rs ;
-	                        }
-	                    } /* end if (ok) */
-	                    if ((rs >= 0) && (len > 0)) break ;
-	                    if (rs < 0) break ;
-	                } /* end while (fetching node entries) */
-	                rs1 = nodedb_curend(&st,&cur) ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (nodedb-cursor) */
-	            rs1 = nodedb_close(&st) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } else if (isNotPresent(rs)) {
-	            rs = SR_OK ;
-	        }
+	    if ((rs = mkpath2(tbuf,pr,nodefname)) >= 0) {
+		rs = subinfo_ndber(sip,tbuf) ;
+		len = rs ;
 	    } /* end if (mkpath) */
 	    rs1 = uc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -343,6 +301,46 @@ static int subinfo_ndb(SI *sip) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_ndb) */
+
+static int subinfo_ndber(SI *sip,cchar *nfn) noex {
+	cint		elen = NODEDB_ENTLEN ;
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	cint		rlen = sip->rlen ;
+	cchar		*nn = sip->nn ;
+	char		*rbuf = sip->rbuf ;
+	if (char *ebuf{} ; (rs = uc_malloc(elen,&ebuf)) >= 0) {
+            if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
+                if (nodedb_cur cur ; (rs = nodedb_curbegin(&st,&cur)) >= 0) {
+                    nodedb_ent  ste ;
+                    cint    	rsn = SR_NOTFOUND ;
+                    while (rs >= 0) {
+                        rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
+                        if (rs1 == rsn) break ;
+                        rs = rs1 ;
+                        if (rs >= 0) {
+                            if (ste.clu && (ste.clu[0] != '\0')) {
+                                rs = sncpy1(rbuf,rlen,ste.clu) ;
+                                len = rs ;
+                            }
+                        } /* end if (ok) */
+                        if ((rs >= 0) && (len > 0)) break ;
+                        if (rs < 0) break ;
+                    } /* end while (fetching node entries) */
+                    rs1 = nodedb_curend(&st,&cur) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (nodedb-cursor) */
+                rs1 = nodedb_close(&st) ;
+                if (rs >= 0) rs = rs1 ;
+            } else if (isNotPresent(rs)) {
+                rs = SR_OK ;
+            }
+	    rs = rsfree(rs,ebuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end if (subinfor_ndber) */
 
 static int subinfo_cdb(SI *sip) noex {
 	cint		rlen = sip->rlen ;
@@ -354,7 +352,7 @@ static int subinfo_cdb(SI *sip) noex {
 	char		*rbuf = sip->rbuf ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
-	    if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
+	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) {
 		cnullptr	np{} ;
 	        if (clusterdb cdb ; (rs = clusterdb_open(&cdb,tbuf)) >= 0) {
 	            auto	cf = clusterdb_curfetchrev ;

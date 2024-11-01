@@ -12,7 +12,7 @@ if [[ $# -gt 0 ]] ; then
 fi
 
 
-: ${HOME:=$( userdir )}
+: ${HOME:=$( userhome )}
 export HOME
 
 

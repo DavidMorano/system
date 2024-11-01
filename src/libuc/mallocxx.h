@@ -1,4 +1,5 @@
 /* mallocxx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -16,10 +17,13 @@
 
 /*******************************************************************************
 
-	This module provides some subroutines to serve as short-cuts to
-	allocating system buffers (that is: buffers that are used by
-	the UNIX® system with their particular buffer-sizes).
+  	Group:
+	mallocxx
 
+	Description:
+	This module provides some subroutines to serve as short-cuts
+	to allocating system buffers (that is: buffers that are
+	used by the UNIX® system with their particular buffer-sizes).
 
 *******************************************************************************/
 

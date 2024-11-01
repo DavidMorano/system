@@ -149,6 +149,7 @@ extern int	uc_chown(cchar *,uid_t,gid_t) noex ;
 extern int	uc_rename(cchar *,cchar *) noex ;
 extern int	uc_utime(cchar *,const UTIMBUF *) noex ;
 extern int	uc_realpath(cchar *,char *) noex ;
+extern int	uc_resolvepath(cchar *,char *,int) noex ;
 extern int	uc_truncate(cchar *,off_t) noex ;
 
 /* use group */

@@ -1,4 +1,5 @@
 /* hdb SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* general-purpose in-core hashing */
@@ -38,7 +39,7 @@
 	key-data pairs with the same keys.
 
 	The "walk" type method, which I never liked in other packages,
-	is deprecated in favor of the "enumerate" (|hdb_enum|) type
+	is deprecated in favor of the "enumerate" (|hdb_curenum|) type
 	method instead.  There are two types of "delete" methods.
 	One deletes all entries with the same key (possibly useful
 	for old timers who never knew what to do with muliple
@@ -172,7 +173,7 @@ extern "C" {
 extern "C" {
     int		hdb_delall(hdb *) noex ;
     int		hdb_fetchrec(hdb *,DAT,CUR *,DAT *,DAT *) noex ;
-    int		hdb_enum(hdb *,CUR *,DAT *,DAT *) noex ;
+    int		hdb_curenum(hdb *,CUR *,DAT *,DAT *) noex ;
 }
 
 
@@ -657,7 +658,7 @@ int hdb_getkeyrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 
 /* advance the cursor to the next entry regardless of key */
 int hdb_next(hdb *op,CUR *curp) noex {
-	return hdb_enum(op,curp,nullptr,nullptr) ;
+	return hdb_curenum(op,curp,nullptr,nullptr) ;
 }
 /* end subroutine (hdb_next) */
 
@@ -673,7 +674,7 @@ int hdb_next(hdb *op,CUR *curp) noex {
 
 ****/
 
-int hdb_enum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
+int hdb_curenum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
 	        CUR	ncur ;
@@ -725,7 +726,7 @@ int hdb_enum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (hdb_enum) */
+/* end subroutine (hdb_curenum) */
 
 /* count of items in container */
 int hdb_count(hdb *op) noex {

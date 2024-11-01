@@ -1,4 +1,5 @@
 /* snxxx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* specialized x-string formatting */
@@ -41,8 +42,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"snxxx.h"
 

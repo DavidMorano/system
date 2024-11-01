@@ -1,4 +1,5 @@
 /* snfsflags SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the file-system flags */
@@ -40,8 +41,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/statvfs.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"snflags.h"
 #include	"snx.h"

@@ -1,4 +1,5 @@
 /* snflags SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of some flags */
@@ -16,14 +17,21 @@
 
 /*******************************************************************************
 
+  	Object:
+	snflags
+
+	Description:
 	Ths object is used in the creation of flags strings.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear(3u)| */
 #include	<storebuf.h>
+#include	<localmisc.h>
 
 #include	"snflags.h"
 
@@ -52,9 +60,10 @@
 /* exported subroutines */
 
 int snflags_start(snflags *op,char *bp,int bl) noex {
+    	SNFLAGS		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && bp) {
-	    rs = memclear(op) ;
+	    rs = memclear(hop) ;
 	    op->bp = bp ;
 	    op->bl = bl ;
 	    *bp = '\0' ;
@@ -90,6 +99,24 @@ int snflags_addstrw(snflags *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (snflags_addstrw) */
 
+int snflags_count(snflags *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->c ;
+	}
+	return rs ;
+}
+/* end subroutine (snflags_count) */
+
+int snflags_len(snflags *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->bi ;
+	}
+	return rs ;
+}
+/* end subroutine (snflags_count) */
+
 int snflags_finish(snflags *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
@@ -100,5 +127,42 @@ int snflags_finish(snflags *op) noex {
 	return rs ;
 }
 /* end subroutine (snflags_finish) */
+
+int snflags::start(char *bp,int bl) noex {
+	return snflags_start(this,bp,bl) ;
+}
+
+int snflags::addstr(cchar *sp) noex {
+	return snflags_addstrw(this,sp,-1) ;
+}
+
+int snflags::addstrw(cchar *sp,int sl) noex {
+	return snflags_addstrw(this,sp,sl) ;
+}
+
+void snflags::dtor() noex {
+	if (cint rs = int(finish) ; rs < 0) {
+	    ulogerror("snflags",rs,"fini-finish") ;
+	}
+}
+
+snflags_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case snflagsmem_count:
+	        rs = snflags_count(op) ;
+	        break ;
+	    case snflagsmem_len:
+	        rs = snflags_len(op) ;
+	        break ;
+	    case snflagsmem_finish:
+	        rs = snflags_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (snflags_co::operator) */
 
 

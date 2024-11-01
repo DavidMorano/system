@@ -1,4 +1,5 @@
 /* mallocxx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -56,12 +57,24 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
 static sysval	pagesize(sysval_ps) ;
 
 
 /* local subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

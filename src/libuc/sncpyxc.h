@@ -1,4 +1,5 @@
 /* sncpyxc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* copy a c-string to a given case */
@@ -19,8 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

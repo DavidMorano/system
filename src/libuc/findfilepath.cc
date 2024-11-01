@@ -1,4 +1,5 @@
 /* findfilepath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to try to find a file in the specified directory path */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	findfilepath
+
+	Description:
 	This subroutine searches through all of the directories in
 	the supplied directory path.  If the given file with the
 	given mode is found in a directory then the path to this
@@ -47,6 +52,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
@@ -112,10 +118,9 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (fn[0]) {
-	        ids	ids ;
-	        if ((rs = ids_load(&ids)) >= 0) {
+	        if (ids id ; (rs = id.load) >= 0) {
 	            if (fn[0] == '/') {
-	                if ((rs = fileperm(&ids,fn,am)) > 0) {
+	                if ((rs = fileperm(&id,fn,am)) > 0) {
 			    rs = mkpath1(rbuf,fn) ;
 	                    len = rs ;
 	                }
@@ -129,7 +134,7 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	                    while ((tp = strchr(dnp,':')) != nullptr) {
 			        {
 	                            dnl = (tp - dnp) ;
-	                            rs = checkone(&ids,rbuf,dnp,dnl,fn,am) ;
+	                            rs = checkone(&id,rbuf,dnp,dnl,fn,am) ;
 	                            len = rs ;
 			        }
 	                        dnp = (tp + 1) ;
@@ -137,7 +142,7 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	                    } /* end while */
 	                } /* end if (non-nullptr path) */
 	            } /* end if */
-	            rs1 = ids_release(&ids) ;
+	            rs1 = id.release ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ids) */
 	    } /* end if (valid) */
@@ -171,10 +176,9 @@ static int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 
 /* is it a file and are the permissions what we want? */
 static int fileperm(ids *idp,cchar *fn,int am) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = u_stat(fn,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode))  {
 	        if ((rs = sperm(idp,&sb,am)) >= 0) {
 		    f = true ;
@@ -215,5 +219,6 @@ static bool isendslash(cc *dp,int dl) noex {
 	if (dl < 0) dl = strlen(dp) ;
 	return ((dl > 0) && (dp[dl-1] == '/')) ;
 }
+/* end subroutine (isendslash) */
 
 

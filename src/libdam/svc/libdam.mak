@@ -277,7 +277,7 @@ OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
 OBJ161= nusers.o mesg.o sysmemutil.o initnow.o 
-OBJ162= getfiledirs.o findfilepath.o findfile.o findxfile.o
+OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o dictdiff.o bufprintf.o xfile.o
 OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o straltwchar.o
 OBJ165= emainfo.o getdig.o
@@ -678,8 +678,6 @@ srvreg.o:		srvreg.c srvreg.h srvrege.h
 
 srvrege.o:		srvrege.c srvrege.h
 
-spawnproc.o:		spawnproc.c spawnproc.h
-
 openport.o:		openport.c openport.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
@@ -820,5 +818,6 @@ sockpeername.o:		sockpeername.cc sockpeername.h
 nlspeername.o:		nlspeername.cc nlspeername.h
 conallof.o:		conallof.cc conallof.h
 ismatstar.o:		ismatstar.cc ismatstar.h
+findxfile.o:		findxfile.cc findxfile.h
 
 

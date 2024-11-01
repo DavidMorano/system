@@ -247,7 +247,7 @@ int recipient_finish(RECIPIENT *op) noex {
 	if ((rs = hdb_curbegin(&op->hash,&keycursor)) >= 0) {
 	    RECIPIENT_VAL	*vp ;
 
-	    while (hdb_enum(&op->hash,&keycursor,&key,&val) >= 0) {
+	    while (hdb_curenum(&op->hash,&keycursor,&key,&val) >= 0) {
 
 	        if (val.buf != NULL) {
 

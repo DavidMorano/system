@@ -56,8 +56,9 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<errno.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
-#include	<ucgetpid.h>
 #include	<upt.h>
 #include	<localmisc.h>
 

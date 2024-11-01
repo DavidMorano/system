@@ -1,4 +1,5 @@
 /* intsat HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Integer Saturation (clamping) */
@@ -24,6 +25,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 

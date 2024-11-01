@@ -107,9 +107,9 @@
 
 namespace {
     struct ucgetnw ;
-    typedef int (ucgetnw::*mem_f)(ucentnw *,char *,int) noex ;
+    typedef int (ucgetnw::*mem_m)(ucentnw *,char *,int) noex ;
     struct ucgetnw {
-	mem_f		m ;
+	mem_m		m ;
 	cchar		*name ;
 	uint32_t	num ;
 	int		type ;

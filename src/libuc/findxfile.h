@@ -1,4 +1,5 @@
 /* findxfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* find an eXecutable file given a name */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ids.h>
 

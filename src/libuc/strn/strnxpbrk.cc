@@ -1,4 +1,5 @@
 /* strnxpbrk SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a character in a counted string */

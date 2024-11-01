@@ -1,4 +1,5 @@
 /* usys_getrandom HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */
@@ -37,6 +38,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #define GRND_NONBLOCK		0x01	/* do not block open */

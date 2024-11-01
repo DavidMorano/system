@@ -1,4 +1,5 @@
 /* getprogpath HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a program path (given some information) */
@@ -24,6 +25,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<ids.h>
+#include	<vecstr.h>
 
 
 EXTERNC_begin

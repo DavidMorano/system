@@ -362,7 +362,7 @@ static int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    while ((rs = hdb_enum(dbp,&cur,&key,&val)) >= 0) {
+	    while ((rs = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
 	        NC_ENT	*tep = (NC_ENT *) val.buf ;
 		if ((ep == nullptr) || (ep->ti_access < tep->ti_access)) {
 		    ep = tep ;
@@ -390,7 +390,7 @@ static int namecache_entfins(NC *op) noex {
 	if ((rs1 = hdb_curbegin(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    while (hdb_enum(elp,&cur,&key,&val) >= 0) {
+	    while (hdb_curenum(elp,&cur,&key,&val) >= 0) {
 	        NC_ENT	*ep = (NC_ENT *) val.buf ;
 		{
 	            rs1 = entry_finish(ep) ;

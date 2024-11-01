@@ -1,4 +1,5 @@
 /* usys_linux HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Apple Darwin operating system support */
@@ -38,6 +39,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 /* USYSLINUX start */

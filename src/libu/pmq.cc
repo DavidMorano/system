@@ -103,9 +103,9 @@ extern "C" {
 
 namespace {
     struct posixhelp ;
-    typedef int (posixhelp::*posixhelp_f)(pmq *) noex ;
+    typedef int (posixhelp::*posixhelp_m)(pmq *) noex ;
     struct posixhelp {
-	posixhelp_f	m ;
+	posixhelp_m	m ;
 	SIGEVENT	*sep ;
 	const pmq_attr	*nattr ;
 	pmq_attr	*oattr ;

@@ -1,4 +1,5 @@
 /* calstrs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calendar strings */
@@ -19,13 +20,19 @@
 
 /*******************************************************************************
 
+  	Name:
+	calstrs
+
+	Description:
 	We provide a database of various common calendar strings.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"calstrs.h"
 

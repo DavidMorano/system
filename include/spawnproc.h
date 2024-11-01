@@ -1,3 +1,4 @@
+/* encoding=ISO8859-1 */
 /* spawnproc HEADER */
 /* lang=C20 */
 
@@ -19,20 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* }pid_t| */
+#include	<sys/types.h>		/* |pid_t| */
 #include	<usystem.h>
 
 
 /* object */
 #define	SPAWNPROC_CON		struct spawnproc_control
-
 /* options */
 #define	SPAWNPROC_OIGNINTR	(1<<0)		/* ignore interrupts */
 #define	SPAWNPROC_OSETSID	(1<<1)		/* set-session-id */
 #define	SPAWNPROC_OSETPGRP	(1<<2)		/* set-proces-group ID */
 #define	SPAWNPROC_OSETCTTY	(1<<3)		/* set control-term PGID */
 #define	SPAWNPROC_OSIGDEFS	(1<<4)		/* set default signals */
-
 /* file descriptor dispositions are */
 #define	SPAWNPROC_DINHERIT	0			/* inherit this FD */
 #define	SPAWNPROC_DCLOSE	1			/* close this FD */

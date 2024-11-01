@@ -44,7 +44,7 @@
 #define	ENVS_DBSTORE(op,k,v)		hdb_store((op),(k),(v))
 #define	ENVS_DBGETREC(op,cp,kp,vp)	hdb_getrec((op),(cp),(kp),(vp))
 #define	ENVS_DBNEXT(op,cp)		hdb_next((op),(cp))
-#define	ENVS_DBENUM(op,cp,kp,vp)	hdb_enum((op),(cp),(kp),(vp))
+#define	ENVS_DBENUM(op,cp,kp,vp)	hdb_curenum((op),(cp),(kp),(vp))
 #define	ENVS_DBCURBEGIN(op,cp)		hdb_curbegin((op),(cp))
 #define	ENVS_DBCUREND(op,cp)		hdb_curend((op),(cp))
 #define	ENVS_DBFETCH(op,k,cp,vp)	hdb_fetch((op),(k),(cp),(vp))

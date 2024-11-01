@@ -1,4 +1,5 @@
 /* mkdirs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make all directories in a directory path */
@@ -46,6 +47,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strcmp(3c)| */
 #include	<usystem.h>
 #include	<ids.h>
@@ -88,8 +91,7 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 	if (dname) {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
-	        ids	id ;
-	        if ((rs = ids_load(&id)) >= 0) {
+	        if (ids id ; (rs = ids_load(&id)) >= 0) {
 	            if ((rs = procdir(&id,dname,dm)) >= 0) {
 	                c += rs ;
 	            } else if (rs == SR_NOENT) {
@@ -112,8 +114,7 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*dirbuf{} ;
-	if ((rs = libmalloc_mp(&dirbuf)) >= 0) {
+	if (char *dirbuf{} ; (rs = libmalloc_mp(&dirbuf)) >= 0) {
             if ((rs = mkpath1(dirbuf,dname)) >= 0) {
                 cchar       *dp = dirbuf ;
                 char        *bp ;
@@ -143,9 +144,8 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 /* end subroutine (mkdirer) */
 
 static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = uc_stat(dirbuf,&sb)) >= 0) {
+	if (USTAT sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        rs = sperm(idp,&sb,X_OK) ;
 	        if (rs > 0) rs = 0 ;

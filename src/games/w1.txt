@@ -42,6 +42,20 @@ Part 2: Generating sets of strings of balanced parens
 7 -> {}
 8 -> {“()()()()”, ... } (( () () ))    ( () () (( () () )) () ) 
 
+trystring(res,N,s,ch) {
+    if (s.length() == N) {
+       if (isBal(s)) {
+          res.push_back(s) ;
+          return true ;
+
+        }
+        return false ;
+    } else {
+    	trystring(res,N,s,')') ;
+	trystring(res,N,s,'(') ;
+    }
+} 
+
 std::set<std::string> Generate(const int N) {
   std::set<std::string>	  res ;
   // TODO
@@ -65,22 +79,7 @@ std::set<std::string> Generate(const int N) {
     s.clear() ;
 
     for (i = 0 ; i < (N-1) ; i += 1) {
-      
-trystring(res,N,s,ch) {
-    if (s.length() == N) {
-       if (isBal(s)) {
-          res.push_back(s) ;
-          return true ;
-
-        }
-        return false ;
-    } else {
-    trystring(res,N,s,')') ;
-               trystring(res,N,s,'(') ;
-    }
-} 
- 
-    )
+    } 
 
   } else if (N == 0) {
      res.insert("") ;

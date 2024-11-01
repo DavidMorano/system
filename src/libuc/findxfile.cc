@@ -1,4 +1,5 @@
 /* findxfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find an executable file */
@@ -24,11 +25,11 @@
 	the existing PATH environment variable.
 
 	Synopsis:
-	int findxfile(ids *idp,char *buf,cchar *pn) noex
+	int findxfile(ids *idp,char *rbuf,cchar *pn) noex
 
 	Arguments:
 	idp		pointer to IDS object
-	buf		buffer to receive resulting path
+	rbuf		buffer to receive resulting path
 	pn		program-name string to search for
 
 	Returns:
@@ -44,14 +45,16 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
+#include	<uvariables.hh>
+#include	<mallocxx.h>
+#include	<getprogpath.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<mkpathx.h>
 #include	<pathclean.h>
-#include	<getprogpath.h>
 #include	<xfile.h>
 #include	<localmisc.h>
 
@@ -59,10 +62,6 @@
 
 
 /* local defines */
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
 
 #define	NENTS	40		/* initial number path components */
 
@@ -97,58 +96,56 @@ int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	static cchar	*path = getenv(VARPATH) ;
 	if (idp && rbuf && pn) {
-	rs = SR_NOENT ;
-	rbuf[0] = '\0' ;
-	if (path != nullptr) {
-	    vecstr	plist ;
-	    cint	ne = NENTS ;
-	    bool	f_pwd = false ;
-
-	    if ((rs = vecstr_start(&plist,ne,0)) >= 0) {
-		int	cl ;
-		cchar	*tp ;
-		cchar	*sp = path ;
-	        char	cbuf[MAXPATHLEN + 1] ;
-
-	        while ((tp = strpbrk(sp,":;")) != nullptr) {
-	            if ((tp-sp) == 0) {
-	                f_pwd = true ;
-		    }
-	            if ((rs = pathclean(cbuf,sp,(tp-sp))) >= 0) {
-	                cl = rs ;
-	                rs = vecstr_adduniq(&plist,cbuf,cl) ;
-	            }
-	            sp = (tp + 1) ;
-	            if (rs < 0) break ;
-	        } /* end while */
-
-	        if ((rs >= 0) && (sp[0] != '\0')) {
-	            rs = vecstr_adduniq(&plist,sp,-1) ;
-		}
-
-	        if (rs >= 0) {
-	            rs = getprogpath(idp,&plist,rbuf,pn,-1) ;
-		    len = rs ;
-		}
-
-	        if ((! f_pwd) && (rs == SR_NOENT)) {
+	    rbuf[0] = '\0' ;
+	    rs = SR_INVALID ;
+	    if (pn[0]) {
+	        static cchar	*path = getenv(varname.path) ;
+	        rs = SR_NOENT ;
+	        if (path) {
+	            cint	vn = NENTS ;
+		    cint	vo = 0 ;
+	            bool	f_pwd = false ;
+	            if (vecstr plist ; (rs = plist.start(vn,vo)) >= 0) {
+		        cchar	*sp = path ;
+	                if (char *cbuf{} ; (rs = malloc_mp(&cbuf)) >= 0) {
+		            cchar	*tp ;
+	                    while ((tp = strpbrk(sp,":;")) != nullptr) {
+	                        if ((tp-sp) == 0) {
+	                            f_pwd = true ;
+		                }
+	                        if ((rs = pathclean(cbuf,sp,(tp - sp))) >= 0) {
+	                            rs = plist.adduniq(cbuf,rs) ;
+	                        }
+	                        sp = (tp + 1) ;
+	                        if (rs < 0) break ;
+	                    } /* end while */
+		            rs = rsfree(rs,cbuf) ;
+		        } /* end if (m-a-f) */
+	                if ((rs >= 0) && (sp[0] != '\0')) {
+	                    rs = plist.adduniq(sp,-1) ;
+		        }
+	                if (rs >= 0) {
+			    auto	gp = getprogpath ;
+	                    if ((rs = gp(idp,&plist,rbuf,pn,-1)) >= 0) {
+		                len = rs ;
+			    } else if (rs == SR_NOENT) {
+	                         if ((! f_pwd) && ((rs = xfile(idp,pn)) >= 0)) {
+	                             rs = mkpath1(rbuf,pn) ;
+		                     len = rs ;
+		                 }
+			    } /* end if */
+	                } /* end if */
+	                rs1 = plist.finish ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (path-list) */
+	        } else {
 	            if ((rs = xfile(idp,pn)) >= 0) {
-	                rs = mkpath1(rbuf,pn) ;
+		        rs = mkpath(rbuf,pn) ;
 		        len = rs ;
-		    }
-	        } /* end if */
-
-	        rs1 = vecstr_finish(&plist) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (path-list) */
-	} else {
-	    if ((rs = xfile(idp,pn)) >= 0) {
-		rs = mkpath1(rbuf,pn) ;
-		len = rs ;
-	    }
-	} /* end if (non-null) */
+	            }
+	        } /* end if (non-null) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }

@@ -536,8 +536,6 @@ ids.o:			ids.c ids.h
 
 linefold.o:		linefold.c linefold.h
 
-envhelp.o:		envhelp.c envhelp.h
-
 mkprogenv.o:		mkprogenv.c mkprogenv.h
 
 spawner.o:		spawner.c spawner.h

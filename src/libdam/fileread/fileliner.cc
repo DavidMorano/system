@@ -1,4 +1,5 @@
 /* fileliner SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine the number of lines in a file */

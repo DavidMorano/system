@@ -1,4 +1,5 @@
 /* snwprintf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform a c-string creation function similar to |snprintf(3c)| */
@@ -45,6 +46,7 @@
 #include	<cstdio>
 #include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

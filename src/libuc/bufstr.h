@@ -1,4 +1,5 @@
 /* bufstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string buffer object */
@@ -32,6 +33,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
 

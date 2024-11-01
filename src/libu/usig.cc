@@ -29,7 +29,6 @@
 	u_sigwait
 	u_sigmask
 
-
 	Name:
 	u_sigprocmask
 

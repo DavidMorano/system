@@ -1,4 +1,5 @@
 /* mailbox_fromaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a FROM address from a mail message */
@@ -42,6 +43,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

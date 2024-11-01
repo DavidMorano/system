@@ -180,13 +180,12 @@ int helper::finish() noex {
 
 helper::operator int () noex {
 	int		rs = SR_OK ;
-	for (auto const &m : mems) {
+	for (const auto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != SR_OK) break ;
 	}
 	return rs ;
 }
-
 
 int helper::tryus() noex {
 	int		rs = SR_OK ;

@@ -25,6 +25,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<sys/socket.h>
 #include	<limits.h>
 #include	<clanguage.h>
 
@@ -99,7 +100,7 @@
 #endif
 
 #ifndef	MKBOOL
-#define	MKBOOL(ch)	((ch)!=0)
+#define	MKBOOL(exp)	((exp)!=0)
 #endif
 
 #ifndef	UC

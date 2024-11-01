@@ -1,4 +1,5 @@
 /* timeval HEADER */
+#include	<usysrets.h>
 /* lang=C20 */
 
 /* time-value object methods */
@@ -16,6 +17,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

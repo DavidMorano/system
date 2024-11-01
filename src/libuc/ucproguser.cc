@@ -48,7 +48,7 @@
 	A. Looking at it now ... maybe not.
 
 	Q. Were there any alternatives?
-	A. Yes; the predicessor to this present implementation was an 
+	A. Yes; the predecessor to this present implementation was an 
 	   implementation that was quite simple, but it had a lot of static
 	   memory storage.  It was the desire to eliminate the static memory
 	   storage that led to this present implementation.

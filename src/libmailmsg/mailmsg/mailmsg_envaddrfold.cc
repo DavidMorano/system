@@ -1,4 +1,5 @@
 /* mailmsg_envaddrfold SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* MAILMSG create a folded envelope address */
@@ -40,6 +41,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

@@ -76,9 +76,9 @@ using usys::usysauxinfo ;		/* subroutines */
 
 namespace {
     struct ucsysauxinfo ;
-    typedef int (ucsysauxinfo::*mem_f)(char *,int,int) noex ;
+    typedef int (ucsysauxinfo::*mem_m)(char *,int,int) noex ;
     struct ucsysauxinfo {
-	mem_f		m ;
+	mem_m		m ;
 	ucsysauxinfo() noex { } ;
 	int get(char *,int,int) noex ;
 	int operator () (char *,int,int) noex ;

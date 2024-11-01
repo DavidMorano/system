@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdint.h>		/* |uint64_t| */
 #include	<stdarg.h>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -128,6 +129,7 @@ struct sbuf : sbuf_head {
 	int addquoted(cchar *sp,int sl = -1) noex {
 	    return sbuf_addquoted(this,sp,sl) ;
 	} ;
+	int hexp(uint64_t,int) noex ;
 	template<typename Binary> int bin(Binary) noex ;
 	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;
@@ -204,6 +206,7 @@ extern int	sbuf_printf(sbuf *,cchar *,...) noex ;
 extern int	sbuf_vprintf(sbuf *,cchar *,va_list) noex ;
 extern int	sbuf_termconseq(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted(sbuf *,cchar *,int) noex ;
+extern int	sbuf_hexp(sbuf *,uint64_t,int) noex ;
 
 static inline int sbuf_str(sbuf *op,cchar *sp) noex {
 	return sbuf_strw(op,sp,-1) ;

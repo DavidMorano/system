@@ -1,4 +1,5 @@
 /* snclean HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* clean up a c-string of text */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

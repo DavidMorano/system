@@ -1,4 +1,5 @@
 /* calstrs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calendar strings */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 extern cchar	*calstrs_months[] ;

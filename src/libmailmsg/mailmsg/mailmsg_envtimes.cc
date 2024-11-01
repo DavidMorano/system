@@ -1,4 +1,5 @@
 /* mailmsg_envtimes SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* extract all environment times (if any) from a message */
@@ -40,6 +41,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

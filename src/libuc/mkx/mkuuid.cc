@@ -24,10 +24,10 @@
 	We create a UUID.
 
 	Synpsis:
-	int mkuuid(MKUUID *up,int ver) noex
+	int mkuuid(uuid_dat *up,int ver) noex
 
 	Arguments:
-	up		pointer to MKUUID object
+	up		pointer to uuid_dat object
 	ver		version desired
 
 	Returns:
@@ -38,6 +38,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* <- for |UINT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear| */
 #include	<mkuuid.h>
@@ -60,14 +62,14 @@ extern "C" {
 
 /* forward references */
 
-static int mkuutime(MKUUID *,uint *) noex ;
-static int mkuuclk(MKUUID *,uint *) noex ;
-static int mkuunode(MKUUID *,uint *) noex ;
+static int mkuutime(uuid_dat *,uint *) noex ;
+static int mkuuclk(uuid_dat *,uint *) noex ;
+static int mkuunode(uuid_dat *,uint *) noex ;
 
 
 /* exported subroutines */
 
-int mkuuid(MKUUID *up,int) noex {
+int mkuuid(uuid_dat *up,int) noex {
 	cint		rsize = (NWORDS * sizeof(uint)) ;
 	uint		rwords[NWORDS+1] ;
 	int		rs ;
@@ -85,7 +87,7 @@ int mkuuid(MKUUID *up,int) noex {
 
 /* local subroutines */
 
-static int mkuutime(MKUUID *up,uint *rwords) noex {
+static int mkuutime(uuid_dat *up,uint *rwords) noex {
 	uint64_t	tv = 0 ;
 	uint64_t	v ;
 	{
@@ -101,7 +103,7 @@ static int mkuutime(MKUUID *up,uint *rwords) noex {
 }
 /* end subroutine (mkuutime) */
 
-static int mkuuclk(MKUUID *up,uint *rwords) noex {
+static int mkuuclk(uuid_dat *up,uint *rwords) noex {
 	uint64_t	v ;
 	{
 	    v = (rwords[2] & UINT_MAX) ;
@@ -112,7 +114,7 @@ static int mkuuclk(MKUUID *up,uint *rwords) noex {
 }
 /* end subroutine (mkuuclk) */
 
-static int mkuunode(MKUUID *up,uint *rwords) noex {
+static int mkuunode(uuid_dat *up,uint *rwords) noex {
 	uint64_t	nv = 0 ;
 	uint64_t	v ;
 	{

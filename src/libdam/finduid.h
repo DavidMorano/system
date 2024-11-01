@@ -1,4 +1,5 @@
 /* finduid HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* find a username given a UID by various means */

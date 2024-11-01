@@ -1,4 +1,5 @@
 /* snkeyval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string formatting (key-value pair) */
@@ -43,9 +44,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"snx.h"
 

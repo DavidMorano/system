@@ -1,4 +1,5 @@
 /* mailmsg_envget SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* MAILMSG get-envelope */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mailmsg
+
+	Description:
 	This subroutine gets information about a MAILMSG envelope.
 
 *******************************************************************************/

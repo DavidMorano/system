@@ -1,4 +1,5 @@
 /* mailbox_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* mailbox handling object */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	nailbox
+
+	Description:
 	This is a *simple* mailbox object.  It reads a mailbox-formatted
 	file and allows some simple manipulations of it.
 
@@ -36,6 +41,7 @@
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
