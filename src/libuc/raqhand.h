@@ -1,4 +1,5 @@
 /* raqhand HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Random-Access Queue Handler */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	RAQHAND_DEFENTS	10

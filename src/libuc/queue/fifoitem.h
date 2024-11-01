@@ -1,4 +1,5 @@
 /* fifoitem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* FIFO container object */
@@ -9,6 +10,14 @@
 
 #ifndef	FIFOITEM_INCLUDE
 #define	FIFOITEM_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	FIFOITEM_MAGIC	0x12345678

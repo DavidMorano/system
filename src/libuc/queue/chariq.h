@@ -1,4 +1,5 @@
 /* chariq HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Character-Interlocked Queue */
@@ -25,6 +26,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<charq.h>
 #include	<ptm.h>

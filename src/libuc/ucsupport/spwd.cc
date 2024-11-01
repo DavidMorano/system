@@ -1,4 +1,5 @@
 /* spwd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */
@@ -19,9 +20,12 @@
 
 /*******************************************************************************
 
+  	Group:
+	sqwd
+
+	Description:
 	I define some subroutines that are missing from some systems, who will
 	remain nameless for now (Apple Darwin).
-
 
 *******************************************************************************/
 
@@ -29,6 +33,8 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>

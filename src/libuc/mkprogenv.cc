@@ -1,4 +1,5 @@
 /* mkprogenv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make program environment */
@@ -78,6 +79,7 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>

@@ -1,4 +1,5 @@
 /* cq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* container Q */
@@ -24,6 +25,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<vechand.h>
 

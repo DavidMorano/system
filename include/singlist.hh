@@ -1,4 +1,5 @@
 /* singlist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* regular (no-frills) singly-linked pointer queue (not-circular) */
@@ -15,6 +16,9 @@
 /* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Object:
+	singlist
 
 	This is a container object (elements are stored within it).
 	This also is implemented as a single-linked list of nodes.
@@ -41,6 +45,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
 #include	<usystem.h>

@@ -1,4 +1,5 @@
 /* pq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++23 */
 
 /* a regular (no-frills) pointer queue */
@@ -26,9 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 #include	"pq.h"
