@@ -328,7 +328,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -480,7 +480,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -801,11 +801,11 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
-	    MKUUID	uuid ;
+	    uuid_dat	uuid ;
 
 	    if ((rs = mkuuid(&uuid,0)) >= 0) {
-		const int	rlen = MAXNAMELEN ;
-		char		rbuf[MAXNAMELEN+1] ;
+		cint	rlen = MAXNAMELEN ;
+		char	rbuf[MAXNAMELEN+1] ;
 		if ((rs = snmkuuid(rbuf,rlen,&uuid)) >= 0) {
 		    rs = shio_print(ofp,rbuf,rs) ;
 		} /* end if (snmkuuid) */

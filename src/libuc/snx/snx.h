@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* types (see below) */
+#include	<sys/types.h>		/* system types (see below) */
+#include        <pthread.h>		/* |pthread_t| */
 #include	<stdarg.h>		/* |va_list| */
 #include	<clanguage.h>
 #include	<utypedefs.h>

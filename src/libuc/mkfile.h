@@ -1,4 +1,5 @@
 /* mkfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a file of a certain type */
@@ -25,6 +26,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+
+#include	<mktmp.h>
 
 
 EXTERNC_begin

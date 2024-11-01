@@ -424,9 +424,6 @@ dirseen.o:		dirseen.c dirseen.h
 paramfile.o:		paramfile.c paramfile.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 
-envhelp.o:		envhelp.c envhelp.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
 mkprogenv.o:		mkprogenv.c mkprogenv.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 

@@ -1,4 +1,5 @@
 /* ucgetpid SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -8,7 +9,7 @@
 
 /* revision history:
 
-	= 2000-05-14, David A-D-­ Morano
+	= 2000-05-14, David A-D- Morano
 	Originally written for Rightcore Network Services.
 
 */
@@ -44,7 +45,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>

@@ -1,4 +1,5 @@
 /* envhelp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* help w/ environment */
@@ -49,7 +50,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
@@ -92,7 +93,7 @@ template<typename ... Args>
 static int envhelp_ctor(envhelp *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((op->elp = new(nothrow) vechand) != np) {
 	        if ((op->spp = new(nothrow) strpack) != np) {
@@ -147,8 +148,8 @@ int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
 	int		rs ;
 	if (envv == nullptr) envv = environ ;
 	if ((rs = envhelp_ctor(op)) >= 0) {
-	    cint	ne = NENVS ;
-	    if ((rs = vechand_start(op->elp,ne,vo)) >= 0) {
+	    cint	vn = NENVS ;
+	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) {
 	        cint	size = DEFENVSTORESIZE ;
 	        if ((rs = strpack_start(op->spp,size)) >= 0) {
 		    if (envv != nullptr) {
@@ -258,6 +259,15 @@ int envhelp_sort(envhelp *op) noex {
 }
 /* end subroutine (envhelp_sort) */
 
+int envhelp_count(envhelp *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = vechand_count(op->elp) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envhelp_count) */
+
 int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
@@ -320,5 +330,46 @@ static int vechand_addover(vechand *elp,cchar *ep) noex {
 	return rs ;
 }
 /* end subroutine (vechand_addover) */
+
+int envhelp::start(mainv argv,mainv envv) noex {
+	return envhelp_start(this,argv,envv) ;
+}
+
+int envhelp::present(cchar *kp,int kl,cchar **rpp) noex {
+	return envhelp_present(this,kp,kl,rpp) ;
+}
+
+int envhelp::envset(cchar *kp,cchar *vp,int vl) noex {
+    	return envhelp_envset(this,kp,vp,vl) ;
+}
+
+int envhelp::getvec(mainv *rp) noex {
+	return envhelp_getvec(this,rp) ;
+}
+
+void envhelp::dtor() noex {
+	if (cint rs = int(finish) ; rs < 0) {
+	    ulogerror("envhelp",rs,"fini-finish") ;
+	}
+}
+
+envhelp_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case envhelpmem_sort:
+	        rs = envhelp_sort(op) ;
+	        break ;
+	    case envhelpmem_count:
+	        rs = envhelp_count(op) ;
+	        break ;
+	    case envhelpmem_finish:
+	        rs = envhelp_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (envhelp_co::operator) */
 
 

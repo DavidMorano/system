@@ -77,8 +77,7 @@ int mkpathrooted(char *rbuf,cchar *fn) noex {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
 	        if (fn[0] != '/') {
-	            char	*pbuf{} ;
-	            if ((rs = libmalloc_mp(&pbuf)) >= 0) {
+	            if (char *pbuf{} ; (rs = libmalloc_mp(&pbuf)) >= 0) {
 	                cint	plen = rs ;
 	                if ((rs = getpwd(pbuf,plen)) >= 0) {
 	                    rs = mkpath(rbuf,pbuf,fn) ;

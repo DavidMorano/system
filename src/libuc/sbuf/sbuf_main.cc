@@ -623,6 +623,10 @@ void sbuf::dtor() noex {
 }
 /* end subroutine (sbuf::dtor) */
 
+int sbuf::hexp(uint64_t v,int n) noex {
+    	return sbuf_hexp(this,v,n) ;
+}
+
 
 /* private subroutines */
 

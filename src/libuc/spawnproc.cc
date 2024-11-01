@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_ISAEXEC	0		/* use Solaris® |isaexec(3c)| */
-#define	CF_ENVSORT	0		/* sort the environment? */
 
 /* revision history:
 
@@ -24,6 +23,8 @@
 
 	Description:
 	Spawn a process while specifying some options for its start-up.
+	This is a cheapy version of this kind of capability as compared
+	with other functions of this sort.
 
 	Synopsis:
 	int spawnproc(SP *psap,cchar *fname,cchar **argv,cchar **envv) noex
@@ -99,9 +100,9 @@
 #endif
 
 #if	(defined(CF_ISAEXEC) && CF_ISAEXEC) && F_SUNOS
-#define	F_ISAECEX	1
+#define	F_ISAEXEC	1
 #else
-#define	F_ISAECEX	0
+#define	F_ISAEXEC	0
 #endif
 
 
@@ -111,6 +112,7 @@
 /* local typedefs */
 
 typedef spawnproc_con	scon ;
+typedef mainv		mv ;
 
 
 /* external subroutines */
@@ -128,9 +130,12 @@ extern "C" {
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxpathlen ;
-} ;
+	int mkvars() noex ;
+    } ;
+}
 
 
 /* forward reference */
@@ -148,7 +153,6 @@ static int	findxfile(ids *,char *,cchar *) noex ;
 static int	ourfork() noex ;
 static int	opendevnull(int *,int) noex ;
 
-static int	mkvars() noex ;
 
 
 /* local variables */
@@ -163,7 +167,7 @@ constexpr cpcchar	envbads[] = {
 	nullptr
 } ;
 
-constexpr cint	sigigns[] = {
+constexpr cint		sigigns[] = {
 	SIGTERM,
 	SIGINT,
 	SIGHUP,
@@ -173,7 +177,7 @@ constexpr cint	sigigns[] = {
 	0
 } ;
 
-constexpr cint	sigdefs[] = {
+constexpr cint		sigdefs[] = {
 	SIGQUIT,
 	SIGTERM,
 	SIGINT,
@@ -181,7 +185,7 @@ constexpr cint	sigdefs[] = {
 	0
 } ;
 
-constexpr cint	sigouts[] = {
+constexpr cint		sigouts[] = {
 	SIGTTOU,
 	0
 } ;
@@ -190,7 +194,7 @@ static vars		var ;
 
 constexpr cchar		nullfname[] = NULLFNAME ;
 
-constexpr bool		f_isaexec = F_ISAEXEC
+constexpr bool		f_isaexec = F_ISAEXEC ;
 
 
 /* exported variables */
@@ -198,44 +202,57 @@ constexpr bool		f_isaexec = F_ISAEXEC
 
 /* exported subroutines */
 
-int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
-	static cint	rsv = mkvars() ;
-	int		rs = SR_OK ;
+static int spawnprocer(scon *psap,cc *fname,mv argv,mv envv) noex {
+    	cint		maxpath = var.maxpathlen ;
+    	cint		sz = ((var.maxpathlen + 1) * 2) ;
+    	int		rs = SR_OK ;
 	int		rs1 ;
+	int		ai = 0 ;
 	int		pid = 0 ;
 	cchar		*efname = fname ;
-	char		pwd[MAXPATHLEN + 1] = { 0 } ;
-	char		pbuf[MAXPATHLEN + 1] ;
-
-	if (psap == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-	if (fname[0] == '\0') return SR_INVALID ;
-
-
-	if ((rs = rsv) >= 0) {
-	if (fname[0] != '/') {
-	    if ((rs = findprog(pwd,pbuf,fname)) > 0) {
-	        efname = pbuf ;
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    char	*pwd = (a + ((maxpath + 1) * ai++)) ;
+	    char	*pbuf = (a + ((maxpath + 1) * ai++)) ;
+	    pwd[0] = '\0' ;
+	    if (fname[0] != '/') {
+	        if ((rs = findprog(pwd,pbuf,fname)) > 0) {
+	            efname = pbuf ;
+	        }
+	    } else {
+	        rs = perm(fname,-1,-1,nullptr,X_OK) ;
 	    }
-	} else {
-	    rs = perm(fname,-1,-1,nullptr,X_OK) ;
-	}
-	if (rs >= 0) {
-	    envhelp	e, *ehp = &e ;
-	    if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
-	        if ((rs = envhelp_load(ehp,pwd,efname,argv)) >= 0) {
-	            mainv	ev{} ;
-	            if ((rs = envhelp_getvec(ehp,&ev)) >= 0) {
-	                rs = spawnproc_pipes(psap,efname,argv,ev) ;
-	                pid = rs ;
-	            }
-	        } /* end if (envhelp_load) */
-	        rs1 = envhelp_finish(ehp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (envhelp_start) */
-	} /* end if (ok) */
-	} /* end if (mkvars) */
+	    if (rs >= 0) {
+	        envhelp		e, *ehp = &e ;
+	        if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
+	            if ((rs = envhelp_load(ehp,pwd,efname,argv)) >= 0) {
+	                if (mainv ev{} ; (rs = envhelp_getvec(ehp,&ev)) >= 0) {
+	                    rs = spawnproc_pipes(psap,efname,argv,ev) ;
+	                    pid = rs ;
+	                }
+	            } /* end if (envhelp_load) */
+	            rs1 = envhelp_finish(ehp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (envhelp_start) */
+	    } /* end if (ok) */
+	    rs = rsfree(rs,a) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? pid : rs ;
+}
+/* end subroutine (spawnprocer) */
 
+int spawnproc(scon *psap,cchar *fname,mainv argv,mainv envv) noex {
+	int		rs = SR_FAULT ;
+	int		pid = 0 ;
+	if (psap && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		static cint	rsv = var.mkvars() ;
+		if ((rs = rsv) >= 0) {
+		    rs = spawnprocer(psap,fname,argv,envv) ;
+		    pid = rs ;
+		} /* end if (mkvars) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? pid : rs ;
 }
 /* end subroutine (spawnproc) */
@@ -243,9 +260,9 @@ int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 
 /* local subroutines */
 
-static int spawnproc_pipes(scon *psap,cchar *fname,
-		mainv argv,mainv ev) noex {
+static int spawnproc_pipes(scon *psap,cc *fname,mainv argv,mainv ev) noex {
 	int		rs ;
+	int		rs1 ;
 	int		pid = 0 ;
 	int		con[2] ;
 	int		dupes[3] ;
@@ -308,7 +325,8 @@ static int spawnproc_pipes(scon *psap,cchar *fname,
 	        } /* end if (error) */
 
 	    } /* end if uc_closeonexec) */
-	    u_close(pfd) ; /* parent-file-descriptor */
+	    rs1 = u_close(pfd) ; /* parent-file-descriptor */
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (uc_pipes) */
 
 	return (rs >= 0) ? pid : rs ;
@@ -429,7 +447,7 @@ static void spawnproc_child(scon *psap,cchar *fname,
 	} /* end if (disposition) */
 	av = argv ;
 	if ((rs >= 0) && (argv == nullptr)) {
-	    if (cchar	*cp ; sfbasename(fname,-1,&cp) > 0) {
+	    if (cchar *cp{} ; sfbasename(fname,-1,&cp) > 0) {
 	        arg[0] = cp ;
 	        arg[1] = nullptr ;
 	        av = arg ;
@@ -457,61 +475,102 @@ static void spawnproc_child(scon *psap,cchar *fname,
 }
 /* end subroutine (spawnproc_child) */
 
-static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,
-		mainv argv) noex {
+namespace {
+    struct envloader ;
+    typedef int (envloader::*envloader_m)() noex ;
+    struct envloader {
+	envhelp		*ehp ;
+	char		*pwd ;
+	cchar		*efname ;
+	mainv		argv ;
 	cint		rsn = SR_NOTFOUND ;
+	envloader(envhelp *p,char *cwd,cc *efn,mainv av) noex : ehp(p) {
+	    pwd = cwd ;
+	    efname = efn ;
+	    argv = av ;
+	} ; /* end ctor */
+	int envfname() noex ;
+	int envpwd() noex ;
+	int envpath() noex ;
+    } ; /* end struct (envloader) */
+}
+
+constexpr envloader_m	envloadermems[] = {
+    	&envloader::envfname,
+    	&envloader::envpwd,
+    	&envloader::envpath
+} ;
+
+static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
+    	envloader	eo(ehp,pwd,efname,argv) ;
+	int		rs{} ;
+	for (const auto m : envloadermems) {
+	    rs = (eo.*m)() ;
+	    if (rs < 0) break ;
+	} /* end for */
+	return rs ;
+}
+/* end subroutine (envhelp_load) */
+
+int envloader::envfname() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = envhelp_envset(ehp,"_EF",efname,-1)) >= 0) {
 	    int		al = -1 ;
 	    cchar	*ap = nullptr ;
-	    if (argv != nullptr) ap = argv[0] ;
+	    if (argv) ap = argv[0] ;
 	    if (ap == nullptr) al = sfbasename(efname,-1,&ap) ;
 	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
 		cint	sulen = (strlen(efname)+22) ;
-		char		*subuf ;
-		if ((rs = uc_malloc((sulen+1),&subuf)) >= 0) {
-	    	    const pid_t		pid = uc_getpid() ;
-	    	    if ((rs = snshellunder(subuf,sulen,pid,efname)) > 0) {
-	       		rs = envhelp_envset(ehp,"_",subuf,rs) ;
-	    	    }
-	    	    uc_free(subuf) ;
+		if (char *subuf{} ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
+	    	    if ((rs = uc_getpid()) >= 0) {
+	    	        if ((rs = snshellunder(subuf,sulen,rs,efname)) > 0) {
+	       		    rs = envhelp_envset(ehp,"_",subuf,rs) ;
+	    	        }
+		    } /* end if (uc_getpid) */
+	    	    rs1 = uc_free(subuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (envhelp_envset) */
 	} /* end if (envhelp_envset) */
-
-	if (rs >= 0) {
-	    static cchar	*var = varname.pwd ;
-	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
-	        int	pwdl = -1 ;
-	        rs = SR_OK ;
-	        if (pwd[0] == '\0') {
-	            rs = getpwd(pwd,MAXPATHLEN) ;
-	            pwdl = rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = envhelp_envset(ehp,var,pwd,pwdl) ;
-	        }
-	    }
-	} /* end if (ok) */
-
-	if (rs >= 0) {
-	    cchar	*var = varname.path ;
-	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
-	        cint	plen = (2 * var.maxpathlen) ;
-	        if (char *pbuf{} ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
-		    cint	cs = _CS_PATH ;
-	            if ((rs = uc_sysconfstr(pbuf,plen,cs)) >= 0) {
-	                rs = envhelp_envset(ehp,var,pbuf,rs) ;
-	            } /* end if */
-	            rs = rsfree(rs,pbuf) ;
-	        } /* end if (m-a-f) */
-	    } /* end if (envhelp_present) */
-	} /* end if (ok) */
-
 	return rs ;
 }
-/* end subroutine (envhelp_load) */
+/* end method (envloader::envfname) */
+
+int envloader::envpwd() noex {
+	int		rs ;
+	cchar		*vn = varname.pwd ;
+	if ((rs = envhelp_present(ehp,vn,-1,nullptr)) == rsn) {
+	    int		pwdl = -1 ;
+	    rs = SR_OK ;
+	    if (pwd[0] == '\0') {
+	        rs = getpwd(pwd,var.maxpathlen) ;
+	        pwdl = rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = envhelp_envset(ehp,vn,pwd,pwdl) ;
+	    }
+	} /* end if (envhelp_present) */
+	return rs ;
+} 
+/* end method (envloader::envpwd) */
+
+int envloader::envpath() noex {
+	int		rs ;
+	cchar	*vn = varname.path ;
+	if ((rs = envhelp_present(ehp,vn,-1,nullptr)) == rsn) {
+	    cint	plen = (2 * var.maxpathlen) ;
+	    if (char *pbuf{} ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
+		cint	cmd = _CS_PATH ;
+	        if ((rs = uc_sysconfstr(pbuf,plen,cmd)) >= 0) {
+	            rs = envhelp_envset(ehp,vn,pbuf,rs) ;
+	        } /* end if */
+	        rs = rsfree(rs,pbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (envhelp_present) */
+	return rs ;
+}
+/* end method (envloader::envpath) */
 
 static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	int		rs ;
@@ -595,13 +654,13 @@ static int opendevnull(int *opens,int i) noex {
 }
 /* end subroutine (opendevnull) */
 
-static int mkvars() noex {
+int vars::mkvars() noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end subroutine (vars::mkvars) */
 
 

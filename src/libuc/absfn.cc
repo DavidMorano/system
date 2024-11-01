@@ -1,4 +1,5 @@
 /* absfn SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create an absolute file-name */
@@ -27,6 +28,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>

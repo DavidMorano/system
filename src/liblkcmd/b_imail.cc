@@ -191,12 +191,11 @@
 
 /* local types */
 
-typedef	int	(*vrecipsch_t)(const void **,const void **) ;
+typedef	int	(*vrecipsch_t)(cvoid **,cvoid **) ;
 
 
 /* external subroutines */
 
-extern int	snmkuuid(char *,int,MKUUID *) ;
 extern int	snsds(char *,int,cchar *,cchar *) ;
 extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy2(char *,int,cchar *,cchar *) ;
@@ -255,7 +254,7 @@ extern int	isfnamespecial(cchar *,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	hasMeAlone(cchar *,int) ;
-extern int	isOneOf(const int *,int) ;
+extern int	isOneOf(cint *,int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
@@ -274,7 +273,7 @@ extern int	proglogout(PROGINFO *,cchar *,cchar *) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
@@ -308,7 +307,7 @@ struct msgopts {
 	uint		mkbcc:1 ;
 	uint		mkcrnl:1 ;
 	uint		mksubj:1 ;
-	uint		mkxuuid:1 ;	/* xUUID */
+	uint		mkxuuid:1 ;	/* UUID */
 	uint		mkxnote:1 ;	/* Apple-Note */
 	uint		mkxmcdate:1 ;	/* created-date (yes, what a crock!) */
 	uint		reqsubj:1 ;
@@ -371,7 +370,7 @@ enum msgloghdrs {
 } ;
 
 /* indexes for getting header-key names */
-static const int	msgloghi[] = {
+static cint	msgloghi[] = {
 	HI_MESSAGEID,
 	HI_FROM,
 	HI_SENDER,
@@ -507,8 +506,8 @@ struct locinfo {
 	PARAMOPT	hdradds ;
 	GRMEMS		gm ;
 	SYSREALNAME	rn ;
-	MKUUID		uuid ;
-	PCSNS		ns ;
+	uuid_dat	uuid ;
+	pcsns		ns ;
 	pthread_t	tid ;
 	time_t		msgtime ;
 	uid_t		uid_pr ;
@@ -624,7 +623,7 @@ static int procprinthdr_mailnote(PROGINFO *,filer *,cchar *,cchar *,int) ;
 static int	procprinthdr_emaone(PROGINFO *,filer *,cchar *,EMA_ENT *) ;
 #endif
 
-static int	procreciploads(PROGINFO *,vechand *,int,const int *) ;
+static int	procreciploads(PROGINFO *,vechand *,int,cint *) ;
 static int	procrecipload(PROGINFO *,vechand *,MSGDATA *,int) ;
 static int	procreciploademas(PROGINFO *,vechand *,EMA *) ;
 static int	procreciploadema(PROGINFO *,vechand *,EMA_ENT *) ;
@@ -770,7 +769,7 @@ static int	loadpathcomp(PROGINFO *,cchar *,int) ;
 static int	loadpathcs(PROGINFO *) ;
 #endif /* CF_CSPATH */
 
-static int	vrecipsch(const void **,const void **) ;
+static int	vrecipsch(cvoid **,cvoid **) ;
 static int	ishigh(int) ;
 static int	hasMailNote(cchar *,int,cchar *) ;
 static int	isBadDate(int) ;
@@ -1042,7 +1041,7 @@ static const char	*chewhdrs[] = {
 } ;
 
 /* these are mail-msg-header indexes that should be singlets only */
-static const int	msghdrsingles[] = {
+static cint	msghdrsingles[] = {
 	HI_CTYPE,
 	HI_CENCODING,
 	-1
@@ -1095,13 +1094,13 @@ static cchar		*userboxes[] = {
 	NULL
 } ;
 
-static const int	rsdatebad[] = {
+static cint	rsdatebad[] = {
 	SR_DOM,
 	SR_INVALID,
 	0
 } ;
 
-static const int	rshup[] = {
+static cint	rshup[] = {
 	SR_HANGUP,
 	SR_OK,
 	SR_NOTCONN,
@@ -1251,7 +1250,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1587,7 +1586,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1658,7 +1657,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                if (argp[0] == '+') {
 	                                    lip->f.def_from = TRUE ;
 	                                } else if (argp[0] != '-') {
-	                                    const int	al = argl ;
+	                                    cint	al = argl ;
 	                                    cchar	*ap = argp ;
 	                                    rs = locinfo_hdrfrom(lip,ap,al) ;
 	                                }
@@ -2105,7 +2104,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -2533,7 +2532,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -2578,14 +2577,14 @@ static int procmklogid(PROGINFO *pip)
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
 	            LOCINFO	*lip = pip->lip ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            lip->kserial = rs ;
 	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
-	                const int	s = lip->kserial ;
+	                cint	slen = LOGIDLEN ;
+	                cint	s = lip->kserial ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -2603,7 +2602,7 @@ static int procmklogid(PROGINFO *pip)
 static int procourconf_begin(PROGINFO *pip,cchar *cfname)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	size = sizeof(CONFIG) ;
+	cint	size = sizeof(CONFIG) ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
 	void		*p ;
@@ -2761,7 +2760,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -2853,7 +2852,7 @@ static int procspec(PROGINFO *pip,cchar np[],int nl)
 	if ((rs = uc_malloc(size,&bestaddr)) >= 0) {
 
 	    if ((rs = mkbestaddr(bestaddr,nl,np,nl)) >= 0) {
-	        const int	bal = rs ;
+	        cint	bal = rs ;
 	        if ((bal > 1) && (strnpbrk(bestaddr,bal,"@!") != NULL)) {
 	            rs = locinfo_loadrecip(lip,bestaddr,bal) ;
 	            c += rs ;
@@ -2902,7 +2901,7 @@ static int procloadname(PROGINFO *pip,cchar np[],int nl)
 	    rs = locinfo_loadrecip(lip,np,nl) ;
 	    c += rs ;
 	} else {
-	    const int	nch = MKCHAR(np[0]) ;
+	    cint	nch = MKCHAR(np[0]) ;
 	    cchar	*tp ;
 	    if ((tp = strnchr(np,nl,'+')) != NULL) {
 	        nl = (tp-np) ;
@@ -2911,7 +2910,7 @@ static int procloadname(PROGINFO *pip,cchar np[],int nl)
 	        LOCINFO_RNCUR	rnc ;
 	        if ((rs = locinfo_rncurbegin(lip,&rnc)) >= 0) {
 	            if ((rs = locinfo_rnlook(lip,&rnc,np,nl)) > 0) {
-	                const int	ul = USERNAMELEN ;
+	                cint	ul = USERNAMELEN ;
 	                char		ub[USERNAMELEN+1] ;
 	                while ((rs = locinfo_rnread(lip,&rnc,ub,ul)) > 0) {
 	                    rs = locinfo_loadrecip(lip,ub,rs) ;
@@ -2969,7 +2968,7 @@ static int procall(PROGINFO *pip)
 	if (lip->f.all && lip->f.allok) {
 	    SYSUSERNAMES	uns ;
 	    if ((rs = sysusernames_open(&uns,NULL)) >= 0) {
-	        const int	unlen = USERNAMELEN ;
+	        cint	unlen = USERNAMELEN ;
 	        char		unbuf[USERNAMELEN+1] ;
 	        while ((rs = sysusernames_readent(&uns,unbuf,unlen)) > 0) {
 	            rs = locinfo_loadrecip(lip,unbuf,rs) ;
@@ -3004,7 +3003,7 @@ static int processin(PROGINFO *pip,cchar *ifname)
 	}
 
 	if ((rs = mailfile_open(&mf,pip,ifname)) >= 0) {
-	    const int	mfd = rs ;
+	    cint	mfd = rs ;
 	    int		opts = 0 ;
 
 #if	CF_PROCMSGSTAGE
@@ -3197,7 +3196,7 @@ static int procdeliver(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	MSGOPTS		opts ;
-	const int	of = (O_CREAT | O_RDWR) ;
+	cint	of = (O_CREAT | O_RDWR) ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*pre = "mbtmp" ;
@@ -3220,8 +3219,8 @@ static int procdeliver(PROGINFO *pip)
 	opts.reqsubj = lip->f.reqsubj ;
 
 	if ((rs = locinfo_opentmpfile(lip,tbuf,of,pre)) >= 0) {
-	    const int	nmsgs = lip->nmsgs ;
-	    const int	sfd = rs ;
+	    cint	nmsgs = lip->nmsgs ;
+	    cint	sfd = rs ;
 	    int		mi ;
 
 #if	CF_DEBUG
@@ -3302,12 +3301,12 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 	        MSGDATA		*mdp ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	            if ((rs = msgdata_getsubject(mdp,NULL)) >= 0) {
-	                const int	f_subj = rs ;
+	                cint	f_subj = rs ;
 	                cchar		*pn = pip->progname ;
 	                cchar		*fmt ;
 	                if (f_subj || (! lip->f.reqsubj)) {
 	                    if ((rs = procdelivermsg(pip,mi,sfd,optp)) >= 0) {
-	                        const int	nr = rs ;
+	                        cint	nr = rs ;
 	                        if ((rs = msgdata_setnrecips(mdp,nr)) >= 0) {
 	                            if ((nr == 0) && (! pip->f.quiet)) {
 	                                fmt = "%s: msg=%u has no recipients\n" ;
@@ -3349,7 +3348,7 @@ static int procdelivermsg(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	vechand		aa ;
-	const int	atypes[] = { msgloghdr_to, msgloghdr_cc, -1 } ;
+	cint	atypes[] = { msgloghdr_to, msgloghdr_cc, -1 } ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -3425,14 +3424,14 @@ vechand		*tlp ;
 	int		c = 0 ;
 
 	if ((rs = vechand_start(llp,4,0)) >= 0) {
-	    const int	mpargs = lip->maxpostargs ;
-	    const int	nbargs = 3 ; /* number of base-arguments */
+	    cint	mpargs = lip->maxpostargs ;
+	    cint	nbargs = 3 ; /* number of base-arguments */
 	    int		size ;
 	    cchar	**args = NULL ;
 
 	    size = (1 + nbargs + mpargs + 1) * sizeof(cchar *) ;
 	    if ((rs = uc_malloc(size,&args)) >= 0) {
-	        const int	n = vechand_count(tlp) ;
+	        cint	n = vechand_count(tlp) ;
 	        int		i = 0 ;
 	        int		ai = 0 ;
 	        int		f = lip->f.usingsendmail ;
@@ -3497,7 +3496,7 @@ vechand		*tlp ;
 {
 	LOCINFO		*lip = pip->lip ;
 	vechand		baddrs, *blp = &baddrs ;
-	const int	nbargs = 3 ; /* number of base-arguments */
+	cint	nbargs = 3 ; /* number of base-arguments */
 	int		rs ;
 	int		rs1 ;
 	int		atypes[] = { msgloghdr_bcc, -1 } ;
@@ -3518,7 +3517,7 @@ vechand		*tlp ;
 
 	if ((rs = vechand_start(blp,1,0)) >= 0) {
 	    vechand	loglist, *llp = &loglist ;
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	rsn = SR_NOTFOUND ;
 	    int		size ;
 	    int		ai ;
 	    int		i ;
@@ -3680,16 +3679,16 @@ vechand		*llp ;
 #endif
 
 	if ((rs = u_rewind(sfd)) >= 0) {
-	    const int	of = (O_CREAT | O_RDWR) ;
+	    cint	of = (O_CREAT | O_RDWR) ;
 	    char	tfname[MAXPATHLEN + 1] = { 0 } ;
 
 	    if ((rs = locinfo_opentmpfile(lip,tfname,of,"tf")) >= 0) {
 	        MSGDATA		*mdp ;
-	        const int	tfd = rs ;
+	        cint	tfd = rs ;
 
 	        u_unlink(tfname) ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
-	            const int	hlen = mdp->hlen ;
+	            cint	hlen = mdp->hlen ;
 	            if ((rs = procmsgfilebcc(pip,tfd,sfd,hlen,ap)) >= 0) {
 	                wlen += rs ;
 	                u_rewind(tfd) ;
@@ -3736,16 +3735,16 @@ VECHAND		*llp ;
 #endif /* CF_DEBUG */
 
 	if ((n > 0) && ((rs = u_rewind(sfd)) >= 0)) {
-	    const int	of = (O_WRONLY | O_CREAT) ;
+	    cint	of = (O_WRONLY | O_CREAT) ;
 	    cchar	*progfname = lip->mailprogfname ;
 	    char	ofname[MAXPATHLEN+1] = { 0 } ;
 	    if ((rs = locinfo_opentmpfile(lip,ofname,of,"of")) >= 0) {
-	        const int	ofd = rs ;
+	        cint	ofd = rs ;
 	        char		efname[MAXPATHLEN+1] = { 0 } ;
 
 	        if ((rs = locinfo_opentmpfile(lip,efname,of,"ef")) >= 0) {
 	            SPAWNPROC	ps ;
-	            const int	efd = rs ;
+	            cint	efd = rs ;
 	            cchar	**envv = pip->envv ;
 
 #if	CF_DEBUG
@@ -3896,7 +3895,7 @@ static int procwaitbad(PROGINFO *pip,pid_t pid,int rrs)
 static int procsave(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	to = -1 ;
+	cint	to = -1 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -3914,11 +3913,11 @@ static int procsave(PROGINFO *pip)
 	            char	template[MAXPATHLEN + 1] ;
 	            if ((rs = mkpath2(template,pip->tmpdname,x)) >= 0) {
 	                const mode_t	om = 0660 ;
-	                const int	of = O_RDWR ;
+	                cint	of = O_RDWR ;
 	                char		tbuf[MAXPATHLEN + 1] ;
 	                if ((rs = opentmpfile(template,of,om,tbuf)) >= 0) {
 	                    MSGOPTS	mo ;
-	                    const int	sfd = rs ;
+	                    cint	sfd = rs ;
 
 	                    uc_unlink(tbuf) ;
 
@@ -3988,7 +3987,7 @@ static int procdisposefile(PROGINFO *pip,char *mbuf,int to,MSGOPTS *mop)
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = opentmp(NULL,0,0)) >= 0) {
-	    const int	sfd = rs ;
+	    cint	sfd = rs ;
 	    if ((rs = procextract(pip,sfd,mop)) > 0) {
 	        wlen = rs ;
 	        if ((rs = u_rewind(sfd)) >= 0) {
@@ -4038,9 +4037,9 @@ static int procextracter(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *mop)
 	int		wlen = 0 ;
 	if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	    if ((rs = msgdata_getsubject(mdp,NULL)) >= 0) {
-	        const int	f_subj = rs ;
+	        cint	f_subj = rs ;
 	        if ((rs = msgdata_getnrecips(mdp)) >= 0) {
-	            const int	nr = rs ;
+	            cint	nr = rs ;
 	            if (mop->nosubj || mop->norecip) {
 	                int	f = FALSE ;
 	                f = f || ((! f_subj) && mop->nosubj) ;
@@ -4511,7 +4510,7 @@ static int procmsgbody(PROGINFO *pip,filer *fbp,int mi)
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
 	off_t	boff = 0 ;
-	const int	xlen = 0x10000 ;
+	cint	xlen = 0x10000 ;
 	int		rs = SR_OK ;
 	int		bl ;
 	int		mlen ;
@@ -4586,7 +4585,7 @@ static int procmsghdr_mid(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 
 	if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	    MAILMSGSTAGE	*msp = &lip->ms ;
-	    const int		ilen = MAILADDRLEN ;
+	    cint		ilen = MAILADDRLEN ;
 	    int			sl ;
 	    cchar		*sp ;
 	    char		ibuf[MAILADDRLEN+1] = { 0 } ;
@@ -4764,7 +4763,7 @@ static int procmsghdr_all(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 
 	    if (matcasestr(skiphdrs,kp,kl) < 0) {
 	        if ((rs = nulstr_start(&ns,kp,kl,&kn)) >= 0) {
-	            const int	f_nz = (matcasestr(chewhdrs,kp,kl) >= 0) ;
+	            cint	f_nz = (matcasestr(chewhdrs,kp,kl) >= 0) ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
@@ -4811,7 +4810,7 @@ static int procmsghdr_clines(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 	        f = f || (mflags & MAILMSGSTAGE_MCPLAIN) ;
 	        if (f) {
 	            if ((v = mailmsgstage_clines(msp,mi)) >= 0) {
-	                const int	diglen = DIGBUFLEN ;
+	                cint	diglen = DIGBUFLEN ;
 	                char		digbuf[DIGBUFLEN + 1] ;
 	                hp = digbuf ;
 	                if ((rs = ctdeci(digbuf,diglen,v)) >= 0) {
@@ -4837,7 +4836,7 @@ static int procmsghdr_clen(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 
 	if (optp->mkclen) {
 	    MAILMSGSTAGE	*msp = &lip->ms ;
-	    const int		diglen = DIGBUFLEN ;
+	    cint		diglen = DIGBUFLEN ;
 	    int			v ;
 	    char		digbuf[DIGBUFLEN + 1] ;
 
@@ -5008,7 +5007,7 @@ static int procmsghdr_sender(PROGINFO *pip,filer *ofp,int mi,MSGOPTS *mop)
 	    } else if (rs == 0) {
 	        if (lip->f.addsender && (! mdp->f.disallowsender)) {
 	            if ((rs = locinfo_mkhdrsender(lip)) >= 0) {
-	                const int	hl = rs ;
+	                cint	hl = rs ;
 	                cchar		*kn = HN_SENDER ;
 	                cchar		*hp = lip->hdraddr_sender ;
 	                if (hp != NULL) {
@@ -5081,7 +5080,7 @@ static int procmsghdr_vsenders(PROGINFO *pip,filer *ofp,MSGDATA *mdp,
 	    EMA_ENT	*ep ;
 	    if ((rs = ema_count(slp)) > 0) {
 	        OUTEMA		ld ;
-	        const int	msgcols = lip->msgcols ;
+	        cint	msgcols = lip->msgcols ;
 	        if ((rs = outema_start(&ld,ofp,msgcols)) >= 0) {
 	            cchar	*kn = HN_SENDER ;
 	            if ((rs = outema_hdrkey(&ld,kn)) >= 0) {
@@ -5139,7 +5138,7 @@ static int procmsghdr_from(PROGINFO *pip,filer *ofp,int mi,MSGOPTS *mop)
 	    if (mop->mkfrom) {
 	        if ((rs = locinfo_mkhdrfrom(lip)) > 0) {
 	            EMA		*elp = &lip->hdrfroms ;
-	            const int	m = (lip->f.onefrom) ? 1 : -1 ;
+	            cint	m = (lip->f.onefrom) ? 1 : -1 ;
 	            rs = procprinthdr_ema(pip,ofp,kn,elp,m) ;
 	            wlen += rs ;
 	        }
@@ -5155,7 +5154,7 @@ static int procmsghdr_addrs(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
-	const int	hdraddridx[] = { HI_TO, HI_CC, -1 } ;
+	cint	hdraddridx[] = { HI_TO, HI_CC, -1 } ;
 	int		rs = SR_OK ;
 	int		i, hi ;
 	int		wlen = 0 ;
@@ -5200,7 +5199,7 @@ static int procmsghdr_addrsbcc(PROGINFO *pip,filer *fbp,int mi)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
-	const int	atypes[] = {
+	cint	atypes[] = {
 	            msgloghdr_to, msgloghdr_cc, msgloghdr_bcc, -1 } ;
 	int		rs ;
 	int		rs1 ;
@@ -5241,7 +5240,7 @@ static int procmsghdr_addrsbcc(PROGINFO *pip,filer *fbp,int mi)
 /* end subroutine (procmsghdr_addrsbcc) */
 
 
-static int procreciploads(PROGINFO *pip,vechand *ehp,int mi,const int *atypes)
+static int procreciploads(PROGINFO *pip,vechand *ehp,int mi,cint *atypes)
 {
 	LOCINFO		*lip = pip->lip ;
 	MSGDATA		*mdp = NULL ;
@@ -5256,7 +5255,7 @@ static int procreciploads(PROGINFO *pip,vechand *ehp,int mi,const int *atypes)
 	if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	    int	i ;
 	    for (i = 0 ; atypes[i] >= 0 ; i += 1) {
-	        const int	ai = atypes[i] ;
+	        cint	ai = atypes[i] ;
 	        rs = procrecipload(pip,ehp,mdp,ai) ;
 	        c += rs ;
 	        if (rs < 0) break ;
@@ -5331,7 +5330,7 @@ static int procreciploadema(PROGINFO *pip,vechand *ehp,EMA_ENT *ep)
 	if (ap == NULL) ap = ep->ap ;
 
 	if (ap != NULL) {
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = vechand_search(ehp,ap,vrecipsch,NULL)) == rsn) {
 	        c += 1 ;
 	        rs = vechand_add(ehp,ap) ;
@@ -5632,7 +5631,7 @@ static int procmsghdr(PROGINFO *pip,filer *fbp,int mi,cchar kn[],int f_nz)
 
 	msp = &lip->ms ;
 	if ((n = mailmsgstage_hdrcount(msp,mi,kn)) > 0) {
-	    const int	mcols = lip->msgcols ;
+	    cint	mcols = lip->msgcols ;
 	    int		ind = 0 ;
 	    int		c ;
 	    int		ln ;
@@ -5695,8 +5694,8 @@ static int procmsghdr(PROGINFO *pip,filer *fbp,int mi,cchar kn[],int f_nz)
 	                    }
 
 	                    if (rs >= 0) {
-	                        const int	in = ind ;
-	                        const int	mc = mcols ;
+	                        cint	in = ind ;
+	                        cint	mc = mcols ;
 	                        c += 1 ;
 	                        rs = procprinthdr_line(pip,fbp,mc,ln,in,cp,cl) ;
 	                        wlen += rs ;
@@ -5794,8 +5793,8 @@ int		f_nz ;
 	            }
 
 	            if (rs >= 0) {
-	                const int	in = ind ;
-	                const int	mc = mcols ;
+	                cint	in = ind ;
+	                cint	mc = mcols ;
 	                c += 1 ;
 	                rs = procprinthdr_line(pip,fbp,mc,ln,in,cp,cl) ;
 	                wlen += rs ;
@@ -5847,8 +5846,8 @@ int		ll ;
 #endif
 
 	if ((rs = mailmsghdrfold_start(&mf,mcols,ln,lp,ll)) >= 0) {
-	    const int	ntab = NTABCOLS ;
-	    const int	mcols = lip->msgcols ;
+	    cint	ntab = NTABCOLS ;
+	    cint	mcols = lip->msgcols ;
 	    int		i = 0 ;
 	    int		leader = 0 ;
 	    int		n ;
@@ -5862,7 +5861,7 @@ int		ll ;
 
 	    while ((sl = mailmsghdrfold_get(&mf,ind,&sp)) > 0) {
 	        if ((ind > 1) && (leader == '\t')) {
-	            const int	acols = (mcols-ind) ;
+	            cint	acols = (mcols-ind) ;
 	            if ((n = ncolstr(ntab,ind,sp,sl)) > acols) {
 	                rs = n ; /* use (for LINT) */
 	                ind = 1 ;
@@ -5911,7 +5910,7 @@ static int procextid(PROGINFO *pip,char id[],cchar hp[],int hl)
 	            for (i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
 	                if (ep != NULL) {
 	                    if ((! ep->f.error) && (ep->rl > 0)) {
-	                        const int	malen = MAILADDRLEN ;
+	                        cint	malen = MAILADDRLEN ;
 	                        char		*bp ;
 	                        bp = strwcpy(id,ep->rp,MIN(malen,ep->rl)) ;
 	                        len = (bp - id) ;
@@ -5948,7 +5947,7 @@ static int procprinthdr(PROGINFO *pip,filer *fbp,cchar *kn,cchar *hp,int hl)
 #endif
 
 	if ((rs = filer_writehdrkey(fbp,kn)) >= 0) {
-	    const int	mcols = lip->msgcols ;
+	    cint	mcols = lip->msgcols ;
 	    int		ind = rs ;
 	    wlen += rs ;
 	    rs = procprinthdr_line(pip,fbp,mcols,ln,ind,hp,hl) ;
@@ -5967,8 +5966,8 @@ static int procprinthdr_mid(PROGINFO *pip,filer *fbp,cchar *mid,int ml)
 	int		wlen = 0 ;
 
 	if (mid != NULL) {
-	    const int	mcols = lip->msgcols ;
-	    const int	ln = 0 ;
+	    cint	mcols = lip->msgcols ;
+	    cint	ln = 0 ;
 	    cchar	*kn = HN_MESSAGEID ;
 
 	    if (ml < 0)
@@ -6017,7 +6016,7 @@ cchar *hp,int hl,int n)
 	    if ((rs = ema_parse(ap,hp,hl)) >= 0) {
 	        if ((rs = ema_count(ap)) > 1) {
 	            OUTEMA	ld ;
-	            const int	msgcols = lip->msgcols ;
+	            cint	msgcols = lip->msgcols ;
 	            if ((rs = outema_start(&ld,ofp,msgcols)) >= 0) {
 	                if ((rs = outema_hdrkey(&ld,kn)) >= 0) {
 	                    EMA_ENT	*ep ;
@@ -6125,8 +6124,8 @@ int m)
 	if (ap != NULL) {
 	    if ((rs = ema_count(ap)) > 0) {
 	        OUTEMA		ld ;
-	        const int	msgcols = lip->msgcols ;
-	        const int	n = rs ;
+	        cint	msgcols = lip->msgcols ;
+	        cint	n = rs ;
 	        if ((rs = outema_start(&ld,ofp,msgcols)) >= 0) {
 	            if ((rs = outema_hdrkey(&ld,kn)) >= 0) {
 	                EMA_ENT	*ep ;
@@ -6177,7 +6176,7 @@ static int procprinthdr_bcc(PROGINFO *pip,filer *fbp,vechand *tlp)
 	    cchar	*kn = HN_BCC ;
 
 	    if ((rs = osetstr_curbegin(rlp,&rcur)) >= 0) {
-	        const int	rsn = SR_NOTFOUND ;
+	        cint	rsn = SR_NOTFOUND ;
 	        cchar		*ap ;
 	        while ((rs1 = osetstr_enum(rlp,&rcur,&ap)) >= 0) {
 	            if ((rs = vechand_search(tlp,ap,vrecipsch,NULL)) == rsn) {
@@ -6417,7 +6416,7 @@ static int proclogmsg_mailer(PROGINFO *pip,int mi)
 	        cchar	*pre = "  xmailer=" ;
 	        hl = rs ;
 	        if (hp != NULL) {
-	            const int	pl = strlen(pre) ;
+	            cint	pl = strlen(pre) ;
 	            int		n ;
 	            n = (LOGFILE_FMTLEN-pl-2) ;
 	            if (hl <= n) {
@@ -6448,7 +6447,7 @@ static int proclogmsg_priority(PROGINFO *pip,int mi)
 	    if ((rs = mailmsgstage_hdrval(msp,mi,kn,&hp)) > 0) {
 	        hl = rs ;
 	        if (hp != NULL) {
-	            const int	ml = (LOGFILE_FMTLEN-8) ;
+	            cint	ml = (LOGFILE_FMTLEN-8) ;
 	            int		rs1 ;
 	            cchar	*fmt = "  xpriority=%t" ;
 	            rs1 = proglog_printf(pip,fmt,hp,MIN(ml,hl)) ;
@@ -6521,7 +6520,7 @@ static int proclogmsg_addrs(PROGINFO *pip,int mi)
 #endif
 
 	if (pip->open.logprog) {
-	    const int	at_ol = msgloghdr_overlast ;
+	    cint	at_ol = msgloghdr_overlast ;
 	    int		at ;
 	    for (at = 0 ; (rs >= 0) && (at < at_ol) ; at += 1) {
 	        rs = proclogmsg_addr(pip,mi,at) ;
@@ -6582,7 +6581,7 @@ static int proclogmsg_addr(PROGINFO *pip,int mi,int at)
 
 static int proclogmsg_addremas(PROGINFO *pip,int mi,cchar *kn,EMA *alp,int m)
 {
-	const int	kl = strlen(kn) ;
+	cint	kl = strlen(kn) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*kp = kn ;
@@ -6625,7 +6624,7 @@ static int proclogmsg_addrema(PROGINFO *pip,int mi,cchar *kn,EMA_ENT *ep,int m)
 	if (ap == NULL) ap = ep->ap ;
 
 	if (ap != NULL) {
-	    const int	al = strlen(ap) ;
+	    cint	al = strlen(ap) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
@@ -6645,11 +6644,11 @@ static int proclogmsg_addrema(PROGINFO *pip,int mi,cchar *kn,EMA_ENT *ep,int m)
 
 	    c += 1 ;
 	    {
-	        const int	plen = 60 ;
+	        cint	plen = 60 ;
 	        cchar		*et = ematypes[ep->type] ;
 	        char		pbuf[60+1] ;
 	        if ((rs = bufprintf(pbuf,plen,"  %s%s=",kn,et)) >= 0) {
-	            const int	pl = rs ;
+	            cint	pl = rs ;
 	            int		n ;
 	            n = (LOGFILE_FMTLEN-pl-2) ;
 	            if (al <= n) {
@@ -6661,7 +6660,7 @@ static int proclogmsg_addrema(PROGINFO *pip,int mi,cchar *kn,EMA_ENT *ep,int m)
 	    } /* end block */
 
 	    if ((rs >= 0) && (ep->cp != NULL) && (rs1 >= 0)) {
-	        const int	maxnamelen = (80-16-6) ;
+	        cint	maxnamelen = (80-16-6) ;
 	        cchar		*fmt ;
 
 #if	CF_DEBUG
@@ -6692,8 +6691,8 @@ static int proclogmsg_midhelp(PROGINFO *pip,MSGDATA *mdp)
 	int		rs = SR_OK ;
 	cchar	*pre = "  mid=" ;
 	if (mdp->hdrmid != NULL) {
-	    const int	pl = strlen(pre) ;
-	    const int	vl = strlen(mdp->hdrmid) ;
+	    cint	pl = strlen(pre) ;
+	    cint	vl = strlen(mdp->hdrmid) ;
 	    int		n ;
 	    cchar		*vp = mdp->hdrmid ;
 #if	CF_DEBUG
@@ -6730,7 +6729,7 @@ static int proclogmsg_bcc(PROGINFO *pip,int mi)
 	            osetstr	*rlp = &lip->recips ;
 	            osetstr_cur	rcur ;
 	            if ((rs = osetstr_curbegin(rlp,&rcur)) >= 0) {
-	                const int	rsn = SR_NOTFOUND ;
+	                cint	rsn = SR_NOTFOUND ;
 	                cchar		*ap ;
 	                while ((rs1 = osetstr_enum(rlp,&rcur,&ap)) >= 0) {
 	                    vrecipsch_t	vs = vrecipsch ;
@@ -6767,7 +6766,7 @@ static int proclogmsg_sender(PROGINFO *pip,int mi)
 	    if (lip->hdraddr_sender != NULL) {
 	        MSGDATA		*mdp = NULL ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
-	            const int	at = msgloghdr_sender ;
+	            cint	at = msgloghdr_sender ;
 	            if (mdp->naddrs[at] <= 0) {
 	                EMA	a, *alp = &a ;
 	                if ((rs = ema_start(alp)) >= 0) {
@@ -6802,12 +6801,12 @@ static int proclogmsg_from(PROGINFO *pip,int mi)
 	    LOCINFO	*lip = pip->lip ;
 	    MSGDATA	*mdp = NULL ;
 	    if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
-	        const int	at = msgloghdr_from ;
+	        cint	at = msgloghdr_from ;
 	        int		f ;
 	        f = (mdp->naddrs[at] <= 0) || lip->f.addfrom ;
 	        if (f && lip->f.hdrfroms) {
 	            EMA		*alp = &lip->hdrfroms ;
-	            const int	m = (lip->f.onefrom) ? 1 : -1 ;
+	            cint	m = (lip->f.onefrom) ? 1 : -1 ;
 	            cchar	*kn = HN_FROM ;
 	            rs = proclogmsg_addremas(pip,mi,kn,alp,m) ;
 	        }
@@ -7604,8 +7603,8 @@ static int locinfo_mkenv(LOCINFO *lip)
 	    if ((rs = locinfo_mkenvfrom(lip)) >= 0) {
 	        if ((rs = locinfo_mkenvdate(lip)) >= 0) {
 	            BUFFER	b ;
-		    const int	flen = strlen(lip->envfrom) ;
-		    const int	dlen = strlen(lip->envdate) ;
+		    cint	flen = strlen(lip->envfrom) ;
+		    cint	dlen = strlen(lip->envdate) ;
 	            if ((rs = buffer_start(&b,(flen+dlen+10))) >= 0) {
 		        cchar	*rbuf ;
 	                buffer_strw(&b,"From ",5) ;
@@ -7642,8 +7641,8 @@ static int locinfo_mkmid(LOCINFO *lip,char *mbuf,int mlen)
 	mbuf[0] = '\0' ;
 	if ((rs = sbuf_start(&mb,mbuf,mlen)) >= 0) {
 	    uint	uv = (uint) pip->pid ;
-	    const int	serial = lip->serial++ ;
-	    const int	nl = strlen(pip->nodename) ;
+	    cint	serial = lip->serial++ ;
+	    cint	nl = strlen(pip->nodename) ;
 	    cchar	*dn = pip->domainname ;
 	    cchar	*nn = pip->nodename ;
 
@@ -7804,14 +7803,12 @@ static int locinfo_mkhdrdate(LOCINFO *lip)
 }
 /* end subroutine (locinfo_mkhdrdate) */
 
-
-static int locinfo_mkhdrxuuid(LOCINFO *lip)
-{
+static int locinfo_mkhdrxuuid(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (! lip->have.hdruuid) {
 	    if ((rs = locinfo_uuid(lip)) >= 0) {
-	        MKUUID		*up = &lip->uuid ;
-	        const int	ulen = 100 ;
+	        uuid_dat	*up = &lip->uuid ;
+	        cint		ulen = 100 ;
 	        char		ubuf[100+1] ;
 	        if ((rs = snmkuuid(ubuf,ulen,up)) >= 0) {
 	            cchar	**vpp = &lip->hdruuid ;
@@ -7826,12 +7823,10 @@ static int locinfo_mkhdrxuuid(LOCINFO *lip)
 }
 /* end subroutine (locinfo_mkhdrxuuid) */
 
-
-static int locinfo_uuid(LOCINFO *lip)
-{
+static int locinfo_uuid(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (! lip->have.uuid) {
-	    MKUUID	*up = &lip->uuid ;
+	    uuid_dat	*up = &lip->uuid ;
 	    if ((rs = mkuuid(up,0)) >= 0) {
 	        lip->have.uuid = TRUE ;
 	    }
@@ -7876,8 +7871,8 @@ static int locinfo_mkhdrname_from(LOCINFO *lip)
 
 	if (lip->hdrname_from == NULL) {
 	    if ((rs = locinfo_prpcs(lip)) >= 0) {
-	        const int	nlen = REALNAMELEN ;
-	        const int	w = pcsnsreq_fullname ;
+	        cint	nlen = REALNAMELEN ;
+	        cint	w = pcsnsreq_fullname ;
 	        cchar		*un = pip->username ;
 	        cchar		*nbp = NULL ;
 	        char		nbuf[REALNAMELEN+1] = { 0 } ;
@@ -7932,7 +7927,7 @@ static int locinfo_prpcs(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (lip->pr_pcs == NULL) {
-	    const int	plen = MAXPATHLEN ;
+	    cint	plen = MAXPATHLEN ;
 	    cchar	*dn = pip->domainname ;
 	    char	pbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpr(pbuf,plen,VARPRPCS,dn)) >= 0) {
@@ -8070,7 +8065,7 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 static int locinfo_tmpmaint(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	to = TO_TMPFILES ;
+	cint	to = TO_TMPFILES ;
 	int		rs ;
 	int		c = 0 ;
 	int		f_need = lip->f.maint ;
@@ -8079,10 +8074,10 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 
 	if ((rs = mkpath2(tsfname,dname,TSFNAME)) >= 0) {
 	    const mode_t	om = 0666 ;
-	    const int		of = (O_WRONLY|O_CREAT) ;
+	    cint		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
 	        struct ustat	usb ;
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
 	            if ((rs = locinfo_fchmodown(lip,fd,&usb,om)) >= 0) {
@@ -8139,7 +8134,7 @@ static int locinfo_fchmodown(LOCINFO *lip,int fd,struct ustat *sbp,mode_t mm)
 	            if ((rs = uc_fminmod(fd,mm)) >= 0) {
 	                const uid_t	uid_pr = lip->uid_pr ;
 	                const gid_t	gid_pr = lip->gid_pr ;
-	                const int	n = _PC_CHOWN_RESTRICTED ;
+	                cint	n = _PC_CHOWN_RESTRICTED ;
 	                if ((rs = u_fpathconf(fd,n,NULL)) == 0) {
 	                    f = TRUE ;
 	                    u_fchown(fd,uid_pr,gid_pr) ; /* may fail */
@@ -8255,7 +8250,7 @@ static int locinfo_xmailer(LOCINFO *lip)
 
 	if (lip->xmailer == NULL) {
 	    PROGINFO	*pip = lip->pip ;
-	    const int	rlen = MAXNAMELEN ;
+	    cint	rlen = MAXNAMELEN ;
 	    int		ol = -1 ;
 	    cchar	*sn = pip->searchname ;
 	    cchar	*pv = pip->version ;
@@ -8317,7 +8312,7 @@ static int locinfo_gm(LOCINFO *lip,cchar *gnp,int gnl)
 	int		c = 0 ;
 	if ((rs = locinfo_gmcurbegin(lip,&gc)) >= 0) {
 	    if ((rs = locinfo_gmlook(lip,&gc,gnp,gnl)) > 0) {
-	        const int	ul = USERNAMELEN ;
+	        cint	ul = USERNAMELEN ;
 	        char		ub[USERNAMELEN+1] ;
 	        while ((rs = locinfo_gmread(lip,&gc,ub,ul)) > 0) {
 	            rs = locinfo_loadrecip(lip,ub,rs) ;
@@ -8340,8 +8335,8 @@ int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 	if (curp == NULL) return SR_FAULT ;
 
 	if (! lip->open.gm) {
-	    const int	max = 20 ;
-	    const int	ttl = (12*3600) ;
+	    cint	max = 20 ;
+	    cint	ttl = (12*3600) ;
 	    rs = grmems_start(&lip->gm,max,ttl) ;
 	    lip->open.gm = (rs >= 0) ;
 	}
@@ -8372,7 +8367,7 @@ int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
 
 int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -8391,7 +8386,7 @@ int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 
 int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -8454,8 +8449,8 @@ int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
 int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	rsn = SR_NOTFOUND ;
-	const int	fo = 0 ;
+	cint	rsn = SR_NOTFOUND ;
+	cint	fo = 0 ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -8482,7 +8477,7 @@ int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char *ubuf,int ulen)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -8520,8 +8515,8 @@ static int locinfo_folderdname(LOCINFO *lip)
 	        rs = mkpath2(tbuf,hdname,folder) ;
 	    }
 	    if (rs >= 0) {
-	        const int	tl = rs ;
-	        const int	rsn = SR_NOENT ;
+	        cint	tl = rs ;
+	        cint	rsn = SR_NOENT ;
 	        struct ustat	sb ;
 	        if ((rs = uc_stat(tbuf,&sb)) == rsn) {
 	            if ((rs = mkdirs(tbuf,0775)) >= 0) {
@@ -8547,7 +8542,7 @@ static int locinfo_groupname(LOCINFO *lip)
 	int		rs ;
 	if (lip == NULL) return SR_FAULT ;
 	if (lip->gnbuf[0] == '\0') {
-	    const int	gnlen = GROUPNAMELEN ;
+	    cint	gnlen = GROUPNAMELEN ;
 	    rs = getgroupname(lip->gnbuf,gnlen,-1) ;
 	} else {
 	    rs = strlen(lip->gnbuf) ;
@@ -8642,7 +8637,7 @@ static int mailfile_open(MAILFILE *mfp,PROGINFO *pip,cchar *ifname)
 	    } /* end if (open-file) */
 	} else {
 	    const mode_t	om = 0660 ;
-	    const int		of = O_RDWR ;
+	    cint		of = O_RDWR ;
 	    rs = uc_open(ifname,of,om) ;
 	    mfd = rs ;
 	} /* end if (open-file) */
@@ -8673,7 +8668,7 @@ static int mailfile_altsetup(MAILFILE *mfp,cchar *tmpdname)
 	if (pip == NULL) return SR_FAULT ; /* LINT */
 
 	if ((rs = opentmp(tmpdname,0,0)) >= 0) {
-	    const int	tlen = 2048 ;
+	    cint	tlen = 2048 ;
 	    char	*tbuf ;
 	    mfd = rs ;
 	    if ((rs = uc_valloc(tlen,&tbuf)) >= 0) {
@@ -8877,8 +8872,8 @@ static int config_files(CONFIG *cfp,PARAMFILE *pfp)
 #endif
 
 	if ((rs = vecstr_start(&sv,4,0)) >= 0) {
-	    const int	am = R_OK ;
-	    const int	rlen = MAXPATHLEN ;
+	    cint	am = R_OK ;
+	    cint	rlen = MAXPATHLEN ;
 	    char	rbuf[MAXPATHLEN + 1] ;
 
 	    vecstr_envadd(&sv,"r",pip->pr,-1) ;
@@ -8933,7 +8928,7 @@ static int config_loadcooks(CONFIG *cfp)
 {
 	PROGINFO	*pip = cfp->pip ;
 	EXPCOOK		*ckp = &cfp->cooks ;
-	const int	hlen = MAXHOSTNAMELEN ;
+	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		vl ;
@@ -9077,8 +9072,8 @@ static int config_reader(CONFIG *cfp)
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
 	    EXPCOOK	*ckp = &cfp->cooks ;
-	    const int	plen = PBUFLEN ;
-	    const int	elen = EBUFLEN ;
+	    cint	plen = PBUFLEN ;
+	    cint	elen = EBUFLEN ;
 	    int		oi ;
 	    int		kl, vl ;
 	    int		el ;
@@ -9485,7 +9480,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 #endif
 	if (mdp->naddrs[msgloghdr_from] > 0) {
 	    EMA		*flp = (mdp->addrs + msgloghdr_from) ;
-	    const int	f_onesender = lip->f.onesender ;
+	    cint	f_onesender = lip->f.onesender ;
 	    int		fl ;
 	    cchar	*fp ;
 	    if ((rs = ema_first(flp,&fp)) > 0) {
@@ -9522,8 +9517,8 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 #endif
 	        if ((rs >= 0) && (si == 0) && lip->f.addsender) {
 	            if ((rs = locinfo_mkhdrsender(lip)) >= 0) {
-	                const int	hl = rs ;
-	                const int	alen = MAILADDRLEN ;
+	                cint	hl = rs ;
+	                cint	alen = MAILADDRLEN ;
 	                cchar		*hp = lip->hdraddr_sender ;
 	                char		*abuf ;
 #if	CF_DEBUGS
@@ -9534,7 +9529,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 #endif
 	                if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
 	                    if ((rs = mkbestaddr(abuf,alen,hp,hl)) > 0) {
-	                        const int	al = rs ;
+	                        cint	al = rs ;
 	                        cchar		*ap = abuf ;
 	                        if ((fl == al) && (stremacmp(fp,ap) == 0)) {
 	                            mdp->f.disallowsender = TRUE ;
@@ -9565,7 +9560,7 @@ static int msgdata_getnvsenders(MSGDATA *mdp)
 
 static int msgdata_getnsenders(MSGDATA *mdp)
 {
-	const int	at = msgloghdr_sender ;
+	cint	at = msgloghdr_sender ;
 	return mdp->naddrs[at] ;
 }
 /* end subroutine (msgdata_getnsenders) */
@@ -9768,7 +9763,7 @@ static int loadorg(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		ol = 0 ;
 	if ((pip->org == NULL) || (pip->org[0] == '\0')) {
-	    const int	olen = ORGLEN ;
+	    cint	olen = ORGLEN ;
 	    cchar	*pr = pip->progname ;
 	    cchar	*un = pip->username ;
 	    char	obuf[ORGLEN+1] ;
@@ -9855,7 +9850,7 @@ static int loadpathprbin(PROGINFO *pip,cchar bname[])
 	char		tbuf[MAXPATHLEN + 1] ;
 
 	if ((rs = mkpath2(tbuf,pip->pr,bname)) >= 0) {
-	    const int	pl = rs ;
+	    cint	pl = rs ;
 	    rs = loadpathcomp(pip,tbuf,pl) ;
 	    c += rs ;
 	}
@@ -9900,8 +9895,8 @@ static int loadpathcomp(PROGINFO *pip,cchar pbuf[],int plen)
 
 	plp = &lip->epath ;
 	if ((rs = pathclean(tbuf,pbuf,plen)) >= 0) { /* allow zero-length */
-	    const int	rsn = SR_NOTFOUND ;
-	    const int	pl = rs ;
+	    cint	rsn = SR_NOTFOUND ;
+	    cint	pl = rs ;
 	    cchar	*pp = tbuf ;
 	    if ((rs = vecstr_findn(plp,pp,pl)) == rsn) {
 	        c += 1 ;
@@ -9914,7 +9909,7 @@ static int loadpathcomp(PROGINFO *pip,cchar pbuf[],int plen)
 /* end subroutine (loadpathcomp) */
 
 
-static int vrecipsch(const void	**v1pp,const void **v2pp)
+static int vrecipsch(cvoid	**v1pp,cvoid **v2pp)
 {
 	cchar		**e1pp = (cchar **) v1pp ;
 	cchar		**e2pp = (cchar **) v2pp ;
@@ -9959,7 +9954,7 @@ static int ishigh(int ch)
 
 static int hasMailNote(cchar *hp,int hl,cchar *ts)
 {
-	const int	tl = strlen(ts) ;
+	cint	tl = strlen(ts) ;
 	if (hl < 0) hl = strlen(hp) ;
 	return (hl >= tl) && (strncmp(hp,ts,tl) == 0) ;
 }
@@ -9975,7 +9970,7 @@ static int isBadDate(int rs)
 
 static int isHdrEmpty(int rs)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	return ((rs == 0) || (rs == rsn)) ;
 }
 /* end subroutine (isHdrEmpty) */

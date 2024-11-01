@@ -678,8 +678,6 @@ srvreg.o:		srvreg.c srvreg.h srvrege.h
 
 srvrege.o:		srvrege.c srvrege.h
 
-spawnproc.o:		spawnproc.c spawnproc.h
-
 openport.o:		openport.c openport.h
 
 openportmsg.o:		openportmsg.c openportmsg.h
