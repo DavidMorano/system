@@ -1,4 +1,5 @@
 /* ucentsp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTSP object management */
@@ -16,17 +17,20 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumsp
+
+	Description:
 	These subroutines perform some SHADOW-structure management
 	functions.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>

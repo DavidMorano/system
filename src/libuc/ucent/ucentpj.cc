@@ -1,4 +1,5 @@
 /* ucentpj SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTPJ object management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumpj
+
+	Description:
 	These subroutines manage some simple tasks for the PROJECT
 	object, referenced as 'struct project'. This object is
 	defined by UNIX® (really Solaris®) standards.
@@ -24,11 +29,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>

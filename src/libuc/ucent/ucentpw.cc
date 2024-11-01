@@ -1,4 +1,5 @@
 /* ucentpw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UCENTPW object management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucenumpw
+
+	Description:
 	These subroutines perform some PASSWD-structure management
 	functions.
 
@@ -23,6 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<utypedefs.h>
