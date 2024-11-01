@@ -1,4 +1,5 @@
 /* tmtime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is supposed to provide OS-independent time management operations */
@@ -49,6 +50,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>

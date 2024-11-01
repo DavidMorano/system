@@ -47,6 +47,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strcmp(3c)| */
 #include	<usystem.h>
 #include	<ids.h>

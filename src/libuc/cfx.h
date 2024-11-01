@@ -1,4 +1,5 @@
 /* cfx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* convert a digit c-string to its integer value */

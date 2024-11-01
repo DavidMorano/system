@@ -1,4 +1,5 @@
 /* ctx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* convert a digit c-string to its integer value */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
 
