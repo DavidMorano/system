@@ -1,4 +1,5 @@
 /* ciq HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* circular (really doubly linked) interlocked queue */

@@ -119,39 +119,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sicasesub(const char *,int,const char *) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
-extern int	getmjd(int,int,int) ;
-extern int	msleep(int) ;
-extern int	hasalldig(const char *,int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
 #if	CF_DEBUGS || CF_DEBUG || CF_DEBUGN
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
@@ -159,10 +126,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -203,10 +166,10 @@ struct locinfo {
 	BIBLEPARA	pdb ;
 	PROGINFO	*pip ;
 	void		*ofp ;
-	const char	*ndbname ;	/* name-db name */
-	const char	*pdbname ;	/* paragraph-db name */
-	const char	*vdbname ;	/* verse-db name */
-	const char	*sdbname ;	/* struture-db name */
+	cchar	*ndbname ;	/* name-db name */
+	cchar	*pdbname ;	/* paragraph-db name */
+	cchar	*vdbname ;	/* verse-db name */
+	cchar	*sdbname ;	/* struture-db name */
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	open ;
 	time_t		ti_tmtime ;
@@ -238,8 +201,8 @@ static int	usage(PROGINFO *) ;
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
 static int	procsome(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
-static int	procspecs(PROGINFO *,const char *,int) ;
-static int	procspec(PROGINFO *,const char *,int) ;
+static int	procspecs(PROGINFO *,cchar *,int) ;
+static int	procspec(PROGINFO *,cchar *,int) ;
 static int	procall(PROGINFO *) ;
 static int	procparse(PROGINFO *,BIBLEVERSE_Q *,cchar *,int) ;
 static int	procmulti(PROGINFO *,BIBLEVERSE_Q *,int) ;
@@ -247,14 +210,14 @@ static int	procload(PROGINFO *,VRBUF *,int,BIBLEVERSE_Q *) ;
 static int	proctoday(PROGINFO *,int,int) ;
 static int	procmjds(PROGINFO *,int,int) ;
 static int	procoutcite(PROGINFO *,BIBLEVERSE_Q *,int) ;
-static int	procout(PROGINFO *,BIBLEVERSE_Q *,const char *,int) ;
-static int	procoutline(PROGINFO *,int,const char *,int) ;
+static int	procout(PROGINFO *,BIBLEVERSE_Q *,cchar *,int) ;
+static int	procoutline(PROGINFO *,int,cchar *,int) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_deflinelen(LOCINFO *) ;
 static int	locinfo_booklookup(LOCINFO *,char *,int,int) ;
-static int	locinfo_bookmatch(LOCINFO *,const char *,int) ;
+static int	locinfo_bookmatch(LOCINFO *,cchar *,int) ;
 static int	locinfo_book(LOCINFO *) ;
 static int	locinfo_today(LOCINFO *) ;
 static int	locinfo_defdayspec(LOCINFO *,DAYSPEC *) ;
@@ -275,7 +238,7 @@ static int	isNotGoodCite(int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -331,7 +294,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"audit",
 	"linelen",
 	"indent",
@@ -363,7 +326,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 static const uchar	aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
@@ -376,7 +339,7 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*qtypes[] = {
+static cchar	*qtypes[] = {
 	"verses",
 	"days",
 	"mjds",
@@ -401,7 +364,7 @@ int b_bibleverse(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -448,19 +411,19 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ndbname = NULL ;
-	const char	*pdbname = NULL ;
-	const char	*vdbname = NULL ;
-	const char	*sdbname = NULL ;
-	const char	*qtypestr = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ndbname = NULL ;
+	cchar	*pdbname = NULL ;
+	cchar	*vdbname = NULL ;
+	cchar	*sdbname = NULL ;
+	cchar	*qtypestr = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -1108,8 +1071,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    cchar	*fmt ;
 	    if ((rs = bibleverse_open(bvp,pip->pr,vdbname)) >= 0) {
 	        const int	nverses = rs ;
-	        const char	*ofn = ofname ;
-	        const char	*afn = afname ;
+	        cchar	*ofn = ofname ;
+	        cchar	*afn = afname ;
 	        lip->open.vdb = TRUE ;
 
 #if	CF_DEBUG
@@ -1258,8 +1221,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<number(s)>|<cite(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1288,7 +1251,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1485,7 +1448,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	int		wlen = 0 ;
 	int		pan = 0 ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (rs >= 0) {
 	    int		ai ;
@@ -1781,7 +1744,7 @@ static int procparse(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar *sp,int sl)
 
 	if ((rs = bcspec_load(&bb,sp,sl)) >= 0) {
 	    const int	nl = bb.nl ;
-	    const char	*np = bb.np ;
+	    cchar	*np = bb.np ;
 	    qp->b = bb.b ;
 	    qp->c = bb.c ;
 	    qp->v = bb.v ;
@@ -1975,7 +1938,7 @@ static int procoutcite(PROGINFO *pip,BIBLEVERSE_Q *qp,int ndays)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		f_havebook = FALSE ;
-	const char	*fmt ;
+	cchar	*fmt ;
 
 #if	CF_COOKIE
 	fmt = "%%\n" ;
@@ -2054,7 +2017,7 @@ static int procout(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar *vp,int vl)
 	int		line = 0 ;
 	int		wlen = 0 ;
 	int		f_p = FALSE ;
-	const char	*sp = vp ;
+	cchar	*sp = vp ;
 	char		cbuf[COLBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -2133,7 +2096,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 	int		rs = SR_OK ;
 	int		indent ;
 	int		wlen = 0 ;
-	const char	*fmt ;
+	cchar	*fmt ;
 
 	if (pip->verboselevel > 0) {
 	    indent = MIN(lip->indent,NBLANKS) ;
@@ -2489,8 +2452,8 @@ static int locinfo_bvsbuilder(LOCINFO *lip)
 	const int	of = 0 ;
 	int		rs ;
 	int		rs1 ;
-	const char	*pr = pip->pr ;
-	const char	*sdbname = lip->sdbname ;
+	cchar	*pr = pip->pr ;
+	cchar	*sdbname = lip->sdbname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -2618,8 +2581,8 @@ static int locinfo_ispara(LOCINFO *lip,BIBLEVERSE_Q *qp)
 #endif
 
 	    if (! lip->open.pdb) {
-	        const char	*pr = pip->pr ;
-	        const char	*pdbname = lip->pdbname ;
+	        cchar	*pr = pip->pr ;
+	        cchar	*pdbname = lip->pdbname ;
 	        if ((rs = biblepara_open(&lip->pdb,pr,pdbname)) >= 0) {
 	            lip->open.pdb = TRUE ;
 	        } else if (isNotPresent(rs)) {

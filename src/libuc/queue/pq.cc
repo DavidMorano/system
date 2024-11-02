@@ -1,4 +1,5 @@
 /* pq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++23 */
 
 /* a regular (no-frills) pointer queue */
@@ -26,9 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 #include	"pq.h"
@@ -41,6 +45,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -115,11 +122,11 @@ int pq_insgroup(pq *qhp,pq_ent *gp,int esize,int n) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && gp) {
-	    caddr_t		p = (caddr_t) gp ;
+	    caddr_t	p = caddr_t(gp) ;
 	    rs = SR_INVALID ;
 	    if ((n > 0) && (esize > 0)) {
-	        pq_ent		*ep = (pq_ent *) p ;
-	        pq_ent		*pep ;
+	        pq_ent	*ep = (pq_ent *) p ;
+	        pq_ent	*pep ;
 		rs = SR_OK ;
 	        if (qhp->head && qhp->tail) {
 		    if (qhp->head != qhp->tail) {
@@ -155,6 +162,27 @@ int pq_insgroup(pq *qhp,pq_ent *gp,int esize,int n) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (pq_insgroup) */
+
+int pq_gethead(pq *qhp,pq_ent **epp) noex {
+	int		rs = SR_FAULT ;
+	int		rc = 0 ;
+	if (qhp) {
+	    pq_ent	*ep = nullptr ;
+	    rs = SR_EMPTY ;
+	    if (qhp->head && qhp->tail) {
+		rs = SR_OK ;
+		ep = qhp->head ;
+	        rc = qhp->count ;
+	    } else {
+	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
+	    } /* end if (not empty) */
+	    if (epp) {
+		*epp = (rs >= 0) ? ep : nullptr ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? rc : rs ;
+}
+/* end subroutine (pq_gethead) */
 
 int pq_gettail(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;

@@ -1,4 +1,5 @@
 /* q SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* self-realtive double-linked queue */
@@ -16,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Object:
+	q
+
 	This object implements a self relative queue for shared
 	memory applications where the shared memory segments have
 	different starting addresses in two or more address spaces.
@@ -31,6 +35,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ptma.h>
 
@@ -49,6 +55,15 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 typedef plainq_ent	*entp ;
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -89,6 +104,9 @@ static inline int q_dtor(q *op) noex {
 	return rs ;
 }
 /* end subroutine (q_dtor) */
+
+
+/* local variables */
 
 
 /* exported variables */

@@ -141,18 +141,17 @@ int ucentsp::format(char *rbuf,int rlen) noex {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen > 0) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 9 ; i += 1) {
-	                if (i > 0) rs = sbuf_chr(&b,':') ;
+	                if (i > 0) rs = b.chr(':') ;
 	                if (rs >= 0) {
 	                    long	v  = -1 ;
 	                    switch (i) {
 	                    case 0:
-	                        rs = sbuf_strw(&b,sp_namp,-1) ;
+	                        rs = b.strw(sp_namp,-1) ;
 	                        break ;
 	                    case 1:
-	                        rs = sbuf_strw(&b,sp_pwdp,-1) ;
+	                        rs = b.strw(sp_pwdp,-1) ;
 	                        break ;
 	                    case 2:
 	                    case 3:
@@ -181,22 +180,19 @@ int ucentsp::format(char *rbuf,int rlen) noex {
 	                            break ;
 	                        } /* end switch */
 	                        if (v != -1) {
-	                            rs = sbuf_decl(&b,v) ;
+	                            rs = b.dec(v) ;
 	                        }
 	                        break ;
 	                    case 8:
-	                        {
-	                            ulong	uv = sp_flag ;
-	                            if (uv != 0) {
-	                                rs = sbuf_decul(&b,uv) ;
-	                            }
+	                        if (ulong uv = sp_flag ; uv != 0) {
+	                            rs = b.dec(uv) ;
 	                        }
 	                        break ;
 	                    } /* end switch */
 	                } /* end if (ok) */
 	                if (rs < 0) break ;
 	            } /* end for */
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	    } /* end if (valid) */

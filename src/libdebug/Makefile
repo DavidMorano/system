@@ -59,7 +59,7 @@ OBJ01= nprintf.o fdprintf.o
 OBJ02= strlinelen.o
 OBJ03= 
 OBJ04= bufprintf.o getdig.o
-OBJ05= format.o
+OBJ05=
 OBJ06=
 OBJ07=
 
@@ -209,15 +209,15 @@ $(T).a(debugprintf.o):	debugprintf.o
 
 
 # special (very special) processing for NPRINTF
-nprintf_r.o:		nprintf.map Makefile nprintf.o lockfile.o format.o
-	$(LD) -r -o $@ -B reduce -M nprintf.map nprintf.o lockfile.o format.o
+nprintf_r.o:		nprintf.map Makefile nprintf.o lockfile.o
+	$(LD) -r -o $@ -B reduce -M nprintf.map nprintf.o lockfile.o
 
 nprintf.o:		nprintf.cc nprintf.h Makefile
 
 
 # special (very special) processing for DEBPRINTF
-debugprintf_r.o:	debugprintf.map Makefile debugprintf.o format.o
-	$(LD) -r -o $@ -B reduce -M debugprintf.map debugprintf.o format.o
+debugprintf_r.o:	debugprintf.map Makefile debugprintf.o
+	$(LD) -r -o $@ -B reduce -M debugprintf.map debugprintf.o
 
 debugprintf.o:		Makefile debugprintf.c
 
@@ -235,11 +235,7 @@ strmgr.o:		strmgr.c strmgr.h
 char.o:			char.c char.h
 snflags.o:		snflags.c snflags.h
 
-
-format.o:		format.c
-
 sfbasename.o:		sfbasename.c
-
 sfdirname.o:		sfdirname.c
 
 strbasename.o:		strbasename.c
@@ -254,7 +250,7 @@ cfdec.o:		cfdec.c cfdec.h
 X01= testdebugprint
 
 X01OBJa= $(X01).o debugprintf.o debug.o
-X01OBJb= format.o
+X01OBJb=
 X01OBJc=
 X01OBJd=
 
@@ -270,7 +266,7 @@ X02= testnprint
 
 X02OBJa= $(X02).o nprintf.o
 X02OBJb= debugprintf.o debug.o
-X02OBJc= format.o
+X02OBJc=
 X02OBJd=
 
 X02OBJ= $(X02OBJa) $(X02OBJb) $(X02OBJc) $(X02OBJd)

@@ -1,4 +1,5 @@
 /* userattrdb HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* user-attribute database management */
@@ -29,9 +30,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<userattr.h>		/* <- money shot */
 
 

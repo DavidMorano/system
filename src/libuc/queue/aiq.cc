@@ -1,4 +1,5 @@
 /* aiq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Asynchronous Interrupt Queue - some sort of queue object for OS stuff! */

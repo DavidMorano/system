@@ -736,6 +736,7 @@ sesmsg.o:		sesmsg.cc sesmsg.h
 msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
+dayofmonth.o:		dayofmonth.cc dayofmonth.h
 
 # DATABASE
 database.o:		database.dir

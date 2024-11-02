@@ -526,8 +526,6 @@ upt.o:			upt.c upt.h
 
 spawnproc.o:		spawnproc.c spawnproc.h
 
-format.o:		format.c format.h
-
 progspawncmd.o:		progspawncmd.c spawnproc.h
 
 mkbestaddr.o:		mkbestaddr.c ema.h
@@ -540,7 +538,7 @@ T01= testchartrans
 T01OBJa= $(T01).o chartrans.o uiconv.o termtrans.o
 T01OBJb= 
 T01OBJc=
-T01OBJd= format.o debugprintf.o debug.o
+T01OBJd= debugprintf.o debug.o
 
 T01OBJ= $(T01OBJa) $(T01OBJb) $(T01OBJc) $(T01OBJd)
 

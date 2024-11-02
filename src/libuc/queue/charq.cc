@@ -1,4 +1,5 @@
-/* charq */
+/* charq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* character queue module */
@@ -20,6 +21,7 @@
 
 *******************************************************************************/
 
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 
 #include	"charq.h"

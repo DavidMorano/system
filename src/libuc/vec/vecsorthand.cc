@@ -313,8 +313,7 @@ int vecsorthand::get(int ai,void *rvp) noex {
 }
 
 void vecsorthand::dtor() noex {
-	cint		rs = vecsorthand_finish(this) ;
-	if (rs < 0) {
+	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecsorthand",rs,"fini-finish") ;
 	}
 }

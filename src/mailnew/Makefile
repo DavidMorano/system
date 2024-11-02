@@ -369,9 +369,6 @@ hdrdecode.o:		hdrdecode.c hdrdecode.h
 
 uiconv.o:		uiconv.c uiconv.h
 
-
-format.o:		format.c format.h
-
 mailmsgmatenv.o:	mailmsgmatenv.c mailmsgmatenv.h
 
 

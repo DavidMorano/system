@@ -25,12 +25,12 @@
 	Synopsis:
 
 	int opensvc_cotd(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -107,35 +107,35 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	statvfsdir(const char *,struct statvfs *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matkeystr(cchar **,cchar *,int) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	statvfsdir(cchar *,struct statvfs *) ;
+extern int	getuserhome(char *,int,cchar *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 extern int	getmjd(int,int,int) ;
 extern int	getyrd(int,int,int) ;
-extern int	hasalldig(const char *,int) ;
+extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* local structures */
@@ -149,7 +149,7 @@ struct subinfo {
 	SUBINFO_FL	f ;
 	SUBINFO_FL	open ;
 	vecstr		stores ;
-	const char	*pr ;
+	cchar	*pr ;
 	int		linelen ;
 	int		year ;
 	int		mon ;
@@ -161,26 +161,26 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,const char *) ;
+static int	subinfo_start(SUBINFO *,cchar *) ;
 static int	subinfo_finish(SUBINFO *) ;
 #if	CF_LOCSETENT
 static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	subinfo_cotd(SUBINFO *,int,const char *,const char *) ;
+static int	subinfo_cotd(SUBINFO *,int,cchar *,cchar *) ;
 static int	subinfo_procout(SUBINFO *,int,int,int,cchar *,int) ;
 static int	subinfo_procoutline(SUBINFO *,FILER *,
 			int,int,int,cchar *,int) ;
 static int	subinfo_tmtime(SUBINFO *) ;
 
 #ifdef	COMMENT
-static int	subinfo_procuser(SUBINFO *,char *,int,const char *) ;
+static int	subinfo_procuser(SUBINFO *,char *,int,cchar *) ;
 #endif
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"sn",
 	"db",
@@ -194,19 +194,19 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 
 /* exported subroutines */
 
 
 int opensvc_cotd(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
@@ -224,10 +224,10 @@ int		to ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*dayspec = NULL ;
-	const char	*dbname = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*dayspec = NULL ;
+	cchar	*dbname = NULL ;
 
 	if (argv != NULL) {
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
@@ -425,7 +425,7 @@ int		to ;
 /* find a possible "dayspec" to act upon */
 
 	if (argv != NULL) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    for (ai = 1 ; ai < argc ; ai += 1) {
 
 	        f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
@@ -451,7 +451,7 @@ int		to ;
 /* default arguments */
 
 	if (sip->linelen <= 0) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((rs >= 0) && (argval != NULL)) {
 	        rs = cfdeci(argval,-1,&v) ;
 	        sip->linelen = v ;
@@ -656,11 +656,9 @@ static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 	int		rs ;
 	int		wlen = 0 ;
 	if (filer b ; (rs = filer_start(&b,wfd,0z,512,0)) >= 0) {
-	    WORDFILL	w ;
-
-	    if ((rs = wordfill_start(&w,cbuf,clen)) >= 0) {
+	    if (wordfill w ; (rs = wordfill_start(&w,cbuf,clen)) >= 0) {
 		int		cols = sip->linelen ;
-	        cint	llen = LINEBUFLEN ;
+	        cint		llen = LINEBUFLEN ;
 	        int		ll ;
 		int		lw ;
 	        int		ln = 0 ;
@@ -731,8 +729,9 @@ static int subinfo_tmtime(SUBINFO *sip)
 	    sip->mday = t.mday ;
 	    sip->yday = t.yday ;
 	    mday = t.mday ;
-	} else
+	} else {
 	    mday = sip->mday ;
+	}
 
 	return (rs >= 0) ? mday : rs ;
 }

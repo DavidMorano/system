@@ -1,4 +1,5 @@
 /* spwdent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SPWD structure management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	spwdent
+
+	Description:
 	These subroutines perform some SHADOW-structure management
 	functions.
 
@@ -23,13 +28,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<cfdec.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"spwd.h"
@@ -46,9 +52,9 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	sfshrink(const char *,int,const char **) noex ;
-    extern int	sichr(const char *,int,int) noex ;
-    extern char	*strnchr(const char *,int,int) noex ;
+    extern int	sfshrink(cchar *,int,cchar **) noex ;
+    extern int	sichr(cchar *,int,int) noex ;
+    extern char	*strnchr(cchar *,int,int) noex ;
 }
 
 
@@ -123,18 +129,17 @@ int spwdent_format(CSPWD *spp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (spp && rbuf) {
-	    sbuf	b ;
-	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	        for (int i = 0 ; i < 9 ; i += 1) {
 	            long	v  = 0 ;
-	            if (i > 0) rs = sbuf_char(&b,':') ;
+	            if (i > 0) rs = b.chr(':') ;
 	            if (rs >= 0) {
 	                switch (i) {
 	                case 0:
-	                    rs = sbuf_strw(&b,spp->sp_namp,-1) ;
+	                    rs = b.strw(spp->sp_namp,-1) ;
 	                    break ;
 	                case 1:
-	                    rs = sbuf_strw(&b,spp->sp_pwdp,-1) ;
+	                    rs = b.strw(spp->sp_pwdp,-1) ;
 	                    break ;
 	                case 2:
 	                case 3:
@@ -163,22 +168,19 @@ int spwdent_format(CSPWD *spp,char *rbuf,int rlen) noex {
 	                        break ;
 	                    } /* end switch */
 	                    if (v != -1) {
-	                        rs = sbuf_decl(&b,v) ;
+	                        rs = b.dec(v) ;
 	                    }
 	                    break ;
 	                case 8:
-	                    {
-	                        ulong	uv = spp->sp_flag ;
-	                        if (uv != 0) {
-	                            rs = sbuf_decul(&b,uv) ;
-	                        }
+	                    if (ulong uv = spp->sp_flag ; uv != 0) {
+	                        rs = b.dec(uv) ;
 	                    }
 	                    break ;
 	                } /* end switch */
 	            } /* end if (ok) */
 	            if (rs < 0) break ;
 	        } /* end for */
-	        rs1 = sbuf_finish(&b) ;
+	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
@@ -187,14 +189,14 @@ int spwdent_format(CSPWD *spp,char *rbuf,int rlen) noex {
 /* end subroutine (spwdent_format) */
 
 int spwdent_size(CSPWD *pp) noex {
-	int		size = 1 ;
+	int		sz = 1 ;
 	if (pp->sp_namp) {
-	    size += (strlen(pp->sp_namp)+1) ;
+	    sz += (strlen(pp->sp_namp) + 1) ;
 	}
 	if (pp->sp_pwdp) {
-	    size += (strlen(pp->sp_pwdp)+1) ;
+	    sz += (strlen(pp->sp_pwdp) + 1) ;
 	}
-	return size ;
+	return sz ;
 }
 /* end subroutine (spwdent_size) */
 
@@ -243,16 +245,17 @@ static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 	    break ;
 	case 8:
 	    if (vl > 0) {
-	        ulong	uv ;
-	        rs = cfdecul(vp,vl,&uv) ;
-	        spp->sp_flag = v ;
+	        if (ulong uv ; (rs = cfdecul(vp,vl,&uv)) >= 0) {
+	            spp->sp_flag = uv ;
+		} else if (isNotValid(rs)) {
+		    rs = SR_OK ;
+		}
 	    }
 	    break ;
 	} /* end switch */
 	if ((rs >= 0) && (vpp != nullptr)) {
 	    int		cl ;
-	    cchar	*cp ;
-	    if ((cl = sfshrink(vp,vl,&cp)) >= 0) {
+	    if (cchar *cp{} ; (cl = sfshrink(vp,vl,&cp)) >= 0) {
 	        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    }
 	}
@@ -263,12 +266,12 @@ static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 static int spwdent_parsedefs(SPWD *spp,SI *ibp,int sfi) noex {
 	int		rs = SR_OK ;
 	if (sfi == 1) {
-	    cchar	**vpp = (const char **) &spp->sp_pwdp ;
-	    cchar	*np = spp->sp_namp ;
-	    cchar	*vp ;
-	    vp = (np + strlen(np)) ;
+	    cchar	**vpp = (cchar **) &spp->sp_pwdp ;
+	    cchar	*sp = spp->sp_namp ;
+	    cchar	*valp ;
+	    valp = (sp + strlen(sp)) ;
 	    sfi += 1 ;
-	    rs = storeitem_strw(ibp,vp,0,vpp) ;
+	    rs = storeitem_strw(ibp,valp,0,vpp) ;
 	}
 	return (rs >= 0) ? sfi : rs ;
 }

@@ -1,7 +1,8 @@
-/* dpq HEADER */
+/* slq HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* Double-Pointer-Queue - regular (no-frills) double circular pointer queue */
+/* SIngle-List-Queue - regular (no-frills) single list pointer queue */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DPQ_INCLUDE
-#define	DPQ_INCLUDE
+#ifndef	SLQ_INCLUDE
+#define	SLQ_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,35 +27,36 @@
 #include	<usysrets.h>
 
 
-#define	DPQ		struct dpq_head
-#define	DPQ_ENT		struct dpq_ent
+#define	SLQ		struct slq_head
+#define	SLQ_ENT		struct slq_ent
 
 
-struct dpq_ent {
-	DPQ_ENT		*next ;
+struct slq_ent {
+	SLQ_ENT		*next ;
 } ;
 
-struct dpq_head {
-	DPQ_ENT		*head ;
-	DPQ_ENT		*tail ;
+struct slq_head {
+	SLQ_ENT		*head ;
+	SLQ_ENT		*tail ;
 } ;
 
-typedef DPQ		dpq ;
-typedef DPQ_ENT		dpq_ent ;
+typedef SLQ		slq ;
+typedef SLQ_ENT		slq_ent ;
 
 EXTERNC_begin
 
-extern int dpq_start(dpq *) noex ;
-extern int dpq_ins(dpq *,dpq_ent *) noex ;
-extern int dpq_insgroup(dpq *,void *,int,int) noex ;
-extern int dpq_rem(dpq *,dpq_ent **) noex ;
-extern int dpq_gettail(dpq *,dpq_ent **) noex ;
-extern int dpq_audit(dpq *) noex ;
-extern int dpq_finish(dpq *) noex ;
+extern int slq_start(slq *) noex ;
+extern int slq_ins(slq *,slq_ent *) noex ;
+extern int slq_insgroup(slq *,void *,int,int) noex ;
+extern int slq_rem(slq *,slq_ent **) noex ;
+extern int slq_gethead(slq *,slq_ent **) noex ;
+extern int slq_gettail(slq *,slq_ent **) noex ;
+extern int slq_audit(slq *) noex ;
+extern int slq_finish(slq *) noex ;
 
 EXTERNC_end
 
 
-#endif /* DPQ_INCLUDE */
+#endif /* SLQ_INCLUDE */
 
 

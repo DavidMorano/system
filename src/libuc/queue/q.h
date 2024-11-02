@@ -1,4 +1,5 @@
 /* q HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* self-relative double-linked queue */

@@ -1,4 +1,5 @@
 /* piq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* pointer interlocked queue */
@@ -23,6 +24,8 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<pq.h>

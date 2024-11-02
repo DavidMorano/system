@@ -627,6 +627,10 @@ int sbuf::hexp(uint64_t v,int n) noex {
     	return sbuf_hexp(this,v,n) ;
 }
 
+int sbuf::decl(long v) noex {
+    	return sbuf_decl(this,v) ;
+}
+
 
 /* private subroutines */
 
