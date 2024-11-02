@@ -74,6 +74,7 @@
 #include	<xperm.h>
 #include	<char.h>
 #include	<hasx.h>
+#include	<isnot.h>
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"pwi.h"
@@ -174,6 +175,7 @@ namespace {
 	int dbnameload(cc *) noex ;
 	int idxload(cc *,int = -1) noex ;
 	int mkpwi() noex ;
+	int decide() noex ;
     } ; /* end struct (opener) */
 }
 
@@ -273,68 +275,64 @@ static vars		var ;
 int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ;
 	if ((rs = pwi_ctor(op,pr)) >= 0) {
-	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) {
-		opener		si(pr,dbname) ;
-		custime		dt = getustime ;
-		if ((rs = si.start()) >= 0) {
-	    	    if ((rs = si.mkidxdname()) >= 0) {
-	        	time_t	ti_pwi ;
-	        	cint	to = TO_FILEMOD ;
-	        	cchar	*suf = IPASSWD_SUF ;
-	        	cchar	*endstr = ENDIANSTR ;
-	        	cchar	*midname = si.idxdname ;
-	        	char	fname[MAXPATHLEN+1] ;
-
-	        if ((rs = mkfnamesuf2(fname,midname,suf,endstr)) >= 0) {
-			USTAT		sb, *sbp = &sb ;
-	            rs1 = u_stat(fname,sbp) ;
-
-	            ti_pwi = sbp->st_mtime ;
-	            if ((rs1 >= 0) && (ti_pwi == 0)) {
-	                rs1 = SR_NOTFOUND ;
-	            }
-
-	            if ((rs1 >= 0) && ((dt - ti_pwi) >= to)) {
-	                rs1 = SR_NOTFOUND ;
-	            }
-
-	            if (rs1 >= 0) {
-
-	                rs1 = u_stat(UCENTPW_FNAME,&sb) ;
-
-	                if ((rs1 >= 0) && (sb.st_mtime > ti_pwi)) {
-	                    rs1 = SR_NOTFOUND ;
-	                }
-
-	            } /* end if (checking against system ucentpw file) */
-
-	            if ((rs1 == SR_NOTFOUND) || (rs1 == SR_ACCESS)) {
-	                rs = si.mkpwi() ;
-	            } else {
-	                rs = rs1 ;
-		    }
-
-	        } /* end if (mkfnamesuf) */
-
-	        if (rs >= 0) {
-	            if ((rs = ipasswd_open(op->dbp,midname)) >= 0) {
-	                op->magic = PWI_MAGIC ;
-	            }
-	        }
-	    } /* end if (opener_midname) */
-	    rs1 = si.finish() ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-	    } /* end if (mkvars) */
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	        static cint	rsv = mkvars() ;
+	        if ((rs = rsv) >= 0) {
+		    opener	so(pr,dbname) ;
+		    if ((rs = so.start()) >= 0) {
+	    	        if ((rs = so.mkidxdname()) >= 0) {
+			    if ((rs = so.decide()) >= 0) {
+				cc *sfn = so.idxdname ;
+				if ((rs = ipasswd_open(op->dbp,sfn)) >= 0) {
+				    rv = rs ;
+	    			    op->magic = PWI_MAGIC ;
+				}
+			    }
+	                } /* end if (opener_midname) */
+	                rs1 = so.finish() ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (opener) */
+	        } /* end if (mkvars) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
 		pwi_dtor(op) ;
 	    }
 	} /* end if (pwi_ctor) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (pwi_open) */
+
+int opener::decide() noex {
+	cint		to = TO_FILEMOD ;
+	int		rs ;
+	cchar		*suf = IPASSWD_SUF ;
+	cchar		*endstr = ENDIANSTR ;
+	cchar		*midname = idxdname ;
+	if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
+	    if ((rs = mkfnamesuf2(fbuf,midname,suf,endstr)) >= 0) {
+		if (USTAT sb ; (rs = u_stat(fbuf,&sb)) >= 0) {
+		    custime	dt = getustime ;
+		    time_t	ti_pwi = sb.st_mtime ;
+		    bool	fmk = false ;
+		    fmk = fmk || ((dt - ti_pwi) >= to) ;
+	            if ((! fmk) && ((rs = u_stat(UCENTPW_FNAME,&sb)) >= 0)) {
+			fmk = (sb.st_mtime > ti_pwi) ;
+	            } /* end if (checking against system ucentpw file) */
+		    if ((rs >= 0) && fmk) {
+	                rs = mkpwi() ;
+		    }
+	        } else if (isNotPresent(rs)) {
+	            rs = mkpwi() ;
+		}
+	    } /* end if (mkfnamesuf) */
+	    rs = rsfree(rs,fbuf) ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end subroutine (opener::decide) */
 
 int pwi_close(pwi *op) noex {
 	int		rs ;
@@ -471,15 +469,16 @@ int opener::finish() noex {
 /* end method (opener::finish) */
 
 int opener::mkidxdname() noex {
+    	cint		nodelen = var.nodenamelen ;
 	int		rs ;
 	if ((dbname == nullptr) || (dbname[0] == '\0')) {
 	    int		ai = 0 ;
-	    cint	sz = ((var.nodenamelen + 1) * 2) ;
-	    if ((char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
-	        cint	nlen = var.nodenamelen ;
-	        cint	clen = var.nodenamelen ;
-	        char	*nbuf = (a + (ai++ * (var.nodenamelen + 1))) ;
-	        char	*cbuf = (a + (ai++ * (var.nodenamelen + 1))) ;
+	    cint	sz = ((nodelen + 1) * 2) ;
+	    if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	        cint	nlen = nodelen ;
+	        cint	clen = nodelen ;
+	        char	*nbuf = (a + (ai++ * (nodelen + 1))) ;
+	        char	*cbuf = (a + (ai++ * (nodelen + 1))) ;
 	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;
 	            cchar	*nn ;

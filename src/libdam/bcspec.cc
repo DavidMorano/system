@@ -1,4 +1,5 @@
 /* bcspec SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* load a Bible-Citation-Specification */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	bcspec
+
+	Description:
 	This object parses and loads a given Bible-Citation-Specification
 	string into itself. The given citation-specification string
 	looks like:
@@ -79,16 +84,16 @@ static int	siourbrk(cchar *,int,int) noex ;
 /* exported subroutines */
 
 int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
+    	BCSPEC		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && sbuf) {
 	    cchar	*sp{} ;
-	    rs = SR_OK ;
-	    memclear(op) ;		/* noted as potentially dangerous */
+	    rs = memclear(hop) ;
 	    op->c = 1 ;
 	    op->v = 1 ;
 	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
-	        int	si ;
 	        int	v ;
+		int	si ;
 	        int	ch = mkchar(sp[0]) ;
 	        if (isalphalatin(ch)) {
 		    op->sp = sp ;
@@ -116,8 +121,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	            rs = SR_DOM ;
 	        }
 	        if ((rs >= 0) && (sl > 0)) {
-		    cchar	*tp ;
-		    if ((tp = strnchr(sp,sl,':')) != nullptr) {
+		    if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
 		        if ((rs = cfdeci(sp,(tp-sp),&v)) >= 0) {
 			    op->c = v ;
 			    sl -= ((tp+1)-sp) ;
