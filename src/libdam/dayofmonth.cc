@@ -32,7 +32,12 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<tmtime.h>
+#include	<calstrs.h>
+#include	<matstr.h>		/* |matcasestr(3uc)| */
+#include	<cfdec.h>
+#include	<mkchar.h>
 #include	<ismisc.h>		/* |isleapyear(3uc)| */
+#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"dayofmonth.h"
@@ -213,9 +218,9 @@ int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 	        }
 	        if (rs >= 0) {
 	            dayofmonth_mon	*mp = op->months[m] ;
-	            int			w = 0 ; /* used-afterwards */
+	            int			w{} ; /* used-afterwards */
 	            if (oday != oday_last) { /* a numbered week */
-	                w = 0 ;
+			w = 0 ;
 	                if (mp->days[w][wday] < 0) {
 			    w += 1 ;
 			}
@@ -237,20 +242,58 @@ int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 }
 /* end subroutine (dayofmonth_lookup) */
 
+int dayofmonth_mkday(dayofmonth *dmp,int m,cchar *cp,int cl) noex {
+	int		rs = SR_OK ;
+	int		mday = 0 ;
+	if ((cl > 0) && (cp[cl-1] == '*')) {
+	    cl -= 1 ;
+	}
+	if (cl > 0) {
+	    cint	ch = mkchar(cp[0]) ;
+	    if (isdigitlatin(ch)) {
+	        rs = cfdeci(cp,cl,&mday) ;
+	    } else if (cl >= 3) {
+		auto	days = calstrs_days ;
+		if (int wday ; (wday = matcasestr(days,cp,3)) >= 0) {
+	            cp += 3 ;
+	            cl -= 3 ;
+		    if (cl > 0) {
+			auto	daytypes = calstrs_daytypes ;
+			int	oday ;
+	                if ((oday = matocasestr(daytypes,2,cp,cl)) >= 0) {
+	                    rs = dayofmonth_lookup(dmp,m,wday,oday) ;
+	                    mday = rs ;
+	                }
+		    } else {
+	                rs = SR_ILSEQ ;
+		    }
+	        } else {
+	            rs = SR_ILSEQ ;
+		}
+	    } else {
+	        rs = SR_ILSEQ ;
+	    }
+	} else {
+	    rs = SR_NOTFOUND ;
+	}
+	return (rs >= 0) ? mday : rs ;
+}
+/* end subroutine (dayofmonth_mkday) */
+
 
 /* private subroutines */
 
 static int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	int		rs = SR_OK ;
 	if (op->months[m] == nullptr) {
-	    cint	sz = szof(dayofmonth_mon) ;
-	    if (dayofmonth_mon *mp ; (rs = uc_malloc(sz,&mp)) >= 0) {
+	    cint	osz = szof(dayofmonth_mon) ;
+	    if (dayofmonth_mon *mp{} ; (rs = uc_malloc(osz,&mp)) >= 0) {
+	       	TM	tmo{} ;
 	        int	daymax = daysmonth[m] ;
 	        op->months[m] = mp ;
 	        if (m == month_february) {
 	            daymax = (isleapyear(op->year)) ? 29 : 28 ;
 	        } /* end if */
-	       	TM	tmo{} ;
 	        tmo.tm_isdst = -1 ;
 	        tmo.tm_year = (op->year - TM_YEAR_BASE) ;
 	        tmo.tm_mon = m ;
@@ -282,5 +325,36 @@ static int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	return rs ;
 }
 /* end subroutine (dayofmonth_mkmonth) */
+
+int dayofmonth::start(int y) noex {
+	return dayofmonth_start(this,y) ;
+}
+
+int dayofmonth::lookup(int m,int wday,int oday) noex {
+	return dayofmonth_lookup(this,m,wday,oday) ;
+}
+
+int dayofmonth::mkday(int m,cchar *sp,int sl) noex {
+	return dayofmonth_mkday(this,m,sp,sl) ;
+}
+
+void dayofmonth::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("dayofmonth",rs,"fini-finish") ;
+	}
+}
+
+dayofmonth_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case dayofmonthmem_finish:
+	        rs = dayofmonth_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (dayofmonth_co::operator) */
 
 

@@ -1,4 +1,5 @@
 /* keyvals SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* key-values (in-memory only) operations */
@@ -659,7 +660,7 @@ static int keyvals_entfins(keyvals *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end while */
-	    if (rs2 != rsn) rs = rs2 ;
+	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	    rs1 = hdb_curend(elp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */

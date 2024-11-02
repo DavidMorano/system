@@ -1,4 +1,5 @@
 /* userattrent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines for simple userattr object (from UNIX® library-3c) management */
@@ -16,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Group:
 	userattrent
 
 	Description:
@@ -48,8 +49,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<storeitem.h>
@@ -96,6 +98,9 @@ static int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int userattrent_parse(UA *uap,char *uabuf,int ualen,cc *sp,int sl) noex {
@@ -135,7 +140,7 @@ int userattrent_parse(UA *uap,char *uabuf,int ualen,cc *sp,int sl) noex {
 	                    if ((cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
 	                        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	                    }
-	                }
+	                } /* end if */
 	                sl -= ((tp+1)-sp) ;
 	                sp = (tp+1) ;
 	                if (rs < 0) break ;
@@ -162,13 +167,13 @@ int userattrent_load(UA *uap,char *uabuf,int ualen,CUA *suap) noex {
 	    memcpy(uap,suap,sizeof(userattr)) ;
 	    if ((rs = storeitem_start(ibp,uabuf,ualen)) >= 0) {
 	        if (suap->attr != nullptr) {
-	            cint	ksize = sizeof(kva_t) ;
-	            cint	al = sizeof(void *) ;
+	            cint	ksize = szof(kva_t) ;
+	            cint	al = szof(void *) ;
 	            cint	n = suap->attr->length ;
-	            void	*p ;
+	            void	*p{} ;
 	            if ((rs = storeitem_block(ibp,ksize,al,&p)) >= 0) {
 	                kva_t	*kvap = (kva_t *) p ;
-	                int	dsize = (n*sizeof(kv_t)) ;
+	                cint	dsize = (n * szof(kv_t)) ;
 	                uap->attr = kvap ;
 	                if ((rs = storeitem_block(ibp,dsize,al,&p)) >= 0) {
 	                    kv_t	*kvp = (kv_t *) p ;
@@ -178,10 +183,10 @@ int userattrent_load(UA *uap,char *uabuf,int ualen,CUA *suap) noex {
 	                        cchar	*dp = suap->attr->data[i].key ;
 	                        cchar	*rp ;
 	                        if ((rs = si_copystr(ibp,&rp,dp)) >= 0) {
-	                            kvp[i].key = (char *) rp ;
+	                            kvp[i].key = charp(rp) ;
 	                            dp = suap->attr->data[i].value ;
 	                            if ((rs = si_copystr(ibp,&rp,dp)) >= 0) {
-	                                kvp[i].value = (char *) rp ;
+	                                kvp[i].value = charp(rp) ;
 	                            }
 	                        }
 	                        if (rs < 0) break ;
@@ -190,9 +195,9 @@ int userattrent_load(UA *uap,char *uabuf,int ualen,CUA *suap) noex {
 	            } /* end if (storeitem_block) */
 	        } /* end if (attr) */
 	        if (rs >= 0) {
-	            cchar	*rp ;
+	            cchar	*rp{} ;
 	            si_copystr(ibp,&rp,suap->name) ;
-	            uap->name = (char *) rp ;
+	            uap->name = charp(rp) ;
 	        }
 	        rs1 = storeitem_finish(ibp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -209,8 +214,7 @@ int userattrent_format(UA *uap,char *rbuf,int rlen) noex {
 	if (uap && rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen > 0) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	        if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 5 ; i += 1) {
 	                if (i > 0) rs = sbuf_char(&b,':') ;
 	                if (rs >= 0) {
@@ -254,22 +258,22 @@ int userattrent_format(UA *uap,char *rbuf,int rlen) noex {
 int userattrent_size(UA *uap) noex {
 	int		rs = SR_FAULT ;
 	if (uap) {
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    kva_t	*kvap = uap->attr ;
 	    if (uap->name) {
-	        size += (strlen(uap->name)+1) ;
+	        sz += (strlen(uap->name) + 1) ;
 	    }
 	    if (uap->attr) {
 	        kv_t	*kvp = kvap->data ;
 	        int	n = kvap->length ;
-	        size += sizeof(kva_t) ;
+	        sz += szof(kva_t) ;
 	        for (int i = 0 ; i < n ; i += 1) {
-	            size += (strlen(kvp[i].key)+1) ;
-	            size += (strlen(kvp[i].value)+1) ;
+	            sz += (strlen(kvp[i].key)+1) ;
+	            sz += (strlen(kvp[i].value)+1) ;
 	        } /* end for */
-	        size += ((n+1)*sizeof(kv_t)) ;
+	        sz += ((n + 1) * szof(kv_t)) ;
 	    } /* end if */
-	    rs = iceil(size,sizeof(const char *)) ;
+	    rs = iceil(sz,szof(cchar *)) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -310,17 +314,17 @@ static int userattrent_parseattr(UA *uap,SI *ibp,cc *sp,int sl) noex {
 /* end subroutine (userattrent_parseattr) */
 
 static int userattrent_parseattrload(UA *uap,SI *ibp,vecstr *alp,int n) noex {
-	cint		ksize = sizeof(kva_t) ;
-	cint		al = sizeof(void *) ;
+	cint		ksize = szof(kva_t) ;
+	cint		al = szof(void *) ;
 	int		rs ;
 	void		*p ;
 	if ((rs = storeitem_block(ibp,ksize,al,&p)) >= 0) {
 	    kva_t	*kvap = (kva_t *) p ;
-	    int		dsize = (n*sizeof(kv_t)) ;
+	    int		dsize = (n * szof(kv_t)) ;
 	    uap->attr = kvap ;
 	    if ((rs = storeitem_block(ibp,dsize,al,&p)) >= 0) {
 	        kv_t	*kvp = (kv_t *) p ;
-	        cchar	*ep ;
+	        cchar	*ep{} ;
 	        uap->attr->length = n ;
 	        uap->attr->data = kvp ;
 	        for (int i = 0 ; vecstr_get(alp,i,&ep) >= 0 ; i += 1) {
@@ -338,21 +342,20 @@ static int userattrent_parseattrload(UA *uap,SI *ibp,vecstr *alp,int n) noex {
 static int si_attrload(SI *ibp,kv_t *kvp,int i,cchar *ep) noex {
 	int		rs ;
 	int		el = -1 ;
-	const char	*tp ;
-	const char	*rp ;
-	const char	*vp ;
-	if ((tp = strchr(ep,'=')) != nullptr) {
+	cchar		*rp{} ;
+	cchar	*vp ;
+	if (cchar *tp ; (tp = strchr(ep,'=')) != nullptr) {
 	    vp = (tp+1) ;
 	    el = (tp-ep) ;
 	} else {
-	    vp = (ep+strlen(ep)) ;
+	    vp = (ep + strlen(ep)) ;
 	}
 	if ((rs = storeitem_strw(ibp,ep,el,&rp)) >= 0) {
 	    kvp[i].key = (char *) rp ;
 	    if ((rs = si_copystr(ibp,&rp,vp)) >= 0) {
 	        kvp[i].value = (char *) rp ;
 	    }
-	}
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (si_attrload) */
@@ -377,11 +380,11 @@ static int sbuf_fmtattrs(sbuf *bp,kva_t *attr) noex {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < n ; i += 1) {
 	        if (kv[i].key != nullptr) {
-	            if (i > 0) rs = sbuf_char(bp,sch) ;
-	            if (rs >= 0) rs = sbuf_strw(bp,kv[i].key,-1) ;
+	            if (i > 0) rs = bp->chr(sch) ;
+	            if (rs >= 0) rs = bp->strw(kv[i].key,-1) ;
 	            if ((rs >= 0) && (kv[i].value != nullptr)) {
-	                rs = sbuf_char(bp,'=') ;
-	                if (rs >= 0) rs = sbuf_strw(bp,kv[i].value,-1) ;
+	                rs = bp->chr('=') ;
+	                if (rs >= 0) rs = bp->strw(kv[i].value,-1) ;
 	            }
 	        } /* end if */
 	        if (rs < 0) break ;

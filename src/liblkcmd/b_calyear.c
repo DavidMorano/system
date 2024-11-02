@@ -1789,9 +1789,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	    }
 
 	} else {
-	    DAYSPEC	ds ;
-
-	    if ((rs = dayspec_load(&ds,sp,sl)) >= 0) {
+	    if (dayspec ds ; (rs = dayspec_load(&ds,sp,sl)) >= 0) {
 	        if ((rs = locinfo_defdayspec(lip,&ds)) >= 0) {
 	            CALYEAR_CITE	q ;
 	            memset(&q,0,sizeof(CALYEAR_CITE)) ;

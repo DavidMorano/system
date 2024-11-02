@@ -1,4 +1,5 @@
 /* userattrdb SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* user-attribute database management */
@@ -27,6 +28,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	userattrdb
+
+	Description:
 	This object is used to access (lookup keynames) in various
 	user-attribute-like databases.  Currently only two databases
 	are possibly queried.  These are:
@@ -52,14 +57,15 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<udomain.h>
-#include	<matxstr.h>
+#include	<matstr.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
@@ -87,6 +93,9 @@ typedef userattrdb	uad ;
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -244,7 +253,7 @@ static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	if (rs >= 0) {
 	    if (op->have.sysdb) {
 	        cchar	*cp{} ;
-	        if ((rs = uc_kvamatch(op->uap->attr,kn,&cp)) >= 0) {
+		if ((rs = uc_kvamatch(op->uap->attr,kn,&cp)) >= 0) {
 		    if (rbuf) {
 		        rs = sncpy1(rbuf,rlen,cp) ;
 		    } else {
@@ -270,8 +279,7 @@ static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	        if (op->domain) {
 		    cchar	*pr = nullptr ;
 		    cchar	*un = op->username ;
-	            char	*dbuf ;
-		    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	            if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
 		        cint	dlen = rs ;
 	                if ((rs = udomain(pr,dbuf,dlen,un)) >= 0) {
 			    cchar	*cp ;

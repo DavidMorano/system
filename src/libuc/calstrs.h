@@ -26,8 +26,9 @@
 #include	<usysdefs.h>
 
 
-extern cchar	*calstrs_months[] ;
-extern cchar	*calstrs_days[] ;
+extern cpcchar	calstrs_months[] ;
+extern cpcchar	calstrs_days[] ;
+extern cpcchar	calstrs_daytypes[] ;
 
 
 #endif /* CALSTRS_INCLUDE */

@@ -38,13 +38,50 @@ struct dayofmonth_head {
 	int		gmtoff ;
 } ;
 
-typedef	DAYOFMONTH	dayofmonth ;
+#ifdef	__cplusplus
+enum dayofmonthmems {
+	dayofmonthmem_finish,
+	dayofmonthmem_overlast
+} ;
+struct dayofmonth ;
+struct dayofmonth_co {
+	dayofmonth	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (dayofmonth *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (dayofmonth_co) */
+struct dayofmonth : dayofmonth_head {
+	dayofmonth_co	finish ;
+	dayofmonth() noex {
+	    finish(this,dayofmonthmem_finish) ;
+	} ;
+	dayofmonth(const dayofmonth &) = delete ;
+	dayofmonth &operator = (const dayofmonth &) = delete ;
+	int start(int) noex ;
+	int lookup(int,int,int) noex ;
+	int mkday(int,cchar *,int) noex ;
+	void dtor() noex ;
+	~dayofmonth() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (dayofmonth) */
+#else	/* __cplusplus */
+typedef DAYOFMONTH	dayofmonth ;
+#endif /* __cplusplus */
+
 typedef	DAYOFMONTH_MON	dayofmonth_mon ;
 
 EXTERNC_begin
 
 extern int dayofmonth_start(dayofmonth *,int) noex ;
 extern int dayofmonth_lookup(dayofmonth *,int,int,int) noex ;
+extern int dayofmonth_mkday(dayofmonth *,int,cchar *,int) noex ;
 extern int dayofmonth_finish(dayofmonth *) noex ;
 
 EXTERNC_end

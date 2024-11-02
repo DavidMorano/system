@@ -24,6 +24,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 
 
@@ -130,6 +132,7 @@ struct sbuf : sbuf_head {
 	    return sbuf_addquoted(this,sp,sl) ;
 	} ;
 	int hexp(uint64_t,int) noex ;
+	int decl(long) noex ;
 	template<typename Binary> int bin(Binary) noex ;
 	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;

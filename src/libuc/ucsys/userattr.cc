@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	userattr
+
+	Description:
 	This file contains the UNIX system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
@@ -31,6 +35,7 @@
 #include	<sys/param.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
