@@ -1,4 +1,5 @@
 /* spwdent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SPWD structure management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	spwdent
+
+	Description:
 	These subroutines perform some SHADOW-structure management
 	functions.
 
@@ -23,10 +28,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<cfdec.h>
 #include	<storeitem.h>
 #include	<sbuf.h>

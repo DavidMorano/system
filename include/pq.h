@@ -52,6 +52,7 @@ EXTERNC_begin
 extern int pq_start(pq *) noex ;
 extern int pq_ins(pq *,pq_ent *) noex ;
 extern int pq_insgroup(pq *,pq_ent *,int,int) noex ;
+extern int pq_gethead(pq *,pq_ent **) noex ;
 extern int pq_gettail(pq *,pq_ent **) noex ;
 extern int pq_rem(pq *,pq_ent **) noex ;
 extern int pq_remtail(pq *,pq_ent **) noex ;

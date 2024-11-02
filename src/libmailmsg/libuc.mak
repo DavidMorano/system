@@ -455,7 +455,7 @@ termescseq.o:		termescseq.cc termescseq.h
 
 tmtime.o:		tmtime.cc tmtime.h
 
-format.o:		format.cc format.h
+fmtstr.o:		fmtstr.cc fmtstr.h
 
 strshrink.o:		strshrink.c
  

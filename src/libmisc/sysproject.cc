@@ -1,4 +1,5 @@
-/* ucenumpj SUPPORT */
+/* sysproject SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* enumerate system SYSDB-XX entries */
@@ -33,7 +34,7 @@
 #include	<localmisc.h>
 
 #include	"ucenumxx.h"
-#include	"ucenumpj.h"
+#include	"sysproject.h"
 
 
 /* local defines */
@@ -56,7 +57,7 @@
 
 /* local variables */
 
-constexpr uint		mxx = UCENUMPJ_MAGIC ;
+constexpr uint		mxx = SYSPROJECT_MAGIC ;
 constexpr sysdbfiles	w = sysdbfile_pj ;
 
 
@@ -68,33 +69,33 @@ constexpr sysdbfiles	w = sysdbfile_pj ;
 
 /* exported subroutines */
 
-int ucenumpj_open(ucenumpj *op,cchar *efname) noex {
-	ucenumxxco<ucenumpj_ent>	ueo(op,mxx) ;
+int sysproject_open(sysproject *op,cchar *efname) noex {
+	ucenumxxco<sysproject_ent>	ueo(op,mxx) ;
 	int		rs ;
 	if (cchar *rp{} ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfnameget) */
 	return rs ;
 }
-/* end if (ucenumpj_open) */
+/* end if (sysproject_open) */
 
-int ucenumpj_close(ucenumpj *op) noex {
-	ucenumxxco<ucenumpj_ent>	ueo(op,mxx) ;
+int sysproject_close(sysproject *op) noex {
+	ucenumxxco<sysproject_ent>	ueo(op,mxx) ;
 	return ueo.close() ;
 } 
-/* end subroutine (ucenumpj_close) */
+/* end subroutine (sysproject_close) */
 
-int ucenumpj_readent(ucenumpj *op,ucenumpj_ent *ep,char *bp,int bl) noex {
-	ucenumxxco<ucenumpj_ent>	ueo(op,mxx) ;
+int sysproject_readent(sysproject *op,sysproject_ent *ep,char *bp,int bl) noex {
+	ucenumxxco<sysproject_ent>	ueo(op,mxx) ;
 	return ueo.readent(ep,bp,bl) ;
 }
-/* end subroutine (ucenumpj_readent) */
+/* end subroutine (sysproject_readent) */
 
-int ucenumpj_reset(ucenumpj *op) noex {
-	ucenumxxco<ucenumpj_ent>	ueo(op,mxx) ;
+int sysproject_reset(sysproject *op) noex {
+	ucenumxxco<sysproject_ent>	ueo(op,mxx) ;
 	return ueo.reset() ;
 }
-/* end subroutine (ucenumpj_reset) */
+/* end subroutine (sysproject_reset) */
 
 
 /* local subroutines */

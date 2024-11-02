@@ -41,6 +41,21 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 
@@ -133,6 +148,24 @@ int slq_rem(slq *op,slq_ent **epp) noex {
 	return rs ;
 }
 /* end subroutine (slq_rem) */
+
+int slq_gethead(slq *op,slq_ent **epp) noex {
+	int		rs = SR_FAULT ;
+	if (op && epp) {
+	    rs = SR_OK ;
+	    if (op->head && op->tail) {
+	        *epp = op->head ;
+	    } else {
+		if (op->head || op->tail) {
+		    rs = SR_BADFMT ;
+		} else {
+		    rs = SR_NOTFOUND ;
+		}
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (slq_gethead) */
 
 int slq_gettail(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;

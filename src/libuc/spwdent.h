@@ -1,4 +1,5 @@
 /* spwdent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* SPWD structure management */
@@ -13,9 +14,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<spwd.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

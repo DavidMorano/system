@@ -425,9 +425,6 @@ svckv.o:		svckv.c svckv.h
 
 svcent.o:		svcent.c svcent.h
 
-format.o:		format.c format.h
-
-
 # standard objects duplicated here
 
 shio.o:			shio.c shio.h

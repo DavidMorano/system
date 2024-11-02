@@ -49,6 +49,7 @@ extern int slq_start(slq *) noex ;
 extern int slq_ins(slq *,slq_ent *) noex ;
 extern int slq_insgroup(slq *,void *,int,int) noex ;
 extern int slq_rem(slq *,slq_ent **) noex ;
+extern int slq_gethead(slq *,slq_ent **) noex ;
 extern int slq_gettail(slq *,slq_ent **) noex ;
 extern int slq_audit(slq *) noex ;
 extern int slq_finish(slq *) noex ;
