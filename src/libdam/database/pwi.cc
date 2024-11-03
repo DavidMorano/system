@@ -6,6 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_PWCACHE	1		/* use |ucpwcache(3uc)| */
+#define	CF_ONLYUNIQ	1		/* only allow unique names on lookup */
 
 /* revision history:
 
@@ -137,6 +138,10 @@
 
 #define	PWDESC		struct pwdesc
 
+#ifndef	CF_ONLYUNIQ
+#define	CF_ONLYUNIQ	1		/* only allow unique names on lookup */
+#endif
+
 
 /* imported namespaces */
 
@@ -178,18 +183,21 @@ namespace {
 	int mk() noex ;
 	int mkbegin(char *) noex ;
 	int mkend() noex ;
+	int decide() noex ;
 	int mkproc(cchar *) noex ;
 	int mkenv(vecstr *) noex ;
 	int mkspawn(cchar *,mainv,vecstr *) noex ;
-	int decide() noex ;
+	int mkwait(int) noex ;
     } ; /* end struct (opener) */
 }
 
-struct pwdesc {
+namespace {
+    struct pwdesc {
 	ucentpw		*pwp ;
 	char		*pwbuf ;
 	int		pwlen ;
-} ;
+    } ; /* end struct (pwdesc) */
+}
 
 namespace {
     struct vars {
@@ -270,6 +278,8 @@ constexpr cpcchar	prbins[] = {
 constexpr cchar		extras[] = "°¹²³" ;
 constexpr cchar		progmkpwi[] = PROG_MKPWI ;
 
+constexpr bool		f_onlyuniq = CF_ONLYUNIQ ;
+
 static vars		var ;
 
 
@@ -314,11 +324,10 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 int opener::decide() noex {
 	cint		to = TO_FILEMOD ;
 	int		rs ;
-	cchar		*suf = IPASSWD_SUF ;
-	cchar		*endstr = ENDIANSTR ;
-	cchar		*midname = idxdname ;
 	if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
-	    if ((rs = mkfnamesuf2(fbuf,midname,suf,endstr)) >= 0) {
+	    cchar	*suf = IPASSWD_SUF ;
+	    cchar	*endstr = ENDIANSTR ;
+	    if ((rs = mkfnamesuf(fbuf,idxdname,suf,endstr)) >= 0) {
 		if (USTAT sb ; (rs = u_stat(fbuf,&sb)) >= 0) {
 		    custime	dt = getustime ;
 		    time_t	ti_pwi = sb.st_mtime ;
@@ -326,7 +335,7 @@ int opener::decide() noex {
 		    fmk = fmk || ((dt - ti_pwi) >= to) ;
 	            if ((! fmk) && ((rs = u_stat(UCENTPW_FNAME,&sb)) >= 0)) {
 			fmk = (sb.st_mtime > ti_pwi) ;
-	            } /* end if (checking against system ucentpw file) */
+	            } /* end if (checking against system PASSWD file) */
 		    if ((rs >= 0) && fmk) {
 	                rs = mk() ;
 		    }
@@ -358,91 +367,109 @@ int pwi_close(pwi *op) noex {
 }
 /* end subroutine (pwi_close) */
 
+namespace {
+    struct lookuper {
+	pwi		*op ;
+	cchar		*name ;
+	char		*rbuf ;
+	int		rlen ;
+	lookuper(pwi *o,char *rb,int rl,cc *n) noex : op(o) {
+	    name = n ;
+	    rbuf = rb ;
+	    rlen = rl ;
+	} ; /* end ctor */
+	int operator () (char *,int) noex ;
+	int proc(cchar *,int) noex ;
+    } ; /* end struct (lookuper) */
+}
+
 int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
-	ipasswd_cur	cur ;
-	realname	rn ;
-	cint		nlen = REALNAMELEN ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		sl ;
-	int		c = 0 ;
-	int		fopts = 0 ;
+    	int		rs ;
 	int		ul = 0 ;
-	cchar		*sp ;
-	char		nbuf[REALNAMELEN + 1] ;
+	if ((rs = pwi_magic(op,rbuf,name)) >= 0) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (name[0]) {
+		cint	nlen = REALNAMELEN ;
+		if (char *nbuf{} ; (rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
+		    lookuper	lo(op,rbuf,rlen,name) ;
+		    {
+		        rs = lo(nbuf,nlen) ;
+		        ul = rs ;
+		    }
+		    rs = rsfree(rs,nbuf) ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? ul : rs ;
+}
+/* end subroutine (pwi_lookup) */
 
-	if (op == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != PWI_MAGIC) return SR_NOTOPEN ;
-
-	if (name[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rlen >= 0) && (rlen < USERNAMELEN))
-	    return SR_OVERFLOW ;
-
-/* conditionally convert to lower case as needed */
-
-	sp = name ;
-	sl = -1 ;
+int lookuper::operator () (char *nbuf,int nlen) noex {
+    	int		rs = SR_OK ;
+	int		ul = 0 ;
+	int		sl = -1 ;
+	cchar		*sp = name ;
 	if (hasuc(name,-1)) {
 	    sp = nbuf ;
 	    rs = sncpylc(nbuf,nlen,name) ;
 	    sl = rs ;
 	}
-
-/* load "name" into realname object for lookup */
-
 	if (rs >= 0) {
+	    rs = proc(sp,sl) ;
+	    ul = rs ;
+	}
+	return (rs >= 0) ? ul : rs ;
+}
+/* end method (lookuper::operator) */
+
+int lookuper::proc(cchar *sp,int sl) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		ul = 0 ;
+	int		c = 0 ;
+	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    PWDESC	pd{} ;
 	    ucentpw	pw ;
-	    cint	pwlen = getbufsize(getbufsize_pw) ;
-	    char	*pwbuf ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-		PWDESC	pd ;
-		pd.pwp = &pw ;
-		pd.pwbuf = pwbuf ;
-		pd.pwlen = pwlen ;
-	        if ((rs = realname_start(&rn,sp,sl)) >= 0) {
-	            if ((rs = ipasswd_curbegin(op->dbp,&cur)) >= 0) {
-		        char	un[USERNAMELEN + 1] ;
+	    cint	pwlen = rs ;
+	    pd.pwp = &pw ;
+	    pd.pwbuf = pwbuf ;
+	    pd.pwlen = pwlen ;
+	    if (realname rn ; (rs = rn.start(sp,sl)) >= 0) {
+		ipasswd		*iop = op->dbp ;
+		auto		ip_cb = ipasswd_curbegin ;
+		if (ipasswd_cur	cur ; (rs = ip_cb(iop,&cur)) >= 0) {
+		    cint	fopts = 0 ;
+		    if (char *un{} ; (rs = malloc_un(&un)) >= 0) {
 	                while (rs >= 0) {
 	                    rs1 = ipasswd_fetch(op->dbp,&rn,&cur,fopts,un) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
 			    rs = rs1 ;
 			    if (rs >= 0) {
 			        if ((rs = realname_isextra(&rn,&pd,un)) == 0) {
-	                            ul = rs1 ; /* this must be HERE! */
 	                            c += 1 ;
 	                            rs = sncpy1(rbuf,rlen,un) ;
 			        }
 			    }
 	                } /* end while */
-	                rs1 = ipasswd_curend(op->dbp,&cur) ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (cursor) */
-	            rs1 = realname_finish(&rn) ;
+			rs = rsfree(rs,un) ;
+		    } /* end if (m-a-f) */
+	            rs1 = ipasswd_curend(op->dbp,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (realname) */
-		rs1 = uc_free(pwbuf) ;
+	        } /* end if (cursor) */
+	        rs1 = rn.finish ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
-	} /* end if (ok) */
-
-/* if there was more than one match to the name, punt and issue error */
-
-	if (rs >= 0) {
-	    if (c <= 0) {
-	        rs = SR_NOTFOUND ;
-	    } else if (c > 1) {
+	    } /* end if (realname) */
+	    rs = rsfree(rs,pwbuf) ;
+	} /* end if (m-a-f) */
+	if_constexpr (f_onlyuniq) {
+	    if ((rs >= 0) && (c > 1)) {
 	        rs = SR_NOTUNIQ ;
 	    }
-	} /* end if */
-
+	} /* end if (f_onlyuniq) */
 	return (rs >= 0) ? ul : rs ;
 }
-/* end subroutine (pwi_lookup) */
+/* end method (lookuper::proc) */
 
 
 /* private subroutines */
@@ -526,6 +553,7 @@ int opener::mk() noex {
         int		rs1 ;
         int		rv = 0 ;
 	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	    pbuf[0] = '\0' ;
             if ((rs = mkbegin(pbuf)) >= 0) {
     		{
 		    rs = mkproc(pbuf) ;
@@ -546,16 +574,16 @@ int opener::mkbegin(char *pbuf) noex {
 	int		len = 0 ;
 	if (ids id ; (rs = id.load) >= 0) {
 	    for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
-	        if ((rs = mkpath3(pbuf,pr,prbins[i],progmkpwi)) >= 0) {
-		    uid_t	u = id.uid ;
-		    gid_t	g = id.gid ;
-		    gid_t	*gids = id.gids ;
+	        if ((rs = mkpath(pbuf,pr,prbins[i],progmkpwi)) >= 0) {
+		    const uid_t		u = id.uid ;
+		    const gid_t		g = id.gid ;
+		    const gid_t		*gids = id.gids ;
 	            if ((rs = perm(pbuf,u,g,gids,X_OK)) >= 0) {
 			len = rs ;
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 		    }
-	        }
+	        } /* end if (mkpath) */
 	        if (rs != 0) break ;
 	    } /* end for */
 	    rs1 = id.release ;
@@ -585,15 +613,17 @@ int opener::mkproc(cchar *pbuf) noex {
 		cchar	*argz = progmkpwi ;
 		if (int cl ; (cl = sfbasename(progmkpwi,-1,&cp)) > 0) {
 		    argz = abuf ;
-		    strwcpyuc(abuf,cp,MIN(cl,alen)) ;
+		    strwcpyuc(abuf,cp,min(cl,alen)) ;
 		}
 		/* setup arguments */
 	        av[ai++] = argz ;
 	        av[ai++] = nullptr ;
 		/* setup environment */
 		if ((rs = mkenv(&envs)) >= 0) {
-		    rs = mkspawn(pbuf,av,&envs) ;
-		    cpid = rs ;
+		    if ((rs = mkspawn(pbuf,av,&envs)) >= 0) {
+		        cint	cpid = rs ;
+			rs = mkwait(cpid) ;
+		    }
 	        } /* end if (mkenv) */
 		rs = rsfree(rs,abuf) ;
 	    } /* end if (m-a-f) */
@@ -625,38 +655,25 @@ int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
 }
 /* end method (opener::mkspawn) */
 
-
-
-#ifdef	COMMENT
-	    if (rs >= 0) {
-
-	        cstat = 0 ;
-	        rs = 0 ;
-	        while (rs == 0) {
-	            rs = u_waitpid(cpid,&cstat,0) ;
-	            if (rs == SR_INTR) rs = 0 ;
-	        } /* end while */
-
-	        if (rs >= 0) {
-	            cex = 0 ;
-	            if (WIFSIGNALED(cstat)) {
-	                rs = SR_UNATCH ;	/* protocol not attached */
-		    } else if (WIFEXITED(cstat)) {
-
-	                cex = WEXITSTATUS(cstat) ;
-
-	                if (cex != 0)
-	                    rs = SR_LIBBAD ;
-
-	            } /* end if (wait-exited) */
-	        } /* end if (process finished) */
-	    } /* end if */
+int opener::mkwait(int cpid) noex {
+    	int		rs = SR_OK ;
+	int		cstat = 0 ;
+	while (rs == 0) {
+	     rs = u_waitpid(cpid,&cstat,0) ;
+	     if (rs == SR_INTR) rs = 0 ;
+	} /* end while */
+	if (rs >= 0) {
+	    if (WIFSIGNALED(cstat)) {
+	        rs = SR_UNATCH ;	/* protocol not attached */
+	    } else if (WIFEXITED(cstat)) {
+		if (int cex = WEXITSTATUS(cstat) ; cex != 0) {
+	      	    rs = SR_LIBBAD ;
+	        } /* end if (wait-exited) */
+	    } /* end if (process finished) */
 	} /* end if (ok) */
 	return rs ;
 }
-/* end method (opener::mkproc) */
-
-#endif /* COMMENT */
+/* end method (opener::mkwait) */
 
 int opener::mkenv(vecstr *elp) noex {
         int		rs ;

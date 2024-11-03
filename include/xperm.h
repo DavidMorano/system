@@ -43,8 +43,8 @@
 EXTERNC_begin
 
 extern int sperm(ids *,USTAT *,int) noex ;
-extern int perm(cchar *,uid_t,gid_t,gid_t *,int) noex ;
-extern int fperm(int,uid_t,gid_t,gid_t *,int) noex ;
+extern int perm(cchar *,uid_t,gid_t,const gid_t *,int) noex ;
+extern int fperm(int,uid_t,gid_t,const gid_t *,int) noex ;
 extern int permsched(mainv,vecstr *,char *,int,cc *,mode_t) noex ;
 
 EXTERNC_end

@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_PWCACHE	1		/* use |ucpwcache(3uc)| */
-#define	CF_ONLYUNIQ	1		/* only allow unique names on lookup */
 
 /* revision history:
 
@@ -138,10 +137,6 @@
 
 #define	PWDESC		struct pwdesc
 
-#ifndef	CF_ONLYUNIQ
-#define	CF_ONLYUNIQ	1		/* only allow unique names on lookup */
-#endif
-
 
 /* imported namespaces */
 
@@ -191,13 +186,11 @@ namespace {
     } ; /* end struct (opener) */
 }
 
-namespace {
-    struct pwdesc {
+struct pwdesc {
 	ucentpw		*pwp ;
 	char		*pwbuf ;
 	int		pwlen ;
-    } ; /* end struct (pwdesc) */
-}
+} ;
 
 namespace {
     struct vars {
@@ -277,8 +270,6 @@ constexpr cpcchar	prbins[] = {
 
 constexpr cchar		extras[] = "°¹²³" ;
 constexpr cchar		progmkpwi[] = PROG_MKPWI ;
-
-constexpr bool		f_onlyuniq = CF_ONLYUNIQ ;
 
 static vars		var ;
 
@@ -367,109 +358,91 @@ int pwi_close(pwi *op) noex {
 }
 /* end subroutine (pwi_close) */
 
-namespace {
-    struct lookuper {
-	pwi		*op ;
-	cchar		*name ;
-	char		*rbuf ;
-	int		rlen ;
-	lookuper(pwi *o,char *rb,int rl,cc *n) noex : op(o) {
-	    name = n ;
-	    rbuf = rb ;
-	    rlen = rl ;
-	} ; /* end ctor */
-	int operator () (char *,int) noex ;
-	int proc(cchar *,int) noex ;
-    } ; /* end struct (lookuper) */
-}
-
 int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
-    	int		rs ;
+	ipasswd_cur	cur ;
+	realname	rn ;
+	cint		nlen = REALNAMELEN ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		sl ;
+	int		c = 0 ;
+	int		fopts = 0 ;
 	int		ul = 0 ;
-	if ((rs = pwi_magic(op,rbuf,name)) >= 0) {
-	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
-	    if (name[0]) {
-		cint	nlen = REALNAMELEN ;
-		if (char *nbuf{} ; (rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
-		    lookuper	lo(op,rbuf,rlen,name) ;
-		    {
-		        rs = lo(nbuf,nlen) ;
-		        ul = rs ;
-		    }
-		    rs = rsfree(rs,nbuf) ;
-		} /* end if (m-a-f) */
-	    } /* end if (valid) */
-	} /* end if (magic) */
-	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (pwi_lookup) */
+	cchar		*sp ;
+	char		nbuf[REALNAMELEN + 1] ;
 
-int lookuper::operator () (char *nbuf,int nlen) noex {
-    	int		rs = SR_OK ;
-	int		ul = 0 ;
-	int		sl = -1 ;
-	cchar		*sp = name ;
+	if (op == nullptr) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+
+	if (op->magic != PWI_MAGIC) return SR_NOTOPEN ;
+
+	if (name[0] == '\0') return SR_INVALID ;
+
+	rbuf[0] = '\0' ;
+	if ((rlen >= 0) && (rlen < USERNAMELEN))
+	    return SR_OVERFLOW ;
+
+/* conditionally convert to lower case as needed */
+
+	sp = name ;
+	sl = -1 ;
 	if (hasuc(name,-1)) {
 	    sp = nbuf ;
 	    rs = sncpylc(nbuf,nlen,name) ;
 	    sl = rs ;
 	}
-	if (rs >= 0) {
-	    rs = proc(sp,sl) ;
-	    ul = rs ;
-	}
-	return (rs >= 0) ? ul : rs ;
-}
-/* end method (lookuper::operator) */
 
-int lookuper::proc(cchar *sp,int sl) noex {
-    	int		rs ;
-	int		rs1 ;
-	int		ul = 0 ;
-	int		c = 0 ;
-	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
-	    PWDESC	pd{} ;
+/* load "name" into realname object for lookup */
+
+	if (rs >= 0) {
 	    ucentpw	pw ;
-	    cint	pwlen = rs ;
-	    pd.pwp = &pw ;
-	    pd.pwbuf = pwbuf ;
-	    pd.pwlen = pwlen ;
-	    if (realname rn ; (rs = rn.start(sp,sl)) >= 0) {
-		ipasswd		*iop = op->dbp ;
-		auto		ip_cb = ipasswd_curbegin ;
-		if (ipasswd_cur	cur ; (rs = ip_cb(iop,&cur)) >= 0) {
-		    cint	fopts = 0 ;
-		    if (char *un{} ; (rs = malloc_un(&un)) >= 0) {
+	    cint	pwlen = getbufsize(getbufsize_pw) ;
+	    char	*pwbuf ;
+	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+		PWDESC	pd ;
+		pd.pwp = &pw ;
+		pd.pwbuf = pwbuf ;
+		pd.pwlen = pwlen ;
+	        if ((rs = realname_start(&rn,sp,sl)) >= 0) {
+	            if ((rs = ipasswd_curbegin(op->dbp,&cur)) >= 0) {
+		        char	un[USERNAMELEN + 1] ;
 	                while (rs >= 0) {
 	                    rs1 = ipasswd_fetch(op->dbp,&rn,&cur,fopts,un) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
 			    rs = rs1 ;
 			    if (rs >= 0) {
 			        if ((rs = realname_isextra(&rn,&pd,un)) == 0) {
+	                            ul = rs1 ; /* this must be HERE! */
 	                            c += 1 ;
 	                            rs = sncpy1(rbuf,rlen,un) ;
 			        }
 			    }
 	                } /* end while */
-			rs = rsfree(rs,un) ;
-		    } /* end if (m-a-f) */
-	            rs1 = ipasswd_curend(op->dbp,&cur) ;
+	                rs1 = ipasswd_curend(op->dbp,&cur) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (cursor) */
+	            rs1 = realname_finish(&rn) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (cursor) */
-	        rs1 = rn.finish ;
+	        } /* end if (realname) */
+		rs1 = uc_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (realname) */
-	    rs = rsfree(rs,pwbuf) ;
-	} /* end if (m-a-f) */
-	if_constexpr (f_onlyuniq) {
-	    if ((rs >= 0) && (c > 1)) {
+	    } /* end if (memory-allocation) */
+	} /* end if (ok) */
+
+/* if there was more than one match to the name, punt and issue error */
+
+	if (rs >= 0) {
+	    if (c <= 0) {
+	        rs = SR_NOTFOUND ;
+	    } else if (c > 1) {
 	        rs = SR_NOTUNIQ ;
 	    }
-	} /* end if (f_onlyuniq) */
+	} /* end if */
+
 	return (rs >= 0) ? ul : rs ;
 }
-/* end method (lookuper::proc) */
+/* end subroutine (pwi_lookup) */
 
 
 /* private subroutines */
