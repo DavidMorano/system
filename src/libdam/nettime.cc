@@ -1,4 +1,5 @@
 /* nettime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to get time from a network time server host */
@@ -424,9 +425,8 @@ static int nettime_udptrysome(UDPARGS *uap,char *tsbuf,vechand *alp,
 	if ((rs = hostaddr_curbegin(hap,&cur)) >= 0) {
 	    ADDRINFO	*aip ;
 	    int		proto ;
-	    int		f ;
-
-	    while (hostaddr_enum(hap,&cur,&aip) >= 0) {
+	    bool		f ;
+	    while (hostaddr_curenum(hap,&cur,&aip) >= 0) {
 
 	        proto = aip->ai_protocol ;
 	        f = ((proto == uap->proto) || (proto <= 0)) ;

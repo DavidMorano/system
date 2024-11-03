@@ -56,10 +56,9 @@
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<endian.h>
-#include	<ids.h>
 #include	<mkpathx.h>
 #include	<mkfname.h>
-#include	<sfx.h>			/* |sfbasename(3uc)| */
+#include	<sfx.h>
 #include	<snx.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
@@ -175,12 +174,7 @@ namespace {
 	int mkidxdname() noex ;
 	int dbnameload(cc *) noex ;
 	int idxload(cc *,int = -1) noex ;
-	int mk() noex ;
-	int mkbegin(char *) noex ;
-	int mkend() noex ;
-	int mkproc(cchar *) noex ;
-	int mkenv(vecstr *) noex ;
-	int mkspawn(cchar *,mainv,vecstr *) noex ;
+	int mkpwi() noex ;
 	int decide() noex ;
     } ; /* end struct (opener) */
 }
@@ -328,10 +322,10 @@ int opener::decide() noex {
 			fmk = (sb.st_mtime > ti_pwi) ;
 	            } /* end if (checking against system ucentpw file) */
 		    if ((rs >= 0) && fmk) {
-	                rs = mk() ;
+	                rs = mkpwi() ;
 		    }
 	        } else if (isNotPresent(rs)) {
-	            rs = mk() ;
+	            rs = mkpwi() ;
 		}
 	    } /* end if (mkfnamesuf) */
 	    rs = rsfree(rs,fbuf) ;
@@ -521,113 +515,86 @@ int opener::idxload(cc *dp,int dl) noex {
 }
 /* end method (opener::idxload) */
 
-int opener::mk() noex {
-        int		rs ;
-        int		rs1 ;
-        int		rv = 0 ;
-	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
-            if ((rs = mkbegin(pbuf)) >= 0) {
-    		{
-		    rs = mkproc(pbuf) ;
-		    rv = rs ;
-		} /* end block */
-	        rs1 = mkend() ;
-	        if (rs >= 0) rs = rs1 ;
-            } /* end if (mk) */
-	    rs = rsfree(rs,pbuf) ;
-	} /* end if (m-a-f) */
-        return (rs >= 0) ? rv : rs ;
-}
-/* end method (opener::mk) */
-
-int opener::mkbegin(char *pbuf) noex {
-    	int		rs ;
+int opener::mkpwi() noex {
+	int		rs = SR_OK ;
 	int		rs1 ;
-	int		len = 0 ;
-	if (ids id ; (rs = id.load) >= 0) {
-	    for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
-	        if ((rs = mkpath3(pbuf,pr,prbins[i],progmkpwi)) >= 0) {
-		    uid_t	u = id.uid ;
-		    gid_t	g = id.gid ;
-		    gid_t	*gids = id.gids ;
-	            if ((rs = perm(pbuf,u,g,gids,X_OK)) >= 0) {
-			len = rs ;
-		    } else if (isNotPresent(rs)) {
-			rs = SR_OK ;
-		    }
-	        }
-	        if (rs != 0) break ;
-	    } /* end for */
-	    rs1 = id.release ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ids) */
-	return (rs >= 0) ? len : rs ;
-}
-/* end method (opener::mkbegin) */
+	cchar		*dbname = idxdname ;
+	char		progfname[MAXPATHLEN + 1] ;
 
-int opener::mkend() noex {
-    	return SR_OK ;
-}
-/* end method (opener::mkend) */
+	if (dbname == nullptr)
+	    return SR_FAULT ;
 
-int opener::mkproc(cchar *pbuf) noex {
-	cint		vn = 10 ;
-	cint		vo = VECSTR_OCOMPACT ;
-	int		rs ;
-	int		rs1 ;
-	int		cpid = 0 ;
-	if (vecstr envs ; (rs = vecstr_start(&envs,vn,vo)) >= 0) {
-	    if (char *abuf{} ; (rs = malloc_mn(&abuf)) >= 0) {
-		cint	alen = rs ;
+	if (dbname[0] == '\0')
+	    return SR_INVALID ;
+
+	for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
+	    if ((rs = mkpath3(progfname,pr,prbins[i],progmkpwi)) >= 0) {
+	        rs = perm(progfname,-1,-1,nullptr,X_OK) ;
+	    }
+	    if (rs >= 0) break ;
+	} /* end for */
+
+	if (rs >= 0) {
+	    pid_t	cpid ;
+	    cint	vn = 10 ;
+	    cint	vo = VECSTR_OCOMPACT ;
+	    int		cstat ;
+	    int		cex ;
+	    if (vecstr envs ; (rs = vecstr_start(&envs,vn,vo)) >= 0) {
+		cint	alen = MAXNAMELEN ;
+		int	cl ;
 	        int	ai = 0 ;
 	        cchar	*av[10] ;
 		cchar	*cp{} ;
 		cchar	*argz = progmkpwi ;
-		if (int cl ; (cl = sfbasename(progmkpwi,-1,&cp)) > 0) {
+		char	abuf[MAXNAMELEN+1] ;
+
+		if ((cl = sfbasename(progmkpwi,-1,&cp)) > 0) {
 		    argz = abuf ;
 		    strwcpyuc(abuf,cp,MIN(cl,alen)) ;
 		}
-		/* setup arguments */
+
+/* setup arguments */
+
 	        av[ai++] = argz ;
 	        av[ai++] = nullptr ;
-		/* setup environment */
-		if ((rs = mkenv(&envs)) >= 0) {
-		    rs = mkspawn(pbuf,av,&envs) ;
-		    cpid = rs ;
-	        } /* end if (mkenv) */
-		rs = rsfree(rs,abuf) ;
-	    } /* end if (m-a-f) */
-	    rs1 = envs.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (vecstr) */
-	return (rs >= 0) ? cpid : rs ;
-}
-/* end method (opener::mkproc) */
 
-int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
-    	int		rs ;
-	int		cpid = 0 ;
-	if (mainv ev{} ; (rs = elp->getvec(&ev)) >= 0) {
-	    spawnproc_con	ps{} ;
-	    ps.opts |= SPAWNPROC_OIGNINTR ;
-	    ps.opts |= SPAWNPROC_OSETPGRP ;
-	    for (int i = 0 ; i < 3 ; i += 1) {
-		if (i != 2) {
-		    ps.disp[i] = SPAWNPROC_DCLOSE ;
-		} else {
-		    ps.disp[i] = SPAWNPROC_DINHERIT ;
+/* setup environment */
+
+	        vecstr_envadd(&envs,VARPRPWI,pr,-1) ;
+
+		if (dbname != nullptr) {
+	            vecstr_envadd(&envs,VARDBNAME,dbname,-1) ;
 		}
-	    } /* end for */
-	    rs = spawnproc(&ps,pbuf,av,ev) ;
-	    cpid = rs ;
-	} /* end if (vecstr_getvec) */
-	return (rs >= 0) ? cpid : rs ;
-}
-/* end method (opener::mkspawn) */
+	        for (int i = 0 ; exports[i] != nullptr ; i += 1) {
+	            if ((cp = getenv(exports[i])) != nullptr) {
+	                rs = vecstr_envadd(&envs,exports[i],cp,-1) ;
+		    }
+	            if (rs < 0) break ;
+	        } /* end for */
+	        if (rs >= 0) {
+	            if (mainv ev{} ; (rs = vecstr_getvec(&envs,&ev)) >= 0) {
 
+	    		spawnproc_con	ps{} ;
+	            ps.opts |= SPAWNPROC_OIGNINTR ;
+	            ps.opts |= SPAWNPROC_OSETPGRP ;
+	            for (int i = 0 ; i < 3 ; i += 1) {
+			if (i != 2) {
+	                    ps.disp[i] = SPAWNPROC_DCLOSE ;
+			} else {
+	                    ps.disp[i] = SPAWNPROC_DINHERIT ;
+			}
+	            } /* end for */
 
+	            rs = spawnproc(&ps,progfname,av,ev) ;
+	            cpid = rs ;
 
-#ifdef	COMMENT
+		    } /* end if (vecstr_getvec) */
+	        } /* end if (ok) */
+	        rs1 = vecstr_finish(&envs) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (vecstr) */
+
 	    if (rs >= 0) {
 
 	        cstat = 0 ;
@@ -641,7 +608,8 @@ int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
 	            cex = 0 ;
 	            if (WIFSIGNALED(cstat)) {
 	                rs = SR_UNATCH ;	/* protocol not attached */
-		    } else if (WIFEXITED(cstat)) {
+		    }
+	            if ((rs >= 0) && WIFEXITED(cstat)) {
 
 	                cex = WEXITSTATUS(cstat) ;
 
@@ -649,31 +617,16 @@ int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
 	                    rs = SR_LIBBAD ;
 
 	            } /* end if (wait-exited) */
+
 	        } /* end if (process finished) */
+
 	    } /* end if */
+
 	} /* end if (ok) */
+
 	return rs ;
 }
-/* end method (opener::mkproc) */
-
-#endif /* COMMENT */
-
-int opener::mkenv(vecstr *elp) noex {
-        int		rs ;
-        cchar		*vn = VARPRPWI ;
-        if ((rs = elp->envadd(vn,pr)) >= 0) {
-	    if (idxdname) {
-	        rs = elp->envadd(VARDBNAME,idxdname) ;
-	    }
-	    for (int i = 0 ; (rs >= 0) && exports[i] ; i += 1) {
-	        if (cc *valp ; (valp = getenv(exports[i])) != nullptr) {
-	            rs = elp->envadd(exports[i],valp) ;
-		}
-	    } /* end for */
-	}
-	return rs ;
-}
-/* end method (opener:mkenv) */
+/* end method (opener::mkpwi) */
 
 static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
 	int		rs ;

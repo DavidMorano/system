@@ -930,6 +930,10 @@ int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
 }
 
+int vecstr::envadd(cchar *kp,cchar *valp,int vall) noex {
+	return vecstr_envadd(this,kp,valp,vall) ;
+}
+
 int vecstr::envset(cchar *kp,cchar *valp,int vall) noex {
 	return vecstr_envset(this,kp,valp,vall) ;
 }
