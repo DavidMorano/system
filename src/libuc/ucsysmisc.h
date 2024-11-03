@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* slightly tuned UNIX® look-alike for |getpid(2)| */
+/* slightly tuned UNIX® look-alike for |getpageize(3c)| */
 /* version %I% last-modified %G% */
 
 
@@ -36,6 +36,8 @@ extern int	uc_pagesize() noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
 struct ucpagesizer {
     	int		pagesize ;
     	operator int () noex ;
@@ -45,6 +47,8 @@ struct ucpagesizer {
 } ; /* end struct (ucpagesizer) */
 
 extern ucpagesizer	ucpagesize ;
+
+#endif /* __cplusplus */
 
 
 #endif /* UCSYSMISC_INCLUDE */

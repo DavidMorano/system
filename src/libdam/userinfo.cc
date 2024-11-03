@@ -1,4 +1,5 @@
 /* userinfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user information from various databases */
@@ -532,7 +533,7 @@ static int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 
 static int userinfo_id(UI *uip) noex {
 	int		rs ;
-	if ((rs = uc_getpid()) >= 0) {
+	if ((rs = ucpid) >= 0) {
 	    uip->pid = rs ;
 	    uip->uid = getuid() ;
 	    uip->euid = geteuid() ;
@@ -541,7 +542,7 @@ static int userinfo_id(UI *uip) noex {
 	    if ((rs = ostype) >= 0) {
 	        uip->ostype = uint(rs) ;
 	    }
-	} /* end if (uc_getpid) */
+	} /* end if (ucpid) */
 	return rs ;
 }
 /* end subroutine (userinfo_id) */

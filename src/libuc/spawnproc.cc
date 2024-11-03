@@ -523,7 +523,7 @@ int envloader::envfname() noex {
 	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
 		cint	sulen = (strlen(efname)+22) ;
 		if (char *subuf{} ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
-	    	    if ((rs = uc_getpid()) >= 0) {
+	    	    if ((rs = ucpid) >= 0) {
 	    	        if ((rs = snshellunder(subuf,sulen,rs,efname)) > 0) {
 	       		    rs = envhelp_envset(ehp,"_",subuf,rs) ;
 	    	        }

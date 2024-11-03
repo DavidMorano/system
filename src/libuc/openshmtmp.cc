@@ -151,17 +151,19 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 /* local subroutines */
 
 static int randinit(ulong *rvp) noex {
-	const pid_t	pid = uc_getpid() ;
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs = SR_FAULT ;
 	if (rvp) {
-	    ulong	rv = 0 ;
-	    ulong	sv = ulong(dt) ;
-	    rv += (sv << 8) ;
-	    sv = ulong(pid) ;
-	    rv += sv ;
-	    *rvp = rv ;
-	    rs = int(rv & INT_MAX) ;
+	    if ((rs = ucpid) >= 0) {
+		cint	pid = rs ;
+	        ulong	rv = 0 ;
+	        ulong	sv = ulong(dt) ;
+	        rv += (sv << 8) ;
+	        sv = ulong(pid) ;
+	        rv += sv ;
+	        *rvp = rv ;
+	        rs = int(rv & INT_MAX) ;
+	    } /* end if (ucpid) */
 	} /* end if (non-null) */
 	return rs ;
 }

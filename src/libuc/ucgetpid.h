@@ -35,6 +35,19 @@ extern int	uc_setpid(pid_t) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+struct ucpider {
+    	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucpagesizer) */
+
+extern ucpider		ucpid ;
+
+#endif /* __cplusplus */
+
 
 #endif /* UCGETPID_INCLUDE */
 

@@ -1,4 +1,5 @@
 /* ucgetpid HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* slightly tuned UNIX® look-alike for |getpid(2)| */
@@ -23,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -32,6 +34,19 @@ extern int	uc_getpid() noex ;
 extern int	uc_setpid(pid_t) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+struct ucpider {
+    	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucpagesizer) */
+
+extern ucpider		ucpid ;
+
+#endif /* __cplusplus */
 
 
 #endif /* UCGETPID_INCLUDE */

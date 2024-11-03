@@ -53,6 +53,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -72,7 +73,36 @@
 #endif
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -84,9 +114,9 @@ int uc_writedesc(int dfd,int sfd,int ulen) noex {
 	if (sfd == dfd) return SR_INVALID ;
 
 	if (ulen != 0) {
-	    if ((rs = uc_pagesize()) >= 0) {
+	    if ((rs = ucpagesize) >= 0) {
 	    size_t	fsize = SIZE_MAX ;
-	    const int	ps = rs ;
+	    cint	ps = rs ;
 	    int		readlen ;
 
 /* calculate the size of a buffer to allocate */
@@ -131,8 +161,8 @@ int uc_writedesc(int dfd,int sfd,int ulen) noex {
 	        if (readlen <= ps) {
 	            rs = uc_libmalloc(readlen,&mdata) ;
 	        } else {
-	            const int	mprot = (PROT_READ|PROT_WRITE) ;
-	            const int	mflag = (MAP_PRIVATE|MAP_ANON) ;
+	            cint	mprot = (PROT_READ|PROT_WRITE) ;
+	            cint	mflag = (MAP_PRIVATE|MAP_ANON) ;
 	            msize = readlen ;
 	            rs = u_mmap(NULL,msize,mprot,mflag,-1,0L,&mdata) ;
 	        }

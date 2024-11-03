@@ -193,7 +193,7 @@ static int lineindex_opener(LI *op) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = lineindex_fileopen(op,dt)) >= 0) {
-	    cint	sz = 16 + 4 + (header_overlast * sizeof(int)) ;
+	    cint	sz = 16 + 4 + (header_overlast * szof(int)) ;
 	    cint	fd = op->fd ;
 	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 		size_t	fsz = size_t(sb.st_size) ;

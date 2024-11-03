@@ -1,4 +1,5 @@
 /* userinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user information from various databases */

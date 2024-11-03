@@ -387,10 +387,11 @@ int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
     	int		rs ;
 	int		ul = 0 ;
 	if ((rs = pwi_magic(op,rbuf,name)) >= 0) {
+	    cint	nl = strlen(name) ;
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (name[0]) {
-		cint	nlen = REALNAMELEN ;
+		cint	nlen = min(REALNAMELEN,nl) ;
 		if (char *nbuf{} ; (rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
 		    lookuper	lo(op,rbuf,rlen,name) ;
 		    {
