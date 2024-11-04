@@ -1048,6 +1048,10 @@ int vecpstr::getvec(mainv *rppp) noex {
 	return vecpstr_getvec(this,rppp) ;
 }
 
+int vecpstr::envadd(cchar *kp,cchar *valp,int vall) noex {
+	return vecpstr_envadd(this,kp,valp,vall) ;
+}
+
 int vecpstr::envset(cchar *kp,cchar *valp,int vall) noex {
 	return vecpstr_envset(this,kp,valp,vall) ;
 }

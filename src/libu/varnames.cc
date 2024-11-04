@@ -1,4 +1,5 @@
 /* varnames SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a database of commonly used environment variable names */
@@ -25,6 +26,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"varnames.hh"
 

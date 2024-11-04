@@ -1,4 +1,5 @@
 /* getostype HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the type of operating system we are on */
@@ -61,13 +62,16 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-struct ostyper {
-    operator int () noex ;
-    int operator () () noex ;
-} ;
+namespace libdam {
+    struct ostyper {
+        operator int () noex ;
+        int operator () () noex ;
+    } ; /* end struct (ostyper) */
+}
 
-extern ostyper	ostype ;
-extern cpcchar	ostypenames[] ;
+extern libdam::ostyper	ostype ;
+
+extern cpcchar		ostypenames[] ;
 
 #endif /* __cplusplus */
 

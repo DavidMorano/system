@@ -113,7 +113,7 @@
 
 /* exported variables */
 
-ucpagesizer		ucpagesize ;
+libuc::ucpagesizer		ucpagesize ;
 
 
 /* exported subroutines */
@@ -214,7 +214,8 @@ int uc_pagesize() noex {
 
 /* local subrouties */
 
-ucpagesizer::operator int () noex {
+namespace libuc {
+    ucpagesizer::operator int () noex {
     	int		rs ;
 	if ((rs = pagesize) == 0) {
 	    cint	cmd = _SC_PAGESIZE ;
@@ -223,7 +224,7 @@ ucpagesizer::operator int () noex {
 	    }
 	}
     	return rs ;
+    } /* end method (ucpagesizer::operator) */
 }
-/* end method (ucpagesizer::operator) */
 
 

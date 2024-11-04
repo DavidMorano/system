@@ -53,6 +53,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -102,41 +103,11 @@
 
 #define	PROG_MKPWI	"mkpwi"
 
-#ifndef	VARHZ
-#define	VARHZ		"HZ"
-#endif
-
-#ifndef	VARNODE
-#define	VARNODE		"NODE"
-#endif
-
-#ifndef	VARHOMEDNAME
-#define	VARHOMEDNAME	"HOME"
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
-#endif
-
-#ifndef	VARTZ
-#define	VARTZ		"TZ"
-#endif
-
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
-#endif
-
 #undef	VARDBNAME
 #define	VARDBNAME	"MKPWI_DBNAME"
 
 #undef	VARPRPWI
 #define	VARPRPWI	"MKPWI_PROGRAMROOT"
-
-#define	PWDESC		struct pwdesc
 
 #ifndef	CF_ONLYUNIQ
 #define	CF_ONLYUNIQ	1		/* only allow unique names on lookup */
@@ -196,6 +167,10 @@ namespace {
 	ucentpw		*pwp ;
 	char		*pwbuf ;
 	int		pwlen ;
+	pwdesc(ucentpw *p,char *pb,int pl) noex : pwp(p) {
+	    pwbuf = pb ;
+	    pwlen = pl ;
+	} ; /* end ctor */
     } ; /* end struct (pwdesc) */
 }
 
@@ -206,6 +181,7 @@ namespace {
 	int		nodenamelen ;
 	int		usernamelen ;
 	int		realnamelen ;
+	int mkvars() noex ;
     } ; /* end struct (vars) */
 }
 
@@ -251,21 +227,18 @@ static inline int pwi_magic(pwi *op,Args ... args) noex {
 }
 /* end subroutine (pwi_magic) */
 
-static int	realname_isextra(realname *,PWDESC *,cchar *) noex ;
-
-static int	mkvars() noex ;
+static int	realname_isextra(realname *,pwdesc *,cchar *) noex ;
 
 
 /* local variables */
 
 constexpr cpcchar	exports[] = {
-	VARHZ,
-	VARNODE,
-	VARHOMEDNAME,
-	VARUSERNAME,
-	VARLOGNAME,
-	VARTZ,
-	VARPWD,
+	varname.node,
+	varname.home,
+	varname.username,
+	varname.logname,
+	varname.tz,
+	varname.pwd,
 	nullptr
 } ;
 
@@ -295,7 +268,7 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	if ((rs = pwi_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
-	        static cint	rsv = mkvars() ;
+	        static cint	rsv = var.mkvars() ;
 	        if ((rs = rsv) >= 0) {
 		    opener	so(pr,dbname) ;
 		    if ((rs = so.start()) >= 0) {
@@ -311,7 +284,7 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	                rs1 = so.finish() ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (opener) */
-	        } /* end if (mkvars) */
+	        } /* end if (vars::mkvars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		pwi_dtor(op) ;
@@ -430,18 +403,15 @@ int lookuper::proc(cchar *sp,int sl) noex {
 	int		ul = 0 ;
 	int		c = 0 ;
 	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
-	    PWDESC	pd{} ;
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
-	    pd.pwp = &pw ;
-	    pd.pwbuf = pwbuf ;
-	    pd.pwlen = pwlen ;
 	    if (realname rn ; (rs = rn.start(sp,sl)) >= 0) {
 		ipasswd		*iop = op->dbp ;
 		auto		ip_cb = ipasswd_curbegin ;
 		if (ipasswd_cur	cur ; (rs = ip_cb(iop,&cur)) >= 0) {
-		    cint	fopts = 0 ;
 		    if (char *un{} ; (rs = malloc_un(&un)) >= 0) {
+			pwdesc	pd(&pw,pwbuf,pwlen) ;
+		        cint	fopts = 0 ;
 	                while (rs >= 0) {
 	                    rs1 = ipasswd_fetch(op->dbp,&rn,&cur,fopts,un) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
@@ -450,6 +420,7 @@ int lookuper::proc(cchar *sp,int sl) noex {
 			        if ((rs = realname_isextra(&rn,&pd,un)) == 0) {
 	                            c += 1 ;
 	                            rs = sncpy1(rbuf,rlen,un) ;
+				    ul = rs ;
 			        }
 			    }
 	                } /* end while */
@@ -579,8 +550,9 @@ int opener::mkbegin(char *pbuf) noex {
 		    const uid_t		u = id.uid ;
 		    const gid_t		g = id.gid ;
 		    const gid_t		*gids = id.gids ;
+		    len = rs ;		/* save length for return */
 	            if ((rs = perm(pbuf,u,g,gids,X_OK)) >= 0) {
-			len = rs ;
+			rs = int(true) ; /* <- signal exit from loop */
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 		    }
@@ -660,8 +632,8 @@ int opener::mkwait(int cpid) noex {
     	int		rs = SR_OK ;
 	int		cstat = 0 ;
 	while (rs == 0) {
-	     rs = u_waitpid(cpid,&cstat,0) ;
-	     if (rs == SR_INTR) rs = 0 ;
+	    rs = u_waitpid(cpid,&cstat,0) ;
+	    if (rs == SR_INTR) rs = 0 ;
 	} /* end while */
 	if (rs >= 0) {
 	    if (WIFSIGNALED(cstat)) {
@@ -693,7 +665,7 @@ int opener::mkenv(vecstr *elp) noex {
 }
 /* end method (opener:mkenv) */
 
-static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
+static int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 	int		rs ;
 	int		f = false ;
 	if (cchar *lp{} ; (rs = realname_getlast(op,&lp)) >= 0) {
@@ -716,23 +688,23 @@ static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
 }
 /* end subroutine (realname_isextra) */
 
-static int mkvars() noex {
+int vars::mkvars() noex {
     	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
 	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
-	        var.maxnamelen = rs ;
+	        maxnamelen = rs ;
 	        if ((rs = getbufsize(getbufsize_nn)) >= 0) {
-		    var.nodenamelen = rs ;
+		    nodenamelen = rs ;
 	            if ((rs = getbufsize(getbufsize_un)) >= 0) {
-			var.usernamelen = rs ;
-			var.realnamelen = REALNAMELEN ;
+			usernamelen = rs ;
+			realnamelen = REALNAMELEN ;
 		    }
 		}
 	    }
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::mkvars) */
 
 

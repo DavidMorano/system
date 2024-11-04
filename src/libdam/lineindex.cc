@@ -144,6 +144,7 @@ static sysval		pagesize(sysval_ps) ;
 
 int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 	int		rs ;
+	int		c = 0 ;
 	if ((rs = lineindex_ctor(op,ifn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (ifn[0]) {
@@ -157,6 +158,7 @@ int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 		    if ((rs = lineindex_stbegin(op,ifn,tfn)) >= 0) {
 		    	{
 		    	    rs = lineindex_opener(op) ;
+			    c = rs ;
 			}
 			if (rs < 0) {
 			    lineindex_stend(op) ;
@@ -168,7 +170,7 @@ int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 		lineindex_dtor(op) ;
 	    }
 	} /* end if (lineindex_ctor) */
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (lineindex_opne) */
 
@@ -295,7 +297,7 @@ int lineindex_curend(LI *op,lineindex_cur *curp) noex {
 
 int lineindex_curenum(LI *op,lineindex_cur *curp,off_t *rop) noex {
 	int		rs ;
-	int		ri ;
+	int		ri = 0 ;
 	if ((rs = lineindex_magic(op,curp,rop)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (op->cursors > 0) {
@@ -345,6 +347,10 @@ int lineindex_lookup(LI *op,uint ri,off_t *rop) noex {
 /* end subroutine (lineindex_lookup) */
 
 static int lieindex_checkclose(LI *op,time_t dt) noex {
+    	int		rs = SR_OK ;
+	(void) op ;
+	(void) dt ;
+	return rs ;
 }
 
 int lineindex_check(LI *op,time_t dt) noex {
@@ -406,7 +412,7 @@ closeit:
 
 static int lineindex_stbegin(LI *op,cc *ifn,cc *tfn) noex {
     	int		rs ;
-	if (char *cp ; (rs = uc_mallocstrw(ifn,-1,&cp)) >= 0) {
+	if (char *cp{} ; (rs = uc_mallocstrw(ifn,-1,&cp)) >= 0) {
 	    op->ifn = cp ;
 	    if (tfn) {
 	        rs = SR_INVALID ;
@@ -526,7 +532,7 @@ static int lineindex_filembegin(LI *op,custime dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata == nullptr) {
-	    xnullptr	np{} ;
+	    cnullptr	np{} ;
 	    if ((rs = lineindex_fileopen(op,dt)) >= 0) {
 		{
 		    rs = lineindex_filemap(op) ;
@@ -555,15 +561,14 @@ static int lineindex_filemend(LI *op) noex {
 /* end subroutine (lineindex_filemend) */
 
 static int lineindex_fileopen(LI *op,custime dt) noex {
-	int	rs = SR_OK ;
-	int	of ;
-	int	f ;
-	int	f_create ;
-	int	f_changed = false ;
+	int		rs = SR_OK ;
+	int		of = op->of ;
+	int		f ;
+	int		f_create ;
+	int		f_changed = false ;
 
 	if (op->fd < 0) {
 
-	of = op->of ;
 	of &= (~ (O_TRUNC | O_CREAT)) ;
 	rs = u_open(op->ifn,of,op->om) ;
 

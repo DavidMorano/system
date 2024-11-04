@@ -89,6 +89,7 @@
 
 #include	<getxname.h>
 #include	<getexecname.h>
+#include	<getngroups.h>
 #include	<termios_cf.h>
 #include	<rsfree.h>
 

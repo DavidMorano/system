@@ -38,15 +38,17 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-struct ucpagesizer {
+namespace libuc {
+    struct ucpagesizer {
     	int		pagesize ;
     	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
 	} ;
-} ; /* end struct (ucpagesizer) */
+    } ; /* end struct (ucpagesizer) */
+}
 
-extern ucpagesizer	ucpagesize ;
+extern libuc::ucpagesizer	ucpagesize ;
 
 #endif /* __cplusplus */
 

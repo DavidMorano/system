@@ -436,7 +436,7 @@ static int pdb_dbcheck(pdb *op,int w) noex {
 int vars::mkvars() noex {
     	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
 	} /* end if (getbufsize) */
     	return rs ;
 }

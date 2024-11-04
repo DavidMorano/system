@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int dayofmonth_ctor(lfm *op,Args ... args) noex {
+static int spawner_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int dayofmonth_ctor(lfm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dayofmonth_ctor) */
+/* end subroutine (spawner_ctor) */
 
-static int dayofmonth_dtor(lfm *op) noex {
+static int spawner_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dayofmonth_dtor) */
+/* end subroutine (spawner_dtor) */
 
 template<typename ... Args>
-static inline int dayofmonth_magic(lfm *op,Args ... args) noex {
+static inline int spawner_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DAYOFMONTH_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SPAWNER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (dayofmonth_magic) */
+/* end subroutine (spawner_magic) */

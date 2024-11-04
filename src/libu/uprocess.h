@@ -123,6 +123,18 @@ inline int u_nice(int incr) noex {
 	return u_nice(incr,nullptr) ;
 }
 
+namespace libu {
+    struct ungrouper {
+        int		ng ;
+        operator int () noex ;
+        int operator () () noex {
+	    return operator int () ;
+        } ;
+    } ; /* end struct (ungrouper) */
+}
+
+extern libu::ungrouper	ungroups ;
+
 #endif /* __cplusplus */
 
 

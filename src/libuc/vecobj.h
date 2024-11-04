@@ -33,7 +33,6 @@
 #define	VECOBJ_CUR		struct vecobj_cursor
 #define	VECOBJ_FL		struct vecobj_flags
 #define	VECOBJ_DEFENTS		10
-
 /* options */
 #define	VECOBJ_ODEFAULT		0
 #define	VECOBJ_OREUSE		(1 << 0)	/* reuse empty slots */
@@ -72,8 +71,57 @@ struct vecobj_cursor {
 	int		i, c ;
 } ;
 
-typedef struct vecobj_head	vecobj ;
-typedef struct vecobj_cursor	vecobj_cur ;
+#ifdef	__cplusplus
+enum vecobjmems {
+	vecobjmem_count,
+	vecobjmem_delall,
+	vecobjmem_audit,
+	vecobjmem_finish,
+	vecobjmem_overlast
+} ;
+struct vecobj ;
+struct vecobj_co {
+	vecobj		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecobj *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (vecobj_co) */
+struct vecobj : vecobj_head {
+	vecobj_co	count ;
+	vecobj_co	delall ;
+	vecobj_co	audit ;
+	vecobj_co	finish ;
+	vecobj() noex {
+	    count(this,vecobjmem_count) ;
+	    delall(this,vecobjmem_delall) ;
+	    audit(this,vecobjmem_audit) ;
+	    finish(this,vecobjmem_finish) ;
+	} ;
+	vecobj(const vecobj &) = delete ;
+	vecobj &operator = (const vecobj &) = delete ;
+	int start(int,int = 0,int = 0) noex ;
+	int add(cvoid *) noex ;
+	int adduniq(cvoid *) noex ;
+	int store(cvoid *,void **) noex ;
+	int get(int,void **) noex ;
+	int getvec(void ***) noex ;
+	int del(int = -1) noex ;
+	void dtor() noex ;
+	~vecobj() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (vecobj) */
+#else	/* __cplusplus */
+typedef VECOBJ		vecobj ;
+#endif /* __cplusplus */
+
+typedef VECOBJ_CUR	vecobj_cur ;
 
 EXTERNC_begin
 
@@ -82,6 +130,7 @@ typedef int (*vecobj_vcf)(cvoid **,cvoid **) noex ;
 extern int vecobj_start(vecobj *,int,int,int) noex ;
 extern int vecobj_add(vecobj *,cvoid *) noex ;
 extern int vecobj_adduniq(vecobj *,cvoid *) noex ;
+extern int vecobj_store(vecobj *,cvoid *,void **) noex ;
 extern int vecobj_inorder(vecobj *,cvoid *,vecobj_vcf,int) noex ;
 extern int vecobj_del(vecobj *,int) noex ;
 extern int vecobj_delall(vecobj *) noex ;
@@ -94,7 +143,6 @@ extern int vecobj_fetch(vecobj *,cvoid *,vecobj_cur *,vecobj_vcf,void **) noex ;
 extern int vecobj_curend(vecobj *,vecobj_cur *) noex ;
 extern int vecobj_search(vecobj *,cvoid *,vecobj_vcf,void **) noex ;
 extern int vecobj_get(vecobj *,int,void **) noex ;
-extern int vecobj_store(vecobj *,cvoid *,void **) noex ;
 extern int vecobj_getvec(vecobj *,void ***) noex ;
 extern int vecobj_audit(vecobj *) noex ;
 extern int vecobj_finish(vecobj *) noex ;

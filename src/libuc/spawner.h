@@ -1,4 +1,5 @@
 /* spawner HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* object to facilitate spanwing processes */
@@ -28,8 +29,9 @@
 #include	<envhelp.h>
 
 
-#define	SPAWNER		struct spawner_head
-
+#define	SPAWNER_MAGIC		0x87235939
+#define	SPAWNER			struct spawner_head
+/* options */
 #define	SPAWNER_OIGNINTR	(1<<0)		/* ignore interrupts */
 #define	SPAWNER_OSETSID		(1<<1)		/* set-session-id */
 #define	SPAWNER_OSETPGRP	(1<<2)		/* set-process-group */
@@ -56,6 +58,7 @@ struct spawner_head {
 	envhelp		env ;
 	pid_t		pid ;
 	pid_t		pgrp ;
+	uint		magic ;
 	int		opts ;
 } ;
 

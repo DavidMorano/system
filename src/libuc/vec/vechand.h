@@ -31,7 +31,6 @@
 #define	VECHAND		struct vechand_head
 #define	VECHAND_FL	struct vechand_flags
 #define	VECHAND_DEFENTS	10
-
 /* options */
 #define	VECHAND_ODEFAULT	0
 #define	VECHAND_OREUSE		(1 << 0)	/* reuse empty slots */

@@ -122,7 +122,7 @@ static ucgetpid		ucgetpid_data ;
 
 /* exported variables */
 
-ucpider			ucpid ;
+libuc::ucpider		ucpid ;
 
 
 /* exported subroutines */
@@ -252,9 +252,10 @@ static void ucgetpid_exit() noex {
 }
 /* end subroutine (ucgetpid_exit) */
 
-ucpider::operator int () noex {
+namespace libuc {
+    ucpider::operator int () noex {
     	return uc_getpid() ;
+    } /* end method (ucpider::operator) */
 }
-/* end method (ucpider::operator) */
 
 

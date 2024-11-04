@@ -78,11 +78,6 @@ consteval int cstrlen(cchar *sp) noex {
 typedef int64_t		mtime_t ;
 #endif
 
-#ifndef	TYPEDEF_MTIME
-#define	TYPEDEF_MTIME
-typedef int64_t		mtime_t ;
-#endif
-
 #ifndef	SUBROUTINE_MTIME
 #define	SUBROUTINE_MTIME
 EXTERNC_begin
@@ -107,15 +102,17 @@ EXTERNC_end
 #ifndef	OBJECT_GETUSTIME
 #define	OBJECT_GETUSTIME
 #ifdef	__cplusplus
-struct ugetustime {
+namespace libu {
+    struct ugetustime {
 	operator time_t () noex {
 	    return time(nullptr) ;
 	} ;
 	static time_t operator () () noex {
 	    return time(nullptr) ;
 	} ;
-} ; /* end struct (getustime) */
-extern ugetustime	getustime ;
+   } ; /* end struct (getustime) */
+}
+extern libu::ugetustime	getustime ;
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
 

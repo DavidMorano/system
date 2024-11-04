@@ -1,4 +1,5 @@
 /* getngroups SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the maximum number of supplemetary groups allowed per process */
@@ -53,6 +54,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<atomic>
 #include	<usystem.h>
@@ -100,6 +102,8 @@ static groupinfo	getngroups_data ;
 
 /* exported variables */
 
+libuc::ucmaxgrouper	ucmaxgroups ;
+
 
 /* exported subroutines */
 
@@ -141,5 +145,16 @@ int groupinfo::operator () (int x) noex {
 	return rs ;
 }
 /* end method (groupinfo::operator) */
+
+namespace libuc {
+    ucmaxgrouper::operator int () noex {
+    	int		rs ;
+	if ((rs = ng) == 0) {
+	    rs = getngroups() ;
+	    ng = rs ;
+	}
+	return rs ;
+    } /* end method (ucmaxgrouper::operator) */
+}
 
 

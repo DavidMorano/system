@@ -123,10 +123,13 @@ int vecpstr_loadgrusers(vecpstr *ulp,gid_t sgid) noex {
 /* local subroutines */
 
 static int subinfo_start(SUBINFO *sip,vecpstr *ulp,gid_t sgid) noex {
-	memclear(sip) ;
-	sip->ulp = ulp ;
-	sip->sgid = sgid ;
-	return SR_OK ;
+    	int		rs = SR_BUGCHECK ;
+	if (sip && ulp) {
+	    rs = memclear(sip) ;
+	    sip->ulp = ulp ;
+	    sip->sgid = sgid ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
@@ -145,12 +148,11 @@ static int subinfo_pwmapload(SUBINFO *sip) noex {
 	int		c = 0 ;
 	if ((rs = subinfo_pwmapbegin(sip)) >= 0) {
 	    int		ml = sip->fsize ;
-	    cchar	*mp = (cchar *) sip->mapdata ;
+	    cchar	*mp = charp(sip->mapdata) ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(mp,ml,CH_NL)) != nullptr) {
-	        gid_t	gid  = 0 ;
-	        int	len = (tp-mp) ;
-	        if ((rs = pwentparse(mp,len,&gid)) > 0) {
+	        cint	len = (tp - mp) ;
+	        if (gid_t gid{} ; (rs = pwentparse(mp,len,&gid)) > 0) {
 		    cint	ul = rs ;
 		    if (sip->sgid == gid) {
 	                c += 1 ;
@@ -178,20 +180,21 @@ static int subinfo_pwmapbegin(SUBINFO *sip) noex {
 	    if ((rs = uc_open(fn,of,om)) >= 0) {
 	        cint	fd = rs ;
 	        if ((rs = uc_fsize(fd)) >= 0) {
-	            size_t	ms = rs ;
+		    cnullptr	np{} ;
+	            csize	ms = rs ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
-	            void	*md ;
 	            sip->fsize = rs ;
-	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            if (void *md ; (rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	                cint		madv = MADV_SEQUENTIAL ;
 			const caddr_t	ma = caddr_t(md) ;
 	                if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                    sip->mapdata = md ;
 	                    sip->mapsize = ms ;
 	                } /* end if (advise) */
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    u_munmap(md,ms) ;
+			}
 	            } /* end if (mmap) */
 	        } /* end if (file-size) */
 	        rs1 = u_close(fd) ;
@@ -206,7 +209,7 @@ static int subinfo_pwmapend(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->mapdata) {
-	    size_t	ms = sip->mapsize ;
+	    csize	ms = sip->mapsize ;
 	    void	*md = sip->mapdata ;
 	    rs1 = u_munmap(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -225,16 +228,14 @@ static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	int		ul = 0 ;
 	cchar		*lp = lbuf ;
 	for (fi = 0 ; fi < 4 ; fi += 1) {
-	    cchar	*tp ;
-	    if ((tp = strnchr(lp,ll,':')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(lp,ll,':')) != nullptr) {
 	        switch (fi) {
 	        case 0:
 	            ul = (tp-lp) ;
 	            break ;
 	        case 3:
 	            {
-	                int	v ;
-	                if ((rs = cfdeci(lp,(tp-lp),&v)) >= 0) {
+	                if (int v{} ; (rs = cfdeci(lp,(tp-lp),&v)) >= 0) {
 	                    *gp = gid_t(v) ;
 	                } else {
 	                    ul = 0 ;

@@ -79,7 +79,7 @@ OBJ_VECPSTR+= objd_vecpstr.o obje_vecpstr.o objf_vecpstr.o
 
 # vecobj
 OBJA_VECOBJ= vecobj.o
-OBJB_VECOBJ= vecobj_recip.o
+OBJB_VECOBJ= vecobj_recip.o vecobj_strsort.o
 
 OBJ_VECOBJ+= obja_vecobj.o objb_vecobj.o
 
@@ -225,7 +225,7 @@ vecpstr_addsyms.o:	vecpstr_addsyms.cc	vecpstr.h
 vecobj.o:		vecobj.cc		vecobj.h
 vecobj_hsort.o:		vecobj_hsort.cc		vecobj.h
 vecobj_recip.o:		vecobj_recip.cc		vecobj.h
-vecobj_stringsort.o:	vecobj_stringsort.cc	vecobj.h
+vecobj_strsort.o:	vecobj_strsort.cc	vecobj.h
 
 vechand.o:		vechand.cc vechand.h
 vecint.o:		vecint.cc vecint.h

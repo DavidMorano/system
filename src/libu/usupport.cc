@@ -1,4 +1,5 @@
 /* usupport SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® kernel support subroutines */
@@ -90,17 +91,17 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	isleep(int) noex ;
+static int		isleep(int) noex ;
 
 
 /* local variables */
 
-constexpr int	onethousand = 1000 ;
+constexpr int		onethousand = 1000 ;
 
 
 /* exported variables */
 
-ugetustime	getustime ;
+libu::ugetustime	getustime ;
 
 
 /* exported subroutines */

@@ -1,4 +1,5 @@
 /* getngroups HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the maximum number of supplemetary groups allowed per process */
@@ -32,6 +33,18 @@ extern "C" {
     extern int getngroups(int) noex ;
     extern int getngroupsx(int = 0) noex ;
 }
+
+namespace libuc {
+    struct ucmaxgrouper {
+    	int		ng ;
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (ucmaxgrouper) */
+}
+
+extern libuc::ucmaxgrouper	ucmaxgroups ;
 
 #else /* __cplusplus */
 

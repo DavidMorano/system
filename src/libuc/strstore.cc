@@ -1,4 +1,5 @@
 /* strstore SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string storeage-table object */
@@ -9,7 +10,7 @@
 /* revision history:
 
 	= 1998-03-24, David A­D­ Morano
-	This object module was morphed from some previous one. I
+	This object module was morphed from some previous one.  I
 	do not remember what the previous one was.
 
 */
@@ -65,19 +66,17 @@
 #endif
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
-#define	STRENTRY	struct strentry
 
 
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
-typedef STRSTORE_CHUNK	strstore_ch ;
 
 extern "C" {
     typedef int (*vo_f)(vecobj *,int,void **) noex ;
@@ -191,7 +190,7 @@ static inline int indexlen(int n) noex {
 /* end subroutine (indexlen) */
 
 static inline int indexsize(int il) noex {
-	return ((il + 1) * 3 * sizeof(int)) ;
+	return ((il + 1) * 3 * szof(int)) ;
 }
 /* end subroutine (indexsize) */
 
@@ -209,8 +208,8 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	    op->chsize = csz ;
 	    if ((rs = vechand_start(clp,nch,vo)) >= 0) {
 	        if ((rs = vechand_start(op->nlp,n,vo)) >= 0) {
-		    cint	isize = sizeof(int) ;
-	            if ((rs = lookaside_start(op->lap,isize,n)) >= 0) {
+		    cint	isz = szof(int) ;
+	            if ((rs = lookaside_start(op->lap,isz,n)) >= 0) {
 		        cnullptr	np{} ;
 		        cint		hn = ((n*3)/2) ;
 	                if ((rs = hdb_start(op->hlp,hn,true,np,np)) >= 0) {
@@ -299,7 +298,7 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	if ((rs = strstore_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        STRSTORE_CHUNK	*ccp = op->ccp ;
+	        strstore_ch	*ccp = op->ccp ;
 		cint		amount = (sl + 1) ;
 		char		*ep = nullptr ;
 	        if ((ccp == nullptr) || (amount > (ccp->csz - ccp->i))) {
@@ -323,7 +322,7 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	            op->totalsize += amount ;
 	        }
 		if (rpp) {
-		    cchar	*cep = (cchar *) ep ;
+		    cchar	*cep = charp(ep) ;
 		    *rpp = (rs >= 0) ? cep : nullptr ;
 		}
 	    } /* end block */
@@ -335,7 +334,7 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 int strstore_curbegin(strstore *op,strstore_cur *curp) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op,curp)) >= 0) {
-		curp->i = -1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -344,7 +343,7 @@ int strstore_curbegin(strstore *op,strstore_cur *curp) noex {
 int strstore_curend(strstore *op,strstore_cur *curp) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op,curp)) >= 0) {
-		curp->i = -1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -357,9 +356,8 @@ int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	        cint	val = (curp->i >= 0) ? (curp->i+1) : 0 ;
 		rs = SR_NOTFOUND ;
 	        if (val < op->c) {
-		    void	*vp{} ;
-	            if ((rs = vechand_get(op->nlp,val,&vp)) >= 0) {
-			cchar	*cp = (cchar *) vp ;
+		    if (void *vp{} ; (rs = vechand_get(op->nlp,val,&vp)) >= 0) {
+			cchar	*cp = charp(vp) ;
 	                cl = strlen(cp) ;
 	                if (rpp) *rpp = cp ;
 	                curp->i = val ;
@@ -371,12 +369,11 @@ int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 /* end subroutine (strstore_enum) */
 
 int strstore_already(strstore *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		si = 0 ;
-	if (op && sp) {
+	if ((rs = strstore_magic(op,sp)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (op->magic == STRSTORE_MAGIC) {
 	        hdb_dat	key, val ;
 	        key.buf = sp ;
 	        key.len = sl ;
@@ -384,8 +381,7 @@ int strstore_already(strstore *op,cchar *sp,int sl) noex {
 	            int		*ip = (int *) val.buf ;
 	            si = *ip ;
 	        } /* end if */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? si : rs ;
 }
 /* end subroutine (strstore_already) */
@@ -411,7 +407,7 @@ int strstore_size(strstore *op) noex {
 int strstore_strsize(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-	    cint	vsz = int(sizeof(int)) ;
+	    cint	vsz = szof(int) ;
 	    rs = iceil(op->totalsize,vsz) ;
 	} /* end if (magic) */
 	return rs ;
@@ -422,7 +418,7 @@ int strstore_strmk(strstore *op,char *tabp,int tabl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = strstore_magic(op,tabp)) >= 0) {
-		cint	size = iceil(op->totalsize,sizeof(int)) ;
+		cint	size = iceil(op->totalsize,szof(int)) ;
 		rs = SR_OVERFLOW ;
 		if (tabl >= size) {
 		    vechand	*vhp = op->clp ;
@@ -430,7 +426,7 @@ int strstore_strmk(strstore *op,char *tabp,int tabl) noex {
 		    void	*vp{} ;
 		    rs = SR_OK ;
 		    for (int i = 0 ; vechand_get(vhp,i,&vp) >= 0 ; i += 1) {
-			STRSTORE_CHUNK	*ccp = (strstore_ch *) vp ;
+			strstore_ch	*ccp = (strstore_ch *) vp ;
 	    	        if (ccp) {
 	        	    if (ccp->cdata) {
 	            	        c += 1 ;
@@ -452,7 +448,7 @@ int strstore_recsize(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
 	    cint	n = (op->c + 1) ;
-	    rs = (n + 1) * sizeof(int) ;
+	    rs = (n + 1) * szof(int) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -464,7 +460,7 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 	if ((rs = strstore_magic(op,rdata)) >= 0) {
 	    cint	n = (op->c + 1) ;
 	    {
-		cint	sz = (n + 1) * sizeof(int) ;
+		cint	sz = (n + 1) * szof(int) ;
 		rs = SR_OVERFLOW ;
 	        if (rsize >= sz) {
 		    hdb		*hp = op->hlp ;
@@ -489,7 +485,7 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 int strstore_indlen(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-		rs = indexlen(op->c+1) ;
+	    rs = indexlen(op->c+1) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -498,8 +494,8 @@ int strstore_indlen(strstore *op) noex {
 int strstore_indsize(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-	        cint il = indexlen(op->c+1) ;
-	        rs = indexsize(il) ;
+	    cint il = indexlen(op->c+1) ;
+	    rs = indexsize(il) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -511,91 +507,90 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	int		sc = 0 ;
 	if (nskip < 0) nskip = 0 ;
 	if ((rs = strstore_magic(op,it)) >= 0) {
-	    int		isize ;
-	        cint		il = indexlen(op->c+1) ;
-		rs = SR_OVERFLOW ;
-		isize = indexsize(il) ;
-	        if (itsize >= isize) {
-	            VECOBJ	ses ;
-	            cint	esize = sizeof(STRENTRY) ;
-		    cint	vo = VECOBJ_OCOMPACT ;
-	            memset(it,0,isize) ;
-	            if ((rs = vecobj_start(&ses,esize,op->c,vo)) >= 0) {
-	                STRENTRY	se ;
-			hdb		*hp = op->hlp ;
-	                hdb_cur		cur ;
-	                hdb_dat		key ;
-	                hdb_dat		val ;
-	                uint		khash, chash, nhash ;
-	                int		lhi, nhi, hi, si ;
-	                if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
-	        	    while ((rs1 = hdb_curenum(hp,&cur,&key,&val)) >= 0) {
-	            		cint	sl = key.len ;
-	            		int	*ip = (int *) val.buf ;
-	            		cchar	*sp = (cchar *) key.buf ;
-	            		si = *ip ;
-	            		khash = hash_elf(sp,sl) ;
-	            		hi = hashindex(khash,il) ;
-	            		if (it[hi][0] == 0) {
-	                	    it[hi][0] = si ;
-	                	    it[hi][1] = int(khash & INT_MAX) ;
-	                	    it[hi][2] = 0 ;
-	                	    sc += 1 ;
-	            		} else {
-	                	    se.khash = khash ;
-	                	    se.si = si ;
-	                	    se.hi = hi ;
-	                	    rs = vecobj_add(&ses,&se) ;
-	            	        } /* end if */
-	            	        if (rs < 0) break ;
-	        	    } /* end while (looping through strings) */
-			    if (rs1 != SR_NOTFOUND) rs = rs1 ;
-	        	    rs1 = hdb_curend(hp,&cur) ;
-			    if (rs >= 0) rs = rs1 ;
-	    	        } /* end if (cursor) */
-	    	        if (rs >= 0) {
-			    vo_f	v = vecobj_get ;
-			    void	*vp{} ;
-	        	    for (int i = 0 ; v(&ses,i,&vp) >= 0 ; i += 1) {
-	    	    	        STRENTRY	*sep = (STRENTRY *) vp ;
-		    		int		c = 0 ;
-	            		khash = sep->khash ;
-	            		si = sep->si ;
-	            		hi = sep->hi ;
-	            		chash = (khash & INT_MAX) ;
-	            		nhash = khash ;
-	            		while (it[hi][0] > 0) {
-	               		    if ((it[hi][1] & INT_MAX) == chash) break ;
-	               		    it[hi][1] |= (~ INT_MAX) ;
-	                	    nhash = hash_again(nhash,c,nskip) ;
-	               		    hi = hashindex(nhash,il) ;
-	                	    c += 1 ;
-	            		} /* end while */
-	            		sc += c ;
-	            		if (it[hi][0] > 0) {
-	                	    lhi = hi ;
-	                	    while ((nhi = it[lhi][2]) > 0) {
-	                    		lhi = nhi ;
-				    }
-	                	    hi = hashindex((lhi + 1),il) ;
-	                	    while (it[hi][0] > 0) {
-	                    	        hi = hashindex((hi + 1),il) ;
-				    }
-	                	    it[lhi][2] = hi ;
-	            		} /* end while */
-	            		it[hi][0] = si ;
-	            		it[hi][1] = chash ;
-	            		it[hi][2] = 0 ;
-	        	    } /* end for */
-	        	    it[il][0] = -1 ;
-	        	    it[il][1] = 0 ;
-	        	    it[il][2] = 0 ;
-	        	    if (sc < 0) sc = 0 ;
-	    	        } /* end if */
-	    		rs1 = vecobj_finish(&ses) ;
-	    		if (rs >= 0) rs = rs1 ;
-		    } /* end if (vechand) */
-		} /* end if (size OK) */
+	    cint	il = indexlen(op->c+1) ;
+	    rs = SR_OVERFLOW ;
+	    if (cint isz = indexsize(il) ; itsize >= isz) {
+                cint	esz = szof(strentry) ;
+		cint	vn = op->c ;
+                cint	vo = VECOBJ_OCOMPACT ;
+                memset(it,0,isz) ;
+                if (vecobj ses ; (rs = vecobj_start(&ses,esz,vn,vo)) >= 0) {
+                    strentry        se ;
+                    hdb             *hp = op->hlp ;
+                    hdb_cur         cur ;
+                    hdb_dat         key ;
+                    hdb_dat         val ;
+                    uint            khash, chash, nhash ;
+                    int             lhi, nhi, hi, si ;
+                    if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
+                        auto        he = hdb_curenum ;
+                        while ((rs1 = he(hp,&cur,&key,&val)) >= 0) {
+                            cint    sl = key.len ;
+                            int     *ip = intp(val.buf) ;
+                            cchar   *sp = charp(key.buf) ;
+                            si = *ip ;
+                            khash = hash_elf(sp,sl) ;
+                            hi = hashindex(khash,il) ;
+                            if (it[hi][0] == 0) {
+                                it[hi][0] = si ;
+                                it[hi][1] = int(khash & INT_MAX) ;
+                                it[hi][2] = 0 ;
+                                sc += 1 ;
+                            } else {
+                                se.khash = khash ;
+                                se.si = si ;
+                                se.hi = hi ;
+                                rs = vecobj_add(&ses,&se) ;
+                            } /* end if */
+                            if (rs < 0) break ;
+                        } /* end while (looping through strings) */
+                        if (rs1 != SR_NOTFOUND) rs = rs1 ;
+                        rs1 = hdb_curend(hp,&cur) ;
+                        if (rs >= 0) rs = rs1 ;
+                    } /* end if (cursor) */
+                    if (rs >= 0) {
+                        auto        v = vecobj_get ;
+                        void        *vp{} ;
+                        for (int i = 0 ; v(&ses,i,&vp) >= 0 ; i += 1) {
+                            strentry        *sep = (strentry *) vp ;
+                            int             c = 0 ;
+                            khash = sep->khash ;
+                            si = sep->si ;
+                            hi = sep->hi ;
+                            chash = (khash & INT_MAX) ;
+                            nhash = khash ;
+                            while (it[hi][0] > 0) {
+                                if ((it[hi][1] & INT_MAX) == chash) break ;
+                                it[hi][1] |= (~ INT_MAX) ;
+                                nhash = hash_again(nhash,c,nskip) ;
+                                hi = hashindex(nhash,il) ;
+                                c += 1 ;
+                            } /* end while */
+                            sc += c ;
+                            if (it[hi][0] > 0) {
+                                lhi = hi ;
+                                while ((nhi = it[lhi][2]) > 0) {
+                                    lhi = nhi ;
+                                }
+                                hi = hashindex((lhi + 1),il) ;
+                                while (it[hi][0] > 0) {
+                                    hi = hashindex((hi + 1),il) ;
+                                }
+                                it[lhi][2] = hi ;
+                            } /* end while */
+                            it[hi][0] = si ;
+                            it[hi][1] = chash ;
+                            it[hi][2] = 0 ;
+                        } /* end for */
+                        it[il][0] = -1 ;
+                        it[il][1] = 0 ;
+                        it[il][2] = 0 ;
+                        if (sc < 0) sc = 0 ;
+                    } /* end if */
+                    rs1 = vecobj_finish(&ses) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (vecobj) */
+	    } /* end if (size OK) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sc : rs ;
 }
@@ -605,11 +600,11 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 /* private subroutines */
 
 static int strstore_chunknew(strstore *op,int amount) noex {
-	STRSTORE_CHUNK	*cep ;
-	cint		csize = sizeof(STRSTORE_CHUNK) ;
+	cint		csize = szof(strstore_ch) ;
 	int		rs ;
 	if (op->chsize > amount) amount = op->chsize ;
-	if ((rs = uc_malloc(csize,&cep)) >= 0) {
+	if (void *vp{} ; (rs = uc_malloc(csize,&vp)) >= 0) {
+	    strstore_ch		*cep = (strstore_ch *) vp ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) {
 	        if ((rs = vechand_add(op->clp,cep)) >= 0) {
 	    	    op->ccp = cep ;
@@ -618,11 +613,13 @@ static int strstore_chunknew(strstore *op,int amount) noex {
 	                op->totalsize = 1 ;
 		    }
 		}
-		if (rs < 0)
+		if (rs < 0) {
 		    chunk_finish(cep) ;
+		}
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uc_free(cep) ;
+	    }
 	} /* end if (memory-allocations) */
 	return rs ;
 }
@@ -652,18 +649,18 @@ static int strstore_chunkfins(strstore *op) noex {
 
 static int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 	int		rs ;
-	int		*ip{} ;
-	if ((rs = lookaside_get(op->lap,&ip)) >= 0) {
+	if (int *ip{} ; (rs = lookaside_get(op->lap,&ip)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    *ip = si ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    val.buf = ip ;
-	    val.len = sizeof(int *) ;
+	    val.len = szof(int *) ;
 	    rs = hdb_store(op->hlp,key,val) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        lookaside_release(op->lap,ip) ;
+	    }
 	} /* end if */
 	return rs ;
 }

@@ -61,6 +61,9 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 

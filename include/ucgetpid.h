@@ -37,14 +37,16 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-struct ucpider {
+namespace libuc {
+    struct ucpider {
     	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
 	} ;
-} ; /* end struct (ucpagesizer) */
+    } ; /* end struct (ucpagesizer) */
+}
 
-extern ucpider		ucpid ;
+extern libuc::ucpider		ucpid ;
 
 #endif /* __cplusplus */
 
