@@ -1,17 +1,18 @@
-/* ng */
+/* ng SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* search (and other things) a newsgroup list for a newsgroup name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SAFE		1
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -19,26 +20,26 @@
 
 /*******************************************************************************
 
-	This little object just keeps track of a list of newsgroup names.
+  	Object:
+	ng
 
+	Description:
+	This little object just keeps track of a list of newsgroup names.
 
 *******************************************************************************/
 
-
-#define	NG_MASTER	1
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<ema.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"ng.h"
@@ -49,8 +50,6 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-
 
 /* external variables */
 
@@ -60,17 +59,20 @@ extern int	sfshrink(const char *,int,const char **) ;
 
 /* forward references */
 
-int		ng_add(NG *,const char *,int,const char *) ;
+extern "C" {
+	int	ng_add(NG *,cchar *,int,cchar *) noex ;
+}
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int ng_start(NG *ngp)
-{
+int ng_start(NG *ngp) noex {
 	int		rs ;
 
 #if	CF_SAFE
@@ -83,10 +85,8 @@ int ng_start(NG *ngp)
 }
 /* end subroutine (ng_start) */
 
-
-int ng_finish(NG *ngp)
-{
-	NG_ENT		*ep ;
+int ng_finish(NG *ngp) noex {
+	ng_ent		*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -128,10 +128,8 @@ int ng_finish(NG *ngp)
 }
 /* end subroutine (mg_finish) */
 
-
-int ng_search(NG *ngp,cchar *name,NG_ENT **rpp)
-{
-	NG_ENT		*ep ;
+int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
+	ng_ent		*ep ;
 	int		rs ;
 	int		i ;
 
@@ -156,19 +154,17 @@ int ng_search(NG *ngp,cchar *name,NG_ENT **rpp)
 }
 /* end subroutine (ng_search) */
 
-
-int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname)
-{
+int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_SAFE
 	if (ngp == NULL) return SR_FAULT ;
 #endif
 
 	if ((rs = uc_mallocstrw(ngbuf,nglen,&cp)) >= 0) {
-	    NG_ENT	ne ;
-	    memset(&ne,0,sizeof(NG_ENT)) ;
+	    ng_ent	ne ;
+	    memset(&ne,0,sizeof(ng_ent)) ;
 	    ne.dir = NULL ;
 	    ne.len = (rs-1) ;
 	    ne.name = cp ;
@@ -179,7 +175,7 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname)
 		}
 	    } /* end if (had directory) */
 	    if (rs >= 0) {
-	        rs = vecitem_add(ngp,&ne,sizeof(NG_ENT)) ;
+	        rs = vecitem_add(ngp,&ne,sizeof(ng_ent)) ;
 	    }
 	    if (rs < 0) {
 		if (ne.dir != NULL) uc_free(ne.dir) ;
@@ -191,10 +187,8 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname)
 }
 /* end subroutine (ng_add) */
 
-
-int ng_copy(NG *ngp1,NG *ngp2)
-{
-	NG_ENT		*ep ;
+int ng_copy(NG *ngp1,NG *ngp2) noex {
+	ng_ent		*ep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		count = 0 ;
@@ -215,9 +209,7 @@ int ng_copy(NG *ngp1,NG *ngp2)
 }
 /* end subroutine (ng_copy) */
 
-
-int ng_count(NG *ngp)
-{
+int ng_count(NG *ngp) noex {
 	int		rs ;
 
 #if	CF_SAFE
@@ -230,9 +222,7 @@ int ng_count(NG *ngp)
 }
 /* end subroutine (ng_count) */
 
-
-int ng_get(NG *ngp,int i,NG_ENT **rpp)
-{
+int ng_get(NG *ngp,int i,ng_ent **rpp) noex {
 	int		rs ;
 
 #if	CF_SAFE
@@ -245,12 +235,10 @@ int ng_get(NG *ngp,int i,NG_ENT **rpp)
 }
 /* end subroutine (ng_get) */
 
-
 /* extract newsgroup names from the "newsgroups" header string */
-int ng_addparse(NG *ngp,cchar *sp,int sl)
-{
-	EMA		aid ;
-	EMA_ENT		*ep ;
+int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
+	ema		aid ;
+	ema_ent		*ep ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -313,9 +301,7 @@ int ng_addparse(NG *ngp,cchar *sp,int sl)
 }
 /* end subroutine (ng_addparse) */
 
-
-int ng_parse(NG *ngp,cchar *sp,int sl)
-{
+int ng_parse(NG *ngp,cchar *sp,int sl) noex {
 	int		rs ;
 
 #if	CF_SAFE

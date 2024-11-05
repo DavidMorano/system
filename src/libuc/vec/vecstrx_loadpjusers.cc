@@ -90,8 +90,7 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	    if (pjn[0]) {
 	        if ((rs = getbufsize(getbufsize_ua)) >= 0) {
 	            cint	ual = rs ;
-	            char	*uab{} ;
-	            if ((rs = uc_libmalloc((ual+1),&uab)) >= 0) {
+	            if (char *uab{} ; (rs = uc_libmalloc((ual+1),&uab)) >= 0) {
 	                ucenumua	eua ;
 	                if ((rs = ucenumua_open(&eua,nullptr)) >= 0) {
 		            re_f	re = ucenumua_readent ;
@@ -124,7 +123,7 @@ static int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
 	cchar		*vp{} ;
 	if ((rs = uc_kvamatch(uap->attr,k,&vp)) >= 0) {
 	    if (strwcmp(pjn,vp,rs) == 0) {
-	        rs = vsp->adduniq(uap->name,-1) ;
+	        rs = vsp->adduniq(uap->name) ;
 	        if (rs < INT_MAX) c += 1 ;
 	    }
 	} else if (isNotPresent(rs)) {

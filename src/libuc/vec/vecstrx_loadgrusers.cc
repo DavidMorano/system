@@ -183,7 +183,7 @@ static int subinfo_pwmapbegin(SUBINFO *sip) noex {
 	        cint	fd = rs ;
 	        if ((rs = uc_fsize(fd)) >= 0) {
 		    cnullptr	np{} ;
-	            csize	ms = rs ;
+	            csize	ms = size_t(rs) ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            sip->fsize = rs ;

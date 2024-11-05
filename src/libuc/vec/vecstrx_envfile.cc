@@ -45,13 +45,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strncasecmp(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<utimeout.h>
 #include	<filer.h>
@@ -76,6 +75,9 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -113,13 +115,16 @@ namespace {
 
 namespace {
     struct eword {
-	cint		l ;
+	int		l ;
 	static cchar	p[] ;
-	constexpr eword() noex : l(szof(WORDEXPORT)-1) { } ;
+	constexpr eword() noex {
+	    l = cstrlen(WORDEXPORT) ;
+	} ;
     } ;
     constexpr char eword::p[] = WORDEXPORT ;
     struct vars {
 	int		linebuflen ;
+	int mkvars() noex ;
     } ;
 }
 
@@ -127,15 +132,13 @@ namespace {
 /* forward references */
 
 static int	vecstrx_envfiler(vecstrx *,cchar *) noex ;
+static int	mkinit() noex ;
 static int	mkterms() noex ;
-static int	mkvars() noex ;
 
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
-static char		fterms[termsize] ;
+static char		fterms[fieldterms_termsize] ;
 static vars		var ;
 
 
@@ -150,14 +153,11 @@ int vecstrx::envfile(cchar *fname) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		static cint	rst = mkterms() ;
-		if ((rs = rst) >= 0) {
-	    	    static cint		rsv = mkvars() ;
-	    	    if ((rs = rsv) >= 0) {
-		        rs = vecstrx_envfiler(this,fname) ;
-		        c = rs ;
-	    	    } /* end if (mkvars) */
-		} /* end if (mkterms) */
+		static cint	rsi = mkinit() ;
+		if ((rs = rsi) >= 0) {
+		    rs = vecstrx_envfiler(this,fname) ;
+		    c = rs ;
+		} /* end if (mkinit) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -184,14 +184,10 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
                     cint    llen = si.llen ;
                     char    *lbuf = si.lbuf ;
                     while ((rs = df.readlns(lbuf,llen,to,np)) > 0) {
-                        cchar	*cp{} ;
-                        int	len = rs ;
-                        if (lbuf[len - 1] == '\n') len -= 1 ;
-                        if (int cl ; (cl = sfskipwhite(lbuf,len,&cp)) > 0) {
-                            if (cp[0] != '#') {
-                                rs = si.line(cp,cl) ;
-                                c += rs ;
-                            }
+			cchar	*cp{} ;
+			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+                            rs = si.line(cp,cl) ;
+                            c += rs ;
                         }
                         if (rs < 0) break ;
                     } /* end while (reading lines) */
@@ -211,13 +207,12 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
 int subinfo::start() noex {
 	int		rs ;
 	int		sz = 0 ;
-	char		*bp{} ;
 	llen = var.linebuflen ;
-	sz += (2*(llen+1)) ;
-	if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
+	sz += (2 * (llen + 1)) ;
+	if (char *bp{} ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    a = bp ;
 	    lbuf = bp ;
-	    bp += (llen+1) ;
+	    bp += (llen + 1) ;
 	    ebuf = bp ;
 	    elen = llen ;
 	} /* end if (m-a) */
@@ -243,17 +238,16 @@ int subinfo::line(cchar *lp,int ll) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-	    int		fl ;
-	    cchar	*fp ;
-	    if ((fl = fsb.get(ft,&fp)) > 0) {
+	    cchar	*fp{} ;
+	    if (int fl ; (fl = fsb.get(ft,&fp)) > 0) {
 	        if ((fl == ew.l) && (strncasecmp(ew.p,fp,fl) == 0)) {
 	            fl = fsb.get(ft,&fp) ;
 	        }
-	    } /* end if (variable key-name) */
-	    if (fl > 0) {
-	        rs = parse(&fsb,fp,fl) ;
-	        c = rs ;
-	    }
+	        if (fl > 0) {
+	            rs = parse(&fsb,fp,fl) ;
+	            c = rs ;
+	        }
+	    } /* end if (field_get) */
 	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */
@@ -262,7 +256,7 @@ int subinfo::line(cchar *lp,int ll) noex {
 /* end subroutine (subinfo::line) */
 
 int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
-	cint		klen = (elen -1) ;
+	cint		klen = (elen - 1) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	char		*kbuf = ebuf ;
@@ -303,14 +297,22 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-static int mkvars() noex {
+int vars::mkvars() noex {
 	int		rs ;
-	cint		cmd = _SC_LINE_MAX ;
-	if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
+	if ((rs = ucmaxline) >= 0) {
 	    var.linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end subroutine (vars::mkvars) */
+
+static int mkinit() noex {
+    	int		rs ;
+	if ((rs = mkterms()) >= 0) {
+	    rs = var.mkvars() ;
+	}
+	return rs ;
+}
+/* end subroutine (mkinit) */
 
 

@@ -102,6 +102,7 @@ struct varnames {
 	static const char editor[] ;
 	static const char visual[] ;
 	static const char random[] ;
+	static const char hz[] ;
 } ; /* end struct (varnames) */
 
 

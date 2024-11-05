@@ -44,8 +44,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<strn.h>
@@ -185,11 +186,10 @@ static int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
 	if (sl > 0) {
 	    int		kl = sl ;
 	    int		vl = 0 ;
-	    int		f_separated = false ;
+	    bool	f_separated = false ;
 	    cchar	*kp = sp ;
 	    cchar	*vp = nullptr ;
-	    cchar	*tp ;
-	    if ((tp = strnchr(sp,sl,'=')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        vp = tp + 1 ;
 	        vl = (kp + kl) - vp ;
 	        kl = tp - kp ;
@@ -217,8 +217,8 @@ static int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
 			}
 	            } /* end if */
 	            if (rs >= 0) {
-		        cint		rsn = SR_NOTFOUND ;
-			auto		vs = vstrkeycmp ;
+		        cint	rsn = SR_NOTFOUND ;
+			auto	vs = vstrkeycmp ;
 	                if ((rs = op->finder(kp,vs,np)) == rsn) {
 	                    f_added = true ;
 	                    if (f_separated) {

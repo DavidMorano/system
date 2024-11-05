@@ -71,7 +71,7 @@
 #include	<filer.h>
 #include	<field.h>
 #include	<fieldterms.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |BCEIL| */
 
 #include	"vecstrx.hh"
 
@@ -110,7 +110,8 @@ using std::nothrow ;			/* constant */
 
 namespace {
     struct vars {
-        int             linebuflen ;
+        int	linebuflen ;
+	int mkvars() noex ;
     } ;
 }
 
@@ -121,16 +122,11 @@ static int	vecstrx_loadfiler(vecstrx *,int,cchar *) noex ;
 static int	vecstrx_loadfd(vecstrx *,int,int) noex ;
 static int	vecstrx_loadline(vecstrx *,int,cchar *,int) noex ;
 static int	mkterms() noex ;
-static int	mkvars() noex ;
 
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
-static bufsizevar	maxlinelen(getbufsize_ml) ;
-
-static char		fterms[termsize] ;
+static char		fterms[fieldterms_termsize] ;
 
 static vars		var ;
 
@@ -148,7 +144,7 @@ int vecstrx::loadfile(int fu,cchar *fname) noex {
 	    if (fname[0]) {
 	        static cint	rst = mkterms() ;
 	        if ((rs = rst) >= 0) {
-	            static cint		rsv = mkvars() ;
+	            static cint		rsv = var.mkvars() ;
 	            if ((rs = rsv) >= 0) {
 			rs = vecstrx_loadfiler(this,fu,fname) ;
 			c = rs ;
@@ -191,14 +187,14 @@ static int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
 static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
-	int		to = -1 ;
 	int		c = 0 ;
 	if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
-		cint	linelen = var.linebuflen ;
+		cint	llen = var.linebuflen ;
 	        cint	fs = ((fsz == 0) ? 1 : int(fsz & INT_MAX)) ;
+		int	to = -1 ;
 	        int	fbsz = DEFBUFLEN ;
 	        int	fbo = 0 ;
 	        if (S_ISREG(sb.st_mode)) {
@@ -208,27 +204,19 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	            to = TO_READ ;
 	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
 	        }
-		if ((rs = maxlinelen) >= 0) {
-		    cint	llen = (linelen > 0) ? linelen : rs ;
-	            char	*lbuf{} ; 
-		    if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
-			if (filer lf ; (rs = lf.start(fd,0z,fbsz,fbo)) >= 0) {
-	                    while ((rs = lf.readln(lbuf,llen,to)) > 0) {
-	                        int	len = rs ;
-	                        if (lbuf[len - 1] == '\n') len -= 1 ;
-			        if ((len > 0) && (lbuf[0] != '#')) {
-			            rs = vecstrx_loadline(vsp,fu,lbuf,len) ;
-			            c += rs ;
-			        }
-	                        if (rs < 0) break ;
-	                    } /* end while (reading lines) */
-	                    rs1 = lf.finish ;
-		            if (rs >= 0) rs = rs1 ;
-	                } /* end if (filer) */
-			rs1 = uc_libfree(lbuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-		} /* end if (maxlinelen) */
+	        if (char *lbuf{} ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
+		    if (filer lf ; (rs = lf.start(fd,0z,fbsz,fbo)) >= 0) {
+	                while ((rs = lf.readln(lbuf,llen,to)) > 0) {
+			    rs = vecstrx_loadline(vsp,fu,lbuf,rs) ;
+			    c += rs ;
+	                    if (rs < 0) break ;
+	                } /* end while (reading lines) */
+	                rs1 = lf.finish ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (filer) */
+		    rs1 = uc_libfree(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    } /* end if (not a directory) */
 	} /* end if (stat) */
 	return (rs >= 0) ? c : rs ;
@@ -267,13 +255,13 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-static int mkvars() noex {
+int vars::mkvars() noex {
         int             rs ;
-        if ((rs = uc_sysconfmaxline()) >= 0) {
+        if ((rs = ucmaxline) >= 0) {
             var.linebuflen = (rs * LINEBUFMULT) ;
         }
         return rs ;
 }       
-/* end subroutine (mkvars) */
+/* end subroutine (vars::mkvars) */
 
 

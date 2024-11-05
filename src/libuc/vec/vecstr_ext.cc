@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* add a "path" compnent to the string-list */
+/* extra functions for string vector objects */
 /* version %I% last-modified %G% */
 
 
@@ -11,12 +11,9 @@
 	= 1998-06-01, David A­D­ Morano
 	This code was originally written.
 
-	= 2023-10-27, David A­D­ Morano
-	I changed to make the MAXPATHLEN value dynamic.
-
 */
 
-/* Copyright © 1998,2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -49,16 +46,17 @@
 namespace {
     struct vecstrer : vecstrx {
         vecstr		*op ;
+	vecstrer() = delete ;
 	vecstrer(vecstr *p) noex : op(p) { } ;
-	int add(cchar *,int = -1) noex ;
-	int adduniq(cchar *,int = -1) noex ;
-	int addkeyval(cchar *,int,cchar *,int = -1) noex ;
-	int insert(int,cchar *,int = -1) noex ;
-	int get(int,cchar **) noex ;
-	int getvec(mainv *) noex ;
-	int finder(cchar *,vecstrx_f,cchar **) noex ;
-	int del(int = -1) noex ;
-	int sort(vecstrx_f = nullptr) noex ;
+	int add(cchar *,int = -1)                   noex override final ;
+	int adduniq(cchar *,int = -1)               noex override final ;
+	int addkeyval(cchar *,int,cchar *,int = -1) noex override final ;
+	int insert(int,cchar *,int = -1)            noex override final ;
+	int get(int,cchar **)                       noex override final ;
+	int getvec(mainv *)                         noex override final ;
+	int finder(cchar *,vecstrx_f,cchar **)      noex override final ;
+	int del(int = -1)                           noex override final ;
+	int sort(vecstrx_f = nullptr)               noex override final ;
     } ; /* end struct (vecstrer) */
 }
 

@@ -81,6 +81,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<climits>
 #include	<usystem.h>
 
@@ -88,6 +90,55 @@
 
 
 /* local defines */
+
+#ifdef	_SC_NPROCESSORS_ONLN
+#define	F_PROCAVAIL	1
+#else
+#define	F_PROCAVAIL	0
+#define	_SC_NPROCESSORS_ONLN	-1
+#endif
+
+#ifdef	_SC_NPROCESSORS_CONF
+#define	F_PROCALL	1
+#else
+#define	F_PROCALL	0
+#define	_SC_NPROCESSORS_CONF	-1
+#endif
+
+#ifdef	HZ
+#define	F_HZ		1
+#else
+#define	F_HZ		0
+#define	HZ		0
+#endif
+
+#ifdef	CLK_TCK 
+#define	F_CLK		1
+#else
+#define	F_CLK		0
+#define	CLK_TCK		-1
+#endif
+
+#ifdef	_SC_CLK_TCK 
+#define	F_SCTCK		1
+#else
+#define	F_SCTCK		0
+#define	_SC_CLK_TCK 	-1
+#endif
+
+#ifdef	_SC_AVPHYS_PAGES
+#define	F_PAGESAVAIL	1
+#else
+#define	F_PAGESAVAIL	0
+#define	_SC_AVPHYS_PAGES	-1
+#endif
+
+#ifdef	_SC_PHYS_PAGES
+#define	F_PAGESALL	1
+#else
+#define	F_PAGESALL	0
+#define	_SC_PHYS_PAGES	-1
+#endif
 
 
 /* local namespaces */
@@ -110,10 +161,18 @@
 
 /* local variables */
 
+constexpr bool		f_procavail 	= F_PROCAVAIL ;
+constexpr bool		f_procall 	= F_PROCALL ;
+constexpr bool		f_hz		= F_HZ ;
+constexpr bool		f_clk		= F_CLK ;
+constexpr bool		f_sctck		= F_SCTCK ;
+constexpr bool		f_pagesavail	= F_PAGESAVAIL ;
+constexpr bool		f_pagesall	= F_PAGESALL ;
+
 
 /* exported variables */
 
-libuc::ucpagesizer		ucpagesize ;
+libuc::ucpagesizer	ucpagesize ;
 
 
 /* exported subroutines */
@@ -124,26 +183,27 @@ int uc_nprocessors(int w) noex {
 	int		n = 0 ;
 	switch (w) {
 	case 0:
-#ifdef	_SC_NPROCESSORS_ONLN
-	    rs = SR_OK ;
-	    cmd = _SC_NPROCESSORS_ONLN ;
-#endif /* _SC_NPROCESSORS_ONLN */
+	    if_constexpr (f_procavail) {
+	        rs = SR_OK ;
+	        cmd = _SC_NPROCESSORS_ONLN ;
+	    } /* end if_constexpr (f_procavail) */
 	    break ;
 	case 1:
-#ifdef	_SC_NPROCESSORS_CONF
-	    rs = SR_OK ;
-	    cmd = _SC_NPROCESSORS_CONF ;
-#endif /* _SC_NPROCESSORS_CONF */
+	    if_constexpr (f_procall) {
+	        rs = SR_OK ;
+	        cmd = _SC_NPROCESSORS_CONF ;
+	    } /* end if_constexpr (f_procaall) */
 	    break ;
 	default:
 	    rs = SR_INVALID ;
 	    break ;
         } /* end switch */
-	if (rs >= 0) {
-	    long	rn ;
-	    rs = uc_sysconfval(cmd,&rn) ;
-	    n = (rn & INT_MAX) ;
-	    if (rs == SR_INVALID) rs = SR_NOTSUP ;
+	if ((rs >= 0) && (cmd >= 0)) {
+	    if (long rn{} ; (rs = uc_sysconfval(cmd,&rn)) >= 0) {
+	        n = intsat(rn) ;
+	    } else if (rs == SR_INVALID) {
+	        rs = SR_NOTSUP ;
+	    }
 	}
 	return (rs >= 0) ? n : rs ;
 }
@@ -152,54 +212,58 @@ int uc_nprocessors(int w) noex {
 int uc_gethz(int w) noex {
 	long	hz = -1 ;
 	int	rs = SR_NOSYS ;
-#if	defined(HZ)
-	if ((hz < 0) && ((w == 0) || (w == 1))) {
-	    rs = SR_OK ;
-	    hz = HZ ;
+	if_constexpr (f_hz) {
+	    if ((hz < 0) && ((w == 0) || (w == 1))) {
+	        rs = SR_OK ;
+	        hz = HZ ;
+	    }
+	} /* end if_constexpr (f_hz) */
+	if_constexpr (f_clk) {
+	    if ((hz < 0) && ((w == 0) || (w == 2))) {
+	        rs = SR_OK ;
+	        hz = CLK_TCK ;
+	    }
+	} /* end if_constexpr (f_clk) */
+	if_constexpr (f_sctck) {
+	    if ((hz < 0) && ((w == 0) || (w == 3))) {
+	        cint	cmd = _SC_CLK_TCK ;
+	        rs = uc_sysconfval(cmd,&hz) ;
+	    }
+	} /* end if_constexpr (f_sctck) */
+	if (rs >= 0) {
+	    rs = intsat(hz) ;
 	}
-#endif
-#if	defined(CLK_TCK) 
-	if ((hz < 0) && ((w == 0) || (w == 2))) {
-	    rs = SR_OK ;
-	    hz = CLK_TCK ;
-	}
-#endif
-#if	defined(_SC_CLK_TCK) 
-	if ((hz < 0) && ((w == 0) || (w == 3))) {
-	    rs = uc_sysconfval(_SC_CLK_TCK,&hz) ;
-	}
-#endif
-	if (rs >= 0) rs = int(hz & INT_MAX) ;
 	return rs ;
 }
 /* end subroutine (uc_gethz) */
 
 int uc_syspages(int w) noex {
-	long		rn = 0 ;
 	int		rs = SR_NOTSUP ;
 	int		cmd = -1 ;
 	int		n = 0 ;
 	switch (w) {
 	case 0:
-#ifdef	_SC_AVPHYS_PAGES
-	    rs = SR_OK ;
-	    cmd = _SC_AVPHYS_PAGES ;
-#endif /* _SC_AVPHYS_PAGES */
+	    if_constexpr (f_pagesavail) {
+	        rs = SR_OK ;
+	        cmd = _SC_AVPHYS_PAGES ;
+	    } /* end if_constexpr (f_pagesavail) */
 	    break ;
 	case 1:
-#ifdef	_SC_PHYS_PAGES
-	    rs = SR_OK ;
-	    cmd = _SC_PHYS_PAGES ;
-#endif /* _SC_PHYS_PAGES */
+	    if_constexpr (f_pagesall) {
+	        rs = SR_OK ;
+	        cmd = _SC_PHYS_PAGES ;
+	    } /* end if_constexpr (f_pagesall) */
 	    break ;
 	default:
 	    rs = SR_INVALID ;
 	    break ;
         } /* end switch */
-	if (rs >= 0) {
-	    rs = uc_sysconfval(cmd,&rn) ;
-	    n = int(rn & INT_MAX) ;
-	    if (rs == SR_INVALID) rs = SR_NOTSUP ;
+	if ((rs >= 0) && (cmd >= 0)) {
+	    if (long rn{} ; (rs = uc_sysconfval(cmd,&rn)) >= 0) {
+	        n = intsat(rn) ;
+	    } else if (rs == SR_INVALID) {
+		rs = SR_NOTSUP ;
+	    }
 	}
 	return (rs >= 0) ? n : rs ;
 }

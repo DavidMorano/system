@@ -40,8 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -84,7 +83,7 @@ int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	    cchar	*tp ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    while ((tp = strnpbrk(sp,sl," ,")) != NULL) {
+	    while ((tp = strnpbrk(sp,sl," ,")) != nullptr) {
 	        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
 	            rs = adduniq(cp,cl) ;
 	            c += ((rs < INT_MAX) ? 1 : 0) ;

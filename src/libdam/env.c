@@ -18,21 +18,20 @@
 
 	HOWEVER:
 
-        Do not use this crap! This crap modifies the environment that was passed
-        to us on invocation. But we have code that runs as both a regular UNIX®
-        process as well as built-in commands within the SHELL. We also have tons
-        of library code that does not know where it is running from! So, do not
-        use this crap! This crap allocates memory for a new environment entry
-        but there is no way to keep track of that allocation for later deletion.
-        Instead of using this crap, make your own new copy of whatever
-        environment that you want to use and manipulate that.
-
+	Do not use this crap!  This crap modifies the environment
+	that was passed to us on invocation.  But we have code that
+	runs as both a regular UNIX® process as well as built-in
+	commands within the SHELL.  We also have tons of library
+	code that does not know where it is running from!  So, do
+	not use this crap!  This crap allocates memory for a new
+	environment entry but there is no way to keep track of that
+	allocation for later deletion.  Instead of using this crap,
+	make your own new copy of whatever environment that you
+	want to use and manipulate that.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<stdlib.h>
 #include	<string.h>
 
@@ -60,8 +59,10 @@ static char	*__findenv(const char *,int *) ;
 #endif
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 #if	CF_SETENV
 
@@ -75,8 +76,7 @@ static char	*__findenv(const char *,int *) ;
  * PUBLIC: #endif
  */
 
-int setenv(const char *name,const char *value,int rewrite)
-{
+int setenv(const char *name,const char *value,int rewrite) {
 	static int	alloced ;		/* if allocated space before */
 	char 		*c ;
 	int 		l_value, offset ;
@@ -147,8 +147,7 @@ int setenv(const char *name,const char *value,int rewrite)
  * PUBLIC: #endif
  */
 
-void unsetenv(const char *name)
-{
+void unsetenv(const char *name) {
 	char 		**p ;
 	int 		offset ;
 
@@ -167,7 +166,6 @@ void unsetenv(const char *name)
 
 /* local subroutines */
 
-
 #if	CF_SETENV || CF_UNSETENV
 
 /*
@@ -180,8 +178,7 @@ void unsetenv(const char *name)
  *	This routine *should* be a static; don't use it.
  */
 
-static char *__findenv(const char *name,int *offset)
-{
+static char *__findenv(const char *name,int *offset) {
 	int 		len ;
 	char 		*np ;
 	char 		**p, *c ;

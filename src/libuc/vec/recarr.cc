@@ -126,7 +126,7 @@ int recarr_start(recarr *op,int n,int opts) noex {
 	if ((rs = recarr_ctor(op)) >= 0) {
 	    if (n <= 1) n = RECARR_DEFENTS ;
 	    if ((rs = recarr_setopts(op,opts)) >= 0) {
-	        cint	sz = (n + 1) * sizeof(void **) ;
+	        cint	sz = (n + 1) * szof(void **) ;
 	        void	*vp{} ;
 	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
@@ -383,7 +383,7 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	            if (op->c > 1) {
 			qsort_f		qcmp = qsort_f(vcmp) ;
 			if_constexpr (f_qsort) {
-			    cint	esize = sizeof(void *) ;
+			    cint	esize = szof(void *) ;
 	                    qsort(op->va,op->i,esize,qcmp) ;
 			} else {
 			    std::sort(op->va,(op->va+op->i),qcmp) ;
@@ -411,7 +411,7 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	int		i = 0 ;
 	void		**rpp = (void **) vrp ;
 	if (op && ep && vcmp) {
-	    cint	esize = sizeof(void *) ;
+	    cint	esize = szof(void *) ;
 	    void	**spp{} ;
 	    if (op->f.osorted && (! op->f.issorted)) {
 	        op->f.issorted = true ;
@@ -495,11 +495,11 @@ static int recarr_extend(recarr *op,int n) noex {
 	    void	*nva{} ;
 	    if (op->va == nullptr) {
 	        nn = (n) ? n : RECARR_DEFENTS ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }

@@ -17,8 +17,12 @@
 
 /*******************************************************************************
 
+  	Object:
+	raqhand
+
+	Description:
 	These routines are used when the caller just wants to store
-	their own pointer in a FIFO-ordered vector. These routines
+	their own pointer in a FIFO-ordered vector.  These routines
 	will not copy the structure pointed to by the passed pointer.
 	The caller is responsible for keeping the original data in
 	scope during the whole life span of the vector list.
@@ -82,7 +86,7 @@ int raqhand_start(raqhand *op,int n,int opts) noex {
 	    if (n <= 1) n = RAQHAND_DEFENTS ;
 	    memclear(op) ;
 	    if ((rs = raqhand_setopts(op,opts)) >= 0) {
-	        cint	sz = ((n+1) * sizeof(void *)) ;
+	        cint	sz = ((n+1) * szof(void *)) ;
 	        void	*vp{} ;
 	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    memclear(vp,sz) ;
@@ -311,7 +315,9 @@ static int raqhand_valid(raqhand *op,int i) noex {
 	if (op->c > 0) {
 	    rs = SR_OK ;
 	    if (op->hi != op->ti) {
-		if ((i < op->hi) || (i >= op->ti)) rs = SR_NOTFOUND ;
+		if ((i < op->hi) || (i >= op->ti)) {
+		    rs = SR_NOTFOUND ;
+		}
 	    }
 	}
 	return rs ;
@@ -324,19 +330,19 @@ static int raqhand_extend(raqhand *op) noex {
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
 	    int		sz ;
-	    void	*np ;
+	    void	*na ;
 	    if (op->va == nullptr) {
 	        nn = RAQHAND_DEFENTS ;
-	        sz = (nn + 1) * sizeof(void **) ;
-	        rs = uc_libmalloc(sz,&np) ;
+	        sz = (nn + 1) * szof(void **) ;
+	        rs = uc_libmalloc(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * sizeof(void **) ;
-	        rs = uc_librealloc(op->va,sz,&np) ;
+	        sz = (nn + 1) * szof(void **) ;
+	        rs = uc_librealloc(op->va,sz,&na) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
-	        op->va = (cvoid **) np ;
+	        op->va = (cvoid **) na ;
 	        op->n = nn ;
 	    }
 	} /* end if */

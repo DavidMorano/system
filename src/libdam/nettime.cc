@@ -75,7 +75,7 @@
 #include	<sbuf.h>
 #include	<cthex.h>
 #include	<sncpyx.h>
-#include	<localmisc.h>		/* |MAXPATHLEN| */
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"nettime.h"
 

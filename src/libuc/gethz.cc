@@ -52,8 +52,10 @@
 #include	<sys/param.h>		/* |HZ| for those that have it */
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| + |atoi(3c)| */
 #include	<usystem.h>
+#include	<uvariables.hh>		/* |varname(3u)| */
 #include	<cfdec.h>
 #include	<isnot.h>		/* |isNotValid(3uc)| */
 #include	<localmisc.h>
@@ -73,10 +75,6 @@
 
 #ifndef	_SC_CLK_TCK
 #define	_SC_CLK_TCK	-1
-#endif
-
-#ifndef	VARHZ
-#define	VARHZ		"HZ"
 #endif
 
 #define	HZ_GUESS	100		/* guessed value */
@@ -171,7 +169,7 @@ int hzmgr::tryconst(int w) noex {
 int hzmgr::tryenv(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_env))) {
-	    static cchar	*val = getenv(VARHZ) ;
+	    static cchar	*val = getenv(varname.hz) ;
 	    if (val) {
 	        if ((rs = decval(val)) > 0) {
 	            hz = rs ;
@@ -197,8 +195,8 @@ int hzmgr::trytck(int w) noex {
 int hzmgr::tryconf(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_conf))) {
-	    if (int req ; (req = _SC_CLK_TCK) >= 0) {
-	        if ((rs = uc_sysconfval(req,nullptr)) >= 0) {
+	    if (int cmd ; (cmd = _SC_CLK_TCK) >= 0) {
+	        if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 		    hz = rs ;
 	        } else if (isNotValid(rs) || isNotSupport(rs)) {
 		    rs = SR_OK ;
@@ -220,7 +218,7 @@ int hzmgr::tryguess(int w) noex {
 
 static int decval(cchar *s) noex {
 	int		rs ;
-	int		rv{} ;
+	int		rv = 0 ;
 	if ((rs = cfdeci(s,-1,&rv)) >= 0) {
 	    if (rv < 0) rs = SR_DOM ;
 	}

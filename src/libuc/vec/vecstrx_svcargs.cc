@@ -65,9 +65,7 @@ static int	hasLong(cchar *,int) noex ;
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
-static char		terms[termsize] ;
+static char		terms[fieldterms_termsize] ;
 
 
 /* exported variables */
