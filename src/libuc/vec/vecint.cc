@@ -108,7 +108,7 @@ int vecint_start(vecint *op,int n,int opts) noex {
 	    if ((rs = vecint_setopts(op,opts)) >= 0) {
 	        op->n = n ;
 	        if (n > 0) {
-	            cint	sz = (n + 1) * sizeof(VECINT_TYPE) ;
+	            cint	sz = (n + 1) * szof(VECINT_TYPE) ;
 		    void	*vp{} ;
 	            if ((rs = uc_malloc(sz,&vp)) >= 0) {
 		        op->va = (VECINT_TYPE *) vp ;
@@ -338,7 +338,7 @@ int vecint_sort(vecint *op) noex {
 	    if (! op->f.issorted) {
 	        op->f.issorted = true ;
 	        if (op->c > 1) {
-		    cint	esize = sizeof(VECINT_TYPE) ;
+		    cint	esize = szof(VECINT_TYPE) ;
 		    qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
 	            qsort(op->va,op->i,esize,qcf) ;
 	        }
@@ -364,7 +364,7 @@ int vecint_find(vecint *op,VECINT_TYPE v) noex {
 	int		i = 0 ; /* ¥ GCC false complaint */
 	if ((rs = vecint_magic(op)) >= 0) {
 	    if (op->f.issorted) {
-	        cint		esz = sizeof(VECINT_TYPE) ;
+	        cint		esz = szof(VECINT_TYPE) ;
 	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
 	        int		*rpp ;
 	        rpp = (int *) bsearch(&v,op->va,op->i,esz,qcf) ;
@@ -537,7 +537,7 @@ static int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 static int vecint_extend(vecint *op,int amount) noex {
 	int		rs = SR_OK ;
 	if (amount > 0) {
-	    cint		esize = sizeof(VECINT_TYPE) ;
+	    cint		esize = szof(VECINT_TYPE) ;
 	    int			nn ;
 	    int			sz ;
 	    VECINT_TYPE		*nva{} ;
@@ -589,7 +589,7 @@ static int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 
 static int vecint_extrange(vecint *op,int n) noex {
 	if (n > op->i) {
-	    cint	nsz = ((n-op->i) * sizeof(VECINT_TYPE)) ;
+	    cint	nsz = ((n-op->i) * szof(VECINT_TYPE)) ;
 	    memclear((op->va+op->i),nsz) ;
 	    op->i = n ;
 	    op->va[op->i] = INT_MIN ;

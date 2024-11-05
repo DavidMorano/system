@@ -1,4 +1,5 @@
 /* sfbrk SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* return a sub-string starting at a break character, if one is found */

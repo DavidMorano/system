@@ -1,4 +1,5 @@
 /* sfdequote SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the dequoted sub-string of the given string */

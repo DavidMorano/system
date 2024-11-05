@@ -111,7 +111,7 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	        op->va = nullptr ;
 	        op->esize = osize ;
 	        if ((rs = vecobj_setopts(op,opts)) >= 0) {
-	            cint	size = (n + 1) * sizeof(char **) ;
+	            cint	size = (n + 1) * szof(char **) ;
 	            void	*vp{} ;
 	            op->i = 0 ;
 	            op->c = 0 ;
@@ -258,7 +258,7 @@ int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 	            if (! op->f.issorted) {
 	                op->f.issorted = true ;
 	                if (op->c > 1) {
-	                    cint	esize = sizeof(void *) ;
+	                    cint	esize = szof(void *) ;
 		            qsort_f	scf = qsort_f(vcf) ;
 	                    qsort(op->va,op->i,esize,scf) ;
 	                }
@@ -461,7 +461,7 @@ int vecobj_sort(vecobj *op,vecobj_vcf vcf) noex {
 	        if (! op->f.issorted) {
 	            op->f.issorted = true ;
 	            if (op->c > 1) {
-	                cint		esize = sizeof(void *) ;
+	                cint		esize = szof(void *) ;
 		        qsort_f		scf = qsort_f(vcf) ;
 	                qsort(op->va,op->i,esize,scf) ;
 	            }
@@ -565,7 +565,7 @@ int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 		if ((rs = vecobj_sorted(op,vcf)) > 0) {
-	            cint	esize = sizeof(void *) ;
+	            cint	esize = szof(void *) ;
 	            qsort_f	scf = qsort_f(vcf) ;
 	            void	**sepp ;
 	            sepp = (void **) bsearch(&ep,op->va,op->i,esize,scf) ;
@@ -706,11 +706,11 @@ static int vecobj_extend(vecobj *op) noex {
 	    void	*nva{} ;
 	    if (op->va == nullptr) {
 	        nn = VECOBJ_DEFENTS ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
@@ -742,7 +742,7 @@ static int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	if (op->f.osorted && (! op->f.issorted)) {
 	    op->f.issorted = true ;
 	    if (op->c > 1) {
-	        cint	esize = sizeof(void *) ;
+	        cint	esize = szof(void *) ;
 		qsort_f	scf = qsort_f(vcf) ;
 		qsort(op->va,op->i,esize,scf) ;
 	    }

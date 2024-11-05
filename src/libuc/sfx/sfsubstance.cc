@@ -1,4 +1,5 @@
 /* sfsubstance SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find substantive part of string (strip garbage around items) */

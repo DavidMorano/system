@@ -1,4 +1,5 @@
 /* sfcenter SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-find the center sub-string */

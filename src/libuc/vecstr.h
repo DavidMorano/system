@@ -17,8 +17,12 @@
 
 /*******************************************************************************
 
-	This object implements a vector of strings.  This are C-styled
-	strings (of course, and as it should be).
+  	Object:
+	vecstr
+
+	Description:
+	This object implements a vector of c-strings.  This are
+	C-styled strings (of course, and as it should be).
 
 *******************************************************************************/
 
@@ -79,6 +83,7 @@ enum vecstrmems {
 	vecstrmem_delall,
 	vecstrmem_strsize,
 	vecstrmem_recsize,
+	vecstrmem_cksize,
 	vecstrmem_audit,
 	vecstrmem_finish,
 	vecstrmem_overlast
@@ -138,6 +143,7 @@ struct vecstr : vecstr_head {
 	vecstr_co	delall ;
 	vecstr_co	strsize ;
 	vecstr_co	recsize ;
+	vecstr_co	cksize ;
 	vecstr_co	audit ;
 	vecstr_co	finish ;
 	vecstr() noex {
@@ -146,6 +152,7 @@ struct vecstr : vecstr_head {
 	    delall(this,vecstrmem_delall) ;
 	    strsize(this,vecstrmem_strsize) ;
 	    recsize(this,vecstrmem_recsize) ;
+	    cksize(this,vecstrmem_cksize) ;
 	    audit(this,vecstrmem_audit) ;
 	    finish(this,vecstrmem_finish) ;
 	} ;
@@ -157,6 +164,7 @@ struct vecstr : vecstr_head {
 	int addsyms(cchar *,mainv) noex ;
 	int addpath(cchar *,int = -1) noex ;
 	int insert(int,cchar *,int = -1) noex ;
+	int store(cchar *,int,cchar **) noex ;
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
 	int envadd(cchar *,cchar *,int = -1) noex ;
@@ -210,6 +218,7 @@ extern int vecstr_getvec(vecstr *,mainv *) noex ;
 extern int vecstr_strsize(vecstr *) noex ;
 extern int vecstr_strmk(vecstr *,char *,int) noex ;
 extern int vecstr_recsize(vecstr *) noex ;
+extern int vecstr_cksize(vecstr *) noex ;
 extern int vecstr_recmk(vecstr *,int *,int) noex ;
 extern int vecstr_recmkstr(vecstr *,int *,int,char *,int) noex ;
 extern int vecstr_avmkstr(vecstr *,cchar **,int,char *,int) noex ;

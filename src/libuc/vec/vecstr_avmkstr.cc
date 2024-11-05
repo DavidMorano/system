@@ -50,8 +50,6 @@
 
 /* forward references */
 
-static int vecstr_cksize(vecstr *) noex ;
-
 
 /* local variables */
 
@@ -66,10 +64,10 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		c = 0 ;
 	if (op && av && tab) {
 	    if ((rs = vecstr_cksize(op)) >= 0) {
-		int	sz = iceil(op->stsize,sizeof(int)) ;
+		int	sz = iceil(op->stsize,szof(int)) ;
 		rs = SR_OVERFLOW ;
 	        if (tabs >= sz) {
-	            sz = (op->c + 1) * sizeof(int) ;
+	            sz = (op->c + 1) * szof(int) ;
 	            if (avs >= sz) {
 		        char	*bp = tab ;
 		        rs = SR_OK ;
@@ -89,17 +87,5 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_avmkstr) */
-
-
-/* local subroutines */
-
-static int vecstr_cksize(vecstr *op) noex {
-	int		rs = SR_OK ;
-	if (op->stsize == 0) {
-	    rs = vecstr_strsize(op) ;
-	}
-	return rs ;
-}
-/* end subroutine (vecstr_cksize) */
 
 

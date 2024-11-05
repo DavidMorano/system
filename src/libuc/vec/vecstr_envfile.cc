@@ -115,7 +115,7 @@ namespace {
     struct eword {
 	cint		l ;
 	static cchar	p[] ;
-	constexpr eword() noex : l(sizeof(WORDEXPORT)-1) { } ;
+	constexpr eword() noex : l(szof(WORDEXPORT)-1) { } ;
     } ;
     constexpr char eword::p[] = WORDEXPORT ;
     struct vars {

@@ -15,6 +15,17 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Object:
+	vecpstr
+
+	Description:
+	This object implements a vector of (packed) c-strings.  This
+	are C-styled strings (of course, and as it should be).
+
+*******************************************************************************/
+
 #ifndef	VECPSTR_INCLUDE
 #define	VECPSTR_INCLUDE
 
@@ -67,10 +78,10 @@ struct vecpstr_chunk {
 
 struct vecpstr_head {
 	cchar		**va ;
-	VECPSTR_CH	*ccp ;
-	uint		magic ;
-	VECPSTR_FL	f ;
 	vechand		*clp ;		/* chunk-list-pointer */
+	VECPSTR_CH	*ccp ;
+	VECPSTR_FL	f ;
+	uint		magic ;
 	int		chsize ;
 	int		an ;		/* suggested add-number */
 	int		c ;		/* total item count */
@@ -94,6 +105,7 @@ enum vecpstrmems {
 	vecpstrmem_delall,
 	vecpstrmem_strsize,
 	vecpstrmem_recsize,
+	vecpstrmem_cksize,
 	vecpstrmem_audit,
 	vecpstrmem_finish,
 	vecpstrmem_overlast
@@ -153,6 +165,7 @@ struct vecpstr : vecpstr_head {
 	vecpstr_co	delall ;
 	vecpstr_co	strsize ;
 	vecpstr_co	recsize ;
+	vecpstr_co	cksize ;
 	vecpstr_co	audit ;
 	vecpstr_co	finish ;
 	vecpstr() noex {
@@ -160,6 +173,7 @@ struct vecpstr : vecpstr_head {
 	    count(this,vecpstrmem_count) ;
 	    delall(this,vecpstrmem_delall) ;
 	    strsize(this,vecpstrmem_strsize) ;
+	    recsize(this,vecpstrmem_recsize) ;
 	    recsize(this,vecpstrmem_recsize) ;
 	    audit(this,vecpstrmem_audit) ;
 	    finish(this,vecpstrmem_finish) ;
@@ -171,6 +185,8 @@ struct vecpstr : vecpstr_head {
 	int adduniq(cchar *,int = -1) noex ;
 	int addsyms(cchar *,mainv) noex ;
 	int addpath(cchar *,int = -1) noex ;
+	int insert(int,cchar *,int = -1) noex ;
+	int store(cchar *,int,cchar **) noex ;
 	int get(int,cchar **) noex ;
 	int getvec(mainv *) noex ;
 	int envadd(cchar *,cchar *,int = -1) noex ;
@@ -207,6 +223,7 @@ extern int vecpstr_finish(vecpstr *) noex ;
 extern int vecpstr_add(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_adduniq(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_addkeyval(vecpstr *,cchar *,int,cchar *,int) noex ;
+extern int vecpstr_insert(vecpstr *,int,cchar *,int) noex ;
 extern int vecpstr_store(vecpstr *,cchar *,int,cchar **) noex ;
 extern int vecpstr_already(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_get(vecpstr *,int,cchar **) noex ;
@@ -224,6 +241,7 @@ extern int vecpstr_getsize(vecpstr *) noex ;
 extern int vecpstr_strsize(vecpstr *) noex ;
 extern int vecpstr_strmk(vecpstr *,char *,int) noex ;
 extern int vecpstr_recsize(vecpstr *) noex ;
+extern int vecpstr_cksize(vecpstr *) noex ;
 extern int vecpstr_recmk(vecpstr *,int *,int) noex ;
 extern int vecpstr_recmkstr(vecpstr *,int *,int,char *,int) noex ;
 extern int vecpstr_avmkstr(vecpstr *,cchar **,int,char *,int) noex ;

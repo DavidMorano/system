@@ -1,4 +1,5 @@
 /* estrings HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* almost all c-string related operations */
