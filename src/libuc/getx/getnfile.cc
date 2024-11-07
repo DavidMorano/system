@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	getnfile
+
+	Description:
 	Here we get the number of file-descriptors that are available
 	to the current process.  This will be the so-called "soft"
 	limit of the number of descriptors.
@@ -32,16 +36,12 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NOFILE| */
 
 #include	"getnfile.h"
 
 
 /* local defines */
-
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
 
 #ifndef	GETNFILE_MAXFD
 #define	GETNFILE_MAXFD	2048	/* our fake maximum limit */
@@ -74,10 +74,10 @@ int getnfile(int w) noex {
 	if (RLIMIT lim ; (rs = u_getrlimit(RLIMIT_NOFILE,&lim)) >= 0) {
 	    switch (w) {
 	    case 0:
-	        nf = (int) lim.rlim_cur ;
+	        nf = int(lim.rlim_cur) ;
 		break ;
 	    case 1:
-	        nf = (int) lim.rlim_max ;
+	        nf = int(lim.rlim_max) ;
 		break ;
 	    case 2:
 		nf = NOFILE ;

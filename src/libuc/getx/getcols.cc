@@ -77,9 +77,8 @@ int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
 	int		i = 0 ; /* used afterwards */
 	if (llen < 0) llen = strlen(lbuf) ;
 	if (ccol < tcol) {
-	    int		cols ;
 	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
-	        cols = charcols(ntab,ccol,lbuf[i]) ;
+	        cint	cols = charcols(ntab,ccol,lbuf[i]) ;
 	        ccol += cols ;
 	    } /* end for */
 	} /* end if */
