@@ -44,7 +44,7 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -tpath $(RUNDIR)
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -59,7 +59,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ0= sialnum.o sialpha.o sibasename.o sibreak.o
 OBJ1= sixchr.o sicasechr.o sicite.o sidigit.o 
 OBJ2= sihyphen.o silbrace.o sileader.o
-OBJ3= siskipwhite.o sispan.o sisub.o sicasesub.o 
+OBJ3= siskipwhite.o sispan.o sisub.o
 OBJ4= sifext.o sinext.o
 OBJ5= sidquote.o siterm.o
 
@@ -145,7 +145,6 @@ sialpha.o:		sialpha.cc		$(INCS)
 sibasename.o:		sibasename.cc		$(INCS)
 sibreak.o:		sibreak.cc		$(INCS)
 sicasechr.o:		sicasechr.cc		$(INCS)
-sicasesub.o:		sicasesub.cc		$(INCS)
 sicite.o:		sicite.cc		$(INCS)
 sidigit.o:		sidigit.cc		$(INCS)
 sidquote.o:		sidquote.cc		$(INCS)

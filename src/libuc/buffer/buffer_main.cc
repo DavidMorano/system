@@ -1,4 +1,5 @@
 /* buffer_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string buffer object */
@@ -18,17 +19,19 @@
 
 /*******************************************************************************
 
+  	Object:
+	buffer
+
+	Description:
 	This module can be used to construct strings or messages
-	in buffers WITHOUT using the 'sprint' subroutine.
-
-	This module is useful when the user does NOT supply a buffer
-	to be used as the working store.  Instead, a dynamically
-	grown and managed buffer is maintained within the object.
-
-	This module uses an object, that must be initialized and
-	eventually freed, to track the state of the dynamically
-	used internal buffer.  An exponential growth is used for
-	increasing the buffer size as needed.
+	in buffers WITHOUT using the 'sprint' subroutine.  This
+	module is useful when the user does NOT supply a buffer to
+	be used as the working store.  Instead, a dynamically grown
+	and managed buffer is maintained within the object.  This
+	module uses an object, that must be initialized and eventually
+	freed, to track the state of the dynamically used internal
+	buffer.  An exponential growth is used for increasing the
+	buffer size as needed.
 
 	Arguments:
 	- bop		pointer to the buffer object
@@ -63,7 +66,7 @@
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"buffer.h"
 
@@ -86,6 +89,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -270,8 +274,7 @@ int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && fmt) {
-	    char	*lbuf ;
-	    if ((rs = libmalloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf{} ; (rs = libmalloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
 	        if ((rs = format(lbuf,llen,0x01,fmt,ap)) >= 0) {
 	            rs = buffer_strw(op,lbuf,rs) ;

@@ -1,4 +1,5 @@
 /* sfbasename SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the base file name out of a path */

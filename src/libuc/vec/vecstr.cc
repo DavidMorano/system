@@ -138,7 +138,7 @@ extern "C" {
 
 static int	vecstr_ctor(vecstr *) noex ;
 static int	vecstr_setopts(vecstr *,int) noex ;
-static int	vecstr_extvec(vecstr *) noex ;
+static int	vecstr_extvec(vecstr *,int = 0) noex ;
 static int	vecstr_addsp(vecstr *,cchar *) noex ;
 static int	vecstr_insertsp(vecstr *,int,cchar *) noex ;
 static int	vecstr_validx(vecstr *,int) noex ;
@@ -165,7 +165,7 @@ constexpr bool		f_qsort = CF_QSORT ;
 constexpr int		optmask = mkoptmask() ;
 
 constexpr int		rsn = SR_NOTFOUND ;
-constexpr int		resz = sizeof(int) ;
+constexpr int		resz = szof(int) ;
 
 
 /* exported variables */
@@ -179,7 +179,7 @@ int vecstr_start(vecstr *op,int n,int opts) noex {
 	if ((rs = vecstr_ctor(op)) >= 0) {
 	    op->n = n ;
 	    if ((rs = vecstr_setopts(op,opts)) >= 0) {
-	        cint	sz = (n + 1) * sizeof(cchar **) ;
+	        cint	sz = (n + 1) * szof(cchar **) ;
 	        void	*va{} ;
 	        if ((rs = uc_libmalloc(sz,&va)) >= 0) {
 	            op->va = (cchar **) va ;
@@ -289,6 +289,29 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecstr_addkeyval) */
+
+int vecstr_insert(vecstr *op,int ii,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (op && sp) {
+	     if ((rs = vecstr_validx(op,ii)) >= 0) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        if ((op->i + 1) > op->n) {
+	            rs = vecstr_extvec(op) ;
+	        }
+	        if (rs >= 0) {
+	            cint	sz = (sl+1) ;
+	            if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	                strwcpy(bp,sp,sl) ;
+	                op->stsize += sz ;
+	                i = vecstr_insertsp(op,ii,bp) ;
+	            } /* end if (memory-allocation) */
+	        } /* end if (OK) */
+	    } /* end if (valid index) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (vecstr_insert) */
 
 int vecstr_store(vecstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -469,7 +492,7 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	if (op) {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) {
-	        cint	esize = sizeof(char *) ;
+	        cint	esize = szof(char *) ;
 		int	i = 0 ;
 	        cchar	**spp{} ;
 	        if (vcf == nullptr) vcf = vstrcmp ;
@@ -612,7 +635,7 @@ int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 /* end subroutine (vecstr_findaddr) */
 
 int vecstr_getvec(vecstr *op,mainv *rppp) noex {
-	int	rs = SR_FAULT ;
+	int		rs = SR_FAULT ;
 	if (op && rppp) {
 	    if ((rs = vecstr_extvec(op)) >= 0) {
 	        if (op->va) {
@@ -641,7 +664,7 @@ int vecstr_strsize(vecstr *op) noex {
 	            op->stsize = stsize ;
 	            op->f.stsize = true ;
 	        } /* end if (calculating size) */
-	        stsize = iceil(op->stsize,sizeof(int)) ;
+	        stsize = iceil(op->stsize,szof(int)) ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? stsize : rs ;
@@ -689,6 +712,17 @@ int vecstr_recsize(vecstr *op) noex {
 	return (rs >= 0) ? rsize : rs ;
 }
 /* end subroutine (vecstr_recsize) */
+
+int vecstr_cksize(vecstr *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = op->stsize) == 0) {
+	        rs = vecstr_strsize(op) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (vecstr_cksize) */
 
 int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 	int		rs = SR_FAULT ;
@@ -750,29 +784,34 @@ int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 }
 /* end subroutine (vecstr_recmkstr) */
 
-int vecstr_insert(vecstr *op,int ii,cchar *sp,int sl) noex {
+int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (op && sp) {
-	     if ((rs = vecstr_validx(op,ii)) >= 0) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        if ((op->i + 1) > op->n) {
-	            rs = vecstr_extvec(op) ;
-	        }
-	        if (rs >= 0) {
-	            char	*bp ;
-	            cint	sz = (sl+1) ;
-	            if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
-	                strwcpy(bp,sp,sl) ;
-	                op->stsize += sz ;
-	                i = vecstr_insertsp(op,ii,bp) ;
+	int		c = 0 ;
+	if (op && av && tab) {
+	    if ((rs = op->cksize) >= 0) {
+		int	sz = iceil(op->stsize,szof(int)) ;
+		rs = SR_OVERFLOW ;
+	        if (tabs >= sz) {
+	            sz = (op->c + 1) * szof(int) ;
+	            if (avs >= sz) {
+		        char	*bp = tab ;
+		        rs = SR_OK ;
+	                *bp++ = '\0' ;
+	                for (int i = 0 ; i < op->i ; i += 1) {
+		            cchar	*ep = op->va[i] ;
+	                    if (ep) {
+	                        av[c++] = bp ;
+	                        bp = strwcpy(bp,ep,-1) + 1 ;
+		            }
+	                } /* end for */
+	                av[c] = nullptr ;
 	            }
-	        } /* end if (OK) */
-	    } /* end if (valid index) */
+	        }
+	    } /* end if (vecstr_cksize) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (vecstr_insert) */
+/* end subroutine (vecstr_avmkstr) */
 
 
 /* private subroutines */
@@ -809,19 +848,19 @@ static int vecstr_setopts(vecstr *op,int vo) noex {
 }
 /* end subroutine (vecstr_setopts) */
 
-static int vecstr_extvec(vecstr *op) noex {
+static int vecstr_extvec(vecstr *op,int n) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
 	    int		sz ;
 	    void	*na{} ;
 	    if (op->va == nullptr) {
-	        nn = VECSTR_DEFENTS ;
-	        sz = (nn + 1) * sizeof(char **) ;
+	        nn = (n > 0) ? n : VECSTR_DEFENTS ;
+	        sz = (nn + 1) * szof(char **) ;
 	        rs = uc_libmalloc(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * sizeof(char **) ;
+	        sz = (nn + 1) * szof(char **) ;
 	        rs = uc_librealloc(op->va,sz,&na) ;
 	    }
 	    if (rs >= 0) {
@@ -892,7 +931,7 @@ static int vecstr_validx(vecstr *op,int i) noex {
 static void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 	qsort_f		scf = qsort_f(vcf) ;
 	if_constexpr (f_qsort) {
-	    cint	esize = sizeof(char *) ;
+	    cint	esize = szof(char *) ;
 	    qsort(op->va,op->i,esize,scf) ;
 	} else {
 	    cint	i = op->i ;
@@ -928,6 +967,10 @@ int vecstr::insert(int ai,cchar *sp,int sl) noex {
 
 int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
+}
+
+int vecstr::envadd(cchar *kp,cchar *valp,int vall) noex {
+	return vecstr_envadd(this,kp,valp,vall) ;
 }
 
 int vecstr::envset(cchar *kp,cchar *valp,int vall) noex {
@@ -971,6 +1014,9 @@ vecstr_co::operator int () noex {
 	        break ;
 	    case vecstrmem_recsize:
 	        rs = vecstr_recsize(op) ;
+	        break ;
+	    case vecstrmem_cksize:
+	        rs = vecstr_cksize(op) ;
 	        break ;
 	    case vecstrmem_audit:
 	        rs = vecstr_audit(op) ;

@@ -1,4 +1,5 @@
 /* buffer_strquote SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* take a string and insert it into the buffer in quoted form */
@@ -18,6 +19,7 @@
 /*******************************************************************************
 
 	Name:
+	buffer_strquote
 
 	Description:
 	This method (for object BUFFER) takes the given string and
@@ -39,6 +41,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>

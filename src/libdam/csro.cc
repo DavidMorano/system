@@ -1,4 +1,5 @@
 /* csro SUPPORT (ComSat Receive Offset) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* email ComSat Receive Offset (CSRO) processing */
@@ -16,10 +17,13 @@
 
 /*******************************************************************************
 
+  	Object:
+	csro
+
+	Description:
 	This object processes and manipulates email CSRO addresses.
 
 	Implementation note:
-
 	Since email addresses can share the same host part, and
 	further since we want to be able to group email addresses
 	by their host parts, we store the host part of all email
@@ -362,14 +366,13 @@ int csro_getvalue(csro *op,cc *mailname,csro_vcur *vcp,csro_val **vepp) noex {
 static int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	int		rs ;
 	int		sz = 1 ;
-	char		*bp ;
 	memclear(ep) ;
 	ep->moff = moff ;
 	sz += (strlen(mailname)+1) ;
 	if (fname != nullptr) {
 	   sz += (strlen(fname)+1) ;
 	}
-	if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    ep->mailname = bp ;
 	    bp = (strwcpy(bp,fname,-1)+1) ;
 	    ep->fname = bp ;

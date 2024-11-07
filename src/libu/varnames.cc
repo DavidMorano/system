@@ -1,4 +1,5 @@
 /* varnames SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a database of commonly used environment variable names */
@@ -25,6 +26,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"varnames.hh"
 
@@ -96,5 +98,7 @@ const char varnames::tmout[] =		"TMOUT" ;
 const char varnames::editor[] =		"EDITOR" ;
 const char varnames::visual[] =		"VISUAL" ;
 const char varnames::random[] =		"RANDOM" ;
+const char varnames::hz[] =		"HZ" ;
+const char varnames::ncpu[] =		"NCPU" ;
 
 

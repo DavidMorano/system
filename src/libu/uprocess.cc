@@ -1,4 +1,5 @@
 /* uprocess SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -239,6 +240,8 @@ constexpr clock_t	errclock = clock_t(-1L) ;
 
 
 /* exported variables */
+
+libu::ungrouper		ungroups ;
 
 
 /* exported subroutines */
@@ -695,5 +698,17 @@ int uprocessbase::operator () () noex {
 	return rs ;
 }
 /* end method (uprocessbase::operator) */
+
+namespace libu {
+    ungrouper::operator int () noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+	if ((rs = ng) == 0) {
+	    rs = u_getgroups(0,np) ;
+	    ng = rs ;
+	}
+	return rs ;
+    } /* end method (ungroper::operator) */
+}
 
 

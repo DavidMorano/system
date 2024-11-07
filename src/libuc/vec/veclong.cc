@@ -383,7 +383,7 @@ int veclong_sort(veclong *op) noex {
 	    if (! op->f.issorted) {
 	        op->f.issorted = true ;
 	        if (op->c > 1) {
-		    cint	esz = sizeof(VECLONG_TYPE) ;
+		    cint	esz = szof(VECLONG_TYPE) ;
 	            sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
 	            qsort(op->va,op->i,esz,scmp) ;
 	        }
@@ -410,7 +410,7 @@ int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	if ((rs = veclong_magic(op)) >= 0) {
 	    if (op->f.issorted) {
 	        long		*rpp2 ;
-	        cint		esz = sizeof(VECLONG_TYPE) ;
+	        cint		esz = szof(VECLONG_TYPE) ;
 	        sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
 	        rpp2 = (long *) bsearch(&v,op->va,op->i,esz,scmp) ;
 	        rs = SR_NOTFOUND ;
@@ -530,7 +530,7 @@ int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 static int veclong_extend(veclong *op,int amount) noex {
 	int		rs = SR_OK ;
 	if (amount > 0) {
-	    cint		esize = sizeof(VECLONG_TYPE) ;
+	    cint		esize = szof(VECLONG_TYPE) ;
 	    int			nn ;
 	    int			sz ;
 	    VECLONG_TYPE	*nva ;
@@ -581,7 +581,7 @@ static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 
 static int veclong_extrange(veclong *op,int n) noex {
 	if (n > op->i) {
-	    cint	nsz = ((n - op->i) * sizeof(VECLONG_TYPE)) ;
+	    cint	nsz = ((n - op->i) * szof(VECLONG_TYPE)) ;
 	    memset((op->va + op->i),0,nsz) ;
 	    op->i = n ;
 	    op->va[op->i] = LONG_MIN ;

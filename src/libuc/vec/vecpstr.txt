@@ -1,0 +1,14 @@
+vecpstr_addpath.cc
+vecpstr_adds.cc
+vecpstr_addsubdirs.cc
+vecpstr_addsyms.cc
+vecpstr_adduniqs.cc
+vecpstr_avmkstr.cc
+vecpstr_env.cc
+vecpstr_envfile.cc
+vecpstr_foilcmp.cc
+vecpstr_loadfile.cc
+vecpstr_loadgrusers.cc
+vecpstr_loadpjusers.cc
+vecpstr_srvargs.cc
+vecpstr_svcargs.cc

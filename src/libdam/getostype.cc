@@ -1,4 +1,5 @@
 /* getostype SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the type of operating system we are on */
@@ -44,7 +45,7 @@
 #include	<mallocxx.h>
 #include	<getsysname.h>
 #include	<sfx.h>
-#include	<matxstr.h>
+#include	<matstr.h>
 #include	<strwcmp.h>
 #include	<localmisc.h>
 
@@ -120,9 +121,9 @@ constexpr typer_m	mems[] = {
 
 /* exported variables */
 
-ostyper		ostype ;
+libdam::ostyper		ostype ;
 
-cpcchar		ostypenames[] = {
+cpcchar			ostypenames[] = {
 	"bsd",
 	"sysv",
 	"linux",
@@ -249,12 +250,13 @@ int typer::other() noex {
 }
 /* end method (typer::other) */
 
-ostyper::operator int () noex {
+namespace libdam {
+    ostyper::operator int () noex {
 	return getostype() ;
-}
-
-int ostyper::operator () () noex {
+    }
+    int ostyper::operator () () noex {
 	return getostype() ;
+    }
 }
 
 

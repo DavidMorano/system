@@ -85,6 +85,21 @@ static inline int uc_sysconfmaxline() noex {
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+namespace libuc {
+    struct ucmaxliner {
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (uxmaxliner) */
+}
+
+extern libuc::ucmaxliner	ucmaxline ;
+
+#endif /* __cplusplus */
+
 
 #endif /* UCSYSCONF_INCLUDE */
 

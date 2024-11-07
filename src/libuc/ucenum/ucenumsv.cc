@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-03-24, David A­D­ Morano
-	This object module was morphed from some previous one. I
+	This object module was morphed from some previous one.  I
 	do not remember what the previous one was.
 
 */
@@ -28,12 +28,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<sysdbfname.h>
 #include	<localmisc.h>
@@ -104,5 +101,44 @@ int ucenumsv_reset(ucenumsv *op) noex {
 
 
 /* local subroutines */
+
+int ucenumsv::readent(ucenumsv_ent *uap,char *uabuf,int ualen) noex {
+	return ucenumsv_readent(this,uap,uabuf,ualen) ;
+}
+
+void ucenumsv::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("ucenumsv",rs,"fini-close") ;
+	}
+}
+
+int ucenumsv_op::operator () (cchar *fn) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ucenumsvmem_open:
+	        rs = ucenumsv_open(op,fn) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ucenumsv_op::operator) */
+
+ucenumsv_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ucenumsvmem_reset:
+	        rs = ucenumsv_reset(op) ;
+	        break ;
+	    case ucenumsvmem_close:
+	        rs = ucenumsv_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ucenumsv_co::operator) */
 
 

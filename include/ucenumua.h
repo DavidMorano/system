@@ -39,12 +39,64 @@
 #include	<ucentua.h>		/* <- money shot */
 
 
-#define	UCENUMUA		struct ucenumua_head
 #define	UCENUMUA_MAGIC		0x88776217
 
 
-typedef UCENUMXX		ucenumua ;
+typedef UCENUMXX		ucenumua_head ;
 typedef ucentua			ucenumua_ent ;
+
+#ifdef	__cplusplus
+enum ucenumuamems {
+    	ucenumuamem_open,
+	ucenumuamem_reset,
+	ucenumuamem_close,
+	ucenumuamem_overlast
+} ;
+struct ucenumua ;
+struct ucenumua_op {
+	ucenumua	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumua *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumua_op) */
+struct ucenumua_co {
+	ucenumua	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumua *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumua_co) */
+struct ucenumua : ucenumxx {
+	ucenumua_op	open ;
+	ucenumua_co	reset ;
+	ucenumua_co	close ;
+	ucenumua() noex {
+	    open(this,ucenumuamem_open) ;
+	    reset(this,ucenumuamem_reset) ;
+	    close(this,ucenumuamem_close) ;
+	} ;
+	ucenumua(const ucenumua &) = delete ;
+	ucenumua &operator = (const ucenumua &) = delete ;
+	int readent(ucenumua_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumua() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumua) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumua ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

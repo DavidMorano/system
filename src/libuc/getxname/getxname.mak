@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -66,7 +65,7 @@ OBJ5= gettmpdname.o getfname.o
 OBJA= obj0.o obj1.o obj2.o 
 OBJB= obj3.o obj4.o obj5.o
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= obja.o objb.o
 
 
 .SUFFIXES:		.hh .ii
@@ -134,6 +133,13 @@ obj4.o:			$(OBJ4)
 
 obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+
+
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
 
 
 getchostname.o:		getchostname.cc	getchostname.h		$(INCS)

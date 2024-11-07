@@ -250,7 +250,7 @@ int spawnproc(scon *psap,cchar *fname,mainv argv,mainv envv) noex {
 		if ((rs = rsv) >= 0) {
 		    rs = spawnprocer(psap,fname,argv,envv) ;
 		    pid = rs ;
-		} /* end if (mkvars) */
+		} /* end if (vars::mkvars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pid : rs ;
@@ -521,9 +521,9 @@ int envloader::envfname() noex {
 	    if (argv) ap = argv[0] ;
 	    if (ap == nullptr) al = sfbasename(efname,-1,&ap) ;
 	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
-		cint	sulen = (strlen(efname)+22) ;
+		cint	sulen = (strlen(efname) + 22) ;
 		if (char *subuf{} ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
-	    	    if ((rs = uc_getpid()) >= 0) {
+	    	    if ((rs = ucpid) >= 0) {
 	    	        if ((rs = snshellunder(subuf,sulen,rs,efname)) > 0) {
 	       		    rs = envhelp_envset(ehp,"_",subuf,rs) ;
 	    	        }
@@ -657,7 +657,7 @@ static int opendevnull(int *opens,int i) noex {
 int vars::mkvars() noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
 	}
 	return rs ;
 }

@@ -1,4 +1,5 @@
 /* strwcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* compare a (NUL-terminated) base c-string with a counted c-string */
@@ -43,6 +44,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<nleadstr.h>
 #include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
 #include	<toxc.h>
@@ -150,8 +152,7 @@ int cmpx::x(cchar *s1,cchar *s2,int s2len) noex {
 	    cint	ch2 = tox(*s2) ;
 	    if ((rc = (ch1 - ch2)) == 0) {
 	        if ((rc = strnxcmp(s1,s2,s2len)) == 0) {
-	            cint	m = nleadxstr(s1,s2,s2len) ;
-	            if (m < s2len) {
+	            if (cint m = nleadxstr(s1,s2,s2len) ; m < s2len) {
 	    	        cint	m1 = tox(s1[m]) ;
 	    	        cint	m2 = tox(s2[m]) ;
 		        rc = (m1 - m2) ;

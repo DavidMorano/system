@@ -1,4 +1,5 @@
 /* xperm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* test the permissions on a file -- similar to |access(2)| */
@@ -30,7 +31,7 @@
 	+ sperm(3uc)
 
 	Synopsis:
-	int perm(cchar *fname,uid_t uid,gid_t gid,gid_t *groups,int am) noex
+	int perm(cchar *fname,uid_t uid,gid_t gid,cgid_t *groups,int am) noex
 
 	Arguments:
 	fname	filename to check
@@ -41,8 +42,9 @@
 		the lower 3 bits are used, like with |access(2)|
 
 	Returns:
-	0	access if allowed
-	<0	access if denied for specified error code (system-return)
+	>0	unused at present
+	==0	access allowed
+	<0	access denied for specified error code (system-return)
 
 *******************************************************************************/
 
@@ -62,9 +64,15 @@
 /* local defines */
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	getngroups() noex ;
+
+/* local typedefs */
+
+typedef const gid_t		cgid ;
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -76,7 +84,7 @@ namespace {
     struct tryer ;
     typedef int (tryer::*tryer_m)(USTAT *,int) noex ;
     struct tryer {
-	gid_t		*gids ;
+	gid_t		*gids ; /* <- possibly allocated */
 	uid_t		euid ;
 	gid_t		egid ;
 	bool		f_gidalloc = false ;
@@ -86,39 +94,40 @@ namespace {
 	int grp(USTAT *,int) noex ;
 	int other(USTAT *,int) noex ;
 	int finish() noex ;
-	tryer(uid_t,gid_t,gid_t *) noex ;
+	tryer(uid_t,gid_t,const gid_t *) noex ;
     } ; /* end struct (tryer) */
 }
 
 
 /* forward references */
 
-static int permer(USTAT *,uid_t,gid_t,gid_t *,int) noex ;
+static int permer(USTAT *,uid_t,gid_t,const gid_t *,int) noex ;
 
 
 /* local variables */
 
-static tryer_m tries[] = {
+constexpr tryer_m	tries[] = {
 	&tryer::root,
 	&tryer::user,
 	&tryer::grp,
-	&tryer::other,
-	nullptr
+	&tryer::other
 } ;
 
-static constexpr uid_t	uidend = (-1) ;
-static constexpr gid_t	gidend = (-1) ;
+constexpr uid_t		uidend = (-1) ;
+constexpr gid_t		gidend = (-1) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int perm(cchar *fn,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
+int perm(cchar *fn,uid_t euid,gid_t egid,const gid_t *gids,int am) noex {
 	int		rs = SR_FAULT ;
 	if (fn) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(fn,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = uc_stat(fn,&sb)) >= 0) {
 	            rs = permer(&sb,euid,egid,gids,am) ;
 	        } /* end if (stat) */
 	    } /* end if (valid) */
@@ -127,11 +136,10 @@ int perm(cchar *fn,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 }
 /* end subroutine (perm) */
 
-int fperm(int fd,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
+int fperm(int fd,uid_t euid,gid_t egid,const gid_t *gids,int am) noex {
 	int		rs = SR_BADF ;
 	if (fd >= 0) {
-	    USTAT	sb ;
-	    if ((rs = uc_fstat(fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 	        rs = permer(&sb,euid,egid,gids,am) ;
 	    } /* end if (stat) */
 	}
@@ -142,9 +150,9 @@ int fperm(int fd,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 int sperm(ids *idp,USTAT *sbp,int am) noex {
 	int		rs = SR_FAULT ;
 	if (idp && sbp) {
-	    const uid_t	euid = idp->euid ;
-	    const gid_t	egid = idp->egid ;
-	    gid_t	*gids = idp->gids ;
+	    const uid_t		euid = idp->euid ;
+	    const gid_t		egid = idp->egid ;
+	    const gid_t		*gids = idp->gids ;
 	    rs = permer(sbp,euid,egid,gids,am) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -154,7 +162,7 @@ int sperm(ids *idp,USTAT *sbp,int am) noex {
 
 /* local subroutines */
 
-static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
+static int permer(USTAT *sbp,uid_t euid,gid_t egid,cgid *gids,int am) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sbp) {
@@ -163,8 +171,7 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 	        tryer	t(euid,egid,gids) ;
 	        am &= 007 ;
 	        if ((rs = t.start()) >= 0) {
-	            for (int i = 0 ; tries[i] ; i += 1) {
-			tryer_m		m = tries[i] ;
+	            for (const auto m : tries) {
 	                rs = (t.*m)(sbp,am) ;
 	                if (rs != 0) break ;
 	            } /* end for */
@@ -178,23 +185,22 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 }
 /* end subroutine (permer) */
 
-tryer::tryer(uid_t eu,gid_t eg,gid_t *gs) noex {
-	    if (eu == uidend) eu = geteuid() ;
-	    if (eg == gidend) eg = getegid() ;
-	    gids = gs ;
-	    euid = eu ;
-	    egid = eg ;
+tryer::tryer(uid_t eu,gid_t eg,const gid_t *gs) noex {
+	if (eu == uidend) eu = geteuid() ;
+	if (eg == gidend) eg = getegid() ;
+	gids = cast_const<gid_t *>(gs) ;
+	euid = eu ;
+	egid = eg ;
 }
-/* end method (tryer::ctor) */
+/* end ctor (tryer::ctor) */
 
 int tryer::start() noex {
 	int		rs  ;
-	if ((rs = getngroups()) >= 0) {
+	if ((rs = ucmaxgroups) >= 0) {
 	    cint	ng = rs ;
 	    if (gids == nullptr) {
-	        cint	gsize = ((ng+1)*sizeof(gid_t)) ;
-	        void	*vp{} ;
-	        if ((rs = uc_libmalloc(gsize,&vp)) >= 0) {
+	        cint	gsize = ((ng + 1) * szof(gid_t)) ;
+	        if (void *vp{} ; (rs = uc_libmalloc(gsize,&vp)) >= 0) {
 		    gids = (gid_t *) vp ;
 		    f_gidalloc = true ;
 	            if ((rs = u_getgroups(ng,gids)) >= 0) {
@@ -205,7 +211,7 @@ int tryer::start() noex {
 		        gids = nullptr ;
 		        f_gidalloc = false ;
 	            }
-	        }
+	        } /* end if (memory-allocation) */
 	    } /* end if (empty GIDs) */
 	} /* end if (getngroups) */
 	return rs ;
@@ -215,7 +221,7 @@ int tryer::start() noex {
 int tryer::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (f_gidalloc) {
+	if (f_gidalloc && gids) {
 	    f_gidalloc = false ;
 	    rs1 = uc_libfree(gids) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -228,7 +234,7 @@ int tryer::finish() noex {
 int tryer::root(USTAT *,int) noex {
 	return (euid == 0) ;
 }
-/* end method (try_root) */
+/* end method (tryer::root) */
 
 int tryer::user(USTAT *sbp,int am) noex {
 	int		rs = SR_OK ;
@@ -258,7 +264,7 @@ int tryer::grp(USTAT *sbp,int am) noex {
 	}
 	return rs ;
 }
-/* end method (tryer::group) */
+/* end method (tryer::grp) */
 
 int tryer::other(USTAT *sbp,int am) noex {
 	cint		om = sbp->st_mode ;

@@ -1,4 +1,5 @@
 /* getnw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get protocol entry */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	getnw
+
+	Description:
 	These subroutines were was written so that we could use a
 	single interface to access the 'netent' database on all
 	UNIX® platforms. This code module provides a platform
@@ -30,6 +35,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"getnw.h"

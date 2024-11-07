@@ -1465,6 +1465,6 @@ int vars::mkvars() noex {
 	} /* end if (getbufsize) */
 	return rs ;
 }
-/* end subroutine (vars::mkvars) */
+/* end method (vars::mkvars) */
 
 

@@ -1,4 +1,5 @@
 /* getrandom HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get some random data (some bytes) of a specified type */
@@ -19,13 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int getrandom(void *,size_t,uint) noex ;
+extern int	getrandom(void *,size_t,uint) noex ;
 
 EXTERNC_end
 

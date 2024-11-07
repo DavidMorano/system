@@ -1,4 +1,5 @@
 /* sesnotes SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* send notes to sessions */
@@ -142,7 +143,7 @@ int sesnotes_open(sesnotes *op,cchar *un) noex {
 	if ((rs = sesnotes_ctor(op,un)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-		if ((rs = uc_getpid()) >= 0) {
+		if ((rs = ucpid) >= 0) {
 		    cint	ulen = var.usernamelen ;
 		    op->pid = rs ;
 		    op->fd = -1 ;

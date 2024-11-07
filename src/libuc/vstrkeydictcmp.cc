@@ -1,4 +1,5 @@
 /* vstrkeydictcmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* vector string key comparison */
@@ -40,6 +41,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"vstrkeycmpx.h"
 

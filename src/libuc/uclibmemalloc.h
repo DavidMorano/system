@@ -37,6 +37,8 @@ extern int uc_libcalloc(int,int,void *) noex ;
 extern int uc_librealloc(cvoid *,int,void *) noex ;
 extern int uc_libfree(cvoid *) noex ;
 
+extern int rslibfree(int,cvoid *) noex ;
+
 EXTERNC_end
 
 

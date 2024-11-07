@@ -91,10 +91,9 @@ int ids_load(ids *op) noex {
 	if ((rs = ids_ctor(op)) >= 0) {
 	    cnullptr	np{} ;
 	    if ((rs = u_getgroups(0,np)) >= 0) {
-	        cint	sz = ((rs+1)*sizeof(gid_t)) ;
-	        void	*vp{} ;
+	        cint	sz = ((rs + 1) * szof(gid_t)) ;
 	        ng = rs ;
-	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    op->gids = (gid_t *) vp ;
 		    if ((rs = u_getgroups(ng,op->gids)) >= 0) {
 		        op->gids[ng] = gidend ;

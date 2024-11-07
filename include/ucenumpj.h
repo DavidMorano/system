@@ -38,12 +38,64 @@
 #include	<ucentpj.h>		/* <- money shot */
 
 
-#define	UCENUMPJ		struct ucenumpj_head
 #define	UCENUMPJ_MAGIC		0x88776216
 
 
-typedef UCENUMXX		ucenumpj ;
+typedef UCENUMXX		ucenumpj_head ;
 typedef ucentpj			ucenumpj_ent ;
+
+#ifdef	__cplusplus
+enum ucenumpjmems {
+    	ucenumpjmem_open,
+	ucenumpjmem_reset,
+	ucenumpjmem_close,
+	ucenumpjmem_overlast
+} ;
+struct ucenumpj ;
+struct ucenumpj_op {
+	ucenumpj	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumpj *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumpj_op) */
+struct ucenumpj_co {
+	ucenumpj	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumpj *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumpj_co) */
+struct ucenumpj : ucenumxx {
+	ucenumpj_op	open ;
+	ucenumpj_co	reset ;
+	ucenumpj_co	close ;
+	ucenumpj() noex {
+	    open(this,ucenumpjmem_open) ;
+	    reset(this,ucenumpjmem_reset) ;
+	    close(this,ucenumpjmem_close) ;
+	} ;
+	ucenumpj(const ucenumpj &) = delete ;
+	ucenumpj &operator = (const ucenumpj &) = delete ;
+	int readent(ucenumpj_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumpj() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumpj) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumpj ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

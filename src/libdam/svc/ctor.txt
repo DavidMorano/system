@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int dayofmonth_ctor(lfm *op,Args ... args) noex {
+static int recipient_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int dayofmonth_ctor(lfm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dayofmonth_ctor) */
+/* end subroutine (recipient_ctor) */
 
-static int dayofmonth_dtor(lfm *op) noex {
+static int recipient_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dayofmonth_dtor) */
+/* end subroutine (recipient_dtor) */
 
 template<typename ... Args>
-static inline int dayofmonth_magic(lfm *op,Args ... args) noex {
+static inline int recipient_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DAYOFMONTH_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == RECIPIENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (dayofmonth_magic) */
+/* end subroutine (recipient_magic) */

@@ -1,4 +1,5 @@
 /* sflast SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the last <n> characters in a given string */

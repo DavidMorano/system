@@ -1,4 +1,5 @@
 /* termnote SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform terminal noticing */
@@ -21,6 +22,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	termnote
+
+	Description:
 	This is a module that operates on termials (to be determined)
 	for the purposes of putting out small messages to them.
 	Subroutines in this module are:
@@ -293,8 +298,7 @@ int termnote_open(termnote *op,cchar *pr) noex {
 	if ((rs = termnote_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
-	        cchar	*cp{} ;
-	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	            op->pr = cp ;
 	            if ((rs = termnote_txopen(op,dt)) >= 0) {
 	                if ((rs = ids_load(op->idp)) >= 0) {
@@ -389,8 +393,7 @@ int termnote_vprintf(termnote *op,cc **rpp,int n,int o,
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) {
-	    char	*obuf{} ;
-	    if ((rs = malloc_ml(&obuf)) >= 0) {
+	    if (char *obuf{} ; (rs = malloc_ml(&obuf)) >= 0) {
 		cint	olen = rs ;
 	        if ((rs = bufvprintf(obuf,olen,fmt,ap)) >= 0) {
 	            rs = termnote_write(op,rpp,n,o,obuf,rs) ;
@@ -785,12 +788,13 @@ static int termnote_lfopen(termnote *op,time_t dt) noex {
 		rs = termnote_nodename(op) ;
 	    }
 	    if (rs >= 0) {
-		const pid_t	pid = uc_getpid() ;
-		rs = mkplogid(op->logid,LOGIDLEN,op->nodename,pid) ;
+		if ((rs = ucpid) >= 0) {
+		    cint	pid = rs ;
+		    rs = mkplogid(op->logid,LOGIDLEN,op->nodename,pid) ;
+		}
 	    }
 	    if (rs >= 0) {
-	        char	*lfname{} ;
-		if ((rs = malloc_mp(&lfname)) >= 0) {
+	        if (char *lfname{} ; (rs = malloc_mp(&lfname)) >= 0) {
 	  	    cchar	*sn = TERMNOTE_SEARCHNAME ;
 	            if ((rs = mkpath3(lfname,op->pr,LOGDNAME,sn)) >= 0) {
 		        rs = termnote_lfopener(op,dt,lfname,sn) ;
@@ -854,13 +858,11 @@ static int termnote_username(termnote *op) noex {
 	int		rs1 ;
 	int		rl = 0 ;
 	if (op->username == nullptr) {
-	    char	*ubuf{} ;
-	    if ((rs = malloc_un(&ubuf)) >= 0) {
+	    if (char *ubuf{} ; (rs = malloc_un(&ubuf)) >= 0) {
 		cint	ulen = rs ;
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
-		    cchar	*cp{} ;
 	            rl = rs ;
-		    if ((rs = uc_mallocstrw(ubuf,rl,&cp)) >= 0) {
+		    if (cc *cp{} ; (rs = uc_mallocstrw(ubuf,rl,&cp)) >= 0) {
 		        op->username = cp ;
 		    }
 	        } /* end if (getnodename) */
@@ -879,13 +881,11 @@ static int termnote_nodename(termnote *op) noex {
 	int		rs1 ;
 	int		rl = 0 ;
 	if (op->nodename == nullptr) {
-	    char	*nbuf{} ;
-	    if ((rs = malloc_nn(&nbuf)) >= 0) {
+	    if (char *nbuf{} ; (rs = malloc_nn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
 	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
-		    cchar	*cp{} ;
 	            rl = rs ;
-		    if ((rs = uc_mallocstrw(nbuf,rl,&cp)) >= 0) {
+		    if (cc *cp{} ; (rs = uc_mallocstrw(nbuf,rl,&cp)) >= 0) {
 		        op->nodename = cp ;
 		    }
 	        } /* end if (getnodename) */

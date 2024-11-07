@@ -38,12 +38,64 @@
 #include	<ucentho.h>		/* <- money shot */
 
 
-#define	UCENUMHO		struct ucenumho_head
 #define	UCENUMHO_MAGIC		0x88776281
 
 
-typedef UCENUMXX		ucenumho ;
+typedef UCENUMXX		ucenumho_head ;
 typedef ucentho			ucenumho_ent ;
+
+#ifdef	__cplusplus
+enum ucenumhomems {
+    	ucenumhomem_open,
+	ucenumhomem_reset,
+	ucenumhomem_close,
+	ucenumhomem_overlast
+} ;
+struct ucenumho ;
+struct ucenumho_op {
+	ucenumho	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumho *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumho_op) */
+struct ucenumho_co {
+	ucenumho	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumho *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumho_co) */
+struct ucenumho : ucenumxx {
+	ucenumho_op	open ;
+	ucenumho_co	reset ;
+	ucenumho_co	close ;
+	ucenumho() noex {
+	    open(this,ucenumhomem_open) ;
+	    reset(this,ucenumhomem_reset) ;
+	    close(this,ucenumhomem_close) ;
+	} ;
+	ucenumho(const ucenumho &) = delete ;
+	ucenumho &operator = (const ucenumho &) = delete ;
+	int readent(ucenumho_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumho() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumho) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumho ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

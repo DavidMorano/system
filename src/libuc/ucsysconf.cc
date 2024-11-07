@@ -64,6 +64,8 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<atomic>
 #include	<usystem.h>
 #include	<errtimer.hh>
@@ -79,6 +81,8 @@
 
 using std::nullptr_t ;			/* type */
 using std::atomic_int ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -134,6 +138,8 @@ static ucconfdatas	ucdata ;
 
 
 /* exported variables */
+
+libuc::ucmaxliner	ucmaxline ;
 
 
 /* exported subroutines */
@@ -278,5 +284,12 @@ int ucsysconf::cache(int req) noex {
 	return rs ;
 }
 /* end subroutine (ucsysconf::cache) */
+
+namespace libuc {
+    ucmaxliner::operator int () noex {
+	cint		cmd = _SC_LINE_MAX ;
+	return uc_sysconfval(cmd,nullptr) ;
+    }
+}
 
 

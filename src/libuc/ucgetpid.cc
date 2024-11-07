@@ -117,10 +117,12 @@ extern "C" {
 
 /* lcoal variables */
 
-static ucgetpid			ucgetpid_data ;
+static ucgetpid		ucgetpid_data ;
 
 
 /* exported variables */
+
+libuc::ucpider		ucpid ;
 
 
 /* exported subroutines */
@@ -249,5 +251,11 @@ static void ucgetpid_exit() noex {
 	ucgetpid_data.fini() ;
 }
 /* end subroutine (ucgetpid_exit) */
+
+namespace libuc {
+    ucpider::operator int () noex {
+    	return uc_getpid() ;
+    } /* end method (ucpider::operator) */
+}
 
 

@@ -134,11 +134,11 @@ int nodesfile_open(NF *op,cchar *fname,int maxsize) noex {
 	if ((rs = nodesfile_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0] && (maxsize > 0)) {
-		if ((rs = uc_pagesize()) >= 0) {
+		if ((rs = ucpagesize) >= 0) {
 		    op->pagesize = rs ;
 		    op->maxsize = maxsize ;
 		    rs = nodesfile_opens(op,fname) ;
-		} /* end if (uc_pagesize) */
+		} /* end if (ucpagesize) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		nodesfile_dtor(op) ;

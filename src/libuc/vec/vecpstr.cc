@@ -128,10 +128,11 @@ struct strentry {
 static int	vecpstr_ctor(vecpstr *) noex ;
 static int	vecpstr_dtor(vecpstr *) noex ;
 static int	vecpstr_setopts(vecpstr *,int) noex ;
+static int	vecpstr_insertsp(vecpstr *,int,cchar *) noex ;
 static int	vecpstr_finchunks(vecpstr *) noex ;
 static int	vecpstr_extstr(vecpstr *,int) noex ;
 static int	vecpstr_newchunk(vecpstr *,int) noex ;
-static int	vecpstr_extvec(vecpstr *,int) noex ;
+static int	vecpstr_extvec(vecpstr *,int = 0) noex ;
 static int	vecpstr_record(vecpstr *,cchar *) noex ;
 static int	vecpstr_reset(vecpstr *) noex ;
 static int	vecpstr_validx(vecpstr *,int) noex ;
@@ -301,6 +302,29 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 }
 /* end subroutine (vecpstr_addkeyval) */
 
+int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int sl) noex {
+	int		rs ;
+	int		i = 0 ;
+	if ((rs = vecpstr_magic(op,sp)) >= 0) {
+	     if ((rs = vecpstr_validx(op,ii)) >= 0) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        if ((op->i + 1) > op->n) {
+	            rs = vecpstr_extvec(op) ;
+	        }
+	        if (rs >= 0) {
+	            cint	sz = (sl+1) ;
+	            if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	                strwcpy(bp,sp,sl) ;
+	                op->stsize += sz ;
+	                i = vecpstr_insertsp(op,ii,bp) ;
+	            } /* end if (memory-allocation) */
+	        } /* end if (OK) */
+	    } /* end if (valid index) */
+	} /* end if (magic) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (vecpstr_insert) */
+
 int vecpstr_store(vecpstr *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
@@ -334,9 +358,9 @@ int vecpstr_already(vecpstr *op,cchar *sp,int sl) noex {
 int vecpstr_get(vecpstr *op,int i,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = vecpstr_validx(op,i)) >= 0) {
-	        if (rpp) {
-	            *rpp = (rs >= 0) ? op->va[i] : nullptr ;
-	        }
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? op->va[i] : nullptr ;
+	    }
 	} /* end if (validx) */
 	return rs ;
 }
@@ -478,7 +502,7 @@ int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 		    cchar	**rpp2 ;
 		    if (vcf == nullptr) vcf = vstrcmp ;
 	            if (op->f.issorted) {
-	                cint	esize = sizeof(char *) ;
+	                cint	esize = szof(char *) ;
 	                qsort_f	scf = qsort_f(vcf) ;
 	                rpp2 = (cchar **) bsearch(&sp,op->va,op->i,esize,scf) ;
 	                rs = SR_NOTFOUND ;
@@ -619,7 +643,7 @@ int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
 	int		c = 0 ;
 	if ((rs = vecpstr_magic(op,tab)) >= 0) {
 		    typedef int (*get_f)(vechand *,int,void **) ;
-		    cint	stsize = uceil(op->stsize,sizeof(int)) ;
+		    cint	stsize = uceil(op->stsize,szof(int)) ;
 		    rs = SR_OVERFLOW ;
 	            if (tabsize >= stsize) {
 			vechand		*clp = op->clp ;
@@ -657,6 +681,17 @@ int vecpstr_recsize(vecpstr *op) noex {
 	return (rs >= 0) ? rsize : rs ;
 }
 /* end subroutine (vecpstr_recsize) */
+
+int vecpstr_cksize(vecpstr *op) noex {
+	int		rs ;
+	if ((rs = vecpstr_magic(op)) >= 0) {
+	    if ((rs = op->stsize) == 0) {
+	        rs = vecpstr_strsize(op) ;
+	    }
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (vecpstr_cksize) */
 
 int vecpstr_recmk(vecpstr *op,int *rec,int recsize) noex {
 	int		rs ;
@@ -714,6 +749,35 @@ int vecpstr_recmkstr(vecpstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecpstr_recmkstr) */
+
+int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
+	int		rs ;
+	int		c = 0 ;
+	if ((rs = vecpstr_magic(op,av,tab)) >= 0) {
+	    if ((rs = op->cksize) >= 0) {
+		int	sz = iceil(op->stsize,szof(int)) ;
+		rs = SR_OVERFLOW ;
+	        if (tabs >= sz) {
+	            sz = (op->c + 1) * szof(int) ;
+	            if (avs >= sz) {
+		        char	*bp = tab ;
+		        rs = SR_OK ;
+	                *bp++ = '\0' ;
+	                for (int i = 0 ; i < op->i ; i += 1) {
+		            cchar	*ep = op->va[i] ;
+	                    if (ep) {
+	                        av[c++] = bp ;
+	                        bp = strwcpy(bp,ep,-1) + 1 ;
+		            }
+	                } /* end for */
+	                av[c] = nullptr ;
+	            }
+	        }
+	    } /* end if (vecpstr_cksize) */
+	} /* end if (magic) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecpstr_avmkstr) */
 
 int vecpstr_indlen(vecpstr *op) noex {
 	int		rs ;
@@ -802,6 +866,30 @@ static int vecpstr_setopts(vecpstr *op,int vo) noex {
 }
 /* end subroutine (vecpstr_setopts) */
 
+static int vecpstr_insertsp(vecpstr *op,int ii,cchar *sp) noex {
+	if (ii == op->i) {
+	    op->i += 1 ;
+	    op->va[op->i] = nullptr ;
+	} else if (op->va[ii] != nullptr) {
+	    int		i ;
+	    for (i = (ii + 1) ; i < op->i ; i += 1) {
+		if (op->va[i] == nullptr) break ;
+	    }
+	    if (i == op->i) {
+	        op->i += 1 ;
+	        op->va[op->i] = nullptr ;
+	    }
+	    for (int j = i ; j > ii ; j -= 1) {
+		op->va[j] = op->va[j-1] ;
+	    }
+	} /* end if */
+	op->va[ii] = sp ;
+	op->c += 1 ;
+	op->f.issorted = false ;
+	return ii ;
+}
+/* end subroutine (vecpstr_insertsp) */
+
 static int vecpstr_finchunks(vecpstr *op) noex {
 	vechand		*clp = op->clp ;
 	int		rs = SR_OK ;
@@ -840,7 +928,7 @@ static int vecpstr_extstr(vecpstr *op,int amount) noex {
 /* end subroutine (vecpstr_extstr) */
 
 static int vecpstr_newchunk(vecpstr *op,int amount) noex {
-	cint		sz = sizeof(vecpstr_ch) ;
+	cint		sz = szof(vecpstr_ch) ;
 	int		rs ;
 	void		*vp{} ;
 	op->ccp = nullptr ;
@@ -871,11 +959,11 @@ static int vecpstr_extvec(vecpstr *op,int n) noex {
 	        cint	dn = (n > 0) ? n : VECPSTR_DEFENTS ;
 	        nn = op->an ;
 	        if (nn < dn) nn = dn ;
-	        vasize = (nn + 1) * sizeof(char **) ;
+	        vasize = (nn + 1) * szof(char **) ;
 	        rs = uc_libmalloc(vasize,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        vasize = (nn + 1) * sizeof(char **) ;
+	        vasize = (nn + 1) * szof(char **) ;
 	        rs = uc_librealloc(op->va,vasize,&na) ;
 	        op->va = nullptr ;
 	    } /* end if */
@@ -918,7 +1006,7 @@ static int vecpstr_reset(vecpstr *op) noex {
 static void vecpstr_arrsort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	qsort_f		scf = qsort_f(vcf) ;
 	if_constexpr (f_qsort) {
-	    cint	esize = sizeof(char *) ;
+	    cint	esize = szof(char *) ;
 	    qsort(op->va,op->i,esize,scf) ;
 	} else {
 	    cint	i = op->i ;
@@ -1015,7 +1103,7 @@ static int indexlen(int n) noex {
 /* end subroutine (indexlen) */
 
 static int indexsize(int il) noex {
-	cint		isize = ((il + 1) * 3 * sizeof(int)) ;
+	cint		isize = ((il + 1) * 3 * szof(int)) ;
 	return isize ;
 }
 /* end subroutine (indexsize) */
@@ -1046,6 +1134,10 @@ int vecpstr::get(int ai,cchar **rpp) noex {
 
 int vecpstr::getvec(mainv *rppp) noex {
 	return vecpstr_getvec(this,rppp) ;
+}
+
+int vecpstr::envadd(cchar *kp,cchar *valp,int vall) noex {
+	return vecpstr_envadd(this,kp,valp,vall) ;
 }
 
 int vecpstr::envset(cchar *kp,cchar *valp,int vall) noex {
@@ -1085,6 +1177,9 @@ vecpstr_co::operator int () noex {
 	        break ;
 	    case vecpstrmem_recsize:
 	        rs = vecpstr_recsize(op) ;
+	        break ;
+	    case vecpstrmem_cksize:
+	        rs = vecpstr_cksize(op) ;
 	        break ;
 	    case vecpstrmem_audit:
 	        rs = vecpstr_audit(op) ;

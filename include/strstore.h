@@ -33,7 +33,7 @@
 #define	STRSTORE_MAGIC		0x42114682
 #define	STRSTORE		struct strstore_head
 #define	STRSTORE_CUR		struct strstore_cursor
-#define	STRSTORE_CHUNK		struct strstore_chunk
+#define	STRSTORE_CH		struct strstore_chunk
 
 #define	STRSTORE_STARTLEN	10
 #define	STRSTORE_CHUNKSIZE	512
@@ -51,7 +51,7 @@ struct strstore_chunk {
 } ;
 
 struct strstore_head {
-	STRSTORE_CHUNK	*ccp ;		/* current chunk pointer */
+	STRSTORE_CH	*ccp ;		/* current chunk pointer */
 	vechand		*clp ;		/* chunk-list-pointer */
 	vechand		*nlp ;		/* number-list-pointer */
 	lookaside	*lap ;		/* look-aside-pointer */
@@ -63,6 +63,7 @@ struct strstore_head {
 } ;
 
 typedef STRSTORE	strstore ;
+typedef STRSTORE_CH	strstore_ch ;
 typedef STRSTORE_CUR	strstore_cur ;
 
 EXTERNC_begin

@@ -104,7 +104,7 @@ int vechand_start(vechand *op,int n,int opts) noex {
 	if ((rs = vechand_ctor(op)) >= 0) {
 	    if (n <= 1) n = VECHAND_DEFENTS ;
 	    if ((rs = vechand_setopts(op,opts)) >= 0) {
-	        cint	size = (n + 1) * sizeof(cvoid **) ;
+	        cint	size = (n + 1) * szof(cvoid **) ;
 	        void	**va ;
 	        if ((rs = uc_libmalloc(size,&va)) >= 0) {
 		    op->va = va ;
@@ -219,7 +219,7 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	if (op && ep && vcf) {
 	    rs = SR_NOENT ;
 	    if (op->va) {
-		csize	esize = sizeof(void *) ;
+		csize	esize = szof(void *) ;
 	        if (op->f.osorted && (! op->f.issorted)) {
 	            op->f.issorted = true ;
 	            if (op->c > 1) {
@@ -375,7 +375,7 @@ int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 	        if (! op->f.issorted) {
 	            op->f.issorted = true ;
 	            if (op->c > 1) {
-			csize		esize = sizeof(void *) ;
+			csize		esize = szof(void *) ;
 			qsort_f		scf = qsort_f(vcf) ;
 	                qsort(op->va,op->i,esize,scf) ;
 		    }
@@ -493,11 +493,11 @@ static int vechand_extend(vechand *op) noex {
 	    void	*nva ;
 	    if (op->va == nullptr) {
 	        nn = VECHAND_DEFENTS ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }

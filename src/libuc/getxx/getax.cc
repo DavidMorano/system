@@ -1,4 +1,5 @@
 /* getax SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® System databases (ucentpw, SHADOW, ucentgr, and ucentpj) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	getax
+
+	Description:
 	These subroutines were written so that we could use a single
 	interface to access the 'passwd' database on all UNIX®
 	platforms. This code module provides a platform independent
@@ -29,6 +34,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"getax.h"

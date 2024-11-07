@@ -1,4 +1,5 @@
 /* valuelims SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* provide value limits on the various integer types */

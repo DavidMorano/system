@@ -99,7 +99,7 @@ int vecsorthand_start(vecsorthand *op,int vn,vc_f cmpfunc) noex {
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
 	    int		sz = 0 ;
 	    void	*vp{} ;
-	    sz += (sizeof(void **) * (vn + 1)) ;
+	    sz += (szof(void **) * (vn + 1)) ;
 	    if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 	        op->va = (void **) vp ;
 	        op->e = vn ;
@@ -247,7 +247,7 @@ int vecsorthand_count(vecsorthand *op) noex {
 /* end subroutine (vecsorthand_count) */
 
 int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
-	cint		esize = sizeof(void *) ;
+	cint		esize = szof(void *) ;
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep) {
@@ -283,11 +283,11 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	    void	**nva{} ;
 	    if (op->e == 0) {
 	        ne = ndef ;
-	        sz = (ne * sizeof(void **)) ;
+	        sz = (ne * szof(void **)) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        ne = (op->e * 2) ;
-	        sz = (ne * sizeof(void **)) ;
+	        sz = (ne * szof(void **)) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	    }
 	    if (rs >= 0) {

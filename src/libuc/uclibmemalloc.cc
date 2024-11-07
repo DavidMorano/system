@@ -178,6 +178,18 @@ int uc_libfree(cvoid *cp) noex {
 }
 /* end subroutine (uc_libfree) */
 
+int rslibfree(int rs,cvoid *p) noex {
+	if (p) {
+    	    if (cint rs1 = uc_free(p) ; rs >= 0) {
+		rs = rs1 ;
+	    }
+	} else {
+    	    if (rs >= 0) rs = SR_FAULT ;
+	}
+	return rs ;
+}
+/* end subroutine (rslibfree) */
+
 
 /* local subroutines */
 

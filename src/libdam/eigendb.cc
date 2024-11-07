@@ -302,13 +302,15 @@ int eigendb_curend(eigendb *op,eigendb_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = eigendb_magic(op,curp)) >= 0) {
-	    {
-	        rs1 = hdb_curend(op->dbp,curp->hcp) ;
-		if (rs >= 0) rs = rs1 ;
-	    }
-	    {
-		delete curp->hcp ;
-		curp->hcp = nullptr ;
+	    if (curp->hcp) {
+	        {
+	            rs1 = hdb_curend(op->dbp,curp->hcp) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+		    delete curp->hcp ;
+		    curp->hcp = nullptr ;
+	        }
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -363,7 +365,7 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 		    rs = SR_ISDIR ;
 		} /* end if (not-directory) */
 	    } /* end if (stat) */
-	    rs1 = u_close(fd) ;
+	    rs1 = uc_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open-file) */
 	return rs ;
@@ -406,8 +408,7 @@ static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	int		mp = PROT_READ ;
 	int		mf = MAP_SHARED ;
 	int		c = 0 ;
-	void		*md{} ;
-	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    char	*sp = charp(md) ;
 	    int		sl = int(ms) ;
 	    int		si ;

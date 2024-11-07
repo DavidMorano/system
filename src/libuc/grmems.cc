@@ -1244,7 +1244,7 @@ static int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = uc_pagesize()) >= 0) {
+	if ((rs = ucpagesize) >= 0) {
 	    var.pagesize = rs ;
 	    if ((rs = getbufsize(getbufsize_gr)) >= 0) {
 	        var.grlen = rs ;
@@ -1255,7 +1255,7 @@ static int mkvars() noex {
 	            }
 	        }
 	    }
-	} /* end if (uc_pagesize) */
+	} /* end if (ucpagesize) */
 	return rs ;
 }
 /* end subroutine (mkvars) */

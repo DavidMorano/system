@@ -288,8 +288,8 @@ OBJ168= getprogexec.o getnodedomain.o getmaxpid.o getrand.o getgid_def.o
 OBJ169= getehostname.o getchostname.o getcanonical.o getourhe.o
 OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
-OBJ172= getnodename.o getclustername.o getnodeinfo.o getdomainname.o getseed.o
-OBJ173= getnprocessors.o getarchitecture.o getnfile.o getpwd.o getrunlevel.o
+OBJ172= getseed.o
+OBJ173= getnfile.o getpwd.o getrunlevel.o
 OBJ174= getsocktype.o
 OBJ175= getpwentry.o getpwlogname.o getgroupname.o getarchitecture.o
 

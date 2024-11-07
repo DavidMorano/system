@@ -1,4 +1,5 @@
 /* termnote HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* perform terminal noticing */
@@ -20,6 +21,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>		/* |va_list| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<tmpx.h>
 #include	<ids.h>
 #include	<logfile.h>
@@ -32,7 +38,6 @@
 #define	TERMNOTE_FL		struct termnote_flags
 #define	TERMNOTE_MAXLINES	20
 #define	TERMNOTE_LOGSIZE	400000
-
 /* options */
 #define	TERMNOTE_OBELL	(1<<0)		/* ring terminal bell */
 #define	TERMNOTE_OBIFF	(1<<1)		/* must have group-execute perm */

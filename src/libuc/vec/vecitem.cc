@@ -129,7 +129,7 @@ int vecitem_start(vecitem *op,int n,int opts) noex {
 	if (op) {
 	    memclear(hop) ;	/* <- potentially dangerous if type changes */
 	    if ((rs = vecitem_setopts(op,opts)) >= 0) {
-	        cint	sz = (n + 1) * sizeof(char **) ;
+	        cint	sz = (n + 1) * szof(char **) ;
 		void	*vp{} ;
 	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
@@ -310,7 +310,7 @@ int vecitem_sort(vecitem *op,cmpf cf) noex {
 	        op->f.issorted = true ;
 	        if (op->c > 1) {
 		    qsort_f	scf = qsort_f(cf) ;
-		    cint	ssz = sizeof(void *) ;
+		    cint	ssz = szof(void *) ;
 	            qsort(op->va,op->i,ssz,scf) ;
 	        }
 	    }
@@ -380,15 +380,15 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	    if (op->f.osorted && (! op->f.issorted)) {
 	        op->f.issorted = true ;
 	        if (op->c > 1) {
-		    qsort_f		scf = qsort_f(cf) ;
-		    cint		ssz = sizeof(void *) ;
+		    qsort_f	scf = qsort_f(cf) ;
+		    cint	ssz = szof(void *) ;
 	            qsort(op->va,op->i,ssz,scf) ;
 	        }
 	    } /* end if (sorting) */
 	    if (op->f.issorted) {
-	        qsort_f	scf = qsort_f(cf) ;
-	        cint	ssz = sizeof(void *) ;
-	        void	**spp ;
+	        qsort_f		scf = qsort_f(cf) ;
+	        cint		ssz = szof(void *) ;
+	        void		**spp ;
 	        rs = SR_NOTFOUND ;
 	        if ((spp = voidpp(bsearch(&cep,op->va,op->i,ssz,scf))) != np) {
 	            i = (spp - op->va) ;
@@ -484,7 +484,7 @@ static int vecitem_setopts(vecitem *op,int vo) noex {
 static int vecitem_extend(vecitem *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
-	    cint	esize = sizeof(char **) ;
+	    cint	esize = szof(char **) ;
 	    int		nn ;
 	    int		sz ;
 	    void	*na{} ;
@@ -572,7 +572,7 @@ static int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
                 op->f.issorted = true ;
                 if (op->c > 1) {
                     qsort_f     scf = qsort_f(cf) ;
-                    cint        ssz = sizeof(void *) ;
+                    cint        ssz = szof(void *) ;
                     qsort(op->va,op->i,ssz,scf) ;
                 } /* end if (sorting) */
                 if ((rs = vecitem_search(op,cep,cf,rpp)) >= 0) {

@@ -1,4 +1,5 @@
 /* sfword SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find an English word within the given string */

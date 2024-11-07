@@ -111,7 +111,7 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	        op->va = nullptr ;
 	        op->esize = osize ;
 	        if ((rs = vecobj_setopts(op,opts)) >= 0) {
-	            cint	size = (n + 1) * sizeof(char **) ;
+	            cint	size = (n + 1) * szof(char **) ;
 	            void	*vp{} ;
 	            op->i = 0 ;
 	            op->c = 0 ;
@@ -258,7 +258,7 @@ int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 	            if (! op->f.issorted) {
 	                op->f.issorted = true ;
 	                if (op->c > 1) {
-	                    cint	esize = sizeof(void *) ;
+	                    cint	esize = szof(void *) ;
 		            qsort_f	scf = qsort_f(vcf) ;
 	                    qsort(op->va,op->i,esize,scf) ;
 	                }
@@ -317,6 +317,19 @@ int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 }
 /* end subroutine (vecobj_inorder) */
 
+int vecobj_store(vecobj *op,cvoid *s,void **rpp) noex {
+	int		rs ;
+	int		i = 0 ;
+	if ((rs = vecobj_add(op,s)) >= 0) {
+	    i = rs ;
+	    if (rpp) {
+	        rs = vecobj_get(op,i,rpp) ;
+	    }
+	}
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (vecobj_store) */
+
 int vecobj_get(vecobj *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op && rpp) {
@@ -334,19 +347,6 @@ int vecobj_get(vecobj *op,int i,void **rpp) noex {
 	return rs ;
 }
 /* end subroutine (vecobj_get) */
-
-int vecobj_store(vecobj *op,cvoid *s,void **rpp) noex {
-	int		rs ;
-	int		i = 0 ;
-	if ((rs = vecobj_add(op,s)) >= 0) {
-	    i = rs ;
-	    if (rpp) {
-	        rs = vecobj_get(op,i,rpp) ;
-	    }
-	}
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_store) */
 
 int vecobj_del(vecobj *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -461,7 +461,7 @@ int vecobj_sort(vecobj *op,vecobj_vcf vcf) noex {
 	        if (! op->f.issorted) {
 	            op->f.issorted = true ;
 	            if (op->c > 1) {
-	                cint		esize = sizeof(void *) ;
+	                cint		esize = szof(void *) ;
 		        qsort_f		scf = qsort_f(vcf) ;
 	                qsort(op->va,op->i,esize,scf) ;
 	            }
@@ -565,7 +565,7 @@ int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 		if ((rs = vecobj_sorted(op,vcf)) > 0) {
-	            cint	esize = sizeof(void *) ;
+	            cint	esize = szof(void *) ;
 	            qsort_f	scf = qsort_f(vcf) ;
 	            void	**sepp ;
 	            sepp = (void **) bsearch(&ep,op->va,op->i,esize,scf) ;
@@ -706,11 +706,11 @@ static int vecobj_extend(vecobj *op) noex {
 	    void	*nva{} ;
 	    if (op->va == nullptr) {
 	        nn = VECOBJ_DEFENTS ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_libmalloc(sz,&nva) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * sizeof(void **) ;
+	        sz = (nn + 1) * szof(void **) ;
 	        rs = uc_librealloc(op->va,sz,&nva) ;
 	        op->va = nullptr ;
 	    }
@@ -742,7 +742,7 @@ static int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	if (op->f.osorted && (! op->f.issorted)) {
 	    op->f.issorted = true ;
 	    if (op->c > 1) {
-	        cint	esize = sizeof(void *) ;
+	        cint	esize = szof(void *) ;
 		qsort_f	scf = qsort_f(vcf) ;
 		qsort(op->va,op->i,esize,scf) ;
 	    }
@@ -798,5 +798,62 @@ int sub_fetch::next(cur *curp) noex {
 	return (rs >= 0) ? i : rs ;
 }
 /* end method (sub_fetch::next) */
+
+int vecobj::start(int osz,int vn,int vo) noex {
+	return vecobj_start(this,osz,vn,vo) ;
+}
+
+int vecobj::add(cvoid *ep) noex {
+	return vecobj_add(this,ep) ;
+}
+
+int vecobj::adduniq(cvoid *ep) noex {
+	return vecobj_adduniq(this,ep) ;
+}
+
+int vecobj::store(cvoid *ep,void **rpp) noex {
+	return vecobj_store(this,ep,rpp) ;
+}
+
+int vecobj::get(int ei,void **rpp) noex {
+	return vecobj_get(this,ei,rpp) ;
+}
+
+int vecobj::getvec(void ***rppp) noex {
+	return vecobj_getvec(this,rppp) ;
+}
+
+int vecobj::del(int ai) noex {
+	if (ai < 0) ai = 0 ;
+	return vecobj_del(this,ai) ;
+}
+
+void vecobj::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("vecobj",rs,"fini-finish") ;
+	}
+}
+
+vecobj_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vecobjmem_count:
+	        rs = vecobj_count(op) ;
+	        break ;
+	    case vecobjmem_delall:
+	        rs = vecobj_delall(op) ;
+	        break ;
+	    case vecobjmem_audit:
+	        rs = vecobj_audit(op) ;
+	        break ;
+	    case vecobjmem_finish:
+	        rs = vecobj_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (vecobj_co::operator) */
 
 
