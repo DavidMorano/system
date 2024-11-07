@@ -20,12 +20,8 @@
 
 /*******************************************************************************
 
-  	System:
-	usys_linux
-
-	Description:
-	This file contains the UNIX® system types and preprocessor
-	symbols that may not be provided.
+	This file contains the UNIX® system types and preprocessor symbols
+	that may not be provided.
 
 *******************************************************************************/
 

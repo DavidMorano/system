@@ -135,7 +135,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	                }
 			rs1 = uc_libfree(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a) */
+		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */

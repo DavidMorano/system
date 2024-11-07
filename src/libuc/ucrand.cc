@@ -1,4 +1,5 @@
 /* ucrand SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -41,8 +42,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<climits>		/* |CHAR_BIT| */
 #include	<cerrno>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>

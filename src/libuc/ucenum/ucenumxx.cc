@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-03-24, David A­D­ Morano
-	This object module was morphed from some previous one. I
+	This object module was morphed from some previous one.  I
 	do not remember what the previous one was.
 
 */
@@ -28,11 +28,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -44,6 +42,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -114,7 +113,7 @@ int ucenumxxbase::close() noex {
 	int		rs1 ;
 	if (op->magic == mxx) {
 	    rs = SR_OK ;
-	    {
+	    if (op->fmp) {
 		rs1 = filemap_close(op->fmp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }

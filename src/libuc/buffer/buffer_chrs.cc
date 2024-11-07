@@ -1,4 +1,5 @@
 /* buffer_chrs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* character insertion options for BUFFER object */
@@ -58,6 +59,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */

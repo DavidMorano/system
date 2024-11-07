@@ -20,12 +20,8 @@
 
 /*******************************************************************************
 
-  	System:
-	usys_sunos
-
-	Description:
-	This file contains the UNIX® system types and preprocessor
-	symbols that may not be provided.
+	This file contains the UNIX® system types and preprocessor symbols
+	that may not be provided.
 
 *******************************************************************************/
 
@@ -38,7 +34,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-
 
 /* USYSSUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)

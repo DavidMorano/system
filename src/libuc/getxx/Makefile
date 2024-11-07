@@ -2,7 +2,7 @@
 
 T= getxx
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -75,6 +74,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -96,9 +96,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_GETXX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_GETXX)
-
-$(T).a:			$(OBJ_GETXX)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -131,9 +128,7 @@ obj3_getxx.o:	$(OBJ3_GETXX)
 
 
 getax.o:		getax.cc getax.h $(INCS)
-
 getus.o:		getus.cc getus.h $(INCS)
-
 getho.o:		getho.cc getho.h $(INCS)
 getnw.o:		getnw.cc getnw.h $(INCS)
 getpr.o:		getpr.cc getpr.h $(INCS)

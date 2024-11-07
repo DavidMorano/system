@@ -54,8 +54,6 @@
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
-
 #ifndef	SYSPASSWD
 #define	SYSPASSWD	"/sysdb/passwd"
 #endif
@@ -66,22 +64,24 @@
 
 /* local structures */
 
-struct subinfo {
+namespace {
+   struct subinfo {
 	vecstrx		*vsp ;
-	void		*mapdata ;
+	void		*mapdata{} ;
 	size_t		mapsize ;
 	size_t		fsize ;
 	gid_t		sgid ;
-} ;
+	int	start(vecstrx *,gid_t) noex ;
+	int	pwmapbegin() noex ;
+	int	pwmapload() noex ;
+	int	pwmapend() noex ;
+	int	finish() noex ;
+    } ; /* end struct (subinfo) */
+}
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,vecstrx *,gid_t) noex ;
-static int	subinfo_pwmapbegin(SUBINFO *) noex ;
-static int	subinfo_pwmapload(SUBINFO *) noex ;
-static int	subinfo_pwmapend(SUBINFO *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
 
 static int	pwentparse(cchar *,int,gid_t *) noex ;
 
@@ -105,14 +105,14 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (this) {
-	    SUBINFO	si, *sip = &si ;
+	    subinfo	si ;
 	    if (numsign(sgid)) sgid = getgid() ;
-	    if ((rs = subinfo_start(sip,this,sgid)) >= 0) {
+	    if ((rs = si.start(this,sgid)) >= 0) {
 		{
-	            rs = subinfo_pwmapload(sip) ;
+	            rs = si.pwmapload() ;
 	            c = rs ;
 		}
-	        rs1 = subinfo_finish(sip) ;
+	        rs1 = si.finish() ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (subinfo) */
 	} /* end if (non-null) */
@@ -123,40 +123,39 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip,vecstrx *vsp,gid_t sgid) noex {
+int subinfo::start(vecstrx *vsp,gid_t g) noex {
     	int		rs = SR_BUGCHECK ;
-	if (sip && vsp) {
-	    rs = memclear(sip) ;
-	    sip->vsp = vsp ;
-	    sip->sgid = sgid ;
+	if (vsp) {
+	    rs = SR_OK ;
+	    vsp = vsp ;
+	    sgid = g ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (subinfo_start) */
+/* end subroutine (subinfo::start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+int subinfo::finish() noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (this) {
 	    rs = SR_OK ;
 	}
 	return rs ;
 }
-/* end subroutine (subinfo_finish) */
+/* end subroutine (subinfo::finish) */
 
-static int subinfo_pwmapload(SUBINFO *sip) noex {
-    	vecstrx		*vsp = sip->vsp ;
+int subinfo::pwmapload() noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = subinfo_pwmapbegin(sip)) >= 0) {
-	    int		ml = sip->fsize ;
-	    cchar	*mp = charp(sip->mapdata) ;
+	if ((rs = pwmapbegin()) >= 0) {
+	    int		ml = fsize ;
+	    cchar	*mp = charp(mapdata) ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(mp,ml,CH_NL)) != nullptr) {
 	        cint	len = (tp - mp) ;
 	        if (gid_t gid{} ; (rs = pwentparse(mp,len,&gid)) > 0) {
 		    cint	ul = rs ;
-		    if (sip->sgid == gid) {
+		    if (sgid == gid) {
 	                c += 1 ;
 	                rs = vsp->adduniq(mp,ul) ;
 	            }
@@ -165,17 +164,17 @@ static int subinfo_pwmapload(SUBINFO *sip) noex {
 	        mp = (tp+1) ;
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-	    rs1 = subinfo_pwmapend(sip) ;
+	    rs1 = pwmapend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (grmems-pwmap) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (subinfo_pwmapload) */
+/* end subroutine (subinfo::pwmapload) */
 
-static int subinfo_pwmapbegin(SUBINFO *sip) noex {
+int subinfo::pwmapbegin() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->mapdata == nullptr) {
+	if (mapdata == nullptr) {
 	    cmode	om = 0666 ;
 	    cint	of = O_RDONLY ;
 	    cchar	*fn = SYSPASSWD ;
@@ -186,13 +185,13 @@ static int subinfo_pwmapbegin(SUBINFO *sip) noex {
 	            csize	ms = size_t(rs) ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
-	            sip->fsize = rs ;
+	            fsize = rs ;
 	            if (void *md ; (rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	                cint		madv = MADV_SEQUENTIAL ;
 			const caddr_t	ma = caddr_t(md) ;
 	                if ((rs = u_madvise(ma,ms,madv)) >= 0) {
-	                    sip->mapdata = md ;
-	                    sip->mapsize = ms ;
+	                    mapdata = md ;
+	                    mapsize = ms ;
 	                } /* end if (advise) */
 	                if (rs < 0) {
 	                    u_munmap(md,ms) ;
@@ -205,22 +204,22 @@ static int subinfo_pwmapbegin(SUBINFO *sip) noex {
 	} /* end if (need mapping) */
 	return rs ;
 }
-/* end subroutine (subinfo_pwmapbegin) */
+/* end subroutine (subinfo::pwmapbegin) */
 
-static int subinfo_pwmapend(SUBINFO *sip) noex {
+int subinfo::pwmapend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->mapdata) {
-	    csize	ms = sip->mapsize ;
-	    void	*md = sip->mapdata ;
+	if (mapdata) {
+	    csize	ms = mapsize ;
+	    void	*md = mapdata ;
 	    rs1 = u_munmap(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->mapdata = nullptr ;
-	    sip->mapsize = 0 ;
+	    mapdata = nullptr ;
+	    mapsize = 0 ;
 	}
 	return rs ;
 }
-/* end subroutine (subinfo_pwmapend) */
+/* end subroutine (subinfo::pwmapend) */
 
 /* PASSWD entry parsing */
 static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {

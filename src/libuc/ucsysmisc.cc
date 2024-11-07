@@ -210,8 +210,8 @@ int uc_nprocessors(int w) noex {
 /* end subroutine (uc_nprocessors) */
 
 int uc_gethz(int w) noex {
-	long	hz = -1 ;
-	int	rs = SR_NOSYS ;
+	int		hz = -1 ;
+	int		rs = SR_NOSYS ;
 	if_constexpr (f_hz) {
 	    if ((hz < 0) && ((w == 0) || (w == 1))) {
 	        rs = SR_OK ;
@@ -227,13 +227,11 @@ int uc_gethz(int w) noex {
 	if_constexpr (f_sctck) {
 	    if ((hz < 0) && ((w == 0) || (w == 3))) {
 	        cint	cmd = _SC_CLK_TCK ;
-	        rs = uc_sysconfval(cmd,&hz) ;
+	        rs = uc_sysconfval(cmd,nullptr) ;
+		hz = rs ;
 	    }
 	} /* end if_constexpr (f_sctck) */
-	if (rs >= 0) {
-	    rs = intsat(hz) ;
-	}
-	return rs ;
+	return (rs >= 0) ? hz : rs ;
 }
 /* end subroutine (uc_gethz) */
 
@@ -289,6 +287,12 @@ namespace libuc {
 	}
     	return rs ;
     } /* end method (ucpagesizer::operator) */
+    ucnprocesser::operator int () noex {
+	return uc_nprocessors(0) ;
+    } /* end method (ucprocesser::operator) */
+    int ucnprocesser::operator () (int w) noex {
+	return uc_nprocessors(w) ;
+    } /* end method (ucprocesser::operator) */
 }
 
 

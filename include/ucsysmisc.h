@@ -48,7 +48,15 @@ namespace libuc {
     } ; /* end struct (ucpagesizer) */
 }
 
+namespace libuc {
+    struct ucnprocesser {
+    	operator int () noex ;
+	int operator () (int = 0) noex ;
+    } ; /* end struct (ucnprocesser) */
+}
+
 extern libuc::ucpagesizer	ucpagesize ;
+extern libuc::ucnprocesser	ucnprocessors ;
 
 #endif /* __cplusplus */
 

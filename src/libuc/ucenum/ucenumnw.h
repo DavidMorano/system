@@ -38,12 +38,64 @@
 #include	<ucentnw.h>		/* <- money shot */
 
 
-#define	UCENUMNW		struct ucenumnw_head
 #define	UCENUMNW_MAGIC		0x88776281
 
 
-typedef UCENUMXX		ucenumnw ;
+typedef UCENUMXX		ucenumnw_head ;
 typedef ucentnw			ucenumnw_ent ;
+
+#ifdef	__cplusplus
+enum ucenumnwmems {
+    	ucenumnwmem_open,
+	ucenumnwmem_reset,
+	ucenumnwmem_close,
+	ucenumnwmem_overlast
+} ;
+struct ucenumnw ;
+struct ucenumnw_op {
+	ucenumnw	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumnw *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumnw_op) */
+struct ucenumnw_co {
+	ucenumnw	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumnw *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumnw_co) */
+struct ucenumnw : ucenumxx {
+	ucenumnw_op	open ;
+	ucenumnw_co	reset ;
+	ucenumnw_co	close ;
+	ucenumnw() noex {
+	    open(this,ucenumnwmem_open) ;
+	    reset(this,ucenumnwmem_reset) ;
+	    close(this,ucenumnwmem_close) ;
+	} ;
+	ucenumnw(const ucenumnw &) = delete ;
+	ucenumnw &operator = (const ucenumnw &) = delete ;
+	int readent(ucenumnw_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumnw() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumnw) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumnw ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

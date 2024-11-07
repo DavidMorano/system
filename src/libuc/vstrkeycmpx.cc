@@ -1,4 +1,5 @@
 /* vstrkeycmpx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* v-string key comparison (obverse and reverse) */
@@ -44,8 +45,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<strkeycmp.h>
 

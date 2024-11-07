@@ -63,7 +63,7 @@ OBJ03= stdfnames.o
 
 OBJ04= isx.o
 OBJ05= nleadstr.o nleadkeystr.o
-OBJ06= mapex.o getourenv.o
+OBJ06= mapex.o
 OBJ07=
 
 OBJ08= strkeycmp.o strnul.o
@@ -281,7 +281,7 @@ objz.o:			$(OBJZ)
 OBJ0_BASE= uctimeout.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE= bufsizedata.o bufsizenames.o
-OBJ3_BASE= getbufsize.o bufsizevar.o 
+OBJ3_BASE= bufsizevar.o 
 
 OBJ_BASE= obj0_base.o obj1_base.o obj2_base.o obj3_base.o
 
@@ -412,9 +412,6 @@ strmgr.o:		strmgr.cc strmgr.h
 serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
-getbufsize.o:		getbufsize.cc getbufsize.h bufsizenames.h usysdefs.h
-getbufsize.o:		bufsizenames.h usysdefs.h bufsizedata.hh
-
 bufsizenames.o:		bufsizenames.c bufsizenames.h
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
@@ -461,7 +458,6 @@ strshrink.o:		strshrink.c
  
 # digit-character management
 ndigits.o:		ndigits.c
-getdig.o:		getdig.cc getdig.h
 checkbase.o:		checkbase.cc
 
 # malloc
@@ -682,6 +678,11 @@ isfiledesc.o:		isfiledesc.dir
 isfiledesc.dir:
 	makesubdir $@
 
+# GETX
+getx.o:		getx.dir
+getx.dir:
+	makesubdir $@
+
 # GETXX
 getxx.o:		getxx.dir
 getxx.dir:
@@ -813,7 +814,6 @@ osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 syspasswd.o:		syspasswd.cc syspasswd.h
 absfn.o:		absfn.cc absfn.h
 
-
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
 vstrkeycmpx.o:		vstrkeycmpx.cc vstrkeycmpx.h
@@ -838,19 +838,6 @@ matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
-
-getuserhome.o:		getuserhome.cc getuserhome.h
-getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
-getxid.o:		getxid.cc getxid.h
-getngroups.o:		getngroups.cc getngroups.h
-getourenv.o:		getourenv.cc getourenv.h
-getaddr.o:		getaddr.cc getaddr.h
-getmjd.o:		getmjd.cc getmjd.h
-gethz.o:		gethz.cc gethz.h
-getpassword.o:		getpassword.cc getpassword.h
-getrand.o:		getrand.cc getrand.h
-getsyslogx.o:		getsyslogx.cc getsyslogx.h
-getprogpath.o:		getprogpath.cc getprogpath.h
 
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh

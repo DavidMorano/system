@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-03-24, David A­D­ Morano
-	This object module was morphed from some previous one. I
+	This object module was morphed from some previous one.  I
 	do not remember what the previous one was.
 
 */
@@ -28,12 +28,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<sysdbfname.h>
 #include	<localmisc.h>
@@ -104,5 +101,44 @@ int ucenumpj_reset(ucenumpj *op) noex {
 
 
 /* local subroutines */
+
+int ucenumpj::readent(ucenumpj_ent *uap,char *uabuf,int ualen) noex {
+	return ucenumpj_readent(this,uap,uabuf,ualen) ;
+}
+
+void ucenumpj::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("ucenumpj",rs,"fini-close") ;
+	}
+}
+
+int ucenumpj_op::operator () (cchar *fn) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ucenumpjmem_open:
+	        rs = ucenumpj_open(op,fn) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ucenumpj_op::operator) */
+
+ucenumpj_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ucenumpjmem_reset:
+	        rs = ucenumpj_reset(op) ;
+	        break ;
+	    case ucenumpjmem_close:
+	        rs = ucenumpj_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ucenumpj_co::operator) */
 
 

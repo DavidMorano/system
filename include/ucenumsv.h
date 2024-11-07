@@ -38,12 +38,64 @@
 #include	<ucentsv.h>		/* <- money shot */
 
 
-#define	UCENUMSV		struct ucenumsv_head
 #define	UCENUMSV_MAGIC		0x88776281
 
 
-typedef UCENUMXX		ucenumsv ;
+typedef UCENUMXX		ucenumsv_head ;
 typedef ucentsv			ucenumsv_ent ;
+
+#ifdef	__cplusplus
+enum ucenumsvmems {
+    	ucenumsvmem_open,
+	ucenumsvmem_reset,
+	ucenumsvmem_close,
+	ucenumsvmem_overlast
+} ;
+struct ucenumsv ;
+struct ucenumsv_op {
+	ucenumsv	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumsv *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumsv_op) */
+struct ucenumsv_co {
+	ucenumsv	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumsv *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumsv_co) */
+struct ucenumsv : ucenumxx {
+	ucenumsv_op	open ;
+	ucenumsv_co	reset ;
+	ucenumsv_co	close ;
+	ucenumsv() noex {
+	    open(this,ucenumsvmem_open) ;
+	    reset(this,ucenumsvmem_reset) ;
+	    close(this,ucenumsvmem_close) ;
+	} ;
+	ucenumsv(const ucenumsv &) = delete ;
+	ucenumsv &operator = (const ucenumsv &) = delete ;
+	int readent(ucenumsv_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumsv() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumsv) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumsv ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

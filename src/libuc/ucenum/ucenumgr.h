@@ -38,12 +38,64 @@
 #include	<ucentgr.h>		/* <- money shot */
 
 
-#define	UCENUMGR		struct ucenumgr_head
 #define	UCENUMGR_MAGIC		0x88776281
 
 
-typedef UCENUMXX		ucenumgr ;
+typedef UCENUMXX		ucenumgr_head ;
 typedef ucentgr			ucenumgr_ent ;
+
+#ifdef	__cplusplus
+enum ucenumgrmems {
+    	ucenumgrmem_open,
+	ucenumgrmem_reset,
+	ucenumgrmem_close,
+	ucenumgrmem_overlast
+} ;
+struct ucenumgr ;
+struct ucenumgr_op {
+	ucenumgr	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumgr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumgr_op) */
+struct ucenumgr_co {
+	ucenumgr	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumgr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumgr_co) */
+struct ucenumgr : ucenumxx {
+	ucenumgr_op	open ;
+	ucenumgr_co	reset ;
+	ucenumgr_co	close ;
+	ucenumgr() noex {
+	    open(this,ucenumgrmem_open) ;
+	    reset(this,ucenumgrmem_reset) ;
+	    close(this,ucenumgrmem_close) ;
+	} ;
+	ucenumgr(const ucenumgr &) = delete ;
+	ucenumgr &operator = (const ucenumgr &) = delete ;
+	int readent(ucenumgr_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumgr() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumgr) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumgr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

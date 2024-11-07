@@ -1,4 +1,5 @@
 /* getuserterm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the name of the most recently accessed controlling terminal */
@@ -155,15 +156,15 @@ int suber::finish() noex {
 /* end method (suber::finish) */
 
 int suber::tmpenum() noex {
-	tmpx		utmp ;
+    	cnullptr	np{} ;
 	time_t		tiacc = 0 ;
+	cint		to = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = tmpx_open(&utmp,nullptr,O_RDONLY)) >= 0) {
-	    tmpx_cur	cur ;
-	    tmpx_ent	ue ;
-	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
+	if (tmpx utmp ; (rs = tmpx_open(&utmp,np,to)) >= 0) {
+	    if (tmpx_cur cur ; (rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
+	        tmpx_ent	ue ;
 	        while (rs >= 0) {
 		    bool	f = true ;
 	            rs1 = tmpx_fetchuser(&utmp,&cur,&ue,username) ;
@@ -208,9 +209,8 @@ static int newer(char *termdev,time_t *tp) noex {
 	int		f = false ;
 	cmode		om = 0666 ;
 	if ((rs = u_open(termdev,of,om)) >= 0) {
-	    USTAT	sb ;
 	    cint	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 		f = true ;
 	        f = f && ((sb.st_mode & S_IWGRP) == S_IWGRP) ;
 	        f = f && (sb.st_atime > *tp) ;

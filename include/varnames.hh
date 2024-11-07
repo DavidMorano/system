@@ -103,6 +103,7 @@ struct varnames {
 	static const char visual[] ;
 	static const char random[] ;
 	static const char hz[] ;
+	static const char ncpu[] ;
 } ; /* end struct (varnames) */
 
 

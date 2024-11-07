@@ -1,4 +1,5 @@
 /* utmpacc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® UTMP access management */
@@ -19,16 +20,18 @@
 
 /*******************************************************************************
 
-	This module serves as a per-process cache for UNIX® UTMP
-	information.
+  	Group:
+	utmpacc
 
-	Since we are basically dealing with global data, we need
-	to make the establishment of it multi-thread safe.  We also
-	want fork safety.  Yes, we want everything, including cleanup
-	on module unloading (since, yes, we could all be inside a
-	loadable and unloadble module!).  For these purposes we
-	employ the basic (and not so basic) means of accomplishing
-	this.  See the code for our various machinations.
+	Description:
+	This module serves as a per-process cache for UNIX® UTMP
+	information.  Since we are basically dealing with global
+	data, we need to make the establishment of it multi-thread
+	safe.  We also want fork safety.  Yes, we want everything,
+	including cleanup on module unloading (since, yes, we could
+	all be inside a loadable and unloadble module!).  For these
+	purposes we employ the basic (and not so basic) means of
+	accomplishing this.  See the code for our various machinations.
 
 	+ descriptions
 
@@ -57,6 +60,7 @@
 #include	<climits>
 #include	<csignal>		/* |sig_atomic_t| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<atomic>
 #include	<usystem.h>
@@ -79,10 +83,8 @@
 
 
 /* local defines */
-
 #define	UTMPACC_ITEM		struct utmpacc_i
 #define	UTMPACC_NTYPES		4	/* number of process types */
-
 /* intervals (seconds) */
 #define	UTMPACC_INTBOOT		(5*3600)
 #define	UTMPACC_INTRUNLEVEL	5

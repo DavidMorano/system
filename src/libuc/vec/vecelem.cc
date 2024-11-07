@@ -283,9 +283,8 @@ int vecelem_audit(vecelem *op) noex {
 	                if ((v & 3) != 0) rs = SR_BADFMT ;
 	            }
 	            if (rs >= 0) {
-		        void	*ep = nullptr ;
 	                cint	esize = op->esize ;
-	                if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
+	                if (void *ep() ; (rs = uc_libmalloc(esize,&ep)) >= 0) {
 		            int		i ; /* used-afterwards */
 	                    for (i = 0 ; i < op->i ; i += 1) {
 		                caddr_t		cap = caddr_t(op->va) ;
@@ -296,7 +295,7 @@ int vecelem_audit(vecelem *op) noex {
 	                    rs = (i == c) ? SR_OK : SR_BADFMT ;
 	                    rs1 = uc_libfree(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (memory-allocation) */
+	                } /* end if (m-a-f) */
 	            } /* end if (ok) */
 		} /* end if (non-nullptr va) */
 	        if (rs >= 0) {

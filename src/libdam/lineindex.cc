@@ -147,7 +147,7 @@ int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 	int		c = 0 ;
 	if ((rs = lineindex_ctor(op,ifn)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (ifn[0]) {
+	    if (ifn[0] && (of >= 0)) {
 	        op->fd = -1 ;
 	        op->of = of ;
 	        op->om = om ;

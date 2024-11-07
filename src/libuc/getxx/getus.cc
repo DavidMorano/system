@@ -1,4 +1,5 @@
 /* getus SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user-shell entries */
@@ -19,12 +20,14 @@
 
 /*******************************************************************************
 
+  	Group:
+	getus
+
+	Description:
 	These subroutines were was written to provide a more
 	consistent interface to the system 'user-shells" database.
-
 	These subroutines are multi-thread safe, because the
 	underlying subroutines are themselves multi-thread safe.
-
 	Although safe for multithreading, different threads using
 	these subroutines at the same time will enumerate separate
 	subsets of the accessed database.  This is the way the UNIX®
@@ -35,6 +38,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"getus.h"

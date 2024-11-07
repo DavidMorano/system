@@ -17,14 +17,10 @@
 
 /*******************************************************************************
 
-  	System:
-	usys_getrandom
-
-	Description:
 	This file contains the UNIX® system types that the brain-damaged
-	MacOS operating system does NOT have.  We are trying in a
-	very small way to make up for some of the immense brain-damage
-	within the Apple Darwin operating system.
+	MacOS operating system does NOT have.  We are trying in a very
+	small way to make up for some of the immense brain-damage within
+	the Apple Darwin operating system.
 
 *******************************************************************************/
 
@@ -45,10 +41,9 @@
 #include	<usysdefs.h>
 
 
-#define GRND_DEFAULT		0		/* default */
-#define GRND_NONBLOCK		(1 << 0)	/* do not block open */
-#define GRND_RANDOM		(1 << 1)	/* use '/dev/random' */
-#define GRND_INSECURE		(1 << 2)	/* quality can be compromised */
+#define GRND_NONBLOCK		0x01	/* do not block open */
+#define GRND_RANDOM		0x02	/* use '/dev/random' */
+#define GRND_INSECURE		0x04	/* quality can be compromised */
 
 
 #ifndef	SUBROUTINE_GETRANDOM

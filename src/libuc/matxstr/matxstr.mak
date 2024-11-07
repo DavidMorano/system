@@ -56,9 +56,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_MATXSTR= matstr.o matostr.o matpstr.o
-OBJ1_MATXSTR= matkeystr.o matlocalfs.o
-OBJ2_MATXSTR= matsubstr.o matcasesubstr.o
-OBJ3_MATXSTR= matnstr.o
+OBJ1_MATXSTR= matkeystr.o matsubstr.o 
+OBJ2_MATXSTR= matnstr.o 
+OBJ3_MATXSTR= matlocalfs.o
 
 OBJA_MATXSTR= obj0.o obj1.o
 OBJB_MATXSTR= obj2.o obj3.o
@@ -141,7 +141,6 @@ matostr.o:		matostr.cc matostr.h		$(INCS)
 matpstr.o:		matpstr.cc matpstr.h		$(INCS)
 matkeystr.o:		matkeystr.cc matkeystr.h	$(INCS)
 matsubstr.o:		matsubstr.cc			$(INCS)
-matcasesubstr.o:	matcasesubstr.cc		$(INCS)
 matnstr.o:		matnstr.cc			$(INCS)
 matlocalfs.o:		matlocalfs.cc			$(INCS)
 

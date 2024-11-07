@@ -18,18 +18,20 @@
 
 /*******************************************************************************
 
-	Get a host entry from the System Name Server databases.
+  	Group:
+	getho
 
+	Description:
+	Get a host entry from the System Name Server databases.
 	This subroutine is used to get a host entry struct for a
 	host name.  It is not too fancy but will try to apply some
 	standard defaults in order to get an entry back.  Names
 	given to lookup will assume the current domain if one is
 	not supplied with the name.  A NULL supplied name is assumed
 	to refer to the current host.  A name specified in the INET
-	style dotted-decimal format is also acceptable.
-
-	Remember that a design goal is to MINIMIZE the number of
-	DNS lookups used.  In general, DNS lookups are very slow.
+	style dotted-decimal format is also acceptable.  Remember
+	that a design goal is to MINIMIZE the number of DNS lookups
+	used.  In general, DNS lookups are very slow.
 
 	Synopsis:
 	int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex
@@ -47,6 +49,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>

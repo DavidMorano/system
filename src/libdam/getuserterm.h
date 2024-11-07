@@ -1,4 +1,5 @@
 /* getuserterm HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the name of the most recently accessed controlling terminal */
@@ -28,7 +29,7 @@
 
 EXTERNC_begin
 
-extern int	getuserterm(char *rbuf,int rlen,cchar *username) noex ;
+extern int	getuserterm(char *,int,cchar *) noex ;
 
 EXTERNC_end
 

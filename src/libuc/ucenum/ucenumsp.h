@@ -38,12 +38,64 @@
 #include	<ucentsp.h>		/* <- money shot */
 
 
-#define	UCENUMSP		struct ucenumsp_head
 #define	UCENUMSP_MAGIC		0x88776281
 
 
-typedef UCENUMXX		ucenumsp ;
+typedef UCENUMXX		ucenumsp_head ;
 typedef ucentsp			ucenumsp_ent ;
+
+#ifdef	__cplusplus
+enum ucenumspmems {
+    	ucenumspmem_open,
+	ucenumspmem_reset,
+	ucenumspmem_close,
+	ucenumspmem_overlast
+} ;
+struct ucenumsp ;
+struct ucenumsp_op {
+	ucenumsp	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumsp *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar *) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (ucenumsp_op) */
+struct ucenumsp_co {
+	ucenumsp	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ucenumsp *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ucenumsp_co) */
+struct ucenumsp : ucenumxx {
+	ucenumsp_op	open ;
+	ucenumsp_co	reset ;
+	ucenumsp_co	close ;
+	ucenumsp() noex {
+	    open(this,ucenumspmem_open) ;
+	    reset(this,ucenumspmem_reset) ;
+	    close(this,ucenumspmem_close) ;
+	} ;
+	ucenumsp(const ucenumsp &) = delete ;
+	ucenumsp &operator = (const ucenumsp &) = delete ;
+	int readent(ucenumsp_ent *,char *,int) noex ;
+	void dtor() noex ;
+	~ucenumsp() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (ucenumsp) */
+#else	/* __cplusplus */
+typedef UCENUMXX	ucenumsp ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

@@ -57,27 +57,23 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 # vecstr
 OBJA_VECSTR= vecstr.o vecstr_ext.o
-OBJB_VECSTR= vecstr_adduniqs.o vecstr_addpath.o
-OBJC_VECSTR= vecstr_loadfile.o vecstr_env.o vecstr_envfile.o 
-OBJD_VECSTR= vecstr_adds.o vecstr_addsyms.o vecstr_foilcmp.o
-OBJE_VECSTR= vecstr_srvargs.o vecstr_svcargs.o
-OBJF_VECSTR= vecstr_loadgrusers.o vecstr_addsubdirs.o
+OBJB_VECSTR= 
+OBJC_VECSTR= 
+OBJD_VECSTR= 
+OBJE_VECSTR= 
+OBJF_VECSTR= 
 
 OBJ_VECSTR+= obja_vecstr.o
-#OBJ_VECSTR+= obja_vecstr.o objb_vecstr.o objc_vecstr.o
-#OBJ_VECSTR+= objd_vecstr.o obje_vecstr.o objf_vecstr.o
 
 # vecpstr
 OBJA_VECPSTR= vecpstr.o vecpstr_ext.o
-OBJB_VECPSTR= vecpstr_adduniqs.o vecpstr_addpath.o
-OBJC_VECPSTR= vecpstr_loadfile.o vecpstr_env.o vecpstr_envfile.o 
-OBJD_VECPSTR= vecpstr_adds.o vecpstr_addsyms.o vecpstr_foilcmp.o
-OBJE_VECPSTR= vecpstr_srvargs.o vecpstr_svcargs.o
-OBJF_VECPSTR= vecpstr_loadgrusers.o vecpstr_addsubdirs.o
+OBJB_VECPSTR= 
+OBJC_VECPSTR= 
+OBJD_VECPSTR= 
+OBJE_VECPSTR= 
+OBJF_VECPSTR= 
 
 OBJ_VECPSTR+= obja_vecpstr.o
-#OBJ_VECPSTR+= obja_vecpstr.o objb_vecpstr.o objc_vecpstr.o 
-#OBJ_VECPSTR+= objd_vecpstr.o obje_vecpstr.o objf_vecpstr.o 
 
 # VECSTRX
 OBJA_VECSTRX= vecstrx_addpath.o vecstrx_adds.o vecstrx_addsubdirs.o
@@ -224,34 +220,8 @@ objd_vec.o:	$(OBJD_VEC)
 vecstr.o:		vecstr.cc		vecstr.h
 vecstr_ext.o:		vecstr_ext.cc		vecstr.h
 
-vecstr_addpath.o:	vecstr_addpath.cc	vecstr.h
-vecstr_adds.o:		vecstr_adds.cc		vecstr.h
-vecstr_addsubdirs.o:	vecstr_addsubdirs.cc	vecstr.h
-vecstr_adduniqs.o:	vecstr_adduniqs.cc	vecstr.h
-vecstr_env.o:		vecstr_env.cc		vecstr.h
-vecstr_envfile.o:	vecstr_envfile.cc	vecstr.h
-vecstr_foilcmp.o:	vecstr_foilcmp.cc	vecstr.h
-vecstr_loadfile.o:	vecstr_loadfile.cc	vecstr.h
-vecstr_loadgrusers.o:	vecstr_loadgrusers.cc	vecstr.h
-vecstr_srvargs.o:	vecstr_srvargs.cc	vecstr.h
-vecstr_svcargs.o:	vecstr_svcargs.cc	vecstr.h
-vecstr_addsyms.o:	vecstr_addsyms.cc	vecstr.h
-
 vecpstr.o:		vecpstr.cc		vecpstr.h
 vecpstr_ext.o:		vecpstr_ext.cc		vecstr.h
-
-vecpstr_addpath.o:	vecpstr_addpath.cc	vecpstr.h
-vecpstr_adds.o:		vecpstr_adds.cc		vecpstr.h
-vecpstr_addsubdirs.o:	vecpstr_addsubdirs.cc	vecpstr.h
-vecpstr_adduniqs.o:	vecpstr_adduniqs.cc	vecpstr.h
-vecpstr_env.o:		vecpstr_env.cc		vecpstr.h
-vecpstr_envfile.o:	vecpstr_envfile.cc	vecpstr.h
-vecpstr_foilcmp.o:	vecpstr_foilcmp.cc	vecpstr.h
-vecpstr_loadfile.o:	vecpstr_loadfile.cc	vecpstr.h
-vecpstr_loadgrusers.o:	vecpstr_loadgrusers.cc	vecpstr.h
-vecpstr_srvargs.o:	vecpstr_srvargs.cc	vecpstr.h
-vecpstr_svcargs.o:	vecpstr_svcargs.cc	vecpstr.h
-vecpstr_addsyms.o:	vecpstr_addsyms.cc	vecpstr.h
 
 vecstrx_addpath.o:	vecstrx_addpath.cc	vecstrx.hh
 vecstrx_adds.o:		vecstrx_adds.cc		vecstrx.hh

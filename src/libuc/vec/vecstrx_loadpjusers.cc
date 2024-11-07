@@ -38,8 +38,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<getbufsize.h>
 #include	<ucenumua.h>
+#include	<libmallocxx.h>
 #include	<strwcmp.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -56,10 +56,6 @@
 /* local typedefs */
 
 typedef ucentua		ent ;
-
-extern "C" {
-	typedef int (*re_f)(ucenumua *,ent *,char *,int) noex ;
-}
 
 
 /* external subroutines */
@@ -88,25 +84,21 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	if (pjn) {
 	    rs = SR_INVALID ;
 	    if (pjn[0]) {
-	        if ((rs = getbufsize(getbufsize_ua)) >= 0) {
+		if (char *uab{} ; (rs = libmalloc_ua(&uab)) >= 0) {
 	            cint	ual = rs ;
-	            if (char *uab{} ; (rs = uc_libmalloc((ual+1),&uab)) >= 0) {
-	                ucenumua	eua ;
-	                if ((rs = ucenumua_open(&eua,nullptr)) >= 0) {
-		            re_f	re = ucenumua_readent ;
-	                    ent		ua{} ;
-	                    while ((rs = re(&eua,&ua,uab,ual)) > 0) {
-	                        rs = vecstrx_loadpjnent(this,&ua,pjn) ;
-	                        c += rs ;
-	                        if (rs < 0) break ;
-	                    } /* end while */
-	                    rs1 = ucenumua_close(&eua) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (sysuserattr) */
-	                rs1 = uc_libfree(uab) ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (memory-allocation) */
-	        } /* end if (getbufsize) */
+	            if (ucenumua eua ; (rs = eua.open) >= 0) {
+	                ucentua		ua{} ;
+	                while ((rs = eua.readent(&ua,uab,ual)) > 0) {
+	                    rs = vecstrx_loadpjnent(this,&ua,pjn) ;
+	                    c += rs ;
+	                    if (rs < 0) break ;
+	                } /* end while */
+	                rs1 = eua.close ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (sysuserattr) */
+	            rs1 = uc_libfree(uab) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -120,8 +112,7 @@ static int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*k = "project" ;
-	cchar		*vp{} ;
-	if ((rs = uc_kvamatch(uap->attr,k,&vp)) >= 0) {
+	if (cchar *vp{} ; (rs = uc_kvamatch(uap->attr,k,&vp)) >= 0) {
 	    if (strwcmp(pjn,vp,rs) == 0) {
 	        rs = vsp->adduniq(uap->name) ;
 	        if (rs < INT_MAX) c += 1 ;
