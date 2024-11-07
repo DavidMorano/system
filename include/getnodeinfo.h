@@ -8,11 +8,12 @@
 
 /* revision history:
 
-	= 1998-03-21, David A­D­ Morano
-	This module was originally written.
+	= 1995-07-01, David A­D­ Morano
+	This code was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
+	= 1996-05-22, David A­D­ Morano
+	This subroutine was enhanced to get the local node-name if
+	one if not supplied, using 'getnodename(3dam)'.
 
 */
 

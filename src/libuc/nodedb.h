@@ -1,4 +1,5 @@
 /* nodedb HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* magement for the NODE-DB file */
@@ -19,7 +20,6 @@
 #include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<localmisc.h>
 
 
 #define	NODEDB_MAGIC		0x31415926
@@ -33,7 +33,7 @@
 
 #define	NODEDB_NFILES		3
 #define	NODEDB_DEFENTS		10
-#define	NODEDB_ENTLEN		(3*NODENAMELEN)
+#define	NODEDB_ENTLEN		(3 * NODENAMELEN)
 
 
 struct nodedb_cursor {

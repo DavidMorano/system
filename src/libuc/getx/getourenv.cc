@@ -49,7 +49,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<matkeystr.h>
 
 #include	"getourenv.h"
@@ -67,10 +66,19 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
+
+
+/* local varialbes */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

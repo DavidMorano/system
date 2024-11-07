@@ -1,4 +1,5 @@
 /* nodedb SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* magement for the NODE-DB file */
@@ -29,6 +30,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	nodedb
+
+	Description:
 	This object manages access to one or more NODE-DB files.
 
 *******************************************************************************/
@@ -87,14 +92,14 @@
 #define	LINEINFO		struct lineinfo
 #define	LINEINFO_FIELD		struct lineinfo_field
 
-#define	NODEDB_KA		sizeof(char *(*)[2])
+#define	NODEDB_KA		szof(char *(*)[2])
 #define	NODEDB_BO(v)		\
 	((NODEDB_KA - ((v) % NODEDB_KA)) % NODEDB_KA)
 
 #undef	ARGSBUFLEN
 #define	ARGSBUFLEN		(3 * MAXHOSTNAMELEN)
 
-#define	KEYALIGNMENT		sizeof(char *(*)[2])
+#define	KEYALIGNMENT		szof(char *(*)[2])
 
 
 /* imported namespaces */
@@ -117,10 +122,6 @@ typedef cchar		*(*keytabp)[2] ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	field_srvarg(field *,cchar *,char *,int) noex ;
-}
 
 
 /* external variables */
@@ -185,7 +186,7 @@ template<typename ... Args>
 static inline int nodedb_ctor(nodedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->checktime = 0 ;
 	    op->magic = 0 ;
@@ -260,13 +261,11 @@ static int	freeit(cchar **) noex ;
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
 /* all white-space, pound ('#'), colon (':'), equal ('='), and comma (',') */
-static char		fterms[termsize] ;
+static char		fterms[fieldterms_termsize] ;
 
 /* argument field terminators (pound '#' and comma ',') */
-static char 		saterms[termsize] ;
+static char 		saterms[fieldterms_termsize] ;
 
 static bufsizevar	maxhostlen(getbufsize_hn) ;
 
@@ -277,16 +276,16 @@ static bufsizevar	maxhostlen(getbufsize_hn) ;
 /* exported subroutines */
 
 int nodedb_open(nodedb *op,cchar *fname) noex {
-	static cint	srm = mkterms() ;
+	static cint	rst = mkterms() ;
 	cint		nf = NODEDB_NFILES ;
 	cint		defents = NODEDB_DEFENTS ;
 	int		rs ;
-	if ((rs = srm) >= 0) {
+	if ((rs = rst) >= 0) {
 	    if ((rs = nodedb_ctor(op,fname)) >= 0) {
 	        rs = SR_INVALID ;
 	        if (fname[0]) {
 		    vecobj	*flp = op->filep ;
-	            cint	fsize = sizeof(nodedb_f) ;
+	            cint	fsize = szof(nodedb_f) ;
 	            cint	vo = VECOBJ_OREUSE ;
 	            if ((rs = vecobj_start(flp,fsize,nf,vo)) >= 0) {
 	                cnullptr	np{} ;
@@ -679,7 +678,7 @@ static int nodedb_fileparseln(nodedb *op,int fi,cchar *lp,int ll) noex {
 static int nodedb_addentry(nodedb *op,int fi,SVCENTRY *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
-	    cint	sz = sizeof(NODEDB_IE) ;
+	    cint	sz = szof(NODEDB_IE) ;
 	    void	*vp{} ;
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) vp ;
@@ -689,7 +688,7 @@ static int nodedb_addentry(nodedb *op,int fi,SVCENTRY *sep) noex {
 	            key.buf = iep->svc ;
 	            key.len = strlen(iep->svc) ;
 	            val.buf = iep ;
-	            val.len = sizeof(NODEDB_IE) ;
+	            val.len = szof(NODEDB_IE) ;
 	            rs = hdb_store(op->entsp,key,val) ;
 	            if (rs < 0) {
 	                ientry_finish(iep) ;
@@ -814,7 +813,7 @@ static int ientry_start(NODEDB_IE *iep,int fi,SVCENTRY *sep) noex {
 	            iep->nkeys = rs ;
 	            c = rs ;
 /* find the size to allocate (everything) */
-	            sz += ((c + 1) * 2 * sizeof(char *)) ;
+	            sz += ((c + 1) * 2 * szof(char *)) ;
 	            for (int i = 0 ; vecobj_get(klp,i,&vp) >= 0 ; i += 1) {
 	                if (vp) {
 			    kep = (SVCENTRY_KEY *) vp ;
@@ -847,7 +846,7 @@ static int ientry_start(NODEDB_IE *iep,int fi,SVCENTRY *sep) noex {
 	                char	*bp = charp(vp) ;
 	                iep->a = (cchar *) vp ;
 	                iep->keys = keys ;
-	                bp += ((c + 1) * 2 * sizeof(char *)) ;
+	                bp += ((c + 1) * 2 * szof(char *)) ;
 /* copy over the key-table and the key and value strings */
 	                for (int i = 0 ; vecobj_get(klp,i,&vp) >= 0 ; i += 1) {
 	                    if (vp) {
@@ -925,7 +924,7 @@ static int svcentry_start(SVCENTRY *sep,LINEINFO *lip) noex {
 	        sz += (cl + 1) ;
 	    } /* end for */
 	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
-	        cint	ksize = sizeof(SVCENTRY_KEY) ;
+	        cint	ksize = szof(SVCENTRY_KEY) ;
 	        sep->a = bp ;
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            switch (i) {
@@ -1039,10 +1038,10 @@ static int entry_load(ND_E *ep,char *ebuf,int elen,ND_I *iep) noex {
 	int		rs = SR_OK ;
 	int		svclen = 0 ;
 	if (iep->tsize <= (elen - bo)) {
-	    cint	kal = (iep->nkeys + 1) * 2 * sizeof(char *) ;
+	    cint	kal = (iep->nkeys + 1) * 2 * szof(char *) ;
 	    cchar	*(*keys)[2] = (cchar *(*)[2]) (ebuf + bo) ;
 	    char	*bp ;
-	    bp = (char *) (ebuf + bo + kal) ;
+	    bp = charp(ebuf + bo + kal) ;
 /* copy in the nodename */
 	    ep->svc = bp ;
 	    bp = (strwcpy(bp,iep->svc,-1) + 1) ;
@@ -1063,7 +1062,7 @@ static int entry_load(ND_E *ep,char *ebuf,int elen,ND_I *iep) noex {
 	    }
 /* copy in the key=values */
 	    {
-		int	i{} ; /* used afterwards */
+		int	i{} ; /* used-afterwards */
 	        for (i = 0 ; i < iep->nkeys ; i += 1) {
 	            keys[i][0] = bp ;
 	            bp = (strwcpy(bp,iep->keys[i][0],-1) + 1) ;
