@@ -1,4 +1,5 @@
 /* openusd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open UNIX®-Socket-Datagram */
@@ -37,6 +38,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/socket.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<sockaddress.h>
@@ -57,6 +60,9 @@
 extern "C" {
     extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */

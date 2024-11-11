@@ -180,11 +180,9 @@ static int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 	    if ((rs = hostaddr_curbegin(&ha,&hacur)) >= 0) {
 	        while ((rs >= 0) && (s < 0)) {
 	            ADDRINFO	*aip ;
-
-	            while ((rs = hostaddr_enum(&ha,&hacur,&aip)) >= 0) {
+	            while ((rs = hostaddr_curenum(&ha,&hacur,&aip)) >= 0) {
 	                if ((aip->ai_family == pf) || (pf == PF_UNSPEC)) break ;
 	            } /* end while */
-
 		    if (rs >= 0) {
 	                if ((rs = listentcp_try(aip,opts)) >= 0) {
 	                    s = rs ;
@@ -193,7 +191,6 @@ static int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 	                    rs = SR_OK ;
 			}
 	            } /* end if (ok) */
-
 	        } /* end while */
 	        rs1 = hostaddr_curend(&ha,&hacur) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -202,9 +199,13 @@ static int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostaddr) */
 
-	if ((rs < 0) && (s >= 0)) u_close(s) ;
+	if ((rs < 0) && (s >= 0)) {
+	    u_close(s) ;
+	}
 
-	if ((rs == SR_NOENT) && (rs_last < 0)) rs = rs_last ;
+	if ((rs == SR_NOENT) && (rs_last < 0)) {
+	    rs = rs_last ;
+	}
 
 	return (rs >= 0) ? s : rs ;
 }

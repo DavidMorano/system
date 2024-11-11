@@ -1,4 +1,5 @@
 /* strcpyxc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy a c-string to destination buffer a/ a case conversion */

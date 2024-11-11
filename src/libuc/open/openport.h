@@ -1,4 +1,5 @@
 /* openport HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to open a priviledged network port */
@@ -15,7 +16,6 @@
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<openportmsg.h>
-#include	<localmisc.h>
 
 
 #define	OPERPORT_PROGNAME	"openport"
@@ -23,7 +23,7 @@
 
 EXTERNC_begin
 
-extern int openport(int,int,int,sockaddress *) noex ;
+extern int	openport(int,int,int,sockaddress *) noex ;
 
 EXTERNC_end
 

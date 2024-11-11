@@ -33,6 +33,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<ischarx.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
 
@@ -72,10 +73,6 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	msleep(int) ;
-extern int	hasallalnum(const char *,int) ;
-extern int	hasprintbad(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;

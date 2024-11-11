@@ -1,4 +1,5 @@
 /* openshm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a share-memory file in shared memory (really private) */
@@ -40,6 +41,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<ctime>			/* <- |time(2)| */
 #include	<usystem.h>

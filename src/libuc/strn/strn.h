@@ -24,6 +24,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysdefs.h>
 
 #include	<strnxcmp.h>		/* compare */
 #include	<strnxchr.h>		/* find */

@@ -115,16 +115,6 @@ static int strpack_dtor(strpack *op) noex {
 }
 /* end subroutine (strpack_dtor) */
 
-template<typename ... Args>
-static inline int strpack_magic(strpack *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == STRPACK_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (strpack_magic) */
-
 static int	strpack_chunknew(strpack *,int) noex ;
 static int	strpack_chunkfins(strpack *) noex ;
 

@@ -31,6 +31,10 @@ EXTERNC_begin
 
 extern int getarchitecture(char *,int) noex ;
 
+static inline int getarch(char *rb,int rl) noex {
+	return getarchitecture(rb,rl) ;
+}
+
 EXTERNC_end
 
 

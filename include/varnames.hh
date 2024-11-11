@@ -87,6 +87,7 @@ struct varnames {
 	static const char display[] ;
 	static const char term[] ;
 	static const char termprogram[] ;
+	static const char termdev[] ;
 	static const char tz[] ;
 	static const char printer[] ;
 	static const char printerbin[] ;
@@ -104,6 +105,7 @@ struct varnames {
 	static const char random[] ;
 	static const char hz[] ;
 	static const char ncpu[] ;
+	static const char nisdomain[] ;
 } ; /* end struct (varnames) */
 
 

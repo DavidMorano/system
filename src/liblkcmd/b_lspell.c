@@ -58,6 +58,7 @@
 #include	<ascii.h>
 #include	<strpack.h>
 #include	<hdb.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -96,9 +97,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	field_word(FIELD *,const uchar *,const char **) ;
-extern int	isalphalatin(int) ;
-extern int	isprintlatin(int) ;
-extern int	isdigitlatin(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;

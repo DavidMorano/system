@@ -63,6 +63,9 @@
 
 #include	<usystem.h>
 #include	<char.h>
+#include	<isnot.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"lookaddr.h"
@@ -92,9 +95,6 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
@@ -261,7 +261,8 @@ int lookaddr_userbegin(LOOKADDR *op,LOOKADDR_USER *up,cchar *un)
 	                if ((rs = uc_mallocstrw(hbuf,hl,&cp)) >= 0) {
 	                    up->dname = cp ;
 #if	CF_DEBUGS
-	                    debugprintf("lookaddr_userbegin: home=%s\n",up->dname) ;
+	                    debugprintf("lookaddr_userbegin: home=%s\n",
+				    up->dname) ;
 #endif
 	                }
 	            } else if (isNotPresent(rs))

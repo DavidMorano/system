@@ -1,4 +1,5 @@
 /* opendial HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -20,6 +21,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -27,22 +29,22 @@
 #define	OPENDIAL_OLONG		(1<<0)		/* FINGER "long" option */
 
 
-enum opendialers {
-	opendialer_unspec,
-	opendialer_udp,
-	opendialer_tcp,
-	opendialer_tcpmux,
-	opendialer_tcpnls,
-	opendialer_uss,
-	opendialer_ussmux,
-	opendialer_ussnls,
-	opendialer_ticotsord,
-	opendialer_ticotsordnls,
-	opendialer_pass,
-	opendialer_open,
-	opendialer_prog,
-	opendialer_finger,
-	opendialer_overlast
+enum opendials {
+	opendial_unspec,
+	opendial_udp,
+	opendial_tcp,
+	opendial_tcpmux,
+	opendial_tcpnls,
+	opendial_uss,
+	opendial_ussmux,
+	opendial_ussnls,
+	opendial_ticotsord,
+	opendial_ticotsordnls,
+	opendial_pass,
+	opendial_open,
+	opendial_prog,
+	opendial_finger,
+	opendial_overlast
 } ;
 
 EXTERNC_begin

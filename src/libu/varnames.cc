@@ -83,6 +83,7 @@ const char varnames::columns[] =	"COLUMNS" ;
 const char varnames::display[] =	"DISPLAY" ;
 const char varnames::term[] =		"TERM" ;
 const char varnames::termprogram[] =	"TERM_PROGRAM" ;
+const char varnames::termdev[] =	"TERMDEV" ;
 const char varnames::tz[] =		"TZ" ;
 const char varnames::printer[] =	"PRINTER" ;
 const char varnames::printerbin[] =	"PRINTERBIN" ;
@@ -100,5 +101,6 @@ const char varnames::visual[] =		"VISUAL" ;
 const char varnames::random[] =		"RANDOM" ;
 const char varnames::hz[] =		"HZ" ;
 const char varnames::ncpu[] =		"NCPU" ;
+const char varnames::nisdomain[] =	"NISDOMAIN" ;
 
 

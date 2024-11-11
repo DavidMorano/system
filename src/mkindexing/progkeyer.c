@@ -62,6 +62,8 @@
 #include	<ascii.h>
 #include	<char.h>
 #include	<eigendb.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"xwords.h"
@@ -84,10 +86,6 @@
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfword(const char *,int,const char **) ;
 extern int	field_word(FIELD *,const uchar *,const char **) ;
-extern int	haslc(const char *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isalnumlatin(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;

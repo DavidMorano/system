@@ -458,7 +458,7 @@ static int try_inet(SUBINFO *sip) noex {
 	        hostaddr_cur	cur ;
 	        if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) {
 	            int		c = 0 ;
-	            while ((rs1 = hostaddr_enum(&ha,&cur,&aip)) >= 0) {
+	            while ((rs1 = hostaddr_curenum(&ha,&cur,&aip)) >= 0) {
 	                cint	aif = aip->ai_family ; /* PF */
 		        bool	f = false ;
 	                f = f || (hint.ai_family == 0) ;

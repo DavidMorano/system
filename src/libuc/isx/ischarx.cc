@@ -157,7 +157,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bitset>
@@ -262,7 +262,7 @@ constexpr void ischarinfo::mkishex() noex {
 
 /* local variables */
 
-static constexpr ischarinfo	ischarx_data ;
+constexpr ischarinfo	ischarx_data ;
 
 
 /* exported variables */
@@ -387,7 +387,7 @@ bool ismmclass_7bit(int ch) noex {
 bool ismmclass_8bit(int ch) noex {
 	bool		f = false ;
 	ch &= UCHAR_MAX ;
-	if ((ch >= 128) && (ch < 0x100)) {
+	if ((ch >= 0x80) && (ch < 0x100)) {
 	    f = ((ch & 0x7f) >= 0x20) ;
 	}
 	return f ;
@@ -450,7 +450,7 @@ than the C++11 |bitset| object look-up, but who is counting?
 ****/
 
 #ifdef	COMMENT
-int ishexlatin(int ch) noex {
+bool ishexlatin(int ch) noex {
 	bool		f = false ;
 	f = f || ((ch >= '0') && (ch <= '9')) ;
 	f = f || ((ch >= 'a') && (ch <= 'f')) ;

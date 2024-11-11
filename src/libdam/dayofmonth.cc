@@ -161,8 +161,8 @@ int dayofmonth_start(dayofmonth *op,int year) noex {
 	        }
 	    } /* end if_constexpr (f_braindamaged) */
 	    if (rs >= 0) {
-	        custime		t = getustime ;
-	        if (tmtime ts{} ; (rs = tmtime_localtime(&ts,t)) >= 0) {
+	        custime		dt = getustime ;
+	        if (tmtime ts{} ; (rs = tmtime_localtime(&ts,dt)) >= 0) {
 	            op->isdst = ts.isdst ;
 	            op->gmtoff = ts.gmtoff ;
 	            op->year = (year >= 0) ? year : (ts.year + TM_YEAR_BASE) ;

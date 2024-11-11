@@ -174,16 +174,16 @@ namespace {
 
 /* forward references */
 
-static int usys_uname(utsname *) noex ;
-static int uname_machine(utsname *) noex ;
-static int uname_nodename(utsname *) noex ;
-static int local_getauxinfo(char *,int,int) noex ;
-static int setup_sysauxinfo() noex ;
+static sysret_t usys_uname(utsname *) noex ;
+static sysret_t uname_machine(utsname *) noex ;
+static sysret_t uname_nodename(utsname *) noex ;
+static sysret_t local_getauxinfo(char *,int,int) noex ;
+static sysret_t setup_sysauxinfo() noex ;
 
 
 /* local variables */
 
-static constexpr uname_f	usubs[] = {
+constexpr uname_f	usubs[] = {
 	uname_machine,
 	uname_nodename
 } ;
@@ -220,9 +220,7 @@ int u_uname(utsname *up) noex {
 		for (cauto &f : usubs) {
 		    if ((rs = f(up)) < 0) break ;
 		} /* end for */
-	    } else {
-	        rs = (- errno) ;
-	    }
+	    } /* end if (usys_uname) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -297,14 +295,14 @@ namespace libu {
 
 /* local subroutines */
 
-static int usys_uname(utsname *utsp) noex {
+static sysret_t usys_uname(utsname *utsp) noex {
 	syscaller	sc ;
 	sc.m = &syscaller::std_uname ;
 	return sc(utsp) ;
 }
 /* end subroutine (usys_uname) */
 
-static int uname_machine(utsname *up) noex {
+static sysret_t uname_machine(utsname *up) noex {
 	cint		mlen = int(sizeof(up->machine)-1) ;
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
@@ -320,7 +318,7 @@ static int uname_machine(utsname *up) noex {
 }
 /* end subroutine (uname_machine) */
 
-static int uname_nodename(utsname *up) noex {
+static sysret_t uname_nodename(utsname *up) noex {
 	int		rs = SR_OK ;
 	char		*nn = up->nodename ;
 	if (char *tp ; (tp = strchr(nn,'.')) != nullptr) {
@@ -330,7 +328,7 @@ static int uname_nodename(utsname *up) noex {
 }
 /* end subroutine (uname_nodename) */
 
-static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
+static sysret_t local_getauxinfo(char *rbuf,int rlen,int req) noex {
 	static cint	rsx = setup_sysauxinfo() ;
 	int		rs ;
 	int		len = 0 ;
@@ -358,15 +356,14 @@ static int local_getauxinfo(char *rbuf,int rlen,int req) noex {
 	return (rs >= 0) ? len : rs ;
 }
 
-static int setup_sysauxinfo() noex {
+static sysret_t setup_sysauxinfo() noex {
 	return um.setup() ;
 }
 
 int umachiner::setup() noex {
-	datobj		dob ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dob.start()) >= 0) {
+	if (datobj dob ; (rs = dob.start()) >= 0) {
 	    if ((rs = dob.load()) >= 0) {
 		mlen = rs ;
 		rs = SR_NOMEM ;

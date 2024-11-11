@@ -83,6 +83,9 @@
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<logfile.h>
+#include	<iserror.h>
+#include	<isnot.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"maintqotd.h"
@@ -167,9 +170,6 @@ extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_addpathclean(vecstr *,cchar *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isprintlatin(int) ;
 
 extern int	maintqotd_prog(MAINTQOTD *,cchar *,cchar *) ;
 

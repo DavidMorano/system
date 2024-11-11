@@ -1,4 +1,5 @@
 /* opentmp HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a tempoary file (one that is removed immediately) */
@@ -20,10 +21,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 enum opentmps {

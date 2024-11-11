@@ -293,7 +293,7 @@ cint	userterm::tdlen = TERMDEVLEN ;
 /* exported subroutines */
 
 int termnote_open(termnote *op,cchar *pr) noex {
-	const time_t	dt = time(nullptr) ;
+	const time_t	dt = getustime ;
 	int		rs ;
 	if ((rs = termnote_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
@@ -332,7 +332,7 @@ int termnote_close(termnote *op) noex {
 	int		rs1 ;
 	if ((rs = termnote_magic(op)) >= 0) {
 	    if (op->open.lf) {
-	        const time_t	dt = time(nullptr) ;
+	        const time_t	dt = getustime ;
 	        char		tbuf[TIMEBUFLEN+1] ;
 	        timestr_logz(dt,tbuf) ;
 	        logfile_printf(op->lfp,"%s done",tbuf) ;
@@ -410,7 +410,7 @@ int termnote_vprintf(termnote *op,cc **rpp,int n,int o,
 int termnote_check(termnote *op,time_t dt) noex {
 	int		rs ;
 	if ((rs = termnote_magic(op)) >= 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    if ((dt - op->ti_check) >= TO_CHECK) {
 	        op->ti_check = dt ;
 	        if ((rs >= 0) && op->open.lf) {
@@ -449,7 +449,7 @@ int termnote_write(termnote *op,cc **rpp,int m,int o,cc *sbuf,int slen) noex {
 		            cbool	fbiff = ((o & TERMNOTE_OBIFF)?1:0) ;
 		            cbool	fall = ((o & TERMNOTE_OALL)?1:0) ;
 		            cchar	*fmt ;
-		            if (dt == 0) dt = time(nullptr) ;
+		            if (dt == 0) dt = getustime ;
 		            timestr_logz(dt,tbuf),
 		            fmt = "%s bell=%u biff=%u all=%u" ;
 	    	            logfile_printf(op->lfp,fmt,tbuf,fbel,fbiff,fall) ;
@@ -469,7 +469,7 @@ int termnote_write(termnote *op,cc **rpp,int m,int o,cc *sbuf,int slen) noex {
 	                rs = logfile_setid(op->lfp,op->logid) ;
 	            }
 	            if (rs >= 0) {
-	                if (dt == 0) dt = time(nullptr) ;
+	                if (dt == 0) dt = getustime ;
 	                op->ti_write = dt ;
 	            }
 	        } /* end if (positive) */
@@ -756,7 +756,7 @@ static int termnote_diswrite(termnote *op,int o,mbuf *mp,cc *termdev) noex {
 static int termnote_txopen(termnote *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (! op->open.tx) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    if ((rs = tmpx_open(op->txp,nullptr,0)) >= 0) {
 	        op->open.tx = true ;
 	        op->ti_tmpx = dt ;
@@ -828,7 +828,7 @@ static int termnote_lfopener(termnote *op,time_t dt,cc *lfname,cc *sn) noex {
                 cchar   *nn = op->nodename ;
                 cchar   *un = op->username ;
                 char    timebuf[TIMEBUFLEN+1] ;
-                if (dt == 0) dt = time(nullptr) ;
+                if (dt == 0) dt = getustime ;
                 timestr_logz(dt,timebuf) ;
                 if ((rs = logfile_printf(lfp,"%s %s",timebuf,sn)) >= 0) {
                     rs = logfile_printf(lfp,"%s!%s",nn,un) ;

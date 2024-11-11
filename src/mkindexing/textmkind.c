@@ -45,6 +45,8 @@
 #include	<ptm.h>
 #include	<psem.h>
 #include	<eigendb.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"fsi.h"
@@ -76,10 +78,6 @@ extern int	sfword(const char *,int,const char **) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	field_word(FIELD *,const uchar *,const char **) ;
-extern int	haslc(const char *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isalnumlatin(int) ;
 
 extern char	*strwcpylc(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;

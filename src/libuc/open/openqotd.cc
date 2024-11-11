@@ -1,4 +1,5 @@
 /* openqotd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */

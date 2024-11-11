@@ -1,4 +1,5 @@
 /* opensockaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a connection to a socket by a SOCKADDR */
@@ -49,6 +50,8 @@
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
@@ -81,6 +84,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

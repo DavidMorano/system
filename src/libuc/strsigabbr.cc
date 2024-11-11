@@ -1,4 +1,5 @@
 /* strsigabbr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* return a signal abbreviation string given a signal number */

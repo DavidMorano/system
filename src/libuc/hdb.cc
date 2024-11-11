@@ -10,18 +10,18 @@
 
 	= 1998-05-01, David A­D­ Morano
 	I wrote this from stratch due to frustration with other
-	types of these things. Why I have to wrote something like
+	types of these things.  Why I have to wrote something like
 	this just goes to show how little strctured containers are
 	used now-a-days.
 
 	= 2003-04-19, David A­D­ Morano
 	I grabbed the previous version and modified it to use a
-	look-aside buffer for the entry-node structures. This is
-	used instead of 'malloc(3c)' to get and release node
-	strutures. The look-aside manager uses 'malloc(3c)' to
-	extend the look-aside entries. Entries released back to the
-	look-aside manager are not given back to 'malloc(3c)' (via
-	'free(3c)' at the present time -- not so easy to do). Anyway,
+	look-aside buffer for the entry-node structures.  This is
+	used instead of |malloc(3c)| to get and release node
+	strutures.  The look-aside manager uses |malloc(3c)| to
+	extend the look-aside entries.  Entries released back to the
+	look-aside manager are not given back to |malloc(3c)| (via
+	|free(3c)| at the present time -- not so easy to do).  Anyway,
 	we get about an average of 27% to 29% speedup on a combination
 	of allocating and freeing entries.
 
@@ -31,6 +31,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	hdb
+
+	Description:
 	This package provides a reasonably general-purpose hashing
 	object for use in cases calling for in-core hashing.
 
@@ -61,17 +65,17 @@
 	Important user note:
 
 	This package does not store the user supplied data into its
-	own storage space. Only pointers from within the user
-	supplied data are stored. For this reason, it is very
+	own storage space.  Only pointers from within the user
+	supplied data are stored.  For this reason, it is very
 	important for the user to not free up any storage locations
-	that are still linked inside of this database. Havoc will
+	that are still linked inside of this database.  Havoc will
 	result! Also, when freeing entries in this database, the
 	user's data is NOT freed! Further, the DB storage location(s)
 	that were used to store the user's data IS freed! This means
 	that the user should make pointers to or copies of any data
 	that they have (if they ever want to access it again) BEFORE
-	they delete the corresponding entry from this database! Got
-	it? Do it!
+	they delete the corresponding entry from this database!  Got
+	it?  Do it!
 
 	Implementation note:
 
@@ -79,12 +83,12 @@
 	object, but I don't know where it is! What am I trying to
 	say? There may be bugs in this mess! It has held up solidly
 	against testing and use already but there could still be
-	some corners that are not quite right. Both the core of
-	'enumerate' and 'fetch' are very hairy. Fetching is especially
-	hairy. Some of the hairyness is due to some efforts (minor)
-	to not repeat executing some code unnecessarily. This appoach
+	some corners that are not quite right.  Both the core of
+	'enumerate' and 'fetch' are very hairy.  Fetching is especially
+	hairy.  Some of the hairyness is due to some efforts (minor)
+	to not repeat executing some code unnecessarily.  This appoach
 	may have been a mistake given the complexity of this whole
-	mess already. Maybe there is something to be said for simple
+	mess already.  Maybe there is something to be said for simple
 	data strctures after all! Enjoy!
 
 	Synopsis:
@@ -316,9 +320,9 @@ static const CUR	icur = mkcurnull() ;
 
 int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	int		rs ;
-	if (n < HDB_DEFSIZE) n = HDB_DEFSIZE ;
+	if (n < HDB_DEFNUM) n = HDB_DEFNUM ;
 	if ((rs = hdb_ctor(op)) >= 0) {
-	    cint	esize = sizeof(ENT) ;
+	    cint	esize = szof(ENT) ;
 	    op->at = at ;
 	    if (op->at > 0) {
 	        cint	lan = max((n/6),6) ;
@@ -830,7 +834,7 @@ int hdb_audit(hdb *op) noex {
 static int hdb_entnew(hdb *op,ENT **epp) noex {
 	int		rs ;
 	if (op->at == 0) {
-	    cint	esize = sizeof(ENT) ;
+	    cint	esize = szof(ENT) ;
 	    rs = uc_malloc(esize,epp) ;
 	} else {
 	     rs = lookaside_get(op->esp,epp) ;
@@ -933,9 +937,8 @@ static int hdb_ext(hdb *op) noex {
 	int		rs1 ;
 	int		nhtlen = (op->htlen * 2) ;
 	int		sz ;
-	void		*vp{} ;
-	sz = nhtlen * sizeof(ENT *) ;
-	if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	sz = nhtlen * szof(ENT *) ;
+	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	    int		i = 0 ; /* <- used later */
 	    ENT		*hep, *nhep ;
 	    ENT		**nhtaddr = (ENT **) vp ;

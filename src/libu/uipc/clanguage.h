@@ -57,11 +57,11 @@
 #endif
 
 #ifndef	nelements
-#define	nelements(n)		(sizeof(n) / sizeof((n)[0]))
+#define	nelements(n)		((int) (sizeof(n) / sizeof((n)[0])))
 #endif
 
 #ifndef	nelem
-#define	nelem(n)		(sizeof(n) / sizeof((n)[0]))
+#define	nelem(n)		((int) (sizeof(n) / sizeof((n)[0])))
 #endif
 
 #ifdef	__cplusplus

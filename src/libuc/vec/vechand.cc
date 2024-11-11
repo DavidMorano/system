@@ -517,4 +517,70 @@ static int vechand_validx(vechand *op,int i) noex {
 }
 /* end subroutine (vechand_validx) */
 
+int vechand::start(int an,int ao) noex {
+	return vechand_start(this,an,ao) ;
+}
+
+int vechand::add(cvoid *ep) noex {
+	return vechand_add(this,ep) ;
+}
+
+int vechand::getvec(void *vap) noex {
+	return vechand_getvec(this,vap) ;
+}
+
+int vechand::sort(vechand_f vcmp) noex {
+	return vechand_sort(this,vcmp) ;
+}
+
+int vechand::del(int ai) noex {
+	if (ai < 0) ai = 0 ;
+	return vechand_del(this,ai) ;
+}
+
+int vechand::delhand(cvoid *ep) noex {
+    	return vechand_delhand(this,ep) ;
+}
+
+int vechand::search(cvoid *ep,vechand_f vcmp,void **rpp) noex {
+    	return vechand_search(this,ep,vcmp,rpp) ;
+}
+
+void vechand::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("vechand",rs,"fini-finish") ;
+	}
+}
+
+vechand_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vechandmem_count:
+	        rs = vechand_count(op) ;
+	        break ;
+	    case vechandmem_setsorted:
+	        rs = vechand_setsorted(op) ;
+	        break ;
+	    case vechandmem_issorted:
+	        rs = vechand_issorted(op) ;
+	        break ;
+	    case vechandmem_delall:
+	        rs = vechand_delall(op) ;
+	        break ;
+	    case vechandmem_extent:
+	        rs = vechand_extent(op) ;
+	        break ;
+	    case vechandmem_audit:
+	        rs = vechand_audit(op) ;
+	        break ;
+	    case vechandmem_finish:
+	        rs = vechand_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (vechand_co::operator) */
+
 

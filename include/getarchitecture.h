@@ -1,4 +1,5 @@
 /* getarchitecture HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the best approximation of the username of the current user */
@@ -22,12 +23,17 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
 EXTERNC_begin
 
 extern int getarchitecture(char *,int) noex ;
+
+static inline int getarch(char *rb,int rl) noex {
+	return getarchitecture(rb,rl) ;
+}
 
 EXTERNC_end
 

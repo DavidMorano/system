@@ -58,17 +58,40 @@
 /* exported variables */
 
 cpcchar	calstrs_months[] = {
-	"January", "February", "March", "April", "May", "June", "July", 
-	"August", "September", "October", "November", "December", nullptr
+	"January", 
+	"February", 
+	"March", 
+	"April", 
+	"May", 
+	"June", 
+	"July", 
+	"August", 
+	"September", 
+	"October", 
+	"November", 
+	"December", 
+	nullptr
 } ;
 
 cpcchar	calstrs_days[] = {
-	"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
-	"Friday", "Saturday", nullptr
+	"Sunday", 
+	"Monday", 
+	"Tuesday", 
+	"Wednesday", 
+	"Thursday", 
+	"Friday", 
+	"Saturday", 
+	nullptr
 } ;
 
 cpcchar	calstrs_daytypes[] = {
-	"First", "Second", "Third", "Fourth", "Fifth", "Last", nullptr
+	"First", 
+	"Second", 
+	"Third", 
+	"Fourth", 
+	"Fifth", 
+	"Last", 
+	nullptr
 } ;
 
 

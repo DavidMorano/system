@@ -1,4 +1,5 @@
 /* udomain SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user domain */
@@ -7,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-10-01, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	I made up this idea for supporting multiple domains on the
 	same machine so that each user could have a different domain
 	name. This idea of multiplexing a single machine to appear
@@ -59,6 +60,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
@@ -67,7 +69,7 @@
 #include	<snwcpy.h>
 #include	<mkpathx.h>
 #include	<filemap.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 #include	"udomain.h"
@@ -100,7 +102,8 @@ extern "C" {
 
 /* local structures */
 
-struct uargs {
+namespace {
+    struct uargs {
 	cchar		*un = nullptr ;
 	char		*dbuf ;
 	int		dlen ;
@@ -117,7 +120,8 @@ struct uargs {
 	int udomainerm(cchar *) noex ;
 	int udomainerf(cchar *) noex ;
 	int parseline(cchar *,int) noex ;
-} ; /* end struct (uargs) */
+    } ; /* end struct (uargs) */
+}
 
 
 /* forward references */
@@ -142,13 +146,12 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	        uargs	a(dbuf,dlen,username,MAXFILESIZE) ;
 	        cchar	*fname = UDOMASTDFNIN ;
 	        if (pr && (pr[0] != '\0') && (strcmp(pr,"/") != 0)) {
-		     char	*udfname{} ;
-		     if ((rs = malloc_mp(&udfname)) >= 0) {
-	    	         if ((rs = mkpath2(udfname,pr,fname)) >= 0) {
-	             	    rs = a.udomainer(udfname) ;
+		     if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
+	    	         if ((rs = mkpath(fbuf,pr,fname)) >= 0) {
+	             	    rs = a.udomainer(fbuf) ;
 		     	    len = rs ;
 		         }
-		         rs1 = uc_free(udfname) ;
+		         rs1 = uc_free(fbuf) ;
 		         if (rs >= 0) rs = rs1 ;
 		     } /* end if (m-a-f) */
 	         } else {
@@ -165,10 +168,9 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 /* local subroutines */
 
 int uargs::udomainer(cchar *fname) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = u_stat(fname,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_size < maxfilesize)) {
 		rs = udomainerm(fname) ;
 		len = rs ;
@@ -182,15 +184,13 @@ int uargs::udomainer(cchar *fname) noex {
 /* end subroutine (uargs::udomainer) */
 
 int uargs::udomainerm(cchar *fname) noex {
-	filemap		udfile ;
 	csize		mfsize = size_t(maxfilesize) ;
-	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if ((rs = filemap_open(&udfile,fname,of,mfsize)) >= 0) {
+	if (filemap udf ; (rs = udf.open(fname,mfsize)) >= 0) {
 	    cchar	*lp ;
-            while ((rs = filemap_getline(&udfile,&lp)) > 0) {
+            while ((rs = udf.getln(&lp)) > 0) {
                 cint	ll = rs ;
                 {
                     rs = parseline(lp,ll) ;
@@ -199,7 +199,7 @@ int uargs::udomainerm(cchar *fname) noex {
                 if (len > 0) break ;
                 if (rs < 0) break ;
             } /* end while (reading lines) */
-            rs1 = filemap_close(&udfile) ;
+            rs1 = udf.close ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (opened file) */
 	return (rs >= 0) ? len : rs ;
@@ -210,14 +210,12 @@ int uargs::udomainerf(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
-	        filebuf		b ;
-	        cint		fd = rs ;
-	        if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
-	            while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	        cint	fd = rs ;
+	        if (filer b ; (rs = b.start(fd,0L,0,0)) >= 0) {
+	            while ((rs = b.readln(lbuf,llen,-1)) > 0) {
 			{
 	                    rs = parseline(lbuf,rs) ;
 	                    len = rs ;
@@ -225,9 +223,9 @@ int uargs::udomainerf(cchar *fname) noex {
 	                if (len > 0) break ;
 	                if (rs < 0) break ;
 	            } /* end while (reading lines) */
-	            rs1 = filebuf_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+	        } /* end if (filer) */
 	        rs1 = uc_close(fd) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (opened file) */

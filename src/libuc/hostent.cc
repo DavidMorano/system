@@ -1,4 +1,5 @@
 /* hostent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manipulate host entry structures */
@@ -16,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	hostent
 
 	Description:
@@ -112,7 +113,7 @@ int hostent_getofficial(HOSTENT *hep,cchar **rpp) noex {
 	    rs = SR_NOTFOUND ;
 	    if (hep->h_name) {
 	        rs = SR_OK ;
-	        nlen = strlen(hep->h_name) ;
+	        nlen = int(strlen(hep->h_name)) ;
 	        if (rpp) {
 	            *rpp = hep->h_name ;
 	        }
@@ -172,7 +173,7 @@ int hostent_curenumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	    rs = SR_OK ;
 	    if (curp == nullptr) {
 	        if (hep->h_name) {
-	            nlen = strlen(hep->h_name) ;
+	            nlen = int(strlen(hep->h_name)) ;
 	            if (rpp) {
 	                *rpp = hep->h_name ;
 		    }
@@ -180,7 +181,7 @@ int hostent_curenumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	    } else {
 	        if (curp->i < 0) {
 	            if (hep->h_name) {
-	                nlen = strlen(hep->h_name) ;
+	                nlen = int(strlen(hep->h_name)) ;
 	                if (rpp) {
 	                    *rpp = hep->h_name ;
 		        }
@@ -188,7 +189,7 @@ int hostent_curenumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
 	            }
 	        } else {
 	            if (hep->h_aliases && hep->h_aliases[curp->i]) {
-	                nlen = strlen(hep->h_aliases[curp->i]) ;
+	                nlen = int(strlen(hep->h_aliases[curp->i])) ;
 	                if (rpp) {
 	                    *rpp = hep->h_aliases[curp->i] ;
 		        }
@@ -245,14 +246,14 @@ int hostent_getcanonical(HOSTENT *hep,cchar **rpp) noex {
 	    rs = SR_NOTFOUND ;
 	    if (hep->h_name && (strchr(hep->h_name,'.') != nullptr)) {
 	        rs = SR_OK ;
-	        nlen = strlen(hep->h_name) ;
+	        nlen = int(strlen(hep->h_name)) ;
 	        *rpp = hep->h_name ;
 	    } /* end if */
 	    if ((rs == SR_NOTFOUND) && (hep->h_aliases != nullptr)) {
 	        for (int i = 0 ; hep->h_aliases[i] != nullptr ; i += 1) {
 	            if (strchr(hep->h_aliases[i],'.') != nullptr) {
 		        rs = SR_OK ;
-	    	        nlen = strlen(hep->h_aliases[i]) ;
+	    	        nlen = int(strlen(hep->h_aliases[i])) ;
 	                *rpp = hep->h_aliases[i] ;
 	                break ;
 	            } /* end if */
@@ -260,7 +261,7 @@ int hostent_getcanonical(HOSTENT *hep,cchar **rpp) noex {
 	    } /* end if */
 	    if ((rs == SR_NOTFOUND) && (hep->h_name != nullptr)) {
 	        rs = SR_OK ;
-	        nlen = strlen(hep->h_name) ;
+	        nlen = int(strlen(hep->h_name)) ;
 	        *rpp = hep->h_name ;
 	    } /* end if */
 	} /* end if (non-null) */
@@ -278,23 +279,23 @@ int hostent_size(HOSTENT *hep) noex {
 	int		rs = SR_FAULT ;
 	int		sz = 1 ;
 	if (hep) {
-	    int		i{} ;
+	    int		i{} ; /* used-afterwards */
 	    rs = SR_OK ;
 	    if (hep->h_name) {
-	        sz += (strlen(hep->h_name)+1) ;
+	        sz += int(strlen(hep->h_name) + 1) ;
 	    }
 	    if (hep->h_aliases) {
 	        for (i = 0 ; hep->h_aliases[i] != nullptr ; i += 1) {
-		    sz += (strlen(hep->h_aliases[i])+1) ;
+		    sz += int(strlen(hep->h_aliases[i]) + 1) ;
 	        }
-	        sz += (i*sizeof(cchar *)) ;
+	        sz += (i*szof(cchar *)) ;
 	    }
 	    if (hep->h_addr_list) {
 	        for (i = 0 ; hep->h_addr_list[i] != nullptr ; i += 1) {
 		    sz += (hep->h_length+1) ;
 	        }
 	    }
-	    sz = iceil(sz,sizeof(cchar *)) ;
+	    sz = iceil(sz,szof(cchar *)) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
 }
@@ -304,13 +305,12 @@ int hostent_load(HOSTENT *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (hep && hebuf && lp) {
-	    storeitem	ib ;
 	    memcpy(hep,lp) ;
-	    if ((rs = storeitem_start(&ib,hebuf,helen)) >= 0) {
+	    if (storeitem ib ; (rs = ib.start(hebuf,helen)) >= 0) {
 	        if (rs >= 0) rs = si_copyaliases(&ib,hep,lp) ;
 	        if (rs >= 0) rs = si_copyaddrs(&ib,hep,lp) ;
 	        if (rs >= 0) rs = si_copystr(&ib,&hep->h_name,lp->h_name) ;
-	        len = storeitem_finish(&ib) ;
+	        len = ib.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
@@ -325,20 +325,17 @@ static int si_copyaliases(SI *ibp,HOSTENT *hep,CHOSTENT *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_aliases != nullptr) {
 	    int		n{} ;
-	    void	**vpp ;
 	    for (n = 0 ; lp->h_aliases[n] != nullptr ; n += 1) ;
-	    if ((rs = storeitem_ptab(ibp,n,&vpp)) >= 0) {
-	        int	i{} ;
-	        char	**cpp ;
-		cpp = (char **) vpp ;
-		hep->h_aliases = cpp ;
+	    if (void **vpp{} ; (rs = ibp->ptab(n,&vpp)) >= 0) {
+	        int	i{} ; /* used-afterwards */
+		hep->h_aliases = charpp(vpp) ;
 		for (i = 0 ; lp->h_aliases[i] ; i += 1) {
 		    cchar	*ap = lp->h_aliases[i] ;
 		    rs = si_copystr(ibp,(hep->h_aliases + i),ap) ;
 		    if (rs < 0) break ;
 		} /* end for */
 		hep->h_aliases[i] = nullptr ;
-	    } /* end if ( storeitem_ptab) */
+	    } /* end if (storeitem_ptab) */
 	} else {
 	    hep->h_aliases = nullptr ;
 	}
@@ -349,14 +346,11 @@ static int si_copyaliases(SI *ibp,HOSTENT *hep,CHOSTENT *lp) noex {
 static int si_copyaddrs(SI *ibp,HOSTENT *hep,CHOSTENT *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_addr_list != nullptr) {
-	    int		n{} ;
-	    void	**vpp ;
+	    int		n{} ; /* used-afterwards */
 	    for (n = 0 ; lp->h_addr_list[n] != nullptr ; n += 1) ;
-	    if ((rs = storeitem_ptab(ibp,n,&vpp)) >= 0) {
+	    if (void **vpp{} ; (rs = ibp->ptab(n,&vpp)) >= 0) {
 	        int	i{} ; /* used-afterwards */
-	        char	**cpp ;
-		cpp = (char **) vpp ;
-	        hep->h_addr_list = cpp ;
+	        hep->h_addr_list = charpp(vpp) ;
 	        for (i = 0 ; lp->h_addr_list[i] ; i += 1) {
 		    cchar	*ap = lp->h_addr_list[i] ;
 		    cint	al = lp->h_length ;
@@ -374,10 +368,10 @@ static int si_copyaddrs(SI *ibp,HOSTENT *hep,CHOSTENT *lp) noex {
 
 static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
+	cchar		**cpp = ccharpp(pp) ;
 	*cpp = nullptr ;
-	if (s1 != nullptr) {
-	    rs = storeitem_strw(ibp,s1,-1,cpp) ;
+	if (s1) {
+	    rs = ibp->strw(s1,-1,cpp) ;
 	}
 	return rs ;
 }
@@ -385,13 +379,19 @@ static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 
 static int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
-	*cpp = nullptr ;
-	if (bp != nullptr) {
-	    rs = storeitem_buf(ibp,bp,bl,cpp) ;
+	cchar		**cpp = ccharpp(pp) ;
+	 *cpp = nullptr ;
+	if (bp) {
+	    rs = ibp->buf(bp,bl,cpp) ;
 	}
 	return rs ;
 }
 /* end subroutine (si_copybuf) */
+
+#ifdef	COMMENT
+using typename storeitem {
+    	int	copybuf(char *pp,cchar *bp,int bl) noex ;
+} ;
+#endif /* COMMENT */
 
 

@@ -67,7 +67,7 @@ OBJ08= getpwentry.o getrand.o getrunlevel.o
 OBJ09= getseed.o getserial.o getserv.o
 OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
-OBJ12= getxid.o
+OBJ12= getxid.o getopendial.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -217,5 +217,6 @@ getuserhome.o:		getuserhome.cc		getuserhome.h		$(INCS)
 getuserorg.o:		getuserorg.cc		getuserorg.h		$(INCS)
 getuserterms.o:		getuserterms.cc		getuserterms.h		$(INCS)
 getxid.o:		getxid.cc		getxid.h		$(INCS)
+getopendial.o:		getopendial.c getopendial.h			$(INCS)
 
 

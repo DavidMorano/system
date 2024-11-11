@@ -46,13 +46,14 @@
 #include	<ftw.h>
 
 #include	<usystem.h>
+#include	<mallocstuff.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<logfile.h>
 #include	<userinfo.h>
 #include	<baops.h>
 #include	<varsub.h>
-#include	<mallocstuff.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -79,7 +80,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	isprintlatin(int) ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;

@@ -1,4 +1,5 @@
 /* maininfo */
+/* encoding=ISO8859-1 */
 
 /* version %I% last-modified %G% */
 

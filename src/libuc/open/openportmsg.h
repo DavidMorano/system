@@ -1,4 +1,5 @@
 /* openportmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to open a priviledged network port */
@@ -12,9 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>		/* |USERNAMELEN| */
 

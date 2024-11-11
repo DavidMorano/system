@@ -20,8 +20,11 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
+  	Name:
+	usysauxinfo
 
+	Description:
+	We defines some system (global) variables in this module.
 
 *******************************************************************************/
 

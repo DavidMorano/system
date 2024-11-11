@@ -111,6 +111,8 @@
 #include	<usysflag.h>
 #include	<ascii.h>
 #include	<stdintx.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"format.h"
@@ -205,9 +207,6 @@ extern "C" {
     extern int	snwcpy(char *,int,const char *,int) ;
     extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
     extern int	strlinelen(const char *,int,int) ;
-    extern int	hasprintbad(const char *,int) ;
-    extern int	isprintbad(int) ;
-    extern int	isprintlatin(int) ;
 }
 
 #if	CF_DEBUGZ

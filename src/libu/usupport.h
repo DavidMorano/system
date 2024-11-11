@@ -16,12 +16,12 @@
 #include	<sys/types.h>
 #include	<time.h>		/* |time_t| */
 #include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
-#include	<usys.h>		/* <- auxillary OS support */
 #include	<stdint.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usys.h>		/* <- auxillary OS support */
 #include	<utimeout.h>
 #include	<ulogerror.h>
 #include	<usysutility.hh>
@@ -65,13 +65,26 @@ inline void *memcpy(T *dp,void *sp) noex {
 #ifndef	SUBROUTINE_CSTRLEN
 #define	SUBROUTINE_CSTRLEN
 #ifdef	__cplusplus
-consteval int cstrlen(cchar *sp) noex {
+constexpr int cstrlen(cchar *sp) noex {
     	cchar		*cp = sp ;
 	while (*cp++) ;
 	return (cp - sp) ;
 }
 #endif /* __cplusplus */
 #endif /* SUBROUTINE_CSTRLEN */
+
+#ifndef	SUBROUTINE_CSTRNLEN
+#define	SUBROUTINE_CSTRNLEN
+#ifdef	__cplusplus
+constexpr int cstrnlen(cchar *sp,int sl = -1) noex {
+    	cchar		*cp = sp ;
+	while (*cp++ && sl) {
+	    sl -= 1 ;
+	}
+	return (cp - sp) ;
+}
+#endif /* __cplusplus */
+#endif /* SUBROUTINE_CSTRNLEN */
 
 #ifndef	TYPEDEF_MTIME
 #define	TYPEDEF_MTIME

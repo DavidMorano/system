@@ -1,7 +1,8 @@
 /* sreq HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* Service-Request */
+/* Service-Request manager */
 /* version %I% last-modified %G% */
 
 
@@ -14,9 +15,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>		/* for MAXPATHLEN */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sockaddress.h>
 #include	<osetstr.h>
 #include	<localmisc.h>		/* |MAXPATHLEN| */
@@ -26,7 +29,7 @@
 #include	"svcentsub.h"
 
 
-#define	SREQ		struct sreq
+#define	SREQ		struct sreq_head
 #define	SREQ_FL		struct sreq_flags
 #define	SREQ_SNCUR	struct sreq_sncursor
 #define	SREQ_MAGIC	0x65918233

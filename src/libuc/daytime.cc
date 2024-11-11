@@ -1,4 +1,5 @@
 /* daytime SUPPORT (DAYTIME) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a MFSERVE loadable service-module */
@@ -43,14 +44,14 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<modload.h>
-#include	<upt.h>
 #include	<nistinfo.h>
-#include	<localmisc.h>		/* |MAXNAMELEN| + |USERNAMELEN| */
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"mfserve.h"
 #include	"daytime.h"
@@ -58,17 +59,13 @@
 
 /* local defines */
 
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	MAXNAMELEN
-#endif
+#define	DT		daytime
 
 #ifndef	ORGCODELEN
-#define	ORGCODELEN	USERNAMELEN
+#define	ORGCODELEN	REALNAMELEN
 #endif
 
 #define	DAYTIME_CSIZE	100 	/* default arg-chuck size */
-
-#define	NDF		"daytime.nd"
 
 
 /* imported namespaces */
@@ -94,9 +91,38 @@ typedef mainv	mv ;
 
 /* forward references */
 
-static int daytime_argsbegin(DAYTIME *,cchar **) noex ;
-static int daytime_argsend(DAYTIME *) noex ;
-static int daytime_worker(DAYTIME *) noex ;
+template<typename ... Args>
+static int daytime_ctor(lfm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(op) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (daytime_ctor) */
+
+static int daytime_dtor(lfm *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (daytime_dtor) */
+
+template<typename ... Args>
+static inline int daytime_magic(lfm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DAYTIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (daytime_magic) */
+
+static int daytime_argsbegin(DT *,cchar **) noex ;
+static int daytime_argsend(DT *) noex ;
+static int daytime_worker(DT *) noex ;
 
 
 /* local variables */
@@ -104,117 +130,106 @@ static int daytime_worker(DAYTIME *) noex ;
 
 /* exported variables */
 
-MFSERVE_OBJ	daytime_mod = {
+DAYTIME_OBJ	daytime_modinfo = {
 	"daytime",
-	sizeof(DAYTIME),
+	sizeof(daytime),
 	0
 } ;
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
-int daytime_start(DAYTIME *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
+int daytime_start(DT *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
 	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (pr == nullptr) return SR_FAULT ;
-	if (argv == nullptr) return SR_FAULT ;
-	if (envv == nullptr) return SR_FAULT ;
-
-	memclear(op) ;
-	op->pr = pr ;
-	op->jep = jep ;
-	op->envv = envv ;
-
-	if ((rs = sreq_getstdout(jep)) >= 0) {
-	    op->ofd = rs ;
-	    if ((rs = daytime_argsbegin(op,argv)) >= 0) {
-	        pthread_t	tid ;
-	        thrsub_f	thr = (thrsub_f) daytime_worker ;
-	        if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
-	            op->f.working = true ;
-	            op->tid = tid ;
-	            op->magic = DAYTIME_MAGIC ;
-	        }
-	        if (rs < 0)
-	            daytime_argsend(op) ;
-	    } /* end if (daytime_argsbegin) */
-	} /* end if (sreq_getstdout) */
-
+	if ((rs = daytime_ctor(op,pr,jep,argv,envv)) >= 0) {
+	    op->pr = pr ;
+	    op->jep = jep ;
+	    op->envv = envv ;
+	    if ((rs = sreq_getstdout(jep)) >= 0) {
+	        op->ofd = rs ;
+	        if ((rs = daytime_argsbegin(op,argv)) >= 0) {
+	            pthread_t	tid ;
+	            thrsub_f	thr = (thrsub_f) daytime_worker ;
+	            if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
+	                op->f.working = true ;
+	                op->tid = tid ;
+	                op->magic = DAYTIME_MAGIC ;
+	            }
+	            if (rs < 0) {
+	                daytime_argsend(op) ;
+		    }
+	        } /* end if (daytime_argsbegin) */
+	    } /* end if (sreq_getstdout) */
+	    if (rs < 0) {
+		daytime_dtor(op) ;
+	    }
+	} /* end if (daytime_ctor) */
 	return rs ;
 }
 /* end subroutine (daytime_start) */
 
-int daytime_finish(DAYTIME *op) noex {
-	int		rs = SR_OK ;
+int daytime_finish(DT *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DAYTIME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->f.working) {
-	    const pid_t	pid = getpid() ;
-	    if (pid == op->pid) {
-	        int	trs = 0 ;
-	        op->f.working = false ;
-	        rs1 = uptjoin(op->tid,&trs) ;
+	if ((rs = daytime_magic(op)) >= 0) {
+	    if (op->f.working) {
+		if ((rs = ucpid) >= 0) {
+	            if (rs == op->pid) {
+	                int	rst{} ;
+	                op->f.working = false ;
+	                rs1 = uptjoin(op->tid,&rst) ;
+	                if (rs >= 0) rs = rs1 ;
+	                if (rs >= 0) rs = rst ;
+	            } else {
+	                op->f.working = false ;
+	                op->tid = 0 ;
+	            }
+		} /* end if (ucpid) */
+	    } /* end if */
+	    {
+	        rs1 = daytime_argsend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        if (rs >= 0) rs = trs ;
-	    } else {
-	        op->f.working = false ;
-	        op->tid = 0 ;
 	    }
-	}
-
-	rs1 = daytime_argsend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	    op->magic = 0 ;
+	} /* end if (daytime_magic) */
 	return rs ;
 }
 /* end subroutine (daytime_finish) */
 
-int daytime_check(DAYTIME *op) noex {
+int daytime_check(DT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != DAYTIME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->f.working) {
-	    const pid_t		pid = getpid() ;
-	    if (pid == op->pid) {
-	        if (op->f_exiting) {
-	            int		trs = 0 ;
+	if ((rs = daytime_magic(op)) >= 0) {
+	    if (op->f.working) {
+	        const pid_t		pid = getpid() ;
+	        if (pid == op->pid) {
+	            if (op->f_exiting) {
+	                int		rst = 0 ;
+	            	op->f.working = false ;
+	                rs1 = uptjoin(op->tid,&rst) ;
+	                if (rs >= 0) rs = rs1 ;
+	                if (rs >= 0) rs = rst ;
+	                f = true ;
+	            }
+	        } else {
 	            op->f.working = false ;
-	            rs1 = uptjoin(op->tid,&trs) ;
-	            if (rs >= 0) rs = rs1 ;
-	            if (rs >= 0) rs = trs ;
-	            f = true ;
 	        }
 	    } else {
-	        op->f.working = false ;
-	    }
-	} else {
-	    f = true ;
-	} /* end if (working) */
-
+	        f = true ;
+	    } /* end if (working) */
+	} /* end if (daytime_magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (daytime_check) */
 
-int daytime_abort(DAYTIME *op) noex {
-	cint	f = op->f_exiting ;
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != DAYTIME_MAGIC) return SR_NOTOPEN ;
-	op->f_abort = true ;
+int daytime_abort(DT *op) noex {
+    	int		rs ;
+	int		f = false ;
+	if ((rs = daytime_magic(op)) >= 0) {
+	    f = op->f_exiting ;
+	    op->f_abort = true ;
+	} /* end if (magic) */
 	return f ;
 }
 /* end subroutine (daytime_abort) */
@@ -222,14 +237,13 @@ int daytime_abort(DAYTIME *op) noex {
 
 /* provate subroutines */
 
-static int daytime_argsbegin(DAYTIME *op,cchar **argv) noex {
+static int daytime_argsbegin(DT *op,cchar **argv) noex {
 	vecpstr		*alp = &op->args ;
 	cint		ss = DAYTIME_CSIZE ;
 	int		rs ;
 	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) {
-	    int		i ;
 	    op->f.args = true ;
-	    for (i = 0 ; (rs >= 0) && (argv[i] != nullptr) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (argv[i] != nullptr) ; i += 1) {
 	        rs = vecpstr_add(alp,argv[i],-1) ;
 	    }
 	    if (rs < 0) {
@@ -241,7 +255,7 @@ static int daytime_argsbegin(DAYTIME *op,cchar **argv) noex {
 }
 /* end subroutine (daytime_argsbegin) */
 
-static int daytime_argsend(DAYTIME *op) noex {
+static int daytime_argsend(DT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->f.args) {
@@ -253,40 +267,36 @@ static int daytime_argsend(DAYTIME *op) noex {
 }
 /* end subroutine (daytime_argsend) */
 
-static int daytime_worker(DAYTIME *op) noex {
+static int daytime_worker(DT *op) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-
 	if (! op->f_abort) {
-	    USTAT	sb ;
 	    cchar	*pr = op->pr ;
-	    if ((rs = uc_stat(pr,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_stat(pr,&sb)) >= 0) {
+		if (char *ybuf{} ; (rs = malloc_un(&ubuf)) >= 0) {
 	        const uid_t	uid = sb.st_uid ;
-	        cint	ulen = USERNAMELEN ;
-	        char		ubuf[USERNAMELEN+1] ;
-	        if ((rs = getusername(ubuf,ulen,uid)) >= 0) {
+	        if ((rs = getusername(ubuf,rs,uid)) >= 0) {
 	            cint	olen = ORGCODELEN ;
 	            char	obuf[ORGCODELEN+1] ;
 	            if ((rs = localgetorgcode(pr,obuf,olen,ubuf)) >= 0) {
-	                NISTINFO	ni{} ;
-	                const time_t	dt = time(nullptr) ;
+	                nistinfo	ni{} ;
+	                custime		dt = getustime ;
 	                char		ntbuf[NISTINFO_BUFLEN+1+1] ;
 	                strdcpy1(ni.org,NISTINFO_ORGLEN,obuf) ;
 	                timestr_nist(dt,&ni,ntbuf) ;
 	                {
-	                    int	tl = strlen(ntbuf) ;
+	                    int		tl = strlen(ntbuf) ;
 			    ntbuf[tl++] = '\n' ;
 			    ntbuf[tl] = '\0' ;
 	                    if ((rs = uc_writen(op->ofd,ntbuf,tl)) >= 0) {
 	                        wlen += rs ;
 				rs = sreq_closefds(op->jep) ;
 			    }
-	                }
+	                } /* end block */
 	            } /* end if (localgetorg) */
 	        } /* end if (getusername) */
 	    } /* end if (uc_stat) */
 	} /* end if (not aborting) */
-
 	op->f_exiting = true ;
 	return (rs >= 0) ? wlen : rs ;
 }

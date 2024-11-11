@@ -1,4 +1,5 @@
 /* openshm HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* open a shared-memory segment */

@@ -1,4 +1,5 @@
 /* strnul HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* assert a NUL-terminated string given a counted c-string */

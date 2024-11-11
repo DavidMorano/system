@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	usysauxinforeqs
+
+  	Description:
 	This file contains enumerations that represent individual
 	system-auxillary-information items that can be retrieved
 	from any particular operating system.  These enumerations

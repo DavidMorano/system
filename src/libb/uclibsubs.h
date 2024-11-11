@@ -104,6 +104,10 @@ extern int	uc_getnisdomain(char *,int) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocs(int) noex ;
 
+static inline int uc_getarch(char *rb,int rl) noex {
+    	return uc_getarchitecture(rb,rl) ;
+}
+
 /* time group */
 extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 extern int	uc_ftime(TIMEB *) noex ;

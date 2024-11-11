@@ -76,9 +76,6 @@
 /* external variables */
 
 
-/* external variables */
-
-
 /* local structures */
 
 struct remover_flags {

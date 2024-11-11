@@ -1,4 +1,5 @@
 /* strlinelen SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the number of characters in a c-string up to a given maximum */
@@ -56,6 +57,8 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* external subroutines */

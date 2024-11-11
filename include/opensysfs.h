@@ -1,4 +1,5 @@
 /* opensysfs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Open-System-File-System (OpenSysFS) */

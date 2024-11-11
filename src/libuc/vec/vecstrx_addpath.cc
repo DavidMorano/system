@@ -93,6 +93,17 @@
 
 /* forward references */
 
+static int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
+    	int		rs ;
+	int		c = 0 ;
+	if ((rs = pathclean(pbuf,sp,sl)) >= 0) {
+	    rs = op->adduniq(pbuf,rs) ;
+	    if (rs < INT_MAX) c += 1 ;
+	}
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecstrx_addone) */
+
 
 /* local variables */
 
@@ -105,6 +116,8 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 int vecstrx::addpathclean(cchar *lp,int ll) noex {
+    	auto		mall = uc_libmalloc ;
+    	auto		free = uc_libfree ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -113,27 +126,24 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	    if (ll < 0) ll = strlen(lp) ;
 	    if (ll > 0) {
 		if ((rs = maxpathlen) >= 0) {
-		    cint	dlen = rs ;
-		    if (char *dbuf ; (rs = uc_libmalloc((dlen+1),&dbuf)) >= 0) {
+		    cint	plen = rs ;
+		    if (char *pbuf{} ; (rs = mall((plen+1),&pbuf)) >= 0) {
 	                cchar	*tp ;
 	                while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
 		            if ((tp-lp) >= 0) {
-	    	                if ((rs = pathclean(dbuf,lp,(tp-lp))) >= 0) {
-		                    rs = adduniq(dbuf,rs) ;
-		                    if (rs < INT_MAX) c += 1 ;
-		                }
+				cint	pl = (tp - lp) ;
+				rs = vecstrx_addone(this,pbuf,lp,pl) ;
+				c += rs ;
 		            }
 		            ll -= ((tp+1)-lp) ;
 		            lp = (tp+1) ;
 		            if (rs < 0) break ;
 	                } /* end while */
 	                if ((rs >= 0) && (ll > 0)) {
-	    	            if ((rs = pathclean(dbuf,lp,ll)) >= 0) {
-		                rs = adduniq(dbuf,rs) ;
-		                if (rs < INT_MAX) c += 1 ;
-		            }
+			    rs = vecstrx_addone(this,pbuf,lp,ll) ;
+			    c += rs ;
 	                }
-			rs1 = uc_libfree(dbuf) ;
+			rs1 = free(pbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
@@ -170,26 +180,26 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 }
 /* end subroutine (vecstrx_addpath) */
 
-int vecstrx_addcspath(vecstrx *vsp) noex {
-	int		rs = SR_FAULT ;
+int vecstrx::addcspath() noex {
+    	auto		mall = uc_libmalloc ;
+    	auto		free = uc_libfree ;
+	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (vsp) {
-	    if ((rs = maxpathlen) >= 0) {
-		cint	plen = (NPATH * rs) ;
-	        if (char *pbuf{} ; (rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
-		    cint	req = _CS_PATH ;
-	            if ((rs = uc_sysconfstr(pbuf,plen,req)) >= 0) {
-	                rs = vsp->addpath(pbuf,rs) ;
-	                c += rs ;
-	            } /* end if */
-	            rs1 = uc_libfree(pbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (maxpathlen) */
-	} /* end if (non-null) */
+        if ((rs = maxpathlen) >= 0) {
+            cint    clen = (NPATH * rs) ;
+            if (char *cbuf{} ; (rs = mall((clen+1),&cbuf)) >= 0) {
+                cint        req = _CS_PATH ;
+                if ((rs = uc_sysconfstr(cbuf,clen,req)) >= 0) {
+                    rs = addpath(cbuf,rs) ;
+                    c += rs ;
+                } /* end if */
+                rs1 = free(cbuf) ;
+                if (rs >= 0) rs = rs1 ;
+            } /* end if (m-a-f) */
+        } /* end if (maxpathlen) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (vecstrx_addcspath) */
+/* end subroutine (vecstrx::addcspath) */
 
 

@@ -1,4 +1,5 @@
 /* udomain HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* retrieve a domain-name for a given username */
@@ -19,8 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

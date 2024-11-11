@@ -16,11 +16,11 @@
 	single database lookup mechanism.
 
 	= 2017-05-01, David A­D­ Morano
-	I just noticed that I too out the UDOMAIN function and
-	forgot to make a note here of it. Well I removed it a few
-	years ago now but have forgotten exactly where it was
-	removed. I removed it because the old UDOMAIN data-base was
-	no longer really needed.
+	I just noticed that I removed the UDOMAIN function and
+	forgot to make a note here of it.  Well I removed it a few
+	years ago now but have forgotten exactly when it was removed.
+	I removed it because the old UDOMAIN data-base was no longer
+	really needed.
 
 */
 
@@ -217,6 +217,15 @@ int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 }
 /* end subroutine (userattrdb_lookup) */
 
+int userattrdb_count(uad *op) noex {
+    	int		rs ;
+	if ((rs = userattrdb_magic(op)) >= 0) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (userattrdb_count) */
+
 
 /* private subroutines */
 
@@ -293,7 +302,7 @@ static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 		} /* end if (domain) */
 	        if ((rs >= 0) && op->domain) {
 		    if (rbuf) {
-		        rs = sncpy1(rbuf,rlen,op->domain) ;
+		        rs = sncpy(rbuf,rlen,op->domain) ;
 		    } else {
 		        rs = strlen(op->domain) ;
 		    }
@@ -305,5 +314,35 @@ static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	return rs ;
 }
 /* end subroutine (userattrdb_ud) */
+
+int userattrdb::open(cchar *un) noex {
+	return userattrdb_open(this,un) ;
+}
+
+int userattrdb::lookup(char *rbuf,int rlen,cchar *k) noex {
+	return userattrdb_lookup(this,rbuf,rlen,k) ;
+}
+
+void userattrdb::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("userattrdb",rs,"fini-finish") ;
+	}
+}
+
+userattrdb_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case userattrdbmem_count:
+	        rs = userattrdb_count(op) ;
+	        break ;
+	    case userattrdbmem_close:
+	        rs = userattrdb_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (userattrdb_co::operator) */
 
 

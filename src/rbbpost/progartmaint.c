@@ -48,6 +48,9 @@
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<hasx.h>
+#include	<ischarx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -127,13 +130,6 @@ extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
 extern int	removes(cchar *) ;
 extern int	bufprintf(char *,int,char *,...) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isprintlatin(int) ;
-extern int	hasNotDots(cchar *,int) ;
-extern int	isOneOf(const int *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-extern int	isNotAccess(int) ;
 
 extern int	mailmsg_loadline(MAILMSG *,cchar *,int) ;
 extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;

@@ -1,4 +1,5 @@
 /* strlibval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this object provides a pointer to a library string-value */
@@ -50,7 +51,7 @@
 
 /* local defines */
 
-#define	PLMULT		2		/* path-length multiplier */
+#define	PLMULT		4		/* path-length multiplier */
 
 
 /* imported namespaces */
@@ -222,8 +223,7 @@ ccharp strlibval::strpath() noex {
 		int	rs1 ;
 		if ((rs = maxpathlen) >= 0) {
 		    cint	tlen = (rs * PLMULT) ;
-		    char	*tbuf{} ;
-		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		    if (char *tbuf{} ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
 			    int		tl = rs ;

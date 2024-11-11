@@ -67,6 +67,10 @@
 #include	<spawner.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<hasx.h>
+#include	<ischarx.h>
+#include	<isfiledesc.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -146,9 +150,6 @@ extern int	opentermnote(cchar *,cchar **,int,int) ;
 extern int	pcsgetprogpath(cchar *,char *,cchar *) ;
 extern int	initnow(struct timeb *,char *,int) ;
 extern int	isasocket(int) ;
-extern int	tolc(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isprintlatin(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
