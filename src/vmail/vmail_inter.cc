@@ -69,6 +69,9 @@
 #include	<toxc.h>
 #include	<ansigr.h>
 #include	<opentmp.h>
+#include	<ischarx.h>
+#include	<iserror.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -158,13 +161,7 @@ extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	msleep(int) ;
-extern int	hasallalnum(const char *,int) ;
-extern int	hasprintbad(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isdigitlatin(int) ;
 extern int	iscmdstart(int) ;
-extern int	isNotAccess(int) ;
-extern int	isNotPresent(int) ;
 
 extern int	mailboxappend(const char *,int,int) ;
 extern int	mkdisplayable(char *,int,const char *,int) ;

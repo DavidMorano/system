@@ -1,4 +1,5 @@
 /* openport SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* proxy-open a socket port for the calling program */

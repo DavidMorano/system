@@ -38,12 +38,11 @@
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstring>
-
 #include	<vector>
 #include	<new>
-
 #include	<usystem.h>
 #include	<ascii.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"progbal.h"
@@ -62,8 +61,6 @@ using namespace		std ;		/* yes, we want punishment! */
 extern "C" int	sichar(cchar *,int,int) ;
 
 extern "C" int	digvalhex(int) ;
-extern "C" int	isprintlatin(int) ;
-extern "C" int	ishexlatin(int) ;
 
 #if	CF_DEBUGS
 extern "C" int	debugprintf(const char *,...) ;

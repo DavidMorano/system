@@ -307,11 +307,10 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (curp) {
 	    cnullptr	np{} ;
-	    cint	csz = sizeof(utmpacc_icur) ;
-	    void	*vp{} ;
+	    cint	csz = szof(utmpacc_icur) ;
 	    curp->icursor = nullptr ;
-	    if ((rs = uc_malloc(csz,&vp)) >= 0) {
-		cint		usz = sizeof(UTMPFENT) ;
+	    if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
+		cint		usz = szof(UTMPFENT) ;
 	        utmpacc_icur	*icurp = (utmpacc_icur *) vp ;
 		memclear(icurp) ;
 		if ((rs = uc_malloc(usz,&vp)) >= 0) {
@@ -355,7 +354,7 @@ int utmpacc_curenum(utmpacc_cur *curp,utmpacc_ent *ep,char *eb,int el) noex {
 	    if (icurp) {
 	        rs = SR_BADFMT ;
 		if (icurp->magic == UTMPACC_CURMAGIC) {
-		    cint	usz = sizeof(UTMPFENT) ;
+		    cint	usz = szof(UTMPFENT) ;
 		    filer	*fbp = &icurp->fb ;
 		    UTMPFENT	*ufp = icurp->utmpfentp ;
 		    if ((rs = filer_read(fbp,ufp,usz,-1)) >= 0) {
@@ -564,9 +563,8 @@ int utmpacc::boottime(time_t *tp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (tp) {
-	    sigblocker	b ;
 	    *tp = 0 ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
@@ -590,11 +588,10 @@ int utmpacc::boottime(time_t *tp) noex {
 /* end method (utmpacc::boottime) */
 
 int utmpacc::irunlevel() noex {
-	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init) >= 0) {
 	        if ((rs = capbegin(-1)) >= 0) {
 		    if ((rs = begin) >= 0) {
@@ -621,8 +618,7 @@ int utmpacc::iusers(int w) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if ((w >= 0) && (w < UTMPACC_NTYPES)) {
-	    sigblocker	b ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
@@ -650,11 +646,10 @@ int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 	int		rs1 ;
 	int		ffound = false ;
 	if (ap && ap->uep && ap->uebuf) {
-	    sigblocker	b ;
 	    memclear(ap->uep) ;
 	    ap->uebuf[0] = '\0' ;
 	    if (sid <= 0) sid = getsid(0) ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {	
@@ -680,11 +675,10 @@ int utmpacc::entstat(ARG *ap,pid_t sid) noex {
 	int		rs1 ;
 	int		ffound = false ;
 	if (ap && ap->uep && ap->uebuf) {
-	    sigblocker	b ;
 	    memclear(ap->uep) ;
 	    ap->uebuf[0] = '\0' ;
 	    if (sid <= 0) sid = getsid(0) ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {	
@@ -710,10 +704,9 @@ int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 	int		rs1 ;
 	int		ffound = false ;
 	if (ap && ap->uep && ap->uebuf && lp) {
-	    sigblocker	b ;
 	    memclear(ap->uep) ;
 	    ap->uebuf[0] = '\0' ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {	
@@ -739,9 +732,8 @@ int utmpacc::stats(utmpacc_sb *usp) noex {
 	int		rs1 ;
 	int		mu = 0 ;
 	if (usp) {
-	    sigblocker	b ;
 	    memclear(usp) ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
@@ -766,8 +758,7 @@ int utmpacc::extract(int fd) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (fd >= 0) {
-	    sigblocker	b ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
@@ -960,23 +951,22 @@ int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
 /* end method (utmpacc::getentline) */
 
 int utmpacc::getextract(int fd) noex {
-	filer		fb ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filer_start(&fb,fd,0z,0,0)) >= 0) {
+	if (filer fb ; (rs = fb.start(fd,0z,0,0)) >= 0) {
 	    {
-	        cint	ul = sizeof(UTMPX) ;
+	        cint	ul = szof(UTMPX) ;
 	        CUTMPX	*up ;
 	        setutxent() ;
 	        while ((up = getutxent()) != nullptr) {
-		    rs = filer_write(&fb,up,ul) ;
+		    rs = fb.write(up,ul) ;
 		    wlen += rs ;
 	            if (rs < 0) break ;
 	        } /* end while (reading UTMPX entries) */
 	        endutxent() ;
 	    } /* end block */
-	    rs1 = filer_finish(&fb) ;
+	    rs1 = fb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? wlen : rs ;
@@ -994,8 +984,7 @@ static void utmpacc_atforkafter() noex {
 /* end subroutine (utmpacc_atforkafter) */
 
 static void utmpacc_exit() noex {
-	cint	rs = utmpacc_fini() ;
-	if (rs < 0) {
+	if (cint rs = utmpacc_fini() ; rs < 0) {
 	    ulogerror("utmpacc",rs,"exit-fini") ;
 	}
 }

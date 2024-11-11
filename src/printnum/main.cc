@@ -6,13 +6,14 @@
 #include	<sys/types.h>
 #include	<cstdio>
 
+#include	<usystem.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 
 /* external subroutines */
 
 extern int	cfdecui(const char *,int,uint *) ;
-extern int	isprintlatin(int) ;
 
 
 /* exported subroutines */

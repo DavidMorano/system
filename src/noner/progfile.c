@@ -46,6 +46,7 @@
 #include	<paramopt.h>
 #include	<vecstr.h>
 #include	<ascii.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -65,7 +66,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	matcasestr(const char **,const char *,int) ;
 extern int	sfbasename(const char *,int,const char **) ;
-extern int	isprintlatin(int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strnpbrk(const char *,int,const char *) ;

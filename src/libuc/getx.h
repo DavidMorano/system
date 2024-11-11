@@ -66,6 +66,7 @@
 #include	<getutmpent.h>
 #include	<getutmpterm.h>
 #include	<getxid.h>
+#include	<getopendial.h>
 
 
 #endif /* GETX_INCLUDE */

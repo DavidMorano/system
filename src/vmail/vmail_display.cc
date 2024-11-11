@@ -46,6 +46,7 @@
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<tabexpand.h>
 #include	<char.h>
+#include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -96,8 +97,6 @@ extern int	strwcmp(cchar *,cchar *,int) ;
 extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	bufvprintf(char *,int,cchar *,va_list) ;
-extern int	isprintlatin(int) ;
-extern int	isdigitlatin(int) ;
 
 extern int	mkdisplayable(char *,int,cchar *,int) ;
 extern int	digsmall(char *,int) noex ;

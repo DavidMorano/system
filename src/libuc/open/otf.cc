@@ -1,4 +1,5 @@
 /* opentmpfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make and open a temporary file */
@@ -46,6 +47,7 @@
 #include	<unistd.h>		/* for |gethostid(3c)| */
 #include	<fcntl.h>
 #include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<ctime>
 #include	<usystem.h>
@@ -151,7 +153,7 @@ static strlibval	val_tmpdir(strlibval_tmpdir) ;
 
 static vars		var ;
 
-constexpr static cchar	platename[] = "otXXXXXXXXXXXX" ;
+constexpr cchar		platename[] = "otXXXXXXXXXXXX" ;
 
 constexpr bool		f_splitfname = CF_SPLITFNAME ;
 

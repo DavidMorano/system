@@ -36,7 +36,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -47,6 +46,7 @@
 #include	<varsub.h>
 #include	<field.h>
 #include	<ascii.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -73,7 +73,6 @@ extern int	mkuibang(char *,int,USERINFO *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
 			const char *,const char *) ;
-extern int	isprintlatin(int) ;
 
 extern int	expander() ;
 

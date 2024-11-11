@@ -1,4 +1,5 @@
 /* splitfname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* split a file-name into its 'dirname" and its 'basename' */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

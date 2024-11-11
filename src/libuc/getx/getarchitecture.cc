@@ -74,8 +74,8 @@ namespace {
 	archer(char *b,int l) noex : rbuf(b), rlen(l) { } ;
 	operator int () noex ;
 	int tryenv() noex ;
-	int trysys() noex ;
 	int trylib() noex ;
+	int trysys() noex ;
 	int trydef() noex ;
     } ; /* end struct (archer) */
 }
@@ -88,8 +88,8 @@ namespace {
 
 constexpr archer_m	mems[] = {
 	&archer::tryenv,
-	&archer::trysys,
 	&archer::trylib,
+	&archer::trysys,
 	&archer::trydef
 } ;
 
@@ -118,7 +118,7 @@ int getarchitecture(char *rbuf,int rlen) noex {
 
 archer::operator int () noex {
 	int		rs = SR_OK ;
-	for (auto const &m : mems) {
+	for (const auto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != SR_OK) break ;
 	} /* end for */
@@ -127,17 +127,22 @@ archer::operator int () noex {
 /* end method (archer::operator) */
 
 int archer::tryenv() noex {
-	static cchar	*vp = getenv(varname.architecture) ;
+	static cchar	*valp = getenv(varname.architecture) ;
 	int		rs = SR_OK ;
-	if (vp) {
-	    cchar	*cp ;
-	    if (int cl ; (cl = sfshrink(vp,-1,&cp)) > 0) {
+	if (valp) {
+	    cchar	*cp{} ;
+	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) {
 	        rs = snwcpy(rbuf,rlen,cp,cl) ;
 	    }
 	}
 	return rs ;
 }
 /* end method (archer::tryenv) */
+
+int archer::trylib() noex {
+	return uc_getarchitecture(rbuf,rlen) ;
+}
+/* end method (archer::trylib) */
 
 int archer::trysys() noex {
 	cint		cmd = usysauxinforeq_architecture ;
@@ -152,11 +157,6 @@ int archer::trysys() noex {
 	return rs ;
 }
 /* end method (archer::trysys) */
-
-int archer::trylib() noex {
-	return uc_getarchitecture(rbuf,rlen) ;
-}
-/* end method (archer::trylib) */
 
 int archer::trydef() noex {
 	return snwcpy(rbuf,rlen,ARCHITECTURE) ;

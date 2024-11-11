@@ -1,4 +1,5 @@
 /* uc_openprog SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -25,15 +26,11 @@
 	This is a dialer to connect to a local program.
 
 	Synopsis:
-	int uc_openprog(fname,oflags,argv,envv)
-	cchar	fname[] ;
-	int		oflags ;
-	cchar	*argv[] ;
-	cchar	*envv[] ;
+	int uc_openprog(cc *fname,int of,mainv argv,mainv envv) noex
 
 	Arguments:
 	fname		program to execute
-	oflags		options to specify read-only or write-only
+	of		options to specify read-only or write-only
 	argv		arguments to program
 	envv		environment to program
 
@@ -42,14 +39,12 @@
 	<0		error (system-return)
 
 	Note:
-
 	On BSD flavored systems, |pipe(2)| does not open both ends
 	of the pipe for both reading and writing, so we observe the
 	old BSD behavior of the zeroth element FD being only open
 	for reading and the oneth element FD only open for writing.
 
 	Importand note on debugging:
-
 	One some (maybe many) OS systems, turning on any debugging
 	in this subroutine can cause hangs after the |fork(2)|.
 	This is due to the famous (infamous) fork-safety problem
@@ -84,44 +79,23 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpy3w(char *,int,cchar *,cchar *,cchar *,int) ;
-extern int	snshellunder(char *,int,pid_t,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	strkeycmp(cchar *,cchar *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	hasvarpathprefix(cchar *,int) ;
-extern int	mkvarpath(char *,cchar *,int) ;
-extern int	mkuserpath(char *,cchar *,cchar *,int) ;
-extern int	getprogpath(IDS *,VECSTR *,char *,cchar *,int) ;
-extern int	vecstr_addcspath(vecstr *) ;
-extern int	ignoresigs(cint *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-
 
 /* external variables */
 
 
 /* forward reference */
 
-static int	mkepath(char *,cchar *) ;
-static int	mkfindpath(char *,cchar *) ;
+static int	mkepath(char *,cchar *) noex ;
+static int	mkfindpath(char *,cchar *) noex ;
 
 #if	CF_ENVLOAD
-static int	mkprogenv_load(MKPROGENV *,cchar *,cchar **) ;
+static int	mkprogenv_load(MKPROGENV *,cchar *,cchar **) noex ;
 #endif
 
-static int	openproger(cchar *,int,cchar **,cchar **,int *) ;
-static int	spawnit(cchar *,int,cchar **,cchar **,int *) ;
+static int	openproger(cchar *,int,cchar **,cchar **,int *) noex ;
+static int	spawnit(cchar *,int,cchar **,cchar **,int *) noex ;
 
-static int	accmode(int) ;
+static int	accmode(int) noex ;
 
 
 /* local variables */
@@ -214,8 +188,7 @@ static int mkfindpath(char *ebuf,cchar *pfn) noex {
 	int		rs1 ;
 	int		el = 0 ;
 	if ((rs = ids_load(&id)) >= 0) {
-	    vecstr	ps ;
-	    if ((rs = vecstr_start(&ps,5,0)) >= 0) {
+	    if (vecstr ps ; (rs = vecstr_start(&ps,5,0)) >= 0) {
 		if ((rs = vecstr_addcspath(&ps)) >= 0) {
 		    rs = getprogpath(&id,&ps,ebuf,pfn,-1) ;
 		    el = rs ;
@@ -231,13 +204,11 @@ static int mkfindpath(char *ebuf,cchar *pfn) noex {
 /* end subroutine (mkfindpath) */
 
 static int openproger(cc *pfn,int of,cc **argv,cc **envv,int *efdp) noex {
-	MKPROGENV	pe ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = mkprogenv_start(&pe,envv)) >= 0) {
-	    cchar	**ev ;
-	    if ((rs = mkprogenv_getvec(&pe,&ev)) >= 0) {
+	if (mkprogenv pe ; (rs = mkprogenv_start(&pe,envv)) >= 0) {
+	    if (mainv ev ; (rs = mkprogenv_getvec(&pe,&ev)) >= 0) {
 		rs = spawnit(pfn,of,argv,ev,efdp) ;
 		fd = rs ;
 	    }
@@ -259,8 +230,7 @@ static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,cchar **argv) noex {
 	    if (ap == NULL) al = sfbasename(pfn,-1,&ap) ;
 	    if ((rs = mkprogenv_envset(pep,"_A0",ap,al)) >= 0) {
 		cint	sulen = (strlen(pfn)+22) ;
-		char		*subuf ;
-		if ((rs = uc_malloc((sulen+1),&subuf)) >= 0) {
+		if (char *subuf{} ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
 	    	    const pid_t	pid = ugetpid() ;
 	    	    if ((rs = snshellunder(subuf,sulen,pid,pfn)) > 0) {
 	        	rs = mkprogenv_envset(pep,"_",subuf,rs) ;
@@ -277,9 +247,7 @@ static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,cchar **argv) noex {
 int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p) noex {
 	int		rs ;
 	int		fd = -1 ;
-	int		pout[2] ;
-
-	if ((rs = uc_piper(pout,0,3)) >= 0) {
+	if (int pout[2] ; (rs = uc_piper(pout,0,3)) >= 0) {
 	    if ((of & O_NDELAY) || (of & O_NONBLOCK)) {
 		if ((rs >= 0) && (of & O_NDELAY)) {
 		    rs = uc_ndelay(pout[0],TRUE) ;
@@ -289,8 +257,7 @@ int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p) noex {
 		}
 	    } /* end if (options) */
 	    if (rs >= 0) {
-		SPAWNPROC	ps ;
-		memset(&ps,0,sizeof(SPAWNPROC)) ;
+		spawnproc	ps{} ;
 		ps.fd[0] = pout[1] ;
 		ps.fd[1] = pout[1] ;
 		ps.disp[0] = SPAWNPROC_DDUP ;
@@ -328,8 +295,8 @@ int spawnit(cchar *pfn,int of,cchar **argv,cchar **envv,int *fd2p) noex {
 }
 /* end subroutine (spawnit) */
 
-static int accmode(int oflags) noex {
-	cint		am = (oflags & O_ACCMODE) ;
+static int accmode(int of) noex {
+	cint		am = (of & O_ACCMODE) ;
 	int		rs = SR_INVALID ;
 	switch (am) {
 	case O_RDONLY:

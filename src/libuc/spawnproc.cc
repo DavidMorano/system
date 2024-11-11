@@ -105,6 +105,8 @@
 #define	F_ISAEXEC	0
 #endif
 
+#define	PATHMULT	4
+
 
 /* imported namespaces */
 
@@ -557,9 +559,9 @@ int envloader::envpwd() noex {
 
 int envloader::envpath() noex {
 	int		rs ;
-	cchar	*vn = varname.path ;
+	cchar		*vn = varname.path ;
 	if ((rs = envhelp_present(ehp,vn,-1,nullptr)) == rsn) {
-	    cint	plen = (2 * var.maxpathlen) ;
+	    cint	plen = (PATHMULT * var.maxpathlen) ;
 	    if (char *pbuf{} ; (rs = uc_malloc((plen + 1),&pbuf)) >= 0) {
 		cint	cmd = _CS_PATH ;
 	        if ((rs = uc_sysconfstr(pbuf,plen,cmd)) >= 0) {

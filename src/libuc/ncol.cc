@@ -1,4 +1,5 @@
 /* ncol SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate number of columns used by a character */
@@ -86,8 +87,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<mkchar.h>
 #include	<tabcols.h>

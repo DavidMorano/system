@@ -52,13 +52,52 @@ struct userattrdb_head {
 	USERATTRDB_FL	init, have ;
 } ;
 
+#ifdef	__cplusplus
+enum userattrdbmems {
+	userattrdbmem_count,
+	userattrdbmem_close,
+	userattrdbmem_overlast
+} ;
+struct userattrdb ;
+struct userattrdb_co {
+	userattrdb	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (userattrdb *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (userattrdb_co) */
+struct userattrdb : userattrdb_head {
+	userattrdb_co	count ;
+	userattrdb_co	close ;
+	userattrdb() noex {
+	    count(this,userattrdbmem_count) ;
+	    close(this,userattrdbmem_close) ;
+	} ;
+	userattrdb(const userattrdb &) = delete ;
+	userattrdb &operator = (const userattrdb &) = delete ;
+	int open(cchar *) noex ;
+	int lookup(char *,int,cchar *) noex ;
+	void dtor() noex ;
+	~userattrdb() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (userattrdb) */
+typedef	USERATTRDB_FL	userattrdb_fl ;
+#else	/* __cplusplus */
 typedef USERATTRDB	userattrdb ;
 typedef	USERATTRDB_FL	userattrdb_fl ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
 extern int userattrdb_open(userattrdb *,cchar *) noex ;
 extern int userattrdb_lookup(userattrdb *,char *,int,cchar *) noex ;
+extern int userattrdb_count(userattrdb *) noex ;
 extern int userattrdb_close(userattrdb *) noex ;
 
 EXTERNC_end

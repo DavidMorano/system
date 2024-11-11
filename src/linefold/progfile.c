@@ -74,6 +74,7 @@
 #include	<bfile.h>
 #include	<ascii.h>
 #include	<char.h>
+#include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -110,7 +111,6 @@ extern int	mktmpfile(char *,mode_t,const char *) ;
 extern int	bwriteblanks(bfile *,int) ;
 extern int	tabcols(int,int) ;
 extern int	iceil(int,int) ;
-extern int	isprintlatin(int) ;
 
 
 /* external variables */

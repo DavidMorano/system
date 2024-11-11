@@ -1,4 +1,5 @@
 /* hostent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manipulate host entry structures */
@@ -17,7 +18,6 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<string.h>
 #include	<usystem.h>
 
 

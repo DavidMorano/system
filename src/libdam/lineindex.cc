@@ -51,9 +51,11 @@
 #include	<filemap.h>
 #include	<intceil.h>
 #include	<intsat.h>
+#include	<isnot.h>
 #include	<localmisc.h>		/* |MODP2| */
 
 #include	"lineindex.h"
+#include	"lineindexhdr.h"
 
 
 /* local defines */
@@ -116,13 +118,14 @@ static int	lineindex_stbegin(LI *,cc *,cc *) noex ;
 static int	lineindex_stend(LI *) noex ;
 static int	lineindex_opener(LI *) noex ;
 
-static int	lineindex_mkindex(lineindex *) noex ;
-static int	lineindex_fileheader(lineindex *) noex ;
-static int	lineindex_filembegin(lineindex *,time_t) noex ;
-static int	lineindex_filemend(lineindex *) noex ;
+static int	lineindex_mkindex(LI *) noex ;
+static int	lineindex_fileheader(LI *) noex ;
+static int	lineindex_filembegin(LI *,time_t) noex ;
+static int	lineindex_filemend(LI *) noex ;
 
-static int	lineindex_fileopen(lineindex *,time_t) noex ;
-static int	lineindex_fileclose(lineindex *) noex ;
+static int	lineindex_fileopen(LI *,time_t) noex ;
+static int	lineindex_fileopener(LI *,time_t) noex ;
+static int	lineindex_fileclose(LI *) noex ;
 
 
 /* local variables */
@@ -135,6 +138,8 @@ enum headers {
 } ;
 
 static sysval		pagesize(sysval_ps) ;
+
+contexpr int		magicsize = LINEINDEXHDR_MAGICSIZE ;
 
 
 /* exported variables */
@@ -154,7 +159,7 @@ int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 		if ((rs = pagesize) >= 0) {
 		    cint	am = (of & O_ACCMODE) ;
 		    op->pagesize = rs ;
-		    op->f.wantwrite = ((am == O_WRONLY) || (am == O_RDWR)) ;
+		    op->fl.wantwrite = ((am == O_WRONLY) || (am == O_RDWR)) ;
 		    if ((rs = lineindex_stbegin(op,ifn,tfn)) >= 0) {
 		    	{
 		    	    rs = lineindex_opener(op) ;
@@ -195,7 +200,7 @@ static int lineindex_opener(LI *op) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = lineindex_fileopen(op,dt)) >= 0) {
-	    cint	sz = 16 + 4 + (header_overlast * szof(int)) ;
+	    cint	sz = magicsize + 4 + (header_overlast * szof(int)) ;
 	    cint	fd = op->fd ;
 	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 		size_t	fsz = size_t(sb.st_size) ;
@@ -210,7 +215,7 @@ static int lineindex_opener(LI *op) noex {
 			    if ((rs = lineindex_filemap(op)) >= 0) {
 	    			if ((rs = lineindex_fileheader(op)) >= 0) {
 	    			    op->ti_access = dt ;
-	    			    op->f.fileinit = true ;
+	    			    op->fl.fileinit = true ;
 				    op->magic = LINEINDEX_MAGIC ;
 				}
 				if (rs < 0) {
@@ -272,8 +277,8 @@ int lineindex_curbegin(LI *op,lineindex_cur *curp) noex {
     	int		rs ;
 	if ((rs = lineindex_magic(op,curp)) >= 0) {
 	    op->cursors += 1 ;
-	    op->f.cursorlockbroken = false ;
-	    op->f.cursoracc = false ;
+	    op->fl.cursorlockbroken = false ;
+	    op->fl.cursoracc = false ;
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -283,7 +288,7 @@ int lineindex_curbegin(LI *op,lineindex_cur *curp) noex {
 int lineindex_curend(LI *op,lineindex_cur *curp) noex {
     	int		rs ;
 	if ((rs = lineindex_magic(op,curp)) >= 0) {
-	    if (op->f.cursoracc) {
+	    if (op->fl.cursoracc) {
 	        op->ti_access = getustime ;
 	    }
 	    if (op->cursors > 0) {
@@ -560,70 +565,55 @@ static int lineindex_filemend(LI *op) noex {
 }
 /* end subroutine (lineindex_filemend) */
 
-static int lineindex_fileopen(LI *op,custime dt) noex {
+static int lineindex_fileopener(LI *op,time_t dt) noex {
+	cint		of = (op->of & (~ (O_TRUNC | O_CREAT))) ;
+    	int		rs ;
+	cmode		om = op->om ;
+	if (dt == 0) dt = getustime ;
+	if ((rs = u_open(op->ifn,of,om)) >= 0) {
+	    op->fd = rs ;
+	    op->ti_open = dt ;
+	} else if (isNotPresent(rs)) {
+	    bool	fc = bool(op->of & O_CREAT) ;
+	    if (fc && (op->tfn != nullptr)) {
+	        if ((rs = lineindex_mkindex(op)) >= 0) {
+	            rs = u_open(op->ifn,of,om) ;
+	    	    op->fd = rs ;
+	    	    op->ti_open = dt ;
+	        }
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (lineindex_fileopener) */
+
+static int lineindex_fileopen(LI *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		of = op->of ;
-	int		f ;
-	int		f_create ;
-	int		f_changed = false ;
-
+	int		fc = false ;
 	if (op->fd < 0) {
-
-	of &= (~ (O_TRUNC | O_CREAT)) ;
-	rs = u_open(op->ifn,of,op->om) ;
-
-	f_create = (op->of & O_CREAT) ;
-
-	if ((rs == SR_NOENT) && f_create && (op->tfn != nullptr)) {
-	    if ((rs = lineindex_mkindex(op)) >= 0) {
-	        rs = u_open(op->ifn,of,op->om) ;
-	    }
-	}
-
-	if (rs < 0)
-	    goto bad0 ;
-
-	op->fd = rs ;
-	op->ti_open = dt ;
-
-/* local or remote */
-
-	rs = isfsremote(op->fd) ;
-	f = (rs > 0) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-	f_changed = (! LEQUIV(f,op->f.remote)) ;
-	if (f_changed)
-	    op->f.remote = f ;
-
-/* had the file itself changed? */
-
-	if (rs >= 0) {
-
-	    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
-
-	        if (! f_changed)
-	            f_changed = (op->filesize != sb.st_size) ||
-	                (op->mtime != sb.st_mtime) ;
-
-	        op->filesize = (uint) sb.st_size ;
-	        op->mtime = sb.st_mtime ;
-	    }
-	}
-
-	} 
-
-ret0:
+	    if ((rs = lineindex_fileopener(op,dt)) >= 0) {
+		if ((rs = isfsremote(op->fd)) >= 0) {
+		    cbool	f = (rs > 0) ;
+		    fc = (! LEQUIV(f,op->fl.remote)) ;
+		    if (fc) {
+	    		op->fl.remote = f ;
+		    }
+	    	    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	                if (! fc) {
+	            	    fc = fc || (op->filesize != sb.st_size) ;
+			    fc = fc || (op->mtime != sb.st_mtime) ;
+			}
+	                op->filesize = intsat(sb.st_size) ;
+	                op->mtime = sb.st_mtime ;
+		    } /* end if (fstat) */
+	        } /* end if (isfsremote) */
+		if (rs < 0) {
+		    u_close(op->fd) ;
+		    op->fd = -1 ;
+		}
+	    } /* end if (lineindex_fileropener) */
+	} /* end if (open needed) */
 	return (rs >= 0) ? f_changed : rs ;
-
-/* bad things */
-bad1:
-	u_close(op->fd) ;
-	op->fd = -1 ;
-
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (lineindex_fileopen) */
 
@@ -641,7 +631,8 @@ static int lineindex_mkindex(LI *op) noex {
 	filemap		lmap ;
 	bfile		ifile ;
 	off_t		headoff ;
-	uint		recoff, lineoff ;
+	uint		recoff ;
+	uint		lineoff ;
 	uint		table[header_overlast + 1] ;
 	uint		recs[NRECS + 1] ;
 	int		rs = SR_OK ;

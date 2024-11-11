@@ -42,8 +42,8 @@
 /* object defines */
 #define	VECPSTR_MAGIC		0x88776215
 #define	VECPSTR			struct vecpstr_head
-#define	VECPSTR_CH		struct vecpstr_chunk
 #define	VECPSTR_FL		struct vecpstr_flags
+#define	VECPSTR_CH		struct vecpstr_chunk
 #define	VECPSTR_DEFENTS		10
 /* options */
 #define	VECPSTR_ODEFAULT	0
@@ -211,6 +211,7 @@ struct vecpstr : vecpstr_head {
 typedef VECSTR		vecpstr ;
 #endif /* __cplusplus */
 
+typedef VECPSTR_FL	vecpstr_fl ;
 typedef VECPSTR_CH	vecpstr_ch ;
 
 EXTERNC_begin

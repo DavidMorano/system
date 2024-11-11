@@ -1,4 +1,5 @@
 /* getnfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate column values */
@@ -28,6 +29,7 @@
 
 EXTERNC_begin
 
+extern int	getnfile(int) noex ;
 
 EXTERNC_end
 

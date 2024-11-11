@@ -737,6 +737,8 @@ msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
 dayofmonth.o:		dayofmonth.cc dayofmonth.h
+lineindex.o:		lineindex.cc lineindex.h
+lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h
 
 # DATABASE
 database.o:		database.dir

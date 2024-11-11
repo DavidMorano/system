@@ -29,7 +29,7 @@
 
 
 #define HDB_MAGIC	314159261
-#define	HDB_DEFSIZE	10
+#define	HDB_DEFNUM	10
 #define	HDB		struct hdb_head
 #define HDB_DATUM	struct hdb_datum
 #define HDB_DAT		struct hdb_datum

@@ -34,9 +34,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<ucgetpid.h>
 #include	<opentmp.h>
 #include	<mktmp.h>
 #include	<mkpathx.h>
@@ -61,6 +61,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */

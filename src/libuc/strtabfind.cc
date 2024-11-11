@@ -1,4 +1,5 @@
 /* strtabfind SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a string in tables created by a STRTAB object */

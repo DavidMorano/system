@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -56,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strpack_main.o strpack_envstore.o 
+OBJ0= strpack_main.o strpack_envstore.o strpack_obj.o
 
 OBJA= obj0.o
 
@@ -135,5 +134,6 @@ obj5.o:			$(OBJ5)
 
 strpack_envstore.o:		strpack_envstore.cc	$(INCS)
 strpack_main.o:			strpack_main.cc		$(INCS)
+strpack_obj.o:			strpack_obj.cc		$(INCS)
 
 

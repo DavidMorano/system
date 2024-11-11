@@ -38,6 +38,7 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ascii.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"filewatch.h"
@@ -60,7 +61,7 @@
 #define	TO_OPEN		60
 
 #ifndef	STDFNIN
-#define	STDFNIN	"*STDIN*"
+#define	STDFNIN		"*STDIN*"
 #endif
 
 #ifndef	STDFNOUT
@@ -73,8 +74,6 @@
 
 
 /* external subroutines */
-
-extern int	isprintlatin(int) ;
 
 
 /* external variables */

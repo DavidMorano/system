@@ -87,27 +87,24 @@ int strpack_envstore(SP *op,cc *kp,cc *vp,int vl,cc **rpp) noex {
 /* end subroutine (strpack_envstore) */
 
 int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (op && kp) {
+	if ((rs = strpack_magic(op,kp)) >= 0) {
 	    int		sz = 1 ;
-	    char	*ep ;
 	    if (kl < 0) kl = strlen(kp) ;
 	    sz += (kl+1) ;
 	    if (vp) {
 	        if (vl < 0) vl = strlen(vp) ;
 	        sz += vl ;
 	    }
-	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
+	    if (char *ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
 		{
-	            int		el ;
 	            char	*bp = ep ;
 	            bp = strwcpy(bp,kp,kl) ;
 	            *bp++ = '=' ;
 	            bp = strwcpy(bp,vp,vl) ;
-	            el = (bp-ep) ;
-	            rs = strpack_store(op,ep,el,rpp) ;
+	            rs = strpack_store(op,ep,(bp - ep),rpp) ;
 		    len = rs ;
 		}
 	        rs1 = uc_free(ep) ;

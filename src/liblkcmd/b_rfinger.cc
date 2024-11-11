@@ -67,6 +67,9 @@
 #include	<filer.h>
 #include	<termout.h>
 #include	<opendial.h>
+#include	<ischarx.h>
+#include	<iserror.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -125,11 +128,6 @@ extern int	opentmp(cchar *,int,mode_t) ;
 extern int	openshmtmp(char *,int,mode_t) ;
 extern int	hasnonwhite(cchar *,int) ;
 extern int	isasocket(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isprintlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;

@@ -75,7 +75,7 @@ int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
 	cchar		*s1 = charp(*s1pp) ;
 	cchar		*s2 = charp(*s2pp) ;
 	if (s1 || s2) {
-	    rc = 1 ;
+	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
 		if (s2) {

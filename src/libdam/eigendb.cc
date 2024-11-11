@@ -31,7 +31,7 @@
 #include	<sys/mman.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<strpack.h>

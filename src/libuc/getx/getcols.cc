@@ -43,7 +43,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"getcols.h"		/* |charcols(3uc)| */
@@ -74,12 +77,11 @@
 
 int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
 	cint		tcol = (ccol + ncols) ;
-	int		i = 0 ; /* used afterwards */
+	int		i = 0 ; /* used-afterwards */
 	if (llen < 0) llen = strlen(lbuf) ;
 	if (ccol < tcol) {
-	    int		cols ;
 	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
-	        cols = charcols(ntab,ccol,lbuf[i]) ;
+	        cint	cols = charcols(ntab,ccol,lbuf[i]) ;
 	        ccol += cols ;
 	    } /* end for */
 	} /* end if */

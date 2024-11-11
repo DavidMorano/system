@@ -1,4 +1,5 @@
 /* strenv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this object provides a pointer to a library string-value */

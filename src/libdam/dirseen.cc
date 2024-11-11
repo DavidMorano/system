@@ -1,4 +1,5 @@
 /* dirseen SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* unique directory manager */
@@ -17,7 +18,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	dirseen
 
 	Description:
@@ -86,16 +87,6 @@ typedef dirseen_ent	**entpp ;
 
 /* forward references */
 
-template<typename ... Args>
-static inline int dirseen_magic(dirseen *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == DIRSEEN_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (dirseen_magic) */
-
 static int entry_start(dirseen_ent *,cchar *,int,dev_t,ino_t) noex ;
 static int entry_finish(dirseen_ent *) noex ;
 
@@ -120,10 +111,10 @@ int dirseen_start(dirseen *op) noex {
 	    op->magic = 0 ;
 	    op->strsize = 0 ;
 	    if ((op->dlistp = new(nothrow) vecobj) != nullptr) {
-		cint	ne = DIRSEEN_NDEF ;
+		cint	vn = DIRSEEN_NDEF ;
 	        cint	vo = 0 ;
-	        cint	esz = sizeof(dirseen_ent) ;
-	        if ((rs = vecobj_start(op->dlistp,esz,ne,vo)) >= 0) {
+	        cint	esz = szof(dirseen_ent) ;
+	        if ((rs = vecobj_start(op->dlistp,esz,vn,vo)) >= 0) {
 	            op->magic = DIRSEEN_MAGIC ;
 	        } /* end if  */
 		if (rs < 0) {
@@ -140,22 +131,25 @@ int dirseen_finish(dirseen *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirseen_magic(op)) >= 0) {
-	    void	*vp{} ;
-	    for (int i = 0 ; vecobj_get(op->dlistp,i,&vp) >= 0 ; i += 1) {
-	        if (vp) {
-	            dirseen_ent	*ep = entp(vp) ;
-	            rs1 = entry_finish(ep) ;
+	    rs = SR_BUGCHECK ;
+	    if (op->dlistp) {
+	        void	*vp{} ;
+	        for (int i = 0 ; vecobj_get(op->dlistp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	                dirseen_ent	*ep = entp(vp) ;
+	                rs1 = entry_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end for */
+	        {
+	            rs1 = vecobj_finish(op->dlistp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
-	    } /* end for */
-	    {
-	        rs1 = vecobj_finish(op->dlistp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->dlistp) {
-		delete op->dlistp ;
-		op->dlistp = nullptr ;
-	    }
+	        {
+		    delete op->dlistp ;
+		    op->dlistp = nullptr ;
+	        }
+	    } /* end if (bugcheck) */
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -274,7 +268,7 @@ void dirseen::dtor() noex {
 }
 
 int dirseen_co::operator () () noex {
-	int	rs = SR_BUGCHECK ;
+	int		rs = SR_BUGCHECK ;
 	switch (w) {
 	case dirseenmem_start:
 	    rs = dirseen_start(op) ;
@@ -292,10 +286,9 @@ int dirseen_co::operator () () noex {
 
 int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
-	cchar		*cp{} ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	    ep->name = cp ;
 	    ep->namelen = rs ;
 	}

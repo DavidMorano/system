@@ -1,4 +1,5 @@
 /* opendial SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a channel using a dialer */
@@ -48,9 +49,8 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<dial.h>
+#include	<dial.h>		/* <- money shot! */
 #include	<localmisc.h>
 
 #include	"opendial.h"
@@ -90,57 +90,57 @@ int opendial(int di,int af,cc *hn,cc *ps,cc *svc,
 		cmode	om = 0666 ;
 	        cchar	*cp ;
 	        switch (di) {
-	        case opendialer_udp:
+	        case opendial_udp:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialudp(hn,cp,af,to,opts) ;
 	            break ;
-	        case opendialer_tcp:
+	        case opendial_tcp:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialtcp(hn,cp,af,to,opts) ;
 	            break ;
-	        case opendialer_tcpmux:
+	        case opendial_tcpmux:
 	            rs = dialtcpmux(hn,ps,af,svc,av,to,opts) ;
 	            break ;
-	        case opendialer_tcpnls:
+	        case opendial_tcpnls:
 	            rs = dialtcpnls(hn,ps,af,svc,to,opts) ;
 	            break ;
-	        case opendialer_uss:
+	        case opendial_uss:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialuss(cp,to,opts) ;
 	            break ;
-	        case opendialer_ussmux:
+	        case opendial_ussmux:
 	            rs = dialussmux(ps,svc,av,to,opts) ;
 	            break ;
-	        case opendialer_ussnls:
+	        case opendial_ussnls:
 	            rs = dialussnls(ps,svc,to,opts) ;
 	            break ;
-	        case opendialer_ticotsord:
+	        case opendial_ticotsord:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialticotsord(cp,-1,to,opts) ;
 	            break ;
-	        case opendialer_ticotsordnls:
+	        case opendial_ticotsordnls:
 	            rs = dialticotsordnls(ps,-1,svc,to,opts) ;
 	            break ;
-	        case opendialer_pass:
+	        case opendial_pass:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialpass(cp,to,opts) ;
 	            break ;
-	        case opendialer_open:
+	        case opendial_open:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = uc_openenv(cp,of,om,ev,to) ;
 	            break ;
-	        case opendialer_prog:
+	        case opendial_prog:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialprog(cp,of,av,ev,np) ;
 	            break ;
-	        case opendialer_finger:
+	        case opendial_finger:
 	            rs = dialfinger(hn,ps,af,svc,av,to,opts) ;
 	            break ;
 	        default:

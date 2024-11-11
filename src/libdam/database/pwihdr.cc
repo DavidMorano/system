@@ -20,8 +20,9 @@
 
 /*******************************************************************************
 
-	Name:
-	pwihdr
+	Group:
+	pwihdr_rd
+	pwihdr_wr
 
 	Description:
 	This subroutine reads from and write to a buffer which
@@ -73,7 +74,7 @@
 
 /* local variables */
 
-constexpr int		headsize = pwihdr_overlast * sizeof(uint) ;
+constexpr int		tabsize = (pwihdr_overlast * szof(uint)) ;
 constexpr int		magicsize = PWIHDR_MAGICSIZE ;
 constexpr char		magicstr[] = PWIHDR_MAGICSTR ;
 
@@ -98,7 +99,7 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
-	    	    if (bl >= headsize) {
+	    	    if (bl >= tabsize) {
 	        	uint	*header = (uint *) bp ;
 			header[pwihdr_fsize] = op->fsize ;
 			header[pwihdr_wrtime] = op->wrtime ;
@@ -116,8 +117,8 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 			header[pwihdr_idxf] = op->idxf ;
 			header[pwihdr_idxfl3] = op->idxfl3 ;
 			header[pwihdr_idxun] = op->idxun ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
+	        	bp += tabsize ;
+	        	bl -= tabsize ;
 			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -131,12 +132,12 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 }
 /* end subroutine (pwihdr_rd) */
 
-int pwihdr_wr(pwihdr *op,char *hbuf,int hlen) noex {
+int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op && hbuf) {
 	    int		bl = hlen ;
-	    char	*bp = hbuf ;
+	    cchar	*bp = hbuf ;
 	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
 		rs = SR_OK ;
 	        bp += magicsize ;
@@ -156,7 +157,7 @@ int pwihdr_wr(pwihdr *op,char *hbuf,int hlen) noex {
 	            rs = SR_ILSEQ ;
 		}
 	        if ((rs >= 0) && (bl > 0)) {
-	            if (bl >= headsize) {
+	            if (bl >= tabsize) {
 			uint	*header = (uint *) bp ;
 	                op->fsize = header[pwihdr_fsize] ;
 	                op->wrtime = header[pwihdr_wrtime] ;
@@ -174,8 +175,8 @@ int pwihdr_wr(pwihdr *op,char *hbuf,int hlen) noex {
 	                op->idxf = header[pwihdr_idxf] ;
 	                op->idxfl3 = header[pwihdr_idxfl3] ;
 	                op->idxun = header[pwihdr_idxun] ;
-	                bp += headsize ;
-	                bl -= headsize ;
+	                bp += tabsize ;
+	                bl -= tabsize ;
 			len = (bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;

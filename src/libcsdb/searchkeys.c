@@ -47,6 +47,8 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<strpack.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"searchkeys.h"
@@ -77,9 +79,6 @@
 
 extern int	snwcpy(char *,int,cchar *) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isalnumlatin(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;

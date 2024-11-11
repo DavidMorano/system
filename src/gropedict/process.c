@@ -53,10 +53,9 @@
 #include	<unistd.h>
 #include	<limits.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -70,7 +69,6 @@
 /* external subroutines */
 
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	isprintlatin(int) ;
 
 
 /* external variables */

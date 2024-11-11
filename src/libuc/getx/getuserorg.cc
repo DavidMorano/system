@@ -180,7 +180,7 @@ int gethomeorg(char *rbuf,int rlen,cchar *hd) noex {
 		    cint	clen = rs ;
 	            if ((rs = sncpy2(cbuf,clen,".",orgname)) >= 0) {
 	                if (char *obuf{} ; (rs = malloc_mp(&obuf)) >= 0) {
-	                    if ((rs = mkpath2(obuf,hd,cbuf)) >= 0) {
+	                    if ((rs = mkpath(obuf,hd,cbuf)) >= 0) {
 	                        if ((rs = filereadln(obuf,rbuf,rlen)) >= 0) {
 	                            len = rs ;
 		                } else if (isNotAccess(rs)) {
@@ -253,8 +253,7 @@ static int getuserorg_home(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*hbuf{} ;
-	if ((rs = malloc_mp(&hbuf)) >= 0) {
+	if (char *hbuf{} ; (rs = malloc_mp(&hbuf)) >= 0) {
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,sip->un)) >= 0) {
 	        if ((rs = gethomeorg(sip->rbuf,sip->rlen,hbuf)) >= 0) {
@@ -307,7 +306,7 @@ static int getuserorg_sys(SI *sip) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (char *ofname{} ; (rs = malloc_mp(&ofname)) >= 0) {
-	    if ((rs = mkpath2(ofname,etcdir,sip->ofp)) >= 0) {
+	    if ((rs = mkpath(ofname,etcdir,sip->ofp)) >= 0) {
 	        rs = filereadln(ofname,sip->rbuf,sip->rlen) ;
 	        len = rs ;
 	    }

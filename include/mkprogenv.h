@@ -1,4 +1,5 @@
 /* mkprogenv HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make new environment for a program */
@@ -18,14 +19,16 @@
 
 
 #define	MKPROGENV	struct mkprogenv_head
+#define	MKPROGENV_MAGIC	0x87485926
 
 
 struct mkprogenv_head {
 	cchar		*un ;		/* user-name */
 	cchar		*uh ;		/* user-home */
 	mainv		envv ;
-	vechand		env ;
-	strpack		stores ;
+	vechand		*envp ;
+	strpack		*storep ;
+	uint		magic ;
 } ;
 
 typedef MKPROGENV	mkprogenv ;

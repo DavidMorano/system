@@ -11,6 +11,7 @@
 #	nn		node-name length
 #	hn		host-name length
 #	un		user-name length
+#	ua		user-attr length
 #	gn		group-name length
 #	pn		project-name length
 #	pw 		passwd entry
@@ -18,6 +19,7 @@
 #	gr 		group entry
 #	pj		project entry
 #	pr 		network protocol entry
+#	nm 		network mask entry
 #	nw 		network network entry
 #	ho 		network host entry
 #	sv		network service entry

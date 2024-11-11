@@ -57,6 +57,8 @@
 #include	<mailmsghdrs.h>
 #include	<ema.h>
 #include	<emainfo.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -112,7 +114,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	isprintlatin(int) ;
 
 extern int	sfsubstance(const char *,int,const char **) ;
 

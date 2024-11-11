@@ -1,4 +1,5 @@
 /* dirseen HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* unique directory manager */
@@ -124,6 +125,20 @@ typedef DIRSEEN		dirseen ;
 typedef DIRSEEN_CUR	dirseen_cur ;
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline int dirseen_magic(dirseen *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DIRSEEN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (dirseen_magic) */
+
+#endif /* __cplusplus */
+
 EXTERNC_begin
 
 extern int dirseen_start(dirseen *) noex ;
@@ -134,6 +149,8 @@ extern int dirseen_count(dirseen *) noex ;
 extern int dirseen_curbegin(dirseen *,dirseen_cur *) noex ;
 extern int dirseen_curend(dirseen *,dirseen_cur *) noex ;
 extern int dirseen_curenum(dirseen *,dirseen_cur *,char *,int) noex ;
+extern int dirseen_notseen(dirseen *,USTAT *,cchar *,int) noex ;
+extern int dirseen_notadd(dirseen *,USTAT *,cchar *,int) noex ;
 extern int dirseen_finish(dirseen *) noex ;
 
 EXTERNC_end

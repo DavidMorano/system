@@ -55,6 +55,8 @@
 #include	<tmpx.h>
 #include	<sesnotes.h>
 #include	<ucmallreg.h>
+#include	<ischarx.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -103,10 +105,6 @@ extern int	mklogid(char *,int,const char *,int,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	tmpx_getuserterms(TMPX *,VECSTR *,const char *) ;
 extern int	tmpx_getsessions(TMPX *,VECINT *,const char *) ;
-extern int	isprintlatin(uint) ;
-extern int	iseol(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
 
 extern int	printhelp(bfile *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;

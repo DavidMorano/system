@@ -47,6 +47,7 @@
 #include	<emainfo.h>
 #include	<outline.h>
 #include	<sfx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -88,7 +89,6 @@
 extern uint	uceil(uint,int) ;
 
 extern int	sncpy1(char *,int,const char *) ;
-extern int	isprintlatin(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;

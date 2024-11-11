@@ -1638,13 +1638,7 @@ const char	svcspec[] ;
 	        hostaddr_curbegin(&ha,&cur) ;
 
 	        c = 0 ;
-	        while (hostaddr_enum(&ha,&cur,&aip) >= 0) {
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("prochost: hostaddr_enum() pf=%u \n",
-	                    aip->ai_family) ;
-#endif
+	        while (hostaddr_curenum(&ha,&cur,&aip) >= 0) {
 
 	            if (c == 0) {
 

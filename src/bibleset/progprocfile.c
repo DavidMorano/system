@@ -45,6 +45,8 @@
 #include	<char.h>
 #include	<ascii.h>
 #include	<linecenter.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -81,11 +83,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	bufprintf(char *,int,const char *,...) ;
-extern int	hasalluc(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
 extern int	bprintlns(bfile *,int,const char *,int) ;
 extern int	bprintln(bfile *,const char *,int) ;
 

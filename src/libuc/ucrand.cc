@@ -42,11 +42,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<cerrno>
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<timewatch.hh>
@@ -68,8 +66,6 @@
 #endif
 
 #define	RBUFLEN		64
-
-#define	GETRANDOM_MAXENT	256	/* maximum bytes per call */
 
 #ifndef	CF_GETRANDOM
 #define	CF_GETRANDOM	1		/* compile-define |getrandom(2)| */
@@ -186,13 +182,8 @@ constexpr bool		f_getrandom = CF_GETRANDOM ;
 
 sysret_t uc_rand(void *arbuf,int arlen) noex {
 	cint		rlen = arlen ;
-	int		rs ;
 	char		*rbuf = charp(arbuf) ;
-	if ((rs = rander_data.get(rbuf,rlen)) < 0) {
-	    errno = (- rs) ;
-	    rs = -1 ;
-	}
-	return rs ;
+	return rander_data.get(rbuf,rlen) ;
 }
 /* end subroutine (uc_rand) */
 
@@ -282,9 +273,8 @@ int rander::get(char *rbuf,int rlen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf) {
-	    sigblocker	b ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = b.start) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            cint	to = utimeout[uto_capture] ;
 	            if ((rs = capbegin(to)) >= 0) {
@@ -323,8 +313,8 @@ int rander::geter(char *rbuf,int rlen) noex {
 	    rs = addnoise ;
 	} /* end if */
 	if (rs >= 0) {
-	    randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
-	    cint	usize = sizeof(ulong) ;
+	    randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
+	    cint	usize = szof(ulong) ;
 	    while ((rs >= 0) && (rlen > 0)) {
 		if (ulong uv ; (rs = randomvar_getulong(rvp,&uv)) >= 0) {
 		    for (int i = 0 ; (rlen > 0) && (i < usize) ; i += 1) {
@@ -347,7 +337,7 @@ int rander::iaddnoise() noex {
 	    cint	rlen = RBUFLEN ;
 	    char	rbuf[RBUFLEN+1] ;
 	    if ((rs = uc_getrandom(rbuf,rlen,0)) >= 0) {
-		randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
+		randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 		cint	len = rs ;
 		rs = randomvar_addnoise(rvp,rbuf,len) ;
 		rl = rs ;
@@ -360,7 +350,7 @@ int rander::iaddnoise() noex {
 	        cint	fd = rs ;
 	        char	rbuf[RBUFLEN+1] ;
 	        if ((rs = u_read(fd,rbuf,rlen)) >= 0) {
-		    randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
+		    randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 		    cint	len = rs ;
 		    rs = randomvar_addnoise(rvp,rbuf,len) ;
 		    rl = rs ;
@@ -376,10 +366,9 @@ int rander::iaddnoise() noex {
 int rander::irandbegin() noex {
 	int		rs = SR_OK ;
 	if (rvarp == nullptr) {
-	    cint	osize = sizeof(randomvar) ;
-	    void	*vp{} ;
-	    if ((rs = uc_libmalloc(osize,&vp)) >= 0) {
-	        randomvar	*rvp = static_cast<randomvar *>(vp) ;
+	    cint	osize = szof(randomvar) ;
+	    if (void *vp{} ; (rs = uc_libmalloc(osize,&vp)) >= 0) {
+	        randomvar	*rvp = cast_static<randomvar *>(vp) ;
 	        if ((rs = randomvar_start(rvp,0,0)) >= 0) {
 	            rvarp = vp ;	/* <- store object pointer */
 		}
@@ -397,7 +386,7 @@ int rander::irandend() noex {
 	int		rs1 ;
 	if (rvarp) {
 	    {
-	        randomvar	*rvp = static_cast<randomvar *>(rvarp) ;
+	        randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 	        rs1 = randomvar_finish(rvp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -464,7 +453,7 @@ static void rander_exit() noex {
 /* end subroutine (rander_exit) */
 
 rander_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
+	int		rs = SR_BUGCHECK ;
 	if (op) switch (w) {
 	    case randermem_init:
 	        rs = op->iinit() ;

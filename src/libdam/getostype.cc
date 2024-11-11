@@ -31,7 +31,11 @@
 	-
 
 	Returns:
-	>=0		0=BSD, 1=SYSV
+	>=0		OS-type:
+				ostype_bsd,
+				ostype_sysv,
+				ostype_linux,
+				ostype_darwin,
 	<0		error (system-return)
 
 *******************************************************************************/
@@ -103,7 +107,9 @@ constexpr osguess	guesses[] = {
 	{ "sunos", ostype_sysv },
 	{ "darwin", ostype_darwin },
 	{ "linux", ostype_linux },
-	{ "sysv", ostype_sysv }
+	{ "sysv", ostype_sysv },
+	{ "unix", ostype_sysv },	/* <- original AT&T "system" name */
+	{ "bsd", ostype_bsd }		/* some BSD systems */
 } ;
 
 constexpr bool		f_darwin	= F_DARWIN ;
@@ -156,7 +162,7 @@ static int mktype() noex {
 	} /* end if_constexpr */
 	return rs ;
 }
-/* end subroutine (mkostype) */
+/* end subroutine (mktype) */
 
 static int findtype() noex {
 	typer		to ;
@@ -166,7 +172,7 @@ static int findtype() noex {
 
 typer::operator int () noex {
 	int		rs = SR_OK ;
-	for (auto &m : mems) {
+	for (const auto &m : mems) {
 	    rs = (this->*m)() ;
 	    if ((rs < 0) || fgot) break ;
 	} /* end for */
@@ -180,7 +186,7 @@ int typer::envostype() noex {
 	if (eot) {
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfshrink(eot,-1,&cp)) > 0) {
-		if (int idx ; (idx = matcasestr(ostypenames,cp,cl)) >= 0) {
+		if (cint idx = matcasestr(ostypenames,cp,cl) ; idx >= 0) {
 		    rs = idx ;
 		    fgot = true ;
 		}
@@ -203,7 +209,7 @@ int typer::envsysname() noex {
 int typer::env(cchar *vn) noex {
 	int		rs = SR_OK ;
 	if (cchar *eot ; (eot = getenv(vn)) != nullptr) {
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfshrink(eot,-1,&cp)) > 0) {
 		rs = matguess(cp,cl) ;
 	    }
@@ -216,10 +222,8 @@ int typer::trysysname() noex {
 	int		rs ;
 	int		rs1 ;
 	int		rtype = 0 ;
-	char		*sbuf{} ;
-	if ((rs = malloc_mn(&sbuf)) >= 0) {
-	    cint	slen = rs ;
-	    if ((rs = getsysname(sbuf,slen)) >= 0) {
+	if (char *sbuf{} ; (rs = malloc_mn(&sbuf)) >= 0) {
+	    if ((rs = getsysname(sbuf,rs)) >= 0) {
 		rs = matguess(sbuf,rs) ;
 		rtype = rs ;
 	    } /* end if (getsysname) */
@@ -244,7 +248,7 @@ int typer::matguess(cchar *sp,int sl) noex {
 /* end method (typer::matguess) */
 
 int typer::other() noex {
-	int	rs = ostype_bsd ;
+	cint		rs = ostype_bsd ;
 	fgot = true ;
 	return rs ;
 }

@@ -57,6 +57,7 @@
 #include	<vecobj.h>
 #include	<paramopt.h>
 #include	<opentmp.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -77,7 +78,6 @@
 /* external subroutines */
 
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	isprintlatin(int) ;
 
 
 /* external variables */

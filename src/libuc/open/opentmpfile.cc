@@ -1,4 +1,5 @@
 /* opentmp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make and open a temporary file */
@@ -51,6 +52,7 @@
 #include	<sys/time.h>		/* for |TIMEVAL| */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<ctime>
 #include	<usystem.h>

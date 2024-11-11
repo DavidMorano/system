@@ -24,8 +24,8 @@
 
 #define	LINEINDEX		struct lineindex_head
 #define	LINEINDEX_FL		struct lineindex_flags
-#define	LINEINDEX_INFO		struct lineindex_information
 #define	LINEINDEX_CUR		struct lineindex_cursor
+#define	LINEINDEX_INFO		struct lineindex_information
 
 #define	LINEINDEX_MAGIC		0x23456787
 #define	LINEINDEX_FILEMAGIC	"LINEINDEX"
@@ -68,7 +68,7 @@ struct lineindex_head {
 	time_t		ti_check ;
 	time_t		ti_access ;
 	size_t		mapsize ;
-	LINEINDEX_FL	f ;
+	LINEINDEX_FL	fl ;
 	uint		magic ;
 	int		pagesize ;
 	int		filesize ;
@@ -82,8 +82,8 @@ struct lineindex_head {
 
 typedef	LINEINDEX		lineindex ;
 typedef	LINEINDEX_FL		lineindex_fl ;
-typedef	LINEINDEX_INFO		lineindex_info ;
 typedef	LINEINDEX_CUR		lineindex_cur ;
+typedef	LINEINDEX_INFO		lineindex_info ;
 
 EXTERNC_begin
 

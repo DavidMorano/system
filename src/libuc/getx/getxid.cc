@@ -157,15 +157,13 @@ int getuid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr	ns ;
-	        cchar	*name{} ;
-	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
-	            char	*pwbuf{} ;
-	            if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	        cchar	*nn{} ;
+	        if (nulstr ns ; (rs = ns.start(sp,sl,&nn)) >= 0) {
+	            if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	                ucentpw	pw{} ; 
 	                cint	pwlen = rs ;
-		        {
-	                    ucentpw	pw ;
-		            rs = GETPW_NAME(&pw,pwbuf,pwlen,name) ;
+			auto	getpw = GETPW_NAME ;
+			if ((rs = getpw(&pw,pwbuf,pwlen,nn)) >= 0) {
 	                    uid = pw.pw_uid ;
 		        }
 	                rs1 = uc_free(pwbuf) ;
@@ -205,11 +203,9 @@ int getgid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr	ns ;
 	        cchar	*name{} ;
-	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
-	            char	*grbuf{} ;
-		    if ((rs = malloc_gr(&grbuf)) >= 0) {
+	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
+	            if (char *grbuf{} ; (rs = malloc_gr(&grbuf)) >= 0) {
 	                cint	grlen = rs ;
 		        {
 	                    ucentgr	gr{} ;
@@ -269,14 +265,12 @@ int getpjid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr	ns ;
 	        cchar	*name{} ;
-	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
-	            char	*pjbuf{} ;
-	            if ((rs = malloc_pj(&pjbuf)) >= 0) {
+	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) {
+	            if (char *pjbuf{} ; (rs = malloc_pj(&pjbuf)) >= 0) {
 	                cint	pjlen = rs ;
 		        {
-	                    ucentpj	pj ;
+	                    ucentpj	pj{} ;
 	                    rs = getpj_name(&pj,pjbuf,pjlen,name) ;
 	                    pjid = pj.pj_projid ;
 		        }

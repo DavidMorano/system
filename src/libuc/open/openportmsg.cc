@@ -1,4 +1,5 @@
 /* openportmsg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* message for |openport(3dam)| support IPC */

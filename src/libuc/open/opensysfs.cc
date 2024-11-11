@@ -1,4 +1,5 @@
 /* opensysfs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a channel (file-descriptor) to some system file or directory */
@@ -52,6 +53,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<bit>
@@ -63,6 +65,8 @@
 #include	<ctdec.h>
 #include	<stdfnames.h>
 #include	<spawnproc.h>
+#include	<ischarx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"opensysfs.h"
@@ -126,8 +130,6 @@ extern "C" {
     extern int	sperm(ids *,USTAT *,int) noex ;
     extern int	dirseen_notseen(dirseen *,USTAT *,cchar *,int) noex ;
     extern int	dirseen_notadd(dirseen *,USTAT *,cchar *,int) noex ;
-    extern int	isprintlatin(int) noex ;
-    extern int	isNotPresent(int) noex ;
 }
 
 extern "C" {

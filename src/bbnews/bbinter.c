@@ -46,7 +46,6 @@
 #include	<stdlib.h>
 #include	<time.h>
 #include	<string.h>
-#include	<ctype.h>
 #include	<stdarg.h>
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -58,6 +57,8 @@
 #include	<keysym.h>
 #include	<toxc.h>
 #include	<mktmp.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"mailmsg.h"
@@ -143,10 +144,6 @@ extern int	mkdirs(const char *,mode_t) ;
 extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
-extern int	hasallalnum(const char *,int) ;
-extern int	hasprintbad(const char *,int) ;
-extern int	isprintlatin(int) ;
-extern int	isdigitlatin(int) ;
 extern int	iscmdstart(int) ;
 
 extern int	mailboxappend(const char *,int,int) ;

@@ -1,4 +1,5 @@
 /* strpack HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-pack */
@@ -15,6 +16,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vechand.h>
 
 
@@ -39,8 +42,51 @@ struct strpack_head {
 	int		c ;		/* total count */
 } ;
 
+#ifdef	__cplusplus
+enum strpackmems {
+    	strpackmem_start,
+	strpackmem_count,
+	strpackmem_size,
+	strpackmem_finish,
+	strpackmem_overlast
+} ;
+struct strpack ;
+struct strpack_co {
+	strpack		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (strpack *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (strpack_co) */
+struct strpack : strpack_head {
+	strpack_co	start ;
+	strpack_co	count ;
+	strpack_co	size ;
+	strpack_co	finish ;
+	strpack() noex {
+	    start(this,strpackmem_start) ;
+	    count(this,strpackmem_count) ;
+	    size(this,strpackmem_size) ;
+	    finish(this,strpackmem_finish) ;
+	} ;
+	strpack(const strpack &) = delete ;
+	strpack &operator = (const strpack &) = delete ;
+	int store(cchar *,int = -1,cchar ** = nullptr) noex ;
+	void dtor() noex ;
+	~strpack() {
+	    dtor() ;
+	} ;
+} ; /* end struct (strpack) */
+#else	/* __cplusplus */
 typedef STRPACK		strpack ;
-typedef STRPACK_CH	strpack_ch ;
+#endif /* __cplusplus */
+
+typedef	STRPACK_CH	strpack_ch ;
 
 EXTERNC_begin
 
@@ -54,6 +100,20 @@ extern int strpack_envstore(strpack *,cc *,cc *,int,cc **) noex ;
 extern int strpack_envstorer(strpack *,cc *,int,cc *,int,cc **) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int strpack_magic(strpack *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == STRPACK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (strpack_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* STRPACK_INCLUDE */

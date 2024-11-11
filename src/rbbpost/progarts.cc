@@ -76,6 +76,9 @@
 #include	<ascii.h>
 #include	<strw.h>		/* |strwset(3uc)| */
 #include	<char.h>
+#include	<ischarx.h>
+#include	<iserror.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"bfliner.h"
@@ -169,11 +172,6 @@ extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	mkartfile(char *,mode_t,cchar *,cchar *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isprintlatin(int) ;
-extern int	hasEOH(cchar *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
 
 extern int	progmsgid(PROGINFO *,char *,int,int) ;
 

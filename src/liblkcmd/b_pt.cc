@@ -62,6 +62,9 @@
 #include	<ids.h>
 #include	<sbuf.h>
 #include	<fsdir.h>
+#include	<ischarx.h>
+#include	<iserror.h>
+#include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -112,11 +115,6 @@ extern "C" int	matpstr(cchar **,int,cchar *,int) ;
 extern "C" int	optbool(cchar *,int) ;
 extern "C" int	optvalue(cchar *,int) ;
 extern "C" int	sperm(IDS *,struct ustat *,int) ;
-extern "C" int	isprintlatin(int) ;
-extern "C" int	isdigitlatin(int) ;
-extern "C" int	isFailOpen(int) ;
-extern "C" int	isNotPresent(int) ;
-extern "C" int	isNotAccess(int) ;
 
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
