@@ -20,8 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<vecitem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	NG		vecitem

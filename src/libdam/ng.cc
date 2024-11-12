@@ -5,7 +5,6 @@
 /* search (and other things) a newsgroup list for a newsgroup name */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SAFE		1
 
 /* revision history:
@@ -95,10 +94,6 @@ int ng_finish(NG *ngp) noex {
 	if (ngp == NULL) return SR_FAULT ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("mg_finish: ent\n") ;
-#endif
-
 	for (i = 0 ; vecitem_get(ngp,i,&ep) >= 0 ; i += 1) {
 	    if (ep != NULL) {
 
@@ -120,10 +115,6 @@ int ng_finish(NG *ngp) noex {
 	rs1 = vecitem_finish(ngp) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("mg_finish: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (mg_finish) */
@@ -135,10 +126,6 @@ int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
 
 #if	CF_SAFE
 	if (ngp == NULL) return SR_FAULT ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("ng_search: ent\n") ;
 #endif
 
 	if (rpp == NULL)
@@ -249,18 +236,9 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 
 	if (sl < 0) sl = strlen(sp) ;
 
-#if	CF_DEBUGS
-	debugprintf("ng_addparse: ent\n") ;
-	debugprintf("ng_addparse: > %t\n",sp,sl) ;
-#endif
-
 	if ((rs = ema_start(&aid)) >= 0) {
 	    if ((rs = ema_parse(&aid,sp,sl)) > 0) {
 		int	i ;
-
-#if	CF_DEBUGS
-	        debugprintf("ng_addparse: got some ema\n") ;
-#endif
 
 	        for (i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
 	            if ((ep != NULL) && (! ep->f.error)) {
@@ -292,10 +270,6 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 	    rs1 = ema_finish(&aid) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ema) */
-
-#if	CF_DEBUGS
-	debugprintf("ng_addparse: ret rs=%d n=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }

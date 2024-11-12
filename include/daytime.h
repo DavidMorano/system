@@ -27,8 +27,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<pthread.h>
-#include	<ptm.h>
-#include	<ptc.h>
 #include	<vecpstr.h>
 #include	<sreq.h>
 
@@ -36,7 +34,6 @@
 
 
 /* object defines */
-
 #define	DAYTIME			struct daytime_head
 #define	DAYTIME_FL		struct daytime_flags
 #define	DAYTIME_MAGIC		0x88773424
@@ -50,8 +47,6 @@ struct daytime_flags {
 struct daytime_head {
 	cchar		*pr ;
 	mainv		envv ;
-	ptm		m ;		/* mutex */
-	ptc		c ;		/* condition variable */
 	SREQ		*jep ;
 	vecpstr		args ;
 	volatile int	f_abort ;	/* command from parent thread */
