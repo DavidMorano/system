@@ -330,8 +330,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	    }
 	    if (rs >= 0) {
 		cint	tsize = (n * esize) ;
-	        void	*vp{} ;
-	        if ((rs = uc_malloc(tsize,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = uc_malloc(tsize,&vp)) >= 0) {
 	            ENT		**hepp = (ENT **) vp ;
 	            memclear(hepp,tsize) ;
 	            op->htlen = n ;
@@ -357,19 +356,19 @@ int hdb_finish(hdb *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hdb_magic(op)) >= 0) {
-		{
-	            rs1 = hdb_delall(op) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-	        if (op->htaddr) {
-	            rs1 = uc_free(op->htaddr) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->htaddr = nullptr ;
-		}
-	        if (op->at > 0) {
-	            rs1 = lookaside_finish(op->esp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
+	    {
+	        rs1 = hdb_delall(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->htaddr) {
+	        rs1 = uc_free(op->htaddr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->htaddr = nullptr ;
+	    }
+	    if (op->at > 0) {
+	        rs1 = lookaside_finish(op->esp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    {
 	        rs1 = hdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -382,27 +381,30 @@ int hdb_finish(hdb *op) noex {
 
 int hdb_delall(hdb *op) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = hdb_magic(op)) >= 0) {
-	        ENT	**hepp = op->htaddr ;
-	        for (int idx = 0 ; idx < op->htlen ; idx += 1) {
-	            ENT	*hp, *next, *nhp, *nnhp ;
-	            for (hp = hepp[idx] ; hp ; hp = next) {
-	                if (hp->same != nullptr) {
-	                    nhp = hp->same ;
-	                    while (nhp->same != nullptr) {
-	                        nnhp = nhp->same ;
-	                        hdb_entdel(op,nhp) ;
-	                        nhp = nnhp ;
-	                    } /* end while */
+	    ENT		**hepp = op->htaddr ;
+	    for (int idx = 0 ; idx < op->htlen ; idx += 1) {
+	        ENT	*hp, *next, *nhp, *nnhp ;
+	        for (hp = hepp[idx] ; hp ; hp = next) {
+	            if (hp->same != nullptr) {
+	                nhp = hp->same ;
+	                while (nhp->same != nullptr) {
+	                    nnhp = nhp->same ;
 	                    hdb_entdel(op,nhp) ;
-	                } /* end if (freeing intermediate entries) */
-	                next = hp->next ;
-	                hp->next = nullptr ;	/* optional */
-	                hdb_entdel(op,hp) ;
-	            } /* end for */
-	            hepp[idx] = nullptr ;
+	                    nhp = nnhp ;
+	                } /* end while */
+	                rs1 = hdb_entdel(op,nhp) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (freeing intermediate entries) */
+	            next = hp->next ;
+	            hp->next = nullptr ;	/* optional */
+	            rs1 = hdb_entdel(op,hp) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end for */
-	        op->count = 0 ;
+	        hepp[idx] = nullptr ;
+	    } /* end for */
+	    op->count = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -411,37 +413,36 @@ int hdb_delall(hdb *op) noex {
 int hdb_store(hdb *op,HDB_D key,DAT val) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,key.buf)) >= 0) {
-	        if (key.len < 0) {
-	            key.len = voidlen(key.buf) ;
-	        }
-	        if (val.buf && (val.len < 0)) {
-	            key.len = voidlen(key.buf) ;
-	        }
-	        if (op->count >= (op->htlen * 1)) {
-	            rs = hdb_ext(op) ;
-	        }
-	        if (rs >= 0) {
-	            ENT		*ep{} ;
-	            if ((rs = hdb_entnew(op,&ep)) >= 0) {
-	                ENT	*ohp ;
-	                uint	hv = (*op->hashfunc)(key.buf,key.len) ;
-	                if ((rs = entry_load(ep,hv,&key,&val)) >= 0) {
-		            ENT	**nextp = getpoint(op,hv,&key) ;
-	                    ohp = *nextp ;
-	                    if (ohp) {
-	                        while (ohp->same) {
-	                            ohp = ohp->same ;
-	                        }
-	                        ohp->same = ep ;
-	                    } else {
-	                        *nextp = ep ;	/* append to hash chain */
-	                    } /* end if */
-	                    op->count += 1 ;
+	    if (key.len < 0) {
+	        key.len = voidlen(key.buf) ;
+	    }
+	    if (val.buf && (val.len < 0)) {
+	        key.len = voidlen(key.buf) ;
+	    }
+	    if (op->count >= (op->htlen * 1)) {
+	        rs = hdb_ext(op) ;
+	    }
+	    if (rs >= 0) {
+	        if (ENT *ep{} ; (rs = hdb_entnew(op,&ep)) >= 0) {
+	            ENT		*ohp ;
+	            uint	hv = (*op->hashfunc)(key.buf,key.len) ;
+	            if ((rs = entry_load(ep,hv,&key,&val)) >= 0) {
+		        ENT	**nextp = getpoint(op,hv,&key) ;
+	                ohp = *nextp ;
+	                if (ohp) {
+	                    while (ohp->same) {
+	                        ohp = ohp->same ;
+	                    }
+	                    ohp->same = ep ;
 	                } else {
-	                    hdb_entdel(op,ep) ;
-	                }
-	            } /* end if (hdb_entnew) */
-	        } /* end if (ok) */
+	                    *nextp = ep ;	/* append to hash chain */
+	                } /* end if */
+	                op->count += 1 ;
+	            } else {
+	                hdb_entdel(op,ep) ;
+	            }
+	        } /* end if (hdb_entnew) */
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -460,33 +461,33 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = hdb_magic(op,key.buf)) >= 0) {
-	        ENT	*hp ;
-	        ENT	**nextp ;
-	        uint	hv = (*op->hashfunc)(key.buf,key.len) ;
-	        if (key.len < 0) {
-	            key.len = voidlen(key.buf) ;
-	        }
-/* get the point of deletion (if there is one) */
-	        nextp = getpoint(op,hv,&key) ;
-	        hp = *nextp ;
-	        if (hp != nullptr) {
-	            int	ocount = op->count ;
-/* unlink this entry from the chain */
-	            *nextp = hp->next ;			/* skip this entry */
-	            hp->next = nullptr ;
-/* OK, we are isolated now from the chain */
-	            while (hp->same != nullptr) {
-	        	ENT	*nhp = hp->same ;
-	                op->count -= 1 ;
-	                hdb_entdel(op,hp) ;
-	                hp = nhp ;
-	            } /* end while */
-	            op->count -= 1 ;
+	    ENT		*hp ;
+	    ENT		**nextp ;
+	    uint	hv = (*op->hashfunc)(key.buf,key.len) ;
+	    if (key.len < 0) {
+	        key.len = voidlen(key.buf) ;
+	    }
+	    /* get the point of deletion (if there is one) */
+	    nextp = getpoint(op,hv,&key) ;
+	    hp = *nextp ;
+	    if (hp != nullptr) {
+	        int	ocount = op->count ;
+		/* unlink this entry from the chain */
+	        *nextp = hp->next ;			/* skip this entry */
+	        hp->next = nullptr ;
+		/* OK, we are isolated now from the chain */
+	        while (hp->same != nullptr) {
+		    ENT	*nhp = hp->same ;
+		    op->count -= 1 ;
 	            hdb_entdel(op,hp) ;
-	            n = (ocount - op->count) ;
-	        } else {
-	            rs = SR_NOTFOUND ;
-	        }
+	            hp = nhp ;
+	        } /* end while */
+	        op->count -= 1 ;
+	        hdb_entdel(op,hp) ;
+	        n = (ocount - op->count) ;
+	    } else {
+	        rs = SR_NOTFOUND ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -507,91 +508,91 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
-	        ENTRYINFO	ei{} ;
-	        cursor_stabilize(curp) ;
-	        if ((rs = hdb_getentry(op,&ei,curp)) >= 0) {
-	            CUR		ncur = *curp ;
-	            ENT		**hepp = op->htaddr ;
-	            ENT		*ep = ei.ep ;
-	            ENT		*pjep = ei.pjep ;
-	            ENT		*pkep = ei.pkep ;
-	            int		i, j ;
-        /* determine any necessary cursor adjustment */
-	            if (f_adv) {
-	                if (ep->same == nullptr) { /* code-reviewed */
-	                    ncur.k = 0 ;
-	                    if (ep->next == nullptr) {
-				cint	htlen = op->htlen ;
-	                        ncur.j = 0 ;
-	                        for (i = (ncur.i + 1) ; i < htlen ; i += 1) {
-	                            if (hepp[i] != nullptr) break ;
-	                        }
-	                        ncur.i = i ;
-	                    } else {
-	                        ncur.j += 1 ;
-		            }
-	                } /* end if */
-	            } else {
-	                if (curp->k == 0) {
-	            	    ENT		*pep{} ;
-	                    int		k ;
-	                    if (curp->j == 0) {
-	                        ncur.j = 0 ;
-	                        ncur.k = 0 ;
-	                        for (i = (curp->i - 1) ; i >= 0 ; i -= 1) {
-	                            if (hepp[i] != nullptr) break ;
-	                        }
-	                        if (i >= 0) {
-	                            pep = hepp[i] ;
-	                            for (j = 0 ; pep->next ; j += 1) {
-	                                pep = pep->next ;
-	                            }
-	                            ncur.j = j ;
-	                            for (k = 0 ; pep->same ; k += 1) {
-	                                pep = pep->same ;
-	                            }
-	                            ncur.k = k ;
-	                        }
-	                        ncur.i = i ;
-	                    } else {
-	                        ncur.j = (curp->j - 1) ;
-	                        pep = pjep ;
-	                        for (k = 0 ; pep->same ; k += 1) {
-	                            pep = pep->same ;
-	                        }
-	                        ncur.k = k ;
-	                    }
-	                } else {
-	                    ncur.k = (curp->k - 1) ;
-	                }
-	            } /* end if (cursor disposition) */
-        /* do all necessary list pointer adjustments */
-	            if (curp->k == 0) { /* code-reviewed */
-	                i = curp->i ;
-	                if (curp->j == 0) {
-	                    if (ep->same != nullptr) {
-	                        (ep->same)->next = ep->next ;
-	                        hepp[i] = ep->same ;
-	                    } else {
-	                        hepp[i] = ep->next ;
-	                    }
-	                } else {
-	                    if (ep->same != nullptr) {
-	                        (ep->same)->next = ep->next ;
-	                        pjep->next = ep->same ;
-	                    } else {
-	                        pjep->next = ep->next ;
-		            }
-	                } /* end if */
-	            } else {
-	                pkep->same = ep->same ;
-	            }
-        /* update cursor */
-	            *curp = ncur ;
-        /* delete the entry itself (return to free-memory pool) */
-	            op->count -= 1 ;
-	            rs = hdb_entdel(op,ep) ;
-	        } /* end if (hdb_getentry) */
+            ENTRYINFO       ei{} ;
+            cursor_stabilize(curp) ;
+            if ((rs = hdb_getentry(op,&ei,curp)) >= 0) {
+                CUR         ncur = *curp ;
+                ENT         **hepp = op->htaddr ;
+                ENT         *ep = ei.ep ;
+                ENT         *pjep = ei.pjep ;
+                ENT         *pkep = ei.pkep ;
+                int         i, j ;
+    /* determine any necessary cursor adjustment */
+                if (f_adv) {
+                    if (ep->same == nullptr) { /* code-reviewed */
+                        ncur.k = 0 ;
+                        if (ep->next == nullptr) {
+                            cint    htlen = op->htlen ;
+                            ncur.j = 0 ;
+                            for (i = (ncur.i + 1) ; i < htlen ; i += 1) {
+                                if (hepp[i] != nullptr) break ;
+                            }
+                            ncur.i = i ;
+                        } else {
+                            ncur.j += 1 ;
+                        }
+                    } /* end if */
+                } else {
+                    if (curp->k == 0) {
+                        ENT         *pep{} ;
+                        int         k ;
+                        if (curp->j == 0) {
+                            ncur.j = 0 ;
+                            ncur.k = 0 ;
+                            for (i = (curp->i - 1) ; i >= 0 ; i -= 1) {
+                                if (hepp[i] != nullptr) break ;
+                            }
+                            if (i >= 0) {
+                                pep = hepp[i] ;
+                                for (j = 0 ; pep->next ; j += 1) {
+                                    pep = pep->next ;
+                                }
+                                ncur.j = j ;
+                                for (k = 0 ; pep->same ; k += 1) {
+                                    pep = pep->same ;
+                                }
+                                ncur.k = k ;
+                            }
+                            ncur.i = i ;
+                        } else {
+                            ncur.j = (curp->j - 1) ;
+                            pep = pjep ;
+                            for (k = 0 ; pep->same ; k += 1) {
+                                pep = pep->same ;
+                            }
+                            ncur.k = k ;
+                        }
+                    } else {
+                        ncur.k = (curp->k - 1) ;
+                    }
+                } /* end if (cursor disposition) */
+    /* do all necessary list pointer adjustments */
+                if (curp->k == 0) { /* code-reviewed */
+                    i = curp->i ;
+                    if (curp->j == 0) {
+                        if (ep->same != nullptr) {
+                            (ep->same)->next = ep->next ;
+                            hepp[i] = ep->same ;
+                        } else {
+                            hepp[i] = ep->next ;
+                        }
+                    } else {
+                        if (ep->same != nullptr) {
+                            (ep->same)->next = ep->next ;
+                            pjep->next = ep->same ;
+                        } else {
+                            pjep->next = ep->next ;
+                        }
+                    } /* end if */
+                } else {
+                    pkep->same = ep->same ;
+                }
+    /* update cursor */
+                *curp = ncur ;
+    /* delete the entry itself (return to free-memory pool) */
+                op->count -= 1 ;
+                rs = hdb_entdel(op,ep) ;
+            } /* end if (hdb_getentry) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -613,36 +614,36 @@ int hdb_fetch(hdb *op,HDB_D key,CUR *curp,DAT *valp) noex {
 int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp,key.buf)) >= 0) {
-	        FETCUR		fc ;
-	        CUR		ncur ;
-	        int		htlen = op->htlen ;
-		hdbhash_f	hf = op->hashfunc ;
-	        if (key.len < 0) {
-	            key.len = voidlen(key.buf) ;
-	        }
-	        if (curp) {
-	            ncur = *curp ;
-	        } else {
-	            ncur = icur ;
-	        }
-	        if ((rs = fetchcur_start(&fc,hf,htlen,&ncur,&key)) >= 0) {
-	            ENT		*ep{} ;
-	            rs = hdb_findkeye(op,&fc,&key,&ep) ;
-	            if ((rs == SR_NOTFOUND) && (fetchcur_adv(&fc) >= 0)) {
-	                rs = hdb_findkeye(op,&fc,&key,&ep) ;
-	            }
-	            if (rs >= 0) {
-	                if (curp != nullptr) *curp = ncur ;
-	                if (ep) {
-	                    if (keyp) *keyp = ep->key ;
-	                    if (valp) *valp = ep->val ;
-	                }
-	            }
-	        } /* end if (fetchcur_start) */
-	        if (rs < 0) {
-	            if (keyp) *keyp = nulldatum ;
-	            if (valp) *valp = nulldatum ;
-	        } /* end if */
+            FETCUR          fc ;
+            CUR             ncur ;
+            int             htlen = op->htlen ;
+            hdbhash_f       hf = op->hashfunc ;
+            if (key.len < 0) {
+                key.len = voidlen(key.buf) ;
+            }
+            if (curp) {
+                ncur = *curp ;
+            } else {
+                ncur = icur ;
+            }
+            if ((rs = fetchcur_start(&fc,hf,htlen,&ncur,&key)) >= 0) {
+                ENT         *ep{} ;
+                rs = hdb_findkeye(op,&fc,&key,&ep) ;
+                if ((rs == SR_NOTFOUND) && (fetchcur_adv(&fc) >= 0)) {
+                    rs = hdb_findkeye(op,&fc,&key,&ep) ;
+                }
+                if (rs >= 0) {
+                    if (curp != nullptr) *curp = ncur ;
+                    if (ep) {
+                        if (keyp) *keyp = ep->key ;
+                        if (valp) *valp = ep->val ;
+                    }
+                }
+            } /* end if (fetchcur_start) */
+            if (rs < 0) {
+                if (keyp) *keyp = nulldatum ;
+                if (valp) *valp = nulldatum ;
+            } /* end if */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -681,52 +682,52 @@ int hdb_next(hdb *op,CUR *curp) noex {
 int hdb_curenum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
-	        CUR	ncur ;
-	        ENT	*ep = nullptr ;
-                ENT	**hepp = op->htaddr ;
-		rs = SR_NOTFOUND ;
-	        if (curp != nullptr) {
-	            ncur = *curp ;
-	        } else {
-	            ncur = icur ;
-	        }
-	        cursor_inc(&ncur) ;
-	        while (ncur.i < op->htlen) {
-	            ENT		*jep ;
-	            if ((jep = hepp[ncur.i]) != nullptr) {
-		        int	j = 0 ; /* <- used afterwards */
-	                for (j = 0 ; j < ncur.j ; j += 1) {
-	                    if (jep->next == nullptr) break ;
-	                    jep = jep->next ;
-	                } /* end for */
-	                if (j == ncur.j) {
-	                    while (jep != nullptr) {
-			        int	k = 0 ;	/* <- used afterwards */
-	                        ep = jep ;
-	                        for (k = 0 ; k < ncur.k ; k += 1) {
-	                            if (ep->same == nullptr) break ;
-	                            ep = ep->same ;
-	                        } /* end for */
-	                        if (k == ncur.k) {
-	                            rs = SR_OK ;
-	                            break ;
-	                        }
-	                        jep = jep->next ;
-	                        ncur.j += 1 ;
-	                        ncur.k = 0 ;
-	                    } /* end while */
-	                    if (rs >= 0) break ;
-	                } /* end if */
-	            } /* end if (have_i) */
-	            ncur.i += 1 ;
-	            ncur.j = 0 ;
-	            ncur.k = 0 ;
-	        } /* end while */
-	        if ((rs >= 0) && ep) {
-	            if (curp) *curp = ncur ;
-	            if (keyp) *keyp = ep->key ;
-	            if (valp) *valp = ep->val ;
-	        } /* end if (found an entry) */
+            CUR     ncur ;
+            ENT     *ep = nullptr ;
+            ENT     **hepp = op->htaddr ;
+            rs = SR_NOTFOUND ;
+            if (curp != nullptr) {
+                ncur = *curp ;
+            } else {
+                ncur = icur ;
+            }
+            cursor_inc(&ncur) ;
+            while (ncur.i < op->htlen) {
+                ENT         *jep ;
+                if ((jep = hepp[ncur.i]) != nullptr) {
+                    int     j = 0 ; /* <- used afterwards */
+                    for (j = 0 ; j < ncur.j ; j += 1) {
+                        if (jep->next == nullptr) break ;
+                        jep = jep->next ;
+                    } /* end for */
+                    if (j == ncur.j) {
+                        while (jep != nullptr) {
+                            int     k = 0 ; /* <- used afterwards */
+                            ep = jep ;
+                            for (k = 0 ; k < ncur.k ; k += 1) {
+                                if (ep->same == nullptr) break ;
+                                ep = ep->same ;
+                            } /* end for */
+                            if (k == ncur.k) {
+                                rs = SR_OK ;
+                                break ;
+                            }
+                            jep = jep->next ;
+                            ncur.j += 1 ;
+                            ncur.k = 0 ;
+                        } /* end while */
+                        if (rs >= 0) break ;
+                    } /* end if */
+                } /* end if (have_i) */
+                ncur.i += 1 ;
+                ncur.j = 0 ;
+                ncur.k = 0 ;
+            } /* end while */
+            if ((rs >= 0) && ep) {
+                if (curp) *curp = ncur ;
+                if (keyp) *keyp = ep->key ;
+                if (valp) *valp = ep->val ;
+            } /* end if (found an entry) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -736,7 +737,7 @@ int hdb_curenum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 int hdb_count(hdb *op) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op)) >= 0) {
-		rs = op->count ;
+	    rs = op->count ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -745,7 +746,7 @@ int hdb_count(hdb *op) noex {
 int hdb_curbegin(hdb *op,CUR *curp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
-		*curp = icur ;
+	    *curp = icur ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -754,7 +755,7 @@ int hdb_curbegin(hdb *op,CUR *curp) noex {
 int hdb_curend(hdb *op,CUR *curp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
-		*curp = icur ;
+	    *curp = icur ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -763,7 +764,7 @@ int hdb_curend(hdb *op,CUR *curp) noex {
 int hdb_hashtablen(hdb *op,uint *rp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,rp)) >= 0) {
-		*rp = op->htlen ;
+	    *rp = op->htlen ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -773,28 +774,28 @@ int hdb_hashtabcounts(hdb *op,int *rp,int n) noex {
 	int		rs ;
 	int		tc = 0 ;
 	if ((rs = hdb_magic(op,rp)) >= 0) {
-		rs = SR_INVALID ;
-	        if (n >= op->htlen) {
-	            ENT		**hepp ;
-	            ENT		*hp ;
-	            int		hi ;
-		    rs = SR_OK ;
-	            for (hi = 0 ; hi < op->htlen ; hi += 1) {
-	                int	c = 0 ;
-	                hepp = (op->htaddr + hi) ;
-	                for (hp = *hepp ; hp ; hp = hp->next) {
-	                    c += 1 ;
-	                    if (hp->same) {
-	                        ENT	*sep ;
-	                        for (sep = hp->same ; sep ; sep = sep->same) {
-	                            c += 1 ;
-	                        }
-	                    } /* end if (same keys) */
-	                } /* end for */
-	                rp[hi] = c ;
-	                tc += c ;
-	            } /* end for */
-	        } /* end if (valid) */
+            rs = SR_INVALID ;
+            if (n >= op->htlen) {
+                ENT         **hepp ;
+                ENT         *hp ;
+                int         hi ;
+                rs = SR_OK ;
+                for (hi = 0 ; hi < op->htlen ; hi += 1) {
+                    int     c = 0 ;
+                    hepp = (op->htaddr + hi) ;
+                    for (hp = *hepp ; hp ; hp = hp->next) {
+                        c += 1 ;
+                        if (hp->same) {
+                            ENT     *sep ;
+                            for (sep = hp->same ; sep ; sep = sep->same) {
+                                c += 1 ;
+                            }
+                        } /* end if (same keys) */
+                    } /* end for */
+                    rp[hi] = c ;
+                    tc += c ;
+                } /* end for */
+            } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tc : rs ;
 }
@@ -804,25 +805,25 @@ int hdb_audit(hdb *op) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = hdb_magic(op)) >= 0) {
-		ENT	**hepp = op->htaddr ;
-	        for (int i = 0 ; i < op->htlen ; i += 1) {
-	            ENT		*ep ;
-	            int		j = 0 ;
-	            for (ep = hepp[i] ; ep ; (ep = ep->next),(j += 1)) {
-	                n += 1 ;
-	                while ((rs >= 0) && ep->same) {
-	                    n += 1 ;
-	                    ep = ep->same ;
-	                } /* end while */
-	                if (rs < 0) break ;
-	            } /* end for */
-	            if (rs < 0) break ;
-	        } /* end for */
-	        if (rs >= 0) {
-	            if (n != op->count) {
-	                rs = SR_BADFMT ;
-	            }
-	        }
+            ENT     **hepp = op->htaddr ;
+            for (int i = 0 ; i < op->htlen ; i += 1) {
+                ENT         *ep ;
+                int         j = 0 ;
+                for (ep = hepp[i] ; ep ; (ep = ep->next),(j += 1)) {
+                    n += 1 ;
+                    while ((rs >= 0) && ep->same) {
+                        n += 1 ;
+                        ep = ep->same ;
+                    } /* end while */
+                    if (rs < 0) break ;
+                } /* end for */
+                if (rs < 0) break ;
+            } /* end for */
+            if (rs >= 0) {
+                if (n != op->count) {
+                    rs = SR_BADFMT ;
+                }
+            } /* end if (OK) */
 	} /* end if (magic) */
 	return rs ;
 }
