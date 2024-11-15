@@ -48,6 +48,9 @@ const char syswords::w_users[] =	"users" ;
 const char syswords::w_help[] =		"help" ;
 const char syswords::w_lib[] =		"lib" ;
 
+const char syswords::w_bindir[] =	"/bin" ;
+const char syswords::w_sbindir[] =	"/sbin" ;
+const char syswords::w_usrdir[] =	"/usr" ;
 const char syswords::w_etcdir[] =	"/etc" ;
 const char syswords::w_tmpdir[] =	"/tmp" ;
 const char syswords::w_devdir[] =	"/dev" ;

@@ -137,6 +137,7 @@ extern "C" {
 /* forward references */
 
 static int	vecstr_ctor(vecstr *) noex ;
+static int	vecstr_dtor(vecstr *) noex ;
 static int	vecstr_setopts(vecstr *,int) noex ;
 static int	vecstr_extvec(vecstr *,int = 0) noex ;
 static int	vecstr_addsp(vecstr *,cchar *) noex ;
@@ -180,14 +181,16 @@ int vecstr_start(vecstr *op,int n,int opts) noex {
 	    op->n = n ;
 	    if ((rs = vecstr_setopts(op,opts)) >= 0) {
 	        cint	sz = (n + 1) * szof(cchar **) ;
-	        void	*va{} ;
-	        if ((rs = uc_libmalloc(sz,&va)) >= 0) {
+	        if (void *va{} ; (rs = uc_libmalloc(sz,&va)) >= 0) {
 	            op->va = (cchar **) va ;
 	            op->va[0] = nullptr ;
 	            op->stsize = 1 ;
 		    op->f.stsize = true ;	/* starts off true */
 	        }
 	    } /* end if */
+	    if (rs < 0) {
+		vecstr_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -215,6 +218,10 @@ int vecstr_finish(vecstr *op) noex {
 	    op->i = 0 ;
 	    op->n = 0 ;
 	    op->c = 0 ;
+	    {
+		rs1 = vecstr_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -533,9 +540,8 @@ int vecstr_searchl(vecstr *op,cchar *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
 	int		rs1 ;
 	int		i = -1 ;
 	if (op && sp) {
-	    nulstr	ns ;
 	    cchar	*s{} ;
-	    if ((rs = ns.start(sp,sl,&s)) >= 0) {
+	    if (nulstr ns ; (rs = ns.start(sp,sl,&s)) >= 0) {
 		if ((rs = vecstr_search(op,s,vcf,rpp)) >= 0) {
 		    i = rs ;
 		} else if (rs == rsn) {
@@ -556,9 +562,9 @@ int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_NOTFOUND ;
+	    if (vcf == nullptr) vcf = vstrcmp ;
 	    if (op->va) {
-		int	i ;
-		if (vcf == nullptr) vcf = vstrcmp ;
+		int	i ; /* used-afterwards */
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i]) {
 	                if ((*vcf)(&sp,(op->va + i)) == 0) break ;
@@ -831,6 +837,15 @@ static int vecstr_ctor(vecstr *op) noex {
 }
 /* end subroutine (vecstr_ctor) */
 
+static int vecstr_dtor(vecstr *op) noex {
+	int		rs = SR_OK ;
+	if (op->va) {
+	    op->va = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (vecstr_dtor) */
+
 static int vecstr_setopts(vecstr *op,int vo) noex {
 	int		rs = SR_INVALID ;
 	if ((vo & (~optmask)) == 0) {
@@ -979,6 +994,14 @@ int vecstr::envset(cchar *kp,cchar *valp,int vall) noex {
 
 int vecstr::envfile(cchar *fn) noex {
 	return vecstr_envfile(this,fn) ;
+}
+
+int vecstr::search(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
+	return vecstr_search(this,s,vcmp,rpp) ;
+}
+
+int vecstr::finder(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
+	return vecstr_finder(this,s,vcmp,rpp) ;
 }
 
 int vecstr::getvec(mainv *rppp) noex {

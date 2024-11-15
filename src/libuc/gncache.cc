@@ -195,7 +195,7 @@ int gncache_start(GN *op,int nmax,int to) noex {
 	    if (rs < 0) {
 		gncache_dtor(op) ;
 	    }
-	} /* end if (gncache_dtor) */
+	} /* end if (gncache_ctor) */
 	return rs ;
 }
 /* end subroutine (gncache_start) */

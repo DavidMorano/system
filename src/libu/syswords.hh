@@ -50,6 +50,9 @@ struct syswords {
 	static const char w_users[] ;
 	static const char w_help[] ;
 	static const char w_lib[] ;
+	static const char w_bindir[] ;
+	static const char w_sbindir[] ;
+	static const char w_usrdir[] ;
 	static const char w_etcdir[] ;
 	static const char w_tmpdir[] ;
 	static const char w_devdir[] ;

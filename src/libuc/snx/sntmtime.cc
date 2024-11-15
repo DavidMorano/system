@@ -150,12 +150,11 @@ int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf && tmp && fmt) {
-	    sbuf	ss, *ssp = &ss ;
-	    if ((rs = sbuf_start(ssp,dbuf,dlen)) >= 0) {
+	    if (sbuf ss ; (rs = ss.start(dbuf,dlen)) >= 0) {
 	        {
 	            rs = sbuf_fmtstrs(&ss,tmp,fmt) ;
 	        }
-	        rs1 = sbuf_finish(&ss) ; /* <- return value */
+	        rs1 = ss.finish ; /* <- return value */
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 	} /* end if (non-null) */
@@ -169,8 +168,8 @@ int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex {
 static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
 	if (ssp && tmp) {
-	    cchar	**m = calstrs_months ;
-	    cchar	**d = calstrs_days ;
+	    cchar	*const *m = calstrs_months ;
+	    cchar	*const *d = calstrs_days ;
 	    rs = SR_OK ;
 	    while ((rs >= 0) && *fmt) {
 	        int	ch = mkchar(*fmt++) ;
@@ -450,7 +449,7 @@ static int sbuf_datex(sbuf *ssp,TMTIME *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
 	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {
-		cchar	**m = calstrs_months ;
+		cchar	*const *m = calstrs_months ;
 	        if ((rs = sbuf_strw(ssp,m[tmp->mon],3)) >= 0) {
 	    	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {
 	        	rs = sbuf_year(ssp,tmp) ;

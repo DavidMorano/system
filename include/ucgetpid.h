@@ -43,10 +43,17 @@ namespace libuc {
 	int operator () () noex {
 	    return operator int () ;
 	} ;
-    } ; /* end struct (ucpagesizer) */
+    } ; /* end struct (ucpider) */
+    struct ucsider {
+    	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (ucsider) */
 }
 
 extern libuc::ucpider		ucpid ;
+extern libuc::ucsider		ucsid ;
 
 #endif /* __cplusplus */
 

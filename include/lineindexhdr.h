@@ -1,6 +1,6 @@
 /* lineindexhdr HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (confirmance reviewed) */
 
 /* Password-Index Header (PWI) */
 /* version %I% last-modified %G% */
@@ -41,7 +41,7 @@ struct lineindexhdr_head {
 	uchar		vetu[4] ;
 } ;
 
-typedef LINEINDEXHDR		lineindexhdr ;
+typedef LINEINDEXHDR	lineindexhdr ;
 
 EXTERNC_begin
 

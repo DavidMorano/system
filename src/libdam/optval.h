@@ -1,4 +1,5 @@
 /* optval HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* divine a value (boolean or otherwise) out of a c-sring */

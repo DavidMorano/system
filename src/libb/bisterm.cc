@@ -1,4 +1,5 @@
 /* bisterm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine is the current I-O stream is a terminal */

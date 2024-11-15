@@ -87,6 +87,7 @@ static inline int b64decoder_dtor(b64decoder *op) noex {
 	}
 	return rs ;
 }
+/* end subroutine (b64decoder_dtor) */
 
 template<typename ... Args>
 static inline int b64decoder_magic(b64decoder *op,Args ... args) noex {
@@ -131,16 +132,16 @@ int b64decoder_finish(b64decoder *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if ((rs = b64decoder_magic(op)) >= 0) {
-	        if (op->outbuf) {
+	    if (op->outbuf) {
 	            obuf 	*obp = (obuf *) op->outbuf ;
 	            delete obp ;
 	            op->outbuf = nullptr ;
-	        }
-	        {
-		    rs1 = b64decoder_dtor(op) ;
-		    if (rs >= 0) rs = rs1 ;
-	        }
-	        op->magic = 0 ;
+	    }
+	    {
+		rs1 = b64decoder_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

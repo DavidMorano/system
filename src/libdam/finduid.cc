@@ -166,9 +166,9 @@ constexpr bool	f_tmpxearly = CF_TMPXEARLY ;
 
 int finduid_start(finduid *op,int nmax,int ttl) noex {
 	int		rs ;
-	if ((rs = finduid_ctor(op)) >= 0) {
 	if (nmax < FINDUID_DEFMAX) nmax = FINDUID_DEFMAX ;
 	if (ttl < FINDUID_DEFTTL) ttl = FINDUID_DEFTTL ;
+	if ((rs = finduid_ctor(op)) >= 0) {
 	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
 		if ((rs = pwcache_start(op->ucp,nmax,ttl)) >= 0) {
 		    if_constexpr (f_tmpxearly) {
@@ -201,12 +201,16 @@ int finduid_finish(finduid *op) noex {
 	        rs1 = finduid_tmpxclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->ucp) {
 	        rs1 = pwcache_finish(op->ucp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->mxp) {
 	        rs1 = ptm_destroy(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = finduid_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -243,7 +247,7 @@ int finduid_check(finduid *op,time_t dt) noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = finduid_magic(op)) >= 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    if ((rs = ptm_lock(op->mxp)) >= 0) {
 	        if (op->open.ut) {
 	            if ((dt - op->ti_utopen) >= INTUTOPEN) {
@@ -283,17 +287,16 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		ul = 0 ;
 	char		*pwbuf{} ;
 	if ((rs = malloc_pw(&pwbuf)) >= 0) {
-	    tmpx_cur	uc ;
-	    tmpx_ent	ue ;
 	    cint	utype = TMPX_TPROCUSER ;
 	    int		pwlen = rs ;
-	    if ((rs = tmpx_curbegin(op->utp,&uc)) >= 0) {
+	    if (tmpx_cur uc ; (rs = tmpx_curbegin(op->utp,&uc)) >= 0) {
+	    	tmpx_ent	ue ;
 		pwcache		*pwc = op->ucp ;
 		ucentpw		pw ;
 		time_t		ti_create = 0 ;
 		time_t		ut ;
 	        while (rs >= 0) { /* loop finding latest */
-		    rs1 = tmpx_enum(op->utp,&uc,&ue) ;
+		    rs1 = tmpx_curenum(op->utp,&uc,&ue) ;
 		    if (rs1 == SR_NOTFOUND) break ;
 		    ut = ue.ut_tv.tv_sec ;
 	            if ((ue.ut_type == utype) && (ut > ti_create)) {
@@ -327,7 +330,7 @@ static int finduid_tmpxopen(finduid *op) noex {
 	if (! op->open.ut) {
 	    tmpx	*txp = op->utp ;
 	    cint	of = O_RDONLY ;
-	    op->ti_utopen = time(nullptr) ;
+	    op->ti_utopen = getustime ;
 	    if ((rs = tmpx_open(txp,nullptr,of)) >= 0) {
 	        op->open.ut = true ;
 	    }

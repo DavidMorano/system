@@ -32,7 +32,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysdefs.h>
 
 #include	<syswords.hh>
 #include	<varnames.hh>

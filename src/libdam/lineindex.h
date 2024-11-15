@@ -1,10 +1,19 @@
 /* lineindex HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* line indexing object */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 2003-06-11, David A­D­ Morano
+	I snarfed this object (flavor) from the SS-Hammock processing
+	and lookup (access management) code.  We will see how it
+	works out!
+
+*/
 
 /* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 

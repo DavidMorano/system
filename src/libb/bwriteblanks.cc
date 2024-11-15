@@ -1,4 +1,5 @@
 /* bwriteblanks SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* write blanks */
@@ -39,6 +40,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -77,7 +80,7 @@ static int	bwritebuf(bfile *,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr cchar		blanks[] = "        " ;
+constexpr char		blanks[] = "        " ;
 
 constexpr int		nblanks = strlen(blanks) ;
 

@@ -1,4 +1,5 @@
 /* termstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to manage terminal database strings */
@@ -125,9 +126,11 @@ struct termtype {
 
 template<typename ... Args>
 static int termstr_ctor(termstr *op,Args ... args) noex {
+    	TERMSTR		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
+	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ti = -1 ;
@@ -169,7 +172,7 @@ static int	termstr_conseq(termstr *,int,int,...) noex ;
 
 /* local variables */
 
-static const struct termtype	terms[] = {
+constexpr termtype	terms[] = {
 	{ "sun", 0 },
 	{ "vt100", (TCF_MVT) },
 	{ "ansi", (TCF_MSR | TCF_MEC | TCF_MACV | TCF_MACSR | TCF_MACSRS) },
@@ -193,7 +196,7 @@ static const struct termtype	terms[] = {
 	{ nullptr, 0 }
 } ;
 
-static cchar	curtypes[] = "ABCD" ;
+constexpr char		curtypes[] = "ABCD" ;
 
 enum curtypes {
 	curtype_u,

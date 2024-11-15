@@ -76,7 +76,7 @@ namespace {
 	uint	d2 = 0 ;
 	int	mch = 0 ;
 	int operator () (char *,int) noex ;
-    } ;
+    } ; /* end struct (snxxx) */
 }
 
 
@@ -144,6 +144,24 @@ int snchrs(char *dp,int dl,int ch,int n) noex {
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (snchrs) */
+
+int snkeval(char *dp,int dl,cchar *k,cchar *valp,int vall) noex {
+    	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	if (dp && k && valp) {
+	    rs = SR_INVALID ;
+	    if (k[0]) {
+		if (storebuf sb(dp,dl) ; (rs = sb.str(k)) >= 0) {
+		    if ((rs = sb.chr('=')) >= 0) {
+			rs = sb.strw(valp,vall) ;
+		        rl = sb.idx ;
+		    }
+		} /* end if (storebuf) */
+	    } /* end if (non-zero key) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end subroutine (snkeval) */
 
 
 /* local subroutines */

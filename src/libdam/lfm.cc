@@ -187,15 +187,13 @@ static int	check_init(lfm_ch *) noex ;
 
 int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 		cc *nn,cc *un,cc *bn) noex {
+	int		rs = SR_OK ;
+	if ((rs = lfm_ctor(op,fname)) >= 0) {
 	custime		dt = getustime ;
 	cint		nnlen = NODENAMELEN ;
 	cint		unlen = USERNAMELEN ;
-	int		rs = SR_OK ;
 	char		nnbuf[NODENAMELEN + 1] ;
 	char		unbuf[USERNAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
 
 	if (to < 0) to = LFM_TOLOCK ;
 
@@ -230,11 +228,9 @@ int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 	}
 
 	if (rs >= 0) {
-	    int		fnl ;
-	    cchar	*fnp ;
-	    if ((fnl = sfnamecomp(fname,-1,&fnp)) > 0) {
-	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
+	    cchar	*fnp{} ;
+	    if (int fnl ; (fnl = sfnamecomp(fname,-1,&fnp)) > 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
 	            cint	fnlen = (rs-1) ;
 	            int		dnl ;
 	            cchar	*dnp ;
@@ -275,6 +271,10 @@ int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 	    if (lcp) lfm_lockload(op,lcp) ;
 	}
 
+	    if (rs < 0) {
+		lfm_dtor(op) ;
+	    }
+	} /* end if (lfm_ctor) */
 	return rs ;
 }
 /* end subroutine (lfm_start) */
@@ -746,6 +746,7 @@ static int lfm_lockend(lfm *op) noex {
 
 static int lfm_checklock(lfm *op,time_t dt) noex {
 	int		rs ;
+	int		rs1 ;
 	int		v = 0 ;
 	if ((rs = lfm_lockbegin(op)) >= 0) {
 	    bool	f_open = (rs > 0) ;

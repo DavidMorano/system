@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int daytime_ctor(lfm *op,Args ... args) noex {
+static int dialtab_ctor(dialtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int daytime_ctor(lfm *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (daytime_ctor) */
+/* end subroutine (dialtab_ctor) */
 
-static int daytime_dtor(lfm *op) noex {
+static int dialtab_dtor(dialtab *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (daytime_dtor) */
+/* end subroutine (dialtab_dtor) */
 
 template<typename ... Args>
-static inline int daytime_magic(lfm *op,Args ... args) noex {
+static inline int dialtab_magic(dialtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DAYTIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (daytime_magic) */
+/* end subroutine (dialtab_magic) */

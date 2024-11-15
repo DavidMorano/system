@@ -1,4 +1,5 @@
 /* printhelp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* print out a help file if we have one */
@@ -83,6 +84,7 @@
 
 /* imported namespaces */
 
+using std::nulptr_t ;			/* type */
 using std::ostream ;			/* type */
 
 
@@ -147,7 +149,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr cpcchar	schedule[] = {
+constexpr cpcchar	schedule[] = {
 	"%r/%l/%n/%n.%f",
 	"%r/%l/%n/%f",
 	"%r/share/help/%n.%f",
@@ -170,7 +172,7 @@ enum expkeys {
 	expkey_overlast
 } ;
 
-static constexpr cpcchar	expkeys[] = {
+constexpr cpcchar	expkeys[] = {
 	"SN",
 	"SS",
 	"PR",

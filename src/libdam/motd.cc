@@ -23,6 +23,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	motd
+
+	Description:
 	This object module writes the contents of various MOTDs (as
 	specified by the caller) to an open file descriptor (also
 	specified by the caller).
@@ -74,7 +78,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -241,7 +246,7 @@ static int	mapdir_procouter(MD *,cc **,cc *,int) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	schedmaps[] = {
+constexpr cpcchar	schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -250,7 +255,7 @@ static constexpr cpcchar	schedmaps[] = {
 	nullptr
 } ;
 
-static constexpr cpcchar	envbad[] = {
+constexpr cpcchar	envbad[] = {
 	"TMOUT",
 	"A__z",
 	nullptr
@@ -267,7 +272,7 @@ enum envstrs {
 	envstr_overlast
 } ;
 
-static constexpr cpcchar	envstrs[] = {
+constexpr cpcchar	envstrs[] = {
 	"USERNAME",
 	"GROUPNAME",
 	"UID",
@@ -280,7 +285,7 @@ static constexpr cpcchar	envstrs[] = {
 constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
 
-constexpr cchar		envpre[] = "MOTD_" ;	/* environment prefix */
+constexpr char		envpre[] = "MOTD_" ;	/* environment prefix */
 
 constexpr bool		f_writeto = CF_WRITETO ;
 
@@ -291,7 +296,7 @@ constexpr bool		f_writeto = CF_WRITETO ;
 /* exported subroutines */
 
 int motd_open(motd *op,cchar *pr) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = time(nullptr) ;
 	int		rs ;
 	cchar		*cp ;
 

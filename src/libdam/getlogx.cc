@@ -1,9 +1,11 @@
 /* getlogterm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the name of the controlling terminal for the current session */
 /* version %I% last-modified %G% */
 
+#define	CF_GETUTMPTERM	1		/* use |getutmpterm(3uc)| */
 
 /* revision history:
 
@@ -19,8 +21,10 @@
 /*******************************************************************************
 
 	Name:
+	getlogid
 	getlogname
 	getlogterm
+	getloghost
 
 	Description:
 	This subroutine will find and return the name of the
@@ -28,6 +32,7 @@
 	ID.
 
 	Synopsis:
+	int getlogid(char *rbuf,int rlen,pid_t sid) noex
 	int getlogname(char *rbuf,int rlen,pid_t sid) noex
 	int getlogterm(char *rbuf,int rlen,pid_t sid) noex
 	int getloghost(char *rbuf,int rlen,pid_t sid) noex
@@ -38,23 +43,24 @@
 	sid		session ID
 
 	Returns :
-	>=	length of returned c-string
-	<0	error (system-return)
+	>=0		length of returned c-string
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system types */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>
+#include	<getutmp.h>		/* |getutmpterm(3uc)| */
 #include	<tmpx.h>
-#include	<strwcpy.h>
-#include	<getutmpent.h>
+#include	<storebuf.h>
+#include	<mknpathxw.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
@@ -63,7 +69,9 @@
 
 /* local defines */
 
-#define	DEVDIR		"/dev/"
+#ifndef	CF_GETUTMPTERM
+#define	CF_GETUTMPTERM	1		/* use |getutmpterm(3uc)| */
+#endif
 
 
 /* imported namespaces */
@@ -71,6 +79,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -87,10 +96,23 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
+static int getusid(pid_t sid) noex {
+    	int	rs = int(sid) ;
+	if (sid < 0) {
+	    rs = ucsid ;
+	}
+	return rs ;
+}
+/* end subroutine (getusid) */
+
 
 /* local variables */
 
-constexpr cchar		devdir[] = DEVDIR ;
+constexpr int		lline = TMPX_LLINE ;
+constexpr int		luser = TMPX_LUSER ;
+constexpr int		lhost = TMPX_LHOST ;
+
+constexpr bool		f_getutmpterm = CF_GETUTMPTERM ;
 
 
 /* exported variables */
@@ -98,72 +120,87 @@ constexpr cchar		devdir[] = DEVDIR ;
 
 /* exported subroutines */
 
+int getlogid(char *rbuf,int rlen,pid_t sid) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (rlen > 0) {
+	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) {
+	            rs = sncpy(rbuf,rlen,ue.id) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (getlogid) */
+
 int getlogname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    utmpentx	e ;
+	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) >= 0) {
-	        rs = sncpy(rbuf,rlen,e.user) ;
-	    }
+	    if (rlen > 0) {
+	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) {
+	            rs = sncpy(rbuf,rlen,ue.user) ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getlogname) */
 
+static int getlogtermer(char *dbuf,int dlen,int usid) noex {
+	cnullptr	np{} ;
+	cint		of = O_RDONLY ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+        if (tmpx ut ; (rs = ut.open(np,of)) >= 0) {
+            if (tmpx_ent ue{} ; (rs = ut.fetchpid(&ue,usid)) >= 0) {
+		cchar	*devdir = sysword.w_devdir ;
+		rs = mknpathw(dbuf,dlen,devdir,ue.ut_line,lline) ;
+		len = rs ;
+            } /* end if (got it) */
+            rs1 = ut.close ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (UTMPX open) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (getlogtermer) */
+
 int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		len = 0 ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
+	    dbuf[0] = '\0' ;
 	    if (dlen > 0) {
-		cnullptr	np{} ;
-	        tmpx		utmp ;
-	        tmpx_ent	ue ;
-		cint		of = O_RDONLY ;
-	        if (sid <= 0) sid = u_getsid((pid_t) 0) ;
-	        if ((rs = tmpx_open(&utmp,np,of)) >= 0) {
-	            if ((rs = tmpx_fetchpid(&utmp,&ue,sid)) >= 0) {
-	                if (dlen >= 0) {
-	                    if (dlen >= 6) {
-				int	i ; /* used-afterwards */
-	                        strcpy(dbuf,devdir) ;
-	                        for (i = 0 ; i < min(32,dlen) ; i += 1) {
-			            if (ue.ut_line[i] == '\0') break ;
-	                            dbuf[5 + i] = ue.ut_line[i] ;
-			        } /* end for */
-	                        if ((i < 32) && (ue.ut_line[i] != '\0')) {
-	                            rs = SR_TOOBIG ;
-	                        } else {
-	                            dbuf[5 + i] = '\0' ;
-			        }
-	                        len = 5 + i ;
-	                    } else {
-	                        rs = SR_TOOBIG ;
-		            }
-	                } else {
-	                    strcpy(dbuf,devdir) ;
-	                    len = strwcpy(dbuf + 5,ue.ut_line,32) - dbuf ;
-	                }
-	            } /* end if (got it) */
-	            rs1 = tmpx_close(&utmp) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (UTMPX open) */
+		if_constexpr (f_getutmpterm) {
+		    rs = getutmpterm(dbuf,dlen,sid) ;
+		    len = rs ;
+		} else {
+		    if ((rs = getusid(sid)) >= 0) {
+		        rs = getlogtermer(dbuf,dlen,rs) ;
+		        len = rs ;
+		    } /* end if (getusid) */
+		} /* end if_constexpr (f_getutmpterm) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getlogterm) */
 
-int getloghost(char *rbuf,int rlen,pid_t sid) noex {
+int getloghost(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    utmpentx	e ;
-	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) >= 0) {
-	        rs = sncpy(rbuf,rlen,e.host) ;
-	    }
+	if (dbuf) {
+	    rs = SR_INVALID ;
+	    dbuf[0] = '\0' ;
+	    if (dlen > 0) {
+	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) {
+	            rs = sncpy(dbuf,dlen,ue.host) ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }

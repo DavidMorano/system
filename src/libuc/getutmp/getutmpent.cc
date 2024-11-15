@@ -1,4 +1,5 @@
 /* getutmpent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user information from UTMP database */
@@ -24,9 +25,10 @@
 
 	Synopsis:
 	int getutmpent(utmpentx *ep,pid_t sid) noex
+	int getutmpid(char *rbuf,int rlen,pid_t sid) noex
 	int getutmpname(char *rbuf,int rlen,pid_t sid) noex
-	int getutmphost(char *rbuf,int rlen,pid_t sid) noex
 	int getutmpline(char *rbuf,int rlen,pid_t sid) noex
+	int getutmphost(char *rbuf,int rlen,pid_t sid) noex
 
 	Arguments:
 	ep		pointer to UTMPENTX object
@@ -48,6 +50,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>
 #include	<utmpacc.h>
 #include	<strwcpy.h>
 #include	<sncpyx.h>
@@ -58,21 +61,13 @@
 
 /* local defines */
 
-#define	AEBUFLEN	sizeof(struct utmpx)
-
-#ifndef	VARUTMPLINE
-#define	VARUTMPLINE	"UTMPLINE"
-#endif
-#ifndef	VARLOGLINE
-#define	VARLOGLINE	"LOGLINE"
-#endif
-
 
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -91,9 +86,9 @@ namespace {
     typedef int (ufinder::*ufinder_m)() noex ;
     struct ufinder {
         utmpacc_ent	ae{} ;
-        char		*aebuf ;
+        char		*aebuf{} ;
 	pid_t		sid ;
-	int		aelen = AEBUFLEN ;
+	cint		aelen = szof(utmpx) ;
 	ufinder(pid_t i) noex : sid(i) { } ;
 	int start() noex ;
 	int finish() noex ;
@@ -101,11 +96,20 @@ namespace {
 	int trysid() noex ;
 	int tryline() noex ;
 	int trystat() noex ;
-    } ;
+    } ; /* end struct (ufinder) */
 }
 
 
 /* forward references */
+
+static int getusid(pid_t sid) noex {
+    	int		rs = int(sid) ;
+	if (sid < 0) {
+	    rs = ucsid ;
+	}
+	return rs ;
+}
+/* end subroutine (getusid) */
 
 static int utmpent_utmpacc(utmpentx *,pid_t) noex ;
 static int utmpent_load(utmpentx *,utmpacc_ent *) noex ;
@@ -120,9 +124,14 @@ constexpr ufinder_m	mems[] = {
 } ;
 
 constexpr cpcchar	utmpenvs[] = {
-	VARUTMPLINE,
-	VARLOGLINE
+	varname.utmpline,
+	varname.logline
 } ;
+
+constexpr int		lid = UTMPACC_LID ;
+constexpr int		luser = UTMPACC_LUSER ;
+constexpr int		lline = UTMPACC_LLINE ;
+constexpr int		lhost = UTMPACC_LHOST ;
 
 
 /* exported variables */
@@ -133,15 +142,16 @@ constexpr cpcchar	utmpenvs[] = {
 int getutmpent(utmpentx *ep,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    if (sid <= 0) sid = getsid(0) ;
-	    ep->id[0] = '\0' ;
-	    ep->line[0] = '\0' ;
-	    ep->user[0] = '\0' ;
-	    ep->host[0] = '\0' ;
-	    ep->session = 0 ;
-	    ep->date = 0 ;
-	    ep->sid = sid ;
-	    rs = utmpent_utmpacc(ep,sid) ;
+	    if ((rs = getusid(sid)) >= 0) {
+	        ep->id[0] = '\0' ;
+	        ep->line[0] = '\0' ;
+	        ep->user[0] = '\0' ;
+	        ep->host[0] = '\0' ;
+	        ep->session = 0 ;
+	        ep->date = 0 ;
+	        ep->sid = rs ;
+	        rs = utmpent_utmpacc(ep,sid) ;
+	    } /* end if (getusid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -150,11 +160,10 @@ int getutmpent(utmpentx *ep,pid_t sid) noex {
 int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    utmpentx	e{} ;
 	    if (rlen < 0) rlen = GETUTMPENT_LUSER ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy(rbuf,rlen,e.user) ;
+	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) {
+	        rs = sncpy(rbuf,rlen,ue.user) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -164,11 +173,10 @@ int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
 int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    utmpentx	e{} ;
 	    if (rlen < 0) rlen = GETUTMPENT_LHOST ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy(rbuf,rlen,e.host) ;
+	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) {
+	        rs = sncpy(rbuf,rlen,ue.host) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -178,11 +186,10 @@ int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    utmpentx	e{} ;
 	    if (rlen < 0) rlen = GETUTMPENT_LLINE ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = getutmpent(&e,sid)) > 0) {
-	        rs = sncpy(rbuf,rlen,e.line) ;
+	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) {
+	        rs = sncpy(rbuf,rlen,ue.line) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -194,7 +201,7 @@ int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 
 ufinder::operator int () noex {
 	int		rs = SR_OK ;
-	for (auto &m : mems) {
+	for (const auto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != 0) break ;
 	} /* end for */
@@ -223,7 +230,7 @@ int ufinder::tryline() noex {
 	static cint	oursid = getsid(0) ;
 	int		rs = SR_OK ;
 	if (sid == oursid) {
-	    for (auto const &vn : utmpenvs) {
+	    for (const auto &vn : utmpenvs) {
 	        if (cchar *line ; (line = getenv(vn)) != nullptr) {
 	            rs = utmpacc_entline(&ae,aebuf,aelen,line,-1) ;
 	        }
@@ -238,11 +245,10 @@ int ufinder::trystat() noex {
 }
 
 static int utmpent_utmpacc(utmpentx *ep,pid_t sid) noex {
-	ufinder		fo(sid) ;
 	int		rs ;
 	int		rs1 ;
 	int		ffound = false ;
-	if ((rs = fo.start()) >= 0) {
+	if (ufinder fo(sid) ; (rs = fo.start()) >= 0) {
 	    if ((rs = fo) > 0) {
 		ffound = true ;
 	        rs = utmpent_load(ep,&fo.ae) ;
@@ -258,10 +264,10 @@ static int utmpent_load(utmpentx *ep,utmpacc_ent *aep) noex {
 	int		rs = SR_FAULT ;
 	if (ep && aep) {
 	    rs = SR_OK ;
-	    strwcpy(ep->id,aep->id,min(GETUTMPENT_LID,UTMPACC_LID)) ;
-	    strwcpy(ep->user,aep->user,min(GETUTMPENT_LUSER,UTMPACC_LUSER)) ;
-	    strwcpy(ep->line,aep->line,min(GETUTMPENT_LLINE,UTMPACC_LLINE)) ;
-	    strwcpy(ep->host,aep->host,min(GETUTMPENT_LHOST,UTMPACC_LHOST)) ;
+	    strwcpy(ep->id,aep->id,min(GETUTMPENT_LID,lid)) ;
+	    strwcpy(ep->user,aep->user,min(GETUTMPENT_LUSER,luser)) ;
+	    strwcpy(ep->line,aep->line,min(GETUTMPENT_LLINE,lline)) ;
+	    strwcpy(ep->host,aep->host,min(GETUTMPENT_LHOST,lhost)) ;
 	    ep->session = aep->session ;
 	    ep->date = aep->ctime ;
 	    ep->sid = aep->sid ;

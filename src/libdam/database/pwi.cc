@@ -248,8 +248,8 @@ constexpr cpcchar	prbins[] = {
 	nullptr
 } ;
 
-constexpr cchar		extras[] = "°¹²³" ;
-constexpr cchar		progmkpwi[] = PROG_MKPWI ;
+constexpr char		extras[] = "°¹²³" ;
+constexpr char		progmkpwi[] = PROG_MKPWI ;
 
 constexpr bool		f_onlyuniq = CF_ONLYUNIQ ;
 

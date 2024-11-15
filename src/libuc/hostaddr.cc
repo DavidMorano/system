@@ -1,4 +1,5 @@
 /* hostaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manipulate host entry structures */
@@ -144,6 +145,7 @@ static inline int hostaddr_dtor(hostaddr *op) noex {
 	}
 	return rs ;
 }
+/* end subroutine (hostaddr_dtor) */
 
 template<typename ... Args>
 static inline int hostaddr_magic(hostaddr *op,Args ... args) noex {

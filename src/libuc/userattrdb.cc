@@ -125,6 +125,7 @@ static inline int userattrdb_dtor(userattrdb *op) noex {
 	}
 	return rs ;
 }
+/* end subroutine (userattrdb_dtor) */
 
 template<typename ... Args>
 static int userattrdb_magic(userattrdb *op,Args ... args) noex {

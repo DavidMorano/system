@@ -1,4 +1,5 @@
 /* bwriteblock SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* write a block data from a given file to the current file */

@@ -2631,14 +2631,12 @@ static int locinfo_wtime(LOCINFO *lip)
 	if (pip == NULL) return SR_FAULT ;
 
 	if (lip->wtime == 0) {
-	    TMPX	ut ;
-	    TMPX_CUR	uc ;
-	    TMPX_ENT	ue ;
-	    if ((rs = tmpx_open(&ut,NULL,0)) >= 0) {
-	        if ((rs = tmpx_curbegin(&ut,&uc)) >= 0) {
-	            int	utype ;
+	    if (tmpx ut ; (rs = tmpx_open(&ut,NULL,0)) >= 0) {
+	        if (tmpx_cur uc ; (rs = tmpx_curbegin(&ut,&uc)) >= 0) {
+	    	    tmpx_ent	ue ;
+	            int		utype ;
 	            while (rs >= 0) {
-	                rs1 = tmpx_enum(&ut,&uc,&ue) ;
+	                rs1 = tmpx_curenum(&ut,&uc,&ue) ;
 	                if (rs1 == SR_NOTFOUND) break ;
 	                rs = rs1 ;
 	                if (rs < 0) break ;

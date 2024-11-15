@@ -196,7 +196,7 @@ enum subs {
 	sub_overlast
 } ;
 
-constexpr cpcchar		subs[] = {
+constexpr cpcchar	subs[] = {
 	"open",
 	"getinfo",
 	"curbegin",
@@ -252,6 +252,10 @@ int sysrealname_close(SRN *op) noex {
 	    }
 	    {
 	        rs1 = sysrealname_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = sysrealname_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -326,14 +330,14 @@ int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
 	        if (callp->curend) {
 		    auto 	co = callp->curend ;
 		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
-		    {
+		    if (icurp) {
 	                rs1 = co(op->obj,icurp) ;
 	                if (rs >= 0) rs = rs1 ;
 		    }
 	        } else {
 		    rs = SR_NOSYS ;
 		}
-	        {
+	        if (curp->scp) {
 	            rs1 = uc_free(curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            curp->scp = nullptr ;
@@ -565,7 +569,7 @@ static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 	    if (sn < 0) {
 	        for (sn = 0 ; sa[sn] != nullptr ; sn += 1) ;
 	    }
-	    sasize = ((sn + 1) * sizeof(cchar *)) ;
+	    sasize = ((sn + 1) * szof(cchar *)) ;
 	    ssize += sasize ;
 	    for (int i = 0 ; i < sn ; i += 1) {
 	        ssize += (strlen(sa[i]) + 1) ;

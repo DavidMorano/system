@@ -76,7 +76,7 @@ namespace {
     struct suber {
 	cchar		*username ;
 	char		*rbuf ;
-	char		*tbuf ;
+	char		*tbuf{} ;
 	int		rlen ;
 	int		tlen ;
 	suber(char *tp,int tl,cchar *up) noex : rbuf(tp), rlen(tl) {
@@ -97,7 +97,7 @@ static int	newer(char *,time_t *) noex ;
 
 /* local variables */
 
-constexpr cchar		devdname[] = DEVDNAME ;
+constexpr char		devdname[] = DEVDNAME ;
 
 
 /* exported variables */
@@ -105,16 +105,15 @@ constexpr cchar		devdname[] = DEVDNAME ;
 
 /* exported subroutines */
 
-int getuserterm(char *rbuf,int rlen,cchar *username) noex {
-	int	rs ;
+int getuserterm(char *rbuf,int rlen,cchar *un) noex {
+	int	rs = SR_FAULT ;
 	int	rs1 ;
 	int	len = 0 ;
-	if (rbuf && username) {
+	if (rbuf && un) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (username[0]) {
-		suber	so(rbuf,rlen,username) ;
-		if ((rs = so.start()) >= 0) {
+	    if (un[0]) {
+		if (suber so(rbuf,rlen,un) ; (rs = so.start()) >= 0) {
 		    {
 			rs = so.tmpenum() ;
 			len = rs ;
@@ -133,8 +132,7 @@ int getuserterm(char *rbuf,int rlen,cchar *username) noex {
 
 int suber::start() noex {
 	int		rs ;
-	char		*p{} ;
-	if ((rs = malloc_mp(&p)) >= 0) {
+	if (char *p{} ; (rs = malloc_mp(&p)) >= 0) {
 	    tbuf = p ;
 	    tlen = rs ;
 	}
@@ -162,12 +160,12 @@ int suber::tmpenum() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (tmpx utmp ; (rs = tmpx_open(&utmp,np,to)) >= 0) {
-	    if (tmpx_cur cur ; (rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
+	if (tmpx ut ; (rs = ut.open(np,to)) >= 0) {
+	    if (tmpx_cur cur ; (rs = ut.curbegin(&cur)) >= 0) {
 	        tmpx_ent	ue ;
 	        while (rs >= 0) {
 		    bool	f = true ;
-	            rs1 = tmpx_fetchuser(&utmp,&cur,&ue,username) ;
+	            rs1 = ut.fetchuser(&cur,&ue,username) ;
 		    if (rs1 == SR_NOTFOUND) break ;
 		    rs = rs1 ;
 		    if (rs < 0) break ;
@@ -176,17 +174,17 @@ int suber::tmpenum() noex {
 	            if (f) {
 	                if ((rs = load(tbuf,tlen,&ue)) >= 0) {
 	                    if ((rs = newer(tbuf,&tiacc)) > 0) {
-	                        rs = sncpy1(rbuf,rlen,tbuf) ;
+	                        rs = sncpy(rbuf,rlen,tbuf) ;
 	                        len = rs ;
 	                    } /* end if (we had a better one) */
-	                } /* end if */
+	                } /* end if (load) */
 		    }
 	            if (rs < 0) break ;
 	        } /* end while (looping through entries) */
-	        rs1 = tmpx_curend(&utmp,&cur) ;
+	        rs1 = ut.curend(&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if */
-	    rs1 = tmpx_close(&utmp) ;
+	    rs1 = ut.close ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (UTMPX open) */
 	return (rs >= 0) ? len : rs ;

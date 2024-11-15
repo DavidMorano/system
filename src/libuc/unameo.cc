@@ -1,4 +1,5 @@
 /* unameo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® information (a cache for |uname(2)|) */
@@ -16,13 +17,16 @@
 
 /*******************************************************************************
 
+  	Object:
+	unameo
+
+	Description:
 	This module serves as a cache (of sorts) for UNIX® information
 	that is related to the underlying machine and which does
-	not (easily) change during program exection.
-
-	Although this object can service as a local cache (cotrolled
-	by this object itself), note that a process-wide cache of
-	the |uname(2)| information can be had and managed by the
+	not (easily) change during program exection.  Although this
+	object can service as a local cache (cotrolled by this
+	object itself), note that a process-wide cache of the
+	|uname(2)| information can be had and managed by the
 	|uinfo(3uc)| facility (enumated system call).
 
 *******************************************************************************/
@@ -30,6 +34,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/utsname.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -76,6 +82,7 @@ static inline int unameo_dtor(unameo *op) noex {
 	}
 	return rs ;
 }
+/* end subroutine (unameo_dtor) */
 
 
 /* local variables */

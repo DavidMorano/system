@@ -120,7 +120,6 @@ static int lookaside_dtor(lookaside *op) noex {
 }
 /* end subroutine (lookaside_dtor) */
 
-static int	lookaside_dtor(lookaside *) noex ;
 static int	lookaside_newchunk(lookaside *) noex ;
 
 
@@ -259,8 +258,7 @@ static int lookaside_newchunk(lookaside *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		sz = op->eaoff + (op->n * op->esize) ;
-	    caddr_t	a ;
-	    if ((rs = OURMALLOC(sz,&a)) >= 0) {
+	    if (caddr_t a ; (rs = OURMALLOC(sz,&a)) >= 0) {
 		pq_ent	*nep = (pq_ent *) a ;
 	        if ((rs = pq_ins(op->cqp,nep)) >= 0) {
 	            op->eap = caddr_t(a + op->eaoff) ;

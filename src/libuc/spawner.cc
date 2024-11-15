@@ -293,19 +293,13 @@ constexpr MAPEX		mapexs[] = {
 /* exported subroutines */
 
 int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
-	int		rs = SR_OK ;
+	int		rs ;
+	if ((rs = spawner_ctor(op,fname)) >= 0) {
 	cchar		*efname = fname ;
 	char		pwd[MAXPATHLEN + 1] = { 0 } ;
 	char		pbuf[MAXPATHLEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-
-/* check for bad input */
-
+	/* check for bad input */
 	if (fname[0] == '\0') return SR_INVAL ;
-
-	memclear(op) ;
 	op->argv = argv ;
 	op->pid = -1 ;
 
@@ -320,9 +314,8 @@ int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
 	}
 
 	if (rs >= 0) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
-	        cint		sz = sizeof(scmd) ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
+	        cint		sz = szof(scmd) ;
 	        op->execfname = cp ;
 	        if ((rs = vecobj_start(&op->cmds,sz,2,0)) >= 0) {
 	            envhelp	*ehp = &op->env ;
@@ -343,6 +336,10 @@ int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
 	    } /* end if (uc_mallocstrw) */
 	} /* end if (ok) */
 
+	    if (rs < 0) {
+		spawner_dtor(op) ;
+	    }
+	} /* end if (spawner_ctor) */
 	return rs ;
 }
 /* end subroutine (spawner_start) */
@@ -380,7 +377,7 @@ int spawner_finish(spawner *op) noex {
 	    }
 	    {
 		rs1 = spawner_dtor(op) ;
-	        rs1 = vecobj_finish(&op->cmds) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

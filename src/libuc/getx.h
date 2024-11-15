@@ -63,8 +63,6 @@
 #include	<getuserhome.h>
 #include	<getuserorg.h>
 #include	<getuserterms.h>
-#include	<getutmpent.h>
-#include	<getutmpterm.h>
 #include	<getxid.h>
 #include	<getopendial.h>
 

@@ -1,4 +1,5 @@
 /* breadln SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* "Basic I-O" package similiar to "stdio" */

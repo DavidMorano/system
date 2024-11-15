@@ -1025,7 +1025,7 @@ static int zaputx(struct utmpx *up)
 	    if ((rs = tmpx_curbegin(&ut,&cur)) >= 0) {
 
 	        f = FALSE ;
-	        while ((ei = tmpx_enum(&ut,&cur,&ue)) >= 0) {
+	        while ((ei = tmpx_curenum(&ut,&cur,&ue)) >= 0) {
 
 	            f = ((strncmp(up->ut_id,ue.ut_id,TMPX_LID) == 0) &&
 	                (strncmp(up->ut_line,ue.ut_line,TMPX_LLINE) == 0)) ;

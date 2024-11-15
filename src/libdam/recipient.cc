@@ -209,6 +209,10 @@ int recipient_finish(RC *op) noex {
 	        rs1 = vecstr_finish(op->nlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
+	    {
+		rs1 = recipient_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }

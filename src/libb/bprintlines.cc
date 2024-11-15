@@ -1,4 +1,5 @@
 /* bprintlns SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* print out lines but filled to the margin */

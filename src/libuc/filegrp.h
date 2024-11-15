@@ -1,4 +1,5 @@
-/* filegrp */
+/* filegrp HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* group-name cache */
@@ -19,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<cq.h>

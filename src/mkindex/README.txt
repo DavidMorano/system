@@ -7,11 +7,9 @@ used in making queries. The index files created are:
 	<idxname>.names
 
 Synopsis:
-
 $ mkindex [-idx <name>] [<keyfile(s)>] [-af argfile] [-a] [-V]
 
-where:
-
+Arguments:
 -idx <idxname>	name of the index
 <keyfile(s)>	key-file(s) to index
 -af <argfile>	argument-list file of key-file(s) to index

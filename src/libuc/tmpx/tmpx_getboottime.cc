@@ -1,9 +1,9 @@
 /* tmpx_getboottime SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the name of the controlling terminal for the current session */
 /* version %I% last-modified %G% */
-
 
 
 /* revision history:
@@ -82,12 +82,11 @@ int tmpx_getboottime(tmpx *op,time_t *rp) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if (op && rp) {
-	    tmpx_cur	uc ;
-	    tmpx_ent	ue ;
 	    *rp = 0 ;
-	    if ((rs = tmpx_curbegin(op,&uc)) >= 0) {
+	    if (tmpx_cur uc ; (rs = tmpx_curbegin(op,&uc)) >= 0) {
+	        tmpx_ent	ue ;
 	        while (rs >= 0) {
-	            rs1 = tmpx_enum(op,&uc,&ue) ;
+	            rs1 = tmpx_curenum(op,&uc,&ue) ;
 	            if (rs1 == SR_NOTFOUND) break ;
 	            rs = rs1 ;
 	            if ((rs >= 0) && (ue.ut_type == TMPX_TBOOTTIME)) {

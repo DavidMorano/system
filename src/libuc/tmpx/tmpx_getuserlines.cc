@@ -1,4 +1,5 @@
 /* tmpx_getuserlines SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get all terminal lines where the given user is logged in on */

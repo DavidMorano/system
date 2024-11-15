@@ -1,4 +1,5 @@
 /* tmpx_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage reading or writing of the [UW]TMP database */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	tmpx
+
+	Description:
 	This code is used to access the Utmpx (or WTMPX) database.
 	Those databases constitute the connect-time accounting
 	information for the system.
@@ -31,6 +36,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
@@ -70,16 +76,6 @@
 
 /* forward references */
 
-template<typename ... Args>
-static inline int tmpx_magic(tmpx *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == TMPX_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (tmpx_magic) */
-
 static int	tmpx_writable(tmpx *,int) noex ;
 static int	tmpx_openbegin(tmpx *,cchar *) noex ;
 static int	tmpx_openend(tmpx *) noex ;
@@ -95,7 +91,7 @@ static int	isproctype(int) noex ;
 
 /* local variables */
 
-static constexpr int	proctypes[] = {
+constexpr int		proctypes[] = {
 	TMPX_TPROCINIT,
 	TMPX_TPROCLOGIN,
 	TMPX_TPROCUSER,
@@ -213,7 +209,7 @@ int tmpx_check(tmpx *op,time_t dt) noex {
 }
 /* end subroutine (tmpx_check) */
 
-int tmpx_curbegin(tmpx *op,TMPX_CUR *curp) noex {
+int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
 	if ((rs = tmpx_magic(op,curp)) >= 0) {
 	        curp->i = -1 ;
@@ -229,7 +225,7 @@ int tmpx_curbegin(tmpx *op,TMPX_CUR *curp) noex {
 }
 /* end subroutine (tmpx_curbegin) */
 
-int tmpx_curend(tmpx *op,TMPX_CUR *curp) noex {
+int tmpx_curend(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
 	if ((rs = tmpx_magic(op,curp)) >= 0) {
 	        if (op->ncursors > 0) op->ncursors -= 1 ;
@@ -239,7 +235,7 @@ int tmpx_curend(tmpx *op,TMPX_CUR *curp) noex {
 }
 /* end subroutine (tmpx_curend) */
 
-int tmpx_enum(tmpx *op,TMPX_CUR *curp,tmpx_ent *ep) noex {
+int tmpx_curenum(tmpx *op,tmpx_cur *curp,tmpx_ent *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = tmpx_magic(op,curp,ep)) >= 0) {
@@ -260,7 +256,7 @@ int tmpx_enum(tmpx *op,TMPX_CUR *curp,tmpx_ent *ep) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
 }
-/* end subroutine (tmpx_enum) */
+/* end subroutine (tmpx_curenum) */
 
 int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 	int		rs ;
@@ -297,7 +293,7 @@ int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 }
 /* end subroutine (tmpx_fetchpid) */
 
-int tmpx_fetchuser(tmpx *op,TMPX_CUR *curp,tmpx_ent *ep,cchar *name) noex {
+int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = tmpx_magic(op,curp,ep,name)) >= 0) {

@@ -1,4 +1,5 @@
 /* bprintcleanlns SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* print a clean (cleaned up) line of text */

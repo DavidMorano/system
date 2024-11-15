@@ -34,7 +34,7 @@
 	Arguments:
 	rbuf		result buffer
 	rlen		result buffer length
-	ms		source string
+	ms		source c-string
 
 	Returns:
 	>=0		length of resulting string
@@ -50,7 +50,7 @@
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"mkx.h"
+#include	"mkmagic.h"
 
 
 /* local defines */
@@ -81,12 +81,11 @@ int mkmagic(char *rbuf,int rlen,cchar *ms) noex {
 	if (rbuf && ms) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((rlen > 2) && ms[0]) {
+	    if ((rlen >= 2) && ms[0]) {
 	        if (cint mslen = strlen(ms) ; (mslen+1) <= rlen) {
 	            char	*bp = strwcpy(rbuf,ms,-1) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
-	            *bp++ = '\0' ;
 	            if (cint zl = ((rbuf + rlen) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
 	            }

@@ -1,6 +1,9 @@
 /* netfile HEADER */
 /* lang=C20 */
 
+/* read a NETRC file and make its contents available */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -14,7 +17,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<vecitem.h>
 
 

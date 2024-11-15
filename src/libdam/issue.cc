@@ -25,6 +25,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	issue
+
+	Description:
 	This object module writes the contents of various ISSUEs
 	(as specified by the caller) to an open file descriptor
 	(also specified by the caller).
@@ -48,8 +52,9 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -138,7 +143,6 @@ extern int	getnodedomain(char *,char *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	msleep(int) ;
 extern int	haslc(cchar *,int) ;
 extern int	hasuc(cchar *,int) ;
 extern int	hasalldig(cchar *,int) ;
@@ -224,7 +228,7 @@ static int	isBaseMatch(cchar *,cchar *,cchar *) ;
 
 /* local variables */
 
-static constexpr cpcchar	schedmaps[] = {
+constexpr cpcchar	schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -233,14 +237,14 @@ static constexpr cpcchar	schedmaps[] = {
 	nullptr
 } ;
 
-static constexpr cpcchar	envbad[] = {
+constexpr cpcchar	envbad[] = {
 	"TMOUT",
 	"A__z",
 	nullptr
 
 } ;
 
-static constexpr cpcchar	envstrs[] = {
+constexpr cpcchar	envstrs[] = {
 	"KEYNAME",
 	"ADMIN",
 	"ADMINDIR",
@@ -254,7 +258,7 @@ enum envstrs {
 	envstr_overlast
 } ;
 
-static constexpr cchar	envpre[] = "ISSUE_" ;	/* environment prefix */
+constexpr char		envpre[] = "ISSUE_" ;	/* environment prefix */
 
 
 /* exported variables */
@@ -263,7 +267,7 @@ static constexpr cchar	envpre[] = "ISSUE_" ;	/* environment prefix */
 /* exported subroutines */
 
 int issue_open(ISSUE *op,cchar *pr) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = time(nullptr) ;
 	int		rs ;
 	cchar		*cp ;
 

@@ -1,0 +1,157 @@
+/* localgetnetload SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
+
+/* get the LOCAL network-load (NETLOAD) */
+/* version %I% last-modified %G% */
+
+#define	CF_UCPROGDATA	1		/* use |ucprogdata_xxx(3uc)| */
+
+/* revision history:
+
+	= 1998-05-01, David A­D­ Morano
+	This subroutine is originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	localgetnetload
+
+	Description:
+	This subroutine retrieves the LOCAL system network-load.
+
+	Synopsis:
+	int localgetnetload(cchar *pr,char *rbuf,int rlen) noex
+
+	Arguments:
+	pr		program root
+	rbuf		caller supplied buffer to place result in
+	rlen		length of caller supplied buffer
+
+	Returns:
+	>=0		length of returned value
+	<0		error (system-return)
+
+	Notes:
+
+	Q. Why the program-cache?
+	A. Because this subroutine, and a couple others like it,
+	get called everytime certain pseudo-"files" are read out.
+	We want some of those files to read out very quickly, so
+	caching away an extra real-file read in this routine (and
+	others like it) really speeds things up.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
+#include	<ucprogdata.h>
+#include	<mallocxx.h>
+#include	<filereadln.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<isnot.h>
+#include	<localmisc.h>
+
+#include	"localget.h"
+
+
+/* local defines */
+
+#ifndef	VARNETLOAD
+#define	VARNETLOAD	"NETLOAD"
+#endif
+
+#define	VARDNAME	"var"
+#define	NETLOADFNAME	"netload"
+#define	TO_TTL		(5*60)
+
+#ifndef	CF_UCPROGDATA
+#define	CF_UCPROGDATA	1
+#endif
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+constexpr bool		f_ucprogdata = CF_UCPROGDATA ;
+
+constexpr char		nlname[] = NETLOADFNAME ;
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (pr[0]) {
+	        cint	di = UCPROGDATA_DNETLOAD ;
+	        cint	ttl = TO_TTL ;
+		rs = SR_OK ;
+/* user environment */
+	        if ((rs >= 0) && (len == 0)) {
+	            static cchar	*netload = getenv(VARNETLOAD) ;
+	            if (netload && (netload[0] != '\0')) {
+	                rs = sncpy1(rbuf,rlen,netload) ;
+	                len = rs ;
+	            }
+	        } /* end if (needed) */
+/* program cache */
+		if_constexpr (f_ucprogdata) {
+	            if ((rs >= 0) && (len == 0)) {
+	                if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
+	                    len = rs ;
+	                }
+	            }
+		} /* end if_constexpr (f_ucprogdata) */
+/* software facility (LOCAL) configuration */
+	        if ((rs >= 0) && (len == 0)) {
+	            cchar	*vardname = VARDNAME ;
+	            if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	                if ((rs = mkpath3(tbuf,pr,vardname,nlname)) >= 0) {
+	                    if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
+	                        len = rs ;
+			        if_constexpr (f_ucprogdata) {
+		                    rs = ucprogdata_set(di,rbuf,len,ttl) ;
+			        }
+		            } else if (isNotPresent(rs)) {
+		                rs = SR_OK ;
+		            }
+	                } /* end if (mkpath) */
+			rs1 = uc_free(tbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (needed) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (localgetnetload) */
+
+

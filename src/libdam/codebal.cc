@@ -108,6 +108,9 @@ int codebal_start(codebal *op) noex {
 	int		rs ;
 	if ((rs = codebal_ctor(op)) >= 0) {
 	    rs = SR_OK ;
+	    if (rs < 0) {
+		codebal_dtor(op) ;
+	    }
 	} /* end if (codebal_ctor) */
 	return rs ;
 }

@@ -164,7 +164,10 @@ int nodesearch_open(NS *op,cc *fn,int fsz) noex {
 		    }
 	        } /* end if (memory-allocation) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		nodesearch_dtor(op) ;
+	    }
+	} /* end if (nodesearch_ctor) */
 	return rs ;
 }
 /* end subroutine (nodesearch_open) */

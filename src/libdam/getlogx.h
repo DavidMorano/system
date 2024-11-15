@@ -1,4 +1,5 @@
 /* getlogx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the name of the controlling terminal for the current session */
@@ -22,6 +23,7 @@
 
 EXTERNC_begin
 
+extern int	getlogid(char *,int,pid_t) noex ;
 extern int	getlogname(char *,int,pid_t) noex ;
 extern int	getlogterm(char *,int,pid_t) noex ;
 extern int	getloghost(char *,int,pid_t) noex ;

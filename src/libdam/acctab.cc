@@ -254,7 +254,7 @@ static int	advance(cchar *,cchar *) noex ;
 
 static int	regerrno ;
 
-constexpr cchar		gterms[] = { /* BS HT VT FF SP # : */
+constexpr char		gterms[] = { /* BS HT VT FF SP # : */
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x04,
 	0x00, 0x00, 0x00, 0x00,
@@ -265,7 +265,7 @@ constexpr cchar		gterms[] = { /* BS HT VT FF SP # : */
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-constexpr cchar		aterms[] = { /* BS HT VT FF SP # */
+constexpr char		aterms[] = { /* BS HT VT FF SP # */
 	0x00, 0x1B, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,

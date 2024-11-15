@@ -1,4 +1,5 @@
 /* filegrp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* group-name cache */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	filegrp
+
+	Description:
 	This object provides a crude cache for GROUP-DB entries.
 
 *******************************************************************************/
@@ -116,6 +121,7 @@ static inline int filegrp_dtor(filegrp *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (filegrp_dtor) */
 
 static int filegrp_searchgid(FGO *,REC **,gid_t) noex ;
 static int filegrp_newrec(FGO *,time_t,REC **,gid_t,cc *) noex ;

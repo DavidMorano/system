@@ -241,6 +241,10 @@ int commandment_close(CMD *op) noex {
 	        rs1 = commandment_objloadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
+	    {
+		rs1 = commandment_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;

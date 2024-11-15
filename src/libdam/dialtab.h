@@ -1,4 +1,9 @@
-/* dialtab */
+/* dialtab HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
+
+/* get additional machine dialing information */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -8,51 +13,48 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<vecobj.h>
 
 
-#define	DIALTAB_ENT	struct dialtab_ent
 #define	DIALTAB		struct dialtab_head
+#define	DIALTAB_ENT	struct dialtab_entry
 
 
-struct dialtab_ent {
-	const char	*name ;
-	const char	*inet ;
-	const char	*uucp ;
-	const char	*username ;
-	const char	*password ;
+struct dialtab_entry {
+	cchar		*name ;
+	cchar		*inet ;
+	cchar		*uucp ;
+	cchar		*username ;
+	cchar		*password ;
 	int		fi ;
 } ;
 
 struct dialtab_head {
+	vecobj		*flp ;
+	vecobj		*elp ;
 	uint		magic ;
-	vecobj		files ;
-	vecobj		entries ;
 } ;
 
+typedef	DIALTAB		dialtab ;
+typedef	DIALTAB_ENT	dialtab_ent ;
 
-#if	(! defined(DIALTAB_MASTER)) || (DIALTAB_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	dialtab_open(dialtab *,cchar *) noex ;
+extern int	dialtab_fileadd(dialtab *,cchar *) noex ;
+extern int	dialtab_check(dialtab *,cchar *) noex ;
+extern int	dialtab_search(dialtab *,cchar *,dialtab_ent **) noex ;
+extern int	dialtab_close(dialtab *) noex ;
 
-extern int	dialtab_open(DIALTAB *,const char *) ;
-extern int	dialtab_fileadd(DIALTAB *,const char *) ;
-extern int	dialtab_check(DIALTAB *,const char *) ;
-extern int	dialtab_search(DIALTAB *,const char *,DIALTAB_ENT **) ;
-extern int	dialtab_close(DIALTAB *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* DIALTAB_MASTER */
 
 #endif /* DIALTAB_INCLUDE */
 
