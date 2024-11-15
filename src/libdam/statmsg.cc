@@ -1,4 +1,5 @@
 /* statmsg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to help (manage) STATMSG messages */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	statmsg
+
+	Description:
 	This object module writes the contents of various STATMSGs
 	(as specified by the caller) to an open file descriptor
 	(also specified by the caller).
@@ -278,7 +283,7 @@ constexpr cpcchar	envstrs[] = {
 constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
 
-constexpr cchar		envpre[] = "STATMSG_" ;	/* environment prefix */
+constexpr char		envpre[] = "STATMSG_" ;	/* environment prefix */
 
 constexpr bool		f_writeto = CF_WRITETO ;
 
@@ -289,7 +294,7 @@ constexpr bool		f_writeto = CF_WRITETO ;
 /* exported subroutines */
 
 int statmsg_open(STATMSG *op,cchar *username) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = time(nullptr) ;
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;

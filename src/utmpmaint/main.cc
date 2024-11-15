@@ -1381,12 +1381,12 @@ static int proclist(PROGINFO *pip,bfile *ofp,MAPSTRINT *nlp,cchar *dbfn)
 	            while (rs >= 0) {
 			int	v = -1 ;
 	                int	f = TRUE ;
-	                rs1 = tmpx_enum(&ut,&ucur,up) ;
+	                rs1 = tmpx_curenum(&ut,&ucur,up) ;
 	                if (rs1 == SR_NOTFOUND) break ;
 	                rs = rs1 ;
 
 	                if ((rs >= 0) && f_restrict) {
-	                    const int	nl = strnlen(up->ut_user,TMPX_LUSER) ;
+	                    cint	nl = strnlen(up->ut_user,TMPX_LUSER) ;
 	                    cchar	*np = up->ut_user ;
 			    f = FALSE ;
 			    if ((rs = procuser(pip,nlp,np,nl,&v)) > 0) {

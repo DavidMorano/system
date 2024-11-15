@@ -1,4 +1,5 @@
 /* hostinfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manipulate host entry structures */
@@ -156,6 +157,7 @@ static inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (hostinfo_dtor) */
 
 static inline int hostinfo_dtor(hostinfo *op) noex {
 	int		rs = SR_FAULT ;

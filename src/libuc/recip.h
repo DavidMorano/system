@@ -1,4 +1,5 @@
 /* recip HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* recipient object for DMAIL¦DMAILBOX */
@@ -19,6 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<clanguage.h>

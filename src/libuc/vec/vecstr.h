@@ -76,6 +76,13 @@ struct vecstr_head {
 	int		stsize ;	/* total string-table length */
 } ; /* end struct (vecstr_head) */
 
+EXTERNC_begin
+
+typedef int (*vecstr_vcmp)(cchar **,cchar **) noex ;
+typedef int (*vecstr_f)(cchar **,cchar **) noex ;
+
+EXTERNC_end
+
 #ifdef	__cplusplus
 enum vecstrmems {
     	vecstrmem_addcspath,
@@ -170,6 +177,8 @@ struct vecstr : vecstr_head {
 	int envadd(cchar *,cchar *,int = -1) noex ;
 	int envset(cchar *,cchar *,int = -1) noex ;
 	int envfile(cchar *) noex ;
+	int search(cchar *,vecstr_f,cchar ** = nullptr) noex ;
+	int finder(cchar *,vecstr_f,cchar ** = nullptr) noex ;
 	int del(int = -1) noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;
@@ -191,9 +200,6 @@ typedef VECSTR		vecstr ;
 typedef	VECSTR_FL	vecstr_fl ;
 
 EXTERNC_begin
-
-typedef int (*vecstr_vcmp)(cchar **,cchar **) noex ;
-typedef int (*vecstr_f)(cchar **,cchar **) noex ;
 
 extern int vecstr_start(vecstr *,int,int) noex ;
 extern int vecstr_add(vecstr *,cchar *,int) noex ;

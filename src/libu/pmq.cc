@@ -39,6 +39,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<usysflag.h>
@@ -175,6 +177,7 @@ static inline int pmq_dtor(pmq *op) noex {
 	}
 	return rs ;
 }
+/* end subroutine (pmq_dtor) */
 
 template<typename ... Args>
 static inline int pmq_magic(pmq *op,Args ... args) noex {

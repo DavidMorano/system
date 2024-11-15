@@ -693,37 +693,32 @@ paramfile.o:		paramfile.cc paramfile.h
 kvsfile.o:		kvsfile.cc kvsfile.h
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
-
 schedvar.o:		schedvar.cc schedvar.h
 
 memfile.o:		memfile.cc memfile.h
 
 baops.o:		baops.cc baops.h
 
-bits.o:			bits.cc bits.h baops.h
-
 rijndael.o:		rijndael.c rijndael.h
 librandom.o:		librandom.cc librandom.h
 
 density.o:		density.c density.h
-dialtab.o:		dialtab.c dialtab.h
 optval.o:		optval.cc optval.h
 
+bits.o:			bits.cc bits.h baops.h
+dialtab.o:		dialtab.cc dialtab.h
 clusterdb.o:		clusterdb.c clusterdb.h
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.c inetaddr.h
-
 lfm.o:			lfm.cc lfm.h
 bfliner.o:		bfliner.cc bfliner.h
-
 keyopt.o:		keyopt.cc keyopt.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
 strstore.o:		strstore.cc strstore.h
-
 userattr.o:		userattr.c userattr.h
 pwfile.o:		pwfile.c pwfile.h pwentry.h
 ts.o:			ts.cc ts.h
@@ -739,6 +734,7 @@ sysrealname.o:		sysrealname.cc sysrealname.h
 dayofmonth.o:		dayofmonth.cc dayofmonth.h
 lineindex.o:		lineindex.cc lineindex.h
 lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h
+netfile.o:		netfile.cc netfile.h
 
 # DATABASE
 database.o:		database.dir
@@ -808,6 +804,16 @@ realname.dir:
 # MSGIDX
 msgidx.o:		msgidx.dir
 msgidx.dir:
+	makesubdir $@
+
+# LOCALSET
+localset.o:		localset.dir
+localset.dir:
+	makesubdir $@
+
+# LOCALGET
+localget.o:		localget.dir
+localget.dir:
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

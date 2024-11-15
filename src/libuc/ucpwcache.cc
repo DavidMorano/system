@@ -1,4 +1,5 @@
 /* ucpwcache SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -17,15 +18,17 @@
 
 /*******************************************************************************
 
-	This module serves as a per-process cache for UNIX®
-	password entries.
+	Group:
+	ucpwcache
 
-	Since we are basically dealing with global data, we need
-	to make the establishment of it multi-thread safe.  We also
-	want fork safety.  Yes, we want everything, including cleanup
-	on module unloading (since, yes, we could all be inside a
-	loadable and unloadble module!).  For these purposes we
-	employ the basic (and not so basic) means of accomplishing
+	Description:
+	This module serves as a per-process cache for UNIX® password
+	entries.  Since we are basically dealing with global data,
+	we need to make the establishment of it multi-thread safe.
+	We also want fork safety.  Yes, we want everything, including
+	cleanup on module unloading (since, yes, we could all be
+	inside a loadable and unloadble module!).  For these purposes
+	we employ the basic (and not so basic) means of accomplishing
 	this.  See the code for our various machinations.
 
 	Notes:

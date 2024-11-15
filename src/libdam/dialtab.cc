@@ -1,9 +1,9 @@
-/* dialtab */
+/* dialtab SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get additional machine dialing information */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,31 +17,40 @@
 
 /*******************************************************************************
 
-        This module provides a management object to access dialing information
-        that is used by some PCS utilities to access remote machines. This whole
-        dialing information thing was a hack when accessing other machine
-        because so problematic due to security considerations.
+  	Object:
+	dialtab
 
+	Description:
+	This module provides a management object to access dialing
+	information that is used by some PCS utilities to access
+	remote machines.  This whole dialing information thing was
+	a hack when accessing other machines because so problematic
+	due to security considerations.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<mallocstuff.h>
+#include	<getpwd.h>
+#include	<absfn.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
-#include	<mallocstuff.h>
+#include	<mkpathx.h>
+#include	<sfx.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"dialtab.h"
@@ -49,9 +58,10 @@
 
 /* local defines */
 
-#define	DIALTAB_MAGIC	31415926
-
-#define	DIALTAB_FILE	struct dialtab_file
+#define	DT_MAGIC	31415926
+#define	DT		dialtab
+#define	DT_ENT		dialtab_ent
+#define	DT_FI		dialtab_file
 
 #ifndef	BUFLEN
 #define	BUFLEN		(MAXPATHLEN + 100)
@@ -62,12 +72,18 @@
 #endif
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	getpwd(char *,int) ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -76,35 +92,84 @@ extern int	getpwd(char *,int) ;
 /* local structures */
 
 struct dialtab_file {
-	const char	*fname ;
+	cchar		*fname ;
 	time_t		mtime ;
 	dev_t		dev ;
-	ino64_t		ino ;
+	ino_t		ino ;
 	int		size ;
 } ;
 
 
 /* forward references */
 
-int		dialtab_fileadd(DIALTAB *,const char *) ;
-int		dialtab_finish(DIALTAB *) ;
+int		dialtab_fileadd(DT *,cchar *) noex ;
+int		dialtab_finish(DT *) noex ;
 
-static int	dialtab_filedump(DIALTAB *,int) ;
-static int	dialtab_filedel(DIALTAB *,int) ;
+template<typename ... Args>
+static int dialtab_ctor(dialtab *op,Args ... args) noex {
+    	DIALTAB		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->flp = new(nothrow) vecobj) != np) {
+	        if ((op->elp = new(nothrow) vecobj) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-vecobj) */
+		if (rs < 0) {
+		    delete op->flp ;
+		    op->flp = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (dialtab_ctor) */
 
-static int	file_start(struct dialtab_file *,const char *) ;
-static int	file_finish(struct dialtab_file *) ;
+static int dialtab_dtor(dialtab *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	    if (op->flp) {
+		delete op->flp ;
+		op->flp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (dialtab_dtor) */
 
-static int	entry_start(struct dialtab_ent *,const char *,int) ;
-static int	entry_enough(struct dialtab_ent *) ;
-static int	entry_finish(struct dialtab_ent *) ;
+template<typename ... Args>
+static inline int dialtab_magic(dialtab *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (dialtab_magic) */
 
-static void	freeit(const char **) ;
+static int	dialtab_filedump(DT *,int) noex ;
+static int	dialtab_filedel(DT *,int) noex ;
+
+static int	file_start(DT_FI *,cchar *) noex ;
+static int	file_finish(DT_FI *) noex ;
+
+static int	entry_start(DT_ENT *,cchar *,int) noex ;
+static int	entry_enough(DT_ENT *) noex ;
+static int	entry_finish(DT_ENT *) noex ;
+
+static void	freeit(cchar **) noex ;
 
 
 /* local variables */
 
-static const unsigned char 	fterms[32] = {
+constexpr char 		fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x08, 0x10, 0x00, 0x24,
 	0x00, 0x00, 0x00, 0x00,
@@ -112,15 +177,7 @@ static const unsigned char 	fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-} ;
-
-static const char	*dialkeys[] = {
-	"uucp",
-	"inet",
-	"username",
-	"password",
-	NULL,
+	0x00, 0x00, 0x00, 0x00
 } ;
 
 enum dialkeys {
@@ -131,73 +188,163 @@ enum dialkeys {
 	dialkey_overlast
 } ;
 
+constexpr cpcchar	dialkeys[] = {
+	"uucp",
+	"inet",
+	"username",
+	"password",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int dialtab_open(op,dialfname)
-DIALTAB		*op ;
-const char	dialfname[] ;
-{
-	int	rs ;
-	int	size ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic == DIALTAB_MAGIC)
-	    return SR_INUSE ;
-
-	size = sizeof(struct dialtab_file) ;
-	rs = vecobj_start(&op->files,size,10,VECOBJ_OREUSE) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-	size = sizeof(struct dialtab_ent) ;
-	rs = vecobj_start(&op->entries,size,20,VECOBJ_OREUSE) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-	op->magic = DIALTAB_MAGIC ;
-	if (dialfname != NULL) {
-
-	    rs = dialtab_fileadd(op,dialfname) ;
-	    if (rs < 0)
-	        goto bad3 ;
-
-	} /* end if (adding a file) */
-
-ret0:
+int dialtab_open(DT *op,cchar *dialfname) noex {
+	int		rs ;
+	if ((rs = dialtab_ctor(op)) >= 0) {
+	    int		vsz = szof(DT_FI) ;
+	    int		vn = 10 ;
+	    int		vo = VECOBJ_OREUSE ;
+	    if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) {
+		vsz = szof(DT_ENT) ;
+		vn = 20 ;
+	        if ((rs = vecobj_start(op->elp,vsz,vn,vo)) >= 0) {
+		    op->magic = DT_MAGIC ;
+	            if (dialfname) {
+	                rs = dialtab_fileadd(op,dialfname) ;
+	            } /* end if */
+		    if (rs < 0) {
+			op->magic = 0 ;
+			vecobj_finish(op->elp) ;
+		    }
+		} /* end if (vecobj_start) */
+		if (rs < 0) {
+		    vecobj_finish(op->flp) ;
+		}
+	    } /* end if (vecobj_start) */
+	    if (rs < 0) {
+		dialtab_dtor(op) ;
+	    }
+	} /* end if (dialtab_ctor) */
 	return rs ;
-
-/* bad stuff */
-bad3:
-	vecobj_finish(&op->entries) ;
-
-bad2:
-	vecobj_finish(&op->files) ;
-
-bad1:
-bad0:
-	op->magic = 0 ;
-	goto ret0 ;
 }
 /* end subroutine (dialtab_open) */
 
+int dialtab_close(DT *op) noex {
+    	int		rs ;
+	int		rs1 ;
+	if ((rs = dialtab_magic(op)) >= 0) {
+	    void	*vp{} ;
+	    /* free up the dial entries */
+	    for (int i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
+	        DT_ENT	*dep = (DT_ENT *) vp ;
+	        if (vp) {
+	            rs1 = entry_finish(dep) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end for */
+	    {
+	        rs1 = vecobj_finish(op->elp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    /* free up the files */
+	    for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	        DT_FI	*fep = (DT_FI *) vp ;
+	        if (vp) {
+	            rs1 = file_finish(fep) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end for */
+	    {
+	        rs1 = vecobj_finish(op->flp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = dialtab_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (dialtab_close) */
 
-/* add the contents of a file to the dialer list */
-int dialtab_fileadd(op,dialfname)
-DIALTAB		*op ;
-const char	dialfname[] ;
-{
-	struct dialtab_ent	de ;
+namespace{
+    strut adder {
+	DT	*op ;
+	cchar	*fname ;
+	adder(DT *p,cchar *f) noex : op(p), fname(f) { } ;
+	operator int () noex ;
+	int reader(DT_FI *,cchar *) noex ;
+	int procln(cchar *,int) noex ;
+    } ; /* end struct (adder) */
+}
 
-	struct dialtab_file	fe, *fep ;
+operator adder::operator int () noex {
+    	int		rs ;
+	int		rs1 ;
+	cchar		*afn{} ;
+	if (absfn af ; (rs = af.start(fname,-1,&afn)) >= 0) {
+	    {
+		rs = reader(&fe,afn) ;
+	    }
+	    rs1 = af.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (absfn) */
+    	return rs ;
+}
 
-	struct ustat		sb ;
+int adder::reader(DT_FI *fep,cchar *fn) noex {
+    	int		rs ;
+	int		rs1 ;
+	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    cchar	*os = "r" ;
+	    cmode	om = 0 ;
+	    if (bfile b ; (rs = bopen(&b,fn,os,om)) >= 0) {
+		cint	cmd = BC_STAT ;
+		if (USTAT sb ; (rs = bcontrol(&b,cmd,&sb)) >= 0) {
+		    fep->dev = sb.st_dev ;
+		    fep->ino = sb.st_ino ;
+		    fep->mtime = sb.st_mtime ;
+		    fep->size = sb.st_size ;
+	            while ((rs = breadlns(&b,lbuf,llen)) > 0) {
+		        cchar	*lp{} ;
+		        if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {
+		            rs = procln(lp,ll) ;
+		        }
+	            } /* end if (bfile_readln) */
+		} /* end if (bcontrol) */
+	        rs1 = bclose(&b) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (bfile) */
+	    rs = rsfree(rs,lbuf) ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
 
-	FIELD	fsb ;
+int dialtab_fileadd(DT *op,cchar *dialfname) noex {
+    	int		rs ;
+	if ((rs = dialtab_magic(op,dialfname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dialfname[0]) {
+    		adder	ao(op,dialfname) ;
+		rs = ao ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (dialtab_fileadd) */
+
+
+    	DT_ENT		de ;
+	DT_FI		fe, *fep ;
+	USTAT		sb ;
+
+	field	fsb ;
 
 	bfile	dialfile, *sfp = &dialfile ;
 
@@ -216,10 +363,10 @@ const char	dialfname[] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 
 
-	if ((op == NULL) || (dialfname == NULL))
+	if ((op == nullptr) || (dialfname == nullptr))
 	    return SR_FAULT ;
 
-	if (op->magic != DIALTAB_MAGIC)
+	if (op->magic != DT_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = bopen(sfp,dialfname,"r",0664) ;
@@ -243,17 +390,16 @@ const char	dialfname[] ;
 	if (rs < 0)
 	    goto bad1 ;
 
-	rs = vecobj_add(&op->files,&fe) ;
+	rs = vecobj_add(op->flp,&fe) ;
 	fi = rs ;
 	if (rs < 0)
 	    goto bad2 ;
 
-	rs = vecobj_get(&op->files,fi,&fep) ;
+	rs = vecobj_get(op->flp,fi,&fep) ;
 	if (rs < 0)
 	    goto bad3 ;
 
 	bcontrol(sfp,BC_STAT,&sb) ;
-
 	fep->dev = sb.st_dev ;
 	fep->ino = sb.st_ino ;
 	fep->mtime = sb.st_mtime ;
@@ -288,7 +434,7 @@ const char	dialfname[] ;
 
 	                if (entry_enough(&de) > 0) {
 
-	                    rs = vecobj_add(&op->entries, &de) ;
+	                    rs = vecobj_add(op->elp, &de) ;
 	                    if (rs < 0) break ;
 
 	                    c += 1 ;
@@ -308,34 +454,23 @@ const char	dialfname[] ;
 
 	            } else {
 
-	                ki = matostr(dialkeys,2,fp,fl) ;
-
-	                if (ki >= 0) {
-
+	                if ((ki = matostr(dialkeys,2,fp,fl)) >= 0) {
 	                    if ((fl = field_get(&fsb,fterms,&fp)) > 0) {
-
 	                        switch (ki) {
-
 	                        case dialkey_uucp:
 	                            de.uucp = mallocstrw(fp,fl) ;
 	                            break ;
-
 	                        case dialkey_inet:
 	                            de.inet = mallocstrw(fp,fl) ;
 	                            break ;
-
 	                        case dialkey_username:
 	                            de.username = mallocstrw(fp,fl) ;
 	                            break ;
-
 	                        case dialkey_password:
 	                            de.password = mallocstrw(fp,fl) ;
 	                            break ;
-
 	                        } /* end switch */
-
 	                    } /* end if (got value for this key) */
-
 	                } /* end if (got a valid key) */
 
 	            } /* end if */
@@ -354,19 +489,10 @@ const char	dialfname[] ;
 	    goto bad4 ;
 
 	if (f_ent && (entry_enough(&de) > 0)) {
-
-	    rs = vecobj_add(&op->entries,&de) ;
-
-#if	CF_DEBUGS
-	    debugprintf("dialtab_start: stored previous entry \"%s\"\n",
-	        se.name) ;
-#endif
-
-	    if (rs >= 0) {
+	    if ((rs = vecobj_add(op->elp,&de)) >= 0) {
 	        c += 1 ;
 		f_ent = FALSE ;
 	    }
-
 	} else if (f_ent) {
 	    entry_finish(&de) ;
 	    f_ent = FALSE ;
@@ -407,301 +533,171 @@ bad0:
 }
 /* end subroutine (dialtab_fileadd) */
 
-
-/* free up the resources occupied by a DIALTAB list */
-int dialtab_close(op)
-DIALTAB		*op ;
-{
-	DIALTAB_ENT	*dep ;
-
-	DIALTAB_FILE	*fep ;
-
-	int	i ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != DIALTAB_MAGIC)
-	    return SR_NOTOPEN ;
-
-/* free up the dial entries */
-
-	for (i = 0 ; vecobj_get(&op->entries,i,&dep) >= 0 ; i += 1) {
-
-	    if (dep == NULL) continue ;
-
-	    entry_finish(dep) ;
-
-	} /* end for */
-
-	vecobj_finish(&op->entries) ;
-
-/* free up the files */
-
-	for (i = 0 ; vecobj_get(&op->files,i,&fep) >= 0 ; i += 1) {
-
-	    if (fep == NULL) continue ;
-
-	    file_finish(fep) ;
-
-	} /* end for */
-
-	vecobj_finish(&op->files) ;
-
-/* get out */
-
-	op->magic = 0 ;
-	return SR_OK ;
-}
-/* end subroutine (dialtab_close) */
-
-
 /* search the dial table for a name match */
-int dialtab_search(op,name,depp)
-DIALTAB		*op ;
-const char	name[] ;
-DIALTAB_ENT	**depp ;
-{
-	int	l, l1, l2, i ;
-
-	const char	*sp, *cp ;
-
-
-#if	CF_DEBUGS
-	debugprintf("dialtab_search: ent name=%s\n",name) ;
-#endif
-
-	for (i = 0 ; vecobj_get(&op->entries,i,depp) >= 0 ; i += 1) {
-	    if (*depp == NULL) continue ;
-
-	    sp = (*depp)->name ;
-
-#if	CF_DEBUGS
-	    debugprintf("dialtab_search: got entry=\"%s\"\n",sp) ;
-#endif
-
-	    if (((cp = strchr(sp,'*')) != NULL) &&
-	        (strchr(sp,'\\') == NULL)) {
-
-#if	CF_DEBUGS
-	        debugprintf("dialtab_search: got a star, cp=%s\n",cp) ;
-#endif
-
-	        if (strncmp(name,sp,cp - sp) == 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("dialtab_search: leading matched up \n") ;
-#endif
-
-	            cp += 1 ;
-	            l1 = strlen(name) ;
-
-	            l2 = strlen(sp) ;
-
-#if	CF_DEBUGS
-	            debugprintf("dialtab_search: l1=%d l2=%d\n",l1,l2) ;
-#endif
-
-	            l = sp + l2 - cp ;
-
-#if	CF_DEBUGS
-	            debugprintf("dialtab_search: l=%d\n",l) ;
-#endif
-
-	            if (strncmp(name + l1 - l,cp,l) == 0)
-	                return i ;
-
-	        }
-
-	    } else if (strcmp(name,sp) == 0)
-	        return i ;
-
-	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("dialtab_search: did not match any entry\n") ;
-#endif
-
-	return -1 ;
+int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
+    	int		rs ;
+	int		idx = 0 ;
+	if ((rs = dialtab_magic(op,name)) >= 0) {
+    	    cnullptr	np{} ;
+	    void	*vp{} ;
+	    for (int i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
+		DT_ENT	*ep = (DT_ENT *) vp ;
+	        if (vp) {
+		    bool	f = true ;
+		    cchar	*sp = ep->name ;
+		    cchar	*cp ;
+	            if (depp) *depp = ep ;
+	            f = f && ((cp = strchr(sp,'*')) != np) ;
+		    f = f && (strchr(sp,'\\') == np) ;
+		    if (f) {
+	                if (strncmp(name,sp,(cp - sp)) == 0) {
+			    cint	l1 = strlen(name) ;
+			    int		l2 = strlen(sp) ;
+			    int		l ;
+	                    cp += 1 ;
+	                    l = (sp + l2 - cp) ;
+	                    if (strncmp((name + l1 - l),cp,l) == 0) {
+	                        idx = i ;
+			        break ;
+		            }
+	                }
+	            } else if (strcmp(name,sp) == 0)
+	                idx = i ;
+		        break ;
+	            }
+	        } /* end if (non-null) */
+	    } /* end for */
+	} /* end if (magic) */
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (dialtab_search) */
 
 
 /* private subroutines */
 
-
-static int dialtab_filedump(op,fi)
-DIALTAB		*op ;
-int		fi ;
-{
-	DIALTAB_ENT	*ep ;
-
-	int	rs = SR_OK ;
-	int	i ;
-
-
-	for (i = 0 ; vecobj_get(&op->entries,i,&ep) >= 0 ; i += 1) {
-	    if (ep == NULL) continue ;
-
-	    if ((fi < 0) || (ep->fi == fi)) {
-	        entry_finish(ep) ;
-	        vecobj_del(&op->entries,i--) ;
-	    }
-
-	} /* end for */
-
+static int dialtab_filedump(DT *op,int fi) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (op) {
+	    rs = SR_OK ;
+	    void	*vp{} ;
+	    for (int i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
+	        DT_ENT	*ep = (DT_ENT *) vp ;
+	        if (vp) {
+	            if ((fi < 0) || (ep->fi == fi)) {
+			{
+	                    rs1 = entry_finish(ep) ;
+			    if (rs >= 0) rs = rs1 ;
+			}
+			{
+	                    rs1 = vecobj_del(op->elp,i--) ;
+			    if (rs >= 0) rs = rs1 ;
+			}
+	            }
+	        } /* end if (non-null) */
+	    } /* end for */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (dialtab_filedump) */
 
-
-static int dialtab_filedel(op,fi)
-DIALTAB		*op ;
-int		fi ;
-{
-	DIALTAB_FILE	*fep ;
-
-	int	rs ;
-
-
-	rs = vecobj_get(&op->files,fi,&fep) ;
-
-	if ((rs >= 0) && (fep != NULL)) {
-	    file_finish(fep) ;
-	    rs = vecobj_del(&op->files,fi) ;
-	}
-
+static int dialtab_filedel(DT *op,int fi) noex {
+	int		rs ;
+	int		rs1 ;
+	if (void *vp{} ; (rs = vecobj_get(op->flp,fi,&vp) >= 0) {
+	    DT_FI	*fep = (DT_FI *) vp ;
+	    if (vp) {
+	        {
+	            rs1 = file_finish(fep) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = vecobj_del(op->flp,fi) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+	    }
+	} /* end if (vecobj_get) */
 	return rs ;
 }
 /* end subroutine (dialtab_filedel) */
 
-
-static int file_start(fep,fname)
-struct dialtab_file	*fep ;
-const char	fname[] ;
-{
-	int	rs = SR_OK ;
-
-
-	if ((fep == NULL) || (fname == NULL))
-	    return SR_FAULT ;
-
-	memset(fep,0,sizeof(struct dialtab_file)) ;
-
-	fep->fname = mallocstr(fname) ;
-	if (fep->fname == NULL)
-	    rs = SR_NOMEM ;
-
+static int file_start(DT_FI *fep,cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	if (fep && fname) {
+	    rs = memclear(fep) ;
+	    if ((fep->fname = mallocstr(fname)) == nullptr) {
+	        rs = SR_NOMEM ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_start) */
 
-
-static int file_finish(fep)
-struct dialtab_file	*fep ;
-{
-
-
-	if (fep == NULL)
-	    return SR_FAULT ;
-
-	if (fep->fname != NULL) {
-	    uc_free(fep->fname) ;
-	    fep->fname = NULL ;
-	}
-
-	return SR_OK ;
+static int file_finish(DT_FI *fep) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (fep) {
+	    rs = SR_OK ;
+	    if (fep->fname) {
+	        rs1 = uc_free(fep->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        fep->fname = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (file_finish) */
 
-
-static int entry_start(dep,dname,nlen)
-struct dialtab_ent	*dep ;
-const char		dname[] ;
-int			nlen ;
-{
-	int	rs = SR_OK ;
-
-
-	if ((dep == NULL) || (dname == NULL))
-	    return SR_FAULT ;
-
-	memset(dep,0,sizeof(struct dialtab_ent)) ;
-
-	dep->name = mallocstrw(dname,nlen) ;
-	if (dep->name == NULL)
-	    rs = SR_NOMEM ;
-
+static int entry_start(DT_ENT *dep,cchar *dname,int nlen) noex {
+	int		rs = SR_FAULT ;
+	if (dep && dname) {
+	    rs = memclear(dep) ;
+	    if ((dep->name = mallocstrw(dname,nlen)) == nullptr) {
+	        rs = SR_NOMEM ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
 
-
-/* is there enough of a service entry to keep it? */
-static int entry_enough(dep)
-struct dialtab_ent	*dep ;
-{
-
-
-	if (dep == NULL)
-	    return SR_FAULT ;
-
-	if ((dep->name == NULL) || (dep->name[0] == '\0'))
-	    return FALSE ;
-
-	if ((dep->uucp != NULL) && (dep->uucp[0] != '\0'))
-	    return TRUE ;
-
-	if ((dep->inet != NULL) && (dep->inet[0] != '\0'))
-	    return TRUE ;
-
-	if ((dep->username != NULL) && (dep->username[0] != '\0'))
-	    return TRUE ;
-
-	if ((dep->password != NULL) && (dep->password[0] != '\0'))
-	    return TRUE ;
-
-	return FALSE ;
+static int entry_enough(DT_ENT *dep) noex {
+    	int		rs = SR_FAULT ;
+	int		fret = false ;
+	if (dep) {
+	    rs = SR_OK ;
+	    if (dep->name && dep->name[0]) {
+	        fret = fret || (dep->uucp && (dep->uucp[0] != '\0')) ;
+	        fret = fret || (dep->inet && (dep->inet[0] != '\0')) ;
+	        fret = fret || (dep->username && (dep->username[0] != '\0')) ;
+	        fret = fret || (dep->password && (dep->password[0] != '\0')) ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? fret : rs ;
 }
 /* end subroutine (entry_enough) */
 
-
-static int entry_finish(dep)
-struct dialtab_ent	*dep ;
-{
-
-
-	if (dep == NULL)
-	    return SR_FAULT ;
-
-	if (dep->name == NULL)
-	    return SR_OK ;
-
-	freeit(&dep->name) ;
-
-	freeit(&dep->uucp) ;
-
-	freeit(&dep->inet) ;
-
-	freeit(&dep->username) ;
-
-	freeit(&dep->password) ;
-
-	return SR_OK ;
+static int entry_finish(DT_ENT *dep) noex {
+    	int		rs = SR_FAULT ;
+	if (dep) {
+	    rs = SR_BUGCHECK ;
+	    if (dep->name) {
+	        rs = SR_OK ;
+		freeit(&dep->name) ;
+		freeit(&dep->uucp) ;
+		freeit(&dep->inet) ;
+		freeit(&dep->username) ;
+		freeit(&dep->password) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_finish) */
 
-
-static void freeit(pp)
-const char	**pp ;
-{
-
-	if (*pp != NULL) {
+static void freeit(cchar **pp) noex {
+	if (*pp) {
 	    uc_free(*pp) ;
-	    *pp = NULL ;
+	    *pp = nullptr ;
 	}
-
 }
 /* end subroutine (freeit) */
 

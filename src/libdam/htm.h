@@ -1,4 +1,5 @@
 /* htm HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* hack to output HTML */

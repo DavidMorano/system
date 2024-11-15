@@ -1,4 +1,5 @@
 /* bopensched SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a file name according to rules */

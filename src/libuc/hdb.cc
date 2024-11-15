@@ -248,6 +248,7 @@ static inline int hdb_dtor(hdb *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (hdb_dtor) */
 
 static int	hdb_entnew(hdb *,ENT **) noex ;
 static int	hdb_entdel(hdb *,ENT *) noex ;

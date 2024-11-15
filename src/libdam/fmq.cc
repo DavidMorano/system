@@ -4,7 +4,6 @@
 /* File Message Queue (FMQ) */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		1		/* safer */
 #define	CF_ALWAYSCREATE	0		/* always create file */
 #define	CF_SENDCREATE	0		/* sender creates also */
 #define	CF_SIGFILLSET	1		/* signal mask on interrupt */
@@ -308,6 +307,10 @@ int fmq_close(fmq *op) noex {
 	    }
 	    {
 	       rs1 = uc_free(op->fname) ;
+	       if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	       rs1 = fmq_dtor(op) ;
 	       if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;

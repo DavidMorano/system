@@ -1,6 +1,6 @@
 /* lineindex SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* line indexing object */
 /* version %I% last-modified %G% */
@@ -9,8 +9,9 @@
 /* revision history:
 
 	= 2003-06-11, David A­D­ Morano
-	I snarfed this file from the SS-Hammock crap since I thought
-	it might be a bit similar.  We will see how it works out!
+	I snarfed this object (flavor) from the SS-Hammock processing
+	and lookup (access management) code.  We will see how it
+	works out!
 
 */
 
@@ -139,7 +140,7 @@ enum headers {
 
 static sysval		pagesize(sysval_ps) ;
 
-contexpr int		magicsize = LINEINDEXHDR_MAGICSIZE ;
+constexpr int		magicsize = LINEINDEXHDR_MAGICSIZE ;
 
 
 /* exported variables */
@@ -203,7 +204,7 @@ static int lineindex_opener(LI *op) noex {
 	    cint	sz = magicsize + 4 + (header_overlast * szof(int)) ;
 	    cint	fd = op->fd ;
 	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-		size_t	fsz = size_t(sb.st_size) ;
+		csize	fsz = size_t(sb.st_size) ;
 		csize	hsz = size_t(sz) ;
 		cint	to = TO_FILECOME ;
 		if (S_ISREG(sb.st_mode)) {
@@ -574,7 +575,7 @@ static int lineindex_fileopener(LI *op,time_t dt) noex {
 	    op->fd = rs ;
 	    op->ti_open = dt ;
 	} else if (isNotPresent(rs)) {
-	    bool	fc = bool(op->of & O_CREAT) ;
+	    cbool	fc = bool(op->of & O_CREAT) ;
 	    if (fc && (op->tfn != nullptr)) {
 	        if ((rs = lineindex_mkindex(op)) >= 0) {
 	            rs = u_open(op->ifn,of,om) ;
@@ -593,10 +594,10 @@ static int lineindex_fileopen(LI *op,time_t dt) noex {
 	if (op->fd < 0) {
 	    if ((rs = lineindex_fileopener(op,dt)) >= 0) {
 		if ((rs = isfsremote(op->fd)) >= 0) {
-		    cbool	f = (rs > 0) ;
-		    fc = (! LEQUIV(f,op->fl.remote)) ;
+		    cbool	fr = (rs > 0) ;
+		    fc = (! LEQUIV(fr,op->fl.remote)) ;
 		    if (fc) {
-	    		op->fl.remote = f ;
+	    		op->fl.remote = fr ;
 		    }
 	    	    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	                if (! fc) {
@@ -613,7 +614,7 @@ static int lineindex_fileopen(LI *op,time_t dt) noex {
 		}
 	    } /* end if (lineindex_fileropener) */
 	} /* end if (open needed) */
-	return (rs >= 0) ? f_changed : rs ;
+	return (rs >= 0) ? fc : rs ;
 }
 /* end subroutine (lineindex_fileopen) */
 

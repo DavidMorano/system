@@ -1,4 +1,5 @@
 /* tmpx_getrunlevel SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the name of the controlling terminal for the current session */
@@ -85,11 +86,10 @@ int tmpx_getrunlevel(tmpx *op) noex {
 	    if_constexpr (f_darwin) {
 		runlevel = 3 ;
 	    } else {
-	        tmpx_ent	ue ;
-	        tmpx_cur	cur ;
-	        if ((rs = tmpx_curbegin(op,&cur)) >= 0) {
+	        if (tmpx_cur cur ; (rs = tmpx_curbegin(op,&cur)) >= 0) {
+	            tmpx_ent	ue{} ;
 	            while (rs >= 0) {
-		        rs1 = tmpx_enum(op,&cur,&ue) ;
+		        rs1 = tmpx_curenum(op,&cur,&ue) ;
 		        if (rs1 == SR_NOTFOUND) break ;
 		        rs = rs1 ;
 		        if (rs < 0) break ;

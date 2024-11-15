@@ -1,4 +1,5 @@
 /* netfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* read a NETRC file and make its contents available */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	netfile
+
+	Description:
 	OK, here is the deal.  We ignore the 'macdef' key totally
 	except to process the fact that it has a value (which is
 	supposed to be the name of the newly defined macro) and the
@@ -52,6 +57,7 @@
 #include	<vecitem.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterminit.hh>
 #include	<matxstr.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>		/* |LINEBUFLEN| */
@@ -171,8 +177,7 @@ int netfile_open(netfile *vep,cchar *netfname) noex {
 	    rs = SR_INVALID ;
 	    if (netfname[0]) {
 	        if ((rs = vecitem_start(vep,10,0)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_stat(netfname,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_stat(netfname,&sb)) >= 0) {
 	                if (! S_ISDIR(sb.st_mode)) {
 	                    NETSTATE	ns ;
 	                    if ((rs = netstate_start(&ns)) >= 0) {
@@ -231,16 +236,14 @@ int netfile_get(netfile *vep,int i,netfile_ent **epp) noex {
 /* private subroutines */
 
 static int netfile_parse(netfile *vep,netstate *nsp,cchar *netfname) noex {
-	linebuffer	lb ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = lb.start) >= 0) {
+	if (linebuffer lb ; (rs = lb.start) >= 0) {
 	    bfile	ourfile, *nfp = &ourfile ;
 	    cint	llen = lb.llen ;
 	    char	*lbuf = lb.lbuf ;
 	    if ((rs = bopen(nfp,netfname,"r",0664)) >= 0) {
-	        field	fsb ;
 	        int	ch ;
 	        char	keybuf[KEYBUFLEN+1] ;
 	        bool	f_macdef = false ;
@@ -257,11 +260,11 @@ static int netfile_parse(netfile *vep,netstate *nsp,cchar *netfname) noex {
 	                if (len == 0) f_macdef = false ;
 	                continue ;
 	            }
-	            if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
+	            if (field fsb ; (rs = fsb.start(lbuf,len)) >= 0) {
 	                int	fl ;
 	                cchar	*fp ;
 	                bool	f_default = false ;
-	                while ((fl = field_get(&fsb,fterms,&fp)) > 0) {
+	                while ((fl = fsb.get(fterms,&fp)) > 0) {
 	                    cint	ml = min(KEYBUFLEN,fl) ;
 	                    int		nki ;
 	                    strwcpylc(keybuf,fp,ml) ;
@@ -276,7 +279,7 @@ static int netfile_parse(netfile *vep,netstate *nsp,cchar *netfname) noex {
 	                        case netkey_password:
 	                        case netkey_account:
 	                            if (fsb.term == '#') break ;
-	                            if ((cl = field_get(&fsb,ft,&fp)) >= 0) {
+	                            if ((cl = fsb.get(ft,&fp)) >= 0) {
 	                                cp = fp ;
 	                            }
 	                            break ;
@@ -301,7 +304,7 @@ static int netfile_parse(netfile *vep,netstate *nsp,cchar *netfname) noex {
 	                    if (fsb.term == '#') break ;
 	                    if (rs < 0) break ;
 	                } /* end while (processing keys) */
-	                rs1 = field_finish(&fsb) ;
+	                rs1 = fsb.finish ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (field) */
 		    if (rs < 0) break ;
@@ -326,11 +329,10 @@ static int netfile_item(netfile *vep,netstate *nsp,int nki,cc *sp,int sl) noex {
 	int		nii = getnii(nki) ;
 	if ((nii == netitem_machine) || (nii < 0)) {
 	    if (netstate_ready(nsp) > 0) {
-		netfile_ent	e ;
-	        if ((rs = entry_start(&e,nsp)) >= 0) {
-		    cint	esize = sizeof(netfile_ent) ;
+		if (netfile_ent e ; (rs = entry_start(&e,nsp)) >= 0) {
+		    cint	esize = szof(netfile_ent) ;
 	            if ((rs = vecitem_add(vep,&e,esize)) >= 0) {
-	                int	ei = rs ;
+	                cint	ei = rs ;
 	                rs = netstate_reset(nsp) ;
 	                if (rs < 0) {
 	                    vecitem_del(vep,ei) ;
@@ -378,12 +380,11 @@ static int netstate_item(netstate *nsp,int ki,cchar *sp,int sl) noex {
 	if ((ki >= 0) && (ki < netitem_overlast)) {
 	    rs = SR_OK ;
 	    if (sp) {
-	        cchar	*cp ;
 	        if (nsp->item[ki] != nullptr) {
 	            uc_free(nsp->item[ki]) ;
 	            nsp->item[ki] = nullptr ;
 	        }
-	        if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	            nsp->item[ki] = cp ;
 	            nsp->c += 1 ;
 	        }

@@ -48,7 +48,6 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"snx.h"
@@ -63,6 +62,12 @@
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */

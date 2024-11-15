@@ -648,16 +648,6 @@ dater.o:		dater.dir
 dater.dir:
 	makesubdir $@
 
-# LOCALSET
-localset.o:		localset.dir
-localset.dir:
-	makesubdir $@
-
-# LOCALGET
-localget.o:		localget.dir
-localget.dir:
-	makesubdir $@
-
 # SBUF
 sbuf.o:			sbuf.dir
 sbuf.dir:

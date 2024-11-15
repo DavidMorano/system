@@ -107,15 +107,7 @@ int uc_getarchitecture(char *rbuf,int rlen) noex {
 		    } else {
 		        arch = "sparc" ;
 		    }
-		} else if_constexpr (f_darwin) {
-		    if_constexpr (f_x8664) {
-		        arch = "x86_64" ;
-		    } else if_constexpr (f_amd) {
-		        arch = "amd64" ;
-		    } else if_constexpr (f_arm) {
-		        arch = "arm64" ;
-		    }
-		} else if_constexpr (f_linux) {
+		} else if_constexpr (f_darwin || f_linux) {
 		    if_constexpr (f_x8664) {
 		        arch = "x86_64" ;
 		    } else if_constexpr (f_amd) {

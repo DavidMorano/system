@@ -1,4 +1,5 @@
 /* breadlns SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a line with possible continuation */

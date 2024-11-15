@@ -1,4 +1,5 @@
 /* spellchecks SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SPELLCHECKS object implementation */
@@ -24,6 +25,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	spellchecks
+
+	Description:
 	This module manages access and maintenance for the spell-check
 	facility.  This facility may contain several spelling lists
 	that may need to have their indices rebuilt as needed.
@@ -34,10 +39,10 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<getbufsize.h>
@@ -66,33 +71,40 @@
 #include	<mkfnamesuf.h>
 #include	<strwcpy.h>
 #include	<cfdec.h>
+#include	<strlist.h>
+#include	<strlistmk.h>
+#include	<matxstr.h>		/* |matpstr(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"spellchecks.h"
-#include	"strlist.h"
-#include	"strlistmk.h"
 
 
 /* local defines */
 
-#define	SPELLCHECKS_DBSUF	"calendar"
-#define	SPELLCHECKS_NLE		1	/* default number line entries */
-#define	SPELLCHECKS_DMODE	0777
-#define	SPELLCHECKS_DBDIR	"share/calendar"
-#define	SPELLCHECKS_LE		struct spellchecks_list
-#define	SPELLCHECKS_LEF		struct spellchecks_lflags
-#define	SPELLCHECKS_CD		struct spellchecks_cachedir
-#define	SPELLCHECKS_CDF		struct spellchecks_cdflags
+#define	SC		spellchecks
+
+#define	SC_DBSUF	"calendar"
+#define	SC_NLE		1	/* default number line entries */
+#define	SC_DMODE	0777
+#define	SC_DBDIR	"share/calendar"
+#define	SC_LE		struct spellchecks_list
+#define	SC_LEF		struct spellchecks_lflags
+#define	SC_CD		struct spellchecks_cachedir
+#define	SC_CDF		struct spellchecks_cdflags
 
 #define	STRDESC			struct strdesc
+
 #define	SUBINFO			struct subinfo
-#define	SUBINFO_FL		SUBINFO_flags
+#define	SUBINFO_FL		subinfo_flags
+
 #define	CONFIG			struct config
+
 #define	CACHEDIR		struct spellchecks_cachedir
-#define	CACHEDIR_NFIELDS	2
+#define	CACHEDIR_NFS	2
+
 #define	DB			struct spellchecks_list
-#define	DB_NFIELDS		3
+#define	DB_NFS		3
 
 #undef	WORDER
 #define	WORDER			struct worder
@@ -145,7 +157,7 @@
 #undef	NLINES
 #define	NLINES		20
 
-#define	CEBUFLEN	(NLINES * 3 * sizeof(int))
+#define	CEBUFLEN	(NLINES * 3 * szof(int))
 
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_MKWAIT	(5 * 50)
@@ -158,12 +170,17 @@
 
 /* external subroutines */
 
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	matpcasestr(cchar **,int,cchar *,int) ;
-extern int	prsetfname(cchar *,char *,cchar *,int,cchar *,cchar *,cchar *) ;
+extern "C" {
+    extern int	prsetfname(cc *,char *,cc *,int,cc *,cc *,cc *) noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
+
+struct subinfo ;
 
 struct strdesc {
 	cchar		*sp ;
@@ -171,14 +188,14 @@ struct strdesc {
 } ;
 
 struct config {
-	SUBINFO		*sip ;
+	subinfo		*sip ;
 	paramfile	p ;
 	expcook		c ;
 	uint		f_p:1 ;
 	uint		f_c:1 ;
 } ;
 
-SUBINFO_flags {
+struct subinfo_flags {
 	uint		stores:1 ;
 	uint		dbs:1 ;
 	uint		cachedirs:1 ;
@@ -189,15 +206,15 @@ SUBINFO_flags {
 	uint		hols:1 ;
 } ;
 
-SUBINFO {
+struct subinfo {
 	vecstr		stores ;
 	vechand		dbs ;
 	vechand		cachedirs ;
-	IDS		id ;
+	ids		id ;
 	SUBINFO_FL	init, f ;
 	SUBINFO_FL	open ;
-	SPELLCHECKS	*op ;
-	CONFIG		*cfp ;
+	spellchecks	*op ;
+	config		*cfp ;
 	cchar		*pr ;
 	cchar		*sn ;
 	cchar		*dbfname ;
@@ -219,7 +236,7 @@ struct spellchecks_list {
 	cchar		*idxname ;	/* index file name */
 	cchar		*dbfname ;	/* DB (actual list) file-name */
 	cchar		*cdname ;	/* cache directory name */
-	SPELLCHECKS_LEF	f ;
+	SC_LEF	f ;
 	STRLIST		idx ;		/* the STRLIST object */
 } ;
 
@@ -261,7 +278,7 @@ struct spellchecks_eflags {
 	uint		hash:1 ;
 } ;
 
-struct spellchecks_e {
+struct spellchecks_entry {
 	struct spellchecks_eline	*lines ;
 	struct spellchecks_eflags	f ;
 	uint		voff ;
@@ -292,7 +309,7 @@ static int	spellchecks_dirnamescreate(SPELLCHECKS *,cchar **) noex ;
 static int	spellchecks_dirnamesdestroy(SPELLCHECKS *) noex ;
 
 static int	spellchecks_checkupdate(SPELLCHECKS *,time_t) noex ;
-static int	spellchecks_loadbuf(SPELLCHECKS *,SPELLCHECKS_ENT *,
+static int	spellchecks_loadbuf(SPELLCHECKS *,SC_ENT *,
 			char *,int) noex ;
 static int	spellchecks_tmpfrees(SPELLCHECKS *) noex ;
 static int	spellchecks_calscreate(SPELLCHECKS *,SUBINFO *,
@@ -302,48 +319,48 @@ static int	spellchecks_calscreater(SPELLCHECKS *,SUBINFO *,
 static int	spellchecks_calsdestroy(SPELLCHECKS *) noex ;
 static int	spellchecks_listcreate(SPELLCHECKS *,SUBINFO *,
 			cchar *,cchar *) noex ;
-static int	spellchecks_listdestroy(SPELLCHECKS *,SPELLCHECKS_CAL *) noex ;
+static int	spellchecks_listdestroy(SPELLCHECKS *,SC_CAL *) noex ;
 
 #ifdef	COMMENT
 static int	spellchecks_mksysvarsi(SPELLCHECKS *,cchar *) noex ;
 #endif
 
-static int	spellchecks_resultfins(SPELLCHECKS *,SPELLCHECKS_CUR *) noex ;
-static int	spellchecks_calcite(SPELLCHECKS *,vecobj *,SPELLCHECKS_CAL *,
-			SPELLCHECKS_QUERY *) noex ;
+static int	spellchecks_resultfins(SPELLCHECKS *,SC_CUR *) noex ;
+static int	spellchecks_calcite(SPELLCHECKS *,vecobj *,SC_CAL *,
+			SC_QUERY *) noex ;
 static int	spellchecks_mkresults(SPELLCHECKS *,vecobj *,
-			SPELLCHECKS_CUR *) noex ;
+			SC_CUR *) noex ;
 static int	spellchecks_already(SPELLCHECKS *,vecobj *,
-			SPELLCHECKS_ENT *) noex ;
+			SC_ENT *) noex ;
 
-static int	cal_open(SPELLCHECKS_CAL *,SUBINFO *,int,
+static int	cal_open(SC_CAL *,SUBINFO *,int,
 			cchar *,cchar *) ;
-static int	cal_close(SPELLCHECKS_CAL *) ;
-static int	cal_dbloadbegin(SPELLCHECKS_CAL *,SUBINFO *) ;
-static int	cal_dbloadend(SPELLCHECKS_CAL *) ;
-static int	cal_indopen(SPELLCHECKS_CAL *,SUBINFO *) ;
-static int	cal_dbmapcreate(SPELLCHECKS_CAL *,time_t) ;
-static int	cal_dbmapdestroy(SPELLCHECKS_CAL *) ;
-static int	cal_indopenperm(SPELLCHECKS_CAL *,SUBINFO *) ;
-static int	cal_indopentmp(SPELLCHECKS_CAL *,SUBINFO *) ;
+static int	cal_close(SC_CAL *) ;
+static int	cal_dbloadbegin(SC_CAL *,SUBINFO *) ;
+static int	cal_dbloadend(SC_CAL *) ;
+static int	cal_indopen(SC_CAL *,SUBINFO *) ;
+static int	cal_dbmapcreate(SC_CAL *,time_t) ;
+static int	cal_dbmapdestroy(SC_CAL *) ;
+static int	cal_indopenperm(SC_CAL *,SUBINFO *) ;
+static int	cal_indopentmp(SC_CAL *,SUBINFO *) ;
 
 #ifdef	COMMENT
-static int	cal_idxset(SPELLCHECKS_CAL *,int) ;
+static int	cal_idxset(SC_CAL *,int) ;
 #endif
 
-static int	cal_idxget(SPELLCHECKS_CAL *) ;
-static int	cal_indopencheck(SPELLCHECKS_CAL *,cchar *,int,int) ;
-static int	cal_mkdirs(SPELLCHECKS_CAL *,cchar *,int) ;
-static int	cal_audit(SPELLCHECKS_CAL *) ;
+static int	cal_idxget(SC_CAL *) ;
+static int	cal_indopencheck(SC_CAL *,cchar *,int,int) ;
+static int	cal_mkdirs(SC_CAL *,cchar *,int) ;
+static int	cal_audit(SC_CAL *) ;
 
-static int	cal_indmk(SPELLCHECKS_CAL *,SUBINFO *,cchar *,
+static int	cal_indmk(SC_CAL *,SUBINFO *,cchar *,
 			int,time_t) ;
-static int	cal_indmkdata(SPELLCHECKS_CAL *,SUBINFO *,cchar *,
+static int	cal_indmkdata(SC_CAL *,SUBINFO *,cchar *,
 			mode_t,int) ;
-static int	cal_indclose(SPELLCHECKS_CAL *) ;
+static int	cal_indclose(SC_CAL *) ;
 
-static int	cal_loadbuf(SPELLCHECKS_CAL *,SPELLCHECKS_ENT *,char *,int) ;
-static int	cal_mapdata(SPELLCHECKS_CAL *,cchar **) ;
+static int	cal_loadbuf(SC_CAL *,SC_ENT *,char *,int) ;
+static int	cal_mapdata(SC_CAL *,cchar **) ;
 
 static int	subinfo_start(SUBINFO *,SPELLCHECKS *,
 			cchar *,cchar *) ;
@@ -365,10 +382,10 @@ static int	subinfo_mkdirnames(SUBINFO *) ;
 static int	subinfo_havedir(SUBINFO *,char *) ;
 static int	subinfo_loadnames(SUBINFO *,vecstr *,cchar *) ;
 static int	subinfo_havestart(SUBINFO *,
-			SPELLCHECKS_QUERY *,cchar *,int) ;
+			SC_QUERY *,cchar *,int) ;
 static int	subinfo_year(SUBINFO *) ;
 static int	subinfo_mkday(SUBINFO *,int,cchar *,int) ;
-static int	subinfo_transhol(SUBINFO *,SPELLCHECKS_CITE *,
+static int	subinfo_transhol(SUBINFO *,SC_CITE *,
 			cchar *,int) ;
 static int	subinfo_checkdname(SUBINFO *,cchar *) ;
 
@@ -382,26 +399,26 @@ static int	cachedir_finish(CACHEDIR *) ;
 static int	db_start(DB *,STRDESC *,int) ;
 static int	db_finish(DB *) ;
 
-static int	entry_start(SPELLCHECKS_ENT *,SPELLCHECKS_CITE *,int,int) ;
-static int	entry_setidx(SPELLCHECKS_ENT *,int) ;
-static int	entry_add(SPELLCHECKS_ENT *,uint,uint) ;
-static int	entry_finish(SPELLCHECKS_ENT *) ;
-static int	entry_mkhash(SPELLCHECKS_ENT *,SPELLCHECKS *) ;
-static int	entry_sethash(SPELLCHECKS_ENT *,uint) ;
-static int	entry_samehash(SPELLCHECKS_ENT *,SPELLCHECKS *,
-			SPELLCHECKS_ENT *) ;
-static int	entry_same(SPELLCHECKS_ENT *,SPELLCHECKS *,SPELLCHECKS_ENT *) ;
-static int	entry_loadbuf(SPELLCHECKS_ENT *,cchar *,char *,int) ;
+static int	entry_start(SC_ENT *,SC_CITE *,int,int) ;
+static int	entry_setidx(SC_ENT *,int) ;
+static int	entry_add(SC_ENT *,uint,uint) ;
+static int	entry_finish(SC_ENT *) ;
+static int	entry_mkhash(SC_ENT *,SPELLCHECKS *) ;
+static int	entry_sethash(SC_ENT *,uint) ;
+static int	entry_samehash(SC_ENT *,SPELLCHECKS *,
+			SC_ENT *) ;
+static int	entry_same(SC_ENT *,SPELLCHECKS *,SC_ENT *) ;
+static int	entry_loadbuf(SC_ENT *,cchar *,char *,int) ;
 
 #if	CF_SAMECITE
-static int	entry_samecite(SPELLCHECKS_ENT *,SPELLCHECKS *,
-			SPELLCHECKS_ENT *) ;
+static int	entry_samecite(SC_ENT *,SPELLCHECKS *,
+			SC_ENT *) ;
 #endif
 
-static int	mkbve_start(CYIMK_ENT *,SUBINFO *,SPELLCHECKS_ENT *) ;
+static int	mkbve_start(CYIMK_ENT *,SUBINFO *,SC_ENT *) ;
 static int	mkbve_finish(CYIMK_ENT *) ;
 
-static int	worder_start(WORDER *,SPELLCHECKS *,SPELLCHECKS_ENT *) ;
+static int	worder_start(WORDER *,SPELLCHECKS *,SC_ENT *) ;
 static int	worder_finish(WORDER *) ;
 static int	worder_get(WORDER *,cchar **) ;
 
@@ -418,26 +435,28 @@ static int	config_dbone(CONFIG *,STRDESC *,int,cchar *,int) ;
 
 static bool	isempty(cchar *,int) noex ;
 
-static int	vrcmp(cvoid *,cvoid *) noex ;
+extern "C" {
+    static int	vrcmp(cvoid **,cvoid **) noex ;
+}
 
 
 /* exported variables */
 
-SPELLCHECKS_OBJ	spellchecks_mod = {
+SC_OBJ	spellchecks_modinfo = {
 	"spellchecks",
-	sizeof(SPELLCHECKS),
-	sizeof(SPELLCHECKS_CUR)
+	szof(spellchecks),
+	szof(spellchecks_cur)
 } ;
 
 
 /* local variables */
 
-static constexpr cpcchar	sched1[] = {
+constexpr cpcchar	sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
 
 enum cparams {
@@ -448,12 +467,12 @@ enum cparams {
 	cparam_overlast
 } ;
 
-static constexpr cpcchar	cparams[] = {
+constexpr cpcchar	cparams[] = {
 	"cachedir",
 	"db",
 	"logfile",
 	"logsize",
-	NULL
+	nullptr
 } ;
 
 enum cooks {
@@ -463,11 +482,11 @@ enum cooks {
 	cook_overlast
 } ;
 
-static constexpr cpcchar	cooks[] = {
+constexpr cpcchar	cooks[] = {
 	"pr",
 	"pn",
 	"bn",
-	NULL
+	nullptr
 } ;
 
 
@@ -482,10 +501,10 @@ int spellchecks_start(SPELLCHECK *op,cchar *pr,cchar *dbfname) noex {
 	int	c = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 #endif
 
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -495,7 +514,7 @@ int spellchecks_start(SPELLCHECK *op,cchar *pr,cchar *dbfname) noex {
 
 	if ((rs = subinfo_start(sip,op,pr,dbfname)) >= 0) {
 	    c = rs ;
-	    op->magic = SPELLCHECKS_MAGIC ;
+	    op->magic = SC_MAGIC ;
 	    subinfo_finish(sip) ;
 	} /* end if (subinfo) */
 
@@ -508,10 +527,10 @@ int spellchecks_finish(SPELLCHECK *op) noex {
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
@@ -532,10 +551,10 @@ int spellchecks_count(SPELLCHECKS *op) noex {
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
@@ -546,21 +565,21 @@ int spellchecks_count(SPELLCHECKS *op) noex {
 /* end subroutine (spellchecks_count) */
 
 int spellchecks_audit(SPELLCHECKS *op) noex {
-	SPELLCHECKS_LE	*lep ;
+	SC_LE	*lep ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
 	for (int i = 0 ; vechand_get(&op->lists,i,&lep) >= 0 ; i += 1) {
 	    STRLIST	*slp ;
-	    if (lep == NULL) continue ;
+	    if (lep == nullptr) continue ;
 	    slp = &lep->sl ;
 	    c += 1 ;
 	    rs = strlist_audit(slp) ;
@@ -571,18 +590,18 @@ int spellchecks_audit(SPELLCHECKS *op) noex {
 }
 /* end subroutine (spellchecks_audit) */
 
-int spellchecks_curbegin(SPELLCHECKS *op,SPELLCHECKS_CUR *curp) noex {
+int spellchecks_curbegin(SPELLCHECKS *op,SC_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL)
+	if (curp == nullptr)
 	    return SR_FAULT ;
 
 	memclear(curp) ;
@@ -590,35 +609,35 @@ int spellchecks_curbegin(SPELLCHECKS *op,SPELLCHECKS_CUR *curp) noex {
 	op->ncursors += 1 ;
 
 	curp->i = -1 ;
-	curp->magic = SPELLCHECKS_MAGIC ;
+	curp->magic = SC_MAGIC ;
 	return rs ;
 }
 /* end subroutine (spellchecks_curbegin) */
 
-int spellchecks_curend(SPELLCHECKS *op,SPELLCHECKS_CUR *curp) noex {
+int spellchecks_curend(SPELLCHECKS *op,SC_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL)
+	if (curp == nullptr)
 	    return SR_FAULT ;
 
-	if (curp->magic != SPELLCHECKS_MAGIC)
+	if (curp->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 
-	if (curp->results != NULL) {
+	if (curp->results != nullptr) {
 	    rs1 = spellchecks_resultfins(op,curp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(curp->results) ;
 	    if (rs >= 0) rs = rs1 ;
-	    curp->results = NULL ;
+	    curp->results = nullptr ;
 	}
 
 	if (op->ncursors > 0) {
@@ -630,12 +649,12 @@ int spellchecks_curend(SPELLCHECKS *op,SPELLCHECKS_CUR *curp) noex {
 }
 /* end subroutine (spellchecks_curend) */
 
-static int spellchecks_resultfins(SPELLCHECKS *op,SPELLCHECKS_CUR *curp) noex {
-	SPELLCHECKS_ENT	*ep = (SPELLCHECKS_ENT *) curp->results ;
+static int spellchecks_resultfins(SPELLCHECKS *op,SC_CUR *curp) noex {
+	SC_ENT	*ep = (SC_ENT *) curp->results ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep != NULL) {
+	if (ep != nullptr) {
 	    int	i ;
 	    for (i = 0 ; i < curp->nresults ; i += 1) {
 		rs1 = entry_finish(ep + i) ;
@@ -649,10 +668,10 @@ static int spellchecks_resultfins(SPELLCHECKS *op,SPELLCHECKS_CUR *curp) noex {
 
 int spellchecks_lookcite(op,curp,qvp)
 SPELLCHECKS	*op ;
-SPELLCHECKS_CUR	*curp ;
-SPELLCHECKS_QUERY	*qvp ;
+SC_CUR	*curp ;
+SC_QUERY	*qvp ;
 {
-	SPELLCHECKS_CAL	*calp ;
+	SC_CAL	*calp ;
 	vecobj		res ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -661,34 +680,34 @@ SPELLCHECKS_QUERY	*qvp ;
 	int		c = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (qvp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (qvp == nullptr) return SR_FAULT ;
 
-	if (curp->magic != SPELLCHECKS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magic != SC_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->results != NULL) {
+	if (curp->results != nullptr) {
 	    spellchecks_resultfins(op,curp) ;
 	    uc_free(curp->results) ;
-	    curp->results = NULL ;
+	    curp->results = nullptr ;
 	}
 
 	opts = 0 ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = sizeof(SPELLCHECKS_ENT) ;
+	size = szof(SC_ENT) ;
 	rs = vecobj_start(&res,size,0,opts) ;
 	if (rs < 0)
 	    goto ret0 ;
 
 	for (i = 0 ; vechand_get(&op->cals,i,&calp) >= 0 ; i += 1) {
-	    if (calp == NULL) continue ;
+	    if (calp == nullptr) continue ;
 
 	    rs = spellchecks_calcite(op,&res,calp,qvp) ;
 	    c += rs ;
@@ -700,9 +719,9 @@ SPELLCHECKS_QUERY	*qvp ;
 	}
 
 	if ((rs < 0) || (c > 0)) {
-	    SPELLCHECKS_ENT	*ep ;
+	    SC_ENT	*ep ;
 	    for (i = 0 ; vecobj_get(&res,i,&ep) >= 0 ; i += 1) {
-		if (ep == NULL) continue ;
+		if (ep == nullptr) continue ;
 		entry_finish(ep) ;
 	    }
 	}
@@ -719,12 +738,12 @@ ret0:
 
 int spellchecks_read(op,curp,qvp,rbuf,rlen)
 SPELLCHECKS	*op ;
-SPELLCHECKS_CUR	*curp ;
-SPELLCHECKS_CITE	*qvp ;
+SC_CUR	*curp ;
+SC_CITE	*qvp ;
 char		*rbuf ;
 int		rlen ;
 {
-	SPELLCHECKS_ENT	*ep ;
+	SC_ENT	*ep ;
 
 	int	rs = SR_OK ;
 	int	i ;
@@ -732,19 +751,19 @@ int		rlen ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (qvp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (qvp == nullptr) return SR_FAULT ;
 
-	if (curp->magic != SPELLCHECKS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magic != SC_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->results == NULL) {
+	if (curp->results == nullptr) {
 	    rs = SR_NOTFOUND ;
 	    goto ret0 ;
 	}
@@ -761,10 +780,10 @@ int		rlen ;
 	    goto ret0 ;
 	}
 
-	ep = (SPELLCHECKS_ENT *) curp->results ;
+	ep = (SC_ENT *) curp->results ;
 	qvp->m = ep->m ;
 	qvp->d = ep->d ;
-	if (rbuf != NULL) {
+	if (rbuf != nullptr) {
 	    rs = spellchecks_loadbuf(op,(ep + i),rbuf,rlen) ;
 	    len = rs ;
 	} /* end if */
@@ -787,10 +806,10 @@ time_t		daytime ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SPELLCHECKS_MAGIC)
+	if (op->magic != SC_MAGIC)
 	    return SR_NOTOPEN ;
 #endif
 
@@ -819,15 +838,15 @@ cchar	**dirnames ;
 	char	*sp ;
 
 
-	if (dirnames == NULL)
+	if (dirnames == nullptr)
 	    goto ret0 ;
 
 	strsize = 1 ;
-	for (i = 0 ; dirnames[i] != NULL ; i += 1) {
+	for (i = 0 ; dirnames[i] != nullptr ; i += 1) {
 	    strsize += (strlen(dirnames[i]) + 1) ;
 	} /* end if */
 
-	size = (i + 1) * sizeof(char *) ;
+	size = (i + 1) * szof(char *) ;
 	rs = uc_malloc(size,&p) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -840,11 +859,11 @@ cchar	**dirnames ;
 	op->dirstrtab = p ;
 	sp = p ;
 	*sp++ = '\0' ;
-	for (i = 0 ; dirnames[i] != NULL ; i += 1) {
+	for (i = 0 ; dirnames[i] != nullptr ; i += 1) {
 	    op->dirnames[i] = sp ;
 	    sp = strwcpy(sp,dirnames[i],-1) + 1 ;
 	} /* end for */
-	op->dirnames[i] = NULL ;
+	op->dirnames[i] = nullptr ;
 
 ret0:
 	return rs ;
@@ -852,7 +871,7 @@ ret0:
 /* bad stuff */
 bad1:
 	uc_free(op->dirnames) ;
-	op->dirnames = NULL ;
+	op->dirnames = nullptr ;
 
 bad0:
 	goto ret0 ;
@@ -867,16 +886,16 @@ SPELLCHECKS	*op ;
 	int	rs1 ;
 
 
-	if (op->dirnames != NULL) {
+	if (op->dirnames != nullptr) {
 	    rs1 = uc_free(op->dirnames) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dirnames = NULL ;
+	    op->dirnames = nullptr ;
 	}
 
-	if (op->dirstrtab != NULL) {
+	if (op->dirstrtab != nullptr) {
 	    rs1 = uc_free(op->dirstrtab) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dirstrtab = NULL ;
+	    op->dirstrtab = nullptr ;
 	}
 
 	return rs ;
@@ -887,10 +906,10 @@ SPELLCHECKS	*op ;
 static int spellchecks_calcite(op,rlp,calp,qvp)
 SPELLCHECKS	*op ;
 vecobj		*rlp ;
-SPELLCHECKS_CAL	*calp ;
-SPELLCHECKS_QUERY	*qvp ;
+SC_CAL	*calp ;
+SC_QUERY	*qvp ;
 {
-	SPELLCHECKS_ENT	e ;
+	SC_ENT	e ;
 
 	CYI		*cip ;
 	CYI_CUR		ccur ;
@@ -905,8 +924,8 @@ SPELLCHECKS_QUERY	*qvp ;
 	int	cidx ;
 	int	n, i ;
 	int	c = 0 ;
-	int	f_ent = FALSE ;
-	int	f_already = FALSE ;
+	int	f_ent = false ;
+	int	f_already = false ;
 
 	char	cebuf[CEBUFLEN + 1] ;
 
@@ -966,7 +985,7 @@ SPELLCHECKS_QUERY	*qvp ;
 			    f_already = (rs > 0) ;
 #endif
 
-			    f_ent = FALSE ;
+			    f_ent = false ;
 			    if ((rs >= 0) && (! f_already)) {
 		                rs = vecobj_add(rlp,&e) ;
 		            } else
@@ -978,7 +997,7 @@ SPELLCHECKS_QUERY	*qvp ;
 	        } /* end while */
 
 		if (f_ent) {
-		    f_ent = FALSE ;
+		    f_ent = false ;
 		    entry_finish(&e) ;
 	 	}
 
@@ -998,17 +1017,17 @@ ret0:
 static int spellchecks_already(op,rlp,ep)
 SPELLCHECKS	*op ;
 vecobj		*rlp ;
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 {
-	SPELLCHECKS_ENT	*oep ;
+	SC_ENT	*oep ;
 
 	int	rs = SR_OK ;
 	int	i ;
-	int	f = FALSE ;
+	int	f = false ;
 
 
 	for (i = 0 ; vecobj_get(rlp,i,&oep) >= 0 ; i += 1) {
-	    if (oep == NULL) continue ;
+	    if (oep == nullptr) continue ;
 
 	    rs = entry_samehash(ep,op,oep) ;
 	    if (rs == 0) continue ; /* not the same */
@@ -1033,10 +1052,10 @@ SPELLCHECKS_ENT	*ep ;
 static int spellchecks_mkresults(op,rlp,curp)
 SPELLCHECKS	*op ;
 vecobj		*rlp ;
-SPELLCHECKS_CUR	*curp ;
+SC_CUR	*curp ;
 {
-	SPELLCHECKS_ENT	*rp ;
-	SPELLCHECKS_ENT	*ep ;
+	SC_ENT	*rp ;
+	SC_ENT	*ep ;
 
 	int	rs = SR_OK ;
 	int	n ;
@@ -1051,13 +1070,13 @@ SPELLCHECKS_CUR	*curp ;
 	if (n <= 0)
 	    goto ret0 ;
 
-	size = n * sizeof(SPELLCHECKS_ENT) ;
+	size = n * szof(SC_ENT) ;
 	rs = uc_malloc(size,&rp) ;
 	if (rs < 0)
 	    goto ret0 ;
 
 	for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep == NULL) continue ;
+	    if (ep == nullptr) continue ;
 
 	    rp[c++] = *ep ;
 	    vecobj_del(rlp,i) ; /* entries are stationary */
@@ -1086,7 +1105,7 @@ SPELLCHECKS	*op ;
 
 
 	for (i = 0 ; vecstr_get(&op->tmpfiles,i,&sp) >= 0 ; i += 1) {
-	    if (sp == NULL) continue ;
+	    if (sp == nullptr) continue ;
 	    if (sp[0] != '\0')
 		u_unlink(sp) ;
 	} /* end for */
@@ -1106,9 +1125,9 @@ cchar	*calnames[] ;
 
 	cchar	**dirnames = sip->dirnames ;
 
-	if (dirnames != NULL) {
+	if (dirnames != nullptr) {
 	    int	i ;
-	    for (i = 0 ; dirnames[i] != NULL ; i += 1) {
+	    for (i = 0 ; dirnames[i] != nullptr ; i += 1) {
 	        if (dirnames[i] == '\0') continue ;
 	        rs = spellchecks_calscreater(op,sip,dirnames[i],calnames) ;
 	        c += rs ;
@@ -1133,16 +1152,16 @@ cchar	*calnames[] ;
 	int	j ;
 	int	n = 0 ;
 	int	c = 0 ;
-	int	f_search = FALSE ;
+	int	f_search = false ;
 
 	cchar	**npp ;
-	cchar	**names = NULL ;
+	cchar	**names = nullptr ;
 
 
-	if (dirname == NULL)
+	if (dirname == nullptr)
 	    goto ret0 ;
 
-	if (calnames == NULL) {
+	if (calnames == nullptr) {
 	    rs = vecstr_start(&cals,1,0) ;
 	    f_search = (rs >= 0) ;
 	    if (rs >= 0) {
@@ -1162,9 +1181,9 @@ cchar	*calnames[] ;
 	    rs = subinfo_ids(sip) ;
 	}
 
-	if ((rs >= 0) && (names != NULL)) {
+	if ((rs >= 0) && (names != nullptr)) {
 
-	    for (j = 0 ; names[j] != NULL ; j += 1) {
+	    for (j = 0 ; names[j] != nullptr ; j += 1) {
 	        if (names[j][0] == '\0') continue ;
 
 		rs = spellchecks_listcreate(op,sip,dirname,names[j]) ;
@@ -1190,7 +1209,7 @@ ret0:
 static int spellchecks_listfins(op)
 SPELLCHECKS	*op ;
 {
-	SPELLCHECKS_LE	*lep ;
+	SC_LE	*lep ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1198,7 +1217,7 @@ SPELLCHECKS	*op ;
 
 
 	for (i = 0 ; vechand_get(&op->lists,i,&lep) >= 0 ; i += 1) {
-	    if (lep == NULL) continue ;
+	    if (lep == nullptr) continue ;
 	    rs1 = spellchecks_listdestroy(op,lep) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end for */
@@ -1216,16 +1235,16 @@ cchar	calname[] ;
 {
 	USTAT	sb ;
 
-	SPELLCHECKS_CAL	*calp ;
+	SC_CAL	*calp ;
 
-	cint	size = sizeof(SPELLCHECKS_CAL) ;
+	cint	size = szof(SC_CAL) ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	cidx ;
-	int	f = FALSE ;
+	int	f = false ;
 
-	cchar	*suf = SPELLCHECKS_DBSUF ;
+	cchar	*suf = SC_DBSUF ;
 
 	char	cname[MAXNAMELEN + 1] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
@@ -1287,7 +1306,7 @@ bad0:
 
 static int spellchecks_listdestroy(op,lep)
 SPELLCHECKS	*op ;
-SPELLCHECKS_LE	*lep ;
+SC_LE	*lep ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1297,10 +1316,10 @@ SPELLCHECKS_LE	*lep ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (lep->a != NULL) {
+	if (lep->a != nullptr) {
 	    rs1 = uc_free(lep->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    lep->a = NULL ;
+	    lep->a = nullptr ;
 	}
 
 	if ((rs1 = vechand_ent(&op->lists,lep)) >= 0) {
@@ -1318,11 +1337,11 @@ SPELLCHECKS_LE	*lep ;
 
 static int spellchecks_loadbuf(op,ep,rbuf,rlen)
 SPELLCHECKS	*op ;
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 char		rbuf[] ;
 int		rlen ;
 {
-	SPELLCHECKS_CAL	*calp ;
+	SC_CAL	*calp ;
 
 	int	rs ;
 	int	cidx ;
@@ -1343,7 +1362,7 @@ ret0:
 
 
 static int cal_open(calp,sip,cidx,dirname,calname)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 int		cidx ;
 cchar	dirname[] ;
@@ -1352,7 +1371,7 @@ cchar	calname[] ;
 	int	rs ;
 
 
-	memset(calp,0,sizeof(SPELLCHECKS_CAL)) ;
+	memset(calp,0,sizeof(SC_CAL)) ;
 
 	calp->cidx = cidx ;
 	rs = uc_mallocstrw(dirname,-1,&calp->dirname) ;
@@ -1385,7 +1404,7 @@ bad0:
 
 
 static int cal_close(calp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1394,16 +1413,16 @@ SPELLCHECKS_CAL	*calp ;
 	rs1 = cal_dbloadend(calp) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (calp->calname != NULL) {
+	if (calp->calname != nullptr) {
 	    rs1 = uc_free(calp->calname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    calp->calname = NULL ;
+	    calp->calname = nullptr ;
 	}
 
-	if (calp->dirname != NULL) {
+	if (calp->dirname != nullptr) {
 	    rs1 = uc_free(calp->dirname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    calp->dirname = NULL ;
+	    calp->dirname = nullptr ;
 	}
 
 	return rs ;
@@ -1412,7 +1431,7 @@ SPELLCHECKS_CAL	*calp ;
 
 
 static int cal_dbloadbegin(calp,sip)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 {
 	int	rs ;
@@ -1440,7 +1459,7 @@ bad0:
 
 
 static int cal_dbloadend(calp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1458,7 +1477,7 @@ SPELLCHECKS_CAL	*calp ;
 
 
 static int cal_dbmapcreate(calp,daytime)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 time_t		daytime ;
 {
 	USTAT	sb ;
@@ -1470,7 +1489,7 @@ time_t		daytime ;
 	char	dbfname[MAXPATHLEN + 1] ;
 
 
-	rs = snsds(cname,MAXNAMELEN,calp->calname,SPELLCHECKS_DBSUF) ;
+	rs = snsds(cname,MAXNAMELEN,calp->calname,SC_DBSUF) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -1509,7 +1528,7 @@ time_t		daytime ;
 	    int		mprot = PROT_READ ;
 	    int		mflags = MAP_SHARED ;
 	    void	*mdata ;
-	    if ((rs = u_mmap(NULL,msize,mprot,mflags,fd,0L,&mdata)) >= 0) {
+	    if ((rs = u_mmap(nullptr,msize,mprot,mflags,fd,0L,&mdata)) >= 0) {
 	        calp->mapdata = mdata ;
 	        calp->mapsize = calp->filesize ;
 	        calp->ti_map = daytime ;
@@ -1528,14 +1547,14 @@ ret0:
 
 
 static int cal_dbmapdestroy(calp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 {
 	int	rs = SR_OK ;
 
 
-	if (calp->mapdata != NULL) {
+	if (calp->mapdata != nullptr) {
 	    rs = u_munmap(calp->mapdata,calp->mapsize) ;
-	    calp->mapdata = NULL ;
+	    calp->mapdata = nullptr ;
 	    calp->mapsize = 0 ;
 	}
 
@@ -1545,7 +1564,7 @@ SPELLCHECKS_CAL	*calp ;
 
 
 static int cal_indopen(calp,sip)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 {
 	int	rs ;
@@ -1558,7 +1577,7 @@ SUBINFO	*sip ;
 	rs = cal_indopenperm(calp,sip) ;
 
 	{
-	    int	f = FALSE ;
+	    int	f = false ;
 
 	    f = f || (rs == SR_ACCESS) ;
 	    f = f || (rs == SR_STALE) ;
@@ -1578,13 +1597,13 @@ ret0:
 
 
 static int cal_indopenperm(calp,sip)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 {
 	int	rs ;
 	int	year = sip->year ;
-	int	f_search = FALSE ;
-	int	f_mkind = FALSE ;
+	int	f_search = false ;
+	int	f_mkind = false ;
 
 	cchar	*idxdname = IDXDNAME ;
 
@@ -1600,7 +1619,7 @@ try:
 
 	if (rs == SR_NOTDIR) {
 	    f_mkind = true ;
-	    rs = cal_mkdirs(calp,idname,SPELLCHECKS_DMODE) ;
+	    rs = cal_mkdirs(calp,idname,SC_DMODE) ;
 	}
 
 	f_mkind = f_mkind || (rs == SR_NOENT) ;
@@ -1621,7 +1640,7 @@ ret0:
 
 
 static int cal_indopentmp(calp,sip)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 {
 	SPELLCHECKS	*op = sip->op ;
@@ -1629,7 +1648,7 @@ SUBINFO	*sip ;
 	int	rs ;
 	int	year = sip->year ;
 	int	f_search = true ;
-	int	f_mkind = FALSE ;
+	int	f_mkind = false ;
 
 	cchar	*idxdname = IDXDNAME ;
 
@@ -1659,7 +1678,7 @@ try:
 
 	if (rs == SR_NOTDIR) {
 	    f_mkind = true ;
-	    rs = cal_mkdirs(calp,idname,SPELLCHECKS_DMODE) ;
+	    rs = cal_mkdirs(calp,idname,SC_DMODE) ;
 	}
 
 	f_mkind = f_mkind || (rs == SR_NOENT) ;
@@ -1679,7 +1698,7 @@ ret0:
 
 
 static int cal_mkdirs(calp,dname,mode)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 cchar	dname[] ;
 int		mode ;
 {
@@ -1703,7 +1722,7 @@ int		mode ;
 
 
 static int cal_indopencheck(calp,dname,year,f_search)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 cchar	dname[] ;
 int		year ;
 int		f_search ;
@@ -1718,7 +1737,7 @@ int		f_search ;
 	    rs = cyi_info(&calp->vind,&binfo) ;
 
 	    if (rs >= 0) {
-		int	f = FALSE ;
+		int	f = false ;
 		f = f || (binfo.ctime < calp->ti_db) ;
 		f = f || (binfo.mtime < calp->ti_db) ;
 		f = f || (binfo.year < year) ;
@@ -1745,7 +1764,7 @@ int		oflags ;
 {
 	int	rs = SR_NOENT ;
 
-	for (int i = 0 ; indopens[i] != NULL ; i += 1) {
+	for (int i = 0 ; indopens[i] != nullptr ; i += 1) {
 
 	    rs = (*indopens[i])(op,sip,oflags) ;
 
@@ -1827,8 +1846,8 @@ cchar	dname[] ;
 int		oflags ;
 {
 	int	rs ;
-	int	f_ok = FALSE ;
-	int	f_mk = FALSE ;
+	int	f_ok = false ;
+	int	f_mk = false ;
 
 	char	indname[MAXPATHLEN + 1] ;
 
@@ -1898,7 +1917,7 @@ time_t		daytime ;
 
 	int	rs ;
 	int	rs1 ;
-	int	f = FALSE ;
+	int	f = false ;
 
 	char	indfname[MAXPATHLEN + 1] ;
 
@@ -1925,7 +1944,7 @@ ret0:
 #endif /* COMMENT */
 
 static int cal_indmk(calp,sip,dname,f_tmp,daytime)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 cchar	dname[] ;
 int		f_tmp ;
@@ -1956,14 +1975,14 @@ time_t		daytime ;
 
 
 static int cal_indmkdata(calp,sip,dname,operms,f_tmp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 SUBINFO	*sip ;
 cchar	dname[] ;
 mode_t		operms ;
 int		f_tmp ;
 {
-	SPELLCHECKS_ENT	e ;
-	SPELLCHECKS_QUERY	q ;
+	SC_ENT	e ;
+	SC_QUERY	q ;
 
 	CYIMK		cyind ;
 	CYIMK_ENT	bve ;
@@ -1980,14 +1999,14 @@ int		f_tmp ;
 	int	year ;
 	int	to ;
 	int	c = 0 ;
-	int	f_ent = FALSE ;
+	int	f_ent = false ;
 	int	f ;
 
 	cchar	*cn ;
 	cchar	*tp, *mp, *lp ;
 
 
-	if (calp->mapdata == NULL)
+	if (calp->mapdata == nullptr)
 	    goto ret0 ;
 
 	rs = subinfo_year(sip) ;
@@ -2014,7 +2033,7 @@ mkgo:
 	mp = calp->mapdata ;
 	ml = calp->mapsize ;
 
-	while ((tp = strnchr(mp,ml,'\n')) != NULL) {
+	while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
 	    len = ((tp + 1) - mp) ;
 	    lp = mp ;
@@ -2032,7 +2051,7 @@ mkgo:
 	                    rs = cyimk_add(&cyind,&bve) ;
 			    mkbve_finish(&bve) ;
 		        }
-			f_ent = FALSE ;
+			f_ent = false ;
 			entry_finish(&e) ;
 	            }
 
@@ -2051,7 +2070,7 @@ mkgo:
 
 		} else { /* bad */
 
-		    f = FALSE ;
+		    f = false ;
 		    f = f || (rs1 == SR_NOENT) || (rs == SR_NOTFOUND) ;
 		    f = f || (rs1 == SR_ILSEQ) ;
 		    f = f || (rs1 == SR_INVALID) ;
@@ -2063,7 +2082,7 @@ mkgo:
 	                    rs = cyimk_add(&cyind,&bve) ;
 			    mkbve_finish(&bve) ;
 		        }
-			f_ent = FALSE ;
+			f_ent = false ;
 			entry_finish(&e) ;
 	            }
 
@@ -2078,7 +2097,7 @@ mkgo:
 	                rs = cyimk_add(&cyind,&bve) ;
 		        mkbve_finish(&bve) ;
 		    }
-	            f_ent = FALSE ;
+	            f_ent = false ;
 	  	    entry_finish(&e) ;
 	        }
 #else
@@ -2100,12 +2119,12 @@ mkgo:
 	        rs = cyimk_add(&cyind,&bve) ;
 		mkbve_finish(&bve) ;
 	    }
-	    f_ent = FALSE ;
+	    f_ent = false ;
 	    entry_finish(&e) ;
 	}
 
 	if (f_ent) {
-	    f_ent = FALSE ;
+	    f_ent = false ;
 	    entry_finish(&e) ;
 	}
 
@@ -2144,13 +2163,13 @@ retinprogress:
 
 
 static int cal_indclose(calp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 {
 	int	rs = SR_OK ;
 
 
 	if (calp->f.vind) {
-	    calp->f.vind = FALSE ;
+	    calp->f.vind = false ;
 	    rs = cyi_close(&calp->vind) ;
 	}
 
@@ -2162,7 +2181,7 @@ SPELLCHECKS_CAL	*calp ;
 #ifdef	COMMENT
 
 static int cal_idxset(calp,cidx)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 int		cidx ;
 {
 
@@ -2176,7 +2195,7 @@ int		cidx ;
 
 
 static int cal_idxget(calp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 {
 	int	cidx = calp->cidx ;
 
@@ -2187,7 +2206,7 @@ SPELLCHECKS_CAL	*calp ;
 
 
 static int cal_audit(calp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 {
 	int	rs = SR_OK ;
 
@@ -2200,8 +2219,8 @@ SPELLCHECKS_CAL	*calp ;
 
 
 static int cal_loadbuf(calp,ep,rbuf,rlen)
-SPELLCHECKS_CAL	*calp ;
-SPELLCHECKS_ENT	*ep ;
+SC_CAL	*calp ;
+SC_ENT	*ep ;
 char		rbuf[] ;
 int		rlen ;
 {
@@ -2219,13 +2238,13 @@ int		rlen ;
 
 
 static int cal_mapdata(calp,mpp)
-SPELLCHECKS_CAL	*calp ;
+SC_CAL	*calp ;
 cchar	**mpp ;
 {
 	int	rs ;
 
 
-	if (mpp != NULL)
+	if (mpp != nullptr)
 	    *mpp = calp->mapdata ;
 
 	rs = calp->mapsize ;
@@ -2243,7 +2262,7 @@ static int subinfo_start(SUBINFO *sip,SPELLCHECK *op,cc *pr,cc *dbfname) noex {
 	memclear(sip) ;
 	sip->op = op ;
 	sip->pr = pr ;
-	sip->sn = SPELLCHECKS_SEARCHNAME ;
+	sip->sn = SC_SEARCHNAME ;
 	sip->dbfname = dbfname ;
 
 	if ((rs = ids_load(&sip->id)) >= 0) {
@@ -2257,7 +2276,7 @@ static int subinfo_start(SUBINFO *sip,SPELLCHECK *op,cc *pr,cc *dbfname) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (subinfo_conf) */
 	    if (rs < 0) {
-	        sip->open.id = FALSE ;
+	        sip->open.id = false ;
 	        ids_release(&sip->id) ;
 	    }
 	} /* end if (ids) */
@@ -2277,28 +2296,28 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	    rs1 = subinfo_cachedirfins(sip) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (sip->userhome != NULL) {
+	if (sip->userhome != nullptr) {
 	    rs1 = uc_free(sip->userhome) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->userhome = NULL ;
+	    sip->userhome = nullptr ;
 	}
 	if (sip->open.dbs) {
-	    sip->open.dbs = FALSE ;
+	    sip->open.dbs = false ;
 	    rs1 = vechand_finish(&sip->dbs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (sip->open.cachedirs) {
-	    sip->open.cachedirs = FALSE ;
+	    sip->open.cachedirs = false ;
 	    rs1 = vechand_finish(&sip->cachedirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (sip->open.stores) {
-	    sip->open.stores = FALSE ;
+	    sip->open.stores = false ;
 	    rs1 = vecstr_finish(&sip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (sip->open.id) {
-	    sip->open.id = FALSE ;
+	    sip->open.id = false ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2317,8 +2336,8 @@ int		vl ;
 	int	vnlen = 0 ;
 
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	if (! sip->open.stores) {
 	    rs = vecstr_start(&sip->stores,4,0) ;
@@ -2328,9 +2347,9 @@ int		vl ;
 	if (rs >= 0) {
 	    int	oi = -1 ;
 
-	    if (*epp != NULL) oi = vecstr_findaddr(&sip->stores,*epp) ;
+	    if (*epp != nullptr) oi = vecstr_findaddr(&sip->stores,*epp) ;
 
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 		vnlen = strnlen(vp,vl) ;
 	        if ((rs = vecstr_add(&sip->stores,vp,vnlen)) >= 0) {
 	            rs = vecstr_get(&sip->stores,rs,epp) ;
@@ -2395,7 +2414,7 @@ static int subinfo_userbegin(SUBINFO *sip)
 /* no need to really do anything here */
 static int subinfo_userend(SUBINFO *sip)
 {
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (subinfo_userend) */
@@ -2404,7 +2423,7 @@ static int subinfo_userend(SUBINFO *sip)
 static int subinfo_confbegin(SUBINFO *sip,CONFIG *cfp)
 {
 	int	rs ;
-	cchar	*cfname = SPELLCHECKS_CONFNAME ;
+	cchar	*cfname = SC_CONFNAME ;
 
 	if ((rs = subinfo_userbegin(sip)) >= 0) {
 	    if ((rs = config_start(cfp,sip,cfname)) >= 0) {
@@ -2425,10 +2444,10 @@ static int subinfo_confend(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (cfp != NULL) {
+	if (cfp != nullptr) {
 	    rs1 = config_finish(cfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->cfp = NULL ;
+	    sip->cfp = nullptr ;
 	}
 
 	rs1 = subinfo_userend(sip) ;
@@ -2444,7 +2463,7 @@ static int subinfo_confread(SUBINF *sip)
 	CONFIG	*cfp = sip->cfp ;
 	int	rs = SR_OK ;
 
-	if (cfp != NULL) {
+	if (cfp != nullptr) {
 	    rs = config_read(cfp) ;
 	}
 
@@ -2480,7 +2499,7 @@ static int subinfo_cachedirfins(SUBINFO *sip)
 	    CACHEDIR	*cdp ;
 	    int	i ;
 	    for (i = 0 ; vechand_get(&op->cachedirs,i,&cdp) >= 0 ; i += 1) {
-		if (cdp == NULL) continue ;
+		if (cdp == nullptr) continue ;
 		rs1 = cachedir_finish(cdp) ;
 		if (rs >= 0) rs = rs1 ;
 		rs1 = uc_free(cdp) ;
@@ -2520,7 +2539,7 @@ static int subinfo_dbfins(SUBINFO *sip)
 	    DB		*dbp ;
 	    int		i ;
 	    for (i = 0 ; vechand_get(&op->dbs,i,&dbp) >= 0 ; i += 1) {
-		if (dbp == NULL) continue ;
+		if (dbp == nullptr) continue ;
 		rs1 = db_finish(dbp) ;
 		if (rs >= 0) rs = rs1 ;
 		rs1 = uc_free(dbp) ;
@@ -2542,7 +2561,7 @@ SUBINFO	*sip ;
 	int	tl ;
 	int	c = 0 ;
 
-	cchar	*sharedname = SPELLCHECKS_DBDIR ;
+	cchar	*sharedname = SC_DBDIR ;
 	char	tmpdname[MAXPATHLEN + 1] ;
 
 
@@ -2591,7 +2610,7 @@ SUBINFO	*sip ;
 ret1:
 	if (rs < 0) {
 	    if (sip->f.defdirs) {
-		sip->f.defdirs = FALSE ;
+		sip->f.defdirs = false ;
 		vecstr_finish(&sip->defdirs) ;
 	    }
 	}
@@ -2610,7 +2629,7 @@ char		tmpdname[] ;
 
 	int	rs = SR_OK ;
 	int	rs1 ; /* lint-ok */
-	int	f = FALSE ;
+	int	f = false ;
 
 
 	if ((rs1 = u_stat(tmpdname,&sb)) >= 0)
@@ -2647,7 +2666,7 @@ SUBINFO	*sip ;
 
 	rs = subinfo_username(sip) ;
 
-	if ((rs >= 0) && (sip->tudname == NULL)) {
+	if ((rs >= 0) && (sip->tudname == nullptr)) {
 
 	    rs = mktmpuserdir(tmpdname,sip->username,IDXDNAME,dmode) ;
 	    dl = rs ;
@@ -2679,7 +2698,7 @@ cchar	dirname[] ;
 	int	nl ;
 	int	c = 0 ;
 
-	cchar	*calsuf = SPELLCHECKS_DBSUF ;
+	cchar	*calsuf = SC_DBSUF ;
 	cchar	*tp ;
 	cchar	*np ;
 
@@ -2693,7 +2712,7 @@ cchar	dirname[] ;
 	while (fsdir_read(&dir,&ds) > 0) {
 	    if (ds.name[0] == '.') continue ;
 
-	    if ((tp = strrchr(ds.name,'.')) != NULL) {
+	    if ((tp = strrchr(ds.name,'.')) != nullptr) {
 
 		rs1 = mkpath2(tmpfname,dirname,ds.name) ;
 
@@ -2732,7 +2751,7 @@ ret0:
 
 static int subinfo_havestart(sip,qp,lp,ll)
 SUBINFO	*sip ;
-SPELLCHECKS_CITE	*qp ;
+SC_CITE	*qp ;
 cchar	*lp ;
 int		ll ;
 {
@@ -2756,7 +2775,7 @@ int		ll ;
 	if (isdigitlatin(ch)) {
 
 	    tp = strnchr(lp,ll,'/') ;
-	    if (tp != NULL) {
+	    if (tp != nullptr) {
 
 	        rs1 = mkmonth(lp,(tp - lp)) ;
 	        qp->m = (rs1 & UCHAR_MAX) ;
@@ -2764,7 +2783,7 @@ int		ll ;
 		if (rs1 >= 0) {
 	            cp = (tp + 1) ;
 	            cl = ((lp + ll) - cp) ;
-		    if ((tp = strnpbrk(cp,cl," \t")) != NULL)
+		    if ((tp = strnpbrk(cp,cl," \t")) != nullptr)
 			cl = (tp - cp) ;
 
 	            rs1 = subinfo_mkday(sip,qp->m,cp,cl) ;
@@ -2772,7 +2791,7 @@ int		ll ;
 
 		} else {
 
-		    f = FALSE ;
+		    f = false ;
 		    f = f || (rs1 == SR_INVALID) ;
 		    if (f)
 			rs1 = SR_ILSEQ ;
@@ -2845,7 +2864,7 @@ int		cl ;
 
 static int subinfo_transhol(sip,qp,sp,sl)
 SUBINFO	*sip ;
-SPELLCHECKS_CITE	*qp ;
+SC_CITE	*qp ;
 cchar	*sp ;
 int		sl ;
 {
@@ -2858,9 +2877,9 @@ int		sl ;
 
 	int	rs = SR_OK ;
 	int	nl ;
-	int	f_negative = FALSE ;
-	int	f_inityear = FALSE ;
-	int	f_found = FALSE ;
+	int	f_negative = false ;
+	int	f_inityear = false ;
+	int	f_found = false ;
 	int	f ;
 
 	cchar	*tp ;
@@ -2872,9 +2891,9 @@ int		sl ;
 	qp->m = 0 ;
 	qp->d = 0 ;
 
-	np = NULL ;
+	np = nullptr ;
 	nl = 0 ;
-	if ((tp = strnpbrk(sp,sl,"+-")) != NULL) {
+	if ((tp = strnpbrk(sp,sl,"+-")) != nullptr) {
 		np = (tp + 1) ;
 		nl = (sl - ((tp + 1) - sp)) ;
 		sl = (tp - sp) ;
@@ -2895,10 +2914,10 @@ int		sl ;
 	    f_inityear = true ;
 	    rs = subinfo_year(sip) ;
 	    if (rs >= 0) {
-	        rs = holidays_open(holp,op->pr,sip->year,NULL) ;
+	        rs = holidays_open(holp,op->pr,sip->year,nullptr) ;
 	        sip->f.hols = (rs >= 0) ;
 
-	 	f = FALSE ;
+	 	f = false ;
 		f = f || (rs == SR_BADFMT) ;
 		f = f || (rs == SR_NOMSG) ;
 		if (f)
@@ -3024,7 +3043,7 @@ static int cachedir_start(CACHEDIR *cdp,STRDESC *dp,int nf)
 		    cdp->dname = bp ;
 		    break ;
 		} /* end switch */
-		if (dp[i].sp != NULL) {
+		if (dp[i].sp != nullptr) {
 		    bp = (strwcpy(bp,dp[i].sp,dp[i].sl) + 1) ;
 		}
 	    } /* end for */
@@ -3040,30 +3059,26 @@ static int cachedir_finish(CACHEDIR *cdp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (cdp->a != NULL) {
+	if (cdp->a != nullptr) {
 	    rs1 = uc_free(cdp->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    cdp->a = NULL ;
+	    cdp->a = nullptr ;
 	}
 
 	return rs ;
 }
 /* end subroutine (cachedir_finish) */
 
-
-static int db_start(DB *dbp,STRDESC *dp,int nf)
-{
+static int db_start(DB *dbp,STRDESC *dp,int nf) noex {
 	int	rs = SR_OK ;
-	int	i ;
 	int	size = 0 ;
-	char	*bp ;
 
 	memset(dbp,0,sizeof(DB)) ;
 
 	{
 	    int		cl ;
 	    cchar	*cp ;
-	    for (i = 0 ; i < nf ; i += 1) {
+	    for (int i = 0 ; i < nf ; i += 1) {
 		cp = dp[i].sp ;
 		cl = dp[i].sl ;
 		if (cl < 0) cl = strlen(cp) ;
@@ -3071,9 +3086,9 @@ static int db_start(DB *dbp,STRDESC *dp,int nf)
 	    } /* end for */
 	}
 
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	if (char *bp ; (rs = uc_malloc(size,&bp)) >= 0) {
 	    cdp->a = bp ;
-	    for (i = 0 ; i < nf ; i += 1) {
+	    for (int i = 0 ; i < nf ; i += 1) {
 		switch (i) {
 		case 0:
 		    dbp->idxname = bp ; /* index file name */
@@ -3085,7 +3100,7 @@ static int db_start(DB *dbp,STRDESC *dp,int nf)
 		    dbp->cdname = bp ; /* cache directory name */
 		    break ;
 		} /* end switch */
-		if (dp[i].sp != NULL) {
+		if (dp[i].sp != nullptr) {
 		    bp = (strwcpy(bp,dp[i].sp,dp[i].sl) + 1) ;
 		}
 	    } /* end for */
@@ -3095,45 +3110,38 @@ static int db_start(DB *dbp,STRDESC *dp,int nf)
 }
 /* end subroutine (db_start) */
 
-
-static int db_finish(DB *dbp)
-{
+static int db_finish(DB *dbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (dbp->a != NULL) {
+	if (dbp->a != nullptr) {
 	    rs1 = uc_free(dbp->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    dbp->a = NULL ;
+	    dbp->a = nullptr ;
 	}
 
 	return rs ;
 }
 /* end subroutine (db_finish) */
 
-
-static int entry_start(ep,qp,loff,llen)
-SPELLCHECKS_ENT		*ep ;
-SPELLCHECKS_CITE	*qp ;
-int		loff, llen ;
-{
+static int entry_start(SC_ENT *ep,SC_CITE *qp,int loff,int llen) noex {
 	struct spellchecks_eline	*elp ;
 
 	int		rs = SR_OK ;
-	int		ne = SPELLCHECKS_NLE ;
+	int		ne = SC_NLE ;
 	int		size ;
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 
-	memset(ep,0,sizeof(SPELLCHECKS_ENT)) ;
+	memset(ep,0,sizeof(SC_ENT)) ;
 	ep->cidx = -1 ;
 	ep->m = qp->m ;
 	ep->d = qp->d ;
 	ep->voff = loff ;
 	ep->vlen = llen ;
 
-	size = ne * sizeof(struct spellchecks_eline) ;
+	size = ne * szof(struct spellchecks_eline) ;
 	if ((rs = uc_malloc(size,&elp)) >= 0) {
 	    ep->lines = elp ;
 	    ep->e = ne ;
@@ -3148,12 +3156,12 @@ int		loff, llen ;
 
 
 static int entry_setidx(ep,cidx)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 int		cidx ;
 {
 
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 
 	ep->cidx = cidx ;
@@ -3164,7 +3172,7 @@ int		cidx ;
 
 
 static int entry_add(ep,loff,llen)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 uint		loff, llen ;
 {
 	struct spellchecks_eline	*elp ;
@@ -3174,7 +3182,7 @@ uint		loff, llen ;
 	int	size ;
 
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 
 	if (ep->e <= 0)
@@ -3184,8 +3192,8 @@ uint		loff, llen ;
 	    return SR_BADFMT ;
 
 	if (ep->i == ep->e) {
-	    ne = (ep->e * 2) + SPELLCHECKS_NLE ;
-	    size = ne * sizeof(struct spellchecks_eline) ;
+	    ne = (ep->e * 2) + SC_NLE ;
+	    size = ne * szof(struct spellchecks_eline) ;
 	    if ((rs = uc_realloc(ep->lines,size,&elp)) >= 0) {
 	        ep->e = ne ;
 	        ep->lines = elp ;
@@ -3206,12 +3214,12 @@ uint		loff, llen ;
 
 
 static int entry_finish(ep)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 
 	if (ep->e <= 0)
@@ -3220,10 +3228,10 @@ SPELLCHECKS_ENT	*ep ;
 	if ((ep->i < 0) || (ep->i > ep->e))
 	    return SR_BADFMT ;
 
-	if (ep->lines != NULL) {
+	if (ep->lines != nullptr) {
 	    rs1 = uc_free(ep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->lines = NULL ;
+	    ep->lines = nullptr ;
 	}
 
 	ep->i = 0 ;
@@ -3236,8 +3244,8 @@ SPELLCHECKS_ENT	*ep ;
 #if	CF_SAMECITE
 
 static int entry_samecite(ep,oep)
-SPELLCHECKS_ENT	*ep ;
-SPELLCHECKS_ENT	*oep ;
+SC_ENT	*ep ;
+SC_ENT	*oep ;
 {
 	int	rs1 = SR_OK ;
 
@@ -3253,9 +3261,9 @@ SPELLCHECKS_ENT	*oep ;
 
 
 static int entry_samehash(ep,op,oep)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 SPELLCHECKS	*op ;
-SPELLCHECKS_ENT	*oep ;
+SC_ENT	*oep ;
 {
 	int	rs = SR_OK ;
 
@@ -3279,10 +3287,10 @@ SPELLCHECKS_ENT	*oep ;
 
 
 static int entry_mkhash(ep,op)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 SPELLCHECKS	*op ;
 {
-	SPELLCHECKS_CAL	*calp ;
+	SC_CAL	*calp ;
 
 	int	rs = SR_OK ;
 	int	sl, cl ;
@@ -3291,13 +3299,13 @@ SPELLCHECKS	*op ;
 	cchar	*cp ;
 
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 
 	if (ep->e <= 0)
 	    return SR_NOTOPEN ;
 
-	if (ep->lines == NULL)
+	if (ep->lines == nullptr)
 	    return SR_NOTOPEN ;
 
 	if ((rs = vechand_get(&op->cals,ep->cidx,&calp)) >= 0) {
@@ -3326,7 +3334,7 @@ SPELLCHECKS	*op ;
 
 
 static int entry_sethash(ep,hash)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 uint		hash ;
 {
 
@@ -3339,15 +3347,15 @@ uint		hash ;
 
 
 static int entry_same(ep,op,oep)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 SPELLCHECKS	*op ;
-SPELLCHECKS_ENT	*oep ;
+SC_ENT	*oep ;
 {
 	WORDER	w1, w2 ;
 
 	int	rs = SR_OK ;
 	int	c1l, c2l ;
-	int	f = FALSE ;
+	int	f = false ;
 
 	cchar	*c1p, *c2p ;
 
@@ -3390,7 +3398,7 @@ SPELLCHECKS_ENT	*oep ;
 
 
 static int entry_loadbuf(ep,mp,rbuf,rlen)
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 cchar	*mp ;
 char		rbuf[] ;
 int		rlen ;
@@ -3435,13 +3443,13 @@ int		rlen ;
 static int mkbve_start(bvep,sip,ep)
 CYIMK_ENT	*bvep ;
 SUBINFO	*sip ;
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 {
 	int	rs ;
 	int	nlines = 0 ;
 
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 
 	if ((rs = entry_mkhash(ep,sip->op)) >= 0) {
@@ -3450,11 +3458,11 @@ SPELLCHECKS_ENT	*ep ;
 	    bvep->voff = ep->voff ;
 	    bvep->vlen = ep->vlen ;
 	    bvep->hash = ep->hash ;
-	    bvep->lines = NULL ;
+	    bvep->lines = nullptr ;
 	    nlines = ep->i ;
 	    if (nlines <= UCHAR_MAX) {
 		CYIMK_LINE	*lines ;
-	        cint	size = (nlines + 1) * sizeof(CYIMK_LINE) ;
+	        cint	size = (nlines + 1) * szof(CYIMK_LINE) ;
 	        bvep->nlines = nlines ;
 	        if ((rs = uc_malloc(size,&lines)) >= 0) {
 		    int	i ;
@@ -3481,13 +3489,13 @@ CYIMK_ENT	*bvep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (bvep == NULL)
+	if (bvep == nullptr)
 	    return SR_FAULT ;
 
-	if (bvep->lines != NULL) {
+	if (bvep->lines != nullptr) {
 	    rs1 = uc_free(bvep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    bvep->lines = NULL ;
+	    bvep->lines = nullptr ;
 	}
 
 	return rs ;
@@ -3498,9 +3506,9 @@ CYIMK_ENT	*bvep ;
 int worder_start(wp,op,ep)
 WORDER		*wp ;
 SPELLCHECKS	*op ;
-SPELLCHECKS_ENT	*ep ;
+SC_ENT	*ep ;
 {
-	SPELLCHECKS_CAL	*calp ;
+	SC_CAL	*calp ;
 	int		rs ;
 
 	if ((rs = vechand_get(&op->cals,ep->cidx,&calp)) >= 0) {
@@ -3511,7 +3519,7 @@ SPELLCHECKS_ENT	*ep ;
 	        wp->nlines = ep->i ;
 	        wp->lines = ep->lines ;
 	        wp->mp = mp ;
-	        if (lines != NULL) {
+	        if (lines != nullptr) {
 	            wp->sp = (mp + lines[0].loff) ;
 	            wp->sl = (lines[0].llen) ;
 	        }
@@ -3527,7 +3535,7 @@ SPELLCHECKS_ENT	*ep ;
 int worder_finish(wp)
 WORDER		*wp ;
 {
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (worder_finish) */
@@ -3557,33 +3565,26 @@ cchar	**rpp ;
 
 	} /* end while */
 
-	if (rpp != NULL)
+	if (rpp != nullptr)
 	    *rpp = cp ;
 
 	return cl ;
 }
 /* end subroutine (worder_get) */
 
-
-/* configuration management */
-static int config_start(csp,sip,cfname)
-CONFIG		*csp ;
-SUBINFO		*sip ;
-cchar	*cfname ;
-{
+static int config_start(config *csp,subinfo *sip,cchar *cfname) noex {
 	int	rs = SR_OK ;
-
 	char	tmpfname[MAXPATHLEN+1] = { 0 } ;
 
 
-	if (csp == NULL) return SR_FAULT ;
+	if (csp == nullptr) return SR_FAULT ;
 
-	if (cfname == NULL) cfname = SPELLCHECKS_CONFNAME ;
+	if (cfname == nullptr) cfname = SC_CONFNAME ;
 
 	memclear(csp) ;
 	csp->sip = sip ;
 
-	if (strchr(cfname,'/') == NULL) {
+	if (strchr(cfname,'/') == nullptr) {
 	    rs = config_findfile(csp,tmpfname,cfname) ;
 	    if (rs > 0) cfname = tmpfname ;
 	}
@@ -3610,14 +3611,12 @@ cchar	*cfname ;
 }
 /* end subroutine (config_start) */
 
-
-static int config_finish(CONFIG *csp)
-{
-	SUBINFO		*sip = csp->sip ;
+static int config_finish(config *csp) noex {
+	subinfo		*sip = csp->sip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (csp == NULL) return SR_FAULT ;
+	if (csp == nullptr) return SR_FAULT ;
 
 	if (csp->f_p) {
 
@@ -3629,17 +3628,15 @@ static int config_finish(CONFIG *csp)
 	    rs1 = paramfile_close(&csp->p) ;
 	    if (rs >= 0) rs = rs1 ;
 
-	    csp->f_p = FALSE ;
+	    csp->f_p = false ;
 	} /* end if (active) */
 
 	return rs ;
 }
 /* end subroutine (config_finish) */
 
-
-static int config_cookbegin(CONFIG *csp)
-{
-	SUBINFO		*sip = csp->sip ;
+static int config_cookbegin(config *csp) noex {
+	subinfo		*sip = csp->sip ;
 	expcook		*ecp = &csp->c ;
 	int		rs ;
 	int		c = 0 ;
@@ -3657,7 +3654,7 @@ static int config_cookbegin(CONFIG *csp)
 	    kbuf[1] = '\0' ;
 	    for (i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 	        kch = MKCHAR(ks[i]) ;
-	        vp = NULL ;
+	        vp = nullptr ;
 	        vl = -1 ;
 	        switch (kch) {
 	        case 'P':
@@ -3695,7 +3692,7 @@ static int config_cookbegin(CONFIG *csp)
 	            vp = sip->userhome ;
 	            break ;
 	        } /* end switch */
-	        if ((rs >= 0) && (vp != NULL)) {
+	        if ((rs >= 0) && (vp != nullptr)) {
 		    c += 1 ;
 	            kbuf[0] = kch ;
 	            rs = expcook_add(ecp,kbuf,vp,vl) ;
@@ -3706,7 +3703,7 @@ static int config_cookbegin(CONFIG *csp)
 		cchar	*kp ;
 	        for (i = 0 ; (rs >= 0) && (i < cook_overlast ; i += 1) {
 		    kp = cooks[i] ;
-		    vp = NULL ;
+		    vp = nullptr ;
 		    vl = -1 ;
 		    switch (i) {
 		    case cook_pr:
@@ -3723,7 +3720,7 @@ static int config_cookbegin(CONFIG *csp)
 			}
 			break ;
 		    case cook_bn:
-			if (sip->dbfname != NULL) {
+			if (sip->dbfname != nullptr) {
 			    int		cl ;
 			    cchar	*cp ;
 			    if ((cl = sfbasename(sip->dbfname,-1,&cp)) > 0) {
@@ -3734,7 +3731,7 @@ static int config_cookbegin(CONFIG *csp)
 			    vp = "null" ;
 			break ;
 		    } /* end switch */
-	            if ((rs >= 0) && (vp != NULL)) {
+	            if ((rs >= 0) && (vp != nullptr)) {
 		        c += 1 ;
 	                rs = expcook_add(ecp,kp,vp,vl) ;
 	            }
@@ -3751,14 +3748,12 @@ static int config_cookbegin(CONFIG *csp)
 }
 /* end subroutine (config_cookbegin) */
 
-
-static int config_cookend(CONFIG *csp)
-{
+static int config_cookend(config *csp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (csp->f_c) {
-	    csp->f_c = FALSE ;
+	    csp->f_c = false ;
 	    rs1 = expcook_finish(&csp->c) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -3767,18 +3762,15 @@ static int config_cookend(CONFIG *csp)
 }
 /* end subroutine (config_cookend) */
 
-
-static int config_read(op)
-struct config	*op ;
-{
+static int config_read(config *op) noex {
 	LOCINFO		*lip = op->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	lip = sip->lip ;
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if (op->f_p) {
 	    cint	plen = PBUFLEN ;
@@ -3795,13 +3787,12 @@ struct config	*op ;
 }
 /* end subroutine (config_read) */
 
-static int config_reader(CONFIG *op,char *pbuf,int plen) noex {
+static int config_reader(config *op,char *pbuf,int plen) noex {
 	paramfile	*pfp = &op->p ;
-	paramfile_cur	cur ;
 	paramfile_ent	pe ;
 	int		rs ;
 
-	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
+	if (paramfile_cur cur ; (rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	    expcook	*ecp = &op->c ;
 	    cint	elen = EBUFLEN ;
 	    int		vl, el ;
@@ -3883,13 +3874,8 @@ static int config_reader(CONFIG *op,char *pbuf,int plen) noex {
 }
 /* end subroutine (config_reader) */
 
-
-static int config_setlfname(cfp,vp,vl)
-CONFIG		*cfp ;
-cchar	*vp ;
-int		vl ;
-{
-	SUBINFO		*sip = cfp->sip ;
+static int config_setlfname(config *cfp,cchar *vp,int vl) noex {
+	subinfo		*sip = cfp->sip ;
 	cchar	*lfn ;
 	cchar	*pr ;
 	cchar	*sn ;
@@ -3902,7 +3888,7 @@ int		vl ;
 	lfn = sip->lfname ;
 	tl = prsetfname(pr,tbuf,vp,vl,true,LOGCNAME,sn,"") ;
 
-	if ((lfn == NULL) || (strcmp(lfn,tbuf) != 0)) {
+	if ((lfn == nullptr) || (strcmp(lfn,tbuf) != 0)) {
 	    cchar	**vpp = &sip->lfname ;
 	    sip->changed.lfname = true ;
 	    rs = subinfo_setentry(sip,vpp,tbuf,-1) ;
@@ -3912,15 +3898,13 @@ int		vl ;
 }
 /* end subroutine (config_setlfname) */
 
-
-static int config_cachedir(CONFIG *csp,cchar *pp,int pl)
-{
-	STRDESC		d[CACHEDIR_NFIELDS] ;
-	cint	nf = CACHEDIR_NFIELDS ;
+static int config_cachedir(config *csp,cchar *pp,int pl) noex {
+	STRDESC		d[CACHEDIR_NFS] ;
+	cint	nf = CACHEDIR_NFS ;
 	int		rs = SR_OK ;
 	int		fi = 0 ;
 	int		si ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	while ((fi < nf) && ((si = sichr(pp,pl,CH_FS)) >= 0)) {
 	    rs = config_cachedirone(csp,d,fi++,pp,si) ;
@@ -3933,7 +3917,7 @@ static int config_cachedir(CONFIG *csp,cchar *pp,int pl)
 	}
 
 	if ((rs >= 0) && (fi >= nf)) {
-	    cint	size = sizeof(CACHEDIR) ;
+	    cint	size = szof(CACHEDIR) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 		CACHEDIR	*cdp = p ;
@@ -3953,17 +3937,9 @@ static int config_cachedir(CONFIG *csp,cchar *pp,int pl)
 }
 /* end subroutine (config_cachedir) */
 
-
-/* ARGSUSED */
-static int config_cachedirone(csp,dp,fi,pp,pl)
-CONFIG		*csp ;
-STRDESC		*dp ;
-int		fi ;
-cchar	*pp ;
-int		pl ;
-{
-	int	rs = SR_OK ;
-
+static int config_cachedirone(config *csp,STRDESC *dp,int fi,
+		cc *pp,int pl) noex {
+	int		rs = SR_OK ;
 		switch (fi) {
 		case 0:
 		case 1:
@@ -3976,15 +3952,13 @@ int		pl ;
 }
 /* end subroutine (config_cachedirone) */
 
-
-static int config_db(CONFIG *csp,cchar *ebuf,int el)
-{
-	STRDESC		d[DB_NFIELDS] ;
-	cint	nf = DB_NFIELDS ;
+static int config_db(config *csp,cchar *ebuf,int el) noex {
+	STRDESC		d[DB_NFS] ;
+	cint		nf = DB_NFS ;
 	int		rs = SR_OK ;
 	int		fi = 0 ;
 	int		si ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	while ((fi < nf) && ((si = sichr(pp,pl,CH_FS)) >= 0)) {
 	    rs = config_dbone(csp,d,fi++,pp,si) ;
@@ -4000,7 +3974,7 @@ static int config_db(CONFIG *csp,cchar *ebuf,int el)
 	    SUBINFO	*sip = csp->sip ;
 	    int		sch = (d[1].sp[0] & 0xff) ;
 	    char	dbuf[MAXPATHLEN+1] ;
-	    if ((sch == '-') && (sip->dbfname != NULL)) {
+	    if ((sch == '-') && (sip->dbfname != nullptr)) {
 		d[1].sp = sip->dbfname ;
 		d[1].sl = -1 ;
 	    }
@@ -4010,11 +3984,10 @@ static int config_db(CONFIG *csp,cchar *ebuf,int el)
 		d[1].sp = dbuf ;
 	    }
 	    if (rs >= 0) {
-		USTAT	sb ;
 		int	f_skip = (sch == '-') ;
-		if (f_skip || (u_stat(d[1],&sb) >= 0)) {
+		if (USTAT sb ; f_skip || (u_stat(d[1],&sb) >= 0)) {
 		    if (f_skip || ((rs = sperm(&sip->id,&sb,R_OK)) >= 0)) {
-	                cint	size = sizeof(DB) ;
+	                cint	size = szof(DB) ;
 	                void	*p ;
 	                if ((rs = uc_malloc(size,&p)) >= 0) {
 		            DB	*dbp = p ;
@@ -4041,15 +4014,7 @@ static int config_db(CONFIG *csp,cchar *ebuf,int el)
 }
 /* end subroutine (config_db) */
 
-
-/* ARGSUSED */
-static int config_dbone(csp,dp,fi,pp,pl)
-CONFIG		*csp ;
-STRDESC		*dp ;
-int		fi ;
-cchar	*pp ;
-int		pl ;
-{
+static int config_dbone(config *csp,STRDESC *dp,int fi,cc *pp,int pl) noex {
 	int	rs = SR_OK ;
 
 		switch (fi) {
@@ -4065,18 +4030,15 @@ int		pl ;
 }
 /* end subroutine (config_dbone) */
 
-
 #if	CF_CONFIGCHECK
-static int config_check(CONFIG *csp)
-{
+static int config_check(config *csp) noex {
 	SUBINFO	*sip = csp->sip ;
-
 	int	rs = SR_OK ;
 
 	if (csp->f_p) {
-	    rs = paramfile_check(&csp->p,sip->daytime) ;
-	    if (rs > 0)
+	    if ((rs = paramfile_check(&csp->p,sip->daytime)) > 0) {
 	        rs = config_read(op) ;
+	    }
 	}
 
 	return rs ;
@@ -4084,16 +4046,15 @@ static int config_check(CONFIG *csp)
 /* end subroutine (config_check) */
 #endif /* CF_CONFIGCHECK */
 
-
 #ifdef	COMMENT
-static int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname) noex {
-	SUBINFO		*sip = csp->sip ;
+static int config_findfile(config *csp,char *tbuf,cchar *cfname) noex {
+	subinfo		*sip = csp->sip ;
 	vecstr		sv ;
 	int		rs ;
 	int		tl = 0 ;
 
 	tbuf[0] = '\0' ;
-	if ((cfname != NULL) && (cfname[0] != '\0')) {
+	if ((cfname != nullptr) && (cfname[0] != '\0')) {
 	    if ((rs = vecstr_start(&sv,6,0)) >= 0) {
 	        cint	tlen = MAXPATHLEN ;
 	        int		i ;
@@ -4106,7 +4067,7 @@ static int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname) noex {
 	        for (i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 		    kch = (ks[i] & 0xff) ;
 		    kbuf[0] = kch ;
-		    vp = NULL ;
+		    vp = nullptr ;
 		    vl = -1 ;
 		    switch (kch) {
 		    case 'p':
@@ -4138,11 +4099,11 @@ static int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname) noex {
 
 static bool isempty(cchar *lp,int ll) noex {
 	int		cl ;
-	bool		f = FALSE ;
-	cchar		*cp ;
+	bool		f = false ;
 	f = f || (ll == 0) ;
 	f = f || (lp[0] == '#') ;
 	if ((! f) && CHAR_ISWHITE(*lp)) {
+	    cchar	*cp ;
 	    cl = sfskipwhite(lp,ll,&cp) ;
 	    f = ((cl == 0) || (cp[0] == '#')) ;
 	}
@@ -4160,34 +4121,24 @@ static int mkmonth(cchar *cp,int cl) noex {
 }
 /* end subroutine (mkmonth) */
 
-/* for use with 'vecobj_sort(3dam)' or similar */
-static int vrcmp(cvoid *v1p,cvoid *v2p) noex {
-	SPELLCHECKS_ENT	*e1p, **e1pp = (SPELLCHECKS_ENT **) v1p ;
-	SPELLCHECKS_ENT	*e2p, **e2pp = (SPELLCHECKS_ENT **) v2p ;
-	int	rc = 0 ;
-
-
-	if (*e1pp == NULL) {
-	    rc = 1 ;
-	    goto ret0 ;
+/* for use with |vecobj_sort(3uc)| or similar */
+static int vrcmp(cvoid **v1pp,cvoid **v2pp) noex {
+	SC_ENT	*e1p = (SC_ENT **) *v1pp ;
+	SC_ENT	*e2p = (SC_ENT **) *v2pp ;
+	int		rc = 0 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+		if (e2p) {
+		    if ((rc = (e1p->m - e2p->m)) == 0) {
+	    		rc = (e1p->d - e2p->d) ;
+		    }
+		}
+	    }
 	}
-
-	if (*e2pp == NULL) {
-	    rc = -1 ;
-	    goto ret0 ;
-	}
-
-	e1p = *e1pp ;
-	e2p = *e2pp ;
-
-	rc = (e1p->m - e2p->m) ;
-	if (rc == 0)
-	    rc = (e1p->d - e2p->d) ;
-
-ret0:
 	return rc ;
 }
 /* end subroutine (vrcmp) */
-
 
 

@@ -34,7 +34,6 @@
 
 	Arguments:
 	- op		object pointer
-	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
@@ -100,7 +99,7 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= tabsize) {
-	        	uint	*header = (uint *) bp ;
+	        	uint	*header = uintp(bp) ;
 			header[pwihdr_fsize] = op->fsize ;
 			header[pwihdr_wrtime] = op->wrtime ;
 			header[pwihdr_wrcount] = op->wrcount ;
@@ -153,12 +152,8 @@ int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 		    }
 	            bp += 4 ;
 	            bl -= 4 ;
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-	        if ((rs >= 0) && (bl > 0)) {
-	            if (bl >= tabsize) {
-			uint	*header = (uint *) bp ;
+	            if ((rs >= 0) && (bl >= tabsize)) {
+			const uint	*header = uintp(bp) ;
 	                op->fsize = header[pwihdr_fsize] ;
 	                op->wrtime = header[pwihdr_wrtime] ;
 	                op->wrcount = header[pwihdr_wrcount] ;
@@ -181,6 +176,8 @@ int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }
+	        } else {
+	            rs = SR_ILSEQ ;
 	        } /* end if (ok) */
 	    } else {
 		rs = SR_ILSEQ ;

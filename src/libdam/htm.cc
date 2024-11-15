@@ -1,4 +1,5 @@
 /* htm SUPPORT (HTML creation and output) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* hack to output HTML */
@@ -151,7 +152,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 	    } /* end if (doctype) */
 	    op->wlen += wlen ;
 	    if (rs < 0) {
-		htm_dtor(op) ;;
+		htm_dtor(op) ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
@@ -171,6 +172,10 @@ int htm_finish(htm *op) noex {
 	    }
 	    if (op->lbuf) {
 		rs1 = uc_free(op->lbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = htm_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    wlen = op->wlen ;

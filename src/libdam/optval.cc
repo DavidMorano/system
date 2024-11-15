@@ -1,4 +1,5 @@
 /* optval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Option-Value (including boolean) */
@@ -36,11 +37,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<matostr.h>
-#include	<mkchar.h>
 #include	<cfnum.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -89,11 +92,10 @@ int optval(cchar *sp,int sl) noex {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (sl > 0) {
-		int	hi ;
-	        if ((hi = matocasestr(hits,1,sp,sl)) >= 0) {
+		if (int hi ; (hi = matocasestr(hits,1,sp,sl)) >= 0) {
 	            v = (hi & 1) ;
 	        } else {
-	            int		ch = mkchar(sp[0]) ;
+	            cint	ch = mkchar(sp[0]) ;
 		    rs = SR_INVALID ;
 	            if (isdigitlatin(ch)) {
 	                rs = cfnumi(sp,sl,&v) ;

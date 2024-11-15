@@ -1,4 +1,5 @@
 /* tmpx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* object to facilitate UTMPX management */
@@ -24,6 +25,7 @@
 #include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 #include	<vecstr.h>
+#include	<vecint.h>
 
 
 /* UTMPX file */
@@ -65,7 +67,7 @@
 #define	TMPX_CUR	struct tmpx_cursor
 #define	TMPX_ENT	struct utmpx
 #define	TMPX_MAGIC	1092387456
-#define	TMPX_ENTSIZE	sizeof(TMPX_ENT)
+#define	TMPX_ENTSIZE	szof(TMPX_ENT)
 #define	TMPX_DEFUTMP	UTMPX_DEFUTMP
 
 /* entry-type values */
@@ -116,10 +118,61 @@ struct tmpx_head {
 	int		mapen ;		/* number of mapped entries */
 } ;
 
-typedef TMPX		tmpx ;
 typedef TMPX_FL		tmpx_fl ;
 typedef TMPX_CUR	tmpx_cur ;
 typedef TMPX_ENT	tmpx_ent ;
+
+#ifdef	__cplusplus
+enum tmpxmems {
+    	tmpxmem_getrunlevel,
+	tmpxmem_nusers,
+	tmpxmem_close,
+	tmpxmem_overlast
+} ;
+struct tmpx ;
+struct tmpx_co {
+	tmpx		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (tmpx *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (tmpx_co) */
+struct tmpx : tmpx_head {
+	tmpx_co		getrunlevel ;
+	tmpx_co		nusers ;
+	tmpx_co		close ;
+	tmpx() noex {
+	    getrunlevel(this,tmpxmem_getrunlevel) ;
+	    nusers(this,tmpxmem_nusers) ;
+	    close(this,tmpxmem_close) ;
+	} ;
+	tmpx(const tmpx &) = delete ;
+	tmpx &operator = (const tmpx &) = delete ;
+	int open(cchar *,int = 0) noex ;
+	int read(int,tmpx_ent *) noex ;
+	int write(int,tmpx_ent *) noex ;
+	int check(time_t) noex ;
+	int curbegin(tmpx_cur *) noex ;
+	int curend(tmpx_cur *) noex ;
+	int curenum(tmpx_cur *,tmpx_ent *) noex ;
+	int fetchuser(tmpx_cur *,tmpx_ent *,cchar *) noex ;
+	int fetchpid(tmpx_ent *,pid_t) noex ;
+	int getboottim(time_t *) noex ;
+	int getuserlines(vecstr *,cchar *) noex ;
+	int getuserterms(vecstr *,cchar *) noex ;
+	void dtor() noex ;
+	~tmpx() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (tmpx) */
+#else	/* __cplusplus */
+typedef TMPX		tmpx ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -129,7 +182,7 @@ extern int tmpx_write(tmpx *,int,tmpx_ent *) noex ;
 extern int tmpx_check(tmpx *,time_t) noex ;
 extern int tmpx_curbegin(tmpx *,tmpx_cur *) noex ;
 extern int tmpx_curend(tmpx *,tmpx_cur *) noex ;
-extern int tmpx_enum(tmpx *,tmpx_cur *,tmpx_ent *) noex ;
+extern int tmpx_curenum(tmpx *,tmpx_cur *,tmpx_ent *) noex ;
 extern int tmpx_fetchuser(tmpx *,tmpx_cur *,tmpx_ent *,cchar *) noex ;
 extern int tmpx_fetchpid(tmpx *,tmpx_ent *,pid_t) noex ;
 extern int tmpx_nusers(tmpx *) noex ;
@@ -139,8 +192,21 @@ extern int tmpx_getboottime(tmpx *,time_t *) noex ;
 extern int tmpx_getrunlevel(tmpx *) noex ;
 extern int tmpx_getuserlines(tmpx *,vecstr *,cchar *) noex ;
 extern int tmpx_getuserterms(tmpx *,vecstr *,cchar *) noex ;
+extern int tmpx_getsessions(tmpx *,vecint *,cchar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+template<typename ... Args>
+static inline int tmpx_magic(tmpx *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TMPX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (tmpx_magic) */
+#endif /* __cplusplus */
 
 
 #endif /* TMPX_INCLUDE */

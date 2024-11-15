@@ -1,4 +1,5 @@
 /* tmpx_getuserterms SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get all of the terminals where the given user is logged in */

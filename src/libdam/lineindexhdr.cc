@@ -1,6 +1,6 @@
 /* lineindexhdr SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PassWord Index file */
 /* version %I% last-modified %G% */
@@ -34,7 +34,6 @@
 
 	Arguments:
 	- op		object pointer
-	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
@@ -100,7 +99,7 @@ int lineindexhdr_rd(lineindexhdr *op,char *hbuf,int hlen) noex {
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= tabsize) {
-	        	uint	*header = (uint *) bp ;
+	        	uint	*header = uintp(bp) ;
 			header[lineindexhdr_rectab] = op->rectab ;
 			header[lineindexhdr_wrtime] = op->wrtime ;
 			header[lineindexhdr_lines] = op->lines ;
@@ -140,12 +139,8 @@ int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 		    }
 	            bp += 4 ;
 	            bl -= 4 ;
-	        } else {
-	            rs = SR_ILSEQ ;
-		}
-	        if ((rs >= 0) && (bl > 0)) {
-	            if (bl >= tabsize) {
-			uint	*header = (uint *) bp ;
+	            if ((rs >= 0) && (bl >= tabsize)) {
+			const uint	*header = uintp(bp) ;
 	                op->rectab = header[lineindexhdr_rectab] ;
 	                op->wrtime = header[lineindexhdr_wrtime] ;
 	                op->lines = header[lineindexhdr_lines] ;
@@ -155,6 +150,8 @@ int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }
+	        } else {
+	            rs = SR_ILSEQ ;
 	        } /* end if (ok) */
 	    } else {
 		rs = SR_ILSEQ ;

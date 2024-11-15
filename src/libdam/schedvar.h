@@ -1,4 +1,5 @@
 /* schedvar HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* creates the substitution varaiables for 'scheduled' type operations */
@@ -42,7 +43,8 @@ EXTERNC_begin
 extern int schedvar_start(schedvar *) noex ;
 extern int schedvar_add(schedvar *,cchar *,cchar *,int) noex ;
 extern int schedvar_curbegin(schedvar *,schedvar_cur *) noex ;
-extern int schedvar_enum(schedvar *,schedvar_cur *,char *,int,char *,int) noex ;
+extern int schedvar_curenum(schedvar *,schedvar_cur *,char *,int,
+		char *,int) noex ;
 extern int schedvar_curend(schedvar *,schedvar_cur *) noex ;
 extern int schedvar_findkey(schedvar *,cchar *,cchar **) noex ;
 extern int schedvar_del(schedvar *,cchar *) noex ;

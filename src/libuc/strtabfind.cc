@@ -49,6 +49,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -62,7 +63,9 @@
 
 /* local defines */
 
+#ifndef	MODP2
 #define	MODP2(v,n)	((v) & ((n) - 1))
+#endif
 
 
 /* imported namespaces */
@@ -99,23 +102,22 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 /* exported subroutines */
 
 int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
-	uint		khash, nhash ;
+	uint		khash ;
+	uint		nhash ;
 	uint		chash ;
-	int		nhi, hi ;
+	int		nhi ;
+	int		hi ;
 	int		nmax ;
 	int		j ; /* used-afterwards */
 	int		si = -1 ;
 	int		sc = 0 ; /* Skip-Count */
 	bool		f_mathash = false ;
 	bool		f_mat = false ;
-
 	nmax = itlen + nskip ;
 	khash = hash_elf(sp,sl) ;
-
 	chash = (khash & INT_MAX) ;
 	nhash = khash ;
 	hi = hashindex(nhash,itlen) ;
-
         for (j = 0 ; (j < nmax) && ((si = it[hi][0]) > 0) ; j += 1) {
 	    f_mathash = ((it[hi][1] & INT_MAX) == chash) ;
 	    if (f_mathash) break ;
@@ -126,7 +128,6 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 	    hi = hashindex(nhash,itlen) ;
 	} /* end for */
 	sc += j ;
-
 	if ((si > 0) && f_mathash) {
 	    while ((si = it[hi][0]) > 0) {
 	        cchar	*cp = (tab + si) ;
@@ -138,7 +139,6 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 		sc += 1 ;
 	    } /* end while */
 	} /* end if */
-
 	return (f_mat) ? sc : SR_NOTFOUND ;
 }
 /* end subroutine (strtabfind) */

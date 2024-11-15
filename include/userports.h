@@ -1,4 +1,5 @@
 /* userports HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* query the USERPOTS database for entries */

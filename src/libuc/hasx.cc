@@ -312,6 +312,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<uvariables.hh>
+#include	<usupport.h>		/* |cstrlen(3u)| */
 #include	<ascii.h>
 #include	<strn.h>
 #include	<char.h>

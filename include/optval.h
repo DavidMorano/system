@@ -1,4 +1,5 @@
 /* optval HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* divine a value (boolean or otherwise) out of a c-sring */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

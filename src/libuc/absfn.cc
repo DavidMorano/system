@@ -120,7 +120,7 @@ static int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) {
 		    sl = rs ;
 	            if (sl > ABSFN_SHORTLEN) {
-		        cchar	*cp ;
+		        cchar	*cp{} ;
 	                if ((rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
 	                    *rpp = cp ;
 	                    op->as = cp ;

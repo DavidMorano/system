@@ -1,4 +1,5 @@
 /* userports SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* query the USERPORTS database for entries */
@@ -257,6 +258,10 @@ int userports_close(UP *op) noex {
 	        rs1 = uc_free(op->fname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
+	    }
+	    {
+		rs1 = userports_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */

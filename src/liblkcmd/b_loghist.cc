@@ -1235,7 +1235,7 @@ static int process(PROGINFO *pip,SHIO *ofp,vecstr *aup)
 
 	if ((rs = tmpx_open(&wt,lip->wtmpfname,O_RDONLY)) >= 0) {
 	    if ((rs = tmpx_curbegin(&wt,&cur)) >= 0) {
-	        while ((ei = tmpx_enum(&wt,&cur,&e)) >= 0) {
+	        while ((ei = tmpx_curenum(&wt,&cur,&e)) >= 0) {
 
 	            if (f_argusers) {
 	                char	userbuf[LOGNAMELEN + 1] ;

@@ -136,6 +136,10 @@ int uiconv_close(uiconv *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->cdp = nullptr ;
 	    }
+	    {
+		rs1 = uiconv_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;

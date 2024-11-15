@@ -177,7 +177,7 @@ constexpr int	connagains[] = {
 constexpr int		tslen = TIMEBUFLEN ;
 constexpr int		onemillion = 1000000 ;
 
-constexpr cchar		inetsvc[] = INETSVC_TIME ;
+constexpr char		inetsvc[] = INETSVC_TIME ;
 
 
 /* exported variables */

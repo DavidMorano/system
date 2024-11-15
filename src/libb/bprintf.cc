@@ -1,4 +1,5 @@
 /* bprintf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a home made "printf" routine */

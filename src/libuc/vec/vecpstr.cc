@@ -1148,6 +1148,14 @@ int vecpstr::envfile(cchar *fn) noex {
 	return vecpstr_envfile(this,fn) ;
 }
 
+int vecpstr::search(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
+	return vecpstr_search(this,s,vcmp,rpp) ;
+}
+
+int vecpstr::finder(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
+	return vecpstr_finder(this,s,vcmp,rpp) ;
+}
+
 int vecpstr::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
 	return vecpstr_del(this,ai) ;

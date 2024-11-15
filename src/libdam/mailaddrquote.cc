@@ -1,4 +1,5 @@
 /* mailaddrquote SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* quote mail-addresses */
@@ -129,7 +130,7 @@ static int	mailaddrquote_quote(MAQ *,cchar *,int) noex ;
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
-constexpr cchar		qchars[] = R"xx("\<>())xx" ;
+constexpr char		qchars[] = R"xx("\<>())xx" ;
 
 static char		qterms[termsize] ;
 

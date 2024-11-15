@@ -1,4 +1,5 @@
 /* recip SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* recipient object for DMAIL¦DMAILBOX */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	recip
+
+	Description:
 	This is an recipil address handling module object. It can
 	parse out and store hierarchically organized RECIPs.
 
@@ -153,6 +158,10 @@ int recip_finish(recip *op) noex {
 		}
 	    } else {
 	        rs = SR_BUGCHECK ;
+	    }
+	    {
+		rs = recip_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
 	} /* end if (non-null) */

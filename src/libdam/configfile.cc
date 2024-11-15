@@ -1,4 +1,5 @@
 /* configfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* parse a configuration file */
@@ -86,7 +87,7 @@ static void	checkfree() noex ;
 /* local variables */
 
 /* these are the terminators for most everything */
-constexpr cchar		fterms[32] = {
+constexpr char		fterms[32] = {
 	0x7F, 0xFE, 0xC0, 0xFE,
 	0x8B, 0x00, 0x00, 0x24, 
 	0x00, 0x00, 0x00, 0x00, 
@@ -98,7 +99,7 @@ constexpr cchar		fterms[32] = {
 } ;
 
 /* these are the terminators for options */
-constexpr cchar		oterms[32] = {
+constexpr char		oterms[32] = {
 	0x00, 0x0B, 0x00, 0x00,
 	0x09, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -236,7 +237,7 @@ int configfile_start(configfile *csp,configfname) noex {
 	if (csp == nullptr)
 	    return SR_FAULT ;
 
-	memset(csp,0,sizeof(CONFIGFILE)) ;
+	memclear(csp) ;
 
 	if ((configfname == nullptr) || (configfname[0] == '\0'))
 	    return SR_NOEXIST ;

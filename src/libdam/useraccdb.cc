@@ -229,7 +229,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 constexpr int		diglen = DIGBUFLEN ;
 
-constexpr cchar		totaluser[] = TOTALNAME ;
+constexpr char		totaluser[] = TOTALNAME ;
 
 
 /* exported variables */
