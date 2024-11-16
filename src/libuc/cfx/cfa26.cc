@@ -1,4 +1,5 @@
 /* cfa26 SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert from Alpha (a base-26 numeric representation) */
@@ -47,9 +48,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
 

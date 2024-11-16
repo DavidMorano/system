@@ -1,4 +1,5 @@
 /* cfdect SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert from a decimal string with time codes on the end */
@@ -16,16 +17,23 @@
 
 /*******************************************************************************
 
+  	Group:
+	cfdect
+
+	Description:
 	This subroutine converts a character string representing a
 	time-interval.  The time-interval is returned in an integer.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<strn.h>
 #include	<sfx.h>

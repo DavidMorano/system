@@ -1,4 +1,5 @@
-/* cfcharss HEADER */
+/* cfcharsx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert a decimal digit string to its binary integer value */
@@ -16,8 +17,11 @@
 
 /*******************************************************************************
 
-	Subroutines to convert digit strings to binary integers.
+  	Object:
+	cfcharsx
 
+	Description:
+	Subroutines to convert digit strings to binary integers.
 
 *******************************************************************************/
 

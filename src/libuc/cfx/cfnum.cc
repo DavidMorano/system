@@ -1,4 +1,5 @@
 /* cfnum SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert from a number to an integer */
@@ -42,11 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strnlen(3c)| */
 #include	<concepts>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
 #include	<cfbin.h>
@@ -58,6 +62,7 @@
 #include	<mkchar.h>
 #include	<toxc.h>
 #include	<ischarx.h>
+#include	<localmisc.h>
 
 #include	"cfnum.h"
 
@@ -91,8 +96,8 @@ int cfnumx(cchar *sp,int sl,T *rp) noex {
 	cchar		*bp{} ;
 	bool		fneg = false ;
 	if (int bl ; (bl = sfsign(sp,sl,&bp,&fneg)) > 0) {
-	    int		ch ;
-	    if (*bp == '\\') {
+	    int		ch = mkchar(*bp) ;
+	    if (ch == '\\') {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 1) {
@@ -119,7 +124,7 @@ int cfnumx(cchar *sp,int sl,T *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
+	    } else if (isdigitlatin(ch)) {
 	        if (bl > 1) {
 	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
@@ -151,7 +156,9 @@ int cfnumx(cchar *sp,int sl,T *rp) noex {
 	            rs = cfdec(bp,bl,rp) ;
 		}
 	    } /* end if */
-	    if (fneg) *rp = (- *rp) ;
+	    if (fneg) {
+		*rp = (- *rp) ;
+	    }
 	} /* end if (sfsign) */
 	return rs ;
 }
@@ -163,8 +170,7 @@ int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	cchar		*sp{} ;
 	bool		fneg{} ;
 	if (int sl ; (sl = sfsign(bp,bl,&sp,&fneg)) > 0) {
-	    UT		uval{} ;
-	    if ((rs = cfnumx(sp,sl,&uval)) >= 0) {
+	    if (UT uval{} ; (rs = cfnumx(sp,sl,&uval)) >= 0) {
 		if (fneg) uval = (- uval) ;
 		*rp = static_cast<T>(uval) ;
 	    } /* end if (cfnumx) */

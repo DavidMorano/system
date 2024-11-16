@@ -1,4 +1,5 @@
 /* cfdecmf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Convert-From-Decimal-Multiply-Factor */
@@ -44,10 +45,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strnlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ascii.h>
 #include	<cfdec.h>

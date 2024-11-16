@@ -1,4 +1,5 @@
 /* dstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* dynamic (allocated) string object */
@@ -16,11 +17,16 @@
 
 /*******************************************************************************
 
+  	Object:
+	dstr
+
+	Description:
 	This little object tries to mimic a dynamic-length string.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -62,11 +68,10 @@
 int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sop && sp) {
-	    cchar	*rp{} ;
 	    sop->sbuf = nullptr ;
 	    sop->slen = 0 ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = uc_mallocstrw(sp,sl,&rp)) >= 0) {
+	    if (cchar *rp{} ; (rs = uc_mallocstrw(sp,sl,&rp)) >= 0) {
 		sop->slen = rs ;
 		sop->sbuf = charp(rp) ;
 	    }

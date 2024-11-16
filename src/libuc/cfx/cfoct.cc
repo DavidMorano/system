@@ -1,4 +1,5 @@
 /* cfoct SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */
@@ -33,11 +34,17 @@
 
 /*******************************************************************************
 
+  	Group:
+	cfoct
+
+	Description:
 	Subroutines to convert digit c-strings to integers.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
 
