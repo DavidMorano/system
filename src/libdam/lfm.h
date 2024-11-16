@@ -23,26 +23,23 @@
 #include	<sys/types.h>		/* system types */
 #include	<unistd.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 /* object defines */
-#define	LFM_MAGIC	0x8a7b7c6d
-#define	LFM		struct lfm_head
-#define	LFM_IN		struct lfm_information
-#define	LFM_CH		struct lfm_check
-
-/*  lock-file types */
+#define	LFM_MAGIC		0x8a7b7c6d
+#define	LFM			struct lfm_head
+#define	LFM_IN			struct lfm_information
+#define	LFM_CH			struct lfm_check
+/* lock-file types */
 #define	LFM_TRECORD		0		/* record lock */
 #define	LFM_TCREATE		1		/* old create file 0444 */
 #define	LFM_TEXCLUSIVE		2		/* modern exclusive open */
 #define	LFM_TOVERLAST		3
-
+/* time-outs */
 #define	LFM_TOLOCK		(5*60)
 #define	LFM_TOMINCHECK		3
 #define	LFM_TOMINSTAT		(60 + 3)
-
-#define	LFM_CHECKBUFLEN		400
+#define	LFM_CHBUFLEN		400
 
 
 struct lfm_information {
@@ -57,7 +54,7 @@ struct lfm_check {
 	cchar		*banner ;	/* banner */
 	pid_t		pid ;		/* lock PID */
 	int		status ;	/* status */
-	char		buf[LFM_CHECKBUFLEN + 1] ;
+	char		buf[LFM_CHBUFLEN + 1] ;
 } ;
 
 struct lfm_head {
@@ -91,6 +88,7 @@ extern int	lfm_printf(lfm *,cchar *,...) noex ;
 extern int	lfm_flush(lfm *) noex ;
 extern int	lfm_getinfo(lfm *,lfm_in *) noex ;
 extern int	lfm_getpid(lfm *,pid_t *) noex ;
+extern int	lfm_rewind(lfm *) noex ;
 extern int	lfm_finish(lfm *) noex ;
 
 EXTERNC_end

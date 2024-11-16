@@ -1,4 +1,5 @@
 /* cfxxx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert a decimal digit string to its binary integer value */
@@ -36,11 +37,17 @@
 
 /*******************************************************************************
 
+  	Group:
+	cfxxx
+
+	Description:
 	Subroutines to convert digit strings to binary integers.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
 

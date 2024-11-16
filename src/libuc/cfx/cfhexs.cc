@@ -1,4 +1,5 @@
 /* cfhexs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert from a HEX string */
@@ -41,6 +42,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<mkchar.h>

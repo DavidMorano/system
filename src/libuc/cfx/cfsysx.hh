@@ -1,4 +1,5 @@
 /* cfxxxx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */
@@ -36,6 +37,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	cfxxxx
+
+	Description:
 	Subroutines to convert digit strings intto binary integers
 	(of various types and sizes).
 

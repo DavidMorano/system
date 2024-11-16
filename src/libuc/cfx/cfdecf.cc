@@ -1,4 +1,5 @@
 /* cfdecf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert a decimal digit string to its binary floating value */
@@ -39,6 +40,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<snwcpy.h>
@@ -72,10 +75,9 @@ int cfdecf(cchar *snp,int snl,double *rp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (snp && rp) {
-	    int		sl ;
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
-	    if ((sl = sfshrink(snp,snl,&sp)) > 0) {
+	    if (int sl ; (sl = sfshrink(snp,snl,&sp)) > 0) {
 	        cint	dlen = DIGBUFLEN ;
 	        int	bl = sl ;
 	        char	dbuf[DIGBUFLEN + 1] ;

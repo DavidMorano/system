@@ -95,7 +95,7 @@ int optval(cchar *sp,int sl) noex {
 	        } else {
 	            int		ch = mkchar(sp[0]) ;
 		    rs = SR_INVALID ;
-	            if (isdigitlatin(ch)) {
+	            if (isnumlatin(ch)) {
 	                rs = cfnumi(sp,sl,&v) ;
 		    }
 	        } /* end if */

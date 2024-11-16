@@ -1,4 +1,5 @@
 /* strtoxlonglong SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* conversion of a decimal c-sting to the type |longlong| */
@@ -69,11 +70,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
 #include	<climits>		/* for |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cctype>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 #include	"strtoxlonglong.h"
@@ -88,12 +91,15 @@
 /* local typedefs */
 
 
-/* local variables */
+/* external subroutines */
 
-constexpr int	maxbase = 36 ;		/* must be classic value */
+
+/* external variables */
 
 
 /* local structures */
+
+constexpr int	maxbase = 36 ;		/* must be classic value */
 
 struct llhelper {
 	const longlong	one = 1 ;
@@ -130,10 +136,10 @@ constexpr llhelper	llhelp ;
  */
 
 longlong strtolonglong(cchar *nptr,char **endptr,int base) noex {
-	longlong acc, cutoff;
-	const char *s;
-	int c;
-	int neg, any, cutlim;
+	longlong	acc, cutoff ;
+	cchar		*s ;
+	int 		c ;
+	int 		neg, any, cutlim ;
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
 	 * If base is 0, allow 0x for hex and 0 for octal, else

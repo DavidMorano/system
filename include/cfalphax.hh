@@ -1,4 +1,5 @@
 /* cfalphax HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* conversion of power-base-two c-string to their binary integer types */
@@ -35,8 +36,11 @@
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 #include	<char.h>
 #include	<ischarx.h>

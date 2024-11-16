@@ -52,23 +52,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |USTAT| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<cstdarg>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ucgetpid.h>
 #include	<estrings.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<getusername.h>
+#include	<absfn.h>
 #include	<linebuffer.h>
 #include	<filer.h>
 #include	<storeitem.h>
@@ -92,14 +94,6 @@
 #define	SB		storebuffer
 #define	SI		storeitem
 
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
 
 /* imported namespaces */
 
@@ -114,18 +108,22 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
+extern "C" {
+    extern int	fmtstr(char *,int,int,cchar *,va_list) noex ;
+}
+
 
 /* external variables */
 
 
 /* local structures */
 
-struct lfm_lockinfo {
+struct lfm_lin { /* lock-info */
 	cchar		*nn ;
 	cchar		*un ;
 	cchar		*bn ;
 	time_t		dt ;
-} ;
+} ; /* end struct (lfm_lin) */
 
 
 /* forward references */
@@ -136,6 +134,9 @@ static int lfm_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = memclear(hop) ;
+	    op->lfd = -1 ;
+	    op->pid_lock = -1 ;
+	    op->tocheck = LFM_TOMINCHECK ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -161,12 +162,15 @@ static inline int lfm_magic(lfm *op,Args ... args) noex {
 /* end subroutine (lfm_magic) */
 
 static int	lfm_startcheck(lfm *,time_t) noex ;
-static int	lfm_startopen(lfm *,lfm_in *) noex ;
+static int	lfm_startopen(lfm *,lfm_lin *) noex ;
+
+static int	lfm_fnbegin(lfm *,cchar *) noex ;
+static int	lfm_fnend(lfm *) noex ;
 
 static int	lfm_lockload(lfm *,lfm_ch *) noex ;
 static int	lfm_locklost(lfm *,lfm_ch *,filer *) noex ;
-static int	lfm_lockwrite(lfm *,lfm_in *,int) noex ;
-static int	lfm_lockwriter(lfm *,lfm_in *,int) noex ;
+static int	lfm_lockwrite(lfm *,lfm_lin *,int) noex ;
+static int	lfm_lockwriter(lfm *,lfm_lin *,int) noex ;
 static int	lfm_lockwritedate(lfm *,time_t) noex ;
 static int	lfm_lockreadpid(lfm *) noex ;
 static int	lfm_lockbegin(lfm *op) noex ;
@@ -183,94 +187,60 @@ static int	check_init(lfm_ch *) noex ;
 /* exported variables */
 
 
+
 /* exported subroutines */
+
+namespace {
+    struct starter {
+	lfm		*op ;
+	lfm_ch		*lcp ;
+	char		*nnbuf{} ;
+	char		*unbuf{} ;
+	cchar		*fname{} ;
+	cchar		*nn ;
+	cchar		*un ;
+	cchar		*bn ;
+	int		nnlen = 0 ;
+	int		unlen = 0 ;
+	starter(lfm *o,lfm_ch *p,cc *n,cc *u,cc *b) noex {
+	    op = o ;
+	    lcp = p ;
+	    nn = n ;
+	    un = u ;
+	    bn = b ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int allocbegin() noex ;
+	int allocend() noex ;
+	int opener() noex ;
+	~starter() {
+	    (void) allocend() ;
+	} ; /* end if (dtor) */
+    } ; /* end struct (starter) */
+}
 
 int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 		cc *nn,cc *un,cc *bn) noex {
-	int		rs = SR_OK ;
-	if ((rs = lfm_ctor(op,fname)) >= 0) {
-	custime		dt = getustime ;
-	cint		nnlen = NODENAMELEN ;
-	cint		unlen = USERNAMELEN ;
-	char		nnbuf[NODENAMELEN + 1] ;
-	char		unbuf[USERNAMELEN + 1] ;
-
+	int		rs ;
 	if (to < 0) to = LFM_TOLOCK ;
-
-/* argument check */
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	if ((type < 0) || (type >= LFM_TOVERLAST))
-	    return SR_INVALID ;
-
-/* priliminary initialization */
-
-	op->type = type ;
-	op->lfd = -1 ;
-	op->pid_lock = -1 ;
-	op->tocheck = LFM_TOMINCHECK ;
-	op->tolock = to ;
-	op->pid = ucgetpid() ;
-
-	if (lcp != nullptr) check_init(lcp) ;
-
-/* continue itialization */
-
-	if ((rs >= 0) && (nn == nullptr)) {
-	    nn = nnbuf ;
-	    rs = getnodename(nnbuf,nnlen) ;
-	}
-
-	if ((rs >= 0) && (un == nullptr)) {
-	    un = unbuf ;
-	    rs = getusername(unbuf,unlen,-1) ;
-	}
-
-	if (rs >= 0) {
-	    cchar	*fnp{} ;
-	    if (int fnl ; (fnl = sfnamecomp(fname,-1,&fnp)) > 0) {
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
-	            cint	fnlen = (rs-1) ;
-	            int		dnl ;
-	            cchar	*dnp ;
-	            op->lfname = cp ;
-	            if ((dnl = sfdirname(op->lfname,fnlen,&dnp)) > 0) {
-	                char	dbuf[MAXPATHLEN+1] ;
-	                if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) {
-	                    lfm_in	li{} ;
-	                    cint	rsn = SR_NOENT ;
-	                    cint	am = (X_OK | W_OK) ;
-	                    li.dt = dt ;
-	                    li.nn = nn ;
-	                    li.un = un ;
-	                    li.bn = bn ;
-	                    if ((rs = u_access(dbuf,am)) >= 0) {
-	                        if ((rs = lfm_startcheck(op,dt)) >= 0) {
-	                            rs = lfm_startopen(op,&li) ;
-	                        }
-	                    } else if (rs == rsn) {
-	                        cmode	dm = 0777 ;
-	                        if ((rs = mkdirs(dbuf,dm)) >= 0) {
-	                            rs = lfm_startopen(op,&li) ;
-	                        }
-	                    }
-	                } /* end if (mkpath) */
-	            }
-	            if (rs < 0) {
-	                if (op->lfname != nullptr) {
-	                    uc_free(op->lfname) ;
-	                    op->lfname = nullptr ;
-	                }
-	            }
-	        } /* end if (m-a) */
-	    } /* end if (sfnamecomp) */
-	} /* end if (ok) */
-
-	if (rs < 0) {
-	    if (lcp) lfm_lockload(op,lcp) ;
-	}
-
+	if ((rs = lfm_ctor(op,fname)) >= 0) {
+	    if ((rs = ucpid) >= 0) {
+		op->pid = rs ;
+	        op->type = type ;
+	        op->tolock = to ;
+	        rs = SR_INVALID ;
+	        if (fname[0] && (type >= 0) && (type < LFM_TOVERLAST)) {
+		    if ((rs = lfm_fnbegin(op,fname)) >= 0) {
+			{
+	            	    starter	so(op,lcp,nn,un,bn) ;
+		    	    rs = so ;
+			}
+			if (rs < 0) {
+			    lfm_fnend(op) ;
+			}
+		    } /* end if (lfm_fnbegin) */
+	        } /* end if (valid) */
+	    } /* end if (ucpid) */
 	    if (rs < 0) {
 		lfm_dtor(op) ;
 	    }
@@ -278,6 +248,97 @@ int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 	return rs ;
 }
 /* end subroutine (lfm_start) */
+
+starter::operator int () noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if ((rs = check_init(lcp)) >= 0) {
+	    if ((rs = allocbegin()) >= 0) {
+	        {
+		    rs = opener() ;
+		    if (rs < 0) {
+	    	        if (lcp) lfm_lockload(op,lcp) ;
+		    }
+	        }
+	        rs1 = allocend() ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (alloc-) */
+	} /* end if (ok) */
+	return rs ;
+}
+/* end method (starter::operator) */
+
+int starter::allocbegin() noex {
+    	int		rs = SR_OK ;
+	if ((rs >= 0) && (nn == nullptr)) {
+	    if ((rs = malloc_nn(&nnbuf)) >= 0) {
+		nnlen = rs ;
+	        nn = nnbuf ;
+	        rs = getnodename(nnbuf,nnlen) ;
+	    } /* end if (memory-allocation) */
+	}
+	if ((rs >= 0) && (un == nullptr)) {
+	    if ((rs = malloc_un(&unbuf)) >= 0) {
+		unlen = rs ;
+	        un = unbuf ;
+	        rs = getusername(unbuf,unlen,-1) ;
+	    } /* end if (memory-allocation) */
+	}
+	return rs ;
+}
+/* end method (starter::allocbegin) */
+
+int starter::allocend() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (unbuf) {
+	    rs1 = uc_free(unbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    unbuf = nullptr ;
+	    unlen = 0 ;
+	}
+	if (nnbuf) {
+	    rs1 = uc_free(nnbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    nnbuf = nullptr ;
+	    nnlen = 0 ;
+	}
+	return rs ;
+}
+/* end method (starter::allocend) */
+
+int starter::opener() noex {
+    	int		rs = SR_OK ;
+	cchar		*fn = op->lfname ;
+	cchar		*dnp{} ;
+	if (int dnl ; (dnl = sfdirname(fn,-1,&dnp)) > 0) {
+            if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
+                if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) {
+                    lfm_lin li{} ;
+                    custime 	dt = getustime ;
+                    cint    	rsn = SR_NOENT ;
+                    cint    	am = (X_OK | W_OK) ;
+                    li.dt = dt ;
+                    li.nn = nn ;
+                    li.un = un ;
+                    li.bn = bn ;
+                    if ((rs = u_access(dbuf,am)) >= 0) {
+                        if ((rs = lfm_startcheck(op,dt)) >= 0) {
+                            rs = lfm_startopen(op,&li) ;
+                        }
+                    } else if (rs == rsn) {
+                        cmode       dm = 0777 ;
+                        if ((rs = mkdirs(dbuf,dm)) >= 0) {
+                            rs = lfm_startopen(op,&li) ;
+                        }
+                    }
+                } /* end if (mkpath) */
+                rs = rsfree(rs,dbuf) ;
+            } /* end if (m-a-f) */
+	} /* end if (sfdirname) */
+	return rs ;
+}
+/* end method (starter::opener) */
 
 int lfm_finish(lfm *op) noex {
 	int		rs ;
@@ -288,13 +349,9 @@ int lfm_finish(lfm *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->lfd = -1 ;
 	    }
-	    if (op->lfname) {
-	        if ((op->type >= LFM_TCREATE) && (op->lfname[0] != '\0')) {
-	            u_unlink(op->lfname) ;
-	        }
-	        rs1 = uc_free(op->lfname) ;
+	    {
+		rs1 = lfm_fnend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->lfname = nullptr ;
 	    }
 	    {
 		rs1 = lfm_dtor(op) ;
@@ -335,33 +392,33 @@ int lfm_check(lfm *op,lfm_ch *cip,time_t dt) noex {
 	if ((rs = lfm_magic(op)) >= 0) {
 	    rs = SR_NOANODE ;
 	    if (op->lfname) {
-		rs = SR_OK ;
-		if (cip) rs = check_init(cip) ;
-	        if ((rs >= 0)  && (op->tocheck >= 0)) {
-	            if (dt == 0) dt = getustime ;
-	            if ((dt - op->ti_check) >= op->tocheck) {
-			bool	f = false ;
-	                op->ti_check = dt ;
-	                op->pid_lock = -1 ;
-		        /* do a check on the INODE (if it is the same) */
-			f = f || ((dt - op->ti_stat) >= LFM_TOMINSTAT) ;
-			f = f || (op->type == LFM_TCREATE) ;
-			if (f) {
-			    cchar	*fn = op->lfname ;
-	                    if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
-	                        op->ti_stat = dt ;
-	                        rs = lfm_ourdevino(op,&sb) ;
+		if ((rs = check_init(cip)) >= 0) {
+	            if (op->tocheck >= 0) {
+	                if (dt == 0) dt = getustime ;
+	                if ((dt - op->ti_check) >= op->tocheck) {
+			    bool	f = false ;
+	                    op->ti_check = dt ;
+	                    op->pid_lock = -1 ;
+		            /* do a check on the INODE (if it is the same) */
+			    f = f || ((dt - op->ti_stat) >= LFM_TOMINSTAT) ;
+			    f = f || (op->type == LFM_TCREATE) ;
+			    if (f) {
+			        cchar	*fn = op->lfname ;
+	                        if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	                            op->ti_stat = dt ;
+	                            rs = lfm_ourdevino(op,&sb) ;
+	                        }
+	                    } /* end if (stat check) */
+	                    if (rs >= 0) {
+	                        rs = lfm_checklock(op,dt) ;
+	                    } /* end if (ok) */
+	                    if ((rs < 0) && cip) {
+	                        lfm_lockload(op,cip) ;
+	                        cip->status = rs ;
 	                    }
-	                } /* end if (stat check) */
-	                if (rs >= 0) {
-	                    rs = lfm_checklock(op,dt) ;
-	                } /* end if (ok) */
-	                if ((rs < 0) && cip) {
-	                    lfm_lockload(op,cip) ;
-	                    cip->status = rs ;
-	                }
-	            } /* end if */
-	        } /* end if (time-out enabled) */
+	                } /* end if */
+	            } /* end if (time-out enabled) */
+		} /* end if (check_init) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -370,7 +427,6 @@ int lfm_check(lfm *op,lfm_ch *cip,time_t dt) noex {
 
 int lfm_printf(lfm *op,cchar *fmt,...) noex {
 	int		rs ;
-	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = lfm_magic(op,fmt)) >= 0) {
 	    rs = SR_BUGCHECK ;
@@ -388,8 +444,9 @@ int lfm_printf(lfm *op,cchar *fmt,...) noex {
 	                    va_begin(ap,fmt) ;
 		            cint	llen = rs ;
 	                    if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) >= 0) {
-	                        if ((rs = u_write(op->lfd,buf,len)) >= 0) {
-	                            op->owrite += len ;
+	                        if ((rs = u_write(op->lfd,lbuf,rs)) >= 0) {
+				    len = rs ;
+	                            op->owrite += rs ;
 	                        }
 	                    } /* end if (fmtstr) */
 			    rs = rsfree(rs,lbuf) ;
@@ -405,7 +462,7 @@ int lfm_printf(lfm *op,cchar *fmt,...) noex {
 
 int lfm_rewind(lfm *op) noex {
     	int		rs ;
-	if ((rs = lfm_rewind(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) {
 	    rs = SR_NOANODE ;
 	    if (op->lfname) {
 		op->owrite = op->orewind ;
@@ -446,6 +503,39 @@ int lfm_getpid(lfm *op,pid_t *rp) noex {
 
 /* private subroutines */
 
+static int lfm_fnbegin(lfm *op,cchar *fname) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	cchar		*fnp{} ;
+	if (int fnl ; (fnl = sfnamecomp(fname,0,&fnp)) > 0) {
+	    cchar	*afn{} ;
+	    if (absfn af ; (rs = af.start(fnp,fnl,&afn)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(afn,rs,&cp)) >= 0) {
+		    op->lfname = cp ;
+		} /* end if (memory-allocation) */
+		rs1 = af.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (absfn) */
+	} /* end if (sfnamecomp) */
+	return rs ;
+}
+/* end subroutine (lfm_fnbegin) */
+
+static int lfm_fnend(lfm *op) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->lfname) {
+	        if ((op->type >= LFM_TCREATE) && (op->lfname[0] != '\0')) {
+	            u_unlink(op->lfname) ;
+	        }
+	        rs1 = uc_free(op->lfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->lfname = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (lfm_fnend) */
+
 static int lfm_startcheck(lfm *op,time_t dt) noex {
 	cint		type = op->type ;
 	int		rs ;
@@ -472,7 +562,7 @@ static int lfm_startcheck(lfm *op,time_t dt) noex {
 }
 /* end subroutine (lfm_startcheck) */
 
-static int lfm_startopen(lfm *op,lfm_in *lip) noex {
+static int lfm_startopen(lfm *op,lfm_lin *lip) noex {
 	cint		type = op->type ;
 	int		rs ;
 	int		of = (O_RDWR | O_CREAT) ;
@@ -508,22 +598,19 @@ static int lfm_startopen(lfm *op,lfm_in *lip) noex {
 /* end subroutie (lfm_startopen) */
 
 static int lfm_lockload(lfm *op,lfm_ch *lcp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-	if (lcp != nullptr) {
-	    if (cchar *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if ((rs = check_init(lcp)) > 0) {
+	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 	        cint	llen = rs ;
 	        cint	of = O_RDONLY ;
-	        cmode	omode = 0666 ;
-	        check_init(lcp) ;
-	        if ((rs = u_open(op->lfname,of,omode)) >= 0) {
+	        cmode	om = 0666 ;
+	        if ((rs = u_open(op->lfname,of,om)) >= 0) {
 	            cint	lfd = rs ;
-	            if (filer b ; (rs = b.start(lfd,0z,512,0)) >= 0) {
+		    cint	bsz = 512 ;
+	            if (filer b ; (rs = b.start(lfd,0z,bsz,0)) >= 0) {
 	                if ((rs = b.readln(lbuf,llen,0)) > 0) {
-	                    int		len = rs ;
-	                    if ((len > 0) && (lbuf[len - 1] == '\n')) {
-	                        len -= 1 ;
-			    }
+	                    cint	len = rmeol(lbuf,rs) ;
 	                    if (int v{} ; (rs = cfdeci(lbuf,len,&v)) >= 0) {
 	                        op->pid_lock = pid_t(v) ;
 			    } else if (isNotValid(rs)) {
@@ -544,7 +631,7 @@ static int lfm_lockload(lfm *op,lfm_ch *lcp) noex {
 	        } /* end if (opened file) */
 		rs = rsfree(rs,lbuf) ;
 	    } /* end if (m-a-f) */
-	} /* end if (non-null) */
+	} /* end if (check_init) */
 	return rs ;
 }
 /* end subroutine (lfm_lockload) */
@@ -555,48 +642,54 @@ namespace {
     linebuffer	*lbp ;
     storeitem	*sip ;
     struct parser {
-	parser(lfm *aop,lfm *alcp,linebuffer *albp,storeitem *asip) noex {
+	parser(lfm *aop,lfm_ch *alcp,linebuffer *albp,storeitem *asip) noex {
 	    op = aop ;
 	    lcp = alcp ;
 	    lbp = albp ;
 	    sip = asip ;
-	} ;
+	} ; /* end ctor */
 	int pnodeuser(int) noex ;
-	int ptimebuffer(int) noex ;
+	int ptimebanner(int) noex ;
     } ; /* end struct (parser) */
 }
 
 int parser::pnodeuser(int len) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		sl = len ;
+	int		cl ;
 	cchar		*sp = lbp->lbuf ;
+	cchar		*cp ;
 	if (cc *tp{} ; (tp = strnchr(sp,sl,'!')) != np) {
 	    sl = (tp - lbp->lbuf) ;
 	    if ((cl = sfshrink(sp,sl,&cp)) > 0) {
-		if (cc *ip{} ; (rs = cb.strw(cp,cl,&ip)) >= 0) {
+		if (cc *ip{} ; (rs = sip->strw(cp,cl,&ip)) >= 0) {
 		    lcp->nodename = ip ;
 		}
 		sl = len - ((tp + 1) - sp) ;
 		sp = (tp + 1) ;
 	    } /* end if (sfshrink) */
 	} /* end if */
-	cl = sfshrink(sp,sl,&cp) ;
 	if (rs >= 0) {
-	    if (cc *ip{} ; (rs = cb.strw(cp,cl,&ip)) >= 0) {
-	        lcp->username = ip ;
+	    if ((cl = sfshrink(sp,sl,&cp)) >= 0) { /* zero-len allowed? */
+	        if (cc *ip{} ; (rs = sip->strw(cp,cl,&ip)) >= 0) {
+	            lcp->username = ip ;
+	        }
 	    }
 	} /* end if */
 	return rs ;
 }
-/* end subroutine (lfm_parsenodeuser) */
+/* end subroutine (parser::pnodeuser) */
 
 int parser::ptimebanner(int len) noex {
+    	cnullptr	np{} ;
     	int		rs = SR_OK ;
 	if (cc *tp{} ; (tp = strnpbrk(lbp->lbuf,len," \t")) != np) {
 	    cchar	*sp = (tp + 1) ;
 	    cint	sl = len - ((tp + 1) - lbp->lbuf) ;
-	    if ((cl = sfshrink(sp,sl,&cp)) >= 0) {
-		if (cc *ip{} ; (rs = cb.strw(cp,cl,&ip)) >= 0) {
+	    cchar	*cp ;
+	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) >= 0) {
+		if (cc *ip{} ; (rs = sip->strw(cp,cl,&ip)) >= 0) {
 		    lcp->banner = ip ;
 		}
 	    }
@@ -607,21 +700,19 @@ int parser::ptimebanner(int len) noex {
 
 /* read the lock information on a failure */
 static int lfm_locklost(lfm *op,lfm_ch *lcp,filer *fp) noex {
-    	cnullptr	np{} ;
 	cint		buflen = LFM_CHBUFLEN ;
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	if (lcp && fp) {
 	    lcp->pid = op->pid_lock ;
 	    if (linebuffer lb ; (rs = lb.start) >= 0) {
-		cint	llen = rs ;
 	        if (storeitem cb ; (rs = cb.start(lcp->buf,buflen)) >= 0) {
-		    parser	po(op,lcp,&lb,&sb) ;
+		    parser	po(op,lcp,&lb,&cb) ;
 	            if ((rs = fp->readln(lb.lbuf,lb.llen,0)) > 0) {
-	                int	len = rmeol(lb,lbuf,rs) ;
+	                int	len = rmeol(lb.lbuf,rs) ;
 			if ((rs = po.pnodeuser(len)) >= 0) {
 	                    if ((rs = fp->readln(lb.lbuf,lb.llen,0)) > 0) {
-	                        len = rmeol(lbuf,rs) ;
+	                        len = rmeol(lb.lbuf,rs) ;
 				rs = po.ptimebanner(len) ;
 			    }
 	                } /* end if (reading time-banner) */
@@ -631,13 +722,13 @@ static int lfm_locklost(lfm *op,lfm_ch *lcp,filer *fp) noex {
 	        } /* end if (storeitem) */
 		rs = lb.finish ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	    } /* end if (linebuffer) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (lfm_locklost) */
 
-static int lfm_lockwrite(lfm *op,lfm_in *lip,int lfd) noex {
+static int lfm_lockwrite(lfm *op,lfm_lin *lip,int lfd) noex {
 	int		rs ;
 	if ((rs = lfm_lockwriter(op,lip,lfd)) >= 0) {
 	    coff	woff = rs ;
@@ -651,7 +742,7 @@ static int lfm_lockwrite(lfm *op,lfm_in *lip,int lfd) noex {
 }
 /* end subroutine (lfm_lockwrite) */
 
-static int lfm_lockwriter(lfm *op,lfm_in *lip,int lfd) noex {
+static int lfm_lockwriter(lfm *op,lfm_lin *lip,int lfd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		woff = 0 ;
@@ -683,7 +774,6 @@ static int lfm_lockreadpid(lfm *op) noex {
     	cnullptr	np{} ;
 	cint		lfd = op->lfd ;
 	int		rs ;
-	int		rs1 ;
 	int		v = 0 ;
 	if ((rs = u_rewind(lfd)) >= 0) {
 	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
@@ -779,9 +869,10 @@ static int lfm_ourdevino(lfm *op,USTAT *sbp) noex {
 /* end subroutine (lfm_ourdevino) */
 
 static int check_init(lfm_ch *lcp) noex {
-    	int		rs = SR_FAULT ;
-	if (lcp && lcp) {
-	    rs = memclear(lcp) ;
+    	int		rs = SR_OK ;
+	if (lcp) {
+	    rs = 1 ;
+	    memclear(lcp) ;
 	    lcp->nodename = nullptr ;
 	    lcp->username = nullptr ;
 	    lcp->banner = nullptr ;
