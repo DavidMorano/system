@@ -1,4 +1,5 @@
 /* acltypes SUPPORT */
+/* encoding=ISO8859-1 */
 /* version %I% last-modified %G% */
 
 /* ACL types (types of ACLs) */
@@ -10,7 +11,7 @@
 	= 2005-02-24, David A­D­ Morano
 	This code was adopted from the SHCAT program, which in turn
 	had been adopted from programs with a lineage dating back
-	(from the previous notes in this space) from 1989! I deleted
+	(from the previous notes in this space) from 1989!  I deleted
 	the long list of notes here to clean this up.
 
 */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	acltypes
+
+	Description:
 	This subroutine performs ACL handling.
 
 *******************************************************************************/
@@ -27,6 +32,7 @@
 #include	<sys/param.h>		/* |MAX_ACL_ENTRIES| */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<matxstr.h>
 #include	<localmisc.h>

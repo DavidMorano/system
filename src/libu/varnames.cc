@@ -102,5 +102,7 @@ const char varnames::random[] =		"RANDOM" ;
 const char varnames::hz[] =		"HZ" ;
 const char varnames::ncpu[] =		"NCPU" ;
 const char varnames::nisdomain[] =	"NISDOMAIN" ;
+const char varnames::systat[] =		"SYSTAT" ;
+const char varnames::netload[] =	"NETLOCAL" ;
 
 

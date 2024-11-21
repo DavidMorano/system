@@ -1,5 +1,6 @@
 /* usysutility HEADER */
-/* lang=C20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* utility subroutines */
 /* version %I% last-modified %G% */
@@ -24,6 +25,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

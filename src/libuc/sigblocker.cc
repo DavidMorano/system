@@ -1,4 +1,5 @@
 /* sigblocker SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* block process signals */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	sigblocker
+
+	Description:
 	This small object provides a way to block (and unblock)
 	process signals.
 
@@ -23,6 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -38,7 +45,7 @@
 /* exported variables */
 
 
-/* local subroutines */
+/* local structures */
 
 
 /* forward references */
@@ -87,7 +94,7 @@ int sigblocker_finish(sigblocker *op) noex {
 /* local subroutines */
 
 int sigblocker_co::operator () (cint *sigs) noex {
-	int	rs = SR_BUGCHECK ;
+	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    rs = sigblocker_start(op,sigs) ;
 	}
@@ -96,15 +103,17 @@ int sigblocker_co::operator () (cint *sigs) noex {
 /* end method (sigblocker::operator) */
 
 sigblocker_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case sigblockermem_start:
-	    rs = sigblocker_start(op,nullptr) ;
-	    break ;
-	case sigblockermem_finish:
-	    rs = sigblocker_finish(op) ;
-	    break ;
-	} /* end switch */
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case sigblockermem_start:
+	        rs = sigblocker_start(op,nullptr) ;
+	        break ;
+	    case sigblockermem_finish:
+	        rs = sigblocker_finish(op) ;
+	        break ;
+	    } /* end switch */
+	}
 	return rs ;
 }
 /* end method (sigblocker::operator) */

@@ -44,13 +44,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| + |PID_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<strwcpy.h>
@@ -64,6 +62,17 @@
 /* local defines */
 
 #define	MAXNC		10		/* total maximum characters */
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -96,7 +105,7 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-		static cint	rsm = ndigit(PID_MAX,10) ;
+		static constexpr int	rsm = ndigit(PID_MAX,10) ;
 		if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rs ;
 		    int		modval ;

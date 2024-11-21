@@ -457,8 +457,8 @@ fmtstr.o:		fmtstr.cc fmtstr.h
 strshrink.o:		strshrink.c
  
 # digit-character management
-ndigits.o:		ndigits.c
-checkbase.o:		checkbase.cc
+ndigit.o:		ndigit.cc ndigit.h
+checkbase.o:		checkbase.cc checkbase.h
 
 # malloc
 mallocxx.o:		mallocxx.cc mallocxx.h

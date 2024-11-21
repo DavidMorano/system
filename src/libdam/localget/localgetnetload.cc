@@ -50,7 +50,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<ucprogdata.h>
@@ -66,11 +66,6 @@
 
 /* local defines */
 
-#ifndef	VARNETLOAD
-#define	VARNETLOAD	"NETLOAD"
-#endif
-
-#define	VARDNAME	"var"
 #define	NETLOADFNAME	"netload"
 #define	TO_TTL		(5*60)
 
@@ -87,15 +82,68 @@
 
 /* local structures */
 
+enum netloadcos {
+	netloaderco_start,
+	netloaderco_finish,
+	netloaderco_overlast
+} ;
+
+namespace {
+    struct netloader ;
+    struct netloader_co {
+	netloader	*op{} ;
+	int		w = -1 ;
+	void operator () (netloader *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+        operator int () noex ;
+    } ; /* end struct (netloader_co) */
+    struct netloader {
+	cchar		*pr ;
+	char		*rbuf ;
+	int		rlen ;
+	netloader_co	start ;
+	netloader_co	finish ;
+	netloader(cc *p,char *rb,int rl) noex : pr(p), rbuf(rb), rlen(rl) {
+	    start(this,netloaderco_start) ;
+	    finish(this,netloaderco_finish) ;
+	} ;
+	operator int () noex ;
+	int env() noex ;
+	int cache() noex ;
+	int localconf() noex ;
+	int istart() noex ;
+	int ifinish() noex ;
+	~netloader() {
+	    (void) ifinish() ;
+	} ;
+    } ; /* end struct (netloader) */
+}
+
+typedef int (netloader::*netloader_m)() noex ;
+
 
 /* forward references */
 
 
 /* local variables */
 
+constexpr int		di = UCPROGDATA_DNETLOAD ;
+constexpr int		ttl = TO_TTL ;
+
 constexpr bool		f_ucprogdata = CF_UCPROGDATA ;
 
 constexpr char		nlname[] = NETLOADFNAME ;
+
+constexpr cchar		*vardname = sysword.w_vardir ;
+
+constexpr netloader_m	mems[] = {
+	&netloader::env,
+	&netloader::cache,
+	&netloader::localconf,
+	nullptr
+} ;
 
 
 /* exported variables */
@@ -111,47 +159,100 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (pr[0]) {
-	        cint	di = UCPROGDATA_DNETLOAD ;
-	        cint	ttl = TO_TTL ;
-		rs = SR_OK ;
-/* user environment */
-	        if ((rs >= 0) && (len == 0)) {
-	            static cchar	*netload = getenv(VARNETLOAD) ;
-	            if (netload && (netload[0] != '\0')) {
-	                rs = sncpy1(rbuf,rlen,netload) ;
-	                len = rs ;
-	            }
-	        } /* end if (needed) */
-/* program cache */
-		if_constexpr (f_ucprogdata) {
-	            if ((rs >= 0) && (len == 0)) {
-	                if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
-	                    len = rs ;
-	                }
-	            }
-		} /* end if_constexpr (f_ucprogdata) */
-/* software facility (LOCAL) configuration */
-	        if ((rs >= 0) && (len == 0)) {
-	            cchar	*vardname = VARDNAME ;
-	            if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	                if ((rs = mkpath3(tbuf,pr,vardname,nlname)) >= 0) {
-	                    if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
-	                        len = rs ;
-			        if_constexpr (f_ucprogdata) {
-		                    rs = ucprogdata_set(di,rbuf,len,ttl) ;
-			        }
-		            } else if (isNotPresent(rs)) {
-		                rs = SR_OK ;
-		            }
-	                } /* end if (mkpath) */
-			rs1 = uc_free(tbuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-	        } /* end if (needed) */
+		if (netloader no(pr,rbuf,rlen) ; (rs = no.start) >= 0) {
+		    {
+			rs = no ;
+			len = rs ;
+		    }
+		    rs1 = no.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (netloader) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetnetload) */
+
+/* user environment */
+int netloader::env() noex {
+    	int		rs = SR_OK ;
+	int		len = 0 ;
+	static cchar	*netload = getenv(varname.netload) ;
+	if (netload && (netload[0] != '\0')) {
+	    rs = sncpy1(rbuf,rlen,netload) ;
+	    len = rs ;
+	}
+	return (rs >= 0) ? len : rs ;
+} 
+/* end method (netloader::env) */
+
+/* program cache */
+int netloader::cache() noex {
+    	int		rs = SR_OK ;
+	int		len = 0 ;
+	if_constexpr (f_ucprogdata) {
+	    if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
+		len = rs ;
+	    }
+	} /* end if_constexpr (f_ucprogdata) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (netloader::cache) */
+
+/* software facility (LOCAL) configuration */
+int netloader::localconf() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	int		len = 0 ;
+        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+            if ((rs = mkpath(tbuf,pr,vardname,nlname)) >= 0) {
+                if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
+                    len = rs ;
+                    if_constexpr (f_ucprogdata) {
+                        rs = ucprogdata_set(di,rbuf,len,ttl) ;
+                    }
+                } else if (isNotPresent(rs)) {
+                    rs = SR_OK ;
+                }
+            } /* end if (mkpath) */
+            rs1 = uc_free(tbuf) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+} 
+/* end method (netloader::localconf) */
+
+int netloader::istart() noex {
+	return SR_OK ;
+}
+
+int netloader::ifinish() noex {
+	return SR_OK ;
+}
+
+netloader::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
+	    netloader_m		m = mems[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+
+netloader_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case netloaderco_start:
+		rs = op->istart() ;
+		break ;
+	    case netloaderco_finish:
+		rs = op->ifinish() ;
+		break ;
+	    } /* end switch */
+	}
+	return rs ;
+}
+/* end method (netloader_co::operator) */
 
 

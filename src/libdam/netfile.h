@@ -37,7 +37,7 @@ typedef	NETFILE_ENT	netfile_ent ;
 EXTERNC_begin
 
 extern int netfile_open(netfile *,cchar *) noex ;
-extern int netfile_get(netfile *,int,NETFILE_ENT **) noex ;
+extern int netfile_get(netfile *,int,netfile_ent **) noex ;
 extern int netfile_close(netfile *) noex ;
 
 EXTERNC_end

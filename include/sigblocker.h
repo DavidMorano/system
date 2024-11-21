@@ -1,4 +1,5 @@
 /* sigblocker HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* little object to block signals */

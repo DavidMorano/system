@@ -41,8 +41,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| + |PID_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -62,8 +61,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -119,9 +120,9 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-	        static cint	rsm = ndigit(PID_MAX,10) ;
+	        static constexpr int	rsm = ndigit(PID_MAX,10) ;
 	        if ((rs = rsm) >= 0) {
-	            cint	maxdigs = rsm ;
+	            cint	maxdigs = rs ;
 		    if ((rs = mkmaxstrlen(maxdigs,rlen)) >= 0) {
 			loghelp		lo(rbuf,rlen,sp,sl,v) ;
 		        cint		maxstrlen = rs ;
@@ -163,10 +164,9 @@ int loghelp::valcvt(int maxdigs,int maxstrlen) noex {
 /* end method (loghelp::valcvt) */
 
 int loghelp::layout(cchar *dp,int dl,int maxstrlen,int ml) noex {
-	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
-        if ((rs = b.start(rbuf,rlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
             if (ml == 0) {
                 b.strw(sp,sl) ;
                 b.strw(dp,dl) ;

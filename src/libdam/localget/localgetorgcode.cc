@@ -292,5 +292,6 @@ orgcoder_co::operator int () noex {
 	}
 	return rs ;
 }
+/* end method (orgcoder_co::operator) */
 
 

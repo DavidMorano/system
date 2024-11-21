@@ -1,4 +1,5 @@
 /* sigdefaults SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* set a given set of signals to their default disposition */
@@ -27,8 +28,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+
+
+/* local defines */
 
 
 /* external subroutines */

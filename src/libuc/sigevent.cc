@@ -1,4 +1,5 @@
 /* sigevent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® signal-event initialization */
@@ -39,9 +40,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<csignal>
-#include	<cstring>		/* <- for |memset(3c)| */
-#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"sigevent.h"
 

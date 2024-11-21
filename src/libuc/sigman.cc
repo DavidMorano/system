@@ -1,4 +1,5 @@
 /* sigman SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage process signals */
@@ -26,11 +27,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<sys/types.h>		/* system types */
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -64,7 +64,7 @@ template<typename ... Args>
 static int sigman_ctor(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    sigman_head		*hp = static_cast<sigman_head *>(op) ;
+	    sigman_head		*hp = cast_static<sigman_head *>(op) ;
 	    rs = memclear(hp) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -109,7 +109,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	    int		sz ;
 	    void	*p ;
 	    if (handle == nullptr) {
-	        handle = reinterpret_cast<sigmanhand_f>(SIG_IGN) ;
+	        handle = cast_reinterpret<sigmanhand_f>(SIG_IGN) ;
 	    }
 	    if ((rs >= 0) && blks) {
 	        uc_sigsetempty(&nsm) ;
@@ -130,13 +130,13 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	            nhs += 1 ;
 	        }
 	    }
-	    sz = (nhs * sizeof(sigman_ha)) ;
+	    sz = (nhs * szof(sigman_ha)) ;
 	    if ((rs >= 0) && (nhs > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
-	        sigman_ha		*hp = handp(p) ;
-	        SIGACTION		san{} ;
-	        SIGACTION		*sap ;
-	        int			hsig ;
-	        int			j = 0 ;
+	        sigman_ha	*hp = handp(p) ;
+	        SIGACTION	san{} ;
+	        SIGACTION	*sap ;
+	        int		hsig ;
+	        int		j = 0 ;
 	        op->handles = handp(p) ;
 	        op->nhs = nhs ;
 	        /* ignore these signals */
@@ -207,7 +207,8 @@ int sigman_finish(sigman *op) noex {
 	        op->handles = nullptr ;
 	    } /* end if */
 	    if (op->nblks > 0) {
-	        pthread_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
+	        rs1 = pthread_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
 		rs1 = sigman_dtor(op) ;

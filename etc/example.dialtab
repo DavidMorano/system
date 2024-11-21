@@ -1,0 +1,17 @@
+# DIALTAB (example)
+#
+#
+
+<name>:
+	<inet>	<value>
+	<uucp>	<value>
+	<username>	<value>
+	<password>	<value>
+
+mtgza:
+	inet		mtgza.mt.com
+	uucp		mtgza
+	username	dam
+	password	Hello123
+
+

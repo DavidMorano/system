@@ -61,6 +61,10 @@ extern int snrealname(char *,int,cchar **,int) noex ;
 extern int snloadavg(char *,int,uint,int,int,int) noex ;
 extern int snkeyval(char *,int,cchar *,int,cchar *,int) noex ;
 
+static inline int snkeval(char *dp,int dl,cchar *k,cchar *vp,int vl) noex {
+    	return snkeyval(dp,dl,k,-1,vp,vl) ;
+}
+
 EXTERNC_end
 
 

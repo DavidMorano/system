@@ -69,8 +69,6 @@
 
 #define	KEYBUFLEN	10
 
-#define	NETSTATE	struct netstate
-
 
 /* imported namespaces */
 
@@ -176,11 +174,12 @@ int netfile_open(netfile *vep,cchar *netfname) noex {
 	if (vep && netfname) {
 	    rs = SR_INVALID ;
 	    if (netfname[0]) {
-	        if ((rs = vecitem_start(vep,10,0)) >= 0) {
+		cint	vn = 10 ;
+		cint	vo = 0 ;
+	        if ((rs = vecitem_start(vep,vn,vo)) >= 0) {
 	            if (USTAT sb ; (rs = u_stat(netfname,&sb)) >= 0) {
 	                if (! S_ISDIR(sb.st_mode)) {
-	                    NETSTATE	ns ;
-	                    if ((rs = netstate_start(&ns)) >= 0) {
+	                    if (netstate ns ; (rs = netstate_start(&ns)) >= 0) {
 				{
 	                            rs = netfile_parse(vep,&ns,netfname) ;
 	                            c = rs ;
@@ -206,7 +205,7 @@ int netfile_close(netfile *vep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (vep) {
-	    netfile_ent	*ep ;
+	    netfile_ent	*ep{} ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; vecitem_get(vep,i,&ep) >= 0 ; i += 1) {
 	        if (ep) {

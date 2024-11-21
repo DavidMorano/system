@@ -36,7 +36,6 @@ extern int snsdd(char *,int,cchar *,uint) noex ;
 extern int snddd(char *,int,uint,uint) noex ;
 extern int snsd(char *,int,cchar *,uint) noex ;
 extern int snchrs(char *,int,int,int) noex ;
-extern int snkeval(char *,int,cchar *,cchar *,int) noex ;
 
 static inline int snchr(char *dp,int dl,int ch) noex {
     return snchrs(dp,dl,ch,1) ;

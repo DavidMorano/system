@@ -40,7 +40,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecobj.h>
@@ -61,18 +61,14 @@
 #define	SK		searchkeys
 #define	SK_CUR		searchkeys_cur
 #define	SK_POP		searchkeys_pop
+#define	SK_PH		searchkeys_ph
+#define	SK_KW		searchkeys_kw
 
 #undef	BUILD
 #define	BUILD		struct build
 
-#undef	BUILDPHRASE
-#define	BUILDPHRASE	struct build_phrase
-
-#undef	SKPHRASE
-#define	SKPHRASE	struct searchkeys_kphrase
-
-#undef	SKWORD
-#define	SKWORD		struct searchkeys_kword
+#undef	BUILD_PH
+#define	BUILD_PH	struct build_phrase
 
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	NATURALWORDLEN
@@ -118,7 +114,7 @@ struct build_phrase {
 /* forward references */
 
 template<typename ... Args>
-static int searchkeys_ctor(searchkeys *op,Args ... args) noex {
+static int searchkeys_ctor(SK *op,Args ... args) noex {
     	SEARCHKEYS	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -133,7 +129,7 @@ static int searchkeys_ctor(searchkeys *op,Args ... args) noex {
 }
 /* end subroutine (searchkeys_ctor) */
 
-static int searchkeys_dtor(searchkeys *op) noex {
+static int searchkeys_dtor(SK *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -147,7 +143,7 @@ static int searchkeys_dtor(searchkeys *op) noex {
 /* end subroutine (searchkeys_dtor) */
 
 template<typename ... Args>
-static inline int searchkeys_magic(searchkeys *op,Args ... args) noex {
+static inline int searchkeys_magic(SK *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == SEARCHKEYS_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -158,26 +154,26 @@ static inline int searchkeys_magic(searchkeys *op,Args ... args) noex {
 
 static int searchkeys_build(SK *,cchar **) noex ;
 static int searchkeys_buildadd(SK *,BUILD *,cchar *) noex ;
-static int searchkeys_buildaddword(SK *,BUILDPHRASE *,cchar *,int) noex ;
-static int searchkeys_buildphrasemat(SK *,BUILD *,BUILDPHRASE *) noex ;
-static int searchkeys_buildmatone(SK *,BUILD *,int,BUILDPHRASE *) noex ;
+static int searchkeys_buildaddword(SK *,BUILD_PH *,cchar *,int) noex ;
+static int searchkeys_buildphrasemat(SK *,BUILD *,BUILD_PH *) noex ;
+static int searchkeys_buildmatone(SK *,BUILD *,int,BUILD_PH *) noex ;
 static int searchkeys_buildreduce(SK *,BUILD *) noex ;
 static int searchkeys_buildload(SK *,BUILD *) noex ;
 static int searchkeys_buildfins(SK *,BUILD *) noex ;
 static int searchkeys_curinc(SK *,SK_CUR *,int *,int *) noex ;
 
-static int buildphrase_start(BUILDPHRASE *) noex ;
-static int buildphrase_add(BUILDPHRASE *,cchar *,int) noex ;
-static int buildphrase_count(BUILDPHRASE *) noex ;
-static int buildphrase_getkey(BUILDPHRASE *,int,cchar **) noex ;
-static int buildphrase_havekey(BUILDPHRASE *,cchar *,int) noex ;
-static int buildphrase_finish(BUILDPHRASE *) noex ;
+static int buildphrase_start(BUILD_PH *) noex ;
+static int buildphrase_add(BUILD_PH *,cchar *,int) noex ;
+static int buildphrase_count(BUILD_PH *) noex ;
+static int buildphrase_getkey(BUILD_PH *,int,cchar **) noex ;
+static int buildphrase_havekey(BUILD_PH *,cchar *,int) noex ;
+static int buildphrase_finish(BUILD_PH *) noex ;
 
 #if	CF_REGPROC
-static int kphrase_proc(SKPHRASE *,int,int,cchar *,int) noex ;
+static int kphrase_proc(SK_PH *,int,int,cchar *,int) noex ;
 #endif
 
-static int kphrase_procxw(SKPHRASE *,int,int,xwords *) noex ;
+static int kphrase_procxw(SK_PH *,int,int,xwords *) noex ;
 
 
 /* local variables */
@@ -305,7 +301,7 @@ int searchkeys_process(SK *op,SK_POP *pop,cchar *sp,int sl) noex {
 	            if (pop->cphrases > 0) {
 	                bool	fpr = pop->f_prefix ;
 	                for (int i = 0 ; i < op->nphrases ; i += 1) {
-	                    SKPHRASE	*pep = (op->kphrases + i) ;
+	                    SK_PH	*pep = (op->kphrases + i) ;
 	                    cint	ki = pop->nmatch[i] ;
 	                    if (ki < pep->nwords) {
 	                        if ((rs = kphrase_proc(pep,fpr,ki,sp,sl)) > 0) {
@@ -331,7 +327,7 @@ int searchkeys_process(SK *op,SK_POP *pop,cchar *sp,int sl) noex {
 #endif /* CF_REGPROC */
 
 int searchkeys_processxw(SK *op,SK_POP *pop,xwords *xwp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f_match = false ;
 	if ((rs = searchkeys_magic(op,pop,xwp)) >= 0) {
 	    rs = SR_BUGCHECK ;
@@ -339,7 +335,7 @@ int searchkeys_processxw(SK *op,SK_POP *pop,xwords *xwp) noex {
 	        if (pop->cphrases > 0) {
 	            bool	fpr = pop->f_prefix ;
 	            for (int i = 0 ; (rs >= 0) && (i < op->nphrases) ; i += 1) {
-	                SKPHRASE	*pep = (op->kphrases + i) ;
+	                SK_PH	*pep = (op->kphrases + i) ;
 	                cint		ki = pop->nmatch[i] ;
 	                if (ki < pep->nwords) {
 	                    if ((rs = kphrase_procxw(pep,fpr,ki,xwp)) > 0) {
@@ -392,7 +388,7 @@ int searchkeys_curenum(SK *op,SK_CUR *curp,cchar **rpp) noex {
 	    int		j{} ;
 	    if ((rs = searchkeys_curinc(op,curp,&i,&j)) >= 0) {
 	        if (i < op->nphrases) {
-	            SKWORD	*wep = op->kphrases[i].kwords ;
+	            SK_KW	*wep = op->kphrases[i].kwords ;
 	            cint	wel = op->kphrases[i].nwords ;
 	            if (j < wel) {
 	                kl = wep[j].kl ;
@@ -421,7 +417,7 @@ static int searchkeys_build(SK *op,cchar **qsp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	cint		vsz = szof(BUILDPHRASE) ;
+	cint		vsz = szof(BUILD_PH) ;
 	cint		vn = 4 ;
 	cint		vo = VECOBJ_OSWAP ;
 	if ((rs = vecobj_start(&bip->phrases,vsz,vn,vo)) >= 0) {
@@ -454,7 +450,7 @@ static int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wc = 0 ;
-	if (BUILDPHRASE bpe{} ; (rs = buildphrase_start(&bpe)) >= 0) {
+	if (BUILD_PH bpe{} ; (rs = buildphrase_start(&bpe)) >= 0) {
 	    bool	f_match = false ;
 	    bool	f_buildphrase = true ;
 	    cchar	*tp ;
@@ -502,13 +498,12 @@ static int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 }
 /* end subroutine (searchkeys_buildadd) */
 
-static int searchkeys_buildaddword(SK *op,BUILDPHRASE *bpp,cc *wp,int wl) noex {
+static int searchkeys_buildaddword(SK *op,BUILD_PH *bpp,cc *wp,int wl) noex {
 	int		rs = SR_OK ;
 	int		kl ;
-	cchar		*kp ;
+	cchar		*kp = wp ;
 	char		keybuf[KEYBUFLEN + 1] ;
 	if (wl < 0) wl = strlen(wp) ;
-	kp = wp ;
 	kl = wl ;
 	if (kl > KEYBUFLEN) kl = KEYBUFLEN ;
 	if (hasuc(kp,kl)) {
@@ -522,7 +517,7 @@ static int searchkeys_buildaddword(SK *op,BUILDPHRASE *bpp,cc *wp,int wl) noex {
 }
 /* end subroutine (searchkeys_buildaddword) */
 
-static int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILDPHRASE *bpp) noex {
+static int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILD_PH *bpp) noex {
 	int		rs  = SR_FAULT ;
 	int		rs1 ;
 	int		f_match = false ;
@@ -532,7 +527,7 @@ static int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILDPHRASE *bpp) noex {
 	        int	kl = rs ;
 	        void	*vp{} ;
 	        for (int i = 0 ; plp->get(i,&vp) >= 0 ; i += 1) {
-	            BUILDPHRASE	*ptp = (BUILDPHRASE *) vp ;
+	            BUILD_PH	*ptp = (BUILD_PH *) vp ;
 	            if (vp) {
 	                if ((rs1 = buildphrase_havekey(ptp,kp,kl)) > 0) {
 	                    f_match = true ;
@@ -551,7 +546,7 @@ static int searchkeys_buildreduce(SK *op,BUILD *bip) noex {
 	int		c = 0 ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(&bip->phrases,i,&vp) >= 0 ; i += 1) {
-	    BUILDPHRASE	*bpp = (BUILDPHRASE *) vp ;
+	    BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	    if (vp) {
 	        if ((rs = buildphrase_count(bpp)) >= 0) {
 	            cint	wc = rs ;
@@ -578,7 +573,7 @@ static int searchkeys_buildfins(SK *op,BUILD *bip) noex {
 	if (op) {
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(&bip->phrases,i,&vp) >= 0 ; i += 1) {
-	        BUILDPHRASE	*bpp = (BUILDPHRASE *) vp ;
+	        BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	        if (vp) {
 		    {
 	                rs1 = buildphrase_finish(bpp) ;
@@ -596,7 +591,7 @@ static int searchkeys_buildfins(SK *op,BUILD *bip) noex {
 /* end subroutine (searchkeys_buildfins) */
 
 static int searchkeys_buildmatone(SK *op,BUILD *bip,int si,
-		BUILDPHRASE *bpp) noex {
+		BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f_match = false ;
@@ -608,7 +603,7 @@ static int searchkeys_buildmatone(SK *op,BUILD *bip,int si,
 	            int		kl = rs ;
 	            void	*vp{} ;
 	            for (int i = si ; plp->get(i,&vp) >= 0 ; i += 1) {
-	                BUILDPHRASE	*ptp = (BUILDPHRASE *) vp ;
+	                BUILD_PH	*ptp = (BUILD_PH *) vp ;
 	                if (vp) {
 	                    if ((rs1 = buildphrase_havekey(ptp,kp,kl)) > 0) {
 	                        f_match = (rs1 > 0) ;
@@ -629,7 +624,7 @@ static int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	int		rs1 ;
 	int		nphrases = 0 ;
 	if ((rs = vecobj_count(plp)) >= 0) {
-	    int		sz = (rs + 1) * szof(SKPHRASE) ;
+	    int		sz = (rs + 1) * szof(SK_PH) ;
 	    nphrases = rs ;
 	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	        int	nwords ;
@@ -637,20 +632,20 @@ static int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	        int	wi, wj ;
 	        int	kl ;
 	        memset(vp,0,sz) ;
-	        op->kphrases = (SKPHRASE *) vp ;
+	        op->kphrases = (SK_PH *) vp ;
 	        op->nphrases = nphrases ;
 	        pj = 0 ;
 	        for (pi = 0 ; vecobj_get(plp,pi,&vp) >= 0 ; pi += 1) {
-	    	    BUILDPHRASE	*bpp = (BUILDPHRASE *) vp ;
+	    	    BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	            if (vp) {
-	    		SKWORD	*wep{} ;
+	    		SK_KW	*wep{} ;
 			{
 	                    rs = buildphrase_count(bpp) ;
 	                    if (rs < 0) break ;
 	                    nwords = rs ;
 		    	}
 			{
-	                    sz = (nwords + 1) * szof(SKWORD) ;
+	                    sz = (nwords + 1) * szof(SK_KW) ;
 	                    rs = uc_malloc(sz,&wep) ;
 	                    if (rs < 0) break ;
 		    	}
@@ -724,10 +719,10 @@ static int searchkeys_curinc(SK *op,SK_CUR *curp,int *ip,int *jp) noex {
 }
 /* end subroutine (searchkeys_curinc) */
 
-static int buildphrase_start(BUILDPHRASE *bpp) noex {
+static int buildphrase_start(BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
 	if (bpp) {
-	    cint	sz = szof(SKWORD) ;
+	    cint	sz = szof(SK_KW) ;
 	    cint	vn = 1 ;
 	    cint	vo = (VECOBJ_OCOMPACT | VECOBJ_OSTATIONARY) ;
 	    rs = vecobj_start(&bpp->words,sz,vn,vo) ;
@@ -736,7 +731,7 @@ static int buildphrase_start(BUILDPHRASE *bpp) noex {
 }
 /* end subroutine (buildphrase_start) */
 
-static int buildphrase_finish(BUILDPHRASE *bpp) noex {
+static int buildphrase_finish(BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (bpp) {
@@ -747,10 +742,10 @@ static int buildphrase_finish(BUILDPHRASE *bpp) noex {
 }
 /* end subroutine (buildphrase_finish) */
 
-static int buildphrase_add(BUILDPHRASE *bpp,cchar *kp,int kl) noex {
+static int buildphrase_add(BUILD_PH *bpp,cchar *kp,int kl) noex {
 	int		rs = SR_FAULT ;
 	if (bpp) {
-	    SKWORD	ke ;
+	    SK_KW	ke ;
 	    if (kl < 0) kl = strlen(kp) ;
 	    ke.kp = kp ;
 	    ke.kl = kl ;
@@ -760,7 +755,7 @@ static int buildphrase_add(BUILDPHRASE *bpp,cchar *kp,int kl) noex {
 }
 /* end subroutine (buildphrase_add) */
 
-static int buildphrase_count(BUILDPHRASE *bpp) noex {
+static int buildphrase_count(BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
 	if (bpp) {
 	    rs = vecobj_count(&bpp->words) ;
@@ -769,7 +764,7 @@ static int buildphrase_count(BUILDPHRASE *bpp) noex {
 }
 /* end subroutine (buildphrase_count) */
 
-static int buildphrase_getkey(BUILDPHRASE *bpp,int i,cchar **rpp) noex {
+static int buildphrase_getkey(BUILD_PH *bpp,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
 	if (bpp) {
@@ -777,7 +772,7 @@ static int buildphrase_getkey(BUILDPHRASE *bpp,int i,cchar **rpp) noex {
 	    if (i >= 0) {
 		vecobj	*wlp = &bpp->words ;
 	        if (void *vp{} ; (rs = wlp->get(i,&vp)) >= 0) {
-	            SKWORD	*kep = (SKWORD *) vp ;
+	            SK_KW	*kep = (SK_KW *) vp ;
 	            if (vp) {
 	                kl = kep->kl ;
 	                if (rpp) {
@@ -791,14 +786,14 @@ static int buildphrase_getkey(BUILDPHRASE *bpp,int i,cchar **rpp) noex {
 }
 /* end subroutine (buildphrase_getkey) */
 
-static int buildphrase_havekey(BUILDPHRASE *bpp,cchar *kp,int kl) noex {
+static int buildphrase_havekey(BUILD_PH *bpp,cchar *kp,int kl) noex {
     	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (bpp && kp) {
 	    void	*vp{} ;
 	    if (kl < 0) kl = strlen(kp) ;
 	    for (int i = 0 ; vecobj_get(&bpp->words,i,&vp) >= 0 ; i += 1) {
-	        SKWORD	*kep = (SKWORD *) vp ;
+	        SK_KW	*kep = (SK_KW *) vp ;
 	        if (vp) {
 	            f = (kl == kep->kl) ;
 	            f = f && (kep->kp[0] == kp[0]) ;
@@ -815,11 +810,11 @@ static int buildphrase_havekey(BUILDPHRASE *bpp,cchar *kp,int kl) noex {
 static int kphrase_proc(SKPHRSE *pep,int f_prefix,int ki,cc *wp,int wl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (pep) {
+	if (pep && wp) {
 	    rs = SR_OK ;
 	    if (ki <= pep->nwords) {
 	        if (ki < pep->nwords) {
-	            SKWORD	*kep = (pep->kwords + ki) ;
+	            SK_KW	*kep = (pep->kwords + ki) ;
 	            if (kep != nullptr) {
 	                f = (kep->kp[0] == wp[0]) ;
 	                if (f) {
@@ -844,12 +839,12 @@ static int kphrase_proc(SKPHRSE *pep,int f_prefix,int ki,cc *wp,int wl) noex {
 /* end subroutine (kphrase_proc) */
 #endif /* CF_REGPROC */
 
-static int kphrase_procxw(SKPHRASE *pep,int f_prefix,int ki,xwords *xwp) noex {
+static int kphrase_procxw(SK_PH *pep,int f_prefix,int ki,xwords *xwp) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (ki <= pep->nwords) {
 	    if (ki < pep->nwords) {
-	        SKWORD	*kep = (pep->kwords + ki) ;
+	        SK_KW	*kep = (pep->kwords + ki) ;
 	        if (kep != nullptr) {
 		    int		wl ;
 		    auto	xw_get = xwords_get ;

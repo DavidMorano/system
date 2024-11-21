@@ -1,4 +1,4 @@
-/* localgetorglocer SUPPORT */
+/* localgetorgloc SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -25,7 +25,7 @@
 /*******************************************************************************
 
 	Name:
-	localgetorglocer
+	localgetorgloc
 
 	Descrption:
 	This subroutine is used to (try to) get the LOCAL software
@@ -38,7 +38,7 @@
 	regularly.
 
 	Synopsis:
-	int localgetorglocer(cchar *pr,char *rbuf,int rlen,cchar *un) noex
+	int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex
 
 	Arguments:
 	pr		program root
@@ -169,7 +169,9 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	if (pr && rbuf) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
+	    if ((un == nullptr) || (un[0] == '\0')) {
+		un = "-" ;
+	    }
 	    if (pr[0]) {
 	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 		    orglocer	oo(pr,un,rbuf,rlen) ;
@@ -274,5 +276,6 @@ orglocer_co::operator int () noex {
 	}
 	return rs ;
 }
+/* end method (orglocer_co::operator) */
 
 

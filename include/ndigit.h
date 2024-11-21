@@ -1,4 +1,5 @@
 /* ndigit HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the number of digits in a given integer given a number-base */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 
@@ -36,10 +38,6 @@ extern int ndigitui(uint,int) noex ;
 extern int ndigitul(ulong,int) noex ;
 extern int ndigitull(ulonglong,int) noex ;
 
-static inline int ndigits(int v,int b) noex {
-	return ndigiti(v,b) ;
-}
-
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -48,7 +46,7 @@ template<typename T>
 constexpr int ndigit(T v,int b) noex {
 	int		n = 0 ;
 	if (v >= 0) {
-	    uint	ub = uint(b) ;	/* faster? */
+	    const uint	ub = uint(b) ;	/* faster? */
 	    if (b >= 2) {
 	        if (v == 0) {
 	            n = 1 ;

@@ -53,7 +53,7 @@
 #include	<stdlib.h>
 #include	<stdint.h>		/* |intptr_t| + |uintptr_t| */
 
-#include	<clanguage.h>		/* relatively necessary inclusion */
+#include	<clanguage.h>		/* <- necessary inclusion */
 
 
 /* for |stat(2)| and its many friends */
@@ -471,6 +471,15 @@ typedef int			unixret_t ;
 #define	TYPEDEF_SYSRET
 typedef int			sysret_t ;
 #endif /* TYPEDEF_SYSRET */
+
+#ifndef	TYPEDEF_SIGT
+#define	TYPEDEF_SIGT
+#if	(! defined(SYSHAS_TYPESIGT)) || (SYSHAS_TYPESIGT == 0)
+EXTERNC_begin
+typedef void (*sig_t)(int) noex ;
+EXTERNC_end
+#endif /* syshas */
+#endif /* TYPEDEF_SIGT */
 
 
 #endif /* UTYPEDEFS_INCLUDE */

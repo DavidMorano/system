@@ -1,4 +1,5 @@
 /* sighand SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage process signals */
@@ -16,17 +17,22 @@
 
 /*******************************************************************************
 
+  	Object:
+	sighand
+
+	Description:
 	This small object provides a way to manage (block, ignore,
 	and catch) process signals.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -46,13 +52,13 @@
 /* exported variables */
 
 
-/* local subroutines */
+/* local structures */
 
 
 /* forward references */
 
 template<typename ... Args>
-static inline int sighand_magic(sighand *op,Args ... args) noex {
+static inline int sighand_magic(SH *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == SIGHAND_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -79,7 +85,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
             void            *p ;
             rs = memclear(iap) ; /* dangerous */
             if (hf == nullptr) {
-                hf = reinterpret_cast<SH_H>(voidp(SIG_IGN)) ;
+                hf = cast_reinterpret<SH_H>(voidp(SIG_IGN)) ;
             }
     /* blocks */
             if ((rs >= 0) && (blocks != nullptr)) {
@@ -103,13 +109,13 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
                     nhandles += 1 ;
                 }
             }
-            sz = (nhandles * sizeof(sighand_ha)) ;
+            sz = (nhandles * szof(sighand_ha)) ;
             if ((rs >= 0) && (sz > 0) && ((rs = uc_malloc(sz,&p)) >= 0)) {
                 sighand_ha      *hp = (sighand_ha *) p ;
-                SIGACTION           san{} ;
-                SIGACTION           *sap ;
-                int                 hsig ;
-                int                 j = 0 ;
+                SIGACTION	san{} ;
+                SIGACTION	*sap ;
+                int		hsig ;
+                int		j = 0 ;
                 iap->handles = (sighand_ha *) p ;
                 iap->nhandles = nhandles ;
                 uc_sigsetempty(&nsm) ;
@@ -159,7 +165,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
 }
 /* end subroutine (sighand_start) */
 
-int sighand_finish(SIGHAND *iap) noex {
+int sighand_finish(SH *iap) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = sighand_magic(iap)) >= 0) {

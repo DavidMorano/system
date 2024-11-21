@@ -1,4 +1,5 @@
 /* utimeout SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 (MUST be C-lang) */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Data:
+	utimeout
+
+	Description:
 	This module (in part) manages UNIX® system kernel-call timeouts.
 
 	Note:
@@ -50,6 +55,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<localmisc.h>
 

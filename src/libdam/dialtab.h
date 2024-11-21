@@ -9,7 +9,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIALTAB_INCLUDE
-#define	DIALTAB_INCLUDE	1
+#define	DIALTAB_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */

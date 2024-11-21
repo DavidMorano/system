@@ -1,4 +1,5 @@
 /* checkbase SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* test whether a string is composed of all characters of a given base */
@@ -35,7 +36,7 @@
 
 	Returns:
 	>=0		OK
-	<0		bad (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -59,6 +60,9 @@
 
 
 /* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

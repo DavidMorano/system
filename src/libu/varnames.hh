@@ -106,6 +106,8 @@ struct varnames {
 	static const char hz[] ;
 	static const char ncpu[] ;
 	static const char nisdomain[] ;
+	static const char systat[] ;
+	static const char netload[] ;
 } ; /* end struct (varnames) */
 
 

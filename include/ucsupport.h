@@ -1,42 +1,35 @@
-/* optval HEADER */
+/* ucsupport HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* divine a value (boolean or otherwise) out of a c-sring */
+/* support utilities for the LIBUC library */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	OPTVAL_INCLUDE
-#define	OPTVAL_INCLUDE
+#ifndef	UCSUPPORT_INCLUDE
+#define	UCSUPPORT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
 #include	<usysrets.h>
 
-
-EXTERNC_begin
-
-extern int	optval(cchar *,int) noex ;
-
-static inline int optbool(cchar *sp,int sl) noex {
-	return optval(sp,sl) ;
-}
-
-EXTERNC_end
+#include	<spwd.h>
+#include	<ucpasswd.h>
+#include	<ucproject.h>
 
 
-#endif /* OPTVAL_INCLUDE */
+#endif /* UCSUPPORT_INCLUDE */
 
 

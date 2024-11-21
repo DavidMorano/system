@@ -54,7 +54,7 @@
 #include	<nleadstr.h>
 #include	<localmisc.h>
 
-#include	"matstr.h"		/* <- needed for one case */
+#include	"matstr.h"		/* <- needed for default case */
 #include	"matostr.h"
 
 
@@ -100,6 +100,9 @@ namespace {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

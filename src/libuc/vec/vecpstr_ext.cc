@@ -23,6 +23,9 @@
   	Object:
 	vecpstr_ext
 
+	Description:
+	Below are the so-called extended function for the VECSTR object.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
