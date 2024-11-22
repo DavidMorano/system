@@ -436,6 +436,8 @@ int vecstr_del(vecstr *op,int i) noex {
 	                } /* end while */
 	            } /* end if */
 	            if (f_fi && (i < op->fi)) op->fi = i ;
+		} else if (rs == SR_NOTFOUND) {
+		    rs = vecstr_delall(op) ;
 	        } /* end if (valid index) */
 		op->f.stsize = false ;
 		op->stsize = 0 ;
@@ -939,7 +941,11 @@ static int vecstr_insertsp(vecstr *op,int ii,cchar *sp) noex {
 /* end subroutine (vecstr_insertsp) */
 
 static int vecstr_validx(vecstr *op,int i) noex {
-	return ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOTFOUND ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOTFOUND ;
+	}
+	return rs ;
 }
 /* end subroutine (vecstr_validx) */
 

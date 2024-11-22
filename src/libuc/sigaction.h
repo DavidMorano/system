@@ -45,7 +45,6 @@ EXTERNC_begin
 
 extern int sigaction_load(SIGACTION *,sigset_t *,int,siginfohand_f) noex ;
 
-
 EXTERNC_end
 
 

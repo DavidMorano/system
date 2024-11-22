@@ -305,22 +305,20 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int sl) noex {
 	int		rs ;
 	int		i = 0 ;
-	if ((rs = vecpstr_magic(op,sp)) >= 0) {
-	     if ((rs = vecpstr_validx(op,ii)) >= 0) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        if ((op->i + 1) > op->n) {
-	            rs = vecpstr_extvec(op) ;
-	        }
-	        if (rs >= 0) {
-	            cint	sz = (sl+1) ;
-	            if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
-	                strwcpy(bp,sp,sl) ;
-	                op->stsize += sz ;
-	                i = vecpstr_insertsp(op,ii,bp) ;
-	            } /* end if (memory-allocation) */
-	        } /* end if (OK) */
-	    } /* end if (valid index) */
-	} /* end if (magic) */
+	if ((rs = vecpstr_validx(op,ii)) >= 0) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((op->i + 1) > op->n) {
+	        rs = vecpstr_extvec(op) ;
+	    }
+	    if (rs >= 0) {
+	        cint	sz = (sl+1) ;
+	        if (char *bp ; (rs = uc_libmalloc(sz,&bp)) >= 0) {
+	            strwcpy(bp,sp,sl) ;
+	            op->stsize += sz ;
+	            i = vecpstr_insertsp(op,ii,bp) ;
+	        } /* end if (memory-allocation) */
+	    } /* end if (OK) */
+	} /* end if (valid index) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecpstr_insert) */
@@ -370,17 +368,17 @@ int vecpstr_getlast(vecpstr *op,cchar **spp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op)) >= 0) {
-	        rs = SR_NOTFOUND ;
-	        if (op->va && (op->c > 0)) {
-	            i = (op->i-1) ;
-	            while ((i >= 0) && (op->va[i] == nullptr)) {
-		        i -= 1 ;
-	            }
-	            if (i >= 0) rs = SR_OK ;
-	        } /* end if (populated) */
-	        if (spp) {
-	             *spp = (rs >= 0) ? op->va[i] : nullptr ;
+	    rs = SR_NOTFOUND ;
+	    if (op->va && (op->c > 0)) {
+	        i = (op->i-1) ;
+	        while ((i >= 0) && (op->va[i] == nullptr)) {
+		    i -= 1 ;
 	        }
+	        if (i >= 0) rs = SR_OK ;
+	    } /* end if (populated) */
+	    if (spp) {
+	        *spp = (rs >= 0) ? op->va[i] : nullptr ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -390,52 +388,54 @@ int vecpstr_del(vecpstr *op,int i) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = vecpstr_validx(op,i)) >= 0) {
-		bool	f_fi = false ;
-	            if (op->va[i] != nullptr) {
-	                op->c -= 1 ;		/* decrement list count */
-	                if (op->f.stsize) {
-	                    op->stsize -= (strlen(op->va[i]) + 1) ;
-	                }
-	            } /* end if (freeing the actual string data) */
-	            if (op->f.ostationary) {
-	                op->va[i] = nullptr ;
-	                if (i == (op->i - 1)) op->i -= 1 ;
-	                f_fi = true ;
-	            } else if (op->f.issorted || op->f.oordered) {
-	                if (op->f.ocompact) {
-	                    op->i -= 1 ;
-	                    for (int j = i ; j < op->i ; j += 1) {
-	                        op->va[j] = op->va[j + 1] ;
-		            }
-	                    op->va[op->i] = nullptr ;
-	                } else {
-	                    op->va[i] = nullptr ;
-	                    if (i == (op->i - 1)) op->i -= 1 ;
-	                    f_fi = true ;
-	                } /* end if */
-	            } else {
-	                bool	f = (op->f.oswap || op->f.ocompact) ;
-	                if (f && (i < (op->i - 1))) {
-	                    op->va[i] = op->va[op->i - 1] ;
-	                    op->va[--op->i] = nullptr ;
-	                    op->f.issorted = false ;
-	                } else {
-	                    op->va[i] = nullptr ;
-	                    if (i == (op->i - 1)) op->i -= 1 ;
-	                    f_fi = true ;
-	                } /* end if */
-	            } /* end if */
-	            if (op->f.oconserve) {
-	                while (op->i > i) {
-	                    if (op->va[op->i - 1] != nullptr) break ;
-	                    op->i -= 1 ;
-	                } /* end while */
-	            } /* end if */
-	            if (f_fi && (i < op->fi)) {
-	                op->fi = i ;
-	            }
-		    c = op->c ;
-	    op->f.stsize = false ;
+            bool        f_fi = false ;
+            if (op->va[i] != nullptr) {
+                op->c -= 1 ;            /* decrement list count */
+                if (op->f.stsize) {
+                    op->stsize -= (strlen(op->va[i]) + 1) ;
+                }
+            } /* end if (freeing the actual string data) */
+            if (op->f.ostationary) {
+                op->va[i] = nullptr ;
+                if (i == (op->i - 1)) op->i -= 1 ;
+                f_fi = true ;
+            } else if (op->f.issorted || op->f.oordered) {
+                if (op->f.ocompact) {
+                    op->i -= 1 ;
+                    for (int j = i ; j < op->i ; j += 1) {
+                        op->va[j] = op->va[j + 1] ;
+                    }
+                    op->va[op->i] = nullptr ;
+                } else {
+                    op->va[i] = nullptr ;
+                    if (i == (op->i - 1)) op->i -= 1 ;
+                    f_fi = true ;
+                } /* end if */
+            } else {
+                bool    f = (op->f.oswap || op->f.ocompact) ;
+                if (f && (i < (op->i - 1))) {
+                    op->va[i] = op->va[op->i - 1] ;
+                    op->va[--op->i] = nullptr ;
+                    op->f.issorted = false ;
+                } else {
+                    op->va[i] = nullptr ;
+                    if (i == (op->i - 1)) op->i -= 1 ;
+                    f_fi = true ;
+                } /* end if */
+            } /* end if */
+            if (op->f.oconserve) {
+                while (op->i > i) {
+                    if (op->va[op->i - 1] != nullptr) break ;
+                    op->i -= 1 ;
+                } /* end while */
+            } /* end if */
+            if (f_fi && (i < op->fi)) {
+                op->fi = i ;
+            }
+            c = op->c ;
+            op->f.stsize = false ;
+	} else if (rs == SR_NOTFOUND) {
+	    rs = vecpstr_delall(op) ;
 	} /* end if (validx) */
 	return (rs >= 0) ? c : rs ;
 }

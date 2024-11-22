@@ -1,4 +1,5 @@
 /* netfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* read a NETRC file and make its contents available */

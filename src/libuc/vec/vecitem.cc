@@ -168,7 +168,7 @@ int vecitem_finish(vecitem *op) noex {
 }
 /* end subroutine (vecitem_finish) */
 
-int vecitem_add(vecitem *op,void *ep,int el) noex {
+int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep) {
@@ -375,7 +375,7 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (op && cep && cf) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_OK ;
 	    if (op->f.osorted && (! op->f.issorted)) {
 	        op->f.issorted = true ;
@@ -633,5 +633,115 @@ static int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecitem_fetchcont) */
+
+int vecitem::start(int an,int ao) noex {
+	return vecitem_start(this,an,ao) ;
+}
+
+int vecitem::add(cvoid *ep,int el) noex {
+	return vecitem_add(this,ep,el) ;
+}
+
+int vecitem::get(int ai,void *rp) noex {
+	return vecitem_get(this,ai,rp) ;
+}
+
+int vecitem::find(cvoid *ep,int el) noex {
+    	return vecitem_find(this,ep,el) ;
+}
+
+int vecitem::fetch(cvoid *ep,vecitem_cur *curp,vecitem_cmpf cf,void *rp) noex {
+    	return vecitem_fetch(this,ep,curp,cf,rp) ;
+}
+
+int vecitem::search(cvoid *ep,vecitem_cmpf cf,void *rp) noex {
+    	return vecitem_search(this,ep,cf,rp) ;
+}
+
+int vecitem::sort(vecitem_cmpf cf) noex {
+    	return vecitem_sort(this,cf) ;
+}
+
+int vecitem::getvec(void **rpp) noex {
+	return vecitem_getvec(this,rpp) ;
+}
+
+void vecitem::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("vecitem",rs,"fini-finish") ;
+	}
+}
+
+int vecitem_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vecitemmem_del:
+	        rs = vecitem_del(op,a) ;
+	        break ;
+	    case vecitemmem_count:
+	        rs = vecitem_count(op) ;
+	        break ;
+	    case vecitemmem_audit:
+	        rs = vecitem_audit(op) ;
+	        break ;
+	    case vecitemmem_finish:
+	        rs = vecitem_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (vecitem_co::operator) */
+
+bool vecitem_iter::operator == (const vecitem_iter &oit) noex {
+	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
+}
+
+bool vecitem_iter::operator != (const vecitem_iter &oit) noex {
+	bool		f = false ;
+	f = f || (va != oit.va) ;
+	f = f || (ii != oit.ii) ;
+	if (!f) {
+	    f = (i < oit.i) ;
+	}
+	return f ;
+}
+/* end method (vecitem_iter::operator) */
+
+vecitem_iter vecitem_iter::operator + (int n) const noex {
+	vecitem_iter	rit(va,i,i) ;
+	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
+	return rit ;
+}
+
+vecitem_iter vecitem_iter::operator += (int n) noex {
+	vecitem_iter	rit(va,i,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
+}
+
+vecitem_iter vecitem_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
+}
+
+vecitem_iter vecitem_iter::operator ++ (int) noex { /* post */
+	vecitem_iter	pre(*this) ;
+	increment() ;
+	return pre ;
+}
+
+void vecitem_iter::increment(int n) noex {
+	if ((i + n) < 0) n = -i ;
+	if (n != 0) {
+	    i += n ;
+	    while ((i < ii) && (va[i] == nullptr)) {
+	        i += 1 ;
+	    }
+	}
+}
+/* end method (vecitem_iter::increment) */
 
 
