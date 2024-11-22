@@ -21,7 +21,7 @@
 #include	<vecitem.h>
 
 
-#define	NETFILE		VECITEM
+#define	NETFILE		vecitem
 #define	NETFILE_ENT	struct netfile_entry
 
 

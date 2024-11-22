@@ -1,6 +1,6 @@
 /* netfile SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* read a NETRC file and make its contents available */
 /* version %I% last-modified %G% */
@@ -9,13 +9,25 @@
 /* revision history:
 
 	= 1998-09-22, David A­D­ Morano
-	This subroutine module was adopted for use from a previous
+	This object module was adopted for use from a previous
 	NETRC reading program.  This version currently ignores all
 	'macdef' entries.
 
+	= 2024-11-22, David A­D­ Morano
+	Ya, the 22nd.  Just a coincidence.  But to the point at
+	hand.  I have just (tried) to review this code.  I must
+	have been on drugs when I first wrote this.  I think that
+	this code is correct.  But I really had to use some thinking
+	to figure out the correctness of this stuff.  This might
+	be a sign that our minds (my mind) really deteriorate over
+	time.  But a main rule for programming is that the code
+	should be readable by anyone.  Well, it is not clear that
+	the code below meets that standard.  Or maybe it is just I
+	who is losing it.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -34,17 +46,11 @@
 
 	If there are more than one 'login', 'account', or what have
 	you, key associated with a single 'machine' key, then we
-	ignore all but the first.
-
-	Finally, this may be more (except for the 'macdef' key)
-	than what the standard FTP and |rexec(3)| NETRC file parsers
-	do!
+	ignore all but the last one.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -70,6 +76,8 @@
 
 #define	NF		netfile
 #define	NF_ENT		netfile_ent
+
+#define	NS		netstate
 
 #define	KEYBUFLEN	10		/* strlen("password") */
 
@@ -309,7 +317,7 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
                         f_default = true ;
                         break ;
                     } /* end switch */
-                    if (cl && cp) {
+                    if (cp) {
                         bool        f = true ;
                         f = f && (nki >= 0) ;
                         f = f && (! f_macdef) ;
@@ -405,9 +413,10 @@ static int netstate_item(netstate *nsp,int ki,cchar *sp,int sl) noex {
 
 static int netstate_ready(netstate *nsp) noex {
     	int		rs = SR_BUGCHECK ;
-    	int		f = true ;
+    	int		f = false ;
 	if (nsp) {
-	    for (const auto ni : readies) {
+	    rs = SR_OK ;
+	    for (cint ni : readies) {
 	        cchar	*sp = nsp->item[ni] ;
 	        f = (sp && (sp[0] != '\0')) ;
 	        if (! f) break ;
@@ -416,18 +425,6 @@ static int netstate_ready(netstate *nsp) noex {
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (netstate_ready) */
-
-#ifdef	COMMENT
-static int netstate_ready(netstate *nsp) noex {
-	int		i ; /* used-afterwards */
-	for (i = 0 ; readies[i] >= 0 ; i += 1) {
-	    cchar 	*sp = nsp->item[i] ;
-	    if ((sp == nullptr) || (sp[0] == '\0')) break ;
-	} /* end for */
-	return (readies[i] >= 0) ? false : true ;
-}
-/* end subroutine (netstate_ready) */
-#endif /* COMMENT */
 
 static int netstate_finish(netstate *nsp) noex {
 	int		rs = SR_OK ;
