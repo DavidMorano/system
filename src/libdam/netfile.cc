@@ -9,21 +9,22 @@
 /* revision history:
 
 	= 1998-09-22, David A­D­ Morano
-	This object module was adopted for use from a previous
-	NETRC reading program.  This version currently ignores all
-	'macdef' entries.
+	This object module was adopted for use from a previous NETRC
+	reading program (from the early 1990s).  This version
+	should ignore all 'macdef' entries, but is not currently
+	coded to handle that properly.
 
 	= 2024-11-22, David A­D­ Morano
 	Ya, the 22nd.  Just a coincidence.  But to the point at
-	hand.  I have just (tried) to review this code.  I must
-	have been on drugs when I first wrote this.  I think that
-	this code is correct.  But I really had to use some thinking
-	to figure out the correctness of this stuff.  This might
-	be a sign that our minds (my mind) really deteriorate over
-	time.  But a main rule for programming is that the code
-	should be readable by anyone.  Well, it is not clear that
-	the code below meets that standard.  Or maybe it is just I
-	who is losing it.
+	hand.  I have just (tried) to review this code for C++20
+	conformance.  I must have been on drugs when I first wrote
+	this.  I think that this code is correct.  But I really had
+	to use some thinking to figure out the correctness of this
+	stuff.  This might be a sign that my mind is really
+	deteriorating over time.  But a main rule for programming
+	is that the code should be readable by anyone.  Well, it
+	is not clear that the code below meets that standard.  Or
+	maybe it is just I who is losing it.
 
 */
 
@@ -56,7 +57,6 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -67,6 +67,7 @@
 #include	<sfx.h>
 #include	<matxstr.h>
 #include	<strwcpy.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"netfile.h"
@@ -249,6 +250,24 @@ int netfile_get(NF *vep,int i,NF_ENT **epp) noex {
 }
 /* end subroutine (netfile_get) */
 
+int netfile_fetch(NF *vep,cchar *mp,int ml,NF_ENT **epp) noex {
+	int		rs = SR_FAULT ;
+	if (vep && mp) {
+	    void	*vp{} ;
+	    for (int i = 0 ; (rs = vecitem_get(vep,i,&vp)) >= 0 ; i += 1) {
+		NF_ENT	*ep = entp(vp) ;
+		if (vp) {
+		    if (ep->machine && (strwcmp(ep->machine,mp,ml) == 0)) {
+		        if (epp) *epp = entp(vp) ;
+			break ;
+		    }
+		}
+	    } /* end for */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (netfile_fetch) */
+
 
 /* private subroutines */
 
@@ -290,15 +309,15 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
 	bool		f_macdef = false ;
         if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
             int     fl ;
+            cchar   *ft = fterms ;
             cchar   *fp ;
             bool    f_default = false ;
-            while ((fl = fsb.get(fterms,&fp)) > 0) {
+            while ((fl = fsb.get(ft,&fp)) > 0) {
                 cint        ml = min(klen,fl) ;
                 strwcpylc(kbuf,fp,ml) ;
                 if (int nki ; (nki = matpstr(netkeys,2,kbuf,ml)) >= 0) {
                     int     cl = 0 ;
                     cchar   *cp = nullptr ;
-                    cchar   *ft = fterms ;
                     switch (nki) {
                     case netkey_machine:
                     case netkey_login:

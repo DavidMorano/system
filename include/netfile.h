@@ -39,6 +39,7 @@ EXTERNC_begin
 
 extern int netfile_open(netfile *,cchar *) noex ;
 extern int netfile_get(netfile *,int,netfile_ent **) noex ;
+extern int netfile_fetch(netfile *,cchar *,int,netfile_ent **) noex ;
 extern int netfile_close(netfile *) noex ;
 
 EXTERNC_end

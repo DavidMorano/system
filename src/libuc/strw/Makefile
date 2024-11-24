@@ -1,6 +1,6 @@
-# MAKEFILES (six)
+# MAKEFILES (strw)
 
-T= six
+T= strw
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += six.h
+INCS += strw.h
 
 LIBS +=
 
@@ -55,17 +55,14 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1= sixchr.o sicasechr.o sicite.o sidigit.o 
+OBJ0= strwcmp.o
+OBJ1= strwchr.o sicasechr.o sicite.o sidigit.o 
 OBJ2= sihyphen.o silbrace.o sileader.o
 OBJ3= siskipwhite.o sispan.o sisub.o
-OBJ4= sifext.o sinext.o
-OBJ5= sidquote.o siterm.o
 
-OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o obj5.o
+OBJA= obj0.o
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= $(OBJA)
 
 
 .SUFFIXES:		.hh .ii
@@ -138,23 +135,6 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-sifext.o:		sifext.cc sifext.h	$(INCS)
-sialnum.o:		sialnum.cc		$(INCS)
-sialpha.o:		sialpha.cc		$(INCS)
-sibasename.o:		sibasename.cc		$(INCS)
-sibreak.o:		sibreak.cc		$(INCS)
-sicasechr.o:		sicasechr.cc		$(INCS)
-sicite.o:		sicite.cc		$(INCS)
-sidigit.o:		sidigit.cc		$(INCS)
-sidquote.o:		sidquote.cc		$(INCS)
-sihyphen.o:		sihyphen.cc		$(INCS)
-silbrace.o:		silbrace.cc		$(INCS)
-sileader.o:		sileader.cc		$(INCS)
-sinext.o:		sinext.cc		$(INCS)
-siskipwhite.o:		siskipwhite.cc		$(INCS)
-sispan.o:		sispan.cc		$(INCS)
-sisub.o:		sisub.cc		$(INCS)
-siterm.o:		siterm.cc		$(INCS)
-sixchr.o:		sixchr.cc		$(INCS)
+strwcmp.o:		strwcmp.cc strwcmp.h		$(INCS)
 
 

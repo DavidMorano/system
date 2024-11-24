@@ -502,6 +502,11 @@ strwcpy.o:		strwcpy.dir
 strwcpy.dir:
 	makesubdir $@
 
+# STRW
+strw.o:			strw.dir
+strw.dir:
+	makesubdir $@
+
 # STRDCPY
 strdcpy.o:		strdcpy.dir
 strdcpy.dir:

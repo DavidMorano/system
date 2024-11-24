@@ -38,7 +38,7 @@
 #define	FMQ_FH			struct fmq_filehead
 #define	FMQ_BD			struct fmq_bufdesc
 #define	FMQ_FILEMAGIC		"FMQ"
-#define	FMQ_FILEMAGICLEN	strlen(FMQ_FILEMAGIC)
+#define	FMQ_FILEMAGICSIZE	16
 #define	FMQ_FILEVERSION		0
 #define	FMQ_ENDIAN		0
 

@@ -1,15 +1,22 @@
-/* authfile HEADER */
+/* strw HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* subroutine to read an authorization file */
+/* string-copy variant */
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	AUTHFILE_INCLUDE
-#define	AUTHFILE_INCLUDE
+#ifndef	STRW_INCLUDE
+#define	STRW_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -17,16 +24,12 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
+
+#include	<strwcpy.h>
+#include	<strwcmp.h>
+#include	<strwset.h>
 
 
-EXTERNC_begin
-
-extern int	authfile(char *,char *,cchar *) noex ;
-
-EXTERNC_end
-
-
-#endif /* AUTHFILE_INCLUDE */
+#endif /* STRW_INCLUDE */
 
 

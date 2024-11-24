@@ -1,4 +1,5 @@
 /* authfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to read an authorization file */
@@ -148,16 +149,15 @@ int suber::finish() noex {
 int suber::procfile(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
-	bfile		afile, *afp = &afile ;
-	if ((rs = bopen(afp,fname,"r",0666)) >= 0) {
-	    while ((rs = breadln(afp,lb.lbuf,lb.llen)) > 0) {
+	if (bfile af ; (rs = bopen(&af,fname,"r",0666)) >= 0) {
+	    while ((rs = breadln(&af,lb.lbuf,lb.llen)) > 0) {
 		{
 		    rs = procline(rs) ;
 		}
 	        if ((username[0] != '\0') && (password[0] != '\0')) break ;
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-	    rs1 = bclose(afp) ;
+	    rs1 = bclose(&af) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
 	return rs ;
@@ -165,10 +165,9 @@ int suber::procfile(cchar *fname) noex {
 /* end method (suber::procfile) */
 
 int suber::procline(int len) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = field_start(&fsb,lb.lbuf,len)) >= 0) {
+	if (field fsb ; (rs = field_start(&fsb,lb.lbuf,len)) >= 0) {
 	    int		fl ;
 	    cchar	*fp ;
 	    while ((rs = field_get(&fsb,fterms,&fp)) >= 0) {

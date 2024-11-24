@@ -199,7 +199,7 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t om,int bsz) noex {
 
 static int fmq_fnopen(fmq *op) noex {
     	cint		rsn = SR_NOTFOUND ;
-	cint		am = (op->operm & O_ACCMODE) ;
+	cint		am = int(op->operm & O_ACCMODE) ;
     	int		rs ;
 	int		of = op->flags & (~ O_CREAT) ;
 	int		f_create = false ;
@@ -281,29 +281,44 @@ bad0:
 /* end subroutine (fmq_open) */
 #else /* COMMENT */
 int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
+	struct ustat	sb ;
+	time_t		daytime = time(NULL) ;
 	int		rs ;
-	int		f_create = false ;
-	if ((rs = fmq_ctor(op,fname)) >= 0) {
-	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        USTAT		sb ;
-	        time_t		dt = getustime ;
-	        int		amode ;
-	        if (bufsize < FMQ_BUFSIZE) bufsize = FMQ_BUFSIZE ;
+	int		amode ;
+	int		f_create = FALSE ;
 
-	of = (of & (~ O_TRUNC)) ;
+#if	CF_SAFE
+	if (op == NULL) return SR_FAULT ;
+#endif /* CF_SAFE */
 
-	op->f.create = (of & O_CREAT) ? true : false ;
-	op->f.ndelay = (of & O_NDELAY) ? true : false ;
-	op->f.nonblock = (of & O_NONBLOCK) ? true : false ;
+	if (fname == NULL) return SR_FAULT ;
 
-	of = (of & (~ (O_NDELAY | O_NONBLOCK))) ;
+	if (fname[0] == '\0') return SR_INVALID ;
 
-	op->oflags = of ;
+	if (bufsize < FMQ_BUFSIZE)
+	    bufsize = FMQ_BUFSIZE ;
+
+	memset(op,0,sizeof(FMQ)) ;
+	op->magic = 0 ;
+	op->fname = NULL ;
+
+#if	CF_ALWAYSCREATE
+	oflags |= O_CREAT ;
+#endif
+
+	oflags = (oflags & (~ O_TRUNC)) ;
+
+	op->f.create = (oflags & O_CREAT) ? TRUE : FALSE ;
+	op->f.ndelay = (oflags & O_NDELAY) ? TRUE : FALSE ;
+	op->f.nonblock = (oflags & O_NONBLOCK) ? TRUE : FALSE ;
+
+	oflags = (oflags & (~ (O_NDELAY | O_NONBLOCK))) ;
+
+	op->oflags = oflags ;
 	op->operm = operm ;
 
 	{
-	    cchar	*cp ;
+	    const char	*cp ;
 	    rs = uc_mallocstrw(fname,-1,&cp) ;
 	    if (rs >= 0) op->fname = cp ;
 	}
@@ -311,20 +326,20 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 
 /* initialize the buffer structure */
 
-	rs = fmq_bufbegin(op) ;
+	rs = fmq_bufinit(op) ;
 	if (rs < 0)
 	    goto bad1 ;
 
 /* try to open the file */
 
-	of = (of& (~ O_CREAT)) ;
-	rs = u_open(op->fname,of,operm) ;
+	oflags = (oflags & (~ O_CREAT)) ;
+	rs = u_open(op->fname,oflags,operm) ;
 
 	if ((rs < 0) && (op->oflags & O_CREAT)) {
 
-	    f_create = true ;
-	    of = op->oflags ;
-	    rs = u_open(op->fname,of,operm) ;
+	    f_create = TRUE ;
+	    oflags = op->oflags ;
+	    rs = u_open(op->fname,oflags,operm) ;
 
 	} /* end if (creating file) */
 
@@ -335,10 +350,9 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 	amode = (operm & O_ACCMODE) ;
 	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 
-	op->opentime = dt ;
-	op->accesstime = dt ;
+	op->opentime = daytime ;
+	op->accesstime = daytime ;
 	rs = u_fstat(op->fd,&sb) ;
-
 	if (rs < 0)
 	    goto bad3 ;
 
@@ -367,7 +381,7 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 
 /* header processing */
 
-	rs = fmq_filebegin(op,dt) ;
+	rs = fmq_fileinit(op,daytime) ;
 
 	if ((rs < 0) && (rs != SR_AGAIN))
 	    goto bad3 ;
@@ -377,14 +391,9 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 
 /* out of here */
 
-ret0:
 	op->magic = FMQ_MAGIC ;
-	    
-	    } /* end if (valid) */
-	    if (rs < 0) {
-		fmq_dtor(op) ;
-	    }
-	} /* end if (fmq_ctor) */
+
+ret0:
 	return (rs >= 0) ? f_create : rs ;
 
 /* bad things */
@@ -393,10 +402,10 @@ bad3:
 	u_close(op->fd) ;
 
 bad2:
-	fmq_bufend(op) ;
+	fmq_buffree(op) ;
 
 bad1:
-	if (op->fname != nullptr)
+	if (op->fname != NULL)
 	    uc_free(op->fname) ;
 
 bad0:
@@ -1137,7 +1146,7 @@ static int fmq_fileopen(fmq *op,time_t dt) noex {
 }
 /* end subroutine (fmq_fileopen) */
 
-int fmq_fileclose(fmq *op) noex {
+static int fmq_fileclose(fmq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -1206,6 +1215,42 @@ static int filemagic(char *buf,int f_read,fmq_fm *mp) noex {
 /* end subroutine (filemagic) */
 
 /* encode or decode the file header */
+#ifdef	COMMENT
+static int filehead_wr(fmq_fh *hp,cchar *buf) noex {
+	const uint	*table = (uint *) buf ;
+	int		rs = SR_BADFMT ;
+	if (buf) {
+	        stdorder_rui((table + 0),&hp->wcount) ;
+	        stdorder_rui((table + 1),&hp->wtime) ;
+	        stdorder_rui((table + 2),&hp->nmsg) ;
+	        stdorder_rui((table + 3),&hp->bsz) ;
+	        stdorder_rui((table + 4),&hp->blen) ;
+	        stdorder_rui((table + 5),&hp->len) ;
+	        stdorder_rui((table + 6),&hp->ri) ;
+	        stdorder_rui((table + 7),&hp->wi) ;
+	    rs = FMQ_HEADLEN ;
+	}
+	return rs ;
+}
+/* end subroutine (filehead_wr) */
+static int filehead_rd(const fmq_fh *hp,char *buf) noex {
+	uint		*table = (uint *) buf ;
+	int		rs = SR_BADFMT ;
+	if (buf) {
+	        stdorder_wui((table + 0),hp->wcount) ;
+	        stdorder_wui((table + 1),hp->wtime) ;
+	        stdorder_wui((table + 2),hp->nmsg) ;
+	        stdorder_wui((table + 3),hp->bsz) ;
+	        stdorder_wui((table + 4),hp->blen) ;
+	        stdorder_wui((table + 5),hp->len) ;
+	        stdorder_wui((table + 6),hp->ri) ;
+	        stdorder_wui((table + 7),hp->wi) ;
+	    rs = FMQ_HEADLEN ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (filehead_rd) */
+#else /* COMMENT */
 static int filehead(char *buf,int f_read,fmq_fh *hp) noex {
 	uint		*table = (uint *) buf ;
 	int		rs = SR_BADFMT ;
@@ -1234,5 +1279,6 @@ static int filehead(char *buf,int f_read,fmq_fh *hp) noex {
 	return rs ;
 }
 /* end subroutine (filehead) */
+#endif /* COMMENT */
 
 

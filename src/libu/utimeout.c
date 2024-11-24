@@ -111,7 +111,7 @@ int utimeout[uto_overlast] = {
 /* exported subroutines */
 
 int u_timeout(int w,int val) noex {
-	int	rs = SR_INVALID ;
+	int		rs = SR_INVALID ;
 	if ((w >= 0) && (w < uto_overlast) && (val != 0)) {
 	    if (val > 0) {
 		utimeout[w] = val ;

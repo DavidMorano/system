@@ -17,13 +17,15 @@
 
 /*******************************************************************************
 
+  	Object:
+	htm
+
+	Description:
 	This is a hack to create and output some basic HTML.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<dlfcn.h>
 #include	<climits>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
@@ -38,34 +40,18 @@
 #include	<linefold.h>
 #include	<bufprintf.h>
 #include	<ctdec.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |COLUMNS| + |DIGBUFLEN| */
 
 #include	"htm.h"
 
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
-
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -122,9 +108,8 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 	if ((rs = htm_ctor(op,ofp)) >= 0) {
 	    op->ofp = ofp ;
 	    if ((rs = shio_print(op->ofp,"<!doctype html>",-1)) >= 0) {
-	        char	*lp{} ;
 	        wlen += rs ;
-		if ((rs = malloc_ml(&lp)) >= 0) {
+	        if (char *lp{} ; (rs = malloc_ml(&lp)) >= 0) {
 		    cint	ll = rs ;
 		    cchar	*fmt ;
 		    op->lbuf = lp ;
@@ -147,7 +132,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 		        if (rs >= 0) rs = rs1 ;
 			op->lbuf = nullptr ;
 			op->llen = 0 ;
-		    }
+		    } /* end if (error handling) */
 		} /* end if (memory-allocation) */
 	    } /* end if (doctype) */
 	    op->wlen += wlen ;
@@ -255,10 +240,10 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 	if ((rs = htm_magic(op,tag)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (tag[0]) {
-	        buffer	b ;
 	        cint	c = COLUMNS ;
-	        if ((rs = buffer_start(&b,c)) >= 0) {
-	            cchar	*k, *v ;
+	        if (buffer b ; (rs = buffer_start(&b,c)) >= 0) {
+	            cchar	*k ;
+	            cchar	*v ;
 	            buffer_chr(&b,CH_LANGLE) ;
 	            buffer_strw(&b,tag,-1) ;
 	            for (int i = 0 ; i < 2 ; i += 1) {
@@ -339,7 +324,6 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	    int		bsz = 0 ;
 	    int		kvsize = 0 ;
 	    cchar	*tag = "textarea" ;
-	    void	*vp ;
 	    if (tkv != nullptr) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; tkv[i][0] != nullptr ; i += 1) ;
@@ -348,7 +332,7 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	    kvsize += (6*(2*sizeof(cchar *))) ;
 	    bsz += kvsize ;
 	    bsz += ((dlen+1)*2) ;
-	    if ((rs = uc_malloc(bsz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_malloc(bsz,&vp)) >= 0) {
 	        cchar	*(*kv)[2] ;
 	        char	*bp = charp(vp) ;
 	        char	*d0, *d1 ;
@@ -405,8 +389,7 @@ int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 	if ((rs = htm_magic(op,href)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (href[0]) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+	        if (sbuf b ; (rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
 	            cchar	*tag = "a" ;
 	            sbuf_chr(&b,CH_LANGLE) ;
 	            sbuf_strw(&b,tag,-1) ;
@@ -485,8 +468,7 @@ int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 	if ((rs = htm_magic(op,src)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (src[0]) {
-	        sbuf		b ;
-	        if ((rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+	        if (sbuf b ; (rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
 	            cchar	*tag = "img" ;
 	            sbuf_chr(&b,CH_LANGLE) ;
 	            sbuf_strw(&b,tag,-1) ;
@@ -569,9 +551,9 @@ int htm_printline(htm *op,cchar *lbuf,int llen) noex {
 /* end subroutine (htm_printline) */
 
 int htm_printf(htm *op,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs ;
 	if ((rs = htm_magic(op)) >= 0) {
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = htm_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
@@ -614,8 +596,7 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	if ((rs = htm_magic(op,tag)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (tag[0]) {
-                sbuf        b ;
-                if ((rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+                if (sbuf b ; (rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
                     sbuf_chr(&b,CH_LANGLE) ;
                     sbuf_strw(&b,tag,-1) ;
                     for (int c = 0 ; c < 2 ; c += 1) {
@@ -654,11 +635,10 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 /* end subroutine (htm_tagalone) */
 
 static int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
-	linefold	f ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = linefold_start(&f,c,1,bp,bl)) >= 0) {
+	if (linefold f ; (rs = linefold_start(&f,c,1,bp,bl)) >= 0) {
 	    int		ll ;
 	    cchar	*lp ;
 	    for (int i = 0 ; (ll = linefold_get(&f,i,&lp)) >= 0 ; i += 1) {
@@ -683,8 +663,7 @@ static int htm_wrfile(htm *op,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-        shio    cf ;
-        if ((rs = shio_open(&cf,cfname,"r",0666)) >= 0) {
+        if (shio cf ; (rs = shio_open(&cf,cfname,"r",0)) >= 0) {
             while ((rs = shio_read(&cf,op->lbuf,op->llen)) > 0) {
                 rs = shio_write(op->ofp,op->lbuf,rs) ;
                 wlen += rs ;

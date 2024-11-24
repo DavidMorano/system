@@ -40,6 +40,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -72,40 +74,40 @@
 namespace {
    struct cmpx {
 	int x(cchar *,cchar *,int) noex ;
-	virtual int tox(int ch) noex ;
-	virtual int strnxcmp(cchar *,cchar *,int) noex ;
-	virtual int nleadxstr(cchar *,cchar *,int) noex ;
+	virtual int tox(int ch) noex = 0 ;
+	virtual int strnxcmp(cchar *,cchar *,int) noex = 0 ;
+	virtual int nleadxstr(cchar *,cchar *,int) noex = 0 ;
    } ; /* end struct (cmpx) */
    struct basecmpx : cmpx {
-	int tox(int ch) noex override {
+	int tox(int ch)					noex override final {
 	    return ch ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl) noex override {
-	   return strncmp(bs,sp,sl) ;
+	int strnxcmp(cchar *bs,cchar *sp,int sl)	noex override final {
+	    return strncmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex override {
+	int nleadxstr(cchar *s1,cchar *s2,int s2len)	noex override final {
 	    return nleadstr(s1,s2,s2len) ;
 	} ;
    } ;
    struct casecmpx : cmpx {
-	int tox(int ch) noex override {
+	int tox(int ch)					noex override final {
 	    return tolc(ch) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl) noex override {
-	   return strncasecmp(bs,sp,sl) ;
+	int strnxcmp(cchar *bs,cchar *sp,int sl)	noex override final {
+	    return strncasecmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex override {
+	int nleadxstr(cchar *s1,cchar *s2,int s2len)	noex override final {
 	    return nleadcasestr(s1,s2,s2len) ;
 	} ;
    } ;
    struct foldcmpx : cmpx {
-	int tox(int ch) noex override {
+	int tox(int ch)					noex override final {
 	    return tofc(ch) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl) noex override {
-	   return strnfoldcmp(bs,sp,sl) ;
+	int strnxcmp(cchar *bs,cchar *sp,int sl)	noex override final {
+	    return strnfoldcmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len) noex override {
+	int nleadxstr(cchar *s1,cchar *s2,int s2len)	noex override final {
 	    return nleadfoldstr(s1,s2,s2len) ;
 	} ;
    } ;
@@ -146,7 +148,9 @@ int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 
 int cmpx::x(cchar *s1,cchar *s2,int s2len) noex {
 	int		rc = tox(s1[0]) ;
-	if (s2len < 0) s2len = strlen(s2) ;
+	if (s2len < 0) {
+	    s2len = strlen(s2) ;
+	}
 	if (s2len > 0) {
 	    cint	ch1 = tox(*s1) ;
 	    cint	ch2 = tox(*s2) ;
@@ -165,17 +169,5 @@ int cmpx::x(cchar *s1,cchar *s2,int s2len) noex {
 	return rc ;
 }
 /* end method (cmpx::x) */
-
-int cmpx::tox(int ch) noex {
-	return ch ;
-}
-
-int cmpx::strnxcmp(cchar *bs,cchar *sp,int sl) noex {
-	return strncmp(bs,sp,sl) ;
-}
-
-int cmpx::nleadxstr(cchar *bs,cchar *sp,int sl) noex {
-	return nleadstr(bs,sp,sl) ;
-}
 
 
