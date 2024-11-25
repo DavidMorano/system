@@ -1,4 +1,5 @@
 /* baops HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Bit-Array Operations (BAO) */
@@ -46,9 +47,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
-#include	<stdintx.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
+#include	<stdintx.h>
 
 
 /* on char(acter) (byte) organized bit arrays */

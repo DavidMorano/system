@@ -1,4 +1,5 @@
 /* attachso SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* attach a shared-object to the current process */
@@ -93,6 +94,9 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
 /* local structures */
 
 struct subinfo_flags {
@@ -133,7 +137,7 @@ constexpr cpcchar	defexts[] = {
 	nullptr
 } ;
 
-constexpr cint		termrs[] = {
+constexpr int		termrs[] = {
 	SR_FAULT,
 	SR_INVALID,
 	SR_NOMEM,
@@ -218,10 +222,9 @@ static int subinfo_soload(SI *sip) noex {
 /* end subroutine (subinfo_soload) */
 
 static int subinfo_sofind(SI *sip) noex {
-	ids		id ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) {
 	    cint	soperm = (X_OK | R_OK) ;
 	    bool	f_open = false ;
 	    mainv	dnames = sip->dnames ;
@@ -260,8 +263,7 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	int		rs = SR_OK ;
 	int		rs1 = SR_NOTFOUND ;
 	int		f = false ;
-	char		*sofname{} ;
-	if ((rs = malloc_mp(&sofname)) >= 0) {
+	if (char *sofname{} ; (rs = malloc_mp(&sofname)) >= 0) {
 	    USTAT	sb ;
 	    cint	soperm = (R_OK | X_OK) ;
 	    mainv	exts = sip->exts ;
@@ -295,9 +297,7 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
     
 	                } /* end if (ok) */
 	            } /* end if (file and perms) */
-    
 	        } /* end if (filename formed) */
-    
 	        if (sip->sop != nullptr) break ;
 	        if (rs < 0) break ;
 	    } /* end for (exts) */

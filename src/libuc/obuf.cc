@@ -1,4 +1,5 @@
 /* obuf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* Output Buffer (object) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	obuf
+
+	Description:
 	This object facilitates output buffering, but with just a 
 	dynamically sized buffer -- no actual output of any sort.
 
@@ -38,9 +43,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>
-#include	<utypedefs.h>
-#include	<clanguage.h>
+#include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"obuf.hh"
@@ -50,6 +56,9 @@
 
 
 /* default name spaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -67,7 +76,21 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
+
+int obuf::push(int ch) noex {
+    	int		rs ;
+	try {
+	    b.push_back(ch) ;
+	    rs = (b.size() - oi) ;
+	} catch (...) {
+	    rs = SR_NOMEM ;
+	}
+	return rs ;
+}
 
 int obuf::adv(int al) noex {
 	cint		sl = b.size() ;
@@ -97,8 +120,32 @@ int obuf::adv(int al) noex {
 }
 /* end subroutine (obuf::adv) */
 
-obuf::operator int () const noex {
- 	return (b.size() - oi) ;
-} 
+void obuf::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("obuf",rs,"fini-finish") ;
+	}
+}
+
+obuf_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case obufmem_start:
+		rs = SR_OK ;
+	        break ;
+	    case obufmem_finish:
+	        rs = op->ilen() ;
+	        break ;
+	    case obufmem_count:
+	        rs = op->ilen() ;
+	        break ;
+	    case obufmem_len:
+	        rs = op->ilen() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (obuf_co::operator) */
 
 

@@ -1,4 +1,5 @@
 /* addrset HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* track memory addresses */
@@ -46,6 +47,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<utility>		/* |hash(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>

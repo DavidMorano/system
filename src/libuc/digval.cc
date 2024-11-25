@@ -1,4 +1,5 @@
 /* digval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the value of a single hexadecimal digit */
@@ -16,6 +17,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Group:
+	digval
 
 	Names:
 	digval
@@ -56,6 +60,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

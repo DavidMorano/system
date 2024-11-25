@@ -746,9 +746,6 @@ isx.dir:
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
-# ENCODE-DECODE
-b64decover.o:		b64decoder.cc b64decoder.h
-
 # tab handling
 tabcols.o:		tabcols.cc tabcols.h
 ncol.o:			ncol.cc ncol.h tabcols.h
@@ -781,7 +778,6 @@ pmq.o:			pmq.cc		pmq.h
 filegrp.o:		filegrp.cc	filegrp.h
 unameo.o:		unameo.cc	unameo.h
 hostaddr.o:		hostaddr.cc	hostaddr.h
-b64decoder.o:		b64decoder.cc	b64decoder.h
 lookaside.o:		lookaside.cc	lookaside.h
 strtab.o:		strtab.cc	strtab.h
 strstore.o:		strstore.cc	strstore.h

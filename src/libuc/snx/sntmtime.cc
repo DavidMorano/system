@@ -156,7 +156,7 @@ int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex {
 	        }
 	        rs1 = ss.finish ; /* <- return value */
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
+	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -188,8 +188,7 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'C':
 	                {
-	                    int		y ;
-	                    y = ((tmp->year+TM_YEAR_BASE)/nyears) ;
+	                    cint y = ((tmp->year+TM_YEAR_BASE)/nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;
@@ -240,7 +239,7 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
     			/* FALLTHROUGH */
 	            case 'p':
 	                if (rs >= 0) {
-	                    cchar	*cp = (tmp->hour < 12) ? "am" : "pm" ;
+	                    cchar *cp = (tmp->hour < 12) ? "am" : "pm" ;
 	                    rs = sbuf_strw(ssp,cp,2) ;
 	                }
 	                break ;
@@ -249,7 +248,7 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'U':
 	                {
-	                    int		w = ((tmp->yday + 7 - tmp->wday) / 7) ;
+	                    cint w = ((tmp->yday + 7 - tmp->wday) / 7) ;
 	                    rs = sbuf_twodig(ssp,w) ;
 	                }
 	                break ;
@@ -271,7 +270,7 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	            case 'W':
 	                {
 	                    int		w ;
-	                    w = (tmp->yday+7-(tmp->wday?(tmp->wday-1):6))/7 ;
+			    w = (tmp->yday+7-(tmp->wday?(tmp->wday-1):6))/7 ;
 	                    rs = sbuf_twodig(ssp,w) ;
 	                }
 	                break ;
@@ -280,8 +279,7 @@ static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'y':
 	                {
-	                    int		y ;
-	                    y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
+	                    cint y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;

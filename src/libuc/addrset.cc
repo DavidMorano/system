@@ -1,4 +1,5 @@
 /* addrset SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* track memory addresses */
@@ -8,7 +9,7 @@
 /* revision history:
 
 	= 2011-04-12, David A­D­ Morano
-	This code was originally written. This is a sort of
+	This code was originally written.  This is a sort of
 	test to replace the previous memory tracking implementation
 	inside of the |ucmemalloc(3uc)| facility (so loved).
 
@@ -52,6 +53,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<utility>		/* |std::unreachable()| */
 #include	<new>
@@ -100,6 +102,9 @@ typedef const nothrow_t			cnothrow ;
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -320,8 +325,7 @@ int addrset::icount() noex {
 void addrset::dtor() noex {
 	ulogerror("addrset",SR_BUGCHECK,"dtor called") ;
 	if (magic) {
-	    cint	rs = ifinish() ;
-	    if (rs < 0) {
+	    if (cint rs = ifinish() ; rs < 0) {
 		ulogerror("addrset",rs,"dtor-finish") ;
 	    }
 	}

@@ -1,4 +1,5 @@
 /* graph HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* Dijkstra (shortest path through graph) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	graph
+
+	Description:
 	We collect some graph-related elements.
 
 *******************************************************************************/
@@ -45,26 +50,24 @@ struct graph_edge {
 	int		dst ;	/* destination vertex */
 	int		weight ; /* weight of edge to this vertex */
 	graph_edge() noex : dst(0), weight(0) { } ;
-	graph_edge(int adst,int aweight = 0) noex : dst(adst), weight(aweight) {
-	} ;
+	graph_edge(int ad,int aw = 0) noex : dst(ad), weight(aw) { } ;
 } ;
 
 struct graph_res {
 	int		dist ; /* distance (summed weight) to present vertex */
 	int		prev ; /* previous vertex */
 	graph_res() noex : dist(0), prev(-1) { } ;
-	graph_res(int adist,int aprev = -1) noex : dist(adist), prev(aprev) {
-	} noex ;
+	graph_res(int ad,int ap = -1) noex : dist(ad), prev(ap) { } ;
 	graph_res &operator = (const graph_res &other) noex {
 	    dist = other.dist ;
 	    prev = other.prev ;
 	    return (*this) ;
-	} noex ;
+	} ;
 	graph_res &operator = (int adist) noex {
 	    dist = adist ;
 	    prev = -1 ;
 	    return (*this) ;
-	} noex ;
+	} ;
 } ;
 
 

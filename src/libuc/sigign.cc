@@ -109,7 +109,7 @@ int sigign_start(sigign *iap,cint *ignores) noex {
 	                            sap = &hp[j].action ;
 	                            u_sigaction(hsig,sap,nullptr) ;
 	                        }
-			    }
+			    } /* end if (error handling) */
 	                } /* end if (ignores) */
 		        if (rs < 0) {
 	      		    uc_free(iap->handles) ;

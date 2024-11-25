@@ -62,8 +62,9 @@ struct absfn : absfn_head {
 	absfn(const absfn &) = delete ;
 	absfn &operator = (const absfn &) = delete ;
 	int start(cchar *sp,int sl,cchar **) noex ;
+	void dtor() noex ;
 	~absfn() noex {
-	    (void) int(finish) ;
+	    dtor() ;
 	} ;
 } ; /* end struct (absfn) */
 #else /* __cplusplus */

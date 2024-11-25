@@ -1,4 +1,5 @@
 /* altzone HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* deal with bad declaration of the |altzone| global variable */
@@ -16,9 +17,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	altzone
+
+	Description:
 	Finally, note that SlowLaris has a 'define' bug in that it
 	does not declare the 'altzone' variable unless some other
-	defines are made (see the code). It is not clear if and
+	defines are made (see the code).  It is not clear if and
 	when this will be or has been fixed.  This subroutine does
 	not currently use the 'altzone' variable anyway.
 

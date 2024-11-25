@@ -1,4 +1,5 @@
 /* base64 SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform BASE64 encoding and decoding */

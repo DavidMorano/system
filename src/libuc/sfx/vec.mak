@@ -76,15 +76,19 @@ OBJF_VECPSTR=
 OBJ_VECPSTR+= obja_vecpstr.o
 
 # VECSTRX
-OBJA_VECSTRX= vecstrx_addpath.o vecstrx_adds.o vecstrx_addsubdirs.o
-OBJB_VECSTRX= vecstrx_addsyms.o vecstrx_adduniqs.o
-OBJC_VECSTRX= vecstrx_env.o vecstrx_envfile.o vecstrx_foilcmp.o
-OBJD_VECSTRX= vecstrx_loadgrusers.o vecstrx_loadpjusers.o
-OBJE_VECSTRX= vecstrx_srvargs.o vecstrx_svcargs.o
-OBJF_VECSTRX= vecstrx_loadfile.o 
+OBJ0_VECSTRX= vecstrx_addpath.o vecstrx_adds.o 
+OBJ1_VECSTRX= vecstrx_addsyms.o vecstrx_adduniqs.o
+OBJ2_VECSTRX= vecstrx_env.o vecstrx_envfile.o vecstrx_foilcmp.o
+OBJ3_VECSTRX= vecstrx_loadgrusers.o vecstrx_loadpjusers.o
+OBJ4_VECSTRX= vecstrx_srvargs.o vecstrx_svcargs.o
+OBJ5_VECSTRX= vecstrx_loadfile.o 
+OBJ6_VECSTRX= vecstrx_addsubdirs.o
 
-OBJ_VECSTRX+= obja_vecstrx.o objb_vecstrx.o objc_vecstrx.o 
-OBJ_VECSTRX+= objd_vecstrx.o obje_vecstrx.o objf_vecstrx.o 
+OBJA_VECSTRX= obj0_vecstrx.o obj1_vecstrx.o 
+OBJB_VECSTRX= obj2_vecstrx.o obj3_vecstrx.o 
+OBJC_VECSTRX= obj4_vecstrx.o obj5_vecstrx.o obj6_vecstrx.o
+
+OBJ_VECSTRX= obja_vecstrx.o objb_vecstrx.o objc_vecstrx.o
 
 # vecobj
 OBJA_VECOBJ= vecobj.o
@@ -183,6 +187,21 @@ objf_vecpstr.o:	$(OBJF_VECPSTR)
 obj_vecpstr.o:	$(OBJ_VECPSTR)
 	$(LD) -r -o $@ $(OBJ_VECPSTR)
 
+obj0_vecstrx.o:	$(OBJ0_VECSTRX)
+	$(LD) -r -o $@ $(OBJ0_VECSTRX)
+obj1_vecstrx.o:	$(OBJ1_VECSTRX)
+	$(LD) -r -o $@ $(OBJ1_VECSTRX)
+obj2_vecstrx.o:	$(OBJ2_VECSTRX)
+	$(LD) -r -o $@ $(OBJ2_VECSTRX)
+obj3_vecstrx.o:	$(OBJ3_VECSTRX)
+	$(LD) -r -o $@ $(OBJ3_VECSTRX)
+obj4_vecstrx.o:	$(OBJ4_VECSTRX)
+	$(LD) -r -o $@ $(OBJ4_VECSTRX)
+obj5_vecstrx.o:	$(OBJ5_VECSTRX)
+	$(LD) -r -o $@ $(OBJ5_VECSTRX)
+obj6_vecstrx.o:	$(OBJ6_VECSTRX)
+	$(LD) -r -o $@ $(OBJ6_VECSTRX)
+
 obja_vecstrx.o:	$(OBJA_VECSTRX)
 	$(LD) -r -o $@ $(OBJA_VECSTRX)
 objb_vecstrx.o:	$(OBJB_VECSTRX)
@@ -191,10 +210,6 @@ objc_vecstrx.o:	$(OBJC_VECSTRX)
 	$(LD) -r -o $@ $(OBJC_VECSTRX)
 objd_vecstrx.o:	$(OBJD_VECSTRX)
 	$(LD) -r -o $@ $(OBJD_VECSTRX)
-obje_vecstrx.o:	$(OBJE_VECSTRX)
-	$(LD) -r -o $@ $(OBJE_VECSTRX)
-objf_vecstrx.o:	$(OBJF_VECSTRX)
-	$(LD) -r -o $@ $(OBJF_VECSTRX)
 
 obj_vecstrx.o:	$(OBJ_VECSTRX)
 	$(LD) -r -o $@ $(OBJ_VECSTRX)
