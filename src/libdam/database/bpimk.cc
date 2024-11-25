@@ -1,10 +1,11 @@
-/* bpimk */
+/* bpimk SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make a BPI database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,27 +18,27 @@
 
 /*******************************************************************************
 
+  	Object:
+	vpimk
+
+	Description:
 	This module creates a BPI database file.
 
 	Synopsis:
-
 	int bpimk_open(op,dbname,...)
 	BPIMK		*op ;
 	const char	dbname[] ;
 
 	Arguments:
-
 	- op		object pointer
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
+	<0		error code (system-return)
 
 
 	Notes:
-
 	= possible returns to an open attempt
 
 	- OK (creating)
@@ -68,12 +69,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<vecobj.h>

@@ -1,12 +1,13 @@
-/* bpi */
+/* bpi SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* read or audit a BPI (Bible Paragraph Index) database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUGENTS	0		/* mode debugging */
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */
-
 
 /* revision history:
 
@@ -19,41 +20,37 @@
 
 /*******************************************************************************
 
-        This subroutine opens and allows for reading or auditing of a BPI (Bible
-        Paragraph Index) database.
+  	Object:
+	bpi
+
+	Description:
+	This subroutine opens and allows for reading or auditing
+	of a BPI (Bible Paragraph Index) database.
 
 	Synopsis:
-
-	int bpi_open(op,dbname)
-	BPI		*op ;
-	const char	dbname[] ;
+	int bpi_open(bpi *op,cchar *dbname) noex
 
 	Arguments:
-
 	- op		object pointer
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<char.h>

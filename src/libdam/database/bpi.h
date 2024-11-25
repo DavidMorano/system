@@ -1,6 +1,9 @@
-/* bpi */
+/* bpi HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 /* Bible Paragraph Index */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,22 +16,21 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BPI_INCLUDE
-#define	BPI_INCLUDE	1
+#define	BPI_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
-#include	<localmisc.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	"bpihdr.h"		/* this is the hash-file-header */
 
 
 #define	BPI_SUF		"bpi"		/* bible-paragraph-index */
-
 #define	BPI		struct bpi_head
-
 #define	BPI_OBJ		struct bpi_obj
 #define	BPI_QUERY	struct bpi_q
 #define	BPI_Q		struct bpi_q
@@ -37,9 +39,8 @@
 #define	BPI_INFO	struct bpi_i
 
 
-/* this is the shared-object description */
 struct bpi_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
