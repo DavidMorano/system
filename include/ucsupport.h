@@ -1,0 +1,35 @@
+/* ucsupport HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 */
+
+/* support utilities for the LIBUC library */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-10, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	UCSUPPORT_INCLUDE
+#define	UCSUPPORT_INCLUDE
+
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+
+#include	<spwd.h>
+#include	<ucpasswd.h>
+#include	<ucproject.h>
+
+
+#endif /* UCSUPPORT_INCLUDE */
+
+

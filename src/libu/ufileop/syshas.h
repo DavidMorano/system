@@ -243,6 +243,9 @@
 /* Solaris®: |dirent_t| */
 #define	SYSHAS_TYPEDIRENT	1
 
+/* Solaris®: |sig_t| */
+#define	SYSHAS_TYPESIGT		0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -475,6 +478,9 @@
 /* Darwin: |dirent_t| */
 #define	SYSHAS_TYPEDIRENT	0
 
+/* Darwin®: |sig_t| */
+#define	SYSHAS_TYPESIGT		1
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -686,6 +692,9 @@
 
 /* Linux: |dirent_t| */
 #define	SYSHAS_TYPEDIRENT	0
+
+/* Linux: |sig_t| */
+#define	SYSHAS_TYPESIGT		0
 
 /******************************************************************************/
 #endif /* OSNAME */

@@ -53,8 +53,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -296,8 +298,7 @@ int bufstr::get(cchar **rpp) noex {
 }
 
 void bufstr::dtor() noex {
-	cint		rs = bufstr_finish(this) ;
-	if (rs < 0) {
+	if (cint rs = bufstr_finish(this) ; rs < 0) {
 	    ulogerror("bufstr",rs,"fini-finish") ;
 	}
 }

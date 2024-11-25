@@ -164,7 +164,7 @@ static int getlogtermer(char *dbuf,int dlen,int usid) noex {
             } /* end if (got it) */
             rs1 = ut.close ;
             if (rs >= 0) rs = rs1 ;
-        } /* end if (UTMPX open) */
+        } /* end if (TMPX) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getlogtermer) */

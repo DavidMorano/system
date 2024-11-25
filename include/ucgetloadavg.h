@@ -1,4 +1,5 @@
 /* ucgetloadavg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -19,8 +20,12 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_getloadavg
+
+	Description:
 	This file contains the UNIX system types that the brain-damaged
-	MacOS operating system does NOT have.  We are trying in a
+	MacOS operating system does NOT have.   We are trying in a
 	very small way to make up for some of the immense brain-damage
 	within the Apple Darwin operating system.
 
@@ -34,7 +39,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

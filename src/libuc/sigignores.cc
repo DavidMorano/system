@@ -1,4 +1,5 @@
 /* sigignores SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* ignores a group of signals */
@@ -28,7 +29,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 
 

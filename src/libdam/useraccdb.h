@@ -13,7 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>		/* for 'ino_t' */
+#include	<sys/types.h>		/* system types */
+#include	<sys/stat.h>		/* system types */
+#include	<usystem.h>		/* for |ino_t| */
 #include	<filer.h>
 #include	<dater.h>
 

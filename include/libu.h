@@ -1,4 +1,5 @@
 /* usyscalls HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -47,6 +48,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	<usys.h>	/* <- auxilllary OS support */
 
@@ -62,6 +64,8 @@
 #include	<usig.h>
 #include	<uprocess.h>
 #include	<uexec.h>
+
+#include	<ptx.h>
 
 
 #endif /* USYSCALLS_INCLUDE */

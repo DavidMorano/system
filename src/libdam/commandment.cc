@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<modload.h>
@@ -207,7 +206,7 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbname) noex {
 		    commandment_calls	*callp = callsp(op->callp) ;
 		    rs = SR_NOSYS ;
 		    if (callp->open) {
-			auto co = callp->open ;
+			auto 	co = callp->open ;
 	                if ((rs = co(op->obj,pr,dbname)) >= 0) {
 		            op->magic = COMMANDMENT_MAGIC ;
 	                }
@@ -231,7 +230,7 @@ int commandment_close(CMD *op) noex {
 	if ((rs = commandment_magic(op)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    if (callp->close) {
-		auto co = callp->close ;
+		auto 	co = callp->close ;
 	        rs1 = co(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
@@ -257,7 +256,7 @@ int commandment_audit(CMD *op) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
-		auto co = callp->audit ;
+		auto 	co = callp->audit ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -271,7 +270,7 @@ int commandment_count(CMD *op) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->count) {
-		auto co = callp->count ;
+		auto 	co = callp->count ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -285,7 +284,7 @@ int commandment_nummax(CMD *op) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->nummax) {
-		auto co = callp->nummax ;
+		auto 	co = callp->nummax ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -299,7 +298,7 @@ int commandment_read(CMD *op,char *rbuf,int rlen,uint cn) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->read) {
-		auto co = callp->read ;
+		auto 	co = callp->read ;
     		rs = co(op->obj,rbuf,rlen,cn) ;
 	    }
 	} /* end if (magic) */
@@ -329,7 +328,7 @@ int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 		cint	csz = op->cursize ;
 	        if (void *vp ; (rs = uc_malloc(csz,&vp)) >= 0) {
 		    curp->scp = vp ;
-		    auto co = callp->curbegin ;
+		    auto 	co = callp->curbegin ;
 		    if ((rs = co(op->obj,curp->scp)) >= 0) {
 		         curp->magic = COMMANDMENT_MAGIC ;
 		    }
@@ -357,7 +356,7 @@ int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 	    rs = SR_NOTOPEN ;
 	    if ((curp->magic == COMMANDMENT_MAGIC) && curp->scp) {
 	        if (callp->curend) {
-		    auto co = callp->curend ;
+		    auto 	co = callp->curend ;
 	            rs1 = co(op->obj,curp->scp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
@@ -381,7 +380,7 @@ int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
 	    rs = SR_NOSYS ;
 	    if (callp->curenum) {
 	        COMMANDMENTS_ENT	cse{} ;
-		auto co = callp->curenum ;
+		auto 	co = callp->curenum ;
 	        rs = co(op->obj,curp->scp,&cse,rbuf,rlen) ;
 	        if (cnp) *cnp = cse.cn ;
 	    }

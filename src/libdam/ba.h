@@ -1,4 +1,5 @@
 /* ba HEADER (BitArray) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* perform some bit-array type operations */
@@ -46,15 +47,15 @@ typedef	BA_NUM		ba_num ;
 
 EXTERNC_begin
 
-extern int	ba_start(ba *,BA_NUM *,int) noex ;
+extern int	ba_start(ba *,ba_num *,int) noex ;
 extern int	ba_setones(ba *) noex ;
 extern int	ba_zero(ba *) noex ;
 extern int	ba_countdown(ba *) noex ;
-extern int	ba_and(ba *,BA *) noex ;
+extern int	ba_and(ba *,ba *) noex ;
 extern int	ba_finish(ba *) noex ;
 /* helpers functions */
-extern int	banum_prepare(BA_NUM *) noex ;
-extern int	banum_forsake(BA_NUM *) noex ;
+extern int	banum_prepare(ba_num *) noex ;
+extern int	banum_forsake(ba_num *) noex ;
 
 EXTERNC_end
 

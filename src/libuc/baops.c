@@ -1,4 +1,5 @@
 /* baops SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* bit-array operations */
@@ -20,17 +21,23 @@
 
 /*******************************************************************************
 
+  	Group:
+	baops
+
+	Description:
 	This facility is now entirely defined within the corresponding
-	header-source file. The older C-language inline subroutines
+	header-source file.  The older C-language inline subroutines
 	(that used to be here) are now in the header file as
 	static-inlines.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
-#include	<stdintx.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"baops.h"

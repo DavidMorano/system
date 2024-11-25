@@ -9,7 +9,8 @@
 /* revision history:
 
 	- 2008-10-01, David A­D­ Morano
-	This module was originally written for hardware CAD support.
+	This object module was originally written for some previous
+	purpose and was adapted for the present use.
 
 */
 
@@ -43,12 +44,12 @@
 
 /* local defines */
 
-#define	BM		biblemeta
+#define	BM			biblemeta
 
 #define	BIBLEMETA_DBNAME	"english"
 #define	BIBLEMETA_DBDNAME	"lib/bibleset/metawords"
 #define	BIBLEMETA_DBTITLE	"Bible"
-#define	BIBLEMETA_DEFENTRIES	67
+#define	BIBLEMETA_DEFENTS	67
 
 
 /* imported namespaces */
@@ -112,6 +113,8 @@ static inline int biblemeta_magic(biblemeta *op,Args ... args) noex {
 }
 /* end subroutine (biblemeta_magic) */
 
+static int	biblemeta_opener(BM *,cc *,cc *) noex ;
+
 
 /* exported variables */
 
@@ -132,31 +135,19 @@ BIBLEMETA_OBJ	biblemeta_modinfo = {
 int biblemeta_open(BM *op,cchar *pr,cchar *dbn) noex {
     	cnullptr	np{} ;
 	int		rs ;
+	int		rc = 0 ;
 	if ((dbn == np) || (dbn[0] == '\0')) dbn = BIBLEMETA_DBNAME ;
 	if ((rs = biblemeta_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
-	        cint	vn = BIBLEMETA_DEFENTRIES ;
-		cint	vo = 0 ;
-	        if ((rs = vecstr_start(op->dbp,vn,vo)) >= 0) {
-	            char	tbuf[MAXPATHLEN + 1] ;
-	            if ((rs = mkpath3(tbuf,pr,BIBLEMETA_DBDNAME,dbn)) >= 0) {
-	                if ((rs = vecstr_loadfile(op->dbp,false,tbuf)) >= 0) {
-	                    if ((rs = vecstr_count(op->dbp)) >= 0) {
-	                        op->magic = BIBLEMETA_MAGIC ;
-	                    }
-	                } /* end if (vecstr_loadfile) */
-	            } /* end if (mkpath) */
-	            if (rs < 0) {
-		        vecstr_finish(op->dbp) ;
-	            }
-	        } /* end if (vecstr_start) */
+		rs = biblemeta_opener(op,pr,dbn) ;
+		rc = rs ;
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		biblemeta_dtor(op) ;
 	    }
 	} /* end if (biblemeta_ctor) */
-	return rs ;
+	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (biblemeta_open) */
 
@@ -217,5 +208,33 @@ int biblemeta_get(BM *op,int i,char *rbuf,int rlen) noex {
 	return rs ;
 }
 /* end subroutine (biblemeta_get) */
+
+
+/* local subroutines */
+
+static int biblemeta_opener(BM *op,cc *pr,cc *dbn) noex {
+	cint		vn = BIBLEMETA_DEFENTS ;
+	cint		vo = 0 ;
+	int		rs ;
+	int		c = 0 ;
+	if ((rs = vecstr_start(op->dbp,vn,vo)) >= 0) {
+	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if ((rs = mkpath3(tbuf,pr,BIBLEMETA_DBDNAME,dbn)) >= 0) {
+	            if ((rs = vecstr_loadfile(op->dbp,false,tbuf)) >= 0) {
+	                if ((rs = vecstr_count(op->dbp)) >= 0) {
+			    c = rs ;
+	                    op->magic = BIBLEMETA_MAGIC ;
+	                }
+	            } /* end if (vecstr_loadfile) */
+	        } /* end if (mkpath) */
+		rs = rsfree(rs,tbuf) ;
+	    } /* end if (m-a-f) */
+	    if (rs < 0) {
+		vecstr_finish(op->dbp) ;
+	    }
+	} /* end if (vecstr_start) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (biblemeta_opener) */
 
 

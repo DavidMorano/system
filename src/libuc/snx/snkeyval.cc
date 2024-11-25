@@ -1,6 +1,6 @@
 /* snkeyval SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* string formatting (key-value pair) */
 /* version %I% last-modified %G% */
@@ -33,8 +33,8 @@
 	dbuf		destination buffer
 	dlen		destination buffer length
 	kp		key-pointer
-	vp		value-pointer
 	kl		key length
+	vp		value-pointer
 	vl		value-length
 
 	Returns:
@@ -80,23 +80,18 @@
 
 int snkeyval(char *dbuf,int dlen,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
 	if (dbuf && kp) {
-	    rs = SR_OK ;
-	    if (rs >= 0) {
-	        rs = storebuf_strw(dbuf,dlen,i,kp,kl) ;
-	        i += rs ;
-	    }
-	    if (rs >= 0) {
-	        rs = storebuf_chr(dbuf,dlen,i,CHX_MIDDLE) ;
-	        i += rs ;
-	    }
-	    if ((rs >= 0) && vp) {
-	        rs = storebuf_strw(dbuf,dlen,i,vp,vl) ;
-	        i += rs ;
-	    }
+	    rs = SR_INVALID ;
+	    if (kp[0]) {
+    	        if (storebuf sb(dbuf,dlen) ; (rs = sb.strw(kp,kl)) >= 0) {
+	            if ((rs = sb.chr(CHX_MIDDLE)) >= 0) {
+	                if (vp) rs = sb.strw(vp,vl) ;
+	                if (rs >= 0) rs = sb.idx ;
+		    }
+		} /* end if (storebuf) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return rs ;
 }
 /* end subroutine (snkeyval) */
 

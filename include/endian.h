@@ -1,4 +1,5 @@
 /* endian HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* machine endian management */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	endian
+
+	Description:
 	This module provides machine endian managemnt.
 
 *******************************************************************************/
@@ -28,6 +33,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #ifndef	ENDIAN

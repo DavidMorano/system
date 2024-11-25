@@ -1,7 +1,8 @@
 /* sighand HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* little object to block signals */
+/* little object to handle signals */
 /* version %I% last-modified %G% */
 
 
@@ -19,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<signal.h>
 #include	<usystem.h>
 
@@ -48,9 +49,10 @@ typedef	SIGHAND_HA	sighand_ha ;
 EXTERNC_begin
 
 typedef void (*sighand_handler)(int,siginfo_t *,void *) noex ;
+typedef void (*sighand_f)(int,siginfo_t *,void *) noex ;
 
-extern int sighand_start(SIGHAND *,cint *,cint *,cint *,sighand_handler) noex ;
-extern int sighand_finish(SIGHAND *) noex ;
+extern int sighand_start(sighand *,cint *,cint *,cint *,sighand_f) noex ;
+extern int sighand_finish(sighand *) noex ;
 
 EXTERNC_end
 

@@ -1,4 +1,5 @@
 /* base64 HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* perform BASE64 encoding and decoding */
@@ -15,6 +16,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>		/* |base64_d| can return an SR */
 
 
 extern const uchar	base64_et[] ;

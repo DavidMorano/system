@@ -21,7 +21,7 @@
 	sntmtime
 
 	Description:
-	Ths subroutine is similar to 'sncpy1(3dam)' but it takes a
+	Ths subroutine is similar to |sncpy1(3dam)| but it takes a
 	broken-out time-specification (a la object TMTIME) and
 	creates the corresponding string in the destination buffer.
 	A format specifiction is supplied to determine what the
@@ -123,15 +123,15 @@
 
 /* forward references */
 
-static int	sbuf_fmtstrs(sbuf *,TMTIME *,cchar *) noex ;
+static int	sbuf_fmtstrs(sbuf *,tmtime *,cchar *) noex ;
 static int	sbuf_twodig(sbuf *,int) noex ;
 static int	sbuf_digs(sbuf *,int,int,int) noex ;
-static int	sbuf_coder(sbuf *,TMTIME *,int) noex ;
-static int	sbuf_year(sbuf *,TMTIME *) noex ;
-static int	sbuf_zoff(sbuf *,TMTIME *) noex ;
-static int	sbuf_dated(sbuf *,TMTIME *) noex ;
-static int	sbuf_dater(sbuf *,TMTIME *) noex ;
-static int	sbuf_datex(sbuf *,TMTIME *) noex ;
+static int	sbuf_coder(sbuf *,tmtime *,int) noex ;
+static int	sbuf_year(sbuf *,tmtime *) noex ;
+static int	sbuf_zoff(sbuf *,tmtime *) noex ;
+static int	sbuf_dated(sbuf *,tmtime *) noex ;
+static int	sbuf_dater(sbuf *,tmtime *) noex ;
+static int	sbuf_datex(sbuf *,tmtime *) noex ;
 
 
 /* local variables */
@@ -146,7 +146,7 @@ constexpr int		nyears = NYEARS_CENTURY ;
 
 /* exported subroutines */
 
-int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex {
+int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf && tmp && fmt) {
@@ -156,7 +156,7 @@ int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex {
 	        }
 	        rs1 = ss.finish ; /* <- return value */
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
+	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -165,7 +165,7 @@ int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex {
 
 /* local subroutines */
 
-static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
+static int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	int		rs = SR_FAULT ;
 	if (ssp && tmp) {
 	    cchar	*const *m = calstrs_months ;
@@ -188,8 +188,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'C':
 	                {
-	                    int		y ;
-	                    y = ((tmp->year+TM_YEAR_BASE)/nyears) ;
+	                    cint y = ((tmp->year+TM_YEAR_BASE)/nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;
@@ -240,7 +239,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
     			/* FALLTHROUGH */
 	            case 'p':
 	                if (rs >= 0) {
-	                    cchar	*cp = (tmp->hour < 12) ? "am" : "pm" ;
+	                    cchar *cp = (tmp->hour < 12) ? "am" : "pm" ;
 	                    rs = sbuf_strw(ssp,cp,2) ;
 	                }
 	                break ;
@@ -249,7 +248,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'U':
 	                {
-	                    int		w = ((tmp->yday + 7 - tmp->wday) / 7) ;
+	                    cint w = ((tmp->yday + 7 - tmp->wday) / 7) ;
 	                    rs = sbuf_twodig(ssp,w) ;
 	                }
 	                break ;
@@ -271,7 +270,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	            case 'W':
 	                {
 	                    int		w ;
-	                    w = (tmp->yday+7-(tmp->wday?(tmp->wday-1):6))/7 ;
+			    w = (tmp->yday+7-(tmp->wday?(tmp->wday-1):6))/7 ;
 	                    rs = sbuf_twodig(ssp,w) ;
 	                }
 	                break ;
@@ -280,8 +279,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'y':
 	                {
-	                    int		y ;
-	                    y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
+	                    cint y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;
@@ -368,7 +366,7 @@ static int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 }
 /* end subroutine (sbuf_digs) */
 
-static int sbuf_year(sbuf *ssp,TMTIME *tmp) noex {
+static int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
 	cint		y = ((tmp->year + TM_YEAR_BASE)%10000) ;
 	int		rs ;
 	char		dbuf[4+1] ;
@@ -379,7 +377,7 @@ static int sbuf_year(sbuf *ssp,TMTIME *tmp) noex {
 }
 /* end subroutine (sbuf_year) */
 
-static int sbuf_coder(sbuf *ssp,TMTIME *tmp,int f_sec) noex {
+static int sbuf_coder(sbuf *ssp,tmtime *tmp,int f_sec) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,tmp->hour)) >= 0) {
 	    if ((rs = sbuf_chr(ssp,':')) >= 0) {
@@ -396,7 +394,7 @@ static int sbuf_coder(sbuf *ssp,TMTIME *tmp,int f_sec) noex {
 }
 /* end subroutine (sbuf_coder) */
 
-static int sbuf_zoff(sbuf *ssp,TMTIME *tmp) noex {
+static int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
 	cint		zo = (tmp->gmtoff / 60) ; /* minutes west of GMT */
 	int		rs ;
 	{
@@ -413,7 +411,7 @@ static int sbuf_zoff(sbuf *ssp,TMTIME *tmp) noex {
 }
 /* end subroutine (sbuf_zoff) */
 
-static int sbuf_dated(sbuf *ssp,TMTIME *tmp) noex {
+static int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,(tmp->mon+1))) >= 0) {
 	    if ((rs = sbuf_chr(ssp,'/')) >= 0) {
@@ -430,7 +428,7 @@ static int sbuf_dated(sbuf *ssp,TMTIME *tmp) noex {
 }
 /* end subroutine (sbuf_dated) */
 
-static int sbuf_dater(sbuf *ssp,TMTIME *tmp) noex {
+static int sbuf_dater(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_year(ssp,tmp)) >= 0) {
 	    if ((rs = sbuf_chr(ssp,'-')) >= 0) {
@@ -445,7 +443,7 @@ static int sbuf_dater(sbuf *ssp,TMTIME *tmp) noex {
 }
 /* end subroutine (sbuf_dater) */
 
-static int sbuf_datex(sbuf *ssp,TMTIME *tmp) noex {
+static int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
 	    if ((rs = sbuf_chr(ssp,' ')) >= 0) {

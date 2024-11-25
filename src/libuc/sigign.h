@@ -1,7 +1,8 @@
 /* sigign HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* little object to block signals */
+/* little object to ignore (block?) signals */
 /* version %I% last-modified %G% */
 
 
@@ -35,9 +36,9 @@ struct sigign_handle {
 } ;
 
 struct sigign_head {
-	uint		magic ;
-	sigset_t	osm ;
 	SIGIGN_HA	*handles ;
+	sigset_t	osm ;
+	uint		magic ;
 	int		nhandles ;
 	int		nblocks ;
 } ;

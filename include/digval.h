@@ -1,4 +1,5 @@
 /* digval HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the value of a single hexadecimal digit */

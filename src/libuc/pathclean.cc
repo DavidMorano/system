@@ -41,7 +41,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strnlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<strwcpy.h>

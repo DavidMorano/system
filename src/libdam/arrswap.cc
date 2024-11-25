@@ -1,4 +1,5 @@
 /* arrswap SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* array swap */
@@ -38,13 +39,12 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 

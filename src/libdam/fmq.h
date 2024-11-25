@@ -1,4 +1,5 @@
 /* fmq HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* File Message Queue (FMQ) */
@@ -30,15 +31,14 @@
 #include	<usysrets.h>
 
 
-#define	FMQ_MAGIC	0x21419876
-#define	FMQ		struct fmq_head
-#define	FMQ_FL		struct fmq_flags
-#define	FMQ_FM		struct fmq_filemagic
-#define	FMQ_FH		struct fmq_filehead
-#define	FMQ_BD		struct fmq_bufdesc
-
+#define	FMQ_MAGIC		0x21419876
+#define	FMQ			struct fmq_head
+#define	FMQ_FL			struct fmq_flags
+#define	FMQ_FM			struct fmq_filemagic
+#define	FMQ_FH			struct fmq_filehead
+#define	FMQ_BD			struct fmq_bufdesc
 #define	FMQ_FILEMAGIC		"FMQ"
-#define	FMQ_FILEMAGICLEN	strlen(FMQ_FILEMAGIC)
+#define	FMQ_FILEMAGICSIZE	16
 #define	FMQ_FILEVERSION		0
 #define	FMQ_ENDIAN		0
 
@@ -98,7 +98,7 @@ struct fmq_head {
 	int		fd ;
 	int		count ;
 	mode_t		operm ;
-} ;
+} ; /* end struct (fmq_head) */
 
 typedef	FMQ		fmq ;
 typedef	FMQ_FL		fmq_fl ;

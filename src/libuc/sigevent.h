@@ -1,4 +1,5 @@
 /* sigevent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* signal event object methods */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	sigevent_load
+
+	Description:
 	Methods for the signal-event object.
 
 *******************************************************************************/

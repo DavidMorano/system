@@ -1,4 +1,5 @@
 /* rsfree SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* special memory-allocation free-up */
@@ -38,7 +39,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<ulogerror.h>
 #include	<localmisc.h>
 
 #include	"rsfree.h"
@@ -74,7 +74,7 @@
 /* exported subroutines */
 
 int rsfree(int rs,cvoid *vp) noex {
-	int	rs1 = uc_free(vp) ;
+	cint	rs1 = uc_free(vp) ;
 	if (rs >= 0) rs = rs1 ;
 	return rs ;
 }

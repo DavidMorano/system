@@ -1,4 +1,5 @@
 /* sigign SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage process signals */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	sigign
+
+	Description:
 	This small object provides a way to manage (block, ignore,
 	and catch) process signals.
 
@@ -26,6 +31,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -42,7 +49,7 @@
 /* exported variables */
 
 
-/* local subroutines */
+/* local structures */
 
 
 /* forward references */
@@ -50,7 +57,7 @@
 
 /* local variables */
 
-static constexpr int	sigouts[] = {
+constexpr int	sigouts[] = {
 	SIGTTOU,
 	0
 } ;
@@ -61,25 +68,24 @@ static constexpr int	sigouts[] = {
 
 /* exported subroutines */
 
-int sigign_start(SIGIGN *iap,cint *ignores) noex {
+int sigign_start(sigign *iap,cint *ignores) noex {
 	int		rs = SR_FAULT ;
 	int		nhandles = 0 ;
 	if (iap) {
-	    rs = SR_OK ;
 	    if (ignores == nullptr) ignores = sigouts ;
-	    memclear(iap) ;
+	    rs = memclear(iap) ;
 	    if (ignores != nullptr) {
-	        int	i = 0 ;
+	        int	i ; /* used-afterwards */
 	        for (i = 0 ; ignores[i] != 0 ; i += 1) {
 		    nhandles += 1 ;
 	        }
 	        nhandles = i ;
 	        if (nhandles > 0) {
-	            cint	size = (nhandles * sizeof(sigign_ha)) ;
-	            void	*vp ;
+	            cint	size = (nhandles * szof(sigign_ha)) ;
 	            iap->nhandles = nhandles ;
-	            if ((rs = uc_malloc(size,&vp)) >= 0) {
-	                SIGACTION	san, *sap ;
+	            if (void *vp{} ; (rs = uc_malloc(size,&vp)) >= 0) {
+	                SIGACTION	san{} ;
+	                SIGACTION	*sap ;
 	                sigset_t	nsm ;
 	                iap->handles = (sigign_ha *) vp ;
 	                uc_sigsetempty(&nsm) ;
@@ -103,7 +109,7 @@ int sigign_start(SIGIGN *iap,cint *ignores) noex {
 	                            sap = &hp[j].action ;
 	                            u_sigaction(hsig,sap,nullptr) ;
 	                        }
-			    }
+			    } /* end if (error handling) */
 	                } /* end if (ignores) */
 		        if (rs < 0) {
 	      		    uc_free(iap->handles) ;
@@ -120,7 +126,7 @@ int sigign_start(SIGIGN *iap,cint *ignores) noex {
 }
 /* end subroutine (sigign_start) */
 
-int sigign_finish(SIGIGN *iap) noex {
+int sigign_finish(sigign *iap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (iap) {

@@ -1,4 +1,4 @@
-/* utimeotdefs HEADER */
+/* utimeoutdefs HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Data:
+	utimeoutdefs
+
+	Description:
 	Timeout values for various UNIX system and UNX C-library
 	services are initialized early (as early as possible from
 	module-load time) with the default values below.  All timeout

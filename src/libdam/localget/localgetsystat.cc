@@ -48,14 +48,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
+#include	<uvariables.hh>
 #include	<ucprogdata.h>
 #include	<mallocxx.h>
-#include	<strlibval.hh>
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -67,11 +65,6 @@
 
 /* local defines */
 
-#ifndef	VARSYSTAT
-#define	VARSYSTAT	"SYSTAT"
-#endif
-
-#define	VARDNAME	"var"
 #define	SYSTATFNAME	"systat"
 #define	TO_TTL		(5*60)
 
@@ -88,15 +81,74 @@
 
 /* local structures */
 
+enum orgloccos {
+	systaterco_start,
+	systaterco_finish,
+	systaterco_overlast
+} ;
+
+namespace {
+    struct systater ;
+    struct systater_co {
+	systater	*op{} ;
+	int		w = -1 ;
+	void operator () (systater *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+        operator int () noex ;
+    } ; /* end struct (systater_co) */
+    struct systater {
+	cchar		*pr ;
+	char		*rbuf ;
+	int		rlen ;
+	systater_co	start ;
+	systater_co	finish ;
+	systater(cc *p,char *rb,int rl) noex : pr(p), rbuf(rb), rlen(rl) {
+	    start(this,systaterco_start) ;
+	    finish(this,systaterco_finish) ;
+	} ;
+	operator int () noex ;
+	int env() noex ;
+	int cache() noex ;
+	int localconf() noex ;
+	int istart() noex ;
+	int ifinish() noex ;
+	~systater() {
+	    (void) ifinish() ;
+	} ;
+    } ; /* end struct (systater) */
+}
+
+typedef int (systater::*systater_m)() noex ;
+
 
 /* forward references */
 
 
 /* local variables */
 
+constexpr int		di = UCPROGDATA_DSYSTAT ;
+constexpr int		ttl = TO_TTL ;
+
 constexpr bool		f_ucprogdata = CF_UCPROGDATA ;
 
 constexpr char		ssn[] = SYSTATFNAME ;
+
+constexpr cchar		*vardname = sysword.w_vardir ;
+
+constexpr systater_m	mems[] = {
+	&systater::env,
+	&systater::cache,
+	&systater::localconf,
+	nullptr
+} ;
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -110,49 +162,102 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	int		len = 0 ;
 	if (pr && rbuf) {
 	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
 	    if (pr[0]) {
-	        cint	di = UCPROGDATA_DSYSTAT ;
-	        cint	ttl = TO_TTL ;
-		rs = SR_OK ;
-	        rbuf[0] = '\0' ;
-/* user environment */
-	        if ((rs >= 0) && (len == 0)) {
-	            static cchar	*systat = getenv(VARSYSTAT) ;
-	            if (systat && (systat[0] != '\0')) {
-	                rs = sncpy1(rbuf,rlen,systat) ;
-	                len = rs ;
-	            }
-	        } /* end if (needed) */
-/* program cache */
-	        if_constexpr (f_ucprogdata) {
-	            if ((rs >= 0) && (len == 0)) {
-	                if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
-	                    len = rs ;
-	                }
-	            }
-	        } /* end if_constexpr (f_ucprogdata) */
-/* software facility (LOCAL) configuration */
-	        if ((rs >= 0) && (len == 0)) {
-	            cchar	*vardname = VARDNAME ;
-	            if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	                if ((rs = mkpath3(tbuf,pr,vardname,ssn)) >= 0) {
-	                    if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
-	                        len = rs ;
-		                if_constexpr (f_ucprogdata) {
-	                            rs = ucprogdata_set(di,rbuf,len,ttl) ;
-		                }
-		            } else if (isNotPresent(rs)) {
-		                rs = SR_OK ;
-		            }
-	                } /* end if (mkpath) */
-			rs1 = uc_free(tbuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-	        } /* end if (needed) */
+		if (systater st(pr,rbuf,rlen) ; (rs = st.start) >= 0) {
+		    {
+		        rs = st ;
+		        len = rs ;
+		    }
+		    rs1 = st.finish ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (systater) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetsystat) */
+
+/* user environment */
+int systater::env() noex {
+	static cchar	*systat = getenv(varname.systat) ;
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	if (systat && (systat[0] != '\0')) {
+	    rs = sncpy1(rbuf,rlen,systat) ;
+	    len = rs ;
+	}
+	return (rs >= 0) ? len : rs ;
+} 
+/* end method (systater::env) */
+
+/* program cache */
+int systater::cache() noex {
+    	int		rs = SR_OK ;
+	int		len = 0 ;
+	if_constexpr (f_ucprogdata) {
+	    if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
+	        len = rs ;
+	    }
+	} /* end if_constexpr (f_ucprogdata) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (systater::cache) */
+
+/* software facility (LOCAL) configuration */
+int systater::localconf() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+            if ((rs = mkpath(tbuf,pr,vardname,ssn)) >= 0) {
+                if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
+                    len = rs ;
+                    if_constexpr (f_ucprogdata) {
+                        rs = ucprogdata_set(di,rbuf,len,ttl) ;
+                    }
+                } else if (isNotPresent(rs)) {
+                    rs = SR_OK ;
+                }
+            } /* end if (mkpath) */
+            rs1 = uc_free(tbuf) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (systater::localconf) */
+
+int systater::istart() noex {
+	return SR_OK ;
+}
+
+int systater::ifinish() noex {
+	return SR_OK ;
+}
+
+systater::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
+	    systater_m	m = mems[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+
+systater_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case systaterco_start:
+		rs = op->istart() ;
+		break ;
+	    case systaterco_finish:
+		rs = op->ifinish() ;
+		break ;
+	    } /* end switch */
+	}
+	return rs ;
+}
+/* end method (systater_co::operator) */
 
 

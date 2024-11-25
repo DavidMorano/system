@@ -222,7 +222,7 @@ OBJ110=
 OBJ111= 
 
 OBJ112= strmgr.o dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o obuf.o
-OBJ113= hdrdecode.o qpdecoder.o b64decoder.o hexdecoder.o utf8decoder.o
+OBJ113= qpdecoder.o b64decoder.o hexdecoder.o utf8decoder.o
 OBJ114= 
 OBJ115=
 OBJ116=
@@ -814,6 +814,16 @@ localset.dir:
 # LOCALGET
 localget.o:		localget.dir
 localget.dir:
+	makesubdir $@
+
+# {x}DECODER
+decoder.o:		decoder.dir
+decoder.dir:
+	makesubdir $@
+
+# ALGORITHMS
+algorithms.o:		algorithms.dir
+algorithms.dir:	
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

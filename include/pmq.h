@@ -1,4 +1,5 @@
 /* pmq HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Posix Message Queue (PMQ) */
@@ -19,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<usystem.h>
 

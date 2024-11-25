@@ -30,12 +30,14 @@
 #	ts -- time servers (INET port 37/UDP or 37/TCP)
 #
 #
-# Be careful about including backslashes where they're needed.  Weird (bad)
-# things can happen when a backslash is omitted where one is intended.
+# Be careful about including backslashes where they are needed.  Weird (bad)
+# things can happen when a backslash is omitted where one is required.
 #
 
 
+#
 # First, we define a global entry which specifies the stuff every host uses.
+#
 
 global.tc:\
 	:sm=255.255.255.0:\

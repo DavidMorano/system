@@ -1,4 +1,5 @@
 /* codebal SUPPORT [*/
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* program character balance */
@@ -31,7 +32,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
 #include	<vector>
 #include	<usystem.h>
@@ -140,11 +141,11 @@ int codebal_finish(codebal *op) noex {
 
 int codebal_load(codebal *op,cchar *sp,int sl) noex {
 	int		rs ;
-	int		f_fail = FALSE ;
+	bool		f_fail = false ;
 	if ((rs = codebal_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    while (sl-- && *sp) {
-	        cint	ch = MKCHAR(*sp++) ;
+	        cint	ch = mkchar(*sp++) ;
 	        int	w ;
 	        switch (ch) {
 	        case CH_LPAREN:
@@ -160,7 +161,7 @@ int codebal_load(codebal *op,cchar *sp,int sl) noex {
 		    if (op->counts[w] > 0) {
 		        op->counts[w] -= 1 ;
 		    } else {
-		        f_fail = TRUE ;
+		        f_fail = true ;
 		    }
 		    break ;
 	        } /* end switch */

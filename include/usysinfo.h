@@ -1,4 +1,5 @@
 /* usysinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* additional UNIX® limits support */
@@ -28,9 +29,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

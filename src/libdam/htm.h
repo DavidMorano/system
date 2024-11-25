@@ -22,9 +22,9 @@
 #include	<shio.h>
 
 
-#define	HTM_MAGIC	0x43628193
-#define	HTM		struct htm_head
-#define	HTM_FL		struct htm_flags
+#define	HTM_MAGIC		0x43628193
+#define	HTM			struct htm_head
+#define	HTM_FL			struct htm_flags
 
 #define	HTM_FBUFWHOLE		(1<<0)
 #define	HTM_FBUFLINE		(1<<1)

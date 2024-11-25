@@ -1,10 +1,10 @@
 /* fmq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* File Message Queue (FMQ) */
 /* version %I% last-modified %G% */
 
-#define	CF_ALWAYSCREATE	0		/* always create file */
 #define	CF_SENDCREATE	0		/* sender creates also */
 #define	CF_SIGFILLSET	1		/* signal mask on interrupt */
 
@@ -36,12 +36,18 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| + |memcpy(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
+#include	<absfn.h>
 #include	<stdorder.h>
+#include	<lockfile.h>
+#include	<strwcpy.h>
+#include	<intceil.h>
+#include	<isfiledesc.h>
 #include	<localmisc.h>
 
 #include	"fmq.h"
@@ -69,27 +75,11 @@
 
 #define	TI_MINUPDATE	4		/* minimum time between updates */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NENTRIES	100
 #define	FBUFLEN		(FMQ_TOPLEN + 9)
 
 
 /* external subroutines */
-
-extern uint	uceil(uint,uint) ;
-
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	msleep(uint) ;
-extern int	isfsremote(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -104,7 +94,6 @@ template<typename ... Args>
 static int fmq_ctor(fmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -129,6 +118,9 @@ static inline int fmq_magic(fmq *op,Args ... args) noex {
 	return rs ;
 }
 /* end subroutine (fmq_magic) */
+
+static int	fmq_fnbegin(fmq *,cchar *) noex ;
+static int	fmq_fnend(fmq *) noex ;
 
 static int	fmq_isend(fmq *,cvoid *,int,int) noex ;
 static int	fmq_irecv(fmq *,void *,int,int) noex ;
@@ -156,86 +148,88 @@ static int	filehead(char *,int,fmq_fh *) noex ;
 
 /* local variables */
 
-constexpr bool		f_alwayscreate = CF_ALWAYSCREATE ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
+#ifdef	COMMENT
+int fmq_open(fmq *op,cchar *fname,int of,mode_t om,int bsz) noex {
 	int		rs ;
+	int		f_create = false ;
+	if (bsz < FMQ_BUFSIZE) bsz = FMQ_BUFSIZE ;
 	if ((rs = fmq_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        USTAT		sb ;
-	        time_t		dt = getustime ;
-	        int		amode ;
-	        int		f_create = false ;
-	        if (bufsize < FMQ_BUFSIZE) bufsize = FMQ_BUFSIZE ;
+		if ((rs = ucpagesize) >= 0) {
+		    op->pagesize = rs ;
+		    op->bufsize = bsz ;
+		    of = (of & (~ O_TRUNC)) ;
+		    op->f.create = bool(of & O_CREAT) ;
+		    op->f.ndelay = bool(of & O_NDELAY) ;
+		    op->f.nonblock = bool(of & O_NONBLOCK) ;
+		    of = (of & (~ (O_NDELAY | O_NONBLOCK))) ;
+		    op->oflags = of ;
+		    op->operm = om ;
+		    if ((rs = fmq_fnbegin(op,fname)) >= 0) {
+		        if ((rs = fmq_bufbegin(op)) >= 0) {
+			    if ((rs = fmq_fnopen(op)) >= 0) {
+    
+    
+    
+			    } /* end if (fmq_fnopen) */
+			    if (rs < 0) {
+			        fmq_bufend(op) ;
+			    }
+		        } /* end if (fmq_bufbegin) */
+		        if (rs < 0) {
+			    fmq_fnend(op) ;
+		        }
+		    } /* end if (fmq_fnbegin) */
+		} /* end if (ucpagesize) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		rs1 = fmq_dtor(op) ;
+	    }
+	} /* end if (fmq_ctor) */
+	return (rs >= 0) ? f_create : rs ;
+}
+/* end subroutine (fmq_open) */
 
-#if	CF_ALWAYSCREATE
-	of|= O_CREAT ;
-#endif
-
-	of = (of & (~ O_TRUNC)) ;
-
-	op->f.create = (of & O_CREAT) ? true : false ;
-	op->f.ndelay = (of & O_NDELAY) ? true : false ;
-	op->f.nonblock = (of & O_NONBLOCK) ? true : false ;
-
-	of = (of & (~ (O_NDELAY | O_NONBLOCK))) ;
-
-	op->oflags = of ;
-	op->operm = operm ;
-
-	{
-	    cchar	*cp ;
-	    rs = uc_mallocstrw(fname,-1,&cp) ;
-	    if (rs >= 0) op->fname = cp ;
-	}
-	if (rs < 0) goto bad0 ;
-
-/* initialize the buffer structure */
-
-	rs = fmq_bufbegin(op) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-/* try to open the file */
-
-	of = (of& (~ O_CREAT)) ;
-	rs = u_open(op->fname,of,operm) ;
-
-	if ((rs < 0) && (op->oflags & O_CREAT)) {
-
+static int fmq_fnopen(fmq *op) noex {
+    	cint		rsn = SR_NOTFOUND ;
+	cint		am = int(op->operm & O_ACCMODE) ;
+    	int		rs ;
+	int		of = op->flags & (~ O_CREAT) ;
+	int		f_create = false ;
+	cmode		om = op->operm ;
+	op->f.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
+	if ((rs = u_open(op->fname,of,om)) >= 0) {
+	    op->fd = rs ;
+	} else if ((rs == rsn) && (op->oflags & O_CREAT)) {
 	    f_create = true ;
-	    of = op->oflags ;
-	    rs = u_open(op->fname,of,operm) ;
-
+	    if ((rs = u_open(op->fname,of,om)) >= 0) {
+	        op->fd = rs ;
+	    }
 	} /* end if (creating file) */
+	return (rs >= 0) ? f_create : rs ;
+}
+/* end subroutine (fmq_fnopen) */
 
-	op->fd = rs ;
-	if (rs < 0)
-	    goto bad2 ;
 
-	amode = (operm & O_ACCMODE) ;
-	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
+	        time_t		dt = getustime ;
 
 	op->opentime = dt ;
 	op->accesstime = dt ;
-	rs = u_fstat(op->fd,&sb) ;
+	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) 
 
 	if (rs < 0)
 	    goto bad3 ;
 
 	op->mtime = sb.st_mtime ;
 	op->filesize = sb.st_size ;
-	op->pagesize = getpagesize() ;
-
-/* local or remote */
-
+	/* local or remote */
 	rs = isfsremote(op->fd) ;
 	op->f.remote = (rs > 0) ;
 	if (rs < 0)
@@ -268,12 +262,6 @@ int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
 ret0:
 	op->magic = FMQ_MAGIC ;
 	    
-	    } /* end if (valid) */
-	    if (rs < 0) {
-		fmq_dtor(op) ;
-	    }
-	} /* end if (fmq_ctor) */
-	return (rs >= 0) ? f_create : rs ;
 
 /* bad things */
 bad4:
@@ -291,6 +279,141 @@ bad0:
 	goto ret0 ;
 }
 /* end subroutine (fmq_open) */
+#else /* COMMENT */
+int fmq_open(fmq *op,cchar *fname,int of,mode_t operm,int bufsize) noex {
+	struct ustat	sb ;
+	time_t		daytime = time(NULL) ;
+	int		rs ;
+	int		amode ;
+	int		f_create = FALSE ;
+
+#if	CF_SAFE
+	if (op == NULL) return SR_FAULT ;
+#endif /* CF_SAFE */
+
+	if (fname == NULL) return SR_FAULT ;
+
+	if (fname[0] == '\0') return SR_INVALID ;
+
+	if (bufsize < FMQ_BUFSIZE)
+	    bufsize = FMQ_BUFSIZE ;
+
+	memset(op,0,sizeof(FMQ)) ;
+	op->magic = 0 ;
+	op->fname = NULL ;
+
+#if	CF_ALWAYSCREATE
+	oflags |= O_CREAT ;
+#endif
+
+	oflags = (oflags & (~ O_TRUNC)) ;
+
+	op->f.create = (oflags & O_CREAT) ? TRUE : FALSE ;
+	op->f.ndelay = (oflags & O_NDELAY) ? TRUE : FALSE ;
+	op->f.nonblock = (oflags & O_NONBLOCK) ? TRUE : FALSE ;
+
+	oflags = (oflags & (~ (O_NDELAY | O_NONBLOCK))) ;
+
+	op->oflags = oflags ;
+	op->operm = operm ;
+
+	{
+	    const char	*cp ;
+	    rs = uc_mallocstrw(fname,-1,&cp) ;
+	    if (rs >= 0) op->fname = cp ;
+	}
+	if (rs < 0) goto bad0 ;
+
+/* initialize the buffer structure */
+
+	rs = fmq_bufinit(op) ;
+	if (rs < 0)
+	    goto bad1 ;
+
+/* try to open the file */
+
+	oflags = (oflags & (~ O_CREAT)) ;
+	rs = u_open(op->fname,oflags,operm) ;
+
+	if ((rs < 0) && (op->oflags & O_CREAT)) {
+
+	    f_create = TRUE ;
+	    oflags = op->oflags ;
+	    rs = u_open(op->fname,oflags,operm) ;
+
+	} /* end if (creating file) */
+
+	op->fd = rs ;
+	if (rs < 0)
+	    goto bad2 ;
+
+	amode = (operm & O_ACCMODE) ;
+	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
+
+	op->opentime = daytime ;
+	op->accesstime = daytime ;
+	rs = u_fstat(op->fd,&sb) ;
+	if (rs < 0)
+	    goto bad3 ;
+
+	op->mtime = sb.st_mtime ;
+	op->filesize = sb.st_size ;
+	op->pagesize = getpagesize() ;
+
+/* local or remote */
+
+	rs = isfsremote(op->fd) ;
+	op->f.remote = (rs > 0) ;
+	if (rs < 0)
+	    goto bad3 ;
+
+/* determine some operational parameters (size of buffer space) */
+
+	op->bufsize = uceil(bufsize,sizeof(int)) ;
+
+/* setup for disabling signals */
+
+#if	CF_SIGFILLSET
+	uc_sigsetfill(&op->sigmask) ;
+#else
+	uc_sigsetempty(&op->sigmask) ;
+#endif
+
+/* header processing */
+
+	rs = fmq_fileinit(op,daytime) ;
+
+	if ((rs < 0) && (rs != SR_AGAIN))
+	    goto bad3 ;
+
+	if ((rs == SR_AGAIN) && (! op->f.create))
+	    rs = SR_OK ;
+
+/* out of here */
+
+	op->magic = FMQ_MAGIC ;
+
+ret0:
+	return (rs >= 0) ? f_create : rs ;
+
+/* bad things */
+bad4:
+bad3:
+	u_close(op->fd) ;
+
+bad2:
+	fmq_buffree(op) ;
+
+bad1:
+	if (op->fname != NULL)
+	    uc_free(op->fname) ;
+
+bad0:
+	goto ret0 ;
+}
+/* end subroutine (fmq_open) */
+
+#endif /* COMMENT */
 
 int fmq_close(fmq *op) noex {
 	int		rs ;
@@ -306,7 +429,7 @@ int fmq_close(fmq *op) noex {
 	        op->fd = -1 ;
 	    }
 	    {
-	       rs1 = uc_free(op->fname) ;
+	       rs1 = fmq_fnend(op) ;
 	       if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -350,9 +473,9 @@ int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts) noex {
 	if ((rs = fmq_magic(op,buf)) >= 0) {
 	    rs = SR_RDONLY ;
 	    if (op->f.writable) {
-	        time_t		dt = getustime ;
-	        time_t		starttime, endtime ;
-	        bool		f_infinite = false ;
+	        time_t	dt = getustime ;
+	        time_t	starttime, endtime ;
+	        bool	f_infinite = false ;
 	        if (to < 0) {
 	            f_infinite = true ;
 	            to = INT_MAX ;
@@ -362,7 +485,7 @@ int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts) noex {
 	        if (endtime < starttime) {
 	            endtime = INT_MAX ;
 	        }
-	        while (true) {
+	        forever {
 	            rs = fmq_isend(op,buf,buflen,opts) ;
 	            tlen = rs ;
 	            if (rs >= 0) break ;
@@ -372,7 +495,7 @@ int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts) noex {
 	            msleep(1000) ;
 	            dt = getustime ;
 	            if (dt >= endtime) break ;
-	        } /* end while */
+	        } /* end forever */
 	        if ((rs == SR_AGAIN) && op->f.ndelay) {
 	            tlen = 0 ;
 	            rs = SR_OK ;
@@ -442,6 +565,36 @@ int fmq_check(fmq *op,time_t dt) noex {
 
 
 /* private subroutines */
+
+static int fmq_fnbegin(fmq *op,cchar *fname) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	cchar		*fnp{} ;
+	if (int fnl ; (fnl = sfnamecomp(fname,0,&fnp)) > 0) {
+	    cchar	*afn{} ;
+	    if (absfn af ; (rs = af.start(fnp,fnl,&afn)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(afn,rs,&cp)) >= 0) {
+		    op->fname = cp ;
+		} /* end if (memory-allocation) */
+		rs1 = af.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (absfn) */
+	} /* end if (sfnamecomp) */
+	return rs ;
+}
+/* end subroutine (fmq_fnbegin) */
+
+static int fmq_fnend(fmq *op) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->fname) {
+	    rs1 = uc_free(op->fname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->fname = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (fmq_fnend) */
 
 static int fmq_isend(fmq *op,cvoid *buf,int buflen,int opts) noex {
 	IOVEC		v[3] ;
@@ -539,14 +692,11 @@ ret0:
 }
 /* end subroutine (fmq_isend) */
 
-
-/* receive a message */
-static int fmq_irecv(fmq *op,void *buf,int buflen,int opts)
-{
+static int fmq_irecv(fmq *op,void *buf,int buflen,int opts) noex {
 	IOVEC		v[3] ;
 	USTAT		sb ;
 	sigset_t	oldsigmask ;
-	off_t	uoff ;
+	off_t		uoff ;
 	time_t		dt = 0 ;
 	uint		eoff ;
 	uint		llen, dlen, mlen, len ;
@@ -799,12 +949,15 @@ bad0:
 /* end subroutine (fmq_filechanged) */
 
 static int fmq_bufbegin(fmq *op) noex {
+        cint		bsz = FMQ_BUFSIZE ;
 	int		rs = SR_FAULT ;
 	if (op) {
 	    op->f.bufvalid = false ;
 	    op->b = {} ;
-	    op->b.bsz = FMQ_BUFSIZE ;
-	    rs = uc_malloc(op->b.bsz,&op->b.buf) ;
+	    if (void *vp{} ; (rs = uc_malloc(bsz,&vp)) >= 0) {
+	        op->b.buf = vp ;
+	        op->b.bsz = bsz ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -865,7 +1018,7 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 	        op->h = {} ;
 	        op->h.bsz = op->bufsize ;
 	        bl += filehead((fbuf + bl),0,&op->h) ;
-	        if ((rs = u_pwrite(op->fd,fbuf,bl,0L)) > 0) {
+	        if ((rs = u_pwrite(op->fd,fbuf,bl,0z)) > 0) {
 	            op->filesize = rs ;
 	            op->mtime = dt ;
 	            if (op->f.remote) {
@@ -878,7 +1031,7 @@ static int fmq_filebegin(fmq *op,time_t dt) noex {
 	} else if (op->filesize >= FMQ_BUFOFF) {
 	    int	f ;
 
-/* read the file header */
+		/* read the file header */
 
 	    if (! op->f.readlocked) {
 
@@ -946,14 +1099,6 @@ static int fmq_lockget(fmq *op,time_t dt,int f_read) noex {
 	    }
 	} /* end if (fmq_fileready) */
 	return rs ;
-
-/* bad stuff */
-bad1:
-	op->f.readlocked = false ;
-	op->f.writelocked = false ;
-
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (fmq_lockget) */
 
@@ -961,8 +1106,8 @@ static int fmq_lockrelease(fmq *op) noex {
 	int		rs = SR_OK ;
 	if ((op->f.readlocked || op->f.writelocked)) {
 	    if (op->fd >= 0) {
-		off_t	fs = op->filesize ;
-	        rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
+		coff	fs = op->filesize ;
+	        rs = lockfile(op->fd,F_ULOCK,0z,fs,TO_LOCK) ;
 	    }
 	    op->f.readlocked = false ;
 	    op->f.writelocked = false ;
@@ -984,17 +1129,24 @@ static int fmq_fileready(fmq *op,time_t dt) noex {
 static int fmq_fileopen(fmq *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
-	    if ((rs = u_open(op->fname,op->oflags,op->operm)) >= 0) {
+	    cchar	*fn = op->fname ;
+	    cint	of = op->oflags ;
+	    cmode	om = op->operm ;
+	    if ((rs = u_open(fn,of,om)) >= 0) {
 		op->fd = rs ;
-		uc_closeonexec(op->fd,true) ;
+		rs = uc_closeonexec(op->fd,true) ;
 		op->opentime = dt ;
-	    }
-	}
+		if (rs < 0) {
+		    u_close(op->fd) ;
+		    op->fd = -1 ;
+		}
+	    } /* end if (open) */
+	} /* end if (needed open) */
 	return (rs >= 0) ? op->fd : rs ;
 }
 /* end subroutine (fmq_fileopen) */
 
-int fmq_fileclose(fmq *op) noex {
+static int fmq_fileclose(fmq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -1063,6 +1215,42 @@ static int filemagic(char *buf,int f_read,fmq_fm *mp) noex {
 /* end subroutine (filemagic) */
 
 /* encode or decode the file header */
+#ifdef	COMMENT
+static int filehead_wr(fmq_fh *hp,cchar *buf) noex {
+	const uint	*table = (uint *) buf ;
+	int		rs = SR_BADFMT ;
+	if (buf) {
+	        stdorder_rui((table + 0),&hp->wcount) ;
+	        stdorder_rui((table + 1),&hp->wtime) ;
+	        stdorder_rui((table + 2),&hp->nmsg) ;
+	        stdorder_rui((table + 3),&hp->bsz) ;
+	        stdorder_rui((table + 4),&hp->blen) ;
+	        stdorder_rui((table + 5),&hp->len) ;
+	        stdorder_rui((table + 6),&hp->ri) ;
+	        stdorder_rui((table + 7),&hp->wi) ;
+	    rs = FMQ_HEADLEN ;
+	}
+	return rs ;
+}
+/* end subroutine (filehead_wr) */
+static int filehead_rd(const fmq_fh *hp,char *buf) noex {
+	uint		*table = (uint *) buf ;
+	int		rs = SR_BADFMT ;
+	if (buf) {
+	        stdorder_wui((table + 0),hp->wcount) ;
+	        stdorder_wui((table + 1),hp->wtime) ;
+	        stdorder_wui((table + 2),hp->nmsg) ;
+	        stdorder_wui((table + 3),hp->bsz) ;
+	        stdorder_wui((table + 4),hp->blen) ;
+	        stdorder_wui((table + 5),hp->len) ;
+	        stdorder_wui((table + 6),hp->ri) ;
+	        stdorder_wui((table + 7),hp->wi) ;
+	    rs = FMQ_HEADLEN ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (filehead_rd) */
+#else /* COMMENT */
 static int filehead(char *buf,int f_read,fmq_fh *hp) noex {
 	uint		*table = (uint *) buf ;
 	int		rs = SR_BADFMT ;
@@ -1091,5 +1279,6 @@ static int filehead(char *buf,int f_read,fmq_fh *hp) noex {
 	return rs ;
 }
 /* end subroutine (filehead) */
+#endif /* COMMENT */
 
 

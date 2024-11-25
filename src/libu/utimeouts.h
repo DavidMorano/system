@@ -17,7 +17,10 @@
 
 /*******************************************************************************
 
-  	Desfription:
+  	Data:
+	utimeouts
+
+  	Description:
 	See the souce code in 'utimeouts.cc' for what is going on.
 	Some documentation and notes on this whole "timeout" facility
 	is located in the source language file 'utimeoutdefs.h'.

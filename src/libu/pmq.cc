@@ -450,8 +450,7 @@ int posixhelp::operator () (pmq *op) noex {
 
 int posixhelp::open(pmq *op) noex {
 	int		rs = SR_OK ;
-	mqd_t		res ;
-	if ((res = mq_open(op->name,of,om,nattr)) == mqdbad) {
+	if (mqd_t res ; (res = mq_open(op->name,of,om,nattr)) == mqdbad) {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -597,8 +596,7 @@ static int getpmquid(void) noex {
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
-	    char	*pwbuf ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf{} ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cchar	*un = PMQ_USERNAME1 ;
 	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
@@ -614,7 +612,7 @@ static int getpmquid(void) noex {
 	        }
 	        rs1 = uc_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (m-a-f) */
 	} /* end if (getbufsize) */
 	return (rs >= 0) ? uid : rs ;
 }
@@ -629,7 +627,7 @@ static int getpmqgid(void) noex {
 	    if ((rs = getgid_group(gn,-1)) == rsn) {
 		rs = PMQ_GID ;
 	    }
-	}
+	} /* end if (getgid_group) */
 	return rs ;
 }
 /* end subroutine (getpmqgid) */

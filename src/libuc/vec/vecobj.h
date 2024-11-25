@@ -30,8 +30,8 @@
 
 /* object defines */
 #define	VECOBJ			struct vecobj_head
-#define	VECOBJ_CUR		struct vecobj_cursor
 #define	VECOBJ_FL		struct vecobj_flags
+#define	VECOBJ_CUR		struct vecobj_cursor
 #define	VECOBJ_DEFENTS		10
 /* options */
 #define	VECOBJ_ODEFAULT		0
@@ -70,6 +70,8 @@ struct vecobj_head {
 struct vecobj_cursor {
 	int		i, c ;
 } ;
+
+typedef VECOBJ_CUR	vecobj_cur ;
 
 #ifdef	__cplusplus
 enum vecobjmems {
@@ -120,8 +122,6 @@ struct vecobj : vecobj_head {
 #else	/* __cplusplus */
 typedef VECOBJ		vecobj ;
 #endif /* __cplusplus */
-
-typedef VECOBJ_CUR	vecobj_cur ;
 
 EXTERNC_begin
 

@@ -30,7 +30,7 @@
 
 EXTERNC_begin
 
-extern int sntmtime(char *,int,TMTIME *,cchar *) noex ;
+extern int sntmtime(char *,int,tmtime *,cchar *) noex ;
 
 EXTERNC_end
 

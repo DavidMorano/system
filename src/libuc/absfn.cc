@@ -113,8 +113,7 @@ int absfn_finish(absfn *op) noex {
 static int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*pbuf{} ;
-	if ((rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
 	    cint	plen = rs ;
 	    if ((rs = getpwd(pbuf,plen)) >= 0) {
 	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) {
@@ -141,8 +140,7 @@ static int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 static int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	if (sl > ABSFN_SHORTLEN) {
-	    cchar	*cp ;
-	    if ((rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = uc_libmallocstrw(sp,sl,&cp)) >= 0) {
 		sl = rs ;
 		*rpp = cp ;
 		op->as = cp ;
@@ -159,13 +157,21 @@ int absfn::start(cchar *sp,int sl,cchar **rpp) noex {
 	return absfn_start(this,sp,sl,rpp) ;
 }
 
+void absfn::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("absfn",rs,"fini-finish") ;
+	}
+}
+
 absfn_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case absfnmem_finish:
-	    rs = absfn_finish(op) ;
-	    break ;
-	} /* end switch */
+	if (op) {
+	    switch (w) {
+	    case absfnmem_finish:
+	        rs = absfn_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (absfn_co::operator) */

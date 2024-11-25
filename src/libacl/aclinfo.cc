@@ -1,4 +1,5 @@
 /* aclinfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* ACL information */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	aclinfo
+
+	Description:
 	These subroutines perform (various) ACL handling functions.
 
 *******************************************************************************/
@@ -29,6 +34,8 @@
 #include	<sys/acl.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
