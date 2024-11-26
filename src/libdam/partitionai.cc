@@ -1,5 +1,6 @@
 /* partitionai SUPPORT */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* integer array partitioning function */
 /* version %I% last-modified %G% */
@@ -23,6 +24,7 @@
 	Partition an array of integers.
 
 	Synopsis:
+	typedef int	(*partitionai_f)(int,int) noex
 	int partitionai(int *a,int al,partpred_f partpred,int v) noex
 
 	Arguments:
@@ -40,12 +42,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<arrswap.h>
 #include	<localmisc.h>
 
 #include	"partitionai.h"
@@ -54,18 +56,19 @@
 /* local defines */
 
 
-/* local typedefs */
+/* imported namespaces */
 
-extern "C" {
-typedef int	(*partpred_f)(int,int) noex ;
-}
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern "C" {
-    extern void	arrswapi(int *,int,int) noex ;
-}
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -79,7 +82,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int partitionai(int *a,int al,partpred_f fn,int pv) noex {
+int partitionai(int *a,int al,partitionai_f fn,int pv) noex {
 	int		last = al ;
 	for (int i = 0 ; i < last ; i += 1) {
 	    cbool	f = (*fn)(a[i],pv) ;

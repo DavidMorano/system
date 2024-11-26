@@ -1,33 +1,35 @@
-/* biblepara */
+/* biblepara SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BIBLEPARA_INCLUDE
-#define	BIBLEPARA_INCLUDE	1
+#define	BIBLEPARA_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
-#include	"bibleparas.h"
+#include	<bibleparas.h>
 
 
 #define	BIBLEPARA_MAGIC		0x99447246
 #define	BIBLEPARA		struct biblepara_head
-#define	BIBLEPARA_QUERY		struct biblepara_q
-#define	BIBLEPARA_CITE		struct biblepara_q
-#define	BIBLEPARA_Q		struct biblepara_q
-#define	BIBLEPARA_CUR		struct biblepara_c
-#define	BIBLEPARA_INFO		struct biblepara_i
-#define	BIBLEPARA_CALLS		struct biblepara_calls
+#define	BIBLEPARA_CITE		struct biblepara_query
+#define	BIBLEPARA_Q		struct biblepara_query
+#define	BIBLEPARA_CUR		struct biblepara_cursor
+#define	BIBLEPARA_INFO		struct biblepara_information
+#define	BIBLEPARA_CA		struct biblepara_calls
 
 
-struct biblepara_i {
+struct biblepara_information {
 	time_t	dbtime ;		/* db-time */
 	time_t	vitime ;		/* vi-time */
 	uint	maxbook ;
@@ -36,17 +38,18 @@ struct biblepara_i {
 	uint	nzverses ;
 } ;
 
-struct biblepara_q {
+struct biblepara_query {
 	uchar	b, c, v ;
 } ;
 
-struct biblepara_c {
+struct biblepara_cursor {
 	uint	magic ;
 	void	*scp ;
 } ;
 
+EXTERNC_begin
 struct biblepara_calls {
-	int	(*open)(void *,const char *,const char *) ;
+	int	(*open)(void *,cchar *,cchar *) ;
 	int	(*count)(void *) ;
 	int	(*ispara)(void *,BIBLEPARAS_Q *) ;
 	int	(*curbegin)(void *,BIBLEPARAS_CUR *) ;
@@ -56,6 +59,7 @@ struct biblepara_calls {
 	int	(*info)(void *,BIBLEPARAS_INFO *) ;
 	int	(*close)(void *) ;
 } ;
+EXTERNC_end
 
 struct biblepara_head {
 	uint		magic ;
@@ -66,28 +70,27 @@ struct biblepara_head {
 	int		cursize ;		/* cursor size */
 } ;
 
+typedef	BIBLEPARA		biblepara ;
+typedef	BIBLEPARA_CITE		biblepara_cute ;
+typedef	BIBLEPARA_Q		biblepara_q ;
+typedef	BIBLEPARA_CUR		biblepara_cur ;
+typedef	BIBLEPARA_INFO		biblepara_info ;
+typedef	BIBLEPARA_CA		biblepara_ca ;
 
-#if	(! defined(BIBLEPARA_MASTER)) || (BIBLEPARA_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	biblepara_open(biblepara *,cchar *,cchar *) noex ;
+extern int	biblepara_count(biblepara *) noex ;
+extern int	biblepara_ispara(biblepara *,biblepara_q *) noex ;
+extern int	biblepara_curbegin(biblepara *,biblepara_cur *) noex ;
+extern int	biblepara_enum(biblepara *,biblepara_cur *,biblepara_q *) noex ;
+extern int	biblepara_curend(biblepara *,biblepara_cur *) noex ;
+extern int	biblepara_audit(biblepara *) noex ;
+extern int	biblepara_info(biblepara *,biblepara_info *) noex ;
+extern int	biblepara_close(biblepara *) noex ;
 
-extern int	biblepara_open(BIBLEPARA *,const char *,const char *) ;
-extern int	biblepara_count(BIBLEPARA *) ;
-extern int	biblepara_ispara(BIBLEPARA *,BIBLEPARA_Q *) ;
-extern int	biblepara_curbegin(BIBLEPARA *,BIBLEPARA_CUR *) ;
-extern int	biblepara_enum(BIBLEPARA *,BIBLEPARA_CUR *,BIBLEPARA_Q *) ;
-extern int	biblepara_curend(BIBLEPARA *,BIBLEPARA_CUR *) ;
-extern int	biblepara_audit(BIBLEPARA *) ;
-extern int	biblepara_info(BIBLEPARA *,BIBLEPARA_INFO *) ;
-extern int	biblepara_close(BIBLEPARA *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BIBLEPARA_MASTER */
 
 #endif /* BIBLEPARA_INCLUDE */
 

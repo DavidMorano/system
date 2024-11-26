@@ -285,11 +285,10 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 = SR_OK ;
 	int		ul = 0 ;
-	char		*pwbuf{} ;
-	if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
 	    cint	utype = TMPX_TPROCUSER ;
 	    int		pwlen = rs ;
-	    if (tmpx_cur uc ; (rs = tmpx_curbegin(op->utp,&uc)) >= 0) {
+	    if (tmpx_cur uc{} ; (rs = tmpx_curbegin(op->utp,&uc)) >= 0) {
 	    	tmpx_ent	ue ;
 		pwcache		*pwc = op->ucp ;
 		ucentpw		pw ;
@@ -326,13 +325,13 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 /* end subroutine (finduid_lookuper) */
 
 static int finduid_tmpxopen(finduid *op) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if (! op->open.ut) {
-	    tmpx	*txp = op->utp ;
 	    cint	of = O_RDONLY ;
-	    op->ti_utopen = getustime ;
-	    if ((rs = tmpx_open(txp,nullptr,of)) >= 0) {
+	    if ((rs = tmpx_open(op->utp,np,of)) >= 0) {
 	        op->open.ut = true ;
+	        op->ti_utopen = getustime ;
 	    }
 	}
 	return rs ;

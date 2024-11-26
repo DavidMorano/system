@@ -21,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	cfalphax
+
+	Description:
 	This code converts a c-string of digits (of a power-of-two
 	base) into the normal integer types: these being |int|,
 	|long|, and |longlong| and their associated unsigned
@@ -32,8 +36,14 @@
 
 *******************************************************************************/
 
+#ifndef	CFALPHAX_INCLUDE
+#define	CFALPHAX_INCLUDE
+#ifdef	__cplusplus
+
+
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* for |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<clanguage.h>
@@ -147,8 +157,7 @@ template<stdintx T> struct cfashelp {
 template<typename T> int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    cfashelp	cfo(sp,sl,b,rp) ;
-	    if ((rs = cfo.getsign()) >= 0) {
+	    if (cfashelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
 		cfo.prepare() ;
 		rs = cfo.proc() ;
 	    } /* end if */
@@ -156,5 +165,9 @@ template<typename T> int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	return rs ;
 }
 /* end subroutine-template (cfalphax) */
+
+
+#endif /* __cplusplus */
+#endif /* CFALPHAX_INCLUDE */
 
 

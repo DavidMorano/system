@@ -1,12 +1,11 @@
-/* bpi */
+/* bpi SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* read or audit a BPI (Bible Paragraph Index) database */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUGENTS	0		/* mode debugging */
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */
-
 
 /* revision history:
 
@@ -19,41 +18,37 @@
 
 /*******************************************************************************
 
-        This subroutine opens and allows for reading or auditing of a BPI (Bible
-        Paragraph Index) database.
+  	Object:
+	bpi
+
+	Description:
+	This subroutine opens and allows for reading or auditing
+	of a BPI (Bible Paragraph Index) database.
 
 	Synopsis:
-
-	int bpi_open(op,dbname)
-	BPI		*op ;
-	const char	dbname[] ;
+	int bpi_open(bpi *op,cchar *dbname) noex
 
 	Arguments:
-
 	- op		object pointer
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>		/* |UINT_MAX| */
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<char.h>
@@ -67,45 +62,20 @@
 
 /* local defines */
 
-#undef	COMMENT
-
 #define	BPI_MAGIC	0x88773422
-#define	BPI_FMI		struct bpi_fmi
-
-#define	BPI_KA		sizeof(BPI_LINE)
+#define	BPI_KA		szof(BPI_LINE)
 #define	BPI_BO(v)	((BPI_KA - ((v) % BPI_KA)) % BPI_KA)
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
 
+#ifndef	MODP2
 #define	MODP2(v,n)	((v) & ((n) - 1))
+#endif
 
 #define	TO_CHECK	4
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -113,10 +83,10 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported variables */
 
-BPI_OBJ	bpi = {
+bpi_obj bpi_modinfo = {
 	"bpi",
-	sizeof(BPI),
-	sizeof(BPI_CUR)
+	szof(bpi),
+	szof(bpi_cir)
 } ;
 
 
@@ -125,48 +95,49 @@ BPI_OBJ	bpi = {
 
 /* forward references */
 
-static int	bpi_loadbegin(BPI *,time_t) ;
-static int	bpi_loadend(BPI *) ;
-static int	bpi_mapcreate(BPI *,time_t) ;
-static int	bpi_mapdestroy(BPI *) ;
-static int	bpi_proc(BPI *,time_t) ;
-static int	bpi_verify(BPI *,time_t) ;
-static int	bpi_auditvt(BPI *) ;
-static int	bpi_checkupdate(BPI *,time_t) ;
-static int	bpi_search(BPI *,BPI_QUERY *) ;
-static int	bpi_loadbve(BPI *,BPI_VERSE *,int) ;
+static int	bpi_loadbegin(bpi *,time_t) noex ;
+static int	bpi_loadend(bpi *) noex ;
+static int	bpi_mapcreate(bpi *,time_t) noex ;
+static int	bpi_mapdestroy(bpi *) noex ;
+static int	bpi_proc(bpi *,time_t) noex ;
+static int	bpi_verify(bpi *,time_t) noex ;
+static int	bpi_auditvt(bpi *) noex ;
+static int	bpi_checkupdate(bpi *,time_t) noex ;
+static int	bpi_search(bpi *,bpi_q *) noex ;
+static int	bpi_loadbve(bpi *,bpi_v *,int) noex ;
 
-static int	mkcitekey(BPI_QUERY *,uint *) ;
+static int	mkcitekey(bpi_q *,uint *) noex ;
 
 #if	CF_SEARCH
-static int	vtecmp(const void *,const void *) ;
+static int	vtecmp(cvoid *,cvoid *) noex ;
 #endif
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bpi_open(BPI *op,cchar *dbname)
-{
-	const time_t	dt = time(NULL) ;
+int bpi_open(bpi *op,cchar *dbname) noex {
+	ctime_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		tl ;
 	int		nverses = 0 ;
-	const char	*cp ;
+	cchar		*cp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BPI)) ;
+	memclear(op) ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
-	    const char	*suf = BPI_SUF ;
-	    const char	*end = ENDIANSTR ;
+	    cchar	*suf = BPI_SUF ;
+	    cchar	*end = ENDIANSTR ;
 	    char	tbuf[MAXPATHLEN + 1] ;
 	    op->dbname = cp ;
 	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
@@ -179,47 +150,41 @@ int bpi_open(BPI *op,cchar *dbname)
 	            }
 	            if (rs < 0) {
 	                uc_free(op->fname) ;
-	                op->fname = NULL ;
+	                op->fname = nullptr ;
 	            }
 	        } /* end if (m-a) */
 	    } /* end if (mkfnamesuf) */
 	    if (rs < 0) {
 	        uc_free(op->dbname) ;
-	        op->dbname = NULL ;
+	        op->dbname = nullptr ;
 	    }
 	} /* end if (m-a) */
-
-#if	CF_DEBUGS
-	debugprintf("bpi_open: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? nverses : rs ;
 }
 /* end subroutine (bpi_open) */
 
-
-int bpi_close(BPI *op)
-{
+int bpi_close(bpi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = bpi_loadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
-	if (op->dbname != NULL) {
+	if (op->dbname != nullptr) {
 	    rs1 = uc_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
+	    op->dbname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -227,12 +192,10 @@ int bpi_close(BPI *op)
 }
 /* end subroutine (bpi_close) */
 
-
-int bpi_audit(BPI *op)
-{
+int bpi_audit(bpi *op) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
@@ -240,21 +203,15 @@ int bpi_audit(BPI *op)
 
 	rs = bpi_auditvt(op) ;
 
-#if	CF_DEBUGS
-	debugprintf("bpi_audit: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (bpi_audit) */
 
-
-int bpi_count(BPI *op)
-{
-	BPIHDR		*hip ;
+int bpi_count(bpi *op) noex {
+	bpihdr		*hip ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
@@ -263,22 +220,20 @@ int bpi_count(BPI *op)
 }
 /* end subroutine (bpi_count) */
 
-
-int bpi_info(BPI *op,BPI_INFO *ip)
-{
-	BPIHDR		*hip ;
+int bpi_info(bpi *op,bpi_i *ip) noex {
+	bpihdr		*hip ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
 	hip = &op->fhi ;
 
-	if (ip != NULL) {
-	    memset(ip,0,sizeof(BPI_INFO)) ;
+	if (ip != nullptr) {
+	    rs = memclear(ip) ;
 	    ip->mtime = op->fmi.ti_mod ;
-	    ip->ctime = (time_t) hip->wtime ;
+	    ip->ctime = time_t(hip->wtime) ;
 	    ip->maxbook = hip->maxbook ;
 	    ip->maxchapter = hip->maxchapter ;
 	    ip->count = hip->nverses ;
@@ -289,20 +244,14 @@ int bpi_info(BPI *op,BPI_INFO *ip)
 }
 /* end subroutine (bpi_info) */
 
-
-int bpi_get(BPI *op,BPI_QUERY *qp)
-{
+int bpi_get(bpi *op,bpi_q *qp) noex {
 	int		rs = SR_OK ;
 	int		vi = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (qp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("bpi_get: q=%u:%u:%u\n",qp->b,qp->c,qp->v) ;
-#endif
 
 /* check for update */
 
@@ -315,21 +264,13 @@ int bpi_get(BPI *op,BPI_QUERY *qp)
 	    vi = rs ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("bpi_get: search rs=%d vi=%u\n",rs,vi) ;
-	debugprintf("bpi_get: ret rs=%d vi=%u\n",rs,vi) ;
-#endif
-
 	return (rs >= 0) ? vi : rs ;
 }
 /* end subroutine (bpi_get) */
 
-
-int bpi_curbegin(BPI *op,BPI_CUR *curp)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+int bpi_curbegin(bpi *op,bpi_cur *curp) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
@@ -340,13 +281,9 @@ int bpi_curbegin(BPI *op,BPI_CUR *curp)
 }
 /* end subroutine (bpi_curbegin) */
 
-
-int bpi_curend(BPI *op,BPI_CUR *curp)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
+int bpi_curend(bpi *op,bpi_cur *curp) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
 	curp->i = 0 ;
@@ -357,17 +294,15 @@ int bpi_curend(BPI *op,BPI_CUR *curp)
 }
 /* end subroutine (bpi_curend) */
 
-
-int bpi_enum(BPI *op,BPI_CUR *curp,BPI_VERSE *bvep)
-{
-	BPIHDR		*hip ;
+int bpi_enum(bpi *op,bpi_cur *curp,bpi_v *bvep) noex {
+	bpihdr		*hip ;
 	int		rs = SR_OK ;
 	int		vi ;
 	int		vtlen ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (bvep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
 
 	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
 
@@ -392,65 +327,61 @@ int bpi_enum(BPI *op,BPI_CUR *curp,BPI_VERSE *bvep)
 
 /* private subroutines */
 
-
-static int bpi_loadbegin(BPI *op,time_t daytime)
-{
+static int bpi_loadbegin(bpi *op,time_t daytime) noex {
 	int		rs ;
 	int		nverses = 0 ;
 
 	if ((rs = bpi_mapcreate(op,daytime)) >= 0) {
 	    rs = bpi_proc(op,daytime) ;
 	    nverses = rs ;
-	    if (rs < 0)
+	    if (rs < 0) {
 		bpi_mapdestroy(op) ;
+	    }
 	} /* end if (map) */
 
 	return (rs >= 0) ? nverses : rs ;
 }
 /* end subroutine (bpi_loadbegin) */
 
-
-static int bpi_loadend(BPI *op)
-{
-	BPI_FMI		*mip ;
+static int bpi_loadend(bpi *op) noex {
+	bpi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = bpi_mapdestroy(op) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = bpi_mapdestroy(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	mip = &op->fmi ;
-	mip->vt = NULL ;
+	mip->vt = nullptr ;
 	return rs ;
 }
 /* end subroutine (bpi_loadend) */
 
-
-static int bpi_mapcreate(BPI *op,time_t daytime)
-{
-	BPI_FMI		*mip = &op->fmi ;
+static int bpi_mapcreate(bpi *op,time_t daytime) noex {
+	bpi_fmi		*mip = &op->fmi ;
 	int		rs ;
 
-	if (op->fname == NULL) return SR_FAULT ;
+	if (op->fname == nullptr) return SR_FAULT ;
 
 	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
-	    const int		fd = rs ;
+	    USTAT	sb ;
+	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
-	        const size_t	fsize = (sb.st_size & UINT_MAX) ;
+	        csize	fsize = (sb.st_size & UINT_MAX) ;
 	        if (fsize > 0) {
 	            size_t	ms = (size_t) fsize ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            void	*md ;
-	            if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                mip->mapdata = md ;
 	                mip->mapsize = ms ;
 	                mip->ti_mod = sb.st_mtime ;
 	                mip->ti_map = daytime ;
 	            } /* end if (u_mmap) */
-	        } else
+	        } else {
 		    rs = SR_UNATCH ;
+		}
 	    } /* end if (stat) */
 	    u_close(fd) ;
 	} /* end if (file-open) */
@@ -459,15 +390,13 @@ static int bpi_mapcreate(BPI *op,time_t daytime)
 }
 /* end subroutine (bpi_mapcreate) */
 
-
-static int bpi_mapdestroy(BPI *op)
-{
-	BPI_FMI		*mip = &op->fmi ;
+static int bpi_mapdestroy(bpi *op) noex {
+	bpi_fmi		*mip = &op->fmi ;
 	int		rs = SR_OK ;
 
-	if (mip->mapdata != NULL) {
+	if (mip->mapdata != nullptr) {
 	    rs = u_munmap(mip->mapdata,mip->mapsize) ;
-	    mip->mapdata = NULL ;
+	    mip->mapdata = nullptr ;
 	    mip->mapsize = 0 ;
 	    mip->ti_map = 0 ;
 	}
@@ -476,17 +405,15 @@ static int bpi_mapdestroy(BPI *op)
 }
 /* end subroutine (bpi_mapdestroy) */
 
-
-static int bpi_checkupdate(BPI *op,time_t dt)
-{
+static int bpi_checkupdate(bpi *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (op->ncursors == 0) {
-	    if (dt <= 0) dt = time(NULL) ;
+	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        struct ustat	sb ;
-	        BPI_FMI		*mip = &op->fmi ;
+	        USTAT		sb ;
+	        bpi_fmi		*mip = &op->fmi ;
 	        op->ti_lastcheck = dt ;
 	        if ((rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
@@ -505,166 +432,86 @@ static int bpi_checkupdate(BPI *op,time_t dt)
 }
 /* end subroutine (bpi_checkupdate) */
 
-
-static int bpi_proc(BPI *op,time_t daytime)
-{
-	BPI_FMI		*mip = &op->fmi ;
-	BPIHDR		*hip = &op->fhi ;
+static int bpi_proc(bpi *op,time_t daytime) noex {
+	bpi_fmi		*mip = &op->fmi ;
+	bpihdr		*hip = &op->fhi ;
 	int		rs ;
 	int		nverses = 0 ;
 
 	rs = bpihdr(hip,1,mip->mapdata,mip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("bpi_proc: bpihdr() rs=%d\n",rs) ;
-#endif
 
 	if (rs >= 0) {
 	    rs = bpi_verify(op,daytime) ;
 	    nverses = hip->nverses ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("bpi_proc: bpi_verify() rs=%d\n",rs) ;
-#endif
-
 	if (rs >= 0) {
 	    mip->vt = (uint (*)[1]) (mip->mapdata + hip->vioff) ;
-#if	CF_DEBUGS
-	debugprintf("bpi_proc: vt={%p}\n",mip->vt) ;
-#endif
 	}
-
-#if	CF_DEBUGS
-	debugprintf("bpi_proc: ret rs=%d nverses=%u\n",rs,nverses) ;
-#endif
 
 	return (rs >= 0) ? nverses : rs ;
 }
 /* end subroutine (bpi_proc) */
 
-
-static int bpi_verify(BPI *op,time_t daytime)
-{
-	BPI_FMI		*mip = &op->fmi ;
-	BPIHDR		*hip = &op->fhi ;
+static int bpi_verify(bpi *op,time_t daytime) noex {
+	bpi_fmi		*mip = &op->fmi ;
+	bpihdr		*hip = &op->fhi ;
 	uint		utime = (uint) daytime ;
 	int		rs = SR_OK ;
 	int		size ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	f = f && (hip->fsize == mip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("bpi_verify: fsize=%u f=%u\n",
-		hip->fsize,f) ;
-#endif
-
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-
-#if	CF_DEBUGS
-	{
-	char	timebuf[TIMEBUFLEN + 1] ;
-	debugprintf("bpi_verify: wtime=%s f=%u\n",
-		timestr_log(((time_t) hip->wtime),timebuf),f) ;
-	}
-#endif
 
 /* alignment restriction */
 
-#if	CF_DEBUGS
-	debugprintf("bpi_verify: vioff=%u\n",hip->vioff) ;
-	debugprintf("bpi_verify: vilen=%u\n",hip->vilen) ;
-#endif
-
-	f = f && ((hip->vioff & (sizeof(int)-1)) == 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("bpi_verify: 1 f=%u\n",f) ;
-#endif
+	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
 
 /* size restrictions */
 
 	f = f && (hip->vioff <= mip->mapsize) ;
-	size = (hip->vilen * 1) * sizeof(uint) ;
+	size = (hip->vilen * 1) * szof(uint) ;
 	f = f && ((hip->vioff + size) <= mip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("bpi_verify: 2 f=%u\n",f) ;
-#endif
 
 /* something restriction? */
 
 	f = f && (hip->vilen == hip->nverses) ;
-
-#if	CF_DEBUGS
-	debugprintf("bpi_verify: 3 f=%u\n",f) ;
-#endif
-
-#if	CF_DEBUGS && CF_DEBUGENTS
-	{
-		uint	(*vt)[1] = (uint (*)[1]) (mip->mapdata + hip->vioff) ;
-		int	vtlen = hip->vilen ;
-		int	i ;
-		for (i = 0 ; i < vtlen ; i += 1)
-		debugprintf("bpi_verify: vt[%u][0]=%08X\n",i,vt[i][0]) ;
-	}
-#endif /* CF_DEBUGENTS */
 
 /* get out */
 
 	if (! f)
 	    rs = SR_BADFMT ;
 
-#if	CF_DEBUGS
-	debugprintf("bpi_verify: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (bpi_verify) */
 
-
-static int bpi_auditvt(BPI *op)
-{
-	BPI_FMI		*mip = &op->fmi ;
-	BPIHDR		*hip = &op->fhi ;
+static int bpi_auditvt(bpi *op) noex {
+	bpi_fmi		*mip = &op->fmi ;
+	bpihdr		*hip = &op->fhi ;
 	uint		(*vt)[1] ;
 	uint		pcitcmpval = 0 ;
 	uint		citcmpval ;
 	int		rs = SR_OK ;
-	int		i ;
-
 	vt = mip->vt ;
-
 /* "verses" table */
-
-	for (i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
-
+	for (int i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
 /* verify all entries are ordered w/ increasing citations */
-
 	    citcmpval = vt[i][0] & 0x00FFFFFF ;
 	    if (citcmpval < pcitcmpval) {
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
 	    pcitcmpval = citcmpval ;
-
 	} /* end for (record table entries) */
-
-#if	CF_DEBUGS
-	debugprintf("bpi_auditvt: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (bpi_auditvt) */
 
-
-static int bpi_search(BPI *op,BPI_QUERY *qp)
-{
-	BPI_FMI		*mip = &op->fmi ;
-	BPIHDR		*hip = &op->fhi ;
+static int bpi_search(bpi *op,bpi_q *qp) noex {
+	bpi_fmi		*mip = &op->fmi ;
+	bpihdr		*hip = &op->fhi ;
 	uint		(*vt)[1] ;
 	uint		citekey ;
 	uint		vte[1] ;
@@ -679,21 +526,14 @@ static int bpi_search(BPI *op,BPI_QUERY *qp)
 
 	mkcitekey(qp,&citekey) ;
 
-#if	CF_DEBUGS
-	debugprintf("bpi_search: vtlen=%u\n",vtlen) ;
-	debugprintf("bpi_search: citekey=%08X\n",citekey) ;
-#endif
-
 	vte[0] = citekey ;
 
 #if	CF_SEARCH
 	{
 	    uint	*vtep ;
-	    int		vtesize = (1 * sizeof(uint)) ;
-
+	    int		vtesize = (1 * szof(uint)) ;
 	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
-
-	    rs = (vtep != NULL) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
+	    rs = (vtep != nullptr) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
 	    vi = rs ;
 	}
 #else /* CF_SEARCH */
@@ -710,18 +550,16 @@ static int bpi_search(BPI *op,BPI_QUERY *qp)
 }
 /* end subroutine (bpi_search) */
 
-
-static int bpi_loadbve(BPI *op,BPI_VERSE *bvep,int vi)
-{
-	BPI_FMI		*mip = &op->fmi ;
-	BPIHDR		*hip = &op->fhi ;
+static int bpi_loadbve(bpi *op,bpi_v *bvep,int vi) noex {
+	bpi_fmi		*mip = &op->fmi ;
+	bpihdr		*hip = &op->fhi ;
 	uint		*vte ;
 	int		rs = SR_OK ;
 	int		vtlen ;
 
-	if (bvep == NULL) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
 
-	memset(bvep,0,sizeof(BPI_VERSE)) ;
+	memclear(bvep) ;
 
 	vtlen = hip->vilen ;
 	if (vi >= vtlen) rs = SR_NOANODE ;
@@ -736,40 +574,27 @@ static int bpi_loadbve(BPI *op,BPI_VERSE *bvep,int vi)
 	    bvep->v = (vte[0] >> 0) & 0xFF ;
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("bpi_loadbve: ret rs=%d\n") ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (bpi_loadbve) */
 
-
-static int mkcitekey(BPI_QUERY *bvp,uint *cip)
-{
-	uint	ci = 0 ;
-
+static int mkcitekey(bpi_q *bvp,uint *cip) noex {
+	uint		ci = 0 ;
 	ci |= (bvp->b & UCHAR_MAX) ;
-
 	ci = (ci << 8) ;
 	ci |= (bvp->c & UCHAR_MAX) ;
-
 	ci = (ci << 8) ;
 	ci |= (bvp->v & UCHAR_MAX) ;
-
 	*cip = ci ;
 	return SR_OK ;
 }
 /* end subroutine (mkcitekey) */
 
-
 #if	CF_SEARCH
-static int vtecmp(const void *v1p,const void *v2p)
-{
+static int vtecmp(cvoid *v1p,cvoid *v2p) noex {
 	uint		*vte1 = (uint *) v1p ;
 	uint		*vte2 = (uint *) v2p ;
 	uint		c1, c2 ;
-
 	c1 = vte1[0] & 0x00FFFFFF ;
 	c2 = vte2[0] & 0x00FFFFFF ;
 	return (c1 - c2) ;

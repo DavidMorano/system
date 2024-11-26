@@ -77,6 +77,7 @@
 #include	<usystem.h>
 #include	<ucgetpid.h>		/* |uc_getpid(3uc)| */
 #include	<ids.h>
+#include	<sigignores.h>
 #include	<sigign.h>
 #include	<xperm.h>
 #include	<findxfile.h>
@@ -143,7 +144,6 @@ extern "C" {
 }
 
 extern "C" {
-    extern int	sigignores(cint *) noex ;
     extern int	sigdefaults(cint *) noex ;
 }
 
@@ -694,6 +694,7 @@ int spawner_wait(spawner *op,int *csp,int opts) noex {
 static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	cint		opts = op->opts ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	cchar		*efname = op->execfname ;
 
 	if ((rs >= 0) && (opts & SPAWNER_OIGNINTR)) {
@@ -713,13 +714,13 @@ static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	    switch (cmdp->cmd) {
 	    case cmd_setctty:
 	        {
-	            SIGIGN	si ;
 	            pid_t	pgrp = getpgrp() ;
-	            if ((rs = sigign_start(&si,sigouts)) >= 0) {
+	            if (sigign si ; (rs = sigign_start(&si,sigouts)) >= 0) {
 	                rs = uc_tcsetpgrp(cmdp->pfd,pgrp) ;
 	                u_close(cmdp->pfd) ;
 	                cmdp->pfd = -1 ;
-	                sigign_finish(&si) ;
+	                rs1 = sigign_finish(&si) ;
+			if (rs >= 0) rs = rs1 ;
 	            } /* end if (sigign) */
 	        }
 	        break ;
