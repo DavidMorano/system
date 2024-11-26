@@ -31,6 +31,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<charconv>
 #include	<usystem.h>
 #include	<stdintx.h>

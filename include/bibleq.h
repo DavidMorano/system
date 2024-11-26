@@ -1,4 +1,6 @@
-/* bibleq */
+/* bibleq SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -11,78 +13,71 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BIBLEQ_INCLUDE
-#define	BIBLEQ_INCLUDE	1
+#define	BIBLEQ_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
-#include	"bibleqs.h"
+#include	<bibleqs.h>
 
 
 #define	BIBLEQ_MAGIC	0x99447243
 #define	BIBLEQ		struct bibleq_head
 #define	BIBLEQ_CUR	struct bibleq_c
-#define	BIBLEQ_CALLS	struct bibleq_calls
-#define	BIBLEQ_QUERY	BIBLEQS_CITE
+#define	BIBLEQ_CA	struct bibleq_calls
 #define	BIBLEQ_Q	BIBLEQS_CITE
 #define	BIBLEQ_CITE	BIBLEQS_CITE
-
 /* query options */
-
 #define	BIBLEQ_OPREFIX	BIBLEQS_OPREFIX		/* prefix match */
 
 
-struct bibleq_c {
+struct bibleq_cursor  {
 	uint	magic ;
 	void	*scp ;		/* SO-cursor pointer */
 } ;
 
+EXTERNC_begin
 struct bibleq_calls {
-	int	(*open)(void *,const char *,const char *) ;
-	int	(*count)(void *) ;
-	int	(*curbegin)(void *,void *) ;
-	int	(*lookup)(void *,void *,int,const char **) ;
-	int	(*enumerate)(void *,void *,BIBLEQS_CITE *,char *,int) ;
-	int	(*curend)(void *,void *) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
+	int	(*open)(void *,cchar *,cchar *) noex ;
+	int	(*count)(void *) noex ;
+	int	(*curbegin)(void *,void *) noex ;
+	int	(*lookup)(void *,void *,int,cchar **) noex ;
+	int	(*enumerate)(void *,void *,BIBLEQS_CITE *,char *,int) noex ;
+	int	(*curend)(void *,void *) noex ;
+	int	(*audit)(void *) noex ;
+	int	(*close)(void *) noex ;
 } ;
+EXTERNC_end
 
 struct bibleq_head {
 	uint		magic ;
-	MODLOAD		loader ;
-	BIBLEQ_CALLS	call ;
+	modload		loader ;
+	BIBLEQ_CA	call ;
 	void		*obj ;		/* object pointer */
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ;
 
 
-#if	(! defined(BIBLEQ_MASTER)) || (BIBLEQ_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int bibleq_open(BIBLEQ *,cchar *,cchar *) noex ;
+extern int bibleq_count(BIBLEQ *) noex ;
+extern int bibleq_curbegin(BIBLEQ *,BIBLEQ_CUR *) noex ;
+extern int bibleq_lookup(BIBLEQ *,BIBLEQ_CUR *,int,cchar **) noex ;
+extern int bibleq_read(BIBLEQ *,BIBLEQ_CUR *,BIBLEQ_CITE *,char *,int) noex ;
+extern int bibleq_curend(BIBLEQ *,BIBLEQ_CUR *) noex ;
+extern int bibleq_audit(BIBLEQ *) noex ;
+extern int bibleq_close(BIBLEQ *) noex ;
 
-extern int bibleq_open(BIBLEQ *,const char *,const char *) ;
-extern int bibleq_count(BIBLEQ *) ;
-extern int bibleq_curbegin(BIBLEQ *,BIBLEQ_CUR *) ;
-extern int bibleq_lookup(BIBLEQ *,BIBLEQ_CUR *,int,const char **) ;
-extern int bibleq_read(BIBLEQ *,BIBLEQ_CUR *,BIBLEQ_CITE *,char *,int) ;
-extern int bibleq_curend(BIBLEQ *,BIBLEQ_CUR *) ;
-extern int bibleq_audit(BIBLEQ *) ;
-extern int bibleq_close(BIBLEQ *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BIBLEQ_MASTER */
 
 #endif /* BIBLEQ_INCLUDE */
 

@@ -78,6 +78,7 @@
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<getpwd.h>
+#include	<sigignores.h>
 #include	<envhelp.h>
 #include	<vecstr.h>
 #include	<ids.h>
@@ -123,7 +124,6 @@ extern "C" {
     extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
     extern int	dupup(int,int) noex ;
     extern int	sigdefaults(cint *) noex ;
-    extern int	sigignores(cint *) noex ;
 }
 
 
@@ -370,8 +370,9 @@ static int spawnproc_parfin(scon *psap,int pfd,int *dupes,
 /* end subroutine (spawnproc_parfin) */
 
 static void spawnproc_child(scon *psap,cchar *fname,
-	mainv argv,mainv ev,int cfd,int *dupes,int (*pipes)[2]) noex {
+		mv argv,mv ev,int cfd,int *dupes,int (*pipes)[2]) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		opens[3] ;
 	mainv		av ;
 	cchar		*arg[2] ;
@@ -393,11 +394,13 @@ static void spawnproc_child(scon *psap,cchar *fname,
 	}
 
 	if ((rs >= 0) && (psap->opts & SPAWNPROC_OSETCTTY)) {
-	    SIGIGN	si ;
 	    pid_t	pgrp = getpgrp() ;
-	    if ((rs = sigign_start(&si,sigouts)) >= 0) {
-	        rs = uc_tcsetpgrp(psap->fd_ctty,pgrp) ;
-	        sigign_finish(&si) ;
+	    if (sigign si ; (rs = sigign_start(&si,sigouts)) >= 0) {
+		{
+	            rs = uc_tcsetpgrp(psap->fd_ctty,pgrp) ;
+		}
+	        rs1 = sigign_finish(&si) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigign) */
 	} /* end if (set PGID for controlling terminal) */
 

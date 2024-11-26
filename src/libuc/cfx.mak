@@ -2,7 +2,7 @@
 
 T= cfx
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -34,7 +33,7 @@ LINT		?= lint
 
 DEFS=
 
-INCS= cfxxxx.hh cfsysx.hh
+INCS= cfx.h cfxxxx.hh cfsysx.hh
 
 LIBS=
 
@@ -69,7 +68,6 @@ OBJ7_CFX= cfnum.o
 OBJA_CFX= obj0cfx.o obj1cfx.o obj2cfx.o obj3cfx.o
 OBJB_CFX= obj4cfx.o obj5cfx.o obj6cfx.o obj7cfx.o
 
-
 OBJ_CFX= obja_cfx.o objb_cfx.o
 
 
@@ -101,9 +99,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_CFX)
-
-$(T).a:			$(OBJ_CFX)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

@@ -1,4 +1,4 @@
-/* partitionai HEADER */
+/* partidxi HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PARTITIONAI_INCLUDE
-#define	PARTITIONAI_INCLUDE
+#ifndef	PARTIDXI_INCLUDE
+#define	PARTIDXI_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -29,13 +29,11 @@
 
 EXTERNC_begin
 
-typedef int	(*partitionai_f)(int,int) noex ;
-
-extern int	partitionai(int *,int,partitionai_f,int) noex ;
+extern int	partidxi(int *,int,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* PARTITIONAI_INCLUDE */
+#endif /* PARTIDXI_INCLUDE */
 
 

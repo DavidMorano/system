@@ -1,5 +1,9 @@
 /* partitionai HEADER */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C20 */
+
+/* integer array partitioning function */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -25,7 +29,9 @@
 
 EXTERNC_begin
 
-extern int	partitionai(int *,int,int (*)(int,int),int) noex ;
+typedef int	(*partitionai_f)(int,int) noex ;
+
+extern int	partitionai(int *,int,partitionai_f,int) noex ;
 
 EXTERNC_end
 

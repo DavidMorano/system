@@ -1,4 +1,6 @@
-/* biblebooks */
+/* biblebooks HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -11,25 +13,25 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BIBLEBOOKS_INCLUDE
-#define	BIBLEBOOKS_INCLUDE	1
+#define	BIBLEBOOKS_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecpstr.h>
-#include	<localmisc.h>
 
 
 #define	BIBLEBOOKS_MAGIC	0x99447243
 #define	BIBLEBOOKS		struct biblebooks_head
-#define	BIBLEBOOKS_OBJ		struct biblebooks_obj
+#define	BIBLEBOOKS_OBJ		struct biblebooks_object
 
 
-/* this is the shared-object descritoption */
-struct biblebooks_obj {
-	const char	*name ;
+struct biblebooks_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -39,27 +41,22 @@ struct biblebooks_head {
 	vecpstr		db ;
 } ;
 
+typedef	BIBLEBOOKS		biblebooks ;
+typedef	BIBLEBOOKS_OBJ		biblebooks_obj ;
 
-#if	(! defined(BIBLEBOOKS_MASTER)) || (BIBLEBOOKS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	biblebooks_open(BIBLEBOOKS *,cchar *,cchar *) noex ;
+extern int	biblebooks_count(BIBLEBOOKS *) noex ;
+extern int	biblebooks_max(BIBLEBOOKS *) noex ;
+extern int	biblebooks_lookup(BIBLEBOOKS *,char *,int,int) noex ;
+extern int	biblebooks_get(BIBLEBOOKS *,int,char *,int) noex ;
+extern int	biblebooks_size(BIBLEBOOKS *) noex ;
+extern int	biblebooks_audit(BIBLEBOOKS *) noex ;
+extern int	biblebooks_close(BIBLEBOOKS *) noex ;
 
-extern int	biblebooks_open(BIBLEBOOKS *,const char *,const char *) ;
-extern int	biblebooks_count(BIBLEBOOKS *) ;
-extern int	biblebooks_max(BIBLEBOOKS *) ;
-extern int	biblebooks_lookup(BIBLEBOOKS *,char *,int,int) ;
-extern int	biblebooks_get(BIBLEBOOKS *,int,char *,int) ;
-extern int	biblebooks_size(BIBLEBOOKS *) ;
-extern int	biblebooks_audit(BIBLEBOOKS *) ;
-extern int	biblebooks_close(BIBLEBOOKS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BIBLEBOOKS_MASTER */
 
 #endif /* BIBLEBOOKS_INCLUDE */
 

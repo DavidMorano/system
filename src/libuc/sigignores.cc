@@ -33,6 +33,11 @@
 #include	<cstdlib>
 #include	<usystem.h>
 
+#include	"sigignores.h"
+
+
+/* local defines */
+
 
 /* external subroutines */
 
@@ -54,7 +59,7 @@
 
 /* exported subroutines */
 
-int sigignores(int *sigs) noex {
+int sigignores(cint *sigs) noex {
 	int		rs = SR_FAULT ;
 	if (sigs) {
 	    rs = SR_OK ;
@@ -65,10 +70,5 @@ int sigignores(int *sigs) noex {
 	return rs ;
 }
 /* end subroutine (sigignores) */
-
-int ignoresigs(int *sigs) noex {
-	return sigignores(sigs) ;
-}
-/* end subroutine (ignoresigs) */
 
 

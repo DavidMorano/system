@@ -46,6 +46,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<sfx.h>
+#include	<digval.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -58,15 +59,17 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	digvalhex(int) noex ;
-}
-
 
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

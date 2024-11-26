@@ -1,42 +1,43 @@
-/* bibleparas */
+/* bibleparas HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BIBLEPARAS_INCLUDE
-#define	BIBLEPARAS_INCLUDE	1
+#define	BIBLEPARAS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-#include	<sys/types.h>
-
-#include	<localmisc.h>
-
-#include	"bpi.h"
+#include	<bpi.h>
 
 
 #define	BIBLEPARAS_MAGIC	0x99447246
 #define	BIBLEPARAS		struct bibleparas_head
-#define	BIBLEPARAS_OBJ		struct bibleparas_obj
+#define	BIBLEPARAS_OBJ		struct bibleparas_object
 #define	BIBLEPARAS_FL		struct bibleparas_flags
-#define	BIBLEPARAS_CITE		struct bibleparas_q
-#define	BIBLEPARAS_Q		struct bibleparas_q
-#define	BIBLEPARAS_CUR		struct bibleparas_c
-#define	BIBLEPARAS_INFO		struct bibleparas_i
-
+#define	BIBLEPARAS_CITE		struct bibleparas_query
+#define	BIBLEPARAS_Q		struct bibleparas_query
+#define	BIBLEPARAS_CUR		struct bibleparas_cursor
+#define	BIBLEPARAS_INFO		struct bibleparas_information
 /* default DB name */
 #define	BIBLEPARAS_DBNAME	"default"
 
 
-/* this is the shared-object description */
-struct bibleparas_obj {
-	const char	*name ;
+struct bibleparas_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct bibleparas_i {
+struct bibleparas_information {
 	time_t		dbtime ;		/* db-time */
 	time_t		vitime ;		/* vi-time */
 	uint		maxbook ;
@@ -45,11 +46,11 @@ struct bibleparas_i {
 	uint		nzverses ;
 } ;
 
-struct bibleparas_q {
+struct bibleparas_query {
 	uchar		b, c, v ;
 } ;
 
-struct bibleparas_c {
+struct bibleparas_cursor {
 	BPI_CUR		vicur ;
 } ;
 
@@ -58,10 +59,9 @@ struct bibleparas_flags {
 } ;
 
 struct bibleparas_head {
-	uint		magic ;
-	const char	*pr ;
-	const char 	*dbname ;		/* DB-name */
-	const char 	*dbfname ;		/* DB file-name */
+	cchar		*pr ;
+	cchar 		*dbname ;		/* DB-name */
+	cchar 		*dbfname ;		/* DB file-name */
 	char		*mapdata ;		/* memory-map address */
 	BIBLEPARAS_FL	f ;
 	BPI		vind ;			/* verse-index */
@@ -71,32 +71,33 @@ struct bibleparas_head {
 	time_t		ti_vind ;		/* verse-index */
 	size_t		mapsize ;		/* map size */
 	size_t		filesize ;		/* file size */
+	uint		magic ;
 	int		nverses ;
 	int		ncursors ;
 } ;
 
+typedef	BIBLEPARAS		bibleparas ;
+typedef	BIBLEPARAS_OBJ		bibleparas_obj ;
+typedef	BIBLEPARAS_FL		bibleparas_fl ;
+typedef	BIBLEPARAS_CITE		bibleparas_cite ;
+typedef	BIBLEPARAS_Q		bibleparas_q ;
+typedef	BIBLEPARAS_CUR		bibleparas_cur ;
+typedef	BIBLEPARAS_INFO		bibleparas_info ;
 
-#if	(! defined(BIBLEPARAS_MASTER)) || (BIBLEPARAS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int bibleparas_open(bibleparas *,cchar *,cchar *) noex ;
+extern int bibleparas_count(bibleparas *) noex ;
+extern int bibleparas_ispara(bibleparas *,bibleparas_q *) noex ;
+extern int bibleparas_curbegin(bibleparas *,bibleparas_cur *) noex ;
+extern int bibleparas_enum(bibleparas *,bibleparas_cur *,bibleparas_q *) noex ;
+extern int bibleparas_curend(bibleparas *,bibleparas_cur *) noex ;
+extern int bibleparas_audit(bibleparas *) noex ;
+extern int bibleparas_info(bibleparas *,bibleparas_info *) noex ;
+extern int bibleparas_close(bibleparas *) noex ;
 
-extern int	bibleparas_open(BIBLEPARAS *,const char *,const char *) ;
-extern int	bibleparas_count(BIBLEPARAS *) ;
-extern int	bibleparas_ispara(BIBLEPARAS *,BIBLEPARAS_Q *) ;
-extern int	bibleparas_curbegin(BIBLEPARAS *,BIBLEPARAS_CUR *) ;
-extern int	bibleparas_enum(BIBLEPARAS *,BIBLEPARAS_CUR *,BIBLEPARAS_Q *) ;
-extern int	bibleparas_curend(BIBLEPARAS *,BIBLEPARAS_CUR *) ;
-extern int	bibleparas_audit(BIBLEPARAS *) ;
-extern int	bibleparas_info(BIBLEPARAS *,BIBLEPARAS_INFO *) ;
-extern int	bibleparas_close(BIBLEPARAS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BIBLEPARAS_MASTER */
 
 #endif /* BIBLEPARAS_INCLUDE */
 

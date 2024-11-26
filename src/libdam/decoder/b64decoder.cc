@@ -260,7 +260,7 @@ static int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
 	            rs = SR_ILSEQ ;
 		}
 	        delete [] rbuf ;
-	    } else { /* memory allocation */
+	    } else { /* memory-allocation-free */
 	        rs = SR_NOMEM ;
 	    }
 	} else {

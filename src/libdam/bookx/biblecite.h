@@ -1,6 +1,9 @@
-/* biblecite */
+/* biblecite HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* bible-citation */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,34 +17,33 @@
 
 
 #ifndef	BIBLECITE_INCLUDE
-#define	BIBLECITE_INCLUDE	1
+#define	BIBLECITE_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
-#include	<localmisc.h>
-
-
-#define	BIBLECITE	struct biblecite
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
-struct biblecite {
+#define	BIBLECITE	struct biblecite_head
+
+
+struct biblecite_head {
 	uint	b, c, v ;
 } ;
 
+typedef	BIBLECITE	biblecite ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	isbiblecite(BIBLECITE *,const char *,int,int *) ;
+extern int	isbiblecite(biblecite *,cchar *,int,int *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* BIBLECITE_INCLUDE */
+
+#endif /* biblecite_INCLUDE */
 
 

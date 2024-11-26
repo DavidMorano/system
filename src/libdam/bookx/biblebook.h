@@ -1,4 +1,5 @@
 /* biblebook HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* BIBLEBOOK object-load management */
@@ -19,9 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
-#include	<localmisc.h>
 
 
 #define	BIBLEBOOK_MAGIC		0x99447242
@@ -32,6 +36,7 @@
 #define	BIBLEBOOK_NBOOKS	66
 
 
+EXTERNC_begin
 struct biblebook_calls {
 	int	(*open)(void *,cchar *,cchar *) ;
 	int	(*count)(void *) ;
@@ -43,6 +48,7 @@ struct biblebook_calls {
 	int	(*audit)(void *) ;
 	int	(*close)(void *) ;
 } ;
+EXTERNC_end
 
 struct biblebook_flags {
 	int		localdb:1 ;	/* using local DB */

@@ -208,9 +208,9 @@ static int fmq_fnopen(fmq *op) noex {
 	if ((rs = u_open(op->fname,of,om)) >= 0) {
 	    op->fd = rs ;
 	} else if ((rs == rsn) && (op->oflags & O_CREAT)) {
-	    f_create = true ;
 	    if ((rs = u_open(op->fname,of,om)) >= 0) {
 	        op->fd = rs ;
+	        f_create = true ;
 	    }
 	} /* end if (creating file) */
 	return (rs >= 0) ? f_create : rs ;
@@ -474,10 +474,11 @@ int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts) noex {
 	    rs = SR_RDONLY ;
 	    if (op->f.writable) {
 	        time_t	dt = getustime ;
-	        time_t	starttime, endtime ;
-	        bool	f_infinite = false ;
+	        time_t	starttime ;
+	        time_t	endtime ;
+	        bool	f_inf = false ;
 	        if (to < 0) {
-	            f_infinite = true ;
+	            f_inf = true ;
 	            to = INT_MAX ;
 	        }
 	        starttime = dt ;
@@ -490,7 +491,7 @@ int fmq_sende(fmq *op,cvoid *buf,int buflen,int to,int opts) noex {
 	            tlen = rs ;
 	            if (rs >= 0) break ;
 	            if (rs != SR_AGAIN) break ;
-	            if (f_infinite && (op->f.ndelay || op->f.nonblock)) break ;
+	            if (f_inf && (op->f.ndelay || op->f.nonblock)) break ;
 	            if (to <= 0) break ;
 	            msleep(1000) ;
 	            dt = getustime ;
@@ -522,9 +523,9 @@ int fmq_recve(fmq *op,void *buf,int buflen,int to,int opts) noex {
 	int		rs ;
 	int		tlen = 0 ;
 	if ((rs = fmq_magic(op,buf)) >= 0) {
-	    bool	f_infinite = false ;
+	    bool	f_inf = false ;
 	    if (to < 0) {
-	        f_infinite = true ;
+	        f_inf = true ;
 	        to = INT_MAX ;
 	    }
 	    while (to >= 0) {
@@ -532,7 +533,7 @@ int fmq_recve(fmq *op,void *buf,int buflen,int to,int opts) noex {
 	        tlen = rs ;
 	        if (rs >= 0) break ;
 	        if (rs != SR_AGAIN) break ;
-	        if (f_infinite && (op->f.ndelay || op->f.nonblock)) break ;
+	        if (f_inf && (op->f.ndelay || op->f.nonblock)) break ;
 	        if (to <= 0) break ;
 	        to -= 1 ;
 	        msleep(1000) ;

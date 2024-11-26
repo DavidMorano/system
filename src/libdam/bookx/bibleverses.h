@@ -1,4 +1,5 @@
 /* bibleverses HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -13,38 +14,37 @@
 
 
 #ifndef	BIBLEVERSES_INCLUDE
-#define	BIBLEVERSES_INCLUDE	1
+#define	BIBLEVERSES_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-#include	"bvi.h"
+#include	<bvi.h>
 
 
 #define	BIBLEVERSES_MAGIC	0x99447245
 #define	BIBLEVERSES		struct bibleverses_head
 #define	BIBLEVERSES_FL		struct bibleverses_flags
-#define	BIBLEVERSES_OBJ		struct bibleverses_obj
-#define	BIBLEVERSES_QUERY	struct bibleverses_q
-#define	BIBLEVERSES_CITE	struct bibleverses_q
-#define	BIBLEVERSES_Q		struct bibleverses_q
-#define	BIBLEVERSES_CUR		struct bibleverses_c
-#define	BIBLEVERSES_INFO	struct bibleverses_i
-#define	BIBLEVERSES_I		struct bibleverses_i
-
+#define	BIBLEVERSES_OBJ		struct bibleverses_object
+#define	BIBLEVERSES_CITE	struct bibleverses_query
+#define	bibleverses_q		struct bibleverses_query
+#define	BIBLEVERSES_CUR		struct bibleverses_cursor
+#define	BIBLEVERSES_INFO	struct bibleverses_information
 #define	BIBLEVERSES_DBNAME	"av"
 
 
-/* this is the shared-object description */
-struct bibleverses_obj {
-	const char	*name ;
+struct bibleverses_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct bibleverses_i {
+struct bibleverses_information {
 	time_t		dbtime ;		/* db-time */
 	time_t		vitime ;		/* vi-time */
 	uint		maxbook ;
@@ -53,11 +53,11 @@ struct bibleverses_i {
 	uint		nzverses ;
 } ;
 
-struct bibleverses_q {
+struct bibleverses_query {
 	uchar		b, c, v ;
 } ;
 
-struct bibleverses_c {
+struct bibleverses_cursor {
 	BVI_CUR		vicur ;
 } ;
 
@@ -66,48 +66,48 @@ struct bibleverses_flags {
 } ;
 
 struct bibleverses_head {
-	uint		magic ;
-	const char	*pr ;
-	const char 	*dbname ;		/* DB-name */
-	const char 	*dbfname ;		/* DB file-name */
+	cchar		*pr ;
+	cchar 		*dbname ;		/* DB-name */
+	cchar 		*dbfname ;		/* DB file-name */
 	char		*mapdata ;		/* memory-map address */
 	BIBLEVERSES_FL	f ;
-	BVI		vind ;			/* verse-index */
+	bvi		vind ;			/* verse-index */
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
 	time_t		ti_vind ;		/* verse-index */
 	size_t		mapsize ;		/* map size */
 	size_t		filesize ;		/* file size */
+	uint		magic ;
 	int		nverses ;
 	int		ncursors ;
 } ;
 
+typedef	BIBLEVERSES		bibleverses ;
+typedef	BIBLEVERSES_FL		bibleverses_fl ;
+typedef	BIBLEVERSES_OBJ		bibleverses_obj ;
+typedef	BIBLEVERSES_CITE	bibleverses_cite ;
+typedef	bibleverses_q		bibleverses_q ;
+typedef	BIBLEVERSES_CUR		bibleverses_cur ;
+typedef	BIBLEVERSES_INFO	bibleverses_info ;
 
-#if	(! defined(BIBLEVERSES_MASTER)) || (BIBLEVERSES_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int bibleverses_open(bibleverses *,cchar *,cchar *) noex ;
+extern int bibleverses_count(bibleverses *) noex ;
+extern int bibleverses_read(bibleverses *,char *,int,bibleverses_q *) noex ;
+extern int bibleverses_get(bibleverses *,bibleverses_q *,char *,int) noex ;
+extern int bibleverses_curbegin(bibleverses *,bibleverses_cur *) noex ;
+extern int bibleverses_enum(bibleverses *,bibleverses_cur *,
+			bibleverses_qUERY *,char *,int) noex ;
+extern int bibleverses_curend(bibleverses *,bibleverses_cur *) noex ;
+extern int bibleverses_audit(bibleverses *) noex ;
+extern int bibleverses_info(bibleverses *,bibleverses_info *) noex ;
+extern int bibleverses_chapters(bibleverses *,int,uchar *,int) noex ;
+extern int bibleverses_close(bibleverses *) noex ;
 
-extern int	bibleverses_open(BIBLEVERSES *,cchar *,cchar *) ;
-extern int	bibleverses_count(BIBLEVERSES *) ;
-extern int	bibleverses_read(BIBLEVERSES *,char *,int,BIBLEVERSES_Q *) ;
-extern int	bibleverses_get(BIBLEVERSES *,BIBLEVERSES_Q *,char *,int) ;
-extern int	bibleverses_curbegin(BIBLEVERSES *,BIBLEVERSES_CUR *) ;
-extern int	bibleverses_enum(BIBLEVERSES *,BIBLEVERSES_CUR *,
-			BIBLEVERSES_QUERY *,char *,int) ;
-extern int	bibleverses_curend(BIBLEVERSES *,BIBLEVERSES_CUR *) ;
-extern int	bibleverses_audit(BIBLEVERSES *) ;
-extern int	bibleverses_info(BIBLEVERSES *,BIBLEVERSES_INFO *) ;
-extern int	bibleverses_chapters(BIBLEVERSES *,int,uchar *,int) ;
-extern int	bibleverses_close(BIBLEVERSES *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BIBLEVERSES_MASTER */
 
 #endif /* BIBLEVERSES_INCLUDE */
 
