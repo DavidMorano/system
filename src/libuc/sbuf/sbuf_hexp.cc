@@ -1,4 +1,5 @@
 /* sbuf_hexp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* storage buffer (SBuf) object */
@@ -38,7 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdint.h>
+#include	<cstdint>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */

@@ -1,4 +1,4 @@
-/* getlogterm SUPPORT */
+/* getlogx SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -42,7 +42,7 @@
 	rlen		result buffer length
 	sid		session ID
 
-	Returns :
+	Returns:
 	>=0		length of returned c-string
 	<0		error (system-return)
 

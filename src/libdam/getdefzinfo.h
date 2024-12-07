@@ -1,4 +1,5 @@
 /* getdefzinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is supposed to provide an OS-independent time management operation */

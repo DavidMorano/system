@@ -1,4 +1,5 @@
 /* ctdecp HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a decimal string /w precision */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
 
@@ -42,7 +44,7 @@ EXTERNC_end
 
 template<typename T>
 inline int ctdecp(char *,int,int,T) noex {
-	return 0 ;
+	return SR_NOSYS ;
 }
 
 template<>

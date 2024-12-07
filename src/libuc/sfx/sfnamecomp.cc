@@ -73,6 +73,16 @@
 
 /* forward references */
 
+static inline bool isleader(cchar *sp) noex {
+	int		i = 3 ;
+    	bool		f = true ;
+	f = f && (sp[--i] == '/') ;
+	f = f && (sp[--i] == '/') ;
+	f = f && (sp[--i] == '/') ;
+	return f ;
+}
+/* end subroutine (isleader) */
+
 
 /* local variables */
 
@@ -85,7 +95,7 @@
 int sfnamecomp(cchar *sp,int sl,cchar **rpp) noex {
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl > 1) {
-	    while ((sl > 1) && (sp[0] == '/') && (sp[1] == '/')) {
+	    while ((sl > 2) && isleader(sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */

@@ -1,4 +1,5 @@
 /* cthexstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to convert a value (as a counted string) to a HEX string */
@@ -11,7 +12,7 @@
 	This code was originally written.
 
 	= 2017-08-15, David A­D­ Morano
-	Rewrote to use the sbuf object.
+	Refactored to use the SBUF object.
 
 */
 
@@ -20,14 +21,14 @@
 /*******************************************************************************
 
 	Name:
-	cthexstring
+	cthexstr
 
 	Description:
-	This subroutine converts a counted array of bytes to a hexadecimal
-	string.
+	This subroutine converts a counted array of bytes to a
+	hexadecimal string.
 
 	Synopsis:
-	int cthexstring(char *dbuf,int dlen,int f,cchar *vp,int vl) noex
+	int cthexstr(char *dbuf,int dlen,int f,cchar *vp,int vl) noex
 
 	Arguments:
 	dbuf		result buffer
@@ -37,8 +38,8 @@
 	vl		length of source in bytes
 
 	Returns:
-	<0		error (overflow)
 	>=0		length of result bytes
+	<0		error (system-return)
 
 	Example-output:
 	+ for (!f)
@@ -49,10 +50,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<sbuf.h>
 
 #include	"cthexstr.h"
@@ -81,29 +86,28 @@
 
 /* exported subroutines */
 
-int cthexstring(char *dbuf,int dlen,int f,cchar *sp,int sl) noex {
+int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && sp) {
-	    sbuf	b ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
-	        const uchar	*vp = (const uchar *) sp ;
+	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
+	        const uchar	*up = (const uchar *) sp ;
 	        for (int i = 0 ; (rs >= 0) && (i < sl) ; i += 1) {
-	            cint	ch = vp[i] ;
+	            cint	ch = up[i] ;
 	            if (f && (i > 0)) {
-		        rs = sbuf_chr(&b,' ') ;
+		        rs = b.chr(' ') ;
 	            }
 		    if (rs >= 0) {
-			rs = sbuf_hexc(&b,ch) ;
+			rs = b.hexc(ch) ;
 		    }
 	        } /* end for */
-	        len = sbuf_finish(&b) ;
+	        len = b.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (cthexstring) */
+/* end subroutine (cthexstr) */
 
 

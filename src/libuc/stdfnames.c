@@ -1,4 +1,5 @@
-/* stdfnames */
+/* stdfnames SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* standard file-names */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Variable:
+	stdfnames
+
+	Description:
 	This modeule provides that c-strings for the standard file
 	names.
 
@@ -28,6 +33,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	"stdfnames.h"
 
@@ -41,7 +47,19 @@
 /* local typedefs */
 
 
-/* subroutine templates */
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

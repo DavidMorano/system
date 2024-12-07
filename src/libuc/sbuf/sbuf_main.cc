@@ -1,4 +1,5 @@
 /* sbuf_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* storage buffer (SBuf) object */
@@ -19,7 +20,7 @@
 	= 2017-11-06, David A­D­ Morano
 	I enhanced the |sbuf_hexXX()| methods using the property
 	that the length (in bytes) of the result is known ahead of
-	time. We cannot do this (really quickly) with decimal
+	time.  We cannot do this (really quickly) with decimal
 	conversions.
 
 */
@@ -33,7 +34,7 @@
 
 	Description:
 	This module can be used to construct strings or messages
-	in buffers WITHOUT using the "snwprint(3c)| subroutine or
+	in buffers WITHOUT using the |snwprint(3uc)| subroutine or
 	something similar.  This module is useful when the user
 	SUPPLIES a buffer of a specified length to the object at
 	object initialization.  This module uses an object, that
@@ -54,6 +55,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -82,6 +84,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -108,13 +111,13 @@ namespace {
 static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 template<typename T>
-int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
+static inline int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-	        int		bl = (SBUF_RLEN-SBUF_INDEX) ;
+	        cint		bl = (SBUF_RLEN-SBUF_INDEX) ;
 	        if (bl >= dlen) {
 	            char	*bp = (SBUF_RBUF+SBUF_INDEX) ;
 	            if ((rs = ctxxx(bp,bl,v)) >= 0) {
@@ -135,25 +138,25 @@ int sbuf_xxxx(sbuf *sbp,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (sbuf_xxxx) */
 
 template<typename T>
-int sbuf_binx(sbuf *sbp,T v) noex {
+static inline int sbuf_binx(sbuf *sbp,T v) noex {
 	return sbuf_xxxx(sbp,ctbin,v) ;
 }
 /* end subroutine-template (sbuf_binx) */
 
 template<typename T>
-int sbuf_octx(sbuf *sbp,T v) noex {
+static inline int sbuf_octx(sbuf *sbp,T v) noex {
 	return sbuf_xxxx(sbp,ctoct,v) ;
 }
 /* end subroutine-template (sbuf_octx) */
 
 template<typename T>
-int sbuf_decx(sbuf *sbp,T v) noex {
+static inline int sbuf_decx(sbuf *sbp,T v) noex {
 	return sbuf_xxxx(sbp,ctdec,v) ;
 }
 /* end subroutine-template (sbuf_decx) */
 
 template<typename T>
-int sbuf_hexx(sbuf *sbp,T v) noex {
+static inline int sbuf_hexx(sbuf *sbp,T v) noex {
 	return sbuf_xxxx(sbp,cthex,v) ;
 }
 /* end subroutine-template (sbuf_hexx) */
@@ -161,7 +164,7 @@ int sbuf_hexx(sbuf *sbp,T v) noex {
 
 /* local variables */
 
-static blanker			bo ;	/* so-valled "blank" object */
+static blanker			bo ;	/* so-called "blank" object */
 
 
 /* exported variables */
@@ -213,7 +216,7 @@ int sbuf_reset(sbuf *sbp) noex {
 int sbuf_buf(sbuf *sbp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (sbp) {
+	if (sbp && sp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 	        if (SBUF_RLEN < 0) {
@@ -260,7 +263,7 @@ int sbuf_strw(sbuf *sbp,cchar *sp,int sl) noex {
 }
 /* end subroutine (sbuf_strw) */
 
-int sbuf_strs(sbuf *bp,int sch,cchar **sv) noex {
+int sbuf_strs(sbuf *bp,int sch,mainv sv) noex {
 	int		rs = SR_FAULT ;
 	if (bp && sv) {
 	    rs = SR_OK ;
@@ -392,12 +395,12 @@ int sbuf_hexll(sbuf *sbp,longlong v) noex {
 /* end subroutine (sbuf_hexll) */
 
 int sbuf_hexuc(sbuf *sbp,uchar v) noex {
-	cint		hlen = (2*sizeof(uchar)) ; /* unsigned character */
+	cint		hlen = (2 * szof(uchar)) ; /* unsigned character */
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-		int	bl = (SBUF_RLEN-SBUF_INDEX) ;
+		cint	bl = (SBUF_RLEN-SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
 	        if (bl >= hlen) {
 	            char	*bp = (SBUF_RBUF+SBUF_INDEX) ;
@@ -432,7 +435,7 @@ int sbuf_chr(sbuf *sbp,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-	        int	bl = (SBUF_RLEN-SBUF_INDEX) ;
+	        cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
 	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
 	        if (bl >= len) {
@@ -456,7 +459,7 @@ int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		rs = SR_INVALID ;
 		if (len >= 0) {
-		    int		bl = (SBUF_RLEN - SBUF_INDEX) ;
+		    cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
 		    char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 		    rs = SR_OVERFLOW ;
 	            if (bl >= len) {

@@ -5,7 +5,7 @@
 /* spawn a local program */
 /* version %I% last-modified %G% */
 
-#define	CF_ENVSORT	0		/* sort the environment? */
+#define	CF_ENVSORT	1		/* sort the environment? */
 
 /* revision history:
 
@@ -41,13 +41,13 @@
 	Implementation notes:  
 
 	Remember that the |pipe(2)| system call creates two pipe
-	file descriptors. Both of these file descriptors are open
-	for reading and writing on System V UNIX®. However, on BSD
+	file descriptors.  Both of these file descriptors are open
+	for reading and writing on System V UNIX®.  However, on BSD
 	systems (or older BSD systems assuming that they have not
 	yet upgraded to the correct System V behavior) the first
 	file descriptor, the one in the zeroth array element, is
-	only open for reading. The second file descriptor, the one
-	in the oneth array element, is only open for writing. We
+	only open for reading.  The second file descriptor, the one
+	in the oneth array element, is only open for writing.  We
 	will follow the BSD semantics for portability but hopefully,
 	someday, the BSD version of UNIX® will get up to speed with
 	the rest of the world!
@@ -56,7 +56,7 @@
 	in a (hotly) mutli-threaded environment, we have to be quite
 	sure that we try to only call async-signal-safe (really
 	fork-safe) subroutines after the |fork(2)| and before any
-	|exit(2)|. The thing to avoid that might be used by "accident"
+	|exit(2)|.  The thing to avoid that might be used by "accident"
 	is a hidden |malloc(3c)| (or friends) after the |fork(2)|
 	someplace.
 
@@ -72,13 +72,15 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<uvariables.hh>
 #include	<ucgetpid.h>		/* |uc_getpid(3uc)| */
-#include	<ids.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<sigignores.h>
 #include	<sigign.h>
+#include	<ids.h>
 #include	<xperm.h>
 #include	<findxfile.h>
 #include	<xfile.h>
@@ -88,9 +90,9 @@
 #include	<mkpathx.h>
 #include	<isnot.h>
 #include	<iserror.h>
-#include	<localmisc.h>
 #include	<mapex.h>
 #include	<exitcodes.h>
+#include	<localmisc.h>		/* |NOFILE| */
 
 #include	"spawner.h"
 
@@ -99,30 +101,8 @@
 
 #define	SCMD		struct spawner_cmd
 
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
-
-#define	NENV		100
-
-#ifndef	ENVBUFLEN
-#define	ENVBUFLEN	(MAXPATHLEN + 40)
-#endif
-
-#ifndef	PATHBUFLEN
-#define	PATHBUFLEN	(8 * MAXPATHLEN)
-#endif
-
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
+#ifndef	CF_ENVSORT
+#define	CF_ENVSORT	0		/* sort the environment? */
 #endif
 
 
@@ -136,12 +116,10 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef mainv		mv ;
+
 
 /* external subroutines */
-
-extern "C" {
-    int		spawner_fddup2(spawner *,int,int) noex ;
-}
 
 extern "C" {
     extern int	sigdefaults(cint *) noex ;
@@ -182,15 +160,39 @@ typedef SCMD		scmd ;
 typedef SCMD *		scmdp ;
 typedef SCMD **		scmdpp ;
 
+namespace {
+    struct vars {
+	int		maxpathlen ;
+	int mkvars() noex {
+	    int		rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		maxpathlen = rs ;
+	    }
+	    return rs ;
+	} ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
 
 template<typename ... Args>
 static int spawner_ctor(spawner *op,Args ... args) noex {
     	SPAWNER		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = memclear(hop) ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->cmdp = new(nothrow) vecobj) != np) {
+		if ((op->envp = new(nothrow) envhelp) != np) {
+		    rs = SR_OK ;
+		}
+		if (rs < 0) {
+		    delete op->cmdp ;
+		    op->cmdp = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -200,6 +202,14 @@ static int spawner_dtor(spawner *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->envp) {
+		delete op->envp ;
+		op->envp = nullptr ;
+	    }
+	    if (op->cmdp) {
+		delete op->cmdp ;
+		op->cmdp = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -215,8 +225,8 @@ static inline int spawner_magic(spawner *op,Args ... args) noex {
 }
 /* end subroutine (spawner_magic) */
 
-
-static int	child(spawner *,scmd **,mainv,mainv) noex ;
+static int	spawner_runer(spawner *) noex ;
+static int	spawner_child(spawner *,scmd **,mainv,mainv) noex ;
 
 static int	procparent(scmd **) noex ;
 static int	defaultfds(scmd **) noex ;
@@ -247,9 +257,7 @@ constexpr int		sigigns[] = {
 	SIGHUP,
 	SIGPIPE,
 	SIGPOLL,
-#if	defined(SIGXFSZ)
 	SIGXFSZ,
-#endif
 	0
 } ;
 
@@ -266,7 +274,7 @@ constexpr int		sigouts[] = {
 	0
 } ;
 
-constexpr MAPEX		mapexs[] = {
+constexpr mapex_map	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -286,56 +294,50 @@ constexpr MAPEX		mapexs[] = {
 	{ 0, 0 }
 } ;
 
+static vars		var ;
+
+static cchar		*nullfname = sysword.w_devnull ;
+
+constexpr bool		f_envsort = CF_ENVSORT ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
+namespace {
+    struct starter {
+	spawner		*op ;
+	cchar		*fn ;
+	mainv		av ;
+	mainv		ev ;
+	char		*a{} ;
+	char		*pwd ;
+	char		*pbuf ;
+	starter(spawner *o,cc *f,mv a,mv e) noex : op(o), fn(f) {
+	    av = a ;
+	    ev = e ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int starts(cchar *) noex ;
+    } ; /* end struct (starter) */
+}
+
+int spawner_start(spawner *op,cchar *fn,mainv av,mainv ev) noex {
 	int		rs ;
-	if ((rs = spawner_ctor(op,fname)) >= 0) {
-	cchar		*efname = fname ;
-	char		pwd[MAXPATHLEN + 1] = { 0 } ;
-	char		pbuf[MAXPATHLEN + 1] ;
-	/* check for bad input */
-	if (fname[0] == '\0') return SR_INVAL ;
-	op->argv = argv ;
-	op->pid = -1 ;
-
-/* find the program */
-
-	if (fname[0] != '/') {
-	    if ((rs = findprog(pwd,pbuf,fname)) > 0) {
-	        efname = pbuf ;
-	    }
-	} else {
-	    rs = perm(fname,-1,-1,nullptr,X_OK) ;
-	}
-
-	if (rs >= 0) {
-	    if (cchar *cp ; (rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
-	        cint		sz = szof(scmd) ;
-	        op->execfname = cp ;
-	        if ((rs = vecobj_start(&op->cmds,sz,2,0)) >= 0) {
-	            envhelp	*ehp = &op->env ;
-	            if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
-	                rs = envhelp_load(ehp,pwd,efname,argv) ;
-	                if (rs < 0) {
-	                    envhelp_finish(ehp) ;
-			}
-	            } /* end if (envhelp_start) */
-	            if (rs < 0) {
-	                vecobj_finish(&op->cmds) ;
+	if ((rs = spawner_ctor(op,fn)) >= 0) {
+	    rs = SR_INVAL ;
+	    if (fn[0]) {
+		static cint	rsv = var.mkvars() ;
+		if ((rs = rsv) >= 0) {
+		    op->argv = av ;
+		    op->pid = -1 ;
+		    if (starter so(op,fn,av,ev) ; (rs = so) >= 0) {
+			op->magic = SPAWNER_MAGIC ;
 		    }
-	        } /* end if (vecobj_start) */
-	        if (rs < 0) {
-	            uc_free(op->execfname) ;
-	            op->execfname = nullptr ;
-	        }
-	    } /* end if (uc_mallocstrw) */
-	} /* end if (ok) */
-
+		} /* end if (mkvars) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
 		spawner_dtor(op) ;
 	    }
@@ -344,11 +346,64 @@ int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex {
 }
 /* end subroutine (spawner_start) */
 
+starter::operator int () noex {
+    	cint		maxpath = var.maxpathlen ;
+	cint		sz = ((var.maxpathlen + 1) * 2) ;
+    	int		rs ;
+	int		ai = 0 ;
+	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    cchar	*efname = fn ;
+	    pwd = (a + ((maxpath + 1) * ai++)) ;
+	    pbuf = (a + ((maxpath + 1) * ai++)) ;
+	    /* find the program */
+	    if (fn[0] != '/') {
+	        if ((rs = findprog(pwd,pbuf,fn)) > 0) {
+	            efname = pbuf ;
+	        }
+	    } else {
+	        rs = perm(fn,-1,-1,nullptr,X_OK) ;
+	    }
+	    if (rs >= 0) {
+	        rs = starts(efname) ;
+	    }
+	    rs = rsfree(rs,a) ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end method (starter::operator) */
+
+int starter::starts(cc *efname) noex {
+    	int		rs ;
+        if (cchar *cp{} ; (rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
+            cint            sz = szof(scmd) ;
+            op->execfname = cp ;
+            if ((rs = vecobj_start(op->cmdp,sz,2,0)) >= 0) {
+                envhelp     *ehp = op->envp ;
+                if ((rs = envhelp_start(ehp,envbads,ev)) >= 0) {
+                    rs = envhelp_load(ehp,pwd,efname,av) ;
+                    if (rs < 0) {
+                        envhelp_finish(ehp) ;
+                    }
+                } /* end if (envhelp_start) */
+                if (rs < 0) {
+                    vecobj_finish(op->cmdp) ;
+                }
+            } /* end if (vecobj_start) */
+            if (rs < 0) {
+                uc_free(op->execfname) ;
+                op->execfname = nullptr ;
+            }
+        } /* end if (memory-allocation) */
+	return rs ;
+}
+/* end method (starter::starts) */
+
 int spawner_finish(spawner *op) noex {
+    	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
-	    if (void **vpp{} ; (rs1 = vecobj_getvec(&op->cmds,&vpp)) >= 0) {
+	    if (void **vpp{} ; (rs1 = vecobj_getvec(op->cmdp,&vpp)) >= 0) {
 	        scmd	**cv = scmdpp(vpp) ;
 	        for (int i = 0 ; cv[i] != nullptr ; i += 1) {
 	            scmd	*cmdp = cv[i] ;
@@ -361,18 +416,18 @@ int spawner_finish(spawner *op) noex {
 	            } /* end switch */
 	        } /* end for */
 	    }
-	    if (rs >= 0) rs = rs1 ;
+	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	    if (op->execfname) {
 	        rs1 = uc_free(op->execfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->execfname = nullptr ;
 	    }
 	    {
-	        rs1 = envhelp_finish(&op->env) ;
+	        rs1 = envhelp_finish(op->envp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecobj_finish(&op->cmds) ;
+	        rs1 = vecobj_finish(op->cmdp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -418,7 +473,7 @@ int spawner_setctty(spawner *op,int fdterm,pid_t pgrp) noex {
 	            sc.cmd = cmd_setctty ;
 	            sc.pfd = nfd ;
 	            sc.cfd = -1 ;
-	            rs = vecobj_add(&op->cmds,&sc) ;
+	            rs = vecobj_add(op->cmdp,&sc) ;
 	            if (rs < 0) {
 	                u_close(nfd) ;
 	            }
@@ -437,7 +492,7 @@ int spawner_seteuid(spawner *op,uid_t uid) noex {
 	    sc.pfd = -1 ;
 	    sc.cfd = -1 ;
 	    sc.euid = uid ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -451,7 +506,7 @@ int spawner_setegid(spawner *op,gid_t gid) noex {
 	    sc.pfd = -1 ;
 	    sc.cfd = -1 ;
 	    sc.egid = gid ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -473,7 +528,7 @@ int spawner_sigignore(spawner *op,int sn) noex {
 	    sc.cmd = cmd_sigign ;
 	    sc.pfd = -1 ;
 	    sc.cfd = sn ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -486,7 +541,7 @@ int spawner_sigdefault(spawner *op,int sn) noex {
 	    sc.cmd = cmd_sigdfl ;
 	    sc.pfd = -1 ;
 	    sc.cfd = sn ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -499,7 +554,7 @@ int spawner_sighold(spawner *op,int sn) noex {
 	    sc.cmd = cmd_sighold ;
 	    sc.pfd = -1 ;
 	    sc.cfd = sn ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -512,23 +567,21 @@ int spawner_sigrelease(spawner *op,int sn) noex {
 	    sc.cmd = cmd_sigrlse ;
 	    sc.pfd = -1 ;
 	    sc.cfd = sn ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (spawner_sigrelease) */
 
 int spawner_fdclose(spawner *op,int cfd) noex {
-	scmd		sc ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	sc.cmd = cmd_fdclose ;
-	sc.pfd = -1 ;
-	sc.cfd = cfd ;
-	rs = vecobj_add(&op->cmds,&sc) ;
-
+	if ((rs = spawner_magic(op)) >= 0) {
+	    scmd	sc{} ;
+	    sc.cmd = cmd_fdclose ;
+	    sc.pfd = -1 ;
+	    sc.cfd = cfd ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (spawner_fdclose) */
@@ -540,7 +593,7 @@ int spawner_fdnull(spawner *op,int of) noex {
 	    sc.cmd = cmd_fdnull ;
 	    sc.pfd = of ; /* open-flags */
 	    sc.cfd = -1 ;
-	    rs = vecobj_add(&op->cmds,&sc) ;
+	    rs = vecobj_add(op->cmdp,&sc) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -555,7 +608,7 @@ int spawner_fddup(spawner *op,int pfd) noex {
 	        sc.cmd = cmd_fddup ;
 	        sc.pfd = nfd ;
 	        sc.cfd = -1 ;
-	        rs = vecobj_add(&op->cmds,&sc) ;
+	        rs = vecobj_add(op->cmdp,&sc) ;
 	        if (rs < 0) {
 	            u_close(nfd) ;
 	        }
@@ -570,11 +623,11 @@ int spawner_fddup2(spawner *op,int pfd,int tfd) noex {
 	if ((rs = spawner_magic(op)) >= 0) {
 	    if ((rs = dupup(pfd,3)) >= 0) {
 	        scmd	sc{} ;
-	        int		nfd = rs ;
+	        int	nfd = rs ;
 	        sc.cmd = cmd_fddup2 ;
 	        sc.pfd = nfd ;
 	        sc.cfd = tfd ;
-	        rs = vecobj_add(&op->cmds,&sc) ;
+	        rs = vecobj_add(op->cmdp,&sc) ;
 	        if (rs < 0) {
 	            u_close(nfd) ;
 	        }
@@ -600,14 +653,14 @@ int spawner_fdcreate(spawner *op,int cfd) noex {
 	        sc.pfdend = pipes[0] ;
 	        sc.pfd = pipes[1] ;
 	        sc.cfd = cfd ;
-	        if ((rs = vecobj_add(&op->cmds,&sc)) >= 0) {
+	        if ((rs = vecobj_add(op->cmdp,&sc)) >= 0) {
 		    fd = pipes[0] ;
 		}
 	        if (rs < 0) {
 	            for (int i = 0 ; i < 2 ; i += 1) {
 			u_close(pipes[i]) ;
 		    }
-	        }
+	        } /* end if (error handling) */
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? fd : rs ;
@@ -617,20 +670,25 @@ int spawner_fdcreate(spawner *op,int cfd) noex {
 int spawner_envset(spawner *op,cchar *kp,cchar *vp,int vl) noex {
     	int		rs ;
 	if ((rs = spawner_magic(op,kp,vp)) >= 0) {
-	    rs = envhelp_envset(&op->env,kp,vp,vl) ;
+	    rs = envhelp_envset(op->envp,kp,vp,vl) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (spawner_envset) */
 
 int spawner_run(spawner *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
+	if ((rs = spawner_magic(op)) >= 0) {
+	    rs = spawner_runer(op) ;
+	}
+	return rs ;
+}
+/* end subroutine (spawner_run) */
+
+static int spawner_runer(spawner *op) noex {
+    	int		rs = SR_OK ;
 	cchar		*args[2] ;
-	mainv		av ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	av = op->argv ;
+	mainv		av = op->argv ;
 	if ((av == nullptr) || (av[0] == nullptr)) {
 	    av = args ;
 	    args[0] = op->execfname ;
@@ -639,21 +697,21 @@ int spawner_run(spawner *op) noex {
 
 /* sort all environment variables */
 
-#if	CF_ENVSORT
-	if (rs >= 0)
-	    rs = envhelp_sort(&op->env) ;
-#endif
+	if_constexpr (f_envsort) {
+	    if (rs >= 0) {
+	        rs = envhelp_sort(op->envp) ;
+	    }
+	} /* end if_constexpr (f_envsort) */
 
 	if (rs >= 0) {
-	    void	**vpp{} ;
-	    if ((rs = vecobj_getvec(&op->cmds,&vpp)) >= 0) {
+	    if (void **vpp{} ; (rs = vecobj_getvec(op->cmdp,&vpp)) >= 0) {
 	        scmd	**cv = scmdpp(vpp) ;
-		mainv	ev ;
-	        if ((rs = envhelp_getvec(&op->env,&ev)) >= 0) {
+		if (mainv ev{} ; (rs = envhelp_getvec(op->envp,&ev)) >= 0) {
 	    	    if ((rs = uc_fork()) == 0) {
 	        	int	ex ;
-	                rs = child(op,cv,av,ev) ;
-	        	if (isNotPresent(rs)) {
+	                if ((rs = spawner_child(op,cv,av,ev)) >= 0) {
+	                    ex = EX_UNKNOWN ;
+			} else if (isNotPresent(rs)) {
 	                    ex = EX_CANTCREAT ;
 	                } else if (isIOError(rs)) {
 	                    ex = EX_IOERR ;
@@ -661,20 +719,18 @@ int spawner_run(spawner *op) noex {
 	                    ex = mapex(mapexs,rs) ;
 		        }
 	                u_exit(ex) ; /* no STDIO flush, no exit-handlers */
-	            } /* end if (child) */
-	            if (rs >= 0) {
-	                op->pid = (pid_t) rs ;
+		    } else if (rs >= 0) {
+	                op->pid = pid_t(rs) ;
 	                rs = procparent(cv) ;
 	            }
 		} /* end if (envhelp_getvec) */
+		if (rs >= 0) rs = op->pid ;
 	    } /* end if (vecobj_getvec) */
 	} /* end if (ok) */
 
-	if (rs >= 0) rs = op->pid ;
-
 	return rs ;
 }
-/* end subroutine (spawner_run) */
+/* end subroutine (spawner_runer) */
 
 int spawner_wait(spawner *op,int *csp,int opts) noex {
     	int		rs ;
@@ -691,7 +747,7 @@ int spawner_wait(spawner *op,int *csp,int opts) noex {
 
 /* local subroutines */
 
-static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
+static int spawner_child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	cint		opts = op->opts ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -699,6 +755,9 @@ static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 
 	if ((rs >= 0) && (opts & SPAWNER_OIGNINTR)) {
 	    rs = sigignores(sigigns) ;
+	}
+	if ((rs >= 0) && (op->opts & SPAWNER_OSIGDEFS)) {
+	    rs = sigdefaults(sigdefs) ;
 	}
 
 	if (rs >= 0) {
@@ -714,11 +773,13 @@ static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	    switch (cmdp->cmd) {
 	    case cmd_setctty:
 	        {
-	            pid_t	pgrp = getpgrp() ;
+	            const pid_t	pgrp = getpgrp() ;
 	            if (sigign si ; (rs = sigign_start(&si,sigouts)) >= 0) {
 	                rs = uc_tcsetpgrp(cmdp->pfd,pgrp) ;
-	                u_close(cmdp->pfd) ;
-	                cmdp->pfd = -1 ;
+			{
+	                    u_close(cmdp->pfd) ;
+	                    cmdp->pfd = -1 ;
+			}
 	                rs1 = sigign_finish(&si) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (sigign) */
@@ -748,8 +809,8 @@ static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	        break ;
 	    case cmd_fdnull:
 	        {
-	            cint	of = cmdp->pfd ; /* open-falgs */
-	            rs = u_open(NULLFNAME,of,0666) ;
+	            cint	of = cmdp->pfd ; /* open-flags */
+	            rs = u_open(nullfname,of,0666) ;
 	        }
 	        break ;
 	    case cmd_fddup:
@@ -776,10 +837,6 @@ static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	    } /* end switch */
 	} /* end for */
 
-	if ((rs >= 0) && (op->opts & SPAWNER_OSIGDEFS)) {
-	    rs = sigdefaults(sigdefs) ;
-	}
-
 	if (rs >= 0) {
 	    if ((rs = closefds(cv)) >= 0) {
 	        if ((rs = defaultfds(cv)) >= 0) {
@@ -790,7 +847,7 @@ static int child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 
 	return rs ;
 }
-/* end subroutine (child) */
+/* end subroutine (spawner_child) */
 
 static int defaultfds(scmd **cv) noex {
 	cint		rsbadf = SR_BADF ;
@@ -799,7 +856,7 @@ static int defaultfds(scmd **cv) noex {
 	    if (! isUsed(cv,i)) {
 	        if ((rs = u_fcntl(i,F_GETFD,0)) == rsbadf) {
 	            cint of = (i == 0) ? O_RDONLY : O_WRONLY ;
-	            rs = u_open(NULLFNAME,of,0666) ;
+	            rs = u_open(nullfname,of,0666) ;
 	        }
 	    }
 	} /* end for */
@@ -848,40 +905,40 @@ static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
 		al = sfbasename(efname,-1,&ap) ;
 	    }
 	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
-	        cint	sulen = (MAXPATHLEN+22) ;
-	        char	*subuf ;
-	        if ((rs = uc_malloc((sulen+1),&subuf)) >= 0) {
-	            const pid_t		pid = uc_getpid() ;
-	            if ((rs = snshellunder(subuf,sulen,pid,efname)) > 0) {
-	                rs = envhelp_envset(ehp,"_",subuf,rs) ;
-	            }
-	            uc_free(subuf) ;
+	        cint	sulen = (var.maxpathlen + 22) ;
+	        if (char *subuf{} ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
+		    if ((rs = ucpid) >= 0) {
+			const pid_t	pid = pid_t(rs) ;
+	                if ((rs = snshellunder(subuf,sulen,pid,efname)) > 0) {
+	                    rs = envhelp_envset(ehp,"_",subuf,rs) ;
+	                }
+		    } /* end if (ucpid) */
+	            rs = rsfree(rs,subuf) ;
 	        } /* end if (m-a-f) */
 	    } /* end if (envhelp_envset) */
 	} /* end if (envhelp_envset) */
 	if (rs >= 0) {
-	    cchar	*var = VARPWD ;
-	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
+	    cchar	*vname = varname.pwd ;
+	    if ((rs = envhelp_present(ehp,vname,-1,nullptr)) == rsn) {
 	        int	pwdl = -1 ;
 	        rs = SR_OK ;
 	        if (pwd[0] == '\0') {
-	            rs = getpwd(pwd,MAXPATHLEN) ;
+	            rs = getpwd(pwd,var.maxpathlen) ;
 	            pwdl = rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = envhelp_envset(ehp,var,pwd,pwdl) ;
+	            rs = envhelp_envset(ehp,vname,pwd,pwdl) ;
 	        }
-	    }
+	    } /* end if (envhelp_present) */
 	} /* end if (ok) */
 	if (rs >= 0) {
-	    cchar	*var = VARPATH ;
-	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
-	        cint	plen = (2*MAXPATHLEN) ;
-	        char	*pbuf ;
-	        if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
+	    cchar	*vname = varname.pwd ;
+	    if ((rs = envhelp_present(ehp,vname,-1,nullptr)) == rsn) {
+	        cint	plen = (4 * var.maxpathlen) ;
+	        if (char *pbuf{} ; (rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 		    cint	req = _CS_PATH ;
 	            if ((rs = uc_sysconfstr(pbuf,plen,req)) >= 0) {
-		        rs = envhelp_envset(ehp,var,pbuf,rs) ;
+		        rs = envhelp_envset(ehp,vname,pbuf,rs) ;
 	            } /* end if */
 	            rs1 = uc_free(pbuf) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -899,7 +956,7 @@ static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	if (ids id ; (rs = id.load) >= 0) {
 	    if (strchr(fname,'/') != nullptr) {
 	        if (pwd[0] == '\0') {
-	            rs = getpwd(pwd,MAXPATHLEN) ;
+	            rs = getpwd(pwd,var.maxpathlen) ;
 	        }
 	        if (rs >= 0) {
 	            if ((rs = mkpath2(pbuf,pwd,fname)) >= 0) {
@@ -939,7 +996,7 @@ static bool isChildFD(int cmd) noex {
 	switch (cmd) {
 	case cmd_fddup2:
 	case cmd_fdcreate:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;

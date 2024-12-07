@@ -1,4 +1,5 @@
 /* ucpeek SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -41,6 +42,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -54,6 +56,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -83,8 +88,7 @@ int uc_peek(int fd,void *dbuf,int dlen) noex {
 	    if (dlen > 0) {
 		rs = SR_BADFD ;
 	        if (fd >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_fstat(fd,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	                if (S_ISSOCK(sb.st_mode)) {
 		            rs = peek_socket(fd,dbuf,dlen) ;
 	                } else if (S_ISCHR(sb.st_mode)) {
@@ -113,8 +117,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*cbuf{} ;
-	if ((rs = libmalloc_ml(&cbuf)) >= 0) {
+	if (char *cbuf{} ; (rs = libmalloc_ml(&cbuf)) >= 0) {
 	    cint	clen = rs ;
 	    cbuf[0] = '\0' ;
 	    {
@@ -123,7 +126,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	        pd.flags = 0 ;
 	        pd.ctlbuf.buf = cbuf ;
 	        pd.ctlbuf.maxlen = clen ;
-	        pd.databuf.buf = (char *) dbuf ;
+	        pd.databuf.buf = charp(dbuf) ;
 	        pd.databuf.maxlen = dlen ;
 	        rs = u_ioctl(fd,req,&pd) ;
 	        len = pd.databuf.len ;
@@ -136,7 +139,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 /* end subroutine (peek_stream) */
 
 static int peek_regular(int fd,void *dbuf,int dlen) noex {
-	off_t		fo ;
+	off_t		fo{} ;
 	int		rs ;
 	if ((rs = u_tell(fd,&fo)) >= 0) {
 	    rs = u_pread(fd,dbuf,dlen,fo) ;

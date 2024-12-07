@@ -55,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_CFX= cfchars.o cfhexs.o
+OBJ0_CFX= cfchars.o cfhexstr.o
 OBJ1_CFX= cfbin.o 
 OBJ2_CFX= cfoct.o
 OBJ3_CFX= cfdec.o cfdecf.o cfdecmf.o cfdect.o
@@ -166,6 +166,6 @@ cfnum.o:			cfnum.cc cfnum.h	$(INCS)
 cfxxxx.o:			cfxxxx.cc cfxxxx.hh	$(INCS)
 cfsysx.o:			cfsysx.cc cfsysx.hh	$(INCS)
 
-cfhexs.o:			cfhex.cc cfhexs.h	$(INCS)
+cfhexstr.o:			cfhexstr.cc cfhexstr.h	$(INCS)
 
 

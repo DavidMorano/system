@@ -101,6 +101,18 @@ EXTERNC_begin
 extern int	bufstr_start(bufstr *) noex ;
 extern int	bufstr_strw(bufstr *,cchar *,int) noex ;
 extern int	bufstr_chr(bufstr *,int) noex ;
+extern int	bufstr_bini(bufstr *,int) noex ;
+extern int	bufstr_binl(bufstr *,long) noex ;
+extern int	bufstr_binll(bufstr *,longlong) noex ;
+extern int	bufstr_binui(bufstr *,uint) noex ;
+extern int	bufstr_binul(bufstr *,ulong) noex ;
+extern int	bufstr_binull(bufstr *,ulonglong) noex ;
+extern int	bufstr_octi(bufstr *,int) noex ;
+extern int	bufstr_octl(bufstr *,long) noex ;
+extern int	bufstr_octll(bufstr *,longlong) noex ;
+extern int	bufstr_octui(bufstr *,uint) noex ;
+extern int	bufstr_octul(bufstr *,ulong) noex ;
+extern int	bufstr_octull(bufstr *,ulonglong) noex ;
 extern int	bufstr_deci(bufstr *,int) noex ;
 extern int	bufstr_decl(bufstr *,long) noex ;
 extern int	bufstr_decll(bufstr *,longlong) noex ;
@@ -119,6 +131,46 @@ extern int	bufstr_finish(bufstr *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
+
+inline int bufstr_bin(bufstr *op,int v) noex {
+	return bufstr_bini(op,v) ;
+}
+inline int bufstr_bin(bufstr *op,long v) noex {
+	return bufstr_binl(op,v) ;
+}
+inline int bufstr_bin(bufstr *op,longlong v) noex {
+	return bufstr_binll(op,v) ;
+}
+
+inline int bufstr_bin(bufstr *op,uint v) noex {
+	return bufstr_binui(op,v) ;
+}
+inline int bufstr_bin(bufstr *op,ulong v) noex {
+	return bufstr_binul(op,v) ;
+}
+inline int bufstr_bin(bufstr *op,ulonglong v) noex {
+	return bufstr_binull(op,v) ;
+}
+
+inline int bufstr_oct(bufstr *op,int v) noex {
+	return bufstr_octi(op,v) ;
+}
+inline int bufstr_oct(bufstr *op,long v) noex {
+	return bufstr_octl(op,v) ;
+}
+inline int bufstr_oct(bufstr *op,longlong v) noex {
+	return bufstr_octll(op,v) ;
+}
+
+inline int bufstr_oct(bufstr *op,uint v) noex {
+	return bufstr_octui(op,v) ;
+}
+inline int bufstr_oct(bufstr *op,ulong v) noex {
+	return bufstr_octul(op,v) ;
+}
+inline int bufstr_oct(bufstr *op,ulonglong v) noex {
+	return bufstr_octull(op,v) ;
+}
 
 inline int bufstr_dec(bufstr *op,int v) noex {
 	return bufstr_deci(op,v) ;

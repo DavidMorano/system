@@ -1,4 +1,5 @@
 /* sbuf HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* storage buffer (SBuf) object */
@@ -169,7 +170,7 @@ extern int	sbuf_finish(sbuf *) noex ;
 extern int	sbuf_reset(sbuf *) noex ;
 extern int	sbuf_buf(sbuf *,cchar *,int) noex ;
 extern int	sbuf_strw(sbuf *,cchar *,int) noex ;
-extern int	sbuf_strs(sbuf *,int,cchar **) noex ;
+extern int	sbuf_strs(sbuf *,int,mainv) noex ;
 extern int	sbuf_bini(sbuf *,int) noex ;
 extern int	sbuf_binl(sbuf *,long) noex ;
 extern int	sbuf_binll(sbuf *,longlong) noex ;

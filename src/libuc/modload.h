@@ -32,7 +32,7 @@
 #define	MODLOAD_MAGIC		0x99447246
 #define	MODLOAD_DEFENTS		(44 * 1000)
 #define	MODLOAD_SYMSUF		"_modinfo"
-
+/* options */
 #define	MODLOAD_OLIBVAR		(1<<0)
 #define	MODLOAD_OPRS		(1<<1)
 #define	MODLOAD_OSDIRS		(1<<2)

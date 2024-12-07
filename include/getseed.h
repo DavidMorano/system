@@ -1,4 +1,5 @@
 /* getseed HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a seed value for use in initializing a true RNG */
@@ -48,7 +49,9 @@
 
 
 EXTERNC_begin
+
 extern int	getseed(int) noex ;
+
 EXTERNC_end
 
 

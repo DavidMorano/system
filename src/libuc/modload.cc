@@ -315,7 +315,7 @@ int modload_getmva(ML *op,int *mva,int mvn) noex {
 	int		v = 0 ;
 	if ((rs = modload_magic(op,mva)) >= 0) {
 	    if (op->midp) {
-	        MODLOAD_MI	*mip = op->midp ;
+	        modload_mi	*mip = op->midp ;
 	        v = mip->mv[0] ;
 	        for (int i = 0 ; i < mvn ; i += 1) {
 	            mva[i] = mip->mv[i] ;
@@ -549,7 +549,7 @@ static int subinfo_socheckvarc(SI *sip,dirseen *dsp,
 	int		rs ;
 	int		rs1 ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	    cchar	*pp = const_cast<cchar *>(tbuf) ;
+	    cchar	*pp = cast_const<cchar *>(tbuf) ;
 	    if ((rs = pathclean(tbuf,ldnp,ldnl)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	pl = rs ;
@@ -682,7 +682,7 @@ static int subinfo_sotest(SI *sip,char *tbuf,int tlen) noex {
 		cnullptr	np{} ;
 	        rs = SR_NOTFOUND ;
 	        if (void *vp ; (vp = dlsym(op->sop,tbuf)) != np) {
-	            MODLOAD_MI	*mip = (MODLOAD_MI *) vp ;
+	            modload_mi	*mip = (modload_mi *) vp ;
 	            op->midp = mip ;
 	            if (strcmp(mip->name,op->modname) == 0) {
 		        rs = SR_OK ;

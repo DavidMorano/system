@@ -1,4 +1,5 @@
 /* um SUPPORT (UNIX® Memory-Management) */
+/* encoding=ISO8859-1 */
 /* lang=C++23 */
 
 /* UNIX® Memory-Management interface */

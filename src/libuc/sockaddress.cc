@@ -1,4 +1,5 @@
 /* sockaddress SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manipulate socket addresses */
@@ -16,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	sockaddress
 
 	Description:
@@ -37,6 +38,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<netinet/in.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<algorithm>		/* for |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
@@ -261,7 +264,6 @@ int sockaddress_getaddr(SA *sap,char *abuf,int alen) noex {
 int sockaddress_getscope(SA *sap,uint *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sap) {
-	    SOCKADDR_IN6	*inet6_sap ;
 	    uint		v = 0 ;
 	    cint		af = ntohs(sap->a_unspec.sa_family) ;
 	    rs = SR_OK ;
@@ -270,8 +272,10 @@ int sockaddress_getscope(SA *sap,uint *rp) noex {
 	        rs = SR_INVALID ;
 	        break ;
 	    case AF_INET6:
-	        inet6_sap = (SOCKADDR_IN6 *) sap ;
-	        v = ntohs(inet6_sap->sin6_scope_id) ;
+		{
+	            SOCKADDR_IN6	*inet6_sap = (SOCKADDR_IN6 *) sap ;
+	            v = ntohs(inet6_sap->sin6_scope_id) ;
+		}
 	        break ;
 	    default:
 	        rs = SR_INVALID ;

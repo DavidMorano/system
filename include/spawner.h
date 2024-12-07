@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -54,8 +54,8 @@ corresponding disposition is OPEN.
 struct spawner_head {
 	mainv		argv ;
 	cchar		*execfname ;
-	vecobj		cmds ;
-	envhelp		env ;
+	vecobj		*cmdp ;
+	envhelp		*envp ;
 	pid_t		pid ;
 	pid_t		pgrp ;
 	uint		magic ;

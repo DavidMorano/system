@@ -1,4 +1,5 @@
 /* ctdec SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a decimal string */
@@ -61,10 +62,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bit>			/* <- for |countr_zero(3c++)| */
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<uvariables.hh>
 #include	<sncpyx.h>
 
@@ -148,7 +153,7 @@ static int ctdecx(char *dbuf,int dlen,UT v) noex {
 template<typename UT,typename ST>
 int sctdecx(char *dp,int dl,const ST &v) noex {
 	UT		ulv = (UT) v ;
-	cint		n = sizeof(ST) ;
+	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
 	if (v < 0) ulv = (- ulv) ;
 	if (dp) {
@@ -170,7 +175,7 @@ int sctdecx(char *dp,int dl,const ST &v) noex {
 
 template<typename UT>
 int uctdecx(char *dp,int dl,const UT &uv) noex {
-	cint		n = sizeof(UT) ;
+	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;

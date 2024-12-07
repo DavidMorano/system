@@ -62,7 +62,7 @@
 #include	<inetaddr.h>
 #include	<strwcpy.h>
 #include	<cfhex.h>
-#include	<cfhexs.h>
+#include	<cfhexstr.h>
 #include	<isindomain.h>
 #include	<localmisc.h>
 
@@ -144,7 +144,7 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 	al -= adv ;
 	if ((al / 2) <= nlen) {
 	    uchar	*upn = ucharp(pn) ;
-	    rs = cfhexs((addr + adv),al,upn) ;
+	    rs = cfhexstr((addr + adv),al,upn) ;
 	    len = rs ;
 	} else {
 	    rs = SR_TOOBIG ;

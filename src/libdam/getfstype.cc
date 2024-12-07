@@ -1,4 +1,5 @@
 /* getfstype SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the type of the filesystem for an FD */
@@ -16,12 +17,18 @@
 
 /*******************************************************************************
 
+  	Name:
+	getfstype
+
+	Description:
 	We return the file-system type associated with the file
 	attached to the given file-descriptor.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

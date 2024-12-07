@@ -1,4 +1,5 @@
 /* lockfile(3dam) SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® System V file-record locking */
@@ -91,7 +92,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<usystem.h>
 
 #include	"lockfile.h"

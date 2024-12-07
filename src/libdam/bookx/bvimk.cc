@@ -1,9 +1,9 @@
-/* bvimk */
+/* bvimk SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make a BVI database */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,27 +17,24 @@
 
 /*******************************************************************************
 
+  	Object:
+	bvimk
+
+	Description:
 	This module creates a BVI database file.
 
 	Synopsis:
-
-	int bvimk_open(op,dbname,...)
-	BVIMK		*op ;
-	cchar		dbname[] ;
+	int bvimk_open(bvimk *op,cchar *dbname,...) noex
 
 	Arguments:
-
 	- op		object pointer
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 	Notes:
-
 	= possible returns to an open attempt
 
 	- OK (creating)
@@ -68,12 +65,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<estrings.h>
@@ -89,11 +87,11 @@
 
 /* local defines */
 
-#define	BVIMK_NENTRIES	(19 * 1024)
+#define	BVIMK_NENTS	(19 * 1024)
 #define	BVIMK_NSKIP	5
-#define	HDRBUFLEN	(sizeof(BVIHDR) + 128)
+#define	HDRBUFLEN	(szof(bvihdr) + 128)
 
-#define	BUFLEN		(sizeof(BVIHDR) + 128)
+#define	BUFLEN		(szof(bvihdr) + 128)
 
 #define	FSUF_IDX	"bvi"
 
@@ -104,41 +102,8 @@
 
 /* external subroutines */
 
-extern uint	uceil(uint,int) ;
-
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfhexi(cchar *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filer_writefill(FILER *,const void *,int) ;
-extern int	iceil(int,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	snopenflags(char *,int,int) ;
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-
 
 /* external variables */
-
-
-/* exported variables */
-
-BVIMK_OBJ	bvimk = {
-	"bvimk",
-	sizeof(BVIMK)
-} ;
 
 
 /* local structures */
@@ -158,73 +123,68 @@ struct blentry {
 
 /* forward references */
 
-static int	bvimk_filesbegin(BVIMK *) ;
-static int	bvimk_filesbeginc(BVIMK *) ;
-static int	bvimk_filesbeginwait(BVIMK *) ;
-static int	bvimk_filesbegincreate(BVIMK *,cchar *,int,mode_t) ;
-static int	bvimk_filesend(BVIMK *) ;
-static int	bvimk_listbegin(BVIMK *,int) ;
-static int	bvimk_listend(BVIMK *) ;
-static int	bvimk_mkidx(BVIMK *) ;
-static int	bvimk_mkidxwrmain(BVIMK *,BVIHDR *) ;
-static int	bvimk_mkidxwrhdr(BVIMK *,BVIHDR *,FILER *) ;
-static int	bvimk_mkidxwrverses(BVIMK *,BVIHDR *,FILER *,int) ;
-static int	bvimk_mkidxwrlines(BVIMK *,BVIHDR *,FILER *,int) ;
-static int	bvimk_nidxopen(BVIMK *) ;
-static int	bvimk_nidxclose(BVIMK *) ;
-static int	bvimk_renamefiles(BVIMK *) ;
+static int	bvimk_filesbegin(bvimk *) noex ;
+static int	bvimk_filesbeginc(bvimk *) noex ;
+static int	bvimk_filesbeginwait(bvimk *) noex ;
+static int	bvimk_filesbegincreate(bvimk *,cchar *,int,mode_t) noex ;
+static int	bvimk_filesend(bvimk *) noex ;
+static int	bvimk_listbegin(bvimk *,int) noex ;
+static int	bvimk_listend(bvimk *) noex ;
+static int	bvimk_mkidx(bvimk *) noex ;
+static int	bvimk_mkidxwrmain(bvimk *,bvihdr *) noex ;
+static int	bvimk_mkidxwrhdr(bvimk *,bvihdr *,filer *) noex ;
+static int	bvimk_mkidxwrverses(bvimk *,bvihdr *,filer *,int) noex ;
+static int	bvimk_mkidxwrlines(bvimk *,bvihdr *,filer *,int) noex ;
+static int	bvimk_nidxopen(bvimk *) noex ;
+static int	bvimk_nidxclose(bvimk *) noex ;
+static int	bvimk_renamefiles(bvimk *) noex ;
 
-static int	mkcitation(uint *,BVIMK_VERSE *) ;
-static int	mknewfname(char *,int,cchar *,cchar *) ;
-static int	unlinkstale(cchar *,int) ;
+static int	mkcitation(uint *,bvimk_v *) noex ;
+static int	mknewfname(char *,int,cchar *,cchar *) noex ;
+static int	unlinkstale(cchar *,int) noex ;
 
-static int	vvecmp(const void *,const void *) ;
+static int	vvecmp(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+bvimk_obj bvimk_modinfo = {
+	"bvimk",
+	szof(bvimk)
+} ;
+
+
 /* exported subroutines */
 
-
-int bvimk_open(BVIMK *op,cchar *dbname,int of,mode_t om)
-{
-	const int	n = BVIMK_NENTRIES ;
+int bvimk_open(bvimk *op,cchar *dbname,int of,mode_t om) noex {
+	cint		n = BVIMK_NENTS ;
 	int		rs ;
 	int		c = 0 ;
-	cchar		*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (dbname == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	{
-	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
-	    debugprintf("bvimk_open: ent dbname=%s\n",dbname) ;
-	    debugprintf("bvimk_open: of=%s\n",obuf) ;
-	    debugprintf("bvimk_open: om=%05o\n",om) ;
-	}
-#endif /* CF_DEBUGS */
-
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BVIMK)) ;
+	memclear(op) ;
 	op->om = (om|0600) ;
 	op->nfd = -1 ;
 
 	op->f.ofcreat = MKBOOL(of & O_CREAT) ;
 	op->f.ofexcl = MKBOOL(of & O_EXCL) ;
 
-	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
+	if (cchar *cp{} ; (rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 	    op->dbname = cp ;
 	    if ((rs = bvimk_filesbegin(op)) >= 0) {
 	        c = rs ;
 	        if ((rs = bvimk_listbegin(op,n)) >= 0) {
 	            op->magic = BVIMK_MAGIC ;
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 	            bvimk_filesend(op) ;
+		}
 	    } /* end if (nvimk) */
 	    if (rs < 0) {
 	        uc_free(op->dbname) ;
@@ -232,17 +192,11 @@ int bvimk_open(BVIMK *op,cchar *dbname,int of,mode_t om)
 	    }
 	} /* end if (m-a) */
 
-#if	CF_DEBUGS
-	debugprintf("bvimk_open: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (bvimk_open) */
 
-
-int bvimk_close(BVIMK *op)
-{
+int bvimk_close(bvimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nverses = 0 ;
@@ -252,9 +206,6 @@ int bvimk_close(BVIMK *op)
 
 	if (op->magic != BVIMK_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("bvimk_close: nverses=%u\n",op->nverses) ;
-#endif
 	f_go = (! op->f.abort) ;
 	if (op->f.notsorted) {
 	    vecobj_sort(&op->verses,vvecmp) ;
@@ -266,10 +217,6 @@ int bvimk_close(BVIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	    f_go = f_go && (rs1 >= 0) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("bvimk_close: bvimk_mkidx() rs=%d\n",rs) ;
-#endif
 
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
@@ -286,10 +233,6 @@ int bvimk_close(BVIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("bvimk_close: bvimk_renamefiles() rs=%d\n",rs) ;
-#endif
-
 	rs1 = bvimk_filesend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
@@ -299,18 +242,12 @@ int bvimk_close(BVIMK *op)
 	    op->dbname = NULL ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("bvimk_close: ret rs=%d nv=%u\n",rs,nverses) ;
-#endif
-
 	op->magic = 0 ;
 	return (rs >= 0) ? nverses : rs ;
 }
 /* end subroutine (bvimk_close) */
 
-
-int bvimk_add(BVIMK *op,BVIMK_VERSE *bvp)
-{
+int bvimk_add(bvimk *op,bvimk_v *bvp) noex {
 	struct bventry	bve ;
 	struct blentry	ble ;
 	uint		li = UINT_MAX ;
@@ -320,11 +257,6 @@ int bvimk_add(BVIMK *op,BVIMK_VERSE *bvp)
 	if (bvp == NULL) return SR_FAULT ;
 
 	if (op->magic != BVIMK_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("bvimk_add: q=%u:%u:%u\n",
-	    bvp->b,bvp->c,bvp->v) ;
-#endif
 
 	if ((bvp->lines != NULL) && (bvp->nlines > 0)) {
 	    int	i ;
@@ -338,10 +270,6 @@ int bvimk_add(BVIMK *op,BVIMK_VERSE *bvp)
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("bvimk_add: li=%u\n",li) ;
-#endif
 
 	if (rs >= 0) {
 	    uint	citcmpval ;
@@ -374,25 +302,17 @@ int bvimk_add(BVIMK *op,BVIMK_VERSE *bvp)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS && 0
-	debugprintf("bvimk_add: ret=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (bvimk_add) */
 
-
-int bvimk_abort(BVIMK *op,int f)
-{
+int bvimk_abort(bvimk *op,int f) noex {
 	op->f.abort = f ;
 	return SR_OK ;
 }
 /* end subroutine (bvimk_abort) */
 
-
-int bvimk_info(BVIMK *op,BVIMK_INFO *bip)
-{
+int bvimk_info(bvimk *op,BVIMK_INFO *bip) noex {
 	int		rs = SR_OK ;
 	int		nverses ;
 
@@ -416,9 +336,7 @@ int bvimk_info(BVIMK *op,BVIMK_INFO *bip)
 
 /* private subroutines */
 
-
-static int bvimk_filesbegin(BVIMK *op)
-{
+static int bvimk_filesbegin(bvimk *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op->f.ofcreat) {
@@ -427,25 +345,20 @@ static int bvimk_filesbegin(BVIMK *op)
 	    rs = bvimk_filesbeginwait(op) ;
 	    c = rs ;
 	}
-#if	CF_DEBUGS
-	debugprintf("bvimk_filesbegin: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (bvimk_filesbegin) */
 
-
-static int bvimk_filesbeginc(BVIMK *op)
-{
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+static int bvimk_filesbeginc(bvimk *op) noex {
+	cint		type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    cchar		*tfn = tbuf ;
-	    char		rbuf[MAXPATHLEN+1] ;
+	    cchar	*tfn = tbuf ;
+	    char	rbuf[MAXPATHLEN+1] ;
+	    cmode	om = op->om ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
 	            op->f.created = TRUE ;
@@ -466,78 +379,54 @@ static int bvimk_filesbeginc(BVIMK *op)
 }
 /* end subroutine (bvimk_filesbeginc) */
 
-
-static int bvimk_filesbeginwait(BVIMK *op)
-{
+static int bvimk_filesbeginwait(bvimk *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    const int		to_stale = BVIMK_INTSTALE ;
-	    const int		nrs = SR_EXISTS ;
-	    const int		of = (O_CREAT|O_WRONLY|O_EXCL) ;
-	    int			to = BVIMK_INTOPEN ;
-	    while ((rs = bvimk_filesbegincreate(op,tbuf,of,om)) == nrs) {
-#if	CF_DEBUGS
-	        debugprintf("bvimk_filesbeginwait: loop ret rs=%d\n",rs) ;
-#endif
+	    cint	to_stale = BVIMK_INTSTALE ;
+	    cint	rsn = SR_EXISTS ;
+	    cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	    int		to = BVIMK_INTOPEN ;
+	    cmode	om = op->om ;
+	    while ((rs = bvimk_filesbegincreate(op,tbuf,of,om)) == rsn) {
 	        c = 1 ;
 	        sleep(1) ;
 	        unlinkstale(tbuf,to_stale) ;
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
-	    if (rs == nrs) {
+	    if (rs == rsn) {
 	        op->f.ofcreat = FALSE ;
 	        c = 0 ;
 	        rs = bvimk_filesbeginc(op) ;
 	    }
 	} /* end if (mknewfname) */
-#if	CF_DEBUGS
-	debugprintf("bvimk_filesbeginwait: ret ret rs=%d\n",rs) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (bvimk_filesbeginwait) */
 
-
-static int bvimk_filesbegincreate(BVIMK *op,cchar *tfn,int of,mode_t om)
-{
+static int bvimk_filesbegincreate(bvimk *op,cchar *tfn,int of,mode_t om) noex {
 	int		rs ;
-#if	CF_DEBUGS
-	{
-	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
-	    debugprintf("bvimk_filesbegincreate: ent of=%s\n",obuf) ;
-	    debugprintf("bvimk_filesbegincreate: om=%05o\n",om) ;
-	}
-#endif
+	int		rs1 ;
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
-	    const int	fd = rs ;
-	    cchar	*cp ;
+	    cint	fd = rs ;
 	    op->f.created = TRUE ;
-	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
-	        op->nidxfname = (char *) cp ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	        op->nidxfname = charp(cp) ;
 	    }
-	    u_close(fd) ;
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (create) */
-
-#if	CF_DEBUGS
-	debugprintf("bvimk_filesbegincreate: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (bvimk_filesbegincreate) */
 
-
-static int bvimk_filesend(BVIMK *op)
-{
+static int bvimk_filesend(bvimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->nidxfname != NULL) {
 	    if (op->f.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
@@ -546,33 +435,23 @@ static int bvimk_filesend(BVIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	    op->nidxfname = NULL ;
 	}
-
 	if (op->idname != NULL) {
 	    rs1 = uc_free(op->idname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("bvimk_filesend: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (bvimk_filesend) */
 
-
-static int bvimk_listbegin(BVIMK *op,int n)
-{
+static int bvimk_listbegin(bvimk *op,int n) noex {
 	int		rs ;
 	int		size ;
-	int		opts ;
-
-	opts = 0 ;
+	int		opts = 0 ;
 	opts |= VECOBJ_OCOMPACT ;
 	opts |= VECOBJ_OORDERED ;
 	opts |= VECOBJ_OSTATIONARY ;
-	size = sizeof(struct bventry) ;
+	size = szof(struct bventry) ;
 	if ((rs = vecobj_start(&op->verses,size,n,opts)) >= 0) {
 	    rs = vecobj_start(&op->lines,size,(n * 2),opts) ;
 	    if (rs < 0)
@@ -583,38 +462,29 @@ static int bvimk_listbegin(BVIMK *op,int n)
 }
 /* end subroutine (bvimk_listbegin) */
 
-
-static int bvimk_listend(BVIMK *op)
-{
+static int bvimk_listend(bvimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
+	{
 	rs1 = vecobj_finish(&op->lines) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = vecobj_finish(&op->verses) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
 }
 /* end subroutine (bvimk_listend) */
 
-
-static int bvimk_mkidx(BVIMK *op)
-{
+static int bvimk_mkidx(bvimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidx: ent\n") ;
-#endif
-
 	if ((rs = bvimk_nidxopen(op)) >= 0) {
-	    BVIHDR	hdr ;
-
-	    memset(&hdr,0,sizeof(BVIHDR)) ;
-	    hdr.vetu[0] = BVIHDR_VERSION ;
+	    bvihdr	hdr{} ;
+	    hdr.vetu[0] = bvihdr_VERSION ;
 	    hdr.vetu[1] = ENDIAN ;
 	    hdr.vetu[2] = 0 ;
 	    hdr.vetu[3] = 0 ;
@@ -625,13 +495,13 @@ static int bvimk_mkidx(BVIMK *op)
 	    hdr.maxchapter = op->maxchapter ;
 
 	    if ((rs = bvimk_mkidxwrmain(op,&hdr)) >= 0) {
-	        const int	hlen = HDRBUFLEN ;
+	        cint	hlen = HDRBUFLEN ;
 	        char		hbuf[HDRBUFLEN+1] ;
 	        hdr.fsize = rs ;
 	        wlen = rs ;
 
 	        if ((rs = bvihdr(&hdr,0,hbuf,hlen)) >= 0) {
-	            const int	bl = rs ;
+	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
 	                const mode_t	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
@@ -644,27 +514,18 @@ static int bvimk_mkidx(BVIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bvimk_nidx) */
 
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidx: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bvimk_mkidx) */
 
-
-static int bvimk_mkidxwrmain(BVIMK *op,BVIHDR *hdrp)
-{
-	FILER		hf, *hfp = &hf ;
-	const int	nfd = op->nfd ;
-	const int	ps = getpagesize() ;
+static int bvimk_mkidxwrmain(bvimk *op,bvihdr *hdrp) noex {
+	filer		hf, *hfp = &hf ;
+	cint	nfd = op->nfd ;
+	cint	ps = getpagesize() ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
 	int		off = 0 ;
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrmain: ent\n") ;
-#endif
 	bsize = (ps * 4) ;
 	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = bvimk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
@@ -681,45 +542,33 @@ static int bvimk_mkidxwrmain(BVIMK *op,BVIHDR *hdrp)
 	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrmain: ret rs=%d off=%u\n",rs,off) ;
-#endif
 	return (rs >= 0) ? off : rs ;
 }
 /* end subroutine (bvimk_mkidxwrmain) */
 
 
 /* ARGSUSED */
-static int bvimk_mkidxwrhdr(BVIMK *op,BVIHDR *hdrp,FILER *hfp)
+static int bvimk_mkidxwrhdr(bvimk *op,bvihdr *hdrp,filer *hfp)
 {
-	const int	hlen = HDRBUFLEN ;
+	cint	hlen = HDRBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HDRBUFLEN+1] ;
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrhdr: ent\n") ;
-#endif
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = bvihdr(hdrp,0,hbuf,hlen)) >= 0) {
 	    rs = filer_writefill(hfp,hbuf,rs) ;
 	    wlen += rs ;
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrhdr: filer_writefill() rs=%d\n",rs) ;
-#endif
 	}
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrhdr: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bvimk_mkidxwrhdr) */
 
 
-static int bvimk_mkidxwrverses(BVIMK *op,BVIHDR *hdrp,FILER *hfp,int off)
+static int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off)
 {
 	struct bventry	*bvep ;
 	uint		a[4] ;
-	const int	size = (4 * sizeof(uint)) ;
+	cint	size = (4 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		n = 0 ;
@@ -738,19 +587,14 @@ static int bvimk_mkidxwrverses(BVIMK *op,BVIHDR *hdrp,FILER *hfp,int off)
 	    if (rs < 0) break ;
 	} /* end for */
 	hdrp->vilen = n ;
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrverses: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bvimk_mkidxwrverses) */
 
-
-static int bvimk_mkidxwrlines(BVIMK *op,BVIHDR *hdrp,FILER *hfp,int off)
-{
+static int bvimk_mkidxwrlines(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
 	struct blentry	*blep ;
 	uint		a[4] ;
-	const int	size = (2 * sizeof(uint)) ;
+	cint	size = (2 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		n = 0 ;
@@ -767,25 +611,17 @@ static int bvimk_mkidxwrlines(BVIMK *op,BVIHDR *hdrp,FILER *hfp,int off)
 	    if (rs < 0) break ;
 	} /* end for */
 	hdrp->vllen = n ;
-#if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrlines: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bvimk_mkidxwrlines) */
 
-
-static int bvimk_nidxopen(BVIMK *op)
-{
-	const mode_t	om = op->om ;
+static int bvimk_nidxopen(bvimk *op) noex {
 	int		rs ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
-#if	CF_DEBUGS
-	debugprintf("bvimk_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
-#endif
+	cmode		om = op->om ;
 	if (op->nidxfname == NULL) {
-	    const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -816,16 +652,11 @@ static int bvimk_nidxopen(BVIMK *op)
 	    op->nfd = rs ;
 	    fd = rs ;
 	}
-#if	CF_DEBUGS
-	debugprintf("bvimk_nidxopen: ret rs=%d\n",rs) ;
-#endif
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (bvimk_nidxopen) */
 
-
-static int bvimk_nidxclose(BVIMK *op)
-{
+static int bvimk_nidxclose(bvimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfd >= 0) {
@@ -837,9 +668,7 @@ static int bvimk_nidxclose(BVIMK *op)
 }
 /* end subroutine (bvimk_nidxclose) */
 
-
-static int bvimk_renamefiles(BVIMK *op)
-{
+static int bvimk_renamefiles(bvimk *op) noex {
 	int		rs ;
 	cchar		*suf = FSUF_IDX ;
 	cchar		*end = ENDIANSTR ;
@@ -859,25 +688,20 @@ static int bvimk_renamefiles(BVIMK *op)
 /* end subroutine (bvimk_renamefiles) */
 
 
-static int mkcitation(uint *cip,BVIMK_VERSE *bvp)
+static int mkcitation(uint *cip,bvimk_v *bvp)
 {
 	uint		ci = 0 ;
 	uint		nlines = 0 ;
-
-	if (bvp->lines != NULL)
+	if (bvp->lines != NULL) {
 	    nlines = bvp->nlines ;
-
+	}
 	ci |= (nlines & UCHAR_MAX) ;
-
 	ci = (ci << 8) ;
 	ci |= (bvp->b & UCHAR_MAX) ;
-
 	ci = (ci << 8) ;
 	ci |= (bvp->c & UCHAR_MAX) ;
-
 	ci = (ci << 8) ;
 	ci |= (bvp->v & UCHAR_MAX) ;
-
 	*cip = ci ;
 	return SR_OK ;
 }
@@ -912,23 +736,21 @@ static int unlinkstale(cchar *fn,int to)
 }
 /* end subroutine (unlinkstale) */
 
-
-static int vvecmp(const void *v1p,const void *v2p)
-{
+static int vvecmp(cvoid *v1p,cvoid *v2p) noex {
 	struct bventry	**e1pp = (struct bventry **) v1p ;
 	struct bventry	**e2pp = (struct bventry **) v2p ;
 	int		rc = 0 ;
-
 	if (*e1pp != NULL) {
 	    if (*e2pp != NULL) {
 	        uint	vc1 = (*e1pp)->citation & 0x00FFFFFF ;
 	        uint	vc2 = (*e2pp)->citation & 0x00FFFFFF ;
 	        rc = (vc1 - vc2) ;
-	    } else
+	    } else {
 	        rc = -1 ;
-	} else
+	    }
+	} else {
 	    rc = 1 ;
-
+	}
 	return rc ;
 }
 /* end subroutine (vvecmp) */

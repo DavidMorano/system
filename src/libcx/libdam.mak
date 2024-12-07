@@ -826,6 +826,11 @@ algorithms.o:		algorithms.dir
 algorithms.dir:	
 	makesubdir $@
 
+# FMQ
+fmq.o:			fmq.dir
+fmq.dir:	
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 

@@ -349,8 +349,7 @@ uctimeout.o:		uctimeout.cc
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
 ucgetpuid.o:		ucgetpuid.cc
 
-uc_safesleep.o:		uc_safesleep.c
-
+uc_safesleep.o:		uc_safesleep.cc
 
 uc_openinfo.o:		uc_openinfo.c opensysfs.h
 uc_openuser.o:		uc_openuser.c opensysfs.h
@@ -360,10 +359,6 @@ posixdirent.o:		posixdirent.cc posixdirent.hh
 fsdir.o:		fsdir.cc fsdir.h
 sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h posixdirent.hh
 darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h posixdirent.hh
-
-sighand.o:		sighand.cc sighand.h
-sigblock.o:		sigblock.cc sigblock.h
-sigign.o:		sigign.cc sigign.h
 
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
@@ -741,6 +736,26 @@ getxname.dir:
 # ISZ
 isx.o:			isx.dir
 isx.dir:
+	makesubdir $@
+
+# SIGX
+sigx.o:			sigx.dir
+sigx.dir:
+	makesubdir $@
+
+# UCLOCK
+uclock.o:		uclock.dir
+uclock.dir:
+	makesubdir $@
+
+# UCSIG
+ucsig.o:		ucsig.dir
+ucsig.dir:
+	makesubdir $@
+
+# SIGOBJ
+sigobj.o:		sigobj.dir
+sigobj.dir:
 	makesubdir $@
 
 # UCINET

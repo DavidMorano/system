@@ -1,4 +1,5 @@
 /* cvtdig SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert an integer value into a c-string, given a value and base */
@@ -47,6 +48,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bit>
 #include	<usystem.h>
 #include	<stdintx.h>

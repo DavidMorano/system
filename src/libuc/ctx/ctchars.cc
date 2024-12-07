@@ -1,4 +1,5 @@
 /* ctchars SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a decimal string */
@@ -56,11 +57,15 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<charconv>
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<uvariables.hh>
 #include	<sncpyx.h>
 
@@ -70,7 +75,7 @@
 /* local defines */
 
 
-/* names spaces */
+/* imported namespaces */
 
 using std::to_chars ;
 using std::to_chars_result ;

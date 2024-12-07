@@ -1,10 +1,11 @@
-/* bvsmk */
+/* bvsmk SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make a BVS database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,29 +18,28 @@
 
 /*******************************************************************************
 
+  	Object:
+	bvsmk
+
+	Description:
 	This module creates a BVS database file.
 
 	Synopsis:
-
 	int bvsmk_open(op,pr,dbname,...)
 	BVSMK		*op ;
 	const char	pr[] ;
 	const char	dbname[] ;
 
 	Arguments:
-
 	- op		object pointer
 	- pr		program-root
 	- dbname	name of DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 	Notes:
-
 	= possible returns to an open attempt
 
 	- OK (creating)

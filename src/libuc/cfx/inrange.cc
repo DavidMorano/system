@@ -109,7 +109,7 @@ struct llhelper {
 	ulonglong	cutoff[maxbase+1] = {} ;
 	int		cutlim[maxbase+1] = {} ;
 	constexpr llhelper() noex {
-	    const int	n = (CHAR_BIT * sizeof(longlong)) ;
+	    cint	n = (CHAR_BIT * szof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n-1)) ;
 	    llmax = longlong(ullmax >> 1) ;
@@ -242,7 +242,7 @@ longlong strtolonglong(cchar *nptr,char **endptr,int base) noex {
 
 ulonglong strtoulonglong(cchar *nptr, char **endptr, int base) noex {
 	ulonglong	acc, cutoff;
-	const char *s;
+	cchar		*s;
 	int c;
 	int neg, any, cutlim;
 	/*
