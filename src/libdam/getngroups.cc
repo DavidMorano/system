@@ -43,8 +43,6 @@
 
 /* local defines */
 
-#define	GETNGROUPS	struct getngroups
-
 
 /* external subroutines */
 
@@ -54,7 +52,7 @@
 
 /* local structures */
 
-struct getngroups {
+struct groupmgr {
 	int		n ;
 } ;
 
@@ -64,7 +62,7 @@ struct getngroups {
 
 /* local variables */
 
-static GETNGROUPS	getngroups_data ; /* zero-initialized */
+static groupmgr		getngroups_data ;
 
 
 /* exported variables */
@@ -73,11 +71,11 @@ static GETNGROUPS	getngroups_data ; /* zero-initialized */
 /* exported subroutines */
 
 int getngroups() noex {
-	GETNGROUPS	*gnp = &getngroups_data ;
+	groupmgr	*gnp = &getngroups_data ;
 	int		rs ;
 	if (gnp->n == 0) {
-	    const int	cmd = _SC_NGROUPS_MAX ;
-	    if ((rs = uc_sysconf(cmd,NULL)) >= 0) {
+	    cint	cmd = _SC_NGROUPS_MAX ;
+	    if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
 	        gnp->n = rs ;
 	    }
 	} else {

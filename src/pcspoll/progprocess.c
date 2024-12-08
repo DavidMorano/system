@@ -115,7 +115,7 @@ extern int	proglog_flush(PROGINFO *) ;
 extern int	progwatch(PROGINFO *,vecstr *) ;
 
 extern int	securefile(const char *,uid_t,gid_t) ;
-extern int	mkplogid(char *,int,const char *,int) ;
+extern int	mklogidpre(char *,int,const char *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG 
 extern int	debugprintf(const char *,...) ;
@@ -486,7 +486,7 @@ PROGINFO	*pip ;
 	    cchar	*nn = pip->nodename ;
 	    int		serial = pip->serial ;
 	    char	lbuf[LOGIDLEN + 1] ;
-	    if ((rs = mkplogid(lbuf,llen,nn,serial)) >= 0) {
+	    if ((rs = mklogidpre(lbuf,llen,nn,serial)) >= 0) {
 		cchar	**vpp = &pip->logid ;
 	        rs = proginfo_setentry(pip,vpp,lbuf,rs) ;
 	    }

@@ -37,10 +37,28 @@
 EXTERNC_begin
 
 extern int	mklogid(char *,int,cchar *,int,int) noex ;
-extern int	mkplogid(char *,int,cchar *,int) noex ;
-extern int	mksublogid(char *,int,cchar *,int) noex ;
+extern int	mklogidpre(char *,int,cchar *,int) noex ;
+extern int	mklogidsub(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+namespace libuc {
+    struct logdigmaxer {
+	int mkdigmax() noex ;
+	operator int () noex {
+	    return mkdigmax() ;
+	} ;
+	int operator () () noex {
+	    return mkdigmax() ;
+	} ;
+    } ; /* end struct (logdigmaxer) */
+}
+
+extern libuc::logdigmaxer	logdigmax ;
+
+#endif /* __cplusplus */
 
 
 #endif /* MKLOGID_INCLUDE */

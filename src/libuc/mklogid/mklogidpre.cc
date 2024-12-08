@@ -1,4 +1,4 @@
-/* mkplogid SUPPORT */
+/* mklogidpre SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	mkplogid
+	mklogidpre
 
 	Description:
 	This subroutine makes a prefix log ID for the PCSPOLL program
@@ -29,7 +29,7 @@
 	in identifying a sub-job of a daemon (or other) program.
 
 	Synopsis:
-	int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex
+	int mklogidpre(char *rbuf,int rlen,cchar *nodename,int v) noex
 
 	Arguments:
 	rbuf		destination buffer
@@ -56,7 +56,7 @@
 #include	<pow.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
-#include	"mkx.h"
+#include	"mklogid.h"
 
 
 /* local defines */
@@ -89,7 +89,7 @@ using std::nothrow ;			/* constant */
 
 /* local variables */
 
-constexpr int	dlen = DIGBUFLEN ;
+constexpr int		dlen = DIGBUFLEN ;
 
 
 /* exported variables */
@@ -97,7 +97,7 @@ constexpr int	dlen = DIGBUFLEN ;
 
 /* exported subroutines */
 
-int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
+int mklogidpre(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	int		rs = SR_FAULT ;
 	int		tl = 0 ;
 	if (rbuf && nodename) {
@@ -105,7 +105,7 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-		static constexpr int	rsm = ndigit(PID_MAX,10) ;
+		static cint	rsm = logdigmax ;
 		if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rs ;
 		    int		modval ;
@@ -152,6 +152,6 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? tl : rs ;
 }
-/* end subroutine (mkplogid) */
+/* end subroutine (mklogidpre) */
 
 

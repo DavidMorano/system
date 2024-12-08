@@ -183,8 +183,8 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	securefile(cchar *,uid_t,gid_t) ;
-extern int	mkplogid(char *,int,cchar *,int) ;
-extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	mklogidpre(char *,int,cchar *,int) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
@@ -2180,11 +2180,11 @@ static int procuserinfo_logid(PROGINFO *pip)
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            lip->kserial = rs ;
-	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
+	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
 	                const int	s = lip->kserial ;
 	                const int	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
-	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
+	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
 	                    rs = proginfo_setentry(pip,vpp,sbuf,rs) ;
 	                }

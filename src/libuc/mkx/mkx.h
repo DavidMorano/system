@@ -33,7 +33,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<mklogid.h>
 #include	<mkgecosname.h>
 #include	<mkcexsync.h>
 #include	<mkuuid.h>

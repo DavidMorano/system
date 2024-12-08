@@ -46,7 +46,6 @@
 
 
 /* extra "open" flags */
-
 enum extraopenflags {
 	extraopenflag_start = 28,
 	extraopenflag_minmode = 28,
@@ -55,9 +54,7 @@ enum extraopenflags {
 	extraopenflag_overlast
 } ;
 
-
 /* missing UNIX® signals */
-
 enum signalmissings {
 	signalmissing_poll = 1000,
 	signalmissing_pwr,
@@ -70,73 +67,67 @@ enum signalmissings {
 #ifndef	SIGCLD
 #define	SIGCLD		SIGCHLD
 #endif
-
 #ifndef	SIGPOLL
 #define	SIGPOLL		signalmissing_poll
 #endif
-
 #ifndef	SIGPWR
 #define	SIGPWR		signalmissing_pwr
 #endif
-
 #ifndef	SIGCANCEL
 #define	SIGCANCEL	signalmissing_cancel
 #endif
-
 #ifndef	SIGLOST
 #define	SIGLOST		signalmissing_lost
 #endif
-
 #ifndef	SIGXFSZ
 #define	SIGXFSZ		signalmissing_xfsz
 #endif
 
 /* missing file open-flags */
-
 #ifndef	O_SPECIALMASK
 #define	O_SPECIALMASK	((~ 0) << extraopenflag_start)
 #endif
-
 #ifndef	O_LARGEFILE
 #define	O_LARGEFILE	0
 #endif
-
 #ifndef	O_MINMODE
 #define	O_MINMODE	(1 << extraopenflag_minmode)
 #endif
-
 #ifndef	O_MINFD
 #define	O_MINFD		(1 << extraopenflag_minfd)
 #endif
-
 #ifndef	O_NETWORK
 #define	O_NETWORK	(1 << extraopenflag_network)
 #endif
 
 /* missing from some operating systems */
-
 #ifndef	S_IAMB
 #define	S_IAMB		0x1FF		/* mask for the permissions field */
 #endif
-
 #ifndef	S_IFNAM
 #define	S_IFNAM		0x5000		/* MicroSoft XENIX® named file */
 #endif
-
 #ifndef	S_IFDOOR
 #define	S_IFDOOR	0xD000		/* Solaris® "door" file */
 #endif
-
 #ifndef	S_ISNAM
 #define	S_ISNAM(fm)	(((fm) & S_IFMT) == S_IFNAM)
 #endif
-
 #ifndef	S_ISDOOR
 #define	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
 #endif
 
-/* PATHCONF preprocessor defines */
+/* system configuration */
+enum extrasysconfs {
+    	extrasysconf_maxpid,
+	extrasysconf_overlast
+} ;
 
+#ifndef	_SC_MAXPID
+#define	_SC_MAXPID	extrasysconf_maxpid
+#endif
+
+/* PATHCONF preprocessor defines */
 #ifndef	_PC_CHOWN_RESTRICTED
 #define	_PC_CHOWN_RESTRICTED	-1
 #endif

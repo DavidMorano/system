@@ -10,7 +10,7 @@
 #define	CF_PROGHANDLE	1		/* call 'proghandle() */
 #define	CF_DUPUP	1		/* 'dupup(3dam)' low FDs */
 #define	CF_LOADNAMES	0		/* load-names here */
-#define	CF_MKSUBLOGID	1		/* use 'mksublogid(3dam)' */
+#define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
 #define	CF_LOGCHECK	1		/* call 'proglog_check()' */
 
 
@@ -135,7 +135,7 @@ extern int	ctdeci(char *,int,int) ;
 extern int	bufprintf(const char *,int,...) ;
 extern int	dupup(int,int) ;
 extern int	nlspeername(const char *,const char *,char *) ;
-extern int	mksublogid(char *,int,const char *,int) ;
+extern int	mklogidsub(char *,int,const char *,int) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	varsub_addvec(VARSUB *,VECSTR *) ;
@@ -1713,14 +1713,14 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 	cip->stime = pip->daytime ;
 
 #if	CF_MKSUBLOGID
-	rs = mksublogid(logid,JOBDB_JOBIDLEN,pip->logid,pip->subserial) ;
+	rs = mklogidsub(logid,JOBDB_JOBIDLEN,pip->logid,pip->subserial) ;
 #else
 	rs = snsdd(logid,JOBDB_JOBIDLEN,pip->logid,pip->subserial) ;
 #endif	/* CF_MKSUBLOGID */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("procwatchnew: mksublogid() rs=%d jobid=%s\n",
+	    debugprintf("procwatchnew: mklogidsub() rs=%d jobid=%s\n",
 		rs,logid) ;
 #endif
 

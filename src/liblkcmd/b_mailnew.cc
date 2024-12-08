@@ -171,8 +171,8 @@ extern int	getnodedomain(char *,char *) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	mkplogid(char *,int,const char *,int) ;
-extern int	mksublogid(char *,int,const char *,int) ;
+extern int	mklogidpre(char *,int,const char *,int) ;
+extern int	mklogidsub(char *,int,const char *,int) ;
 extern int	mkcleanline(char *,int,int) ;
 extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
@@ -1439,10 +1439,10 @@ static int procuserinfo_logid(PROGINFO *pip)
 	            const int	pv = pip->pid ;
 	            const char	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
-	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
+	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
 	                const int	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
-	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
+	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    const char	**vpp = &pip->logid ;
 	                    rs = proginfo_setentry(pip,vpp,sbuf,rs) ;
 	                }

@@ -613,6 +613,11 @@ mkx.o:			mkx.dir
 mkx.dir:
 	makesubdir $@
 
+# MKLOGID
+mklogid.o:		mklogid.dir
+mklogid.dir:
+	makesubdir $@
+
 # MKTMP
 mktmp.o:		mktmp.dir
 mktmp.dir:

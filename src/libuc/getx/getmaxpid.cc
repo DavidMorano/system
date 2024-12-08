@@ -50,6 +50,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"getmaxpid.h"
+
 
 /* local defines */
 
@@ -72,7 +74,7 @@
 
 /* local structures */
 
-struct getmaxpid {
+struct pidmgr {
 	pid_t		pid ;		/* assume this is atomic */
 } ;
 
@@ -82,10 +84,12 @@ struct getmaxpid {
 
 /* local variables */
 
-static struct getmaxpid		getmaxpid_data ; /* zero-initialized */
+static pidmgr		getmaxpid_data ;
 
 
 /* exported variables */
+
+libdam::maxpider	maxpid ;
 
 
 /* exported subroutines */
@@ -95,28 +99,22 @@ int getmaxpid(int w) noex {
 	switch (w) {
 	case 0:
 	    {
-#ifdef	_SC_MAXPID
-		{
-		    struct getmaxpid	*op = &getmaxpid_data ;
-		    if (op->pid == 0) {
-	    	        const int	cmd = _SC_MAXPID ;
-	                rs = uc_sysconf(cmd,NULL) ;
-		        op->pid = rs ;
-	            } else {
-		        rs = op->pid ;
-		    }
-		} /* end block */
-#else
-	        rs = PID_MAX ;
-#endif /* _SC_MAXPID */
-	    }
+                pidmgr      *op = &getmaxpid_data ;
+                if (op->pid == 0) {
+                    cint    cmd = _SC_MAXPID ;
+                    if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
+                        op->pid = rs ;
+                    } else if (rs == SR_NOSYS) {
+                        rs = PID_MAX ;
+                        op->pid = rs ;
+                    }
+                } else {
+                    rs = op->pid ;
+                }
+            } /* end block */
 	    break ;
 	case 1:
-#ifdef	SYSPID_MAX
-	    rs = SYSPID_MAX ;
-#else
-	    rs = SR_NOSYS ;
-#endif /* SYSPID_MAX */
+	    rs = PID_MAX ;
 	    break ;
 	default:
 	    rs = SR_INVALID ;

@@ -1,4 +1,4 @@
-/* mksublogid SUPPORT */
+/* mklogidsub SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	mksublogid
+	mklogidsub
 
 	Description:
 	This subroutine makes a composite (also called a "serial")
@@ -35,7 +35,7 @@
 	minimum before failure is returned.
 
 	Synopsis:
-	int mksublogid(char *dbuf,int dlen,cchar *bname,int v) noex
+	int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex
 
 	Arguments:
 	dbuf		destination buffer (for result)
@@ -62,7 +62,7 @@
 #include	<storebuf.h>
 #include	<localmisc.h>
 
-#include	"mkx.h"
+#include	"mklogid.h"
 
 
 /* local defines */
@@ -107,14 +107,14 @@ constexpr int	vlen = DIGBUFLEN ;
 
 /* exported subroutines */
 
-int mksublogid(char *dbuf,int dlen,cchar *bname,int v) noex {
+int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && bname) {
 	    rs = SR_INVALID ;
 	    if (dlen < 0) dlen = LOGIDLEN ;
       	    dbuf[0] = '\0' ;
 	    if (v >= 0) {
-        	int		max ;
+        	int		dmax ;
         	int		al ;
         	int		bl ;
         	int		vl = 0 ;
@@ -131,47 +131,47 @@ int mksublogid(char *dbuf,int dlen,cchar *bname,int v) noex {
         	    bp = bname ;
         	    bl = strlen(bname) ;
         	    if ((bl + 1 + vl) > dlen) {
-        	        max = MAXDIG ;
-        	        if (vl > max) {
-        	            al = (vl - max) ;
+        	        dmax = MAXDIG ;
+        	        if (vl > dmax) {
+        	            al = (vl - dmax) ;
         	            vp += al ;
         	            vl -= al ;
         	        }
         	    } /* end if */
         	    if ((bl + 1 + vl) > dlen) {
-        	        max = MAXBAS ;
-        	        if (bl > max) {
-        	            al = (bl - max) ;
+        	        dmax = MAXBAS ;
+        	        if (bl > dmax) {
+        	            al = (bl - dmax) ;
         	            bl -= al ;
         	        }
         	    } /* end if */
         	    if ((bl + 1 + vl) > dlen) {
-        	        max = MIDDIG ;
-        	        if (vl > max) {
-        	            al = (vl - max) ;
+        	        dmax = MIDDIG ;
+        	        if (vl > dmax) {
+        	            al = (vl - dmax) ;
         	            vp += al ;
         	            vl -= al ;
         	        }
         	    } /* end if */
         	    if ((bl + 1 + vl) > dlen) {
-        	        max = MIDBAS ;
-        	        if (bl > max) {
-        	            al = (bl - max) ;
+        	        dmax = MIDBAS ;
+        	        if (bl > dmax) {
+        	            al = (bl - dmax) ;
         	            bl -= al ;
         	        }
         	    } /* end if */
         	    if ((bl + 1 + vl) > dlen) {
-        	        max = MINDIG ;
-        	        if (vl > max) {
-        	            al = (vl - max) ;
+        	        dmax = MINDIG ;
+        	        if (vl > dmax) {
+        	            al = (vl - dmax) ;
         	            vp += al ;
         	            vl -= al ;
         	        }
         	    } /* end if */
         	    if ((bl + 1 + vl) > dlen) {
-        	        max = MINBAS ;
-        	        if (bl > max) {
-        	            al = (bl - max) ;
+        	        dmax = MINBAS ;
+        	        if (bl > dmax) {
+        	            al = (bl - dmax) ;
         	            bl -= al ;
         	        }
         	    } /* end if */
@@ -181,25 +181,24 @@ int mksublogid(char *dbuf,int dlen,cchar *bname,int v) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mksublogid) */
+/* end subroutine (mklogidsub) */
 
 
 /* local subroutines */
 
 static int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
 	int		rs ;
-	int		i = 0 ;
-	if ((rs = storebuf_strw(dbuf,dlen,i,bp,bl)) >= 0) {
-	    i += rs ;
+	int		idx = 0 ;
+	if (storebuf sb(dbuf,dlen) ; (rs = sb.strw(bp,bl)) >= 0) {
 	    if ((vl >= 0) && vp[0]) {
-	        if ((rs = storebuf_chr(dbuf,dlen,i,MIDDLECHAR)) >= 0) {
-	    	    i += rs ;
-	            rs = storebuf_strw(dbuf,dlen,i,vp,vl) ;
-	            i += rs ;
+	        if ((rs = sb.chr(MIDDLECHAR)) >= 0) {
+	            if ((rs = sb.strw(vp,vl)) >= 0) {
+		    	idx = sb.idx ;
+		    }
 		}
 	    } /* end if (trailing part) */
 	} /* end if (base part) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (mkjoin) */
 

@@ -51,9 +51,10 @@
 #include	<ctdec.h>
 #include	<ndigit.h>
 #include	<pow.h>
+#include	<getmaxpid.h>
 #include	<localmisc.h>		/* |LOGIDLEN| */
 
-#include	"mkx.h"
+#include	"mklogid.h"
 
 
 /* local defines */
@@ -110,6 +111,8 @@ constexpr int		logidlen = LOGIDLEN ;
 
 /* exported variables */
 
+libuc::logdigmaxer	logdigmax ;
+
 
 /* exported subroutines */
 
@@ -120,7 +123,7 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-	        static constexpr int	rsm = ndigit(PID_MAX,10) ;
+	        static cint	rsm = logdigmax ;
 	        if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rs ;
 		    if ((rs = mkmaxstrlen(maxdigs,rlen)) >= 0) {
@@ -207,5 +210,15 @@ static int mkmaxstrlen(int maxdigs,int rlen) noex {
 	return (rs >= 0) ? maxstrlen : rs ;
 }
 /* end subroutine (mkmaxstrlen) */
+
+namespace libuc {
+    int logdigmaxer::mkdigmax() noex {
+	int		rs ;
+	if ((rs = maxpid) >= 0) {
+	    rs = ndigit(rs,10) ;
+	}
+	return rs ;
+    } /* end method (mkdigmax) */
+}
 
 
