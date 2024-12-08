@@ -1,5 +1,6 @@
 /* uc_safesleep */
-/* lang=C20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* safely sleep for a while */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_safesleep
+
+	Description:
 	This code safely sleeps for a while without interferring
 	with the dangerous and fragile ALARM signal (which likely
 	gets changed to different things under some execution modes
@@ -30,6 +35,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mtime.h>
 #include	<localmisc.h>
@@ -57,21 +64,24 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_safesleep(int n) noex {
 	int		rs = SR_OK ;
 	if (n > 0) {
 	    POLLFD	fds[1] = {} ;
-	    mtime_t	mn = (n*1000) ;
+	    mtime_t	mn = (n * POLL_INTMULT) ;
 	    mtime_t	dt = mtime() ;
 	    mtime_t	st ;
 	    fds[0].fd = -1 ;
 	    fds[0].events = 0 ;
 	    fds[0].revents = 0 ;
 	    st = dt ;
-	    while ((rs >= 0) && ((dt-st) < mn)) {
-	        cint	intpoll = (mn-(dt-st)) ;
+	    while ((rs >= 0) && ((dt - st) < mn)) {
+	        cint	intpoll = (mn - (dt - st)) ;
 	        rs = u_poll(fds,0,intpoll) ;
 	        dt = mtime() ;
 		if (rs == SR_INTR) rs = SR_OK ;

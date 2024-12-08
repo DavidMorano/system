@@ -790,7 +790,7 @@ static int termnote_lfopen(termnote *op,time_t dt) noex {
 	    if (rs >= 0) {
 		if ((rs = ucpid) >= 0) {
 		    cint	pid = rs ;
-		    rs = mkplogid(op->logid,LOGIDLEN,op->nodename,pid) ;
+		    rs = mklogidpre(op->logid,LOGIDLEN,op->nodename,pid) ;
 		}
 	    }
 	    if (rs >= 0) {

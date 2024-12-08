@@ -49,6 +49,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strn.h>
 #include	<matkeystr.h>
 

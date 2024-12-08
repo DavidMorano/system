@@ -1,5 +1,6 @@
 /* ctwords SUPPORT */
-/* lang=C++11 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 */
 
 /* convert to Number Words */
 /* version %I% last-modified %G% */
@@ -38,14 +39,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
 
 #include	"ctwords.hh"
 

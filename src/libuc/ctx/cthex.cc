@@ -1,4 +1,5 @@
 /* cthex SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a HEX string */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	cthex
+
+	Description:
 	These subroutines that perform conversions which also have
 	an integral power-of-two base are much faster than anything
 	that uses |lltostr(3c)| (or friends) because there are no
@@ -24,9 +29,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysrets.h>
-#include	<utypedefs.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 #include	<cvtdig.hh>
 
@@ -62,65 +71,65 @@ constexpr int	b = OURBASE ;
 
 int cthexc(char *dp,int dl,int val) noex {
 	uint		uv = uint(val) ;
-	cint		n = sizeof(char) ;
+	cint		n = szof(char) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexc) */
 
 int cthexs(char *dp,int dl,int val) noex {
 	uint		uv = uint(val) ;
-	cint		n = sizeof(short) ;
+	cint		n = szof(short) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexs) */
 
 int cthexi(char *dp,int dl,int val) noex {
 	uint		uv = uint(val) ;
-	cint		n = sizeof(int) ;
+	cint		n = szof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexi) */
 
 int cthexl(char *dp,int dl,long val) noex {
 	ulong		uv = ulong(val) ;
-	cint		n = sizeof(long) ;
+	cint		n = szof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexl) */
 
 int cthexll(char *dp,int dl,longlong val) noex {
 	ulonglong	uv = ulonglong(val) ;
-	cint		n = sizeof(longlong) ;
+	cint		n = szof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexll) */
 
 int cthexuc(char *dp,int dl,uint uv) noex {
-	cint		n = sizeof(uchar) ;
+	cint		n = szof(uchar) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexuc) */
 
 int cthexus(char *dp,int dl,uint uv) noex {
-	cint		n = sizeof(ushort) ;
+	cint		n = szof(ushort) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexus) */
 
 int cthexui(char *dp,int dl,uint uv) noex {
-	cint		n = sizeof(uint) ;
+	cint		n = szof(uint) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexui) */
 
 int cthexul(char *dp,int dl,ulong uv) noex {
-	cint		n = sizeof(ulong) ;
+	cint		n = szof(ulong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexul) */
 
 int cthexull(char *dp,int dl,ulonglong uv) noex {
-	cint		n = sizeof(ulonglong) ;
+	cint		n = szof(ulonglong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexull) */

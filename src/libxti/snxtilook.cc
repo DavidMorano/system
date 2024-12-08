@@ -1,4 +1,5 @@
 /* snxtilook SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make string version of the XTI |t_look(3nsl)| codes */
@@ -38,8 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<xti.h>
 #include	<usystem.h>
+#include	<uxti.h>
 #include	<sncpy.h>
 
 

@@ -1,4 +1,5 @@
 /* dialticotsord SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to dial over to a UNIX® domaiun socket */
@@ -57,24 +58,21 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<xti.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<uxti.h>
+#include	<mallocxx.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<cfhex.h>
+#include	<cfhexstr.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#define	ADDRBUFLEN	MAXPATHLEN
-#define	CONNTIMEOUT	120		/* seconds */
-#define	LINGERTIME	(3 * 6)		/* seconds */
 #define	TPIDEV		"/dev/ticotsord"
-
-#define	HEXBUFLEN	((2 * MAXPATHLEN) + 2)
 
 #define	SUBINFO		struct subinfo
 
@@ -117,7 +115,7 @@ static int	pushmod(int,cchar *) noex ;
 
 /* local variables */
 
-constexpr bool	f_pushmod = CF_PUSHMOD ;
+constexpr bool		f_pushmod = CF_PUSHMOD ;
 
 
 /* exported variables */
@@ -126,36 +124,37 @@ constexpr bool	f_pushmod = CF_PUSHMOD ;
 /* exported subroutines */
 
 int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
-	SUBINFO		g ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		fd = -1 ;
-	char		addrbuf[ADDRBUFLEN + 1] ;
 	(void) opts ;
-	if (abuf == NULL) return SR_FAULT ;
-
-	if (alen < 0) {
-	    if (strncmp(abuf,"\\x",2) == 0) {
-	        abuf += 2 ;
-	        alen = strlen(abuf) ;
-	        if ((alen >> 1) <= ADDRBUFLEN) {
-	            rs = cfhexs(abuf,alen,addrbuf) ;
-	            abuf = addrbuf ;
-		    alen = rs ;
-	        } else {
-	            rs = SR_TOOBIG ;
-		}
-	    } else {
-	        alen = strlen(abuf) ;
-	    }
-	} /* end if */
-
-/* try to connect to the remote machine */
-
-	if (rs >= 0) {
-	    rs = makeconn(&g,abuf,alen,to) ;
-	    fd = rs ;
-	}
-
+	if (abuf) {
+	    if (char *addrbuf{} ; (rs = malloc_mp(&addrbuf)) >= 0) {
+		cint	addlen = rs ;
+	        if (alen < 0) {
+	            if (strncmp(abuf,"\\x",2) == 0) {
+	                abuf += 2 ;
+	                alen = strlen(abuf) ;
+	                if ((alen >> 1) <= addrlen) {
+	                    rs = cfhexstr(abuf,alen,addrbuf) ;
+	                    abuf = addrbuf ;
+		            alen = rs ;
+	                } else {
+	                    rs = SR_TOOBIG ;
+		        }
+	            } else {
+	                alen = strlen(abuf) ;
+	            }
+	        } /* end if */
+	        /* try to connect to the remote machine */
+	        if (rs >= 0) {
+	            if (SUBINFO g ; (rs = makeconn(&g,abuf,alen,to)) >= 0) {
+	                fd = rs ;
+	            }
+	        }
+	    	rs = rsfree(rs,addrbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialticotsord) */
@@ -170,21 +169,21 @@ static int makeconn(SUBINFO *gp,cchar addr[],int alen,int to) noex {
 	    struct t_info	info{} ;
 	    if ((rs = ut_open(TPIDEV,O_RDWR,&info)) >= 0) {
 	        fd = rs ;
-	        if ((rs = ut_bind(fd,NULL,NULL)) >= 0) {
+	        if ((rs = ut_bind(fd,nullptr,nullptr)) >= 0) {
 	            struct t_call	*sndcall ;
 	            if ((rs = ut_alloc(fd,T_CALL,0,(void **) &sndcall)) >= 0) {
 	                sndcall->addr.maxlen = alen ;
 	                sndcall->addr.buf = (char *) addr ;
 	                sndcall->addr.len = alen ;
 		        {
-	                    rs = ut_connect(fd,sndcall,NULL) ;
+	                    rs = ut_connect(fd,sndcall,nullptr) ;
 		        }
 	                sndcall->addr.maxlen = 0 ;
-	                sndcall->addr.buf = NULL ;
+	                sndcall->addr.buf = nullptr ;
 	                sndcall->addr.len = 0 ;
 	                ut_free(sndcall,T_CALL) ;
 	            } /* end if (alloc) */
-    /* was this "busy" at all, requiring a TLOOK operation? */
+    		    /* was this "busy" at all, requiring a TLOOK operation? */
 	            if ((rs == SR_BUSY) || (rs == SR_LOOK)) {
 	                rs = ut_look(fd) ;
 	            }
@@ -205,53 +204,50 @@ static int makeconn(SUBINFO *gp,cchar addr[],int alen,int to) noex {
 
 #if	CF_PUSHMOD
 static int pushmod(int fd,cchar *mods) noex {
-	int		rs = SR_OK ;
-	cchar		*timod = "timod" ;
-
-	if (mods == NULL) return SR_FAULT ;
-	if (fd < 0) return SR_NOTOPEN ;
-
-	if (strcmp(mods,timod) == 0) {
-
-	    if ((rs = u_ioctl(fd,I_LOOK,timod)) == SR_INVALID) {
-	        rs = u_ioctl(fd,I_PUSH,timod) ;
-	    }
-
-	} else { /* pop 'timod' if it is on the stack */
-	    char	mbuf[MAXNAMELEN + 1] ;
-
-	    if ((rs = u_ioctl(fd,I_LOOK,mbuf)) >= 0) {
-	        if (strcmp(mbuf,timod) == 0) {
-	            rs = u_ioctl(fd,I_POP,0) ;
-	        }
-	    } else if (rs == SR_INVALID) {
-	        rs = SR_OK ;
-	    }
-	    if (rs >= 0) {
-	        int	cl ;
-	        cchar	*sp = mods ;
-	        cchar	*cp{} ;
-	        cchar	*tp ;
-	        while ((tp = strchr(sp,',')) != NULL) {
-	            if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
-	                strnwcpy(mbuf,MAXNAMELEN,cp,cl) ;
-	                rs = u_ioctl(fd,I_PUSH,mbuf) ;
+	int		rs = SR_FAULT ;
+	if (mods) {
+	    rs = SR_NOTOPEN ;
+	    if (fd >= 0) {
+	        cchar	timod[] = "timod" ;
+	        if (strcmp(mods,timod) == 0) {
+	            if ((rs = u_ioctl(fd,I_LOOK,timod)) == SR_INVALID) {
+	                rs = u_ioctl(fd,I_PUSH,timod) ;
 	            }
-	            sp = (tp + 1) ;
-	            if (rs < 0) break ;
-	        } /* end while */
-
-	        if ((rs >= 0) && sp[0]) {
-	            if ((cl = sfshrink(sp,-1,&cp)) > 0) {
-	                strnwcpy(mbuf,MAXNAMELEN,cp,cl) ;
-	                rs = u_ioctl(fd,I_PUSH,mbuf) ;
-	            }
-	        } /* end if */
-
-	    } /* end if (pushing) */
-
-	} /* end if (easy or more complex) */
-
+	        } else { /* pop 'timod' if it is on the stack */
+	            if (char *mbuf{} ; (rs = malloc_mp(&mbuf)) >= 0) {
+		        cint	mlen = rs ;
+	                if ((rs = u_ioctl(fd,I_LOOK,mbuf)) >= 0) {
+	                    if (strcmp(mbuf,timod) == 0) {
+	                        rs = u_ioctl(fd,I_POP,0) ;
+	                    }
+	                } else if (rs == SR_INVALID) {
+	                    rs = SR_OK ;
+	                }
+	                if (rs >= 0) {
+	                    int		cl ;
+	                    cchar	*sp = mods ;
+	                    cchar	*cp{} ;
+	                    cchar	*tp ;
+	                    while ((tp = strchr(sp,',')) != nullptr) {
+	                        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
+	                            strnwcpy(mbuf,mlen,cp,cl) ;
+	                            rs = u_ioctl(fd,I_PUSH,mbuf) ;
+	                        }
+	                        sp = (tp + 1) ;
+	                        if (rs < 0) break ;
+	                    } /* end while */
+	                    if ((rs >= 0) && sp[0]) {
+	                        if ((cl = sfshrink(sp,-1,&cp)) > 0) {
+	                            strnwcpy(mbuf,mlen,cp,cl) ;
+	                            rs = u_ioctl(fd,I_PUSH,mbuf) ;
+	                        }
+	                    } /* end if */
+	                } /* end if (pushing) */
+	                rs = rsfree(rs,mbuf) ;
+	    	    } /* end if (m-a-f) */
+		} /* end if (easy or more complex) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pushmod) */

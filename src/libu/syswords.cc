@@ -57,6 +57,7 @@ const char syswords::w_devdir[] =	"/dev" ;
 const char syswords::w_vardir[] =	"/var" ;
 const char syswords::w_procdir[] =	"/proc" ;
 const char syswords::w_sysdbdir[] =	"/sysdb" ;
+const char syswords::w_devnull[] =	"/dev/null" ;
 const char syswords::w_maildir[] =	"/var/mail" ;
 const char syswords::w_usrlocaldir[] =	"/usr/local" ;
 

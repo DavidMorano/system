@@ -76,7 +76,7 @@ using std::nothrow ;			/* constant */
 static int	bufstr_extend(bufstr *,int,char ** = nullptr) noex ;
 
 template<typename T>
-int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
+static inline int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -93,13 +93,25 @@ int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (bufstr_xxxx) */
 
 template<typename T>
-int bufstr_decx(bufstr *sbp,T v) noex {
+static inline int bufstr_binx(bufstr *sbp,T v) noex {
+	return bufstr_xxxx(sbp,ctbin,v) ;
+}
+/* end subroutine-template (bufstr_binx) */
+
+template<typename T>
+static inline int bufstr_octx(bufstr *sbp,T v) noex {
+	return bufstr_xxxx(sbp,ctoct,v) ;
+}
+/* end subroutine-template (bufstr_octx) */
+
+template<typename T>
+static inline int bufstr_decx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctdec,v) ;
 }
 /* end subroutine-template (bufstr_decx) */
 
 template<typename T>
-int bufstr_hexx(bufstr *sbp,T v) noex {
+static inline int bufstr_hexx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,cthex,v) ;
 }
 /* end subroutine-template (bufstr_hexx) */
@@ -183,6 +195,66 @@ int bufstr_get(bufstr *op,cchar **spp) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bufstr_get) */
+
+int bufstr_bini(bufstr *sbp,int v) noex {
+	return bufstr_binx(sbp,v) ;
+}
+/* end subroutine (bufstr_bini) */
+
+int bufstr_binl(bufstr *sbp,long v) noex {
+	return bufstr_binx(sbp,v) ;
+}
+/* end subroutine (bufstr_binl) */
+
+int bufstr_binll(bufstr *sbp,longlong v) noex {
+	return bufstr_binx(sbp,v) ;
+}
+/* end subroutine (bufstr_binll) */
+
+int bufstr_binui(bufstr *sbp,uint v) noex {
+	return bufstr_binx(sbp,v) ;
+}
+/* end subroutine (bufstr_binui) */
+
+int bufstr_binul(bufstr *sbp,ulong v) noex {
+	return bufstr_binx(sbp,v) ;
+}
+/* end subroutine (bufstr_binul) */
+
+int bufstr_binull(bufstr *sbp,ulonglong v) noex {
+	return bufstr_binx(sbp,v) ;
+}
+/* end subroutine (bufstr_binull) */
+
+int bufstr_octi(bufstr *sbp,int v) noex {
+	return bufstr_octx(sbp,v) ;
+}
+/* end subroutine (bufstr_octi) */
+
+int bufstr_octl(bufstr *sbp,long v) noex {
+	return bufstr_octx(sbp,v) ;
+}
+/* end subroutine (bufstr_octl) */
+
+int bufstr_octll(bufstr *sbp,longlong v) noex {
+	return bufstr_octx(sbp,v) ;
+}
+/* end subroutine (bufstr_octll) */
+
+int bufstr_octui(bufstr *sbp,uint v) noex {
+	return bufstr_octx(sbp,v) ;
+}
+/* end subroutine (bufstr_octui) */
+
+int bufstr_octul(bufstr *sbp,ulong v) noex {
+	return bufstr_octx(sbp,v) ;
+}
+/* end subroutine (bufstr_octul) */
+
+int bufstr_octull(bufstr *sbp,ulonglong v) noex {
+	return bufstr_octx(sbp,v) ;
+}
+/* end subroutine (bufstr_octull) */
 
 int bufstr_deci(bufstr *sbp,int v) noex {
 	return bufstr_decx(sbp,v) ;

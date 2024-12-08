@@ -20,7 +20,7 @@
 #define	CF_SPERM	1		/* use 'sperm(3dam)' */
 #define	CF_SLOWGROW	1		/* slowly grow polling interval */
 #define	CF_ENVLOCAL	0		/* use only local environment */
-#define	CF_MKSUBLOGID	1		/* use 'mksublogid(3dam)' */
+#define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
 #define	CF_JOBDNAME	1		/* use "jobdname" */
 #define	CF_PROCFINDPROG	0		/* use |procfindprog()| */
 
@@ -119,7 +119,7 @@ extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	nextfield(cchar *,int,cchar **) ;
 extern int	cfdeci(char *,int,int *) ;
@@ -1653,7 +1653,7 @@ SVCENTRY_ARGS	*pap ;
 	    pap->jobid = jobid ;
 
 #if	CF_MKSUBLOGID
-	    rs = mksublogid(jobid,SVCENTRY_IDLEN,pip->logid,pcp->serial) ;
+	    rs = mklogidsub(jobid,SVCENTRY_IDLEN,pip->logid,pcp->serial) ;
 #else
 	    rs = snsdd(jobid,SVCENTRY_IDLEN,pip->logid,pcp->serial) ;
 #endif /* CF_MKSUBLOGID */

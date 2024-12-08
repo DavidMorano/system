@@ -1,4 +1,5 @@
 /* sbuf_addquoted SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* storage buffer (SBuf) object */
@@ -38,8 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<mkquoted.h>
@@ -76,8 +77,7 @@ int sbuf_addquoted(sbuf *sbp,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
 	        cint	qlen = ((sl * 2) + 3) ;
-	        char	*qbuf = nullptr ;
-	        if ((rs = uc_libmalloc((qlen+1),&qbuf)) >= 0) {
+	        if (char *qbuf{} ; (rs = uc_libmalloc((qlen+1),&qbuf)) >= 0) {
 	            if ((rs = mkquoted(qbuf,qlen,sp,sl)) >= 0) {
 	                len = rs ;
 	                rs = sbuf_strw(sbp,qbuf,len) ;

@@ -284,7 +284,7 @@ OBJ165= emainfo.o getdig.o
 OBJ166= listentcp.o listenudp.o listenuss.o listenusd.o 
 OBJ167= listenpass.o listenconn.o
 
-OBJ168= getprogexec.o getnodedomain.o getmaxpid.o getrand.o getgid_def.o
+OBJ168= getprogexec.o getnodedomain.o getrand.o getgid_def.o
 OBJ169= getehostname.o getchostname.o getcanonical.o getourhe.o
 OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
@@ -824,6 +824,11 @@ decoder.dir:
 # ALGORITHMS
 algorithms.o:		algorithms.dir
 algorithms.dir:	
+	makesubdir $@
+
+# FMQ
+fmq.o:			fmq.dir
+fmq.dir:	
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

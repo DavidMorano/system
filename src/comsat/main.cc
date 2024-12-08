@@ -142,7 +142,7 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	mkplogid(char *,int,cchar *,int) ;
+extern int	mklogidpre(char *,int,cchar *,int) ;
 extern int	getportnum(cchar *,cchar *) ;
 extern int	getprotofamily(int) ;
 extern int	listenudp(int,cchar *,cchar *,int) ;
@@ -1388,7 +1388,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 	int		rs ;
 	cchar		*nn = pip->nodename ;
 	char		pbuf[LOGIDLEN+1] ;
-	if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
+	if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
 	    cchar	**vpp = &pip->logid ;
 	    rs = proginfo_setentry(pip,vpp,pbuf,rs) ;
 	}

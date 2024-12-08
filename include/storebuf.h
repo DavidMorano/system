@@ -1,4 +1,5 @@
 /* storebuf HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* storage buffer manipulation subroutines */
@@ -155,52 +156,52 @@ struct storebuf {
 	storebuf() = delete ;
 	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { } ;
 	int chrs(int ch,int n) noex {
-	    int rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
+	    cint rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int chr(int ch) noex {
-	    int rs = storebuf_chr(bufp,bufl,idx,ch) ;
+	    cint rs = storebuf_chr(bufp,bufl,idx,ch) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int strw(cchar *sp,int sl = -1) noex {
-	    int rs = storebuf_strw(bufp,bufl,idx,sp,sl) ;
+	    cint rs = storebuf_strw(bufp,bufl,idx,sp,sl) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int str(cchar *sp) noex {
-	    int rs = storebuf_str(bufp,bufl,idx,sp) ;
+	    cint rs = storebuf_str(bufp,bufl,idx,sp) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int buf(cchar *sp,int sl = -1) noex {
-	    int rs = storebuf_buf(bufp,bufl,idx,sp,sl) ;
+	    cint rs = storebuf_buf(bufp,bufl,idx,sp,sl) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int blanks(int n = 1) noex {
-	    int rs = storebuf_blanks(bufp,bufl,idx,n) ;
+	    cint rs = storebuf_blanks(bufp,bufl,idx,n) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int bin(auto v) noex {
-	    int rs = storebuf_bin(bufp,bufl,idx,v) ;
+	    cint rs = storebuf_bin(bufp,bufl,idx,v) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int oct(auto v) noex {
-	    int rs = storebuf_oct(bufp,bufl,idx,v) ;
+	    cint rs = storebuf_oct(bufp,bufl,idx,v) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int dec(auto v) noex {
-	    int rs = storebuf_dec(bufp,bufl,idx,v) ;
+	    cint rs = storebuf_dec(bufp,bufl,idx,v) ;
 	    idx += rs ;
 	    return rs ;
 	} ;
 	int hexn(int i,auto v) noex {
-	    int rs = storebuf_hex(bufp,bufl,idx,v) ;
+	    cint rs = storebuf_hex(bufp,bufl,idx,v) ;
 	    idx += rs ;
 	    return rs ;
 	} ;

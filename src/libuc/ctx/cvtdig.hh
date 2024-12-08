@@ -1,4 +1,5 @@
 /* cvtdig HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert an integer value into a c-string, given a value and base */
@@ -29,8 +30,9 @@
 
 	Description:
 	This subroutine converts a value (and a base) into its
-	string representation. It only works for bases that are a
-	power-of-two, and also only for bases up to sixty four (64).
+	string representation.  It only works for bases that are a
+	power-of-two, and also only for bases up to
+	one-hundred-twenty-eight (128).
 
 	Synopsis:
 	template<typename UT>
@@ -48,6 +50,7 @@
 				16=hexadecimal
 				32=
 				64=
+				128=
 
 	Returns:
 	-		length of result characters
@@ -63,16 +66,18 @@
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
-#include	<uvariables.hh>
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<uvariables.hh>
 #include	<stdintx.h>
 
 
-static constexpr int	cvtdig_maxbase = 64 ;	/* largest pow-of-two */
+constexpr int	cvtdig_maxbase = 128 ;	/* largest pow-of-two */
 
-static inline constexpr int cvtdig_ffbsi(int b) noex {
+inline constexpr int cvtdig_ffbsi(int b) noex {
 	cuint		ub = uint(b) ;
 	return std::countr_zero(ub) ;
 }
@@ -87,7 +92,7 @@ constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	    ndig = ((n * CHAR_BIT) + nshift - 1) / nshift ;
 	    rs = SR_OVERFLOW ;
 	    if (ndig <= rlen) {
-	        cuint	mask = uint(b-1) ;
+	        const UT	mask = uint(b-1) ;
 	        for (int i = (ndig - 1) ; i >= 0 ; i -= 1) {
 	            rbuf[i] = sysword.w_digtab[val & mask] ;
 	            val >>= nshift ;

@@ -1,4 +1,5 @@
 /* storebuf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* storage buffer manipulation subroutines */
@@ -61,6 +62,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<ctbin.h>
@@ -88,6 +91,7 @@
 /* forward references */
 
 template<typename T>
+static inline 
 int storebuf_xxxx(char *rp,int rl,int i,int (*ctxxx)(char *,int,T),T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
@@ -120,25 +124,26 @@ int storebuf_xxxx(char *rp,int rl,int i,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (storebuf_xxxx) */
 
 template<typename T>
-int storebuf_binx(char *bp,int bl,int i,T v) noex {
+static inline int storebuf_binx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctbin,v) ;
 }
 /* end subroutine-template (storebuf_binx) */
 
 template<typename T>
-int storebuf_octx(char *bp,int bl,int i,T v) noex {
+static inline int storebuf_octx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctoct,v) ;
 }
 /* end subroutine-template (storebuf_octx) */
 
 template<typename T>
+static inline 
 int storebuf_decx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctdec,v) ;
 }
 /* end subroutine-template (storebuf_decx) */
 
 template<typename T>
-int storebuf_hexx(char *bp,int bl,int i,T v) noex {
+static inline int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,cthex,v) ;
 }
 /* end subroutine-template (storebuf_hexx) */

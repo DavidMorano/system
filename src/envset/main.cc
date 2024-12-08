@@ -181,7 +181,7 @@ extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	inittimezone(char *,int,cchar *) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotValid(int) ;
@@ -2072,10 +2072,10 @@ static int procuserinfo_logid(PROGINFO *pip)
 	            const int	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
-	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
+	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
 	                const int	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
-	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
+	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
 	                    rs = proginfo_setentry(pip,vpp,sbuf,rs) ;
 	                }

@@ -1,4 +1,5 @@
 /* cthexstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to convert a value (as a counted string) to a HEX string */
@@ -22,13 +23,14 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
 
 
 EXTERNC_begin
 
-int cthexstring(char *dbuf,int dlen,int f,cchar *sp,int sl) noex ;
+extern int cthexstring(char *,int,int,cchar *,int) noex ;
 
 static inline int cthexstr(char *dp,int dl,cchar *sp,int sl) noex {
 	cint	f = true ;

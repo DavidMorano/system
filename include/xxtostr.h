@@ -11,9 +11,12 @@
 	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2024-01-15, David A.D. Morano
+	Added a comment below.
+
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright (c) 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

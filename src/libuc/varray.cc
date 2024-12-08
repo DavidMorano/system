@@ -1,4 +1,5 @@
 /* varray SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object implementing variable-length array of elements */
@@ -26,7 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -111,9 +113,8 @@ int varray_start(varray *op,int esize,int n) noex {
 	    if (n <= 0) n = VARRAY_DEFENTS ;
 	    if (esize > 0) {
 	        cint	sz = (n + 1) * sizeof(void **) ;
-	        void	*vp{} ;
 	        op->esize = esize ;
-	        if ((rs = OURMALLOC(sz,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = OURMALLOC(sz,&vp)) >= 0) {
 	            memclear(vp,sz) ;
 	            op->va = (void **) vp ;
 	            op->n = n ;
@@ -138,11 +139,11 @@ int varray_finish(varray *op) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 		rs = SR_OK ;
-	        {
+	        if (op->lap) {
 		    rs1 = lookaside_finish(op->lap) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
-		{
+		if (op->va) {
 	            rs1 = OURFREE(op->va) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;

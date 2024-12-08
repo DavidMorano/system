@@ -1,6 +1,9 @@
-/* bvses */
+/* bvses HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* access manager interface to a Bible Verse Structure DB */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,35 +16,35 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BVSES_INCLUDE
-#define	BVSES_INCLUDE	1
+#define	BVSES_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-#include	<sys/types.h>
-
-#include	<localmisc.h>
-
-#include	"bvshdr.h"		/* this has the file-header */
+#include	<bvshdr.h>		/* this has the file-header */
 
 
 #define	BVSES_MAGIC	0x88773421
 #define	BVSES_SUF	"bvs"		/* variable-index */
-
 #define	BVSES		struct bvses_head
-#define	BVSES_OBJ	struct bvses_obj
-#define	BVSES_VERSE	struct bvses_v
-#define	BVSES_INFO	struct bvses_i
-#define	BVSES_FMI	struct bvses_fmi
+#define	BVSES_OBJ	struct bvses_object
+#define	BVSES_V		struct bvses_verse
+#define	BVSES_INFO	struct bvses_information
+#define	BVSES_FMI	struct bvses_filemap
 
 
-struct bvses_obj {
-	const char	*name ;
+struct bvses_object {
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct bvses_i {
+struct bvses_information {
 	time_t		ctime ;
 	time_t		mtime ;
 	uint		nzbooks ;		/* number of non-zero books */
@@ -51,11 +54,11 @@ struct bvses_i {
 	uint		nzverses ;
 } ;
 
-struct bvses_v {
+struct bvses_verse {
 	uchar		b, c, v ;
 } ;
 
-struct bvses_fmi {
+struct bvses_filemap {
 	char		*mapdata ;	/* file map-data */
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
@@ -65,35 +68,33 @@ struct bvses_fmi {
 } ;
 
 struct bvses_head {
-	uint		magic ;
-	const char 	*pr ;
-	const char 	*dbname ;
-	const char	*fname ;
+	cchar 		*pr ;
+	cchar 		*dbname ;
+	cchar		*fname ;
 	BVSES_FMI	fmi ;		/* file-map information */
-	BVSHDR		fhi ;		/* file-header information */
+	bvshdr		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
+	uint		magic ;
 	int		ncursors ;
 } ;
 
+typedef	BVSES		bvses ;
+typedef	BVSES_OBJ	bvses_obj ;
+typedef	BVSES_V		bvses_v ;
+typedef	BVSES_INFO	bvses_info ;
+typedef	BVSES_FMI	bvses_fmi ;
 
-#if	(! defined(BVSES_MASTER)) || (BVSES_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	bvses_open(bvses *,cchar *,cchar *) noex ;
+extern int	bvses_count(bvses *) noex ;
+extern int	bvses_info(bvses *,bvses_info *) noex ;
+extern int	bvses_mkmodquery(bvses *,bvses_v *,int) noex ;
+extern int	bvses_audit(bvses *) noex ;
+extern int	bvses_close(bvses *) noex ;
 
-extern int	bvses_open(BVSES *,const char *,const char *) ;
-extern int	bvses_count(BVSES *) ;
-extern int	bvses_info(BVSES *,BVSES_INFO *) ;
-extern int	bvses_mkmodquery(BVSES *,BVSES_VERSE *,int) ;
-extern int	bvses_audit(BVSES *) ;
-extern int	bvses_close(BVSES *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BVSES_MASTER */
 
 #endif /* BVSES_INCLUDE */
 

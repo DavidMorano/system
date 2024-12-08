@@ -36,6 +36,8 @@
 
 #include	<sigevent.h>
 #include	<sigaction.h>
+#include	<sigdefaults.h>
+#include	<sigignores.h>
 
 
 #endif /* SIGX_INCLUDE */

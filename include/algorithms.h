@@ -32,6 +32,8 @@
 #include	<dijkstra1.hh>
 #include	<dijkstra2.hh>
 #include	<graph.hh>
+#include	<partidxi.h>
+#include	<partitionai.h>
 
 
 #endif /* ALGORITHMS_INCLUDE */

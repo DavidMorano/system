@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	hostaddr
 
 	Description:
@@ -176,8 +176,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) {
-	    char	*ehostname{} ;
-	    if ((rs = malloc_hn(&ehostname)) >= 0) {
+	    if (char *ehostname{} ; (rs = malloc_hn(&ehostname)) >= 0) {
 	        ADDRINFO	*aip{} ;
 	        if ((rs = geteaddrinfo(hn,svc,hintp,ehostname,&aip)) >= 0) {
 	            op->aip = aip ;
@@ -286,8 +285,7 @@ int hostaddr_curenum(hostaddr *op,hostaddr_cur *curp,ADDRINFO **rpp) noex {
 
 static int hostaddr_resultbegin(hostaddr *op) noex {
 	ADDRINFO	*aip = op->aip ;
-	ADDRINFO	**resarr{} ;
-	cint		esize = sizeof(ADDRINFO) ;
+	cint		esize = szof(ADDRINFO) ;
 	int		rs ;
 	int		n = 0 ;
 	int		sz ;
@@ -297,7 +295,7 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    n += 1 ;
 	} /* end while */
 	sz = ((n + 1) * esize) ;
-	if ((rs = uc_malloc(sz,&resarr)) >= 0) {
+	if (ADDRINFO **resarr{} ; (rs = uc_malloc(sz,&resarr)) >= 0) {
 	    int		i = 0 ; /* used-afterwards */
 	    op->resarr = resarr ;
 	    op->n = n ;
@@ -309,7 +307,7 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    } /* end while */
 	    resarr[i] = nullptr ;
 	    if (n > 1) {
-		cint	ssize = sizeof(void *) ;
+		cint	ssize = szof(void *) ;
 	        qsort(resarr,n,ssize,vcmpaddr) ;
 	    }
 	} /* end if (m-a) */

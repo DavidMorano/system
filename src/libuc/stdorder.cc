@@ -1,4 +1,5 @@
 /* stdorder SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* standard byte-order serializations */
@@ -82,7 +83,7 @@ constexpr int	nb = CHAR_BIT ;
 
 template<typename T>
 static int stdorder_rxx(cchar *buf,T *wp) noex {
-	cint		n = sizeof(T) ;
+	cint		n = szof(T) ;
 	T		stage = 0 ;
 	const uchar	*ubuf = (uchar *) buf ;
 	for (int i = 0 ; i < n ; i += 1) {
@@ -96,7 +97,7 @@ static int stdorder_rxx(cchar *buf,T *wp) noex {
 
 template<typename T>
 static int stdorder_wxx(char *buf,T w) noex {
-	cint		n = sizeof(T) ;
+	cint		n = szof(T) ;
 	uchar		*ubuf = (uchar *) buf ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    ubuf[i] = uchar(w >> (i * nb)) ;

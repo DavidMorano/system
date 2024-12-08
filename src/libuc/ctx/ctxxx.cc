@@ -1,4 +1,5 @@
 /* ctxxx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a decimal string */
@@ -64,6 +65,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |ULONG_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<usystem.h>		/* <- memory-allocation */
@@ -71,6 +74,7 @@
 #include	<syswords.hh>
 #include	<stdintx.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"ctxxx.h"
 
@@ -115,7 +119,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	if (v != 0) {
 	    int		di ;
 	    if_constexpr (sizeof(UT) > sizeof(ulong)) {
-	        const UT	vmask(~ULONG_MAX) ;
+	        const UT	vmask(~ ULONG_MAX) ;
 	        UT		nv ;
 	        while ((v & vmask) != 0UL) {
 	            nv = v / ub ;
@@ -153,7 +157,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 template<typename UT,typename ST>
 int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	UT		ulv = (UT) v ;
-	cint		n = sizeof(ST) ;
+	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
 	if (v < 0) ulv = (- ulv) ;
 	if (dp) {
@@ -188,7 +192,7 @@ int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 
 template<typename UT>
 int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
-	cint		n = sizeof(UT) ;
+	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;

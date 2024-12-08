@@ -31,7 +31,8 @@
 #define	BVI		struct bvi_head
 #define	BVI_OBJ		struct bvi_object
 #define	BVI_CUR		struct bvi_cursor
-#define	BVI_V		struct bvi_vverse
+#define	BVI_V		struct bvi_verse
+#define	BVI_Q		struct bvi_query
 #define	BVI_LINE	struct bvi_liner
 #define	BVI_INFO	struct bvi_information
 #define	BVI_FMI		struct bvi_filemap
@@ -95,6 +96,7 @@ typedef	BVI		bvi ;
 typedef	BVI_OBJ		bvi_obj ;
 typedef	BVI_CUR		bvi_cur ;
 typedef	BVI_V		bvi_v ;
+typedef	BVI_Q		bvi_q ;
 typedef	BVI_LINE	bvi_line ;
 typedef	BVI_INFO	bvi_info ;
 typedef	BVI_FMI		bvi_fmi ;

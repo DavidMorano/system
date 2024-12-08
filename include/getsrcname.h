@@ -1,4 +1,5 @@
 /* getsrcname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the source (network) name of a network socket */
@@ -50,7 +51,9 @@
 
 
 EXTERNC_begin
+
 extern int	getsrcname(char *,int,int) noex ;
+
 EXTERNC_end
 
 

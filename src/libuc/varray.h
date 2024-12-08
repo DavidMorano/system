@@ -1,4 +1,5 @@
 /* varray HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* object implementing variable-length array of elements */

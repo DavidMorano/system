@@ -1,4 +1,4 @@
-/* cfhexs HEADER */
+/* cfhexstr HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CFHEXS_INCLUDE
-#define	CFHEXS_INCLUDE
+#ifndef	CFHEXSTR_INCLUDE
+#define	CFHEXSTR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -29,11 +29,11 @@
 
 EXTERNC_begin
 
-extern int cfhexs(cchar *,int,uchar *) noex ;
+extern int cfhexstr(cchar *,int,uchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* CFHEXS_INCLUDE */
+#endif /* CFHEXSTR_INCLUDE */
 
 

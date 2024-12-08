@@ -104,8 +104,8 @@ extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	mkplogid(char *,int,cchar *,int) ;
-extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	mklogidpre(char *,int,cchar *,int) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	cfdecti(cchar *,int,int *) ;
@@ -1922,10 +1922,10 @@ static int procuserinfo_logid(PROGINFO *pip)
 	            const int	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
-	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
+	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
 	                const int	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
-	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
+	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
 	                    rs = proginfo_setentry(pip,vpp,sbuf,rs) ;
 	                }

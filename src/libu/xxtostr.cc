@@ -1,4 +1,5 @@
 /* xxtostr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a c-string */
@@ -58,9 +59,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>		/* <- for |errno| */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 #include	<localmisc.h>		/* ?? not-needed ?? */
 

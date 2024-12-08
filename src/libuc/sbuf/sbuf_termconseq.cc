@@ -1,4 +1,5 @@
 /* sbuf_termconseq SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* extra method for the storage buffer (SBuf) object */
@@ -41,6 +42,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
 #include	<usystem.h>
 #include	<termconseq.h>

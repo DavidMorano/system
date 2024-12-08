@@ -1,4 +1,5 @@
 /* mapex HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* map status-return (SR) values to program exit-codes (EX) */
@@ -8,9 +9,9 @@
 /* revision history:
 
 	= 1998-02-15, David A­D­ Morano
-	This code is basically an independent repeat of the same code located
-	in |localmisc.h|.  That code should be dropped and instead just include
-	this header file there instead.
+	This code is basically an independent repeat of the same
+	code located in |localmisc.h|.  That code should be dropped
+	and instead just include this header file there instead.
 
 */
 
@@ -21,9 +22,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #ifndef	MAPEX
@@ -43,7 +46,7 @@ struct mapex_map {
 
 EXTERNC_begin
 
-extern int	mapex(const MAPEX *,int) noex ;
+extern int	mapex(const mapex_map *,int) noex ;
 
 EXTERNC_end
 

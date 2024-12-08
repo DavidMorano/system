@@ -166,7 +166,7 @@ extern int	bufprintf(const char *,int,...) ;
 extern int	dupup(int,int) ;
 extern int	passfd(cchar *,int) ;
 extern int	nlspeername(const char *,const char *,char *) ;
-extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	xfile(IDS *,cchar *) ;
@@ -575,7 +575,7 @@ int mfswatch_newjob(PROGINFO *pip,int jtype,int stype,int ifd,int ofd)
 	    cint	jsn = rs ;
 	    cint	llen = LOGIDLEN ;
 	    char	lbuf[LOGIDLEN+1] ;
-	    if ((rs = mksublogid(lbuf,llen,pip->logid,jsn)) >= 0) {
+	    if ((rs = mklogidsub(lbuf,llen,pip->logid,jsn)) >= 0) {
 	        SREQDB	*slp = &wip->reqs ;
 	        if ((rs = sreqdb_newjob(slp,jsn,lbuf,ifd,ofd)) >= 0) {
 	            if ((rs = sreqdb_typeset(slp,rs,jtype,stype)) >= 0) {

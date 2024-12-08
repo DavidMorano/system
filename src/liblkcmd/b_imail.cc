@@ -229,8 +229,8 @@ extern int	findxfile(IDS *,char *,cchar *) ;
 extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	mkplogid(char *,int,cchar *,int) ;
-extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	mklogidpre(char *,int,cchar *,int) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
@@ -2582,11 +2582,11 @@ static int procmklogid(PROGINFO *pip)
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            lip->kserial = rs ;
-	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
+	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
 	                cint	slen = LOGIDLEN ;
 	                cint	s = lip->kserial ;
 	                char		sbuf[LOGIDLEN+1] ;
-	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
+	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
 	                    rs = proginfo_setentry(pip,vpp,sbuf,rs) ;
 	                }

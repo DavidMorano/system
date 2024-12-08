@@ -41,9 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>		/* we have one SR below */
 #include	<mkchar.h>
 
@@ -63,6 +66,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

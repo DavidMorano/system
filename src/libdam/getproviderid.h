@@ -1,17 +1,20 @@
-/* getproviderid */
+/* getproviderid HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 /* get a provider ID */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETPROVIDERID_INCLUDE
-#define	GETPROVIDERID_INCLUDE	1
+#define	GETPROVIDERID_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
+#include	<usystem.h>
 
 
 #define	PROVIDERID_UNKNOWN	0
@@ -23,19 +26,12 @@
 #define	PROVIDERID_OVERLAST	6
 
 
-#if	(! defined(GETPROVIDERID_MASTER)) || (GETPROVIDERID_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int getproviderid(cchar *,int) noex ;
 
-extern int getproviderid(const char *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* GETPROVIDERID_MASTER */
 
 #endif /* GETPROVIDERID_INCLUDE */
 

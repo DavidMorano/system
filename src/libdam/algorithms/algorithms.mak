@@ -58,9 +58,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ0= bellmanford1.o bellmanford2.o
 OBJ1= bfs1.o
 OBJ2= dijkstra1.o dijkstra2.o
-OBJ3= 
+OBJ3= partidxi.o partitionai.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 
 OBJ= $(OBJA)
 
@@ -147,5 +147,7 @@ bellmanford2.o:		bellmanford2.cc	bellmanford2.hh		$(INCS)
 bfs1.o:			bfs1.cc		bfs1.hh			$(INCS)
 dijkstra1.o:		dijkstra1.cc	dijkstra1.hh		$(INCS)
 dijkstra2.o:		dijkstra2.cc	dijkstra2.hh		$(INCS)
+partidxi.o:		partidxi.cc	partidxi.h		$(INCS)
+partitionai.o:		partitionai.cc	partitionai.h		$(INCS)
 
 

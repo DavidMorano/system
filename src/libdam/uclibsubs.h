@@ -86,6 +86,8 @@
 #include	<ucsysconf.h>
 #include	<ucprochave.h>
 #include	<ucsysmisc.h>
+#include	<ucsig.h>
+#include	<uclock.h>
 
 #include	<getxname.h>
 #include	<getexecname.h>
@@ -176,8 +178,6 @@ extern int	uc_fsize(int) noex ;
 extern int	uc_fuid(int) noex ;
 extern int	uc_fgid(int) noex ;
 extern int	uc_rewind(int) noex ;
-extern int	uc_lockf(int,int,off_t) noex ;
-extern int	uc_lockfile(int,int,off_t,off_t,int) noex ;
 
 extern int	uc_bind(int,void *,int) noex ;
 extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
@@ -222,7 +222,6 @@ extern int	uc_msgdiscard(int) noex ;
 extern int	uc_setappend(int,int) noex ;
 extern int	uc_closeonexec(int,int) noex ;
 extern int	uc_close(int) noex ;
-extern int	uc_locktail(int,int,int,int) noex ;
 
 extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
@@ -250,11 +249,10 @@ extern int	uc_sigsetismem(sigset_t *,int) noex ;
 extern int	uc_sigqueue(pid_t,int,const SIGVAL) noex ;
 extern int	uc_sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
 extern int	uc_sigtimedwait(const sigset_t *,siginfo_t *,
-			const TIMESPEC *) noex ;
+			CTIMESPEC *) noex ;
 extern int	uc_sigwaitinfoto(const sigset_t *,siginfo_t *,
-			const TIMESPEC *) noex ;
+			CTIMESPEC *) noex ;
 /* special */
-
 extern int	uc_safesleep(int) noex ;
 extern int	uc_mktime(TM *,time_t *) noex ;
 extern int	uc_gmtime(const time_t *,TM *) noex ;

@@ -1,4 +1,5 @@
 /* ctdecf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to convert an floating-value to a decimal string */
@@ -44,12 +45,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usysrets.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<convertx.h>		/* <- the money shot! */
+#include	<localmisc.h>
 
 
 /* local defines */
