@@ -21,7 +21,8 @@
 	getsrcname
 
 	Descriptor:
-	Find and return a name associated with a file-descriptor.
+	Find and return a network name associated with a network
+	file-descriptor.
 
 	Synopsis:
 	int getsrcname(char *rbuf,int rlen,int s) noex

@@ -1,16 +1,16 @@
-/* cmd_follow */
+/* cmd_follow SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* "follow-up" on an article */
-
-
-#define	CF_DEBUG	0		/* run-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1994-02-01, David A­D­ Morano
-        I wrote this from scratch when I took over the code. The previous code
-        was a mess (still is in many places!).
+	I wrote this from scratch when I took over the code.  The
+	previous code was a mess (still is in many places!).
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -21,26 +21,29 @@
 
 /*******************************************************************************
 
-	This subroutine performs some sort of command.
+  	Name:
+	cmd_follow
 
+	Description:
+	This subroutine performs some sort of command.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getfiledirs.h>
+#include	<mallocstuff.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<char.h>
-#include	<mallocstuff.h>
 #include	<localmisc.h>
 
 #include	"artlist.h"
@@ -55,7 +58,6 @@
 
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	getfiledirs(char *,const char *,const char *,vecstr *) ;
 extern int	bbcpy(char *,const char *) ;
 
 extern int	uc_system(cchar *) ;

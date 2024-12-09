@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} mkplogid mksublogid"
+NAMES="${NAMES} ipow"
 
 DN=/dev/null
 
@@ -11,8 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/mkplogid/s//mklogidpre/g
-g/mksublogid/s//mklogidsub/g
+g/ipow.h/s//pow.h/g
 	w
 	q
 EOF

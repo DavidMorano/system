@@ -1,4 +1,5 @@
 /* xpow SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate integer-power */
@@ -40,9 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
@@ -78,12 +82,12 @@ static int	ipow10(int) noex ;
 
 /* local variables */
 
-constexpr bool	f_dynamic = CF_DYNAMIC ;
-
 constexpr int	b10tab[] = {
 	1, 10, 100, 1000, 10000, 100000, 1000000,
 	10000000, 100000000, 1000000000
 } ;
+
+constexpr bool	f_dynamic = CF_DYNAMIC ;
 
 
 /* exported variables */

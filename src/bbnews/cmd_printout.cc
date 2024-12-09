@@ -1,16 +1,16 @@
-/* printout */
+/* printout SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* send the article to the PCS printer */
-
-
-#define	CF_DEBUG	0		/* run-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1994-02-01, David A­D­ Morano
-        I wrote this from scratch when I took over the code. The previous code
-        was a mess (still is in many places!).
+	I wrote this from scratch when I took over the code.  The
+	previous code was a mess (still is in many places!).
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -19,16 +19,15 @@
 
 /* Copyright © 1994,1998 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<errno.h>
-
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -47,8 +46,6 @@
 /* external subroutines */
 
 extern int	bufprintf(char *,int,cchar *,...) ;
-
-extern int	getfiledirs() ;
 
 
 /* external variables */

@@ -1,4 +1,5 @@
 /* mkdatefile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a temporary date-type job file */
@@ -45,10 +46,11 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdio>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<gettmpdname.h>
@@ -84,7 +86,7 @@
 /* local structures */
 
 struct tryer {
-	TM		tms ;
+	TM		tmdat ;
 	cchar		*dname ;
 	cchar		*ext ;
 	char		*rbuf ;
@@ -151,14 +153,14 @@ tryer::operator int () noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    time_t	dt = time(nullptr) ;
+	    custime	dt = getustime ;
 	    rlen = rs ;
-	    if ((rs = uc_localtime(&dt,&tms)) >= 0) {
+	    if ((rs = uc_localtime(&dt,&tmdat)) >= 0) {
 	        if ((rs = mkpath(rbuf,dname)) >= 0) {
 		    rl = rs ;
 		    if ((rs = snaddw(rbuf,rlen,rl,"/d",-1)) >= 0) {
 			rl += rs ;
-			if ((rs = sntmymd((rbuf+rl),(rlen-rl),&tms)) >= 0) {
+			if ((rs = sntmymd((rbuf+rl),(rlen-rl),&tmdat)) >= 0) {
 			    rl += rs ;
 		            rs = looper() ;
 		            len = rs ;

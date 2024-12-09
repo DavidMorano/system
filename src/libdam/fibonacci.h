@@ -1,7 +1,8 @@
 /* fibonacci HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* calculate fibonacci */
+/* calculate Fibonacci */
 /* version %I% last-modified %G% */
 
 

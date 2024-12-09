@@ -1,9 +1,9 @@
-/* getfiledirs */
+/* getfiledirs SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* subroutine to try and find a file in the specified directory path */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* find all directories that contain a specified file */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,20 +17,19 @@
 
 /*******************************************************************************
 
-        This subroutine searches through the specified directory path for the
-        given file with the given file mode. A list of all directories that
-        contain that file is optionally returned.
+  	Name:
+	getfiledirs
+
+	Description:
+	This subroutine searches through the specified directory
+	path for the given file with the given file mode.  A list
+	of all directories that contain that file is optionally
+	returned.
 
 	Synopsis:
-
-	int getfiledirs(path,filename,mode,dlp)
-	const char	path[] ;
-	const char	filename[] ;
-	const char	mode[] ;
-	vecstr		*dlp ;
+	int getfiledirs(cc *path,cc *filename,cc *mode,vecstr *dlp) noex
 
 	Arguments:
-
 	path		execution path or NULL to use default 'PATH'
 	filename	file to be searched for
 	mode		mode that file must have, one or more of:
@@ -39,43 +38,37 @@
 			"w"	writeable
 			"rx"	readable and executable
 			et cetera
-	dlp		pointer to VECSTR structure or NULL
+	dlp		pointer to VECSTR object or NULL
 
 	Returns:
-
 	>0	the number of directories the file was found in
 	==0	file not found in any directory
-	<0	error in finding file
-
+	<0	error in finding file (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
 #include	<usystem.h>
+#include	<uvariables.hh>
+#include	<getpwd.h>
 #include	<vecstr.h>
+#include	<strwcpy.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"getfiledirs.h"
 
 
 /* local defines */
 
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
 
 /* external subroutines */
-
-extern int	getpwd(char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -86,32 +79,29 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	checkit(const char *,int,const char *,int,vecstr *) ;
-static int	getmode(const char *) ;
+static int	checkit(cchar *,int,cchar *,int,vecstr *) noex ;
+static int	getmode(cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int getfiledirs(path,fname,modestr,slp)
-const char	path[] ;
-const char	fname[] ;
-const char	modestr[] ;
-vecstr		*slp ;
-{
+int getfiledirs(cc *path,cc *fname,cc *modestr,vecstr *slp) noex {
 	int		n, dirlen ;
 	int		pwdlen ;
 	int		mode ;
 	int		f_pwd = FALSE ;
-	const char	*pp ;
-	const char	*tp ;
+	cchar	*pp ;
+	cchar	*tp ;
 	char		pwd[MAXPATHLEN + 1] ;
 
 	if (path == NULL)
-	    path = getenv(VARPATH) ;
+	    path = getenv(varname.path) ;
 
 	if (path == NULL)
 	    return SR_INVALID ;
@@ -125,26 +115,18 @@ vecstr		*slp ;
 	    dirlen = (tp - pp) ;
 	    if (dirlen == 0) {
 
-#if	CF_DEBUGS
-	        debugprintf("getfiledirs: got a null directory\n") ;
-#endif
-
 	        if (! f_pwd) {
-
 	            f_pwd = TRUE ;
 	            pwdlen = getpwd(pwd,MAXPATHLEN) ;
-
-#if	CF_DEBUGS
-	            debugprintf("getfiledirs: got the PWD %d\n",pwdlen) ;
-#endif
-
 	        }
 
-	        if (pwdlen >= 0)
+	        if (pwdlen >= 0) {
 	            n += checkit(pwd,pwdlen,fname,mode,slp) ;
+		}
 
-	    } else
+	    } else {
 	        n += checkit(pp,dirlen,fname,mode,slp) ;
+	    }
 
 	    pp = (tp + 1) ;
 
@@ -172,14 +154,7 @@ vecstr		*slp ;
 
 /* local subroutines */
 
-
-static int checkit(dir,dirlen,fname,mode,slp)
-const char	dir[] ;
-int		dirlen ;
-const char	fname[] ;
-int		mode ;
-vecstr		*slp ;
-{
+static int checkit(cchar *dir,int dirlen,cc *fname,int mode,vecstr *slp) noex {
 	int		rs = 0 ;
 	char		pathbuf[MAXPATHLEN + 1], *pbp ;
 
@@ -197,16 +172,11 @@ vecstr		*slp ;
 
 	        pbp = strwcpy(pbp,fname,MAXPATHLEN - (pbp - pathbuf)) ;
 
-#if	CF_DEBUGS
-	        debugprintf("getfiledirs/checkit: p=%s\n",pathbuf) ;
-#endif
-
 	        if (u_access(pathbuf,mode) >= 0) {
-
 	            rs = 1 ;
-	            if (slp != NULL)
+	            if (slp != NULL) {
 	                vecstr_add(slp,pathbuf,dirlen) ;
-
+		    }
 	        }
 
 	    } /* end if */
@@ -215,40 +185,34 @@ vecstr		*slp ;
 
 	    if (u_access(fname,mode) >= 0) {
 	        rs = 1 ;
-	        if (slp != NULL)
-	            vecstr_add(slp,pathbuf,dirlen) ;
+	        if (slp) {
+	            rs = vecstr_add(slp,pathbuf,dirlen) ;
+		}
 	    }
 
 	} /* end if (NULL directory or not) */
-
-#if	CF_DEBUGS
-	debugprintf("getfiledirs/checkit: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (checkit) */
 
-
-static int getmode(const char *modestr)
-{
-	int		mode = 0 ;
-	const char	*cp = modestr ;
-	while (*cp) {
-	    int	kc = (*cp++ & 0xff) ;
+static int getmode(cchar *modestr) noex {
+	int		am = 0 ;
+	cchar		*cp = modestr ;
+	for (int kc ; (kc = mkchar(*cp++)) != 0 ; ) {
 	    switch (kc) {
 	    case 'r':
-	        mode |= R_OK ;
+	        am |= R_OK ;
 	        break ;
 	    case 'w':
-	        mode |= W_OK ;
+	        am |= W_OK ;
 	        break ;
 	    case 'x':
-	        mode |= X_OK ;
+	        am |= X_OK ;
 	        break ;
 	    } /* end switch */
 	} /* end while */
-	return mode ;
+	return am ;
 }
 /* end subroutine (getmode) */
 

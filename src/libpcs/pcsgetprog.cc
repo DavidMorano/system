@@ -1,9 +1,9 @@
-/* pcsgetprog */
+/* pcsgetprog SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get the path to a program that is used within the PCS system */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,55 +17,54 @@
 
 /*******************************************************************************
 
-        This subroutine is used to find a PCS related program and to verify that
-        it is executable.
+  	Name:
+	pcsgetprog
+
+	Description:
+	This subroutine is used to find a PCS related program and
+	to verify that it is executable.
 
 	Important:
-
-        This subroutine differs from 'pcsgetprogpath(3pcs)' in that a full path
-        is returned *only* when the program path is not absolute-rooted and it
-        is found in the PCS distribution area. The 'pcsgetprogpath(3pcs)'
-        subroutine, in contrast, returns a full path of the found program
-        whenever it is different than that supplied.
+	This subroutine differs from |pcsgetprogpath(3pcs)| in that
+	a full path is returned *only* when the program path is not
+	absolute-rooted and it is found in the PCS distribution
+	area.  The |pcsgetprogpath(3pcs)| subroutine, in contrast,
+	returns a full path of the found program whenever it is
+	different than that supplied.
 
 	Synopsis:
-
 	int pcsgetprog(pcsroot,programpath,program)
 	const char	pcsroot[] ;
 	char		programpath[] ;
 	const char	program[] ;
 
 	Arguments:
-
 	pcsroot		PCS program-root
 	programpath	resulting path to program if it is not absolute
 			and it is found in the PCS distribution
 	program		program to find
 
 	Returns:
-
 	>0		found the program in the PCS distribution and
 			this is the length of the returned path string
 	0		found the program in user's PATH
-	<0		did not find the program
+	<0		did not find the program (system-return)
 
 	programpath	resulting path to program if it is not absolute
 			and it is found in the PCS distribution
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
@@ -78,7 +77,6 @@
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	mkpath1w(char *,const char *,int) ;
 extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	getfiledirs(const char *,const char *,const char *,vecstr *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 
 extern char	*strnchr(const char *,int,int) ;
@@ -96,11 +94,12 @@ extern char	*strnchr(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsgetprog(cchar *pcsroot,char *output,cchar *name)
-{
+int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 	struct ustat	sb ;
 	int		rs = SR_NOTFOUND ;
 	int		namelen ;

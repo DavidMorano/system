@@ -48,7 +48,7 @@
 #include	<field.h>
 #include	<estrings.h>
 #include	<cfdec.h>
-#include	<ipow.h>
+#include	<pow.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

@@ -1,4 +1,5 @@
 /* mkjobfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a temporary job file */
@@ -49,9 +50,10 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
@@ -101,8 +103,7 @@ int mkjobfile(char *rbuf,cchar *dname,mode_t fm) noex {
 	if (rbuf && dname) {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
-		USTAT	sb ;
-	        if ((rs = u_stat(dname,&sb)) >= 0) {
+		if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	    	    rs = SR_NOTDIR ;
 	            if (S_ISDIR(sb.st_mode)) {
 			cmode	pm = (fm & S_IAMB) ;
@@ -123,8 +124,7 @@ static int mkform(char *rbuf,cchar *dname,mode_t fm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	char		*nbuf{} ;
-	if ((rs = malloc_nn(&nbuf)) >= 0) {
+	if (char *nbuf{} ; (rs = malloc_nn(&nbuf)) >= 0) {
 	    int		nlen = rs ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		cint	pl = PREFIXLEN ;

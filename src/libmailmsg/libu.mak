@@ -247,7 +247,6 @@ obje.o:			$(OBJE)
 timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
-mtime.o:		mtime.cc mtime.h		$(INCS)
 timespec.o:		timespec.cc timespec.h		$(INCS)
 
 utimeout.o:		utimeout.c utimeout.h		$(INCS)

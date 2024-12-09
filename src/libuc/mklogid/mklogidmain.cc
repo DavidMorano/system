@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 2005-11-01, David A­D­ Morano
+	= 1998-09-01, David A­D­ Morano
 	This was originally written but modeled after a version of
 	this sort of subroutine that I previously wrote.
 
 */
 
-/* Copyright © 2005 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -52,7 +52,7 @@
 #include	<ndigit.h>
 #include	<pow.h>
 #include	<getmaxpid.h>
-#include	<localmisc.h>		/* |LOGIDLEN| */
+#include	<localmisc.h>		/* |LOGIDLEN| + |DIGBUFLEN| */
 
 #include	"mklogid.h"
 
@@ -218,7 +218,7 @@ namespace libuc {
 	    rs = ndigit(rs,10) ;
 	}
 	return rs ;
-    } /* end method (mkdigmax) */
+    } /* end method (logdigmaxer::mkdigmax) */
 }
 
 

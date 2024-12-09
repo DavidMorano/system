@@ -1,4 +1,5 @@
 /* mkartfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make an article file */
@@ -121,8 +122,7 @@ static int mktry(char *rp,int rl,cc *pre,ui ts,int ss,int es,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*tfname{} ;
-	if ((rs = malloc_mp(&tfname)) >= 0) {
+	if (char *tfname{} ; (rs = malloc_mp(&tfname)) >= 0) {
 	    if ((rs = mkoutname(tfname,pre,ts,ss,es)) >= 0) {
 	        if ((rs = pathadd(rp,rl,tfname)) >= 0) {
 		    len = rs ;

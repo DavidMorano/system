@@ -53,7 +53,7 @@
 #include	<strn.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
-#include	<ipow.h>
+#include	<pow.h>
 #include	<mkchar.h>
 #include	<isnot.h>
 #include	<localmisc.h>

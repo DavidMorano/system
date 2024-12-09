@@ -45,7 +45,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 template<typename T>
 inline int memclear(T *op) noex {
-	csize	osz = sizeof(T) ;
+	csize	osz = szof(T) ;
 	return memclear(op,osz) ;
 }
 #endif /* __cplusplus */
@@ -56,7 +56,7 @@ inline int memclear(T *op) noex {
 #ifdef	__cplusplus
 template<typename T>
 inline void *memcpy(T *dp,void *sp) noex {
-	csize	dsz = sizeof(T) ;
+	csize	dsz = szof(T) ;
 	return memcpy(dp,sp,dsz) ;
 }
 #endif /* __cplusplus */
@@ -91,10 +91,10 @@ constexpr int cstrnlen(cchar *sp,int sl = -1) noex {
 typedef int64_t		mtime_t ;
 #endif
 
-#ifndef	SUBROUTINE_MTIME
-#define	SUBROUTINE_MTIME
+#ifndef	SUBROUTINE_UMTIME
+#define	SUBROUTINE_UMTIME
 EXTERNC_begin
-extern mtime_t	mtime(void) noex ;
+extern mtime_t	umtime(void) noex ;
 EXTERNC_end
 #endif
 
@@ -111,6 +111,25 @@ EXTERNC_begin
 extern int	filetype(mode_t) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
+
+#ifndef	OBJECT_GETMTIME
+#define	OBJECT_GETMTIME
+#ifdef	__cplusplus
+
+struct usys_mtime {
+	operator mtime_t () noex {
+	    return umtime() ;
+	} ;
+	static mtime_t operator () () noex {
+	    return umtime() ;
+	} ;
+} ; /* end struct (getustime) */
+
+extern usys_mtime	mtime ;
+extern usys_mtime	getmtime ;
+
+#endif /* __cplusplus */
+#endif /* OBJECT_GETMTIME */
 
 #ifndef	OBJECT_GETUSTIME
 #define	OBJECT_GETUSTIME

@@ -1,30 +1,28 @@
-/* handle */
+/* handle SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle this connection of messages */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUG	1		/* run-time debug print-outs */
-
-
 /* revision history:
 
 	= 1986-07-10, David A­D­ Morano
-
 	This program was originally written.
 
-
 	= 1998-07-01, David A­D­ Morano
-
 	I added the ability to specify the "address_from"
 	for the case when we add an envelope header to the message.
 
-
 */
-
 
 /**************************************************************************
 
+  	Name:
+	handle
+
+	Description:
 	This subroutine will handle a connection that may contain one
 	or more messages in it to be processed.  Incoming messages are
 	collected from the input in three phases.  The phases are in
@@ -58,12 +56,13 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<pcsconf.h>
 #include	<bfile.h>
 #include	<char.h>
@@ -89,7 +88,6 @@ extern int	snddd(char *,int,uint,uint) ;
 extern int	snsds(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getfiledirs(char *,const char *,const char *,char *) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -115,14 +113,12 @@ extern char	*timestr_edate(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int handle(pip,s,elp)
-struct proginfo	*pip ;
-int		s ;
-vecstr		*elp ;
-{
+int handle(proginfo *pip,int s,vecstr *elp) noex {
 	bfile	infile, *ifp = &infile ;
 
 	off_t	fsize ;

@@ -1,16 +1,15 @@
-/* emit_test */
+/* emit_test SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* version %I% last-modified %G% */
 /* emit (process) an article */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DELREMOTE	0		/* ? */
 #define	CF_LINECHECK	0		/* |proglinecheck()| */
 #define	CF_DELREMOTE	0		/* |delremote()| */
 #define	CF_ISUS		0		/* |isus()| */
 #define	CF_REPLY	0		/* |cmd_reply()| */
-
 
 /* revision history:
 
@@ -37,11 +36,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	emit_test
+
+	Description:
 	This subroutine is one of the "EMIT" subroutines used for
 	"emitting" articles in different ways.
 
 	Synopsis:
-
 	int emit_test(pip,dsp,ai,aep,ngdir,af)
 	struct proginfo	*pip ;
 	MKDIRLIST_ENT	*dsp ;
@@ -51,7 +53,6 @@
 	char		af[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		user structure pointer
 	ai		article index within newsgroup
@@ -60,32 +61,29 @@
 	af		article base file name
 
 	Returns:
-
-	<0		error
 	>=0		EMIT-code
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
 #include	<termios.h>
 #if	CF_SIGJMP
 #include	<setjmp.h>
 #endif /* CF_SIGJMP */
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<strings.h>
-#include	<string.h>
-#include	<time.h>
 #include	<pwd.h>
-
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -111,18 +109,17 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	getfiledirs(const char *,const char *,const char *,vecstr *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	strwcmp(cchar *,cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 extern int	cmd_save() ;
 extern int	cmd_printout() ;
@@ -133,35 +130,35 @@ extern int	cmd_output() ;
 extern int	cmd_reply() ;
 #endif
 
-extern int	bbcpy(char *,const char *) ;
+extern int	bbcpy(char *,cchar *) ;
 extern int	hmatch(cchar *,cchar *) ;
 extern int	proglinecheck(struct proginfo *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char	*getourenv(const char **,const char *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
 
-extern const char	*monthname[] ;
+extern cchar	*monthname[] ;
 
 
 /* forward references */
 
 static int	deluser() ;
-static int	hastabs(const char *) ;
+static int	hastabs(cchar *) ;
 
 #if	CF_ISUS
-static int	isus(bfile *,const char *) ;
+static int	isus(bfile *,cchar *) ;
 #endif
 
 #if	CF_DEKREMOTE
@@ -176,7 +173,7 @@ static jmp_buf		jmpenv ;
 #endif /* CF_SIGJMP */
 
 /* users who can delete articles */
-static const char	*deleteusers[] = {
+constexpr cpcchar	deleteusers[] = {
 	"pcs",
 	"root",
 	"special",
@@ -193,23 +190,25 @@ static const char	*deleteusers[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int emit_test(pip,dsp,ai,ap,ngdir,af)
 struct proginfo	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	af[] ;
+cchar	ngdir[] ;
+cchar	af[] ;
 {
 	struct passwd	*pp ;
 	struct ustat	sb ;
 	bfile		afile, *afp = &afile ;
 	bfile		helpfname, *hfp = &helpfname ;
 	bfile		savefile, *sfp = &savefile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i, len ;
@@ -226,12 +225,12 @@ const char	af[] ;
 	int		f_articleid = FALSE ;
 	int		f_shown = FALSE ;
 	int		f_a, f_b, f_c, f_d, f_e, f_f ;
-	const char	*un = pip->username ;
-	const char	*fmt ;
-	const char	*cp, *cp2 ;
-	const char	*ofname ;
-	const char	*oflags ;
-	const char	*resp ;
+	cchar	*un = pip->username ;
+	cchar	*fmt ;
+	cchar	*cp, *cp2 ;
+	cchar	*ofname ;
+	cchar	*oflags ;
+	cchar	*resp ;
 
 	char		lbuf[LINEBUFLEN + 1], *lbp ;
 	char		outbuf[(2*LINEBUFLEN) + 1], *obp ;
@@ -1221,10 +1220,10 @@ prompt:
 /* FALLTHROUGH */
 	case 'm':
 	    {
-	        const int	m = SMODE_MAILBOX ;
-		const int	mblen = MAXNAMELEN ;
+	        cint	m = SMODE_MAILBOX ;
+		cint	mblen = MAXNAMELEN ;
 		int		f_new = FALSE ;
-		const char	*tp ;
+		cchar	*tp ;
 		char		mbname[MAXNAMELEN+1] ;
 		while ((tp = strpbrk(resp," ,\t")) != NULL) {
 		    if ((rs = sncpy1w(mbname,mblen,resp,(tp-resp))) > 0) {
@@ -1464,8 +1463,8 @@ ret0:
 /* is the specified user allow to perform deletes? */
 static int deluser(pip,deleteusers,username)
 struct proginfo	*pip ;
-const char	*deleteusers[] ;
-const char	username[] ;
+cchar	*deleteusers[] ;
+cchar	username[] ;
 {
 	int	i ;
 
@@ -1614,14 +1613,14 @@ char		afname[] ;
 #if	CF_ISUS
 static int isus(nfp,hostbuf)
 bfile		*nfp ;
-const char	hostbuf[] ;
+cchar	hostbuf[] ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		cl ;
 	int		f = FALSE ;
-	const char	*lbp ;
-	const char	*cp ;
+	cchar	*lbp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 

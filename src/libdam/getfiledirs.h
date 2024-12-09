@@ -1,41 +1,40 @@
-/* powtwo HEADER */
+/* getfiledirs HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* handle some power-of-two issues */
+/* find all directories that contain a specified file */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-05-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	POWTWO_INCLUDE
-#define	POWTWO_INCLUDE
+#ifndef	GETFILEDIRS_INCLUDE
+#define	GETFILEDIRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-
-#include	<nextpowtwo.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<vecstr.h>
 
 
 EXTERNC_begin
 
-static inline int ispowtwo(int v) noex {
-	return (v && !(v & (v - 1))) ;
-}
+extern int	getfiledirs(cc *,cc *,cc *,vecstr *) noex ;
 
 EXTERNC_end
 
 
-#endif /* POWTWO_INCLUDE */
+#endif /* GETFILEDIRS_INCLUDE */
 
 

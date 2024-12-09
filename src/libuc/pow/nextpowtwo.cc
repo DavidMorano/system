@@ -1,4 +1,5 @@
 /* nextpowtwo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the next higher power of two for a given number */
@@ -46,10 +47,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bit>			/* |countl_zero(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"nextpowtwo.h"
@@ -75,11 +79,14 @@ using std::bit_ceil ;			/* subroutine-template */
 /* external subroutines */
 
 extern "C" {
-   extern int nextpowtwo(int) noex ;
+    extern int nextpowtwo(int) noex ;
 }
 
 
-/* local subroutines */
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */

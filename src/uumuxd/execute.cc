@@ -1,20 +1,17 @@
-/* execute */
+/* execute SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* execute a server daemon program */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUG	1
-
-
 /* revision history:
 
 	= David A.D. Morano, July 1986
-
 	This program was originally written.
 
 	= David A.D. Morano, July 1998
-
 	I added the ability to specify the "address_from"
 	for the case when we add an envelope header to the message.
 
@@ -24,28 +21,29 @@
 
 /**************************************************************************
 
-	This subroutine just 'exec(2)'s a daemon server program.
+  	Name:
+	execute
 
+	Description:
+	This subroutine just |exec(2)|'s a daemon server program.
 
 ***************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/utsname.h>
 #include	<sys/param.h>
 #include	<fcntl.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<time.h>
+#include	<cerrno>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<signal.h>
-#include	<string.h>
-#include	<errno.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -64,7 +62,6 @@
 
 /* external subroutines */
 
-extern int	getfiledirs() ;
 extern int	processargs(char *,VECSTR *) ;
 extern int	process() ;
 
@@ -84,8 +81,10 @@ extern struct global	g ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int execute(gp,s,elp,program,arg0,alp)
 struct global	*gp ;

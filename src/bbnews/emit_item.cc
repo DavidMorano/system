@@ -1,12 +1,12 @@
-/* emit_article */
+/* emit_article SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* emit (process) an article */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUG	1		/* run-time debugging */
 #define	CF_DELREMOTE	0		/* ? */
 #define	CF_REPLY	0		/* |cmd_reply()| */
-
 
 /* revision history:
 
@@ -14,8 +14,8 @@
 	- added a mode to intercept for mailbox use
 
 	= 1994-12-01, David A­D­ Morano
-        - modified to only print out header fields that a user is normally
-        interested in
+	- modified to only print out header fields that a user is
+	normally interested in
 
 	= 1995-07-01, David A­D­ Morano
 	- extensively modified to add:
@@ -33,11 +33,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	emit_article
+
+	Description:
 	This subroutine is one of the "EMIT" subroutines used for
 	"emitting" articles in different ways.
 
 	Synopsis:
-
 	int emit_article(pip,dsp,ai,ap,ngdir,af)
 	struct proginfo	*pip ;
 	MKDIRLIST_ENT	*dsp ;
@@ -47,7 +50,6 @@
 	char		af[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		user structure pointer
 	ai		article index within newsgroup
@@ -56,7 +58,6 @@
 	af		article base file name
 
 	Returns:
-
 	EMIT_OK		0
 	EMIT_NEXT	0
 	EMIT_BAD	-1
@@ -66,25 +67,24 @@
 	EMIT_SKIP	-5
 	EMIT_SAVE	-6
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
 #include	<termios.h>
-#include	<setjmp.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<setjmp.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<strings.h>
-#include	<string.h>
 #include	<pwd.h>
-
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -113,7 +113,6 @@
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	sfshrink(const char *,int,const char **) ;
-extern int	getfiledirs(const char *,const char *,const char *,vecstr *) ;
 
 extern int	cmd_save() ;
 extern int	cmd_printout() ;
@@ -152,7 +151,7 @@ static void	onintr() ;
 static jmp_buf		jmpenv ;
 
 /* users who can delete articles */
-static const char	*deleteusers[] = {
+constexpr cpcchar	deleteusers[] = {
 	"pcs",
 	"root",
 	"special",
@@ -169,8 +168,10 @@ static const char	*deleteusers[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int emit_article(pip,dsp,ai,ap,ngdir,af)
 struct proginfo	*pip ;

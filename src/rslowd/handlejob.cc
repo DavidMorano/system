@@ -1,9 +1,10 @@
-/* handlejob */
+/* handlejob SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* perform various functions on a job */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1
 #define	CF_ACCCESSCHECK	0
 
 /* revision history:
@@ -17,6 +18,10 @@
 
 /*****************************************************************************
 
+  	Name:
+	handlejob
+
+	Description:
 	This subroutine is responsible for processing a job that
 	we have received in full.
 
@@ -28,13 +33,15 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<ftw.h>
 #include	<dirent.h>
-#include	<limits.h>
-#include	<string.h>
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -92,8 +99,10 @@ struct argparams {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int handlejob_start(jep,jfp,sbp,sep)
 struct jobentry	*jep ;

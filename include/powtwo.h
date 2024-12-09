@@ -30,7 +30,7 @@
 
 EXTERNC_begin
 
-static inline int ispowtwo(int v) noex {
+static inline bool ispowtwo(int v) noex {
 	return (v && !(v & (v - 1))) ;
 }
 

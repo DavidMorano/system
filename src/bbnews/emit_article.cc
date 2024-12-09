@@ -1,16 +1,15 @@
-/* emit_article */
+/* emit_article SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* emit (process) an article */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DELREMOTE	0		/* ? */
 #define	CF_LINECHECK	0		/* |proglinecheck()| */
 #define	CF_DELREMOTE	0		/* |delremote()| */
 #define	CF_ISUS		0		/* |isus()| */
 #define	CF_REPLY	0		/* |cmd_reply()| */
-
 
 /* revision history:
 
@@ -51,7 +50,6 @@
 	char		af[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		user structure pointer
 	ai		article index within newsgroup
@@ -60,32 +58,29 @@
 	af		article base file name
 
 	Returns:
-
-	<0		error
 	>=0		EMIT-code
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
 #include	<termios.h>
 #if	CF_SIGJMP
 #include	<setjmp.h>
 #endif /* CF_SIGJMP */
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<strings.h>
-#include	<string.h>
-#include	<time.h>
 #include	<pwd.h>
-
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -121,7 +116,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	nextfield(const char *,int,const char **) ;
 extern int	strwcmp(const char *,const char *,int) ;
-extern int	getfiledirs(const char *,const char *,const char *,vecstr *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 
 extern int	cmd_save() ;
@@ -176,7 +170,7 @@ static jmp_buf		jmpenv ;
 #endif /* CF_SIGJMP */
 
 /* users who can delete articles */
-static const char	*deleteusers[] = {
+constexpr cpcchar	deleteusers[] = {
 	"pcs",
 	"root",
 	"special",

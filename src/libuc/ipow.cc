@@ -45,7 +45,7 @@
 #include	<clanguage.h>
 #include	<localmisc.h>		/* 'LONG' type */
 
-#include	"ipow.h"
+#include	"pow.h"
 
 
 /* local defines */

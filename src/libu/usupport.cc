@@ -36,7 +36,7 @@
 
 
 	Name:
-	mtime
+	umtime
 
 	Description:
 	This is sort of like |time(2)| but returns milliseconds
@@ -102,25 +102,27 @@ constexpr int		onethousand = 1000 ;
 /* exported variables */
 
 libu::ugetustime	getustime ;
+usys_mtime		getmtime ;
+usys_mtime		mtime ;
 
 
 /* exported subroutines */
 
-mtime_t mtime(void) noex {
-	TIMEVAL		tv ;
+mtime_t umtime(void) noex {
 	mtime_t		t ;
 	mtime_t		m = 0 ;
-	if (gettimeofday(&tv,nullptr) >= 0) {
+	if (TIMEVAL tv ; gettimeofday(&tv,nullptr) >= 0) {
 	    t = tv.tv_sec ;
 	    m += (t * onethousand) ;
 	    m += (tv.tv_usec / onethousand) ;
 	} else {
-	    t = time(nullptr) ;
+	    const time_t	ut = time(nullptr) ;
+	    t = mtime_t(ut) ;
 	    m += (t * onethousand) ;
 	}
 	return m ;
 }
-/* end subroutine (mtime) */
+/* end subroutine (umtime) */
 
 int msleep(int msec) noex {
 	int		rs = SR_INVALID ;
@@ -191,6 +193,9 @@ namespace libu {
 	}
 	return rs ;
     }
+} /* end namespace (libu) */
+
+namespace libu {
     sysret_t uitimer_get(int w,ITIMERVAL *otvp) noex {
 	int		rs = SR_FAULT ;
 	if (otvp) {
@@ -213,9 +218,6 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     }
-}
-
-namespace libu {
     sysret_t ustrftime(char *dbuf,int dlen,cchar *fmt,CTM *tmp) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt && tmp) {
@@ -232,7 +234,7 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     }
-}
+} /* end namespace (libu) */
 
 namespace libu {
     template<typename T>
@@ -255,7 +257,7 @@ namespace libu {
     int ctdecull(char *dp,int dl,ulonglong uv) noex {
 	return ctdecx(ulltostr,dp,dl,uv) ;
     }
-}
+} /* end namespace (libu) */
 
 
 /* local subroutines */

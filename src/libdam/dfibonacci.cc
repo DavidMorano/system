@@ -1,18 +1,19 @@
 /* dfibonacci SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
-/* floating-point Fibonacci function */
+/* floating-point (double) Fibonacci function */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2018-10-08, David A.D. Morano
+	= 1998-11-01, David A­D­ Morano
 	This was rewritten (and in C++11).
 
 */
 
-/* Copyright ï¿½ 2018 David Aï¿½Dï¿½ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -54,6 +55,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"dfibonacci.h"
@@ -63,8 +65,6 @@
 
 
 /* external subroutines */
-
-extern "C" double	dfibonacci(int) noex ;
 
 extern "C" double	binexp(double,int) noex ;
 

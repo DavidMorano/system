@@ -32,6 +32,7 @@
 
 	Returns:
 	-		the value of the digit requested
+	-1		error (argument is out-of-domain)
 
 *******************************************************************************/
 
@@ -42,6 +43,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<uvariables.hh>
 #include	<localmisc.h>
 

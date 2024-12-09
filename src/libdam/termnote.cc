@@ -113,7 +113,7 @@
 #include	<mkpathx.h>
 #include	<termconseq.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
-#include	<ipow.h>
+#include	<pow.h>
 #include	<xperm.h>
 #include	<timestr.h>
 #include	<mkchar.h>

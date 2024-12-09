@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* subroutine to try and find a file in the specified directory path */
+/* find all directories that contain a specified file */
 /* version %I% last-modified %G% */
 
 
@@ -38,7 +38,7 @@
 			"w"	writeable
 			"rx"	readable and executable
 			et cetera
-	dlp		pointer to VECSTR structure or NULL
+	dlp		pointer to VECSTR object or NULL
 
 	Returns:
 	>0	the number of directories the file was found in
@@ -52,25 +52,25 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
+#include	<uvariables.hh>
+#include	<getpwd.h>
+#include	<mallocxx.h>
+#include	<strlibval.hh>
 #include	<vecstr.h>
+#include	<strwcpy.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"getfiledirs.h"
 
 
 /* local defines */
 
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
 
 /* external subroutines */
-
-extern int	getpwd(char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -78,35 +78,71 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* local structures */
 
+namespace {
+    struct getter {
+	cchar		*path ;		/* subroutine argument */
+	cchar		*fname ;	/* subroutine argument */
+	vecstr		*dlp ;		/* subroutine argument */
+	char		*pwd{} ;
+	char		*pbuf{} ;
+	int		am ;		/* derived argument */
+	int		plen{} ;
+	getter(cc *ap,cc *af,int aa,vecstr *vp) noex : path(ap), fname(af) {
+	    if (path == nullptr) {
+		static cchar *gpath = getenv(varname.path) ;
+		path = gpath ;
+	    }
+	    am = aa ;
+	    dlp = vp ;
+	} ; /* end ctor */
+	operator int () noex ;
+    } ; /* end struct (getter) */
+}
+
 
 /* forward references */
 
-static int	checkit(const char *,int,const char *,int,vecstr *) ;
-static int	getmode(const char *) ;
+static int	checkit(cchar *,int,cchar *,int,vecstr *) noex ;
+static int	getmode(cchar *) noex ;
 
 
 /* local variables */
 
+static strlibval		envpath(strlibval_path) ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
+int getfiledirs(cc *path,cc *fname,cc *modestr,vecstr *dlp) noex {
+    	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (fname && dlp) {
+	    cint	am = getmode(modestr) ;
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		if (getter go(path,fname,am,dlp) ; (rs = go) >= 0) {
+		    c = rs ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (getfiledirs) */
 
-int getfiledirs(path,fname,modestr,slp)
-const char	path[] ;
-const char	fname[] ;
-const char	modestr[] ;
-vecstr		*slp ;
-{
+#ifdef	COMMENT
 	int		n, dirlen ;
 	int		pwdlen ;
 	int		mode ;
 	int		f_pwd = FALSE ;
-	const char	*pp ;
-	const char	*tp ;
+	cchar	*pp ;
+	cchar	*tp ;
 	char		pwd[MAXPATHLEN + 1] ;
 
 	if (path == NULL)
-	    path = getenv(VARPATH) ;
+	    path = getenv(varname.path) ;
 
 	if (path == NULL)
 	    return SR_INVALID ;
@@ -123,7 +159,6 @@ vecstr		*slp ;
 	        if (! f_pwd) {
 	            f_pwd = TRUE ;
 	            pwdlen = getpwd(pwd,MAXPATHLEN) ;
-
 	        }
 
 	        if (pwdlen >= 0) {
@@ -156,18 +191,30 @@ vecstr		*slp ;
 	return n ;
 }
 /* end subroutine (getfiledirs) */
+#endif /* COMMENT */
 
 
 /* local subroutines */
 
+getter::operator int () noex {
+    	int		rs = SR_FAULT ;
+	if (path) {
+    	    rs = SR_INVALID ;
+	    if (path[0]) {
+	        if ((rs = malloc_mp(&pbuf)) >= 0) {
+		    plen = rs ;
+		    {
+	                rs = SR_OK ;
+		    }
+		    rs = rsfree(rs,pbuf) ;
+	        } /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+    	return rs ;
+}
+/* end method (getter::operator) */
 
-static int checkit(dir,dirlen,fname,mode,slp)
-const char	dir[] ;
-int		dirlen ;
-const char	fname[] ;
-int		mode ;
-vecstr		*slp ;
-{
+static int checkit(cchar *dir,int dirlen,cc *fname,int mode,vecstr *slp) noex {
 	int		rs = 0 ;
 	char		pathbuf[MAXPATHLEN + 1], *pbp ;
 
@@ -198,8 +245,8 @@ vecstr		*slp ;
 
 	    if (u_access(fname,mode) >= 0) {
 	        rs = 1 ;
-	        if (slp != NULL) {
-	            vecstr_add(slp,pathbuf,dirlen) ;
+	        if (slp) {
+	            rs = vecstr_add(slp,pathbuf,dirlen) ;
 		}
 	    }
 
@@ -209,26 +256,28 @@ vecstr		*slp ;
 }
 /* end subroutine (checkit) */
 
-
-static int getmode(const char *modestr)
-{
-	int		mode = 0 ;
-	const char	*cp = modestr ;
-	while (*cp) {
-	    int	kc = (*cp++ & 0xff) ;
-	    switch (kc) {
-	    case 'r':
-	        mode |= R_OK ;
-	        break ;
-	    case 'w':
-	        mode |= W_OK ;
-	        break ;
-	    case 'x':
-	        mode |= X_OK ;
-	        break ;
-	    } /* end switch */
-	} /* end while */
-	return mode ;
+static int getmode(cchar *modestr) noex {
+	int		am = (R_OK|X_OK) ;
+	if (modestr) {
+	    if (modestr[0]) {
+	        cchar		*cp = modestr ;
+	        am = 0 ;
+	        for (int kc ; (kc = mkchar(*cp++)) != 0 ; ) {
+	            switch (kc) {
+	            case 'r':
+	                am |= R_OK ;
+	                break ;
+	            case 'w':
+	                am |= W_OK ;
+	                break ;
+	            case 'x':
+	                am |= X_OK ;
+	                break ;
+	            } /* end switch */
+	        } /* end while */
+	    } /* end if (not-empty) */
+	} /* end if (non-null) */
+	return am ;
 }
 /* end subroutine (getmode) */
 

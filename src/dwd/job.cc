@@ -1,9 +1,10 @@
-/* job */
+/* job SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* perform various functions on a job */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_PCSPROG	1		/* assume a PCS program first */
 #define	CF_UGETPW	1		/* use 'ugetpw(3uc)' */
 
@@ -18,6 +19,10 @@
 
 /*****************************************************************************
 
+  	Group:
+	job
+
+	Description:
 	This subroutine is responsible for processing a job that
 	we have received in full.
 
@@ -30,12 +35,13 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<ctdec.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -88,7 +94,8 @@ extern char	*strbasename(char *) ;
 
 /* forward references */
 
-static int	processargs(), expand() ;
+static int	processargs() ;
+static int	expand() ;
 
 
 /* local structures */
@@ -106,17 +113,14 @@ struct argparams {
 
 
 
+/* exported variables */
 
 
-int job_init(jhp)
-JOB	*jhp ;
-{
-	int	rs ;
+/* exported subroutines */
 
-
-	if (jhp == NULL)
-		return SR_FAULT ;
-
+int job_init(JOB *jhp) noex {
+	int		rs ;
+	if (jhp == NULL) return SR_FAULT ;
 	rs = vecitem_start(jhp,10,0) ;
 
 	return rs ;

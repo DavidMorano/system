@@ -17,6 +17,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdint.h>
 
 
@@ -25,10 +26,10 @@
 typedef int64_t		mtime_t ;
 #endif
 
-#ifndef	SUBROUTINE_MTIME
-#define	SUBROUTINE_MTIME
+#ifndef	SUBROUTINE_UMTIME
+#define	SUBROUTINE_UMTIME
 EXTERNC_begin
-extern mtime_t	mtime(void) noex ;
+extern mtime_t	umtime(void) noex ;
 EXTERNC_end
 #endif
 
@@ -38,13 +39,14 @@ EXTERNC_end
 
 struct usys_mtime {
 	operator mtime_t () noex {
-	    return mtime() ;
+	    return umtime() ;
 	} ;
 	static mtime_t operator () () noex {
-	    return mtime() ;
+	    return umtime() ;
 	} ;
 } ; /* end struct (getustime) */
 
+extern usys_mtime	mtime ;
 extern usys_mtime	getmtime ;
 
 #endif /* __cplusplus */
