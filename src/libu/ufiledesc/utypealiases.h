@@ -25,10 +25,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
+#include	<sys/param.h>
+#include	<sys/mount.h>		/* for |struct statfs| */
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
-#include	<sys/time.h>		/* for 'u_adjtime(3u)' */
-#include	<sys/timeb.h>		/* for 'uc_ftime(3uc)' */
+#include	<sys/times.h>		/* for |struct tms| */
+#include	<sys/time.h>		/* for |u_adjtime(3u)| */
+#include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
 #include	<sys/resource.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>

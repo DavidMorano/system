@@ -1,4 +1,5 @@
 /* calmgr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calendar manager object */
@@ -23,6 +24,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	calmgr
+
+	Description:
 	We manage a single calendar object.
 
 *******************************************************************************/
@@ -35,19 +40,19 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucmallreg.h>
 #include	<getbufsize.h>
+#include	<getusername.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<tmtime.h>
-#include	<getusername.h>
 #include	<fsdir.h>
-#include	<ucmallreg.h>
-#include	<localmisc.h>
 #include	<mkpathx.h>
+#include	<char.h>
+#include	<localmisc.h>
 
 #include	"calmgr.h"
 #include	"calent.h"

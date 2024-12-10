@@ -1,4 +1,5 @@
 /* calent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calendar entry object (for CALYEARS) */
@@ -17,9 +18,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
-
-#include	"calcite.h"
+#include	<calcite.h>
 
 
 #define	CALENT		struct calent_head

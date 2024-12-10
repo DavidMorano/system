@@ -1,4 +1,5 @@
 /* calcite SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calendar citation */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	calcite
+
+	Description:
 	This small object just holds a citation for a calendar entry.
 
 *******************************************************************************/

@@ -45,9 +45,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -56,6 +61,15 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -67,7 +81,7 @@
 /* exported subroutines */
 
 int sfbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
-	int		f = false ;
+	bool		f = false ;
 	if (sl < 0) sl = strlen(sp) ;
 	while (sl && *sp) {
 	    for (int j = 0 ; sb[j] ; j += 1) {

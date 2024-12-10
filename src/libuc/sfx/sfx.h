@@ -66,9 +66,6 @@ static inline int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 static inline int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	return sfnextbrk(sp,sl,ss,rpp) ;
 }
-static inline int getpr(cchar *pp,int pl,cchar **rpp) noex {
-	return sfprogroot(pp,pl,rpp) ;
-}
 
 EXTERNC_end
 

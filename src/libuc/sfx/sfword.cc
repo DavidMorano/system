@@ -55,13 +55,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<ascii.h>
 #include	<char.h>
 #include	<strn.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -79,6 +83,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 static int	sfshrinkmore(cchar *,int,cchar **) noex ;
@@ -87,7 +94,7 @@ static bool	iswhitemore(int) noex ;
 
 /* local variables */
 
-static constexpr cchar	*allows[] = {
+constexpr cpcchar	allows[] = {
 	"'s",
 	"'t",
 	"s'",

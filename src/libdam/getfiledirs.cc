@@ -9,7 +9,11 @@
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-	This code was originally written.
+	This code was adopted from a previous function of mine (of
+	some sort) that pretty much did the same thing.
+
+	= 2024-12-08, David A­D­ Morano
+	I added a comment note below (under "Notes").
 
 */
 
@@ -45,6 +49,15 @@
 	==0	file not found in any directory
 	<0	error in finding file (system-return)
 
+	Notes:
+	This is a review comment (2024-12-08).  Looking through
+	this code (now for a review of conformance w/ C++20), I can
+	see (likely not obvious to anyone else) that this code
+	originates from some very (very) old source (way predating
+	the 1998 adoption).  I can tell by the style of coding that
+	I used. 
+	-- David A-D- Morano, 2024-12-08
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -58,10 +71,18 @@
 #include	<uvariables.hh>
 #include	<getpwd.h>
 #include	<mallocxx.h>
+#include	<ids.h>
+#include	<xperm.h>
 #include	<strlibval.hh>
 #include	<vecstr.h>
+#include	<mkpath.h>
+#include	<mknpath.h>
+#include	<pathadd.h>
 #include	<strwcpy.h>
+#include	<sfx.h>
+#include	<sif.hh>
 #include	<mkchar.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getfiledirs.h"
@@ -78,37 +99,51 @@
 
 /* local structures */
 
+static cchar	*getdefpath() noex ;
+
 namespace {
     struct getter {
-	cchar		*path ;		/* subroutine argument */
-	cchar		*fname ;	/* subroutine argument */
-	vecstr		*dlp ;		/* subroutine argument */
-	char		*pwd{} ;
+	cchar		*path ;		/* passed argument */
+	cchar		*fname ;	/* passed argument */
+	vecstr		*dlp ;		/* passed argument */
 	char		*pbuf{} ;
+	ids		id ;
 	int		am ;		/* derived argument */
+	int		dlen ;
 	int		plen{} ;
+	bool		fpwd = false ;
 	getter(cc *ap,cc *af,int aa,vecstr *vp) noex : path(ap), fname(af) {
 	    if (path == nullptr) {
-		static cchar *gpath = getenv(varname.path) ;
+		static cchar *gpath = getdefpath() ;
 		path = gpath ;
 	    }
 	    am = aa ;
 	    dlp = vp ;
 	} ; /* end ctor */
 	operator int () noex ;
+	int storer() noex ;
+	int finder() noex ;
+	int checking() noex ;
+	int checks(cc *,int) noex ;
+	int checker(cc *,int) noex ;
+	int checkname(bool,int) noex ;
     } ; /* end struct (getter) */
 }
+
+enum nametypes : bool {
+	nametype_dir,
+	nametype_file
+} ;
 
 
 /* forward references */
 
-static int	checkit(cchar *,int,cchar *,int,vecstr *) noex ;
 static int	getmode(cchar *) noex ;
 
 
 /* local variables */
 
-static strlibval		envpath(strlibval_path) ;
+static strlibval		defpath(strlibval_path) ;
 
 
 /* exported variables */
@@ -132,129 +167,137 @@ int getfiledirs(cc *path,cc *fname,cc *modestr,vecstr *dlp) noex {
 }
 /* end subroutine (getfiledirs) */
 
-#ifdef	COMMENT
-	int		n, dirlen ;
-	int		pwdlen ;
-	int		mode ;
-	int		f_pwd = FALSE ;
-	cchar	*pp ;
-	cchar	*tp ;
-	char		pwd[MAXPATHLEN + 1] ;
-
-	if (path == NULL)
-	    path = getenv(varname.path) ;
-
-	if (path == NULL)
-	    return SR_INVALID ;
-
-	mode = getmode(modestr) ;
-
-	n = 0 ;
-	pp = path ;
-	while ((tp = strchr(pp,':')) != NULL) {
-
-	    dirlen = (tp - pp) ;
-	    if (dirlen == 0) {
-
-	        if (! f_pwd) {
-	            f_pwd = TRUE ;
-	            pwdlen = getpwd(pwd,MAXPATHLEN) ;
-	        }
-
-	        if (pwdlen >= 0) {
-	            n += checkit(pwd,pwdlen,fname,mode,slp) ;
-		}
-
-	    } else {
-	        n += checkit(pp,dirlen,fname,mode,slp) ;
-	    }
-
-	    pp = (tp + 1) ;
-
-	} /* end while */
-
-	dirlen = strlen(pp) ;
-
-	if (dirlen == 0) {
-
-	    if (! f_pwd) {
-	        f_pwd = TRUE ;
-	        pwdlen = getpwd(pwd,MAXPATHLEN) ;
-	    }
-
-	    if (pwdlen >= 0)
-	        n += checkit(pwd,pwdlen,fname,mode,slp) ;
-
-	} else
-	    n += checkit(pp,dirlen,fname,mode,slp) ;
-
-	return n ;
-}
-/* end subroutine (getfiledirs) */
-#endif /* COMMENT */
-
 
 /* local subroutines */
 
 getter::operator int () noex {
     	int		rs = SR_FAULT ;
+	int		c = 0 ;
 	if (path) {
     	    rs = SR_INVALID ;
 	    if (path[0]) {
-	        if ((rs = malloc_mp(&pbuf)) >= 0) {
-		    plen = rs ;
-		    {
-	                rs = SR_OK ;
-		    }
-		    rs = rsfree(rs,pbuf) ;
-	        } /* end if (m-a-f) */
+		if (fname[0] == '/') {
+		    rs = storer() ;
+		    c = rs ;
+		} else {
+		    rs = finder() ;
+		    c = rs ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-    	return rs ;
+    	return (rs >= 0) ? c : rs ;
 }
 /* end method (getter::operator) */
 
-static int checkit(cchar *dir,int dirlen,cc *fname,int mode,vecstr *slp) noex {
-	int		rs = 0 ;
-	char		pathbuf[MAXPATHLEN + 1], *pbp ;
+int getter::storer() noex {
+    	int		rs = SR_OK ;
+	int		c = 0 ;
+	cchar		*cp{} ;
+	if (int cl ; (cl = sfdirname(fname,-1,&cp)) > 0) {
+	    c = 1 ;
+	    rs = dlp->add(cp,cl) ;
+	}
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (getter::storer) */
 
-	if (dirlen != 0) {
+int getter::finder() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+        if ((rs = id.load) >= 0) {
+            if ((rs = malloc_mp(&pbuf)) >= 0) {
+                plen = rs ;
+                {
+                    rs = checking() ;
+                    c = rs ;
+                }
+                rs = rsfree(rs,pbuf) ;
+                plen = 0 ;
+            } /* end if (m-a-f) */
+            rs1 = id.release ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (ids) */
+    	return (rs >= 0) ? c : rs ;
+}
+/* end method (getter::finder) */
 
-	    pbp = pathbuf ;
-	    pbp = strwcpy(pathbuf,dir,dirlen) ;
+int getter::checking() noex {
+	sif		po(path,-1,":;") ;
+    	int		rs ;
+	int		c = 0 ;
+	cchar		*pp ;
+	for (int pl ; (pl = po(&pp)) >= 0 ; ) {
+	    rs = checks(pp,pl) ;
+	    c += rs ;
+	    if (rs < 0) break ;
+	} /* end for */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (getter::checking) */
 
-/* recalculate the directory length if it was given as negative */
+int getter::checks(cc *dp,int dl) noex {
+    	int		rs ;
+	int		c = 0 ;
+	if ((rs = checker(dp,dl)) > 0) {
+	    c = rs ;
+	    rs = dlp->adduniq(pbuf,dlen) ;
+	}
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (getter::checks) */
 
-	    dirlen = pbp - pathbuf ;
-	    if (u_access(pathbuf,X_OK) >= 0) {
-
-	        pbp = strwcpy(pbp,"/",MAXPATHLEN - (pbp - pathbuf)) ;
-
-	        pbp = strwcpy(pbp,fname,MAXPATHLEN - (pbp - pathbuf)) ;
-
-	        if (u_access(pathbuf,mode) >= 0) {
-	            rs = 1 ;
-	            if (slp != NULL) {
-	                vecstr_add(slp,pathbuf,dirlen) ;
+int getter::checker(cc *dp,int dl) noex {
+    	int		rs = SR_OK ;
+	int		c = 0 ;
+	bool		ty{} ;
+	if (dl > 0) {
+	    if ((rs = mknpathw(pbuf,plen,dp,dl)) >= 0) {
+		cint	dm = (R_OK|X_OK) ;
+		dlen = rs ;
+		ty = nametype_dir ;
+		if ((rs = checkname(ty,dm)) > 0) {
+		    if ((rs = pathadd(pbuf,dlen,fname)) >= 0) {
+			ty = nametype_file ;
+		        rs = checkname(ty,am) ;
+			c = rs ;
 		    }
-	        }
-
-	    } /* end if */
-
-	} else {
-
-	    if (u_access(fname,mode) >= 0) {
-	        rs = 1 ;
-	        if (slp) {
-	            rs = vecstr_add(slp,pathbuf,dirlen) ;
 		}
 	    }
-
-	} /* end if (NULL directory or not) */
-
-	return rs ;
+	} else if (! fpwd) {
+	    dlen = 0 ;
+	    if ((rs = mknpath(pbuf,plen,fname)) >= 0) {
+	        ty = nametype_file ;
+	        if ((rs = checkname(ty,am)) > 0) {
+	            c = rs ;
+	    	    fpwd = true ;
+		    rs = getpwd(pbuf,plen) ;
+		    dlen = rs ;
+		}
+	    }
+	}
+	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (checkit) */
+/* end method (getter::checker) */
+
+int getter::checkname(bool fdir,int am) noex {
+    	int		rs ;
+	int		c = 0 ;
+	if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+	    cmode	pm = sb.st_mode ;
+	    if ((fdir && S_ISDIR(pm)) || ((!fdir) && S_ISREG(pm))) {
+	        if ((rs = sperm(&id,&sb,am)) >= 0) {
+	            c = 1 ;
+	        } else if (isNotAccess(rs)) {
+		    rs = SR_OK ;
+		}
+	    } /* end if (is-dir) */
+	} else if (isNotPresent(rs)) { /* including EPERM for Apple-Darwin */
+	    rs = SR_OK ;
+	}
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (getter::checkname) */
 
 static int getmode(cchar *modestr) noex {
 	int		am = (R_OK|X_OK) ;
@@ -280,5 +323,9 @@ static int getmode(cchar *modestr) noex {
 	return am ;
 }
 /* end subroutine (getmode) */
+
+static cchar *getdefpath() noex {
+    	return defpath ;
+}
 
 

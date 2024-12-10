@@ -37,6 +37,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
@@ -83,13 +84,13 @@ extern "C" {
 int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
 	int		len = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
-/* skip over whitespace */
+	/* skip over whitespace */
 	while (sl && CHAR_ISWHITE(sp[0])) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	} /* end while */
 	if (rpp) *rpp = sp ;
-/* skip over the non-whitespace */
+	/* skip over the non-whitespace */
 	len = sl ;
 	while (sl && sp[0] && (! CHAR_ISWHITE(sp[0]))) {
 	    int		si ;
@@ -103,7 +104,7 @@ int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
 	    sp += si ;
 	    sl -= si ;
 	} /* end while */
-	len = (len - sl) ;
+	len -= sl ;
 	return len ;
 }
 /* end subroutine (sfnextqtok) */

@@ -42,12 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<strnxcmp.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -83,7 +86,7 @@
 
 int sfsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		sslen = 0 ;
-	int		f = false ;
+	bool		f = false ;
 	if (sp && ss) {
 	    int		i = 0 ;
 	    f = true ;

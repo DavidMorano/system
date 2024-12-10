@@ -79,12 +79,13 @@ constexpr int	npresent[] = {
 	SR_CONNREFUSED,
 	SR_LIBACC,			/* libs can be "files" also! */
 	SR_STALE,
+	SR_PERM,			/* Apple-Darwin from |stat(2)| */
 	0	
 } ;
 
 constexpr int	naccess[] = {
 	SR_ACCESS,
-	SR_PERM,
+	SR_PERM,			
 	0	
 } ;
 

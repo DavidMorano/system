@@ -1,4 +1,5 @@
 /* calent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calendar entry object (for CALYEARS) */

@@ -403,10 +403,10 @@ static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
 static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	cnullptr	np{} ;
 	csize		ms = size_t(fsize) ;
+	cint		mp = PROT_READ ;
+	cint		mf = MAP_SHARED ;
 	int		rs ;
 	int		rs1 ;
-	int		mp = PROT_READ ;
-	int		mf = MAP_SHARED ;
 	int		c = 0 ;
 	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    char	*sp = charp(md) ;

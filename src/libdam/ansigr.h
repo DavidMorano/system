@@ -1,6 +1,9 @@
-/* ansigr */
+/* ansigr HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* ANSI® graphic-rendition codes */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,13 +15,11 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	ANSIGR_INCLUDE
-#define	ANSIGR_INCLUDE	1
+#define	ANSIGR_INCLUDE
 
 
 /* ANSI® control sequence parameter codes (Ps) for graphic renditions */
-
 /* these are *defined* by ANSI® */
 #define	ANSIGR_OFFALL	0		/* all-off */
 #define	ANSIGR_BOLD	1		/* bold */

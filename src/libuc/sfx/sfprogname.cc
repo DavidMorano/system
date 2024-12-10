@@ -39,11 +39,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- not-needed */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<six.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -60,8 +64,7 @@ int sfprogname(cchar *sp,int sl,cchar **rpp) noex {
 	int		cl = 0 ;
 	cchar		*cp{} ;
 	if ((cl = sfbasename(sp,sl,&cp)) > 0) {
-	    int		si ;
-	    if ((si = sirchr(cp,cl,'.')) >= 0) {
+	    if (int si ; (si = sirchr(cp,cl,'.')) >= 0) {
 		cl -= si ;
 	    }
 	    if ((cl > 0) && (cp[0] == '=')) {

@@ -1,4 +1,5 @@
 /* calmgr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calendar manager object */
@@ -20,10 +21,10 @@
 #include	<vechand.h>
 #include	<vecobj.h>
 
-#include	"calyears.h"
-#include	"calent.h"
-#include	"cyi.h"
-#include	"calcite.h"
+#include	<calyears.h>
+#include	<calent.h>
+#include	<cyi.h>
+#include	<calcite.h>
 
 
 #define	CALMGR		struct calmgr_head

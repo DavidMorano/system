@@ -43,13 +43,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ascii.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -60,9 +64,15 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
-static int	isnotours(int) noex ;
+static bool	isnotours(int) noex ;
 
 
 /* local variables */
@@ -97,8 +107,8 @@ int sfsubstance(cchar *sp,int sl,cchar **cpp) noex {
 
 /* local subroutines */
 
-static int isnotours(int ch) noex {
-	int	f = false ;
+static bool isnotours(int ch) noex {
+	bool		f = false ;
 	f = f || CHAR_ISWHITE(ch) ;
 	f = f || (ch == CH_DQUOTE) ;
 	f = f || (ch == CH_SQUOTE) ;

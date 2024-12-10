@@ -40,12 +40,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strn.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -79,8 +83,7 @@ int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl >= 2) {
 	    int		sch = mkchar(ss[0]) ;
-	    cchar	*tp ;
-	    if ((tp = strnchr(sp,sl,sch)) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
 	        sch = mkchar(ss[1]) ;
 		cp = (tp+1) ;
 	        sl -= ((tp+1)-sp) ;
