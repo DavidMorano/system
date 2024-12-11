@@ -257,7 +257,7 @@ int getter::checker(cc *dp,int dl) noex {
 		dlen = rs ;
 		ty = nametype_dir ;
 		if ((rs = checkname(ty,dm)) > 0) {
-		    if ((rs = pathadd(pbuf,dlen,fname)) >= 0) {
+		    if ((rs = pathnadd(pbuf,plen,dlen,fname)) >= 0) {
 			ty = nametype_file ;
 		        rs = checkname(ty,am) ;
 			c = rs ;
