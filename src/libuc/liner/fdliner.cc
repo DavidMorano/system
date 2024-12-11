@@ -1,4 +1,5 @@
 /* fdliner SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* file-read line hanlding */
@@ -16,30 +17,8 @@
 
 /*******************************************************************************
 
-	This object module processes one or more mail messages (in
-	appropriate mailbox format if more than one) from a file
-	descriptor passed in the 'init' call-method.  The input
-	file descriptor can be a pipe as a standard mailbox file
-	is not required (one of the whole reasons for this object
-	as opposed to the MAILBOX object).
-
-	Any mail messages found are effectively partially parsed
-	and the object is then ready for queries by additional
-	method calls.
-
-	The parsed mail meta-data is stored in a manner such that
-	it is optimized for repeated access.
-
-	Use should proceed roughly as:
-
-		if ((rs = mailmsgstage_start()) >= 0) {
-
-		    mailmsgstage_xxxx() 
-
-		    mailmegstage_finish()
-		} end if (mailmsgstage)
-
-	This object is pretty fast also!
+  	Object:
+	fdliner
 
 *******************************************************************************/
 

@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -64,8 +63,6 @@ OBJ4=
 OBJ5=
 
 OBJA= obj0.o
-#OBJA= obj0.o obj1.o obj2.o 
-#OBJB= obj3.o obj4.o obj5.o
 
 OBJ= $(OBJA) $(OBJB)
 
@@ -99,9 +96,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
-
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

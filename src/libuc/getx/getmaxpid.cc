@@ -98,7 +98,7 @@ constexpr int		rsnosys[] = {
 
 /* exported variables */
 
-libdam::maxpider	maxpid ;
+libuc::maxpider		maxpid ;
 
 
 /* exported subroutines */
