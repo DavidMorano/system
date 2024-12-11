@@ -66,7 +66,7 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<usystem.h>
 #include	<uvariables.hh>
 #include	<getpwd.h>
@@ -122,6 +122,7 @@ namespace {
 	} ; /* end ctor */
 	operator int () noex ;
 	int storer() noex ;
+	int trier() noex ;
 	int finder() noex ;
 	int checking() noex ;
 	int checks(cc *,int) noex ;
@@ -179,6 +180,9 @@ getter::operator int () noex {
 		if (fname[0] == '/') {
 		    rs = storer() ;
 		    c = rs ;
+		} else if (strchr(fname,'/') != nullptr) {
+		    rs = trier() ;
+		    c = rs ;
 		} else {
 		    rs = finder() ;
 		    c = rs ;
@@ -201,6 +205,33 @@ int getter::storer() noex {
 }
 /* end method (getter::storer) */
 
+int getter::trier() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+        if ((rs = id.load) >= 0) {
+            if ((rs = malloc_mp(&pbuf)) >= 0) {
+                plen = rs ;
+	        if ((rs = getpwd(pbuf,plen)) >= 0) {
+	            if ((rs = pathnadd(pbuf,plen,rs,fname)) >= 0) {
+			bool	ty = nametype_file ;
+		        if ((rs = checkname(ty,am)) > 0) {
+			    c = rs ;
+	    		    rs = dlp->adduniq(pbuf,dlen) ;
+			}
+	            } /* end if (pathnadd) */
+	        } /* end if (getpwd) */
+                rs = rsfree(rs,pbuf) ;
+		pbuf = nullptr ;
+                plen = 0 ;
+            } /* end if (m-a-f) */
+            rs1 = id.release ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (ids) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (getter::trier) */
+
 int getter::finder() noex {
     	int		rs ;
 	int		rs1 ;
@@ -213,6 +244,7 @@ int getter::finder() noex {
                     c = rs ;
                 }
                 rs = rsfree(rs,pbuf) ;
+		pbuf = nullptr ;
                 plen = 0 ;
             } /* end if (m-a-f) */
             rs1 = id.release ;
@@ -317,7 +349,7 @@ static int getmode(cchar *modestr) noex {
 	                am |= X_OK ;
 	                break ;
 	            } /* end switch */
-	        } /* end while */
+	        } /* end for */
 	    } /* end if (not-empty) */
 	} /* end if (non-null) */
 	return am ;
