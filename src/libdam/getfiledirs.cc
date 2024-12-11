@@ -245,7 +245,7 @@ int getter::checkfile(int pl) noex {
 
 int getter::trypath() noex {
 	sif		po(path,-1,":;") ;
-    	int		rs ;
+    	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*pp ;
 	for (int pl ; (pl = po(&pp)) >= 0 ; ) {
