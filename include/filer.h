@@ -1,4 +1,5 @@
 /* filer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* support some buffered file operations */
@@ -126,7 +127,7 @@ struct filer : filer_head {
 	int writefill(cchar *,int) noex ;
 	int writefd(char *,int,int,int) noex ;
 	void dtor() noex ;
-	~filer() noex {
+	~filer() {
 	    dtor() ;
 	} ;
 } ; /* end struct (filer) */

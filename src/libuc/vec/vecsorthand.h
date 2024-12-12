@@ -128,7 +128,7 @@ struct vecsorthand : vecsorthand_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecsorthand() noex {
+	~vecsorthand() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecsorthand) */

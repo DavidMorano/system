@@ -155,7 +155,7 @@ struct sbuf : sbuf_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~sbuf() noex {
+	~sbuf() {
 	    dtor() ;
 	} ;
 } ; /* end struct (sbuf) */

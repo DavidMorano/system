@@ -82,7 +82,7 @@ struct snflags : snflags_head {
 	int addstr(cchar *) noex ;
 	int addstrw(cchar *,int = -1) noex ;
 	void dtor() noex ;
-	~snflags() noex {
+	~snflags() {
 	    dtor() ;
 	} ;
 } ; /* end struct (snflags) */

@@ -1,4 +1,5 @@
 /* memtrack SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* track memory blocks */
@@ -215,8 +216,7 @@ int memtrack::icount() noex {
 void memtrack::dtor() noex {
 	ulogerror("memtrack",SR_BUGCHECK,"dtor called") ;
 	if (magic == memtrack_magic) {
-	    cint	rs = ifinish() ;
-	    if (rs < 0) {
+	    if (cint rs = ifinish() ; rs < 0) {
 		ulogerror("memtrack",rs,"dtor-finish") ;
 	    }
 	}

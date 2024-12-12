@@ -248,4 +248,10 @@ int ids::copy(const ids *oip) noex {
 	return ids_copy(this,oip) ;
 }
 
+void ids::dtor() noex {
+	if (cint rs = release ; rs < 0) {
+	    ulogerror("ids",rs,"fini-finish") ;
+	}
+}
+
 

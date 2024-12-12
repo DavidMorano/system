@@ -118,4 +118,10 @@ sigblocker_co::operator int () noex {
 }
 /* end method (sigblocker::operator) */
 
+void sigblocker::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("sigblocker",rs,"fini-finish") ;
+	}
+}
+
 

@@ -103,6 +103,9 @@ static int	mkvarpath_join(char *,cchar *,int,cchar *) noex ;
 static bufsizevar	maxpathlen(getbufsize_mp,MKVARPATH_MP) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkvarpath(char *rbuf,cchar *fp,int fl) noex {

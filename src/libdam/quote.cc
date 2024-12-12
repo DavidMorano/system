@@ -1,7 +1,9 @@
-/* quote */
+/* quote SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* quote database operations */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGCUR	0		/* debug cursor operation */
@@ -11,7 +13,6 @@
 #define	CF_TMPPRNAME	1		/* put under a PRNAME in /tmp */
 #define	CF_SAMECITE	0		/* same entry citation? */
 #define	CF_ALREADY	1		/* do not allow duplicate results */
-
 
 /* revision history:
 
@@ -24,11 +25,14 @@
 
 /*******************************************************************************
 
+  	Object:
+	quote
+
+	Descrption:
 	This module implements an interface (a trivial one) that
 	allows access to the QUOTE datbase.
 
 	Implementation notes:
-
 	= parsing a calendar file
 
 	There are several valid forms for the date (month-day) part of
@@ -37,7 +41,6 @@
 		name[±ii]	name plus-or-minus increment in days
 	The subroutine 'subinfo_havestart()' parses this out.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -45,9 +48,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -69,9 +72,6 @@
 
 /* local defines */
 
-#undef	COMMENT
-
-#define	QUOTE_MAGIC		0x99447245
 #define	QUOTE_DBSUF		"calendar"
 #define	QUOTE_CAL		struct quote_qdir
 
@@ -125,44 +125,44 @@
 
 /* external subroutines */
 
-extern uint	hash_elf(const char *,int) ;
+extern uint	hash_elf(cchar *,int) ;
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	sibreak(const char *,int,const char *) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	matocasestr(const char **,int,const char *,int) ;
-extern int	matpcasestr(const char **,int,const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	mkpath3w(char *,cchar *,cchar *,cchar *,int) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	siskipwhite(cchar *,int) ;
+extern int	sibreak(cchar *,int,cchar *) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	matocasestr(cchar **,int,cchar *,int) ;
+extern int	matpcasestr(cchar **,int,cchar *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	sperm(ids *,struct ustat *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -175,14 +175,14 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	IDS		id ;
+	ids		id ;
 	vecstr		defdirs ;
 	struct subinfo_flags	init, f ;
 	QUOTE		*op ;
-	const char	*tmpdname ;
+	cchar	*tmpdname ;
 	char		*tudname ;
 	char		*userhome ;
-	const char	**dirnames ;
+	cchar	**dirnames ;
 	time_t		daytime ;
 	int		year ;
 	int		isdst ;
@@ -249,8 +249,8 @@ struct quote_citer {
 
 struct worder {
 	struct quote_eline	*lines ;
-	const char	*mp ;
-	const char	*sp ;
+	cchar	*mp ;
+	cchar	*sp ;
 	int		sl ;
 	int		i ;
 	int		nlines ;
@@ -259,7 +259,7 @@ struct worder {
 
 /* forward references */
 
-static int	quote_dirnamescreate(QUOTE *,const char **) ;
+static int	quote_dirnamescreate(QUOTE *,cchar **) ;
 static int	quote_dirnamesdestroy(QUOTE *) ;
 
 static int	quote_checkupdate(QUOTE *,time_t) ;
@@ -268,19 +268,19 @@ static int	quote_loadbuf(QUOTE *,QUOTE_ENT *,
 static int	quote_tmpfrees(QUOTE *) ;
 
 static int	quote_dirsopen(QUOTE *,struct subinfo *,
-			const char **,const char **) ;
+			cchar **,cchar **) ;
 static int	quote_dirsclose(QUOTE *) ;
 static int	quote_diropen(QUOTE *,struct subinfo *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 static int	quote_dirclose(QUOTE *,QDIR *) ;
 
 static int	quote_qdirsdestroy(QUOTE *) ;
 static int	quote_qdircreate(QUOTE *,struct subinfo *,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
 static int	quote_qdirdestroy(QUOTE *,QUOTE_CAL *) ;
 
 #ifdef	COMMENT
-static int	quote_mksysvarsi(QUOTE *,const char *) ;
+static int	quote_mksysvarsi(QUOTE *,cchar *) ;
 #endif
 
 static int	quote_freeresults(QUOTE *,QUOTE_CUR *) ;
@@ -291,11 +291,11 @@ static int	quote_already(QUOTE *,vecobj *,
 			QUOTE_ENT *) ;
 
 #if	CF_DEBUGS && CF_DEBUGCUR
-static int	quote_debugcur(QUOTE *,vecobj *,const char *) ;
+static int	quote_debugcur(QUOTE *,vecobj *,cchar *) ;
 #endif
 
 static int	cal_open(QUOTE_CAL *,struct subinfo *,int,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
 static int	cal_close(QUOTE_CAL *) ;
 static int	cal_dbloadinit(QUOTE_CAL *,struct subinfo *) ;
 static int	cal_dbloadfree(QUOTE_CAL *) ;
@@ -310,36 +310,36 @@ static int	cal_idxset(QUOTE_CAL *,int) ;
 #endif
 
 static int	cal_idxget(QUOTE_CAL *) ;
-static int	cal_indopencheck(QUOTE_CAL *,const char *,int,int) ;
-static int	cal_mkdirs(QUOTE_CAL *,const char *,mode_t) ;
+static int	cal_indopencheck(QUOTE_CAL *,cchar *,int,int) ;
+static int	cal_mkdirs(QUOTE_CAL *,cchar *,mode_t) ;
 static int	cal_audit(QUOTE_CAL *) ;
 
-static int	cal_indmk(QUOTE_CAL *,struct subinfo *,const char *,
+static int	cal_indmk(QUOTE_CAL *,struct subinfo *,cchar *,
 			int,time_t) ;
-static int	cal_indmkdata(QUOTE_CAL *,struct subinfo *,const char *,int,
+static int	cal_indmkdata(QUOTE_CAL *,struct subinfo *,cchar *,int,
 			int) ;
 static int	cal_indclose(QUOTE_CAL *) ;
 
 static int	cal_loadbuf(QUOTE_CAL *,QUOTE_ENT *,char *,int) ;
-static int	cal_mapdata(QUOTE_CAL *,const char **) ;
+static int	cal_mapdata(QUOTE_CAL *,cchar **) ;
 
-static int	subinfo_start(struct subinfo *,QUOTE *,time_t,const char **) ;
+static int	subinfo_start(struct subinfo *,QUOTE *,time_t,cchar **) ;
 static int	subinfo_ids(struct subinfo *) ;
 static int	subinfo_finish(struct subinfo *) ;
 static int	subinfo_username(struct subinfo *) ;
 static int	subinfo_tmpuserdir(struct subinfo *) ;
 static int	subinfo_mkdirnames(struct subinfo *) ;
 static int	subinfo_havedir(struct subinfo *,char *) ;
-static int	subinfo_loadnames(struct subinfo *,vecstr *,const char *) ;
+static int	subinfo_loadnames(struct subinfo *,vecstr *,cchar *) ;
 static int	subinfo_havestart(struct subinfo *,
-			QUOTE_QUERY *,const char *,int) ;
+			QUOTE_QUERY *,cchar *,int) ;
 static int	subinfo_year(struct subinfo *) ;
-static int	subinfo_checkdname(struct subinfo *,const char *) ;
+static int	subinfo_checkdname(struct subinfo *,cchar *) ;
 
 #ifdef	COMMENT
-static int	subinfo_mkday(struct subinfo *,int,const char *,int) ;
+static int	subinfo_mkday(struct subinfo *,int,cchar *,int) ;
 static int	subinfo_transhol(struct subinfo *,QUOTE_CITE *,
-			const char *,int) ;
+			cchar *,int) ;
 #endif
 
 static int	entry_start(QUOTE_ENT *,QUOTE_CITE *,int,int) ;
@@ -355,7 +355,7 @@ static int	entry_mkhash(QUOTE_ENT *,QUOTE *) ;
 static int	entry_sethash(QUOTE_ENT *,uint) ;
 static int	entry_samehash(QUOTE_ENT *,QUOTE *,QUOTE_ENT *) ;
 static int	entry_same(QUOTE_ENT *,QUOTE *,QUOTE_ENT *) ;
-static int	entry_loadbuf(QUOTE_ENT *,const char *,char *,int) ;
+static int	entry_loadbuf(QUOTE_ENT *,cchar *,char *,int) ;
 
 #if	CF_SAMECITE
 static int	entry_samecite(QUOTE_ENT *,QUOTE *,QUOTE_ENT *) ;
@@ -366,28 +366,19 @@ static int	mkbve_finish(CYIMK_ENT *) ;
 
 static int	worder_start(WORDER *,QUOTE *,QUOTE_ENT *) ;
 static int	worder_finish(WORDER *) ;
-static int	worder_get(WORDER *,const char **) ;
+static int	worder_get(WORDER *,cchar **) ;
 
-static int	isempty(const char *,int) ;
+static int	isempty(cchar *,int) ;
 
-static int	mkmonth(const char *,int) ;
-static int	dayofmonth_mkday(DAYOFMONTH *,uint,const char *,int) ;
+static int	mkmonth(cchar *,int) ;
+static int	dayofmonth_mkday(DAYOFMONTH *,uint,cchar *,int) ;
 
 static int	vrcmp(const void *,const void *) ;
 
 
-/* exported variables */
-
-QUOTE_OBJ	quote = {
-	"quote",
-	sizeof(QUOTE),
-	sizeof(QUOTE_CUR)
-} ;
-
-
 /* local variables */
 
-static cint	termrs[] = {
+constexpr cint		termrs[] = {
 	SR_FAULT,
 	SR_INVALID,
 	SR_NOMEM,
@@ -403,14 +394,22 @@ static cint	termrs[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+quote_obj	quote_modinfo = {
+	"quote",
+	szof(quote),
+	szof(quote_cur)
+} ;
+
+
+/* exported subroutines */
 
 int quote_open(op,pr,dirnames,quotenames)
 QUOTE		*op ;
-const char	pr[] ;
-const char	*dirnames[] ;
-const char	*quotenames[] ;
+cchar	pr[] ;
+cchar	*dirnames[] ;
+cchar	*quotenames[] ;
 {
 	struct subinfo	si, *sip = &si ;
 
@@ -493,13 +492,8 @@ bad0:
 }
 /* end subroutine (quote_open) */
 
-
-/* free up the entire vector string data structure object */
-int quote_close(op)
-QUOTE		*op ;
-{
+int quote_close(quote *op) noex {
 	int	rs ;
-
 
 #if	CF_SAFE
 	if (op == NULL)
@@ -528,19 +522,12 @@ QUOTE		*op ;
 }
 /* end subroutine (quote_close) */
 
-
-int quote_count(op)
-QUOTE		*op ;
-{
-	int	rs ;
-
+int quote_count(quote *op) noex {
+	int		rs ;
 
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	rs = op->nentries ;
@@ -549,26 +536,17 @@ QUOTE		*op ;
 }
 /* end subroutine (quote_count) */
 
-
-int quote_audit(op)
-QUOTE		*op ;
-{
+int quote_audit(quote *op) noex {
 	QUOTE_CAL	*calp ;
-
 	int	rs = SR_OK ;
-	int	i ;
 	int	c = 0 ;
 
-
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	for (i = 0 ; vechand_get(&op->cals,i,&calp) >= 0 ; i += 1) {
+	for (int i = 0 ; vechand_get(&op->cals,i,&calp) >= 0 ; i += 1) {
 	    if (calp == NULL) continue ;
 	    c += 1 ;
 	    rs = cal_audit(calp) ;
@@ -580,54 +558,35 @@ QUOTE		*op ;
 }
 /* end subroutine (quote_audit) */
 
-
-int quote_curbegin(op,curp)
-QUOTE		*op ;
-QUOTE_CUR	*curp ;
-{
-
+int quote_curbegin(quote *op,quote_cur *curp) noex {
+    	int		rs = SR_OK ;
 
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL)
-	    return SR_FAULT ;
-
-	memset(curp,0,sizeof(QUOTE_CUR)) ;
+	if (curp == NULL) return SR_FAULT ;
+	memclear(curp) ;
 
 	op->ncursors += 1 ;
 
 	curp->i = -1 ;
 	curp->magic = QUOTE_MAGIC ;
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (quote_curbegin) */
 
-
-int quote_curend(op,curp)
-QUOTE		*op ;
-QUOTE_CUR	*curp ;
-{
-
+int quote_curend(quote *op,quote_cur *curp) noex {
+	int		rs = SR_OK ;
 
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL)
-	    return SR_FAULT ;
-
-	if (curp->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (curp == NULL) return SR_FAULT ;
+	if (curp->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->results != NULL) {
 	    quote_freeresults(op,curp) ;
@@ -635,33 +594,29 @@ QUOTE_CUR	*curp ;
 	    curp->results = NULL ;
 	}
 
-	if (op->ncursors > 0)
+	if (op->ncursors > 0) {
 	    op->ncursors -= 1 ;
+	}
 
 	curp->magic = 0 ;
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (quote_curend) */
 
-
-static int quote_freeresults(op,curp)
-QUOTE		*op ;
-QUOTE_CUR	*curp ;
-{
+static int quote_freeresults(quote *op,quote_cur *curp) noex {
 	QUOTE_ENT	*ep ;
-	int		i ;
+	int		rs = SR_OK ;
 
 	ep = (QUOTE_ENT *) curp->results ;
 	if (ep != NULL) {
-	    for (i = 0 ; i < curp->nresults ; i += 1) {
+	    for (int i = 0 ; i < curp->nresults ; i += 1) {
 		entry_finish(ep + i) ;
 	    }
 	} /* end if */
 
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (quote_freeresults) */
-
 
 int quote_lookup(op,curp,qopts,qvp)
 QUOTE		*op ;
@@ -679,23 +634,14 @@ QUOTE_QUERY	*qvp ;
 	int	size ;
 	int	c = 0 ;
 
-
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL)
-	    return SR_FAULT ;
-
-	if (curp->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (qvp == NULL)
-	    return SR_FAULT ;
+	if (curp == NULL) return SR_FAULT ;
+	if (curp->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
+	if (qvp == NULL) return SR_FAULT ;
 
 	if (curp->results != NULL) {
 	    quote_freeresults(op,curp) ;
@@ -758,7 +704,6 @@ ret0:
 }
 /* end subroutine (quote_lookcite) */
 
-
 int quote_read(op,curp,qvp,rbuf,rlen)
 QUOTE		*op ;
 QUOTE_CUR	*curp ;
@@ -767,28 +712,18 @@ char		*rbuf ;
 int		rlen ;
 {
 	QUOTE_ENT	*ep ;
-
 	int	rs = SR_OK ;
 	int	i ;
 	int	len = 0 ;
 
-
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL)
-	    return SR_FAULT ;
-
-	if (curp->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (qvp == NULL)
-	    return SR_FAULT ;
+	if (curp == NULL) return SR_FAULT ;
+	if (curp->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
+	if (qvp == NULL) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("quote_read: entered\n") ;
@@ -846,24 +781,16 @@ ret0:
 }
 /* end subroutine (quote_read) */
 
-
-int quote_check(op,daytime)
-QUOTE		*op ;
-time_t		daytime ;
-{
+int quote_check(quote *op,time_t dt) noex {
 	int	rs = SR_OK ;
 
-
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != QUOTE_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op == NULL) return SR_FAULT ;
+	if (op->magic != QUOTE_MAGIC) return SR_NOTOPEN ;
 #endif
 
 #ifdef	COMMENT
-	rs = quote_checkupdate(op,daytime) ;
+	rs = quote_checkupdate(op,dt) ;
 #endif
 
 	return rs ;
@@ -873,11 +800,7 @@ time_t		daytime ;
 
 /* private subroutines */
 
-
-static int quote_dirnamescreate(op,dirnames)
-QUOTE		*op ;
-const char	**dirnames ;
-{
+static int quote_dirnamescreate(quote *op,cchar **dirnames) noex {
 	int	rs = SR_OK ;
 	int	strsize ;
 	int	size ;
@@ -926,13 +849,8 @@ bad0:
 }
 /* end subroutine (quote_dirnamescreate) */
 
-
-static int quote_dirnamesdestroy(op)
-QUOTE		*op ;
-{
-	int	rs = SR_OK ;
-
-
+static int quote_dirnamesdestroy(quote *op) noex {
+	int		rs = SR_OK ;
 	if (op->dirnames != NULL) {
 	    uc_free(op->dirnames) ;
 	    op->dirnames = NULL ;
@@ -955,10 +873,9 @@ QUOTE_CAL	*calp ;
 QUOTE_QUERY	*qvp ;
 {
 	QUOTE_ENT	e ;
-
 	TXTLOOK		*cip ;
 	TEXTLOOK_CUR	ccur ;
-	TEXTLOOK_QUERY	cq ;
+	TEXTLOOK_QUERY	cq{} ;
 	TEXTLOOK_ENT	ce ;
 
 	uint	loff, llen ;
@@ -985,32 +902,24 @@ QUOTE_QUERY	*qvp ;
 	debugprintf("quote_qdircite: cidx=%d\n",cidx) ;
 #endif
 
-	memset(&cq,0,sizeof(TEXTLOOK_QUERY)) ;
 	cq.m = qvp->m ;
 	cq.d = qvp->d ;
 
 	if ((rs = cyi_curbegin(cip,&ccur)) >= 0) {
 
-	    rs = cyi_lookcite(cip,&ccur,&cq) ;
-
-#if	CF_DEBUGS
-	debugprintf("quote_qdircite: cyi_lookcite() rs=%d\n",rs) ;
-#endif
-
-	    if (rs >= 0) {
-
+	    if ((rs = cyi_curcite(cip,&ccur,&cq)) >= 0) {
 	        while (rs >= 0) {
 
 #if	CF_DEBUGS && CF_DEBUGCUR
-		debugprintf("quote_qdircite: cyi_read() c=%u\n",c) ;
-		quote_debugcur(op,rlp,"before cyi_read") ;
+		debugprintf("quote_qdircite: cyi_curread() c=%u\n",c) ;
+		quote_debugcur(op,rlp,"before cyi_curread") ;
 #endif
 
-	            rs1 = cyi_read(cip,&ccur,&ce,cebuf,celen) ;
+	            rs1 = cyi_curread(cip,&ccur,&ce,cebuf,celen) ;
 
 #if	CF_DEBUGS && CF_DEBUGCUR
-		debugprintf("quote_qdircite: cyi_read() rs1=%d\n",rs1) ;
-		quote_debugcur(op,rlp,"after cyi_read") ;
+		debugprintf("quote_qdircite: cyi_curread() rs1=%d\n",rs1) ;
+		quote_debugcur(op,rlp,"after cyi_curread") ;
 #endif
 
 	            if ((rs1 == SR_NOTFOUND) || (rs1 == 0))
@@ -1092,13 +1001,10 @@ vecobj		*rlp ;
 QUOTE_ENT	*ep ;
 {
 	QUOTE_ENT	*oep ;
-
 	int	rs = SR_OK ;
-	int	i ;
 	int	f = FALSE ;
 
-
-	for (i = 0 ; vecobj_get(rlp,i,&oep) >= 0 ; i += 1) {
+	for (int i = 0 ; vecobj_get(rlp,i,&oep) >= 0 ; i += 1) {
 	    if (oep == NULL) continue ;
 
 	    rs = entry_samehash(ep,op,oep) ;
@@ -1118,7 +1024,6 @@ QUOTE_ENT	*ep ;
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (quote_already) */
-
 
 static int quote_mkresults(op,rlp,curp)
 QUOTE		*op ;
@@ -1187,31 +1092,24 @@ ret0:
 }
 /* end subroutine (quote_mkresults) */
 
-
-static int quote_tmpfrees(op)
-QUOTE		*op ;
-{
-	int	i ;
-
-	char	*sp ;
-
-
-	for (i = 0 ; vecstr_get(&op->tmpfiles,i,&sp) >= 0 ; i += 1) {
+static int quote_tmpfrees(quote *op) noex {
+    	int		rs = SR_OK ;
+	char		*sp ;
+	for (int i = 0 ; vecstr_get(&op->tmpfiles,i,&sp) >= 0 ; i += 1) {
 	    if (sp == NULL) continue ;
-	    if (sp[0] != '\0')
+	    if (sp[0] != '\0') {
 		u_unlink(sp) ;
+	    }
 	} /* end for */
-
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (quote_tmpfrees) */
-
 
 static int quote_dirsopen(op,sip,dirnames,quotenames)
 QUOTE		*op ;
 struct subinfo	*sip ;
-const char	*dirnames[] ;
-const char	*quotenames[] ;
+cchar	*dirnames[] ;
+cchar	*quotenames[] ;
 {
 	int	rs = SR_OK ;
 	int	i ;
@@ -1236,18 +1134,11 @@ ret0:
 }
 /* end subroutine (quote_dirsopen) */
 
-
-static int quote_dirsclose(op)
-QUOTE		*op ;
-{
+static int quote_dirsclose(quote *op) noex {
 	QDIR	*qdirp ;
-
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	i ;
-
-
-	for (i = 0 ; vechand_get(&op->cals,i,&qdirp) >= 0 ; i += 1) {
+	for (int i = 0 ; vechand_get(&op->cals,i,&qdirp) >= 0 ; i += 1) {
 	    if (qdirp == NULL) continue ;
 	    rs1 = quote_dirclose(op,qdirp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1261,8 +1152,8 @@ QUOTE		*op ;
 static int quote_diropen(op,sip,dirname,quotenames)
 QUOTE		*op ;
 struct subinfo	*sip ;
-const char	*dirname ;
-const char	*quotenames[] ;
+cchar	*dirname ;
+cchar	*quotenames[] ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -1316,14 +1207,9 @@ bad0:
 }
 /* end subroutine (quote_diropen) */
 
-
-static int quote_dirclose(op,qdirp)
-QUOTE		*op ;
-QDIR		*qdirp ;
-{
-	int	rs ;
-	int	rs1 ;
-
+static int quote_dirclose(quote *op,qdir *qdirp) noex {
+	int		rs ;
+	int		rs1 ;
 
 	rs = cal_close(qdirp) ;
 
@@ -1341,8 +1227,8 @@ QDIR		*qdirp ;
 static int quote_qdircreate(op,sip,dirname,calname)
 QUOTE		*op ;
 struct subinfo	*sip ;
-const char	dirname[] ;
-const char	calname[] ;
+cchar	dirname[] ;
+cchar	calname[] ;
 {
 	struct ustat	sb ;
 
@@ -1354,7 +1240,7 @@ const char	calname[] ;
 	int	size = sizeof(QUOTE_CAL) ;
 	int	f = FALSE ;
 
-	const char	*suf = QUOTE_DBSUF ;
+	cchar	*suf = QUOTE_DBSUF ;
 
 	char	cname[MAXNAMELEN + 1] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
@@ -1531,7 +1417,7 @@ ret0:
 static int qdir_open(qdirp,sip,dirname)
 QDIR		*qdirp ;
 struct subinfo	*sip ;
-const char	dirname[] ;
+cchar	dirname[] ;
 {
 	QUOTE	*op = sip->op ;
 
@@ -1544,8 +1430,8 @@ const char	dirname[] ;
 	int	f_remake = FALSE ;
 	int	f_textlook = FALSE ;
 
-	const char	*basedname ;
-	const char	*dbdir = QDIR_DBDIR ;
+	cchar	*basedname ;
+	cchar	*dbdir = QDIR_DBDIR ;
 
 	char	dbdname[MAXPATHLEN + 1] ;
 	char	dbname[MAXPATHLEN + 1] ;
@@ -1664,7 +1550,7 @@ QDIR		*qdirp ;
 static int qdir_dbdir(qdirp,sip,dbdname)
 QDIR		*qdirp ;
 struct subinfo	*sip ;
-const char	dbdname[] ;
+cchar	dbdname[] ;
 {
 	struct ustat	sb ;
 
@@ -1704,7 +1590,7 @@ ret0:
 
 static int qdir_newer(qdirp,dirname,mtime)
 QDIR		*qdirp ;
-const char	dirname[] ;
+cchar	dirname[] ;
 time_t		mtime ;
 {
 	struct ustat	sb ;
@@ -1720,8 +1606,8 @@ time_t		mtime ;
 	int	f_dbdir = FALSE ;
 	int	f_newer = FALSE ;
 
-	const char	*dbdir = QDIR_DBDIR ;
-	const char	*denp ;
+	cchar	*dbdir = QDIR_DBDIR ;
+	cchar	*denp ;
 
 	char	fname[MAXPATHLEN + 1] ;
 
@@ -1767,8 +1653,8 @@ ret0:
 static int qdir_remake(qdirp,sip,dbname,basedname) ;
 QDIR		*qdirp ;
 struct subinfo	*sip ;
-const char	dbname[] ;
-const char	basedname[] ;
+cchar	dbname[] ;
+cchar	basedname[] ;
 {
 	QUOTE	*op = sip->op ;
 
@@ -1787,8 +1673,8 @@ static int cal_open(calp,sip,cidx,dirname,calname)
 QUOTE_CAL	*calp ;
 struct subinfo	*sip ;
 int		cidx ;
-const char	dirname[] ;
-const char	calname[] ;
+cchar	dirname[] ;
+cchar	calname[] ;
 {
 	int	rs ;
 
@@ -2040,7 +1926,7 @@ struct subinfo	*sip ;
 	int	f_search = FALSE ;
 	int	f ;
 
-	const char	*idxdname = IDXDNAME ;
+	cchar	*idxdname = IDXDNAME ;
 
 	char	idname[MAXNAMELEN + 1] ;
 
@@ -2082,7 +1968,7 @@ struct subinfo	*sip ;
 	int	f_search = TRUE ;
 	int	f ;
 
-	const char	*idxdname = IDXDNAME ;
+	cchar	*idxdname = IDXDNAME ;
 
 	char	idname[MAXPATHLEN + 1] ;
 
@@ -2161,7 +2047,7 @@ ret0:
 
 static int cal_mkdirs(calp,dname,mode)
 QUOTE_CAL	*calp ;
-const char	dname[] ;
+cchar	dname[] ;
 mode_t		mode ;
 {
 	struct ustat	sb ;
@@ -2183,7 +2069,7 @@ mode_t		mode ;
 
 static int cal_indopencheck(calp,dname,year,f_search)
 QUOTE_CAL	*calp ;
-const char	dname[] ;
+cchar	dname[] ;
 int		year ;
 int		f_search ;
 {
@@ -2221,7 +2107,7 @@ int		f_search ;
 static int quote_debugcur(op,rlp,s)
 QUOTE		*op ;
 vecobj		*rlp ;
-const char	s[] ;
+cchar	s[] ;
 {
 	struct quote_eline	*lines ;
 
@@ -2257,7 +2143,7 @@ ret0:
 static int cal_indmk(calp,sip,dname,f_tmp,daytime)
 QUOTE_CAL	*calp ;
 struct subinfo	*sip ;
-const char	dname[] ;
+cchar	dname[] ;
 int		f_tmp ;
 time_t		daytime ;
 {
@@ -2296,7 +2182,7 @@ ret0:
 static int cal_indmkdata(calp,sip,dname,operms,f_tmp)
 QUOTE_CAL	*calp ;
 struct subinfo	*sip ;
-const char	dname[] ;
+cchar	dname[] ;
 int		operms ;
 int		f_tmp ;
 {
@@ -2323,7 +2209,7 @@ int		f_tmp ;
 	int	f_ent = FALSE ;
 	int	f ;
 
-	const char	*cn ;
+	cchar	*cn ;
 
 	char	*tp, *mp, *lp ;
 
@@ -2577,7 +2463,7 @@ int		rlen ;
 {
 	int	rs ;
 
-	const char	*mp ;
+	cchar	*mp ;
 
 
 	rs = cal_mapdata(calp,&mp) ;
@@ -2598,7 +2484,7 @@ ret0:
 
 static int cal_mapdata(calp,mpp)
 QUOTE_CAL	*calp ;
-const char	**mpp ;
+cchar	**mpp ;
 {
 	int	rs ;
 
@@ -2618,7 +2504,7 @@ static int subinfo_start(sip,op,daytime,dirnames)
 struct subinfo	*sip ;
 QUOTE		*op ;
 time_t		daytime ;
-const char	*dirnames[] ;
+cchar	*dirnames[] ;
 {
 	int	rs = SR_OK ;
 
@@ -2654,7 +2540,7 @@ struct subinfo	*sip ;
 	int	tl ;
 	int	c = 0 ;
 
-	const char	*sharedname = QDIR_QUOTES ;
+	cchar	*sharedname = QDIR_QUOTES ;
 
 	char	tmpdname[MAXPATHLEN + 1] ;
 
@@ -2703,10 +2589,10 @@ struct subinfo	*sip ;
 /* finish */
 
 	if (rs >= 0) {
-	    const char	**dap ;
+	    cchar	**dap ;
 	    rs = vecstr_getvec(&sip->defdirs,&dap) ;
 	    if (rs >= 0)
-	        sip->dirnames = (const char **) dap ;
+	        sip->dirnames = (cchar **) dap ;
 	}
 
 ret1:
@@ -2863,7 +2749,7 @@ struct subinfo	*sip ;
 static int subinfo_loadnames(sip,nlp,dirname)
 struct subinfo	*sip ;
 vecstr		*nlp ;
-const char	dirname[] ;
+cchar	dirname[] ;
 {
 	struct ustat	sb ;
 
@@ -2876,9 +2762,9 @@ const char	dirname[] ;
 	int	nl ;
 	int	c = 0 ;
 
-	const char	*calsuf = QUOTE_DBSUF ;
-	const char	*tp ;
-	const char	*np ;
+	cchar	*calsuf = QUOTE_DBSUF ;
+	cchar	*tp ;
+	cchar	*np ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 
@@ -2924,7 +2810,7 @@ ret0:
 static int subinfo_havestart(sip,qp,lp,ll)
 struct subinfo	*sip ;
 QUOTE_CITE	*qp ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	int		rs1 = SR_OK ;
@@ -3046,7 +2932,7 @@ struct subinfo	*sip ;
 static int subinfo_mkday(sip,m,cp,cl)
 struct subinfo	*sip ;
 int		m ;
-const char	*cp ;
+cchar	*cp ;
 int		cl ;
 {
 	DAYOFMONTH	*dmp ;
@@ -3074,7 +2960,7 @@ int		cl ;
 static int subinfo_transhol(sip,qp,sp,sl)
 struct subinfo	*sip ;
 QUOTE_CITE	*qp ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	HOLIDAYS_CUR	hcur ;
@@ -3092,8 +2978,8 @@ int		sl ;
 	int	f_found = FALSE ;
 	int	f ;
 
-	const char	*tp ;
-	const char	*np ;
+	cchar	*tp ;
+	cchar	*np ;
 
 
 #if	CF_DEBUGS
@@ -3237,7 +3123,7 @@ ret0:
 
 static int subinfo_checkdname(sip,dname)
 struct subinfo	*sip ;
-const char	dname[] ;
+cchar	dname[] ;
 {
 	struct ustat	sb ;
 
@@ -3475,8 +3361,8 @@ QUOTE	*op ;
 	int	i ;
 	int	sl, cl ;
 
-	const char	*sp ;
-	const char	*mp ;
+	cchar	*sp ;
+	cchar	*mp ;
 
 	char	*cp ;
 
@@ -3542,7 +3428,7 @@ QUOTE_ENT	*oep ;
 	int	c1l, c2l ;
 	int	f = FALSE ;
 
-	const char	*c1p, *c2p ;
+	cchar	*c1p, *c2p ;
 
 
 	rs = worder_start(&w1,op,ep) ;
@@ -3594,7 +3480,7 @@ bad0:
 
 static int entry_loadbuf(ep,mp,rbuf,rlen)
 QUOTE_ENT	*ep ;
-const char	*mp ;
+cchar	*mp ;
 char		rbuf[] ;
 int		rlen ;
 {
@@ -3606,7 +3492,7 @@ int		rlen ;
 	int		nlines ;
 	int		ll ;
 	int		len = 0 ;
-	const char	*lp ;
+	cchar	*lp ;
 
 	lines = ep->lines ;
 	nlines = ep->i ; /* number of line elements */
@@ -3731,7 +3617,7 @@ QUOTE_ENT	*ep ;
 
 	int	rs ;
 
-	const char	*mp ;
+	cchar	*mp ;
 
 
 	rs = vechand_get(&op->cals,ep->cidx,&calp) ;
@@ -3768,7 +3654,7 @@ WORDER		*wp ;
 
 int worder_get(wp,rpp)
 WORDER		*wp ;
-const char	**rpp ;
+cchar	**rpp ;
 {
 	int	cl = 0 ;
 
@@ -3802,7 +3688,7 @@ ret0:
 
 
 static int isempty(lp,ll)
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	int	cl ;

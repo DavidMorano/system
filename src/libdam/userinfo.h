@@ -104,7 +104,7 @@ struct userinfo : userinfo_head {
 	userinfo(const userinfo &) = delete ;
 	userinfo &operator = (const userinfo &) = delete ;
 	void dtor() noex ;
-	~userinfo() noex {
+	~userinfo() {
 	    dtor() ;
 	} ;
 } ; /* end struct (userinfo) */

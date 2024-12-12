@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2001-12-03, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This code was born out of frustration with cleaning up bad
 	legacy code (of which there is quite a bit -- like almost
 	all of it).
@@ -21,7 +21,7 @@
 
 */
 
-/* Copyright © 2001,2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -64,6 +64,9 @@ extern "C" {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkpath1w(char *pp,cc *s1,int sl) noex {
@@ -90,5 +93,10 @@ int mkpath5w(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return mknpathxw(pp,-1,5,s1,s2,s3,s4,s5,sl) ;
 }
 /* end subroutine (mknpath5w) */
+
+int mkpath6w(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
+	return mknpathxw(pp,-1,6,s1,s2,s3,s4,s5,s6,sl) ;
+}
+/* end subroutine (mknpath6w) */
 
 

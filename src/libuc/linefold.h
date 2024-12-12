@@ -1,4 +1,5 @@
 /* linefold HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manage folding of a line */
@@ -112,7 +113,7 @@ struct linefold : linefold_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~linefold() noex {
+	~linefold() {
 	    dtor() ;
 	} ;
 } ; /* end struct (linefold) */

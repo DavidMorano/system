@@ -89,7 +89,7 @@ struct ucenumnw : ucenumxx {
 	ucenumnw &operator = (const ucenumnw &) = delete ;
 	int readent(ucenumnw_ent *,char *,int) noex ;
 	void dtor() noex ;
-	~ucenumnw() noex {
+	~ucenumnw() {
 	    dtor() ;
 	} ;
 } ; /* end struct (ucenumnw) */

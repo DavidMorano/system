@@ -1,4 +1,5 @@
 /* linebuffer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* provide a line-buffer of the system-defined line-length */
@@ -62,8 +63,9 @@ struct linebuffer : linebuffer_head {
 	} ;
 	linebuffer(const linebuffer &) = delete ;
 	linebuffer &operator = (const linebuffer &) = delete ;
-	~linebuffer() noex {
-	    (void) int(finish) ;
+	void dtor() noex ;
+	~linebuffer() {
+	    dtor() ;
 	} ;
 } ; /* end struct (linebuffer) */
 #else /* __cplusplus */

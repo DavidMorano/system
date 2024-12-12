@@ -60,6 +60,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -67,6 +70,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -78,7 +84,7 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 	int		sl ;
 	cchar		*sp ;
 	if ((sl = sfshrink(pp,pl,&sp)) > 0) {
-	    if (strnpbrk(sp,sl,"-()") == NULL) {
+	    if (strnpbrk(sp,sl,"-()") == nullptr) {
 	        cint	tlen = sl ;
 	        char	*tbuf ;
 	        if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {

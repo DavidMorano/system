@@ -115,7 +115,7 @@ struct vecobj : vecobj_head {
 	int getvec(void ***) noex ;
 	int del(int = -1) noex ;
 	void dtor() noex ;
-	~vecobj() noex {
+	~vecobj() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecobj) */

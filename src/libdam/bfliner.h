@@ -79,7 +79,7 @@ struct bfliner : bfliner_head {
 	int getpoff(off_t *) noex ;
 	int adv(int = 0) noex ;
 	void dtor() noex ;
-	~bfliner() noex {
+	~bfliner() {
 	    dtor() ;
 	} ;
 } ; /* end struct (bfliner) */

@@ -42,9 +42,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>
+#include	<sys/types.h>		/* |pid_t| */
+#include	<unistd.h>		/* |sysconf(3c)| */
+#include	<climits>		/* |PID_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -109,7 +109,7 @@ int getmaxpid(int w) noex {
 	case 0:
 	    {
                 pidmgr      *op = &getmaxpid_data ;
-                if (op->pid == 0) {
+                if ((rs = op->pid) == 0) {
                     cint    cmd = _SC_MAXPID ;
                     if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
                         op->pid = rs ;
@@ -117,8 +117,6 @@ int getmaxpid(int w) noex {
                         rs = PID_MAX ;
                         op->pid = rs ;
                     }
-                } else {
-                    rs = op->pid ;
                 }
             } /* end block */
 	    break ;

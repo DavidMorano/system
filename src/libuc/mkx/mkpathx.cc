@@ -8,14 +8,14 @@
 
 /* revision history:
 
-	= 2001-12-03, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This code was born out of frustration with cleaning up bad
 	legacy code (of which there is quite a bit -- like almost
 	all of it).
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -93,5 +93,10 @@ int mkpath5(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 	return mknpathx(pp,-1,5,s1,s2,s3,s4,s5) ;
 }
 /* end subroutine (mkpath5) */
+
+int mkpath6(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
+	return mknpathx(pp,-1,6,s1,s2,s3,s4,s5,s6) ;
+}
+/* end subroutine (mkpath6) */
 
 

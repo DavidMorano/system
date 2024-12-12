@@ -75,8 +75,9 @@ struct strop : strop_head {
 	int findterm(cchar *) noex ;
 	int spanterm(cchar *) noex ;
 	int span(cchar *) noex ;
-	~strop() noex {
-	    (void) int(finish) ;
+	void dtor() noex ;
+	~strop() {
+	    dtor() ;
 	} ;
 } ; /* end struct (strop) */
 #else	/* __cplusplus */

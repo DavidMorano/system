@@ -62,7 +62,7 @@ struct ass : ass_head {
 	ass &operator = (const ass &) = delete ;
 	int addchr(int) noex ;
 	void dtor() noex ;
-	~ass() noex {
+	~ass() {
 	    dtor() ;
 	} ;
 } ; /* end struct (ass) */

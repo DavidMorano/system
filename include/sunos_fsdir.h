@@ -1,4 +1,5 @@
 /* fsdir HEADER (SunOS) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® file system dirextory operations */

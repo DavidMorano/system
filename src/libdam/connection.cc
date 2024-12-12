@@ -1,4 +1,5 @@
 /* connection SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to provide some INET connection information */

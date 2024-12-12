@@ -38,8 +38,8 @@
 	p3		third component
 
 	Returns:
-	<0		error
 	>=0		OK, length of resulting filename
+	<0		error (system-return)
 
 	Notes: 
 	1. Note that |mkfname1()| is sematically identical to |mkpath1()|
@@ -69,6 +69,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -80,7 +83,7 @@
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
-/* exported subroutines */
+/* exported variables */
 
 
 /* exported subroutines */

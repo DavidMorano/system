@@ -1,4 +1,5 @@
 /* nulstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* assert a NUL-terminated string */
@@ -112,5 +113,11 @@ nulstr_co::operator int () noex {
 	return rs ;
 }
 /* end method (nulstr_co::operator) */
+
+void dtor::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("dtor",rs,"fini-finish") ;
+	}
+}
 
 

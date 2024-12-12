@@ -1,4 +1,5 @@
 /* serialbuf HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* object that serializes various types into a given buffer */
@@ -131,7 +132,7 @@ struct serialbuf : serialbuf_head {
 	    return *this ;
 	} ;
 	void dtor() noex ;
-	~serialbuf() noex {
+	~serialbuf() {
 	    dtor() ;
 	} ;
 } ; /* end struct (serialbuf) */

@@ -1,4 +1,5 @@
 /* fmtsub HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -92,7 +93,7 @@ struct fmtsub : fmtsub_head {
 	int emit(fmtspec *,cchar *,int) noex ;
 	int formstr(fmtspec *,fmtstrdata *) noex ;
 	void dtor() noex ;
-	~fmtsub() noex {
+	~fmtsub() {
 	    dtor() ;
 	} ;
 } ; /* end struct (fmtsub) */

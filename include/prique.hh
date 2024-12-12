@@ -1,4 +1,5 @@
 /* prique HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
@@ -202,7 +203,7 @@ public:
 	    pop(this,priquemem_pop) ;
 	    rem(this) ;
 	} ; /* end ctor) */
-	~prique() noex {
+	~prique() {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;

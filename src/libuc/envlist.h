@@ -68,7 +68,7 @@ struct envlist : envlist_head {
 	int add(cchar *,int = -1) noex ;
 	int present(cchar *,int = -1,cchar ** = nullptr) noex ;
 	void dtor() noex ;
-	~envlist() noex {
+	~envlist() {
 	    dtor() ;
 	} ;
 } ; /* end struct (envlist) */

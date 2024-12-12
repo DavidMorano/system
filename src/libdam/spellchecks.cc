@@ -942,13 +942,13 @@ SC_QUERY	*qvp ;
 
 	if ((rs = cyi_curbegin(cip,&ccur)) >= 0) {
 
-	    rs = cyi_lookcite(cip,&ccur,&cq) ;
+	    rs = cyi_curcite(cip,&ccur,&cq) ;
 
 	    if (rs >= 0) {
 
 	        while (rs >= 0) {
 
-	            rs1 = cyi_read(cip,&ccur,&ce,cebuf,celen) ;
+	            rs1 = cyi_curread(cip,&ccur,&ce,cebuf,celen) ;
 
 	            if ((rs1 == SR_NOTFOUND) || (rs1 == 0))
 		        break ;

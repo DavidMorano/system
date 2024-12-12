@@ -324,7 +324,7 @@ static int getmode(cchar *modestr) noex {
 	int		am = (R_OK|X_OK) ;
 	if (modestr) {
 	    if (modestr[0]) {
-	        cchar		*cp = modestr ;
+	        cchar	*cp = modestr ;
 	        am = 0 ;
 	        for (int kch ; (kch = mkchar(*cp++)) != 0 ; ) {
 	            switch (kch) {

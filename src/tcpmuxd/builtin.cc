@@ -1,13 +1,14 @@
-/* builtin */
+/* builtin SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* built-in services */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* switchable */
 #define	CF_CHECKDIR	0		/* check for existence of dir */
 #define	CF_HOSTINFO	1		/* send HOSTINFO instead of LOADAVE */
-
 
 /* revision history:
 
@@ -20,21 +21,18 @@
 
 /*******************************************************************************
 
-        This module contains the code for the built-in servers. There are not a
-        lot of built in servers because there is no way (currently) to shut them
-        off except to define a new one by the same name in the regular srver
-        table file.
+  	Name:
+	builtin
 
+	Description:
+	This module contains the code for the built-in servers.
+	There are not a lot of built in servers because there is
+	no way (currently) to shut them off except to define a new
+	one by the same name in the regular server table file.
 
 *******************************************************************************/
 
-
-#define	BUILTIN_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
 #include	<sys/stat.h>
@@ -46,7 +44,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<buffer.h>
@@ -57,6 +54,7 @@
 #include	<svcfile.h>
 #include	<serialbuf.h>
 #include	<connection.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"nistinfo.h"
@@ -108,8 +106,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matcasestr(const char **,const char *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	chmods(const char *,mode_t) ;
-extern int	getproviderid(const char *,int) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 
 extern int	progtmpdir(PROGINFO *,char *) ;

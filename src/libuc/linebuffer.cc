@@ -1,4 +1,5 @@
 /* linebuffer SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* provide a line-buffer of the system-defined line-length */
@@ -97,5 +98,11 @@ linebuffer_co::operator int () noex {
 	return rs ;
 }
 /* end method (linebuffer_co::operator) */
+
+void linebuffer::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("linebuffer",rs,"fini-finish") ;
+	}
+}
 
 

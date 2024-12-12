@@ -83,7 +83,7 @@ struct ptc : pthread_cond_t {
 	int timedwait(ptm *,CTIMESPEC *) noex ;
 	int reltimedwaitnp(ptm *,CTIMESPEC *) noex ;
 	void dtor() noex ;
-	~ptc() noex {
+	~ptc() {
 	    dtor() ;
 	} ; /* end dtor (ptc) */
 } ; /* end class (ptc) */

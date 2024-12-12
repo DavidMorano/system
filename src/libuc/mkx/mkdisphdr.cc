@@ -71,6 +71,9 @@ using std::nullptr_t ;			/* type */
 /* external subroutines */
 
 
+/* external varaibles */
+
+
 /* local structures */
 
 
@@ -80,6 +83,9 @@ using std::nullptr_t ;			/* type */
 /* local variables */
 
 constexpr bool		f_nonstandard = CF_NONSTANDARD ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

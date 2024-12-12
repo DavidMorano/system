@@ -1,12 +1,13 @@
-/* cyi */
+/* cyi SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* read or audit a CYI database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */
 #define	CF_ISOUR	0		/* isOur */
-
 
 /* revision history:
 
@@ -19,11 +20,14 @@
 
 /*******************************************************************************
 
-	This subroutine opens and allows for reading or auditing of a VAR
-	database (which currently consists of two files).
+  	Object:
+	cyi
+
+	Description:
+	This subroutine opens and allows for reading or auditing
+	of a VAR database (which currently consists of two files).
 
 	Synopsis:
-
 	int cyi_open(op,year,dname,cname)
 	CYI		*op ;
 	int		year ;
@@ -31,33 +35,28 @@
 	cchar		cname[] ;
 
 	Arguments:
-
 	op		object pointer
 	year		year
 	dnames		list of (pointers to) directories to search
 	cnames		list of (pointers to) calendar files to use
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<vecstr.h>
@@ -98,7 +97,7 @@ extern int	pathadd(char *,int,const char *) ;
 extern int	nleadstr(const char *,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(ids *,struct ustat *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -146,7 +145,7 @@ struct blentry {
 /* forward references */
 
 static int	cyi_dbfind(CYI *,time_t,cchar *,cchar *,int) ;
-static int	cyi_dbfindname(CYI *,IDS *,time_t,char *,cchar *,cchar *,int) ;
+static int	cyi_dbfindname(CYI *,ids *,time_t,char *,cchar *,cchar *,int) ;
 static int	cyi_dbfindone(CYI *,time_t,cchar *,cchar *) ;
 static int	cyi_dblose(CYI *) ;
 
@@ -333,9 +332,7 @@ int cyi_curend(CYI *op,CYI_CUR *curp)
 }
 /* end subroutine (cyi_curend) */
 
-
-int cyi_lookcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp)
-{
+int cyi_curcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp) noex {
 	CYI_FMI		*mip ;
 	CYIHDR		*hip ;
 	uint		(*vt)[5] ;
@@ -412,9 +409,7 @@ int cyi_lookcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp)
 }
 /* end subroutine (cyi_lookcite) */
 
-
-int cyi_read(CYI *op,CYI_CUR *curp,CYI_ENT *ep,char ebuf[],int elen)
-{
+int cyi_curread(CYI *op,CYI_CUR *curp,CYI_ENT *ep,char *ebuf,int elen) noex {
 	CYI_FMI		*mip ;
 	CYIHDR		*hip ;
 	uint		vi ;
@@ -488,10 +483,7 @@ int cyi_read(CYI *op,CYI_CUR *curp,CYI_ENT *ep,char ebuf[],int elen)
 }
 /* end subroutine (cyi_read) */
 
-
-int cyi_enum(CYI *op,CYI_CUR *curp,CYI_ENT *bvep,char ebuf[],int elen)
-{
-
+int cyi_curenum(CYI *op,CYI_CUR *curp,CYI_ENT *bvep,char *ebuf,int elen) noex {
 	return cyi_read(op,curp,bvep,ebuf,elen) ;
 }
 /* end subroutine (cyi_enum) */
@@ -499,10 +491,8 @@ int cyi_enum(CYI *op,CYI_CUR *curp,CYI_ENT *bvep,char ebuf[],int elen)
 
 /* private subroutines */
 
-
-static int cyi_dbfind(CYI *op,time_t dt,cchar dname[],cchar cname[],int y)
-{
-	IDS		id ;
+static int cyi_dbfind(CYI *op,time_t dt,cchar *dname,cchar *cname,int y) noex {
+	ids		id ;
 	int		rs ;
 	int		tl = 0 ;
 
@@ -535,7 +525,7 @@ static int cyi_dbfind(CYI *op,time_t dt,cchar dname[],cchar cname[],int y)
 /* end subroutine (cyi_dbfind) */
 
 
-static int cyi_dbfindname(CYI *op,IDS *idp,time_t dt,char *tbuf,
+static int cyi_dbfindname(CYI *op,ids *idp,time_t dt,char *tbuf,
 		cchar *dname,cchar *cal,int y)
 {
 	int		rs ;

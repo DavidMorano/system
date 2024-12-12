@@ -82,7 +82,7 @@ struct buffer : buffer_head {
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
 	void dtor() noex ;
-	~buffer() noex {
+	~buffer() {
 	    dtor() ;
 	} ;
 } ; /* end struct (buffer) */

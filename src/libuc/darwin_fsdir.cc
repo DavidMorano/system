@@ -1,4 +1,5 @@
 /* fsdir SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to read directory entries in the UNIX® file system */
@@ -274,18 +275,20 @@ fsdir_opener::operator int () noex {
 /* end method (fsdir_opener:operator) */
 
 fsdir_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
-	switch (w) {
-	case fsdirmem_rewind:
-	    rs = fsdir_rewind(op) ;
-	    break ;
-	case fsdirmem_audit:
-	    rs = fsdir_audit(op) ;
-	    break ;
-	case fsdirmem_close:
-	    rs = fsdir_close(op) ;
-	    break ;
-	} /* end switch */
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fsdirmem_rewind:
+	        rs = fsdir_rewind(op) ;
+	        break ;
+	    case fsdirmem_audit:
+	        rs = fsdir_audit(op) ;
+	        break ;
+	    case fsdirmem_close:
+	        rs = fsdir_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (fsdir_co::operator) */
@@ -300,6 +303,12 @@ int fsdir::tell(off_t *offp) noex {
 
 int fsdir::seek(off_t o) noex {
 	return fsdir_seek(this,o) ;
+}
+
+void fsdir::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("fsdir",rs,"fini-finish") ;
+	}
 }
 
 

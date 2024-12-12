@@ -205,7 +205,7 @@ struct vecpstr : vecpstr_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecpstr() noex {
+	~vecpstr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecpstr) */
