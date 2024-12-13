@@ -80,7 +80,7 @@ struct cyi_fmier {
 struct cyi_head {
 	cchar		*fname ;
 	CYI_FMI		fmi ;		/* file-map information */
-	CYIHDR		fhi ;		/* file-header information */
+	cyihdr		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;

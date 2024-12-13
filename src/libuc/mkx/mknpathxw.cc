@@ -124,7 +124,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	            cc		*sp = (cchar *) va_arg(ap,char *) ;
 		    bool	f = true ;
-	            if (i == (n-1)) sl = (int) va_arg(ap,int) ;
+	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
 	            f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
 		    f = f && (sp[0] != '\0') && (sp[0] != '/') ;
 		    if (f) {
@@ -136,7 +136,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 		        }
 	            } /* end if (needed a pathname separator) */
 	            if (rs >= 0) {
-	                if ((rs = snwcpy(bp,bl,sp,sl)) >= 0) {
+	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) {
 	                    bp += rs ;
 	                    bl -= rs ;
 	                } else if (rs == SR_OVERFLOW) {

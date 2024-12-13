@@ -1,4 +1,5 @@
 /* inetaddrparse SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* this little thing parses an INET address into parts */
@@ -42,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
@@ -79,7 +81,7 @@ int inetaddrparse_load(inetaddrparse *ap,cchar *sp,int sl) noex {
 	int		n = 0 ;
 	if (ap && sp) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(ap) ;
+	    rs = memclear(ap) ;
 	    n += 1 ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
 	        int	cl ;

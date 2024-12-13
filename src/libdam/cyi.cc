@@ -2,10 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* read or audit a CYI database */
+/* read or audit a cyi database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */
 #define	CF_ISOUR	0		/* isOur */
 
@@ -28,11 +27,7 @@
 	of a VAR database (which currently consists of two files).
 
 	Synopsis:
-	int cyi_open(op,year,dname,cname)
-	CYI		*op ;
-	int		year ;
-	cchar		dname[] ;
-	cchar		cname[] ;
+	int cyi_open(cyi *op,int year,cc *dname,cc *cname) noex
 
 	Arguments:
 	op		object pointer
@@ -52,17 +47,23 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<endian.h>
-#include	<vecstr.h>
 #include	<ids.h>
 #include	<storebuf.h>
+#include	<mkpathx.h>
+#include	<snx.h>
+#include	<sncpyx.h>
+#include	<strwcpy.h>
 #include	<char.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"cyi.h"
@@ -71,8 +72,7 @@
 
 /* local defines */
 
-#define	CYI_FMI		struct cyi_fmi
-#define	CYI_KA		sizeof(CYI_LINE)
+#define	CYI_KA		szof(CYI_LINE)
 #define	CYI_FSUF	"cyi"
 #define	CYI_FSUFLEN	10
 #define	CYI_BO(v)	((CYI_KA - ((v) % CYI_KA)) % CYI_KA)
@@ -86,44 +86,8 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	sperm(ids *,struct ustat *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
-#if	CF_DEBUGS
-extern char	*timestr_log(time_t,char *) ;
-#endif
-
 
 /* external variables */
-
-
-/* exported variables */
-
-CYI_OBJ	cyi = {
-	"cyi",
-	sizeof(CYI),
-	sizeof(CYI_CUR)
-} ;
 
 
 /* local structures */
@@ -141,86 +105,88 @@ struct blentry {
 	uint	llen ;
 } ;
 
+namespace {
+    struct vars {
+	int		maxpathlen ;
+	int mkvars() noex ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
 
-static int	cyi_dbfind(CYI *,time_t,cchar *,cchar *,int) ;
-static int	cyi_dbfindname(CYI *,ids *,time_t,char *,cchar *,cchar *,int) ;
-static int	cyi_dbfindone(CYI *,time_t,cchar *,cchar *) ;
-static int	cyi_dblose(CYI *) ;
+static int	cyi_dbfind(cyi *,time_t,cchar *,cchar *,int) noex ;
+static int	cyi_dbfindname(cyi *,ids *,time_t,char *,cc *,cc *,int) noex ;
+static int	cyi_dbfindone(cyi *,time_t,cchar *,cchar *) noex ;
+static int	cyi_dblose(cyi *) noex ;
 
-static int	cyi_loadbegin(CYI *,time_t,const char *) ;
-static int	cyi_loadend(CYI *) ;
-static int	cyi_mapcreate(CYI *,time_t,const char *) ;
-static int	cyi_mapdestroy(CYI *) ;
-static int	cyi_proc(CYI *,time_t) ;
-static int	cyi_verify(CYI *,time_t) ;
-static int	cyi_auditvt(CYI *) ;
-static int	cyi_checkupdate(CYI *,time_t) ;
-static int	cyi_loadbve(CYI *,CYI_ENT *,char *,int,uint *) ;
+static int	cyi_loadbegin(cyi *,time_t,cchar *) noex ;
+static int	cyi_loadend(cyi *) noex ;
+static int	cyi_mapcreate(cyi *,time_t,cchar *) noex ;
+static int	cyi_mapdestroy(cyi *) noex ;
+static int	cyi_proc(cyi *,time_t) noex ;
+static int	cyi_verify(cyi *,time_t) noex ;
+static int	cyi_auditvt(cyi *) noex ;
+static int	cyi_checkupdate(cyi *,time_t) noex ;
+static int	cyi_loadbve(cyi *,cyi_ent *,char *,int,uint *) noex ;
 
 #if	CF_SEARCH
-static int	cyi_bsearch(CYI *,uint (*)[5],int,uint *) ;
+static int	cyi_bsearch(cyi *,uint (*)[5],int,uint *) noex ;
 #else
-static int	cyi_lsearch(CYI *,uint (*)[5],int,uint *) ;
+static int	cyi_lsearch(cyi *,uint (*)[5],int,uint *) noex ;
 #endif
 
-static int	mkydname(char *,cchar *,int) ;
-static int	mkcitekey(uint *,CYI_QUERY *) ;
+static int	mkydname(char *,cchar *,int) noex ;
+static int	mkcitekey(uint *,cyi_q *) noex ;
 
 #if	CF_SEARCH
-static int	vtecmp(const void *,const void *) ;
+static int	vtecmp(cvoid *,cvoid *) noex ;
 #endif
 
 #if	CF_ISOUR
-static int	isOurSuffix(const char *,const char *) ;
-static int	isNotOurFile(int) ;
+static bool	isOurSuffix(cchar *,cchar *) noex ;
+static bool	isNotOurFile(int) noex ;
 #endif
 
 
 /* local variables */
 
+static vars		var ;
+
+
+/* exported variables */
+
+cyi_obj		cyi_modinfo = {
+	"cyi",
+	szof(cyi),
+	szof(cyi_cur)
+} ;
+
 
 /* exported subroutines */
 
-
-int cyi_open(CYI *op,int year,cchar dname[],cchar cname[])
-{
-	const time_t	dt = time(NULL) ;
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (dname == NULL) return SR_FAULT ;
-	if (cname == NULL) return SR_FAULT ;
-
-	if (dname[0] == '\0') return SR_INVALID ;
-	if (cname[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(CYI)) ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_open: dname=%s\n",dname) ;
-	debugprintf("cyi_open: cname=%s\n",cname) ;
-	debugprintf("cyi_open: year=%d\n",year) ;
-#endif
-
-	if ((rs = cyi_dbfind(op,dt,dname,cname,year)) >= 0) {
-	    op->ti_lastcheck = dt ;
-	    op->year = year ;
-	    op->magic = CYI_MAGIC ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("cyi_open: ret rs=%d\n",rs) ;
-#endif
-
+int cyi_open(cyi *op,int year,cchar *dname,cchar *cname) noex {
+	int		rs = SR_FAULT ;
+	if (op && dname && cname) {
+	    rs = SR_INVALID ;
+	    if (dname[0] && cname[0]) {
+		static cint	rsv = var.mkvars() ;
+		if ((rs = rsv) >= 0) {
+	            custime	dt = getustime ;
+	            memclear(op) ;
+	            if ((rs = cyi_dbfind(op,dt,dname,cname,year)) >= 0) {
+	                op->ti_lastcheck = dt ;
+	                op->year = year ;
+	                op->magic = CYI_MAGIC ;
+	            }
+		} /* end if (vars::mkvars) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (cyi_open) */
 
-
-int cyi_close(CYI *op)
-{
+int cyi_close(cyi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -236,9 +202,7 @@ int cyi_close(CYI *op)
 }
 /* end subroutine (cyi_close) */
 
-
-int cyi_audit(CYI *op)
-{
+int cyi_audit(cyi *op) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -249,18 +213,12 @@ int cyi_audit(CYI *op)
 
 	rs = cyi_auditvt(op) ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_audit: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyi_audit) */
 
-
-int cyi_count(CYI *op)
-{
-	CYIHDR		*hip ;
+int cyi_count(cyi *op) noex {
+	cyihdr		*hip ;
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -272,10 +230,8 @@ int cyi_count(CYI *op)
 }
 /* end subroutine (cyi_count) */
 
-
-int cyi_info(CYI *op,CYI_INFO *ip)
-{
-	CYIHDR		*hip ;
+int cyi_info(cyi *op,CYI_INFO *ip) noex {
+	cyihdr		*hip ;
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -284,7 +240,7 @@ int cyi_info(CYI *op,CYI_INFO *ip)
 
 	hip = &op->fhi ;
 	if (ip != NULL) {
-	    memset(ip,0,sizeof(CYI_INFO)) ;
+	    memclear(ip) ;
 	    ip->mtime = op->fmi.ti_mod ;
 	    ip->ctime = (time_t) hip->wtime ;
 	    ip->count = hip->nentries ;
@@ -295,16 +251,14 @@ int cyi_info(CYI *op,CYI_INFO *ip)
 }
 /* end subroutine (cyi_info) */
 
-
-int cyi_curbegin(CYI *op,CYI_CUR *curp)
-{
+int cyi_curbegin(cyi *op,cyi_cur *curp) noex {
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
 	if (op->magic != CYI_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(CYI_CUR)) ;
+	memclear(curp) ;
 	curp->citekey = UINT_MAX ;
 	curp->i = -1 ;
 	curp->magic = CYI_MAGIC ;
@@ -314,10 +268,7 @@ int cyi_curbegin(CYI *op,CYI_CUR *curp)
 }
 /* end subroutine (cyi_curbegin) */
 
-
-int cyi_curend(CYI *op,CYI_CUR *curp)
-{
-
+int cyi_curend(cyi *op,cyi_cur *curp) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
@@ -332,9 +283,9 @@ int cyi_curend(CYI *op,CYI_CUR *curp)
 }
 /* end subroutine (cyi_curend) */
 
-int cyi_curcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp) noex {
-	CYI_FMI		*mip ;
-	CYIHDR		*hip ;
+int cyi_curcite(cyi *op,cyi_cur *curp,cyi_q *qp) noex {
+	cyi_fmi		*mip ;
+	cyihdr		*hip ;
 	uint		(*vt)[5] ;
 	uint		vte[5] ;
 	uint		citekey ;
@@ -348,10 +299,6 @@ int cyi_curcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp) noex {
 
 	if (op->magic != CYI_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != CYI_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_lookcite: q=(%u:%u)\n",qp->m,qp->d) ;
-#endif
 
 	mip = &op->fmi ;
 	hip = &op->fhi ;
@@ -371,11 +318,6 @@ int cyi_curcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp) noex {
 
 	mkcitekey(&citekey,qp) ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_lookcite: citekey=%08X\n",citekey) ;
-	debugprintf("cyi_lookcite: vtlen=%u\n",vtlen) ;
-#endif
-
 	vte[3] = citekey ;
 
 #if	CF_SEARCH
@@ -390,10 +332,6 @@ int cyi_curcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp) noex {
 	}
 #endif /* CF_SEARCH */
 
-#if	CF_DEBUGS
-	debugprintf("cyi_lookcite: search rs=%d vi=%u\n",rs,vi) ;
-#endif
-
 	if (rs >= 0) {
 	    curp->citekey = citekey ;
 	    curp->i = vi ;
@@ -401,17 +339,13 @@ int cyi_curcite(CYI *op,CYI_CUR *curp,CYI_QUERY *qp) noex {
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("cyi_lookcite: ret rs=%d vi=%u\n",rs,vi) ;
-#endif
-
 	return (rs >= 0) ? vi : rs ;
 }
 /* end subroutine (cyi_lookcite) */
 
-int cyi_curread(CYI *op,CYI_CUR *curp,CYI_ENT *ep,char *ebuf,int elen) noex {
-	CYI_FMI		*mip ;
-	CYIHDR		*hip ;
+int cyi_curread(cyi *op,cyi_cur *curp,cyi_ent *ep,char *ebuf,int elen) noex {
+	cyi_fmi		*mip ;
+	cyihdr		*hip ;
 	uint		vi ;
 	uint		(*vt)[5] ;
 	uint		*vtep ;
@@ -434,56 +368,34 @@ int cyi_curread(CYI *op,CYI_CUR *curp,CYI_ENT *ep,char *ebuf,int elen) noex {
 	mip = &op->fmi ;
 	hip = &op->fhi ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_read: ent elen=%d\n",elen) ;
-	debugprintf("cyi_read: vilen=%u vi=%u\n",hip->vilen,vi) ;
-#endif
-
 	if (vi < hip->vllen) {
 
 	    vt = mip->vt ;
 	    vtep = vt[vi] ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_read: c_cite=%08x\n",curp->citekey) ;
-	debugprintf("cyi_read: vte[3]=%08x\n", vtep[3]) ;
-#endif
-
 	    if (curp->citekey != UINT_MAX) {
-
-		if (curp->citekey != (vtep[3] & 0xffff))
+		if (curp->citekey != (vtep[3] & 0xffff)) {
 		    rs = SR_NOTFOUND ;
-
+		}
 	    } /* end if */
 
-	} else
+	} else {
 	    rs = SR_NOTFOUND ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_read: mid rs=%d\n",rs) ;
-#endif
+	}
 
 	if (rs >= 0) {
 	    rs = cyi_loadbve(op,ep,ebuf,elen,vtep) ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_read: cyi_loadbve() rs=%d\n",rs) ;
-#endif
-
 	}
 
-	if (rs >= 0)
+	if (rs >= 0) {
 	    curp->i = (vi + 1) ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_read: ret rs=%d\n",rs) ;
-#endif
+	}
 
 	return rs ;
 }
 /* end subroutine (cyi_read) */
 
-int cyi_curenum(CYI *op,CYI_CUR *curp,CYI_ENT *bvep,char *ebuf,int elen) noex {
+int cyi_curenum(cyi *op,cyi_cur *curp,cyi_ent *bvep,char *ebuf,int elen) noex {
 	return cyi_read(op,curp,bvep,ebuf,elen) ;
 }
 /* end subroutine (cyi_enum) */
@@ -491,110 +403,71 @@ int cyi_curenum(CYI *op,CYI_CUR *curp,CYI_ENT *bvep,char *ebuf,int elen) noex {
 
 /* private subroutines */
 
-static int cyi_dbfind(CYI *op,time_t dt,cchar *dname,cchar *cname,int y) noex {
-	ids		id ;
+static int cyi_dbfind(cyi *op,time_t dt,cchar *dname,cchar *cname,int y) noex {
 	int		rs ;
+	int		rs1 ;
 	int		tl = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfind: ent\n") ;
-#endif
-
-	if ((rs = ids_load(&id)) >= 0) {
-	    char	tbuf[MAXPATHLEN + 1] ;
-	    if ((rs = cyi_dbfindname(op,&id,dt,tbuf,dname,cname,y)) >= 0) {
-	        cchar	*cp ;
-#if	CF_DEBUGS
-		debugprintf("cyi_dbfind: tl=%d\n",rs) ;
-		debugprintf("cyi_dbfind: tb=%s\n",tbuf) ;
-#endif
-	        tl = rs ;
-	        if ((rs = uc_mallocstrw(tbuf,tl,&cp)) >= 0) {
-	            op->fname = cp ;
-		}
-	    }
-	    ids_release(&id) ;
+	if (ids id ; (rs = id.load) >= 0) {
+	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if ((rs = cyi_dbfindname(op,&id,dt,tbuf,dname,cname,y)) >= 0) {
+	            tl = rs ;
+	            if (cchar *cp{} ; (rs = uc_mallocstrw(tbuf,tl,&cp)) >= 0) {
+	                op->fname = cp ;
+		    }
+	        }
+	    	rs = rsfree(tbuf) ;
+	    } /* end if (m-a-f) */
+	    rs1 = id.release ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
-
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfind: ret rs=%d tl=%u\n",rs,tl) ;
-#endif
-
 	return (rs >= 0) ? tl : rs ;
 }
 /* end subroutine (cyi_dbfind) */
 
-
-static int cyi_dbfindname(CYI *op,ids *idp,time_t dt,char *tbuf,
-		cchar *dname,cchar *cal,int y)
-{
+static int cyi_dbfindname(cyi *op,ids *idp,time_t dt,char *tbuf,
+		cchar *dname,cchar *cal,int y) noex {
 	int		rs ;
 	int		tl = 0 ;
-	char		ydname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindname: ent\n") ;
-	debugprintf("cyi_dbfindname: dname=%s\n",dname) ;
-	debugprintf("cyi_dbfindname: cal=%s\n",cal) ;
-#endif
-
-	if ((rs = mkydname(ydname,dname,y)) >= 0) {
-	    const int	flen = CYI_FSUFLEN ;
-	    cchar	*suf = CYI_FSUF ;
-	    cchar	*end = ENDIANSTR ;
-	    char	fsuf[CYI_FSUFLEN + 1] ;
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindname: ydname=%s\n",ydname) ;
-#endif
-	    if ((rs = sncpy2(fsuf,flen,suf,end)) >= 0) {
-	        char	cname[MAXNAMELEN + 1] ;
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindname: fsuf=%s\n",fsuf) ;
-#endif
-	        if ((rs = snsds(cname,MAXNAMELEN,cal,fsuf)) >= 0) {
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindname: cname=%s\n",cname) ;
-#endif
-		    if ((rs = mkpath2(tbuf,ydname,cname)) >= 0) {
-			struct ustat	sb ;
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindname: tb=%s\n",tbuf) ;
-#endif
-			if ((rs = uc_stat(tbuf,&sb)) >= 0) {
-			    const int	am = (R_OK) ;
-			    if ((rs = sperm(idp,&sb,am)) >= 0) {
-	                        tl = rs ;
-	                        rs = cyi_dbfindone(op,dt,cal,tbuf) ;
+	int		ai = 0 ;
+	cint		sz = ((var.maxpathlen + 1) * 2) ;
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    char	*ydname = (a + ((var.maxpathlen + 1) * ai++)) ;
+	    if ((rs = mkydname(ydname,dname,y)) >= 0) {
+	        cint	flen = CYI_FSUFLEN ;
+	        cchar	*suf = CYI_FSUF ;
+	        cchar	*end = ENDIANSTR ;
+	        char	fsuf[CYI_FSUFLEN + 1] ;
+	        if ((rs = sncpy2(fsuf,flen,suf,end)) >= 0) {
+		    cint	clen = var.maxpathlen ;
+	            char	*cbuf = (a + ((var.maxpathlen + 1) * ai++)) ;
+	            if ((rs = snsds(cbuf,clen,cal,fsuf)) >= 0) {
+		        if ((rs = mkpath2(tbuf,ydname,cbuf)) >= 0) {
+			    if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
+			        cint	am = (R_OK) ;
+			        if ((rs = sperm(idp,&sb,am)) >= 0) {
+	                            tl = rs ;
+	                            rs = cyi_dbfindone(op,dt,cal,tbuf) ;
+			        }
 			    }
-			}
-#if	CF_DEBUGS
-			debugprintf("cyi_dbfindname: stat-out rs=%d\n",rs) ;
-#endif
-		    } /* end if (mkpath) */
-	        } /* end if (snsds) */
-	    } /* end if (sncpy) */
-	} /* end if (mkydname) */
-
+		        } /* end if (mkpath) */
+	            } /* end if (snsds) */
+	        } /* end if (sncpy) */
+	    } /* end if (mkydname) */
+	    rs = rsfree(rs,a) ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? tl : rs ;
 }
 /* end subroutine (cyi_dbfindname) */
 
-
-static int cyi_dbfindone(CYI *op,time_t dt,cchar *cal,cchar *tmpfname)
-{
-	CYI_FMI		*mip = &op->fmi ;
-	CYIHDR		*hip = &op->fhi ;
+static int cyi_dbfindone(cyi *op,time_t dt,cchar *cal,cchar *tmpfname) noex {
+	cyi_fmi		*mip = &op->fmi ;
+	cyihdr		*hip = &op->fhi ;
 	int		rs ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindone: cal=%s\n",cal) ;
-	debugprintf("cyi_dbfindone: tfn=%s\n",tmpfname) ;
-#endif
-
 	if ((rs = cyi_loadbegin(op,dt,tmpfname)) >= 0) {
-	    caddr_t	md = (caddr_t) mip->mapdata ;
-	    const int	mnl = MAXNAMELEN ;
-	    const char	*cp ;
+	    caddr_t	md = caddr_t(mip->mapdata) ;
+	    cint	mnl = var.maxpathlen ;
+	    cchar	*cp ;
 	    cp = (md + hip->caloff) ;
 	    if (strncmp(cp,cal,mnl) != 0) rs = SR_NOMSG ;
 	    if (rs < 0) {
@@ -602,42 +475,29 @@ static int cyi_dbfindone(CYI *op,time_t dt,cchar *cal,cchar *tmpfname)
 	    }
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("cyi_dbfindone: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyi_dbfindone) */
 
-
-static int cyi_dblose(CYI *op)
-{
+static int cyi_dblose(cyi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = cyi_loadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fname != NULL) {
+	{
+	    rs1 = cyi_loadend(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (op->fname) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->fname = NULL ;
 	}
-
 	return rs ;
 }
 /* end subroutine (cyi_dblose) */
 
-
-static int cyi_loadbegin(CYI *op,time_t dt,cchar fname[])
-{
+static int cyi_loadbegin(cyi *op,time_t dt,cchar *fname) noex {
 	int		rs ;
 	int		fsize = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_loadbegin: fn=%s\n",fname) ;
-#endif
 
 	if ((rs = cyi_mapcreate(op,dt,fname)) >= 0) {
 	    fsize = rs ;
@@ -647,18 +507,12 @@ static int cyi_loadbegin(CYI *op,time_t dt,cchar fname[])
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cyi_loadbegin: ret rs=%d fsize=%u\n",rs,fsize) ;
-#endif
-
 	return (rs >= 0) ? fsize : rs ;
 }
 /* end subroutine (cyi_loadbegin) */
 
-
-static int cyi_loadend(CYI *op)
-{
-	CYI_FMI		*mip ;
+static int cyi_loadend(cyi *op) noex {
+	cyi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -675,47 +529,41 @@ static int cyi_loadend(CYI *op)
 }
 /* end subroutine (cyi_loadend) */
 
-
-static int cyi_mapcreate(CYI *op,time_t dt,cchar fname[])
-{
+static int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
+    	cnullptr	np{} ;
 	int		rs ;
+	int		rs1 ;
 	int		fsize = 0 ;	/* subroutine return value */
-
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
-	    const int		fd = rs ;
+	    USTAT	sb ;
+	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 		fsize = (sb.st_size & INT_MAX) ;
 	        if (fsize > 0) {
-	    	    size_t	ms = (size_t) fsize ;
-	    	    int		mp = PROT_READ ;
-	    	    int		mf = MAP_SHARED ;
+	    	    csize	ms = (size_t) fsize ;
+	    	    cint	mp = PROT_READ ;
+	    	    cint	mf = MAP_SHARED ;
 	    	    void	*md ;
-	    	    if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
-			CYI_FMI	*mip = &op->fmi ;
+	    	    if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+			cyi_fmi	*mip = &op->fmi ;
 			mip->mapdata = md ;
 	        	mip->mapsize = ms ;
 	        	mip->ti_mod = sb.st_mtime ;
 	        	mip->ti_map = dt ;
 	    	    } /* end if (u_mmap) */
-		} else
+		} else {
 	    	    rs = SR_NOCSI ;
+		}
 	    } /* end if (stat) */
-	    u_close(fd) ;
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
-
-#if	CF_DEBUGS
-	debugprintf("cyi_mapcreate: ret rs=%d fsize=%u\n",rs,fsize) ;
-#endif
-
 	return (rs >= 0) ? fsize : rs ;
 }
 /* end subroutine (cyi_mapcreate) */
 
-
-static int cyi_mapdestroy(CYI *op)
-{
-	CYI_FMI		*mip = &op->fmi ;
+static int cyi_mapdestroy(cyi *op) noex {
+	cyi_fmi		*mip = &op->fmi ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -731,23 +579,16 @@ static int cyi_mapdestroy(CYI *op)
 }
 /* end subroutine (cyi_mapdestroy) */
 
-
-static int cyi_checkupdate(CYI *op,time_t dt)
-{
+static int cyi_checkupdate(cyi *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_checkupdate: ncursors=%u\n",op->ncursors) ;
-#endif
+	int		f = false ;
 
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = time(NULL) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        struct ustat	sb ;
-	        CYI_FMI		*mip = &op->fmi ;
+	        cyi_fmi		*mip = &op->fmi ;
 	        op->ti_lastcheck = dt ;
-	        if ((rs = u_stat(op->fname,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
 	            f = f || (sb.st_mtime > mip->ti_map) ;
 	            if (f) {
@@ -760,19 +601,13 @@ static int cyi_checkupdate(CYI *op,time_t dt)
 	    } /* end if (timed out) */
 	} /* end if (no cursors out) */
 
-#if	CF_DEBUGS
-	debugprintf("cyi_checkupdate: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (cyi_checkupdate) */
 
-
-static int cyi_proc(CYI *op,time_t dt)
-{
-	CYI_FMI		*mip = &op->fmi ;
-	CYIHDR		*hip = &op->fhi ;
+static int cyi_proc(cyi *op,time_t dt) noex {
+	cyi_fmi		*mip = &op->fmi ;
+	cyihdr		*hip = &op->fhi ;
 	int		rs ;
 
 	if ((rs = cyihdr(hip,1,mip->mapdata,mip->mapsize)) >= 0) {
@@ -783,47 +618,27 @@ static int cyi_proc(CYI *op,time_t dt)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cyi_proc: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyi_proc) */
 
-
-static int cyi_verify(CYI *op,time_t dt)
-{
-	CYI_FMI		*mip = &op->fmi ;
-	CYIHDR		*hip = &op->fhi ;
+static int cyi_verify(cyi *op,time_t dt) noex {
+	cyi_fmi		*mip = &op->fmi ;
+	cyihdr		*hip = &op->fhi ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
 	int		size ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	f = f && (hip->fsize == mip->mapsize) ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_verify: fsize=%u f=%u\n",
-		hip->fsize,f) ;
-#endif
-
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
 
-#if	CF_DEBUGS
-	{
-	char	timebuf[TIMEBUFLEN + 1] ;
-	debugprintf("cyi_verify: wtime=%s f=%u\n",
-		timestr_log(((time_t) hip->wtime),timebuf),f) ;
-	}
-#endif
-
 	f = f && (hip->vioff <= mip->mapsize) ;
-	size = hip->vilen * 5 * sizeof(uint) ;
+	size = hip->vilen * 5 * szof(uint) ;
 	f = f && ((hip->vioff + size) <= mip->mapsize) ;
 
 	f = f && (hip->vloff <= mip->mapsize) ;
-	size = hip->vllen * 2 * sizeof(uint) ;
+	size = hip->vllen * 2 * szof(uint) ;
 	f = f && ((hip->vloff + size) <= mip->mapsize) ;
 
 	f = f && (hip->vilen == hip->nentries) ;
@@ -833,19 +648,13 @@ static int cyi_verify(CYI *op,time_t dt)
 	if (! f)
 	    rs = SR_BADFMT ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_verify: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyi_verify) */
 
-
-static int cyi_auditvt(CYI *op)
-{
-	CYI_FMI		*mip = &op->fmi ;
-	CYIHDR		*hip = &op->fhi ;
+static int cyi_auditvt(cyi *op) noex {
+	cyi_fmi		*mip = &op->fmi ;
+	cyihdr		*hip = &op->fhi ;
 	uint		(*vt)[5] ;
 	uint		pcitcmpval = 0 ;
 	uint		citcmpval ;
@@ -877,27 +686,17 @@ static int cyi_auditvt(CYI *op)
 
 	} /* end for (record table entries) */
 
-#if	CF_DEBUGS
-	debugprintf("cyi_auditvt: VT rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyi_auditvt) */
 
-
 #if	CF_SEARCH
 
-static int cyi_bsearch(op,vt,vtlen,vte)
-CYI		*op ;
-uint		(*vt)[5] ;
-int		vtlen ;
-uint		vte[5] ;
-{
+static int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,vte[5]) noex {
 	uint		citekey ;
 	uint		(*vtep)[5] ;
 	int		rs ;
-	int		vtesize = (5 * sizeof(uint)) ;
+	int		vtesize = (5 * szof(uint)) ;
 	int		vi ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -905,16 +704,8 @@ uint		vte[5] ;
 	citekey = (vte[3] & 0xffff) ;
 	vtep = (uint (*)[5]) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_bsearch: bsearch() vtep=%p\n",vtep) ;
-#endif
-
 	rs = (vtep != NULL) ? (vtep - vt) : SR_NOTFOUND ;
 	vi = rs ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_bsearch: rs=%d \n",rs) ;
-#endif
 
 	if (rs >= 0) {
 	    while ((vi > 0) && ((vt[vi-1][3] & 0x0000FFFF) == citekey)) {
@@ -922,40 +713,20 @@ uint		vte[5] ;
 	    }
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("cyi_bsearch: ret rs=%d vi=%u\n",rs,vi) ;
-#endif
-
 	return (rs >= 0) ? vi : rs ;
 }
 /* end subroutine (cyi_bsearch) */
 
 #else /* CF_SEARCH */
 
-static int cyi_lsearch(op,vt,vtlen,vte)
-CYI		*op ;
-uint		(*vt)[5] ;
-int		vtlen ;
-uint		vte[5] ;
-{
+static int cyi_lsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	uint		citekey ;
 	int		rs ;
 	int		vi ;
 
-#if	CF_DEBUGS
-	debugprintf("cyi_lsearch: vtlen=%u\n",vtlen) ;
-#endif
-
 	citekey = (vte[3] & 0xffff) ;
 	for (vi = 0 ; vi < vtlen ; vi += 1) {
-
-#if	CF_DEBUGS
-	debugprintf("cyi_lsearch: cite%02u=%08x\n",vi,
-	    (vt[vi][3] & 0x0000FFFF)) ;
-#endif
-
-	    if ((vt[vi][3] & 0x0000FFFF) == citekey)
-		break ;
+	    if ((vt[vi][3] & 0x0000FFFF) == citekey) break ;
 	}
 	rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
 
@@ -965,15 +736,9 @@ uint		vte[5] ;
 
 #endif /* CF_SEARCH */
 
-
-static int cyi_loadbve(op,bvep,ebuf,ebuflen,vte)
-CYI		*op ;
-CYI_ENT		*bvep ;
-char		ebuf[] ;
-int		ebuflen ;
-uint		vte[5] ;
-{
-	CYIHDR		*hip = &op->fhi ;
+static int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int ebuflen,
+		uint vte[5]) noex {
+	cyihdr		*hip = &op->fhi ;
 	int		rs = SR_OK ;
 	uint		li ;
 	int		nlines ;
@@ -987,7 +752,7 @@ uint		vte[5] ;
 
 /* load the basic stuff */
 
-	memset(bvep,0,sizeof(CYI_ENT)) ;
+	memclear(bvep) ;
 	bvep->voff = vte[0] ;
 	bvep->vlen = vte[1] ;
 	bvep->nlines = (vte[3] >> 24) & UCHAR_MAX ;
@@ -1001,25 +766,15 @@ uint		vte[5] ;
 	nlines = bvep->nlines ;
 
 	if (li < hip->vllen) {
-	    CYI_FMI	*mip = &op->fmi ;
-	    const int	bo = CYI_BO((ulong) ebuf) ;
-	    const int	linesize = ((nlines + 1) * sizeof(CYI_LINE)) ;
-
-#if	CF_DEBUGS
-	debugprintf("cyi_loadbve: li=%u\n",li) ;
-#endif
-
-#if	CF_DEBUGS
-	    debugprintf("cyi_loadbve: nlines=%u\n",nlines) ;
-	    debugprintf("cyi_loadbve: q=%u:%u\n",
-		bvep->m,bvep->d) ;
-#endif
+	    cyi_fmi	*mip = &op->fmi ;
+	    cint	bo = CYI_BO((ulong) ebuf) ;
+	    cint	linesize = ((nlines + 1) * szof(CYI_LINE)) ;
 
 	    if (linesize <= (ebuflen - bo)) {
 	        CYI_LINE	*lines ;
 	        caddr_t		ma = (caddr_t) mip->mapdata ;
 	        uint		(*lt)[2] ;
-	        int		i ;
+	        int		i ; /* used-afterwards */
 
 	        lt = (uint (*)[2]) (ma + hip->vloff) ;
 	        lines = (CYI_LINE *) (ebuf + bo) ;
@@ -1028,10 +783,6 @@ uint		vte[5] ;
 	        for (i = 0 ; i < nlines ; i += 1) {
 	            lines[i].loff = lt[li+i][0] ;
 	            lines[i].llen = lt[li+i][1] ;
-#if	CF_DEBUGS
-		    debugprintf("cyi_loadbve: loff[%u]=%u\n",i,lt[li+i][0]) ;
-		    debugprintf("cyi_loadbve: llen[%u]=%u\n",i,lt[li+i][1]) ;
-#endif
 	        } /* end for */
 
 	        if (rs >= 0) {
@@ -1047,61 +798,39 @@ uint		vte[5] ;
 	    rs = SR_BADFMT ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cyi_loadbve: ret rs=%d rlen=%u\n",rs,rlen) ;
-#endif
-
 	return (rs >= 0) ? rlen : rs ;
 }
 /* end subroutine (cyi_loadbve) */
 
-
-static int mkydname(char *rbuf,cchar *dname,int year)
-{
-	const int	rlen = MAXPATHLEN ;
-	int		rs = SR_OK ;
-	int		i = 0 ;
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,dname,-1) ;
-	    i += rs ;
+static int mkydname(char *rbuf,cchar *dname,int year) noex {
+	cint		rlen = var.maxpathlen ;
+	int		rs ;
+	int		len = 0 ;
+	if (storebuf sb(rbuf,rlen) ; (rs = sb.start) >= 0) {
+	    if (rs >= 0) rs = sb.str(dname) ;
+	    if (rs >= 0) rs = sb.chr('/') ;
+	    if (rs >= 0) rs = sb.chr('y') ;
+	    if (rs >= 0) rs = sb.dec(year) ;
+	    len = sb.idx ;
 	}
-	if (rs >= 0) {
-	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    rs = storebuf_chr(rbuf,rlen,i,'y') ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    rs = storebuf_deci(rbuf,rlen,i,year) ;
-	    i += rs ;
-	}
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkydname) */
 
-
-static int mkcitekey(uint *cip,CYI_QUERY *bvp)
-{
+static int mkcitekey(uint *cip,cyi_q *bvp) noex {
 	uint		ci = 0 ;
-
 	ci |= ((bvp->m & UCHAR_MAX) << 8) ;
 	ci |= ((bvp->d & UCHAR_MAX) << 0) ;
-
 	*cip = ci ;
 	return SR_OK ;
 }
 /* end subroutine (mkcitekey) */
 
-
 #if	CF_SEARCH
-static int vtecmp(const void *v1p,const void *v2p)
-{
+static int vtecmp(cvoid *v1p,cvoid *v2p) noex {
 	uint		*vte1 = (uint *) v1p ;
 	uint		*vte2 = (uint *) v2p ;
 	int		c1, c2 ;
-
 	c1 = vte1[3] & 0x0000FFFF ;
 	c2 = vte2[3] & 0x0000FFFF ;
 	return (c1 - c2) ;
@@ -1109,25 +838,22 @@ static int vtecmp(const void *v1p,const void *v2p)
 /* end subroutine (vtecmp) */
 #endif /* CF_SEARCH */
 
-
 #if	CF_ISOUR
-static int isOurSuffix(const char *name,const char *fsuf)
-{
-	int		f = FALSE ;
-	const char	*tp ;
-	if (((tp = strchr(name,'.')) != NULL) && (strcmp((tp+1),fsuf) == 0)) {
-	    f = TRUE ;
+static bool isOurSuffix(cchar *name,cchar *fsuf) noex {
+    	cnullptr	np{} ;
+	bool		f = false ;
+	cchar		*tp ;
+	if (((tp = strchr(name,'.')) != np) && (strcmp((tp+1),fsuf) == 0)) {
+	    f = true ;
 	}
 	return f ;
 }
 /* end subroutine (isOurSuffix) */
 #endif /* CF_ISOUR */
 
-
 #if	CF_ISOUR
-static int isNotOurFile(int rs)
-{
-	int	f = FALSE ;
+static bool isNotOurFile(int rs) noex {
+	bool		f = false ;
 	f = f || isNotPresent(rs) ;
 	f = f || (rs == SR_NOMSG) ;
 	f = f || (rs == SR_NOCSI) ;
@@ -1135,5 +861,14 @@ static int isNotOurFile(int rs)
 }
 /* end subroutine (isNotOurFile) */
 #endif /* CF_ISOUR */
+
+int vars::mkvars() noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	}
+    	return rs ;
+}
+/* end method (vars::mkvars) */
 
 

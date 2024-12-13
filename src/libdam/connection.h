@@ -41,7 +41,7 @@ struct connection_flags {
 
 struct connection_head {
 	cchar		*inetdomain ;	/* local domain name */
-	cchar		*peername ;	/* dynamically allocated */
+	cchar		*name ;		/* dynamically allocated */
 	cchar		*pr ;		/* dynamically allocated */
 	sockaddress	*sap ;
 	INADDR		netipaddr ;
@@ -76,18 +76,19 @@ struct connection : connection_head {
 	connection(const connection &) = delete ;
 	connection &operator = (const connection &) = delete ;
 	int start(cchar *) noex ;
-	void dtor() noex {
+	int socklocname(char *,int,int) noex ;
+	int sockremname(char *,int,int) noex ;
+	int peername(sockaddress *,int,char *,int) noex ;
+	int mknames(vecstr *) noex ;
+	void dtor() noex ;
 	~connection() {
 	    dtor() ;
 	} ;
 } ; /* end struct (connection) */
 #else	/* __cplusplus */
-typedef CONNECTION		connection ;
+typedef CONNECTION	connection ;
 #endif /* __cplusplus */
 
-typedef	CONNECTION_FL	connection_fl ;
-
-typedef	CONNECTION	connection ;
 typedef	CONNECTION_FL	connection_fl ;
 
 EXTERNC_begin
