@@ -52,6 +52,8 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
@@ -380,7 +382,7 @@ static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 static int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = ccharpp(pp) ;
-	 *cpp = nullptr ;
+	*cpp = nullptr ;
 	if (bp) {
 	    rs = ibp->buf(bp,bl,cpp) ;
 	}

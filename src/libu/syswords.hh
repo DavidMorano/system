@@ -65,6 +65,7 @@ struct syswords {
 	static const char w_digtab[] ;
 	static const char w_blanks[] ;
 	static const char w_defprovider[] ;
+	static const char w_localhost[] ;
 } ; /* end struct (syswords) */
 
 

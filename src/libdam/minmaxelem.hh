@@ -1,4 +1,5 @@
 /* minmaxelem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* calculate the minimum and maximum at the same time */
@@ -20,8 +21,12 @@
 
 /*******************************************************************************
 
-	We find both the minimum and the maximum element in a range of a
-	container.
+  	Name:
+	minmaxelem
+
+	Description:
+	We find both the minimum and the maximum element in a range
+	of a container.
 
 *******************************************************************************/
 
@@ -30,10 +35,10 @@
 #ifdef	__cplusplus
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<climits>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<new>
 #include	<utility>
@@ -41,7 +46,6 @@
 #include	<algorithm>
 #include	<vector>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 template<typename I,typename T>
