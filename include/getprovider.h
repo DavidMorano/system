@@ -26,13 +26,13 @@ enum providerids {
     providerid_overlast
 } ;
 
-#define	PROVIDERID_UNKNOWN	providerif_unknown
-#define	PROVIDERID_SUN		providerif_sun
-#define	PROVIDERID_COMPAQ	providerif_compaq
-#define	PROVIDERID_SGI		providerif_sgi
-#define	PROVIDERID_DELL		providerif_dell
-#define	PROVIDERID_HP		providerif_hp
-#define	PROVIDERID_OVERLAST	providerif_overlast
+#define	PROVIDERID_UNKNOWN	providerid_unknown
+#define	PROVIDERID_SUN		providerid_sun
+#define	PROVIDERID_COMPAQ	providerid_compaq
+#define	PROVIDERID_SGI		providerid_sgi
+#define	PROVIDERID_DELL		providerid_dell
+#define	PROVIDERID_HP		providerid_hp
+#define	PROVIDERID_OVERLAST	providerid_overlast
 
 
 EXTERNC_begin
@@ -42,6 +42,21 @@ extern int getprovider(char *,int) noex ;
 extern int getvendor(char *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+namespace libdam {
+    struct provider {
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (provider) */
+}
+
+extern libdam::provider		providerid ;
+
+#endif /* __cplusplus */
 
 
 #endif /* GETPROVIDERID_INCLUDE */

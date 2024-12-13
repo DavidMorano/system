@@ -108,6 +108,7 @@ struct varnames {
 	static const char nisdomain[] ;
 	static const char systat[] ;
 	static const char netload[] ;
+	static const char provider[] ;
 } ; /* end struct (varnames) */
 
 

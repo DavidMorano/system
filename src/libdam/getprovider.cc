@@ -22,10 +22,10 @@
 
 	Description:
 	This is a small hack to get a number associated with a
-	manufacturing provider.  Prividers are identified (from
-	getting this information from the kernel) by a string.  This
-	subroutine looks this string up and returns the corresponding
-	number.
+	manufacturing provider.  Prividers are identified by a
+	c-string (itself provided by the kernel).  This subroutine
+	looks this string up in a database (of providers) and 
+	returns the corresponding Provider-ID number.
 
 	Synopsis:
 	int getproviderid(char *sp,int sl) noex
@@ -45,7 +45,8 @@
 	getvendor
 
 	Description:
-	Get and return the machine provider string.
+	Retrieve and return the machine provider c-string (or
+	the "realname" of the provider when using |getvendor|).
 
 	Synopsis:
 	int getprovider(char *rbuf,int rlen) noex
@@ -59,17 +60,35 @@
 	>=0		number of characters returned
 	<0		error (system-return)
 
+
+	Variable:
+	providerid
+
+	Description:
+	This is a global variable that contains a numeric (type |int|)
+	value that is the Provider-ID of the current system.
+
+	Synopsis:
+	int providerid
+
+	Arguments:
+	*none*
+
+	Returns:
+	>=0		the Provider-ID of the current system
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<uvariables.hh>
+#include	<uvariables.hh>		/* |sysword(3u)| + |varname(3u)| */
 #include	<uinfo.h>
 #include	<mallocxx.h>
-#include	<estrings.h>
+#include	<estrings.h>		/* |sf{x}(3uc)| + |snwcpy(3uc)| */
 #include	<nleadstr.h>
 #include	<localmisc.h>
 
@@ -77,10 +96,6 @@
 
 
 /* local defines */
-
-#ifndef	VARPROVIDER
-#define	VARPROVIDER	"PROVIDER"
-#endif
 
 
 /* external subroutines */
@@ -92,7 +107,7 @@
 /* local structures */
 
 struct provider {
-	uint		providerid ;
+	uint		id ;
 	cchar		*codename ;
 	cchar		*realname ;
 } ;
@@ -103,7 +118,7 @@ namespace {
     struct trier {
 	char		*rbuf ;
 	int		rlen ;
-	trier(char *rp,int rl) noex : rbuf(rp), rlen(rl) { 
+	trier(char *rb,int rl) noex : rbuf(rb), rlen(rl) { 
 	    rbuf[0] = '\0' ;
 	} ; /* end ctor */
 	operator int () noex ;
@@ -136,6 +151,8 @@ constexpr trier_m	tries[] = {
 
 /* exported variables */
 
+libdam::provider		providerid ;
+
 
 /* exported subroutines */
 
@@ -143,19 +160,15 @@ int getproviderid(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	int		id = 0 ;
 	if (sp) {
-	    int		i ; /* used-afterwards */
-	    int		m ;
-	    int		f = false ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    for (i = 0 ; providers[i].codename != nullptr ; i += 1) {
+	    for (int m, i = 0 ; providers[i].codename ; i += 1) {
 	        cchar	*bs = providers[i].codename ;
 	        m = nleadstr(bs,sp,sl) ;
-	        f = ((m == sl) && (bs[m] == '\0')) ;
-	        if (f) break ;
+	        if ((m == sl) && (bs[m] == '\0')) {
+	            id = providers[i].id ;
+		    break ;
+		}
 	    } /* end for */
-	    if (f) {
-	        id = providers[i].providerid ;
-	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? id : rs ;
 }
@@ -181,9 +194,8 @@ int getvendor(char *rbuf,int rlen) noex {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-	        if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
-		    cint	plen = rs ;
-	            if ((rs = getprovider(pbuf,plen)) >= 0) {
+	        if (char *pbuf{} ; (rs = malloc_mn(&pbuf)) >= 0) {
+	            if ((rs = getprovider(pbuf,rs)) >= 0) {
 	                cint	pl = rs ;
 	                int	i ; /* used-afterwards */
 	                int	m ;
@@ -196,7 +208,11 @@ int getvendor(char *rbuf,int rlen) noex {
 	                    if (f) break ;
 	                } /* end for */
 	                if (f) {
-		            rs = sncpy1(rbuf,rlen,providers[i].realname) ;
+			    cchar *rn = providers[i].realname ;
+			    if (rn == nullptr) {
+			       rn = providers[i].codename ;
+			    }
+		            rs = sncpy(rbuf,rlen,rn) ;
 			    rl = rs ;
 	                }
 	            } /* end if (getprovider) */
@@ -213,7 +229,7 @@ int getvendor(char *rbuf,int rlen) noex {
 
 trier::operator int () noex {
     	int		rs = SR_OK ;
-	for (const auto &m : tries) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)() ;
 	    if (rs != 0) break ;
 	} /* end for */
@@ -222,13 +238,13 @@ trier::operator int () noex {
 /* end method (trier::operator) */
 
 int trier::tryenv() noex {
-	static cchar	*valp = getenv(VARPROVIDER) ;
+	static cchar	*valp = getenv(varname.provider) ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	if (valp) {
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) {
-	        rs = sncpy1w(rbuf,rlen,cp,cl) ;
+	        rs = snwcpy(rbuf,rlen,cp,cl) ;
 		rl = rs ;
 	    }
 	}
@@ -241,7 +257,7 @@ int trier::tryinfo() noex {
 	int		rl = 0 ;
 	if (uinfo_infoaux aux ; (rs = uinfo_aux(&aux)) >= 0) {
 	    if (aux.hwprovider) {
-		rs = sncpy1(rbuf,rlen,aux.hwprovider) ;
+		rs = sncpy(rbuf,rlen,aux.hwprovider) ;
 		rl = rs ;
 	    }
 	} /* end if (uinfo) */
@@ -250,8 +266,23 @@ int trier::tryinfo() noex {
 /* end method (trier::tryinfo) */
 
 int trier::trydef() noex {
-	return sncpy1(rbuf,rlen,sysword.w_defprovider) ;
+	return sncpy(rbuf,rlen,sysword.w_defprovider) ;
 }
 /* end method (trier::trydef) */
+
+namespace libdam {
+    provider::operator int () noex {
+	int		rs ;
+	int		id = 0 ;
+	if (char *pbuf{} ; (rs = malloc_mn(&pbuf)) >= 0) {
+	    if ((rs = getprovider(pbuf,rs)) >= 0) {
+		rs = getproviderid(pbuf,rs) ;
+		id = rs ;
+	    }
+	    rs = rsfree(rs,pbuf) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? id : rs ;
+    }
+}
 
 
