@@ -387,8 +387,8 @@ int sub_mknames::addresses(hostinfo *hip) noex {
 	int		n = 0 ;
 	if (char *nbuf{} ; (rs = malloc_hn(&nbuf)) >= 0) {
 	    cint		nlen = rs ;
-	    const uchar		*ap ;
 	    if (hostinfo_cur hc ; (rs = hostinfo_curbegin(hip,&hc)) >= 0) {
+	        const uchar	*ap{} ;
 	        while ((rs = hostinfo_curenumaddr(hip,&hc,&ap)) > 0) {
 		    cint	al = rs ;
 	            if (al != in4addrlen) continue ;
@@ -473,7 +473,7 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	        if ((rs = getho_addr(&he,hebuf,helen,af,ap,al)) >= 0) {
 	            hostent_cur		hc ;
 	            cchar		*sp = nullptr ;
-	            if (cnp->inetdomain != nullptr) {
+	            if (cnp->inetdomain) {
 	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
 			    auto	enumname = hostent_curenumname ;
 	                    while ((rs = enumname(&he,&hc,&sp)) > 0) {
@@ -482,9 +482,7 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	                    rs1 = hostent_curend(&he,&hc) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (hostent-cur) */
-	            } else {
-	                rs1 = SR_INVALID ;
-		    }
+		    } /* end if (non-null) */
 		    if (rs >= 0) {
 	               if (sp) {
 			   cint		sl = rmdot(sp) ; /* last 'dot' */
