@@ -43,6 +43,7 @@
 #include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
@@ -68,13 +69,8 @@
 
 #define	CALMGR_DBSUF	"calendar"
 #define	CALMGR_MAXLINES	40		/* maximum lines per entry */
-#define	CALMGR_DMODE	0777
 
 #define	IDXDNAME	".calyears"
-
-#ifndef	TMPVARDNAME
-#define	TMPVARDNAME	"/var/tmp"
-#endif
 
 #define	CEBUFLEN	((CALMGR_MAXLINES*COLUMNS) + (3*szof(int)))
 
@@ -103,6 +99,13 @@ struct calmgr_idx {
 	int		year ;
 	uint		f_open:1 ;
 } ;
+
+namespace {
+    struct vars {
+	int		maxpathlen ;
+	int mkvars() noex ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -152,6 +155,7 @@ static int	calmgr_dbloadbegin(calmgr *,time_t) noex ;
 static int	calmgr_dbloadend(calmgr *) noex ;
 static int	calmgr_dbmapcreate(calmgr *,time_t) noex ;
 static int	calmgr_dbmapdestroy(calmgr *) noex ;
+static int	calmgr_dbmaper(calmgr *,cc *,time_t) noex ;
 static int	calmgr_idxdir(calmgr *) noex ;
 
 static int	calmgr_lookyear(calmgr *,calmgr_q *,cyi **) noex ;
@@ -186,6 +190,8 @@ static bool	isempty(cchar *,int) noex ;
 
 /* local variables */
 
+static vars		var ;
+
 
 /* exported variables */
 
@@ -196,24 +202,27 @@ int calmgr_start(calmgr *op,calyears *cyp,int cidx,cchar *dn,cchar *cn) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = calmgr_ctor(op,cyp,dn,cn)) >= 0) {
-	    op->cyp = cyp ; /* parent object */
-	    op->cidx = cidx ; /* parent index */
-	    if ((rs = calmgr_argbegin(op,dn,cn)) >= 0) {
-	        if ((rs = calmgr_dbloadbegin(op,dt)) >= 0) {
-	            if ((rs = calmgr_idxdir(op)) >= 0) {
-	                cint	vo = VECHAND_OSTATIONARY ;
-	                if ((rs = vechand_start(op->idxp,1,vo)) >= 0) {
-	                    op->f.idxes = true ;
-	                }
-	            } /* end if (calmgr_idxdir) */
+	    static cint		rsv = var.mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	        op->cyp = cyp ; /* parent object */
+	        op->cidx = cidx ; /* parent index */
+	        if ((rs = calmgr_argbegin(op,dn,cn)) >= 0) {
+	            if ((rs = calmgr_dbloadbegin(op,dt)) >= 0) {
+	                if ((rs = calmgr_idxdir(op)) >= 0) {
+	                    cint	vo = VECHAND_OSTATIONARY ;
+	                    if ((rs = vechand_start(op->idxp,1,vo)) >= 0) {
+	                        op->f.idxes = true ;
+	                    }
+	                } /* end if (calmgr_idxdir) */
+	                if (rs < 0) {
+	                    calmgr_dbloadend(op) ;
+		        }
+	            } /* end if (calmgr_dbloadbegin) */
 	            if (rs < 0) {
-	                calmgr_dbloadend(op) ;
-		    }
-	        } /* end if (calmgr_dbloadbegin) */
-	        if (rs < 0) {
-	            calmgr_argend(op) ;
-	        }
-	    } /* end if (calmgr_argbegin) */
+	                calmgr_argend(op) ;
+	            }
+	        } /* end if (calmgr_argbegin) */
+	    } /* end if (vars::mkvars) */
 	    if (rs < 0) {
 		calmgr_dtor(op) ;
 	    }
@@ -389,58 +398,71 @@ static int calmgr_dbloadend(calmgr *op) noex {
 /* end subroutine (calmgr_dbloadend) */
 
 static int calmgr_dbmapcreate(calmgr *op,time_t dt) noex {
-	cint		nlen = MAXNAMELEN ;
+    	cint		maxpath = var.maxpathlen ;
+	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	int		rs ;
-	int		rs1 ;
-	cchar		*suf = CALMGR_DBSUF ;
-	char		nbuf[MAXNAMELEN + 1] ;
-
-	if ((rs = snsds(nbuf,nlen,op->cn,suf)) >= 0) {
-	    char	dbfname[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(dbfname,op->dn,nbuf)) >= 0) {
-	        if ((rs = u_open(dbfname,O_RDONLY,0666)) >= 0) {
-	            cint	fd = rs ;
-	            if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-	                if (S_ISREG(sb.st_mode)) {
-			    csize	im = size_t(INT_MAX) ;
-	                    op->fsize = size_t(sb.st_size) ;
-	                    op->ti_db = sb.st_mtime ;
-	                    if (op->fsize <= im) {
-	                        csize	ms = op->fsize ;
-	                        cint	mp = PROT_READ ;
-	                        cint	mf = MAP_SHARED ;
-	                        void	*n = nullptr ;
-	                        void	*md{} ;
-	                        if ((rs = u_mmap(n,ms,mp,mf,fd,0L,&md)) >= 0) {
-	                            if (dt == 0) dt = getustime ;
-	                            op->mapdata = charp(md) ;
-	                            op->mapsize = op->fsize ;
-	                            op->ti_map = dt ;
-	                            op->ti_lastcheck = dt ;
-	                        } /* end if (u_mmap) */
-	                    } else {
-	                        rs = SR_TOOBIG ;
-			    }
-	                } else {
-	                    rs = SR_NOTSUP ;
-			}
-	            } /* end if (stat) */
-	            rs1 = u_close(fd) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (file) */
-	    } /* end if (mkpath) */
-	} /* end if (snsds) */
-
+	int		ai = 0 ;
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    cint	nlen = maxpath ;
+	    cchar	*suf = CALMGR_DBSUF ;
+	    char	*nbuf = (a + ((maxpath + 1) * ai++)) ;
+	    if ((rs = snsds(nbuf,nlen,op->cn,suf)) >= 0) {
+	        char	*dbuf = (a + ((maxpath + 1) * ai++)) ;
+	        if ((rs = mkpath2(dbuf,op->dn,nbuf)) >= 0) {
+		    rs = calmgr_dbmaper(op,dbuf,dt) ;
+	        } /* end if (mkpath) */
+	    } /* end if (snsds) */
+	    rs = rsfree(rs,a) ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (calmgr_dbmapcreate) */
+
+static int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
+	cnullptr	np{} ;
+	cint		of = O_RDONLY ;
+	int		rs ;
+	int		rs1 ;
+	cmode		om = 0666 ;
+        if ((rs = u_open(dbuf,of,om)) >= 0) {
+            cint        fd = rs ;
+            if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+                if (S_ISREG(sb.st_mode)) {
+                    csize       szm = size_t(INT_MAX) ;
+                    op->fsize = size_t(sb.st_size) ;
+                    op->ti_db = sb.st_mtime ;
+                    if (op->fsize <= szm) {
+                        csize   ms = op->fsize ;
+                        cint    mp = PROT_READ ;
+                        cint    mf = MAP_SHARED ;
+                        void    *md{} ;
+                        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+                            if (dt == 0) dt = getustime ;
+                            op->mapdata = charp(md) ;
+                            op->mapsize = op->fsize ;
+                            op->ti_map = dt ;
+                            op->ti_lastcheck = dt ;
+                        } /* end if (u_mmapbegin) */
+                    } else {
+                        rs = SR_TOOBIG ;
+                    }
+                } else {
+                    rs = SR_NOTSUP ;
+                }
+            } /* end if (stat) */
+            rs1 = u_close(fd) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (file) */
+	return rs ;
+}
+/* end subroutine (calmgr_dbmaper) */
 
 static int calmgr_dbmapdestroy(calmgr *op) noex {
 	int		rs = SR_OK ;
 	if (op->mapdata) {
 	    csize	ms = op->mapsize ;
 	    void	*md = voidp(op->mapdata) ;
-	    rs = u_munmap(md,ms) ;
+	    rs = u_mmapend(md,ms) ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
 	}
@@ -450,13 +472,15 @@ static int calmgr_dbmapdestroy(calmgr *op) noex {
 
 static int calmgr_idxdir(calmgr *op) noex {
 	int		rs ;
-	cchar		*idc = IDXDNAME ;
-	char		idxdname[MAXPATHLEN+1] ;
-	if ((rs = mkpath2(idxdname,op->dn,idc)) >= 0) {
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(idxdname,rs,&cp)) >= 0) {
-	        op->idxdname = cp ;
+	if (char *ibuf{} ; (rs = malloc_mp(&ibuf)) >= 0) {
+	    cchar	*idc = IDXDNAME ;
+	    if ((rs = mkpath(ibuf,op->dn,idc)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(ibuf,rs,&cp)) >= 0) {
+	            op->idxdname = cp ;
+	        }
 	    }
-	}
+	    rs = rsfree(rs,ibuf) ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (calmgr_idxdir) */
@@ -794,8 +818,7 @@ static int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	dm &= S_IAMB ;
 	if ((rs = mkdirs(dname,dm)) >= 0) {
-	    struct ustat	sb ;
-	    if ((rs = u_stat(dname,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	        if (((sb.st_mode & dm) != dm)) {
 	            rs = uc_minmod(dname,dm) ;
 	        }
@@ -810,9 +833,9 @@ static int calmgr_mapdata(calmgr *op,cchar **rpp) noex {
 	int		rs ;
 	if (op->mapdata != nullptr) {
 	    if (rpp) {
-	       	*rpp = (cchar *) op->mapdata ;
+	       	*rpp = charp(op->mapdata) ;
 	    }
-	    rs = (int) op->mapsize ;
+	    rs = int(op->mapsize) ;
 	} else {
 	    rs = SR_INVALID ;
 	}
@@ -829,16 +852,16 @@ static int calmgr_idxends(calmgr *op) noex {
 	    calmgr_idx	*cip = (calmgr_idx *) vp ;
 	    if (vp) {
 		{
-	        rs1 = vechand_del(ilp,i--) ; /* really optional! */
-	        if (rs >= 0) rs = rs1 ;
+	            rs1 = vechand_del(ilp,i--) ; /* really optional! */
+	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	        rs1 = calmgr_idxend(op,cip) ;
-	        if (rs >= 0) rs = rs1 ;
+	            rs1 = calmgr_idxend(op,cip) ;
+	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	        rs1 = uc_free(cip) ;
-	        if (rs >= 0) rs = rs1 ;
+	            rs1 = uc_free(cip) ;
+	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
 	} /* end for */
@@ -907,6 +930,15 @@ static int mkbve_finish(CYIMK_ENT *bvep) noex {
 	return rs ;
 }
 /* end subroutine (mkbve_finish) */
+
+int vars::mkvars() noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	}
+    	return rs ;
+}
+/* end method (vars::mkvars) */
 
 static bool isempty(cchar *lp,int ll) noex {
 	int		f = false ;
