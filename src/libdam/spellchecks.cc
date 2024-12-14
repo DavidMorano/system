@@ -1728,16 +1728,11 @@ int		year ;
 int		f_search ;
 {
 	CYI_INFO	binfo ;
-	int		rs = SR_OK ;
+	int		rs ;
 
-
-	rs = cyi_open(&calp->vind,dname,calp->calname,f_search) ;
-
-	if (rs >= 0) {
-	    rs = cyi_info(&calp->vind,&binfo) ;
-
-	    if (rs >= 0) {
-		int	f = false ;
+	if ((rs = cyi_open(&calp->vind,dname,calp->calname,f_search)) >= 0) {
+	    if ((rs = cyi_getinfo(&calp->vind,&binfo)) >= 0) {
+		bool 	f = false ;
 		f = f || (binfo.ctime < calp->ti_db) ;
 		f = f || (binfo.mtime < calp->ti_db) ;
 		f = f || (binfo.year < year) ;

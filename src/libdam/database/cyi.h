@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* Calendar-Year-Index DB (read or audit a CYI database) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -69,12 +72,12 @@ struct cyi_cursor {
 } ;
 
 struct cyi_fmier {
-	void		*mapdata ;	/* file map */
+	void		*mapdata ;	/* file map data pointer */
 	uint		(*vt)[5] ;	/* mapped entries table */
 	uint		(*lt)[2] ;	/* mapped lines table */
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
-	size_t		mapsize ;
+	size_t		mapsize ;	/* file map data length */
 } ;
 
 struct cyi_head {

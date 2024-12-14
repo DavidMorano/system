@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* read or audit a CYI database */
+/* Calendar-Year-Index DB (read or audit a CYI database) */
 /* version %I% last-modified %G% */
 
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */

@@ -886,8 +886,8 @@ QUOTE_QUERY	*qvp ;
 	int	cidx ;
 	int	n, i ;
 	int	c = 0 ;
-	int	f_ent = FALSE ;
-	int	f_already = FALSE ;
+	int	f_ent = false ;
+	int	f_already = false ;
 
 	char	cebuf[CEBUFLEN + 1] ;
 
@@ -945,7 +945,7 @@ QUOTE_QUERY	*qvp ;
 			    if (! f_ent) {
 	        		rs = entry_start(&e,qvp,loff,llen) ;
 				if (rs >= 0) {
-				    f_ent = TRUE ;
+				    f_ent = true ;
 				    entry_sethash(&e,ce.hash) ;
 				    rs = entry_setidx(&e,cidx) ;
 				}
@@ -962,7 +962,7 @@ QUOTE_QUERY	*qvp ;
 			    f_already = (rs > 0) ;
 #endif
 
-			    f_ent = FALSE ;
+			    f_ent = false ;
 			    if ((rs >= 0) && (! f_already))
 		                rs = vecobj_add(rlp,&e) ;
 		            if ((rs < 0) || f_already)
@@ -974,7 +974,7 @@ QUOTE_QUERY	*qvp ;
 	        } /* end while */
 
 		if (f_ent) {
-			f_ent = FALSE ;
+			f_ent = false ;
 			entry_finish(&e) ;
 	 	}
 
@@ -1002,7 +1002,7 @@ QUOTE_ENT	*ep ;
 {
 	QUOTE_ENT	*oep ;
 	int	rs = SR_OK ;
-	int	f = FALSE ;
+	int	f = false ;
 
 	for (int i = 0 ; vecobj_get(rlp,i,&oep) >= 0 ; i += 1) {
 	    if (oep == NULL) continue ;
@@ -1238,7 +1238,7 @@ cchar	calname[] ;
 	int	rs1 ;
 	int	cidx ;
 	int	size = sizeof(QUOTE_CAL) ;
-	int	f = FALSE ;
+	int	f = false ;
 
 	cchar	*suf = QUOTE_DBSUF ;
 
@@ -1287,7 +1287,7 @@ cchar	calname[] ;
 	if (rs < 0)
 	    goto bad2 ;
 
-	f = TRUE ;
+	f = true ;
 
 ret0:
 	return (rs >= 0) ? f : rs ;
@@ -1338,7 +1338,7 @@ time_t		daytime ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	f = FALSE ;
+	int	f = false ;
 
 
 	if (op->ncursors > 0)
@@ -1357,7 +1357,7 @@ time_t		daytime ;
 
 	if ((sb.st_mtime > op->ti_db) || (sb.st_mtime > op->ti_map)) {
 
-	    f = TRUE ;
+	    f = true ;
 	    quote_dbloadfree(op) ;
 
 	    rs = subinfo_start(&si,op,op->daytime,NULL) ;
@@ -1427,8 +1427,8 @@ cchar	dirname[] ;
 
 	int	rs = SR_NOENT ;
 	int	dbl ;
-	int	f_remake = FALSE ;
-	int	f_textlook = FALSE ;
+	int	f_remake = false ;
+	int	f_textlook = false ;
 
 	cchar	*basedname ;
 	cchar	*dbdir = QDIR_DBDIR ;
@@ -1468,7 +1468,7 @@ cchar	dirname[] ;
 	rs1 = textlook_open(&qdirp->looker,op->pr,dbname,basedname) ;
 	f_textlook = (rs1 >= 0) ;
 	if (rs1 == SR_NOENT) {
-	    f_remake = TRUE ;
+	    f_remake = true ;
 	} else
 	    rs = rs1 ;
 
@@ -1492,7 +1492,7 @@ cchar	dirname[] ;
 
 	if (f_remake) {
 	    if (f_textlook) {
-		f_textlook = FALSE ;
+		f_textlook = false ;
 	        textlook_close(&qdirp->looker) ;
 	    }
 	    rs = qdir_remake(qdirp,sip,dbname,basedname) ;
@@ -1516,7 +1516,7 @@ ret0:
 /* bad stuff */
 bad2:
 	if (f_textlook) {
-		f_textlook = FALSE ;
+		f_textlook = false ;
 	        textlook_close(&qdirp->looker) ;
 	}
 
@@ -1569,7 +1569,7 @@ cchar	dbdname[] ;
 	    dmode |= 0755 ;
 	    rs = u_mkdir(dbdname,dmode) ;
 	    if (rs >= 0) {
-		qdirp->f.writedbdir = TRUE :
+		qdirp->f.writedbdir = true :
 		rs = uc_minmod(dbdname,dmode) ;
 	    }
 	}
@@ -1603,8 +1603,8 @@ time_t		mtime ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	f_dbdir = FALSE ;
-	int	f_newer = FALSE ;
+	int	f_dbdir = false ;
+	int	f_newer = false ;
 
 	cchar	*dbdir = QDIR_DBDIR ;
 	cchar	*denp ;
@@ -1622,7 +1622,7 @@ time_t		mtime ;
 	        denp = de.name ;
 	        if (! f_dbdir) {
 	            if (strcmp(denp,dbdir) == 0) 
-		        f_dbdir = TRUE ;
+		        f_dbdir = true ;
 	        }
 
 	        if (denp[0] == '.') continue ;
@@ -1632,7 +1632,7 @@ time_t		mtime ;
 	            rs1 = u_stat(fname,&sb) ;
 		    if ((rs1 >= 0) && (! S_ISDIR(sb.st_mode))) {
 		         if (sb.st_mtime > mtime) {
-			    f_newer = TRUE ;
+			    f_newer = true ;
 			    break ;
 		         }
 		    }
@@ -1889,7 +1889,7 @@ struct subinfo	*sip ;
 #endif
 
 	{
-	    int	f = FALSE ;
+	    int	f = false ;
 
 	    f = f || (rs == SR_ACCESS) ;
 	    f = f || (rs == SR_STALE) ;
@@ -1923,7 +1923,7 @@ struct subinfo	*sip ;
 {
 	int	rs ;
 	int	year = sip->year ;
-	int	f_search = FALSE ;
+	int	f_search = false ;
 	int	f ;
 
 	cchar	*idxdname = IDXDNAME ;
@@ -1941,7 +1941,7 @@ try:
 	if (rs == SR_NOTDIR)
 	    rs = cal_mkdirs(calp,idname,QUOTE_DMODE) ;
 
-	f = FALSE ;
+	f = false ;
 	f = f || (rs == SR_NOENT) ;
 	f = f || (rs == SR_STALE) ;
 	f = f || (rs == SR_NOCSI) ; /* zero sized file */
@@ -1965,7 +1965,7 @@ struct subinfo	*sip ;
 
 	int	rs ;
 	int	year = sip->year ;
-	int	f_search = TRUE ;
+	int	f_search = true ;
 	int	f ;
 
 	cchar	*idxdname = IDXDNAME ;
@@ -2011,7 +2011,7 @@ try:
 
 	}
 
-	f = FALSE ;
+	f = false ;
 	f = f || (rs == SR_NOENT) ;
 	f = f || (rs == SR_STALE) ;
 	f = f || (rs == SR_NOCSI) ; /* zero sized file */
@@ -2074,17 +2074,10 @@ int		year ;
 int		f_search ;
 {
 	TEXTLOOK_INFO	binfo ;
-
-	int	rs = SR_OK ;
-	int	f ;
-
-
-	rs = cyi_open(&calp->vind,dname,calp->calname,f_search) ;
-
-	if (rs >= 0) {
-	    rs = cyi_info(&calp->vind,&binfo) ;
-	    if (rs >= 0) {
-		f = FALSE ;
+	int	rs ;
+	if ((rs = cyi_open(&calp->vind,dname,calp->calname,f_search)) >= 0) {
+	    if ((rs = cyi_info(&calp->vind,&binfo)) >= 0) {
+		bool	f = false ;
 		f = f || (binfo.ctime < calp->ti_db) ;
 		f = f || (binfo.year < year) ;
 		if (f) {
@@ -2206,7 +2199,7 @@ int		f_tmp ;
 	int	year ;
 	int	to ;
 	int	c = 0 ;
-	int	f_ent = FALSE ;
+	int	f_ent = false ;
 	int	f ;
 
 	cchar	*cn ;
@@ -2281,14 +2274,14 @@ mkgo:
 	                    rs = cyimk_add(&cyind,&bve) ;
 			    mkbve_finish(&bve) ;
 		        }
-			f_ent = FALSE ;
+			f_ent = false ;
 			entry_finish(&e) ;
 	            }
 
 	            if (rs >= 0) {
 	                rs = entry_start(&e,&q,(fileoff + si),(ll - si)) ;
 			if (rs >= 0) {
-	                    f_ent = TRUE ;
+	                    f_ent = true ;
 			    rs = entry_setidx(&e,cidx) ;
 			}
 		    }
@@ -2300,7 +2293,7 @@ mkgo:
 
 		} else { /* bad */
 
-		    f = FALSE ;
+		    f = false ;
 		    f = f || (rs1 == SR_NOENT) || (rs == SR_NOTFOUND) ;
 		    f = f || (rs1 == SR_ILSEQ) ;
 		    f = f || (rs1 == SR_INVALID) ;
@@ -2312,7 +2305,7 @@ mkgo:
 	                    rs = cyimk_add(&cyind,&bve) ;
 			    mkbve_finish(&bve) ;
 		        }
-			f_ent = FALSE ;
+			f_ent = false ;
 			entry_finish(&e) ;
 	            }
 
@@ -2327,7 +2320,7 @@ mkgo:
 	                rs = cyimk_add(&cyind,&bve) ;
 		        mkbve_finish(&bve) ;
 		    }
-	            f_ent = FALSE ;
+	            f_ent = false ;
 	  	    entry_finish(&e) ;
 	        }
 #else
@@ -2351,12 +2344,12 @@ mkgo:
 	        rs = cyimk_add(&cyind,&bve) ;
 		mkbve_finish(&bve) ;
 	    }
-	    f_ent = FALSE ;
+	    f_ent = false ;
 	    entry_finish(&e) ;
 	}
 
 	if (f_ent) {
-	    f_ent = FALSE ;
+	    f_ent = false ;
 	    entry_finish(&e) ;
 	}
 
@@ -2402,7 +2395,7 @@ QUOTE_CAL	*calp ;
 
 
 	if (calp->f.vind) {
-	    calp->f.vind = FALSE ;
+	    calp->f.vind = false ;
 	    rs = cyi_close(&calp->vind) ;
 	}
 
@@ -2598,7 +2591,7 @@ struct subinfo	*sip ;
 ret1:
 	if (rs < 0) {
 	    if (sip->f.defdirs) {
-		sip->f.defdirs = FALSE ;
+		sip->f.defdirs = false ;
 		vecstr_finish(&sip->defdirs) ;
 	    }
 	}
@@ -2617,7 +2610,7 @@ char		tmpdname[] ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
-	int	f = FALSE ;
+	int	f = false ;
 
 
 	rs1 = u_stat(tmpdname,&sb) ;
@@ -2637,7 +2630,7 @@ struct subinfo	*sip ;
 
 
 	if (! sip->f.id) {
-	    sip->f.id = TRUE ;
+	    sip->f.id = true ;
 	    rs = ids_load(&sip->id) ;
 	}
 
@@ -2653,19 +2646,19 @@ struct subinfo	*sip ;
 	int		rs1 ;
 
 	if (sip->f.hols) {
-	    sip->f.hols = FALSE ;
+	    sip->f.hols = false ;
 	    rs1 = holidays_close(&sip->hols) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (sip->f.dom) {
-	    sip->f.dom = FALSE ;
+	    sip->f.dom = false ;
 	    rs1 = dayofmonth_finish(&sip->dom) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (sip->f.defdirs) {
-	    sip->f.defdirs = FALSE ;
+	    sip->f.defdirs = false ;
 	    rs1 = vecstr_finish(&sip->defdirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2685,7 +2678,7 @@ struct subinfo	*sip ;
 	if (sip->f.id) {
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->f.id = FALSE ;
+	    sip->f.id = false ;
 	}
 
 	return rs ;
@@ -2867,7 +2860,7 @@ int		ll ;
 
 		} else {
 
-		    f = FALSE ;
+		    f = false ;
 		    f = f || (rs1 == SR_INVALID) ;
 		    if (f)
 			rs1 = SR_ILSEQ ;
@@ -2973,9 +2966,9 @@ int		sl ;
 
 	int	rs = SR_OK ;
 	int	nl ;
-	int	f_negative = FALSE ;
-	int	f_inityear = FALSE ;
-	int	f_found = FALSE ;
+	int	f_negative = false ;
+	int	f_inityear = false ;
+	int	f_found = false ;
 	int	f ;
 
 	cchar	*tp ;
@@ -3018,8 +3011,8 @@ int		sl ;
 /* open the HOLIDAYS database if it is not already open */
 
 	if (! sip->init.hols) {
-	    sip->init.hols = TRUE ;
-	    f_inityear = TRUE ;
+	    sip->init.hols = true ;
+	    f_inityear = true ;
 	    rs = subinfo_year(sip) ;
 	    if (rs >= 0) {
 	        rs = holidays_open(holp,op->pr,sip->year,NULL) ;
@@ -3030,7 +3023,7 @@ int		sl ;
 		rs) ;
 #endif
 
-	 	f = FALSE ;
+	 	f = false ;
 		f = f || (rs == SR_BADFMT) ;
 		f = f || (rs == SR_NOMSG) ;
 		if (f)
@@ -3052,7 +3045,7 @@ int		sl ;
 	
 	    rs = holidays_fetchname(holp,sp,sl,&hcur,&hc,holbuf,HOLBUFLEN) ;
 	    if (rs >= 0) {
-		f_found = TRUE ;
+		f_found = true ;
 		qp->m = hc.m ;
 		qp->d = hc.d ;
 	    }
@@ -3396,7 +3389,7 @@ QUOTE	*op ;
 	} /* end for */
 
 	ep->hash = hash ;
-	ep->f.hash = TRUE ;
+	ep->f.hash = true ;
 
 ret0:
 	return rs ;
@@ -3411,7 +3404,7 @@ uint		hash ;
 
 
 	ep->hash = hash ;
-	ep->f.hash = TRUE ;
+	ep->f.hash = true ;
 	return SR_OK ;
 }
 /* end subroutine (entry_sethash) */
@@ -3426,7 +3419,7 @@ QUOTE_ENT	*oep ;
 
 	int	rs = SR_OK ;
 	int	c1l, c2l ;
-	int	f = FALSE ;
+	int	f = false ;
 
 	cchar	*c1p, *c2p ;
 
@@ -3449,7 +3442,7 @@ QUOTE_ENT	*oep ;
 		break ;
 
 	    if ((c1l == 0) && (c2l == 0)) {
-		f = TRUE ;
+		f = true ;
 		break ;
 	    }
 
@@ -3692,7 +3685,7 @@ cchar	*lp ;
 int		ll ;
 {
 	int	cl ;
-	int	f = FALSE ;
+	int	f = false ;
 
 	char	*cp ;
 

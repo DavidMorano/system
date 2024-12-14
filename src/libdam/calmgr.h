@@ -49,7 +49,7 @@ struct calmgr_head {
 	cchar 		*cn ;			/* DB calendar-name */
 	cchar		*a ;			/* memory-allocations */
 	cchar		*idxdname ;
-	void		*calyears ;
+	void		*cyp ;			/* CALYEARS object pointer */
 	cchar		*mapdata ;		/* DB memory-map address */
 	vechand		idxes ;			/* indices */
 	time_t		ti_db ;			/* DB file modification */
