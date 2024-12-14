@@ -57,7 +57,6 @@
 /* local defines */
 
 
-
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
@@ -160,8 +159,7 @@ int realname_esther::operator () (dstr *dsp) noex {
 }
 
 void realname::dtor() noex {
-	cint	rs = int(finish) ;
-	if (rs < 0) {
+	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("realname",rs,"fini-finish") ;
 	}
 }

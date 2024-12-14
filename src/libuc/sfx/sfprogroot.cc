@@ -55,11 +55,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strnxcmp.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -68,6 +72,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -85,15 +92,13 @@
 /* exported subroutines */
 
 int sfprogroot(cchar *pp,int pl,cchar **rpp) noex {
-	int		dl ;
 	int		sl = -1 ;
-	cchar		*dp ;
 	cchar		*sp = nullptr ;
-	if ((dl = sfdirname(pp,pl,&dp)) > 0) {
-	    int		f ;
-	    cchar	*bp ;
-	    int		bl ;
-	    bl = sfbasename(dp,dl,&bp) ;
+	cchar		*dp{} ;
+	if (int dl ; (dl = sfdirname(pp,pl,&dp)) > 0) {
+	    bool	f ;
+	    cchar	*bp{} ;
+	    int		bl = sfbasename(dp,dl,&bp) ;
 	    f = ((bl == 3) && (strncmp(bp,"bin",bl) == 0)) ;
 	    if (! f) {
 	        f = ((bl == 4) && (strncmp(bp,"sbin",bl) == 0)) ;

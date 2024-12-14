@@ -76,7 +76,7 @@ struct storeitem : storeitem_head {
 	int ptab(int,void ***) noex ;
 	int block(int,int,void **) noex ;
 	void dtor() noex ;
-	~storeitem() noex {
+	~storeitem() {
 	    dtor() ;
 	} ;
 } ; /* end struct (storeitem) */

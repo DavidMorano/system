@@ -58,6 +58,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -65,6 +68,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -75,10 +81,9 @@ int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	if (rbuf && dn && nn) {
 	    rs = SR_INVALID ;
 	    if (dn[0] && nn[0] && (pid >= 0)) {
-	        sbuf	mb ;
-	        if ((rs = mb.start(rbuf,rlen)) >= 0) {
+	        if (sbuf mb ; (rs = mb.start(rbuf,rlen)) >= 0) {
 		    {
-	                const time_t	dt = time(NULL) ;
+	                custime		dt = getustime ;
 	                uint		uv = (uint) pid ;
 	                mb.strw(nn) ;
 	                mb.dec(uv) ;

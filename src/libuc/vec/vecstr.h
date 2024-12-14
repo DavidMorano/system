@@ -189,7 +189,7 @@ struct vecstr : vecstr_head {
 	    return it ;
 	} ;
 	void dtor() noex ;
-	~vecstr() noex {
+	~vecstr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (vecstr) */

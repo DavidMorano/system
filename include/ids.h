@@ -72,8 +72,9 @@ struct ids : ids_head {
 	ids(const ids &) = delete ;
 	ids &operator = (const ids &) = delete ;
 	int copy(const ids *) noex ;
-	~ids() noex {
-	    (void) int(release) ;
+	void dtor() noex ;
+	~ids() {
+	    dtor() ;
 	} ;
 } ; /* end struct (ids) */
 #else	/* __cplusplus */

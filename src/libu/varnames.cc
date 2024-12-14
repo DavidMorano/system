@@ -104,5 +104,6 @@ const char varnames::ncpu[] =		"NCPU" ;
 const char varnames::nisdomain[] =	"NISDOMAIN" ;
 const char varnames::systat[] =		"SYSTAT" ;
 const char varnames::netload[] =	"NETLOCAL" ;
+const char varnames::provider[] =	"PROVIDER" ;
 
 

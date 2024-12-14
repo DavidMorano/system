@@ -1,4 +1,5 @@
 /* filemap HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* read-file funtion through file-mapping */
@@ -93,7 +94,7 @@ struct filemap : filemap_head {
 	int getln(cchar **) noex ;
 	int seek(off_t,int = 0) noex ;
 	void dtor() noex ;
-	~filemap() noex {
+	~filemap() {
 	    dtor() ;
 	} ;
 } ; /* end struct (filemap) */

@@ -81,7 +81,7 @@ struct ptm : pthread_mutex_t {
 	ptm(const ptm &) = delete ;
 	ptm &operator = (const ptm &) = delete ;
 	void dtor() noex ;
-	~ptm() noex {
+	~ptm() {
 	    dtor() ;
 	} ; /* end dtor (ptm) */
 } ; /* end class (ptm) */

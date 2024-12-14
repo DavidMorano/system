@@ -166,7 +166,7 @@ struct tmpx : tmpx_head {
 	int getuserlines(vecstr *,cchar *) noex ;
 	int getuserterms(vecstr *,cchar *) noex ;
 	void dtor() noex ;
-	~tmpx() noex {
+	~tmpx() {
 	    dtor() ;
 	} ;
 } ; /* end struct (tmpx) */

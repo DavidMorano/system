@@ -1,4 +1,5 @@
 /* mapblock HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
@@ -186,7 +187,7 @@ public:
 	    finish(this,mapblockmem_finish) ;
 	    count(this,mapblockmem_count) ;
 	} ; /* end ctor) */
-	~mapblock() noex {
+	~mapblock() {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;
@@ -225,7 +226,6 @@ int mapblock<K,B>::ifinish() noex {
 	}
 	return rs ;
 }
-
 
 template<typename K,typename B>
 int mapblock<K,B>::ins(K k,const B &v) noex {

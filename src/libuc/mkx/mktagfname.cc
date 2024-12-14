@@ -66,6 +66,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mktagfname(char *rbuf,cchar *basedname,cchar *sp,int sl) noex {

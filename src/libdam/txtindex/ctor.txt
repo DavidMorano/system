@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int dialtab_ctor(dialtab *op,Args ... args) noex {
+static int cyi_ctor(cyi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int dialtab_ctor(dialtab *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dialtab_ctor) */
+/* end subroutine (cyi_ctor) */
 
-static int dialtab_dtor(dialtab *op) noex {
+static int cyi_dtor(cyi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dialtab_dtor) */
+/* end subroutine (cyi_dtor) */
 
 template<typename ... Args>
-static inline int dialtab_magic(dialtab *op,Args ... args) noex {
+static inline int cyi_magic(cyi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CYI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (dialtab_magic) */
+/* end subroutine (cyi_magic) */

@@ -63,13 +63,13 @@ OBJ04_MKX= mkdisplayable.o
 OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
 OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
 OBJ07_MKX= mkgecosname.o
-OBJ08_MKX= mkintfname.o mklogid.o mkmagic.o
+OBJ08_MKX= mkintfname.o mkmagic.o
 OBJ09_MKX= mkmaildirtest.o mkmailname.o mkmid.o
 OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
 OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
-OBJ12_MKX= mkplogid.o mkquoted.o
+OBJ12_MKX= mkquoted.o
 OBJ13_MKX= mkrealname.o mkrevstr.o
-OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o mksublogid.o
+OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o
 OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
@@ -214,9 +214,6 @@ obje_mkx.o:	$(OBJE_MKX)
 
 mkfdfname.o:		mkfdfname.cc $(INCS) mkfdfname.h
 mkgecosname.o:		mkgecosname.cc $(INCS) mkgecosname.h
-mklogid.o:		mklogid.cc $(INCS)
-mkplogid.o:		mkplogid.cc $(INCS)
-mksublogid.o:		mksublogid.cc $(INCS)
 mkmid.o:		mkmid.cc $(INCS)
 
 mkaddrname.o:		mkaddrname.cc  $(INCS)

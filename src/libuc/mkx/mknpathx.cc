@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2001-12-03, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This code was born out of frustration with cleaning up bad
 	legacy code, originally back around 1992 (of which there
 	is quite a bit -- like almost all of it).  I will refrain
@@ -16,7 +16,7 @@
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -60,6 +60,12 @@
 
 /* local strutures */
 
+namespace {
+    struct maxpather {
+	static int operator () (int) noex ;
+    } ; /* end struct (maxpather) */
+}
+
 
 /* forward references */
 
@@ -67,6 +73,7 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp,MKNPATH_MAXPATHLEN) ;
+static maxpather	getrlen ;
 
 
 /* exported variables */
@@ -99,19 +106,18 @@ int mknpath5(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 }
 /* end subroutine (mknpath5) */
 
+int mknpath6(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
+	return mknpathx(pp,pl,6,s1,s2,s3,s4,s5,s6) ;
+}
+/* end subroutine (mknpath5) */
+
 int mknpathx(char *pbuf,int plen,int n,...) noex {
 	int		rs = SR_FAULT ;
 	char		*bp = pbuf ;
 	if (pbuf) {
-	    int		ml = 0 ;
-	    rs = SR_OK ;
-	    if (plen < 0) {
-		rs = maxpathlen ;
-		plen = rs ;
-	    }
-	    if (rs >= 0) {
-	        va_list		ap ;
-	        int		rlen = (plen + 1) ;
+	    va_list	ap ;
+	    if ((rs = getrlen(plen)) >= 0) {
+	        int	rlen = (rs + 1) ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	            cc		*sp = (char *) va_arg(ap,char *) ;
@@ -127,7 +133,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 		        }
 	            } /* end if (needed a pathname separator) */
 		    if (rs >= 0) {
-	                if ((ml = strlcpy(bp,sp,rlen)) < rlen) {
+	                if (int ml ; (ml = strlcpy(bp,sp,rlen)) < rlen) {
 	        	    bp += ml ;
 	        	    rlen -= ml ;
 		        } else {
@@ -136,11 +142,23 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 		    } /* end if */
 	        } /* end for */
 	        va_end(ap) ;
-	    } /* end block */
+	    } /* end if (getrlen) */
 	    *bp = '\0' ; /* in case of overflow */
 	} /* end if (non-null) */
 	return (rs >= 0) ? (bp - pbuf) : rs ;
 }
 /* end subroutine (mknpathx) */
+
+
+/* local subroutines */
+
+int maxpather::operator () (int plen) noex {
+    	int		rs ;
+	if ((rs = plen) < 0) {
+	    rs = maxpathlen ;
+	}
+	return rs ;
+}
+/* end method (maxpather::operator) */
 
 

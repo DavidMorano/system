@@ -69,7 +69,7 @@ struct envhelp : envhelp_head {
 	int envset(cchar *,cchar *,int) noex ;
 	int getvec(mainv *) noex ;
 	void dtor() noex ;
-	~envhelp() noex {
+	~envhelp() {
 	    dtor() ;
 	} ;
 } ; /* end struct (envhelp) */

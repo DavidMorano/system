@@ -88,6 +88,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
@@ -118,9 +121,12 @@ namespace {
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
-static constexpr cchar	qchars[] = "\"\\$`" ;
+constexpr cchar		qchars[] = "\"\\$`" ;
 
 static char		qterms[termsize] ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -153,24 +159,22 @@ quoter::operator int () noex {
 /* end method (quoter::operator) */
 
 int quoter::mkq() noex {
-	sbuf		b ;
 	int		rs ;
 	int		len = 0 ;
 	int		al = alen ;
 	cchar		*ap = abuf ;
-	if ((rs = b.start(qbuf,qlen)) >= 0) {
-	    int		i ;
+	if (sbuf b ; (rs = b.start(qbuf,qlen)) >= 0) {
 	    if (f_white) {
 	        b.chr(CH_DQUOTE) ;
 	    }
-	    while ((i = siterm(ap,al,qterms)) >= 0) {
+	    for (int i ; (i = siterm(ap,al,qterms)) >= 0 ; ) {
 	        b.strw(ap,i) ;
 	        b.chr(CH_BSLASH) ;
 	        rs = b.chr(ap[i]) ;
 	        ap += (i+1) ;
 	        al -= (i+1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (al > 0)) {
 	        rs = b.strw(ap,al) ;
 	    }

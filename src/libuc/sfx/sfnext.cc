@@ -91,11 +91,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<char.h>
+#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -138,6 +141,7 @@ namespace {
    } ; /* end struct (sfnextx) */
 }
 
+
 /* forward references */
 
 
@@ -158,7 +162,7 @@ int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    int		sch ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx(int ch) noex override {
+	    bool termx(int ch) noex override final {
 		return (ch == sch) ;
 	    } ;
 	} ; /* end struct */
@@ -172,7 +176,7 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    cchar	*bstr ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx (int ch) noex override {
+	    bool termx (int ch) noex override final {
 		return (strchr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
@@ -205,6 +209,6 @@ sfnextx::operator int () noex {
 	} /* end if (non-null) */
 	return rl ;
 }
-/* end subroutine (sfnextx:operator) */
+/* end subroutine (sfnextx::operator) */
 
 

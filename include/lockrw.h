@@ -74,8 +74,9 @@ struct lockrw : lockrw_head {
 	} ;
 	lockrw(const lockrw &) = delete ;
 	lockrw &operator = (const lockrw &) = delete ;
-	~lockrw() noex {
-	    (void) int(destroy) ;
+	void dtor() noex ;
+	~lockrw() {
+	    dtor() ;
 	}
 } ; /* end struct (lockrw) */
 #else

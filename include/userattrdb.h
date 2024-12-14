@@ -83,7 +83,7 @@ struct userattrdb : userattrdb_head {
 	int open(cchar *) noex ;
 	int lookup(char *,int,cchar *) noex ;
 	void dtor() noex ;
-	~userattrdb() noex {
+	~userattrdb() {
 	    dtor() ;
 	} ;
 } ; /* end struct (userattrdb) */

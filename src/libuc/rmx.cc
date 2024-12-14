@@ -1,4 +1,5 @@
 /* rmx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* remove characters from the end of the given c-string */
@@ -48,10 +49,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strn.h>
 #include	<matstr.h>
 #include	<ischarx.h>
@@ -83,7 +87,7 @@
 
 /* local variables */
 
-static constexpr cpcchar	exts[] = {
+constexpr cpcchar	exts[] = {
 	"x",
 	"s5",
 	"s5u",

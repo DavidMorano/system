@@ -1,4 +1,5 @@
 /* inetaddrparse HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* this little thing parses an INET address into parts */

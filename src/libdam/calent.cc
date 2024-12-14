@@ -1,4 +1,5 @@
 /* calent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* calendar entry object (for CALYEARS) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	calent
+
+	Description:
 	We manage an individual calendar entry.  We do not actually
 	hold the entry (proper).  Rather we hold a reference to the
 	entry.
@@ -63,7 +68,6 @@
 int calent_start(calent *ep,calent_q *qp,uint loff,int llen) noex {
 	int		rs = SR_FAULT ;
 	if (ep && qp) {
-	    calent_ln	*elp ;
 	    cint	ne = CALENT_NLE ;
 	    int		sz ;
 	    memclear(ep) ;
@@ -71,8 +75,8 @@ int calent_start(calent *ep,calent_q *qp,uint loff,int llen) noex {
 	    ep->q = *qp ;
 	    ep->voff = loff ;
 	    ep->vlen = llen ;
-	    sz = ne * sizeof(calent_ln) ;
-	    if ((rs = uc_malloc(sz,&elp)) >= 0) {
+	    sz = ne * szof(calent_ln) ;
+	    if (calent_ln *elp ; (rs = uc_malloc(sz,&elp)) >= 0) {
 	        ep->lines = elp ;
 	        ep->e = ne ;
 	        ep->i += 1 ;
@@ -130,7 +134,7 @@ int calent_add(calent *ep,uint loff,int llen) noex {
 		    rs = SR_OK ;
 	            if (ep->i == ep->e) {
 	                cint	ne = (ep->e * 2) + CALENT_NLE ;
-	                sz = ne * sizeof(calent_ln) ;
+	                sz = ne * szof(calent_ln) ;
 	                if ((rs = uc_realloc(ep->lines,sz,&elp)) >= 0) {
 	                    ep->e = ne ;
 	                    ep->lines = elp ;
@@ -220,22 +224,21 @@ int calent_gethash(calent *ep,uint *rp) noex {
 /* end subroutine (calent_gethash) */
 
 int calent_loadbuf(calent *ep,char *rbuf,int rlen,cchar *mp) noex {
-	sbuf		b ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	    calent_ln	*lines = ep->lines ;
 	    int		nlines = ep->i ; /* number of line elements */
 	    int		ll ;
 	    cchar	*lp ;
 	    for (int i = 0 ; i < nlines ; i += 1) {
-	        if (i > 0) sbuf_chr(&b,' ') ;
+	        if (i > 0) b.chr(' ') ;
 	        lp = (mp + lines[i].loff) ;
 	        ll = lines[i].llen ;
-	        rs = sbuf_strw(&b,lp,ll) ;
+	        rs = b.strw(lp,ll) ;
 	        if (rs < 0) break ;
 	    } /* end for */
-	    len = sbuf_finish(&b) ;
+	    len = b.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;

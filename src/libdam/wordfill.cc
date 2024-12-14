@@ -1,4 +1,5 @@
 /* wordfill HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* text (word) fill */

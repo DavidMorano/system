@@ -242,4 +242,10 @@ strop_co::operator int () noex {
 }
 /* end method (strop_co::operator) */
 
+void strop::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("strop",rs,"fini-finish") ;
+	}
+}
+
 

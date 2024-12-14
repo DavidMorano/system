@@ -64,10 +64,19 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

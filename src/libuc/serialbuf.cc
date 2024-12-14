@@ -1,4 +1,5 @@
 /* serialbuf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* serializing buffer object handling */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	serialbug
+
+	Description:
 	This object provides a means by which data units can be
 	serialized into a sbuffer and unserialized back again.  The
 	serialization into the sbuffer is done in a portable way
@@ -724,8 +729,7 @@ int serialbuf::adv(int sz) noex {
 }
 
 void serialbuf::dtor() noex {
-	cint		rs = int(finish) ;
-	if (rs < 0) {
+	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("serialbuf",rs,"fini-finish") ;
 	}
 }

@@ -113,7 +113,7 @@ struct randomvar : randomvar_head {
 	int get(int *) noex ;
 	int get(uint *) noex ;
 	void dtor() noex ;
-	~randomvar() noex {
+	~randomvar() {
 	    dtor() ;
 	} ;
 } ; /* end struct (randomvar) */

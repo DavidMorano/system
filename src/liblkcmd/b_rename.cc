@@ -54,7 +54,7 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<sbuf.h>
-#include	<ipow.h>
+#include	<pow.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

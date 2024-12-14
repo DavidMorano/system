@@ -1,4 +1,5 @@
 /* connection HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manipulate INET connection information */
@@ -28,7 +29,6 @@
 
 #define	CONNECTION		struct connection_head
 #define	CONNECTION_FL		struct connection_flags
-#define	CONNECTION_PEERNAMELEN	MAX(MAXPATHLEN,MAXHOSTNAMELEN)
 
 
 struct connection_flags {
@@ -41,7 +41,7 @@ struct connection_flags {
 
 struct connection_head {
 	cchar		*inetdomain ;	/* local domain name */
-	cchar		*peername ;	/* dynamically allocated */
+	cchar		*name ;		/* dynamically allocated */
 	cchar		*pr ;		/* dynamically allocated */
 	sockaddress	*sap ;
 	INADDR		netipaddr ;
@@ -50,7 +50,45 @@ struct connection_head {
 	int		s ;
 } ;
 
-typedef	CONNECTION	connection ;
+#ifdef	__cplusplus
+enum connectionmems {
+	connectionmem_finish,
+	connectionmem_overlast
+} ;
+struct connection ;
+struct connection_co {
+	connection	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (connection *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (connection_co) */
+struct connection : connection_head {
+	connection_co	finish ;
+	connection() noex {
+	    finish(this,connectionmem_finish) ;
+	} ;
+	connection(const connection &) = delete ;
+	connection &operator = (const connection &) = delete ;
+	int start(cchar *) noex ;
+	int socklocname(char *,int,int) noex ;
+	int sockremname(char *,int,int) noex ;
+	int peername(sockaddress *,int,char *,int) noex ;
+	int mknames(vecstr *) noex ;
+	void dtor() noex ;
+	~connection() {
+	    dtor() ;
+	} ;
+} ; /* end struct (connection) */
+#else	/* __cplusplus */
+typedef CONNECTION	connection ;
+#endif /* __cplusplus */
+
 typedef	CONNECTION_FL	connection_fl ;
 
 EXTERNC_begin

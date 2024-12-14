@@ -1,4 +1,5 @@
 /* inetaddr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to manipulate INET adresses */
@@ -59,6 +60,8 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| + |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
@@ -88,9 +91,6 @@
 
 
 /* external variables */
-
-
-/* local typedefs */
 
 
 /* local structures */
@@ -176,12 +176,11 @@ int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	        addrl -= 1 ;
 	    }
 	    if (addrl > 0) {
-		in_addr_t	a ;
 	        if (ap != addrp) {
 	            strwcpy(abuf,ap,addrl) ;
 	            ap = abuf ;
 	        }
-		if ((a = inet_addr(ap)) != inaddrbad) {
+		if (in_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
 	            ip->a.s_addr = a ;
 		} else {
 	            rs = SR_INVALID ;

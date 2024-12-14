@@ -161,6 +161,9 @@ extern "C" int	mkcdpath(char *,cchar *,int) noex ;
 static bufsizevar	maxpathlen(getbufsize_mp,MKCDPATH_MP) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkcdpath(char *ebuf,cchar *fp,int fl) noex {

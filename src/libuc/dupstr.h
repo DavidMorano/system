@@ -1,4 +1,5 @@
 /* dupstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create a (writable) duplicate of a string */
@@ -62,7 +63,7 @@ struct dupstr : dupstr_head {
 	dupstr &operator = (const dupstr &) = delete ;
 	int start(cchar *,int,char **) noex ;
 	void dtor() noex ;
-	~dupstr() noex {
+	~dupstr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (dupstr) */

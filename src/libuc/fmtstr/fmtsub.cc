@@ -1,4 +1,5 @@
 /* fmtsub SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	fmtsub
+
+	Description:
 	This (FMTSUB) is a helper object for the FMTSTR facility.
 
 *******************************************************************************/
@@ -74,8 +79,10 @@
 
 /* imported namespaces */
 
-using std::min ;			/* type */
-using std::max ;			/* type */
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -578,6 +585,12 @@ fmtsub_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
+}
+
+void fmtsub::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("fmtsub",rs,"fini-finish") ;
+	}
 }
 
 static bool  hasourbad(cchar *sp,int sl) noex {

@@ -71,7 +71,7 @@ struct ptma : pthread_mutexattr_t {
 	int	getrobustnp(int *) noex ;
 	int	gettype(int *) noex ;
 	void dtor() noex ;
-	~ptma() noex {
+	~ptma() {
 	    dtor() ;
 	} ; /* end dtor (ptma) */
 } ; /* end class (ptma) */

@@ -102,6 +102,9 @@ static int	isend(int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkcleanline(char *lp,int ll,int m) noex {

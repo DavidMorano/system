@@ -1,4 +1,5 @@
 /* groupids HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* group-ID fetch (UNIX® group-IDs) */
@@ -21,8 +22,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 enum groupidsmems {
@@ -71,8 +75,9 @@ struct groupids {
 	int get(gid_t **) noex ;
 	int istart(gid_t **) noex ;
 	int ifinish() noex ;
-	~groupids() noex {
-	    (void) int(finish) ;
+	void dtor() noex ;
+	~groupids() {
+	    dtor() ;
 	} ;
 } ; /* end struct (groupids) */
 

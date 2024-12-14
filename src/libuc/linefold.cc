@@ -1,4 +1,5 @@
 /* linefold SUPPORT */
+constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 /* lang=C++20 */
 
 /* manage folding of a line */
@@ -460,5 +461,11 @@ cchar *linefold_iter::operator * () noex {
 	return rp ;
 }
 /* end method (linefold_iter::operator) */
+
+void linefold::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("linefold",rs,"fini-finish") ;
+	}
+}
 
 

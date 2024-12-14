@@ -129,7 +129,7 @@ struct addrset {
 	int	curbegin(addrset_cur *) noex ;
 	int	curenum(addrset_cur *,ent *) noex ;
 	int	curend(addrset_cur *) noex ;
-	~addrset() noex {
+	~addrset() {
 	    dtor() ;
 	} ; /* end if (dtor) */
     private:

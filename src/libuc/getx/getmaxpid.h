@@ -61,7 +61,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-namespace libdam {
+namespace libuc {
     struct maxpider {
     	operator int () noex {
     	    return getmaxpid(0) ;
@@ -72,7 +72,7 @@ namespace libdam {
     } ; /* end struct (maxpider) */
 }
 
-extern libdam::maxpider		maxpid ;
+extern libuc::maxpider		maxpid ;
 
 #endif /* __cplusplus */
 

@@ -182,8 +182,7 @@ int namestr::brk(cchar *bs,cchar **rpp) noex {
 }
 
 void namestr::dtor() noex {
-	cint	rs = int(finish) ;
-	if (rs < 0) {
+	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("namestr",rs,"fini-finish") ;
 	}
 }

@@ -1,4 +1,5 @@
 /* connection SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to provide some INET connection information */
@@ -64,10 +65,11 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<uvariables.hh>
 #include	<uinet.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -78,6 +80,7 @@
 #include	<inetaddr.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
+#include	<rmx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
 #include	<isindomain.h>
@@ -88,9 +91,6 @@
 
 
 /* local defines */
-
-#undef	LOCALHOST
-#define	LOCALHOST	"localhost"
 
 #define	CON		connection
 #define	SA		sockaddress
@@ -118,12 +118,15 @@ typedef SOCKADDR *	sockaddrp ;
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxpathlen ;
 	int		maxhostlen ;
 	int		socknamelen ;
 	int		hostentlen ;
-} ;
+	int mkvars() noex ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -136,8 +139,6 @@ static int isNotFound(int rs) noex {
 	return isNotPresent(rs) ;
 }
 
-static int mkvars() noex ;
-
 
 /* local variables */
 
@@ -146,6 +147,8 @@ static vars		var ;
 constexpr int		in4addrlen = INET4ADDRLEN ;
 constexpr int		in6addrlen = INET6ADDRLEN ;
 
+constexpr cchar		*localhost = sysword.w_localhost ;
+
 
 /* exported variables */
 
@@ -153,11 +156,11 @@ constexpr int		in6addrlen = INET6ADDRLEN ;
 /* exported subroutines */
 
 int connection_start(CON *cnp,cchar *inetdomain) noex {
+    	CONNECTION	*hop = cnp ;
 	int		rs = SR_FAULT ;
 	if (cnp && inetdomain) {
-	    static cint		rsv = mkvars() ;
-	    connection_head	*hop = static_cast<connection *>(cnp) ;
-	    cint		ssz = sizeof(sockaddress) ;
+	    static cint		rsv = var.mkvars() ;
+	    cint		ssz = szof(sockaddress) ;
 	    memclear(hop) ;
 	    if ((rs = rsv) >= 0) {
 	        cnp->inetdomain = inetdomain ;
@@ -166,7 +169,7 @@ int connection_start(CON *cnp,cchar *inetdomain) noex {
 	        if (void *vp{} ; (rs = uc_libmalloc(ssz,&vp)) >= 0) {
 		    cnp->sap = sockaddressp(vp) ;
 	        }
-	    } /* end if (mkvars) */
+	    } /* end if (vars::mkvars) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -183,10 +186,10 @@ int connection_finish(CON *cnp) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        cnp->inetdomain = nullptr ;
 	    }
-	    if (cnp->peername) {
-	        rs1 = uc_free(cnp->peername) ;
+	    if (cnp->name) {
+	        rs1 = uc_free(cnp->name) ;
 	        if (rs >= 0) rs = rs1 ;
-	        cnp->peername = nullptr ;
+	        cnp->name = nullptr ;
 	    }
 	    if (cnp->sap) {
 		rs1 = uc_libfree(cnp->sap) ;
@@ -204,11 +207,10 @@ int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex {
 	if (cnp && dp) {
 	    rs = SR_BADF ;
 	    if (s >= 0) {
-		USTAT	sb ;
-	        if ((rs = uc_fstat(s,&sb)) >= 0) {
+		if (USTAT sb ; (rs = uc_fstat(s,&sb)) >= 0) {
 		    if (S_ISSOCK(sb.st_mode)) {
 	                sockaddress	*sap = cnp->sap ;
-	                int		sal = sizeof(sockaddress) ;
+	                int		sal = szof(sockaddress) ;
 	                cnp->s = s ;
 	                if ((rs = u_sockaddrloc(s,sap,&sal)) >= 0) {
 	                    cnp->f.sa = true ;
@@ -216,8 +218,7 @@ int connection_socklocname(CON *cnp,char *dp,int dl,int s) noex {
 	                    len = rs ;
 	                }
 	    	    } else if (S_ISFIFO(sb.st_mode)) {
-	                cchar	*lh = LOCALHOST ;
-	                rs = sncpy1(dp,dl,lh) ;
+	                rs = sncpy(dp,dl,localhost) ;
 	                len = rs ;
 		    } /* end if */
 		} /* end if (uc_fstat) */
@@ -233,11 +234,10 @@ int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex {
 	if (cnp && dp) {
 	    rs = SR_BADF ;
 	    if (s >= 0) {
-		USTAT	sb ;
-	        if ((rs = uc_fstat(s,&sb)) >= 0) {
+		if (USTAT sb ; (rs = uc_fstat(s,&sb)) >= 0) {
 		    if (S_ISSOCK(sb.st_mode)) {
 	                sockaddress	*sap = cnp->sap ;
-	                int		sal = sizeof(sockaddress) ;
+	                int		sal = szof(sockaddress) ;
 	                cnp->s = s ;
 	                if ((rs = u_sockaddrrem(s,sap,&sal)) >= 0) {
 	                    cnp->f.sa = true ;
@@ -245,8 +245,7 @@ int connection_sockremname(CON *cnp,char *dp,int dl,int s) noex {
 	                    len = rs ;
 	                }
 	    	    } else if (S_ISFIFO(sb.st_mode)) {
-	                cchar	*lh = LOCALHOST ;
-	                rs = sncpy1(dp,dl,lh) ;
+	                rs = sncpy(dp,dl,localhost) ;
 	                len = rs ;
 		    } /* end if */
 		} /* end if (uc_fstat) */
@@ -322,7 +321,7 @@ sub_mknames::operator int () noex {
 	        cint	af = rs ;
 	        switch (af) {
 	        case AF_UNIX:
-	            rs = connection_addname(cnp,nlp,LOCALHOST) ;
+	            rs = connection_addname(cnp,nlp,localhost) ;
 		    n += rs ;
 		    break ;
 		case AF_INET4:
@@ -338,11 +337,10 @@ sub_mknames::operator int () noex {
 /* end method (sub_mknames::operator) */
 
 int sub_mknames::addstuff(int af) noex {
-	hostinfo	hi ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = hostinfo_start(&hi,af,cnp->peername)) >= 0) {
+	if (hostinfo hi ; (rs = hostinfo_start(&hi,af,cnp->name)) >= 0) {
 	    if ((rs = addnames(&hi)) >= 0) {
 		n += rs ;
 		rs = addresses(&hi) ;
@@ -388,29 +386,26 @@ int sub_mknames::addresses(hostinfo *hip) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if (char *nbuf{} ; (rs = malloc_hn(&nbuf)) >= 0) {
-	    hostinfo_cur	hc ;
 	    cint		nlen = rs ;
-	    const uchar		*ap ;
-	    if ((rs = hostinfo_curbegin(hip,&hc)) >= 0) {
+	    if (hostinfo_cur hc ; (rs = hostinfo_curbegin(hip,&hc)) >= 0) {
+	        const uchar	*ap{} ;
 	        while ((rs = hostinfo_curenumaddr(hip,&hc,&ap)) > 0) {
-		    inetaddr	ia ;
 		    cint	al = rs ;
-	            if (al != INET4ADDRLEN) continue ;
-	            if ((rs = inetaddr_start(&ia,ap)) >= 0) {
-	                auto in_ga = inetaddr_getdotaddr ;
-	                if ((rs = in_ga(&ia,nbuf,nlen)) >= 0) {
-	                    rs = vecstr_adduniq(nlp,nbuf,-1) ;
+	            if (al != in4addrlen) continue ;
+		    if (inetaddr ia ; (rs = ia.start(ap)) >= 0) {
+	                if ((rs = ia.getdotaddr(nbuf,nlen)) >= 0) {
+	                    rs = nlp->adduniq(nbuf) ;
 	                    if (rs < INT_MAX) n += 1 ;
 		        }
-	                rs1 = inetaddr_finish(&ia) ;
+	                rs1 = ia.finish ;
 	   	        if (rs >= 0) rs = rs1 ;
-	            } /* end if (inet4addr) */
+	            } /* end if (inetaddr) */
 	            if (rs < 0) break ;
 	        } /* end while (addresses) */
 	        rs1 = hostinfo_curend(hip,&hc) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (hostinfo-cur) */
-	    rs = rsfree(rs,&nbuf) ;
+	    rs = rsfree(rs,nbuf) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -425,16 +420,15 @@ int sub_mknames::adddots(int af) noex {
 	if ((af == AF_INET4) && cnp->f.inet && cnp->f.addr) {
 	    if (char *nbuf{} ; (rs = malloc_hn(&nbuf)) >= 0) {
 	        cint		nlen = rs ;
-	        inetaddr	ia ;
-	        if ((rs = inetaddr_start(&ia,&cnp->netipaddr)) >= 0) {
-	            if ((rs = inetaddr_getdotaddr(&ia,nbuf,nlen)) >= 0) {
-	                rs = vecstr_adduniq(nlp,nbuf,rs) ;
+	        if (inetaddr ia ; (rs = ia.start(&cnp->netipaddr)) >= 0) {
+	            if ((rs = ia.getdotaddr(nbuf,nlen)) >= 0) {
+	                rs = nlp->adduniq(nbuf,rs) ;
 	                if (rs < INT_MAX) n += 1 ;
 		    }
-	            rs1 = inetaddr_finish(&ia) ;
+	            rs1 = ia.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (inetaddr) */
-	        rs = rsfree(rs,&nbuf) ;
+	        rs = rsfree(rs,nbuf) ;
 	    } /* end if (m-a-f) */
 	} /* end if (go) */
 	return (rs >= 0) ? n : rs ;
@@ -446,18 +440,15 @@ int sub_mknames::adddots(int af) noex {
 /* private subroutines */
 
 static int connection_addname(CON *cnp,vecstr *nlp,cc *name) noex {
-	int		nl = strlen(name) ;
+	int		sl = strlen(name) ;
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = vecstr_adduniq(nlp,name,nl)) >= 0) {
+	if ((rs = nlp->adduniq(name,sl)) >= 0) {
 	    cchar	*dn = cnp->inetdomain ;
 	    n += (rs < INT_MAX) ;
 	    if (dn && isindomain(name,dn)) {
-		cnullptr	np{} ;
-	        if (cchar *tp ; (tp = strchr(name,'.')) != np) {
-		    nl = (tp - name) ;
-		}
-		rs = vecstr_adduniq(nlp,name,nl) ;
+		sl = rmchr(name,sl,'.') ; /* <- first dot for 'nodename' */
+		rs = nlp->adduniq(name,sl) ;
 	    	n += (rs < INT_MAX) ;
 	    } /* end if (it is in our domain) */
 	} /* end if (vecstr_adduniq) */
@@ -468,7 +459,7 @@ static int connection_addname(CON *cnp,vecstr *nlp,cc *name) noex {
 /* lookup this IP (INET4) address */
 static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	sockaddress	*sap = cnp->sap ;
-	cint		alen = INET4ADDRLEN ;
+	cint		alen = in4addrlen ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -477,12 +468,12 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	        ucentho		he ;
 	        cint		helen = rs ;
 	        cint		af = AF_INET4 ;
-	        cint		al = INET4ADDRLEN ;
+	        cint		al = in4addrlen ;
 	        cchar		*ap  = charp(&cnp->netipaddr) ;
 	        if ((rs = getho_addr(&he,hebuf,helen,af,ap,al)) >= 0) {
 	            hostent_cur		hc ;
 	            cchar		*sp = nullptr ;
-	            if (cnp->inetdomain != nullptr) {
+	            if (cnp->inetdomain) {
 	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
 			    auto	enumname = hostent_curenumname ;
 	                    while ((rs = enumname(&he,&hc,&sp)) > 0) {
@@ -491,34 +482,27 @@ static int connection_ip4lookup(CON *cnp,char *dp,int dl) noex {
 	                    rs1 = hostent_curend(&he,&hc) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (hostent-cur) */
-	            } else {
-	                rs1 = SR_INVALID ;
-		    }
+		    } /* end if (non-null) */
 		    if (rs >= 0) {
 	               if (sp) {
-			    cnullptr	np{} ;
-	                    int		nl = -1 ;
-	                    if (cchar *tp ; (tp = strchr(sp,'.')) != np) {
-			        nl = (tp-sp) ;
-			    }
-	                    rs = sncpy1w(dp,dl,sp,nl) ;
-			    len = rs ;
+			   cint		sl = rmdot(sp) ; /* last 'dot' */
+	                   rs = sncpyw(dp,dl,sp,sl) ;
+			   len = rs ;
 	               } else {
 		           /* it is NOT in our domain */
 	                   if ((rs = hostent_getcanonical(&he,&sp)) >= 0) {
-	                        rs = sncpy1(dp,dl,sp) ;
+	                        rs = sncpy(dp,dl,sp) ;
 				len = rs ;
 		           }
 	               } /* end if */
 		    } /* end if (ok) */
 	        } else if (isNotFound(rs)) {
-	            inetaddr	ia ;
-	            if ((rs = inetaddr_start(&ia,&cnp->netipaddr)) >= 0) {
+	            if (inetaddr ia ; (rs = ia.start(&cnp->netipaddr)) >= 0) {
 		        {
-	                    rs = inetaddr_getdotaddr(&ia,dp,dl) ;
+	                    rs = ia.getdotaddr(dp,dl) ;
 			    len = rs ;
 		        }
-	                rs1 = inetaddr_finish(&ia) ;
+	                rs1 = ia.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (inetadd) */
 	        } /* end if */
@@ -542,7 +526,7 @@ static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 	    char	sbuf[NI_MAXSERV + 1] ;
 	    auto gni = uc_getnameinfo ;
 	    if ((rs = gni(ssap,sal,hnbuf,hnlen,sbuf,slen,fl)) >= 0) {
-	        rs = sncpy1(dp,dl,hnbuf) ;
+	        rs = sncpy(dp,dl,hnbuf) ;
 	        len = rs ;
 	    } else if (isNotPresent(rs)) {
 		sockaddress	*sap = cnp->sap ;
@@ -554,8 +538,7 @@ static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 	                rs = connection_ip4lookup(cnp,dp,dl) ;
 	                len = rs ;
 	            } else if (isin6loopback(in6addr)) {
-		        cchar	*lh = LOCALHOST ;
-	                rs = sncpy1(dp,dl,lh) ;
+	                rs = sncpy(dp,dl,localhost) ;
 	                len = rs ;
 	            } /* end if */
 		} /* end if (sockaddress_getaddr) */
@@ -566,20 +549,59 @@ static int connection_ip6lookup(CON *cnp,char *dp,int dl) noex {
 }
 /* end subroutine (connection_ip6lookup) */
 
-static int mkvars() noex {
+int connection::start(cchar *dname) noex {
+    	return connection_start(this,dname) ;
+}
+
+int connection::socklocname(char *dp,int dl,int s) noex {
+	return connection_socklocname(this,dp,dl,s) ;
+}
+
+int connection::sockremname(char *dp,int dl,int s) noex {
+	return connection_sockremname(this,dp,dl,s) ;
+}
+
+int connection::peername(sockaddress *sap,int sal,char *dp,int dl) noex {
+	return connection_peername(this,sap,sal,dp,dl) ;
+}
+
+int connection::mknames(vecstr *nlp) noex {
+	return connection_mknames(this,nlp) ;
+}
+
+void connection::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("connection",rs,"fini-finish") ;
+	}
+}
+
+connection_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case connectionmem_finish:
+	        rs = connection_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (connection_co::operator) */
+
+int vars::mkvars() noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
 	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
-	        var.maxhostlen = rs ;
+	        maxhostlen = rs ;
 	        if ((rs = getbufsize(getbufsize_ho)) >= 0) {
-		    var.hostentlen = rs ;
-	            var.socknamelen = max(var.maxpathlen,var.maxhostlen) ;
+		    hostentlen = rs ;
+	            socknamelen = max(maxpathlen,maxhostlen) ;
 		}
 	    }
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::mkvars) */
 
 

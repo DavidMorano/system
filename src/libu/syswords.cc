@@ -64,5 +64,7 @@ const char syswords::w_usrlocaldir[] =	"/usr/local" ;
 const char syswords::w_digtab[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
 		"abcdefghijklmnopqrstuvwxyz" "Øø" ;
 const char syswords::w_blanks[] = "        " ;
+const char syswords::w_defprovider[] = "Rightcore Network Services" ;
+const char syswords::w_localhost[] = "localhost" ;
 
 

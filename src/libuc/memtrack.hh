@@ -1,4 +1,5 @@
 /* memtrack HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* track memory chunks */
@@ -103,7 +104,7 @@ struct memtrack {
 	int	ifinish() noex ;
 	int	icount() noex ;
 	void	dtor() noex ;
-	~memtrack() noex {
+	~memtrack() {
 	    dtor() ;
 	} ; /* end if (dtor) */
 } ; /* end struct (memtrack) */

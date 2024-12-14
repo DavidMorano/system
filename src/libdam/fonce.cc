@@ -1,4 +1,5 @@
 /* fonce SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
@@ -148,6 +149,12 @@ int fonce::icount() noex {
 	return rs ;
 }
 /* end method (fonce::icount) */
+
+void fonce::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("fonce",rs,"fini-finish") ;
+	}
+}
 
 int fonce_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;

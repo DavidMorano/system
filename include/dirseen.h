@@ -24,9 +24,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
 #include	<usysdefs.h>
-#include	<usyscalls.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
 
 
@@ -114,8 +113,10 @@ struct dirseen : dirseen_head {
 	dirseen(const dirseen &) = delete ;
 	dirseen &operator = (const dirseen &) = delete ;
 	int add(cchar *,int,USTAT *) noex ;
+	int havename(cchar *,int) noex ;
+	int havedevino(USTAT *) noex ;
 	void dtor() noex ;
-	~dirseen() noex {
+	~dirseen() {
 	    dtor() ;
 	} ;
 } ; /* end struct (dirseen) */

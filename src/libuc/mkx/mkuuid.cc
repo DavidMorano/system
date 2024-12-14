@@ -60,11 +60,23 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 static int mkuutime(uuid_dat *,uint *) noex ;
 static int mkuuclk(uuid_dat *,uint *) noex ;
 static int mkuunode(uuid_dat *,uint *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

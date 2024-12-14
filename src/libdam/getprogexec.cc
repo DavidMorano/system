@@ -41,6 +41,7 @@
 #include	<sncpy.h>
 #include	<localmisc.h>
 
+#include	"getprogexec.h"
 #include	"getexecname.h"
 
 
@@ -76,10 +77,9 @@
 int getprogexec(char *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
 	if (ebuf) {
-	    cchar	*en ;
 	    rs = SR_NOSYS ;
 	    ebuf[0] = '\0' ;
-	    if ((en = getexecname()) != nullptr) {
+	    if (cchar *en ; (en = getexecname()) != nullptr) {
 	        rs = sncpy1(ebuf,elen,en) ;
 	    }
 	} /* end if (non-null) */

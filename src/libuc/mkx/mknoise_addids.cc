@@ -5,6 +5,11 @@
 #define	PROCFNAME	"/proc"
 
 
+/* exported variables */
+
+
+/* local subroutines */
+
 static int noisedata_addids(NOISEDATA *ndp,cchar *procdname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -16,8 +21,7 @@ static int noisedata_addids(NOISEDATA *ndp,cchar *procdname) noex {
 	int		v ;
 	char		*bp ;
 	char		*dnp ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    cint	tlen = rs ;
 	    char	*nbuf{} ;
 

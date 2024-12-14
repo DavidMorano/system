@@ -1,4 +1,5 @@
 /* fsdir SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* object to read directory entries in the UNIX® file system */
@@ -323,5 +324,11 @@ static int fsdir_end(fsdir *op) noex {
 	return rs ;
 }
 /* end subroutine (fsdir_end) */
+
+void fsdir::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("fsdir",rs,"fini-finish") ;
+	}
+}
 
 

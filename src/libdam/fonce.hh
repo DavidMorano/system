@@ -1,4 +1,5 @@
 /* fonce HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
@@ -119,8 +120,9 @@ struct fonce {
 	    finish(this,foncemem_finish) ;
 	    count(this,foncemem_count) ;
 	} ; /* end ctor) */
+	void dtor() noex ;
 	~fonce() noex {
-	    (void) ifinish() ;
+	    dtor() ;
 	} ; /* end dtor */
 	int		checkin(CUSTAT *) noex ;
 	int		istart(int) noex ;

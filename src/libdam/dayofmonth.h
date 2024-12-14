@@ -67,7 +67,7 @@ struct dayofmonth : dayofmonth_head {
 	int lookup(int,int,int) noex ;
 	int mkday(int,cchar *,int) noex ;
 	void dtor() noex ;
-	~dayofmonth() noex {
+	~dayofmonth() {
 	    dtor() ;
 	} ;
 } ; /* end struct (dayofmonth) */

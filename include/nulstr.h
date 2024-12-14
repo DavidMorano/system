@@ -1,4 +1,5 @@
 /* nulstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* assert a NUL-terminated string */
@@ -61,8 +62,9 @@ struct nulstr : nulstr_head {
 	nulstr(const nulstr &) = delete ;
 	nulstr &operator = (const nulstr &) = delete ;
 	int start(cchar *,int,cchar **) noex ;
-	~nulstr() noex {
-	    (void) int(finish) ;
+	void dtor() noex ;
+	~nulstr() {
+	    dtor() ;
 	} ;
 } ; /* end struct (nulstr) */
 #else /* __cplusplus */

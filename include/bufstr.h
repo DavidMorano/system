@@ -88,7 +88,7 @@ struct bufstr : bufstr_head {
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
 	void dtor() noex ;
-	~bufstr() noex {
+	~bufstr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (bufstr) */

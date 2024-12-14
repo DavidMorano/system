@@ -239,7 +239,7 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 	        rs = (-ec) ;
 	    } else {
 		if (errno) {
-		    rs = (-errno) ;
+		    rs = (- errno) ;
 		} else {
 		    rs = SR_IO ;
 		}
@@ -271,7 +271,7 @@ int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
 	            rs = (-ec) ;
 		} else {
 		    if (errno) {
-			rs = (-errno) ;
+			rs = (- errno) ;
 		    } else {
 		        rs = SR_IO ;
 		    }
@@ -304,7 +304,7 @@ int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
 	            rs = (-ec) ;
 		} else {
 		    if (errno) {
-			rs = (-errno) ;
+			rs = (- errno) ;
 		    } else {
 		        rs = SR_IO ;
 		    }

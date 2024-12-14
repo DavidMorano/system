@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2001-12-03, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This code was born out of frustration with cleaning up bad
 	legacy code (of which there is quite a bit -- like almost
 	all of it).
@@ -21,7 +21,7 @@
 
 */
 
-/* Copyright © 2001,2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -30,7 +30,7 @@
 
 	Description:
         This subroutine constructs a file path out of one or more path
-        componets.
+        componets (the last of which can have an optional length).
 
 *******************************************************************************/
 
@@ -60,6 +60,12 @@
 
 /* local strutures */
 
+namespace {
+    struct maxpather {
+	static int operator () (int) noex ;
+    } ; /* end struct (maxpather) */
+}
+
 
 /* forward references */
 
@@ -67,6 +73,10 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp,MKNPATHW_MAXPATHLEN) ;
+static maxpather	getrlen ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -96,46 +106,62 @@ int mknpath5w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 }
 /* end subroutine (mknpath5w) */
 
+int mknpath6w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,
+		int sl) noex {
+	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
+}
+/* end subroutine (mknpath6w) */
+
 int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	int		rs = SR_FAULT ;
 	char		*bp = pbuf ;
 	if (pbuf) {
 	    va_list	ap ;
-	    int		bl = plen ;
-	    int		sl = -1 ;
-	    va_begin(ap,n) ;
-	    rs = SR_OK ;
-	    if (plen < 0) {
-		rs = maxpathlen ;
-		plen = rs ;
-	    }
-	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	        cc	*sp = (cchar *) va_arg(ap,char *) ;
-		bool	f = true ;
-	        if (i == (n-1)) sl = (int) va_arg(ap,int) ;
-	        f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
-		f = f && (sp[0] != '\0') && (sp[0] != '/') ;
-		if (f) {
-	            if (bl > 0) {
-	                *bp++ = '/' ;
-	                bl -= 1 ;
-	            } else {
-	                rs = SR_NAMETOOLONG ;
-		    }
-	        } /* end if (needed a pathname separator) */
-	        if (rs >= 0) {
-	            if ((rs = snwcpy(bp,bl,sp,sl)) >= 0) {
-	                bp += rs ;
-	                bl -= rs ;
-	            } else if (rs == SR_OVERFLOW)
-	                rs = SR_NAMETOOLONG ;
-	        } /* end if */
-	    } /* end for */
-	    *bp = '\0' ; /* in case of overflow */
-	    va_end(ap) ;
+	    if ((rs = getrlen(plen)) >= 0) {
+	        int	bl = rs ;
+	        int	sl = -1 ;
+	        va_begin(ap,n) ;
+	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	            cc		*sp = (cchar *) va_arg(ap,char *) ;
+		    bool	f = true ;
+	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
+	            f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
+		    f = f && (sp[0] != '\0') && (sp[0] != '/') ;
+		    if (f) {
+	                if (bl > 0) {
+	                    *bp++ = '/' ;
+	                    bl -= 1 ;
+	                } else {
+	                    rs = SR_NAMETOOLONG ;
+		        }
+	            } /* end if (needed a pathname separator) */
+	            if (rs >= 0) {
+	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) {
+	                    bp += rs ;
+	                    bl -= rs ;
+	                } else if (rs == SR_OVERFLOW) {
+	                    rs = SR_NAMETOOLONG ;
+		        }
+	            } /* end if */
+	        } /* end for */
+	        *bp = '\0' ; /* in case of overflow */
+	        va_end(ap) ;
+	    } /* end if (getplen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? (bp - pbuf) : rs ;
 }
 /* end subroutine (mknpathxw) */
+
+
+/* local subroutines */
+
+int maxpather::operator () (int plen) noex {
+    	int		rs ;
+	if ((rs = plen) < 0) {
+	    rs = maxpathlen ;
+	}
+	return rs ;
+}
+/* end method (maxpather::operator) */
 
 

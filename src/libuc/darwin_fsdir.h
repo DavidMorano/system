@@ -1,4 +1,5 @@
 /* fsdir HEADER (Darwin) */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® file system dirextory operations */
@@ -106,8 +107,9 @@ struct fsdir : fsdir_head {
 	int read(ent *,char *,int) noex ;
 	int tell(off_t * = nullptr) noex ;
 	int seek(off_t = 0) noex ;
-	~fsdir() noex {
-	    (void) int(close) ;
+	void dtor() noex ;
+	~fsdir() {
+	    dtor() ;
 	} ;
 } ; /* end struct (fsdir) */
 #else	/* __cplusplus */

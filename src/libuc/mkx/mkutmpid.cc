@@ -203,6 +203,9 @@ static tmp_m	tmpcalls[] {
 static constexpr cchar		dpre[] = "/dev/" ;	/* device prefix */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkutmpid(char *idbuf,int idlen,cchar *devbuf,int devlen) noex {
@@ -260,12 +263,11 @@ int tmper::extdev(cchar **rpp) noex {
 int tmper::subdirs(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	if ((ll > 0) && (rbuf[0] == '\0')) {
-	    cchar	*tp ;
-	    if ((tp = strnchr(lp,ll,'/')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(lp,ll,'/')) != nullptr) {
 	        cint	sl = (tp - lp) ;
 	        cint	cl = (ll - ((tp+1) - lp)) ;
 	        int	pl = 0 ;
-	        int	i = 0 ;
+	        int	i ; /* used-afterwards */
 	        cchar	*sp = lp ;
 	        cchar	*cp = (tp+1) ;
 	        cchar	*pp{} ;
@@ -286,7 +288,7 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 int tmper::basename(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	if ((ll > 0) && (rbuf[0] == '\0')) {
-	    int		i = 0 ;
+	    int		i ; /* used-afterwards */
 	    int		cl = ll ;
 	    int		pl = 0 ;
 	    cchar	*cp = lp ;
@@ -354,7 +356,7 @@ static int idcpy(char *idbuf,int idlen,cchar *pp,int pl,cchar *cp,int cl) noex {
 	for (int k = 0 ; (j < idlen) && (k < cl) ; j += 1) {
 	    idbuf[j] = cp[k++] ;
 	}
-	rs = j ;
+	rs = j ; /* <- return value */
 	while (j < idlen) {
 	    idbuf[j++] = '\0' ;
 	}

@@ -1,4 +1,5 @@
 /* groupids SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* group-ID fetch (UNIX® group-IDs) */
@@ -172,5 +173,11 @@ groupids_co::operator int () noex {
 	return rs ;
 }
 /* end method (groupids_co::operator) */
+
+void groupids::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("groupids",rs,"fini-finish") ;
+	}
+}
 
 

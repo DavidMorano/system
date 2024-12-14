@@ -21,7 +21,8 @@
 	getsrcname
 
 	Descriptor:
-	Find and return a name associated with a file-descriptor.
+	Find and return a network name associated with a network
+	file-descriptor.
 
 	Synopsis:
 	int getsrcname(char *rbuf,int rlen,int s) noex
@@ -53,6 +54,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef connection	conn ;
+
+
 /* external subroutines */
 
 
@@ -77,13 +86,12 @@ int getsrcname(char *rbuf,int rlen,int s) noex {
 		if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
 		    cint	dlen = rs ;
 	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
-	                connection	 conn ;
-	                if ((rs = connection_start(&conn,dbuf)) >= 0) {
+	                if (conn cn ; (rs = connection_start(&cn,dbuf)) >= 0) {
             		    {
-	                        rs = connection_socksrcname(&conn,rbuf,rlen,s) ;
+	                        rs = connection_socklocname(&cn,rbuf,rlen,s) ;
 	                        len = rs ;
             		    }
-	                    rs1 = connection_finish(&conn) ;
+	                    rs1 = connection_finish(&cn) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (connection) */
 	            } /* end if (getinetdomain) */

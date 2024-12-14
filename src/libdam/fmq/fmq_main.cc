@@ -240,14 +240,14 @@ int fmq_count(fmq *op) noex {
 }
 /* end subroutine (fmq_count) */
 
-int fmq_send(fmq *op,cvoid *buf,int buflen) noex {
+int fmq_send(fmq *op,cvoid *ubuf,int ulen) noex {
 	int		rs ;
 	int		tlen = 0 ;
-	if ((rs = fmq_magic(op,buf)) >= 0) {
+	if ((rs = fmq_magic(op,ubuf)) >= 0) {
 	    rs = SR_RDONLY ;
 	    if (op->f.writable) {
 	        cint	to = -1 ;
-	        rs = fmq_sende(op,buf,buflen,to,0) ;
+	        rs = fmq_sende(op,ubuf,ulen,to,0) ;
 	        tlen = rs ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -255,12 +255,12 @@ int fmq_send(fmq *op,cvoid *buf,int buflen) noex {
 }
 /* end subroutine (fmq_send) */
 
-int fmq_recv(fmq *op,void *buf,int buflen) noex {
+int fmq_recv(fmq *op,void *ubuf,int ulen) noex {
 	int		rs ;
 	int		tlen = 0 ;
-	if ((rs = fmq_magic(op,buf)) >= 0) {
+	if ((rs = fmq_magic(op,ubuf)) >= 0) {
 	    cint	to = -1 ;
-	    rs = fmq_recve(op,buf,buflen,to,0) ;
+	    rs = fmq_recve(op,ubuf,ulen,to,0) ;
 	    tlen = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;

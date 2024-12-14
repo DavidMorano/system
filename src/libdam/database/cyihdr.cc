@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* text-index for CYI-INDEX file */
+/* Calendar-Year-Index DB header (text-index for CYI-INDEX file) */
 /* version %I% last-modified %G% */
 
 
@@ -16,15 +16,16 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	cyihdr
 
 	Description:
-	This subroutine writes out the hash file.
+	This ojbect represents the data from the header of CYI 
+	database file.
 
 	Synopsis:
 	int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex

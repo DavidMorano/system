@@ -67,7 +67,7 @@ struct strnul {
 	    return operator () (ap,al) ;
 	} ; /* end method */
 	operator ccharp () noex ;
-	~strnul() noex {
+	~strnul() {
 	    if (as) {
 		delete [] as ;
 		as = nullptr ;

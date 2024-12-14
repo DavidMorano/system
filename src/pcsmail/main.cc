@@ -1,24 +1,19 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time */
 #define	CF_NOSEND	1
 
-
 /*******************************************************************************
- *									
+
 	= 94-01-06, David A­D­ Morano 
 
 	This subroutine was adopted from the 'main' subroutine of the
 	old PCS SENDMAIL program.
 
-*
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
@@ -26,17 +21,18 @@
 #include	<sys/wait.h>
 #include	<netinet/in.h>
 #include	<netdb.h>
-#include	<cerrno>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<csignal>
-#include	<time.h>
+#include	<cerrno>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdio>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<cstdio>
-
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<baops.h>
 #include	<logfile.h>
 #include	<bfile.h>
@@ -89,7 +85,7 @@ static int	popt_store() ;
 
 /* local static data */
 
-static const char	*argopts[] = {
+constexpr cpcchar	argopts[] = {
 	"ROOT",
 	"TMPDIR",
 	"TERM",
@@ -112,7 +108,7 @@ static const char	*argopts[] = {
 
 /* program options */
 
-static const char	*progopts[] = {
+constexpr cpcchar	progopts[] = {
 	"verify",
 	"filecopy",
 	"edit",
@@ -124,13 +120,12 @@ static const char	*progopts[] = {
 #define	PROGOPT_EDIT		2
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+int main(int argc,mainv argv,mainv)
 	bfile	errfile, *efp = &errfile ;
 	bfile	infile, *ifp = &infile ;
 	bfile	outfile, *ofp = &outfile ;

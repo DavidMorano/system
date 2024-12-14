@@ -1,4 +1,5 @@
 /* bfliner SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* BFILE-liner */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	bfliner
+
+	Description:
 	This object provider a way to read lines w/ a push-back
 	feature. This is used for reading raw mail-message files
 	for analysis.

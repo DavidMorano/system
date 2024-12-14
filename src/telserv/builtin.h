@@ -1,9 +1,9 @@
-/* builtin */
+/* builtin HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
-
 
 #ifndef	BUILTIN_INCLUDE
 #define	BUILTIN_INCLUDE

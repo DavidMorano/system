@@ -1,11 +1,10 @@
-/* main (RSHE) */
+/* main SUPPORT (RSHE) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to run a program remotely inheriting the local environment */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
-#define	CF_DEBUG	0		/* run-time */
 
 /* revision history:
 
@@ -16,12 +15,14 @@
 	This operation of the 'x' option was modified to
 	reflect modern usage of the same option in similar programs.
 
-
 */
 
 /* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 
 /**************************************************************************
+
+  	Name:
+	main
 
 	Synopsis:
 	$ rshe [-n] [-l user] [-d] [-e=file] remotehost command [args]
@@ -67,15 +68,15 @@
 #include	<rpcsvc/rstat.h>
 #include	<netdb.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<usystem.h>
+#include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<vecstr.h>
@@ -109,7 +110,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getfiledirs() ;
 extern int	getpwd(char *,int) ;
 
 extern char	*strbasename(char *) ;
@@ -144,15 +144,6 @@ static void	bdump() ;
 
 /* define command option words */
 
-static const char	*argopts[] = {
-	"TMPDIR",
-	"VERSION",
-	"VERBOSE",
-	"ROOT",
-	"LOGFILE",
-	NULL
-} ;
-
 enum argopts {
 	argopt_tmpdir,
 	argopt_version,
@@ -162,21 +153,25 @@ enum argopts {
 	argopt_overlast
 } ;
 
+constexpr cpcchar	argopts[] = {
+	"TMPDIR",
+	"VERSION",
+	"VERBOSE",
+	"ROOT",
+	"LOGFILE",
+	NULL
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	struct proginfo	g, *pip = &g ;
-
 	struct jobinfo	ji ;
-
-	USERINFO	u ;
-
+	userinfo	u ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		jobfile, *jfp = &jobfile ;
 	bfile		file0, file1, file2, *fpa[3] ;

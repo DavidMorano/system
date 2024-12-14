@@ -1,4 +1,5 @@
 /* calcite SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calendar citation */
@@ -16,13 +17,15 @@
 
 /*******************************************************************************
 
+  	Object:
+	calcite
+
+	Description:
 	This small object just holds a citation for a calendar entry.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>

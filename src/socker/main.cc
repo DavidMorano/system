@@ -327,10 +327,10 @@ char	*envv[] ;
 	int	opts ;
 	int	ex = EX_INFO ;
 	int	f_optminus, f_optplus, f_optequal ;
-	int	f_version = FALSE ;
-	int	f_usage = FALSE ;
-	int	f_help = FALSE ;
-	int	f_caf = FALSE ;
+	int	f_version = false ;
+	int	f_usage = false ;
+	int	f_help = false ;
+	int	f_caf = false ;
 	int	f ;
 
 	char	*argp, *aop, *akp, *avp ;
@@ -367,7 +367,7 @@ char	*envv[] ;
 
 	proginfo_setbanner(pip,cp) ;
 
-	pip->f.efile = FALSE ;
+	pip->f.efile = false ;
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->f.efile = TRUE ;
@@ -378,7 +378,7 @@ char	*envv[] ;
 	pip->f.ofile = TRUE ;
 	if (u_fstat(FD_STDOUT,&sb) < 0) {
 
-	    pip->f.ofile = FALSE ;
+	    pip->f.ofile = false ;
 	    u_open("/dev/null",O_WRONLY,0666) ;
 
 	}
@@ -443,7 +443,7 @@ char	*envv[] ;
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
@@ -465,7 +465,7 @@ char	*envv[] ;
 	                    case argopt_tmpdir:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) 
 					pip->tmpdname = avp ;
 
@@ -500,7 +500,7 @@ char	*envv[] ;
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                rs = cfdeci(avp,avl,
 	                                    &pip->verboselevel) ;
@@ -513,7 +513,7 @@ char	*envv[] ;
 	                    case argopt_root:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                pr = avp ;
 
@@ -539,7 +539,7 @@ char	*envv[] ;
 	                    case argopt_conf:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                confname = avp ;
 
@@ -566,7 +566,7 @@ char	*envv[] ;
 				    pip->final.logfname = TRUE ;
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                logfname = avp ;
 
@@ -596,7 +596,7 @@ char	*envv[] ;
 	                    case argopt_sn:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                searchname = avp ;
 
@@ -642,7 +642,7 @@ char	*envv[] ;
 	                            pip->debuglevel = 1 ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 	                                    rs = cfdeci(avp,avl,
 	                                        &pip->debuglevel) ;
@@ -698,7 +698,7 @@ char	*envv[] ;
 	                            pip->f.daemon = TRUE ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 	                                    rs = cfdeci(avp,avl,
 	                                        &pip->runint) ;
@@ -751,7 +751,7 @@ char	*envv[] ;
 	                            pip->verboselevel = 2 ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 	                                    rs = cfdeci(avp,avl,
 	                                        &pip->verboselevel) ;
@@ -1848,7 +1848,7 @@ char	*envv[] ;
 	    debugprintf("main: 1 rs=%d accfname=%s\n",rs,accfname) ;
 #endif
 
-	pip->f.acctab = FALSE ;
+	pip->f.acctab = false ;
 	if ((rs >= 0) || (perm(accfname,-1,-1,NULL,R_OK) >= 0)) {
 
 	    if (pip->debuglevel > 0)
@@ -2576,80 +2576,48 @@ const char	fname[] ;
 }
 /* end subroutine (checkfiledir) */
 
+static int caf(proginfo *pip) noex {
+	int		rs1 ;
+	int		oflags ;
+	int		c = 0 ;
 
-static int caf(pip)
-struct proginfo	*pip ;
-{
-	int	rs1 ;
-	int	i, oflags ;
-	int	c = 0 ;
-
-
-	for (i = 0 ; i < 3 ; i += 1) {
-
+	for (int i = 0 ; i < 3 ; i += 1) {
 	    rs1 = u_close(i) ;
-
-	    if (rs1 >= 0)
-	        c += 1 ;
-
+	    if (rs1 >= 0) c += 1 ;
 	}
-
-	for (i = 0 ; i < 3 ; i += 1) {
-
+	for (int i = 0 ; i < 3 ; i += 1) {
 	    oflags = (i == 0) ? O_RDONLY : O_WRONLY ;
 	    u_open(NULLDEV,oflags,0666) ;
-
 	}
 
 	return c ;
 }
 /* end subroutine (caf) */
 
-
-static int svarsinit(pip,svp)
-struct proginfo	*pip ;
-vecstr	*svp ;
-{
-	int	rs ;
-
-
-	rs = vecstr_start(svp,6,0) ;
-	pip->open.svars = (rs >= 0) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs = vecstr_envset(svp,"p",pip->pr,-1) ;
-
-	if (rs >= 0)
-	rs = vecstr_envset(svp,"e","etc",-1) ;
-
-	if (rs >= 0)
-	rs = vecstr_envset(svp,"n",pip->searchname,-1) ;
-
-	if (rs < 0) {
-		pip->open.svars = FALSE ;
+static int svarsinit(proginfo *pip,vecstr *svp) noex {
+	int		rs ;
+	if ((rs = svp->start(6,0)) >= 0) {
+	    pip->open.svars = true ;
+	    rs = svp->envset("p",pip->pr,-1) ;
+	    if (rs >= 0) rs = svp->envset("e","etc",-1) ;
+	    if (rs >= 0) rs = svp->envset("n",pip->searchname,-1) ;
+	    if (rs < 0) {
+		pip->open.svars = false ;
 		vecstr_finish(svp) ;
-	}
-
-ret0:
+	    }
+	} /* end if (vecstr_start) */
 	return rs ;
 }
 /* end subroutine (svarsinit) */
 
-
-static int svarsfree(pip,svp)
-struct proginfo	*pip ;
-vecstr	*svp ;
-{
+static int svarsfree(proginfo *pip,vacstr *svp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (pip->open.svars && (svp != NULL)) {
-	    pip->open.svars = FALSE ;
+	if (pip->open.svars && svp) {
+	    pip->open.svars = false ;
 	    rs1 = vecstr_finish(svp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (svarsfree) */

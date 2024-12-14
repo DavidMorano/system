@@ -91,7 +91,7 @@ struct field : field_head {
 	int srvarg(cchar *,char *,int) noex ;
 	int remaining(cchar ** = nullptr) noex ;
 	void dtor() noex ;
-	~field() noex {
+	~field() {
 	    dtor() ;
 	} ;
 } ; /* end struct (field) */

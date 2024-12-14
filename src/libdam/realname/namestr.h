@@ -67,7 +67,7 @@ struct namestr : namestr_head {
 	int next(cchar **,int *,int *) noex ;
 	int brk(cchar *,cchar **) noex ;
 	void dtor() noex ;
-	~namestr() noex {
+	~namestr() {
 	    dtor() ;
 	} ;
 } ; /* end struct (namestr) */

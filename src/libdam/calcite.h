@@ -1,4 +1,5 @@
 /* calcite HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calendar citation */
@@ -17,7 +18,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 
 
 #define	CALCITE		struct calcite_head

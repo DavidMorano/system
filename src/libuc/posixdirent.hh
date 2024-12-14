@@ -1,4 +1,5 @@
 /* posixdirent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* help interface to POSIX |dirent(3c)| facility */
@@ -71,7 +72,7 @@ public:
 	int tell(off_t *) noex ;
 	int seek(off_t) noex ;
 	int rewind() noex ;
-	~posixdirent() noex {
+	~posixdirent() {
 	    (void) close() ;
 	}
 } ; /* end struct (posixdirent) */

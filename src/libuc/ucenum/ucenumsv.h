@@ -89,7 +89,7 @@ struct ucenumsv : ucenumxx {
 	ucenumsv &operator = (const ucenumsv &) = delete ;
 	int readent(ucenumsv_ent *,char *,int) noex ;
 	void dtor() noex ;
-	~ucenumsv() noex {
+	~ucenumsv() {
 	    dtor() ;
 	} ;
 } ; /* end struct (ucenumsv) */

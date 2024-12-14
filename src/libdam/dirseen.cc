@@ -260,9 +260,16 @@ int dirseen::add(cchar *sp,int sl,USTAT *sbp) noex {
 	return dirseen_add(this,sp,sl,sbp) ;
 }
 
+int dirseen::havename(cchar *sp,int sl) noex {
+	return dirseen_havename(this,sp,sl) ;
+}
+
+int dirseen::havedevino(USTAT *sbp) noex {
+	return dirseen_havedevino(this,sbp) ;
+}
+
 void dirseen::dtor() noex {
-	cint	rs = int(finish) ;
-	if (rs < 0) {
+	if (int rs ; (rs = finish) < 0) {
 	    ulogerror("dirseen",rs,"dtor-finish") ;
 	}
 }

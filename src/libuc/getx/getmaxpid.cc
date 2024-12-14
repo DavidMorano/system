@@ -42,12 +42,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>
+#include	<sys/types.h>		/* |pid_t| */
+#include	<unistd.h>		/* |sysconf(3c)| */
+#include	<climits>		/* |PID_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<isoneof.h>
 #include	<localmisc.h>
 
 #include	"getmaxpid.h"
@@ -81,48 +82,57 @@ struct pidmgr {
 
 /* forward references */
 
+static int isnosys(int) noex ;
+
 
 /* local variables */
 
 static pidmgr		getmaxpid_data ;
 
+constexpr int		rsnosys[] = {
+    	SR_NOSYS,
+	SR_INVALID,
+	0
+} ;
+
 
 /* exported variables */
 
-libdam::maxpider	maxpid ;
+libuc::maxpider		maxpid ;
 
 
 /* exported subroutines */
 
 int getmaxpid(int w) noex {
-	int		rs ;
+	int		rs = SR_INVALID ;
 	switch (w) {
 	case 0:
 	    {
                 pidmgr      *op = &getmaxpid_data ;
-                if (op->pid == 0) {
+                if ((rs = op->pid) == 0) {
                     cint    cmd = _SC_MAXPID ;
                     if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
                         op->pid = rs ;
-                    } else if (rs == SR_NOSYS) {
+                    } else if (isnosys(rs)) {
                         rs = PID_MAX ;
                         op->pid = rs ;
                     }
-                } else {
-                    rs = op->pid ;
                 }
             } /* end block */
 	    break ;
 	case 1:
 	    rs = PID_MAX ;
 	    break ;
-	default:
-	    rs = SR_INVALID ;
-	    break ;
 	} /* end switch */
-
 	return rs ;
 }
 /* end subroutine (getmaxpid) */
+
+
+/* local subroutines */
+
+static int isnosys(int rs) noex {
+    	return isOneOf(rsnosys,rs) ;
+}
 
 
