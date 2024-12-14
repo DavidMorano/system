@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int cyi_ctor(cyi *op,Args ... args) noex {
+static int calent_ctor(calent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int cyi_ctor(cyi *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cyi_ctor) */
+/* end subroutine (calent_ctor) */
 
-static int cyi_dtor(cyi *op) noex {
+static int calent_dtor(calent *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cyi_dtor) */
+/* end subroutine (calent_dtor) */
 
 template<typename ... Args>
-static inline int cyi_magic(cyi *op,Args ... args) noex {
+static inline int calent_magic(calent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CYI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (cyi_magic) */
+/* end subroutine (calent_magic) */

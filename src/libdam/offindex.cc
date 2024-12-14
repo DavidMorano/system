@@ -80,11 +80,12 @@ struct offindex_e {
 
 template<typename ... Args>
 static int offindex_ctor(offindex *op,Args ... args) noex {
+    	OFFINDEX	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous ! */
+	    memclear(hop) ; /* dangerous ! */
 	    if ((op->oip = new(nothrow) vecobj) != np) {
 		rs = SR_OK ;
 	    }

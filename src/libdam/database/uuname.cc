@@ -94,11 +94,12 @@ struct uuname_calls {
 
 template<typename ... Args>
 static int uuname_ctor(uuname *op,Args ... args) noex {
+    	UUNAME		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->loader = new(nothrow) modload) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-modload) */

@@ -50,9 +50,6 @@
 /* forward references */
 
 
-/* exported variables */
-
-
 /* local variables */
 
 

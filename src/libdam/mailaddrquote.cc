@@ -87,11 +87,12 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int mailaddrquote_ctor(MAQ *op,Args ... args) noex {
+    	MAQ		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->bsp = new(nothrow) bufstr) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-bufstr) */

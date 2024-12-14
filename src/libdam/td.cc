@@ -137,11 +137,12 @@ struct termtype {
 
 template<typename ... Args>
 static int td_ctor(td *op,Args ... args) noex {
+    	TD		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ; /* dangerous */
 	    if ((op->tsp = new(nothrow) termstr) != np) {
 	        if ((op->wlp = new(nothrow) vecitem) != np) {
 		    rs = SR_OK ;

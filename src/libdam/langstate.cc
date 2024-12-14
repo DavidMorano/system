@@ -74,10 +74,11 @@ namespace {
 
 template<typename ... Args>
 static int langstate_ctor(langstate *op,Args ... args) noex {
+    	LANGSTATE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ; /* dangerous */
 	} /* end if (non-null) */
 	return rs ;
 }

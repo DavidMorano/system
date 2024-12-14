@@ -109,6 +109,7 @@
 #include	<sfx.h>
 #include	<snx.h>
 #include	<mkx.h>
+#include	<mklogid.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
 #include	<termconseq.h>
@@ -197,11 +198,12 @@ struct colstate {
 
 template<typename ... Args>
 static int termnote_ctor(termnote *op,Args ... args) noex {
+    	TERMNOTE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ;
 	    if ((op->idp = new(nothrow) ids) != np) {
 	        if ((op->txp = new(nothrow) tmpx) != np) {
 	            if ((op->lfp = new(nothrow) logfile) != np) {

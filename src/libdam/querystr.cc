@@ -120,11 +120,12 @@ namespace {
 
 template<typename ... Args>
 static int querystr_ctor(querystr *op,Args ... args) noex {
+    	QUERYSTR	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ; /* dangerous */
 	    if ((op->spp = new(nothrow) strpack) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-strpack) */

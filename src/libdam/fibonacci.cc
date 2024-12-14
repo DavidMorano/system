@@ -50,8 +50,8 @@
 	Note that when putting the result into a 32-bit unsigned
 	integer (which is what we are doing here) the largest valued
 	input (domain) of the Fibonacci function that can be
-	represented in the result is 47. An input value of 48
-	overflows the 32-bit unsigned integer result. For this
+	represented in the result is 47.  An input value of 48
+	overflows the 32-bit unsigned integer result.  For this
 	reason, the table of values below is only 48 entries, with
 	the last entry (#47) storing the last representable result
 	for a 32-bit unsigned integer.
@@ -59,10 +59,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"fibonacci.h"
@@ -112,7 +114,7 @@ long fibonacci(int n) noex {
 	if (n < ntab) {
 	    v = fibotab[n] ;
 	} else {
-	    v = fibonacci(n-1) * fibonacci(n-2) ;
+	    v = fibonacci(n - 1) * fibonacci(n - 2) ;
 	}
 	return v ;
 }

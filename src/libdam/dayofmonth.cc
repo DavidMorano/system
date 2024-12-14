@@ -83,7 +83,11 @@ static int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
     	dayofmonth	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = memclear(hop) ;
+	    cint	sz = (szof(dayofmonth_mon *) * DAYOFMONTH_NMONS) ;
+	    memclear(hop) ;
+	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		op->months = (dayofmonth_mon **) vp ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -91,8 +95,14 @@ static int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
 
 static int dayofmonth_dtor(dayofmonth *op) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->months) {
+		rs1 = uc_free(op->months) ;
+		if (rs >= 0) rs = rs1 ;
+		op->months = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -109,9 +119,6 @@ static inline int dayofmonth_magic(dayofmonth *op,Args ... args) noex {
 /* end subroutine (dayofmonth_magic) */
 
 static int	dayofmonth_mkmonth(dayofmonth *,int) noex ;
-
-
-/* exported variables */
 
 
 /* local structures */
