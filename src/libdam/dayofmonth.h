@@ -23,7 +23,7 @@
 #define	DAYOFMONTH_MAGIC	0x99447245
 #define	DAYOFMONTH		struct dayofmonth_head
 #define	DAYOFMONTH_MON		struct dayofmonth_month
-#define	DAYOFMONTH_NMONS	12
+#define	DAYOFMONTH_NMONS	12	/* very constant! */
 
 
 struct dayofmonth_month {
@@ -31,7 +31,7 @@ struct dayofmonth_month {
 } ;
 
 struct dayofmonth_head {
-	DAYOFMONTH_MON	*months[DAYOFMONTH_NMONS] ;
+	DAYOFMONTH_MON	**months ;
 	uint		magic ;
 	int		year ;
 	int		isdst ;

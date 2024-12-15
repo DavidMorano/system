@@ -1,4 +1,5 @@
 /* substring SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* routine to match a substring within a larger string */
@@ -43,7 +44,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<six.h>
 #include	<localmisc.h>
 

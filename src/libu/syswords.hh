@@ -62,6 +62,7 @@ struct syswords {
 	static const char w_devnull[] ;
 	static const char w_maildir[] ;
 	static const char w_usrlocaldir[] ;
+	static const char w_vartmpdir[] ;
 	static const char w_digtab[] ;
 	static const char w_blanks[] ;
 	static const char w_defprovider[] ;

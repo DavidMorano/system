@@ -70,11 +70,12 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int wordfill_ctor(wordfill *op,Args ... args) noex {
+    	WORDFILL	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->sqp = new(nothrow) fifostr) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-fifostr) */

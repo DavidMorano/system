@@ -1,4 +1,5 @@
 /* keysymer SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* keysym name-value database */

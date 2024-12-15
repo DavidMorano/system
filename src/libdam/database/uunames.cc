@@ -236,11 +236,12 @@ typedef liner *		linerp ;
 
 template<typename ... Args>
 static int uunames_ctor(uunames *op,Args ... args) noex {
+    	UUNAMES		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->nlp = new(nothrow) vecobj) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */

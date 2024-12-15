@@ -1,10 +1,10 @@
-/* cyimk */
+/* cyimk SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* make a CYI database */
+/* Calendar-Year-Index DB-make (make a CYI database) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -16,6 +16,9 @@
 /* Copyright © 1998 David A≠D≠ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Object:
+	cyimk
 
 	Description:
 	This module creates a CYI database file.
@@ -39,7 +42,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error code
+	<0		error code (system-return)
 
 	Notes:
 
@@ -72,11 +75,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<endian.h>
@@ -87,6 +92,7 @@
 #include	<tmtime.h>
 #include	<opentmp.h>
 #include	<char.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"cyimk.h"
@@ -108,39 +114,16 @@
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
 
+/* imported nameﬂpaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	filer_writefill(FILER *,const void *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
-
-
-/* exported variables */
-
-CYIMK_OBJ	cyimk = {
-	"cyimk",
-	sizeof(CYIMK)
-} ;
 
 
 /* local structures */
@@ -196,12 +179,19 @@ static int	vvecmp(const void *,const void *) ;
 /* local variables */
 
 
+/* exported variables */
+
+cyimk_obj	cyimk_modinfo cyimk = {
+	"cyimk",
+	szof(cyimk)
+} ;
+
+
 /* exported subroutines */
 
-
-int cyimk_open(CYIMK *op,int year,cchar dname[],cchar cname[],int of,mode_t om)
+int cyimk_open(CYIMK *op,int year,cchar *dname,cchar *cname,int of,mode_t om)
 {
-	const int	n = CYIMK_DEFENTS ;
+	cint	n = CYIMK_DEFENTS ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -212,22 +202,12 @@ int cyimk_open(CYIMK *op,int year,cchar dname[],cchar cname[],int of,mode_t om)
 	if (dname[0] == '\0') return SR_INVALID ;
 	if (cname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_open: ent\n") ;
-	debugprintf("cyimk_open: dname=%s\n",dname) ;
-	debugprintf("cyimk_open: cname=%s\n",cname) ;
-#endif
-
 	if (year <= 0) {
 	    TMTIME	tm ;
 	    time_t	dt = time(NULL) ;
 	    rs = tmtime_localtime(&tm,dt) ;
 	    year = (tm.year + TM_YEAR_BASE) ;
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("cyimk_open: y=%u\n",year) ;
-#endif
 
 	memset(op,0,sizeof(CYIMK)) ;
 	op->om = (om|0600) ;
@@ -263,10 +243,6 @@ int cyimk_open(CYIMK *op,int year,cchar dname[],cchar cname[],int of,mode_t om)
 	    } /* end if (cyim_idbegin) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_open: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (cyimk_open) */
@@ -283,10 +259,6 @@ int cyimk_close(CYIMK *op)
 
 	if (op->magic != CYIMK_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_close: nentries=%u\n",op->nentries) ;
-#endif
-
 	f_go = (! op->f.abort) ;
 	n = op->nentries ;
 	if (n > 0) {
@@ -298,10 +270,6 @@ int cyimk_close(CYIMK *op)
 	    f_go = f_go && (rs1 >= 0) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_close: cyimk_mkidx() rs=%d\n",rs) ;
-#endif
-
 	rs1 = cyimk_listend(op) ;
 	if (rs >= 0) rs = rs1 ;
 	f_go = f_go && (rs1 >= 0) ;
@@ -310,10 +278,6 @@ int cyimk_close(CYIMK *op)
 	    rs1 = cyimk_renamefiles(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("cyimk_close: cyimk_renamefiles() rs=%d\n",rs) ;
-#endif
 
 	rs1 = cyimk_filesend(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -326,10 +290,6 @@ int cyimk_close(CYIMK *op)
 
 	rs1 = cyimk_idend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("cyimk_close: ret rs=%d n=%u\n",rs,n) ;
-#endif
 
 	op->magic = 0 ;
 	return (rs >= 0) ? n : rs ;
@@ -347,13 +307,9 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
 
 	if (op->magic != CYIMK_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_add: q=%u:%u\n",bvp->m,bvp->d) ;
-#endif
-
 	if ((bvp->lines != NULL) && (bvp->nlines > 0)) {
 	    struct blentry	ble ;
-	    const int		imax = UCHAR_MAX ;
+	    cint		imax = UCHAR_MAX ;
 	    int			i ;
 	    for (i = 0 ; (i < bvp->nlines) && (i < imax) ; i += 1) {
 
@@ -381,10 +337,6 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
 	    op->nentries += 1 ;
 	}
 
-#if	CF_DEBUGS && 0
-	debugprintf("cyimk_add: ret=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyimk_add) */
@@ -400,20 +352,13 @@ int cyimk_abort(CYIMK *op,int f)
 
 /* private subroutines */
 
-
-static int cyimk_idbegin(CYIMK *op,cchar *dname,int year)
-{
-	struct ustat	sb ;
+static int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
 	int		rs ;
-#if	CF_DEBUGS
-	debugprintf("cyimk_idbegin: dname=%s\n",dname) ;
-#endif
-	if ((rs = uc_stat(dname,&sb)) >= 0) {
-	    IDS		id ;
-	    const int	am = (W_OK|X_OK) ;
+	if (USTAT sb ; (rs = uc_stat(dname,&sb)) >= 0) {
+	    cint	am = (W_OK|X_OK) ;
 	    op->gid = sb.st_gid ;
 	    op->uid = sb.st_uid ;
-	    if ((rs = ids_load(&id)) >= 0) {
+	    if (ids id ; (rs = ids_load(&id)) >= 0) {
 	        if ((rs = sperm(&id,&sb,am)) >= 0) {
 	            char	ydname[MAXPATHLEN+1] ;
 	            if ((rs = mkydname(ydname,dname,year)) >= 0) {
@@ -428,9 +373,6 @@ static int cyimk_idbegin(CYIMK *op,cchar *dname,int year)
 		ids_release(&id) ;
 	    } /* end if (ids) */
 	} /* end if */
-#if	CF_DEBUGS
-	debugprintf("cyimk_idbegin: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (cyimk_idbegin) */
@@ -440,20 +382,14 @@ static int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname)
 {
 	struct ustat	sb ;
 	const mode_t	dm = 0777 ;
-	const int	nrs = SR_NOENT ;
+	cint	nrs = SR_NOENT ;
 	int		rs = SR_OK ;
-#if	CF_DEBUGS
-	debugprintf("cyimk_idxdir: ydname=%s\n",ydname) ;
-#endif
 	if ((rs = uc_stat(ydname,&sb)) >= 0) {
-	    const int	am = (W_OK|X_OK) ;
+	    cint	am = (W_OK|X_OK) ;
 	    uid_t	uid_yd = sb.st_uid ;
 	    gid_t	gid_yd = sb.st_gid ;
 	    if ((rs = sperm(idp,&sb,am)) >= 0) {
 		uid_t	uid = geteuid() ;
-#if	CF_DEBUGS
-	debugprintf("cyimk_idxdir: perm() rs=%d\n",rs) ;
-#endif
 		if (uid == uid_yd) {
 		    if ((uid_yd != op->uid) || (gid_yd != op->gid)) {
 			rs = cyimk_minown(op,ydname,dm) ;
@@ -464,13 +400,7 @@ static int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname)
 	    if ((rs = mkdirs(ydname,dm)) >= 0) {
 		rs = cyimk_minown(op,ydname,dm) ;
 	    } /* end if (mkdirs) */
-#if	CF_DEBUGS
-	debugprintf("cyimk_idxdir: mkdirs() rs=%d\n",rs) ;
-#endif
 	}
-#if	CF_DEBUGS
-	debugprintf("cyimk_idxdir: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (cyimk_idxdir) */
@@ -513,9 +443,6 @@ static int cyimk_filesbegin(CYIMK *op)
 	    rs = cyimk_filesbeginwait(op) ;
 	    c = rs ;
 	}
-#if	CF_DEBUGS
-	debugprintf("cyimk_filesbegin: ret rs=%d c=%u\n",rs,c) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (cyimk_filesbegin) */
@@ -523,7 +450,7 @@ static int cyimk_filesbegin(CYIMK *op)
 
 static int cyimk_filesbeginc(CYIMK *op)
 {
-	const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	int		rs ;
 	char		dbn[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
@@ -565,14 +492,11 @@ static int cyimk_filesbeginwait(CYIMK *op)
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
 	    const mode_t	om = op->om ;
-	    const int		to_stale = CYIMK_INTSTALE ;
-	    const int		nrs = SR_EXISTS ;
-	    const int		of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	    cint		to_stale = CYIMK_INTSTALE ;
+	    cint		nrs = SR_EXISTS ;
+	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
 	    int			to = CYIMK_INTOPEN ;
 	    while ((rs = cyimk_filesbegincreate(op,tbuf,of,om)) == nrs) {
-#if	CF_DEBUGS
-	        debugprintf("cyimk_filesbeginwait: loop ret rs=%d\n",rs) ;
-#endif
 	        c = 1 ;
 	        sleep(1) ;
 	        unlinkstale(tbuf,to_stale) ;
@@ -585,9 +509,6 @@ static int cyimk_filesbeginwait(CYIMK *op)
 	    }
 	} /* end if (mknewfname) */
 	} /* end if (mkpath) */
-#if	CF_DEBUGS
-	debugprintf("cyimk_filesbeginwait: ret ret rs=%d\n",rs) ;
-#endif
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (cyimk_filesbeginwait) */
@@ -596,16 +517,8 @@ static int cyimk_filesbeginwait(CYIMK *op)
 static int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om)
 {
 	int		rs ;
-#if	CF_DEBUGS
-	{
-	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
-	    debugprintf("cyimk_filesbegincreate: ent of=%s\n",obuf) ;
-	    debugprintf("cyimk_filesbegincreate: om=%05o\n",om) ;
-	}
-#endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    cchar	*cp ;
 	    op->f.created = TRUE ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
@@ -613,10 +526,6 @@ static int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om)
 	    }
 	    u_close(fd) ;
 	} /* end if (create) */
-
-#if	CF_DEBUGS
-	debugprintf("cyimk_filesbegincreate: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -627,10 +536,6 @@ static int cyimk_filesend(CYIMK *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("cyimk_filesend: ent\n") ;
-#endif
 
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
@@ -647,10 +552,6 @@ static int cyimk_filesend(CYIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	    op->nidxfname = NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("cyimk_filesend: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -701,10 +602,6 @@ static int cyimk_mkidx(CYIMK *op)
 	int		rs1 ;
 	int		wlen = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_mkidx: ent\n") ;
-#endif
-
 	if ((rs = cyimk_nidxopen(op)) >= 0) {
 	    CYIHDR	hdr ;
 
@@ -719,13 +616,13 @@ static int cyimk_mkidx(CYIMK *op)
 	    hdr.year = op->year ;
 
 	    if ((rs = cyimk_mkidxmain(op,&hdr)) >= 0) {
-	        const int	hlen = HDRBUFLEN ;
+	        cint	hlen = HDRBUFLEN ;
 	        char		hbuf[HDRBUFLEN+1] ;
 	        hdr.fsize = rs ;
 	        wlen = rs ;
 
 	        if ((rs = cyihdr(&hdr,0,hbuf,hlen)) >= 0) {
-	            const int	bl = rs ;
+	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
 	                const mode_t	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
@@ -738,10 +635,6 @@ static int cyimk_mkidx(CYIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cyimk_nidx) */
 
-#if	CF_DEBUGS
-	debugprintf("cyimk_mkidx: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (cyimk_mkidx) */
@@ -750,8 +643,8 @@ static int cyimk_mkidx(CYIMK *op)
 static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 {
 	FILER		hf, *hfp = &hf ;
-	const int	nfd = op->nfd ;
-	const int	ps = getpagesize() ;
+	cint	nfd = op->nfd ;
+	cint	ps = getpagesize() ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
@@ -784,7 +677,7 @@ static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 /* ARGSUSED */
 static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILER *hfp)
 {
-	const int	hlen = HDRBUFLEN ;
+	cint	hlen = HDRBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HDRBUFLEN+1] ;
@@ -828,7 +721,7 @@ static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	struct bventry	*bvep ;
 	vecobj		*elp = &op->verses ;
 	uint		a[5] ;
-	const int	size = (5 * sizeof(uint)) ;
+	cint	size = (5 * sizeof(uint)) ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
@@ -861,7 +754,7 @@ static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	struct blentry	*blep ;
 	vecobj		*llp = &op->lines ;
 	uint		a[2] ;
-	const int	size = (2 * sizeof(uint)) ;
+	cint	size = (2 * sizeof(uint)) ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	int		i ;
@@ -892,12 +785,8 @@ static int cyimk_nidxopen(CYIMK *op)
 	int		rs ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
-#if	CF_DEBUGS
-	debugprintf("cyimk_nidxopen: ent\n") ;
-	debugprintf("cyimk_nidxopen: nidxfname=%s\n",op->nidxfname) ;
-#endif
 	if (op->nidxfname == NULL) {
-	    const int	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
+	    cint	type = (op->f.ofcreat && (! op->f.ofexcl)) ;
 	    cchar	*dbn = op->cname ;
 	    cchar	*suf = FSUF_IDX ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -928,9 +817,6 @@ static int cyimk_nidxopen(CYIMK *op)
 	    op->nfd = rs ;
 	    fd = rs ;
 	}
-#if	CF_DEBUGS
-	debugprintf("cyimk_nidxopen: ret rs=%d\n",rs) ;
-#endif
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (cyimk_nidxopen) */
@@ -956,16 +842,9 @@ static int cyimk_renamefiles(CYIMK *op)
 	cchar		*suf = FSUF_IDX ;
 	cchar		*end = ENDIANSTR ;
 	char		dbn[MAXPATHLEN+1] ;
-#if	CF_DEBUGS
-	debugprintf("cyimk_renamefiles: ent\n") ;
-	debugprintf("cyimk_renamefiles: nidxfname=%s\n",op->nidxfname) ;
-#endif
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
 	    char	idxfname[MAXPATHLEN + 1] ;
 	if ((rs = mkfnamesuf2(idxfname,dbn,suf,end)) >= 0) {
-#if	CF_DEBUGS
-	debugprintf("cyimk_renamefiles: idxfname=%s\n",idxfname) ;
-#endif
 	    if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
 	        op->nidxfname[0] = '\0' ;
 	    } else {
@@ -974,10 +853,6 @@ static int cyimk_renamefiles(CYIMK *op)
 	    }
 	} /* end if (mkfnamesuf) */
 	} /* end if (mkpath) */
-#if	CF_DEBUGS
-	debugprintf("cyimk_renamefiles: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cyimk_renamefiles) */
@@ -999,10 +874,8 @@ static int mkcitation(uint *cip,CYIMK_ENT *bvp)
 }
 /* end subroutine (mkcitation) */
 
-
-static int mkydname(char *rbuf,cchar *dname,int year)
-{
-	const int	rlen = MAXPATHLEN ;
+static int mkydname(char *rbuf,cchar *dname,int year) noex {
+	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (rs >= 0) {

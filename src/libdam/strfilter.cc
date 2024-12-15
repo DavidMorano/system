@@ -1,4 +1,5 @@
 /* strfilter SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* filter a string of text against some criteria */
@@ -72,11 +73,12 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int strfilter_ctor(strfilter *op,Args ... args) noex {
+    	STRFILTER	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->sslp = new(nothrow) vecstr) != np) {
 	        if ((op->sxlp = new(nothrow) vecstr) != np) {
 		    rs = SR_OK ;

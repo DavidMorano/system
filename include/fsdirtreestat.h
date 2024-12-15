@@ -1,4 +1,5 @@
 /* fsdirtreestat HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get status (??) on a file */

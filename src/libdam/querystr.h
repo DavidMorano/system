@@ -1,4 +1,5 @@
 /* querystr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* Query-String manager */
@@ -16,6 +17,7 @@
 
 #ifndef	QUERYSTR_INCLUDE
 #define	QUERYSTR_INCLUDE
+
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
@@ -57,8 +59,8 @@ extern int querystr_count(querystr *) noex ;
 extern int querystr_already(querystr *,cchar *,int) noex ;
 extern int querystr_curbegin(querystr *,querystr_cur *) noex ;
 extern int querystr_curend(querystr *,querystr_cur *) noex ;
+extern int querystr_curenum(querystr *,querystr_cur *,cchar **,cchar **) noex ;
 extern int querystr_fetch(querystr *,cchar *,int,querystr_cur *,cchar **) noex ;
-extern int querystr_enum(querystr *,querystr_cur *,cchar **,cchar **) noex ;
 extern int querystr_get(querystr *,int,cchar **,cchar **) noex ;
 extern int querystr_finish(querystr *) noex ;
 

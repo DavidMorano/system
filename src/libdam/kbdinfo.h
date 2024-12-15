@@ -1,33 +1,29 @@
-/* kbdinfo */
+/* kbdinfo HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* keyboard-information database access */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	KBDINFO_INCLUDE
-#define	KBDINFO_INCLUDE	1
+#define	KBDINFO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<localmisc.h>
-
-#include	"keysymer.h"
-#include	"termcmd.h"
 
 
 #define	KBDINFO_MAGIC		0x24182138
 #define	KBDINFO			struct kbdinfo_head
 #define	KBDINFO_KE		struct kbdinfo_e
 #define	KBDINFO_CUR		struct kbdinfo_c
-
 /* types */
-
 #define	KBDINFO_TREG		0
 #define	KBDINFO_TESC		1
 #define	KBDINFO_TCSI		2
@@ -42,10 +38,10 @@ struct kbdinfo_flags {
 } ;
 
 struct kbdinfo_e {
-	const char	*a ;		/* the memory allocation */
-	const char	*keyname ;	/* keysym */
-	const char	*istr ;
-	const char	*dstr ;
+	cchar		*a ;		/* the memory allocation */
+	cchar		*keyname ;	/* keysym */
+	cchar		*istr ;
+	cchar		*dstr ;
 	short		*p ;		/* parameters */
 	int		type ;		/* key type */
 	int		name ;		/* key name */
@@ -71,7 +67,7 @@ struct kbdinfo_head {
 extern "C" {
 #endif
 
-extern int kbdinfo_open(KBDINFO *,KEYSYMER *,const char *) ;
+extern int kbdinfo_open(KBDINFO *,KEYSYMER *,cchar	 *) ;
 extern int kbdinfo_count(KBDINFO *) ;
 extern int kbdinfo_lookup(KBDINFO *,char *,int,TERMCMD *) ;
 extern int kbdinfo_curbegin(KBDINFO *,KBDINFO_CUR *) ;

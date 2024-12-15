@@ -39,6 +39,7 @@
 #include	<cfdecmf.h>
 #include	<cfnum.h>
 
+#include	<cfdouble.h>
 #include	<cfhexs.h>
 
 

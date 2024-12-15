@@ -1,4 +1,5 @@
 /* readkeycmd HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -10,7 +11,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #ifndef	READCMDKEY_INCLUDE
 #define	READCMDKEY_INCLUDE

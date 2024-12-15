@@ -1,4 +1,5 @@
 /* dirlist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* directory list manager */

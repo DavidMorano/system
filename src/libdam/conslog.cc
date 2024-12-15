@@ -1,4 +1,5 @@
 /* conslog SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* send log messages to the system logger device */

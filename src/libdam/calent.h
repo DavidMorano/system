@@ -26,6 +26,7 @@
 #define	CALENT_FL	struct calent_flags
 #define	CALENT_Q	CALCITE
 #define	CALENT_NLE	4		/* starting number of lines */
+#define	CALENT_MAGIC	0x99000001
 
 
 struct calent_line {

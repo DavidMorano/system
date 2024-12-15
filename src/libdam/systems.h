@@ -1,4 +1,5 @@
 /* systems HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get machine dialing information from UUCP "Systems" DB */

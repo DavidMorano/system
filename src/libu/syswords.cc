@@ -60,6 +60,7 @@ const char syswords::w_sysdbdir[] =	"/sysdb" ;
 const char syswords::w_devnull[] =	"/dev/null" ;
 const char syswords::w_maildir[] =	"/var/mail" ;
 const char syswords::w_usrlocaldir[] =	"/usr/local" ;
+const char syswords::w_vartmpdir[] =	"/var/tmp" ;
 
 const char syswords::w_digtab[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
 		"abcdefghijklmnopqrstuvwxyz" "Øø" ;

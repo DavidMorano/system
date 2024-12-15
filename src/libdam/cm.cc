@@ -1,4 +1,5 @@
 /* cm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Connection Manager */
@@ -145,10 +146,9 @@ int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 /* save the dialer name */
 
 	if (rs >= 0) {
-	    int		nl = sep->dialernamelen ;
-	    cchar	*np = sep->dialername ;
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
+	    cint	sl = sep->dialernamelen ;
+	    cchar	*sp = sep->dialername ;
+	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 		op->magic = CM_MAGIC ;
 	        op->dname = cp ;
 	    }
@@ -177,7 +177,6 @@ int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 }
 /* end subroutine (cm_open) */
 
-/* free up the resources occupied by this CM */
 int cm_close(CM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;

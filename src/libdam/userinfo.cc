@@ -90,6 +90,7 @@
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
 #include	<mkx.h>
+#include	<mklogid.h>
 #include	<cfdec.h>
 #include	<ctdec.h>
 #include	<char.h>
@@ -272,9 +273,9 @@ namespace {
 
 template<typename ... Args>
 static int userinfo_ctor(userinfo *op,Args ... args) noex {
+    	USERINFO	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    userinfo_head	*hop = static_cast<userinfo_head *>(op) ;
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;

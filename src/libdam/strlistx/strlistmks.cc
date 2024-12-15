@@ -154,11 +154,12 @@ struct vars {
 
 template<typename ... Args>
 static int strlistmks_ctor(strlistmks *op,Args ... args) noex {
+    	STRLISTMKS	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->stp = new(nothrow) strtab) != np) {
 		if ((op->rtp = new(nothrow) srectab) != np) {
 		    rs = SR_OK ;

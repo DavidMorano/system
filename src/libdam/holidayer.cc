@@ -1,4 +1,5 @@
 /* holidayer SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* access for the HOLIDAYER database */

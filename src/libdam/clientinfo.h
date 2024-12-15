@@ -1,4 +1,5 @@
 /* clientinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage client information (a little bit) */
@@ -18,7 +19,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<sockaddress.h>
 #include	<vecstr.h>
 

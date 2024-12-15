@@ -1,4 +1,5 @@
 /* cmdmap HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manage the map of keys to commands */

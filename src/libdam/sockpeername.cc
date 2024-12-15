@@ -1,4 +1,5 @@
 /* sockpeername SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a peer host name if there is one */

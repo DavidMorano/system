@@ -66,7 +66,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
-extern int	cfdouble() ;
 
 #ifdef	BSD
 extern int	i_multiply() ;

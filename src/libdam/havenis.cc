@@ -1,6 +1,9 @@
-/* havenis */
+/* havenis SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* do we have NIS running? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,32 +17,29 @@
 
 /******************************************************************************
 
+  	Name:
+	havenis
+
+	Description:
 	We determine is NIS is activated.  Note that NIS may not be active.
 
 	Synopsis:
-
 	int havenis() ;
 
 	Arguments:
-
 	*
 
 	Returns:
-
-	<0	error
-	==	NIS not activated on current system
 	>0	NIS is activate (but not necessarily running)
-
+	==	NIS not activated on current system
+	<0	error
 
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -1,4 +1,5 @@
 /* termtrans SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* terminal-character-translation management */
@@ -29,6 +30,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<new>

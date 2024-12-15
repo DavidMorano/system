@@ -1,4 +1,5 @@
 /* streamsync HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* data stream synchronization mechanism */
@@ -15,6 +16,9 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 
 #define	STREAMSYNC_MAGIC	0x96817463

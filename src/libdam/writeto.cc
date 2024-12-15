@@ -1,4 +1,5 @@
 /* writeto SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform timed write operation */
@@ -7,13 +8,13 @@
 
 /* revision history:
 
-	= 1998-02-01, David AÂ­DÂ­ Morano
+	= 1998-02-01, David A­D­ Morano
 	This object module was originally written to create a logging
 	mechanism for PCS application programs.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************
 
@@ -24,6 +25,8 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

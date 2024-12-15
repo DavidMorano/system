@@ -1,31 +1,29 @@
-/* mxalias */
+/* mxalias HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MXALIAS_INCLUDE
-#define	MXALIAS_INCLUDE	1
+#define	MXALIAS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-
 #include	<usystem.h>		/* for 'ino_t' */
 #include	<vecobj.h>
 #include	<keyvals.h>
 #include	<localmisc.h>
 
 
-/* object defines */
-
 #define	MXALIAS		struct mxalias_head
-#define	MXALIAS_CUR	struct mxalias_c
+#define	MXALIAS_CUR	struct mxalias_cursor
 #define	MXALIAS_MAGIC	0x23456112
 
 
-struct mxalias_c {
+struct mxalias_cursor {
 	uint		magic ;
 	char		*vbuf ;
 	char		**vals ;
@@ -40,16 +38,16 @@ struct mxalias_flags {
 } ;
 
 struct mxalias_head {
-	uint		magic ;
-	const char	*pr ;
-	const char	*username ;
-	const char	*userdname ;
-	const char	*pwd ;
+	cchar		*pr ;
+	cchar		*username ;
+	cchar		*userdname ;
+	cchar		*pwd ;
 	vecobj		files ;
 	KEYVALS		entries ;
 	struct mxalias_flags	f ;
 	time_t		ti_access ;
 	time_t		ti_check ;
+	uint		magic ;
 	int		ncursors ;
 	int		count ;
 } ;
@@ -61,11 +59,11 @@ struct mxalias_head {
 extern "C" {
 #endif
 
-extern int	mxalias_open(MXALIAS *,const char *,const char *) ;
+extern int	mxalias_open(MXALIAS *,cchar *,cchar *) ;
 extern int	mxalias_count(MXALIAS *) ;
 extern int	mxalias_curbegin(MXALIAS *,MXALIAS_CUR *) ;
 extern int	mxalias_lookup(MXALIAS *,MXALIAS_CUR *,
-			const char *,int) ;
+			cchar *,int) ;
 extern int	mxalias_read(MXALIAS *,MXALIAS_CUR *,char *,int) ;
 extern int	mxalias_enum(MXALIAS *,MXALIAS_CUR *,
 			char *,int,char *,int) ;

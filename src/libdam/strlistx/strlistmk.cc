@@ -91,11 +91,12 @@ typedef strlistmk_calls *	callsp ;
 
 template<typename ... Args>
 static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
+    	STRLISTMK	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->mlp = new(nothrow) modload) != np) {
 		strlistmk_calls	*callp ;
 	        if ((callp = new(nothrow) strlistmk_calls) != np) {

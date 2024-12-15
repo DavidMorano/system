@@ -6,6 +6,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	- 2008-10-01, David A­D­ Morano
+	This object module was originally written.
+
+*/
+
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CALMGR_INCLUDE
@@ -29,8 +36,9 @@
 
 #define	CALMGR		struct calmgr_head
 #define	CALMGR_Q	CALCITE
-#define	CALMGR_CUR	struct calmgr_cursor
 #define	CALMGR_FL	struct calmgr_flags
+#define	CALMGR_CUR	struct calmgr_cursor
+#define	CALMGR_MAGIC	0x15712543
 
 
 struct calmgr_cursor {
@@ -51,13 +59,14 @@ struct calmgr_head {
 	cchar		*idxdname ;
 	void		*cyp ;			/* CALYEARS object pointer */
 	cchar		*mapdata ;		/* DB memory-map address */
-	vechand		idxes ;			/* indices */
+	vechand		*idxp ;			/* indiex-list-pointer */
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* DB last check */
 	size_t		fsize ;			/* DB file size */
 	size_t		mapsize ;		/* DB map length */
 	CALMGR_FL	f ;
+	uint		magic ;
 	int		nentries ;		/* DB entries */
 	int		cidx ;			/* parent index (ordinal) */
 } ;

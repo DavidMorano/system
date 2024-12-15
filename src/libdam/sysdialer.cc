@@ -1,4 +1,5 @@
 /* sysdialer SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* system-dialer storage object */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	sysdialer
+
+	Description:
 	This object manages what sysdialers have been loaded so far.
 
 *******************************************************************************/

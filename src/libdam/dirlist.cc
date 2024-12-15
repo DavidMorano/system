@@ -1,4 +1,5 @@
 /* dirlist SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* directory list manager */
@@ -28,6 +29,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	dirlist
+
+	Description:
 	This object manages directory lists by:
 	+ ensuring unique entries by name
 	+ ensuring unique entries by dev-inode pair
@@ -104,7 +109,7 @@ template<typename ... Args>
 static inline int dirlist_ctor(dirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->tlen = 0 ;

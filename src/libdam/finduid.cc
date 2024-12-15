@@ -93,11 +93,12 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int finduid_ctor(finduid *op,Args ... args) noex {
+    	FINDUID		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->utp = new(nothrow) tmpx) != np) {
 	            if ((op->ucp = new(nothrow) pwcache) != np) {

@@ -1,4 +1,5 @@
 /* querystr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* Query-String manager */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	querystr
+
+	Description:
 	We take a raw "query-string" and process it so that its
 	components can be accessed.
 
@@ -27,6 +32,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<vector>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<strn.h>
@@ -43,8 +49,6 @@
 
 
 /* local defines */
-
-#define	KEYVAL	struct keyval
 
 
 /* imported namespaces */
@@ -120,11 +124,12 @@ namespace {
 
 template<typename ... Args>
 static int querystr_ctor(querystr *op,Args ... args) noex {
+    	QUERYSTR	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ; /* dangerous */
 	    if ((op->spp = new(nothrow) strpack) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-strpack) */
@@ -288,7 +293,7 @@ int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 }
 /* end subroutine (querystr_fetch) */
 
-int querystr_enum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
+int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
 	if (op && curp) {
@@ -316,7 +321,7 @@ int querystr_enum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
 }
-/* end subroutine (querystr_enum) */
+/* end subroutine (querystr_curenum) */
 
 
 /* private subroutines */
@@ -450,12 +455,11 @@ int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 
 int subinfo::load() noex {
 	cint		n = kvs.size() ;
-	cint		esize = 2*sizeof(cchar *) ;
+	cint		esize = 2 * szof(cchar *) ;
 	int		rs ;
 	int		sz ;
-	void		*p ;
 	sz = ((n+1)*esize) ;
-	if ((rs = uc_malloc(sz,&p)) >= 0) {
+	if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    op->kv = (cchar *(*)[2]) p ;
 	    op->n = n ;
 	    for (int i = 0 ; i < n ; i += 1) {
@@ -474,8 +478,7 @@ static char *strwebhex(char *rp,cchar *tp,int tl) noex {
 	    cint	ch1 = mkchar(tp[1]) ;
 	    cint	ch2 = mkchar(tp[2]) ;
 	    if (ishexlatin(ch1) && ishexlatin(ch2)) {
-	        int	v ;
-	        if (cfhexi((tp+1),2,&v) >= 0) {
+	        if (int v ; cfhexi((tp+1),2,&v) >= 0) {
 	            *rp++ = v ;
 	        }
 	    }

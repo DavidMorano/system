@@ -146,9 +146,9 @@ struct tcpaddr {
 
 template<typename ... Args>
 static int listenspec_ctor(listenspec *op,Args ... args) noex {
+    	LISTENSPEC	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    listenspec_head	*hop = static_cast<listenspec *>(op) ;
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;

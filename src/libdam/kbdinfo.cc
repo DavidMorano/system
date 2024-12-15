@@ -1,10 +1,11 @@
-/* kbdinfo */
+/* kbdinfo SUPPORT */
+/* encoding=ISO8859-1 */
+/* version %I% last-modified %G% */
 
 /* keyboard-information database access */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -17,29 +18,28 @@
 
 /*******************************************************************************
 
+  	Name:
+	kbdinfo
+
+	Description:
         This object provides access to a keyboard-information database. This
         information is used in creating the name of a key pressed on a
         particular keyboard.
 
-        Notes: There is much to be desired with the implementation of this
-        object. We may have to revisit this object if we ever need to get some
-        enhanced function out of function keys.
-
+        Notes: 
+	There is much to be desired with the implementation of this
+	object.  We may have to revisit this object if we ever need
+	to get some enhanced function out of function keys.
 
 *******************************************************************************/
 
-
-#define	KBDINFO_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<bfile.h>

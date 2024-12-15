@@ -122,9 +122,10 @@ namespace {
 
 template<typename ... Args>
 static int cyi_ctor(cyi *op,Args ... args) noex {
+    	CYI		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -203,7 +204,6 @@ int cyi_open(cyi *op,int year,cchar *dname,cchar *cname) noex {
 		static cint	rsv = var.mkvars() ;
 		if ((rs = rsv) >= 0) {
 	            custime	dt = getustime ;
-	            memclear(op) ;
 	            if ((rs = cyi_dbfind(op,dt,dname,cname,year)) >= 0) {
 	                op->ti_lastcheck = dt ;
 	                op->year = year ;

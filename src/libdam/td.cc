@@ -1,4 +1,5 @@
 /* td SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Terminal Display (TD) library */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	td
+
+	Description:
 	This object module facilitates managing a terminal display.
 	This object contains routines (not unlike in the UNIX
 	'curses' library) to display information in "windows" on a
@@ -25,7 +30,6 @@
 	that THIS LIBRARY WORKS!
 
 	Other notes:
-
 	An 'xterm' terminal is almost en entire complete 'vt102'
 	terminal.  It pretty much only lacks the blinking character
 	attribute and the double height-width characters.
@@ -137,11 +141,12 @@ struct termtype {
 
 template<typename ... Args>
 static int td_ctor(td *op,Args ... args) noex {
+    	TD		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ; /* dangerous */
 	    if ((op->tsp = new(nothrow) termstr) != np) {
 	        if ((op->wlp = new(nothrow) vecitem) != np) {
 		    rs = SR_OK ;

@@ -67,7 +67,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
-extern int	cfdouble() ;
 extern int	machineinit(), machineadd() ;
 extern int	runinit(), runadd(), rundel() ;
 

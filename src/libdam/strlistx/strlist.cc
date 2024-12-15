@@ -118,11 +118,12 @@ enum itentries {
 
 template<typename ... Args>
 static int strlist_ctor(strlist *op,Args ... args) noex {
+    	STRLIST		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->fhp = new(nothrow) strlisthdr) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-strlisthdr) */

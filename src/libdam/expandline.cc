@@ -1,4 +1,5 @@
 /* expandline SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to expand a line out for TROFF rendering */
@@ -17,7 +18,7 @@
 /* Copyright © 1987 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
-/*******************************************************************
+/*******************************************************************************
 
 	Name:
 	expandline
@@ -42,7 +43,7 @@
 	>=0		length of output line processed
 	<0		error (system-return)
 
-*********************************************************************/
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>

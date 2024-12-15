@@ -1,4 +1,6 @@
-/* cvtdater */
+/* cvtdater SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* date conversion object */
 /* version %I% last-modified %G% */

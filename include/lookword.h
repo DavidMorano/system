@@ -1,4 +1,5 @@
 /* lookword HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* word look-up object */

@@ -92,7 +92,7 @@ typedef fonce::stype::iterator	setiter ;
 /* exported subroutines */
 
 
-/* local subroutines */
+/* local subroutines (methods) */
 
 int fonce::istart(int n) noex {
 	int		rs = SR_INVALID ;

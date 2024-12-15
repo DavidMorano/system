@@ -1,5 +1,9 @@
 /* strfilter HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
+
+/* filter a string of text against some criteria */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2009 David A­D­ Morano.  All rights reserved. */

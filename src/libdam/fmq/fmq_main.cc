@@ -98,9 +98,10 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int fmq_ctor(fmq *op,Args ... args) noex {
+    	FMQ		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = memclear(op) ;
+	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }

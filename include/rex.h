@@ -1,4 +1,5 @@
 /* rex HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to open a FD to a remotely executing command */
@@ -17,7 +18,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<netfile.h>
 
 

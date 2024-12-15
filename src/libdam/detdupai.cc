@@ -1,4 +1,5 @@
 /* detdupai SUPPORT (Determine-Duplicate-Array-Integers) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* does the given array of integers have duplicate entries */

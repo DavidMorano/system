@@ -1,4 +1,5 @@
 /* mkdirlist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create a list of the newsgroup directories */

@@ -1,4 +1,5 @@
 /* securefile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* check if a given file name is SUID and owned by our effective UID */

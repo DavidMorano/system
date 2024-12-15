@@ -28,10 +28,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<sbuf.h>
@@ -45,6 +45,17 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -56,6 +67,36 @@
 
 /* forward references */
 
+template<typename ... Args>
+static int calent_ctor(calent *op,Args ... args) noex {
+    	CALENT		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (calent_ctor) */
+
+static int calent_dtor(calent *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (calent_dtor) */
+
+template<typename ... Args>
+static inline int calent_magic(calent *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (calent_magic) */
+
 
 /* local variables */
 
@@ -65,121 +106,130 @@
 
 /* exported subroutines */
 
-int calent_start(calent *ep,calent_q *qp,uint loff,int llen) noex {
-	int		rs = SR_FAULT ;
-	if (ep && qp) {
-	    cint	ne = CALENT_NLE ;
-	    int		sz ;
-	    memclear(ep) ;
-	    ep->cidx = -1 ;
-	    ep->q = *qp ;
-	    ep->voff = loff ;
-	    ep->vlen = llen ;
-	    sz = ne * szof(calent_ln) ;
+int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
+	cint		ne = CALENT_NLE ;
+	int		rs ;
+	if ((rs = calent_ctor(op,qp)) >= 0) {
+	    cint	sz = ne * szof(calent_ln) ;
+	    op->cidx = -1 ;
+	    op->q = *qp ;
+	    op->voff = loff ;
+	    op->vlen = llen ;
 	    if (calent_ln *elp ; (rs = uc_malloc(sz,&elp)) >= 0) {
-	        ep->lines = elp ;
-	        ep->e = ne ;
-	        ep->i += 1 ;
-	        ep->magic = 0x99000001 ;
+	        op->lines = elp ;
+	        op->e = ne ;
+	        op->i += 1 ;
+	        op->magic = CALENT_MAGIC ;
 	        elp->loff = loff ;
 	        elp->llen = llen ;
 	    } /* end if (memory-allocation) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		calent_dtor(op) ;
+	    }
+	} /* end if (calent_ctor) */
 	return rs ;
 }
 /* end subroutine (calent_start) */
 
-int calent_finish(calent *ep) noex {
-	int		rs = SR_FAULT ;
+int calent_finish(calent *op) noex {
+	int		rs ;
 	int		rs1 ;
-	if (ep) {
+	if ((rs = calent_magic(op)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (ep->e > 0) {
+	    if (op->e > 0) {
 		rs = SR_BADFMT ;
-	        if ((ep->i >= 0) && (ep->i <= ep->e)) {
+	        if ((op->i >= 0) && (op->i <= op->e)) {
 		    rs = SR_OK ;
-	            if (ep->lines) {
-	                rs1 = uc_free(ep->lines) ;
+	            if (op->lines) {
+	                rs1 = uc_free(op->lines) ;
 	                if (rs >= 0) rs = rs1 ;
-	                ep->lines = nullptr ;
+	                op->lines = nullptr ;
 	            }
-	            ep->i = 0 ;
-	            ep->e = 0 ;
+	            op->i = 0 ;
+	            op->e = 0 ;
 	        } /* end if (good) */
 	    } /* end if (open) */
-	} /* end if (non-null) */
+	    {
+		rs1 = calent_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (calent_finish) */
 
-int calent_setidx(calent *ep,int cidx) noex {
-	int		rs = SR_FAULT ;
-	if (ep) {
-	    rs = cidx ;
-	    ep->cidx = cidx ;
-	}
+int calent_setidx(calent *op,int cidx) noex {
+	int		rs ;
+	if ((rs = calent_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (cidx >= 0) {
+	        rs = cidx ;
+	        op->cidx = cidx ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (calent_setidx) */
 
-int calent_add(calent *ep,uint loff,int llen) noex {
-	int		rs = SR_FAULT ;
-	if (ep) {
+int calent_add(calent *op,uint loff,int llen) noex {
+	int		rs ;
+	if ((rs = calent_magic(op)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (ep->e > 0) {
+	    if (op->e > 0) {
 		rs = SR_BADFMT ;
-	        if ((ep->i >= 0) && (ep->i <= ep->e)) {
+	        if ((op->i >= 0) && (op->i <= op->e)) {
 	            calent_ln	*elp ;
 	            int		sz ;
 		    rs = SR_OK ;
-	            if (ep->i == ep->e) {
-	                cint	ne = (ep->e * 2) + CALENT_NLE ;
+	            if (op->i == op->e) {
+	                cint	ne = (op->e * 2) + CALENT_NLE ;
 	                sz = ne * szof(calent_ln) ;
-	                if ((rs = uc_realloc(ep->lines,sz,&elp)) >= 0) {
-	                    ep->e = ne ;
-	                    ep->lines = elp ;
+	                if ((rs = uc_realloc(op->lines,sz,&elp)) >= 0) {
+	                    op->e = ne ;
+	                    op->lines = elp ;
 	                }
 	            }
 	            if (rs >= 0) {
-	                ep->vlen = ((loff + llen) - ep->voff) ;
-	                elp = (ep->lines + ep->i) ;
+	                op->vlen = ((loff + llen) - op->voff) ;
+	                elp = (op->lines + op->i) ;
 	                elp->loff = loff ;
 	                elp->llen = llen ;
-	                ep->i += 1 ;
+	                op->i += 1 ;
 	            } /* end if (ok) */
 	        } /* end if (good) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (calent_add) */
 
-int calent_samecite(calent *ep,CALENT *oep) noex {
-	int		rs = SR_FAULT ;
+int calent_samecite(calent *op,CALENT *oop) noex {
+	int		rs ;
 	int		f = true ;
-	if (ep && oep) {
-	    f = f && (ep->q.y == oep->q.y) ;
-	    f = f && (ep->q.m == oep->q.m) ;
-	    f = f && (ep->q.d == oep->q.d) ;
-	} /* end if (non-null) */
+	if ((rs = calent_magic(op,oop)) >= 0) {
+	    f = f && (op->q.y == oop->q.y) ;
+	    f = f && (op->q.m == oop->q.m) ;
+	    f = f && (op->q.d == oop->q.d) ;
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (calent_samecite) */
 
-int calent_mkhash(calent *ep,cchar *md) noex {
-	int		rs = SR_FAULT ;
-	if (ep && md) {
+int calent_mkhash(calent *op,cchar *md) noex {
+	int		rs ;
+	if ((rs = calent_magic(op,md)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (ep->e > 0) {
+	    if (op->e > 0) {
 		rs = SR_NOTOPEN ;
-	        if (ep->lines) {
-	            calent_ln	*elp = ep->lines ;
+	        if (op->lines) {
+	            calent_ln	*elp = op->lines ;
 	            rs = SR_OK ;
-	            if (! ep->f.hash) {
+	            if (! op->f.hash) {
 	                uint	hash = 0 ;
 	                int	sl, cl ;
 	                cchar	*sp, *cp ;
-	                for (int i = 0 ; i < ep->i ; i += 1) {
+	                for (int i = 0 ; i < op->i ; i += 1) {
 	                    sp = (md + elp[i].loff) ;
 	                    sl = elp[i].llen ;
 	                    while ((cl = nextfield(sp,sl,&cp)) > 0) {
@@ -188,68 +238,70 @@ int calent_mkhash(calent *ep,cchar *md) noex {
 	                        sp = (cp + cl) ;
 	                    } /* end while */
 	                } /* end for */
-	                ep->hash = hash ;
-	                ep->f.hash = true ;
+	                op->hash = hash ;
+	                op->f.hash = true ;
 	           } /* end if (needed) */
 	        } /* end if (open) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (calent_mkhash) */
 
-int calent_sethash(calent *ep,uint hash) noex {
-	int		rs = SR_FAULT ;
-	if (ep) {
+int calent_sethash(calent *op,uint hash) noex {
+	int		rs ;
+	if ((rs = calent_magic(op)) >= 0) {
 	    rs = SR_OK ;
-	    ep->hash = hash ;
-	    ep->f.hash = true ;
-	} /* end if (non-null) */
+	    op->hash = hash ;
+	    op->f.hash = true ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (calent_sethash) */
 
-int calent_gethash(calent *ep,uint *rp) noex {
-	int		rs = SR_FAULT ;
+int calent_gethash(calent *op,uint *rp) noex {
+	int		rs ;
 	int		f = false ;
-	if (ep) {
+	if ((rs = calent_magic(op)) >= 0) {
 	    rs = SR_OK ;
-	    f = ep->f.hash ;
+	    f = op->f.hash ;
 	    if (rp) {
-	        *rp = (f) ? ep->hash : 0 ;
+	        *rp = (f) ? op->hash : 0 ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (calent_gethash) */
 
-int calent_loadbuf(calent *ep,char *rbuf,int rlen,cchar *mp) noex {
+int calent_loadbuf(calent *op,char *rbuf,int rlen,cchar *mp) noex {
 	int		rs ;
 	int		len = 0 ;
-	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
-	    calent_ln	*lines = ep->lines ;
-	    int		nlines = ep->i ; /* number of line elements */
-	    int		ll ;
-	    cchar	*lp ;
-	    for (int i = 0 ; i < nlines ; i += 1) {
-	        if (i > 0) b.chr(' ') ;
-	        lp = (mp + lines[i].loff) ;
-	        ll = lines[i].llen ;
-	        rs = b.strw(lp,ll) ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	    len = b.finish ;
-	    if (rs >= 0) rs = len ;
-	} /* end if (sbuf) */
+	if ((rs = calent_magic(op,rbuf,mp)) >= 0) {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	        calent_ln	*lines = op->lines ;
+	        int		nlines = op->i ; /* number of line elements */
+	        int		ll ;
+	        cchar		*lp ;
+	        for (int i = 0 ; i < nlines ; i += 1) {
+	            if (i > 0) b.chr(' ') ;
+	            lp = (mp + lines[i].loff) ;
+	            ll = lines[i].llen ;
+	            rs = b.strw(lp,ll) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        len = b.finish ;
+	        if (rs >= 0) rs = len ;
+	    } /* end if (sbuf) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (calent_loadbuf) */
 
-int calent_getci(calent *ep) noex {
-	int		rs = SR_FAULT ;
-	if (ep) {
-	    rs = ep->cidx ;
-	}
+int calent_getci(calent *op) noex {
+	int		rs ;
+	if ((rs = calent_magic(op)) >= 0) {
+	    rs = op->cidx ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (calent_getci) */
