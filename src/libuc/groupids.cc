@@ -109,17 +109,22 @@ int groupids::get(gid_t **gpp) noex {
 }
 /* end method (groupids::get) */
 
+void groupids::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("groupids",rs,"fini-finish") ;
+	}
+}
+
 
 /* local subroutines */
 
 int groupids::istart(gid_t **gpp) noex {
 	int		rs ;
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	if ((rs = u_getgroups(0,np)) >= 0) {
-	    cint	size = ((rs+1)*sizeof(gid_t)) ;
-	    void	*vp{} ;
+	    cint	sz = ((rs + 1) * szof(gid_t)) ;
 	    ng = rs ;
-	    if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 		gids = (gid_t *) vp ;
 		if ((rs = u_getgroups(ng,gids)) >= 0) {
 		    gids[ng] = gidend ;
@@ -150,15 +155,15 @@ int groupids::ifinish() noex {
 }
 /* end subroutine (groupids::ifinish) */
 
-groupids_ster::operator int () noex {
+groupids_st::operator int () noex {
 	return op->istart(nullptr) ;
 }
-/* end method (groupids_ster::operator) */
+/* end method (groupids_st::operator) */
 
-int groupids_ster::operator () (gid_t **gpp) noex {
+int groupids_st::operator () (gid_t **gpp) noex {
 	return op->istart(gpp) ;
 }
-/* end method (groupids_ster::operator) */
+/* end method (groupids_st::operator) */
 
 groupids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -173,11 +178,5 @@ groupids_co::operator int () noex {
 	return rs ;
 }
 /* end method (groupids_co::operator) */
-
-void groupids::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
-	    ulogerror("groupids",rs,"fini-finish") ;
-	}
-}
 
 

@@ -72,7 +72,7 @@
 
 #define	IDXDNAME	".calyears"
 
-#define	CEBUFLEN	((CALMGR_MAXLINES*COLUMNS) + (3*szof(int)))
+#define	CEBUFLEN	((CALMGR_MAXLINES * COLUMNS) + (3 * szof(int)))
 
 
 /* imported namespaces */
@@ -179,8 +179,8 @@ static int	calmgr_mapdata(calmgr *,cchar **) noex ;
 static int	calmgr_mkdirs(calmgr *,cchar *,mode_t) noex ;
 #endif /* CF_MKDIRS */
 
-static int	mkbve_start(CYIMK_ENT *,cchar *,calent *) noex ;
-static int	mkbve_finish(CYIMK_ENT *) noex ;
+static int	mkbve_start(cyimk_ent *,cchar *,calent *) noex ;
+static int	mkbve_finish(cyimk_ent *) noex ;
 
 static bool	isempty(cchar *,int) noex ;
 
@@ -351,10 +351,10 @@ int calmgr_audit(calmgr *op) noex {
 
 static int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 	int		rs ;
-	int		size = 0 ;
-	size += (strlen(dn)+1) ;
-	size += (strlen(cn)+1) ;
-	if (char *bp{} ; (rs = uc_malloc(size,&bp)) >= 0) {
+	int		sz = 0 ;
+	sz += (strlen(dn)+1) ;
+	sz += (strlen(cn)+1) ;
+	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->dn = bp ;
 	    bp = (strwcpy(bp,dn,-1)+1) ;
@@ -525,14 +525,13 @@ static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 
 	if ((rs = cyi_curbegin(cip,&ccur)) >= 0) {
 	    if ((rs = cyi_curcite(cip,&ccur,qp)) >= 0) {
+	        cint		celen = CEBUFLEN ;
+		if (char *cebuf{} ; (rs = uc_malloc((celen+1),&cebuf)) >= 0) {
 	        calent		e ;
 	        uint		loff ;
-	        cint		celen = CEBUFLEN ;
 	        int		llen ;
-	        int		f_ent = false ;
-	        int		f_already = false ;
-	        char		cebuf[CEBUFLEN + 1] ;
-
+	        bool		f_ent = false ;
+	        bool		f_already = false ;
 	        while (rs >= 0) {
 
 	            rs1 = cyi_curread(cip,&ccur,&ce,cebuf,celen) ;
@@ -581,16 +580,18 @@ static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 	            } /* end if (positive) */
 
 	        } /* end while */
-
 	        if (f_ent) {
 	            f_ent = false ;
 	            calent_finish(&e) ;
 	        }
+		    rs = rsfree(rs,cebuf) ;
+		} /* end if (m-a-f) */
 
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = SR_OK ;
 	    }
-	    cyi_curend(cip,&ccur) ;
+	    rs1 = cyi_curend(cip,&ccur) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cyi-cur) */
 
 	return (rs >= 0) ? c : rs ;
@@ -598,9 +599,9 @@ static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 /* end subroutine (calmgr_lookone) */
 
 static int calmgr_mkidx(calmgr *op,int y) noex {
-	cint		csize = szof(calmgr_idx) ;
+	cint		csz = szof(calmgr_idx) ;
 	int		rs ;
-	if (calmgr_idx *cip{} ; (rs = uc_malloc(csize,&cip)) >= 0) {
+	if (calmgr_idx *cip{} ; (rs = uc_malloc(csz,&cip)) >= 0) {
 	    if ((rs = calmgr_idxbegin(op,cip,y)) >= 0) {
 	        vechand		*ilp = op->idxp ;
 	        rs = vechand_add(ilp,cip) ;
@@ -638,11 +639,10 @@ static int calmgr_idxend(calmgr *op,calmgr_idx *cip) noex {
 
 static int calmgr_cyiopen(calmgr *op,calmgr_idx *cip,int y) noex {
 	cyi		*cyp = &cip->cy ;
-	time_t		ti_db = op->ti_db ;
+	custime		ti_db = op->ti_db ;
 	int		rs ;
 	cchar		*dn = op->idxdname ;
 	cchar		*cn = op->cn ;
-
 	if ((rs = cyi_open(cyp,y,dn,cn)) >= 0) {
 	    bool	f_open = true ;
 	    if (cyi_info ci ; (rs = cyi_getinfo(cyp,&ci)) >= 0) {
@@ -664,40 +664,39 @@ static int calmgr_cyiopen(calmgr *op,calmgr_idx *cip,int y) noex {
 	        rs = cyi_open(cyp,y,dn,cn) ;
 	    }
 	} /* end if (cyi_open) */
-
 	return rs ;
 }
 /* end subroutine (calent_cyiopen) */
 
 static int calmgr_cyiclose(calmgr *op,calmgr_idx *cip) noex {
-	cyi		*cyp = &cip->cy ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op == nullptr) return SR_FAULT ;
-	{
-	    rs1 = cyi_close(cyp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
+	if (op) {
+	    cyi		*cyp = &cip->cy ;
+	    {
+	        rs1 = cyi_close(cyp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calmgr_cyiclose) */
 
 static int calmgr_mkcyi(calmgr *op,int y) noex {
-	CYIMK		cyind ;
-	CYIMK_ENT	bve ;
+	cyimk		cyind ;
+	cyimk_ent	bve ;
 	int		rs ;
 	int		rs1 ;
 	int		of = 0 ;
 	int		si ;
 	int		c = 0 ;
-	int		f ;
 	cmode		om = 0664 ;
 	cchar	*dn = op->idxdname ;
 	cchar	*cn = op->cn ;
 
 	if ((rs = cyimk_open(&cyind,y,dn,cn,of,om)) >= 0) {
 	    calent	e ;
-	    CALCITE	q ;
+	    calcite	q ;
 	    uint	foff = 0 ;
 	    cint	cidx = op->cidx ;
 	    int		ml = op->mapsize ;
@@ -708,6 +707,7 @@ static int calmgr_mkcyi(calmgr *op,int y) noex {
 	    cchar	*mp = op->mapdata ;
 	    cchar	*lp ;
 	    cchar	*tp ;
+	    bool	f = false ;
 
 	    while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
@@ -830,15 +830,13 @@ static int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
 #endif /* CF_MKDIRS */
 
 static int calmgr_mapdata(calmgr *op,cchar **rpp) noex {
-	int		rs ;
-	if (op->mapdata != nullptr) {
+	int		rs = SR_INVALID ;
+	if (op->mapdata) {
 	    if (rpp) {
 	       	*rpp = charp(op->mapdata) ;
 	    }
 	    rs = int(op->mapsize) ;
-	} else {
-	    rs = SR_INVALID ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calmgr_mapdata) */
@@ -870,63 +868,61 @@ static int calmgr_idxends(calmgr *op) noex {
 /* end subroutine (calmgr_idxends) */
 
 static int calmgr_idxaudit(calmgr *op,calmgr_idx *cip) noex {
-	cyi		*cyp = &cip->cy ;
-	int		rs ;
-	if (op == nullptr) return SR_FAULT ;
-	rs = cyi_audit(cyp) ;
+	int		rs = SR_FAULT ;
+	if (op && cip) {
+	    cyi		*cyp = &cip->cy ;
+	    rs = cyi_audit(cyp) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (calmgr_idxaudit) */
 
-static int mkbve_start(CYIMK_ENT *bvep,cchar *md,calent *ep) noex {
-	int		rs ;
+static int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
+	int		rs = SR_FAULT ;
 	int		nlines = 0 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if ((rs = calent_mkhash(ep,md)) >= 0) {
-	    bvep->m = ep->q.m ;
-	    bvep->d = ep->q.d ;
-	    bvep->voff = ep->voff ;
-	    bvep->vlen = ep->vlen ;
-	    bvep->hash = ep->hash ;
-	    bvep->lines = nullptr ;
-	    nlines = ep->i ;
-	    if (nlines <= UCHAR_MAX) {
-	        CYIMK_LINE	*lines ;
-	        cint		size = (nlines + 1) * szof(CYIMK_LINE) ;
-	        bvep->nlines = nlines ;
-	        if ((rs = uc_malloc(size,&lines)) >= 0) {
-	            int		i ; /* used-afterwards */
-	            bvep->lines = lines ;
-	            for (i = 0 ; i < nlines ; i += 1) {
-	                lines[i].loff = ep->lines[i].loff ;
-	                lines[i].llen = ep->lines[i].llen ;
-	            }
-	            lines[i].loff = 0 ;
-	            lines[i].llen = 0 ;
-	        } /* end if (memory-allocation) */
-	    } else {
-	        rs = SR_TOOBIG ;
-	    }
-	} /* end if (calent_mkhash) */
-
+	if (bvep && md && ep) {
+	    if ((rs = calent_mkhash(ep,md)) >= 0) {
+	        bvep->m = ep->q.m ;
+	        bvep->d = ep->q.d ;
+	        bvep->voff = ep->voff ;
+	        bvep->vlen = ep->vlen ;
+	        bvep->hash = ep->hash ;
+	        bvep->lines = nullptr ;
+	        nlines = ep->i ;
+	        if (nlines <= UCHAR_MAX) {
+	            cyimk_ln	*lines ;
+	            cint	lsz = (nlines + 1) * szof(cyimk_ln) ;
+	            bvep->nlines = nlines ;
+	            if ((rs = uc_malloc(lsz,&lines)) >= 0) {
+	                int	i ; /* used-afterwards */
+	                bvep->lines = lines ;
+	                for (i = 0 ; i < nlines ; i += 1) {
+	                    lines[i].loff = ep->lines[i].loff ;
+	                    lines[i].llen = ep->lines[i].llen ;
+	                }
+	                lines[i].loff = 0 ;
+	                lines[i].llen = 0 ;
+	            } /* end if (memory-allocation) */
+	        } else {
+	            rs = SR_TOOBIG ;
+	        }
+	    } /* end if (calent_mkhash) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? nlines : rs ;
 }
 /* end subroutine (mkbve_start) */
 
-static int mkbve_finish(CYIMK_ENT *bvep) noex {
-	int		rs = SR_OK ;
+static int mkbve_finish(cyimk_ent *bvep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (bvep == nullptr) return SR_FAULT ;
-
-	if (bvep->lines != nullptr) {
-	    rs1 = uc_free(bvep->lines) ;
-	    if (rs >= 0) rs = rs1 ;
-	    bvep->lines = nullptr ;
-	}
-
+	if (bvep) {
+	    rs = SR_OK ;
+	    if (bvep->lines) {
+	        rs1 = uc_free(bvep->lines) ;
+	        if (rs >= 0) rs = rs1 ;
+	        bvep->lines = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mkbve_finish) */

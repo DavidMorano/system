@@ -735,6 +735,7 @@ dayofmonth.o:		dayofmonth.cc dayofmonth.h
 lineindex.o:		lineindex.cc lineindex.h
 lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h
 netfile.o:		netfile.cc netfile.h
+calmgr.o:		calmgr.cc calmgr.h
 
 # DATABASE
 database.o:		database.dir

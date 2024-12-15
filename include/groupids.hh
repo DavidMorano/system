@@ -21,7 +21,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -37,14 +37,14 @@ enum groupidsmems {
 
 struct groupids ;
 
-struct groupids_ster {
+struct groupids_st {
 	groupids	*op{} ;
 	operator int () noex ;
 	int operator () (gid_t ** = nullptr) noex ;
 	void operator () (groupids *p) {
 	    op = p ;
 	} ;
-} ; /* end struct (groupids_ster) */
+} ; /* end struct (groupids_st) */
 
 struct groupids_co {
 	groupids	*op{} ;
@@ -60,7 +60,9 @@ struct groupids_co {
 } ; /* end struct (groupids_co) */
 
 struct groupids {
-	groupids_ster	start ;
+    	friend		groupids_st ;
+    	friend		groupids_co ;
+	groupids_st	start ;
 	groupids_co	ngroups ;
 	groupids_co	finish ;
 	gid_t		*gids = nullptr ;
@@ -73,12 +75,13 @@ struct groupids {
 	groupids(const groupids &) = delete ;
 	groupids &operator = (const groupids &) = delete ;
 	int get(gid_t **) noex ;
-	int istart(gid_t **) noex ;
-	int ifinish() noex ;
 	void dtor() noex ;
 	~groupids() {
 	    dtor() ;
 	} ;
+    private:
+	int istart(gid_t **) noex ;
+	int ifinish() noex ;
 } ; /* end struct (groupids) */
 
 

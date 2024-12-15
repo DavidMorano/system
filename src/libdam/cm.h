@@ -31,8 +31,8 @@
 #include	<usysrets.h>
 #include	<localmisc.h>		/* |MAXNAMELEN| */
 
-#include	"systems.h"
-#include	"sysdialer.h"
+#include	<systems.h>
+#include	<sysdialer.h>
 
 
 #define	CM_MAGIC	31815926
@@ -66,7 +66,7 @@ struct cm_head {
 	void		*dobj ;		/* individual sysdialer object */
 	cchar		*dname ;	/* sysdialer name */
 	CM_ARGS		*ap ;
-	SYSDIALER_CALLS	c ;
+	sysdialer_ca	c ;
 	uint		magic ;
 	int		dsize ;		/* individual sysdialer object size */
 	int		dflags ;	/* sysdialer flags */
