@@ -1,4 +1,5 @@
 /* psem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* POSIX© unnamed Semaphore (PSEM) */
@@ -16,14 +17,17 @@
 
 /*******************************************************************************
 
-	These are "unnamed" POSIX® semaphores.
+  	Object:
+	psem
 
-	This module implements an emulated POSIX® semaphore.  I have
-	to write a look-alike implementation of POSIX semaphores
-	myself because the Apple Darwin implemention does not allow
-	for the un-named semaphore use case!  Yes, once and (and again,
-	and again) the Apple Darwin UNIX-like implementation sucks
-	cock meat. F*ck Apple Darwin.
+	Description:
+	These are "unnamed" POSIX® semaphores.  This module implements
+	an emulated POSIX® semaphore.  I have to write a look-alike
+	implementation of POSIX semaphores myself because the Apple
+	Darwin implemention does not allow for the un-named semaphore
+	use case!  Yes, once and (and again, and again) the Apple
+	Darwin UNIX-like implementation sucks cock meat. F*ck Apple
+	Darwin.
 
 *******************************************************************************/
 
@@ -35,6 +39,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<csem.h>		/* <- couting semaphore (DAM) */
 

@@ -1,4 +1,5 @@
 /* lockmemalloc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* memory allocation facility w/ locking */
@@ -8,7 +9,8 @@
 /* revision history:
 
 	= 2015-04-06, David A­D­ Morano
-	Written to have a place for the various KSH initialization subroutines.
+	Written to have a place for the various KSH initialization
+	subroutines.
 
 */
 
@@ -22,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

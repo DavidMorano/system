@@ -1,4 +1,5 @@
 /* inttypesx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* extended integer types */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<inttypes.h>
 #include	<stdintx.h>
 

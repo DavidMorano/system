@@ -1,4 +1,5 @@
 /* uproguser SUPPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® username and possibly user-home-directory */
@@ -20,8 +21,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

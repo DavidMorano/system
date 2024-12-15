@@ -1,4 +1,5 @@
 /* rmeol INCLUDE */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* remove EOL (End-Of-Line) characters from the given string */
@@ -19,20 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<char.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int rmeol(cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* RMEOL_INCLUDE */

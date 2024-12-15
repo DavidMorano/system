@@ -1,4 +1,5 @@
 /* urotate HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* rotate an unsigned integer */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

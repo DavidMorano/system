@@ -1,4 +1,5 @@
 /* utmpaccent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UTMPACCENT management */
@@ -23,7 +24,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #ifndef	UTMPFENT

@@ -1,4 +1,5 @@
 /* sysdbfname HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* special function to retrieve system-database (SYSDB) filenames */
@@ -24,6 +25,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<sysdbfnames.h>		/* <- the money shot */
 

@@ -1,4 +1,5 @@
 /* inet4int SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert an INETv4 address (in network form) to an unsigned-integer */

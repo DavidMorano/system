@@ -1,8 +1,8 @@
-/* ucopeninfo HEADER */
+/* inetdomainname HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* additional UNIX® limits support */
+/* get the local node name and INET domain name */
 /* version %I% last-modified %G% */
 
 
@@ -20,46 +20,34 @@
 
 /*******************************************************************************
 
-	Additional support for the UNIX® OPEN facility.
+  	Name:
+	inetdomainname
+
+	Description:
+	This file contains some support for the UNIX® INETDOMAINNAME related
+	operations.
 
 *******************************************************************************/
 
-#ifndef	UCOPENINFO_INCLUDE
-#define	UCOPENINFO_INCLUDE
+#ifndef	INETDOMAINNAME_INCLUDE
+#define	INETDOMAINNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
-
-#define	UCOPENINFO	ucopeninfo_head
-
-
-struct ucopeninfo_head {
-	mainv		envv ;
-	cchar		*fname ;
-	int		clinks ;
-	int		oflags ;
-	int		to ;
-	int		opts ;
-	mode_t		operms ;
-} ;
-
-typedef UCOPENINFO	ucopeninfo ;
 
 EXTERNC_begin
 
-extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
-extern int	uc_openinfo(ucopeninfo *) noex ;
+extern uint	inetdomainname(char *,int,cchar *,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* UCOPENINFO_INCLUDE */
+#endif /* INETDOMAINNAME_INCLUDE */
 
 

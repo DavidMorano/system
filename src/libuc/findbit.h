@@ -1,4 +1,5 @@
 /* findbit HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* find bit patterns (whatever!) */
@@ -15,6 +16,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 

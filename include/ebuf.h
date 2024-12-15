@@ -1,4 +1,5 @@
 /* ebuf HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* manage entry buffering of a file */
@@ -24,6 +25,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -31,10 +33,10 @@
 #define	EBUF_NENTS	4
 #define	EBUF		struct ebuf_head
 #define	EBUF_FL		struct ebuf_flags
-#define	EBUF_WAY	struct ebuf_way
+#define	EBUF_WAY	struct ebuf_wayer
 
 
-struct ebuf_way {
+struct ebuf_wayer {
 	char		*wbuf ;		/* buffer */
 	off_t		woff ;		/* "way" offset to file entries */
 	uint		utime ;		/* usage time */
@@ -61,6 +63,8 @@ struct ebuf_head {
 } ;
 
 typedef EBUF		ebuf ;
+typedef	EBUF_FL		ebuf_fl ;
+typedef	EBUF_WAY	ebuf_way ;
 
 EXTERNC_begin
 

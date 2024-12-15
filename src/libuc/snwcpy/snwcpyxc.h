@@ -1,4 +1,5 @@
 /* snwcpyxc HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* copy a c-string to a given case */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

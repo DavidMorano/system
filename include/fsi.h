@@ -1,4 +1,5 @@
 /* fsi HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* FIFO-String-Interlocked */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	fsi
+
+	Description:
 	Manage interlocked string-FIFO operations.
 
 *******************************************************************************/

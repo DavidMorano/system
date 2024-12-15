@@ -1,4 +1,5 @@
 /* manstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* special string manipulations */
@@ -12,9 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	MANSTR		struct manstr_head

@@ -1,4 +1,5 @@
 /* wsix HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* wide-c-string find-index operations */
@@ -23,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 EXTERNC_begin

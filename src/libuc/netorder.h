@@ -1,4 +1,5 @@
 /* netorder HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* network byte order manipulations */
@@ -17,11 +18,13 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
 
 
 #define	NETORDER	char *
+
 
 EXTERNC_begin
 

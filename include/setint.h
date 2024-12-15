@@ -1,4 +1,5 @@
 /* setint HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* unordered set of integers */
@@ -15,6 +16,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	SETINT		struct setint_head

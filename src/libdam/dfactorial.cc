@@ -50,10 +50,15 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cmath>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
+
+#include	"dfactorial.h"
 
 
 /* local defines */
@@ -74,8 +79,6 @@ extern "C" {
 
 /* foward references */
 
-extern "C" double	dfactorial(double,int) noex ;
-
 
 /* local variables */
 
@@ -88,7 +91,7 @@ constexpr double	phi = ((1.0 + sqrt(5.0))/2.0) ;
 /* exported subroutines */
 
 double dfactorial(int n) noex {
-	double			v = -1.0 ;
+	double		v = -1.0 ;
 	if (n >= 0) {
 	    v = 1.0 ;
 	    if (n > 1) {

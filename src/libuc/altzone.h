@@ -35,6 +35,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<time.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #if	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0))

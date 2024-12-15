@@ -1,4 +1,5 @@
 /* outbuf HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* output buffer management (really?) */
@@ -12,9 +13,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	OUTBUF		struct outbuf_head

@@ -1,4 +1,5 @@
 /* utmpent HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get user information from UTMP database */
@@ -24,14 +25,13 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
-/* object defines */
 #ifndef	UTMPENT
 #define	UTMPENT		struct utmpx
 #endif
-
 /* entry type values */
 #define	UTMPENT_TEMPTY		0	/* entry is unused */
 #define	UTMPENT_TRUNLEVEL	1

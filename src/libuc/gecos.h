@@ -1,4 +1,5 @@
 /* gecos HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* parse a GECOS field located in a buffer */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

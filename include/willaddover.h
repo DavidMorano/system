@@ -1,4 +1,5 @@
 /* willaddover HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Will an Addition Overflow? */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 

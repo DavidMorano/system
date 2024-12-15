@@ -1,4 +1,5 @@
 /* inetdomainname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the local node name and INET domain name */
@@ -85,8 +86,9 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<strings.h>		/* |strncasecmp(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstrings>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<filebuf.h>
 #include	<sfx.h>
@@ -94,6 +96,8 @@
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
+
+#include	"inetdomainname.h"
 
 
 /* local defines */
@@ -135,9 +139,9 @@ struct guess {
 static char	*findguess(char *) noex ;
 
 
-/* local static variables */
+/* local variables */
 
-static constexpr struct guess	ga[] = {
+constexpr guess		ga[] = {
 	{ "hammett", "ece.neu.com" },
 	{ "gilmore", "ece.neu.com" },
 	{ "dr", "dr.lucent.com" },

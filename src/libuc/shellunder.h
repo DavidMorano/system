@@ -1,4 +1,5 @@
 /* shellunder HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* parse a c-string into the shell-under information components */
@@ -16,6 +17,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
