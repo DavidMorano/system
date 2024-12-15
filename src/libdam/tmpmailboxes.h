@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	getsrcname
+	tmpmailboxes
 
 	Description:
 	I do something w/ temporary mailboxes.  I am sure that this

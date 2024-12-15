@@ -43,12 +43,12 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<uvariables.hh>
 #include	<getnodename.h>
 #include	<mallocxx.h>
-#include	<estrings.h>
+#include	<estrings.h>		/* |sncpy{x}(3uc)| */
 #include	<mkpr.h>
 #include	<xperm.h>
 #include	<isnot.h>
@@ -97,14 +97,13 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rbuf) {
-	    USTAT	sb ;
 	    cchar	*tmpmb = TMPMAILBOXES ;
 	    rbuf[0] = '\0' ;
-	    if ((rs = uc_stat(tmpmb,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_stat(tmpmb,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|W_OK|X_OK) ;
 		    if ((rs = perm(tmpmb,-1,-1,nullptr,am)) >= 0) {
-	                rs = sncpy1(rbuf,rlen,tmpmb) ;
+	                rs = sncpy(rbuf,rlen,tmpmb) ;
 		        rl = rs ;
 		    } else if (isNotAccess(rs)) {
 	                rs = deftmpdir(rbuf,rlen) ;
@@ -149,23 +148,22 @@ static int deftmpdir(char *rbuf,int rlen) noex {
 	cchar		*tmpdir = sysword.w_tmpdir ;
 	static cchar	*cp = getenv(varname.tmpdir) ;
 	if (cp) {
-	    USTAT	sb ;
-	    if ((rs = uc_stat(cp,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_stat(cp,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|W_OK|X_OK) ;
 		    if ((rs = perm(cp,-1,-1,nullptr,am)) >= 0) {
-	                rs = sncpy1(rbuf,rlen,cp) ;
+	                rs = sncpy(rbuf,rlen,cp) ;
 		    } else if (isNotAccess(rs)) {
-	                rs = sncpy1(rbuf,rlen,tmpdir) ;
+	                rs = sncpy(rbuf,rlen,tmpdir) ;
 		    }
 		} else {
-	            rs = sncpy1(rbuf,rlen,tmpdir) ;
+	            rs = sncpy(rbuf,rlen,tmpdir) ;
 		}
 	    } else if (isNotPresent(rs)) {
-	        rs = sncpy1(rbuf,rlen,tmpdir) ;
+	        rs = sncpy(rbuf,rlen,tmpdir) ;
 	    }
 	} else {
-	    rs = sncpy1(rbuf,rlen,tmpdir) ;
+	    rs = sncpy(rbuf,rlen,tmpdir) ;
 	}
 	return rs ;
 }
@@ -174,16 +172,14 @@ static int deftmpdir(char *rbuf,int rlen) noex {
 static int chownpcs(cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*dbuf{} ;
-	if ((rs = malloc_hn(&dbuf)) >= 0) {
+	if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
 	    cint	dlen = rs ;
 	    if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
 		if (char *prbuf{} ; (rs = malloc_mp(&prbuf)) >= 0) {
 	             cint	prlen = rs ;
 	    	     cchar	*prname = PRNAME ;
 	             if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
-	 	         USTAT	sb ;
-		         if ((rs = uc_stat(prbuf,&sb)) >= 0) {
+	 	         if (USTAT sb ; (rs = uc_stat(prbuf,&sb)) >= 0) {
 		             const uid_t	uid_pcs = sb.st_uid ;
 		             const gid_t	gid_pcs = sb.st_gid ;
 		             rs = uc_chown(dname,uid_pcs,gid_pcs) ;

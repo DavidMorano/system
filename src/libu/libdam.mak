@@ -261,8 +261,8 @@ OBJ144= cfdouble.o cfdecf.o cfb26.o
 OBJ145= cfdecmf.o cfdect.o cfroman.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o isort.o
-OBJ148= fam.o fhm.o fsum.o binexp.o
-OBJ149= permutations.o combinations.o factorial.o fibonacci.o ipowell.o
+OBJ148= fam.o fhm.o fsum.o
+OBJ149= permutations.o combinations.o
 OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 
@@ -830,6 +830,11 @@ algorithms.dir:
 # FMQ
 fmq.o:			fmq.dir
 fmq.dir:	
+	makesubdir $@
+
+# MATHDAM
+mathdam.o:		mathdam.dir
+mathdam.dir:	
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

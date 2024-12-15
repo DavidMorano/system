@@ -25,7 +25,7 @@
 /*******************************************************************************
 
   	Group:
-	sncpyxw
+	sncpy{x}w
 
 	Description:
 	This subroutine concatenates strings into a single resulting
@@ -61,11 +61,19 @@
 /* external subroutines */
 
 
-/* forward subroutines */
+/* external varaibles */
 
-extern "C" {
-    int	sncpyxw(char *,int,int,...) noex ;
-}
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

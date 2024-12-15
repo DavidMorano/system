@@ -66,7 +66,7 @@
 
 #ifdef	__cplusplus
 #ifndef	npack
-#define	npack(args)		sizeof...(args)
+#define	npack(args)		int(sizeof...(args))
 #endif
 #endif /* __cplusplus */
 

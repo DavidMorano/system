@@ -74,12 +74,12 @@ struct flagstrs {
 } ;
 
 
-/* foward references */
+/* forward references */
 
 
 /* local variables */
 
-static constexpr struct flagstrs	fs_vstat[] = {
+constexpr flagstrs	fs_vstat[] = {
 	{ ST_RDONLY, "RDONLY" },
 	{ ST_NOSUID, "NOSUID" },
 #ifdef	ST_NOTRUNC

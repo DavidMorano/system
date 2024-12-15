@@ -24,7 +24,7 @@
 #define	REX_DEFEXECSERVICE		512
 
 /* 
-This flag is used in the same namespace as the |open(2)| open 
+This (next) flag is used in the same namespace as the |open(2)| open 
 flags and therefor is pretty dangerous, but we live on the edge!
 */
 
@@ -50,7 +50,7 @@ struct rex_auth {
 	cchar		*res ;
 	cchar		*username ;
 	cchar		*password ;
-	NETFILE_ENT	**machinev ;
+	netfile_ent	**machinev ;
 } ;
 
 typedef	REX_FL		rex_fl ;

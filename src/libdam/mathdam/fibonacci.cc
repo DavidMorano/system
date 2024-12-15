@@ -37,7 +37,7 @@
 	Notes:
 	The original Fibonacci function:
 
-	long fibonacci(int n) {
+	long fibonacci(int n) noex {
 	    long	v = 0 ;
 	    if ((n == 1) || (n == 2)) {
 	        n = 1 ;

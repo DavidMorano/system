@@ -65,14 +65,14 @@ struct val {
 } ;
 
 
-/* foward references */
+/* forward references */
 
 static int	findent(int) noex ;
 
 
 /* local variables */
 
-static const struct val	vals[] = {
+constexpr val	vals[] = {
 	{ T_LISTEN, "LISTEN", "connection indication received" },
 	{ T_CONNECT, "CONNECT", "connect confirmation received" },
 	{ T_DATA, "DATA", "normal data received" },

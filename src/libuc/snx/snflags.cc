@@ -48,7 +48,7 @@
 /* local structures */
 
 
-/* foward references */
+/* forward references */
 
 
 /* local variables */

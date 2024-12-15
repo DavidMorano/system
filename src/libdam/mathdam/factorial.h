@@ -1,8 +1,8 @@
-/* dfibonacci HEADER */
+/* factorial HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* calculate double-precision fibonacci */
+/* calculate factorial */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DFIBONACCI_INCLUDE
-#define	DFIBONACCI_INCLUDE
+#ifndef	FACTORIAL_INCLUDE
+#define	FACTORIAL_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,12 +28,11 @@
 
 EXTERNC_begin
 
-extern double		dfibonacci(int) noex ;
-extern long double	ldfibonacci(int) noex ;
+extern long	factorial(int) noex ;
 
 EXTERNC_end
 
 
-#endif /* DFIBONACCI_INCLUDE */
+#endif /* FACTORIAL_INCLUDE */
 
 

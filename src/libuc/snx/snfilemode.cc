@@ -92,7 +92,7 @@ struct flagstrs {
 } ;
 
 
-/* foward references */
+/* forward references */
 
 
 /* local variables */
