@@ -1,4 +1,5 @@
 /* logbase HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Integer-Remaider */
@@ -47,6 +48,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

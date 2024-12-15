@@ -1,6 +1,6 @@
 /* cvtdater HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
-
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -10,8 +10,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	CVTDATER	struct cvtdater_head
@@ -25,12 +28,11 @@ typedef CVTFATER	cvtdater ;
 
 EXTERNC_begin
 
-extern int	cvtdater_start(CVTDATER *,time_t) noex ;
-extern int	cvtdater_load(CVTDATER *,time_t *,cchar *,int) noex ;
-extern int	cvtdater_finish(CVTDATER *) noex ;
+extern int	cvtdater_start(cvtdater *,time_t) noex ;
+extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int) noex ;
+extern int	cvtdater_finish(cvtdater *) noex ;
 
 EXTERNC_end
-#
 
 #endif /* CVTDATER_INCLUDE */
 

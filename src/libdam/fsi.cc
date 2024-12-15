@@ -1,4 +1,5 @@
 /* fsi SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* FIFO-String-Interlocked management */
@@ -16,11 +17,17 @@
 
 /*******************************************************************************
 
+  	Object:
+	fsi
+
+	Description:
 	This object manages interlocked FIFO-string operations.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<fifostr.h>

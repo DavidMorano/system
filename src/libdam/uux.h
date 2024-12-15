@@ -1,4 +1,5 @@
 /* uux HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* SYSDIALER "uux" module */
@@ -26,7 +27,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<logfile.h>
-
 #include	<sysdialer.h>
 
 

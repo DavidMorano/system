@@ -1,7 +1,9 @@
-/* nthai */
+/* nthai SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* find the Nth index-value function (for an array of integers) */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 
@@ -34,11 +36,9 @@
 	Returns:
 	-	
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
 #include	<localmisc.h>
 
@@ -46,7 +46,10 @@
 /* local defines */
 
 
-/* typedefs */
+/* imported namespaces */
+
+
+/* local typedefs */
 
 typedef int	(*partpred_t)(int,int) ;
 

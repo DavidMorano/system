@@ -1,4 +1,5 @@
 /* outfmt SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* output formats */
@@ -16,14 +17,22 @@
 
 /*******************************************************************************
 
+  	Name:
+	ourfmt
+
+	Description:
 	These are (below) the output formats for something.
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>
 
 #include	"outfmt.h"

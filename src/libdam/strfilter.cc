@@ -1,4 +1,5 @@
 /* strfilter SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* filter a string of text against some criteria */

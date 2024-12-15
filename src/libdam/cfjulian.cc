@@ -1,4 +1,5 @@
 /* cfjulian SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert a digit string (possibly a Julian date) to its UNIX time value */

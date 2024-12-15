@@ -1,4 +1,5 @@
 /* rmermsg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* create and parse the internal messages */
@@ -26,6 +27,8 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<serialbuf.h>
 #include	<stdorder.h>

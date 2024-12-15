@@ -1,4 +1,5 @@
 /* rex SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to open a FD to a remotely executing command */

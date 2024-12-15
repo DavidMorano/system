@@ -1,4 +1,5 @@
 /* ecmsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* email-cover subchannel message */
@@ -18,7 +19,6 @@
 #define	ECMSG_INCLUDE
 
 
-/* object defines */
 #define	ECMSG			struct ecmsg_head
 #define	ECMSG_MAXBUFLEN		(8 * 1024)
 

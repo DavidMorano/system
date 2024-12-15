@@ -1,4 +1,5 @@
-/* holidays */
+/* holidays HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* access for the HOLIDAYS database */
@@ -18,10 +19,9 @@
 #define	HOLIDAYS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 #define	HOLIDAYS_MAGIC	0x63328183

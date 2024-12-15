@@ -1,4 +1,5 @@
 /* digsmall HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* format a number for a three-column-wide field for the VMAIL program */

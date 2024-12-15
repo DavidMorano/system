@@ -1,4 +1,5 @@
 /* strerrabbr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* return an abbreviation string given a system-error return number */
@@ -36,6 +37,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 

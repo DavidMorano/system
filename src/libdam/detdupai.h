@@ -1,4 +1,5 @@
 /* detdupai HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* does the given array of integers have duplicate entries */

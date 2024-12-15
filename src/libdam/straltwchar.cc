@@ -1,4 +1,5 @@
 /* straltwchar SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
@@ -42,7 +43,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<climits>
-#include	<cstddef>		/* presumably for 'wchar_t' type */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>

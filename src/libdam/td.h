@@ -1,4 +1,5 @@
 /* td HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Terminal-Display manager */
@@ -25,7 +26,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<vecitem.h>
 #include	<termstr.h>
 
@@ -34,14 +34,12 @@
 #define	TD_POS		struct td_position
 #define	TD_WIN		struct td_window
 #define	TD_FL		struct td_flags
-
 /* control codes */
 #define	TD_CEOL		0		/* set "erase to EOL" mode */
 #define	TD_CLINES	1		/* change number of lines in window */
 #define	TD_CSCROLL	2		/* scroll the window up or down */
 #define	TD_CSUBWIN	3		/* create a subwindow */
 #define	TD_CCURSOR	4		/* position the cursor */
-
 /* graphic renditions */
 #define	TD_GRBOLD	(1<<0)		/* graphic-rendition bold */
 #define	TD_GRUNDER	(1<<1)		/* graphic-rendition underline */

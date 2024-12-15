@@ -1,4 +1,5 @@
 /* rfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutines to write to remote files or read from them */

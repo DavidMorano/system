@@ -1,4 +1,5 @@
 /* uibang SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a "bang" name from USERINFO data */
@@ -41,6 +42,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

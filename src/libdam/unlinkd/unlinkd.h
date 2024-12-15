@@ -1,4 +1,5 @@
 /* unlinkd HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* unlink a file after a specified delay (in seconds) */

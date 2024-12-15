@@ -1,4 +1,5 @@
 /* onc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* ONC operations */
@@ -8,8 +9,8 @@
 /* revision history:
 
 	= 1998-07-10, David A­D­ Morano
-	This subroutine was written to deal with NIS key authorization issues
-	when using Solaris 2.x.
+	This subroutine was written to deal with NIS key authorization
+	issues when using Solaris 2.x.
 
 */
 

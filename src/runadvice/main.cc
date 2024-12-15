@@ -59,12 +59,13 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<bfile.h>
 #include	<baops.h>
 #include	<userinfo.h>
@@ -72,6 +73,7 @@
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<mallocstuff.h>
+#include	<cfx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -104,7 +106,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdouble() ;
 extern int	bufprintf(const char *,...) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 
@@ -1248,50 +1249,23 @@ const char	*envv[] ;
 	            if (sp == NULL) continue ;
 
 	            if ((cp = strchr(sp,'=')) != NULL) {
-
 	                *cp++ = '\0' ;
 #if	CF_DEBUG
 	                    if (g.debuglevel > 1)
-	                        debugprintf("main: string=%s\n",
-	                            cp) ;
-#endif
-
-#if	CF_DEBUG
-		debugprintf("main: float=%6.3f\n",(double) 2.51) ;
+	                        debugprintf("main: string=%s\n", cp) ;
 #endif
 
 	                if ((*cp != '\0') &&
 	                    (cfdouble(cp,-1,&dvalue) >= 0)) {
 
-#if	CF_DEBUG
-	                    if (g.debuglevel > 1)
-	                        debugprintf("main: processed machine %s %s\n",
-	                            sp,cp) ;
-#endif
-
-#if	CF_DEBUG
-		debugprintf("main: dvalue=%6.3f\n",(double) dvalue) ;
-#endif
-
-	                    if ((rs = machineadd(&mh,sp,(double) dvalue)) < 0)
+	                    if ((rs = machineadd(&mh,sp,(double) dvalue)) < 0) {
 	                        bprintf(g.efp,
 	                            "%s: failed on machine \"%s\" (rs %d)\n",
 	                            g.progname,sp,rs) ;
 
-	                    else
+			    } else {
 	                        g.f.machines = TRUE ;
-
-#if	CF_DEBUG	
-	if ((g.debuglevel > 1) && (rs >= 0)) 
-		debugprintf("main: m=%s a=%d\n",sp,
-		((struct machine *) (mh.va[rs]))->sp->avenrun[0]) ;
-#endif
-
-#if	CF_DEBUG && 0
-	                    if (g.debuglevel > 1)
-	                        debugprintf("main: a.f_rsh=%d\n",
-	                            ((struct machine *) (mh.va[0]))->f.rsh) ;
-#endif
+			    }
 
 	                } /* end if (machine entry has a good loadave) */
 

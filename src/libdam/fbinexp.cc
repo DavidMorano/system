@@ -1,4 +1,5 @@
 /* dbinexp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* (floating) binary-exponential function */

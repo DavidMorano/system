@@ -1,4 +1,5 @@
 /* mxalias SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage a MXALIAS object */
@@ -26,6 +27,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mxalias
+
+	Description:
 	This module is used to manage a MXALIAS object.
 
 *******************************************************************************/

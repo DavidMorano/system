@@ -1,4 +1,5 @@
 /* linehist SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* Line History (object) */

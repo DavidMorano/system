@@ -1,16 +1,17 @@
-/* emaentry_getbestaddr */
+/* emaentry_getbestaddr SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get the "best" address out of an EMA-entry address specification */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
 	= 1999-02-01, David A­D­ Morano
-        This code was part of another subroutine and I pulled it out to make a
-        subroutine that can be used in multiple places.
+	This code was part of another subroutine and I pulled it
+	out to make a subroutine that can be used in multiple places.
 
 */
 
@@ -18,21 +19,19 @@
 
 /*******************************************************************************
 
-        This subroutine extracts the "best" address out of an EMA-entry address
-        specification (given in raw string form).
-
+  	Description:
+	This subroutine extracts the "best" address out of an
+	EMA-entry address specification (given in raw string form).
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ema.h>
 #include	<localmisc.h>

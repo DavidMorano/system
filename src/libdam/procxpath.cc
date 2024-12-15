@@ -1,13 +1,13 @@
-/* procxpath */
+/* procxpath SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a 'xpath' file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_PATHCLEAN	1		/* clean up the path */
 #define	CF_STAT		0		/* directory needs to be there */
-
 
 /* revision history:
 
@@ -20,39 +20,34 @@
 
 /*******************************************************************************
 
-        This subroutine will read (process) a file that has directory paths in
-        it. The directory paths are read in and added (one by one) to the
-        specified list.
+  	Description:
+	This subroutine will read (process) a file that has directory
+	paths in it.  The directory paths are read in and added
+	(one by one) to the specified list.
 
 	Synopsis:
-
 	int procxpath(lp,fname)
 	VECSTR		*lp ;
 	const char	fname[] ;
 
 	Arguments:
-
 	lp		pointer to VECSTR list
 	fname		filename to process
 
 	Returns:
-
 	>=0		count of paths read in
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<bfile.h>

@@ -1,4 +1,5 @@
-/* dfs-1 */
+/* dfs-1 SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* Depth-First-Search (visit all nodes through un-weighted graph) */

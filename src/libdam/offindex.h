@@ -1,4 +1,5 @@
 /* offindex HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* offset-index object */

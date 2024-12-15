@@ -1,4 +1,5 @@
 /* wciswhite SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* check for a white-space wide-character */
@@ -22,7 +23,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<cstddef>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<char.h>
 #include	<localmisc.h>
 

@@ -1,4 +1,5 @@
 /* outline SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage printing lines */
@@ -21,11 +22,16 @@
 
 /*******************************************************************************
 
+  	Name:
+	outline
+
+	Description:
 	This object deals with printing lines.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>

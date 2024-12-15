@@ -66,7 +66,6 @@ extern int	matstr() ;
 extern int	vsainit(), vsaadd(), vsaget(), vsafree() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
-extern int	cfdouble() ;
 extern int	machineinit(), machineadd() ;
 extern int	runinit(), runadd(), rundel() ;
 

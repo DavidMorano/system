@@ -1,4 +1,5 @@
 /* sfill SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* text fill */
@@ -16,12 +17,18 @@
 
 /*******************************************************************************
 
+  	Object:
+	sfill
+
+	Description:
 	This object mediates filling out text to an output file
 	using the BFILE package.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>

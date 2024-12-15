@@ -1,11 +1,11 @@
-/* editdistance */
+/* editdistance SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* find the edit-distance between two given strings */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -26,11 +26,9 @@
 
 	a -> b
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<new>

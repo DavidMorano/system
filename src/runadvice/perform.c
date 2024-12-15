@@ -67,7 +67,6 @@ extern int	mktmpfile(char *,mode_t,const char *) ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
-extern int	cfdouble() ;
 extern int	machineinit(), machineadd() ;
 extern int	runinit(), runadd(), rundel() ;
 

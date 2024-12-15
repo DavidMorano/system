@@ -1,4 +1,5 @@
 /* rcmdr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get connection to remote command (unpriviledged) */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	rcmdr
+
+	Description:
 	This is a dialer to use the underlying RSH program to make
 	a "SHELL" remote login connection to another machine.
 

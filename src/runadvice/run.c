@@ -73,7 +73,6 @@ extern int	cfdec() ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
-extern int	cfdouble() ;
 
 extern char	*strbasename() ;
 

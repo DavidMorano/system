@@ -1,4 +1,5 @@
 /* cksum SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform the POSIX 1003.2 CRC checksum algorithm */

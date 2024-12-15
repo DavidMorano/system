@@ -1,4 +1,5 @@
 /* mailmsg_loadfd SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* load a mail-message from a file-descriptor (FD) */
@@ -16,17 +17,23 @@
 
 /*******************************************************************************
 
+  	Object:
+	mailmsg
+
+	Description:
 	This subroutine loads a mail-message (into the MAILMSG
 	object) from a source that consists of a file-descriptor
 	(FD).
 
-	Note: At first we skip empty lines until we find a non-empty
+	Note: 
+	At first we skip empty lines until we find a non-empty
 	line; afterwards we do not ignore empty lines.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

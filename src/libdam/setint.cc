@@ -1,4 +1,5 @@
 /* setint SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* unordered set of integers */

@@ -1,4 +1,5 @@
 /* mkcdpath SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* try to make a prefix-variable path of type CDPATH */

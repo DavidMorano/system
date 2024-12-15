@@ -1,9 +1,8 @@
-/* msort */
+/* msort SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -16,31 +15,29 @@
 
 /*******************************************************************************
 
-	Our version of Quick Sort (sort of the daddy of all sorts, mostly).
+  	name:
+	msort
 
-	Everyone has their own, right?
+  	Description:
+	Our version of Quick Sort (sort of the daddy of all sorts,
+	mostly).  Everyone has their own, right?
 
 	Synopsis:
-
 	typedef int	(*sortcmp_t)(const void *,const void *) ;
 	void msort(void *base,int nelem,int esize,sortcmp_t *cmp)
 
 	Arguments:
-
 	base		pointer to base of array to sort
 	nelem		number of elements in array
 	esize		size in bytes of an array element
 	cmp		comparison function
 
 	Returns:
-
 	-		nothing (sorted array in place)
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
