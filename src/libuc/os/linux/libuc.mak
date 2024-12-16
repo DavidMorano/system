@@ -766,7 +766,7 @@ sigobj.dir:
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
-# tab handling
+# tab and character column handling
 tabcols.o:		tabcols.cc tabcols.h
 ncol.o:			ncol.cc ncol.h tabcols.h
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h

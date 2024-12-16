@@ -44,8 +44,6 @@
 	==0		program not found
 	<0		error (system-return)
 
-	rbuf		resulting path if different than input
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

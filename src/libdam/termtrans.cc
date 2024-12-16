@@ -214,7 +214,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr struct termtrans_terminfo	terms[] = {
+constexpr termtrans_terminfo	terms[] = {
 	{ "sun", 0 },
 	{ "ansi", 0 },
 	{ "xterm", TA_MBASE },
@@ -238,7 +238,7 @@ static constexpr struct termtrans_terminfo	terms[] = {
 	{ nullptr, 0 }
 } ; /* end array (terms) */
 
-static constexpr struct termtrans_sch	specials[] = {
+constexpr termtrans_sch		specials[] = {
 	{ UC('x'), '*', 2, 0x60 },
 	{ UC('×'), '*', 2, 0x60 },
 	{ 'X', '*', 2, 0x60 },

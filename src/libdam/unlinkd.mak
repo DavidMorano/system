@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (unlinkd)
 
 T= unlinkd
 

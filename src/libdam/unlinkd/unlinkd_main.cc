@@ -1,4 +1,5 @@
 /* unlinkd_main SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to try and invoke the UNLINK daemon */
@@ -8,12 +9,12 @@
 
 /* revision history:
 
-	= 1998-05-14, Dave Morano
+	= 1998-05-14, David A-D- Morano
 	This code was originally written.
 
 */
 
-/* Copyright © 1998 David Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /******************************************************************************
 
@@ -48,8 +49,12 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<uvariables.hh>
+#include	<getnodename.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
+#include	<mkpath.h>
+#include	<mkpr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -68,10 +73,6 @@
 
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
 #endif
 
 #define	DEFDELAY	30
@@ -94,15 +95,8 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	pcsgetprogpath(cchar *,char *,cchar *,int) ;
-extern int	findfilepath(cchar *,cchar *,int,char *) ;
-extern int	msleep(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -113,7 +107,7 @@ extern cchar	**environ ;	/* from system at invocation */
 /* local structures */
 
 struct subinfo_args {
-	cchar	*fname ;
+	cchar		*fname ;
 	uint		delay ;
 } ;
 
@@ -130,16 +124,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,int) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_fork(SUBINFO *) ;
-static int	subinfo_daemon(SUBINFO *) ;
-static int	subinfo_rmer(SUBINFO *) ;
+static int	subinfo_start(SUBINFO *,cchar *,int) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
+static int	subinfo_fork(SUBINFO *) noex ;
+static int	subinfo_daemon(SUBINFO *) noex ;
+static int	subinfo_rmer(SUBINFO *) noex ;
 
 
 /* local variables */
 
-static int	(*scheds[])(SUBINFO *) = {
+constexpr int	(*scheds[])(SUBINFO *) = {
 	subinfo_rmer,
 	subinfo_fork,
 	subinfo_daemon,
@@ -153,7 +147,6 @@ static int	(*scheds[])(SUBINFO *) = {
 /* exported subroutines */
 
 int unlinkd(cchar *fname,int delay) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		rs1 ;
 
@@ -161,15 +154,15 @@ int unlinkd(cchar *fname,int delay) noex {
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	if ((rs = u_stat(fname,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    SUBINFO	si, *sip = &si ;
 	    if ((rs = subinfo_start(sip,fname,delay)) >= 0) {
-		int	i ;
-		for (i = 0 ; scheds[i] != NULL ; i += 1) {
+		for (int i = 0 ; scheds[i] != NULL ; i += 1) {
 	    	    rs = (*scheds[i])(sip) ;
 	    	    if (rs >= 0) break ;
 	        } /* end for */
-	        subinfo_finish(sip) ;
+	        rs1 = subinfo_finish(sip) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (subinfo) */
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
@@ -183,31 +176,31 @@ int unlinkd(cchar *fname,int delay) noex {
 /* local subroutines */
 
 static int subinfo_start(SUBINFO *sip,cchar *fname,int delay) noex {
-	int		rs = SR_OK ;
-
-	if (delay <= 0)
-	    delay = DEFDELAY ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
-
-	sip->daytime = time(NULL) ;
-
-	sip->arg.fname = fname ;
-	sip->arg.delay = delay ;
+	int		rs = SR_FAULT ;
+	if (delay <= 0) delay = DEFDELAY ;
+	if (sip && fname) {
+	    rs = memclear(sip) ;
+	    sip->daytime = getustime ;
+	    sip->arg.fname = fname ;
+	    sip->arg.delay = delay ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
 static int subinfo_finish(SUBINFO *sip) noex {
-	sip->daytime = 0 ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (sip) {
+	    sip->daytime = 0 ;
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
 static int subinfo_fork(SUBINFO *sip) noex {
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = u_fork()) == 0) {
 	    USTAT	sb ;
 	    time_t	ti_expire ;
@@ -226,8 +219,9 @@ static int subinfo_fork(SUBINFO *sip) noex {
 
 /* the child continues on from here */
 
-	    for (i = 0 ; i < NOFILE ; i += 1)
+	    for (i = 0 ; i < NOFILE ; i += 1) {
 	        u_close(i) ;
+	    }
 
 	    u_setsid() ;
 
@@ -245,8 +239,9 @@ static int subinfo_fork(SUBINFO *sip) noex {
 
 	    } /* end for */
 
-	    if ((rs1 >= 0) && (sip->arg.fname != NULL))
+	    if ((rs1 >= 0) && (sip->arg.fname != NULL)) {
 	        u_unlink(sip->arg.fname) ;
+	    }
 
 	    uc_exit(EX_OK) ;
 	} /* end if (we got a child off) */
@@ -301,7 +296,8 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 	}
 
 	if ((rs >= 0) && (rs1 < 0)) {
-	    rs = findfilepath(VARPATH,pn,X_OK,progfname) ;
+	    cchar	*pvname = varname.path ;
+	    rs = findfilepath(pvname,progfname,pn,X_OK) ;
 	}
 
 	if (rs < 0)
@@ -329,11 +325,11 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 	av[i++] = "RMER" ;
 	av[i++] = NULL ;
 
-	memset(&pg,0,sizeof(struct spawnproc)) ;
-
 	pg.disp[0] = SPAWNPROC_DOPEN ;
 	pg.disp[1] = SPAWNPROC_DCLOSE ;
 	pg.disp[2] = SPAWNPROC_DCLOSE ;
+	pg.opts |= SPAWNPROC_OIGNINTR ;
+	pg.opts |= SPAWNPROC_OSETPGRP ;
 	rs = spawnproc(&pg,progfname,av,environ) ;
 	pid = rs ;
 
@@ -373,8 +369,9 @@ static int subinfo_rmer(SUBINFO *sip) noex {
 	} /* end for */
 
 ret1:
-	if (ipcbuf != NULL)
+	if (ipcbuf != NULL) {
 	    uc_free(ipcbuf) ;
+	}
 
 ret0:
 	return rs ;
