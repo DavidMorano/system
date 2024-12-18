@@ -1,6 +1,6 @@
 /* dfactorial HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* calculate the factorial of an integer yieling a double floating result */
 /* version %I% last-modified %G% */

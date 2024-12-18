@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* PassWord Index file */
+/* Line-Index-Header */
 /* version %I% last-modified %G% */
 
 
@@ -26,7 +26,8 @@
 
 	Description:
 	This subroutine reads from and write to a buffer which
-	ropresents a PWI file header when written out to a file.
+	ropresents a LINEINDEX file header when written out to a
+	file.
 
 	Synopsis:
 	int lineindexhdr_rd(pwdhdr *op,char *hbuf,int hlen) noex
@@ -46,7 +47,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkmagic.h>
@@ -160,5 +161,13 @@ int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (lineindexhdr_wr) */
+
+int lineindexhdr::rd(char *rbuf,int rlen) noex {
+    	return lineindexhdr_rd(this,rbuf,rlen) ;
+}
+
+int lineindexhdr::wr(cchar *wbuf,int wlen) noex {
+    	return lineindexhdr_wr(this,wbuf,wlen) ;
+}
 
 

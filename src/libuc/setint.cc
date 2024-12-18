@@ -1,4 +1,5 @@
 /* setint SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* unordered set of integers */
@@ -16,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	setint
 
 	Description:
@@ -28,6 +29,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
@@ -53,8 +55,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef unordered_set<int>	usetint ;
-typedef unordered_set<int> *	usetintp ;
+typedef unordered_set<int>		usetint ;
+typedef unordered_set<int> *		usetintp ;
 typedef unordered_set<int>::iterator	usetintit ;
 typedef unordered_set<int>::iterator *	usetintitp ;
 
@@ -226,7 +228,7 @@ int setint_curend(setint *op,setint_cur *curp) noex {
 }
 /* end subroutine (setint_curend) */
 
-int setint_enum(setint *op,setint_cur *curp,int *rp) noex {
+int setint_curenum(setint *op,setint_cur *curp,int *rp) noex {
 	int		rs = SR_FAULT ;
 	if (op && curp && rp) {
 	    rs = SR_NOTOPEN ;
@@ -247,6 +249,6 @@ int setint_enum(setint *op,setint_cur *curp,int *rp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (setint_enum) */
+/* end subroutine (setint_curenum) */
 
 

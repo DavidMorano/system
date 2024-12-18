@@ -1,4 +1,5 @@
 /* timestr_elapsed SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert UNIX time into an elapsed time character string */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	timestr_elapsed
+
+	Description:
 	This subroutine creates a string of elapsed time.
 
 *******************************************************************************/
@@ -23,6 +28,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<tzfile.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdio>
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
@@ -38,7 +45,16 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward subroutines */
+
+
+/* local variables */
 
 
 /* exported variables */

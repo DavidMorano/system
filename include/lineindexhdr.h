@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 (confirmance reviewed) */
 
-/* Password-Index Header (PWI) */
+/* Line-Index-Header */
 /* version %I% last-modified %G% */
 
 
@@ -41,7 +41,17 @@ struct lineindexhdr_head {
 	uchar		vetu[4] ;
 } ;
 
+#ifdef	__cplusplus
+struct lineindexhdr : lineindexhdr_head {
+	lineindexhdr(const lineindexhdr &) = delete ;
+	lineindexhdr &operator = (const lineindexhdr &) = delete ;
+	lineindexhdr() = default ;
+	int rd(char *,int) noex ;
+	int wr(cchar *,int) noex ;
+} ; /* end struct (lineindexhdr) */
+#else	/* __cplusplus */
 typedef LINEINDEXHDR	lineindexhdr ;
+#endif	/* __cplusplus */
 
 EXTERNC_begin
 

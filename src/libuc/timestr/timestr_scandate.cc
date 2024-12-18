@@ -1,4 +1,5 @@
 /* timestr_scandate SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert UNIX® time into a VMAIL "scan" date-string format */
@@ -25,6 +26,10 @@
 
 /*******************************************************************************
  
+  	Name:
+	timestr_scandate
+
+	Description:
 	Return a date string in the supplied buffer in a format
 	(the new format as of 2001-08-23) as (for example):
 		 4 Jun 20:52 97
@@ -37,6 +42,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
 #include	<tmtime.h>
@@ -61,7 +67,13 @@
 /* external variables */
 
 
-/* local (static) variables */
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -75,8 +87,7 @@ char *timestr_scandate(time_t t,char *tbuf) noex {
 	if (tbuf) {
 	    rs = SR_DOM ;
 	    if (t >= 0) {
-	        TMTIME	ts ;
-	        if ((rs = tmtime_localtime(&ts,t)) >= 0) {
+	        if (TMTIME ts ; (rs = tmtime_localtime(&ts,t)) >= 0) {
 		    cchar	*fmt = "%e %b %R %y" ;
 	            rs = sntmtime(tbuf,tlen,&ts,fmt) ;
 	        }

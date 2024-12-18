@@ -203,8 +203,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	    if ((rs = mkvarsx()) >= 0) {
 		cint	maxpath = rs ;
 		cint	sz = (2 * (var.maxpathlen + 1)) ;
-		char	*a{} ;
-	        if ((rs = uc_malloc(sz,&a)) >= 0) {
+		if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
 	            char	*ibuf = (a) ;
 	            char	*obuf = (a + (maxpath + 1)) ;
 	            if ((rs = mkpath(ibuf,dname,platename)) >= 0) {
@@ -242,8 +241,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	if (inname && obuf) {
 	    rs = SR_INVALID ;
 	    if (inname[0] && (of >= 0) && (opt >= 0)) {
-	        char	*pbuf{} ;
-	        if ((rs = malloc_mp(&pbuf)) >= 0) {
+	        if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
 	            if ((rs = mkexpandpath(pbuf,inname,-1)) > 0) {
 		        rs = opentmpxer(pbuf,of,om,opt,obuf) ;
 		        fd = rs ;
@@ -506,8 +504,7 @@ static int randload(ulong *rvp) noex {
 	    cnullptr	np{} ;
 	    cuint	sid = getsid(0) ;
 	    cuint	uid = getuid() ;
-	    if ((rs = uc_getpid()) >= 0) {
-	        TIMEVAL	tod ;
+	    if ((rs = ucpid) >= 0) {
 		cuint	pid = rs ;
 	        ulong	rv = 0 ;
 	        ulong	v = sid ;
@@ -516,7 +513,7 @@ static int randload(ulong *rvp) noex {
 	        rv += (v << 32) ;
 	        v = uid ;
 	        rv += (v << 16) ;
-	        if ((rs = uc_gettimeofday(&tod,np)) >= 0) {
+	        if (TIMEVAL tod ; (rs = uc_gettimeofday(&tod,np)) >= 0) {
 	            v = tod.tv_sec ;
 	            rv += (v << 32) ;
 	            rv += (v << 12) ;

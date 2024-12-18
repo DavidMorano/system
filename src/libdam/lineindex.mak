@@ -1,6 +1,6 @@
-# MAKEFILES (fmq)
+# MAKEFILES (lineindex)
 
-T= fmq
+T= lineindex
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += fmq.h
+INCS += lineindex.h
 
 LIBS +=
 
@@ -55,12 +55,15 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= fmq_main.o
-OBJ1=
+OBJ0= lineindexhdr.o
+OBJ1= lineindex_main.o
+OBJ2= 
+OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
+OBJB=
 
-OBJ= $(OBJA)
+OBJ= obja.o
 
 
 .SUFFIXES:		.hh .ii
@@ -130,6 +133,14 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-fmq_main.o:		fmq_main.cc		$(INCS)
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+
+lineindex_main.o:	lineindex_main.cc			$(INCS)
+lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h		$(INCS)
 
 

@@ -1,4 +1,5 @@
 /* timest_nist SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert UNIX® time into a Julian like character string */
@@ -16,9 +17,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	timestr_nist
+
+	Description:
 	This little subroutine formats a time string that is close
 	to what NIST itself uses for the 'daytime' Internet service.
 
+	Notes:
 	We are currently not exact with this string format.  The
 	NIST format (that has its own RFC) contains information
 	that we do not easily have available to us.  Everything
@@ -34,6 +40,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */

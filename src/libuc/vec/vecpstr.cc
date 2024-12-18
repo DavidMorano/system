@@ -851,7 +851,7 @@ static int vecpstr_dtor(vecpstr *op) noex {
 
 static int vecpstr_setopts(vecpstr *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECPSTR_OREUSE) op->f.oreuse = 1 ;
@@ -871,7 +871,7 @@ static int vecpstr_insertsp(vecpstr *op,int ii,cchar *sp) noex {
 	    op->i += 1 ;
 	    op->va[op->i] = nullptr ;
 	} else if (op->va[ii] != nullptr) {
-	    int		i ;
+	    int		i ; /* used-afterwards */
 	    for (i = (ii + 1) ; i < op->i ; i += 1) {
 		if (op->va[i] == nullptr) break ;
 	    }

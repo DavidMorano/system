@@ -1,6 +1,6 @@
 /* dfactorial SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* floating-pint factorial function */
 /* version %I% last-modified %G% */
@@ -9,7 +9,8 @@
 /* revision history:
 
 	= 2004-10-09, David A­D­ Morano
-	This was originally written.
+	This was adopted from some a previous implementation of
+	this subroutine.
 
 */
 
@@ -79,7 +80,8 @@
 
 /* impored namespaces */
 
-using std::tgamma ;			/* subroutine-template (req by C++) */
+using std::numbers::pi ;		/* constant (C++20) */
+using std::numbers::e ;			/* constant (C++20) */
 
 
 /* local typedefs */

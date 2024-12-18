@@ -470,7 +470,7 @@ static int vechand_ctor(vechand *op) noex {
 
 static int vechand_setopts(vechand *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECHAND_OREUSE) op->f.oreuse = 1 ;

@@ -1517,12 +1517,6 @@ obuf.o:			obuf.cc obuf.h
 osetstr.o:		osetstr.c osetstr.h
 	$(GPP) -c $(CCOPTS_GCCOPTSGPP) $(CFLAGS) $(CPPFLAGS) osetstr.cc
 
-osetint.o:		osetint.cc osetint.h
-	$(GPP) -c $(CCOPTS_GCCOPTSGPP) $(CFLAGS) $(CPPFLAGS) osetint.cc
-
-setint.o:		setint.cc setint.h
-	$(GPP) -c $(CCOPTS_GCCOPTSGPP) $(CFLAGS) $(CPPFLAGS) setint.o
-
 chartrans.o:		chartrans.c chartrans.h 
 
 mbcache.o:		mbcache.c mbcache.h

@@ -1,4 +1,5 @@
 /* timestr_date SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* convert UNIX® time into a various date formats */
@@ -24,7 +25,11 @@
 /* Copyright © 1998,2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Group:
+	timestr_date
  
+	Description:
 	Return the date (in UNIX® mail envelope format) into the
 	user supplied buffer.
 

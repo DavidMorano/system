@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int calent_ctor(calent *op,Args ... args) noex {
+static int filemap_ctor(filemap *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,14 @@ static int calent_ctor(calent *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (calent_ctor) */
+/* end subroutine (filemap_ctor) */
 
-static int calent_dtor(calent *op) noex {
+static int filemap_dtor(filemap *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (calent_dtor) */
+/* end subroutine (filemap_dtor) */
 
-template<typename ... Args>
-static inline int calent_magic(calent *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (calent_magic) */

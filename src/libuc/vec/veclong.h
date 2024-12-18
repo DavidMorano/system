@@ -97,7 +97,7 @@ extern int veclong_getval(veclong *,int,VECLONG_TYPE *) noex ;
 extern int veclong_getvec(veclong *,VECLONG_TYPE **) noex ;
 extern int veclong_mkvec(veclong *,VECLONG_TYPE *) noex ;
 extern int veclong_curbegin(veclong *,veclong_cur *) noex ;
-extern int veclong_enum(veclong *,veclong_cur *,VECLONG_TYPE *) noex ;
+extern int veclong_curenum(veclong *,veclong_cur *,VECLONG_TYPE *) noex ;
 extern int veclong_curend(veclong *,veclong_cur *) noex ;
 extern int veclong_audit(veclong *) noex ;
 

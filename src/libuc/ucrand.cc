@@ -20,14 +20,14 @@
 /*******************************************************************************
 
 	Name:
-	ucrand
+	uc_rand
 
 	Description:
 	This is an emulated operating system kernel call that retrieves
 	random data from a pool of random data (in user space).
 
 	Synopsis:
-	int ucrand(void *mrbuf,int rlen) noex
+	int uc_rand(void *rbuf,int rlen) noex
 
 	Arguments:
 	rbuf		result buffer pointer
@@ -60,10 +60,6 @@
 
 
 /* local defines */
-
-#ifndef	RANDOMDEV
-#define	RANDOMDEV	"/dev/urandom"
-#endif
 
 #define	RBUFLEN		64
 
@@ -314,9 +310,9 @@ int rander::geter(char *rbuf,int rlen) noex {
 	} /* end if */
 	if (rs >= 0) {
 	    randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
-	    cint	usize = szof(ulong) ;
 	    while ((rs >= 0) && (rlen > 0)) {
 		if (ulong uv ; (rs = randomvar_getulong(rvp,&uv)) >= 0) {
+	    	    cint	usize = szof(ulong) ;
 		    for (int i = 0 ; (rlen > 0) && (i < usize) ; i += 1) {
 			rbuf[rl++] = char(uv) ;
 			uv >>= CHAR_BIT ;
@@ -338,13 +334,13 @@ int rander::iaddnoise() noex {
 	    char	rbuf[RBUFLEN+1] ;
 	    if ((rs = uc_getrandom(rbuf,rlen,0)) >= 0) {
 		randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
-		cint	len = rs ;
+		cint		len = rs ;
 		rs = randomvar_addnoise(rvp,rbuf,len) ;
 		rl = rs ;
 	    } /* end if (uc_getrandom) */
 	} else {
 	    cint	of = O_RDONLY ;
-	    cchar	*dev = RANDOMDEV ;
+	    cchar	*dev = sysword.w_devrandom ;
 	    if ((rs = u_open(dev,of,0666)) >= 0) {
 	        cint	rlen = RBUFLEN ;
 	        cint	fd = rs ;
@@ -445,8 +441,7 @@ static void rander_atforkafter() noex {
 /* end subroutine (rander_atforkafter) */
 
 static void rander_exit() noex {
-	int		rs ;
-	if ((rs = rander_data.fini()) < 0) {
+	if (int rs ; (rs = rander_data.fini()) < 0) {
 	    ulogerror("ucrand",rs,"exit-fini") ;
 	}
 }

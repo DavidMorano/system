@@ -47,17 +47,13 @@
 	Arguments:
 	fd	file descriptor of file to lock
 	cmd	command, one of:
-
 			F_ULOCK
-
 			F_WTEST (F_TEST)
 			F_WLOCK (F_LOCK)
 			F_TWLOCK (F_TLOCK)
-
 			F_RTEST
 			F_RLOCK
 			F_TRLOCK
-
 	start		starting offset of region to lock (or test)
 	size		size of region to lock in the file (0="whole file")
 	to		time-out in seconds to wait for the lock
@@ -85,7 +81,7 @@
 	file-locking does not "prevent" reading memory (from a
 	process that has the same file memory-mapped), but neither
 	does file-locking prevent another process from reading the
-	same file using |read(2)|!  Do you get it solaris boys?
+	same file using |read(2)|!  Do you get it Solaris® boys?
 
 *******************************************************************************/
 
@@ -99,6 +95,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -117,10 +114,18 @@
 #endif
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
+
+static int	trylock(int,FLOCK *,int) noex ;
 
 
 /* local variables */
@@ -128,7 +133,7 @@
 constexpr bool		f_oldunixbug = CF_OLDUNIXBUG ;
 
 #ifdef	COMMENT
-static const struct lockcmd	cmdlu[] = {
+constexpr lockcmd	cmdlu[] = {
 	{ F_ULOCK, "unlock" },
 	{ F_LOCK, "lock" },
 	{ F_TLOCK, "tlock" },
@@ -178,22 +183,22 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 	    switch (cmd) {
 	    case F_TRLOCK:
 	        to = 0 ;
+		fallthrough ;
 		/* FALLTHROUGH */
 	    case F_RLOCK:
 	        fl.l_type = F_RDLCK ;
 	        break ;
 	    case F_TWLOCK:
 	        to = 0 ;
+		fallthrough ;
 		/* FALLTHROUGH */
 	    case F_WLOCK:
 	        fl.l_type = F_WRLCK ;
 		break ;
 	    } /* end switch */
-	    for (int i = 0 ; i < (to + 1) ; i += 1) {
-	        rs = u_fcntl(fd,F_SETLK,&fl) ;
-	        if ((rs != SR_AGAIN) && (rs != SR_ACCES)) break ;
-	        if (i < to) uc_safesleep(1) ;
-	    } /* end for */
+	    if (rs >= 0) {
+		rs = trylock(fd,&fl,to) ;
+	    }
 	    break ;
 	case F_ULOCK:
 	    fl.l_type = F_UNLCK ;
@@ -211,5 +216,20 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 	return rs ;
 }
 /* end subroutine (uc_lockfile) */
+
+
+/* local subroutines */
+
+static int trylock(int fd,FLOCK *flp,int to) noex {
+    	int		rs = SR_OK ;
+	for (int i = 0 ; rs >= 0 ; i += 1) {
+	    rs = u_fcntl(fd,F_SETLK,flp) ;
+	    if ((rs != SR_AGAIN) && (rs != SR_ACCES)) break ;
+	    if (i >= to) break ;
+	    rs = uc_safesleep(1) ;
+	} /* end for */
+	return rs ;
+}
+/* end subroutine (trylock) */
 
 

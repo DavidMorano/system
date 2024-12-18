@@ -1,4 +1,5 @@
 /* b_imail SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -1153,7 +1154,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	ARGINFO		ainfo ;
+	ARGINFO		ainfo{} ;
 	BITS		pargs ;
 	KEYOPT		akopts ;
 	SHIO		errfile ;
@@ -1971,7 +1972,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* go through the loops */
 
-	memset(&ainfo,0,sizeof(ARGINFO)) ;
 	ainfo.argc = argc ;
 	ainfo.ai = ai ;
 	ainfo.argv = argv ;
@@ -2104,7 +2104,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        cint	size = (10*sizeof(uint)) ;
+	        cint		size = (10 * szof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -2602,7 +2602,7 @@ static int procmklogid(PROGINFO *pip)
 static int procourconf_begin(PROGINFO *pip,cchar *cfname)
 {
 	LOCINFO		*lip = pip->lip ;
-	cint	size = sizeof(CONFIG) ;
+	cint		size = szof(CONFIG) ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
 	void		*p ;
@@ -3191,23 +3191,16 @@ static int procprepare(PROGINFO *pip)
 }
 /* end subroutine (procprepare) */
 
-
-static int procdeliver(PROGINFO *pip)
-{
+static int procdeliver(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
-	MSGOPTS		opts ;
-	cint	of = (O_CREAT | O_RDWR) ;
+	MSGOPTS		opts{} ;
+	cint		of = (O_CREAT | O_RDWR) ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
 	cchar		*pre = "mbtmp" ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_imail/procdeliver: ent\n") ;
-#endif
-
-	memset(&opts,0,sizeof(MSGOPTS)) ;
 	opts.mkclines = TRUE ;
 	opts.mkcrnl = TRUE ;			/* possible CRNL enforcement */
 	opts.mkenv = lip->f.addenv ;
@@ -3223,11 +3216,6 @@ static int procdeliver(PROGINFO *pip)
 	    cint	sfd = rs ;
 	    int		mi ;
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("b_imail/procdeliver: nmsgs=%u\n",nmsgs) ;
-#endif
-
 	    u_unlink(tbuf) ;
 	    for (mi = 0 ; mi < nmsgs ; mi += 1) {
 	        rs = procdelivery(pip,mi,sfd,&opts) ;
@@ -3235,31 +3223,20 @@ static int procdeliver(PROGINFO *pip)
 	        if (rs < 0) break ;
 	    } /* end for */
 
-	    u_close(sfd) ;
+	    rs1 = u_close(sfd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (locinfo_opentmpfile) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_imail/procdeliver: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procdeliver) */
 
-
 /* deliver one message (#=<mi>) */
-static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
-{
+static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_imail/procdelivery: mi=%u\n",mi) ;
-#endif
 
 	if (mi > 0) {
 	    rs = u_rewind(sfd) ;
@@ -3269,17 +3246,10 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 	    off_t	fboff = 0 ;
 	    cint	bsize = lip->pagesize ;
 	    if (filer fb ; (rs = filer_start(&fb,sfd,fboff,bsize,0)) >= 0) {
-
-	        rs = procmsg(pip,&fb,mi,optp) ;
-	        wlen += rs ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("b_imail/procdelivery: "
-	                "procmsg() rs=%d wlen=%u\n",
-	                rs,wlen) ;
-#endif
-
+		{
+	            rs = procmsg(pip,&fb,mi,optp) ;
+	            wlen += rs ;
+		}
 	        rs1 = filer_finish(&fb) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
@@ -3288,22 +3258,13 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 	        rs = uc_ftruncate(sfd,wlen) ;
 	    }
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        debugprintf("b_imail/procdelivery: mid rs=%d wlen=%u\n",
-	            rs,wlen) ;
-	        debugprintf("b_imail/procdelivery: f_deliver=%u\n",
-	            lip->f.deliver) ;
-	    }
-#endif /* CF_DEBUG */
-
 	    if ((rs >= 0) && lip->f.deliver) {
 	        MSGDATA		*mdp ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	            if ((rs = msgdata_getsubject(mdp,NULL)) >= 0) {
 	                cint	f_subj = rs ;
-	                cchar		*pn = pip->progname ;
-	                cchar		*fmt ;
+	                cchar	*pn = pip->progname ;
+	                cchar	*fmt ;
 	                if (f_subj || (! lip->f.reqsubj)) {
 	                    if ((rs = procdelivermsg(pip,mi,sfd,optp)) >= 0) {
 	                        cint	nr = rs ;
@@ -3334,21 +3295,14 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_imail/procdelivery: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procdelivery) */
 
-
-static int procdelivermsg(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
-{
+static int procdelivermsg(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp) noex {
 	LOCINFO		*lip = pip->lip ;
 	vechand		aa ;
-	cint	atypes[] = { msgloghdr_to, msgloghdr_cc, -1 } ;
+	cint		atypes[] = { msgloghdr_to, msgloghdr_cc, -1 } ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -3429,7 +3383,7 @@ vechand		*tlp ;
 	    int		size ;
 	    cchar	**args = NULL ;
 
-	    size = (1 + nbargs + mpargs + 1) * sizeof(cchar *) ;
+	    size = (1 + nbargs + mpargs + 1) * szof(cchar *) ;
 	    if ((rs = uc_malloc(size,&args)) >= 0) {
 	        cint	n = vechand_count(tlp) ;
 	        int		i = 0 ;
@@ -3595,7 +3549,7 @@ vechand		*tlp ;
 	        if (rs >= 0) {
 	            if ((rs = vechand_start(llp,4,0)) >= 0) {
 	                cchar	**args = NULL ;
-	                size = ((1 + nbargs + 1 + 1) * sizeof(cchar *)) ;
+	                size = ((1 + nbargs + 1 + 1) * szof(cchar *)) ;
 	                if ((rs = uc_malloc(size,&args)) >= 0) {
 	                    int	f ;
 
@@ -3684,7 +3638,7 @@ vechand		*llp ;
 
 	    if ((rs = locinfo_opentmpfile(lip,tfname,of,"tf")) >= 0) {
 	        MSGDATA		*mdp ;
-	        cint	tfd = rs ;
+	        cint		tfd = rs ;
 
 	        u_unlink(tfname) ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
@@ -3740,20 +3694,13 @@ VECHAND		*llp ;
 	    char	ofname[MAXPATHLEN+1] = { 0 } ;
 	    if ((rs = locinfo_opentmpfile(lip,ofname,of,"of")) >= 0) {
 	        cint	ofd = rs ;
-	        char		efname[MAXPATHLEN+1] = { 0 } ;
+	        char	efname[MAXPATHLEN+1] = { 0 } ;
 
 	        if ((rs = locinfo_opentmpfile(lip,efname,of,"ef")) >= 0) {
-	            SPAWNPROC	ps ;
+	            SPAWNPROC	ps{} ;
 	            cint	efd = rs ;
 	            cchar	**envv = pip->envv ;
 
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(2))
-	                debugprintf("b_imail/procdeliverenter: "
-	                    "spawnproc()\n") ;
-#endif
-
-	            memset(&ps,0,sizeof(SPAWNPROC)) ;
 	            ps.disp[0] = SPAWNPROC_DDUP ;
 	            ps.disp[1] = SPAWNPROC_DDUP ;
 	            ps.disp[2] = SPAWNPROC_DDUP ;
@@ -3910,12 +3857,12 @@ static int procsave(PROGINFO *pip)
 	    if ((rs = locinfo_cmbfname(lip,mbfname)) >= 0) {
 	        if (mbfname[0] != '\0') {
 	            cchar	*x = "mbtmpXXXXXXXXX" ;
-	            char	template[MAXPATHLEN + 1] ;
-	            if ((rs = mkpath2(template,pip->tmpdname,x)) >= 0) {
-	                const mode_t	om = 0660 ;
+	            char	tpat[MAXPATHLEN + 1] ;
+	            if ((rs = mkpath2(tpat,pip->tmpdname,x)) >= 0) {
+	                cmode	om = 0660 ;
 	                cint	of = O_RDWR ;
-	                char		tbuf[MAXPATHLEN + 1] ;
-	                if ((rs = opentmpfile(template,of,om,tbuf)) >= 0) {
+	                char	tbuf[MAXPATHLEN + 1] ;
+	                if ((rs = opentmpfile(tpat,of,om,tbuf)) >= 0) {
 	                    MSGOPTS	mo ;
 	                    cint	sfd = rs ;
 
@@ -6931,14 +6878,12 @@ static int procgetns(PROGINFO *pip,char *nbuf,int nlen,cchar *un,int w)
 }
 /* end subroutine (procgetns) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs ;
 
 	if (lip == NULL) return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->uid_pr = -1 ;
 	lip->gid_pr = -1 ;
@@ -7356,7 +7301,7 @@ static int locinfo_msgdatabegin(LOCINFO *lip)
 	    int		size ;
 	    n = rs ;
 	    lip->nmsgs = n ;
-	    size = (n * sizeof(MSGDATA)) ;
+	    size = (n * szof(MSGDATA)) ;
 	    if ((rs = uc_malloc(size,&mdp)) >= 0) {
 	        int	i ;
 	        lip->md = mdp ;
@@ -8005,18 +7950,17 @@ static int locinfo_mkhdraddrfrom(LOCINFO *lip)
 }
 /* end subroutine (locinfo_mkhdraddrfrom) */
 
-
 static int locinfo_opentmpfile(LOCINFO *lip,char *tbuf,int of,cchar *prefix)
 {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 
 	if ((rs = locinfo_jobdname(lip)) >= 0) {
-	    const mode_t	om = 0660 ;
-	    int			fl ;
-	    char		cname[JOBCLEN + 1] ;
-	    char		template[MAXPATHLEN + 1] ;
-	    char		*bp ;
+	    int		fl ;
+	    char	cname[JOBCLEN + 1] ;
+	    char	tpat[MAXPATHLEN + 1] ;
+	    char	*bp ;
+	    cmode	om = 0660 ;
 
 	bp = strwcpy(cname,prefix,JOBCLEN) ;
 	fl = (bp - cname) ;
@@ -8024,8 +7968,8 @@ static int locinfo_opentmpfile(LOCINFO *lip,char *tbuf,int of,cchar *prefix)
 	    strwset(bp,'X',(JOBCLEN - fl)) ;
 	}
 
-	if ((rs = mkpath2(template,lip->jobdname,cname)) >= 0) {
-	    rs = opentmpfile(template,of,om,tbuf) ;
+	if ((rs = mkpath2(tpat,lip->jobdname,cname)) >= 0) {
+	    rs = opentmpfile(tpat,of,om,tbuf) ;
 	    fd = rs ;
 	}
 
@@ -8608,16 +8552,14 @@ static int locinfo_isnotdisabled(LOCINFO *lip,int w)
 }
 /* end subroutine (locinfo_isnotdisabled) */
 
-
-static int mailfile_open(MAILFILE *mfp,PROGINFO *pip,cchar *ifname)
-{
+static int mailfile_open(MAILFILE *mfp,PROGINFO *pip,cchar *ifname) noex {
 	int		rs = SR_OK ;
 	int		mfd = -1 ;
 
-	if ((ifname == NULL) || (ifname[0] == '\0') || (ifname[0] == '-'))
+	if ((ifname == NULL) || (ifname[0] == '\0') || (ifname[0] == '-')) {
 	    ifname = STDFNIN ;
-
-	memset(mfp,0,sizeof(MAILFILE)) ;
+	}
+	memclear(mfp) ;
 	mfp->pip = pip ;
 	mfp->mfd = -1 ;
 
@@ -8653,25 +8595,18 @@ static int mailfile_open(MAILFILE *mfp,PROGINFO *pip,cchar *ifname)
 }
 /* end subroutine (mailfile_open) */
 
-
-static int mailfile_altsetup(MAILFILE *mfp,cchar *tmpdname)
-{
+static int mailfile_altsetup(MAILFILE *mfp,cchar *tmpdname) noex {
 	PROGINFO	*pip = mfp->pip ;
 	int		rs ;
+	int		rs1 ;
 	int		mfd = -1 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("b_imail/mailfile_altsetup: ent\n") ;
-#endif
 
 	if (pip == NULL) return SR_FAULT ; /* LINT */
 
 	if ((rs = opentmp(tmpdname,0,0)) >= 0) {
 	    cint	tlen = 2048 ;
-	    char	*tbuf ;
 	    mfd = rs ;
-	    if ((rs = uc_valloc(tlen,&tbuf)) >= 0) {
+	    if (char *tbuf{} ; (rs = uc_valloc(tlen,&tbuf)) >= 0) {
 	        SHIO	*ifp = &mfp->infile ;
 	        int	wlen = 0 ;
 
@@ -8685,19 +8620,14 @@ static int mailfile_altsetup(MAILFILE *mfp,cchar *tmpdname)
 	            rs = u_rewind(mfd) ;
 	        }
 
-	        uc_free(tbuf) ;
+	        rs1 = uc_free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    if (rs < 0) {
 	        u_close(mfd) ;
 	        mfd = -1 ;
 	    }
 	} /* end if (opentmp) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("b_imail/mailfile_altsetup: ret rs=%d mfd=%u\n",
-	        rs,mfd) ;
-#endif
 
 	return (rs >= 0) ? mfd : rs ;
 }
@@ -8765,22 +8695,15 @@ static int mailfile_read(MAILFILE *mfp,char rbuf[],int rlen)
 
 #endif /* COMMENT */
 
-
 /* configuration maintenance */
-static int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname)
-{
+static int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname) noex {
 	PARAMFILE	*pfp ;
 	int		rs ;
 	int		c = 0 ;
 
 	if (cfp == NULL) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_imail/config_start: ent cf=%s\n",cfname) ;
-#endif
-
-	memset(cfp,0,sizeof(struct config)) ;
+	memclear(cfp) ;
 	cfp->pip = pip ;
 
 	pfp = &cfp->params ;
@@ -9283,15 +9206,13 @@ static int config_reader(CONFIG *cfp)
 }
 /* end subroutine (config_reader) */
 
-
-static int msgdata_start(MSGDATA *mdp,int mn)
-{
+static int msgdata_start(MSGDATA *mdp,int mn) noex {
 	int		rs = SR_OK ;
 	int		n, i ;
 
 	if (mdp == NULL) return SR_FAULT ;
 
-	memset(mdp,0,sizeof(MSGDATA)) ;
+	memclear(mdp) ;
 	mdp->mn = mn ;
 	for (i = 0 ; i < msgloghdr_overlast ; i += 1) {
 	    mdp->naddrs[i] = -1 ;
@@ -9721,39 +9642,32 @@ static int msgdata_setfrom(MSGDATA *mdp,cchar *sp,int sl)
 /* end subroutine (msgdata_setfrom) */
 #endif /* COMMENT */
 
-
 #if	CF_MSGOPTSNONE
-static int msgopts_none(MSGOPTS *optp)
-{
-	memset(optp,0,sizeof(MSGOPTS)) ;
-	return SR_OK ;
+static int msgopts_none(MSGOPTS *optp) noex {
+    	return memclear(optp) ;
 }
 /* end subroutine (msgopts_none) */
 #endif
 
-
-static int msgopts_all(MSGOPTS *optp)
-{
-	memset(optp,0,sizeof(MSGOPTS)) ;
+static int msgopts_all(MSGOPTS *optp) noex {
+    	int		rs = memclear(optp) ;
 	optp->mkenv = TRUE ;
 	optp->mkclen = TRUE ;
 	optp->mkclines = TRUE ;
 	optp->mkfrom = TRUE ;
 	optp->mkbcc = TRUE ;
 	optp->mksubj = TRUE ;
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (msgopts_all) */
 
-
-static int msgopts_dead(MSGOPTS *optp)
-{
-	memset(optp,0,sizeof(MSGOPTS)) ;
+static int msgopts_dead(MSGOPTS *optp) noex {
+	int		rs = memclear(optp) ;
 	optp->mkenv = TRUE ;
 	optp->mkclen = TRUE ;
 	optp->mkclines = TRUE ;
 	optp->mkbcc = TRUE ;
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (msgopts_dead) */
 

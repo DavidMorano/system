@@ -41,7 +41,7 @@
 struct filemap_head {
 	cchar		*bp ;
 	void		*mapdata ;
-	USTAT		sb ;		/* requires 'usystem.h' */
+	USTAT		*sbp ;		/* requires 'usystem.h' */
 	size_t		mapsize ;
 	size_t		maxsize ;
 } ;

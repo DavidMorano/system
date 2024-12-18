@@ -207,7 +207,7 @@ OBJ96= memfile.o linehist.o langstate.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
-OBJ100= mknoise.o rijndael.o expcook.o schedvar.o
+OBJ100= rijndael.o expcook.o schedvar.o
 OBJ101= termnote.o egs.o librandom.o bits.o 
 OBJ102= loadave.o modload.o userinfo.o pwentry.o 
 OBJ103= dw.o fmq.o useraccdb.o csem.o
@@ -732,8 +732,6 @@ msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
 dayofmonth.o:		dayofmonth.cc dayofmonth.h
-lineindex.o:		lineindex.cc lineindex.h
-lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h
 netfile.o:		netfile.cc netfile.h
 calmgr.o:		calmgr.cc calmgr.h
 
@@ -827,14 +825,19 @@ algorithms.o:		algorithms.dir
 algorithms.dir:	
 	makesubdir $@
 
+# MATHDAM
+mathdam.o:		mathdam.dir
+mathdam.dir:	
+	makesubdir $@
+
 # FMQ
 fmq.o:			fmq.dir
 fmq.dir:	
 	makesubdir $@
 
-# MATHDAM
-mathdam.o:		mathdam.dir
-mathdam.dir:	
+# LINEINDEX
+lineindex.o:		lineindex.dir
+lineindex.dir:	
 	makesubdir $@
 
 fhm.o:			fhm.cc fhm.h

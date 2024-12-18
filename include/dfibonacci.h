@@ -1,6 +1,6 @@
 /* dfibonacci HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C20 */
+/* lang=C20 (conformance reviewed) */
 
 /* calculate double-precision fibonacci */
 /* version %I% last-modified %G% */

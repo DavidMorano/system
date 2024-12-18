@@ -336,7 +336,7 @@ static int vecelem_dtor(vecelem *op) noex {
 
 static int vecelem_setopts(vecelem *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECELEM_OREUSE) op->f.oreuse = 1 ;

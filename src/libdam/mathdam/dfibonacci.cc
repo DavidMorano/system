@@ -1,6 +1,6 @@
 /* dfibonacci SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++98 */
+/* lang=C++20 (conformance reviewed) */
 
 /* floating-point (double) Fibonacci function */
 /* version %I% last-modified %G% */

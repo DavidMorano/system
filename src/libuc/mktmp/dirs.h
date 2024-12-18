@@ -1,4 +1,5 @@
 /* dirs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a series of possibly hierarchical directories */
@@ -19,8 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<mkdirs.h>
 #include	<rmdirs.h>

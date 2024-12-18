@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (bibleq)
 
 T= bibleq
 
@@ -471,12 +471,6 @@ bpimk.o:		bpimk.c bpimk.h bpihdr.h
 
 bpihdr.o:		bpihdr.c bpihdr.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-vecint.o:		vecint.c vecint.h
-	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-setint.o:		setint.cc setint.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) setint.cc
 
 ts.o:			ts.c ts.h
 	$(CC) -c $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<

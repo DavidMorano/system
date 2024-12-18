@@ -85,7 +85,7 @@
 /* local defines */
 
 #define	RMSESFILES_LOCKFILE	"LOCK"
-#define	RMSESFILES_NENT	512
+#define	RMSESFILES_NENT		512
 
 
 /* external subroutines */
@@ -177,14 +177,12 @@ static int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	if ((rs = mkpath(pbuf,dname)) >= 0) {
 	    cint	pl = rs ;
 	    if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
-	        sigblocker	s ;
 		cint		nlen = rs ;
-	        if ((rs = s.start) >= 0) {
+	        if (sigblocker s ; (rs = s.start) >= 0) {
 	            if ((rs = lockbegin(pbuf,pl)) >= 0) {
 	                cint		lfd = rs ;
-	                fsdir		d ;
-	                fsdir_ent	de ;
-	                if ((rs = fsdir_open(&d,pbuf)) >= 0) {
+	                if (fsdir d ; (rs = fsdir_open(&d,pbuf)) >= 0) {
+	                    fsdir_ent	de ;
 	                    while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
 	                        cchar	*sp = de.name ;
 	                        if (hasNotDots(sp,rs) && (sp[0] == 's')) {
@@ -221,10 +219,9 @@ static int lockbegin(char *pbuf,int plen) noex {
 	int		lfd = -1 ;
 	cchar		*lfn = RMSESFILES_LOCKFILE ;
 	if ((rs = pathadd(pbuf,plen,lfn)) >= 0) {
-	    openstate	ols ;
 	    cmode	om = 0666 ;
 	    cint	of = (O_CREAT|O_RDWR|O_TRUNC) ;
-	    if ((rs = openstate_open(&ols,pbuf,of,om)) >= 0) {
+	    if (openstate ols ; (rs = openstate_open(&ols,pbuf,of,om)) >= 0) {
 	        lfd = rs ;
 	        if (ols.f_created) {
 	            rs = u_fchmod(lfd,om) ;
@@ -257,10 +254,9 @@ static int lockend(char *pbuf,int plen,int lfd) noex {
 /* end subroutine (lockend) */
 
 static int rmsesdir(ids *idp,char *pbuf,int plen) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = u_stat(pbuf,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        cint	am = (R_OK|W_OK|X_OK) ;
 	        if ((rs = sperm(idp,&sb,am)) >= 0) {
@@ -320,9 +316,8 @@ static int vecpstr_dirload(vecpstr *flp,char *pbuf,int plen) noex {
 	strnul		dname(pbuf,plen) ;
 	if (cchar *dn = dname ; dn != nullptr) {
 	    if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
-	        fsdir	dir ;
 		cint	nlen = rs ;
-	        if ((rs = fsdir_open(&dir,dn)) >= 0) {
+	        if (fsdir dir ; (rs = fsdir_open(&dir,dn)) >= 0) {
 	            fsdir_ent	de ;
 	            while ((rs = fsdir_read(&dir,&de,nbuf,nlen)) > 0) {
 	                cint	sl = rs ;

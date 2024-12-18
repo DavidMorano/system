@@ -89,13 +89,13 @@
 /* exported subroutines */
 
 int mknoise(uint *a,int n) noex {
-	uint		sz = sizeof(uint) ;
 	int		rs = SR_FAULT ;
 	if (a) {
 	    rs = SR_INVALID ;
-	    if (n) {
+	    if (n > 0) {
+	        cint	sz = szof(uint) ;
 	        if ((rs = uc_rand(a,(n * sz))) >= 0) {
-		    n = int(rs / sz) ;
+		    n = (rs / sz) ;
 		}
 	    }
 	}

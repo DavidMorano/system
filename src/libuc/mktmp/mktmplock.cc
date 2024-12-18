@@ -1,4 +1,5 @@
 /* mktmplock SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a temporary file which is "lockable" */
@@ -46,6 +47,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>

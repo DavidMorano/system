@@ -45,7 +45,7 @@ extern int setint_count(setint *) noex ;
 extern int setint_mkvec(setint *,int *) noex ;
 extern int setint_extent(setint *) noex ;
 extern int setint_curbegin(setint *,setint_cur *) noex ;
-extern int setint_enum(setint *,setint_cur *,int *) noex ;
+extern int setint_curenum(setint *,setint_cur *,int *) noex ;
 extern int setint_curend(setint *,setint_cur *) noex ;
 extern int setint_find(setint *,int) noex ;
 

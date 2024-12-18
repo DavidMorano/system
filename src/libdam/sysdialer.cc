@@ -152,7 +152,7 @@ static int	getext(fext *,cchar *,int) noex ;
 
 /* local variables */
 
-static cchar	*prnames[] = {
+constexpr cpcchar	prnames[] = {
 	"LOCAL",
 	"PCS",
 	"NCMP",
@@ -160,21 +160,21 @@ static cchar	*prnames[] = {
 	nullptr
 } ;
 
-static cchar	*exts[] = {
+constexpr cpcchar	exts[] = {
 	"so",
 	"o",
 	"",
 	nullptr
 } ;
 
-static cchar	*de64[] = {
+constexpr cpcchar	de64[] = {
 	"sparcv9",
 	"sparc",
 	"",
 	nullptr
 } ;
 
-static cchar	*de32[] = {
+constexpr cpcchar	de32[] = {
 	"sparcv8",
 	"sparcv7",
 	"sparc",
@@ -205,21 +205,6 @@ static cchar	*dirs32[] = {
 } ;
 #endif /* _LP64 */
 
-static cchar	*subs[] = {
-	"open",
-	"reade",
-	"recve",
-	"recvfrome",
-	"recvmsge",
-	"write",
-	"send",
-	"sendto",
-	"sendmsg",
-	"shutdown",
-	"close",
-	nullptr
-} ;
-
 enum subs {
 	sub_open,
 	sub_reade,
@@ -235,7 +220,22 @@ enum subs {
 	sub_overlast
 } ;
 
-static const int	rsnotconnected[] = {
+constexpr cpcchar	subs[] = {
+	"open",
+	"reade",
+	"recve",
+	"recvfrome",
+	"recvmsge",
+	"write",
+	"send",
+	"sendto",
+	"sendmsg",
+	"shutdown",
+	"close",
+	nullptr
+} ;
+
+constexpr int		rsnotconnected[] = {
 	SR_PFNOSUPPORT,
 	SR_AFNOSUPPORT,
 	SR_NETUNREACH,
@@ -254,21 +254,22 @@ static const int	rsnotconnected[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs)
-{
+int sysdialer_start(sysdialer *op,cchar *pr,cchar **prs,cchar **dirs) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		size ;
 	int		opts ;
-	cchar	*cp ;
+	cchar		*cp ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (pr == nullptr) return SR_FAULT ;
 
-	memset(op,0,sizeof(SYSDIALER)) ;
+	memclear(op) ;
 
 	rs = uc_mallocstrw(pr,-1,&cp) ;
 	if (rs < 0)
@@ -353,11 +354,7 @@ bad0:
 }
 /* end subroutine (sysdialer_start) */
 
-
-/* free up and get out */
-int sysdialer_finish(op)
-SYSDIALER	*op ;
-{
+int sysdialer_finish(sysdialer *op) noex {
 	SYSDIALER_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;

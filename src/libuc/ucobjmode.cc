@@ -1,4 +1,5 @@
 /* ucobjmode SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -42,7 +43,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<poll.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<libmallocxx.h>
 #include	<hasnonpath.h>
@@ -126,9 +128,8 @@ int uc_minmod(cchar *fname,mode_t mm) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		USTAT		sb ;
 	        mm &= (~ S_IFMT) ;
-	        if ((rs = u_stat(fname,&sb)) >= 0) {
+		if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	            cmode	cm = (sb.st_mode & (~ S_IFMT)) ;
 	            if ((cm & mm) != mm) {
 	                f_changed = true ;
@@ -153,9 +154,8 @@ static int ensuremode(cchar *rbuf,mode_t nm) noex {
 		cmode	om = 0666 ;
 		cint	of = O_RDONLY ;
 	        if ((rs = u_open(rbuf,of,om)) >= 0) {
-	            USTAT	sb ;
 	            cint	fd = rs ;
-	            if ((rs = u_fstat(fd,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	                cmode	cm = sb.st_mode & (~ S_IFMT) ;
 	                nm &= (~ S_IFMT) ;
 	                if ((cm & nm) != nm) {

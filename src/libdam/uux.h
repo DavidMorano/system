@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -40,7 +39,7 @@ struct uux_flags {
 } ;
 
 struct uux_head {
-	LOGFILE		lh ;
+	logfile		*lfp ;		/* log-file-pointer */
 	UUX_FL		f ;
 	uint		magic ;
 	int		fd ;
