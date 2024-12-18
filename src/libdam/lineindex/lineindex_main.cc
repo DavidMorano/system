@@ -460,16 +460,16 @@ static int lineindex_idxverify(LI *op) noex {
 	    cint	ml = op->mapsize ;
 	    char	*mp = charp(op->mapdata) ;
 	    if (lineindexhdr hdr{} ; (rs = hdr.wr(mp,ml)) >= 0) {
-		cint	ver = op->vetu[0] ;
-		cint	end = op->vetu[1] ;
-		cuint	typ = op->vetu[2] ;
+		cint	ver = hdr.vetu[0] ;
+		cint	end = hdr.vetu[1] ;
+		cuint	typ = hdr.vetu[2] ;
 		bool	fbad = false ;
 		op->rectab = uintp(mp + hdr.rectab) ;
 		op->tiwrite = time_t(hdr.wrtime) ;
 		op->lines = int(hdr.lines) ;
 		fbad = fbad || (ver != LINEINDEX_FILEVERSION) ;
 		fbad = fbad || (end != ENDIAN) ;
-		fbad = fbad || (ver != LINEINDEX_FILETYPE) ;
+		fbad = fbad || (typ != LINEINDEX_FILETYPE) ;
 		if (fbad) rs = SR_BADFMT ;
 	    } /* end if (lineindexhdr_wr) */
 	}

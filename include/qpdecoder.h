@@ -1,4 +1,5 @@
 /* qpdecoder HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Quoted-Printable (QP) decoder */
@@ -19,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	QPDECODER_MAGIC		0x13f3c205
@@ -38,20 +39,21 @@ struct qpdecoder_flags {
 
 struct qpdecoder_head {
 	void		*outbuf ;	/* output-buffer */
+	QPDECODER_FL	f ;
 	uint		magic ;
 	int		rl ;		/* stage length */
-	QPDECODER_FL	f ;
 	char		rb[4+1] ;	/* stage buffer */
 } ;
 
-typedef QPDECODER	qpdecoder ;
+typedef	QPDECODER	qpdecoder ;
+typedef	QPDECODER_FL	qpdecoder_fl ;
 
 EXTERNC_begin
 
-extern int qpdecoder_start(QPDECODER *,int) noex ;
-extern int qpdecoder_load(QPDECODER *,cchar *,int) noex ;
-extern int qpdecoder_read(QPDECODER *,char *,int) noex ;
-extern int qpdecoder_finish(QPDECODER *) noex ;
+extern int qpdecoder_start(qpdecoder *,int) noex ;
+extern int qpdecoder_load(qpdecoder *,cchar *,int) noex ;
+extern int qpdecoder_read(qpdecoder *,char *,int) noex ;
+extern int qpdecoder_finish(qpdecoder *) noex ;
 
 EXTERNC_end
 

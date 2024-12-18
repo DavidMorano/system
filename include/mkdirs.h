@@ -13,14 +13,14 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MKDIRS_INCLUDE
 #define	MKDIRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
+#include	<fcntl.h>		/* |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

@@ -1,4 +1,5 @@
 /* hexdecoder HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* HEX decoder */
@@ -19,10 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	HEXDECODER_MAGIC	0x13f3c202
@@ -40,14 +42,14 @@ typedef HEXDECODER	hexdecoder ;
 
 EXTERNC_begin
 
-extern int hexdecoder_start(HEXDECODER *) noex ;
-extern int hexdecoder_load(HEXDECODER *,cchar *,int) noex ;
-extern int hexdecoder_read(HEXDECODER *,char *,int) noex ;
-extern int hexdecoder_finish(HEXDECODER *) noex ;
+extern int hexdecoder_start(hexdecoder *) noex ;
+extern int hexdecoder_load(hexdecoder *,cchar *,int) noex ;
+extern int hexdecoder_read(hexdecoder *,char *,int) noex ;
+extern int hexdecoder_finish(hexdecoder *) noex ;
 
 EXTERNC_end
 
 
-#endif /* HEXDECODER_INCLUDE */
+#endif /* hexdecoder_INCLUDE */
 
 

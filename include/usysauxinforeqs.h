@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2000-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	usysauxinforeqs
+
+  	Description:
 	This file contains enumerations that represent individual
 	system-auxillary-information items that can be retrieved
 	from any particular operating system.  These enumerations

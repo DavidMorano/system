@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	System:
-	usys_ufcntl
+	usys_fcntl
 
 	Description:
 	This is a utility function for use by other emulators.

@@ -1,4 +1,5 @@
 /* ismmclass HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* is a character int a mail-message class? */
@@ -30,6 +31,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 #include	<ischarx.h>
 

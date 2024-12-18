@@ -1,5 +1,6 @@
 /* ctwords HEADER */
-/* lang=C++11 */
+/* encoding=ISO8859-1 */
+/* lang=C++20  */
 
 /* convert to Number Words */
 /* version %I% last-modified %G% */
@@ -20,14 +21,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string>		/* |string(3c++)| */
+#include	<string>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
-extern int	ctwords(std::string *,int) noex ;
+extern int ctwords(std::string *,int) noex ;
 
 
 #endif /* __cplusplus */

@@ -1,4 +1,5 @@
 /* dirs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a series of possibly hierarchical directories */
@@ -12,19 +13,28 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIRS_INCLUDE
 #define	DIRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 #include	<mkdirs.h>
 #include	<rmdirs.h>
-#include	<dirempty.h>
+
+
+EXTERNC_begin
+
+extern int dirempty(cchar *) noex ;
+
+EXTERNC_end
 
 
 #endif /* DIRS_INCLUDE */
