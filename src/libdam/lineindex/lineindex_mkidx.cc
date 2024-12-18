@@ -66,12 +66,6 @@
 #define	LI_VERSION	LINEINDEX_FILEVERSION
 #define	LI_TYPE		LINEINDEX_FILETYPE
 
-#define	TO_FILECOME	2
-#define	TO_OPEN		(60 * 60)
-#define	TO_MAP		(1 * 60)
-#define	TO_CHECK	4
-#define	TO_ACCESS	(1 * 60)
-
 
 /* imported namespaces */
 
@@ -82,9 +76,6 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
-typedef mode_t		om_t ;		/* open-mode */
-typedef uint *		uintp ;
 
 
 /* external subroutines */
@@ -298,7 +289,7 @@ int idxer::liner(int fd,size_t ms) noex {
 		    lp += si ;
 		    if (rs < 0) break ;
 		} /* end while */
-		if (ll > 0) {
+		if ((rs >= 0) && (ll > 0)) {
 		    rs = add(md,lp) ;
 		    lines += 1 ;
 		}
@@ -340,7 +331,7 @@ int idxer::wridx(int lines) noex {
 		    vec[0].iov_base = hbuf ;
        		    vec[0].iov_len = hsz ;
         	    vec[1].iov_base = caddr_t(va) ;
-        	    vec[1].iov_len = (lines * szof(uint)) ;
+        	    vec[1].iov_len = (lines * szof(int)) ;
 		    rs = u_writev(tfd,vec,2) ;
 		} /* end if */
 	    } /* end if (lineindexhdr_rd) */

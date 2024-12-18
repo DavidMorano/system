@@ -56,7 +56,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= lineindexhdr.o
-OBJ1= lineindex_main.o
+OBJ1= lineindex_main.o lineindex_mkidx.o
 OBJ2= 
 OBJ3=
 
@@ -141,6 +141,7 @@ objb.o:			$(OBJB)
 
 
 lineindex_main.o:	lineindex_main.cc			$(INCS)
+lineindex_mkidx.o:	lineindex_mkidx.cc			$(INCS)
 lineindexhdr.o:		lineindexhdr.cc lineindexhdr.h		$(INCS)
 
 
