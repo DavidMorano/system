@@ -23,7 +23,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |caddr_t| */
+#include	<sys/stat.h>		/* |struct stat| */
 #include	<time.h>		/* |time_t| */
+#include	<fcntl.h>		/* |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -41,7 +43,6 @@
 #define	LINEINDEX_FILEMAGICSIZE	16
 #define	LINEINDEX_FILEMAGICLEN	sizeof(LINEINDEX_FILEMAGIC)
 #define	LINEINDEX_FILEVERSION	1
-#define	LINEINDEX_ENDIAN	1	/* always network order */
 #define	LINEINDEX_FILETYPE	0
 
 
@@ -69,13 +70,14 @@ struct lineindex_head {
 	cchar		*ifn ;		/* index-file-name */
 	cchar		*tfn ;		/* text-file-name */
 	uint		*rectab ;
+	USTAT		*sbp ;
 	caddr_t		mapdata ;
-	time_t		wtime ;
-	time_t		mtime ;
-	time_t		ti_open ;
-	time_t		ti_map ;
-	time_t		ti_check ;
-	time_t		ti_access ;
+	time_t		tiwrite ;
+	time_t		tifmod ;
+	time_t		tiopen ;
+	time_t		timap ;
+	time_t		ticheck ;
+	time_t		tiaccess ;
 	size_t		mapsize ;
 	LINEINDEX_FL	fl ;
 	uint		magic ;
@@ -97,7 +99,7 @@ typedef	LINEINDEX_INFO		lineindex_info ;
 EXTERNC_begin
 
 extern int lineindex_open(lineindex *,cchar *,int,mode_t,cchar *) noex ;
-extern int lineindex_lookup(lineindex *,uint,off_t *) noex ;
+extern int lineindex_lookup(lineindex *,int,off_t *) noex ;
 extern int lineindex_curbegin(lineindex *,lineindex_cur *) noex ;
 extern int lineindex_curend(lineindex *,lineindex_cur *) noex ;
 extern int lineindex_curenum(lineindex *,lineindex_cur *,off_t *) noex ;

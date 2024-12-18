@@ -72,7 +72,7 @@ static int	findent(int) noex ;
 
 /* local variables */
 
-static constexpr struct val	vals[] = {
+constexpr val	vals[] = {
 	{ TBADADDR, "BADADDR", "incorrect address format" },
  	{ TBADOPT, "BADOPT", "incorrect options format" },
 	{ TACCES, "ACCESS", "illegal permissions" },

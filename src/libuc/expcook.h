@@ -1,4 +1,5 @@
 /* expcook HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<hdbstr.h>
 #include	<buffer.h>

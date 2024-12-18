@@ -68,12 +68,12 @@ struct flagstrs {
 } ;
 
 
-/* foward references */
+/* forward references */
 
 
 /* local variables */
 
-static constexpr struct flagstrs	fs_open[] = {
+constexpr flagstrs	fs_open[] = {
 	{ O_APPEND, "APPEND" },
 	{ O_CREAT, "CREAT" },
 	{ O_EXCL, "EXCL" },

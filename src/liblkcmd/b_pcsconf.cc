@@ -1,4 +1,5 @@
 /* b_pcsconf SUPPORT (PCSCONF) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* PCS Configuration */
@@ -20,6 +21,9 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This program is used either by programs or a user to retrieve
 	the current PCS configuration settings from a PCS configuration
 	file in the PCS distribution directory tree.
@@ -31,7 +35,6 @@
 	$ pcsconf [-ROOT program_root] [-C conf] [keyword] [-V?]
 
 	Notes:
-
 	Note the subtle differences between queries:
 		org
 		pcsdeforg
@@ -66,11 +69,12 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<userinfo.h>
+#include	<getlogx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<ascii.h>
 #include	<field.h>
-#include	<userinfo.h>
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<sbuf.h>
@@ -78,7 +82,7 @@
 #include	<pcspoll.h>
 #include	<pcsns.h>
 #include	<prgetclustername.h>
-#include	<getlogx.h>
+#include	<nchr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -146,7 +150,6 @@ extern int	checkonc(cchar *,cchar *,cchar *,cchar *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	pcsgetorg(cchar *,char *,int,cchar *) ;
 extern int	pcsgetfacility(cchar *,char *,int) ;
-extern int	nchr(cchar *,int,int) ;
 extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -275,24 +278,6 @@ static int	mkpresent(char *,int,int,int,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"CONFIG",
-	"LOGFILE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"lf",
-	"cf",
-	"df",
-	"dump",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -319,7 +304,25 @@ static const PIVARS	initvars = {
 	VARPRNAME
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"CONFIG",
+	"LOGFILE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"lf",
+	"cf",
+	"df",
+	"dump",
+	NULL
+} ;
+
+constexpr mapex_map	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -333,42 +336,13 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
-	"squery",
-	NULL
-} ;
-
 enum akonames {
 	akoname_squery,
 	akoname_overlast
 } ;
 
-/* define the configuration keywords */
-static const char	*qopts[] = {
-	"username",
-	"nodename",
-	"domainname",
-	"nisdomain",
-	"systemname",
-	"clustername",
-	"hostname",
-	"pcsuid",
-	"pcsgid",
-	"pcsusername",
-	"pcsdeforg",
-	"pcsorg",
-	"gecosname",
-	"realname",
-	"name",
-	"pcsname",
-	"fullname",
-	"pcsfullname",
-	"mailname",
-	"org",
-	"ema",
-	"logname",
-	"facility",
-	"pr",
+constexpr cpcchar	akonames[] = {
+	"squery",
 	NULL
 } ;
 
@@ -400,7 +374,36 @@ enum qopts {
 	qopt_overlast
 } ;
 
-static const uchar	aterms[] = {
+/* define the configuration keywords */
+constexpr cpcchar	qopts[] = {
+	"username",
+	"nodename",
+	"domainname",
+	"nisdomain",
+	"systemname",
+	"clustername",
+	"hostname",
+	"pcsuid",
+	"pcsgid",
+	"pcsusername",
+	"pcsdeforg",
+	"pcsorg",
+	"gecosname",
+	"realname",
+	"name",
+	"pcsname",
+	"fullname",
+	"pcsfullname",
+	"mailname",
+	"org",
+	"ema",
+	"logname",
+	"facility",
+	"pr",
+	NULL
+} ;
+
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -412,10 +415,12 @@ static const uchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_pcsconf(int argc,cchar *argv[],void *contextp)
+int b_pcsconf(int argc,mainv argv,void *contextp) noex {
 {
 	int		rs ;
 	int		rs1 ;
@@ -434,9 +439,7 @@ int b_pcsconf(int argc,cchar *argv[],void *contextp)
 }
 /* end subroutine (b_pcsconf) */
 
-
-int p_pcsconf(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_pcsconf(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_pcsconf) */
@@ -444,10 +447,8 @@ int p_pcsconf(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -538,7 +539,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -780,7 +781,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1234,9 +1235,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
@@ -1290,10 +1289,8 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutines (usage) */
 
-
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
+static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1391,23 +1388,16 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 }
 /* end subroutine (process) */
 
-
-static int proclist(PROGINFO *pip,SHIO *ofp)
-{
+static int proclist(PROGINFO *pip,SHIO *ofp) noex {
 	PCSCONF		*pcp = pip->pcsconf ;
 	PCSCONF_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/proclist: ent\n") ;
-#endif
-
 	if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	    const int	klen = KBUFLEN ;
-	    const int	vlen = VBUFLEN ;
+	    cint	klen = KBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    int		vl ;
 	    int		nfs ;
 	    char	kbuf[KBUFLEN+1] ;
@@ -1427,11 +1417,6 @@ static int proclist(PROGINFO *pip,SHIO *ofp)
 	    rs1 = pcsconf_curend(pcp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pcsconf-cursor) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("main/proclist: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -1474,7 +1459,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,cchar *afn)
 	    if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1536,7 +1521,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
 {
 	LOCINFO		*lip = pip->lip ;
 	PCSCONF		*pcp = pip->pcsconf ;
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		vl = -1 ;
@@ -1739,16 +1724,17 @@ static int procpcsdump(PROGINFO *pip,cchar *dfname)
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((dfname != NULL) && ((dfname[0] == '\0') || (dfname[0] == '-')))
+	if ((dfname != NULL) && ((dfname[0] == '\0') || (dfname[0] == '-'))) {
 	    dfname = STDFNOUT ;
+	}
 
 	if (pip->open.pcsconf && (dfname != NULL)) {
 	    PCSCONF	*pcp = pip->pcsconf ;
 	    if ((rs = shio_open(dfp,dfname,"wct",0666)) >= 0) {
 	        PCSCONF_CUR	cur ;
 	        if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	            const int	klen = KBUFLEN ;
-	            const int	vlen = VBUFLEN ;
+	            cint	klen = KBUFLEN ;
+	            cint	vlen = VBUFLEN ;
 	            int		vl ;
 	            int		nfs ;
 	            char	kbuf[KBUFLEN+1] ;
@@ -1805,7 +1791,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1847,13 +1833,13 @@ static int procuserinfo_logid(PROGINFO *pip)
 	if ((rs = lib_runmode()) >= 0) {
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -1879,8 +1865,8 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	    if (DEBUGLEVEL(3)) {
 	        PCSCONF_CUR	cur ;
 	        if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	            const int	klen = KBUFLEN ;
-	            const int	vlen = VBUFLEN ;
+	            cint	klen = KBUFLEN ;
+	            cint	vlen = VBUFLEN ;
 	            int		vl ;
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
@@ -1915,7 +1901,7 @@ static int procpcsconf_end(PROGINFO *pip)
 
 static int mkpresent(char *vbuf,int vlen,int vl,int sch,int sn)
 {
-	const int	tlen = (vlen+(3*sn)) ;
+	cint	tlen = (vlen+(3*sn)) ;
 	int		rs ;
 	char		*tbuf ;
 
@@ -2056,7 +2042,7 @@ static int locinfo_nisdomain(LOCINFO *lip)
 	int		rs1 ;
 
 	if (! lip->f.nisdomain) {
-	    const int	dlen = MAXHOSTNAMELEN ;
+	    cint	dlen = MAXHOSTNAMELEN ;
 	    int		dl = -1 ;
 	    cchar	*dp = NULL ;
 	    char	dbuf[MAXHOSTNAMELEN+ 1] ;
@@ -2147,7 +2133,7 @@ static int locinfo_clustername(LOCINFO *lip)
 	int		rs1 ;
 
 	if (! lip->f.clustername) {
-	    const int	nlen = NODENAMELEN ;
+	    cint	nlen = NODENAMELEN ;
 	    int		nl = -1 ;
 	    cchar	*np = NULL ;
 	    char	nbuf[NODENAMELEN+ 1] ;
@@ -2215,14 +2201,14 @@ static int locinfo_org(LOCINFO *lip)
 #endif
 
 	if (! lip->f.org) {
-	    const int	rlen = ORGLEN ;
+	    cint	rlen = ORGLEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = pip->org ;
 	    char	rbuf[ORGLEN+ 1] ;
 	    lip->f.org = TRUE ;
 
 	    if ((rp == NULL) || (rp[0] == '\0')) {
-	        const int	w = pcsnsreq_pcsorg ;
+	        cint	w = pcsnsreq_pcsorg ;
 	        cchar		*un = pip->username ;
 	        if ((rs = locinfo_pcsnsget(lip,rbuf,rlen,un,w)) > 0) {
 	            rl = rs ;
@@ -2269,7 +2255,7 @@ static int locinfo_pcsorg(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (! lip->f.pcsorg) {
-	    const int	rlen = ORGLEN ;
+	    cint	rlen = ORGLEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[ORGLEN+ 1] ;
@@ -2280,7 +2266,7 @@ static int locinfo_pcsorg(LOCINFO *lip)
 	    }
 
 	    if (rp == NULL) {
-	        const int	w = pcsnsreq_pcsorg ;
+	        cint	w = pcsnsreq_pcsorg ;
 	        cchar		*un = pip->username ;
 	        if ((rs = locinfo_pcsnsget(lip,rbuf,rlen,un,w)) > 0) {
 	            rl = rs ;
@@ -2313,7 +2299,7 @@ static int locinfo_pcsdeforg(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (! lip->f.pcsdeforg) {
-	    const int	rlen = ORGLEN ;
+	    cint	rlen = ORGLEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[ORGLEN+ 1] ;
@@ -2363,7 +2349,7 @@ static int locinfo_name(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (! lip->f.name) {
-	    const int	rlen = REALNAMELEN ;
+	    cint	rlen = REALNAMELEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[REALNAMELEN+1] ;
@@ -2380,7 +2366,7 @@ static int locinfo_name(LOCINFO *lip)
 	    }
 
 	    if (rp == NULL) {
-	        const int	w = pcsnsreq_pcsname ;
+	        cint	w = pcsnsreq_pcsname ;
 	        cchar		*un = pip->username ;
 	        if ((rs = locinfo_pcsnsget(lip,rbuf,rlen,un,w)) > 0) {
 	            rl = rs ;
@@ -2413,7 +2399,7 @@ static int locinfo_fullname(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (! lip->f.fullname) {
-	    const int	rlen = REALNAMELEN ;
+	    cint	rlen = REALNAMELEN ;
 	    int		rl = -1 ;
 	    cchar	*rp = NULL ;
 	    char	rbuf[REALNAMELEN+1] ;
@@ -2424,7 +2410,7 @@ static int locinfo_fullname(LOCINFO *lip)
 	    }
 
 	    if (rp == NULL) {
-	        const int	w = pcsnsreq_fullname ;
+	        cint	w = pcsnsreq_fullname ;
 	        cchar		*un = pip->username ;
 	        if ((rs = locinfo_pcsnsget(lip,rbuf,rlen,un,w)) > 0) {
 	            rl = rs ;
@@ -2457,7 +2443,7 @@ static int locinfo_ema(LOCINFO *lip)
 	int		rs = SR_OK ;
 
 	if (! lip->f.ema) {
-	    const int	dlen = MAXHOSTNAMELEN ;
+	    cint	dlen = MAXHOSTNAMELEN ;
 	    int		dl = -1 ;
 	    cchar	*dp = NULL ;
 	    char	dbuf[MAXHOSTNAMELEN+ 1] ;
@@ -2524,7 +2510,7 @@ static int locinfo_pcsusername(LOCINFO *lip)
 
 	if (! lip->f.pcsusername) {
 	    PCSCONF	*pcp = pip->pcsconf ;
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    lip->f.pcsusername = TRUE ;
 	    if ((rs = pcsconf_getpcsusername(pcp,ubuf,ulen)) >= 0) {
@@ -2546,7 +2532,7 @@ static int locinfo_facility(LOCINFO *lip)
 
 	if (! lip->f.facility) {
 	    PROGINFO	*pip = lip->pip ;
-	    const int	flen = MAXNAMELEN ;
+	    cint	flen = MAXNAMELEN ;
 	    char	fbuf[MAXNAMELEN+1] ;
 	    lip->f.facility = TRUE ;
 	    if ((rs = pcsgetfacility(pip->pr,fbuf,flen)) >= 0) {
@@ -2568,7 +2554,7 @@ static int locinfo_prpcs(LOCINFO *lip)
 	int		rs ;
 
 	if (lip->pr_pcs == NULL) {
-	    const int	plen = MAXPATHLEN ;
+	    cint	plen = MAXPATHLEN ;
 	    cchar	*dn = pip->domainname ;
 	    char	pbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpr(pbuf,plen,VARPRPCS,dn)) >= 0) {

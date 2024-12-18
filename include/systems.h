@@ -42,8 +42,8 @@ struct systems_entry {
 } ;
 
 struct systems_head {
-	vecobj		files ;
-	vecobj		entries ;
+	vecobj		*flp ;		/* file-list-pointer */
+	vecobj		*elp ;		/* entry-list-pointer */
 	time_t		checktime ;
 	uint		magic ;
 } ;
@@ -60,7 +60,7 @@ extern int	systems_filedel(systems *,cchar *) noex ;
 extern int	systems_check(systems *,time_t) noex ;
 extern int	systems_curbegin(systems *,systems_cur *) noex ;
 extern int	systems_curend(systems *,systems_cur *) noex ;
-extern int	systems_enum(systems *,systems_cur *,systems_ent **) noex ;
+extern int	systems_curenum(systems *,systems_cur *,systems_ent **) noex ;
 extern int	systems_fetch(systems *,cchar *,systems_cur *,
 			systems_ent **) noex ;
 extern int	systems_close(systems *) noex ;

@@ -72,8 +72,134 @@ struct vecint_head {
 	int		fi ;		/* free index */
 } ;
 
-typedef VECINT		vecint ;
+typedef VECINT_FL	vecint_fl ;
 typedef VECINT_CUR	vecint_cur ;
+
+#ifdef	__cplusplus
+enum vecintmems {
+	vecintmem_count,
+	vecintmem_extent,
+	vecintmem_delall,
+	vecintmem_sort,
+	vecintmem_setsorted,
+	vecintmem_resize,
+	vecintmem_audit,
+	vecintmem_finish,
+	vecintmem_overlast
+} ;
+struct vecint_iter {
+	VECINT_TYPE	*va = nullptr ;
+	int		i = -1 ;
+	int		ii = -1 ;
+	vecint_iter() = default ;
+	vecint_iter(VECINT_TYPE *ov,int oi,int oii) noex : va(ov), i(oi) {
+	    ii = oii ;
+	} ;
+	vecint_iter(const vecint_iter &oit) noex {
+	    if (this != &oit) {
+		va = oit.va ;
+		i = oit.i ;
+		ii = oit.ii ;
+	    }
+	} ;
+	vecint_iter &operator = (const vecint_iter &oit) noex {
+	    if (this != &oit) {
+		va = oit.va ;
+		i = oit.i ;
+		ii = oit.ii ;
+	    }
+	    return *this ;
+	} ;
+	bool operator != (const vecint_iter &) noex ;
+	bool operator == (const vecint_iter &) noex ;
+	VECINT_TYPE *operator * () noex {
+	    VECINT_TYPE	*rp = nullptr ;
+	    if (i < ii) rp = (va + i) ;
+	    return rp ;
+	} ;
+	vecint_iter operator + (int) const noex ;
+	vecint_iter operator += (int) noex ;
+	vecint_iter operator ++ () noex ; /* pre */
+	vecint_iter operator ++ (int) noex ; /* post */
+	void increment(int = 1) noex ;
+} ; /* end struct vecint_iter) */
+struct vecint ;
+struct vecint_st {
+	vecint		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecint *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0,int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (vecint_st) */
+struct vecint_co {
+	vecint		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecint *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (vecint_co) */
+struct vecint : vecint_head {
+    	vecint_st	start ;
+	vecint_co	count ;
+	vecint_co	extent ;
+	vecint_co	delall ;
+	vecint_co	sort ;
+	vecint_co	setsorted ;
+	vecint_co	resize ;
+	vecint_co	audit ;
+	vecint_co	finish ;
+	vecint() noex {
+	    start(this,0) ;
+	    extent(this,vecintmem_extent) ;
+	    count(this,vecintmem_count) ;
+	    delall(this,vecintmem_delall) ;
+	    sort(this,vecintmem_sort) ;
+	    setsorted(this,vecintmem_setsorted) ;
+	    resize(this,vecintmem_resize) ;
+	    audit(this,vecintmem_audit) ;
+	    finish(this,vecintmem_finish) ;
+	} ;
+	vecint(const vecint &) = delete ;
+	vecint &operator = (const vecint &) = delete ;
+	int add(VECINT_TYPE) noex ;
+	int adduniq(VECINT_TYPE) noex ;
+	int insert(int,VECINT_TYPE) noex ;
+	int assign(int,VECINT_TYPE) noex ;
+	int del(int) noex ;
+	int find(VECINT_TYPE) noex ;
+	int match(VECINT_TYPE) noex ;
+	int getval(int,VECINT_TYPE *) noex ;
+	int getvec(VECINT_TYPE **) noex ;
+	int mkvec(VECINT_TYPE *) noex ;
+	int curbegin(vecint_cur *) noex ;
+	int curend(vecint_cur *) noex ;
+	int curenum(vecint_cur *,VECINT_TYPE *) noex ;
+	vecint_iter begin() noex {
+	    vecint_iter		it(va,0,i) ;
+	    return it ;
+	} ;
+	vecint_iter end() noex {
+	    vecint_iter		it(va,i,i) ;
+	    return it ;
+	} ;
+	void dtor() noex ;
+	~vecint() {
+	    dtor() ;
+	} ;
+} ; /* end struct (vecint) */
+#else	/* __cplusplus */
+typedef VECINT		vecint ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -96,7 +222,7 @@ extern int vecint_getval(vecint *,int,VECINT_TYPE *) noex ;
 extern int vecint_getvec(vecint *,VECINT_TYPE **) noex ;
 extern int vecint_mkvec(vecint *,VECINT_TYPE *) noex ;
 extern int vecint_curbegin(vecint *,vecint_cur *) noex ;
-extern int vecint_enum(vecint *,vecint_cur *,VECINT_TYPE *) noex ;
+extern int vecint_curenum(vecint *,vecint_cur *,VECINT_TYPE *) noex ;
 extern int vecint_curend(vecint *,vecint_cur *) noex ;
 extern int vecint_audit(vecint *) noex ;
 

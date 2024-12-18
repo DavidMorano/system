@@ -850,7 +850,7 @@ static int vecstr_dtor(vecstr *op) noex {
 
 static int vecstr_setopts(vecstr *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECSTR_OREUSE) op->f.oreuse = 1 ;

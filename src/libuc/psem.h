@@ -1,4 +1,5 @@
 /* psem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* POSIX® unnamed-Semaphore (PSEM) */
@@ -14,10 +15,13 @@
 
 /*******************************************************************************
 
-	These are unnamed POSIX® semaphores.
+  	Object:
+	psem
 
-	Sss the corresponding main C-language source file for more
-	information on what is going on here.
+	Description:
+	These are unnamed POSIX® semaphores.  Sss the corresponding
+	main C-language source file for more information on what
+	is going on here.
 
 *******************************************************************************/
 

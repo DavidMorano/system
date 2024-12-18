@@ -46,7 +46,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkmagic.h>

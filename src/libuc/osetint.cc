@@ -1,4 +1,5 @@
 /* osetint SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* ordered set of integers */
@@ -33,6 +34,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>
 #include	<utility>
 #include	<set>

@@ -1,4 +1,5 @@
 /* nextpowtwo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get the next higher power-of-two for a given number */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

@@ -20,7 +20,7 @@
 /*******************************************************************************
 
   	Name:
-	uclocktail
+	uc_locktail
 
 	Description:
 	This subroutine is used to lock the end of files.  Other
@@ -51,6 +51,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -63,21 +66,20 @@
 /* exported subroutines */
 
 int uc_locktail(int fd,int f_lock,int f_read,int to) noex {
-	FLOCK		fl ;
+	FLOCK		fl{} ;
 	int		rs = SR_OK ;
 	if (f_lock) {
 	    fl.l_type = (f_read) ? F_RDLCK : F_WRLCK ;
 	    fl.l_whence = SEEK_END ;
-	    fl.l_start = 0L ;
-	    fl.l_len = 0L ;
+	    fl.l_start = 0z ;
+	    fl.l_len = 0z ;
 	    rs = SR_TIMEDOUT ;
 	    if (to > 0) {
 	        bool	f_exit = false ;
 	        for (int i = 0 ; i < to ; i += 1) {
 	            if (i > 0) msleep(1000) ;
 	            f_exit = true ;
-	            rs = u_fcntl(fd,F_SETLK,&fl) ;
-		    if (rs < 0) {
+	            if ((rs = u_fcntl(fd,F_SETLK,&fl)) < 0) {
 	                switch (rs) {
 	                case SR_INTR:
 	                case SR_ACCES:

@@ -1,4 +1,5 @@
 /* format HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* header file for the FORMAT subroutine */
@@ -23,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

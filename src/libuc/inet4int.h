@@ -1,4 +1,5 @@
 /* inet4int HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* some INET-related subroutine */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	inet4int
+
+	Description:
 	This file contains some support for the UNIX® INET4INT related
 	operations.
 
@@ -32,6 +37,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

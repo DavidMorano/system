@@ -1,4 +1,5 @@
 /* ffbs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Find-First-Bit-Set in various sized integers */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<stdintx.h>
 
 

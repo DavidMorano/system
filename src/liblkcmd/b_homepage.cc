@@ -1,4 +1,5 @@
 /* b_homepage SUPPORT (HOMEPAGE) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to create a "home" webpage in corporate environment */
@@ -26,6 +27,9 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This program creates a web page that is (generally) meant to
 	be a home page for a browser in a corporate environment.
 
@@ -160,7 +164,6 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfdequote(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	nchr(cchar *,int,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
@@ -4483,10 +4486,7 @@ static int filedat_worker(FILEDAT *fep)
 #endif
 
 	if ((rs = uc_open(fep->fname,O_RDONLY,0666)) >= 0) {
-	    const int	fd = rs ;
-#if	CF_DEBUGS
-	    debugprintf("filedat_worker: uc_open() svc=%s fd=%d\n",fep->svc,fd) ;
-#endif
+	    cint	fd = rs ;
 	    if ((rs = filedat_workread(fep,fd)) > 0) {
 	        int	lines = 0 ;
 	        int	sl = rs ;

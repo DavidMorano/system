@@ -1,4 +1,5 @@
 /* filemap SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* read-file funtion through file-mapping */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	filemap
+
+	Description:
         This little object supports some buffered file operations for
         low-overhead buffered I-O operations (read-only).
 
@@ -30,7 +35,6 @@
 #include	<climits>		/* |ULONG_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<sysval.hh>
@@ -64,6 +68,35 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
+template<typename ... Args>
+static int filemap_ctor(filemap *op,Args ... args) noex {
+    	FILEMAP		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(hop) ;
+	    if ((op->sbp = new(nothrow) USTAT) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (filemap_ctor) */
+
+static int filemap_dtor(filemap *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->sbp) {
+		delete op->sbp ;
+		op->sbp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (filemap_dtor) */
+
 static int filemap_opener(filemap *,cchar *) noex ;
 static int filemap_openmap(filemap *,int,size_t) noex ;
 
@@ -79,20 +112,18 @@ static sysval		pagesize(sysval_ps) ;
 /* exported subroutines */
 
 int filemap_open(filemap *op,cchar *fname,size_t nmax) noex {
-	int		rs = SR_FAULT ;
-	if (op && fname) {
+	int		rs ;
+	if ((rs = filemap_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
-	    op->maxsize = 0 ;
-	    op->mapsize = 0 ;
-	    op->mapdata = nullptr ;
-	    op->bp = nullptr ;
-	    op->sb = {} ;
 	    if (fname[0]) {
 	        if (nmax <= 0) nmax = ULONG_MAX ;
 	        op->maxsize = nmax ;
 		rs = filemap_opener(op,fname) ;
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		filemap_dtor(op) ;
+	    }
+	} /* end if (filemap_ctor) */
 	return rs ;
 }
 /* end subroutine (filemap_open) */
@@ -103,12 +134,16 @@ int filemap_close(filemap *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->mapdata) {
-	        size_t	ms = op->mapsize ;
+	        csize	ms = op->mapsize ;
 	        void	*ma = op->mapdata ;
 	        rs1 = u_mmapend(ma,ms) ;
 		if (rs >= 0) rs = rs1 ;
 	        op->mapdata = nullptr ;
 	        op->mapsize = 0 ;
+	    }
+	    {
+		rs1 = filemap_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->bp = nullptr ;
 	} /* end if (non-null) */
@@ -121,7 +156,7 @@ int filemap_stat(filemap *op,USTAT *sbp) noex {
 	if (op && sbp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
-		*sbp = op->sb ;
+		*sbp = *op->sbp ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -131,10 +166,11 @@ int filemap_stat(filemap *op,USTAT *sbp) noex {
 int filemap_read(filemap *op,int rlen,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
-	    size_t	fsize = size_t(op->sb.st_size) ;
+	    USTAT	*sbp = op->sbp ;
+	    size_t	fsize = size_t(sbp->st_size) ;
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
-		cchar	*bdata = (cchar *) op->mapdata ;
+		cchar	*bdata = charp(op->mapdata) ;
 	        cvoid	**bpp = (cvoid **) vp ;
 		cchar	*sbp = op->bp ;
 		if (fsize > op->maxsize) fsize = op->maxsize ;
@@ -151,9 +187,11 @@ int filemap_read(filemap *op,int rlen,void *vp) noex {
 /* end subroutine (filemap_read) */
 
 int filemap_getln(filemap *op,cchar **bpp) noex {
+	size_t		fsize ;
 	int		rs = SR_FAULT ;
 	if (op && bpp) {
-	    size_t	fsize = size_t(op->sb.st_size) ;
+	    USTAT	*sbp = op->sbp ;
+	    fsize = size_t(sbp->st_size) ;
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
 	        cchar	*bdata = charp(op->mapdata) ;
@@ -178,26 +216,26 @@ int filemap_seek(filemap *op,off_t off,int w) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
+	        cchar	*bdata = charp(op->mapdata) ;
 		off_t	noff = 0 ;
 	        switch (w) {
 	        case SEEK_SET:
 		    noff = off ;
 	            break ;
 	        case SEEK_END:
-	            noff = (op->sb.st_size + off) ;
+		    {
+			USTAT	*sbp = op->sbp ;
+	                noff = (sbp->st_size + off) ;
+		    }
 	            break ;
 	        case SEEK_CUR:
-	            {
-		        cchar	*bdata = charp(op->mapdata) ;
-	                noff = ((op->bp - bdata) + off) ;
-	            }
+	            noff = ((op->bp - bdata) + off) ;
 	            break ;
 	        default:
 	            rs = SR_INVALID ;
 	            break ;
 	        } /* end switch */
 	        if (rs >= 0) {
-	            cchar	*bdata = (cchar *) op->mapdata ;
 	            if (noff < 0) {
 	                rs = SR_INVALID ;
 	            } else {
@@ -219,7 +257,7 @@ int filemap_tell(filemap *op,off_t *offp) noex {
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
-	        cchar	*bdata = (cchar *) op->mapdata ;
+	        cchar	*bdata = charp(op->mapdata) ;
 	        if (offp) *offp = (op->bp - bdata) ;
 	        rs = intsat(op->bp - bdata) ;
 	    } /* end if (open) */
@@ -234,7 +272,7 @@ int filemap_rewind(filemap *op) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
 		rs = SR_OK ;
-		op->bp = (char *) op->mapdata ;
+		op->bp = charp(op->mapdata) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -250,9 +288,8 @@ static int filemap_opener(filemap *op,cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = uc_open(fn,of,0666)) >= 0) {
-	    USTAT	*sbp = &op->sb ;
 	    cint	fd = rs ;
-	    if ((rs = uc_fstat(fd,sbp)) >= 0) {
+	    if (USTAT *sbp = op->sbp ; (rs = uc_fstat(fd,sbp)) >= 0) {
 		if (S_ISREG(sbp->st_mode)) {
 		    csize	fsize = size_t(sbp->st_size) ;
 		    rs = SR_TOOBIG ;
@@ -280,7 +317,7 @@ static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	    cint	mf = MAP_SHARED ;
 	    void	*md{} ;
 	    ms = max(ps,fsize) ;
-	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	        cint	madv = MADV_SEQUENTIAL ;
 	        if ((rs = u_madvise(md,ms,madv)) >= 0) {
 	            op->mapdata = md ;
@@ -346,8 +383,7 @@ int filemap::seek(off_t fo,int w) noex {
 }
 
 void filemap::dtor() noex {
-	cint	rs = int(close) ;
-	if (rs < 0) {
+	if (cint rs = close ; rs < 0) {
 	    ulogerror("filemap",rs,"fini-close") ;
 	}
 }

@@ -58,7 +58,7 @@
 
 /* local defines */
 
-#define	EBUFLEN		(2*sizeof(ulong))
+#define	EBUFLEN		(2 * szof(ulong))
 #define	NTRIES		1000
 
 #ifndef	SHMNAME_MAX
@@ -100,8 +100,7 @@ int openshmtmpx(mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	char		*sbuf{} ;
-	if ((rs = malloc_mn(&sbuf)) >= 0) {
+	if (char *sbuf{} ; (rs = malloc_mn(&sbuf)) >= 0) {
 	    cint	slen = rs ;
 	    {
 		rs = openshmtmp(sbuf,slen,om) ;
@@ -113,7 +112,7 @@ int openshmtmpx(mode_t om) noex {
 	if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
-/* end subroutine (openshmtmp) */
+/* end subroutine (openshmtmpx) */
 
 int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	int		rs = SR_FAULT ;
@@ -123,8 +122,7 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	    if ((rs = maxnamelen) >= 0) {
 		if (rlen < 0) rlen = rs ;
 	        if (ulong rv{} ; (rs = randinit(&rv)) >= 0) {
-	            sigblocker	b ;
-	            if ((rs = b.start) >= 0) {
+	            if (sigblocker b ; (rs = b.start) >= 0) {
 	                cint	of = (O_CREAT | O_EXCL | O_RDWR) ;
 	                cint	ntries = NTRIES ;
 	                for (int i = 0 ; i < ntries ; i += 1) {
@@ -153,17 +151,17 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 /* local subroutines */
 
 static int randinit(ulong *rvp) noex {
-	const pid_t	pid = uc_getpid() ;
-	const time_t	dt = time(nullptr) ;
 	int		rs = SR_FAULT ;
 	if (rvp) {
-	    ulong	rv = 0 ;
-	    ulong	sv = ulong(dt) ;
-	    rv += (sv << 8) ;
-	    sv = ulong(pid) ;
-	    rv += sv ;
-	    *rvp = rv ;
-	    rs = int(rv & INT_MAX) ;
+	    custime	dt = getustime ;
+	    if ((rs = ucpid) >= 0) {
+	        ulong	rv = rs ;
+	        ulong	sv = ulong(dt) ;
+	        rv += (sv << 8) ;
+	        rv += sv ;
+	        *rvp = rv ;
+	        rs = int(rv & INT_MAX) ;
+	    } /* end if (ucpid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -177,7 +175,7 @@ static int mkshmname(char *rbuf,int rlen,ulong rv) noex {
 	if ((rs = cthex(ebuf,elen,rv)) >= 0) {
 	    cint	el = (SHMNAME_MAX - tmplen) ;
 	    cint	i = (rs >= 16) ? ((rs-16)+6) : 0 ;
-	    rs = sncpy2w(rbuf,rlen,tpre,(ebuf+i),el) ;
+	    rs = sncpy2w(rbuf,rlen,tpre,(ebuf + i),el) ;
 	}
 	return rs ;
 }

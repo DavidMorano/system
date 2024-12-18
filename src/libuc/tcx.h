@@ -1,4 +1,5 @@
 /* tcx HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Teerminal-Control-X (perform various terminal-control functions ) */
@@ -21,9 +22,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |uid_t| + |gid_t| */
 #include	<termios.h>		/* |WINSIZE| */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>	/* |WINSIZE| */
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

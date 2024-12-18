@@ -683,7 +683,7 @@ static int vecobj_dtor(vecobj *op) noex {
 
 static int vecobj_setopts(vecobj *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECOBJ_OREUSE) op->f.oreuse = 1 ;

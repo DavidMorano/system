@@ -56,9 +56,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= fmq_main.o
-OBJ1=
+OBJ1= fmqhdr.o
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 
 OBJ= $(OBJA)
 
@@ -131,5 +131,6 @@ obj5.o:			$(OBJ5)
 
 
 fmq_main.o:		fmq_main.cc		$(INCS)
+fmqhdr.o:		fmqhdr.cc fmqhdr.h	$(INCS)
 
 

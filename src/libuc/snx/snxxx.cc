@@ -80,6 +80,15 @@ namespace {
 }
 
 
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snsdd(char *dbuf,int dlen,cchar *s1,uint d2) noex {

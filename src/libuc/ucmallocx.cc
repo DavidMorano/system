@@ -1,4 +1,5 @@
 /* ucmallocx SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -34,7 +35,7 @@
 	rpp		resulting pointer
 
 	Returns:
-	>=0		nominally -> (strlen(string) + 1)
+	>=0		number of bytes in allocated (system) buffer
 	<0		error code (system-return)
 
 
@@ -84,7 +85,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| + |strncpy(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
@@ -140,9 +141,8 @@ int uc_mallocsys(int w,char **rpp) noex {
 	if (rpp) {
 	    *rpp = nullptr ;
 	    if ((rs = getbufsize(w)) >= 0) {
-	        char	*bp{} ;
 		rl = rs ;
-	        if ((rs = uc_malloc((rl+1),&bp)) >= 0) {
+	        if (char *bp{} ; (rs = uc_malloc((rl+1),&bp)) >= 0) {
 	            *rpp = bp ;
 	        } /* end if */
 	    } /* end if (getbufsize) */
@@ -155,12 +155,11 @@ int uc_mallocbuf(cvoid *vp,int vl,cvoid **vrpp) noex {
 	int	rs = SR_FAULT ;
 	cchar	**rpp = (cchar **) vrpp ;
 	if (vp && rpp) {
-	    char	*bp{} ;
 	    if (vl < 0) {
 		cchar	*sp = charp(vp) ;
 		vl = strlen(sp) ;
 	    }
-	    if ((rs = uc_malloc((vl+1),&bp)) >= 0) {
+	    if (char *bp{} ; (rs = uc_malloc((vl+1),&bp)) >= 0) {
 	        memcpy(bp,vp,vl) ;
 	        bp[vl] = '\0' ;
 	        *rpp = bp ;
@@ -175,9 +174,8 @@ int uc_mallocbuf(cvoid *vp,int vl,cvoid **vrpp) noex {
 int uc_mallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
-	    char	*bp{} ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = uc_malloc((sl+1),&bp)) >= 0) {
+	    if (char *bp{} ; (rs = uc_malloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
 	        ourstrwcpy(bp,sp,sl) ;
 	    } else {

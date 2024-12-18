@@ -1,4 +1,5 @@
 /* cheaprand HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* retrieve a cheap random number */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

@@ -60,6 +60,7 @@ struct syswords {
 	static const char w_procdir[] ;
 	static const char w_sysdbdir[] ;
 	static const char w_devnull[] ;
+	static const char w_devrandom[] ;
 	static const char w_maildir[] ;
 	static const char w_usrlocaldir[] ;
 	static const char w_vartmpdir[] ;

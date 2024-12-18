@@ -17,8 +17,30 @@
 
 /*******************************************************************************
 
-	This subroutine constructs a single string from a single
-	specificed string.
+  	Group:
+	sncpy{x}c
+
+	Description:
+	These subroutines construct a single string (into a
+	caller-supplied counted buffer) from a single specificed
+	c-string.  But a character-case conversion is available.
+	Available character-case conversions are:
+	+ none (straight through copy)
+	+ convert to lower-case
+	+ convert to upper-case
+	+ convert to folded-case
+
+	Synopsis:
+	int sncpy{x}c(char *rbuf,int rlen,cchar *sp) noex
+
+	Arguments:
+	rbuf		result buffer pointer
+	rlen		result buffer length
+	sp		source c-string to copy-convert
+
+	Returns:
+	>=0		number of bytes copies (coverted)
+	<0		error (system-return)[
 
 *******************************************************************************/
 
@@ -42,7 +64,13 @@
 /* external subroutines */
 
 
-/* local subroutine-templates */
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references (local subroutine-templates) */
 
 template<int (*toxc)(int)>
 int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
@@ -56,6 +84,12 @@ int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
 	return (sp[i] == '\0') ? (dp - dbuf) : SR_OVERFLOW ;
 }
 /* end subroutine-template (sncpyxc) */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

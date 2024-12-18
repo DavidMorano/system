@@ -116,8 +116,7 @@ static int liner(int fd,size_t ms) noex {
 	int		rs1 ;
 	int		lines = 0 ;
 	cnullptr	np{} ;
-	void		*md{} ;
-	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    cint	cmd = MADV_SEQUENTIAL ;
 	    if ((rs = u_madvise(md,ms,cmd)) >= 0) {
 		size_t	ll = ms ;

@@ -191,7 +191,7 @@ SOBJ= txtindexes.o txtindexhdr.o offindex.o strtabfind.o
 
 TISOBJ= txtindexes.o txtindexhdr.o offindex.o strtabfind.o
 
-MKSOBJ= txtindexmks.o txtindexhdr.o strtabfind.o osetint.o
+MKSOBJ= txtindexmks.o txtindexhdr.o
 
 
 SRC= $(OBJ:.c=.o)
@@ -385,24 +385,8 @@ wordfill.o:		wordfill.c wordfill.h
 
 strstore.o:		strstore.c strstore.h
 
-fsi.o:			fsi.c fsi.h
-
-dirseen.o:		dirseen.c dirseen.h
-
 textlook.o:		textlook.c textlook.h
 
 searchkeys.o:		searchkeys.c searchkeys.h
-
-ciq.o:			ciq.c ciq.h
-
-modload.o:		modload.c modload.h
-
-vecint.o:		vecint.c vecint.h
-
-setint.o:		setint.cc setint.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
-
-osetint.o:		osetint.cc osetint.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CCOPTS_GCCLIB) $(CPPFLAGS) $<
 
 

@@ -1,4 +1,5 @@
 /* mktmpdir SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* make the program-specific temporary directory */
@@ -42,6 +43,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>

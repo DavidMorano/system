@@ -336,6 +336,7 @@ ucclustername.o:	ucclustername.cc ucclustername.h
 uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 ucsysconf.o:		ucsysconf.cc ucsysconf.h
+ucobjmode.o:		ucobjmode.cc
 
 # UNIX C-language system library string-to-integer interface
 # string-to-x
@@ -766,7 +767,7 @@ sigobj.dir:
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
-# tab handling
+# tab and character column handling
 tabcols.o:		tabcols.cc tabcols.h
 ncol.o:			ncol.cc ncol.h tabcols.h
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h

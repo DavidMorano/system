@@ -295,7 +295,7 @@ int veclong_curend(veclong *op,veclong_cur *curp) noex {
 }
 /* end subroutine (veclong_end) */
 
-int veclong_enum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
+int veclong_curenum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
 	int		rs ;
 	int		v = 0 ;
 	if ((rs = veclong_magic(op,curp,rp)) >= 0) {
@@ -310,7 +310,7 @@ int veclong_enum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
 	if (rp) *rp = (rs >= 0) ? v : INT_MIN ;
 	return rs ;
 }
-/* end subroutine (veclong_enum) */
+/* end subroutine (veclong_curenum) */
 
 int veclong_del(veclong *op,int i) noex {
 	int		rs ;
@@ -471,7 +471,7 @@ int veclong_audit(veclong *op) noex {
 static int veclong_setopts(veclong *op,int vo) noex {
 	constexpr int	m = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~m)) == 0) {
+	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECLONG_OREUSE) op->f.oreuse = 1 ;

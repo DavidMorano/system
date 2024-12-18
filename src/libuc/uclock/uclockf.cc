@@ -36,12 +36,11 @@
 			F_RLOCK
 			F_TRLOCK
 			F_RTEST
-
 	size		size of region to lock in the file (0="whole file")
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 	NOTE:
 	Note that the stupid developers of the File Locking mechanism
@@ -62,7 +61,7 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -89,7 +88,9 @@ int uc_lockf(int fd,int cmd,off_t size) noex {
 	        bool	f_exit = false ;
 	        repeat {
 	            errno = 0 ;
-	            if ((rs = lockf(fd,cmd,size)) < 0) rs = (- errno) ;
+	            if ((rs = lockf(fd,cmd,size)) < 0) {
+			rs = (- errno) ;
+		    }
 	            if (rs < 0) {
 	                switch (rs) {
 	                case SR_DEADLK:

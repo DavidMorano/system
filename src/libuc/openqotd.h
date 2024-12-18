@@ -1,4 +1,5 @@
 /* openqotd HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
@@ -19,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

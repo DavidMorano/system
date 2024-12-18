@@ -1,4 +1,5 @@
 /* pwfile HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a 'passwd' formatted file for access */
@@ -15,6 +16,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<vecitem.h>
 #include	<hdb.h>
@@ -26,10 +28,9 @@
 #define	PWFILE_FL	struct pwfile_flags
 #define	PWFILE_CUR	struct pwfile_cursor
 #define	PWFILE_ENT	pwentry
-
+/* ... */
 #define	PWFILE_RECLEN	PWENTRY_BUFLEN
 #define	PWFILE_ENTLEN	PWENTRY_BUFLEN
-
 /* are these even needed? */
 #define	PWFILE_NAMELEN	32		/* max username length */
 #define	PWFILE_PASSLEN	32		/* max normal password length */

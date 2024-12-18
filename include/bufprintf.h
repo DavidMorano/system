@@ -1,4 +1,5 @@
 /* bufprintf HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to process a format-string into a buffer */
@@ -23,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

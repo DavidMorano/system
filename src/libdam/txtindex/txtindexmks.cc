@@ -160,7 +160,7 @@
 #define	LISTOBJ_COUNT(op)		vecint_count((op))
 #define	LISTOBJ_MKVEC(op,va)		vecint_mkvec((op),(va))
 #define	LISTOBJ_CURBEGIN(op,cp)		vecint_curbegin((op),(cp))
-#define	LISTOBJ_ENUM(op,cp,rp)		vecint_enum((op),(cp),(rp))
+#define	LISTOBJ_ENUM(op,cp,rp)		vecint_curenum((op),(cp),(rp))
 #define	LISTOBJ_CUREND(op,cp)		vecint_curend((op),(cp))
 #endif /* CF_SETINT */
 

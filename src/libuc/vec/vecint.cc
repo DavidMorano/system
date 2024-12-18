@@ -78,7 +78,7 @@ static int	vecint_extrange(vecint *,int) noex ;
 
 static int	deftypecmp(const VECINT_TYPE *,const VECINT_TYPE *) noex ;
 
-static consteval int mkoptmask() noex {
+consteval int mkoptmask() noex {
 	int		m = 0 ;
 	m |= VECINT_OREUSE ;
 	m |= VECINT_OSWAP ;
@@ -100,17 +100,17 @@ static consteval int mkoptmask() noex {
 
 /* exported subroutines */
 
-int vecint_start(vecint *op,int n,int opts) noex {
+int vecint_start(vecint *op,int vn,int vo) noex {
+    	VECINT		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (n < 0) n = VECINT_DEFENTS ;
+	if (vn < 0) vn = VECINT_DEFENTS ;
 	if (op) {
-	    memclear(op) ; /* <- potentially dangerous if type changes */
-	    if ((rs = vecint_setopts(op,opts)) >= 0) {
-	        op->n = n ;
-	        if (n > 0) {
-	            cint	sz = (n + 1) * szof(VECINT_TYPE) ;
-		    void	*vp{} ;
-	            if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    memclear(hop) ;
+	    if ((rs = vecint_setopts(op,vo)) >= 0) {
+	        op->n = vn ;
+	        if (vn > 0) {
+	            cint	sz = (vn + 1) * szof(VECINT_TYPE) ;
+		    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		        op->va = (VECINT_TYPE *) vp ;
 	    	        op->va[0] = INT_MIN ;
 		    }
@@ -120,7 +120,7 @@ int vecint_start(vecint *op,int n,int opts) noex {
 	        }
 	    } /* end if */
 	} /* end if (non-null) */
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? vn : rs ;
 }
 /* end subroutine (vecint_start) */
 
@@ -267,9 +267,9 @@ int vecint_del(vecint *op,int i) noex {
 	    if ((i >= 0) && (i < op->i)) {
 	        bool	f_fi = false ;
 		rs = SR_OK ;
-/* delete the entry */
+		/* delete the entry */
 	        op->c -= 1 ;			/* decrement list count */
-/* apply the appropriate deletion based on management policy */
+		/* apply the appropriate deletion based on management policy */
 	        if (op->f.ostationary) {
 	            (op->va)[i] = INT_MIN ;
 	            if (i == (op->i - 1)) {
@@ -313,6 +313,17 @@ int vecint_del(vecint *op,int i) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecint_del) */
+
+int vecint_delall(vecint *op) noex {
+	int		rs ;
+	if ((rs = vecint_magic(op)) >= 0) {
+	    op->i = 0 ;
+	    op->c = 0 ;
+	    op->fi = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (vecint_delall) */
 
 int vecint_count(vecint *op) noex {
 	int		rs ;
@@ -438,7 +449,7 @@ int vecint_curend(vecint *op,vecint_cur *curp) noex {
 }
 /* end subroutine (vecint_curend) */
 
-int vecint_enum(vecint *op,vecint_cur *curp,VECINT_TYPE *rp) noex {
+int vecint_curenum(vecint *op,vecint_cur *curp,VECINT_TYPE *rp) noex {
 	int		rs ;
 	int		v = 0 ;
 	if ((rs = vecint_magic(op,curp)) >= 0) {
@@ -453,7 +464,7 @@ int vecint_enum(vecint *op,vecint_cur *curp,VECINT_TYPE *rp) noex {
 	if (rp) *rp = (rs >= 0) ? v : INT_MIN ;
 	return rs ;
 }
-/* end subroutine (vecint_enum) */
+/* end subroutine (vecint_curenum) */
 
 int vecint_audit(vecint *op) noex {
 	int		rs ;
@@ -478,7 +489,7 @@ int vecint_audit(vecint *op) noex {
 static int vecint_setopts(vecint *op,int vo) noex {
 	constexpr int	m = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~m)) == 0) {
+	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
 	    if (vo & VECINT_OREUSE) op->f.oreuse = 1 ;
@@ -614,5 +625,166 @@ static int deftypecmp(const VECINT_TYPE *l1p,const VECINT_TYPE *l2p) noex {
 	return rc ;
 }
 /* end subroutine (deftypecmp) */
+
+int vecint_st::operator () (int vn,int vo) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case 0:
+    	        rs = vecint_start(op,vn,vo) ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int vecint::add(VECINT_TYPE v) noex {
+	return vecint_add(this,v) ;
+}
+
+int vecint::adduniq(VECINT_TYPE v) noex {
+	return vecint_adduniq(this,v) ;
+}
+
+int vecint::insert(int i,VECINT_TYPE v) noex {
+	return vecint_insert(this,i,v) ;
+}
+
+int vecint::assign(int i,VECINT_TYPE v) noex {
+	return vecint_insert(this,i,v) ;
+}
+
+int vecint::del(int i) noex {
+    	int		rs ;
+	if (i >= 0) {
+	    rs = vecint_del(this,i) ;
+	} else {
+	    rs = vecint_delall(this) ;
+	}
+	return rs ;
+}
+
+int vecint::find(VECINT_TYPE v) noex {
+	return vecint_find(this,v) ;
+}
+
+int vecint::match(VECINT_TYPE v) noex {
+	return vecint_match(this,v) ;
+}
+
+int vecint::getval(int i,VECINT_TYPE *rp) noex {
+	return vecint_getval(this,i,rp) ;
+}
+
+int vecint::getvec(VECINT_TYPE **rpp) noex {
+	return vecint_getvec(this,rpp) ;
+}
+
+int vecint::mkvec(VECINT_TYPE *va) noex {
+	return vecint_mkvec(this,va) ;
+}
+
+int vecint::curbegin(vecint_cur *curp) noex {
+	return vecint_curbegin(this,curp) ;
+}
+
+int vecint::curend(vecint_cur *curp) noex {
+	return vecint_curend(this,curp) ;
+}
+
+int vecint::curenum(vecint_cur *curp,VECINT_TYPE *rp) noex {
+	return vecint_curenum(this,curp,rp) ;
+}
+
+void vecint::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("vecint",rs,"fini-finish") ;
+	}
+}
+
+int vecint_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case vecintmem_count:
+	        rs = vecint_count(op) ;
+	        break ;
+	    case vecintmem_extent:
+	        rs = vecint_extent(op) ;
+	        break ;
+	    case vecintmem_delall:
+	        rs = vecint_delall(op) ;
+	        break ;
+	    case vecintmem_sort:
+	        rs = vecint_sort(op) ;
+	        break ;
+	    case vecintmem_setsorted:
+	        rs = vecint_setsorted(op) ;
+	        break ;
+	    case vecintmem_resize:
+	        rs = vecint_resize(op,a) ;
+	        break ;
+	    case vecintmem_audit:
+	        rs = vecint_audit(op) ;
+	        break ;
+	    case vecintmem_finish:
+	        rs = vecint_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (vecint_co::operator) */
+
+bool vecint_iter::operator == (const vecint_iter &oit) noex {
+	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
+}
+
+bool vecint_iter::operator != (const vecint_iter &oit) noex {
+	bool		f = false ;
+	f = f || (va != oit.va) ;
+	f = f || (ii != oit.ii) ;
+	if (!f) {
+	    f = (i < oit.i) ;
+	}
+	return f ;
+}
+/* end method (vecint_iter::operator) */
+
+vecint_iter vecint_iter::operator + (int n) const noex {
+	vecint_iter	rit(va,i,i) ;
+	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
+	return rit ;
+}
+
+vecint_iter vecint_iter::operator += (int n) noex {
+	vecint_iter	rit(va,i,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
+}
+
+vecint_iter vecint_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
+}
+
+vecint_iter vecint_iter::operator ++ (int) noex { /* post */
+	vecint_iter	pre(*this) ;
+	increment() ;
+	return pre ;
+}
+
+void vecint_iter::increment(int n) noex {
+	if ((i + n) < 0) n = -i ;
+	if (n != 0) {
+	    i += n ;
+	    while ((i < ii) && (va[i] == -1)) {
+	        i += 1 ;
+	    }
+	}
+}
+/* end method (vecint_iter::increment) */
+
 
 

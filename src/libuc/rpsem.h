@@ -1,4 +1,5 @@
 /* psem HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* POSIX© unnamed Semaphore (PSEM) */
@@ -26,8 +27,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<semaphore.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	PSEM		sem_t

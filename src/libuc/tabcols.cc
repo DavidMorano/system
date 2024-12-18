@@ -1,4 +1,5 @@
 /* tabcols SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate tab columns */
@@ -37,9 +38,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<utypedefs.h>
+#include	<cstdlib>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<intceil.h>
+#include	<localmisc.h>
 
 #include	"tabcols.h"
 

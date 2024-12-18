@@ -1,4 +1,5 @@
 /* progfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* version %I% last-modified %G% */
@@ -73,6 +74,10 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ascii.h>
+#include	<mktmp.h>
+#include	<mkpathx.h>
+#include	<tabcols.h>
+#include	<intceil.h>
 #include	<char.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
@@ -106,12 +111,6 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	bwriteblanks(bfile *,int) ;
-extern int	tabcols(int,int) ;
-extern int	iceil(int,int) ;
-
 
 /* external variables */
 
@@ -140,14 +139,12 @@ static int	nexttoken(const char *,int,const char **) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progfile(pip,opts,fname)
-PROGINFO	*pip ;
-struct procoptions	opts ;
-const char	fname[] ;
-{
+int progfile(proginfo *pip,procoptions opts,cc *fname) noex {
 	LINEDESC	ld ;
 	bfile		infile, *ifp = &infile ;
 	bfile		tmpfile, *ofp = &tmpfile ;

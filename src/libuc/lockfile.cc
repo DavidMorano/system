@@ -31,17 +31,14 @@
 	with this routine unlike with |lockf(3c)|.  Like with
 	|lockf(3c)| all lock regions are relative to the current
 	file position if the starting off is given as negative
-	(anything).
-
-	If the 'start' argument is negative, then the function
-	behaves essentially the same as |lockf(3c)| and all locks
-	are relative with respect to the current file off position.
-	Also, a zero-sized lock is equivalent to locking from the
-	specified starting position (possibly the current position)
-	to (and beyond) the end of the file.
-
-	A negative 'timeout' is equivalent to a default timeout.
-	A 'timeout' of zero is zero!
+	(anything).  If the 'start' argument is negative, then the
+	function behaves essentially the same as |lockf(3c)| and
+	all locks are relative with respect to the current file off
+	position.  Also, a zero-sized lock is equivalent to locking
+	from the specified starting position (possibly the current
+	position) to (and beyond) the end of the file.  A negative
+	'timeout' is equivalent to a default timeout.  A 'timeout'
+	of zero is zero!
 
 	Synopsis:
 	int lockfile(int fd,int cmd,off_t start,off_t size,int timeout) noex
@@ -49,17 +46,13 @@
 	Arguments:
 	fd	file descriptor of file to lock
 	cmd	command, one of:
-
 			F_ULOCK
-
 			F_WLOCK (F_LOCK)
 			F_TWLOCK (F_TLOCK)
 			F_TWTEST (F_TEST)
-
 			F_RLOCK
 			F_TRLOCK
 			F_RTEST
-
 	start		starting off of region to lock (or test)
 	size		size of region to lock in the file (0="whole file")
 	timeout		timeout in seconds to wait for the lock

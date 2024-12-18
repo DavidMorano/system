@@ -1,4 +1,5 @@
 /* setint HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* unordered set of integers */
@@ -15,6 +16,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	SETINT		struct setint_head
@@ -42,7 +45,7 @@ extern int setint_count(setint *) noex ;
 extern int setint_mkvec(setint *,int *) noex ;
 extern int setint_extent(setint *) noex ;
 extern int setint_curbegin(setint *,setint_cur *) noex ;
-extern int setint_enum(setint *,setint_cur *,int *) noex ;
+extern int setint_curenum(setint *,setint_cur *,int *) noex ;
 extern int setint_curend(setint *,setint_cur *) noex ;
 extern int setint_find(setint *,int) noex ;
 

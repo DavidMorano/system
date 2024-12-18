@@ -19,7 +19,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	termout
 
 	Description:
@@ -135,6 +135,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::initializer_list ;		/* type */
 using std::vector ;			/* type */
 using std::string ;			/* type */
@@ -250,7 +251,7 @@ static bool	isspecial(SCH *,uchar,uchar) noex ;
 
 /* local variables */
 
-static constexpr struct termout_terminfo	terms[] = {
+constexpr termout_terminfo	terms[] = {
 	{ "sun", 0 },
 	{ "ansi", 0 },
 	{ "xterm", TA_MBASE },
@@ -274,7 +275,7 @@ static constexpr struct termout_terminfo	terms[] = {
 	{ nullptr, 0 }
 } ; /* end struct (termout_terminfo) */
 
-static constexpr struct termout_sch	specials[] = {
+constexpr termout_sch		specials[] = {
 	{ '1', '4', 0, UC('¼') },
 	{ '1', '2', 0, UC('½') },
 	{ '3', '4', 0, UC('¾') },
@@ -385,10 +386,11 @@ static constexpr struct termout_sch	specials[] = {
 /* exported subroutines */
 
 int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
+    	TERMOUT		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && tstr) {
 	    rs = SR_INVALID ;
-	    memclear(op) ;		/* <- dangerous */
+	    memclear(hop) ;		/* <- dangerous */
 	    if (ncols > 0) {
 	        vector<GCH>	*cvp ;
 		rs = SR_NOMEM ;

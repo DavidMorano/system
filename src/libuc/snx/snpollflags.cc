@@ -69,12 +69,12 @@ struct flagstrs {
 } ;
 
 
-/* foward references */
+/* forward references */
 
 
 /* local variables */
 
-static const struct flagstrs	fs_poll[] = {
+const flagstrs		fs_poll[] = {
 	{ POLLIN, "IN" },
 	{ POLLOUT, "OUT" },
 	{ POLLERR, "ERR" },

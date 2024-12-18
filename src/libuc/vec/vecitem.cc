@@ -467,7 +467,7 @@ static int vecitem_setopts(vecitem *op,int vo) noex {
 	constexpr int	m = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	op->f = {} ;
-	if ((vo & (~m)) == 0) {
+	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
 	    if (vo & VECITEM_OREUSE) op->f.oreuse = 1 ;
 	    if (vo & VECITEM_OSWAP) op->f.oswap = 1 ;

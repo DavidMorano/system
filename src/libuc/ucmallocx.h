@@ -17,8 +17,10 @@
 
 /*******************************************************************************
 
-	The following subroutines are made available:
+  	Group:
+	icmallocx
 
+	The following subroutines are made available:
 	uc_mallocsys
 	uc_mallocbuf
 	uc_mallocstrw
@@ -30,8 +32,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

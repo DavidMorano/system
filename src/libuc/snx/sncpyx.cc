@@ -26,11 +26,14 @@
 
 /*******************************************************************************
 
+  	Group:
+	sncpy{x}
+
+	Description:
 	This subroutine concatenates c-strings into a single resulting
 	c-string.
 
 	Observation 2015-09-29, David A­D­ Morano:
-
 	Just some musing here: was the choice of changing to use
 	|strlcpy(3c)| really such a good idea after all?  Just
 	wondering.  Yes, we used it now for tons of years, but was
@@ -72,10 +75,6 @@
 
 
 /* forward references */
-
-extern "C" {
-    int	sncpyx(char *,int,int,...) noex ;
-}
 
 
 /* local variables */

@@ -1,4 +1,5 @@
 /* sesmsg SIPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* create and parse the internal messages */
@@ -24,6 +25,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<localmisc.h>		/* constants */
 
 

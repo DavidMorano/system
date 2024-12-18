@@ -1,4 +1,5 @@
 /* simsg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* messages for SIMSG requests-responses */
@@ -22,6 +23,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	SIMSG_SYSMISCGET	struct simsg_msggetsysmisc
