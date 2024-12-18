@@ -1,4 +1,5 @@
 /* bfliner HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* BFILE-liner */
@@ -23,6 +24,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<bfile.h>
 
@@ -75,8 +77,9 @@ struct bfliner : bfliner_head {
 	int getln(cchar ** = nullptr) noex ;
 	int getlns(cchar ** = nullptr) noex ;
 	int getpoff(off_t *) noex ;
+	int adv(int = 0) noex ;
 	void dtor() noex ;
-	~bfliner() noex {
+	~bfliner() {
 	    dtor() ;
 	} ;
 } ; /* end struct (bfliner) */
@@ -92,6 +95,7 @@ extern int bfliner_getln(bfliner *,cchar **) noex ;
 extern int bfliner_getlns(bfliner *,cchar **) noex ;
 extern int bfliner_readover(bfliner *) noex ;
 extern int bfliner_getpoff(bfliner *,off_t *) noex ;
+static int bfliner_adv(bfliner *,int) noex ;
 extern int bfliner_finish(bfliner *) noex ;
 
 EXTERNC_end

@@ -1,4 +1,5 @@
 /* holidayer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* access for the HOLIDAYER database */
@@ -16,7 +17,6 @@
 #include	<usystem.h>
 #include	<ids.h>
 #include	<vechand.h>
-#include	<localmisc.h>
 
 #include	"holidays.h"
 
@@ -36,9 +36,9 @@ struct holidayer_object {
 } ;
 
 struct holidayer_cursor {
-	uint		magic ;
 	holidays_cur	hcur ;
 	holidays	*hop ;
+	uint		magic ;
 	uint		year ;
 } ;
 

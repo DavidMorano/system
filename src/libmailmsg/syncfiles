@@ -1,7 +1,7 @@
 #!/usr/extra/bin/ksh
-# SUB
+# SYNCFILES
 files_d | while read D ; do
-  find $D -type f -mtime -60 -name '*.h*' -print | while read N ; do
+  find $D -type f -mtime -120 -name '*.h*' -print | while read N ; do
     BN=${N##*/}
     IN=include/${BN}
     if [[ -f ${IN} ]] ; then

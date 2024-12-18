@@ -1,5 +1,4 @@
 /* udup HEADER */
-/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® File-Descriptor Dupplication */
@@ -37,21 +36,23 @@
 #include	<sys/types.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>
 
 #include	<usys.h>
 
 
-EXTERNC_begin
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
 extern int u_dup(int) noex ;
 extern int u_dup2(int,int) noex ;
 
-EXTERNC_end
+#ifdef	__cplusplus
+}
+#endif
 
 
 #endif /* UDUP_INCLUDE */

@@ -1,30 +1,18 @@
-/* offindex HEADER */
-/* lang=C20 */
-
-/* offset-index object */
-/* version %I% last-modified %G% */
+/* offindex */
 
 
-/* revision history:
-
-	= 1998-03-01, David A­D­ Morano
-	This code was originally written.
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OFFINDEX_INCLUDE
-#define	OFFINDEX_INCLUDE
+#define	OFFINDEX_INCLUDE	1
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |off_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+
+#include	<sys/types.h>
+
 #include	<vecobj.h>
+#include	<localmisc.h>
 
 
 #define	OFFINDEX	struct offindex_head
@@ -37,23 +25,28 @@ struct offindex_flags {
 } ;
 
 struct offindex_head {
-	vecobj		*oip ;
-	OFFINDEX_FL	f ;
 	uint		magic ;
+	vecobj		list ;
+	OFFINDEX_FL	f ;
 } ;
 
-typedef	OFFINDEX	offindex ;
-typedef	OFFINDEX_FL	offindex_fl ;
 
-EXTERNC_begin
+#if	(! defined(OFFINDEX_MASTER)) || (OFFINDEX_MASTER == 0)
 
-extern int	offindex_start(offindex *,int) noex ;
-extern int	offindex_add(offindex *,off_t,int) noex ;
-extern int	offindex_lookup(offindex *,off_t) noex ;
-extern int	offindex_finish(offindex *) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int	offindex_start(OFFINDEX *,int) ;
+extern int	offindex_add(OFFINDEX *,off_t,int) ;
+extern int	offindex_lookup(OFFINDEX *,off_t) ;
+extern int	offindex_finish(OFFINDEX *) ;
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* OFFINDEX_MASTER */
 
 #endif /* OFFINDEX_INCLUDE */
 

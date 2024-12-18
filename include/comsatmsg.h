@@ -1,9 +1,6 @@
-/* comsatmsg HEADER */
-/* encoding=ISO8859-1 */
-/* lang=C20 */
+/* comsatmsg */
 
 /* create and parse COMSAT messages */
-/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,17 +13,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	COMSATMSG_INCLUDE
-#define	COMSATMSG_INCLUDE
+#define	COMSATMSG_INCLUDE	1
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |off_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>		/* |USERNAMELEN| */
+
+#include	<sys/types.h>
+
+#include	<localmisc.h>
 
 
 #ifndef	USERNAMELEN
@@ -37,9 +31,9 @@
 
 
 struct comsatmsg_mo {
+	ulong		offset ;
 	char		username[USERNAMELEN + 1] ;
 	char		fname[MAXNAMELEN + 1] ;
-	ulong		offset ;
 } ;
 
 
@@ -50,12 +44,19 @@ enum comsatmsgtypes {
 } ;
 
 
-EXTERNC_begin
+#if	(! defined(COMSATMSG_MASTER)) || (COMSATMSG_MASTER == 0)
 
-extern int comsatmsg_mo(COMSATMSG_MO *,int,char *,int) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int comsatmsg_mo(COMSATMSG_MO *,int,char *,int) ;
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* COMSATMSG_MASTER */
 
 #endif /* COMSATMSG_INCLUDE */
 

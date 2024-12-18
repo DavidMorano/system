@@ -1,4 +1,5 @@
 /* querystr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* Query-String manager */
@@ -17,20 +18,22 @@
 #ifndef	QUERYSTR_INCLUDE
 #define	QUERYSTR_INCLUDE
 
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<strpack.h>
 
 
 #define	QUERYSTR	struct querystr_head
 #define	QUERYSTR_FL	struct querystr_flags
-#define	QUERYSTR_CUR	struct querystr_cursor
+#define	QUERYSTR_CUR	struct querystr_cur
 
 
-struct querystr_cursor {
+struct querystr_cur {
 	int		i ;
 } ;
 

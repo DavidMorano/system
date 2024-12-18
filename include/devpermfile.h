@@ -1,6 +1,9 @@
-/* devpermfile */
+/* devpermfile HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* object to handle parameter files */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,17 +16,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DEVPERMFILE_INCLUDE
-#define	DEVPERMFILE_INCLUDE	1
+#define	DEVPERMFILE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	DEVPERMFILE_MAGIC	0x12349887

@@ -1,0 +1,20 @@
+#!/usr/extra/bin/ksh
+# SYNCFILES
+  find * -type f -mtime -120 -name '*.h*' -print | while read N ; do
+    BN=${N##*/}
+    IN=include/${BN}
+    if [[ -f ${IN} ]] ; then
+      if [[ $N -ef ${IN} ]] ; then 
+        print -- YES
+      else
+        print -- NO 
+        p -- "syncing to INCLUDE ${N}"
+        li $N $IN
+#	ln -f $N include
+      fi
+    else 
+      p -- "linking to INCLUDE ${N}"
+      ln $N $IN
+    fi
+  done
+

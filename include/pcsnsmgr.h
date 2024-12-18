@@ -1,4 +1,5 @@
 /* pcsnsmgr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* PCS Name-Server Cache */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

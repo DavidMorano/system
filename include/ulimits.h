@@ -1,5 +1,4 @@
 /* ulimits HEADER */
-/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* additional UNIX® limits support */
@@ -31,10 +30,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>
 
 
 #ifndef	LONG64_MIN
@@ -73,9 +71,6 @@
 #endif
 #endif
 
-#ifndef	TIME_MIN
-#define	TIME_MIN	LONG_MIN
-#endif
 #ifndef	TIME_MAX
 #define	TIME_MAX	LONG_MAX
 #endif

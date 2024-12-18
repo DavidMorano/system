@@ -1,4 +1,5 @@
 /* userinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get user information from various databases */
@@ -103,7 +104,7 @@ struct userinfo : userinfo_head {
 	userinfo(const userinfo &) = delete ;
 	userinfo &operator = (const userinfo &) = delete ;
 	void dtor() noex ;
-	~userinfo() noex {
+	~userinfo() {
 	    dtor() ;
 	} ;
 } ; /* end struct (userinfo) */

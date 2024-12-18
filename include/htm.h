@@ -1,4 +1,5 @@
 /* htm HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* hack to output HTML */
@@ -15,13 +16,15 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<stdarg.h>
 #include	<shio.h>
 
 
-#define	HTM_MAGIC	0x43628193
-#define	HTM		struct htm_head
-#define	HTM_FL		struct htm_flags
+#define	HTM_MAGIC		0x43628193
+#define	HTM			struct htm_head
+#define	HTM_FL			struct htm_flags
 
 #define	HTM_FBUFWHOLE		(1<<0)
 #define	HTM_FBUFLINE		(1<<1)

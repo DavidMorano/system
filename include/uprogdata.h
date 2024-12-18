@@ -1,4 +1,5 @@
 /* uprogdata SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® program-data cache */
@@ -8,7 +9,7 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This subroutine was originally written.
+	This code was originally written.
 
 */
 
@@ -20,8 +21,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 /* registery */
@@ -31,10 +35,10 @@
 
 EXTERNC_begin
 
-extern int uprogdata_init() ;
-extern int uprogdata_set(int,cchar *,int,int) ;
-extern int uprogdata_get(int,char *,int) ;
-extern void uprogdata_fini() ;
+extern int uprogdata_init() noex ;
+extern int uprogdata_set(int,cchar *,int,int) noex ;
+extern int uprogdata_get(int,char *,int) noex ;
+extern int uprogdata_fini() noex ;
 
 EXTERNC_end
 

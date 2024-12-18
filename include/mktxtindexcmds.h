@@ -1,4 +1,6 @@
-/* mkcmds */
+/* mkcmds HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,13 +12,15 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	MKCMDS_INCLUDE
-#define	MKCMDS_INCLUDE		1
+#define	MKCMDS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 enum mkcmds {

@@ -1,9 +1,4 @@
-/* mailmsg_envget HEADER */
-/* encoding=ISO8859-1 */
-/* lang=C++20 */
-
-/* MAILMSG get-envelope */
-/* version %I% last-modified %G% */
+/* mailmsg_enver HEADER */
 
 
 /* revision history:
@@ -15,44 +10,43 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MAILMSGENVGET_INCLUDE
-#define	MAILMSGENVGET_INCLUDE
+#ifndef	MAILMSGENVER_INCLUDE
+#define	MAILMSGENVER_INCLUDE
 
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<envstandards.h>
+#include	<sys/param.h>
 #include	<mailmsg.h>
 
 
-#define	MAILMSG_ENVDAT		struct mailmsg_envdata
-#define	MAILMSG_ENVSTR		struct mailmsg_envstring
+#define	MAILMSG_ENVER		struct mailmsg_enver
 
 
-struct mailmsg_envstring {
-	cchar		*ep ;
+struct mailmsg_envstr {
+	const char	*ep ;
 	int		el ;
 } ;
 
-struct mailmsg_envdata {
-	MAILMSG_ENVSTR	a ;		/* address */
-	MAILMSG_ENVSTR	d ;		/* ?? */
-	MAILMSG_ENVSTR	r ;		/* route-address */
+struct mailmsg_enver {
+	struct mailmsg_envstr	a, d, r ;
 } ;
 
-typedef MAILMSG_ENVSTR		mailmsg_envstr ;
-typedef MAILMSG_ENVDAT		mailmsg_envdat ;
 
-EXTERNC_begin
+#if	(! defined(MAILMSGENVER_MASTER)) || (MAILMSGENVER_MASTER == 0)
 
-extern int	mailmsg_envget(mailmsg *,int,mailmsg_envdat *) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int mailmsg_enver(MAILMSG *,int,MAILMSG_ENVER *) noex ;
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* MAILMSGENVER_MASTER */
 
 
-#endif /* MAILMSGENVGET_INCLUDE */
+#endif /* MAILMSGENVER_INCLUDE */
 
 

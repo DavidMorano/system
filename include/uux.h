@@ -1,4 +1,5 @@
 /* uux HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* SYSDIALER "uux" module */
@@ -19,16 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<logfile.h>
-#include	<localmisc.h>
-
-#include	"sysdialer.h"
+#include	<sysdialer.h>
 
 
 #define	UUX_MAGIC	0x31455926
@@ -41,7 +39,7 @@ struct uux_flags {
 } ;
 
 struct uux_head {
-	LOGFILE		lh ;
+	logfile		*lfp ;		/* log-file-pointer */
 	UUX_FL		f ;
 	uint		magic ;
 	int		fd ;

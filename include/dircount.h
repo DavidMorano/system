@@ -1,4 +1,5 @@
 /* dircount HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* retrieve the number of files in a specified directory */
@@ -15,6 +16,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 

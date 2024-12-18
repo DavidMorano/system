@@ -1,4 +1,5 @@
 /* mkdisphdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* make a c-string displayable */
@@ -12,10 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin

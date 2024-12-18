@@ -1,4 +1,5 @@
 /* finduid HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* find a username given a UID by various means */
@@ -12,11 +13,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ptm.h>
 #include	<pwcache.h>

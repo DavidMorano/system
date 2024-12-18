@@ -1,4 +1,5 @@
 /* sockpeername HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* get a peer host name if there is one */
@@ -21,9 +22,17 @@
 
 EXTERNC_begin
 
-extern int	sockpeername(int,cchar *,char *) noex ;
+extern int	sockpeername(int,char *,int,cchar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern int sockpeernamex(int s,char *rb,int rl,cchar *dn = nullptr) noex {
+	return sockpeername(s,rb,rl,dn) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* SOCKPEERNAME_INCLUDE */

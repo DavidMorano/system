@@ -54,10 +54,10 @@ struct mkdirlist_ent {
 	dev_t		dev ;
 	time_t		mtime ;
 	time_t		utime ;
-	MKDIRLIST_OFL	f ;
 	int		nlen ;
 	int		narticles ;
 	int		order ;
+	MKDIRLIST_OFL	f ;
 	mode_t		mode ;
 } ;
 

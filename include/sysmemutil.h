@@ -1,43 +1,40 @@
-/* sysmemutil HEADER */
-/* lang=C++20 */
-
-/* retrieve the utilization (in a percentage of total) of system memory */
-/* version %I% last-modified %G% */
+/* sysmemutil */
 
 
 /* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSMEMUTIL_INCLUDE
-#define	SYSMEMUTIL_INCLUDE
+#define	SYSMEMUTIL_INCLUDE	1
 
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<localmisc.h>		/* for the signed special types */
 
 
-#define	SYSMEMUTIL_DAT		struct sysmemutil_data
+#define	SYSMEMUTIL		struct sysmemutil
 
 
-struct sysmemutil_data {
+struct sysmemutil {
 	long		mt ;		/* pages "total" */
 	long		ma ;		/* pages "available" */
 	int		mu ;		/* as a percentage */
 } ;
 
-typedef SYSMEMUTIL_DAT	sysmemutil_dat ;
 
-EXTERNC_begin
+#if	(! defined(SYSMEMUTIL_MASTER)) || (SYSMEMUTIL_MASTER == 0)
 
-extern int sysmemutil(sysmemutil_dat *) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int sysmemutil(SYSMEMUTIL *) ;
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* SYSMEMUTIL_MASTER */
 
 #endif /* SYSMEMUTIL_INCLUDE */
 

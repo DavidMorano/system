@@ -1,4 +1,5 @@
 /* strlist HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* read or audit a STRLIST database */
@@ -19,10 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<strlisthdr.h>
 
 
@@ -89,8 +91,8 @@ EXTERNC_begin
 extern int	strlist_open(strlist *,cchar *) noex ;
 extern int	strlist_count(strlist *) noex ;
 extern int	strlist_curbegin(strlist *,strlist_cur *) noex ;
-extern int	strlist_look(strlist *,strlist_cur *,cchar *,int) noex ;
-extern int	strlist_enum(strlist *,strlist_cur *,char *,int) noex ;
+extern int	strlist_curlook(strlist *,strlist_cur *,cchar *,int) noex ;
+extern int	strlist_curenum(strlist *,strlist_cur *,char *,int) noex ;
 extern int	strlist_curend(strlist *,strlist_cur *) noex ;
 extern int	strlist_getinfo(strlist *,strlist_info *) noex ;
 extern int	strlist_audit(strlist *) noex ;

@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>		/* |USTAT| */
 #include	<stdarg.h>

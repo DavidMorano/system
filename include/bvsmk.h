@@ -1,9 +1,4 @@
-/* bvsmk HEADER */
-/* encoding=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
-
-/* make a BVS database */
-/* version %I% last-modified %G% */
+/* bvsmk */
 
 
 /* revision history:
@@ -16,28 +11,28 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BVSMK_INCLUDE
-#define	BVSMK_INCLUDE
+#define	BVSMK_INCLUDE	1
 
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<envstandards.h>
+
+#include	<sys/types.h>
+
 #include	<vecobj.h>
+#include	<localmisc.h>
 
 
 #define	BVSMK_MAGIC	0x88773423
 #define	BVSMK		struct bvsmk_head
 #define	BVSMK_FL	struct bvsmk_flags
-#define	BVSMK_OBJ	struct bvsmk_object
+#define	BVSMK_OBJ	struct bvsmk_obj
 #define	BVSMK_INTOPEN	(10*60)
 #define	BVSMK_INTSTALE	(5*60)
 
 
-struct bvsmk_object {
-	cchar		*name ;
+/* this is the shared-object description */
+struct bvsmk_obj {
+	const char	*name ;
 	uint		objsize ;
 } ;
 
@@ -51,34 +46,38 @@ struct bvsmk_flags {
 } ;
 
 struct bvsmk_head {
+	uint		magic ;
 	cchar		*a ;		/* memory-allocation (pr, db) */
 	cchar		*pr ;
 	cchar 		*db ;
 	cchar		*idname ;
 	char		*nidxfname ;
-	vecobj		books ;
 	BVSMK_FL	f ;
-	uint		magic ;
+	VECOBJ		books ;
+	mode_t		om ;
 	int		nverses ;
 	int		nzverses ;
 	int		maxbook ;
 	int		nfd ;
-	mode_t		om ;
 } ;
 
-typedef	BVSMK		bvsmk ;
-typedef	BVSMK_FL	bvsmk_fl ;
-typedef	BVSMK_OBJ	bvsmk_obj ;
 
-EXTERNC_begin
+#if	(! defined(BVSMK_MASTER)) || (BVSMK_MASTER == 0)
 
-extern int	bvsmk_open(bvsmk *,cchar *,cchar *,int,mode_t) noex ;
-extern int	bvsmk_add(bvsmk *,int,uchar *,int) noex ;
-extern int	bvsmk_abort(bvsmk *,int) noex ;
-extern int	bvsmk_close(bvsmk *) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int	bvsmk_open(BVSMK *,const char *,const char *,int,mode_t) ;
+extern int	bvsmk_add(BVSMK *,int,uchar *,int) ;
+extern int	bvsmk_abort(BVSMK *,int) ;
+extern int	bvsmk_close(BVSMK *) ;
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* BVSMK_MASTER */
 
 #endif /* BVSMK_INCLUDE */
 

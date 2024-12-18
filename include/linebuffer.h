@@ -1,4 +1,5 @@
 /* linebuffer HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* provide a line-buffer of the system-defined line-length */
@@ -22,6 +23,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -61,12 +63,13 @@ struct linebuffer : linebuffer_head {
 	} ;
 	linebuffer(const linebuffer &) = delete ;
 	linebuffer &operator = (const linebuffer &) = delete ;
-	~linebuffer() noex {
-	    (void) int(finish) ;
+	void dtor() noex ;
+	~linebuffer() {
+	    dtor() ;
 	} ;
 } ; /* end struct (linebuffer) */
 #else /* __cplusplus */
-typedef LINEBUFFER		linebuffer ;
+typedef LINEBUFFER	linebuffer ;
 #endif /* __cplusplus */
 
 EXTERNC_begin

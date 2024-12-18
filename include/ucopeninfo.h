@@ -1,4 +1,5 @@
 /* ucopeninfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* additional UNIX® limits support */
@@ -33,6 +34,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 #define	UCOPENINFO	ucopeninfo_head

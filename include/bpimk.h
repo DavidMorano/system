@@ -1,39 +1,37 @@
-/* bpimk HEADER */
-/* encoding=ISO8859-1 */
-/* lang=C20 (conformance reviewed) */
+/* bpimk */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BPIMK_INCLUDE
-#define	BPIMK_INCLUDE
+#define	BPIMK_INCLUDE	1
 
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<envstandards.h>
+
+#include	<sys/types.h>
+
 #include	<vecobj.h>
+#include	<localmisc.h>
 
 
 #define	BPIMK_MAGIC	0x88773423
 #define	BPIMK		struct bpimk_head
-#define	BPIMK_OBJ	struct bpimk_object
-#define	BPIMK_VER	struct bpimk_verser
-#define	BPIMK_INFO	struct bpimk_information
+#define	BPIMK_OBJ	struct bpimk_obj
+#define	BPIMK_VERSE	struct bpimk_v
+#define	BPIMK_INFO	struct bpimk_i
 #define	BPIMK_FL	struct bpimk_flags
 #define	BPIMK_INTOPEN	(10*60)
 #define	BPIMK_INTSTALE	(5*60)
 
 
-struct bpimk_object {
-	cchar		*name ;
+/* this is the shared-object description */
+struct bpimk_obj {
+	const char	*name ;
 	uint		objsize ;
 } ;
 
-struct bpimk_information {
+struct bpimk_i {
 	uint		maxbook ;
 	uint		maxchapter ;
 	uint		maxverse ;
@@ -41,7 +39,7 @@ struct bpimk_information {
 	uint		nzverses ;
 } ;
 
-struct bpimk_verser {
+struct bpimk_v {
 	uchar		nlines, b, c, v ;
 } ;
 
@@ -56,11 +54,11 @@ struct bpimk_flags {
 
 struct bpimk_head {
 	uint		magic ;
-	cchar 		*dbname ;
-	cchar		*idname ;
+	const char 	*dbname ;
+	const char	*idname ;
 	char		*nidxfname ;
 	BPIMK_FL	f ;
-	vecobj		verses ;
+	VECOBJ		verses ;
 	mode_t		om ;
 	uint		pcitation ;
 	uint		maxbook ;
@@ -71,22 +69,24 @@ struct bpimk_head {
 	int		nfd ;
 } ;
 
-typedef BPIMK		bpimk ;
-typedef	BPIMK_FL	bpimk_fl ;
-typedef	BPIMK_OBJ	bpimk_obj ;
-typedef	BPIMK_VER	bpimk_ver ;
-typedef	BPIMK_INFO	bpimk_info ;
 
-EXTERNC_begin
+#if	(! defined(BPIMK_MASTER)) || (BPIMK_MASTER == 0)
 
-extern int	bpimk_open(bpimk *,cchar *,int,mode_t) noex ;
-extern int	bpimk_add(bpimk *,bpimk_ver *) noex ;
-extern int	bpimk_abort(bpimk *,int) noex ;
-extern int	bpimk_info(bpimk *,bpimk_info *) noex ;
-extern int	bpimk_close(bpimk *) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int	bpimk_open(BPIMK *,const char *,int,mode_t) ;
+extern int	bpimk_add(BPIMK *,BPIMK_VERSE *) ;
+extern int	bpimk_abort(BPIMK *,int) ;
+extern int	bpimk_info(BPIMK *,BPIMK_INFO *) ;
+extern int	bpimk_close(BPIMK *) ;
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* BPIMK_MASTER */
 
 #endif /* BPIMK_INCLUDE */
 

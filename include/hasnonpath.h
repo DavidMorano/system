@@ -1,4 +1,5 @@
 /* hasnonpath HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 
@@ -9,20 +10,23 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	HASNONPATH_INCLUDE
 #define	HASNONPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 EXTERNC_begin
 
-extern int hasnonpath(cchar *,int) noex ;
+extern bool hasnonpath(cchar *,int) noex ;
 
 EXTERNC_end
 

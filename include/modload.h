@@ -1,4 +1,5 @@
 /* modload HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* module-load management */
@@ -19,17 +20,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	MODLOAD			struct modload_head
 #define	MODLOAD_MI		struct modload_mid
 #define	MODLOAD_MAGIC		0x99447246
 #define	MODLOAD_DEFENTS		(44 * 1000)
-#define	MODLOAD_SYMSUF		"_mod"
-
+#define	MODLOAD_SYMSUF		"_modinfo"
+/* options */
 #define	MODLOAD_OLIBVAR		(1<<0)
 #define	MODLOAD_OPRS		(1<<1)
 #define	MODLOAD_OSDIRS		(1<<2)

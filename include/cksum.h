@@ -1,6 +1,9 @@
-/* cksum */
+/* cksum HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* perform the POSIX 1003.2 CRC checksum algorithm */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,18 +15,19 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	CKSUM_INCLUDE
-#define	CKSUM_INCLUDE	1
+#define	CKSUM_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
-
-/* object defines */
 
 #define	CKSUM		struct cksum_head
 #define	CKSUM_FL	struct cksum_flags
@@ -44,6 +48,8 @@ struct cksum_head {
 } ;
 
 typedef	CKSUM		cksum ;
+typedef	CKSUM_FL	cksum_fl ;
+typedef	CKSUM_ST	cksum_st ;
 
 EXTERNC_begin
 

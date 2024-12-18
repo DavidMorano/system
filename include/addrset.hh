@@ -1,4 +1,5 @@
 /* addrset HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* track memory addresses */
@@ -35,7 +36,7 @@
 	addrset::ifinish
 
 	Description:
-	Reack memory blocks.
+	Track memory blocks.
 
 *******************************************************************************/
 
@@ -46,11 +47,13 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<utility>		/* |hash(3c++)| */
-#include	<usysdefs.h>
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<mapblock.hh>
 
 
@@ -126,7 +129,7 @@ struct addrset {
 	int	curbegin(addrset_cur *) noex ;
 	int	curenum(addrset_cur *,ent *) noex ;
 	int	curend(addrset_cur *) noex ;
-	~addrset() noex {
+	~addrset() {
 	    dtor() ;
 	} ; /* end if (dtor) */
     private:

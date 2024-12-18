@@ -1,4 +1,5 @@
 /* strlisthdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* string-list database-file header */
@@ -15,14 +16,15 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	STRLISTHDR		struct strlisthdr_head
-#define	STRLISTHDR_FSUF		"si"	/* String-Index */
-#define	STRLISTHDR_MAGICSTR	"STRLIST"
 #define	STRLISTHDR_MAGICSIZE	16	/* the standard (pretty much) */
+#define	STRLISTHDR_MAGICSTR	"STRLIST"
 #define	STRLISTHDR_VERSION	0	/* file (string-list) version */
+#define	STRLISTHDR_FSUF		"si"	/* String-Index */
 
 
 struct strlisthdr_head {
@@ -36,7 +38,7 @@ struct strlisthdr_head {
 	uint		itlen ;		/* index-table length (n-entries) */
 	uint		nstrs ;		/* total number of strings */
 	uint		nskip ;		/* a hash-lookup parameter */
-	char		vetu[4] ;	/* relatively standard (V-E-T-U) ID */
+	uchar		vetu[4] ;	/* relatively standard (V-E-T-U) ID */
 } ;
 
 typedef STRLISTHDR	strlisthdr ;

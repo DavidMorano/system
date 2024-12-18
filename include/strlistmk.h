@@ -25,20 +25,27 @@
 
 
 #define	STRLISTMK		struct strlistmk_head
+#define	STRLISTMK_FL		struct strlistmk_flags
 #define	STRLISTMK_MAGIC		0x99447256
 #define	STRLISTMK_MODBNAME	"strlistmks"
 #define	STRLISTMK_OBJNAME	"strlistmks"
 
 
+struct strlistmk_flags {
+    	uint		modload:1 ;
+} ;
+
 struct strlistmk_head {
 	modload		*mlp ;		/* module-load-pointer */
 	void		*callp ;	/* calls-structure-pointer */
 	void		*obj ;		/* object pointer */
+	STRLISTMK_FL	fl ;
 	uint		magic ;
 	int		objsize ;	/* object size */
 } ;
 
 typedef	STRLISTMK	strlistmk ;
+typedef	STRLISTMK_FL	strlistmk_fl ;
 
 EXTERNC_begin
 

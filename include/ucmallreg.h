@@ -1,4 +1,5 @@
 /* ucmallreg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* support object for UNIX® C-language library Memory-Allocation management */
@@ -29,7 +30,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysdefs.h>
 
 
 #define		UCMALLREG_CUR	struct ucmallreg_cursor

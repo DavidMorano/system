@@ -1,41 +1,41 @@
-/* sysvars HEADER */
-/* lang=C20 */
-
-/* interface to query the system-variable database */
-/* version %I% last-modified %G% */
+/* sysvars */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSVARS_INCLUDE
-#define	SYSVARS_INCLUDE
+#define	SYSVARS_INCLUDE	1
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<var.h>
+
+#include	<sys/types.h>
+
+#include	<localmisc.h>
+
+#include	"var.h"
 
 
 #define	SYSVARS		struct sysvars_head
+#define	SYSVARS_CUR	struct sysvars_c
+#define	SYSVARS_OBJ	struct sysvars_obj
 #define	SYSVARS_FL	struct sysvars_flags
-#define	SYSVARS_CUR	struct sysvars_cursor
-#define	SYSVARS_OBJ	struct sysvars_object
+
+/* object defines */
 #define	SYSVARS_MAGIC	0x99889298
+
+/* query options */
 #define	SYSVARS_OPREFIX	(1<<0)		/* prefix match */
 
 
-struct sysvars_object {
-	char		*name ;
+struct sysvars_obj {
+	const char	*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct sysvars_cursor {
-	var_cur		vcur ;
+struct sysvars_c {
+	VAR_CUR		vcur ;
 } ;
 
 struct sysvars_flags {
@@ -43,34 +43,38 @@ struct sysvars_flags {
 } ;
 
 struct sysvars_head {
-	cvoid		*a ;		/* allocation */
-	char		*pr ;
-	char		*dbname ;	/* DB name (allocated) */
+	uint		magic ;
+	const void	*a ;		/* allocation */
+	const char	*pr ;
+	const char	*dbname ;	/* DB name (allocated) */
+	SYSVARS_FL	f ;
 	VAR		vind ;		/* variable index */
 	time_t		ti_db ;		/* DB mtime */
-	SYSVARS_FL	f ;
-	uint		magic ;
 	int		ncursors ;
 } ;
 
-typedef SYSVARS		sysvars ;
-typedef SYSVARS_FL	sysvars_fl ;
-typedef SYSVARS_CUR	sysvars_cur ;
-typedef SYSVARS_OBJ	sysvars_obj ;
 
-EXTERNC_begin
+#if	(! defined(SYSVARS_MASTER)) || (SYSVARS_MASTER == 0)
 
-extern int sysvars_open(sysvars *,char *,char *) noex ;
-extern int sysvars_count(sysvars *) noex ;
-extern int sysvars_curbegin(sysvars *,sysvars_cur *) noex ;
-extern int sysvars_fetch(sysvars *, char *,int,sysvars_cur *,char *,int) noex ;
-extern int sysvars_enum(sysvars *,sysvars_cur *,char *,int,char *,int) noex ;
-extern int sysvars_curend(sysvars *,sysvars_cur *) noex ;
-extern int sysvars_audit(sysvars *) noex ;
-extern int sysvars_close(sysvars *) noex ;
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-EXTERNC_end
+extern int sysvars_open(SYSVARS *,const char *,const char *) ;
+extern int sysvars_count(SYSVARS *) ;
+extern int sysvars_curbegin(SYSVARS *,SYSVARS_CUR *) ;
+extern int sysvars_fetch(SYSVARS *, const char *,int,SYSVARS_CUR *,
+				char *,int) ;
+extern int sysvars_enum(SYSVARS *,SYSVARS_CUR *,char *,int,char *,int) ;
+extern int sysvars_curend(SYSVARS *,SYSVARS_CUR *) ;
+extern int sysvars_audit(SYSVARS *) ;
+extern int sysvars_close(SYSVARS *) ;
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* SYSVARS_MASTER */
 
 #endif /* SYSVARS_INCLUDE */
 
