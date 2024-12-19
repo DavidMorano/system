@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
-/* calculate double-precision fibonacci */
+/* calculate double-precision Fibonacci */
 /* version %I% last-modified %G% */
 
 

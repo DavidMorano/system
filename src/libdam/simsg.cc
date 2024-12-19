@@ -1,4 +1,5 @@
 /* simsg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* messages for SIMSG requests-responses */
@@ -22,9 +23,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<stdorder.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<serialbuf.h>
 #include	<localmisc.h>
 

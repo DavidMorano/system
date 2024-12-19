@@ -2,19 +2,19 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* floating-pint factorial function */
+/* floating-point (double) factorial function */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2004-10-09, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This was adopted from some a previous implementation of
 	this subroutine.
 
 */
 
-/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

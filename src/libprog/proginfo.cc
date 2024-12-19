@@ -522,7 +522,7 @@ int proginfo_progename(proginfo *pip) noex {
 	    if ((rs >= 0) && (efn == nullptr) && (efn[0] != '\0')) {
 		cchar	*cp ;
 	        if ((cp = getourenv(pip->envv,VARUNDER)) != nullptr) {
-		    if (shellunder_wr(&su,cp) >= 0) {
+		    if (shellunder_load(&su,cp) >= 0) {
 	                efn = su.progename ;
 		    }
 	        }

@@ -1,4 +1,5 @@
 /* shellunder SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* parse out the shell-under information (as might be present) */
@@ -17,14 +18,14 @@
 /*******************************************************************************
 
 	Name:
-	shellunder
+	shellunder_load
 
 	Description:
 	This subroutine will parse out the shell-under information
 	from a given string (containing the shell-under information).
 
 	Synopsis:
-	int shellunder_wr(shellunder_dat *op,char *under) noex
+	int shellunder_load(shellunder_dat *op,char *under) noex
 
 	Arguments:
 	op		pointer to object
@@ -80,7 +81,7 @@
 
 /* exported subroutines */
 
-int shellunder_wr(shellunder_dat *op,cchar *under) noex {
+int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	if (op && under) {

@@ -33,7 +33,11 @@ typedef	SHELLUNDER_DAT	shellunder_dat ;
 
 EXTERNC_begin
 
-extern int	shellunder_wr(shellunder_dat *,cchar *) noex ;
+extern int	shellunder_load(shellunder_dat *,cchar *) noex ;
+
+static inline int shellunder_wr(shellunder_dat *sup,cchar *sp) noex {
+	return shellunder_load(sup,sp) noex ;
+}
 
 EXTERNC_end
 

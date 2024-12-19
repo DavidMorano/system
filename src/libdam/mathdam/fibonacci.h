@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* calculate Fibonacci */
+/* calculate (integer) Fibonacci */
 /* version %I% last-modified %G% */
 
 

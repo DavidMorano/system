@@ -1,7 +1,8 @@
-/* siletter SUPPORT */
+/* siletter SUPPORT (String-Index-Letter) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* is the ... something ... a "letter" (whatever that is)? */
+/* String-Index-Letter string searching function */
 /* version %I% last-modified %G% */
 
 
@@ -16,19 +17,23 @@
 
 /*******************************************************************************
 
-	We check for some condition.
+  	Name:
+	siletter
+
+	Description:
+	This is some sort of special String-Index searching function.
+	It is used in parsing certain kinds of texts.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<mkchar.h>
 #include	<sfx.h>
 #include	<strn.h>
-#include	<six.h>
 #include	<hasx.h>
-#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"siletter.h"
@@ -37,16 +42,38 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
 int siletter(siletter_res *lsp,cchar *sp,int sl) noex {
+	SILETTER_RES	*hop = lsp ;
 	int		rs = SR_FAULT ;
 	int		si = 0 ;
 	if (lsp && sp) {
-	    memclear(lsp) ;		/* potentially dangerous */
+	    memclear(hop) ;
 	    if (sl > 0) {
 	        if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
 	            cchar	*cp{} ;

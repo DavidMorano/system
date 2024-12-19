@@ -30,10 +30,10 @@
 
 #define	QUERYSTR	struct querystr_head
 #define	QUERYSTR_FL	struct querystr_flags
-#define	QUERYSTR_CUR	struct querystr_cur
+#define	QUERYSTR_CUR	struct querystr_cursor
 
 
-struct querystr_cur {
+struct querystr_cursor {
 	int		i ;
 } ;
 
@@ -59,8 +59,8 @@ extern int querystr_count(querystr *) noex ;
 extern int querystr_already(querystr *,cchar *,int) noex ;
 extern int querystr_curbegin(querystr *,querystr_cur *) noex ;
 extern int querystr_curend(querystr *,querystr_cur *) noex ;
+extern int querystr_curenum(querystr *,querystr_cur *,cchar **,cchar **) noex ;
 extern int querystr_fetch(querystr *,cchar *,int,querystr_cur *,cchar **) noex ;
-extern int querystr_enum(querystr *,querystr_cur *,cchar **,cchar **) noex ;
 extern int querystr_get(querystr *,int,cchar **,cchar **) noex ;
 extern int querystr_finish(querystr *) noex ;
 

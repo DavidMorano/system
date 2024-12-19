@@ -1,8 +1,9 @@
-/* sha */
+/* sha1 HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 */
 
-
-#ifndef SHA1_INCLUDE
-#define SHA1_INCLUDE	1
+/* NIST Secure Hash Algorithm (SHA) */
+/* version %I% last-modified %G% */
 
 
 /* NIST Secure Hash Algorithm */
@@ -11,6 +12,17 @@
 /* Applied Cryptography by Bruce Schneier */
 
 /* This code is in the public domain */
+
+#ifndef SHA1_INCLUDE
+#define SHA1_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #ifndef ENDIAN_H
@@ -26,15 +38,14 @@
 
 
 /* Useful defines and typedefs */
-
 #define	SHA1			SHA1_INFO
-
-
-typedef unsigned char SHA1_BYTE ;	/* 8-bit quantity */
-typedef unsigned long	SHA1_LONG ;	/* 32-or-more-bit quantity */
 
 #define SHA1_BLOCKSIZE		64
 #define SHA1_DIGESTSIZE		20
+
+
+typedef unsigned char	SHA1_BYTE ;	/* 8-bit quantity */
+typedef unsigned long	SHA1_LONG ;	/* 32-or-more-bit quantity */
 
 typedef struct {
     SHA1_LONG digest[5];		/* message digest */
@@ -43,29 +54,23 @@ typedef struct {
     int local;				/* unprocessed amount in data */
 } SHA1_INFO ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int sha1_start(SHA1 *) noex ;
+extern int sha1_update(SHA1 *,const char *, int) noex ;
+extern int sha1_digest(SHA1 *,unsigned char *) noex ;
+extern int sha1_finish(SHA1 *) noex ;
 
-extern int sha1_start(SHA1 *) ;
-extern int sha1_update(SHA1 *,const char *, int) ;
-extern int sha1_digest(SHA1 *,unsigned char[20]) ;
-extern int sha1_finish(SHA1 *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
+EXTERNC_end
 
 #ifdef SHA1_FOR_C
 
 #include <stdlib.h>
 #include <stdio.h>
 
-void sha_stream(unsigned char [20], SHA1_INFO *, FILE *);
-void sha_print(unsigned char [20]);
-char *sha_version(void);
+void sha_stream(unsigned char [20], SHA1_INFO *, FILE *) noex ;
+void sha_print(unsigned char [20]) noex ;
+char *sha_version(void) noex ;
 
 #endif /* SHA1_FOR_C */
 

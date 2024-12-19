@@ -145,7 +145,7 @@ RM= rm -f
 
 INC00= config.h defs.h 
 INC01= progoff.h 
-INC02= multiout.h biblecur.h siletter.h
+INC02= multiout.h biblecur.h
 INC03= linecenter.h biblebook.h
 
 INCS= $(INC00) $(INC01) $(INC02) $(INC03)
@@ -153,7 +153,7 @@ INCS= $(INC00) $(INC01) $(INC02) $(INC03)
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
 OBJ01= progfile.o progout.o progoff.o progfront.o 
-OBJ02= multiout.o biblecur.o siletter.o
+OBJ02= multiout.o biblecur.o
 OBJ03= linecenter.o 
 OBJ04=
 OBJ05=
@@ -300,44 +300,5 @@ progfront.o:		progfront.c $(INCS)
 multiout.o:		multiout.c multiout.h
 
 biblecur.o:		biblecur.c biblecur.h
-
-siletter.o:		siletter.c siletter.h
-
-
-linecenter.o:		linecenter.c linecenter.h
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-biblebook.o:		biblebook.c biblebook.h biblebooks.h
-
-biblemeta.o:		biblemeta.c biblemeta.h
-
-xwords.o:		xwords.c xwords.h
-
-wordfill.o:		wordfill.c wordfill.h
-
-fifostr.o:		fifostr.c fifostr.h
-
-storebuf.o:		storebuf.c storebuf.h
-
-
-# BFILE
-
-breadline.o:		breadline.o bfile.h
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) breadline.cc
-
-bprintlines.o:		bprintlines.o bfile.h
 
 

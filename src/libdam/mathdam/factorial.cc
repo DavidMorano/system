@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* factorial function */
+/* (integer) factorial function */
 /* version %I% last-modified %G% */
 
 

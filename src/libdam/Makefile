@@ -620,8 +620,8 @@ egs.o:			egs.c egs.h
 
 sha1.o:			sha1.c sha1.h
 
-outstore.o:		outstore.c outstore.h
-outbuf.o:		outbuf.c outbuf.h
+outstore.o:		outstore.cc outstore.h
+outbuf.o:		outbuf.cc outbuf.h
 
 strmgr.o:		strmgr.c strmgr.h
 

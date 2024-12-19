@@ -79,31 +79,28 @@
 
 int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		idx = 0 ;
 	if (dbuf && execfname) {
+	    storebuf db(dbuf,dlen) ; 
 	    rs = SR_OK ;
 	    if (pid >= 0) {
-	        cint	mch = '*' ;
+		if (rs >= 0) {
+		    rs = sb.chr('*') ;
+		}
 	        if (rs >= 0) {
-	            rs = storebuf_chr(dbuf,dlen,i,mch) ;
-	            i += rs ;
+	            uint v = uint(pid) ;
+	            rs = sb.dec(v) ;
 	        }
 	        if (rs >= 0) {
-	            uint	v = uint(pid) ;
-	            rs = storebuf_decui(dbuf,dlen,i,v) ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_chr(dbuf,dlen,i,mch) ;
-	            i += rs ;
+	            rs = sb.chr(mch) ;
 	        }
 	    } /* end if (PID included) */
 	    if (rs >= 0) {
-	        rs = storebuf_strw(dbuf,dlen,i,execfname,-1) ;
-	        i += rs ;
+	        rs = sb.str(execfname) ;
+	        idx = sb.idx ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (snshellunder) */
 

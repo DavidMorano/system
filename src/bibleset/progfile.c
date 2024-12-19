@@ -74,35 +74,35 @@
 
 /* external subroutines */
 
-extern int	sibreak(const char *,int,const char *) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sibreak(cchar *,int,cchar *) ;
+extern int	siskipwhite(cchar *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
-extern int	bprintln(bfile *,const char *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	bprintlns(bfile *,int,cchar *,int) ;
+extern int	bprintln(bfile *,cchar *,int) ;
 
 extern int	progoutmtheader(struct proginfo *,bfile *) ;
 extern int	progoutmtfooter(struct proginfo *,bfile *) ;
 
 #ifdef	COMMENT
-extern int	sileader(const char *,int) ;
+extern int	sileader(cchar *,int) ;
 #endif
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -125,15 +125,15 @@ static int versestartone(struct proginfo *,bfile *,BIBLECUR *) ;
 static int versestart(struct proginfo *,bfile *,BIBLECUR *) ;
 static int verseend(struct proginfo *,bfile *,BIBLECUR *) ;
 
-static int	handleversezero(struct proginfo *,bfile *,const char *,int) ;
+static int	handleversezero(struct proginfo *,bfile *,cchar *,int) ;
 
-static int	printletter(struct proginfo *,bfile *,int,const char *,int) ;
+static int	printletter(struct proginfo *,bfile *,int,cchar *,int) ;
 static int	printversenum(struct proginfo *,bfile *,int) ;
-static int	printwords(struct proginfo *,bfile *,const char *,int) ;
+static int	printwords(struct proginfo *,bfile *,cchar *,int) ;
 static int	printversezero(struct proginfo *,bfile *) ;
 static int	printwordsend(struct proginfo *,bfile *) ;
 
-static int	mkfixbuf(struct proginfo *,char *,int,const char *,int) ;
+static int	mkfixbuf(struct proginfo *,char *,int,cchar *,int) ;
 static int	mkfixbufend(struct proginfo *,char *,int) ;
 
 static int	setchapter(struct proginfo *,bfile *,int) ;
@@ -157,7 +157,7 @@ static int	outcols_normal(struct proginfo *) ;
 int progfile(pip,ofp,fname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile		infile ;
 	int		rs ;
@@ -184,7 +184,7 @@ const char	fname[] ;
 	        const int	llen = LINEBUFLEN ;
 	        int		len ;
 	        int		sl ;
-	        const char	*sp ;
+	        cchar	*sp ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(&infile,lbuf,llen)) > 0) {
@@ -417,7 +417,7 @@ BIBLEBOOK	*bbp ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*fmt ;
+	cchar	*fmt ;
 
 	if (bcp == NULL) return SR_FAULT ;
 	if (bbp == NULL) return SR_FAULT ;
@@ -553,7 +553,7 @@ BIBLECUR	*bcp ;
 	pip->f.inchapter = TRUE ;
 
 	if (rs >= 0) {
-	    const char	*com = pip->troff.linecomment ;
+	    cchar	*com = pip->troff.linecomment ;
 	    rs = bprintf(ofp,"%s start chapter=%u\n",com,chapter) ;
 	    wlen += rs ;
 	}
@@ -587,7 +587,7 @@ BIBLECUR	*bcp ;
 	}
 
 	if ((rs >= 0) && (chapter > 0)) {
-	    const char	*n ;
+	    cchar	*n ;
 
 	    n = pip->word[word_chapter] ;
 	    if (bcp->book == 19)
@@ -690,7 +690,7 @@ BIBLECUR	*bcp ;
 
 	pip->f.inverse = TRUE ;
 	if (rs >= 0) {
-	    const char	*com = pip->troff.linecomment ;
+	    cchar	*com = pip->troff.linecomment ;
 	    rs = bprintf(ofp,"%s start verse=%u\n",com,verse) ;
 	    wlen += rs ;
 	}
@@ -852,7 +852,7 @@ static int printletter(pip,ofp,verse,lp,ll)
 struct proginfo	*pip ;
 bfile		*ofp ;
 int		verse ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	int		rs = SR_OK ;
@@ -897,7 +897,7 @@ int		verse ;
 	        const int	cwbl = CWBUFLEN ;
 	        int		i = 0 ;
 	        int		j ;
-	        const char	*fmt ;
+	        cchar	*fmt ;
 	        char		cwbuf[CWBUFLEN + 1] ;
 
 	        if (rs >= 0) {
@@ -960,14 +960,14 @@ int		verse ;
 static int handleversezero(pip,ofp,buf,buflen)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int		rs = SR_OK ;
 	int		sl, cl, wl ;
 	int		si ;
-	const char	*tp, *sp, *wp ;
-	const char	*cp ;
+	cchar	*tp, *sp, *wp ;
+	cchar	*cp ;
 	char		fixbuf[FIXBUFLEN + 1] ;
 
 	if (ofp == NULL) return SR_FAULT ;
@@ -1022,7 +1022,7 @@ int		buflen ;
 static int printwords(pip,ofp,sp,sl)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	sp[] ;
+cchar	sp[] ;
 int		sl ;
 {
 	WORDFILL	w ;
@@ -1034,8 +1034,8 @@ int		sl ;
 	int		len ;
 	int		linewidth = pip->linewidth ;
 	int		wlen = 0 ;
-	const char	*tp, *wp ;
-	const char	*cp ;
+	cchar	*tp, *wp ;
+	cchar	*cp ;
 	char		fixbuf[FIXBUFLEN + 1] ;
 	char		colbuf[LINEBUFLEN + 1] ;
 
@@ -1153,7 +1153,7 @@ bfile		*ofp ;
 	int		c ;
 	int		ll ;
 	int		wlen = 0 ;
-	const char	*lp ;
+	cchar	*lp ;
 
 	if (rs >= 0) {
 	    rs = bprintf(ofp,".SP 0.5\n") ;
@@ -1190,14 +1190,14 @@ static int mkfixbuf(pip,buf,buflen,sp,sl)
 struct proginfo	*pip ;
 char		buf[] ;
 int		buflen ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	int		rs = SR_OK ;
 	int		si ;
 	int		cl ;
 	int		i = 0 ;
-	const char	*tp, *cp ;
+	cchar	*tp, *cp ;
 
 #if	CF_DEBUG && 0
 	if (DEBUGLEVEL(5))
@@ -1270,7 +1270,7 @@ int		buflen ;
 	int		i = 0 ;
 
 	if (pip->c.vmissing > 0) {
-	    const char	*cp = pip->troff.infont_p ;
+	    cchar	*cp = pip->troff.infont_p ;
 	    pip->c.vmissing = 0 ;
 	    if (rs >= 0) {
 	        rs = storebuf_strw(buf,buflen,i,"\\&",-1) ;

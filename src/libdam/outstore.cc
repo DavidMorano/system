@@ -1,4 +1,5 @@
 /* outstore SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage some dynamic output storage (mostly for SHIO use) */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	outstore
+
+	Description:
 	This object manages a small buffer for output storage
 	purposes.  This is mostly (or perhaps only) used as a helper
 	object for the SHIO object when it is:
@@ -31,6 +36,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -61,9 +67,10 @@ using std::max ;			/* subroutine-template */
 /* exported subroutines */
 
 int outstore_start(outstore *op) noex {
+    	OUTSTORE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = memclear(op) ;		/* dangerous */
+	    rs = memclear(hop) ;
 	}
 	return rs ;
 }
@@ -136,8 +143,7 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	        rlen = (slen-op->len) ;
 	        if (sl > rlen) {
 		    cint	dlen = max((sl+slen),(2*slen)) ;
-		    char	*dp{} ;
-		    if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
+		    if (char *dp{} ; (rs = uc_malloc((dlen+1),&dp)) >= 0) {
 		        op->dlen = dlen ;
 		        op->dbuf = dp ;
 		        dp = strwcpy(dp,op->sbuf,op->len) ;
