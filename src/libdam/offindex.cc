@@ -45,7 +45,7 @@
 
 /* local defines */
 
-#define	OFFINDEX_E	struct offindex_e
+#define	OI_E		struct offindex_e
 
 #define	NDEF		100
 
@@ -119,7 +119,7 @@ static inline int offindex_magic(offindex *op,Args ... args) noex {
 /* end subroutine (offindex_magic) */
 
 static int vecmp(cvoid **,cvoid **) noex ;
-static int vecmpe(OFFINDEX_E **,OFFINDEX_E **) noex ;
+static int vecmpe(OI_E **,OI_E **) noex ;
 
 
 /* local variables */
@@ -134,7 +134,7 @@ int offindex_start(offindex *op,int vn) noex {
 	int		rs ;
 	if (vn < NDEF) vn = NDEF ;
 	if ((rs = offindex_ctor(op)) >= 0) {
-	    cint	vsz = sizeof(OFFINDEX_E) ;
+	    cint	vsz = sizeof(OI_E) ;
 	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(op->oip,vsz,vn,vo)) >= 0) {
 	        op->magic = OFFINDEX_MAGIC ;
@@ -168,7 +168,7 @@ int offindex_finish(offindex *op) noex {
 int offindex_add(offindex *op,off_t off,int len) noex {
 	int		rs ;
 	if ((rs = offindex_magic(op)) >= 0) {
-	    OFFINDEX_E	e ;
+	    OI_E	e ;
 	    e.lineoff = off ;
 	    e.linelen = len ;
 	    rs = vecobj_add(op->oip,&e) ;
@@ -181,11 +181,11 @@ int offindex_lookup(offindex *op,off_t off) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = offindex_magic(op)) >= 0) {
-	    OFFINDEX_E	key ;
+	    OI_E	key ;
 	    void	*vp{} ;
 	    rs = SR_NOSYS ;
 	    if (! op->f.setsorted) {
-	        op->f.setsorted = TRUE ;
+	        op->f.setsorted = true ;
 	        vecobj_setsorted(op->oip) ;
 	    }
 	    key.lineoff = off ;
@@ -193,7 +193,7 @@ int offindex_lookup(offindex *op,off_t off) noex {
 	    if ((rs = vecobj_search(op->oip,&key,vecmp,&vp)) >= 0) {
 	        rs = SR_BADFMT ;
 	        if (vp) {
-	            OFFINDEX_E	*oep = (OFFINDEX_E *) vp ;
+	            OI_E	*oep = (OI_E *) vp ;
 	            rs = SR_OK ;
 	            len = oep->linelen ;
 	        }
@@ -207,25 +207,23 @@ int offindex_lookup(offindex *op,off_t off) noex {
 /* private subroutines */
 
 static int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
-	OFFINDEX_E	**e1pp = (OFFINDEX_E **) v1pp ;
-	OFFINDEX_E	**e2pp = (OFFINDEX_E **) v2pp ;
+	OI_E		**e1pp = (OI_E **) v1pp ;
+	OI_E		**e2pp = (OI_E **) v2pp ;
 	return vecmpe(e1pp,e2pp) ;
 }
 /* end subroutine (vecmp) */
 
-static int vecmpe(OFFINDEX_E **e1pp,OFFINDEX_E **e2pp) noex {
-	OFFINDEX_E	*e1p = *e1pp ;
-	OFFINDEX_E	*e2p = *e2pp ;
+static int vecmpe(OI_E **e1pp,OI_E **e2pp) noex {
+	OI_E		*e1p = *e1pp ;
+	OI_E		*e2p = *e2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
+	    rc = +1 ;
 	    if (e1p) {
+		rc = -1 ;
 	        if (e2p) {
 	            rc = (e1p->lineoff - e2p->lineoff) ;
-	        } else {
-	            rc = -1 ;
 	        }
-	    } else {
-	        rc = 1 ;
 	    }
 	}
 	return rc ;

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int filemap_ctor(filemap *op,Args ... args) noex {
+static int rtags_ctor(rtags *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,14 +8,23 @@ static int filemap_ctor(filemap *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filemap_ctor) */
+/* end subroutine (rtags_ctor) */
 
-static int filemap_dtor(filemap *op) noex {
+static int rtags_dtor(rtags *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filemap_dtor) */
+/* end subroutine (rtags_dtor) */
 
+template<typename ... Args>
+static inline int rtags_magic(termtrans *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (rtags_magic) */
