@@ -98,6 +98,7 @@
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
+#include	<strdcpy.h>
 #include	<rtags.h>
 #include	<char.h>
 #include	<hasx.h>
@@ -136,9 +137,6 @@
 #define	DISP		disp_head
 #define	DISP_ARGS	disp_args
 #define	DISP_THR	disp_thr
-
-#define	TAGQ		tagq 
-#define	TAGQ_THING	tagq_thing
 
 #define	TI		txtindex
 #define	TI_CUR		txtindex_cur
@@ -207,13 +205,13 @@ struct disp_thr {
 } ;
 
 struct disp_head {
+	DISP_THR	*threads ;	/* thread-privte data */
 	DISP_ARGS	a ;		/* arguments */
-	TAGQ		wq ;		/* work-queue */
+	tagq		wq ;		/* work-queue */
 	psem		sem_wq ;	/* work-queue semaphore */
 	psem		sem_done ;	/* done-semaphore */
 	ptm		m ;		/* nbusy-mutex */
 	ptc		cond ;		/* condition variable */
-	DISP_THR	*threads ;	/* thread-privte data */
 	volatile int	f_exit ;	/* assumed atomic */
 	volatile int	f_done ;	/* assumed atomic */
 	volatile int	f_ready ;	/* ready for workers to access */
@@ -304,21 +302,22 @@ static int	subinfo_finish(SI *) noex ;
 static int	disp_start(DISP *,DISP_ARGS *) noex ;
 static int	disp_starter(DISP *) noex ;
 static int	disp_finish(DISP *,int) noex ;
-static int	disp_addwork(DISP *,TI_TAG *) noex ;
+static int	disp_addwork(DISP *,TI_TAG *,cc *,int) noex ;
 static int	disp_setstate(DISP *,DISP_THR *,int) noex ;
 static int	disp_nbusy(DISP *) noex ;
 static int	disp_nexiting(DISP *) noex ;
 static int	disp_waitdone(DISP *) noex ;
 static int	disp_worker(DISP *) noex ;
+static int	disp_workone(DISP *,TI_TAG *,cc *,int) noex ;
 static int	disp_getourthr(DISP *,DISP_THR **) noex ;
 static int	disp_readyset(DISP *) noex ;
 static int	disp_readywait(DISP *) noex ;
 
-static int	tagq_start(TAGQ *,int) noex ;
-static int	tagq_finish(TAGQ *) noex ;
-static int	tagq_count(TAGQ *) noex ;
-static int	tagq_ins(TAGQ *,TI_TAG *) noex ;
-static int	tagq_rem(TAGQ *,TI_TAG *) noex ;
+static int	tagq_start(tagq *,int) noex ;
+static int	tagq_finish(tagq *) noex ;
+static int	tagq_count(tagq *) noex ;
+static int	tagq_ins(tagq *,TI_TAG *,cc *,int) noex ;
+static int	tagq_rem(tagq *,TI_TAG *,char *,int) noex ;
 
 static int	mkfieldterms(char *) noex ;
 
@@ -457,15 +456,23 @@ int textlook_curbegin(TL *op,TL_CUR *curp) noex {
 	int		rs ;
 	if ((rs = textlook_magic(op,curp)) >= 0) {
 	    memclear(curp) ;
-	    if ((rs = rtags_start(&curp->tags,0)) >= 0) {
-	        if ((rs = rtags_curbegin(&curp->tags,&curp->tcur)) >= 0) {
-	            op->ncursors += 1 ;
-	            curp->magic = TEXTLOOK_MAGIC ;
-	        }
-	        if (rs < 0) {
-	            rtags_finish(&curp->tags) ;
-	        }
-	    } /* end if (rtags_start) */
+	    if (char *tb{} ; (rs = malloc_mp(&tb)) >= 0) {
+		curp->tbuf = tb ;
+	        if ((rs = rtags_start(&curp->tags,0)) >= 0) {
+		    rtag_tag	*rtp = &curp->tcur ;
+	            if ((rs = rtags_curbegin(&curp->tags,rtp)) >= 0) {
+	                op->ncursors += 1 ;
+	                curp->magic = TEXTLOOK_MAGIC ;
+	            }
+	            if (rs < 0) {
+	                rtags_finish(&curp->tags) ;
+	            }
+	        } /* end if (rtags_start) */
+		if (rs < 0) {
+		    uc_free(tb) ;
+		    curp->tbuf = nullptr ;
+		} /* end if (error-handling) */
+	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -484,6 +491,11 @@ int textlook_curend(TL *op,TL_CUR *curp) noex {
 		{
 		    rs1 = rtags_finish(&curp->tags) ;
 		    if (rs >= 0) rs = rs1 ;
+		}
+		if (curp->tbuf) {
+		    rs1 = uc_free(curp->tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		    curp->tbuf = nullptr ;
 		}
 	        curp->ntags = 0 ;
 	        if (op->ncursors > 0) {
@@ -581,10 +593,10 @@ int textlook_count(TL *op) noex {
 
 static int textlook_inbegin(TL *op,cchar *dbname,cchar *bdname) noex {
 	int		rs ;
-	if (cc *cp{} ; (rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
+	if (cc *cp{} ; (rs = uc_mallocstr(dbname,&cp)) >= 0) {
 	    op->dbname = cp ;
 	    if (bdname) {
-	        if ((rs = uc_mallocstrw(bdname,-1,&cp)) >= 0) {
+	        if ((rs = uc_mallocstr(bdname,&cp)) >= 0) {
 	            op->bdname = cp ;
 		}
 	    }
@@ -782,7 +794,7 @@ static int textlook_havekeyers(TL *op,TI_TAG *tagp,int qo,
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	(void) go ; /* UNUSED */
+	(void) qo ; /* UNUSED */
 	if (reclen > maxreclen) reclen = maxreclen ;
 	mo = ufloor(recoff,op->pagesize) ;
 	recext = (recoff + reclen) ;
@@ -935,12 +947,16 @@ static int textlook_lookuper(TL *op,TL_CUR *curp,int qo,SK *skp,
 	    if ((rs = txtindex_curbegin(op->idp,&tcur)) >= 0) {
 	        if ((rs = txtindex_curlook(op->idp,&tcur,hkeya)) >= 0) {
 	            int		ntags = rs ;
+		    int		fl{} ;
 	            while ((rs >= 0) && (ntags-- > 0)) {
-	                rs1 = txtindex_curread(op->idp,&tcur,&ttag) ;
+			cint	tl = curp->tlen ;
+			char	*tb = curp->tbuf ;
+	                rs1 = txtindex_curenum(op->idp,&tcur,&ttag,tb,tl) ;
 	                if (rs1 == SR_NOTFOUND) break ;
 	                rs = rs1 ;
+			fl = rs ;
 	                if ((rs >= 0) && (ttag.reclen > 0)) {
-	                    rs = disp_addwork(dop,&ttag) ;
+	                    rs = disp_addwork(dop,&ttag,tb,fl) ;
 	                }
 	            } /* end while */
 	        } /* end if (txtindex_curlook) */
@@ -972,8 +988,8 @@ static int textlook_dispstart(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	if (op->disp == nullptr) {
 	    if ((rs = uptgetconcurrency()) >= 0) {
 	        cint	npar = (rs+1) ;
-	        cint	size = szof(DISP) ;
-	        if (void *p{} ; (rs = uc_malloc(size,&p)) >= 0) {
+	        cint	osz = szof(DISP) ;
+	        if (void *p{} ; (rs = uc_malloc(osz,&p)) >= 0) {
 	            DISP	*dop = (DISP *) p ;
 	            {
 	                DISP_ARGS	a{} ;
@@ -1085,7 +1101,7 @@ static int disp_starter(DISP *dop) noex {
 	if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    DISP_THR	*dtp ;
 	    pthread_t	tid ;
-	    uptsub_f	sub = uptsub_t(disp_worker) ;
+	    uptsub_f	sub = uptsub_f(disp_worker) ;
 	    int		i ; /* used-afterwards */
 	    dop->threads = (DISP_THR *) p ;
 	    memset(p,0,sz) ;
@@ -1169,9 +1185,9 @@ static int disp_finish(DISP *dop,int f_abort) noex {
 }
 /* end subroutine (disp_finish) */
 
-static int disp_addwork(DISP *dop,TI_TAG *tagp) noex {
+static int disp_addwork(DISP *dop,TI_TAG *tagp,cc *fp,int fl) noex {
 	int		rs ;
-	if ((rs = tagq_ins(&dop->wq,tagp)) >= 0) {
+	if ((rs = tagq_ins(&dop->wq,tagp,fp,fl)) >= 0) {
 	    rs = psem_post(&dop->sem_wq) ; /* post always (more parallelism) */
 	}
 	return rs ;
@@ -1268,46 +1284,51 @@ static int disp_worker(DISP *dop) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (DISP_THR *dtp{} ; (rs = disp_getourthr(dop,&dtp)) >= 0) {
-	    TL		*op = dop->a.op ;
-	    SK		*skp ;
-	    rtags	*rtp ;
-	    int		qo ;
-	    while ((rs >= 0) && (! dop->f_exit)) {
-	        if ((rs = psem_wait(&dop->sem_wq)) >= 0) {
-	            if (dop->f_exit) break ;
-	            if ((rs = disp_setstate(dop,dtp,true)) >= 0) {
-	    		TI_TAG	qv ;
-	                while ((rs = tagq_rem(&dop->wq,&qv)) > 0) {
-	                    qo = dop->a.qo ; /* renew */
-	                    skp = dop->a.skp ; /* renew */
-	                    rtp = dop->a.rtp ; /* renew */
-	                    if ((rs = textlook_havekeys(op,&qv,qo,skp)) > 0) {
-	    			rtags_tag	rt{} ;
-	                        c += 1 ;
-	                        rt.hash = 0 ;
-	                        rt.recoff = qv.recoff ;
-	                        rt.reclen = qv.reclen ;
-	                        rt.fname[0] = '\0' ;
-	                        if (qv.fname[0] != '\0') {
-	                            mkpath1(rt.fname,qv.fname) ;
-	                        }
-	                        rs = rtags_add(rtp,&rt) ;
-	                    } /* end if (found a key) */
-	            	    if (dop->f_exit) break ;
-			    if (rs < 0) break ;
-	                } /* end while (work) */
-	                rs1 = disp_setstate(dop,dtp,false) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (worker was busy) */
-	        } /* end if (psem_wait) */
-	        if (dop->f_done) break ;
-	    } /* end while (waiting) */
+	    if (char *tb{} ; (rs = malloc_mp(&tb)) >= 0) {
+		cint	tl = rs ;
+	        while ((rs >= 0) && (! dop->f_exit)) {
+	            if ((rs = psem_wait(&dop->sem_wq)) >= 0) {
+	                if (dop->f_exit) break ;
+	                if ((rs = disp_setstate(dop,dtp,true)) >= 0) {
+	    		    TI_TAG	qv ;
+	                    while ((rs = tagq_rem(&dop->wq,&qv,tb,tl)) > 0) {
+				cint	fl = rs ;
+			        rs = disp_workone(dop,&qv,tb,fl) ;
+	            	        if (dop->f_exit) break ;
+			        if (rs < 0) break ;
+	                    } /* end while (work) */
+	                    rs1 = disp_setstate(dop,dtp,false) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (worker was busy) */
+	            } /* end if (psem_wait) */
+	            if (dop->f_done) break ;
+	        } /* end while (waiting) */
+		rs = rsfree(rs,tb) ;
+	    } /* end if (m-a-f) */
 	    dtp->rs = rs ;
 	    dtp->f_exiting = true ;
 	} /* end if (disp_getourthr) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (disp_worker) */
+
+static int disp_workone(DISP *dop,TI_TAG *qvp,cc *fp,int fl) noex {
+	TL	*op = dop->a.op ;
+	SK	*skp = dop->a.skp ; /* renew */
+	rtags	*rtp = dop->a.rtp ; /* renew */
+	int	qo = dop->a.qo ; /* renew */
+	int	rs ;
+	if ((rs = textlook_havekeys(op,&qv,qo,skp)) > 0) {
+	    rtags_tag	rt{} ;
+	    c += 1 ;
+	    rt.hash = 0 ;
+	    rt.recoff = qv.recoff ;
+	    rt.reclen = qv.reclen ;
+	    rs = rtags_add(rtp,&rt,fp,fl) ;
+	} /* end if (found a key) */
+	return rs ;
+}
+/* end subroutine (disp_workone) */
 
 /* child thread calls this to get its own local-data pointer */
 static int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
@@ -1366,8 +1387,8 @@ static int disp_readywait(DISP *dop) noex {
 }
 /* end subroutine (disp_readywait) */
 
-/* this object ('TAGQ') forms the Q of work going into the worker threads */
-static int tagq_start(TAGQ *tqp,int n) noex {
+/* this object ('tagq') forms the Q of work going into the worker threads */
+static int tagq_start(tagq *tqp,int n) noex {
 	cint		f_shared = false ;
 	int		rs ;
 	if (n < 1) n = 1 ;
@@ -1381,7 +1402,7 @@ static int tagq_start(TAGQ *tqp,int n) noex {
 }
 /* end subroutine (tagq_start) */
 
-static int tagq_finish(TAGQ *tqp) noex {
+static int tagq_finish(tagq *tqp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rs2 ;
@@ -1407,20 +1428,20 @@ static int tagq_finish(TAGQ *tqp) noex {
 }
 /* end subroutine (tagq_finish) */
 
-static int tagq_count(TAGQ *tqp) noex {
+static int tagq_count(tagq *tqp) noex {
 	return ciq_count(&tqp->q) ;
 }
 /* end subroutine (tagq_finish) */
 
-static int tagq_ins(TAGQ *tqp,TI_TAG *tagp) noex {
+static int tagq_ins(tagq *tqp,TI_TAG *tagp,cc *fp,int fl) noex {
 	int		rs ;
-	int		sz = szof(TAGQ_THING) + strlen(tagp->fname) + 1 ;
+	int		sz = szof(tagq_thing) + fl + 1 ;
 	int		rc = 0 ;
 	if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
-	    TAGQ_THING	*ttp = (TAGQ_THING *) p ;
+	    tagq_thing	*ttp = (tagq_thing *) p ;
 	    ttp->recoff = tagp->recoff ;
 	    ttp->reclen = tagp->reclen ;
-	    strwcpy(ttp->fname,tagp->fname,MAXPATHLEN) ;
+	    strwcpy(ttp->fname,fp,fl) ;
 	    if ((rs = psem_wait(&tqp->wsem)) >= 0) {
 	        rs = ciq_ins(&tqp->q,ttp) ;
 	        rc = rs ;
@@ -1431,14 +1452,13 @@ static int tagq_ins(TAGQ *tqp,TI_TAG *tagp) noex {
 }
 /* end subroutine (tagq_ins) */
 
-static int tagq_rem(TAGQ *tqp,TI_TAG *tagp) noex {
-	TAGQ_THING	*ttp ;
+static int tagq_rem(tagq *tqp,TI_TAG *tagp,char *fbuf,int flen) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = ciq_rem(&tqp->q,&ttp)) >= 0) {
+	if (tagq_thing *ttp{} ; (rs = ciq_rem(&tqp->q,&ttp)) >= 0) {
 	    tagp->recoff = ttp->recoff ;
 	    tagp->reclen = ttp->reclen ;
-	    len = strwcpy(tagp->fname,ttp->fname,MAXPATHLEN) - tagp->fname ;
+	    len = strdcpy(fbuf,flen,ttp->fname) - fbuf ;
 	    uc_free(ttp) ;
 	    rs = psem_post(&tqp->wsem) ;
 	} else if (rs == SR_NOTFOUND) {

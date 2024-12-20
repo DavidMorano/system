@@ -76,7 +76,7 @@ extern "C" {
     typedef int	(*soiseigen_f)(void *,cchar *,int) noex ;
     typedef int	(*socurbegin_f)(void *,void *) noex ;
     typedef int	(*socurlook_f)(void *,void *,mainv) noex ;
-    typedef int	(*socurenum_f)(void *,void *,txtindexes_tag *) noex ;
+    typedef int	(*socurenum_f)(void *,void *,txtindexes_tag *,char *,int) noex ;
     typedef int	(*socurend_f)(void *,void *) noex ;
     typedef int	(*soaudit_f)(void *) noex ;
     typedef int	(*soclose_f)(void *) noex ;
@@ -410,20 +410,22 @@ int txtindex_curlook(txtindex *op,TI_CUR *curp,mainv klp) noex {
 }
 /* end subroutine (txtindex_curlook) */
 
-int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp) noex {
+int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp,
+		char *rb,int rl) noex {
 	int		rs ;
+	int		fl = 0 ;
 	if ((rs = txtindex_magic(op,curp,tagp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == TXTINDEX_MAGIC) {
 		rs = SR_NOSYS ;
-	        if (callp->curenum) {
-		    auto	co = callp->curenum ;
-	            rs = co(op->obj,curp->scp,tagp) ;
+	        if (auto co = callp->curenum ; co != nullptr) {
+	            rs = co(op->obj,curp->scp,tagp,rb,rl) ;
+		    fl = rs ;
 	        }
 	    } /* end if (magic) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (txtindex_curenum) */
 

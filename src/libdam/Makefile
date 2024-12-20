@@ -857,5 +857,6 @@ nlspeername.o:		nlspeername.cc nlspeername.h
 conallof.o:		conallof.cc conallof.h
 ismatstar.o:		ismatstar.cc ismatstar.h
 findxfile.o:		findxfile.cc findxfile.h
+getostype.o:		getostype.cc getostype.h
 
 

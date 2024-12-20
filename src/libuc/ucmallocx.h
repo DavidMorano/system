@@ -1,4 +1,4 @@
-/* ucmallox HEADER */
+/* ucmallocx HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Group:
-	icmallocx
+	ucmallocx
 
 	The following subroutines are made available:
 	uc_mallocsys
@@ -27,8 +27,8 @@
 
 *******************************************************************************/
 
-#ifndef	UCMALLOX_INCLUDE
-#define	UCMALLOX_INCLUDE
+#ifndef	UCMALLOCX_INCLUDE
+#define	UCMALLOCX_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -45,9 +45,13 @@ extern int uc_mallocsys(int,char **) noex ;
 extern int uc_mallocbuf(cvoid *,int,cvoid **) noex ;
 extern int uc_mallocstrw(cchar *,int,cchar **) noex ;
 
+static inline int uc_mallocstr(cchar *sp,cchar **rpp) noex {
+    	return uc_mallocstrw(sp,-1,rpp) ;
+}
+
 EXTERNC_end
 
 
-#endif /* UCMALLOX_INCLUDE */
+#endif /* UCMALLOCX_INCLUDE */
 
 

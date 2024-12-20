@@ -74,7 +74,8 @@ extern int txtindex_getsfn(txtindex *,char *,int) noex ;
 extern int txtindex_iseigen(txtindex *,cchar *,int) noex ;
 extern int txtindex_curbegin(txtindex *,txtindex_cur *) noex ;
 extern int txtindex_curlook(txtindex *,txtindex_cur *,mainv) noex ;
-extern int txtindex_curenum(txtindex *,txtindex_cur *,txtindex_tag *) noex ;
+extern int txtindex_curenum(txtindex *,txtindex_cur *,txtindex_tag *,
+		char *,int) noex ;
 extern int txtindex_curend(txtindex *,txtindex_cur *) noex ;
 extern int txtindex_audit(txtindex *) noex ;
 extern int txtindex_close(txtindex *) noex ;

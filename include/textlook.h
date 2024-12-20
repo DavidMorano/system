@@ -51,9 +51,11 @@ struct textlook_object {
 } ;
 
 struct textlook_cursor {
+    	char		*tbuf ;
 	rtags		tags ;
 	rtags_cur	tcur ;
 	uint		magic ;
+	int		tlen ;
 	int		ntags ;
 } ;
 

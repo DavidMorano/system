@@ -61,7 +61,9 @@ enum ostypes {
 } ;
 
 EXTERNC_begin
+
 extern int	getostype() noex ;
+
 EXTERNC_end
 
 #ifdef	__cplusplus

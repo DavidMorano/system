@@ -151,7 +151,7 @@ static inline int rtags_magic(rtags *op,Args ... args) noex {
 }
 /* end subroutine (rtags_magic) */
 
-static int	fname_start(FNAME *,cchar *,int) noex ;
+static int	fname_start(FNAME *,cc *,int,int) noex ;
 static int	fname_finish(FNAME *) noex ;
 
 static int	tagent_start(RT_TAG *,int,int,int) noex ;
@@ -211,7 +211,7 @@ int rtags_finish(rtags *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = rtags_magic(op)) >= 0) {
-	    {
+	    if (op->mxp) {
 	        rs1 = ptm_destroy(op->mxp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -225,15 +225,15 @@ int rtags_finish(rtags *op) noex {
 	        }
 	    } /* end for */
 	    /* free up all tags */
-	    {
+	    if (op->tlp) {
 		rs1 = vecobj_finish(op->tlp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->flp) {
 		rs1 = vecobj_finish(op->flp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->hdp) {
 		rs1 = hdb_finish(op->hdp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -247,24 +247,24 @@ int rtags_finish(rtags *op) noex {
 }
 /* end subroutine (rtags_finish) */
 
-int rtags_add(rtags *op,RT_TAG *tip,cchar *fname) noex {
+int rtags_add(rtags *op,RT_TAG *tip,cchar *fp,int fl) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = rtags_magic(op,tip,fname)) >= 0) {
+	if ((rs = rtags_magic(op,tip,fp)) >= 0) {
 	    ptm		*mxp = op->mxp ;
 	    if ((rs = mxp->lockbegin) >= 0) {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
 	        cint		nrs = SR_NOTFOUND ;
 		int		fi{} ;
-	        key.buf = fname ;
-	        key.len = strlen(fname) ;
+	        key.buf = fp ;
+	        key.len = fl ;
 	        val.buf = nullptr ;
 	        val.len = 0 ;
 	        /* is the filename already present? */
 	        if ((rs = hdb_fetch(op->hdp,key,nullptr,&val)) == nrs) {
 	            FNAME	fe ;
-	            if ((rs = fname_start(&fe,fname,op->nfiles)) >= 0) {
+	            if ((rs = fname_start(&fe,fp,fl,op->nfiles)) >= 0) {
 		    	vecobj	*flp = op->flp ;
 	                if ((rs = flp->add(&fe)) >= 0) {
 	                    fi = rs ;
@@ -447,15 +447,14 @@ int rtags_count(rtags *op) noex {
 
 /* private subroutines */
 
-static int fname_start(FNAME *fep,cchar *fname,int fi) noex {
+static int fname_start(FNAME *fep,cc *fp,int fl,int fi) noex {
 	int		rs = SR_FAULT ;
-	if (fep && fname) {
+	if (fep && fp) {
 	    fep->fi = fi ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
 		fep->name = cp ;
 	    }
 	} /* end if (non-null) */
-
 	return rs ;
 }
 /* end subroutine (fname_start) */

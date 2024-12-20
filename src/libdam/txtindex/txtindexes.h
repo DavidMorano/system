@@ -115,7 +115,7 @@ extern int	txtindexes_getsfn(txtindexes *,char *,int) noex ;
 extern int	txtindexes_iseigen(txtindexes *,cchar *,int) noex ;
 extern int	txtindexes_curbegin(txtindexes *,txtindexes_cur *) noex ;
 extern int	txtindexes_curlook(txtindexes *,txtindexes_cur *,mainv) noex ;
-extern int	txtindexes_curread(txtindexes *,txtindexes_cur *,
+extern int	txtindexes_curenum(txtindexes *,txtindexes_cur *,
 			txtindexes_tag *,char *,int) noex ;
 extern int	txtindexes_curend(txtindexes *,txtindexes_cur *) noex ;
 extern int	txtindexes_audit(txtindexes *) noex ;

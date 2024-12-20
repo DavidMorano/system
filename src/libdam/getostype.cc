@@ -172,7 +172,7 @@ static int findtype() noex {
 
 typer::operator int () noex {
 	int		rs = SR_OK ;
-	for (const auto &m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if ((rs < 0) || fgot) break ;
 	} /* end for */
@@ -236,7 +236,7 @@ int typer::trysysname() noex {
 
 int typer::matguess(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	for (const osguess &g : guesses) {
+	for (cauto &g : guesses) {
 	    if (strwcasecmp(g.name,sp,sl) == 0) {
 		rs = g.type ;
 		fgot = true ;

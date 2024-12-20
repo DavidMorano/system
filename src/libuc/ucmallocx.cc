@@ -120,7 +120,9 @@ static inline void ourstrwcpy(char *bp,cchar *sp,int sl) noex {
 	    strncpy(bp,sp,sl) ;
 	    bp[sl] = '\0' ;
 	} else {
-	    while (sl-- && *sp) *bp++ = *sp++ ;
+	    while (sl-- && *sp) {
+		*bp++ = *sp++ ;
+	    }
 	    *bp = '\0' ;
 	}
 }

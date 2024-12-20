@@ -440,9 +440,9 @@ int txtindexes_curbegin(txtindexes *op,TI_CUR *curp) noex {
 	int		rs ;
 	if ((rs = txtindexes_magic(op,curp)) >= 0) {
 	    memclear(curp) ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    if ((rs = ptm_lockbegin(op->mxp)) >= 0) {
 	        op->ncursors += 1 ;
-	        ptm_unlock(op->mxp) ;
+	        ptm_lockend(op->mxp) ;
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
@@ -459,11 +459,11 @@ int txtindexes_curend(txtindexes *op,TI_CUR *curp) noex {
 	        curp->taglist = nullptr ;
 	    }
 	    curp->taglen = 0 ;
-	    if ((rs1 = ptm_lock(op->mxp)) >= 0) {
+	    if ((rs1 = ptm_lockbegin(op->mxp)) >= 0) {
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
 	        }
-	        ptm_unlock(op->mxp) ;
+	        ptm_lockend(op->mxp) ;
 	    } /* end if */
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (magic) */
@@ -505,14 +505,14 @@ int txtindexes_curlook(txtindexes *op,TI_CUR *curp,mainv klp) noex {
 /* end subroutine (txtindexes_curlook) */
 
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_curread(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
+int txtindexes_curenum(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = txtindexes_magic(op,curp,tagp,rbuf)) >= 0) {
-	    uint		tagoff ;
-	    TI_FI		*fip = &op->tf ;
-	    cchar		*tagbuf ;
+	    TI_FI	*fip = &op->tf ;
+	    cchar	*tagbuf ;
+	    uint	tagoff ;
 	    if ((curp->taglist == nullptr) || (curp->taglen == 0)) {
 	        rs = SR_NOTFOUND ;
 	    }
@@ -520,7 +520,7 @@ int txtindexes_curread(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
 	        rs = SR_NOTFOUND ;
 	    }
 	    if (rs >= 0) {
-	        uint		idx = curp->i ;
+	        uint	idx = curp->i ;
 	        if ((idx >= op->ifi.taglen) || (idx >= curp->taglen)) {
 	            rs = SR_NOTFOUND ;
 	        }
@@ -549,7 +549,7 @@ int txtindexes_curread(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (txtindexes_read) */
+/* end subroutine (txtindexes_curenum) */
 
 
 /* private subroutines */
@@ -1212,8 +1212,8 @@ static int tag_parse(TI_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    } /* end if */
 	    if (rs >= 0) {
 	        if ((tp = strnchr(sp,sl,',')) != nullptr) {
-		    uint	uv ;
-	            if ((rs = cfdecui(sp,(tp - sp),&uv)) >= 0) {
+		    cint	vl = (tp - sp) ;
+		    if (uint uv ; (rs = cfdecui(sp,vl,&uv)) >= 0) {
 			tagp->recoff = uv ;
 	                sl -= ((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
@@ -1222,7 +1222,9 @@ static int tag_parse(TI_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	                }
 	                tagp->reclen = INT_MAX ;
 	                if (sl >= 0) {
-	                    rs = cfdecui(sp,sl,&tagp->reclen) ;
+			    if (uint v{} ; (rs = cfdecui(sp,sl,&v)) >= 0) {
+			        tagp->reclen = v ;
+			    }
 	                }
 	            } /* end if (ok) */
 	        } else {
