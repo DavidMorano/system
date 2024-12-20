@@ -501,7 +501,8 @@ int textlook_curend(TL *op,TL_CUR *curp) noex {
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
 	        }
-	    } /* end if (valid) */
+		curp->magic = 0 ;
+	    } /* end if (valid-subcursor) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -926,11 +927,9 @@ static int textlook_mkhkeys(TL *op,vecstr *hkp,SK *skp) noex {
 	        if (rs < 0) break ;
 	    } /* end while (enumerating search-keys) */
 	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-
 	    rs1 = searchkeys_curend(skp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
-
 	return (rs >= 0) ? nkeys : rs ;
 }
 /* end subroutine (textlook_mkhkeys) */
@@ -1197,17 +1196,17 @@ static int disp_addwork(DISP *dop,TI_TAG *tagp,cc *fp,int fl) noex {
 
 /* worker threads call this to set their "busy" status */
 static int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
-	ptm		*mp = &dop->m ;
+	ptm		*mxp = &dop->m ;
 	int		rs ;
 	int		rs1 ;
 	int		f_prev = false ;
-	if ((rs = ptm_lock(mp)) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) {
 	    f_prev = tip->f_busy ;
 	    tip->f_busy = f ;
 	    if ((! f) && f_prev) {
 	        rs = psem_post(&dop->sem_done) ;
 	    }
-	    rs1 = ptm_unlock(mp) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? f_prev : rs ;
@@ -1220,9 +1219,8 @@ static int disp_nbusy(DISP *dop) noex {
 	int		n = 0 ;
 	if (dop->threads != nullptr) {
 	    DISP_THR	*dtp ;
-	    int		i ;
-	    for (i = 0 ; i < dop->nthr ; i += 1) {
-	        dtp = (dop->threads+i) ;
+	    for (int i = 0 ; i < dop->nthr ; i += 1) {
+	        dtp = (dop->threads + i) ;
 	        if (dtp->f_busy) n += 1 ;
 	    }
 	}
@@ -1248,10 +1246,10 @@ static int disp_waitdone(DISP *dop) noex {
 	int		nbusy = -1 ;
 	int		nexited = -1 ;
 	int		nwq = -1 ;
-	int		f_cond = false ;
-	int		f_notbusy = false ;
-	int		f_empty = false ;
-	int		f_allexited = false ;
+	bool		f_cond = false ;
+	bool		f_notbusy = false ;
+	bool		f_empty = false ;
+	bool		f_allexited = false ;
 	for (int i = 0 ; (rs >= 0) && (! f_cond) ; i += 1) {
 	    if ((rs >= 0) && (i > 0)) {
 	        rs = psem_wait(&dop->sem_done) ;
@@ -1356,15 +1354,15 @@ static int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
 
 /* main-thread calls this to indicate sub-threads can read completed object */
 static int disp_readyset(DISP *dop) noex {
-	ptm		*mp = &dop->m ;
+	ptm		*mxp = &dop->m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(mp)) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) {
 	    {
 	        dop->f_ready = true ;
 	        rs = ptc_broadcast(&dop->cond) ; /* 0-bit semaphore */
 	    }
-	    rs1 = ptm_unlock(mp) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -1373,15 +1371,15 @@ static int disp_readyset(DISP *dop) noex {
 
 /* sub-threads call this to wait until object is ready */
 static int disp_readywait(DISP *dop) noex {
-	ptm		*mp = &dop->m ;
+	ptm		*mxp = &dop->m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(mp)) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) {
 	    while ((! dop->f_ready) && (! dop->f_exit)) {
-	        rs = ptc_wait(&dop->cond,mp) ;
+	        rs = ptc_wait(&dop->cond,mxp) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = ptm_unlock(mp) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -1435,8 +1433,8 @@ static int tagq_count(tagq *tqp) noex {
 /* end subroutine (tagq_finish) */
 
 static int tagq_ins(tagq *tqp,TI_TAG *tagp,cc *fp,int fl) noex {
+	cint		sz = szof(tagq_thing) + fl + 1 ;
 	int		rs ;
-	int		sz = szof(tagq_thing) + fl + 1 ;
 	int		rc = 0 ;
 	if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    tagq_thing	*ttp = (tagq_thing *) p ;
