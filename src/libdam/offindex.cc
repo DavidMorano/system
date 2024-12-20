@@ -86,7 +86,7 @@ static int offindex_ctor(offindex *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(hop) ; /* dangerous ! */
+	    memclear(hop) ;
 	    if ((op->oip = new(nothrow) vecobj) != np) {
 		rs = SR_OK ;
 	    }
@@ -119,7 +119,7 @@ static inline int offindex_magic(offindex *op,Args ... args) noex {
 /* end subroutine (offindex_magic) */
 
 static int vecmp(cvoid **,cvoid **) noex ;
-static int vecmpe(OI_E **,OI_E **) noex ;
+static int ecmpe(OI_E *,OI_E *) noex ;
 
 
 /* local variables */
@@ -207,15 +207,13 @@ int offindex_lookup(offindex *op,off_t off) noex {
 /* private subroutines */
 
 static int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
-	OI_E		**e1pp = (OI_E **) v1pp ;
-	OI_E		**e2pp = (OI_E **) v2pp ;
-	return vecmpe(e1pp,e2pp) ;
+	OI_E		*e1p = (OI_E *) *v1pp ;
+	OI_E		*e2p = (OI_E *) *v2pp ;
+	return ecmpe(e1p,e2p) ;
 }
 /* end subroutine (vecmp) */
 
-static int vecmpe(OI_E **e1pp,OI_E **e2pp) noex {
-	OI_E		*e1p = *e1pp ;
-	OI_E		*e2p = *e2pp ;
+static int ecmpe(OI_E *e1p,OI_E *e2p) noex {
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
@@ -228,6 +226,6 @@ static int vecmpe(OI_E **e1pp,OI_E **e2pp) noex {
 	}
 	return rc ;
 }
-/* end subroutine (vecmpe) */
+/* end subroutine (ecmpe) */
 
 

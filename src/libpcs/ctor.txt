@@ -20,7 +20,7 @@ static int rtags_dtor(rtags *op) noex {
 /* end subroutine (rtags_dtor) */
 
 template<typename ... Args>
-static inline int rtags_magic(termtrans *op,Args ... args) noex {
+static inline int rtags_magic(rtags *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;

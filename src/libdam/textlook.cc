@@ -18,7 +18,7 @@
 
 */
 
-/* Copyright Â© 2008,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2008,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -67,16 +67,13 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<climits>
-#include	<ctime>
+#include	<ticreat>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<vecstr.h>
-#include	<expcook.h>
-#include	<storebuf.h>
-#include	<eigendb.h>
 #include	<ids.h>
 #include	<ascii.h>
 #include	<field.h>
@@ -114,6 +111,9 @@
 #define	TEXTLOOK_QLEN		16
 #define	TEXTLOOK_MAXRECLEN	(10*1024*1024)
 
+#define	TL		textlook
+#define	TL_IN		textlook_info
+
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	NATURALWORDLEN
 #endif
@@ -142,43 +142,6 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfword(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	strpcmp(cchar *,cchar *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	getnprocessors(cchar **,int) ;
-extern int	haslc(cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isFailOpen(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-
-
-/* exported variables */
-
-TEXTLOOK_OBJ	textlook = {
-	"textlook",
-	sizeof(TEXTLOOK),
-	sizeof(TEXTLOOK_CUR)
-} ;
-
 
 /* local structures */
 
@@ -187,14 +150,14 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	IDS		id ;
+	ids		id ;
 	SUBINFO_FL	f ;
 	time_t		daytime ;
 } ;
 
 struct tagq {
 	PSEM		wsem ;
-	CIQ		q ;
+	ciq		q ;
 } ;
 
 struct tagq_thing {
@@ -225,7 +188,7 @@ struct disp_head {
 	TAGQ		wq ;		/* work-queue */
 	PSEM		sem_wq ;	/* work-queue semaphore */
 	PSEM		sem_done ;	/* done-semaphore */
-	PTM		m ;		/* nbusy-mutex */
+	ptm		m ;		/* nbusy-mutex */
 	PTC		cond ;		/* condition variable */
 	DISP_THR	*threads ;	/* thread-privte data */
 	volatile int	f_exit ;	/* assumed atomic */
@@ -238,229 +201,218 @@ struct disp_head {
 
 /* forward references */
 
-static int	textlook_infoloadbegin(TEXTLOOK *,cchar *,cchar *) ;
-static int	textlook_infoloadend(TEXTLOOK *) ;
-static int	textlook_indopen(TEXTLOOK *,SUBINFO *) ;
+static int	textlook_inbegin(TL *,cchar *,cchar *) noex ;
+static int	textlook_inend(TL *) noex ;
+static int	textlook_indopen(TL *,SUBINFO *) noex ;
 
-static int	textlook_snbegin(TEXTLOOK *) ;
-static int	textlook_snend(TEXTLOOK *) ;
+static int	textlook_snbegin(TL *) noex ;
+static int	textlook_snend(TL *) noex ;
 
-static int	textlook_dispstart(TEXTLOOK *,int,SEARCHKEYS *,RTAGS *) ;
-static int	textlook_dispfinish(TEXTLOOK *) ;
+static int	textlook_dispstart(TL *,int,SEARCHKEYS *,RTAGS *) noex ;
+static int	textlook_dispfinish(TL *) noex ;
 
-static int	textlook_indclose(TEXTLOOK *) ;
-static int	textlook_havekeys(TEXTLOOK *,TXTINDEX_TAG *,int,SEARCHKEYS *) ;
-static int	textlook_havekeyer(TEXTLOOK *,TXTINDEX_TAG *,int,
-			SEARCHKEYS *,SEARCHKEYS_POP *,cchar *) ;
-static int	textlook_havekeyers(TEXTLOOK *,TXTINDEX_TAG *,int,
-			SEARCHKEYS *,int,SEARCHKEYS_POP *) ;
-static int	textlook_havekeysline(TEXTLOOK *,
-			SEARCHKEYS *,SEARCHKEYS_POP *,cchar *,int) ;
-static int	textlook_matchkeys(TEXTLOOK *,
-			SEARCHKEYS *,SEARCHKEYS_POP *,cchar *,int) ;
-static int	textlook_mkhkeys(TEXTLOOK *,vecstr *,SEARCHKEYS *) ;
+static int	textlook_indclose(TL *) noex ;
+static int	textlook_havekeys(TL *,TXTINDEX_TAG *,int,SEARCHKEYS *) ;
+static int	textlook_havekeyer(TL *,TXTINDEX_TAG *,int,
+			SEARCHKEYS *,SEARCHKEYS_POP *,cchar *) noex ;
+static int	textlook_havekeyers(TL *,TXTINDEX_TAG *,int,
+			SEARCHKEYS *,int,SEARCHKEYS_POP *) noex ;
+static int	textlook_havekeysline(TL *,
+			SEARCHKEYS *,SEARCHKEYS_POP *,cchar *,int) noex ;
+static int	textlook_matchkeys(TL *,
+			SEARCHKEYS *,SEARCHKEYS_POP *,cchar *,int) noex ;
+static int	textlook_mkhkeys(TL *,vecstr *,SEARCHKEYS *) noex ;
 
-static int	textlook_lookuper(TEXTLOOK *,TEXTLOOK_CUR *,int,
-			SEARCHKEYS *,cchar **) ;
-static int	textlook_checkdisp(TEXTLOOK *,int,SEARCHKEYS *,RTAGS *) ;
+static int	textlook_lookuper(TL *,TEXTLOOK_CUR *,int,
+			SEARCHKEYS *,cchar **) noex ;
+static int	textlook_checkdisp(TL *,int,SEARCHKEYS *,RTAGS *) noex ;
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+static int	subinfo_start(SUBINFO *) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
 
-static int	disp_start(DISP *,DISP_ARGS *) ;
-static int	disp_starter(DISP *) ;
-static int	disp_finish(DISP *,int) ;
-static int	disp_addwork(DISP *,TXTINDEX_TAG *) ;
-static int	disp_setstate(DISP *,DISP_THR *,int) ;
-static int	disp_nbusy(DISP *) ;
-static int	disp_nexiting(DISP *) ;
-static int	disp_waitdone(DISP *) ;
-static int	disp_worker(DISP *) ;
-static int	disp_getourthr(DISP *,DISP_THR **) ;
-static int	disp_readyset(DISP *) ;
-static int	disp_readywait(DISP *) ;
+static int	disp_start(DISP *,DISP_ARGS *) noex ;
+static int	disp_starter(DISP *) noex ;
+static int	disp_finish(DISP *,int) noex ;
+static int	disp_addwork(DISP *,TXTINDEX_TAG *) noex ;
+static int	disp_setstate(DISP *,DISP_THR *,int) noex ;
+static int	disp_nbusy(DISP *) noex ;
+static int	disp_nexiting(DISP *) noex ;
+static int	disp_waitdone(DISP *) noex ;
+static int	disp_worker(DISP *) noex ;
+static int	disp_getourthr(DISP *,DISP_THR **) noex ;
+static int	disp_readyset(DISP *) noex ;
+static int	disp_readywait(DISP *) noex ;
 
-static int	tagq_start(TAGQ *,int) ;
-static int	tagq_finish(TAGQ *) ;
-static int	tagq_count(TAGQ *) ;
-static int	tagq_ins(TAGQ *,TXTINDEX_TAG *) ;
-static int	tagq_rem(TAGQ *,TXTINDEX_TAG *) ;
+static int	tagq_start(TAGQ *,int) noex ;
+static int	tagq_finish(TAGQ *) noex ;
+static int	tagq_count(TAGQ *) noex ;
+static int	tagq_ins(TAGQ *,TXTINDEX_TAG *) noex ;
+static int	tagq_rem(TAGQ *,TXTINDEX_TAG *) noex ;
 
-static int	mkfieldterms(uchar *) ;
+static int	mkfieldterms(uchar *) noex ;
 
 #ifdef	COMMENT
-static int	vcmpthreads(DISP_THR **,DISP_THR **) ;
+static int	vcmpthreads(DISP_THR **,DISP_THR **) noex ;
 #endif /* COMMENT */
 
 
 /* local variables */
 
+static char		wterms[32] ;
+
+
+/* exported variables */
+
+txtlook_obj		textlook_modinfo = {
+	"textlook",
+	szof(textlook),
+	szof(textlook_cur)
+} ;
+
 
 /* exported subroutines */
 
-
-int textlook_open(TEXTLOOK *op,cchar *pr,cchar *dbname,cchar *basedname)
-{
-	SUBINFO		si ;
+int textlook_open(TL *op,cchar *pr,cchar *dbname,cchar *bdname) noex {
 	int		rs ;
 	int		rs1 ;
+	if ((rs = textlook_ctor(op,pr,dbname,bdname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && dbname[0]) {
+		op->pr = pr ;
+		static cint	rsm = mkfieldterms(wterms) ;
+		if (rs = rsm) >= 0) {
+	            if ((op->pagesize = ucpagesize) >= 0) {
+	                if ((rs = textlook_inbegin(op,dbname,bdname)) >= 0) {
+			    SUBINFO	si ;
+	                    if ((rs = subinfo_start(&si)) >= 0) {
+	                        {
+	                            rs = textlook_indopen(op,&si) ;
+	                        }
+	                        rs1 = subinfo_finish(&si) ;
+	                        if (rs >= 0) rs = rs1 ;
+	                    } /* end if */
+	                    if (rs < 0) {
+	                        textlook_inend(op) ;
+	                    }
+	                } /* end if (textlook_inbegin) */
+	                if (rs >= 0) {
+	                    mkfieldterms(op->wterms) ;
+	                    op->magic = TEXTLOOK_MAGIC ;
+	                }
+	            } /* end if (ucpagesize) */
+		} /* end if (mkfieldterms) */
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(TEXTLOOK)) ;
-	op->pr = pr ;
-	op->pagesize = getpagesize() ;
-
-	if ((rs = textlook_infoloadbegin(op,dbname,basedname)) >= 0) {
-	    if ((rs = subinfo_start(&si)) >= 0) {
-	        {
-	            rs = textlook_indopen(op,&si) ;
-	        }
-	        rs1 = subinfo_finish(&si) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        textlook_infoloadend(op) ;
+		textlook_dtor(op) ;
 	    }
-	} /* end if (textlook_infoloadbegin) */
-
-	if (rs >= 0) {
-	    mkfieldterms(op->wterms) ;
-	    op->magic = TEXTLOOK_MAGIC ;
-	}
-
+	} /* end if (textlook_ctor) */
 	return rs ;
 }
 /* end subroutine (textlook_open) */
 
-
-int textlook_close(TEXTLOOK *op)
-{
-	int		rs = SR_OK ;
+int textlook_close(TL *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TEXTLOOK_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = textlook_dispfinish(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = textlook_snend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = textlook_indclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = textlook_infoloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = textlook_magic(op)) >= 0) {
+	    {
+	        rs1 = textlook_dispfinish(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = textlook_snend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = textlook_indclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = textlook_inend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = textlook_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (textlook_close) */
 
-
-int textlook_audit(TEXTLOOK *op)
-{
+int textlook_audit(TL *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TEXTLOOK_MAGIC) return SR_NOTOPEN ;
-
-	rs = txtindex_audit(&op->ind) ;
-
+	if ((rs = textlook_magic(op)) >= 0) {
+	    rs = txtindex_audit(&op->ind) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (textlook_audit) */
 
-
-int textlook_info(TEXTLOOK *op,TEXTLOOK_INFO *tlip)
-{
-	TXTINDEX_INFO	ti ;
+int textlook_getinfo(TL *op,TL_IN *tlip) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (tlip == NULL) return SR_FAULT ;
-
-	if (op->magic != TEXTLOOK_MAGIC) return SR_NOTOPEN ;
-
-	memset(tlip,0,sizeof(TEXTLOOK_INFO)) ;	/* do we want this? */
-
-	if ((rs = txtindex_info(&op->ind,&ti)) >= 0) {
-	    tlip->ctime = ti.ctime ;		/* index creation-time */
-	    tlip->mtime = ti.mtime ;		/* index modification-time */
-	    tlip->count = ti.count ;		/* number of tags */
-	    tlip->neigen = ti.neigen ;
-	    tlip->minwlen = ti.minwlen ;	/* minimum word length */
-	    tlip->maxwlen = ti.maxwlen ;	/* maximum word length */
-	    strwcpy(tlip->sdn,ti.sdn,MAXPATHLEN) ;
-	    strwcpy(tlip->sfn,ti.sfn,MAXPATHLEN) ;
-	} /* end if (textindex_info) */
-
+	if ((rs = textlook_magic(op,tlip)) >= 0) {
+	    TXTINDEX_INFO	ti ;
+	    memclear(tlip) ;
+	    if ((rs = txtindex_info(&op->ind,&ti)) >= 0) {
+	        tlip->ticreat = ti.ticreat ;	/* index creation-time */
+	        tlip->timod = ti.timod ;	/* index modification-time */
+	        tlip->count = ti.count ;	/* number of tags */
+	        tlip->neigen = ti.neigen ;
+	        tlip->minwlen = ti.minwlen ;	/* minimum word length */
+	        tlip->maxwlen = ti.maxwlen ;	/* maximum word length */
+	        strwcpy(tlip->sdn,ti.sdn,MAXPATHLEN) ;
+	        strwcpy(tlip->sfn,ti.sfn,MAXPATHLEN) ;
+	    } /* end if (textindex_info) */
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (textlook_info) */
+/* end subroutine (textlook_getinfo) */
 
-
-int textlook_curbegin(TEXTLOOK *op,TEXTLOOK_CUR *curp)
-{
+int textlook_curbegin(TL *op,TEXTLOOK_CUR *curp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != TEXTLOOK_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(TEXTLOOK_CUR)) ;
-	if ((rs = rtags_start(&curp->tags,0)) >= 0) {
-	    if ((rs = rtags_curbegin(&curp->tags,&curp->tcur)) >= 0) {
-	        op->ncursors += 1 ;
-	        curp->magic = TEXTLOOK_MAGIC ;
-	    }
-	    if (rs < 0)
-	        rtags_finish(&curp->tags) ;
-	} /* end if (rtags_start) */
-
+	if ((rs = textlook_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    if ((rs = rtags_start(&curp->tags,0)) >= 0) {
+	        if ((rs = rtags_curbegin(&curp->tags,&curp->tcur)) >= 0) {
+	            op->ncursors += 1 ;
+	            curp->magic = TEXTLOOK_MAGIC ;
+	        }
+	        if (rs < 0) {
+	            rtags_finish(&curp->tags) ;
+	        }
+	    } /* end if (rtags_start) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (textlook_curbegin) */
 
-
-int textlook_curend(TEXTLOOK *op,TEXTLOOK_CUR *curp)
-{
-	int		rs = SR_OK ;
+int textlook_curend(TL *op,TEXTLOOK_CUR *curp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != TEXTLOOK_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != TEXTLOOK_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = rtags_curend(&curp->tags,&curp->tcur) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = rtags_finish(&curp->tags) ;
-	if (rs >= 0) rs = rs1 ;
-
-	curp->ntags = 0 ;
-	if (op->ncursors > 0)
-	    op->ncursors -= 1 ;
-
+	if ((rs = textlook_magic(op,curp)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == TEXTLOOK_MAGIC) {
+		{
+		    rs1 = rtags_curend(&curp->tags,&curp->tcur) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    rs1 = rtags_finish(&curp->tags) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+	        curp->ntags = 0 ;
+	        if (op->ncursors > 0) {
+	            op->ncursors -= 1 ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (textlook_curend) */
 
-
-int textlook_lookup(TEXTLOOK *op,TEXTLOOK_CUR *curp,int qo,cchar **qsp)
-{
+int textlook_lookup(TL *op,TEXTLOOK_CUR *curp,int qo,cchar **qsp) noex {
 	SEARCHKEYS	sk ;
 	vecstr		hkeys ;			/* hash-keys */
 	int		rs = SR_OK ;
@@ -517,9 +469,7 @@ int textlook_lookup(TEXTLOOK *op,TEXTLOOK_CUR *curp,int qo,cchar **qsp)
 }
 /* end subroutine (textlook_lookup) */
 
-
-int textlook_read(TEXTLOOK *op,TEXTLOOK_CUR *curp,TEXTLOOK_TAG *tagp)
-{
+int textlook_read(TL *op,TEXTLOOK_CUR *curp,TEXTLOOK_TAG *tagp) noex {
 	RTAGS_TAG	rt ;
 	int		rs = SR_OK ;
 	int		fl = 0 ;
@@ -549,9 +499,7 @@ int textlook_read(TEXTLOOK *op,TEXTLOOK_CUR *curp,TEXTLOOK_TAG *tagp)
 }
 /* end subroutine (textlook_read) */
 
-
-int textlook_count(TEXTLOOK *op)
-{
+int textlook_count(TL *op) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -567,17 +515,15 @@ int textlook_count(TEXTLOOK *op)
 
 /* private subroutines */
 
-
-static int textlook_infoloadbegin(TEXTLOOK *op,cchar *dbname,cchar *basedname)
-{
+static int textlook_inbegin(TL *op,cchar *dbname,cchar *bdname) noex {
 	int		rs ;
 	cchar	*cp ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
 	    op->dbname = cp ;
-	    if (basedname != NULL) {
-	        rs = uc_mallocstrw(basedname,-1,&cp) ;
-	        op->basedname = cp ;
+	    if (bdname != NULL) {
+	        rs = uc_mallocstrw(bdname,-1,&cp) ;
+	        op->bdname = cp ;
 	    }
 	    if (rs < 0)
 	        uc_free(op->dbname) ;
@@ -585,18 +531,16 @@ static int textlook_infoloadbegin(TEXTLOOK *op,cchar *dbname,cchar *basedname)
 
 	return rs ;
 }
-/* end subroutine (textlook_infoloadbegin) */
+/* end subroutine (textlook_inbegin) */
 
-
-static int textlook_infoloadend(TEXTLOOK *op)
-{
+static int textlook_inend(TL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->basedname != NULL) {
-	    rs1 = uc_free(op->basedname) ;
+	if (op->bdname != NULL) {
+	    rs1 = uc_free(op->bdname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->basedname = NULL ;
+	    op->bdname = NULL ;
 	}
 
 	if (op->dbname != NULL) {
@@ -607,11 +551,9 @@ static int textlook_infoloadend(TEXTLOOK *op)
 
 	return rs ;
 }
-/* end subroutine (textlook_infoloadend) */
+/* end subroutine (textlook_inend) */
 
-
-static int textlook_indopen(TEXTLOOK *op,SUBINFO *sip)
-{
+static int textlook_indopen(TL *op,SUBINFO *sip) noex {
 	int		rs ;
 
 	if (sip == NULL) return SR_FAULT ;
@@ -627,9 +569,7 @@ static int textlook_indopen(TEXTLOOK *op,SUBINFO *sip)
 }
 /* end subroutine (textlook_indopen) */
 
-
-static int textlook_snbegin(TEXTLOOK *op)
-{
+static int textlook_snbegin(TL *op) noex {
 	int		rs ;
 	cchar	*cp ;
 
@@ -658,37 +598,30 @@ static int textlook_snbegin(TEXTLOOK *op)
 }
 /* end subroutines (textlook_snbegin) */
 
-
-static int textlook_snend(TEXTLOOK *op)
-{
+static int textlook_snend(TL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->sfn != NULL) {
 	    rs1 = uc_free(op->sfn) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->sfn = NULL ;
 	}
-
 	if (op->sdn != NULL) {
 	    rs1 = uc_free(op->sdn) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->sdn = NULL ;
 	}
-
 	return rs ;
 }
 /* end subroutines (textlook_snend) */
 
-
-static int textlook_indclose(TEXTLOOK *op)
-{
+static int textlook_indclose(TL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
+	{
 	rs1 = textlook_snend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	if (op->f.ind) {
 	    op->f.ind = FALSE ;
 	    rs1 = txtindex_close(&op->ind) ;
@@ -699,11 +632,8 @@ static int textlook_indclose(TEXTLOOK *op)
 }
 /* end subroutine (textlook_inclose) */
 
-
-/* does this primary tag have the query keys? */
-static int textlook_havekeys(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
-		SEARCHKEYS *skp)
-{
+static int textlook_havekeys(TL *op,TXTINDEX_TAG *tagp,int qo,
+		SEARCHKEYS *skp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -726,7 +656,7 @@ static int textlook_havekeys(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
 	                if (fn[0] != '/') {
 	                    dn = op->sdn ;
 	                    if ((dn == NULL) || (dn[0] == '\0')) {
-	                        dn = op->basedname ;
+	                        dn = op->bdname ;
 	                    }
 	                    if ((dn != NULL) && (dn[0] != '\0')) {
 	                        rs = mkpath2(fname,dn,fn) ;
@@ -751,11 +681,9 @@ static int textlook_havekeys(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
 }
 /* end subroutine (textlook_havekeys) */
 
-
-static int textlook_havekeyer(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
-		SEARCHKEYS *skp,SEARCHKEYS_POP *pkp,cchar *fn)
-{
-	cint	of = O_RDONLY ;
+static int textlook_havekeyer(TL *op,TXTINDEX_TAG *tagp,int qo,
+		SEARCHKEYS *skp,SEARCHKEYS_POP *pkp,cchar *fn) noex {
+	cint		of = O_RDONLY ;
 	int		rs ;
 	int		f = FALSE ;
 	if ((rs = u_open(fn,of,0666)) >= 0) {
@@ -778,11 +706,9 @@ static int textlook_havekeyer(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
 }
 /* end subroutine (textlook_havekeyer) */
 
-
 /* ARGSUSED */
-static int textlook_havekeyers(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
-		SEARCHKEYS *skp,int fd,SEARCHKEYS_POP *pkp)
-{
+static int textlook_havekeyers(TL *op,TXTINDEX_TAG *tagp,int qo,
+		SEARCHKEYS *skp,int fd,SEARCHKEYS_POP *pkp) noex {
 	off_t	recoff = tagp->recoff ;
 	off_t	recext ;
 	off_t	mo ;
@@ -830,8 +756,8 @@ static int textlook_havekeyers(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
 }
 /* end subroutine (textlook_havekeyers) */
 
-
-static int textlook_havekeysline(op,skp,pkp,lp,ll)
+/* HERE */
+static int textlook_havekeysline(TL *op,skp,pkp,lp,ll)
 TEXTLOOK	*op ;
 SEARCHKEYS	*skp ;
 SEARCHKEYS_POP	*pkp ;
@@ -883,7 +809,6 @@ int		ll ;
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (textlook_havekeysline) */
-
 
 /* do the keys match? */
 static int textlook_matchkeys(op,skp,pkp,sp,sl)
@@ -937,9 +862,7 @@ int		sl ;
 }
 /* end subroutine (textlook_matchkeys) */
 
-
-static int textlook_mkhkeys(TEXTLOOK *op,vecstr *hkp,SEARCHKEYS *skp)
-{
+static int textlook_mkhkeys(TL *op,vecstr *hkp,SEARCHKEYS *skp) noex {
 	SEARCHKEYS_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
@@ -966,7 +889,6 @@ static int textlook_mkhkeys(TEXTLOOK *op,vecstr *hkp,SEARCHKEYS *skp)
 	return (rs >= 0) ? nkeys : rs ;
 }
 /* end subroutine (textlook_mkhkeys) */
-
 
 static int textlook_lookuper(op,curp,qo,skp,hkeya)
 TEXTLOOK	*op ;
@@ -1014,34 +936,25 @@ cchar	**hkeya ;
 }
 /* end subroutine (textlook_lookuper) */
 
-
-static int textlook_checkdisp(TEXTLOOK *op,int qo,SEARCHKEYS *skp,RTAGS *rtp)
-{
+static int textlook_checkdisp(TL *op,int qo,SEARCHKEYS *skp,RTAGS *rtp) noex {
 	int		rs = SR_OK ;
-
 	if (op->disp == NULL) {
 	    rs = textlook_dispstart(op,qo,skp,rtp) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (textlook_checkdisp) */
 
-
-static int textlook_dispstart(TEXTLOOK *op,int qo,SEARCHKEYS *skp,RTAGS *rtp)
-{
+static int textlook_dispstart(TL *op,int qo,SEARCHKEYS *skp,RTAGS *rtp) noex {
 	int		rs = SR_OK ;
-
 	if (op->disp == NULL) {
 	    if ((rs = uptgetconcurrency()) >= 0) {
 	        cint	npar = (rs+1) ;
-	        cint	size = sizeof(DISP) ;
-	        void		*p ;
-	        if ((rs = uc_malloc(size,&p)) >= 0) {
+	        cint	size = szof(DISP) ;
+	        if (void *p ; (rs = uc_malloc(size,&p)) >= 0) {
 	            DISP	*dop = p ;
 	            {
-	                DISP_ARGS	a ;
-	                memset(&a,0,sizeof(DISP_ARGS)) ;
+	                DISP_ARGS	a{} ;
 	                a.op = op ;
 	                a.qo = qo ;
 	                a.skp = skp ;
@@ -1056,18 +969,14 @@ static int textlook_dispstart(TEXTLOOK *op,int qo,SEARCHKEYS *skp,RTAGS *rtp)
 	        } /* end if (memory-allocation) */
 	    } /* end if (uptgetconcurrency) */
 	} /* end if (needed start-up) */
-
 	return rs ;
 }
 /* end subroutine (textlook_dispstart) */
 
-
-static int textlook_dispfinish(TEXTLOOK *op)
-{
+static int textlook_dispfinish(TL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_abort = TRUE ;
-
 	if (op->disp != NULL) {
 	    DISP	*dop = op->disp ;
 	    rs1 = disp_finish(dop,f_abort) ;
@@ -1076,48 +985,39 @@ static int textlook_dispfinish(TEXTLOOK *op)
 	    if (rs >= 0) rs = rs1 ;
 	    op->disp = NULL ;
 	}
-
 	return rs ;
 }
 /* end subroutine (textlook_dispfinish) */
 
-
-static int subinfo_start(SUBINFO *sip)
-{
-	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
-	sip->daytime = time(NULL) ;
-
+static int subinfo_start(SUBINFO *sip) noex {
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = memclear(sip) ;
+	    sip->daytime = getustime ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (sip->f.id) {
 	    sip->f.id = FALSE ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int disp_start(DISP *dop,DISP_ARGS *dap)
-{
-	cint	qlen = TEXTLOOK_QLEN ;
+static int disp_start(DISP *dop,DISP_ARGS *dap) noex {
+	cint		qlen = TEXTLOOK_QLEN ;
 	int		rs ;
 
 	if (dop == NULL) return SR_FAULT ;
 
-	memset(dop,0,sizeof(DISP)) ;
+	memclear(dop) ;
 	dop->a = *dap ;
 	dop->nthr = dap->npar ;
 
@@ -1132,31 +1032,33 @@ static int disp_start(DISP *dop,DISP_ARGS *dap)
 	                    {
 	                        rs = disp_starter(dop) ;
 	                    }
-	                    if (rs < 0)
+	                    if (rs < 0) {
 	                        tagq_finish(&dop->wq) ;
+			    }
 	                } /* end if (tagq_start) */
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    psem_destroy(&dop->sem_done) ;
+			}
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                psem_destroy(&dop->sem_wq) ;
+		    }
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 	            ptc_destroy(&dop->cond) ;
+		}
 	    } /* end if (ptc-create) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        ptm_destroy(&dop->m) ;
+	    }
 	} /* end if (ptm-create) */
 
 	return rs ;
 }
 /* end subroutine (disp_start) */
 
-
-/* start-up helper */
-static int disp_starter(DISP *dop)
-{
-	cint	size = (dop->nthr*sizeof(DISP_THR)) ;
+static int disp_starter(DISP *dop) noex {
+	cint		size = (dop->nthr * szof(DISP_THR)) ;
 	int		rs ;
 	int		i ;
 	void		*p ;
@@ -1196,9 +1098,7 @@ static int disp_starter(DISP *dop)
 }
 /* end subroutine (disp_starter) */
 
-
-static int disp_finish(DISP *dop,int f_abort)
-{
+static int disp_finish(DISP *dop,int f_abort) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -1206,9 +1106,9 @@ static int disp_finish(DISP *dop,int f_abort)
 	if (dop == NULL) return SR_FAULT ;
 
 	dop->f_done = TRUE ;		/* assumed to be atomic! */
-	if (f_abort)
+	if (f_abort) {
 	    dop->f_exit = TRUE ;	/* assumed to be atomic! */
-
+	}
 	for (i = 0 ; i < dop->nthr ; i += 1) {
 	    rs1 = psem_post(&dop->sem_wq) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1231,41 +1131,38 @@ static int disp_finish(DISP *dop,int f_abort)
 	    if (rs >= 0) rs = rs1 ;
 	    dop->threads = NULL ;
 	} /* end if (threads) */
-
+	{
 	rs1 = tagq_finish(&dop->wq) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = psem_destroy(&dop->sem_done) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = psem_destroy(&dop->sem_wq) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = ptm_destroy(&dop->m) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
 }
 /* end subroutine (disp_finish) */
 
-
-static int disp_addwork(DISP *dop,TXTINDEX_TAG *tagp)
-{
+static int disp_addwork(DISP *dop,TXTINDEX_TAG *tagp) noex {
 	int		rs ;
-
 	if ((rs = tagq_ins(&dop->wq,tagp)) >= 0) {
 	    rs = psem_post(&dop->sem_wq) ; /* post always (more parallelism) */
 	}
-
 	return rs ;
 }
 /* end subroutine (disp_addwork) */
 
-
 /* worker threads call this to set their "busy" status */
-static int disp_setstate(DISP *dop,DISP_THR *tip,int f)
-{
-	PTM		*mp = &dop->m ;
+static int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
+	ptm		*mp = &dop->m ;
 	int		rs ;
 	int		rs1 ;
 	int		f_prev = FALSE ;
@@ -1283,10 +1180,8 @@ static int disp_setstate(DISP *dop,DISP_THR *tip,int f)
 }
 /* end subroutine (disp_setstate) */
 
-
 /* main or manager thread calls this to find out how many workers are busy */
-static int disp_nbusy(DISP *dop)
-{
+static int disp_nbusy(DISP *dop) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	if (dop->threads != NULL) {
@@ -1301,25 +1196,20 @@ static int disp_nbusy(DISP *dop)
 }
 /* end subroutine (disp_nbusy) */
 
-
 /* manager thread calls this get get number of exited workers */
-static int disp_nexiting(DISP *dop)
-{
+static int disp_nexiting(DISP *dop) noex {
 	DISP_THR	*dtp = dop->threads ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		n = 0 ;
-	for (i = 0 ; i < dop->nthr ; i += 1) {
+	for (int i = 0 ; i < dop->nthr ; i += 1) {
 	    if (dtp[i].f_exiting) n += 1 ;
 	}
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (disp_nexiting) */
 
-
 /* main-thread calls this to wait for a parallel query to complete */
-static int disp_waitdone(DISP *dop)
-{
+static int disp_waitdone(DISP *dop) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		nbusy = -1 ;
@@ -1363,9 +1253,7 @@ static int disp_waitdone(DISP *dop)
 }
 /* end subroutine (disp_waitdone) */
 
-
-static int disp_worker(DISP *dop)
-{
+static int disp_worker(DISP *dop) noex {
 	DISP_THR	*dtp ;
 	int		rs ;
 	int		rs1 ;
@@ -1421,10 +1309,8 @@ static int disp_worker(DISP *dop)
 }
 /* end subroutine (disp_worker) */
 
-
 /* child thread calls this to get its own local-data pointer */
-static int disp_getourthr(DISP *dop,DISP_THR **rpp)
-{
+static int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	int		f = FALSE ;
@@ -1446,11 +1332,9 @@ static int disp_getourthr(DISP *dop,DISP_THR **rpp)
 }
 /* end subroutine (disp_getourthr) */
 
-
 /* main-thread calls this to indicate sub-threads can read completed object */
-static int disp_readyset(DISP *dop)
-{
-	PTM		*mp = &dop->m ;
+static int disp_readyset(DISP *dop) noex {
+	ptm		*mp = &dop->m ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lock(mp)) >= 0) {
@@ -1465,11 +1349,9 @@ static int disp_readyset(DISP *dop)
 }
 /* end subroutine (disp_readyset) */
 
-
 /* sub-threads call this to wait until object is ready */
-static int disp_readywait(DISP *dop)
-{
-	PTM		*mp = &dop->m ;
+static int disp_readywait(DISP *dop) noex {
+	ptm		*mp = &dop->m ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lock(mp)) >= 0) {
@@ -1484,10 +1366,8 @@ static int disp_readywait(DISP *dop)
 }
 /* end subroutine (disp_readywait) */
 
-
 /* this object ('TAGQ') forms the Q of work going into the worker threads */
-static int tagq_start(TAGQ *tqp,int n)
-{
+static int tagq_start(TAGQ *tqp,int n) noex {
 	cint		f_shared = FALSE ;
 	int		rs ;
 
@@ -1495,57 +1375,51 @@ static int tagq_start(TAGQ *tqp,int n)
 
 	if ((rs = psem_create(&tqp->wsem,f_shared,n)) >= 0) {
 	    rs = ciq_start(&tqp->q) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        psem_destroy(&tqp->wsem) ;
+	    }
 	}
 
 	return rs ;
 }
 /* end subroutine (tagq_start) */
 
-
-static int tagq_finish(TAGQ *tqp)
-{
-	CIQ		*cqp = &tqp->q ;
+static int tagq_finish(TAGQ *tqp) noex {
+	ciq		*cqp = &tqp->q ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rs2 ;
 	char		*p ;
-
 	while ((rs2 = ciq_rem(cqp,&p)) >= 0) {
 	    rs1 = uc_free(p) ; /* these things are opaque */
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if ((rs >= 0) && (rs2 != SR_NOTFOUND)) rs = rs2 ;
-
+	{
 	rs1 = ciq_finish(cqp) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = psem_destroy(&tqp->wsem) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
 }
 /* end subroutine (tagq_finish) */
 
-
-static int tagq_count(TAGQ *tqp)
-{
-
+static int tagq_count(TAGQ *tqp) noex {
 	return ciq_count(&tqp->q) ;
 }
 /* end subroutine (tagq_finish) */
 
-
-static int tagq_ins(TAGQ *tqp,TXTINDEX_TAG *tagp)
-{
+static int tagq_ins(TAGQ *tqp,TXTINDEX_TAG *tagp) noex {
 	TAGQ_THING	*ttp ;
 	int		rs ;
 	int		size ;
 	int		rc = 0 ;
 	void		*p ;
 
-	size = sizeof(TAGQ_THING) + strlen(tagp->fname) + 1 ;
+	size = szof(TAGQ_THING) + strlen(tagp->fname) + 1 ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 
 	    ttp = (TAGQ_THING *) p ;
@@ -1565,9 +1439,7 @@ static int tagq_ins(TAGQ *tqp,TXTINDEX_TAG *tagp)
 }
 /* end subroutine (tagq_ins) */
 
-
-static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp)
-{
+static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp) noex {
 	TAGQ_THING	*ttp ;
 	int		rs ;
 	int		len = 0 ;
@@ -1587,18 +1459,22 @@ static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp)
 /* end subroutine (tagq_rem) */
 
 static int mkfieldterms(uchar *wterms) noex {
-	for (int i = 0 ; i < 32 ; i += 1) {
-	    wterms[i] = 0xFF ;
-	}
-	for (int i = 0 ; i < 256 ; i += 1) {
-	    if (isalnumlatin(i)) {
-	        BACLR(wterms,i) ;
+    	int		rs = SR_FAULT ;
+	if (wterms) {
+	    rs = SR_OK ;
+	    for (int i = 0 ; i < 32 ; i += 1) {
+	        wterms[i] = 0xFF ;
 	    }
-	} /* end for */
-	BACLR(wterms,CH_SQUOTE) ;		/* allow apostrophe */
-	BACLR(wterms,'_') ;			/* allow under-score */
-	BACLR(wterms,'-') ;			/* allow minus-sign */
-	return SR_OK ;
+	    for (int i = 0 ; i < 256 ; i += 1) {
+	        if (isalnumlatin(i)) {
+	            baclr(wterms,i) ;
+	        }
+	    } /* end for */
+	    baclr(wterms,CH_SQUOTE) ;		/* allow apostrophe */
+	    baclr(wterms,'_') ;			/* allow under-score */
+	    baclr(wterms,'-') ;			/* allow minus-sign */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (mkfieldterms) */
 

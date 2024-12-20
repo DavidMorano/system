@@ -14,6 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
+#include	<fcntl.h>		/* |mode_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -27,7 +28,7 @@
 
 #define	FILECOUNTS		struct filecounts_head
 #define	FILECOUNTS_N		struct filecounts_name
-#define	FILECOUNTS_INFO		struct filecounts_infomation
+#define	FILECOUNTS_INFO		struct filecounts_information
 #define	FILECOUNTS_CUR		struct filecounts_cursor
 #define	FILECOUNTS_II		struct filecounts_iil
 #define	FILECOUNTS_FL		struct filecounts_flags
@@ -40,13 +41,13 @@ struct filecounts_iil {
 } ;
 
 struct filecounts_cursor {
-	uint		magic ;
 	FILECOUNTS_II	*listp ;	/* list-pointer */
+	uint		magic ;
 	int		listn ;		/* list-number */
 	int		i ;
 } ;
 
-struct filecounts_infomation {
+struct filecounts_information {
 	time_t		utime ;		/* last update time */
 	int		value ;		/* counter previous value */
 } ;
@@ -68,12 +69,12 @@ struct filecounts_head {
 	int		ncursors ;
 } ;
 
-extern	FILECOUNTS		filecounts ;
-extern	FILECOUNTS_N		filecounts_n ;
-extern	FILECOUNTS_INFO		filecounts_info ;
-extern	FILECOUNTS_CUR		filecounts_cur ;
-extern	FILECOUNTS_II		filecounts_ii ;
-extern	FILECOUNTS_FL		filecounts_fl ;
+typedef	FILECOUNTS		filecounts ;
+typedef	FILECOUNTS_N		filecounts_n ;
+typedef	FILECOUNTS_INFO		filecounts_info ;
+typedef	FILECOUNTS_CUR		filecounts_cur ;
+typedef	FILECOUNTS_II		filecounts_ii ;
+typedef	FILECOUNTS_FL		filecounts_fl ;
 
 EXTERNC_begin
 

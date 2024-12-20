@@ -44,12 +44,15 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<getpwd.h>
+#include	<absfn.h>
 #include	<mkpathx.h>
-#include	<ismatstar.h>
+#include	<vecobj.h>
 #include	<bfile.h>
 #include	<field.h>
-#include	<vecobj.h>
+#include	<ismatstar.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"systems.h"
@@ -61,9 +64,10 @@
 #define	CUR		systems_cur
 #define	ENT		systems_ent
 
-#define	TI_SYS_FILECHECK	3
-#define	SYSLINELEN	((4 * 1024) + 1)
-#define	ARGSBUFLEN	((6 * MAXPATHLEN) + 35)
+#define	TI_FILECHECK	3
+
+#define	FILELINEMULT	6
+#define	FILEARGSMULT	6
 
 
 /* imported namespaces */
@@ -84,6 +88,16 @@ using std::nothrow ;			/* constant */
 
 
 /* local structures */
+
+namespace {
+    struct vars {
+	int		maxpathlen ;
+	int		maxlinelen ;
+	int		filelinelen ;
+	int		fileargslen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
 
 struct systems_file {
 	cchar		*fname ;
@@ -146,8 +160,6 @@ static inline int systems_magic(systems *op,Args ... args) noex {
 /* end subroutine (systems_magic) */
 
 static int systems_fileparse(systems *,int,SYS_FILE *) noex ;
-static int systems_filealready(systems *,dev_t,ino_t) noex ;
-static int systems_procline(systems *,int,field *) noex ;
 static int systems_delfes(systems *,int) noex ;
 
 static int file_start(SYS_FILE *,cchar *) noex ;
@@ -158,10 +170,10 @@ static int entry_dialer(ENT *,cchar *,int) noex ;
 static int entry_args(ENT *,cchar *,int) noex ;
 static int entry_finish(ENT *) noex ;
 
-static int bdumpline(bfile *,char *,int) noex ;
-
 
 /* local variables */
+
+static vars		var ;
 
 /* entry field terminators */
 constexpr cchar		fterms[32] = {
@@ -196,30 +208,33 @@ constexpr cchar		remterms[32] = {
 int systems_open(systems *op,cchar *sysfname) noex {
 	int		rs ;
 	if ((rs = systems_ctor(op)) >= 0) {
-	    int		sz = szof(SYS_FILE) ;
-	    int		vn = 10 ;
-	    int		vo = VECOBJ_OREUSE ;
-	    if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
-	        sz = szof(ENT) ;
-		vn = 20 ;
-	        vo = 0 ;
-	        if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
-	            op->magic = SYSTEMS_MAGIC ;
-	            if (sysfname) {
-	                rs = systems_fileadd(op,sysfname) ;
+	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+	        int	sz = szof(SYS_FILE) ;
+	        int	vn = 10 ;
+	        int	vo = VECOBJ_OREUSE ;
+	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
+	            sz = szof(ENT) ;
+		    vn = 20 ;
+	            vo = 0 ;
+	            if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
+	                op->magic = SYSTEMS_MAGIC ;
+	                if (sysfname) {
+	                    rs = systems_fileadd(op,sysfname) ;
+	                }
+	                if (rs < 0) {
+		            op->magic = 0 ;
+		            vecobj_finish(op->elp) ;
+	                }
 	            }
 	            if (rs < 0) {
-		        op->magic = 0 ;
-		        vecobj_finish(op->elp) ;
+	               vecobj_finish(op->flp) ;
 	            }
-	        }
-	        if (rs < 0) {
-	           vecobj_finish(op->flp) ;
-	        }
-	    } /* end if (vecobj_start) */
-	     if (rs < 0) {
-		 systems_dtor(op) ;
-	     }
+	        } /* end if (vecobj_start) */
+	    } /* end if (vars) */
+	    if (rs < 0) {
+		systems_dtor(op) ;
+	    }
 	} /* end if (systems_ctor) */
 	return rs ;
 }
@@ -268,19 +283,10 @@ int systems_close(systems *op) noex {
 
 int systems_fileadd(systems *op,cchar *sysfname) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = systems_magic(op,sysfname)) >= 0) {
 	    cchar	*sp ;
-	    char	tmpfname[MAXPATHLEN + 1] ;
-	    /* make a file pathname if necessary */
-	    sp = sysfname ;
-	    if (sysfname[0] != '/') {
-	        char	pwdbuf[MAXPATHLEN+1] ;
-	        if ((rs = getpwd(pwdbuf,MAXPATHLEN)) >= 0) {
-	            sp = tmpfname ;
-	            rs = mkpath2(tmpfname,pwdbuf,sysfname) ;
-	        }
-	    } /* end if */
-	    if (rs >= 0) {
+	    if (absfn sfn ; (rs = sfn.start(sysfname,-1,&sp)) >= 0) {
 	        if (SYS_FILE fe ; (rs = file_start(&fe,sp)) >= 0) {
 	            if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
 	                cint	fi = rs ;
@@ -302,6 +308,8 @@ int systems_fileadd(systems *op,cchar *sysfname) noex {
 		        file_finish(&fe) ;
 		    }
 	        } /* end if (file_start) */
+		rs1 = sfn.finish ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
@@ -331,8 +339,7 @@ int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 	int		ei = 0 ;
 	if ((rs = systems_magic(op,curp,depp)) >= 0) {
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	    void	*vp{} ;
-	    if ((rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
 	        *depp = (ENT *) vp ;
 	        curp->i = ei ;
 	    }
@@ -370,26 +377,31 @@ int systems_check(systems *op,time_t dt) noex {
 	if (dt <= 0) dt = getustime ;
 	if ((rs = systems_magic(op)) >= 0) {
 	    /* should we even check? */
-	    if ((dt - op->checktime) > TI_SYS_FILECHECK) {
+	    if ((dt - op->checktime) > TI_FILECHECK) {
 	        USTAT	sb ;
 	        void	*vp{} ;
-	        bool	f = false ;
 	        op->checktime = dt ;
 	        for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
 	            SYS_FILE	*fep = (SYS_FILE *) vp ;
 	            if (vp) {
-	                rs = u_stat(fep->fname,&sb) ;
-		        csize	fsize = size_t(sb.st_size) ;
-	                f = ((rs < 0) || (sb.st_mtime > fep->timod) || 
-	                    (fsize != fep->fsize)) ;
-	                if (f) {
+	        	bool	fdel = false ;
+	                if ((rs = u_stat(fep->fname,&sb)) >= 0) {
+		            csize	fsize = size_t(sb.st_size) ;
+			    rs = SR_OK ;
+			    fdel = fdel || (sb.st_mtime > fep->timod) ;
+			    fdel = fdel || (fsize != fep->fsize) ;
+			} else if (isNotPresent(rs)) {
+			    rs = SR_OK ;
+			    fdel = true ;
+			}
+	                if ((rs >= 0) && fdel) {
 	                    c += 1 ;
 	                    systems_delfes(op,i) ;
 	                    if (rs >= 0) {
 	                        systems_fileparse(op,i,fep) ;
 		            }
 	                } /* end if (file changed) */
-	            }
+		    } /* end if (non-null) */
 	        } /* end for */
 	    } /* end if (needed) */
 	} /* end if (magic) */
@@ -400,7 +412,46 @@ int systems_check(systems *op,time_t dt) noex {
 
 /* private subroutines */
 
+namespace {
+    struct parser {
+	systems	*op ;
+	char	*lbuf ;
+	char	*abuf ;
+	int	llen ;
+	int	alen ;
+	int	fi ; /* file-index */
+	parser(systems *p,int i) noex : op(p), fi(i) { } ;
+	int operator () (SYS_FILE *) noex ;
+	int parse(SYS_FILE *) noex ;
+	int parsealready(dev_t,ino_t) noex ;
+	int parseln(field *) noex ;
+    } ; /* end struct (parser) */
+}
+
+int parser::operator () (SYS_FILE *fep) noex {
+	cint		sz = (var.filelinelen + var.fileargslen + 2) ;
+    	int		rs ;
+	int		c = 0 ;
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    lbuf = a ;
+	    llen = var.filelinelen ;
+	    abuf = (a + (var.filelinelen + 1)) ;
+	    alen = var.fileargslen ;
+	    {
+		rs = parse(fep) ;
+		c = rs ;
+	    }
+	    rs = rsfree(rs,a) ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+}
+
 static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
+	parser po(op,fi) ;
+       	return po(fep) ;
+}
+
+int parser::parse(SYS_FILE *fep) noex {
     	cnullptr	np{} ;
 	bfile		dialfile, *sfp = &dialfile ;
 	int		rs ;
@@ -410,10 +461,7 @@ static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
 	    if (USTAT sb ; (rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) {
 		const dev_t	dev = sb.st_dev ;
 		const ino_t	ino = sb.st_ino ;
-		if ((rs = systems_filealready(op,dev,ino)) == 0) {
-		    cint	llen = SYSLINELEN ;
-		    char	*lbuf ;
-		    if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
+		if ((rs = parsealready(dev,ino)) == 0) {
 		        field	fsb ;
 			cint	to = -1 ;
 		        int	len ;
@@ -423,36 +471,21 @@ static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
 		        fep->ino = sb.st_ino ;
 		        while ((rs = breadlns(sfp,lbuf,llen,to,np)) > 0) {
 	    	            len = rs ;
-
-	    	        if (len == 1) continue ;	/* blank line */
-
-	    	        if (lbuf[len - 1] != '\n') {
-			    bdumpline(sfp,lbuf,llen) ;
-	        	    continue ;
-	    	        }
-
-	    		len -= 1 ;
-	    		if ((len == 0) || (lbuf[0] == '#')) continue ;
-
-	    	        if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
-			    int		fl ;
-			    cchar	*fp ;
-
-	        	    fl = field_get(&fsb,fterms,&fp) ;
-
-	        	    if ((fl > 0) && (fsb.term != '#')) {
-	            	        rs = systems_procline(op,fi,&fsb) ;
-	            	        if (rs > 0) c += 1 ;
-	        	    } /* end if */
-
-	        	    field_finish(&fsb) ;
-	    	        } /* end if (field) */
-
-	                if (rs < 0) break ;
-	            } /* end while (reading lines) */
-			rs1 = uc_free(lbuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a) */
+	    		    if ((len <= 1) || (lbuf[0] == '#')) continue ;
+	    	            if ((rs = fsb.start(lbuf,len)) >= 0) {
+			        int	fl ;
+			        cchar	*fp ;
+	        	        if ((fl = fsb.get(fterms,&fp)) >= 0) {
+	        	            if (fsb.term != '#') {
+	            	                rs = parseln(&fsb) ;
+	            	                if (rs > 0) c += 1 ;
+	        	            } /* end if */
+			        }
+	        	        rs1 = fsb.finish ;
+			        if (rs >= 0) rs = rs1 ;
+	    	            } /* end if (field) */
+	                    if (rs < 0) break ;
+	                } /* end while (reading lines) */
 	        } /* end if (not-already) */
 	    } /* end if (bcontrol) */
 	    rs1 = bclose(sfp) ;
@@ -460,9 +493,9 @@ static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
 	} /* end if (file) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (systems_fileparse) */
+/* end method (parser::parse) */
 
-static int systems_filealready(systems *op,dev_t dev,ino_t ino) noex {
+int parser::parsealready(dev_t dev,ino_t ino) noex {
 	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -478,9 +511,9 @@ static int systems_filealready(systems *op,dev_t dev,ino_t ino) noex {
 	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (systems_filealready) */
+/* end method (parser::parsealready) */
 
-static int systems_procline(systems *op,int fi,field *fsp) noex {
+int parser::parseln(field *fsp) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if ((fsp->fl > 0) && (fsp->term != '#')) {
@@ -491,9 +524,7 @@ static int systems_procline(systems *op,int fi,field *fsp) noex {
 	        if ((fl = fsp->get(fterms,&fp)) > 0) {
 	            if ((rs = entry_dialer(&e,fp,fl)) >= 0) {
 	                if (fsp->term != '#') {
-	                    cint	alen = ARGSBUFLEN ;
 			    cchar	*ft = remterms ;
-	                    char	abuf[ARGSBUFLEN + 1] ;
 	                    if ((rs = fsp->srvarg(ft,abuf,alen)) >= 0) {
 	                	cint	al = rs ;
 	                	if ((rs = entry_args(&e,abuf,al)) >= 0) {
@@ -514,7 +545,7 @@ static int systems_procline(systems *op,int fi,field *fsp) noex {
 	} /* end if (possible) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (systems_procline) */
+/* end method (parser::parseln) */
 
 static int systems_delfes(systems *op,int fi) noex {
 	vecobj		*elp = op->elp ;
@@ -632,15 +663,18 @@ static int entry_finish(ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int bdumpline(bfile *fp,char *lbuf,int llen) noex {
-    	cnullptr	np{} ;
-    	cint		to = -1 ;
-	int		rs ;
-	while ((rs = breadlns(fp,lbuf,llen,to,np)) > 0) {
-	    if (lbuf[rs - 1] == '\n') break ;
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+		maxlinelen = rs ;
+		filelinelen = (maxlinelen * FILELINEMULT) ;
+		fileargslen = (maxpathlen * FILEARGSMULT) ;
+	    }
 	}
 	return rs ;
 }
-/* end subroutine (bdumpline) */
+/* end method (vars::operator) */
 
 

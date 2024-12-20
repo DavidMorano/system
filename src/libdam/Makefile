@@ -735,6 +735,11 @@ dayofmonth.o:		dayofmonth.cc dayofmonth.h
 netfile.o:		netfile.cc netfile.h
 calmgr.o:		calmgr.cc calmgr.h
 
+textlook.o:		textlook.cc textlook.h
+searchkeys.o:		searchkeys.cc searchkeys.h
+xwords.o:		xwords.cc xwords.h
+rtags.o:		rtags.cc rtags.h
+
 # DATABASE
 database.o:		database.dir
 database.dir:

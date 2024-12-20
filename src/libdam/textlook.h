@@ -15,12 +15,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<eigendb.h>
-#include	<vecobj.h>
-#include	<psem.h>
-#include	<ptm.h>
-
-#include	"txtindex.h"
-#include	"rtags.h"
+#include	<txtindex.h>
+#include	<rtags.h>
 
 
 #define	TEXTLOOK_MAGIC	0x99889298
@@ -35,8 +31,8 @@
 
 
 struct textlook_information {
-	time_t		ctime ;		/* index creation-time */
-	time_t		mtime ;		/* index modification-time */
+	time_t		ticreat ;	/* index creation-time */
+	time_t		timod ;		/* index modification-time */
 	uint		count ;		/* number of tags */
 	uint		neigen ;
 	uint		minwlen ;	/* minimum word length */
@@ -58,9 +54,9 @@ struct textlook_object {
 } ;
 
 struct textlook_cursor {
+	rtags		tags ;
+	rtags_cur	tcur ;
 	uint		magic ;
-	RTAGS		tags ;
-	RTAGS_CUR	tcur ;
 	int		ntags ;
 } ;
 
@@ -78,18 +74,17 @@ struct textlook_head {
 	cchar		*sdn ;
 	cchar		*sfn ;
 	void		*disp ;
-	TEXTLOOK_FL	f ;
-	EIGENDB		edb ;
-	TXTINDEX	ind ;
+	eigendb		edb ;
+	txtindex	ind ;
 	time_t		ti_lastcheck ;
 	time_t		ti_tind ;		/* text-index */
+	TEXTLOOK_FL	f ;
 	uint		magic ;
 	int		pagesize ;
 	int		dbfsize ;		/* DB file-size */
 	int		mapsize ;		/* historial (for mapping) */
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
-	uchar		wterms[32] ;
 } ;
 
 #define	TEXTLOOK	struct textlook_head
@@ -103,7 +98,7 @@ EXTERNC_begin
 
 extern int textlook_open(textlook *,cchar *,cchar *,cchar *) noex ;
 extern int textlook_count(textlook *) noex ;
-extern int textlook_info(textlook *,textlook_info *) noex ;
+extern int textlook_getinfo(textlook *,textlook_info *) noex ;
 extern int textlook_curbegin(textlook *,textlook_cur *) noex ;
 extern int textlook_lookup(textlook *,textlook_cur *,int,cchar **) noex ;
 extern int textlook_read(textlook *,textlook_cur *,textlook_tag *) noex ;

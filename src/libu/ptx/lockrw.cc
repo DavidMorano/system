@@ -365,7 +365,7 @@ int lockrw_co::operator () (int to) noex {
 /* end method (lockrw_co::operator) */
 
 void lockrw::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
+	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("lockrw",rs,"fini-finish") ;
 	}
 }

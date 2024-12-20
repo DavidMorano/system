@@ -1,4 +1,4 @@
-/* rtags SUPPORT */
+/* rtags SUPPORT (Result-Tags) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -46,12 +46,13 @@
 
 /* local defines */
 
-#define	RT		rtags
+#define	RT	rtags
+#define	RT_TE	rtags_te
 
-#define	FNAME		rtags_fname
-#define	TAG		rtags_te
+#define	FNAME	rtags_fname
+#define	CUR	rtags_cur
 
-#define	NDEFS		10
+#define	NDEFS	10
 
 
 /* imported namespaces */
@@ -80,11 +81,6 @@ struct rtags_fname {
 
 
 /* forward references */
-
-	vecobj		*flp ;		/* file-list-pointer */
-	vecobj		*tlp ;		/* tag-list-pointer */
-	hdb		*hdp ;		/* has-data-pointer */
-	ptm		*mxp ;		/* mutex-pointer */
 
 template<typename ... Args>
 static int rtags_ctor(rtags *op,Args ... args) noex {
@@ -133,12 +129,12 @@ static int rtags_dtor(rtags *op) noex {
 		op->hdp = nullptr ;
 	    }
 	    if (op->tlp) {
-		delete op->tdp ;
-		op->tdp = nullptr ;
+		delete op->tlp ;
+		op->tlp = nullptr ;
 	    }
 	    if (op->flp) {
-		delete op->fdp ;
-		op->fdp = nullptr ;
+		delete op->flp ;
+		op->flp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -146,7 +142,7 @@ static int rtags_dtor(rtags *op) noex {
 /* end subroutine (rtags_dtor) */
 
 template<typename ... Args>
-static inline int rtags_magic(termtrans *op,Args ... args) noex {
+static inline int rtags_magic(rtags *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -158,11 +154,11 @@ static inline int rtags_magic(termtrans *op,Args ... args) noex {
 static int	fname_start(FNAME *,cchar *,int) noex ;
 static int	fname_finish(FNAME *) noex ;
 
-static int	tag_start(TAG *,int,int,int) noex ;
-static int	tag_finish(TAG *) noex ;
+static int	tagent_start(RT_TE *,int,int,int) noex ;
+static int	tagent_finish(RT_TE *) noex ;
 
 static int	vcmpdef(cvoid **,cvoid **) noex ;
-static int	cmpdefe(RTAGS_TE *,RTAGS_TE *) noex ;
+static int	cmpdefe(RT_TE *,RT_TE *) noex ;
 
 
 /* local variables */
@@ -176,16 +172,16 @@ static int	cmpdefe(RTAGS_TE *,RTAGS_TE *) noex ;
 int rtags_start(rtags *op,int vn) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	if (vn < NDEFS) n = NDEFS ;
+	if (vn < NDEFS) vn = NDEFS ;
 	if ((rs = rtags_ctor(op)) >= 0) {
-	    if ((rs = hdb_start(&op->fni,vn,1,np,np)) >= 0) {
-	        cint	vo = VECOBJ_OSTATIONARY ;
-	        cint	vsz = szof(FNAME) ;
+	    if ((rs = hdb_start(op->hdp,vn,1,np,np)) >= 0) {
+	        int	vo = VECOBJ_OSTATIONARY ;
+	        int	vsz = szof(FNAME) ;
 	        if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) {
-	            size = szof(TAG) ;
-	            opts = 0 ;
-	            if ((rs = vecobj_start(op->tlp,size,n,opts)) >= 0) {
-	                if ((rs = ptm_create(&op->m,np)) >= 0) {
+	            vsz = szof(RT_TE) ;
+	            vo = 0 ;
+	            if ((rs = vecobj_start(op->tlp,vsz,vn,vo)) >= 0) {
+	                if ((rs = ptm_create(op->mxp,np)) >= 0) {
 	                    op->magic = RTAGS_MAGIC ;
 	                }
 	                if (rs < 0) {
@@ -197,7 +193,7 @@ int rtags_start(rtags *op,int vn) noex {
 		    }
 	        }
 	        if (rs < 0) {
-	            hdb_finish(&op->fni) ;
+	            hdb_finish(op->hdp) ;
 	        }
 	    }
 	    if (rs < 0) {
@@ -211,15 +207,16 @@ int rtags_start(rtags *op,int vn) noex {
 int rtags_finish(rtags *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = rtags_magic(op)) {
+	if ((rs = rtags_magic(op)) >= 0) {
 	    {
-	        rs1 = ptm_destroy(&op->m) ;
+	        rs1 = ptm_destroy(op->mxp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    /* free up all files */
-	    FNAME		*fep ;
-	    for (int i = 0 ; vecobj_get(op->flp,i,&fep) >= 0 ; i += 1) {
-	        if (fep != nullptr) {
+	    void	*vp{} ;
+	    for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	        FNAME	*fep = (FNAME *) vp ;
+	        if (vp) {
 	            rs1 = fname_finish(fep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
@@ -234,7 +231,7 @@ int rtags_finish(rtags *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs1 = hdb_finish(&op->fni) ;
+		rs1 = hdb_finish(op->hdp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -247,236 +244,195 @@ int rtags_finish(rtags *op) noex {
 }
 /* end subroutine (rtags_finish) */
 
-int rtags_add(rtags *op,RTAGS_TAG *tip) noex {
-	RTAGS_TE	te ;
-	FNAME		fe, *fep ;
-	HDB_DATUM	key, value ;
+int rtags_add(rtags *op,RT_TE *tip,cchar *fname) noex {
 	int		rs ;
-	int		fi ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (tip == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-	    const int	nrs = SR_NOTFOUND ;
-
-	    key.buf = tip->fname ;
-	    key.len = strlen(tip->fname) ;
-
-	    value.buf = nullptr ;
-	    value.len = 0 ;
-
-/* is the filename already present? */
-
-	    if ((rs = hdb_fetch(&op->fni,key,nullptr,&value)) == nrs) {
-
-	        if ((rs = fname_start(&fe,tip->fname,op->nfiles)) >= 0) {
-
-	            if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
-	                fi = rs ;
-
-	                vecobj_get(op->flp,fi,&fep) ;
-
-	                key.buf = fep->name ;
-	                key.len = strlen(fep->name) ;
-
-	                value.buf = fep ;
-	                value.len = szof(FNAME) ;
-
-	                rs = hdb_store(&op->fni,key,value) ;
-	                if (rs < 0) {
-	                    vecobj_del(op->flp,fi) ;
-			}
-	            } else {
-	                fname_finish(&fe) ;
+	int		rs1 ;
+	if ((rs = rtags_magic(op,tip,fname)) >= 0) {
+	    ptm		*mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
+	        hdb_dat		key ;
+	        hdb_dat		val ;
+	        cint		nrs = SR_NOTFOUND ;
+		int		fi{} ;
+	        key.buf = fname ;
+	        key.len = strlen(fname) ;
+	        val.buf = nullptr ;
+	        val.len = 0 ;
+	        /* is the filename already present? */
+	        if ((rs = hdb_fetch(op->hdp,key,nullptr,&val)) == nrs) {
+	            FNAME	fe ;
+	            if ((rs = fname_start(&fe,fname,op->nfiles)) >= 0) {
+		    	vecobj	*flp = op->flp ;
+	                if ((rs = flp->add(&fe)) >= 0) {
+	                    fi = rs ;
+	                    if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
+	            	        FNAME	*fep = (FNAME *) vp ;
+	                        key.buf = fep->name ;
+	                        key.len = strlen(fep->name) ;
+	                        val.buf = fep ;
+	                        val.len = szof(FNAME) ;
+	                        rs = hdb_store(op->hdp,key,val) ;
+			    }
+	                    if (rs < 0) {
+	                        flp->del(fi) ;
+			    }
+	                } /* end if (vecobj_add) */
+			if (rs < 0) {
+	                    fname_finish(&fe) ;
+		        }
+	            } /* end if (fname_start) */
+	            if (rs >= 0) {
+	                op->nfiles += 1 ;
 		    }
-
+	        } else if (rs >= 0) {
+	            FNAME	*fep = (FNAME *) val.buf ;
+	            fi = fep->fi ;
 	        } /* end if */
-
-	        if (rs >= 0)
-	            op->nfiles += 1 ;
-
-	    } else if (rs >= 0) {
-
-	        fep = (FNAME *) value.buf ;
-	        fi = fep->fi ;
-
-	    } /* end if */
-
-	    if (rs >= 0) {
-
-	        if ((rs = tag_start(&te,fi,tip->recoff,tip->reclen)) >= 0) {
-	            rs = vecobj_add(op->tlp,&te) ;
-	            if (rs < 0)
-	                tag_finish(&te) ;
-	        }
-
-	    } /* end if */
-
-	    ptm_unlock(&op->m) ;
-	} /* end if (ptm) */
-
+	        if (rs >= 0) {
+	            RT_TE	te{} ;
+		    uint	recoff = tip->recoff ;
+		    uint	reclen = tip->reclen ;
+	            if ((rs = tagent_start(&te,fi,recoff,reclen)) >= 0) {
+	                rs = vecobj_add(op->tlp,&te) ;
+	                if (rs < 0) {
+	                    tagent_finish(&te) ;
+		        }
+	            }
+	        } /* end if */
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (ptm) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rtags_add) */
 
 int rtags_sort(rtags *op,rtags_f cf) noex {
-{
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
+	int		rs1 ;
+	int		rv = 0 ;
 	if (cf == nullptr) cf = vcmpdef ;
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-	    rs = vecobj_sort(op->tlp,cf) ;
-	    ptm_unlock(&op->m) ;
-	} /* end if (ptm) */
-
-	return rs ;
+	if ((rs = rtags_magic(op)) >= 0) {
+	    ptm		*mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
+		{
+	            rs = vecobj_sort(op->tlp,cf) ;
+		    rv = rs ;
+		}
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (ptm) */
+	} /* end if (magic) */
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (rtags_sort) */
 
-int rtags_curbegin(rtags *op,RTAGS_CUR *curp) noex {
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	curp->i = -1 ;
-	return SR_OK ;
+int rtags_curbegin(rtags *op,CUR *curp) noex {
+	int		rs ;
+	if ((rs = rtags_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (rtags_curbegin) */
 
-int rtags_curend(rtags *op,RTAGS_CUR *curp) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	curp->i = -1 ;
-	return SR_OK ;
+int rtags_curend(rtags *op,CUR *curp) noex {
+    	int		rs ;
+	if ((rs = rtags_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (rtags_curend) */
 
-int rtags_curdump(rtags *op,RTAGS_CUR *curp) noex {
-	FNAME	*fep ;
-	int		rs = SR_OK ;
+int rtags_curdump(rtags *op,CUR *curp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-	    int		i ;
-
-/* free up all files */
-
-	    for (i = 0 ; vecobj_get(op->flp,i,&fep) >= 0 ; i += 1) {
-	        if (fep != nullptr) {
-	            rs1 = fname_finish(fep) ;
-	    	    if (rs >= 0) rs = rs1 ;
+	if ((rs = rtags_magic(op,curp)) >= 0) {
+	    ptm		*mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
+	        void	*vp{} ;
+	        for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
+	            FNAME	*fep = (FNAME *) vp ;
+	            if (vp) {
+	                rs1 = fname_finish(fep) ;
+	    	        if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end for */
+	        {
+	            rs1 = vecobj_delall(op->tlp) ;
+	            if (rs >= 0) rs = rs1 ;
 	        }
-	    } /* end for */
-
-	    rs1 = vecobj_delall(op->tlp) ;
-	    if (rs >= 0) rs = rs1 ;
-
-	    rs1 = vecobj_delall(op->flp) ;
-	    if (rs >= 0) rs = rs1 ;
-
-	    rs1 = hdb_delall(&op->fni) ;
-	    if (rs >= 0) rs = rs1 ;
-
-	    curp->i = -1 ;
-
-	    ptm_unlock(&op->m) ;
-	} /* end if (ptm) */
-
+	        {
+	            rs1 = vecobj_delall(op->flp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = hdb_delall(op->hdp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        curp->i = -1 ;
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (ptm) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rtags_curdump) */
 
-int rtags_curenum(rtags *op,RTAGS_CUR *curp,RTAGS_TAG *tip) noex {
+int rtags_curenum(rtags *op,CUR *curp,RT_TE *tip,char *rb,int rl) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (tip == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-	    RTAGS_TE	*tep ;
-	    int		i ;
-
-	    i = (curp->i < 0) ? 0 : (curp->i + 1) ;
-
-	    while ((rs = vecobj_get(op->tlp,i,&tep)) >= 0) {
-		if (tep != nullptr) break ;
-
-	        i += 1 ;
-	    } /* end while */
-
-	    if (rs >= 0) {
-	        FNAME	*fep ;
-
-	        tip->recoff = tep->recoff ;
-	        tip->reclen = tep->reclen ;
-	        if ((rs = vecobj_get(op->flp,tep->fi,&fep)) >= 0) {
-	            if (fep != nullptr) {
-	                rs = mkpath1(tip->fname,fep->name) ;
-	                if (rs >= 0) curp->i = i ;
-	            } else {
-	                rs = SR_NOANODE ;
+	int		rs1 ;
+	if ((rs = rtags_magic(op,curp,tip)) >= 0) {
+	    ptm		*mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
+		RT_TE	*tep{} ;
+	        int	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
+	        void	*vp{} ;
+	        while ((rs = vecobj_get(op->tlp,i,&vp)) >= 0) {
+		    tep = (RT_TE *) vp ;
+		    if (vp) {
+	                i += 1 ;
 		    }
-	        }
-	    }
-
-	    ptm_unlock(&op->m) ;
-	} /* end if (ptm) */
-
+	        } /* end while */
+	        if ((rs >= 0) && tep) {
+	            tip->recoff = tep->recoff ; /* fill in partial result */
+	            tip->reclen = tep->reclen ; /* fill in partial result */
+		    tip->fi = tep->fi ;		/* fill in partial result */
+		    void	*vp{} ;
+	            if ((rs = vecobj_get(op->flp,tep->fi,&vp)) >= 0) {
+	                FNAME	*fep = (FNAME *) vp ;
+	                if (vp) {
+	                    rs = mkpath(rb,rl,fep->name) ;
+	                    if (rs >= 0) curp->i = i ;
+	                } else {
+	                    rs = SR_NOANODE ;
+		        }
+	            }
+	        } /* end if (ok) */
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (ptm) */
+	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (rtags_enum) */
+/* end subroutine (rtags_curenum) */
 
 int rtags_count(rtags *op) noex {
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != RTAGS_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-
-	    rs = vecobj_count(op->tlp) ;
-	    c = rs ;
-
-	    ptm_unlock(&op->m) ;
-	} /* end if */
-
+	if ((rs = rtags_magic(op)) >= 0) {
+	    ptm		*mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
+	        {
+	            rs = vecobj_count(op->tlp) ;
+	            c = rs ;
+	        }
+	        rs1 = mxp->lockend ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (rtags_count) */
@@ -488,7 +444,9 @@ static int fname_start(FNAME *fep,cchar *fname,int fi) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) {
 	    fep->fi = fi ;
-	    rs = uc_mallocstrw(fname,-1,&fep->name) ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+		fep->name = cp ;
+	    }
 	} /* end if (non-null) */
 
 	return rs ;
@@ -510,7 +468,7 @@ static int fname_finish(FNAME *fep) noex {
 }
 /* end subroutine (fname_finish) */
 
-static int tag_start(RTAGS_TE *tep,int fi,int recoff,int reclen) noex {
+static int tagent_start(RT_TE *tep,int fi,int recoff,int reclen) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
 	    tep->fi = fi ;
@@ -520,9 +478,9 @@ static int tag_start(RTAGS_TE *tep,int fi,int recoff,int reclen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (tag_start) */
+/* end subroutine (tagent_start) */
 
-static int tag_finish(RTAGS_TE *tep) noex {
+static int tagent_finish(RT_TE *tep) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
 	    tep->fi = -1 ;
@@ -530,16 +488,16 @@ static int tag_finish(RTAGS_TE *tep) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (tag_finish) */
+/* end subroutine (tagent_finish) */
 
-static int cmpdefe(RTAGS_TE *e1p,RTAGS_TE *e2p) noex {
+static int cmpdefe(RT_TE *e1p,RT_TE *e2p) noex {
 	int		rc  = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            if ((rc = (e1p->fi - e2p->fi) == 0) {
+	            if ((rc = (e1p->fi - e2p->fi)) == 0) {
 	                rc = (e1p->recoff - e2p->recoff) ;
 	            }
 	        } 
@@ -550,8 +508,8 @@ static int cmpdefe(RTAGS_TE *e1p,RTAGS_TE *e2p) noex {
 /* end subroutine (cmpdefe) */
 
 static int vcmpdef(cvoid **v1pp,cvoid **v2pp) noex {
-    	RTAGS_TE	*e1p = (RTAGS_TE *) *v1pp ;
-    	RTAGS_TE	*e1p = (RTAGS_TE *) *v1pp ;
+    	RT_TE	*e1p = (RT_TE *) *v1pp ;
+    	RT_TE	*e2p = (RT_TE *) *v2pp ;
 	return cmpdefe(e1p,e2p) ;
 }
 /* end subroutine (vcmpdef) */

@@ -81,10 +81,11 @@ static int	xwords_more(xwords *,cchar *,int,int) noex ;
 /* exported subroutines */
 
 int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
+    	XWORDS		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && wbuf) {
-	    rs = memclear(op) ; /* dangerous ! */
+	    rs = memclear(hop) ;
             /* always enter the whole word */
 	    op->words[i].wp = wbuf ;
 	    op->words[i].wl = wlen ;
