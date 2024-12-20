@@ -76,8 +76,8 @@ struct txtindexes_mile {
 
 /* returned information */
 struct txtindexes_information {
-	time_t		ctime ;		/* index creation-time */
-	time_t		mtime ;		/* index modification-time */
+	time_t		ticreat ;	/* index creation-time */
+	time_t		timod ;		/* index modification-time */
 	uint		count ;		/* number of tags */
 	uint		neigen ;
 	uint		minwlen ;	/* minimum word length */
@@ -114,7 +114,7 @@ extern int	txtindexes_getsdn(txtindexes *,char *,int) noex ;
 extern int	txtindexes_getsfn(txtindexes *,char *,int) noex ;
 extern int	txtindexes_iseigen(txtindexes *,cchar *,int) noex ;
 extern int	txtindexes_curbegin(txtindexes *,txtindexes_cur *) noex ;
-extern int	txtindexes_curlook(txtindexes *,txtindexes_cur *,cc **) noex ;
+extern int	txtindexes_curlook(txtindexes *,txtindexes_cur *,mainv) noex ;
 extern int	txtindexes_curread(txtindexes *,txtindexes_cur *,
 			txtindexes_tag *,char *,int) noex ;
 extern int	txtindexes_curend(txtindexes *,txtindexes_cur *) noex ;

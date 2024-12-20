@@ -75,7 +75,7 @@ extern "C" {
     typedef int	(*sogetsfn_f)(void *,char *,int) noex ;
     typedef int	(*soiseigen_f)(void *,cchar *,int) noex ;
     typedef int	(*socurbegin_f)(void *,void *) noex ;
-    typedef int	(*socurlookup_f)(void *,void *,cchar **) noex ;
+    typedef int	(*socurlook_f)(void *,void *,mainv) noex ;
     typedef int	(*socurenum_f)(void *,void *,txtindexes_tag *) noex ;
     typedef int	(*socurend_f)(void *,void *) noex ;
     typedef int	(*soaudit_f)(void *) noex ;
@@ -100,7 +100,7 @@ struct txtindex_calls {
 	sogetsfn_f	getsfn ;
 	soiseigen_f	iseigen ;
 	socurbegin_f	curbegin ;
-	socurlookup_f	curlookup ;
+	socurlook_f	curlook ;
 	socurenum_f	curenum ;
 	socurend_f	curend ;
 	soaudit_f	audit ;
@@ -182,7 +182,7 @@ enum subs {
 	sub_getsfn,
 	sub_iseigen,
 	sub_curbegin,
-	sub_curlookup,
+	sub_curlook,
 	sub_curenum,
 	sub_curend,
 	sub_audit,
@@ -199,7 +199,7 @@ constexpr cpcchar	subs[] = {
 	"getsfn",
 	"iseigen",
 	"curbegin",
-	"curlookup",
+	"curlook",
 	"curenum",
 	"curend",
 	"audit",
@@ -394,15 +394,14 @@ int txtindex_curend(txtindex *op,TI_CUR *curp) noex {
 }
 /* end subroutine (txtindex_curend) */
 
-int txtindex_curlook(txtindex *op,TI_CUR *curp,cchar **klp) noex {
+int txtindex_curlook(txtindex *op,TI_CUR *curp,mainv klp) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,curp,klp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == TXTINDEX_MAGIC) {
 		rs = SR_BUGCHECK ;
-		if (callp->curlookup) {
-		    auto	co = callp->curlookup ;
+		if (auto co = callp->curlook ; co != nullptr) {
 		    rs = co(op->obj,curp->scp,klp) ;
 		}
 	    } /* end if (magic) */
@@ -531,8 +530,8 @@ static int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
                 case sub_curbegin:
                     callp->curbegin = socurbegin_f(snp) ;
                     break ;
-                case sub_curlookup:
-                    callp->curlookup = socurlookup_f(snp) ;
+                case sub_curlook:
+                    callp->curlook = socurlook_f(snp) ;
                     break ;
                 case sub_curenum:
                     callp->curenum = socurenum_f(snp) ;
@@ -564,7 +563,7 @@ static bool isrequired(int i) noex {
 	case sub_neigen:
 	case sub_iseigen:
 	case sub_curbegin:
-	case sub_curlookup:
+	case sub_curlook:
 	case sub_curenum:
 	case sub_curend:
 	case sub_close:

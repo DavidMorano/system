@@ -224,7 +224,7 @@ static int	txtindexes_fimapdestroy(txtindexes *,int) noex ;
 static int	txtindexes_dbmapcreate(txtindexes *,time_t) noex ;
 static int	txtindexes_dbmapdestroy(txtindexes *) noex ;
 static int	txtindexes_dbproc(txtindexes *,time_t) noex ;
-static int	txtindexes_mkhashkeys(txtindexes *,vecstr *,cchar **) noex ;
+static int	txtindexes_mkhashkeys(txtindexes *,vecstr *,mainv) noex ;
 static int	txtindexes_mktaglist(txtindexes *,uint **,vecstr *) noex ;
 static int	txtindexes_oureigen(txtindexes *,cchar *,int) noex ;
 static int	txtindexes_hdrverify(txtindexes *,time_t) noex ;
@@ -379,8 +379,8 @@ int txtindexes_getinfo(txtindexes *op,TI_INFO *ip) noex {
 	    memclear(ip) ;
 	    if (ip != nullptr) {
 	        TI_FI	*fip = &op->hf ;
-	        ip->ctime = time_t(op->ifi.wtime) ;
-	        ip->mtime = fip->ti_mod ;
+	        ip->ticreat = time_t(op->ifi.wtime) ;
+	        ip->timod = fip->ti_mod ;
 	        ip->count = n ;
 	        ip->neigen = (op->ifi.erlen - 1) ;
 	        ip->minwlen = op->ifi.minwlen ;
@@ -471,12 +471,13 @@ int txtindexes_curend(txtindexes *op,TI_CUR *curp) noex {
 }
 /* end subroutine (txtindexes_curend) */
 
-int txtindexes_curlook(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
+int txtindexes_curlook(txtindexes *op,TI_CUR *curp,mainv klp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		taglen = 0 ;
 	if ((rs = txtindexes_magic(op,curp,klp)) >= 0) {
-	    vecstr	hkeys ;
+	    cint	vn = 10 ;
+	    cint	vo = 0 ;
 	    uint	*taglist = nullptr ;
 	    curp->taglen = 0 ;
 	    if (curp->taglist != nullptr) {
@@ -484,7 +485,7 @@ int txtindexes_curlook(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
 	        curp->taglist = nullptr ;
 	    }
 	    /* condition the keys for the lookup */
-	    if ((rs = vecstr_start(&hkeys,10,0)) >= 0) {
+	    if (vecstr hkeys ; (rs = hkeys.start(vn,vo)) >= 0) {
 	        if ((rs = txtindexes_mkhashkeys(op,&hkeys,klp)) >= 0) {
 	            if ((rs = txtindexes_mktaglist(op,&taglist,&hkeys)) >= 0) {
 	                taglen = rs ;
@@ -495,7 +496,7 @@ int txtindexes_curlook(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
 	                }
 	            } /* end if (txtindexes_mktaglist) */
 	        } /* end if (txtindexes_mkhashkeys) */
-	        rs1 = vecstr_finish(&hkeys) ;
+	        rs1 = hkeys.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (hkeys) */
 	} /* end if (magic) */
@@ -686,7 +687,7 @@ static int txtindexes_dbproc(txtindexes *op,time_t dt) noex {
 }
 /* end subroutine (txtindexes_dbproc) */
 
-static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,cchar **klp) noex {
+static int txtindexes_mkhashkeys(txtindexes *op,vecstr *clp,mainv klp) noex {
 	cint		klen = KEYBUFLEN ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;

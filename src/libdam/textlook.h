@@ -42,7 +42,6 @@ struct textlook_information {
 struct textlook_taget {
 	uint		recoff ;
 	uint		reclen ;
-	char		fname[MAXPATHLEN + 1] ;
 } ;
 
 struct textlook_object {
@@ -68,7 +67,7 @@ struct textlook_flags {
 struct textlook_head {
 	cchar		*pr ;
 	cchar		*dbname ;		/* DB database name */
-	cchar		*basedname ;		/* base-directory */
+	cchar		*bdname ;		/* base-directory */
 	cchar		*sdn ;
 	cchar		*sfn ;
 	void		*disp ;

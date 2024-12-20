@@ -73,6 +73,8 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<upt.h>
+#include	<mallocxx.h>
 #include	<baops.h>
 #include	<vecstr.h>
 #include	<ids.h>
@@ -97,8 +99,8 @@
 #include	<sncpyx.h>
 #include	<strwcpy.h>
 #include	<rtags.h>
-#include	<upt.h>
 #include	<char.h>
+#include	<hasx.h>
 #include	<isnot.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -125,6 +127,7 @@
 #define	TL_IN		textlook_info
 
 #define	SK		searchkeys
+#define	SK_CUR		searchkeys_cur
 #define	SK_POP		searchkeys_pop
 
 #define	SI		subinfo
@@ -191,7 +194,6 @@ struct disp_args {
 	textlook	*op ;
 	rtags		*rtp ;
 	SK		*skp ;
-	const uchar	*wterms ;
 	int		qo ;		/* query options */
 	int		npar ;		/* n-parallelism */
 } ;
@@ -282,7 +284,7 @@ static int	textlook_dispstart(TL *,int,SK *,rtags *) noex ;
 static int	textlook_dispfinish(TL *) noex ;
 
 static int	textlook_indclose(TL *) noex ;
-static int	textlook_havekeys(TL *,TI_TAG *,int,SK *) ;
+static int	textlook_havekeys(TL *,TI_TAG *,int,SK *) noex ;
 static int	textlook_havekeyer(TL *,TI_TAG *,int,
 			SK *,SK_POP *,cchar *) noex ;
 static int	textlook_havekeyers(TL *,TI_TAG *,int,
@@ -293,8 +295,7 @@ static int	textlook_matchkeys(TL *,
 			SK *,SK_POP *,cchar *,int) noex ;
 static int	textlook_mkhkeys(TL *,vecstr *,SK *) noex ;
 
-static int	textlook_lookuper(TL *,TL_CUR *,int,
-			SK *,cchar **) noex ;
+static int	textlook_lookuper(TL *,TL_CUR *,int,SK *,mainv) noex ;
 static int	textlook_checkdisp(TL *,int,SK *,rtags *) noex ;
 
 static int	subinfo_start(SI *) noex ;
@@ -498,7 +499,7 @@ int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = textlook_magic(op,curp,qsq)) >= 0) {
+	if ((rs = textlook_magic(op,curp,qsp)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == TEXTLOOK_MAGIC) {
 		cnullptr	np{} ;
@@ -515,7 +516,7 @@ int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	                cint	vo = (VECSTR_OCOMPACT) ;
 	                if ((rs = hlp->start(vn,vo)) >= 0) {
 	                    if ((rs = textlook_mkhkeys(op,&hkeys,&sk)) >= 0) {
-	            		cchar	**hkeya{} ;
+	            		mainv	hkeya{} ;
 	                        if ((rs = hlp->getvec(&hkeya)) >= 0) {
 			            auto	lu = textlook_lookuper ;
 	                            if ((rs = lu(op,curp,qo,&sk,hkeya)) >= 0) {
@@ -568,7 +569,7 @@ int textlook_curread(TL *op,TL_CUR *curp,TL_TAG *tagp,char *bp,int bl) noex {
 
 int textlook_count(TL *op) noex {
 	int		rs ;
-	if ((rs = textlook_magic(op,curp,tagp,bp)) >= 0) {
+	if ((rs = textlook_magic(op)) >= 0) {
 	    rs = txtindex_count(op->idp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -602,12 +603,12 @@ static int textlook_inend(TL *op) noex {
 	if (op->bdname) {
 	    rs1 = uc_free(op->bdname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->bdname = NULL ;
+	    op->bdname = nullptr ;
 	}
 	if (op->dbname) {
 	    rs1 = uc_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
+	    op->dbname = nullptr ;
 	}
 	return rs ;
 }
@@ -631,26 +632,35 @@ static int textlook_indopen(TL *op,SI *sip) noex {
 static int textlook_snbegin(TL *op) noex {
 	int		rs ;
 	if ((rs = textlook_snend(op)) >= 0) {
-	    TI_INFO	tinfo ;
-	    if ((rs = txtindex_getinfo(op->idp,&tinfo)) >= 0) {
-		cchar	*cp{} ;
-	        if (tinfo.sdn[0] != '\0') {
-	            if ((rs = uc_mallocstrw(tinfo.sdn,-1,&cp)) >= 0) {
-	                op->sdn = cp ;
-		    }
-	        } /* end if (SDN) */
-	        if ((rs >= 0) && (tinfo.sfn[0] != '\0')) {
-	            if ((rs = uc_mallocstrw(tinfo.sfn,-1,&cp)) >= 0) {
-	                op->sfn = cp ;
-	            }
-	            if (rs < 0) {
-	                if (op->sdn) {
-	                    uc_free(op->sdn) ;
-	                    op->sdn = NULL ;
-	                }
-	            } /* end if (error-handling) */
-	        }
-	    } /* end if (txtindex_getinfo) */
+	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+		cint	tlen = rs ;
+		if ((rs = txtindex_getsdn(op->idp,tbuf,tlen)) >= 0) {
+		    cchar	*cp{} ;
+		    int		tl = rs ;
+	            if (tbuf[0] != '\0') {
+	                if ((rs = uc_mallocstrw(tbuf,tl,&cp)) >= 0) {
+	                    op->sdn = cp ;
+		        }
+	            } /* end if (SDN) */
+	            if (rs >= 0) {
+			if ((rs = txtindex_getsfn(op->idp,tbuf,tlen)) >= 0) {
+			    tl = rs ;
+	            	    if (tbuf[0] != '\0') {
+	            	        if ((rs = uc_mallocstrw(tbuf,tl,&cp)) >= 0) {
+	                	    op->sfn = cp ;
+	            		}
+			    }
+			}
+	                if (rs < 0) {
+	                    if (op->sdn) {
+	                        uc_free(op->sdn) ;
+	                        op->sdn = nullptr ;
+	                    }
+	                } /* end if (error-handling) */
+		    } /* end if (ok) */
+	        } /* end if (txtindex_getsdn) */
+		rs = rsfree(rs,tbuf) ;
+	    } /* end if (m-a-f) */
 	} /* end if (textlook_snend) */
 	return rs ;
 }
@@ -662,12 +672,12 @@ static int textlook_snend(TL *op) noex {
 	if (op->sfn) {
 	    rs1 = uc_free(op->sfn) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->sfn = NULL ;
+	    op->sfn = nullptr ;
 	}
 	if (op->sdn) {
 	    rs1 = uc_free(op->sdn) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->sdn = NULL ;
+	    op->sdn = nullptr ;
 	}
 	return rs ;
 }
@@ -758,7 +768,6 @@ static int textlook_havekeyer(TL *op,TI_TAG *tagp,int qo,
 }
 /* end subroutine (textlook_havekeyer) */
 
-/* ARGSUSED */
 static int textlook_havekeyers(TL *op,TI_TAG *tagp,int qo,
 		SK *skp,int fd,SK_POP *pkp) noex {
     	cnullptr	np{} ;
@@ -773,6 +782,7 @@ static int textlook_havekeyers(TL *op,TI_TAG *tagp,int qo,
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
+	(void) go ; /* UNUSED */
 	if (reclen > maxreclen) reclen = maxreclen ;
 	mo = ufloor(recoff,op->pagesize) ;
 	recext = (recoff + reclen) ;
@@ -803,7 +813,6 @@ static int textlook_havekeyers(TL *op,TI_TAG *tagp,int qo,
 }
 /* end subroutine (textlook_havekeyers) */
 
-/* HERE */
 static int textlook_havekeysln(TL *op,SK *skp,SK_POP *pkp,
 		cc *lp,int ll) noex {
 	int		rs ;
@@ -824,7 +833,7 @@ static int textlook_havekeysln(TL *op,SK *skp,SK_POP *pkp,
 
 	        sl = sfword(fp,fl,&sp) ;
 
-	        if ((sl <= 0) || (sp == NULL)) continue ;
+	        if ((sl <= 0) || (sp == nullptr)) continue ;
 
 	        kp = sp ;
 	        kl = sl ;
@@ -895,9 +904,9 @@ static int textlook_mkhkeys(TL *op,vecstr *hkp,SK *skp) noex {
 	if (SK_CUR cur ; (rs = searchkeys_curbegin(skp,&cur)) >= 0) {
 	    int		kl ;
 	    cchar	*kp ;
-	    while ((rs1 = searchkeys_enum(skp,&cur,&kp)) >= 0) {
+	    while ((rs1 = searchkeys_curenum(skp,&cur,&kp)) >= 0) {
 	        kl = rs1 ;
-	        if ((kp != NULL) && (kl >= op->minwlen)) {
+	        if ((kp != nullptr) && (kl >= op->minwlen)) {
 	            rs = vecstr_adduniq(hkp,kp,kl) ;
 	            if (rs < INT_MAX) nkeys += 1 ;
 	        }
@@ -914,20 +923,20 @@ static int textlook_mkhkeys(TL *op,vecstr *hkp,SK *skp) noex {
 /* end subroutine (textlook_mkhkeys) */
 
 static int textlook_lookuper(TL *op,TL_CUR *curp,int qo,SK *skp,
-		cc **hkeya) noex {
+		mainv hkeya) noex {
 	rtags		*rtp = &curp->tags ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = textlook_checkdisp(op,qo,skp,rtp)) >= 0) {
-	    TO_CUR	tcur ;
+	    TI_CUR	tcur ;
 	    TI_TAG	ttag ;
-	    DISP	*dop = op->disp ;
+	    DISP	*dop = (DISP *) op->disp ;
 	    if ((rs = txtindex_curbegin(op->idp,&tcur)) >= 0) {
 	        if ((rs = txtindex_curlook(op->idp,&tcur,hkeya)) >= 0) {
 	            int		ntags = rs ;
 	            while ((rs >= 0) && (ntags-- > 0)) {
-	                rs1 = txtindex_read(op->idp,&tcur,&ttag) ;
+	                rs1 = txtindex_curread(op->idp,&tcur,&ttag) ;
 	                if (rs1 == SR_NOTFOUND) break ;
 	                rs = rs1 ;
 	                if ((rs >= 0) && (ttag.reclen > 0)) {
@@ -951,7 +960,7 @@ static int textlook_lookuper(TL *op,TL_CUR *curp,int qo,SK *skp,
 
 static int textlook_checkdisp(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	int		rs = SR_OK ;
-	if (op->disp == NULL) {
+	if (op->disp == nullptr) {
 	    rs = textlook_dispstart(op,qo,skp,rtp) ;
 	}
 	return rs ;
@@ -960,7 +969,7 @@ static int textlook_checkdisp(TL *op,int qo,SK *skp,rtags *rtp) noex {
 
 static int textlook_dispstart(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	int		rs = SR_OK ;
-	if (op->disp == NULL) {
+	if (op->disp == nullptr) {
 	    if ((rs = uptgetconcurrency()) >= 0) {
 	        cint	npar = (rs+1) ;
 	        cint	size = szof(DISP) ;
@@ -973,7 +982,6 @@ static int textlook_dispstart(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	                a.skp = skp ;
 	                a.rtp = rtp ;
 	                a.npar = npar ;
-	                a.wterms = wterms ;
 	                if ((rs = disp_start(dop,&a)) >= 0) {
 	                    op->disp = dop ;
 	                }
@@ -991,7 +999,7 @@ static int textlook_dispfinish(TL *op) noex {
 	int		rs1 ;
 	int		f_abort = true ;
 	if (op->disp) {
-	    DISP	*dop = op->disp ;
+	    DISP	*dop = (DISP *) op->disp ;
 	    {
 	        rs1 = disp_finish(dop,f_abort) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -999,7 +1007,7 @@ static int textlook_dispfinish(TL *op) noex {
 	    {
 	        rs1 = uc_free(dop) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->disp = NULL ;
+	        op->disp = nullptr ;
 	    }
 	}
 	return rs ;
@@ -1035,8 +1043,8 @@ static int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 	    memclear(dop) ;
 	    dop->a = *dap ;
 	    dop->nthr = dap->npar ;
-	    if ((rs = ptm_create(&dop->m,NULL)) >= 0) {
-	        if ((rs = ptc_create(&dop->cond,NULL)) >= 0) {
+	    if ((rs = ptm_create(&dop->m,nullptr)) >= 0) {
+	        if ((rs = ptc_create(&dop->cond,nullptr)) >= 0) {
 	            cint	f_sh = false ;
 	            if ((rs = psem_create(&dop->sem_wq,f_sh,0)) >= 0) {
 	                psem	*ws = &dop->sem_done ;
@@ -1077,13 +1085,13 @@ static int disp_starter(DISP *dop) noex {
 	if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
 	    DISP_THR	*dtp ;
 	    pthread_t	tid ;
-	    uptsub_t	fn = (uptsub_t) disp_worker ;
+	    uptsub_f	sub = uptsub_t(disp_worker) ;
 	    int		i ; /* used-afterwards */
-	    dop->threads = p ;
+	    dop->threads = (DISP_THR *) p ;
 	    memset(p,0,sz) ;
 	    for (i = 0 ; i < dop->nthr ; i += 1) {
 	        dtp = (dop->threads+i) ;
-	        if ((rs = uptcreate(&tid,NULL,fn,dop)) >= 0) {
+	        if ((rs = uptcreate(&tid,nullptr,sub,dop)) >= 0) {
 	            dtp->tid = tid ;
 	            dtp->f_active = true ;
 	        }
@@ -1100,10 +1108,10 @@ static int disp_starter(DISP *dop) noex {
 	        }
 	        for (int j = 0 ; j < n ; j += 1) {
 	            dtp = (dop->threads + j) ;
-	            uptjoin(dtp->tid,NULL) ;
+	            uptjoin(dtp->tid,nullptr) ;
 	        } /* end for */
 	        uc_free(p) ;
-	        dop->threads = NULL ;
+	        dop->threads = nullptr ;
 	    } /* end if (error) */
 	} /* end if (m-a) */
 	return rs ;
@@ -1123,7 +1131,7 @@ static int disp_finish(DISP *dop,int f_abort) noex {
 	        rs1 = psem_post(&dop->sem_wq) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (dop->threads != NULL) {
+	    if (dop->threads != nullptr) {
 	        DISP_THR	*dtp ;
 	        pthread_t	tid ;
 	        for (int i = 0 ; i < dop->nthr ; i += 1) {
@@ -1131,14 +1139,14 @@ static int disp_finish(DISP *dop,int f_abort) noex {
 	            if (dtp->f_active) {
 	                dtp->f_active = false ;
 	                tid = dtp->tid ;
-	                rs1 = uptjoin(tid,NULL) ;
+	                rs1 = uptjoin(tid,nullptr) ;
 	                if (rs >= 0) rs = rs1 ;
 	                if (rs >= 0) rs = dtp->rs ;
 	            } /* end if (active) */
 	        } /* end for */
 	        rs1 = uc_free(dop->threads) ;
 	        if (rs >= 0) rs = rs1 ;
-	        dop->threads = NULL ;
+	        dop->threads = nullptr ;
 	    } /* end if (threads) */
 	    {
 	        rs1 = tagq_finish(&dop->wq) ;
@@ -1193,7 +1201,7 @@ static int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
 static int disp_nbusy(DISP *dop) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
-	if (dop->threads != NULL) {
+	if (dop->threads != nullptr) {
 	    DISP_THR	*dtp ;
 	    int		i ;
 	    for (i = 0 ; i < dop->nthr ; i += 1) {

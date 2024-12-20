@@ -1,4 +1,5 @@
 /* upt SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® POSIX Thread manipulation */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	upt
+
+	Description:
 	This module provides an informal way to abstract some of
 	the junk needed to work with threads.
 
@@ -29,9 +34,11 @@
 #include	<cerrno>
 #include	<csignal>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdint>
 #include	<usystem.h>
+#include	<uvariables.hh>
 #include	<hasx.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
@@ -40,10 +47,6 @@
 
 
 /* local defines */
-
-#ifndef	VARNCPU
-#define	VARNCPU		"NCPU"
-#endif
 
 #ifndef	PTA
 #define	PTA		pthread_attr_t
@@ -59,6 +62,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 struct ourarg {
@@ -72,6 +78,12 @@ struct ourarg {
 static int	uptcreator(pthread_t *,PTA *,void *) noex ;
 
 static void	*uptruner(void *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -268,12 +280,12 @@ int uptncpus(int w) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	if (n == 0) {
-	    cchar	*vn = VARNCPU ;
-	    cchar	*cp ;
-	    if ((cp = getenv(vn)) != nullptr) {
-	        if (hasalldig(cp,-1)) {
-	            int		v ;
-	            if ((cfdeci(cp,-1,&v)) >= 0) n = v ;
+	    static cchar	*valp = getenv(varname.ncpu) ;
+	    if (valp) {
+	        if (hasalldig(valp,-1)) {
+	            if (int v{} ; (cfdeci(valp,-1,&v)) >= 0) {
+			n = v ;
+		    }
 	        }
 	    } /* end if (environment) */
 	}
