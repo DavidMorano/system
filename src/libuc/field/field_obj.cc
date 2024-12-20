@@ -24,7 +24,7 @@
 /*******************************************************************************
 
   	Object (continued):
-	field_obj
+	field
 
 	Description:
 	Object support routines for the FIELD object.
@@ -66,9 +66,6 @@
 /* local variables */
 
 
-/* local inline-subroutines */
-
-
 /* exported variables */
 
 
@@ -107,8 +104,7 @@ int field::remaining(cchar **rpp) noex {
 }
 
 void field::dtor() noex {
-	cint	rs = field_finish(this) ;
-	if (rs < 0) {
+	if (cint rs = field_finish(this) ; rs < 0) {
 	    ulogerror("field",rs,"fini-finish") ;
 	}
 }

@@ -27,11 +27,11 @@
 
 #define	RTAGS		struct rtags_head
 #define	RTAGS_CUR	struct rtags_cursor
-#define	RTAGS_TE	struct rtags_teent
+#define	RTAGS_TAG	struct rtags_tager
 #define	RTAGS_MAGIC	0x99662223
 
 
-struct rtags_teent {
+struct rtags_tager {
 	int		fi ;
 	uint		recoff ;
 	uint		reclen ;
@@ -52,19 +52,19 @@ struct rtags_cursor {
 
 typedef	RTAGS		rtags ;
 typedef	RTAGS_CUR	rtags_cur ;
-typedef	RTAGS_TE	rtags_te ;
+typedef	RTAGS_TAG	rtags_tag ;
 
 EXTERNC_begin
 
 typedef int (*rtags_f)(cvoid **,cvoid **) noex ;
 
 extern int	rtags_start(rtags *,int) noex ;
-extern int	rtags_add(rtags *,rtags_te *,cchar *) noex ;
+extern int	rtags_add(rtags *,rtags_tag *,cchar *) noex ;
 extern int	rtags_sort(rtags *,rtags_f) noex ;
 extern int	rtags_curbegin(rtags *,rtags_cur *) noex ;
 extern int	rtags_curend(rtags *,rtags_cur *) noex ;
 extern int	rtags_curdump(rtags *,rtags_cur *) noex ;
-extern int	rtags_curenum(rtags *,rtags_cur *,rtags_te *,char *,int) noex ;
+extern int	rtags_curenum(rtags *,rtags_cur *,rtags_tag *,char *,int) noex ;
 extern int	rtags_count(rtags *) noex ;
 extern int	rtags_finish(rtags *) noex ;
 

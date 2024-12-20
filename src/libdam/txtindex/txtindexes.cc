@@ -376,33 +376,48 @@ int txtindexes_getinfo(txtindexes *op,TI_INFO *ip) noex {
 	int		n = 0 ;
 	if ((rs = txtindexes_magic(op)) >= 0) {
 	    n = op->ifi.taglen ;
+	    memclear(ip) ;
 	    if (ip != nullptr) {
 	        TI_FI	*fip = &op->hf ;
-	        memclear(ip) ;
-	        ip->ctime = (time_t) op->ifi.wtime ;
+	        ip->ctime = time_t(op->ifi.wtime) ;
 	        ip->mtime = fip->ti_mod ;
 	        ip->count = n ;
 	        ip->neigen = (op->ifi.erlen - 1) ;
 	        ip->minwlen = op->ifi.minwlen ;
 	        ip->maxwlen = op->ifi.maxwlen ;
-#ifdef	COMMENT
-		if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-	            cint	plen = rs ;
-	            cchar	*sp = (fip->mapdata + op->ifi.sdnoff) ;
-	            if (sp[0] != '\0') {
-	                strwcpy(ip->sdn,sp,plen) ;
-	            }
-	            sp = (fip->mapdata + op->ifi.sfnoff) ;
-	            if (sp[0] != '\0') {
-	                strwcpy(ip->sfn,sp,plen) ;
-	            }
-		} /* end if (getbufsize) */
-#endif /* COMMENT */
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (txtindexes_info) */
+/* end subroutine (txtindexes_getinfo) */
+
+int txtindexes_getsdn(txtindexes *op,char *rb,int rl) noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = txtindexes_magic(op,rb)) >= 0) {
+	    TI_FI	*fip = &op->hf ;
+	    if (cc *sp = (fip->mapdata + op->ifi.sdnoff) ; sp[0] != '\0') {
+	        rs = sncpy(rb,rl,sp) ;
+	        len = rs ;
+	    }
+	} /* end if (magic) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (txtindexes_getsdn) */
+
+int txtindexes_getsfn(txtindexes *op,char *rb,int rl) noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = txtindexes_magic(op,rb)) >= 0) {
+	    TI_FI	*fip = &op->hf ;
+	    if (cc *sp = (fip->mapdata + op->ifi.sfnoff) ; sp[0] != '\0') {
+	        rs = sncpy(rb,rl,sp) ;
+		len = rs ;
+	    }
+	} /* end if (magic) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (txtindexes_getsfn) */
 
 int txtindexes_iseigen(txtindexes *op,cchar *kp,int kl) noex {
 	int		rs ;
@@ -456,7 +471,7 @@ int txtindexes_curend(txtindexes *op,TI_CUR *curp) noex {
 }
 /* end subroutine (txtindexes_curend) */
 
-int txtindexes_lookup(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
+int txtindexes_curlook(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		taglen = 0 ;
@@ -486,10 +501,10 @@ int txtindexes_lookup(txtindexes *op,TI_CUR *curp,cchar **klp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? taglen : rs ;
 }
-/* end subroutine (txtindexes_lookup) */
+/* end subroutine (txtindexes_curlook) */
 
 /* returns length of the filename (if any) in the returned tag (if any) */
-int txtindexes_read(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
+int txtindexes_curread(txtindexes *op,TI_CUR *curp,TI_TAG *tagp,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ;

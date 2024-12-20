@@ -202,7 +202,7 @@ int keyvals_start(keyvals *op,int ndef) noex {
 	if (ndef < KEYVALS_DEFENTS) ndef = KEYVALS_DEFENTS ;
 	if ((rs = keyvals_ctor(op)) >= 0) {
 	    cnullptr	np{} ;
-	    cint	sz = sizeof(KEYVALS_KEY) ;
+	    cint	sz = szof(KEYVALS_KEY) ;
 	    cint	vn = (ndef / 10) ;
 	    cint	vo = (VECOBJ_OSTATIONARY | VECOBJ_OREUSE) ;
 	    if ((rs = vecobj_start(op->keyp,sz,vn,vo)) >= 0) {
@@ -311,7 +311,7 @@ int keyvals_count(keyvals *op) noex {
 int keyvals_curbegin(keyvals *op,keyvals_cur *curp) noex {
 	int		rs ;
 	if ((rs = keyvals_magic(op,curp)) >= 0) {
-	    cint	osz = sizeof(hdb_cur) ;
+	    cint	osz = szof(hdb_cur) ;
 	    curp->i = -1 ;
 	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
 		curp->ecp = (hdb_cur *) vp ;
@@ -590,7 +590,7 @@ static int keyvals_already(keyvals *op,ENT *nep) noex {
 	hdb_dat		val ;
 	int		rs ;
 	key.buf = nep ;
-	key.len = sizeof(KEYVALS_ENT) ;
+	key.len = szof(KEYVALS_ENT) ;
 	rs = hdb_fetch(op->bykeyvalp,key,nullptr,&val) ;
 	return rs ;
 }
@@ -600,7 +600,7 @@ static int keyvals_already(keyvals *op,ENT *nep) noex {
 static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	int		rs ;
 	int		rs1 ;
-	int		sz = sizeof(KEYVALS_ENT) ;
+	int		sz = szof(KEYVALS_ENT) ;
 	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	    ENT		*ep = entp(vp) ;
 	    KEY		*kep ;
@@ -614,11 +614,11 @@ static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	    }
 	    {
 	        val.buf = ep ;
-	        val.len = sizeof(KEYVALS_ENT) ;
+	        val.len = szof(KEYVALS_ENT) ;
 	    }
 	    if ((rs = hdb_store(op->bykeyp,key,val)) >= 0) {
 		key.buf = ep ;
-		key.len = sizeof(KEYVALS_ENT) ;
+		key.len = szof(KEYVALS_ENT) ;
 	        rs = hdb_store(op->bykeyvalp,key,val) ;
 		if (rs < 0) {
 	    	    hdb_cur	cur ;

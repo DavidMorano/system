@@ -47,7 +47,7 @@
 /* local defines */
 
 #define	RT	rtags
-#define	RT_TE	rtags_te
+#define	RT_TAG	rtags_tag
 
 #define	FNAME	rtags_fname
 #define	CUR	rtags_cur
@@ -154,11 +154,14 @@ static inline int rtags_magic(rtags *op,Args ... args) noex {
 static int	fname_start(FNAME *,cchar *,int) noex ;
 static int	fname_finish(FNAME *) noex ;
 
-static int	tagent_start(RT_TE *,int,int,int) noex ;
-static int	tagent_finish(RT_TE *) noex ;
+static int	tagent_start(RT_TAG *,int,int,int) noex ;
+static int	tagent_finish(RT_TAG *) noex ;
 
-static int	vcmpdef(cvoid **,cvoid **) noex ;
-static int	cmpdefe(RT_TE *,RT_TE *) noex ;
+extern "C" {
+    static int	vcmpdef(cvoid **,cvoid **) noex ;
+}
+
+static int	cmpdefe(RT_TAG *,RT_TAG *) noex ;
 
 
 /* local variables */
@@ -178,7 +181,7 @@ int rtags_start(rtags *op,int vn) noex {
 	        int	vo = VECOBJ_OSTATIONARY ;
 	        int	vsz = szof(FNAME) ;
 	        if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) {
-	            vsz = szof(RT_TE) ;
+	            vsz = szof(RT_TAG) ;
 	            vo = 0 ;
 	            if ((rs = vecobj_start(op->tlp,vsz,vn,vo)) >= 0) {
 	                if ((rs = ptm_create(op->mxp,np)) >= 0) {
@@ -244,7 +247,7 @@ int rtags_finish(rtags *op) noex {
 }
 /* end subroutine (rtags_finish) */
 
-int rtags_add(rtags *op,RT_TE *tip,cchar *fname) noex {
+int rtags_add(rtags *op,RT_TAG *tip,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = rtags_magic(op,tip,fname)) >= 0) {
@@ -289,7 +292,7 @@ int rtags_add(rtags *op,RT_TE *tip,cchar *fname) noex {
 	            fi = fep->fi ;
 	        } /* end if */
 	        if (rs >= 0) {
-	            RT_TE	te{} ;
+	            RT_TAG	te{} ;
 		    uint	recoff = tip->recoff ;
 		    uint	reclen = tip->reclen ;
 	            if ((rs = tagent_start(&te,fi,recoff,reclen)) >= 0) {
@@ -380,31 +383,35 @@ int rtags_curdump(rtags *op,CUR *curp) noex {
 }
 /* end subroutine (rtags_curdump) */
 
-int rtags_curenum(rtags *op,CUR *curp,RT_TE *tip,char *rb,int rl) noex {
+int rtags_curenum(rtags *op,CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
 	int		rs ;
 	int		rs1 ;
+	int		fl = 0 ; /* file-length */
 	if ((rs = rtags_magic(op,curp,tip)) >= 0) {
 	    ptm		*mxp = op->mxp ;
 	    if ((rs = mxp->lockbegin) >= 0) {
-		RT_TE	*tep{} ;
+		RT_TAG	*tep{} ;
 	        int	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	        void	*vp{} ;
 	        while ((rs = vecobj_get(op->tlp,i,&vp)) >= 0) {
-		    tep = (RT_TE *) vp ;
+		    tep = (RT_TAG *) vp ;
 		    if (vp) {
 	                i += 1 ;
 		    }
 	        } /* end while */
 	        if ((rs >= 0) && tep) {
+		    vecobj	*flp = op->flp ;
 	            tip->recoff = tep->recoff ; /* fill in partial result */
 	            tip->reclen = tep->reclen ; /* fill in partial result */
 		    tip->fi = tep->fi ;		/* fill in partial result */
 		    void	*vp{} ;
-	            if ((rs = vecobj_get(op->flp,tep->fi,&vp)) >= 0) {
+	            if ((rs = flp->get(tep->fi,&vp)) >= 0) {
 	                FNAME	*fep = (FNAME *) vp ;
 	                if (vp) {
-	                    rs = mkpath(rb,rl,fep->name) ;
-	                    if (rs >= 0) curp->i = i ;
+	                    if ((rs = mkpath(rb,rl,fep->name)) >= 0) {
+				fl = rs ;
+	                        curp->i = i ;
+			    }
 	                } else {
 	                    rs = SR_NOANODE ;
 		        }
@@ -414,7 +421,7 @@ int rtags_curenum(rtags *op,CUR *curp,RT_TE *tip,char *rb,int rl) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (rtags_curenum) */
 
@@ -468,7 +475,7 @@ static int fname_finish(FNAME *fep) noex {
 }
 /* end subroutine (fname_finish) */
 
-static int tagent_start(RT_TE *tep,int fi,int recoff,int reclen) noex {
+static int tagent_start(RT_TAG *tep,int fi,int recoff,int reclen) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
 	    tep->fi = fi ;
@@ -480,7 +487,7 @@ static int tagent_start(RT_TE *tep,int fi,int recoff,int reclen) noex {
 }
 /* end subroutine (tagent_start) */
 
-static int tagent_finish(RT_TE *tep) noex {
+static int tagent_finish(RT_TAG *tep) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
 	    tep->fi = -1 ;
@@ -490,7 +497,7 @@ static int tagent_finish(RT_TE *tep) noex {
 }
 /* end subroutine (tagent_finish) */
 
-static int cmpdefe(RT_TE *e1p,RT_TE *e2p) noex {
+static int cmpdefe(RT_TAG *e1p,RT_TAG *e2p) noex {
 	int		rc  = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
@@ -508,8 +515,8 @@ static int cmpdefe(RT_TE *e1p,RT_TE *e2p) noex {
 /* end subroutine (cmpdefe) */
 
 static int vcmpdef(cvoid **v1pp,cvoid **v2pp) noex {
-    	RT_TE	*e1p = (RT_TE *) *v1pp ;
-    	RT_TE	*e2p = (RT_TE *) *v2pp ;
+    	RT_TAG	*e1p = (RT_TAG *) *v1pp ;
+    	RT_TAG	*e2p = (RT_TAG *) *v2pp ;
 	return cmpdefe(e1p,e2p) ;
 }
 /* end subroutine (vcmpdef) */

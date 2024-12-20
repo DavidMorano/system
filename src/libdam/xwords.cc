@@ -81,7 +81,7 @@ static int	xwords_more(xwords *,cchar *,int,int) noex ;
 /* exported subroutines */
 
 int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
-    	XWORDS		*hop = op ;
+    	XWORDS		*hop = op ; /* <- head */
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && wbuf) {
@@ -157,12 +157,11 @@ int xwords_finish(xwords *op) noex {
 /* private subroutines */
 
 static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
-	vecobj		wil ;
-	cint		esize = sizeof(xwords_wi) ;
+	cint		esize = szof(xwords_wi) ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = vecobj_start(&wil,esize,2,0)) >= 0) {
+	if (vecobj wil ; (rs = vecobj_start(&wil,esize,2,0)) >= 0) {
 	    xwords_wi	wi ;
 	    wi.wp = wbuf ;
 	    wi.wl = si ;

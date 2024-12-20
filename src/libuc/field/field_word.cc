@@ -74,9 +74,15 @@
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
 /* local variables */
 
-static constexpr cchar		wterms[] = {
+constexpr char		wterms[] = {
 	0x00, 0x1A, 0x00, 0x00,
 	0x3F, 0x40, 0x00, 0x7C,
 	0x00, 0x00, 0x00, 0x00,

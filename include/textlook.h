@@ -37,8 +37,6 @@ struct textlook_information {
 	uint		neigen ;
 	uint		minwlen ;	/* minimum word length */
 	uint		maxwlen ;	/* maximum word length */
-	char		sdn[MAXPATHLEN + 1] ;
-	char		sfn[MAXPATHLEN + 1] ;
 } ;
 
 struct textlook_taget {
@@ -74,34 +72,36 @@ struct textlook_head {
 	cchar		*sdn ;
 	cchar		*sfn ;
 	void		*disp ;
-	eigendb		edb ;
-	txtindex	ind ;
+	eigendb		*edp ;			/* eigen-data-pointer */
+	txtindex	*idp ;			/* index-data-pointer */
 	time_t		ti_lastcheck ;
 	time_t		ti_tind ;		/* text-index */
 	TEXTLOOK_FL	f ;
 	uint		magic ;
 	int		pagesize ;
 	int		dbfsize ;		/* DB file-size */
-	int		mapsize ;		/* historial (for mapping) */
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
 } ;
 
-#define	TEXTLOOK	struct textlook_head
-#define	TEXTLOOK_FL	struct textlook_flags
-#define	TEXTLOOK_CUR	struct textlook_cursor
-#define	TEXTLOOK_OBJ	struct textlook_object
-#define	TEXTLOOK_TAG	struct textlook_taget
-#define	TEXTLOOK_INFO	struct textlook_information
+typedef	TEXTLOOK	textlook ;
+typedef	TEXTLOOK_FL	textlook_fl ;
+typedef	TEXTLOOK_CUR	textlook_cur ;
+typedef	TEXTLOOK_OBJ	textlook_obj ;
+typedef	TEXTLOOK_TAG	textlook_tag ;
+typedef	TEXTLOOK_INFO	textlook_info ;
 
 EXTERNC_begin
 
 extern int textlook_open(textlook *,cchar *,cchar *,cchar *) noex ;
 extern int textlook_count(textlook *) noex ;
 extern int textlook_getinfo(textlook *,textlook_info *) noex ;
+extern int textlook_getsdn(textlook *,char *,int) noex ;
+extern int textlook_getsfn(textlook *,char *,int) noex ;
 extern int textlook_curbegin(textlook *,textlook_cur *) noex ;
-extern int textlook_lookup(textlook *,textlook_cur *,int,cchar **) noex ;
-extern int textlook_read(textlook *,textlook_cur *,textlook_tag *) noex ;
+extern int textlook_curlook(textlook *,textlook_cur *,int,cchar **) noex ;
+extern int textlook_curread(textlook *,textlook_cur *,textlook_tag *,
+		char *,int) noex ;
 extern int textlook_curend(textlook *,textlook_cur *) noex ;
 extern int textlook_audit(textlook *) noex ;
 extern int textlook_close(textlook *) noex ;

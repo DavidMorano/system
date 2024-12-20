@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int rtags_ctor(rtags *op,Args ... args) noex {
+static int textlook_ctor(textlook *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int rtags_ctor(rtags *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (rtags_ctor) */
+/* end subroutine (textlook_ctor) */
 
-static int rtags_dtor(rtags *op) noex {
+static int textlook_dtor(textlook *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (rtags_dtor) */
+/* end subroutine (textlook_dtor) */
 
 template<typename ... Args>
-static inline int rtags_magic(rtags *op,Args ... args) noex {
+static inline int textlook_magic(textlook *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TEXTLOOK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (rtags_magic) */
+/* end subroutine (textlook_magic) */

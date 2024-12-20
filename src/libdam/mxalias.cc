@@ -105,38 +105,41 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwds(struct ustat *,char *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getuserhome(char *,int,cchar *) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	isalphalatin(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strwcpyuc(char *,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
+
+
+/* external variables */
 
 
 /* local structures */
 
 struct mxalias_file {
-	const char	*fname ;
+	cchar	*fname ;
 	ino_t		ino ;
 	dev_t		dev ;
 	time_t		mtime ;
@@ -144,7 +147,7 @@ struct mxalias_file {
 } ;
 
 struct bufdesc {
-	const char	*a ;		/* memory allocation */
+	cchar		*a ;		/* memory allocation */
 	char		*lbuf ;
 	char		*fbuf ;
 	char		*kbuf ;
@@ -153,14 +156,15 @@ struct bufdesc {
 	int		klen ;
 } ;
 
+
 /* forward references */
 
-static int	mxalias_username(MXALIAS *,const char *) ;
+static int	mxalias_username(MXALIAS *,cchar *) ;
 static int	mxalias_userdname(MXALIAS *) ;
 static int	mxalias_mkuserfname(MXALIAS *,char *) ;
 static int	mxalias_filesadd(MXALIAS *,time_t) ;
-static int	mxalias_fileadd(MXALIAS *,const char *) ;
-static int	mxalias_filereg(MXALIAS *,struct ustat *,const char *) ;
+static int	mxalias_fileadd(MXALIAS *,cchar *) ;
+static int	mxalias_filereg(MXALIAS *,struct ustat *,cchar *) ;
 static int	mxalias_fileparse(MXALIAS *,int) ;
 static int	mxalias_fileparser(MXALIAS *,int,bfile *) ;
 static int	mxalias_fileparseline(MXALIAS *,int,BUFDESC *,cchar *,int) ;
@@ -169,7 +173,7 @@ static int	mxalias_filedels(MXALIAS *) ;
 static int	mxalias_filedel(MXALIAS *,int) ;
 static int	mxalias_entfins(MXALIAS *) ;
 static int	mxalias_mkvals(MXALIAS *,MXALIAS_CUR *,vecstr *) ;
-static int	mxalias_addvals(MXALIAS *,vecstr *,vecstr *,const char *) ;
+static int	mxalias_addvals(MXALIAS *,vecstr *,vecstr *,cchar *) ;
 static int	mxalias_allocfins(MXALIAS *) ;
 
 static int	mxalias_fileparseline_alias(MXALIAS *,int,BUFDESC *,FIELD *) ;
@@ -184,21 +188,25 @@ static int	mxalias_filealready(MXALIAS *,dev_t,ino_t) ;
 static int	mxalias_filechecks(MXALIAS *,time_t) ;
 #endif
 
-static int	file_start(struct mxalias_file *,struct ustat *,const char *) ;
+static int	file_start(struct mxalias_file *,struct ustat *,cchar *) ;
 static int	file_finish(struct mxalias_file *) ;
 
 static int	bufdesc_start(BUFDESC *,int) ;
 static int	bufdesc_finish(BUFDESC *) ;
 
-static int	isnotspecial(int) ;
-static int	isOurFileType(mode_t) ;
+static int	cmpfe(MXALIAS_FILE *,MXALIAS_FILE *) noex ;
 
-static int	vcmpfe() ;
+extern "C" {
+    static int	vcmpfe(cvoid **,cvoid **) noex ;
+}
+
+static bool	isnotspecial(int) noex ;
+static bool	isOurFileType(mode_t) noex ;
 
 
 /* local variables */
 
-static const uchar	kterms[] = {
+constexpr char		kterms[] = {
 	0x00, 0x26, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -210,7 +218,7 @@ static const uchar	kterms[] = {
 } ;
 
 /* all white space plus comma (',') */
-static const uchar	vterms[] = {
+constexpr char		vterms[] = {
 	0x00, 0x26, 0x00, 0x00,
 	0x09, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -219,15 +227,6 @@ static const uchar	vterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
-
-static const char	*keywords[] = {
-	"alias",
-	"group",
-	"unalias",
-	"ungroup",
-	"source",
-	NULL
 } ;
 
 enum keywords {
@@ -239,15 +238,25 @@ enum keywords {
 	keyword_overlast
 } ;
 
+constexpr cpcchar	keywords[] = {
+	"alias",
+	"group",
+	"unalias",
+	"ungroup",
+	"source",
+	NULL
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int mxalias_open(MXALIAS *op,cchar *pr,cchar *username)
-{
+int mxalias_open(MXALIAS *op,cchar *pr,cchar *username) noex {
 	int		rs ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
@@ -436,7 +445,7 @@ int mxalias_enum(MXALIAS *op,MXALIAS_CUR *curp,char *kbuf,int klen,
 	KEYVALS_CUR	*kvcp ;
 	int		rs = SR_OK ;
 	int		kl = 0 ;
-	const char	*kp, *vp ;
+	cchar	*kp, *vp ;
 
 
 #if	CF_SAFE
@@ -501,8 +510,8 @@ int mxalias_lookup(MXALIAS *op,MXALIAS_CUR *curp,cchar *kbuf,int klen)
 	int		i ;
 	int		opts ;
 	int		c = 0 ;
-	const char	*kp ;
-	const char	*cp ;
+	cchar	*kp ;
+	cchar	*cp ;
 
 #if	CF_SAFE
 	if (op == NULL) return SR_FAULT ;
@@ -565,7 +574,7 @@ int mxalias_read(MXALIAS *op,MXALIAS_CUR *curp,char *vbuf,int vlen)
 	int		rs = SR_OK ;
 	int		ni ;
 	int		vl = 0 ;
-	const char	*vp ;
+	cchar	*vp ;
 
 #if	CF_SAFE
 	if (op == NULL) return SR_FAULT ;
@@ -607,7 +616,7 @@ int mxalias_read(MXALIAS *op,MXALIAS_CUR *curp,char *vbuf,int vlen)
 static int mxalias_username(MXALIAS *op,cchar *username)
 {
 	int		rs = SR_OK ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((username == NULL) || (username[0] == '\0'))
 	    username = "-" ;
@@ -631,7 +640,7 @@ static int mxalias_userdname(MXALIAS *op)
 	    char	hbuf[MAXPATHLEN+1] ;
 	    cchar	*un = op->username ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-	        const char	*cp ;
+	        cchar	*cp ;
 		hl = rs ;
 	        if ((rs = uc_mallocstrw(hbuf,rs,&cp)) >= 0) {
 	            op->userdname = cp ;
@@ -682,7 +691,7 @@ int mxalias_fileadd(MXALIAS *op,cchar *atfname)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*np ;
+	cchar	*np ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -696,7 +705,7 @@ int mxalias_fileadd(MXALIAS *op,cchar *atfname)
 	debugprintf("mxalias_fileadd: fname=%s\n",atfname) ;
 #endif
 
-	np = (const char *) atfname ;
+	np = (cchar *) atfname ;
 	if (atfname[0] != '/') {
 	    if ((rs = mxalias_userdname(op)) >= 0) {
 	        rs = mkpath2(tmpfname,op->userdname,atfname) ;
@@ -922,7 +931,7 @@ static int mxalias_fileparser(MXALIAS *op,int fi,bfile *lfp)
 	    int		cl ;
 	    int		f_bol = TRUE ;
 	    int		f_eol ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    char	*lbuf = bd.lbuf ;
 
 	    while ((rs = breadln(lfp,lbuf,llen)) > 0) {
@@ -971,7 +980,7 @@ static int mxalias_fileparseline(MXALIAS *op,int fi,BUFDESC *bdp,
 	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
 	    int		ki ;
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 	    if ((fl = field_get(&fsb,kterms,&fp)) > 0) {
 
 	        if ((ki = matstr(keywords,fp,fl)) >= 0) {
@@ -1015,7 +1024,7 @@ static int mxalias_fileparseline_alias(MXALIAS *op,int fi,BUFDESC *bdp,
 	int		fl ;
 	int		c_field = 0 ;
 	int		c = 0 ;
-	const char	*fp ;
+	cchar	*fp ;
 	char		*keybuf = bdp->kbuf ;
 	char		*fbuf = bdp->fbuf ;
 
@@ -1187,12 +1196,12 @@ static int mxalias_fileold(MXALIAS *op,time_t daytime)
 	if ((rs = mxalias_aprofile(op,daytime)) >= 0) {
 	    struct ustat	sb ;
 	    int		i ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 	    for (i = 0 ; op->aprofile[i] != NULL ; i += 1) {
 
-	        cp = (const char *) op->aprofile[i] ;
+	        cp = (cchar *) op->aprofile[i] ;
 	        if (*cp != '/') {
 	            cp = tmpfname ;
 	            mkpath2(tmpfname,op->pr,op->aprofile[i]) ;
@@ -1294,7 +1303,7 @@ static int mxalias_mkvals(MXALIAS *op,MXALIAS_CUR *curp,vecstr *vlp)
 	    int		size = (n + 1) * sizeof(char **) ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        int		i ;
-	        const char	*cp ;
+	        cchar	*cp ;
 	        curp->vals = p ;
 	        size = 1 ;
 	        for (i = 0 ; vecstr_get(vlp,i,&cp) >= 0 ; i += 1) {
@@ -1364,9 +1373,7 @@ static int mxalias_allocfins(MXALIAS *op)
 }
 /* end subroutine (mxalias_allocfins) */
 
-
-static int mxalias_entfins(MXALIAS *op)
-{
+static int mxalias_entfins(MXALIAS *op) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -1375,12 +1382,10 @@ static int mxalias_entfins(MXALIAS *op)
 }
 /* end subroutine (mxalias_entfins) */
 
-
 /* ARGSUSED */
-static int file_start(MXALIAS_FILE *fep,USTAT *sbp,cchar *fname)
-{
+static int file_start(MXALIAS_FILE *fep,USTAT *sbp,cchar *fname) noex {
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if (fname == NULL) return SR_FAULT ;
 
@@ -1401,9 +1406,7 @@ static int file_start(MXALIAS_FILE *fep,USTAT *sbp,cchar *fname)
 }
 /* end subroutine (file_start) */
 
-
-static int file_finish(MXALIAS_FILE *fep)
-{
+static int file_finish(MXALIAS_FILE *fep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1419,10 +1422,8 @@ static int file_finish(MXALIAS_FILE *fep)
 }
 /* end subroutine (file_finish) */
 
-
-static int bufdesc_start(BUFDESC *bdp,int llen)
-{
-	const int	klen = KEYBUFLEN ;
+static int bufdesc_start(BUFDESC *bdp,int llen) noex {
+	cint		klen = KEYBUFLEN ;
 	int		size ;
 	int		rs ;
 	char		*bp ;
@@ -1443,9 +1444,7 @@ static int bufdesc_start(BUFDESC *bdp,int llen)
 }
 /* end subroutine (bufdesc_start) */
 
-
-static int bufdesc_finish(BUFDESC *bdp)
-{
+static int bufdesc_finish(BUFDESC *bdp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (bdp->a != NULL) {
@@ -1457,9 +1456,7 @@ static int bufdesc_finish(BUFDESC *bdp)
 }
 /* end subroutine (bufdesc_finish) */
 
-
-static int vcmpfe(MXALIAS_FILE **e1pp,MXALIAS_FILE **e2pp)
-{
+static int cmpfe(MXALIAS_FILE *e1p,MXALIAS_FILE *e2p) noex {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
@@ -1476,21 +1473,21 @@ static int vcmpfe(MXALIAS_FILE **e1pp,MXALIAS_FILE **e2pp)
 	}
 	return rc ;
 }
-/* end subroutine (vcmpfe) */
+/* end subroutine (cmpfe) */
 
+static int vcmpfe(cvoid **v1pp,cvoid **v2pp) noex {
+	MXALIAS_FILE	*e1p = (MXALIAS_FILE *) *v1pp ;
+	MXALIAS_FILE	*e2p = (MXALIAS_FILE *) *v2pp ;
+	return cmpfe(e1p,e2p) ;
+}
 
-static int isnotspecial(int ch)
-{
-	int		f ;
+static bool isnotspecial(int ch) noex {
 	ch &= 255 ;
-	f = (ch != '/') && (ch != '|') ;
-	return f ;
+	f = return (ch != '/') && (ch != '|') ;
 }
 /* end subroutine (isnotspecial) */
 
-
-static int isOurFileType(mode_t m)
-{
+static boolisOurFileType(mode_t m) noex {
 	return S_ISREG(m) || S_ISSOCK(m) || S_ISFIFO(m) || S_ISCHR(m) ;
 }
 /* end subroutine (isOurFileType) */

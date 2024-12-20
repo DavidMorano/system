@@ -55,6 +55,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<linebuffer.h>
 #include	<filer.h>
 #include	<lockfile.h>
@@ -82,8 +83,8 @@
 #define	FC_I		filecounts_info
 #define	FC_CUR		filecounts_cur
 
-#define	WORKER		struct worker
-#define	WORKER_ENT	struct worker_ent
+#define	WORKER		worker
+#define	WORKER_ENT	worker_ent
 #define	WORKER_CMDNUL	0
 #define	WORKER_CMDINC	1
 #define	WORKER_CMDSET	2
@@ -92,8 +93,7 @@
 
 #define	TO_LOCK		4		/* seconds */
 
-#define	UPDATEBUFLEN	(FILECOUNTS_NUMDIGITS + 1 + \
-	            FILECOUNTS_LOGZLEN + 1 + MAXNAMELEN + 1)
+#define	UENTADDER	(FILECOUNTS_NUMDIGITS + 1 + FILECOUNTS_LOGZLEN + 1 + 1)
 
 
 /* imported namespaces */
@@ -130,6 +130,14 @@ struct worker_ent {
 	int		action ;	/* action to perform */
 	int		ni ;		/* name-index */
 } ;
+
+namespace {
+    struct vars {
+	int		maxnamelen ;
+	int		uentlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -187,12 +195,16 @@ static int	worker_finish(WORKER *) noex ;
 static int	mkentry(char *,int,uint,int,cchar *,int,cchar *) noex ;
 static int	actioncmd(int) noex ;
 
+static int	cmpoff(WORKER_ENT *,WORKER_ENT *) noex ;
+
 extern "C" {
     static int	vcmpoff(cvoid **,cvoid **) noex ;
 }
 
 
 /* local variables */
+
+static vars		var ;
 
 constexpr int		diglen = DIGBUFLEN ;
 
@@ -204,21 +216,24 @@ constexpr char		total[] = "TOTAL" ;
 
 /* exported subroutines */
 
-int filecounts_open(FC *op,cchar *fname,int of,mode_t om) noex {
+int filecounts_open(FC *op,cchar *fn,int of,mode_t om) noex {
 	int		rs ;
-	if ((rs = filecounts_ctor(op,fname)) >= 0) {
-	    op->f.rdonly = ((of & O_ACCMODE) == O_RDONLY) ;
-	    if ((rs = u_open(fname,of,om)) >= 0) {
-	        op->fd = rs ;
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-		    op->fname = cp ;
-	            op->magic = FILECOUNTS_MAGIC ;
-	        } /* end if (memory-allocation) */
-	        if (rs < 0) {
-	            u_close(op->fd) ;
-	            op->fd = -1 ;
-	        }
-	    } /* end if (open) */
+	if ((rs = filecounts_ctor(op,fn)) >= 0) {
+	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+	        op->f.rdonly = ((of & O_ACCMODE) == O_RDONLY) ;
+	        if ((rs = u_open(fn,of,om)) >= 0) {
+	            op->fd = rs ;
+	            if (cchar *cp{} ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
+		        op->fname = cp ;
+	                op->magic = FILECOUNTS_MAGIC ;
+	            } /* end if (memory-allocation) */
+	            if (rs < 0) {
+	                u_close(op->fd) ;
+	                op->fd = -1 ;
+	            }
+	        } /* end if (open) */
+	    } /* end if (vars) */
 	    if (rs < 0) {
 		filecounts_dtor(op) ;
 	    }
@@ -356,40 +371,32 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 /* read (get info on) a counter by name */
 int filecounts_curread(FC *op,FC_CUR *curp,FC_I *fcip,
 		char *nbuf,int nlen) noex {
-	int		rs = SR_OK ;
-	int		ei ;
-	int		nl = 0 ;
-	cchar	*sp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (fcip == nullptr) return SR_FAULT ;
-	if (nbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != FILECOUNTS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != FILECOUNTS_MAGIC) return SR_NOTOPEN ;
-
-	ei = (curp->i >= 0) ? curp->i : 0 ;
-	if (ei < curp->listn) {
-
-	    fcip->utime = curp->listp[ei].utime ;
-	    fcip->value = curp->listp[ei].value ;
-	    sp = curp->listp[ei].name ;
-	    nbuf[0] = '\0' ;
-	    if (sp) {
-	        rs = sncpy(nbuf,nlen,sp) ;
-	        nl = rs ;
-	    }
-
-	    if (rs >= 0) {
-	        curp->i = (ei + 1) ;
-	    }
-
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
-
-	return (rs >= 0) ? nl : rs ;
+	int		rs ;
+	int		rl = 0 ;
+	if ((rs = filecounts_magic(op,curp,fcip,nbuf)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == FILECOUNTS_MAGIC) {
+	        int	ei = (curp->i >= 0) ? curp->i : 0 ;
+	        cchar	*sp ;
+		rs = SR_OK ;
+	        if (ei < curp->listn) {
+	            fcip->utime = curp->listp[ei].utime ;
+	            fcip->value = curp->listp[ei].value ;
+	            sp = curp->listp[ei].name ;
+	            nbuf[0] = '\0' ;
+	            if (sp) {
+	                rs = sncpy(nbuf,nlen,sp) ;
+	                rl = rs ;
+	            }
+	            if (rs >= 0) {
+	                curp->i = (ei + 1) ;
+	            }
+	        } else {
+	            rs = SR_NOTFOUND ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (filecounts_curread) */
 
@@ -518,14 +525,12 @@ static int filecounts_update(FC *op,WORKER *wp) noex {
 static int filecounts_updateone(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
     	cnullptr	np{} ;
 	uint		nv = wep->ovalue ; /* default is same as old value */
-	cint		ulen = UPDATEBUFLEN ;
 	cint		na = wep->action ;
 	cint		nd = FILECOUNTS_NUMDIGITS ;
 	cint		tlen = FILECOUNTS_LOGZLEN ;
 	int		rs = SR_OK ;
 	int		ni = wep->ni ;
 	int		wlen = 0 ;
-	char		ubuf[UPDATEBUFLEN + 1] ;
 	switch (na) {
 	case WORKER_CMDINC:
 	    if (ni >= 0) {
@@ -538,11 +543,15 @@ static int filecounts_updateone(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	    nv = wep->avalue ;
 	    break ;
 	} /* end switch */
-	if ((rs = mkentry(ubuf,ulen,nv,nd,tbuf,tlen,np)) >= 0) {
-	    off_t	uoff = wep->eoff ;
-	    wlen = rs ;
-	    rs = u_pwrite(op->fd,ubuf,wlen,uoff) ;
-	}
+	if (char *ubuf{} ; (rs = uc_malloc(var.uentlen,&ubuf)) >= 0) {
+	    cint	ulen = rs ;
+	    if ((rs = mkentry(ubuf,ulen,nv,nd,tbuf,tlen,np)) >= 0) {
+	        coff	uoff = wep->eoff ;
+	        wlen = rs ;
+	        rs = u_pwrite(op->fd,ubuf,wlen,uoff) ;
+	    }
+	    rs = rsfree(rs,ubuf) ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filecounts_updateone) */
@@ -551,11 +560,9 @@ static int filecounts_append(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	uint		nv = 0 ;
 	cint		nvsize = FILECOUNTS_NUMDIGITS ;
 	cint		tlen = FILECOUNTS_LOGZLEN ;
-	cint		ulen = UPDATEBUFLEN ;
 	cint		na = wep->action ;
 	int		rs ;
 	int		wlen = 0 ;
-	char		ubuf[UPDATEBUFLEN + 1] ;
 	switch (na) {
 	case WORKER_CMDINC:
 	    nv = (wep->avalue+1) ;
@@ -564,13 +571,19 @@ static int filecounts_append(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	    nv = wep->avalue ;
 	    break ;
 	} /* end switch */
-	if ((rs = mkentry(ubuf,ulen,nv,nvsize,tbuf,tlen,wep->name)) >= 0) {
-	    wlen += rs ;
-	    if (off_t eoff{} ; (rs = u_seeko(op->fd,0z,SEEK_END,&eoff)) >= 0) {
-	        rs = u_write(op->fd,ubuf,wlen) ;
-	        wep->eoff = eoff ;
-	    }
-	} /* end if (mkentry) */
+	if (char *ubuf{} ; (rs = uc_malloc(var.uentlen,&ubuf)) >= 0) {
+	    cint	ulen = rs ;
+	    cchar	*nn = wep->name ;
+	    if ((rs = mkentry(ubuf,ulen,nv,nvsize,tbuf,tlen,nn)) >= 0) {
+	        cint	w = SEEK_END ;
+	        wlen += rs ;
+	        if (off_t eoff{} ; (rs = u_seeko(op->fd,0z,w,&eoff)) >= 0) {
+	            rs = u_write(op->fd,ubuf,wlen) ;
+	            wep->eoff = eoff ;
+	        }
+	    } /* end if (mkentry) */
+	    rs = rsfree(rs,ubuf) ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filecounts_append) */
@@ -627,60 +640,56 @@ static int filecounts_snaper(FC *op,vecobj *ilp) noex {
 
 static int filecounts_snaperline(FC *op,dater *dmp,vecobj *ilp,
 		char *lbuf,int llen) noex {
-	int		rs = SR_OK ;
-	int		si ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	si = (FILECOUNTS_NUMDIGITS + 1 + FILECOUNTS_LOGZLEN + 1) ;
-	if (llen >= (si+1)) {
-	    uint	v ;
-	    int		sl = llen ;
-	    int		cl ;
-	    cchar	*cp ;
-	    cchar	*np ;
-	    cchar	*sp = lbuf ;
-
-	if (sl && (sp[sl-1] == '\n')) sl -= 1 ;
-
-	while (sl && CHAR_ISWHITE(sp[sl-1])) /* EOL removal */
-	    sl -= 1 ;
-
-	cp = sp ;
-	cl = FILECOUNTS_NUMDIGITS ;
-	if ((rs = cfdecui(cp,cl,&v)) >= 0) {
-
-	sl -= ((cp + cl + 1) - sp) ;
-	sp = (cp + cl + 1) ;
-
-	cp = (cchar *) sp ;
-	cl = FILECOUNTS_LOGZLEN ;
-	if ((rs = dater_setlogz(dmp,cp,cl)) >= 0) {
-	    time_t	utime ;
-	    if ((rs = dater_gettime(dmp,&utime)) >= 0) {
-
-	sl -= ((cp + cl + 1) - sp) ;
-	sp = (cp + cl + 1) ;
-
-	cp = sp ;
-	cl = sl ;
-
-	            if ((rs = uc_mallocstrw(cp,cl,&np)) >= 0) {
-	                FC_II	ii ;
-	                ii.name = np ;
-	                ii.value = v ;
-	                ii.utime = utime ;
-	                rs = vecobj_add(ilp,&ii) ;
-	                if (rs < 0) {
-			    uc_free(np) ;
-			}
-	            } /* end if (m-a) */
-	        } /* end if (dater_gettime) */
-	    } /* end if (dater_setlogz) */
-	} /* end if (cfdecui) */
-
-	} /* end if (zero or positive) */
-
+	int		rs = SR_FAULT ;
+	if (op) {
+	    cint si = (FILECOUNTS_NUMDIGITS + 1 + FILECOUNTS_LOGZLEN + 1) ;
+	    if (llen >= (si + 1)) {
+	        int	sl = llen ;
+	        int	cl ;
+	        cchar	*cp ;
+	        cchar	*sp = lbuf ;
+	        if (sl && (sp[sl-1] == '\n')) {
+	            sl -= 1 ;
+	        }
+	        while (sl && CHAR_ISWHITE(sp[sl-1])) /* EOL removal */ {
+	            sl -= 1 ;
+	        }
+	        cp = sp ;
+	        cl = FILECOUNTS_NUMDIGITS ;
+	        if (uint v{} ; (rs = cfdecui(cp,cl,&v)) >= 0) {
+	            {
+	                sl -= ((cp + cl + 1) - sp) ;
+	                sp = (cp + cl + 1) ;
+	            }
+	            cp = sp ;
+	            cl = FILECOUNTS_LOGZLEN ;
+	            if ((rs = dater_setlogz(dmp,cp,cl)) >= 0) {
+	                time_t	utime ;
+	                if ((rs = dater_gettime(dmp,&utime)) >= 0) {
+		            {
+	                        sl -= ((cp + cl + 1) - sp) ;
+	                        sp = (cp + cl + 1) ;
+		            }
+		            {
+	                        cp = sp ;
+	                        cl = sl ;
+		            }
+			    auto ucmstr = uc_mallocstrw ;
+	                    if (cc *nnp{} ; (rs = ucmstr(cp,cl,&nnp)) >= 0) {
+	                        FC_II	ii{} ;
+	                        ii.name = nnp ;
+	                        ii.value = v ;
+	                        ii.utime = utime ;
+	                        rs = vecobj_add(ilp,&ii) ;
+	                        if (rs < 0) {
+			            uc_free(nnp) ;
+			        }
+	                    } /* end if (m-a) */
+	                } /* end if (dater_gettime) */
+	            } /* end if (dater_setlogz) */
+	        } /* end if (cfdecui) */
+	    } /* end if (zero or positive) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (filecounts_snaperline) */
@@ -821,6 +830,7 @@ static int worker_get(WORKER *wp,int i,WORKER_ENT **rpp) noex {
 static int mkentry(char *rbuf,int rlen,uint nv,int nvs,
 		cchar *tb,int ts,cc *name) noex {
 	int		rs ;
+	int		idx = 0 ;
 	if (char digbuf[diglen + 1] ; (rs = ctdecui(digbuf,diglen,nv)) >= 0) {
 	    storebuf	sb(rbuf,rlen) ;
 	    int		n = rs ;
@@ -854,9 +864,9 @@ static int mkentry(char *rbuf,int rlen,uint nv,int nvs,
 	    if (rs >= 0) {
 	        rs = sb.chr('\n') ;
 	    }
-	    rs = sb.idx ;
+	    idx = sb.idx ;
 	} /* end if (ctdecui) */
-	return rs ;
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (mkentry) */
 
@@ -874,9 +884,7 @@ static int actioncmd(int nv) noex {
 }
 /* end subroutine (actioncmd) */
 
-static int vcmpoff(cvoid **v1pp,cvoid **v2pp) noex {
-	WORKER_ENT	*e1p = (WORKER_ENT *) *v1pp ;
-	WORKER_ENT	*e2p = (WORKER_ENT *) *v2pp ;
+static int cmpoff(WORKER_ENT *e1p,WORKER_ENT *e2p) noex {
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
@@ -896,6 +904,23 @@ static int vcmpoff(cvoid **v1pp,cvoid **v2pp) noex {
 	}
 	return rc ;
 }
+/* end subroutine (cmpoff) */
+
+static int vcmpoff(cvoid **v1pp,cvoid **v2pp) noex {
+	WORKER_ENT	*e1p = (WORKER_ENT *) *v1pp ;
+	WORKER_ENT	*e2p = (WORKER_ENT *) *v2pp ;
+	return cmpoff(e1p,e2p) ;
+}
 /* end subroutine (vcmpoff) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    maxnamelen = rs ;
+	    uentlen = (rs + UENTADDER) ;
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

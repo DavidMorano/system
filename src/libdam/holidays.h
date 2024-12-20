@@ -21,6 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
+#include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 
 

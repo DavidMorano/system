@@ -67,6 +67,9 @@ using std::nullptr_t ;			/* type */
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
