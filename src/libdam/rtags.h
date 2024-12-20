@@ -59,7 +59,7 @@ EXTERNC_begin
 typedef int (*rtags_f)(cvoid **,cvoid **) noex ;
 
 extern int	rtags_start(rtags *,int) noex ;
-extern int	rtags_add(rtags *,rtags_tag *,cchar *) noex ;
+extern int	rtags_add(rtags *,rtags_tag *,cchar *,int) noex ;
 extern int	rtags_sort(rtags *,rtags_f) noex ;
 extern int	rtags_curbegin(rtags *,rtags_cur *) noex ;
 extern int	rtags_curend(rtags *,rtags_cur *) noex ;

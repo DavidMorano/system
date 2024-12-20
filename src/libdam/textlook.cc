@@ -282,7 +282,7 @@ static int	textlook_dispstart(TL *,int,SK *,rtags *) noex ;
 static int	textlook_dispfinish(TL *) noex ;
 
 static int	textlook_indclose(TL *) noex ;
-static int	textlook_havekeys(TL *,TI_TAG *,int,SK *) noex ;
+static int	textlook_havekeys(TL *,TI_TAG *,cc *,int,int,SK *) noex ;
 static int	textlook_havekeyer(TL *,TI_TAG *,int,
 			SK *,SK_POP *,cchar *) noex ;
 static int	textlook_havekeyers(TL *,TI_TAG *,int,
@@ -459,8 +459,8 @@ int textlook_curbegin(TL *op,TL_CUR *curp) noex {
 	    if (char *tb{} ; (rs = malloc_mp(&tb)) >= 0) {
 		curp->tbuf = tb ;
 	        if ((rs = rtags_start(&curp->tags,0)) >= 0) {
-		    rtag_tag	*rtp = &curp->tcur ;
-	            if ((rs = rtags_curbegin(&curp->tags,rtp)) >= 0) {
+		    rtags_cur	*rcp = &curp->tcur ;
+	            if ((rs = rtags_curbegin(&curp->tags,rcp)) >= 0) {
 	                op->ncursors += 1 ;
 	                curp->magic = TEXTLOOK_MAGIC ;
 	            }
@@ -711,7 +711,8 @@ static int textlook_indclose(TL *op) noex {
 }
 /* end subroutine (textlook_inclose) */
 
-static int textlook_havekeys(TL *op,TI_TAG *tagp,int qo,SK *skp) noex {
+static int textlook_havekeys(TL *op,TI_TAG *tagp,cc *fp,int fl,
+		int qo,SK *skp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = false ;
@@ -721,7 +722,7 @@ static int textlook_havekeys(TL *op,TI_TAG *tagp,int qo,SK *skp) noex {
 	    cint	f_prefix = (qo & TEXTLOOK_OPREFIX) ;
 	    if ((rs = searchkeys_popbegin(skp,&pkeys,f_prefix)) >= 0) {
 	        if (rs > 0) {
-	            cchar	*fn = tagp->fname ;
+	            cchar	*fn = fp ;
 	            if ((fn[0] == '\0') && (op->sfn != np)) {
 	                fn = op->sfn ;
 	            }
@@ -733,7 +734,7 @@ static int textlook_havekeys(TL *op,TI_TAG *tagp,int qo,SK *skp) noex {
 	                            dn = op->bdname ;
 	                        }
 	                        if ((dn != np) && (dn[0] != '\0')) {
-	                            rs = mkpath(fbuf,dn,fn) ;
+	                            rs = mkpath(fbuf,dn,fn,fl) ;
 	                            fn = fbuf ;
 	                        }
 	                    }
@@ -1318,15 +1319,15 @@ static int disp_workone(DISP *dop,TI_TAG *qvp,cc *fp,int fl) noex {
 	rtags	*rtp = dop->a.rtp ; /* renew */
 	int	qo = dop->a.qo ; /* renew */
 	int	rs ;
-	if ((rs = textlook_havekeys(op,&qv,qo,skp)) > 0) {
+	int	c = 0 ;
+	if ((rs = textlook_havekeys(op,qvp,fp,fl,qo,skp)) > 0) {
 	    rtags_tag	rt{} ;
 	    c += 1 ;
-	    rt.hash = 0 ;
-	    rt.recoff = qv.recoff ;
-	    rt.reclen = qv.reclen ;
+	    rt.recoff = qvp->recoff ;
+	    rt.reclen = qvp->reclen ;
 	    rs = rtags_add(rtp,&rt,fp,fl) ;
 	} /* end if (found a key) */
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (disp_workone) */
 
