@@ -1,4 +1,5 @@
 /* sicite SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* string-index to a citation escape */

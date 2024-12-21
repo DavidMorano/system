@@ -1,4 +1,5 @@
 /* sihyphen SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a hyphen (a fake hyphen of two minus characters) in a string */

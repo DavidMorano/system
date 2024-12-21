@@ -1,4 +1,5 @@
 /* siterm SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the index in a c-string up to a terminator character */

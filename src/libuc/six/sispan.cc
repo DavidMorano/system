@@ -1,4 +1,5 @@
 /* sispan SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the index of character pass a span of a string */

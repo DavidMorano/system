@@ -77,9 +77,7 @@
 #include	<ucpts.h>		/* pseudo-terminal management */
 #include	<ucfdmanip.h>
 #include	<uctimer.h>
-#include	<ucgetpid.h>
 #include	<ucrand.h>
-#include	<ucgetrandom.h>
 #include	<ucsysauxinfo.h>
 #include	<uctimer.h>
 #include	<ucinetconv.h>
@@ -88,6 +86,7 @@
 #include	<ucsysmisc.h>
 #include	<ucsig.h>
 #include	<uclock.h>
+#include	<ucgetx.h>
 
 #include	<getxname.h>
 #include	<getexecname.h>
@@ -99,19 +98,9 @@
 EXTERNC_begin
 
 /* system group */
-extern int	uc_gethostid(ulong *) noex ;
-extern int	uc_gethostname(char *,int) noex ;
-extern int	uc_getarchitecture(char *,int) noex ;
-extern int	uc_getnisdomain(char *,int) noex ;
-extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocs(int) noex ;
 
-static inline int uc_getarch(char *rb,int rl) noex {
-    	return uc_getarchitecture(rb,rl) ;
-}
-
 /* time group */
-extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 extern int	uc_ftime(TIMEB *) noex ;
 extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
 extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
@@ -130,13 +119,10 @@ extern int	uc_atforkrecord(void_f,void_f,void_f) noex ;
 extern int	uc_atforkexpunge(void_f,void_f,void_f) noex ;
 extern int	uc_atfork(void_f,void_f,void_f) noex ;
 
-extern int	uc_getcwd(char *,int) noex ;
 extern int	uc_swapcontext(ucontext_t *,const ucontext_t *) noex ;
 extern int	uc_msync(caddr_t,size_t,int) noex ;
-extern int	uc_getauid() noex ;
-extern int	uc_getpriority(int,id_t,int *) noex ;
+
 extern int	uc_setpriority(int,id_t,int) noex ;
-extern int	uc_getpuid(pid_t) noex ;
 extern int	uc_procpid(cchar *,uid_t) noex ;
 
 /* double-special open group */
@@ -268,27 +254,16 @@ extern int	uc_openshm(cchar *,int,mode_t) noex ;
 extern int	uc_openshmto(cchar *,int,mode_t,int) noex ;
 extern int	uc_unlinkshm(cchar *) noex ;
 
-/* NETWORK IPNODE database */
-extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
-extern int	uc_getipnodebyaddr(HOSTENT **,cvoid *,int,int) noex ;
 extern int	uc_hostentfree(HOSTENT *) noex ;
 
 /* NETWORK ADDRINFO database */
 extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
 extern int uc_addrinfofree(ADDRINFO *) noex ;
 
-/* NETWORK SOCKADDR combined database */
-extern int	uc_getnameinfo(const SOCKADDR *,int,
-			char *,int,char *,int,int) noex ;
-
-/* why was this missing? */
-extern int	uc_getlogin(char *,int) noex ;
-
 /* miscellaneous */
 extern int	uc_ztime(TM *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
-extern int	uc_getnetname(char *) noex ;
 
 EXTERNC_end
 

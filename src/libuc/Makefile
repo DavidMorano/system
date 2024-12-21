@@ -326,10 +326,7 @@ ucatfork.o:		ucatfork.cc
 ucatexit.o:		ucatexit.cc
 ucfork.o:		ucfork.cc
 ucgetipnodeby.o:	ucgetipnodeby.cc
-ucgetnameinfo.o:	ucgetnameinfo.cc
-ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
-ucgetpid.o:		ucgetpid.cc ucgetpid.h
 ucproguser.o:		ucproguser.cc ucproguser.h
 ucprogdata.o:		ucprogdata.cc ucprogdata.h
 ucclustername.o:	ucclustername.cc ucclustername.h
@@ -348,7 +345,6 @@ uctimeout.o:		uctimeout.cc
 
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
-ucgetpuid.o:		ucgetpuid.cc
 
 uc_safesleep.o:		uc_safesleep.cc
 
@@ -572,6 +568,11 @@ ucget.dir:
 # UCENUM
 ucenum.o:		ucenum.dir
 ucenum.dir:
+	makesubdir $@
+
+# UCGETX
+ucgetx.o:		ucgetx.dir
+ucgetx.dir:
 	makesubdir $@
 
 # UCOPEN
@@ -871,6 +872,7 @@ callback.o:		callback.cc callback.h
 dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h
+nisdomainname.o:	nisdomainname.cc nisdomainname.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

@@ -1,4 +1,5 @@
 /* sileader SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve the string-index into a "leader" */

@@ -1,4 +1,5 @@
 /* sifext SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* determine if file-name (just a c-string) has an approved file-extension */

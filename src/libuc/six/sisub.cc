@@ -1,4 +1,5 @@
 /* sisub SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* find the string-index of a sub-stringin the given c-string */

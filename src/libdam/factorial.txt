@@ -1,0 +1,25 @@
+FACTORIAL
+
+One of the best formulas for the calculation of n factorial is the
+Ramanujanâs formula:
+
+n! ~ (sqr(pi))((n/e)^n)(8n^3 + 4n^2 + n + 1/30)^(1/6)
+
+A slightly improved version of Ramanujanâ's formula is:
+
+n! ~ (sqr(pi))((n/e)^n)(8n^3 + 4n^2 + n + 1/(pi^3))^(1/6)
+
+The great Indian mathematician Srinivasa Ramanujan working on the
+evaluation for the n factorial, discovered the amazing approximation
+formula:
+
+(sqr(pi))((n/e)^n)(8n^3+4n^2+n+1/30)^(1/6)
+
+Four weeks ago, I improved Ramanujan's formula. The new and improved
+formula is based on the original Ramanujan's formula and it is the
+following:
+
+n! ~ (sqr(pi))((n/e)^n)*
+	(8n^3 + 4n^2 + n + 1/(pi^(3+(1/(n+(ln(n-3))^2)))))^(1/6)
+
+

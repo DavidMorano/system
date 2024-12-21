@@ -1,4 +1,5 @@
 /* sicasechr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to find the index of a character in a given string */

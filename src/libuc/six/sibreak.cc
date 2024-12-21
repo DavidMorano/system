@@ -1,4 +1,5 @@
 /* sibreak SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to find a character in a given string */

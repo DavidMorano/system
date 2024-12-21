@@ -1,4 +1,5 @@
 /* sinext SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* return index to end of next string-field */

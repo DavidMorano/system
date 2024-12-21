@@ -1,4 +1,5 @@
 /* sifext HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* determine if file-name (just a string) has an approved file-extension */

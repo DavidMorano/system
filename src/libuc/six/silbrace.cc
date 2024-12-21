@@ -1,4 +1,5 @@
 /* silbrace SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* is the next non-whatspace character a left-brace? */

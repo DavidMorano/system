@@ -1,4 +1,5 @@
 /* nisdomainname SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the NIS domain name for the current host */
@@ -43,6 +44,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<filereadln.h>
@@ -64,6 +66,8 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using libu::ugetnisdom ;		/* subroutine */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
