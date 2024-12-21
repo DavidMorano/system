@@ -1,7 +1,7 @@
 /* mktxtindexcmds HEADER */
 /* lang=C20 */
 
-/* names string storiage: purpose? */
+/* these enumerations are commands used in text indexing operations */
 /* version %I% last-modified %G% */
 
 
@@ -19,9 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 enum mkcmds {
@@ -37,7 +38,7 @@ enum mkcmds {
 } ;
 
 
-extern cpcchar		mkcmds[] ;
+extern cpcchar	mktxtindexcmds[] ;
 
 
 #endif /* MKTXTINDEXCMDS_INCLUDE */

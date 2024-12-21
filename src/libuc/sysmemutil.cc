@@ -1,4 +1,5 @@
 /* sysmemutil SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve the utilization (in a percentage of total) of system memory */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+	Name:
+	sysmemutil
+
+	Description:
 	We hope that the OS has some |sysconf(3c)| subroutines to
 	help us here.  We really are tired of searching through the
 	kernel for this sort of information. We return SR_NOSYS if

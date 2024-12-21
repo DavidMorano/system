@@ -826,6 +826,7 @@ osetstr.o:		osetstr.cc osetstr.h
 osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 syspasswd.o:		syspasswd.cc syspasswd.h
 absfn.o:		absfn.cc absfn.h
+envmgr.o:		envmgr.cc envmgr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h
@@ -873,6 +874,7 @@ dictdiff.o:		dictdiff.cc dictdiff.h
 rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h
 nisdomainname.o:	nisdomainname.cc nisdomainname.h
+sysmemutil.o:		sysmemutil.cc sysmemutil.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

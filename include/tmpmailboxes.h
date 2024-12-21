@@ -18,14 +18,14 @@
 /*******************************************************************************
 
 	Name:
-	getsrcname
+	tmpmailboxes
 
 	Description:
 	I do something w/ temporary mailboxes.  I am sure that this
 	has some purpose someplace.
 
 	Synopsis:
-	int getsrcname(char *rbuf,int rlen) noex
+	int tmpmailboxes(char *rbuf,int rlen) noex
 
 	Arguments:
 	rbuf		result buffer pointer
@@ -50,9 +50,7 @@
 
 
 EXTERNC_begin
-
 extern int	tmpmailboxes(char *,int) noex ;
-
 EXTERNC_end
 
 

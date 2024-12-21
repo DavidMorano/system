@@ -18,10 +18,12 @@
 
 /*******************************************************************************
 
-	These are (secretly) POSIX® "named" semaphores!
-	These do NOT have the same API as the w/ regular POSIX®
-	interface.
+  	Object:
+	ucsem
 
+	Description:
+	These are (secretly) POSIX® "named" semaphores!  These do
+	NOT have the same API as the w/ regular POSIX® interface.
 	This module provides a sanitized version of the standard
 	POSIX® semaphore facility provided with some new UNIX®i.
 	Some operating system problems are managed within these
@@ -39,6 +41,8 @@
 #include	<fcntl.h>
 #include	<semaphore.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -119,17 +123,17 @@ constexpr bool		f_condunlink = CF_CONDUNLINK ;
 /* exported subroutines */
 
 int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
+    	UCSEM		*hop = op ;
 	int		to_mfile = utimeout[uto_mfile] ;
 	int		to_nfile = utimeout[uto_nfile] ;
 	int		to_nospc = utimeout[uto_nospc] ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && name) {
-	    memclear(op) ;
+	    memclear(hop) ;
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-		char	*altname = nullptr ;
-		if ((rs = malloc_mn(&altname)) >= 0) {
+		if (char *altname{} ; (rs = malloc_mn(&altname)) >= 0) {
 	            if (name[0] != '/') {
 			if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 			    cint	mnlen = rs ;
@@ -175,14 +179,13 @@ int ucsem_open(ucsem *op,cchar *name,int oflag,mode_t om,uint count) noex {
 	                    } /* end if (error) */
 	                } until ((rs >= 0) || f_exit) ;
 	                if (rs >= 0) {
-			    char	*bp ;
-			    if ((rs = malloc_mn(&bp)) >= 0) {
+			    if (char *bp{} ; (rs = malloc_mn(&bp)) >= 0) {
 				cint	mnlen = rs ;
 				op->name = bp ;
 	                        strwcpy(bp,name,mnlen) ;
 	                        if (oflag & O_CREAT) ucsemdiradd(name,om) ;
 	                        op->magic = UCSEM_MAGIC ;
-			    }
+			    } /* end if (memory-allocation) */
 	                } /* end if (opened) */
 	            } /* end if (ok) */
 		    rs1 = uc_free(altname) ;

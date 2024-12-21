@@ -1,4 +1,5 @@
 /* envmgr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Environment Manager */
@@ -16,11 +17,16 @@
 
 /*******************************************************************************
 
+  	Object:
+	envmgr
+
+	Description:
 	Manage an environment ensemble.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -35,10 +41,16 @@
 /* local defines */
 
 
-/* external subroutines */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */

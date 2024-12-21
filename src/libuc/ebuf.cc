@@ -1,4 +1,5 @@
 /* ebuf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage entry buffering of a file */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	ebuf
+
+	Description:
 	This module manages the entry-buffering of a read-write
 	file database.  We ignore what the entries actually are and
 	just (really) cache them.  Our purpose is to try to avoid
@@ -36,6 +41,7 @@
 #include	<fcntl.h>
 #include	<climits>
 #include	<cinttypes>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>

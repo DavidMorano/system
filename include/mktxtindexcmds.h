@@ -1,6 +1,8 @@
-/* mkcmds HEADER */
-/* encoding=ISO8859-1 */
+/* mktxtindexcmds HEADER */
 /* lang=C20 */
+
+/* these enumerations are commands used in text indexing operations */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,8 +14,8 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MKCMDS_INCLUDE
-#define	MKCMDS_INCLUDE
+#ifndef	MKTXTINDEXCMDS_INCLUDE
+#define	MKTXTINDEXCMDS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -36,9 +38,9 @@ enum mkcmds {
 } ;
 
 
-extern const char	*mkcmds[] ;
+extern cpcchar	mktxtindexcmds[] ;
 
 
-#endif /* MKCMDS_INCLUDE */
+#endif /* MKTXTINDEXCMDS_INCLUDE */
 
 

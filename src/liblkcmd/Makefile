@@ -420,7 +420,7 @@ OBJ95= maintqotd.o maintqotd_prog.o
 
 OBJ096= proginfo.o proginfo_setpiv.o proginfo_rootname.o 
 OBJ097= progdebugout.o proglog.o proglogout.o proguserlist.o
-OBJ098= maininfo.o sysmemutil.o
+OBJ098= maininfo.o
 OBJ099= 
 OBJ100= msghdr.o cmsghdr.o
 OBJ101= getourenv.o

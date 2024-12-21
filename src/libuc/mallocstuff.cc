@@ -1,4 +1,5 @@
 /* mallocstuff SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* miscellaneous |malloc(3c)| related */
@@ -17,17 +18,21 @@
 
 /*****************************************************************************
 
+  	Group:
+	mallocstuff
+
+	Description:
 	These subroutines allocate a suitable amount of memory and
 	then copy the user supplied thing into it.
 
 ****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
 #include	<usystem.h>
+#include	<usupport.h>		/* |ulogeerror(3u)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 

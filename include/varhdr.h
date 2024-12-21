@@ -1,5 +1,9 @@
 /* varhdr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
+
+/* text-index header for VAR-INDEX file */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -9,18 +13,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	VARHDR			struct varhdr_head
-#define	VARHDR_FSUF		"vi"
-#define	VARHDR_MAGICSTR		"VARIND"
-#define	VARHDR_MAGICLEN		sizeof(VARHDR_MAGICSTR)
 #define	VARHDR_MAGICSIZE	16
+#define	VARHDR_MAGICSTR		"VARIND"
 #define	VARHDR_VERSION		0
+#define	VARHDR_FSUF		"vi"
 
 
 struct varhdr_head {
@@ -36,14 +40,15 @@ struct varhdr_head {
 	uint		itlen ;
 	uint		nvars ;
 	uint		nskip ;
-	char		vetu[4] ;
+	uchar		vetu[4] ;
 } ;
 
 typedef	VARHDR		varhdr ;
 
 EXTERNC_begin
 
-extern int varhdr_msg(varhdr *,int,char *,int) noex ;
+extern int	varhdr_rd(varhdr *,char *,int) noex ;
+extern int	varhdr_wr(varhdr *,cchar *,int) noex ;
 
 EXTERNC_end
 

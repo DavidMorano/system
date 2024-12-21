@@ -43,7 +43,7 @@ I06= termstr.h
 I07= kinfo.h loadave.h fsdir.h fsdirtree.h
 I08= logfile.h lfm.h tmpx.h
 I09= storeitem.h 
-I10= mallocstuff.h userinfo.h openport.h
+I10= userinfo.h openport.h
 I11= char.h ansigr.h baops.h bwops.h
 I12= envs.h
 I13= raqhand.h
@@ -110,7 +110,7 @@ OBJ13= matstr.o matostr.o matpstr.o matpcasestr.o
 OBJ14= matkeystr.o matnstr.o matsubstr.o matcasesubstr.o
 OBJ15=
 
-OBJ16= mallocstuff.o fileread.o
+OBJ16=
 OBJ17= 
 OBJ18= 
 OBJ19= 
@@ -276,7 +276,7 @@ OBJ158= localgetnetload.o localsetnetload.o localgetsystat.o localsetsystat.o
 OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
-OBJ161= nusers.o mesg.o sysmemutil.o initnow.o 
+OBJ161= nusers.o mesg.o initnow.o 
 OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o dictdiff.o bufprintf.o xfile.o
 OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o straltwchar.o

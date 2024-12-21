@@ -1,6 +1,6 @@
 /* ctwords SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++11 */
 
 /* convert to Number Words */
 /* version %I% last-modified %G% */
@@ -45,12 +45,9 @@
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 #include	"ctwords.hh"
 
@@ -60,6 +57,7 @@
 
 /* local name-spaces */
 
+using std::nullptr_t ;			/* type */
 using std::string ;			/* type */
 
 
@@ -77,19 +75,19 @@ using std::string ;			/* type */
 
 /* forward references */
 
-static int speak_billions(string *,int) ;
-static int speak_millions(string *,int) ;
-static int speak_thousands(string *,int) ;
-static int speak_group(string *,int) ;
-static int speak_hundreds(string *,int) ;
-static int speak_tens(string *,int) ;
-static int speak_teens(string *,int) ;
-static int speak_ones(string *,int) ;
+static int speak_billions(string *,int) noex ;
+static int speak_millions(string *,int) noex ;
+static int speak_thousands(string *,int) noex ;
+static int speak_group(string *,int) noex ;
+static int speak_hundreds(string *,int) noex ;
+static int speak_tens(string *,int) noex ;
+static int speak_teens(string *,int) noex ;
+static int speak_ones(string *,int) noex ;
 
 
 /* local variables */
 
-static constexpr cchar	*ones[] = {
+constexpr cpcchar	ones[] = {
 	"Zero",
 	"One",
 	"Two",
@@ -103,7 +101,7 @@ static constexpr cchar	*ones[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*teens[] = {
+constexpr cpcchar	teens[] = {
 	"Ten",
 	"Eleven",
 	"Twelve",
@@ -117,7 +115,7 @@ static constexpr cchar	*teens[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*tens[] = {
+constexpr cpcchar	tens[] = {
 	"and",
 	"Ten",
 	"Twenty",

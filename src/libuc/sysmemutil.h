@@ -1,4 +1,5 @@
 /* sysmemutil HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve the utilization (in a percentage of total) of system memory */
@@ -11,14 +12,12 @@
 #define	SYSMEMUTIL_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 
 
 #define	SYSMEMUTIL_DAT		struct sysmemutil_data

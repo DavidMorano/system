@@ -1,4 +1,5 @@
 /* csem SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Counting-Semaphore (CSEM) */
@@ -26,13 +27,13 @@
 
 	Description:
 	This module provides an interlocked (atomic) counting
-	semaphore. It uses the underlying POSIX® mutex and
+	semaphore.  It uses the underlying POSIX® mutex and
 	condition-variables synchronization facility implementations.
 	One would think that some OS (or even POSIX) would have
 	given us a counting semaphore by now, but NO, that is not
-	the case. Admittedly, there are no longer as many uses for
+	the case.  Admittedly, there are no longer as many uses for
 	a counting semaphore per se, now that the p-threads semaphore
-	and p-threads condition variables are available. But we get
+	and p-threads condition variables are available.  But we get
 	by because the usual decrement amount on the semaphore count
 	is usually only one (1), and that happens to be the only,
 	but generally sufficient, decrement amount that p-threads
@@ -51,8 +52,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<cstddef>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<new>
 #include	<usystem.h>
 #include	<localmisc.h>
