@@ -40,7 +40,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
-#include	<cinttypes>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
@@ -54,7 +54,7 @@
 
 /* local defines */
 
-#define	WAY	struct ebuf_way
+#define	WAY	ebuf_way
 
 
 /* imported namespaces */
@@ -109,10 +109,10 @@ static int	ebuf_wayloadread(ebuf *,int,int,char **) noex ;
 /* exported subroutines */
 
 int ebuf_start(ebuf *op,int fd,uint soff,int esize,int nways,int npw) noex {
+    	EBUF		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    USTAT	sb ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if (nways < 0) nways = 1 ;
 	    if (npw < EBUF_NENTS) npw = EBUF_NENTS ;
 	    op->fd = fd ;
@@ -121,15 +121,14 @@ int ebuf_start(ebuf *op,int fd,uint soff,int esize,int nways,int npw) noex {
 	    op->nways = nways ;
 	    op->iways = 0 ;
 	    op->npw = npw ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 		csize	fsz = size_t(sb.st_size) ;
 	        int	sz ;
-	        void	*vp{} ;
 	        if (uint foff = intsat(fsz) ; foff > soff) {
 	            op->nentries = ((foff - soff) / esize) ;
 	        }
-	        sz = nways * sizeof(WAY) ;
-	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	        sz = nways * szof(WAY) ;
+	        if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 		    op->ways = (EBUF_WAY *) vp ;
 		    memset(op->ways,0,sz) ;
 		    op->magic = EBUF_MAGIC ;
@@ -178,27 +177,27 @@ int ebuf_write(ebuf *op,int ei,cvoid *ebuf) noex {
 	if ((rs = ebuf_magic(op)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (ei >= 0) {
-	        char	*rp = nullptr ;
+		char	*rp = nullptr ;
 	        if ((rs = ebuf_search(op,ei,&rp)) >= 0) {
-	            if (ebuf != nullptr) {
+	            if (ebuf) {
 	                memcpy(rp,ebuf,op->esize) ;
 	            }
 	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
 	            if (ebuf != nullptr) {
-	                rp = (char *) ebuf ;
+	                rp = charp(ebuf) ;
 	            }
 	        }
 	        if (rs >= 0) {
 	            if (ei < 0) ei = op->nentries ;
-	            if (rp != nullptr) {
-		        off_t	poff = op->soff + (ei * op->esize) ;
+	            if (rp) {
+		        coff	poff = op->soff + (ei * op->esize) ;
 	                if ((rs = u_pwrite(op->fd,rp,op->esize,poff)) >= 0) {
 		            if (ei >= op->nentries) {
 		                op->nentries = (ei + 1) ;
 		            }
 	                }
-	            } /* end if */
+	            } /* end if (result available) */
 	        } /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -248,7 +247,9 @@ static int ebuf_waybegin(ebuf *op,int wi) noex {
 	if ((rs = ebuf_magic(op)) >= 0) {
 	    WAY		*wp = (op->ways + wi) ;
 	    int		wsize = (op->npw * op->esize) ;
-	    rs = uc_malloc(wsize,&wp->wbuf) ;
+	    if (void *vp{} ; (rs = uc_malloc(wsize,&vp)) >= 0) {
+		wp->wbuf = charp(vp) ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -334,15 +335,15 @@ static int ebuf_wayfindfin(ebuf *op) noex {
 	int		rs ;
 	int		wi = 0 ;
 	if ((rs = ebuf_magic(op)) >= 0) {
-	    WAY		*wp ;
+	    WAY		*wp{} ;
 	    for (wi = 0 ; wi < op->iways ; wi += 1) {
 	        wp = (op->ways + wi) ;
 	        if (wp->wlen == 0) break ;
 	    } /* end if */
 	    if (wi >= op->iways) {
-/* look for un-initialized and not used once yet */
+		/* look for un-initialized and not used once yet */
 	        if (op->iways >= op->nways) {
-/* look for un-initialized anywhere (if this even ever occurs) */
+		    /* look for un-initialized anywhere */
 	            for (wi = 0 ; wi < op->iways ; wi += 1) {
 	                wp = (op->ways + wi) ;
 	                if (wp->wbuf == nullptr) break ;
@@ -360,7 +361,7 @@ static int ebuf_wayfindfin(ebuf *op) noex {
 /* end subroutine (ebuf_wayfindfin) */
 
 static int ebuf_wayfindevict(ebuf *op) noex {
-	WAY		*wp ;
+	WAY		*wp = nullptr ;
 	uint		otime = INT_MAX ;
 	int		rs = SR_OK ;
 	int		wi = 0 ;
@@ -393,28 +394,27 @@ static int ebuf_wayevict(ebuf *op,int wi) noex {
 static int ebuf_wayloadread(ebuf *op,int wi,int ei,char **rpp) noex {
 	WAY		*wp = (op->ways + wi) ;
 	off_t		poff ;
-	uint		woff ;
 	int		rs = SR_OK ;
-	int		wsize = (op->npw * op->esize) ;
-	int		len ;
 	int		n = 0 ;
 	if (wp->wbuf == nullptr) {
 	    rs = ebuf_waybegin(op,wi) ;
 	}
 	if (rs >= 0) {
-	    woff = op->soff + (ei * op->esize) ;
-	    poff = woff ;
-	    rs = u_pread(op->fd,wp->wbuf,wsize,poff) ;
-	    len = rs ;
-	    if ((rs >= 0) && (len > 0)) {
+	    uint	woff = op->soff + (ei * op->esize) ;
+	    int		wsize = (op->npw * op->esize) ;
+	    poff = off_t(woff) ;
+	    if ((rs = u_pread(op->fd,wp->wbuf,wsize,poff)) > 0) {
+	        cint	len = rs ;
 		n = (len / op->esize) ;
 		wp->woff = woff ;
 		wp->wlen = ifloor(len,op->esize) ;
 		wp->utime = ++op->utimer ;
 		wp->nvalid = n ;
-		if (op->iways < op->nways) op->iways += 1 ;
-	    }
-	}
+		if (op->iways < op->nways) {
+		    op->iways += 1 ;
+		}
+	    } /* end if (non-zero positive) */
+	} /* end if (ok) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? wp->wbuf : nullptr ;
 	}

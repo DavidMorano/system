@@ -1,4 +1,5 @@
 /* pwfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a 'passwd' formatted file for access */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	pwfile
+
+	Description:
 	This module manipulates passsword records in a 'passwd'
 	type file.  No, it is not particularly pretty but such is
 	life often times!
@@ -32,13 +37,13 @@
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<gecos.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<storeitem.h>
 #include	<mallocstuff.h>
 #include	<strn.h>
 #include	<snwcpy.h>
+#include	<rmx.h>
 #include	<cfdec.h>
 #include	<lockfile.h>
 #include	<pwentry.h>
@@ -49,7 +54,12 @@
 
 /* local defines */
 
-#define	DEFENTRIES	10
+#define	DEFENTS	10
+
+#define	PF		pwfile
+#define	PF_CUR		pwfile_cur
+
+#define	PWE		pwentry
 
 #define	TO_LOCK		60
 
@@ -82,10 +92,10 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int pwfile_ctor(pwfile *op,Args ... args) noex {
+static int pwfile_ctor(PF *op,Args ... args) noex {
+	PWFILE		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    PWFILE	*hop = (PWFILE *) op ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->alp = new(nothrow) vecitem) != nullptr) {
@@ -102,7 +112,7 @@ static int pwfile_ctor(pwfile *op,Args ... args) noex {
 }
 /* end subroutine (pwfile_ctor) */
 
-static int pwfile_dtor(pwfile *op) noex {
+static int pwfile_dtor(PF *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -120,7 +130,7 @@ static int pwfile_dtor(pwfile *op) noex {
 /* end subroutine (pwfile_dtor) */
 
 template<typename ... Args>
-static int pwfile_magic(pwfile *op,Args ... args) noex {
+static int pwfile_magic(PF *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -129,12 +139,13 @@ static int pwfile_magic(pwfile *op,Args ... args) noex {
 }
 /* end subroutine (pwfile_magic) */
 
-static int	pwfile_loadbegin(pwfile *) noex ;
-static int	pwfile_loadend(pwfile *) noex ;
-static int	pwfile_filefront(pwfile *) noex ;
-static int	pwfile_filefronter(pwfile *) noex ;
-static int	pwfile_fileback(pwfile *) noex ;
-static int	pwfile_checkopen(pwfile *) noex ;
+static int	pwfile_loadbegin(PF *) noex ;
+static int	pwfile_loadend(PF *) noex ;
+static int	pwfile_filefront(PF *) noex ;
+static int	pwfile_filefronter(PF *) noex ;
+static int	pwfile_fileln(PF *,cchar *,int) noex ;
+static int	pwfile_fileback(PF *) noex ;
+static int	pwfile_checkopen(PF *) noex ;
 
 
 /* local variables */
@@ -145,13 +156,12 @@ static int	pwfile_checkopen(pwfile *) noex ;
 
 /* exported subroutines */
 
-int pwfile_open(pwfile *op,cchar *pwfname) noex {
+int pwfile_open(PF *op,cchar *pwfname) noex {
 	int		rs ;
 	if ((rs = pwfile_ctor(op,pwfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pwfname[0]) {
-	        cchar	*cp{} ;
-	        if ((rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
 	            op->fname = cp ;
 	            op->lfd = -1 ;
 	            if ((rs = pwfile_loadbegin(op)) >= 0) {
@@ -172,7 +182,7 @@ int pwfile_open(pwfile *op,cchar *pwfname) noex {
 }
 /* end subroutine (pwfile_open) */
 
-int pwfile_close(pwfile *op) noex {
+int pwfile_close(PF *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pwfile_magic(op)) >= 0) {
@@ -200,18 +210,19 @@ int pwfile_close(pwfile *op) noex {
 }
 /* end subroutine (pwfile_close) */
 
-int pwfile_curenum(pwfile *op,pwfile_cur *curp,pwentry *uep,
-		char *rbuf,int rlen) noex {
+int pwfile_curenum(PF *op,PF_CUR *curp,PWE *uep,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = pwfile_magic(op,curp,uep,rbuf)) >= 0) {
-	    pwentry	*ep{} ;
-	    while ((rs = vecitem_get(op->alp,curp->i,&ep)) >= 0) {
+	    pwentry	*ep = nullptr ; /* used-afterwards */
+	    void	*vp{} ;
+	    while ((rs = vecitem_get(op->alp,curp->i,&vp)) >= 0) {
+	        ep = (PWE *) vp ;
 	        curp->i += 1 ;
-	        if (ep != nullptr) break ;
+	        if (vp) break ;
 	    } /* end while */
 /* load up the user's structure with the information from our internal one */
-	    if (rs >= 0) {
-	        rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
+	    if ((rs >= 0) && ep) {
+	        rs = ep->mkcopy(uep,rbuf,rlen) ;
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = SR_OK ;
 	    }
@@ -221,17 +232,16 @@ int pwfile_curenum(pwfile *op,pwfile_cur *curp,pwentry *uep,
 /* end subroutine (pwfile_curenum) */
 
 /* fetch the next entry that matches the specified username */
-int pwfile_fetchuser(pwfile *op,cc *username,pwfile_cur *curp,
-		pwentry *uep,char *rbuf,int rlen) noex {
+int pwfile_fetchuser(PF *op,cc *un,PF_CUR *curp,PWE *uep,char *rb,int rl) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(op,username,curp,uep,rbuf)) >= 0) {
+	if ((rs = pwfile_magic(op,un,curp,uep,rb)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (username[0]) {
+	    if (un[0]) {
 	        USTAT	sb ;
 	        if (op->lfd < 0) {
-	            rs = u_stat(op->fname,&sb) ;
+	            rs = uc_stat(op->fname,&sb) ;
 	        } else {
-	            rs = u_fstat(op->lfd,&sb) ;
+	            rs = uc_fstat(op->lfd,&sb) ;
 	        }
 	        if (rs >= 0) {
 	            hdb_dat	key ;
@@ -241,13 +251,13 @@ int pwfile_fetchuser(pwfile *op,cc *username,pwfile_cur *curp,
 	                pwfile_loadend(op) ;
 	                pwfile_loadbegin(op) ;
 	            } /* end if */
-/* continue with the query */
-	            key.buf = username ;
-	            key.len = strlen(username) ;
+		    /* continue with the query */
+	            key.buf = un ;
+	            key.len = strlen(un) ;
 	            if ((rs = hdb_fetch(op->ulp,key,hcurp,&val)) >= 0) {
 	                if (uep) {
-	                    pwentry	*ep = (pwentry *) val.buf ;
-	                    rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
+	                    pwentry	*ep = (PWE *) val.buf ;
+	                    rs = ep->mkcopy(uep,rb,rl) ;
 	                }
 	            } /* end if (hdb_fetch) */
 	        } /* end if (ok) */
@@ -257,16 +267,16 @@ int pwfile_fetchuser(pwfile *op,cc *username,pwfile_cur *curp,
 }
 /* end subroutine (pwfile_fetchuser) */
 
-int pwfile_curbegin(pwfile *op,pwfile_cur *curp) noex {
+int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	int		rs ;
 	if ((rs = pwfile_magic(op,curp)) >= 0) {
 	    if ((rs = pwfile_checkopen(op)) >= 0) {
-		int	cmd ;
+		int	cmd ; /* used in two blocks below */
 	        bool	f_locked = false ;
 	        if (! op->f.locked) {
 		    cint	to = TO_LOCK ;
 		    cmd = F_RLOCK ;
-	            if ((rs = lockfile(op->lfd,cmd,0L,0L,to)) < 0) {
+	            if ((rs = lockfile(op->lfd,cmd,0z,0z,to)) < 0) {
 	                u_close(op->lfd) ;
 	                op->lfd = -1 ;
 	                return rs ;
@@ -275,12 +285,14 @@ int pwfile_curbegin(pwfile *op,pwfile_cur *curp) noex {
 	            f_locked = true ;
 	        } /* end if (not locked) */
 	        curp->i = 0 ;
-	        rs = hdb_curbegin(op->ulp,curp->hcp) ;
+	        if (rs >= 0) {
+		    rs = hdb_curbegin(op->ulp,curp->hcp) ;
+		}
 	        if ((rs < 0) && f_locked) {
 	            op->f.locked = op->f.locked_cur = false ;
 #ifdef	COMMENT
 		    cmd = F_ULOCK ;
-	            lockfile(op->lfd,cmd,0L,0L,to) ;
+	            lockfile(op->lfd,cmd,0z,0z,to) ;
 #else
 	            u_close(op->lfd) ;
 	            op->lfd = -1 ;
@@ -292,23 +304,26 @@ int pwfile_curbegin(pwfile *op,pwfile_cur *curp) noex {
 }
 /* end subroutine (pwfile_curbegin) */
 
-int pwfile_curend(pwfile *op,pwfile_cur *curp) noex {
+int pwfile_curend(PF *op,PF_CUR *curp) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = pwfile_magic(op,curp)) >= 0) {
 	    if (op->f.locked_cur && (! op->f.locked_explicit)) {
 		cint	to = TO_LOCK ;
 	        op->f.locked = false ;
-	        lockfile(op->lfd,F_ULOCK,0L,0L,to) ;
+	        rs1 = lockfile(op->lfd,F_ULOCK,0z,0z,to) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->f.locked_cur = false ;
 	    curp->i = 0 ;
-	    rs = hdb_curend(op->ulp,curp->hcp) ;
+	    rs1 = hdb_curend(op->ulp,curp->hcp) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_curend) */
 
-int pwfile_lock(pwfile *op,int type,int to_lock) noex {
+int pwfile_lock(PF *op,int type,int to_lock) noex {
 	int		rs ;
 	int		f_opened = false ;
 	if ((rs = pwfile_magic(op)) >= 0) {
@@ -318,7 +333,7 @@ int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 	        case F_ULOCK:
 	            if (op->f.locked_explicit) {
 	                op->f.locked = op->f.locked_explicit = false ;
-	                rs = lockfile(op->lfd,type,0L,0L,to_lock) ;
+	                rs = lockfile(op->lfd,type,0z,0z,to_lock) ;
 	                if (rs < 0) {
 	                    u_close(op->lfd) ;
 	                    op->lfd = -1 ;
@@ -332,7 +347,7 @@ int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 	        case F_WTEST:
 	            rs = SR_LOCKED ;
 	            if (! op->f.locked) {
-	                rs = lockfile(op->lfd,type,0L,0L,to_lock) ;
+	                rs = lockfile(op->lfd,type,0z,0z,to_lock) ;
 #ifdef	COMMENT
 	                if (f_opened) {
 	                    u_close(op->lfd) ;
@@ -347,7 +362,7 @@ int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 	        case F_TWLOCK:
 	            if (! op->f.locked) {
 			cint	to = to_lock ;
-	                if ((rs = lockfile(op->lfd,type,0L,0L,to)) >= 0) {
+	                if ((rs = lockfile(op->lfd,type,0z,0z,to)) >= 0) {
 	                    op->f.locked = op->f.locked_explicit = true ;
 	                }
 	            } else {
@@ -364,23 +379,24 @@ int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 
 /* private subroutines */
 
-static int pwfile_loadbegin(pwfile *op) noex {
+static int pwfile_loadbegin(PF *op) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = pwfile_filefront(op)) >= 0) {
 	    cnullptr	np{} ;
-	    hdb_dat	key ;
-	    hdb_dat	val ;
 	    n = rs ;
 	    if ((rs = hdb_start(op->ulp,n,0,np,np)) >= 0) {
-	        vecitem	*alp = op->alp ;
-	        pwentry	*ep ;
-	        for (int i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
-	            if (ep) {
+	        vecitem		*alp = op->alp ;
+	        void		*vp{} ;
+	        for (int i = 0 ; vecitem_get(alp,i,&vp) >= 0 ; i += 1) {
+	            pwentry	*ep = (pwentry *) vp ;
+	            if (vp) {
+	        	hdb_dat		key ;
+	        	hdb_dat		val ;
 	                key.buf = ep->username ;
 	                key.len = strlen(ep->username) ;
 	                val.buf = ep ;
-	                val.len = sizeof(pwentry) ;
+	                val.len = szof(pwentry) ;
 	                rs = hdb_store(op->ulp,key,val) ;
 	            }
 	            if (rs < 0) break ;
@@ -397,7 +413,7 @@ static int pwfile_loadbegin(pwfile *op) noex {
 }
 /* end subroutine (pwfile_loadbegin) */
 
-static int pwfile_loadend(pwfile *op) noex {
+static int pwfile_loadend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->ulp) {
@@ -412,20 +428,19 @@ static int pwfile_loadend(pwfile *op) noex {
 }
 /* end subroutine (pwfile_loadend) */
 
-static int pwfile_filefront(pwfile *op) noex {
+static int pwfile_filefront(PF *op) noex {
 	int		rs = SR_NOENTRY ;
 	if (op->fname[0]) {
-	    USTAT	sb ;
-	    if ((rs = uc_stat(op->fname,&sb)) >= 0) {
-	        vecitem	*alp = op->alp ;
-	        cint	vo = VECITEM_OCOMPACT ;
-	        int	ne = ((sb.st_size / 60) + 5) ;
-	        if (ne < DEFENTRIES) ne = DEFENTRIES ;
-	        if ((rs = vecitem_start(alp,ne,vo)) >= 0) {
+	    if (USTAT sb ; (rs = uc_stat(op->fname,&sb)) >= 0) {
+	        vecitem		*alp = op->alp ;
+	        cint		vo = VECITEM_OCOMPACT ;
+	        int		vn = ((sb.st_size / 60) + 5) ;
+	        if (vn < DEFENTS) vn = DEFENTS ;
+	        if ((rs = alp->start(vn,vo)) >= 0) {
 	            op->readtime = sb.st_mtime ;
 	            rs = pwfile_filefronter(op) ;
 	            if (rs < 0) {
-	                vecitem_finish(alp) ;
+	                alp->finish() ;
 		    }
 	        }
 	    } /* end if (uc_stat) */
@@ -434,55 +449,27 @@ static int pwfile_filefront(pwfile *op) noex {
 }
 /* end subroutine (pwfile_filefront) */
 
-static int pwfile_filefronter(pwfile *op) noex {
+static int pwfile_filefronter(PF *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    bfile	pwfile, *fp = &pwfile ;
+	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    bfile	pf, *fp = &pf ;
 	    cint	llen = rs ;
-	    if ((rs = bopen(fp,op->fname,"rc",0644)) >= 0) {
+	    cmode	om = 0644 ;
+	    if ((rs = bopen(fp,op->fname,"rc",om)) >= 0) {
 	        if (! op->f.locked) {
 	            rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	        }
 	        if (rs >= 0) {
-	            pwentry	entry ;
 	            while ((rs = breadln(fp,lbuf,llen)) > 0) {
-	                int	len = rs ;
-	                if (lbuf[len - 1] == '\n') len -= 1 ;
-	                lbuf[len] = '\0' ;
-	                if ((rs = pwentry_start(&entry)) >= 0) {
-	                    int		fn = 0 ;
-	                    cchar	*tp ;
-	                    cchar	*cp = lbuf ;
-	                    while ((tp = strchr(cp,':')) != nullptr) {
-	                        rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
-	                        cp = (tp + 1) ;
-	                        fn += 1 ;
-	                        if (rs < 0) break ;
-	                    } /* end while */
-	                    if ((rs >= 0) && (cp[0] != '\0')) {
-	                        rs = pwentry_fieldpw(&entry,fn,cp,-1) ;
-	                    }
-/* make any extras fields that we want */
-	                    if (rs >= 0) {
-	                        rs = pwentry_mkextras(&entry) ;
-	                    }
-/* add the entry to our list */
-	                    if (rs >= 0) {
-	                        cint	esize = sizeof(pwentry) ;
-	                        n += 1 ;
-	                        rs = vecitem_add(op->alp,&entry,esize) ;
-	                    }
-	                    if (rs < 0) {
-	                        pwentry_finish(&entry) ;
-			    }
-	                } /* end if (initialized new entry) */
+			cint	ll = rmeol(lbuf,rs) ;
+			rs = pwfile_fileln(op,lbuf,ll) ;
+			n += rs ;
 	                if (rs < 0) break ;
 	            } /* end while (reading file entries) */
-	            if (! op->f.locked) {
-	                bcontrol(fp,BC_UNLOCK,0) ;
+	            if ((rs >= 0) && (! op->f.locked)) {
+	                rs = bcontrol(fp,BC_UNLOCK,0) ;
 	            }
 	        } /* end if (ok) */
 	        rs1 = bclose(fp) ;
@@ -495,32 +482,71 @@ static int pwfile_filefronter(pwfile *op) noex {
 }
 /* end subroutine (pwfile_filefronter) */
 
-static int pwfile_fileback(pwfile *op) noex {
+static int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+    	int		n = 0 ;
+        if (pwentry ent ; (rs = ent.start) >= 0) {
+            int         fn = 0 ;
+            int         cl = ll ;
+	    cchar	*cp = lbuf ; /* used-afterwards */
+            for (cc *tp{} ; (tp = strnchr(cp,cl,':')) != np ; ) {
+                rs = ent.fieldpw(fn,cp,(tp - cp)) ;
+                cl -= ((tp + 1) - cp) ;
+                cp = (tp + 1) ;
+                fn += 1 ;
+                if (rs < 0) break ;
+            } /* end for */
+            if ((rs >= 0) && (cl > 0) && cp[0]) {
+                rs = ent.fieldpw(fn,cp,cl) ;
+            }
+            /* make any extras fields that we want */
+            if (rs >= 0) {
+                rs = ent.mkextras ;
+            }
+            /* add the entry to our list */
+            if (rs >= 0) {
+                cint    esz = szof(pwentry) ;
+                n += 1 ;
+                rs = vecitem_add(op->alp,&ent,esz) ;
+            }
+            if (rs < 0) {
+                ent.finish() ;
+            }
+        } /* end if (initialized new entry) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (pwfile_fileln) */
+
+static int pwfile_fileback(PF *op) noex {
 	vecitem		*alp = op->alp ;
-	pwentry		*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (int i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
-	    if (ep) {
-	        rs1 = pwentry_finish(ep) ;
+	void		*vp{} ;
+	for (int i = 0 ; alp->get(i,&vp) >= 0 ; i += 1) {
+	    pwentry	*ep = (PWE *) vp ;
+	    if (vp) {
+	        rs1 = ep->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
 	{
-	    rs1 = vecitem_finish(alp) ;
+	    rs1 = alp->finish ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
 }
 /* end subroutine (pwfile_fileback) */
 
-static int pwfile_checkopen(pwfile *op) noex {
+static int pwfile_checkopen(PF *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->lfd < 0) {
 	    cint	of = O_RDONLY ;
-	    rs = u_open(op->fname,of,0666) ;
+	    cmode	om = 0666 ;
+	    rs = u_open(op->fname,of,om) ;
 	    op->lfd = rs ;
+	    f = true ;
 	} /* end if (it wasn not open) */
 	return (rs >= 0) ? f : rs ;
 }

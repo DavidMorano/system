@@ -30,11 +30,11 @@
 	Arguments:
 	w		which source to use:
 				0 -> any
-				1 -> 'HZ' define only
-				2 -> environment variable 'HZ'
-				3 -> 'CLK_TCK' define (or facility) only
-				4 -> |sysconf(3c)| 'CLK_TCK' only
-				4 -> guess value
+				1 -> environment variable 'HZ'
+				2 -> |sysconf(3c)| 'CLK_TCK' only
+				3 -> 'HZ' define only
+				4 -> 'CLK_TCK' define (or facility) only
+				5 -> guess value
 
 	Returns:
 	>0		HZ value
@@ -78,7 +78,7 @@
 #define	_SC_CLK_TCK	-1
 #endif
 
-#define	HZ_GUESS	100		/* guessed value */
+#define	HZ_GUESS	100		/* guessed value (AT&T 3B2 series) */
 
 
 /* external subroutines */
@@ -95,20 +95,20 @@ namespace {
     struct hzmgr {
 	int		hz ;
 	int operator () (int) noex ;
-	int getval(int) noex ;
-	int tryconst(int) noex ;
+	int getany(int) noex ;
 	int tryenv(int) noex ;
-	int trytck(int) noex ;
 	int tryconf(int) noex ;
+	int tryconst(int) noex ;
+	int trytck(int) noex ;
 	int tryguess(int) noex ;
     } ; /* end struct (hzmgr) */
 }
 
 constexpr hzmgr_m	mems[] = {
-	&hzmgr::tryconst,
 	&hzmgr::tryenv,
-	&hzmgr::trytck,
 	&hzmgr::tryconf,
+	&hzmgr::tryconst,
+	&hzmgr::trytck,
 	&hzmgr::tryguess
 } ;
 
@@ -125,13 +125,16 @@ static hzmgr		gethz_data ;
 
 /* exported variables */
 
+ucgetx::gethzer		gethz ;
+
 
 /* exported subroutines */
 
-int gethz(int w) noex {
+namespace ucgetx {
+    int gethzer::operator () (int w) noex {
 	return gethz_data(w) ;
+    } /* end method (gethzer::operator) */
 }
-/* end subroutine (gethz) */
 
 
 /* local subroutines */
@@ -139,7 +142,7 @@ int gethz(int w) noex {
 int hzmgr::operator () (int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) || (w > 0)) {
-	    rs = getval(w) ;
+	    rs = getany(w) ;
 	} else {
 	    rs = hz ;
 	}
@@ -147,7 +150,7 @@ int hzmgr::operator () (int w) noex {
 }
 /* end method (hzmgr::operator) */
 
-int hzmgr::getval(int w) noex {
+int hzmgr::getany(int w) noex {
 	int		rs = SR_OK ;
 	for (auto &m : mems) {
 	    rs = (this->*m)(w) ;
@@ -155,17 +158,7 @@ int hzmgr::getval(int w) noex {
 	} /* end for */
 	return rs ;
 }
-/* end method (hzmgr::getval) */
-
-int hzmgr::tryconst(int w) noex {
-	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_const))) {
-	    rs = HZ ;
-	    hz = rs ;
-	}
-	return rs ;
-}
-/* end method (hzmgr::tryconst) */
+/* end method (hzmgr::getany) */
 
 int hzmgr::tryenv(int w) noex {
 	int		rs = SR_OK ;
@@ -183,16 +176,6 @@ int hzmgr::tryenv(int w) noex {
 }
 /* end method (hzmgr::tryenv) */
 
-int hzmgr::trytck(int w) noex {
-	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_tck))) {
-	    rs = CLK_TCK ;
-	    hz = rs ;
-	}
-	return rs ;
-}
-/* end method (hzmgr::trytck) */
-
 int hzmgr::tryconf(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_conf))) {
@@ -207,6 +190,26 @@ int hzmgr::tryconf(int w) noex {
 	return rs ;
 }
 /* end method (hzmgr::tryconf) */
+
+int hzmgr::tryconst(int w) noex {
+	int		rs = SR_OK ;
+	if ((hz == 0) && ((w == gethz_any) || (w == gethz_const))) {
+	    rs = HZ ;
+	    hz = rs ;
+	}
+	return rs ;
+}
+/* end method (hzmgr::tryconst) */
+
+int hzmgr::trytck(int w) noex {
+	int		rs = SR_OK ;
+	if ((hz == 0) && ((w == gethz_any) || (w == gethz_tck))) {
+	    rs = CLK_TCK ;
+	    hz = rs ;
+	}
+	return rs ;
+}
+/* end method (hzmgr::trytck) */
 
 int hzmgr::tryguess(int w) noex {
 	int		rs = SR_OK ;

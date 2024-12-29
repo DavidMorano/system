@@ -108,7 +108,7 @@ struct addrfam {
 
 /* local variables */
 
-static const struct addrfam	addrfamilies[] = {
+constexpr addrfam	addrfamilies[] = {
 	{ "unix", AF_UNIX },
 	{ "inet", AF_INET },
 	{ "inet4", AF_INET4 },

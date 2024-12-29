@@ -29,7 +29,7 @@
 
 EXTERNC_begin
 
-extern int nisdomainname(char *,int) noex ;
+extern int	nisdomainname(char *,int) noex ;
 
 EXTERNC_end
 

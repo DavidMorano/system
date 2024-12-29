@@ -1,4 +1,5 @@
 /* uctimeout SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* interface components for UNIX® library-3c */
@@ -48,10 +49,12 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
+#include	<pthread.h>		/* |PTHREAD_SCOPE_SYSTEM| */
 #include	<ucontext.h>
 #include	<csignal>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<queue>
 #include	<usystem.h>
 #include	<timewatch.hh>
@@ -83,9 +86,6 @@
 #define	TO_CAPTURE	60		/* capture wait for threads */
 #define	TO_SIGWAIT	2		/* signal-process wait */
 #define	TO_DISPRECV	5		/* dispatch-process wait */
-
-
-#define	NDF		"uctimeout.deb"
 
 
 /* imported namespaces */
@@ -177,8 +177,7 @@ namespace {
 	int disphandle() noex ;
 	int dispjobdel(TIMEOUT *) noex ;
 	~uctimeout() noex {
-	    cint	rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uctimeout",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (uctimeout) */
@@ -195,6 +194,8 @@ enum dispcmds {
 
 /* forward references */
 
+static int	ourcmp(const TIMEOUT *,const TIMEOUT *) noex ;
+
 extern "C" {
     static int	uctimeout_sigerworker(uctimeout *) noex ;
     static int	uctimeout_dispworker(uctimeout *) noex ;
@@ -202,7 +203,7 @@ extern "C" {
     static void	uctimeout_atforkparent() noex ;
     static void	uctimeout_atforkchild() noex ;
     static void	uctimeout_exit() noex ;
-    static int	ourcmp(cvoid *,cvoid *) noex ;
+    static int	vourcmp(cvoid *,cvoid *) noex ;
 }
 
 consteval int uctimeout_voents() noex {
@@ -356,12 +357,10 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (valp->metf) {
-	    TIMEOUT	*ep ;
-	    cint	esize = sizeof(TIMEOUT) ;
-	    if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
+	    cint	esize = szof(TIMEOUT) ;
+	    if (TIMEOUT *ep{} ; (rs = uc_libmalloc(esize,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
-	            vechand	*elp = &ents ;
-	            if ((rs = vechand_add(elp,ep)) >= 0) {
+	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
 	                *ep = *valp ;
 	                {
@@ -369,7 +368,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	                    rs = enterpri(ep) ;
 	                }
 	                if (rs < 0) {
-	                    vechand_del(elp,ei) ;
+	                    ents.del(ei) ;
 			}
 	            } /* end if (vechand_add) */
 	            rs1 = mx.lockend ;
@@ -390,8 +389,7 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	if ((rs = mx.lockbegin) >= 0) {
 	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
-	    void	*vp ;
-	    if ((rs = vechand_get(elp,id,&vp)) >= 0) {
+	    if (void *vp ; (rs = vechand_get(elp,id,&vp)) >= 0) {
 	        TIMEOUT	*ep = (TIMEOUT *) vp ;
 	        cint	ei = rs ;
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
@@ -623,12 +621,11 @@ int uctimeout::workdump() noex {
 /* end subroutine (uctimeout::workdump) */
 
 int uctimeout::priqbegin() noex {
-	cint		osize = sizeof(vecsorthand) ;
+	cint		osize = szof(vecsorthand) ;
 	int		rs ;
-	void		*p ;
-	if ((rs = uc_libmalloc(osize,&p)) >= 0) {
+	if (void *p ; (rs = uc_libmalloc(osize,&p)) >= 0) {
 	    prique	*pqp = (prique *) p ;
-	    rs = vecsorthand_start(pqp,1,ourcmp) ;
+	    rs = vecsorthand_start(pqp,1,vourcmp) ;
 	    if (rs < 0) {
 	        uc_libfree(pqp) ;
 	        pqp = nullptr ;
@@ -701,12 +698,11 @@ int uctimeout::sigend() noex {
 /* end subroutine (uctimeout::sigend) */
 
 int uctimeout::timerbegin() noex {
-	SIGEVENT	se ;
 	cint		st = SIGEV_SIGNAL ;
 	cint		sig = SIGTIMEOUT ;
 	cint		val = 0 ; /* we do not (really) care about this */
 	int		rs ;
-	if ((rs = sigevent_load(&se,st,sig,val)) >= 0) {
+	if (SIGEVENT se ; (rs = sigevent_load(&se,st,sig,val)) >= 0) {
 	    const clockid_t	cid = CLOCK_REALTIME ;
 	    timer_t		tid ;
 	    if ((rs = uc_timercreate(cid,&se,&tid)) >= 0) {
@@ -767,11 +763,10 @@ int uctimeout::thrsend() noex {
 /* end subroutine (uctimeout::thrsend) */
 
 int uctimeout::sigerbegin() noex {
-	pta		ta ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = pta_create(&ta)) >= 0) {
+	if (pta ta ; (rs = pta_create(&ta)) >= 0) {
 	    cint	scope = UCTIMEOUT_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
@@ -795,9 +790,8 @@ int uctimeout::sigerend() noex {
 	    pthread_t	tid = tid_siger ;
 	    cint	sig = SIGTIMEOUT ;
 	    if ((rs = uptkill(tid,sig)) >= 0) {
-	        int	trs ;
 	        fl.running_siger = false ;
-	        if ((rs = uptjoin(tid,&trs)) >= 0) {
+	        if (int trs{} ; (rs = uptjoin(tid,&trs)) >= 0) {
 	            rs = trs ;
 	        } else if (rs == SR_SRCH) {
 	            rs = SR_OK ;
@@ -874,8 +868,7 @@ int uctimeout::sigerserve() noex {
 	if ((rs = capbegin(to)) >= 0) {
 	    const time_t	dt = time(nullptr) ;
 	    while ((rs = vecsorthand_count(pqp)) > 0) {
-	        TIMEOUT		*tep ;
-	        if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
+	        if (TIMEOUT *tep{} ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
 	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {
@@ -906,11 +899,10 @@ int uctimeout::sigerdump() noex {
 /* end subroutine (uctimeout::sigerdump) */
 
 int uctimeout::dispbegin() noex {
-	pta		ta ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = pta_create(&ta)) >= 0) {
+	if (pta ta ; (rs = pta_create(&ta)) >= 0) {
 	    cint	scope = UCTIMEOUT_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
@@ -1069,25 +1061,32 @@ static void uctimeout_exit() noex {
 }
 /* end subroutine (uctimeout_atforkparent) */
 
-static int ourcmp(cvoid *a1p,cvoid *a2p) noex {
-	TIMEOUT		**e1pp = (TIMEOUT **) a1p ;
-	TIMEOUT		**e2pp = (TIMEOUT **) a2p ;
+static int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
 	int		rc = 0 ;
-	{
-	    TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
-	    TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
-	    if (e1p || e2p) {
-	        rc = 1 ;
-	        if (e1p) {
-		    rc = -1 ;
-	            if (e2p) {
-	                rc = (e1p->val - e2p->val) ;
-	            }
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+	            rc = (e1p->val - e2p->val) ;
 	        }
 	    }
-	} /* end block */
+	}
 	return rc ;
 }
 /* end subroutine (ourcmp) */
+
+static int vourcmp(cvoid *v1pp,cvoid *v2pp) noex {
+	const TIMEOUT	**e1pp = (const TIMEOUT **) v1pp ;
+	const TIMEOUT	**e2pp = (const TIMEOUT **) v2pp ;
+	int		rc ;
+	{
+	    TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
+	    TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
+	    rc = ourcmp(e1p,e2p) ;
+	}
+	return rc ;
+}
+/* end subroutine (vourcmp) */
 
 

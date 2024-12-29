@@ -149,7 +149,6 @@ extern int	getarchitecture(char *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	getproviderid(const char *,int) ;
 extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;

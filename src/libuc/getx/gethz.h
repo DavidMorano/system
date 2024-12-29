@@ -29,19 +29,32 @@
 
 enum gethzes {
 	gethz_any,
-	gethz_const,
 	gethz_env,
-	gethz_tck,
 	gethz_conf,
+	gethz_const,
+	gethz_tck,
 	gethz_guess,
 	gethz_overlast
 } ;
 
+#ifdef	__cplusplus
+
 EXTERNC_begin
 
-extern int	gethz(int) noex ;
+namespace ucgetx {
+    struct gethzer {
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+    } ; /* end struct (gethzer) */
+}
+
+extern ucgetx::gethzer	gethz ;
 
 EXTERNC_end
+
+#endif /* __cplusplus */
 
 
 #endif /* GETHZ_INCLUDE */

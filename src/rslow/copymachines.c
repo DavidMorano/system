@@ -55,8 +55,6 @@
 
 /* external subroutines */
 
-extern int	getnodedomain(char *,char *) ;
-
 extern int	hostequiv() ;
 
 

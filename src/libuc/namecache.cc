@@ -1,4 +1,5 @@
 /* namecache SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* real-name cache (from UNIX® System PASSWD database) */
@@ -18,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	namecache
+
+	Description:
 	This object provides a crude cache for PASSWD-DB real-names.
 
 *******************************************************************************/
@@ -37,7 +42,7 @@
 #include	<mkgecosname.h>
 #include	<strwcpy.h>
 #include	<strdcpy.h>
-#include	<localmisc.h>		/* |READNAMELEN| */
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"namecache.h"
 
@@ -94,11 +99,12 @@ struct namecache_ent {
 
 template<typename ... Args>
 static int namecache_ctor(namecache *op,Args ... args) noex {
+    	NAMECACHE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ;
 	    if ((op->dbp = new(nothrow) hdb) != np) {
 		rs = SR_OK ;
 	    }
@@ -152,26 +158,25 @@ constexpr bool		f_fullname = CF_FULLNAME ;
 
 /* exported subroutines */
 
-int namecache_start(NC *op,cchar *varname,int nmax,int ttl) noex {
+int namecache_start(NC *op,cchar *vname,int nmax,int ttl) noex {
 	int		rs ;
-	if ((rs = namecache_ctor(op,varname)) >= 0) {
+	if ((rs = namecache_ctor(op,vname)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (varname[0]) {
-	        cchar	*cp{} ;
+	    if (vname[0]) {
 	        if (nmax < 3) nmax = NAMECACHE_DEFMAX ;
 	        if (ttl < 1) ttl = NAMECACHE_DEFTO ;
-	        if ((rs = uc_mallocstrw(varname,-1,&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(vname,-1,&cp)) >= 0) {
 		    cnullptr	np{} ;
 	            cint	ne = NAMECACHE_DEFENTS ;
-	            op->varname = cp ;
+	            op->vname = cp ;
 	            if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
 	                op->nmax = nmax ;
 	                op->ttl = ttl ;
 	                op->magic = NAMECACHE_MAGIC ;
 	            } /* end if (hdb-start) */
 	            if (rs < 0) {
-		        uc_free(op->varname) ;
-		        op->varname = nullptr ;
+		        uc_free(op->vname) ;
+		        op->vname = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
 	    } /* end if (valid) */
@@ -195,10 +200,10 @@ int namecache_finish(NC *op) noex {
 	        rs1 = hdb_finish(op->dbp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->varname) {
-	        rs1 = uc_free(op->varname) ;
+	    if (op->vname) {
+	        rs1 = uc_free(op->vname) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->varname = nullptr ;
+	        op->vname = nullptr ;
 	    }
 	    {
 	        rs1 = namecache_dtor(op) ;
@@ -216,12 +221,11 @@ int namecache_add(NC *op,cchar *un,cchar *rnp,int rnl) noex {
 	    rs = SR_INVALID ;
 	    if (un[0]) {
 	        hdb_dat		key ;
-	        hdb_dat		val ;
+	        hdb_dat		val{} ;
 	        key.buf = un ;
 	        key.len = strlen(un) ;
 	        if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
-	            NC_ENT	*ep ;
-	            ep = (NC_ENT *) val.buf ;
+	            NC_ENT	*ep = (NC_ENT *) val.buf ;
 	            rs = entry_update(ep,rnp,rnl) ;
 	        } else if (rs == SR_NOTFOUND) {
 	            if ((rs = hdb_count(op->dbp)) >= op->nmax) {
@@ -242,17 +246,16 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	int		rl = 0 ;
 	if (rpp) *rpp = nullptr ;
 	if ((rs = namecache_magic(op,un)) >= 0) {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = getustime ;
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-	        ucentpw		pw ;
 	        cchar		*rp = nullptr ;
-	        char		*pwbuf{} ;
 	        op->s.total += 1 ;
-	        if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	        if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	            ucentpw	pw{} ;
 	            NC_ENT	*ep ;
 	            hdb_dat	key ;
-	            hdb_dat	val ;
+	            hdb_dat	val{} ;
 		    cint	pwlen = rs ;
 	            cint	rlen = REALNAMELEN ;
 	            char	rbuf[REALNAMELEN + 1] ;
@@ -325,14 +328,13 @@ int namecache_stats(NC *op,NC_ST *sp) noex {
 /* private subroutines */
 
 static int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
-	NC_ENT		*ep{} ;
-	cint		msize = sizeof(NC_ENT) ;
+	cint		msize = szof(NC_ENT) ;
 	int		rs ;
 	if (epp) *epp = nullptr ;
-	if ((rs = uc_malloc(msize,&ep)) >= 0) {
+	if (NC_ENT *ep{} ; (rs = uc_malloc(msize,&ep)) >= 0) {
 	    if ((rs = entry_start(ep,un,sp,sl)) >= 0) {
 	        hdb_dat		key ;
-	        hdb_dat		val ;
+	        hdb_dat		val{} ;
 	        key.buf = ep->username ;
 	        key.len = strlen(ep->username) ;
 	        val.buf = ep ;
@@ -353,15 +355,14 @@ static int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 /* end subroutine (namecache_newent) */
 
 static int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
-	NC_ENT		*ep = nullptr ;
+	NC_ENT		*ep = nullptr ; /* used-afterwards */
 	hdb		*dbp = op->dbp ;
-	hdb_cur		cur ;
 	int		rs ;
 	int		rs1 ;
 	if (epp) *epp = nullptr ;
-	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	if (hdb_cur cur{} ; (rs = hdb_curbegin(dbp,&cur)) >= 0) {
 	    hdb_dat	key ;
-	    hdb_dat	val ;
+	    hdb_dat	val{} ;
 	    while ((rs = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
 	        NC_ENT	*tep = (NC_ENT *) val.buf ;
 		if ((ep == nullptr) || (ep->ti_access < tep->ti_access)) {
@@ -384,12 +385,11 @@ static int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 
 static int namecache_entfins(NC *op) noex {
 	hdb		*elp = op->dbp ;
-	hdb_cur		cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((rs1 = hdb_curbegin(elp,&cur)) >= 0) {
+	if (hdb_cur cur{} ; (rs1 = hdb_curbegin(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
-	    hdb_dat	val ;
+	    hdb_dat	val{} ;
 	    while (hdb_curenum(elp,&cur,&key,&val) >= 0) {
 	        NC_ENT	*ep = (NC_ENT *) val.buf ;
 		{
@@ -410,7 +410,7 @@ static int namecache_entfins(NC *op) noex {
 /* end subroutine (namecache_entfins) */
 
 static int entry_start(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs = SR_FAULT ;
 	if (ep && up && rp) {
 	    rs = SR_INVALID ;
@@ -455,10 +455,9 @@ static int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 	    f_changed = f_changed && (strncmp(ep->realname,rp,rl) == 0) ;
 	    f_changed = f_changed && (ep->realname[rl] == '\0') ;
 	    if (f_changed) {
-		char	*ubuf{} ;
-	        ep->ti_init = time(nullptr) ;
+	        ep->ti_init = getustime ;
 	        ep->realnamelen = rl ;
-	        if ((rs = malloc_un(&ubuf)) >= 0) {
+		if (char *ubuf{} ; (rs = malloc_un(&ubuf)) >= 0) {
 		    cint	ulen = rs ;
 		    {
 		        strdcpy1(ubuf,ulen,ep->username) ;
@@ -476,14 +475,13 @@ static int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 static int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	int		rs ;
 	int		sz = 0 ;
-	char		*bp ;
 	if (ep->a != nullptr) {
 	    uc_free(ep->a) ;
 	    ep->a = nullptr ;
 	}
 	sz += (strlen(up)+1) ;
 	sz += (strnlen(rp,rl)+1) ;
-	if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	    ep->a = bp ;
 	    ep->username = bp ;
 	    bp = (strwcpy(bp,up,-1)+1) ;
@@ -503,15 +501,14 @@ static int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
 	char		gbuf[GNAMELEN+1] ;
 	nbuf[0] = '\0' ;
 	if ((rs = mkgecosname(gbuf,glen,gecos)) >= 0) {
-	    realname	rn ;
 	    cint	gl = rs ;
-	    if ((rs = realname_start(&rn,gbuf,gl)) >= 0) {
+	    if (realname rn ; (rs = rn.start(gbuf,gl)) >= 0) {
 		if_constexpr (f_fullname) {
-	            rl = realname_fullname(&rn,nbuf,nlen) ;
+	            rl = rn.fullname(nbuf,nlen) ;
 		} else {
-	            rl = realname_name(&rn,nbuf,nlen) ;
+	            rl = rn.name(nbuf,nlen) ;
 		} /* end if_constexpr (f_fullanem) */
-	        rs1 = realname_finish(&rn) ;
+	        rs1 = rn.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
 	} /* end if (mkgeoxname) */

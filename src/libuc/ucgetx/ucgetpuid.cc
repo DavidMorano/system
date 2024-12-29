@@ -43,10 +43,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
+#include	<uvariables.hh>		/* |sysword(3u)| */
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<libmallocxx.h>
@@ -94,9 +95,8 @@ int uc_getpuid(pid_t pid) noex {
 	if (pid >= 0) {
 	    uid_t	uid = 0 ;
 	    if (pid > 0) {
-	        char	*pidfname{} ;
-		if ((rs = libmalloc_mp(&pidfname)) >= 0) {
-	            cchar	*pd = PROCDNAME ;
+	        if (char *pidfname{} ; (rs = libmalloc_mp(&pidfname)) >= 0) {
+	            cchar	*pd = sysword.w_procdir ;
 	            if ((rs = mkpidfname(pidfname,pd,pid)) >= 0) {
 	                USTAT	sb ;
 		        cint	nrs = SR_NOENT ;

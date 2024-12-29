@@ -194,6 +194,7 @@ int pta_getdetachstate(pta *op,int *vp) noex {
 
 int pta_setscope(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
+	if (v < 0) v = PTHREAD_SCOPE_SYSTEM ; /* usual desired default */
 	if (op) {
 	    if ((rs = pthread_attr_setscope(op,v)) > 0) {
 	        rs = (- rs) ;
@@ -290,5 +291,43 @@ int pta_setstack(pta *op,void *saddr,size_t ssize) noex {
 	return rs ;
 }
 /* end subroutine (pta_setstack) */
+
+int pta::setguardsize(size_t sz) noex {
+    	return pta_setguardsize(this,sz) ;
+}
+
+int pta::setstackaddr(void *sa) noex {
+    	return pta_setstackaddr(this,sa) ;
+}
+
+int pta::setstacksize(size_t sz) noex {
+    	return pta_setstacksize(this,sz) ;
+}
+
+void pta::dtor() noex {
+	if (cint rs = destroy ; rs < 0) {
+	    ulogerror("pta",rs,"dtor-destroy") ;
+	}
+} 
+/* end method (pta::dtor) */
+
+int pta_co::operator () (int a) noex {
+	int	rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ptamem_create:
+	        rs = pta_create(op) ;
+	        break ;
+	    case ptamem_destroy:
+	        rs = pta_destroy(op) ;
+	        break ;
+	    case ptamem_setscope:
+	        rs = pta_setscope(op,a) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (pta_co::operator) */
 
 

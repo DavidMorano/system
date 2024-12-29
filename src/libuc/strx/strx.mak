@@ -55,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strwildsub.o strrpbrk.o
+OBJ0= strrpbrk.o
 OBJ1= strwhite.o
 OBJ2= strsub.o
 OBJ3= strbasename.o strdirname.o
@@ -133,12 +133,15 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-strwildsub.o:		strwildsub.cc		$(INCS)
 strrpbrk.o:		strrpbrk.cc		$(INCS)
 strwhite.o:		strwhite.cc		$(INCS)
 strsub.o:		strsub.cc strsub.h	$(INCS)
 
 strbasename.o:		strbasename.cc		$(INCS)
 strdirname.o:		strdirname.cc		$(INCS)
+
+# 2014-12-26, David A-D- Morano
+# I retired the ass of this subroutine (below).
+#strwildsub.o:		strwildsub.cc		$(INCS)
 
 

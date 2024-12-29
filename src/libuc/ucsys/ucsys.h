@@ -42,7 +42,7 @@
 
 EXTERNC_begin
 
-extern int ucsys_getec(int) noex ;
+extern int	ucsys_getresolvec(int) noex ;
 
 EXTERNC_end
 

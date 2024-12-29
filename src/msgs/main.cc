@@ -157,7 +157,6 @@ extern int	snsds(char *,int,const char *,const char *) ;
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	hmatch() ;
 extern int	mkuiname(char *,int,USERINFO *) ;

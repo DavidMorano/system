@@ -31,6 +31,17 @@ EXTERNC_begin
 
 extern int	getnodedomain(char *,char *) noex ;
 
+extern int	getuserdomain(char *,int) noex ;
+extern int	getsysdomain(char *,int) noex ;
+
+static inline int getinetdomain(char *rbuf,int rlen) noex {
+	return getsysdomain(rbuf,rlen) ;
+}
+
+static inline int getdomainnamex(char *rp,int rl) noex {
+	return getsysdomain(rp,rl) ;
+}
+
 EXTERNC_end
 
 

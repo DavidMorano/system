@@ -19,8 +19,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<pthread.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -32,10 +30,48 @@
 #define	PTA	pthread_attr_t
 
 
-#ifndef	TYPEDEF_PTA
-#define	TYPEDEF_PTA
-typedef PTA	pta ;
-#endif
+#ifdef	__cplusplus
+enum ptamems {
+	ptamem_create,
+	ptamem_destroy,
+	ptamem_setscope,
+	ptamem_overlast
+} ;
+struct pta ;
+struct pta_co {
+        pta             *op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (pta *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+        int operator () (int a = -1) noex ;
+        operator int () noex {
+	    return operator () (-1) ;
+	}
+} ; /* end struct (pta_co) */
+struct pta : pthread_attr_t {
+	pta_co		create ;
+	pta_co		destroy ;
+	pta_co		setscope ;
+	constexpr pta() noex {
+	    create(this,ptamem_create) ;
+	    destroy(this,ptamem_destroy) ;
+	    setscope(this,ptamem_setscope) ;
+	} ;
+	pta(const pta &) = delete ;
+	pta &operator = (const pta &) = delete ;
+	int setguardsize(size_t) noex ;
+	int setstackaddr(void *) noex ;
+	int setstacksize(size_t) noex ;
+	void dtor() noex ;
+	~pta() {
+	    dtor() ;
+	} ; /* end dtor (pta) */
+} ; /* end class (pta) */
+#else
+typedef PTA		pta ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

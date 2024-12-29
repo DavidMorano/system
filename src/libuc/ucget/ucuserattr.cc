@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_serattr{x}
+
+	Description:
 	This module supplies the following subroutines for accessing
 	the system user-attribute database:
 
@@ -78,6 +82,9 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 
@@ -117,13 +124,15 @@ int uc_userattrent(userattr **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (rpp) {
 	    userattr	*uap = nullptr ;
-	    rs = SR_NOSYS ;
 	    if_constexpr (f_userattr) {
+		rs = SR_OK ;
 	        uap = getuserattr() ;
 	        if (uap) {
-		    ucentua	*ep = static_cast<ucentua *>(uap) ;
+		    ucentua	*ep = cast_static<ucentua *>(uap) ;
 		    rs = ep->size() ;
 	        }
+	    } else {
+	        rs = SR_NOSYS ;
 	    } /* end if_constexpr (f_userattr) */
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
@@ -137,14 +146,15 @@ int uc_userattrnam(userattr **rpp,cchar *un) noex {
 	    userattr	*uap = nullptr ;
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-		rs = SR_NOSYS ;
 	        if_constexpr (f_userattr) {
 		    rs = SR_NOTFOUND ;
 	            uap = getusernam(un) ;
 	            if (uap) {
-		    	ucentua	*ep = static_cast<ucentua *>(uap) ;
+		    	ucentua	*ep = cast_static<ucentua *>(uap) ;
 		        rs = ep->size() ;
 	            }
+		} else {
+		    rs = SR_NOSYS ;
 	 	} /* end if_constexpr (f_userattr) */
 	    } /* end if (valid) */
 	    *rpp = (rs >= 0) ? uap : nullptr ;
@@ -158,15 +168,16 @@ int uc_userattruid(userattr **rpp,uid_t uid) noex {
 	if (rpp) {
 	    userattr	*uap = nullptr ;
 	    rs = SR_INVALID ;
-	    if (!numsign(uid)) {
-		rs = SR_NOSYS ;
+	    if (! numsign(uid)) {
 	        if_constexpr (f_userattr) {
 		    rs = SR_NOTFOUND ;
 	    	    uap = getuseruid(uid) ;
 	            if (uap) {
-		        ucentua	*ep = static_cast<ucentua *>(uap) ;
+		        ucentua	*ep = cast_static<ucentua *>(uap) ;
 		        rs = ep->size() ;
 	            }
+		} else {
+		    rs = SR_NOSYS ;
 		} /* end if_constexpr (f_userattr) */
 	    } /* end if (valid) */
 	    *rpp = (rs >= 0) ? uap : nullptr ;

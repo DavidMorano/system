@@ -1,4 +1,5 @@
 /* nss_parse SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* Name-Server-Switch (NSS) database parsing support */
@@ -35,21 +36,48 @@
 /* Use is subject to license terms. */
 
 
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+
 #ifdef	COMMENT /* modification by David A-D- Morano */
 #include "mt.h"
 #include <stdio.h>
 #endif /* COMMENT */
 
-#include <stdlib.h>
-#include <strings.h>
+#include	<stdlib.h>
+#include	<strings.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 
 /* modification by David A-D- Morano */
 #include	<nss_parse.h>
 
 
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
-char *_strpbrk_escape(char *, char *) ;
+char *_strpbrk_escape(char *, char *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -59,9 +87,7 @@ char *_strpbrk_escape(char *, char *) ;
  *   Like strtok_r, except we don't break on a token if it is escaped
  *   with the escape character (\).
  */
-char *
-_strtok_escape(char *string, char *sepset, char **lasts)
-{
+char * _strtok_escape(char *string, char *sepset, char **lasts) noex {
 	char	*r;
 
 	/* first or subsequent call */
@@ -87,10 +113,8 @@ _strtok_escape(char *string, char *sepset, char **lasts)
 /*
  * Return ptr to first occurrence of any non-escaped character from `brkset'
  * in the character string `string'; NULL if none exists.
- */
-char *
-_strpbrk_escape(char *string, char *brkset)
-{
+ */ 
+char * _strpbrk_escape(char *string, char *brkset) noex {
 	const char *p;
 
 	do {
@@ -107,9 +131,7 @@ _strpbrk_escape(char *string, char *brkset)
 	return (NULL);
 }
 
-char   *
-_escape(char *s, char *esc)
-{
+char   * _escape(char *s, char *esc) noex {
 	int	nescs = 0;	/* number of escapes to place in s */
 	int	i, j;
 	int	len_s;
@@ -134,9 +156,7 @@ _escape(char *s, char *esc)
 	return (tmp);
 }
 
-char *
-_unescape(char *s, char *esc)
-{
+char * _unescape(char *s, char *esc) noex {
 	int	len_s;
 	int	i, j;
 	char	*tmp;
@@ -157,9 +177,7 @@ _unescape(char *s, char *esc)
 	return (tmp);
 }
 
-char *
-_strdup_null(char *s)
-{
+char * _strdup_null(char *s) noex {
 	return (strdup(s ? s : ""));
 }
 
@@ -170,12 +188,11 @@ _strdup_null(char *s)
  * read a line into buffer from a mmap'ed file.
  * return length of line read.
  */
-int
-_readbufline(char *mapbuf,	/* input mmap buffer */
+int _readbufline(char *mapbuf,	/* input mmap buffer */
     int mapsize,		/* input size */
     char *buffer,		/* output storage */
     int buflen,			/* output size */
-    int *lastlen)		/* input read till here last time */
+    int *lastlen) noex		/* input read till here last time */
 {
 	int	linelen;
 

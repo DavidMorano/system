@@ -95,9 +95,6 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r -o $(LDFLAGS) $@ $(OBJ)
 
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 

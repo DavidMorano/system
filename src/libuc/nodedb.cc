@@ -701,7 +701,7 @@ static int nodedb_filedump(nodedb *op,int fi) noex {
 	        if ((iep->fi == fi) || (fi < 0)) {
 	            c += 1 ;
 		    {
-	                rs1 = hdb_delcur(elp,&cur,0) ;
+	                rs1 = hdb_curdel(elp,&cur,0) ;
 	                if (rs >= 0) rs = rs1 ;
 		    }
 		    {

@@ -787,7 +787,7 @@ static int kvsfile_addentry(kvsfile *op,kf_ent *nep) noex {
 	                key.buf = ep ;
 	                key.len = sizeof(kf_ent) ;
 	                if (hdb_fetch(op->kvlp,key,&cur,&val) >= 0) {
-	                    hdb_delcur(op->kvlp,&cur,0) ;
+	                    hdb_curdel(op->kvlp,&cur,0) ;
 			}
 	            }
 	            hdb_curend(op->kvlp,&cur) ;
@@ -812,7 +812,7 @@ static int kvsfile_filedump(kvsfile *op,int fi) noex {
 	    while (hdb_curenum(op->kvlp,&cur,&key,&val) >= 0) {
 	        ep = entp(val.buf) ;
 	        if ((ep->fi == fi) || (fi < 0)) {
-	            hdb_delcur(op->kvlp,&cur,0) ;
+	            hdb_curdel(op->kvlp,&cur,0) ;
 	        } /* end if (found matching entry) */
 	    } /* end while (looping through entries) */
 	    rs1 = hdb_curend(op->kvlp,&cur) ;
@@ -825,7 +825,7 @@ static int kvsfile_filedump(kvsfile *op,int fi) noex {
 	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
 			{
-	                    rs1 = hdb_delcur(op->elp,&cur,0) ;
+	                    rs1 = hdb_curdel(op->elp,&cur,0) ;
 	                    if (rs >= 0) rs = rs1 ;
 			}
 			{

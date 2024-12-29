@@ -140,7 +140,6 @@ extern int	haslc(cchar *,int) ;
 extern int	hascdpath(cchar *,int) ;
 extern int	hasvarpathprefix(cchar *,int) ;
 extern int	sichr(cchar *,int,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getinetdomain(char *,int) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;

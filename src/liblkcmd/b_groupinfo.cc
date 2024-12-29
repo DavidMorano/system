@@ -152,7 +152,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	vecpstr_loadgrusers(VECPSTR *,gid_t) ;
 extern int	isdigitlatin(int) ;
 extern int	isalphalatin(int) ;

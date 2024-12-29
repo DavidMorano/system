@@ -154,7 +154,6 @@ extern int	ctdeci(char *,int,int) ;
 extern int	ctdecpi(char *,int,int,int) ;
 extern int	getaf(cchar *,int) ;
 extern int	getmjd(int,int,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) ;
 extern int	getprogexec(char *,int) ;

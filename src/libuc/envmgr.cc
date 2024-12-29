@@ -113,8 +113,9 @@ int envmgr_start(envmgr *op) noex {
 	int		rs ;
 	if ((rs = envmgr_ctor(op)) >= 0) {
 	    vechand	*elp = op->listp ;
+	    cint	vn = 10 ;
 	    cint	vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
-	    if ((rs = vechand_start(elp,10,vo)) >= 0) {
+	    if ((rs = vechand_start(elp,vn,vo)) >= 0) {
 	        vecstr		*slp = op->strp ;
 	        if ((rs = vecstr_start(slp,2,0)) >= 0) {
 		    for (int i = 0 ; (rs >= 0) && environ[i] ; i += 1) {
@@ -138,11 +139,11 @@ int envmgr_finish(envmgr *op) noex {
 	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
-	    {
+	    if (op->strp) {
 	        rs1 = vecstr_finish(op->strp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->listp) {
 	        rs1 = vechand_finish(op->listp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -160,10 +161,9 @@ int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
 	if (op && kp) {
 	    vecstr	*esp = op->strp ;
 	    if ((rs = vecstr_envset(esp,kp,vp,vl)) >= 0) {
-	        vechand	*elp = op->listp ;
-	        cint	i = rs ;
-	        cchar	*ep{} ;
-	        if ((rs = vecstr_get(esp,i,&ep)) >= 0) {
+	        vechand		*elp = op->listp ;
+	        cint		i = rs ;
+	        if (cchar *ep{} ; (rs = vecstr_get(esp,i,&ep)) >= 0) {
 		    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
 		    cnullptr		np{} ;
 		    cint		nrs = SR_NOTFOUND ;

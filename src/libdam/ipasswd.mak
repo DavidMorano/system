@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -44,7 +43,7 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -tpath $(RUNDIR)
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -94,7 +93,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r -o $(LDFLAGS) $@ $(OBJ)
 
 $(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?

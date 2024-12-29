@@ -119,7 +119,6 @@ extern int	matstr(const char **,char *,int) ;
 extern int	matstr2(const char **,char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 

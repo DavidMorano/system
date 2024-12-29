@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	ucentua
+	uc_entua{x}
 
 	Description:
 	These subroutines manage some simple tasks for the USERATTR
@@ -44,6 +44,7 @@
 #include	<localmisc.h>
 
 #include	"ucentua.h"
+#include	"ucentxx.hh"
 
 
 /* local defines */
@@ -54,6 +55,8 @@
 
 
 /* imported namespaces */
+
+using ucent::si_copystr ;		/* local group support subroutine */
 
 
 /* local typedefs */
@@ -74,7 +77,6 @@ static int userattrent_parseattr(UA *,storeitem *,cchar *,int) noex ;
 static int userattrent_parseattrload(UA *,storeitem *,vecstr *,int) noex ;
 
 static int si_attrload(storeitem *,kv_t *,int,cchar *) noex ;
-static int si_copystr(storeitem *,char **,cchar *) noex ;
 
 static int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
 
@@ -88,6 +90,7 @@ static int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
 /* exported subroutines */
 
 int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -95,44 +98,41 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    memclear(this) ;		/* potentially dangerous */
 	    if ((sl > 0) && (sp[0] != '#')) {
-	        storeitem	ib, *ibp = &ib ;
-	        if ((rs = storeitem_start(ibp,uabuf,ualen)) >= 0) {
+	        if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
 	            int		fi = 0 ;
-	            cchar	*tp ;
-	            while ((tp = strnchr(sp,sl,':')) != nullptr) {
+	            for (cc *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
 	                cchar	**vpp = nullptr ;
 	                switch (fi++) {
 	                case 0:
-	                    vpp = (cchar **) &name ;
+	                    vpp = ccharpp(&name) ;
 	                    break ;
 	                case 1:
-	                    vpp = (cchar **) &qualifier ;
+	                    vpp = ccharpp(&qualifier) ;
 	                    break ;
 	                case 2:
-	                    vpp = (cchar **) &res1 ;
+	                    vpp = ccharpp(&res1) ;
 	                    break ;
 	                case 3:
-	                    vpp = (cchar **) &res1 ;
+	                    vpp = ccharpp(&res1) ;
 	                    break ;
 	                case 4:
-	                    rs = userattrent_parseattr(this,ibp,sp,(tp-sp)) ;
+	                    rs = userattrent_parseattr(this,&si,sp,(tp-sp)) ;
 	                    break ;
 	                } /* end switch */
 	                if ((rs >= 0) && vpp) {
-	                    int		cl ;
 	                    cchar	*cp{} ;
-	                    if ((cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
-	                        rs = storeitem_strw(ibp,cp,cl,vpp) ;
+	                    if (int cl ; (cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
+	                        rs = si.strw(cp,cl,vpp) ;
 	                    }
 	                }
 	                sl -= ((tp+1)-sp) ;
 	                sp = (tp+1) ;
 	                if (rs < 0) break ;
-	            } /* end while */
+	            } /* end for */
 	            if ((rs >= 0) && (fi == 4) && sl && sp[0]) {
-	                rs = userattrent_parseattr(this,ibp,sp,sl) ;
+	                rs = userattrent_parseattr(this,&si,sp,sl) ;
 	            }
-	            rs1 = storeitem_finish(ibp) ;
+	            rs1 = si.finish ;
 	            if (rs >= 0) rs = rs1 ;
 		    wlen = rs1 ;
 	        } /* end if (storeitem) */
@@ -147,29 +147,28 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if (this && uabuf && suap) {
-	    storeitem	ib, *ibp = &ib ;
 	    memcpy(this,suap,sizeof(userattr)) ;
-	    if ((rs = storeitem_start(ibp,uabuf,ualen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
 	        if (suap->attr) {
-	            cint	ksize = sizeof(kva_t) ;
-	            cint	al = sizeof(void *) ;
+	            cint	ksize = szof(kva_t) ;
+	            cint	al = szof(void *) ;
 	            cint	n = suap->attr->length ;
 	            void	*p{} ;
-	            if ((rs = storeitem_block(ibp,ksize,al,&p)) >= 0) {
+	            if ((rs = si.block(ksize,al,&p)) >= 0) {
 	                kva_t	*kvap = (kva_t *) p ;
-	                int	dsize = (n*sizeof(kv_t)) ;
+	                int	dsize = (n * szof(kv_t)) ;
 	                attr = kvap ;
-	                if ((rs = storeitem_block(ibp,dsize,al,&p)) >= 0) {
+	                if ((rs = si.block(dsize,al,&p)) >= 0) {
 	                    kv_t	*kvp = (kv_t *) p ;
 	                    attr->length = n ;
 	                    attr->data = kvp ;
 	                    for (int i = 0 ; i < n ; i += 1) {
 	                        cchar	*dp = suap->attr->data[i].key ;
 	                        char	*rp ;
-	                        if ((rs = si_copystr(ibp,&rp,dp)) >= 0) {
+	                        if ((rs = si_copystr(&si,&rp,dp)) >= 0) {
 	                            kvp[i].key = rp ;
 	                            dp = suap->attr->data[i].value ;
-	                            if ((rs = si_copystr(ibp,&rp,dp)) >= 0) {
+	                            if ((rs = si_copystr(&si,&rp,dp)) >= 0) {
 	                                kvp[i].value = rp ;
 	                            }
 	                        }
@@ -179,11 +178,12 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	            } /* end if (storeitem_block) */
 	        } /* end if (attr) */
 	        if (rs >= 0) {
-	            char	*rp ;
-	            si_copystr(ibp,&rp,suap->name) ;
-	            name = rp ;
+	            char *rp{} ;
+		    if ((rs = si_copystr(&si,&rp,suap->name)) >= 0) {
+	                name = rp ;
+		    }
 	        }
-	        rs1 = storeitem_finish(ibp) ;
+	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 		wlen = rs1 ;
 	    } /* end if (storeitem) */
@@ -198,28 +198,27 @@ int ucentua::format(char *rbuf,int rlen) noex {
 	if (this && rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen > 0) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 5 ; i += 1) {
-	                if (i > 0) rs = sbuf_chr(&b,':') ;
+	                if (i > 0) rs = b.chr(':') ;
 	                if (rs >= 0) {
 	                    switch (i) {
 	                    case 0:
-	                        rs = sbuf_strw(&b,name,-1) ;
+	                        rs = b.str(name) ;
 	                        break ;
 	                    case 1:
 	                        if (qualifier) {
-	                            rs = sbuf_strw(&b,qualifier,-1) ;
+	                            rs = b.str(qualifier) ;
 	                        }
 	                        break ;
 	                    case 2:
 	                        if (res1) {
-	                            rs = sbuf_strw(&b,res1,-1) ;
+	                            rs = b.str(res1) ;
 	                        }
 	                        break ;
 	                    case 3:
 	                        if (res2) {
-	                            rs = sbuf_strw(&b,res2,-1) ;
+	                            rs = b.strw(res2) ;
 	                        }
 	                        break ;
 	                    case 4:
@@ -231,7 +230,7 @@ int ucentua::format(char *rbuf,int rlen) noex {
 	                } /* end if */
 	                if (rs < 0) break ;
 	            } /* end for */
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	    } /* end if (valid) */
@@ -243,22 +242,22 @@ int ucentua::format(char *rbuf,int rlen) noex {
 int ucentua::size() noex {
 	int		rs = SR_FAULT ;
 	if (this) {
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    kva_t	*kvap = attr ;
 	    if (name) {
-	        size += (strlen(name)+1) ;
+	        sz += (strlen(name)+1) ;
 	    }
 	    if (attr) {
 	        kv_t	*kvp = kvap->data ;
 	        cint	n = kvap->length ;
-	        size += sizeof(kva_t) ;
+	        sz += szof(kva_t) ;
 	        for (int i = 0 ; i < n ; i += 1) {
-	            size += (strlen(kvp[i].key)+1) ;
-	            size += (strlen(kvp[i].value)+1) ;
+	            sz += (strlen(kvp[i].key)+1) ;
+	            sz += (strlen(kvp[i].value)+1) ;
 	        } /* end for */
-	        size += ((n+1)*sizeof(kv_t)) ;
+	        sz += ((n+1)*szof(kv_t)) ;
 	    } /* end if */
-	    rs = iceil(size,sizeof(cchar *)) ;
+	    rs = iceil(sz,szof(cchar *)) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -267,18 +266,17 @@ int ucentua::size() noex {
 
 /* local subroutines */
 
-static int userattrent_parseattr(UA *uap,SI *ibp,cc *sp,int sl) noex {
-	vecstr		attrs, *alp = &attrs ;
+static int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = vecstr_start(alp,0,0)) >= 0) {
+	if (vecstr a ; (rs = a.start(0,0)) >= 0) {
 	    cint	sch = ';' ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
 	        if ((tp-sp) > 0) {
 		    c += 1 ;
-	            rs = vecstr_add(alp,sp,(tp-sp)) ;
+	            rs = a.add(sp,(tp-sp)) ;
 	        }
 	        sl -= ((tp+1)-sp) ;
 	        sp = (tp+1) ;
@@ -286,35 +284,35 @@ static int userattrent_parseattr(UA *uap,SI *ibp,cc *sp,int sl) noex {
 	    } /* end while */
 	    if ((rs >= 0) && (sl > 0)) {
 		c += 1 ;
-	        rs = vecstr_add(alp,sp,sl) ;
+	        rs = a.add(sp,sl) ;
 	    }
-	    if ((rs >= 0) && ((rs = vecstr_count(alp)) > 0)) {
-	        rs = userattrent_parseattrload(uap,ibp,alp,rs) ;
+	    if ((rs >= 0) && ((rs = a.count) > 0)) {
+	        rs = userattrent_parseattrload(uap,sip,&a,rs) ;
 	    }
-	    rs1 = vecstr_finish(alp) ;
+	    rs1 = a.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return rs ;
 }
 /* end subroutine (userattrent_parseattr) */
 
-static int userattrent_parseattrload(UA *uap,SI *ibp,vecstr *alp,int n) noex {
-	cint		ksize = sizeof(kva_t) ;
-	cint		al = sizeof(void *) ;
+static int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
+	cint		ksize = szof(kva_t) ;
+	cint		al = szof(void *) ;
 	int		rs ;
 	void		*p ;
-	if ((rs = storeitem_block(ibp,ksize,al,&p)) >= 0) {
+	if ((rs = sip->block(ksize,al,&p)) >= 0) {
 	    kva_t	*kvap = (kva_t *) p ;
-	    int		dsize = (n*sizeof(kv_t)) ;
+	    int		dsize = (n*szof(kv_t)) ;
 	    uap->attr = kvap ;
-	    if ((rs = storeitem_block(ibp,dsize,al,&p)) >= 0) {
+	    if ((rs = sip->block(dsize,al,&p)) >= 0) {
 	        kv_t	*kvp = (kv_t *) p ;
 	        cchar	*ep{} ;
 	        uap->attr->length = n ;
 	        uap->attr->data = kvp ;
-	        for (int i = 0 ; vecstr_get(alp,i,&ep) >= 0 ; i += 1) {
+	        for (int i = 0 ; alp->get(i,&ep) >= 0 ; i += 1) {
 	            if (ep) {
-	                rs = si_attrload(ibp,kvp,i,ep) ;
+	                rs = si_attrload(sip,kvp,i,ep) ;
 	            }
 	            if (rs < 0) break ;
 	        } /* end for */
@@ -324,23 +322,21 @@ static int userattrent_parseattrload(UA *uap,SI *ibp,vecstr *alp,int n) noex {
 }
 /* end subroutine (userattrent_parseattrload) */
 
-static int si_attrload(SI *ibp,kv_t *kvp,int i,cchar *ep) noex {
+static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	int		rs ;
 	int		el = -1 ;
-	cchar		*tp ;
 	cchar		*vp ;
-	if ((tp = strchr(ep,'=')) != nullptr) {
+	if (cchar *tp ; (tp = strchr(ep,'=')) != nullptr) {
 	    vp = (tp+1) ;
 	    el = (tp-ep) ;
 	} else {
 	    vp = (ep+strlen(ep)) ;
 	}
 	{
-	    cchar	*crp{} ;
-	    if ((rs = storeitem_strw(ibp,ep,el,&crp)) >= 0) {
-		char	*rp = const_cast<charp>(crp) ;
+	    if (cchar *crp{} ; (rs = sip->strw(ep,el,&crp)) >= 0) {
+		char	*rp = cast_const<charp>(crp) ;
 	        kvp[i].key = rp ;
-	        if ((rs = si_copystr(ibp,&rp,vp)) >= 0) {
+	        if ((rs = si_copystr(sip,&rp,vp)) >= 0) {
 	            kvp[i].value = rp ;
 	        }
 	    }
@@ -349,31 +345,20 @@ static int si_attrload(SI *ibp,kv_t *kvp,int i,cchar *ep) noex {
 }
 /* end subroutine (si_attrload) */
 
-static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
-	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
-	*cpp = nullptr ;
-	if (p1) {
-	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
-	}
-	return rs ;
-}
-/* end subroutine (si_copystr) */
-
-static int sbuf_fmtattrs(sbuf *bp,kva_t *attr) noex {
+static int sbuf_fmtattrs(sbuf *sbp,kva_t *attr) noex {
 	int		rs = SR_FAULT ;
-	if (bp && attr) {
+	if (sbp && attr) {
 	    kv_t	*kv = attr->data ;
 	    cint	n = attr->length ;
 	    cint	sch = ';' ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < n ; i += 1) {
 	        if (kv[i].key != nullptr) {
-	            if (i > 0) rs = sbuf_chr(bp,sch) ;
-	            if (rs >= 0) rs = sbuf_strw(bp,kv[i].key,-1) ;
+	            if (i > 0) rs = sbp->chr(sch) ;
+	            if (rs >= 0) rs = sbp->str(kv[i].key) ;
 	            if ((rs >= 0) && (kv[i].value != nullptr)) {
-	                rs = sbuf_chr(bp,'=') ;
-	                if (rs >= 0) rs = sbuf_strw(bp,kv[i].value,-1) ;
+	                rs = sbp->chr('=') ;
+	                if (rs >= 0) rs = sbp->str(kv[i].value) ;
 	            }
 	        } /* end if */
 	        if (rs < 0) break ;

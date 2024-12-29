@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Group:
-	ucenumnw
+	uc_entnw{x}
 
 	Description:
 	I provide the normal (usual) subroutines for managing the
@@ -50,6 +50,7 @@
 #include	<localmisc.h>
 
 #include	"ucentnw.h"
+#include	"ucentxx.hh"
 
 
 /* local defines */
@@ -59,11 +60,11 @@
 #define	SI	storeitem
 
 #ifndef INET4ADDRLEN
-#define INET4ADDRLEN            sizeof(in_addr_t)
+#define INET4ADDRLEN            szof(in_addr_t)
 #endif
 
 #ifndef INET6ADDRLEN
-#define INET6ADDRLEN            sizeof(in6_addr_t)
+#define INET6ADDRLEN            szof(in6_addr_t)
 #endif
 
 #ifndef INET4_ADDRSTRLEN
@@ -79,8 +80,13 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using ucent::si_loadnames ;		/* local group support subroutine */
+using ucent::si_loadname ;		/* local group support subroutine */
+using ucent::si_copystr ;		/* local group support subroutine */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -102,17 +108,13 @@ static int ucentnw_parsestrs(NWE *,SI *,cchar *,int) noex ;
 
 static int ucentnw_formataddr(NWE *,sbuf *) noex ;
 
-static int si_loadnames(SI *,vechand *,cchar *,int) noex ;
-static int si_loadname(SI *,vechand *,cchar *,int) noex ;
-static int si_copystr(SI *,char **,cchar *) noex ;
-
 
 /* local variables */
 
-constexpr int			inet4addrlen = int(INET4ADDRLEN) ;
-constexpr int			inet6addrlen = int(INET6ADDRLEN) ;
-constexpr int			inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
-constexpr int			astrlen = int(ASTRLEN) ;
+constexpr int		inet4addrlen = int(INET4ADDRLEN) ;
+constexpr int		inet6addrlen = int(INET6ADDRLEN) ;
+constexpr int		inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
+constexpr int		astrlen = int(ASTRLEN) ;
 
 
 /* exported variables */
@@ -124,37 +126,35 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && ebuf && sp) {
-	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    memclear(this) ;		/* potentially dangerous */
 	    n_addrtype = AF_INET4 ;		/* <- mandatory */
-	    if ((rs = storeitem_start(ibp,ebuf,elen)) >= 0) {
-	        int	fi = 0 ;
-		int	si ;
-		int	cl ;
-	        cchar	*cp ;
-		if ((si = sichr(sp,sl,'#')) >= 0) sl = si ;
-	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
+	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
+	        cchar	*cp{} ;
+		if (int idx ; (idx = sichr(sp,sl,'#')) >= 0) {
+		    sl = idx ;
+		}
+	        for (int cl, fi = 0 ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	            cchar	**vpp = nullptr ;
 	            switch (fi++) {
 	            case 0:
-	                vpp = (cchar **) &n_name ;
+	                vpp = ccharpp(&n_name) ;
 	                break ;
 	            case 1:
 	                rs = ucentnw_parseaddr(this,cp,cl) ;
 	                break ;
 	            case 2:
-	                rs = ucentnw_parsestrs(this,ibp,cp,cl) ;
+	                rs = ucentnw_parsestrs(this,&si,cp,cl) ;
 	                break ;
 	            } /* end switch */
 		    if ((rs >= 0) && vpp) {
-	        	rs = storeitem_strw(ibp,cp,cl,vpp) ;
+	        	rs = si.strw(cp,cl,vpp) ;
 		    }
 	            sl -= ((cp+cl)-sp) ;
 	            sp = (cp+cl) ;
 	            if (rs < 0) break ;
 	        } /* end while */
-	        rs1 = storeitem_finish(ibp) ;
+	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
@@ -166,19 +166,18 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cprp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (this && rbuf && cprp) {
-	    storeitem	ib ;
 	    memcpy(this,cprp,sizeof(ucentnw)) ;
-	    if ((rs = storeitem_start(&ib,rbuf,rlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
 	        if (cprp->n_aliases) {
-	            int		n = 0 ;
-	            void	**tab{} ;
+	            int		n ; /* used-afterwards */
 	            for (n = 0 ; cprp->n_aliases[n] ; n += 1) ;
-	            if ((rs = storeitem_ptab(&ib,n,&tab)) >= 0) {
-		        cchar	**aliases = (cchar **) cprp->n_aliases ;
-		        int	i = 0 ;
-	                n_aliases = (char **) tab ;
+	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
+		        cchar	**aliases = ccharpp(cprp->n_aliases) ;
+		        int	i ; /* used-afterwards */
+	                n_aliases = charpp(tab) ;
 	                for (i = 0 ; cprp->n_aliases[i] ; i += 1) {
-	                    rs = si_copystr(&ib,(n_aliases + i),aliases[i]) ;
+			    cchar	*an = aliases[i] ;
+	                    rs = si_copystr(&si,(n_aliases + i),an) ;
 	                    if (rs < 0) break ;
 	                } /* end for */
 	                n_aliases[i] = nullptr ;
@@ -186,8 +185,10 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cprp) noex {
 	        } else {
 		    n_aliases = nullptr ;
 	        } /* end if (aliases) */
-		if (rs >= 0) rs = si_copystr(&ib,&n_name,cprp->n_name) ;
-	        rs1 = storeitem_finish(&ib) ;
+		if (rs >= 0) {
+		    rs = si_copystr(&si,&n_name,cprp->n_name) ;
+		}
+	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
@@ -201,29 +202,28 @@ int ucentnw::format(char *rbuf,int rlen) noex {
 	if (this && rbuf) {
 	    rs = SR_AFNOSUPPORT ;
 	    if (n_addrtype == AF_INET4) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 3 ; i += 1) {
-	                if (i > 0) rs = sbuf_chr(&b,' ') ;
+	                if (i > 0) rs = b.chr(' ') ;
 	                if (rs >= 0) {
 	                    switch (i) {
 	                    case 0:
-	                        rs = sbuf_strw(&b,n_name,-1) ;
+	                        rs = b.str(n_name) ;
 	                        break ;
 	                    case 1:
 			        rs = ucentnw_formataddr(this,&b) ;
 	                        break ;
 	                    case 2:
 			        if (n_aliases) {
-				    cchar	**sv = (cchar **) n_aliases ;
-	                            rs = sbuf_strs(&b,' ',sv) ;
+				    cchar	**sv = ccharpp(n_aliases) ;
+	                            rs = b.strs(' ',sv) ;
 			        }
 	                        break ;
 	                    } /* end switch */
 	                } /* end if */
 	                if (rs < 0) break ;
 	            } /* end for */
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	    } /* end if (supported AF) */
@@ -235,18 +235,18 @@ int ucentnw::format(char *rbuf,int rlen) noex {
 int ucentnw::size() noex {
 	int		rs = SR_FAULT ;
 	if (this) {
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    if (n_name) {
-	        size += (strlen(n_name)+1) ;
+	        sz += (strlen(n_name)+1) ;
 	    }
 	    if (n_aliases) {
-	        int	i = 0 ;
+	        int	i ; /* used-afterwards */
 	        for (i = 0 ; n_aliases[i] ; i += 1) {
-	            size += (strlen(n_aliases[i])+1) ;
+	            sz += (strlen(n_aliases[i])+1) ;
 	        } /* end for */
-	        size += ((i+1)*sizeof(cchar *)) ;
+	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (name-list aliases) */
-	    rs = iceil(size,sizeof(cchar *)) ;
+	    rs = iceil(sz,szof(cchar *)) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -269,27 +269,25 @@ static int ucentnw_parseaddr(ucentnw *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (ucentnw_parseaddr) */
 
-static int ucentnw_parsestrs(ucentnw *prp,SI *ibp,cchar *sp,int sl) noex {
-	vechand		u ;
+static int ucentnw_parsestrs(ucentnw *prp,SI *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vechand_start(&u,8,0)) >= 0) {
-	    if ((rs = si_loadnames(ibp,&u,sp,sl)) > 0) {
+	if (vechand u ; (rs = u.start(8,0)) >= 0) {
+	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) {
 	        cint	n = rs ;
-	        void	**ptab ;
-	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
-		    int		i = 0 ;
+	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) {
+		    int		i ; /* used-afterwards */
 	            void	*vp{} ;
-	            prp->n_aliases = (char **) ptab ;
-		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
-	                prp->n_aliases[i] = (char *) vp ;
+	            prp->n_aliases = charpp(ptab) ;
+		    for (i = 0 ; u.get(i,&vp) >= 0 ; i += 1) {
+	                prp->n_aliases[i] = charp(vp) ;
 	            } /* end for */
 	            prp->n_aliases[i] = nullptr ;
 	        } /* end if (storeitem-ptab) */
 	    } else {
 	        prp->n_aliases = nullptr ;
 	    }
-	    rs1 = vechand_finish(&u) ;
+	    rs1 = u.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
@@ -303,52 +301,10 @@ static int ucentnw_formataddr(ucentnw *hep,sbuf *sbp) noex {
 	char		pbuf[astrlen +1] ;
 	in4_addr_t	a = htonl(hep->n_net) ;
 	if ((rs = inetntop(pbuf,plen,af,&a)) >= 0) {
-	    rs = sbuf_strw(sbp,pbuf,rs) ;
+	    rs = sbp->strw(pbuf,rs) ;
 	}
 	return rs ;
 }
 /* end subroutine (ucentnw_formataddr) */
-
-static int si_loadnames(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		c = 0 ;
-	cchar		*tp ;
-	while ((tp = strnpbrk(sp,sl," ,")) != nullptr) {
-	    if ((tp-sp) > 0) {
-		c += 1 ;
-		rs = si_loadname(ibp,ulp,sp,(tp-sp)) ;
-	    } /* end if (non-zero) */
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
-	    if (rs < 0) break ;
-	} /* end while */
-	if ((rs >= 0) && sl && sp[0]) {
-	    c += 1 ;
-	    rs = si_loadname(ibp,ulp,sp,sl) ;
-	}
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (si_loadnames) */
-
-static int si_loadname(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
-	int		rs ;
-	cchar		*cp ;
-	if ((rs = storeitem_strw(ibp,sp,sl,&cp)) >= 0) {
-	    rs = vechand_add(ulp,cp) ;
-	}
-	return rs ;
-}
-/* end subroutine (si_loadname) */
-
-static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
-	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
-	*cpp = nullptr ;
-	if (p1) {
-	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
-	}
-	return rs ;
-}
-/* end subroutine (si_copystr) */
 
 

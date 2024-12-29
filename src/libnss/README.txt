@@ -9,7 +9,7 @@ into the files below (as unchanged from the originals as possible).
 Q. Why are we using code from the Illumos project?
 A. We are using this code as an homage to the spirit of Illumos.
    I could have written code myself that performs the functions that
-   the code below performs. But as an homage and courtesy to Illumos,
+   the code below performs.  But as an homage and courtesy to Illumos,
    I am going to actually use their code (essentially unchanged).
 
 Q. What about the fact that the original Illumos code does not
@@ -18,7 +18,7 @@ A. This is not a unique problem associated with the Illumos code
    used here.  Other parts of the enclosing project also do not
    (in themselves) meet the quality standards of the enclosing project.
    Steps are taken to mitigate any damage that could occur from using
-   lesser quality code. So these same mitigation techniqueus are
+   lesser quality code.  So these same mitigation techniqueus are
    availble for use with the Illumos code below.
 
 

@@ -87,7 +87,6 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	optbool(const char *,int) ;
 extern int	initnow(struct timeb *,char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getportnum(const char *,const char *) ;
 extern int	dialudp(const char *,const char *,int,int,int) ;
 extern int	dialtcp(const char *,const char *,int,int,int) ;

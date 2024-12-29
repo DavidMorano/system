@@ -1,4 +1,5 @@
 /* callback HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* time-out interface */
@@ -30,6 +31,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 
 #define	CALLBACK	struct callback_entry

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int textlook_ctor(textlook *op,Args ... args) noex {
+static int hdbstr_ctor(hdbstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int textlook_ctor(textlook *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (textlook_ctor) */
+/* end subroutine (hdbstr_ctor) */
 
-static int textlook_dtor(textlook *op) noex {
+static int hdbstr_dtor(hdbstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (textlook_dtor) */
+/* end subroutine (hdbstr_dtor) */
 
 template<typename ... Args>
-static inline int textlook_magic(textlook *op,Args ... args) noex {
+static inline int hdbstr_magic(hdbstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TEXTLOOK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = SR_OK ;
 	}
 	return rs ;
 }
-/* end subroutine (textlook_magic) */
+/* end subroutine (hdbstr_magic) */

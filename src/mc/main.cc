@@ -121,7 +121,6 @@ extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getserial(const char *) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	getfname(const char *,const char *,int,char *) ;

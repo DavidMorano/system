@@ -1,8 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
@@ -19,12 +20,11 @@
 #define	CF_PROCENVSYS	1		/* call 'procenvsys()' */
 #define	CF_SYSVARENUM	1		/* enumerate sys-vars */
 
-
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-	This subroutine was borrowed and modified from previous generic
-	front-end 'main' subroutines!
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
 
 */
 
@@ -32,30 +32,32 @@
 
 /*******************************************************************************
 
-	This subroutine is the front-end for several a super-server programs.
-	These server programs have widely differing functions, but they start
-	by initializing in similar ways.  Hence this subroutine.
-
+  	Description:
+	This subroutine is the front-end for several a super-server
+	programs.  These server programs have widely differing
+	functions, but they start by initializing in similar ways.
+	Hence this subroutine.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<userinfo.h>
+#include	<ucmallreg.h>
+#include	<gethz.h>
 #include	<sigblocker.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -63,14 +65,12 @@
 #include	<nulstr.h>
 #include	<bfile.h>
 #include	<ids.h>
-#include	<userinfo.h>
 #include	<logfile.h>
 #include	<expcook.h>
 #include	<varsub.h>
 #include	<storebuf.h>
 #include	<getax.h>
 #include	<char.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -144,12 +144,10 @@ extern int	optvalue(const char *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	gethz(int) ;
 extern int	getarchitecture(char *,int) ;
 extern int	getnprocessors(const char **,int) ;
 extern int	getproviderid(const char *,int) ;
 extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;

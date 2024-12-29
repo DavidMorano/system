@@ -365,10 +365,10 @@ int bdb_delcur(BDB *op,BDB_CUR *curp,int f_adv)
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
-	rs = hdb_delcur(&op->keys,&curp->cur,f_adv) ;
+	rs = hdb_curdel(&op->keys,&curp->cur,f_adv) ;
 
 #if	CF_DEBUGS
-	debugprintf("bdbdelcursor: hdb_delcur() rs=%d\n",rs) ;
+	debugprintf("bdbdelcursor: hdb_curdel() rs=%d\n",rs) ;
 #endif
 
 	return rs ;

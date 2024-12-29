@@ -284,10 +284,9 @@ int lockrw_readers(lockrw *op) noex {
 /* private subroutines */
 
 static int lockrw_ptminit(lockrw *op,int f_shared) noex {
-	ptma		a ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptma_create(&a)) >= 0) {
+	if (ptma a ; (rs = ptma_create(&a)) >= 0) {
 	    bool	f_ptm = false ;
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
@@ -299,17 +298,18 @@ static int lockrw_ptminit(lockrw *op,int f_shared) noex {
 	    }
 	    rs1 = ptma_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptm) ptm_destroy(op->mxp) ;
+	    if ((rs < 0) && f_ptm) {
+		ptm_destroy(op->mxp) ;
+	    }
 	} /* end if (ptma) */
 	return rs ;
 }
 /* end subroutine (lockrw_ptminit) */
 
 static int lockrw_ptcinit(lockrw *op,int f_shared) noex {
-	ptca		a ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptca_create(&a)) >= 0) {
+	if (ptca a ; (rs = ptca_create(&a)) >= 0) {
 	    bool	f_ptc = false ;
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
@@ -321,7 +321,9 @@ static int lockrw_ptcinit(lockrw *op,int f_shared) noex {
 	    }
 	    rs1 = ptca_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptc) ptc_destroy(op->cvp) ;
+	    if ((rs < 0) && f_ptc) {
+		ptc_destroy(op->cvp) ;
+	    }
 	} /* end if (ptca) */
 	return rs ;
 }

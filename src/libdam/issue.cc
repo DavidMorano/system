@@ -139,7 +139,6 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;

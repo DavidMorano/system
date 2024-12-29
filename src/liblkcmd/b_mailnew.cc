@@ -167,7 +167,6 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	cfdecmfi(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;

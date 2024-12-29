@@ -290,7 +290,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
 	        while (hdb_fetchrec(dbp,skey,&keycursor,&key,&val) >= 0) {
-	            if (hdb_delcur(dbp,&keycursor,1) >= 0) {
+	            if (hdb_curdel(dbp,&keycursor,1) >= 0) {
 	                char	*ep = charp(val.buf) ;
 	                if (ep) {
 	                    uc_free(ep) ;
@@ -303,7 +303,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 	                f = f || (skey.len != key.len) ;
 		        f = f || (strncmp(sp,kp,skey.len) != 0) ;
 		        if (f) break ;
-	                if (hdb_delcur(dbp,&keycursor,0) >= 0) {
+	                if (hdb_curdel(dbp,&keycursor,0) >= 0) {
 	                    char	*ep = charp(val.buf) ;
 	                    if (ep) {
 	                        uc_free(ep) ;
@@ -328,7 +328,7 @@ int mapstrint_delcur(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 	    hdb_dat	val{} ;
 	    if ((rs = hdb_getrec(dbp,curp,&key,&val)) >= 0) {
 	        char	*ep = charp(val.buf) ;
-	        rs = hdb_delcur(dbp,curp,f_adv)  ;
+	        rs = hdb_curdel(dbp,curp,f_adv)  ;
 	        if ((rs >= 0) && ep) {
 	            uc_free(ep) ;
 	        }

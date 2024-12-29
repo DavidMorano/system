@@ -25,8 +25,7 @@
 #include	<ptrwa.h>
 
 
-#define	PTRWLOCK		pthread_rwlock_t
-#define	PTRWLOCK_NAMELEN	(MAXNAMELEN+1)
+#define	PTRWLOCK	pthread_rwlock_t
 
 
 typedef PTRWLOCK	ptrwlock ;

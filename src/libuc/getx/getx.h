@@ -41,11 +41,11 @@
 #include	<gethz.h>
 #include	<getmailgid.h>
 #include	<getmjd.h>
-#include	<getngroups.h>
-#include	<getnodeinfo.h>
 #include	<getnfile.h>
-#include	<getnprocessors.h>
+#include	<getngroups.h>
 #include	<getnodedomain.h>
+#include	<getnodeinfo.h>
+#include	<getnprocessors.h>
 #include	<getourenv.h>
 #include	<getpassword.h>
 #include	<getportnum.h>

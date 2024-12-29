@@ -60,6 +60,7 @@
 #include	<localmisc.h>
 
 #include	"ucgetus.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -98,8 +99,7 @@ namespace {
 	    mx.lockend() ;
         }
 	~ucgetus() noex {
-	    int		rs = fini() ;
-	    if (rs < 0) {
+	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucgetus",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (ucgetus) */

@@ -324,12 +324,11 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 	if ((rs = filecounts_magic(op,curp)) >= 0) {
 	    rs = SR_BADSLOT ;
 	    if (op->ncursors > 0) {
-	        vecobj	tlist ;
 	        cint	iisize = szof(FC_II) ;
 	        cint	to = TO_LOCK ;
 	        int	vn = DEFNENTRIES ;
 	        int	vo = 0 ;
-	        if ((rs = vecobj_start(&tlist,iisize,vn,vo)) >= 0) {
+	        if (vecobj tlist ; (rs = tlist.start(iisize,vn,vo)) >= 0) {
 	            if ((rs = lockfile(op->fd,F_RLOCK,0z,0z,to)) >= 0) {
 		        {
 	                    rs = filecounts_snaper(op,&tlist) ;
@@ -337,15 +336,12 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 	                rs1 = lockfile(op->fd,F_ULOCK,0z,0z,0) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (locked-DB) */
-	            if (rs >= 0) {
-	                int	sz ;
-	                c = vecobj_count(&tlist) ;
-	                sz = ((c + 1) * iisize) ;
+	            if ((rs >= 0) && (rs = tlist.count) >= 0) {
+	                cint	sz = ((rs + 1) * iisize) ;
 	                if (char *cp{} ; (rs = uc_malloc(sz,&cp)) >= 0) {
 	                    FC_II	*ilist = (FC_II *) cp ;
 		            void	*vp{} ;
 		            auto	vog = vecobj_get ;
-	                    c = 0 ;
 	                    for (int i = 0 ; vog(&tlist,i,&vp) >= 0 ; i += 1) {
 	                        FC_II	*ep = (FC_II *) vp ;
 	                        if (vp) {
@@ -359,7 +355,7 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 	                    curp->listn = c ;
 	                } /* end if (memory allocation) */
 	            } /* end if (ok) */
-	            rs1 = vecobj_finish(&tlist) ;
+	            rs1 = tlist.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (tlist) */
 	    } /* end if (valid) */
@@ -404,11 +400,10 @@ int filecounts_curread(FC *op,FC_CUR *curp,FC_I *fcip,
 /* private subroutines */
 
 static int filecounts_proclist(FC *op,FC_N *nlp) noex {
-	WORKER		work ;
 	int		rs ;
 	int		rs1 ;
 	int		vo = 0 ;
-	if ((rs = worker_start(&work,nlp)) >= 0) {
+	if (WORKER work ; (rs = worker_start(&work,nlp)) >= 0) {
 	    if ((rs = filecounts_lockbegin(op)) >= 0) {
 		cint	fd = op->fd ;
 	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) {

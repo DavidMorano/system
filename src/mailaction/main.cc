@@ -125,7 +125,6 @@ extern int	getpwd(char *,int) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	listentcp(const char *,const char *,int) ;
 extern int	listenfifo(const char *,int,int) ;

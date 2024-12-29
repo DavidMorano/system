@@ -114,7 +114,6 @@ extern int	sfcookkey(cchar *,int,cchar **) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;

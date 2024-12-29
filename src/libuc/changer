@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} cyi_lookcite cyi_enum cyi_read "
+NAMES="${NAMES} hdb_delcur "
 
 DN=/dev/null
 
@@ -11,9 +11,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep -q "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/cyi_lookcite/s//cyi_curcite/g
-g/cyi_read/s//cyi_curread/g
-g/cyi_enum/s//cyi_curenum/g
+g/hdb_delcur/s//hdb_curdel/g
 	w
 	q
 EOF

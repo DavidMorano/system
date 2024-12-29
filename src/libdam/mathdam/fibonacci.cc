@@ -32,7 +32,7 @@
 	n	number to return Fibonacci value for
 
 	Returns:
-	-	the Fibonacci number of the input
+	-	the Fibonacci result of the input
 
 	Notes:
 	The original Fibonacci function:

@@ -52,9 +52,7 @@
 	>=0		OK
 	<0		error
 
-
 	Notes:
-
 	1. We use |gethz()| rather than |uc_sysconfval()| because it
 	may be faster.  The |gethz()| function caches its value
 	internally without having to go to the kernel.  In some
@@ -343,7 +341,6 @@ int mkprogenv_finish(mkprogenv *op) noex {
 
 int mkprogenv_envset(mkprogenv *op,cchar *kp,cchar *valp,int vall) noex {
     	cnullptr	np{} ;
-	vechand		*elp = op->envp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
@@ -364,6 +361,7 @@ int mkprogenv_envset(mkprogenv *op,cchar *kp,cchar *valp,int vall) noex {
 	        }
 		cint	el = (bp - ebuf) ;
 	        if (cchar *ep{} ; (rs = spp->store(ebuf,el,&ep)) >= 0) {
+	    	    vechand	*elp = op->envp ;
 		    {
 		        auto	vcf = vechand_f(vstrkeycmp) ;
 	                if ((rs = vechand_search(elp,ep,vcf,np)) >= 0) {

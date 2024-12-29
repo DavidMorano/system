@@ -2,7 +2,7 @@
 
 T= ucget
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -34,7 +33,7 @@ LINT		?= lint
 
 DEFS=
 
-INCS= ucget.h
+INCS= ucget.h ucgetxx.hh
 
 LIBS=
 
@@ -71,6 +70,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -92,9 +92,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_UCGET)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCGET)
-
-$(T).a:			$(OBJ_UCGET)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -127,17 +124,17 @@ obj3_ucget.o:	$(OBJ3_UCGET)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCGET)
 
 
-ucgetpw.o:		ucgetpw.cc ucgetpw.h $(INCS)
-ucgetsp.o:		ucgetsp.cc ucgetsp.h $(INCS)
-ucgetgr.o:		ucgetgr.cc ucgetgr.h $(INCS)
-ucgetpj.o:		ucgetpj.cc ucgetpj.h $(INCS)
+ucgetpw.o:		ucgetpw.cc ucgetpw.h		$(INCS)
+ucgetsp.o:		ucgetsp.cc ucgetsp.h		$(INCS)
+ucgetgr.o:		ucgetgr.cc ucgetgr.h		$(INCS)
+ucgetpj.o:		ucgetpj.cc ucgetpj.h		$(INCS)
 
-ucuserattr.o:		ucuserattr.cc ucuserattr.h $(INCS)
-ucgetus.o:		ucgetus.cc ucgetus.h $(INCS)
+ucuserattr.o:		ucuserattr.cc ucuserattr.h	$(INCS)
+ucgetus.o:		ucgetus.cc ucgetus.h		$(INCS)
 
-ucgetpr.o:		ucgetpr.cc ucgetpr.h $(INCS)
-ucgetnw.o:		ucgetnw.cc ucgetnw.h $(INCS)
-ucgetho.o:		ucgetho.cc ucgetho.h $(INCS)
-ucgetsv.o:		ucgetsv.cc ucgetsv.h $(INCS)
+ucgetpr.o:		ucgetpr.cc ucgetpr.h		$(INCS)
+ucgetnw.o:		ucgetnw.cc ucgetnw.h		$(INCS)
+ucgetho.o:		ucgetho.cc ucgetho.h		$(INCS)
+ucgetsv.o:		ucgetsv.cc ucgetsv.h		$(INCS)
 
 

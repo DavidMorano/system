@@ -6,18 +6,31 @@
 /* subroutine to get a single "host" entry (raw) */
 /* version %I% last-modified %G% */
 
-#define	CF_USERENT	1		/* use reentrant API if available */
 
 /* revision history:
 
 	= 1998-03-21, David A­D­ Morano
 	This program was originally written.
 
+	= 2024-12-21, David A­D­ Morano
+	I refactored (really rewrote) these subroutines because
+	they needed to be updated in order to handle all of the
+	interface combinations across the several main (important)
+	operating systems (OSes) of the current period.  These OSes
+	are: System-V, Darwin, and Linux.  Incidentially, I took
+	the easy way out of rewriting this former stuff.  For the
+	rewrite, I used some subroutines that already existed that
+	are (were) already operating system independent.  Enjoy.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Group:
+	uc_gethost{x}
+
 
 	Name:
 	uc_gethostbyname
@@ -54,7 +67,6 @@
 			int af,cc *ap,int al) noex
 
 	Arguments:
-
 	- hep		pointer to 'hostent' structure
 	- hebuf		user supplied buffer to hold result
 	- helen		length of user supplied buffer
@@ -67,18 +79,17 @@
 	SR_FAULT	address fault
 	SR_TIMEDOUT	request timed out (bad network someplace)
 	SR_NOTFOUND	host could not be found
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<netdb.h>
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<storeitem.h>
@@ -90,30 +101,17 @@
 
 /* local defines */
 
-#if	(! defined(SYSHAS_GETHOSTXXXR)) || (SYSHAS_GETHOSTXXXR == 0)
-#undef	CF_USERENT
-#define	CF_USERENT	0
-#endif /* SYSHAS_GETHOSTXXXR */
-
-#define	NLOOPS		3
-
 
 /* external subroutines */
 
 
 /* external variables */
 
-#if	(CF_USERENT == 0)
-extern int	h_errno ;
-#endif
-
 
 /* local structures */
 
 
 /* forward references */
-
-static int	gethosterr(int) noex ;
 
 
 /* local variables */
@@ -125,255 +123,32 @@ static int	gethosterr(int) noex ;
 /* exported subroutines */
 
 int uc_gethostbegin(int stayopen) noex {
-	int		rs = SR_INVALID ;
-	if (stayopen >= 0) {
-	    sethostent(stayopen) ;
-	}
-	return rs ;
+    	return uc_gethobegin(stayopen) ;
 }
 /* end subrouttine (uc_gethostbegin) */
 
 int uc_gethostend() noex {
-	endhostent() ;
-	return SR_OK ;
+    	return uc_gethoend() ;
 }
 /* end subrouttine (uc_gethostend) */
 
 int uc_gethostent(HOSTENT *hep,char *hebuf,int helen) noex {
-	HOSTENT		*lp ;
-	int		rs = SR_OK ;
-
-	if (hep == NULL) return SR_FAULT ;
-	if (hebuf == NULL) return SR_FAULT ;
-
-	if (helen <= 0) return SR_OVERFLOW ;
-
-/* do the real work */
-
-#if	CF_USERENT
-	{
-	    int		h_errno ;
-
-	    for (int i = 0 ; i < NLOOPS ; i += 1) {
-	        if (i > 0) msleep(1000) ;
-
-	        rs = SR_OK ;
-	        errno = 0 ;
-	        h_errno = 0 ;
-	        lp = gethostent_r(hep,hebuf,helen,&h_errno) ;
-
-	        if (lp != NULL) break ;
-	        rs = gethosterr(h_errno) ;
-	        if (rs != SR_AGAIN) break ;
-
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        rs = hostent_size(hep) ;
-	    } else if (rs == SR_AGAIN) {
-	        rs = SR_TIMEDOUT ;
-	    }
-
-	}
-#else /* CF_USERENT */
-	{
-	    for (int i = 0 ; i < NLOOPS ; i += 1) {
-	        if (i > 0) msleep(1000) ;
-
-	        rs = SR_OK ;
-	        errno = 0 ;
-	        h_errno = 0 ;
-	        lp = gethostent() ;
-	        if (lp != NULL) break ;
-
-	        rs = gethosterr(h_errno) ;
-	        if (rs != SR_AGAIN) break ;
-
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        rs = hostent_load(hep,hebuf,helen,lp) ;
-	    } else if (rs == SR_AGAIN) {
-	        rs = SR_TIMEDOUT ;
-	    }
-
-	}
-#endif /* CF_USERENT */
-
-	if (rs == SR_PROTONOSUPPORT) rs = SR_OK ;
-
-	return rs ;
+    	ucentho		*up = cast_static<ucentho *>(hep) ;
+	return uc_gethoent(up,hebuf,helen) ;
 }
 /* end subroutine (uc_gethostent) */
 
 int uc_gethostbyname(HOSTENT *hep,char *hebuf,int helen,cc *name) noex {
-	HOSTENT		*lp ;
-	int		rs = SR_OK ;
-
-	if (name == NULL) return SR_FAULT ;
-	if (hep == NULL) return SR_FAULT ;
-	if (hebuf == NULL) return SR_FAULT ;
-
-	if (helen <= 0) return SR_OVERFLOW ;
-
-/* do the real work */
-
-#if	CF_USERENT
-	{
-	    int	h_errno ;
-	    for (int i = 0 ; i < NLOOPS ; i += 1) {
-	        if (i > 0) msleep(1000) ;
-
-	        rs = SR_OK ;
-	        errno = 0 ;
-	        h_errno = 0 ;
-	        lp = gethostbyname_r(name,hep,hebuf,helen,&h_errno) ;
-
-	        if (lp != NULL) break ;
-	        rs = gethosterr(h_errno) ;
-	        if (rs != SR_AGAIN) break ;
-
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        rs = hostent_size(hep) ;
-	    } else if (rs == SR_AGAIN) {
-	        rs = SR_TIMEDOUT ;
-	    }
-
-	}
-#else /* CF_USERENT */
-	{
-
-	    for (int i = 0 ; i < NLOOPS ; i += 1) {
-	        if (i > 0) msleep(1000) ;
-
-	        rs = SR_OK ;
-	        errno = 0 ;
-	        h_errno = 0 ;
-	        lp = gethostbyname(name) ;
-
-	        if (lp != NULL) break ;
-	        rs = gethosterr(h_errno) ;
-	        if (rs != SR_AGAIN) break ;
-
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        rs = hostent_load(hep,hebuf,helen,lp) ;
-	    } else if (rs == SR_AGAIN) {
-	        rs = SR_TIMEDOUT ;
-	    }
-
-	}
-#endif /* CF_USERENT */
-
-	return rs ;
+    	ucentho		*up = cast_static<ucentho *>(hep) ;
+	return uc_gethonam(up,hebuf,helen,name) ;
 }
 /* end subroutine (uc_gethostbyname) */
 
 int uc_gethostbyaddr(HOSTENT *hep,char *hebuf,int helen,
 		int af,cc *ap,int al) noex {
-	HOSTENT		*lp ;
-	int		rs = SR_OK ;
-
-	if (hep == NULL) return SR_FAULT ;
-	if (hebuf == NULL) return SR_FAULT ;
-	if (ap == NULL) return SR_FAULT ;
-
-	if (helen <= 0) return SR_OVERFLOW ;
-
-/* do the real work */
-
-#if	CF_USERENT
-	{
-	    int	h_errno ;
-	    for (int i = 0 ; i < NLOOPS ; i += 1) {
-	        if (i > 0) msleep(1000) ;
-
-	        rs = SR_OK ;
-	        errno = 0 ;
-	        h_errno = 0 ;
-	        lp = gethostbyaddr_r(ap,al,af,
-	            hep,hebuf,helen,&h_errno) ;
-
-	        if (lp != NULL) break ;
-
-	        rs = gethosterr(h_errno) ;
-	        if (rs != SR_AGAIN) break ;
-
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        rs = hostent_size(hep) ;
-	    } else if (rs == SR_AGAIN) {
-	        rs = SR_TIMEDOUT ;
-	    }
-
-	}
-#else /* CF_USERENT */
-	{
-
-	    for (int i = 0 ; i < NLOOPS ; i += 1) {
-	        if (i > 0) msleep(1000) ;
-
-	        rs = SR_OK ;
-	        errno = 0 ;
-	        h_errno = 0 ;
-	        lp = gethostbyaddr(ap,al,af) ;
-	        if (lp != NULL) break ;
-
-	        rs = gethosterr(h_errno) ;
-	        if (rs != SR_AGAIN) break ;
-
-	    } /* end for */
-
-	    if (rs >= 0) {
-	        rs = hostent_load(hep,hebuf,helen,lp) ;
-	    } else if (rs == SR_AGAIN) {
-	        rs = SR_TIMEDOUT ;
-	    }
-
-	}
-#endif /* CF_USERENT */
-
-	return rs ;
+    	ucentho		*up = cast_static<ucentho *>(hep) ;
+	return uc_gethoadd(up,hebuf,helen,af,ap,al) ;
 }
 /* end subroutine (uc_gethostbyaddr) */
-
-
-/* local subroutines */
-
-static int gethosterr(int h_errno) noex {
-	int		rs = SR_OK ;
-	if (errno != 0) {
-	    rs = (- errno) ;
-	} else {
-	    switch (h_errno) {
-	    case TRY_AGAIN:
-	        rs = SR_AGAIN ;
-	        break ;
-	    case NO_DATA:
-	        rs = SR_HOSTUNREACH ;
-	        break ;
-	    case NO_RECOVERY:
-	        rs = SR_IO ;
-	        break ;
-	    case HOST_NOT_FOUND:
-	        rs = SR_NOTFOUND ;
-	        break ;
-#ifdef	NETDB_INTERNAL /* not everyone (MacOS) has this! */
-	    case NETDB_INTERNAL:
-	        rs = SR_NOANODE ;
-	        break ;
-#endif /* NETDB_INTERNAL */
-	    default:
-	        rs = SR_PROTONOSUPPORT ;
-	        break ;
-	    } /* end switch */
-	} /* end if (errno) */
-	return rs ;
-}
-/* end subroutine (gethosterr) */
 
 

@@ -1,4 +1,5 @@
 /* ucsyssp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for PEOJECT-DB access */
@@ -104,7 +105,7 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	    ec = EINVAL ;
 	    memset(spp,0,sizeof(SPWD)) ;
 	    if (splen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -138,7 +139,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	    ec = EINVAL ;
 	    memset(spp,0,sizeof(SPWD)) ;
 	    if ((splen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -155,7 +156,7 @@ int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	    ec = EINVAL ;
 	    memset(spp,0,sizeof(SPWD)) ;
 	    if (splen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -168,7 +169,7 @@ int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	    ec = EINVAL ;
 	    memset(spp,0,sizeof(SPWD)) ;
 	    if ((splen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

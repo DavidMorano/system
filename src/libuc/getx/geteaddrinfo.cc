@@ -68,7 +68,7 @@
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
-#include	<getnodename.h>		/* <- for |getnodedomain(2uc)| */
+#include	<getnodedomain.h>
 #include	<snx.h>
 #include	<snwcpy.h>
 #include	<isnot.h>

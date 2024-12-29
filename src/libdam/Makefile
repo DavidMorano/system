@@ -661,8 +661,6 @@ zoffparts.o:		zoffparts.c zoffparts.h
 
 dayspec.o:		dayspec.c dayspec.h
 
-cvtdater.o:		cvtdater.c cvtdater.h
-
 gecos.o:		gecos.c gecos.h
 
 kinfo.o:		kinfo.c kinfo.h
@@ -734,6 +732,7 @@ sysrealname.o:		sysrealname.cc sysrealname.h
 dayofmonth.o:		dayofmonth.cc dayofmonth.h
 netfile.o:		netfile.cc netfile.h
 calmgr.o:		calmgr.cc calmgr.h
+cvtdater.o:		cvtdater.cc cvtdater.h
 
 textlook.o:		textlook.cc textlook.h
 searchkeys.o:		searchkeys.cc searchkeys.h
@@ -858,5 +857,6 @@ conallof.o:		conallof.cc conallof.h
 ismatstar.o:		ismatstar.cc ismatstar.h
 findxfile.o:		findxfile.cc findxfile.h
 getostype.o:		getostype.cc getostype.h
+deprecated.o:		deprecated.cc
 
 

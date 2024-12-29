@@ -30,7 +30,7 @@
 	n	number to return factorial value for
 
 	Returns:
-	-	the Fibonacci number of the input
+	-	the factorial result of the input
 
 	Notes:
 	The original Fibonacci function:

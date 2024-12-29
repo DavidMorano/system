@@ -173,12 +173,12 @@ constexpr gecoshelp_m	gmems[] = {
 /* exported subroutines */
 
 int gecos_start(gecos *op,cchar *sbuf,int slen) noex {
+    	GECOS		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (op && sbuf) {
-	    gecoshelp	ho(op,sbuf,slen) ;
-	    memclear(op) ;
-	    if ((rs = ho.start()) >= 0) {
+	    memclear(hop) ;
+	    if (gecoshelp ho(op,sbuf,slen) ; (rs = ho.start()) >= 0) {
 		{
 		    ho.proc() ;
 		}
@@ -480,5 +480,36 @@ void gecoshelp::proc() noex {
 	} /* end for */
 }
 /* end method (gecoshelp::proc) */
+
+int gecos::start(cchar *sp,int sl) noex {
+	return gecos_start(this,sp,sl) ;
+}
+
+int gecos::compose(char *rb,int rl) noex {
+	return gecos_compose(this,rb,rl) ;
+}
+
+int gecos::getval(int i,cchar **rpp) noex {
+	return gecos_getval(this,i,rpp) ;
+}
+
+void gecos::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("gecos",rs,"fini-finish") ;
+	}
+}
+
+gecos_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case gecosmem_finish:
+	        rs = gecos_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (gecos_co::operator) */
 
 

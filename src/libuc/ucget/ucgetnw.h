@@ -33,7 +33,7 @@ EXTERNC_begin
 extern int	uc_getnwbegin(int) noex ;
 extern int	uc_getnwent(ucentnw *,char *,int) noex ;
 extern int	uc_getnwnam(ucentnw *,char *,int,cchar *) noex ;
-extern int	uc_getnwnum(ucentnw *,char *,int,uint32_t,int) noex ;
+extern int	uc_getnwnum(ucentnw *,char *,int,int,uint32_t) noex ;
 extern int	uc_getnwend() noex ;
 
 EXTERNC_end

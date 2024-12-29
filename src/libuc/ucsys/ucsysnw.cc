@@ -1,4 +1,5 @@
 /* ucsysnw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for NETENT-DB access */
@@ -98,14 +99,14 @@
 #if	defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getprent_rp(NETENT *nwp,char *nwbuf,int prlen) noex {
+int getnwent_rp(NETENT *nwp,char *nwbuf,int prlen) noex {
 	NETENT		*rp{} ;
 	int		ec ;
 	int		herr{} ;
 	errno = 0 ;
 	if ((ec = getnetent_r(nwp,nwbuf,prlen,&rp,&herr)) == 0) {
 	    if (rp == nullptr) {
-		ec = ucsys_getec(herr) ;
+		ec = ucsys_getresolvec(herr) ;
 	        errno = ec ;
 	    }
 	} else if (ec > 0) {
@@ -141,7 +142,7 @@ int getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
 	    ec = EINVAL ;
 	    memset(nwp,0,sizeof(NETENT)) ;
 	    if (nwlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -157,14 +158,14 @@ int getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
 #if	defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getprnam_rp(NETENT *nwp,char *nwbuf,int prlen,cchar *n) noex {
+int getnwnam_rp(NETENT *nwp,char *nwbuf,int prlen,cchar *n) noex {
 	NETENT		*rp{} ;
 	int		ec ;
 	int		herr{} ;
 	errno = 0 ;
 	if ((ec = getnetbyname_r(n,nwp,nwbuf,prlen,&rp,&herr)) == 0) {
 	    if (rp == nullptr) {
-		ec = ucsys_getec(herr) ;
+		ec = ucsys_getresolvec(herr) ;
 	        errno = ec ;
 	    }
 	} else if (ec > 0) {
@@ -194,13 +195,13 @@ int getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 
 #else
 
-int getwtnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
+int getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (nwp && nwbuf && n) {
 	    ec = EINVAL ;
 	    memset(nwp,0,sizeof(NETENT)) ;
 	    if ((nwlen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -223,7 +224,7 @@ int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
 	errno = 0 ;
 	if ((ec = getnetbyaddr_r(n,t,nwp,nwbuf,prlen,&rp,&herr)) == 0) {
 	    if (rp == nullptr) {
-		ec = ucsys_getec(herr) ;
+		ec = ucsys_getresolvec(herr) ;
 	        errno = ec ;
 	    }
 	} else if (ec > 0) {
@@ -258,7 +259,7 @@ int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
 	    ec = EINVAL ;
 	    memset(nwp,0,sizeof(NETENT)) ;
 	    if ((nwlen > 0) && (t >= 0)) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

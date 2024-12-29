@@ -165,7 +165,6 @@ extern int	optvalue(cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	udomain(cchar *,char *,int,cchar *) ;
 extern int	getinetdomain(char *,int,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	gethomeorg(char *,int,cchar *) ;
 extern int	localgetorg(cchar *,char *,int,cchar *) ;

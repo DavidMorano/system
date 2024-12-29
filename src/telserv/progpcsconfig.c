@@ -90,7 +90,6 @@ extern int	vstrkeycmp(char **,char **) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
 
 extern char	*strwcpy(char *,const char *,int) ;

@@ -34,8 +34,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<string>		/* <- C++ |string| */
+#include	<cstring>		/* <- |strlen(3c)| */
+#include	<string>		/* <- |string(3c++)| */
+#include	<string_view>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -90,9 +91,8 @@ public:
 		    sl = strlen(sp) ;
 		}
 		try {
-	            for (int i = 0 ; sp[i] && sl ; i += 1) {
-		        b.push_back(sp[i]) ;
-	            }
+		    std::string_view	sv(sp,sl) ;
+		    b += sv ;
 		} catch (...) {
 		}
 	    } /* end if (non-null) */
@@ -115,11 +115,12 @@ public:
 	int add(cchar *sp,int sl = -1) noex {
 	    int		rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    for (int i = 0 ; (rs >= 0) && (i < sl) ; i += 1) {
-		rs = push(sp[i]) ;
-	    }
-	    if (rs >= 0) {
+	    try {
+		std::string_view	sv(sp,sl) ;
+		b += sv ;
 	        rs = (b.size() - oi) ;
+	    } catch (...) {
+		rs = SR_NOMEM ;
 	    }
 	    return rs ;
 	} ;

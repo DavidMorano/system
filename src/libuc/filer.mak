@@ -2,7 +2,7 @@
 
 T= filer
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -56,15 +56,14 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_FILER= filer_main.o
-OBJ1_FILER= filer_writers.o
-OBJ2_FILER= filer_mailsup.o
+OBJ0_FILER=
+OBJ1_FILER=
+OBJ2_FILER=
 OBJ3_FILER=
 
-OBJA_FILER= obj0_filer.o obj1_filer.o
-OBJB_FILER= obj2_filer.o
+OBJA_FILER= filer_main.o filer_writers.o filer_obj.o
 
-OBJ_FILER= $(OBJA_FILER) $(OBJB_FILER)
+OBJ_FILER= $(OBJA_FILER)
 
 
 .SUFFIXES:		.hh .ii
@@ -132,6 +131,6 @@ obj3_filer.o:	$(OBJ3_FILER)
 
 filer_main.o:		filer_main.cc		$(INCS)
 filer_writers.o:	filer_writers.cc	$(INCS)
-filer_mailsup.o:	filer_mailsup.cc	$(INCS)
+filer_obj.o:		filer_obj.cc		$(INCS)
 
 

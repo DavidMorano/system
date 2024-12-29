@@ -18,6 +18,9 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_getpr{x}
+
 	Name:
 	uc_getprnam
 
@@ -78,9 +81,10 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
+#include	<ucsyspr.h>
 
-#include	"ucsyspr.h"
 #include	"ucgetpr.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -93,6 +97,8 @@
 
 
 /* imported namespaces */
+
+using ucget::ucgeter ;			/* type */
 
 
 /* local typedefs */
@@ -161,9 +167,16 @@ int uc_getprent(ucentpr *prp,char *prbuf,int prlen) noex {
 /* end subroutine (uc_getprent) */
 
 int uc_getprnam(ucentpr *prp,char *prbuf,int prlen,cchar *name) noex {
-	ucgetpr		pro(name) ;
-	pro.m = &ucgetpr::getpr_nam ;
-	return pro(prp,prbuf,prlen) ;
+    	int		rs = SR_FAULT ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		ucgetpr		pro(name) ;
+		pro.m = &ucgetpr::getpr_nam ;
+		rs = pro(prp,prbuf,prlen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_getprnam) */
 
@@ -179,49 +192,14 @@ int uc_getprnum(ucentpr *prp,char *prbuf,int prlen,int num) noex {
 
 int ucgetpr::operator () (ucentpr *prp,char *prbuf,int prlen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	if (prp && prbuf) {
 	    rs = SR_OVERFLOW ;
-	    if (prlen > 0) {
-	        timecount	to_again(utimeout[uto_again]) ;
-	        timecount	to_nomem(utimeout[uto_nomem]) ;
-	        timecount	to_mfile(utimeout[uto_mfile]) ;
-	        timecount	to_nfile(utimeout[uto_nfile]) ;
-		bool		f_exit = false ;
+	    if (ucgeter err ; prlen > 0) {
 	        repeat {
 	            if ((rs = (this->*m)(prp,prbuf,prlen)) < 0) {
-	                switch (rs) {
-	                case SR_AGAIN:
-			    if ((rs1 = to_again) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-		            break ;
-	                case SR_NOMEM:
-			    if ((rs1 = to_nomem) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-		            break ;
-	                case SR_MFILE:
-			    if ((rs1 = to_mfile) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-			    break ;
-	                case SR_NFILE:
-			    if ((rs1 = to_nfile) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-	                case SR_INTR:
-	                    break ;
-	                default:
-		            f_exit = true ;
-		            break ;
-	                } /* end switch */
+			rs = err(rs) ;
 	            } /* end if (error) */
-	        } until ((rs >= 0) || f_exit) ;
+	        } until ((rs >= 0) || err.fexit) ;
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
@@ -229,7 +207,8 @@ int ucgetpr::operator () (ucentpr *prp,char *prbuf,int prlen) noex {
 /* end subroutine (ucgetpr::operator) */
 
 int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
-	int		rs = SR_NOSYS ;
+    	cnullptr	np{} ;
+	int		rs ;
 	errno = 0 ;
 	if_constexpr (f_getprxxxr) {
 	    cint	ec = getprent_rp(prp,prbuf,prlen) ;
@@ -245,8 +224,8 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 		}
 	    }
 	} else {
-	    ucentpr	*rp = static_cast<ucentpr *>(getprent()) ;
-	    if (rp) {
+	    SYSDBPR	*ep = getprent() ;
+	    if (ucentpr *rp = cast_static<ucentpr *>(ep) ; rp != np) {
 	        rs = prp->load(prbuf,prlen,rp) ;
 	    } else {
 	        rs = (- errno) ;
@@ -260,67 +239,65 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 /* end subroutine (ucgetpr::getpr_ent) */
 
 int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
-	int		rs = SR_FAULT ;
-	if (name) {
-	    errno = 0 ;
-	    if_constexpr (f_getprxxxr) {
-	        cint	ec = getprnam_rp(prp,prbuf,prlen,name) ;
-	        if (ec == 0) {
-	            rs = prp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (- errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentpr	*rp = static_cast<ucentpr *>(getprnam(name)) ;
-	        if (rp) {
-	            rs = prp->load(prbuf,prlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (non-null) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getprxxxr) {
+            cint    ec = getprnam_rp(prp,prbuf,prlen,name) ;
+            if (ec == 0) {
+                rs = prp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (- errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBPR         *ep = getprnam(name) ;
+            if (ucentpr *rp = cast_static<ucentpr *>(ep) ; rp != np) {
+                rs = prp->load(prbuf,prlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetpr::getpr_nam) */
 
 int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
-	int		rs = SR_INVALID ;
-	if (num >= 0) {
-	    errno = 0 ;
-	    if_constexpr (f_getprxxxr) {
-	        cint	ec = getprnum_rp(prp,prbuf,prlen,num) ;
-	        if (ec == 0) {
-	            rs = prp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (- errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentpr	*rp = static_cast<ucentpr *>(getprnum(num)) ;
-	        if (rp) {
-	            rs = prp->load(prbuf,prlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (valid num) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getprxxxr) {
+            cint    ec = getprnum_rp(prp,prbuf,prlen,num) ;
+            if (ec == 0) {
+                rs = prp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (- errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBPR         *ep = getprnum(num) ;
+            if (ucentpr *rp = cast_static<ucentpr *>(ep) ; rp != np) {
+                rs = prp->load(prbuf,prlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetpr::getpr_num) */

@@ -398,6 +398,11 @@ enum extrasysconfs {
 #define	NI_MAXSERV	SVCNAMELEN
 #endif
 
+/* network-related name resolving service (some system do not have) */
+#ifndef	NETDB_INTERAL
+#define	NETDB_INTERAL	-1
+#endif
+
 /* for |poll(2)| */
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-interval-multiplier (to secs) */

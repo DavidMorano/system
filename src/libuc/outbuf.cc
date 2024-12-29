@@ -1,4 +1,5 @@
 /* outbuf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* output buffer management (really?) */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	outbuf
+
+	Description:
 	This little object lets a caller start out thinking that
 	his caller-supplied buffer will be returned by the |_get()|
 	method.  However, if the original call to the |_start()|
@@ -50,6 +55,12 @@
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
@@ -67,7 +78,7 @@ int outbuf_start(outbuf *oop,char *obuf,int olen) noex {
 	            oop->olen = olen ;
 	        } else {
 		    if ((rs = maxpathlen) >= 0) {
-	               oop->olen = (rs+1) ;
+	               oop->olen = rs ;
 		    }
 	        }
 	    } /* end if (valid) */
@@ -101,9 +112,8 @@ int outbuf_get(outbuf *oop,char **onpp) noex {
 	        *onpp = oop->obuf ;
 	    } else {
 	        if (oop->obuf == nullptr) {
-		    cint	size = (oop->olen+1) ;
-	            char	*vp{} ;
-	            if ((rs = uc_valloc(size,&vp)) >= 0) {
+		    cint	sz = (oop->olen + 1) ;
+	            if (char *vp{} ; (rs = uc_valloc(sz,&vp)) >= 0) {
 	                oop->obuf = vp ;
 	                oop->f_alloc = true ;
 	                oop->obuf[0] = '\0' ;

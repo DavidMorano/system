@@ -96,7 +96,6 @@ extern int	sfbasename(const char *,int,const char **) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	matkeystr(const char **,const char *,int) ;
 extern int	getnodename(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;

@@ -506,7 +506,7 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 
 ****/
 
-int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
+int hdb_curdel(hdb *op,CUR *curp,int f_adv) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
             ENTRYINFO       ei{} ;
@@ -597,7 +597,7 @@ int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (hdb_delcur) */
+/* end subroutine (hdb_curdel) */
 
 /* advance the cursor to the next entry matching the key-cursor pair */
 int hdb_nextrec(hdb *op,HDB_D key,CUR *curp) noex {

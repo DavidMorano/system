@@ -238,7 +238,7 @@ namespace libu {
 
 namespace libu {
     template<typename T>
-    int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
+    static int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    cint	dlen = DIGBUFLEN ;

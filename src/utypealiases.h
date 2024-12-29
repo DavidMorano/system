@@ -428,23 +428,23 @@
 #endif
 
 #ifndef	CPROTOENT
-#define	CPROTOENT	const struct protoent
+#define	CPROTOENT	const PROTOENT
 #endif
 
 #ifndef	CNETENT
-#define	CNETENT		const struct netent
+#define	CNETENT		const NETENT
 #endif
 
 #ifndef	CHOSTENT
-#define	CHOSTENT	const struct hostent
+#define	CHOSTENT	const HOSTENT
 #endif
 
 #ifndef	CSERVENT
-#define	CSERVENT	const struct servent
+#define	CSERVENT	const SERVENT
 #endif
 
 #ifndef	CADDRINFO
-#define	CADDRINFO	const struct addrinfo
+#define	CADDRINFO	const ADDRINFO
 #endif
 
 /* UNIX® System V Inter-Process-Communication (IPC) */
@@ -481,6 +481,29 @@
 #define	CSEMUN		const union semun	/* for UNIX® SysV-IPC SEM */
 #endif
 
+/* SYSDB double-aliases */
+
+#define	SYSDBPW		PASSWD
+#define	SYSDBSP		SPWD
+#define	SYSDBUA		USERATTR
+#define	SYSDBGR		GROUP
+#define	SYSDBPJ		PROJECT
+#define	SYSDBPR		PROTOENT
+#define	SYSDBNW		NETENT
+#define	SYSDBHO		HOSTENT
+#define	SYSDBSV		SERVENT
+#define	SYSDBAI		ADDRINFO
+
+#define	CSYSDBPW	const PASSWD
+#define	CSYSDBSP	const SPWD
+#define	CSYSDBUA	const USERATTR
+#define	CSYSDBGR	const GROUP
+#define	CSYSDBPH	const PROJECT
+#define	CSYSDBPR	const PROTOENT
+#define	CSYSDBNW	const NETENT
+#define	CSYSDBHO	const HOSTENT
+#define	CSYSDBSV	const SERVENT
+#define	CSYSDBAI	const ADDRINFO
 
 #endif /* UTYPEALIASES_INCLUDE */
 

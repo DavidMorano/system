@@ -128,9 +128,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<strn.h>
@@ -163,6 +163,9 @@ using std::nullptr_t ;			/* type */
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -183,8 +186,7 @@ int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rbuf && gf) {
-	    cchar	*cp{} ;
-	    if ((rs = getgecosname(gf,-1,&cp)) >= 0) {
+	    if (cchar *cp{} ; (rs = getgecosname(gf,-1,&cp)) >= 0) {
 		cint	cl = rs ;
 	        rs = snwcpyhyphen(rbuf,rlen,cp,cl) ;
 		rl = rs ;

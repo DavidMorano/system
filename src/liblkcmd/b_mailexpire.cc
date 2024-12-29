@@ -129,7 +129,6 @@ extern int	cfdecmfi(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	sperm(IDS *,struct ustat *,int) ;

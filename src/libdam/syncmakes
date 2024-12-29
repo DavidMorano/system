@@ -1,21 +1,24 @@
 #!/usr/extra/bin/ksh
 # SYNCMAKES
 files_d | while read D ; do
-  find $D -type f -mtime -120 -name Makefile -print | while read N ; do
-    BN=${N##*/}
-    DN=${N%/*}
-    if [[ -f ${IN} ]] ; then
-      if [[ $N -ef ${IN} ]] ; then 
+  MF=${D}/Makefile
+  if [[ -f $MF ]] ; then
+    DN=${D%/*}
+    BN=${D##*/}
+    MFA=${BN}.mak
+    if [[ -f $MFA ]] ; then
+      if [[ $MF -ef $MFA ]] ; then 
         print -- YES
       else
-        print -- NO 
-        li $N $IN
-        ln -f $N include
+        print -- NO $BN
+        li $MF
+        li $MFA
+	ln -f $MF $MFA
       fi
-    else 
-      p -- "linking to INCLUDE ${N}"
-      ln $N $IN
+    else
+      print -- NOT present $MFA
+      ln -f $MF $MFA
     fi
-  done
+  fi
 done
 

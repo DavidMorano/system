@@ -274,7 +274,7 @@ enum errnomssings {
 #define	SR_NOTUNIQ	(- ENOTUNIQ)	/* given login name not unique */
 #define	SR_BADFD	(- EBADFD)	/* FD invalid for this operation */
 #define	SR_REMCHG	(- EREMCHG)	/* Remote address changed */
-#define	SR_LIBACC	(- ELIBACC)	/* Can't access a needed shared lib */
+#define	SR_LIBACC	(- ELIBACC)	/* Cannot access a needed shared lib */
 #define	SR_LIBBAD	(- ELIBBAD)	/* Accessing a corrupted shared lib */
 #define	SR_LIBSCN	(- ELIBSCN)	/* .lib section in a.out corrupted */
 #define	SR_LIBMAX	(- ELIBMAX)	/* Attempting link in too many libs */
@@ -283,7 +283,7 @@ enum errnomssings {
 #define	SR_NOSYS	(- ENOSYS)	/* Unsupported file system operation */
 #define	SR_LOOP		(- ELOOP)	/* Symbolic link loop */
 #define	SR_RESTART	(- ERESTART)	/* Restartable system call */
-#define	SR_STRPIPE	(- ESTRPIPE)	/* if pipe/FIFO, don't sleep */
+#define	SR_STRPIPE	(- ESTRPIPE)	/* if pipe/FIFO, do not sleep */
 #define	SR_NOTEMPTY	(- ENOTEMPTY)	/* directory not empty */
 #define	SR_USERS	(- EUSERS)	/* Too many users (for UFS) */
 #define	SR_NOTSOCK	(- ENOTSOCK)	/* Socket operation on non-socket */
@@ -297,7 +297,7 @@ enum errnomssings {
 #define	SR_PFNOSUPPORT	(- EPFNOSUPPORT)	/* proto family not supported */
 #define	SR_AFNOSUPPORT	(- EAFNOSUPPORT)	/* AF not supported by */
 #define	SR_ADDRINUSE	(- EADDRINUSE)	/* Address already in use */
-#define	SR_ADDRNOTAVAIL	(- EADDRNOTAVAIL)	/* Can't assign address */
+#define	SR_ADDRNOTAVAIL	(- EADDRNOTAVAIL)	/* Cannot assign address */
 #define	SR_NETDOWN	(- ENETDOWN)	/* Network is down */
 #define	SR_NETUNREACH	(- ENETUNREACH)	/* Network is unreachable */
 #define	SR_NETRESET	(- ENETRESET)	/* Network dropped connection reset */
@@ -306,8 +306,8 @@ enum errnomssings {
 #define	SR_NOBUFS	(- ENOBUFS)	/* No buffer space available */
 #define	SR_ISCONN	(- EISCONN)	/* Socket is already connected */
 #define	SR_NOTCONN	(- ENOTCONN)	/* Socket is not connected */
-#define	SR_SHUTDOWN	(- ESHUTDOWN)	/* Can't send after socket shutdown */
-#define	SR_TOOMANYREFS	(- ETOOMANYREFS)	/* Too many: can't splice */
+#define	SR_SHUTDOWN	(- ESHUTDOWN)	/* Cannot send after socket shutdown */
+#define	SR_TOOMANYREFS	(- ETOOMANYREFS)	/* Too many: cannot splice */
 #define	SR_TIMEDOUT	(- ETIMEDOUT)	/* Connection timed out */
 #define	SR_CONNREFUSED	(- ECONNREFUSED)	/* Connection refused */
 #define	SR_HOSTDOWN	(- EHOSTDOWN)	/* Host is down */
@@ -334,7 +334,7 @@ enum errnomssings {
 #define	SR_INUSE	SR_ADDRINUSE	/* already in use */
 #define	SR_LOCKLOST	SR_NXIO		/* a lock was lost */
 #define	SR_HANGUP	SR_NXIO		/* hangup on device (not writable) */
-#define	SR_POLLERR	SR_IO		/* SPECIAL for 'poll(2)' error */
+#define	SR_POLLERR	SR_IO		/* SPECIAL for |poll(2)| error */
 #define	SR_TOOBIG	SR_2BIG		/* arguments too big */
 #define	SR_BADFMT	SR_BFONT	/* invalid format */
 #define	SR_FULL		SR_XFULL	/* object is full */

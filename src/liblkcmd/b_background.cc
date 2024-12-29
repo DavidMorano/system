@@ -157,7 +157,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matpstr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;

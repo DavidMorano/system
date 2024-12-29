@@ -1,4 +1,5 @@
 /* ucsysho SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for HOSTENT-DB access */
@@ -108,7 +109,7 @@ int getprent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	errno = 0 ;
 	if ((ec = gethostent_r(hop,hobuf,holen,&rp,&herr)) == 0) {
 	    if (rp == nullptr) {
-		ec = ucsys_getec(herr) ;
+		ec = ucsys_getresolvec(herr) ;
 	        errno = ec ;
 	    }
 	} else if (ec > 0) {
@@ -120,7 +121,7 @@ int getprent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	return ec ;
 }
 
-#else
+#else /* other than GBU-style reentrant interfaces */
 
 /* POSIX draft-6 inspired version (like on SunOS) */
 int gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
@@ -136,7 +137,7 @@ int gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 
 #endif	/* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
 
-#else
+#else /* for non-reentrant interfaces */
 
 int gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	int		ec = EFAULT ;
@@ -144,7 +145,7 @@ int gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	    ec = EINVAL ;
 	    memclear(hop) ;
 	    if (holen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -160,14 +161,14 @@ int gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 #if	defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getprnam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
+int gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 	HOSTENT		*rp{} ;
 	int		ec ;
 	int		herr{} ;
 	errno = 0 ;
 	if ((ec = gethostbyname_r(n,hop,hobuf,holen,&rp,&herr)) == 0) {
 	    if (rp == nullptr) {
-		ec = ucsys_getec(herr) ;
+		ec = ucsys_getresolvec(herr) ;
 	        errno = ec ;
 	    }
 	} else if (ec > 0) {
@@ -197,13 +198,13 @@ int gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 
 #else
 
-int getwtnam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
+int gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 	int		ec = EFAULT ;
 	if (hop && hobuf &&n) {
 	    ec = EINVAL ;
 	    memclear(hop) ;
 	    if ((holen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -226,7 +227,7 @@ int gethonum_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	errno = 0 ;
 	if ((ec = gethostbyaddr_r(ap,al,af,hop,hobuf,holen,&rp,&herr)) == 0) {
 	    if (rp == nullptr) {
-		ec = ucsys_getec(herr) ;
+		ec = ucsys_getresolvec(herr) ;
 	        errno = ec ;
 	    }
 	} else if (ec > 0) {
@@ -241,9 +242,9 @@ int gethonum_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 #else
 
 /* POSIX draft-6 inspired version (like on SunOS) */
-int gethoad_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
+int gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	HOSTENT		*rp ;
-	int		rc ;
+	int		rc = 0 ;
 	errno = 0 ;
 	if ((rp = gethostbyaddr_r(ap,al,af,hop,hobuf,holen)) == nullptr) {
 	    rc = errno ;
@@ -261,7 +262,7 @@ int gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	    ec = EINVAL ;
 	    memclear(hop) ;
 	    if ((holen > 0) && (al > 0) && (af >= 0)) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

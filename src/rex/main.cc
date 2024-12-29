@@ -72,7 +72,6 @@
 
 /* external subroutines */
 
-extern int	getnodedomain() ;
 extern int	isdigitlatin(int) ;
 
 extern int	authfile() ;

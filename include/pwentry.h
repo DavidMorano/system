@@ -12,10 +12,10 @@
 	This was originally written.
 
 	= 2018-12-21, David A.D. Morano
-	Added |pwentrybufsize(3dam)|.
+	Added |pwentrybufsize(3dam)|.  I added this to facilitate
+	buffer allocations for using this object.
 
-
-***********************************************************************/
+****/
 
 /* Copyright © 1998,2018 David A-D- Morano.  All rights reserved. */
 
@@ -66,7 +66,47 @@ struct pwentry_head {
 	gid_t		gid ;
 } ;
 
+#ifdef	__cplusplus
+enum pwentrymems {
+    	pwentrymem_start,
+	pwentrymem_mkextras,
+	pwentrymem_finish,
+	pwentrymem_overlast
+} ;
+struct pwentry ;
+struct pwentry_co {
+	pwentry		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (pwentry *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (pwentry_co) */
+struct pwentry : pwentry_head {
+	pwentry_co	start ;
+	pwentry_co	mkextras ;
+	pwentry_co	finish ;
+	pwentry() noex {
+	    start(this,pwentrymem_start) ;
+	    mkextras(this,pwentrymem_mkextras) ;
+	    finish(this,pwentrymem_finish) ;
+	} ;
+	pwentry(const pwentry &) = delete ;
+	pwentry &operator = (const pwentry &) = delete ;
+	int fieldpw(int,cchar *,int = -1) noex ;
+	int mkcopy(pwentry *,char *,int) noex ;
+	void dtor() noex ;
+	~pwentry() {
+	    dtor() ;
+	} ;
+} ; /* end struct (pwentry) */
+#else	/* __cplusplus */
 typedef PWENTRY		pwentry ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

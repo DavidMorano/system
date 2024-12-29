@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -44,7 +43,7 @@ INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
 
-RUNINFO= -tpath $(RUNDIR)
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -56,11 +55,12 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strcasestr.o
-OBJ1=
-OBJ2=
+OBJ0= strrpbrk.o
+OBJ1= strwhite.o
+OBJ2= strsub.o
+OBJ3= strbasename.o strdirname.o
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o obj2.o
 #OBJB= obj3.o obj4.o obj5.o
 
 OBJ= $(OBJA)
@@ -95,9 +95,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
-
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -136,6 +133,15 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-strcasestr.o:		strcasestr.cc	$(INCS)
+strrpbrk.o:		strrpbrk.cc		$(INCS)
+strwhite.o:		strwhite.cc		$(INCS)
+strsub.o:		strsub.cc strsub.h	$(INCS)
+
+strbasename.o:		strbasename.cc		$(INCS)
+strdirname.o:		strdirname.cc		$(INCS)
+
+# 2014-12-26, David A-D- Morano
+# I retired the ass of this subroutine (below).
+#strwildsub.o:		strwildsub.cc		$(INCS)
 
 

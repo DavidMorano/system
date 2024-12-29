@@ -1,4 +1,5 @@
 /* namecache HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* real-name cache (from UNIX® System PASSWD database) */
@@ -7,7 +8,7 @@
 
 /* revision history:
 
-	= 2004-06-23, David A­D­ Morano
+	= 2004-01-10, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
@@ -45,7 +46,7 @@ struct namecache_statistics {
 
 struct namecache_head {
 	hdb		*dbp ;
-	cchar		*varname ;
+	cchar		*vname ;
 	NAMECACHE_ST	s ;
 	uint		magic ;
 	int		nmax ;		/* maximum number of entries */

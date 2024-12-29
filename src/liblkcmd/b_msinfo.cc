@@ -119,7 +119,6 @@ extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;

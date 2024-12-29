@@ -129,6 +129,7 @@ struct sbuf : sbuf_head {
 	int str(cchar *sp) noex {
 	    return sbuf_strw(this,sp,-1) ;
 	} ;
+	int strs(int,mainv) noex ;
 	int addquoted(cchar *sp,int sl = -1) noex {
 	    return sbuf_addquoted(this,sp,sl) ;
 	} ;

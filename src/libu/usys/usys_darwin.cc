@@ -1,4 +1,5 @@
 /* usys_darwin SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	usys_darwin
+
+	Description:
 	We defines some system (global) variables in this module.
 
 *******************************************************************************/

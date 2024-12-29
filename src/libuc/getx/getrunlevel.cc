@@ -29,7 +29,6 @@
 	we return zero (0).
 
 	Synopsis:
-
 	int getrunlevel(cchar *utmpxfname) noex
 
 	Arguments:
@@ -39,14 +38,14 @@
 	>=0	run-level (including '0' meaning no record found)
 	<0	one of: SR_NOENT, SR_ACCESS, other means some bad happened
 
-	Notes: Why some subroutine like this was not provided by
-	the UNIX® developers themselves is a mystery.
+	Notes: 
+	Why some subroutine like this was not provided by the UNIX®
+	developers themselves is a mystery.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<fcntl.h>		/* open flags */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>

@@ -25,9 +25,10 @@
 	POSIX read-write lock.
 
 	Side-note: 
-	The POXIX® read-write lock is broken on the Solaris platform
-	and is not used any long.  So this object here gets little
-	use now-a-days.
+	The POXIX® read-write lock is broken on the Solaris® platform
+	and is not used any longer.  So this object here gets little
+	(no) use now-a-days (because of the broken Solaris®
+	read-write lock implementation).
 
 *******************************************************************************/
 

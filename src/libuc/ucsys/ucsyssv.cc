@@ -1,4 +1,5 @@
 /* ucsyssv SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for SERVENT-DB access */
@@ -144,7 +145,7 @@ int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 	    ec = EINVAL ;
 	    memset(svp,0,sizeof(SERVENT)) ;
 	    if (svlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -155,7 +156,7 @@ int getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 /* GETSVXXXR end */
 
 /* HETPRXXXR begin */
-#if	defined(SYSHAS_HETPRXXXR) && (SYSHAS_HETPRXXXR > 0)
+#if	defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0)
 
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
@@ -203,14 +204,14 @@ int getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 	    ec = EINVAL ;
 	    memset(svp,0,sizeof(SERVENT)) ;
 	    if ((svlen > 0) && n[0] && p[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
 	return ec ;
 }
 
-#endif /* defined(SYSHAS_HETPRXXXR) && (SYSHAS_HETPRXXXR > 0) */
+#endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
 /* HETPRXXXR ent */
 
 /* GETSVXXXR begin */
@@ -262,7 +263,7 @@ int getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
 	    ec = EINVAL ;
 	    memset(svp,0,sizeof(SERVENT)) ;
 	    if ((svlen > 0) && (num >= 0)) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

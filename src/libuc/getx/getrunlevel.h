@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	getrunlevel
+
+	Description:
 	This file contains some support for the UNIX® Address-Familt
 	(AF) related operations.
 

@@ -96,7 +96,6 @@ extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getfname(char *,char *,int,char *) ;
 extern int	bopenroot(bfile *,char *,char *,char *,char *,int) ;
 extern int	expander(PROGINFO *,char *,int,char *,int) ;

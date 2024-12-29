@@ -68,7 +68,6 @@ extern int	mklogid(char *,int,const char *,int,int) ;
 extern int	strkeycmp(const char *,const char *) ;
 extern int	vstrkeycmp(const void **,const void **) ;
 extern int	getuid_name(cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	isNotPresent(int) ;
 
 

@@ -1,4 +1,5 @@
 /* b_sysval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -106,9 +107,10 @@
 #include	<utmpx.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
+#include	<getbufsize.h>
+#include	<gethz.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<ctdec.h>
@@ -121,7 +123,6 @@
 #include	<tmtime.h>
 #include	<uinfo.h>
 #include	<nulstr.h>
-#include	<getbufsize.h>
 #include	<sysmemutil.h>
 #include	<prgetclustername.h>
 #include	<exitcodes.h>
@@ -175,7 +176,6 @@ extern int	getuserhome(char *,int,cchar *) ;
 extern int	gethomeorg(char *,int,cchar *) ;
 extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
 extern int	getstacksize(int) ;
-extern int	gethz(int) ;
 extern int	getngroups(void) ;
 extern int	getmaxpid(int) ;
 extern int	getsysdomain(char *,int) ;

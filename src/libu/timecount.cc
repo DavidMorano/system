@@ -1,4 +1,5 @@
 /* timecount SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* count-down timer */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	timecount
+
+	Description:
 	This object provides a glorified count-down timer.
 
 *******************************************************************************/
@@ -38,6 +43,12 @@
 
 
 /* external variables */
+
+
+/* local variables */
+
+
+/* forward references */
 
 
 /* local variables */

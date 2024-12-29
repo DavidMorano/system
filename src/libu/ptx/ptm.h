@@ -20,8 +20,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<pthread.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -50,10 +48,10 @@ struct ptm_creater {
 	    op = p ;
 	    w = m ;
 	} ;
+	int operator () (ptma * = nullptr) noex ;
 	operator int () noex {
 	    return (*this)() ;
 	} ;
-	int operator () (ptma * = nullptr) noex ;
 } ; /* end struct (ptm_creater) */
 struct ptm_co {
         ptm             *op = nullptr ;
@@ -86,7 +84,7 @@ struct ptm : pthread_mutex_t {
 	} ; /* end dtor (ptm) */
 } ; /* end class (ptm) */
 #else
-typedef PTM	ptm ;
+typedef PTM		ptm ;
 #endif /* __cplusplus */
 
 EXTERNC_begin

@@ -510,7 +510,7 @@ static int mfsbuilt_entprune(MFSBUILT *op)
 		ep = (ENT *) v.buf ;
 		if (ep != NULL) {
 		    if ((rs = ent_isnotloaded(ep)) > 0) {
-		        rs1 = hdb_delcur(dbp,&c,0) ;
+		        rs1 = hdb_curdel(dbp,&c,0) ;
 		        if (rs >= 0) rs = rs1 ;
 		        rs1 = ent_finish(ep) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -642,7 +642,7 @@ static int mfsbuilt_fins(MFSBUILT *op)
 		ep = (ENT *) v.buf ;
 		if (ep != NULL) {
 #ifdef	OPTIONAL
-		    rs1 = hdb_delcur(dbp,&c,0) ; /* why is this needed? */
+		    rs1 = hdb_curdel(dbp,&c,0) ; /* why is this needed? */
 		    if (rs >= 0) rs = rs1 ;
 #endif
 		    rs1 = ent_finish(ep) ;

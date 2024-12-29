@@ -1,4 +1,5 @@
 /* utmpent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* methods for the UTMPENT object */
@@ -66,9 +67,10 @@
 /* exported subroutines */
 
 int utmpent_start(utmpent *op) noex {
+    	UTMPENT		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = memclear(op) ;
+	    rs = memclear(hop) ;
 	}
 	return rs ;
 }

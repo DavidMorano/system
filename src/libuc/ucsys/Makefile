@@ -2,7 +2,7 @@
 
 T= ucsys
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -43,6 +42,8 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
+
+RUNINFO= -rpath $(RUNDIR)
 
 LIBINFO= $(LIBDIRS) $(LIBS)
 

@@ -22,12 +22,9 @@
 
 	Check our own (program) time-stamp.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -76,7 +73,6 @@ extern int	vstrkeycmp(char **,char **) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getserial(const char *) ;
 extern int	getfname(const char *,const char *,int,char *) ;

@@ -121,7 +121,6 @@ extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	getnodename(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;

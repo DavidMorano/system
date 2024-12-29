@@ -146,7 +146,6 @@ extern int	nleadstr(const char *,const char *,int) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	filer_writefill(FILER *,char *,int) ;

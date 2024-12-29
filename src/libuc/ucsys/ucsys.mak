@@ -2,7 +2,7 @@
 
 T= ucsys
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -44,6 +43,8 @@ INCDIRS=
 LIBDIRS= -L$(LIBDIR)
 
 
+RUNINFO= -rpath $(RUNDIR)
+
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,8 +56,8 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0_UCSYS= ucsys_sup.o
-OBJ1_UCSYS= userattr.o spwd.o
-OBJ2_UCSYS= ucsyspw.o ucsysgr.o ucsyspj.o
+OBJ1_UCSYS= userattr.o
+OBJ2_UCSYS= ucsyspw.o ucsyssp.o ucsysgr.o ucsyspj.o
 OBJ3_UCSYS= ucsyspr.o ucsysnw.o ucsysho.o ucsyssv.o
 
 OBJ_UCSYS= obj0_ucsys.o obj1_ucsys.o obj2_ucsys.o obj3_ucsys.o
@@ -68,6 +69,7 @@ OBJ_UCSYS= obj0_ucsys.o obj1_ucsys.o obj2_ucsys.o obj3_ucsys.o
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -90,9 +92,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSYS)
-
-$(T).a:			$(OBJ_UCSYS)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -127,10 +126,10 @@ obj3_ucsys.o:	$(OBJ3_UCSYS)
 
 ucsys_sup.o:	ucsys_sup.cc ucsys.h $(INCS)
 
-spwd.o:		spwd.cc spwd.h $(INCS)
 userattr.o:	userattr.cc userattr.h $(INCS)
 
 ucsyspw.o:	ucsyspw.cc ucsyspw.h $(INCS)
+ucsyssp.o:	ucsyssp.cc ucsyssp.h $(INCS)
 ucsysgr.o:	ucsysgr.cc ucsysgr.h $(INCS)
 ucsyspj.o:	ucsyspj.cc ucsyspj.h $(INCS)
 

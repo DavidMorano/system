@@ -1,4 +1,5 @@
 /* expcook SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */
@@ -127,8 +128,10 @@ static int	mkcomp(char *,int,cchar *,int,cchar *,int) noex ;
 int expcook_start(EX *op) noex {
 	int		rs ;
 	if ((rs = expcook_ctor(op)) >= 0) {
+	    hdbstr	*slp = op->hlp ;
+	    cint	ne = 10 ;
 	    op->magic = 0 ;
-	    if ((rs = hdbstr_start(op->hlp,10)) >= 0) {
+	    if ((rs = slp->start(ne)) >= 0) {
 	        op->magic = EXPCOOK_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -145,7 +148,7 @@ int expcook_finish(EX *op) noex {
 	if ((rs = expcook_magic(op)) >= 0) {
 	    {
 	        hdbstr	*slp = op->hlp ;
-		rs1 = hdbstr_finish(slp) ;
+		rs1 = slp->finish ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -164,13 +167,13 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	if ((rs = expcook_magic(op,kbuf)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
 	    int		kl = strlen(kbuf) ;
-	    if ((rs = hdbstr_fetch(slp,kbuf,kl,np,np)) >= 0) {
-	        rs = hdbstr_delkey(slp,kbuf,kl) ;
+	    if ((rs = slp->fetch(kbuf,kl,np,np)) >= 0) {
+	        rs = slp->delkey(kbuf,kl) ;
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = SR_OK ;
 	    }
 	    if ((rs >= 0) && vbuf) {
-	        rs = hdbstr_add(slp,kbuf,kl,vbuf,vlen) ;
+	        rs = slp->add(kbuf,kl,vbuf,vlen) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -184,7 +187,7 @@ int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	    rs = SR_NOMEM ;
 	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
 	        hdbstr	*slp = op->hlp ;
-	        rs = hdbstr_curbegin(slp,curp->clp) ;
+	        rs = slp->curbegin(curp->clp) ;
 		if (rs < 0) {
 		    delete curp->clp ;
 		    curp->clp = nullptr ;
@@ -201,7 +204,7 @@ int expcook_curend(EX *op,expcook_cur *curp) noex {
 	if ((rs = expcook_magic(op,curp)) >= 0) {
 	    {
 	        hdbstr	*slp = op->hlp ;
-	        rs1 = hdbstr_curend(slp,curp->clp) ;
+	        rs1 = slp->curend(curp->clp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    if (curp->clp) {
@@ -221,7 +224,7 @@ int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	    int		vl ;
 	    cchar	*kp{} ;
 	    cchar	*vp{} ;
-	    if ((rs = hdbstr_curenum(slp,curp->clp,&kp,&vp,&vl)) >= 0) {
+	    if ((rs = slp->curenum(curp->clp,&kp,&vp,&vl)) >= 0) {
 	        cint	kl = rs ;
 	        rs = mkcomp(rbuf,rlen,kp,kl,vp,vl) ;
 	        bl = rs ;
@@ -235,7 +238,7 @@ int expcook_findkey(EX *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,kp,rpp)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
-	    rs = hdbstr_fetch(slp,kp,kl,nullptr,rpp) ;
+	    rs = slp->fetch(kp,kl,nullptr,rpp) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -245,7 +248,7 @@ int expcook_delkey(EX *op,cchar *key) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,key)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
-	    rs = hdbstr_delkey(slp,key,-1) ;
+	    rs = slp->delkey(key,-1) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -353,7 +356,7 @@ static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 	if (kl > 0) {
 	    hdbstr	*slp = op->hlp ;
 	    cchar	*vp{} ;
-	    if ((rs = hdbstr_fetch(slp,kp,kl,nullptr,&vp)) >= 0) {
+	    if ((rs = slp->fetch(kp,kl,nullptr,&vp)) >= 0) {
 	        cint	vl = rs ;
 	        if (vl > 0) {
 	            rs = buffer_strw(bufp,vp,vl) ;

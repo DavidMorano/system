@@ -452,7 +452,7 @@ static int hdb_release(hdb *hsp) noex {
 	    rs = SR_OK ;
 	    hdb_curbegin(hsp,&cur) ;
 	    while (hdb_curenum(hsp,&cur,nullptr,nullptr) >= 0) {
-	        hdb_delcur(hsp,&cur,0) ;
+	        hdb_curdel(hsp,&cur,0) ;
 	    }
 	    hdb_curend(hsp,&cur) ;
 	} /* end if (non-null) */

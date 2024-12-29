@@ -1,4 +1,5 @@
 /* sdprog SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* SYSDIALER "prog" dialer */
@@ -41,6 +42,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<gethz.h>
 #include	<baops.h>
 #include	<ids.h>
 #include	<userinfo.h>
@@ -1925,9 +1927,7 @@ static int loadarchitecture(SUBINFO *sip)
 }
 /* end subroutine (loadarchitecture) */
 
-
-static int loadhz(SUBINFO *sip)
-{
+static int loadhz(SUBINFO *sip) noex {
 	int		rs ;
 	if ((rs = gethz(0)) >= 0) {
 	    const int	dlen = DIGBUFLEN ;

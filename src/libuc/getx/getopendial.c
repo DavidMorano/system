@@ -69,21 +69,21 @@
 /* local variables */
 
 static cpcchar		dialers[] = {
-	[opendial_unspec] = "unspec", 
-	[opendial_udp] = "udp", 
-	[opendial_tcp] = "tcp", 
-	[opendial_tcpmux] = "tcpmux", 
-	[opendial_tcpnls] = "tcpnls", 
-	[opendial_uss] = "uss", 
-	[opendial_ussmux] = "ussmux", 
-	[opendial_ussnls] = "ussnls", 
-	[opendial_ticotsord] = "ticotsord",
-	[opendial_ticotsordnls] = "ticotsordnls", 
-	[opendial_pass] = "pass", 
-	[opendial_open] = "open", 
-	[opendial_prog] = "prog", 
-	[opendial_finger] = "finger", 
-	[opendial_overlast] = nullptr
+	[opendial_unspec] 		= "unspec", 
+	[opendial_udp] 			= "udp", 
+	[opendial_tcp] 			= "tcp", 
+	[opendial_tcpmux] 		= "tcpmux", 
+	[opendial_tcpnls] 		= "tcpnls", 
+	[opendial_uss] 			= "uss", 
+	[opendial_ussmux] 		= "ussmux", 
+	[opendial_ussnls] 		= "ussnls", 
+	[opendial_ticotsord] 		= "ticotsord",
+	[opendial_ticotsordnls] 	= "ticotsordnls", 
+	[opendial_pass] 		= "pass", 
+	[opendial_open] 		= "open", 
+	[opendial_prog] 		= "prog", 
+	[opendial_finger] 		= "finger", 
+	[opendial_overlast] 		= nullptr
 } ;
 
 

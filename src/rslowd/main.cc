@@ -101,7 +101,6 @@
 
 extern int	cfdeci(const char *,int,int *) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getpwd(char *,int) ;
 
 extern char	*strbasename(char *) ;

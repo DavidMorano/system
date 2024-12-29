@@ -80,7 +80,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
 extern int	mkfnamesuf1(char *,const char *,const char *) ;
 extern int	nleadstr(const char *,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	pathclean(char *,const char *,int) ;
 

@@ -30,12 +30,12 @@
 
 	Synopsis:
 	int uc_opendialer(prn,svc,of,om,argv,envv,to)
-	const char	prn[] ;
-	const char	svc[] ;
+	cchar	prn[] ;
+	cchar	svc[] ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv[] ;
-	const char	**envv[] ;
+	cchar	**argv[] ;
+	cchar	**envv[] ;
 	int		to ;
 
 	Arguments:
@@ -59,12 +59,12 @@
 	subroutine looks like:
 
 	int opendialer_<svc>(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	*argv[] ;
-	const char	*envv[] ;
+	cchar	*argv[] ;
+	cchar	*envv[] ;
 
 	Multiple services can be actually implemented in the same
 	shared-object.  But the actual file of that object should
@@ -84,6 +84,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
+#include	<getnodedomain.h>
 #include	<ids.h>
 #include	<localmisc.h>
 
@@ -103,28 +104,27 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mksofname(char *,const char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfprogroot(const char *,int,const char **) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mksofname(char *,cchar *,cchar *,cchar *) ;
+extern int	pathadd(char *,int,cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfprogroot(cchar *,int,cchar **) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
+extern int	getuserhome(char *,int,cchar *) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strdcpy2w(char *,int,const char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strdcpy2w(char *,int,cchar *,cchar *,int) ;
 
 
 /* external variables */
@@ -134,8 +134,8 @@ extern char	**environ ;
 
 /* local structures */
 
-typedef int (*subdialer_t)(const char *,const char *,const char *,
-	    int,mode_t,const char **,const char **,int) ;
+typedef int (*subdialer_t)(cchar *,cchar *,cchar *,
+	    int,mode_t,cchar **,cchar **,int) ;
 
 struct subinfo_flags {
 	uint		dummy:1 ;
@@ -144,11 +144,11 @@ struct subinfo_flags {
 struct subinfo {
 	IDS		id ;
 	SUBINFO_FL	f ;
-	const char	*prn ;
-	const char	*svc ;
-	const char	*dialsym ;	/* memory-allocated */
-	const char	**argv ;
-	const char	**envv ;
+	cchar	*prn ;
+	cchar	*svc ;
+	cchar	*dialsym ;	/* memory-allocated */
+	cchar	**argv ;
+	cchar	**envv ;
 	mode_t		om ;
 	int		of ;
 	int		to ;
@@ -171,13 +171,13 @@ static int	subinfo_idend(SUBINFO *) ;
 
 /* local variables */
 
-static const char	*prns[] = {
+static cchar	*prns[] = {
 	"extra",
 	"preroot",
 	NULL
 } ;
 
-static const char	*soexts[] = {
+static cchar	*soexts[] = {
 	"so",
 	"o",
 	"",
@@ -188,12 +188,12 @@ static const char	*soexts[] = {
 /* exported subroutines */
 
 int uc_opendialer(prn,svc,of,om,argv,envv,to)
-const char	prn[] ;
-const char	svc[] ;
+cchar	prn[] ;
+cchar	svc[] ;
 int		of ;
 mode_t		om ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
@@ -225,12 +225,12 @@ int		to ;
 
 static int subinfo_start(sip,prn,svc,of,om,argv,envv,to)
 SUBINFO		*sip ;
-const char	*prn ;
-const char	*svc ;
+cchar	*prn ;
+cchar	*svc ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
@@ -239,17 +239,17 @@ int		to ;
 	sip->prn = prn ;
 	sip->svc = svc ;
 	sip->argv = argv ;
-	sip->envv = (envv != NULL) ? envv : ((const char **) environ) ;
+	sip->envv = (envv != NULL) ? envv : ((cchar **) environ) ;
 	sip->of = of ;
 	sip->om = om ;
 	sip->to = to ;
 	sip->fd = -1 ;
 
 	{
-	    const char	*prefix = SVCSYMPREFIX ;
+	    cchar	*prefix = SVCSYMPREFIX ;
 	    char	dialsym[MAXNAMELEN+1] ;
 	    if ((rs = sncpy2(dialsym,MAXNAMELEN,prefix,sip->prn)) >= 0) {
-	        const char	*ccp ;
+	        cchar	*ccp ;
 	        if ((rs = uc_libmallocstrw(dialsym,rs,&ccp)) >= 0) {
 	            sip->dialsym = ccp ;
 		}
@@ -378,10 +378,10 @@ static int subinfo_searchcall(SUBINFO *sip,cchar *pr,subdialer_t symp) noex {
 	int		of = sip->of ;
 	int		to = sip->to ;
 	int		f = FALSE ;
-	const char	*prn = sip->prn ;
-	const char	*svc = sip->svc ;
-	const char	**argv = sip->argv ;
-	const char	**envv = sip->envv ;
+	cchar	*prn = sip->prn ;
+	cchar	*svc = sip->svc ;
+	cchar	**argv = sip->argv ;
+	cchar	**envv = sip->envv ;
 
 	if ((rs = (*symp)(pr,prn,svc,of,om,argv,envv,to)) >= 0) {
 	    sip->fd = rs ;

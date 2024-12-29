@@ -239,8 +239,7 @@ int ptma_settype(ptma *op,int nf) noex {
 /* local subroutines */
 
 void ptma::dtor() noex {
-	int		rs = ptma_destroy(this) ;
-	if (rs < 0) {
+	if (cint rs = ptma_destroy(this) ; rs < 0) {
 	    ulogerror("ptma",rs,"dtor-destroy") ;
 	}
 } 

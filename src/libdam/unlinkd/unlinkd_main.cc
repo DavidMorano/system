@@ -95,7 +95,6 @@
 
 /* external subroutines */
 
-extern int	getnodedomain(char *,char *) ;
 extern int	pcsgetprogpath(cchar *,char *,cchar *,int) ;
 
 

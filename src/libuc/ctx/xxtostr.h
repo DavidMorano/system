@@ -75,7 +75,7 @@
 static cint		xxtostr_maxbase = strlen(sysword.w_digtab) ;
 
 template<typename UT>
-inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
+inline int uxxtostr(char *endp,int b,UT v) noex {
 	uint		ub = uint(b) ;
 	int		rs = SR_FAULT ;
 	char		*rp = endp ;
@@ -85,7 +85,7 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	    if ((b >= 2) && (b <= xxtostr_maxbase)) {
 	        if (v != 0) {
                     int		di ;
-	            if_constexpr (sizeof(UT) > sizeof(ulong)) {
+	            if_constexpr (szof(UT) > szof(ulong)) {
 	                const UT	vmask(~LONG_MAX) ;
 		        UT		nv ;
 	                while ((v & vmask) != 0L) {

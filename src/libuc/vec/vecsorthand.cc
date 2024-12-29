@@ -98,9 +98,8 @@ int vecsorthand_start(vecsorthand *op,int vn,vc_f cmpfunc) noex {
 	if (vn <= 1) vn = VECSORTHAND_DEFENTS ;
 	if ((rs = vecsorthand_ctor(op,cmpfunc)) >= 0) {
 	    int		sz = 0 ;
-	    void	*vp{} ;
 	    sz += (szof(void **) * (vn + 1)) ;
-	    if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_libmalloc(sz,&vp)) >= 0) {
 	        op->va = (void **) vp ;
 	        op->e = vn ;
 	        {

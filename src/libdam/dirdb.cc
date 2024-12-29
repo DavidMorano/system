@@ -267,7 +267,7 @@ int dirdb_clean(dirdb *op) noex {
 	            dirdb_ent	*ep = (dirdb_ent *) val.buf ;
 	            if ((rs = dirdb_alreadyentry(op,ep)) >= 0) {
 		        {
-	                    rs1 = hdb_delcur(op->dbp,&cur,0) ;
+	                    rs1 = hdb_curdel(op->dbp,&cur,0) ;
 		            if (rs >= 0) rs = rs1 ;
 		        }
 		        {

@@ -1,4 +1,5 @@
 /* main SUPPORT (envset) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* set environment for a user (usually at login) */
@@ -64,6 +65,7 @@
 #include	<uinfo.h>
 #include	<userinfo.h>
 #include	<userattr.h>
+#include	<gethz.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
@@ -169,7 +171,6 @@ extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	xfile(IDS *,cchar *) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
-extern int	gethz(int) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
 extern int	getsysdomain(char *,int) ;
 extern int	getsystypenum(char *,char *,cchar *,cchar *) ;

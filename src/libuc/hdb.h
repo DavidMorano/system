@@ -93,7 +93,7 @@ extern int hdb_curenum(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
 extern int hdb_getrec(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
 extern int hdb_next(hdb *,hdb_cur *) noex ;
 extern int hdb_delkey(hdb *,hdb_dat) noex ;
-extern int hdb_delcur(hdb *,hdb_cur *,int) noex ;
+extern int hdb_curdel(hdb *,hdb_cur *,int) noex ;
 extern int hdb_delall(hdb *) noex ;
 extern int hdb_count(hdb *) noex ;
 extern int hdb_hashtablen(hdb *,uint *) noex ;

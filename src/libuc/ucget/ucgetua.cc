@@ -20,6 +20,9 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_getua{x}
+
 	Description:
 	These subroutines were written so that we could use a single
 	interface to access the 'group' database on all UNIX®
@@ -51,9 +54,10 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
+#include	<userattr.h>
 
-#include	"userattr.h"
 #include	"ucgetua.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -102,10 +106,9 @@ int uc_getuaent(ucentua *uap,char *uabuf,int ualen) noex {
 	if (uap && uabuf) {
 	    rs = SR_INVALID ;
 	    if (ualen > 0) {
-		userattr	*ep{} ;
-		if ((rs = uc_userattrent(&ep)) >= 0) {
+		if (userattr *ep{} ; (rs = uc_userattrent(&ep)) >= 0) {
 		    {
-			ucentua	*oep = static_cast<ucentua *>(ep) ;
+			ucentua	*oep = cast_static<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
 			sz = rs ;
 		    }
@@ -125,10 +128,9 @@ int uc_getuanam(ucentua *uap,char *uabuf,int ualen,cchar *name) noex {
 	if (uap && uabuf && name) {
 	    rs = SR_INVALID ;
 	    if (ualen > 0) {
-		userattr	*ep{} ;
-		if ((rs = uc_userattrnam(&ep,name)) >= 0) {
+		if (userattr *ep{} ; (rs = uc_userattrnam(&ep,name)) >= 0) {
 		    {
-			ucentua	*oep = static_cast<ucentua *>(ep) ;
+			ucentua	*oep = cast_static<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
 			sz = rs ;
 		    }
@@ -148,10 +150,9 @@ int uc_getuauid(ucentua *uap,char *uabuf,int ualen,uid_t uid) noex {
 	if (uap && uabuf) {
 	    rs = SR_INVALID ;
 	    if (ualen > 0) {
-		userattr	*ep{} ;
-		if ((rs = uc_userattruid(&ep,uid)) >= 0) {
+		if (userattr *ep{} ; (rs = uc_userattruid(&ep,uid)) >= 0) {
 		    {
-			ucentua	*oep = static_cast<ucentua *>(ep) ;
+			ucentua	*oep = cast_static<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
 			sz = rs ;
 		    }

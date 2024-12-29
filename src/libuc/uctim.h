@@ -18,7 +18,11 @@
 
 /*******************************************************************************
 
-	This is a facility to create timers.
+  	Group:
+	uctim
+
+	Description:
+	This is a facility to create process timers.
 
 *******************************************************************************/
 
@@ -27,7 +31,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
+#include	<sys/time.h>		/* i-timer types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

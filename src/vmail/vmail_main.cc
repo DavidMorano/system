@@ -1,4 +1,5 @@
 /* main SUPPORT (VMAIL) */
+/* encoding=ISO8859-1 */
 /* lang=C89 */
 
 /* the VMAIL program */
@@ -27,6 +28,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is the front-end subroutine for the PCS program VMAIL.
 	There is a good bit of setup in this subroutine before the
 	program goes interactive.
@@ -47,6 +49,7 @@
 #include	<usystem.h>
 #include	<ucmallreg.h>
 #include	<userinfo.h>
+#include	<gethz.h>
 #include	<toxc.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -2551,9 +2554,7 @@ static int loadarchitecture(PROGINFO *pip)
 }
 /* end subroutine (loadarchitecture) */
 
-
-static int loadhz(PROGINFO *pip)
-{
+static int loadhz(PROGINFO *pip) noex {
 	int		rs ;
 	if ((rs = gethz(0)) >= 0) {
 	    cint	dlen = DIGBUFLEN ;

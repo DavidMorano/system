@@ -62,9 +62,9 @@
 
 struct msgide_all {
 	uint		count ;		/* count */
-	uint		utime ;		/* update time-stamp */
-	uint		ctime ;		/* creation time-stamp */
-	uint		mtime ;		/* message time-stamp */
+	uint		utime ;		/* time-stamp update */
+	uint		ctime ;		/* time-stamp creation */
+	uint		mtime ;		/* time-stamp message */
 	uint		hash ;
 	char		recipient[MSGIDE_LRECIP + 1] ;
 	char		messageid[MSGIDE_LMSGID + 1] ;

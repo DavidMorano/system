@@ -89,7 +89,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getpwd(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	isdigitlatin(int) ;
 
 extern int	expander() ;

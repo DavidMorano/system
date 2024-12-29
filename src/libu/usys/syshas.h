@@ -130,8 +130,8 @@
 #define	SYSHAS_GETNWGNUR	0	/* has GNU (GLIBC) interface */
 
 /* Solaris®: gethostbyxxx_r(3c) */
-#define	SYSHAS_GETHPXXXR	1
-#define	SYSHAS_GETHPGNUR	0	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETHOXXXR	1
+#define	SYSHAS_GETHOGNUR	0	/* has GNU (GLIBC) interface */
 
 /* Solaris®: getservbyxxx_r(3c) */
 #define	SYSHAS_GETSVXXXR	1
@@ -369,8 +369,8 @@
 #define	SYSHAS_GETNWGNUR	0	/* has GNU (GLIBC) interface */
 
 /* Darwin: gethostbyxxx_r(3c) */
-#define	SYSHAS_GETHPXXXR	0
-#define	SYSHAS_GETHPGNUR	0	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETHOXXXR	0
+#define	SYSHAS_GETHOGNUR	0	/* has GNU (GLIBC) interface */
 
 /* Darwin: getservbyxxx_r(3c) */
 #define	SYSHAS_GETSVXXXR	0
@@ -584,8 +584,8 @@
 #define	SYSHAS_GETNWGNUR	1	/* has GNU (GLIBC) interface */
 
 /* Linux: gethostbyxxx_r(3c) */
-#define	SYSHAS_GETHPXXXR	1	/* has a reentrant interface */
-#define	SYSHAS_GETHPGNUR	1	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETHOXXXR	1	/* has a reentrant interface */
+#define	SYSHAS_GETHOGNUR	1	/* has GNU (GLIBC) interface */
 
 /* Linux: getservbyxxx_r(3c) */
 #define	SYSHAS_GETSVXXXR	1	/* has a reentrant interface */

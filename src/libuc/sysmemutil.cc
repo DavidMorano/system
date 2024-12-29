@@ -34,6 +34,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -75,13 +77,11 @@ constexpr int	acmd = _SC_AVPHYS_PAGES ;
 /* exported subroutines */
 
 int sysmemutil(sysmemutil_dat *mup) noex {
-	int		rs = SR_NOSYS ;
+	int		rs ;
 	int		percent = 0 ;
 	if_constexpr ((cmd >= 0) && (acmd >= 0)) {
-	    long	mt{} ;
-	    if ((rs = uc_sysconfval(cmd,&mt)) >= 0) {
-	        long	ma{} ;
-	        if ((rs = uc_sysconfval(acmd,&ma)) >= 0) {
+	    if (long mt{} ; (rs = uc_sysconfval(cmd,&mt)) >= 0) {
+	        if (long ma{} ; (rs = uc_sysconfval(acmd,&ma)) >= 0) {
 	      	    ulong	mu100 ;
 	    	    if (mt > 0) {
 	        	ulong	mu = (mt - ma) ;
@@ -97,7 +97,8 @@ int sysmemutil(sysmemutil_dat *mup) noex {
 		} /* end if (sysconf) */
 	    } /* end if (sysconf) */
 	} else {
-	    memclear(mup) ;
+	    rs = SR_NOSYS ;
+	    if (mup) memclear(mup) ;
 	} /* end if_constexpr (_SC_PHUS_PAGES) */
 	return (rs >= 0) ? percent : rs ;
 }

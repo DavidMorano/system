@@ -123,7 +123,7 @@ so:			$(T).so
 
 
 $(T).a:			$(OBJ)
-	$(AR) -rc $(T).a $?
+	$(AR) $(ARFLAGS) -rc $(T).a $?
 
 $(T).o:			$(OBJ) Makefile localmisc.h
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)

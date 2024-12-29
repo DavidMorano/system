@@ -133,8 +133,7 @@ int ptca_setpshared(ptca *op,int fl) noex {
 /* local subroutines */
 
 void ptca::dtor() noex {
-	int		rs = ptca_destroy(this) ;
-	if (rs < 0) {
+	if (cint rs = ptca_destroy(this) ; rs < 0) {
 	    ulogerror("ptca",rs,"dtor-destroy") ;
 	}
 } 

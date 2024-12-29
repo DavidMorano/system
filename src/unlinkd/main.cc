@@ -99,7 +99,6 @@
 
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	pcsgetprogpath(const char *,char *,const char *,int) ;
 extern int	findfilepath(const char *,const char *,int,char *) ;

@@ -74,14 +74,15 @@
 #include	<climits>		/* for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* for |getenv(3c)| */
+#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<usystem.h>
+#include	<uinfo.h>
 #include	<varnames.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
+#include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<estrings.h>
-#include	<uinfo.h>
 #include	<filer.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -118,6 +119,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -157,12 +159,6 @@ namespace {
 
 
 /* forward references */
-
-extern "C" {
-    int		getnodedomain(char *,char *) noex ;
-    int		getsysdomain(char *,int) noex ;
-    int		getuserdomain(char *,int) noex ;
-}
 
 static int	try_start(TRY *,char *,char *,int) noex ;
 static int	try_finish(TRY *) noex ;
@@ -214,6 +210,9 @@ constexpr guess		ga[] = {
 	{ "rc", "rightcore.com" },
 	{ "rca", "rightcore.com" },
 	{ "rcb", "rightcore.com" },
+	{ "rcc", "rightcore.com" },
+	{ "rcd", "rightcore.com" },
+	{ "rce", "rightcore.com" },
 	{ "rcf", "rightcore.com" },
 	{ "rcg", "rightcore.com" },
 	{ "jig", "rightcore.com" },
@@ -235,8 +234,7 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = maxhostlen) >= 0) {
-	    TRY		ti ;
-	    if ((rs = try_start(&ti,nbuf,dbuf,rs)) >= 0) {
+	    if (TRY ti ; (rs = try_start(&ti,nbuf,dbuf,rs)) >= 0) {
 		/* do we need a nodename? */
 	        if (nbuf != nullptr) {
 	            nbuf[0] = '\0' ;
@@ -267,9 +265,8 @@ int getsysdomain(char *dbuf,int dlen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (dbuf) {
-	    TRY		ti ;
 	    dbuf[0] = '\0' ;
-	    if ((rs = try_start(&ti,nullptr,dbuf,dlen)) >= 0) {
+	    if (TRY ti ; (rs = try_start(&ti,nullptr,dbuf,dlen)) >= 0) {
 		/* do we need a domainname? */
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs == SR_OK) && systries[i] ; i += 1) {
@@ -293,8 +290,7 @@ int getuserdomain(char *dbuf,int dlen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (dbuf) {
-	    char	*dn{} ;
-	    if ((rs = malloc_hn(&dn)) >= 0) {
+	    if (char *dn{} ; (rs = malloc_hn(&dn)) >= 0) {
 	        if (dlen < 0) dlen = rs ;
 	        if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	            rs = sncpy1(dbuf,dlen,dn) ;
@@ -374,9 +370,8 @@ static int try_initvarnode(TRY *tip) noex {
 static int try_inituname(TRY *tip) noex {
 	int		rs = SR_OK ;
 	if (! tip->f.inituname) {
-	    uinfo_names		uin ;
 	    tip->f.inituname = true ;
-	    if ((rs = uinfo_name(&uin)) >= 0) {
+	    if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) {
 	        cchar	*sp = uin.nodename ;
 	        int	sl = strlen(uin.nodename) ;
 	        if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
@@ -454,7 +449,7 @@ static int try_varlocaldomain(TRY *tip) noex {
 	static cchar	*val = getenv(varname.localdomain) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (val != nullptr) {
+	if (val) {
 	    int		cl ;
 	    cchar	*sp = val ;
 	    cchar	*cp ;
@@ -465,8 +460,7 @@ static int try_varlocaldomain(TRY *tip) noex {
 	    while (*sp && (! CHAR_ISWHITE(*sp)) && (*sp != ':')) {
 	        sp += 1 ;
 	    }
-	    cl = (sp - cp) ;
-	    if (cl > 0) {
+	    if ((cl = (sp - cp)) > 0) {
 		cint	dlen = tip->dlen ;
 	        rs = snwcpy(tip->domainname,dlen,cp,cl) ;
 		len = rs ;
@@ -526,8 +520,7 @@ static int try_gethost(TRY *tip) noex {
 	    rs = try_initnode(tip) ;
 	}
 	if ((rs >= 0) && tip->f.node) {
-	    char	*hbuf{} ;
-	    if ((rs = malloc_ho(&hbuf)) >= 0) {
+	    if (char *hbuf{} ; (rs = malloc_ho(&hbuf)) >= 0) {
 		cnullptr	np{} ;
 	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
@@ -579,8 +572,7 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
 		cint	fd = rs ;

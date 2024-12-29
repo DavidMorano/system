@@ -30,10 +30,15 @@ extern char	*strrpbrk(cchar *,cchar *) noex ;
 extern char	*strwhite(cchar *) noex ;
 
 /* deprecated (can give erroneous result) */
-extern char	*strbasename(cchar *) noex ;
+[[deprecated("can give erroneous result")]] 
+extern char *strbasename(cchar *) noex ;
 
+#ifdef	COMMENT /* retired 2024-12-26 */
 /* deprecated (writes to source string) */
-[[deprecated("writes to source string")]] extern char *strdirname(char *) noex ; 
+[[deprecated("writes to source string")]] 
+extern char *strdirname(char *) noex ; 
+#endif /* COMMENT */
+
 EXTERNC_end
 
 

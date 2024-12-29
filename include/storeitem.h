@@ -79,6 +79,9 @@ struct storeitem : storeitem_head {
 	~storeitem() {
 	    dtor() ;
 	} ;
+	int str(cchar *sp,cchar **rpp) noex {
+	    return strw(sp,-1,rpp) ;
+	} ;
 } ; /* end struct (storeitem) */
 #else	/* __cplusplus */
 typedef STOREITEM	storeitem ;

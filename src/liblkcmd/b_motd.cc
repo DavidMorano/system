@@ -241,7 +241,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getrunlevel(cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	termwritable(cchar *) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;

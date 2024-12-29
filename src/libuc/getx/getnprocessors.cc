@@ -25,7 +25,7 @@
 	processors that are online.
 
 	Synopsis:
-	int getnprocessors(cchar **envv,int w) noex
+	int getnprocessors(mainv envv,int w) noex
 
 	Arguments:
 	- envv		pointer to process environment
@@ -42,7 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- for |getenv(3c)| */
 #include	<usystem.h>
@@ -85,9 +84,9 @@ namespace {
     struct procer ;
     typedef int (procer::*procer_m)() noex ;
     struct procer {
-	cchar		**envv{} ;
+	mainv		envv{} ;
 	int		w = 0 ;
-	procer(cchar **p,int aw) noex : envv(p), w(aw) { } ;
+	procer(mainv p,int aw) noex : envv(p), w(aw) { } ;
 	int locenv() noex ;
 	int gloenv() noex ;
 	int ucsys() noex ;
@@ -101,12 +100,11 @@ namespace {
 
 /* local variables */
 
-static procer_m		procers[] = {
+constexpr procer_m	procers[] = {
 	&procer::locenv,
 	&procer::gloenv,
 	&procer::ucsys,
-	&procer::def,
-	nullptr
+	&procer::def
 } ;
 
 
@@ -115,14 +113,14 @@ static procer_m		procers[] = {
 
 /* exported subroutines */
 
-int getnprocessors(cchar **envv,int w) noex {
+int getnprocessors(mainv envv,int w) noex {
 	int		rs = SR_INVALID ;
 	if (w >= 0) {
 	    procer	po(envv,w) ;
 	    rs = SR_OK ;
-	    for (int i = 0 ; (rs == 0) && procers[i] ; i += 1) {
-	        procer_m	m = procers[i] ;
+	    for (cauto &m : procers) {
 		rs = (po.*m)() ;
+		if (rs != 0) break ;
 	    } /* end for */
 	} /* end if (valid) */
 	return rs ;
@@ -158,11 +156,12 @@ int procer::locenv() noex {
 /* end method (procer::locent) */
 
 int procer::gloenv() noex {
+	cchar		*vn = varname.ncpu ;
 	int		rs = SR_OK ;
 	if ((w == w_all) || (w == w_gloenv)) {
-	    cchar	*vn = varname.ncpu ;
-	    if (cchar *cp ; (cp = getenv(vn)) != nullptr) {
-		rs = decout(cp) ;
+	    static cchar	*valp = getenv(vn) ;
+	    if (valp) {
+		rs = decout(valp) ;
 	    } /* end if (global-environment) */
 	} /* end if (selected) */
 	return rs ;

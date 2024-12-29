@@ -68,7 +68,6 @@ extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	isdigitlatin(int) ;
 
 extern int	proginfo_setpiv(PROGINFO *,const char *,

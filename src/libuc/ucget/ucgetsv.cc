@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_getsv{x}
+
 	Name:
 	uc_getsvbegin
 	uc_getsvent
@@ -63,9 +66,10 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
+#include	<ucsyssv.h>
 
-#include	"ucsyssv.h"
 #include	"ucgetsv.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -78,6 +82,8 @@
 
 
 /* imported namespaces */
+
+using ucget::ucgeter ;			/* type */
 
 
 /* local typedefs */
@@ -148,16 +154,29 @@ int uc_getsvent(ucentsv *svp,char *svbuf,int svlen) noex {
 /* end subroutine (uc_getsvent) */
 
 int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
-	ucgetsv		svo(n,p) ;
-	svo.m = &ucgetsv::getsv_nam ;
-	return svo(svp,svbuf,svlen) ;
+    	int		rs = SR_FAULT ;
+	if (n && p) {
+	    if (n[0] && p[0]) {
+		ucgetsv		svo(n,p) ;
+		svo.m = &ucgetsv::getsv_nam ;
+		rs = svo(svp,svbuf,svlen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_getsvnam) */
 
 int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int n,cchar *p) noex {
-	ucgetsv		svo(n,p) ;
-	svo.m = &ucgetsv::getsv_num ;
-	return svo(svp,svbuf,svlen) ;
+    	int		rs = SR_FAULT ;
+	if (p) {
+	    rs = SR_INVALID ;
+	    if ((n >= 0) && p[0]) {
+		ucgetsv		svo(n,p) ;
+		svo.m = &ucgetsv::getsv_num ;
+		rs = svo(svp,svbuf,svlen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_getsvnum) */
 
@@ -166,49 +185,14 @@ int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int n,cchar *p) noex {
 
 int ucgetsv::operator () (ucentsv *svp,char *svbuf,int svlen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	if (svp && svbuf) {
 	    rs = SR_OVERFLOW ;
-	    if (svlen > 0) {
-	        timecount	to_again(utimeout[uto_again]) ;
-	        timecount	to_nomem(utimeout[uto_nomem]) ;
-	        timecount	to_mfile(utimeout[uto_mfile]) ;
-	        timecount	to_nfile(utimeout[uto_nfile]) ;
-		bool		f_exit = false ;
+	    if (ucgeter err ; svlen > 0) {
 	        repeat {
 	            if ((rs = (this->*m)(svp,svbuf,svlen)) < 0) {
-	                switch (rs) {
-	                case SR_AGAIN:
-			    if ((rs1 = to_again) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-		            break ;
-	                case SR_NOMEM:
-			    if ((rs1 = to_nomem) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-		            break ;
-	                case SR_MFILE:
-			    if ((rs1 = to_mfile) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-			    break ;
-	                case SR_NFILE:
-			    if ((rs1 = to_nfile) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-	                case SR_INTR:
-	                    break ;
-	                default:
-		            f_exit = true ;
-		            break ;
-	                } /* end switch */
-	            } /* end if (error) */
-	        } until ((rs >= 0) || f_exit) ;
+			rs = err(rs) ;
+		    }
+	        } until ((rs >= 0) || err.fexit) ;
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
@@ -216,7 +200,8 @@ int ucgetsv::operator () (ucentsv *svp,char *svbuf,int svlen) noex {
 /* end subroutine (ucgetsv::operator) */
 
 int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
-	int		rs = SR_NOSYS ;
+    	cnullptr	np{} ;
+	int		rs ;
 	errno = 0 ;
 	if_constexpr (f_getsvxxxr) {
 	    cint	ec = getsvent_rp(svp,svbuf,svlen) ;
@@ -232,8 +217,8 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 		}
 	    }
 	} else {
-	    ucentsv	*rp = static_cast<ucentsv *>(getsvent()) ;
-	    if (rp) {
+	    SYSDBSV	*ep = getsvent() ;
+	    if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
 	        rs = svp->load(svbuf,svlen,rp) ;
 	    } else {
 	        rs = (- errno) ;
@@ -247,70 +232,65 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 /* end subroutine (ucgetsv::getsv_ent) */
 
 int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
-	int		rs = SR_FAULT ;
-	if (name && proto) {
-	    errno = 0 ;
-	    if_constexpr (f_getsvxxxr) {
-	        cint	ec = getsvnam_rp(svp,svbuf,svlen,name,proto) ;
-	        if (ec == 0) {
-	            rs = svp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentsv	*rp = static_cast<ucentsv *>(getsvnam(name,proto)) ;
-	        if (rp) {
-	            rs = svp->load(svbuf,svlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (non-null) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getsvxxxr) {
+            cint    ec = getsvnam_rp(svp,svbuf,svlen,name,proto) ;
+            if (ec == 0) {
+                rs = svp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBSV         *ep = getsvnam(name,proto) ;
+            if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
+                rs = svp->load(svbuf,svlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetsv::getsv_nam) */
 
 int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
-	int		rs = SR_FAULT ;
-	if (proto) {
-	    rs = SR_INVALID ;
-	    if ((num >= 0) && proto[0]) {
-	        errno = 0 ;
-	        if_constexpr (f_getsvxxxr) {
-	            cint	ec = getsvpor_rp(svp,svbuf,svlen,num,proto) ;
-	            if (ec == 0) {
-	                rs = svp->size() ;
-	            } else if (ec > 0) {
-	                rs = (-ec) ;
-		    } else {
-		        if (errno) {
-			    rs = (-errno) ;
-		        } else {
-		            rs = SR_IO ;
-		        }
-	            }
-	        } else {
-	            ucentsv *rp = static_cast<ucentsv *>(getsvpor(num,proto)) ;
-	            if (rp) {
-	                rs = svp->load(svbuf,svlen,rp) ;
-	            } else {
-	                rs = (- errno) ;
-	            }
-	        } /* end if_constexpr (selection) */
-	        if_constexpr (f_sunos) {
-		    if (rs == SR_BADF) rs = SR_NOENT ;
-	        }
-	    } /* end if (valid) */
-	} /* end if (non-null) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getsvxxxr) {
+            cint        ec = getsvpor_rp(svp,svbuf,svlen,num,proto) ;
+            if (ec == 0) {
+                rs = svp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBSV     *ep = getsvpor(num,proto) ;
+            if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
+                rs = svp->load(svbuf,svlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetsv::getsv_num) */

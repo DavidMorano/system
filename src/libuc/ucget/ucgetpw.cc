@@ -20,6 +20,9 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_getpw{x}
+
 	Names:
 	uc_getpwbegin
 	uc_getpwent
@@ -66,9 +69,10 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
+#include	<ucsyspw.h>
 
-#include	"ucsyspw.h"
 #include	"ucgetpw.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -91,6 +95,8 @@
 
 
 /* imported namespaces */
+
+using ucget::ucgeter ;			/* type */
 
 
 /* local typedefs */
@@ -121,6 +127,10 @@ namespace {
 
 
 /* forward references */
+
+static constexpr bool bit(uint v,int b) noex {
+	return bool((v >> b) & 1) ;
+}
 
 
 /* local variables */
@@ -162,75 +172,46 @@ int uc_getpwent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 /* end subroutine (uc_getpwent) */
 
 int uc_getpwnam(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
-	ucgetpw		pwo(name) ;
-	pwo.m = &ucgetpw::getpw_nam ;
-	return pwo(pwp,pwbuf,pwlen) ;
+    	int		rs = SR_FAULT ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		ucgetpw		pwo(name) ;
+		pwo.m = &ucgetpw::getpw_nam ;
+		rs = pwo(pwp,pwbuf,pwlen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_getpwnam) */
 
 int uc_getpwuid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
-	ucgetpw		pwo(nullptr,uid) ;
-	pwo.m = &ucgetpw::getpw_uid ;
-	return pwo(pwp,pwbuf,pwlen) ;
+    	int		rs = SR_INVALID ;
+	if (bit(uid,31)) {
+	    uid = getuid() ;
+	}
+	if (uid != uidend) {
+	    ucgetpw	pwo(nullptr,uid) ;
+	    pwo.m = &ucgetpw::getpw_uid ;
+	    rs = pwo(pwp,pwbuf,pwlen) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_getpwuid) */
 
 
 /* local subroutines */
 
-static constexpr bool bit(uint v,int b) noex {
-	return bool((v >> b) & 1) ;
-}
-
 int ucgetpw::operator () (ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
 	if (pwp && pwbuf) {
 	    rs = SR_OVERFLOW ;
-	    if (pwlen > 0) {
-	        int	to_again = utimeout[uto_again] ;
-	        int	to_nomem = utimeout[uto_nomem] ;
-	        int	to_mfile = utimeout[uto_mfile] ;
-	        int	to_nfile = utimeout[uto_nfile] ;
-	        bool	f_exit = false ;
+	    if (ucgeter err ; pwlen > 0) {
 	        repeat {
 	            if ((rs = (this->*m)(pwp,pwbuf,pwlen)) < 0) {
-	                switch (rs) {
-	                case SR_AGAIN:
-		            if (to_again-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-		            break ;
-	                case SR_NOMEM:
-		            if (to_nomem-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-		            break ;
-	                case SR_MFILE:
-		            if (to_mfile-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-			    break ;
-	                case SR_NFILE:
-		            if (to_nfile-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-			    break ;
-	                case SR_INTR:
-	                    break ;
-	                default:
-		            f_exit = true ;
-		            break ;
-	                } /* end switch */
-	            } /* end if (error) */
-	        } until ((rs >= 0) || f_exit) ;
+			rs = err(rs) ;
+		    }
+	        } until ((rs >= 0) || err.fexit) ;
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
@@ -238,6 +219,7 @@ int ucgetpw::operator () (ucentpw *pwp,char *pwbuf,int pwlen) noex {
 /* end subroutine (ucgetpw::operator) */
 
 int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_NOSYS ;
 	errno = 0 ;
 	if_constexpr (f_getpwentr) {
@@ -254,8 +236,8 @@ int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 		}
 	    }
 	} else {
-	    ucentpw	*rp = static_cast<ucentpw *>(getpwent()) ;
-	    if (rp) {
+	    SYSDBPW	*ep = getpwent() ;
+	    if (ucentpw *rp = cast_static<ucentpw *>(ep) ; rp != np) {
 	        rs = pwp->load(pwbuf,pwlen,rp) ;
 	    } else {
 	        rs = (- errno) ;
@@ -269,68 +251,65 @@ int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 /* end subroutine (ucgetpw::getpw_ent) */
 
 int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
-	int		rs = SR_FAULT ;
-	if (name) {
-	    errno = 0 ;
-	    if_constexpr (f_getpwnamr) {
-	        cint	ec = getpwnam_rp(pwp,pwbuf,pwlen,name) ;
-	        if (ec == 0) {
-	            rs = pwp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentpw		*rp = static_cast<ucentpw *>(getpwnam(name)) ;
-	        if (rp) {
-	            rs = pwp->load(pwbuf,pwlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (non-null) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getpwnamr) {
+            cint    ec = getpwnam_rp(pwp,pwbuf,pwlen,name) ;
+            if (ec == 0) {
+                rs = pwp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBPW         *ep = getpwnam(name) ;
+            if (ucentpw *rp = cast_static<ucentpw *>(ep) ; rp != np) {
+                rs = pwp->load(pwbuf,pwlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetpw::getpw_nam) */
 
 int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
-	int		rs = SR_INVALID ;
-	if (bit(uid,31)) uid = getuid() ;
-	if (uid != uidend) {
-	    errno = 0 ;
-	    if_constexpr (f_getpwuidr) {
-	        cint	ec = getpwuid_rp(pwp,pwbuf,pwlen,uid) ;
-	        if (ec == 0) {
-	            rs = pwp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentpw		*rp = static_cast<ucentpw *>(getpwuid(uid)) ;
-	        if (rp) {
-	            rs = pwp->load(pwbuf,pwlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (valid UID) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getpwuidr) {
+            cint    ec = getpwuid_rp(pwp,pwbuf,pwlen,uid) ;
+            if (ec == 0) {
+                rs = pwp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBPW         *ep = getpwuid(uid) ;
+            if (ucentpw *rp = cast_static<ucentpw *>(ep) ; rp != np) {
+                rs = pwp->load(pwbuf,pwlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetpw::getpw_uid) */

@@ -78,8 +78,6 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;

@@ -1,4 +1,5 @@
 /* ucsyspw SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for PASSWD-DB access */
@@ -129,7 +130,7 @@ int getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	    ec = EINVAL ;
 	    memset(pwp,0,sizeof(PASSWD)) ;
 	    if (pwlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -191,7 +192,7 @@ int getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
 	    ec = EINVAL ;
 	    memset(pwp,0,sizeof(PASSWD)) ;
 	    if ((pwlen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -253,7 +254,7 @@ int getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t) noex {
 	    ec = EINVAL ;
 	    memset(pwp,0,sizeof(PASSWD)) ;
 	    if (pwlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

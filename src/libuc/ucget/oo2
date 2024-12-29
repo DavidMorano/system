@@ -1,0 +1,25 @@
+        errno = 0 ;
+        if_constexpr (f_getsvxxxr) {
+            cint        ec = getsvpor_rp(svp,svbuf,svlen,num,proto) ;
+            if (ec == 0) {
+                rs = svp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBSV     *ep = getsvpor(num,proto) ;
+            if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
+                rs = svp->load(svbuf,svlen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }

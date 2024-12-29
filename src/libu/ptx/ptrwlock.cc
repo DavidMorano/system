@@ -3,7 +3,7 @@
 /* lang=C++20 */
 /* ** broken on SOLARIS®! ** */
 
-/* POSIX® Thread Read-Weite Lock (PTRWLOCK) */
+/* POSIX® Thread Read-Write Lock (PTRWLOCK) */
 /* version %I% last-modified %G% */
 
 
@@ -24,14 +24,14 @@
 	** broken on SOLARIS®! **
 	Description:
 	The supplied reader-writer lock implemetation (used within
-	this source file) on Solaris (used within this source file)
-	is broken.  See alternative implementionals.
+	this source file) on Solaris® (used within this source file)
+	is broken.  See alternative implementations.
 
 	This module provides a sanitized version of the standard
-	POSIX® semaphore facility provided with some new UNIX®i.
-	Some operating system problems are managed within these
-	routines for the common stuff that happens when a poorly
-	configured OS gets overloaded!
+	POSIX® reader-writer lock facility provided with some new
+	UNIX®i.  Some operating system problems are managed within
+	these routines for the common stuff that happens when a
+	poorly configured OS gets overloaded!
 
 	Enjoy!
 
@@ -49,11 +49,12 @@
 	was loaded by a program manually (through |dlopen(3dl)|)
 	it fails by messing up its lock state for some reason.  This
 	failure, although quite obscure for most, makes this object
-	unusable for any of our purposes.  Use our own read-write
-	lock (which we developed ourselves) instead.  We do not
-	make stupid-ass mistakes like the Solaris® developers do.
-	Maybe we make our own types of mistakes, but not the
-	stupid-ass mistakes that the Solaris® developers have done.
+	unusable for any of our purposes.  Use my own read-write
+	lock (which I developed myself) instead.  I do not make
+	stupid-ass mistakes like the Solaris® developers do.  Maybe
+	I make my own types of mistakes, but not the stupid-ass
+	mistakes that the Solaris® developers have done.
+		-- David A­D­ Morano
 
 *******************************************************************************/
 
@@ -102,6 +103,8 @@
 
 
 /* local variables */
+
+constexpr int	mint = (1000/NLPS) ;
 
 
 /* exported variables */
@@ -163,13 +166,11 @@ int ptrwlock_tryrdlock(ptrwlock *psp) noex {
 
 int ptrwlock_rdlockto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
+	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
 	if (psp) {
-	    cint	mint = (1000/NLPS) ;
-	    int		cto ;
+	    int		cto = (to*NLPS) ;
 	    int		c = 0 ;
 	    bool	f_exit = false ;
-	    if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	    cto = (to*NLPS) ;
 	    repeat {
 	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
 		    rs = (- rs) ;
@@ -180,7 +181,7 @@ int ptrwlock_rdlockto(ptrwlock *psp,int to) noex {
 		        if (++c < cto) {
 	    		    msleep(mint) ;
 		        } else {
-			    f_exit = false ;
+			    f_exit = true ;
 		        }
 		        break ;
 		    case SR_INTR:
@@ -224,13 +225,11 @@ int ptrwlock_trywrlock(ptrwlock *psp) noex {
 
 int ptrwlock_wrlockto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
+	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
 	if (psp) {
-	    cint	mint = (1000/NLPS) ;
-	    int		cto ;
+	    int		cto = (to*NLPS) ;
 	    int		c = 0 ;
 	    bool	f_exit = false ;
-	    if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	    cto = (to*NLPS) ;
 	    repeat {
 	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
 		    rs = (- rs) ;

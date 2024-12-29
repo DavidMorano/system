@@ -37,7 +37,7 @@
 	-	the factorial result (as a |double|)
 
 	Notes:
-	The original Fibonacci function:
+	The original factorial function:
 
 	double factorial(int n) noex {
 	    return (n * dfactorial(n-1)) ;

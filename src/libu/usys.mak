@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -82,6 +81,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -103,9 +103,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_USYS)
-
-$(T).a:			$(OBJ_USYS)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

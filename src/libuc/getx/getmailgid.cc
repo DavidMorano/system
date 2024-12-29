@@ -80,9 +80,9 @@ constexpr gid_t		gidend = -1 ;
 /* exported subroutines */
 
 int getmailgid(cchar *gname,gid_t gid) noex {
-	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	if (gname) {
+	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = getgid_group(gname,-1)) == rsn) {
 	        if (gid != gidend) {
 	            rs = gid ;

@@ -2,7 +2,7 @@
 
 T= mkx
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -64,23 +63,24 @@ OBJ04_MKX= mkdisplayable.o
 OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
 OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
 OBJ07_MKX= mkgecosname.o
-OBJ08_MKX= mkintfname.o mklogid.o mkmagic.o
+OBJ08_MKX= mkintfname.o mkmagic.o
 OBJ09_MKX= mkmaildirtest.o mkmailname.o mkmid.o
 OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
 OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
-OBJ12_MKX= mkplogid.o mkquoted.o
+OBJ12_MKX= mkquoted.o
 OBJ13_MKX= mkrealname.o mkrevstr.o
-OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o mksublogid.o
+OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o
 OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o
+OBJ19_MKX= mkpr.o
 
 OBJA_MKX= obj00_mkx.o obj01_mkx.o obj02_mkx.o obj03_mkx.o
 OBJB_MKX= obj04_mkx.o obj05_mkx.o obj06_mkx.o obj07_mkx.o
 OBJC_MKX= obj08_mkx.o obj09_mkx.o obj10_mkx.o obj11_mkx.o
 OBJD_MKX= obj12_mkx.o obj13_mkx.o obj14_mkx.o obj15_mkx.o
-OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o 
+OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o obj19_mkx.o
 
 OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o objd_mkx.o obje_mkx.o
 
@@ -192,6 +192,9 @@ obj17_mkx.o:	$(OBJ17_MKX)
 obj18_mkx.o:	$(OBJ18_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ18_MKX)
 
+obj19_mkx.o:	$(OBJ19_MKX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ19_MKX)
+
 
 obja_mkx.o:	$(OBJA_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MKX)
@@ -211,9 +214,6 @@ obje_mkx.o:	$(OBJE_MKX)
 
 mkfdfname.o:		mkfdfname.cc $(INCS) mkfdfname.h
 mkgecosname.o:		mkgecosname.cc $(INCS) mkgecosname.h
-mklogid.o:		mklogid.cc $(INCS)
-mkplogid.o:		mkplogid.cc $(INCS)
-mksublogid.o:		mksublogid.cc $(INCS)
 mkmid.o:		mkmid.cc $(INCS)
 
 mkaddrname.o:		mkaddrname.cc  $(INCS)
@@ -235,5 +235,7 @@ mkstrunique.o:		mkstrunique.cc $(INCS)
 mkcleanline.o:		mkcleanline.cc $(INCS)
 mkfmtphone.o:		mkfmtphone.cc $(INCS)
 mkfingerquery.o:	mkfingerquery.cc $(INCS)
+
+mkpr.o:			mkpr.cc mkpr.h		$(INCS)
 
 

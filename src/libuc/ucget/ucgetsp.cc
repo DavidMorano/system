@@ -20,6 +20,9 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_getsp{x}
+
 	Description:
 	These subroutines were written so that we could use a single
 	interface to access the 'spwd' database on all UNIX®
@@ -52,9 +55,10 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
+#include	<spwd.h>
 
-#include	"spwd.h"
 #include	"ucgetsp.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -72,6 +76,8 @@
 
 
 /* imported namespaces */
+
+using ucget::ucgeter ;			/* type */
 
 
 /* local typedefs */
@@ -138,9 +144,16 @@ int uc_getspent(ucentsp *spp,char *spbuf,int splen) noex {
 /* end subroutine (uc_getspent) */
 
 int uc_getspnam(ucentsp *spp,char *spbuf,int splen,cchar *name) noex {
-	ucgetsp		spo(name) ;
-	spo.m = &ucgetsp::getsp_nam ;
-	return spo(spp,spbuf,splen) ;
+    	int		rs = SR_FAULT ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		ucgetsp		spo(name) ;
+		spo.m = &ucgetsp::getsp_nam ;
+		rs = spo(spp,spbuf,splen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_getspnam) */
 
@@ -151,51 +164,12 @@ int ucgetsp::operator () (ucentsp *spp,char *spbuf,int splen) noex {
 	int		rs = SR_FAULT ;
 	if (spp && spbuf) {
 	    rs = SR_OVERFLOW ;
-	    if (splen > 0) {
-	        int	to_again = utimeout[uto_again] ;
-	        int	to_nomem = utimeout[uto_nomem] ;
-	        int	to_mfile = utimeout[uto_mfile] ;
-	        int	to_nfile = utimeout[uto_nfile] ;
-	        bool	f_exit = false ;
-	        repeat {
+	    if (ucgeter err ; splen > 0) {
+		repeat {
 	            if ((rs = (this->*m)(spp,spbuf,splen)) < 0) {
-	                switch (rs) {
-	                case SR_AGAIN:
-		            if (to_again-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-		            break ;
-	                case SR_NOMEM:
-		            if (to_nomem-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-			    break ;
-	                case SR_MFILE:
-		            if (to_mfile-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-			    break ;
-	                case SR_NFILE:
-		            if (to_nfile-- > 0) {
-	                        msleep(1000) ;
-	 	            } else {
-		                f_exit = true ;
-		            }
-			    break ;
-	                case SR_INTR:
-	                    break ;
-	                default:
-		            f_exit = true ;
-		            break ;
-	                } /* end switch */
+			rs = err(rs) ;
 	            } /* end if (error) */
-	        } until ((rs >= 0) || f_exit) ;
+	        } until ((rs >= 0) || err.fexit) ;
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
@@ -203,7 +177,8 @@ int ucgetsp::operator () (ucentsp *spp,char *spbuf,int splen) noex {
 /* end subroutine (ucgetsp::operator) */
 
 int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
-	int		rs = SR_NOSYS ;
+    	cnullptr	np{} ;
+	int		rs ;
 	errno = 0 ;
 	if_constexpr (f_getspentr) {
 	    cint	ec = getspent_rp(spp,spbuf,splen) ;
@@ -219,8 +194,8 @@ int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 		}
 	    }
 	} else {
-	    ucentsp	*rp = static_cast<ucentsp *>(getspent()) ;
-	    if (rp) {
+	    SYSDBSP	*ep = getspent() ;
+	    if (ucentsp *rp = cast_static<ucentsp *>(ep) ; ep != np) {
 	        rs = spp->load(spbuf,splen,rp) ;
 	    } else {
 	        rs = (- errno) ;
@@ -234,34 +209,33 @@ int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 /* end subroutine (ucgetsp::getsp_ent) */
 
 int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
-	int		rs = SR_FAULT ;
-	if (name) {
-	    errno = 0 ;
-	    if_constexpr (f_getspnamr) {
-	        cint	ec = getspnam_rp(spp,spbuf,splen,name) ;
-	        if (ec == 0) {
-	            rs = spp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentsp		*rp = static_cast<ucentsp *>(getspnam(name)) ;
-	        if (rp) {
-	            rs = spp->load(spbuf,splen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (non-null) */
+    	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_getspnamr) {
+            cint    ec = getspnam_rp(spp,spbuf,splen,name) ;
+            if (ec == 0) {
+                rs = spp->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBSP         *ep = getspnam(name) ;
+            if (ucentsp *rp = cast_static<ucentsp *>(ep) ; ep != np) {
+                rs = spp->load(spbuf,splen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetsp::getsp_nam) */

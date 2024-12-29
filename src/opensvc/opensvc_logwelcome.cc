@@ -138,7 +138,6 @@ extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	matkeystr(cchar **,cchar *,int) ;
 extern int	getnodename(char *,int) ;
 extern int	getinetdomain(char *,int,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	getuserorg(char *,int,cchar *) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;

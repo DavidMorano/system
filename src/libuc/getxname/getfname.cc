@@ -178,8 +178,7 @@ int subinfo::loc() noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = perm(fname,-1,-1,nullptr,am)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = uc_stat(fname,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 		if (! S_ISDIR(sb.st_mode)) {
 		    rs = mkpath(rbuf,fname) ;
 		    len = rs ;
@@ -201,8 +200,7 @@ int subinfo::rem() noex {
 	    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
 		len = rs ;
 	        if ((rs = perm(rbuf,-1,-1,nullptr,am)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = uc_stat(fname,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
 		            len = 0 ;
 			}

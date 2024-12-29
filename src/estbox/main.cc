@@ -88,7 +88,6 @@ static char *argopts[] = {
 
 /* external subroutines */
 
-extern int	getnodedomain() ;
 extern int	authfile() ;
 extern int	cfdec() ;
 extern int	isdigitlatin(int) ;

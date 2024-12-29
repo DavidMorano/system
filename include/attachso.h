@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int attachso(cchar **,cchar *,cchar **,cchar **,int,void **) noex ;
+extern int attachso(mainv,cchar *,mainv,mainv,int,void **) noex ;
 
 EXTERNC_end
 

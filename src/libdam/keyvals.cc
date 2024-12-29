@@ -449,7 +449,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
 		        c += 1 ;
-	                hdb_delcur(op->bykeyp,&cur,0) ;
+	                hdb_curdel(op->bykeyp,&cur,0) ;
 	            } /* end if (found matching entry) */
 	        } /* end while (looping through entries) */
 	        rs1 = hdb_curend(op->bykeyp,&cur) ;
@@ -460,7 +460,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	            while (hdb_curenum(op->bykeyvalp,&cur,&key,&val) >= 0) {
 	                ep = entp(val.buf) ;
 	                if ((ep->fi == fi) || (fi < 0)) {
-	                    hdb_delcur(op->bykeyvalp,&cur,0) ;
+	                    hdb_curdel(op->bykeyvalp,&cur,0) ;
 		            entry_finish(ep) ;
 		            uc_free(ep) ;
 	                } /* end if (key-match) */
@@ -491,7 +491,7 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	        key.len = strlen(kp) ;
 	        while ((rs1 = hdb_fetch(bykeyp,key,&cur,&val)) >= 0) {
 		    c += 1 ;
-	            hdb_delcur(bykeyp,&cur,0) ;
+	            hdb_curdel(bykeyp,&cur,0) ;
 	        } /* end while */
 		if (rs1 != rsn) rs = rs1 ;
 	        hdb_curend(bykeyp,&cur) ;
@@ -503,7 +503,7 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	            while ((rs1 = hdb_curenum(bykeyvalp,&cur,&key,&val)) >= 0) {
 	                ep = entp(val.buf) ;
 	                if ((rs = entry_matkey(ep,kp,kl)) >= 0) {
-	                    hdb_delcur(bykeyvalp,&cur,0) ;
+	                    hdb_curdel(bykeyvalp,&cur,0) ;
 		            entry_finish(ep) ;
 		            uc_free(ep) ;
 			} else if (rs == rsn) {
@@ -625,7 +625,7 @@ static int keyvals_addentry(keyvals *op,ENT *nep) noex {
 	    	    hdb_curbegin(op->bykeyp,&cur) ;
 	    	    {
 	        	if ((rs1 = hdb_fetch(op->bykeyp,key,&cur,&val)) >= 0) {
-	            	    hdb_delcur(op->bykeyp,&cur,0) ;
+	            	    hdb_curdel(op->bykeyp,&cur,0) ;
 			}
 	    	    }
 	    	    hdb_curend(op->bykeyp,&cur) ;

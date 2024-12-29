@@ -13,11 +13,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<pthread.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ptm.h>
 #include	<ptc.h>

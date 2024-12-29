@@ -1,4 +1,5 @@
 /* ucsyspj SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for PEOJECT-DB access */
@@ -107,7 +108,7 @@ int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if (pjlen > 0) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -137,7 +138,7 @@ int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if ((pjlen > 0) && n[0]) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -167,7 +168,7 @@ int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if (pjlen > 0) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -197,7 +198,7 @@ int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if ((pjlen > 0) && n[0]) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -220,19 +221,19 @@ void setprojent() noex { }
 void endprojent() noex { }
 
 PROJECT	*getpjent() noex {
-	errno = ENOENT ;
+	errno = ENOSYS ;
 	return nullptr ;
 }
 PROJECT	*getpjnam(cchar *) noex {
-	errno = ENOENT ;
+	errno = ENOSYS ;
 	return nullptr ;
 }
 PROJECT	*getpjpid(projid_t) noex {
-	errno = ENOENT ;
+	errno = ENOSYS ;
 	return nullptr ;
 }
 PROJECT	*getpjdef(cchar *) noex {
-	errno = ENOENT ;
+	errno = ENOSYS ;
 	return nullptr ;
 }
 
@@ -242,7 +243,7 @@ int getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if (pjlen > 0) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -255,7 +256,7 @@ int getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if ((pjlen > 0) && n[0]) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -268,7 +269,7 @@ int getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if (pjlen > 0) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;
@@ -281,7 +282,7 @@ int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
             ec = EINVAL ;
             memset(pjp,0,sizeof(PROJECT)) ;
             if ((pjlen > 0) && n[0]) {
-                ec = ENOENT ;
+                ec = ENOSYS ;
             }
         }
         errno = ec ;

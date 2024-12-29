@@ -72,7 +72,7 @@ int getnfile(int w) noex {
 	cint		cmd = RLIMIT_NOFILE ;
 	int		rs ;
 	int		nf = 0 ;
-	if (RLIMIT lim ; (rs = u_getrlimit(cmd,&lim)) >= 0) {
+	if (RLIMIT lim{} ; (rs = u_getrlimit(cmd,&lim)) >= 0) {
 	    switch (w) {
 	    case 0:
 	        nf = int(lim.rlim_cur) ;

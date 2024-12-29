@@ -136,7 +136,7 @@ int nisdomainname(char *rbuf,int rlen) noex {
 
 nisfind::operator int () noex {
 	int		rs = SR_OK ;
-	for (auto m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != 0) break ;
 	} /* end for */
@@ -148,24 +148,21 @@ int nisfind::tryenv() noex {
 	static cchar	*val = getenv(vn) ;
 	int		rs = SR_OK ;
 	if (val && val[0]) {
-	    rs = sncpy1(rbuf,rlen,val) ;
+	    rs = sncpy(rbuf,rlen,val) ;
 	} /* end block (environment variable) */
 	return rs ;
 }
 /* end method (nisfind::tryenv) */
 
 int nisfind::tryget() noex {
-	return ugetnisdom(rbuf,rlen) ;
+	return uc_getnisdomain(rbuf,rlen) ;
 }
 /* end method (nisfind::tryget) */
 
 int nisfind::tryfile() noex {
 	return nisfile(rbuf,rlen,NISDOMAINNAME) ;
 }
-/* end method (nisfind::tryget) */
-
-
-/* local subroutines */
+/* end method (nisfind::tryfile) */
 
 static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 	int		rs ;

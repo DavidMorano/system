@@ -1,4 +1,5 @@
 /* uctim SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++11 */
 
 /* interface components for UNIX® library-3c */
@@ -12,12 +13,9 @@
 	= 2014-04-04, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
-	= 2018-10-12, David A.D. Morano
-	Added some small error resiliency to |uctim_enterpri()|.
-
 */
 
-/* Copyright © 2014,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -26,6 +24,7 @@
 	uc_timdestroy
 	uc_timset
 	uc_timget
+	uc_timover
 
 	Description:
 	This module creates per-process (virtual) time-of-day timers
@@ -53,6 +52,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
+#include	<pthread.h>		/* |PTHREAD_SCOPE_SYSTEM| */
 #include	<ucontext.h>
 #include	<csignal>
 #include	<ctime>
@@ -98,7 +98,7 @@
 /* local typedefs */
 
 extern "C" {
-    typedef int (*tworker)(void *) noex ;
+    typedef int (*tworker_f)(void *) noex ;
 }
 
 typedef vecsorthand	prique ;
@@ -212,6 +212,8 @@ enum cmdsubs {
 
 /* forward references */
 
+static int	ourcmp(const TIMEOUT *,const TIMEOUT *) noex ;
+
 extern "C" {
     static int	uctim_sigerworker(uctim *) noex ;
     static int	uctim_dispworker(uctim *) noex ;
@@ -219,7 +221,7 @@ extern "C" {
     static void	uctim_atforkparent() noex ;
     static void	uctim_atforkchild() noex ;
     static void	uctim_exit() noex ;
-    static int	ourcmp(cvoid *,cvoid *) noex ;
+    static int	vourcmp(cvoid *,cvoid *) noex ;
 }
 
 consteval int uctim_voents() noex {
@@ -400,7 +402,7 @@ int uctim::cmdset(callback *valp) noex {
 	int		rs1 ;
 	if (valp->metf) {
 	    callback	*ep ;
-	    cint	esize = sizeof(callback) ;
+	    cint	esize = szof(callback) ;
 	    if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	        if ((rs = mx.lockbegin) >= 0) {
 	            vechand	*elp = &ents ;
@@ -494,12 +496,11 @@ int uctim::enterpri(callback *ep) noex {
 /* end subroutine (uctim::enterpri) */
 
 int uctim::timerset(time_t val) noex {
-	TIMESPEC	ts ;
+    	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = timespec_load(&ts,val,0)) >= 0) {
-	    ITIMERSPEC	it ;
-	    if ((rs = itimerspec_load(&it,&ts,nullptr)) >= 0) {
-	        cint		tf = TIMER_ABSTIME ;
+	if (TIMESPEC ts ; (rs = timespec_load(&ts,val,0)) >= 0) {
+	    if (ITIMERSPEC it ; (rs = itimerspec_load(&it,&ts,np)) >= 0) {
+	        cint	tf = TIMER_ABSTIME ;
 	        rs = uc_timerset(timerid,tf,&it,nullptr) ;
 	    }
 	}
@@ -556,7 +557,7 @@ int uctim::workready() noex {
 int uctim::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
-	    static cint		vo = voents ;
+	    cint	vo = voents ;
 	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
 	        if ((rs = priqbegin()) >= 0) {
 	            if ((rs = sigbegin()) >= 0) {
@@ -632,7 +633,7 @@ int uctim::workfins() noex {
 	vechand		*elp = &ents ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	void		*top ;
+	void		*top{} ;
 	for (int i = 0 ; vechand_get(elp,i,&top) >= 0 ; i += 1) {
 	    if (top) {
 	        rs1 = uc_libfree(top) ;
@@ -665,10 +666,9 @@ int uctim::workdump() noex {
 /* end subroutine (uctim::workdump) */
 
 int uctim::priqbegin() noex {
-	cint		osize = sizeof(vecsorthand) ;
+	cint		osize = szof(vecsorthand) ;
 	int		rs ;
-	void		*p ;
-	if ((rs = uc_libmalloc(osize,&p)) >= 0) {
+	if (void *p ; (rs = uc_libmalloc(osize,&p)) >= 0) {
 	    prique	*pqp = (prique *) p ;
 	    rs = vecsorthand_start(pqp,1,ourcmp) ;
 	    if (rs < 0) {
@@ -743,12 +743,11 @@ int uctim::sigend() noex {
 /* end subroutine (uctim::sigend) */
 
 int uctim::timerbegin() noex {
-	SIGEVENT	se ;
 	cint		st = SIGEV_SIGNAL ;
 	cint		sig = SIGALARM ;
 	cint		val = 0 ; /* we do not (really) care about this */
 	int		rs ;
-	if ((rs = sigevent_load(&se,st,sig,val)) >= 0) {
+	if (SIGEVENT se ; (rs = sigevent_load(&se,st,sig,val)) >= 0) {
 	    const clockid_t	cid = CLOCK_REALTIME ;
 	    timer_t		tid ;
 	    if ((rs = uc_timercreate(cid,&se,&tid)) >= 0) {
@@ -809,22 +808,20 @@ int uctim::thrsend() noex {
 /* end subroutine (uctim::thrsend) */
 
 int uctim::sigerbegin() noex {
-	pta		ta ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = pta_create(&ta)) >= 0) {
+	if (pta ta ; (rs = ta.create) >= 0) {
 	    cint	scope = UCTIM_SCOPE ;
-	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
-	        pthread_t	tid ;
-	        tworker		wt = (tworker) uctim_sigerworker ;
-	        if ((rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
+	    if ((rs = ta.setscope(scope)) >= 0) {
+	        tworker_f	wt = tworker_f(uctim_sigerworker) ;
+	        if (pthread_t tid ; (rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
 	            fl.running_siger = true ;
 	            tid_siger = tid ;
 	            f = true ;
 	        } /* end if (pthread-create) */
 	    } /* end if (pta-setscope) */
-	    rs1 = pta_destroy(&ta) ;
+	    rs1 = ta.destroy ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pta) */
 	return (rs >= 0) ? f : rs ;
@@ -868,35 +865,35 @@ int uctim::sigerworker() noex {
 /* end subroutine (uctim::sigerworker) */
 
 int uctim::sigerwait() noex {
-	TIMESPEC	ts ;
 	sigset_t	ss ;
-	siginfo_t	si ;
 	cint		sig = SIGALARM ;
 	cint		to = TO_SIGWAIT ;
 	int		rs ;
 	int		cmd = 0 ;
-	bool		f_exit = false ;
 	bool		f_timedout = false ;
 	uc_sigsetempty(&ss) ;
 	uc_sigsetadd(&ss,sig) ;
 	uc_sigsetadd(&ss,SIGALRM) ;
-	timespec_load(&ts,to,0) ;
-	repeat {
-	    rs = uc_sigwaitinfoto(&ss,&si,&ts) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_INTR:
-	            break ;
-	        case SR_AGAIN:
-	            f_timedout = true ;
-	            rs = SR_OK ; /* will cause exit from loop */
-	            break ;
-	        default:
-	            f_exit = true ;
-	            break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	if (TIMESPEC ts ; (rs = timespec_load(&ts,to,0)) >= 0) {
+	    siginfo_t	si{} ;
+	    bool	f_exit = false ;
+	    repeat {
+	        rs = uc_sigwaitinfoto(&ss,&si,&ts) ;
+	        if (rs < 0) {
+	            switch (rs) {
+	            case SR_INTR:
+	                break ;
+	            case SR_AGAIN:
+	                f_timedout = true ;
+	                rs = SR_OK ; /* will cause exit from loop */
+	                break ;
+	            default:
+	                f_exit = true ;
+	                break ;
+	            } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || f_exit) ;
+	} /* end if (timespec) */
 	if (rs >= 0) {
 	    if (! freqexit) {
 	        if (f_timedout) {
@@ -917,7 +914,7 @@ int uctim::sigerserve() noex {
 	if ((rs = capbegin(to)) >= 0) {
 	    const time_t	dt = time(nullptr) ;
 	    while ((rs = vecsorthand_count(pqp)) > 0) {
-	        callback		*tep ;
+	        callback	*tep ;
 	        if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
@@ -949,22 +946,20 @@ int uctim::sigerdump() noex {
 /* end subroutine (uctim::sigerdump) */
 
 int uctim::dispbegin() noex {
-	pta		ta ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = pta_create(&ta)) >= 0) {
+	if (pta ta ; (rs = ta.create) >= 0) {
 	    cint	scope = UCTIM_SCOPE ;
-	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
-	        pthread_t	tid ;
-	        tworker		wt = (tworker) uctim_dispworker ;
-	        if ((rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
+	    if ((rs = ta.setscope(scope)) >= 0) {
+	        tworker_f	wt = tworker_f(uctim_dispworker) ;
+	        if (pthread_t tid ; (rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
 	            fl.running_disper = true ;
 	            tid_disper = tid ;
 	            f = true ;
 	        } /* end if (uptcreate) */
 	    } /* end if (pta-setscope) */
-	    rs1 = pta_destroy(&ta) ;
+	    rs1 = ta.destroy ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pta) */
 	return (rs >= 0) ? f : rs ;
@@ -975,9 +970,8 @@ int uctim::dispend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_disper) {
 	    pthread_t	tid = tid_disper ;
-	    int		trs ;
 	    fl.running_disper = false ;
-	    if ((rs = uptjoin(tid,&trs)) >= 0) {
+	    if (int trs{} ; (rs = uptjoin(tid,&trs)) >= 0) {
 	        rs = trs ;
 	    } else if (rs == SR_SRCH) {
 	        rs = SR_OK ;
@@ -1036,7 +1030,7 @@ int uctim::disprecv() noex {
 /* end subroutine (uctim::disprecv) */
 
 int uctim::disphandle() noex {
-	callback		*tep ;
+	callback	*tep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	while ((rs1 = ciq_rem(&pass,&tep)) >= 0) {
@@ -1112,25 +1106,32 @@ static void uctim_exit() noex {
 }
 /* end subroutine (uctim_atforkparent) */
 
-static int ourcmp(cvoid *a1p,cvoid *a2p) noex {
-	callback	**e1pp = (callback **) a1p ;
-	callback	**e2pp = (callback **) a2p ;
+static int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
 	int		rc = 0 ;
-	{
-	    callback	*e1p = *e1pp ;
-	    callback	*e2p = *e2pp ;
-	    if (e1p || e2p) {
-	        rc = 1 ;
-	        if (e1p) {
-		    rc = -1 ;
-	            if (e2p) {
-	                rc = (e1p->val - e2p->val) ;
-	            }
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+	            rc = (e1p->val - e2p->val) ;
 	        }
 	    }
-	} /* end block */
+	}
 	return rc ;
 }
 /* end subroutine (ourcmp) */
+
+static int vourcmp(cvoid *v1pp,cvoid *v2pp) noex {
+	const TIMEOUT	**e1pp = (const TIMEOUT **) v1pp ;
+	const TIMEOUT	**e2pp = (const TIMEOUT **) v2pp ;
+	int		rc ;
+	{
+	    TIMEOUT	*e1p = (TIMEOUT *) *e1pp ;
+	    TIMEOUT	*e2p = (TIMEOUT *) *e2pp ;
+	    rc = ourcmp(e1p,e2p) ;
+	}
+	return rc ;
+}
+/* end subroutine (vourcmp) */
 
 

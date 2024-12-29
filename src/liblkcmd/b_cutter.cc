@@ -92,8 +92,6 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;

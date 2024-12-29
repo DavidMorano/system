@@ -163,7 +163,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	mklogid(char *,int,const char *,int,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;

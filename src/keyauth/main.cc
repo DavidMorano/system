@@ -77,7 +77,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getuserhome(char *,int,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isFailOpen(int) ;

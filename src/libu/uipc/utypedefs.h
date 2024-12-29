@@ -453,7 +453,7 @@ typedef time_t			ustime ;
 #endif
 
 #ifndef	TYPEDEF_CUSTIME
-#define	TYPEDEF_USTIME
+#define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
 #endif
 
@@ -471,6 +471,21 @@ typedef int			unixret_t ;
 #define	TYPEDEF_SYSRET
 typedef int			sysret_t ;
 #endif /* TYPEDEF_SYSRET */
+
+#ifndef	TYPEDEF_CERRNO
+#define	TYPEDEF_CERRNO
+typedef const errno_t		cerrno_t ;
+#endif /* TYPEDEF_CERRNO */
+
+#ifndef	TYPEDEF_CUNIXRET
+#define	TYPEDEF_CUNIXRET
+typedef const unixret_t		cunixret_t ;
+#endif /* TYPEDEF_CUNIXRET */
+
+#ifndef	TYPEDEF_CSYSRET
+#define	TYPEDEF_CSYSRET
+typedef const sysret_t		csysret_t ;
+#endif /* TYPEDEF_CSYSRET */
 
 #ifndef	TYPEDEF_SIGT
 #define	TYPEDEF_SIGT

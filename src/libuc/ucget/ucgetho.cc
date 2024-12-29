@@ -18,6 +18,9 @@
 
 /*******************************************************************************
 
+  	Group:
+	uc_getho{x}
+
 	Name:
 	uc_gethobegin
 	uc_gethoend
@@ -66,9 +69,10 @@
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
+#include	<ucsysho.h>
 
-#include	"ucsysho.h"
 #include	"ucgetho.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -81,6 +85,8 @@
 
 
 /* imported namespaces */
+
+using ucget::ucgeter ;			/* UCGET subgroup UC library type */
 
 
 /* local typedefs */
@@ -125,8 +131,6 @@ namespace {
 /* local variables */
 
 constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
 
 constexpr bool		f_gethoxxxr = F_GETHOXXXR ;
 
@@ -158,16 +162,30 @@ int uc_gethoent(ucentho *hop,char *hobuf,int holen) noex {
 /* end subroutine (uc_gethoent) */
 
 int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
-	ucgetho		hoo(name) ;
-	hoo.m = &ucgetho::getho_nam ;
-	return hoo(hop,hobuf,holen) ;
+    	int		rs = SR_FAULT ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        ucgetho		hoo(name) ;
+	        hoo.m = &ucgetho::getho_nam ;
+	        rs =hoo(hop,hobuf,holen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_gethonam) */
 
 int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
-	ucgetho		hoo(nullptr,af,ap,al) ;
-	hoo.m = &ucgetho::getho_add ;
-	return hoo(hop,hobuf,holen) ;
+    	int		rs = SR_FAULT ;
+	if (ap) {
+	    rs = SR_INVALID ;
+	    if ((af >= 0) && (al > 0)) {
+		ucgetho		hoo(nullptr,af,ap,al) ;
+		hoo.m = &ucgetho::getho_add ;
+	    	rs = hoo(hop,hobuf,holen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (uc_gethoadd) */
 
@@ -176,49 +194,14 @@ int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 
 int ucgetho::operator () (ucentho *hop,char *hobuf,int holen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	if (hop && hobuf) {
 	    rs = SR_OVERFLOW ;
-	    if (holen > 0) {
-	        timecount	to_again(utimeout[uto_again]) ;
-	        timecount	to_nomem(utimeout[uto_nomem]) ;
-	        timecount	to_mfile(utimeout[uto_mfile]) ;
-	        timecount	to_nfile(utimeout[uto_nfile]) ;
-		bool		f_exit = false ;
+	    if (ucgeter err ; holen > 0) {
 	        repeat {
 	            if ((rs = (this->*m)(hop,hobuf,holen)) < 0) {
-	                switch (rs) {
-	                case SR_AGAIN:
-			    if ((rs1 = to_again) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-		            break ;
-	                case SR_NOMEM:
-			    if ((rs1 = to_nomem) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-		            break ;
-	                case SR_MFILE:
-			    if ((rs1 = to_mfile) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-			    break ;
-	                case SR_NFILE:
-			    if ((rs1 = to_nfile) < 0) {
-				if (rs1 != SR_TIMEDOUT) rs = rs1 ;
-				f_exit = true ;
-			    }
-	                case SR_INTR:
-	                    break ;
-	                default:
-		            f_exit = true ;
-		            break ;
-	                } /* end switch */
-	            } /* end if (error) */
-	        } until ((rs >= 0) || f_exit) ;
+			rs = err(rs) ;
+		    }
+	        } until ((rs >= 0) || err.fexit) ;
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
@@ -226,10 +209,11 @@ int ucgetho::operator () (ucentho *hop,char *hobuf,int holen) noex {
 /* end subroutine (ucgetho::operator) */
 
 int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
-	int		rs = SR_NOSYS ;
+	cnullptr	np{} ;
+	int		rs ;
 	errno = 0 ;
 	if_constexpr (f_gethoxxxr) {
-	    cint	ec = gethoent_rp(hop,hobuf,holen) ;
+	    cerrno_t ec = gethoent_rp(hop,hobuf,holen) ;
 	    if (ec == 0) {
 	        rs = hop->size() ;
 	    } else if (ec > 0) {
@@ -242,8 +226,8 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 		}
 	    }
 	} else {
-	    ucentho	*rp = static_cast<ucentho *>(gethoent()) ;
-	    if (rp) {
+	    SYSDBHO	*ep = gethoent() ;
+	    if (ucentho *rp = cast_static<ucentho *>(ep) ; rp != np) {
 	        rs = hop->load(hobuf,holen,rp) ;
 	    } else {
 	        rs = (- errno) ;
@@ -257,70 +241,65 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 /* end subroutine (ucgetho::getho_ent) */
 
 int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
-	int		rs = SR_FAULT ;
-	if (name) {
-	    errno = 0 ;
-	    if_constexpr (f_gethoxxxr) {
-	        cint	ec = gethonam_rp(hop,hobuf,holen,name) ;
-	        if (ec == 0) {
-	            rs = hop->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
-	    } else {
-	        ucentho	*rp = static_cast<ucentho *>(gethonam(name)) ;
-	        if (rp) {
-	            rs = hop->load(hobuf,holen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
-	    }
-	} /* end if (non-null) */
+	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_gethoxxxr) {
+            cerrno_t ec = gethonam_rp(hop,hobuf,holen,name) ;
+            if (ec == 0) {
+                rs = hop->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBHO     *ep = gethonam(name) ;
+            if (ucentho *rp = cast_static<ucentho *>(ep) ; rp != np) {
+                rs = hop->load(hobuf,holen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetho::getho_nam) */
 
 int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
-	int		rs = SR_FAULT ;
-	if (ap) {
-	    rs = SR_INVALID ;
-	    if ((al >= 0) && (af >= 0)) {
-	        errno = 0 ;
-	        if_constexpr (f_gethoxxxr) {
-	            cint	ec = gethoadd_rp(hop,hobuf,holen,af,ap,al) ;
-	            if (ec == 0) {
-	                rs = hop->size() ;
-	            } else if (ec > 0) {
-	                rs = (-ec) ;
-		    } else {
-		        if (errno) {
-			    rs = (-errno) ;
-		        } else {
-		            rs = SR_IO ;
-		        }
-	            }
-	        } else {
-	            ucentho *rp = static_cast<ucentho *>(gethoadd(af,ap,al)) ;
-	            if (rp) {
-	                rs = hop->load(hobuf,holen,rp) ;
-	            } else {
-	                rs = (- errno) ;
-	            }
-	        } /* end if_constexpr (selection) */
-	        if_constexpr (f_sunos) {
-		    if (rs == SR_BADF) rs = SR_NOENT ;
-	        }
-	    } /* end if (valid) */
-	} /* end if (non-null) */
+	cnullptr	np{} ;
+	int		rs ;
+        errno = 0 ;
+        if_constexpr (f_gethoxxxr) {
+            cerrno_t ec = gethoadd_rp(hop,hobuf,holen,af,ap,al) ;
+            if (ec == 0) {
+                rs = hop->size() ;
+            } else if (ec > 0) {
+                rs = (-ec) ;
+            } else {
+                if (errno) {
+                    rs = (-errno) ;
+                } else {
+                    rs = SR_IO ;
+                }
+            }
+        } else {
+            SYSDBHO     *ep = gethoadd(af,ap,al) ;
+            if (ucentho *rp = cast_static<ucentho *>(ep) ; rp != np) {
+                rs = hop->load(hobuf,holen,rp) ;
+            } else {
+                rs = (- errno) ;
+            }
+        } /* end if_constexpr (selection) */
+        if_constexpr (f_sunos) {
+            if (rs == SR_BADF) rs = SR_NOENT ;
+        }
 	return rs ;
 }
 /* end subroutine (ucgetho::getho_add) */

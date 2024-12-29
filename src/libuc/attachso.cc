@@ -25,7 +25,7 @@
 	that attempts to load a named module.
 
 	Synopsis:
-	int attachso(cc **dnames,cc *oname,cc **exts,cc **syms,
+	int attachso(mainv dnames,cc *oname,cc **exts,mainv syms,
 				int dlmode,void **ropp) noex
 
 	Arguments:
@@ -158,7 +158,7 @@ constexpr int		termrs[] = {
 
 /* exported subroutines */
 
-int attachso(cc **dnames,cc *oname,cc **exts,cc **syms,int m,void **ropp) noex {
+int attachso(mv dnames,cc *oname,mv exts,mv syms,int m,void **ropp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dnames && oname) {
@@ -186,27 +186,34 @@ int attachso(cc **dnames,cc *oname,cc **exts,cc **syms,int m,void **ropp) noex {
 
 static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 			int m,void **ropp) noex {
+    	int		rs = SR_FAULT ;
 	if (exts == nullptr) exts = defexts ;
-	memclear(sip) ;
-	sip->dnames = dnames ;
-	sip->oname = oname ;
-	sip->exts = exts ;
-	sip->syms = syms ;
-	sip->dlmode = m ;
-	sip->ropp = ropp ;
-	return SR_OK ;
+	if (sip) {
+	    rs = memclear(sip) ;
+	    sip->dnames = dnames ;
+	    sip->oname = oname ;
+	    sip->exts = exts ;
+	    sip->syms = syms ;
+	    sip->dlmode = m ;
+	    sip->ropp = ropp ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
 static int subinfo_finish(SI *sip,int f_abort) noex {
-	if (f_abort && sip->ropp) {
-	    void	*sop = (void *) *(sip->ropp) ;
-	    if (sop && (! isSpecialObject(sop))) {
-		dlclose(sop) ;
+    	int		rs = SR_FAULT ;
+	if (sip) {
+    	    rs = SR_OK ;
+	    if (f_abort && sip->ropp) {
+	        void	*sop = voidp(*(sip->ropp)) ;
+	        if (sop && (! isSpecialObject(sop))) {
+		    dlclose(sop) ;
+	        }
+	        *(sip->ropp) = nullptr ;
 	    }
-	    *(sip->ropp) = nullptr ;
-	}
-	return SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
@@ -224,32 +231,31 @@ static int subinfo_soload(SI *sip) noex {
 static int subinfo_sofind(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	if (ids id ; (rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = id.load) >= 0) {
 	    cint	soperm = (X_OK | R_OK) ;
 	    bool	f_open = false ;
 	    mainv	dnames = sip->dnames ;
-	    cchar	*dname ;
 	    for (int i = 0 ; dnames[i] ; i += 1) {
-	        dname = dnames[i] ;
+	        cchar	*dname = dnames[i] ;
 	        if (dname[0] != '\0') {
 		    if (strcmp(dname,DNAME_SELF) == 0) {
 			sip->sop = RTLD_SELF ;
 			rs = subinfo_checksyms(sip) ;
 		    } else {
-		        USTAT	sb ;
-	                if ((rs = u_stat(dname,&sb)) >= 0) {
-	                    if (! S_ISDIR(sb.st_mode)) {
+		        if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
+	                    if (S_ISDIR(sb.st_mode)) {
+	                	rs = sperm(&id,&sb,soperm) ;
+			    } else {
 			        rs = SR_NOTDIR ;
 			    }
 			}
-	                if (rs >= 0) rs = sperm(&id,&sb,soperm) ;
-	                if (rs >= 0) rs = subinfo_socheck(sip,&id,dname) ;
 		    } /* end if */
+		    if (rs >= 0) rs = subinfo_socheck(sip,&id,dname) ;
 		    if (rs >= 0) f_open = true ;
 	            if ((rs >= 0) || (! isNotLib(rs))) break ;
 	        } /* end if */
 	    } /* end for */
-	    rs1 = ids_release(&id) ;
+	    rs1 = id.release ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_open) {
 		subinfo_modclose(sip) ;
@@ -282,7 +288,6 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	                sip->sop = dlopen(sofname,sip->dlmode) ;
 	                if (sip->sop == nullptr) rs1 = SR_NOENT ;
 	                if (rs1 >= 0) {
-    
 	                    if ((rs1 = subinfo_checksyms(sip)) >= 0) {
 			        f = true ;
 	                    } else {
@@ -294,7 +299,6 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	                        }
 	                        if (isOneOf(termrs,rs1)) rs = rs1 ;
 			    }
-    
 	                } /* end if (ok) */
 	            } /* end if (file and perms) */
 	        } /* end if (filename formed) */
@@ -302,7 +306,9 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	        if (rs < 0) break ;
 	    } /* end for (exts) */
 	    if (rs >= 0) {
-	        if (sip->sop == nullptr) rs = rs1 ;
+	        if (sip->sop == nullptr) {
+		    rs = rs1 ;
+		}
 	    } else {
 	        sip->sop = nullptr ;
 	    }
@@ -331,13 +337,17 @@ static int subinfo_checksyms(SI *sip) noex {
 /* end subroutine (subinfo_checksyms) */
 
 static int subinfo_modclose(SI *sip) noex {
-	if (sip->sop != nullptr) {
-	    if (! isSpecialObject(sip->sop)) {
-		dlclose(sip->sop) ;
+    	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = SR_OK ;
+	    if (sip->sop) {
+	        if (! isSpecialObject(sip->sop)) {
+		    dlclose(sip->sop) ;
+	        }
+	        sip->sop = nullptr ;
 	    }
-	    sip->sop = nullptr ;
-	}
-	return SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_modclose) */
 

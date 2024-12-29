@@ -218,8 +218,7 @@ int ptc::reltimedwaitnp(ptm *pop,CTIMESPEC *tsp) noex {
 }
 
 void ptc::dtor() noex {
-	int		rs = destroy ;
-	if (rs < 0) {
+	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("ptc",rs,"dtor-destroy") ;
 	}
 } 

@@ -109,7 +109,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getnodename(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	strwcmp(const char *,const char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;

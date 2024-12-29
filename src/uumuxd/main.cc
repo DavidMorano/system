@@ -96,7 +96,6 @@
 
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getpwd(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	vstrkeycmp(const char **,const char **) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;

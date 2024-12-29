@@ -1,4 +1,5 @@
 /* ucclock SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -8,15 +9,19 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-03-23, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Group:
+	uc_clock{x}
+
+	Description:
 	The UNIX® System "clock" subroutines.
 
 *******************************************************************************/

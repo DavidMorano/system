@@ -109,7 +109,6 @@ extern int	snsds(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getpwd(char *,int) ;
 
 extern char	*strbasename(char *) ;

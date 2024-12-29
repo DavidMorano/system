@@ -230,8 +230,7 @@ int ucptm::locktry(ptm *op) noex {
 /* end method (ucptm::locktry) */
 
 void ptm::dtor() noex {
-	int		rs = destroy ;
-	if (rs < 0) {
+	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("ptm",rs,"dtor-destroy") ;
 	}
 } 

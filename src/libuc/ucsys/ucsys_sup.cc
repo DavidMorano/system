@@ -1,4 +1,5 @@
 /* ucsys_sup SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* USYS support */
@@ -49,6 +50,9 @@
 /* external variables */
 
 
+/* local variables */
+
+
 /* forward references */
 
 
@@ -60,7 +64,7 @@
 
 /* exported subroutines */
 
-int ucsys_getec(int herr) noex {
+int ucsys_getresolvec(int herr) noex {
 	int	ec = EBUGCHECK ;
 	switch (herr) {
 	case HOST_NOT_FOUND:
@@ -75,12 +79,15 @@ int ucsys_getec(int herr) noex {
 	case NO_DATA:
 	    ec = ENODATA ;
 	    break ;
+	case NETDB_INTERNAL:
+	    ec = EAFNOSUPPORT ;		/* suggested from Solaris® */
+	    break ;
 	default:
-	    ec = EBUGCHECK ;
+	    ec = EPROTONOSUPPORT ;
 	    break ;
 	} /* end switch */
 	return ec ;
 }
-/* end subroutine (ucsys_getec) */
+/* end subroutine (ucsys_getresolvec) */
 
 

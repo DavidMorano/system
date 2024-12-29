@@ -53,8 +53,45 @@ struct gecos_head {
 	GECOS_VAL	vals[gecosval_overlast] ;
 } ;
 
-typedef GECOS		gecos ;
 typedef GECOS_VAL	gecos_val ;
+
+#ifdef	__cplusplus
+enum gecosmems {
+	gecosmem_finish,
+	gecosmem_overlast
+} ;
+struct gecos ;
+struct gecos_co {
+	gecos		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (gecos *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (gecos_co) */
+struct gecos : gecos_head {
+	gecos_co	finish ;
+	gecos() noex {
+	    finish(this,gecosmem_finish) ;
+	} ;
+	gecos(const gecos &) = delete ;
+	gecos &operator = (const gecos &) = delete ;
+	int start(cchar *,int = -1) noex ;
+	int compose(char *,int) noex ;
+	int getval(int,cchar **) noex ;
+	void dtor() noex ;
+	~gecos() {
+	    dtor() ;
+	} ;
+} ; /* end struct (gecos) */
+#else	/* __cplusplus */
+typedef GECOS		gecos ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 

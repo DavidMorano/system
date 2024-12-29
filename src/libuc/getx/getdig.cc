@@ -62,6 +62,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 

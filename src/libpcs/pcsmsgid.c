@@ -49,6 +49,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
+#include	<getnodedomain.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 

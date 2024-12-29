@@ -1,4 +1,5 @@
 /* ucsysgr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for GROUP-DB access */
@@ -125,7 +126,7 @@ int getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 	    ec = EINVAL ;
 	    memset(grp,0,sizeof(GROUP)) ;
 	    if (grlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -162,7 +163,7 @@ int getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 	    ec = EINVAL ;
 	    memset(grp,0,sizeof(GROUP)) ;
 	    if ((grlen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -200,7 +201,7 @@ int getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
 	    ec = EINVAL ;
 	    memset(grp,0,sizeof(GROUP)) ;
 	    if (grlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

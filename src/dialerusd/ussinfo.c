@@ -77,7 +77,6 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	getaf(const char *,int) ;

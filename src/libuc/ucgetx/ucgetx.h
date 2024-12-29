@@ -41,18 +41,19 @@ extern int	uc_gethostname(char *,int) noex ;
 extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_getnisdomain(char *,int) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
-
 extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
-extern int	uc_getcwd(char *,int) noex ;
-extern int	uc_getauid() noex ;
-extern int	uc_getpriority(int,id_t,int *) noex ;
-extern int	uc_getpuid(pid_t) noex ;
 
 /* NETWORK IPNODE database */
 extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
 extern int	uc_getipnodebyaddr(HOSTENT **,cvoid *,int,int) noex ;
 
+extern int	uc_getcwd(char *,int) noex ;
+extern int	uc_getauid() noex ;
+extern int	uc_getpriority(int,id_t,int *) noex ;
+extern int	uc_getpuid(pid_t) noex ;
+
 extern int	uc_getnetname(char *) noex ;
+extern int	uc_getrusage(int,RUSAGE *) noex ;
 
 /* NETWORK SOCKADDR combined database */
 extern int	uc_getnameinfo(const SOCKADDR *,int,

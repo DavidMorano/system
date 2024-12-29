@@ -381,8 +381,6 @@ linefold.o:		linefold.cc linefold.h
 envlist.o:		envlist.cc envlist.h
 envhelp.o:		envhelp.cc envhelp.h
 
-mkprogenv.o:		mkprogenv.cc mkprogenv.h
-
 spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
@@ -409,13 +407,9 @@ bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
 mapex.o:		mapex.cc mapex.h
-
 sigevent.o:		sigevent.cc sigevent.h
-
 timeout.o:		timeout.cc timeout.h
-
 upt.o:			upt.cc upt.h
-
 spawnproc.o:		spawnproc.cc spawnproc.h
 
 memfile.o:		memfile.cc memfile.h
@@ -429,6 +423,7 @@ groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
 
+mkprogenv.o:		mkprogenv.cc mkprogenv.h
 mkvarpath.o:		mkvarpath.cc
 mkuserpath.o:		mkuserpath.cc
 mkcdpath.o:		mkcdpath.cc

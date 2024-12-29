@@ -20,8 +20,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<pthread.h>
 #include	<time.h>
 #include	<clanguage.h>
@@ -29,9 +27,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-
-#include	"ptm.h"			/* needed for interface */
-#include	"ptca.h"
+#include	<ptm.h>			/* needed for interface */
+#include	<ptca.h>
 
 
 #define	PTC		pthread_cond_t

@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Group:
-	ucenumpw
+	uc_entpw{x}
 
 	Description:
 	These subroutines perform some PASSWD-structure management
@@ -46,6 +46,7 @@
 #include	<localmisc.h>
 
 #include	"ucentpw.h"
+#include	"ucentxx.hh"
 
 
 /* local defines */
@@ -54,6 +55,8 @@
 
 
 /* imported namespaces */
+
+using ucent::si_copystr ;		/* local group support subroutine */
 
 
 /* local typedefs */
@@ -73,8 +76,6 @@
 static int ucentpw_parseone(ucentpw *,SI *,int,cchar *,int) noex ;
 static int ucentpw_parsedefs(ucentpw *,SI *,int) noex ;
 
-static int si_copystr(SI *,char **,cchar *) noex ;
-
 
 /* local variables */
 
@@ -91,26 +92,24 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    memclear(this) ;		/* potentially dangerous */
 	    if (pwlen > 0) {
-	        storeitem	ib, *ibp = &ib ;
 	        if (sl < 0) sl = strlen(sp) ;
-	        if ((rs = storeitem_start(ibp,pwbuf,pwlen)) >= 0) {
+	        if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
 	            int		fi = 0 ;
-	            int		si ;
-	            while ((si = sichr(sp,sl,':')) >= 0) {
-	                rs = ucentpw_parseone(this,ibp,fi++,sp,si) ;
-	                sl -= (si+1) ;
-	                sp += (si+1) ;
+	            for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
+	                rs = ucentpw_parseone(this,&si,fi++,sp,idx) ;
+	                sl -= (idx +1) ;
+	                sp += (idx +1) ;
 	                if (rs < 0) break ;
-	            } /* end while */
+	            } /* end for */
 	            if ((rs >= 0) && sl && sp[0]) {
-	                rs = ucentpw_parseone(this,ibp,fi++,sp,sl) ;
+	                rs = ucentpw_parseone(this,&si,fi++,sp,sl) ;
 	            }
 	            if (rs >= 0) {
-	                rs = ucentpw_parsedefs(this,ibp,fi) ;
+	                rs = ucentpw_parsedefs(this,&si,fi) ;
 		        fi = rs ;
 	            }
 	            if ((rs >= 0) && (fi < 6)) rs = SR_BADFMT ;
-	            rs1 = storeitem_finish(ibp) ;
+	            rs1 = si.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (storeitem) */
 	    } /* end if (valid) */
@@ -125,15 +124,16 @@ int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 	if (this && pwbuf && spwp) {
 	    rs = SR_INVALID ;
 	    if (pwlen > 0) {
-	        storeitem	ib ;
 	        (*this) = *spwp ;	/* <- copy over opaque values */
-	        if ((rs = storeitem_start(&ib,pwbuf,pwlen)) >= 0) {
-	            si_copystr(&ib,&pw_name,spwp->pw_name) ;
-	            si_copystr(&ib,&pw_passwd,spwp->pw_passwd) ;
-	            si_copystr(&ib,&pw_gecos,spwp->pw_gecos) ;
-	            si_copystr(&ib,&pw_dir,spwp->pw_dir) ;
-	            si_copystr(&ib,&pw_shell,spwp->pw_shell) ;
-	            rs1 = storeitem_finish(&ib) ;
+	        if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
+		    {
+	                si_copystr(&si,&pw_name,spwp->pw_name) ;
+	                si_copystr(&si,&pw_passwd,spwp->pw_passwd) ;
+	                si_copystr(&si,&pw_gecos,spwp->pw_gecos) ;
+	                si_copystr(&si,&pw_dir,spwp->pw_dir) ;
+	                si_copystr(&si,&pw_shell,spwp->pw_shell) ;
+		    }
+	            rs1 = si.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (storeitem) */
 	    } /* end if (valid) */
@@ -148,41 +148,40 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 	if (this && rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen > 0) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	            for (int i = 0 ; i < 7 ; i += 1) {
-	                if (i > 0) rs = sbuf_chr(&b,':') ;
+	                if (i > 0) rs = b.chr(':') ;
 	                if (rs >= 0) {
 	                    int		v ;
 	                    switch (i) {
 	                    case 0:
-	                        rs = sbuf_strw(&b,pw_name,-1) ;
+	                        rs = b.str(pw_name) ;
 	                        break ;
 	                    case 1:
-	                        rs = sbuf_strw(&b,pw_passwd,-1) ;
+	                        rs = b.str(pw_passwd) ;
 	                        break ;
 	                    case 2:
 	                        v = int(pw_uid) ;
-	                        rs = sbuf_deci(&b,v) ;
+	                        rs = b.dec(v) ;
 	                        break ;
 	                    case 3:
 	                        v = int(pw_gid) ;
-	                        rs = sbuf_deci(&b,v) ;
+	                        rs = b.deci(v) ;
 	                        break ;
 	                    case 4:
-	                        rs = sbuf_strw(&b,pw_gecos,-1) ;
+	                        rs = b.str(pw_gecos) ;
 	                        break ;
 	                    case 5:
-	                        rs = sbuf_strw(&b,pw_dir,-1) ;
+	                        rs = b.str(pw_dir) ;
 	                        break ;
 	                    case 6:
-	                        rs = sbuf_strw(&b,pw_shell,-1) ;
+	                        rs = b.strw(pw_shell) ;
 	                        break ;
 	                    } /* end switch */
 	                } /* end if */
 	                if (rs < 0) break ;
 	            } /* end for */
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	    } /* end if (valid) */	
@@ -194,23 +193,23 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 int ucentpw::size() noex {
 	int		rs = SR_FAULT ;
 	if (this) {
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    if (pw_name) {
-	        size += (strlen(pw_name)+1) ;
+	        sz += (strlen(pw_name)+1) ;
 	    }
 	    if (pw_passwd) {
-	        size += (strlen(pw_passwd)+1) ;
+	        sz += (strlen(pw_passwd)+1) ;
 	    }
 	    if (pw_gecos) {
-	        size += (strlen(pw_gecos)+1) ;
+	        sz += (strlen(pw_gecos)+1) ;
 	    }
 	    if (pw_dir) {
-	        size += (strlen(pw_dir)+1) ;
+	        sz += (strlen(pw_dir)+1) ;
 	    }
 	    if (pw_shell) {
-	        size += (strlen(pw_shell)+1) ;
+	        sz += (strlen(pw_shell)+1) ;
 	    }
-	    rs = size ;
+	    rs = sz ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -219,16 +218,16 @@ int ucentpw::size() noex {
 
 /* local subroutines */
 
-static int ucentpw_parseone(ucentpw *pwp,SI *ibp,int fi,cc *vp,int vl) noex {
+static int ucentpw_parseone(ucentpw *pwp,SI *sip,int fi,cc *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		v = -1 ;
 	cchar		**vpp = nullptr ;
 	switch (fi) {
 	case 0:
-	    vpp = (cchar **) &pwp->pw_name ;
+	    vpp = ccharpp(&pwp->pw_name) ;
 	    break ;
 	case 1:
-	    vpp = (cchar **) &pwp->pw_passwd ;
+	    vpp = ccharpp(&pwp->pw_passwd) ;
 	    break ;
 	case 2:
 	    rs = cfdeci(vp,vl,&v) ;
@@ -239,49 +238,37 @@ static int ucentpw_parseone(ucentpw *pwp,SI *ibp,int fi,cc *vp,int vl) noex {
 	    pwp->pw_gid = v ;
 	    break ;
 	case 4:
-	    vpp = (cchar **) &pwp->pw_gecos ;
+	    vpp = ccharpp(&pwp->pw_gecos) ;
 	    break ;
 	case 5:
-	    vpp = (cchar **) &pwp->pw_dir ;
+	    vpp = ccharpp(&pwp->pw_dir) ;
 	    break ;
 	case 6:
-	    vpp = (cchar **) &pwp->pw_shell ;
+	    vpp = ccharpp(&pwp->pw_shell) ;
 	    break ;
 	} /* end switch */
 	if ((rs >= 0) && vpp) {
-	    int		cl ;
 	    cchar	*cp{} ;
-	    if ((cl = sfshrink(vp,vl,&cp)) >= 0) {
-	        rs = storeitem_strw(ibp,cp,cl,vpp) ;
+	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) >= 0) {
+	        rs = sip->strw(cp,cl,vpp) ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (ucentpw_parseone) */
 
-static int ucentpw_parsedefs(ucentpw *pwp,storeitem *ibp,int sfi) noex {
+static int ucentpw_parsedefs(ucentpw *pwp,storeitem *sip,int sfi) noex {
 	int		rs = SR_OK ;
 	if (sfi == 6) {
-	    cchar	**vpp = (cchar **) &pwp->pw_shell ;
+	    cchar	**vpp = ccharpp(&pwp->pw_shell) ;
 	    cchar	*sp = pwp->pw_name ;
 	    cchar	*vp ;
 	    vp = (sp + strlen(sp)) ;
 	    sfi += 1 ;
-	    rs = storeitem_strw(ibp,vp,0,vpp) ;
+	    rs = sip->strw(vp,0,vpp) ;
 	}
 	return (rs >= 0) ? sfi : rs ;
 }
 /* end subroutine (ucentpw_parsedefs) */
-
-static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
-	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
-	*cpp = nullptr ;
-	if (p1) {
-	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
-	}
-	return rs ;
-}
-/* end subroutine (si_copystr) */
 
 

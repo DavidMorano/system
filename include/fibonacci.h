@@ -2,13 +2,13 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* calculate (integer) Fibonacci */
+/* calculate fibonacci */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-09-10, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */

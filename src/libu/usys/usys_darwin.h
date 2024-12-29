@@ -49,7 +49,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysdefs.h>
 
 
 #ifndef	SIGEVENT
@@ -144,6 +144,10 @@ typedef int	timer_t ;
 
 #ifndef	ITIMERSPEC
 #define	ITIMERSPEC	struct itimerspec
+#endif
+
+#ifndef	CITIMERSPEC
+#define	CITIMERSPEC	const ITIMERSPEC
 #endif
 
 #ifndef	TIMER_ABSTIME

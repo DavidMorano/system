@@ -2,7 +2,7 @@
 
 T= ucent
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -59,8 +58,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ0_UCENT= ucentpw.o ucentsp.o ucentua.o 
 OBJ1_UCENT= ucentgr.o ucentpj.o
 OBJ2_UCENT= ucentpr.o ucentnw.o ucentho.o ucentsv.o
+OBJ3_UCENT= ucentxx.o
 
-OBJ_UCENT= obj0_ucent.o obj1_ucent.o obj2_ucent.o
+OBJ_UCENT= obj0_ucent.o obj1_ucent.o obj2_ucent.o obj3_ucent.o
 
 
 .SUFFIXES:		.hh .ii
@@ -69,6 +69,7 @@ OBJ_UCENT= obj0_ucent.o obj1_ucent.o obj2_ucent.o
 default:		$(T).o
 
 all:			$(ALL)
+
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -91,9 +92,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_UCENT)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCENT)
-
-$(T).a:			$(OBJ_UCENT)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -122,6 +120,11 @@ obj1_ucent.o:	$(OBJ1_UCENT)
 obj2_ucent.o:	$(OBJ2_UCENT)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCENT)
 
+obj3_ucent.o:	$(OBJ3_UCENT)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCENT)
+
+
+ucentxx.o:		ucentxx.cc ucentxx.hh $(INCS)
 
 ucentpw.o:		ucentpw.cc ucentpw.h $(INCS)
 ucentsp.o:		ucentsp.cc ucentsp.h $(INCS)

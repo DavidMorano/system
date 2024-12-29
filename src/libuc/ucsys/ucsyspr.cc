@@ -1,4 +1,5 @@
 /* ucsyspr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* additional operaring-system support for PROTOENT-DB access */
@@ -144,7 +145,7 @@ int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 	    ec = EINVAL ;
 	    memset(prp,0,sizeof(PROTOENT)) ;
 	    if (prlen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
@@ -155,7 +156,7 @@ int getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 /* GETPRXXXR end */
 
 /* HETPRXXXR begin */
-#if	defined(SYSHAS_HETPRXXXR) && (SYSHAS_HETPRXXXR > 0)
+#if	defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0)
 
 #if	defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0)
 
@@ -203,14 +204,14 @@ int getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 	    ec = EINVAL ;
 	    memset(prp,0,sizeof(PROTOENT)) ;
 	    if ((prlen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;
 	return ec ;
 }
 
-#endif /* defined(SYSHAS_HETPRXXXR) && (SYSHAS_HETPRXXXR > 0) */
+#endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
 /* HETPRXXXR ent */
 
 /* GETPRXXXR begin */
@@ -262,7 +263,7 @@ int getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 	    ec = EINVAL ;
 	    memset(prp,0,sizeof(PROTOENT)) ;
 	    if ((prlen > 0) && (num >= 0)) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
 	    }
 	}
 	errno = ec ;

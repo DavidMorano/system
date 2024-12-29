@@ -121,7 +121,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getuid_name(cchar *,int) ;
 extern int	mklogidpre(char *,int,cchar *,int) ;
 extern int	mklogidsub(char *,int,cchar *,int) ;

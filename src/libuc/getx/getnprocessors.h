@@ -29,7 +29,7 @@
 
 EXTERNC_begin
 
-extern int getnprocessors(char *,int) noex ;
+extern int	getnprocessors(mainv,int) noex ;
 
 EXTERNC_end
 
