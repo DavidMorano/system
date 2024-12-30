@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int hdbstr_ctor(hdbstr *op,Args ... args) noex {
+static int dbi_ctor(dbi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int hdbstr_ctor(hdbstr *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (hdbstr_ctor) */
+/* end subroutine (dbi_ctor) */
 
-static int hdbstr_dtor(hdbstr *op) noex {
+static int dbi_dtor(dbi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (hdbstr_dtor) */
+/* end subroutine (dbi_dtor) */
 
 template<typename ... Args>
-static inline int hdbstr_magic(hdbstr *op,Args ... args) noex {
+static inline int dbi_magic(dbi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = (op->magic == DBI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (hdbstr_magic) */
+/* end subroutine (dbi_magic) */

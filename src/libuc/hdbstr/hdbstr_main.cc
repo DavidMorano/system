@@ -97,6 +97,8 @@ static inline int hdbstr_magic(hdbstr *op,Args ... args) noex {
 }
 /* end subroutine (hdbstr_magic) */
 
+static int	hdbstr_finents(hdbstr *) noex ;
+
 
 /* local variables */
 
@@ -106,10 +108,10 @@ static inline int hdbstr_magic(hdbstr *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int hdbstr_start(hdbstr *op,int n) noex {
+int hdbstr_start(hdbstr *op,int ne) noex {
 	int		rs ;
 	if ((rs = hdbstr_ctor(op)) >= 0) {
-	    rs = hdb_start(op,n,0,nullptr,nullptr) ;
+	    rs = hdb_start(op,ne,0,nullptr,nullptr) ;
 	    if (rs < 0) {
 		hdbstr_dtor(op) ;
 	    }
@@ -123,27 +125,46 @@ int hdbstr_finish(hdbstr *op) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if ((rs = hdbstr_magic(op)) >= 0) {
-    	    cint	rsn = SR_NOTFOUND ;
-	    if (hdb_cur cur{} ; (rs = hdb_curbegin(op,&cur)) >= 0) {
-	        hdb_dat		key{} ;
-	        hdb_dat		val{} ;
-	        while ((rs1 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
-	            if (key.buf != nullptr) {
-	                rs1 = uc_free(key.buf) ;
-	                if (rs >= 0) rs = rs1 ;
-	            }
-	            n += 1 ;
-	        } /* end while (enum) */
-		if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	        rs1 = hdb_curend(op,&cur) ;
+	    {
+		rs1 = hdbstr_finents(op) ;
+		if (rs >= 0) rs = rs1 ;
+		n = rs1 ;
+	    }
+	    {
+		rs1 = hdb_finish(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = hdbstr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-	    rs1 = hdb_finish(op) ;
-	    if (rs >= 0) rs = rs1 ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (hdbstr_finish) */
+
+static int hdbstr_finents(hdbstr *op) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
+	int		rs1 ;
+	int		n = 0 ;
+	if (hdb_cur cur{} ; (rs = hdb_curbegin(op,&cur)) >= 0) {
+            hdb_dat	key{} ;
+            hdb_dat	val{} ;
+            while ((rs1 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
+                if (key.buf != nullptr) {
+                    rs1 = uc_free(key.buf) ;
+                    if (rs >= 0) rs = rs1 ;
+                }
+                n += 1 ;
+            } /* end while (enum) */
+            if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+            rs1 = hdb_curend(op,&cur) ;
+            if (rs >= 0) rs = rs1 ;
+	} /* end if (cursor) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (hdbstr_finents) */
 
 /* add a string pair to the database */
 int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
@@ -162,12 +183,12 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
+	        bp = strwcpy(bp,kstr,klen) + 1 ;
+	        if (vstr) strwcpy(bp,vstr,vlen) ;
 	        key.buf = bp ;
 	        key.len = klen ;
-	        bp = strwcpy(bp,kstr,klen) + 1 ;
 	        val.buf = bp ;
 	        val.len = vlen ;
-	        if (vstr) strwcpy(bp,vstr,vlen) ;
 	        rs = hdb_store(op,key,val) ;
 	        if (rs < 0) {
 	            uc_free(bp) ;
@@ -179,8 +200,7 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 /* end subroutine (hdbstr_add) */
 
 /* enumerate all of the entries */
-int hdbstr_curenum(hdbstr *op,cur *curp,cc **kpp,
-		cc **vpp,int *vlenp) noex {
+int hdbstr_curenum(hdbstr *op,cur *curp,cc **kpp,cc **vpp,int *vlp) noex {
 	int		rs ;
 	int		kl = 0 ;
 	if ((rs = hdbstr_magic(op,curp)) >= 0) {
@@ -195,8 +215,8 @@ int hdbstr_curenum(hdbstr *op,cur *curp,cc **kpp,
 	        if (vpp) {
 	            *vpp = charp(val.buf) ;
 	        }
-	        if (vlenp) {
-	            *vlenp = val.len ;
+	        if (vlp) {
+	            *vlp = val.len ;
 	        }
 	    } /* end if (had entry) */
 	} /* end if (magic) */
@@ -227,7 +247,7 @@ int hdbstr_fetch(hdbstr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 
 /* fetch the next entry value matching the given key */
 int hdbstr_fetchrec(hdbstr *op,cc *kstr,int klen,cur *curp,cc **kpp,cc **vpp,
-		int *vlenp) noex {
+		int *vlp) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = hdbstr_magic(op,kstr,curp)) >= 0) {
@@ -244,8 +264,8 @@ int hdbstr_fetchrec(hdbstr *op,cc *kstr,int klen,cur *curp,cc **kpp,cc **vpp,
 	        if (vpp) {
 	            *vpp = charp(val.buf) ;
 	        }
-	        if (vlenp) {
-	            *vlenp = val.len ;
+	        if (vlp) {
+	            *vlp = val.len ;
 	        }
 	        len = key.len ;
 	    } /* end if (had entry) */
@@ -255,8 +275,7 @@ int hdbstr_fetchrec(hdbstr *op,cc *kstr,int klen,cur *curp,cc **kpp,cc **vpp,
 /* end subroutine (hdbstr_fetchrec) */
 
 /* get the current record under the cursor */
-int hdbstr_getrec(hdbstr *op,cur *curp,cchar **kpp,
-		cchar **vpp,int *vlenp) noex {
+int hdbstr_getrec(hdbstr *op,cur *curp,cc **kpp,cc **vpp,int *vlp) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = hdbstr_magic(op,curp)) >= 0) {
@@ -270,8 +289,8 @@ int hdbstr_getrec(hdbstr *op,cur *curp,cchar **kpp,
 	        if (vpp) {
 	            *vpp = charp(val.buf) ;
 	        }
-	        if (vlenp) {
-	            *vlenp = val.len ;
+	        if (vlp) {
+	            *vlp = val.len ;
 	        }
 	        len = val.len ;
 	    } /* end if (had entry) */

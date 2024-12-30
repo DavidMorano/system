@@ -709,7 +709,7 @@ int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 
 	                            while (rs >= 0) {
 
-	                                cl = clusterdb_fetch(&dbi.cluster,cp,
+	                                cl = clusterdb_curfetch(&dbi.cluster,cp,
 	                                    &cc,cnode,NODENAMELEN) ;
 
 	                                if (cl == SR_NOTFOUND)
@@ -1885,21 +1885,11 @@ cchar	nodename[] ;
 	    cint		clen = NODENAMELEN ;
 	    cchar		*nn = nodename ;
 	    char		cname[NODENAMELEN + 1] ;
-
-
-#if	CF_DEBUGS && 0
-	    debugprintf("getclusters: cluster lookup\n") ;
-#endif
-
 	    if ((rs = clusterdb_curbegin(cdb,&cur)) >= 0) {
 
 	        while (rs >= 0) {
 
-#if	CF_DEBUGS && 0
-	            debugprintf("getclusters: cluster whiletop\n") ;
-#endif
-
-	            rs1 = clusterdb_fetchrev(cdb,nn,&cur,cname,clen) ;
+	            rs1 = clusterdb_curfetchrev(cdb,nn,&cur,cname,clen) ;
 	            if (rs1 == SR_NOTFOUND) break ;
 
 	            if (rs >= 0) {
@@ -1910,24 +1900,12 @@ cchar	nodename[] ;
 	                }
 	            }
 
-#if	CF_DEBUGS && 0
-	            debugprintf("getclusters: cluster whilebot\n") ;
-#endif
-
 	        } /* end while (fetchrev) */
-
-#if	CF_DEBUGS && 0
-	        debugprintf("getclusters: cluster whileout\n") ;
-#endif
 
 	        clusterdb_curend(cdb,&cur) ;
 	    } /* end if (cursor) */
 
 	} /* end if */
-
-#if	CF_DEBUGS && 0
-	debugprintf("getclusters: ret rs=%d c=%d\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }

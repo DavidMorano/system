@@ -1148,6 +1148,10 @@ int vecpstr::envfile(cchar *fn) noex {
 	return vecpstr_envfile(this,fn) ;
 }
 
+int vecpstr::find(cchar *s) noex {
+    	return vecpstr_find(this,s) ;
+}
+
 int vecpstr::search(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_search(this,s,vcmp,rpp) ;
 }

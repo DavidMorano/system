@@ -86,9 +86,10 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
+    	NODESFILE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    memclear(op) ;
+	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->nlp = new(nothrow) hdb) != nullptr) {
 		rs = SR_OK ;
@@ -285,7 +286,7 @@ static int nodesfile_opens(NF *op,cc *fn) noex {
 			op->fi.oflags = of ;
 			if (cc *cp{} ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
 			    op->fi.fname = cp ;
-			    op->fi.mtime = sb.st_mtime ;
+			    op->fi.timod = sb.st_mtime ;
 			    op->fi.ino = sb.st_ino ;
 			    op->fi.dev = sb.st_dev ;
 			    op->filesize = sb.st_size ;
@@ -382,15 +383,15 @@ static int nodesfile_filechanged(NF *op,time_t daytime) noex {
 	int		rs ;
 	int		f = false ;
 	if (USTAT sb ; (rs = uc_stat(op->fi.fname,&sb)) >= 0) {
-	    f = (op->fi.mtime > sb.st_mtime) ;
+	    f = (op->fi.timod > sb.st_mtime) ;
 	    f = f || (op->fi.ino != sb.st_ino) ;
 	    f = f || (op->fi.dev != sb.st_dev) ;
 	    if (f) {
-	        f = f && ((daytime - op->fi.mtime) >= TO_HOLD) ;
+	        f = f && ((daytime - op->fi.timod) >= TO_HOLD) ;
 	    }
 	    if (f) {
 	        op->filesize = sb.st_size ;
-	        op->fi.mtime = sb.st_mtime ;
+	        op->fi.timod = sb.st_mtime ;
 	        op->fi.ino = sb.st_ino ;
 	        op->fi.dev = sb.st_dev ;
 	        if (sb.st_size > op->mapsize) {
@@ -448,13 +449,12 @@ static int nodesfile_filemapend(NF *op) noex {
 static int hdb_release(hdb *hsp) noex {
 	int		rs = SR_FAULT ;
 	if (hsp) {
-	    hdb_cur	cur ;
-	    rs = SR_OK ;
-	    hdb_curbegin(hsp,&cur) ;
-	    while (hdb_curenum(hsp,&cur,nullptr,nullptr) >= 0) {
-	        hdb_curdel(hsp,&cur,0) ;
-	    }
-	    hdb_curend(hsp,&cur) ;
+	    if (hdb_cur cur{} ; (rs = hdb_curbegin(hsp,&cur)) >= 0) {
+	        while (hdb_curenum(hsp,&cur,nullptr,nullptr) >= 0) {
+	            hdb_curdel(hsp,&cur,0) ;
+	        }
+	        hdb_curend(hsp,&cur) ;
+	    } /* end if (cursor) */
 	} /* end if (non-null) */
 	return rs ;
 }

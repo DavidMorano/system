@@ -1,4 +1,4 @@
-/* nodesfile SUPPORT */
+/* nodesearch SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -214,12 +214,12 @@ int nodesearch_check(NS *op,time_t dt) noex {
 }
 /* end subroutine (nodesearch_check) */
 
-int nodesearch_search(NS *op,cc *nodename,int nl) noex {
+int nodesearch_search(NS *op,cc *sp,int sl) noex {
 	int		rs ;
 	int		f_found = false ;
-	if ((rs = nodesearch_magic(op,nodename)) >= 0) {
-	    if (nl < 0) nl = strlen(nodename) ;
-	    if ((rs = nodesfile_search(op->nfp,nodename,nl)) >= 0) {
+	if ((rs = nodesearch_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = nodesfile_search(op->nfp,sp,sl)) >= 0) {
 	        f_found = true ;
 	    }
 	} /* end if (magic) */

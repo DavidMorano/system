@@ -364,8 +364,8 @@ int mkprogenv_envset(mkprogenv *op,cchar *kp,cchar *valp,int vall) noex {
 	    	    vechand	*elp = op->envp ;
 		    {
 		        auto	vcf = vechand_f(vstrkeycmp) ;
-	                if ((rs = vechand_search(elp,ep,vcf,np)) >= 0) {
-	                    rs = vechand_del(elp,rs) ;
+	                if ((rs = elp->search(ep,vcf,np)) >= 0) {
+	                    rs = elp->del(rs) ;
 			} else if (rs == rsn) {
 	                    rs = SR_OK ;
 			}
@@ -387,9 +387,9 @@ int mkprogenv_getvec(mkprogenv *op,mainv *evp) noex {
 	if ((rs = mkprogenv_magic(op)) >= 0) {
 	    vechand	*elp = op->envp ;
 	    if (evp) {
-	        rs = vechand_getvec(elp,evp) ;
+	        rs = elp->getvec(evp) ;
 	    } else {
-	        rs = vechand_count(elp) ;
+	        rs = elp->count ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -435,7 +435,7 @@ static int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
 	                    f_path = (strkeycmp(kp,varpath) == 0) ;
 	                }
 	                n += 1 ;
-	                if ((rs = vechand_add(elp,kp)) >= 0) {
+	                if ((rs = elp->add(kp)) >= 0) {
 	                    rs = et.add(kp,-1) ;
 	                }
 	            } /* end if (good ENV variable) */
@@ -552,9 +552,7 @@ static int mkprogenv_mkenvsys(mkprogenv *op,EL *etp,mainv envs) noex {
                                 } else {
                                     vp = uid.nodename ;
                                     if ((tp = strchr(vp,'.')) != np) {
-                                        rs = snwcpy(vbuf,vlen,vp,(tp-vp)) ;
-                                        vl = rs ;
-                                        vp = vbuf ;
+                                        vl = (tp - vp) ;
                                     }
                                 } /* end if */
                                 break ;
@@ -648,11 +646,11 @@ static int mkprogenv_envadd(mkprogenv *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	if (vp) {
 	    bl += ((vl >= 0) ? vl : int(strlen(vp))) ;
 	}
-	if (char *bp ; (rs = uc_malloc((bl+1),&bp)) >= 0) {
+	if (char *bp{} ; (rs = uc_malloc((bl+1),&bp)) >= 0) {
 	    strpack	*spp = op->storep ;
 	    strdcpy3w(bp,bl,kp,"=",vp,vl) ;
 	    if (cchar *ep{} ; (rs = spp->store(bp,bl,&ep)) >= 0) {
-	        if ((rs = vechand_add(elp,ep)) >= 0) {
+	        if ((rs = elp->add(ep)) >= 0) {
 	            rs = etp->add(ep,kl) ;
 	        }
 	    } /* end if (store) */
@@ -693,7 +691,7 @@ static int mkprogenv_userinfo(mkprogenv *op) noex {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
 		    cchar	*un = pw.pw_name ;
 		    cchar	*uh = pw.pw_dir ;
-		    if (cchar *cp ; (rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
+		    if (cchar *cp{} ; (rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
 			op->un = cp ;
 			if ((rs = uc_mallocstrw(uh,-1,&cp)) >= 0) {
 	                    op->uh = cp ;

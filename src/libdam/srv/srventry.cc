@@ -1,4 +1,5 @@
 /* srventry SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* build up a server entry piece-meal as it were */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	srventry
+
+	Description:
 	This little object is used to create a server entry and to
 	populate aspects of it with different operations on the
 	object.  This object is used in "server" types of programs.

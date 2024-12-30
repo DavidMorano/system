@@ -127,7 +127,7 @@ typedef cchar		*(*keytabp)[2] ;
 
 struct nodedb_file {
 	cchar		*fname ;
-	time_t		mtime ;
+	time_t		timod ;
 	dev_t		dev ;
 	ino_t		ino ;
 	size_t		fsize ;
@@ -476,8 +476,8 @@ static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	    vecobj	*flp = op->filep ;
 	    vecobj_vcf	vcf = vecobj_vcf(vcmpfn) ;
 	    cint	rsn = SR_NOTFOUND ;
-	    if ((rs = vecobj_search(flp,&fe,vcf,nullptr)) == rsn) {
-	        if ((rs = vecobj_add(flp,&fe)) >= 0) {
+	    if ((rs = flp->search(&fe,vcf,nullptr)) == rsn) {
+	        if ((rs = flp->add(&fe)) >= 0) {
 	            cint	fi = rs ;
 	            rs = nodedb_fileparse(op,fi) ;
 	            if (rs < 0) {
@@ -498,7 +498,7 @@ static int nodedb_filefins(nodedb *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(flp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    nodedb_f	*fep = (nodedb_f *) vp ;
 	    if (vp) {
 	        rs1 = file_finish(fep) ;
@@ -514,11 +514,11 @@ static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
 	int		rs = SR_OK ;
 	int		c_changed = 0 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(flp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		nodedb_f	*fep = (nodedb_f *) vp ;
 		if (USTAT sb ; (rs = u_stat(fep->fname,&sb)) >= 0) {
-	            if (sb.st_mtime > fep->mtime) {
+	            if (sb.st_mtime > fep->timod) {
 	                c_changed += 1 ;
 	                nodedb_filedump(op,i) ;
 	                rs = nodedb_fileparse(op,i) ;
@@ -538,7 +538,7 @@ static int nodedb_fileparse(nodedb *op,int fi) noex {
 	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		c = 0 ;
-	if (void *vp{} ; (rs = vecobj_get(flp,fi,&vp)) >= 0) {
+	if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (vp) {
 		nodedb_f	*fep = (nodedb_f *) vp ;
@@ -565,11 +565,11 @@ static int nodedb_fileparser(nodedb *op,nodedb_f *fep,int fi) noex {
 	        bool	f_eol ;
 	        if (USTAT sb ; (rs = bcontrol(lfp,BC_STAT,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
-	                if (fep->mtime < sb.st_mtime) {
+	                if (fep->timod < sb.st_mtime) {
 			    cnullptr	np{} ;
 	                    fep->dev = sb.st_dev ;
 	                    fep->ino = sb.st_ino ;
-	                    fep->mtime = sb.st_mtime ;
+	                    fep->timod = sb.st_mtime ;
 	                    fep->fsize = size_t(sb.st_size) ;
 	                    while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
 	                        int	len = rs ;
@@ -608,13 +608,12 @@ static int nodedb_fileparseln(nodedb *op,int fi,cchar *lp,int ll) noex {
 	int		rs1 ;
 	int		f_ent = false ;
 	if (char *abuf{} ; (rs = uc_malloc((alen + 1),&abuf)) >= 0) {
-	    SE		se ;
+	    SE		se ; /* used multiple blocks below */
 	    lineinfo	li{} ;
 	    int		c_field = 0 ;
 	    if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-	        int	fl ;
-	        cchar	*fp ;
-	        while ((fl = fsb.get(fterms,&fp)) >= 0) {
+	        cchar	*fp{} ;
+	        for (int fl ; (fl = fsb.get(fterms,&fp)) >= 0 ; ) {
 	            if ((c_field == 0) && (fl == 0)) break ;
 	            if ((c_field < 3) && (fsb.term == ':')) {
 	                li.f[c_field].fp = fp ;
@@ -641,7 +640,7 @@ static int nodedb_fileparseln(nodedb *op,int fi,cchar *lp,int ll) noex {
 	            c_field += 1 ;
 	            if (fsb.term == '#') break ;
 	            if (rs < 0) break ;
-	        } /* end while (fields) */
+	        } /* end for (fields) */
 	        rs1 = fsb.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
@@ -725,7 +724,7 @@ static int nodedb_filedel(nodedb *op,int fi) noex {
 	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp{} ; (rs = vecobj_get(flp,fi,&vp)) >= 0) {
+	if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
 	    if (vp) {
 		{
 	            nodedb_f	*fep = (nodedb_f *) vp ;
@@ -733,7 +732,7 @@ static int nodedb_filedel(nodedb *op,int fi) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = vecobj_del(flp,fi) ;
+	            rs1 = flp->del(fi) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end if (non-null) */
@@ -784,21 +783,21 @@ static int ientry_start(NODEDB_IE *iep,int fi,SE *sep) noex {
 	    vecobj	*klp = &sep->keys ;
 	    rs = SR_INVALID ;
 	    memclear(iep) ;
-/* basic checks on input data */
+	    /* basic checks on input data */
 	    if (sep->svc && sep->svc[0]) {
 	        iep->fi = fi ;
-/* ok to continue */
-	        if ((rs = vecobj_count(klp)) >= 0) {
+		/* OK to continue */
+	        if ((rs = klp->count) >= 0) {
 	            SE_KEY	*kep ;
 	            int		sz = 0 ;
 	            void	*vp{} ;
 	            iep->nkeys = rs ;
-	            c = rs ;
-/* find the size to allocate (everything) */
+	            c = rs ; /* <- return value */
+		    /* find the size to allocate (everything) */
 	            sz += ((c + 1) * 2 * szof(char *)) ;
-	            for (int i = 0 ; vecobj_get(klp,i,&vp) >= 0 ; i += 1) {
+	            for (int i = 0 ; klp->get(i,&vp) >= 0 ; i += 1) {
+			kep = (SE_KEY *) vp ;
 	                if (vp) {
-			    kep = (SE_KEY *) vp ;
 	                    if (kep->kname) sz += kep->kl ;
 	                    sz += 1 ;
 	                    if (kep->args) sz += kep->al ;
@@ -820,7 +819,7 @@ static int ientry_start(NODEDB_IE *iep,int fi,SE *sep) noex {
 	                } /* end switch */
 	                sz += (strlen(cp) + 1) ;
 	            } /* end for */
-/* allocate */
+		    /* allocate */
 	            iep->tsize = sz ;
 	            if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	                int	j = 0 ;
@@ -829,8 +828,8 @@ static int ientry_start(NODEDB_IE *iep,int fi,SE *sep) noex {
 	                iep->a = charp(vp) ;
 	                iep->keys = keys ;
 	                bp += ((c + 1) * 2 * szof(char *)) ;
-/* copy over the key-table and the key and value strings */
-	                for (int i = 0 ; vecobj_get(klp,i,&vp) >= 0 ; i += 1) {
+			/* copy over the key-table w/ strings */
+	                for (int i = 0 ; klp->get(i,&vp) >= 0 ; i += 1) {
 	                    if (vp) {
 			        kep = (SE_KEY *) vp ;
 	                        if (kep->kname) {
@@ -848,7 +847,7 @@ static int ientry_start(NODEDB_IE *iep,int fi,SE *sep) noex {
 	                } /* end for */
 	                keys[j][0] = nullptr ;
 	                keys[j][1] = nullptr ;
-/* copy over the other stuff */
+			/* copy over the other stuff */
 	                for (int i = 0 ; i < 3 ; i += 1) {
 	                    cchar	*cp{} ;
 	                    switch (i) {
@@ -921,14 +920,14 @@ static int svcentry_start(SE *sep,lineinfo *lip) noex {
 	            } /* end switch */
 	            bp = (strwcpy(bp,lip->f[i].fp,lip->f[i].fl) + 1) ;
 	        } /* end for */
-/* prepare for arguments */
+		/* prepare for arguments */
 		cint	vn = 5 ;
 		cint	vo = VECOBJ_OORDERED ;
 	        rs = vecobj_start(&sep->keys,ksize,vn,vo) ;
 	        if (rs < 0) {
 	            uc_free(sep->a) ;
 	            sep->a = nullptr ;
-	        }
+	        } /* end if (error handling) */
 	    } else {
 	        sep->svc = nullptr ;
 	    }
@@ -975,7 +974,7 @@ static int svcentry_addkey(SE *sep,cc *kp,int kl,cc *ap,int al) noex {
 	                    key.kname = nullptr ;
 	                    key.args = nullptr ;
 	                }
-	            }
+	            } /* end if (error handling) */
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -991,9 +990,9 @@ static int svcentry_finish(SE *sep) noex {
 	    if (sep->svc) {
 	        vecobj	*klp = &sep->keys ;
 	        void	*vp{} ;
-	        for (int i = 0 ; vecobj_get(klp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; klp->get(i,&vp) >= 0 ; i += 1) {
+	    	    SE_KEY	*kep = (SE_KEY *) vp ;
 	            if (vp) {
-	    	        SE_KEY	*kep = (SE_KEY *) vp ;
 	                if (kep->kname) {
 	                    rs1 = uc_free(kep->kname) ;
 	                    if (rs >= 0) rs = rs1 ;
@@ -1024,25 +1023,25 @@ static int entry_load(ND_E *ep,char *ebuf,int elen,ND_I *iep) noex {
 	    cchar	*(*keys)[2] = (cchar *(*)[2]) (ebuf + bo) ;
 	    char	*bp ;
 	    bp = charp(ebuf + bo + kal) ;
-/* copy in the nodename */
+	    /* copy in the nodename */
 	    ep->svc = bp ;
 	    bp = (strwcpy(bp,iep->svc,-1) + 1) ;
 	    svclen = (bp - ep->svc - 1) ;
-/* copy in the clustername */
+	    /* copy in the clustername */
 	    ep->clu = bp ;
 	    if (iep->clu) {
 	        bp = (strwcpy(bp,iep->clu,-1) + 1) ;
 	    } else {
 	        *bp++ = '\0' ;
 	    }
-/* copy in the systemname */
+	    /* copy in the systemname */
 	    ep->sys = bp ;
 	    if (iep->sys) {
 	        bp = (strwcpy(bp,iep->sys,-1) + 1) ;
 	    } else {
 	        *bp++ = '\0' ;
 	    }
-/* copy in the key=values */
+	    /* copy in the key=values */
 	    {
 		int	i{} ; /* used-afterwards */
 	        for (i = 0 ; i < iep->nkeys ; i += 1) {

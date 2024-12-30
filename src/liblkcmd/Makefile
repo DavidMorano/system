@@ -422,10 +422,10 @@ OBJ096= proginfo.o proginfo_setpiv.o proginfo_rootname.o
 OBJ097= progdebugout.o proglog.o proglogout.o proguserlist.o
 OBJ098= maininfo.o
 OBJ099= 
-OBJ100= msghdr.o cmsghdr.o
-OBJ101= getourenv.o
-OBJ102= getlogname.o getmjd.o getnodeinfo.o getclusters.o 
-OBJ103= hdrextnum.o lastlogin.o termwritable.o opendial.o openqotd.o
+OBJ100=
+OBJ101=
+OBJ102=
+OBJ103=
 
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
@@ -1144,28 +1144,11 @@ ctdecpi.o:		ctdecpi.c
 
 getrootdname.o:		getrootdname.c
 
-getlogname.o:		getlogname.c
-
-getclusters.o:		getclusters.c
-
-getopendial.o:		getopendial.c opendial.h
-
 termwritable.o:		termwritable.c
 
 mkcleanline.o:		mkcleanline.c
 
-mkuuid.o:		mkuuid.c mkuuid.h
-
 snmkuuid.o:		snmkuuid.c snmkuuid.h mkuuid.h
-
-maintqotd.o:		maintqotd.c maintqotd.h
-
-maintqotd_prog.o:	maintqotd_prog.c maintqotd.h
-
-svckv.o:		svckv.c svckv.h
-
-svcent.o:		svcent.c svcent.h
-
 
 # objects
 
@@ -1175,143 +1158,11 @@ paramopt.o:		paramopt.c paramopt.h
 
 lastlogfile.o:		lastlogfile.c lastlogfile.h
 
-char.o:			char.c char.h
-
-field.o:		field.c field.h
-
-field_word.o:		field_word.c field.h
-
-field_wordphrase.o:	field_wordphrase.c field.h
-
-field_srvarg.o:		field_srvarg.c field.h
-
-modload.o:		modload.c modload.h
-
-filecounts.o:		filecounts.c filecounts.h
-
-fifostr.o:		fifostr.c fifostr.h
-
-fifoelem.o:		fifoelem.c fifoelem.h
-
-vecstr.o:		vecstr.c vecstr.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c vecstr.h
-
-vecstr_env.o:		vecstr_env.c vecstr.h
-
-vecstr_envfile.o:	vecstr_envfile.c vecstr.h
-
-vecstr_adduniq.o:	vecstr_adduniq.c vecstr.h
-
-vecstr_avmkstr.o:	vecstr_avmkstr.c vecstr.h
-
-keyopt.o:		keyopt.c keyopt.h
-
-vecelem.o:		vecelem.c vecelem.h
-
-veclist.o:		vechand.c vechand.h
-
-hdb.o:			hdb.c hdb.h
 
 loadave.o:		loadave.c loadave.h
 
 entropy.o:		entropy.c entropy.h
 
-sha1.o:			sha1.c sha1.h
-
-buffer.o:		buffer.c buffer.h
-
-buffer_stropaque.o:	buffer_stropaque.c buffer.h
-
-buffer_strquote.o:	buffer_strquote.c buffer.h
-
-bufstr.o:		bufstr.c bufstr.h
-
-sbuf.o:			sbuf.c sbuf.h
-
-sbuf_loadstrs.o:	sbuf_loadstrs.c sbuf.h
-
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-
-sbuf_termconseq.o:	sbuf_termconseq.c sbuf.h
-
-sbuf_blanks.o:		sbuf_blanks.c sbuf.h
-
-lookaside.o:		lookaside.c lookaside.h
-
-plainq.o:		plainq.c plainq.h
-
-q.o:			q.c q.h
-
-plainq.o:		plainq.c plainq.h
-
-pq.o:			pq.c pq.h
-
-charq.o:		charq.c charq.h
-
-serialbuf.o:		serialbuf.c serialbuf.h
-
-netorder.o:		netorder.c netorder.h
-
-storeitem.o:		storeitem.c storeitem.h
-
-outbuf.o:		outbuf.c outbuf.h
-
-mailbox.o:		mailbox.c mailbox.h mailmsg.h
-
-mailbox_getfrom.o:	mailbox_getfrom.c mailbox.h mailmsg.h
-
-mailbox_fromaddr.o:	mailbox_fromaddr.c mailbox.h mailmsg.h
-
-mailmsg.o:		mailmsg.c mailmsg.h mailmsgmatenv.h
-
-mailmsg_loadmb.o:	mailmsg_loadmb.c mailmsg.h mailmsgmatenv.h
-
-mailmsg_enver.o:	mailmsg_enver.c mailmsg_enver.h
-
-mailmsghdrval.o:	mailmsghdrval.c mailmsghdrval.h
-
-mailmsghdrfold.o:	mailmsghdrfold.c mailmsghdrfold.h
-
-mailmsghdrs.o:		mailmsghdrs.c mailmsghdrs.h
-
-mailmsgstage.o:		mailmsgstage.c mailmsgstage.h
-
-mailmsgmatenv.o:	mailmsgmatenv.c mailmsgmatenv.h
-
-mailmsgfrom.o:		mailmsgfrom.c mailmsgfrom.h
-
-realname.o:		realname.c realname.h
-
-hostinfo.o:		hostinfo.c hostinfo.h
-
-hostaddr.o:		hostaddr.c hostaddr.h
-
-hostent.o:		hostent.c hostent.h
-
-inetaddr.o:		inetaddr.c inetaddr.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-gecos.o:		gecos.c gecos.h
-
-kinfo.o:		kinfo.c kinfo.h
-
-msfile.o:		msfile.c msfile.h msfilee.h
-
-msfile_best.o:		msfile_best.c msfile.h
-
-msfile_best.o:		msfile_best.c msfile.h msfilee.h
-
-msfilee.o:		msfilee.c msfilee.h
-
-nodedb.o:		nodedb.c nodedb.h
-
-clusterdb.o:		clusterdb.c clusterdb.h
-
-kvsfile.o:		kvsfile.c kvsfile.h
-
-fsdir.o:		fsdir.c fsdir.h
 
 objfile.o:		objfile.c objfile.h
 

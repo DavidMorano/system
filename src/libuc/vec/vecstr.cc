@@ -281,8 +281,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	    }
 	    if (rs >= 0) {
 	        cint	sz = (kl + 1 + vl + 1) ;
-	        char	*ap{} ;
-	        if ((rs = uc_libmalloc(sz,&ap)) >= 0) {
+	        if (char *ap{} ; (rs = uc_libmalloc(sz,&ap)) >= 0) {
 		    char	*bp = ap ;
 	            bp = strwcpy(bp,kp,kl) ;
 	            *bp++ = '=' ;
@@ -1000,6 +999,10 @@ int vecstr::envset(cchar *kp,cchar *valp,int vall) noex {
 
 int vecstr::envfile(cchar *fn) noex {
 	return vecstr_envfile(this,fn) ;
+}
+
+int vecstr::find(cchar *s) noex {
+    	return vecstr_find(this,s) ;
 }
 
 int vecstr::search(cchar *s,vecstr_f vcmp,cchar **rpp) noex {

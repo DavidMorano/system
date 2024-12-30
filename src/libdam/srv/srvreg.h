@@ -1,4 +1,5 @@
 /* srvreg HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 
@@ -85,7 +86,8 @@ struct srvreg_head {
 	SRVREG_FILE	h ;
 	SVCREG_BUF	b ;	/* file buffer */
 	uint		magic ;
-	int		oflags, operm ;
+	int		oflags ;
+	int		operm ;
 	int		pagesize ;
 	int		filesize ;
 	int		fd ;
@@ -96,11 +98,12 @@ struct srvreg_cursor {
 	int		i ;
 } ;
 
-typedef	SRVREG			struct srvreg_head
-typedef	SRVREG_FL		struct srvreg_flags
-typedef	SRVREG_FILE		struct srvreg_filehead
-typedef	SRVREG_BUF		struct srvreg_buffer
-typedef	SRVREG_CUR		struct srvreg_cursor
+typedef	SRVREG			srvreg ;
+typedef	SRVREG_FL		srvreg_fl ;
+typedef	SRVREG_FILE		srvreg_file ;
+typedef	SRVREG_BUF		srvreg_buf ;
+typedef	SRVREG_CUR		srvreg_cur ;
+typedef	SRVREG_ENT		srvreg_ent ;
 
 EXTERNC_begin
 

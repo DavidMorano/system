@@ -1,4 +1,5 @@
 /* srvrege SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
@@ -6,7 +7,6 @@
 /* revision history:
 
 	= 2003-06-25, David A­D­ Morano
-
 	This is a whole rewrite of the marshalling for deadling
 	with MS entries.  The previous stuff (now eradicated !)
 	was too error-prone and inflexible to deal with partial
@@ -32,8 +32,8 @@
 #include	<sys/types.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<inttypes.h>
-#include	<time.h>
+#include	<cinttypes>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -53,6 +53,18 @@
 
 
 /* external subroutines */
+
+
+/* exported variables */
+
+
+/* local structures */
+
+
+/* forward referenes */
+
+
+/* local variables */
 
 
 /* exported variables */

@@ -1,4 +1,5 @@
 /* srvrege HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* machine status entry */

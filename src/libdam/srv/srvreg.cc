@@ -1,4 +1,5 @@
 /* srvreg SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage reading or writing of a server registry file */
@@ -27,7 +28,6 @@
 	or from a server registry file. A server registry file is
 	where (system?) servers register themselves so that clients
 	know how to communicate with them.
-
 
 *******************************************************************************/
 

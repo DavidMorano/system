@@ -828,6 +828,10 @@ int vecobj::del(int ai) noex {
 	return vecobj_del(this,ai) ;
 }
 
+int vecobj::search(cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
+	return vecobj_search(this,ep,vcf,rpp) ;
+}
+
 void vecobj::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecobj",rs,"fini-finish") ;

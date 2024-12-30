@@ -73,6 +73,12 @@ struct vecobj_cursor {
 
 typedef VECOBJ_CUR	vecobj_cur ;
 
+EXTERNC_begin
+
+typedef int (*vecobj_vcf)(cvoid **,cvoid **) noex ;
+
+EXTERNC_end
+
 #ifdef	__cplusplus
 enum vecobjmems {
 	vecobjmem_count,
@@ -114,6 +120,7 @@ struct vecobj : vecobj_head {
 	int get(int,void **) noex ;
 	int getvec(void ***) noex ;
 	int del(int = -1) noex ;
+	int search(cvoid *,vecobj_vcf,void **) noex ;
 	void dtor() noex ;
 	~vecobj() {
 	    dtor() ;

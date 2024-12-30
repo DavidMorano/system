@@ -776,7 +776,6 @@ ucmemla.o:		ucmemla.cc ucmemla.h
 ucpts.o:		ucpts.cc ucpts.h
 
 # other
-nodedb.o:		nodedb.cc	nodedb.h
 expcook.o:		expcook.cc	expcook.h
 keyopt.o:		keyopt.cc	keyopt.h
 utf8decoder.o:		utf8decoder.cc	utf8decoder.h

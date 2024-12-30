@@ -99,14 +99,6 @@
 #define	PARTTYPE_RGX		1
 #define	PARTTYPE_UNKNOWN	2
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #ifndef	CF_REGEX
 #define	CF_REGEX	0		/* stupid UNIX REGEX? (buggy) */
 #endif
@@ -252,7 +244,7 @@ static int	advance(cchar *,cchar *) noex ;
 
 /* local varaibles */
 
-static int	regerrno ;
+static int	regerrno ;		/* TODO - get rid of this stuff! */
 
 constexpr char		gterms[] = { /* BS HT VT FF SP # : */
 	0x00, 0x1B, 0x00, 0x00,
@@ -289,12 +281,12 @@ constexpr bool		f_regex = CF_REGEX ;
 int acctab_open(acctab *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = acctab_ctor(op)) >= 0) {
-	    cint	sz = sizeof(struct acctab_file) ;
+	    cint	sz = szof(ACCTAB_FI) ;
 	    cint	vn = 10 ;
 	    int		vo = VECOBJ_OREUSE ;
 	    op->checktime = getustime ;
 	    if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
-		cint	vsz = sizeof(acctab_ent) ;
+		cint	vsz = szof(acctab_ent) ;
 	        vo = VECOBJ_OSORTED ;
 	        if ((rs = vecobj_start(op->stdalp,vsz,vn,vo)) >= 0) {
 	            vo = VECOBJ_OCOMPACT ;
@@ -363,10 +355,9 @@ int acctab_fileadd(acctab *op,cchar *fname) noex {
 	int		rs1 ;
 	int		fi = 0 ;
 	if ((rs = acctab_magic(op,fname)) >= 0) {
-	    absfn	afo ;
-	    if (cchar *fn{} ; (rs = afo.start(fname,-1,&fn)) >= 0) {
-		ACCTAB_FI	fe ;
-	        if ((rs = file_start(&fe,fn)) >= 0) {
+	    cchar	*fn{} ;
+	    if (absfn afo ; (rs = afo.start(fname,-1,&fn)) >= 0) {
+		if (ACCTAB_FI fe ; (rs = file_start(&fe,fn)) >= 0) {
 		    if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
 		        fi = rs ;
 		        rs = acctab_fileparse(op,fi) ;
@@ -398,14 +389,13 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 	        rs = acctab_filechecks(op,dt) ;
 	    } /* end if (we needed to check) */
 	    if (rs >= 0) {
-	        acctab_ent	ae ;
-	        acctab_ent	*aep ;
-	        vecobj		*slp ;
-	        vecobj_cur	cur ;
-	        void		*vp{} ;
 	        /* load up a fake entry for comparison purposes */
-	        if ((rs = entry_start(&ae)) >= 0) {
+	        if (acctab_ent ae ; (rs = entry_start(&ae)) >= 0) {
 	            if ((rs = entry_tmpload(&ae,ng,ma,un,pw)) >= 0) {
+	        	vecobj_cur	cur ;
+	        	acctab_ent	*aep ;
+	        	vecobj		*slp ;
+	        	void		*vp{} ; /* used in two blocks below */
 		        /* search the STD entries first */
 	                slp = op->stdalp ;
 	                if ((rs = vecobj_curbegin(slp,&cur)) >= 0) {
@@ -425,8 +415,8 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 		        /* search the RGX entries (if necessary) */
 	                if ((rs == rsn) || (! f)) {
 	                    slp = op->rgxalp ;
-			    auto	vll = [slp] (int i,void **vpp) -> int {
-				return vecobj_get(slp,i,vpp) ;
+			    auto vll = [slp] (int i,void **vpp) -> int {
+				return slp->get(i,vpp) ;
 			    } ;
 	                    for (int i = 0 ; (rs1 = vll(i,&vp)) >= 0 ; i += 1) {
 		    		aep = entp(vp) ;

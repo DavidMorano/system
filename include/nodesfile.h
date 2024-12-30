@@ -48,7 +48,7 @@ struct nodesfile_finfo {
 	cchar		*fname ;
 	ino_t		ino ;
 	dev_t		dev ;
-	time_t		mtime ;
+	time_t		timod ;
 	int		oflags ;
 } ;
 

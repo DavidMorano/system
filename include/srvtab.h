@@ -1,4 +1,5 @@
 /* srvtab HEADER */ 
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* perform service table file related functions */
@@ -66,6 +67,7 @@ struct srvtab_entry {
 
 typedef SRVTAB		srvtab ;
 typedef SRVTAB_ENT	srvtab_ent ;
+typedef	SRVTAB_FILE	srvtab_file ;
 
 EXTERNC_begin
 
