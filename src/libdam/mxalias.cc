@@ -60,6 +60,7 @@
 #include	<strwcpy.h>
 #include	<matstr.h>
 #include	<char.h>
+#include	<isnot.h>
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"mxalias.h"
@@ -205,7 +206,7 @@ static int	mxalias_fileadd(MA *,cchar *) noex ;
 static int	mxalias_filereg(MA *,USTAT *,cchar *) noex ;
 static int	mxalias_fileparse(MA *,int) noex ;
 static int	mxalias_fileparser(MA *,int,bfile *) noex ;
-static int	mxalias_fileparseline(MA *,int,BD *,cchar *,int) noex ;
+static int	mxalias_fileparseln(MA *,int,BD *,cchar *,int) noex ;
 static int	mxalias_filedump(MA *,int) noex ;
 static int	mxalias_filedels(MA *) noex ;
 static int	mxalias_filedel(MA *,int) noex ;
@@ -214,9 +215,9 @@ static int	mxalias_mkvals(MA *,MA_CUR *,vecstr *) noex ;
 static int	mxalias_addvals(MA *,vecstr *,vecstr *,cchar *) noex ;
 static int	mxalias_finallocs(MA *) noex ;
 
-static int	mxalias_fileparseline_alias(MA *,int,BD *,field *) noex ;
-static int	mxalias_fileparseline_unalias(MA *,int,BD *,field *) noex ;
-static int	mxalias_fileparseline_source(MA *,int,BD *,field *) noex ;
+static int	mxalias_fileparseln_alias(MA *,int,BD *,field *) noex ;
+static int	mxalias_fileparseln_unalias(MA *,int,BD *,field *) noex ;
+static int	mxalias_fileparseln_source(MA *,int,BD *,field *) noex ;
 
 #ifdef	COMMENT
 static int	mxalias_filealready(MA *,dev_t,ino_t) noex ;
@@ -624,7 +625,7 @@ static int mxalias_filesadd(MA *op,time_t dt) noex {
 	    if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
 	        if_constexpr (f_filesys) {
 	            if (rs >= 0) {
-	                if ((rs = mkpath1(fbuf,MXALIAS_SYSDB)) >= 0) {
+	                if ((rs = mkpath(fbuf,MXALIAS_SYSDB)) >= 0) {
 	                    rs = mxalias_fileadd(op,fbuf) ;
 	                    c += rs ;
 	                }
@@ -647,43 +648,43 @@ static int mxalias_filesadd(MA *op,time_t dt) noex {
 
 /* add a file to the list of files */
 int mxalias_fileadd(MA *op,cchar *atfname) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		c = 0 ;
-	cchar	*np ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (atfname == nullptr) return SR_FAULT ;
-
-	if (op->magic != MXALIAS_MAGIC) return SR_NOTOPEN ;
-
-	if (atfname[0] == '\0') return SR_INVALID ;
-
-	np = (cchar *) atfname ;
-	if (atfname[0] != '/') {
-	    if ((rs = mxalias_userdname(op)) >= 0) {
-	        rs = mkpath2(tmpfname,op->userdname,atfname) ;
-	        np = tmpfname ;
-	    }
-	} /* end if (added PWD) */
-
-	if (rs >= 0) {
-	    USTAT	sb ;
-	    if ((u_stat(np,&sb) >= 0) && isOurFileType(sb.st_mode)) {
-	        if ((rs = mxalias_filereg(op,&sb,np)) >= 0) {
-	            int	fi = rs ;
-	            if (rs < INT_MAX) {
-	                if ((rs = mxalias_fileparse(op,fi)) >= 0) {
-	                    c = rs ;
-	                }
-	            } /* end if (needed registration) */
-	            if (rs < 0) {
-	                mxalias_filedel(op,fi) ;
-		    }
-	        } /* end if (filereg) */
-	    } /* end if (our file type) */
-	} /* end if (ok) */
-
+	if ((rs = mxalias_magic(op,atfname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (atfname[0]) {
+	        cchar	*fn = atfname ;
+	        char	*tbuf = nullptr ;
+	        if (atfname[0] != '/') {
+	            if ((rs = mxalias_userdname(op)) >= 0) {
+	                rs = mkpath(tbuf,op->userdname,atfname) ;
+	                fn = tbuf ;
+	            }
+	        } /* end if (added PWD) */
+	        if (rs >= 0) {
+	            if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+		        if (isOurFileType(sb.st_mode)) {
+	                    if ((rs = mxalias_filereg(op,&sb,fn)) >= 0) {
+	                        cint	fi = rs ;
+	                        if (rs < INT_MAX) {
+	                            if ((rs = mxalias_fileparse(op,fi)) >= 0) {
+	                                c = rs ;
+	                            }
+	                        } /* end if (needed registration) */
+	                        if (rs < 0) {
+	                            mxalias_filedel(op,fi) ;
+		                }
+	                    } /* end if (mxalias_filereg) */
+		        } /* end if (allowed file-type) */
+	            } else if (isNotPresent(rs)) {
+		        rs = SR_OK ;
+	            } /* end if (our file type) */
+	        } /* end if (ok) */
+		if (tbuf) {
+		    rs = rsfree(rs,tbuf) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mxalias_fileadd) */
@@ -800,40 +801,23 @@ static int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (BD bd ; (rs = bufdesc_start(&bd,llen)) >= 0) {
-	    int		len ;
-	    int		cl ;
-	    bool	f_bol = true ;
-	    bool	f_eol ;
-	    cchar	*cp ;
 	    char	*lbuf = bd.lbuf ;
-
 	    while ((rs = breadln(lfp,lbuf,llen)) > 0) {
-	        len = rs ;
-
-	        f_eol = (lbuf[len - 1] == '\n') ;
-	        if (f_eol) len -= 1 ;
-	        lbuf[len] = '\0' ;
-
-	        if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
-	            if (f_bol && (*cp != '#')) {
-	                rs = mxalias_fileparseline(op,fi,&bd,cp,cl) ;
-	                c += rs ;
-	            }
+	        cchar	*cp{} ;
+		if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+	             rs = mxalias_fileparseln(op,fi,&bd,cp,cl) ;
+	             c += rs ;
 	        }
-
-	        f_bol = f_eol ;
 	        if (rs < 0) break ;
 	    } /* end while (reading extended lines) */
-
 	    rs1 = bufdesc_finish(&bd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bufdesc) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mxalias_fileparser) */
 
-static int mxalias_fileparseline(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
+static int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -844,15 +828,15 @@ static int mxalias_fileparseline(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	            switch (ki) {
 	            case keyword_alias:
 	            case keyword_group:
-	                rs = mxalias_fileparseline_alias(op,fi,bdp,&fsb) ;
+	                rs = mxalias_fileparseln_alias(op,fi,bdp,&fsb) ;
 	                c += rs ;
 	                break ;
 	            case keyword_unalias:
 	            case keyword_ungroup:
-	                rs = mxalias_fileparseline_unalias(op,fi,bdp,&fsb) ;
+	                rs = mxalias_fileparseln_unalias(op,fi,bdp,&fsb) ;
 	                break ;
 	            case keyword_source:
-	                rs = mxalias_fileparseline_source(op,fi,bdp,&fsb) ;
+	                rs = mxalias_fileparseln_source(op,fi,bdp,&fsb) ;
 	                c += rs ;
 	                break ;
 	            } /* end switch */
@@ -863,10 +847,9 @@ static int mxalias_fileparseline(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	} /* end if (field) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (mxalias_fileparseline) */
+/* end subroutine (mxalias_fileparseln) */
 
-static int mxalias_fileparseline_alias(MA *op,int fi,BD *bdp,
-		field *fsbp) noex {
+static int mxalias_fileparseln_alias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint	flen = bdp->flen ;
 	cint	klen = bdp->klen ;
 	int		rs = SR_OK ;
@@ -874,10 +857,10 @@ static int mxalias_fileparseline_alias(MA *op,int fi,BD *bdp,
 	int		c_field = 0 ;
 	int		c = 0 ;
 	cchar	*fp ;
-	char		*keybuf = bdp->kbuf ;
+	char		*kbuf = bdp->kbuf ;
 	char		*fbuf = bdp->fbuf ;
 	(void) fi ;
-	keybuf[0] = '\0' ;
+	kbuf[0] = '\0' ;
 	while (rs >= 0) {
 
 	    fp = fbuf ;
@@ -887,26 +870,25 @@ static int mxalias_fileparseline_alias(MA *op,int fi,BD *bdp,
 	        break ;
 
 	    if (c_field++ == 0) {
-	        strwcpy(keybuf,fp,MIN(fl,klen)) ;
-	    } else if (keybuf[0] != '\0') {
+	        strwcpy(kbuf,fp,MIN(fl,klen)) ;
+	    } else if (kbuf[0] != '\0') {
 	        c += 1 ;
-	        rs = keyvals_add(op->elp,fi,keybuf,fp,fl) ;
+	        rs = keyvals_add(op->elp,fi,kbuf,fp,fl) ;
 	    } /* end if (handling record) */
 
 	    if (fsbp->term == '#') break ;
 	} /* end while (fields) */
 
-	if ((rs >= 0) && (c == 0) && (keybuf[0] != '\0')) {
+	if ((rs >= 0) && (c == 0) && (kbuf[0] != '\0')) {
 	    c += 1 ;
-	    rs = keyvals_add(op->elp,fi,keybuf,fbuf,0) ;
+	    rs = keyvals_add(op->elp,fi,kbuf,fbuf,0) ;
 	}
 
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (mxalias_fileparseline_alias) */
+/* end subroutine (mxalias_fileparseln_alias) */
 
-static int mxalias_fileparseline_unalias(MA *op,int fi,BD *bdp,	
-		field *fsbp) noex {
+static int mxalias_fileparseln_unalias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
 	int		rs = SR_OK ;
 	int		fl ;
@@ -917,11 +899,9 @@ static int mxalias_fileparseline_unalias(MA *op,int fi,BD *bdp,
 	}
 	return rs ;
 }
-/* end subroutine (mxalias_fileparseline_unalias) */
+/* end subroutine (mxalias_fileparseln_unalias) */
 
-/* ARGSUSED */
-static int mxalias_fileparseline_source(MA *op,int fi,BD *bdp,
-		field *fsbp) noex {
+static int mxalias_fileparseln_source(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
 	int		rs ;
 	int		c = 0 ;
@@ -933,7 +913,7 @@ static int mxalias_fileparseline_source(MA *op,int fi,BD *bdp,
 	}
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (mxalias_fileparseline_source) */
+/* end subroutine (mxalias_fileparseln_source) */
 
 static int mxalias_filedump(MA *op,int fi) noex {
 	int		rs = SR_OK ;
@@ -1017,7 +997,7 @@ static int mxalias_fileold(MA *op,time_t daytime) noex {
 	            cchar	*cp = charp(op->aprofile[i]) ;
 	            if (*cp != '/') {
 	                cp = tbuf ;
-	                mkpath2(tbuf,op->pr,op->aprofile[i]) ;
+	                mkpath(tbuf,op->pr,op->aprofile[i]) ;
 	            }
 	            rs1 = u_stat(cp,&sb) ;
 	            if ((rs1 >= 0) && (sb.st_mtime > op->fi.timod)) break ;
@@ -1037,7 +1017,7 @@ static int mxalias_mkuserfname(MA *op,char *fname) noex {
 	fname[0] = '\0' ;
 	if ((rs = mxalias_userdname(op)) >= 0) {
 	    cchar	*homedname = op->userdname ;
-	    rs = mkpath2(fname,homedname,MXALIAS_USERDB) ;
+	    rs = mkpath(fname,homedname,MXALIAS_USERDB) ;
 	}
 	return rs ;
 }
@@ -1049,11 +1029,12 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 	int		c = 0 ;
 	if (kp[0] != '\0') {
 	    keyvals_cur	kcur ;
+	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = keyvals_curbegin(op->elp,&kcur)) >= 0) {
 	        while (rs >= 0) {
 	            cchar *vp{} ;
 	            int	vl = keyvals_fetch(op->elp,kp,&kcur,&vp) ;
-	            if (vl == SR_NOTFOUND) break ;
+	            if (vl == rsn) break ;
 	            rs = vl ;
 	            c += 1 ;
 	            if ((rs >= 0) && (vl > 0)) {
@@ -1061,10 +1042,13 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 	                f = f && (strncmp(kp,vp,vl) == 0) ;
 	                f = f && (kp[vl] == '\0') ;
 	                if (! f) {
-	                    rs1 = vecstr_findn(klp,vp,vl) ;
-	                    f = (rs1 >= 0) ;
+	                    if ((rs = vecstr_findn(klp,vp,vl)) >= 0) {
+	                        f = true ;
+			    } else if (rs == rsn) {
+				rs = SR_OK ;
+			    }
 	                }
-	                if (! f) {
+	                if ((rs >= 0) && (! f)) {
 	                    rs = vecstr_adduniq(vlp,vp,vl) ;
 			}
 	            } /* end if (substantive value) */
@@ -1155,7 +1139,6 @@ static int mxalias_finents(MA *op) noex {
 }
 /* end subroutine (mxalias_finents) */
 
-/* ARGSUSED */
 static int file_start(MA_FI *fep,USTAT *sbp,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && sbp && fname) {
