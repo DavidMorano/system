@@ -1005,6 +1005,10 @@ int vecstr::find(cchar *s) noex {
     	return vecstr_find(this,s) ;
 }
 
+int vecstr::findn(cchar *sp,int sl) noex {
+    	return vecstr_findn(this,sp,sl) ;
+}
+
 int vecstr::search(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
 	return vecstr_search(this,s,vcmp,rpp) ;
 }

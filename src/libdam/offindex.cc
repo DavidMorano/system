@@ -118,7 +118,10 @@ static inline int offindex_magic(offindex *op,Args ... args) noex {
 }
 /* end subroutine (offindex_magic) */
 
-static int vecmp(cvoid **,cvoid **) noex ;
+extern "C" {
+    static int vecmp(cvoid **,cvoid **) noex ;
+}
+
 static int ecmpe(OI_E *,OI_E *) noex ;
 
 
@@ -134,7 +137,7 @@ int offindex_start(offindex *op,int vn) noex {
 	int		rs ;
 	if (vn < NDEF) vn = NDEF ;
 	if ((rs = offindex_ctor(op)) >= 0) {
-	    cint	vsz = sizeof(OI_E) ;
+	    cint	vsz = szof(OI_E) ;
 	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(op->oip,vsz,vn,vo)) >= 0) {
 	        op->magic = OFFINDEX_MAGIC ;
@@ -182,7 +185,6 @@ int offindex_lookup(offindex *op,off_t off) noex {
 	int		len = 0 ;
 	if ((rs = offindex_magic(op)) >= 0) {
 	    OI_E	key ;
-	    void	*vp{} ;
 	    rs = SR_NOSYS ;
 	    if (! op->f.setsorted) {
 	        op->f.setsorted = true ;
@@ -190,6 +192,7 @@ int offindex_lookup(offindex *op,off_t off) noex {
 	    }
 	    key.lineoff = off ;
 	    key.linelen = 0 ;
+	    void	*vp{} ;
 	    if ((rs = vecobj_search(op->oip,&key,vecmp,&vp)) >= 0) {
 	        rs = SR_BADFMT ;
 	        if (vp) {

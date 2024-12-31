@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int dbi_ctor(dbi *op,Args ... args) noex {
+static int mxalias_ctor(mxalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int dbi_ctor(dbi *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dbi_ctor) */
+/* end subroutine (mxalias_ctor) */
 
-static int dbi_dtor(dbi *op) noex {
+static int mxalias_dtor(mxalias *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dbi_dtor) */
+/* end subroutine (mxalias_dtor) */
 
 template<typename ... Args>
-static inline int dbi_magic(dbi *op,Args ... args) noex {
+static inline int mxalias_magic(mxalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DBI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MXALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (dbi_magic) */
+/* end subroutine (mxalias_magic) */

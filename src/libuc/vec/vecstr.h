@@ -178,6 +178,7 @@ struct vecstr : vecstr_head {
 	int envset(cchar *,cchar *,int = -1) noex ;
 	int envfile(cchar *) noex ;
 	int find(cchar *) noex ;
+	int findn(cchar *,int = -1) noex ;
 	int search(cchar *,vecstr_f,cchar ** = nullptr) noex ;
 	int finder(cchar *,vecstr_f,cchar ** = nullptr) noex ;
 	int del(int = -1) noex ;

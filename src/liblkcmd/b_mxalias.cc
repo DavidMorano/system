@@ -1267,37 +1267,34 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 	}
 
 	if (rs >= 0) {
-	    MXALIAS_CUR	cur ;
+	    mxalias		*mxp = &lip->madb ;
+	    mxalias_cur		cur ;
 	    if ((rs = mxalias_curbegin(&lip->madb,&cur)) >= 0) {
-
 	        if ((rs = mxalias_lookup(&lip->madb,&cur,np,nl)) > 0) {
-	            const int	vlen = VBUFLEN ;
+	            cint	vlen = VBUFLEN ;
 	            int		vl ;
 	            char	vbuf[VBUFLEN + 1] ;
-
 	            while (rs >= 0) {
-	                vl = mxalias_read(&lip->madb,&cur,vbuf,vlen) ;
+	                vl = mxalias_curread(mxp,&cur,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                rs = vl ;
-
 	                if (rs >= 0) {
 	                    c += 1 ;
 	                    if (lip->f.addr) {
 	                        rs = locinfo_outadd(lip,vbuf,vl) ;
-	                    } else
+	                    } else {
 	                        rs = procvalprint(pip,ofp,vbuf,vl) ;
+			    }
 	                } /* end if (ok) */
-
 	            } /* end while */
-
 	        } else if (((rs == 0) || (rs == SR_NOTFOUND)) &&
 	            lip->f.unresolved && lip->f.addr) {
 
 	            rs = locinfo_outadd(lip,np,nl) ;
 
-	        } else if (rs == SR_NOTFOUND)
+	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
-
+		}
 	        rs1 = mxalias_curend(&lip->madb,&cur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
@@ -1324,33 +1321,26 @@ static int procmxdump(PROGINFO *pip,cchar dfname[])
 	    dfname = STDFNOUT ;
 
 	if ((rs = shio_open(dfp,dfname,"rwct",0666)) >= 0) {
-	    MXALIAS_CUR	cur ;
-
-/* dump the database */
-
+	    mxalias		*mxp = &lip->madb ;
+	    mxalias_cur		cur ;
+	    /* dump the database */
 	    if ((rs = mxalias_curbegin(&lip->madb,&cur)) >= 0) {
-	        const int	klen = KBUFLEN ;
-	        const int	vlen = VBUFLEN ;
-	        char		kbuf[KBUFLEN + 1] ;
-	        char		vbuf[VBUFLEN + 1] ;
-
+	        cint	klen = KBUFLEN ;
+	        cint	vlen = VBUFLEN ;
+	        char	kbuf[KBUFLEN + 1] ;
+	        char	vbuf[VBUFLEN + 1] ;
 	        while (rs >= 0) {
-
-	            rs1 = mxalias_enum(&lip->madb,&cur,kbuf,klen,vbuf,vlen) ;
+	            rs1 = mxalias_curenum(maxp,&cur,kbuf,klen,vbuf,vlen) ;
 	            if (rs1 == SR_NOTFOUND) break ;
 	            rs = rs1 ;
-
 	            if (rs >= 0) {
 	                c += 1 ;
 	                rs = procmxprint(pip,dfp,kbuf,vbuf) ;
 	            }
-
 	        } /* end while */
-
 	        rs1 = mxalias_curend(&lip->madb,&cur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
-
 	    rs1 = shio_close(dfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dump-file) */
@@ -1359,11 +1349,9 @@ static int procmxdump(PROGINFO *pip,cchar dfname[])
 }
 /* end subroutine (procmxdump) */
 
-
 /* print out a "dump" mail-alias entry */
-static int procmxprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf)
-{
-	const int	ch = MKCHAR(vbuf[0]) ;
+static int procmxprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf) noex {
+	cint		ch = MKCHAR(vbuf[0]) ;
 	int		rs ;
 	int		klen ;
 	int		blen ;

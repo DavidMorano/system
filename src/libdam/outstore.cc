@@ -64,6 +64,18 @@ using std::nothrow ;			/* constant */
 /* exported variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int outstore_start(outstore *op) noex {

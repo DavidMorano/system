@@ -67,6 +67,8 @@
 #define	CLUSTERFNAME	"etc/cluster"
 #endif
 
+#define	EBUFMULT	3		/* entry-buffer multiplier */
+
 
 /* local namespaces */
 
@@ -86,6 +88,14 @@ using std::nothrow ;			/* constant */
 
 
 /* local structures */
+
+namespace {
+    struct vars {
+	int		nodenamelen ;
+	int		elen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -143,9 +153,13 @@ static int dbi_nodebegin(dbi *,ids *,cchar *) noex ;
 static int dbi_nodeend(dbi *) noex ;
 static int dbi_clusterbegin(dbi *,ids *,cchar *) noex ;
 static int dbi_clusterend(dbi *) noex ;
+static int dbi_trynodes(dbi *,vecstr *,cc *) noex ;
+static int dbi_tryclusters(dbi *,vecstr *,cc *) noex ;
 
 
 /* local variables */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -159,18 +173,21 @@ int dbi_open(dbi *op,cchar *pr) noex {
 	if ((rs = dbi_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
-	        if (ids id ; (rs = id.load) >= 0) {
-	            if ((rs = dbi_nodebegin(op,&id,pr)) >= 0) {
-	                if ((rs = dbi_clusterbegin(op,&id,pr)) >= 0) {
-			    op->magic = DBI_MAGIC ;
-			}
-	                if (rs < 0) {
-	                    dbi_nodeend(op) ;
-		        }
-	            } /* end if (node-db) */
-	            rs1 = id.release ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (ids) */
+		static cint	rsv = var ;
+		if ((rs = rsv) >= 0) {
+	            if (ids id ; (rs = id.load) >= 0) {
+	                if ((rs = dbi_nodebegin(op,&id,pr)) >= 0) {
+	                    if ((rs = dbi_clusterbegin(op,&id,pr)) >= 0) {
+			        op->magic = DBI_MAGIC ;
+			    }
+	                    if (rs < 0) {
+	                        dbi_nodeend(op) ;
+		            }
+	                } /* end if (node-db) */
+	                rs1 = id.release ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (ids) */
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		dbi_dtor(op) ;
@@ -202,130 +219,59 @@ int dbi_close(dbi *op) noex {
 }
 /* end subroutine (dbi_close) */
 
-int dbi_getclusters(dbi *op,vecstr *slp,cchar *nodename) noex {
-	cint	nrs = SR_NOTFOUND ;
-	int		rs = SR_OK ;
-	int		rs1 ;
+int dbi_getclusters(dbi *op,vecstr *slp,cchar *nn) noex {
+	int		rs ;
 	int		c = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (slp == NULL) return SR_FAULT ;
-	if (nodename == NULL) return SR_FAULT ;
-
-	if (nodename[0] == '\0') return SR_INVALID ;
-
-	if (op->fl.node) {
-	    nodedb	*nop = op->nlp ;
-	    nodedb_cur	cur ;
-	    nodedb_ent	ste ;
-
-	    if ((rs = nodedb_curbegin(nop,&cur)) >= 0) {
-	        cint		elen = NODEDB_ENTLEN ;
-	        char		ebuf[NODEDB_ENTLEN + 1] ;
-
-	        while (rs >= 0) {
-
-	            rs1 = nodedb_fetch(nop,nodename,&cur,&ste,ebuf,elen) ;
-	            if (rs1 == nrs) break ;
-	            rs = rs1 ;
-
-	            if (rs >= 0) {
-	                if ((ste.clu != NULL) && (ste.clu[0] != '\0')) {
-
-	                    if ((rs = vecstr_find(slp,ste.clu)) == nrs) {
-	                        c += 1 ;
-	                        rs = vecstr_add(slp,ste.clu,-1) ;
-	                    }
-
-	                } /* end if (got one) */
-	            } /* end if (ok) */
-
-	        } /* end while (looping through node-db entries) */
-
-	        rs1 = nodedb_curend(nop,&cur) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-
-	} /* end if (DB lookup) */
-	/* try the CLUSTER table if we have one */
-	if ((rs >= 0) && op->fl.clu) {
-	    clusterdb		*cop = op->clp ;
-	    clusterdb_cur	cur ;
-
-	    if ((rs = clusterdb_curbegin(cop,&cur)) >= 0) {
-	        cint	clen = NODENAMELEN ;
-	        char		cbuf[NODENAMELEN + 1] ;
-
-	        while (rs >= 0) {
-	            rs1 = clusterdb_curfetchrev(cop,nodename,&cur,cbuf,clen) ;
-	            if (rs1 == nrs) break ;
-	            rs = rs1 ;
-
-	            if (rs >= 0) {
-	                if ((rs = vecstr_find(slp,cbuf)) == nrs) {
-	                    c += 1 ;
-	                    rs = vecstr_add(slp,cbuf,-1) ;
-	                }
-	            } /* end if (ok) */
-
-	        } /* end while (reverse fetch) */
-
-	        rs1 = clusterdb_curend(cop,&cur) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (cluster-cursor) */
-
-	} /* end if */
-
+	if ((rs = dbi_magic(op,slp,nn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (nn[0]) {
+		if ((rs = dbi_trynodes(op,slp,nn)) >= 0) {
+		    c += rs ;
+		    if ((rs = dbi_tryclusters(op,slp,nn)) >= 0) {
+			c += rs ;
+		    }
+		}
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (dbi_getclusters) */
 
 int dbi_getnodes(dbi *op,vecstr *clp,vecstr *nlp) noex {
-	clusterdb	*cop ;
-	clusterdb_cur	cc ;
-	cint	clen = NODENAMELEN ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-	int		cl ;
 	int		c = 0 ;
-	cchar	*cp ;
-	char		cbuf[NODENAMELEN + 1] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (clp == NULL) return SR_FAULT ;
-	if (nlp == NULL) return SR_FAULT ;
-
-	cop = op->clp ;
-	for (i = 0 ; vecstr_get(clp,i,&cp) >= 0 ; i += 1) {
-	    if (cp != NULL) {
-
-	        if ((rs = clusterdb_curbegin(cop,&cc)) >= 0) {
-	            cint	nrs = SR_NOTFOUND ;
-
-	            while (rs >= 0) {
-
-	                cl = clusterdb_curfetch(cop,cp,&cc,cbuf,clen) ;
-	                if (cl == SR_NOTFOUND) break ;
-	                rs = cl ;
-
-	                if (rs >= 0) {
-	                    if ((rs = vecstr_findn(nlp,cbuf,cl)) == nrs) {
-	                        c += 1 ;
-	                        rs = vecstr_add(nlp,cbuf,cl) ;
-	                    }
-	                } /* end if (ok) */
-
-	            } /* end while (looping through cluster entries) */
-
-	            rs1 = clusterdb_curend(cop,&cc) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (clusterdb-cursor) */
-
-	    }
-	    if (rs < 0) break ;
-	} /* end for */
-
+	if ((rs = dbi_magic(op,clp,nlp)) >= 0) {
+	    if (char *cbuf{} ; (rs = malloc_nn(&cbuf)) >= 0) {
+		clusterdb	*cop = op->clp ;
+		cint		clen = rs ;
+		int		cl ;
+		cchar		*cp{} ;
+	        for (int i = 0 ; clp->get(i,&cp) >= 0 ; i += 1) {
+	            if (cp) {
+		        clusterdb_cur	cur ;
+	                if ((rs = clusterdb_curbegin(cop,&cur)) >= 0) {
+	                    cint	rsn = SR_NOTFOUND ;
+	                    while (rs >= 0) {
+	                        cl = clusterdb_curfetch(cop,cp,&cur,cbuf,clen) ;
+	                        if (cl == SR_NOTFOUND) break ;
+	                        rs = cl ;
+	                        if (rs >= 0) {
+	                            if ((rs = nlp->findn(cbuf,cl)) == rsn) {
+	                                c += 1 ;
+	                                rs = nlp->add(cbuf,cl) ;
+	                            }
+	                        } /* end if (ok) */
+	                    } /* end while (looping through cluster entries) */
+	                    rs1 = clusterdb_curend(cop,&cur) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (clusterdb-cursor) */
+	            }
+	            if (rs < 0) break ;
+	        } /* end for */
+		rs = rsfree(rs,cbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (dbi_getnodes) */
@@ -404,5 +350,82 @@ static int dbi_clusterend(dbi *op) noex {
 	return rs ;
 }
 /* end subroutine (dbi_clusterend) */
+
+static int dbi_trynodes(dbi *op,vecstr *slp,cc *nn) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (op->fl.node) {
+	    cint	elen = var.elen ;
+	    if (char *ebuf{} ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
+	        nodedb		*nop = op->nlp ;
+	        nodedb_cur	cur ;
+	        if ((rs = nodedb_curbegin(nop,&cur)) >= 0) {
+	    	    nodedb_ent	ste ;
+	            while (rs >= 0) {
+	                rs1 = nodedb_fetch(nop,nn,&cur,&ste,ebuf,elen) ;
+	                if (rs1 == rsn) break ;
+	                rs = rs1 ;
+	                if (rs >= 0) {
+	                    if (ste.clu && (ste.clu[0] != '\0')) {
+	                        if ((rs = slp->find(ste.clu)) == rsn) {
+	                            c += 1 ;
+	                            rs = slp->add(ste.clu) ;
+	                        }
+	                    } /* end if (got one) */
+	                } /* end if (ok) */
+	            } /* end while (looping through node-db entries) */
+	            rs1 = nodedb_curend(nop,&cur) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (cursor) */
+		rs = rsfree(rs,ebuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (DB lookup) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (dbi_trynodes) */
+
+static int dbi_tryclusters(dbi *op,vecstr *slp,cc *nn) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (op->fl.clu) {
+	    if (char *cbuf{} ; (rs = malloc_nn(&cbuf)) >= 0) {
+	        clusterdb	*cop = op->clp ;
+	    	cint		clen = rs ;
+	        clusterdb_cur	cur ; 
+		if ((rs = clusterdb_curbegin(cop,&cur)) >= 0) {
+	            while (rs >= 0) {
+	                rs1 = clusterdb_curfetchrev(cop,nn,&cur,cbuf,clen) ;
+	                if (rs1 == rsn) break ;
+	                rs = rs1 ;
+	                if (rs >= 0) {
+	                    if ((rs = slp->find(cbuf)) == rsn) {
+	                        c += 1 ;
+	                        rs = slp->add(cbuf) ;
+	                    }
+	                } /* end if (ok) */
+	            } /* end while (reverse fetch) */
+	            rs1 = clusterdb_curend(cop,&cur) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (cluster-cursor) */
+		rs = rsfree(rs,cbuf) ;
+	    } /* end if (m-a-f) */
+	} /* end if (have cluster-DB) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (dbi_tryclusters) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    nodenamelen = rs ;
+	    elen = (rs * EBUFMULT) ;
+	}
+    	return rs ;
+}
+/* end method (vars::operator) */
 
 

@@ -329,7 +329,7 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 /* private subroutines */
 
 static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
-	cint		sz = sizeof(dirdb_ent) ;
+	cint		sz = szof(dirdb_ent) ;
 	int		rs ;
 	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	    dirdb_ent	*ep = entp(vp) ;
@@ -339,7 +339,7 @@ static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
 		    hdb_dat	val ;
 	            int		dbi = rs ;
 	            key.buf = &ep->fid ;
-	            key.len = sizeof(dirdb_fid) ;
+	            key.len = szof(dirdb_fid) ;
 	            val.buf = ep ;
 	            val.len = sz ;
 	            if ((rs = hdb_store(op->dbp,key,val)) >= 0) {
@@ -396,7 +396,7 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	            fid.ino = sb.st_ino ;
 	            fid.dev = sb.st_dev ;
 	            key.buf = &fid ;
-	            key.len = sizeof(dirdb_fid) ;
+	            key.len = szof(dirdb_fid) ;
 	            if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
 		        f = true ;
 	            } else if (rs == SR_NOTFOUND) {
@@ -449,7 +449,7 @@ static int entry_finish(dirdb_ent *ep) noex {
 static int cmpstat(const USTAT *e1p,const USTAT *e2p) noex {
 	int		rc = (e1p->st_ino - e2p->st_ino) ;
 	if (rc == 0) {
-	    rc = (e1p->st_dev - e2p->st_dev)
+	    rc = (e1p->st_dev - e2p->st_dev) ;
 	}
 	return rc ;
 }

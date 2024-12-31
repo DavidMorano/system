@@ -11,23 +11,23 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<usystem.h>		/* for 'ino_t' */
+#include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<keyvals.h>
 #include	<localmisc.h>
 
 
 #define	MXALIAS		struct mxalias_head
+#define	MXALIAS_FL	struct mxalias_flags
 #define	MXALIAS_CUR	struct mxalias_cursor
 #define	MXALIAS_MAGIC	0x23456112
 
 
 struct mxalias_cursor {
-	uint		magic ;
 	char		*vbuf ;
 	char		**vals ;
 	KEYVALS_CUR	*kvcp ;
+	uint		magic ;
 	int		nvals ;
 	int		i ;
 } ;
@@ -42,40 +42,35 @@ struct mxalias_head {
 	cchar		*username ;
 	cchar		*userdname ;
 	cchar		*pwd ;
-	vecobj		files ;
-	KEYVALS		entries ;
-	struct mxalias_flags	f ;
+	vecobj		*flp ;
+	keyvals		*elp ;
 	time_t		ti_access ;
 	time_t		ti_check ;
+	MXALIAS_FL	f ;
 	uint		magic ;
 	int		ncursors ;
 	int		count ;
 } ;
 
+typedef	MXALIAS		mxalias ;
+typedef	MXALIAS_FL	mxalias_fl ;
+typedef	MXALIAS_CUR	mxalias_cur ;
 
-#if	(! defined(MXALIAS_MASTER)) || (MXALIAS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	mxalias_open(mxalias *,cchar *,cchar *) noex ;
+extern int	mxalias_count(mxalias *) noex ;
+extern int	mxalias_curbegin(mxalias *,mxalias_cur *) noex ;
+extern int	mxalias_curlook(mxalias *,mxalias_cur *,cchar *,int) noex ;
+extern int	mxalias_curread(mxalias *,mxalias_cur *,char *,int) noex ;
+extern int	mxalias_curenum(mxalias *,mxalias_cur *,
+			char *,int,char *,int) noex ;
+extern int	mxalias_curend(mxalias *,mxalias_cur *) noex ;
+extern int	mxalias_audit(mxalias *) noex ;
+extern int	mxalias_close(mxalias *) noex ;
 
-extern int	mxalias_open(MXALIAS *,cchar *,cchar *) ;
-extern int	mxalias_count(MXALIAS *) ;
-extern int	mxalias_curbegin(MXALIAS *,MXALIAS_CUR *) ;
-extern int	mxalias_lookup(MXALIAS *,MXALIAS_CUR *,
-			cchar *,int) ;
-extern int	mxalias_read(MXALIAS *,MXALIAS_CUR *,char *,int) ;
-extern int	mxalias_enum(MXALIAS *,MXALIAS_CUR *,
-			char *,int,char *,int) ;
-extern int	mxalias_curend(MXALIAS *,MXALIAS_CUR *) ;
-extern int	mxalias_audit(MXALIAS *) ;
-extern int	mxalias_close(MXALIAS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MXALIAS_MASTER */
 
 #endif /* MXALIAS_INCLUDE */
 

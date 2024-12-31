@@ -733,6 +733,8 @@ dayofmonth.o:		dayofmonth.cc dayofmonth.h
 netfile.o:		netfile.cc netfile.h
 calmgr.o:		calmgr.cc calmgr.h
 cvtdater.o:		cvtdater.cc cvtdater.h
+dbi.o:			dbi.cc dbi.h
+dirdb.o:		dirdb.cc dirdb.h
 
 textlook.o:		textlook.cc textlook.h
 searchkeys.o:		searchkeys.cc searchkeys.h
@@ -858,5 +860,6 @@ ismatstar.o:		ismatstar.cc ismatstar.h
 findxfile.o:		findxfile.cc findxfile.h
 getostype.o:		getostype.cc getostype.h
 deprecated.o:		deprecated.cc
+getclusters.o:		getclusters.cc getclusters.h
 
 

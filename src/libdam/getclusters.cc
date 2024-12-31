@@ -97,14 +97,24 @@ namespace {
 	int		elen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
+    struct geter {
+	cchar		*pr ;
+	cchar		*nn ;
+	vecstr		*slp ;
+	char		*a ;
+	char		*tbuf ;
+	char		*ebuf ;
+	int		tlen ;
+	int		elen ;
+	geter(cc *p,vecstr *s,cc *n) noex : pr(p), nn(n), slp(s) { } ;
+	operator int () noex ;
+	int ndb() noex ;
+	int cdb() noex ;
+    } ; /* end struct (geter) */
 }
 
 
 /* forward references */
-
-static int getclusters_ndb(cchar *,vecstr *,cchar *) noex ;
-static int getclusters_ndbs(char *,cc *,vecstr *,cc *) noex ;
-static int getclusters_cdb(cchar *,vecstr *,cchar *) noex ;
 
 
 /* local variables */
@@ -125,12 +135,9 @@ int getclusters(cchar *pr,vecstr *slp,cchar *nn) noex {
 	    if (pr[0] && nn[0]) {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
-	            if ((rs = getclusters_ndb(pr,slp,nn)) >= 0) {
-	                c += rs ;
-	                if ((rs = getclusters_cdb(pr,slp,nn)) >= 0) {
-		            c += rs ;
-	                }
-	            }
+		    geter go(pr,slp,nn) ;
+		    rs = go ;
+		    c = rs ;
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -141,31 +148,36 @@ int getclusters(cchar *pr,vecstr *slp,cchar *nn) noex {
 
 /* local subroutines */
 
-static int getclusters_ndb(cchar *pr,vecstr *slp,cchar *nn) noex {
+geter::operator int () noex {
     	cint		sz = (var.maxpathlen + 2 + var.elen) ;
-	int		rs ;
+    	int		rs ;
 	int		c = 0 ;
-	if (char *tbuf{} ; (rs = uc_malloc(sz,&tbuf)) >= 0) {
-	    char	*ebuf = (tbuf + (var.maxpathlen + 1)) ;
-	    if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
-		rs = getclusters_ndbs(ebuf,tbuf,slp,nn) ;
-		c = rs ;
+	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    tlen = var.maxpathlen ;
+	    tbuf = a ;
+	    elen = var.elen ;
+	    ebuf = (a + (var.maxpathlen + 1)) ;
+	    if ((rs = ndb()) >= 0) {
+		c += rs ;
+		if ((rs = cdb()) >= 0) {
+		    c += rs ;
+		}
 	    }
-	    rs = rsfree(rs,tbuf) ;
+	    rs = rsfree(rs,a) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (getclusters_ndb) */
+/* end method (geter::operator) */
 
-static int getclusters_ndbs(char *ebuf,cc *fn,vecstr *slp,cc *nn) noex {
+int geter::ndb() noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (nodedb st ; (rs = nodedb_open(&st,fn)) >= 0) {
-	    if (nodedb_cur cur ; (rs = nodedb_curbegin(&st,&cur)) >= 0) {
+	if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
+	    if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
+	        if (nodedb_cur cur ; (rs = nodedb_curbegin(&st,&cur)) >= 0) {
 	    	    nodedb_ent	ste ;
 		    cint	nrs = SR_NOTFOUND ;
-	            cint	elen = var.elen ;
 	            while (rs >= 0) {
 	                rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
 	                if (rs1 == nrs) break ;
@@ -184,33 +196,30 @@ static int getclusters_ndbs(char *ebuf,cc *fn,vecstr *slp,cc *nn) noex {
 		} /* end if (nodedb-cursor) */
 	        rs1 = nodedb_close(&st) ;
 		if (rs >= 0) rs = rs1 ;
-	} else if (isNotPresent(rs)) {
-	    rs = SR_OK ;
-	}
+	    } else if (isNotPresent(rs)) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (mkpath) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (getclusters_ndbs) */
+/* end method (geter::ndb) */
 
-static int getclusters_cdb(cchar *pr,vecstr *slp,cchar *nn) noex {
+int geter::cdb() noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		tbuf[MAXPATHLEN+1] ;
-
-	if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
+	if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
 	    if (clusterdb clu ; (rs = clusterdb_open(&clu,tbuf)) >= 0) {
 	        if (cdb_cur cur{} ; (rs = clusterdb_curbegin(&clu,&cur)) >= 0) {
 		    cint	nrs = SR_NOTFOUND ;
-		    cint	clen = NODENAMELEN ;
-	            char	cbuf[NODENAMELEN+ 1] ;
 	            while (rs >= 0) {
-	                rs1 = clusterdb_curfetchrev(&clu,nn,&cur,cbuf,clen) ;
+	                rs1 = clusterdb_curfetchrev(&clu,nn,&cur,ebuf,elen) ;
 	                if (rs1 == nrs) break ;
 			rs = rs1 ;
 			if (rs >= 0) {
-	            	    if ((rs = slp->find(cbuf)) == nrs) {
+	            	    if ((rs = slp->find(ebuf)) == nrs) {
 	                	c += 1 ;
-	                	rs = slp->add(cbuf) ;
+	                	rs = slp->add(ebuf) ;
 			    }
 	            	} /* end if (ok) */
 	            } /* end while (fetchrev) */
@@ -223,10 +232,9 @@ static int getclusters_cdb(cchar *pr,vecstr *slp,cchar *nn) noex {
 		rs = SR_OK ;
 	    }
 	} /* end if (mkpath) */
-
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (getclusters_cdb) */
+/* end method (geter::cdb) */
 
 vars::operator int () noex {
     	int		rs ;
