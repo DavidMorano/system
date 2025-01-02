@@ -135,7 +135,7 @@ int babycalc_open(BC *op,cchar *pr,cchar *dbname) noex {
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BABYCALC)) ;
+	memclear(op) ;
 
 	if ((rs = babycalc_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {

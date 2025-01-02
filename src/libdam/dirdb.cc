@@ -261,10 +261,10 @@ int dirdb_clean(dirdb *op) noex {
 	int		rs1 ;
 	if ((rs = dirdb_magic(op)) >= 0) {
 	    if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
-	        hdb_dat		key ;
-	        hdb_dat		val ;
+	        hdb_dat		key{} ;
+	        hdb_dat		val{} ;
 	        while ((rs1 = hdb_curenum(op->dbp,&cur,&key,&val)) >= 0) {
-	            dirdb_ent	*ep = (dirdb_ent *) val.buf ;
+	            dirdb_ent	*ep = entp(val.buf) ;
 	            if ((rs = dirdb_alreadyentry(op,ep)) >= 0) {
 		        {
 	                    rs1 = hdb_curdel(op->dbp,&cur,0) ;
@@ -314,8 +314,7 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	int		len = 0 ;
 	if ((rs = dirdb_magic(op,curp,epp)) >= 0) {
 	    int		i = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	    void	*vp{} ;
-	    if ((rs = vechand_get(op->dlp,i,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = vechand_get(op->dlp,i,&vp)) >= 0) {
 		*epp = entp(vp) ;
 	        curp->i = i ;
 	        len = strlen((*epp)->name) ;
@@ -363,18 +362,18 @@ static int dirdb_adding(dirdb *op,USTAT *sbp,cchar *sp,int sl) noex {
 
 static int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
 	int		rs = SR_OK ;
-	int		dlen = strlen(ep->name) ;
+	int		dnamel = strlen(ep->name) ;
 	int		cl ;
 	int		f = false ;
 	cchar		*dnamep = ep->name ;
 	cchar		*cp ;
-	while ((cl = sfdirname(dnamep,dlen,&cp)) > 0) {
+	while ((cl = sfdirname(dnamep,dnamel,&cp)) > 0) {
 	    if ((rs = dirdb_alreadyname(op,cp,cl)) > 0) {
 		f = true ;
 	        break ;
 	    }
 	    dnamep = cp ;
-	    dlen = cl ;
+	    dnamel = cl ;
 	    if (rs < 0) break ;
 	} /* end while */
 	return (rs >= 0) ? f : rs ;
@@ -388,11 +387,10 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if (nlen < 0) nlen = strlen(name) ;
 	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(tbuf,&sb)) >= 0) {
+	        if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            dirdb_fid	fid{} ;
 	            hdb_dat	key ;
-	            hdb_dat	val ;
+	            hdb_dat	val{} ;
 	            fid.ino = sb.st_ino ;
 	            fid.dev = sb.st_dev ;
 	            key.buf = &fid ;

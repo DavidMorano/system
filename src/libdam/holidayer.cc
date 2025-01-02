@@ -80,15 +80,6 @@
 /* external variables */
 
 
-/* exported variables */
-
-holidayer_obj	Hholidayer_mod = {
-	"holidayer",
-	sizeof(holidayer),
-	sizeof(holidayer_cur)
-} ;
-
-
 /* local structures */
 
 struct holidayer_hol {
@@ -126,7 +117,7 @@ static bool	isOurMode(mode_t) noex ;
 
 /* local variables */
 
-static const char	*holdnames[] = {
+constexpr cpcchar		holdnames[] = {
 	"etc/acct",
 	"/etc/acct",
 	nullptr
@@ -135,12 +126,17 @@ static const char	*holdnames[] = {
 
 /* exported variables */
 
+extern const holidayer_obj	holidayer_modinfo = {
+	"holidayer",
+	szof(holidayer),
+	szof(holidayer_cur)
+} ;
+
 
 /* exported subroutines */
 
 int holidayer_open(HO *op,cchar *pr) noex {
 	int		rs ;
-	cchar		*cp ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (pr == nullptr) return SR_FAULT ;
@@ -148,7 +144,7 @@ int holidayer_open(HO *op,cchar *pr) noex {
 	if (pr[0] == '\0') return SR_INVALID ;
 
 	memclear(op) ;
-	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	if (cchar *cp{} ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
 	    if ((rs = ids_load(&op->id)) >= 0) {
 	        op->magic = HOLIDAYER_MAGIC ;
@@ -531,7 +527,7 @@ static int holidayer_yearfinder(HO *op,int y,HO_H **rpp) noex {
 	char		hfname[MAXPATHLEN+1] ;
 	if ((rs = holidayer_yearfile(op,hfname,y)) >= 0) {
 	    HOLIDAYER_HOL	*hep ;
-	    cint		esize = sizeof(HOLIDAYER_HOL) ;
+	    cint		esize = szof(HOLIDAYER_HOL) ;
 	    if ((rs = uc_malloc(esize,&hep)) >= 0) {
 	        if ((rs = holidayer_holbegin(op,hep,y,hfname)) >= 0) {
 	            if ((rs = holidayer_yearadd(op,hep)) >= 0) {

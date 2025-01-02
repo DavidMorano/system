@@ -1,14 +1,15 @@
-/* bibleparas */
+/* bibleparas SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BIBLEPARAS implementation */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		0		/* normal safety */
 #define	CF_INORDER	0		/* create indices as encountered */
 #define	CF_TMPPRNAME	1		/* put under a PRNAME in /tmp */
 #define	CF_STARTAUDIT	1		/* start w/ audit on BPI object */
-
 
 /* revision history:
 
@@ -21,26 +22,24 @@
 
 /*******************************************************************************
 
-        This module implements an interface (a trivial one) that allows access
-        to the BIBLEPARAS datbase.
+  	Object:
+	bibleparas
 
+	Description:
+	This module implements an interface (a trivial one) that
+	allows access to the BIBLEPARAS datbase.
 
 *******************************************************************************/
 
-
-#define	BIBLEPARAS_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
@@ -106,33 +105,8 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	siskipwhite(cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
+/* external variables */
 
 
 /* local structures */
@@ -195,18 +169,9 @@ static int	isempty(cchar *,int) ;
 static int	isstart(cchar *,int,BIBLEPARAS_Q *,int *) ;
 
 
-/* exported variables */
-
-BIBLEPARAS_OBJ	bibleparas = {
-	"bibleparas",
-	sizeof(BIBLEPARAS),
-	sizeof(int)
-} ;
-
-
 /* local variables */
 
-static cchar	*idxdirs[] = {
+constexpr cpcchar	idxdirs[] = {
 	"%R/var/%S",
 	"/var/tmp/%{PRN}",
 	"/var/tmp",
@@ -217,11 +182,18 @@ static cchar	*idxdirs[] = {
 } ;
 
 
+/* exported variables */
+
+extern const bibleparas_obj	bibleparas_modinfo = {
+	"bibleparas",
+	szof(bibleparas),
+	szof(int)
+} ;
+
+
 /* exported subroutines */
 
-
-int bibleparas_open(BIBLEPARAS *op,cchar pr[],cchar dbname[])
-{
+int bibleparas_open(BIBLEPARAS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		nverses = 0 ;
 	cchar		*suf = BIBLEPARAS_DBSUF ;
@@ -236,10 +208,11 @@ int bibleparas_open(BIBLEPARAS *op,cchar pr[],cchar dbname[])
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	if ((dbname == NULL) || (dbname[0] == '\0'))
+	if ((dbname == NULL) || (dbname[0] == '\0')) {
 	    dbname = BIBLEPARAS_DBNAME ;
+	}
 
-	memset(op,0,sizeof(BIBLEPARAS)) ;
+	memclear(op) ;
 	op->pr = pr ;
 	op->dbname = dbname ;
 
@@ -474,7 +447,7 @@ int bibleparas_info(BIBLEPARAS *op,BIBLEPARAS_INFO *ip)
 	if ((rs = bpi_info(&op->vind,&bi)) >= 0) {
 	    nverses = bi.count ;
 	    if (ip != NULL) {
-	        memset(ip,0,sizeof(BIBLEPARAS_INFO)) ;
+	        memclear(ip) ;
 	        ip->dbtime = op->ti_db ;
 	        ip->vitime = op->ti_vind ;
 	        ip->maxbook = bi.maxbook ;
@@ -1022,34 +995,26 @@ static int bibleparas_indclose(BIBLEPARAS *op)
 }
 /* end subroutine (bibleparas_indclose) */
 
-
-static int subinfo_start(SUBINFO *sip)
-{
+static int subinfo_start(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->dt = time(NULL) ;
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	if (sip == NULL) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int entry_start(BIBLEPARAS_ENT *ep,BIBLEPARAS_Q *qp)
-{
+static int entry_start(BIBLEPARAS_ENT *ep,BIBLEPARAS_Q *qp) noex {
 	int		rs = SR_OK ;
 
 	if (ep == NULL) return SR_FAULT ;
 
-	memset(ep,0,sizeof(BIBLEPARAS_ENT)) ;
+	memclear(ep) ;
 	ep->b = qp->b ;
 	ep->c = qp->c ;
 	ep->v = qp->v ;

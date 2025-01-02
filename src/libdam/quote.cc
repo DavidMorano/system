@@ -378,7 +378,7 @@ static int	vrcmp(const void *,const void *) ;
 
 /* local variables */
 
-constexpr cint		termrs[] = {
+constexpr cint		rsterm[] = {
 	SR_FAULT,
 	SR_INVALID,
 	SR_NOMEM,
@@ -396,7 +396,7 @@ constexpr cint		termrs[] = {
 
 /* exported variables */
 
-quote_obj	quote_modinfo = {
+extern const quote_obj	quote_modinfo = {
 	"quote",
 	szof(quote),
 	szof(quote_cur)
@@ -405,31 +405,19 @@ quote_obj	quote_modinfo = {
 
 /* exported subroutines */
 
-int quote_open(op,pr,dirnames,quotenames)
-QUOTE		*op ;
-cchar	pr[] ;
-cchar	*dirnames[] ;
-cchar	*quotenames[] ;
-{
-	struct subinfo	si, *sip = &si ;
-
-	int	rs ;
-	int	opts ;
-	int	c = 0 ;
-
+int quote_open(quote *op,cc *pr,cc *dirnames,cc *quotenames) noex {
+	subinfo		si, *sip = &si ;
+	int		rs ;
+	int		wopts ;
+	int		c = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL)
-	    return SR_FAULT ;
+	if (op == NULL) return SR_FAULT ;
 #endif
+	if (pr == NULL) return SR_FAULT ;
+	if (pr[0] == '\0') return SR_INVALID ;
 
-	if (pr == NULL)
-	    return SR_FAULT ;
-
-	if (pr[0] == '\0')
-	    return SR_INVALID ;
-
-	memset(op,0,sizeof(QUOTE)) ;
+	memclear(op) ;
 
 	op->pr = pr ;
 	op->tmpdname = getenv(VARTMPDNAME) ;

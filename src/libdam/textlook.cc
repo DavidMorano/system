@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_SINGLEWORD	1		/* treat extra words as single */
-#define	CF_TESTERROR	0		/* test thread error-exit */
 
 /* revision history:
 
@@ -150,6 +149,10 @@
 #define	KEYBUFLEN	NATURALWORDLEN
 #endif
 
+#ifndef	CF_SINGLEWORD
+#define	CF_SINGLEWORD	1		/* treat extra words as single */
+#endif
+
 
 /* imported namespaces */
 
@@ -210,8 +213,8 @@ struct disp_head {
 	tagq		wq ;		/* work-queue */
 	psem		sem_wq ;	/* work-queue semaphore */
 	psem		sem_done ;	/* done-semaphore */
-	ptm		m ;		/* nbusy-mutex */
-	ptc		cond ;		/* condition variable */
+	ptm		mx ;		/* nbusy-mutex */
+	ptc		cv ;		/* condition variable */
 	volatile int	f_exit ;	/* assumed atomic */
 	volatile int	f_done ;	/* assumed atomic */
 	volatile int	f_ready ;	/* ready for workers to access */
@@ -330,10 +333,12 @@ static int	vcmpthreads(DISP_THR **,DISP_THR **) noex ;
 
 static char		wterms[32] ;
 
+constexpr bool		f_singleword = CF_SINGLEWORD ;
+
 
 /* exported variables */
 
-textlook_obj		textlook_modinfo = {
+extern const textlook_obj	textlook_modinfo = {
 	"textlook",
 	szof(textlook),
 	szof(textlook_cur)
@@ -648,7 +653,7 @@ static int textlook_snbegin(TL *op) noex {
 	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 		cint	tlen = rs ;
 		if ((rs = txtindex_getsdn(op->idp,tbuf,tlen)) >= 0) {
-		    cchar	*cp{} ;
+		    cchar	*cp{} ; /* used multiple blocks */
 		    int		tl = rs ;
 	            if (tbuf[0] != '\0') {
 	                if ((rs = uc_mallocstrw(tbuf,tl,&cp)) >= 0) {
@@ -837,18 +842,13 @@ static int textlook_havekeysln(TL *op,SK *skp,SK_POP *pkp,
 	    cchar	*fp, *sp, *kp ;
 	    char	keybuf[KEYBUFLEN + 1] ;
 	    while ((fl = fsb.word(wterms,&fp)) >= 0) {
-
 	        if (fl && (fp[0] == CH_SQUOTE)) {
 	            fp += 1 ;
 	            fl -= 1 ;
 	        }
-
 	        if (fl == 0) continue ;
-
 	        sl = sfword(fp,fl,&sp) ;
-
 	        if ((sl <= 0) || (sp == nullptr)) continue ;
-
 	        kp = sp ;
 	        kl = sl ;
 	        if (kl > KEYBUFLEN) {			/* prevents overflow */
@@ -879,33 +879,33 @@ static int textlook_matchkeys(TL *op,SK *skp,SK_POP *pkp,cc *sp,int sl) noex {
 	int		f = false ;
 	if (op) {
 	    /* deal with extra (ex: possessive) words */
-#if	CF_SINGLEWORD
-	    if (xwords xw ; (rs = xwords_start(&xw,sp,sl)) >= 0) {
-	        {
-	            rs = searchkeys_processxw(skp,pkp,&xw) ;
-	            f = (rs > 0) ;
-	        }
-	        rs1 = xwords_finish(&xw) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
-#else /* CF_SINGLEWORD */
-	    if (xwords xw ; (rs = xwords_start(&xw,sp,sl)) >= 0) {
-	        int	wi = 0 ;
-	        int	cl ;
-	        cchar	*cp ;
-	        while ((cl = xwords_get(&xw,wi,&cp)) > 0) {
-		    {
-	                rs = searchkeys_process(skp,pkp,cp,cl) ;
+	    if_constexpr (f_singleword) {
+	        if (xwords xw ; (rs = xwords_start(&xw,sp,sl)) >= 0) {
+	            {
+	                rs = searchkeys_processxw(skp,pkp,&xw) ;
 	                f = (rs > 0) ;
-		    }
-	            if (rs < 0) break ;
-	            if (f) break ;
-	            wi += 1 ;
-	        } /* end while (matching words) */
-	        rs1 = xwords_finish(&xw) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
-#endif /* CF_SINGLEWORD */
+	            }
+	            rs1 = xwords_finish(&xw) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if */
+	    } else {
+	        if (xwords xw ; (rs = xwords_start(&xw,sp,sl)) >= 0) {
+	            int		wi = 0 ;
+	            int		cl ;
+	            cchar	*cp ;
+	            while ((cl = xwords_get(&xw,wi,&cp)) > 0) {
+		        {
+	                    rs = searchkeys_process(skp,pkp,cp,cl) ;
+	                    f = (rs > 0) ;
+		        }
+	                if (rs < 0) break ;
+	                if (f) break ;
+	                wi += 1 ;
+	            } /* end while (matching words) */
+	            rs1 = xwords_finish(&xw) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if */
+	    } /* end if_constexpr (f_singleword) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -947,7 +947,7 @@ static int textlook_lookuper(TL *op,TL_CUR *curp,int qo,SK *skp,
 	    if ((rs = txtindex_curbegin(op->idp,&tcur)) >= 0) {
 	        if ((rs = txtindex_curlook(op->idp,&tcur,hkeya)) >= 0) {
 	            int		ntags = rs ;
-		    int		fl{} ;
+		    int		fl ;
 	            while ((rs >= 0) && (ntags-- > 0)) {
 			cint	tl = curp->tlen ;
 			char	*tb = curp->tbuf ;
@@ -1059,8 +1059,8 @@ static int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 	    memclear(dop) ;
 	    dop->a = *dap ;
 	    dop->nthr = dap->npar ;
-	    if ((rs = ptm_create(&dop->m,nullptr)) >= 0) {
-	        if ((rs = ptc_create(&dop->cond,nullptr)) >= 0) {
+	    if ((rs = ptm_create(&dop->mx,nullptr)) >= 0) {
+	        if ((rs = ptc_create(&dop->cv,nullptr)) >= 0) {
 	            cint	f_sh = false ;
 	            if ((rs = psem_create(&dop->sem_wq,f_sh,0)) >= 0) {
 	                psem	*ws = &dop->sem_done ;
@@ -1083,11 +1083,11 @@ static int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 		        }
 	            }
 	            if (rs < 0) {
-	                ptc_destroy(&dop->cond) ;
+	                ptc_destroy(&dop->cv) ;
 		    }
 	        } /* end if (ptc-create) */
 	        if (rs < 0) {
-	            ptm_destroy(&dop->m) ;
+	            ptm_destroy(&dop->mx) ;
 	        }
 	    } /* end if (ptm-create) */
 	} /* end if (non-null) */
@@ -1148,13 +1148,11 @@ static int disp_finish(DISP *dop,int f_abort) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (dop->threads != nullptr) {
-	        DISP_THR	*dtp ;
-	        pthread_t	tid ;
 	        for (int i = 0 ; i < dop->nthr ; i += 1) {
-	            dtp = (dop->threads+i) ;
+	            DISP_THR	*dtp = (dop->threads + i) ;
 	            if (dtp->f_active) {
+	                pthread_t	tid = dtp->tid ;
 	                dtp->f_active = false ;
-	                tid = dtp->tid ;
 	                rs1 = uptjoin(tid,nullptr) ;
 	                if (rs >= 0) rs = rs1 ;
 	                if (rs >= 0) rs = dtp->rs ;
@@ -1177,7 +1175,7 @@ static int disp_finish(DISP *dop,int f_abort) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&dop->m) ;
+	        rs1 = ptm_destroy(&dop->mx) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -1196,7 +1194,7 @@ static int disp_addwork(DISP *dop,TI_TAG *tagp,cc *fp,int fl) noex {
 
 /* worker threads call this to set their "busy" status */
 static int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
-	ptm		*mxp = &dop->m ;
+	ptm		*mxp = &dop->mx ;
 	int		rs ;
 	int		rs1 ;
 	int		f_prev = false ;
@@ -1354,13 +1352,13 @@ static int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
 
 /* main-thread calls this to indicate sub-threads can read completed object */
 static int disp_readyset(DISP *dop) noex {
-	ptm		*mxp = &dop->m ;
+	ptm		*mxp = &dop->mx ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mxp->lockbegin) >= 0) {
 	    {
 	        dop->f_ready = true ;
-	        rs = ptc_broadcast(&dop->cond) ; /* 0-bit semaphore */
+	        rs = ptc_broadcast(&dop->cv) ; /* 0-bit semaphore */
 	    }
 	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1371,12 +1369,12 @@ static int disp_readyset(DISP *dop) noex {
 
 /* sub-threads call this to wait until object is ready */
 static int disp_readywait(DISP *dop) noex {
-	ptm		*mxp = &dop->m ;
+	ptm		*mxp = &dop->mx ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mxp->lockbegin) >= 0) {
 	    while ((! dop->f_ready) && (! dop->f_exit)) {
-	        rs = ptc_wait(&dop->cond,mxp) ;
+	        rs = ptc_wait(&dop->cv,mxp) ;
 	        if (rs < 0) break ;
 	    } /* end while */
 	    rs1 = mxp->lockend ;
@@ -1467,21 +1465,21 @@ static int tagq_rem(tagq *tqp,TI_TAG *tagp,char *fbuf,int flen) noex {
 }
 /* end subroutine (tagq_rem) */
 
-static int mkfieldterms(char *wterms) noex {
+static int mkfieldterms(char *terms) noex {
     	int		rs = SR_FAULT ;
-	if (wterms) {
+	if (terms) {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < 32 ; i += 1) {
-	        wterms[i] = 0xFF ;
+	        terms[i] = 0xFF ;
 	    }
 	    for (int i = 0 ; i < 256 ; i += 1) {
 	        if (isalnumlatin(i)) {
-	            baclr(wterms,i) ;
+	            baclr(terms,i) ;
 	        }
 	    } /* end for */
-	    baclr(wterms,CH_SQUOTE) ;		/* allow apostrophe */
-	    baclr(wterms,'_') ;			/* allow under-score */
-	    baclr(wterms,'-') ;			/* allow minus-sign */
+	    baclr(terms,CH_SQUOTE) ;		/* allow apostrophe */
+	    baclr(terms,'_') ;			/* allow under-score */
+	    baclr(terms,'-') ;			/* allow minus-sign */
 	} /* end if (non-null) */
 	return rs ;
 }

@@ -401,12 +401,12 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 	        op->f.issorted = true ;
 	        if (op->c > 1) {
 		    csize	qn = size_t(op->i) ;
-		    csize	qsz = sizeof(char *) ;
+		    csize	qsz = szof(char *) ;
 	            qsort(op->va,qn,qsz,cmpfunc) ;
 	    } /* end if (sorting) */
 	    if (op->f.issorted) {
 	        csize	bn = size_t(op->i) ;
-	        csize	bsz = sizeof(char *) ;
+	        csize	bsz = szof(char *) ;
 	        rpp2 = (char **) bsearch(&s,op->va,bn,bsz,cmpfunc) ;
 	        rs = SR_NOTFOUND ;
 	        if (rpp2) {

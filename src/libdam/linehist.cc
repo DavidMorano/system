@@ -1,6 +1,6 @@
 /* linehist SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++98 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Line History (object) */
 /* version %I% last-modified %G% */

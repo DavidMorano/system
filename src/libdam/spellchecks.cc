@@ -442,7 +442,7 @@ extern "C" {
 
 /* exported variables */
 
-SC_OBJ	spellchecks_modinfo = {
+extern const SC_OBJ	spellchecks_modinfo = {
 	"spellchecks",
 	szof(spellchecks),
 	szof(spellchecks_cur)

@@ -26,12 +26,7 @@
 	This subroutine creates a VAR database file.
 
 	Synopsis:
-	int varmks_open(op,dbname,of,om,n)
-	VARMKS		*op ;
-	cchar	dbname[] ;
-	int		of ;
-	mode_t		om ;
-	int		n ;
+	int varmks_open(varmks *op,cc *dbname,int of,mode_t om,int n) noex
 
 	Arguments:
 	op		object pointer
@@ -45,7 +40,6 @@
 	<0		error code
 
 	Notes:
-
 	= possible returns to an open attempt
 	- OK (creating)
 	- already exists
@@ -78,6 +72,7 @@
 #include	<fcntl.h>
 #include	<climits>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -109,8 +104,8 @@
 #define	KEYBUFLEN	120
 #endif
 
-#define	HDRBUFLEN	(sizeof(VARHDR) + 128)
-#define	BUFLEN		(sizeof(VARHDR) + 128)
+#define	HDRBUFLEN	(szof(VARHDR) + 128)
+#define	BUFLEN		(szof(VARHDR) + 128)
 
 #define	FSUF_IDX	VARHDR_FSUF
 
@@ -122,31 +117,6 @@
 
 
 /* external subroutines */
-
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	strnnlen(cchar *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfhexi(cchar *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	vstrkeycmp(cchar *,cchar *) ;
-extern int	filer_writefill(FILER *,cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -206,9 +176,9 @@ static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct varentry *) ;
 
 /* exported variables */
 
-VARMKS_OBJ	varmks_mod = {
+extern const varmks_obj		varmks_modinfo = {
 	"varmks",
-	sizeof(VARMKS)
+	szof(varmks)
 } ;
 
 
@@ -232,7 +202,7 @@ int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 	if (n < VARMKS_NENTRIES)
 	    n = VARMKS_NENTRIES ;
 
-	memset(op,0,sizeof(VARMKS)) ;
+	memclear(op) ;
 	op->om = om ;
 	op->nfd = -1 ;
 	op->gid = -1 ;
@@ -604,9 +574,7 @@ static int varmks_mkvarfiler(VARMKS *op)
 #endif
 
 	if ((rs = varmks_nidxopen(op)) >= 0) {
-	    VARHDR	hdr ;
-
-	    memset(&hdr,0,sizeof(VARHDR)) ;
+	    varhdr	hdr{} ;
 	    hdr.vetu[0] = VARHDR_VERSION ;
 	    hdr.vetu[1] = ENDIAN ;
 	    hdr.vetu[2] = 0 ;
@@ -701,7 +669,7 @@ static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 	rtl = rectab_getvec(&op->rectab,&rt) ;
 	hdrp->rtoff = off ;
 	hdrp->rtlen = rtl ;
-	size = ((rtl + 1) * 2 * sizeof(uint)) ;
+	size = ((rtl + 1) * 2 * szof(uint)) ;
 	if ((rs = filer_write(hfp,rt,size)) >= 0) {
 	    STRTAB	*ksp = &op->keys ;
 	    char	*kstab = NULL ;
@@ -721,7 +689,7 @@ static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 		    int		itl = nextpowtwo(rtl) ;
 	            hdrp->itoff = off ;
 	            hdrp->itlen = itl ;
-	            size = (itl + 1) * 3 * sizeof(int) ;
+	            size = (itl + 1) * 3 * szof(int) ;
 	            if ((rs = uc_malloc(size,&indtab)) >= 0) {
 	                memset(indtab,0,size) ;
 	                if ((rs = varmks_mkind(op,kstab,indtab,itl)) >= 0) {
@@ -768,7 +736,7 @@ int		il ;
 	    VECOBJ		ves ;
 	    int			size, opts ;
 
-	    size = sizeof(struct varentry) ;
+	    size = szof(struct varentry) ;
 	    opts = VECOBJ_OCOMPACT ;
 	    if ((rs = vecobj_start(&ves,size,rtl,opts)) >= 0) {
 
@@ -971,7 +939,7 @@ static int rectab_start(RECTAB *rtp,int n)
 
 	rtp->i = 0 ;
 	rtp->n = n ;
-	size = (n + 1) * 2 * sizeof(int) ;
+	size = (n + 1) * 2 * szof(int) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    rtp->rectab = p ;
 	    rtp->rectab[0][0] = 0 ;
@@ -1029,7 +997,7 @@ static int rectab_extend(RECTAB *rtp)
 	    int		nn, size ;
 
 	    nn = (rtp->n + 1) * 2 ;
-	    size = (nn + 1) * 2 * sizeof(int) ;
+	    size = (nn + 1) * 2 * szof(int) ;
 	    if ((rs = uc_realloc(rtp->rectab,size,&va)) >= 0) {
 	        rtp->rectab = va ;
 	        rtp->n = nn ;

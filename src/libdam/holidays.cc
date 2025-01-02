@@ -83,15 +83,6 @@
 /* external variables */
 
 
-/* exported variables */
-
-holidays_obj	holidays_mod = {
-	"holidays",
-	sizeof(holidays),
-	sizeof(holidays_cur)
-} ;
-
-
 /* local structures */
 
 struct varentry {
@@ -150,13 +141,13 @@ static int	mkcite(uint *,int,int) ;
 static int	indinsert(uint (*rt)[3],int (*it)[3],int,struct varentry *) ;
 static int	ismatkey(const char *,const char *,int) ;
 
-static int	vcmprec(const void *,const void *) ;
-static int	cmprec(const void *,const void *) ;
+static int	vcmprec(cvoid *,cvoid *) ;
+static int	cmprec(cvoid *,cvoid *) ;
 
 
 /* local variables */
 
-static const char	*holdnames[] = {
+constexpr cpcchar	holdnames[] = {
 	"etc/acct",
 	"etc",
 	"/etc/acct",
@@ -164,11 +155,18 @@ static const char	*holdnames[] = {
 } ;
 
 
+/* exported variables */
+
+extern const holidays_obj	holidays_modinfo = {
+	"holidays",
+	szof(holidays),
+	szof(holidays_cur)
+} ;
+
+
 /* exported subroutines */
 
-
-int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname)
-{
+int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname) noex {
 	time_t		dt = time(NULL) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -187,7 +185,7 @@ int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname)
 	if (year < 1970)
 	    return SR_INVALID ;
 
-	memset(op,0,sizeof(HOLIDAYS)) ;
+	memclear(op) ;
 	op->year = year ;
 	op->pr = pr ;
 
@@ -351,7 +349,7 @@ int		vlen ;
 	uint		(*rt)[3] ;
 	uint		(*rpp)[3] ;
 	uint		scite ;
-	const int	esize = (3 * sizeof(uint)) ;
+	cint	esize = (3 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		ri, vi ;
 	int		rtlen ;
@@ -448,7 +446,7 @@ int		vlen ;
 	HOLIDAYS_CUR	dcur ;
 	uint		khash, nhash, chash ;
 	uint		(*rt)[3] ;
-	const int	nskip = HOLIDAYS_NSKIP ;
+	cint	nskip = HOLIDAYS_NSKIP ;
 	int		rs = SR_OK ;
 	int		ri, ki, vi, hi ;
 	int		c ;
@@ -740,17 +738,13 @@ static int holidays_dbfinder(HOLIDAYS *op,IDS *idp,char *tmpfname,cchar *cname)
 }
 /* end subroutine (holidays_dbfinder) */
 
-
-static int subinfo_start(SUBINFO *sip,HOLIDAYS *op)
-{
+static int subinfo_start(SUBINFO *sip,HOLIDAYS *op) noex {
 	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
-
+	memclear(sip) ;
 	sip->op = op ;
 	if ((rs = bopen(&sip->hfile,op->fname,"r",0666)) >= 0) {
-	    const int	size = sizeof(SUBINFO_REC) ;
-	    const int	n = HOLIDAYS_DEFRECS ;
+	    cint	size = szof(SUBINFO_REC) ;
+	    cint	n = HOLIDAYS_DEFRECS ;
 	    if ((rs = vecobj_start(&sip->recs,size,n,0)) >= 0) {
 	        struct ustat	sb ;
 	        bcontrol(&sip->hfile,BC_STAT,&sb) ;
@@ -798,8 +792,8 @@ static int subinfo_finish(SUBINFO *sip)
 static int subinfo_procfile(SUBINFO *sip)
 {
 	HOLIDAYS	*op = sip->op ;
-	const int	llen = LINEBUFLEN ;
-	const int	maxrecs = HOLIDAYS_MAXRECS ;
+	cint	llen = LINEBUFLEN ;
+	cint	maxrecs = HOLIDAYS_MAXRECS ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		c = 0 ;
@@ -952,7 +946,7 @@ static int subinfo_mkrt(SUBINFO *sip)
 	    vecobj_sort(&sip->recs,vcmprec) ;
 	}
 
-	size = (n + 2) * 3 * sizeof(uint) ;
+	size = (n + 2) * 3 * szof(uint) ;
 	if ((rs = uc_malloc(size,&rt)) >= 0) {
 	    rt[c][0] = 0 ;
 	    rt[c][1] = 0 ;
@@ -983,19 +977,19 @@ static int subinfo_mkst(SUBINFO *sip)
 	int		rs ;
 
 	if ((rs = strtab_strsize(&sip->kstrs)) >= 0) {
-	    const int	ksize = rs ;
+	    cint	ksize = rs ;
 	    char	*kst ;
 	    if ((rs = uc_malloc(ksize,&kst)) >= 0) {
 		int	kisize ;
 		if ((rs = strtab_strmk(&sip->kstrs,kst,ksize)) >= 0) {
 		    int		(*kit)[3] ;
 		    op->itlen = nextpowtwo(op->rtlen) ;
-		    kisize = (op->itlen + 1) * 3 * sizeof(int) ;
+		    kisize = (op->itlen + 1) * 3 * szof(int) ;
 		    if ((rs = uc_malloc(kisize,&kit)) >= 0) {
 		        memset(kit,0,kisize) ;
 			if ((rs = subinfo_mkind(sip,kst,kit,op->itlen)) >= 0) {
 			    if ((rs = strtab_strsize(&sip->vstrs)) >= 0) {
-				const int	vs = rs ;
+				cint	vs = rs ;
 				char		*vst ;
 				if ((rs = uc_malloc(vs,&vst)) >= 0) {
 				    STRTAB	*vsp = &sip->vstrs ;
@@ -1043,7 +1037,7 @@ int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il)
 #if	CF_FIRSTHASH
 	{
 	    VECOBJ		ves ;
-	    const int		size = sizeof(struct varentry) ;
+	    cint		size = szof(struct varentry) ;
 	    int			opts ;
 
 	    opts = VECOBJ_OCOMPACT ;
@@ -1234,7 +1228,7 @@ static int ismatkey(cchar key[],cchar kp[],int kl) noex {
 }
 /* end subroutine (ismatkey) */
 
-static int vcmprec(const void *v1p,const void *v2p) noex {
+static int vcmprec(cvoid *v1p,cvoid *v2p) noex {
 	uint		**i1pp = (uint **) v1p ;
 	uint		**i2pp = (uint **) v2p ;
 	int		rc = 0 ;
@@ -1253,7 +1247,7 @@ static int vcmprec(const void *v1p,const void *v2p) noex {
 }
 /* end subroutine (vcmprec) */
 
-static int cmprec(const void *v1p,const void *v2p) noex {
+static int cmprec(cvoid *v1p,cvoid *v2p) noex {
 	uint		*i1p = (uint *) v1p ;
 	uint		*i2p = (uint *) v2p ;
 	int		rc = 0 ;

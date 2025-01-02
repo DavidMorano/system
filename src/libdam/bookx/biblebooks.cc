@@ -1,9 +1,9 @@
-/* biblebooks */
+/* biblebooks SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BIBLEBOOKS object implementation */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,22 +17,20 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that allows access
-	to the BIBLEBOOKS datbase.
+  	Object:
+	biblebooks
 
+	Description:
+	This module implements an interface (a trivial one) that
+	allows access to the BIBLEBOOKS datbase.
 
 *******************************************************************************/
 
-
-#define	BIBLEBOOKS_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecpstr.h>
 #include	<localmisc.h>
@@ -50,13 +48,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	vecpstr_loadfile(vecpstr *,int,const char *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -65,24 +58,22 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* forward references */
 
 
+/* local variables */
+
+
 /* exported variables */
 
-BIBLEBOOKS_OBJ	biblebooks = {
+extern const biblebooks_obj	biblebooks_modinfo = {
 	"biblebooks",
-	sizeof(BIBLEBOOKS),
-	sizeof(int)
+	szof(biblebooks),
+	szof(int)
 } ;
-
-
-/* local variables */
 
 
 /* exported subroutines */
 
-
-int biblebooks_open(BIBLEBOOKS *op,cchar pr[],cchar dbname[])
-{
-	const int	n = BIBLEBOOKS_DEFENTS ;
+int biblebooks_open(BIBLEBOOKS *op,cchar *pr,cchar *dbname) noex {
+	cint		n = BIBLEBOOKS_DEFENTS ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;

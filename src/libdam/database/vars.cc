@@ -44,6 +44,7 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -109,10 +110,10 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 /* exported variables */
 
-VARS_OBJ	vars_mod = {
+extern const vars_obj	vars_modinfo = {
 	"vars",
-	sizeof(VARS),
-	sizeof(VARS_CUR)
+	szof(vars),
+	szof(vars_cur)
 } ;
 
 
@@ -582,9 +583,7 @@ static int vars_filemapdestroy(VARS *op,VARS_FM *fip)
 }
 /* end subroutine (vars_filemapdestroy) */
 
-
-static int vars_dbproc(VARS *op,time_t dt)
-{
+static int vars_dbproc(VARS *op,time_t dt) noex {
 	VARS_FM		*fip = &op->vf ;
 	VARS_MI		*mip = &op->mi ;
 	VARHDR		*hip = &op->ifi ;
@@ -625,11 +624,11 @@ static int vars_viverify(VARS *op,time_t dt)
 	f = f && ((hip->vsoff + hip->vslen) <= fip->msize) ;
 
 	f = f && (hip->rtoff <= fip->msize) ;
-	size = (hip->rtlen + 1) * 2 * sizeof(int) ;
+	size = (hip->rtlen + 1) * 2 * szof(int) ;
 	f = f && ((hip->rtoff + size) <= fip->msize) ;
 
 	f = f && (hip->itoff <= fip->msize) ;
-	size = (hip->itlen + 1) * 3 * sizeof(int) ;
+	size = (hip->itlen + 1) * 3 * szof(int) ;
 	f = f && ((hip->itoff + size) <= fip->msize) ;
 
 /* an extra (redundant) value */

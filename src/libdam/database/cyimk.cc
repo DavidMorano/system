@@ -181,7 +181,7 @@ static int	vvecmp(const void *,const void *) ;
 
 /* exported variables */
 
-cyimk_obj	cyimk_modinfo cyimk = {
+extern const cyimk_obj	cyimk_modinfo = {
 	"cyimk",
 	szof(cyimk)
 } ;
@@ -189,9 +189,8 @@ cyimk_obj	cyimk_modinfo cyimk = {
 
 /* exported subroutines */
 
-int cyimk_open(CYIMK *op,int year,cchar *dname,cchar *cname,int of,mode_t om)
-{
-	cint	n = CYIMK_DEFENTS ;
+int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
+	cint		n = CYIMK_DEFENTS ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 

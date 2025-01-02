@@ -244,21 +244,23 @@ int systems_close(systems *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = systems_magic(op)) >= 0) {
+	    vecobj	*elp = op->elp ;
+	    vecobj	*flp = op->flp ;
 	    void	*vp{} ;
-	    for (int i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
-	        ENT		*dep = (ENT *) vp ;
+	    for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
+	        ENT	*dep = (ENT *) vp ;
 	        if (vp) {
 	            rs1 = entry_finish(dep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end for */
 	    {
-	        rs1 = vecobj_finish(op->elp) ;
+	        rs1 = elp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    /* free up the files */
-	    for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
-	        SYS_FILE	*fep = (SYS_FILE *) vp ;
+	    for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
+	        SYS_FILE	*fep = filep(vp) ;
 	        if (vp) {
 	            if (fep->fname) {
 	                rs1 = uc_free(fep->fname) ;
@@ -268,7 +270,7 @@ int systems_close(systems *op) noex {
 	        }
 	    } /* end for */
 	    {
-	        rs1 = vecobj_finish(op->flp) ;
+	        rs1 = flp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -288,20 +290,20 @@ int systems_fileadd(systems *op,cchar *sysfname) noex {
 	    cchar	*sp ;
 	    if (absfn sfn ; (rs = sfn.start(sysfname,-1,&sp)) >= 0) {
 	        if (SYS_FILE fe ; (rs = file_start(&fe,sp)) >= 0) {
-	            if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
+		    vecobj	*flp = op->flp ;
+	            if ((rs = flp->add(&fe)) >= 0) {
 	                cint	fi = rs ;
-		        void	*vp{} ;
-	                if ((rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
-			    SYS_FILE	*fep = (SYS_FILE *) vp ;
+		        if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
+			    SYS_FILE	*fep = filep(vp) ;
 			    {
 	                        rs = systems_fileparse(op,fi,fep) ;
 	                        if ((rs < 0) && (rs != SR_EXIST)) {
-		                    vecobj_del(op->flp,fi) ;
+		                    flp->del(fi) ;
 	                        }
 			    }
 	                }
 	                if (rs < 0) {
-		            vecobj_del(op->flp,fi) ;
+		            flp->del(fi) ;
 		        }
 	            } /* end if (vecobj_add) */
 	            if (rs < 0) {
@@ -338,8 +340,9 @@ int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = systems_magic(op,curp,depp)) >= 0) {
+	    vecobj	*elp = op->elp ;
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	    if (void *vp{} ; (rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = elp->get(ei,&vp)) >= 0) {
 	        *depp = (ENT *) vp ;
 	        curp->i = ei ;
 	    }
@@ -352,9 +355,10 @@ int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = systems_magic(op,name,curp,depp)) >= 0) {
+	    vecobj	*elp = op->elp ;
 	    void	*vp{} ;
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	    while ((rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
+	    while ((rs = elp->get(ei,&vp)) >= 0) {
 	        *depp = (ENT *) vp ;
 	        if (vp) {
 	            if (ismatstar((*depp)->sysname,name)) {
@@ -378,11 +382,12 @@ int systems_check(systems *op,time_t dt) noex {
 	if ((rs = systems_magic(op)) >= 0) {
 	    /* should we even check? */
 	    if ((dt - op->checktime) > TI_FILECHECK) {
+		vecobj	*flp = op->flp ;
 	        USTAT	sb ;
 	        void	*vp{} ;
 	        op->checktime = dt ;
-	        for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
-	            SYS_FILE	*fep = (SYS_FILE *) vp ;
+	        for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
+	            SYS_FILE	*fep = filep(vp) ;
 	            if (vp) {
 	        	bool	fdel = false ;
 	                if ((rs = u_stat(fep->fname,&sb)) >= 0) {
@@ -462,30 +467,29 @@ int parser::parse(SYS_FILE *fep) noex {
 		const dev_t	dev = sb.st_dev ;
 		const ino_t	ino = sb.st_ino ;
 		if ((rs = parsealready(dev,ino)) == 0) {
-		        field	fsb ;
-			cint	to = -1 ;
-		        int	len ;
-		        fep->timod = sb.st_mtime ;
-		        fep->fsize = size_t(sb.st_size & UINT_MAX) ;
-		        fep->dev = sb.st_dev ;
-		        fep->ino = sb.st_ino ;
-		        while ((rs = breadlns(sfp,lbuf,llen,to,np)) > 0) {
-	    	            len = rs ;
-	    		    if ((len <= 1) || (lbuf[0] == '#')) continue ;
-	    	            if ((rs = fsb.start(lbuf,len)) >= 0) {
-			        int	fl ;
-			        cchar	*fp ;
-	        	        if ((fl = fsb.get(fterms,&fp)) >= 0) {
-	        	            if (fsb.term != '#') {
-	            	                rs = parseln(&fsb) ;
-	            	                if (rs > 0) c += 1 ;
-	        	            } /* end if */
-			        }
-	        	        rs1 = fsb.finish ;
-			        if (rs >= 0) rs = rs1 ;
-	    	            } /* end if (field) */
-	                    if (rs < 0) break ;
-	                } /* end while (reading lines) */
+                    field   fsb ;
+                    cint    to = -1 ;
+                    fep->timod = sb.st_mtime ;
+                    fep->fsize = size_t(sb.st_size & UINT_MAX) ;
+                    fep->dev = sb.st_dev ;
+                    fep->ino = sb.st_ino ;
+                    while ((rs = breadlns(sfp,lbuf,llen,to,np)) > 0) {
+                        cint	len = rs ;
+                        if ((len <= 1) || (lbuf[0] == '#')) continue ;
+                        if ((rs = fsb.start(lbuf,len)) >= 0) {
+                            int     fl ;
+                            cchar   *fp ;
+                            if ((fl = fsb.get(fterms,&fp)) >= 0) {
+                                if (fsb.term != '#') {
+                                    rs = parseln(&fsb) ;
+                                    if (rs > 0) c += 1 ;
+                                } /* end if */
+                            }
+                            rs1 = fsb.finish ;
+                            if (rs >= 0) rs = rs1 ;
+                        } /* end if (field) */
+                        if (rs < 0) break ;
+                    } /* end while (reading lines) */
 	        } /* end if (not-already) */
 	    } /* end if (bcontrol) */
 	    rs1 = bclose(sfp) ;
@@ -501,8 +505,8 @@ int parser::parsealready(dev_t dev,ino_t ino) noex {
 	int		rs1 ;
 	int		f = false ;
 	void		*vp{} ;
-	for (int i = 0 ; (rs1 = vecobj_get(flp,i,&vp)) >= 0 ; i += 1) {
-	    SYS_FILE	*fep = (SYS_FILE *) vp ;
+	for (int i = 0 ; (rs1 = flp->get(i,&vp)) >= 0 ; i += 1) {
+	    SYS_FILE	*fep = filep(vp) ;
 	    if (vp) {
 		f = ((fep->dev == dev) && (fep->ino == ino)) ;
 		if (f) break ;
@@ -552,7 +556,7 @@ static int systems_delfes(systems *op,int fi) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(elp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
 	    ENT		*ep = (ENT *) vp ;
 	    if (vp) {
 	        if (ep->fi == fi) {
@@ -561,7 +565,7 @@ static int systems_delfes(systems *op,int fi) noex {
 		        if (rs >= 0) rs = rs1 ;
 		    }
 		    {
-	                rs1 = vecobj_del(op->elp,i--) ;
+	                rs1 = elp->del(i--) ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
 	        }
@@ -630,7 +634,6 @@ static int entry_args(ENT *ep,cchar *args,int argslen) noex {
 		ep->dialerargs = cp ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? argslen : rs ;
 }
 /* end subroutine (entry_args) */

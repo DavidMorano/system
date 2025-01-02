@@ -1,10 +1,11 @@
-/* bvses */
+/* bvses SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* read or audit a BVSES (Bible Verse Structure) database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,43 +18,38 @@
 
 /*******************************************************************************
 
-	This subroutine opens and allows for reading or auditing of a BVSES
-	database.
+  	Object:
+	bvses
+
+	Description:
+	This subroutine opens and allows for reading or auditing
+	of a BVSES database.
 
 	Synopsis:
-
-	int bvses_open(op,pr,dbname)
-	BVSES		*op ;
-	const char	pr[] ;
-	const char	dbname[] ;
+	int bvses_open(bvses *op,cchar *pr,cchar *dbname) noex
 
 	Arguments:
-
 	- op		object pointer
 	- pr		program root
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<char.h>
@@ -78,28 +74,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-#endif
 
 
 /* external variables */
@@ -138,18 +112,16 @@ static int	bvses_checkupdate(BVSES *,time_t) ;
 
 /* exported variables */
 
-BVSES_OBJ	bvses = {
+extern const bvses_obj	vcses_modinfo = {
 	"bvses",
-	sizeof(BVSES),
+	szof(bvses),
 	0
 } ;
 
 
 /* exported subroutines */
 
-
-int bvses_open(BVSES *op,cchar pr[],cchar dbname[])
-{
+int bvses_open(BVSES *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	cchar		*cp ;
 
@@ -164,11 +136,7 @@ int bvses_open(BVSES *op,cchar pr[],cchar dbname[])
 	if (strchr(dbname,'/') != NULL) return SR_INVALID ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("bvses_open: dbname=%s\n",dbname) ;
-#endif
-
-	memset(op,0,sizeof(BVSES)) ;
+	memclear(op) ;
 
 	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
@@ -306,7 +274,7 @@ int bvses_info(BVSES *op,BVSES_INFO *ip)
 	hip = &op->fhi ;
 
 	if (ip != NULL) {
-	    memset(ip,0,sizeof(BVSES_INFO)) ;
+	    memclear(ip0 ;
 	    ip->mtime = op->fmi.ti_mod ;
 	    ip->ctime = (time_t) hip->wtime ;
 	    ip->nzbooks = hip->nzbooks ;
@@ -399,26 +367,15 @@ int bvses_mkmodquery(BVSES *op,BVSES_VERSE *bvep,int mjd)
 	cl = hip->ctlen ;
 	ct = (mip->ct + ci) ;
 	for (c = 1 ; (c < cl) && (c < be.al) && (v >= ct[c]) ; c += 1) {
-#if	CF_DEBUGS
-	    debugprintf("bvses_mkmodquery: c=%u ncv=%u\n",c,ct[c]) ;
-#endif
 	    v -= ct[c] ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("bvses_mkmodquery: fin c=%u ncv=%u v=%u\n",c,ct[c],v) ;
-#endif
-
-	memset(bvep,0,sizeof(BVSES_VERSE)) ;
+	memclear(bvep) ;
 	bvep->b = b ;
 	bvep->c = c ;
 	bvep->v = (v+1) ;
 
 	} /* end if (ok ) */
-
-#if	CF_DEBUGS
-	debugprintf("bvses_get: ret rs=%d vi=%u\n",rs,vi) ;
-#endif
 
 	return (rs >= 0) ? vi : rs ;
 }
@@ -427,22 +384,17 @@ int bvses_mkmodquery(BVSES *op,BVSES_VERSE *bvep,int mjd)
 
 /* private subroutines */
 
-
-static int bvses_loadbegin(BVSES *op,time_t dt)
-{
+static int bvses_loadbegin(BVSES *op,time_t dt) noex {
 	int		rs ;
 	int		fsize = 0 ;
 
 	if ((rs = bvses_mapbegin(op,dt)) >= 0) {
 	    fsize = rs ;
 	    rs = bvses_proc(op,dt) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        bvses_mapend(op) ;
+	    }
 	} /* end if (loadbegin) */
-
-#if	CF_DEBUGS
-	debugprintf("bvses_loadbegin: ret rs=%d fsize=%u\n",rs,fsize) ;
-#endif
 
 	return (rs >= 0) ? fsize : rs ;
 }
@@ -628,7 +580,7 @@ static int bvses_verify(BVSES *op,time_t dt)
 #endif
 
 /* alignment restriction */
-	f = f && ((hip->btoff & (sizeof(uint)-1)) == 0) ;
+	f = f && ((hip->btoff & (szof(uint)-1)) == 0) ;
 
 #if	CF_DEBUGS
 	debugprintf("bvses_verify: 2 f=%u\n",f) ;
@@ -642,7 +594,7 @@ static int bvses_verify(BVSES *op,time_t dt)
 	debugprintf("bvses_verify: 3 f=%u\n",f) ;
 #endif
 
-	size = hip->btlen * 4 * sizeof(ushort) ;
+	size = hip->btlen * 4 * szof(ushort) ;
 	f = f && ((hip->btoff + size) <= mip->mapsize) ;
 
 #if	CF_DEBUGS
@@ -656,7 +608,7 @@ static int bvses_verify(BVSES *op,time_t dt)
 	debugprintf("bvses_verify: 5 f=%u\n",f) ;
 #endif
 
-	size = hip->ctlen * 1 * sizeof(uchar) ;
+	size = hip->ctlen * 1 * szof(uchar) ;
 	f = f && ((hip->ctoff + size) <= mip->mapsize) ;
 
 #if	CF_DEBUGS

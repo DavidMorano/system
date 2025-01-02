@@ -1,14 +1,15 @@
-/* bibleverses */
+/* bibleverses SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* BIBLEVERSES implementation */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGSTART	0		/* debug |isstart()| */
 #define	CF_DEUGMKDATA	0		/* debug make-data */
 #define	CF_EMPTYTERM	1		/* terminate entry on empty line */
 #define	CF_SAFE		0		/* normal safety */
-
 
 /* revision history:
 
@@ -21,27 +22,25 @@
 
 /*******************************************************************************
 
-	This module implements the (actual) interface to the BIBLEVERSES
-	datbase.
+  	Object:
+	bibleverses
 
+	Description:
+	This module implements the (actual) interface to the
+	BIBLEVERSES datbase.
 
 *******************************************************************************/
 
-
-#define	BIBLEVERSES_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
@@ -107,37 +106,8 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	chownsame(cchar *,cchar *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isOneOf(const int *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+/* external variables */
 
 
 /* local structures */
@@ -199,27 +169,17 @@ static int	bvemk_start(BVIMK_VERSE *,BIBLEVERSES_ENT *) ;
 static int	bvemk_finish(BVIMK_VERSE *) ;
 
 static int	mkdname(cchar *,mode_t) ;
-static int	checkdname(const char *) ;
+static int	checkdname(cchar *) ;
 
-static int	isempty(const char *,int) ;
-static int	isstart(const char *,int,BIBLEVERSES_Q *,int *) ;
+static int	isempty(cchar *,int) ;
+static int	isstart(cchar *,int,BIBLEVERSES_Q *,int *) ;
 
 static int	isNeedIndex(int) ;
 
 
-/* exported variables */
-
-
-BIBLEVERSES_OBJ	bibleverses = {
-	"bibleverses",
-	sizeof(BIBLEVERSES),
-	sizeof(BIBLEVERSES_CUR)
-} ;
-
-
 /* local variables */
 
-static const char	*idxdirs[] = {
+constexpr cpcchar	idxdirs[] = {
 	"/var/tmp/%{PRN}/%S",
 	"/tmp/%{PRN}/%S",
 	"%R/var/%S",
@@ -229,22 +189,29 @@ static const char	*idxdirs[] = {
 	NULL
 } ;
 
-static const int	rsneeds[] = {
+constexpr int		rsneeds[] = {
 	SR_STALE,
 	0
 } ;
 
 
+/* exported variables */
+
+extern const bibleverses_obj	bibleverses_modinfo = {
+	"bibleverses",
+	szof(bibleverses),
+	szof(bibleverses_cur)
+} ;
+
+
 /* exported subroutines */
 
-
-int bibleverses_open(BIBLEVERSES *op,cchar *pr,cchar *dbname)
-{
-	SUBINFO		si ;
-	const int	clen = MAXNAMELEN ;
+int bibleverses_open(BIBLEVERSES *op,cchar *pr,cchar *dbname) noex {
+	subinfo		si ;
+	cint	clen = MAXNAMELEN ;
 	int		rs ;
 	int		nverses = 0 ;
-	const char	*suf = BIBLEVERSES_DBSUF ;
+	cchar	*suf = BIBLEVERSES_DBSUF ;
 	char		cbuf[MAXNAMELEN + 1] ;
 
 #if	CF_SAFE
@@ -259,7 +226,7 @@ int bibleverses_open(BIBLEVERSES *op,cchar *pr,cchar *dbname)
 	    dbname = BIBLEVERSES_DBNAME ;
 	}
 
-	memset(op,0,sizeof(BIBLEVERSES)) ;
+	memclear(op) ;
 	op->pr = pr ;
 	op->dbname = dbname ;
 
@@ -378,7 +345,7 @@ int bibleverses_read(BIBLEVERSES *op,char *vbuf,int vlen,BIBLEVERSES_Q *qp)
 	BVI_VERSE	viv ;
 	BVI_LINE	lines[BIBLEVERSES_NLINES + 1] ;
 	time_t		dt = 0 ;
-	const int	nlines = BIBLEVERSES_NLINES ;
+	cint	nlines = BIBLEVERSES_NLINES ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -397,7 +364,7 @@ int bibleverses_read(BIBLEVERSES *op,char *vbuf,int vlen,BIBLEVERSES_Q *qp)
 	}
 
 	if (rs >= 0) {
-	    const int	lsize = ((nlines+1) * sizeof(BVI_LINE)) ;
+	    cint	lsize = ((nlines+1) * szof(BVI_LINE)) ;
 	    char	*lb = (char *) lines ;
 	    viq.b = qp->b ;
 	    viq.c = qp->c ;
@@ -505,7 +472,7 @@ int		vlen ;
 	    BVI_CUR	*bcurp = &curp->vicur ;
 	    BVI_VERSE	viv ;
 	    BVI_LINE	lines[BIBLEVERSES_NLINES + 1] ;
-	    const int	ls = ((BIBLEVERSES_NLINES + 1) * sizeof(BVI_LINE)) ;
+	    cint	ls = ((BIBLEVERSES_NLINES + 1) * szof(BVI_LINE)) ;
 	    if ((rs = bvi_enum(&op->vind,bcurp,&viv,(char *) lines,ls)) >= 0) {
 	        if (vbuf != NULL) {
 	            rs = bibleverses_loadbuf(op,&viv,vbuf,vlen) ;
@@ -540,14 +507,10 @@ int bibleverses_info(BIBLEVERSES *op,BIBLEVERSES_INFO *ip)
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("bibleverses_info: ent\n") ;
-#endif
-
 	if ((rs = bvi_info(&op->vind,&bi)) >= 0) {
 	    nverses = bi.count ;
 	    if (ip != NULL) {
-	        memset(ip,0,sizeof(BIBLEVERSES_INFO)) ;
+	        memclear(ip) ;
 	        ip->dbtime = op->ti_db ;
 	        ip->vitime = op->ti_vind ;
 	        ip->maxbook = bi.maxbook ;
@@ -668,7 +631,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
 	    struct ustat	sb ;
-	    const int		fd = rs ;
+	    cint		fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 	            if ((sb.st_size <= INT_MAX) && (sb.st_size > 0)) {
@@ -683,7 +646,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 #endif
 	                if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                    const caddr_t	ma = md ;
-	                    const int		madv = MADV_RANDOM ;
+	                    cint		madv = MADV_RANDOM ;
 	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                        op->mapdata = md ;
 	                        op->mapsize = ms ;
@@ -792,10 +755,10 @@ static int bibleverses_loadbuf(BIBLEVERSES *op,BVI_VERSE *vivp,
 
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	    BVI_LINE	*lines = vivp->lines ;
-	    const int	nlines = vivp->nlines ;
+	    cint	nlines = vivp->nlines ;
 	    int		i ;
 	    int		ll ;
-	    const char	*lp ;
+	    cchar	*lp ;
 
 	    for (i = 0 ; i < nlines ; i += 1) {
 
@@ -874,7 +837,7 @@ static int bibleverses_indopenseqer(BIBLEVERSES *op,SUBINFO *sip,
 		DIRSEEN *dsp,EXPCOOK *ckp)
 {
 	IDS		id ;
-	const int	elen = MAXPATHLEN ;
+	cint	elen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		nverses = 0 ;
@@ -929,14 +892,14 @@ static int bibleverses_indopenseqer(BIBLEVERSES *op,SUBINFO *sip,
 static int bibleverses_dirok(BIBLEVERSES *op,DIRSEEN *dsp,IDS *idp,
 		cchar *dp,int dl)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		f_ok = FALSE ;
 	if ((rs = dirseen_havename(dsp,dp,dl)) == rsn) {
 	    USTAT	sb ;
 	    if ((rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
-		    const int	am = (W_OK|R_OK|X_OK) ;
+		    cint	am = (W_OK|R_OK|X_OK) ;
 		    if ((rs = sperm(idp,&sb,am)) >= 0) {
 			f_ok = TRUE ;
 		    } else if (isNotPresent(rs)) {
@@ -1275,45 +1238,37 @@ static int bibleverses_indclose(BIBLEVERSES *op)
 }
 /* end subroutine (bibleverses_indclose) */
 
-
-static int subinfo_start(SUBINFO *sip)
-{
+static int subinfo_start(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->dt = time(NULL) ;
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	if (sip == NULL) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (subinfo_finish) */
 
-
 static int entry_start(BIBLEVERSES_ENT *ep,BIBLEVERSES_Q *qp,
-		uint loff,uint llen)
-{
-	const int	ne = BIBLEVERSES_NLE ;
+		uint loff,uint llen) noex {
+	cint	ne = BIBLEVERSES_NLE ;
 	int		rs ;
 	int		size ;
 	void		*p ;
 
 	if (ep == NULL) return SR_FAULT ;
 
-	memset(ep,0,sizeof(BIBLEVERSES_ENT)) ;
+	memclear(ep) ;
 	ep->b = qp->b ;
 	ep->c = qp->c ;
 	ep->v = qp->v ;
 	ep->voff = loff ;
 	ep->vlen = llen ;
 
-	size = (ne * sizeof(BIBLEVERSES_EL)) ;
+	size = (ne * szof(BIBLEVERSES_EL)) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    ep->lines = p ;
 	    ep->e = ne ;
@@ -1345,7 +1300,7 @@ static int entry_add(BIBLEVERSES_ENT *ep,uint loff,uint llen)
 
 	if (ep->i == ep->e) {
 	    ne = ep->e + BIBLEVERSES_NLE ;
-	    size = (ne * sizeof(BIBLEVERSES_EL)) ;
+	    size = (ne * szof(BIBLEVERSES_EL)) ;
 	    if ((rs = uc_realloc(ep->lines,size,&elp)) >= 0) {
 	        ep->lines = elp ;
 	        ep->e = ne ;
@@ -1408,7 +1363,7 @@ static int bvemk_start(BVIMK_VERSE *bvep,BIBLEVERSES_ENT *ep)
 	    BVIMK_LINE	*lines ;
 	    int		size ;
 	    bvep->nlines = nlines ;
-	    size = (nlines + 1) * sizeof(BVIMK_LINE) ;
+	    size = (nlines + 1) * szof(BVIMK_LINE) ;
 	    if ((rs = uc_malloc(size,&lines)) >= 0) {
 	        int	i ;
 	        bvep->lines = lines ;
@@ -1419,16 +1374,15 @@ static int bvemk_start(BVIMK_VERSE *bvep,BIBLEVERSES_ENT *ep)
 	        lines[i].loff = 0 ;
 	        lines[i].llen = 0 ;
 	    } /* end if (memory-allocation) */
-	} else
+	} else {
 	    rs = SR_TOOBIG ;
+	}
 
 	return (rs >= 0) ? nlines : rs ;
 }
 /* end subroutine (bvemk_start) */
 
-
-static int bvemk_finish(BVIMK_VERSE *bvep)
-{
+static int bvemk_finish(BVIMK_VERSE *bvep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1447,7 +1401,7 @@ static int bvemk_finish(BVIMK_VERSE *bvep)
 
 static int mkdname(cchar *dname,mode_t dm)
 {
-	const int	nrs = SR_NOENT ;
+	cint	nrs = SR_NOENT ;
 	int		rs ;
 	if ((rs = checkdname(dname)) == nrs) {
 	    rs = mkdirs(dname,dm) ;
@@ -1482,7 +1436,7 @@ static int isempty(cchar *lp,int ll)
 {
 	int		cl ;
 	int		f = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	f = f || (ll == 0) ;
 	f = f || (lp[0] == '#') ;
@@ -1498,7 +1452,7 @@ static int isempty(cchar *lp,int ll)
 
 
 static int isstart(lp,ll,qp,sip)
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 BIBLEVERSES_Q	*qp ;
 int		*sip ;
@@ -1508,7 +1462,7 @@ int		*sip ;
 	int		ch ;
 	int		si = 0 ;
 	int		f = FALSE ;
-	const char	*sp = lp ;
+	cchar	*sp = lp ;
 
 #if	CF_DEBUGS && CF_DEBUGSTART
 	debugprintf("bibleqs/isstart: ent l=>%t<\n",lp,
@@ -1525,7 +1479,7 @@ int		*sip ;
 	    int		i ;
 	    int		cl ;
 	    int		v ;
-	    const char	*tp, *cp ;
+	    cchar	*tp, *cp ;
 
 	    for (i = 0 ; i < 3 ; i += 1) {
 

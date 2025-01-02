@@ -1,11 +1,12 @@
-/* bvs */
+/* bvs SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Bible Verse Structure */
 /* load management and interface for the BVSES object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -18,25 +19,25 @@
 
 /*******************************************************************************
 
-        This module implements an interface (a trivial one) that provides access
-        to the BVSES object (which is dynamically loaded).
+  	Object:
+	bvs
 
+	Description:
+	This module implements an interface (a trivial one) that
+	provides access to the BVSES object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	BVS_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -62,25 +63,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -88,27 +72,14 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	bvs_objloadbegin(BVS *,const char *,const char *) ;
+static int	bvs_objloadbegin(BVS *,cchar *,cchar *) ;
 static int	bvs_objloadend(BVS *) ;
-static int	bvs_loadcalls(BVS *,const char *) ;
+static int	bvs_loadcalls(BVS *,cchar *) ;
 
 static int	isrequired(int) ;
 
 
-/* external variables */
-
-
 /* local variables */
-
-static const char	*subs[] = {
-	"open",
-	"count",
-	"info",
-	"mkmodquery",
-	"audit",
-	"close",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -120,19 +91,30 @@ enum subs {
 	sub_overlast
 } ;
 
+constexpr cpcchar	subs[] = {
+	"open",
+	"count",
+	"info",
+	"mkmodquery",
+	"audit",
+	"close",
+	NULL
+} ;
+
+
+/* exported variables */
+
+extern const bvs_obj		bvs_modinfo = {
+    	"bvs",
+	szof(bvs)
+} ;
+
 
 /* exported subroutines */
 
-
-int bvs_open(BVS *op,cchar *pr,cchar *dbname)
-{
+int bvs_open(BVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	const char	*objname = BVS_OBJNAME ;
-
-#if	CF_DEBUGS
-	debugprintf("bvs_open: pr=%s\n",pr) ;
-	debugprintf("bvs_open: dbname=%s\n",dbname) ;
-#endif
+	cchar		*objname = BVS_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
@@ -141,7 +123,7 @@ int bvs_open(BVS *op,cchar *pr,cchar *dbname)
 	if (pr[0] == '\0') return SR_INVALID ;
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(BVS)) ;
+	memclear(op) ;
 
 	if ((rs = bvs_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
@@ -215,7 +197,7 @@ int bvs_info(BVS *op,BVS_INFO *ip)
 	}
 
 	if (ip != NULL) {
-	    memset(ip,0,sizeof(BVS_INFO)) ;
+	    memclear(ip) ;
 	    if (rs >= 0) {
 		ip->ctime = bvsi.ctime ;
 		ip->mtime = bvsi.mtime ;
@@ -231,9 +213,7 @@ int bvs_info(BVS *op,BVS_INFO *ip)
 }
 /* end subroutine (bvs_info) */
 
-
-int bvs_mkmodquery(BVS *op,BVS_VERSE *bvep,int mjd)
-{
+int bvs_mkmodquery(BVS *op,BVS_VERSE *bvep,int mjd) noex {
 	BVSES_VERSE	bv ;
 	int		rs = SR_NOSYS ;
 	int		n = 0 ;
@@ -248,7 +228,7 @@ int bvs_mkmodquery(BVS *op,BVS_VERSE *bvep,int mjd)
 	}
 
 	if (bvep != NULL) {
-	    memset(bvep,0,sizeof(BVS_VERSE)) ;
+	    memclear(bvep) ;
 	    if (rs >= 0) {
 		bvep->b = bv.b ;
 		bvep->c = bv.c ;
@@ -313,9 +293,9 @@ static int bvs_objloadbegin(BVS *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = BVS_MODBNAME ;
+	            cchar	*modbname = BVS_MODBNAME ;
 	            opts = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 	            rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
 		    f_modload = (rs >= 0) ;
@@ -406,7 +386,7 @@ static int bvs_loadcalls(BVS *op,cchar objname[])
 		switch (i) {
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
 		case sub_count:
 		    op->call.count = (int (*)(void *)) snp ;

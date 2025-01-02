@@ -1,4 +1,5 @@
 /* bibleqs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* bible-query database manager */
@@ -26,6 +27,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	bibleqs
+
+	Description:
 	This little object provides access to the BIBLEQS database
 	and index (if any).
 
@@ -203,52 +208,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	siskipwhite(cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	chownsame(cchar *,cchar *) ;
-extern int	sperm(IDS *,USTAT	 *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	strpcmp(cchar *,cchar *) ;
-extern int	isOneOf(cint *,int) ;
-extern int	isNotPresent(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-
-
-/* exported variables */
-
-BIBLEQS_OBJ	bibleqs = {
-	"bibleqs",
-	sizeof(BIBLEQS),
-	sizeof(BIBLEQS_CUR)
-} ;
+/* external variables */
 
 
 /* local structures */
@@ -360,7 +321,7 @@ static int	isNeedIndex(int) ;
 /* local variables */
 
 #if	CF_MKBIBLEQSI
-static cchar	*envchild[] = {
+constexpr cpcchar	envchild[] = {
 	VARSYSNAME,
 	VARRELEASE,
 	VARVERSION,
@@ -380,14 +341,14 @@ static cchar	*envchild[] = {
 
 /* use fixed locations for security reasons (like we care!) */
 #if	CF_MKBIBLEQSI
-static cchar	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	NULL
 } ;
 #endif /* CF_MKBIBLEQSI */
 
-static cchar	*idxdirs[] = {
+constexpr cpcchar	idxdirs[] = {
 	"/var/tmp/%{PRN}/%S",
 	"/tmp/%{PRN}/%S",
 	"%R/var/%S",
@@ -399,7 +360,7 @@ static cchar	*idxdirs[] = {
 
 #if	CF_EXTRASTRONG
 
-static cchar	*eigenfnames[] = {
+constexpr cpcchar	eigenfnames[] = {
 	"lib/bibleqs/%n.%f",
 	"lib/bibleqs/%f",
 	"share/dict/%n.%f",
@@ -413,7 +374,7 @@ static cchar	*eigenfnames[] = {
 #else /* CF_EXTRASTRONG */
 
 /* these are not likely to change since their publication in 1890! */
-static cchar	*strongseigens[] = {
+constexpr cpcchar	strongseigens[] = {
 	"a", "an", "and", "are", "as", "be", "but", "by", "for",
 	"from", "he", "her", "him", "his", "i", "in", "is", "it",
 	"me", "my", "not", "o", "of", "our", "out", "shall", "shalt",
@@ -425,18 +386,25 @@ static cchar	*strongseigens[] = {
 
 #endif /* CF_EXTRASTRONG */
 
-static cint	rsneeds[] = {
+constexpr int	rsneeds[] = {
 	SR_STALE,
 	0
 } ;
 
 
+/* exported variables */
+
+extern const bibleqs_obj	bibleqs_modinfo = {
+	"bibleqs",
+	szof(bibleqs),
+	szof(bibleqs_cur)
+} ;
+
+
 /* exported subroutines */
 
-
-int bibleqs_open(BIBLEQS *op,cchar *pr,cchar *dbname)
-{
-	SUBINFO		si ;
+int bibleqs_open(BIBLEQS *op,cchar *pr,cchar *dbname) noex {
+	subinfo		si ;
 	int		rs ;
 	int		rs1 ;
 
@@ -579,7 +547,7 @@ int bibleqs_curbegin(BIBLEQS *op,BIBLEQS_CUR *curp)
 
 	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(BIBLEQS_CUR)) ;
+	memclear(curp) ;
 	op->ncursors += 1 ;
 
 #if	CF_DEBUGN
@@ -1002,7 +970,7 @@ static int bibleqs_dirok(BIBLEQS *op,DIRSEEN *dsp,IDS *idp,
 
 static int bibleqs_mkdir(BIBLEQS *op,cchar *dp)
 {
-	const mode_t	dm = 0777 ;
+	cmode	dm = 0777 ;
 	int		rs ;
 	int		f_ok = FALSE ;
 	if ((rs = mkdirs(dp,dm)) >= 0) {
@@ -1132,7 +1100,7 @@ static int bibleqs_indopenmk(BIBLEQS *op,SUBINFO *sip,cchar *idir)
 
 static int bibleqs_indmk(BIBLEQS *op,cchar *dname,time_t dt)
 {
-	const mode_t	dm = BIBLEQS_DIRMODE ;
+	cmode	dm = BIBLEQS_DIRMODE ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1145,11 +1113,10 @@ static int bibleqs_indmk(BIBLEQS *op,cchar *dname,time_t dt)
 	    char	indname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
 		TXTINDEXMK	mk ;
-		TXTINDEXMK_PA	ta ;
-		const mode_t	om = BIBLEQS_IDXMODE ;
+		TXTINDEXMK_PA	ta{} ;
+		cmode	om = BIBLEQS_IDXMODE ;
 		cint	of = 0 ; /* auto-make */
 
-		memset(&ta,0,sizeof(TXTINDEXMK_PA)) ;
 		ta.tablen = 0 ;			/* use default! */
 		ta.minwlen = op->minwlen ;
 		ta.maxwlen = BIBLEQS_MAXWLEN ;
@@ -1199,7 +1166,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 #endif
 
 	if (op->f.edb) {
-	    cint	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
+	    cint	size = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
 	if ((rs = uc_malloc(size,&keys)) >= 0) {
 	    int	i = 0 ;
 	int		wl ;
@@ -1259,7 +1226,7 @@ static int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip)
 
 	if (op == NULL) return SR_FAULT ;
 
-	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
+	size = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
 	if ((rs = uc_malloc(size,&keys)) >= 0) {
 	    int		wl ;
 	    cchar	*wp ;
@@ -1517,12 +1484,11 @@ static int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname)
 	        if (rs >= 0) {
 		    cchar	**ev ;
 	            if ((rs = vecstr_getvec(&envs,&ev)) >= 0) {
-			SPAWNPROC	ps ;
+			SPAWNPROC	ps{} ;
 			cchar	*av[10] ;
 	    		i = 0 ;
 	    		av[i++] = prog ;
 	    		av[i++] = NULL ;
-	                memset(&ps,0,sizeof(SPAWNPROC)) ;
 	                ps.opts |= SPAWNPROC_OIGNINTR ;
 	                ps.opts |= SPAWNPROC_OSETPGRP ;
 	                for (i = 0 ; i < 3 ; i += 1) {
@@ -1947,7 +1913,7 @@ VECSTR		*hkp ;
 /* store results (file-record offsets) */
 
 	        if (rs >= 0) {
-	            cint	size = (c + 1) * sizeof(uint) ;
+	            cint	size = (c + 1) * szof(uint) ;
 	            if ((rs = uc_malloc(size,&curp->verses)) >= 0) {
 	                int *a ;
 	                if ((rs = vecint_getvec(&recoffs,&a)) >= 0) {
@@ -2018,46 +1984,34 @@ SEARCHKEYS	*skp ;
 }
 /* end subroutine (bibleqs_mkhkeys) */
 
-
-static int subinfo_start(SUBINFO *sip)
-{
+static int subinfo_start(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->dt = time(NULL) ;
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
 #ifdef	COMMENT
-static int subinfo_ids(SUBINFO *sip)
-{
+static int subinfo_ids(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-
 	if (! sip->f.id) {
 	    sip->f.id = TRUE ;
 	    rs = ids_load(&sip->id) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_ids) */
 #endif /* COMMENT */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (sip->f.id) {
 	    sip->f.id = FALSE ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */

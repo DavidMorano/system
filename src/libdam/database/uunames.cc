@@ -18,6 +18,10 @@
 
 /******************************************************************************
 
+  	Object:
+	uunames
+
+	Description:
 	This little object provides access to the UUNAMES database
 	and index (if any).
 
@@ -210,7 +214,7 @@ typedef uunames_cur	cur ;
 /* external subroutines */
 
 
-/* exported variables */
+/* external variables */
 
 
 /* local structures */
@@ -370,6 +374,12 @@ constexpr uunames_f	indopens[] = {
 
 /* exported variables */
 
+extern const uunames_obj	uunames_modinfo = {
+    	"uunames",
+	szof(uunames),
+	szof(uunames_cur)
+} ;
+
 
 /* exported subroutines */
 
@@ -383,7 +393,7 @@ int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
 	            dbname = DBNAME ;
 	        }
 		if ((rs = uunames_infoloadbegin(op,pr,dbname)) >= 0) {
-	            cint	sz = sizeof(liner) ;
+	            cint	sz = szof(liner) ;
 	            cint	ne = DEFNAMES ;
 	            if ((rs = vecobj_start(op->nlp,sz,ne,0)) >= 0) {
 			if ((rs = uunames_indopen(op,dt)) >= 0) {

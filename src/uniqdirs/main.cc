@@ -1,20 +1,20 @@
-/* main (UNIQDIRS) */
+/* main SUPPORT (UNIQDIRS) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic fron-end subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	1		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
-
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -22,21 +22,22 @@
 
 /*******************************************************************************
 
-        This is just a rather generic front-end (main) for the UNIQDIRS program.
+  	Name:
 
+	Description:
+	This is just a rather generic front-end (main) for the
+	UNIQDIRS program.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<csignal>
 #include	<unistd.h>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
@@ -56,31 +57,6 @@
 
 
 /* external subroutines */
-
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isFailOpen(int) ;
-
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */

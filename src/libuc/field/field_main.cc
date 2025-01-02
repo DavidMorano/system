@@ -199,8 +199,8 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	if (fsbp && fpp) {
 	    if (terms == nullptr) terms = dterms.terms ;
 	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
-		int		ch ;
-		int		chterm = '\0' ;
+		int	ch ;
+		int	chterm = '\0' ;
 		so.white() ;
 		fp = so.sp ;	/* <- first field? */
 	        if (so.sl > 0) {
@@ -257,8 +257,8 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	if (fsbp && fpp) {
 	    if (terms == nullptr) terms = dterms.terms ;
 	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
-		int		ch ;
-		int		chterm = '\0' ;
+		int	ch ;
+		int	chterm = '\0' ;
 		so.white() ;
 		fp = so.sp ;	/* <- first field? */
 	        if (so.sl > 0) {

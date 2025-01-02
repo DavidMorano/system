@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	varmk
+
+	Description:
 	This module implements an interface (a trivial one) that
 	provides access to the VARMK object (which is dynamically
 	loaded).
@@ -31,6 +35,7 @@
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -78,15 +83,6 @@ static bool	isrequired(int) noex ;
 
 /* local variables */
 
-static cchar	*subs[] = {
-	"open",
-	"addvar",
-	"abort",
-	"chgrp",
-	"close",
-	nullptr
-} ;
-
 enum subs {
 	sub_open,
 	sub_addvar,
@@ -94,6 +90,15 @@ enum subs {
 	sub_chgrp,
 	sub_close,
 	sub_overlast
+} ;
+
+constexpr cpcchar	subs[] = {
+	"open",
+	"addvar",
+	"abort",
+	"chgrp",
+	"close",
+	nullptr
 } ;
 
 

@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	uuname
+
+	Description:
 	This module implements an interface (a trivial one) that
 	provides access to the UUNAME object (which is dynamically
 	loaded).
@@ -27,6 +31,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<modload.h>

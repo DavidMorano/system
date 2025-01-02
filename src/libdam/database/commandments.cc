@@ -77,38 +77,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfprogroot(cchar *,int,cchar **) ;
-extern int	sfrootname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	mkdirs(char *,mode_t) ;
-extern int	removes(cchar *) ;
-extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuserhome(char *,int,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* local structures */
 
@@ -125,7 +93,7 @@ struct mkent {
 	ushort		cn ;
 } ;
 
-static cint	rsold[] = {
+constexpr int		rsold[] = {
 	SR_STALE,
 	0
 } ;
@@ -184,10 +152,10 @@ static int	isStale(int) noex ;
 
 /* exported variables */
 
-COMMANDMENTS_OBJ	commandments_modinfo = {
+extern const commandments_obj	commandments_modinfo = {
 	"commandments",
-	sizeof(COMMANDMENTS),
-	sizeof(COMMANDMENTS_CUR)
+	szof(commandments),
+	szof(commandment_cur)
 } ;
 
 
@@ -210,7 +178,7 @@ int commandments_open(COMMANDMENTS *op,cchar *pr,cchar *dbname) noex {
 	    dbname = COMMANDMENTS_DBNAME ;
 	}
 
-	memset(op,0,sizeof(COMMANDMENTS)) ;
+	memclear(op) ;
 	op->uid = -1 ;
 	op->uid_pr = -1 ;
 	op->gid_pr = -1 ;
@@ -355,7 +323,7 @@ int commandments_read(COMMANDMENTS *op,char *vbuf,int vlen,uint cn)
 #endif
 
 	if (rs >= 0) {
-	    cint	lsize = ((nlines+1) * sizeof(CMI_LINE)) ;
+	    cint	lsize = ((nlines+1) * szof(CMI_LINE)) ;
 	    char	*lb = (char *) lines ;
 	    if ((rs = cmi_read(&op->idx,&viv,lb,lsize,cn)) >= 0) {
 	        if (vbuf != NULL) {
@@ -455,14 +423,14 @@ int		vlen ;
 	    CMI_CUR	*bcurp = &curp->vicur ;
 	    CMI_ENT	viv ;
 	    CMI_LINE	lines[COMMANDMENTS_NLINES + 1] ;
-	    cint	ls = ((COMMANDMENTS_NLINES + 1) * sizeof(CMI_LINE)) ;
+	    cint	ls = ((COMMANDMENTS_NLINES + 1) * szof(CMI_LINE)) ;
 	    if ((rs = cmi_enum(&op->idx,bcurp,&viv,(char *) lines,ls)) >= 0) {
 	        if (vbuf != NULL) {
 	            rs = commandments_loadbuf(op,&viv,vbuf,vlen) ;
 		    len = rs ;
 		}
 	        if ((rs >= 0) && (ep != NULL)) {
-		    memset(ep,0,sizeof(COMMANDMENTS_E)) ;
+		    memclear(ep) ;
 		    ep->cn = viv.cn ;
 	        }
 	    } /* end if (cmi_enum) */
@@ -1275,12 +1243,12 @@ static int mkent_start(MKENT *ep,int cn,uint eoff,uint elen) noex {
 	debugprintf("mkent_start: ent cn=%u\n",cn) ;
 #endif
 
-	memset(ep,0,sizeof(MKENT)) ;
+	memclear(ep) ;
 	ep->cn = cn ;
 	ep->eoff = eoff ;
 	ep->elen = elen ;
 
-	size = (ne * sizeof(CMIMK_LINE)) ;
+	size = (ne * szof(CMIMK_LINE)) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    ep->lines = p ;
 	    ep->e = ne ;
@@ -1343,7 +1311,7 @@ static int mkent_add(MKENT *ep,uint eoff,uint elen)
 
 	if (ep->i == ep->e) {
 	    ne = (ep->e + CMIMK_NE) ;
-	    size = (ne * sizeof(MKENT_LINE)) ;
+	    size = (ne * szof(MKENT_LINE)) ;
 	    if ((rs = uc_realloc(ep->lines,size,&elp)) >= 0) {
 	        ep->lines = elp ;
 		ep->e = ne ;
@@ -1361,15 +1329,13 @@ static int mkent_add(MKENT *ep,uint eoff,uint elen)
 }
 /* end subroutine (mkent_add) */
 
-
-static int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep)
-{
+static int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep) noex {
 	uint		nlines = 0 ;
 	int		rs = SR_OK ;
 
 	if (ep == NULL) return SR_FAULT ;
 
-	memset(bvep,0,sizeof(CMIMK_ENT)) ;
+	memclear(bvep) ;
 	bvep->cn = ep->cn ;
 	bvep->eoff = ep->eoff ;
 	bvep->elen = ep->elen ;
@@ -1385,7 +1351,7 @@ static int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep)
 	    CMIMK_LINE	*lines ;
 	    int		size ;
 	    bvep->nlines = nlines ;
-	    size = ((nlines + 1) * sizeof(CMIMK_LINE)) ;
+	    size = ((nlines + 1) * szof(CMIMK_LINE)) ;
 	    if ((rs = uc_malloc(size,&lines)) >= 0) {
 	        int	i ;
 	        bvep->lines = lines ;

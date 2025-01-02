@@ -187,7 +187,7 @@ constexpr bool		f_search = CF_SEARCH ;
 
 /* exported variables */
 
-cyi_obj		cyi_modinfo = {
+extern const cyi_obj	cyi_modinfo = {
 	"cyi",
 	szof(cyi),
 	szof(cyi_cur)

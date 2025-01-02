@@ -57,7 +57,7 @@
 
 /* local defines */
 
-#define	CMI_KA		sizeof(cmi_line)
+#define	CMI_KA		szof(cmi_line)
 #define	CMI_BO(v)	((CMI_KA - ((v) % CMI_KA)) % CMI_KA)
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
@@ -75,15 +75,6 @@
 
 
 /* external variables */
-
-
-/* exported variables */
-
-cmi_obj cmi_modinfo = {
-	"cmi",
-	sizeof(cmi),
-	sizeof(cmi_cur)
-} ;
 
 
 /* local structures */
@@ -142,6 +133,12 @@ constexpr bool		f_search = CF_SEARCH ;
 
 /* exported variables */
 
+extern const cmi_obj	cmi_modinfo = {
+	"cmi",
+	szof(cmi),
+	szof(cmi_cur)
+} ;
+
 
 /* exported subroutines */
 
@@ -158,7 +155,7 @@ int cmi_open(cmi *op,cchar *dbname) noex {
 	    char	tmpfname[MAXPATHLEN + 1] ;
 	    op->dbname = cp ;
 	    if ((rs = mkfnamesuf2(tmpfname,op->dbname,CMI_SUF,es)) >= 0) {
-	        const int	tl = rs ;
+	        cint	tl = rs ;
 	        if ((rs = uc_mallocstrw(tmpfname,tl,&cp)) >= 0) {
 	            op->fname = cp ;
 	            if ((rs = cmi_loadbegin(op,dt)) >= 0) {
@@ -481,22 +478,22 @@ static int cmi_verify(cmi *op,time_t dt) noex {
 
 /* alignment restriction */
 
-	f = f && ((hip->vioff & (sizeof(int)-1)) == 0) ;
+	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
 
 /* size restrictions */
 
 	f = f && (hip->vioff <= mip->mapsize) ;
-	size = hip->vilen * 4 * sizeof(uint) ;
+	size = hip->vilen * 4 * szof(uint) ;
 	f = f && ((hip->vioff + size) <= mip->mapsize) ;
 
 /* alignment restriction */
 
-	f = f && ((hip->vloff & (sizeof(int)-1)) == 0) ;
+	f = f && ((hip->vloff & (szof(int)-1)) == 0) ;
 
 /* size restrictions */
 
 	f = f && (hip->vloff <= mip->mapsize) ;
-	size = (hip->vllen * 2 * sizeof(uint)) ;
+	size = (hip->vllen * 2 * szof(uint)) ;
 	f = f && ((hip->vloff + size) <= mip->mapsize) ;
 
 /* size restrictions */
@@ -563,7 +560,7 @@ static int cmi_search(cmi *op,uint cn) noex {
 	vte[3] = citekey ;
 	if_constexpr (f_search) {
 	    uint	*vtep ;
-	    int		vtesize = (4 * sizeof(uint)) ;
+	    int		vtesize = (4 * szof(uint)) ;
 	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
 	    rs = (vtep != nullptr) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
 	    vi = rs ;
@@ -618,7 +615,7 @@ static int cmi_loadcmd(cmi *op,cmi_ent *bvep,char *ebuf,int elen,int vi) noex {
 
 	    bo = CMI_BO(uebuf) ;
 
-	    linesize = ((nlines + 1) * sizeof(cmi_line)) ;
+	    linesize = ((nlines + 1) * szof(cmi_line)) ;
 	    if (linesize <= (elen - (bo-uebuf))) {
 
 	        lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;

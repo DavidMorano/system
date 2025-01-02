@@ -1,4 +1,5 @@
 /* calyears SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* CALYEARS object implementation */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	calyears
+
+	Description:
 	This module manages access to the various CALENDAR databases
 	either in the distribution or specified by the caller.
 
@@ -38,8 +43,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<getbufsize.h>
@@ -109,7 +115,7 @@
 #undef	NLINES
 #define	NLINES		20
 
-#define	CEBUFLEN	(NLINES * 3 * sizeof(int))
+#define	CEBUFLEN	(NLINES * 3 * szof(int))
 
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_MKWAIT	(5 * 50)
@@ -226,15 +232,6 @@ static int	isNotOrIllegalSeq(int) noex ;
 static int	isNotHols(int) noex ;
 
 
-/* exported variables */
-
-calyears_obj	calyears_mod = {
-	"calyears",
-	sizeof(calyears),
-	sizeof(calyears_cur)
-} ;
-
-
 /* local variables */
 
 enum wdays {
@@ -273,6 +270,12 @@ constexpr cint	rsnothols[] = {
 
 /* exported variables */
 
+extern const calyears_obj	calyears_modinfo = {
+	"calyears",
+	szof(calyears),
+	szof(calyears_cur)
+} ;
+
 
 /* exported subroutines */
 
@@ -287,7 +290,7 @@ int calyears_open(CALYEARS *op,cchar *pr,cchar **dns,cchar **cns) noex {
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(CALYEARS)) ;
+	memclear(op) ;
 
 	if (op->tmpdname == NULL) op->tmpdname = getenv(VARTMPDNAME) ;
 	if (op->tmpdname == NULL) op->tmpdname = TMPDNAME ;
@@ -414,7 +417,7 @@ int calyears_curbegin(CALYEARS *op,CALYEARS_CUR *curp)
 
 	if (curp == NULL) return SR_FAULT ;
 
-	memset(curp,0,sizeof(CALYEARS_CUR)) ;
+	memclear(curp) ;
 	op->ncursors += 1 ;
 	curp->magic = CALYEARS_MAGIC ;
 	return SR_OK ;
@@ -488,7 +491,7 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 
 	if (rs >= 0) {
 	    vecobj	res ;
-	    cint	size = sizeof(CALENT) ;
+	    cint	size = szof(CALENT) ;
 	    int 	vo = 0 ;
 	    vo |= VECOBJ_OORDERED ;
 	    vo |= VECOBJ_OSTATIONARY ;
@@ -770,7 +773,7 @@ static int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp)
 	if ((n = vecobj_count(rlp)) > 0) {
 	    CALENT		*rp ;
 	    CALENT		*ep ;
-	    cint		size = (n * sizeof(CALENT)) ;
+	    cint		size = (n * szof(CALENT)) ;
 	    if ((rs = uc_malloc(size,&rp)) >= 0) {
 	        int	i ;
 		for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
@@ -859,7 +862,7 @@ static int calyars_domyear(CALYEARS *op,int y,DAYOFMONTH **rpp) noex {
 		}
 	    }
 	} else if (rs == SR_NOTFOUND) {
-	    cint	dsize = sizeof(CALYEARS_DOMER) ;
+	    cint	dsize = szof(CALYEARS_DOMER) ;
 	    if ((rs = uc_malloc(dsize,&dop)) >= 0) {
 		int	f_ent = TRUE ;
 	        if ((rs = calyears_domerbegin(op,dop,y)) >= 0) {
@@ -1176,24 +1179,17 @@ static int calyears_checkupdate(CALYEARS *op,time_t dt)
 /* end subroutine (calyears_checkupdate) */
 #endif /* COMMENT */
 
-static int subinfo_start(SUBINFO *sip,CALYEARS *op,time_t dt)
-{
+static int subinfo_start(SUBINFO *sip,CALYEARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
-	if (dt == 0)
-	    dt = time(NULL) ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	if (dt == 0) dt = time(NULL) ;
+	memclear(sip) ;
 	sip->op = op ;
 	sip->dt = dt ;
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
