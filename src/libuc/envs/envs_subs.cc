@@ -1,4 +1,5 @@
 /* envs_subs SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the cookie substitutions for environment variables */
@@ -66,19 +67,23 @@
 
 /* local defines */
 
-#define	EBUFLEN		1024		/* environment-variable buf-length */
+#define	EBUFMULT	3		/* env-var buf-len-multiplier */
 
 #ifndef	DEFNPATHS
 #define	DEFNPATHS	20
 #endif
 
-#define	SUBINFO		struct subinfo
+#ifndef	CF_EXPAND
+#define	CF_EXPAND	0		/* perform expand-cookie */
+#endif
 
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -86,38 +91,35 @@ using std::max ;			/* subroutine-template */
 
 /* external subroutines */
 
-extern "C" {
-    extern int vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
-}
-
 
 /* external variables */
 
 
 /* local structures */
 
-struct subinfo {
+namespace {
+    struct subinfo {
 	envs		*nlp ;
 	expcook		*clp ;
 	vecstr		*pvp ;
 	vecstr		*evp ;
-} ;
-
-struct vars {
+	int procvar(cchar *,int) noex ;
+	int procvarnorm(cchar *,int) noex ;
+	int procvarpath(cchar *,int) noex ;
+	int procpathsplit(vecstr *,cchar *,int) noex ;
+	int procsub(buffer *,cchar *,int) noex ;
+    } ; /* end struct (subinfo) */
+    struct vars {
 	int		maxpathlen ;
-} ;
+	int		elen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
 
-static int	procvar(subinfo *,cchar *,int) noex ;
-static int	procvarnorm(subinfo *,cchar *,int) noex ;
-static int	procvarpath(subinfo *,cchar *,int) noex ;
-static int	procpathsplit(subinfo *,vecstr *,cchar *,int) noex ;
-static int	procsub(subinfo *,buffer *,cchar *,int) noex ;
-static int	pathjoin(vecstr *,char *,int) noex ;
-
-static int	mkvars() noex ;
+static int	vecstr_pathjoin(vecstr *,char *,int) noex ;
 
 
 /* local variables */
@@ -125,6 +127,8 @@ static int	mkvars() noex ;
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 static vars		var ;
+
+constexpr bool		f_expand = CF_EXPAND ;
 
 
 /* exported variables */
@@ -137,30 +141,29 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (nlp && clp && pvp && evp) {
-	    static cint	srs = mkvars() ;
-	    if ((rs = srs) >= 0) {
-	        SUBINFO		si, *sip = &si ;
-	        envs_cur	cur ;
-	        sip->evp = evp ;
-	        sip->clp = clp ;
-	        sip->pvp = pvp ;
-	        sip->nlp = nlp ;
-	        if ((rs = envs_curbegin(nlp,&cur)) >= 0) {
+	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+	        subinfo		si ;
+	        si.evp = evp ;
+	        si.clp = clp ;
+	        si.pvp = pvp ;
+	        si.nlp = nlp ;
+	        if (envs_cur cur ; (rs = envs_curbegin(nlp,&cur)) >= 0) {
 	            int		kl ;
 	            cchar	*kp{} ;
 	            while (rs >= 0) {
-	                kl = envs_enumkey(nlp,&cur,&kp) ;
+	                kl = envs_curenumkey(nlp,&cur,&kp) ;
 	                if (kl == SR_NOTFOUND) break ;
 	                rs = kl ;
 	                if (rs >= 0) {
 	                    c += 1 ;
-	                    rs = procvar(sip,kp,kl) ;
+	                    rs = si.procvar(kp,kl) ;
 	                }
 	            } /* end while */
 	            rs1 = envs_curend(nlp,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
-	    } /* end if (mkvars) */
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -169,110 +172,104 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 
 /* local subroutines */
 
-static int procvar(subinfo *sip,cchar *kp,int kl) noex {
+int subinfo::procvar(cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((rs1 = vecstr_findn(sip->pvp,kp,kl)) >= 0) {
-	    rs = procvarpath(sip,kp,kl) ;
+	if ((rs1 = vecstr_findn(pvp,kp,kl)) >= 0) {
+	    rs = procvarpath(kp,kl) ;
 	} else if (rs1 == SR_NOTFOUND) {
-	    rs = procvarnorm(sip,kp,kl) ;
+	    rs = procvarnorm(kp,kl) ;
 	} else {
 	    rs = rs1 ;
 	}
 	return rs ;
 }
-/* end subroutine (procvar) */
+/* end method (subinfo::procvar) */
 
-static int procvarnorm(subinfo *sip,cchar *kp,int kl) noex {
-	buffer		b ;
+int subinfo::procvarnorm(cchar *kp,int kl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = buffer_start(&b,EBUFLEN)) >= 0) {
-	    envs_cur	cur ;
-	    int		bl ;
-	    cchar	*bp ;
-	    if ((rs = envs_curbegin(sip->nlp,&cur)) >= 0) {
+	if (buffer b ; (rs = b.start(var.elen)) >= 0) {
+	    if (envs_cur cur ; (rs = envs_curbegin(nlp,&cur)) >= 0) {
 	        int	vl ;
 	        cchar	*vp ;
 	        while (rs >= 0) {
-	            vl = envs_fetch(sip->nlp,kp,kl,&cur,&vp) ;
+	            vl = envs_fetch(nlp,kp,kl,&cur,&vp) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 	            if ((rs >= 0) && (vl > 0)) {
 	                if (rs >= 0) {
-	                    rs = procsub(sip,&b,vp,vl) ;
+	                    rs = procsub(&b,vp,vl) ;
 			}
 	            } /* end if */
 	        } /* end while */
-	        rs1 = envs_curend(sip->nlp,&cur) ;
+	        rs1 = envs_curend(nlp,&cur) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
+	    } /* end if (envs-cursor) */
 	    if (rs >= 0) {
-	        if ((bl = buffer_get(&b,&bp)) >= 0) {
-	            rs = vecstr_envadd(sip->evp,kp,bp,bl) ;
+	        if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
+	            rs = vecstr_envadd(evp,kp,bp,rs) ;
 		}
-	    } /* end if */
-	    rs1 = buffer_finish(&b) ;
+	    } /* end if (ok) */
+	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (procvarnorm) */
+/* end method (subinfo::procvarnorm) */
 
-static int procvarpath(subinfo *sip,cchar *kp,int kl) noex {
-	vecstr		paths ;
+int subinfo::procvarpath(cchar *kp,int kl) noex {
+    	cint		vn = DEFNPATHS ;
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = vecstr_start(&paths,DEFNPATHS,vo)) >= 0) {
-	    buffer	b ;
+	if (vecstr paths ; (rs = paths.start(vn,vo)) >= 0) {
 	    cint	bslen = var.maxpathlen ;
-	    if ((rs = buffer_start(&b,bslen)) >= 0) {
-		envs_cur	cur ;
-	        if ((rs = envs_curbegin(sip->nlp,&cur)) >= 0) {
+	    if (buffer b ; (rs = b.start(bslen)) >= 0) {
+		if (envs_cur cur ; (rs = envs_curbegin(nlp,&cur)) >= 0) {
 		    int		vl, bl ;
 		    cchar	*vp, *bp ;
 	            while (rs >= 0) {
-	                vl = envs_fetch(sip->nlp,kp,kl,&cur,&vp) ;
+	                vl = envs_fetch(nlp,kp,kl,&cur,&vp) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                rs = vl ;
 	                if ((rs >= 0) && (vp[0] != ':')) {
-	                    buffer_reset(&b) ;
-	                    if ((rs = procsub(sip,&b,vp,vl)) >= 0) {
-	                        if ((bl = buffer_get(&b,&bp)) >= 0) {
-	                            rs = procpathsplit(sip,&paths,bp,bl) ;
+	                    b.reset() ;
+	                    if ((rs = procsub(&b,vp,vl)) >= 0) {
+	                        if ((bl = b.get(&bp)) >= 0) {
+	                            rs = procpathsplit(&paths,bp,bl) ;
 				}
 	                    } /* end if */
 	                } /* end if */
 	            } /* end while */
-	            rs1 = envs_curend(sip->nlp,&cur) ;
+	            rs1 = envs_curend(nlp,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
 	        if (rs >= 0) {
-	            cint	size = vecstr_strsize(&paths) ;
-	            cint	npaths = vecstr_count(&paths) ;
-	            int		bufl ;
-	            char	*bufp{} ;
-	            bufl = (size + npaths + 1) ;
-	            if ((rs = uc_malloc(bufl,&bufp)) >= 0) {
-			cchar	*sp = bufp ;
-			int	sl = 0 ;
-	                if ((rs = pathjoin(&paths,bufp,bufl)) > 0) {
-			    sl = rs ;
-			    while (sl && (sp[0] == ':')) {
-				sp += 1 ;
-				sl -= 1 ;
-			    } /* end while */
-			    len = sl ;
-	                    rs = vecstr_envadd(sip->evp,kp,sp,sl) ;
-			} /* end if (pathjoin) */
-	                rs1 = uc_free(bufp) ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (allocation) */
+	            cint	psz = paths.strsize ;
+		    if ((rs = paths.count) >= 0) {
+			cint	npaths = rs ;
+	                cint	bufl = (psz + npaths + 1) ;
+	                if (char *bufp{} ; (rs = uc_malloc(bufl,&bufp)) >= 0) {
+			    cchar	*sp = bufp ;
+			    int	sl = 0 ;
+	                    if ((rs = vecstr_pathjoin(&paths,bufp,bufl)) > 0) {
+			        sl = rs ;
+			        while (sl && (sp[0] == ':')) {
+				    sp += 1 ;
+				    sl -= 1 ;
+			        } /* end while */
+			        len = sl ;
+	                        rs = vecstr_envadd(evp,kp,sp,sl) ;
+			    } /* end if (vecstr_pathjoin) */
+	                    rs1 = uc_free(bufp) ;
+			    if (rs >= 0) rs = rs1 ;
+	                } /* end if (allocation) */
+		    } /* end if (vecstr_count) */
 	        } /* end if (ok) */
-	        rs1 = buffer_finish(&b) ;
+	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (buffer) */
 	    rs1 = vecstr_finish(&paths) ;
@@ -280,26 +277,25 @@ static int procvarpath(subinfo *sip,cchar *kp,int kl) noex {
 	} /* end if (vecstr-paths) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (procvarpath) */
+/* end method (subinfo::procvarpath) */
 
-static int procpathsplit(subinfo *sip,vecstr *plp,cchar *vp,int vl) noex {
+int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (sip) {
-	    char	*pathbuf{} ;
-	    if ((rs = malloc_mp(&pathbuf)) >= 0) {
+	if (plp) {
+	    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
 	        int	pl, cl ;
 	        cchar	*tp, *cp ;
 	        while ((tp = strnpbrk(vp,vl,":;")) != nullptr) {
 	            cp = vp ;
 	            cl = (tp - vp) ;
 	            c += 1 ;
-	            if ((pl = pathclean(pathbuf,cp,cl)) >= 0) {
-	                rs = vecstr_adduniq(plp,pathbuf,pl) ;
+	            if ((pl = pathclean(pbuf,cp,cl)) >= 0) {
+	                rs = plp->adduniq(pbuf,pl) ;
 		    }
 	            if ((rs >= 0) && (tp[0] == ';')) {
-	                rs = vecstr_adduniq(plp,";",1) ;
+	                rs = plp->adduniq(";",1) ;
 	            }
 	            vl -= ((tp + 1) - vp) ;
 	            vp = (tp + 1) ;
@@ -307,98 +303,92 @@ static int procpathsplit(subinfo *sip,vecstr *plp,cchar *vp,int vl) noex {
 	        } /* end while */
 	        if ((rs >= 0) && ((c == 0) || (vl > 0))) {
 	            c += 1 ;
-	            if ((pl = pathclean(pathbuf,vp,(tp - vp))) >= 0) {
-	                rs = vecstr_adduniq(plp,pathbuf,pl) ;
+	            if ((pl = pathclean(pbuf,vp,(tp - vp))) >= 0) {
+	                rs = plp->adduniq(pbuf,pl) ;
 	            }
 	        } /* end if */
-		rs1 = uc_free(pathbuf) ;
+		rs1 = uc_free(pbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (procpathsplit) */
+/* end method (subinfo::procpathsplit) */
 
-#if	CF_EXPAND
-static int procsub(subinfo *sip,buffer *bp,cchar *vp,int vl) noex {
-	int		rs ;
-	int		rs1 = SR_NOTFOUND ;
-	int		i ;
-	int		buflen = max(EBUFLEN,vl) ;
-	char		*buf = nullptr ;
-	char		*p ;
-	for (i = 0 ; (rs = uc_malloc(buflen,&p)) >= 0 ; i += 1) {
-	    buf = p ;
-	    rs1 = expcook_exp(sip->clp,0,buf,buflen,vp,vl) ;
-	    if (rs1 >= 0) break ;
-	    buflen += EBUFLEN ;
-	    uc_free(buf) ;
-	    buf = nullptr ;
-	} /* end while */
-	if ((rs >= 0) && (rs1 > 0)) {
-	    rs = buffer_strw(bp,buf,rs1) ;
-	}
-	if (buf != nullptr) {
-	    uc_free(buf) ;
-	}
-	return rs ;
-}
-/* end subroutine (procsub) */
-#else /* CF_EXPAND */
-static int procsub(subinfo *sip,buffer *bp,cchar *vp,int vl) noex {
+int subinfo::procsub(buffer *bp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
-	    rs = buffer_strw(bp,vp,vl) ;
+	if (bp) {
+	    if_constexpr (f_expand) {
+	        int	rs1 = SR_NOTFOUND ;
+	        int	elen = max(var.elen,vl) ;
+	        char	*ebuf{} ;
+	        char	*p{} ;
+	        for (int i = 0 ; (rs = uc_malloc(elen,&p)) >= 0 ; i += 1) {
+	            ebuf = p ;
+	            rs1 = expcook_exp(clp,0,ebuf,elen,vp,vl) ;
+	            if (rs1 >= 0) break ;
+	            elen += var.elen ;
+	            uc_free(ebuf) ;
+	            ebuf = nullptr ;
+	        } /* end while */
+	        if ((rs >= 0) && (rs1 > 0) && ebuf) {
+	            rs = bp->strw(ebuf,rs1) ;
+	        }
+	        if (ebuf) {
+	            uc_free(ebuf) ;
+	        }
+	    } else {
+	        rs = bp->strw(vp,vl) ;
+	    } /* end if_constexpr (f_expand) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (procsub) */
-#endif /* CF_EXPAND */
+/* end method (subinfo::procsub) */
 
-static int pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
-	sbuf		b ;
+static int vecstr_pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	int		rs ;
-	int		c = 0 ;
 	int		bl = 0 ;
-	int		f_semi = false ;
-	if ((rs = sbuf_start(&b,jbuf,jlen)) >= 0) {
-	    int		sc ;
+	if (sbuf b ; (rs = b.start(jbuf,jlen)) >= 0) {
+	    int		c = 0 ;
 	    cchar	*cp ;
-	    for (int i = 0 ; vecstr_get(plp,i,&cp) >= 0 ; i += 1) {
+	    bool	f_semi = false ;
+	    for (int i = 0 ; plp->get(i,&cp) >= 0 ; i += 1) {
 	        if (cp) {
-	        if (cp[0] != ';') {
-	            if (c++ > 0) {
-	                if (f_semi) {
-	                    f_semi = false ;
-	                    sc = ';' ;
-	                } else {
-	                    sc = ':' ;
-			}
-	                rs = sbuf_chr(&b,sc) ;
-	            }
-	            if (rs >= 0) {
-	                rs = sbuf_strw(&b,cp,-1) ;
+	            if (cp[0] != ';') {
+	                if (c++ > 0) {
+			    int sc{} ;
+	    		    if (f_semi) {
+	                        f_semi = false ;
+	                        sc = ';' ;
+	                    } else {
+	                        sc = ':' ;
+			    }
+	                    rs = b.chr(sc) ;
+	                }
+	                if (rs >= 0) {
+	                    rs = b.str(cp) ;
+		        }
+	            } else {
+	                f_semi = true ;
 		    }
-	        } else {
-	            f_semi = true ;
-		}
 		} /* end if (non-null) */
 	        if (rs < 0) break ;
 	    } /* end for */
-	    bl = sbuf_finish(&b) ;
+	    bl = b.finish ;
 	    if (rs >= 0) rs = bl ;
 	} /* end if (sbuf) */
 
 	return (rs >= 0) ? bl : rs ;
 }
-/* end subroutine (pathjoin) */
+/* end subroutine (vecstr_pathjoin) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = maxpathlen) >= 0) {
-	    var.maxpathlen = rs ;
+	    maxpathlen = rs ;
+	    elen = (rs * EBUFMULT) ;
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::operator) */
 

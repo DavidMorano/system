@@ -1,18 +1,15 @@
-/* output */
+/* output SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* subroutine to write out the make time information */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUG	0		/* compile-time debugging */
-
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-
 	This subroutine was written for Rightcore Network Services.
-
 
 */
 
@@ -20,18 +17,20 @@
 
 /*******************************************************************************
 
-	This subroutine outputs the created string.
+  	Name:
+	output
 
+	Description:
+	This subroutine outputs the created string.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ascii.h>
@@ -62,11 +61,12 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int output(PROGINFO *pip,cchar *ofname)
-{
+int output(progifo *pip,cchar *ofname) noex {
 	bfile		ofile, *ofp = &ofile ;
 	const time_t	clock = pip->daytime ;
 	const int	olen = ORGLEN ;
@@ -81,10 +81,9 @@ int output(PROGINFO *pip,cchar *ofname)
 /* we cannot allow any weirdo quotes from getting into our target string */
 
 	if ((org != NULL) && (org[0] != '\0')) {
-	    int		i ;
 	    len = strnlen(org,olen) ;
 	    bp = obuf ;
-	    for (i = 0 ; (i < len) && org[i] ; i += 1) {
+	    for (int i = 0 ; (i < len) && org[i] ; i += 1) {
 	        if (org[i] == '"') *bp++ = '\\' ;
 	        *bp++ = org[i] ;
 	    } /* end for */

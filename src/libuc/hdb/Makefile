@@ -1,6 +1,6 @@
-# MAKEFILES (hdbstr)
+# MAKEFILES (hdb)
 
-T= hdbstr
+T= hdb
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += hdbstr.h
+INCS += hdb.h
 
 LIBS +=
 
@@ -55,12 +55,12 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= hdbstr_main.o hdbstr_obj.o hdbstr_iter.o
-OBJ1= hdbstr_loadkeys.o hdbstr_loadpairs.o
+OBJ0= hdb_main.o hdb_obj.o
+OBJ1=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o
 
-OBJ= $(OBJA)
+OBJ= obja.o
 
 
 .SUFFIXES:		.hh .ii
@@ -129,12 +129,6 @@ obj4.o:			$(OBJ4)
 obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
-obj6.o:			$(OBJ6)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6)
-
-obj7.o:			$(OBJ7)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
-
 
 obja.o:			$(OBJA)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
@@ -143,10 +137,7 @@ objb.o:			$(OBJB)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
 
 
-hdbstr_main.o:		hdbstr_main.cc		$(INCS)
-hdbstr_obj.o:		hdbstr_obj.cc		$(INCS)
-hdbstr_iter.o:		hdbstr_iter.cc		$(INCS)
-hdbstr_loadkeys.o:	hdbstr_loadkeys.cc	$(INCS)
-hdbstr_loadpairs.o:	hdbstr_loadpairs.cc	$(INCS)
+hdb_main.o:		hdb_main.cc		$(INCS)
+hdb_obj.o:		hdb_obj.cc		$(INCS)
 
 

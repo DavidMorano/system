@@ -1835,7 +1835,7 @@ static int procreger(PROGINFO *pip,cchar *db,int nc,int ac,MAPSTRINT *nlp)
 	        if ((rs = mapstrint_curbegin(nlp,&cur)) >= 0) {
 	            int		v ;
 	            cchar	*np ;
-	            while (mapstrint_enum(nlp,&cur,&np,&v) >= 0) {
+	            while (mapstrint_curenum(nlp,&cur,&np,&v) >= 0) {
 	                if (np != NULL) {
 	                    if (i < nc) {
 	                        namelist[i].name = np ;

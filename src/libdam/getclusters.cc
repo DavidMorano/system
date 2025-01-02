@@ -177,14 +177,14 @@ int geter::ndb() noex {
 	    if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
 	        if (nodedb_cur cur ; (rs = nodedb_curbegin(&st,&cur)) >= 0) {
 	    	    nodedb_ent	ste ;
-		    cint	nrs = SR_NOTFOUND ;
+		    cint	rsn = SR_NOTFOUND ;
 	            while (rs >= 0) {
 	                rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
-	                if (rs1 == nrs) break ;
+	                if (rs1 == rsn) break ;
 			rs = rs1 ;
 			if (rs >= 0) {
 	            	    if (ste.clu && (ste.clu[0] != '\0')) {
-	                	if ((rs = slp->find(ste.clu)) == nrs) {
+	                	if ((rs = slp->find(ste.clu)) == rsn) {
 	                    	    c += 1 ;
 	                    	    rs = slp->add(ste.clu) ;
 	                	}
@@ -211,13 +211,13 @@ int geter::cdb() noex {
 	if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
 	    if (clusterdb clu ; (rs = clusterdb_open(&clu,tbuf)) >= 0) {
 	        if (cdb_cur cur{} ; (rs = clusterdb_curbegin(&clu,&cur)) >= 0) {
-		    cint	nrs = SR_NOTFOUND ;
+		    cint	rsn = SR_NOTFOUND ;
 	            while (rs >= 0) {
 	                rs1 = clusterdb_curfetchrev(&clu,nn,&cur,ebuf,elen) ;
-	                if (rs1 == nrs) break ;
+	                if (rs1 == rsn) break ;
 			rs = rs1 ;
 			if (rs >= 0) {
-	            	    if ((rs = slp->find(ebuf)) == nrs) {
+	            	    if ((rs = slp->find(ebuf)) == rsn) {
 	                	c += 1 ;
 	                	rs = slp->add(ebuf) ;
 			    }

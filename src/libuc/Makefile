@@ -374,7 +374,6 @@ dstr.o:			dstr.cc dstr.h
 
 varray.o:		varray.cc varray.h
 
-hdb.o:			hdb.cc hdb.h
 lookaside.o:		lookaside.cc lookaside.h
 linefold.o:		linefold.cc linefold.h
 
@@ -705,6 +704,11 @@ strpack.o:		strpack.dir
 strpack.dir:
 	makesubdir $@
 
+# HDB
+hdb.o:			hdb.dir
+hdb.dir:
+	makesubdir $@
+
 # HDBSTR
 hdbstr.o:		hdbstr.dir
 hdbstr.dir:
@@ -789,7 +793,6 @@ groupids.o:		groupids.cc	groupids.hh
 realname.o:		realname.cc	realname.h
 bits.o:			bits.cc		bits.h
 userattrdb.o:		userattrdb.cc	userattrdb.h
-hdb.o:			hdb.cc		hdb.h
 pmq.o:			pmq.cc		pmq.h
 filegrp.o:		filegrp.cc	filegrp.h
 unameo.o:		unameo.cc	unameo.h
@@ -816,11 +819,13 @@ sif.o:			sif.cc		sif.hh
 bufstr.o:		bufstr.cc bufstr.h
 setint.o:		setint.cc setint.h
 osetint.o:		osetint.cc osetint.h
-osetstr.o:		osetstr.cc osetstr.h
-osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 syspasswd.o:		syspasswd.cc syspasswd.h
 absfn.o:		absfn.cc absfn.h
 envmgr.o:		envmgr.cc envmgr.h
+
+# set-(of)-strings
+osetstr.o:		osetstr.cc osetstr.h
+osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h

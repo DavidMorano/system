@@ -1,4 +1,5 @@
 /* envs HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* environment-variable list container */
@@ -46,8 +47,8 @@ extern int envs_present(envs *,cchar *,int) noex ;
 extern int envs_substr(envs *,cchar *,int,cchar *,int) noex ;
 extern int envs_curbegin(envs *,envs_cur *) noex ;
 extern int envs_curend(envs *,envs_cur *) noex ;
-extern int envs_enumkey(envs *,envs_cur *,cchar **) noex ;
-extern int envs_enum(envs *,envs_cur *,cchar **,cchar **) noex ;
+extern int envs_curenumkey(envs *,envs_cur *,cchar **) noex ;
+extern int envs_curenum(envs *,envs_cur *,cchar **,cchar **) noex ;
 extern int envs_fetch(envs *,cchar *,int,envs_cur *,cchar **) noex ;
 extern int envs_delname(envs *,cchar *,int) noex ;
 extern int envs_count(envs *) noex ;

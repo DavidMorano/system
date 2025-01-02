@@ -13,7 +13,7 @@
 /* revision history:
 
 	= 2003-06-11, David A­D­ Morano
-	I snarfed this file from some hardware research use since
+	I snarfed this code from some hardware research use since
 	it seemed be a pretty good match for the present algorithm
 	needs.  We will see how it works out! :-|
 
@@ -484,7 +484,7 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	                    rs = sncpy1(vbuf,vlen,vp) ;
 		        }
 	            } /* end if */
-	        } /* end if */
+	        } /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
@@ -710,27 +710,26 @@ static int mxalias_filereg(MA *op,USTAT *sbp,cchar *fn) noex {
 #if	CF_FILECHECK
 
 /* check if files have changed */
-static int mxalias_filechecks(MA *op,time_t daytime) noex {
+static int mxalias_filechecks(MA *op,time_t dt) noex {
     	vecobj		*flp = op->flp ;
-	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		c_changed = 0 ;
 	void		*vp{} ;
 	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    MA_FI	*fep = (MA_FI *) vp ;
-	    if (fep == nullptr) continue ;
-
-	    if ((u_stat(fep->fname,&sb) >= 0) && (sb.st_mtime > fep->timod)) {
-
-	        c_changed += 1 ;
-	        mxalias_filedump(op,i) ;
-
-	        rs = mxalias_fileparse(op,i) ;
-	    } /* end if */
-
+	    if (vp) {
+	        if (USTAT sb ; (rs = uc_stat(fep->fname,&sb)) >= 0) {
+		    if (sb.st_mtime > fep->timod) {
+	        	c_changed += 1 ;
+	        	mxalias_filedump(op,i) ;
+	        	rs = mxalias_fileparse(op,i) ;
+		    }
+	        } else if (isNotPresent(rs)) {
+		    rs = SR_OK ;{
+	        } /* end if */
+	    }
 	    if (rs < 0) break ;
 	} /* end for */
-
 	op->ti_check = daytime ;
 	return (rs >= 0) ? c_changed : rs ;
 }
@@ -784,13 +783,13 @@ static int mxalias_fileparse(MA *op,int fi) noex {
 	            rs1 = bclose(lfp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (bfile) */
+		if (rs < 0) {
+	    	    mxalias_filedump(op,fi) ;
+		}
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
 	} /* end if (vecobj_get) */
-	if (rs < 0) {
-	    mxalias_filedump(op,fi) ;
-	}
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mxalias_fileparse) */
@@ -850,52 +849,45 @@ static int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 /* end subroutine (mxalias_fileparseln) */
 
 static int mxalias_fileparseln_alias(MA *op,int fi,BD *bdp,field *fsbp) noex {
-	cint	flen = bdp->flen ;
-	cint	klen = bdp->klen ;
+	cint		flen = bdp->flen ;
+	cint		klen = bdp->klen ;
 	int		rs = SR_OK ;
 	int		fl ;
 	int		c_field = 0 ;
 	int		c = 0 ;
-	cchar	*fp ;
 	char		*kbuf = bdp->kbuf ;
 	char		*fbuf = bdp->fbuf ;
 	(void) fi ;
 	kbuf[0] = '\0' ;
 	while (rs >= 0) {
-
-	    fp = fbuf ;
+	    cchar	*fp = fbuf ;
 	    fl = field_sharg(fsbp,vterms,fbuf,flen) ;
-
-	    if ((fl < 0) || ((c_field == 0) && (fl == 0)))
-	        break ;
-
+	    if ((fl < 0) || ((c_field == 0) && (fl == 0))) break ;
 	    if (c_field++ == 0) {
-	        strwcpy(kbuf,fp,MIN(fl,klen)) ;
+	        strwcpy(kbuf,fp,min(fl,klen)) ;
 	    } else if (kbuf[0] != '\0') {
 	        c += 1 ;
 	        rs = keyvals_add(op->elp,fi,kbuf,fp,fl) ;
 	    } /* end if (handling record) */
-
 	    if (fsbp->term == '#') break ;
 	} /* end while (fields) */
-
 	if ((rs >= 0) && (c == 0) && (kbuf[0] != '\0')) {
 	    c += 1 ;
 	    rs = keyvals_add(op->elp,fi,kbuf,fbuf,0) ;
 	}
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mxalias_fileparseln_alias) */
 
 static int mxalias_fileparseln_unalias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
-	int		rs = SR_OK ;
-	int		fl ;
+	int		rs ;
 	char		*fbuf = bdp->fbuf ;
 	(void) fi ;
-	if ((fl = field_sharg(fsbp,vterms,fbuf,flen)) > 0) {
-	    rs = keyvals_delkey(op->elp,fbuf,fl) ;
+	if ((rs = fsbp->sharg(vterms,fbuf,flen)) > 0) {
+	    rs = keyvals_delkey(op->elp,fbuf,rs) ;
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
 	}
 	return rs ;
 }
@@ -1002,7 +994,7 @@ static int mxalias_fileold(MA *op,time_t daytime) noex {
 	            rs1 = u_stat(cp,&sb) ;
 	            if ((rs1 >= 0) && (sb.st_mtime > op->fi.timod)) break ;
 	        } /* end for */
-	        f = (op->aprofile[i] != nullptr) ? 1 : 0 ;
+	        f = (op->aprofile[i] != nullptr) ;
 	    	rs = rsfree(rs,tbuf) ;
 	    } /* end if (m-a-f) */
 	} /* end if (mxalias_aprofile) */
@@ -1042,14 +1034,14 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 	                f = f && (strncmp(kp,vp,vl) == 0) ;
 	                f = f && (kp[vl] == '\0') ;
 	                if (! f) {
-	                    if ((rs = vecstr_findn(klp,vp,vl)) >= 0) {
+	                    if ((rs = klp->findn(vp,vl)) >= 0) {
 	                        f = true ;
 			    } else if (rs == rsn) {
 				rs = SR_OK ;
 			    }
 	                }
 	                if ((rs >= 0) && (! f)) {
-	                    rs = vecstr_adduniq(vlp,vp,vl) ;
+	                    rs = vlp->adduniq(vp,vl) ;
 			}
 	            } /* end if (substantive value) */
 	        } /* end while */
@@ -1057,7 +1049,7 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 	    if ((rs >= 0) && (c > 0)) {
-	        rs = vecstr_adduniq(klp,kp,-1) ;
+	        rs = klp->adduniq(kp) ;
 	    }
 	} /* end if (non-nul) */
 	return (rs >= 0) ? c : rs ;
@@ -1097,7 +1089,7 @@ static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	                curp->vals = nullptr ;
 	            }
 	        } /* end if (m-a) */
-	    } /* end if (non-zero) */
+	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }

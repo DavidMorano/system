@@ -293,10 +293,10 @@ int filecounts_curend(FC *op,FC_CUR *curp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == FILECOUNTS_MAGIC) {
 	        if ((curp->listn > 0) && (curp->listp != nullptr)) {
-	            FC_II	*list = curp->listp ;
+	            FC_II	*rlp = curp->listp ;
 	            for (int i = 0 ; i < curp->listn ; i += 1) {
-	                if (list[i].name != nullptr) {
-	                    rs1 = uc_free(list[i].name) ;
+	                if (rlp[i].name != nullptr) {
+	                    rs1 = uc_free(rlp[i].name) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                }
 	            } /* end for */
@@ -324,11 +324,11 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 	if ((rs = filecounts_magic(op,curp)) >= 0) {
 	    rs = SR_BADSLOT ;
 	    if (op->ncursors > 0) {
-	        cint	iisize = szof(FC_II) ;
+	        cint	iisz = szof(FC_II) ;
 	        cint	to = TO_LOCK ;
 	        int	vn = DEFNENTRIES ;
 	        int	vo = 0 ;
-	        if (vecobj tlist ; (rs = tlist.start(iisize,vn,vo)) >= 0) {
+	        if (vecobj tlist ; (rs = tlist.start(iisz,vn,vo)) >= 0) {
 	            if ((rs = lockfile(op->fd,F_RLOCK,0z,0z,to)) >= 0) {
 		        {
 	                    rs = filecounts_snaper(op,&tlist) ;
@@ -337,7 +337,7 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (locked-DB) */
 	            if ((rs >= 0) && (rs = tlist.count) >= 0) {
-	                cint	sz = ((rs + 1) * iisize) ;
+	                cint	sz = ((rs + 1) * iisz) ;
 	                if (char *cp{} ; (rs = uc_malloc(sz,&cp)) >= 0) {
 	                    FC_II	*ilist = (FC_II *) cp ;
 		            void	*vp{} ;
@@ -373,12 +373,11 @@ int filecounts_curread(FC *op,FC_CUR *curp,FC_I *fcip,
 	    rs = SR_NOTOPEN ;
 	    if (curp->magic == FILECOUNTS_MAGIC) {
 	        int	ei = (curp->i >= 0) ? curp->i : 0 ;
-	        cchar	*sp ;
 		rs = SR_OK ;
 	        if (ei < curp->listn) {
+	            cchar	*sp = curp->listp[ei].name ;
 	            fcip->utime = curp->listp[ei].utime ;
 	            fcip->value = curp->listp[ei].value ;
-	            sp = curp->listp[ei].name ;
 	            nbuf[0] = '\0' ;
 	            if (sp) {
 	                rs = sncpy(nbuf,nlen,sp) ;
@@ -456,11 +455,10 @@ static int filecounts_procline(FC *op,WORKER *wp,int eo,
 	cint		llen = FILECOUNTS_NUMDIGITS ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		si ;
 	if (op && wp) {
+	    cint si = (FILECOUNTS_NUMDIGITS + 1 + FILECOUNTS_LOGZLEN + 1) ;
 	    rs = SR_OK ;
 	    /* calulate the "skip" index */
-	    si = (FILECOUNTS_NUMDIGITS + 1 + FILECOUNTS_LOGZLEN + 1) ;
 	    if (len >= (si+1)) {
 	        cchar	*sp = (lbuf + si) ;
 	        cint	sl = rmeol((lbuf + si),(len - si)) ;
@@ -490,7 +488,7 @@ static int filecounts_update(FC *op,WORKER *wp) noex {
 	/* sort the entries by offset (w/ new ones at the rear) */
 	if ((rs = worker_sort(wp)) >= 0) {
 	    FC_N	*nlp = wp->nlp ;
-	    WORKER_ENT	*wep ;
+	    WORKER_ENT	*wep{} ;
 	    for (int i = 0 ; worker_get(wp,i,&wep) >= 0 ; i += 1) {
 	        if (wep) {
 	            if (wep->action >= 0) {
@@ -553,7 +551,7 @@ static int filecounts_updateone(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 
 static int filecounts_append(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	uint		nv = 0 ;
-	cint		nvsize = FILECOUNTS_NUMDIGITS ;
+	cint		nvsz = FILECOUNTS_NUMDIGITS ;
 	cint		tlen = FILECOUNTS_LOGZLEN ;
 	cint		na = wep->action ;
 	int		rs ;
@@ -569,7 +567,7 @@ static int filecounts_append(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	if (char *ubuf{} ; (rs = uc_malloc(var.uentlen,&ubuf)) >= 0) {
 	    cint	ulen = rs ;
 	    cchar	*nn = wep->name ;
-	    if ((rs = mkentry(ubuf,ulen,nv,nvsize,tbuf,tlen,nn)) >= 0) {
+	    if ((rs = mkentry(ubuf,ulen,nv,nvsz,tbuf,tlen,nn)) >= 0) {
 	        cint	w = SEEK_END ;
 	        wlen += rs ;
 	        if (off_t eoff{} ; (rs = u_seeko(op->fd,0z,w,&eoff)) >= 0) {
@@ -588,7 +586,7 @@ static int filecounts_fins(FC *op,WORKER *wp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
-	    WORKER_ENT	*wep ;
+	    WORKER_ENT	*wep{} ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs1 = worker_get(wp,i,&wep)) >= 0 ; i += 1) {
 	        if (wep) {
@@ -703,14 +701,14 @@ static int filecounts_lockend(FC *op) noex {
 /* end subroutine (filecounts_lockend) */
 
 static int worker_start(WORKER *wp,FC_N *nlp) noex  {
-	cint		wesize = szof(WORKER_ENT) ;
+	cint		wesz = szof(WORKER_ENT) ;
 	cint		vn = DEFNENTRIES ;
 	int		rs ;
 	int		vo = VECOBJ_OCOMPACT ;
 	memclear(wp) ;
 	wp->nlp = nlp ;
-	if ((rs = vecobj_start(&wp->wlist,wesize,vn,vo)) >= 0) {
-	    WORKER_ENT	we ;
+	if ((rs = vecobj_start(&wp->wlist,wesz,vn,vo)) >= 0) {
+	    WORKER_ENT	we{} ;
 	    int		i ; /* used-afterwards */
 	    int		na ;
 	    int		vadding = 0 ;
@@ -722,7 +720,6 @@ static int worker_start(WORKER *wp,FC_N *nlp) noex  {
 	            cint	nv = nlp[i].value ;
 	            na = actioncmd(nv) ;
 	            if (na == WORKER_CMDINC) vadding += nv ;
-		    we = {} ;
 	            we.eoff = -1 ;
 	            we.ni = i ;
 	            we.name = sp ;
@@ -748,7 +745,6 @@ static int worker_start(WORKER *wp,FC_N *nlp) noex  {
 	        vecobj_finish(&wp->wlist) ;
 	    }
 	} /* end if (vecobj_start) */
-
 	return rs ;
 }
 /* end subroutine (worker_start) */
@@ -785,9 +781,10 @@ static int worker_remaining(WORKER *wp) noex {
 /* end subroutine (worker_remaining) */
 
 static int worker_record(WORKER *wp,int ei,int eoff,uint v) noex {
+    	vecobj		*wlp = &wp->wlist ;
 	FC_N		*nlp = wp->nlp ;
 	int		rs ;
-	if (void *vp{} ; (rs = vecobj_get(&wp->wlist,ei,&vp)) >= 0) {
+	if (void *vp{} ; (rs = wlp->get(ei,&vp)) >= 0) {
 	    WORKER_ENT	*wep = (WORKER_ENT *) vp ;
 	    if (vp) {
 	        cint	ni = wep->ni ;
@@ -806,14 +803,16 @@ static int worker_record(WORKER *wp,int ei,int eoff,uint v) noex {
 /* end subroutine (worker_record) */
 
 static int worker_sort(WORKER *wp) noex {
-	return vecobj_sort(&wp->wlist,vcmpoff) ;
+    	vecobj		*wlp = &wp->wlist ;
+	return wlp->sort(vcmpoff) ;
 }
 /* end subroutine (worker_sort) */
 
 static int worker_get(WORKER *wp,int i,WORKER_ENT **rpp) noex {
     	int		rs = SR_FAULT ;
 	if (wp && rpp) {
-	    if (void *vp{} ; (rs = vecobj_get(&wp->wlist,i,&vp)) >= 0) {
+    	    vecobj	*wlp = &wp->wlist ;
+	    if (void *vp{} ; (rs = wlp->get(i,&vp)) >= 0) {
 		*rpp = (WORKER_ENT *) vp ;
 	    }
 	} /* end if (non-null) */

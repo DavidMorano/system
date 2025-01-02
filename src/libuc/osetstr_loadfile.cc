@@ -1,4 +1,5 @@
 /* osetstr_loadfile SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* load strings from a file */
@@ -59,7 +60,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
@@ -109,7 +109,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 static int	osetstr_loadfd(osetstr *,int,int) noex ;
-static int	osetstr_loadline(osetstr *,int,cchar *,int) noex ;
+static int	osetstr_loadln(osetstr *,int,cchar *,int) noex ;
 
 
 /* local structures */
@@ -159,16 +159,14 @@ int osetstr_loadfile(osetstr *vsp,int fu,cchar *fname) noex {
 /* local subroutines */
 
 static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
 	int		c = 0 ;
-	if ((rs = u_fstat(fd,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	    if (! S_ISDIR(sb.st_mode)) {
-		linebuffer	lb ;
-		int		fbsz = 1024 ;
-		int		fbo = 0 ;
+		int	fbsz = 1024 ;
+		int	fbo = 0 ;
 	        if (S_ISREG(sb.st_mode)) {
 	            int	fs = ((sb.st_size == 0) ? 1 : intsat(sb.st_size)) ;
 	            int	cs ;
@@ -178,15 +176,15 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 	            to = TO_READ ;
 	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
 	        }
-		if ((rs = lb.start) >= 0) {
+		if (linebuffer lb ; (rs = lb.start) >= 0) {
 		    filer	loadfile, *lfp = &loadfile ;
 		    cint	llen = rs ;
 		    char	*lbuf = lb.lbuf ;
 	            if ((rs = filer_start(lfp,fd,0z,fbsz,fbo)) >= 0) {
 	                while ((rs = filer_readln(lfp,lbuf,llen,to)) > 0) {
-			    cchar	*cp ;
+			    cchar	*cp{} ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-			        rs = osetstr_loadline(vsp,fu,cp,cl) ;
+			        rs = osetstr_loadln(vsp,fu,cp,cl) ;
 			        c += rs ;
 			    }
 	                    if (rs < 0) break ;
@@ -205,11 +203,11 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 }
 /* end subroutine (osetstr_loadfd) */
 
-static int osetstr_loadline(osetstr *vsp,int fu,cchar *lbuf,int len) noex {
+static int osetstr_loadln(osetstr *vsp,int fu,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (field fsb ; (rs = fsb.start(lbuf,len)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    int		fl ;
 	    cchar	*fp ;
 	    while ((fl = fsb.get(ft.terms,&fp)) >= 0) {
@@ -230,6 +228,6 @@ static int osetstr_loadline(osetstr *vsp,int fu,cchar *lbuf,int len) noex {
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (osetstr_loadline) */
+/* end subroutine (osetstr_loadln) */
 
 

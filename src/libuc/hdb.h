@@ -72,28 +72,83 @@ struct hdb_head {
 	int		at ;		/* allocation-type */
 } ; /* end struct (hdb_head) */
 
-typedef HDB		hdb ;
 typedef HDB_DAT		hdb_dat ;
 typedef HDB_ENT		hdb_ent ;
 typedef HDB_CUR		hdb_cur ;
+
+#ifdef	__cplusplus
+enum hdbmems {
+    	hdbmem_delall,
+	hdbmem_audit,
+	hdbmem_finish,
+	hdbmem_overlast
+} ;
+struct hdb ;
+struct hdb_co {
+	hdb		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (hdb *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ; /* end struct (hdb_co) */
+struct hdb : hdb_head {
+	hdb_co	delall ;
+	hdb_co	audit ;
+	hdb_co	finish ;
+	hdb() noex {
+	    delall(this,hdbmem_delall) ;
+	    audit(this,hdbmem_audit) ;
+	    finish(this,hdbmem_finish) ;
+	} ;
+	hdb(const hdb &) = delete ;
+	hdb &operator = (const hdb &) = delete ;
+	int start(int,int,hdbhash_f,hdbcmp_f) noex ;
+	int store(hdb_dat,hdb_dat) noex ;
+	int fetch(hdb_dat,hdb_cur *,hdb_dat *) noex ;
+	int fetchrec(hdb_dat,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+	int getkeyrec(hdb_dat,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+	int nextrec(hdb_dat,hdb_cur *) noex ;
+	int curbegin(hdb_cur *) noex ;
+	int curget(hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+	int curenum(hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+	int curnext(hdb_cur *) noex ;
+	int curdel(hdb_cur *,int) noex ;
+	int curend(hdb_cur *) noex ;
+	int curdone(hdb_cur *) noex ;
+	int delkey(hdb_dat) noex ;
+	void dtor() noex ;
+	~hdb() {
+	    dtor() ;
+	} ;
+} ; /* end struct (hdb) */
+#else	/* __cplusplus */
+typedef HDB		hdb ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
 extern int hdb_start(hdb *,int,int,hdbhash_f,hdbcmp_f) noex ;
 extern int hdb_store(hdb *,hdb_dat,hdb_dat) noex ;
 extern int hdb_curbegin(hdb *,hdb_cur *) noex ;
+extern int hdb_curenum(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+extern int hdb_curget(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
+extern int hdb_curnext(hdb *,hdb_cur *) noex ;
+extern int hdb_curdel(hdb *,hdb_cur *,int) noex ;
 extern int hdb_curend(hdb *,hdb_cur *) noex ;
+extern int hdb_curdone(hdb *,hdb_cur *) noex ;
+extern int hdb_curcopy(hdb *,hdb_cur *,hdb_cur *) noex ;
 extern int hdb_fetch(hdb *,hdb_dat,hdb_cur *,hdb_dat *) noex ;
 extern int hdb_fetchrec(hdb *,hdb_dat,hdb_cur *,
 			hdb_dat *,hdb_dat *) noex ;
 extern int hdb_getkeyrec(hdb *,hdb_dat,hdb_cur *,
 			hdb_dat *,hdb_dat *) noex ;
 extern int hdb_nextrec(hdb *,hdb_dat,hdb_cur *) noex ;
-extern int hdb_curenum(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
-extern int hdb_getrec(hdb *,hdb_cur *,hdb_dat *,hdb_dat *) noex ;
-extern int hdb_next(hdb *,hdb_cur *) noex ;
 extern int hdb_delkey(hdb *,hdb_dat) noex ;
-extern int hdb_curdel(hdb *,hdb_cur *,int) noex ;
 extern int hdb_delall(hdb *) noex ;
 extern int hdb_count(hdb *) noex ;
 extern int hdb_hashtablen(hdb *,uint *) noex ;

@@ -121,6 +121,7 @@ struct vecobj : vecobj_head {
 	int getvec(void ***) noex ;
 	int del(int = -1) noex ;
 	int search(cvoid *,vecobj_vcf,void **) noex ;
+	int sort(vecobj_vcf) noex ;
 	void dtor() noex ;
 	~vecobj() {
 	    dtor() ;

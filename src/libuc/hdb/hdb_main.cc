@@ -1,4 +1,4 @@
-/* hdb SUPPORT */
+/* hdb_main SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -23,7 +23,8 @@
 	look-aside manager are not given back to |malloc(3c)| (via
 	|free(3c)| at the present time -- not so easy to do).  Anyway,
 	we get about an average of 27% to 29% speedup on a combination
-	of allocating and freeing entries.
+	of allocating and freeing entries, over typical workloads I
+	usually deal with.
 
 */
 
@@ -116,7 +117,7 @@
 
 	A "value" structure MUST always be passed to this subroutine
 	from the caller. But the buffer address of a "value" can
-	be nullptr.
+	be NULL.
 
 	Also, zero length values can be stored by specifying a value
 	length of zero (buffer address of anything).
@@ -250,6 +251,16 @@ static inline int hdb_dtor(hdb *op) noex {
 }
 /* end subroutine (hdb_dtor) */
 
+template<typename ... Args>
+static inline int hdb_magic(hdb *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (hdb_magic) */
+
 static int	hdb_entnew(hdb *,ENT **) noex ;
 static int	hdb_entdel(hdb *,ENT *) noex ;
 
@@ -267,7 +278,7 @@ static int	entry_match(ENT *,hdbcmp_f,uint,HDB_D *) noex ;
 static int	cursor_stabilize(CUR *) noex ;
 static int	cursor_inc(CUR *) noex ;
 
-static int	fetchcur_start(FETCUR *,fc_f,int,CUR *,HDB_D *) noex ;
+static int	fetchcur_load(FETCUR *,fc_f,int,CUR *,HDB_D *) noex ;
 static int	fetchcur_adv(FETCUR *) noex ;
 
 static ENT	**getpoint(hdb *,uint,HDB_D *) noex ;
@@ -279,15 +290,6 @@ static inline int defcmpfun(cvoid *s1,cvoid *s2,int sl) noex {
 static inline int voidlen(cvoid *buf) noex {
 	cchar	*s = charp(buf) ;
 	return strlen(s) ;
-}
-
-template<typename ... Args>
-static inline int hdb_magic(hdb *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
 }
 
 consteval CUR mkcurnull() noex {
@@ -323,14 +325,14 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	int		rs ;
 	if (n < HDB_DEFNUM) n = HDB_DEFNUM ;
 	if ((rs = hdb_ctor(op)) >= 0) {
-	    cint	esize = szof(ENT) ;
+	    cint	esz = szof(ENT) ;
 	    op->at = at ;
 	    if (op->at > 0) {
 	        cint	lan = max((n/6),6) ;
-	        rs = lookaside_start(op->esp,esize,lan) ;
+	        rs = lookaside_start(op->esp,esz,lan) ;
 	    }
 	    if (rs >= 0) {
-		cint	tsize = (n * esize) ;
+		cint	tsize = (n * esz) ;
 	        if (void *vp{} ; (rs = uc_malloc(tsize,&vp)) >= 0) {
 	            ENT		**hepp = (ENT **) vp ;
 	            memclear(hepp,tsize) ;
@@ -588,9 +590,9 @@ int hdb_curdel(hdb *op,CUR *curp,int f_adv) noex {
                 } else {
                     pkep->same = ep->same ;
                 }
-    /* update cursor */
+    		/* update cursor */
                 *curp = ncur ;
-    /* delete the entry itself (return to free-memory pool) */
+    		/* delete the entry itself (return to free-memory pool) */
                 op->count -= 1 ;
                 rs = hdb_entdel(op,ep) ;
             } /* end if (hdb_getentry) */
@@ -627,7 +629,7 @@ int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
             } else {
                 ncur = icur ;
             }
-            if ((rs = fetchcur_start(&fc,hf,htlen,&ncur,&key)) >= 0) {
+            if ((rs = fetchcur_load(&fc,hf,htlen,&ncur,&key)) >= 0) {
                 ENT         *ep{} ;
                 rs = hdb_findkeye(op,&fc,&key,&ep) ;
                 if ((rs == SR_NOTFOUND) && (fetchcur_adv(&fc) >= 0)) {
@@ -640,7 +642,7 @@ int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
                         if (valp) *valp = ep->val ;
                     }
                 }
-            } /* end if (fetchcur_start) */
+            } /* end if (fetchcur_load) */
             if (rs < 0) {
                 if (keyp) *keyp = nulldatum ;
                 if (valp) *valp = nulldatum ;
@@ -651,10 +653,10 @@ int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 /* end subroutine (hdb_fetchrec) */
 
 /* get the current record under the CURRENT cursor regardless of key */
-int hdb_getrec(hdb *op,CUR *curp,DAT *keyp,DAT *valp) noex {
+int hdb_curget(hdb *op,CUR *curp,DAT *keyp,DAT *valp) noex {
 	return hdb_get(op,false,nulldatum,curp,keyp,valp) ;
 }
-/* end subroutine (hdb_getrec) */
+/* end subroutine (hdb_curget) */
 
 /* get the current record under the cursor but only if it matches the key */
 int hdb_getkeyrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
@@ -663,17 +665,18 @@ int hdb_getkeyrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 /* end subroutine (hdb_getkeyrec) */
 
 /* advance the cursor to the next entry regardless of key */
-int hdb_next(hdb *op,CUR *curp) noex {
+int hdb_curnext(hdb *op,CUR *curp) noex {
 	return hdb_curenum(op,curp,nullptr,nullptr) ;
 }
-/* end subroutine (hdb_next) */
+/* end subroutine (hdb_curnext) */
 
 /* subroutine to enumerate all entries */
 
 /****
+
 	This subroutine will return all entries in the DB using the
 	given cursor to sequence through it all.  Specifically, it
-	differs from |hdb_getrec()| in that it "fetches" the NEXT
+	differs from |hdb_curget()| in that it "fetches" the NEXT
 	entry after the one under the current cursor!  It then
 	updates the cursor to the returned entry.  This returns
 	'SR_NOTFOUND' on exhausting all entries.
@@ -694,8 +697,7 @@ int hdb_curenum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
             }
             cursor_inc(&ncur) ;
             while (ncur.i < op->htlen) {
-                ENT         *jep ;
-                if ((jep = hepp[ncur.i]) != nullptr) {
+                if (ENT *jep ; (jep = hepp[ncur.i]) != nullptr) {
                     int     j = 0 ; /* <- used afterwards */
                     for (j = 0 ; j < ncur.j ; j += 1) {
                         if (jep->next == nullptr) break ;
@@ -753,6 +755,16 @@ int hdb_curbegin(hdb *op,CUR *curp) noex {
 }
 /* end subroutine (hdb_curbegin) */
 
+int hdb_curdone(hdb *op,CUR *curp) noex {
+	int		rs ;
+	int		fret = false ;
+	if ((rs = hdb_magic(op,curp)) >= 0) {
+	    fret = (curp->i >= op->htlen) ;
+	} /* end if (magic) */
+	return (rs >= 0) ? fret : rs ;
+}
+/* end subroutine (hdb_curdone) */
+
 int hdb_curend(hdb *op,CUR *curp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
@@ -761,6 +773,15 @@ int hdb_curend(hdb *op,CUR *curp) noex {
 	return rs ;
 }
 /* end subroutine (hdb_curend) */
+
+int hdb_curcopy(hdb *op,CUR *curp,CUR *othp) noex {
+	int		rs ;
+	if ((rs = hdb_magic(op,curp,othp)) >= 0) {
+	    *othp = *curp ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (hdb_curcopy) */
 
 int hdb_hashtablen(hdb *op,uint *rp) noex {
 	int		rs ;
@@ -836,8 +857,8 @@ int hdb_audit(hdb *op) noex {
 static int hdb_entnew(hdb *op,ENT **epp) noex {
 	int		rs ;
 	if (op->at == 0) {
-	    cint	esize = szof(ENT) ;
-	    rs = uc_malloc(esize,epp) ;
+	    cint	esz = szof(ENT) ;
+	    rs = uc_malloc(esz,epp) ;
 	} else {
 	     rs = lookaside_get(op->esp,epp) ;
 	}
@@ -898,37 +919,32 @@ static int hdb_findkeye(hdb *op,FETCUR *fcp,HDB_D *kp,ENT **epp) noex {
 /* end subroutine (hdb_findkeye) */
 
 static int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
-	int		rs = SR_FAULT ;
-	if (op && curp && keyp) {
-	    rs = SR_NOTOPEN ;
-	    if (HDB_MAGICGOOD(op)) {
-		rs = SR_OK ;
+	int		rs ;
+	if ((rs = hdb_magic(op,curp,keyp)) >= 0) {
 	        if ((!f) || key.buf) {
 	            ENTRYINFO	ei{} ;
 	            cursor_stabilize(curp) ;
 	            if ((rs = hdb_getentry(op,&ei,curp)) >= 0) {
 	                ENT	*ep = ei.ep ;
 	                if (f && (key.buf != nullptr)) {
-	                    int 	rc = 1 ;
-	                    if (key.len == ep->key.len) {
+	                    if (int rc = 1 ; key.len == ep->key.len) {
 			        cvoid	*v1 = key.buf ;
 				cvoid	*v2 = ep->key.buf ;
 	                        rc = (*op->cmpfunc)(v1,v2,key.len) ;
+	                        if (rc != 0) rs = SR_NOTFOUND ;
 	                    }
-	                    if (rc != 0) rs = SR_NOTFOUND ;
 	                } /* end if (key comparison) */
 	                if (rs >= 0) {
-	                    if (keyp != nullptr) *keyp = ep->key ;
-	                    if (valp != nullptr) *valp = ep->val ;
+	                    if (keyp) *keyp = ep->key ;
+	                    if (valp) *valp = ep->val ;
 	                }
 	            } /* end if (entry found) */
 	            if (rs < 0) {
-	                if (keyp != nullptr) *keyp = nulldatum ;
-	                if (valp != nullptr) *valp = nulldatum ;
+	                if (keyp) *keyp = nulldatum ;
+	                if (valp) *valp = nulldatum ;
 	            }
 	        } /* end if (valid) */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (hdb_get) */
@@ -1147,7 +1163,7 @@ static int cursor_inc(CUR *curp) noex {
 }
 /* end subroutine (cursor_inc) */
 
-static int fetchcur_start(FETCUR *fcp,fc_f hfp,int htl,CUR *curp,DAT *kp) noex {
+static int fetchcur_load(FETCUR *fcp,fc_f hfp,int htl,CUR *curp,DAT *kp) noex {
 	int		rs = SR_NOTFOUND ;
 	if (curp->i < htl) {
 	    rs = SR_OK ;
@@ -1173,7 +1189,7 @@ static int fetchcur_start(FETCUR *fcp,fc_f hfp,int htl,CUR *curp,DAT *kp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (fetchcur_start) */
+/* end subroutine (fetchcur_load) */
 
 static int fetchcur_adv(FETCUR *fcp) noex {
 	int		rs = SR_ALREADY ;

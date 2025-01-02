@@ -1,4 +1,5 @@
 /* osetstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++98 */
 
 /* ordered set of strings */

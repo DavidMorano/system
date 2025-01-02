@@ -55,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= hdbstr_main.o hdbstr_obj.o
+OBJ0= hdbstr_main.o hdbstr_obj.o hdbstr_iter.o
 OBJ1= hdbstr_loadkeys.o hdbstr_loadpairs.o
 
 OBJA= obj0.o obj1.o
@@ -136,9 +136,17 @@ obj7.o:			$(OBJ7)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7)
 
 
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+
+
 hdbstr_main.o:		hdbstr_main.cc		$(INCS)
+hdbstr_obj.o:		hdbstr_obj.cc		$(INCS)
+hdbstr_iter.o:		hdbstr_iter.cc		$(INCS)
 hdbstr_loadkeys.o:	hdbstr_loadkeys.cc	$(INCS)
 hdbstr_loadpairs.o:	hdbstr_loadpairs.cc	$(INCS)
-hdbstr_obj.o:		hdbstr_obj.cc		$(INCS)
 
 

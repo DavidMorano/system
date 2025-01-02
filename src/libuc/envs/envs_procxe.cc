@@ -1,4 +1,5 @@
 /* envs_procxe SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* process an environment file */
@@ -16,6 +17,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+ 	Name:
+	envs_procxe
 
 	Description:
 	This subroutine will read (process) an environment file and
@@ -92,13 +96,14 @@
 
 #define	VS		vecstr
 #define	EC		expcook
-#define	SI		struct subinfo
-#define	AT		struct assigntypes
+#define	SI		subinfo
+#define	AT		assigntypes
 
 
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -127,10 +132,10 @@ namespace {
 	vecstr		*dlp ;
 	mainv		envv ;
 	subinfo(envs *op,EC *aclp,mainv ev,vecstr *adlp) noex {
-		    nlp = op ;
-		    clp = aclp ;
-		    dlp = adlp ;
-		    envv = ev ;
+	    nlp = op ;
+	    clp = aclp ;
+	    dlp = adlp ;
+	    envv = ev ;
 	} ; /* end if (ctor) */
 	int procer(cchar *) noex ;
 	int expln(cchar *,int) noex ;
@@ -162,22 +167,21 @@ static int	mkterms() noex ;
 /* local variables */
 
 constexpr int		rsn = SR_NOTFOUND ;
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr int		termsize = ((UCHAR_MAX + 1) / CHAR_BIT) ;
 constexpr int		envnamelen = ENVNAMELEN ;
 
 static char		vterms[termsize] ;
-
 static char		dterms[termsize] ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
-static constexpr cchar	ssp[] = {
+constexpr cchar		ssp[] = {
 	CH_LPAREN, 
 	CH_RPAREN,
 	0
 } ;
 
-static constexpr cchar	strassign[] = "+:;¶µ­Ð=-" ;
+constexpr cchar		strassign[] = "+:;¶µ­Ð=-" ;
 
 
 /* exported variables */
@@ -191,8 +195,8 @@ int envs_procxe(envs *op,EC *clp,mainv ev,VS *dlp,cchar *fn) noex {
 	if ((rs = envs_magic(op,clp,ev,dlp,fn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-		static cint	srs = mkterms() ;
-	        if ((rs = srs) >= 0) {
+		static cint	rst = mkterms() ;
+	        if ((rs = rst) >= 0) {
 		    subinfo	si(op,clp,ev,dlp) ;
 		    rs = si.procer(fn) ;
 		    c = rs ;
@@ -207,29 +211,21 @@ int envs_procxe(envs *op,EC *clp,mainv ev,VS *dlp,cchar *fn) noex {
 /* local subroutines */
 
 int subinfo::procer(cchar *fn) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = maxlinelen) >= 0) {
 	    cint	sz = ((rs + 1) * NLINES) ;
-	    char	*lbuf{} ;
-	    if ((rs = uc_malloc((sz + 1),&lbuf)) > 0) {
+	    if (char *lbuf{} ; (rs = uc_malloc((sz + 1),&lbuf)) > 0) {
 		cint	llen = sz ;
 	        bfile	xefile, *xfp = &xefile ;
 	        if ((rs = bopen(xfp,fn,"r",0666)) >= 0) {
-	            int		cl ;
-	            int		len ;
-	            cchar	*cp ;
 	            while ((rs = breadlns(xfp,lbuf,llen,-1,np)) > 0) {
-	        	len = rs ;
-	        	if (lbuf[len - 1] == '\n') len -= 1 ;
-	        	lbuf[len] = '\0' ;
-	        	if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
-		    	    if (cp[0] != '#') {
-	                	c += 1 ;
-	                	rs = expln(cp,cl) ;
-		    	    }
+	                cchar	*cp{} ;
+			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+			    c += 1 ;
+			    rs = expln(cp,cl) ;
 			}
 	        	if (rs < 0) break ;
 	    	    } /* end while (reading lines) */
@@ -250,18 +246,16 @@ int subinfo::expln(cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (strnchr(sp,sl,'%') != nullptr) {
-	    buffer	b ;
-	    cint	bsize = (sl+20) ;
-	    if ((rs = buffer_start(&b,bsize)) >= 0) {
+	    cint	bsz = (sl + 20) ;
+	    if (buffer b ; (rs = b.start(bsz)) >= 0) {
 	        if ((rs = expcook_expbuf(clp,0,&b,sp,sl)) >= 0) {
 	            cint	bl = rs ;
-	            cchar	*bp ;
-	            if ((rs = buffer_get(&b,&bp)) >= 0) {
+	            if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
 	                rs = ln(bp,bl) ;
 	                len = rs ;
 	            } /* end if (buffer-get) */
 	        } /* end if (expand-buf) */
-	        rs1 = buffer_finish(&b) ;
+	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (buffer) */
 	} else {
@@ -369,7 +363,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	            sl -= 1 ;
 	        } /* end while */
 	        {
-	            cchar	*cp ;
+	            cchar	*cp{} ;
 	            if (int cl ; (cl = sfshrink(ep,el,&cp)) > 0) {
 	                enp = envnamebuf ;
 	                enl = cl ;
@@ -378,8 +372,8 @@ int subinfo::ln(cchar *sp,int sl) noex {
 			}
 	            }
 	        } /* end block */
-/* do we already have this definition? */
-/* loop processing the values */
+		/* do we already have this definition? */
+		/* loop processing the values */
 	        if (f_go) {
 	            rs = lner(enp,enl,&at,sch,sp,sl) ;
 		}
@@ -390,15 +384,13 @@ int subinfo::ln(cchar *sp,int sl) noex {
 /* end method (subinfo::ln) */
 
 int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
-	buffer		b ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((sl >= 0) && ((rs = buffer_start(&b,sl)) >= 0)) {
+	if (buffer b ; (sl >= 0) && ((rs = b.start(sl)) >= 0)) {
 	    if ((rs = vals(&b,ssp,sp,sl)) >= 0) {
 	        bool	f_store = true ;
-	        cchar	*cp{} ;
-	        if ((rs = buffer_get(&b,&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = b.get(&cp)) >= 0) {
 	            cint	cl = rs ;
 	            if ((rs >= 0) && f_store && atp->uniqstr) {
 	                if ((rs = envs_substr(nlp,enp,enl,sp,sl)) > 0) {
@@ -409,11 +401,9 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 		    } /* end if (unique string) */
 	            if ((rs >= 0) && f_store && atp->dir) {
 	                if (cl > 0) {
-			    nulstr	ns ;
-			    cchar	*dname{} ;
-			    if ((rs = ns.start(cp,cl,&dname)) >= 0) {
-	                        USTAT	sb ;
-	                        if ((rs = u_stat(dname,&sb)) >= 0) {
+			    cchar	*dn{} ;
+			    if (nulstr ns ; (rs = ns.start(cp,cl,&dn)) >= 0) {
+	                        if (USTAT sb ; (rs = u_stat(dn,&sb)) >= 0) {
 	                            if (! S_ISDIR(sb.st_mode)) {
 	                                f_store = false ;
 				    }
@@ -446,7 +436,7 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	            } /* end if (store) */
 	        } /* end if (buffer_get) */
 	    } /* end if (subinfo::vals) */
-	    len = buffer_finish(&b) ;
+	    len = b.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (buffer initialization) */
 	return (rs >= 0) ? len : rs ;
@@ -455,14 +445,13 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 
 int subinfo::deps(cchar *sp,int sl) noex {
 	cnullptr	np{} ;
-	field		fsb ;
 	int		rs ;
 	int		rs1 = 0 ;
 	int		f = true ;
-	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
+	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 	    int		fl ;
 	    cchar	*fp{} ;
-	    while ((fl = field_get(&fsb,dterms,&fp)) >= 0) {
+	    while ((fl = fsb.get(dterms,&fp)) >= 0) {
 	        if (fl > 0) {
 		    auto	vs = vstrkeycmp ;
 	            if ((rs = vecstr_searchl(dlp,fp,fl,vs,np)) >= 0) {
@@ -473,7 +462,7 @@ int subinfo::deps(cchar *sp,int sl) noex {
 		} /* end if (non-zero positive) */
 		if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = field_finish(&fsb) ;
+	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? f : rs ;
@@ -486,16 +475,14 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*fbuf{} ;
-	if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	    field	fsb ;
-	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
+	if (char *fbuf{} ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
+	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 	        int	fl ;
 	        int	c = 0 ;
-	        while ((fl = field_sharg(&fsb,vterms,fbuf,flen)) >= 0) {
+	        while ((fl = fsb.sharg(vterms,fbuf,flen)) >= 0) {
 	            if (fl > 0) {
 	                if (c++ > 0) {
-	                    rs = buffer_chr(bp,' ') ;
+	                    rs = bp->chr(' ') ;
 	                    len += rs ;
 	                }
 	                if (rs >= 0) {
@@ -506,7 +493,7 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	            if (fsb.term == '#') break ;
 	            if (rs < 0) break ;
 	        } /* end while (looping over values) */
-	        rs1 = field_finish(&fsb) ;
+	        rs1 = fsb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
 	    rs1 = uc_free(fbuf) ;
@@ -518,14 +505,14 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 
 int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		kl, cl ;
+	int		kl ;
 	int		len = 0 ;
-	cchar		*kp, *cp ;
+	cchar		*kp{} ;
 	while ((kl = sfthing(sp,sl,ss,&kp)) >= 0) {
-	    cp = sp ;
-	    cl = ((kp - 2) - sp) ;
+	    cchar	*cp = sp ;
+	    int		cl = ((kp - 2) - sp) ;
 	    if (cl > 0) {
-	        rs = buffer_strw(bp,cp,cl) ;
+	        rs = bp->strw(cp,cl) ;
 	        len += rs ;
 	    }
 	    if ((rs >= 0) && (kl > 0)) {
@@ -537,7 +524,7 @@ int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	    if (rs < 0) break ;
 	} /* end while */
 	if ((rs >= 0) && (sl > 0)) {
-	    rs = buffer_strw(bp,sp,sl) ;
+	    rs = bp->strw(sp,sl) ;
 	    len += rs ;
 	}
 	return (rs >= 0) ? len : rs ;
@@ -550,8 +537,7 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	if (kl != 0) {
 	    int		al = 0 ;
 	    cchar	*ap = nullptr ;
-	    cchar	*tp ;
-	    if ((tp = strnchr(kp,kl,'=')) != nullptr) {
+	    if (cc *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
 	        al = (kp + kl) - (tp + 1) ;
 	        kl = (tp - kp) ;
@@ -564,7 +550,7 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	        if ((rs = vecstr_searchl(dlp,kp,kl,vs,&cp)) >= 0) {
 		    f_found = true ;
 	            cl = strlen(cp) ;
-	            if ((tp = strchr(cp,'=')) != nullptr) {
+	            if (cc *tp ; (tp = strchr(cp,'=')) != nullptr) {
 	                cl -= ((tp + 1) - cp) ;
 	                cp = (tp + 1) ;
 	            }
@@ -574,10 +560,10 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 /* perform any appropriate substitution */
 		if (rs >= 0) {
 	            if (f_found) {
-	                rs = buffer_strw(bp,cp,cl) ;
+	                rs = bp->strw(cp,cl) ;
 	                len += rs ;
 	            } else if (al > 0) {
-	                rs = buffer_strw(bp,ap,al) ;
+	                rs = bp->strw(ap,al) ;
 	                len += rs ;
 	            }
 		} /* end if (ok) */

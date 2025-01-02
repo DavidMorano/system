@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1988-06-01, David A­D­ Morano
-	This code was originally written (and largely forgotten).
+	This code was originally written.
 
 	= 1993-02-01, David A­D­ Morano
 	This subroutine was adopted for use in the RUNADVICE program.

@@ -21,7 +21,12 @@
 	keysymer
 
 	Description:
-	This object provides access to a keysym name-value database.
+	This object provides access to a KEY-SYM name-value database.
+	The database is stored as a plain-text file, with a single
+	record (make up of fields) on each single line.  Each valid
+	line starts with the '#' character in column 1 and the word
+	(sequence of characters) "define" following the initial '#'
+	character.
 
 *******************************************************************************/
 
@@ -32,7 +37,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* |strncasecmp(3c)| */
+#include	<strings.h>		/* |strncasecmp(3c)| + |strlen(3c)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
@@ -83,9 +88,9 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int keysymer_ctor(keysymer *op,Args ... args) noex {
+	KEYSYMER	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    KEYSYMER	*hop = op ;
 	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
@@ -148,11 +153,9 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 	    if (pr[0]) {
 		cint	ne = 20 ;
 	        if ((rs = mapstrint_start(op->mlp,ne)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_stat(pr,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_stat(pr,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
-	        	    char	*tbuf{} ;
-			    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	        	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 		                cchar	*idn = KEYSYMER_INCDNAME ;
 		                cchar	*kfn = KEYSYMER_KSFNAME ;
 		                if ((rs = mkpath(tbuf,pr,idn,kfn)) >= 0) {
@@ -256,7 +259,7 @@ int keysymer_enum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
 	    cchar	*sp = nullptr ;
 	    rp->keynum = 0 ;
 	    rp->keyname[0] = '\0' ;
-	    if ((rs = mapstrint_enum(op->mlp,&curp->c,&sp,&v)) >= 0) {
+	    if ((rs = mapstrint_curenum(op->mlp,&curp->c,&sp,&v)) >= 0) {
 	        sl = rs ;
 	        if (sp) {
 	            strwcpy(rp->keyname,sp,min(sl,keylen)) ;
@@ -278,12 +281,11 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 	if (fname) {
 	    bfile	dfile, *dfp = &dfile ;
 	    if ((rs = bopen(dfp,fname,"r",0666)) >= 0) {
-		bfliner		bl ;
-		if ((rs = bl.start(dfp)) >= 0) {
+		if (bfliner bl ; (rs = bl.start(dfp)) >= 0) {
 		    cchar	*lp ;
 	            while ((rs = bl.getlns(&lp)) > 0) {
 	                cint	len = rmeol(lp,rs) ;
-	                cchar	*sp ;
+	                cchar	*sp{} ;
 		        if (int sl ; (sl = sfshrink(lp,len,&sp)) > 0) {
 	                     if (sp[0] == '#') { /* look for '#define' */
 	        	         if ((rs = keysymer_parseln(op,sp,sl)) >= 0) {
@@ -311,23 +313,22 @@ static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	if ((ll > 1) && (lp[0] == '#')) {
 	    int		sl = (ll-1) ;
 	    cchar	*sp = (lp+1) ;
-	    cchar	*cp ;
-	    if (int cl ; (cl = nextfield(sp,sl,&cp)) > 0) {
+	    cchar	*cp{} ;
+	    if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 		if (strncmp("define",cp,cl) == 0) {
 		    sl -= ((cp+cl) - sp) ;
 		    sp = (cp+cl) ;
-		    if ((cl = nextfield(sp,sl,&cp)) > 0) {
+		    if ((cl = sfnext(sp,sl,&cp)) > 0) {
 			cnullptr	np{} ;
 		        if (cchar *tp ; (tp = strnchr(cp,cl,'_')) != np) {
 		            if (strncmp("KEYSYM",cp,(tp-cp)) == 0) {
 				cint	kl = ((cp+cl) - (tp+1)) ;
-				cchar		*kp = (tp+1) ;
+				cchar	*kp = (tp+1) ;
 				if (strncasecmp("include",cp,cl) != 0) {
 				    sl -= ((cp + cl) - sp) ;
 				    sp = (cp + cl) ;
 				    rs = keysymer_ks(op,kp,kl,sp,sl) ;
 				    c = rs ;
-
 			 	} /* end if (not "INCLUDE") */
 	                    } /* end if (KEYSYM) */
 	                } /* end if (marker) */
@@ -335,16 +336,16 @@ static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	        } /* end if (define) */
 	    } /* end if (deine-key) */
 	} /* end if (pound) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (keysymer_parseln) */
 
+/* store a key-value string pair */
 static int keysymer_ks(KS *op,cc *kp,int kl,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	cchar		*ip ;
+	cchar		*ip{} ;
 	if (int il ; (il = sfnext(sp,sl,&ip)) > 0) {
 	    int		kn ;
 	    if (ip[0] == CH_SQUOTE) {
@@ -410,6 +411,7 @@ static int keysymer_seen(keysymer *op,cchar *sp,int sl,int *rp) noex {
 }
 /* end subroutine (keysymer_seen) */
 
+/* Convert-From-Literal */
 static int cfliteral(cchar *sp,int sl,int *rp) noex {
 	cint		sch = CH_SQUOTE ;
 	int		rs = SR_INVALID ;
@@ -430,6 +432,6 @@ static int cfliteral(cchar *sp,int sl,int *rp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (cfliternal) */
+/* end subroutine (cfliteral) */
 
 

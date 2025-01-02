@@ -832,6 +832,10 @@ int vecobj::search(cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	return vecobj_search(this,ep,vcf,rpp) ;
 }
 
+int vecobj::sort(vecobj_vcf vcf) noex {
+	return vecobj_sort(this,vcf) ;
+}
+
 void vecobj::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecobj",rs,"fini-finish") ;

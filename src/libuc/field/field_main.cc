@@ -301,10 +301,10 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 		int	chterm = '\0' ;
 		so.white() ;
 	        if (so.sl > 0) {
-		    int		ch ;
+		    int		ch ; /* used in two blocks below */
 		    char	*bp = fbuf ;
 	            while (so.sl > 0) {
-		        int	qe ;
+		        int	qe ; /* used in two blocks below */
 	                ch = mkchar(*so.sp) ;
 		        if (istermandnotquote(terms,ch)) break ;
 	                if (char_iswhite(ch)) break ;

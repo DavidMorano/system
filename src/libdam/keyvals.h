@@ -34,7 +34,7 @@ struct keyvals_cursor {
 } ;
 
 struct keyvals_head {
-	vecobj		*keyp ;
+	vecobj		*keyp ;		/* store "keys" */
 	hdb		*bykeyp ;	/* indexed by key only */
 	hdb		*bykeyvalp ;	/* indexed by key-val together */
 	uint		magic ;
@@ -47,6 +47,7 @@ EXTERNC_begin
 
 extern int keyvals_start(keyvals *,int) noex ;
 extern int keyvals_add(keyvals *,int,cchar *,cchar *,int) noex ;
+extern int keyvals_already(keyvals *,cchar *,int) noex ;
 extern int keyvals_count(keyvals *) noex ;
 extern int keyvals_curbegin(keyvals *,keyvals_cur *) noex ;
 extern int keyvals_curend(keyvals *,keyvals_cur *) noex ;

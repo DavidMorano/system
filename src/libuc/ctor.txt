@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mxalias_ctor(mxalias *op,Args ... args) noex {
+static int hdb_ctor(hdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int mxalias_ctor(mxalias *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mxalias_ctor) */
+/* end subroutine (hdb_ctor) */
 
-static int mxalias_dtor(mxalias *op) noex {
+static int hdb_dtor(hdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mxalias_dtor) */
+/* end subroutine (hdb_dtor) */
 
 template<typename ... Args>
-static inline int mxalias_magic(mxalias *op,Args ... args) noex {
+static inline int hdb_magic(hdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MXALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mxalias_magic) */
+/* end subroutine (hdb_magic) */

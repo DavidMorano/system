@@ -49,8 +49,6 @@
 
 /* local typedefs */
 
-typedef hdbstr_cur	cur ;
-
 
 /* external subroutines */
 
@@ -80,8 +78,8 @@ int hdbstr::curbegin(hdbstr_cur *curp) noex {
 	return hdbstr_curbegin(this,curp) ;
 }
 
-int hdbstr::curend(hdbstr_cur *curp) noex {
-	return hdbstr_curend(this,curp) ;
+int hdbstr::curget(hdbstr_cur *curp,cc **kpp,cc **vpp,int *vlp) noex {
+	return hdbstr_curget(this,curp,kpp,vpp,vlp) ;
 }
 
 int hdbstr::curenum(hdbstr_cur *curp,cc **kpp,cc **vpp,int *vlenp) noex {
@@ -92,12 +90,32 @@ int hdbstr::curdel(hdbstr_cur *curp,int fadv) noex {
 	return hdbstr_curdel(this,curp,fadv) ;
 }
 
+int hdbstr::curnext(hdbstr_cur *curp) noex {
+	return hdbstr_curnext(this,curp) ;
+}
+
+int hdbstr::curdone(hdbstr_cur *curp) noex {
+	return hdbstr_curdone(this,curp) ;
+}
+
+int hdbstr::curend(hdbstr_cur *curp) noex {
+	return hdbstr_curend(this,curp) ;
+}
+
 int hdbstr::fetch(cchar *kstr,int klen,hdbstr_cur *curp,cchar **rpp) noex {
 	return hdbstr_fetch(this,kstr,klen,curp,rpp) ;
 }
 
 int hdbstr::delkey(cchar *kstr,int klen) noex {
 	return hdbstr_delkey(this,kstr,klen) ;
+}
+
+int hdbstr::loadkeys(cchar *fn) noex {
+	return hdbstr_loadkeys(this,fn) ;
+}
+
+int hdbstr::loadpairs(cchar *fn) noex {
+	return hdbstr_loadpairs(this,fn) ;
 }
 
 void hdbstr::dtor() noex {
@@ -112,6 +130,9 @@ int hdbstr_co::operator () (int a) noex {
 	    switch (w) {
 	    case hdbstrmem_start:
 	        rs = hdbstr_start(op,a) ;
+	        break ;
+	    case hdbstrmem_delall:
+	        rs = hdbstr_delall(op) ;
 	        break ;
 	    case hdbstrmem_count:
 	        rs = hdbstr_count(op) ;
