@@ -110,8 +110,8 @@ struct subinfo {
 	mainv		dnames ;
 	mainv		exts ;
 	mainv		syms ;
-	SUBINFO_FL	f ;
 	ids		id ;
+	SUBINFO_FL	f ;
 	int		dlmode ;
 } ;
 
@@ -164,7 +164,7 @@ int attachso(mv dnames,cc *oname,mv exts,mv syms,int m,void **ropp) noex {
 	if (dnames && oname) {
 	    rs = SR_INVALID ;
 	    if (oname[0]) {
-	        SUBINFO		si ;
+	        subinfo		si ;
 		auto		ss = subinfo_start ;
 	        if ((rs = ss(&si,dnames,oname,exts,syms,m,ropp)) >= 0) {
 	            int		f_abort ;
@@ -233,8 +233,8 @@ static int subinfo_sofind(SI *sip) noex {
 	int		rs1 ;
 	if (ids id ; (rs = id.load) >= 0) {
 	    cint	soperm = (X_OK | R_OK) ;
-	    bool	f_open = false ;
 	    mainv	dnames = sip->dnames ;
+	    bool	f_open = false ;
 	    for (int i = 0 ; dnames[i] ; i += 1) {
 	        cchar	*dname = dnames[i] ;
 	        if (dname[0] != '\0') {
@@ -266,7 +266,7 @@ static int subinfo_sofind(SI *sip) noex {
 /* end subroutine (subinfo_sofind) */
 
 static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 = SR_NOTFOUND ;
 	int		f = false ;
 	if (char *sofname{} ; (rs = malloc_mp(&sofname)) >= 0) {

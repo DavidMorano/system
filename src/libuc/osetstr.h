@@ -41,8 +41,57 @@ struct osetstr_head {
 	uint		magic ;
 } ;
 
-typedef OSETSTR		osetstr ;
 typedef OSETSTR_CUR	osetstr_cur ;
+
+#ifdef	__cplusplus
+enum osetstrmems {
+    	osetstrmem_start,
+	osetstrmem_count,
+	osetstrmem_delall,
+	osetstrmem_finish,
+	osetstrmem_overlast
+} ;
+struct osetstr ;
+struct osetstr_co {
+	osetstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (osetstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (osetstr_co) */
+struct osetstr : osetstr_head {
+	osetstr_co	start ;
+	osetstr_co	delall ;
+	osetstr_co	count ;
+	osetstr_co	finish ;
+	osetstr() noex {
+	    start(this,osetstrmem_start) ;
+	    count(this,osetstrmem_count) ;
+	    delall(this,osetstrmem_delall) ;
+	    finish(this,osetstrmem_finish) ;
+	} ;
+	osetstr(const osetstr &) = delete ;
+	osetstr &operator = (const osetstr &) = delete ;
+	int already(cchar *,int = -1) noex ;
+	int add(cchar *,int = -1) noex ;
+	int del(cchar *,int = -1) noex ;
+	int curbegin(osetstr_cur *) noex ;
+	int curenum(osetstr_cur *,cchar **) noex ;
+	int curend(osetstr_cur *) noex ;
+	void dtor() noex ;
+	~osetstr() {
+	    dtor() ;
+	} ;
+} ; /* end struct (osetstr) */
+#else	/* __cplusplus */
+typedef OSETSTR		osetstr ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 

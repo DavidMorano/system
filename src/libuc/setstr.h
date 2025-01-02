@@ -1,4 +1,5 @@
 /* setstr HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* a set object for c-strings */
@@ -23,12 +24,58 @@
 #include	<hdb.h>
 
 
-#define	SETSTR		HDB
-#define	SETSTR_CUR	HDB_CUR
+#define	SETSTR		hdb
+#define	SETSTR_CUR	hdb_cur
 
 
-typedef SETSTR		setstr ;
+typedef SETSTR		setstr_head ;
 typedef SETSTR_CUR	setstr_cur ;
+
+#ifdef	__cplusplus
+enum setstrmems {
+    	setstrmem_start,
+	setstrmem_count,
+	setstrmem_finish,
+	setstrmem_overlast
+} ;
+struct setstr ;
+struct setstr_co {
+	setstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (setstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (setstr_co) */
+struct setstr : setstr_head {
+	setstr_co	start ;
+	setstr_co	count ;
+	setstr_co	finish ;
+	setstr() noex {
+	    start(this,setstrmem_start) ;
+	    count(this,setstrmem_count) ;
+	    finish(this,setstrmem_finish) ;
+	} ;
+	setstr(const setstr &) = delete ;
+	setstr &operator = (const setstr &) = delete ;
+	int already(cchar *,int = -1) noex ;
+	int add(cchar *,int = -1) noex ;
+	int del(cchar *,int = -1) noex ;
+	int curbegin(setstr_cur *) noex ;
+	int curenum(setstr_cur *,cchar **) noex ;
+	int curend(setstr_cur *) noex ;
+	void dtor() noex ;
+	~setstr() {
+	    dtor() ;
+	} ;
+} ; /* end struct (setstr) */
+#else	/* __cplusplus */
+typedef SETSTR		setstr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -38,7 +85,7 @@ extern int setstr_add(setstr *,cchar *,int) noex ;
 extern int setstr_del(setstr *,cchar *,int) noex ;
 extern int setstr_count(setstr *) noex ;
 extern int setstr_curbegin(setstr *,setstr_cur *) noex ;
-extern int setstr_enum(setstr *,setstr_cur *,cchar **) noex ;
+extern int setstr_curenum(setstr *,setstr_cur *,cchar **) noex ;
 extern int setstr_curend(setstr *,setstr_cur *) noex ;
 extern int setstr_finish(setstr *) noex ;
 

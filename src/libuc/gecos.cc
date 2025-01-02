@@ -1,4 +1,5 @@
 /* gecos SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* parse a GECOS field located in a buffer */
@@ -16,11 +17,14 @@
 
 /*******************************************************************************
 
+  	Object:
+	gecos
+
+	Description:
 	This module parses out the various GOCOS information as it
 	is given in its encoded form in a specified buffer.
 
 	Extra npotes:
-
 	The GECOS field of the 'passwd' database should be formatted
 	in one of the following ways:
 
@@ -90,6 +94,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -172,13 +177,13 @@ constexpr gecoshelp_m	gmems[] = {
 
 /* exported subroutines */
 
-int gecos_start(gecos *op,cchar *sbuf,int slen) noex {
+int gecos_start(gecos *op,cchar *sp,int sl) noex {
     	GECOS		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (op && sbuf) {
+	if (op && sp) {
 	    memclear(hop) ;
-	    if (gecoshelp ho(op,sbuf,slen) ; (rs = ho.start()) >= 0) {
+	    if (gecoshelp ho(op,sp,sl) ; (rs = ho.start()) >= 0) {
 		{
 		    ho.proc() ;
 		}
@@ -222,12 +227,11 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && rbuf) {
-            sbuf	b ;
-            if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+            if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
                 bool        fparen = false ;
                 if (op->vals[gecosval_organization].vp != nullptr) {
                     gecos_storeit(op,&b,gecosval_organization) ;
-                    sbuf_strw(&b,"-",1) ;
+                    b.strw("-",1) ;
                 }
                 if (op->vals[gecosval_realname].vp != nullptr) {
                     int     vi = gecosval_realname ;
@@ -243,36 +247,36 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                 if ((op->vals[gecosval_account].vp != nullptr) || 
                     (op->vals[gecosval_bin].vp != nullptr)) {
                     fparen = true ;
-                    sbuf_chr(&b,CH_LPAREN) ;
+                    b.chr(CH_LPAREN) ;
                 }
                 if (op->vals[gecosval_account].vp != nullptr) {
                     gecos_storeit(op,&b,gecosval_account) ;
                 }
                 if (op->vals[gecosval_bin].vp != nullptr) {
-                    sbuf_strw(&b,",",1) ;
+                    b.strw(",",1) ;
                     gecos_storeit(op,&b,gecosval_bin) ;
                 }
                 if (fparen) {
-                    sbuf_chr(&b,CH_RPAREN) ;
+                    b.chr(CH_RPAREN) ;
                 }
     		/* do we have the old finger stuff */
                 if (op->vals[gecosval_office].vp != nullptr) {
-                    if (! fparen) sbuf_strw(&b,",",1) ;
+                    if (! fparen) b.strw(",",1) ;
                     gecos_storeit(op,&b,gecosval_office) ;
                 }
                 if (op->vals[gecosval_wphone].vp != nullptr) {
-                    sbuf_strw(&b,",",1) ;
+                    b.strw(",",1) ;
                     gecos_storeit(op,&b,gecosval_wphone) ;
                 }
                 if (op->vals[gecosval_hphone].vp != nullptr) {
-                    sbuf_strw(&b,",",1) ;
+                    b.strw(",",1) ;
                     gecos_storeit(op,&b,gecosval_hphone) ;
                 }
                 if (op->vals[gecosval_printer].vp != nullptr) {
-                    sbuf_strw(&b,",",1) ;
+                    b.strw(",",1) ;
                     gecos_storeit(op,&b,gecosval_printer) ;
                 }
-                rs1 = sbuf_finish(&b) ;
+                rs1 = b.finish ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (sbuf) */
 	} /* end if (non-null) */
@@ -284,7 +288,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
 /* private subroutines */
 
 static int gecos_storeit(gecos *op,sbuf *bp,int vi) noex {
-	return sbuf_strw(bp,op->vals[vi].vp,op->vals[vi].vl) ;
+	return bp->strw(op->vals[vi].vp,op->vals[vi].vl) ;
 }
 /* end subroutine (gecos_storeit) */
 
@@ -297,24 +301,24 @@ static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	sl = op->vals[vi].vl ;
 	/* store the initial segment of the name */
 	if ((tp - sp) > 0) {
-	    sbuf_strw(bp,sp,(tp - sp)) ;
+	    bp->strw(sp,(tp - sp)) ;
 	    sl -= (tp - sp) ;
 	    sp = tp ;
 	}
 	/* make the substitution */
 	{
-	    sbuf_chr(bp,'_') ;
+	    bp->chr('_') ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
 	/* loop searching for other segments */
 	while ((tp = strnchr(sp,sl,'-')) != nullptr) {
-	    sbuf_strw(bp,sp,(tp - sp)) ;
+	    bp->strw(sp,(tp - sp)) ;
 	    sl -= (tp - sp) ;
 	    sp = tp ;
 	} /* end while */
 	if (sl > 0) {
-	    rs = sbuf_strw(bp,sp,sl) ;
+	    rs = bp->strw(sp,sl) ;
 	}
 	return rs ;
 }

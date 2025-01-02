@@ -1,4 +1,5 @@
 /* mapstrint SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* Map (database) for String-Integer pairs */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mapstrint
+
+	[Description:
 	This little object maps a string to an integer value using
 	a hash table.  The underlying hash table is implemented
 	with a HDB object (currently).
@@ -27,7 +32,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
@@ -44,6 +49,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -95,12 +101,12 @@ int mapstrint_finish(MSI *dbp) noex {
 	int		n = 0 ;
 	if (dbp) {
 	    {
-	        mapstrint_cur	keycursor ;
+	        mapstrint_cur	kcur ;
 	        rs = SR_OK ;
-	        if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
+	        if ((rs1 = hdb_curbegin(dbp,&kcur)) >= 0) {
 	            hdb_dat	key{} ;
 	            hdb_dat	val{} ;
-	            while (hdb_curenum(dbp,&keycursor,&key,&val) >= 0) {
+	            while (hdb_curenum(dbp,&kcur,&key,&val) >= 0) {
 	                cchar	*ep = charp(val.buf) ;
 	                if (ep) {
 	                    rs1 = uc_free(ep) ;
@@ -108,7 +114,7 @@ int mapstrint_finish(MSI *dbp) noex {
 	                }
 	                n += 1 ;
 	            } /* end while */
-	            hdb_curend(dbp,&keycursor) ;
+	            hdb_curend(dbp,&kcur) ;
 	        } /* end if */
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -129,18 +135,18 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 	        int		sz ;
 	        int		*ip{} ;
 	        if (klen < 0) klen = strlen(kstr) ;
-	        sz = sizeof(int) + klen + 1 ;
+	        sz = szof(int) + klen + 1 ;
 	        if ((rs = uc_malloc(sz,&ip)) >= 0) {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            char	*bp ;
 	            *ip = ival ;
-	            bp = ((char *) ip) + sizeof(int) ;
+	            bp = charp( ip) + szof(int) ;
 	            strwcpy(bp,kstr,klen) ;
 	            key.buf = bp ;
 	            key.len = klen ;
 	            val.buf = ip ;
-	            val.len = sizeof(int) ;
+	            val.len = szof(int) ;
 	            rs = hdb_store(dbp,key,val) ;
 	            if (rs < 0) {
 		        uc_free(ip) ;
@@ -177,7 +183,7 @@ int mapstrint_curenum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	            *kpp = charp(key.buf) ;
 	        }
 	        if (vp) {
-	            int		*ip = (int *) val.buf ;
+	            int *ip = intp(val.buf) ;
 	            *vp = *ip ;
 	        }
 	    } /* end if (hdb_curenum) */
@@ -196,7 +202,7 @@ int mapstrint_fetch(MSI *dbp,cchar *kstr,int klen,cur *curp,int *vp) noex {
 	    key.len = klen ;
 	    if ((rs = hdb_fetch(dbp,key,curp,&val)) >= 0) {
 	        if (vp) {
-	            int	*ip = (int *) val.buf ;
+	            int	*ip = intp(val.buf) ;
 	            *vp = *ip ;
 	        }
 	    } /* end if (hdb_fetch) */
@@ -218,10 +224,10 @@ int mapstrint_fetchrec(MSI *dbp,cc *kstr,int klen,cur *curp,
 	    if (kpp) *kpp = nullptr ;
 	    if ((rs = hdb_fetchrec(dbp,key,curp,&rkey,&val)) >= 0) {
 	        if (kpp) {
-	            *kpp = (char *) rkey.buf ;
+	            *kpp = charp(rkey.buf) ;
 	        }
 	        if (vp) {
-	            int		*ip = (int *) val.buf ;
+	            int *ip = intp(val.buf) ;
 	            *vp = *ip ;
 	        }
 	    } /* end if (hdb_fetchrec) */
@@ -240,10 +246,10 @@ int mapstrint_curget(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	    if ((rs = hdb_curget(dbp,curp,&key,&val)) >= 0) {
 	        klen = key.len ;
 	        if (kpp) {
-	            *kpp = (char *) key.buf ;
+	            *kpp = charp(key.buf) ;
 	        }
 	        if (vp) {
-	            int	*ip = (int *) val.buf ;
+	            int	*ip = intp(val.buf) ;
 	            *vp = *ip ;
 	        }
 	    } /* end if (hdb_curget) */
@@ -280,40 +286,40 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbp && kstr) {
-	    mapstrint_cur	keycursor ;
+	    mapstrint_cur	kcur ;
 	    hdb_dat		skey ;
 	    if (klen < 0) klen = strlen(kstr) ;
 	    skey.buf = kstr ;
 	    skey.len = klen ;
 	    /* delete all of the data associated with this key */
-	    if ((rs = hdb_curbegin(dbp,&keycursor)) >= 0) {
+	    if ((rs = hdb_curbegin(dbp,&kcur)) >= 0) {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
-	        while (hdb_fetchrec(dbp,skey,&keycursor,&key,&val) >= 0) {
-	            if (hdb_curdel(dbp,&keycursor,1) >= 0) {
+	        while (hdb_fetchrec(dbp,skey,&kcur,&key,&val) >= 0) {
+	            if (hdb_curdel(dbp,&kcur,1) >= 0) {
 	                char	*ep = charp(val.buf) ;
 	                if (ep) {
 	                    uc_free(ep) ;
 		        }
 	            } /* end if */
-	            while (hdb_curget(dbp,&keycursor,&key,&val) >= 0) {
+	            while (hdb_curget(dbp,&kcur,&key,&val) >= 0) {
 		        cchar	*kp = charp(key.buf) ;
 		        cchar	*sp = charp(skey.buf) ;
 		        bool	f = false ;
 	                f = f || (skey.len != key.len) ;
 		        f = f || (strncmp(sp,kp,skey.len) != 0) ;
 		        if (f) break ;
-	                if (hdb_curdel(dbp,&keycursor,0) >= 0) {
+	                if (hdb_curdel(dbp,&kcur,0) >= 0) {
 	                    char	*ep = charp(val.buf) ;
 	                    if (ep) {
 	                        uc_free(ep) ;
 			    }
 	                } /* end if */
-	                rs1 = hdb_nextrec(dbp,skey,&keycursor) ;
+	                rs1 = hdb_nextrec(dbp,skey,&kcur) ;
 	                if (rs1 == SR_NOTFOUND) break ;
 	            } /* end while */
 	        } /* end while */
-	        rs1 = hdb_curend(dbp,&keycursor) ;
+	        rs1 = hdb_curend(dbp,&kcur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 	} /* end if (non-null) */
@@ -328,7 +334,7 @@ int mapstrint_curdel(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 	    hdb_dat	val{} ;
 	    if ((rs = hdb_curget(dbp,curp,&key,&val)) >= 0) {
 	        char	*ep = charp(val.buf) ;
-	        rs = hdb_curdel(dbp,curp,f_adv)  ;
+	        rs = hdb_curdel(dbp,curp,f_adv) ;
 	        if ((rs >= 0) && ep) {
 	            uc_free(ep) ;
 	        }
@@ -355,7 +361,7 @@ int mapstrint_cursetval(MSI *dbp,mapstrint_cur *curp,int ival) noex {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if ((rs = hdb_curget(dbp,curp,&key,&val)) >= 0) {
-	        int	*ip = (int *) val.buf ;
+	        int	*ip = intp(val.buf) ;
 	        *ip = ival ;
 	        kl = key.len ;
 	    }

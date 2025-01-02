@@ -50,7 +50,9 @@
 
 /* imported namespaces */
 
-using namespace		std ;		/* yes, we want punishment! */
+using std::nullptr_t ;			/* type */
+using std::vector ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -78,6 +80,9 @@ namespace {
 	} ;
     } ; /* end struct (item) */
 }
+
+typedef vector<item>	ivec ;
+typedef vector<item> *	ivecp ;
 
 
 /* forward references */
@@ -136,9 +141,8 @@ int linehist_start(linehist *op,cchar *ss) noex {
 	    rs = SR_INVALID ;
 	    if (ss[0]) {
 		cnullptr	np{} ;
-	        vector<item>	*lvp ;
 		rs = SR_NOMEM ;
-	        if ((lvp = new(nothrow) vector<item>) != np) {
+	        if (ivec *lvp ; (lvp = new(nothrow) ivec) != np) {
 	            op->lvp = lvp ;
 	            if ((rs = langstate_start(op->lsp)) >= 0) {
 	                strncpy(op->ss,ss,2) ;
@@ -148,7 +152,7 @@ int linehist_start(linehist *op,cchar *ss) noex {
 		        delete lvp ;
 		        op->lvp = nullptr ;
 	            }
-	        } /* end if (new-vector<item>) */
+	        } /* end if (new-ivec) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		linehist_dtor(op) ;
@@ -163,7 +167,7 @@ int linehist_finish(linehist *op) noex {
 	int		rs1 ;
 	if ((rs = linehist_magic(op)) >= 0) {
 	    if (op->lvp) {
-	        vector<item>	*lvp = (vector<item> *) op->lvp ;
+	        ivec *lvp = ivecp(op->lvp) ;
 	        delete lvp ;
 	        op->lvp = nullptr ;
 	    }
@@ -182,12 +186,11 @@ int linehist_finish(linehist *op) noex {
 /* end subroutine (linehist_finish) */
 
 int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = linehist_magic(op,sp)) >= 0) {
-	    cnullptr		np{} ;
-	    vector<item>	*lvp ;
-	    if ((lvp = ((vector<item> *) op->lvp)) != np) {
+	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
 	        cint	sch0 = mkchar(op->ss[0]) ;
 	        cint	sch1 = mkchar(op->ss[1]) ;
 	        while ((rs >= 0) && sl && *sp) {
@@ -228,12 +231,11 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 /* end subroutine (linehist_proc) */
 
 int linehist_count(linehist *op) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = linehist_magic(op)) >= 0) {
-	    cnullptr		np{} ;
-	    vector<item>	*lvp ;
-	    if ((lvp = ((vector<item> *) op->lvp)) != np) {
+	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
 	        c = lvp->size() ;
 	    } else {
 	        rs = SR_BUGCHECK ;
@@ -244,14 +246,13 @@ int linehist_count(linehist *op) noex {
 /* end subroutine (linehist_count) */
 
 int linehist_get(linehist *op,int i,int *lnp) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		type = 0 ;
 	if ((rs = linehist_magic(op,lnp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (i >= 0) {
-	        cnullptr	np{} ;
-	        vector<item>	*lvp ;
-	        if ((lvp = ((vector<item> *) op->lvp)) != np) {
+	        if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
 	            cint	len = lvp->size() ;
 	            if (i < len) {
 	                item	vi = lvp->at(i) ;

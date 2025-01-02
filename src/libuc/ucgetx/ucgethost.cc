@@ -101,6 +101,8 @@
 
 /* local defines */
 
+#define	HE	HOSTENT
+
 
 /* external subroutines */
 
@@ -132,20 +134,19 @@ int uc_gethostend() noex {
 }
 /* end subrouttine (uc_gethostend) */
 
-int uc_gethostent(HOSTENT *hep,char *hebuf,int helen) noex {
+int uc_gethostent(HE *hep,char *hebuf,int helen) noex {
     	ucentho		*up = cast_static<ucentho *>(hep) ;
 	return uc_gethoent(up,hebuf,helen) ;
 }
 /* end subroutine (uc_gethostent) */
 
-int uc_gethostbyname(HOSTENT *hep,char *hebuf,int helen,cc *name) noex {
+int uc_gethostbyname(HE *hep,char *hebuf,int helen,cc *name) noex {
     	ucentho		*up = cast_static<ucentho *>(hep) ;
 	return uc_gethonam(up,hebuf,helen,name) ;
 }
 /* end subroutine (uc_gethostbyname) */
 
-int uc_gethostbyaddr(HOSTENT *hep,char *hebuf,int helen,
-		int af,cc *ap,int al) noex {
+int uc_gethostbyaddr(HE *hep,char *hebuf,int helen,int af,cc *ap,int al) noex {
     	ucentho		*up = cast_static<ucentho *>(hep) ;
 	return uc_gethoadd(up,hebuf,helen,af,ap,al) ;
 }

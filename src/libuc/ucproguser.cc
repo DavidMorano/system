@@ -1,4 +1,5 @@
 /* ucproguser SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -228,7 +229,6 @@ int ucproguser_fini() noex {
 
 int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 	UPROGUSER	*uip = &ucproguser_data ;
-	sigblocker	b ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -239,7 +239,7 @@ int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 
 	rbuf[0] = '\0' ;
 	if (uip->username[0] != '\0') {
-	    if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = ucproguser_init()) >= 0) {
 	            if ((rs = uc_forklockbegin(-1)) >= 0) {
 	                if ((rs = ptm_lock(&uip->mx)) >= 0) {
@@ -262,7 +262,8 @@ int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (forklock) */
 	        } /* end if (ucproguser_init) */
-	        sigblocker_finish(&b) ;
+	        rs1 = b.finish ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (possible match) */
 
@@ -277,10 +278,9 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	if (cbuf) {
 	    rs = SR_INVALID ;
 	    if (cbuf[0]) {
-		sigblocker	b ;
 	        if (uid == 0) uid = getuid() ;
 	        if (ttl < 0) ttl = TO_TTL ;
-	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+		if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucproguser_init()) >= 0) {
 			typedef int (*un_f)(UPROGUSER *,cchar *,int) noex ;
 	                UPROGUSER	*uip = &ucproguser_data ;
@@ -300,7 +300,7 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (forklock) */
 	            } /* end if (ucproguser_init) */
-	            rs1 = sigblocker_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	    } /* end if (valid) */

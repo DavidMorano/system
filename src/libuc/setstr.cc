@@ -1,4 +1,5 @@
 /* setstr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C99 */
 
 /* set of strings */
@@ -27,6 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<string>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -64,14 +67,13 @@ int setstr_finish(setstr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    {
-	        hdb_cur		cur ;
-	        hdb_dat		key ;
-	        hdb_dat		val ;
 	        cint		rsn = SR_NOTFOUND ;
-	        if ((rs1 = hdb_curbegin(op,&cur)) >= 0) {
+	        if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
+	            hdb_dat	key{} ;
+	            hdb_dat	val{} ;
 	            int		rs2 ;
 	            while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
-	                if (key.buf != nullptr) {
+	                if (key.buf) {
 		            c += 1 ;
 	                    rs1 = uc_free(key.buf) ;
 	                    if (rs >= 0) rs = rs1 ;
@@ -117,7 +119,8 @@ int setstr_add(setstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (op && sp) {
-	    hdb_dat	key, val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
@@ -125,8 +128,7 @@ int setstr_add(setstr *op,cchar *sp,int sl) noex {
 	    val.buf = sp ;
 	    val.len = sl ;
 	    if ((rs = hdb_fetch(op,key,nullptr,&val)) == rsn) {
-	        cchar	*asp ;
-	        if ((rs = uc_mallocstrw(sp,sl,&asp)) >= 0) {
+	        if (cchar *asp{} ; (rs = uc_mallocstrw(sp,sl,&asp)) >= 0) {
 		    key.buf = asp ;
 		    val.buf = asp ;
 	            f = true ;
@@ -147,7 +149,7 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	int		f = false ;
 	if (op && sp) {
 	    hdb_dat	key ;
-	    hdb_dat	val ;
+	    hdb_dat	val{} ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
@@ -186,13 +188,12 @@ int setstr_curend(setstr *op,setstr_cur *curp) noex {
 }
 /* end subroutine (setstr_curend) */
 
-int setstr_enum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
+int setstr_curenum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (op && curp && rpp) {
-	    hdb_dat	key ;
-	    hdb_dat	val ;
-	    if ((rs = hdb_curenum(op,curp,&key,&val)) >= 0) {
+	    hdb_dat	val{} ;
+	    if ((rs = hdb_curenum(op,curp,nullptr,&val)) >= 0) {
 	        rl = val.len ;
 	        if (rpp) {
 	            *rpp = charp(val.buf) ;
@@ -203,6 +204,55 @@ int setstr_enum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (setstr_enum) */
+/* end subroutine (setstr_curenum) */
+
+int setstr::already(cchar *sp,int sl) noex {
+	return setstr_already(this,sp,sl) ;
+}
+
+int setstr::add(cchar *sp,int sl) noex {
+	return setstr_add(this,sp,sl) ;
+}
+
+int setstr::del(cchar *sp,int sl) noex {
+	return setstr_del(this,sp,sl) ;
+}
+
+int setstr::curbegin(setstr_cur *curp) noex {
+	return setstr_curbegin(this,curp) ;
+}
+
+int setstr::curend(setstr_cur *curp) noex {
+	return setstr_curend(this,curp) ;
+}
+
+int setstr::curenum(setstr_cur *curp,cchar **rpp) noex {
+	return setstr_curenum(this,curp,rpp) ;
+}
+
+void setstr::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("setstr",rs,"fini-finish") ;
+	}
+}
+
+int setstr_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case setstrmem_start:
+	        rs = setstr_start(op,a) ;
+	        break ;
+	    case setstrmem_count:
+	        rs = setstr_count(op) ;
+	        break ;
+	    case setstrmem_finish:
+	        rs = setstr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (setstr_co::operator) */
 
 

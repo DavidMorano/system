@@ -1,11 +1,11 @@
 /* urotate SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
-
-#define	CF_ROT	1			/* use C++20 bit-rotate */
 
 /* perform a bit rotation of an unsigned integer */
 /* version %I% last-modified %G% */
 
+#define	CF_ROT	1			/* use C++20 bit-rotate */
 
 /* revision history:
 

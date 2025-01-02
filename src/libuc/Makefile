@@ -826,6 +826,7 @@ envmgr.o:		envmgr.cc envmgr.h
 # set-(of)-strings
 osetstr.o:		osetstr.cc osetstr.h
 osetstr_loadfile.o:	osetstr_loadfile.cc osetstr.h
+setstr.o:		setstr.cc setstr.h
 
 # sring-comparisons
 vstrcmpx.o:		vstrcmpx.cc vstrcmpx.h

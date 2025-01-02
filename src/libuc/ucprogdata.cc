@@ -1,4 +1,5 @@
 /* ucprogdata SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
@@ -253,9 +254,8 @@ int ucprogdata_set(int di,cchar *cbuf,int clen,int ttl) noex {
 	if (cbuf) {
 	    rs = SR_INVALID ;
 	    if ((di >= 0) && cbuf[0]) {
-	        sigblocker	b ;
 	        if (ttl < 0) ttl = TO_TTL ;
-	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	        if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucprogdata_init()) >= 0) {
 		        UCPROGDATA	*uip = &ucprogdata_data ;
 		        if ((rs = ucprogdata_capbegin(uip,-1)) >= 0) {
@@ -267,7 +267,7 @@ int ucprogdata_set(int di,cchar *cbuf,int clen,int ttl) noex {
 		            if (rs >= 0) rs = rs1 ;
 		        } /* end if (ucprogdata_cap) */
 	            } /* end if (ucprogdata_init) */
-	            rs1 = sigblocker_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	    } /* end if (valid) */
@@ -284,8 +284,7 @@ int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (di >= 0) {
-	        sigblocker	b ;
-	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	        if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucprogdata_init()) >= 0) {
 	                UCPROGDATA	*uip = &ucprogdata_data ;
 	                if ((rs = ucprogdata_capbegin(uip,-1)) >= 0) {
@@ -297,7 +296,7 @@ int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 	                    if (rs >= 0) rs = rs1 ;
 		        } /* end if (ucprogdata_cap) */
 	            } /* end if (ucprogdata_init) */
-	            rs1 = sigblocker_finish(&b) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	    } /* end if (valid) */

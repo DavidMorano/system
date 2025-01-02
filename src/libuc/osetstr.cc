@@ -99,8 +99,12 @@ int osetstr_finish(osetstr *op) noex {
 	int		rs ;
 	if ((rs = osetstr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
-	    delete setp ;
-	    op->setp = nullptr ;
+	    rs = SR_BADFMT ;
+	    if (setp) {
+		rs = SR_OK ;
+	        delete setp ;
+	        op->setp = nullptr ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -116,8 +120,7 @@ int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
 	        iter	ite = setp->end() ;
-	        iter	it ;
-	        if ((it = setp->find(*strp)) == ite) {
+	        if (iter it ; (it = setp->find(*strp)) == ite) {
 	            f = false ;
 		}
 		delete strp ;
@@ -151,10 +154,9 @@ int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        iter		it ;
-	        iter		ite = setp->end() ;
-	        string		v(sp,sl) ;
-	        if ((it = setp->find(v)) != ite) {
+	        iter	ite = setp->end() ;
+	        string	v(sp,sl) ;
+	        if (iter it ; (it = setp->find(v)) != ite) {
 		    f = true ;
 		    setp->erase(it) ;
 	        }
@@ -169,9 +171,8 @@ int osetstr_delall(osetstr *op) noex {
 	if ((rs = osetstr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
  	    {
-	        iter	it = setp->begin() ;
 	        iter	ite = setp->end() ;
-	        if (it != ite) {
+	        if (iter it = setp->begin() ; it != ite) {
 		    setp->erase(it,ite) ;
 	        }
 	    }
@@ -198,8 +199,7 @@ int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
 	if ((rs = osetstr_magic(op,curp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
-	    iter	*itp ;
-	    if ((itp = new(nothrow) iter) != np) {
+	    if (iter *itp ; (itp = new(nothrow) iter) != np) {
 	        *itp = setp->begin() ;
 	        curp->itp = itp ;
 	    } else {
@@ -246,5 +246,46 @@ int osetstr_curenum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	return rs ;
 }
 /* end subroutine (osetstr_curenum) */
+
+int osetstr::already(cchar *sp,int sl) noex {
+	return osetstr_already(this,sp,sl) ;
+}
+
+int osetstr::add(cchar *sp,int sl) noex {
+	return osetstr_add(this,sp,sl) ;
+}
+
+int osetstr::del(cchar *sp,int sl) noex {
+	return osetstr_del(this,sp,sl) ;
+}
+
+void osetstr::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("osetstr",rs,"fini-finish") ;
+	}
+}
+
+int osetstr_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case osetstrmem_start:
+	        rs = osetstr_start(op,a) ;
+	        break ;
+	    case osetstrmem_delall:
+	        rs = osetstr_delall(op) ;
+	        break ;
+	    case osetstrmem_count:
+	        rs = osetstr_count(op) ;
+	        break ;
+	    case osetstrmem_finish:
+	        rs = osetstr_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (osetstr_co::operator) */
+
 
 

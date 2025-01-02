@@ -221,7 +221,7 @@ int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	int		bl = 0 ;
 	if ((rs = expcook_magic(op,curp,rbuf)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
-	    int		vl ;
+	    int		vl{} ;
 	    cchar	*kp{} ;
 	    cchar	*vp{} ;
 	    if ((rs = slp->curenum(curp->clp,&kp,&vp,&vl)) >= 0) {
@@ -262,18 +262,16 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
-	        buffer	bo ;
-	        if ((rs = buffer_start(&bo,rlen)) >= 0) {
+	        if (buffer bo ; (rs = bo.start(rlen)) >= 0) {
 	            if ((rs = expcook_expbuf(op,wch,&bo,sp,sl)) >= 0) {
-		        cchar	*bp{} ;
 	                bl = rs ;
-	                if ((rs = buffer_get(&bo,&bp)) >= 0) {
+		        if (cchar *bp{} ; (rs = bo.get(&bp)) >= 0) {
 	                    if (bp) {
 	                        rs = snwcpy(rbuf,rlen,bp,bl) ;
 			    }
 	                }
 	            }
-	            rs1 = buffer_finish(&bo) ;
+	            rs1 = bo.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (buffer) */
 	    } else {
@@ -293,7 +291,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	    cchar	*tp ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
-	        if ((rs = buffer_strw(bufp,sp,(tp-sp))) >= 0) {
+	        if ((rs = bufp->strw(sp,(tp-sp))) >= 0) {
 	            int		kl = -1 ;
 	            cchar	*kp = nullptr ;
 		    len += rs ;
@@ -301,7 +299,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	            sp = (tp+1) ;
 	            if (sl > 0) {
 	                if (sp[0] == sch) {
-	                    rs = buffer_chr(bufp,sch) ;
+	                    rs = bufp->chr(sch) ;
 		  	    len += rs ;
 	                    sl -= 1 ;
 	                    sp += 1 ;
@@ -338,7 +336,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	    } /* end while (expanding) */
 	    /* copy over any remainder (trailing part) */
 	    if ((rs >= 0) && (sl > 0)) {
-	        rs = buffer_strw(bufp,sp,sl) ;
+	        rs = bufp->strw(sp,sl) ;
 	        len += rs ;
 	    }
 	} /* end if (magic) */
@@ -355,11 +353,10 @@ static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 	if (kl < 0) kl = strlen(kp) ;
 	if (kl > 0) {
 	    hdbstr	*slp = op->hlp ;
-	    cchar	*vp{} ;
-	    if ((rs = slp->fetch(kp,kl,nullptr,&vp)) >= 0) {
+	    if (cchar *vp{} ; (rs = slp->fetch(kp,kl,nullptr,&vp)) >= 0) {
 	        cint	vl = rs ;
 	        if (vl > 0) {
-	            rs = buffer_strw(bufp,vp,vl) ;
+	            rs = bufp->strw(vp,vl) ;
 		    len += rs ;
 	        }
 	    } else if (rs == SR_NOTFOUND) {
@@ -378,11 +375,11 @@ static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 static int buffer_keydef(buffer *bufp,int wch,cchar *kp,int kl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = buffer_chr(bufp,wch)) >= 0) {
+	if ((rs = bufp->chr(wch)) >= 0) {
 	    len = rs ;
-	    if ((rs = buffer_strw(bufp,kp,kl)) >= 0) {
+	    if ((rs = bufp->strw(kp,kl)) >= 0) {
 		len += rs ;
-	        rs = buffer_chr(bufp,wch) ;
+	        rs = bufp->chr(wch) ;
 		len += rs ;
 	    } /* end if */
 	} /* end if */
@@ -394,16 +391,15 @@ static int mkcomp(char *rp,int rl,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (rp && kp) {
-	    sbuf	b ;
-	    if ((rs = sbuf_start(&b,rp,rl)) >= 0) {
+	    if (sbuf b ; (rs = b.start(rp,rl)) >= 0) {
 	        {
-	            if (rs >= 0) rs = sbuf_strw(&b,kp,kl) ;
-	            if (rs >= 0) rs = sbuf_chr(&b,'=') ;
+	            if (rs >= 0) rs = b.strw(kp,kl) ;
+	            if (rs >= 0) rs = b.chr('=') ;
 	            if (vp) {
-		        if (rs >= 0) rs = sbuf_strw(&b,vp,vl) ;
+		        if (rs >= 0) rs = b.strw(vp,vl) ;
 		    }
 	        }
-	        rs1 = sbuf_finish(&b) ;
+	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */

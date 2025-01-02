@@ -312,8 +312,8 @@ int rander::geter(char *rbuf,int rlen) noex {
 	    randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 	    while ((rs >= 0) && (rlen > 0)) {
 		if (ulong uv ; (rs = randomvar_getulong(rvp,&uv)) >= 0) {
-	    	    cint	usize = szof(ulong) ;
-		    for (int i = 0 ; (rlen > 0) && (i < usize) ; i += 1) {
+	    	    cint	usz = szof(ulong) ;
+		    for (int i = 0 ; (rlen > 0) && (i < usz) ; i += 1) {
 			rbuf[rl++] = char(uv) ;
 			uv >>= CHAR_BIT ;
 			rlen -= 1 ;
@@ -362,8 +362,8 @@ int rander::iaddnoise() noex {
 int rander::irandbegin() noex {
 	int		rs = SR_OK ;
 	if (rvarp == nullptr) {
-	    cint	osize = szof(randomvar) ;
-	    if (void *vp{} ; (rs = uc_libmalloc(osize,&vp)) >= 0) {
+	    cint	osz = szof(randomvar) ;
+	    if (void *vp{} ; (rs = uc_libmalloc(osz,&vp)) >= 0) {
 	        randomvar	*rvp = cast_static<randomvar *>(vp) ;
 	        if ((rs = randomvar_start(rvp,0,0)) >= 0) {
 	            rvarp = vp ;	/* <- store object pointer */

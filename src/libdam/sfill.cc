@@ -61,6 +61,8 @@
 
 /* local variables */
 
+constexpr int		wordlen = WORDBUFLEN ;
+
 
 /* exported variables */
 
@@ -68,10 +70,11 @@
 /* exported subroutines */
 
 int sfill_start(sfill *op,int indent,bfile *ofp) noex {
+    	SFILL		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && ofp) {
 	    cint	osz = szof(fifostr) ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(hop) ;
 	    op->ofp = ofp ;
 	    op->indent = indent ;
 	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
@@ -155,7 +158,7 @@ int sfill_wline(sfill *op,int olinelen) noex {
 	    int		cl ;
 	    int		c_words = 0 ;
 	    cchar	*cp ;
-	    char	wordbuf[WORDBUFLEN + 1] ;
+	    char	wordbuf[wordlen + 1] ;
 	    rs = SR_OK ;
 	    if (op->indent > 0) {
 	        rs = bwriteblanks(ofp,op->indent) ;
@@ -163,7 +166,7 @@ int sfill_wline(sfill *op,int olinelen) noex {
 	    }
 	    while ((rs >= 0) && (wlen < olinelen)) {
 	        cp = wordbuf ;
-	        cl = fifostr_headread(op->fsp,wordbuf,WORDBUFLEN) ;
+	        cl = fifostr_headread(op->fsp,wordbuf,wordlen) ;
 	        if (cl == SR_NOENT) break ;
 	        rs = cl ;
 	        if (rs < 0) break ;

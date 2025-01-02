@@ -32,8 +32,8 @@
 #define	MAPSTRINT_CUR	hdb_cur
 
 
-typedef	hdb		mapstrint ;
-typedef	hdb_cur		mapstrint_cur ;
+typedef	MAPSTRINT	mapstrint ;
+typedef	MAPSTRINT_CUR	mapstrint_cur ;
 
 EXTERNC_begin
 
