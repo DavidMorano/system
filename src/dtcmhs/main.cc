@@ -23,12 +23,9 @@
         This program is a DTCM_HAVE server. It listens for requests and returns
         the present-status on a DTCM calendar.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -37,21 +34,22 @@
 #include	<sys/uio.h>
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<cerrno>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdio>
+#include	<cstring>
 #include	<syslog.h>
 #include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<utmpx.h>
-
 #include	<usystem.h>
+#include	<getportnum.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<userinfo.h>
@@ -98,7 +96,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matmsgstart(const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	listenudp(int,const char *,const char *,int) ;
 extern int	openport(int,int,int,SOCKADDRESS *) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
@@ -815,7 +812,7 @@ char	*envv[] ;
 	    }
 
 	    if (rs >= 0) {
-		const int	af = AF_INET ;
+		cint	af = AF_INET ;
 
 /* can we bind our port ourselves? */
 

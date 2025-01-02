@@ -48,25 +48,22 @@
 	>=0		port number that was parsed out
 	<0		error
 
-
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<netinet/in.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getportnum.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -88,7 +85,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 

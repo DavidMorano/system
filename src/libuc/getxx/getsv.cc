@@ -86,8 +86,8 @@ int getsv_ent(ucentsv *sep,char *rbuf,int rlen) noex {
 }
 /* end subroutine (getsv_ent) */
 
-int getsv_name(ucentsv *sep,char *rbuf,int rlen,cchar *pn,cchar *svc) noex {
-	return uc_getsvnam(sep,rbuf,rlen,pn,svc) ;
+int getsv_name(ucentsv *sep,char *rbuf,int rlen,cchar *svc,cchar *pn) noex {
+	return uc_getsvnam(sep,rbuf,rlen,svc,pn) ;
 }
 /* end subroutine (getsv_name) */
 

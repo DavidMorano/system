@@ -1,16 +1,17 @@
-/* parsenodespec */
+/* parsenodespec SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* parse a COMSAT node specification into node and port */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -18,55 +19,49 @@
 
 /******************************************************************************
 
-	This little subroutine just parses out a node specification.  A node
-	specification looks like:
+  	Name:
+	parrsenodespec
+
+	Description:
+	This little subroutine just parses out a node specification.
+	A node specification looks like:
 
 		hostname[:port]
 
-	The port can be either numeric or all alpha.  If the parse is
-	successful, the port number is returned.  If no port number (or name)
-	was within the specification, the default port that was passed by the
-	caller is returned instead.
+	The port can be either numeric or all alpha.  If the parse
+	is successful, the port number is returned.  If no port
+	number (or name) was within the specification, the default
+	port that was passed by the caller is returned instead.
 
 	Synopsis:
-
-	int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl)
-	PROGINFO	*pip ;
-	char		rbuf[] ;
-	char		*nsp ;
-	int		nsl ;
+	int parsenodespec(PROGINFO *pip,char *rbuf,cchar *nsp,int nsl) noex
 
 	Arguments:
-
 	pip		pointer to program information
 	rbuf		user supplied buffer
 	nsp		pointer to node-specification
 	nsl		length of node-specification
 
 	Returns:
-
 	>=0		port number that was parsed out
-	<0		error
-
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<netinet/in.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getportnum.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -88,7 +83,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 

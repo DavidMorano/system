@@ -19,23 +19,21 @@
 
 /*******************************************************************************
 
-        This subroutine forms the front-end part of a generic PCS daemon type of
-        program. This front-end is used in a variety of PCS daemons and other
-        programs.
+	This subroutine forms the front-end part of a generic PCS
+	daemon type of program. This front-end is used in a variety
+	of PCS daemons and other programs.
 
-        This code was originally part of the Personal Communications
-        Services (PCS) package but can also be used independently from it.
-        Historically, this was developed as part of an effort to maintain high
-        function (and reliable) email communications in the face of increasingly
-        draconian security restrictions imposed on the computers in the DEFINITY
-        development organization.
-
+	This code was originally part of the Personal Communications
+	Services (PCS) package but can also be used independently
+	from it.  Historically, this was developed as part of an
+	effort to maintain high function (and reliable) email
+	communications in the face of increasingly draconian security
+	restrictions imposed on the computers in the DEFINITY
+	development organization.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -44,13 +42,15 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getportnum.h>
+#include	<getax.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -63,7 +63,6 @@
 #include	<pcsconf.h>
 #include	<mallocstuff.h>
 #include	<exitcodes.h>
-#include	<getax.h>
 #include	<userinfo.h>
 #include	<localmisc.h>
 
@@ -102,7 +101,6 @@ extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	getfname(const char *,const char *,int,char *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
 extern int	bopenroot(bfile *,cchar *,cchar *,cchar *,char *,mode_t) ;
 extern int	isalphalatin(int) ;

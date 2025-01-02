@@ -43,6 +43,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getportnum.h>
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<paramfile.h>
@@ -92,7 +93,6 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	getportnum(cchar *,cchar *) noex ;
     extern int	getheour(cchar *,cchar *,HOSTENT *,char *,int) noex ;
     extern int	issamehostname(cchar *,cchar *,cchar *) noex ;
     extern int	parsenodespec(proginfo *,char *,cchar *,int) noex ;

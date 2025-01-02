@@ -48,6 +48,7 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getserv.h>		/* |getserv_port(3uc)| */
 #include	<cfdec.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -58,14 +59,13 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getserv_name(cchar *,cchar *) noex ;
-}
 
 
 /* external variables */
@@ -96,9 +96,9 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	            rs = cfdeci(ps,pl,&port) ;
 	        } /* end if */
 	        if ((rs >= 0) && (port < 0) && (pn != nullptr)) {
-	            if ((rs = getserv_name(pn,ps)) >= 0) {
+	            if ((rs = getserv_port(pn,ps)) >= 0) {
 	                port = rs ;
-	            } /* end if (getserv_name) */
+	            } /* end if (getserv_port) */
 	        } /* end if */
 	        if ((rs >= 0) && (port < 0)) {
 	            rs = SR_NOTFOUND ;

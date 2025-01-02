@@ -17,8 +17,12 @@
 
 /*******************************************************************************
 
+  	Name:
+	getportnum
+
+	Description:
 	This file contains some support for the UNIX® Internet-Address
-	 related operations.
+	related operations.
 
 *******************************************************************************/
 

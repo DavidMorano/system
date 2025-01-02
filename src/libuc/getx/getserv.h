@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* get a network service port given a protocl-name and serive-name */
+/* get a network service port given a protocol-name and service-name */
 /* version %I% last-modified %G% */
 
 
@@ -29,7 +29,7 @@
 
 EXTERNC_begin
 
-extern int	getserv_name(cchar *,cchar *) noex ;
+extern int	getserv_port(cchar *,cchar *) noex ;
 
 EXTERNC_end
 

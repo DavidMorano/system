@@ -1,13 +1,13 @@
 /* main (openport) */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to create and bind a socket (OPENPORT setuid program) */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -18,8 +18,8 @@
 	I enhanced the program a little.
 
 	= 2013-03-01, David A­D­ Morano
-        I added logging of requests to a file. This would seem to be an
-        appropriate security precaution.
+	I added logging of requests to a file.  This would seem to
+	be an appropriate security precaution.
 
 */
 
@@ -27,13 +27,14 @@
 
 /*******************************************************************************
 
-        This is the SETUID program called from |openport(3dam)| to acquire
-        access to a privileged network (either TCP or UDP in the present case)
-        port. We pass the acquired file-sdesciptor back to the client (we are
-        the server) using our STDIN pipe between us. We use the USERPORTS
-        database to determine who has access rights to any particular privileged
-        ports. The messaging protocold between the client and the server is done
-        using the OPENPORTMSG messages.
+	This is the SETUID program called from |openport(3dam)| to
+	acquire access to a privileged network (either TCP or UDP
+	in the present case) port. We pass the acquired file-sdesciptor
+	back to the client (we are the server) using our STDIN pipe
+	between us. We use the USERPORTS database to determine who
+	has access rights to any particular privileged ports. The
+	messaging protocold between the client and the server is
+	done using the OPENPORTMSG messages.
 
 	Synopsis:
 
@@ -41,34 +42,32 @@
 
 	All transactions are done on STDIN.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getax.h>
+#include	<getportnum.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
 #include	<vecpstr.h>
 #include	<userinfo.h>
 #include	<msgbuf.h>
-#include	<getax.h>
 #include	<sockaddress.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -103,7 +102,6 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	getportnum(const char *,const char *) ;
 extern int	getuid_user(cchar *,int) ;
 extern int	vecpstr_adduniq(VECPSTR *,const char *,int) ;
 extern int	hasalldig(const char *,int) ;

@@ -23,19 +23,16 @@
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-
 	This code module was completely rewritten to replace the
 	previous mail-delivery program for PCS, written around 1990 or
 	so and which also served for a time to filter environment for
 	the SENDMAIL daemon.
 
 	= 2004-02-17, David A­D­ Morano
-
 	This was modified to add the MSGID object.  That is a database
 	that stores message IDs.  We used it to eliminate duplicate
 	mail deliveries which as of late are coming from several
 	popular sources!
-
 
 */
 
@@ -43,38 +40,39 @@
 
 /*******************************************************************************
 
-	This is the front-end subroutine (main) for the BB program.  It is
-	similar to most other PCS programs but may be a little different since
-	it originated differently from the others.
+  	Description:
+	This is the front-end subroutine (main) for the BB program.
+	It is similar to most other PCS programs but may be a little
+	different since it originated differently from the others.
 
-	NOTE: The big thing to note in this subroutine, and any other code that
-	"pretends" to check for the existence of the mail spool directory, is
-	that the directory may also be an AUTOMOUNT mount point.  This means
-	that it might not be accessible when we go to check it alone.  Instead,
-	we have to check something inside the directory to make sure that the
-	AUTOMOUNTer first mounts the directory.
-
+	NOTE: 
+	The big thing to note in this subroutine, and any other
+	code that "pretends" to check for the existence of the mail
+	spool directory, is that the directory may also be an
+	AUTOMOUNT mount point.  This means that it might not be
+	accessible when we go to check it alone.  Instead, we have
+	to check something inside the directory to make sure that
+	the AUTOMOUNTer first mounts the directory.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<grp.h>
-
 #include	<usystem.h>
+#include	<ucmallreg.h>
+#include	<getportnum.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -88,10 +86,8 @@
 #include	<dater.h>
 #include	<estrings.h>
 #include	<ids.h>
-#include	<estrings.h>
 #include	<logsys.h>
 #include	<pcsconf.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -150,7 +146,6 @@ extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	pcstrustuser(const char *,const char *) ;
 extern int	pcsuserfile(const char *,const char *,const char *,
 			const char *,const char *) ;
-extern int	getportnum(const char *,const char *) ;
 extern int	getmailgid(const char *,gid_t) ;
 extern int	initnow(struct timeb *,const char *,int) ;
 
@@ -1592,16 +1587,6 @@ const char	*envv[] ;
 	        pip->gid_maildir = sb.st_gid ;
 	    }
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("main: maildir uid=%d gid=%d\n",
-	            sb.st_uid, sb.st_gid) ;
-#endif
-
-#if	CF_DEBUGN
-	    nprintf(NUCMEMALLOC,"main: getportnum()\n") ;
-#endif
-
 	    if ((rs >= 0) && (portspec != NULL)) {
 	        rs = getportnum(PROTONAME_COMSAT,portspec) ;
 	        if (rs == SR_NOTFOUND) rs = IPPORT_BIFFUDP ;
@@ -1624,7 +1609,7 @@ const char	*envv[] ;
 
 /* process the usernames given at invocation or in the argfile */
 
-	size = sizeof(RECIP) ;
+	size = szof(RECIP) ;
 	rs = vecobj_start(&recips,size,10,0) ;
 
 #if	CF_DEBUG
@@ -1643,7 +1628,7 @@ const char	*envv[] ;
 #endif /* CF_DEBUGS */
 
 	if (rs >= 0) {
-	    memset(&ainfo,0,sizeof(struct arginfo)) ;
+	    memclear(&ainfo) ;
 	    ainfo.argc = argc ;
 	    ainfo.argv = argv ;
 	    ainfo.ai_max = ai_max ;
@@ -1921,7 +1906,7 @@ const char	*envv[] ;
 
 /* initialze the container for message information */
 
-	size = sizeof(struct msginfo) ;
+	size = szof(struct msginfo) ;
 	rs = vecobj_start(&info,size,5,0) ;
 	if (rs < 0) {
 	    ex = EX_TEMPFAIL ;
@@ -2463,7 +2448,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        const int	size = (10*szof(uint)) ;
 	        const char	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -3232,7 +3217,7 @@ int		tfd ;
 
 	    pip->daytime = time(NULL) ;
 	    dt = pip->daytime ;
-	    memset(&midkey,0,sizeof(MSGID_KEY)) ;
+	    memclear(&midkey) ;
 
 	    midkey.recip = rp->recipient ;
 	    midkey.reciplen = -1 ;
@@ -3450,7 +3435,7 @@ int		tfd ;
 
 	    } /* end if (looked up username) */
 
-	    memset(&midkey,0,sizeof(MSGID_KEY)) ;
+	    memclear(&midkey) ;
 
 	    midkey.recip = rp->recipient ;
 	    midkey.reciplen = -1 ;
@@ -3990,7 +3975,7 @@ struct proginfo	*pip ;
 
 	if (lip == NULL) return SR_FAULT ;
 
-	memset(lip,0,sizeof(struct locinfo)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 

@@ -1,4 +1,5 @@
 /* listenudp SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to listen on a UDP port */
@@ -51,6 +52,7 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getportnum.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<hostent.h>
@@ -119,7 +121,6 @@ typedef unsigned int	in_addr_t ;
 
 extern "C" {
     extern int	mnwcpy(char *,int,cvoid *,int) noex ;
-    extern int	getportnum(cchar *,cchar *) noex ;
     extern int	getprotofamily(int) noex ;
     extern int	getproto_name(cchar *,int) noex ;
 }

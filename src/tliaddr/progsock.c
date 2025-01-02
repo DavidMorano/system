@@ -1,4 +1,5 @@
-/* progsock */
+/* progsock SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to process socket interface type addresses */
@@ -9,9 +10,10 @@
 /* revision history:
 
 	= 1999-08-17, David A­D­ Morano
-        This subroutine (and whole program) is replacing serveral that did
-        similar things in the past. One program that did something similar to
-        this was 'hostrfs(1)' from the old days. There was also 'rfsaddr(1).
+	This subroutine (and whole program) is replacing serveral
+	that did similar things in the past. One program that did
+	something similar to this was 'hostrfs(1)' from the old
+	days. There was also 'rfsaddr(1).
 
 */
 
@@ -19,12 +21,13 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine tries to make a socket-style TLI address
 	out of the given arguments.
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -32,11 +35,12 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getportnum.h>
 #include	<char.h>
 #include	<bfile.h>
 #include	<hostinfo.h>
@@ -87,7 +91,6 @@
 extern int	sncpy1(char *,int,cchar *) ;
 extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	getaf(cchar *,int) ;
 extern int	getaflen(int) ;
 extern int	cfnumi(cchar *,int,int *) ;

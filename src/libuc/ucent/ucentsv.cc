@@ -217,6 +217,18 @@ int ucentsv::size() noex {
 }
 /* end subroutine (ucentsv::size) */
 
+int ucentsv::getent(char *rb,int rl) noex {
+    	return uc_getsvent(this,rb,rl) ;
+}
+
+int ucentsv::getnam(char *rb,int rl,cc *n,cc *p) noex {
+    	return uc_getsvnam(this,rb,rl,n,p) ;
+}
+
+int ucentsv::getnum(char *rb,int rl,int n,cchar *p) noex {
+    	return uc_getsvnum(this,rb,rl,n,p) ;
+}
+
 
 /* local subroutines */
 

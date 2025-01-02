@@ -35,6 +35,9 @@ struct ucentsv : servent {
 	int load(char *,int,const ucentsv *) noex ;
 	int format(char *,int) noex ;
 	int size() noex ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *,cchar *) noex ;
+	int getnum(char *,int,int,cchar *) noex ;
 	operator int () noex {
 	    return size() ;
 	} ;

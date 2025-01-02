@@ -1,19 +1,17 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0
-
 
 /* revision history:
 
 	= 1994-09-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -21,43 +19,41 @@
 
 /*****************************************************************************
 
+  	Description:
 	This subroutine forms the front-end part of a generic PCS
 	type of program.  This front-end is used in a variety of
-	PCS programs.
-
-	This code was originally part of the Personal
+	PCS programs.  This code was originally part of the Personal
 	Communications Services (PCS) package but can also be used
-	independently from it.  Historically, this was developed as
-	part of an effort to maintain high function (and reliable)
+	independently from it.  Historically, this was developed
+	as part of an effort to maintain high function (and reliable)
 	email communications in the face of increasingly draconian
-	security restrictions imposed on the computers in the DEFINITY
-	development organization.
-
-
+	security restrictions imposed on the computers in the
+	DEFINITY development organization.
 
 *****************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getax.h>
+#include	<getusername.h>
+#include	<getportnum.h>
+#include	<mallocstuff.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -65,10 +61,7 @@
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<varsub.h>
-#include	<getax.h>
-#include	<getusername.h>
 #include	<userinfo.h>
-#include	<mallocstuff.h>
 #include	<srvtab.h>
 #include	<localmisc.h>
 
@@ -105,7 +98,6 @@ extern int	getfname(const char *,const char *,int,char *) ;
 extern int	bopenroot(bfile *,char *,char *,char *,char *,int) ;
 extern int	var_load(), var_subbuf(), var_merge() ;
 extern int	expander() ;
-extern int	getportnum() ;
 extern int	procfileenv(char *,char *,VECSTR *) ;
 extern int	procfilepaths(char *,char *,VECSTR *) ;
 extern int	watch(struct global *,
@@ -1745,55 +1737,27 @@ char	*argv[], *envv[] ;
 /* look up some miscellaneous stuff in various databases */
 
 	    if (portspec != NULL) {
-
 	        if (getportnum(portspec,&port) < 0)
 	            goto badport ;
-
 	    }
 
 	    if (port < 0) {
-
-#if	CF_DEBUG
-	        if (g.debuglevel > 1)
-	            debugprintf("main: default port \n") ;
-#endif
-
 	        sep = getservbyname(PORTNAME, "tcp") ;
-
-	        if (sep != NULL)
+	        if (sep != NULL) {
 	            port = (int) ntohs(sep->s_port) ;
-
-	        else
+		} else {
 	            port = PORT ;
-
-#if	CF_DEBUG
-	        if (g.debuglevel > 1)
-	            debugprintf("main: done looking at port stuff so far\n") ;
-#endif
-
+		}
 	    } /* end if (no port specified) */
-
-#if	CF_DEBUG
-	    if (g.debuglevel > 1)
-	        debugprintf("main: about to get a protocol number\n") ;
-#endif
-
 
 /* get the protocol number */
 
 	    pep = getprotobyname("tcp") ;
-
-	    if (pep != NULL)
+	    if (pep != NULL) {
 	        proto = pep->p_proto ;
-
-	    else
+	    } else {
 	        proto = IPPROTO_TCP ;
-
-
-#if	CF_DEBUG
-	    if (g.debuglevel > 1)
-	        debugprintf("main: about to call 'socket'\n") ;
-#endif
+	    }
 
 	    if ((s = u_socket(PF_INET, SOCK_STREAM, proto)) < 0)
 	        goto badsocket ;

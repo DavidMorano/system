@@ -52,6 +52,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
+#include	<getportnum.h>
 #include	<sighand.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -143,7 +144,6 @@ extern int	optvalue(cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	getprotofamily(int) ;
 extern int	listenudp(int,cchar *,cchar *,int) ;
 extern int	opentermnote(cchar *,cchar **,int,int) ;
@@ -1734,13 +1734,7 @@ static int procdaemonbegin(PROGINFO *pip)
 	    }
 
 	    if ((rs = getportnum(protoname,portname)) >= 0) {
-	        const int	port = rs ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(3)) {
-	            debugprintf("main/procdaemonbegin: port=%d\n",port) ;
-	        }
-#endif
+	        cint	port = rs ;
 
 	        if ((pip->euid == 0) || (port >= IPPORT_RESERVED)) {
 	            char	digbuf[DIGBUFLEN+1] ;

@@ -1,11 +1,12 @@
-/* main */
+/* main SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to send echo data to a remote host (and back) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -18,26 +19,25 @@
 
 /*******************************************************************************
 
-        This subroutine forms a program that tests the input-update capability
-        (at least a little bit) of the PINGSTAT program.
-
+  	Description:
+	This subroutine forms a program that tests the input-update
+	capability (at least a little bit) of the PINGSTAT program.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/time.h>
 #include	<netinet/in.h>
 #include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getportnum.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
@@ -87,7 +87,6 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	optbool(const char *,int) ;
 extern int	initnow(struct timeb *,char *,int) ;
-extern int	getportnum(const char *,const char *) ;
 extern int	dialudp(const char *,const char *,int,int,int) ;
 extern int	dialtcp(const char *,const char *,int,int,int) ;
 extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;

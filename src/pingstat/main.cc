@@ -1,4 +1,5 @@
 /* main SUPPORT (pingstat) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic (pretty much) front end program subroutine */
@@ -19,6 +20,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine forms the front-end part of a generic PCS
 	type of program.  This front-end is used in a variety of
 	PCS programs.
@@ -49,8 +51,10 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<getbufsize.h>
 #include	<ucmallreg.h>
+#include	<getbufsize.h>
+#include	<getportnum.h>
+#include	<gethe.h>
 #include	<mallocxx.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -64,7 +68,6 @@
 #include	<dater.h>
 #include	<sockaddress.h>
 #include	<lfm.h>
-#include	<gethe.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -104,7 +107,6 @@ extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	getportnum(const char *,const char *) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
@@ -1679,15 +1681,14 @@ int		dpn ;
 }
 /* end subroutine (procdefportspec) */
 
-
-static int proclocnames_begin(PROGINFO *pip)
-{
+static int proclocnames_begin(PROGINFO *pip) noex {
 	vecstr		*lnp = &pip->localnames ;
 	int		rs ;
 	if ((rs = vecstr_start(lnp,5,0)) >= 0) {
 	    rs = proclocnames_load(pip) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vecstr_finish(lnp) ;
+	    }
 	}
 	return rs ;
 }

@@ -71,11 +71,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<getproto.h>
+#include	<getprotofamily.h>
+#include	<getportnum.h>
 #include	<hostinfo.h>
 #include	<hostaddr.h>
 #include	<hostent.h>
-#include	<getproto.h>
-#include	<getprotofamily.h>
 #include	<sockaddress.h>
 #include	<inetconv.h>
 #include	<iserror.h>
@@ -112,7 +113,6 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	getportnum(cchar *,cchar *) noex ;
     extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
 }
 

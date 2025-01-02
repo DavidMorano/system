@@ -50,12 +50,13 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getax.h>
+#include	<getportnum.h>
 #include	<mallocxx.h>
 #include	<pwcache.h>
 #include	<filemap.h>
 #include	<field.h>
 #include	<fieldterminit.hh>
-#include	<getax.h>
 #include	<nulstr.h>
 #include	<strn.h>
 #include	<strdcpyx.h>
@@ -106,10 +107,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getportnum(cchar *,cchar *) noex ;
-}
 
 
 /* external variables */

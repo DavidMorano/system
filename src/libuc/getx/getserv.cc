@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* get a network service number (port) given protocol and service name */
+/* get a network service number (port) given protocol-name and service-name */
 /* version %I% last-modified %G% */
 
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	getserv_name
+	getserv_port
 
 	Description:
 	Get a service number (a port number really) given a protocol
@@ -28,7 +28,7 @@
 	depending on what protocol name it is associated with.
 
 	Synopsis:
-	int getserv_name(cchar *protoname,cchar *svc) noex
+	int getserv_port(cchar *protoname,cchar *svc) noex
 
 	Arguments:
 	protoname	protocol name
@@ -37,6 +37,12 @@
 	Returns:
 	>=0		port number
 	<0		error (system-return)
+
+	Notes:
+	Notice that the port-name and service-name are given in
+	that order (port-name fist followed by service-name).  This
+	is the opposite order of (essentially) all other means
+	(interfaces) of retrieving a network-service entry.
 
 *******************************************************************************/
 
@@ -80,27 +86,22 @@
 
 /* exported subroutines */
 
-int getserv_name(cchar *pn,cchar *svc) noex {
+int getserv_port(cchar *pn,cchar *svc) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		port = 0 ;
 	if (pn && svc) {
 	    rs = SR_INVALID ;
 	    if (pn[0] && svc[0]) {
-	        char	*svbuf{} ;
-	        if ((rs = malloc_sv(&svbuf)) >= 0) {
-	            ucentsv	sv ;
-		    cint	svlen = rs ;
-	            if ((rs = getsv_name(&sv,svbuf,svlen,pn,svc)) >= 0) {
+	        if (char *svbuf{} ; (rs = malloc_sv(&svbuf)) >= 0) {
+	            if (ucentsv sv ; (rs = sv.getnam(svbuf,rs,svc,pn)) >= 0) {
 	                port = int(ntohs(sv.s_port)) ;
 	            }
-	            rs1 = uc_free(svbuf) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
+		    rs = rsfree(rs,svbuf) ;
+	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;
 }
-/* end subroutine (getserv_name) */
+/* end subroutine (getserv_port) */
 
 

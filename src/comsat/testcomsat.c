@@ -45,9 +45,9 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<syslog.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getportnum.h>
 #include	<sbuf.h>
 #include	<sockaddress.h>
 #include	<exitcodes.h>
@@ -88,7 +88,6 @@ extern int	mkpath1w(char *,const char *,int) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
 extern int	issamehostname(const char *,const char *,const char *) ;
 extern int	isNotPresent(int) ;

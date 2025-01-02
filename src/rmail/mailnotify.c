@@ -1,17 +1,18 @@
-/* prognotify */
+/* prognotify SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_ISSAMEHOST	1		/* use 'issamehostname(3dam)' */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -19,36 +20,33 @@
 
 /*******************************************************************************
 
-        This subroutine sends a message to hosts indicating that some mail has
-        come in for a user.
+  	Description:
+	This subroutine sends a message to hosts indicating that
+	some mail has come in for a user.
 
 	Implementation notes:
-
-        Note that we use the same socket for all messages. This avoids creating
-        new sockets for each one. But it also means that we only bother with one
-        protocol family, and that family is PF_INET. This has not proved to be a
-        big problem!
-
+	Note that we use the same socket for all messages. This
+	avoids creating new sockets for each one.  But it also means
+	that we only bother with one protocol family, and that
+	family is PF_INET. This has not proved to be a big problem!
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<getportnum.h>
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<paramfile.h>
@@ -99,7 +97,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getserial(const char *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
 extern int	issamehostname(const char *,const char *,const char *) ;
 extern int	isNotPresent(int) ;

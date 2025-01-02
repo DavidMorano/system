@@ -57,8 +57,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<estrings.h>
+#include	<ucmallreg.h>
 #include	<getbufsize.h>
+#include	<getportnum.h>
+#include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -78,7 +80,6 @@
 #include	<ids.h>
 #include	<logsys.h>
 #include	<tmtime.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -144,7 +145,6 @@ extern int	pcstrustuser(cchar *,cchar *) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getserial(cchar *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	getgid_def(cchar *,gid_t) ;
 extern int	getuid_name(cchar *,int) ;
 extern int	getuid_user(cchar *,int) ;
@@ -3972,10 +3972,8 @@ static int procfindsched(PROGINFO *pip,vecstr *slp)
 }
 /* end subroutine (procfindsched) */
 
-
-static int procportcomsat(PROGINFO *pip)
-{
-	const int	rsn = SR_NOTFOUND ;
+static int procportcomsat(PROGINFO *pip) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if (pip->portspec == NULL) pip->portspec = PORTSPEC_COMSAT ;
 	if ((rs = getportnum(PROTONAME_COMSAT,pip->portspec)) == rsn) {
