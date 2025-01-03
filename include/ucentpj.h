@@ -35,6 +35,10 @@ struct ucentpj : project {
 	int load(char *,int,const ucentpj *) noex ;
 	int format(char *,int) noex ;
 	int size() noex ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *) noex ;
+	int getpid(char *,int,projid_t) noex ;
+	int getdef(char *,int,cchar *) noex ;
 	operator int () noex {
 	    return size() ;
 	} ;

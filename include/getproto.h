@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	getproto_name
+
+	Description:
 	This file contains some support for the UNIX® Address-Familt
 	(AF) related operations.
 

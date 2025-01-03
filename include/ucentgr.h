@@ -35,6 +35,9 @@ struct ucentgr : group {
 	int load(char *,int,const ucentgr *) noex ;
 	int format(char *,int) noex ;
 	int size() noex ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *) noex ;
+	int getgid(char *,int,gid_t) noex ;
 	operator int () noex {
 	    return size() ;
 	} ;

@@ -233,6 +233,19 @@ int ucentgr::size() noex {
 /* end subroutine (ucentgr::size) */
 
 
+int ucentgr::getent(char *grbuf,int grlen) noex {
+	return uc_getgrent(this,grbuf,grlen) ;
+}
+
+int ucentgr::getnam(char *grbuf,int grlen,cchar *name) noex {
+	return uc_getgrnam(this,grbuf,grlen,name) ;
+}
+
+int ucentgr::getgid(char *grbuf,int grlen,gid_t gid) noex {
+	return uc_getgrgid(this,grbuf,grlen,gid) ;
+}
+
+
 /* local subroutines */
 
 static int ucentgr_parseusers(ucentgr *grp,SI *sip,cchar *sp,int sl) noex {

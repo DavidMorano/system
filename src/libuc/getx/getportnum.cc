@@ -36,6 +36,12 @@
 	>=0		port-number
 	<0		error (syhstem-return)
 
+	Notes:
+	Notice that the port-name and service-name are given in
+	that order (port-name fist followed by service-name).  This
+	is the opposite order of (essentially) all other means
+	(interfaces) of retrieving a network-service entry.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -48,7 +54,7 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<getserv.h>		/* |getserv_port(3uc)| */
+#include	<getserv.h>		/* |getserv_name(3uc)| */
 #include	<cfdec.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -96,7 +102,7 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	            rs = cfdeci(ps,pl,&port) ;
 	        } /* end if */
 	        if ((rs >= 0) && (port < 0) && (pn != nullptr)) {
-	            if ((rs = getserv_port(pn,ps)) >= 0) {
+	            if ((rs = getserv_name(ps,pn)) >= 0) {
 	                port = rs ;
 	            } /* end if (getserv_port) */
 	        } /* end if */

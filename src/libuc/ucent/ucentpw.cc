@@ -215,6 +215,18 @@ int ucentpw::size() noex {
 }
 /* end subroutine (ucentpw::size) */
 
+int ucentpw::getent(char *pwbuf,int pwlen) noex {
+    	return uc_getpwent(this,pwbuf,pwlen) ;
+}
+
+int ucentpw::getnam(char *pwbuf,int pwlen,cchar *name) noex {
+    	return uc_getpwnam(this,pwbuf,pwlen,name) ;
+}
+
+int ucentpw::getuid(char *pwbuf,int pwlen,uid_t uid) noex {
+    	return uc_getpwuid(this,pwbuf,pwlen,uid) ;
+}
+
 
 /* local subroutines */
 

@@ -38,6 +38,8 @@ struct ucentsp : spwd {
 	operator int () noex {
 	    return size() ;
 	} ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *) noex ;
 } ; /* end struct (ucentsp) */
 
 #else /* __cplusplus */

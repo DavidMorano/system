@@ -35,6 +35,9 @@ struct ucentpr : protoent {
 	int load(char *,int,const ucentpr *) noex ;
 	int format(char *,int) noex ;
 	int size() noex ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *) noex ;
+	int getnum(char *,int,int) noex ;
 	operator int () noex {
 	    return size() ;
 	} ;

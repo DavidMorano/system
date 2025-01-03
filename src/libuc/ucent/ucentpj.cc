@@ -275,6 +275,22 @@ int ucentpj::size() noex {
 }
 /* end subroutine (ucentpj::size) */
 
+int ucentpj::getent(char *pjbuf,int pjlen) noex {
+	return uc_getpjent(this,pjbuf,pjlen) ;
+}
+
+int ucentpj::getnam(char *pjbuf,int pjlen,cchar *name) noex {
+	return uc_getpjnam(this,pjbuf,pjlen,name) ;
+}
+
+int ucentpj::getpid(char *pjbuf,int pjlen,projid_t pjid) noex {
+	return uc_getpjpid(this,pjbuf,pjlen,pjid) ;
+}
+
+int ucentpj::getdef(char *pjbuf,int pjlen,cchar *name) noex {
+	return uc_getpjdef(this,pjbuf,pjlen,name) ;
+}
+
 
 /* local subroutines */
 

@@ -261,6 +261,18 @@ int ucentho::size() noex {
 }
 /* end subroutine (ucentho::size) */
 
+int ucentho::getent(char *hobuf,int holen) noex {
+	return uc_gethoent(this,hobuf,holen) ;
+}
+
+int ucentho::getnam(char *hobuf,int holen,cchar *name) noex {
+	return uc_gethonam(this,hobuf,holen,name) ;
+}
+
+int ucentho::getadd(char *hobuf,int holen,int af,cvoid *ap,int al) noex {
+	return uc_gethoadd(this,hobuf,holen,af,ap,al) ;
+}
+
 
 /* local subroutines */
 

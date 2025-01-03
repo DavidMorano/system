@@ -29,7 +29,7 @@
 
 EXTERNC_begin
 
-extern int	getserv_port(cchar *,cchar *) noex ;
+extern int	getserv_name(cchar *,cchar *) noex ;
 
 EXTERNC_end
 

@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	getserv_port
+	getserv_name
 
 	Description:
 	Get a service number (a port number really) given a protocol
@@ -28,21 +28,15 @@
 	depending on what protocol name it is associated with.
 
 	Synopsis:
-	int getserv_port(cchar *protoname,cchar *svc) noex
+	int getserv_name(cc *svc,cc *pn) noex
 
 	Arguments:
-	protoname	protocol name
 	svc		service name
+	pn		protocol name
 
 	Returns:
 	>=0		port number
 	<0		error (system-return)
-
-	Notes:
-	Notice that the port-name and service-name are given in
-	that order (port-name fist followed by service-name).  This
-	is the opposite order of (essentially) all other means
-	(interfaces) of retrieving a network-service entry.
 
 *******************************************************************************/
 
@@ -86,10 +80,10 @@
 
 /* exported subroutines */
 
-int getserv_port(cchar *pn,cchar *svc) noex {
+int getserv_name(cchar *svc,cchar *pn) noex {
 	int		rs = SR_FAULT ;
 	int		port = 0 ;
-	if (pn && svc) {
+	if (svc && pn) {
 	    rs = SR_INVALID ;
 	    if (pn[0] && svc[0]) {
 	        if (char *svbuf{} ; (rs = malloc_sv(&svbuf)) >= 0) {
@@ -102,6 +96,6 @@ int getserv_port(cchar *pn,cchar *svc) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;
 }
-/* end subroutine (getserv_port) */
+/* end subroutine (getserv_name) */
 
 

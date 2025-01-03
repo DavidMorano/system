@@ -20,6 +20,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stdint.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -35,6 +36,9 @@ struct ucentnw : netent {
 	int load(char *,int,const ucentnw *) noex ;
 	int format(char *,int) noex ;
 	int size() noex ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *) noex ;
+	int getnum(char *,int,int,uint32_t) noex ;
 	operator int () noex {
 	    return size() ;
 	} ;

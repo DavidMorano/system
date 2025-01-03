@@ -34,6 +34,7 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdint>
 #include	<cstring>		/* <- |memcpy(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
@@ -251,6 +252,18 @@ int ucentnw::size() noex {
 	return rs ;
 }
 /* end subroutine (ucentnw::size) */
+
+int ucentnw::getent(char *nwbuf,int nwlen) noex {
+	return uc_getnwent(this,nwbuf,nwlen) ;
+}
+
+int ucentnw::getnam(char *nwbuf,int nwlen,cchar *name) noex {
+	return uc_getnwnam(this,nwbuf,nwlen,name) ;
+}
+
+int ucentnw::getnum(char *nwbuf,int nwlen,int af,uint32_t num) noex {
+	return uc_getnwnum(this,nwbuf,nwlen,af,num) ;
+}
 
 
 /* local subroutines */

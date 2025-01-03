@@ -35,6 +35,9 @@ struct ucentpw : passwd {
 	int load(char *,int,const ucentpw *) noex ;
 	int format(char *,int) noex ;
 	int size() noex ;
+	int getent(char *,int) noex ;
+	int getnam(char *,int,cchar *) noex ;
+	int getuid(char *,int,uid_t) noex ;
 	operator int () noex {
 	    return size() ;
 	} ;

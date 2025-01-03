@@ -217,6 +217,14 @@ int ucentsp::size() noex {
 }
 /* end subroutine (ucentsp::size) */
 
+int ucentsp::getent(char *spbuf,int splen) noex {
+	return uc_getspent(this,spbuf,splen) ;
+}
+
+int ucentsp::getnam(char *spbuf,int splen,cchar *name) noex {
+	return uc_getspnam(this,spbuf,splen,name) ;
+}
+
 
 /* local subroutines */
 

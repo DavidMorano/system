@@ -218,6 +218,18 @@ int ucentpr::size() noex {
 }
 /* end subroutine (ucentpr::size) */
 
+int ucentpr::getent(char *prbuf,int prlen) noex {
+	return uc_getprent(this,prbuf,prlen) ;
+}
+
+int ucentpr::getnam(char *prbuf,int prlen,cchar *name) noex {
+	return uc_getprnam(this,prbuf,prlen,name) ;
+}
+
+int ucentpr::getnum(char *prbuf,int prlen,int num) noex {
+	return uc_getprnum(this,prbuf,prlen,num) ;
+}
+
 
 /* local subroutines */
 

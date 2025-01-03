@@ -263,6 +263,18 @@ int ucentua::size() noex {
 }
 /* end subroutine (userattrent_size) */
 
+int ucentua::getent(char *uabuf,int ualen) noex {
+	return uc_getuaent(this,uabuf,ualen) ;
+}
+
+int ucentua::getnam(char *uabuf,int ualen,cchar *name) noex {
+	return uc_getuanam(this,uabuf,ualen,name) ;
+}
+
+int ucentua::getuid(char *uabuf,int ualen,uid_t uid) noex {
+	return uc_getuauid(this,uabuf,ualen,uid) ;
+}
+
 
 /* local subroutines */
 
@@ -300,8 +312,7 @@ static int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
 	cint		ksize = szof(kva_t) ;
 	cint		al = szof(void *) ;
 	int		rs ;
-	void		*p ;
-	if ((rs = sip->block(ksize,al,&p)) >= 0) {
+	if (void *p ; (rs = sip->block(ksize,al,&p)) >= 0) {
 	    kva_t	*kvap = (kva_t *) p ;
 	    int		dsize = (n*szof(kv_t)) ;
 	    uap->attr = kvap ;
