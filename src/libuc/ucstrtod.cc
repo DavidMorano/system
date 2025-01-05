@@ -27,7 +27,25 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -38,9 +56,15 @@
 int uc_strtod(cchar *startp,char **endpp,double *rp) noex {
 	int	rs = SR_FAULT ;
 	if (startp && rp) {
+	    char	*ep{} ;
 	    errno = 0 ;
-	    *rp = strtod(startp,endpp) ;
-	    rs = (errno != 0) ? (- errno) : 0 ;
+	    *rp = strtod(startp,&ep) ;
+	    if (errno) {
+		rs = (- errno) ;
+	    } else {
+		rs = (ep - startp) ;
+		if (endpp) *endpp = ep ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }

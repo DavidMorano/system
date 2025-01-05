@@ -47,7 +47,7 @@
 
 /* local defines */
 
-#define	BITS_BPW	(CHAR_BIT * sizeof(BITS_TYPEDIGIT))
+#define	BITS_BPW	(CHAR_BIT * szof(BITS_TYPEDIGIT))
 #define	BITS_MINWORDS	4
 
 
@@ -95,7 +95,7 @@ static int		ffbsarr(digit *,int) noex ;
 constexpr int		minwords = BITS_MINWORDS ;
 constexpr int		nawords = BITS_SHORTDIGS ;
 constexpr int		nabits = (BITS_SHORTDIGS * BITS_BPW) ;
-constexpr int		dsize = int(sizeof(digit)) ;
+constexpr int		dsize = int(szof(digit)) ;
 
 
 /* exported variables */
@@ -189,7 +189,7 @@ int bits_clear(bits *op,int i) noex {
 	    } else { /* <- clear all bits */
 		bits_naclear(op) ;
 	        if (op->a) {
-		    cint nbytes = ((op->nwords - nawords) * sizeof(digit)) ;
+		    cint nbytes = ((op->nwords - nawords) * szof(digit)) ;
 		    memclear(op->a,nbytes) ;
 	        }
 	    } /* end if (valid) */
@@ -285,7 +285,7 @@ int bits_count(bits *op) noex {
 /* private subroutines */
 
 static void bits_naclear(bits *op) noex {
-	cint	nabytes = (nawords * sizeof(digit)) ;
+	cint	nabytes = (nawords * szof(digit)) ;
 	memclear(op->na,nabytes) ;
 }
 /* end subroutine (bits_naclear) */

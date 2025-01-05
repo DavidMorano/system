@@ -989,6 +989,10 @@ int vecstr::get(int ai,cchar **rpp) noex {
 	return vecstr_get(this,ai,rpp) ;
 }
 
+int vecstr::getlast(cchar **spp) noex {
+    	return vecstr_getlast(this,spp) ;
+}
+
 int vecstr::envadd(cchar *kp,cchar *valp,int vall) noex {
 	return vecstr_envadd(this,kp,valp,vall) ;
 }

@@ -188,6 +188,7 @@ struct vecpstr : vecpstr_head {
 	int insert(int,cchar *,int = -1) noex ;
 	int store(cchar *,int,cchar **) noex ;
 	int get(int,cchar **) noex ;
+	int getlast(cchar **) noex ;
 	int getvec(mainv *) noex ;
 	int envadd(cchar *,cchar *,int = -1) noex ;
 	int envset(cchar *,cchar *,int = -1) noex ;
@@ -212,7 +213,7 @@ struct vecpstr : vecpstr_head {
 	} ;
 } ; /* end struct (vecpstr) */
 #else	/* __cplusplus */
-typedef VECSTR		vecpstr ;
+typedef VECPSTR		vecpstr ;
 #endif /* __cplusplus */
 
 typedef VECPSTR_FL	vecpstr_fl ;

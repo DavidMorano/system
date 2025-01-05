@@ -29,10 +29,16 @@
 
 EXTERNC_begin
 
+extern int		strtoxi(cchar *,char **,int) noex ;
+extern uint		strtoxui(cchar *,char **,int) noex ;
+
+extern long		strtoxl(cchar *,char **,int) noex ;
+extern ulong		strtoxul(cchar *,char **,int) noex ;
+
 extern longlong		strtoxll(cchar *,char **,int) noex ;
 extern ulonglong	strtoxull(cchar *,char **,int) noex ;
 
-#ifdef	COMMENT
+#ifdef	COMMENT /* this is a 128-bit integer; but it does not yet exist */
 extern intmax		strtoxim(cchar *,char **,int) noex ;
 extern uintmax		strtoxuim(cchar *,char **,int) noex ;
 #endif /* COMMENT */

@@ -1,19 +1,24 @@
 /* ow (Open Weather) */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 
 #ifndef	OW_INCLUDE
-#define	OW_INCLUDE	1
+#define	OW_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<logfile.h>
 #include	<logsys.h>
-#include	<localmisc.h>
+
 
 #define	OW_SEARCHNAME	"weather"
 #define	OW_CFNAME	"conf"
@@ -30,7 +35,7 @@
 #define	OW_LOGFACILITY	"daemon"
 
 #define	OW		struct ow
-#define	OW_FLAGS	struct ow_flags
+#define	OW_FL		struct ow_flags
 
 #include	"owconfig.h"
 
@@ -43,26 +48,26 @@ struct ow_flags {
 } ;
 
 struct ow {
-	OW_FLAGS	f, open ;
-	VECSTR		stores ;
-	VECSTR		svars ;
+	OW_FL		f, open ;
+	vecstr		stores ;
+	vecstr		svars ;
 	OWCONFIG	c ;
-	LOGFILE		lf ;
-	LOGSYS		ls ;
-	const char	*pr ;		/* from arguments */
-	const char	*sn ;		/* from static config */
-	const char	*vd ;		/* from static config */
-	const char	*ws ;		/* from arguments */
-	const char	*rn ;		/* root-name (derived) */
-	const char	*ld ;		/* log-file directory component name */
-	const char	*nodename ;
-	const char	*domainname ;
-	const char	*cfname ;
-	const char	*whost ;	/* from configuration */
-	const char	*wprefix ; 	/* from configuration */
-	const char	*defws ;	/* from configuration */
-	const char	*logfname ;	/* for LOGFILE */
-	const char	*logfacility ;	/* for LOGSYS */
+	logfile		lf ;
+	locsys		ls ;
+	cchar		*pr ;		/* from arguments */
+	cchar		*sn ;		/* from static config */
+	cchar		*vd ;		/* from static config */
+	cchar		*ws ;		/* from arguments */
+	cchar		*rn ;		/* root-name (derived) */
+	cchar		*ld ;		/* log-file directory component name */
+	cchar		*nodename ;
+	cchar		*domainname ;
+	cchar		*cfname ;
+	cchar		*whost ;	/* from configuration */
+	cchar		*wprefix ; 	/* from configuration */
+	cchar		*defws ;	/* from configuration */
+	cchar		*logfname ;	/* for LOGFILE */
+	cchar		*logfacility ;	/* for LOGSYS */
 	time_t		daytime ;
 	time_t		ti_weather ;	/* weather-file m-time */
 	uid_t		pruid ;
@@ -76,24 +81,22 @@ struct ow {
 	char		logid[LOGFILE_LOGIDLEN+1] ;
 } ;
 
+typedef	OW		ow ;
+typedef	OW_FL		ow_fl ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	ow_start(OW *,const char *,const char *,const char *,
-			const char *,time_t,int,int) ;
-extern int	ow_finish(OW *,int) ;
-extern int	ow_setentry(OW *,const char **,const char *,int) ;
-extern int	ow_nodedomain(OW *) ;
-extern int	ow_setmin(OW *) ;
-extern int	ow_prid(OW *) ;
-extern int	ow_isvalid(OW *,time_t) ;
-extern int	ow_logprintf(OW *,const char *,...) ;
+extern int	ow_start(ow *,cchar *,cchar *,cchar *,
+			cchar *,time_t,int,int) noex ;
+extern int	ow_finish(ow *,int) noex ;
+extern int	ow_setentry(ow *,cchar **,cchar *,int) noex ;
+extern int	ow_nodedomain(ow *) noex ;
+extern int	ow_setmin(ow *) noex ;
+extern int	ow_prid(ow *) noex ;
+extern int	ow_isvalid(ow *,time_t) noex ;
+extern int	ow_logprintf(ow *,cchar *,...) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* OW_INCLUDE */

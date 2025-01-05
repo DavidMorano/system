@@ -103,7 +103,7 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	        }
 	    } /* end if (got some) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? (rp-rbuf) : rs ;
+	return (rs >= 0) ? (rp - rbuf) : rs ;
 }
 /* end subroutine (cfhexstr) */
 

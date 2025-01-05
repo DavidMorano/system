@@ -45,6 +45,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strnlen(3c)| */
@@ -57,6 +58,8 @@
 #include	<cfdec.h>
 #include	<char.h>
 #include	<toxc.h>
+#include	<intsat.h>
+#include	<localmisc.h>
 
 #include	"cfdecmf.h"
 
@@ -94,16 +97,18 @@ int cfdecmfx(int (*cfdecx)(cchar *,int,T *),cchar *sp,int sl,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    ulong	mf{} ;
-	    int		ml = getmf(sp,sl,&mf) ;
-	    T		v ;
-	    if ((rs = cfdecx(sp,ml,&v)) >= 0) {
-	        rs = int((v * mf) & INT_MAX) ;
+	    cint	ml = getmf(sp,sl,&mf) ;
+	    if (T v{} ; (rs = cfdecx(sp,ml,&v)) >= 0) {
+	        rs = intsat(v * mf) ;
 	        if (rp) *rp = (v * mf) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine-template (cfdecmfx) */
+
+
+/* local variables */
 
 
 /* exported variables */

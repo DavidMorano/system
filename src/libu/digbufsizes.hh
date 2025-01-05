@@ -1,4 +1,5 @@
 /* digbufsizes HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* provide buffer sizes for c-string digits */
@@ -14,6 +15,17 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/******************************************************************************* 
+  	Name:
+	digbufsizes
+
+	Description:
+	These subroutines facilitate determining buffer sizes for 
+	various digits in different types and number bases.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
 #ifndef	DIGBUFSIZES_INCLUDE
 #define	DIGBUFSIZES_INCLUDE
 #ifdef	__cplusplus /* everything is C++ only */

@@ -1,6 +1,6 @@
 /* ucprogdata SUPPORT */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface components for UNIX® library-3c */
 /* set or get some program (process) data */
@@ -52,21 +52,23 @@
 
 	Q. Were there any alternatives?
 	A. Yes; the predecessor to this present implementation was an 
-	   implementation that was quite simple, but it had a lot of static
-	   memory storage.  It was the desire to eliminate the static memory
-	   storage that led to this present implementation.
+	   implementation that was quite simple, but it had a lot
+	   of static memory storage.  It was the desire to eliminate
+	   the static memory storage that led to this present
+	   implementation.
 
 	Q. Are there ways to clean this up further?
-	A. Probably, but it looks I have already done more to this simple
-	   function than may have been ever warranted to begin with!
+	A. Probably, but it looks I have already done more to this 
+	   simple function than may have been ever warranted to
+	   begin with!
 
 	Q. Did these subroutines have to be Async-Signal-Safe?
 	A. Not really.
 
 	Q. Then why did you do it?
-	A. The system-call |uname(2)| is Async-Signal-Safe.  Since these
-	   subroutines sort of look like |uname(2)| (of a sort), I thought 
-	   it was a good idea.
+	A. The system-call |uname(2)| is Async-Signal-Safe.  Since 
+	   these subroutines sort of look like |uname(2)| (of a
+	   sort), I thought it was a good idea.
 
 	Q. Was it really a good idea?
 	A. I guess not.
@@ -96,10 +98,8 @@
 
 /* local defines */
 
-#define	UCPROGDATA	struct ucprogdata_head
-#define	UCPROGDATA_ENT	struct ucprogdata_e
-
-#define	PD		UCPROGDATA
+#define	UCPD		ucprogdata_head
+#define	UCPD_ENT	ucprogdata_ent
 
 #define	TO_TTL		(2*3600)	/* two hours */
 
@@ -127,7 +127,7 @@ extern "C" {
 
 struct ucprogdata_head {
 	ptm		mx ;		/* data mutex */
-	ptc		cv;		/* condition variable */
+	ptc		cv ;		/* condition variable */
 	varray		*ents ;
 	vaflag		waiters ;
 	vaflag		f_void ;
@@ -136,7 +136,7 @@ struct ucprogdata_head {
 	vaflag		f_capture ;	/* capture flag */
 } ;
 
-struct ucprogdata_e {
+struct ucprogdata_ent {
 	cchar		*vp ;
 	time_t		et ;		/* entry-time (load-time) */
 	int		vl ;
@@ -152,29 +152,29 @@ extern "C" {
     static void	ucprogdata_exit() noex ;
 }
 
-static int	ucprogdata_struct(PD *) noex ;
-static int	ucprogdata_begin(PD *) noex ;
-static int	ucprogdata_end(PD *) noex ;
-static int	ucprogdata_entfins(PD *) noex ;
-static int	ucprogdata_capbegin(PD *,int) noex ;
-static int	ucprogdata_capend(PD *) noex ;
-static int	ucprogdata_seter(PD *,int,cchar *,int,int) noex ;
-static int	ucprogdata_geter(PD *,int,char *,int) noex ;
+static int	ucprogdata_struct(UCPD *) noex ;
+static int	ucprogdata_begin(UCPD *) noex ;
+static int	ucprogdata_end(UCPD *) noex ;
+static int	ucprogdata_entfins(UCPD *) noex ;
+static int	ucprogdata_capbegin(UCPD *,int) noex ;
+static int	ucprogdata_capend(UCPD *) noex ;
+static int	ucprogdata_seter(UCPD *,int,cchar *,int,int) noex ;
+static int	ucprogdata_geter(UCPD *,int,char *,int) noex ;
 
-static int entry_start(UCPROGDATA_ENT *,cchar *,int,int) noex ;
-static int entry_reload(UCPROGDATA_ENT *,cchar *,int,int) noex ;
-static int entry_finish(UCPROGDATA_ENT *) noex ;
+static int entry_start(UCPD_ENT *,cchar *,int,int) noex ;
+static int entry_reload(UCPD_ENT *,cchar *,int,int) noex ;
+static int entry_finish(UCPD_ENT *) noex ;
 
 
 /* local variables */
 
-static UCPROGDATA	ucprogdata_data ;
+static UCPD	ucprogdata_data ;
 
 
 /* exported subroutines */
 
 int ucprogdata_init() noex {
-	UCPROGDATA	*uip = &ucprogdata_data ;
+	UCPD	*uip = &ucprogdata_data ;
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! uip->f_void) {
@@ -217,7 +217,7 @@ int ucprogdata_init() noex {
 /* end subroutine (ucprogdata_init) */
 
 int ucprogdata_fini() noex {
-	UCPROGDATA	*uip = &ucprogdata_data ;
+	UCPD	*uip = &ucprogdata_data ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->f_initdone && (! uip->f_void)) {
@@ -257,7 +257,7 @@ int ucprogdata_set(int di,cchar *cbuf,int clen,int ttl) noex {
 	        if (ttl < 0) ttl = TO_TTL ;
 	        if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucprogdata_init()) >= 0) {
-		        UCPROGDATA	*uip = &ucprogdata_data ;
+		        UCPD	*uip = &ucprogdata_data ;
 		        if ((rs = ucprogdata_capbegin(uip,-1)) >= 0) {
 		            if ((rs = ucprogdata_struct(uip)) >= 0) {
 			        rs = ucprogdata_seter(uip,di,cbuf,clen,ttl) ;
@@ -286,7 +286,7 @@ int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 	    if (di >= 0) {
 	        if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucprogdata_init()) >= 0) {
-	                UCPROGDATA	*uip = &ucprogdata_data ;
+	                UCPD	*uip = &ucprogdata_data ;
 	                if ((rs = ucprogdata_capbegin(uip,-1)) >= 0) {
 		            if ((rs = ucprogdata_struct(uip)) >= 0) {
 	                        rs = ucprogdata_geter(uip,di,rbuf,rlen) ;
@@ -308,7 +308,7 @@ int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int ucprogdata_struct(PD *uip) noex {
+static int ucprogdata_struct(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    rs = ucprogdata_begin(uip) ;
@@ -317,13 +317,13 @@ static int ucprogdata_struct(PD *uip) noex {
 }
 /* end subroutine (ucprogdata_struct) */
 
-static int ucprogdata_begin(PD *uip) noex {
+static int ucprogdata_begin(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
-	    cint	osize = sizeof(varray) ;
+	    cint	osize = szof(varray) ;
 	    void	*p ;
 	    if ((rs = uc_libmalloc(osize,&p)) >= 0) {
-	        cint		esize = sizeof(UCPROGDATA_ENT) ;
+	        cint		esize = szof(UCPD_ENT) ;
 	        cint		n = 4 ;
 	        varray		*ents = (varray *) p ;
 	        if ((rs = varray_start(ents,esize,n)) >= 0) {
@@ -337,7 +337,7 @@ static int ucprogdata_begin(PD *uip) noex {
 }
 /* end subroutine (ucprogdata_begin) */
 
-static int ucprogdata_end(PD *uip) noex {
+static int ucprogdata_end(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->ents) {
@@ -360,9 +360,9 @@ static int ucprogdata_end(PD *uip) noex {
 }
 /* end subroutine (ucprogdata_end) */
 
-static int ucprogdata_entfins(PD *uip) noex {
+static int ucprogdata_entfins(UCPD *uip) noex {
 	varray		*vap = (varray *) uip->ents ;
-	UCPROGDATA_ENT	*ep ;
+	UCPD_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; varray_enum(vap,i,&ep) >= 0 ; i += 1) { 
@@ -375,7 +375,7 @@ static int ucprogdata_entfins(PD *uip) noex {
 }
 /* end subroutine (ucprogdata_entfins) */
 
-static int ucprogdata_capbegin(PD *uip,int to) noex {
+static int ucprogdata_capbegin(UCPD *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lockto(&uip->mx,to)) >= 0) {
@@ -394,7 +394,7 @@ static int ucprogdata_capbegin(PD *uip,int to) noex {
 }
 /* end subroutine (ucprogdata_capbegin) */
 
-static int ucprogdata_capend(PD *uip) noex {
+static int ucprogdata_capend(UCPD *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lock(&uip->mx)) >= 0) {
@@ -409,9 +409,9 @@ static int ucprogdata_capend(PD *uip) noex {
 }
 /* end subroutine (ucprogdata_capend) */
 
-static int ucprogdata_seter(PD *uip,int di,cchar *cbuf,int clen,int ttl) noex {
+static int ucprogdata_seter(UCPD *uip,int di,cc *cbuf,int clen,int ttl) noex {
 	varray		*vap = (varray *) uip->ents ;
-	UCPROGDATA_ENT	*ep ;
+	UCPD_ENT	*ep ;
 	int		rs ;
 	if ((rs = varray_acc(vap,di,&ep)) > 0) {
 	    rs = entry_reload(ep,cbuf,clen,ttl) ;
@@ -424,12 +424,11 @@ static int ucprogdata_seter(PD *uip,int di,cchar *cbuf,int clen,int ttl) noex {
 }
 /* end subroutine (ucprogdata_seter) */
 
-static int ucprogdata_geter(PD *uip,int di,char *rbuf,int rlen) noex {
+static int ucprogdata_geter(UCPD *uip,int di,char *rbuf,int rlen) noex {
 	varray		*vap = (varray *) uip->ents ;
-	UCPROGDATA_ENT	*ep ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = varray_acc(vap,di,&ep)) > 0) {
+	if (UCPD_ENT *ep ; (rs = varray_acc(vap,di,&ep)) > 0) {
 	    custime	dt = getustime ;
 	    if ((ep->et > 0) && ((dt-ep->et) < ep->ttl)) {
 		rs = sncpy1w(rbuf,rlen,ep->vp,ep->vl) ;
@@ -441,13 +440,13 @@ static int ucprogdata_geter(PD *uip,int di,char *rbuf,int rlen) noex {
 /* end subroutine (ucprogdata_geter) */
 
 static void ucprogdata_atforkbefore() noex {
-	UCPROGDATA	*uip = &ucprogdata_data ;
+	UCPD	*uip = &ucprogdata_data ;
 	ucprogdata_capbegin(uip,-1) ;
 }
 /* end subroutine (ucprogdata_atforkbefore) */
 
 static void ucprogdata_atforkafter() noex {
-	UCPROGDATA	*uip = &ucprogdata_data ;
+	UCPD	*uip = &ucprogdata_data ;
 	ucprogdata_capend(uip) ;
 }
 /* end subroutine (ucprogdata_atforkafter) */
@@ -460,7 +459,7 @@ static void ucprogdata_exit() noex {
 /* end subroutine (ucprogdata_exit) */
 
 
-static int entry_start(UCPROGDATA_ENT *ep,cchar *vp,int vl,int ttl) noex {
+static int entry_start(UCPD_ENT *ep,cchar *vp,int vl,int ttl) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if (vl < 0) vl = strlen(vp) ;
@@ -475,7 +474,7 @@ static int entry_start(UCPROGDATA_ENT *ep,cchar *vp,int vl,int ttl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(UCPROGDATA_ENT *ep) noex {
+static int entry_finish(UCPD_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp) {
@@ -487,7 +486,7 @@ static int entry_finish(UCPROGDATA_ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_reload(UCPROGDATA_ENT *ep,cchar *vp,int vl,int ttl) noex {
+static int entry_reload(UCPD_ENT *ep,cc *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
 	if (ep->vp != nullptr) {
 	    rs = uc_libfree(ep->vp) ;

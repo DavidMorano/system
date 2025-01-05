@@ -1,4 +1,6 @@
-/* pcsconf */
+/* pcsconf HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -18,28 +20,32 @@
 /* Copyright © 1992,1998,2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSCONF_INCLUDE
-#define	PCSCONF_INCLUDE	1
+#define	PCSCONF_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<modload.h>
 #include	<ptm.h>
-#include	<localmisc.h>
 
 #include	"pcsconfs.h"
 
 
 #define	PCSCONF		struct pcsconf_head
-#define	PCSCONF_CUR	struct pcsconf_c
-#define	PCSCONF_CALLS	struct pcsconf_calls
 #define	PCSCONF_FL	struct pcsconf_flags
+#define	PCSCONF_CUR	struct pcsconf_cursor
+#define	PCSCONF_CA	struct pcsconf_calls
 #define	PCSCONF_MAGIC	0x97677246
 #define	PCSCONF_USER	"pcs"
 
+
+EXTERNC_begin
 
 struct pcsconf_calls {
 	int	(*start)(void *,cchar *,cchar **,cchar *) ;
@@ -51,9 +57,11 @@ struct pcsconf_calls {
 	int	(*finish)(void *) ;
 } ;
 
-struct pcsconf_c {
-	uint		magic ;
+EXTERNC_end
+
+struct pcsconf_cursor {
 	void		*scp ;		/* SO-cursor pointer */
+	uint		magic ;
 } ;
 
 struct pcsconf_flags {
@@ -61,48 +69,45 @@ struct pcsconf_flags {
 } ;
 
 struct pcsconf_head {
-	uint		magic ;
-	MODLOAD		loader ;
-	PTM		m ;
+	modload		loader ;
+	ptmM		mx ;
 	void		*obj ;		/* object pointer */
 	void		*cookmgr ;	/* cookie-manager */
-	cchar	*pr ;		/* supplied program-root */
-	cchar	**envv ;	/* supplied environment */
-	cchar	*pcsusername ;	/* calculated */
-	PCSCONF_CALLS	call ;
+	cchar		*pr ;		/* supplied program-root */
+	cchar		**envv ;	/* supplied environment */
+	cchar		*pcsusername ;	/* calculated */
+	PCSCONF_CA	call ;
 	PCSCONF_FL	f ;
 	uid_t		uid_pcs ;
 	gid_t		gid_pcs ;
+	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ;
 
+typedef	PCSCONF		pcsconf ;
+typedef	PCSCONF_FL	pcsconf_fl ;
+typedef	PCSCONF_CUR	pcsconf_cur ;
+typedef	PCSCONF_CA	pcsconf_ca ;
 
-#if	(! defined(PCSCONF_MASTER)) || (PCSCONF_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsconf_start(pcsconf *,cchar *,cchar **,cchar *) noex ;
+extern int pcsconf_curbegin(pcsconf *,pcsconf_cur *) noex ;
+extern int pcsconf_fetch(pcsconf *,cchar *,int,pcsconf_cur *,char *,int) noex ;
+extern int pcsconf_enum(pcsconf *,pcsconf_cur *,char *,int,char *,int) noex ;
+extern int pcsconf_curend(pcsconf *,pcsconf_cur *) noex ;
+extern int pcsconf_fetchone(pcsconf *,cchar *,int,char *,int) noex ;
+extern int pcsconf_audit(pcsconf *) noex ;
+extern int pcsconf_getpcsuid(pcsconf *) noex ;
+extern int pcsconf_getpcsgid(pcsconf *) noex ;
+extern int pcsconf_getpcsusername(pcsconf *,char *,int) noex ;
+extern int pcsconf_getpr(pcsconf *,cchar **) noex ;
+extern int pcsconf_getenvv(pcsconf *,cchar ***) noex ;
+extern int pcsconf_finish(pcsconf *) noex ;
 
-extern int pcsconf_start(PCSCONF *,cchar *,cchar **,cchar *) ;
-extern int pcsconf_curbegin(PCSCONF *,PCSCONF_CUR *) ;
-extern int pcsconf_fetch(PCSCONF *,cchar *,int,PCSCONF_CUR *,char *,int) ;
-extern int pcsconf_enum(PCSCONF *,PCSCONF_CUR *,char *,int,char *,int) ;
-extern int pcsconf_curend(PCSCONF *,PCSCONF_CUR *) ;
-extern int pcsconf_fetchone(PCSCONF *,cchar *,int,char *,int) ;
-extern int pcsconf_audit(PCSCONF *) ;
-extern int pcsconf_getpcsuid(PCSCONF *) ;
-extern int pcsconf_getpcsgid(PCSCONF *) ;
-extern int pcsconf_getpcsusername(PCSCONF *,char *,int) ;
-extern int pcsconf_getpr(PCSCONF *,cchar **) ;
-extern int pcsconf_getenvv(PCSCONF *,cchar ***) ;
-extern int pcsconf_finish(PCSCONF *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSCONF_MASTER */
 
 #endif /* PCSCONF_INCLUDE */
 

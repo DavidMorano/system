@@ -31,6 +31,7 @@
 #include	<intsat.h>
 #include	<xxtostr.h>
 #include	<strtox.h>
+#include	<stdintx.h>
 
 
 #ifndef	SUBROUTINE_MEMCLEAR
@@ -196,6 +197,11 @@ namespace libu {
     extern int ustrftime(char *,int,cchar *,CTM *) noex ;
     extern int uitimer_get(int,ITIMERVAL *) noex ;
     extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
+}
+namespace libu {
+    extern int cfdec(cchar *,int,int *) noex ;
+    extern int cfdec(cchar *,int,long *) noex ;
+    extern int cfdec(cchar *,int,longlong *) noex ;
 }
 #endif /* __cplusplus */
 

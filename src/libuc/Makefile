@@ -66,7 +66,7 @@ OBJ05= nleadstr.o nleadkeystr.o
 OBJ06= mapex.o
 OBJ07=
 
-OBJ08= strkeycmp.o strnul.o
+OBJ08= strkeycmp.o
 OBJ09= readln.o ccfile.o
 OBJ10= cfx.o memtrack.o addrset.o mapblock.o
 OBJ11= strmgr.o strop.o field.o

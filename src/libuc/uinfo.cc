@@ -1,4 +1,5 @@
 /* uinfo SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UNIX® information (a cache for |uname(2)| and sisters) */
@@ -310,13 +311,13 @@ int uinfo::getname_setup() noex {
 /* end method (uinfo::getname_setup) */
 
 int uinfo::getname_load(setname *setp) noex {
-	cint		usz = sizeof(UTSNAME) ;
+	cint		usz = szof(UTSNAME) ;
 	int		rs ;
 	int		rs1 ;
 	if (void *vp{} ; (rs = uc_libmalloc(usz,&vp)) >= 0) {
 	    UTSNAME	*utsp = (UTSNAME *) vp ;
             if ((rs = u_uname(utsp)) >= 0) {
-                cint    nlen = int(sizeof(utsp->sysname) - 1) ;
+                cint    nlen = (szof(utsp->sysname) - 1) ;
                 int     sz = 0 ;
                 sz += (strnlen(utsp->sysname,nlen) + 1) ;
                 sz += (strnlen(utsp->nodename,nlen) + 1) ;
@@ -398,7 +399,7 @@ int uinfo::getaux_setup() noex {
 /* end method (uinfo::getaux_setup) */
 
 int uinfo::getaux_load(setaux *setp) noex {
-	cint		usz = sizeof(auxinfo) ;
+	cint		usz = szof(auxinfo) ;
 	int		rs ;
 	int		rs1 ;
 	if (void *vp{} ; (rs = uc_libmalloc(usz,&vp)) >= 0) {

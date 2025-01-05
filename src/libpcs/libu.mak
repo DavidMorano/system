@@ -247,7 +247,10 @@ obje.o:			$(OBJE)
 timewatch.o:		timewatch.cc timewatch.hh
 aflag.o:		aflag.cc aflag.hh
 errtimer.o:		errtimer.cc errtimer.hh
+timeval.o:		timeval.cc timeval.h
+itimerval.o:		itimerval.cc itimerval.h
 timespec.o:		timespec.cc timespec.h		$(INCS)
+itimerspec.o:		itimerspec.cc itimerspec.h
 
 utimeout.o:		utimeout.c utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc utimeouts.h	$(INCS)
@@ -320,14 +323,11 @@ valuelims.o:		valuelims.cc valuelims.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 endian.o::		endian.cc endian.h
 
-timeval.o:		timeval.cc timeval.h
-itimerval.o:		itimerval.cc itimerval.h
-
-timespec.o:		timespec.cc timespec.h
-itimerspec.o:		itimerspec.cc itimerspec.h
-
 timecount.o:		timecount.cc timecount.hh
+
 strtox.o:		strtox.cc strtox.h		$(INCS)
 xxtostr.o:		xxtostr.cc xxtostr.h		$(INCS)
+
+strnul.o:		strnul.cc strnul.hh
 
 

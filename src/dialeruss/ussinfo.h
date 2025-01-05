@@ -1,20 +1,19 @@
-/* ussinfo */
+/* ussinfo HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 
 #ifndef	USSINFO_INCLUDE
-#define	USSINFO_INCLUDE	1
+#define	USSINFO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<expcook.h>
 #include	<userinfo.h>
 #include	<keyopt.h>
-#include	<localmisc.h>
 
 #include	"sysdialer.h"
 
@@ -34,57 +33,57 @@ struct ussinfo_flags {
 } ;
 
 struct ussinfo_allocs {
-	const char	*node ;
-	const char	*svc ;
-	const char	*pr ;
-	const char	*portspec ;
+	cchar		*node ;
+	cchar		*svc ;
+	cchar		*pr ;
+	cchar		*portspec ;
 } ;
 
 struct ussinfo_head {
-	const char	**argv ;
-	const char	**envv ;
-	const char	*pr ;
-	const char	*prn ;
-	const char	*searchname ;
-	const char	*version ;
-	const char	*afspec ;
-	const char	*hostname ;
-	const char	*portspec ;
-	const char	*svcname ;
-	const char	*pvfname ;
-	const char	*dfname ;
-	const char	*xfname ;
-	const char	*efname ;
-	const char	*architecture ;		/* machine architecture */
-	const char	*umachine ;		/* UNAME machine name */
-	const char	*usysname ;		/* UNAME OS system-name */
-	const char	*urelease ;		/* UNAME OS release */
-	const char	*uversion ;		/* UNAME OS version */
-	const char	*hz ;			/* OS HZ */
-	const char	*nodename ;		/* USERINFO */
-	const char	*domainname ;		/* USERINFO */
-	const char	*username ;		/* USERINFO */
-	const char	*homedname ;		/* USERINFO */
-	const char	*shell ;		/* USERINFO */
-	const char	*organization ;		/* USERINFO */
-	const char	*gecosname ; 		/* USERINFO */
-	const char	*realname ;		/* USERINFO */
-	const char	*name ;			/* USERINFO */
-	const char	*tz ;			/* USERINFO */
-	const char	*groupname ;
-	const char	*tmpdname ;
-	const char	*maildname ;
-	const char	*hfname ;
-	const char	*lfname ;
-	const char	*paramfname ;
-	const char	*logid ;
-	const char	*defprog ;
+	cchar		**argv ;
+	cchar		**envv ;
+	cchar		*pr ;
+	cchar		*prn ;
+	cchar		*searchname ;
+	cchar		*version ;
+	cchar		*afspec ;
+	cchar		*hostname ;
+	cchar		*portspec ;
+	cchar		*svcname ;
+	cchar		*pvfname ;
+	cchar		*dfname ;
+	cchar		*xfname ;
+	cchar		*efname ;
+	cchar		*architecture ;		/* machine architecture */
+	cchar		*umachine ;		/* UNAME machine name */
+	cchar		*usysname ;		/* UNAME OS system-name */
+	cchar		*urelease ;		/* UNAME OS release */
+	cchar		*uversion ;		/* UNAME OS version */
+	cchar		*hz ;			/* OS HZ */
+	cchar		*nodename ;		/* USERINFO */
+	cchar		*domainname ;		/* USERINFO */
+	cchar		*username ;		/* USERINFO */
+	cchar		*homedname ;		/* USERINFO */
+	cchar		*shell ;		/* USERINFO */
+	cchar		*organization ;		/* USERINFO */
+	cchar		*gecosname ; 		/* USERINFO */
+	cchar		*realname ;		/* USERINFO */
+	cchar		*name ;			/* USERINFO */
+	cchar		*tz ;			/* USERINFO */
+	cchar		*groupname ;
+	cchar		*tmpdname ;
+	cchar		*maildname ;
+	cchar		*hfname ;
+	cchar		*lfname ;
+	cchar		*paramfname ;
+	cchar		*logid ;
+	cchar		*defprog ;
 	void		*op ;
 	SYSDIALER_ARGS	*ap ;
-	IDS		id ;
-	VECSTR		aenvs ;
-	VECSTR		stores ;
-	USERINFO	u ;
+	ids		id ;
+	vecstr		aenvs ;
+	vecstr		stores ;
+	userinfo	u ;
 	USSINFO_A	a ;
 	USSINFO_FL	f, init, open ;
 	uid_t		uid ;
@@ -96,28 +95,21 @@ struct ussinfo_head {
 	int		to ;
 } ;
 
+typedef	USSIFO		ussifo ;
 
-#if	(! defined(USSINFO_MASTER)) || (USSINFO_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	ussinfo_start(ussinfo *,void *,SYSDIALER_INFO *,
+			SYSDIALER_ARGS *,cchar *,cchar *) noex ;
+extern int	ussinfo_finish(ussinfo *) noex ;
+extern int	ussinfo_procargs(ussinfo *) noex ;
+extern int	ussinfo_procopts(ussinfo *,keyopt *) noex ;
+extern int	ussinfo_defaults(ussinfo *) noex ;
+extern int	ussinfo_addrparse(ussinfo *) noex ;
+extern int	ussinfo_logfile(ussinfo *) noex ;
 
-extern int	ussinfo_start(USSINFO *,void *, SYSDIALER_INFO *,
-			SYSDIALER_ARGS *,
-			const char *,const char *) ;
-extern int	ussinfo_finish(USSINFO *) ;
-extern int	ussinfo_procargs(USSINFO *) ;
-extern int	ussinfo_procopts(USSINFO *,KEYOPT *) ;
-extern int	ussinfo_defaults(USSINFO *) ;
-extern int	ussinfo_addrparse(USSINFO *) ;
-extern int	ussinfo_logfile(USSINFO *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* USSINFO_MASTER */
 
 #endif /* USSINFO_INCLUDE */
 

@@ -83,19 +83,23 @@
 /* exported subroutines */
 
 int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
-	bool		fn = false ;
+	bool		fneg = false ;
 	if (sl < 0) sl = strlen(sp) ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
 	if ((sl > 0) && isplusminus(*sp)) {
-	    fn = (*sp == '-') ;
+	    fneg = (*sp == '-') ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	}
+	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
 	*rpp = sp ;
-	if (bp) *bp = fn ;
+	if (bp) *bp = fneg ;
 	return sl ;
 }
 /* end subroutine (sfsign) */

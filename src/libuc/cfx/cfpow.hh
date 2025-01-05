@@ -38,12 +38,13 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<uvariables.hh>		/* |sysword.w_digtab(3u)| */
 #include	<stdintx.h>
 #include	<char.h>
 #include	<ischarx.h>
 
 
-constexpr int	cfpow_maxbase = 128 ;	/* limited by SYSWORD |w_digtab| */
+static uint	cfpow_maxbase = strlen(sysword.w_digtab) ;
 
 struct cfpow_helper {
 	const longlong	one = 1 ;
@@ -53,7 +54,7 @@ struct cfpow_helper {
 	ulonglong	cutoff[cfpow_maxbase+1] = {} ;
 	int		cutlim[cfpow_maxbase+1] = {} ;
 	constexpr cfpow_helper() noex {
-	    const int	n = (CHAR_BIT * sizeof(longlong)) ;
+	    cint	n = (CHAR_BIT * szof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n-1)) ;
 	    llmax = longlong(ullmax >> 1) ;
@@ -66,7 +67,7 @@ struct cfpow_helper {
 
 template<typename T>
 struct cfpowshelp {
-	cint		nb = (CHAR_BIT * sizeof(T)) ;
+	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
 	T		cutoff ;

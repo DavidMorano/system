@@ -1,4 +1,5 @@
 /* snwcpyshrink SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy the shrunken part of a source string */
@@ -46,6 +47,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<strmgr.h>
@@ -53,10 +56,20 @@
 #include	<strn.h>
 #include	<char.h>
 
-#include	"snwcpyx.h"
+#include	"snwcpy.h"		/* also for |snwcpy(3uc)| */
 
 
 /* local defines */
+
+#ifndef	CF_ONEPASS
+#define	CF_ONEPASS	1		/* try one-pass over the string */
+#endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -65,43 +78,49 @@
 /* exported variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+constexpr bool		f_onepass = CF_ONEPASS ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-#if	CF_ONEPASS
 int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*cp ;
 	dbuf[0] = '\0' ;
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-	    strmgr	d ;
-	    if ((rs = strmgr_start(&d,dbuf,dlen)) >= 0) {
-		while ((rs >= 0) && cl--) {
-		    if (*cp == CH_NL) break ;
-		    rs = strmgr_chr(&d,*cp) ;
-		    cp += 1 ;
-		} /* end while */
-		rs1 = strmgr_finish(&d) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (strmgr) */
-	} /* end if (sfshrink) */
+	if_constexpr (f_onepass) {
+	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	        if (strmgr d ; (rs = d.start(dbuf,dlen)) >= 0) {
+		    while ((rs >= 0) && cl--) {
+		        if (*cp == CH_NL) break ;
+		        rs = d.chr(*cp) ;
+		        cp += 1 ;
+		    } /* end while */
+		    rs1 = d.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (strmgr) */
+	    } /* end if (sfshrink) */
+	} else {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
+	        sl = (tp - sp) ;
+	    }
+	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	        rs = snwcpy(dbuf,dlen,cp,cl) ;
+	    }
+	} /* end if_constexpr (f_onepass) */
 	return rs ;
 }
 /* end subroutine (snwcpyshrink) */
-#else /* CF_ONEPASS */
-int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	cchar		*cp ;
-	dbuf[0] = '\0' ;
-	if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
-	    sl = (tp-sp) ;
-	}
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
-	    rs = snwcpy(dbuf,dlen,cp,cl) ;
-	}
-	return rs ;
-}
-/* end subroutine (snwcpyshrink) */
-#endif /* CF_ONEPASS */
 
 

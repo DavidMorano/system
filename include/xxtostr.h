@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	{x}tostr
+
+	Description:
 	These subroutines convert integers (either signed or unsigned
 	of various sized types) into their c-string digit
 	representations.
@@ -86,7 +90,7 @@ inline int uxxtostr(char *endp,int b,UT v) noex {
 	        if (v != 0) {
                     int		di ;
 	            if_constexpr (szof(UT) > szof(ulong)) {
-	                const UT	vmask(~LONG_MAX) ;
+	                const UT	vmask(~ LONG_MAX) ;
 		        UT		nv ;
 	                while ((v & vmask) != 0L) {
 	                    nv = v / ub ;

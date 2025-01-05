@@ -173,6 +173,7 @@ struct vecstr : vecstr_head {
 	int insert(int,cchar *,int = -1) noex ;
 	int store(cchar *,int,cchar **) noex ;
 	int get(int,cchar **) noex ;
+	int getlast(cchar **) noex ;
 	int getvec(mainv *) noex ;
 	int envadd(cchar *,cchar *,int = -1) noex ;
 	int envset(cchar *,cchar *,int = -1) noex ;

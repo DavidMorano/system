@@ -1,4 +1,5 @@
 /* snwcpycompact SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* counted-string copy while compacting white-space from the source */

@@ -36,7 +36,49 @@ struct strmgr_head {
 	int		dlen ;
 } ;
 
+#ifdef	__cplusplus
+enum strmgrmems {
+    	strmgrmem_avail,
+	strmgrmem_rem,
+	strmgrmem_finish,
+	strmgrmem_overlast
+} ;
+struct strmgr ;
+struct strmgr_co {
+	strmgr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (strmgr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (strmgr_co) */
+struct strmgr : strmgr_head {
+	strmgr_co	avail ;
+	strmgr_co	rem ;
+	strmgr_co	finish ;
+	strmgr() noex {
+	    avail(this,strmgrmem_avail) ;
+	    rem(this,strmgrmem_rem) ;
+	    finish(this,strmgrmem_finish) ;
+	} ;
+	strmgr(const strmgr &) = delete ;
+	strmgr &operator = (const strmgr &) = delete ;
+	int start(char *,int = -1) noex ;
+	int str(cchar *,int = -1) noex ;
+	int chr(int) noex ;
+	void dtor() noex ;
+	~strmgr() {
+	    dtor() ;
+	} ;
+} ; /* end struct (strmgr) */
+#else	/* __cplusplus */
 typedef STRMGR		strmgr ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 

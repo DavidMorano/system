@@ -40,7 +40,7 @@
 /* revision history:
 
 	= 2023-05-14, David A­D­ Morano
-	I adapted this to serve the |xlonglong| types.
+	I adapted this to serve the |{x}longlong| types.
 
 */
 
@@ -48,18 +48,14 @@
 
 /*******************************************************************************
 
+  	Group:
+	strto{x}
+
+	Description:
 	This code converts a c-string of decimal digits into the
 	integer type |longlong|.  It is obviously a derivative work
 	of the original |strtol(3c)| from the Berkley BSD edition
-	of its UNIX® variant.  I am forced to do this since I have
-	lost my own conversion-suite version from over forty years
-	ago and also lost my other conversion-suite versions (two
-	others) from some more recent years ago (all lost to coporate
-	America now, which means they are gone).  I kind of have to
-	laugh at having to make-shift code like this given I had
-	coded things like this so long ago and thought that I would
-	never have to do it again.
-		-- David A.D. Morano, 2023-10-10
+	of its UNIX® variant.  Ant locale information is ignored.
 
 	Notes:
 	1. This code is limited (by the coding used) to a maximum
@@ -70,7 +66,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
 #include	<climits>		/* for |CHAR_BIT| */
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |strtol(3c)| */
 #include	<cctype>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -98,7 +95,7 @@
 
 /* local variables */
 
-constexpr int	maxbase = 36 ;		/* must be classic value */
+constexpr uint	maxbase = 36 ;		/* must be classic value */
 
 
 /* local structures */
@@ -111,9 +108,9 @@ struct llhelper {
 	int		cutlim[maxbase+1] = {} ;
 	constexpr llhelper() noex {
 	    const longlong	one = 1 ;
-	    const int		n = (CHAR_BIT * sizeof(longlong)) ;
-	    ullmax = ~ullmax ;
-	    llmin = (one << (n-1)) ;
+	    const int		n = (CHAR_BIT * szof(longlong)) ;
+	    ullmax = (~ ullmax) ;
+	    llmin = (one << (n - 1)) ;
 	    llmax = longlong(ullmax >> 1) ;
 	    for (uint b = 2 ; b <= maxbase ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
@@ -121,6 +118,62 @@ struct llhelper {
 	    } /* end for */
 	} ; /* end constructor */
 } ; /* end subroutine (llhelper) */
+
+
+/* forward references */
+
+template<typename T> constexpr static inline int nbits(T) noex {
+    	return (szof(T) * CHAR_BIT) ;
+}
+
+template<typename T>
+constexpr static inline bool bit(T v,int n) noex {
+	return !!((v >> n) & 1) ;
+}
+
+template<typename T>
+inline void strtox(cchar *,char **,int,T *rp) noex {
+	*rp = 0 ;
+}
+
+template<>
+inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
+	clong	v = strtol(sp,epp,b) ;
+	*rp = int(v) ;
+	if (errno == 0) {
+	    cint	n = nbits(v) ;
+	    {
+	        cbool	f_neg = bit(v,(n-1)) ;
+		if (f_neg) {	/* test negative value */
+	    	    ulong	uv = ulong(v) ;
+		    uv = (~ uv) ;
+	            uv >>= (n/2) ;
+		    if (uv || (! bit(v,((n/2)-1)))) {
+			errno = ERANGE ;
+		    }
+		} else {	/* test poitive value */
+	    	    ulong	uv = ulong(v) ;
+	            uv >>= (n/2) ;
+		    if (uv || bit(v,((n/2)-1))) {
+			errno = ERANGE ;
+		    }
+		}
+	    } /* end block */
+	} /* end if (no error so far) */
+}
+
+template<>
+inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
+	ulong	uv = strtoul(sp,epp,b) ;
+	*rp = uint(uv) ;
+	if (errno == 0) {
+	    cint	n = nbits(uv) ;
+	    uv >>= (n/2) ;
+	    if (uv) {
+		errno = ERANGE ;
+	    }
+	}
+}
 
 
 /* local variables */
@@ -133,12 +186,29 @@ constexpr llhelper	llhelp ;
 
 /* exported subroutines */
 
-/*
- * Convert a string to a |longlong| integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
- */
+int strtoxi(cchar *sp,char **epp,int b) noex {
+    	int	v{} ;
+	strtox(sp,epp,b,&v) ;
+	return v ;
+}
+/* end subroutine (uc_strtoi) */
+
+uint strtoxui(cchar *sp,char **epp,int b) noex {
+    	uint	uv{} ;
+	strtox(sp,epp,b,&uv) ;
+	return uv ;
+}
+/* end subroutine (uc_strtoui) */
+
+long strtoxl(cchar *sp,char **epp,int b) noex {
+	return strtol(sp,epp,b) ;
+}
+/* end subroutine (uc_strtol) */
+
+ulong strtoxul(cchar *sp,char **epp,int b) noex {
+    	return strtoul(sp,epp,b) ;
+}
+/* end subroutine (uc_strtoul) */
 
 longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	longlong acc, cutoff;

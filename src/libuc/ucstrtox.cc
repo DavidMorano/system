@@ -37,7 +37,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>
-#include	<climits>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -64,6 +64,10 @@
 
 /* local subroutine-templates */
 
+template<typename T> constexpr static inline int nbits(T) noex {
+    	return (szof(T) * CHAR_BIT) ;
+}
+
 template<typename T>
 static inline bool bit(T v,int n) noex {
 	return !!((v >> n) & 1) ;
@@ -79,16 +83,25 @@ void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 	clong	v = strtol(sp,epp,b) ;
 	*rp = int(v) ;
 	if (errno == 0) {
-	    cint	n = sizeof(ulong) ;
-	    ulong	uv = ulong(v) ;
-	    uv >>= (n>>1) ;
-	    if (uv) {
-	        errno = ERANGE ;
-	    } else {
+	    cint	n = nbits(v) ;
+	    {
 	        cbool	f_neg = bit(v,(n-1)) ;
-		if ((!f_neg) && bit(v,((n/2)-1))) errno = ERANGE ;
-	    }
-	} /* end block */
+		if (f_neg) {	/* test negative value */
+	    	    ulong	uv = ulong(v) ;
+		    uv = (~ uv) ;
+	            uv >>= (n/2) ;
+		    if (uv || (! bit(v,((n/2)-1)))) {
+			errno = ERANGE ;
+		    }
+		} else {	/* test poitive value */
+	    	    ulong	uv = ulong(v) ;
+	            uv >>= (n/2) ;
+		    if (uv || bit(v,((n/2)-1))) {
+			errno = ERANGE ;
+		    }
+		}
+	    } /* end block */
+	} /* end if (no error so far) */
 }
 
 template<>
@@ -106,9 +119,11 @@ void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	ulong	uv = strtoul(sp,epp,b) ;
 	*rp = uint(uv) ;
 	if (errno == 0) {
-	    cint	n = sizeof(ulong) ;
+	    cint	n = nbits(uv) ;
 	    uv >>= (n/2) ;
-	    if (uv) errno = ERANGE ;
+	    if (uv) {
+		errno = ERANGE ;
+	    }
 	}
 }
 

@@ -329,9 +329,9 @@ int rander::iaddnoise() noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
+	cint		rlen = RBUFLEN ;
+	char		rbuf[RBUFLEN+1] ;
 	if_constexpr (f_getrandom) {
-	    cint	rlen = RBUFLEN ;
-	    char	rbuf[RBUFLEN+1] ;
 	    if ((rs = uc_getrandom(rbuf,rlen,0)) >= 0) {
 		randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 		cint		len = rs ;
@@ -342,9 +342,7 @@ int rander::iaddnoise() noex {
 	    cint	of = O_RDONLY ;
 	    cchar	*dev = sysword.w_devrandom ;
 	    if ((rs = u_open(dev,of,0666)) >= 0) {
-	        cint	rlen = RBUFLEN ;
 	        cint	fd = rs ;
-	        char	rbuf[RBUFLEN+1] ;
 	        if ((rs = u_read(fd,rbuf,rlen)) >= 0) {
 		    randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 		    cint	len = rs ;
@@ -441,7 +439,7 @@ static void rander_atforkafter() noex {
 /* end subroutine (rander_atforkafter) */
 
 static void rander_exit() noex {
-	if (int rs ; (rs = rander_data.fini()) < 0) {
+	if (cint rs = rander_data.fini() ; rs < 0) {
 	    ulogerror("ucrand",rs,"exit-fini") ;
 	}
 }
@@ -449,7 +447,8 @@ static void rander_exit() noex {
 
 rander_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) switch (w) {
+	if (op) {
+	    switch (w) {
 	    case randermem_init:
 	        rs = op->iinit() ;
 	        break ;
@@ -471,7 +470,8 @@ rander_co::operator int () noex {
 	    case randermem_addnoise:
 	        rs = op->iaddnoise() ;
 	        break ;
-	} /* end switch */
+	    } /* end switch */
+	}
 	return rs ;
 }
 /* end method (rander_co::operator) */

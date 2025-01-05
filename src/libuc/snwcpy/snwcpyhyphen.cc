@@ -1,4 +1,5 @@
 /* snwcpyhyphen SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* similar to |snwcpy(3dam)| w/ exceptions */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	snwcpyhyphen
+
+	Description:
 	This subroutine is similar to |snwcpy(3dam)| except that
 	any underscore characters found in the source string are
 	substituted for hyphen characters in the target destination

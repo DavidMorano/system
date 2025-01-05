@@ -1,4 +1,5 @@
 /* snwcpywidehdr SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */

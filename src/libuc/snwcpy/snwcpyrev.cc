@@ -1,4 +1,5 @@
 /* snwcpyrev SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* copy in reverse the characters from a source to a destiation */

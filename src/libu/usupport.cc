@@ -64,6 +64,8 @@
 #include	<intsat.h>
 #include	<stdintx.h>
 #include	<xxtostr.h>
+#include	<strtox.h>
+#include	<strnul.hh>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"usupport.h"
@@ -74,6 +76,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -259,6 +262,36 @@ namespace libu {
     }
 } /* end namespace (libu) */
 
+namespace libu {
+    template<typename T>
+    static int cfdecx(T (*cfx)(cc *,char **,int),cc *sp,int sl,T *rp) noex {
+	cint		b = 10 ;
+	int		rs = SR_FAULT ;
+	char		*endp{} ; /* <- unused */
+	if (sp) {
+	    T		v{} ;
+	    strnul	str(sp,sl) ;
+	    errno = 0 ;
+	    v = cfx(str,&endp,b) ;
+	    if (rp) *rp = v ;
+	    if (errno) {
+		rs = (- errno) ;
+	    } else {
+		rs = intsat(v) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine-template (cfdecx) */
+    int cfdec(cchar *sp,int sl,int *rp) noex {
+	return cfdecx(strtoxi,sp,sl,rp) ;
+    }
+    int cfdec(cchar *sp,int sl,long *rp) noex {
+	return cfdecx(strtoxl,sp,sl,rp) ;
+    }
+    int cfdec(cchar *sp,int sl,longlong *rp) noex {
+	return cfdecx(strtoxll,sp,sl,rp) ;
+    }
+} /* end namespace (libu) */
 
 /* local subroutines */
 

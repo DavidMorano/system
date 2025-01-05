@@ -1132,6 +1132,10 @@ int vecpstr::get(int ai,cchar **rpp) noex {
 	return vecpstr_get(this,ai,rpp) ;
 }
 
+int vecpstr::getlast(cchar **spp) noex {
+    	return vecpstr_getlast(this,spp) ;
+}
+
 int vecpstr::getvec(mainv *rppp) noex {
 	return vecpstr_getvec(this,rppp) ;
 }

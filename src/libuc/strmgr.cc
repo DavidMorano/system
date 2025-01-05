@@ -137,3 +137,24 @@ int strmgr_finish(strmgr *op) noex {
 /* end subroutine (strmgr_finish) */
 
 
+/* local subroutines */
+
+int strmgr::start(char *sp,int sl) noex {
+    	return strmgr_start(this,sp,sl) ;
+}
+
+int strmgr::str(cchar *sp,int sl) noex {
+    	return strmgr_str(this,sp,sl) ;
+}
+
+int strmgr::chr(int ch) noex {
+    	return strmgr_chr(this,ch) ;
+}
+
+void strmgr::dtor() noex {
+    	if (cint rs = finish ; rs < 0) {
+	    ulogerror("strmgr",rs,"dtor-finish") ;
+	}
+}
+
+

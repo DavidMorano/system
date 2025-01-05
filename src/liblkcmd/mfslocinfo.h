@@ -1,5 +1,8 @@
-/* mfs-locinfo */
+/* mfs-locinfo HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
+/* version %I% last-modified %G% */
 /* version %I% last-modified %G% */
 
 
@@ -16,13 +19,16 @@
 /* Copyright © 2011,2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MFSLOCINFO_INCLUDE
-#define	MFSLOCINFO_INCLUDE	1
+#define	MFSLOCINFO_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
 #include	<keyopt.h>
 #include	<msfile.h>
@@ -105,18 +111,18 @@ struct locinfo {
 	cchar		*svcfname ;
 	cchar		*accfname ;
 	cchar		*msfname ;
-	PROGINFO	*pip ;
+	proginfo	*pip ;
 	void		*adj ;		/* adjunct local data */
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	open ;
-	LFM		pidlock, tmplock ;
-	ENVHELP		envs ;
-	VARSUB		subs ;
-	EXPCOOK		cooks ;
-	VECSTR		svars ;		/* schedule variables */
+	lfm		pidlock, tmplock ;
+	envhelp		envs ;
+	varsub		subs ;
+	expcook		cooks ;
+	vecstr		svars ;		/* schedule variables */
 	MFSNS		ns ;		/* name-server object */
-	KEYOPT		cmds ;
-	VECOBJ		listens ;
+	keyopt		cmds ;
+	vecobj		listens ;
 	time_t		ti_lastlock ;
 	time_t		ti_start ;
 	time_t		ti_marklog ;
@@ -145,50 +151,46 @@ struct locinfo {
 	char		cmd[LOGIDLEN + 1] ;	/* for MFS */
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	locinfo_start(locinfo *,proginfo *) noex ;
+extern int	locinfo_finish(locinfo *) noex ;
+extern int	locinfo_setentry(locinfo *,cchar **,cchar *,int) noex ;
+extern int	locinfo_rootname(locinfo *) noex ;
+extern int	locinfo_defs(locinfo *) noex ;
+extern int	locinfo_lockbegin(locinfo *) noex ;
+extern int	locinfo_lockcheck(locinfo *) noex ;
+extern int	locinfo_lockend(locinfo *) noex ;
+extern int	locinfo_defreg(locinfo *) noex ;
+extern int	locinfo_defdaemon(locinfo *) noex ;
+extern int	locinfo_tmpourdir(locinfo *) noex ;
+extern int	locinfo_builtdname(locinfo *) noex ;
+extern int	locinfo_msfile(locinfo *) noex ;
+extern int	locinfo_reqfname(locinfo *) noex ;
+extern int	locinfo_ipcpid(locinfo *,int) noex ;
+extern int	locinfo_rootids(locinfo *) noex ;
+extern int	locinfo_nsbegin(locinfo *) noex ;
+extern int	locinfo_nsend(locinfo *) noex ;
+extern int	locinfo_nslook(locinfo *,char *,int,cchar *,int) noex ;
+extern int	locinfo_maintourtmp(locinfo *) noex ;
+extern int	locinfo_cmdsload(locinfo *,cchar *,int) noex ;
+extern int	locinfo_cmdscount(locinfo *) noex ;
+extern int	locinfo_reqexit(locinfo *,cchar *) noex ;
+extern int	locinfo_isreqexit(locinfo *) noex ;
+extern int	locinfo_getaccto(locinfo *) noex ;
+extern int	locinfo_getreqs(locinfo *) noex ;
+extern int	locinfo_newserial(locinfo *) noex ;
+extern int	locinfo_varbegin(locinfo *) noex ;
+extern int	locinfo_varend(locinfo *) noex ;
+extern int	locinfo_varsub(locinfo *,char *,int,cchar *,int) noex ;
+extern int	locinfo_daemonbegin(locinfo *) noex ;
+extern int	locinfo_daemonend(locinfo *) noex ;
+extern int	locinfo_cooksvc(locinfo *,cchar *,cchar *,cchar **,int) noex ;
+extern int	locinfo_svctype(locinfo *,cchar *,int) noex ;
+extern int	locinfo_newreq(locinfo *,int) noex ;
 
-extern int	locinfo_start(LOCINFO *,PROGINFO *) ;
-extern int	locinfo_finish(LOCINFO *) ;
-extern int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-extern int	locinfo_rootname(LOCINFO *) ;
-extern int	locinfo_defs(LOCINFO *) ;
-extern int	locinfo_lockbegin(LOCINFO *) ;
-extern int	locinfo_lockcheck(LOCINFO *) ;
-extern int	locinfo_lockend(LOCINFO *) ;
-extern int	locinfo_defreg(LOCINFO *) ;
-extern int	locinfo_defdaemon(LOCINFO *) ;
-extern int	locinfo_tmpourdir(LOCINFO *) ;
-extern int	locinfo_builtdname(LOCINFO *) ;
-extern int	locinfo_msfile(LOCINFO *) ;
-extern int	locinfo_reqfname(LOCINFO *) ;
-extern int	locinfo_ipcpid(LOCINFO *,int) ;
-extern int	locinfo_rootids(LOCINFO *) ;
-extern int	locinfo_nsbegin(LOCINFO *) ;
-extern int	locinfo_nsend(LOCINFO *) ;
-extern int	locinfo_nslook(LOCINFO *,char *,int,cchar *,int) ;
-extern int	locinfo_maintourtmp(LOCINFO *) ;
-extern int	locinfo_cmdsload(LOCINFO *,cchar *,int) ;
-extern int	locinfo_cmdscount(LOCINFO *) ;
-extern int	locinfo_reqexit(LOCINFO *,cchar *) ;
-extern int	locinfo_isreqexit(LOCINFO *) ;
-extern int	locinfo_getaccto(LOCINFO *) ;
-extern int	locinfo_getreqs(LOCINFO *) ;
-extern int	locinfo_newserial(LOCINFO *) ;
-extern int	locinfo_varbegin(LOCINFO *) ;
-extern int	locinfo_varend(LOCINFO *) ;
-extern int	locinfo_varsub(LOCINFO *,char *,int,cchar *,int) ;
-extern int	locinfo_daemonbegin(LOCINFO *) ;
-extern int	locinfo_daemonend(LOCINFO *) ;
-extern int	locinfo_cooksvc(LOCINFO *,cchar *,cchar *,cchar **,int) ;
-extern int	locinfo_svctype(LOCINFO *,cchar *,int) ;
-extern int	locinfo_newreq(LOCINFO *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* MFSLOCINFO_INCLUDE */
 

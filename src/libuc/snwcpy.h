@@ -1,8 +1,8 @@
-/* cfdouble HEADER */
+/* snwcpy HEADER */
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* convert a floating point digit string to its double value */
+/* copy a c-string to a sized destination buffer */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CFDOUNLE_INCLUDE
-#define	CFDOUNLE_INCLUDE
+#ifndef	SNWCPY_INCLUDE
+#define	SNWCPY_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -24,17 +24,24 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>
+#include	<snwcpyx.h>
 
 
 EXTERNC_begin
 
-extern int cfdouble(cchar *,int,double *) noex ;
+extern int	snwcpy(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
 
-#endif /* CFDOUNLE_INCLUDE */
+inline int snwcpy(char *dbuf,int dlen,cchar *sp) noex {
+	return snwcpy(dbuf,dlen,sp,-1) ;
+}
+
+#endif /* __cplusplus */
+
+
+#endif /* SNWCPY_INCLUDE */
 
 

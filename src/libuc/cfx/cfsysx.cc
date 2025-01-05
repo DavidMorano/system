@@ -1,4 +1,4 @@
-/* cfxxxx SUPPORT */
+/* cfsysx SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -38,7 +38,7 @@
 /*******************************************************************************
 
   	Group:
-	cfxxxx
+	cfsysx
 
 	Description:
 	Subroutines to convert digit strings to binary integers.

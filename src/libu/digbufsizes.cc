@@ -1,4 +1,5 @@
 /* digbufsizes SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* digit buffer sizes */
@@ -15,6 +16,10 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
+  	Name:
+	digbufsizes
+
+	Description:
 	These subroutines facilitate determining buffer sizes for 
 	various digits in different types and number bases.
 

@@ -1,19 +1,25 @@
-/* pcsconf */
+/* pcsconf HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	PCSCONF_INCLUDE
 #define	PCSCONF_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 
+
+#define	PCSCONF			struct pcsconf_head
 
 #ifndef	PCSCONF_PCS
 #define	PCSCONF_PCS		"/usr/add-on/pcs"
@@ -34,10 +40,13 @@
 
 #define	PCSCONF_LEN		(3 * 1024)
 
+#ifndef	PCS_MSGIDLEN
+#define	PCS_MSGIDLEN		(3 * MAXHOSTNAMELEN)
+#endif
 
 
 
-struct pcsconf {
+struct pcsconf_head {
 	char	*pcs ;			/* program root (for PCS) */
 	char	*nodename ;
 	char	*domainname ;
@@ -60,24 +69,16 @@ struct pcsconf {
 	gid_t	gid_pcs ;
 } ;
 
+typedef	PCSCONF		pcsconf ;
 
+EXTERNC_begin
 
-#if	(! defined(PCSCONF_MASTER)) || (PCSCONF_MASTER == 0)
+extern int pcsconf(char *,char *,pcsconf *,vecstr *,vecstr *,
+	char *,int) noex ;
 
-extern int pcsconf(char *,char *,struct pcsconf *,VECSTR *,VECSTR *,
-	char *,int) ;
-
-#endif /* PCSCONF_MASTER */
-
-
-/* other PCS defines */
-
-#ifndef	PCS_MSGIDLEN
-#define	PCS_MSGIDLEN	(3 * MAXHOSTNAMELEN)
-#endif
+EXTERNC_end
 
 
 #endif /* PCSCONF_INCLUDE */
-
 
 

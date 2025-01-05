@@ -67,7 +67,7 @@ int setstr_finish(setstr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    {
-	        cint		rsn = SR_NOTFOUND ;
+	        cint	rsn = SR_NOTFOUND ;
 	        if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
 	            hdb_dat	key{} ;
 	            hdb_dat	val{} ;

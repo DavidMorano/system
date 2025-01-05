@@ -1,25 +1,28 @@
-/* initinfo */
+/* initinfo HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 #ifndef	INITINFO_INCLUDE
-#define	INITINFO_INCLUDE	1
+#define	INITINFO_INCLUDE
 
 
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
-
-#include	"localmisc.h"
-
 
 
 #define	INITINFO	struct initinfo_head
-#define	INITINFO_CUR	struct initinfo_c
+#define	INITINFO_FL	struct initinfo_flags
+#define	INITINFO_CUR	struct initinfo_cursor
 
 
-
-
-struct initinfo_c {
+struct initinfo_cursor {
 	int	i ;
 } ;
 
@@ -28,27 +31,29 @@ struct initinfo_flags {
 } ;
 
 struct initinfo_head {
-	unsigned long		magic ;
-	const char		*pr ;
-	VECSTR			entries ;
-	struct initinfo_flags	f ;
-	time_t			ti_check ;
-	time_t			ti_pread ;
+	cchar		*pr ;
+	vecstr		entries ;
+	time_t		ti_check ;
+	time_t		ti_pread ;
+	INITINFO_FL	f ;
+	uint		magic ;
 } ;
 
+typedef	INITINFO	initinfo ;
+typedef	INITINFO_FL	initinfo_fl ;
+typedef	INITINFO_CUR	initinfo_cur ;
 
+EXTERNC_begin
 
-#if	(! defined(INITINFO_MASTER)) || (INITINFO_MASTER == 0)
+extern int	initinfo_open(initinfo *,cchar *) noex ;
+extern int	initinfo_curbegin(initinfo *,initinfo_cur *) noex ;
+extern int	initinfo_curend(initinfo *,initinfo_cur *) noex ;
+extern int	initinfo_query(initinfo *,cchar *,char *,int) noex ;
+extern int	initinfo_enum(initinfo *,initinfo_cur *,
+			char *,int,char *,int) noex ;
+extern int	initinfo_close(initinfo *) noex ;
 
-extern int	initinfo_open(INITINFO *,const char *) ;
-extern int	initinfo_curbegin(INITINFO *,INITINFO_CUR *) ;
-extern int	initinfo_curend(INITINFO *,INITINFO_CUR *) ;
-extern int	initinfo_query(INITINFO *,const char *,char *,int) ;
-extern int	initinfo_enum(INITINFO *,INITINFO_CUR *,
-			char *,int,char *,int) ;
-extern int	initinfo_close(INITINFO *) ;
-
-#endif /* INITINFO_MASTER */
+EXTERNC_end
 
 
 #endif /* INITINFO_INCLUDE */

@@ -30,7 +30,12 @@
 
 EXTERNC_begin
 
-extern int cfdecf(cchar *,int,double *) noex ;
+extern int	cfdecf(cchar *,int,double *) noex ;
+
+/* historical (from about 1995 or earlier) */
+static inline int cfdouble(cchar *sp,int sl,double *rp) noex {
+    	return cfdecf(sp,sl,rp) ;
+}
 
 EXTERNC_end
 

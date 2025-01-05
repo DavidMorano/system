@@ -172,7 +172,7 @@ int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	if (int sl ; (sl = sfsign(bp,bl,&sp,&fneg)) > 0) {
 	    if (UT uval{} ; (rs = cfnumx(sp,sl,&uval)) >= 0) {
 		if (fneg) uval = (- uval) ;
-		*rp = static_cast<T>(uval) ;
+		*rp = cast_static<T>(uval) ;
 	    } /* end if (cfnumx) */
 	} /* end if (sfsign) */
 	return rs ;

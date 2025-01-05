@@ -193,7 +193,7 @@ int ccfile::open(strview sv,cchar *ofs,mode_t om) noex {
 	        strnul	fn(svp,svl) ;
 		rs = open(fn,ofs,om) ;
 	    } /* end block */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (ccfile::open) */

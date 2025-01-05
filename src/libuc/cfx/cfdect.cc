@@ -39,6 +39,7 @@
 #include	<sfx.h>
 #include	<cfdec.h>
 #include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"cfdect.h"
 
@@ -47,6 +48,9 @@
 
 
 /* external subroutines */
+
+
+/* external varaibles */
 
 
 /* local structures */
@@ -69,10 +73,9 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	int		rs = SR_FAULT ;
 	int		res = 0 ;
 	if (sbuf) {
-	    int		sl ;
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
-	    if ((sl = sfshrink(sbuf,slen,&sp)) > 0) {
+	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
 		bool	f_negative = false ;
 		int	res = 0 ;
 	        cchar	*tp ;
@@ -108,11 +111,9 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 
 static int convert(cchar *sp,int sl,int mc,int *rp) noex {
 	int		rs = SR_OK ;
-	int		cl ;
 	cchar		*cp ;
-	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	    int		mf = 1 ;
-	    int		v = 0 ;
 	    switch (mc) {
 	    case 'Y':
 	        mf = 365 * 24 * 60 * 60 ;
@@ -137,7 +138,7 @@ static int convert(cchar *sp,int sl,int mc,int *rp) noex {
 	    case 's':
 	        break ;
 	    } /* end switch */
-	    if ((rs = cfdeci(cp,cl,&v)) >= 0) {
+	    if (int v{} ; (rs = cfdeci(cp,cl,&v)) >= 0) {
 	        *rp += (v * mf) ;
 	    }
 	} /* end if (non-zero) */

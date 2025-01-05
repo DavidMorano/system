@@ -1,4 +1,6 @@
-/* bbhosts */
+/* bbhosts HEADER */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* revision history:
@@ -12,35 +14,32 @@
 
 
 #ifndef	BBHOSTS_INCLUDE
-#define	BBHOSTS_INCLUDE	1
+#define	BBHOSTS_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<vecstr.h>
 
 
-#define	BBHOSTS		VECSTR
+#define	BBHOSTS		vecstr
 
 
-#if	(! defined(BBHOSTS_MASTER)) || (BBHOSTS_MASTER == 0)
+typedef	BBHOSTS		bbhosts ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	bbhosts_start(BBHOSTS *,const char *,const char *) ;
-extern int	bbhosts_finish(BBHOSTS *) ;
-extern int	bbhosts_get(BBHOSTS *,int,const char **) ;
-extern int	bbhosts_find(BBHOSTS *,const char *) ;
+extern int	bbhosts_start(bbhosts *,cchar *,cchar *) noex ;
+extern int	bbhosts_finish(bbhosts *) noex ;
+extern int	bbhosts_get(bbhosts *,int,cchar **) noex ;
+extern int	bbhosts_find(bbhosts *,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* BBHOSTS_MASTER */
 
 #endif /* BBHOSTS_INCLUDE */
 

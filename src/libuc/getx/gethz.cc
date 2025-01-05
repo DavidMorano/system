@@ -54,7 +54,7 @@
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| + |atoi(3c)| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<uvariables.hh>		/* |varname(3u)| */
 #include	<cfdec.h>

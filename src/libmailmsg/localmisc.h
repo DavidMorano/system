@@ -377,7 +377,7 @@ typedef const char		cc ;
 #endif
 
 #ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
+#define	TIMEBUFLEN	80		/* can hold? all known date strings */
 #endif
 
 #ifndef	COLUMNS

@@ -287,10 +287,9 @@ static int rmdirfiles(char *pbuf,int plen) noex {
 	if (pbuf) {
 	    rs = SR_INVALID ;
 	    if (pbuf[0]) {
-	        vecpstr		files ;
 	        cint		vn = RMSESFILES_NENT ;
 		cint		vo = 0 ;
-	        if ((rs = vecpstr_start(&files,0,vn,vo)) >= 0) {
+	        if (vecpstr files ; (rs = files.start(0,vn,vo)) >= 0) {
 	            int		c = 0 ;
 	            if ((rs = vecpstr_dirload(&files,pbuf,plen)) > 0) {
 	                c = rs ;
@@ -300,7 +299,7 @@ static int rmdirfiles(char *pbuf,int plen) noex {
 	            } else if (rs == 0) {
 	                rc = 1 ;
 	            }
-	            rs1 = vecpstr_finish(&files) ;
+	            rs1 = files.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (files) */
 	    } /* end if (valid) */

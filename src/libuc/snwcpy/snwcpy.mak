@@ -2,7 +2,7 @@
 
 T= snwcpy
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -98,9 +97,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_SNWCPYX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SNWCPYX)
-
-$(T).a:			$(OBJ_SNWCPYX)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

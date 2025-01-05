@@ -1,4 +1,5 @@
 /* snwcpylatin SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
@@ -40,8 +41,8 @@
 
 
 	Notes:
-	This subroutine just calls either the 'sncpy1(3dam)' or the
-	'strwcpy(3dam)' subroutine based on the arguments.
+	This subroutine just calls either the |sncpy1(3dam)| or the
+	|strwcpy(3dam)| subroutine based on the arguments.
 
 	See-also:
 	snwcpy(3dam),

@@ -16,19 +16,20 @@
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
-	I took the plunge and rewrote this set of subroutine using
+	I took the plunge and rewrote this set of subroutines using
 	the LIBC subroutines |strtoXX(3c)|, being much simplified
-	now.  It is no longer stand-alone, like in the old days,
-	but we have been mostly on UNIX®i for some time now (decades)
-	and use in non-UNIX®i environments is now quite rare.  I
-	hope that this is not a problem.  We will see.
+	now.  It is no longer stand-alone (no LIBC dependency),
+	like in the old days, but we have been mostly on UNIX®i for
+	some time now (decades) and use in non-UNIX®i environments
+	is now quite rare.  I hope that this is not a problem.  We
+	will see.
 
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
-	a subroutine-template. This did nothing to make the code
-	faster in any way. After template expansion the code is the
+	a subroutine-template.  This did nothing to make the code
+	faster in any way.  After template expansion the code is the
 	same as before.  All type-versions of the former subroutines
-	are now in a single subroutine-template. I guess that I had
+	are now in a single subroutine-template.  I guess that I had
 	too much idle time on my hands.
 
 */
@@ -88,27 +89,27 @@
 /* exported subroutines */
 
 int cfxxxi(cchar *sp,int sl,int b,int *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
+	return cfsysx(sp,sl,b,rp) ;
 }
 
 int cfxxxl(cchar *sp,int sl,int b,long *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
+	return cfsysx(sp,sl,b,rp) ;
 }
 
 int cfxxxll(cchar *sp,int sl,int b,longlong *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
+	return cfsysx(sp,sl,b,rp) ;
 }
 
 int cfxxxui(cchar *sp,int sl,int b,uint *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
+	return cfsysx(sp,sl,b,rp) ;
 }
 
 int cfxxxul(cchar *sp,int sl,int b,ulong *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
+	return cfsysx(sp,sl,b,rp) ;
 }
 
 int cfxxxull(cchar *sp,int sl,int b,ulonglong *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
+	return cfsysx(sp,sl,b,rp) ;
 }
 
 

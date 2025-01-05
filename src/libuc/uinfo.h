@@ -1,4 +1,5 @@
 /* uinfo HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® information (a cache for 'uname(2)' and sisters) */

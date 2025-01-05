@@ -44,8 +44,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<getxx.h>
+#include	<mallocxx.h>
 #include	<localmisc.h>
 
 #include	"getserv.h"

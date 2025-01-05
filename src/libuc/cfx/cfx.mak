@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS=
 
-INCS= cfx.h cfxxxx.hh cfsysx.hh
+INCS= cfx.h cfsysx.hh cfutil.h
 
 LIBS=
 
@@ -63,12 +63,14 @@ OBJ4_CFX= cfhex.o
 OBJ5_CFX= cfxxx.o
 OBJ6_CFX= cfa26.o
 OBJ7_CFX= cfnum.o
+OBJ8_CFX= cfutil.o
 
 
 OBJA_CFX= obj0cfx.o obj1cfx.o obj2cfx.o obj3cfx.o
 OBJB_CFX= obj4cfx.o obj5cfx.o obj6cfx.o obj7cfx.o
+OBJC_CFX= obj8cfx.o
 
-OBJ_CFX= obja_cfx.o objb_cfx.o
+OBJ_CFX= obja_cfx.o objb_cfx.o objc_cfx.o
 
 
 .SUFFIXES:		.hh .ii
@@ -118,55 +120,64 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0cfx.o:	$(OBJ0_CFX)
+obj0cfx.o:		$(OBJ0_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CFX)
 
-obj1cfx.o:	$(OBJ1_CFX)
+obj1cfx.o:		$(OBJ1_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CFX)
 
-obj2cfx.o:	$(OBJ2_CFX)
+obj2cfx.o:		$(OBJ2_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CFX)
 
-obj3cfx.o:	$(OBJ3_CFX)
+obj3cfx.o:		$(OBJ3_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CFX)
 
-obj4cfx.o:	$(OBJ4_CFX)
+obj4cfx.o:		$(OBJ4_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_CFX)
 
-obj5cfx.o:	$(OBJ5_CFX)
+obj5cfx.o:		$(OBJ5_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_CFX)
 
-obj6cfx.o:	$(OBJ6_CFX)
+obj6cfx.o:		$(OBJ6_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6_CFX)
 
-obj7cfx.o:	$(OBJ7_CFX)
+obj7cfx.o:		$(OBJ7_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_CFX)
 
+obj8cfx.o:		$(OBJ8_CFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8_CFX)
 
-obja_cfx.o:	$(OBJA_CFX)
+obj9cfx.o:		$(OBJ9_CFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ9_CFX)
+
+
+obja_cfx.o:		$(OBJA_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_CFX)
 
-objb_cfx.o:	$(OBJB_CFX)
+objb_cfx.o:		$(OBJB_CFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_CFX)
 
+objc_cfx.o:		$(OBJC_CFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_CFX)
 
-cfchars.o:			cfchars.cc cfchars.h cfcharsx.hh $(INCS)
-cfbin.o:			cfbin.cc cfbin.h		$(INCS)
-cfoct.o:			cfoct.cc cfoct.h		$(INCS)
-cfdec.o:			cfdec.cc cfdec.h		$(INCS)
-cfdecf.o:			cfdecf.cc cfdecf.h		$(INCS)
-cfdecmf.o:			cfdecmf.cc cfdecmf.h		$(INCS)
-cfdect.o:			cfdect.cc cfdect.h		$(INCS)
-cfhex.o:			cfhex.cc cfhex.h		$(INCS)
-cfxxx.o:			cfxxx.cc cfxxx.h		$(INCS)
-cfa26.o:			cfa26.cc cfa26.h cfalphax.hh	$(INCS)
-cfnum.o:			cfnum.cc cfnum.h		$(INCS)
+
+cfutil.o:		cfutil.cc				$(INCS)
+
+cfchars.o:		cfchars.cc cfchars.h cfcharsx.hh	$(INCS)
+cfbin.o:		cfbin.cc cfbin.h			$(INCS)
+cfoct.o:		cfoct.cc cfoct.h			$(INCS)
+cfdec.o:		cfdec.cc cfdec.h			$(INCS)
+cfdecf.o:		cfdecf.cc cfdecf.h			$(INCS)
+cfdecmf.o:		cfdecmf.cc cfdecmf.h			$(INCS)
+cfdect.o:		cfdect.cc cfdect.h			$(INCS)
+cfhex.o:		cfhex.cc cfhex.h			$(INCS)
+cfxxx.o:		cfxxx.cc cfxxx.h			$(INCS)
+cfa26.o:		cfa26.cc cfa26.h cfalphax.hh		$(INCS)
+cfnum.o:		cfnum.cc cfnum.h			$(INCS)
 
 # algorithms
-cfxxxx.o:			cfxxxx.cc cfxxxx.hh		$(INCS)
-cfsysx.o:			cfsysx.cc cfsysx.hh		$(INCS)
+cfsysx.o:		cfsysx.cc cfsysx.hh			$(INCS)
 
-cfdouble.o:			cfdouble.cc cfdouble.h		$(INCS)
-cfhexstr.o:			cfhexstr.cc cfhexstr.h		$(INCS)
+cfhexstr.o:		cfhexstr.cc cfhexstr.h			$(INCS)
 
 

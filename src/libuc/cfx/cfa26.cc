@@ -110,19 +110,19 @@ int cfa26ll(cchar *sp,int sl,longlong *rp) noex {
 /* end subroutine (cfa26ll) */
 
 int cfa26ui(cchar *sp,int sl,uint *rp) noex {
-	int		*rrp = reinterpret_cast<int *>(rp) ;
+	int		*rrp = cast_reinterpret<int *>(rp) ;
 	return cfalphax(sp,sl,base,rrp) ;
 }
 /* end subroutine (cfa26ui) */
 
 int cfa26ul(cchar *sp,int sl,ulong *rp) noex {
-	long		*rrp = reinterpret_cast<long *>(rp) ;
+	long		*rrp = cast_reinterpret<long *>(rp) ;
 	return cfalphax(sp,sl,base,rrp) ;
 }
 /* end subroutine (cfa26ul) */
 
 int cfa26ull(cchar *sp,int sl,ulonglong *rp) noex {
-	longlong	*rrp = reinterpret_cast<longlong *>(rp) ;
+	longlong	*rrp = cast_reinterpret<longlong *>(rp) ;
 	return cfalphax(sp,sl,base,rrp) ;
 }
 /* end subroutine (cfa26ull) */

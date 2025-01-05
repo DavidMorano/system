@@ -29,7 +29,6 @@
 	base) into the normal integer types: these being |int|,
 	|long|, and |longlong| and their associated unsigned
 	variations.
-		-- David A.D. Morano, 2023-10-10
 
 	Notes:
 	1. This code is limited to a maximum base of 64.
@@ -52,12 +51,14 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<stdintx.h>
+#include	<sfx.h>
+#include	<cfutil.h>
 #include	<char.h>
 #include	<ischarx.h>
 
 
 template<stdintx T> struct cfashelp {
-	cint		nb = (CHAR_BIT * sizeof(T)) ;
+	cint		nb = (CHAR_BIT * szof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
 	T		cutoff{} ;
@@ -75,6 +76,33 @@ template<stdintx T> struct cfashelp {
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
+	int getsign() noex {
+	    int		rs = SR_FAULT ;
+	    if (rp) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if ((sl > 0) && isplusminus(*sp)) {
+	            fneg = (*sp == '-') ;
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if (sl > 1) {
+		    cint r = cfx::rmleadzero(sp,sl) ;
+		    sp += (sl - r) ;
+		    sl = r ;
+		} else if (sl == 0) {
+		    rs = SR_INVALID ;
+		} /* end if */
+	    } /* end if (non-null) */
+	    return rs ;
+	} ; /* end if (getsign) */
 	void prepare() noex {
 	    cutoff = fneg ? tmin : tmax ;
 	    cutlim = int(cutoff % base) ;
@@ -99,27 +127,6 @@ template<stdintx T> struct cfashelp {
 	    }
 	    return rs ;
 	} ; /* end method (getval) */
-	int getsign() noex {
-	    int		rs = SR_FAULT ;
-	    if (rp) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if ((sl > 0) && isplusminus(*sp)) {
-	            fneg = (*sp == '-') ;
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if (sl == 0) rs = SR_INVALID ;
-	    } /* end if (non-null) */
-	    return rs ;
-	} ; /* end if (getsign) */
 	int proc() noex {
 	    int		rs = SR_INVALID ;
 	    if (fneg) {
@@ -154,7 +161,8 @@ template<stdintx T> struct cfashelp {
 	} ; /* end method (proc) */
 } ; /* end struct (cfashelp) */
 
-template<typename T> int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+template<typename T> 
+inline int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    if (cfashelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {

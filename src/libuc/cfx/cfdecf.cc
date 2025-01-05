@@ -42,19 +42,24 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
-#include	<snwcpy.h>
 #include	<sfx.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
+#include	<strnul.hh>
 #include	<localmisc.h>		/* <- for |DIGBUFLEN| below */
 
 #include	"cfdecf.h"
+#include	"cfutil.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+using cfx::sfdigs ;			/* subroutine */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -79,35 +84,15 @@
 
 int cfdecf(cchar *snp,int snl,double *rp) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
 	if (snp && rp) {
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
-	    if (int sl ; (sl = sfshrink(snp,snl,&sp)) > 0) {
-	        cint	dlen = DIGBUFLEN ;
-	        int	bl = sl ;
-	        char	dbuf[DIGBUFLEN + 1] ;
-	        cchar	*bp = sp ;
-		rs = SR_OK ;
-	        if ((sl >= 0) && sp[sl]) {
-	            bp = dbuf ;
-	            rs = snwcpy(dbuf,dlen,sp,sl) ;
-	            bl = rs ;
-	        }
-	        if ((rs >= 0) && bl) {
-	            cint	ch = mkchar(*bp) ;
-	            if ((! isdigitlatin(ch)) && (ch != '.')) {
-	                rs = SR_INVALID ;
-	            }
-	        }
-	        if (rs >= 0) {
-	            char	*ep{} ;
-	            rs = uc_strtod(bp,&ep,rp) ;
-		    len = (ep - bp) ;
-	        }
-	    } /* end if (sfshrink) */
+	    if (int sl ; (sl = sfdigs(snp,snl,&sp)) > 0) {
+		strnul	str(sp,sl) ;
+	        rs = uc_strtod(str,nullptr,rp) ;
+	    } /* end if (sfdigs) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 }
 /* end subroutine (cfdecf) */
 

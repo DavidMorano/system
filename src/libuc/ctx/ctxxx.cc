@@ -118,7 +118,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	*rp = '\0' ;
 	if (v != 0) {
 	    int		di ;
-	    if_constexpr (sizeof(UT) > sizeof(ulong)) {
+	    if_constexpr (szof(UT) > szof(ulong)) {
 	        const UT	vmask(~ ULONG_MAX) ;
 	        UT		nv ;
 	        while ((v & vmask) != 0UL) {

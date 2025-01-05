@@ -86,7 +86,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<uvariables.hh>
-#include	<cfdec.h>
+#include	<usupport.h>		/* |libu::cfdec(3u)| */
 #include	<randlc.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -101,6 +101,7 @@
 
 #define	STIRINTERVAL	(5 * 60)
 #define	MAINTCOUNT	1000
+#define	LOOPMULT	10
 
 #define	NINITS		8		/* number initiailization vars */
 #define	NLS		8		/* number of longs in array(of) */
@@ -111,6 +112,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libu::cfdec ;			/* subroutine (overloaded) */
 using std::nothrow ;			/* constant */
 
 
@@ -216,9 +218,9 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	        } else {
 		    rs = randomvar_initreal(op,seed) ;
 	        } /* end if (initializing state) */
-    		/* our polynomial --  x**128 + x**67 + x**23 + 1  */
+    		/* our polynomial --  x**127 + x**67 + x**23 + 1  */
 		if (rs >= 0) {
-		    cint	n = (slen * 10) ;
+		    cint	n = (slen * LOOPMULT) ;
 	            op->a = COF(67) ;
 	            op->b = COF(23) ;
 	            op->c = COF(0) ;
@@ -543,18 +545,18 @@ static int wrulong(char *bp,int bl,ulong ulw) noex {
 
 /* this extracts process-constant randoness (done only once) */
 static int mkprocrand() noex {
-	uint		v ;
+	uint		uv ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*var = getenv(varname.random) ;
-	initrv.v[c++] = (v = getpid(),randlc(v)) ;
-	initrv.v[c++] = (v = getuid(),randlc(v)) ;
-	initrv.v[c++] = (v = getppid(),randlc(v)) ;
-	initrv.v[c++] = (v = getpgrp(),randlc(v)) ;
-	initrv.v[c++] = (v = getsid(0),randlc(v)) ;
+	initrv.v[c++] = (uv = getpid(),randlc(uv)) ;
+	initrv.v[c++] = (uv = getuid(),randlc(uv)) ;
+	initrv.v[c++] = (uv = getppid(),randlc(uv)) ;
+	initrv.v[c++] = (uv = getpgrp(),randlc(uv)) ;
+	initrv.v[c++] = (uv = getsid(0),randlc(uv)) ;
 	if (var) {
-	    if ((rs = cfdecui(var,-1,&v)) >= 0) {
-		initrv.v[c++] = v ;
+	    if (int v{} ; (rs = cfdec(var,-1,&v)) >= 0) {
+		initrv.v[c++] = uint(v) ;
 	    } else if (isNotValid(rs)) {
 		rs = SR_OK ;
 	    }
