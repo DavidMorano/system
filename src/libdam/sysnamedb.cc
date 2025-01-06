@@ -1,8 +1,8 @@
-/* dbi SUPPORT */
+/* sysnamedb SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* object to access both NODEDB and clusterdb objects */
+/* object to access both NODEDB and CLUSTERDB objects */
 /* version %I% last-modified %G% */
 
 
@@ -24,7 +24,7 @@
 /*******************************************************************************
 
   	Object:
-	dbi
+	sysnamedb
 
 	Description:
 	This hack just keeps some interactions with a NODEDB object
@@ -54,7 +54,7 @@
 #include	<iserror.h>
 #include	<localmisc.h>
 
-#include	"dbi.h"
+#include	"sysnamedb.h"
 
 
 /* local defines */
@@ -101,8 +101,8 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int dbi_ctor(dbi *op,Args ... args) noex {
-    	DBI		*hop = op ;
+static int sysnamedb_ctor(sysnamedb *op,Args ... args) noex {
+    	SYSNAMEDB	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -120,9 +120,9 @@ static int dbi_ctor(dbi *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dbi_ctor) */
+/* end subroutine (sysnamedb_ctor) */
 
-static int dbi_dtor(dbi *op) noex {
+static int sysnamedb_dtor(sysnamedb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -137,24 +137,24 @@ static int dbi_dtor(dbi *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dbi_dtor) */
+/* end subroutine (sysnamedb_dtor) */
 
 template<typename ... Args>
-static inline int dbi_magic(dbi *op,Args ... args) noex {
+static inline int sysnamedb_magic(sysnamedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DBI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SYSNAMEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (dbi_magic) */
+/* end subroutine (sysnamedb_magic) */
 
-static int dbi_nodebegin(dbi *,ids *,cchar *) noex ;
-static int dbi_nodeend(dbi *) noex ;
-static int dbi_clusterbegin(dbi *,ids *,cchar *) noex ;
-static int dbi_clusterend(dbi *) noex ;
-static int dbi_trynodes(dbi *,vecstr *,cc *) noex ;
-static int dbi_tryclusters(dbi *,vecstr *,cc *) noex ;
+static int sysnamedb_nodebegin(sysnamedb *,ids *,cchar *) noex ;
+static int sysnamedb_nodeend(sysnamedb *) noex ;
+static int sysnamedb_clusterbegin(sysnamedb *,ids *,cchar *) noex ;
+static int sysnamedb_clusterend(sysnamedb *) noex ;
+static int sysnamedb_trynodes(sysnamedb *,vecstr *,cc *) noex ;
+static int sysnamedb_tryclusters(sysnamedb *,vecstr *,cc *) noex ;
 
 
 /* local variables */
@@ -167,21 +167,21 @@ static vars		var ;
 
 /* exported subroutines */
 
-int dbi_open(dbi *op,cchar *pr) noex {
+int sysnamedb_open(sysnamedb *op,cchar *pr) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dbi_ctor(op,pr)) >= 0) {
+	if ((rs = sysnamedb_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
 	            if (ids id ; (rs = id.load) >= 0) {
-	                if ((rs = dbi_nodebegin(op,&id,pr)) >= 0) {
-	                    if ((rs = dbi_clusterbegin(op,&id,pr)) >= 0) {
-			        op->magic = DBI_MAGIC ;
+	                if ((rs = sysnamedb_nodebegin(op,&id,pr)) >= 0) {
+	                    if ((rs = sysnamedb_clusterbegin(op,&id,pr)) >= 0) {
+			        op->magic = SYSNAMEDB_MAGIC ;
 			    }
 	                    if (rs < 0) {
-	                        dbi_nodeend(op) ;
+	                        sysnamedb_nodeend(op) ;
 		            }
 	                } /* end if (node-db) */
 	                rs1 = id.release ;
@@ -190,44 +190,44 @@ int dbi_open(dbi *op,cchar *pr) noex {
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
-		dbi_dtor(op) ;
+		sysnamedb_dtor(op) ;
 	    }
-	} /* end if (dbi_ctor) */
+	} /* end if (sysnamedb_ctor) */
 	return rs ;
 }
-/* end subroutine (dbi_open) */
+/* end subroutine (sysnamedb_open) */
 
-int dbi_close(dbi *op) noex {
+int sysnamedb_close(sysnamedb *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dbi_magic(op)) >= 0) {
+	if ((rs = sysnamedb_magic(op)) >= 0) {
 	    {
-	        rs1 = dbi_nodeend(op) ;
+	        rs1 = sysnamedb_nodeend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = dbi_clusterend(op) ;
+	        rs1 = sysnamedb_clusterend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = dbi_dtor(op) ;
+	        rs1 = sysnamedb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (dbi_close) */
+/* end subroutine (sysnamedb_close) */
 
-int dbi_getclusters(dbi *op,vecstr *slp,cchar *nn) noex {
+int sysnamedb_getclusters(sysnamedb *op,vecstr *slp,cchar *nn) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = dbi_magic(op,slp,nn)) >= 0) {
+	if ((rs = sysnamedb_magic(op,slp,nn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (nn[0]) {
-		if ((rs = dbi_trynodes(op,slp,nn)) >= 0) {
+		if ((rs = sysnamedb_trynodes(op,slp,nn)) >= 0) {
 		    c += rs ;
-		    if ((rs = dbi_tryclusters(op,slp,nn)) >= 0) {
+		    if ((rs = sysnamedb_tryclusters(op,slp,nn)) >= 0) {
 			c += rs ;
 		    }
 		}
@@ -235,13 +235,13 @@ int dbi_getclusters(dbi *op,vecstr *slp,cchar *nn) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (dbi_getclusters) */
+/* end subroutine (sysnamedb_getclusters) */
 
-int dbi_getnodes(dbi *op,vecstr *clp,vecstr *nlp) noex {
+int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = dbi_magic(op,clp,nlp)) >= 0) {
+	if ((rs = sysnamedb_magic(op,clp,nlp)) >= 0) {
 	    if (char *cbuf{} ; (rs = malloc_nn(&cbuf)) >= 0) {
 		clusterdb	*cop = op->clp ;
 		cint		clen = rs ;
@@ -274,12 +274,12 @@ int dbi_getnodes(dbi *op,vecstr *clp,vecstr *nlp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (dbi_getnodes) */
+/* end subroutine (sysnamedb_getnodes) */
 
 
 /* private subroutines */
 
-static int dbi_nodebegin(dbi *op,ids *idp,cchar *pr) noex {
+static int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
@@ -300,9 +300,9 @@ static int dbi_nodebegin(dbi *op,ids *idp,cchar *pr) noex {
 	} /* end if (m-a-f) */
 	return rs ;
 }
-/* end subroutine (dbi_nodebegin) */
+/* end subroutine (sysnamedb_nodebegin) */
 
-static int dbi_nodeend(dbi *op) noex {
+static int sysnamedb_nodeend(sysnamedb *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.node) {
@@ -313,9 +313,9 @@ static int dbi_nodeend(dbi *op) noex {
 	}
 	return rs ;
 }
-/* end subroutine (dbi_nodeend) */
+/* end subroutine (sysnamedb_nodeend) */
 
-static int dbi_clusterbegin(dbi *op,ids *idp,cchar *pr) noex {
+static int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
 	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
@@ -336,9 +336,9 @@ static int dbi_clusterbegin(dbi *op,ids *idp,cchar *pr) noex {
 	} /* end if (m-a-f) */
 	return rs ;
 }
-/* end subroutine (dbi_clusterbegin) */
+/* end subroutine (sysnamedb_clusterbegin) */
 
-static int dbi_clusterend(dbi *op) noex {
+static int sysnamedb_clusterend(sysnamedb *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.clu) {
@@ -349,9 +349,9 @@ static int dbi_clusterend(dbi *op) noex {
 	}
 	return rs ;
 }
-/* end subroutine (dbi_clusterend) */
+/* end subroutine (sysnamedb_clusterend) */
 
-static int dbi_trynodes(dbi *op,vecstr *slp,cc *nn) noex {
+static int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -384,9 +384,9 @@ static int dbi_trynodes(dbi *op,vecstr *slp,cc *nn) noex {
 	} /* end if (DB lookup) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (dbi_trynodes) */
+/* end subroutine (sysnamedb_trynodes) */
 
-static int dbi_tryclusters(dbi *op,vecstr *slp,cc *nn) noex {
+static int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -416,7 +416,7 @@ static int dbi_tryclusters(dbi *op,vecstr *slp,cc *nn) noex {
 	} /* end if (have cluster-DB) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (dbi_tryclusters) */
+/* end subroutine (sysnamedb_tryclusters) */
 
 vars::operator int () noex {
     	int		rs ;

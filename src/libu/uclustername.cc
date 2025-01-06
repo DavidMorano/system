@@ -371,14 +371,12 @@ static int subinfo_cacheset(SUBINFO *sip,uclustername *uip,int ttl) noex {
 	if (ttl < 0) ttl = sip->to ;
 	if ((rs = uclustername_allocbegin(uip,sip->dt,ttl)) > 0) {
 	    uclustername_a	uca ;
-	    int			size = 0 ;
-	    char		*bp ;
-
+	    int			casz = 0 ;
 	    f = true ;
-	    memset(&uca,0,sizeof(uclustername_a)) ;
-	    size += (strlen(sip->nn) + 1) ;
-	    size += (strnlen(sip->rbuf,sip->rlen) + 1) ;
-	    if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	    memclear(&uca) ;
+	    casz += (strlen(sip->nn) + 1) ;
+	    casz += (strnlen(sip->rbuf,sip->rlen) + 1) ;
+	    if (char *bp{} ; (rs = uc_libmalloc(casz,&bp)) >= 0) {
 	        uca.a = bp ;
 	        aprev = uip->a ;
 	        uca.nn = bp ;
@@ -388,11 +386,12 @@ static int subinfo_cacheset(SUBINFO *sip,uclustername *uip,int ttl) noex {
 	        uca.et = sip->dt ;
 	        uca.ttl = ttl ;
 	    } /* end if (m-a) */
-
 	    rs1 = uclustername_allocend(uip,&uca) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (alloc) */
-	if ((rs >= 0) && (aprev != nullptr)) uc_libfree(aprev) ;
+	if ((rs >= 0) && (aprev != nullptr)) {
+	    uc_libfree(aprev) ;
+	}
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (subinfo_cacheset) */

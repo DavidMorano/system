@@ -42,7 +42,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<nulstr.h>
@@ -76,11 +76,11 @@
 /* exported subroutines */
 
 int stackaddr_start(stackaddr *op,char *dbuf,int dlen) noex {
+    	STACKADDR	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && dbuf) {
-	    stackaddr_head	*hp = static_cast<stackaddr_head *>(op) ;
 	    dbuf[0] = '\0' ;
-	    rs = memclear(hp) ;
+	    rs = memclear(hop) ;
 	    op->dbuf = dbuf ;
 	    op->dlen = dlen ;
 	} /* end if (non-null) */
@@ -108,10 +108,9 @@ int stackaddr_add(stackaddr *op,cchar *hp,int hl,cchar *up,int ul) noex {
                     op->i = op->ri ;
                 }
                 if ((rs >= 0) && (hp != np) && (hp[0] != '\0')) {
-                    nulstr      h ;
                     cchar       *nhp ;
                     if (hl < 0) hl = strlen(hp) ;
-                    if ((rs = nulstr_start(&h,hp,hl,&nhp)) >= 0) {
+                    if (nulstr h ; (rs = h.start(hp,hl,&nhp)) >= 0) {
                         cchar   *lhp = op->lhp ;
                         int     lhl = op->lhl ;
                         if ((lhp == np) || (strwcmp(nhp,lhp,lhl) != 0)) {
@@ -133,7 +132,7 @@ int stackaddr_add(stackaddr *op,cchar *hp,int hl,cchar *up,int ul) noex {
                                 op->ri = op->i ;
                             }
                         } /* end if (a new different host) */
-                        rs1 = nulstr_finish(&h) ;
+                        rs1 = h.finish ;
                         if (rs >= 0) rs = rs1 ;
                     } /* end if (nulstr) */
                 } /* end if (had a host) */

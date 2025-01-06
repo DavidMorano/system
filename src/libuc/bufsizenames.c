@@ -1,4 +1,5 @@
 /* bufsizenames SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C23 (MUST-BE C-language) */
 
 /* enumerate the various system buffer-size names */
@@ -56,6 +57,8 @@ cchar *bufsizenames[] = {
 	[getbufsize_sv] = "SV",		/* service-ent */
 	[getbufsize_fs] = "FS",		/* filesystem-type */
 	[getbufsize_zn] = "ZN",		/* zone-name (from Zone-Info) */
+	[getbufsize_ps] = "PS",		/* page-size */
+	[getbufsize_mailaddr] = "MAILADDR",	/* page-size */
 	nullptr
 } ; /* end array (bufsizenames) */
 

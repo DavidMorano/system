@@ -85,6 +85,7 @@
 #include	<cfdecmf.h>
 #include	<isnot.h>
 #include	<bufsizedata.hh>
+#include	<mailvalues.hh>		/* |hostnamemult| + |nodenamemult| */
 #include	<localmisc.h>
 
 #include	"getbufsize.h"
@@ -117,8 +118,11 @@ namespace {
 	int init() noex ;
 	int begin() noex ;
 	int load() noex ;
-	int def(int) noex ;
+	int loadent(cchar *) noex ;
+	int retrieve(int) noex ;
 	int sysbs(int,int) noex ;
+	int def(int) noex ;
+	int mailaddr(int) noex ;
     public:
 	int		bs[getbufsize_overlast] ; /* Buffer-Size */
 	int operator [] (int) noex ;
@@ -151,7 +155,7 @@ int ubufsize::operator [] (int w) noex {
 	if ((w >= 0) && (w < getbufsize_overlast)) {
 	    if ((rs = bs[w]) == 0) {
 	        if ((rs = init()) >= 0) {
-	            rs = def(w) ;
+	            rs = retrieve(w) ;
 	        } /* end if (ubufsize::init) */
 	    } /* end if (need initialization) */
 	} /* end if (valid) */
@@ -200,36 +204,14 @@ int ubufsize::load() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (! floaded) {
-	    vecstr	cv ;
 	    floaded = true ;
-	    if ((rs = vecstr_start(&cv,1,0)) >= 0) {
+	    if (vecstr cv ; (rs = vecstr_start(&cv,1,0)) >= 0) {
 	        cchar	*fn = GETBUFSIZE_CONF ;
 	        if ((rs = vecstr_envfile(&cv,fn)) >= 0) {
-	            int		kl, vl ;
-	            cchar	*tp ;
-	            cchar	*kp, *vp ;
+	            cchar	*kp ;
 	            for (int i = 0 ; vecstr_get(&cv,i,&kp) >= 0 ; i += 1) {
 	                if (kp) {
-	                    vp = nullptr ;
-	                    kl = -1 ;
-	                    vl = 0 ;
-	                    if ((tp = strchr(kp,'=')) != nullptr) {
-	                        kl = (tp-kp) ;
-	                        vp = (tp+1) ;
-	                        vl = -1 ;
-	                    }
-	                    if (vp) {
-	                        int		w ;
-				cchar		**vars = bufsizenames ;
-	                        if ((w = matocasestr(vars,4,kp,kl)) >= 0) {
-	                            int		v ;
-	                            if ((rs = cfdecmfi(vp,vl,&v)) >= 0) {
-	                                bs[w] = v ;
-	                            } else if (isNotValid(rs)) {
-	                                rs = SR_OK ;
-	                            }
-	                        } /* end if (matocasestr) */
-	                    } /* end if (non-null) */
+			    rs = loadent(kp) ;
 	                } /* end if (non-null) */
 	                if (rs < 0) break ;
 	            } /* end for */
@@ -244,7 +226,29 @@ int ubufsize::load() noex {
 }
 /* end subroutine (getbufsize_load) */
 
-int ubufsize::def(int w) noex {
+int ubufsize::loadent(cchar *kp) noex {
+    	int		rs = SR_OK ;
+	int		kl = -1 ;
+	int		vl = 0 ;
+	cchar		*vp = nullptr ;
+	cchar		**vars = bufsizenames ;
+	if (cchar *tp ; (tp = strchr(kp,'=')) != nullptr) {
+	    kl = (tp-kp) ;
+	    vp = (tp+1) ;
+	    vl = -1 ;
+	} /* end if */
+	if (int w ; (w = matocasestr(vars,4,kp,kl)) >= 0) {
+	    if (int v ; (rs = cfdecmfi(vp,vl,&v)) >= 0) {
+		bs[w] = v ;
+	    } else if (isNotValid(rs)) {
+		rs = SR_OK ;
+	    }
+	} /* end if (matocasestr) */
+	return rs ;
+} 
+/* end method (ubufsize::loadent) */
+
+int ubufsize::retrieve(int w) noex {
 	int		rs ;
 	if ((rs = bs[w]) == 0) {
 	    cint	name = bufdata[w].name ;
@@ -257,13 +261,13 @@ int ubufsize::def(int w) noex {
  		   rs  = GETBUFSIZE_DEFVAL ;
 		} /* end if (ubufsize::sysbs) */
 	    } else {
-		rs = (defval) ? defval : GETBUFSIZE_DEFVAL ;
+		rs = def(w) ;
 		bs[w] = rs ;
 	    } /* end if */
 	} /* end if (getting default value) */
 	return rs ;
 }
-/* end subroutine (ubufsize::def) */
+/* end subroutine (ubufsize::retrieve) */
 
 int ubufsize::sysbs(int w,int name) noex {
 	int		rs = bs[w] ;
@@ -276,6 +280,42 @@ int ubufsize::sysbs(int w,int name) noex {
 	} /* end if */
 	return rs ;
 }
-/* end subroutine (getbufsize_sysbs) */
+/* end method (ubufsize::sysbs) */
+
+int ubufsize::def(int w) noex {
+	cint		defval = bufdata[w].defval ;
+	int		rs = SR_OK ;
+	if (defval >= 0) {
+    	    bs[w] = (defval) ? defval : GETBUFSIZE_DEFVAL ;
+	} else {
+	    switch (w) {
+	    case getbufsize_mailaddr:
+		rs = mailaddr(w) ;
+	        break ;
+	    default:
+		rs = SR_NOTSUP ;
+		break ;
+	    } /* end switch */
+	} /* end if */
+	return rs ;
+}
+/* end method (ubufsize::def) */
+
+/* yes; I call myself recursively - repeatedly (deal with it) */
+int ubufsize::mailaddr(int w) noex {
+    	cint		hostmult = mailvalue.hostnamemult ;
+    	cint		nodemult = mailvalue.nodenamemult ;
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    cint	hnl = rs ;
+	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+		cint	nnl = rs ;
+		rs = ((hostmult * hnl) + (nodemult * nnl)) ;
+		bs[w] = rs ;
+	    }
+	}
+	return rs ;
+}
+/* end method (ubufsize::mailaddr) */
 
 

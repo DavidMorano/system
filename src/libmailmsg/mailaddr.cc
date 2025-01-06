@@ -54,6 +54,8 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>		/* for |getbufsize_mailaddr| */
+#include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<strn.h>
 #include	<sncpyx.h>
@@ -75,7 +77,28 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct vars {
+	int		hostnamelen ;
+	int		mailaddrlen ;
+	operator int () noex ;
+    } ; /* end struct (val) */
+}
+
+
+/* forward references */
+
+
 /* local variables */
+
+static vars		var ;
+
+constexpr char		localhostpart[] = MAILADDR_LOCALHOST ;
 
 
 /* exported variables */
@@ -84,79 +107,82 @@
 /* exported subroutines */
 
 int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
-	int		rs = SR_OK ;
-	int		t ;
-	int		mal = MAILADDRLEN ;
-	cchar	*localhostpart = MAILADDR_LOCALHOST ;
-	cchar	*cp ;
-	cchar	*cp1, *cp2 ;
-
-	if (sp == nullptr) return SR_FAULT ;
-	if (mahost == nullptr) return SR_FAULT ;
-	if (malocal == nullptr) return SR_FAULT ;
-
-	mahost[0] = '\0' ;
-	malocal[0] = '\0' ;
-	if (sl < 0) sl = strlen(sp) ;
-
-/* what kind of address do we have? */
-
-	if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
-	    if ((cp2 = strnchr(sp,sl,':')) != nullptr) {
-/* ARPAnet route address */
-	        t = MAILADDRTYPE_ARPAROUTE ;
-	        if ((cp = strnchr(sp,sl,',')) != nullptr) {
+	int		rs = SR_FAULT ;
+	int		t = 0 ;
+	if (sp && mahost && malocal) {
+	    static cint		rsv = var ;
+	    mahost[0] = '\0' ;
+	    malocal[0] = '\0' ;
+	    if ((rs = rsv) >= 0) {
+	        cint	hnl = var.hostnamelen ; /* host-name length */
+	        cint	mal = var.mailaddrlen ; /* mail-address length */
+	        cchar	*cp ;
+	        cchar	*cp1 ;
+	        cchar	*cp2 ;
+	        rs = SR_OK ;
+	        if (sl < 0) sl = strlen(sp) ;
+	        /* what kind of address do we have? */
+	        if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
+	            if ((cp2 = strnchr(sp,sl,':')) != nullptr) {
+		        /* ARPAnet route address */
+	                t = MAILADDRTYPE_ARPAROUTE ;
+	                if ((cp = strnchr(sp,sl,',')) != nullptr) {
+	                    if (rs >= 0) {
+			        cint	vlen = (cp - (cp1 + 1)) ;
+			        cchar	*vstr = (cp1 + 1) ;
+	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
+		            }
+	                    if (rs >= 0) {
+	                        rs = sncpy1(malocal,mal,(cp + 1)) ;
+		            }
+	                } else {
+	                    if (rs >= 0) {
+			        cint	vlen = (cp2 - (cp1 + 1)) ;
+			        cchar	*vstr = (cp1 + 1) ;
+	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
+		            }
+	                    if (rs >= 0) {
+	                        rs = sncpy1(malocal,mal,(cp2 + 1)) ;
+		            }
+	                } /* end if */
+	            } else {
+		        /* normal ARPAnet address */
+	                t = MAILADDRTYPE_ARPA ;
+	                if (rs >= 0) {
+	                    rs = sncpy1(mahost,hnl,(cp1 + 1)) ;
+		        }
+	                if (rs >= 0) {
+	                    rs = snwcpy(malocal,mal,sp,(cp1 - sp)) ;
+		        }
+	            } /* end if */
+	        } else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
+	            t = MAILADDRTYPE_UUCP ;
 	            if (rs >= 0) {
-	                rs = snwcpy(mahost,mal,(cp1 + 1),(cp - (cp1 + 1))) ;
-		    }
+	                rs = snwcpy(mahost,hnl,sp,(cp - sp)) ;
+	            }
 	            if (rs >= 0) {
 	                rs = sncpy1(malocal,mal,(cp + 1)) ;
-		    }
+	            }
 	        } else {
+	           /* local */
+	            t = MAILADDRTYPE_LOCAL ;
 	            if (rs >= 0) {
-	                rs = snwcpy(mahost,mal,(cp1 + 1),cp2 - (cp1 + 1)) ;
-		    }
+	                rs = sncpy1(mahost,hnl,localhostpart) ;
+	            }
 	            if (rs >= 0) {
-	                rs = sncpy1(malocal,mal,(cp2 + 1)) ;
-		    }
+	                rs = snwcpy(malocal,mal,sp,sl) ;
+	            }
 	        } /* end if */
-	    } else {
-/* normal ARPAnet address */
-	        t = MAILADDRTYPE_ARPA ;
+	        /* perform some cleanup (remove stupid trailing dots) */
 	        if (rs >= 0) {
-	            rs = sncpy1(mahost,mal,(cp1 + 1)) ;
-		}
-	        if (rs >= 0) {
-	            rs = snwcpy(malocal,mal,sp,(cp1 - sp)) ;
-		}
-	    } /* end if */
-	} else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
-	    t = MAILADDRTYPE_UUCP ;
-	    if (rs >= 0) {
-	        rs = snwcpy(mahost,mal,sp,(cp - sp)) ;
-	    }
-	    if (rs >= 0) {
-	        rs = sncpy1(malocal,mal,(cp + 1)) ;
-	    }
-	} else {
-/* local */
-	    t = MAILADDRTYPE_LOCAL ;
-	    if (rs >= 0) {
-	        rs = sncpy1(mahost,mal,localhostpart) ;
-	    }
-	    if (rs >= 0) {
-	        rs = snwcpy(malocal,mal,sp,sl) ;
-	    }
-	} /* end if */
-/* perform some cleanup on host-domain part (remove stupid trailing dots) */
-	if (rs >= 0) {
-	    int		cl = strlen(mahost) ;
-	    while ((cl > 0) && (mahost[cl - 1] == '.')) {
-	        cl -= 1 ;
-	    }
-	    mahost[cl] = '\0' ;
-	} /* end if (ok) */
-
+	            int		cl = strlen(mahost) ;
+	            while ((cl > 0) && (mahost[cl - 1] == '.')) {
+	                cl -= 1 ;
+	            }
+	            mahost[cl] = '\0' ;
+	        } /* end if (ok) */
+	    } /* end if (vars) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? t : rs ;
 }
 /* end subroutine (mailaddrparse) */
@@ -164,144 +190,139 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 /* put an address back together as it was ORIGINALLY */
 int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		len = 0 ;
 	if (dp && mahost && malocal) {
 	    rs = SR_INVALID ;
 	    if (type >= 0) {
+		storebuf	b(dp,dl) ;
 		rs = SR_OK ;
 	        switch (type) {
 	        case MAILADDRTYPE_LOCAL:
 	  	    {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            break ;
 	        case MAILADDRTYPE_UUCP:
 		    {
-	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
-	                i += rs ;
+	                rs = b.str(mahost) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,"!",1) ;
-	                i += rs ;
+	                rs = b.strw("!",1) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            break ;
 	        case MAILADDRTYPE_ARPA:
 		    {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,"@",1) ;
-	                i += rs ;
+	                rs = b.strw("@",1) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
-	                i += rs ;
+	                rs = b.str(mahost) ;
 		    }
 	            break ;
 	        case MAILADDRTYPE_ARPAROUTE:
 		    {
-	                rs = storebuf_strw(dp,dl,0, "@",1) ;
-	                i += rs ;
+	                rs = b.strw("@",1) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
-	                i += rs ;
+	                rs = b.str(mahost) ;
 		    }
 	            if (rs >= 0) {
 	                if (strchr(malocal,':') != nullptr) {
-	                    rs = storebuf_strw(dp,dl,i,",",1) ;
+	                    rs = b.strw(",",1) ;
 	                } else {
-	                    rs = storebuf_strw(dp,dl,i,":",1) ;
-	                    i += rs ;
+	                    rs = b.strw(":",1) ;
 		        }
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            break ;
 	        } /* end switch */
+		len = b.idx ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mailaddjoin) */
 
 /* put an address back together as its ARPA form only */
 int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		len = 0 ;
 	if (dp && mahost && malocal) {
 	    rs = SR_INVALID ;
 	    if (type >= 0) {
+		storebuf	b(dp,dl) ;
 	        rs = SR_OK ;
 	        switch (type) {
 	        case MAILADDRTYPE_LOCAL:
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            break ;
 	        case MAILADDRTYPE_UUCP:
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,"@",1) ;
-	                i += rs ;
+	                rs = b.strw("@",1) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
-	                i += rs ;
+	                rs = b.str(mahost) ;
 		    }
 	            break ;
 	        case MAILADDRTYPE_ARPA:
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,"@",1) ;
-	                i += rs ;
+	                rs = b.strw("@",1) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
-	                i += rs ;
+	                rs = b.str(mahost) ;
 		    }
 	            break ;
 	        case MAILADDRTYPE_ARPAROUTE:
 		    if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,"@",1) ;
-	                i += rs ;
+	                rs = b.strw("@",1) ;
 		    }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
-	                i += rs ;
+	                rs = b.str(mahost) ;
 		    }
 	            if (rs >= 0) {
 	                if (strchr(malocal,':') != nullptr) {
-	                    rs = storebuf_strw(dp,dl,i,",",1) ;
-	                } else
-	                    rs = storebuf_strw(dp,dl,i,":",1) ;
-	                i += rs ;
+	                    rs = b.strw(",",1) ;
+	                } else {
+	                    rs = b.strw(":",1) ;
+			}
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
-	                i += rs ;
+	                rs = b.str(malocal) ;
 		    }
 	            break ;
 	        } /* end switch */
+		len = b.idx ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mailaddrarpa) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    hostnamelen = rs ;
+	    if ((rs = getbufsize(getbufsize_mailaddr)) >= 0) {
+	        mailaddrlen = rs ;
+	    }
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

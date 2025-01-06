@@ -733,7 +733,7 @@ dayofmonth.o:		dayofmonth.cc dayofmonth.h
 netfile.o:		netfile.cc netfile.h
 calmgr.o:		calmgr.cc calmgr.h
 cvtdater.o:		cvtdater.cc cvtdater.h
-dbi.o:			dbi.cc dbi.h
+sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
 
 textlook.o:		textlook.cc textlook.h

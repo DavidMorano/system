@@ -890,6 +890,7 @@ rsfree.o:		rsfree.cc rsfree.h
 xfile.o:		xfile.cc xfile.h
 nisdomainname.o:	nisdomainname.cc nisdomainname.h
 sysmemutil.o:		sysmemutil.cc sysmemutil.h
+mailvalues.o:		mailvalues.cc mailvalues.hh
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h

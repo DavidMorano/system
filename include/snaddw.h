@@ -24,6 +24,10 @@
 	This subroutine adds a c-string to the end of an existing
 	string.  Return the incremental amount added.
 
+	Notes:
+	This subroutine sbould be the same as (the older)
+	|storebuf_strw(3uc)|.
+
 ******************************************************************************/
 
 #ifndef	SNADDW_INCLUDE

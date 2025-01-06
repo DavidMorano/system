@@ -51,13 +51,13 @@
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<ids.h>
+#include	<sysnamedb.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"dialopts.h"
 #include	"config.h"
 #include	"defs.h"
-#include	"dbi.h"
 #include	"proglog.h"
 
 
@@ -1237,64 +1237,47 @@ static int procprintnodes(PROGINFO *pip,cchar *ofn)
 }
 /* end subroutine (procprintnodes) */
 
-
-static int procprintnoding(PROGINFO *pip,bfile *ofp)
-{
-	DBI		info ;
+static int procprintnoding(PROGINFO *pip,bfile *ofp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = dbi_open(&info,pip->pr)) >= 0) {
-	    VECSTR	clusters, nodes ;
-	    if ((rs = vecstr_start(&clusters,10,0)) >= 0) {
-	        if ((rs = vecstr_start(&nodes,30,0)) >= 0) {
+	if (sysnamedb info ; (rs = sysnamedb_open(&info,pip->pr)) >= 0) {
+	    if (vecstr clusters ; (rs = vecstr_start(&clusters,10,0)) >= 0) {
+	        if (vecstr nodes ; (rs = vecstr_start(&nodes,30,0)) >= 0) {
 	            cchar	*cn = pip->clustername ;
 	            cchar	*nn = pip->nodename ;
-
 	            if ((cn != NULL) && (cn[0] != '\0')) {
 	                rs = vecstr_add(&clusters,cn,-1) ;
 	            } else {
-	                rs = dbi_getclusters(&info,&clusters,nn) ;
+	                rs = sysnamedb_getclusters(&info,&clusters,nn) ;
 	            }
-
 	            if (rs >= 0) {
-	                rs = dbi_getnodes(&info,&clusters,&nodes) ;
+	                rs = sysnamedb_getnodes(&info,&clusters,&nodes) ;
 	            }
-
 	            if (rs >= 0) {
-	                int	i ;
 	                cchar	*cp ;
-	                for (i = 0 ; vecstr_get(&nodes,i,&cp) >= 0 ; i += 1) {
-	                    if (cp != NULL) {
+	                for (int i = 0 ; nodes.get(i,&cp) >= 0 ; i += 1) {
+	                    if (cp) {
 	                        rs = bprintln(ofp,cp,-1) ;
 	                        wlen += rs ;
 	                    }
 	                    if (rs < 0) break ;
 	                } /* end for */
 	            } /* end if */
-
 	            rs1 = vecstr_finish(&nodes) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nodes) */
 	        rs1 = vecstr_finish(&clusters) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (clusters) */
-	    rs1 = dbi_close(&info) ;
+	    rs1 = sysnamedb_close(&info) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dbi) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main/procprintnoding: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procprintnoding) */
 
-
-static int procdial(PROGINFO *pip,cchar *rhostname,cchar *rcmdname)
-{
+static int procdial(PROGINFO *pip,cchar *rhostname,cchar *rcmdname) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1577,11 +1560,9 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
 #if	CF_LOCINFOSET
-int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 

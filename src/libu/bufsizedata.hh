@@ -88,8 +88,7 @@ namespace {
 	bufsizeitem	item[getbufsize_overlast] = {} ;
 	constexpr bufsizedata() noex ;
 	constexpr bufsizeitem operator [] (int w) const noex {
-	    bufsizeitem		def{-1,0} ;
-	    bufsizeitem		it = def ;
+	    bufsizeitem		it = {-1,0} ;
 	    if ((w >= 0) && (w < getbufsize_overlast)) {
 	        it = item[w] ;
 	    }
@@ -172,6 +171,13 @@ constexpr bufsizedata::bufsizedata() noex {
 	    case getbufsize_zn:
 	        ip->name = _SC_TZNAME_MAX ;
 		ip->defval = ZNBUFLEN ;
+	        break ;
+	    case getbufsize_ps:
+	        ip->name = _SC_PAGESIZE ;
+		ip->defval = (8 * 1024) ;	/* page-size Solaris® */
+	        break ;
+	    case getbufsize_mailaddr:
+		ip->defval = -1 ;		/* no default size */
 	        break ;
 	    } /* end switch */
 	} /* end for */

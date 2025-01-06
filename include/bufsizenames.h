@@ -1,4 +1,5 @@
 /* bufsizenames HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* list the various system buffer-size names (as strings) */
@@ -57,6 +58,8 @@ enum getbufsizes {
 	getbufsize_sv,		/* service-ent */
 	getbufsize_fs,		/* filesystem-type */
 	getbufsize_zn,		/* zone-name (from Zone-Info) */
+	getbufsize_ps,		/* page-size */
+	getbufsize_mailaddr,	/* mail-addr */
 	getbufsize_overlast
 } ; /* end enum (getbufsizes) */
 

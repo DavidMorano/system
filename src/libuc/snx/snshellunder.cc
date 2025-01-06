@@ -71,6 +71,8 @@
 
 /* local variables */
 
+constexpr int		dch = '*' ;
+
 
 /* exported variables */
 
@@ -81,23 +83,22 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	int		rs = SR_FAULT ;
 	int		idx = 0 ;
 	if (dbuf && execfname) {
-	    storebuf db(dbuf,dlen) ; 
+	    storebuf	b(dbuf,dlen) ; 
 	    rs = SR_OK ;
 	    if (pid >= 0) {
 		if (rs >= 0) {
-		    rs = sb.chr('*') ;
+		    rs = b.chr(dch) ;
 		}
-	        if (rs >= 0) {
-	            uint v = uint(pid) ;
-	            rs = sb.dec(v) ;
+	        if (uint uv = uint(pid) ; rs >= 0) {
+	            rs = b.dec(uv) ;
 	        }
 	        if (rs >= 0) {
-	            rs = sb.chr(mch) ;
+	            rs = b.chr(dch) ;
 	        }
 	    } /* end if (PID included) */
 	    if (rs >= 0) {
-	        rs = sb.str(execfname) ;
-	        idx = sb.idx ;
+	        rs = b.str(execfname) ;
+	        idx = b.idx ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;

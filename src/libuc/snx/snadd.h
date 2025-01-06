@@ -24,6 +24,10 @@
 	Ths object is used to concatenate a new c-string to
 	an existing counted c-string.
 
+	Notes:
+	This subroutine should be the same as (the older)
+	|storebuf_str(3uc)|.
+
 ******************************************************************************/
 
 #ifndef	SNADD_INCLUDE

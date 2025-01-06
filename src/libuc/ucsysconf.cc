@@ -1,4 +1,5 @@
 /* ucsysconf SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -271,7 +272,7 @@ int ucsysconf::cache(int req) noex {
 	    rs = (*this)(req) ;
 	    break ;
 	default:
-	    rs = SR_BUGCHECK;
+	    rs = SR_BUGCHECK ;
 	    break ;
 	} /* end switch */
 	if ((rs >= 0) && (ii >= 0)) {

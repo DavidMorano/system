@@ -136,11 +136,10 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	if ((rs = splitaddr_ctor(op,ap)) >= 0) {
 	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) {
 	        int	al = strlen(ap) ;
-	        char	*bp ;
 	        while (al && (ap[al-1] == '.')) {
 		    al -= 1 ;
 	        }
-	        if ((rs = uc_malloc((al+1),&bp)) >= 0) {
+	        if (char *bp ; (rs = uc_malloc((al+1),&bp)) >= 0) {
 	            int		bl = al ;
 	            bool	f = false ;
 	            cchar	*tp ;
@@ -220,48 +219,45 @@ int splitaddr_prematch(splitaddr *op,splitaddr *tp) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = splitaddr_magic(op,tp)) >= 0) {
-	int		rs1 ;
-	int		rs2 ;
-	int		i = 0 ;
-	int		f_so = false ;
-	/* CONSTCOND */
-	forever {
-	    void	*v1p{} ;
-	    void	*v2p{} ;
-	    rs1 = vechand_get(op->comp,i,&v1p) ;
-	    if (rs1 < 0) break ;
-
-	    f_so = false ;
-	    rs2 = vechand_get(tp->comp,i,&v2p) ;
-	    if (rs2 < 0) break ;
-
-	    f_so = true ;
-	    cchar	*c1p = charp(v1p) ;
-	    cchar	*c2p = charp(v2p) ;
-	    f = (strcasecmp(c1p,c2p) == 0) ;
-	    if (! f) break ;
-
-	    i += 1 ;
-	} /* end forever */
-/* handle non-matching related errors first */
-
-	if ((rs1 < 0) && (rs1 != SR_NOTFOUND)) {
-	    rs = rs1 ;
-	}
-	if ((rs >= 0) && (rs2 < 0) && (rs2 != SR_NOTFOUND)) {
-	    rs = rs2 ;
-	}
-/* candidate entry must be as long or longer than the list entry */
-	if ((rs >= 0) && f) {
-	    f = f_so ;
-	}
-/* candidate entry must have local-name match if list entry has local */
-	if ((rs >= 0) && f && (op->local != nullptr)) {
-	    f = false ;
-	    if (tp->local != nullptr) {
-	        f = (strcmp(op->local,tp->local) == 0) ;
+	    int		rs1 ;
+	    int		rs2 ;
+	    int		f_so = false ;
+	    for (int i = 0 ; true ; i += 1) {
+	        void	*v1p{} ;
+	        void	*v2p{} ;
+		{
+	            rs1 = vechand_get(op->comp,i,&v1p) ;
+	            if (rs1 < 0) break ;
+    		}
+		{
+	            f_so = false ;
+	            rs2 = vechand_get(tp->comp,i,&v2p) ;
+	            if (rs2 < 0) break ;
+		}
+	        f_so = true ;
+	        cchar	*c1p = charp(v1p) ;
+	        cchar	*c2p = charp(v2p) ;
+	        f = (strcasecmp(c1p,c2p) == 0) ;
+	        if (! f) break ;
+	    } /* end for */
+	    /* handle non-matching related errors first */
+	    if ((rs1 < 0) && (rs1 != SR_NOTFOUND)) {
+	        rs = rs1 ;
 	    }
-	} /* end if */
+	    if ((rs >= 0) && (rs2 < 0) && (rs2 != SR_NOTFOUND)) {
+	        rs = rs2 ;
+	    }
+    	    /* candidate entry must be as long or longer than the list entry */
+	    if ((rs >= 0) && f) {
+	        f = f_so ;
+	    }
+    	    /* candidate entry must have local-name match if it is local */
+	    if ((rs >= 0) && f && (op->local != nullptr)) {
+	        f = false ;
+	        if (tp->local != nullptr) {
+	            f = (strcmp(op->local,tp->local) == 0) ;
+	        }
+	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }

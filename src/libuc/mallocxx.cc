@@ -49,6 +49,9 @@
 
 /* local defines */
 
+#define	HOSTNAMEMULT		2	/* host-name multiplier */
+#define	NODENAMEMULT		2	/* node-name multiplier */
+
 
 /* external subroutines */
 
@@ -185,12 +188,13 @@ int malloc_mailaddr(char **rpp) noex {
 		w = getbufsize_nn ;
 		if ((rs = getbufsize(w)) >= 0) {
 		    cint	nnl = rs ;
-		    mal = (hnl + (2 * nnl)) ;
+		    mal = ((HOSTNAMEMULT * hnl) + (NODENAMEMULT * nnl)) ;
 		    rs = uc_malloc((mal+1),rpp) ;
 		} /* end if */
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? mal : rs ;
 }
+/* end subroutine (mailoc_mailaddr) */
 
 

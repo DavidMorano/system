@@ -1,4 +1,5 @@
 /* bufsizedata SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* buffer-size-data */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bufsizedata
+
+	Description:
 	This module provides the database from which decisions are made
 	for determing buffer sizes.  A decision about how to determine
 	any particular buffer size is make at the point when a particular

@@ -39,6 +39,10 @@
 			the existing c-string buffer
 	<0		error (system-return)
 
+	Notes:
+	This subroutine should be the same as (the older)
+	|storebuf_str(3uc)|.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

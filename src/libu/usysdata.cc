@@ -303,7 +303,7 @@ static sysret_t usys_uname(utsname *utsp) noex {
 /* end subroutine (usys_uname) */
 
 static sysret_t uname_machine(utsname *up) noex {
-	cint		mlen = int(sizeof(up->machine)-1) ;
+	cint		mlen = (szof(up->machine) - 1) ;
 	int		rs = SR_OK ;
 	char		*mbuf = up->machine ;
 	if (strcmp(mbuf,"x86_64") == 0) {
