@@ -82,14 +82,14 @@ int lkmail_start(LKMAIL *mlp,LKMAIL_IDS *idp,cchar *mfname)
 	if (mlp == NULL) return SR_FAULT ;
 	if (idp == NULL) return SR_FAULT ;
 
-	memset(mlp,0,sizeof(LKMAIL)) ;
+	memset(mlp,0,szof(LKMAIL)) ;
 	mlp->lfd = -1 ;
 
 	if ((rs = mkfnamesuf1(mlp->lockfname,mfname,suf)) >= 0) {
 	    mlp->id = *idp ;
 	    if (mlp->id.gid_maildir <= 0) {
-	        struct ustat	sb ;
-	        char		maildname[MAXPATHLEN + 1] ;
+	        USTAT	sb ;
+	        char	maildname[MAXPATHLEN + 1] ;
 
 	        if ((cl = sfdirname(mlp->lockfname,-1,&cp)) > 0) {
 	            if ((rs = mkpath1w(maildname,cp,cl)) >= 0) {
@@ -123,7 +123,7 @@ int lkmail_finish(LKMAIL *mlp)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	memset(mlp,0,sizeof(LKMAIL)) ;
+	memset(mlp,0,szof(LKMAIL)) ;
 	mlp->lfd = -1 ;
 	mlp->magic = 0 ;
 

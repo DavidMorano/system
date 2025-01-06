@@ -588,9 +588,8 @@ static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	int		rs = SR_FAULT ;
 	if (op && mip) {
-	    cint	sz = sizeof(MMF_MI) ;
-	    MMF_MI	*ep ;
-	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
+	    cint	sz = szof(MMF_MI) ;
+	    if (MMF_MI	*ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
 	        hdb_dat	key ;
 	        hdb_dat	val ;
 	        *ep = *mip ; /* copy */

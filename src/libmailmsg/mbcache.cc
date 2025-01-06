@@ -250,7 +250,7 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	            mailbox_info	*mip = &op->mbi ;
 	            op->mbfname = cp ;
 	            if ((rs = mailbox_getinfo(mbp,mip)) >= 0) {
-	                cint	mssize = sizeof(ME **) ;
+	                cint	mssize = szof(ME **) ;
 	                if (mip->nmsgs >= 0) {
 	                    cint	sz = ((mip->nmsgs + 1) * mssize) ;
 	                    void	*vp{} ;
@@ -370,8 +370,8 @@ int mbcache_sort(mbcache *op) noex {
 	        rs = mbcache_msgtimers(op,mi,nullptr) ;
 	    } /* end for */
 	    if (rs >= 0) {
-	        cint	qsize = sizeof(cchar *) ;
-	        void	*msgs = (void *) op->msgs ;
+	        cint	qsize = szof(cchar *) ;
+	        void	*msgs = voidp(op->msgs) ;
 	        qsort(msgs,nmsgs,qsize,vcmpmsgentry) ;
 	    }
 	} /* end if (magic) */
@@ -726,9 +726,8 @@ static int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	if (op->msgs[mi] == nullptr) {
 	    mailbox_mi	*mip{} ;
 	    if ((rs = mailbox_msgret(op->mbp,mi,&mip)) >= 0) {
-	        ME	*mep = nullptr ;
-	        cint	sz = sizeof(ME) ;
-	        if ((rs = uc_malloc(sz,&mep)) >= 0) {
+	        cint	sz = szof(ME) ;
+	        if (ME *mep{} ; (rs = uc_malloc(sz,&mep)) >= 0) {
 	            if ((rs = msgentry_start(mep,mi)) >= 0) {
 	                if ((rs = msgentry_frame(mep,mip)) >= 0) {
 	                    op->msgs[mi] = mep ;

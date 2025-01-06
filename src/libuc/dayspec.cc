@@ -49,18 +49,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<calstrs.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<estrings.h>
 #include	<cfdec.h>
+#include	<six.h>
+#include	<char.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
+#include	<hasx.h>
+#include	<getmjd.h>		/* |getyrd(3uc)| */
 #include	<localmisc.h>
 
 #include	"dayspec.h"
@@ -71,20 +74,16 @@
 
 /* imported namespaces */
 
-using std::min ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sialnum(cchar *,int) noex ;
-extern int	matpcasestr(cchar **,int,cchar *,int) noex ;
-extern int	getyrd(int,int,int) noex ;
-extern int	hasalldig(cchar *,int) noex ;
-extern int	isalphalatin(int) noex ;
-extern int	isdigitlatin(int) noex ;
 
 
 /* external variables */
@@ -153,7 +152,6 @@ int dayspec_yday(dayspec *op) noex {
 
 static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		si ;
 	int		yl = 0 ;
 	int		ml = 0 ;
 	int		dl = 0 ;
@@ -172,6 +170,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	        yl = min(4,(sl-4)) ;
 	        sp += 4 ;
 	        sl -= 4 ;
+		fallthrough ;
 		/* FALLTHROUGH */
 	    case 4:
 	    case 3:
@@ -179,6 +178,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	        ml = min(2,(sl-2)) ;
 	        sp += 2 ;
 	        sl -= 2 ;
+		fallthrough ;
 	        /* FALLTHROUGH */
 	    case 2:
 	    case 1:
@@ -188,6 +188,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	    } /* end switch */
 	} else {
 	    if (int ti ; (ti = siourbrk(sp,sl,0)) >= 0) {
+		int	si ;
 	        bool	f_dig = false ;
 		{
 	            yp = sp ;

@@ -172,7 +172,7 @@ int bfliner_getpoff(bfliner *op,off_t *rp) noex {
 }
 /* end subroutine (bfliner_getpoff) */
 
-static int bfliner_adv(bfliner *op,int inc) noex {
+int bfliner_adv(bfliner *op,int inc) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;

@@ -277,7 +277,7 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 static int hdrdecode_b64decoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->b64p == nullptr) {
-	    cint	sz = sizeof(b64decoder) ;
+	    cint	sz = szof(b64decoder) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        op->b64p = (b64decoder *) p ;
@@ -295,7 +295,7 @@ static int hdrdecode_b64decoder(hdrdecode *op) noex {
 static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->qpp == nullptr) {
-	    cint	sz = sizeof(qpdecoder) ;
+	    cint	sz = szof(qpdecoder) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        op->qpp = (qpdecoder *) p ;
@@ -313,7 +313,7 @@ static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 static int hdrdecode_chartrans(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->ctp == nullptr) {
-	    cint	sz = sizeof(chartrans) ;
+	    cint	sz = szof(chartrans) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        op->ctp = (chartrans *) p ;
@@ -443,7 +443,7 @@ int subinfo::proctranser(ESCINFO *eip,cchar *tp,int tl) noex {
 /* end subroutine (subinfo::proctranser) */
 
 int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
-	cint		rlen = (tl * sizeof(wchar_t)) ;
+	cint		rlen = (tl * szof(wchar_t)) ;
 	int		rs ;
 	int		wl = 0 ;
 	wchar_t		*rbuf{} ;

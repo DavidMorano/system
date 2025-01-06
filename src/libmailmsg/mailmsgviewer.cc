@@ -132,7 +132,7 @@ int mailmsgviewer_open(MMV *op,cchar *fname) noex {
 	if ((rs = mailmsgviewer_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        cint	esz = sizeof(MMV_LN) ;
+	        cint	esz = szof(MMV_LN) ;
 	        cint	vo = VECOBJ_OCOMPACT ;
 	        cint	ne = 10 ;
 	        if ((rs = vecobj_start(op->llp,esz,ne,vo)) >= 0) {

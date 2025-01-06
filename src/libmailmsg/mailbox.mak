@@ -2,7 +2,7 @@
 
 T= mailbox
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 INDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -95,9 +94,6 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILBOX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILBOX)
 
-$(T).a:			$(OBJ_MAILBOX)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
@@ -114,6 +110,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_mailbox.o:	$(OBJ0_MAILBOX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILBOX)

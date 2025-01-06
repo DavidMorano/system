@@ -115,7 +115,7 @@ int		pathlen ;
 
 #endif /* CF_MAILBOXZERO */
 
-	rs = vecitem_add(lp,&e,sizeof(MAILFILES_ENT)) ;
+	rs = vecitem_add(lp,&e,szof(MAILFILES_ENT)) ;
 
 	if (rs < 0)
 	    goto bad1 ;

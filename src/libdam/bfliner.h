@@ -95,7 +95,7 @@ extern int bfliner_getln(bfliner *,cchar **) noex ;
 extern int bfliner_getlns(bfliner *,cchar **) noex ;
 extern int bfliner_readover(bfliner *) noex ;
 extern int bfliner_getpoff(bfliner *,off_t *) noex ;
-static int bfliner_adv(bfliner *,int) noex ;
+extern int bfliner_adv(bfliner *,int) noex ;
 extern int bfliner_finish(bfliner *) noex ;
 
 EXTERNC_end

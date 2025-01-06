@@ -1,10 +1,10 @@
 /* ema_first SUPPORT */
-/* lang=C++20 */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get first non-empty E-Mail Address */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -17,17 +17,17 @@
 
 /*******************************************************************************
 
-	We get the first non-empty EMA address.
+  	Name:
+	ema_first
 
+	Description:
+	We get the first non-empty EMA address.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -39,18 +39,11 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
 
 /* external variables */
 
 
 /* local structures */
-
-
-/* external subroutines */
 
 
 /* forward references */
@@ -59,16 +52,18 @@ extern int	debugprintf(cchar *,...) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int ema_first(EMA *op,cchar **rpp) noex {
-	EMA_ENT		*ep ;
-	int		rs = SR_OK ;
-	int		i ;
+int ema_first(ema *op,cchar **rpp) noex {
+	int		rs ;
 	int		rl = 0 ;
 	cchar		*rp = nullptr ;
-	for (i = 0 ; (rs = ema_get(op,i,&ep)) >= 0 ; i += 1) {
-	    if (ep != nullptr) {
+	ema_ent		*ep{} ;
+	for (int i = 0 ; (rs = ema_get(op,i,&ep)) >= 0 ; i += 1) {
+	    if (ep) {
 		if ((ep->rp != nullptr) || (ep->ap != nullptr)) {
 		    if (rl == 0) {
 			rl = ep->rl ;
@@ -83,11 +78,11 @@ int ema_first(EMA *op,cchar **rpp) noex {
 	    if (rl > 0) break ;
 	} /* end for */
 	if (rs >= 0) {
-	    if (rpp != nullptr) {
+	    if (rpp) {
 		*rpp = (rl > 0) ? rp : nullptr ;
 	    }
 	} else if (rs == SR_NOTFOUND) {
-	    if (rpp != nullptr) *rpp = nullptr ;
+	    if (rpp) *rpp = nullptr ;
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? rl : rs ;

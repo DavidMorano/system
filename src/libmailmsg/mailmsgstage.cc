@@ -167,7 +167,7 @@ int mailmsgstage_start(MMS *op,int ifd,int to,int mmo) noex {
 	    rs = SR_BADF ;
 	    memclear(op) ; /* dangerous */
 	    if (ifd >= 0) {
-		cint	osz = sizeof(vechand) ;
+		cint	osz = szof(vechand) ;
 	        cchar	*tmpdn = nullptr ;
 		void	*vp{} ;
 	        op->tfd = -1 ;
@@ -720,7 +720,7 @@ static int mailmsgstage_gmsgbody(MMS *op,filer *tfp,fdliner *lsp,
 static int mailmsgstage_gmsgentnew(MMS *op,msgentry **mpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	esz = sizeof(msgentry) ;
+	    cint	esz = szof(msgentry) ;
 	    rs = uc_malloc(esz,mpp) ;
 	} /* end if (non-null) */
 	return rs ;

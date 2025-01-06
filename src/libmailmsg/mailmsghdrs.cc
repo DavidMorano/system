@@ -135,9 +135,8 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && msgp) {
-	    int		sz = (n+1) * sizeof(char **) ;
-	    void	*p{} ;
-	    if ((rs = uc_malloc(sz,&p)) >= 0) {
+	    int		sz = (n+1) * szof(char **) ;
+	    if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
 	        int	i ; /* used-afterwards */
 	        mainv	mhnames = mailmsghdrs_names ;
 	        cchar	*hp{} ;

@@ -17,14 +17,16 @@
 
 /*******************************************************************************
 
+  	Group:
+	parts
+
+	Description:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -113,6 +115,6 @@ namespace emaobj {
 	return rs ;
     } /* end subroutine (partsend) */
 
-}
+} /* end namespace (emaobj) */
 
 

@@ -402,7 +402,7 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	    case ':':
 	        if ((state == si_address) &&
 	            (! f_quote) && (c_comment == 0)) {
-	            size = sizeof(ema) ;
+	            size = szof(ema) ;
 	            if ((rs = uc_malloc(size,&nlp)) >= 0) {
 	                if ((rs = ema_start(nlp)) >= 0) {
 	                    asstr_adv(bp) ;
@@ -545,7 +545,7 @@ static int ema_load(ema *hp,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 	int		rs = SR_OK ;
 	if (olen < 0) olen = strlen(orig) ;
 	if (olen > 0) {
-	    cint	size = sizeof(ema_ent) ;
+	    cint	size = szof(ema_ent) ;
 	    if ((rs = uc_malloc(size,&ep)) >= 0) {
 	        if ((rs = entry_start(ep)) >= 0) {
 	            int		sl ;
@@ -619,7 +619,7 @@ static int ema_load(ema *hp,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 #if	CF_ADDENT
 static int ema_addentone(ema *op,ema_ent *ep) noex {
 	ema_ent		*nep ;
-	cint		size = sizeof(ema_ent) ;
+	cint		size = szof(ema_ent) ;
 	int		rs ;
 	if ((rs = uc_malloc(size,&nep)) >= 0) {
 	    if ((rs = entry_startload(nep,ep)) >= 0) {

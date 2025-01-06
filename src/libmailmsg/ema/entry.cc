@@ -17,14 +17,16 @@
 
 /*******************************************************************************
 
+	Object:
+	entry
+
+	Description:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -80,7 +82,7 @@ namespace emaobj {
    int entry_start(ema_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    memclear(ep) ;
+	    rs = memclear(ep) ;
 	    ep->type = ematype_reg ;
 	}
 	return rs ;
@@ -142,10 +144,9 @@ namespace emaobj {
 	    ep->cp = mallocstrw(oep->cp,oep->cl) ;
 	}
 	if (oep->listp != nullptr) {
-	    ema		*nop = nullptr ; /* LINT assignment */
-	    cint	size = sizeof(ema) ;
+	    cint	nsz = szof(ema) ;
 	    ep->listp = nullptr ;
-	    if ((rs = uc_malloc(size,&nop)) >= 0) {
+	    if (ema *nop{} ; (rs = uc_malloc(nsz,&nop)) >= 0) {
 	        if ((rs = ema_start(nop)) >= 0) {
 	            if ((rs = ema_addents(nop,oep->listp)) >= 0) {
 	                ep->listp = nop ;
@@ -162,7 +163,7 @@ namespace emaobj {
 	return rs ;
     } /* end subroutine (entry_startload) */
 
-}
+} /* end namespace (emaobj) */
 
 #if	COMMENT
 static int entry_debugprint(ema_ent *ep,cchar *s) noex {

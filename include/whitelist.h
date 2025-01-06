@@ -35,7 +35,7 @@ struct whitelist_head {
 	uint		magic ;
 } ;
 
-struct whitelist_c {
+struct whitelist_cursor {
 	int		i ;
 } ;
 

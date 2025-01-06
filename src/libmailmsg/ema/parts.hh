@@ -32,19 +32,14 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| */
-#include	<usystem.h>
-#include	<mallocstuff.h>
-#include	<strn.h>
-#include	<char.h>
-#include	<ascii.h>
-#include	<localmisc.h>
-
-#include	"asstr.hh"
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<asstr.hh>
 
 
 namespace emaobj {

@@ -332,8 +332,9 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 		c = *s++;
 	} else { 
 		neg = 0;
-		if (c == '+')
+		if (c == '+') {
 			c = *s++;
+		}
 	}
 	if ((base == 0 || base == 16) &&
 	    c == '0' && (*s == 'x' || *s == 'X')) {
@@ -345,27 +346,8 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 		base = ((c == '0') ? 8 : 10) ;
 	}
 
-        /* BIONIC: avoid division and modulo for common cases */
-#define  CASE_BASE(x)                            \
-            case x: cutoff = llhelp.ullmax / x;    \
-	            cutlim = llhelp.ullmax % x;    \
-		    break
-
-#ifdef	COMMENT
-        switch (base) {
-        CASE_BASE(8);
-	CASE_BASE(10);
-	CASE_BASE(16);
-	default:
-	    cutoff = llhelp.ullmax / base;
-	    cutlim = llhelp.ullmax % base;
-	    break ;
-	} /* end switch */
-#else /* COMMENT */
 	    cutoff = llhelp.cutoff[base] ;
 	    cutlim = llhelp.cutlim[base] ;
-#endif /* COMMENT */
-	
 	for (acc = 0, any = 0 ; ; c = (unsigned char) *s++) {
 		if (isdigit(c)) {
 			c -= '0';

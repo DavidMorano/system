@@ -32,11 +32,12 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstring>		/* for |strlen(3c)| */
-#include	<usystem.h>
-#include	<localmisc.h>
-
-#include	"ema.h"
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<ema.h>
 
 
 namespace emaobj {

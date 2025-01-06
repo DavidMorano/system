@@ -112,10 +112,10 @@
 #define	MAILALIAS_DIRMODE	0775
 
 #define	MAILALIAS_IDOFF		0
-#define	MAILALIAS_IDLEN		(MAILALIAS_MAGICSIZE + sizeof(uint))
+#define	MAILALIAS_IDLEN		(MAILALIAS_MAGICSIZE + szof(uint))
 
 #define	MAILALIAS_HEADOFF	MAILALIAS_IDLEN
-#define	MAILALIAS_HEADLEN	(mailaliashdr_overlast * sizeof(uint))
+#define	MAILALIAS_HEADLEN	(mailaliashdr_overlast * szof(uint))
 
 #define	MAILALIAS_TOPLEN	(MAILALIAS_IDLEN + MAILALIAS_HEADLEN)
 #define	MAILALIAS_BUFOFF	(MAILALIAS_HEADOFF + MAILALIAS_HEADLEN)
@@ -1112,7 +1112,7 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 /* end subroutine (mailalias_dbmaker) */
 
 static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
-	cint		sz = sizeof(record) ;
+	cint		sz = szof(record) ;
 	int		rs ;
 	int		rs1 ;
 	vecobj		recs ;

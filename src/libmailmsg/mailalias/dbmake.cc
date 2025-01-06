@@ -188,13 +188,13 @@ int dbmake::wrfile(time_t dt) noex {
 	int		rs ;
 	if ((rs = strtab_count(klp)) >= 0) {
 	    ktlen = (rs+1) ;
-	    ktsize = (ktlen + 1) * sizeof(int) ;
+	    ktsize = (ktlen + 1) * szof(int) ;
 	    if ((rs = vecobj_count(rlp)) >= 0) {
 		reclen = (rs + 1) ;
-		recsize = ((reclen+1) * (2 * sizeof(int))) ;
+		recsize = ((reclen+1) * (2 * szof(int))) ;
 		rilen = nextpowtwo(reclen) ;
 		if (rilen < 4) rilen = 4 ;
-		risize = (rilen * 2 * sizeof(int)) ;
+		risize = (rilen * 2 * szof(int)) ;
 		if ((rs = strtab_strsize(klp)) >= 0) {
 		    sksize = rs ;
 		    if ((rs = strtab_strsize(vlp)) >= 0) {
@@ -231,7 +231,7 @@ int dbmake::wrfiler(time_t dt) noex {
 	}
 /* write magic along with version encoding */
 	if ((rs = u_write(fd,fidbuf,(bp - fidbuf))) >= 0) {
-	    cint	hsize = (mailaliashdr_overlast * sizeof(int)) ;
+	    cint	hsize = (mailaliashdr_overlast * szof(int)) ;
 	    fto += (bp - fidbuf) ;
 /* make the header itself (skip over it for FTO) */
 	    {
@@ -463,7 +463,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	    if ((rs = vecobj_count(rp)) >= 0) {
 	        n = nextpowtwo(rs) ;
 	        if (n < 4) n = 4 ;
-	        sz = (n * 2 * sizeof(uint)) ;
+	        sz = (n * 2 * szof(uint)) ;
 	        if (sz <= itsz) {
 		    void	*vp{} ;
 	            uint	khash ;

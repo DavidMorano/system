@@ -168,9 +168,9 @@ int getmjd(int yr,int mo,int day) noex {
 	if ((rs = indomain(yr,mo,day)) >= 0) {
 	    int		nlyears ;	/* leap years from 1900 */
 	    int		myr = 0 ;	/* modified-year (years since 1900) */
-/* adjust year as needed (for convenience to caller) */
+	    /* adjust year as needed (for convenience to caller) */
 	    if (yr < yrbase) yr += yrbase ;
-/* continue to calculate MHD */
+	    /* continue to calculate MHD */
 	    myr = (yr - yrbase) ;	/* get modified year */
 	    nlyears = (myr - 1)/4 ;	/* number of leap years since 1900 */
 /*
@@ -195,12 +195,12 @@ int getyrd(int yr,int mo,int day) noex {
 	int		rs ;
 	int		yday = 0 ;
 	if ((rs = indomain(yr,mo,day)) >= 0) {
-/* calculate */
+	    /* calculate */
 	    if (yr < yrbase) yr += yrbase ;
 	    yday += (doy[mo] + (day - 1)) ;
 /*
-	If the current month is March or later, then we must add 1 day if
-	the current year is a leap year.
+	    If the current month is March or later, then we must
+	    add 1 day if the current year is a leap year.
 */
 	    if ((mo >= mon_mar) && isleapyear(yr)) {
 	        yday += 1 ;

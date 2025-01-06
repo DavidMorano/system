@@ -2,7 +2,7 @@
 
 T= mailmsg
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -14,7 +14,6 @@ HELPDIR		?= $(REPOROOT)/share/help
 CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
-
 
 CPP		?= cpp
 CC		?= gcc
@@ -77,6 +76,7 @@ default:		$(T).a
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -99,9 +99,6 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILMSG)
 
-$(T).a:			$(OBJ_MAILMSG)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
@@ -119,6 +116,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_mailmsg.o:	$(OBJ0_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSG)
 
@@ -133,6 +131,7 @@ obj3_mailmsg.o:	$(OBJ3_MAILMSG)
 
 obj4_mailmsg.o:	$(OBJ4_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILMSG)
+
 
 obja_mailmsg.o:	$(OBJA_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILMSG)

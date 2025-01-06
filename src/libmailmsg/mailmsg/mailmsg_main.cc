@@ -539,7 +539,7 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 /* end subroutine (mailmsg_procline) */
 
 static int mailmsg_envbegin(mailmsg *op) noex {
-	cint		esz = sizeof(mmenvdat) ;
+	cint		esz = szof(mmenvdat) ;
 	return vecobj_start(op->elp,esz,4,0) ;
 }
 /* end subroutine (mailmsg_envbegin) */
@@ -565,7 +565,7 @@ static int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
 /* end subroutine (mailmsg_envadd) */
 
 static int mailmsg_hdrbegin(mailmsg *op) noex {
-	cint		hsz = sizeof(MMHNAME) ;
+	cint		hsz = szof(MMHNAME) ;
 	op->lastname = -1 ;
 	return vecobj_start(op->hlp,hsz,10,0) ;
 }
@@ -678,7 +678,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,
 static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *vp,int vl) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
-	int		isz = sizeof(MMHINST) ;
+	int		isz = szof(MMHINST) ;
 	memclear(hnp) ;
 	hnp->vp = nullptr ;
 	hnp->vl = 0 ;
@@ -876,7 +876,7 @@ static int msghdrname_count(MMHNAME *hnp) noex {
 /* end subroutine (msghdrname_count) */
 
 static int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
-	cint		vsz = sizeof(MMHVAL) ;
+	cint		vsz = szof(MMHVAL) ;
 	int		rs ;
 	memclear(hip) ;
 	hip->vp = nullptr ;

@@ -178,13 +178,11 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	if ((rs = whitelist_magic(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		char	*mbuf{} ;
-		if ((rs = malloc_mailaddr(&mbuf)) >= 0) {
+		if (char *mbuf{} ; (rs = malloc_mailaddr(&mbuf)) >= 0) {
 		    cint	mlen = rs ;
 		    bfile	loadfile, *lfp = &loadfile ;
 	            if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
-			bfliner		bl ;
-			if ((rs = bl.start(lfp)) >= 0) {
+			if (bfliner bl ; (rs = bl.start(lfp)) >= 0) {
 			    cchar	*lp ;
 	    		    while ((rs = bl.getln(&lp)) > 0) {
 				cchar	*cp ;

@@ -575,7 +575,7 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	            op->ti_mod = sb.st_mtime ;
 	            op->ti_check = time(nullptr) ;
 	            if ((rs = uc_mallocstrw(mbfname,-1,&cp)) >= 0) {
-	                cint	es = sizeof(mailbox_msginfo) ;
+	                cint	es = szof(mailbox_msginfo) ;
 	                cint	vo = VECOBJ_OCOMPACT ;
 	                op->mailfname = cp ;
 	                nmsgs = MAILBOX_DEFMSGS ;

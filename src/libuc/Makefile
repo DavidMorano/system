@@ -58,28 +58,43 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 OBJ00= matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o sif.o
-OBJ02= snwcpy.o strcpyxc.o strwcpy.o strwcmp.o strdcpy.o
-OBJ03= stdfnames.o
+OBJ02= snwcpy.o strcpyxc.o strwcpy.o strdcpy.o
+OBJ03= stdfnames.o strw.o
 
 OBJ04= isx.o
 OBJ05= nleadstr.o nleadkeystr.o
 OBJ06= mapex.o
 OBJ07=
 
-OBJ08= strkeycmp.o
-OBJ09= readln.o ccfile.o
+OBJ08= strkey.o
+OBJ09=
 OBJ10= cfx.o memtrack.o addrset.o mapblock.o
 OBJ11= strmgr.o strop.o field.o
 
-OBJ12= ucttyname.o uctc.o ucsysconf.o
+OBJ12=
 OBJ13=
-OBJ14= ucsys.o
-OBJ15= tcx.o
+OBJ14=
+OBJ15=
 
-OBJ16 += wsix.o wsnx.o wsx.o
-OBJ17 += six.o snx.o sfx.o rmx.o
-OBJ18 +=
-OBJ19 += hdb.o hdbstr.o
+OBJ16 = wsix.o wsnx.o wsx.o
+OBJ17 = six.o snx.o sfx.o rmx.o
+OBJ18 = 
+OBJ19 = 
+
+OBJ20= hdb.o hdbstr.o ccfile.o
+OBJ21=
+OBJ22=
+OBJ23=
+
+OBJ24=
+OBJ25=
+OBJ26=
+OBJ27=
+
+OBJ28= ucttyname.o uctc.o ucsysconf.o
+OBJ29=
+OBJ30= ucsys.o
+OBJ31= tcx.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -302,7 +317,7 @@ base.o:		$(OBJ_BASE)
 
 
 # CHARACTER
-OBJA_CHAR= toxc.o char.o rmeol.o
+OBJA_CHAR= toxc.o char.o
 OBJB_CHAR= hasx.o
 
 OBJ_CHAR= obja_char.o objb_char.o

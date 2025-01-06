@@ -25,8 +25,8 @@
 
 
 #define	EMA		struct ema_head
-#define	EMA_ENT		struct ema_entry
 #define	EMA_FL		struct ema_flags
+#define	EMA_ENT		struct ema_entry
 #define	EMA_MAGIC	0x73169284
 #define	EMADEFENTS	4
 
@@ -76,6 +76,7 @@ struct ema_entry {
 } ;
 
 typedef EMA		ema ;
+typedef	EMA_FL		ema_fl ;
 typedef EMA_ENT		ema_ent ;
 
 EXTERNC_begin
@@ -88,6 +89,8 @@ extern int ema_addents(ema *,ema *) noex ;
 extern int ema_get(ema *,int,ema_ent **) noex ;
 extern int ema_getbestaddr(ema *,int,cchar **) noex ;
 extern int ema_count(ema *) noex ;
+extern int ema_haveaddr(ema *,cchar *,int) noex ;
+extern int ema_first(ema *,cchar **) noex ;
 extern int ema_finish(ema *) noex ;
 
 EXTERNC_end

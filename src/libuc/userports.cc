@@ -84,14 +84,6 @@
 #define	SVCNAMELEN	32
 #endif
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #ifndef	PROTONAME
 #define	PROTONAME	"tcp"
 #endif
@@ -124,9 +116,12 @@ struct entry_elem {
 typedef	ENTRY		entry ;
 typedef	ENTRY *		entryp ;
 
-struct vars {
+namespace {
+    struct vars {
 	int		usernamelen ;
-} ;
+	operator int () noex ;
+    } ;
+}
 
 
 /* forward references */
@@ -195,8 +190,6 @@ static int userports_procline(UP *,pwcache *,cchar *,int) noex ;
 static int userports_procent(UP *,uid_t,cchar *,int) noex ;
 static int userports_procenter(UP *,uid_t,cchar *,cchar *) noex ;
 
-static int	mkvars() noex ;
-
 
 /* local variables */
 
@@ -223,7 +216,7 @@ int userports_open(UP *op,cchar *fname) noex {
 	    fname = USERPORTS_FNAME ;
 	}
 	if ((rs = userports_ctor(op)) >= 0) {
-	    static cint		rsv = mkvars() ;
+	    static cint		rsv = var ;
 	    if ((rs = rsv) >= 0) {
 		rs = userports_opener(op,fname) ;
 	    }
@@ -577,13 +570,13 @@ static int userports_procenter(UP *op,uid_t uid,cc *pn,cc *ps) noex {
 }
 /* end subroutine (userports_procenter) */
 
-static int mkvars() noex {
+vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	    var.usernamelen = rs ;
 	}
 	return rs ;
 }
-/* end subroutine (mkvars) */
+/* end method (vars::operator) */
 
 
