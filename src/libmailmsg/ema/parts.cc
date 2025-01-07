@@ -60,9 +60,6 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 
-/* external subroutines */
-
-
 /* forward references */
 
 
@@ -80,8 +77,8 @@ namespace emaobj {
 	int		rs = SR_FAULT ;
 	if (asp) {
 	    rs = SR_OK ;
-	    for (int i = 0 ; i < si_overlast ; i += 1) {
-	        asstr_start(asp + i) ;
+	    for (int i = 0 ; (rs >= 0) && (i < si_overlast) ; i += 1) {
+	        rs = asstr_start(asp + i) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

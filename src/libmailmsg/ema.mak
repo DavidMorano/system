@@ -55,10 +55,11 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= ema_main.o ema_haveaddr.o ema_first.o
-OBJ1= asstr.o parts.o entry.o
+OBJ0= ema_main.o ema_obj.o
+OBJ1= ema_haveaddr.o ema_first.o
+OBJ2= asstr.o parts.o entry.o
 
-OBJ_EMA= obj0.o obj1.o
+OBJ_EMA= obj0.o obj1.o obj2.o
 
 
 .SUFFIXES:		.hh .ii
@@ -123,6 +124,7 @@ obj3.o:			$(OBJ3)
 
 
 ema_main.o:		ema_main.cc parts.hh asstr.hh entry.hh	$(INCS)
+ema_obj.o:		ema_obj.cc				$(INCS)
 ema_haveaddr.o:		ema_haveaddr.cc				$(INCS)
 ema_first.o:		ema_first.cc				$(INCS)
 

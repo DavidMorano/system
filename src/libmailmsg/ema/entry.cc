@@ -63,9 +63,6 @@ typedef ema_ent		ent ;
 /* local structures */
 
 
-/* external subroutines */
-
-
 /* forward references */
 
 
@@ -82,7 +79,7 @@ namespace emaobj {
    int entry_start(ema_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    rs = memclear(ep) ;
+	    rs = memclear(ep) ; /* dangerous */
 	    ep->type = ematype_reg ;
 	}
 	return rs ;
@@ -115,7 +112,8 @@ namespace emaobj {
 	    }
 	    if (ep->listp != nullptr) {
 		{
-	            rs1 = ema_finish(ep->listp) ;
+		    ema *emap = cast_static<ema *>(ep->listp) ;
+	            rs1 = ema_finish(emap) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
@@ -148,7 +146,8 @@ namespace emaobj {
 	    ep->listp = nullptr ;
 	    if (ema *nop{} ; (rs = uc_malloc(nsz,&nop)) >= 0) {
 	        if ((rs = ema_start(nop)) >= 0) {
-	            if ((rs = ema_addents(nop,oep->listp)) >= 0) {
+		    ema *emap = cast_static<ema *>(ep->listp) ;
+	            if ((rs = ema_addents(nop,emap)) >= 0) {
 	                ep->listp = nop ;
 	            }
 	            if (rs < 0) {

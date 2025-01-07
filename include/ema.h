@@ -28,7 +28,6 @@
 #define	EMA_FL		struct ema_flags
 #define	EMA_ENT		struct ema_entry
 #define	EMA_MAGIC	0x73169284
-#define	EMADEFENTS	4
 
 
 enum emnatypes {
@@ -75,13 +74,71 @@ struct ema_entry {
 	int		ol, al, rl, cl ;
 } ;
 
-typedef EMA		ema ;
 typedef	EMA_FL		ema_fl ;
 typedef EMA_ENT		ema_ent ;
 
+#ifdef	__cplusplus
+enum emamems {
+    	emamem_start,
+	emamem_count,
+	emamem_finish,
+	emamem_overlast
+} ;
+struct ema ;
+struct ema_st {
+	ema		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ema *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar * = nullptr,int = -1) noex ;
+	operator int () noex {
+	    cchar	*sp = nullptr ;
+	    return operator () (sp,0) ;
+	} ;
+} ; /* end struct (ema_st) */
+struct ema_co {
+	ema		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ema *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ema_co) */
+struct ema : ema_head {
+    	ema_st		start ;
+	ema_co		count ;
+	ema_co		finish ;
+	ema() noex {
+	    start(this,emamem_start) ;
+	    count(this,emamem_count) ;
+	    finish(this,emamem_finish) ;
+	} ;
+	ema(const ema &) = delete ;
+	ema &operator = (const ema &) = delete ;
+	int parse(cchar *,int = -1) noex ;
+	int addent(ema_ent *) noex ;
+	int addents(ema *) noex ;
+	int get(int,ema_ent **) noex ;
+	int getbestaddr(int,cchar **) noex ;
+	int haveaddr(cchar *,int = -1) noex ;
+	int first(cchar **) noex ;
+	void dtor() noex ;
+	~ema() {
+	    dtor() ;
+	} ;
+} ; /* end struct (ema) */
+#else	/* __cplusplus */
+typedef EMA		ema ;
+#endif /* __cplusplus */
+
 EXTERNC_begin
 
-extern int ema_starter(ema *,cchar *,int) noex ;
 extern int ema_start(ema *) noex ;
 extern int ema_parse(ema *,cchar *,int) noex ;
 extern int ema_addent(ema *,ema_ent *) noex ;
@@ -94,6 +151,24 @@ extern int ema_first(ema *,cchar **) noex ;
 extern int ema_finish(ema *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static int ema_magic(ema *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == EMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (ema_magic) */
+
+namespace ema_ns {
+    extern int	ema_starter(ema *,cchar *,int) noex ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* EMA_INCLUDE */

@@ -30,9 +30,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -50,6 +47,8 @@
 
 
 /* local defines */
+
+#define	EMA_DEFENTS	4		/* default number of entries */
 
 
 /* imported namespaces */
@@ -72,9 +71,6 @@ typedef ema_ent	*	entp ;
 
 
 /* local structures */
-
-
-/* external subroutines */
 
 
 /* forward references */
@@ -108,21 +104,6 @@ static inline int ema_dtor(ema *op) noex {
 }
 /* end subroutine (memfile_dtor) */
 
-template<typename ... Args>
-static int ema_magic(ema *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == EMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (ema_magic) */
-
-int		ema_starter(ema *,cchar *,int) noex ;
-int		ema_start(ema *) noex ;
-int		ema_parse(ema *,cchar *,int) noex ;
-int		ema_finish(ema *) noex ;
-
 static int	ema_parseit(ema *,asstr *) noex ;
 static int	ema_load(ema *,cchar *,int,asstr *,ema *) noex ;
 
@@ -143,46 +124,30 @@ static int	malloccompactstr(cchar *,int,char **) noex ;
 
 /* exported subroutines */
 
-int ema_starter(ema *hp,cchar *sp,int sl) noex {
+int ema_start(ema *op) noex {
 	int		rs ;
-	if ((rs = ema_ctor(hp,sp)) >= 0) {
-	    rs = SR_INVALID ;
-	    if (sp[0]) {
-	        if ((rs = ema_start(hp)) >= 0) {
-	            rs = ema_parse(hp,sp,sl) ;
-	            if (rs < 0) {
-	                ema_finish(hp) ;
-	            }
-	        } /* end if (ema_start) */
-	    } /* end if (valid) */
-	    if (rs < 0) {
-		ema_dtor(hp) ;
+	if ((rs = ema_ctor(op)) >= 0) {
+	    cint	vn = EMA_DEFENTS ;
+	    cint	vo = 0 ;
+	    memclear(op) ;
+	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) {
+	        op->magic = EMA_MAGIC ;
 	    }
-	} /* end if (ema_ctor) */
-	return rs ;
-}
-/* end subroutine (ema_starter) */
-
-int ema_start(ema *hp) noex {
-	int		rs ;
-	if ((rs = ema_ctor(hp)) >= 0) {
-	    cint	ne = EMADEFENTS ;
-	    memclear(hp) ;
-	    if ((rs = vechand_start(hp->elp,ne,0)) >= 0) {
-	        hp->magic = EMA_MAGIC ;
+	    if (rs < 0) {
+		ema_dtor(op) ;
 	    }
 	} /* end if (ema_ctor) */
 	return rs ;
 }
 /* end subroutine (ema_start) */
 
-int ema_finish(ema *hp) noex {
+int ema_finish(ema *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ema_magic(hp)) >= 0) {
-	    hp->n = -1 ;
+	if ((rs = ema_magic(op)) >= 0) {
+	    op->n = -1 ;
 	    void	*vp{} ;
-	    for (int i = 0 ; vechand_get(hp->elp,i,&vp) >= 0 ; i += 1) {
+	    for (int i = 0 ; vechand_get(op->elp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
 		    ema_ent	*ep = entp(vp) ;
 		    {
@@ -196,28 +161,28 @@ int ema_finish(ema *hp) noex {
 	        } /* end if (non-null) */
 	    } /* end for */
 	    {
-	        rs1 = vechand_finish(hp->elp) ;
+	        rs1 = vechand_finish(op->elp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ema_dtor(hp) ;
+	        rs1 = ema_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    hp->magic = 0 ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ema_finish) */
 
-int ema_parse(ema *hp,cchar *sp,int sl) noex {
+int ema_parse(ema *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = ema_magic(hp,sp)) >= 0) {
+	if ((rs = ema_magic(op,sp)) >= 0) {
 	    asstr	desc ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    desc.sp = (char *) sp ;
 	    desc.sl = sl ;
-	    if ((rs = ema_parseit(hp,&desc)) > 0) {
-	        hp->n += rs ;
+	    if ((rs = ema_parseit(op,&desc)) > 0) {
+	        op->n += rs ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -237,11 +202,11 @@ int ema_addent(ema *op,ema_ent *ep) noex {
 #endif /* CF_ADDENT */
 
 /* get the ema under the current cursor */
-int ema_get(ema *hp,int i,ema_ent **epp) noex {
+int ema_get(ema *op,int i,ema_ent **epp) noex {
 	int		rs ;
-	if ((rs = ema_magic(hp,epp)) >= 0) {
+	if ((rs = ema_magic(op,epp)) >= 0) {
 	    void	*vp{} ;
-	    if ((rs = vechand_get(hp->elp,i,&vp)) >= 0) {
+	    if ((rs = vechand_get(op->elp,i,&vp)) >= 0) {
 	        *epp = entp(vp) ;
 	    }
 	} /* end if (magic) */
@@ -249,13 +214,13 @@ int ema_get(ema *hp,int i,ema_ent **epp) noex {
 }
 /* end subroutine (ema_get) */
 
-int ema_getbestaddr(ema *hp,int i,cchar **rpp) noex {
+int ema_getbestaddr(ema *op,int i,cchar **rpp) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = ema_magic(hp)) >= 0) {
+	if ((rs = ema_magic(op)) >= 0) {
 	    cchar	*rp = nullptr ;
 	    void	*vp{} ;
-	    if ((rs = vechand_get(hp->elp,i,&vp)) >= 0) {
+	    if ((rs = vechand_get(op->elp,i,&vp)) >= 0) {
 	        if (vp) {
 		    ema_ent		*ep = entp(vp) ;
 	    	    if ((rl == 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
@@ -277,10 +242,10 @@ int ema_getbestaddr(ema *hp,int i,cchar **rpp) noex {
 /* end subroutine (ema_getbestaddr) */
 
 /* return the number of EMAs we have so far */
-int ema_count(ema *hp) noex {
+int ema_count(ema *op) noex {
 	int		rs ;
-	if ((rs = ema_magic(hp)) >= 0) {
-	    rs = vechand_count(hp->elp) ;
+	if ((rs = ema_magic(op)) >= 0) {
+	    rs = vechand_count(op->elp) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -301,8 +266,23 @@ int ema_addents(ema *op,ema *oop) noex {
 
 /* private subroutines */
 
+namespace ema_ns {
+    int ema_starter(ema *op,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = ema_start(op)) >= 0) {
+	    if (sp) {
+	        rs = ema_parse(op,sp,sl) ;
+	    } /* end if (optional data) */
+	    if (rs < 0) {
+	        ema_finish(op) ;
+	    }
+	} /* end if (ema_start) */
+	return rs ;
+   } /* end subroutine (ema_starter) */
+} /* end namespace (ema_ns) */
+
 /* this subroutine parses out EMAs recursively */
-static int ema_parseit(ema *hp,asstr *bp) noex {
+static int ema_parseit(ema *op,asstr *bp) noex {
 	asstr		as[si_overlast] ;
 	ema		*nlp = nullptr ;
 	int		rs = SR_OK ;
@@ -441,7 +421,7 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	            olen = bp->sp - orig ;
 	            if ((olen > 0) && (partslen(as) > 0)) {
 	                n += 1 ;
-	                rs = ema_load(hp,orig,olen,as,nlp) ;
+	                rs = ema_load(op,orig,olen,as,nlp) ;
 	            }
 	            partsend(as) ;
 	            if (rs >= 0) {
@@ -520,7 +500,7 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	if (rs >= 0) {
 	    if ((olen > 0) && (partslen(as) > 0)) {
 	        n += 1 ;
-	        rs = ema_load(hp,orig,olen,as,nlp) ;
+	        rs = ema_load(op,orig,olen,as,nlp) ;
 	        nlp = nullptr ;
 	    } else {
 	        if (nlp != nullptr) {
@@ -539,12 +519,12 @@ static int ema_parseit(ema *hp,asstr *bp) noex {
 	}
 
 	partsend(as) ;
-	hp->n += n ;
+	op->n += n ;
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (ema_parseit) */
 
-static int ema_load(ema *hp,cchar *orig,int olen,asstr *as,ema *nlp) noex {
+static int ema_load(ema *op,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 	ema_ent		*ep = nullptr ;
 	int		rs = SR_OK ;
 	if (olen < 0) olen = strlen(orig) ;
@@ -602,9 +582,9 @@ static int ema_load(ema *hp,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 	                ep->type = ematype_group ;
 	            }
 	            if (rs >= 0) {
-	                if ((rs = vechand_add(hp->elp,ep)) >= 0) {
+	                if ((rs = vechand_add(op->elp,ep)) >= 0) {
 	                    ep = nullptr ;
-	                    hp->n += 1 ;
+	                    op->n += 1 ;
 	                }
 	            }
 	            if (rs < 0) {
@@ -645,13 +625,13 @@ static int ema_addentone(ema *op,ema_ent *ep) noex {
 #endif /* CF_ADDENT */
 
 #ifdef	COMMENT
-static int ema_debugprint(ema *hp,cchar *s) noex {
+static int ema_debugprint(ema *op,cchar *s) noex {
 	if (s != nullptr) {
 	    debugprintf("ema_debugprint: s=%s\n",s) ;
 	}
-	debugprintf("ema_debugprint: n=%u\n",hp->n) ;
+	debugprintf("ema_debugprint: n=%u\n",op->n) ;
 	void		*vp{} ;
-	for (int i = 0 ; vechand_get(hp->elp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; vechand_get(op->elp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		ema_ent	*ep = entp(vp) ;
 	        entry_debugprint(ep,s) ;

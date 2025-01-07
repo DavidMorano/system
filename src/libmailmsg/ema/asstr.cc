@@ -67,9 +67,6 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 
-/* external subroutines */
-
-
 /* forward references */
 
 
@@ -116,6 +113,7 @@ namespace emaobj {
 	if (asp) {
 	    int		ne ;
 	    char	*cp{} ;
+	    rs = SR_OK ;
 	    if (asp->sp == nullptr) {
 	        asp->sl = 0 ;
 	        ne = ADDRESSLEN ;
