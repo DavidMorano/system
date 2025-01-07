@@ -1,4 +1,5 @@
 /* booleval SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* evaluate a boolean expression */
@@ -16,11 +17,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	booleval
+
 	Description:
 	This subroutine evaluates the boolean expression contained
 	in the input string "bexp" (contains characters 01&|() ).
 	a boolean expression is thus, for example, 1 & 0 . returns
-	1 (true), 0 (false), -1 (invalid expression).  the evaluation
+	1 (true), 0 (false), -1 (invalid expression).  The evaluation
 	is done by a table-driven stack machine.
 
 *******************************************************************************/
@@ -30,6 +34,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>

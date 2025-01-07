@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mhcom
+
+	Description:
 	This object separates comment characters from the value
 	characters in a mail message header field value.  Comment
 	characters are introduced with parentheses.  See RFC-822
@@ -88,9 +92,8 @@ static int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
 int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    int		size ;
+	    int		sz ;
 	    int		buflen ;
-	    void	*p{} ;
 	    memclear(op) ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
@@ -98,8 +101,8 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	        sl -= 1 ;
 	    }
 	    buflen = (sl + 2) ;
-	    size = (2*buflen) ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	    sz = (2*buflen) ;
+	    if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
 	        op->a = charp(p) ;
 	        op->value = (op->a + (0*buflen)) ;
 	        op->comment = (op->a + (1*buflen)) ;
@@ -219,7 +222,7 @@ static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	                    sbuf_chr((as + state),*sp++) ;
 			}
 	                break ;
-/* I think these cases are just optimizations (not required) */
+		    /* some optimizations (not required?) */
 	            case '\t':
 	            case ' ':
 	                if (! f_quote) {

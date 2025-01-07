@@ -23,16 +23,17 @@
 
 /*******************************************************************************
 
-        This is the front-end subroutine for the PCS program VMAIL. There is a
-        good bit of setup in this subroutine before the program goes
-        interactive.
+  	name:
+	vmail_term
 
+	Description:
+	This is the front-end subroutine for the PCS program VMAIL.
+	There is a good bit of setup in this subroutine before the
+	program goes interactive.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -59,28 +60,28 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	pathclean(char *,const char *,int) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
 extern int	mkuibang(char *,int,USERINFO *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	tcgetlines(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strncpylow(char *,const char *,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern char	*strncpylow(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -100,11 +101,12 @@ static int procmesg_end(PROGINFO *,UTERM *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progterm(PROGINFO *pip)
-{
+int progterm(progifo *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -122,8 +124,8 @@ int progterm(PROGINFO *pip)
 	if ((rs = uterm_start(&ut,pip->tfd)) >= 0) {
 	    if ((rs = proctermlines(pip,&ut)) >= 0) {
 		if ((rs = procmesg_begin(pip,&ut)) >= 0) {
-		    const int	ucmd = utermcmd_setmode ;
-		    const int	fm = fm_notecho ;
+		    cint	ucmd = utermcmd_setmode ;
+		    cint	fm = fm_notecho ;
 	            if ((rs = uterm_control(&ut,ucmd,fm)) >= 0) {
 			INTER		ia ;
 
@@ -179,13 +181,11 @@ int progterm(PROGINFO *pip)
 
 /* local subroutines */
 
-
-static int proctermlines(PROGINFO *pip,UTERM *utp)
-{
+static int proctermlines(PROGINFO *pip,UTERM *utp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		v ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #ifdef	COMMENT
 	if (pip->termtype == NULL) pip->termtype = getenv(VARTERM) ;
@@ -245,7 +245,7 @@ static int procmesg_begin(PROGINFO *pip,UTERM *utp)
 	int		rs ;
 	if ((rs = uterm_control(utp,utermcmd_getuid,0)) >= 0) {
 	    if (pip->euid == rs) {
-		const int	ucmd = utermcmd_setmesg ;
+		cint	ucmd = utermcmd_setmesg ;
 		if ((rs = uterm_control(utp,ucmd,FALSE)) >= 0) {
 	    	    pip->f.mesgs = (rs > 0) ;
 		    if (rs > 0) pip->changed.mesgs = TRUE ;
@@ -261,7 +261,7 @@ static int procmesg_end(PROGINFO *pip,UTERM *utp)
 {
 	int		rs = SR_OK ;
 	if (pip->changed.mesgs) {
-	    const int	ucmd = utermcmd_setmesg ;
+	    cint	ucmd = utermcmd_setmesg ;
 	    rs = uterm_control(utp,ucmd,pip->f.mesgs) ;
 	}
 	return rs ;

@@ -91,12 +91,9 @@ char	*nm, *buf ;
 	while (*d++ = *s) {
 
 	    if (*s++ == '$') {
-
-	        register char  *start = d ;
-	        register    braces = *s == '{' ;
-	        register char  *value ;
-
-
+	        char  *start = d ;
+	        char  *value ;
+	        braces = *s == '{' ;
 	        while (*d++ = *s) {
 
 	            if (braces ? *s == '}' : !isalnum (*s))
@@ -136,8 +133,8 @@ char	*nm, *buf ;
 
 	    } else {			/* ~user/filename */
 
-	        register char  *nnm ;
-	        register struct passwd *pw ;
+	        char  *nnm ;
+	        struct passwd *pw ;
 
 
 	        for (s = nm; *s && *s != '/'; s++) ;
@@ -172,9 +169,7 @@ char	*nm, *buf ;
 	while (*s) {
 
 	    if ((*d++ = *s++) == '/' && d > buf + 1) {
-
-	        register char  *t = d - 2 ;
-
+	        char  *t = d - 2 ;
 
 	        switch (*t) {
 	        case '/': 	/* found // in the name */

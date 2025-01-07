@@ -74,6 +74,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
@@ -95,9 +96,6 @@ all:			$(ALL)
 
 $(T).o:			$(OBJ_MAILALIAS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILALIAS)
-
-$(T).a:			$(OBJ_MAILALIAS)
-	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm

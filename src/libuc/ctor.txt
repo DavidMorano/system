@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int hdb_ctor(hdb *op,Args ... args) noex {
+static int mimetypes_ctor(mimetypes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int hdb_ctor(hdb *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (hdb_ctor) */
+/* end subroutine (mimetypes_ctor) */
 
-static int hdb_dtor(hdb *op) noex {
+static int mimetypes_dtor(mimetypes *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (hdb_dtor) */
+/* end subroutine (mimetypes_dtor) */
 
 template<typename ... Args>
-static inline int hdb_magic(hdb *op,Args ... args) noex {
+static inline int mimetypes_magic(mimetypes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MIMETYPES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (hdb_magic) */
+/* end subroutine (mimetypes_magic) */

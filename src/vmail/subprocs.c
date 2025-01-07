@@ -118,13 +118,14 @@ extern int	strlinelen(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int subprocs_start(SUBPROCS *op)
-{
-	const int	n = DEFENTRIES ;
-	const int	vo = (VECINT_OCOMPACT|VECINT_OSWAP|VECINT_OREUSE) ;
+int subprocs_start(SUBPROCS *op) noex {
+	cint		n = DEFENTRIES ;
+	cint		vo = (VECINT_OCOMPACT|VECINT_OSWAP|VECINT_OREUSE) ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;

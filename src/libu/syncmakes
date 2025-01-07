@@ -5,20 +5,19 @@ files_d | while read D ; do
   if [[ -f $MF ]] ; then
     DN=${D%/*}
     BN=${D##*/}
-    MFA=${BN}.mak
-    if [[ -f $MFA ]] ; then
-      if [[ $MF -ef $MFA ]] ; then 
-        print -- YES
+    for MFA in ${BN}.mak ${D}/${BN}.mak ; do
+      if [[ -f $MFA ]] ; then
+        if [[ $MF -ef $MFA ]] ; then 
+          print -- YES
+        else
+          print -- NO $BN
+	  ln -f $MF $MFA
+        fi
       else
-        print -- NO $BN
-        li $MF
-        li $MFA
-	ln -f $MF $MFA
+        print -- NOT present $MFA
+        ln -f $MF $MFA
       fi
-    else
-      print -- NOT present $MFA
-      ln -f $MF $MFA
-    fi
+    done
   fi
 done
 

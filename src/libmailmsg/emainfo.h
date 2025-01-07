@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
+/* parse mail route-address host and local parts */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -26,13 +29,12 @@
 
 /* object defines */
 #define	EMAINFO		struct emainfo_head
-
 /* other defines */
 #define	EMAINFO_TLOCAL		0
 #define	EMAINFO_TUUCP		1
 #define	EMAINFO_TARPA		2
 #define	EMAINFO_TARPAROUTE	3
-
+/* special token */
 #define	EMAINFO_LOCALHOST	"*LOCAL*"
 
 

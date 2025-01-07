@@ -69,8 +69,7 @@
 
 namespace mailutils {
     typedef int (*rt_t)[2] ;
-    class dbmake {
-    public:
+    struct dbmake {
 	vecobj		*rlp ;
 	strtab		*klp ;
 	strtab		*vlp ;
@@ -121,15 +120,14 @@ namespace mailutils {
 	int wrfilevals() noex ;
 	int mkind(vecobj *,cc *,rt_t,int) noex ;
     } ; /* end class (dbmake) */
-    class record {
-    public:
+    struct record {
 	uint		key ;
 	uint		val ;
 	record() noex : key(0), val(0) { } ;
 	record(uint k,uint v) noex : key(k), val(v) { } ;
     } ; /* end class (record) */
     typedef record *	recordp ;
-}
+} /* end namespace (mailutils) */
 
 
 #endif /* DBMAKE_INCLUDE */

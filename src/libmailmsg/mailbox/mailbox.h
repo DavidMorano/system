@@ -40,7 +40,6 @@
 #define	MAILBOX_READ		struct mailbox_reader
 #define	MAILBOX_FL		struct mailbox_flags
 #define	MAILBOX_MFL		struct mailbox_msgflags
-
 /* options */
 #define	MAILBOX_ORDONLY		O_RDONLY	/* open read-only */
 #define	MAILBOX_ORDWR		O_RDWR		/* open read-write */

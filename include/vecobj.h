@@ -117,6 +117,7 @@ struct vecobj : vecobj_head {
 	int add(cvoid *) noex ;
 	int adduniq(cvoid *) noex ;
 	int store(cvoid *,void **) noex ;
+	int find(cvoid *) noex ;
 	int get(int,void **) noex ;
 	int getvec(void ***) noex ;
 	int del(int = -1) noex ;

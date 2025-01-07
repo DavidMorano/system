@@ -72,6 +72,7 @@ default:		$(T).o
 
 all:			$(ALL)
 
+
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 

@@ -37,7 +37,7 @@ enum contentencodings {
 	contentencoding_overlast
 } ;
 
-extern cchar	*contentencodings[] ;
+extern cpcchar		contentencodings[] ;
 
 
 #define	CF_NONE		contentencoding_none,

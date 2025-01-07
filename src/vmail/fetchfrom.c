@@ -82,16 +82,13 @@ extern struct mailbox	mb ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int fetchfrom(pip,mn,str,len)
-struct proginfo	*pip ;
-int		mn, len ;
-char		str[] ;
-{
+int fetchfrom(proginfo *pip,int mn,char *str,int len) noex {
 	int	i, sl ;
-
 	char	temp[LINEBUFLEN + 1], last[LINEBUFLEN + 1] ;
 	char	sender[LINEBUFLEN + 1] ;
 	char	*word, *c ;
@@ -165,16 +162,15 @@ char		str[] ;
 	} /* end while */
 
 #ifdef	COMMENT
-/* pad to proper field length */
-
-	for (i = strlen(str) ; i < len ; i += 1)  
+	/* pad to proper field length */
+	for (i = strlen(str) ; i < len ; i += 1) {
 		str[i] = ' ' ;
+	}
 #endif
 
 	str[len] = '\0' ;
 	return SR_OK ;
 }
 /* end subroutine (fetchfrom) */
-
 
 

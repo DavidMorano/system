@@ -86,7 +86,6 @@
 /* exported subroutines */
 
 int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
-	sbuf		msgbuf ;
 	ulong		ulv ;
 	int		rs ;
 	int		rs1 ;
@@ -125,7 +124,7 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
 	        rs = SR_BADMSG ;
 	    }
 	} else { /* write */
-	    if ((rs = sbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
+	    if (sbuf msgbuf ; (rs = sbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
 	        sbuf_strw(&msgbuf,msp->username,-1) ;
 	        sbuf_chr(&msgbuf,'@') ;
 	        ulv = msp->offset ;

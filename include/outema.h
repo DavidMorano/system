@@ -33,7 +33,7 @@
 #include	<localmisc.h>
 
 
-#define	OUTEMA_MAGIC	0x837261595
+#define	OUTEMA_MAGIC	0x37261595
 #define	OUTEMA		struct outema_head
 #define	OUTEMA_FL	struct outema_flags
 

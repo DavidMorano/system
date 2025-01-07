@@ -406,6 +406,12 @@ typedef const char *const *	mainv ;
 typedef in_addr_t		in4_addr_t ;
 #endif
 
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#if	defined(OSNUM) && (OSNUM <= 9)
+typedef struct in6_addr		in6_addr_t ;
+#endif
+#endif
+
 /* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if	defined(OSNUM) && (OSNUM <= 7)
@@ -413,12 +419,6 @@ typedef in_addr_t		in4_addr_t ;
 #define	TYPEDEF_ID
 typedef int			id_t ;
 #endif /* TYPEDEF_ID */
-#endif
-#endif
-
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if	defined(OSNUM) && (OSNUM <= 9)
-typedef struct in6_addr		in6_addr_t ;
 #endif
 #endif
 

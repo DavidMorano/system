@@ -117,7 +117,10 @@ static inline int whitelist_magic(whitelist *op,Args ... args) noex {
 /* end subroutine (whitelist_magic) */
 
 static int	mkaddr(char *,int,cchar *,int) noex ;
-static int	cmpaddr(cchar **,cchar **) noex ;
+
+extern "C" {
+    static int	vcmpaddr(cchar **,cchar **) noex ;
+}
 
 
 /* local variables */
@@ -256,7 +259,7 @@ int whitelist_prematch(whitelist *op,cchar *ta) noex {
 	        vecstr	*lp = op->wlp ;
 	        if_constexpr (f_partial) {
 	             if (strpbrk(ta,"@!") != nullptr) {
-	                 if ((rs = vecstr_search(lp,ta,cmpaddr,np)) >= 0) {
+	                 if ((rs = vecstr_search(lp,ta,vcmpaddr,np)) >= 0) {
 	                     f = true ;
 	                 }
 	             }
@@ -308,7 +311,7 @@ static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
 }
 /* end subroutine (mkaddr) */
 
-static int cmpaddr(cchar **e1pp,cchar **e2pp) noex {
+static int vcmpaddr(cchar **e1pp,cchar **e2pp) noex {
 	cchar		*e1p = *e1pp ;
 	cchar		*e2p = *e2pp ;
 	int		rc = 0 ;
@@ -333,6 +336,6 @@ static int cmpaddr(cchar **e1pp,cchar **e2pp) noex {
 	}
 	return rc ;
 }
-/* end subroutine (cmpaddr) */
+/* end subroutine (vcmpaddr) */
 
 

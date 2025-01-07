@@ -55,23 +55,23 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
-OBJ1= mailmsgmatenv.o mailmsgmathdr.o
-OBJ2= mailmsghdrfold.o mailmsghdrval.o mailmsgheadkey.o
+OBJ0= mailmsgx.o mailmsg.o msgentry.o mailbox.o
+OBJ1= mailmsgmatx.o
+OBJ2= mailmsghdrx.o
 OBJ3= mhcom.o mcmsg.o mimetypes.o 
 OBJ4= ema.o emainfo.o comparse.o
 OBJ5= mbcache.o contypevals.o contentencodings.o
 OBJ6= whitelist.o splitaddr.o
 OBJ7= filer_mailsup.o mailalias.o 
 
-OBJ8= hdrextnum.o hdrextid.o
-OBJ9= hdrctype.o hdrdecode.o 
+OBJ8= hdrx.o
+OBJ9=
 
 OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
 OBJC= obj4.o obj5.o
 OBJD= obj6.o obj7.o
-OBJE= obj8.o obj9.o
+OBJE= obj8.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o
 
@@ -185,6 +185,21 @@ mailmsg.o:		mailmsg.dir
 mailmsg.dir:
 	makesubdir $@
 
+# MAILMSGX
+mailmsgx.o:		mailmsgx.dir
+mailmsgx.dir:
+	makesubdir $@
+
+# MAILMSGHDRX
+mailmsghdrx.o:		mailmsghdrx.dir
+mailmsghdrx.dir:
+	makesubdir $@
+
+# MAILMSGMATX
+mailmsgmatx.o:		mailmsgmatx.dir
+mailmsgmatx.dir:
+	makesubdir $@
+
 # MAILALIAS
 mailalias.o:		mailalias.dir
 mailalias.dir:
@@ -195,17 +210,14 @@ ema.o:		ema.dir
 ema.dir:
 	makesubdir $@
 
+# HDRX
+hdrx.o:		hdrx.dir
+hdrx.dir:
+	makesubdir $@
+
 contypevals.o:		contypevals.cc contypevals.h		$(INCS)
 contentencodings.o:	contentencodings.cc contentencodings.h	$(INCS)
 
-mailmsghdrfold.o:	mailmsghdrfold.cc mailmsghdrfold.h	$(INCS)
-mailmsghdrval.o:	mailmsghdrval.cc mailmsghdrval.h	$(INCS)
-mailmsghdrct.o:		mailmsghdrct.cc mailmsghdrct.h
-mailmsgmatenv.o:	mailmsgmatenv.cc mailmsgmatenv.h	$(INCS)
-mailmsgmathdr.o:	mailmsgmathdr.cc mailmsgmathdr.h	$(INCS)
-
-mailmsgstage.o:		mailmsgstage.cc mailmsgstage.h		$(INCS)
-mailmsgheadkey.o:	mailmsgheadkey.cc 			$(INCS)
 mbcache.o:		mbcache.cc mbcache.h			$(INCS)
 msgentry.o:		msgentry.cc msgentry.h			$(INCS)
 
@@ -214,10 +226,6 @@ mcmsg.o:		mcmsg.cc mcmsg.h			$(INCS)
 emainfo.o:		emainfo.cc emainfo.h			$(INCS)
 mimetypes.o:		mimetypes.cc mimetypes.h		$(INCS)
 
-hdrextnum.o:		hdrextnum.cc hdrextnum.h		$(INCS)
-hdrextid.o:		hdrextid.cc hdrextid.h			$(INCS)
-hdrctype.o:		hdrctype.cc hdrctype.h			$(INCS)
-hdrdecode.o:		hdrdecode.cc hdrdecode.h		$(INCS)
 outema.o:		outema.cc outema.h			$(INCS)
 comparse.o:		comparse.cc comparse.h			$(INCS)
 whitelist.o:		whitelist.cc whitelist.h		$(INCS)

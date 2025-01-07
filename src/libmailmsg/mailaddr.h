@@ -25,20 +25,15 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| */
 
 
-/* mail address */
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN		(3 * MAXHOSTNAMELEN)
-#endif
-
+/* mail-address types */
 #define	MAILADDRTYPE_NOHOST	-1
 #define	MAILADDRTYPE_LOCAL	0
 #define	MAILADDRTYPE_UUCP	1
 #define	MAILADDRTYPE_ARPA	2
 #define	MAILADDRTYPE_ARPAROUTE	3
-
+/* special token to indicate a local address */
 #define	MAILADDR_LOCALHOST	"*LOCAL*"
 #define	LOCALHOSTPART		"*LOCAL*"
 

@@ -296,8 +296,7 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	    op->aprofile = defprofile ;
 	    op->pagesize = getpagesize() ;
 	    if ((rs = ids_load(op->idp)) >= 0) {
-	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	            op->pr = cp ;
 	            if ((rs = uc_mallocstrw(pname,-1,&cp)) >= 0) {
 	                op->apname = cp ;
@@ -438,7 +437,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	    if (curp->magic == MAILALIAS_MAGIC) {
 		rs = SR_INVALID ;
 	        if (op->cursors) {
-	            ustime	dt = 0 ;
+	            time_t	dt = 0 ;
 		    int		ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
 		    /* capture a hold on the file */
 	            if ((rs = mailalias_enterbegin(op,dt)) >= 0) {
@@ -494,7 +493,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	    if (curp->magic == MAILALIAS_MAGIC) {
 		rs = SR_INVALID ;
 	        if (op->cursors) {
-	            time_t		dt = 0 ;
+	            time_t	dt = 0 ;
                     if ((rs = mailalias_enterbegin(op,dt)) >= 0) {
                         cint        ns = MAILALIAS_NSHIFT ;
 	                uint	khash ;
@@ -639,8 +638,7 @@ static int mailalias_opener(MA *op) noex {
 	if ((rs = maxpathlen) >= 0) {
 	    cint	maxpath = rs ;
 	    cint	sz = ((rs + 1) * 2) ;
-	    char	*a{} ;
-	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
 		cchar	*pname = op->apname ;
 	        cchar	*fe = MAILALIAS_FSUF ;
 	        char	endstr[2] ;
@@ -685,9 +683,8 @@ static int mailalias_checkchanged(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if ((dt - op->ti_filecheck) > TO_FILECHECK) {
-	    USTAT	sb ;
 	    op->ti_filecheck = dt ;
-	    if ((rs = u_stat(op->dbfname,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
 	        rs = mailalias_filechanged(op,&sb) ;
 	        f = rs ;
 	    } else if (isNotPresent(rs)) {
@@ -1254,31 +1251,30 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 static int mailalias_aprofiler(MA *op,char *tbuf,int tlen,cchar *profp) noex {
 	int		rs ;
 	int		rs1 ;
-	kvsfile		aptab ;
-	    if ((rs = kvsfile_open(&aptab,0,profp)) >= 0) {
-		vecstr		*app = op->afp ;
-	        kvsfile_cur	cur ;
+	if (kvsfile aptab ; (rs = kvsfile_open(&aptab,0,profp)) >= 0) {
+		vecstr		*afp = op->afp ;
 		cchar		*fp{} ;
-	        for (int i = 0 ; vecstr_get(app,i,&fp) >= 0 ; i += 1) {
+	        for (int i = 0 ; afp->get(i,&fp) >= 0 ; i += 1) {
 	            if (fp) {
-	                vecstr_del(op->afp,i--) ;
+	                afp->del(i--) ;
 	            }
 	        } /* end for */
-	        if ((rs = kvsfile_curbegin(&aptab,&cur)) >= 0) {
+	        kvsfile_cur cur ; 
+		if ((rs = kvsfile_curbegin(&aptab,&cur)) >= 0) {
 	            while (rs >= 0) {
 	                rs1 = kvsfile_fetch(&aptab,op->apname,&cur,tbuf,tlen) ;
 	                if (rs1 < 0) break ;
-	                rs = vecstr_add(op->afp,tbuf,rs1) ;
+	                rs = afp->add(tbuf,rs1) ;
 	            } /* end while */
 	            rs1 = kvsfile_curend(&aptab,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (kvsfile-cur) */
 	        if (rs >= 0) {
-	            rs = vecstr_getvec(op->afp,&op->aprofile) ;
+	            rs = afp->getvec(&op->aprofile) ;
 	        }
-	        rs1 = kvsfile_close(&aptab) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (opened key-values table) */
+	    rs1 = kvsfile_close(&aptab) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (opened key-values table) */
 	return rs ;
 }
 /* end subroutine (mailalias_aprofiler) */

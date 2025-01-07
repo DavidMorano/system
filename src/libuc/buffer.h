@@ -56,10 +56,10 @@ struct buffer_co {
 	    op = p ;
 	    w = m ;
 	} ;
+	int operator () (int = 0) noex ;
 	operator int () noex {
 	    return operator () () ;
 	} ;
-	int operator () (int = 0) noex ;
 } ; /* end struct (buffer_co) */
 struct buffer : buffer_head {
 	buffer_co	start ;
@@ -78,6 +78,11 @@ struct buffer : buffer_head {
 	int strw(cchar *,int = -1) noex ;
 	int chr(int) noex ;
 	int get(cchar **) noex ;
+	int strcompact(cchar *,int = -1) noex ;
+	int stropaque(cchar *,int = -1) noex ;
+	int strquote(cchar *,int = -1) noex ;
+	int chrs(int,int) noex ;
+	int blanks(int) noex ;
 	template<typename Binary> int bin(Binary) noex ;
 	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;

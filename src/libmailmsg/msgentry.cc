@@ -224,12 +224,11 @@ int msgentry_setce(msgentry *mep) noex {
 	cchar		*hp ;
 	mep->f.ceplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CENCODING,&hp)) > 0) {
-	    comparse	com ;
 	    int		vl ;
 	    cchar	*tp ;
 	    cchar	*vp ;
 	    mep->hdr.cencoding = true ;
-	    if ((rs = comparse_start(&com,hp,hl)) >= 0) {
+	    if (comparse com ; (rs = comparse_start(&com,hp,hl)) >= 0) {
 	        if ((vl = comparse_getval(&com,&vp)) > 0) {
 	            if ((tp = strnchr(vp,vl,';')) != nullptr) {
 	                vl = (tp - vp) ;

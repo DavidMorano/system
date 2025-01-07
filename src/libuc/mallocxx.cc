@@ -42,15 +42,13 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
+#include	<mailvalues.hh>
 #include	<localmisc.h>
 
 #include	"mallocxx.h"
 
 
 /* local defines */
-
-#define	HOSTNAMEMULT		2	/* host-name multiplier */
-#define	NODENAMEMULT		2	/* node-name multiplier */
 
 
 /* external subroutines */
@@ -179,6 +177,8 @@ int malloc_ps(char **rpp) noex {
 }
 
 int malloc_mailaddr(char **rpp) noex {
+    	cint		hmult = mailvalue.hostnamemult ;
+    	cint		nmult = mailvalue.nodenamemult ;
 	int		rs = SR_FAULT ;
 	int		mal = 0 ;		/* mail-address length */
 	if (rpp) {
@@ -188,7 +188,7 @@ int malloc_mailaddr(char **rpp) noex {
 		w = getbufsize_nn ;
 		if ((rs = getbufsize(w)) >= 0) {
 		    cint	nnl = rs ;
-		    mal = ((HOSTNAMEMULT * hnl) + (NODENAMEMULT * nnl)) ;
+		    mal = ((hmult * hnl) + (nmult * nnl)) ;
 		    rs = uc_malloc((mal+1),rpp) ;
 		} /* end if */
 	    } /* end if */

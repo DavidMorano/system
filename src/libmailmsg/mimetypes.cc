@@ -17,13 +17,16 @@
 
 /*******************************************************************************
 
+  	Object:
+	mimetypes
+
+	Description:
 	This object module manages a MIME-type database. It reads
 	in MIME-type formatted files with the |mimetypes_file()|
 	subroutine and provides other subroutines for database
 	queries.
 
 	Note on file parsing:
-
 	The MIME content type field (the first field of the file)
 	*must* be a single contiguous string without any white-space
 	in it. This may be obvious but it should be observed when
@@ -40,12 +43,14 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<strn.h>
+#include	<sfx.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
 #include	<char.h>
@@ -62,6 +67,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -79,13 +85,37 @@ typedef mimetypes_dat	mt_dat ;
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		typelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
 
+template<typename ... Args>
+static inline int mimetypes_magic(mimetypes *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MIMETYPES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mimetypes_magic) */
+
+static int	mimetypes_fileln(mt *,cchar *,int) noex ;
+
+static int	mkterms() noex ;
 static int	exttypespec(cchar *,int,cchar **) noex ;
 
 
 /* local variables */
+
+static vars		var ;
+
+static char		terms[fieldterms_termsize] ;
 
 
 /* exported variables */
@@ -93,84 +123,120 @@ static int	exttypespec(cchar *,int,cchar **) noex ;
 
 /* exported subroutines */
 
-int mimetypes_start(mt *dbp) noex {
+int mimetypes_start(mt *op) noex {
 	int		rs = SR_FAULT ;
-	if (dbp) {
-	    cint	ne = MIMETYPES_NUMKEYS ;
-	    rs = hdb_start(dbp,ne,1,nullptr,nullptr) ;
+	if (op) {
+	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+		cint	hsz = szof(hdb) ;
+		op->typelen = var.typelen ;
+		if (void *vp ; (rs = uc_malloc(hsz,&vp)) >= 0) {
+	            cint	ne = MIMETYPES_NUMKEYS ;
+		    op->dbp = (hdb *) vp ;
+	            if ((rs = hdb_start(op->dbp,ne,1,nullptr,nullptr)) >= 0) {
+			op->magic = MIMETYPES_MAGIC ;
+		    }
+		    if (rs < 0) {
+			uc_free(op->dbp) ;
+			op->dbp = nullptr ;
+		    }
+		} /* end if (memory-allocation) */
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mimetypes_start) */
 
-int mimetypes_finish(mt *dbp) noex {
+int mimetypes_finish(mt *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (dbp) {
-	    mt_cur	cur ;
-	    mt_dat	key ;
-	    mt_dat	data ;
-	    if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
-	        while (hdb_curenum(dbp,&cur,&key,&data) >= 0) {
-	            if (key.buf != nullptr) {
-		        void	*vp = voidp(key.buf) ;
-	                rs1 = uc_free(vp) ;
-	                if (rs >= 0) rs = rs1 ;
-	            }
-	        } /* end while */
-	        rs1 = hdb_curend(dbp,&cur) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
-	    {
-	        rs1 = hdb_finish(dbp) ;
-	        if (rs >= 0) rs = rs1 ;
+	int		rs2 ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->dbp) {
+	        hdb	*dbp = op->dbp ;
+	        if (mt_cur cur ; (rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	            mt_dat	key ;
+	            mt_dat	data ;
+	            while ((rs2 = hdb_curenum(dbp,&cur,&key,&data)) >= 0) {
+	                if (key.buf != nullptr) {
+		            void	*vp = voidp(key.buf) ;
+	                    rs1 = uc_free(vp) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                }
+	            } /* end while */
+		    if ((rs >= 0) && (rs2 != SR_NOTFOUND)) rs = rs2 ;
+	            rs1 = hdb_curend(dbp,&cur) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if */
+	        {
+	            rs1 = hdb_finish(dbp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+		{
+		    rs1 = uc_free(op->dbp) ;
+		    if (rs >= 0) rs = rs1 ;
+		    op->dbp = nullptr ;
+		}
 	    }
+	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mimetypes_finish) */
 
 /* read a whole file into the database */
-int mimetypes_file(mt *dbp,cchar *fname) noex {
-	int		rs = SR_FAULT ;
+int mimetypes_file(mt *op,cchar *fname) noex {
+	int		rs ;
 	int		rs1 ;
         int             c = 0 ;
-	if (dbp && fname) {
-	    cnullptr	np{} ;
-            int             ctl ;
-            int             size ;
-            int             cl, fl ;
-            cchar   *fp ;
-            cchar   *cp ;
-            cchar   *ctp ;
-	    char	*lbuf{} ;
-	    if ((rs = malloc_ml(&lbuf)) >= 0) {
+	if ((rs = mimetypes_magic(op,fname)) >= 0) {
+	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
                 bfile	mfile, *mfp = &mfile ;
-                char	terms[32] ;
 		cint	llen = rs ;
-                fieldterms(terms,false," \t#") ;
                 if ((rs = bopen(mfp,fname,"r",0666)) >= 0) {
-                    mt_dat      key ;
-                    mt_dat      data ;
                     while ((rs = breadln(mfp,lbuf,llen)) > 0) {
-                        field       fb ;
-                        int		len = rs ;
-                        if (lbuf[len - 1] == '\n') len -= 1 ;
-                        lbuf[len] = '\0' ;
-                        if (len == 0) continue ;
-    /* extract the typespec (MIME content type) */
-                        ctl = exttypespec(lbuf,len,&ctp) ;
-                        if (ctl <= 0) continue ;
-    /* get the file suffixes for this MIME content type */
-                        cp = ctp + ctl ;
-                        cl = len - (cp - lbuf) ;
-                        if ((rs = field_start(&fb,cp,cl)) >= 0) {
-                            cchar       *kp{} ;
-                            while ((fl = field_get(&fb,terms,&fp)) >= 0) {
-                                if (fl > 0) {
-                                    key.buf = fp ;
-                                    key.len = fl ;
-                                    if (hdb_fetch(dbp,key,np,&data) < 0) {
+			cchar	*cp ;
+			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+			    rs = mimetypes_fileln(op,cp,cl) ;
+			    c = rs ;
+			}
+                        if (rs < 0) break ;
+                    } /* end while (reading lines) */
+                    rs1 = bclose(mfp) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (bfile) */
+		rs1 = uc_free(lbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (magic) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (mimetypes_file) */
+
+static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
+	cnullptr	np{} ;
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	cchar		*ctp{} ;
+	/* extract the typespec (MIME content type) */
+	if (int ctl ; (ctl = exttypespec(lbuf,ll,&ctp)) > 0) {
+            int		size ;
+            int		cl, fl ;
+            cchar	*cp = ctp + ctl ;
+            /* get the file suffixes for this MIME content type */
+            cl = ll - (cp - lbuf) ;
+	    if (field fb ; (rs = fb.start(cp,cl)) >= 0) {
+		cchar	*fp ;
+		while ((fl = fb.get(terms,&fp)) >= 0) {
+		    if (fl > 0) {
+            		mt_dat	key ;
+            		mt_dat	data ;
+			cchar	*kp{} ;
+			key.buf = fp ;
+			key.len = fl ;
+                        if (hdb_fetch(op->dbp,key,np,&data) < 0) {
                                         char    *bkp, *bvp ;
                                         size = key.len + 1 + ctl + 1 ;
                                         rs = uc_malloc(size,&bkp) ;
@@ -181,122 +247,120 @@ int mimetypes_file(mt *dbp,cchar *fname) noex {
                                         strwcpy(bvp,ctp,ctl) ;
                                         data.len = ctl ;
                                         data.buf = bvp ;
-                                        rs = hdb_store(dbp,key,data) ;
+                                        rs = hdb_store(op->dbp,key,data) ;
                                         if (rs < 0) {
                                             uc_free(bkp) ;
                                             break ;
                                         }
                                         c += 1 ;
-                                    } /* end if */
-                                } /* end if */
-                                if (fb.term == '#') break ;
-                                if (rs < 0) break ;
-                            } /* end while (reading fields) */
-                            rs1 = field_finish(&fb) ;
-                            if (rs >= 0) rs = rs1 ;
-                        } /* end if (field) */
-                        if (rs < 0) break ;
-                    } /* end while (reading lines) */
-                    rs1 = bclose(mfp) ;
-                    if (rs >= 0) rs = rs1 ;
-                } /* end if (bfile) */
-		rs1 = uc_free(lbuf) ;
+			} /* end if */
+                    } /* end if (non-zero field) */
+ 		    if (fb.term == '#') break ;
+		    if (rs < 0) break ;
+		} /* end while (reading fields) */
+		rs1 = fb.finish ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (non-null) */
+	    } /* end if (field) */
+	} /* end if (exttypespec) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (mimetypes_file) */
+/* end subroutine (mimetypes_fileln) */
 
 /* find a MIME type for the given extension */
-int mimetypes_find(mt *dbp,char *typespec,cchar *ext) noex {
-	int		rs = SR_FAULT ;
+int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
+	int		rs ;
 	int		len = 0 ;
-	if (ext) {
-	    cchar	*tp = ext ;
+	if ((rs = mimetypes_magic(op,ext)) >= 0) {
+	    cchar	*tp ;
 	    rs = SR_NOTFOUND ;
 	    if (typespec) typespec[0] = '\0' ;
 	    if ((tp = strrchr(ext,'.')) != nullptr) {
 	        tp += 1 ;
+	    } else {
+		tp = ext ;
 	    }
 	    if (tp[0] != '\0') {
 	        mt_dat	key ;
-	        mt_dat	data ;
+	        mt_dat	data{} ;
 	        key.len = -1 ;
 	        key.buf = tp ;
-	        if ((rs = hdb_fetch(dbp,key,nullptr,&data)) >= 0) {
+	        if ((rs = hdb_fetch(op->dbp,key,nullptr,&data)) >= 0) {
 	            if (typespec != nullptr) {
-	                cint	typelen = MIMETYPES_TYPELEN ;
+	                cint	typelen = var.typelen ;
 		        cchar	*valp = charp(data.buf) ;
 	                rs = snwcpy(typespec,typelen,valp,data.len) ;
 	                len = rs ;
 	            }
 	        }
 	    } /* end if (found) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mimetypes_find) */
 
-int mimetypes_curbegin(mt *dbp,mt_cur *cp) noex {
-	return hdb_curbegin(dbp,cp) ;
+int mimetypes_curbegin(mt *op,mt_cur *curp) noex {
+    	int		rs ;
+	if ((rs = mimetypes_magic(op,curp)) >= 0) {
+	    rs = hdb_curbegin(op->dbp,curp) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (mimetypes_curbegin) */
 
-int mimetypes_curend(mt *dbp,mt_cur *cp) noex {
-	return hdb_curend(dbp,cp) ;
+int mimetypes_curend(mt *op,mt_cur *curp) noex {
+    	int		rs ;
+	if ((rs = mimetypes_magic(op,curp)) >= 0) {
+	    rs = hdb_curend(op->dbp,curp) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (mimetypes_curend) */
 
 /* enumerate all of the key-val pairs */
-int mimetypes_enum(mt *dbp,mt_cur *curp,char *ext,char *ts) noex {
-	int		rs = SR_FAULT ;
-	if (dbp && curp && ext) {
-	    mt_dat	key ;
-	    mt_dat	val ;
+int mimetypes_enum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
+	int		rs ;
+	if ((rs = mimetypes_magic(op,curp,ext)) >= 0) {
+	    mt_dat	key{} ;
+	    mt_dat	val{} ;
 	    ext[0] = '\0' ;
 	    if (ts) ts[0] = '\0' ;
-	    if ((rs = hdb_curenum(dbp,curp,&key,&val)) >= 0) {
-	        cint	ml = min(key.len,MIMETYPES_TYPELEN) ;
+	    if ((rs = hdb_curenum(op->dbp,curp,&key,&val)) >= 0) {
+	        cint	ml = min(key.len,var.typelen) ;
 	        cchar	*kp = charp(key.buf) ;
 	        strwcpy(ext,kp,ml) ;
-	        rs = min(val.len,MIMETYPES_TYPELEN) ;
+	        rs = min(val.len,var.typelen) ;
 	        if (ts != nullptr) {
 		    cchar	*valp = charp(val.buf) ;
 		    strwcpy(ts,valp,rs) ;
 	        }
 	    }
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mimetypes_enum) */
 
-
 /* fetch the next val by extension and a possible cursor */
-int mimetypes_fetch(mt *dbp,mt_cur *curp,
-		char *ext,char *ts) noex {
-	mt_dat	key, val ;
+int mimetypes_fetch(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	int		rs ;
-
-	if (dbp == nullptr) return SR_FAULT ;
-	if ((ext == nullptr) || (ts == nullptr)) return SR_FAULT ;
-
-	key.buf = ext ;
-	key.len = -1 ;
-	ts[0] = '\0' ;
-	if ((rs = hdb_fetch(dbp,key,curp,&val)) >= 0) {
-	    cint	ml = min(val.len,MIMETYPES_TYPELEN) ;
-	    cchar	*mp = charp(val.buf) ;
-	    rs = (strwcpy(ts,mp,ml) - ts) ;
-	}
-
+	if ((rs = mimetypes_magic(op,curp,ext,ts)) >= 0) {
+	    mt_dat	key ;
+	    mt_dat	val{} ;
+	    key.buf = ext ;
+	    key.len = -1 ;
+	    ts[0] = '\0' ;
+	    if ((rs = hdb_fetch(op->dbp,key,curp,&val)) >= 0) {
+	        cint	ml = min(val.len,var.typelen) ;
+	        cchar	*mp = charp(val.buf) ;
+	        rs = (strwcpy(ts,mp,ml) - ts) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mimetypes_fetch) */
 
 /* OLDER API: find a MIME type given an extension */
-int mimetypes_get(mt *dbp,char *typespec,cchar *ext) noex {
-	return mimetypes_find(dbp,typespec,ext) ;
+int mimetypes_get(mt *op,char *typespec,cchar *ext) noex {
+	return mimetypes_find(op,typespec,ext) ;
 }
 /* end subroutine (mimetypes_get) */
 
@@ -308,13 +372,12 @@ static int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
 	int		spec = -1 ;
 	int		cl = tlen ;
 	cchar		*cp = tbuf ;
-	cchar		*sp ;
 	while (CHAR_ISWHITE(*cp) && (cl > 0)) {
 	    cp += 1 ;
 	    cl -= 1 ;
 	}
 	if (*cp != '#') {
-	    sp = cp ;
+	    cchar	*sp = cp ;
 	    while (*cp && (cl > 0) && (! CHAR_ISWHITE(*cp)) && (*cp != '#')) {
 	        cp += 1 ;
 	        cl -= 1 ;
@@ -325,5 +388,19 @@ static int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
 	return spec ;
 }
 /* end subroutine (exttypespec) */
+
+static int mkterms() noex {
+    	return fieldterms(terms,false," \t#") ;
+}
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    typelen = rs ;	/* "TYPELEN" is set to MAXNAMELEN */
+	    rs = mkterms() ;
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

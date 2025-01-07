@@ -31,6 +31,10 @@
 	int filer_writehdrkey(filer *,cchar *) noex
 	int filer_writehdrkey(filer *,cchar *) noex
 
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -73,6 +77,8 @@ static int filer_writehdrval(filer *,cchar *,int) noex ;
 
 /* local variables */
 
+constexpr int		mcols = MAILMSGCOLS ;
+
 
 /* exported variables */
 
@@ -85,25 +91,24 @@ int filer_writehdr(filer *fbp,cchar *sp,int sl) noex {
 	if (fbp && sp) {
 	    int		kl ;
 	    int		vl = -1 ;
-	    cchar	*tp ;
 	    cchar	*vp = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    kl = sl ;
-	    if ((tp = strnchr(sp,sl,'=')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        kl = (tp - sp) ;
 	        vp = (tp+1) ;
 	        vl = ((sp+sl)-vp) ;
 	    }
 	    if (kl > 0) {
-	        if ((rs = filer_write(fbp,sp,kl)) >= 0) {
+	        if ((rs = fbp->write(sp,kl)) >= 0) {
 	            wlen += rs ;
-	            if ((rs = filer_write(fbp,": ",2)) >= 0) {
+	            if ((rs = fbp->write(": ",2)) >= 0) {
 	                wlen += rs ;
 	                if (vl > 0) {
 	                    rs = filer_writehdrval(fbp,vp,vl) ;
 	                    wlen += rs ;
 	                } else {
-	                    rs = filer_println(fbp,sp,0) ;
+	                    rs = fbp->println(sp,0) ;
 	                    wlen += rs ;
 	                }
 	            } /* end if (write) */
@@ -120,9 +125,9 @@ int filer_writehdrkey(filer *fbp,cchar *kn) noex {
 	if (fbp && kn) {
 	    rs = SR_INVALID ;
 	    if (kn[0]) {
-	        if ((rs = filer_write(fbp,kn,-1)) >= 0) {
+	        if ((rs = fbp->write(kn,-1)) >= 0) {
 	            wlen += rs ;
-	            rs = filer_write(fbp,": ",2) ;
+	            rs = fbp->write(": ",2) ;
 	            wlen += rs ;
 	        }
 	    } /* end if (valid) */
@@ -142,17 +147,17 @@ int filer_printlncont(filer *fbp,int leader,cchar *sp,int sl) noex {
 	        if ((rs >= 0) && (leader > 0)) {
 	            buf[0] = leader ;
 	            buf[1] = '\0' ;
-	            rs = filer_write(fbp,buf,1) ;
+	            rs = fbp->write(buf,1) ;
 	            wlen += rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = filer_write(fbp,sp,sl) ;
+	            rs = fbp->write(sp,sl) ;
 	            wlen += rs ;
 	        }
 	        if (rs >= 0) {
 	            buf[0] = '\n' ;
 	            buf[1] = '\0' ;
-	            rs = filer_write(fbp,buf,1) ;
+	            rs = fbp->write(buf,1) ;
 	            wlen += rs ;
 	        }
 	    } /* end if (non-empty value) */
@@ -171,32 +176,30 @@ static int filer_writehdrval(filer *fbp,cchar *vp,int vl) noex {
 	int		wlen = 0 ;
 	if (vp) {
 	    MAILMSGHDRFOLD	folder, *fp = &folder ;
-	    static cint		mcols = MAILMSGCOLS ;
 	    if (vl < 0) vl = strlen(vp) ;
 	    while (vl && CHAR_ISWHITE(*vp)) {
 	        vp += 1 ;
 	        vl -= 1 ;
 	    }
 	    if ((rs = mailmsghdrfold_start(fp,mcols,ln,vp,vl)) >= 0) {
-	        int	i = 0 ;
 	        int	indent = wlen ;
-	        while (rs >= 0) {
+	        for (int i = 0 ; rs >= 0 ; ) {
 	    	    int		ll ;
 	    	    cchar	*lp = nullptr ;
 	            rs = mailmsghdrfold_get(fp,indent,&lp) ;
 	            if (rs <= 0) break ;
 	            ll = rs ;
 	            if ((rs >= 0) && (i > 0)) {
-	                rs = filer_write(fbp," ",1) ;
+	                rs = fbp->write(" ",1) ;
 	                wlen += rs ;
 	            }
 	            if (rs >= 0) {
-	                rs = filer_println(fbp,lp,ll) ;
+	                rs = fbp->println(lp,ll) ;
 	                wlen += rs ;
 	            }
 	            indent = 1 ;
 	            i += 1 ;
-	        } /* end while */
+	        } /* end for */
 	        rs1 = mailmsghdrfold_finish(fp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mailmsghdrfold) */

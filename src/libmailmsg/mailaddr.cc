@@ -17,6 +17,10 @@
 
 /*****************************************************************************
 
+  	Group:
+	mailaddr
+
+	Description:
 	This subroutine will parse email route addresses into
 	hostname and localname parts.  The assumption is that only
 	route addresses are given to us.  If this is wrong, the
@@ -26,11 +30,7 @@
 
 	Synopsis:
 	int mailaddrparse(dp,dl,mahost,malocal)
-
-	Synopsis:
 	int mailaddrjoin(dp,dl,mahost,malocal,type)
-
-	Synopsis:
 	int mailaddrarpa(dp,dl,mahost,malocal,type)
 
 	Arguments:

@@ -19,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	mbcache
+
+	Description:
 	This object parses out and then caches information about
 	messages within a mailbox.  All information saved about
 	each message is stored under the index of that message
@@ -27,7 +31,6 @@
 	Implementation notes
 
 	= Things to watch for (or to do in the future)
-
 	This object is a cache of the MAILBOX object, but we provide
 	some additional processing that the MAILBOX object does not
 	provide.  For the most part, the MAILBOX object contains
@@ -51,6 +54,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<char.h>
@@ -67,7 +72,7 @@
 #include	<timestr.h>
 #include	<intsat.h>
 #include	<isoneof.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| */
+#include	<localmisc.h>		/* }DIGBUFLEN| + |MAILADDRLEN| */
 
 #include	"mailbox.h"
 #include	"mbcache.h"
@@ -81,16 +86,10 @@
 #undef	BUFLEN
 #define	BUFLEN		MAX(100,MAILADDRLEN)
 
-#ifndef	HDRBUFLEN
-#define	HDRBUFLEN	(2*MAILADDRLEN)
-#endif
+#define	HDRBUFMULT	4		/* only four?! */
 
 #undef	SCANBUFLEN
 #define	SCANBUFLEN	100
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
 
 #define	RECORDFNAME	"envelopes.log"
 
@@ -129,15 +128,22 @@ struct scantitle {
 	int		col ;
 } ;
 
+namespace {
+    struct vars {
+	int		hdrbuflen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
 
 template<typename ... Args>
 static int mbcache_ctor(mbcache *op,Args ... args) noex {
+    	MBCACHE		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
-	    memclear(op) ;
+	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -162,6 +168,7 @@ static int mbcache_magic(mbcache *op,Args ... args) noex {
 }
 /* end subroutine (mbcache_magic) */
 
+static int mbcache_starter(mbcache *,cc *) noex ;
 static int mbcache_msgfins(mbcache *) noex ;
 static int mbcache_msgframing(mbcache *,int,ME **) noex ;
 static int mbcache_msgtimers(mbcache *,int,time_t *) noex ;
@@ -228,6 +235,8 @@ constexpr struct scantitle	scantitles[] = {
 } ;
 #endif /* COMMENT */
 
+static vars		var ;
+
 
 /* exported variables */
 
@@ -240,22 +249,38 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	if ((rs = mbcache_ctor(op,mbfname,mbp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (mbfname[0]) {
-		cnullptr	np{} ;
-	        strpack		*psp = &op->strs ;
-	        cchar		*cp ;
+		static cint	rsv = var ;
 	        op->mflags = mflags ;
 	        op->mbp = mbp ;
 	        op->f.readonly = (! (mflags & MBCACHE_ORDWR)) ;
-	        if ((rs = uc_mallocstrw(mbfname,-1,&cp)) >= 0) {
+		if ((rs = rsv) >= 0) {
+		    rs = mbcache_starter(op,mbfname) ;
+		    nmsgs = rs ;
+		}
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		mbcache_dtor(op) ;
+	    }
+	} /* end if (mbcache_ctor) */
+	return (rs >= 0) ? nmsgs : rs ;
+}
+/* end subroutine (mbcache_start) */
+
+static int mbcache_starter(mbcache *op,cc *mbfname) noex {
+	cnullptr	np{} ;
+	mailbox		*mbp = op->mbp ;
+	strpack		*psp = &op->strs ;
+	int		rs ;
+	int		nmsgs = 0 ;
+	        if (cchar *cp ; (rs = uc_mallocstrw(mbfname,-1,&cp)) >= 0) {
 	            mailbox_info	*mip = &op->mbi ;
 	            op->mbfname = cp ;
 	            if ((rs = mailbox_getinfo(mbp,mip)) >= 0) {
 	                cint	mssize = szof(ME **) ;
 	                if (mip->nmsgs >= 0) {
 	                    cint	sz = ((mip->nmsgs + 1) * mssize) ;
-	                    void	*vp{} ;
 	                    nmsgs = mip->nmsgs ;
-	                    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	                    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
 	                        cint	csize = (mip->nmsgs * 6 * 20) ;
 	                        op->msgs = mepp(vp) ;
 	                        memset(op->msgs,0,sz) ;
@@ -282,14 +307,9 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	                op->mbfname = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
-	    } /* end if (valid) */
-	    if (rs < 0) {
-		mbcache_dtor(op) ;
-	    }
-	} /* end if (mbcache_ctor) */
 	return (rs >= 0) ? nmsgs : rs ;
 }
-/* end subroutine (mbcache_start) */
+/* end subroutine (mbcache_starter) */
 
 int mbcache_finish(mbcache *op) noex {
 	int		rs ;
@@ -1003,17 +1023,19 @@ static int msgentry_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	cchar		*hdr = HN_MESSAGEID ;
 	cchar		*sp ;
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
+	    cint	hlen = var.hdrbuflen ;
 	    strpack	*psp = &op->strs ;
-	    cint	hlen = HDRBUFLEN ;
-	    char	hbuf[HDRBUFLEN+1] ;
-	    if ((rs = mkaddrbest(hbuf,hlen,sp,rs)) >= 0) {
-	        cint	vi = mbcachemf_hdrmid ;
-	        cchar	**rpp ;
-	        sl = rs ;
-	        rpp = (mep->vs + vi) ;
-	        mep->vl[vi] = sl ;
-	        rs = strpack_store(psp,hbuf,sl,rpp) ;
-	    } /* end if (mkaddrbest) */
+	    if (char *hbuf ; (rs = uc_malloc((hlen+1),&hbuf)) >= 0) {
+	        if ((rs = mkaddrbest(hbuf,hlen,sp,rs)) >= 0) {
+	            cint	vi = mbcachemf_hdrmid ;
+	            cchar	**rpp ;
+	            sl = rs ;
+	            rpp = (mep->vs + vi) ;
+	            mep->vl[vi] = sl ;
+	            rs = strpack_store(psp,hbuf,sl,rpp) ;
+	        } /* end if (mkaddrbest) */
+		rs = rsfree(rs,hbuf) ;
+	    } /* end if (m-a-f) */
 	} else if (isNoMsg(rs)) {
 	    rs = SR_OK ;
 	}
@@ -1176,19 +1198,21 @@ static int msgentry_procscanfrom(ME *mep,mbcache *op) noex {
 	        sp = mep->vs[mbcachemf_envaddr] ;
 	    }
 	    if ((sp != nullptr) && (sl > 0)) {
-	        strpack		*psp = &op->strs ;
-	        cint		hlen = HDRBUFLEN ;
-	        char		hbuf[HDRBUFLEN+1] ;
-	        if ((rs = mkaddrname(hbuf,hlen,sp,sl)) >= 0) {
-	            cint	vi = mbcachemf_scanfrom ;
-	            cchar	**rpp ;
-	            len = rs ;
-	            rpp = (mep->vs + vi) ;
-	            mep->vl[vi] = len ;
-	            if ((rs = strpack_store(psp,hbuf,len,rpp)) >= 0) {
-	                mep->f.scanfrom = true ;
-	            }
-	        }
+	        strpack	*psp = &op->strs ;
+	        cint	hlen = var.hdrbuflen ;
+	        if (char *hbuf ; (rs = uc_malloc((hlen+1),&hbuf)) >= 0) {
+	            if ((rs = mkaddrname(hbuf,hlen,sp,sl)) >= 0) {
+	                cint	vi = mbcachemf_scanfrom ;
+	                cchar	**rpp ;
+	                len = rs ;
+	                rpp = (mep->vs + vi) ;
+	                mep->vl[vi] = len ;
+	                if ((rs = strpack_store(psp,hbuf,len,rpp)) >= 0) {
+	                    mep->f.scanfrom = true ;
+	                }
+	            } /* end if (mkaddrname) */
+		    rs = rsfree(rs,hbuf) ;
+		} /* end if (m-a-f) */
 	    } /* end if (positive) */
 	} else if (mep->vs[mbcachemf_scanfrom] != nullptr) {
 	    len = mep->vl[mbcachemf_scanfrom] ;
@@ -1243,6 +1267,14 @@ static int msgentry_msgtimes(ME *mep,mbcache *op) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (msgentry_msgtimes) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mailaddr)) >= 0) {
+	    hdrbuflen = (rs * HDRBUFMULT) ;
+	}
+	return rs ;
+}
 
 static bool isBadDate(int rs) noex {
 	return isOneOf(rsdatebad,rs) ;

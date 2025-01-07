@@ -55,7 +55,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_BUFFER= buffer_main.o
+OBJ0_BUFFER= buffer_main.o buffer_obj.o
 OBJ1_BUFFER= buffer_chrs.o
 OBJ2_BUFFER= buffer_strquote.o
 OBJ3_BUFFER= buffer_strcompact.o buffer_stropaque.o
@@ -137,6 +137,7 @@ objb.o:			$(OBJB_BUFFER)
 
 
 buffer_main.o:		buffer_main.cc		$(INCS)
+buffer_obj.o:		buffer_obj.cc		$(INCS)
 buffer_chrs.o:		buffer_chrs.cc		$(INCS)
 buffer_strcompact.o:	buffer_strcompact.cc	$(INCS)
 buffer_stropaque.o:	buffer_stropaque.cc	$(INCS)

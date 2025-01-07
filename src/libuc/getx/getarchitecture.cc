@@ -118,7 +118,7 @@ int getarchitecture(char *rbuf,int rlen) noex {
 
 archer::operator int () noex {
 	int		rs = SR_OK ;
-	for (const auto &m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != SR_OK) break ;
 	} /* end for */

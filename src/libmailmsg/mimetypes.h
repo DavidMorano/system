@@ -13,7 +13,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -23,12 +22,18 @@
 #include	<localmisc.h>		/* |MAXNAMELEN| */
 
 
-/* object defines */
-#define	MIMETYPES		hdb
+#define	MIMETYPES		mimetypes_head
 #define	MIMETYPES_CUR		hdb_cur
 #define	MIMETYPES_DAT		hdb_dat
-#define	MIMETYPES_TYPELEN	MAXNAMELEN
 #define	MIMETYPES_NUMKEYS	200	/* initial estimated number of keys */
+#define	MIMETYPES_MAGIC		0x22047662
+
+
+struct mimetypes_head {
+    	hdb		*dbp ;
+	uint		magic ;
+	int		typelen ;
+} ;
 
 
 typedef MIMETYPES	mimetypes ;

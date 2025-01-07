@@ -19,6 +19,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
+#include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -29,39 +30,34 @@
 
 #define	LKMAIL_MAGIC	0x95437651
 #define	LKMAIL		struct lkmail_head
-#define	LKMAIL_IDS	struct lkmail_ids
+#define	LKMAIL_IDS	struct lkmail_holdids
 
 
-struct lkmail_ids {
+struct lkmail_holdids {
 	uid_t		uid, euid, uid_maildir ;
 	gid_t		gid, egid, gid_maildir ;
 } ;
 
 struct lkmail_head {
-	uint		magic ;
+	char		*lockfname ;
 	LKMAIL_IDS	id ;
+	uint		magic ;
 	int		lfd ;
-	char		lockfname[MAXPATHLEN + 1] ;
 } ;
 
+typedef	LKMAIL		lkmail ;
+typedef	LKMAIL_IDS	lkmail_ids ;
 
-#if	(! defined(LKMAIL_MASTER)) || (LKMAIL_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int lkmail_start(lkmail *,lkmail_ids *,cchar *) noex ;
+extern int lkmail_create(lkmail *) noex ;
+extern int lkmail_unlink(lkmail *) noex ;
+extern int lkmail_old(lkmail *,time_t,int) noex ;
+extern int lkmail_finish(lkmail *) noex ;
 
-extern int lkmail_start(LKMAIL *,LKMAIL_IDS *,cchar *) ;
-extern int lkmail_create(LKMAIL *) ;
-extern int lkmail_unlink(LKMAIL *) ;
-extern int lkmail_old(LKMAIL *,time_t,int) ;
-extern int lkmail_finish(LKMAIL *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* LKMAIL_MASTER */
 
 #endif /* LKMAIL_INCLUDE */
 

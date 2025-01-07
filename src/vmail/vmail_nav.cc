@@ -1,16 +1,18 @@
-/* navigate */
+/* vmail_nav SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* navigate among the mail message in the current mailbox */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
-
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -18,17 +20,19 @@
 
 /*******************************************************************************
 
-        Move the global curr.msgno message pointer to the previous or next
-        message ; if none, leave pointer at the limit. Some useful information:
+  	Name:
+	vmail_nav
+
+	Description:
+	Move the global curr.msgno message pointer to the previous
+	or next message ; if none, leave pointer at the limit. Some
+	useful information:
 
 	curr.msgno	holds the  number of current message [1 to 'total']
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -41,7 +45,7 @@
 
 #include	"config.h"
 #include	"defs.h"
-#include	"ds.h>
+#include	"ds.h"
 
 
 /* external subroutines */
@@ -52,28 +56,27 @@
 extern struct mailbox	mb ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int navigate(pip,dsp,mbp,inc)
-struct proginfo	*pip ;
-DS		*dsp ;
-struct mailbox	*mbp ;
-int	inc ;
-{
+int navigate(proginfo *pip,DS *dsp,mailbox *mbp,int inc) noex {
 	int	f_scroll = FALSE ;
 	int	nshown ;
 	int	nscroll = 0 ;
 	int	m_first, m_last, m_farlast, m_farfirst ;
-	int	new, new_first, new_last ;
+	int	nval ;
+	int	new_first, new_last ;
 	int	new_cur ;
 
 
-	new = mbp->current + inc ;
-	if (new < 0) new = 0 ;
+	nval = mbp->current + inc ;
+	if (nval < 0) nval = 0 ;
 
-	if (new > (mbp->total - 1)) 
-		new = (mbp->total - 1) ;
+	if (nval > (mbp->total - 1)) {
+	    nval = (mbp->total - 1) ;
+	}
 
 	curr.pageno = 0 ;
 	nshown = dsp->nh ;
@@ -88,7 +91,7 @@ int	inc ;
 #if	CF_DEBUG
 	if (pip->debuglevel > 0) {
 	    debugprintf("navigate: nshown current=%d new=%d t=%d margin=%d\n",
-	        mbp->current,new,mbp->total,dsp->margin) ;
+	        mbp->current,nval,mbp->total,dsp->margin) ;
 	    debugprintf("navigate: nshown current=%d s=%d l=%d f=%d\n",
 	        mbp->current,nshown,
 		m_last,mbp->shown) ;
@@ -96,35 +99,38 @@ int	inc ;
 #endif
 
 	m_farlast = m_last + nshown ;
-	if (m_farlast > (mbp->total - 1)) 
+	if (m_farlast > (mbp->total - 1)) {
 		m_farlast = (mbp->total - 1) ;
+	}
 
 /* handle the cases */
 /* determine the number of lines to scroll the message display */
 
-	if (new < (m_first + dsp->margin)) {
+	if (nval < (m_first + dsp->margin)) {
 
-	    new_first = new - dsp->margin ;
-	    if (new_first < 0) 
+	    new_first = nval - dsp->margin ;
+	    if (new_first < 0) {
 			new_first = 0 ;
+	    }
 
 	    nscroll = new_first - m_first ;
-	    new_cur = new - new_first ;
+	    new_cur = nval - new_first ;
 	    ds_scan(dsp,&mb,new_first,nshown,nscroll,
 	        dsp->hl_cur,new_cur) ;
 
-	} else if (new > (m_last - dsp->margin)) {
+	} else if (nval > (m_last - dsp->margin)) {
 
-	    new_last = new + dsp->margin ;
-	    if (new_last > (mbp->total - 1)) 
+	    new_last = nval + dsp->margin ;
+	    if (new_last > (mbp->total - 1)) {
 			new_last = (mbp->total - 1) ;
+	    }
 
 	    new_first = new_last + 1 - nshown ;
 	    if (new_first < 0) 
 		new_first = 0 ;
 
 	    nscroll = new_first - m_first ;
-	    new_cur = new - new_first ;
+	    new_cur = nval - new_first ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 0)
@@ -143,7 +149,7 @@ debugprintf("navigate: last nf=%d, nl=%d, ns=%d, nc=%d\n",
 	} else {
 
 	    new_first = m_first ;
-	    new_cur = new - new_first ;
+	    new_cur = nval - new_first ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 0)
@@ -165,7 +171,7 @@ debugprintf("middle nf=%d, ns=%d, nc=%d\n",
 
 	dsp->hl_cur = new_cur ;
 	mbp->shown = new_first ;
-	mbp->current = new ;
+	mbp->current = nval ;
 	curr.msgno = mbp->current ;
 
 	cursline = dsp->hl_cur ;
@@ -180,6 +186,5 @@ debugprintf("middle nf=%d, ns=%d, nc=%d\n",
 	return nscroll ;
 }
 /* end subroutine (navigate) */
-
 
 

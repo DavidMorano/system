@@ -44,10 +44,10 @@ typedef MHCOM		mhcom ;
 
 EXTERNC_begin
 
-extern int mhcom_start(MHCOM *,cchar *,int) noex ;
-extern int mhcom_getval(MHCOM *,cchar **) noex ;
-extern int mhcom_getcom(MHCOM *,cchar **) noex ;
-extern int mhcom_finish(MHCOM *) noex ;
+extern int mhcom_start(mhcom *,cchar *,int) noex ;
+extern int mhcom_getval(mhcom *,cchar **) noex ;
+extern int mhcom_getcom(mhcom *,cchar **) noex ;
+extern int mhcom_finish(mhcom *) noex ;
 
 EXTERNC_end
 

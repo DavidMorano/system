@@ -68,6 +68,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -84,7 +85,7 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int emainfo_load(EMAINFO *eip,cchar *sp,int sl) noex {
+int emainfo_load(emainfo *eip,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		type = 0 ;
 	if (eip && sp) {
@@ -92,10 +93,10 @@ int emainfo_load(EMAINFO *eip,cchar *sp,int sl) noex {
 	    cchar	*cp1, *cp2 ;
 	    rs = memclear(eip) ;
 	    if (sl < 0) sl = strlen(sp) ;
-/* what kind of address do we have? */
+	    /* what kind of address do we have? */
 	    if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
 	        if ((cp2 = strnchr(sp,sl,':')) != nullptr) {
-/* ARPAnet route address */
+		    /* ARPAnet route address */
 	            eip->type = EMAINFO_TARPAROUTE ;
 	            if ((cp = strnchr(sp,sl,',')) != nullptr) {
 	                eip->host = (cp1 + 1) ;
@@ -109,7 +110,7 @@ int emainfo_load(EMAINFO *eip,cchar *sp,int sl) noex {
 	                eip->llen = (sp + sl) - (cp2 + 1) ;
 	            } /* end if */
 	        } else {
-/* normal ARPAnet address */
+		    /* normal ARPAnet address */
 	            eip->type = EMAINFO_TARPA ;
 	            eip->host = (cp1 + 1) ;
 	            eip->hlen = (sp + sl) - (cp1 + 1) ;
@@ -124,7 +125,7 @@ int emainfo_load(EMAINFO *eip,cchar *sp,int sl) noex {
 	        eip->llen = (sp + sl) - (cp + 1) ;
 	        eip->hlen = (cp - sp) ;
 	    } else {
-/* local */
+		/* local */
 	        eip->type = EMAINFO_TLOCAL ;
 	        eip->host = nullptr ;
 	        eip->hlen = 0 ;
@@ -137,85 +138,72 @@ int emainfo_load(EMAINFO *eip,cchar *sp,int sl) noex {
 }
 /* end subroutine (emainfo) */
 
-int emainfo_mktype(EMAINFO *eip,int type,char *rbuf,int rlen) noex {
+int emainfo_mktype(emainfo *eip,int type,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		rl = 0 ;
 	if (eip && rbuf) {
 	    rs = SR_OK ;
 	    if (type >= 0) {
 		cnullptr	np{} ;
+		storebuf	b(rbuf,rlen) ;
 	        switch (type) {
 	        case EMAINFO_TLOCAL:
 		    {
 		        cint	ml = min(eip->llen,rlen) ;
-	                rs = strwcpy(rbuf,eip->local,ml) - rbuf ;
-	                i += rs ;
+			rs = b.strw(eip->local,ml) ;
 		    }
 	            break ;
 	        case EMAINFO_TUUCP:
 	            if (eip->host && (eip->hlen >= 0)) {
 		        cint	hl = eip->hlen ;
 		        cchar	*hp = eip->host ;
-	                rs = storebuf_strw(rbuf,rlen,i,hp,hl) ;
-	                i += rs ;
-		        if (rs >= 0) {
-	                    rs = storebuf_chr(rbuf,rlen,i,'!') ;
-	                    i += rs ;
+	                if ((rs = b.strw(hp,hl)) >= 0) {
+	                    rs = b.chr('!') ;
 		        }
 	            } /* end if (had a host part) */
 		    if (rs >= 0) {
-	                rs = storebuf_strw(rbuf,rlen,i,eip->local,eip->llen) ;
-	                i += rs ;
+	                rs = b.strw(eip->local,eip->llen) ;
 		    }
 	            break ;
 	        case EMAINFO_TARPA:
-	            rs = storebuf_strw(rbuf,rlen,i,eip->local,eip->llen) ;
-	            i += rs ;
-	            if ((rs >= 0) && eip->host && (eip->hlen >= 0)) {
-	                rs = storebuf_chr(rbuf,rlen,i,'@') ;
-	                i += rs ;
-	                if (rs >= 0) {
-		            cint	hl = eip->hlen ;
-			    cchar	*hp = eip->host ;
-	                    rs = storebuf_strw(rbuf,rlen,i,hp,hl) ;
-	                    i += rs ;
-		        }
-	            } /* end if */
+	            if ((rs = b.strw(eip->local,eip->llen)) >= 0) {
+	                if (eip->host && (eip->hlen >= 0)) {
+	                    if ((rs = b.chr('@')) >= 0) {
+		                cint	hl = eip->hlen ;
+			        cchar	*hp = eip->host ;
+	                        rs = b.strw(hp,hl) ;
+		            }
+	                } /* end if */
+		    } /* end if */
 	            break ;
 	        case EMAINFO_TARPAROUTE:
 	            if (eip->host && (eip->hlen >= 0)) {
-	                rs = storebuf_chr(rbuf,rlen,i,'@') ;
-	                i += rs ;
-		        if (rs >= 0) {
+	                if ((rs = b.chr('@')) >= 0) {
 		            cint	hl = eip->hlen ;
 			    cchar	*hp = eip->host ;
-	                    rs = storebuf_strw(rbuf,rlen,i,hp,hl) ;
-	                    i += rs ;
-		        }
-		        if (rs >= 0) {
-	                    if (strnchr(eip->local,eip->llen,':') != np) {
-	                        rs = storebuf_chr(rbuf,rlen,i,',') ;
-			        i += rs ;
-	                    } else {
-	                        rs = storebuf_chr(rbuf,rlen,i,':') ;
-	                        i += rs ;
-		            }
+	                    if ((rs = b.strw(hp,hl)) >= 0) {
+	                        if (strnchr(eip->local,eip->llen,':') != np) {
+	                            rs = b.chr(',') ;
+	                        } else {
+	                            rs = b.chr(':') ;
+		                }
+			    }
 		        }
 	            } /* end if (had a host part) */
 		    if (rs >= 0) {
 		        cint	ll = eip->llen ;
 		        cchar	*lp = eip->local ;
-	                rs = storebuf_strw(rbuf,rlen,i,lp,ll) ;
-	                i += rs ;
+	                rs = b.strw(lp,ll) ;
 		    }
 	            break ;
 	        } /* end switch */
+		rl = b.idx ;
 	    } else {
 		cint	ml = min(eip->llen,rlen) ;
-	        i = strwcpy(rbuf,eip->local,ml) - rbuf ;
+	        rl = strwcpy(rbuf,eip->local,ml) - rbuf ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (emainfo_mktype) */
 

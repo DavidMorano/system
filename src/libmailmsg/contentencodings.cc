@@ -66,7 +66,7 @@
 
 /* exported variables */
 
-cchar	*contentencodings[] = {
+cpcchar		contentencodings[] = {
 	"none",
 	"7bit",
 	"8bit",

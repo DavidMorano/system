@@ -143,33 +143,26 @@ int dbmake::wrfileproc(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c_rec = 0 ; /* ¥ GCC false complaint */
+	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		linebuffer	lb ;
-		if ((rs = lb.start) >= 0) {
-	            bfile	afile ;
+		if (linebuffer lb ; (rs = lb.start) >= 0) {
 		    cint	llen = lb.llen ;
 		    char	*lbuf = lb.lbuf ;
-	            if ((rs = bopen(&afile,fname,"r",0666)) >= 0) {
-	                bool	f_bol = true ;
-	                bool	f_eol ;
+		    cmode	om = 0666 ;
+	            if (bfile afile ; (rs = bopen(&afile,fname,"r",om)) >= 0) {
 	                f_havekey = false ;
 	                while ((rs = breadln(&afile,lbuf,llen)) > 0) {
-	                    int		len = rs ;
-	                    f_eol = (lbuf[len - 1] == '\n') ;
-	                    if (f_eol) len -= 1 ;
-	                    if ((len > 0) && f_bol && f_eol) {
-	                        if (lbuf[0] != '#') {
-	                            if (! CHAR_ISWHITE(lbuf[0])) {
+			    cchar	*cp ;
+			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+	                            if (! CHAR_ISWHITE(cp[0])) {
 	                                f_havekey = false ;
 	                            }
-	                            rs = wrfileline(lbuf,len) ;
+	                            rs = wrfileline(cp,cl) ;
 	                            c_rec += rs ;
-	                        }
-	                    } /* end if (BOL and EOL) */
-	                    f_bol = f_eol ;
+	                    } /* end if (sfcontetnt) */
 	                    if (rs < 0) break ;
-	                } /* end while (reading extended lines) */
+	                } /* end while */
 	                rs1 = bclose(&afile) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } else if (isNotPresent(rs)) {
@@ -179,6 +172,7 @@ int dbmake::wrfileproc(cchar *fname) noex {
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (linebuffer) */
 	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c_rec : rs ;
 }
 /* end subroutine (dbmake::wrfileproc) */
@@ -189,7 +183,7 @@ int dbmake::wrfile(time_t dt) noex {
 	if ((rs = strtab_count(klp)) >= 0) {
 	    ktlen = (rs+1) ;
 	    ktsize = (ktlen + 1) * szof(int) ;
-	    if ((rs = vecobj_count(rlp)) >= 0) {
+	    if ((rs = rlp->count) >= 0) {
 		reclen = (rs + 1) ;
 		recsize = ((reclen+1) * (2 * szof(int))) ;
 		rilen = nextpowtwo(reclen) ;
@@ -283,11 +277,10 @@ int dbmake::wrfiler(time_t dt) noex {
 /* end subroutine (dbmake::wrfiler) */
 
 int dbmake::wrfileline(cchar *lbuf,int llen) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		c_rec = 0 ;
-	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lbuf,llen)) >= 0) {
 	    cint	rsn = SR_NOTFOUND ;
 	    cint	klen = DBMAKE_ALIASNAMELEN ;
 	    char	kbuf[DBMAKE_ALIASNAMELEN+1] = { 0 } ;
@@ -295,7 +288,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 		cchar	*kt = keys.terms ;
 	        cchar	*pm = "Postmaster" ;
 	        cchar	*kp ;
-	        if (int kl ; (kl = field_get(&fsb,kt,&kp)) >= 0) {
+	        if (int kl ; (kl = fsb.get(kt,&kp)) >= 0) {
 	            if (kl > 0) {
 			bool	f = true ;
 	                f = f && (kl == 10) ;
@@ -314,7 +307,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	        int	vl ;
 		cchar	*vt = vals.terms ;
 	        cchar	*vp ;
-	        while ((vl = field_get(&fsb,vt,&vp)) >= 0) {
+	        while ((vl = fsb.get(vt,&vp)) >= 0) {
 	            if (vl > 0) {
 	                int	ival = 0 ;
 	                if (c == 0) { /* enter into key-string table */
@@ -325,7 +318,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	                        ikey = rs ;
 	                    }
 	                } /* end if (entering key) */
-/* enter value into string table */
+			/* enter value into string table */
 	                if (rs >= 0) { /* enter into val-string table */
 	                    if ((rs = strtab_already(vlp,vp,vl)) == rsn) {
 	                        rs = strtab_add(vlp,vp,vl) ;
@@ -333,11 +326,11 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	                    } else if (rs >= 0) {
 	                        ival = rs ;
 	                    }
-/* enter record */
+			    /* enter record */
 	                    if ((rs >= 0) && (ival > 0)) {
 	                        record	re(ikey,ival) ;
-	                        if ((rs = vecobj_find(rlp,&re)) == rsn) {
-	                            rs = vecobj_add(rlp,&re) ;
+	                        if ((rs = rlp->find(&re)) == rsn) {
+	                            rs = rlp->add(&re) ;
 	                        }
 	                        if (rs >= 0) {
 	                            nrecs += 1 ;
@@ -351,7 +344,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	            } /* end while (fields) */
 	        } /* end if (retrieved key) */
 	    } /* end if (have key) */
-	    rs1 = field_finish(&fsb) ;
+	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	count = c_rec ;
@@ -381,15 +374,14 @@ int dbmake::wrfilerec() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	int		(*rectab)[2] ;
-	if ((rs = uc_malloc(recsize,&rectab)) >= 0) {
+	if (int (*rectab)[2] ; (rs = uc_malloc(recsize,&rectab)) >= 0) {
 	    {
 	        void	*vp{} ;
 	        int	ri = 0 ;
 	        rectab[ri][0] = 0 ;
 	        rectab[ri][1] = 0 ;
 	        ri += 1 ;
-	        for (int i = 0 ; vecobj_get(rlp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; rlp->get(i,&vp) >= 0 ; i += 1) {
 	    	    record	*rep = recordp(vp) ;
 	            rectab[ri][0] = rep->key ;
 	            rectab[ri][1] = rep->val ;
@@ -412,8 +404,7 @@ int dbmake::wrfilekeys() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	int		(*indtab)[2] ;
-	if ((rs = uc_malloc(risize,&indtab)) >= 0) {
+	if (int (*indtab)[2] ; (rs = uc_malloc(risize,&indtab)) >= 0) {
 	    if (char *kstab ; (rs = uc_malloc(sksize,&kstab)) >= 0) {
 	        if ((rs = strtab_strmk(klp,kstab,sksize)) >= 0) {
 	            int		(*it)[2] = indtab ;
@@ -460,7 +451,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	int		n = 0 ; /* ¥ GCC false complaint */
 	if (it) {
 	    int		sz ;
-	    if ((rs = vecobj_count(rp)) >= 0) {
+	    if ((rs = rp->count) >= 0) {
 	        n = nextpowtwo(rs) ;
 	        if (n < 4) n = 4 ;
 	        sz = (n * 2 * szof(uint)) ;
@@ -474,7 +465,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	            cchar	*kp ;
 	            memset(it,0,sz) ;
 	            ri = 1 ;
-	            for (int i = 0 ; vecobj_get(rp,i,&vp) >= 0 ; i += 1) {
+	            for (int i = 0 ; rp->get(i,&vp) >= 0 ; i += 1) {
 	                record	*rep = recordp(vp) ;
 	                int	c = 0 ;
 	                kp = charp(skey + rep->key) ;
@@ -497,16 +488,13 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	                    } /* end while */
 	                } /* end if (secondary hash on collision) */
 	                if (it[hi][0] != 0) {
-	                    int	lhi ;
-	                    c += 1 ;
+	                    int		lhi ;
 	                    while (it[hi][1] != 0) {
-	                        c += 1 ;
 	                        hi = it[hi][1] ;
 	                    }
 	                    lhi = hi ;	/* save last hash-index value */
 	                    hi = hashindex((hi + 1),n) ;
 	                    while (it[hi][0] != 0) {
-	                        c += 1 ;
 	                        hi = hashindex((hi + 1),n) ;
 	                    } /* end while */
 	                    it[lhi][1] = hi ; /* update the previous slot */

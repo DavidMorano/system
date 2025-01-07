@@ -26,17 +26,9 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#include	<mailmsghdrs.h>
-#include	<mailmsghdrfold.h>
-#include	<mailmsghdrval.h>
-#include	<mailmsghdrct.h>
-#include	<mailmsgmatenv.h>
-#include	<mailmsgmathdr.h>
-#include	<mailmsgstage.h>
-#include	<mailmsgatt.h>
-#include	<mailmsgattent.h>
-#include	<mailmsgfrom.h>
-
+#include	<mailmsghdrx.h>		/* composite group */
+#include	<mailmsgmatx.h>		/* composite group */
+#include	<mailmsgx.h>		/* composite group */
 #include	<mailbox.h>
 #include	<msgentry.h>
 
@@ -46,10 +38,8 @@
 #include	<mhcom.h>
 #include	<mcmsg.h>
 
-#include	<hdrextnum.h>
-#include	<hdrextid.h>
-#include	<hdrctype.h>
-#include	<hdrdecode.h>
+#include	<hdrx.h>		/* composite group */
+#include	<contentencodings.h>
 #include	<contypevals.h>
 #include	<headkeymat.h>
 #include	<comparse.h>

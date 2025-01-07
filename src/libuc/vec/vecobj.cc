@@ -815,6 +815,10 @@ int vecobj::store(cvoid *ep,void **rpp) noex {
 	return vecobj_store(this,ep,rpp) ;
 }
 
+int vecobj::find(void *vp) noex {
+	return vecobj_find(this,vp) ;
+}
+
 int vecobj::get(int ei,void **rpp) noex {
 	return vecobj_get(this,ei,rpp) ;
 }

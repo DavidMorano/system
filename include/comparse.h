@@ -31,8 +31,6 @@
 #define	COMPARSE_MAGIC		0x77811276
 #define	COMPARSE		struct comparse_head
 #define	COMPARSE_STR		struct comparse_string
-#define	COMPARSE_LVALUE		MAILADDRLEN
-#define	COMPARSE_LCOMMENT	LINEBUFLEN
 
 
 struct comparse_string {
@@ -43,6 +41,8 @@ struct comparse_string {
 struct comparse_head {
 	COMPARSE_STR	val ;
 	COMPARSE_STR	com ;
+	int		mailaddrlen ;
+	int		mailcommlen ;
 	uint		magic ;
 } ;
 

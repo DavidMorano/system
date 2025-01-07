@@ -53,7 +53,7 @@
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"address.h"
+#include	"mailaddr.h"
 #include	"splitaddr.h"
 
 
