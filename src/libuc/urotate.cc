@@ -78,7 +78,7 @@ uint urotate(uint v,int n) noex {
 	    rv = std::rotr(v,n) ;
 	} else {
 	    if (n) {
-	        cint	nb = (sizeof(uint) * CHAR_BIT) ;
+	        cint	nb = (szof(uint) * CHAR_BIT) ;
 	        int	nr, nl ;
 	        if (n >= 0) {
 	            nr = n ;

@@ -121,7 +121,7 @@ using std::nothrow ;			/* constant */
 
 namespace {
     struct vars {
-	int	mailaliaslen ;
+	int		mailaliaslen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 }
@@ -529,3 +529,5 @@ vars::operator int () noex {
 	return SR_OK ;
 }
 /* end method (vars::operator) */
+
+
