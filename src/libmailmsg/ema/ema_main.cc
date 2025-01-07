@@ -1,4 +1,4 @@
-/* ema SUPPORT */
+/* ema_main SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	ema
+
+	Description:
 	This is an email address handling module object.  It can
 	parse out and store hierarchically organized EMAs.
 

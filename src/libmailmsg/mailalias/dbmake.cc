@@ -83,11 +83,12 @@
 #include	<hashindex.h>
 #include	<randlc.h>
 #include	<matxstr.h>
+#include	<mailvalues.hh>		/* |mailaliaslen| */
 #include	<char.h>
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<ischarx.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| */
+#include	<localmisc.h>
 
 #include	"dbmake.hh"
 #include	"mailaliashdr.h"
@@ -118,6 +119,13 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int	mailaliaslen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
+
 
 /* forward references */
 
@@ -126,6 +134,7 @@ using std::nothrow ;			/* constant */
 
 static bufsizevar		maxnamelen(getbufsize_mn) ;
 static bufsizevar		maxpathlen(getbufsize_mp) ;
+static vars			var ;
 
 /* all white space plus colon (':') */
 constexpr fieldterminit		keys("\b\t\n\f\v :") ;
@@ -210,28 +219,28 @@ int dbmake::wrfiler(time_t dt) noex {
 	int		ml ;
 	char		fidbuf[DBMAKE_IDLEN + 1] ;
 	char		*bp ;
-/* prepare the file magic */
+	/* prepare the file magic */
 	{
 	    bp = fidbuf ;
 	    ml = mkmagic(bp,mags,magp) ;
 	    bp += ml ;
 	}
-/* prepare the version and encoding (VETU) */
+	/* prepare the version and encoding (VETU) */
 	{
 	fidbuf[16] = uchar(fver) ;	/* file-version */
 	fidbuf[17] = ENDIAN ;
 	fidbuf[18] = ropts ;
 	fidbuf[19] = 0 ;
 	}
-/* write magic along with version encoding */
+	/* write magic along with version encoding */
 	if ((rs = u_write(fd,fidbuf,(bp - fidbuf))) >= 0) {
 	    cint	hsize = (mailaliashdr_overlast * szof(int)) ;
 	    fto += (bp - fidbuf) ;
-/* make the header itself (skip over it for FTO) */
+	    /* make the header itself (skip over it for FTO) */
 	    {
 	    fto += hsize ;
 	    }
-/* everything else */
+	    /* everything else */
 	    {
 	    header[mailaliashdr_wtime] = uint(dt) ;
 	    header[mailaliashdr_wcount] = 1 ;
@@ -261,7 +270,7 @@ int dbmake::wrfiler(time_t dt) noex {
 	    header[mailaliashdr_svalsize] = svsize ;
 	    fto += svsize ;
 	    }
-/* write out the header */
+	    /* write out the header */
 	    if ((rs = u_write(fd,header,hsize)) >= 0) {
 		if ((rs = wrfilekeytab()) >= 0) {
 	            if ((rs = wrfilerec()) >= 0) {
@@ -277,77 +286,80 @@ int dbmake::wrfiler(time_t dt) noex {
 /* end subroutine (dbmake::wrfiler) */
 
 int dbmake::wrfileline(cchar *lbuf,int llen) noex {
+    	static cint	rsv = var ;
 	int		rs ;
 	int		rs1 ;
 	int		c_rec = 0 ;
-	if (field fsb ; (rs = fsb.start(lbuf,llen)) >= 0) {
-	    cint	rsn = SR_NOTFOUND ;
-	    cint	klen = DBMAKE_ALIASNAMELEN ;
-	    char	kbuf[DBMAKE_ALIASNAMELEN+1] = { 0 } ;
-	    if (! f_havekey) {
-		cchar	*kt = keys.terms ;
-	        cchar	*pm = "Postmaster" ;
-	        cchar	*kp ;
-	        if (int kl ; (kl = fsb.get(kt,&kp)) >= 0) {
-	            if (kl > 0) {
-			bool	f = true ;
-	                f = f && (kl == 10) ;
-			f = f && (strncasecmp(pm,kp,kl) == 0) ;
-	                f_havekey = true ;
-	                if (f) {
-	                    strwcpylc(kbuf,kp,min(kl,klen)) ;
-	                } else {
-	                    strwcpy(kbuf,kp,min(kl,klen)) ;
-	                }
-	            } /* end if (positive) */
-	        } /* end if (field_get) */
-	    } /* end if (didn't have a key already) */
-	    if (f_havekey && (fsb.term != '#')) {
-		int	c = 0 ;
-	        int	vl ;
-		cchar	*vt = vals.terms ;
-	        cchar	*vp ;
-	        while ((vl = fsb.get(vt,&vp)) >= 0) {
-	            if (vl > 0) {
-	                int	ival = 0 ;
-	                if (c == 0) { /* enter into key-string table */
-	                    if ((rs = strtab_already(klp,kbuf,-1)) == rsn) {
-	                        rs = strtab_add(klp,kbuf,-1) ;
-	                        ikey = rs ;
+	if ((rs = rsv) >= 0) {
+	    cint	klen = var.mailaliaslen ;
+	    if (field fsb ; (rs = fsb.start(lbuf,llen)) >= 0) {
+	        cint	rsn = SR_NOTFOUND ;
+	        char	kbuf[klen +1] = { 0 } ;
+	        if (! f_havekey) {
+		    cchar	*kt = keys.terms ;
+	            cchar	*pm = "Postmaster" ;
+	            cchar	*kp ;
+	            if (int kl ; (kl = fsb.get(kt,&kp)) >= 0) {
+	                if (kl > 0) {
+			    bool	f = true ;
+	                    f = f && (kl == 10) ;
+			    f = f && (strncasecmp(pm,kp,kl) == 0) ;
+	                    f_havekey = true ;
+	                    if (f) {
+	                        strwcpylc(kbuf,kp,min(kl,klen)) ;
 	                    } else {
-	                        ikey = rs ;
+	                        strwcpy(kbuf,kp,min(kl,klen)) ;
 	                    }
-	                } /* end if (entering key) */
-			/* enter value into string table */
-	                if (rs >= 0) { /* enter into val-string table */
-	                    if ((rs = strtab_already(vlp,vp,vl)) == rsn) {
-	                        rs = strtab_add(vlp,vp,vl) ;
-	                        ival = rs ;
-	                    } else if (rs >= 0) {
-	                        ival = rs ;
-	                    }
-			    /* enter record */
-	                    if ((rs >= 0) && (ival > 0)) {
-	                        record	re(ikey,ival) ;
-	                        if ((rs = rlp->find(&re)) == rsn) {
-	                            rs = rlp->add(&re) ;
+	                } /* end if (positive) */
+	            } /* end if (field_get) */
+	        } /* end if (didn't have a key already) */
+	        if (f_havekey && (fsb.term != '#')) {
+		    int	c = 0 ;
+	            int	vl ;
+		    cchar	*vt = vals.terms ;
+	            cchar	*vp ;
+	            while ((vl = fsb.get(vt,&vp)) >= 0) {
+	                if (vl > 0) {
+	                    int	ival = 0 ;
+	                    if (c == 0) { /* enter into key-string table */
+	                        if ((rs = strtab_already(klp,kbuf,-1)) == rsn) {
+	                            rs = strtab_add(klp,kbuf,-1) ;
+	                            ikey = rs ;
+	                        } else {
+	                            ikey = rs ;
 	                        }
-	                        if (rs >= 0) {
-	                            nrecs += 1 ;
-	                            c_rec += 1 ;
-				    c += 1 ;
+	                    } /* end if (entering key) */
+			    /* enter value into string table */
+	                    if (rs >= 0) { /* enter into val-string table */
+	                        if ((rs = strtab_already(vlp,vp,vl)) == rsn) {
+	                            rs = strtab_add(vlp,vp,vl) ;
+	                            ival = rs ;
+	                        } else if (rs >= 0) {
+	                            ival = rs ;
 	                        }
-	                    } /* end if (new entry) */
-	                } /* end if (ok) */
-	                if (fsb.term == '#') break ;
-	                if (rs < 0) break ;
-	            } /* end while (fields) */
-	        } /* end if (retrieved key) */
-	    } /* end if (have key) */
-	    rs1 = fsb.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (field) */
-	count = c_rec ;
+			        /* enter record */
+	                        if ((rs >= 0) && (ival > 0)) {
+	                            record	re(ikey,ival) ;
+	                            if ((rs = rlp->find(&re)) == rsn) {
+	                                rs = rlp->add(&re) ;
+	                            }
+	                            if (rs >= 0) {
+	                                nrecs += 1 ;
+	                                c_rec += 1 ;
+				        c += 1 ;
+	                            }
+	                        } /* end if (new entry) */
+	                    } /* end if (ok) */
+	                    if (fsb.term == '#') break ;
+	                    if (rs < 0) break ;
+	                } /* end while (fields) */
+	            } /* end if (retrieved key) */
+	        } /* end if (have key) */
+	        rs1 = fsb.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (field) */
+	    count = c_rec ;
+	} /* end if (vars) */
 	return (rs >= 0) ? c_rec : rs ;
 }
 /* end method (dbmake::wrfileline) */
@@ -512,4 +524,8 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 }
 /* end method (dbmake::mkind) */
 
-
+vars::operator int () noex {
+    	mailaliaslen = mailvalue.mailaliaslen ;
+	return SR_OK ;
+}
+/* end method (vars::operator) */

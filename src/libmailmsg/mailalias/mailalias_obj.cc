@@ -63,6 +63,7 @@
 #include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
@@ -94,12 +95,13 @@
 #include	<matxstr.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<mailvalues.hh>
 #include	<hasx.h>
 #include	<isfiledesc.h>
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<ischarx.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| + |MODP2| */
+#include	<localmisc.h>		/* |MODP2| */
 
 #include	"mailalias.h"
 #include	"mailaliashdr.h"
@@ -166,6 +168,14 @@ typedef mode_t		m_t ;
 
 
 /* local structures */
+
+namespace {
+    struct vars {
+	int		mailaddrlen ;
+	int		mailaliaslen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
 
 
 /* forward references */
@@ -266,11 +276,8 @@ constexpr cpcchar	aptabsched[] = {
 } ;
 
 static sysval		pagesize(sysval_ps) ;
-
 static bufsizevar	maxpathlen(getbufsize_mp) ;
-
-constexpr int		mailaddrlen = MAILADDRLEN ;
-constexpr int		mailaliaslen = MAILALIASLEN ;
+static vars		var ;
 
 constexpr bool		f_defprofile = CF_DEFPROFILE ;
 
@@ -286,38 +293,40 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	int		rs ;
 	int		f_create = false ;
 	if ((rs = mailalias_ctor(op,pr,pname)) >= 0) {
-	    op->fd = -1 ;
-	    op->oflags = of ;
-	    op->operm = om ;
-	    op->otype = ot ;
-	    op->f.ocreate = ((of & O_CREAT) == O_CREAT) ;
-	    op->f.owrite |= ((of & O_WRONLY) == O_WRONLY) ;
-	    op->f.owrite |= ((of & O_RDWR) == O_RDWR) ;
-	    op->aprofile = defprofile ;
-	    op->pagesize = getpagesize() ;
-	    if ((rs = ids_load(op->idp)) >= 0) {
-	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	            op->pr = cp ;
-	            if ((rs = uc_mallocstrw(pname,-1,&cp)) >= 0) {
-	                op->apname = cp ;
-		        if ((rs = pagesize) >= 0) {
-			    op->pagesize = rs ;
-			    rs = mailalias_opener(op) ;
-		        } /* end if (pagesize) */
+	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+	        op->fd = -1 ;
+	        op->oflags = of ;
+	        op->operm = om ;
+	        op->otype = ot ;
+	        op->f.ocreate = ((of & O_CREAT) == O_CREAT) ;
+	        op->f.owrite |= ((of & O_WRONLY) == O_WRONLY) ;
+	        op->f.owrite |= ((of & O_RDWR) == O_RDWR) ;
+	        op->aprofile = defprofile ;
+	        if ((rs = ids_load(op->idp)) >= 0) {
+	            if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	                op->pr = cp ;
+	                if ((rs = uc_mallocstrw(pname,-1,&cp)) >= 0) {
+	                    op->apname = cp ;
+		            if ((rs = pagesize) >= 0) {
+			        op->pagesize = rs ;
+			        rs = mailalias_opener(op) ;
+		            } /* end if (pagesize) */
+	                    if (rs < 0) {
+	                        uc_free(op->apname) ;
+	                        op->apname = nullptr ;
+	                    }
+	                } /* end if (ma-a) */
 	                if (rs < 0) {
-	                    uc_free(op->apname) ;
-	                    op->apname = nullptr ;
+	                    uc_free(op->pr) ;
+	                    op->pr = nullptr ;
 	                }
-	            } /* end if (ma-a) */
+	            } /* end if (m-a) */
 	            if (rs < 0) {
-	                uc_free(op->pr) ;
-	                op->pr = nullptr ;
+	                ids_release(op->idp) ;
 	            }
-	        } /* end if (m-a) */
-	        if (rs < 0) {
-	            ids_release(op->idp) ;
-	        }
-	    } /* end if (ids_load) */
+	        } /* end if (ids_load) */
+	    } /* end if (vars) */
 	    if (rs < 0) {
 		mailalias_dtor(op) ;
 	    }
@@ -448,9 +457,9 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	                        int	cl ;
 	                        char	*bp ;
 	                        if (kbuf != nullptr) {
-	                            cl = mailaliaslen ;
+	                            cl = var.mailaliaslen ;
 	                	    if (klen >= 0) {
-	                    	        cl = min(klen,mailaliaslen) ;
+	                    	        cl = min(klen,var.mailaliaslen) ;
 				    }
 				    bp = strwcpy(kbuf,(op->skey + ai),cl) ;
 	                	    vl = (bp - kbuf) ;
@@ -458,9 +467,9 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	                             vl = strlen(op->skey + ai) ;
 	                         }
 	                         if (vbuf != nullptr) {
-	                             cl = mailaddrlen ;
+	                             cl = var.mailaddrlen ;
 	                             if (vlen >= 0) {
-	                                 cl = min(vlen,mailaddrlen) ;
+	                                 cl = min(vlen,var.mailaddrlen) ;
 	                             }
 	                             strwcpy(vbuf,(op->sval + vi),cl) ;
 	                         } /* end if (value buffer present) */
@@ -495,6 +504,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	        if (op->cursors) {
 	            time_t	dt = 0 ;
                     if ((rs = mailalias_enterbegin(op,dt)) >= 0) {
+			cint	keylen = var.mailaliaslen ;
                         cint        ns = MAILALIAS_NSHIFT ;
 	                uint	khash ;
                         int         vi, hi, ri ;
@@ -506,10 +516,10 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                         n = op->rilen ;
                         /* OK, we go from here */
                         if (curp->i < 0) {
-                            char    keybuf[mailaliaslen + 1] ;
+                            char    keybuf[keylen + 1] ;
 			    if (strcasecmp(aname,pm) == 0) {
                                 hp = keybuf ;
-                                cp = strwcpylc(keybuf,aname,mailaliaslen) ;
+                                cp = strwcpylc(keybuf,aname,keylen) ;
                                 hl = cp - keybuf ;
                             } else {
                                 hp = aname ;
@@ -573,7 +583,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
                         if (rs >= 0) {
                             vi = op->rectab[ri][1] ;
                             if (vbuf != nullptr) {
-                                cl = min(vlen,mailaliaslen) ;
+                                cl = min(vlen,var.mailaliaslen) ;
                                 cp = strwcpy(vbuf,(op->sval + vi),cl) ;
                                 vl = (cp - vbuf) ;
                             } else {
@@ -1321,5 +1331,15 @@ static int mailalias_mapcheck(MA *op,time_t dt) noex {
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (mailalias_mapcheck) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_mailaddr)) >= 0) {
+	    mailaddrlen = rs ;
+	    mailaliaslen = mailvalue.mailaliaslen ;
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
 
 

@@ -52,11 +52,12 @@
 #ifndef	MAILALIASHDR_INCLUDE
 #define	MAILALIASHDR_INCLUDE
 
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| */
+#include	<usysdefs.h>
 
 
 enum mailaliashdrs {

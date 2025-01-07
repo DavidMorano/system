@@ -72,7 +72,7 @@
 #include	<timestr.h>
 #include	<intsat.h>
 #include	<isoneof.h>
-#include	<localmisc.h>		/* }DIGBUFLEN| + |MAILADDRLEN| */
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"mailbox.h"
 #include	"mbcache.h"
@@ -83,13 +83,11 @@
 #define	MC		mbcache
 #define	ME		mbcache_scan
 
-#undef	BUFLEN
-#define	BUFLEN		MAX(100,MAILADDRLEN)
-
 #define	HDRBUFMULT	4		/* only four?! */
 
-#undef	SCANBUFLEN
+#ifdef	SCANBUFLEN
 #define	SCANBUFLEN	100
+#endif
 
 #define	RECORDFNAME	"envelopes.log"
 

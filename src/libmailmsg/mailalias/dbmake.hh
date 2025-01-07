@@ -58,11 +58,11 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<strtab.h>
-#include	<localmisc.h>		/* |MAILADDRLEN| + |MAILALIASLEN| */
 
 
+/* lengths (small) */
 #define	DBMAKE_IDLEN		64
-#define	DBMAKE_ALIASNAMELEN	MAILALIASLEN
+/* options */
 #define	DBMAKE_OSEC		(1<<0)
 #define	DBMAKE_ORANDLC		(1<<1)
 

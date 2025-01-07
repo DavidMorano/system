@@ -30,6 +30,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>		/* |MAILALIASLEN| */
 
 #include	"mailvalues.hh"
 
@@ -44,5 +45,6 @@
 
 const int	mailvalues::hostnamemult =	HOSTNAMEMULT ;
 const int	mailvalues::nodenamemult =	NODENAMEMULT ;
+const int	mailvalues::mailaliaslen =	MAILALIASLEN ;
 
 

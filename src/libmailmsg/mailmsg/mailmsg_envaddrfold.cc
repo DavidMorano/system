@@ -45,6 +45,8 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<emainfo.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
@@ -54,22 +56,6 @@
 
 
 /* local defines */
-
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-#ifndef	HDRNAMELEN
-#define	HDRNAMELEN	80
-#endif
-
-#ifndef	MSGLINELEN
-#define	MSGLINELEN	(2 * 1024)
-#endif
-
-#ifndef	MAXMSGLINELEN
-#define	MAXMSGLINELEN	76
-#endif
 
 
 /* imported namespaces */
@@ -108,11 +94,9 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = mailmsg_magic(op,rbuf)) >= 0) {
-	    cint	alen = MAILADDRLEN ;
-	    char	*abuf ;
-	    if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
-	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	    if (char *abuf ; (rs = malloc_mailaddr(&abuf)) >= 0) {
+		cint	alen = rs ;
+	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
 	            mailmsg_envdat	me, *mep = &me ;
 		    auto		mef = mailmsg_envget ;
 	            int			cl ;
@@ -121,10 +105,10 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	                if ((mep->r.ep != NULL) && (mep->r.el > 0)) {
 	                    cp = mep->r.ep ;
 	                    cl = mep->r.el ;
-	                    if (c > 0) rs = sbuf_chr(&b,'!') ;
+	                    if (c > 0) rs = b.chr('!') ;
 	                    if (rs >= 0) {
 	                        c += 1 ;
-	                        rs = sbuf_strw(&b,cp,cl) ;
+	                        rs = b.strw(cp,cl) ;
 	                    }
 	                } /* end if (remote) */
 	                if (rs >= 0) {
@@ -133,7 +117,7 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	                } /* end if (address) */
 	                if (rs < 0) break ;
 	            } /* end for (looping through envelopes) */
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	        rs1 = uc_free(abuf) ;
@@ -158,10 +142,10 @@ static int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	        cint	at = rs ;
 	        if ((rs = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
 		    cint	al = rs ;
-		    if (c > 0) rs = sbuf_chr(sbp,'!') ;
+		    if (c > 0) rs = sbp->chr('!') ;
 		    if (rs >= 0) {
 		        c += 1 ;
-		        rs = sbuf_strw(sbp,abuf,al) ;
+		        rs = sbp->strw(abuf,al) ;
 		    } /* end if (ok) */
 	        } /* end if */
 	    } /* end if (emainfo_load) */
