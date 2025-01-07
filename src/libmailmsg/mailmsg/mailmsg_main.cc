@@ -656,7 +656,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	int		f = false ;
 	if (hl < 0) hl = strlen(hp) ;
 	*hnpp = nullptr ;
-	void		*vp{} ;
+	void	*vp{} ;
 	for (i = 0 ; (rs = vecobj_get(op->hlp,i,&vp)) >= 0 ; i += 1) {
 	    *hnpp = (MMHNAME *) vp ;
 	    if (*hnpp != nullptr) {

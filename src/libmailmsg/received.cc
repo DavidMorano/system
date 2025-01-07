@@ -5,9 +5,8 @@
 /* manage a "received" object */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		0		/* run in "safe" mode */
 #define	CF_EMPTYVALUE	0		/* allow for empty values */
-#define	CF_FIELDWORD	1		/* used 'field_word(3dam)' */
+#define	CF_FIELDWORD	1		/* used |field_word(3dam)| */
 
 /* revision history:
 
@@ -66,6 +65,14 @@
 
 /* local defines */
 
+#ifndef	CF_EMPTYVALUE
+#define	CF_EMPTYVALUE	0		/* allow for empty values */
+#endif
+
+#ifndef	CF_FIELDWORD
+#define	CF_FIELDWORD	1		/* used |field_word(3dam)| */
+#endif
+
 
 /* external subroutines */
 
@@ -77,6 +84,16 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static inline int received_magic(received *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == RECEIVED_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (received_magic) */
 
 static int received_bake(received *,int,cchar *,int) noex ;
 
@@ -106,7 +123,7 @@ constexpr cpcchar	received_keys[] = {
 
 ****/
 
-constexpr cchar		fterms[] = {
+constexpr char		fterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x01, 0x00, 0x00, 0x08,
 	0x00, 0x00, 0x00, 0x00,
@@ -117,6 +134,9 @@ constexpr cchar		fterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
+constexpr bool		f_emptyvalue = CF_EMPTYVALUE ;
+constexpr bool		f_fieldword = CF_FIELDWORD ;
+
 
 /* external variables */
 
@@ -124,79 +144,69 @@ constexpr cchar		fterms[] = {
 /* exported subroutines */
 
 int received_start(received *op,cchar *hbuf,int hlen) noex {
-	int		rs ;
+    	RECEIVED	*hop = op ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (hbuf == nullptr) return SR_FAULT ;
-
-	memclear(op) ;
-	if (hlen < 0) hlen = strlen(hbuf) ;
-	/* prepare a MHCOM object for comment parsing */
-	mhcom		com ;
-	if ((rs = mhcom_start(&com,hbuf,hlen)) >= 0) {
-	    cchar	*sp ;
-	    int		sl ;
-	    if ((sl = mhcom_getval(&com,&sp)) > 0) {
-	        cint	sz = (sl + 1) ;
-	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
-	            op->a = charp(p) ;
-	            if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
-	                c = rs ;
-	                op->magic = RECEIVED_MAGIC ;
-	            }
-	            if (rs < 0) {
-	                uc_free(op->a) ;
-	                op->a = nullptr ;
-	            }
-	        } /* end if (memory-allocation) */
-	    } /* end if (non-zero content) */
-	    mhcom_finish(&com) ;
-	} /* end if (mhcom) */
-
+	if (op && hbuf) {
+	    memclear(hop) ;
+	    if (hlen < 0) hlen = strlen(hbuf) ;
+	    /* prepare a MHCOM object for comment parsing */
+	    if (mhcom com ; (rs = com.start(hbuf,hlen)) >= 0) {
+	        if (cchar *sp ; (rs = com.getval(&sp)) > 0) {
+		    cint	sl = rs ;
+	            cint	sz = (rs + 1) ;
+	            if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	                op->a = charp(p) ;
+	                if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
+	                    c = rs ;
+	                    op->magic = RECEIVED_MAGIC ;
+	                }
+	                if (rs < 0) {
+	                    uc_free(op->a) ;
+	                    op->a = nullptr ;
+	                }
+	            } /* end if (memory-allocation) */
+	        } /* end if (non-zero content) */
+	        rs1 = com.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (received) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (received_start) */
 
 int received_finish(received *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != RECEIVED_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (op->a != nullptr) {
-	    rs1 = uc_free(op->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->a = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = received_magic(op)) >= 0) {
+	    if (op->a) {
+	        rs1 = uc_free(op->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->a = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (received_finish) */
 
 int received_getkey(received *op,int ki,cchar **rpp) noex {
+    	int		rs ;
 	int		cl = 0 ;
-
-#if	CF_SAFE
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != RECEIVED_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (ki < 0) return SR_INVALID ;
-
-	if (ki >= received_keyoverlast) return SR_NOENT ;
-
-	cl = (op->key[ki] != nullptr) ? strlen(op->key[ki]) : 0 ;
-
-	if (rpp != nullptr) {
-	    *rpp = op->key[ki] ;
-	}
-
-	return cl ;
+	if ((rs = received_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (ki >= 0) {
+	        rs = SR_NOENT ;
+	        if ((ki >= 0) && (ki < received_keyoverlast)) {
+		    cl = (op->key[ki] != nullptr) ? strlen(op->key[ki]) : 0 ;
+		    if (rpp) {
+	    		*rpp = op->key[ki] ;
+		    }
+		} /* end if ("found") */
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? cl : rs ;
 }
 /* end subroutine (received_getkey) */
 
@@ -215,87 +225,99 @@ static int received_bake(received *op,int sz,cchar *sp,int sl) noex {
 	int		wi = 0 ;
 	int		c = 0 ;
 	int		f_prevmatch = false ;
-
-	if (sbuf sb ; (rs = sbuf_start(&sb,op->a,sz)) >= 0) {
-	    if (field fsb ; (rs = field_start(&fsb,sp,sl)) >= 0) {
+	if (sbuf sb ; (rs = sb.start(op->a,sz)) >= 0) {
+	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
 	        cchar	*fp ;
 	        int	fl ;
-
 	        while (rs >= 0) {
-
-#if	CF_FIELDWORD
-	            fl = field_word(&fsb,fterms,&fp) ;
-#else
-	            fl = field_get(&fsb,fterms,&fp) ;
-#endif
-
-	            if (fl <= 0)
-	                break ;
-
+		    if_constexpr (f_emptyvalue) {
+	                fl = fsb.word(fterms,&fp) ;
+		    } else {
+	                fl = fsb.get(fterms,&fp) ;
+		    } /* end if_constexpr (f_emptyvalue) */
+	            if (fl <= 0) break ;
 	            rs1 = -1 ;
-	            if (! f_prevmatch)
+	            if (! f_prevmatch) {
 	                rs1 = matcasestr(received_keys,fp,fl) ;
-
-#if	(! CF_EMPTYVALUE)
-	            f_prevmatch = (rs1 >= 0) ;
-#endif
-
+		    }
+		    if_constexpr (! f_fieldword) {
+	                f_prevmatch = (rs1 >= 0) ;
+		    } /* end if_constexpr (! f_fieldword) */
 	            if (rs1 >= 0) {
-
-	                if (c > 0)
-	                    sbuf_chr(&sb,'\0') ;
-
+	                if (c > 0) {
+	                    sb.chr('\0') ;
+			}
 	                ki = rs1 ;
 	                wi = 0 ;
-
 	            } else if (ki >= 0) {
-
 	                if ((wi == 0) && (ki >= 0)) {
 	                    cchar	*cp ;
-
-	                    sbuf_getpoint(&sb,&cp) ;
-
+	                    sb.getpoint(&cp) ;
 	                    op->key[ki] = cp ;
 	                    c += 1 ;
 	                }
-
-	                if (wi > 0)
+	                if (wi > 0) {
 	                    sbuf_chr(&sb,' ') ;
-
-	                rs = sbuf_strw(&sb,fp,fl) ;
+			}
+	                rs = sb.strw(fp,fl) ;
 	                wi += 1 ;
-
 	            } /* end if */
-
 	            if (fsb.term == ';') break ;
 	        } /* end while */
-
 	        if ((rs >= 0) && (fsb.term == ';')) {
 	            cchar	*cp ;
 	            int		cl ;
-	            if (c > 0)
-	                sbuf_chr(&sb,'\0') ;
-
-	            sbuf_getpoint(&sb,&cp) ;
-
-	            op->key[received_keydate] = cp ;
-	            c += 1 ;
-
-	            cp = (cchar *) fsb.lp ;
+	            if (c > 0) {
+	                sb.chr('\0') ;
+		    }
+	            sb.getpoint(&cp) ;
+		    {
+	                op->key[received_keydate] = cp ;
+	                c += 1 ;
+		    }
+	            cp = ccharp(fsb.lp) ;
 	            cl = fsb.ll ;
-	            sbuf_strw(&sb,cp,cl) ;
-
+	            sb.strw(cp,cl) ;
 	        } /* end if (had a date) */
-
-	        field_finish(&fsb) ;
+	        rs1 = fsb.finish ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
-
-	    rs1 = sbuf_finish(&sb) ;
+	    rs1 = sb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sbuf) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (received_bake) */
+
+int received::start(cchar *sp,int sl) noex {
+	return received_start(this,sp,sl) ;
+}
+
+int received::getkey(int ki,cchar **rpp) noex {
+	return received_getkey(this,ki,rpp) ;
+}
+
+int received::getitem(int ki,cchar **rpp) noex {
+	return received_getitem(this,ki,rpp) ;
+}
+
+void received::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("received",rs,"fini-finish") ;
+	}
+}
+
+received_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case receivedmem_finish:
+	        rs = received_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (received_co::operator) */
 
 

@@ -19,7 +19,7 @@
 /*******************************************************************************
 
   	Group:
-	uctim
+	uctim{x}
 
 	Description:
 	This is a facility to create process timers.

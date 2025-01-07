@@ -45,10 +45,8 @@ extern int mapstrint_fetch(mapstrint *,cchar *,int,
 		mapstrint_cur *,int *) noex ;
 extern int mapstrint_fetchrec(mapstrint *,cchar *,int,
 		mapstrint_cur *,cchar **,int *) noex ;
-extern int mapstrint_curget(mapstrint *,mapstrint_cur *,
-		cchar **,int *) noex ;
-extern int mapstrint_curenum(mapstrint *,mapstrint_cur *,
-		cchar **,int *) noex ;
+extern int mapstrint_curget(mapstrint *,mapstrint_cur *,cchar **,int *) noex ;
+extern int mapstrint_curenum(mapstrint *,mapstrint_cur *,cchar **,int *) noex ;
 extern int mapstrint_delkey(mapstrint *,cchar *,int) noex ;
 extern int mapstrint_curdel(mapstrint *,mapstrint_cur *,int) noex ;
 extern int mapstrint_curnext(mapstrint *,mapstrint_cur *) noex ;
@@ -61,6 +59,6 @@ extern int mapstrint_finish(mapstrint *) noex ;
 EXTERNC_end
 
 
-#endif /* mapstrint_INCLUDE */
+#endif /* MAPSTRINT_INCLUDE */
 
 

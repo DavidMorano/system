@@ -40,7 +40,42 @@ struct mhcom_head {
 	int		clen ;
 } ;
 
+#ifdef	__cplusplus
+enum mhcommems {
+	mhcommem_finish,
+	mhcommem_overlast
+} ;
+struct mhcom ;
+struct mhcom_co {
+	mhcom		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (mhcom *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (mhcom_co) */
+struct mhcom : mhcom_head {
+	mhcom_co	finish ;
+	mhcom() noex {
+	    finish(this,mhcommem_finish) ;
+	} ;
+	mhcom(const mhcom &) = delete ;
+	mhcom &operator = (const mhcom &) = delete ;
+	int start(cchar *,int = -1) noex ;
+	int getval(cchar **) noex ;
+	int getcom(cchar **) noex ;
+	void dtor() noex ;
+	~mhcom() {
+	    dtor() ;
+	} ;
+} ; /* end struct (mhcom) */
+#else	/* __cplusplus */
 typedef MHCOM		mhcom ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int termtrans_magic(termtrans *op,Args ... args) noex {
+static inline int received_magic(received *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TERMTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == RECEIVED_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (termtrans_magic) */
+/* end subroutine (received_magic) */

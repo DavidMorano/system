@@ -100,9 +100,9 @@ int mapstrint_finish(MSI *dbp) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if (dbp) {
+	    rs = SR_OK ;
 	    {
 	        mapstrint_cur	kcur ;
-	        rs = SR_OK ;
 	        if ((rs1 = hdb_curbegin(dbp,&kcur)) >= 0) {
 	            hdb_dat	key{} ;
 	            hdb_dat	val{} ;
@@ -131,12 +131,10 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 	int		rs = SR_FAULT ;
 	if (dbp && kstr) {
 	    rs = SR_INVALID ;
+	    if (klen < 0) klen = strlen(kstr) ;
 	    if (klen > 0) {
-	        int		sz ;
-	        int		*ip{} ;
-	        if (klen < 0) klen = strlen(kstr) ;
-	        sz = szof(int) + klen + 1 ;
-	        if ((rs = uc_malloc(sz,&ip)) >= 0) {
+	        cint	sz = szof(int) + klen + 1 ;
+	        if (int *ip{} ; (rs = uc_malloc(sz,&ip)) >= 0) {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            char	*bp ;
@@ -159,11 +157,11 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 /* end subroutine (mapstrint_add) */
 
 int mapstrint_already(MSI *op,cchar *kstr,int klen) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && kstr) {
 	    if (int v{} ; (rs = mapstrint_fetch(op,kstr,klen,np,&v)) >= 0) {
-	        rs = (v & INT_MAX) ;
+	        rs = v ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -283,19 +281,20 @@ int mapstrint_nextkey(MSI *dbp,cchar *kstr,int klen,mapstrint_cur *curp) noex {
 
 /* delete all of the entries that match a key */
 int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
+    	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rs2 ;
 	if (dbp && kstr) {
-	    mapstrint_cur	kcur ;
-	    hdb_dat		skey ;
 	    if (klen < 0) klen = strlen(kstr) ;
-	    skey.buf = kstr ;
-	    skey.len = klen ;
 	    /* delete all of the data associated with this key */
-	    if ((rs = hdb_curbegin(dbp,&kcur)) >= 0) {
+	    if (hdb_cur kcur ; (rs = hdb_curbegin(dbp,&kcur)) >= 0) {
+	        hdb_dat		skey ;
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
-	        while (hdb_fetchrec(dbp,skey,&kcur,&key,&val) >= 0) {
+	        skey.buf = kstr ;
+	        skey.len = klen ;
+	        while ((rs2 = hdb_fetchrec(dbp,skey,&kcur,&key,&val)) >= 0) {
 	            if (hdb_curdel(dbp,&kcur,1) >= 0) {
 	                char	*ep = charp(val.buf) ;
 	                if (ep) {
@@ -319,6 +318,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int klen) noex {
 	                if (rs1 == SR_NOTFOUND) break ;
 	            } /* end while */
 	        } /* end while */
+		if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	        rs1 = hdb_curend(dbp,&kcur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */

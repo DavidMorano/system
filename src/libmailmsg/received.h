@@ -20,11 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysrets.h>
 
 
@@ -49,7 +48,42 @@ struct received_head {
 	uint		magic ;
 } ;
 
+#ifdef	__cplusplus
+enum receivedmems {
+	receivedmem_finish,
+	receivedmem_overlast
+} ;
+struct received ;
+struct received_co {
+	received		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (received *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (received_co) */
+struct received : received_head {
+	received_co	finish ;
+	received() noex {
+	    finish(this,receivedmem_finish) ;
+	} ;
+	received(const received &) = delete ;
+	received &operator = (const received &) = delete ;
+	int start(cchar *,int = -1) noex ;
+	int getkey(int,cchar **) noex ;
+	int getitem(int,cchar **) noex ;
+	void dtor() noex ;
+	~received() {
+	    dtor() ;
+	} ;
+} ; /* end struct (received) */
+#else	/* __cplusplus */
 typedef	RECEIVED	received ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 

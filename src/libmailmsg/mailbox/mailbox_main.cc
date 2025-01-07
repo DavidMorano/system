@@ -641,14 +641,14 @@ static int mailbox_parse(mailbox *op) noex {
 /* end subroutine (mailbox_parse) */
 
 static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		ll = 0 ;
 	if (MAILBOXPI pi ; (rs = mailboxpi_start(&pi,lsp,mi)) >= 0) {
 	    mmenvdat	me ;
 	    int		vi = 0 ;
 	    cchar	*lp ;
-/* find message start */
+	    /* find message start */
 	    while ((rs = fbliner_getln(lsp,&lp)) >= 0) {
 	        ll = rs ;
 	        if (ll == 0) break ;
@@ -682,20 +682,20 @@ static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
 
 static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	fbliner		*lsp = pip->lsp ;
-	mailmsghdrval	mhv ;
 	cint		mi = pip->mi ;
 	int		rs ;
 	int		rs1 ;
 	int		ll = 0 ;
-	cchar		*lp ;
 	MB_MI		msg, *msgp = &msg ;
 	if ((rs = msginfo_start(msgp,lsp->poff,mi)) >= 0) {
+	    mailmsghdrval	mhv ;
 	    int		hi = 0 ;
 	    int		kl = 0 ;
 	    int		vl = 0 ;
 	    int		clen = -1 ;
 	    int		clines = -1 ;
 	    int		vi ;
+	    cchar	*lp ;
 	    cchar	*vp ;
 	    pip->f.fmsg = true ;
 	    if (pip->f.fenv) {
@@ -716,8 +716,8 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	            pip->f.fhdr = false ;
 	            if (pip->f.fmhv) { /* previous value outstanding */
 	                rs = mailbox_loadmsghead(op,msgp,&mhv) ;
-	                pip->f.fmhv = false ;
 	                mailmsghdrval_finish(&mhv) ;
+	                pip->f.fmhv = false ;
 	            } /* end if (had a previous value outstanding) */
 	            if (msgp->hoff < 0) {
 	                msgp->hoff = lsp->poff ;
@@ -728,8 +728,9 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	            if ((rs >= 0) && (hi >= 0)) {
 	                vp = (lp + vi) ;
 	                vl = (ll - vi) ;
-	                pip->f.fmhv = true ;
-	                rs = mailmsghdrval_start(&mhv,hi,vp,vl) ;
+	                if ((rs = mailmsghdrval_start(&mhv,hi,vp,vl)) >= 0) {
+	                    pip->f.fmhv = true ;
+			}
 	            } /* end if (have one we want) */
 	        } else if ((rs >= 0) && (ll > 1) && MSGHEADCONT(lp[0])) {
 	            if (pip->f.fmhv) {
@@ -738,8 +739,8 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	        } else if ((rs >= 0) && ((lp[0] == '\n') || hasEOH(lp,ll))) {
 	            if (pip->f.fmhv) { /* previous value outstanding */
 	                rs = mailbox_loadmsghead(op,msgp,&mhv) ;
-	                pip->f.fmhv = false ;
 	                mailmsghdrval_finish(&mhv) ;
+	                pip->f.fmhv = false ;
 	            } /* end if (had a previous value outstanding) */
 	            pip->f.feoh = true ;
 	            if (msgp->hoff < 0) {
@@ -786,8 +787,14 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 		    }
 	            pip->f.fbol = true ;
 	            clines = 0 ;
-	            while ((rs >= 0) && (clines < linemax) && 
-	                ((rs = fbliner_getln(lsp,&lp)) >= 0)) {
+		    auto lamb = [&clines,&linemax,&lsp] (cchar **lpp) noex { 
+			int	rs = SR_OK ;
+			if (clines < linemax) {
+	                    rs = fbliner_getln(lsp,lpp) ;
+			}
+			return rs ;
+		    } ;
+		    while ((rs >= 0) && ((rs = lamb(&lp)) > 0)) {
 	                ll = rs ;
 	                if (ll == 0) break ;
 	                pip->f.feol = (lp[ll-1] == '\n') ;

@@ -623,6 +623,10 @@ int sbuf::strs(int sch,mainv sv) noex {
 }
 /* end subroutine (sbuf::strs) */
 
+int sbuf::getpoint(cchar **rpp) noex {
+	return sbuf_getpoint(this,rpp) ;
+}
+
 void sbuf::dtor() noex {
 	if (cint rs = sbuf_finish(this) ; rs < 0) {
 	   ulogerror("sbuf",rs,"dtor-finish") ;

@@ -61,11 +61,11 @@
 #include	<cstring>
 #include	<queue>
 #include	<usystem.h>
+#include	<upt.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<pta.h>
-#include	<upt.h>
 #include	<vechand.h>		/* vector-handles */
 #include	<vecsorthand.h>		/* vector-sorted-handles */
 #include	<ciq.h>			/* container-interlocked-queue */

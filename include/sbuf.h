@@ -134,6 +134,7 @@ struct sbuf : sbuf_head {
 	    return sbuf_addquoted(this,sp,sl) ;
 	} ;
 	int hexp(uint64_t,int) noex ;
+	int getpoint(cchar **) noex ;
 	int decl(long) noex ;
 	template<typename Binary> int bin(Binary) noex ;
 	template<typename Octal> int oct(Octal) noex ;

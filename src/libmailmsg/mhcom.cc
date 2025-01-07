@@ -90,18 +90,19 @@ static int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
+    	MHCOM		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && sp) {
 	    int		sz ;
 	    int		buflen ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
 	    buflen = (sl + 2) ;
-	    sz = (2*buflen) ;
+	    sz = ( 2* buflen) ;
 	    if (void *p{} ; (rs = uc_malloc(sz,&p)) >= 0) {
 	        op->a = charp(p) ;
 	        op->value = (op->a + (0*buflen)) ;
@@ -265,5 +266,37 @@ static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (mhcom_bake) */
+
+int mhcom::start(cchar *sp,int sl) noex {
+	return mhcom_start(this,sp,sl) ;
+}
+
+int mhcom::getval(cchar **rpp) noex {
+	return mhcom_getval(this,rpp) ;
+}
+
+int mhcom::getcom(cchar **rpp) noex {
+	return mhcom_getcom(this,rpp) ;
+}
+
+void mhcom::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("mhcom",rs,"fini-finish") ;
+	}
+}
+
+mhcom_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case mhcommem_finish:
+	        rs = mhcom_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (mhcom_co::operator) */
+
 
 
