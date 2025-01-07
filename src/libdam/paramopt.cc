@@ -1,4 +1,5 @@
 /* paramopt SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* paramater option manipulations */
@@ -16,8 +17,12 @@
 
 /*******************************************************************************
 
+  	Object:
+	paramopt
+
+	Description:
 	This code module contains subroutines used to add paramters
-	to parameter lists and such for later access. Although meant
+	to parameter lists and such for later access.  Although meant
 	to be relatively straight forward, there are several aspects
 	of this object that are tailored towards special uses that
 	are not at all obvious.
@@ -44,7 +49,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
@@ -82,24 +88,6 @@
 
 /* forward references */
 
-extern "C" {
-    int		paramopt_loadu(PO *,cchar *,int) noex ;
-    int		paramopt_loads(PO *,cchar *,cchar *,int) noex ;
-    int		paramopt_load(PO *,cchar *,cchar *,int) noex ;
-    int		paramopt_curbegin(PO *,PO_CUR *) noex ;
-    int		paramopt_curend(PO *,PO_CUR *) noex ;
-}
-
-template<typename ... Args>
-static inline int paramopt_magic(paramopt *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (paramopt_magic) */
-
 static int	paramopt_findkey(PO *,cchar *,PO_NAME **) noex ;
 
 static int	name_incri(PO_NAME *) noex ;
@@ -114,26 +102,29 @@ static int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
 
 /* exported subroutines */
 
-int paramopt_start(PO *php) noex {
+int paramopt_start(PO *op) noex {
+    	PARAMOPT	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (php) {
-	    rs = memclear(php) ;		/* dangerous */
-	    php->head = php->tail = nullptr ;
-	    php->magic = PARAMOPT_MAGIC ;
-	    php->f_inited = true ;
+	if (op) {
+	    if ((rs = memclear(hop)) >= 0) {
+	        op->head = nullptr ;
+	        op->tail = nullptr ;
+	        op->magic = PARAMOPT_MAGIC ;
+	        op->f_inited = true ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (paramopt_start) */
 
-int paramopt_finish(PO *php) noex {
+int paramopt_finish(PO *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = paramopt_magic(php)) >= 0) {
-	    PO_NAME	*np, *nnp ;
+	if ((rs = paramopt_magic(op)) >= 0) {
+	    PO_NAME	*ap, *nnp ;
 	    PO_VAL	*vp, *nvp ;
-	    for (np = php->head ; np != nullptr ; np = nnp) {
-	        for (vp = np->head ; vp != nullptr ; vp = nvp) {
+	    for (ap = op->head ; ap != nullptr ; ap = nnp) {
+	        for (vp = ap->head ; vp != nullptr ; vp = nvp) {
 	            if (vp->value != nullptr) {
 	                rs1 = uc_free(vp->value) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -142,18 +133,18 @@ int paramopt_finish(PO *php) noex {
 	            rs1 = uc_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end for */
-	        if (np->name != nullptr) {
-	            rs1 = uc_free(np->name) ;
+	        if (ap->name != nullptr) {
+	            rs1 = uc_free(ap->name) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
-	        nnp = np->next ;
-	        rs1 = uc_free(np) ;
+	        nnp = ap->next ;
+	        rs1 = uc_free(ap) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end for */
-	    php->head = nullptr ;
-	    php->tail = nullptr ;
-	    php->f_inited = false ;
-	    php->magic = 0 ;
+	    op->head = nullptr ;
+	    op->tail = nullptr ;
+	    op->f_inited = false ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -169,23 +160,20 @@ Notice that the keyname is extrcted from the supplied string.
 
 ****/
 
-int paramopt_loadu(PO *php,cchar *sp,int sl) noex {
+int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(php,sp)) >= 0) {
-	    int		si ;
+	if ((rs = paramopt_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((si = sibreak(sp,sl,"=\t")) >= 0) {
-	        int	cl ;
+	    if (int si ; (si = sibreak(sp,sl,"=\t")) >= 0) {
 	        cchar	*cp{} ;
-	        if ((cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
-		    char	*name{} ;
-		    if ((rs = uc_malloc((cl+1),&name)) >= 0) {
+	        if (int cl ; (cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
+		    if (char *name{} ; (rs = uc_malloc((cl+1),&name)) >= 0) {
 			{
 		            strwcpy(name,cp,cl) ;
 	                    si += 1 ;
-	                    rs = paramopt_loads(php,name,(sp + si),(sl- si)) ;
+	                    rs = paramopt_loads(op,name,(sp + si),(sl- si)) ;
 	                    c += rs ;
 			}
 		        rs1 = uc_free(name) ;
@@ -210,24 +198,23 @@ given that a keyname is specified explicitly.
 
 ****/
 
-int paramopt_loads(PO *php,cchar *name,cchar *sp,int sl) noex {
+int paramopt_loads(PO *op,cchar *name,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(php,name,sp)) >= 0) {
-	    int		si ;
+	if ((rs = paramopt_magic(op,name,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    while ((si = sibreak(sp,sl," :,\t\r\n\v\f")) >= 0) {
+	    for (int si ; (si = sibreak(sp,sl," :,\t\r\n\v\f")) >= 0 ; ) {
 	        cchar	*cp = (sp+si) ;
 	        if (si > 0) {
-	            rs = paramopt_load(php,name,sp,si) ;
+	            rs = paramopt_load(op,name,sp,si) ;
 	            c += rs ;
 	        }
 	        sp = (cp + 1) ;
 	        sl -= (si + 1) ;
 	        if (rs < 0) break ;
-	    }  /* end while */
+	    }  /* end for */
 	    if ((rs >= 0) && (sl > 0)) {
-	        rs = paramopt_load(php,name,sp,sl) ;
+	        rs = paramopt_load(op,name,sp,sl) ;
 	        c += rs ;
 	    }
 	} /* end if (magic) */
@@ -236,50 +223,51 @@ int paramopt_loads(PO *php,cchar *name,cchar *sp,int sl) noex {
 /* end subroutine (paramopt_loads) */
 
 /* load a single key=value pair */
-int paramopt_load(PO *php,cchar *name,cchar *vbuf,int vlen) noex {
+int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = paramopt_magic(php,name,vbuf)) >= 0) {
+	if ((rs = paramopt_magic(op,name,vbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-	        int	vl ;
 	        cchar	*vp{} ;
+		rs = SR_OK ;
 	        if (vlen < 0) vlen = strlen(vbuf) ;
-	        if ((vl = sfshrink(vbuf,vlen,&vp)) > 0) {
-	            PO_VAL	*ovp, *nvp ;
+	        if (int vl ; (vl = sfshrink(vbuf,vlen,&vp)) > 0) {
+	            PO_VAL	*ovp ;
+	            PO_VAL	*nvp ;
 	            PO_NAME	*pp ;
 	            cint	rsn = SR_NOTFOUND ;
-	            int		size ;
+	            int		nsz ;
 	            cchar	*cp ;
 	            while ((vl > 0) && 
 	                (CHAR_ISWHITE(vp[vl - 1]) || (vp[vl - 1] == ','))) {
 	                vl -= 1 ;
 	            }
-/* do we have one of these named keys already? */
-	            if ((rs = paramopt_findkey(php,name,&pp)) == rsn) {
-/* make a new parameter header block, insert at head */
-	                size = sizeof(PO_NAME) ;
-	                if ((rs = uc_malloc(size,&pp)) >= 0) {
+		    /* do we have one of these named keys already? */
+	            if ((rs = paramopt_findkey(op,name,&pp)) == rsn) {
+			/* make a new parameter header block, insert at head */
+	                nsz = szof(PO_NAME) ;
+	                if ((rs = uc_malloc(nsz,&pp)) >= 0) {
 	                    pp->c = 0 ;
-	                    pp->next = php->head ;	/* insert at head */
+	                    pp->next = op->head ;	/* insert at head */
 	                    pp->head = nullptr ;
 	                    pp->tail = nullptr ;
 	                    pp->current = nullptr ;
 	                    if ((rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
 	                        pp->name = cp ;
-	                        php->head = pp ;	/* insert at head */
+	                        op->head = pp ;	/* insert at head */
 	                    }
 	                    if (rs < 0) {
 	                        uc_free(pp) ;
 		            }
 	                } /* end if */
 	            } /* end if (adding a new parameter block on the list) */
-/* OK, now we have the parameter block that we are looking for in 'pp' */
+		    /* OK, now we have the parameter block in 'pp' */
 	            if (rs >= 0) {
 	                if ((rs = name_vfind(pp,vp,vl,&ovp)) == rsn) {
+	                    cint	vsz = szof(PO_VAL) ;
 	                    f = true ;
-	                    size = sizeof(PO_VAL) ;
-	                    if ((rs = uc_malloc(size,&nvp)) >= 0) {
+	                    if ((rs = uc_malloc(vsz,&nvp)) >= 0) {
 	                        nvp->next = nullptr ;
 	                        if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
 	                            nvp->value = cp ;
@@ -307,48 +295,43 @@ int paramopt_load(PO *php,cchar *name,cchar *vbuf,int vlen) noex {
 }
 /* end subroutine (paramopt_load) */
 
-int paramopt_loaduniq(PO *php,cchar *name,cchar *vp,int vl) noex {
+int paramopt_loaduniq(PO *op,cchar *name,cchar *vp,int vl) noex {
 	int		rs ;
-	if ((rs = paramopt_haveval(php,name,vp,vl)) == 0) {
-	    rs = paramopt_load(php,name,vp,vl) ;
+	if ((rs = paramopt_haveval(op,name,vp,vl)) == 0) {
+	    rs = paramopt_load(op,name,vp,vl) ;
 	}
 	return rs ;
 }
 /* end subroutine (paramopt_loaduniq) */
 
-int paramopt_havekey(PO *php,cchar *name) noex {
-	PO_NAME	*pp ;
+int paramopt_havekey(PO *op,cchar *name) noex {
 	int		rs ;
 	int		c = 0 ;
-
-	if (php == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-
-	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
-
-	if (name[0] == '\0') return SR_INVALID ;
-
-	if ((rs = paramopt_findkey(php,name,&pp)) >= 0) {
-	    c = pp->c ;
-	} else if (rs == SR_NOTFOUND) {
-	    rs = SR_OK ;
-	}
-
+	if ((rs = paramopt_magic(op,name)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        if (PO_NAME *pp ; (rs = paramopt_findkey(op,name,&pp)) >= 0) {
+	            c = pp->c ;
+	        } else if (rs == SR_NOTFOUND) {
+	            rs = SR_OK ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (paramopt_havekey) */
 
-int paramopt_enumkeys(PO *php,PO_CUR *curp,cchar **rpp) noex {
+int paramopt_curenumkeys(PO *op,PO_CUR *curp,cchar **rpp) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = paramopt_magic(php,curp)) >= 0) {
+	if ((rs = paramopt_magic(op,curp)) >= 0) {
 	    PO_NAME	*kp ;
 	    if (rpp) {
 	        *rpp = nullptr ;
 	    }
 	    if (curp->keyp == nullptr) {
-	        kp = php->head ;	/* get the next key-pointer */
-	        curp->valuep = nullptr ;
+	        kp = op->head ;	/* get the next key-pointer */
+	        curp->valp = nullptr ;
 	    } else {
 	        kp = curp->keyp ;	/* get the current key-pointer */
 	        kp = kp->next ;		/* get the next key-pointer */
@@ -363,12 +346,12 @@ int paramopt_enumkeys(PO *php,PO_CUR *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
 }
-/* end subroutine (paramopt_enumkeys) */
+/* end subroutine (paramopt_curenumkeys) */
 
-int paramopt_fetch(PO *php,cchar *key,PO_CUR *curp,cchar **rpp) noex {
+int paramopt_fetch(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = paramopt_magic(php,key)) >= 0) {
+	if ((rs = paramopt_magic(op,key)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (key[0]) {
 	        PO_NAME	*kp = nullptr ;
@@ -377,23 +360,23 @@ int paramopt_fetch(PO *php,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	        if (curp == nullptr) {
 	            curp = &ncur ;
 	            curp->keyp = nullptr ;
-	            curp->valuep = nullptr ;
+	            curp->valp = nullptr ;
 	        }
 	        if (rpp) *rpp = nullptr ;
-/* do we have this key? */
+		/* do we have this key? */
 	        if (curp->keyp == nullptr) {
-	            if ((rs = paramopt_findkey(php,key,&kp)) >= 0) {
+	            if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
 	                curp->keyp = kp ;
 	                vp = kp->head ;
 	            }
 	        } else {
 	            kp = curp->keyp ;
-	            vp = (curp->valuep)->next ;
+	            vp = (curp->valp)->next ;
 	        } /* end if */
 	        if ((rs >= 0) && (kp && vp)) {
 	            if (rpp) *rpp = vp->value ;
 	            if (vp->value) vl = strlen(vp->value) ;
-	            curp->valuep = vp ;
+	            curp->valp = vp ;
 	        } else {
 	            rs = SR_NOTFOUND ;
 	        }
@@ -403,32 +386,31 @@ int paramopt_fetch(PO *php,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 }
 /* end subroutine (paramopt_fetch) */
 
-int paramopt_enumvalues(PO *php,cchar *key,PO_CUR *curp,
-		cchar **rpp) noex {
-	return paramopt_fetch(php,key,curp,rpp) ;
+int paramopt_enumvalues(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
+	return paramopt_fetch(op,key,curp,rpp) ;
 }
 /* end subroutine (paramopt_enumvalues) */
 
-int paramopt_haveval(PO *php,cchar *key,cchar *vp,int vl) noex {
+int paramopt_haveval(PO *op,cchar *key,cchar *vp,int vl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(php,key,vp)) >= 0) {
+	if ((rs = paramopt_magic(op,key,vp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (key[0]) {
 	        PO_CUR	cur ;
-	        if ((rs = paramopt_curbegin(php,&cur)) >= 0) {
+	        if ((rs = paramopt_curbegin(op,&cur)) >= 0) {
 		    auto	pe = paramopt_enumvalues ;
 	            int		f = 0 ;
 	            cchar	*pvp{} ;
-	            while ((rs1 = pe(php,key,&cur,&pvp)) >= 0) {
+	            while ((rs1 = pe(op,key,&cur,&pvp)) >= 0) {
 	                if (pvp) {
 	                    f = (strwcmp(pvp,vp,vl) == 0) ;
 	                    c += f ;
 		        }
 	            } /* end while */
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-	            rs1 = paramopt_curend(php,&cur) ;
+	            rs1 = paramopt_curend(op,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (paramopt-cur) */
 	    } /* end if (valid) */
@@ -438,16 +420,16 @@ int paramopt_haveval(PO *php,cchar *key,cchar *vp,int vl) noex {
 /* end subroutine (paramopt_haveval) */
 
 /* increment the parameters */
-int paramopt_incr(PO *php) noex {
+int paramopt_incr(PO *op) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(php)) >= 0) {
-	    PO_NAME	*pp = php->head ;
+	if ((rs = paramopt_magic(op)) >= 0) {
+	    PO_NAME	*pp = op->head ;
 	    PO_VAL	*vp ;
 	    rs = SR_NOTFOUND ;
 	    if (pp->next) {
 	        rs = name_incri(pp->next) ;
 	    }
-/* increment ourselves if we are at bottom or if previous guy carried */
+	    /* increment ourselves as may be appropriate */
 	    if (rs < 0) {
 	        vp = pp->current ;
 	        if (vp->next == nullptr) {
@@ -464,36 +446,36 @@ int paramopt_incr(PO *php) noex {
 /* end subroutine (paramopt_incr) */
 
 /* initialize a cursor */
-int paramopt_curbegin(PO *php,PO_CUR *curp) noex {
+int paramopt_curbegin(PO *op,PO_CUR *curp) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(php,curp)) >= 0) {
+	if ((rs = paramopt_magic(op,curp)) >= 0) {
 	    curp->keyp = nullptr ;
-	    curp->valuep = nullptr ;
+	    curp->valp = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (paramopt_curbegin) */
 
 /* free up a cursor */
-int paramopt_curend(PO *php,PO_CUR *curp) noex {
+int paramopt_curend(PO *op,PO_CUR *curp) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(php,curp)) >= 0) {
+	if ((rs = paramopt_magic(op,curp)) >= 0) {
 	    curp->keyp = nullptr ;
-	    curp->valuep = nullptr ;
+	    curp->valp = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (paramopt_curend) */
 
 /* find the number of values for a given key */
-int paramopt_countvals(PO *php,cchar *key) noex {
+int paramopt_countvals(PO *op,cchar *key) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(php,key)) >= 0) {
+	if ((rs = paramopt_magic(op,key)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (key[0]) {
 	        PO_NAME	*kp{} ;
-	        if ((rs = paramopt_findkey(php,key,&kp)) >= 0) {
+	        if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
 	            c = kp->c ;
 	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
@@ -508,12 +490,12 @@ int paramopt_countvals(PO *php,cchar *key) noex {
 /* private subroutines */
 
 /* find a parameter by key-name */
-static int paramopt_findkey(PO *php,cc *name,PO_NAME **rpp) noex {
+static int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(php,name)) >= 0) {
+	if ((rs = paramopt_magic(op,name)) >= 0) {
 	    PO_NAME	*pp ;
-	    for (pp = php->head ; pp != nullptr ; pp = pp->next) {
+	    for (pp = op->head ; pp != nullptr ; pp = pp->next) {
 	        if (strcmp(pp->name,name) == 0) break ;
 	    } /* end for */
 	    if (pp) c = pp->c ;
@@ -527,13 +509,13 @@ static int paramopt_findkey(PO *php,cc *name,PO_NAME **rpp) noex {
 #ifdef	COMMENT
 
 /* find a paramter by key/value pair */
-static int paramopt_findvalue(PO *php,cc *key,cc *value,int vlen,
+static int paramopt_findvalue(PO *op,cc *key,cc *value,int vlen,
 		PO_VAL **rpp) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(php)) >= 0) {
+	if ((rs = paramopt_magic(op)) >= 0) {
 	    PO_NAME	*kp{} ;
 	    if (vlen < 0) vlen = strlen(value) ;
-	    if ((rs = paramopt_findkey(php,key,&kp)) >= 0) {
+	    if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
 	        rs = name_vfind(kp,value,vlen,rpp) ;
 	    }
 	} /* end if (magic) */
@@ -549,7 +531,7 @@ static int name_incri(PO_NAME *pp) noex {
 	if (pp->next != nullptr) {
 	    rs = name_incri(pp->next) ;
 	}
-/* increment ourselves if we are at bottom or if previous guy carried */
+	/* increment ourselves as may be appropriate */
 	if (rs < 0) {
 	    vp = pp->current ;
 	    if (vp->next == nullptr) {
@@ -566,11 +548,11 @@ static int name_incri(PO_NAME *pp) noex {
 
 /* find a paramter by value? */
 static int name_vfind(PO_NAME *pp,cchar *vp,int vl,PO_VAL **rpp) noex {
-	PO_VAL		*vep ;
+	PO_VAL		*vep = nullptr ;
 	int		c = 0 ;
 	bool		f = false ;
 	if (vl < 0) vl = strlen(vp) ;
-	for (vep = pp->head ; vep != nullptr ; vep = vep->next) {
+	for (vep = pp->head ; vep ; vep = vep->next) {
 	    f = (strncmp(vep->value,vp,vl) == 0) ;
 	    f = f && (vep->value[vl] == '\0') ;
 	    if (f) break ;

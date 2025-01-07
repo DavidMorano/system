@@ -1,6 +1,6 @@
 /* mailmsg_envget HEADER */
 /* encoding=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* MAILMSG get-envelope */
 /* version %I% last-modified %G% */

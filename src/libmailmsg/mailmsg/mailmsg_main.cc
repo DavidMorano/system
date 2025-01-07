@@ -1,11 +1,10 @@
-/* mailmsg SUPPORT */
+/* mailmsg_main SUPPORT */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* message parsing object */
 /* version %I% last-modified %G% */
 
-#define	CF_PEDANTIC	0		/* extra precautions */
 
 /* revision history:
 
@@ -52,16 +51,16 @@
 	Notes:
 
 	Our basic algoirthm is to read all message-header lines and
-	to store them in allocated space. We then construct structures
+	to store them in allocated space.  We then construct structures
 	that contain elements that point to strings in the stored
-	lines (previously read). We had (at least) two options for
+	lines (previously read).  We had (at least) two options for
 	which object to use to store the lines: STRPACK or VECSTR.
-	Either is useful and probably fairly efficient. The STRPACK
+	Either is useful and probably fairly efficient.  The STRPACK
 	is more space efficient but VECSTR is probably more speed
-	efficient. I originally had both coded in and available
-	with a compile-time switch, but I removed that option. We
+	efficient.  I originally had both coded in and available
+	with a compile-time switch, but I removed that option.  We
 	now only use STRPACK.  If you want VECSTR or something else,
-	just replace calls to STRPACK with your new thing. There
+	just replace calls to STRPACK with your new thing.  There
 	are only a few places where these are.
 
 	This object is pretty kick-butt fast! We also use late
@@ -93,9 +92,9 @@
 
 /* local defines */
 
-#define	MMHVAL		struct msghdrval
-#define	MMHINST		struct msghdrinst
-#define	MMHNAME		struct msghdrname
+#define	MMHVAL		msghdrval
+#define	MMHINST		msghdrinst
+#define	MMHNAME		msghdrname
 
 #define	DEFHEADERS	25
 
@@ -157,11 +156,12 @@ enum msgstates {
 
 template<typename ... Args>
 static int mailmsg_ctor(mailmsg *op,Args ... args) noex {
+    	MAILMSG		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ; /* dangerous */
+	    memclear(hop) ;
 	    if ((op->slp = new(nothrow) strpack) != np) {
 	        if ((op->elp = new(nothrow) vecobj) != np) {
 	            if ((op->hlp = new(nothrow) vecobj) != np) {
@@ -518,8 +518,7 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	int		vi = 0 ;
 	cchar		*vp ;
 	if (op->msgstate == msgstate_env) {
-	    mmenvdat	es ;
-	    if ((rs = mailmsgmatenv(&es,lp,ll)) > 0) {
+	    if (mmenvdat es ; (rs = mailmsgmatenv(&es,lp,ll)) > 0) {
 	        rs = mailmsg_envadd(op,&es) ;
 	    } else if (rs == 0) {
 	        op->msgstate = msgstate_hdr ;
@@ -650,15 +649,14 @@ static int mailmsg_hdraddcont(mailmsg *op,cchar *vp,int vl) noex {
 }
 /* end subroutine (mailmsg_hdraddcont) */
 
-static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,
-		cc *hp,int hl) noex {
+static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	int		i{} ;		/* used afterwards */
+	int		i ; /* used-afterwards */
 	int		f = false ;
-	void		*vp{} ;
 	if (hl < 0) hl = strlen(hp) ;
 	*hnpp = nullptr ;
+	void		*vp{} ;
 	for (i = 0 ; (rs = vecobj_get(op->hlp,i,&vp)) >= 0 ; i += 1) {
 	    *hnpp = (MMHNAME *) vp ;
 	    if (*hnpp != nullptr) {
@@ -745,6 +743,7 @@ static int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (hnp && hp) {
+	    rs = SR_OK ;
 	    f = (hnp->namelen == hl) ;
 	    f = f && (hnp->name[0] == hp[0]) ;
 	    f = f && (strncmp(hnp->name,hp,hl) == 0) ;
@@ -930,7 +929,6 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	int		vl = hip->vl ;
 	if (hip->vp == nullptr) {
 	    int		sz = 1 ;
-	    char	*bp{} ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(&hip->vals,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
@@ -938,7 +936,7 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	            sz += (valp->vl + 1) ;
 		}
 	    } /* end for */
-	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	    if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
 		int	n = 0 ;
 		hip->vp = bp ;
 		hip->f_alloc = true ;

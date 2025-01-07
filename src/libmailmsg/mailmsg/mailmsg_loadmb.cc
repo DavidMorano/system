@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	mailmsg_loadmb
+
+	Description:
 	This subroutine loads a mail-message (into the mailmsg
 	object) from a source that consists of a mailbox object.
 	The mailbox object also reads the associated mail-box where
@@ -24,7 +28,8 @@
 	same mail-box. It does so through a read-interface that is
 	a small subset of the full mailbox interface.
 
-        Note: At first we skip empty lines until we find a non-empty line;
+        Note: 
+	At first we skip empty lines until we find a non-empty line;
         afterwards we do not ignore empty lines.
 
 *******************************************************************************/
@@ -74,8 +79,7 @@ int mailmsg_loadmb(mailmsg *op,mailbox *mbp,off_t fbo) noex {
 	if ((rs = mailmsg_magic(op)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
 	        cint	llen = (rs * MAILMSG_MF) ;
-	        char	*lbuf{} ;
-	        if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
+	        if (char *lbuf{} ; (rs = uc_malloc((llen+1),&lbuf)) >= 0) {
 	            mailbox_read	cur ;
 	            cint		bsize = MAILMSG_BSIZE ;
 	            if ((rs = mailbox_readbegin(mbp,&cur,fbo,bsize)) >= 0) {

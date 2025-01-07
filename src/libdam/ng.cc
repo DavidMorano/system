@@ -72,71 +72,61 @@ extern "C" {
 /* exported subroutines */
 
 int ng_start(NG *ngp) noex {
-	int		rs ;
-
-#if	CF_SAFE
-	if (ngp == NULL) return SR_FAULT ;
-#endif
-
-	rs = vecitem_start(ngp,10,0) ;
-
+	int		rs = SR_FAULT ;
+	if (ngp) {
+	    rs = vecitem_start(ngp,10,0) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ng_start) */
 
 int ng_finish(NG *ngp) noex {
-	ng_ent		*ep ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		i ;
-
-#if	CF_SAFE
-	if (ngp == NULL) return SR_FAULT ;
-#endif
-
-	for (i = 0 ; vecitem_get(ngp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-
-	        if (ep->name != NULL) {
-	            rs1 = uc_free(ep->name) ;
-		    if (rs >= 0) rs = rs1 ;
-		    ep->name = NULL ;
+	if (ngp) {
+	    void *vp{} ;
+	    rs = SR_OK ;
+	    for (int i = 0 ; vecitem_get(ngp,i,&vp) >= 0 ; i += 1) {
+	        ng_ent	*ep = (ng_ent *) vp ;
+	        if (vp) {
+	            if (ep->name) {
+	                rs1 = uc_free(ep->name) ;
+		        if (rs >= 0) rs = rs1 ;
+		        ep->name = NULL ;
+	            }
+	            if (ep->dir) {
+	                rs1 = uc_free(ep->dir) ;
+		        if (rs >= 0) rs = rs1 ;
+		        ep->dir = NULL ;
+	            }
 	        }
-
-	        if (ep->dir != NULL) {
-	            rs1 = uc_free(ep->dir) ;
-		    if (rs >= 0) rs = rs1 ;
-		    ep->dir = NULL ;
-	        }
-
+	    } /* end for */
+	    {
+	        rs1 = vecitem_finish(ngp) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
-	} /* end for */
-
-	rs1 = vecitem_finish(ngp) ;
-	if (rs >= 0) rs = rs1 ;
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mg_finish) */
 
 int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
-	ng_ent		*ep ;
-	int		rs ;
-	int		i ;
-
-#if	CF_SAFE
-	if (ngp == NULL) return SR_FAULT ;
-#endif
-
-	if (rpp == NULL)
-	    rpp = &ep ;
-
-	for (i = 0 ; (rs = vecitem_get(ngp,i,rpp)) >= 0 ; i += 1) {
-	    if ((*rpp) != NULL) {
-	        if (strcasecmp(name,(*rpp)->name) == 0) break ;
-	    }
-	} /* end for */
-
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		i = 0 ;
+	if (rpp) *rpp = nullptr ;
+	if (ngp) {
+	    void *vp{} ;
+	    for (int i = 0 ; (rs1 = vecitem_get(ngp,i,&vp)) >= 0 ; i += 1) {
+	        ng_ent	*ep = (ng_ent *) vp ;
+	        if (vp) {
+	            if (strcasecmp(name,ep->name) == 0) {
+			if (rpp) *rpp = ep ;
+		        break ;
+		    }
+	        }
+	    } /* end for */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (ng_search) */
@@ -150,8 +140,7 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 #endif
 
 	if ((rs = uc_mallocstrw(ngbuf,nglen,&cp)) >= 0) {
-	    ng_ent	ne ;
-	    memset(&ne,0,sizeof(ng_ent)) ;
+	    ng_ent	ne{} ;
 	    ne.dir = NULL ;
 	    ne.len = (rs-1) ;
 	    ne.name = cp ;
@@ -162,7 +151,8 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 		}
 	    } /* end if (had directory) */
 	    if (rs >= 0) {
-	        rs = vecitem_add(ngp,&ne,sizeof(ng_ent)) ;
+		cint	nsz = szof(ng_ent) ;
+	        rs = vecitem_add(ngp,&ne,nsz) ;
 	    }
 	    if (rs < 0) {
 		if (ne.dir != NULL) uc_free(ne.dir) ;
@@ -238,9 +228,7 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 
 	if ((rs = ema_start(&aid)) >= 0) {
 	    if ((rs = ema_parse(&aid,sp,sl)) > 0) {
-		int	i ;
-
-	        for (i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
+	        for (int i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
 	            if ((ep != NULL) && (! ep->f.error)) {
 	                int	sl = 0 ;
 	                cchar	*sp = NULL ;
@@ -276,14 +264,10 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 /* end subroutine (ng_addparse) */
 
 int ng_parse(NG *ngp,cchar *sp,int sl) noex {
-	int		rs ;
-
-#if	CF_SAFE
-	if (ngp == NULL) return SR_FAULT ;
-#endif
-
-	rs = ng_addparse(ngp,sp,sl) ;
-
+	int		rs = SR_FAULT ;
+	if (ngp) {
+	    rs = ng_addparse(ngp,sp,sl) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ng_parse) */

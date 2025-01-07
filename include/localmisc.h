@@ -338,11 +338,6 @@ typedef const char		cc ;
 #define	LOGIDLEN	15
 #endif
 
-/* mail address */
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * HOSTNAMELEN)
-#endif
-
 /* mail alias-length */
 #ifndef	MAILALIASLEN
 #define	MAILALIASLEN	64

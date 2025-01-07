@@ -1,5 +1,9 @@
 /* received HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
+
+/* manage a "received" object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -40,23 +44,25 @@ enum received_keys {
 } ;
 
 struct received_head {
-	uint		magic ;
 	char		*a ;
-	cchar	*key[received_keyoverlast] ;
+	cchar		*key[received_keyoverlast] ;
+	uint		magic ;
 } ;
+
+typedef	RECEIVED	received ;
 
 EXTERNC_begin
 
-extern int received_start(RECEIVED *,cchar *,int) noex ;
-extern int received_getkey(RECEIVED *,int,cchar **) noex ;
-extern int received_getitem(RECEIVED *,int,cchar **) noex ;
-extern int received_finish(RECEIVED *) noex ;
+extern int received_start(received *,cchar *,int) noex ;
+extern int received_getkey(received *,int,cchar **) noex ;
+extern int received_getitem(received *,int,cchar **) noex ;
+extern int received_finish(received *) noex ;
 
 EXTERNC_end
 
-extern cchar	*received_keys[] ;
+extern cpcchar	received_keys[] ;
 
 
-#endif /* RECEIVED_INCLUDE */
+#endif /* received_INCLUDE */
 
 

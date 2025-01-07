@@ -72,7 +72,7 @@ OBJ_MAILMSG= obja_mailmsg.o objb_mailmsg.o objc_mailmsg.o
 .SUFFIXES:		.hh .ii
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 

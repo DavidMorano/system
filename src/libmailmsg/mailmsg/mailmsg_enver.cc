@@ -87,8 +87,7 @@ int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 	if ((rs = mailmsg_magic(op,mep)) >= 0) {
 	    memclear(mep) ;
 	    if_constexpr (f_direct) {
-	        void	*vp{} ;
-	        if ((rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
 	            mmenvdat	*ep = (mmenvdat *) vp ;
 	            mep->a.ep = ep->a.ep ;
 	            mep->a.el = ep->a.el ;

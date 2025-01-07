@@ -109,7 +109,7 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	    if (osize > 0) {
 	        if (n <= 0) n = VECOBJ_DEFENTS ;
 	        op->va = nullptr ;
-	        op->esize = osize ;
+	        op->esz = osize ;
 	        if ((rs = vecobj_setopts(op,opts)) >= 0) {
 	            cint	size = (n + 1) * szof(char **) ;
 	            void	*vp{} ;
@@ -167,9 +167,8 @@ int vecobj_finish(vecobj *op) noex {
 
 int vecobj_add(vecobj *op,cvoid *s) noex {
 	int		rs ;
-	void		*ep ;
-	if ((rs = vecobj_addnew(op,&ep)) >= 0) {
-	    memcpy(ep,s,op->esize) ;
+	if (void *ep ; (rs = vecobj_addnew(op,&ep)) >= 0) {
+	    memcpy(ep,s,op->esz) ;
 	}
 	return rs ;
 }
@@ -182,7 +181,7 @@ int vecobj_adduniq(vecobj *op,cvoid *ep) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 	        const caddr_t	*vepp ; 
-	        cint		esize = op->esize ;
+	        cint		esize = op->esz ;
 	        rs = INT_MAX ;
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            vepp = (caddr_t *) op->va ;
@@ -601,7 +600,7 @@ int vecobj_find(vecobj *op,cvoid *cep) noex {
 	        for (i = 0 ; i < op->i ; i += 1) {
 		    cvoid	*ep = op->va[i] ;
 	            if (ep) {
-	                if (memcmp(cep,ep,op->esize) == 0) break ;
+	                if (memcmp(cep,ep,op->esz) == 0) break ;
 	            }
 	        } /* end for */
 	        rs = (i < op->i) ? SR_OK : SR_NOTFOUND ;
@@ -662,7 +661,7 @@ static int vecobj_ctor(vecobj *op) noex {
 	    op->i = 0 ;
 	    op->n = 0 ;
 	    op->fi = 0 ;
-	    op->esize = 0 ;
+	    op->esz = 0 ;
 	    if ((op->lap = new(nothrow) lookaside) != np) {
 		rs = SR_OK ;
 	    }
@@ -815,8 +814,8 @@ int vecobj::store(cvoid *ep,void **rpp) noex {
 	return vecobj_store(this,ep,rpp) ;
 }
 
-int vecobj::find(void *vp) noex {
-	return vecobj_find(this,vp) ;
+int vecobj::find(cvoid *ep) noex {
+	return vecobj_find(this,ep) ;
 }
 
 int vecobj::get(int ei,void **rpp) noex {

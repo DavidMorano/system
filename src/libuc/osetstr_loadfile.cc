@@ -40,7 +40,7 @@
 	Notes:
 
 	Why use FILER over BFILE?  Yes, FILER is a tiny bit more
-	lightweight than BFILE -- on a good day. But the real reason
+	lightweight than BFILE -- on a good day.  But the real reason
 	may be so that we don't need to load BFILE in code that
 	resides very deep in a software stack if we don't need it
 	-- like deep inside loadable modules.  Anyway, just a thought!
@@ -167,21 +167,22 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 	    if (! S_ISDIR(sb.st_mode)) {
 		int	fbsz = 1024 ;
 		int	fbo = 0 ;
+	        int	cs ;
 	        if (S_ISREG(sb.st_mode)) {
 	            int	fs = ((sb.st_size == 0) ? 1 : intsat(sb.st_size)) ;
-	            int	cs ;
 	            cs = BCEIL(fs,512) ;
 	            fbsz = min(cs,1024) ;
 	        } else {
 	            to = TO_READ ;
-	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
+	            if (S_ISSOCK(sb.st_mode)) {
+			fbo |= FILER_ONET ;
+		    }
 	        }
 		if (linebuffer lb ; (rs = lb.start) >= 0) {
-		    filer	loadfile, *lfp = &loadfile ;
 		    cint	llen = rs ;
 		    char	*lbuf = lb.lbuf ;
-	            if ((rs = filer_start(lfp,fd,0z,fbsz,fbo)) >= 0) {
-	                while ((rs = filer_readln(lfp,lbuf,llen,to)) > 0) {
+		    if (filer fb ; (rs = fb.start(fd,0z,fbsz,fbo)) >= 0) {
+	                while ((rs = fb.readln(lbuf,llen,to)) > 0) {
 			    cchar	*cp{} ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
 			        rs = osetstr_loadln(vsp,fu,cp,cl) ;
@@ -189,7 +190,7 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd) noex {
 			    }
 	                    if (rs < 0) break ;
 	                } /* end while (reading lines) */
-	                rs1 = filer_finish(lfp) ;
+	                rs1 = fb.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (filer) */
 		    rs1 = lb.finish ;

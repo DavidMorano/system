@@ -64,7 +64,7 @@ struct vecobj_head {
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
-	int		esize ;		/* object size */
+	int		esz ;		/* object size */
 } ;
 
 struct vecobj_cursor {

@@ -47,10 +47,6 @@
 
 /* local defines */
 
-#ifndef	MAILMSGLINEBUFLEN
-#define	MAILMSGLINEBUFLEN	(LINEBUFLEN * 5)
-#endif
-
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
 
 

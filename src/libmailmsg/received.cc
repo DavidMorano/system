@@ -1,4 +1,5 @@
 /* received SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* manage a "received" object */
@@ -19,20 +20,23 @@
 
 /*******************************************************************************
 
+  	Object:
+	received
+
+	Description:
 	This object module processes and stores the information in
-	a "received" header field for mail messages.
+	a "received" header field for mail messages.  Note that
+	some (stupid) mailers put characters like quote characters
+	and other weirdo characters into some of the value fields
+	of the RECEIVED header.  I don't know how many of these
+	weirdo characters are legal in an RFC-822 value (if any)
+	but we are currently using 'field_word(3dam)' with only the
+	semi-colon character as a terminator to try to handle these
+	wirdo cases.  If quote characters are not allowed to represent
+	a regular legal character (without any escape quoting),
+	then maybe 'field_get(3dam)' should be used.
 
-	Note that some (stupid) mailers put characters like quote
-	characters and other weirdo characters into some of the
-	value fields of the RECEIVED header.  I don't know how many
-	of these weirdo characters are legal in an RFC-822 value
-	(if any) but we are currently using 'field_word(3dam)' with
-	only the semi-colon character as a terminator to try to
-	handle these wirdo cases.  If quote characters are not
-	allowed to represent a regular legal character (without any
-	escape quoting), then maybe 'field_get(3dam)' should be
-	used.
-
+	Note:
 	Note also that all RFC-822 comments are removed from the
 	RECEIVED header value before trying to parse it out into
 	components.  Doing full tokenization on these strings while
@@ -52,6 +56,7 @@
 #include	<usystem.h>
 #include	<field.h>
 #include	<sbuf.h>
+#include	<matstr.h>
 #include	<matxstr.h>
 #include	<localmisc.h>
 
@@ -73,7 +78,7 @@
 
 /* forward references */
 
-static int received_bake(RECEIVED *,int,cchar *,int) noex ;
+static int received_bake(received *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -118,9 +123,7 @@ constexpr cchar		fterms[] = {
 
 /* exported subroutines */
 
-int received_start(RECEIVED *op,cchar *hbuf,int hlen) noex {
-{
-	MHCOM		com ;
+int received_start(received *op,cchar *hbuf,int hlen) noex {
 	int		rs ;
 	int		c = 0 ;
 
@@ -128,20 +131,16 @@ int received_start(RECEIVED *op,cchar *hbuf,int hlen) noex {
 	if (hbuf == nullptr) return SR_FAULT ;
 
 	memclear(op) ;
-
-	if (hlen < 0)
-	    hlen = strlen(hbuf) ;
-
-/* prepare a MHCOM object for comment parsing */
-
+	if (hlen < 0) hlen = strlen(hbuf) ;
+	/* prepare a MHCOM object for comment parsing */
+	mhcom		com ;
 	if ((rs = mhcom_start(&com,hbuf,hlen)) >= 0) {
 	    cchar	*sp ;
 	    int		sl ;
 	    if ((sl = mhcom_getval(&com,&sp)) > 0) {
 	        cint	sz = (sl + 1) ;
-	        void	*p ;
-	        if ((rs = uc_malloc(sz,&p)) >= 0) {
-	            op->a = p ;
+	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	            op->a = charp(p) ;
 	            if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
 	                c = rs ;
 	                op->magic = RECEIVED_MAGIC ;
@@ -159,16 +158,12 @@ int received_start(RECEIVED *op,cchar *hbuf,int hlen) noex {
 }
 /* end subroutine (received_start) */
 
-
-/* free up a this object */
-int received_finish(RECEIVED *op)
-{
+int received_finish(received *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != RECEIVED_MAGIC) return SR_NOTOPEN ;
 #endif
 
@@ -183,14 +178,11 @@ int received_finish(RECEIVED *op)
 }
 /* end subroutine (received_finish) */
 
-
-int received_getkey(RECEIVED *op,int ki,cchar **rpp)
-{
+int received_getkey(received *op,int ki,cchar **rpp) noex {
 	int		cl = 0 ;
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != RECEIVED_MAGIC) return SR_NOTOPEN ;
 #endif
 
@@ -208,10 +200,7 @@ int received_getkey(RECEIVED *op,int ki,cchar **rpp)
 }
 /* end subroutine (received_getkey) */
 
-
-int received_getitem(RECEIVED *op,int ki,cchar **rpp)
-{
-
+int received_getitem(received *op,int ki,cchar **rpp) noex {
 	return received_getkey(op,ki,rpp) ;
 }
 /* end subroutine (received_getitem) */
@@ -219,8 +208,7 @@ int received_getitem(RECEIVED *op,int ki,cchar **rpp)
 
 /* private subroutines */
 
-static int received_bake(RECEIVED *op,int sz,cchar *sp,int sl) noex {
-	sbuf		sb ;
+static int received_bake(received *op,int sz,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ki = -1 ;
@@ -228,10 +216,8 @@ static int received_bake(RECEIVED *op,int sz,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	int		f_prevmatch = false ;
 
-	if ((rs = sbuf_start(&sb,op->a,sz)) >= 0) {
-	    field	fsb ;
-
-	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
+	if (sbuf sb ; (rs = sbuf_start(&sb,op->a,sz)) >= 0) {
+	    if (field fsb ; (rs = field_start(&fsb,sp,sl)) >= 0) {
 	        cchar	*fp ;
 	        int	fl ;
 

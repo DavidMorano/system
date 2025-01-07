@@ -39,7 +39,7 @@
 #define	TERMSTR_VCURS	"\0337"		/* cursor save-restore (VT) */
 #define	TERMSTR_VCURR	"\0338"		/* cursor save-restore (VT) */
 
-#define	TERMSTR_ACURS	"\033[s"	/* cursor save-restore (ASNI) */
+#define	TERMSTR_ACURS	"\033[s"	/* cursor save-restore (ANSI) */
 #define	TERMSTR_ACURR	"\033[u"	/* cursor save-restore (ANSI) */
 
 #define	TERMSTR_SAVE	TERMSTR_VCURS	/* cursor save-restore (VT) */

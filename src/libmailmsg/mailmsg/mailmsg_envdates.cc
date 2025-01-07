@@ -73,8 +73,7 @@ int mailmsg_envdates(mailmsg *op,TIMEB *nowp,char *zname,time_t *rp) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if ((rs = mailmsg_magic(op,nowp,zname,rp)) >= 0) {
-	    dater	d ;
-	    if ((rs = dater_start(&d,nowp,zname,-1)) >= 0) {
+	    if (dater d ; (rs = dater_start(&d,nowp,zname,-1)) >= 0) {
 	        auto	mef = mailmsg_envdate ;
 	        time_t	envtime ;
 	        time_t	posttime = 0 ;

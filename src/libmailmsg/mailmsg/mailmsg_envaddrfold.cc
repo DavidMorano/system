@@ -135,10 +135,9 @@ static int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && mep && abuf && sbp) {
-	    emainfo	ai ;
 	    int		cl = mep->a.el ;
 	    cchar	*cp = mep->a.ep ;
-	    if ((rs = emainfo_load(&ai,cp,cl)) >= 0) {
+	    if (emainfo ai ; (rs = emainfo_load(&ai,cp,cl)) >= 0) {
 	        cint	at = rs ;
 	        if ((rs = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
 		    cint	al = rs ;

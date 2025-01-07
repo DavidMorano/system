@@ -23,8 +23,8 @@
 
 	Description:
 	I make an interface to the standard-C library for most
-	types.  But I have to roll my own for the |xlonglong| type
-	(|xint64_t|).  I have six exported subroutines from this
+	types.  But I have to roll my own for the |{x}longlong| type
+	(|{x}int64_t|).  I have six exported subroutines from this
 	module (3 types X 2 signs).
 
 	Notes:

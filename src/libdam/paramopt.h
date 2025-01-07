@@ -2,6 +2,9 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
+/* paramater option manipulations */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -54,7 +57,7 @@ struct paramopt_head {
 
 struct paramopt_cursor {
 	PARAMOPT_NAME	*keyp ;
-	PARAMOPT_VAL	*valuep ;
+	PARAMOPT_VAL	*valp ;
 } ;
 
 typedef PARAMOPT	paramopt ;
@@ -74,14 +77,27 @@ extern int paramopt_haveval(paramopt *,cchar *,cchar *,int) noex ;
 extern int paramopt_countvals(paramopt *,cchar *) noex ;
 extern int paramopt_curbegin(paramopt *,paramopt_cur *) noex ;
 extern int paramopt_curend(paramopt *,paramopt_cur *) noex ;
-extern int paramopt_enumkeys(paramopt *,paramopt_cur *,cchar **) noex ;
+extern int paramopt_curenumkeys(paramopt *,paramopt_cur *,cchar **) noex ;
 extern int paramopt_fetch(paramopt *,cchar *,paramopt_cur *,cchar **) noex ;
-extern int paramopt_enumvalues(paramopt *,cchar *,paramopt_cur *,
-			cchar **) noex ;
+extern int paramopt_enumvalues(paramopt *,cchar *,paramopt_cur *,cc **) noex ;
 extern int paramopt_incr(paramopt *) noex ;
 extern int paramopt_finish(paramopt *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int paramopt_magic(paramopt *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (paramopt_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* PARAMOPT_INCLUDE */

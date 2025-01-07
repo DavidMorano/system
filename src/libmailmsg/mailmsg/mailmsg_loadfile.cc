@@ -36,7 +36,8 @@
 	>=0		OK
 	<0		error (system-return)
 
-	Note: At first we skip empty lines until we find a non-empty line;
+	Note: 
+	At first we skip empty lines until we find a non-empty line;
 	afterwards we do not ignore empty lines.
 
 *******************************************************************************/
@@ -85,8 +86,7 @@ int mailmsg_loadfile(mailmsg *op,bfile *fp) noex {
 	if ((rs = mailmsg_magic(op,fp)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
 		cint	llen = (rs * MAILMSG_MF) ;
-		char	*lbuf{} ;
-		if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
+		if (char *lbuf{} ; (rs = uc_malloc((llen+1),&lbuf)) >= 0) {
 	    	    int		line = 0 ;
 	    	    cchar	*lp = lbuf ;
 	    	    while ((rs = breadln(fp,lbuf,llen)) > 0) {

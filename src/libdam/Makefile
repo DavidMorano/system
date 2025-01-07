@@ -612,7 +612,8 @@ fifoelem.o:		fifoelem.c fifoelem.h
 
 keyvals.o:		keyvals.cc keyvals.h
 
-paramopt.o:		paramopt.c paramopt.h
+paramopt.o:		paramopt.cc paramopt.h
+paramopt_loadone.o:	paramopt_loadone.cc paramopt.h
 
 loadave.o:		loadave.c loadave.h
 
