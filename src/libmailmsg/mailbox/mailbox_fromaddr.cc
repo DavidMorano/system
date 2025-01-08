@@ -24,12 +24,13 @@
 	This subroutine gets a FROM address from a mail message.
 
 	Synopsis:
-	int mailbox_fromaddr(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn)
+	typedef mailmsgfrom	mmf_t ;
+	int mailbox_fromaddr(mailbox *mbp,dater *dp,mmf_t *fip,cchar *mfn) noex
 
 	Arguments:
-	mbp		pointer to mailbox object
-	dp		pointer to DATER object
-	fip		pointer to MAILMSGFROM object
+	mbp		MAILBOX object pointer
+	dp		DATER object pointer
+	fip		MAILMSGFROM object pointer
 	mfn		mailbox file-name
 
 	Returns:
@@ -40,7 +41,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -88,9 +88,9 @@ extern "C" {
 
 /* forward references */
 
-static int mailbox_proc(mailbox *,DATER *,MAILMSGFROM *,bfile *,int) noex ;
+static int mailbox_proc(mailbox *,dater *,MMF *,bfile *,int) noex ;
 
-static int mailmsg_msgfrom(mailmsg *,MAILMSGFROM *) noex ;
+static int mailmsg_msgfrom(mailmsg *,MMF *) noex ;
 static int mailmsg_msgtime(mailmsg *,dater *,time_t *) noex ;
 static int mailmsg_hdrtime(mailmsg *,dater *,time_t *) noex ;
 static int mailmsg_envtime(mailmsg *,dater *,time_t *) noex ;
@@ -112,8 +112,8 @@ static constexpr int	rsnomsg[] = {
 
 /* exported subroutines */
 
-int mailbox_fromaddr(mailbox *mbp,DATER *dp,MMF *fip,cchar *mfn) noex {
-	int		rs = SR_FAULT ;
+int mailbox_fromaddr(mailbox *mbp,dater *dp,MMF *fip,cchar *mfn) noex {
+	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = mailbox_magic(mbp,dp,fip,mfn)) >= 0) {
@@ -142,7 +142,7 @@ int mailbox_fromaddr(mailbox *mbp,DATER *dp,MMF *fip,cchar *mfn) noex {
 
 /* local subroutines */
 
-static int mailbox_proc(mailbox *mbp,DATER *dp,MMF *fip,
+static int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
 		 bfile *mfp,int mi) noex {
 	mailbox_mi	*mip{} ;
 	int		rs ;
@@ -171,7 +171,7 @@ static int mailbox_proc(mailbox *mbp,DATER *dp,MMF *fip,
 }
 /* end subroutine (mailbox_proc) */
 
-static int mailmsg_msgfrom(mailmsg *mmp,MAILMSGFROM *fip) noex {
+static int mailmsg_msgfrom(mailmsg *mmp,MMF *fip) noex {
 	int		rs ;
 	int		vl ;
 	int		len = 0 ;
@@ -213,7 +213,7 @@ static int mailmsg_msgfrom(mailmsg *mmp,MAILMSGFROM *fip) noex {
 }
 /* end subroutine (mailmsg_msgfrom) */
 
-static int mailmsg_msgtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
+static int mailmsg_msgtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
 	if ((rs = mailmsg_hdrtime(mmp,dp,tp)) == 0) {
 	    rs = mailmsg_envtime(mmp,dp,tp) ;
@@ -222,7 +222,7 @@ static int mailmsg_msgtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_msgtime) */
 
-static int mailmsg_hdrtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
+static int mailmsg_hdrtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
 	int		f = false ;
 	cchar		*hn = HN_FROM ;
@@ -241,7 +241,7 @@ static int mailmsg_hdrtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_hdrtime) */
 
-static int mailmsg_envtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
+static int mailmsg_envtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
 	int		f = false ;
 	cchar		*vp{} ;

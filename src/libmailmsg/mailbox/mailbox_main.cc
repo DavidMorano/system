@@ -87,11 +87,10 @@
 
 #define	MB_MI			mailbox_mi
 
-#define	FMAT(cp)	((cp)[0] == 'F')
-
 #define	TO_LOCK		120		/* mailbox lock-timeout */
 #define	TO_READ		5
 
+#define	FMAT(cp)	((cp)[0] == 'F')
 #define	MSGHEADCONT(ch)	(((ch) == CH_SP) || ((ch) == CH_TAB))
 
 #define	TMPDIRMODE	(0777 | S_ISVTX)
@@ -104,7 +103,6 @@
 #define	SIGSTATE	sigstate
 #define	MAILBOXPI	mailboxpi
 #define	MAILBOXPI_FL	mailboxpi_flags
-
 #define	MMHV		mailmsghdrval
 
 #ifndef	CF_READTO
@@ -168,10 +166,11 @@ struct mailboxpi {
 
 template<typename ... Args>
 static int mailbox_ctor(mailbox *op,Args ... args) noex {
+    	MAILBOX		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(hop) ;
 	    if ((op->mlp = new(nothrow) vecobj) != nullptr) {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
@@ -787,14 +786,14 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 		    }
 	            pip->f.fbol = true ;
 	            clines = 0 ;
-		    auto lamb = [&clines,&linemax,&lsp] (cchar **lpp) noex { 
+		    auto getln = [&clines,&linemax,&lsp] (cchar **lpp) noex { 
 			int	rs = SR_OK ;
 			if (clines < linemax) {
 	                    rs = fbliner_getln(lsp,lpp) ;
 			}
 			return rs ;
 		    } ;
-		    while ((rs >= 0) && ((rs = lamb(&lp)) > 0)) {
+		    while ((rs >= 0) && ((rs = getln(&lp)) > 0)) {
 	                ll = rs ;
 	                if (ll == 0) break ;
 	                pip->f.feol = (lp[ll-1] == '\n') ;

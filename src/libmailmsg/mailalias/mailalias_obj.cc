@@ -182,10 +182,11 @@ namespace {
 
 template<typename ... Args>
 static int mailalias_ctor(mailalias *op,Args ... args) noex {
+    	MAILALIAS	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((op->afp = new(nothrow) vecstr) != nullptr) {
 	        if ((op->idp = new(nothrow) ids) != nullptr) {
 		    rs = SR_OK ;

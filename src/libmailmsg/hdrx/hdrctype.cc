@@ -64,12 +64,13 @@
 /* exported subroutines */
 
 int hdrctype_decode(hdrctype *op,cchar *hp,int hl) noex {
+    	HDRCTYPE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && hp) {
 	    int		cl ;
 	    cchar	*cp ;
 	    cchar	*tp ;
-	    rs = memclear(op) ;
+	    rs = memclear(hop) ;
 	    if (hl < 0) hl = strlen(hp) ;
 /* ignore any parameters */
 	    if ((tp = strnchr(hp,hl,';')) != nullptr) {

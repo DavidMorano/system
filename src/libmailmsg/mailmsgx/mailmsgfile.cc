@@ -130,10 +130,11 @@ namespace {
 
 template<typename ... Args>
 static int mailmsgfile_ctor(mailmsgfile *op,Args ... args) noex {
+    	MAILMSGFILE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->flp = new(nothrow) hdb) != np) {
 		rs = SR_OK ;

@@ -146,12 +146,13 @@ constexpr cchar		breaks[] = ";:@.%!=" ;
 /* exported subroutines */
 
 int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
+    	MAILMSGHDRFOLD	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && sp) {
 	    rs = SR_INVALID ;
 	    if ((mcols >= 1) && (ln >= 0)) {
 		if (sl < 0) sl = strlen(sp) ;
-	        rs = memclear(op) ;
+	        rs = memclear(hop) ;
 	        op->mcols = mcols ;
 	        op->ln = ln ;
 	        while (sl && isskip(*sp)) {

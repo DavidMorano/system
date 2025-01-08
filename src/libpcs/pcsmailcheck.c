@@ -1,11 +1,12 @@
-/* pcsmailcheck */
+/* pcsmailcheck SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* determine if the given user has mail (as PCS determines it) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_CVTFROM	0		/* convert FROM address */
-
 
 /* revision history:
 
@@ -18,8 +19,12 @@
 
 /*******************************************************************************
 
-        This subroutine determines if the given user (supplied) has mail waiting
-        (unread).
+	Name:
+	pcsmailcheck
+
+  	Description:
+	This subroutine determines if the given user (supplied) has
+	mail waiting (unread).
 
 	Synopsis:
 
@@ -156,7 +161,6 @@ extern int	mkaddrfrom(char *,int,const char *,int) ;
 extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuid_name(cchar *,int) ;
-extern int	mailbox_getfrom(MAILBOX *,char *,int,cchar *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isOneOf(const int *,int) ;
 

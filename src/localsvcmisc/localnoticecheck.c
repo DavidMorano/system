@@ -1,18 +1,17 @@
-/* localnoticecheck */
+/* localnoticecheck SUPPORT */
+/* encoding=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* determine if the given user has mail (as PCS determines it) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
-
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-
 	This code was originally written.
-
 
 */
 
@@ -20,11 +19,15 @@
 
 /*******************************************************************************
 
-	This subroutine determines how many (if any) notices a given user
-	(supplied) has received within the last (given) time period interncal.
+  	Name:
+	localnoticecheck
+
+	Description:
+	This subroutine determines how many (if any) notices a given
+	user (supplied) has received within the last (given) time
+	period interncal.
 
 	Synopsis:
-
 	int localnoticecheck(pr,rbuf,rlen,username,period)
 	cchar	pr[] ;
 	char		rbuf[] ;
@@ -33,7 +36,6 @@
 	int		period ;
 
 	Arguments:
-
 	pr		PCS system program root (if available)
 	rbuf		buffer to hold result
 	rlen		length of supplied result buffer
@@ -41,25 +43,21 @@
 	period		period of time to include
 
 	Returns:
-
 	>=0		OK
-	<0		some error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
@@ -130,45 +128,20 @@
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
 
+#define	MBC		mbcache
+
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef time_t		tm_t ;
+
+
 /* external subroutines */
-
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mknpath1(char *,int,cchar *) ;
-extern int	mknpath2(char *,int,cchar *,cchar *) ;
-extern int	sfsubstance(cchar *,int,cchar **) ;
-extern int	matkeystr(cchar **,char *,int) ;
-extern int	vstrkeycmp(cchar **,cchar **) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	mkaddrfrom(char *,int,cchar *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	compactstr(char *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isOneOf(cint *,int) ;
-
-#ifdef	COMMENT
-extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
-#endif /* COMMENT */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -203,11 +176,7 @@ static int	subinfo_finish(struct subinfo *) ;
 static int	subinfo_username(struct subinfo *,cchar *) ;
 
 static int	procmailfile(char *,int,cchar *,time_t) ;
-static int	procmailmsg(MBCACHE *,time_t,char *,int,int,int) ;
-
-#ifdef	COMMENT
-static int	mailbox_getfrom(MAILBOX *,cchar *,int,char *,int) ;
-#endif
+static int	procmailmsg(MBC *,time_t,char *,int,int,int) ;
 
 
 /* local variables */
@@ -400,99 +369,8 @@ static int procmailfile(char *rbuf,int rlen,cchar *mbfname,time_t nt)
 }
 /* end subroutine (procmailfile) */
 
-
-#ifdef	COMMENT
-static int mailbox_getfrom(mbp,fname,mi,rbuf,rlen)
-MAILBOX		*mbp ;
-cchar	fname[] ;
-int		mi ;
-char		rbuf[] ;
-int		rlen ;
-{
-	MAILBOX_MSGINFO	msginfo ;
-	MAILMSG		m ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		sl ;
-	int		len = 0 ;
-	cchar	*sp ;
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/mailbox_getfrom: mi=%d\n",mi) ;
-#endif
-
-	if (mbp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_FAULT ;
-
-	if (mi < 0) {
-	    MAILBOX_INFO	mbinfo ;
-	    rs1 = mailbox_getinfo(mbp,&mbinfo) ;
-	    if ((rs1 >= 0) && (mbinfo.nmsgs > 0)) {
-	        mi = (mbinfo.nmsgs - 1) ;
-	    }
-	} /* end if (default) */
-
-	if (mi >= 0) {
-	    if ((rs = mailbox_msginfo(mbp,mi,&msginfo)) >= 0) {
-		bfile		mf ;
-	        if ((rs1 = bopen(&mf,fname,"r",0666)) >= 0) {
-		    off_t	moff = msginfo.moff ;
-	            if ((rs1 = bseek(&mf,moff,SEEK_SET)) >= 0) {
-
-#if	CF_DEBUGS
-	                debugprintf("pcsmailcheck/mailbox_getfrom: "
-				"moff=%ld\n", moff) ;
-#endif
-
-	                if ((rs1 = mailmsg_start(&m)) >= 0) {
-
-/* load the message data into the MAILMSG object */
-
-	                    if (rs1 >= 0)
-	                        rs1 = mailmsg_loadfile(&m,&mf) ;
-
-/* extract the MAILMSG information that we want */
-
-	                    if (rs1 >= 0) {
-	                        rs1 = mailmsg_hdrval(&m,HN_FROM,&sp) ;
-	                        sl = rs1 ;
-	                    }
-
-	                    if ((rs1 < 0) || (sl == 0)) {
-	                        rs1 = mailmsg_envaddress(&m,0,&sp) ;
-	                        sl = rs1 ;
-	                    }
-
-/* parse the EMAs */
-
-	                    if ((rs1 >= 0) && (sl > 0)) {
-	                        rs = mkaddrfrom(rbuf,rlen,sp,sl) ;
-	                        len = rs ;
-	                    }
-
-	                    rs1 = mailmsg_finish(&m) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (mailmsg) */
-
-	            } /* end if (seek) */
-	            rs1 = bclose(&mf) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mail-file) */
-	    } /* end if (msg-info) */
-	} /* end if (positive MI) */
-
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailbox_getfrom) */
-#endif /* COMMENT */
-
-
-static int procmailmsg(MBCACHE *mbp,time_t nt,char *rbuf,int rlen,int mi,int c)
-{
-	MBCACHE_SCAN	*msp ;
+static int procmailmsg(MBC *mbp,tm_t nt,char *rbuf,int rlen,int mi,int c) noex {
+	mbcache_scan	*msp ;
 	int		rs ;
 	int		f = FALSE ;
 #if	CF_DEBUGS

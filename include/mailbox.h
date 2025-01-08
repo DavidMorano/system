@@ -30,6 +30,8 @@
 #include	<usysrets.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
+#include	<dater.h>
+#include	<mailmsgfrom.h>
 
 
 /* object defines */
@@ -172,6 +174,8 @@ extern int mailbox_countdel(mailbox *) noex ;
 extern int mailbox_readbegin(mailbox *,mailbox_read *,off_t,int) noex ;
 extern int mailbox_readln(mailbox *,mailbox_read *,char *,int) noex ;
 extern int mailbox_readend(mailbox *,mailbox_read *) noex ;
+extern int mailbox_getfrom(mailbox *,char *,int,cchar *,int) noex ;
+extern int mailbox_fromaddr(mailbox *,dater *,mailmsgfrom *,cchar *) noex ;
 extern int mailbox_close(mailbox *) noex ;
 
 #ifdef	COMMENT

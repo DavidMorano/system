@@ -67,6 +67,7 @@
 /* exported subroutines */
 
 int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
+    	MAILMSGHDRCT	*hop = op ;
 	mode_t	operms = 0660 ;
 
 	int	rs ;
@@ -86,7 +87,7 @@ int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
 	if (mfd < 0)
 	    return SR_BADF ;
 
-	memclear(op) ;
+	memclear(hop) ;
 
 	op->tfd = -1 ;
 	op->f.useclen = (opts & MAILMSGHDRCT_OUSECLEN) ? 1 : 0 ;

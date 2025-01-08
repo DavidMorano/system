@@ -125,11 +125,12 @@ static int	malloccompactstr(cchar *,int,char **) noex ;
 /* exported subroutines */
 
 int ema_start(ema *op) noex {
+    	EMA		*hop = op ;
 	int		rs ;
 	if ((rs = ema_ctor(op)) >= 0) {
 	    cint	vn = EMA_DEFENTS ;
 	    cint	vo = 0 ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) {
 	        op->magic = EMA_MAGIC ;
 	    }

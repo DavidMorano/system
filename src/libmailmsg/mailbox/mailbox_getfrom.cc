@@ -24,12 +24,12 @@
 	This subroutine gets a FROM address from a mail message.
 
 	Synopsis:
-	int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cc *fn,int mi) noex
+	int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cc *fn,int mi) noex
 
 	Arguments:
-	mbp		pointer to MAILBOX object
-	rbuf		buffer to hold result
-	rlen		length of supplied result buffer
+	mbp		MAILBOX object pointer
+	rbuf		result buffer pointer
+	rlen		result buffer length
 	fn		mailbox file-name
 	mi		message-id (ID of message within mail-box)
 
@@ -40,7 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -89,7 +88,7 @@ static bool	isNoMsg(int) noex ;
 
 /* local variables */
 
-static constexpr int	rsnomsg[] = {
+constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
@@ -102,7 +101,7 @@ static constexpr int	rsnomsg[] = {
 /* exported subroutines */
 
 int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = mailbox_magic(mbp,rbuf,fn)) >= 0) {
@@ -112,16 +111,18 @@ int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 	        if (mi < 0) {
 	            mailbox_info	mbinfo{} ;
 	            rs = mailbox_getinfo(mbp,&mbinfo) ;
-	            if (mbinfo.nmsgs > 0) mi = (mbinfo.nmsgs - 1) ;
+	            if (mbinfo.nmsgs > 0) {
+			mi = (mbinfo.nmsgs - 1) ;
+		    }
 	        } /* end if (default) */
 	        if ((rs >= 0) && (mi >= 0)) {
-	            mailbox_mi		*mip{} ;
+	            mailbox_mi	*mip{} ;
 	            if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
-		        bfile		mf ;
-	                if ((rs = bopen(&mf,fn,"r",0666)) >= 0) {
-		            const off_t	moff = mip->moff ;
+			cmode	om = 0666 ;
+		        if (bfile mf ; (rs = bopen(&mf,fn,"r",om)) >= 0) {
+		            coff	moff = mip->moff ;
 	                    if ((rs = bseek(&mf,moff,SEEK_SET)) >= 0) {
-			        MAILMSG		m ;
+			        mailmsg		m ;
 	                        if ((rs = mailmsg_start(&m)) >= 0) {
 			            if ((rs = mailmsg_loadfile(&m,&mf)) >= 0) {
 				        rs = mailmsg_fromer(&m,rbuf,rlen) ;
