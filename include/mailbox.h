@@ -65,7 +65,7 @@ struct mailbox_flags {
 
 struct mailbox_head {
 	vecobj		*mlp ;		/* Message-List-Pointer */
-	cchar		*mailfname ;
+	cchar		*mailfname ;	/* allocated */
 	time_t		ti_mod ;	/* modification time */
 	time_t		ti_check ;	/* check time */
 	MAILBOX_FL	f ;
@@ -136,10 +136,13 @@ struct mailbox_msgvalues {
 	cchar	*received ;	/* headers "received" */
 	cchar	*subject ;	/* header "subject" */
 	cchar	*ctype ;	/* header "content-type" */
+	cchar	*sent ;		/* header "sent" */
 	cchar	*from ;		/* header "from" */
 	cchar	*date ;		/* header "date" */
 	cchar	*to ;		/* header "to" */
 	cchar	*cc ;		/* header "cc" */
+	cchar	*bcc ;		/* header "bcc" */
+	cchar	*reply-to:	/* header "reply-to" */
 	cchar	*status ;	/* header "status" */
 	cchar	*mid ;		/* message ID "message-id" */
 } ;

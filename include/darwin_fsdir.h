@@ -23,8 +23,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system types */
 #include	<limits.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -91,7 +90,7 @@ struct fsdir_co {
 	} ;
 } ; /* end struct (fsdir_co) */
 struct fsdir : fsdir_head {
-	typedef fsdir_entry	ent ;
+	FSDIR_ENT	ent ;
 	fsdir_opener	open ;
 	fsdir_co	rewind ;
 	fsdir_co	audit ;
@@ -104,7 +103,7 @@ struct fsdir : fsdir_head {
 	} ; /* end ctor */
 	fsdir(const fsdir &) = delete ;
 	fsdir &operator = (const fsdir &) = delete ;
-	int read(ent *,char *,int) noex ;
+	int read(fsdir_ent *,char *,int) noex ;
 	int tell(off_t * = nullptr) noex ;
 	int seek(off_t = 0) noex ;
 	void dtor() noex ;

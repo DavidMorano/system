@@ -1,4 +1,5 @@
 /* uopen HEADER */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* UNIX® support for opening files or devices */

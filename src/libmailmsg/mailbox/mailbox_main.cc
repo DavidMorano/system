@@ -45,6 +45,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<sysval.hh>
 #include	<mallocxx.h>
 #include	<sigblocker.h>
 #include	<filer.h>
@@ -79,6 +80,8 @@
 #ifndef	MSGCOLS
 #define	MSGCOLS			76
 #endif
+
+#define	BUFPAGEMULT		32	/* read buffer multiplier */
 
 #define	MAILBOX_DEFMSGS		100
 #define	MAILBOX_READSIZE	(4*1024)
@@ -217,6 +220,8 @@ static int writeblanks(int,int) noex ;
 
 /* local variables */
 
+static sysval		pagesize(sysval_ps) ;
+
 enum headkeys {
 	headkey_clen,
 	headkey_clines,
@@ -258,19 +263,21 @@ int mailbox_open(mailbox *op,cchar *mbfname,int mflags) noex {
 	if ((rs = mailbox_ctor(op,mbfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (mbfname[0]) {
-	        int	oflags = 0 ;
-	        op->mfd = -1 ;
-	        op->msgs_total = 0 ;
-	        op->to_lock = TO_LOCK ;
-	        op->to_read = TO_READ ;
-	        op->mflags = mflags ;
-	        op->pagesize = getpagesize() ;
-	        op->f.readonly = (! (mflags & MAILBOX_ORDWR)) ;
-	        op->f.useclen = (! (mflags & MAILBOX_ONOCLEN)) ;
-	        op->f.useclines = MKBOOL(mflags & MAILBOX_OUSECLINES) ;
-	        oflags |= (mflags & MAILBOX_ORDWR) ? O_RDWR : 0 ;
-		rs = mailbox_opener(op,mbfname,oflags) ;
-		nmsgs = rs ;
+		if ((rs = pagesize) >= 0) {
+	            int		oflags = 0 ;
+	            op->pagesize = rs ;
+	            op->msgs_total = 0 ;
+	            op->mflags = mflags ;
+	            op->mfd = -1 ;
+	            op->to_lock = TO_LOCK ;
+	            op->to_read = TO_READ ;
+	            op->f.readonly = (! (mflags & MAILBOX_ORDWR)) ;
+	            op->f.useclen = (! (mflags & MAILBOX_ONOCLEN)) ;
+	            op->f.useclines = !!(mflags & MAILBOX_OUSECLINES) ;
+	            oflags |= (mflags & MAILBOX_ORDWR) ? O_RDWR : 0 ;
+		    rs = mailbox_opener(op,mbfname,oflags) ;
+		    nmsgs = rs ;
+		} /* end if (pageisze) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mailbox_dtor(op) ;
@@ -613,14 +620,14 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 
 static int mailbox_parse(mailbox *op) noex {
 	coff		soff = 0z ;
-	cint		bsize = (32 * op->pagesize) ;
+	cint		bsz = (BUFPAGEMULT * op->pagesize) ;
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
 	if_constexpr (f_readto) {
 	    to = op->to_read ;
 	}
-	if (filer fb ; (rs = fb.start(op->mfd,soff,bsize,0)) >= 0) {
+	if (filer fb ; (rs = fb.start(op->mfd,soff,bsz,0)) >= 0) {
 	    fbliner	ls, *lsp = &ls ;
 	    if ((rs = fbliner_start(lsp,&fb,soff,to)) >= 0) {
 	        int	mi = 0 ;
@@ -974,17 +981,17 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	int		bl = op->pagesize ;
 	int		wlen = 0 ;
 	if (char *bp{} ; (rs = uc_valloc(bl,&bp)) >= 0) {
-	    MSGCOPY	mc{} ;
 	    filer	fb, *fbp = &fb ;
+	    MSGCOPY	mc{} ;
 	    off_t	mbchange = -1 ;
 	    cint	mfd = op->mfd ;
-	    cint	bsize = min(iceil(op->mblen,ps),(16*ps)) ;
+	    cint	bsz = min(iceil(op->mblen,ps),(16*ps)) ;
 	    int		elen = 0 ; /* GCC false complaint */
-	    mc.fbp = fbp ;
 	    mc.bp = bp ;
 	    mc.bl = bl ;
 	    mc.moff = 0 ;
-	    if ((rs = fbp->start(tfd,0z,bsize,0)) >= 0) {
+	    if ((rs = fbp->start(tfd,0z,bsz,0)) >= 0) {
+	        mc.fbp = fbp ;
 	        for (int mi = 0 ; mi < op->msgs_total ; mi += 1) {
 		    bool	f = false ;
 		    bool	fcopy = false ;

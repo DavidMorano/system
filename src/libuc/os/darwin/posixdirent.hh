@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	posixdirent
+
+	Description:
 	See the 'cc' file for more information (and commentary) on
 	this object.
 
@@ -42,8 +46,27 @@ struct posixdirent ;
 
 typedef int (posixdirent::*posixdirent_m)() noex ;
 
+enum posixdirentmems {
+    	posixdirentmem_rewind,
+	posixdirentmem_close,
+	posixdirentmem_overlast
+} ;
+
+class posixdirent ;
+struct posixdirent_co {
+	posixdirent	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (posixdirent *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (posixdirent_co) */
 class posixdirent {
-	posixdirent_m	m ;
+    	friend		posixdirent_co ;
 	DIR		*dirp = nullptr ;
 	dirent		*debuf = nullptr ;
 	dirent		*dep ;
@@ -61,19 +84,25 @@ class posixdirent {
 	int dirseek() noex ;
 	int dirrewind() noex ;
 	int setup(cchar *) noex ;
-	int callout() noex ;
+	int callout(posixdirent_m) noex ;
+	int irewind() noex ;
+	int iclose() noex ;
 public:
-	posixdirent() = default ;
+	posixdirent() noex {
+	    rewind(this,posixdirentmem_rewind) ;
+	    close(this,posixdirentmem_close) ;
+	} ;
 	posixdirent(const posixdirent &) = delete ;
 	posixdirent &operator = (const posixdirent &) = delete ;
+	posixdirent_co	rewind ;
+	posixdirent_co	close ;
 	int open(cchar *) noex ;
-	int close() noex ;
 	int read(dirent *,char *,int) noex ;
 	int tell(off_t *) noex ;
 	int seek(off_t) noex ;
-	int rewind() noex ;
+	void dtor() noex ;
 	~posixdirent() {
-	    (void) close() ;
+	    dtor() ;
 	}
 } ; /* end struct (posixdirent) */
 

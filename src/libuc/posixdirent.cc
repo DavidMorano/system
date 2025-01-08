@@ -1,4 +1,5 @@
 /* posixdirent SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* helper interface to POSIX |dirent(3c)| facility */
@@ -53,8 +54,9 @@
 #include	<usysrets.h>
 #include	<usysflag.h>
 #include	<uclibsubs.h>
-#include	<snwcpy.h>
+#include	<errtimer.hh>
 #include	<getbufsize.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>
 
 #include	"posixdirent.hh"
@@ -104,21 +106,19 @@ int posixdirent::open(cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	if (fn) {
 	    if ((rs = setup(fn)) >= 0) {
-	        m = &posixdirent::diropen ;
 	        fname = fn ;
-	        rs = callout() ;
+	        rs = callout(&posixdirent::diropen) ;
 	    } /* end if (setup) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (posixdirent::open) */
 
-int posixdirent::close() noex {
+int posixdirent::iclose() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	{
-	    m = &posixdirent::dirclose ;
-	    rs1 = callout() ;
+	if (dirp) {
+	    rs1 = callout(&posixdirent::dirclose) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (debuf) {
@@ -129,18 +129,17 @@ int posixdirent::close() noex {
 	}
 	return rs ;
 }
-/* end subroutine (posixdirent::close) */
+/* end subroutine (posixdirent::iclose) */
 
 int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (ep && dbuf) {
 	    rs = SR_INVALID ;
 	    if (dlen > 0) {
-	        m = &posixdirent::dirread ;
 		dep = ep ;
 	        nbuf = dbuf ;
 	        nlen = dlen ;
-	        rs = callout() ;
+	        rs = callout(&posixdirent::dirread) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -150,26 +149,23 @@ int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 int posixdirent::tell(off_t *offp) noex {
 	int		rs = SR_FAULT ;
 	if (offp) {
-	    m = &posixdirent::dirtell ;
 	    sop = offp ;
-	    rs = callout() ;
+	    rs = callout(&posixdirent::dirtell) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (posixdirent::tell) */
 
 int posixdirent::seek(off_t o) noex {
-	m = &posixdirent::dirseek ;
 	so = o ;
-	return callout() ;
+	return callout(&posixdirent::dirseek) ;
 }
 /* end subroutine (posixdirent::seek) */
 
-int posixdirent::rewind() noex {
-	m = &posixdirent::dirrewind ;
-	return callout() ;
+int posixdirent::irewind() noex {
+	return callout(&posixdirent::dirrewind) ;
 }
-/* end subroutine (posixdirent::rewind) */
+/* end subroutine (posixdirent::irewind) */
 
 
 /* local subroutines */
@@ -182,12 +178,15 @@ int posixdirent::setup(cchar *fn) noex {
 		cint	pl = rs ;
 		if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 		    cint	dl = max(rs,pl) ;
-		    void	*vp{} ;
-	            delen = (dl + sizeof(dirent)) ;
-	            if ((rs = uc_libmalloc((delen+1),&vp)) >= 0) {
-		        debuf = (dirent *) vp ;
-		        memset(vp,0,(delen+1)) ;
-		    }
+	            delen = (dl + szof(dirent)) ;
+		    {
+		        auto mall = uc_libmalloc ;
+			cint dsz = (delen + 1) ;
+		        if (void *vp{} ; (rs = mall(dsz,&vp)) >= 0) {
+		            debuf = (dirent *) vp ;
+		            memset(vp,0,dsz) ;
+		        }
+		    } /* end block */
 		} /* end if (getbufsize) */
 	    } /* end if (uc_pathconf) */
 	} else {
@@ -197,59 +196,65 @@ int posixdirent::setup(cchar *fn) noex {
 }
 /* end subroutine (posixdirent::setup) */
 
-int posixdirent::callout() noex {
-	int		rs = SR_NOTOPEN ;
-	if (dirp) {
-            int     to_again = utimeout[uto_again] ;
-            int     to_nomem = utimeout[uto_nomem] ;
-            bool    f_exit = false ;
-            repeat {
-                if ((rs = (this->*m)()) < 0) {
-                    switch (rs) {
-                    case SR_AGAIN:
-                        if (to_again-- > 0) {
-                            msleep(1000) ;
-                        } else {
-                            f_exit = true ;
-                        }
-                        break ;
-                    case SR_NOMEM:
-                        if (to_nomem-- > 0) {
-                            msleep(1000) ;
-                        } else {
-                            f_exit = true ;
-                        }
-                        break ;
-                    case SR_INTR:
-                        break ;
-                    default:
-                        f_exit = true ;
-                        break ;
-                    } /* end switch */
-                } /* end if (error) */
-            } until ((rs >= 0) || f_exit) ;
-	} /* end if (non-null) */
+int posixdirent::callout(posixdirent_m m) noex {
+	int		rs ;
+        errtimer    to_again = utimeout[uto_again] ;
+        errtimer    to_nomem = utimeout[uto_nomem] ;
+        errtimer    to_nosr = utimeout[uto_nosr] ;
+        errtimer    to_nobufs = utimeout[uto_nobufs] ;
+        errtimer    to_io = utimeout[uto_io] ;
+        reterr      r ;
+        repeat {
+            if ((rs = (this->*m)()) < 0) {
+                r(rs) ;             /* <- default is to exit */
+                switch (rs) {
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSR:
+                    r = to_nosr(rs) ;
+                    break ;
+                case SR_NOBUFS:
+                    r = to_nobufs(rs) ;
+                    break ;
+                case SR_IO:
+                    r = to_io(rs) ;
+                    break ;
+                case SR_INTR:
+                    r(false) ;
+                    break ;
+                } /* end switch */
+            } /* end if (error) */
+        } until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end subroutine (posixdirent::callout) */
 
 int posixdirent::diropen() noex {
-	DIR		*p ;
 	int		rs = SR_OK ;
 	errno = 0 ;
-	if ((p = opendir(fname)) != nullptr) {
+	if (DIR *p ; (p = opendir(fname)) != nullptr) {
 	    dirp = p ;
 	} else {
-	    rs = (-errno) ;
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
 /* end subroutine (posixdirent::diropen) */
 
 int posixdirent::dirclose() noex {
-	errno = 0 ;
-	closedir(dirp) ;
-	return (-errno) ;
+	int		rs = SR_OK ;
+	if (dirp) {
+	    errno = 0 ;
+	    if (int rc = closedir(dirp) ; rc < 0) {
+	        rs = (- errno) ;
+	    }
+	    dirp = nullptr ;
+	}
+	return rs ;
 }
 /* end subroutine (posixdirent::dirclose) */
 
@@ -312,5 +317,27 @@ int posixdirent::dirrewind() noex {
 	return (-errno) ;
 }
 /* end subroutine (posixdirent::dirrewind) */
+
+void posixdirent::dtor() noex {
+    	if (cint rs = close() ; rs < 0) {
+	    ulogerror("posixdirent",rs,"dtor-close") ;
+	}
+}
+
+posixdirent_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case posixdirentmem_rewind:
+	        rs = op->irewind() ;
+	        break ;
+	    case posixdirentmem_close:
+	        rs = op->iclose() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (posixdirent_co::operator) */
 
 

@@ -145,23 +145,23 @@ int fsdir_open(fsdir *op,cchar *dname) noex {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
 	        if ((rs = fsdir_begin(op,dname)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_fstat(op->dfd,&sb)) >= 0) {
+	            if (USTAT sb ; (rs = u_fstat(op->dfd,&sb)) >= 0) {
 		        rs = SR_NOTDIR ;
 		        if (S_ISDIR(sb.st_mode)) {
-	    	            cint	psize = getpagesize() ;
-	    	            int		dsize = intsat(sb.st_size) ;
-			    int		sz ;
-	    	            char	*bp ;
-			    if (dsize < FSDIR_MINBUFLEN) {
-				    dsize = FSDIR_MINBUFLEN ;
-			    }
-			    sz = min(psize,dsize) ;
-	                    if ((rs = uc_valloc(sz,&bp)) >= 0) {
-		                op->bdata = bp ;
-			        op->bsize = sz ;
-	                        op->magic = FSDIR_MAGIC ;
-	                    }
+			    if ((rs = ucpagesize) >= 0) {
+	    	                cint	ps = rs ;
+	    	                int	ds = intsat(sb.st_size) ;
+			        int	sz ;
+			        if (ds < FSDIR_MINBUFLEN) {
+				    ds = FSDIR_MINBUFLEN ;
+			        }
+			        sz = min(ps,ds) ;
+	    	                if (char *bp ; (rs = uc_valloc(sz,&bp)) >= 0) {
+		                    op->bdata = bp ;
+			            op->bsize = sz ;
+	                            op->magic = FSDIR_MAGIC ;
+	                        } /* end if (memory-allocation) */
+			    } /* end if (pagesize) */
 		        } /* end if (direcyory indicated) */
 	            } /* end if (stat) */
 	            if (rs < 0) {

@@ -1,4 +1,4 @@
-/* fsdir SUPPORT */
+/* fsdir SUPPORT (Darwin) */
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
@@ -47,7 +47,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>
 #include	<usystem.h>
 #include	<intsat.h>
@@ -65,13 +64,15 @@
 /* imported namespaces */
 
 
+/* local typedefs */
+
+typedef posixdirent *	posixdirentp ;
+
+
 /* external subroutines */
 
 
 /* external variables */
-
-
-/* local typedefs */
 
 
 /* local structures */
@@ -94,6 +95,9 @@ static int	fsdir_isdir(fsdir *,cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -146,9 +150,8 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	if ((rs = fsdir_magic(op,dep,nbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (nlen > 0) {
-		posixdirent	*objp = (posixdirent *) op->posixp ;
-		dirent		de ;
-		if ((rs = objp->read(&de,nbuf,nlen)) >= 0) {
+		posixdirent	*objp = posixdirentp(op->posixp) ;
+		if (dirent de ; (rs = objp->read(&de,nbuf,nlen)) >= 0) {
 		    dep->ino = de.d_ino ;
 		    dep->nlen = de.d_namlen ;
 		    dep->name = nbuf ;
@@ -163,7 +166,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 int fsdir_tell(fsdir *op,off_t *rp) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-	    posixdirent	*objp = (posixdirent *) op->posixp ;
+	    posixdirent	*objp = posixdirentp(op->posixp) ;
 	    if (off_t o{} ; (rs = objp->tell(&o)) >= 0) {
 		if (rp) *rp = o ;
 		rs = intsat(o) ;
@@ -176,7 +179,7 @@ int fsdir_tell(fsdir *op,off_t *rp) noex {
 int fsdir_seek(fsdir *op,off_t o) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-	    posixdirent	*objp = (posixdirent *) op->posixp ;
+	    posixdirent	*objp = posixdirentp(op->posixp) ;
 	    rs = objp->seek(o) ;
 	} /* end if (magic) */
 	return rs ;
@@ -186,8 +189,8 @@ int fsdir_seek(fsdir *op,off_t o) noex {
 int fsdir_rewind(fsdir *op) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) {
-	    posixdirent	*objp = (posixdirent *) op->posixp ;
-	    rs = objp->rewind() ;
+	    posixdirent	*objp = posixdirentp(op->posixp) ;
+	    rs = objp->rewind ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -206,16 +209,17 @@ int fsdir_audit(fsdir *op) noex {
 /* private subroutines */
 
 static int fsdir_begin(fsdir *op,cchar *dname) noex {
-	cint		objl = sizeof(posixdirent) ;
+	cint		objl = szof(posixdirent) ;
 	int		rs ;
 	if (void *vp{} ; (rs = uc_libmalloc(objl,&vp)) >= 0) {
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    if (posixdirent *objp ; (objp = new(vp) posixdirent) != nullptr) {
+	    if (posixdirent *objp ; (objp = new(vp) posixdirent) != np) {
 		if ((rs = objp->open(dname)) >= 0) {
 	            op->posixp = vp ;
 		}
 		if (rs < 0) {
-		    objp->~posixdirent() ;
+		    objp->dtor() ;
 		}
 	    } /* end if (operator-new) */
 	    if (rs < 0) {
@@ -232,10 +236,10 @@ static int fsdir_end(fsdir *op) noex {
 	if (op->posixp) {
 	    rs = SR_OK ;
 	    {
-	        posixdirent	*objp = (posixdirent *) op->posixp ;
-	        rs1 = objp->close() ;
+		posixdirent	*objp = posixdirentp(op->posixp) ;
+	        rs1 = objp->close ;
 	        if (rs >= 0) rs = rs1 ;
-	        objp->~posixdirent() ;
+	        objp->dtor() ;
 	    }
 	    {
 		rs1 = uc_libfree(op->posixp) ;
@@ -306,8 +310,8 @@ int fsdir::seek(off_t o) noex {
 }
 
 void fsdir::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
-	    ulogerror("fsdir",rs,"fini-finish") ;
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("fsdir",rs,"dtor-close") ;
 	}
 }
 

@@ -34,7 +34,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<unistd.h>		/* |getpagesize(3c)| */
+#include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */

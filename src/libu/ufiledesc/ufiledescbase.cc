@@ -1,4 +1,5 @@
 /* ufiledescbase SUPPORT (UNIX® file operations) */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -17,6 +18,7 @@
 /*******************************************************************************
 
 	Names:
+	ufiledescbase
 
 	Description:
 	UNIX® File-Descriptor system calls.
