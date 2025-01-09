@@ -23,7 +23,7 @@
 	Description:
 	This object provides a helper interface to the POSIX©
 	|dirent(3c)| facility.  This is badly needed on such a 
-	poorly designed interface that this POSIX© crap is.
+	poorly designed interface that the standard POSIX© crap is.
 
 	Comments:
 	Laughing!  I am laughing at how how it is to use the interface
@@ -57,6 +57,7 @@
 #include	<errtimer.hh>
 #include	<getbufsize.h>
 #include	<snwcpy.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"posixdirent.hh"
@@ -105,10 +106,13 @@ constexpr bool		f_readdirr = F_READDIRR ;
 int posixdirent::open(cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	if (fn) {
-	    if ((rs = setup(fn)) >= 0) {
-	        fname = fn ;
-	        rs = callout(&posixdirent::diropen) ;
-	    } /* end if (setup) */
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+	        if ((rs = setup(fn)) >= 0) {
+	            fname = fn ;
+	            rs = callout(&posixdirent::diropen) ;
+	        } /* end if (setup) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -146,15 +150,11 @@ int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 }
 /* end subroutine (posixdirent::read) */
 
-int posixdirent::tell(off_t *offp) noex {
-	int		rs = SR_FAULT ;
-	if (offp) {
-	    sop = offp ;
-	    rs = callout(&posixdirent::dirtell) ;
-	} /* end if (non-null) */
-	return rs ;
+int posixdirent::itell(off_t *offp) noex {
+	sop = offp ;
+	return callout(&posixdirent::dirtell) ;
 }
-/* end subroutine (posixdirent::tell) */
+/* end subroutine (posixdirent::itell) */
 
 int posixdirent::seek(off_t o) noex {
 	so = o ;
@@ -184,7 +184,7 @@ int posixdirent::setup(cchar *fn) noex {
 			cint dsz = (delen + 1) ;
 		        if (void *vp{} ; (rs = mall(dsz,&vp)) >= 0) {
 		            debuf = (dirent *) vp ;
-		            memset(vp,0,dsz) ;
+		            memclear(vp,dsz) ;
 		        }
 		    } /* end block */
 		} /* end if (getbufsize) */
@@ -227,6 +227,7 @@ int posixdirent::callout(posixdirent_m m) noex {
                     r(false) ;
                     break ;
                 } /* end switch */
+		rs = r ;
             } /* end if (error) */
         } until ((rs >= 0) || r.fexit) ;
 	return rs ;
@@ -246,75 +247,89 @@ int posixdirent::diropen() noex {
 /* end subroutine (posixdirent::diropen) */
 
 int posixdirent::dirclose() noex {
-	int		rs = SR_OK ;
+	int		rs = SR_NOTOPEN ;
 	if (dirp) {
 	    errno = 0 ;
+	    rs = SR_OK ;
 	    if (int rc = closedir(dirp) ; rc < 0) {
 	        rs = (- errno) ;
 	    }
 	    dirp = nullptr ;
-	}
+	} /* end if (open) */
 	return rs ;
 }
 /* end subroutine (posixdirent::dirclose) */
 
 int posixdirent::dirread() noex {
-	dirent		*p ;
-	int		rs ;
-	errno = 0 ;
-	if_constexpr (f_readdirr) {
-	    if (errno_t ec ; (ec = readdir_r(dirp,debuf,&p)) == 0) {
-		if (p) {
+    	cint		desz = szof(dirent) ;
+	int		rs = SR_NOTOPEN ;
+	if (dirp) {
+	    dirent	*p ;
+	    errno = 0 ;
+	    if_constexpr (f_readdirr) {
+	        if (errno_t ec ; (ec = readdir_r(dirp,debuf,&p)) == 0) {
+		    if (p) {
+	                cint	nl = int(p->d_namlen & INT_MAX) ;
+		        memcpy(dep,p,desz) ;
+	                rs = snwcpy(nbuf,nlen,p->d_name,nl) ;
+		    } else {
+	                rs = (- errno) ;	/* <- EOF condition */
+		    }
+	        } else {
+	            rs = (-ec) ;
+	        }
+	    } else {
+	        if ((p = readdir(dirp)) != nullptr) {
 	            cint	nl = int(p->d_namlen & INT_MAX) ;
-		    memcpy(dep,p,delen) ;
+		    memcpy(dep,p,desz) ;
 	            rs = snwcpy(nbuf,nlen,p->d_name,nl) ;
-		} else {
-	            rs = (-errno) ;	/* <- EOF condition */
-		}
-	    } else {
-	        rs = (-ec) ;
-	    }
-	} else {
-	    if ((p = readdir(dirp)) != nullptr) {
-	        cint	nl = int(p->d_namlen & INT_MAX) ;
-	        *dep = *p ;
-	        rs = snwcpy(nbuf,nlen,p->d_name,nl) ;
-	    } else {
-	        rs = (-errno) ;		/* <- EOF condition */
-	    }
-	} /* end if_constexpr (f_readdirr) */
+	        } else {
+	            rs = (- errno) ;		/* <- EOF condition */
+	        }
+	    } /* end if_constexpr (f_readdirr) */
+	} /* end if (open) */
 	return rs ;
 }
 /* end subroutine (posixdirent::dirread) */
 
 int posixdirent::dirtell() noex {
-	int		rs = SR_FAULT ;
-	if (sop) {		/* <- YES, twice now (not needed here) */
+	int		rs = SR_NOTOPEN ;
+	if (dirp) {
 	    long	loff{} ;
 	    errno = 0 ;
   	    loff = telldir(dirp) ;
-	    so = off_t(loff) ;
-	    if ((rs = (-errno)) >= 0) {
-		*sop = so ;
-		rs = int(so & INT_MAX) ;
+	    if ((rs = (- errno)) >= 0) {
+	        so = off_t(loff) ;
+	        if (sop) *sop = so ;
+	        rs = intsat(so) ;
+	    } else {
+	        if (sop) *sop = 0z ;
 	    }
-	}
+	} /* end if (open) */
 	return rs ;
 }
 /* end subroutine (posixdirent::dirtell) */
 
 int posixdirent::dirseek() noex {
-	long	loff = long(so) ;
-	errno = 0 ;
-	seekdir(dirp,loff) ;
-	return (-errno) ;
+    	int		rs = SR_NOTOPEN ;
+	if (dirp) {
+	    long	loff = long(so) ;
+	    errno = 0 ;
+	    seekdir(dirp,loff) ;
+	    rs = (- errno) ;
+	} /* end if (open) */
+	return rs ;
 }
 /* end subroutine (posixdirent::dirseek) */
 
 int posixdirent::dirrewind() noex {
-	errno = 0 ;
-	rewinddir(dirp) ;
-	return (-errno) ;
+    	int		rs = SR_NOTOPEN ;
+	if (dirp) {
+	    errno = 0 ;
+	    rewinddir(dirp) ;
+	    rs = (- errno) ;
+	} /* end if (open) */
+	return rs ;
 }
 /* end subroutine (posixdirent::dirrewind) */
 
@@ -323,6 +338,19 @@ void posixdirent::dtor() noex {
 	    ulogerror("posixdirent",rs,"dtor-close") ;
 	}
 }
+
+int posixdirent_te::operator () (off_t *offp) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case posixdirentmem_rewind:
+		rs = op->itell(offp) ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (posixdirent_te::operator) */
 
 posixdirent_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;

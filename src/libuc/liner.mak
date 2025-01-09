@@ -134,7 +134,7 @@ obj5.o:			$(OBJ5)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
 
 
-fbliner.o:		fbliner.cc	$(INCS)
-fdliner.o:		fdliner.cc	$(INCS)
+fbliner.o:		fbliner.cc	fbliner.h	$(INCS)
+fdliner.o:		fdliner.cc	fdliner.h	$(INCS)
 
 

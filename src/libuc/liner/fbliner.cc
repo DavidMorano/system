@@ -9,9 +9,8 @@
 /* revision history:
 
 	= 2009-01-10, David A­D­ Morano
-	This is being written from scratch to finally get an
-	abstracted "mailbox" that is fast enough for interactive
-	use.
+        This is being written as a helper line-reading object
+	for use in other objects.
 
 */
 
@@ -21,6 +20,9 @@
 
 	Name:
 	fbliner
+
+	Description:
+	This object is a line-reading helper manager.
 
 *******************************************************************************/
 
@@ -46,6 +48,7 @@
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -74,8 +77,7 @@ using std::max ;			/* subroutine-template */
 int fbliner_start(fbliner *lsp,filer *fbp,off_t foff,int to) noex {
 	int		rs = SR_FAULT ;
 	if (lsp && fbp) {
-	    char	*lp{} ;
-	    if ((rs = malloc_ml(&lp)) >= 0) {
+	    if (char *lp{} ; (rs = malloc_ml(&lp)) >= 0) {
 		lp[0] = '\0' ;
 	        lsp->llen = rs ;
 	        lsp->lbuf = lp ;
@@ -107,22 +109,25 @@ int fbliner_finish(fbliner *lsp) noex {
 /* end subroutine (fbliner_finish) */
 
 int fbliner_getln(fbliner *lsp,cchar **lpp) noex {
-	filer		*fbp = lsp->fbp ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (lsp->llen < 0) {
-	    cint	to = lsp->to ;
-	    cint	ll = lsp->llen ;
-	    char	*lp = lsp->lbuf ;
-	    lsp->poff = lsp->foff ;
-	    if ((rs = filer_readln(fbp,lp,ll,to)) >= 0) {
-		len = rs ;
-	        lsp->foff += len ;
+	if (lsp) {
+	    filer	*fbp = lsp->fbp ;
+	    rs = SR_OK ;
+	    if (lsp->llen < 0) {
+	        cint	to = lsp->to ;
+	        cint	ll = lsp->llen ;
+	        char	*lp = lsp->lbuf ;
+	        lsp->poff = lsp->foff ;
+	        if ((rs = filer_readln(fbp,lp,ll,to)) >= 0) {
+		    len = rs ;
+	            lsp->foff += len ;
+	        }
+	    } /* end if (needed a new line) */
+	    if (lpp) {
+	        *lpp = (rs >= 0) ? lsp->lbuf : nullptr ;
 	    }
-	} /* end if (needed a new line) */
-	if (lpp) {
-	    *lpp = (rs >= 0) ? lsp->lbuf : nullptr ;
-	}
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (fbliner_getln) */
@@ -139,18 +144,54 @@ int fbliner_done(fbliner *lsp) noex {
 }
 /* end subroutine (fbliner_done) */
 
-int fbliner_seek(fbliner *lsp,int inc) noex {
-	int		rs = SR_OK ;
-	lsp->poff = lsp->foff ;
-	if (inc > 0) {
-	    lsp->llen = -1 ;
-	    lsp->lbuf[0] = '\0' ;
-	    lsp->poff += inc ;
-	    lsp->foff += inc ;
-	    rs = filer_adv(lsp->fbp,inc) ;
-	} /* end if */
+int fbliner_adv(fbliner *lsp,int inc) noex {
+    	int		rs = SR_FAULT ;
+	if (lsp) {
+	    rs = SR_OK ;
+	    lsp->poff = lsp->foff ;
+	    if (inc > 0) {
+	        lsp->llen = -1 ;
+	        lsp->lbuf[0] = '\0' ;
+	        lsp->poff += inc ;
+	        lsp->foff += inc ;
+	        rs = filer_adv(lsp->fbp,inc) ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (fbliner_seek) */
+/* end subroutine (fbliner_adv) */
+
+int fbliner::start(filer *fbp,off_t off,int to) noex {
+	return fbliner_start(this,fbp,off,to) ;
+}
+
+int fbliner::getln(cchar **lpp) noex {
+	return fbliner_getln(this,lpp) ;
+}
+
+void fbliner::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("fbliner",rs,"fini-finish") ;
+	}
+}
+
+int fbliner_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fblinermem_done:
+	        rs = fbliner_done(op) ;
+	        break ;
+	    case fblinermem_adv:
+	        rs = fbliner_adv(op,a) ;
+	        break ;
+	    case fblinermem_finish:
+	        rs = fbliner_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (fbliner_co::operator) */
 
 

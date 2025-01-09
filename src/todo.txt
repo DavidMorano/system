@@ -4,12 +4,10 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-lineindex
-filecounts
-mkprogenv
 uctim
 libuc		fix to completely compile!
-lfm
+deffile
+quote
 mailmsghdrct
 srv{x}
 memfile		can we just trash this?
@@ -25,11 +23,11 @@ mailmsg		needs a lot of pointer implementation
 mailmsgstage
 calmgr		pointer implementation
 spawnproc	block structure; actually this is a huge mess
-spawner		pointer implementation
 termnote	could use some break-down of large subs into smaller ones
-pwi
 ipasswd
-progsig
+postfile
+nettime		add 'constexpr if'
+msgidx		(mesgid, msgide)
 statmsg
 motd
 var
@@ -38,15 +36,17 @@ varmk
 varmks
 ts
 spellchecks	incredible mess!
-dialtab
 
 = Future
 
 file		description
 --------------------------------------------------------------------------------
+searchkeys
+lookaddr	pointer-implementation
 progsig		total mess
 termtrans	not coded up properly
 sysvars
+systems
 uunames		block structure
 dialcprog	incredible mess (maybe not worth refactoring)
 logsys		mess -- cannot compile on macOS-Darwin (no STREAMS®)

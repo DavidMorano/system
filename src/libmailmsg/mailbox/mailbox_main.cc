@@ -93,8 +93,7 @@
 #define	TO_LOCK		120		/* mailbox lock-timeout */
 #define	TO_READ		5
 
-#define	FMAT(cp)	((cp)[0] == 'F')
-#define	MSGHEADCONT(ch)	(((ch) == CH_SP) || ((ch) == CH_TAB))
+#define	MSGHDRCONT(ch)	(((ch) == CH_SP) || ((ch) == CH_TAB))
 
 #define	TMPDIRMODE	(0777 | S_ISVTX)
 
@@ -216,6 +215,10 @@ static int mailboxpi_finish(MAILBOXPI *) noex ;
 static int mailboxpi_havemsg(MAILBOXPI *) noex ;
 
 static int writeblanks(int,int) noex ;
+
+static inline bool hasfmat(cc *lp,int ll) noex {
+    	return ((ll > 5) && (lp[0] == 'F')) ;
+}
 
 
 /* local variables */
@@ -629,14 +632,14 @@ static int mailbox_parse(mailbox *op) noex {
 	}
 	if (filer fb ; (rs = fb.start(op->mfd,soff,bsz,0)) >= 0) {
 	    fbliner	ls, *lsp = &ls ;
-	    if ((rs = fbliner_start(lsp,&fb,soff,to)) >= 0) {
+	    if ((rs = lsp->start(&fb,soff,to)) >= 0) {
 	        int	mi = 0 ;
 	        while ((rs = mailbox_parsemsg(op,lsp,mi)) > 0) {
 	            mi += 1 ;
 	        } /* end while */
 	        op->mblen = (lsp->foff - soff) ;
 	        op->msgs_total = mi ;
-	        rs1 = fbliner_finish(lsp) ;
+	        rs1 = lsp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (liner) */
 	    rs1 = fb.finish ;
@@ -653,18 +656,14 @@ static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
 	if (MAILBOXPI pi ; (rs = mailboxpi_start(&pi,lsp,mi)) >= 0) {
 	    mmenvdat	me ;
 	    int		vi = 0 ;
-	    cchar	*lp ;
 	    /* find message start */
-	    while ((rs = fbliner_getln(lsp,&lp)) >= 0) {
+	    for (cchar *lp ; (rs = lsp->getln(&lp)) > 0 ; ) {
 	        ll = rs ;
-	        if (ll == 0) break ;
-	        if ((rs >= 0) && (ll > 5) && FMAT(lp) &&
-	            ((rs = mailmsgmatenv(&me,lp,ll)) > 0)) {
+	        if (hasfmat(lp,ll) && ((rs = mailmsgmatenv(&me,lp,ll)) > 0)) {
 	            pi.f.fenv = true ;
-	        } else if ((rs >= 0) && (ll > 2) &&
-	            ((rs = mailmsgmathdr(lp,ll,&vi)) > 0)) {
+	        } else if ((ll > 2) && ((rs = mailmsgmathdr(lp,ll,&vi)) > 0)) {
 	            pi.f.fhdr = true ;
-	        } else if ((rs >= 0) && (ll <= 2) && (mi == 0)) {
+	        } else if ((ll <= 2) && (mi == 0)) {
 	            if ((lp[0] == '\n') || hasEOH(lp,ll)) {
 	                pi.f.feoh = true ;
 	            }
@@ -672,9 +671,11 @@ static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
 	        if (rs < 0) break ;
 	        if (pi.f.fenv || pi.f.fhdr) break ;
 	        ll = 0 ;
-	        fbliner_done(lsp) ;
+	        rs1 = lsp->done() ;
+		if (rs >= 0) rs = rs1 ;
 	        if (pi.f.feoh) break ;
-	    } /* end while */
+		if (rs < 0) break ;
+	    } /* end for */
 	    if ((rs >= 0) && mailboxpi_havemsg(&pi)) {
 	        rs = mailbox_parsemsger(op,&me,&pi) ;
 	        ll = rs ;
@@ -706,13 +707,12 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	    pip->f.fmsg = true ;
 	    if (pip->f.fenv) {
 	        if ((rs = msginfo_setenv(msgp,mep)) >= 0) {
-	            fbliner_done(lsp) ;
+	            rs = lsp->done ;
 	        }
 	    }
 	    /* read headers (ignoring envelope) */
-	    while ((rs >= 0) && ((rs = fbliner_getln(lsp,&lp)) >= 0)) {
+	    while ((rs >= 0) && ((rs = lsp->getln(&lp)) > 0)) {
 	        ll = rs ;
-	        if (ll == 0) break ;
 	        if ((ll > 2) && (! pip->f.fenv) && 
 	            (! pip->f.fhdr) && (! pip->f.feoh)) {
 	            kl = mailmsgmathdr(lp,ll,&vi) ;
@@ -738,7 +738,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	                    pip->f.fmhv = true ;
 			}
 	            } /* end if (have one we want) */
-	        } else if ((rs >= 0) && (ll > 1) && MSGHEADCONT(lp[0])) {
+	        } else if ((rs >= 0) && (ll > 1) && MSGHDRCONT(lp[0])) {
 	            if (pip->f.fmhv) {
 	                rs = mailmsghdrval_add(&mhv,lp,ll) ;
 	            }
@@ -757,7 +757,8 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	        ll = 0 ;
 	        pip->f.fenv = false ;
 	        pip->f.fhdr = false ;
-	        fbliner_done(lsp) ;
+	        rs1 = lsp->done ;
+		if (rs >= 0) rs = rs1 ;
 	        if (pip->f.feoh) break ;
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
@@ -784,7 +785,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	    if (rs >= 0) {
 	        if (op->f.useclen && msgp->hdrval.clen) {
 	            clen = msgp->clen ;
-	            rs = fbliner_seek(lsp,msgp->clen) ;
+	            rs = lsp->adv(msgp->clen) ;
 	        } else {
 	            int		linemax = INT_MAX ;
 	            if (op->f.useclines && 
@@ -796,15 +797,14 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 		    auto getln = [&clines,&linemax,&lsp] (cchar **lpp) noex { 
 			int	rs = SR_OK ;
 			if (clines < linemax) {
-	                    rs = fbliner_getln(lsp,lpp) ;
+	                    rs = lsp->getln(lpp) ;
 			}
 			return rs ;
 		    } ;
 		    while ((rs >= 0) && ((rs = getln(&lp)) > 0)) {
 	                ll = rs ;
-	                if (ll == 0) break ;
 	                pip->f.feol = (lp[ll-1] == '\n') ;
-	                if (pip->f.fbol && FMAT(lp) && (ll > 5)) {
+	                if (pip->f.fbol && hasfmat(lp,ll)) {
 	                    if ((rs = mailmsgmatenv(mep,lp,ll)) > 0) {
 	                        pip->f.fenv = true ;
 	                    }
@@ -815,7 +815,8 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	                    clines += 1 ;
 			}
 	                pip->f.fbol = pip->f.feol ;
-	                fbliner_done(lsp) ;
+	                rs1 = lsp->done ;
+			if (rs >= 0) rs = rs1 ;
 	            } /* end while (searching for new start-msg) */
 	            if ((rs >= 0) && msgp->hdrval.clines) {
 	                if (clines < msgp->clines) {
@@ -1158,6 +1159,17 @@ static int msginfo_setenv(MB_MI *msgp,mmenvdat *mep) noex {
 }
 /* end subroutine (msginfo_setenv) */
 
+static int mailboxpi_start(MAILBOXPI *pip,fbliner *lsp,int mi) noex {
+	int		rs = SR_FAULT ;
+	if (pip && lsp) {
+	    rs = memclear(pip) ; /* dangerous */
+	    pip->lsp = lsp ;
+	    pip->mi = mi ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailboxpi_start) */
+
 static int mailboxpi_finish(MAILBOXPI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
@@ -1171,17 +1183,6 @@ static int mailboxpi_havemsg(MAILBOXPI *pip) noex {
 	return (pip->f.fenv || pip->f.fhdr || pip->f.feoh) ;
 }
 /* end subroutine (mailboxpi_havemsg) */
-
-static int mailboxpi_start(MAILBOXPI *pip,fbliner *lsp,int mi) noex {
-	int		rs = SR_FAULT ;
-	if (pip && lsp) {
-	    rs = memclear(pip) ; /* dangerous */
-	    pip->lsp = lsp ;
-	    pip->mi = mi ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (mailboxpi_start) */
 
 static int writeblanks(int mfd,int len) noex {
 	int		rs ;

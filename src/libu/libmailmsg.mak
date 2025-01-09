@@ -56,9 +56,9 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= mailmsgx.o mailmsg.o msgentry.o mailbox.o
-OBJ1= mailmsgmatx.o
-OBJ2= mailmsghdrx.o
-OBJ3= mhcom.o mcmsg.o mimetypes.o 
+OBJ1= mailmsgmatx.o mailmsghdrx.o
+OBJ2= recip.o envmat.o
+OBJ3= mhcom.o mcmsg.o comsatmsg.o mimetypes.o 
 OBJ4= ema.o emainfo.o comparse.o
 OBJ5= mbcache.o contypevals.o contentencodings.o
 OBJ6= whitelist.o splitaddr.o
@@ -223,6 +223,7 @@ msgentry.o:		msgentry.cc msgentry.h			$(INCS)
 
 mhcom.o:		mhcom.cc mhcom.h			$(INCS)
 mcmsg.o:		mcmsg.cc mcmsg.h			$(INCS)
+comsatmsg.o:		comsatmsg.cc comsatmsg.h		$(INCS)
 emainfo.o:		emainfo.cc emainfo.h			$(INCS)
 mimetypes.o:		mimetypes.cc mimetypes.h		$(INCS)
 
@@ -231,7 +232,10 @@ comparse.o:		comparse.cc comparse.h			$(INCS)
 whitelist.o:		whitelist.cc whitelist.h		$(INCS)
 splitaddr.o:		splitaddr.cc splitaddr.h		$(INCS)
 stackaddr.o:		stackaddr.cc stackaddr.h		$(INCS)
+recip.o:		recip.cc recip.h			$(INCS)
 
 filer_mailsup.o:	filer_mailsup.cc			$(INCS)
+
+envmat.o:		envmat.cc envmat.h			$(INCS)
 
 

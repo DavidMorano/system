@@ -867,6 +867,7 @@ matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
+mkdirs.o:		mkdirs.cc mkdirs.h
 
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh

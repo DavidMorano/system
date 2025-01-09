@@ -2,7 +2,7 @@
 /* encoding=ISO8859-1 */
 /* lang=C20 */
 
-/* Match a String */
+/* Prefix-Match a String */
 /* version %I% last-modified %G% */
 
 

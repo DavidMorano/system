@@ -61,6 +61,7 @@ typedef	FSDIR_ENT	fsdir_ent ;
 
 #ifdef	__cplusplus
 enum fsdirmems {
+	fsdirmem_tell,
 	fsdirmem_rewind,
 	fsdirmem_audit,
 	fsdirmem_close,
@@ -77,6 +78,18 @@ struct fsdir_opener {
 	operator int () noex ;
 	int operator () (cchar * = nullptr) noex ;
 } ; /* end struct (fsdir_opener) */
+struct fsdir_te {
+	fsdir		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (fsdir *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (off_t * = nullptr) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (fsdir_te) */
 struct fsdir_co {
 	fsdir		*op = nullptr ;
 	int		w = -1 ;
@@ -92,11 +105,13 @@ struct fsdir_co {
 struct fsdir : fsdir_head {
 	FSDIR_ENT	ent ;
 	fsdir_opener	open ;
+	fsdir_te	tell ;
 	fsdir_co	rewind ;
 	fsdir_co	audit ;
 	fsdir_co	close ;
 	fsdir(cchar *n = nullptr) noex {
 	    open(this,n) ;
+	    tell(this,fsdirmem_tell) ;
 	    rewind(this,fsdirmem_rewind) ;
 	    audit(this,fsdirmem_audit) ;
 	    close(this,fsdirmem_close) ;
@@ -104,7 +119,6 @@ struct fsdir : fsdir_head {
 	fsdir(const fsdir &) = delete ;
 	fsdir &operator = (const fsdir &) = delete ;
 	int read(fsdir_ent *,char *,int) noex ;
-	int tell(off_t * = nullptr) noex ;
 	int seek(off_t = 0) noex ;
 	void dtor() noex ;
 	~fsdir() {

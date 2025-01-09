@@ -13,10 +13,14 @@
 
 */
 
-/* Copyright Â© 1999 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Object:
+	comsatmsg
+
+	Description:
 	This module contains the code to make and parse Comsat
 	messages.  A Comsat message looks like:
 		<user>@<offset>[:<file>]
@@ -34,20 +38,22 @@
 	This subroutine is used to create or to parse a Comsat message.
 		
 	Synopsis:
-	int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex
+	int comsatmsg_start(comsatmsg(comsatmsg *op) noex
+	int comsatmsg_rd(comsatmsg(comsatmsg *op,char *rdbuf,int rdlen) noex
+	int comsatmsg_wr(comsatmsg(comsatmsg *op,cchar *wrbuf,int wrlen) noex
+	int comsatmsg_finish(comsatmsg(comastmsg *op) noex
 		
 	Arguments:
-		msp		pointer to COMSATMSG_MO object (the result)
-		f_read		flag to indicate if we are parsing (read)
-				or creating (write)
-		mbuf		string buffer (input for parseing,
-				output for creating
-		mlen		length of string buffer
+	op		COMSATMSG object pointer
+	rdbuf		read-buffer pointer
+	webuf		write-buffer pointer
+	rdlen		read-buffer length
+	wrlen		write-buffer length
 
 	Returns:
-		<0		error
-		>=0		for parsing
-		>0		lrngth of result when creating
+	>0		lrngth of result when creating
+	>=0		for parsing
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -57,6 +63,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<sbuf.h>
 #include	<strn.h>
 #include	<sncpyx.h>
@@ -74,10 +81,26 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
+
+namespace {
+    struct vars {
+	int		usernamelen ;
+	int		maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+}
+
+
+/* forward references */
 
 
 /* local variables */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -85,60 +108,139 @@
 
 /* exported subroutines */
 
-int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
-	ulong		ulv ;
-	int		rs ;
+int comsatmsg_start(comsatmsg *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    static cint		rsv = var ;
+	    if ((rs = rsv) >= 0) {
+	        cint	sz = (var.usernamelen + var.maxpathlen + 2) ;
+	        if (char *cp ; (rs = uc_malloc(sz,&cp)) >= 0) {
+		    op->a = cp ;
+		    op->username = (cp) ;
+		    op->fname = (cp + (var.usernamelen + 1)) ;
+	        } /* end if (memory-allocation) */
+	    } /* end if (vars) */
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int comsatmsg_finish(comsatmsg *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (f_read) { /* read */
-	    int		cl ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->a) {
+		rs1 = uc_free(op->a) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int comsatmsg_wr(comsatmsg *op,cchar *mbuf,int mlen) noex {
+	int		rs = SR_FAULT ;
+	if (op && mbuf) {
+	    cint	ulen = var.usernamelen ;
+	    char	*ubuf = op->username ;
 	    int		sl = mlen ;
-	    cchar	*tp, *cp ;
 	    cchar	*sp = mbuf ;
-	    msp->offset = 0 ;
-	    msp->username[0] = '\0' ;
-	    msp->fname[0] = '\0' ;
+	    rs = SR_OK ;
+	    op->offset = 0 ;
+	    op->username[0] = '\0' ;
+	    op->fname[0] = '\0' ;
 	    while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
 	        sl -= 1 ;
 	    }
-	    if ((tp = strnchr(sp,sl,'@')) != NULL) {
-	        cint	ulen = USERNAMELEN ;
-	        char	*ubuf = msp->username ;
+	    if (cc *tp ; (tp = strnchr(sp,sl,'@')) != nullptr) {
+		int	cl ;
+		cchar	*cp{} ;
 	        if ((rs = sncpy1w(ubuf,ulen,sp,(tp-sp))) >= 0) {
 	            sl -= ((tp + 1) - mbuf) ;
 	            sp = (tp + 1) ;
 	            cp = sp ;
 	            cl = sl ;
-	            if ((tp = strnchr(sp,sl,':')) != NULL) {
+	            if ((tp = strnchr(sp,sl,':')) != nullptr) {
+	                char	*fbuf = op->fname ;
 	                cl = (tp - sp) ;
-	                if (rs >= 0) {
-	                    char	*fbuf = msp->fname ;
-	                    rs = mkpath1w(fbuf,(tp+1),((sp+sl)-(tp+1))) ;
-	                }
+	                rs = mkpath1w(fbuf,(tp+1),((sp+sl)-(tp+1))) ;
 	            }
 	            if (rs >= 0) {
-	                rs = cfdecul(cp,cl,&ulv) ;
-	                msp->offset = ulv ;
+	                if (ulong ulv ; (rs = cfdec(cp,cl,&ulv)) >= 0) {
+	                    op->offset = ulv ;
+			}
 	            }
 	        } /* end if */
 	    } else {
 	        rs = SR_BADMSG ;
 	    }
-	} else { /* write */
-	    if (sbuf msgbuf ; (rs = sbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
-	        sbuf_strw(&msgbuf,msp->username,-1) ;
-	        sbuf_chr(&msgbuf,'@') ;
-	        ulv = msp->offset ;
-	        sbuf_decul(&msgbuf,ulv) ;
-	        if (msp->fname[0] != '\0') {
-	            sbuf_chr(&msgbuf,':') ;
-	            sbuf_strw(&msgbuf,msp->fname,-1) ;
-	        } /* end if */
-	        rs1 = sbuf_finish(&msgbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (sbuf) */
-	} /* end if */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (comsatmsg_mo) */
+
+int comsatmsg_rd(comsatmsg *op,char *mbuf,int mlen) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (op && mbuf) {
+	    if (sbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
+	        ulong	ulv = op->offset ;
+	        sb.str(op->username) ;
+	        sb.chr('@') ;
+	        sb.dec(ulv) ;
+	        if (op->fname[0] != '\0') {
+	            sb.chr(':') ;
+	            sb.str(op->fname) ;
+	        } /* end if */
+	        len = sb.finish ;
+	        if (rs >= 0) rs = len ;
+	    } /* end if (sbuf) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (comsatmsg_rd) */
+
+
+/* private subroutines */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    usernamelen = rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		maxpathlen = rs ;
+	    }
+	}
+	return rs ;
+}
+/* end method (vars::operator) */
+
+int comsatmsg::rd(char *rdbuf,int rdlen) noex {
+	return comsatmsg_rd(this,rdbuf,rdlen) ;
+}
+
+int comsatmsg::wr(cchar *sp,int sl) noex {
+	return comsatmsg_wr(this,sp,sl) ;
+}
+
+void comsatmsg::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("comsatmsg",rs,"fini-finish") ;
+	}
+}
+
+comsatmsg_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case comsatmsgmem_start:
+	        rs = comsatmsg_start(op) ;
+	        break ;
+	    case comsatmsgmem_finish:
+	        rs = comsatmsg_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (comsatmsg_co::operator) */
 
 

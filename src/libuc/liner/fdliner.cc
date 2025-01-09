@@ -20,6 +20,9 @@
   	Object:
 	fdliner
 
+	Description:
+	This object is a line-reading helper manager.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -77,18 +80,16 @@ int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 	if (op) {
 	    rs = SR_BADF ;
 	    if (mfd >= 0) {
-		cint	osz = sizeof(filer) ;
-		void	*vp{} ;
+		cint	osz = szof(filer) ;
 	        op->poff = 0 ;
 	        op->foff = foff ;
 	        op->fbo = 0 ;
 	        op->to = to ;
 	        op->llen = 0 ;
 	        op->lbuf = nullptr ;
-		if ((rs = uc_malloc(osz,&vp)) >= 0) {
-		    char	*lp{} ;
+		if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
 		    op->fbp = (filer *) vp ;
-		    if ((rs = malloc_ml(&lp)) >= 0) {
+		    if (char *lp{} ; (rs = malloc_ml(&lp)) >= 0) {
 			op->lbuf = lp ;
 			op->llen = rs ;
 			rs = fdliner_starter(op,mfd) ;
@@ -172,13 +173,30 @@ int fdliner_done(fdliner *op) noex {
 }
 /* end subroutine (fdliner_done) */
 
+int fdliner_adv(fdliner *lsp,int inc) noex {
+    	int		rs = SR_FAULT ;
+	if (lsp) {
+	    rs = SR_OK ;
+	    lsp->poff = lsp->foff ;
+	    if (inc > 0) {
+	        lsp->llen = -1 ;
+	        lsp->lbuf[0] = '\0' ;
+	        lsp->poff += inc ;
+	        lsp->foff += inc ;
+	        rs = filer_adv(lsp->fbp,inc) ;
+	    } /* end if */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (fdliner_adv) */
+
 
 /* local subroutines */
 
 static int fdliner_starter(fdliner *op,int mfd) noex {
 	int		rs ;
 	if ((rs = fdliner_bufsize(op,mfd)) >= 0) {
-	    const off_t	foff = op->foff ;
+	    coff	foff = op->foff ;
 	    cint	bs = rs ;
 	    cint	fbo = op->fbo ;
 	    rs = filer_start(op->fbp,mfd,foff,bs,fbo) ;
@@ -210,5 +228,38 @@ static int fdliner_bufsize(fdliner *op,int mfd) noex {
 	return (rs >= 0) ? bs : rs ;
 }
 /* end subroutine (fdliner_bufsize) */
+
+int fdliner::start(int mfd,off_t foff,int to) noex {
+	return fdliner_start(this,mfd,foff,to) ;
+}
+
+int fdliner::getln(cchar **lpp) noex {
+	return fdliner_getln(this,lpp) ;
+}
+
+void fdliner::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("fdliner",rs,"fini-finish") ;
+	}
+}
+
+int fdliner_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fdlinermem_done:
+	        rs = fdliner_done(op) ;
+	        break ;
+	    case fdlinermem_adv:
+	        rs = fdliner_adv(op,a) ;
+	        break ;
+	    case fdlinermem_finish:
+	        rs = fdliner_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (fdliner_co::operator) */
 
 

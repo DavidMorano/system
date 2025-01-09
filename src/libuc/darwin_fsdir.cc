@@ -278,6 +278,19 @@ fsdir_opener::operator int () noex {
 }
 /* end method (fsdir_opener:operator) */
 
+int fsdir_te::operator () (off_t *offp) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case fsdirmem_tell:
+	        rs = fsdir_tell(op,offp) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (fsdir_co::operator) */
+
 fsdir_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
@@ -299,10 +312,6 @@ fsdir_co::operator int () noex {
 
 int fsdir::read(fsdir_ent *ep,char *ebuf,int elen) noex {
 	return fsdir_read(this,ep,ebuf,elen) ;
-}
-
-int fsdir::tell(off_t *offp) noex {
-	return fsdir_tell(this,offp) ;
 }
 
 int fsdir::seek(off_t o) noex {

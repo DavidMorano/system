@@ -9,8 +9,8 @@
 /* revision history:
 
 	= 2009-01-10, David A­D­ Morano
-        This is being written from scratch to finally get an abstracted
-        "mailbox" that is fast enough for interactive use.
+        This is being written as a helper line-reading object
+	for use in other objects.
 
 */
 
@@ -20,6 +20,9 @@
 
 	Name:
 	fbliner
+
+	Description:
+	This object is a line-reading helper manager.
 
 *******************************************************************************/
 
@@ -49,14 +52,54 @@ struct fbliner_head {
 	int		llen ;
 } ;
 
-typedef	FBLINER		fbliner ;
+#ifdef	__cplusplus
+enum fblinermems {
+    	fblinermem_done,
+	fblinermem_adv,
+	fblinermem_finish,
+	fblinermem_overlast
+} ;
+struct fbliner ;
+struct fbliner_co {
+	fbliner		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (fbliner *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (fbliner_co) */
+struct fbliner : fbliner_head {
+	fbliner_co	done ;
+	fbliner_co	adv ;
+	fbliner_co	finish ;
+	fbliner() noex {
+	    done(this,fblinermem_done) ;
+	    adv(this,fblinermem_adv) ;
+	    finish(this,fblinermem_finish) ;
+	} ;
+	fbliner(const fbliner &) = delete ;
+	fbliner &operator = (const fbliner &) = delete ;
+	int start(filer *,off_t = 0z,int = -1) noex ;
+	int getln(cchar **) noex ;
+	void dtor() noex ;
+	~fbliner() {
+	    dtor() ;
+	} ;
+} ; /* end struct (fbliner) */
+#else	/* __cplusplus */
+typedef FBLINER		fbliner ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
 extern int fbliner_start(fbliner *,filer *,off_t,int) noex ;
 extern int fbliner_getln(fbliner *,cchar **) noex ;
 extern int fbliner_done(fbliner *) noex ;
-extern int fbliner_seek(fbliner *,int) noex ;
+extern int fbliner_adv(fbliner *,int) noex ;
 extern int fbliner_finish(fbliner *) noex ;
 
 EXTERNC_end

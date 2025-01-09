@@ -47,8 +47,8 @@
 	already) is significant in the total performance of reading
 	large mailboxes (the only really performance challenge this
 	whole program has).  So far, no significant way to increase
-	performance has been found (so we leave the compile-switch
-	OFF).
+	performance within this subroutine has been found (so we
+	leave the compile-switch OFF).
 
 *******************************************************************************/
 

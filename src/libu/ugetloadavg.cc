@@ -1,4 +1,4 @@
-/* make_ugetloadavg SUPPORT */
+/* ugetloadavg SUPPORT */
 /* lang=C++20 */
 
 /* get the standard load averages maintained by the kernel */
@@ -8,14 +8,14 @@
 /* revision history:
 
 	= 2001-04-23, David A­D­ Morano
-	Well Solaris-8 supplied this new capability. I have no idea
+	Well Solaris-8 supplied this new capability.  I have no idea
 	about any status as a standard of any sort but this is a
 	lot easier than using 'kstat(3kstat)'! I continued to use
 	(and still do) 'kstat(3kstat)' on Solaris-8 since it first
-	came out. Originally I resisted investigating how to get
+	came out.  Originally I resisted investigating how to get
 	the direct load averages out of the kernel besides using
-	'kstat(3kstat)'. A little investigation (easy) showed that
-	they had implemented a new system call to do it. I guess
+	'kstat(3kstat)'.  A little investigation (easy) showed that
+	they had implemented a new system call to do it.  I guess
 	that they were also getting tired of using 'kstat(3kstat)'
 	for kernel load averages!
 
@@ -25,15 +25,18 @@
 
 /*******************************************************************************
 
+  	Name:
+	u_getloadavg
+
+	Description:
 	Yes, this grabs (rather directly and easily), the load
-	averages maintained by the kernel. Solaris-8 (I think) was
+	averages maintained by the kernel.  Solaris-8 (I think) was
 	the first version to allow these kernel load averages to
 	be grabbed without using |kstat(3kstat)| (but I am not
-	sure). Anyway, this little subroutine uses the UNDOCUMENTED
+	sure).  Anyway, this little subroutine uses the UNDOCUMENTED
 	new system call in Solaris-8 to grab these load averages!
-
-	Let me repeat myself for those in the audience who didn't
-	quite hear me correctly the first time. This subroutine
+	Let me repeat myself for those in the audience who did not
+	quite hear me correctly the first time.  This subroutine
 	uses the secret and UNDOCUMENTED new system call to grab
 	the load averages from the kernel.  This could break at any
 	time! If you do not believe me, go back to using the draft
@@ -55,7 +58,7 @@
 	This subroutine uses a secret and undocumented new system
 	call introduced maybe with Solaris-8.  This function could
 	go away at any time so do nt get to comfortable with using
-	it!  Do not give up your day job but rather instead keep your
+	it!   Do not give up your day job but rather instead keep your
 	old |kstat(3kstat)| stuff around for getting load averages
 	when this new thing suddenly "goes away"!
 

@@ -47,12 +47,25 @@ struct posixdirent ;
 typedef int (posixdirent::*posixdirent_m)() noex ;
 
 enum posixdirentmems {
+    	posixdirentmem_tell,
     	posixdirentmem_rewind,
 	posixdirentmem_close,
 	posixdirentmem_overlast
 } ;
 
 class posixdirent ;
+struct posixdirent_te {
+	posixdirent	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (posixdirent *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (off_t * = nullptr) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (posixdirent_te) */
 struct posixdirent_co {
 	posixdirent	*op = nullptr ;
 	int		w = -1 ;
@@ -66,6 +79,7 @@ struct posixdirent_co {
 	} ;
 } ; /* end struct (posixdirent_co) */
 class posixdirent {
+    	friend		posixdirent_te ;
     	friend		posixdirent_co ;
 	DIR		*dirp = nullptr ;
 	dirent		*debuf = nullptr ;
@@ -85,20 +99,22 @@ class posixdirent {
 	int dirrewind() noex ;
 	int setup(cchar *) noex ;
 	int callout(posixdirent_m) noex ;
+	int itell(off_t *) noex ;
 	int irewind() noex ;
 	int iclose() noex ;
 public:
+	posixdirent_te	tell ;
+	posixdirent_co	rewind ;
+	posixdirent_co	close ;
 	posixdirent() noex {
+	    tell(this,posixdirentmem_tell) ;
 	    rewind(this,posixdirentmem_rewind) ;
 	    close(this,posixdirentmem_close) ;
 	} ;
 	posixdirent(const posixdirent &) = delete ;
 	posixdirent &operator = (const posixdirent &) = delete ;
-	posixdirent_co	rewind ;
-	posixdirent_co	close ;
 	int open(cchar *) noex ;
 	int read(dirent *,char *,int) noex ;
-	int tell(off_t *) noex ;
 	int seek(off_t) noex ;
 	void dtor() noex ;
 	~posixdirent() {

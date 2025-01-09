@@ -46,6 +46,8 @@
 #include	<whitelist.h>
 #include	<splitaddr.h>
 #include	<stackaddr.h>
+#include	<comsatmsg.h>
+#include	<envmat.h>
 
 
 EXTERNC_begin

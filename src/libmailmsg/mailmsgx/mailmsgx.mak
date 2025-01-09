@@ -60,10 +60,10 @@ OBJ1_MAILMSGX= mailmsgfile.o mailmsgfrom.o
 OBJ2_MAILMSGX= mailmsgheadkey.o mailmsgstage.o
 OBJ3_MAILMSGX= mailmsgviewer.o
 
-OBJA_MAILMSGX= obj0_mailmsgx.o obj1_mailmsgx.o
-OBJB_MAILMSGX= obj2_mailmsgx.o obj3_mailmsgx.o
+OBJA= obj0_mailmsgx.o obj1_mailmsgx.o
+OBJB= obj2_mailmsgx.o obj3_mailmsgx.o
 
-OBJ_MAILMSGX= $(OBJA_MAILMSGX) $(OBJB_MAILMSGX)
+OBJ_MAILMSGX= obja.o objb.o
 
 
 .SUFFIXES:		.hh .ii
@@ -125,6 +125,13 @@ obj2_mailmsgx.o:	$(OBJ2_MAILMSGX)
 
 obj3_mailmsgx.o:	$(OBJ3_MAILMSGX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILMSGX)
+
+
+obja.o:			$(OBJA)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+
+objb.o:			$(OBJB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
 
 
 mailmsgatt.o:		mailmsgatt.cc		mailmsgatt.h		$(INCS)

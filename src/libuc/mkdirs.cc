@@ -91,14 +91,14 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 	if (dname) {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
-	        if (ids id ; (rs = ids_load(&id)) >= 0) {
+	        if (ids id ; (rs = id.load) >= 0) {
 	            if ((rs = procdir(&id,dname,dm)) >= 0) {
 	                c += rs ;
 	            } else if (rs == SR_NOENT) {
 			rs = mkdirer(&id,dname,dm) ;
 			c += rs ;
 	            } /* end if (needed some creations) */
-	            rs1 = ids_release(&id) ;
+	            rs1 = id.release ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ids) */
 	    } /* end if (valid) */

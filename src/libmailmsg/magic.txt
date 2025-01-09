@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int received_magic(received *op,Args ... args) noex {
+static inline int mailspool_magic(mailspool *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == RECEIVED_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MAILSPOOL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (received_magic) */
+/* end subroutine (mailspool_magic) */

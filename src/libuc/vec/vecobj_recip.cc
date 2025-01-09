@@ -60,6 +60,14 @@
 /* local structures */
 
 
+/* forward references */
+
+static int	vecobj_reciphave(vecobj *,cchar *,int) noex ;
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
@@ -70,18 +78,8 @@ int vecobj_recipadd(vecobj *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl > 0) {
-	    bool	f ;
-	    void	*vp{} ;
-	    for (int i = 0 ; (rs = vecobj_get(op,i,&vp)) >= 0 ; i += 1) {
-	        if (vp) {
-	            RECIP	*rp = (RECIP *) vp ;
-	            f = recip_match(rp,sp,sl) ;
-	            if (f) break ;
-	        }
-	    } /* end for */
-	    if (rs == SR_NOTFOUND) {
-	        RECIP	re ;
-	        if ((rs = recip_start(&re,sp,sl)) >= 0) {
+	    if ((rs = vecobj_reciphave(op,sp,sl)) == 0) {
+	        if (RECIP re ; (rs = recip_start(&re,sp,sl)) >= 0) {
 		    c = 1 ;
 	            rs = vecobj_add(op,&re) ;
 	            if (rs < 0) {
@@ -100,7 +98,7 @@ int vecobj_recipfins(vecobj *op) noex {
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(op,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
-		RECIP	*rp = (RECIP *) vp ;
+		recip	*rp = (recip *) vp ;
 	        rs1 = recip_finish(rp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -108,5 +106,28 @@ int vecobj_recipfins(vecobj *op) noex {
 	return rs ;
 }
 /* end subroutine (vecobj_recipfins) */
+
+
+/* local subroutines */
+
+static int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		f = false ;
+	void		*vp{} ;
+	if (sl < 0) sl = strlen(sp) ;
+	for (int i = 0 ; (rs1 = vecobj_get(op,i,&vp)) >= 0 ; i += 1) {
+	    recip	*rp = (recip *) vp ;
+	    if (vp) {
+	        f = recip_match(rp,sp,sl) ;
+	        if (f) break ;
+	    }
+	} /* end for */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (vecobj_reciphave) */
+
 
 
