@@ -1,4 +1,5 @@
 /* toxc SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C20 */
 
 /* convert a single character to a given case */

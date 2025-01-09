@@ -71,8 +71,8 @@
 
 /* forward references */
 
-static int	mkdirer(ids *,cchar *,mode_t) noex ;
 static int	procdir(ids *,cchar *,mode_t) noex ;
+static int	mkdirer(ids *,cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -110,39 +110,6 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 
 /* local subroutines */
 
-static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
-	int		rs ;
-	int		rs1 ;
-	int		c = 0 ;
-	if (char *dirbuf{} ; (rs = libmalloc_mp(&dirbuf)) >= 0) {
-            if ((rs = mkpath1(dirbuf,dname)) >= 0) {
-                cchar       *dp = dirbuf ;
-                char        *bp ;
-                while ((bp = strchr(dp,'/')) != nullptr) {
-                    bool    f = true ;
-                    *bp = '\0' ;	/* <- set temporary termination */
-                    f = f && ((bp - dp) > 0) ;
-                    f = f && (strcmp(dp,".") != 0) ;
-                    if (f) {
-                        rs = procdir(idp,dirbuf,dm) ;
-                        c += rs ;
-                    } /* end if */
-                    *bp = '/' ;		/* <- remove temporary termination */
-                    dp = (bp + 1) ;
-                    if (rs < 0) break ;
-                } /* end while */
-                if ((rs >= 0) && (*dp != '\0')) {
-                    rs = procdir(idp,dirbuf,dm) ;
-                    c += rs ;
-                } /* end if */
-            } /* end if (mkpath1) */
-	    rs1 = uc_libfree(dirbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirer) */
-
 static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	int		rs ;
 	if (USTAT sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
@@ -159,5 +126,38 @@ static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	return rs ;
 }
 /* end subroutine (procdir) */
+
+static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
+    	cnullptr	np{} ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (char *dirbuf{} ; (rs = libmalloc_mp(&dirbuf)) >= 0) {
+            if ((rs = mkpath(dirbuf,dname)) >= 0) {
+                cchar       *dp = dirbuf ;
+                for (char *bp ; (bp = strchr(dp,'/')) != np ; ) {
+                    bool    f = true ;
+                    *bp = '\0' ;	/* <- set temporary termination */
+                    f = f && ((bp - dp) > 0) ;
+                    f = f && (strcmp(dp,".") != 0) ;
+                    if (f) {
+                        rs = procdir(idp,dirbuf,dm) ;
+                        c += rs ;
+                    } /* end if */
+                    *bp = '/' ;		/* <- remove temporary termination */
+                    dp = (bp + 1) ;
+                    if (rs < 0) break ;
+                } /* end for */
+                if ((rs >= 0) && (*dp != '\0')) {
+                    rs = procdir(idp,dirbuf,dm) ;
+                    c += rs ;
+                } /* end if */
+            } /* end if (mkpath1) */
+	    rs1 = uc_libfree(dirbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (mkdirer) */
 
 

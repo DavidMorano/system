@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mimetypes_ctor(mimetypes *op,Args ... args) noex {
+static int deffile_ctor(deffile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int mimetypes_ctor(mimetypes *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mimetypes_ctor) */
+/* end subroutine (deffile_ctor) */
 
-static int mimetypes_dtor(mimetypes *op) noex {
+static int deffile_dtor(deffile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mimetypes_dtor) */
+/* end subroutine (deffile_dtor) */
 
 template<typename ... Args>
-static inline int mimetypes_magic(mimetypes *op,Args ... args) noex {
+static inline int deffile_magic(deffile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MIMETYPES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == DEFFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mimetypes_magic) */
+/* end subroutine (deffile_magic) */

@@ -155,7 +155,7 @@ int paramopt_finish(PO *op) noex {
 /****
 
 This loads someting that looks like:
-	key=v1,v2,v3,...
+	key=v1,v2,v3,
 Notice that the keyname is extrcted from the supplied string.
 
 ****/
@@ -193,7 +193,7 @@ int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 /****
 
 This loads someting that looks like:
-	v1,v2,v3,...
+	v1,v2,v3,
 given that a keyname is specified explicitly.
 
 ****/
@@ -508,15 +508,15 @@ static int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 
 #ifdef	COMMENT
 
-/* find a paramter by key/value pair */
-static int paramopt_findvalue(PO *op,cc *key,cc *value,int vlen,
+/* find a paramter by key-value pair */
+static int paramopt_findvalue(PO *op,cc *key,cc *val,int vlen,
 		PO_VAL **rpp) noex {
 	int		rs ;
 	if ((rs = paramopt_magic(op)) >= 0) {
 	    PO_NAME	*kp{} ;
-	    if (vlen < 0) vlen = strlen(value) ;
+	    if (vlen < 0) vlen = strlen(val) ;
 	    if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
-	        rs = name_vfind(kp,value,vlen,rpp) ;
+	        rs = name_vfind(kp,val,vlen,rpp) ;
 	    }
 	} /* end if (magic) */
 	return rs ;

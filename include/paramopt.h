@@ -81,6 +81,7 @@ extern int paramopt_curenumkeys(paramopt *,paramopt_cur *,cchar **) noex ;
 extern int paramopt_fetch(paramopt *,cchar *,paramopt_cur *,cchar **) noex ;
 extern int paramopt_enumvalues(paramopt *,cchar *,paramopt_cur *,cc **) noex ;
 extern int paramopt_incr(paramopt *) noex ;
+extern int paramopt_loadone(paramopt *,cchar *,int) noex ;
 extern int paramopt_finish(paramopt *) noex ;
 
 EXTERNC_end

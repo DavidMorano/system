@@ -21,7 +21,7 @@
 	paramopt_loadone
 
 	Description:
-	This is very similar to 'paramopt_loadu(3dam)' but it allows
+	This is very similar to |paramopt_loadu(3dam)| but it allows
 	for a special separator character between the key and the
 	data values; the special separator character is ':'.
 
@@ -69,11 +69,11 @@ int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
-	    if ((i = sibreak(sp,sl," \t=,")) >= 0) {
+	    if (int si ; (si = sibreak(sp,sl," \t=,")) >= 0) {
 	        cchar	*keyname ;
 	        if (nulstr kn ; (rs = kn.start(sp,i,&keyname)) >= 0) {
-	            sp += i ;
-	            sl -= i ;
+	            sp += si ;
+	            sl -= si ;
 	            while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	                sp += 1 ;
 	                sl -= 1 ;

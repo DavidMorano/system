@@ -33,10 +33,10 @@
 #define	RECIP_MAGIC	0x73169284
 #define	RECIP		struct recip_head
 #define	RECIP_FL	struct recip_flags
-#define	RECIP_ENT	struct recip_ent
+#define	RECIP_ENT	struct recip_entry
 
 
-struct recip_ent {
+struct recip_entry {
 	int		moff ;
 	int		mlen ;
 } ;

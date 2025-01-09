@@ -381,6 +381,11 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 			rs1 = filer_finish(fbp) ;
 			if (rs >= 0) rs = rs1 ;
 		    }
+		    if (icurp->fd >= 0) {
+		        rs1 = u_close(icurp->fd) ;
+		        if (rs >= 0) rs = rs1 ;
+		        icurp->fd = -1 ;
+		    }
 		    if (icurp->utmpfentp) {
 			rs1 = uc_free(icurp->utmpfentp) ;
 			if (rs >= 0) rs = rs1 ;

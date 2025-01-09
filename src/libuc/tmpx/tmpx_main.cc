@@ -185,25 +185,24 @@ int tmpx_check(tmpx *op,time_t dt) noex {
 	int		rs ;
 	int		f_ch = false ;
 	if ((rs = tmpx_magic(op)) >= 0) {
-	        if ((op->ncursors == 0) && (op->fd >= 0)) {
-	            if (dt == 0) dt = time(nullptr) ;
-	            if ((dt - op->ti_check) >= TMPX_INTCHECK) {
-	                op->ti_check = dt ;
-	                if ((dt - op->ti_open) < TMPX_INTOPEN) {
-	                    USTAT	sb ;
-	                    if ((rs = uc_fstat(op->fd,&sb)) >= 0) {
-				csize	fs = sb.st_size ;
-	                        f_ch = (fs != op->fsize) ;
-	                        f_ch = f_ch || (sb.st_mtime > op->ti_mod) ;
-	                        op->fsize = sb.st_size ;
-	                        op->ti_mod = sb.st_mtime ;
-	                    } else {
-	                        uc_close(op->fd) ;
-	                        op->fd = -1 ;
-	                    }
-	                } /* end if */
-	            } /* end if (check time-out) */
-	        } /* end if (possible) */
+            if ((op->ncursors == 0) && (op->fd >= 0)) {
+                if (dt == 0) dt = getustime ;
+                if ((dt - op->ti_check) >= TMPX_INTCHECK) {
+                    op->ti_check = dt ;
+                    if ((dt - op->ti_open) < TMPX_INTOPEN) {
+                        if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+                            csize   fs = sb.st_size ;
+                            f_ch = (fs != op->fsize) ;
+                            f_ch = f_ch || (sb.st_mtime > op->ti_mod) ;
+                            op->fsize = sb.st_size ;
+                            op->ti_mod = sb.st_mtime ;
+                        } else {
+                            uc_close(op->fd) ;
+                            op->fd = -1 ;
+                        }
+                    } /* end if */
+                } /* end if (check time-out) */
+            } /* end if (possible) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_ch : rs ;
 }
@@ -215,8 +214,8 @@ int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 	        curp->i = -1 ;
 	        if (op->ncursors == 0) {
 	            if (op->fd < 0) {
-	                const time_t	daytime = time(nullptr) ;
-	                rs = tmpx_filesize(op,daytime) ;
+	                custime	dt = getustime ;
+	                rs = tmpx_filesize(op,dt) ;
 	            } /* end if (opened the file) */
 	        }
 	        if (rs >= 0) op->ncursors += 1 ;
@@ -425,7 +424,7 @@ static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	int		rs ;
 	cchar		*cp{} ;
 	if ((rs = uc_mallocstrw(dbfn,-1,&cp)) >= 0) {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = getustime ;
 	    op->fname = cp ;
 	    if ((rs = tmpx_fileopen(op,dt)) >= 0) {
 		USTAT	sb ;
@@ -464,14 +463,13 @@ static int tmpx_openend(tmpx *op) noex {
 } 
 /* end subroutine (tmpx_openend) */
 
-static int tmpx_filesize(tmpx *op,time_t daytime) noex {
+static int tmpx_filesize(tmpx *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
-	    rs = tmpx_fileopen(op,daytime) ;
+	    rs = tmpx_fileopen(op,dt) ;
 	}
 	if (rs >= 0) {
-	    USTAT	sb ;
-	    if ((rs = uc_fstat(op->fd,&sb)) >= 0) {
+	    if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
 	        op->ti_mod = sb.st_mtime ;
 	        op->fsize = sb.st_size ;
 	    }
@@ -480,13 +478,13 @@ static int tmpx_filesize(tmpx *op,time_t daytime) noex {
 }
 /* end subroutine (tmpx_filesize) */
 
-static int tmpx_fileopen(tmpx *op,time_t daytime) noex {
+static int tmpx_fileopen(tmpx *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if ((rs = tmpx_fileopener(op)) >= 0) {
 	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
-	            if (daytime == 0) daytime = time(nullptr) ;
-	            op->ti_open = daytime ;
+	            if (dt == 0) dt = getustime ;
+	            op->ti_open = dt ;
 	        }
 		if (rs < 0) {
 		    uc_close(op->fd) ;
@@ -507,7 +505,9 @@ static int tmpx_fileopener(tmpx *op) noex {
 	        op->fd = rs ;
 	    }
 	} else if ((rs == SR_DOM) || (rs == SR_BADF)) {
-	    if ((rs = uc_open(op->fname,op->oflags,0660)) >= 0) {
+	    cint	of = op->oflags ;
+	    cmode	om = 0660 ;
+	    if ((rs = uc_open(op->fname,of,om)) >= 0) {
 	        op->fd = rs ;
 	    }
 	}

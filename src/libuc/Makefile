@@ -744,6 +744,11 @@ pow.o:			pow.dir
 pow.dir:
 	makesubdir $@
 
+# UTMPXS
+utmpxx.o:		utmpxx.dir
+utmpxx.dir:
+	makesubdir $@
+
 # GETUTMP
 getutmp.o:		getutmp.dir
 getutmp.dir:
@@ -883,7 +888,6 @@ calstrs.o:		calstrs.cc calstrs.h
 ipow.o:			ipow.cc ipow.h
 base64.o:		base64.cc base64.h
 ffbs.o:			ffbs.cc ffbs.h
-utmpent.o:		utmpent.cc utmpent.h
 shellunder.o:		shellunder.cc shellunder.h
 callback.o:		callback.cc callback.h
 dictdiff.o:		dictdiff.cc dictdiff.h
@@ -897,8 +901,6 @@ mailvalues.o:		mailvalues.cc mailvalues.hh
 uinfo.o:		uinfo.cc uinfo.h
 umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
-utmpacc.o:		utmpacc.cc utmpacc.h
-utmpaccent.o:		utmpaccent.cc utmpaccent.h
 ucrand.o:		ucrand.cc ucrand.h
 ucprochave.o:		ucprochave.cc ucprochave.h
 

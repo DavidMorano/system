@@ -36,7 +36,7 @@
 
 struct deffile_head {
 	cchar		*fname ;
-	vecstr		vars ;
+	vecstr		*vlp ;
 	time_t		ti_check ;
 	time_t		ti_filemod ;
 	uint		magic ;

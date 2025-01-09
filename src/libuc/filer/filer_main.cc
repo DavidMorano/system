@@ -40,7 +40,6 @@
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<intfloor.h>
 #include	<format.h>
 #include	<localmisc.h>
@@ -131,8 +130,7 @@ int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 		op->fd = fd ;
 		op->of = of ;
 		if ((rs = filer_adjbuf(op,bsz)) >= 0) {
-	            char	*p ;
-	            if ((rs = uc_libvalloc(bsz,&p)) >= 0) {
+	            if (char *p ; (rs = uc_libvalloc(bsz,&p)) >= 0) {
 	                op->dbuf = p ;
 	                op->bp = p ;
 	                if (foff < 0) {
@@ -190,7 +188,8 @@ int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 	    int		rc = (op->f.net) ? FILER_RCNET : 1 ;
 	    bool	f_timedout = false ;
 	    char	*dbp = charp(rbuf) ;
-	    char	*bp, *lastp ;
+	    char	*bp ;
+	    char	*lastp ;
 	    while (tlen < rlen) {
 	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
@@ -249,7 +248,8 @@ int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	    int		rc = (op->f.net) ? FILER_RCNET : 1 ;
 	    bool	f_timedout = false ;
 	    char	*rbp = rbuf ;
-	    char	*bp, *lastp ;
+	    char	*bp ;
+	    char	*lastp ;
 	    while ((rs >= 0) && (tlen < rlen)) {
 	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
@@ -441,8 +441,7 @@ int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 	if ((rs = filer_magic(op,fmt,ap)) >= 0) {
 	    if ((rs = maxlinelen) >= 0) {
 		cint	llen = rs ;
-		char	*lbuf{} ;
-		if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
+		if (char *lbuf{} ; (rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
 	    	    if ((rs = format(lbuf,llen,0,fmt,ap)) >= 0) {
 	    	        rs = filer_write(op,lbuf,rs) ;
 			wlen = rs ;
@@ -457,10 +456,10 @@ int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 /* end subroutine (filer_vprintf) */
 
 int filer_printf(filer *op,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && fmt) {
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = filer_vprintf(op,fmt,ap) ;
 	    wlen = rs ;
@@ -599,18 +598,17 @@ int filer_poll(filer *op,int mto) noex {
 /* private subroutines */
 
 static int filer_adjbuf(filer *op,int bufsize) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->dt = filetype(sb.st_mode) ;
 	    if (bufsize <= 0) {
 	        if (S_ISFIFO(sb.st_mode)) {
 	            bufsize = PIPEBUFLEN ;
 	        } else {
 		    if ((rs = pagesize) >= 0) {
-			const off_t	ps = off_t(rs) ;
-		        off_t		cs ;
-	        	cint		of = op->of ;
+			coff	ps = off_t(rs) ;
+		        off_t	cs ;
+	        	cint	of = op->of ;
 		        if ((of & O_ACCMODE) == O_RDONLY) {
 		            off_t fs = ((sb.st_size == 0) ? 1 : sb.st_size) ;
 		            cs = BCEIL(fs,BLOCKBUFLEN) ;

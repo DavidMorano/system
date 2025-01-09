@@ -135,18 +135,18 @@ int recip_finish(recip *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    if (op->recipient != nullptr) {
+	    if (op->recipient) {
 	        {
 	            rs1 = uc_free(op->recipient) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->recipient = nullptr ;
 		}
-	        if (op->name != nullptr) {
+	        if (op->name) {
 	            rs1 = uc_free(op->name) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->name = nullptr ;
 	        }
-	        if (op->maildname != nullptr) {
+	        if (op->maildname) {
 	            rs1 = uc_free(op->maildname) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->maildname = nullptr ;
@@ -170,8 +170,8 @@ int recip_finish(recip *op) noex {
 
 int recip_get(recip *op,cchar **rpp) noex {
 	int		rs ;
-	cchar		*rp = nullptr ;
 	if ((rs = recip_magic(op)) >= 0) {
+	    cchar	*rp = nullptr ;
 	    if (op->recipient) {
 	        rp = op->recipient ;
 	        rs = strlen(rp) ;

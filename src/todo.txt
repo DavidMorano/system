@@ -6,7 +6,6 @@ file		what
 --------------------------------------------------------------------------------
 uctim
 libuc		fix to completely compile!
-deffile
 quote
 mailmsghdrct
 srv{x}

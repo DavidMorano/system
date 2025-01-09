@@ -36,7 +36,7 @@
 #define	MSFILE_CUR		struct msfile_cursor
 #define	MSFILE_ENT		MSFILEE_ALL
 #define	MSFILE_FL		struct msfile_flags
-#define	MSFILE_H		struct msfile_h
+#define	MSFILE_H		struct msfile_her
 
 #define	MSFILE_MAGIC		918245634
 #define	MSFILE_FILEMAGIC	"MS"
@@ -54,7 +54,7 @@
 #define	MSFILE_FPMAVAIL		0x04	/* flag-percent_memory_available */
 
 
-struct msfile_h {
+struct msfile_her {
 	uint		nentries ;
 	uint		wtime ;
 	uint		wcount ;
@@ -76,13 +76,12 @@ struct msfile_head {
 	ebuf		ebm ;		/* entry-buffer-manager */
 	mapstrint	ni ;		/* nodename index */
 	cchar		*fname ;
-	uint		magic ;
 	MSFILE_FL	f ;
 	MSFILE_H	h ;
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
-	mode_t		operm ;
+	uint		magic ;
 	int		oflags ;
 	int		pagesize ;
 	int		filesize ;
@@ -90,6 +89,7 @@ struct msfile_head {
 	int		fd ;
 	int		ncursors ;
 	int		fileversion, fileencoding, filetype ;
+	mode_t		operm ;
 	char		topbuf[MSFILE_TOPLEN + 1] ;	/* top-buffer */
 } ;
 

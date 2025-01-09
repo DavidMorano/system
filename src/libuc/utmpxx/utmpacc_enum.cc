@@ -1,4 +1,5 @@
 /* utmpaccenum SUPPORT */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* UTMPACC enumeration feature */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	utmpacc_{x}
+
+	Description:
 	These subroutines perform enumeration on UTMPACC entries.
 
 *******************************************************************************/
@@ -57,6 +62,9 @@ typedef utmpacc_ent	ent ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
