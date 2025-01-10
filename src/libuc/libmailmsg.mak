@@ -61,7 +61,7 @@ OBJ2= recip.o retpath.o envmat.o
 OBJ3= mhcom.o mcmsg.o comsatmsg.o mimetypes.o 
 OBJ4= ema.o emainfo.o comparse.o
 OBJ5= mbcache.o contypevals.o contentencodings.o
-OBJ6= whitelist.o splitaddr.o
+OBJ6= whitelist.o splitaddr.o csro.o
 OBJ7= filer_mailsup.o mailalias.o 
 
 OBJ8= hdrx.o
@@ -229,6 +229,7 @@ msgentry.o:		msgentry.cc msgentry.h			$(INCS)
 mhcom.o:		mhcom.cc mhcom.h			$(INCS)
 mcmsg.o:		mcmsg.cc mcmsg.h			$(INCS)
 comsatmsg.o:		comsatmsg.cc comsatmsg.h		$(INCS)
+csro.o:			csro.cc csro.h				$(INCS)
 emainfo.o:		emainfo.cc emainfo.h			$(INCS)
 mimetypes.o:		mimetypes.cc mimetypes.h		$(INCS)
 

@@ -133,6 +133,8 @@ struct sbuf : sbuf_head {
 	int addquoted(cchar *sp,int sl = -1) noex {
 	    return sbuf_addquoted(this,sp,sl) ;
 	} ;
+	int vprintf(cchar *,va_list) noex ;
+	int printf(cchar *,...) noex ;
 	int hexp(uint64_t,int) noex ;
 	int getpoint(cchar **) noex ;
 	int decl(long) noex ;

@@ -2,8 +2,11 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* manage a MXALIAS (Mail-X Alias) object */
+/* version %I% last-modified %G% */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MXALIAS_INCLUDE
 #define	MXALIAS_INCLUDE

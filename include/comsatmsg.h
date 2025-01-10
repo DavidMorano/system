@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1999-07-21, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	COMSATMSG_INCLUDE
 #define	COMSATMSG_INCLUDE

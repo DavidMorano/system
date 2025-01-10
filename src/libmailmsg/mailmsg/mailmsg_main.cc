@@ -277,7 +277,7 @@ int mailmsg_finish(mailmsg *op) noex {
 	        rs1 = mailmsg_envend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->slp) {
 	        rs1 = strpack_finish(op->slp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }

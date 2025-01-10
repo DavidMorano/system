@@ -522,8 +522,8 @@ int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
 
 /* PRINTFLIKE2 */
 int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
-	int		rs ;
 	va_list		ap ;
+	int		rs ;
 	{
 	    va_begin(ap,fmt) ;
 	    rs = sbuf_vprintf(op,fmt,ap) ;
@@ -623,16 +623,24 @@ int sbuf::strs(int sch,mainv sv) noex {
 }
 /* end subroutine (sbuf::strs) */
 
+int sbuf::vprintf(cchar *fmt,va_list ap) noex {
+    	return sbuf_vprintf(this,fmt,ap) ;
+}
+
+int sbuf::printf(cchar *fmt,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (fmt) {
+	    va_begin(ap,fmt) ;
+	    rs = sbuf_vprintf(this,fmt,ap) ;
+	    va_end(ap) ;
+	}
+	return rs ;
+}
+
 int sbuf::getpoint(cchar **rpp) noex {
 	return sbuf_getpoint(this,rpp) ;
 }
-
-void sbuf::dtor() noex {
-	if (cint rs = sbuf_finish(this) ; rs < 0) {
-	   ulogerror("sbuf",rs,"dtor-finish") ;
-	}
-}
-/* end subroutine (sbuf::dtor) */
 
 int sbuf::hexp(uint64_t v,int n) noex {
     	return sbuf_hexp(this,v,n) ;
@@ -641,6 +649,13 @@ int sbuf::hexp(uint64_t v,int n) noex {
 int sbuf::decl(long v) noex {
     	return sbuf_decl(this,v) ;
 }
+
+void sbuf::dtor() noex {
+	if (cint rs = sbuf_finish(this) ; rs < 0) {
+	   ulogerror("sbuf",rs,"dtor-finish") ;
+	}
+}
+/* end subroutine (sbuf::dtor) */
 
 
 /* private subroutines */

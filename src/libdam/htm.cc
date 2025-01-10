@@ -61,9 +61,10 @@
 
 template<typename ... Args>
 static int htm_ctor(htm *op,Args ... args) noex {
+    	HTM		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -241,11 +242,11 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 	    rs = SR_INVALID ;
 	    if (tag[0]) {
 	        cint	c = COLUMNS ;
-	        if (buffer b ; (rs = buffer_start(&b,c)) >= 0) {
+	        if (buffer b ; (rs = b.start(c)) >= 0) {
 	            cchar	*k ;
 	            cchar	*v ;
-	            buffer_chr(&b,CH_LANGLE) ;
-	            buffer_strw(&b,tag,-1) ;
+	            b.chr(CH_LANGLE) ;
+	            b.strw(tag,-1) ;
 	            for (int i = 0 ; i < 2 ; i += 1) {
 	                v = nullptr ;
 	                switch (i) {
@@ -259,7 +260,7 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 	                    break ;
 	                } /* end switch */
 	                if ((v != nullptr) && (v[0] != '\0')) {
-	                    rs = buffer_printf(&b," %s=\"%s\"",k,v) ;
+	                    rs = b.printf(" %s=\"%s\"",k,v) ;
 	                }
 	                if (rs < 0) break ;
 	            } /* end for */
@@ -275,19 +276,18 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 		            } else {
 	                        fmt = " %s" ;
 		            }
-	                    rs = buffer_printf(&b,fmt,kv[i][0],kv[i][1]) ;
+	                    rs = b.printf(fmt,kv[i][0],kv[i][1]) ;
 	                    if (rs < 0) break ;
 	                } /* end for */
 	            } /* end if (key-vals) */
-	            buffer_chr(&b,CH_RANGLE) ;
+	            b.chr(CH_RANGLE) ;
 	            if (rs >= 0) {
-		        cchar	*bp ;
-	                if ((rs = buffer_get(&b,&bp)) >= 0) {
+		        if (cchar *bp ; (rs = b.get(&bp)) >= 0) {
 		            rs = htm_printout(op,c,bp,rs) ;
 		            wlen += rs ;
 	                } /* enbd if (buffer_get) */
 	            } /* end if (ok) */
-	            rs1 = buffer_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (buffer) */
 	        op->wlen += wlen ;
@@ -327,9 +327,9 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	    if (tkv != nullptr) {
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; tkv[i][0] != nullptr ; i += 1) ;
-	        kvsize = (i*(2*sizeof(cchar *))) ;
+	        kvsize = (i*(2*szof(cchar *))) ;
 	    }
-	    kvsize += (6*(2*sizeof(cchar *))) ;
+	    kvsize += (6*(2*szof(cchar *))) ;
 	    bsz += kvsize ;
 	    bsz += ((dlen+1)*2) ;
 	    if (void *vp{} ; (rs = uc_malloc(bsz,&vp)) >= 0) {
@@ -389,10 +389,10 @@ int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 	if ((rs = htm_magic(op,href)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (href[0]) {
-	        if (sbuf b ; (rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(op->lbuf,op->llen)) >= 0) {
 	            cchar	*tag = "a" ;
-	            sbuf_chr(&b,CH_LANGLE) ;
-	            sbuf_strw(&b,tag,-1) ;
+	            b.chr(CH_LANGLE) ;
+	            b.strw(tag,-1) ;
 	            for (int c = 0 ; c < 4 ; c += 1) {
 	                cchar	*k = nullptr ;
 	                cchar	*v = nullptr ;
@@ -416,16 +416,16 @@ int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 	                } /* end switch */
 	                if ((v != nullptr) && (v[0] != '\0')) {
 			    cchar	*fmt = "\n %s=\"%s\"" ;
-	                    rs = sbuf_printf(&b,fmt,k,v) ;
+	                    rs = b.printf(fmt,k,v) ;
 	                }
 	                if (rs < 0) break ;
 	            } /* end for */
-	            sbuf_chr(&b,CH_RANGLE) ;
-	            if ((rs = sbuf_getlen(&b)) >= 0) {
+	            b.chr(CH_RANGLE) ;
+	            if ((rs = b.getlen) >= 0) {
 	                rs = shio_print(op->ofp,op->lbuf,rs) ;
 	                wlen += rs ;
 	            }
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	        op->wlen += wlen ;
@@ -468,10 +468,10 @@ int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 	if ((rs = htm_magic(op,src)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (src[0]) {
-	        if (sbuf b ; (rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(op->lbuf,op->llen)) >= 0) {
 	            cchar	*tag = "img" ;
-	            sbuf_chr(&b,CH_LANGLE) ;
-	            sbuf_strw(&b,tag,-1) ;
+	            b.chr(CH_LANGLE) ;
+	            b.strw(tag,-1) ;
 	            for (int c = 0 ; c < 5 ; c += 1) {
 	                cchar	*k = nullptr ;
 	                cchar	*v = nullptr ;
@@ -498,25 +498,25 @@ int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 	                    break ;
 	                } /* end switch */
 	                if ((v != nullptr) && (v[0] != '\0')) {
-	                    rs = sbuf_printf(&b,"\n %s=\"%s\"",k,v) ;
+	                    rs = b.printf("\n %s=\"%s\"",k,v) ;
 	                }
 	                if (rs < 0) break ;
 	            } /* end for */
 	            if ((rs >= 0) && (w >= 0)) {
-	                rs = sbuf_printf(&b," width=\"%d\"",w) ;
+	                rs = b.printf(" width=\"%d\"",w) ;
 	            }
 	            if ((rs >= 0) && (h >= 0)) {
-	                rs = sbuf_printf(&b," height=\"%d\"",h) ;
+	                rs = b.printf(" height=\"%d\"",h) ;
 	            }
-	            sbuf_strw(&b," /",2) ;
-	            sbuf_chr(&b,CH_RANGLE) ;
+	            b.strw(" /",2) ;
+	            b.chr(CH_RANGLE) ;
 	            if (rs >= 0) {
-	                if ((rs = sbuf_getlen(&b)) >= 0) {
+	                if ((rs = b.getlen) >= 0) {
 	                    rs = shio_print(op->ofp,op->lbuf,rs) ;
 	                    wlen += rs ;
 	                }
 	            }
-	            rs1 = sbuf_finish(&b) ;
+	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	        op->wlen += wlen ;
@@ -596,9 +596,9 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	if ((rs = htm_magic(op,tag)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (tag[0]) {
-                if (sbuf b ; (rs = sbuf_start(&b,op->lbuf,op->llen)) >= 0) {
-                    sbuf_chr(&b,CH_LANGLE) ;
-                    sbuf_strw(&b,tag,-1) ;
+                if (sbuf b ; (rs = b.start(op->lbuf,op->llen)) >= 0) {
+                    b.chr(CH_LANGLE) ;
+                    b.strw(tag,-1) ;
                     for (int c = 0 ; c < 2 ; c += 1) {
                         cchar       *k = nullptr ;
                         cchar       *v = nullptr ;
@@ -613,19 +613,19 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
                             break ;
                         } /* end switch */
                         if ((v != nullptr) && (v[0] != '\0')) {
-                            rs = sbuf_printf(&b," %s=\"%s\"",k,v) ;
+                            rs = b.printf(" %s=\"%s\"",k,v) ;
                         }
                         if (rs < 0) break ;
                     } /* end for */
-                    sbuf_strw(&b," /",2) ;
-                    sbuf_chr(&b,CH_RANGLE) ;
+                    b.strw(" /",2) ;
+                    b.chr(CH_RANGLE) ;
                     if (rs >= 0) {
-                        if ((rs = sbuf_getlen(&b)) >= 0) {
+                        if ((rs = b.getlen) >= 0) {
                             rs = shio_print(op->ofp,op->lbuf,rs) ;
                             wlen += rs ;
                         }
                     }
-                    rs1 = sbuf_finish(&b) ;
+                    rs1 = b.finish ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (sbuf) */
 	    } /* end if (valid) */

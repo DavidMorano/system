@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-02-01, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 	= 2018-11-21, David A.D. Morano
@@ -16,7 +16,7 @@
 
 */
 
-/* Copyright © 2000,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -32,6 +32,7 @@
 	all be inside a loadable and unloadble module!).  For these
 	purposes we employ the basic (and not so basic) means of
 	accomplishing this.  See the code for our various machinations.
+	This facility is thread-safe, and async-signal safe..
 
 	+ descriptions
 
@@ -165,6 +166,7 @@ namespace {
 	} ; /* end ctor */
     } ; /* end struct (utmpacc_arg) */
     struct utmpacc {
+	friend		utmpacc_co ;
 	utmpacc_co	init ;
 	utmpacc_co	fini ;
 	utmpacc_co	capbegin ;
@@ -195,12 +197,6 @@ namespace {
 	    runlevel(this,utmpaccmem_runlevel) ;
 	    users(this,utmpaccmem_users) ;
 	} ;
-	int iinit() noex ;
-	int ifini() noex ;
-	int icapbegin(int) noex ;
-	int icapend() noex ;
-	int ibegin() noex ;
-	int iend() noex ;
 	int boottime(time_t *) noex ;
 	int irunlevel() noex ;
 	int iusers(int) noex ;
@@ -214,6 +210,13 @@ namespace {
 	int getentstat(ARG *,pid_t) noex ;
 	int getentline(ARG *,cchar *,int) noex ;
 	int getextract(int) noex ;
+    private:
+	int iinit() noex ;
+	int ifini() noex ;
+	int icapbegin(int) noex ;
+	int icapend() noex ;
+	int ibegin() noex ;
+	int iend() noex ;
     } ; /* end struct (utmpacc) */
 }
 
@@ -576,7 +579,7 @@ int utmpacc::boottime(time_t *tp) noex {
 	    *tp = 0 ;
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {
 	                    custime	dt = time(nullptr) ;
 	                    cint	to = UTMPACC_INTBOOT ;
@@ -603,7 +606,7 @@ int utmpacc::irunlevel() noex {
 	int		n = 0 ;
 	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init) >= 0) {
-	        if ((rs = capbegin(-1)) >= 0) {
+	        if ((rs = capbegin) >= 0) {
 		    if ((rs = begin) >= 0) {
 	                custime		dt = time(nullptr) ;
 	                cint		to = UTMPACC_INTRUNLEVEL ;
@@ -630,7 +633,7 @@ int utmpacc::iusers(int w) noex {
 	if ((w >= 0) && (w < UTMPACC_NTYPES)) {
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {
 	                    custime	dt = time(nullptr) ;
 	                    cint	to = UTMPACC_INTUSERS ;
@@ -661,7 +664,7 @@ int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 	    if (sid <= 0) sid = getsid(0) ;
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentsid(ap,sid) ;
@@ -690,7 +693,7 @@ int utmpacc::entstat(ARG *ap,pid_t sid) noex {
 	    if (sid <= 0) sid = getsid(0) ;
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentstat(ap,sid) ;
@@ -718,7 +721,7 @@ int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 	    ap->uebuf[0] = '\0' ;
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentline(ap,lp,ll) ;
@@ -745,7 +748,7 @@ int utmpacc::stats(utmpacc_sb *usp) noex {
 	    memclear(usp) ;
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {
 	                    usp->maxusers = maxusers ;
 	                    usp->maxents = maxents ;
@@ -770,7 +773,7 @@ int utmpacc::extract(int fd) noex {
 	if (fd >= 0) {
 	    if (sigblocker b ; (rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin(-1)) >= 0) {
+	            if ((rs = capbegin) >= 0) {
 		        if ((rs = begin) >= 0) {
 			    {
 			        rs = getextract(fd) ;

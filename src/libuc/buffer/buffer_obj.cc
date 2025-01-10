@@ -138,4 +138,18 @@ int buffer::blanks(int n) noex {
 	return buffer_blanks(this,n) ;
 }
 
+int buffer::vprintf(cchar *fmt,va_list ap) noex {
+    	return buffer_vprintf(this,fmt,ap) ;
+}
+
+int buffer::printf(cchar *fmt,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (fmt) {
+	    va_begin(ap,fmt) ;
+	    rs = buffer_vprintf(this,fmt,ap) ;
+	    va_end(ap) ;
+	}
+	return rs ;
+}
 

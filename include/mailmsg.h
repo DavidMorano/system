@@ -60,6 +60,7 @@ extern int mailmsg_hdrikey(mailmsg *,int,cchar **) noex ;
 extern int mailmsg_hdriline(mailmsg *,cchar *,int,int,cchar **) noex ;
 extern int mailmsg_hdrival(mailmsg *,cchar *,int,cchar **) noex ;
 extern int mailmsg_hdrval(mailmsg *,cchar *,cchar **) noex ;
+extern int mailmsg_loadfd(mailmsg *,int,off_t) noex ;
 extern int mailmsg_finish(mailmsg *) noex ;
 
 EXTERNC_end

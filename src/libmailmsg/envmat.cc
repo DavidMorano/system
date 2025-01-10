@@ -10,7 +10,7 @@
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
 /***************************************************************************

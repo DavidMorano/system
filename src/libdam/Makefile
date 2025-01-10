@@ -741,6 +741,7 @@ textlook.o:		textlook.cc textlook.h
 searchkeys.o:		searchkeys.cc searchkeys.h
 xwords.o:		xwords.cc xwords.h
 rtags.o:		rtags.cc rtags.h
+cgi.o:			cgi.cc cgi.h
 
 # DATABASE
 database.o:		database.dir

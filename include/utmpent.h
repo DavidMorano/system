@@ -44,7 +44,6 @@
 #define	UTMPENT_TDEADPROC	8	/* dead process (moved to WUTMPENT) */
 #define	UTMPENT_TACCOUNT	9	/* used in WUTMPENT only? */
 #define	UTMPENT_TSIGNATURE	10	/* used in WUTMPENT only? */
-
 /* entry lengths */
 #define	UTMPENT_LID		4
 #define	UTMPENT_LUSER		32

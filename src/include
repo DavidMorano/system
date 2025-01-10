@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1994-09-01, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1994 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OURMSGINFO_INCLUDE
 #define	OURMSGINFO_INCLUDE

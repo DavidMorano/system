@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-02-15, David A­D­ Morano
+	= 1995-04-01, David A­D­ Morano
 	This code was started for Levo related work.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ENVMAT_INCLUDE
 #define	ENVMAT_INCLUDE

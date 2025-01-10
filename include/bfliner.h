@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-04-01, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BFLINER_INCLUDE
 #define	BFLINER_INCLUDE

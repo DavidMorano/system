@@ -26,6 +26,16 @@
 	a text file).  Note that unlike the |fileliner(3dam)|
 	subroutine, no comment character can be specified.
 
+	Synopsis:
+	int filelines(cchar *fn) noex
+
+	Arguments:
+	fn		file-name
+
+	Returns:
+	>=0		number of lines in file
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */

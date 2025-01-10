@@ -14,10 +14,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types - |off_t| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<hdb.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 /* object defines */

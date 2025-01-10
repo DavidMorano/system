@@ -20,7 +20,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Group:
 	utmpent
 
 	Description:
@@ -29,11 +29,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<strn.h>

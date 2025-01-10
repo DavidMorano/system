@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	KEYSYMER_INCLUDE
 #define	KEYSYMER_INCLUDE

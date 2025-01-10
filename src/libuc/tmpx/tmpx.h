@@ -124,12 +124,25 @@ typedef TMPX_ENT	tmpx_ent ;
 
 #ifdef	__cplusplus
 enum tmpxmems {
+    	tmpxmem_open,
     	tmpxmem_getrunlevel,
 	tmpxmem_nusers,
 	tmpxmem_close,
 	tmpxmem_overlast
 } ;
 struct tmpx ;
+struct tmpx_op {
+	tmpx		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (tmpx *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (cchar * = nullptr,int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (tmpx_op) */
 struct tmpx_co {
 	tmpx		*op = nullptr ;
 	int		w = -1 ;
@@ -143,17 +156,18 @@ struct tmpx_co {
 	} ;
 } ; /* end struct (tmpx_co) */
 struct tmpx : tmpx_head {
+    	tmpx_op		open ;
 	tmpx_co		getrunlevel ;
 	tmpx_co		nusers ;
 	tmpx_co		close ;
 	tmpx() noex {
+	    open(this,tmpxmem_open) ;
 	    getrunlevel(this,tmpxmem_getrunlevel) ;
 	    nusers(this,tmpxmem_nusers) ;
 	    close(this,tmpxmem_close) ;
 	} ;
 	tmpx(const tmpx &) = delete ;
 	tmpx &operator = (const tmpx &) = delete ;
-	int open(cchar *,int = 0) noex ;
 	int read(int,tmpx_ent *) noex ;
 	int write(int,tmpx_ent *) noex ;
 	int check(time_t) noex ;

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int deffile_ctor(deffile *op,Args ... args) noex {
+static int chi_ctor(chi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int deffile_ctor(deffile *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (deffile_ctor) */
+/* end subroutine (chi_ctor) */
 
-static int deffile_dtor(deffile *op) noex {
+static int chi_dtor(chi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (deffile_dtor) */
+/* end subroutine (chi_dtor) */
 
 template<typename ... Args>
-static inline int deffile_magic(deffile *op,Args ... args) noex {
+static inline int chi_magic(chi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DEFFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CGI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (deffile_magic) */
+/* end subroutine (chi_magic) */

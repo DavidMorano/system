@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIRDB_INCLUDE
 #define	DIRDB_INCLUDE

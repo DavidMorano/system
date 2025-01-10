@@ -17,8 +17,8 @@
 
 /*******************************************************************************
 
-  	Object:
-	mailmsg
+	Name:
+	mailmsg_loadfd
 
 	Description:
 	This subroutine loads a mail-message (into the MAILMSG
@@ -74,20 +74,18 @@
 /* exported subroutines */
 
 int mailmsg_loadfd(mailmsg *op,int mfd,off_t fbo) noex {
-	cint		bsize = 2048 ;
+	cint		bsz = 2048 ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
 	if ((rs = mailmsg_magic(op)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
 		cint	llen = (rs * MAILMSG_MF) ;
-		char	*lbuf{} ;
-		if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-		    filer	b ;
+		if (char *lbuf{} ; (rs = uc_malloc((llen+1),&lbuf)) >= 0) {
 	    	    cchar	*lp = lbuf ;
-	            if ((rs = filer_start(&b,mfd,fbo,bsize,0)) >= 0) {
+		    if (filer b ; (rs = b.start(mfd,fbo,bsz,0)) >= 0) {
 			int	line = 0 ;
-	                while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
+	                while ((rs = b.readln(lbuf,llen,-1)) > 0) {
 	                    int		ll = rs ;
 	                    tlen += ll ;
 	                    while ((ll > 0) && ISEND(lbuf[0])) {
@@ -99,7 +97,7 @@ int mailmsg_loadfd(mailmsg *op,int mfd,off_t fbo) noex {
 	                    }
 	                    if (rs <= 0) break ;
 	                } /* end while (reading lines) */
-	                rs1 = filer_finish(&b) ;
+	                rs1 = b.finish ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (filer) */
 	    	    rs1 = uc_free(lbuf) ;

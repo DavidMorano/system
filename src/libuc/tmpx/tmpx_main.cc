@@ -2,10 +2,11 @@
 /* encoding=ISO8859-1 */
 /* lang=C++20 */
 
-/* manage reading or writing of the [UW]TMP database */
+/* manage access of the [UW]TMP database */
 /* version %I% last-modified %G% */
 
 #define	CF_DYNENTS	1		/* dynamic entries per read */
+#define	CF_UTMPACC	1		/* use UTMPACC */
 
 /* revision history:
 
@@ -13,9 +14,27 @@
 	This subroutine module was adopted for use from some previous
 	code that performed similar sorts of functions.
 
+	= 2025-01-09, David A­D­ Morano
+	I changed the code slightly (maybe that is debatable) to
+	only retrieved records from the UTMPACC facility rather
+	than from the raw file (as before).  Accessing the raw file
+	was always really non-portable, so I convinved myself to
+	make this facility object (TMPX) portable by using UTMPACC,
+	which itself eventually makes calls into the system-supplied
+	subroutine for UTMPX access.  I may enhance this in the
+	future, but we have gone now for at least 25 years (or
+	longer, whatever was before this present code) and the need
+	to do anything other than read some UTMPX entries (lile
+	writing them) has not really been important.  The change
+	was amazingly rather simple.  Just look at the boolen
+	variable |f_utmpacc| variable and where it is used to see
+	the quite small change of how to open a file for mapping.
+	The function |tmpx_write()| will succed but the entry gord
+	nowhere (to a TMP file that vanishes after use).
+
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -23,9 +42,11 @@
 	tmpx
 
 	Description:
-	This code is used to access the Utmpx (or WTMPX) database.
-	Those databases constitute the connect-time accounting
-	information for the system.
+	This code is used to access the UTMPX (or WTMPX) database.
+	Those databases constitute the login-time accounting
+	information for the system.  The motivation for this object
+	was to get a thread-safe access facility to the system UTMPX
+	dataase.
 
 *******************************************************************************/
 
@@ -35,15 +56,18 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<utmpacc.h>
+#include	<getfdfile.h>
+#include	<opentmp.h>
 #include	<sysval.hh>
 #include	<intfloor.h>
 #include	<intceil.h>
-#include	<getfdfile.h>
 #include	<localmisc.h>
 
 #include	"tmpx.h"
@@ -62,6 +86,11 @@
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -101,6 +130,7 @@ constexpr int		proctypes[] = {
 static sysval		pagesize(sysval_ps) ;
 
 constexpr bool		f_dynents = CF_DYNENTS ;
+constexpr bool		f_utmpacc = CF_UTMPACC ;
 
 
 /* exported variables */
@@ -371,7 +401,7 @@ int tmpx_nusers(tmpx *op) noex {
                 en = ((op->fsize / esz) + 1) ;
             } else {
                 en = TMPX_NENTS ;
-            }
+            } /* end if_constexpr (f_dynents) */
             if (op->ncursors == 0) {
                 rs = tmpx_filesize(op,0L) ;
             }
@@ -493,21 +523,37 @@ static int tmpx_fileopen(tmpx *op,time_t dt) noex {
 }
 /* end subroutine (tmpx_fileopen) */
 
+/* this is where I modified some code (David Morano, 2025) */
 static int tmpx_fileopener(tmpx *op) noex {
+    	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = getfdfile(op->fname,-1)) >= 0) {
-	    cint	fd = rs ;
-	    cint	fdmin = 10 ;
-	    if ((rs = uc_duper(fd,fdmin)) >= 0) {
-	        op->fd = rs ;
+	if_constexpr (f_utmpacc) { /* new code */
+	    cint	of = (O_CLOEXEC | O_MINFD) ;
+	    cmode	om = 0664 ;
+	    if ((rs = opentmp(np,of,om)) >= 0) {
+		cint	fd = rs ;
+		if ((rs = utmpacc_extract(fd)) >= 0) { /* <- money shot! */
+		    op->fd = fd ;
+		}
+		if (rs < 0) {
+		    uc_close(fd) ;
+		}
+	    } /* end if (opentmp) */
+	} else { /* old code (still here) */
+	    if ((rs = getfdfile(op->fname,-1)) >= 0) {
+	        cint	fd = rs ;
+	        cint	fdmin = 10 ;
+	        if ((rs = uc_duper(fd,fdmin)) >= 0) {
+	            op->fd = rs ;
+	        }
+	    } else if ((rs == SR_DOM) || (rs == SR_BADF)) {
+	        cint	of = op->oflags ;
+	        cmode	om = 0660 ;
+	        if ((rs = uc_open(op->fname,of,om)) >= 0) {
+	            op->fd = rs ;
+	        }
 	    }
-	} else if ((rs == SR_DOM) || (rs == SR_BADF)) {
-	    cint	of = op->oflags ;
-	    cmode	om = 0660 ;
-	    if ((rs = uc_open(op->fname,of,om)) >= 0) {
-	        op->fd = rs ;
-	    }
-	}
+	} /* end if_constexpr (f_utmpacc) */
 	return rs ;
 }
 /* end subroutine (tmpx_fileopener) */
@@ -572,38 +618,34 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 }
 /* end subroutine (tmpx_mapents) */
 
-static int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsize) noex {
-	off_t		mo = woff ;
-	size_t		ms = wsize ;
-	uint		eoff ;
-	uint		eext ;
-	uint		e ;
-	cint		esz = TMPX_ENTSIZE ;
-	int		rs = SR_OK ;
-	int		fd = op->fd ;
-	int		mp = PROT_READ ;
-	int		mf = MAP_SHARED ;
+static int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsz) noex {
+    	cnullptr	np{} ;
+	csize		ms = size_t(wsz) ;
+	coff		mo = off_t(woff) ;
+	cuint		esz = TMPX_ENTSIZE ;
+	cuint		fsz = uint(op->fsize) ;
+	cint		mp = PROT_READ ;
+	cint		mf = MAP_SHARED ;
+	cint		fd = op->fd ;
+	int		rs ;
 	int		n = 0 ;
-	void		*md{} ;
 	if (op->mapdata) {
 	    u_mmapend(op->mapdata,op->mapsize) ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
 	    op->mapen = 0 ;
 	}
-	if ((rs = u_mmapbegin(nullptr,ms,mp,mf,fd,mo,&md)) >= 0) {
-	    cint		madv = MADV_SEQUENTIAL ;
-	    const caddr_t	ma = caddr_t(md) ;
-	    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
-		csize	esize = size_t(esz) ;
+	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,mo,&md)) >= 0) {
+	    cuint	eoff = uceil(woff,esz) ;
+	    cuint	e = min((woff + wsz),fsz) ;
+	    cint	madv = MADV_SEQUENTIAL ;
+	    if ((rs = u_madvise(md,ms,madv)) >= 0) {
+	        cuint	eext = ufloor(e,esz) ;
 	        op->mapdata = caddr_t(md) ;
 	        op->mapsize = ms ;
-	        op->mapoff = uint(mo) ;
-	        eoff = uceil(woff,esize) ;
-	        e = MIN((woff + wsize),op->fsize) ;
-	        eext = ufloor(e,esz) ;
-	        op->mapei = eoff / esize ;
-	        op->mapen = (eext - eoff) / esize ;
+	        op->mapoff = woff ;
+	        op->mapei = eoff / esz ;
+	        op->mapen = (eext - eoff) / esz ;
 	        if (ei >= op->mapei) {
 	            n = ((op->mapei + op->mapen) - ei) ;
 		}

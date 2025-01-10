@@ -81,8 +81,8 @@ int mailmsg_loadmb(mailmsg *op,mailbox *mbp,off_t fbo) noex {
 	        cint	llen = (rs * MAILMSG_MF) ;
 	        if (char *lbuf{} ; (rs = uc_malloc((llen+1),&lbuf)) >= 0) {
 	            mailbox_read	cur ;
-	            cint		bsize = MAILMSG_BSIZE ;
-	            if ((rs = mailbox_readbegin(mbp,&cur,fbo,bsize)) >= 0) {
+	            cint		bsz = MAILMSG_BSIZE ;
+	            if ((rs = mailbox_readbegin(mbp,&cur,fbo,bsz)) >= 0) {
 	                int	line = 0 ;
 	    	        cchar	*lp = lbuf ;
 	                while ((rs = mailbox_readln(mbp,&cur,lbuf,llen)) > 0) {

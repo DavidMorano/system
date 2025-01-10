@@ -31,7 +31,7 @@
 	email addresses will be hashed with the index being the
 	host part of the address.  This allows super quick retrival
 	of those email addresses belonging to a particular host
-	(maybe this wasn not an imperative but that is what we did).
+	(maybe this was not an imperative but that is what we did).
 	The host parts are stored in a simple VECSTR container
 	object and all email addresess are registered in a VECOBJ
 	container object.
@@ -148,7 +148,7 @@ int csro_start(csro *op,int n) noex {
 	int		rs ;
 	if ((rs = csro_ctor(op)) >= 0) {
 	    int		vo = VECSTR_OCONSERVE ;
-	    int		sz = sizeof(csro_val) ;
+	    int		sz = szof(csro_val) ;
 	    if (n <= 1) n = CSRO_DEFENTS ;
 	    if ((rs = vecstr_start(op->nlp,n,vo)) >= 0) {
 		vo = 0 ;

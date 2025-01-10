@@ -67,10 +67,6 @@
 
 /* exported subroutines */
 
-int tmpx::open(cchar *fn,int of) noex {
-	return tmpx_open(this,fn,of) ;
-}
-
 int tmpx::read(int ei,tmpx_ent *ep) noex {
 	return tmpx_read(this,ei,ep) ;
 }
@@ -108,6 +104,19 @@ void tmpx::dtor() noex {
 	    ulogerror("tmpx",rs,"fini-close") ;
 	}
 }
+
+int tmpx_op::operator () (cchar *fn,int of) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case tmpxmem_open:
+		rs = tmpx_open(op,fn,of) ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (tmpx_op::operator) */
 
 tmpx_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;

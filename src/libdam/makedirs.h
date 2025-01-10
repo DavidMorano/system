@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-02-15, David A­D­ Morano
+	= 1998-10-01, David A­D­ Morano
 	This code was started for Levo related work.
 
 */
